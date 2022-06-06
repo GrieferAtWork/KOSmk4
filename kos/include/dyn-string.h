@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41c4b0d3 */
+/* HASH CRC-32:0xcdcb5e5a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: EMX kLIBC (/libc/include/dyn-string.h) */
 /* (#) Portability: libiberty (/include/dyn-string.h) */
 #ifndef _DYN_STRING_H
 #define _DYN_STRING_H 1

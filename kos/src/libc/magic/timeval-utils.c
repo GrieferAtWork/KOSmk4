@@ -38,7 +38,7 @@ __SYSDECL_BEGIN
 [[no_crt_self_import, decl_include("<bits/os/timeval.h>")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timeval_add")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timeval_add64")]]
-[[impl_include("<bits/os/timeval.h>")]]
+[[impl_include("<bits/os/timeval.h>", "<bits/types.h>")]]
 void timeval_add([[out]] struct timeval *result,
                  [[in]] struct timeval const *lhs,
                  [[in]] struct timeval const *rhs) {
@@ -53,7 +53,7 @@ void timeval_add([[out]] struct timeval *result,
 [[no_crt_self_import, decl_include("<bits/os/timeval.h>")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timeval_sub")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timeval_sub64")]]
-[[impl_include("<bits/os/timeval.h>")]]
+[[impl_include("<bits/os/timeval.h>", "<bits/types.h>")]]
 void timeval_sub([[out]] struct timeval *result,
                  [[in]] struct timeval const *lhs,
                  [[in]] struct timeval const *rhs) {
@@ -71,7 +71,7 @@ void timeval_sub([[out]] struct timeval *result,
 
 [[decl_include("<bits/os/timeval.h>")]]
 [[preferred_time64_variant_of(timeval_add), doc_alias("timeval_add")]]
-[[impl_include("<bits/os/timeval.h>")]]
+[[impl_include("<bits/os/timeval.h>", "<bits/types.h>")]]
 void timeval_add64([[out]] struct timeval64 *result,
                    [[in]] struct timeval64 const *lhs,
                    [[in]] struct timeval64 const *rhs) {
@@ -85,7 +85,7 @@ void timeval_add64([[out]] struct timeval64 *result,
 
 [[decl_include("<bits/os/timeval.h>")]]
 [[preferred_time64_variant_of(timeval_sub), doc_alias("timeval_sub")]]
-[[impl_include("<bits/os/timeval.h>")]]
+[[impl_include("<bits/os/timeval.h>", "<bits/types.h>")]]
 void timeval_sub64([[out]] struct timeval64 *result,
                    [[in]] struct timeval64 const *lhs,
                    [[in]] struct timeval64 const *rhs) {

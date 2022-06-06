@@ -51,13 +51,13 @@ require_utility openssl    "$PKG_CONFIG_PATH/openssl.pc"
 #    number(1):       Works
 #    phantasia(1):    Coredumps immediately
 #    pig(1):          Works
-#    pom(1):          Unimplemented function called: `sin()'
+#    pom(1):          Works
 #    ppt(1):          Works
 #    primes(1):       Works
 #    quiz(1):         Works
 #    rain(1):         Works
 #    random(1):       Works
-#    robots(1):       Works               -- Though I don't know how to play that game)
+#    robots(1):       Works               -- Though I don't know how to play that game
 #    rot13(1):        Works
 #    sail(1):         "sail: syncfile: No such file or directory"
 #    snake(1):        Works

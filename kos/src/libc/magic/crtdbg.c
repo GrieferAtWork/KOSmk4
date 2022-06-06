@@ -26,6 +26,13 @@
 %[define_replacement(size_t = __SIZE_TYPE__)]
 %[default:section(".text.crt.dos.heap.debug_malloc")]
 
+%[define_decl_include_implication("<bits/crt/dos/_CrtMemState.h>" => ["<hybrid/typecore.h>"])]
+%[define_decl_include("<bits/crt/dos/_CrtMemState.h>": [
+	"struct _CrtMemBlockHeader",
+	"struct _CrtMemState",
+	"_CrtMemState",
+])]
+
 %[insert:prefix(
 #include <features.h>
 )]%{
@@ -40,6 +47,8 @@
 #include <bits/types.h>
 )]%[insert:prefix(
 #include <parts/assert.h>
+)]%[insert:prefix(
+#include <bits/crt/dos/_CrtMemState.h>
 )]%{
 
 }%[insert:prefix(
@@ -88,16 +97,6 @@
 
 #define _CRTDBG_REPORT_FLAG (-1)
 
-#define _BLOCK_TYPE(block)    ((block) & 0xffff)
-#define _BLOCK_SUBTYPE(block) ((block) >> 16 & 0xffff)
-
-#define _FREE_BLOCK   0
-#define _NORMAL_BLOCK 1
-#define _CRT_BLOCK    2
-#define _IGNORE_BLOCK 3
-#define _CLIENT_BLOCK 4
-#define _MAX_BLOCKS   5
-
 #ifndef _STATIC_ASSERT
 #define _STATIC_ASSERT(expr) __STATIC_ASSERT(expr)
 #endif /* !_STATIC_ASSERT */
@@ -124,36 +123,12 @@ typedef int (__ATTR_CLRCALL *_CRT_ALLOC_HOOK_M)(int, void *, __SIZE_TYPE__, int,
 typedef void (__ATTR_CLRCALL *_CRT_DUMP_CLIENT_M)(void *, __SIZE_TYPE__);
 #endif /* _M_CEE */
 
-
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("pBlockHeader")
-#pragma push_macro("lCounts")
-#pragma push_macro("lSizes")
-#pragma push_macro("lHighWaterCount")
-#pragma push_macro("lTotalCount")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef pBlockHeader
-#undef lCounts
-#undef lSizes
-#undef lHighWaterCount
-#undef lTotalCount
-struct _CrtMemBlockHeader;
-typedef struct _CrtMemState {
-	struct _CrtMemBlockHeader *pBlockHeader;
-	__SIZE_TYPE__              lCounts[_MAX_BLOCKS];
-	__SIZE_TYPE__              lSizes[_MAX_BLOCKS];
-	__SIZE_TYPE__              lHighWaterCount;
-	__SIZE_TYPE__              lTotalCount;
-} _CrtMemState;
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("lTotalCount")
-#pragma pop_macro("lHighWaterCount")
-#pragma pop_macro("lSizes")
-#pragma pop_macro("lCounts")
-#pragma pop_macro("pBlockHeader")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-
+}%[define(DEFINE__PFNCRTDOFORALLCLIENTOBJECTS =
+@@pp_ifndef ___PFNCRTDOFORALLCLIENTOBJECTS_defined@@
+#define ___PFNCRTDOFORALLCLIENTOBJECTS_defined
 typedef void (__ATTR_CDECL *_PFNCRTDOFORALLCLIENTOBJECTS)(void *, void *);
+@@pp_endif@@
+)]%[insert:prefix(DEFINE__PFNCRTDOFORALLCLIENTOBJECTS)]%{
 
 
 #ifndef _DEBUG
@@ -605,6 +580,7 @@ __WCHAR16_TYPE__ *_wgetdcwd_dbg(int driveno, [[out(? <= buflen)]] __WCHAR16_TYPE
 %[insert:guarded_function(_getdcwd_lk_dbg = _getdcwd_dbg)]
 %[insert:guarded_function(_wgetdcwd_lk_dbg = _wgetdcwd_dbg)]
 
+[[decl_include("<crtdefs.h>")]]
 [[guard, attribute(@_Check_return_wat_@)]]
 [[crt_dos_only, requires_function(_dupenv_s)]]
 [[decl_include("<bits/types.h>")]]
@@ -617,6 +593,7 @@ $errno_t _dupenv_s_dbg([[out]] char **pbuf, [[out]] $size_t *pbufsize,
 	return _dupenv_s(pbuf, pbufsize, varname);
 }
 
+[[decl_include("<crtdefs.h>")]]
 [[guard, attribute(@_Check_return_wat_@), crt_dos_only]]
 [[decl_include("<bits/types.h>")]]
 $errno_t _wdupenv_s_dbg([[out]] __WCHAR16_TYPE__ **pbuf, [[out]] $size_t *pbuflen,
@@ -639,7 +616,7 @@ int _CrtCheckMemory() {
 	return 0;
 }
 
-[[crt_dos_only]]
+[[crt_dos_only, decl_prefix(DEFINE__PFNCRTDOFORALLCLIENTOBJECTS)]]
 void _CrtDoForAllClientObjects([[nonnull]] _PFNCRTDOFORALLCLIENTOBJECTS pfn, void *context) {
 	COMPILER_IMPURE();
 	(void)pfn;
@@ -682,11 +659,13 @@ int _CrtReportBlockType(void const *ptr) {
 }
 
 [[crt_dos_only]]
+[[decl_include("<bits/crt/dos/_CrtMemState.h>")]]
 void _CrtMemCheckpoint([[out]] _CrtMemState *state) {
 	bzero(state, sizeof(*state));
 }
 
 [[crt_dos_only]]
+[[decl_include("<bits/crt/dos/_CrtMemState.h>")]]
 int _CrtMemDifference([[out]] _CrtMemState *state,
                       [[in]] _CrtMemState const *old_state,
                       [[in]] _CrtMemState const *new_state) {
@@ -697,12 +676,14 @@ int _CrtMemDifference([[out]] _CrtMemState *state,
 }
 
 [[crt_dos_only]]
+[[decl_include("<bits/crt/dos/_CrtMemState.h>")]]
 void _CrtMemDumpAllObjectsSince([[in]] _CrtMemState const *state) {
 	COMPILER_IMPURE();
 	(void)state;
 }
 
 [[crt_dos_only]]
+[[decl_include("<bits/crt/dos/_CrtMemState.h>")]]
 void _CrtMemDumpStatistics([[in]] _CrtMemState const *state) {
 	COMPILER_IMPURE();
 	(void)state;

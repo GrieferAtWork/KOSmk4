@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f107d41 */
+/* HASH CRC-32:0x779efab9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_except_print_short_description_defined
 #define __local_except_print_short_description_defined
 #include <__crt.h>
-struct exception_data;
+#include <kos/bits/exception_data.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_except_as_errno_defined
@@ -38,9 +38,6 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_except_name_defined
 #define __local___localdep_except_name_defined
 #ifdef __CRT_HAVE_except_name
-__NAMESPACE_LOCAL_END
-#include <kos/bits/exception_data.h>
-__NAMESPACE_LOCAL_BEGIN
 __COMPILER_CREDIRECT(__LIBC,__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__LIBKCALL,__localdep_except_name,(__except_code_t __code),except_name,(__code))
 #else /* __CRT_HAVE_except_name */
 __NAMESPACE_LOCAL_END
@@ -81,7 +78,6 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/host.h>
 #include <kos/except/codes.h>
-#include <kos/bits/exception_data.h>
 #include <bits/crt/inttypes.h>
 #include <libregdump/register.h>
 #include <dlfcn.h>

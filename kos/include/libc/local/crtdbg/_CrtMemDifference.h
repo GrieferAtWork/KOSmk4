@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5915b015 */
+/* HASH CRC-32:0x5eb253d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__CrtMemDifference_defined
 #define __local__CrtMemDifference_defined
 #include <__crt.h>
+#include <bits/crt/dos/_CrtMemState.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_bzero_defined
 #define __local___localdep_bzero_defined
@@ -46,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_bzero __LIBC_LOCAL_NAME(bzero)
 #endif /* !... */
 #endif /* !__local___localdep_bzero_defined */
-__LOCAL_LIBC(_CrtMemDifference) int
+__LOCAL_LIBC(_CrtMemDifference) __ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1) int
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_CrtMemDifference))(_CrtMemState *__state, _CrtMemState const *__old_state, _CrtMemState const *__new_state) {
 	(void)__old_state;
 	(void)__new_state;

@@ -19,6 +19,11 @@
  */
 %[default:section(".text.crt{|.dos}.sched.rpc")]
 
+%[define_decl_include_implication("<kos/bits/guid.h>" => ["<bits/types.h>"])]
+%[define_decl_include("<kos/bits/guid.h>": ["__guid_t", "__GUID_STRLEN"])]
+%[define_replacement(GUID_STRLEN = __GUID_STRLEN)]
+%[define_replacement(guid_t = __guid_t)]
+
 %[insert:prefix(
 #include <features.h>
 )]%[insert:prefix(
@@ -30,15 +35,9 @@
 }%[insert:prefix(
 #include <bits/crt/inttypes.h>
 )]%[insert:prefix(
-#include <bits/types.h>
+#include <kos/bits/guid.h>
 )]%{
 
-#define __OFFSET_GUID_A 0
-#define __OFFSET_GUID_B 4
-#define __OFFSET_GUID_C 6
-#define __OFFSET_GUID_D 8
-#define __OFFSET_GUID_E 10
-#define __SIZEOF_GUID   16
 #ifdef __USE_KOS_KERNEL
 #define OFFSET_GUID_A __OFFSET_GUID_A
 #define OFFSET_GUID_B __OFFSET_GUID_B
@@ -51,48 +50,8 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("g_guid")
-#pragma push_macro("g_a")
-#pragma push_macro("g_b")
-#pragma push_macro("g_c")
-#pragma push_macro("g_d")
-#pragma push_macro("g_e_1")
-#pragma push_macro("g_e_2")
-#pragma push_macro("g_data")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef g_guid
-#undef g_a
-#undef g_b
-#undef g_c
-#undef g_d
-#undef g_e_1
-#undef g_e_2
-#undef g_data
-
 /* Example: "054b1def-b2ae-4d99-a99c-54b9730c3dc3" */
-typedef union __ATTR_PACKED {
-	__u8       g_guid[16]; /* GUID */
-	struct {
-		__be32 g_a;
-		__be16 g_b;
-		__be16 g_c;
-		__be16 g_d;
-		__be32 g_e_1;
-		__be16 g_e_2;
-	}          g_data;
-} guid_t;
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("g_data")
-#pragma pop_macro("g_e_2")
-#pragma pop_macro("g_e_1")
-#pragma pop_macro("g_d")
-#pragma pop_macro("g_c")
-#pragma pop_macro("g_b")
-#pragma pop_macro("g_a")
-#pragma pop_macro("g_guid")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-
+typedef __guid_t guid_t;
 
 #define GUID_A(x) __hybrid_betoh32((x).g_data.g_a)
 #define GUID_B(x) __hybrid_betoh16((x).g_data.g_b)
@@ -105,7 +64,7 @@ typedef union __ATTR_PACKED {
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 
 /* Length of the string representation of a GUID */
-#define GUID_STRLEN 36
+#define GUID_STRLEN __GUID_STRLEN /* 36 */
 
 /* Printf helpers for GUID printing */
 #define FORMAT_GUID_T         "%" __PRINP_4 "-%" __PRINP_2 "-%" __PRINP_2 "-%" __PRINP_2 "-%.12" __PRI8_PREFIX "X"
@@ -153,9 +112,6 @@ typedef union __ATTR_PACKED {
 
 }
 
-%[define_replacement(guid_t = guid_t)]
-
-
 @@>> guid_fromstr(3)
 @@Convert a given `string' into a GUID
 @@>> guid_t g;
@@ -163,7 +119,8 @@ typedef union __ATTR_PACKED {
 @@@return: string + GUID_STRLEN: Success
 @@@return: NULL:                 `string' isn't a valid GUID.
 [[kernel, impl_include("<libc/template/hex.h>")]]
-char const *guid_fromstr([[in]] char const string[@GUID_STRLEN@],
+[[decl_include("<kos/bits/guid.h>")]]
+char const *guid_fromstr([[in]] char const string[@__GUID_STRLEN@],
                          [[out]] guid_t *__restrict result) {
 	unsigned int i;
 	for (i = 0; i < 16; ++i) {

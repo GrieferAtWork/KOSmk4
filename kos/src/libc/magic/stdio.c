@@ -883,7 +883,7 @@ int setvbuf([[inout]] FILE *__restrict stream,
 [[                                                                           alias(CNL_fgetc...)]]
 [[                                                                           alias(CNL_fgetc_unlocked...)]]
 [[userimpl, requires((defined(__CRT_DOS) && $has_function(_filbuf)) || $has_function(crt_fread))]]
-[[impl_include("<bits/crt/io-file.h>")]]
+[[impl_include("<bits/crt/io-file.h>", "<asm/crt/stdio.h>")]]
 int fgetc([[inout]] FILE *__restrict stream) {
 @@pp_if defined(__CRT_DOS) && $has_function(_filbuf) && (defined(__USE_STDIO_UNLOCKED) || !$has_function(crt_fread))@@
 	return --stream->__f_cnt >= 0 ? (int)((u8)*stream->__f_ptr++) : _filbuf(stream);
@@ -918,7 +918,7 @@ int getchar() {
 [[                                                                           alias(CNL_fputc...)]]
 [[                                                                           alias(CNL_fputc_unlocked...)]]
 [[crtbuiltin, userimpl, requires((defined(__CRT_DOS) && $has_function(_flsbuf)) || $has_function(crt_fwrite))]]
-[[impl_include("<bits/crt/io-file.h>", "<features.h>")]]
+[[impl_include("<bits/crt/io-file.h>", "<features.h>", "<asm/crt/stdio.h>")]]
 int fputc(int ch, [[inout]] FILE *__restrict stream) {
 @@pp_if defined(__CRT_DOS) && $has_function(_flsbuf) && (defined(__USE_STDIO_UNLOCKED) || !$has_function(crt_fwrite))@@
 	return --stream->__f_cnt >= 0 ? (int)((u8)(*stream->__f_ptr++ = (char)ch)) : _flsbuf(ch, stream);
@@ -952,8 +952,9 @@ int putchar(int ch) {
 @@Afterwards, append a trailing NUL-character and re-return `buf', or return `NULL' on error.
 [[std, cp_stdio, wunused, decl_include("<features.h>")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("fgets_unlocked")]]
-[[export_alias("_IO_fgets"), alias("fgets_unlocked"), impl_include("<hybrid/typecore.h>", "<libc/errno.h>")]]
-[[requires($has_function(fgetc) && $has_function(ungetc) && $has_function(ferror))]]
+[[export_alias("_IO_fgets"), alias("fgets_unlocked")]]
+[[requires_function(fgetc, ungetc, ferror)]]
+[[impl_include("<hybrid/typecore.h>", "<libc/errno.h>", "<asm/crt/stdio.h>")]]
 char *fgets([[out(? <= bufsize)]] char *__restrict buf,
             __STDC_INT_AS_SIZE_T bufsize, [[inout]] FILE *__restrict stream) {
 	size_t n;
@@ -1004,7 +1005,7 @@ char *fgets([[out(? <= bufsize)]] char *__restrict buf,
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), crtbuiltin(fputs_unlocked)]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("fputs_unlocked")]]
 [[crtbuiltin, export_alias("_IO_fputs"), alias("fputs_unlocked")]]
-[[requires($has_function(fwrite))]]
+[[requires_function(fwrite)]]
 __STDC_INT_AS_SSIZE_T fputs([[in]] char const *__restrict string,
                             [[inout]] FILE *__restrict stream) {
 	__STDC_INT_AS_SIZE_T result;
@@ -1026,7 +1027,7 @@ __STDC_INT_AS_SSIZE_T fputs([[in]] char const *__restrict string,
 [[crtbuiltin, export_alias("_IO_puts"), alias("puts_unlocked")]]
 [[impl_include("<libc/template/stdstreams.h>")]]
 [[requires_include("<libc/template/stdstreams.h>")]]
-[[requires(defined(__LOCAL_stdout) && $has_function(fputs) && $has_function(fputc))]]
+[[requires(defined(__LOCAL_stdout) && $has_function(fputs, fputc))]]
 __STDC_INT_AS_SSIZE_T puts([[in]] char const *__restrict string) {
 	__STDC_INT_AS_SSIZE_T result, temp;
 	result = fputs(string, stdout);
@@ -1058,6 +1059,7 @@ int ungetc(int ch, [[inout]] FILE *__restrict stream);
 [[                                                                           alias(CNL_fread...)]]
 [[                                                                           alias(CNL_fread_unlocked...)]]
 [[userimpl, requires_function(fgetc)]]
+[[impl_include("<asm/crt/stdio.h>")]]
 [[section(".text.crt{|.dos}.FILE.locked.read.read")]]
 size_t fread([[out(return * elemsize <= elemcount * elemsize)]] void *__restrict buf,
              size_t elemsize, size_t elemcount, [[inout]] FILE *__restrict stream) {
@@ -1085,6 +1087,7 @@ done:
 [[                                                                           alias(CNL_fwrite...)]]
 [[                                                                           alias(CNL_fwrite_unlocked...)]]
 [[crtbuiltin, userimpl, requires_function(fputc)]]
+[[impl_include("<asm/crt/stdio.h>")]]
 [[section(".text.crt{|.dos}.FILE.locked.write.write")]]
 size_t fwrite([[in(return * elemsize <= elemcount * elemsize)]] void const *__restrict buf,
               size_t elemsize, size_t elemcount, [[inout]] FILE *__restrict stream) {
@@ -1220,7 +1223,7 @@ int ferror([[in]] $FILE __KOS_FIXED_CONST *__restrict stream);
 [[cp, std, guard, export_alias("_IO_perror")]]
 [[requires_include("<libc/template/stdstreams.h>", "<libc/errno.h>")]]
 [[requires(defined(__LOCAL_stderr) && defined(__libc_geterrno) &&
-           $has_function(fprintf) && $has_function(strerror))]]
+           $has_function(fprintf, strerror))]]
 [[impl_include("<parts/printf-config.h>")]]
 [[impl_include("<libc/template/stdstreams.h>", "<libc/errno.h>")]]
 [[section(".text.crt{|.dos}.errno.utility")]]
@@ -1787,6 +1790,7 @@ int fflush_unlocked([[nullable]] $FILE *stream) {
 [[no_crt_self_import, no_crt_self_export]]
 [[export_alias(CNL_fread_unlocked...), alias(CNL_fread...)]]
 [[requires_function(fgetc_unlocked)]]
+[[impl_include("<asm/crt/stdio.h>")]]
 [[userimpl, section(".text.crt{|.dos}.FILE.unlocked.read.read")]]
 $size_t fread_unlocked([[out(return * elemsize <= elemcount * elemsize)]] void *__restrict buf,
                        $size_t elemsize, $size_t elemcount, [[inout]] $FILE *__restrict stream) {
@@ -1811,6 +1815,7 @@ done:
 [[no_crt_self_import, no_crt_self_export]]
 [[export_alias(CNL_fwrite_unlocked...), alias(CNL_fwrite...)]]
 [[requires_function(fgetc_unlocked)]]
+[[impl_include("<asm/crt/stdio.h>")]]
 [[userimpl, section(".text.crt{|.dos}.FILE.unlocked.write.write")]]
 $size_t fwrite_unlocked([[in(return * elemsize <= elemcount * elemsize)]] void const *__restrict buf,
                         $size_t elemsize, $size_t elemcount, [[inout]] $FILE *__restrict stream) {
@@ -1852,7 +1857,8 @@ fileno_unlocked(*) = fileno;
 @@Same as `fgetc()', but performs I/O without acquiring a lock to `stream'
 [[impl_include("<bits/crt/io-file.h>")]]
 [[cp_stdio, no_crt_self_import, no_crt_self_export, export_alias(CNL_fgetc_unlocked...)]]
-[[if(!defined(__CRT_DOS) || !defined(__CRT_HAVE__filbuf)), alias(CNL_fgetc...)]]
+[[if(!defined(__CRT_DOS) || !$has_function(_filbuf)), alias(CNL_fgetc...)]]
+[[impl_include("<asm/crt/stdio.h>")]]
 [[userimpl, requires((defined(__CRT_DOS) && $has_function(_filbuf)) || $has_function(crt_fread_unlocked))]]
 int fgetc_unlocked([[inout]] $FILE *__restrict stream) {
 @@pp_if defined(__CRT_DOS) && $has_function(_filbuf)@@
@@ -1871,7 +1877,8 @@ int fgetc_unlocked([[inout]] $FILE *__restrict stream) {
 @@Same as `fputc()', but performs I/O without acquiring a lock to `stream'
 [[cp_stdio, no_crt_self_import, no_crt_self_export]]
 [[crtbuiltin, export_alias(CNL_fputc_unlocked...)]]
-[[if(!defined(__CRT_DOS) || !defined(__CRT_HAVE__flsbuf)), alias(CNL_fputc...)]]
+[[if(!defined(__CRT_DOS) || !$has_function(_flsbuf)), alias(CNL_fputc...)]]
+[[impl_include("<asm/crt/stdio.h>")]]
 [[userimpl, requires((defined(__CRT_DOS) && $has_function(_flsbuf)) || $has_function(crt_fwrite_unlocked))]]
 int fputc_unlocked(int ch, [[inout]] $FILE *__restrict stream) {
 @@pp_if defined(__CRT_DOS) && $has_function(_flsbuf)@@
@@ -2429,13 +2436,14 @@ $FILE *popenve([[in]] char const *path,
 %#if (defined(__USE_MISC) || defined(__USE_DOS) || \
 %     (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K)))
 
-%[default:section(".text.crt{|.dos}.FILE.locked.read.getc")]
 
 @@>> getw(3)
 @@Similar to `getc()', but read 2 bytes
 [[cp_stdio, dos_only_export_alias("_getw")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("getw_unlocked")]]
-[[requires_function(fread), impl_include("<asm/crt/stdio.h>")]]
+[[impl_include("<asm/crt/stdio.h>")]]
+[[requires_function(fread)]]
+[[section(".text.crt{|.dos}.FILE.locked.read.getc")]]
 int getw([[inout]] $FILE *__restrict stream) {
 	u16 result;
 	return fread(&result, sizeof(result), 1, stream)
@@ -2443,13 +2451,14 @@ int getw([[inout]] $FILE *__restrict stream) {
 	       : (int)EOF;
 }
 
-%[default:section(".text.crt{|.dos}.FILE.locked.write.putc")]
 
 @@>> putw(3)
 @@Similar to `putc()', but write 2 bytes loaded from `W & 0xffff'
 [[cp_stdio, dos_only_export_alias("_putw")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("putw_unlocked")]]
-[[requires_function(fwrite), impl_include("<asm/crt/stdio.h>")]]
+[[impl_include("<asm/crt/stdio.h>")]]
+[[requires_function(fwrite)]]
+[[section(".text.crt{|.dos}.FILE.locked.write.putc")]]
 int putw(int w, [[inout]] $FILE *__restrict stream) {
 	u16 c = (u16)w;
 	return fwrite(&c, sizeof(c), 1, stream)
@@ -2728,8 +2737,8 @@ $FILE *fopencookie(void *__restrict magic_cookie,
 @@>> fgets_unlocked(3)
 @@Same as `fgets()', but performs I/O without acquiring a lock to `stream'
 [[cp_stdio, alias("fgets"), wunused, decl_include("<features.h>")]]
+[[requires_function(fgetc_unlocked, ungetc_unlocked, ferror_unlocked)]]
 [[impl_include("<hybrid/typecore.h>", "<asm/crt/stdio.h>", "<libc/errno.h>")]]
-[[requires($has_function(fgetc_unlocked) && $has_function(ungetc_unlocked) && $has_function(ferror_unlocked))]]
 char *fgets_unlocked([[out(? <= bufsize)]] char *__restrict buf,
                      __STDC_INT_AS_SIZE_T bufsize, [[inout]] $FILE *__restrict stream) {
 	$size_t n;
@@ -3255,6 +3264,7 @@ int getw_unlocked([[inout]] $FILE *__restrict stream) {
 
 [[cp_stdio, alias("putw", "_putw")]]
 [[requires_function(putw)]]
+[[impl_include("<asm/crt/stdio.h>")]]
 [[section(".text.crt{|.dos}.FILE.unlocked.write.putc")]]
 int putw_unlocked(int w, [[inout]] $FILE *__restrict stream) {
 	u16 c = (u16)w;
@@ -4111,7 +4121,7 @@ __LOCAL_LIBC(funopen2_to_funopen2_64_flushfn) int
 [[guard, wunused, decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias("funopen2")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias("funopen2_64")]]
-[[userimpl, requires($has_function(malloc) && $has_function(funopen2_64))]]
+[[userimpl, requires_function(malloc, funopen2_64)]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(DEFINE_FUNOPEN_HOLDER)]]
 [[impl_prefix(DEFINE_FUNOPEN2_HOLDER)]]

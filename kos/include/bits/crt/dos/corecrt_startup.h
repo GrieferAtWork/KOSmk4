@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x69accfeb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,19 +17,44 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__CrtMemDumpStatistics_defined
-#define __local__CrtMemDumpStatistics_defined
-#include <__crt.h>
-#include <bits/crt/dos/_CrtMemState.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_CrtMemDumpStatistics) __ATTR_IN(1) void
-__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_CrtMemDumpStatistics))(_CrtMemState const *__state) {
-	__COMPILER_IMPURE();
-	(void)__state;
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep__CrtMemDumpStatistics_defined
-#define __local___localdep__CrtMemDumpStatistics_defined
-#define __localdep__CrtMemDumpStatistics __LIBC_LOCAL_NAME(_CrtMemDumpStatistics)
-#endif /* !__local___localdep__CrtMemDumpStatistics_defined */
-#endif /* !__local__CrtMemDumpStatistics_defined */
+#ifndef _BITS_CRT_DOS__CRTMEMSTATE_H
+#define _BITS_CRT_DOS__CRTMEMSTATE_H 1
+
+#include <__stdinc.h>
+#include <hybrid/typecore.h>
+
+#ifdef __CC__
+__DECL_BEGIN
+
+struct _EXCEPTION_POINTERS;
+
+typedef enum _crt_app_type {
+	_crt_unknown_app = 0,
+	_crt_console_app = 1,
+	_crt_gui_app     = 2,
+} _crt_app_type;
+
+typedef int (__LIBCCALL *_UserMathErrorFunctionPointer)(struct _exception *);
+
+typedef void (__LIBDCALL *_PVFV)(void);
+typedef int  (__LIBDCALL *_PIFV)(void);
+typedef void (__LIBDCALL *_PVFI)(int __exit_code);
+
+typedef struct _onexit_table_t {
+	_PVFV *_first;
+	_PVFV *_last;
+	_PVFV *_end;
+} _onexit_table_t;
+
+#ifndef _CRT_ONEXIT_T_DEFINED
+#define _CRT_ONEXIT_T_DEFINED
+#ifndef _ONEXIT_T_DEFINED
+#define _ONEXIT_T_DEFINED
+typedef int (__LIBDCALL *_onexit_t)(void);
+#endif /* !_ONEXIT_T_DEFINED */
+#endif /* !_CRT_ONEXIT_T_DEFINED */
+
+__DECL_END
+#endif /* __CC__ */
+
+#endif /* !_BITS_CRT_DOS__CRTMEMSTATE_H */

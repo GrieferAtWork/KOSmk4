@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c6e0636 */
+/* HASH CRC-32:0xfb858aa2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,6 +30,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 #include <bits/os/timeval.h>
+#include <bits/types.h>
 INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) void
 NOTHROW_NCX(LIBCCALL libc_timeval_add)(struct timeval *result,
                                        struct timeval const *lhs,
@@ -42,6 +43,7 @@ NOTHROW_NCX(LIBCCALL libc_timeval_add)(struct timeval *result,
 	}
 }
 #include <bits/os/timeval.h>
+#include <bits/types.h>
 INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) void
 NOTHROW_NCX(LIBCCALL libc_timeval_sub)(struct timeval *result,
                                        struct timeval const *lhs,

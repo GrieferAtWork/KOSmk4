@@ -1009,9 +1009,9 @@ void tdestroy([[inout_opt]] void *root,
 	wrap: ($cook c, void const *a, void const *b): int { return (*c)(a, b); },
 	impl: _lfind_s(key, pbase, pitem_count, item_size, (int (LIBCCALL *)(void *, void const *, void const *))&$wrap, (void *)$cook),
 ))]]
-void *lfind([[in_opt]] void const *key, [[in(*pitem_count * item_size)]] void const *pbase, [[in]] size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, [[nonnull]] __compar_fn_t compar)
-	[([[in_opt]] void const *key, [[in(*pitem_count * item_size)]] void *pbase, [[in]] size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, [[nonnull]] __compar_fn_t compar): void *]
-	[([[in_opt]] void const *key, [[in(*pitem_count * item_size)]] void const *pbase, [[in]] size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, [[nonnull]] __compar_fn_t compar): void const *]
+void *lfind([[in_opt]] void const *key, [[in(*pitem_count * item_size)]] void const *pbase, [[in]] size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b))
+	[([[in_opt]] void const *key, [[in(*pitem_count * item_size)]] void *pbase, [[in]] size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b)): void *]
+	[([[in_opt]] void const *key, [[in(*pitem_count * item_size)]] void const *pbase, [[in]] size_t __KOS_FIXED_CONST *pitem_count, size_t item_size, [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b)): void const *]
 {
 	size_t i, count = *pitem_count;
 	void const *result = pbase;
@@ -1061,7 +1061,7 @@ typedef __compar_fn_t _CoreCrtMgdNonSecureSearchSortCompareFunction;
 %[insert:extern(qsort)]
 %[insert:extern(bsearch)]
 
-[[wunused, throws, decl_include("<hybrid/typecore.h>"), crt_dos_variant(callback(
+[[wunused, throws, decl_include("<hybrid/typecore.h>", "<features.h>"), crt_dos_variant(callback(
 	cook: struct { auto compar = compar; auto arg = arg; },
 	wrap: ($cook *c, void const *a, void const *b): int { return (*c->compar)(c->arg, a, b); },
 	impl: _lfind_s(key, pbase, pitem_count, item_size, (int (LIBCCALL *)(void *, void const *, void const *))&$wrap, &$cook),

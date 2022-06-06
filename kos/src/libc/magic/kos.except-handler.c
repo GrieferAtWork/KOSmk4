@@ -23,6 +23,15 @@
 %[define_type_class(__except_handler_t = "TP")]
 %[default:nodos]
 
+%[define_decl_include("<kos/bits/exception_data.h>": [
+	"struct exception_data"
+])]
+
+%[define_decl_include("<kos/bits/except-handler.h>": [
+	"except_handler_t"
+])]
+
+
 %[insert:prefix(
 #include <kos/anno.h>
 )]%[insert:prefix(
@@ -239,6 +248,8 @@ __SYSDECL_BEGIN
 typedef __except_handler_t except_handler_t;
 #endif /* !__except_handler_t_defined */
 
+struct exception_data;
+
 }
 
 
@@ -285,11 +296,13 @@ int get_exception_handler([[nullable]] unsigned int *pmode,
 
 @@Mode #2 / #3 exception handler (see description above)
 [[throws, ATTR_NORETURN, cc("__EXCEPT_HANDLER_CC")]]
+[[decl_include("<kos/bits/exception_data.h>")]]
 void except_handler3(except_register_state_t *__restrict state,
                      struct exception_data *__restrict error);
 
 @@Mode #4 exception handler (see description above)
 [[throws, ATTR_NORETURN, cc("__EXCEPT_HANDLER_CC")]]
+[[decl_include("<kos/bits/exception_data.h>")]]
 void except_handler4(except_register_state_t *__restrict state,
                      struct exception_data *__restrict error);
 

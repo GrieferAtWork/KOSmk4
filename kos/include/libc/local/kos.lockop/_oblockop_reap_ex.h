@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20984559 */
+/* HASH CRC-32:0xf4eb0f89 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,13 +22,7 @@
 #define __local__oblockop_reap_ex_defined
 #include <__crt.h>
 #include <kos/anno.h>
-#ifndef __LOCKOP_CC
-#define __LOCKOP_CC __LIBKCALL
-#endif /* !__LOCKOP_CC */
-struct oblockop_slist;
-#ifndef _KOS_LOCKOP_H
-#include <kos/lockop.h>
-#endif /* !_KOS_LOCKOP_H */
+#include <kos/bits/lockop.h>
 #include <hybrid/__atomic.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_oblockop_reap_ex) __NOBLOCK __ATTR_INOUT(1) __ATTR_NONNULL((2, 3, 5)) void

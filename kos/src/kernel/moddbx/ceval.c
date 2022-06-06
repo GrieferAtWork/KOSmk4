@@ -110,8 +110,8 @@ DECL_BEGIN
  * Evaluated as:
  * >> *(typeof(foo)(*)[12])&foo
  *
- * Not that while parsing an expression within parenthesis,
- * this option is always set to `true':
+ * Note that  while  parsing  an  expression  within
+ * parenthesis, this option is always set to `true':
  * >> (&foo, 12)
  * Always parsed as:
  * >> 12

@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x69accfeb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,19 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local__CrtMemDumpStatistics_defined
-#define __local__CrtMemDumpStatistics_defined
-#include <__crt.h>
-#include <bits/crt/dos/_CrtMemState.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_CrtMemDumpStatistics) __ATTR_IN(1) void
-__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_CrtMemDumpStatistics))(_CrtMemState const *__state) {
-	__COMPILER_IMPURE();
-	(void)__state;
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep__CrtMemDumpStatistics_defined
-#define __local___localdep__CrtMemDumpStatistics_defined
-#define __localdep__CrtMemDumpStatistics __LIBC_LOCAL_NAME(_CrtMemDumpStatistics)
-#endif /* !__local___localdep__CrtMemDumpStatistics_defined */
-#endif /* !__local__CrtMemDumpStatistics_defined */
+#ifndef _I386_KOS_KOS_ASM_LOCKOP_H
+#define _I386_KOS_KOS_ASM_LOCKOP_H 1
+
+#include <__stdinc.h>
+
+#include <hybrid/host.h>
+
+#ifndef __x86_64__
+/* Use fastcall calling convention on i386 */
+#define __LOCKOP_CC __ATTR_FASTCALL
+#endif /* !__x86_64__ */
+
+#endif /* !_I386_KOS_KOS_ASM_LOCKOP_H */

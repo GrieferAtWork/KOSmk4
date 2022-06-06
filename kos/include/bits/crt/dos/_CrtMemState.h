@@ -17,16 +17,54 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_KOS_BITS_LOCKOP_H
-#define _I386_KOS_KOS_BITS_LOCKOP_H 1
+#ifndef _BITS_CRT_DOS__CRTMEMSTATE_H
+#define _BITS_CRT_DOS__CRTMEMSTATE_H 1
 
 #include <__stdinc.h>
+#include <hybrid/typecore.h>
 
-#include <hybrid/host.h>
+#define _BLOCK_TYPE(block)    ((block) & 0xffff)
+#define _BLOCK_SUBTYPE(block) ((block) >> 16 & 0xffff)
 
-#ifndef __x86_64__
-/* Use fastcall calling convention on i386 */
-#define __LOCKOP_CC __ATTR_FASTCALL
-#endif /* !__x86_64__ */
+#define _FREE_BLOCK   0
+#define _NORMAL_BLOCK 1
+#define _CRT_BLOCK    2
+#define _IGNORE_BLOCK 3
+#define _CLIENT_BLOCK 4
+#define _MAX_BLOCKS   5
 
-#endif /* !_I386_KOS_KOS_BITS_LOCKOP_H */
+#ifdef __CC__
+__DECL_BEGIN
+
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("pBlockHeader")
+#pragma push_macro("lCounts")
+#pragma push_macro("lSizes")
+#pragma push_macro("lHighWaterCount")
+#pragma push_macro("lTotalCount")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef pBlockHeader
+#undef lCounts
+#undef lSizes
+#undef lHighWaterCount
+#undef lTotalCount
+struct _CrtMemBlockHeader;
+typedef struct _CrtMemState {
+	struct _CrtMemBlockHeader *pBlockHeader;
+	__SIZE_TYPE__              lCounts[_MAX_BLOCKS];
+	__SIZE_TYPE__              lSizes[_MAX_BLOCKS];
+	__SIZE_TYPE__              lHighWaterCount;
+	__SIZE_TYPE__              lTotalCount;
+} _CrtMemState;
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("lTotalCount")
+#pragma pop_macro("lHighWaterCount")
+#pragma pop_macro("lSizes")
+#pragma pop_macro("lCounts")
+#pragma pop_macro("pBlockHeader")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+
+__DECL_END
+#endif /* __CC__ */
+
+#endif /* !_BITS_CRT_DOS__CRTMEMSTATE_H */

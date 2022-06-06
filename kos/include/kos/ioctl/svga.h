@@ -49,9 +49,9 @@ __DECL_BEGIN
  *    The mmap(2) operation once again asserts that you've got `CAP_SYS_RAWIO',
  *    but once that check passes, it will map the mode's `smi_lfb' (if present)
  *    or the region `A0000-BFFFF'
- *  - SVGA_IOC_SETMODE: [svga] Sets the video mode of the currently active tty.
- *                             When a video lock is  active, the video mode  of
- *                             the tty that will be loaded once the video  lock
+ *  - SVGA_IOC_SETMODE: [svga] Sets the video mode  of the currently active  tty.
+ *                             When a video lock is active, change the video mode
+ *                             of the tty that will be loaded once the video lock
  *                             is released.
  *  - SVGA_IOC_SETMODE: [tty]  Sets the video mode of this tty. If the tty is
  *                             not currently active, changes will only become
@@ -121,7 +121,7 @@ struct svga_maketty {
 
 struct svga_strings {
 	__uint64_t      svs_start; /* Start enumeration with the `svs_start'th name/value pair. */
-	__uint64_t      svs_count; /* [in]  Max # of strings to write.
+	__uint64_t      svs_count; /* [in]  Max # of name/value pairs to write.
 	                            * [out] # of written name/value pairs. */
 	__uint64_t      svs_bufsz; /* [in]  Input buffer size (in bytes)
 	                            * [out] Required buffer size (in bytes) to write up to

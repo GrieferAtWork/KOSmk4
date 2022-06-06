@@ -27,7 +27,7 @@
  *    struct dirent {
  *        ...
  *    };
- *    #ifdef __USE_LARGEFILE64
+ *    #ifdef    __USE_LARGEFILE64
  *    #define __dirent64 dirent64
  *    struct dirent64 {
  *        ...

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7be8b1a9 */
+/* HASH CRC-32:0xe1a4cfd9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,10 +22,9 @@
 #define __local_except_as_errno_defined
 #include <__crt.h>
 #include <bits/types.h>
-struct exception_data;
+#include <kos/bits/exception_data.h>
 #include <asm/os/errno.h>
 #include <hybrid/host.h>
-#include <kos/bits/exception_data.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>

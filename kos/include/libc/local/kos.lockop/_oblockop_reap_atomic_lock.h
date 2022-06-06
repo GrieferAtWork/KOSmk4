@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf35218d */
+/* HASH CRC-32:0xf4449ecc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,14 +22,8 @@
 #define __local__oblockop_reap_atomic_lock_defined
 #include <__crt.h>
 #include <kos/anno.h>
-#ifndef __LOCKOP_CC
-#define __LOCKOP_CC __LIBKCALL
-#endif /* !__LOCKOP_CC */
-struct oblockop_slist;
+#include <kos/bits/lockop.h>
 struct atomic_lock;
-#ifndef _KOS_LOCKOP_H
-#include <kos/lockop.h>
-#endif /* !_KOS_LOCKOP_H */
 #include <hybrid/__atomic.h>
 #include <hybrid/sched/atomic-lock.h>
 __NAMESPACE_LOCAL_BEGIN

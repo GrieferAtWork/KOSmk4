@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd03ed62a */
+/* HASH CRC-32:0x917b8023 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,8 +21,9 @@
 #ifndef __local__CrtMemDumpAllObjectsSince_defined
 #define __local__CrtMemDumpAllObjectsSince_defined
 #include <__crt.h>
+#include <bits/crt/dos/_CrtMemState.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_CrtMemDumpAllObjectsSince) void
+__LOCAL_LIBC(_CrtMemDumpAllObjectsSince) __ATTR_IN(1) void
 __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(_CrtMemDumpAllObjectsSince))(_CrtMemState const *__state) {
 	__COMPILER_IMPURE();
 	(void)__state;

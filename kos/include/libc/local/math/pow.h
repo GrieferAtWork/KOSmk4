@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcb2adcd0 */
+/* HASH CRC-32:0xc26c5964 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@
 #include <libm/isnan.h>
 #include <libm/matherr.h>
 #include <libm/pow.h>
+#include <libm/signbit.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(pow) __ATTR_WUNUSED __DECL_SIMD_pow double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(pow))(double __x, double __y) {

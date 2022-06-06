@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d9c0e1c */
+/* HASH CRC-32:0x41cc6d78 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__initterm_defined
 #define __local__initterm_defined
 #include <__crt.h>
+#include <bits/crt/dos/corecrt_startup.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_syslog_defined
 #define __local___localdep_syslog_defined

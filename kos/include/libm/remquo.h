@@ -27,6 +27,7 @@
 
 #include <bits/types.h>
 
+#include <libm/fabs.h>
 #include <libm/fdlibm.h>
 #include <libm/fmod.h>
 
@@ -84,7 +85,7 @@ __LIBM_LOCAL_FUNC(remquof) __ATTR_WUNUSED __ATTR_NONNULL((3)) __IEEE754_FLOAT_TY
 		__x = __ieee754_fmodf(__x, 8 * __y); /* now x < 8y */
 	if ((__hx - __hy) == 0) {
 		*__pexponent = __qs ? -1 : 1;
-		return __LIBM_LOCAL_VALUE(zero) * __x;
+		return __LIBM_LOCAL_VALUE(zerof) * __x;
 	}
 	__x    = __ieee754_fabsf(__x);
 	__y    = __ieee754_fabsf(__y);

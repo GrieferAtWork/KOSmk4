@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2fa0dcf6 */
+/* HASH CRC-32:0xfd11d6d9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,6 +75,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(4) __ATTR_OUT_OPT(1),__SIZE_TYPE__,__THR
 #endif /* !__local___localdep_crt_fread_defined */
 __NAMESPACE_LOCAL_END
 #include <bits/crt/io-file.h>
+#include <asm/crt/stdio.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fgetc) __ATTR_INOUT(1) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fgetc))(__FILE *__restrict __stream) __THROWS(...) {

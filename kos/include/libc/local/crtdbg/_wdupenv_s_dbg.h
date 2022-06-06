@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b4b5b0 */
+/* HASH CRC-32:0x3d8520c9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local__wdupenv_s_dbg_defined
 #define __local__wdupenv_s_dbg_defined
 #include <__crt.h>
+#include <crtdefs.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_wdupenv_s_dbg) _Check_return_wat_ __ATTR_IN(3) __ATTR_OUT(1) __ATTR_OUT(2) __errno_t

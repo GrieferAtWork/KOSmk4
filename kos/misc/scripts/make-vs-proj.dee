@@ -115,7 +115,7 @@ function createVsFile(filename: string, cb: Callable) {
 }
 
 function injectPath(): string {
-	/* For some reason, Visual Studio unsetenv's $PATH when calling our build script.
+	/* For some reason, Visual Studio unsetenv's  $PATH when calling our build  script.
 	 * Work around this issue by saving $PATH at the time the project files were build,
 	 * so it can be injected into magic.dee, which will then restore it! */
 	return "\"--environ=PATH={}\"".format({ fs.environ["PATH"] });

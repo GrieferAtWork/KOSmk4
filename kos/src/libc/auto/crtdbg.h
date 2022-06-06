@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b79e6c1 */
+/* HASH CRC-32:0x9a13b83b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,10 +64,10 @@ INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libc__CrtIsValidPointer)(void 
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libc__CrtIsValidHeapPointer)(void const *heap_ptr);
 INTDEF int NOTHROW_NCX(LIBDCALL libc__CrtIsMemoryBlock)(void const *ptr, __STDC_UINT_AS_SIZE_T num_bytes, __LONG32_TYPE__ *prequest_number, char **filename, int *line);
 INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBDCALL libc__CrtReportBlockType)(void const *ptr);
-INTDEF void NOTHROW_NCX(LIBDCALL libc__CrtMemCheckpoint)(_CrtMemState *state);
-INTDEF int NOTHROW_NCX(LIBDCALL libc__CrtMemDifference)(_CrtMemState *state, _CrtMemState const *old_state, _CrtMemState const *new_state);
-INTDEF void NOTHROW_NCX(LIBDCALL libc__CrtMemDumpAllObjectsSince)(_CrtMemState const *state);
-INTDEF void NOTHROW_NCX(LIBDCALL libc__CrtMemDumpStatistics)(_CrtMemState const *state);
+INTDEF ATTR_OUT(1) void NOTHROW_NCX(LIBDCALL libc__CrtMemCheckpoint)(_CrtMemState *state);
+INTDEF ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libc__CrtMemDifference)(_CrtMemState *state, _CrtMemState const *old_state, _CrtMemState const *new_state);
+INTDEF ATTR_IN(1) void NOTHROW_NCX(LIBDCALL libc__CrtMemDumpAllObjectsSince)(_CrtMemState const *state);
+INTDEF ATTR_IN(1) void NOTHROW_NCX(LIBDCALL libc__CrtMemDumpStatistics)(_CrtMemState const *state);
 INTDEF int NOTHROW_NCX(LIBDCALL libc__CrtDumpMemoryLeaks)(void);
 INTDEF int NOTHROW_NCX(LIBDCALL libc__CrtSetCheckCount)(int check_count);
 INTDEF ATTR_PURE int NOTHROW_NCX(LIBDCALL libc__CrtGetCheckCount)(void);

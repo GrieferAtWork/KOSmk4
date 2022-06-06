@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e1196a9 */
+/* HASH CRC-32:0x72064363 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,6 +63,9 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_fputc_defined
 #endif /* !... */
 #endif /* !__local___localdep_fputc_defined */
+__NAMESPACE_LOCAL_END
+#include <asm/crt/stdio.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fwrite) __ATTR_INOUT(4) __ATTR_IN_OPT(1) __SIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(fwrite))(void const *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream) __THROWS(...) {
 	__SIZE_TYPE__ __i, __result = 0;

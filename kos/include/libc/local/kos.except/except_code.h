@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd8d21d2 */
+/* HASH CRC-32:0x2d856701 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,9 +28,6 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_except_data_defined
 #define __local___localdep_except_data_defined
 #ifdef __CRT_HAVE_except_data
-__NAMESPACE_LOCAL_END
-struct exception_data;
-__NAMESPACE_LOCAL_BEGIN
 __COMPILER_CREDIRECT(__LIBC,__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,struct exception_data *,__NOTHROW,__LIBKCALL,__localdep_except_data,(void),except_data,())
 #elif defined(__arch_except_data)
 __NAMESPACE_LOCAL_END

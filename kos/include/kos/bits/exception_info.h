@@ -74,7 +74,6 @@ typedef __EXCEPT_REGISTER_STATE_TYPE except_register_state_t;
 #endif /* !__except_register_state_t_defined */
 struct exception_info;
 
-#ifdef __USE_KOS_KERNEL
 #undef ei_data
 #undef ei_code
 #undef ei_class
@@ -156,8 +155,6 @@ struct exception_info {
 #define ei_class    _ei_class_subclass.ei_class
 #define ei_subclass _ei_class_subclass.ei_subclass
 #endif /* ... */
-#endif /* __USE_KOS_KERNEL */
-
 
 __DECL_END
 #endif /* __CC__ */

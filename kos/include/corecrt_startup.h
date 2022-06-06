@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2792a8f */
+/* HASH CRC-32:0xf193d800 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,7 @@
 
 #include <features.h>
 #include <bits/types.h>
+#include <bits/crt/dos/corecrt_startup.h>
 #include <vcruntime_startup.h>
 
 #ifdef __USE_DOS
@@ -53,34 +54,6 @@ typedef __size_t size_t;
 #define __errno_t_defined
 typedef __errno_t errno_t;
 #endif /* !__errno_t_defined */
-
-struct _EXCEPTION_POINTERS;
-
-typedef enum _crt_app_type {
-	_crt_unknown_app = 0,
-	_crt_console_app = 1,
-	_crt_gui_app     = 2,
-} _crt_app_type;
-
-typedef int (__LIBCCALL *_UserMathErrorFunctionPointer)(struct _exception *);
-
-typedef void (__LIBDCALL *_PVFV)(void);
-typedef int  (__LIBDCALL *_PIFV)(void);
-typedef void (__LIBDCALL *_PVFI)(int __exit_code);
-
-typedef struct _onexit_table_t {
-	_PVFV *_first;
-	_PVFV *_last;
-	_PVFV *_end;
-} _onexit_table_t;
-
-#ifndef _CRT_ONEXIT_T_DEFINED
-#define _CRT_ONEXIT_T_DEFINED
-#ifndef _ONEXIT_T_DEFINED
-#define _ONEXIT_T_DEFINED
-typedef int (__LIBDCALL *_onexit_t)(void);
-#endif /* !_ONEXIT_T_DEFINED */
-#endif /* !_CRT_ONEXIT_T_DEFINED */
 
 #ifdef __CRT_HAVE__seh_filter_dll
 __LIBC __ATTR_INOUT(2) int __NOTHROW_NCX(__LIBDCALL _seh_filter_dll)(__ULONG32_TYPE__ __xno, struct _EXCEPTION_POINTERS *__infp_ptrs) __CASMNAME_SAME("_seh_filter_dll");

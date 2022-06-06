@@ -31,6 +31,8 @@
 )]%[insert:prefix(
 #include <bits/types.h>
 )]%[insert:prefix(
+#include <bits/crt/dos/corecrt_startup.h>
+)]%[insert:prefix(
 #include <vcruntime_startup.h>
 )]%{
 
@@ -54,34 +56,6 @@ typedef __size_t size_t;
 typedef __errno_t errno_t;
 #endif /* !__errno_t_defined */
 
-struct _EXCEPTION_POINTERS;
-
-typedef enum _crt_app_type {
-	_crt_unknown_app = 0,
-	_crt_console_app = 1,
-	_crt_gui_app     = 2,
-} _crt_app_type;
-
-typedef int (__LIBCCALL *_UserMathErrorFunctionPointer)(struct _exception *);
-
-typedef void (__LIBDCALL *_PVFV)(void);
-typedef int  (__LIBDCALL *_PIFV)(void);
-typedef void (__LIBDCALL *_PVFI)(int __exit_code);
-
-typedef struct _onexit_table_t {
-	_PVFV *_first;
-	_PVFV *_last;
-	_PVFV *_end;
-} _onexit_table_t;
-
-#ifndef _CRT_ONEXIT_T_DEFINED
-#define _CRT_ONEXIT_T_DEFINED
-#ifndef _ONEXIT_T_DEFINED
-#define _ONEXIT_T_DEFINED
-typedef int (__LIBDCALL *_onexit_t)(void);
-#endif /* !_ONEXIT_T_DEFINED */
-#endif /* !_CRT_ONEXIT_T_DEFINED */
-
 }
 
 %[define(_crt_unknown_app = 0)]
@@ -99,32 +73,37 @@ typedef int (__LIBDCALL *_onexit_t)(void);
 %[define_type_class(onexit_t  = "TP")]
 
 [[crt_dos_only, decl_include("<hybrid/typecore.h>")]]
+[[decl_include("<bits/crt/dos/corecrt_startup.h>")]]
 int _seh_filter_dll(__ULONG32_TYPE__ xno, [[inout]] struct _EXCEPTION_POINTERS *infp_ptrs);
 
 [[crt_dos_only, decl_include("<hybrid/typecore.h>")]]
+[[decl_include("<bits/crt/dos/corecrt_startup.h>")]]
 int _seh_filter_exe(__ULONG32_TYPE__ xno, [[inout]] struct _EXCEPTION_POINTERS *infp_ptrs);
 
 [[const, wunused, crt_dos_only]]
-[[decl_include("<corecrt_startup.h>")]]
+[[decl_include("<bits/crt/dos/corecrt_startup.h>")]]
+[[impl_include("<bits/crt/dos/corecrt_startup.h>")]]
 _crt_app_type _query_app_type(void) {
 	return (_crt_app_type)_crt_console_app;
 }
 
 [[crt_dos_only, export_alias("__set_app_type")]]
-[[decl_include("<corecrt_startup.h>")]]
+[[decl_include("<bits/crt/dos/corecrt_startup.h>")]]
 void _set_app_type(_crt_app_type type);
 
 [[crt_dos_variant]]
 void __setusermatherr([[nonnull]] int (__LIBCCALL *fptr)(struct _exception *));
 
-[[crt_dos_only, decl_include("<bits/types.h>", "<vcruntime_startup.h>")]]
+[[crt_dos_only]]
+[[decl_include("<bits/types.h>", "<vcruntime_startup.h>")]]
 errno_t _configure_narrow_argv(_crt_argv_mode mode) {
 	COMPILER_IMPURE();
 	(void)mode;
 	return 0;
 }
 
-[[crt_dos_only, decl_include("<bits/types.h>", "<vcruntime_startup.h>")]]
+[[crt_dos_only]]
+[[decl_include("<bits/types.h>", "<vcruntime_startup.h>")]]
 [[crt_intern_alias("libc__configure_narrow_argv")]]
 errno_t _configure_wide_argv(_crt_argv_mode mode) {
 	COMPILER_IMPURE();
@@ -209,7 +188,10 @@ __WCHAR16_TYPE__ **__p__wcmdln(void);
 
 
 
-[[crt_dos_only, impl_include("<asm/os/syslog.h>")]]
+[[crt_dos_only]]
+[[decl_include("<bits/crt/dos/corecrt_startup.h>")]]
+[[impl_include("<bits/crt/dos/corecrt_startup.h>")]]
+[[impl_include("<asm/os/syslog.h>")]]
 void _initterm(_PVFV *start, _PVFV *end) {
 	for (; start < end; ++start) {
 		if (*start == NULL)
@@ -224,7 +206,10 @@ void _initterm(_PVFV *start, _PVFV *end) {
 @@pp_endif@@
 }
 
-[[crt_dos_only, impl_include("<asm/os/syslog.h>")]]
+[[crt_dos_only]]
+[[decl_include("<bits/crt/dos/corecrt_startup.h>")]]
+[[impl_include("<bits/crt/dos/corecrt_startup.h>")]]
+[[impl_include("<asm/os/syslog.h>")]]
 int _initterm_e(_onexit_t *start, _onexit_t *end) {
 	int result = 0;
 	for (; start < end; ++start) {
@@ -247,7 +232,10 @@ int _initterm_e(_onexit_t *start, _onexit_t *end) {
 	return result;
 }
 
-[[crt_dos_only, decl_include("<corecrt_startup.h>"), requires_function(bzero)]]
+[[crt_dos_only]]
+[[decl_include("<bits/crt/dos/corecrt_startup.h>")]]
+[[requires_function(bzero)]]
+[[impl_include("<bits/crt/dos/corecrt_startup.h>")]]
 int _initialize_onexit_table([[nullable]] struct _onexit_table_t *self) {
 	if unlikely(!self)
 		return -1;
@@ -255,7 +243,7 @@ int _initialize_onexit_table([[nullable]] struct _onexit_table_t *self) {
 	return 0;
 }
 
-[[decl_include("<corecrt_startup.h>")]]
+[[decl_include("<bits/crt/dos/corecrt_startup.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[crt_dos_only, requires_function(realloc, malloc_usable_size)]]
 int _register_onexit_function([[nullable]] struct _onexit_table_t *self,
@@ -278,7 +266,7 @@ int _register_onexit_function([[nullable]] struct _onexit_table_t *self,
 	return 0;
 }
 
-[[crt_dos_only, decl_include("<corecrt_startup.h>")]]
+[[crt_dos_only, decl_include("<bits/crt/dos/corecrt_startup.h>")]]
 [[requires_function(_initialize_onexit_table, _initterm_e)]]
 int _execute_onexit_table([[nullable]] struct _onexit_table_t *self) {
 	int result;
@@ -298,7 +286,8 @@ int _execute_onexit_table([[nullable]] struct _onexit_table_t *self) {
 
 
 [[hidden, crt_dos_only, requires_function(_register_onexit_function)]]
-[[decl_include("<corecrt_startup.h>"), impl_include("<corecrt_startup.h>")]]
+[[decl_include("<bits/crt/dos/corecrt_startup.h>")]]
+[[impl_include("<bits/crt/dos/corecrt_startup.h>")]]
 int __dllonexit(_onexit_t func,
                 [[inout]] _onexit_t **p_begin,
                 [[inout]] _onexit_t **p_end) {

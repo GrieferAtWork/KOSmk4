@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7f6d102 */
+/* HASH CRC-32:0x9d7b35a7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -106,6 +106,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.write.putc") int
 }
 #include <hybrid/typecore.h>
 #include <libc/errno.h>
+#include <asm/crt/stdio.h>
 /* >> fgets(3)
  * Read up to `bufsize - 1' bytes of data from `stream', storing them into `buf' stopped when the
  * buffer is full or a line-feed was read (in this case, the line-feed is also written to `buf').

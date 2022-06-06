@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x142bd03e */
+/* HASH CRC-32:0xb6da8dcd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -388,11 +388,11 @@ NOTHROW_NCX(LIBDCALL libc__CrtReportBlockType)(void const *ptr) {
 	COMPILER_IMPURE();
 	return ptr ? 1 /*_NORMAL_BLOCK*/ : 0 /*_FREE_BLOCK*/;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") ATTR_OUT(1) void
 NOTHROW_NCX(LIBDCALL libc__CrtMemCheckpoint)(_CrtMemState *state) {
 	libc_bzero(state, sizeof(*state));
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") int
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") ATTR_IN(2) ATTR_IN(3) ATTR_OUT(1) int
 NOTHROW_NCX(LIBDCALL libc__CrtMemDifference)(_CrtMemState *state,
                                              _CrtMemState const *old_state,
                                              _CrtMemState const *new_state) {
@@ -401,12 +401,12 @@ NOTHROW_NCX(LIBDCALL libc__CrtMemDifference)(_CrtMemState *state,
 	libc_bzero(state, sizeof(*state));
 	return 0;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") ATTR_IN(1) void
 NOTHROW_NCX(LIBDCALL libc__CrtMemDumpAllObjectsSince)(_CrtMemState const *state) {
 	COMPILER_IMPURE();
 	(void)state;
 }
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") void
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.debug_malloc") ATTR_IN(1) void
 NOTHROW_NCX(LIBDCALL libc__CrtMemDumpStatistics)(_CrtMemState const *state) {
 	COMPILER_IMPURE();
 	(void)state;

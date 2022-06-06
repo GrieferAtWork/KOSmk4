@@ -40,7 +40,7 @@
 #endif /* !KOS_BUILD_CONFIG_TOOLCHAIN_GCC_VERSION */
 
 
-/* ----------------- `gcc -dumpmachine` from toolchain host
+/* ----------------- `gcc  -dumpmachine`  from  toolchain   host
  * >> #define KOS_BUILD_CONFIG_TOOLCHAIN_HOST "x86_64-pc-cygwin" */
 #ifndef KOS_BUILD_CONFIG_TOOLCHAIN_HOST
 #error "Missing macro: KOS_BUILD_CONFIG_TOOLCHAIN_HOST"
@@ -61,14 +61,14 @@
 #endif /* !KOS_BUILD_CONFIG_TOOLCHAIN_BUILD */
 
 
-/* ----------------- Build architecture for toolchain
+/* ----------------- Build   architecture   for  toolchain
  * >> #define KOS_BUILD_CONFIG_TOOLCHAIN_BUILD_ARCH "i386" */
 #ifndef KOS_BUILD_CONFIG_TOOLCHAIN_BUILD_ARCH
 #error "Missing macro: KOS_BUILD_CONFIG_TOOLCHAIN_BUILD_ARCH"
 #endif /* !KOS_BUILD_CONFIG_TOOLCHAIN_BUILD_ARCH */
 
 
-/* ----------------- Latest CPU supported by toolchain
+/* ----------------- Latest CPU  supported  by  toolchain
  * >> #define KOS_BUILD_CONFIG_TOOLCHAIN_BUILD_CPU "i686" */
 #ifndef KOS_BUILD_CONFIG_TOOLCHAIN_BUILD_CPU
 #error "Missing macro: KOS_BUILD_CONFIG_TOOLCHAIN_BUILD_CPU"

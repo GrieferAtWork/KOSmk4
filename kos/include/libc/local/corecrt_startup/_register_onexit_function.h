@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e4e999 */
+/* HASH CRC-32:0x76537148 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #define __local__register_onexit_function_defined
 #include <__crt.h>
 #if (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize))
-#include <corecrt_startup.h>
+#include <bits/crt/dos/corecrt_startup.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_malloc_usable_size_defined
 #define __local___localdep_malloc_usable_size_defined

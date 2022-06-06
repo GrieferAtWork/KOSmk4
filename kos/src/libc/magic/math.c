@@ -877,11 +877,12 @@ double log2(double x) {
 @@Return `x' to the `y' power
 [[attribute("__DECL_SIMD_pow"), decl_include("<bits/crt/math-vector.h>")]]
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__pow")]]
-[[impl_include("<libm/finite.h>", "<libm/isnan.h>", "<libm/matherr.h>")]]
-[[requires_include("<ieee754.h>"), impl_include("<libm/pow.h>")]]
+[[requires_include("<ieee754.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
            defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))]]
+[[impl_include("<libm/finite.h>", "<libm/isnan.h>", "<libm/matherr.h>")]]
+[[impl_include("<libm/pow.h>", "<libm/signbit.h>")]]
 double pow(double x, double y) {
 	double result;
 	result = __LIBM_MATHFUN2(@pow@, x, y);
@@ -1342,7 +1343,7 @@ int ilogbl(__LONGDOUBLE x) %{generate(double2ldouble("ilogb"))}
             defined(__IEEE854_LONG_DOUBLE_TYPE__)) ||
             $has_function(nextafterl))]]
 double nexttoward(double x, __LONGDOUBLE y) {
-@@pp_ifdef __IEEE854_LONG_DOUBLE_TYPE__@@
+@@pp_ifdef      __IEEE854_LONG_DOUBLE_TYPE__@@
 @@pp_ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__@@
 	return (double)__ieee754_nexttoward((__IEEE754_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
 @@pp_else@@
@@ -1551,7 +1552,7 @@ __LONGLONG llround(double x) {
             defined(__IEEE854_LONG_DOUBLE_TYPE__)) ||
             $has_function(nextafterl))]]
 float nexttowardf(float x, __LONGDOUBLE y) {
-@@pp_ifdef __IEEE854_LONG_DOUBLE_TYPE__@@
+@@pp_ifdef    __IEEE854_LONG_DOUBLE_TYPE__@@
 @@pp_ifdef __IEEE754_FLOAT_TYPE_IS_FLOAT__@@
 	return (float)__ieee754_nexttowardf((__IEEE754_FLOAT_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
 @@pp_else@@

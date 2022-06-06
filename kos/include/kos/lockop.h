@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x670ac4d7 */
+/* HASH CRC-32:0xa9ee4065 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -145,15 +145,6 @@ __SYSDECL_BEGIN
  * >> }
  */
 
-struct lockop;
-struct postlockop;
-struct oblockop;
-struct obpostlockop;
-
-#ifndef __LOCKOP_CC
-#define __LOCKOP_CC __LIBKCALL
-#endif /* !__LOCKOP_CC */
-
 /* Calling convention for functions from the lockop API */
 #ifndef LOCKOP_CC
 #define LOCKOP_CC __LOCKOP_CC
@@ -161,19 +152,10 @@ struct obpostlockop;
 
 
 /* Callback prototype for an operation to-be performed once locks have been released. */
-typedef __NOBLOCK __ATTR_NONNULL_T((1)) void
-__NOTHROW_T(LOCKOP_CC *postlockop_callback_t)(struct postlockop *__restrict __self);
-typedef __NOBLOCK __ATTR_NONNULL_T((1, 2)) void
-__NOTHROW_T(LOCKOP_CC *obpostlockop_callback_t)(struct obpostlockop *__restrict __self,
-                                                void *__restrict __obj);
-
-/* Callback prototype for pending locked operations.
- * @return: NULL: Completed.
- * @return: * :   A descriptor for an operation to perform after the lock has been released. */
-typedef __NOBLOCK __ATTR_NONNULL_T((1)) struct postlockop *
-__NOTHROW_T(LOCKOP_CC *lockop_callback_t)(struct lockop *__restrict __self);
-typedef __NOBLOCK __ATTR_NONNULL_T((1, 2)) struct obpostlockop *
-__NOTHROW_T(LOCKOP_CC *oblockop_callback_t)(struct oblockop *__restrict __self, void *__restrict __obj);
+typedef __postlockop_callback_t postlockop_callback_t;
+typedef __obpostlockop_callback_t obpostlockop_callback_t;
+typedef __lockop_callback_t lockop_callback_t;
+typedef __oblockop_callback_t oblockop_callback_t;
 
 /* Helper template for copy+paste:
 PRIVATE NOBLOCK NONNULL((1, 2)) void
@@ -183,50 +165,6 @@ PRIVATE NOBLOCK NONNULL((1, 2)) Tobpostlockop(mystruct) *
 NOTHROW(LOCKOP_CC mystruct_action_lop)(Toblockop(mystruct) *__restrict self,
                                        struct mystruct *__restrict obj);
 */
-
-struct postlockop {
-/*	SLIST_ENTRY(postlockop)                 plo_link; */
-	struct { struct postlockop *sle_next; } plo_link; /* [0..1] Next post-lock operation. */
-	postlockop_callback_t                   plo_func; /* [1..1][const] Callback to invoke. */
-};
-
-struct obpostlockop {
-/*	SLIST_ENTRY(obpostlockop)                 oplo_link; */
-	struct { struct obpostlockop *sle_next; } oplo_link; /* [0..1] Next post-lock operation. */
-	obpostlockop_callback_t                   oplo_func; /* [1..1][const] Callback to invoke. */
-};
-
-struct lockop {
-/*	SLIST_ENTRY(lockop)                 lo_link; */
-	struct { struct lockop *sle_next; } lo_link; /* [0..1] Next lock operation. */
-	lockop_callback_t                   lo_func; /* [1..1][const] Operation to perform. */
-};
-
-struct oblockop {
-/*	SLIST_ENTRY(oblockop)                 olo_link; */
-	struct { struct oblockop *sle_next; } olo_link; /* [0..1] Next lock operation. */
-	oblockop_callback_t                   olo_func; /* [1..1][const] Operation to perform. */
-};
-
-/* Should be `SLIST_HEAD(lockop_slist, lockop);' (but isn't to prevent dependency on <hybrid/sequence/list.h>) */
-struct lockop_slist {
-	struct lockop *slh_first; /* [0..1] List head */
-};
-
-/* `SLIST_HEAD(postlockop_slist, postlockop);' (but isn't to prevent dependency on <hybrid/sequence/list.h>)  */
-struct postlockop_slist {
-	struct postlockop *slh_first; /* [0..1] List head */
-};
-
-/* `SLIST_HEAD(oblockop_slist, oblockop);' (but isn't to prevent dependency on <hybrid/sequence/list.h>)  */
-struct oblockop_slist {
-	struct oblockop *slh_first; /* [0..1] List head */
-};
-
-/* `SLIST_HEAD(obpostlockop_slist, obpostlockop);' (but isn't to prevent dependency on <hybrid/sequence/list.h>)  */
-struct obpostlockop_slist {
-	struct obpostlockop *slh_first; /* [0..1] List head */
-};
 
 
 /* Helpers to make object-based lockop callbacks easier to integrate */

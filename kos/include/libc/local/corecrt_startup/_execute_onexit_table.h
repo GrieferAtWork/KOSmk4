@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd6fdc87c */
+/* HASH CRC-32:0xeed3f416 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local__execute_onexit_table_defined
 #define __local__execute_onexit_table_defined
 #include <__crt.h>
-#include <corecrt_startup.h>
+#include <bits/crt/dos/corecrt_startup.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__initialize_onexit_table_defined
 #define __local___localdep__initialize_onexit_table_defined

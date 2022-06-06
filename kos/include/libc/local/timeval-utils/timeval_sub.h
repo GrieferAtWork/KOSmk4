@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d6ac678 */
+/* HASH CRC-32:0xacbf7d8f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_timeval_sub_defined
 #include <__crt.h>
 #include <bits/os/timeval.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(timeval_sub) __ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timeval_sub))(struct timeval *__result, struct timeval const *__lhs, struct timeval const *__rhs) {

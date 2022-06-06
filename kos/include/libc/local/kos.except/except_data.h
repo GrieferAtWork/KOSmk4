@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x925f6065 */
+/* HASH CRC-32:0x9fdae108 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <kos/bits/fastexcept.h>
 #ifdef __arch_except_data
-struct exception_data;
+#include <kos/bits/exception_data.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(except_data) __ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED struct exception_data *
 __NOTHROW(__LIBKCALL __LIBC_LOCAL_NAME(except_data))(void) {

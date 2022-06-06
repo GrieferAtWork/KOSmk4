@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdcad925f */
+/* HASH CRC-32:0xb06cf107 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,6 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_wctomb_defined */
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>
+#include <libc/template/MB_CUR_MAX.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wctomb_s) __ATTR_OUTS(2, 3) __ATTR_OUT_OPT(1) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctomb_s))(int *__presult, char *__buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ __wc) {
@@ -49,7 +50,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wctomb_s))(int *__presult, char *__bu
 		return 1;
 #endif /* !__EINVAL */
 	}
-	if (__buflen < MB_CUR_MAX) {
+#ifdef __LOCAL_MB_CUR_MAX
+	if (__buflen < __LOCAL_MB_CUR_MAX)
+#else /* __LOCAL_MB_CUR_MAX */
+	if (__buflen < 7)
+#endif /* !__LOCAL_MB_CUR_MAX */
+	{
 #ifdef __ERANGE
 		return __ERANGE;
 #else /* __ERANGE */

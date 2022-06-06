@@ -111,7 +111,7 @@ struct __ATTR_PACKED vbe_modeinfo {
 	__uint8_t  vmi_bpp;               /* Bits per pixel (color-depth) */
 	__uint8_t  vmi_numbanks;          /* Number of banks */
 	__uint8_t  vmi_memmodel;          /* Memory model (oen of `VBE_MEMMODEL_*') */
-	__uint8_t  vmi_banksize;          /* Bask size in Kb */
+	__uint8_t  vmi_banksize;          /* Bank size in Kb */
 	__uint8_t  vmi_maximgplanes;      /* Max image plane number (== number of image planes -1) */
 	__uint8_t _vmi_res1;              /* ... */
 	__uint8_t  vmi_rbits;             /* [valid_if(vmi_memmodel == VBE_MEMMODEL_DCOLOR)] # of red color bits */

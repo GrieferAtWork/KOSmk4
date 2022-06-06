@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
+/* (#) Portability: EMX kLIBC (/libc/include/sort.h) */
 /* (#) Portability: libiberty (/include/sort.h) */
 }
 

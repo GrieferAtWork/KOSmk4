@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28b5ba62 */
+/* HASH CRC-32:0xede0a7c0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,9 +33,7 @@ DECL_BEGIN
 #if defined(__OPTIMIZE_SIZE__) && defined(__x86_64__)
 DEFINE_INTERN_ALIAS(libc_lockop_reap_ex, libc_oblockop_reap_ex);
 #else /* __OPTIMIZE_SIZE__ && __x86_64__ */
-#ifndef _KOS_LOCKOP_H
-#include <kos/lockop.h>
-#endif /* !_KOS_LOCKOP_H */
+#include <kos/bits/lockop.h>
 #include <hybrid/__atomic.h>
 INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_INOUT(1) NONNULL((2, 3)) void
 NOTHROW(__LOCKOP_CC libc_lockop_reap_ex)(struct lockop_slist *__restrict self,
@@ -51,9 +49,7 @@ NOTHROW(__LOCKOP_CC libc_lockop_reap_ex)(struct lockop_slist *__restrict self,
 #endif /* !__INTELLISENSE__ */
 }
 #endif /* !__OPTIMIZE_SIZE__ || !__x86_64__ */
-#ifndef _KOS_LOCKOP_H
-#include <kos/lockop.h>
-#endif /* !_KOS_LOCKOP_H */
+#include <kos/bits/lockop.h>
 #include <hybrid/__atomic.h>
 INTERN ATTR_SECTION(".text.crt.sched.lockop") __NOBLOCK ATTR_INOUT(1) NONNULL((2, 3, 5)) void
 NOTHROW(__LOCKOP_CC libc_oblockop_reap_ex)(struct oblockop_slist *__restrict self,

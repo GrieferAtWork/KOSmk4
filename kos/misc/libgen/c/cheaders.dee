@@ -1644,7 +1644,7 @@ function usingImportReturnTypeNameOf(exposedName: string): string {
 	return "__PRIVATE_{}_rt".format({ exposedName });
 }
 
-@@Set of functions that are imported from the global namespace. Functions
+@@Set  of functions that are imported from the global namespace. Functions
 @@in this set may need to be able to support the cast-to-return-type trick
 @@if they are ever defined as macros.
 global everImportedFromGlobalNamespace: HashSet with string = HashSet();

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2d398ca */
+/* HASH CRC-32:0x53ddb9f1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -239,6 +239,8 @@ __SYSDECL_BEGIN
  * function may differ based on other flags passed to `set_exception_handler()' */
 typedef __except_handler_t except_handler_t;
 #endif /* !__except_handler_t_defined */
+
+struct exception_data;
 
 /* >> set_exception_handler(2)
  * Set the exception handler mode for the calling thread.

@@ -167,9 +167,9 @@ done_tmpfs:
 
 		/* Construct ansitty device /dev/svga1 */
 		bzero(&tty, sizeof(tty));
-#if HOP_OPENFD_MODE_AUTO != 0 /* When `0', will have already been done by bzero() */
-		tty.smt_res.of_mode = HOP_OPENFD_MODE_AUTO;
-#endif /* HOP_OPENFD_MODE_AUTO != 0 */
+#if OPENFD_MODE_AUTO != 0 /* When `0', will have already been done by bzero() */
+		tty.smt_res.of_mode = OPENFD_MODE_AUTO;
+#endif /* OPENFD_MODE_AUTO != 0 */
 		tty.smt_res.of_flags = IO_CLOEXEC;
 		Ioctl(display, SVGA_IOC_GETDEFMODE, &tty.smt_mode);
 		tty.smt_name = "svga1";
@@ -339,8 +339,8 @@ done_tmpfs:
 
 		/* Kill  anything which may  have been left  alive by the shell.
 		 * Note that kill(-1, ...) will never kill a process with pid=1,
-		 * meaning  that we  (the process  with pid=1)  won't get killed
-		 * by this! */
+		 * meaning  that we (the process with pid=1) won't get killed by
+		 * this! */
 		/* TODO: Send SIGTERM and  wait for a  configurable timeout until  all
 		 *       processes except for our own have died. Only once the timeout
 		 *       expires with different processes  still alive should we  send
@@ -355,15 +355,16 @@ done_tmpfs:
 		kill(-1, SIGKILL);
 
 		/* Become the foreground process of /dev/console
-		 * In  theory  this  shouldn't  be  necessary,  since  the  kill()   before
-		 * should  have  gotten rid  of any  process that  could have  been holding
-		 * the foreground-process  lock before,  however just  in case  the  kernel
-		 * decides to  have a  SIGKILL-broadcast  be performed  asynchronously,  in
-		 * which case  the  old foreground  process  may  still be  alive  when  we
-		 * clear the console  above, we  go the safe  route and  always become  the
-		 * foreground process once again. - Note however that since we've installed
-		 * a SIG_IGN  handler for  `SIGTTOU', we  still wouldn't  get suspended  in
-		 * such a scenario, but we'd also be unable to reset the tty... */
+		 * In theory  this shouldn't  be necessary,  since the  kill()  before
+		 * should have gotten rid of any process that could have been  holding
+		 * the foreground-process lock before, however just in case the kernel
+		 * decides to have a SIGKILL-broadcast be performed asynchronously, in
+		 * which  case the old  foreground process may still  be alive when we
+		 * clear the console above, we go the safe route and always become the
+		 * foreground process  once  again.  - Note  however  that  since  we'
+		 * installed a SIG_IGN  handler for `SIGTTOU',  we still wouldn't  get
+		 * suspended in such a scenario, but we'd also be unable to reset  the
+		 * tty... */
 		console_set_fgproc();
 
 		/* Reset the termios of /dev/console to sane values */

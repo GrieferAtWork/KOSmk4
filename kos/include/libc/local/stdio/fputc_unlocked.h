@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29e35e05 */
+/* HASH CRC-32:0x9ce44b9a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,6 +65,9 @@ __CREDIRECT(__ATTR_INOUT(4) __ATTR_IN_OPT(1),__SIZE_TYPE__,__THROWING,__localdep
 #undef __local___localdep_crt_fwrite_unlocked_defined
 #endif /* !... */
 #endif /* !__local___localdep_crt_fwrite_unlocked_defined */
+__NAMESPACE_LOCAL_END
+#include <asm/crt/stdio.h>
+__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fputc_unlocked) __ATTR_INOUT(2) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fputc_unlocked))(int __ch, __FILE *__restrict __stream) __THROWS(...) {
 #if defined(__CRT_DOS) && (defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf))

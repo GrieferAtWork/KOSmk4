@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85aca848 */
+/* HASH CRC-32:0xf58c7fd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_timeval_add_defined
 #include <__crt.h>
 #include <bits/os/timeval.h>
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(timeval_add) __ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timeval_add))(struct timeval *__result, struct timeval const *__lhs, struct timeval const *__rhs) {

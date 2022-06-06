@@ -553,6 +553,7 @@ global typeHeaders: {string: string} = Dict({
 	"__STDC_UINT_AS_SIZE_T": "<features.h>",
 	"__STDC_UINT32_AS_SIZE_T": "<features.h>",
 	"__STDC_INT_AS_UINT_T": "<features.h>",
+	"__KOS_FIXED_CONST": "<features.h>",
 
 	/* <bits/os/...> */
 	"__timespec": "<bits/os/timespec.h>",

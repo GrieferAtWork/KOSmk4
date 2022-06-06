@@ -23,6 +23,22 @@
 %[define_decl_include_implication("<bits/os/siginfo.h>" => ["<hybrid/typecore.h>"])]
 %[define_decl_include("<bits/os/siginfo.h>": ["struct __siginfo_struct"])]
 
+%[define_decl_include_implication("<kos/bits/exception_nest.h>" => [
+	"<hybrid/typecore.h>",
+	"<bits/types.h>",
+	"<kos/bits/except.h>",
+	"<kos/bits/exception_data.h>",
+])]
+%[define_decl_include("<kos/bits/exception_nest.h>": [
+	"struct _exception_nesting_data"
+])]
+%[define_decl_include("<kos/bits/exception_data.h>": [
+	"struct exception_data"
+])]
+/*%[define_decl_include("<kos/bits/exception_info.h>": [
+	"struct exception_info"
+])]*/
+
 %(auto_source){
 #include <errno.h>
 #include <signal.h>
@@ -166,7 +182,7 @@ typedef __except_subclass_t except_subclass_t;
 [[kernel, cc(LIBKCALL)]]
 [[if($extended_include_prefix("<kos/bits/fastexcept.h>")defined(__arch_except_data)),
   preferred_fast_extern_inline("except_data", { return __arch_except_data(); })]]
-[[const, wunused, nothrow, nonnull, decl_prefix(struct exception_data;)]]
+[[const, wunused, nothrow, nonnull, decl_include("<kos/bits/exception_data.h>")]]
 [[userimpl, requires_include("<kos/bits/fastexcept.h>"), requires(defined(__arch_except_data))]]
 struct exception_data *except_data(void) {
 	return __arch_except_data();
@@ -264,7 +280,7 @@ except_register_state_t *except_register_state(void) {
 @@When no special errno is defined for `data', return `EPERM'.
 [[kernel, cc(LIBKCALL)]]
 [[pure, wunused, decl_include("<bits/types.h>")]]
-[[decl_prefix(struct exception_data;)]]
+[[decl_include("<kos/bits/exception_data.h>")]]
 [[impl_include("<asm/os/errno.h>")]]
 [[impl_include("<hybrid/host.h>")]]
 [[impl_include("<kos/bits/exception_data.h>")]]
@@ -915,7 +931,7 @@ for (local name: classes.keys.sorted()) {
 @@Otherwise, `*result' is left in an undefined state, and `false'
 @@is returned.
 [[wunused, kernel, cc(LIBKCALL)]]
-[[decl_prefix(struct exception_data;)]]
+[[decl_include("<kos/bits/exception_data.h>")]]
 [[decl_include("<bits/os/siginfo.h>")]]
 [[impl_include("<hybrid/host.h>")]]
 [[impl_include("<asm/os/siginfo.h>")]]
@@ -1451,7 +1467,7 @@ unsigned int except_priority(except_code_t code) {
 @@@param: flags: Set of `EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_*'
 @@@return: * : The usual pformatprinter-compatible return value
 [[kernel, cc(LIBKCALL)]]
-[[decl_prefix(struct exception_data;)]]
+[[decl_include("<kos/bits/exception_data.h>")]]
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<hybrid/host.h>", "<kos/except/codes.h>")]]
 [[impl_include("<kos/bits/exception_data.h>", "<bits/crt/inttypes.h>")]]
@@ -1958,7 +1974,8 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(except_code_t __code);
 #define __EXCEPT_NESTING_BEGIN_CC __LIBKCALL
 #endif /* !__EXCEPT_NESTING_BEGIN_CC */
 ), nothrow, kernel, cc(__EXCEPT_NESTING_BEGIN_CC)]]
-[[decl_include("<kos/bits/exception_info.h>", "<bits/types.h>")]]
+[[decl_include("<kos/bits/exception_nest.h>", "<bits/types.h>")]]
+[[impl_include("<kos/bits/exception_info.h>")]]
 void except_nesting_begin([[inout]] struct _exception_nesting_data *__restrict saved) {
 	struct exception_info *info = except_info();
 	if (info->@ei_code@ == @EXCEPT_CODEOF@(@E_OK@)) {
@@ -1986,8 +2003,9 @@ void except_nesting_begin([[inout]] struct _exception_nesting_data *__restrict s
 #define __EXCEPT_NESTING_END_CC __LIBKCALL
 #endif /* !__EXCEPT_NESTING_END_CC */
 ), nothrow, kernel, cc(__EXCEPT_NESTING_END_CC)]]
-[[decl_include("<kos/bits/exception_info.h>")]]
+[[decl_include("<kos/bits/exception_nest.h>")]]
 [[impl_include("<hybrid/__assert.h>")]]
+[[impl_include("<kos/bits/exception_info.h>")]]
 void except_nesting_end([[in]] struct _exception_nesting_data const *__restrict saved) {
 	struct exception_info *info;
 	if unlikely(!saved->@en_size@)

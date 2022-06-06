@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b4a2f4b */
+/* HASH CRC-32:0xbd67411e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+#include <bits/crt/dos/corecrt_startup.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST WUNUSED _crt_app_type
 NOTHROW_NCX(LIBDCALL libc__query_app_type)(void) {
 	return (_crt_app_type)1;
@@ -66,6 +67,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") ATTR_PU
 NOTHROW_NCX(LIBDCALL libc__get_wide_winmain_command_line)(void) {
 	return (__WCHAR16_TYPE__ *)*libc___p__wcmdln();
 }
+#include <bits/crt/dos/corecrt_startup.h>
 #include <asm/os/syslog.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") void
 NOTHROW_NCX(LIBDCALL libc__initterm)(_PVFV *start,
@@ -82,6 +84,7 @@ NOTHROW_NCX(LIBDCALL libc__initterm)(_PVFV *start,
 	libc_syslog(__LOG_DEBUG, "[libd] _initterm: done\n");
 
 }
+#include <bits/crt/dos/corecrt_startup.h>
 #include <asm/os/syslog.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") int
 NOTHROW_NCX(LIBDCALL libc__initterm_e)(_onexit_t *start,
@@ -106,6 +109,7 @@ NOTHROW_NCX(LIBDCALL libc__initterm_e)(_onexit_t *start,
 
 	return result;
 }
+#include <bits/crt/dos/corecrt_startup.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") int
 NOTHROW_NCX(LIBDCALL libc__initialize_onexit_table)(struct _onexit_table_t *self) {
 	if unlikely(!self)
@@ -146,7 +150,7 @@ NOTHROW_NCX(LIBDCALL libc__execute_onexit_table)(struct _onexit_table_t *self) {
 
 	return result;
 }
-#include <corecrt_startup.h>
+#include <bits/crt/dos/corecrt_startup.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.application.init") ATTR_INOUT(2) ATTR_INOUT(3) int
 NOTHROW_NCX(LIBDCALL libc___dllonexit)(_onexit_t func,
                                        _onexit_t **p_begin,

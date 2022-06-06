@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88aaee14 */
+/* HASH CRC-32:0x63a53b0f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __CRT_HAVE_except_as_errno
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
-struct exception_data;
+#include <kos/bits/exception_data.h>
 __NAMESPACE_LOCAL_BEGIN
 __COMPILER_CREDIRECT(__LIBC,__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__errno_t,__NOTHROW_NCX,__LIBKCALL,__localdep_except_as_errno,(struct exception_data const *__restrict __self),except_as_errno,(__self))
 #else /* __CRT_HAVE_except_as_errno */
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_except_data_defined
 #ifdef __CRT_HAVE_except_data
 __NAMESPACE_LOCAL_END
-struct exception_data;
+#include <kos/bits/exception_data.h>
 __NAMESPACE_LOCAL_BEGIN
 __COMPILER_CREDIRECT(__LIBC,__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,struct exception_data *,__NOTHROW,__LIBKCALL,__localdep_except_data,(void),except_data,())
 #else /* __CRT_HAVE_except_data */

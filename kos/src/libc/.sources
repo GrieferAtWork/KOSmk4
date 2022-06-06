@@ -68,6 +68,11 @@ BEGIN
 			"auto/*.c",
 			"user/*.c",
 		})
+#if 0 /* Enable this and run clang-tidy to test-compile libc/local headers. */
+		for (local dir: fs.dir("kos/include/libc/local")) {
+			SOURCE({ "/kos/include/libc/local/" + dir + "/*.h" })
+		}
+#endif
 	END
 	BEGIN GROUP("libs.libc") { COMPILE };
 		SET_LANGUAGE("assembler-with-cpp")

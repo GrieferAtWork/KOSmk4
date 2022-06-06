@@ -456,9 +456,9 @@ NOTHROW(FCALL cmodule_getsym_withhint)(struct cmodule *start_module,
                                        uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
 
 /* Initialize a debug information CU parser to load debug information for a component located
- * at `dip' within the `.debug_info' mapping of `self'. For this purpose, this function will
- * locate the CU that contains `dip', and proceed to call `cmodunit_parser()' to initialize
- * `result'. If the given `dip' is not apart of any of the CUs of `self', then `result' will
+ * at  `dip' within the `.debug_info' mapping of `self'. For this purpose, this function will
+ * locate  the CU that contains `dip', and  proceed to call `cmodunit_parser()' to initialize
+ * `result'. If the given `dip' is not apart of any of the CUs of `self', then `result'  will
  * be initialized to always indicate EOF.
  * @param: dip: DebugInfoPointer. (s.a. `cmodunit_parser_from_dip()') */
 FUNDEF NONNULL((1, 2, 3)) void

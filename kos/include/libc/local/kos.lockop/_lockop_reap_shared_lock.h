@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97597788 */
+/* HASH CRC-32:0x6378b55d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,14 +24,8 @@
 #include <kos/syscalls.h>
 #if __CRT_HAVE_XSC(lfutex)
 #include <kos/anno.h>
-#ifndef __LOCKOP_CC
-#define __LOCKOP_CC __LIBKCALL
-#endif /* !__LOCKOP_CC */
-struct lockop_slist;
+#include <kos/bits/lockop.h>
 struct shared_lock;
-#ifndef _KOS_LOCKOP_H
-#include <kos/lockop.h>
-#endif /* !_KOS_LOCKOP_H */
 #include <hybrid/__atomic.h>
 #include <kos/sched/shared-lock.h>
 __NAMESPACE_LOCAL_BEGIN

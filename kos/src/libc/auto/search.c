@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x901d1873 */
+/* HASH CRC-32:0x94270af0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1074,7 +1074,7 @@ INTERN ATTR_SECTION(".text.crt.utility.search") ATTR_INOUT_OPT(1) NONNULL((2)) v
 #ifndef __dwrap_cTP_TDTPTPTP_CA1A2_defined
 #define __dwrap_cTP_TDTPTPTP_CA1A2_defined
 PRIVATE ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") int
-(LIBCCALL _dwrap_cTP_TDTPTPTP_CA1A2)(__compar_fn_t c,
+(LIBCCALL _dwrap_cTP_TDTPTPTP_CA1A2)(int (LIBDCALL *c)(void const *a, void const *b),
                                      void const *a,
                                      void const *b) THROWS(...) {
 	return (*c)(a, b);
@@ -1087,7 +1087,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.search") WUNUSED A
                       void const *pbase,
                       size_t __KOS_FIXED_CONST *pitem_count,
                       size_t item_size,
-                      __compar_fn_t compar) THROWS(...) {
+                      int (LIBDCALL *compar)(void const *a, void const *b)) THROWS(...) {
 	return libc__lfind_s(key, pbase, pitem_count, item_size, (int (LIBCCALL *)(void *, void const *, void const *))&_dwrap_cTP_TDTPTPTP_CA1A2, (void *)compar);
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -1099,7 +1099,7 @@ INTERN ATTR_SECTION(".text.crt.utility.search") WUNUSED ATTR_IN(3) ATTR_IN_OPT(1
                       void const *pbase,
                       size_t __KOS_FIXED_CONST *pitem_count,
                       size_t item_size,
-                      __compar_fn_t compar) THROWS(...) {
+                      int (LIBCCALL *compar)(void const *a, void const *b)) THROWS(...) {
 	size_t i, count = *pitem_count;
 	void const *result = pbase;
 	for (i = 0; i < count; ++i) {

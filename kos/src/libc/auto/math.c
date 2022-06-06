@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9973cd0 */
+/* HASH CRC-32:0x4722696d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1403,6 +1403,7 @@ NOTHROW(LIBCCALL libc_log2l)(__LONGDOUBLE x) {
 #include <libm/isnan.h>
 #include <libm/matherr.h>
 #include <libm/pow.h>
+#include <libm/signbit.h>
 /* >> powf(3), pow(3), powl(3)
  * Return `x' to the `y' power */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_pow double
@@ -1473,6 +1474,7 @@ NOTHROW(LIBCCALL libc_sqrt)(double x) {
 #include <libm/isnan.h>
 #include <libm/matherr.h>
 #include <libm/pow.h>
+#include <libm/signbit.h>
 /* >> powf(3), pow(3), powl(3)
  * Return `x' to the `y' power */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_powf float
@@ -1555,6 +1557,7 @@ NOTHROW(LIBCCALL libc_sqrtf)(float x) {
 #include <libm/isnan.h>
 #include <libm/matherr.h>
 #include <libm/pow.h>
+#include <libm/signbit.h>
 /* >> powf(3), pow(3), powl(3)
  * Return `x' to the `y' power */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __DECL_SIMD_powl __LONGDOUBLE

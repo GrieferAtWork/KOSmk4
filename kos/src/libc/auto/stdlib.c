@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26fa3b32 */
+/* HASH CRC-32:0x6dd1ba9a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3682,6 +3682,7 @@ NOTHROW_NCX(LIBKCALL libc__wctomb_l)(char *buf,
 	(void)locale;
 	return libc_wctomb(buf, wc);
 }
+#include <libc/template/MB_CUR_MAX.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_OUTS(2, 3) ATTR_OUT_OPT(1) errno_t
 NOTHROW_NCX(LIBDCALL libd_wctomb_s)(int *presult,
                                     char *buf,
@@ -3694,7 +3695,12 @@ NOTHROW_NCX(LIBDCALL libd_wctomb_s)(int *presult,
 
 
 	}
-	if (buflen < MB_CUR_MAX) {
+#ifdef __LOCAL_MB_CUR_MAX
+	if (buflen < __LOCAL_MB_CUR_MAX)
+#else /* __LOCAL_MB_CUR_MAX */
+	if (buflen < 7)
+#endif /* !__LOCAL_MB_CUR_MAX */
+	{
 
 		return 34;
 
@@ -3704,6 +3710,7 @@ NOTHROW_NCX(LIBDCALL libd_wctomb_s)(int *presult,
 	*presult = libd_wctomb(buf, wc);
 	return 0;
 }
+#include <libc/template/MB_CUR_MAX.h>
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_OUTS(2, 3) ATTR_OUT_OPT(1) errno_t
 NOTHROW_NCX(LIBKCALL libc_wctomb_s)(int *presult,
                                     char *buf,
@@ -3716,7 +3723,12 @@ NOTHROW_NCX(LIBKCALL libc_wctomb_s)(int *presult,
 
 
 	}
-	if (buflen < MB_CUR_MAX) {
+#ifdef __LOCAL_MB_CUR_MAX
+	if (buflen < __LOCAL_MB_CUR_MAX)
+#else /* __LOCAL_MB_CUR_MAX */
+	if (buflen < 7)
+#endif /* !__LOCAL_MB_CUR_MAX */
+	{
 
 		return ERANGE;
 

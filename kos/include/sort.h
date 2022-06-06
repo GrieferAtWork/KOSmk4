@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5285e645 */
+/* HASH CRC-32:0xb83304a3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: EMX kLIBC (/libc/include/sort.h) */
 /* (#) Portability: libiberty (/include/sort.h) */
 #ifndef _SORT_H
 #define _SORT_H 1

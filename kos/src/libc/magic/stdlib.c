@@ -5228,7 +5228,8 @@ int _wctomb_l(char *buf, wchar_t wc, $locale_t locale) {
 %
 %#ifdef __USE_DOS_SLIB
 [[wchar, decl_include("<bits/types.h>")]]
-[[impl_include("<libc/errno.h>")]]
+[[requires_function(wctomb)]]
+[[impl_include("<libc/errno.h>", "<libc/template/MB_CUR_MAX.h>")]]
 [[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 errno_t wctomb_s([[out_opt]] int *presult,
                  [[out(? <= buflen)]] char *buf,
@@ -5240,7 +5241,12 @@ errno_t wctomb_s([[out_opt]] int *presult,
 		return 1;
 @@pp_endif@@
 	}
-	if (buflen < @MB_CUR_MAX@) {
+@@pp_ifdef __LOCAL_MB_CUR_MAX@@
+	if (buflen < __LOCAL_MB_CUR_MAX)
+@@pp_else@@
+	if (buflen < 7)
+@@pp_endif@@
+	{
 @@pp_ifdef ERANGE@@
 		return $ERANGE;
 @@pp_else@@

@@ -22,8 +22,7 @@
 
 #include <__crt.h>
 #include <__stdinc.h>
-
-#include <hybrid/typecore.h>
+#include <features.h>
 
 #ifdef __CC__
 __DECL_BEGIN

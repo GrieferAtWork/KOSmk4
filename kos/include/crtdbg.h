@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x213b8e0b */
+/* HASH CRC-32:0x4ea63ed8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,6 +38,7 @@
 
 #include <bits/types.h>
 #include <parts/assert.h>
+#include <bits/crt/dos/_CrtMemState.h>
 
 #include <crtdefs.h>
 
@@ -83,16 +84,6 @@
 
 #define _CRTDBG_REPORT_FLAG (-1)
 
-#define _BLOCK_TYPE(block)    ((block) & 0xffff)
-#define _BLOCK_SUBTYPE(block) ((block) >> 16 & 0xffff)
-
-#define _FREE_BLOCK   0
-#define _NORMAL_BLOCK 1
-#define _CRT_BLOCK    2
-#define _IGNORE_BLOCK 3
-#define _CLIENT_BLOCK 4
-#define _MAX_BLOCKS   5
-
 #ifndef _STATIC_ASSERT
 #define _STATIC_ASSERT(expr) __STATIC_ASSERT(expr)
 #endif /* !_STATIC_ASSERT */
@@ -119,36 +110,10 @@ typedef int (__ATTR_CLRCALL *_CRT_ALLOC_HOOK_M)(int, void *, __SIZE_TYPE__, int,
 typedef void (__ATTR_CLRCALL *_CRT_DUMP_CLIENT_M)(void *, __SIZE_TYPE__);
 #endif /* _M_CEE */
 
-
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("pBlockHeader")
-#pragma push_macro("lCounts")
-#pragma push_macro("lSizes")
-#pragma push_macro("lHighWaterCount")
-#pragma push_macro("lTotalCount")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef pBlockHeader
-#undef lCounts
-#undef lSizes
-#undef lHighWaterCount
-#undef lTotalCount
-struct _CrtMemBlockHeader;
-typedef struct _CrtMemState {
-	struct _CrtMemBlockHeader *pBlockHeader;
-	__SIZE_TYPE__              lCounts[_MAX_BLOCKS];
-	__SIZE_TYPE__              lSizes[_MAX_BLOCKS];
-	__SIZE_TYPE__              lHighWaterCount;
-	__SIZE_TYPE__              lTotalCount;
-} _CrtMemState;
-#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("lTotalCount")
-#pragma pop_macro("lHighWaterCount")
-#pragma pop_macro("lSizes")
-#pragma pop_macro("lCounts")
-#pragma pop_macro("pBlockHeader")
-#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-
+#ifndef ___PFNCRTDOFORALLCLIENTOBJECTS_defined
+#define ___PFNCRTDOFORALLCLIENTOBJECTS_defined
 typedef void (__ATTR_CDECL *_PFNCRTDOFORALLCLIENTOBJECTS)(void *, void *);
+#endif /* !___PFNCRTDOFORALLCLIENTOBJECTS_defined */
 
 
 #ifndef _DEBUG
@@ -702,28 +667,28 @@ __LIBC __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL _CrtReportBlockTy
 __NAMESPACE_LOCAL_USING_OR_IMPL(_CrtReportBlockType, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED int __NOTHROW_NCX(__LIBDCALL _CrtReportBlockType)(void const *__ptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtReportBlockType))(__ptr); })
 #endif /* !__CRT_HAVE__CrtReportBlockType */
 #ifdef __CRT_HAVE__CrtMemCheckpoint
-__LIBC void __NOTHROW_NCX(__LIBDCALL _CrtMemCheckpoint)(_CrtMemState *__state) __CASMNAME_SAME("_CrtMemCheckpoint");
+__LIBC __ATTR_OUT(1) void __NOTHROW_NCX(__LIBDCALL _CrtMemCheckpoint)(_CrtMemState *__state) __CASMNAME_SAME("_CrtMemCheckpoint");
 #else /* __CRT_HAVE__CrtMemCheckpoint */
 #include <libc/local/crtdbg/_CrtMemCheckpoint.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtMemCheckpoint, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBDCALL _CrtMemCheckpoint)(_CrtMemState *__state) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtMemCheckpoint))(__state); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtMemCheckpoint, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) void __NOTHROW_NCX(__LIBDCALL _CrtMemCheckpoint)(_CrtMemState *__state) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtMemCheckpoint))(__state); })
 #endif /* !__CRT_HAVE__CrtMemCheckpoint */
 #ifdef __CRT_HAVE__CrtMemDifference
-__LIBC int __NOTHROW_NCX(__LIBDCALL _CrtMemDifference)(_CrtMemState *__state, _CrtMemState const *__old_state, _CrtMemState const *__new_state) __CASMNAME_SAME("_CrtMemDifference");
+__LIBC __ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1) int __NOTHROW_NCX(__LIBDCALL _CrtMemDifference)(_CrtMemState *__state, _CrtMemState const *__old_state, _CrtMemState const *__new_state) __CASMNAME_SAME("_CrtMemDifference");
 #else /* __CRT_HAVE__CrtMemDifference */
 #include <libc/local/crtdbg/_CrtMemDifference.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtMemDifference, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBDCALL _CrtMemDifference)(_CrtMemState *__state, _CrtMemState const *__old_state, _CrtMemState const *__new_state) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtMemDifference))(__state, __old_state, __new_state); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtMemDifference, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_IN(3) __ATTR_OUT(1) int __NOTHROW_NCX(__LIBDCALL _CrtMemDifference)(_CrtMemState *__state, _CrtMemState const *__old_state, _CrtMemState const *__new_state) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtMemDifference))(__state, __old_state, __new_state); })
 #endif /* !__CRT_HAVE__CrtMemDifference */
 #ifdef __CRT_HAVE__CrtMemDumpAllObjectsSince
-__LIBC void __NOTHROW_NCX(__LIBDCALL _CrtMemDumpAllObjectsSince)(_CrtMemState const *__state) __CASMNAME_SAME("_CrtMemDumpAllObjectsSince");
+__LIBC __ATTR_IN(1) void __NOTHROW_NCX(__LIBDCALL _CrtMemDumpAllObjectsSince)(_CrtMemState const *__state) __CASMNAME_SAME("_CrtMemDumpAllObjectsSince");
 #else /* __CRT_HAVE__CrtMemDumpAllObjectsSince */
 #include <libc/local/crtdbg/_CrtMemDumpAllObjectsSince.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtMemDumpAllObjectsSince, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBDCALL _CrtMemDumpAllObjectsSince)(_CrtMemState const *__state) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtMemDumpAllObjectsSince))(__state); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtMemDumpAllObjectsSince, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) void __NOTHROW_NCX(__LIBDCALL _CrtMemDumpAllObjectsSince)(_CrtMemState const *__state) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtMemDumpAllObjectsSince))(__state); })
 #endif /* !__CRT_HAVE__CrtMemDumpAllObjectsSince */
 #ifdef __CRT_HAVE__CrtMemDumpStatistics
-__LIBC void __NOTHROW_NCX(__LIBDCALL _CrtMemDumpStatistics)(_CrtMemState const *__state) __CASMNAME_SAME("_CrtMemDumpStatistics");
+__LIBC __ATTR_IN(1) void __NOTHROW_NCX(__LIBDCALL _CrtMemDumpStatistics)(_CrtMemState const *__state) __CASMNAME_SAME("_CrtMemDumpStatistics");
 #else /* __CRT_HAVE__CrtMemDumpStatistics */
 #include <libc/local/crtdbg/_CrtMemDumpStatistics.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtMemDumpStatistics, __FORCELOCAL __ATTR_ARTIFICIAL void __NOTHROW_NCX(__LIBDCALL _CrtMemDumpStatistics)(_CrtMemState const *__state) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtMemDumpStatistics))(__state); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(_CrtMemDumpStatistics, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) void __NOTHROW_NCX(__LIBDCALL _CrtMemDumpStatistics)(_CrtMemState const *__state) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_CrtMemDumpStatistics))(__state); })
 #endif /* !__CRT_HAVE__CrtMemDumpStatistics */
 #ifdef __CRT_HAVE__CrtDumpMemoryLeaks
 __LIBC int __NOTHROW_NCX(__LIBDCALL _CrtDumpMemoryLeaks)(void) __CASMNAME_SAME("_CrtDumpMemoryLeaks");

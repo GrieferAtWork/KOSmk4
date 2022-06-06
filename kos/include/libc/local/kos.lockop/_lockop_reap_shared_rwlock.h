@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x961169f3 */
+/* HASH CRC-32:0x2a218184 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,7 @@
 #include <kos/bits/shared-rwlock.h>
 #if defined(__CRT_HAVE_shared_rwlock_endwrite) || defined(__shared_rwlock_wrwait_send)
 #include <kos/anno.h>
-#ifndef __LOCKOP_CC
-#define __LOCKOP_CC __LIBKCALL
-#endif /* !__LOCKOP_CC */
-struct lockop_slist;
+#include <kos/bits/lockop.h>
 struct shared_rwlock;
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_shared_rwlock_endwrite_defined
@@ -94,11 +91,6 @@ __LOCAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT(1) __BOOL __NOTHROW(__FCALL __loca
 }
 #endif /* !__CRT_HAVE_shared_rwlock_trywrite */
 #endif /* !__local___localdep_shared_rwlock_trywrite_defined */
-__NAMESPACE_LOCAL_END
-#ifndef _KOS_LOCKOP_H
-#include <kos/lockop.h>
-#endif /* !_KOS_LOCKOP_H */
-__NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_lockop_reap_shared_rwlock) __NOBLOCK __ATTR_INOUT(1) __ATTR_INOUT(2) void
 __NOTHROW(__LOCKOP_CC __LIBC_LOCAL_NAME(_lockop_reap_shared_rwlock))(struct lockop_slist *__restrict __self, struct shared_rwlock *__restrict __lock) {
 #ifndef __INTELLISENSE__

@@ -28,8 +28,10 @@
 #include <bits/crt/fenv.h>
 #include <bits/types.h>
 
+#include <libc/fenv.h>
 #include <libm/asm/expm1.h>
 #include <libm/floor.h>
+#include <libm/inf.h>
 #include <libm/ldexp.h>
 
 #ifdef __CC__

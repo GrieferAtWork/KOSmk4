@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4dd02ee4 */
+/* HASH CRC-32:0x9a34335f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,10 +21,11 @@
 #ifndef __local_guid_fromstr_defined
 #define __local_guid_fromstr_defined
 #include <__crt.h>
+#include <kos/bits/guid.h>
 #include <libc/template/hex.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(guid_fromstr) __ATTR_IN(1) __ATTR_OUT(2) char const *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(guid_fromstr))(char const __string[GUID_STRLEN], guid_t *__restrict __result) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(guid_fromstr))(char const __string[__GUID_STRLEN], __guid_t *__restrict __result) {
 	unsigned int __i;
 	for (__i = 0; __i < 16; ++__i) {
 		__BYTE_TYPE__ __nibbles[2];

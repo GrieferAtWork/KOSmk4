@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
+/* (#) Portability: libstdc++ (/include/bits/std_abs.h) */
 %[define_replacement(errno_t = __errno_t)]
 
 %[insert:prefix(

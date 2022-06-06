@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f22895a */
+/* HASH CRC-32:0x9b511bdb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1485,6 +1485,7 @@ err:
 	return temp;
 #undef FMT
 }
+#include <kos/bits/exception_info.h>
 /* >> except_nesting_begin(3)
  * Begin a nested  TRY-block. (i.e. inside  of another EXCEPT  block)
  * Don't call this function directly; use `NESTED_EXCEPTION' instead. */
