@@ -21,6 +21,7 @@
 #define GUARD_LIBC_LIBC_STDLIB_CTEST 1
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
+#define _UTF_SOURCE 1
 #undef NDEBUG
 
 #include <hybrid/compiler.h>
@@ -31,6 +32,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <uchar.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -47,32 +49,79 @@ PRIVATE void assert_strtoi(intmax_t expected, char const *str) {
 	        str, expected, actual);
 }
 
-DEFINE_TEST(strtoi) {
-	assert_strtoi(0, "0");
-	assert_strtoi(42, "42");
-	assert_strtoi(0, "  0");
-	assert_strtoi(42, "  42");
-	assert_strtoi(42, "\n\t 42");
-	assert_strtoi(42, "\n\t\u00A0" "42");
-	assert_strtoi(42, "\n\t\u2000" "42");
-	assert_strtoi(42, "\n\t\u2001" "42");
-	assert_strtoi(42, "\n\t\u2002" "42");
-	assert_strtoi(42, "\n\t\u2003" "42");
-	assert_strtoi(42, "\n\t\u2004" "42");
-	assert_strtoi(42, "\n\t\u2005" "42");
-	assert_strtoi(42, "\n\t\u2006" "42");
-	assert_strtoi(42, "\n\t\u2007" "42");
-	assert_strtoi(42, "\n\t\u2008" "42");
-	assert_strtoi(42, "\n\t\u2009" "42");
-	assert_strtoi(42, "\n\t\u200A" "42");
-	assert_strtoi(42, "\n\t\u202F" "42");
-	assert_strtoi(42, "\n\t\u205F" "42");
-	assert_strtoi(0x42, "0x42");
-	assert_strtoi(0x42, "  0x42");
-	assert_strtoi(1 + 2 + 4 + 8, "0b1111");
-	assert_strtoi(1 + 2 + 4 + 8, "  0b1111");
+PRIVATE void assert_wcstoi(intmax_t expected, wchar_t const *str) {
+	intmax_t actual;
+	errno_t error;
+	actual = wcstoimax_r(str, NULL, 0, &error);
+	assertf(error == EOK, "Failed to parse: %lq -- %s(%s)",
+	        str, strerrorname_np(error), strerrordesc_np(error));
+	assertf(actual == expected,
+	        "Wrong value parsed from %lq (expected: %" PRIdMAX ", actual: %" PRIdMAX ")",
+	        str, expected, actual);
+}
 
-	/* TODO: Test decode of unicode digit characters */
+PRIVATE void assert_c16toi(intmax_t expected, char16_t const *str) {
+	intmax_t actual;
+	errno_t error;
+	actual = c16stoimax_r(str, NULL, 0, &error);
+	assertf(error == EOK, "Failed to parse: %I16q -- %s(%s)",
+	        str, strerrorname_np(error), strerrordesc_np(error));
+	assertf(actual == expected,
+	        "Wrong value parsed from %I16q (expected: %" PRIdMAX ", actual: %" PRIdMAX ")",
+	        str, expected, actual);
+}
+
+PRIVATE void assert_c32toi(intmax_t expected, char32_t const *str) {
+	intmax_t actual;
+	errno_t error;
+	actual = c32stoimax_r(str, NULL, 0, &error);
+	assertf(error == EOK, "Failed to parse: %I32q -- %s(%s)",
+	        str, strerrorname_np(error), strerrordesc_np(error));
+	assertf(actual == expected,
+	        "Wrong value parsed from %I32q (expected: %" PRIdMAX ", actual: %" PRIdMAX ")",
+	        str, expected, actual);
+}
+
+#define ASSERT_STRTOI(expected, str)  \
+	(assert_strtoi(expected, str),    \
+	 assert_wcstoi(expected, L##str), \
+	 assert_c16toi(expected, u##str), \
+	 assert_c32toi(expected, U##str)) \
+
+
+DEFINE_TEST(strtoi) {
+	ASSERT_STRTOI(0, "0");
+	ASSERT_STRTOI(42, "42");
+	ASSERT_STRTOI(0, "  0");
+	ASSERT_STRTOI(42, "  42");
+	ASSERT_STRTOI(42, "\n\t 42");
+	/* Test that unicode whitespace gets skipped */
+	ASSERT_STRTOI(42, "\n\t\u00A0" "42");
+	ASSERT_STRTOI(42, "\n\t\u2000" "42");
+	ASSERT_STRTOI(42, "\n\t\u2001" "42");
+	ASSERT_STRTOI(42, "\n\t\u2002" "42");
+	ASSERT_STRTOI(42, "\n\t\u2003" "42");
+	ASSERT_STRTOI(42, "\n\t\u2004" "42");
+	ASSERT_STRTOI(42, "\n\t\u2005" "42");
+	ASSERT_STRTOI(42, "\n\t\u2006" "42");
+	ASSERT_STRTOI(42, "\n\t\u2007" "42");
+	ASSERT_STRTOI(42, "\n\t\u2008" "42");
+	ASSERT_STRTOI(42, "\n\t\u2009" "42");
+	ASSERT_STRTOI(42, "\n\t\u200A" "42");
+	ASSERT_STRTOI(42, "\n\t\u202F" "42");
+	ASSERT_STRTOI(42, "\n\t\u205F" "42");
+	ASSERT_STRTOI(0x42, "0x42");
+	ASSERT_STRTOI(0x42, "  0x42");
+	ASSERT_STRTOI(1 + 2 + 4 + 8, "0b1111");
+	ASSERT_STRTOI(1 + 2 + 4 + 8, "  0b1111");
+
+	/* Test decode of unicode decimal characters */
+	ASSERT_STRTOI(INTMAX_C(9876543210), "9876543210");
+	ASSERT_STRTOI(INTMAX_C(9876543210), "𝟗𝟖𝟕𝟔𝟓𝟒𝟑𝟐𝟏𝟎");
+	ASSERT_STRTOI(INTMAX_C(9876543210), "𝟡𝟠𝟟𝟞𝟝𝟜𝟛𝟚𝟙𝟘");
+	ASSERT_STRTOI(INTMAX_C(9876543210), "𝟫𝟪𝟩𝟨𝟧𝟦𝟥𝟤𝟣𝟢");
+	ASSERT_STRTOI(INTMAX_C(9876543210), "𝟵𝟴𝟳𝟲𝟱𝟰𝟯𝟮𝟭𝟬");
+	ASSERT_STRTOI(INTMAX_C(9876543210), "𝟿𝟾𝟽𝟼𝟻𝟺𝟹𝟸𝟷𝟶");
 }
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e1f8590 */
+/* HASH CRC-32:0x2bcb4070 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,14 +58,23 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strlstrip))(char const *__str) {
 			/* Fast-pass: ASCII space characters. */
 			++__str;
 		} else if (__ch >= 0x80) {
-			__CHAR32_TYPE__ __uni = __libc_unicode_readutf8((char const **)&__str);
+			char const *__new_str = __str;
+			__CHAR32_TYPE__ __uni = __libc_unicode_readutf8(&__new_str);
 			if (!__libc_unicode_isspace(__uni))
 				break;
+			__str = __new_str;
 		} else {
 			break;
 		}
 	}
 #else /* __CRT_HAVE___unicode_descriptor */
+
+
+
+
+
+
+
 	while ((__NAMESPACE_LOCAL_SYM __localdep_isspace)((unsigned char)*__str))
 		++__str;
 #endif /* !__CRT_HAVE___unicode_descriptor */

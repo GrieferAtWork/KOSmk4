@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b644063 */
+/* HASH CRC-32:0x530c37cc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,6 +87,15 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16lstrip))(__CHAR16_TYPE__ const *__
 
 
 
+
+
+
+
+	/* NOTE: No  need for special  handling for UTF-16 surrogates:
+	 *       there are no unicode whitespace characters that would
+	 *       need to be  encoded using surrogates  (so any  UTF-16
+	 *       character that  might be  a space  is always  encoded
+	 *       using a single word) */
 
 	while ((__NAMESPACE_LOCAL_SYM __localdep_isspace16)((__CHAR16_TYPE__)*__str))
 		++__str;

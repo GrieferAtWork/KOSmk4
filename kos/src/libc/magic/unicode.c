@@ -565,7 +565,9 @@ char32_t unicode_readutf16([[inout]] /*utf-16*/ char16_t const **__restrict ptex
 		result -= UTF16_HIGH_SURROGATE_MIN;
 		result <<= 10;
 		result += UTF16_SURROGATE_SHIFT - UTF16_LOW_SURROGATE_MIN;
-		result += *text++; /* low surrogate */
+		result += *text; /* low surrogate */
+		if likely(*text) /* Don't advance past NUL! */
+			++text;
 	}
 	*ptext = text;
 	return result;
@@ -614,7 +616,8 @@ char32_t unicode_readutf16_swap([[inout]] /*utf-16-swap*/ char16_t const **__res
 		result <<= 10;
 		result += UTF16_SURROGATE_SHIFT - UTF16_LOW_SURROGATE_MIN;
 		result += __hybrid_bswap16(*text); /* low surrogate */
-		++text;
+		if likely(*text) /* Don't advance past NUL! */
+			++text;
 	}
 	*ptext = text;
 	return result;

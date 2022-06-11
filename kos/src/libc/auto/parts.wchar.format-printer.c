@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x492ba92f */
+/* HASH CRC-32:0x410a55d2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -356,7 +356,7 @@ special_control:
 encode_hex:
 				if (text < textend) {
 					char16_t const *new_text = text;
-					uint32_t next_ch;
+					char32_t next_ch;
 
 
 
@@ -365,7 +365,7 @@ encode_hex:
 
 
 
-					if (__libc_ishexU(next_ch))
+					if (__libc_ishex(next_ch))
 						goto encode_uni;
 				}
 				if (ch <= 0xf) {
@@ -627,16 +627,16 @@ special_control:
 encode_hex:
 				if (text < textend) {
 					char32_t const *new_text = text;
-					uint32_t next_ch;
+					char32_t next_ch;
 
 
 
 
 
 
-					next_ch = (uint32_t)*new_text++;
+					next_ch = (char32_t)*new_text++;
 
-					if (__libc_ishexU(next_ch))
+					if (__libc_ishex(next_ch))
 						goto encode_uni;
 				}
 				if (ch <= 0xf) {

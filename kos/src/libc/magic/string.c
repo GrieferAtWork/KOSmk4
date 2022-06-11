@@ -7509,14 +7509,23 @@ char *strlstrip([[in]] char const *str)
 			/* Fast-pass: ASCII space characters. */
 			++str;
 		} else if (ch >= 0x80) {
-			char32_t uni = @__libc_unicode_readutf8@((char const **)&str);
+			char const *new_str = str;
+			char32_t uni = @__libc_unicode_readutf8@(&new_str);
 			if (!__libc_unicode_isspace(uni))
 				break;
+			str = new_str;
 		} else {
 			break;
 		}
 	}
 @@pp_else@@
+@@pp_if __SIZEOF_CHAR__ == 2@@
+	/* NOTE: No  need for special  handling for UTF-16 surrogates:
+	 *       there are no unicode whitespace characters that would
+	 *       need to be  encoded using surrogates  (so any  UTF-16
+	 *       character that  might be  a space  is always  encoded
+	 *       using a single word) */
+@@pp_endif@@
 	while (isspace((unsigned char)*str))
 		++str;
 @@pp_endif@@
@@ -7553,6 +7562,13 @@ char *strrstrip([[in]] char *str) {
 		}
 	}
 @@pp_else@@
+@@pp_if __SIZEOF_CHAR__ == 2@@
+	/* NOTE: No  need for special  handling for UTF-16 surrogates:
+	 *       there are no unicode whitespace characters that would
+	 *       need to be  encoded using surrogates  (so any  UTF-16
+	 *       character that  might be  a space  is always  encoded
+	 *       using a single word) */
+@@pp_endif@@
 	while (endp > str && isspace((unsigned char)endp[-1]))
 		--endp;
 @@pp_endif@@

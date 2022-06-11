@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2af6a913 */
+/* HASH CRC-32:0xba47203a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2936,6 +2936,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnend)(char32_t const *__restrict str,
 #include <hybrid/__overflow.h>
 #include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
+#include <libc/unicode.h>
 /* >> wcsto32_r(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) int32_t
 NOTHROW_NCX(LIBDCALL libd_wcsto32_r)(char16_t const *__restrict nptr,
@@ -2986,12 +2987,42 @@ NOTHROW_NCX(LIBDCALL libd_wcsto32_r)(char16_t const *__restrict nptr,
 		char16_t ch;
 		ch = *num_iter;
 		if (!__libc_hex2int(ch, &digit)) {
-			/* TODO: Unicode support */
-			break;
+
+			/* Unicode decimal support */
+
+
+
+
+
+
+
+
+
+
+
+
+
+			char16_t const *new_num_iter;
+			char32_t uni;
+			new_num_iter = (char16_t const *)num_iter;
+			uni = __libc_unicode_readutf16(&new_num_iter);
+			if (__libc_unicode_asdigit(uni, (uint8_t)base, &digit)) {
+				num_iter = new_num_iter;
+			} else
+
+
+
+
+
+
+			{
+				break;
+			}
+		} else {
+			if (digit >= base)
+				break;
+			++num_iter;
 		}
-		if (digit >= base)
-			break;
-		++num_iter;
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_sadd(result, digit, &result)) {
 
@@ -3009,12 +3040,42 @@ handle_overflow:
 				for (;;) {
 					ch = *num_iter;
 					if (!__libc_hex2int(ch, &digit)) {
-						/* TODO: Unicode support */
-						break;
+
+						/* Unicode decimal support */
+
+
+
+
+
+
+
+
+
+
+
+
+
+						char16_t const *new_num_iter;
+						char32_t uni;
+						new_num_iter = (char16_t const *)num_iter;
+						uni = __libc_unicode_readutf16(&new_num_iter);
+						if (__libc_unicode_asdigit(uni, (uint8_t)base, &digit)) {
+							num_iter = new_num_iter;
+						} else
+
+
+
+
+
+
+						{
+							break;
+						}
+					} else {
+						if (digit >= base)
+							break;
+						++num_iter;
 					}
-					if (digit >= base)
-						break;
-					++num_iter;
 				}
 				*endptr = (char16_t *)num_iter;
 			}
@@ -3085,6 +3146,7 @@ handle_overflow:
 #include <hybrid/__overflow.h>
 #include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
+#include <libc/unicode.h>
 /* >> wcsto32_r(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) int32_t
 NOTHROW_NCX(LIBKCALL libc_wcsto32_r)(char32_t const *__restrict nptr,
@@ -3135,12 +3197,42 @@ NOTHROW_NCX(LIBKCALL libc_wcsto32_r)(char32_t const *__restrict nptr,
 		char32_t ch;
 		ch = *num_iter;
 		if (!__libc_hex2int(ch, &digit)) {
-			/* TODO: Unicode support */
-			break;
+
+			/* Unicode decimal support */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			if (__libc_unicode_asdigit(ch, (uint8_t)base, &digit)) {
+				++num_iter;
+			} else
+
+
+			{
+				break;
+			}
+		} else {
+			if (digit >= base)
+				break;
+			++num_iter;
 		}
-		if (digit >= base)
-			break;
-		++num_iter;
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_sadd(result, digit, &result)) {
 
@@ -3158,12 +3250,42 @@ handle_overflow:
 				for (;;) {
 					ch = *num_iter;
 					if (!__libc_hex2int(ch, &digit)) {
-						/* TODO: Unicode support */
-						break;
+
+						/* Unicode decimal support */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+						if (__libc_unicode_asdigit(ch, (uint8_t)base, &digit)) {
+							++num_iter;
+						} else
+
+
+						{
+							break;
+						}
+					} else {
+						if (digit >= base)
+							break;
+						++num_iter;
 					}
-					if (digit >= base)
-						break;
-					++num_iter;
 				}
 				*endptr = (char32_t *)num_iter;
 			}
@@ -3234,6 +3356,7 @@ handle_overflow:
 #include <hybrid/__overflow.h>
 #include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
+#include <libc/unicode.h>
 /* >> wcstou32_r(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) uint32_t
 NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
@@ -3284,12 +3407,42 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 		char16_t ch;
 		ch = *num_iter;
 		if (!__libc_hex2int(ch, &digit)) {
-			/* TODO: Unicode support */
-			break;
+
+			/* Unicode decimal support */
+
+
+
+
+
+
+
+
+
+
+
+
+
+			char16_t const *new_num_iter;
+			char32_t uni;
+			new_num_iter = (char16_t const *)num_iter;
+			uni = __libc_unicode_readutf16(&new_num_iter);
+			if (__libc_unicode_asdigit(uni, (uint8_t)base, &digit)) {
+				num_iter = new_num_iter;
+			} else
+
+
+
+
+
+
+			{
+				break;
+			}
+		} else {
+			if (digit >= base)
+				break;
+			++num_iter;
 		}
-		if (digit >= base)
-			break;
-		++num_iter;
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_uadd(result, digit, &result)) {
 
@@ -3307,12 +3460,42 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 				for (;;) {
 					ch = *num_iter;
 					if (!__libc_hex2int(ch, &digit)) {
-						/* TODO: Unicode support */
-						break;
+
+						/* Unicode decimal support */
+
+
+
+
+
+
+
+
+
+
+
+
+
+						char16_t const *new_num_iter;
+						char32_t uni;
+						new_num_iter = (char16_t const *)num_iter;
+						uni = __libc_unicode_readutf16(&new_num_iter);
+						if (__libc_unicode_asdigit(uni, (uint8_t)base, &digit)) {
+							num_iter = new_num_iter;
+						} else
+
+
+
+
+
+
+						{
+							break;
+						}
+					} else {
+						if (digit >= base)
+							break;
+						++num_iter;
 					}
-					if (digit >= base)
-						break;
-					++num_iter;
 				}
 				*endptr = (char16_t *)num_iter;
 			}
@@ -3383,6 +3566,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 #include <hybrid/__overflow.h>
 #include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
+#include <libc/unicode.h>
 /* >> wcstou32_r(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) uint32_t
 NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
@@ -3433,12 +3617,42 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
 		char32_t ch;
 		ch = *num_iter;
 		if (!__libc_hex2int(ch, &digit)) {
-			/* TODO: Unicode support */
-			break;
+
+			/* Unicode decimal support */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			if (__libc_unicode_asdigit(ch, (uint8_t)base, &digit)) {
+				++num_iter;
+			} else
+
+
+			{
+				break;
+			}
+		} else {
+			if (digit >= base)
+				break;
+			++num_iter;
 		}
-		if (digit >= base)
-			break;
-		++num_iter;
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_uadd(result, digit, &result)) {
 
@@ -3456,12 +3670,42 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
 				for (;;) {
 					ch = *num_iter;
 					if (!__libc_hex2int(ch, &digit)) {
-						/* TODO: Unicode support */
-						break;
+
+						/* Unicode decimal support */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+						if (__libc_unicode_asdigit(ch, (uint8_t)base, &digit)) {
+							++num_iter;
+						} else
+
+
+						{
+							break;
+						}
+					} else {
+						if (digit >= base)
+							break;
+						++num_iter;
 					}
-					if (digit >= base)
-						break;
-					++num_iter;
 				}
 				*endptr = (char32_t *)num_iter;
 			}
@@ -3600,6 +3844,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32)(char32_t const *__restrict nptr,
 #include <hybrid/__overflow.h>
 #include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
+#include <libc/unicode.h>
 /* >> wcsto64_r(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) int64_t
 NOTHROW_NCX(LIBDCALL libd_wcsto64_r)(char16_t const *__restrict nptr,
@@ -3650,12 +3895,42 @@ NOTHROW_NCX(LIBDCALL libd_wcsto64_r)(char16_t const *__restrict nptr,
 		char16_t ch;
 		ch = *num_iter;
 		if (!__libc_hex2int(ch, &digit)) {
-			/* TODO: Unicode support */
-			break;
+
+			/* Unicode decimal support */
+
+
+
+
+
+
+
+
+
+
+
+
+
+			char16_t const *new_num_iter;
+			char32_t uni;
+			new_num_iter = (char16_t const *)num_iter;
+			uni = __libc_unicode_readutf16(&new_num_iter);
+			if (__libc_unicode_asdigit(uni, (uint8_t)base, &digit)) {
+				num_iter = new_num_iter;
+			} else
+
+
+
+
+
+
+			{
+				break;
+			}
+		} else {
+			if (digit >= base)
+				break;
+			++num_iter;
 		}
-		if (digit >= base)
-			break;
-		++num_iter;
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_sadd(result, digit, &result)) {
 
@@ -3673,12 +3948,42 @@ handle_overflow:
 				for (;;) {
 					ch = *num_iter;
 					if (!__libc_hex2int(ch, &digit)) {
-						/* TODO: Unicode support */
-						break;
+
+						/* Unicode decimal support */
+
+
+
+
+
+
+
+
+
+
+
+
+
+						char16_t const *new_num_iter;
+						char32_t uni;
+						new_num_iter = (char16_t const *)num_iter;
+						uni = __libc_unicode_readutf16(&new_num_iter);
+						if (__libc_unicode_asdigit(uni, (uint8_t)base, &digit)) {
+							num_iter = new_num_iter;
+						} else
+
+
+
+
+
+
+						{
+							break;
+						}
+					} else {
+						if (digit >= base)
+							break;
+						++num_iter;
 					}
-					if (digit >= base)
-						break;
-					++num_iter;
 				}
 				*endptr = (char16_t *)num_iter;
 			}
@@ -3749,6 +4054,7 @@ handle_overflow:
 #include <hybrid/__overflow.h>
 #include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
+#include <libc/unicode.h>
 /* >> wcsto64_r(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) int64_t
 NOTHROW_NCX(LIBKCALL libc_wcsto64_r)(char32_t const *__restrict nptr,
@@ -3799,12 +4105,42 @@ NOTHROW_NCX(LIBKCALL libc_wcsto64_r)(char32_t const *__restrict nptr,
 		char32_t ch;
 		ch = *num_iter;
 		if (!__libc_hex2int(ch, &digit)) {
-			/* TODO: Unicode support */
-			break;
+
+			/* Unicode decimal support */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			if (__libc_unicode_asdigit(ch, (uint8_t)base, &digit)) {
+				++num_iter;
+			} else
+
+
+			{
+				break;
+			}
+		} else {
+			if (digit >= base)
+				break;
+			++num_iter;
 		}
-		if (digit >= base)
-			break;
-		++num_iter;
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_sadd(result, digit, &result)) {
 
@@ -3822,12 +4158,42 @@ handle_overflow:
 				for (;;) {
 					ch = *num_iter;
 					if (!__libc_hex2int(ch, &digit)) {
-						/* TODO: Unicode support */
-						break;
+
+						/* Unicode decimal support */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+						if (__libc_unicode_asdigit(ch, (uint8_t)base, &digit)) {
+							++num_iter;
+						} else
+
+
+						{
+							break;
+						}
+					} else {
+						if (digit >= base)
+							break;
+						++num_iter;
 					}
-					if (digit >= base)
-						break;
-					++num_iter;
 				}
 				*endptr = (char32_t *)num_iter;
 			}
@@ -3898,6 +4264,7 @@ handle_overflow:
 #include <hybrid/__overflow.h>
 #include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
+#include <libc/unicode.h>
 /* >> wcstou64_r(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) uint64_t
 NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
@@ -3948,12 +4315,42 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 		char16_t ch;
 		ch = *num_iter;
 		if (!__libc_hex2int(ch, &digit)) {
-			/* TODO: Unicode support */
-			break;
+
+			/* Unicode decimal support */
+
+
+
+
+
+
+
+
+
+
+
+
+
+			char16_t const *new_num_iter;
+			char32_t uni;
+			new_num_iter = (char16_t const *)num_iter;
+			uni = __libc_unicode_readutf16(&new_num_iter);
+			if (__libc_unicode_asdigit(uni, (uint8_t)base, &digit)) {
+				num_iter = new_num_iter;
+			} else
+
+
+
+
+
+
+			{
+				break;
+			}
+		} else {
+			if (digit >= base)
+				break;
+			++num_iter;
 		}
-		if (digit >= base)
-			break;
-		++num_iter;
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_uadd(result, digit, &result)) {
 
@@ -3971,12 +4368,42 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 				for (;;) {
 					ch = *num_iter;
 					if (!__libc_hex2int(ch, &digit)) {
-						/* TODO: Unicode support */
-						break;
+
+						/* Unicode decimal support */
+
+
+
+
+
+
+
+
+
+
+
+
+
+						char16_t const *new_num_iter;
+						char32_t uni;
+						new_num_iter = (char16_t const *)num_iter;
+						uni = __libc_unicode_readutf16(&new_num_iter);
+						if (__libc_unicode_asdigit(uni, (uint8_t)base, &digit)) {
+							num_iter = new_num_iter;
+						} else
+
+
+
+
+
+
+						{
+							break;
+						}
+					} else {
+						if (digit >= base)
+							break;
+						++num_iter;
 					}
-					if (digit >= base)
-						break;
-					++num_iter;
 				}
 				*endptr = (char16_t *)num_iter;
 			}
@@ -4047,6 +4474,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 #include <hybrid/__overflow.h>
 #include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
+#include <libc/unicode.h>
 /* >> wcstou64_r(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) uint64_t
 NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
@@ -4097,12 +4525,42 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
 		char32_t ch;
 		ch = *num_iter;
 		if (!__libc_hex2int(ch, &digit)) {
-			/* TODO: Unicode support */
-			break;
+
+			/* Unicode decimal support */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+			if (__libc_unicode_asdigit(ch, (uint8_t)base, &digit)) {
+				++num_iter;
+			} else
+
+
+			{
+				break;
+			}
+		} else {
+			if (digit >= base)
+				break;
+			++num_iter;
 		}
-		if (digit >= base)
-			break;
-		++num_iter;
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_uadd(result, digit, &result)) {
 
@@ -4120,12 +4578,42 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
 				for (;;) {
 					ch = *num_iter;
 					if (!__libc_hex2int(ch, &digit)) {
-						/* TODO: Unicode support */
-						break;
+
+						/* Unicode decimal support */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+						if (__libc_unicode_asdigit(ch, (uint8_t)base, &digit)) {
+							++num_iter;
+						} else
+
+
+						{
+							break;
+						}
+					} else {
+						if (digit >= base)
+							break;
+						++num_iter;
 					}
-					if (digit >= base)
-						break;
-					++num_iter;
 				}
 				*endptr = (char32_t *)num_iter;
 			}
@@ -5259,6 +5747,15 @@ NOTHROW_NCX(LIBDCALL libd_wcslstrip)(char16_t const *str) {
 
 
 
+
+
+
+	/* NOTE: No  need for special  handling for UTF-16 surrogates:
+	 *       there are no unicode whitespace characters that would
+	 *       need to be  encoded using surrogates  (so any  UTF-16
+	 *       character that  might be  a space  is always  encoded
+	 *       using a single word) */
+
 	while (libd_iswspace((char16_t)*str))
 		++str;
 
@@ -5271,6 +5768,15 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") ATTR_PURE ATTR_R
 NOTHROW_NCX(LIBKCALL libc_wcslstrip)(char32_t const *str) {
 	/* NOTE: assert(!isspace('\0'));
 	 * -> So we don't need special handling to stop on NUL! */
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5317,6 +5823,13 @@ NOTHROW_NCX(LIBDCALL libd_wcsrstrip)(char16_t *str) {
 
 
 
+
+	/* NOTE: No  need for special  handling for UTF-16 surrogates:
+	 *       there are no unicode whitespace characters that would
+	 *       need to be  encoded using surrogates  (so any  UTF-16
+	 *       character that  might be  a space  is always  encoded
+	 *       using a single word) */
+
 	while (endp > str && libd_iswspace((char16_t)endp[-1]))
 		--endp;
 
@@ -5329,6 +5842,13 @@ NOTHROW_NCX(LIBDCALL libd_wcsrstrip)(char16_t *str) {
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") ATTR_RETNONNULL WUNUSED ATTR_IN(1) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsrstrip)(char32_t *str) {
 	char32_t *endp = libc_wcsend(str);
+
+
+
+
+
+
+
 
 
 

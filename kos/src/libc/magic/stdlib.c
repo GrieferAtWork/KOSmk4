@@ -1187,6 +1187,7 @@ $int64_t strto64_r([[in]] char const *__restrict nptr,
 %[define_template(tpl_strtoi_r<T, nptr, endptr, base, error> =
 	[[impl_include("<asm/os/errno.h>", "<hybrid/__overflow.h>")]]
 	[[impl_include("<libc/template/hex.h>", "<hybrid/limitcore.h>")]]
+	[[impl_include("<libc/unicode.h>")]]
 {
 @@exec global SIGNED = !"${T}".@startswith@("u");@@
 @@exec global BITS = "${T}".@strip@("uint_t");@@
@@ -1232,12 +1233,42 @@ $int64_t strto64_r([[in]] char const *__restrict nptr,
 		char ch;
 		ch = *num_iter;
 		if (!__libc_hex2int(ch, &digit)) {
-			/* TODO: Unicode support */
-			break;
+@@pp_if $has_function(__unicode_descriptor)@@
+			/* Unicode decimal support */
+@@pp_if __SIZEOF_CHAR__ == 1@@
+			char const *new_num_iter;
+			char32_t uni;
+@@pp_ifndef __OPTIMIZE_SIZE__@@
+			if ((unsigned char)ch < 0x80)
+				break;
+@@pp_endif@@
+			new_num_iter = num_iter;
+			uni = @__libc_unicode_readutf8@(&new_num_iter);
+			if (__libc_unicode_asdigit(uni, (uint8_t)${base}, &digit)) {
+				num_iter = new_num_iter;
+			} else
+@@pp_elif __SIZEOF_CHAR__ == 2@@
+			char16_t const *new_num_iter;
+			char32_t uni;
+			new_num_iter = (char16_t const *)num_iter;
+			uni = @__libc_unicode_readutf16@(&new_num_iter);
+			if (__libc_unicode_asdigit(uni, (uint8_t)${base}, &digit)) {
+				num_iter = new_num_iter;
+			} else
+@@pp_else@@
+			if (__libc_unicode_asdigit(ch, (uint8_t)${base}, &digit)) {
+				++num_iter;
+			} else
+@@pp_endif@@
+@@pp_endif@@
+			{
+				break;
+			}
+		} else {
+			if (digit >= ${base})
+				break;
+			++num_iter;
 		}
-		if (digit >= ${base})
-			break;
-		++num_iter;
 		if unlikely(@@yield("__hybrid_overflow_" + su + "mul")@@(result, (unsigned int)${base}, &result) ||
 		            @@yield("__hybrid_overflow_" + su + "add")@@(result, digit, &result)) {
 @@if SIGNED@@
@@ -1255,12 +1286,42 @@ handle_overflow:
 				for (;;) {
 					ch = *num_iter;
 					if (!__libc_hex2int(ch, &digit)) {
-						/* TODO: Unicode support */
-						break;
+@@pp_if $has_function(__unicode_descriptor)@@
+						/* Unicode decimal support */
+@@pp_if __SIZEOF_CHAR__ == 1@@
+						char const *new_num_iter;
+						char32_t uni;
+@@pp_ifndef __OPTIMIZE_SIZE__@@
+						if ((unsigned char)ch < 0x80)
+							break;
+@@pp_endif@@
+						new_num_iter = num_iter;
+						uni = @__libc_unicode_readutf8@(&new_num_iter);
+						if (__libc_unicode_asdigit(uni, (uint8_t)${base}, &digit)) {
+							num_iter = new_num_iter;
+						} else
+@@pp_elif __SIZEOF_CHAR__ == 2@@
+						char16_t const *new_num_iter;
+						char32_t uni;
+						new_num_iter = (char16_t const *)num_iter;
+						uni = @__libc_unicode_readutf16@(&new_num_iter);
+						if (__libc_unicode_asdigit(uni, (uint8_t)${base}, &digit)) {
+							num_iter = new_num_iter;
+						} else
+@@pp_else@@
+						if (__libc_unicode_asdigit(ch, (uint8_t)${base}, &digit)) {
+							++num_iter;
+						} else
+@@pp_endif@@
+@@pp_endif@@
+						{
+							break;
+						}
+					} else {
+						if (digit >= ${base})
+							break;
+						++num_iter;
 					}
-					if (digit >= ${base})
-						break;
-					++num_iter;
 				}
 				*${endptr} = (char *)num_iter;
 			}

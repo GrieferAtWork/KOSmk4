@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63b90cd3 */
+/* HASH CRC-32:0xbaaa1603 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -756,6 +756,7 @@ NOTHROW_NCX(LIBCCALL libc_strtold)(char const *__restrict nptr,
 #include <hybrid/__overflow.h>
 #include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
+#include <libc/unicode.h>
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
  * errors in `*error' (if non-NULL).  The following errors are  defined:
@@ -821,12 +822,42 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
 		char ch;
 		ch = *num_iter;
 		if (!__libc_hex2int(ch, &digit)) {
-			/* TODO: Unicode support */
-			break;
+#ifdef __CRT_HAVE___unicode_descriptor
+			/* Unicode decimal support */
+
+			char const *new_num_iter;
+			char32_t uni;
+#ifndef __OPTIMIZE_SIZE__
+			if ((unsigned char)ch < 0x80)
+				break;
+#endif /* !__OPTIMIZE_SIZE__ */
+			new_num_iter = num_iter;
+			uni = __libc_unicode_readutf8(&new_num_iter);
+			if (__libc_unicode_asdigit(uni, (uint8_t)base, &digit)) {
+				num_iter = new_num_iter;
+			} else
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif /* __CRT_HAVE___unicode_descriptor */
+			{
+				break;
+			}
+		} else {
+			if (digit >= base)
+				break;
+			++num_iter;
 		}
-		if (digit >= base)
-			break;
-		++num_iter;
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_uadd(result, digit, &result)) {
 
@@ -844,12 +875,42 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
 				for (;;) {
 					ch = *num_iter;
 					if (!__libc_hex2int(ch, &digit)) {
-						/* TODO: Unicode support */
-						break;
+#ifdef __CRT_HAVE___unicode_descriptor
+						/* Unicode decimal support */
+
+						char const *new_num_iter;
+						char32_t uni;
+#ifndef __OPTIMIZE_SIZE__
+						if ((unsigned char)ch < 0x80)
+							break;
+#endif /* !__OPTIMIZE_SIZE__ */
+						new_num_iter = num_iter;
+						uni = __libc_unicode_readutf8(&new_num_iter);
+						if (__libc_unicode_asdigit(uni, (uint8_t)base, &digit)) {
+							num_iter = new_num_iter;
+						} else
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif /* __CRT_HAVE___unicode_descriptor */
+						{
+							break;
+						}
+					} else {
+						if (digit >= base)
+							break;
+						++num_iter;
 					}
-					if (digit >= base)
-						break;
-					++num_iter;
 				}
 				*endptr = (char *)num_iter;
 			}
@@ -981,12 +1042,42 @@ NOTHROW_NCX(LIBCCALL libc_strto32_r)(char const *__restrict nptr,
 		char ch;
 		ch = *num_iter;
 		if (!__libc_hex2int(ch, &digit)) {
-			/* TODO: Unicode support */
-			break;
+#ifdef __CRT_HAVE___unicode_descriptor
+			/* Unicode decimal support */
+
+			char const *new_num_iter;
+			char32_t uni;
+#ifndef __OPTIMIZE_SIZE__
+			if ((unsigned char)ch < 0x80)
+				break;
+#endif /* !__OPTIMIZE_SIZE__ */
+			new_num_iter = num_iter;
+			uni = __libc_unicode_readutf8(&new_num_iter);
+			if (__libc_unicode_asdigit(uni, (uint8_t)base, &digit)) {
+				num_iter = new_num_iter;
+			} else
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif /* __CRT_HAVE___unicode_descriptor */
+			{
+				break;
+			}
+		} else {
+			if (digit >= base)
+				break;
+			++num_iter;
 		}
-		if (digit >= base)
-			break;
-		++num_iter;
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_sadd(result, digit, &result)) {
 
@@ -1004,12 +1095,42 @@ handle_overflow:
 				for (;;) {
 					ch = *num_iter;
 					if (!__libc_hex2int(ch, &digit)) {
-						/* TODO: Unicode support */
-						break;
+#ifdef __CRT_HAVE___unicode_descriptor
+						/* Unicode decimal support */
+
+						char const *new_num_iter;
+						char32_t uni;
+#ifndef __OPTIMIZE_SIZE__
+						if ((unsigned char)ch < 0x80)
+							break;
+#endif /* !__OPTIMIZE_SIZE__ */
+						new_num_iter = num_iter;
+						uni = __libc_unicode_readutf8(&new_num_iter);
+						if (__libc_unicode_asdigit(uni, (uint8_t)base, &digit)) {
+							num_iter = new_num_iter;
+						} else
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif /* __CRT_HAVE___unicode_descriptor */
+						{
+							break;
+						}
+					} else {
+						if (digit >= base)
+							break;
+						++num_iter;
 					}
-					if (digit >= base)
-						break;
-					++num_iter;
 				}
 				*endptr = (char *)num_iter;
 			}
@@ -1141,12 +1262,42 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
 		char ch;
 		ch = *num_iter;
 		if (!__libc_hex2int(ch, &digit)) {
-			/* TODO: Unicode support */
-			break;
+#ifdef __CRT_HAVE___unicode_descriptor
+			/* Unicode decimal support */
+
+			char const *new_num_iter;
+			char32_t uni;
+#ifndef __OPTIMIZE_SIZE__
+			if ((unsigned char)ch < 0x80)
+				break;
+#endif /* !__OPTIMIZE_SIZE__ */
+			new_num_iter = num_iter;
+			uni = __libc_unicode_readutf8(&new_num_iter);
+			if (__libc_unicode_asdigit(uni, (uint8_t)base, &digit)) {
+				num_iter = new_num_iter;
+			} else
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif /* __CRT_HAVE___unicode_descriptor */
+			{
+				break;
+			}
+		} else {
+			if (digit >= base)
+				break;
+			++num_iter;
 		}
-		if (digit >= base)
-			break;
-		++num_iter;
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_uadd(result, digit, &result)) {
 
@@ -1164,12 +1315,42 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
 				for (;;) {
 					ch = *num_iter;
 					if (!__libc_hex2int(ch, &digit)) {
-						/* TODO: Unicode support */
-						break;
+#ifdef __CRT_HAVE___unicode_descriptor
+						/* Unicode decimal support */
+
+						char const *new_num_iter;
+						char32_t uni;
+#ifndef __OPTIMIZE_SIZE__
+						if ((unsigned char)ch < 0x80)
+							break;
+#endif /* !__OPTIMIZE_SIZE__ */
+						new_num_iter = num_iter;
+						uni = __libc_unicode_readutf8(&new_num_iter);
+						if (__libc_unicode_asdigit(uni, (uint8_t)base, &digit)) {
+							num_iter = new_num_iter;
+						} else
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif /* __CRT_HAVE___unicode_descriptor */
+						{
+							break;
+						}
+					} else {
+						if (digit >= base)
+							break;
+						++num_iter;
 					}
-					if (digit >= base)
-						break;
-					++num_iter;
 				}
 				*endptr = (char *)num_iter;
 			}
@@ -1301,12 +1482,42 @@ NOTHROW_NCX(LIBCCALL libc_strto64_r)(char const *__restrict nptr,
 		char ch;
 		ch = *num_iter;
 		if (!__libc_hex2int(ch, &digit)) {
-			/* TODO: Unicode support */
-			break;
+#ifdef __CRT_HAVE___unicode_descriptor
+			/* Unicode decimal support */
+
+			char const *new_num_iter;
+			char32_t uni;
+#ifndef __OPTIMIZE_SIZE__
+			if ((unsigned char)ch < 0x80)
+				break;
+#endif /* !__OPTIMIZE_SIZE__ */
+			new_num_iter = num_iter;
+			uni = __libc_unicode_readutf8(&new_num_iter);
+			if (__libc_unicode_asdigit(uni, (uint8_t)base, &digit)) {
+				num_iter = new_num_iter;
+			} else
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif /* __CRT_HAVE___unicode_descriptor */
+			{
+				break;
+			}
+		} else {
+			if (digit >= base)
+				break;
+			++num_iter;
 		}
-		if (digit >= base)
-			break;
-		++num_iter;
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_sadd(result, digit, &result)) {
 
@@ -1324,12 +1535,42 @@ handle_overflow:
 				for (;;) {
 					ch = *num_iter;
 					if (!__libc_hex2int(ch, &digit)) {
-						/* TODO: Unicode support */
-						break;
+#ifdef __CRT_HAVE___unicode_descriptor
+						/* Unicode decimal support */
+
+						char const *new_num_iter;
+						char32_t uni;
+#ifndef __OPTIMIZE_SIZE__
+						if ((unsigned char)ch < 0x80)
+							break;
+#endif /* !__OPTIMIZE_SIZE__ */
+						new_num_iter = num_iter;
+						uni = __libc_unicode_readutf8(&new_num_iter);
+						if (__libc_unicode_asdigit(uni, (uint8_t)base, &digit)) {
+							num_iter = new_num_iter;
+						} else
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif /* __CRT_HAVE___unicode_descriptor */
+						{
+							break;
+						}
+					} else {
+						if (digit >= base)
+							break;
+						++num_iter;
 					}
-					if (digit >= base)
-						break;
-					++num_iter;
 				}
 				*endptr = (char *)num_iter;
 			}

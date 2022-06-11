@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9686f1ad */
+/* HASH CRC-32:0xb97d481c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -304,7 +304,7 @@ special_control:
 encode_hex:
 				if (text < textend) {
 					char const *new_text = text;
-					uint32_t next_ch;
+					char32_t next_ch;
 
 					next_ch = libc_unicode_readutf8_n((char const **)&new_text, textend);
 
@@ -313,7 +313,7 @@ encode_hex:
 
 
 
-					if (__libc_ishexU(next_ch))
+					if (__libc_ishex(next_ch))
 						goto encode_uni;
 				}
 				if (ch <= 0xf) {

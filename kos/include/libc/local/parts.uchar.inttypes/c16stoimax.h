@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe111435f */
+/* HASH CRC-32:0x54252b64 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +18,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_c16toimax_defined
-#define __local_c16toimax_defined
+#ifndef __local_c16stoimax_defined
+#define __local_c16stoimax_defined
 #include <__crt.h>
 #include <features.h>
 #include <hybrid/typecore.h>
@@ -96,8 +96,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_c16sto64 __LIBC_LOCAL_NAME(c16sto64)
 #endif /* !... */
 #endif /* !__local___localdep_c16sto64_defined */
-__LOCAL_LIBC(c16toimax) __ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __INTMAX_TYPE__
-__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16toimax))(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base) {
+__LOCAL_LIBC(c16stoimax) __ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __INTMAX_TYPE__
+__NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16stoimax))(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base) {
 #if __SIZEOF_INTMAX_T__ <= 4
 	return (__INTMAX_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_c16sto32)(__nptr, __endptr, __base);
 #else /* __SIZEOF_INTMAX_T__ <= 4 */
@@ -105,8 +105,8 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16toimax))(__CHAR16_TYPE__ const *__
 #endif /* __SIZEOF_INTMAX_T__ > 4 */
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_c16toimax_defined
-#define __local___localdep_c16toimax_defined
-#define __localdep_c16toimax __LIBC_LOCAL_NAME(c16toimax)
-#endif /* !__local___localdep_c16toimax_defined */
-#endif /* !__local_c16toimax_defined */
+#ifndef __local___localdep_c16stoimax_defined
+#define __local___localdep_c16stoimax_defined
+#define __localdep_c16stoimax __LIBC_LOCAL_NAME(c16stoimax)
+#endif /* !__local___localdep_c16stoimax_defined */
+#endif /* !__local_c16stoimax_defined */

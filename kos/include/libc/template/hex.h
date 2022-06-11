@@ -44,10 +44,22 @@ __CSDECLARE2(,unsigned char const _hex_value[256],_hex_value)
 /* >> bool __libc_hex2int(char ch, T *p_result);
  * Returns `true' if `ch' is a valid hex-character, in which case `*p_result'
  * is filled with that character's value. Else, `false' is returned, and  the
- * contents of `*p_result' are undefined. */
+ * contents of `*p_result' are undefined.
+ *
+ * NOTE: Unicode decimal characters are _NOT_ supported! */
 #ifdef __LOCAL__hex_value
-#define __libc_hex2int(ch, p_result) \
-	((*(p_result) = __LOCAL__hex_value[(unsigned char)(char)(ch)]) != 99)
+#ifdef __NO_builtin_choose_expr
+#define __libc_hex2int(ch, p_result)                                       \
+	(sizeof(ch) <= __SIZEOF_CHAR__                                         \
+	 ? (*(p_result) = __LOCAL__hex_value[(unsigned char)(char)(ch)]) != 99 \
+	 : ((ch) <= 0xff && (*(p_result) = __LOCAL__hex_value[(unsigned char)(char)(ch)]) != 99))
+#else /* __NO_builtin_choose_expr */
+#define __libc_hex2int(ch, p_result)                                     \
+	__builtin_choose_expr(                                               \
+	sizeof(ch) <= __SIZEOF_CHAR__,                                       \
+	(*(p_result) = __LOCAL__hex_value[(unsigned char)(char)(ch)]) != 99, \
+	((ch) <= 0xff && (*(p_result) = __LOCAL__hex_value[(unsigned char)(char)(ch)]) != 99))
+#endif /* !__NO_builtin_choose_expr */
 #else /* __LOCAL__hex_value */
 #define __libc_hex2int(ch, p_result)                           \
 	(((ch) >= '0' && (ch) <= '9')                              \
@@ -63,22 +75,20 @@ __CSDECLARE2(,unsigned char const _hex_value[256],_hex_value)
 /* >> bool __libc_ishex(char ch);
  * Check if `ch' is a hex-character (0-9, A-F, a-f) */
 #ifdef __LOCAL__hex_value
-#define __libc_ishex(ch) \
-	(__LOCAL__hex_value[(unsigned char)(char)(ch)] != 99)
+#ifdef __NO_builtin_choose_expr
+#define __libc_ishex(ch)                                   \
+	(sizeof(ch) <= __SIZEOF_CHAR__                         \
+	 ? __LOCAL__hex_value[(unsigned char)(char)(ch)] != 99 \
+	 : ((ch) <= 0xff && __LOCAL__hex_value[(unsigned char)(char)(ch)] != 99))
+#else /* __NO_builtin_choose_expr */
+#define __libc_ishex(ch)                                 \
+	__builtin_choose_expr(                               \
+	sizeof(ch) <= __SIZEOF_CHAR__,                       \
+	__LOCAL__hex_value[(unsigned char)(char)(ch)] != 99, \
+	((ch) <= 0xff && __LOCAL__hex_value[(unsigned char)(char)(ch)] != 99))
+#endif /* !__NO_builtin_choose_expr */
 #else /* __LOCAL__hex_value */
 #define __libc_ishex(ch)             \
-	(((ch) >= '0' && (ch) <= '9') || \
-	 ((ch) >= 'A' && (ch) <= 'F') || \
-	 ((ch) >= 'a' && (ch) <= 'f'))
-#endif /* !__LOCAL__hex_value */
-
-/* >> bool __libc_ishexU(char32_t ch);
- * Same as `__libc_ishex()', but `ch' is a unicode character. */
-#ifdef __LOCAL__hex_value
-#define __libc_ishexU(ch) \
-	((__UINT32_TYPE__)(ch) <= 0xff && __LOCAL__hex_value[(unsigned char)(char)(ch)] != 99)
-#else /* __LOCAL__hex_value */
-#define __libc_ishexU(ch)             \
 	(((ch) >= '0' && (ch) <= '9') || \
 	 ((ch) >= 'A' && (ch) <= 'F') || \
 	 ((ch) >= 'a' && (ch) <= 'f'))

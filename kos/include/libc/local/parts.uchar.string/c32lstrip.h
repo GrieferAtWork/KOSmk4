@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f65fe66 */
+/* HASH CRC-32:0x66bdad3b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,6 +72,15 @@ __LOCAL_LIBC(c32lstrip) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(c32lstrip))(__CHAR32_TYPE__ const *__str) {
 	/* NOTE: assert(!isspace('\0'));
 	 * -> So we don't need special handling to stop on NUL! */
+
+
+
+
+
+
+
+
+
 
 
 

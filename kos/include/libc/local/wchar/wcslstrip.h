@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc6ec27e */
+/* HASH CRC-32:0x86d8931 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,14 +70,23 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcslstrip))(__WCHAR_TYPE__ const *__s
 			/* Fast-pass: ASCII space characters. */
 			++__str;
 		} else if (__ch >= 0x80) {
-			__CHAR32_TYPE__ __uni = __libc_unicode_readutf8((__WCHAR_TYPE__ const **)&__str);
+			__WCHAR_TYPE__ const *__new_str = __str;
+			__CHAR32_TYPE__ __uni = __libc_unicode_readutf8(&__new_str);
 			if (!__libc_unicode_isspace(__uni))
 				break;
+			__str = __new_str;
 		} else {
 			break;
 		}
 	}
 #else /* __CRT_HAVE___unicode_descriptor && __SIZEOF_WCHAR_T__ == 1 */
+#if __SIZEOF_WCHAR_T__ == 2
+	/* NOTE: No  need for special  handling for UTF-16 surrogates:
+	 *       there are no unicode whitespace characters that would
+	 *       need to be  encoded using surrogates  (so any  UTF-16
+	 *       character that  might be  a space  is always  encoded
+	 *       using a single word) */
+#endif /* __SIZEOF_WCHAR_T__ == 2 */
 	while ((__NAMESPACE_LOCAL_SYM __localdep_iswspace)((__WCHAR_TYPE__)*__str))
 		++__str;
 #endif /* !__CRT_HAVE___unicode_descriptor || __SIZEOF_WCHAR_T__ != 1 */

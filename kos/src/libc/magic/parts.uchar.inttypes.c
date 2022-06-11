@@ -40,17 +40,31 @@ __SYSDECL_BEGIN
 
 }
 
-c16toimax:(*) %{uchar16("wcstoimax")}
-c32toimax:(*) %{uchar32("wcstoimax")}
-c16toumax:(*) %{uchar16("wcstoumax")}
-c32toumax:(*) %{uchar32("wcstoumax")}
+c16stoimax:(*) %{uchar16("wcstoimax")}
+c32stoimax:(*) %{uchar32("wcstoimax")}
+c16stoumax:(*) %{uchar16("wcstoumax")}
+c32stoumax:(*) %{uchar32("wcstoumax")}
 
+%
 %#ifdef __USE_XOPEN2K8
-c16toimax_l:(*) %{uchar16("wcstoimax_l")}
-c32toimax_l:(*) %{uchar32("wcstoimax_l")}
-c16toumax_l:(*) %{uchar16("wcstoumax_l")}
-c32toumax_l:(*) %{uchar32("wcstoumax_l")}
+c16stoimax_l:(*) %{uchar16("wcstoimax_l")}
+c32stoimax_l:(*) %{uchar32("wcstoimax_l")}
+c16stoumax_l:(*) %{uchar16("wcstoumax_l")}
+c32stoumax_l:(*) %{uchar32("wcstoumax_l")}
 %#endif /* __USE_XOPEN2K8 */
+
+%
+%#ifdef __USE_KOS
+/************************************************************************/
+/* WARNING: The following functions aren't exported by-name from libc!  */
+/************************************************************************/
+c16stoimax_r:(*) %{uchar16("wcstoimax_r")}
+c32stoimax_r:(*) %{uchar32("wcstoimax_r")}
+c16stoumax_r:(*) %{uchar16("wcstoumax_r")}
+c32stoumax_r:(*) %{uchar32("wcstoumax_r")}
+/************************************************************************/
+%#endif /* __USE_KOS */
+
 
 %{
 

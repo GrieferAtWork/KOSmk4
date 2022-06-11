@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41e34fd2 */
+/* HASH CRC-32:0x979b4ed */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -233,16 +233,16 @@ __special_control:
 __encode_hex:
 				if (__text < __textend) {
 					__WCHAR_TYPE__ const *__new_text = __text;
-					__UINT32_TYPE__ __next_ch;
+					__CHAR32_TYPE__ __next_ch;
 #if __SIZEOF_WCHAR_T__ == 1
 					__next_ch = (__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf8_n)((__WCHAR_TYPE__ const **)&__new_text, __textend);
 #elif __SIZEOF_WCHAR_T__ == 2
 					__next_ch = (__NAMESPACE_LOCAL_SYM __localdep_unicode_readutf16_n)((__CHAR16_TYPE__ const **)&__new_text,
 					                              (__CHAR16_TYPE__ const *)__textend);
 #else /* ... */
-					__next_ch = (__UINT32_TYPE__)*__new_text++;
+					__next_ch = (__CHAR32_TYPE__)*__new_text++;
 #endif /* !... */
-					if (__libc_ishexU(__next_ch))
+					if (__libc_ishex(__next_ch))
 						goto __encode_uni;
 				}
 				if (__ch <= 0xf) {

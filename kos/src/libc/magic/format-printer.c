@@ -587,16 +587,16 @@ special_control:
 encode_hex:
 				if (text < textend) {
 					char const *new_text = text;
-					uint32_t next_ch;
+					char32_t next_ch;
 @@pp_if __SIZEOF_CHAR__ == 1@@
 					next_ch = unicode_readutf8_n((char const **)&new_text, textend);
 @@pp_elif __SIZEOF_CHAR__ == 2@@
 					next_ch = unicode_readutf16_n((char16_t const **)&new_text,
 					                              (char16_t const *)textend);
 @@pp_else@@
-					next_ch = (uint32_t)*new_text++;
+					next_ch = (char32_t)*new_text++;
 @@pp_endif@@
-					if (__libc_ishexU(next_ch))
+					if (__libc_ishex(next_ch))
 						goto encode_uni;
 				}
 				if (ch <= 0xf) {

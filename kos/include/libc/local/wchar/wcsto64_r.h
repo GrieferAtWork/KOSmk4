@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e800cc4 */
+/* HASH CRC-32:0xb0c63157 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,6 +40,7 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/__overflow.h>
 #include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
+#include <libc/unicode.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcsto64_r) __ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(4) __INT64_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsto64_r))(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) {
@@ -87,12 +88,42 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsto64_r))(__WCHAR_TYPE__ const *__r
 		__WCHAR_TYPE__ __ch;
 		__ch = *__num_iter;
 		if (!__libc_hex2int(__ch, &__digit)) {
-			/* TODO: Unicode support */
-			break;
+#ifdef __CRT_HAVE___unicode_descriptor
+			/* Unicode decimal support */
+#if __SIZEOF_WCHAR_T__ == 1
+			__WCHAR_TYPE__ const *__new_num_iter;
+			__CHAR32_TYPE__ __uni;
+#ifndef __OPTIMIZE_SIZE__
+			if ((__WCHAR_TYPE__)__ch < 0x80)
+				break;
+#endif /* !__OPTIMIZE_SIZE__ */
+			__new_num_iter = __num_iter;
+			__uni = __libc_unicode_readutf8(&__new_num_iter);
+			if (__libc_unicode_asdigit(__uni, (__UINT8_TYPE__)__base, &__digit)) {
+				__num_iter = __new_num_iter;
+			} else
+#elif __SIZEOF_WCHAR_T__ == 2
+			__CHAR16_TYPE__ const *__new_num_iter;
+			__CHAR32_TYPE__ __uni;
+			__new_num_iter = (__CHAR16_TYPE__ const *)__num_iter;
+			__uni = __libc_unicode_readutf16(&__new_num_iter);
+			if (__libc_unicode_asdigit(__uni, (__UINT8_TYPE__)__base, &__digit)) {
+				__num_iter = __new_num_iter;
+			} else
+#else /* ... */
+			if (__libc_unicode_asdigit(__ch, (__UINT8_TYPE__)__base, &__digit)) {
+				++__num_iter;
+			} else
+#endif /* !... */
+#endif /* __CRT_HAVE___unicode_descriptor */
+			{
+				break;
+			}
+		} else {
+			if (__digit >= __base)
+				break;
+			++__num_iter;
 		}
-		if (__digit >= __base)
-			break;
-		++__num_iter;
 		if __unlikely(__hybrid_overflow_smul(__result, (unsigned int)__base, &__result) ||
 		            __hybrid_overflow_sadd(__result, __digit, &__result)) {
 
@@ -110,12 +141,42 @@ __handle_overflow:
 				for (;;) {
 					__ch = *__num_iter;
 					if (!__libc_hex2int(__ch, &__digit)) {
-						/* TODO: Unicode support */
-						break;
+#ifdef __CRT_HAVE___unicode_descriptor
+						/* Unicode decimal support */
+#if __SIZEOF_WCHAR_T__ == 1
+						__WCHAR_TYPE__ const *__new_num_iter;
+						__CHAR32_TYPE__ __uni;
+#ifndef __OPTIMIZE_SIZE__
+						if ((__WCHAR_TYPE__)__ch < 0x80)
+							break;
+#endif /* !__OPTIMIZE_SIZE__ */
+						__new_num_iter = __num_iter;
+						__uni = __libc_unicode_readutf8(&__new_num_iter);
+						if (__libc_unicode_asdigit(__uni, (__UINT8_TYPE__)__base, &__digit)) {
+							__num_iter = __new_num_iter;
+						} else
+#elif __SIZEOF_WCHAR_T__ == 2
+						__CHAR16_TYPE__ const *__new_num_iter;
+						__CHAR32_TYPE__ __uni;
+						__new_num_iter = (__CHAR16_TYPE__ const *)__num_iter;
+						__uni = __libc_unicode_readutf16(&__new_num_iter);
+						if (__libc_unicode_asdigit(__uni, (__UINT8_TYPE__)__base, &__digit)) {
+							__num_iter = __new_num_iter;
+						} else
+#else /* ... */
+						if (__libc_unicode_asdigit(__ch, (__UINT8_TYPE__)__base, &__digit)) {
+							++__num_iter;
+						} else
+#endif /* !... */
+#endif /* __CRT_HAVE___unicode_descriptor */
+						{
+							break;
+						}
+					} else {
+						if (__digit >= __base)
+							break;
+						++__num_iter;
 					}
-					if (__digit >= __base)
-						break;
-					++__num_iter;
 				}
 				*__endptr = (__WCHAR_TYPE__ *)__num_iter;
 			}
