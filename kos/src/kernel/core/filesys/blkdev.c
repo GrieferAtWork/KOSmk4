@@ -705,14 +705,14 @@ blkdev_makeparts_loadembr(struct blkdev *__restrict self,
 			dev->bd_partinfo.bp_mbr_sysno = 0;
 			*(char *)mempcpy(dev->bd_partinfo.bp_efi_name, pent->epe_desc, 64) = '\0';
 
-			/* Trim partition name. */
-			while (*dev->bd_partinfo.bp_efi_name && isspace(*dev->bd_partinfo.bp_efi_name))
-				memmovedown(dev->bd_partinfo.bp_efi_name, dev->bd_partinfo.bp_efi_name + 1, 65, sizeof(char));
-			while (*dev->bd_partinfo.bp_efi_name) {
-				size_t len = strlen(dev->bd_partinfo.bp_efi_name);
-				if (!isspace(dev->bd_partinfo.bp_efi_name[len - 1]))
-					break;
-				dev->bd_partinfo.bp_efi_name[len - 1] = '\0';
+			/* Trim leading/trailing whitespace from partition name. */
+			{
+				char *stripped;
+				stripped = strstrip(dev->bd_partinfo.bp_efi_name);
+				if (dev->bd_partinfo.bp_efi_name < stripped) {
+					memmovedown(dev->bd_partinfo.bp_efi_name, stripped,
+					            strlen(stripped) + 1, sizeof(char));
+				}
 			}
 
 			dev->bd_partinfo.bp_active = 0; /* I don't think eMBR has a way to indicate active partitions... :( */

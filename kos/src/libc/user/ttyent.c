@@ -76,8 +76,7 @@ NOTHROW_NCX(LIBCCALL libc_endttyent)(void)
 
 PRIVATE ATTR_SECTION(".text.crt.database.tty") ATTR_RETNONNULL NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL tty_strip_and_unescape)(char *str) {
-	while (isspace(*str))
-		++str;
+	str = strlstrip(str);
 	if (*str == '"') {
 		char *eos = ++str;
 		while (*eos) {
@@ -94,10 +93,8 @@ NOTHROW_NCX(LIBCCALL tty_strip_and_unescape)(char *str) {
 		*eos = '\0';
 		str = strccpy(str, str);
 	} else {
-		char *eos = strend(str);
-		while (eos > str && isspace(eos[-1]))
-			--eos;
-		*eos = '\0';
+		/* Strip trailing whitespace */
+		str = strrstrip(str);
 	}
 	return str;
 }
@@ -105,10 +102,8 @@ NOTHROW_NCX(LIBCCALL tty_strip_and_unescape)(char *str) {
 PRIVATE ATTR_SECTION(".text.crt.database.tty") ATTR_RETNONNULL NONNULL((1)) char *
 NOTHROW_NCX(LIBCCALL tty_nextfield)(char *str) {
 	while (*str) {
-		if (isspace(*str)) {
-			do {
-				++str;
-			} while (isspace(*str));
+		if (isspace(*str)) { /* XXX: Unicode support here? */
+			str = strlstrip(str + 1);
 			str[-1] = '\0';
 			break;
 		}
@@ -129,8 +124,8 @@ NOTHROW_NCX(LIBCCALL tty_nextfield)(char *str) {
 			}
 			if (*str)
 				str[-1] = '\0';
-			while (isspace(*str))
-				++str; /* Skip whitespace after end of quoted area */
+			/* Skip whitespace after end of quoted area */
+			str = strlstrip(str);
 			break;
 		}
 		++str;
@@ -148,20 +143,16 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getttyent)(void)
 	if (!ttys_file)
 		libc_setttyent();
 	while ((line = fgetln(ttys_file, NULL)) != NULL) {
-		char *temp;
 
 		/* Strip leading space */
-		while (isspace(*line))
-			++line;
+		line = strlstrip(line);
 
+		/* Skip empty- or comment-only lines */
 		if (*line == '\0' || *line == '#')
-			continue; /* Skip empty- or comment-only lines */
+			continue;
 
 		/* Strip trailing space */
-		temp = strend(line);
-		while (temp > line && isspace(temp[-1]))
-			--temp;
-		*temp = '\0';
+		line = strrstrip(line);
 
 		/* Skip empty lines. */
 		if (*line == '\0')
@@ -209,9 +200,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getttyent)(void)
 		}
 		if (*line == '#') {
 			/* Trailing comment */
-			do {
-				++line;
-			} while (isspace(*line));
+			line = strlstrip(line + 1);
 			tty_ent.ty_comment = line;
 		}
 

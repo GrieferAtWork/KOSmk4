@@ -188,6 +188,13 @@ wildc32casecmp(*) %{uchar32("wildwcscasecmp")}
 c16verscmp(*) %{uchar16("wcsverscmp")}
 c32verscmp(*) %{uchar32("wcsverscmp")}
 
+c16lstrip(*) %{uchar16("wcslstrip")}
+c32lstrip(*) %{uchar32("wcslstrip")}
+c16rstrip(*) %{uchar16("wcsrstrip")}
+c32rstrip(*) %{uchar32("wcsrstrip")}
+c16strip(*) %{uchar16("wcsstrip")}
+c32strip(*) %{uchar32("wcsstrip")}
+
 
 %#ifdef __USE_XOPEN2K8
 c16casestr_l(*) %{uchar16("wcscasestr_l")}

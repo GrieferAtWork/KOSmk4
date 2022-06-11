@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51df9a1 */
+/* HASH CRC-32:0x2af6a913 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2934,6 +2934,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnend)(char32_t const *__restrict str,
 #endif /* !LIBC_ARCH_HAVE_C32SNEND */
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
+#include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
 /* >> wcsto32_r(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) int32_t
@@ -2941,15 +2942,21 @@ NOTHROW_NCX(LIBDCALL libd_wcsto32_r)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
                                      __STDC_INT_AS_UINT_T base,
                                      errno_t *error) {
-	int32_t result;
+
+
+
+
 	char16_t sign;
+
+	int32_t result;
 	char16_t const *num_start = nptr;
 	char16_t const *num_iter;
-	while (libd_iswspace(*num_start))
-		++num_start;
+	num_start = libd_wcslstrip(num_start);
+
 	sign = *num_start;
 	if (sign == '-' || sign == '+')
 		++num_start;
+
 	if (base == 0) {
 		/* Automatically deduce base. */
 		if (*num_start == '0') {
@@ -2973,17 +2980,13 @@ NOTHROW_NCX(LIBDCALL libd_wcsto32_r)(char16_t const *__restrict nptr,
 	}
 	num_iter = num_start;
 	result   = 0;
+
 	for (;;) {
 		uint8_t digit;
 		char16_t ch;
 		ch = *num_iter;
-		if (ch >= '0' && ch <= '9')
-			digit = (uint8_t)(ch - '0');
-		else if (ch >= 'a' && ch <= 'z')
-			digit = (uint8_t)(10 + ch - 'a');
-		else if (ch >= 'A' && ch <= 'Z')
-			digit = (uint8_t)(10 + ch - 'A');
-		else {
+		if (!__libc_hex2int(ch, &digit)) {
+			/* TODO: Unicode support */
 			break;
 		}
 		if (digit >= base)
@@ -2991,7 +2994,9 @@ NOTHROW_NCX(LIBDCALL libd_wcsto32_r)(char16_t const *__restrict nptr,
 		++num_iter;
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_sadd(result, digit, &result)) {
+
 handle_overflow:
+
 			/* Integer overflow. */
 			if (error) {
 
@@ -3003,13 +3008,8 @@ handle_overflow:
 			if (endptr) {
 				for (;;) {
 					ch = *num_iter;
-					if (ch >= '0' && ch <= '9')
-						digit = (uint8_t)(ch - '0');
-					else if (ch >= 'a' && ch <= 'z')
-						digit = (uint8_t)(10 + ch - 'a');
-					else if (ch >= 'A' && ch <= 'Z')
-						digit = (uint8_t)(10 + ch - 'A');
-					else {
+					if (!__libc_hex2int(ch, &digit)) {
+						/* TODO: Unicode support */
 						break;
 					}
 					if (digit >= base)
@@ -3018,22 +3018,28 @@ handle_overflow:
 				}
 				*endptr = (char16_t *)num_iter;
 			}
+
 			if (sign == '-')
 				return __INT32_MIN__;
 			return __INT32_MAX__;
+
+
+
 		}
 	}
+
 	if (sign == '-') {
 		if (__hybrid_overflow_sneg_p2n(result, &result)) /* NOLINT */
 			goto handle_overflow; /* Overflow... */
 	}
+
+
 	if unlikely(num_iter == num_start) {
 		/* Check for special case: `0xGARBAGE'.
 		 * -> In this case, return `0' and set `endptr' to `x' */
 		if ((base == 16 || base == 2) && num_start > nptr) {
 			char16_t const *nptr_ps = nptr;
-			while (libd_iswspace(*nptr_ps))
-				++nptr_ps;
+			nptr_ps = libd_wcslstrip(nptr_ps);
 			if (num_start > nptr_ps && *nptr_ps == '0') {
 				if (endptr)
 					*endptr = (char16_t *)nptr_ps + 1;
@@ -3042,7 +3048,6 @@ handle_overflow:
 				return 0;
 			}
 		}
-
 		/* Empty number... */
 		if (error) {
 
@@ -3063,8 +3068,7 @@ handle_overflow:
 			*error = 0;
 			/* Check for `EINVAL' */
 			if unlikely(*num_iter) {
-				while (libd_iswspace(*num_iter))
-					++num_iter;
+				num_iter = libd_wcslstrip(num_iter);
 				if (*num_iter) {
 
 					*error = EINVAL;
@@ -3079,6 +3083,7 @@ handle_overflow:
 }
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
+#include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
 /* >> wcsto32_r(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) int32_t
@@ -3086,15 +3091,21 @@ NOTHROW_NCX(LIBKCALL libc_wcsto32_r)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
                                      __STDC_INT_AS_UINT_T base,
                                      errno_t *error) {
-	int32_t result;
+
+
+
+
 	char32_t sign;
+
+	int32_t result;
 	char32_t const *num_start = nptr;
 	char32_t const *num_iter;
-	while (libc_iswspace(*num_start))
-		++num_start;
+	num_start = libc_wcslstrip(num_start);
+
 	sign = *num_start;
 	if (sign == '-' || sign == '+')
 		++num_start;
+
 	if (base == 0) {
 		/* Automatically deduce base. */
 		if (*num_start == '0') {
@@ -3118,17 +3129,13 @@ NOTHROW_NCX(LIBKCALL libc_wcsto32_r)(char32_t const *__restrict nptr,
 	}
 	num_iter = num_start;
 	result   = 0;
+
 	for (;;) {
 		uint8_t digit;
 		char32_t ch;
 		ch = *num_iter;
-		if (ch >= '0' && ch <= '9')
-			digit = (uint8_t)(ch - '0');
-		else if (ch >= 'a' && ch <= 'z')
-			digit = (uint8_t)(10 + ch - 'a');
-		else if (ch >= 'A' && ch <= 'Z')
-			digit = (uint8_t)(10 + ch - 'A');
-		else {
+		if (!__libc_hex2int(ch, &digit)) {
+			/* TODO: Unicode support */
 			break;
 		}
 		if (digit >= base)
@@ -3136,7 +3143,9 @@ NOTHROW_NCX(LIBKCALL libc_wcsto32_r)(char32_t const *__restrict nptr,
 		++num_iter;
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_sadd(result, digit, &result)) {
+
 handle_overflow:
+
 			/* Integer overflow. */
 			if (error) {
 
@@ -3148,13 +3157,8 @@ handle_overflow:
 			if (endptr) {
 				for (;;) {
 					ch = *num_iter;
-					if (ch >= '0' && ch <= '9')
-						digit = (uint8_t)(ch - '0');
-					else if (ch >= 'a' && ch <= 'z')
-						digit = (uint8_t)(10 + ch - 'a');
-					else if (ch >= 'A' && ch <= 'Z')
-						digit = (uint8_t)(10 + ch - 'A');
-					else {
+					if (!__libc_hex2int(ch, &digit)) {
+						/* TODO: Unicode support */
 						break;
 					}
 					if (digit >= base)
@@ -3163,22 +3167,28 @@ handle_overflow:
 				}
 				*endptr = (char32_t *)num_iter;
 			}
+
 			if (sign == '-')
 				return __INT32_MIN__;
 			return __INT32_MAX__;
+
+
+
 		}
 	}
+
 	if (sign == '-') {
 		if (__hybrid_overflow_sneg_p2n(result, &result)) /* NOLINT */
 			goto handle_overflow; /* Overflow... */
 	}
+
+
 	if unlikely(num_iter == num_start) {
 		/* Check for special case: `0xGARBAGE'.
 		 * -> In this case, return `0' and set `endptr' to `x' */
 		if ((base == 16 || base == 2) && num_start > nptr) {
 			char32_t const *nptr_ps = nptr;
-			while (libc_iswspace(*nptr_ps))
-				++nptr_ps;
+			nptr_ps = libc_wcslstrip(nptr_ps);
 			if (num_start > nptr_ps && *nptr_ps == '0') {
 				if (endptr)
 					*endptr = (char32_t *)nptr_ps + 1;
@@ -3187,7 +3197,6 @@ handle_overflow:
 				return 0;
 			}
 		}
-
 		/* Empty number... */
 		if (error) {
 
@@ -3208,8 +3217,7 @@ handle_overflow:
 			*error = 0;
 			/* Check for `EINVAL' */
 			if unlikely(*num_iter) {
-				while (libc_iswspace(*num_iter))
-					++num_iter;
+				num_iter = libc_wcslstrip(num_iter);
 				if (*num_iter) {
 
 					*error = EINVAL;
@@ -3224,17 +3232,29 @@ handle_overflow:
 }
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
+#include <libc/template/hex.h>
+#include <hybrid/limitcore.h>
 /* >> wcstou32_r(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) uint32_t
 NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
                                       char16_t **endptr,
                                       __STDC_INT_AS_UINT_T base,
                                       errno_t *error) {
+
+
+
+
+
+
 	uint32_t result;
 	char16_t const *num_start = nptr;
 	char16_t const *num_iter;
-	while (libd_iswspace(*num_start))
-		++num_start;
+	num_start = libd_wcslstrip(num_start);
+
+
+
+
+
 	if (base == 0) {
 		/* Automatically deduce base. */
 		if (*num_start == '0') {
@@ -3258,16 +3278,13 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 	}
 	num_iter = num_start;
 	result   = 0;
+
 	for (;;) {
 		uint8_t digit;
-		char16_t ch = *num_iter;
-		if (ch >= '0' && ch <= '9')
-			digit = (uint8_t)(ch - '0');
-		else if (ch >= 'a' && ch <= 'z')
-			digit = (uint8_t)(10 + ch - 'a');
-		else if (ch >= 'A' && ch <= 'Z')
-			digit = (uint8_t)(10 + ch - 'A');
-		else {
+		char16_t ch;
+		ch = *num_iter;
+		if (!__libc_hex2int(ch, &digit)) {
+			/* TODO: Unicode support */
 			break;
 		}
 		if (digit >= base)
@@ -3275,6 +3292,9 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 		++num_iter;
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_uadd(result, digit, &result)) {
+
+
+
 			/* Integer overflow. */
 			if (error) {
 
@@ -3286,13 +3306,8 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 			if (endptr) {
 				for (;;) {
 					ch = *num_iter;
-					if (ch >= '0' && ch <= '9')
-						digit = (uint8_t)(ch - '0');
-					else if (ch >= 'a' && ch <= 'z')
-						digit = (uint8_t)(10 + ch - 'a');
-					else if (ch >= 'A' && ch <= 'Z')
-						digit = (uint8_t)(10 + ch - 'A');
-					else {
+					if (!__libc_hex2int(ch, &digit)) {
+						/* TODO: Unicode support */
 						break;
 					}
 					if (digit >= base)
@@ -3301,16 +3316,28 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 				}
 				*endptr = (char16_t *)num_iter;
 			}
-			return (uint32_t)-1;
+
+
+
+
+
+			return __UINT32_MAX__;
+
 		}
 	}
+
+
+
+
+
+
+
 	if unlikely(num_iter == num_start) {
 		/* Check for special case: `0xGARBAGE'.
 		 * -> In this case, return `0' and set `endptr' to `x' */
 		if ((base == 16 || base == 2) && num_start > nptr) {
 			char16_t const *nptr_ps = nptr;
-			while (libd_iswspace(*nptr_ps))
-				++nptr_ps;
+			nptr_ps = libd_wcslstrip(nptr_ps);
 			if (num_start > nptr_ps && *nptr_ps == '0') {
 				if (endptr)
 					*endptr = (char16_t *)nptr_ps + 1;
@@ -3319,7 +3346,6 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 				return 0;
 			}
 		}
-
 		/* Empty number... */
 		if (error) {
 
@@ -3340,8 +3366,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 			*error = 0;
 			/* Check for `EINVAL' */
 			if unlikely(*num_iter) {
-				while (libd_iswspace(*num_iter))
-					++num_iter;
+				num_iter = libd_wcslstrip(num_iter);
 				if (*num_iter) {
 
 					*error = EINVAL;
@@ -3356,17 +3381,29 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 }
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
+#include <libc/template/hex.h>
+#include <hybrid/limitcore.h>
 /* >> wcstou32_r(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) uint32_t
 NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
                                       char32_t **endptr,
                                       __STDC_INT_AS_UINT_T base,
                                       errno_t *error) {
+
+
+
+
+
+
 	uint32_t result;
 	char32_t const *num_start = nptr;
 	char32_t const *num_iter;
-	while (libc_iswspace(*num_start))
-		++num_start;
+	num_start = libc_wcslstrip(num_start);
+
+
+
+
+
 	if (base == 0) {
 		/* Automatically deduce base. */
 		if (*num_start == '0') {
@@ -3390,16 +3427,13 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
 	}
 	num_iter = num_start;
 	result   = 0;
+
 	for (;;) {
 		uint8_t digit;
-		char32_t ch = *num_iter;
-		if (ch >= '0' && ch <= '9')
-			digit = (uint8_t)(ch - '0');
-		else if (ch >= 'a' && ch <= 'z')
-			digit = (uint8_t)(10 + ch - 'a');
-		else if (ch >= 'A' && ch <= 'Z')
-			digit = (uint8_t)(10 + ch - 'A');
-		else {
+		char32_t ch;
+		ch = *num_iter;
+		if (!__libc_hex2int(ch, &digit)) {
+			/* TODO: Unicode support */
 			break;
 		}
 		if (digit >= base)
@@ -3407,6 +3441,9 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
 		++num_iter;
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_uadd(result, digit, &result)) {
+
+
+
 			/* Integer overflow. */
 			if (error) {
 
@@ -3418,13 +3455,8 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
 			if (endptr) {
 				for (;;) {
 					ch = *num_iter;
-					if (ch >= '0' && ch <= '9')
-						digit = (uint8_t)(ch - '0');
-					else if (ch >= 'a' && ch <= 'z')
-						digit = (uint8_t)(10 + ch - 'a');
-					else if (ch >= 'A' && ch <= 'Z')
-						digit = (uint8_t)(10 + ch - 'A');
-					else {
+					if (!__libc_hex2int(ch, &digit)) {
+						/* TODO: Unicode support */
 						break;
 					}
 					if (digit >= base)
@@ -3433,16 +3465,28 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
 				}
 				*endptr = (char32_t *)num_iter;
 			}
-			return (uint32_t)-1;
+
+
+
+
+
+			return __UINT32_MAX__;
+
 		}
 	}
+
+
+
+
+
+
+
 	if unlikely(num_iter == num_start) {
 		/* Check for special case: `0xGARBAGE'.
 		 * -> In this case, return `0' and set `endptr' to `x' */
 		if ((base == 16 || base == 2) && num_start > nptr) {
 			char32_t const *nptr_ps = nptr;
-			while (libc_iswspace(*nptr_ps))
-				++nptr_ps;
+			nptr_ps = libc_wcslstrip(nptr_ps);
 			if (num_start > nptr_ps && *nptr_ps == '0') {
 				if (endptr)
 					*endptr = (char32_t *)nptr_ps + 1;
@@ -3451,7 +3495,6 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
 				return 0;
 			}
 		}
-
 		/* Empty number... */
 		if (error) {
 
@@ -3472,8 +3515,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
 			*error = 0;
 			/* Check for `EINVAL' */
 			if unlikely(*num_iter) {
-				while (libc_iswspace(*num_iter))
-					++num_iter;
+				num_iter = libc_wcslstrip(num_iter);
 				if (*num_iter) {
 
 					*error = EINVAL;
@@ -3556,6 +3598,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32)(char32_t const *__restrict nptr,
 }
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
+#include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
 /* >> wcsto64_r(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) int64_t
@@ -3563,15 +3606,21 @@ NOTHROW_NCX(LIBDCALL libd_wcsto64_r)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
                                      __STDC_INT_AS_UINT_T base,
                                      errno_t *error) {
-	int64_t result;
+
+
+
+
 	char16_t sign;
+
+	int64_t result;
 	char16_t const *num_start = nptr;
 	char16_t const *num_iter;
-	while (libd_iswspace(*num_start))
-		++num_start;
+	num_start = libd_wcslstrip(num_start);
+
 	sign = *num_start;
 	if (sign == '-' || sign == '+')
 		++num_start;
+
 	if (base == 0) {
 		/* Automatically deduce base. */
 		if (*num_start == '0') {
@@ -3595,17 +3644,13 @@ NOTHROW_NCX(LIBDCALL libd_wcsto64_r)(char16_t const *__restrict nptr,
 	}
 	num_iter = num_start;
 	result   = 0;
+
 	for (;;) {
 		uint8_t digit;
 		char16_t ch;
 		ch = *num_iter;
-		if (ch >= '0' && ch <= '9')
-			digit = (uint8_t)(ch - '0');
-		else if (ch >= 'a' && ch <= 'z')
-			digit = (uint8_t)(10 + ch - 'a');
-		else if (ch >= 'A' && ch <= 'Z')
-			digit = (uint8_t)(10 + ch - 'A');
-		else {
+		if (!__libc_hex2int(ch, &digit)) {
+			/* TODO: Unicode support */
 			break;
 		}
 		if (digit >= base)
@@ -3613,7 +3658,9 @@ NOTHROW_NCX(LIBDCALL libd_wcsto64_r)(char16_t const *__restrict nptr,
 		++num_iter;
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_sadd(result, digit, &result)) {
+
 handle_overflow:
+
 			/* Integer overflow. */
 			if (error) {
 
@@ -3625,13 +3672,8 @@ handle_overflow:
 			if (endptr) {
 				for (;;) {
 					ch = *num_iter;
-					if (ch >= '0' && ch <= '9')
-						digit = (uint8_t)(ch - '0');
-					else if (ch >= 'a' && ch <= 'z')
-						digit = (uint8_t)(10 + ch - 'a');
-					else if (ch >= 'A' && ch <= 'Z')
-						digit = (uint8_t)(10 + ch - 'A');
-					else {
+					if (!__libc_hex2int(ch, &digit)) {
+						/* TODO: Unicode support */
 						break;
 					}
 					if (digit >= base)
@@ -3640,22 +3682,28 @@ handle_overflow:
 				}
 				*endptr = (char16_t *)num_iter;
 			}
+
 			if (sign == '-')
 				return __INT64_MIN__;
 			return __INT64_MAX__;
+
+
+
 		}
 	}
+
 	if (sign == '-') {
 		if (__hybrid_overflow_sneg_p2n(result, &result)) /* NOLINT */
 			goto handle_overflow; /* Overflow... */
 	}
+
+
 	if unlikely(num_iter == num_start) {
 		/* Check for special case: `0xGARBAGE'.
 		 * -> In this case, return `0' and set `endptr' to `x' */
 		if ((base == 16 || base == 2) && num_start > nptr) {
 			char16_t const *nptr_ps = nptr;
-			while (libd_iswspace(*nptr_ps))
-				++nptr_ps;
+			nptr_ps = libd_wcslstrip(nptr_ps);
 			if (num_start > nptr_ps && *nptr_ps == '0') {
 				if (endptr)
 					*endptr = (char16_t *)nptr_ps + 1;
@@ -3664,7 +3712,6 @@ handle_overflow:
 				return 0;
 			}
 		}
-
 		/* Empty number... */
 		if (error) {
 
@@ -3685,8 +3732,7 @@ handle_overflow:
 			*error = 0;
 			/* Check for `EINVAL' */
 			if unlikely(*num_iter) {
-				while (libd_iswspace(*num_iter))
-					++num_iter;
+				num_iter = libd_wcslstrip(num_iter);
 				if (*num_iter) {
 
 					*error = EINVAL;
@@ -3701,6 +3747,7 @@ handle_overflow:
 }
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
+#include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
 /* >> wcsto64_r(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) int64_t
@@ -3708,15 +3755,21 @@ NOTHROW_NCX(LIBKCALL libc_wcsto64_r)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
                                      __STDC_INT_AS_UINT_T base,
                                      errno_t *error) {
-	int64_t result;
+
+
+
+
 	char32_t sign;
+
+	int64_t result;
 	char32_t const *num_start = nptr;
 	char32_t const *num_iter;
-	while (libc_iswspace(*num_start))
-		++num_start;
+	num_start = libc_wcslstrip(num_start);
+
 	sign = *num_start;
 	if (sign == '-' || sign == '+')
 		++num_start;
+
 	if (base == 0) {
 		/* Automatically deduce base. */
 		if (*num_start == '0') {
@@ -3740,17 +3793,13 @@ NOTHROW_NCX(LIBKCALL libc_wcsto64_r)(char32_t const *__restrict nptr,
 	}
 	num_iter = num_start;
 	result   = 0;
+
 	for (;;) {
 		uint8_t digit;
 		char32_t ch;
 		ch = *num_iter;
-		if (ch >= '0' && ch <= '9')
-			digit = (uint8_t)(ch - '0');
-		else if (ch >= 'a' && ch <= 'z')
-			digit = (uint8_t)(10 + ch - 'a');
-		else if (ch >= 'A' && ch <= 'Z')
-			digit = (uint8_t)(10 + ch - 'A');
-		else {
+		if (!__libc_hex2int(ch, &digit)) {
+			/* TODO: Unicode support */
 			break;
 		}
 		if (digit >= base)
@@ -3758,7 +3807,9 @@ NOTHROW_NCX(LIBKCALL libc_wcsto64_r)(char32_t const *__restrict nptr,
 		++num_iter;
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_sadd(result, digit, &result)) {
+
 handle_overflow:
+
 			/* Integer overflow. */
 			if (error) {
 
@@ -3770,13 +3821,8 @@ handle_overflow:
 			if (endptr) {
 				for (;;) {
 					ch = *num_iter;
-					if (ch >= '0' && ch <= '9')
-						digit = (uint8_t)(ch - '0');
-					else if (ch >= 'a' && ch <= 'z')
-						digit = (uint8_t)(10 + ch - 'a');
-					else if (ch >= 'A' && ch <= 'Z')
-						digit = (uint8_t)(10 + ch - 'A');
-					else {
+					if (!__libc_hex2int(ch, &digit)) {
+						/* TODO: Unicode support */
 						break;
 					}
 					if (digit >= base)
@@ -3785,22 +3831,28 @@ handle_overflow:
 				}
 				*endptr = (char32_t *)num_iter;
 			}
+
 			if (sign == '-')
 				return __INT64_MIN__;
 			return __INT64_MAX__;
+
+
+
 		}
 	}
+
 	if (sign == '-') {
 		if (__hybrid_overflow_sneg_p2n(result, &result)) /* NOLINT */
 			goto handle_overflow; /* Overflow... */
 	}
+
+
 	if unlikely(num_iter == num_start) {
 		/* Check for special case: `0xGARBAGE'.
 		 * -> In this case, return `0' and set `endptr' to `x' */
 		if ((base == 16 || base == 2) && num_start > nptr) {
 			char32_t const *nptr_ps = nptr;
-			while (libc_iswspace(*nptr_ps))
-				++nptr_ps;
+			nptr_ps = libc_wcslstrip(nptr_ps);
 			if (num_start > nptr_ps && *nptr_ps == '0') {
 				if (endptr)
 					*endptr = (char32_t *)nptr_ps + 1;
@@ -3809,7 +3861,6 @@ handle_overflow:
 				return 0;
 			}
 		}
-
 		/* Empty number... */
 		if (error) {
 
@@ -3830,8 +3881,7 @@ handle_overflow:
 			*error = 0;
 			/* Check for `EINVAL' */
 			if unlikely(*num_iter) {
-				while (libc_iswspace(*num_iter))
-					++num_iter;
+				num_iter = libc_wcslstrip(num_iter);
 				if (*num_iter) {
 
 					*error = EINVAL;
@@ -3846,17 +3896,29 @@ handle_overflow:
 }
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
+#include <libc/template/hex.h>
+#include <hybrid/limitcore.h>
 /* >> wcstou64_r(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) uint64_t
 NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
                                       char16_t **endptr,
                                       __STDC_INT_AS_UINT_T base,
                                       errno_t *error) {
+
+
+
+
+
+
 	uint64_t result;
 	char16_t const *num_start = nptr;
 	char16_t const *num_iter;
-	while (libd_iswspace(*num_start))
-		++num_start;
+	num_start = libd_wcslstrip(num_start);
+
+
+
+
+
 	if (base == 0) {
 		/* Automatically deduce base. */
 		if (*num_start == '0') {
@@ -3880,16 +3942,13 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 	}
 	num_iter = num_start;
 	result   = 0;
+
 	for (;;) {
 		uint8_t digit;
-		char16_t ch = *num_iter;
-		if (ch >= '0' && ch <= '9')
-			digit = (uint8_t)(ch - '0');
-		else if (ch >= 'a' && ch <= 'z')
-			digit = (uint8_t)(10 + ch - 'a');
-		else if (ch >= 'A' && ch <= 'Z')
-			digit = (uint8_t)(10 + ch - 'A');
-		else {
+		char16_t ch;
+		ch = *num_iter;
+		if (!__libc_hex2int(ch, &digit)) {
+			/* TODO: Unicode support */
 			break;
 		}
 		if (digit >= base)
@@ -3897,6 +3956,9 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 		++num_iter;
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_uadd(result, digit, &result)) {
+
+
+
 			/* Integer overflow. */
 			if (error) {
 
@@ -3908,13 +3970,8 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 			if (endptr) {
 				for (;;) {
 					ch = *num_iter;
-					if (ch >= '0' && ch <= '9')
-						digit = (uint8_t)(ch - '0');
-					else if (ch >= 'a' && ch <= 'z')
-						digit = (uint8_t)(10 + ch - 'a');
-					else if (ch >= 'A' && ch <= 'Z')
-						digit = (uint8_t)(10 + ch - 'A');
-					else {
+					if (!__libc_hex2int(ch, &digit)) {
+						/* TODO: Unicode support */
 						break;
 					}
 					if (digit >= base)
@@ -3923,16 +3980,28 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 				}
 				*endptr = (char16_t *)num_iter;
 			}
-			return (uint64_t)-1;
+
+
+
+
+
+			return __UINT64_MAX__;
+
 		}
 	}
+
+
+
+
+
+
+
 	if unlikely(num_iter == num_start) {
 		/* Check for special case: `0xGARBAGE'.
 		 * -> In this case, return `0' and set `endptr' to `x' */
 		if ((base == 16 || base == 2) && num_start > nptr) {
 			char16_t const *nptr_ps = nptr;
-			while (libd_iswspace(*nptr_ps))
-				++nptr_ps;
+			nptr_ps = libd_wcslstrip(nptr_ps);
 			if (num_start > nptr_ps && *nptr_ps == '0') {
 				if (endptr)
 					*endptr = (char16_t *)nptr_ps + 1;
@@ -3941,7 +4010,6 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 				return 0;
 			}
 		}
-
 		/* Empty number... */
 		if (error) {
 
@@ -3962,8 +4030,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 			*error = 0;
 			/* Check for `EINVAL' */
 			if unlikely(*num_iter) {
-				while (libd_iswspace(*num_iter))
-					++num_iter;
+				num_iter = libd_wcslstrip(num_iter);
 				if (*num_iter) {
 
 					*error = EINVAL;
@@ -3978,17 +4045,29 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 }
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
+#include <libc/template/hex.h>
+#include <hybrid/limitcore.h>
 /* >> wcstou64_r(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) uint64_t
 NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
                                       char32_t **endptr,
                                       __STDC_INT_AS_UINT_T base,
                                       errno_t *error) {
+
+
+
+
+
+
 	uint64_t result;
 	char32_t const *num_start = nptr;
 	char32_t const *num_iter;
-	while (libc_iswspace(*num_start))
-		++num_start;
+	num_start = libc_wcslstrip(num_start);
+
+
+
+
+
 	if (base == 0) {
 		/* Automatically deduce base. */
 		if (*num_start == '0') {
@@ -4012,16 +4091,13 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
 	}
 	num_iter = num_start;
 	result   = 0;
+
 	for (;;) {
 		uint8_t digit;
-		char32_t ch = *num_iter;
-		if (ch >= '0' && ch <= '9')
-			digit = (uint8_t)(ch - '0');
-		else if (ch >= 'a' && ch <= 'z')
-			digit = (uint8_t)(10 + ch - 'a');
-		else if (ch >= 'A' && ch <= 'Z')
-			digit = (uint8_t)(10 + ch - 'A');
-		else {
+		char32_t ch;
+		ch = *num_iter;
+		if (!__libc_hex2int(ch, &digit)) {
+			/* TODO: Unicode support */
 			break;
 		}
 		if (digit >= base)
@@ -4029,6 +4105,9 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
 		++num_iter;
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_uadd(result, digit, &result)) {
+
+
+
 			/* Integer overflow. */
 			if (error) {
 
@@ -4040,13 +4119,8 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
 			if (endptr) {
 				for (;;) {
 					ch = *num_iter;
-					if (ch >= '0' && ch <= '9')
-						digit = (uint8_t)(ch - '0');
-					else if (ch >= 'a' && ch <= 'z')
-						digit = (uint8_t)(10 + ch - 'a');
-					else if (ch >= 'A' && ch <= 'Z')
-						digit = (uint8_t)(10 + ch - 'A');
-					else {
+					if (!__libc_hex2int(ch, &digit)) {
+						/* TODO: Unicode support */
 						break;
 					}
 					if (digit >= base)
@@ -4055,16 +4129,28 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
 				}
 				*endptr = (char32_t *)num_iter;
 			}
-			return (uint64_t)-1;
+
+
+
+
+
+			return __UINT64_MAX__;
+
 		}
 	}
+
+
+
+
+
+
+
 	if unlikely(num_iter == num_start) {
 		/* Check for special case: `0xGARBAGE'.
 		 * -> In this case, return `0' and set `endptr' to `x' */
 		if ((base == 16 || base == 2) && num_start > nptr) {
 			char32_t const *nptr_ps = nptr;
-			while (libc_iswspace(*nptr_ps))
-				++nptr_ps;
+			nptr_ps = libc_wcslstrip(nptr_ps);
 			if (num_start > nptr_ps && *nptr_ps == '0') {
 				if (endptr)
 					*endptr = (char32_t *)nptr_ps + 1;
@@ -4073,7 +4159,6 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
 				return 0;
 			}
 		}
-
 		/* Empty number... */
 		if (error) {
 
@@ -4094,8 +4179,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
 			*error = 0;
 			/* Check for `EINVAL' */
 			if unlikely(*num_iter) {
-				while (libc_iswspace(*num_iter))
-					++num_iter;
+				num_iter = libc_wcslstrip(num_iter);
 				if (*num_iter) {
 
 					*error = EINVAL;
@@ -5151,6 +5235,138 @@ NOTHROW_NCX(LIBKCALL libc_wcsverscmp)(char32_t const *s1,
 		++s2;
 	} while (c1 != '\0');
 	return 0;
+}
+#include <libc/unicode.h>
+#include <hybrid/typecore.h>
+/* >> wcslstrip(3) */
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_IN(1) char16_t *
+NOTHROW_NCX(LIBDCALL libd_wcslstrip)(char16_t const *str) {
+	/* NOTE: assert(!isspace('\0'));
+	 * -> So we don't need special handling to stop on NUL! */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	while (libd_iswspace((char16_t)*str))
+		++str;
+
+	return (char16_t *)str;
+}
+#include <libc/unicode.h>
+#include <hybrid/typecore.h>
+/* >> wcslstrip(3) */
+INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_IN(1) char32_t *
+NOTHROW_NCX(LIBKCALL libc_wcslstrip)(char32_t const *str) {
+	/* NOTE: assert(!isspace('\0'));
+	 * -> So we don't need special handling to stop on NUL! */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	while (libc_iswspace((char32_t)*str))
+		++str;
+
+	return (char32_t *)str;
+}
+#include <libc/unicode.h>
+#include <hybrid/typecore.h>
+/* >> wcsrstrip(3) */
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") ATTR_RETNONNULL WUNUSED ATTR_IN(1) char16_t *
+NOTHROW_NCX(LIBDCALL libd_wcsrstrip)(char16_t *str) {
+	char16_t *endp = libd_wcsend(str);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	while (endp > str && libd_iswspace((char16_t)endp[-1]))
+		--endp;
+
+	*endp = '\0'; /* Delete trailing space. */
+	return str;
+}
+#include <libc/unicode.h>
+#include <hybrid/typecore.h>
+/* >> wcsrstrip(3) */
+INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") ATTR_RETNONNULL WUNUSED ATTR_IN(1) char32_t *
+NOTHROW_NCX(LIBKCALL libc_wcsrstrip)(char32_t *str) {
+	char32_t *endp = libc_wcsend(str);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	while (endp > str && libc_iswspace((char32_t)endp[-1]))
+		--endp;
+
+	*endp = '\0'; /* Delete trailing space. */
+	return str;
+}
+/* >> wcsstrip(3) */
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") ATTR_RETNONNULL WUNUSED ATTR_IN(1) char16_t *
+NOTHROW_NCX(LIBDCALL libd_wcsstrip)(char16_t *str) {
+	str = libd_wcslstrip(str);
+	str = libd_wcsrstrip(str);
+	return str;
+}
+/* >> wcsstrip(3) */
+INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") ATTR_RETNONNULL WUNUSED ATTR_IN(1) char32_t *
+NOTHROW_NCX(LIBKCALL libc_wcsstrip)(char32_t *str) {
+	str = libc_wcslstrip(str);
+	str = libc_wcsrstrip(str);
+	return str;
 }
 /* >> wcsncoll_l(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
@@ -6220,6 +6436,12 @@ DEFINE_PUBLIC_ALIAS(DOS$wildwcscasecmp, libd_wildwcscasecmp);
 DEFINE_PUBLIC_ALIAS(wildwcscasecmp, libc_wildwcscasecmp);
 DEFINE_PUBLIC_ALIAS(DOS$wcsverscmp, libd_wcsverscmp);
 DEFINE_PUBLIC_ALIAS(wcsverscmp, libc_wcsverscmp);
+DEFINE_PUBLIC_ALIAS(DOS$wcslstrip, libd_wcslstrip);
+DEFINE_PUBLIC_ALIAS(wcslstrip, libc_wcslstrip);
+DEFINE_PUBLIC_ALIAS(DOS$wcsrstrip, libd_wcsrstrip);
+DEFINE_PUBLIC_ALIAS(wcsrstrip, libc_wcsrstrip);
+DEFINE_PUBLIC_ALIAS(DOS$wcsstrip, libd_wcsstrip);
+DEFINE_PUBLIC_ALIAS(wcsstrip, libc_wcsstrip);
 DEFINE_PUBLIC_ALIAS(DOS$_wcsncoll_l, libd_wcsncoll_l);
 DEFINE_PUBLIC_ALIAS(DOS$wcsncoll_l, libd_wcsncoll_l);
 DEFINE_PUBLIC_ALIAS(wcsncoll_l, libc_wcsncoll_l);

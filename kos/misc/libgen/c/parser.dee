@@ -35,8 +35,8 @@ class UserString {
 	@@The actual text represented by this UserString
 	public member text: string;
 
-	@@Return a (line, column) pair describing the origin of
-	@@this   UserString   within    the   file    @filename
+	@@Return a (line, column) pair describing the origin
+	@@of this UserString within the file @filename
 	public property lc: (int, int) = {
 		get(): (int, int) {
 			return parser.lcAt(start);
@@ -46,6 +46,11 @@ class UserString {
 	@@Print an error @message and throw an @Error
 	function err(message: string) {
 		parser.errAt(start, message);
+	}
+
+	@@Print an error @message and throw an @Error
+	function errAt(offset: int, message: string) {
+		parser.errAt(start + offset, message);
 	}
 
 	@@Simple alias for @(parser.filename)
@@ -500,6 +505,26 @@ twochar:
 				continue;
 			}
 			if (tok in ")]},")
+				break;
+			tok = next();
+		}
+		local resultEnd = tokStart;
+		while (resultEnd > resultStart && text.isspace(resultEnd - 1))
+			--resultEnd;
+		return getUserString(resultStart, resultEnd);
+	}
+
+	@@Same as @parseAllUntilRParen, but also skip over @"<...>"-pairs
+	function parseAllUntilRParenWithinTemplate(): UserString | string {
+		local tok = this.tok;
+		local resultStart = tokStart;
+		for (;;) {
+			if (tok in "([{<") {
+				skipPair();
+				tok = next();
+				continue;
+			}
+			if (tok in ")]}>,")
 				break;
 			tok = next();
 		}

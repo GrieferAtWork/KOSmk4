@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1bbc85d */
+/* HASH CRC-32:0x8fa45c13 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2965,6 +2965,9 @@ DEFINE_PUBLIC_ALIAS(DOS$strstartcmp, libd_strstartcmp);
 DEFINE_PUBLIC_ALIAS(DOS$strstartcmpz, libd_strstartcmpz);
 DEFINE_PUBLIC_ALIAS(DOS$bitcpy, libd_bitcpy);
 DEFINE_PUBLIC_ALIAS(DOS$strrstr, libd_strrstr);
+DEFINE_PUBLIC_ALIAS(DOS$strlstrip, libd_strlstrip);
+DEFINE_PUBLIC_ALIAS(DOS$strrstrip, libd_strrstrip);
+DEFINE_PUBLIC_ALIAS(DOS$strstrip, libd_strstrip);
 DEFINE_PUBLIC_ALIAS(DOS$_strlwr, libd_strlwr);
 DEFINE_PUBLIC_ALIAS(DOS$strlwr, libd_strlwr);
 DEFINE_PUBLIC_ALIAS(DOS$_strupr, libd_strupr);

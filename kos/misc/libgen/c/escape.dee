@@ -1009,7 +1009,8 @@ again_handle_tok:
 			tok = self.next();
 			switch (tok) {
 
-			case "exec": {
+			case "exec":
+			case "yield": {
 				self.next();
 				local exprStart = self.tokStart;
 				local exprEnd   = exprStart;
@@ -1020,15 +1021,16 @@ again_handle_tok:
 				if (evalEnviron is none)
 					evalEnviron = Dict();
 				local evalExpr = self.text[exprStart:exprEnd];
+				local evalResult;
 				try {
-					exec(evalExpr, globals: evalEnviron);
+					evalResult = exec(evalExpr.replace("@", ""), globals: evalEnviron);
 				} catch (Error as e) {
 					self.errAt(exprStart, e);
 					throw;
 				}
+				if (tok == "yield")
+					fp << str evalResult;
 			}	break;
-
-			/* TODO: @@yield {expr}@@ */
 
 			case "push_namespace": {
 				if (namespaceStack is none)

@@ -123,8 +123,7 @@ do_parse_as_hex:
 				(*iter >= 'A' && *iter <= 'F'))
 				goto do_parse_as_hex;
 			if (!(flags & DBG_EVALADDR_FLAG_NO_HEX)) {
-				while (isspace(*iter))
-					++iter;
+				iter = strlstrip(iter);
 				/* Only parse as hex, if a hex number is everything that was given! */
 				if (!*iter)
 					goto do_parse_as_hex;
@@ -201,8 +200,7 @@ do_parse_as_hex:
 		flags |= DBG_EVALADDR_FLAG_NO_HEX;
 		if (!ev_expr(&p, presult, flags))
 			goto err;
-		while (isspace(*p))
-			++p;
+		p = strlstrip(p);
 		if (*p != ')')
 			return ev_errorf(flags, DBGSTR("Unmatched `('"));
 		break;
@@ -251,13 +249,11 @@ NOTHROW(FCALL dbg_evaladdr)(char const *__restrict expr,
                             uintptr_t *__restrict presult,
                             unsigned int flags) {
 	char *p = (char *)expr;
-	while (isspace(*p))
-		++p;
+	p = strlstrip(p);
 	ev_current_expression = p;
 	if (!ev_expr(&p, presult, flags))
 		return false;
-	while (isspace(*p))
-		++p;
+	p = strlstrip(p);
 	if (*p != '\0')
 		return ev_errorf(flags, DBGSTR("Unused trailing text %q after expression"), expr);
 	return true;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1e7f58 */
+/* HASH CRC-32:0x53b5201f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3304,6 +3304,7 @@
 #define __CRT_HAVE_DOS$strlcat
 #define __CRT_HAVE_DOS$strlcpy
 #define __CRT_HAVE_DOS$strlen
+#define __CRT_HAVE_DOS$strlstrip
 #define __CRT_HAVE_DOS$strlwr
 #define __CRT_HAVE_DOS$strlwr_l
 #define __CRT_HAVE_DOS$strmode
@@ -3344,6 +3345,7 @@
 #define __CRT_HAVE_DOS$strroff
 #define __CRT_HAVE_DOS$strrspn
 #define __CRT_HAVE_DOS$strrstr
+#define __CRT_HAVE_DOS$strrstrip
 #define __CRT_HAVE_DOS$strsep
 #define __CRT_HAVE_DOS$strset
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -3355,6 +3357,7 @@
 #define __CRT_HAVE_DOS$strstartcmp
 #define __CRT_HAVE_DOS$strstartcmpz
 #define __CRT_HAVE_DOS$strstr
+#define __CRT_HAVE_DOS$strstrip
 #define __CRT_HAVE_DOS$strsuftoll
 #define __CRT_HAVE_DOS$strsuftollx
 #define __CRT_HAVE_DOS$strto32
@@ -3774,6 +3777,7 @@
 #define __CRT_HAVE_DOS$wcslcat
 #define __CRT_HAVE_DOS$wcslcpy
 #define __CRT_HAVE_DOS$wcslen
+#define __CRT_HAVE_DOS$wcslstrip
 #define __CRT_HAVE_DOS$wcslwr
 #define __CRT_HAVE_DOS$wcslwr_l
 #define __CRT_HAVE_DOS$wcsncasecmp
@@ -3811,11 +3815,13 @@
 #define __CRT_HAVE_DOS$wcsrchrnul
 #define __CRT_HAVE_DOS$wcsrev
 #define __CRT_HAVE_DOS$wcsroff
+#define __CRT_HAVE_DOS$wcsrstrip
 #define __CRT_HAVE_DOS$wcsrtombs
 #define __CRT_HAVE_DOS$wcssep
 #define __CRT_HAVE_DOS$wcsset
 #define __CRT_HAVE_DOS$wcsspn
 #define __CRT_HAVE_DOS$wcsstr
+#define __CRT_HAVE_DOS$wcsstrip
 #define __CRT_HAVE_DOS$wcsto32
 #define __CRT_HAVE_DOS$wcsto32_l
 #define __CRT_HAVE_DOS$wcsto32_r
@@ -7663,6 +7669,7 @@
 #define __CRT_HAVE_strlcat
 #define __CRT_HAVE_strlcpy
 #define __CRT_HAVE_strlen
+#define __CRT_HAVE_strlstrip
 #ifndef __KERNEL__
 #define __CRT_HAVE_strlwr
 #define __CRT_HAVE_strlwr_l
@@ -7712,6 +7719,9 @@
 #define __CRT_HAVE_strroff
 #define __CRT_HAVE_strrspn
 #define __CRT_HAVE_strrstr
+#endif /* !__KERNEL__ */
+#define __CRT_HAVE_strrstrip
+#ifndef __KERNEL__
 #define __CRT_HAVE_strsep
 #define __CRT_HAVE_strset
 #define __CRT_HAVE_strsignal
@@ -7720,6 +7730,7 @@
 #define __CRT_HAVE_strstartcmp
 #define __CRT_HAVE_strstartcmpz
 #define __CRT_HAVE_strstr
+#define __CRT_HAVE_strstrip
 #ifndef __KERNEL__
 #define __CRT_HAVE_strsuftoll
 #define __CRT_HAVE_strsuftollx
@@ -8127,6 +8138,7 @@
 #define __CRT_HAVE_wcslcat
 #define __CRT_HAVE_wcslcpy
 #define __CRT_HAVE_wcslen
+#define __CRT_HAVE_wcslstrip
 #define __CRT_HAVE_wcslwr
 #define __CRT_HAVE_wcslwr_l
 #define __CRT_HAVE_wcsncasecmp
@@ -8164,11 +8176,13 @@
 #define __CRT_HAVE_wcsrchrnul
 #define __CRT_HAVE_wcsrev
 #define __CRT_HAVE_wcsroff
+#define __CRT_HAVE_wcsrstrip
 #define __CRT_HAVE_wcsrtombs
 #define __CRT_HAVE_wcssep
 #define __CRT_HAVE_wcsset
 #define __CRT_HAVE_wcsspn
 #define __CRT_HAVE_wcsstr
+#define __CRT_HAVE_wcsstrip
 #define __CRT_HAVE_wcsto32
 #define __CRT_HAVE_wcsto32_l
 #define __CRT_HAVE_wcsto32_r

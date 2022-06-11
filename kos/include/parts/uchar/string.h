@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96a63f4d */
+/* HASH CRC-32:0xa9886d57 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3530,6 +3530,96 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN
 #include <libc/local/parts.uchar.string/c32verscmp.h>
 /* >> wcsverscmp(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(c32verscmp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBKCALL c32verscmp)(char32_t const *__s1, char32_t const *__s2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32verscmp))(__s1, __s2); })
+#endif /* !... */
+#if defined(__CRT_HAVE_wcslstrip) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+/* >> wcslstrip(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),char16_t *,__NOTHROW_NCX,c16lstrip,(char16_t const *__str),wcslstrip,(__str))
+#elif defined(__CRT_HAVE_DOS$wcslstrip)
+/* >> wcslstrip(3) */
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),char16_t *,__NOTHROW_NCX,c16lstrip,(char16_t const *__str),wcslstrip,(__str))
+#elif __SIZEOF_WCHAR_T__ == 2
+#include <libc/local/wchar/wcslstrip.h>
+/* >> wcslstrip(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char16_t *__NOTHROW_NCX(__LIBDCALL c16lstrip)(char16_t const *__str) { return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslstrip))((__WCHAR_TYPE__ const *)__str); }
+#else /* ... */
+#include <libc/local/parts.uchar.string/c16lstrip.h>
+/* >> wcslstrip(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16lstrip, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char16_t *__NOTHROW_NCX(__LIBDCALL c16lstrip)(char16_t const *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16lstrip))(__str); })
+#endif /* !... */
+#if defined(__CRT_HAVE_wcslstrip) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+/* >> wcslstrip(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),char32_t *,__NOTHROW_NCX,c32lstrip,(char32_t const *__str),wcslstrip,(__str))
+#elif defined(__CRT_HAVE_KOS$wcslstrip)
+/* >> wcslstrip(3) */
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),char32_t *,__NOTHROW_NCX,c32lstrip,(char32_t const *__str),wcslstrip,(__str))
+#elif __SIZEOF_WCHAR_T__ == 4
+#include <libc/local/wchar/wcslstrip.h>
+/* >> wcslstrip(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char32_t *__NOTHROW_NCX(__LIBKCALL c32lstrip)(char32_t const *__str) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcslstrip))((__WCHAR_TYPE__ const *)__str); }
+#else /* ... */
+#include <libc/local/parts.uchar.string/c32lstrip.h>
+/* >> wcslstrip(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32lstrip, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char32_t *__NOTHROW_NCX(__LIBKCALL c32lstrip)(char32_t const *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32lstrip))(__str); })
+#endif /* !... */
+#if defined(__CRT_HAVE_wcsrstrip) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+/* >> wcsrstrip(3) */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),char16_t *,__NOTHROW_NCX,c16rstrip,(char16_t *__str),wcsrstrip,(__str))
+#elif defined(__CRT_HAVE_DOS$wcsrstrip)
+/* >> wcsrstrip(3) */
+__CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),char16_t *,__NOTHROW_NCX,c16rstrip,(char16_t *__str),wcsrstrip,(__str))
+#elif __SIZEOF_WCHAR_T__ == 2
+#include <libc/local/wchar/wcsrstrip.h>
+/* >> wcsrstrip(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char16_t *__NOTHROW_NCX(__LIBDCALL c16rstrip)(char16_t *__str) { return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsrstrip))((__WCHAR_TYPE__ *)__str); }
+#else /* ... */
+#include <libc/local/parts.uchar.string/c16rstrip.h>
+/* >> wcsrstrip(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16rstrip, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char16_t *__NOTHROW_NCX(__LIBDCALL c16rstrip)(char16_t *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16rstrip))(__str); })
+#endif /* !... */
+#if defined(__CRT_HAVE_wcsrstrip) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+/* >> wcsrstrip(3) */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),char32_t *,__NOTHROW_NCX,c32rstrip,(char32_t *__str),wcsrstrip,(__str))
+#elif defined(__CRT_HAVE_KOS$wcsrstrip)
+/* >> wcsrstrip(3) */
+__CREDIRECT_KOS(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),char32_t *,__NOTHROW_NCX,c32rstrip,(char32_t *__str),wcsrstrip,(__str))
+#elif __SIZEOF_WCHAR_T__ == 4
+#include <libc/local/wchar/wcsrstrip.h>
+/* >> wcsrstrip(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char32_t *__NOTHROW_NCX(__LIBKCALL c32rstrip)(char32_t *__str) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsrstrip))((__WCHAR_TYPE__ *)__str); }
+#else /* ... */
+#include <libc/local/parts.uchar.string/c32rstrip.h>
+/* >> wcsrstrip(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32rstrip, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char32_t *__NOTHROW_NCX(__LIBKCALL c32rstrip)(char32_t *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32rstrip))(__str); })
+#endif /* !... */
+#if defined(__CRT_HAVE_wcsstrip) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+/* >> wcsstrip(3) */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),char16_t *,__NOTHROW_NCX,c16strip,(char16_t *__str),wcsstrip,(__str))
+#elif defined(__CRT_HAVE_DOS$wcsstrip)
+/* >> wcsstrip(3) */
+__CREDIRECT_DOS(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),char16_t *,__NOTHROW_NCX,c16strip,(char16_t *__str),wcsstrip,(__str))
+#elif __SIZEOF_WCHAR_T__ == 2
+#include <libc/local/wchar/wcsstrip.h>
+/* >> wcsstrip(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char16_t *__NOTHROW_NCX(__LIBDCALL c16strip)(char16_t *__str) { return (__CHAR16_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsstrip))((__WCHAR_TYPE__ *)__str); }
+#else /* ... */
+#include <libc/local/parts.uchar.string/c16strip.h>
+/* >> wcsstrip(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16strip, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char16_t *__NOTHROW_NCX(__LIBDCALL c16strip)(char16_t *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16strip))(__str); })
+#endif /* !... */
+#if defined(__CRT_HAVE_wcsstrip) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+/* >> wcsstrip(3) */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),char32_t *,__NOTHROW_NCX,c32strip,(char32_t *__str),wcsstrip,(__str))
+#elif defined(__CRT_HAVE_KOS$wcsstrip)
+/* >> wcsstrip(3) */
+__CREDIRECT_KOS(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),char32_t *,__NOTHROW_NCX,c32strip,(char32_t *__str),wcsstrip,(__str))
+#elif __SIZEOF_WCHAR_T__ == 4
+#include <libc/local/wchar/wcsstrip.h>
+/* >> wcsstrip(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char32_t *__NOTHROW_NCX(__LIBKCALL c32strip)(char32_t *__str) { return (__CHAR32_TYPE__ *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsstrip))((__WCHAR_TYPE__ *)__str); }
+#else /* ... */
+#include <libc/local/parts.uchar.string/c32strip.h>
+/* >> wcsstrip(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32strip, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char32_t *__NOTHROW_NCX(__LIBKCALL c32strip)(char32_t *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32strip))(__str); })
 #endif /* !... */
 #ifdef __USE_XOPEN2K8
 #if defined(__CRT_HAVE_wcscasestr_l) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)

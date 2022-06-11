@@ -2803,7 +2803,6 @@ again:
 	}
 
 	public function parseDirective_define_double_replacement() {
-		local tok = self.tok;
 		self.next();
 		self.skip("(");
 		local orig = self.parseCStringOrKeyword();
@@ -2825,7 +2824,6 @@ again:
 		return parseDirective_define_double2float_replacement(MATH_REPLACEMENT_MODE_LDBL);
 	}
 	public function parseDirective_define_double2float_replacement(mode: int = none) {
-		local tok = self.tok;
 		self.next();
 		self.skip("(");
 		local origStart = self.tokStart;
@@ -2839,6 +2837,129 @@ again:
 			self.errAt(origStart, e.message);
 		}
 		self.skip(")");
+	}
+
+	private function _parseTemplateIncludeAttribute(template: Template, kind: string) {
+		self.next();
+		local tok = self.skip("(");
+		while (tok !in ["", ")"]) {
+			template.operator . (kind).append(
+				"#include " + self.parseCStringOrAllUntilRParen());
+			tok = self.tok;
+			if (tok != ",")
+				break;
+			tok = self.next();
+		}
+		self.skip(")");
+	}
+
+	private function _parseTemplatePrefixAttribute(template: Template, kind: string) {
+		self.next();
+		self.skip("(");
+		template.operator . (kind).append(self.parseCStringOrAllUntilRParen());
+		self.skip(")");
+	}
+
+	private function _parseTemplateAttributes(template: Template) {
+		do {
+			_parseTemplateAttribute(template);
+			if (self.tok != ",")
+				break;
+			self.next();
+		} while (self.tok !in ["", "]"]);
+	}
+	private function _parseTemplateAttribute(template: Template) {
+		local tok = self.tok;
+		switch (tok) {
+
+		case "[":
+			/* Recursion... */
+			self.next();
+			_parseTemplateAttributes(template);
+			self.skip("]");
+			break;
+
+		case "requires": {
+			self.next();
+			self.skip("(");
+			local addend = self.parseCStringOrAllUntilRParen();
+			self.skip(")");
+			if (template.ppCond is UserString || template.ppCond != "1")
+				addend = "({}) && ({})".format({ template.ppCond, addend });
+			template.ppCond = addend;
+		}	break;
+
+		case "impl_include":
+			_parseTemplateIncludeAttribute(template, "implPrefix");
+			break;
+
+		case "impl_prefix":
+			_parseTemplatePrefixAttribute(template, "implPrefix");
+			break;
+
+		case "requires_include":
+			_parseTemplateIncludeAttribute(template, "ppCondPrefix");
+			break;
+
+		case "requires_prefix":
+			_parseTemplatePrefixAttribute(template, "ppCondPrefix");
+			break;
+
+		default:
+			self.err("Unrecognized template attribute: {!r}"
+				.format({ tok }));
+			break;
+		}
+	}
+
+	@@Define function implementation templates
+	@@>%[define_template(tpl_strtoi<SIGNED, T, BITS> =
+	@@>	[[impl_include("<asm/os/errno.h>", "<hybrid/__overflow.h>")]]
+	@@>	[[impl_include("<hybrid/limitcore.h>")]]
+	@@>	[[impl_include("<libc/template/hex.h>")]]
+	@@>{
+	@@>	BODY
+	@@>}
+	public function parseDirective_define_template() {
+		self.next();
+		self.skip("(");
+		local template = Template();
+		local nameStart = self.tokStart;
+		template.name = self.parseCStringOrKeyword();
+		self.skip("<");
+		while (self.tok != ">") {
+			local arg = TemplateArgument();
+			arg.name = self.parseAllUntilRParenWithinTemplate();
+			if (self.tok == "=") {
+				self.next();
+				arg.defl = self.parseAllUntilRParenWithinTemplate();
+			}
+			template.args.append(arg);
+			if (self.tok != ",")
+				break;
+			self.next();
+		}
+		self.skip(">");
+		self.skip("=");
+		while (self.tok == "[") {
+			self.next();
+			_parseTemplateAttributes(template);
+			self.skip("]");
+		}
+		local bodyStart = self.tokStart;
+		self.skip("{");
+		self.skipPair("{", "}");
+		local bodyEnd = self.tokEnd;
+		template.body = self.getUserString(bodyStart, bodyEnd);
+		self.skip("}");
+		self.skip(")");
+
+		/* Register the template. */
+		local ok, oldTemplate = templates.setnew_ex(str template.name, template)...;
+		if (!ok && oldTemplate != template) {
+			self.errAt(nameStart, "define_template: re-definition of template {!r}"
+				.format({ str template.name }));
+		}
 	}
 
 	@@Define simple textual replacement macros
@@ -5322,6 +5443,51 @@ got_chkExpr:
 						loaderImpl = loaderImpl();
 				}	break;
 
+				case "template": {
+					currentFeatures.assertAllGeneratedFunctionBody(self, currentName);
+					self.next();
+					self.skip("(");
+					local templateNameStart = self.tokStart;
+					local templateName: string = str self.parseCStringOrKeyword();
+					self.skip("<");
+					local templateArgs: {string | UserString...} = List();
+					while (self.tok != ">") {
+						templateArgs.append(self.parseAllUntilRParenWithinTemplate());
+						if (self.tok != ",")
+							break;
+						self.next();
+					}
+					self.skip(">");
+					self.skip(")");
+					loaderImpl = [](): LoaderFunctionImplementation {
+						local usedTemplate: Template = templates.get(templateName);
+						if (usedTemplate is none)
+							self.error(templateNameStart, "Unknown template {!r}".format({ templateName }));
+						local templateInst: TemplateInstantiation;
+						try {
+							templateInst = usedTemplate.instantiate(templateArgs);
+						} catch (...) {
+							self.warnAt(templateNameStart,
+								"... while instantiating template for {!r}"
+								.format({ currentName }));
+							throw;
+						}
+						return LoaderFunctionImplementation(
+							ppCond:       templateInst.ppCond,
+							ppCondPrefix: templateInst.ppCondPrefix,
+							impl:         FunctionImplementation(
+								body:         templateInst.body,
+								name:         currentName,
+								implPrefix:   templateInst.implPrefix,
+								dependencies: scanForNamesOfDependentFunctions(
+									templateInst.body, currentName, currentPrototype,
+									forcedDependencies:       currentFeatures.forcedDependencies,
+									unforcedDependencies:     currentFeatures.unforcedDependencies,
+									noAutoDependencyScanning: currentFeatures.noAutoDependencyScanning)
+							)
+						);
+					};
+				}	break;
 
 				case "generate": {
 					/* Syntax:
@@ -5336,11 +5502,11 @@ got_chkExpr:
 						self.err("Expected keyword in %{{generate(...)}}, but got {!r}"
 							.format({ tok }));
 					}
-					local gennetatorName = tok;
-					local gen: Generator = generators.get(gennetatorName);
+					local generatorName = tok;
+					local gen: Generator = generators.get(generatorName);
 					if (gen is none) {
 						self.err("Unknown generator {!r}"
-							.format({ gennetatorName }));
+							.format({ generatorName }));
 					}
 					tok = self.next();
 					local baseFunctionName = none;
@@ -5365,7 +5531,7 @@ got_chkExpr:
 							self.errAt(currentNameTokStart,
 								"Unable to deduce automatic base function name for "
 								"generator {!r} from current function name {!r}"
-								.format({ gennetatorName, currentName }));
+								.format({ generatorName, currentName }));
 						}
 					}
 					/* Hint at the generator about the replacement. */
@@ -6114,7 +6280,11 @@ with_primaryImplementation:
 							name:                     currentName,
 							originalSystemHeaderName: headerName,
 							prototype:                currentPrototype,
-							documentation:            current.documentation);
+							documentation:            current.documentation,
+							impl: loaderImpl is Callable
+								? [] -> loaderImpl().impl
+								: loaderImpl
+						);
 						defineFunctionInMapping(allLocalFunctionsByName, localFunc);
 						if (!result.localFunctionsByName.setnew(localFunc.name, localFunc)) {
 							self.errAt(currentNameTokStart, "Duplicate local function: {!r}"

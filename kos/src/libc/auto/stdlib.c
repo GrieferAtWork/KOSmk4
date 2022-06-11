@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6dd1ba9a */
+/* HASH CRC-32:0x63b90cd3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/stdlib.h"
-#include "../user/ctype.h"
 #include "../user/dirent.h"
 #include "err.h"
 #include "../user/fcntl.h"
@@ -755,6 +754,8 @@ NOTHROW_NCX(LIBCCALL libc_strtold)(char const *__restrict nptr,
 #endif /* !__KERNEL__ */
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
+#include <libc/template/hex.h>
+#include <hybrid/limitcore.h>
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
  * errors in `*error' (if non-NULL).  The following errors are  defined:
@@ -776,11 +777,21 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
                                       char **endptr,
                                       __STDC_INT_AS_UINT_T base,
                                       errno_t *error) {
+
+
+
+
+
+
 	uint32_t result;
 	char const *num_start = nptr;
 	char const *num_iter;
-	while (libc_isspace(*num_start))
-		++num_start;
+	num_start = libc_strlstrip(num_start);
+
+
+
+
+
 	if (base == 0) {
 		/* Automatically deduce base. */
 		if (*num_start == '0') {
@@ -804,16 +815,13 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
 	}
 	num_iter = num_start;
 	result   = 0;
+
 	for (;;) {
 		uint8_t digit;
-		char ch = *num_iter;
-		if (ch >= '0' && ch <= '9')
-			digit = (uint8_t)(ch - '0');
-		else if (ch >= 'a' && ch <= 'z')
-			digit = (uint8_t)(10 + ch - 'a');
-		else if (ch >= 'A' && ch <= 'Z')
-			digit = (uint8_t)(10 + ch - 'A');
-		else {
+		char ch;
+		ch = *num_iter;
+		if (!__libc_hex2int(ch, &digit)) {
+			/* TODO: Unicode support */
 			break;
 		}
 		if (digit >= base)
@@ -821,6 +829,9 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
 		++num_iter;
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_uadd(result, digit, &result)) {
+
+
+
 			/* Integer overflow. */
 			if (error) {
 #ifdef ERANGE
@@ -832,13 +843,8 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
 			if (endptr) {
 				for (;;) {
 					ch = *num_iter;
-					if (ch >= '0' && ch <= '9')
-						digit = (uint8_t)(ch - '0');
-					else if (ch >= 'a' && ch <= 'z')
-						digit = (uint8_t)(10 + ch - 'a');
-					else if (ch >= 'A' && ch <= 'Z')
-						digit = (uint8_t)(10 + ch - 'A');
-					else {
+					if (!__libc_hex2int(ch, &digit)) {
+						/* TODO: Unicode support */
 						break;
 					}
 					if (digit >= base)
@@ -847,16 +853,28 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
 				}
 				*endptr = (char *)num_iter;
 			}
-			return (uint32_t)-1;
+
+
+
+
+
+			return __UINT32_MAX__;
+
 		}
 	}
+
+
+
+
+
+
+
 	if unlikely(num_iter == num_start) {
 		/* Check for special case: `0xGARBAGE'.
 		 * -> In this case, return `0' and set `endptr' to `x' */
 		if ((base == 16 || base == 2) && num_start > nptr) {
 			char const *nptr_ps = nptr;
-			while (libc_isspace(*nptr_ps))
-				++nptr_ps;
+			nptr_ps = libc_strlstrip(nptr_ps);
 			if (num_start > nptr_ps && *nptr_ps == '0') {
 				if (endptr)
 					*endptr = (char *)nptr_ps + 1;
@@ -865,7 +883,6 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
 				return 0;
 			}
 		}
-
 		/* Empty number... */
 		if (error) {
 #ifdef ECANCELED
@@ -886,8 +903,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
 			*error = 0;
 			/* Check for `EINVAL' */
 			if unlikely(*num_iter) {
-				while (libc_isspace(*num_iter))
-					++num_iter;
+				num_iter = libc_strlstrip(num_iter);
 				if (*num_iter) {
 #ifdef EINVAL
 					*error = EINVAL;
@@ -900,7 +916,6 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
 	}
 	return result;
 }
-#include <hybrid/limitcore.h>
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
  * errors in `*error' (if non-NULL).  The following errors are  defined:
@@ -922,15 +937,21 @@ NOTHROW_NCX(LIBCCALL libc_strto32_r)(char const *__restrict nptr,
                                      char **endptr,
                                      __STDC_INT_AS_UINT_T base,
                                      errno_t *error) {
-	int32_t result;
+
+
+
+
 	char sign;
+
+	int32_t result;
 	char const *num_start = nptr;
 	char const *num_iter;
-	while (libc_isspace(*num_start))
-		++num_start;
+	num_start = libc_strlstrip(num_start);
+
 	sign = *num_start;
 	if (sign == '-' || sign == '+')
 		++num_start;
+
 	if (base == 0) {
 		/* Automatically deduce base. */
 		if (*num_start == '0') {
@@ -954,17 +975,13 @@ NOTHROW_NCX(LIBCCALL libc_strto32_r)(char const *__restrict nptr,
 	}
 	num_iter = num_start;
 	result   = 0;
+
 	for (;;) {
 		uint8_t digit;
 		char ch;
 		ch = *num_iter;
-		if (ch >= '0' && ch <= '9')
-			digit = (uint8_t)(ch - '0');
-		else if (ch >= 'a' && ch <= 'z')
-			digit = (uint8_t)(10 + ch - 'a');
-		else if (ch >= 'A' && ch <= 'Z')
-			digit = (uint8_t)(10 + ch - 'A');
-		else {
+		if (!__libc_hex2int(ch, &digit)) {
+			/* TODO: Unicode support */
 			break;
 		}
 		if (digit >= base)
@@ -972,7 +989,9 @@ NOTHROW_NCX(LIBCCALL libc_strto32_r)(char const *__restrict nptr,
 		++num_iter;
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_sadd(result, digit, &result)) {
+
 handle_overflow:
+
 			/* Integer overflow. */
 			if (error) {
 #ifdef ERANGE
@@ -984,13 +1003,8 @@ handle_overflow:
 			if (endptr) {
 				for (;;) {
 					ch = *num_iter;
-					if (ch >= '0' && ch <= '9')
-						digit = (uint8_t)(ch - '0');
-					else if (ch >= 'a' && ch <= 'z')
-						digit = (uint8_t)(10 + ch - 'a');
-					else if (ch >= 'A' && ch <= 'Z')
-						digit = (uint8_t)(10 + ch - 'A');
-					else {
+					if (!__libc_hex2int(ch, &digit)) {
+						/* TODO: Unicode support */
 						break;
 					}
 					if (digit >= base)
@@ -999,22 +1013,28 @@ handle_overflow:
 				}
 				*endptr = (char *)num_iter;
 			}
+
 			if (sign == '-')
 				return __INT32_MIN__;
 			return __INT32_MAX__;
+
+
+
 		}
 	}
+
 	if (sign == '-') {
 		if (__hybrid_overflow_sneg_p2n(result, &result)) /* NOLINT */
 			goto handle_overflow; /* Overflow... */
 	}
+
+
 	if unlikely(num_iter == num_start) {
 		/* Check for special case: `0xGARBAGE'.
 		 * -> In this case, return `0' and set `endptr' to `x' */
 		if ((base == 16 || base == 2) && num_start > nptr) {
 			char const *nptr_ps = nptr;
-			while (libc_isspace(*nptr_ps))
-				++nptr_ps;
+			nptr_ps = libc_strlstrip(nptr_ps);
 			if (num_start > nptr_ps && *nptr_ps == '0') {
 				if (endptr)
 					*endptr = (char *)nptr_ps + 1;
@@ -1023,7 +1043,6 @@ handle_overflow:
 				return 0;
 			}
 		}
-
 		/* Empty number... */
 		if (error) {
 #ifdef ECANCELED
@@ -1044,8 +1063,7 @@ handle_overflow:
 			*error = 0;
 			/* Check for `EINVAL' */
 			if unlikely(*num_iter) {
-				while (libc_isspace(*num_iter))
-					++num_iter;
+				num_iter = libc_strlstrip(num_iter);
 				if (*num_iter) {
 #ifdef EINVAL
 					*error = EINVAL;
@@ -1079,11 +1097,21 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
                                       char **endptr,
                                       __STDC_INT_AS_UINT_T base,
                                       errno_t *error) {
+
+
+
+
+
+
 	uint64_t result;
 	char const *num_start = nptr;
 	char const *num_iter;
-	while (libc_isspace(*num_start))
-		++num_start;
+	num_start = libc_strlstrip(num_start);
+
+
+
+
+
 	if (base == 0) {
 		/* Automatically deduce base. */
 		if (*num_start == '0') {
@@ -1107,16 +1135,13 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
 	}
 	num_iter = num_start;
 	result   = 0;
+
 	for (;;) {
 		uint8_t digit;
-		char ch = *num_iter;
-		if (ch >= '0' && ch <= '9')
-			digit = (uint8_t)(ch - '0');
-		else if (ch >= 'a' && ch <= 'z')
-			digit = (uint8_t)(10 + ch - 'a');
-		else if (ch >= 'A' && ch <= 'Z')
-			digit = (uint8_t)(10 + ch - 'A');
-		else {
+		char ch;
+		ch = *num_iter;
+		if (!__libc_hex2int(ch, &digit)) {
+			/* TODO: Unicode support */
 			break;
 		}
 		if (digit >= base)
@@ -1124,6 +1149,9 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
 		++num_iter;
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_uadd(result, digit, &result)) {
+
+
+
 			/* Integer overflow. */
 			if (error) {
 #ifdef ERANGE
@@ -1135,13 +1163,8 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
 			if (endptr) {
 				for (;;) {
 					ch = *num_iter;
-					if (ch >= '0' && ch <= '9')
-						digit = (uint8_t)(ch - '0');
-					else if (ch >= 'a' && ch <= 'z')
-						digit = (uint8_t)(10 + ch - 'a');
-					else if (ch >= 'A' && ch <= 'Z')
-						digit = (uint8_t)(10 + ch - 'A');
-					else {
+					if (!__libc_hex2int(ch, &digit)) {
+						/* TODO: Unicode support */
 						break;
 					}
 					if (digit >= base)
@@ -1150,16 +1173,28 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
 				}
 				*endptr = (char *)num_iter;
 			}
-			return (uint64_t)-1;
+
+
+
+
+
+			return __UINT64_MAX__;
+
 		}
 	}
+
+
+
+
+
+
+
 	if unlikely(num_iter == num_start) {
 		/* Check for special case: `0xGARBAGE'.
 		 * -> In this case, return `0' and set `endptr' to `x' */
 		if ((base == 16 || base == 2) && num_start > nptr) {
 			char const *nptr_ps = nptr;
-			while (libc_isspace(*nptr_ps))
-				++nptr_ps;
+			nptr_ps = libc_strlstrip(nptr_ps);
 			if (num_start > nptr_ps && *nptr_ps == '0') {
 				if (endptr)
 					*endptr = (char *)nptr_ps + 1;
@@ -1168,7 +1203,6 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
 				return 0;
 			}
 		}
-
 		/* Empty number... */
 		if (error) {
 #ifdef ECANCELED
@@ -1189,8 +1223,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
 			*error = 0;
 			/* Check for `EINVAL' */
 			if unlikely(*num_iter) {
-				while (libc_isspace(*num_iter))
-					++num_iter;
+				num_iter = libc_strlstrip(num_iter);
 				if (*num_iter) {
 #ifdef EINVAL
 					*error = EINVAL;
@@ -1224,15 +1257,21 @@ NOTHROW_NCX(LIBCCALL libc_strto64_r)(char const *__restrict nptr,
                                      char **endptr,
                                      __STDC_INT_AS_UINT_T base,
                                      errno_t *error) {
-	int64_t result;
+
+
+
+
 	char sign;
+
+	int64_t result;
 	char const *num_start = nptr;
 	char const *num_iter;
-	while (libc_isspace(*num_start))
-		++num_start;
+	num_start = libc_strlstrip(num_start);
+
 	sign = *num_start;
 	if (sign == '-' || sign == '+')
 		++num_start;
+
 	if (base == 0) {
 		/* Automatically deduce base. */
 		if (*num_start == '0') {
@@ -1256,17 +1295,13 @@ NOTHROW_NCX(LIBCCALL libc_strto64_r)(char const *__restrict nptr,
 	}
 	num_iter = num_start;
 	result   = 0;
+
 	for (;;) {
 		uint8_t digit;
 		char ch;
 		ch = *num_iter;
-		if (ch >= '0' && ch <= '9')
-			digit = (uint8_t)(ch - '0');
-		else if (ch >= 'a' && ch <= 'z')
-			digit = (uint8_t)(10 + ch - 'a');
-		else if (ch >= 'A' && ch <= 'Z')
-			digit = (uint8_t)(10 + ch - 'A');
-		else {
+		if (!__libc_hex2int(ch, &digit)) {
+			/* TODO: Unicode support */
 			break;
 		}
 		if (digit >= base)
@@ -1274,7 +1309,9 @@ NOTHROW_NCX(LIBCCALL libc_strto64_r)(char const *__restrict nptr,
 		++num_iter;
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
 		            __hybrid_overflow_sadd(result, digit, &result)) {
+
 handle_overflow:
+
 			/* Integer overflow. */
 			if (error) {
 #ifdef ERANGE
@@ -1286,13 +1323,8 @@ handle_overflow:
 			if (endptr) {
 				for (;;) {
 					ch = *num_iter;
-					if (ch >= '0' && ch <= '9')
-						digit = (uint8_t)(ch - '0');
-					else if (ch >= 'a' && ch <= 'z')
-						digit = (uint8_t)(10 + ch - 'a');
-					else if (ch >= 'A' && ch <= 'Z')
-						digit = (uint8_t)(10 + ch - 'A');
-					else {
+					if (!__libc_hex2int(ch, &digit)) {
+						/* TODO: Unicode support */
 						break;
 					}
 					if (digit >= base)
@@ -1301,22 +1333,28 @@ handle_overflow:
 				}
 				*endptr = (char *)num_iter;
 			}
+
 			if (sign == '-')
 				return __INT64_MIN__;
 			return __INT64_MAX__;
+
+
+
 		}
 	}
+
 	if (sign == '-') {
 		if (__hybrid_overflow_sneg_p2n(result, &result)) /* NOLINT */
 			goto handle_overflow; /* Overflow... */
 	}
+
+
 	if unlikely(num_iter == num_start) {
 		/* Check for special case: `0xGARBAGE'.
 		 * -> In this case, return `0' and set `endptr' to `x' */
 		if ((base == 16 || base == 2) && num_start > nptr) {
 			char const *nptr_ps = nptr;
-			while (libc_isspace(*nptr_ps))
-				++nptr_ps;
+			nptr_ps = libc_strlstrip(nptr_ps);
 			if (num_start > nptr_ps && *nptr_ps == '0') {
 				if (endptr)
 					*endptr = (char *)nptr_ps + 1;
@@ -1325,7 +1363,6 @@ handle_overflow:
 				return 0;
 			}
 		}
-
 		/* Empty number... */
 		if (error) {
 #ifdef ECANCELED
@@ -1346,8 +1383,7 @@ handle_overflow:
 			*error = 0;
 			/* Check for `EINVAL' */
 			if unlikely(*num_iter) {
-				while (libc_isspace(*num_iter))
-					++num_iter;
+				num_iter = libc_strlstrip(num_iter);
 				if (*num_iter) {
 #ifdef EINVAL
 					*error = EINVAL;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc108bb3e */
+/* HASH CRC-32:0xdf5f806c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -609,6 +609,18 @@ INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBKCALL libc_wil
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_wcsverscmp)(char16_t const *s1, char16_t const *s2);
 /* >> wcsverscmp(3) */
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBKCALL libc_wcsverscmp)(char32_t const *s1, char32_t const *s2);
+/* >> wcslstrip(3) */
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_IN(1) char16_t *NOTHROW_NCX(LIBDCALL libd_wcslstrip)(char16_t const *str);
+/* >> wcslstrip(3) */
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_IN(1) char32_t *NOTHROW_NCX(LIBKCALL libc_wcslstrip)(char32_t const *str);
+/* >> wcsrstrip(3) */
+INTDEF ATTR_RETNONNULL WUNUSED ATTR_IN(1) char16_t *NOTHROW_NCX(LIBDCALL libd_wcsrstrip)(char16_t *str);
+/* >> wcsrstrip(3) */
+INTDEF ATTR_RETNONNULL WUNUSED ATTR_IN(1) char32_t *NOTHROW_NCX(LIBKCALL libc_wcsrstrip)(char32_t *str);
+/* >> wcsstrip(3) */
+INTDEF ATTR_RETNONNULL WUNUSED ATTR_IN(1) char16_t *NOTHROW_NCX(LIBDCALL libd_wcsstrip)(char16_t *str);
+/* >> wcsstrip(3) */
+INTDEF ATTR_RETNONNULL WUNUSED ATTR_IN(1) char32_t *NOTHROW_NCX(LIBKCALL libc_wcsstrip)(char32_t *str);
 /* >> wcsncoll_l(3) */
 INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_wcsncoll_l)(char16_t const *s1, char16_t const *s2, size_t maxlen, locale_t locale);
 /* >> wcsncoll_l(3) */

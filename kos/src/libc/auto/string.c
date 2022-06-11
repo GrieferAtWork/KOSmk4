@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5a5b105 */
+/* HASH CRC-32:0xd641c0e5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5971,6 +5971,83 @@ miss:
 	return result;
 }
 #endif /* !LIBC_ARCH_HAVE_STRRSTR */
+#endif /* !__KERNEL__ */
+#include <libc/unicode.h>
+/* >> strlstrip(3)
+ * Skip all leading `isspace(3)'-characters of `str' to return a pointer
+ * to  the first  non-space character (or  the trailing NUL  if `str' is
+ * empty or contains only spaces).
+ * NOTE: If available, use `unicode_isspace(3)' instead of `isspace(3)'
+ * @return: * : Pointer to the first non-space character in `str' */
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_IN(1) char *
+NOTHROW_NCX(LIBCCALL libc_strlstrip)(char const *str) {
+	/* NOTE: assert(!isspace('\0'));
+	 * -> So we don't need special handling to stop on NUL! */
+#ifdef __CRT_HAVE___unicode_descriptor
+	/* Unicode support */
+	for (;;) {
+		unsigned char ch = (unsigned char)*str;
+		if (libc_isspace(ch)) {
+			/* Fast-pass: ASCII space characters. */
+			++str;
+		} else if (ch >= 0x80) {
+			char32_t uni = __libc_unicode_readutf8((char const **)&str);
+			if (!__libc_unicode_isspace(uni))
+				break;
+		} else {
+			break;
+		}
+	}
+#else /* __CRT_HAVE___unicode_descriptor */
+	while (libc_isspace((unsigned char)*str))
+		++str;
+#endif /* !__CRT_HAVE___unicode_descriptor */
+	return (char *)str;
+}
+/* >> strrstrip(3)
+ * Find the last trailing `isspace(3)'-character (i.e. the one closest
+ * to the start and not followed by a non-`isspace(3)'-character), and
+ * replace it with '\0', effectively deleting trailing space.
+ * NOTE: If available, use `unicode_isspace(3)' instead of `isspace(3)'
+ * @return: * : Always re-returns `str' */
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_RETNONNULL WUNUSED ATTR_IN(1) char *
+NOTHROW_NCX(LIBCCALL libc_strrstrip)(char *str) {
+	char *endp = libc_strend(str);
+#ifdef __CRT_HAVE___unicode_descriptor
+	/* Unicode support */
+	for (;;) {
+		unsigned char ch = (unsigned char)endp[-1];
+		if (libc_isspace(ch)) {
+			/* Fast-pass: ASCII space characters. */
+			--endp;
+		} else if (ch >= 0x80) {
+			char const *new_endp = endp;
+			char32_t uni;
+			uni = __libc_unicode_readutf8_rev_n(&new_endp, str);
+			if (!__libc_unicode_isspace(uni))
+				break;
+			endp = (char *)new_endp;
+		} else {
+			break;
+		}
+	}
+#else /* __CRT_HAVE___unicode_descriptor */
+	while (endp > str && libc_isspace((unsigned char)endp[-1]))
+		--endp;
+#endif /* !__CRT_HAVE___unicode_descriptor */
+	*endp = '\0'; /* Delete trailing space. */
+	return str;
+}
+/* >> strstrip(3)
+ * The combination of `strlstrip(3)' and `strrstrip(3)'
+ * @return: * : Same as `strrstrip(strlstrip(str))' */
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_RETNONNULL WUNUSED ATTR_IN(1) char *
+NOTHROW_NCX(LIBCCALL libc_strstrip)(char *str) {
+	str = libc_strlstrip(str);
+	str = libc_strrstrip(str);
+	return str;
+}
+#ifndef __KERNEL__
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_INOUT(1) char *
 NOTHROW_NCX(LIBCCALL libc_strlwr)(char *__restrict str) {
 	char *iter, ch;
@@ -7496,6 +7573,9 @@ DEFINE_PUBLIC_ALIAS(bitcpy, libc_bitcpy);
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRRSTR)
 DEFINE_PUBLIC_ALIAS(strrstr, libc_strrstr);
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRRSTR */
+DEFINE_PUBLIC_ALIAS(strlstrip, libc_strlstrip);
+DEFINE_PUBLIC_ALIAS(strrstrip, libc_strrstrip);
+DEFINE_PUBLIC_ALIAS(strstrip, libc_strstrip);
 #ifndef __KERNEL__
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strlwr, libc_strlwr);

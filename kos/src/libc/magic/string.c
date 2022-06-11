@@ -7486,6 +7486,90 @@ miss:
 	return result;
 }
 
+@@>> strlstrip(3)
+@@Skip all leading `isspace(3)'-characters of `str' to return a pointer
+@@to  the first  non-space character (or  the trailing NUL  if `str' is
+@@empty or contains only spaces).
+@@NOTE: If available, use `unicode_isspace(3)' instead of `isspace(3)'
+@@@return: * : Pointer to the first non-space character in `str'
+[[kernel, nonnull, wunused, pure, requires_function(isspace)]]
+[[impl_include("<libc/unicode.h>")]]
+[[impl_include("<hybrid/typecore.h>")]]
+char *strlstrip([[in]] char const *str)
+	[([[in]] char *str): [[nonnull]] char *]
+	[([[in]] char const *str): [[nonnull]] char const *]
+{
+	/* NOTE: assert(!isspace('\0'));
+	 * -> So we don't need special handling to stop on NUL! */
+@@pp_if $has_function(__unicode_descriptor) && __SIZEOF_CHAR__ == 1@@
+	/* Unicode support */
+	for (;;) {
+		unsigned char ch = (unsigned char)*str;
+		if (isspace(ch)) {
+			/* Fast-pass: ASCII space characters. */
+			++str;
+		} else if (ch >= 0x80) {
+			char32_t uni = @__libc_unicode_readutf8@((char const **)&str);
+			if (!__libc_unicode_isspace(uni))
+				break;
+		} else {
+			break;
+		}
+	}
+@@pp_else@@
+	while (isspace((unsigned char)*str))
+		++str;
+@@pp_endif@@
+	return (char *)str;
+}
+
+@@>> strrstrip(3)
+@@Find the last trailing `isspace(3)'-character (i.e. the one closest
+@@to the start and not followed by a non-`isspace(3)'-character), and
+@@replace it with '\0', effectively deleting trailing space.
+@@NOTE: If available, use `unicode_isspace(3)' instead of `isspace(3)'
+@@@return: * : Always re-returns `str'
+[[kernel, nonnull, wunused, requires_function(isspace)]]
+[[impl_include("<libc/unicode.h>")]]
+[[impl_include("<hybrid/typecore.h>")]]
+char *strrstrip([[in]] char *str) {
+	char *endp = strend(str);
+@@pp_if $has_function(__unicode_descriptor) && __SIZEOF_CHAR__ == 1@@
+	/* Unicode support */
+	for (;;) {
+		unsigned char ch = (unsigned char)endp[-1];
+		if (isspace(ch)) {
+			/* Fast-pass: ASCII space characters. */
+			--endp;
+		} else if (ch >= 0x80) {
+			char const *new_endp = endp;
+			char32_t uni;
+			uni = @__libc_unicode_readutf8_rev_n@(&new_endp, str);
+			if (!__libc_unicode_isspace(uni))
+				break;
+			endp = (char *)new_endp;
+		} else {
+			break;
+		}
+	}
+@@pp_else@@
+	while (endp > str && isspace((unsigned char)endp[-1]))
+		--endp;
+@@pp_endif@@
+	*endp = '\0'; /* Delete trailing space. */
+	return str;
+}
+
+@@>> strstrip(3)
+@@The combination of `strlstrip(3)' and `strrstrip(3)'
+@@@return: * : Same as `strrstrip(strlstrip(str))'
+[[kernel, nonnull, wunused, requires_function(strlstrip, strrstrip)]]
+char *strstrip([[in]] char *str) {
+	str = strlstrip(str);
+	str = strrstrip(str);
+	return str;
+}
+
 %#endif /* __USE_KOS */
 
 %

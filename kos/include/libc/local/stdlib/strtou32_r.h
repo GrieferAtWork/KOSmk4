@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55a95991 */
+/* HASH CRC-32:0xc29d41b3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,37 +24,40 @@
 #include <features.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_isspace_defined
-#define __local___localdep_isspace_defined
+#ifndef __local___localdep_strlstrip_defined
+#define __local___localdep_strlstrip_defined
+#ifdef __CRT_HAVE_strlstrip
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),char *,__NOTHROW_NCX,__localdep_strlstrip,(char const *__str),strlstrip,(__str))
+#else /* __CRT_HAVE_strlstrip */
 __NAMESPACE_LOCAL_END
-#include <bits/crt/ctype.h>
+#include <libc/local/string/strlstrip.h>
 __NAMESPACE_LOCAL_BEGIN
-#if defined(__crt_isspace) && defined(__CRT_HAVE_isspace)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace,(int __ch),isspace,{ return __crt_isspace(__ch); })
-#elif defined(__crt_isspace)
-__LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isspace)(int __ch) { return __crt_isspace(__ch); }
-#elif __has_builtin(__builtin_isspace) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isspace)
-__CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace,(int __ch),isspace,{ return __builtin_isspace(__ch); })
-#elif defined(__CRT_HAVE_isspace)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isspace,(int __ch),isspace,(__ch))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/ctype/isspace.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_isspace __LIBC_LOCAL_NAME(isspace)
-#endif /* !... */
-#endif /* !__local___localdep_isspace_defined */
+#define __localdep_strlstrip __LIBC_LOCAL_NAME(strlstrip)
+#endif /* !__CRT_HAVE_strlstrip */
+#endif /* !__local___localdep_strlstrip_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
+#include <libc/template/hex.h>
+#include <hybrid/limitcore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strtou32_r) __ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(4) __UINT32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou32_r))(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) {
+
+
+
+
+
+
 	__UINT32_TYPE__ __result;
 	char const *__num_start = __nptr;
 	char const *__num_iter;
-	while ((__NAMESPACE_LOCAL_SYM __localdep_isspace)(*__num_start))
-		++__num_start;
+	__num_start = (__NAMESPACE_LOCAL_SYM __localdep_strlstrip)(__num_start);
+
+
+
+
+
 	if (__base == 0) {
 		/* Automatically deduce base. */
 		if (*__num_start == '0') {
@@ -78,16 +81,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou32_r))(char const *__restrict _
 	}
 	__num_iter = __num_start;
 	__result   = 0;
+
 	for (;;) {
 		__UINT8_TYPE__ __digit;
-		char __ch = *__num_iter;
-		if (__ch >= '0' && __ch <= '9')
-			__digit = (__UINT8_TYPE__)(__ch - '0');
-		else if (__ch >= 'a' && __ch <= 'z')
-			__digit = (__UINT8_TYPE__)(10 + __ch - 'a');
-		else if (__ch >= 'A' && __ch <= 'Z')
-			__digit = (__UINT8_TYPE__)(10 + __ch - 'A');
-		else {
+		char __ch;
+		__ch = *__num_iter;
+		if (!__libc_hex2int(__ch, &__digit)) {
+			/* TODO: Unicode support */
 			break;
 		}
 		if (__digit >= __base)
@@ -95,6 +95,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou32_r))(char const *__restrict _
 		++__num_iter;
 		if __unlikely(__hybrid_overflow_umul(__result, (unsigned int)__base, &__result) ||
 		            __hybrid_overflow_uadd(__result, __digit, &__result)) {
+
+
+
 			/* Integer overflow. */
 			if (__error) {
 #ifdef __ERANGE
@@ -106,13 +109,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou32_r))(char const *__restrict _
 			if (__endptr) {
 				for (;;) {
 					__ch = *__num_iter;
-					if (__ch >= '0' && __ch <= '9')
-						__digit = (__UINT8_TYPE__)(__ch - '0');
-					else if (__ch >= 'a' && __ch <= 'z')
-						__digit = (__UINT8_TYPE__)(10 + __ch - 'a');
-					else if (__ch >= 'A' && __ch <= 'Z')
-						__digit = (__UINT8_TYPE__)(10 + __ch - 'A');
-					else {
+					if (!__libc_hex2int(__ch, &__digit)) {
+						/* TODO: Unicode support */
 						break;
 					}
 					if (__digit >= __base)
@@ -121,16 +119,28 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou32_r))(char const *__restrict _
 				}
 				*__endptr = (char *)__num_iter;
 			}
-			return (__UINT32_TYPE__)-1;
+
+
+
+
+
+			return __UINT32_MAX__;
+
 		}
 	}
+
+
+
+
+
+
+
 	if __unlikely(__num_iter == __num_start) {
 		/* Check for special case: `0xGARBAGE'.
 		 * -> In this case, return `0' and set `endptr' to `x' */
 		if ((__base == 16 || __base == 2) && __num_start > __nptr) {
 			char const *__nptr_ps = __nptr;
-			while ((__NAMESPACE_LOCAL_SYM __localdep_isspace)(*__nptr_ps))
-				++__nptr_ps;
+			__nptr_ps = (__NAMESPACE_LOCAL_SYM __localdep_strlstrip)(__nptr_ps);
 			if (__num_start > __nptr_ps && *__nptr_ps == '0') {
 				if (__endptr)
 					*__endptr = (char *)__nptr_ps + 1;
@@ -139,7 +149,6 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou32_r))(char const *__restrict _
 				return 0;
 			}
 		}
-
 		/* Empty number... */
 		if (__error) {
 #ifdef __ECANCELED
@@ -160,8 +169,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou32_r))(char const *__restrict _
 			*__error = 0;
 			/* Check for `EINVAL' */
 			if __unlikely(*__num_iter) {
-				while ((__NAMESPACE_LOCAL_SYM __localdep_isspace)(*__num_iter))
-					++__num_iter;
+				__num_iter = (__NAMESPACE_LOCAL_SYM __localdep_strlstrip)(__num_iter);
 				if (*__num_iter) {
 #ifdef __EINVAL
 					*__error = __EINVAL;

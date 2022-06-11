@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_LIBC_CRT_CTEST
-#define GUARD_LIBC_LIBC_CRT_CTEST 1
+#ifndef GUARD_LIBC_LIBC_CTYPE_CTEST
+#define GUARD_LIBC_LIBC_CTYPE_CTEST 1
 #define _KOS_SOURCE 1
 #define _UTF_SOURCE 1
 #undef NDEBUG
@@ -33,6 +33,7 @@
 #include <stdio.h>
 #include <uchar.h>
 #include <unicode.h>
+#include <wchar.h>
 #include <wctype.h>
 
 DECL_BEGIN
@@ -185,8 +186,30 @@ DEFINE_TEST(ctype) {
 		testw16(ch);
 		testw32(ch);
 	}
+
+	/* Lots of code assumes the following, and the standards also say
+	 * that the NUL character isn't considered a space. But just to
+	 * be sure that our implementation gets it right, assert that fact */
+	assert(!isspace((unsigned char)'\0'));
+	assert(!isspace((unsigned char)0));
+	assert(!iswspace((wchar_t)'\0'));
+	assert(!iswspace((wchar_t)0));
+	assert(!iswspace(btowc('\0')));
+	assert(!iswspace(btowc(0)));
+	assert(!isspace16((char16_t)'\0'));
+	assert(!isspace16((char16_t)0));
+	assert(!isspace16(btoc16('\0')));
+	assert(!isspace16(btoc16(0)));
+	assert(!isspace32((char32_t)'\0'));
+	assert(!isspace32((char32_t)0));
+	assert(!isspace32(btoc32('\0')));
+	assert(!isspace32(btoc32(0)));
+	assert(!unicode_isspace((unsigned char)'\0'));
+	assert(!unicode_isspace((unsigned char)0));
+	assert(!unicode_isspace((char32_t)'\0'));
+	assert(!unicode_isspace((char32_t)0));
 }
 
 DECL_END
 
-#endif /* !GUARD_LIBC_LIBC_CRT_CTEST */
+#endif /* !GUARD_LIBC_LIBC_CTYPE_CTEST */

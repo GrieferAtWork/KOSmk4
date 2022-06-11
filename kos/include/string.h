@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f389ca9 */
+/* HASH CRC-32:0xcb8b2fde */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7701,6 +7701,92 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN
 __NAMESPACE_LOCAL_USING_OR_IMPL(strrstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) char *__NOTHROW_NCX(__LIBCCALL strrstr)(char const *__haystack, char const *__needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strrstr))(__haystack, __needle); })
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #endif /* !__CRT_HAVE_strrstr */
+#ifdef __CRT_HAVE_strlstrip
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
+extern "C++" {
+/* >> strlstrip(3)
+ * Skip all leading `isspace(3)'-characters of `str' to return a pointer
+ * to  the first  non-space character (or  the trailing NUL  if `str' is
+ * empty or contains only spaces).
+ * NOTE: If available, use `unicode_isspace(3)' instead of `isspace(3)'
+ * @return: * : Pointer to the first non-space character in `str' */
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),char *,__NOTHROW_NCX,strlstrip,(char *__str),strlstrip,(__str))
+/* >> strlstrip(3)
+ * Skip all leading `isspace(3)'-characters of `str' to return a pointer
+ * to  the first  non-space character (or  the trailing NUL  if `str' is
+ * empty or contains only spaces).
+ * NOTE: If available, use `unicode_isspace(3)' instead of `isspace(3)'
+ * @return: * : Pointer to the first non-space character in `str' */
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),char const *,__NOTHROW_NCX,strlstrip,(char const *__str),strlstrip,(__str))
+} /* extern "C++" */
+#else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
+/* >> strlstrip(3)
+ * Skip all leading `isspace(3)'-characters of `str' to return a pointer
+ * to  the first  non-space character (or  the trailing NUL  if `str' is
+ * empty or contains only spaces).
+ * NOTE: If available, use `unicode_isspace(3)' instead of `isspace(3)'
+ * @return: * : Pointer to the first non-space character in `str' */
+__CDECLARE(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),char *,__NOTHROW_NCX,strlstrip,(char const *__str),(__str))
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
+#else /* __CRT_HAVE_strlstrip */
+#include <libc/local/string/strlstrip.h>
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
+extern "C++" {
+/* >> strlstrip(3)
+ * Skip all leading `isspace(3)'-characters of `str' to return a pointer
+ * to  the first  non-space character (or  the trailing NUL  if `str' is
+ * empty or contains only spaces).
+ * NOTE: If available, use `unicode_isspace(3)' instead of `isspace(3)'
+ * @return: * : Pointer to the first non-space character in `str' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char *__NOTHROW_NCX(__LIBCCALL strlstrip)(char *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlstrip))(__str); }
+/* >> strlstrip(3)
+ * Skip all leading `isspace(3)'-characters of `str' to return a pointer
+ * to  the first  non-space character (or  the trailing NUL  if `str' is
+ * empty or contains only spaces).
+ * NOTE: If available, use `unicode_isspace(3)' instead of `isspace(3)'
+ * @return: * : Pointer to the first non-space character in `str' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char const *__NOTHROW_NCX(__LIBCCALL strlstrip)(char const *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlstrip))(__str); }
+} /* extern "C++" */
+#else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
+/* >> strlstrip(3)
+ * Skip all leading `isspace(3)'-characters of `str' to return a pointer
+ * to  the first  non-space character (or  the trailing NUL  if `str' is
+ * empty or contains only spaces).
+ * NOTE: If available, use `unicode_isspace(3)' instead of `isspace(3)'
+ * @return: * : Pointer to the first non-space character in `str' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(strlstrip, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char *__NOTHROW_NCX(__LIBCCALL strlstrip)(char const *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strlstrip))(__str); })
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
+#endif /* !__CRT_HAVE_strlstrip */
+#ifdef __CRT_HAVE_strrstrip
+/* >> strrstrip(3)
+ * Find the last trailing `isspace(3)'-character (i.e. the one closest
+ * to the start and not followed by a non-`isspace(3)'-character), and
+ * replace it with '\0', effectively deleting trailing space.
+ * NOTE: If available, use `unicode_isspace(3)' instead of `isspace(3)'
+ * @return: * : Always re-returns `str' */
+__CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),char *,__NOTHROW_NCX,strrstrip,(char *__str),(__str))
+#else /* __CRT_HAVE_strrstrip */
+#include <libc/local/string/strrstrip.h>
+/* >> strrstrip(3)
+ * Find the last trailing `isspace(3)'-character (i.e. the one closest
+ * to the start and not followed by a non-`isspace(3)'-character), and
+ * replace it with '\0', effectively deleting trailing space.
+ * NOTE: If available, use `unicode_isspace(3)' instead of `isspace(3)'
+ * @return: * : Always re-returns `str' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(strrstrip, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char *__NOTHROW_NCX(__LIBCCALL strrstrip)(char *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strrstrip))(__str); })
+#endif /* !__CRT_HAVE_strrstrip */
+#ifdef __CRT_HAVE_strstrip
+/* >> strstrip(3)
+ * The combination of `strlstrip(3)' and `strrstrip(3)'
+ * @return: * : Same as `strrstrip(strlstrip(str))' */
+__CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),char *,__NOTHROW_NCX,strstrip,(char *__str),(__str))
+#else /* __CRT_HAVE_strstrip */
+#include <libc/local/string/strstrip.h>
+/* >> strstrip(3)
+ * The combination of `strlstrip(3)' and `strrstrip(3)'
+ * @return: * : Same as `strrstrip(strlstrip(str))' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(strstrip, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char *__NOTHROW_NCX(__LIBCCALL strstrip)(char *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strstrip))(__str); })
+#endif /* !__CRT_HAVE_strstrip */
 #endif /* __USE_KOS */
 
 

@@ -28,10 +28,10 @@
 #include <hybrid/compiler.h>
 
 #include <hybrid/byteorder.h>
+#include <hybrid/sched/atomic-rwlock.h>
 #include <hybrid/sequence/bsearch.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
-#include <hybrid/sched/atomic-rwlock.h>
 
 #include <alloca.h>
 #include <assert.h>
@@ -437,7 +437,7 @@ NOTHROW(CC pci_ids_parser_readline)(struct pci_ids_parser *__restrict self) {
 				continue;
 			id2 = decode_hex4(ptr);
 			ptr += 4;
-			if (!isspace(*ptr) && *ptr != '\0')
+			if (!isspace(*ptr) /*&& *ptr != '\0'*/)
 				continue;
 			self->pip_subvendor = id;
 			self->pip_subdevice = id2;
@@ -454,18 +454,6 @@ NOTHROW(CC pci_ids_parser_readline)(struct pci_ids_parser *__restrict self) {
 		return true;
 	}
 	return false;
-}
-
-PRIVATE WUNUSED NONNULL((1)) char *
-NOTHROW(CC str_strip)(char *__restrict str) {
-	char *end;
-	while (isspace(*str))
-		++str;
-	end = strend(str);
-	while (end > str && isspace(end[-1]))
-		--end;
-	*end = '\0';
-	return str;
 }
 
 
@@ -485,7 +473,7 @@ NOTHROW(CC get_vendor_name)(uint16_t vendor_id) {
 				if (parser.pip_vendor != vendor_id)
 					continue; /* Some other vendor name... */
 				/* Remember this vendor's name. */
-				result = remember_vendor_name(vendor_id, str_strip(parser.pip_name));
+				result = remember_vendor_name(vendor_id, strstrip(parser.pip_name));
 				break;
 			}
 			pci_ids_parser_fini(&parser);
@@ -513,7 +501,7 @@ NOTHROW(CC get_device_name)(pci_devnameid_t id) {
 				if (parser.pip_devnameid != id)
 					continue; /* Some other device... */
 				/* Remember this device's name. */
-				result = remember_device_name(id, str_strip(parser.pip_name));
+				result = remember_device_name(id, strstrip(parser.pip_name));
 				break;
 			}
 			pci_ids_parser_fini(&parser);
@@ -680,11 +668,11 @@ PRIVATE void NOTHROW(CC preload_system_pci_names)(void) {
 			if (parser.pip_device == PCI_MATCH_ANY) {
 				/* Vendor name. */
 				if (pci_vennameid_list_contains(vennames, parser.pip_vendor))
-					remember_vendor_name(parser.pip_vendor, str_strip(parser.pip_name));
+					remember_vendor_name(parser.pip_vendor, strstrip(parser.pip_name));
 			} else {
 				/* Device name. */
 				if (pci_devnameid_list_contains(devnames, parser.pip_devnameid))
-					remember_device_name(parser.pip_devnameid, str_strip(parser.pip_name));
+					remember_device_name(parser.pip_devnameid, strstrip(parser.pip_name));
 			}
 		}
 		pci_ids_parser_fini(&parser);

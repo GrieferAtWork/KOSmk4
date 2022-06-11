@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ad92c53 */
+/* HASH CRC-32:0xe2fdd10b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2354,6 +2354,48 @@ INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) char *NOTHROW_NCX(LIBDCALL libd_s
  * If no such needle exists, return `NULL' */
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) char *NOTHROW_NCX(LIBCCALL libc_strrstr)(char const *haystack, char const *needle);
 #endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> strlstrip(3)
+ * Skip all leading `isspace(3)'-characters of `str' to return a pointer
+ * to  the first  non-space character (or  the trailing NUL  if `str' is
+ * empty or contains only spaces).
+ * NOTE: If available, use `unicode_isspace(3)' instead of `isspace(3)'
+ * @return: * : Pointer to the first non-space character in `str' */
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_IN(1) char *NOTHROW_NCX(LIBDCALL libd_strlstrip)(char const *str);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+/* >> strlstrip(3)
+ * Skip all leading `isspace(3)'-characters of `str' to return a pointer
+ * to  the first  non-space character (or  the trailing NUL  if `str' is
+ * empty or contains only spaces).
+ * NOTE: If available, use `unicode_isspace(3)' instead of `isspace(3)'
+ * @return: * : Pointer to the first non-space character in `str' */
+INTDEF ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_IN(1) char *NOTHROW_NCX(LIBCCALL libc_strlstrip)(char const *str);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> strrstrip(3)
+ * Find the last trailing `isspace(3)'-character (i.e. the one closest
+ * to the start and not followed by a non-`isspace(3)'-character), and
+ * replace it with '\0', effectively deleting trailing space.
+ * NOTE: If available, use `unicode_isspace(3)' instead of `isspace(3)'
+ * @return: * : Always re-returns `str' */
+INTDEF ATTR_RETNONNULL WUNUSED ATTR_IN(1) char *NOTHROW_NCX(LIBDCALL libd_strrstrip)(char *str);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+/* >> strrstrip(3)
+ * Find the last trailing `isspace(3)'-character (i.e. the one closest
+ * to the start and not followed by a non-`isspace(3)'-character), and
+ * replace it with '\0', effectively deleting trailing space.
+ * NOTE: If available, use `unicode_isspace(3)' instead of `isspace(3)'
+ * @return: * : Always re-returns `str' */
+INTDEF ATTR_RETNONNULL WUNUSED ATTR_IN(1) char *NOTHROW_NCX(LIBCCALL libc_strrstrip)(char *str);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> strstrip(3)
+ * The combination of `strlstrip(3)' and `strrstrip(3)'
+ * @return: * : Same as `strrstrip(strlstrip(str))' */
+INTDEF ATTR_RETNONNULL WUNUSED ATTR_IN(1) char *NOTHROW_NCX(LIBDCALL libd_strstrip)(char *str);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+/* >> strstrip(3)
+ * The combination of `strlstrip(3)' and `strrstrip(3)'
+ * @return: * : Same as `strrstrip(strlstrip(str))' */
+INTDEF ATTR_RETNONNULL WUNUSED ATTR_IN(1) char *NOTHROW_NCX(LIBCCALL libc_strstrip)(char *str);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_INOUT(1) char *NOTHROW_NCX(LIBDCALL libd_strlwr)(char *__restrict str);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

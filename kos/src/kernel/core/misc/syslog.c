@@ -283,8 +283,7 @@ kernel_configure_syslog_levels(char *__restrict arg) {
 		levels = setup_loglevel_from_name(arg, (size_t)(comma - arg));
 		arg = comma + 1;
 		for (;;) {
-			while (isspace(*arg))
-				++arg;
+			arg = strlstrip(arg);
 			if (!*arg)
 				break;
 			comma = strchr(arg, ',');

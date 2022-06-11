@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
+import util;
 import * from deemon;
 import * from .cheaders;
 import * from .escape;
@@ -808,3 +809,125 @@ global generators: {string: Generator} = Dict({
 	"double2float"   : MATH_GENERATORS[0],
 	"double2ldouble" : MATH_GENERATORS[1],
 });
+
+
+
+
+/* FUNCTION TEMPLATES */
+class TemplateArgument {
+	this = default;
+	public member name: UserString | string;
+	public member defl: UserString | string | none = none;
+}
+class TemplateInstantiation {
+	this = default;
+	public member body: string;
+	public member implPrefix: {string...};
+	public member ppCond: string;
+	public member ppCondPrefix: {string...};
+}
+
+function _templateInjectArguments(body: string | UserString, args: {string: string}): string {
+	local bodyStr = str body;
+	File.Writer fp;
+	local flushStart = 0;
+	local i = 0, len = #bodyStr;
+	while (i < len) {
+		if (!bodyStr.startswith("${", i)) {
+			++i;
+			continue;
+		}
+		fp << bodyStr[flushStart:i];
+		i += 2;
+		local nameEnd = bodyStr.index("}", i);
+		local argName = bodyStr[i:nameEnd];
+		local argValue = args.get(argName);
+		if (argValue is none) {
+			if (body is UserString) {
+				body.errAt(i, "Undefined template argument {!r}"
+					.format({ argName }));
+			}
+			argValue = args[argName]; /* Force an exception */
+		}
+		fp << argValue;
+		i = flushStart = nameEnd + 1;
+	}
+	fp << bodyStr[flushStart:len];
+	return fp.string;
+}
+
+function _templateInjectArgumentsList(bodies: {string | UserString...}, args: {string: string}): {string...} {
+	for (local body: bodies) {
+		yield _templateInjectArguments(body, args);
+	}
+}
+
+
+class Template {
+	this = default;
+
+	@@Template name (usually prefixed by @"tpl_")
+	public member name: string | UserString;
+
+	@@Template arguments
+	public member args: {TemplateArgument...} = [];
+
+	@@Template body
+	public member body: string | UserString;
+
+	@@Implementation prefixes
+	public member implPrefix: {(string | UserString)...} = [];
+
+	public member ppCond: string | UserString = "1";
+	public member ppCondPrefix: {(string | UserString)...} = [];
+
+	@@Template mapped by name
+	public property argsByName: {string: TemplateArgument} = {
+		get(): {string: TemplateArgument} {
+			if (m_argsByName !is bound) {
+				m_argsByName = Dict(for (local arg: args) (str arg.name, arg));
+			}
+			return m_argsByName;
+		}
+	}
+	private member m_argsByName: {string: TemplateArgument};
+
+	private function _err(message: string) {
+		if (this.name is UserString)
+			this.name.err(message);
+		throw Error(message);
+	}
+
+	@@Instantiate this template with the given @instArgs
+	public function instantiate(instArgs: {string | UserString...}): TemplateInstantiation {
+		if (#instArgs > #this.args) {
+			this._err("Too many arguments for template {!r} (takes {!r}, but given {!r})"
+				.format({ this.name, #this.args, #instArgs }));
+		}
+		local usedArgs: {string: string} = Dict();
+		for (local i, arg: util.enumerate(this.args)) {
+			local value: UserString | string = arg.defl;
+			if (i < #instArgs)
+				value = str instArgs[i];
+			if (value is none) {
+				this._err("Missing template argument {!r} needed by {!r}"
+					.format({ arg.name, this.name }));
+			}
+			usedArgs[str arg.name] = value;
+		}
+		return TemplateInstantiation(
+			body:         _templateInjectArguments(this.body, usedArgs),
+			implPrefix:   Tuple(_templateInjectArgumentsList(this.implPrefix, usedArgs)),
+			ppCond:       _templateInjectArguments(this.ppCond, usedArgs),
+			ppCondPrefix: Tuple(_templateInjectArgumentsList(this.ppCondPrefix, usedArgs)),
+		);
+	}
+}
+
+@@Mapping of template name to template
+global templates: {string: Template} = Dict();
+
+
+
+
+

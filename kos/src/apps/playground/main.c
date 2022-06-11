@@ -384,9 +384,7 @@ int main_logtime(int argc, char *argv[], char *envp[]) {
 		if (next.tv_sec != prev.tv_sec) {
 			char buf[26];
 			ctime_r(&next.tv_sec, buf);
-			while (*buf && isspace(strend(buf)[-1]))
-				strend(buf)[-1] = '\0';
-			printf(AC_CUP("", "") "%s" AC_EL(""), buf);
+			printf(AC_CUP("", "") "%s" AC_EL(""), strrstrip(buf));
 			fflush(stdout);
 		}
 		if (next >= prev) {
@@ -422,10 +420,8 @@ int main_sleep(int argc, char *argv[], char *envp[]) {
 		struct timespec delay;
 		gettimeofday(&now, NULL);
 		ctime_r(&now.tv_sec, buf);
-		while (*buf && isspace(strend(buf)[-1]))
-			strend(buf)[-1] = '\0';
 		printf(AC_CUP("", "") "%s  [usec:%.6u]" AC_EL(""),
-		       buf, (unsigned int)now.tv_usec);
+		       strrstrip(buf), (unsigned int)now.tv_usec);
 		fflush(stdout);
 		delay.tv_sec  = 0;
 		delay.tv_nsec = 0;

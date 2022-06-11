@@ -2311,6 +2311,18 @@ wcsverscmp(*) %{generate(str2wcs("strverscmp"))}
 
 
 
+@@>> wcslstrip(3)
+[[wchar]]
+wcslstrip(*) %{generate(str2wcs("strlstrip"))}
+
+@@>> wcsrstrip(3)
+[[wchar]]
+wcsrstrip(*) %{generate(str2wcs("strrstrip"))}
+
+@@>> wcsstrip(3)
+[[wchar]]
+wcsstrip(*) %{generate(str2wcs("strstrip"))}
+
 
 
 
