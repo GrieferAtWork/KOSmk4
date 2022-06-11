@@ -2310,7 +2310,15 @@ __LOCAL __ATTR_CONST __ATTR_WUNUSED __UINT8_TYPE__
 __NOTHROW(__LIBCCALL __unicode_asdigit)(char32_t __ch) {
 	struct __unitraits const *__traits = __unicode_descriptor(__ch);
 	if (!(__traits->__ut_flags & __UNICODE_ISXDIGIT))
-		return 0xff;
+		return 0xff; /* Filter out stuff like `²' */
+	/* We assume that `__ut_digit_idx < __UNICODE_DIGIT_IDENTITY_COUNT', and
+	 * that `__UNICODE_DIGIT_IDENTITY_COUNT >= 16'. With these  assumptions,
+	 * we are allowed to simply return the digit index to our caller  (which
+	 * is  the `unicode_asdigit(3)'  macro), who  will then  check that said
+	 * index is less than their radix.
+	 *
+	 * Thus, so-long as `radix <= __UNICODE_DIGIT_IDENTITY_COUNT', there won't
+	 * be any inconsistencies! */
 	return __traits->__ut_digit_idx;
 }
 #endif /* !____unicode_asdigit_defined */
@@ -2322,8 +2330,10 @@ __NOTHROW(__LIBCCALL __unicode_asdigit)(char32_t __ch) {
 __LOCAL __ATTR_CONST __ATTR_WUNUSED __UINT8_TYPE__
 __NOTHROW(__LIBCCALL unicode_getnumeric)(char32_t __ch) {
 	struct __unitraits const *__traits = __unicode_descriptor(__ch);
-	if __likely(__traits->__ut_digit_idx <= __UNICODE_DIGIT_IDENTITY_MAX)
+#ifndef __OPTIMIZE_SIZE__
+	if __likely(__traits->__ut_digit_idx < __UNICODE_DIGIT_IDENTITY_COUNT)
 		return __traits->__ut_digit_idx;
+#endif /* !__OPTIMIZE_SIZE__ */
 #ifdef ____unicode_descriptor_digit_defined
 	return __unicode_descriptor_digit(__traits->__ut_digit_idx);
 #elif defined(____unicode_descriptor_digit64_defined)
@@ -2341,8 +2351,10 @@ __NOTHROW(__LIBCCALL unicode_getnumeric)(char32_t __ch) {
 __LOCAL __ATTR_CONST __ATTR_WUNUSED __UINT64_TYPE__
 __NOTHROW(__LIBCCALL unicode_getnumeric64)(char32_t __ch) {
 	struct __unitraits const *__traits = __unicode_descriptor(__ch);
-	if __likely(__traits->__ut_digit_idx <= __UNICODE_DIGIT_IDENTITY_MAX)
+#ifndef __OPTIMIZE_SIZE__
+	if __likely(__traits->__ut_digit_idx < __UNICODE_DIGIT_IDENTITY_COUNT)
 		return __traits->__ut_digit_idx;
+#endif /* !__OPTIMIZE_SIZE__ */
 #ifdef ____unicode_descriptor_digit64_defined
 	return __unicode_descriptor_digit64(__traits->__ut_digit_idx);
 #elif defined(____unicode_descriptor_digit_defined)
@@ -2361,8 +2373,10 @@ __NOTHROW(__LIBCCALL unicode_getnumeric64)(char32_t __ch) {
 __LOCAL __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL unicode_getnumericdbl)(char32_t __ch) {
 	struct __unitraits const *__traits = __unicode_descriptor(__ch);
-	if __likely(__traits->__ut_digit_idx <= __UNICODE_DIGIT_IDENTITY_MAX)
+#ifndef __OPTIMIZE_SIZE__
+	if __likely(__traits->__ut_digit_idx < __UNICODE_DIGIT_IDENTITY_COUNT)
 		return (double)__traits->__ut_digit_idx;
+#endif /* !__OPTIMIZE_SIZE__ */
 #ifdef ____unicode_descriptor_digitd_defined
 	return __unicode_descriptor_digitd(__traits->__ut_digit_idx);
 #else /* ____unicode_descriptor_digitd_defined */
@@ -2378,8 +2392,10 @@ __NOTHROW(__LIBCCALL unicode_getnumericdbl)(char32_t __ch) {
 __LOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL unicode_getnumericldbl)(char32_t __ch) {
 	struct __unitraits const *__traits = __unicode_descriptor(__ch);
-	if __likely(__traits->__ut_digit_idx <= __UNICODE_DIGIT_IDENTITY_MAX)
+#ifndef __OPTIMIZE_SIZE__
+	if __likely(__traits->__ut_digit_idx < __UNICODE_DIGIT_IDENTITY_COUNT)
 		return (__LONGDOUBLE)__traits->__ut_digit_idx;
+#endif /* !__OPTIMIZE_SIZE__ */
 #ifdef ____unicode_descriptor_digitld_defined
 	return __unicode_descriptor_digitld(__traits->__ut_digit_idx);
 #elif defined(____unicode_descriptor_digitd_defined)
@@ -2594,7 +2610,15 @@ __LOCAL __ATTR_CONST __ATTR_WUNUSED __UINT8_TYPE__
 __NOTHROW(__LIBCCALL __unicode_asdigit)(__CHAR32_TYPE__ __ch) {
 	struct __unitraits const *__traits = __libc___unicode_descriptor(__ch);
 	if (!(__traits->__ut_flags & __UNICODE_ISXDIGIT))
-		return 0xff;
+		return 0xff; /* Filter out stuff like `²' */
+	/* We assume that `__ut_digit_idx < __UNICODE_DIGIT_IDENTITY_COUNT', and
+	 * that `__UNICODE_DIGIT_IDENTITY_COUNT >= 16'. With these  assumptions,
+	 * we are allowed to simply return the digit index to our caller  (which
+	 * is  the `unicode_asdigit(3)'  macro), who  will then  check that said
+	 * index is less than their radix.
+	 *
+	 * Thus, so-long as `radix <= __UNICODE_DIGIT_IDENTITY_COUNT', there won't
+	 * be any inconsistencies! */
 	return __traits->__ut_digit_idx;
 }
 #endif /* !____unicode_asdigit_defined */
@@ -2606,8 +2630,10 @@ __NOTHROW(__LIBCCALL __unicode_asdigit)(__CHAR32_TYPE__ __ch) {
 __LOCAL __ATTR_CONST __ATTR_WUNUSED __UINT8_TYPE__
 __NOTHROW(__LIBCCALL __libc_unicode_getnumeric)(__CHAR32_TYPE__ __ch) {
 	struct __unitraits const *__traits = __libc___unicode_descriptor(__ch);
-	if __likely(__traits->__ut_digit_idx <= __UNICODE_DIGIT_IDENTITY_MAX)
+#ifndef __OPTIMIZE_SIZE__
+	if __likely(__traits->__ut_digit_idx < __UNICODE_DIGIT_IDENTITY_COUNT)
 		return __traits->__ut_digit_idx;
+#endif /* !__OPTIMIZE_SIZE__ */
 #ifdef ____libc___unicode_descriptor_digit_defined
 	return __libc___unicode_descriptor_digit(__traits->__ut_digit_idx);
 #elif defined(____libc___unicode_descriptor_digit64_defined)
@@ -2625,8 +2651,10 @@ __NOTHROW(__LIBCCALL __libc_unicode_getnumeric)(__CHAR32_TYPE__ __ch) {
 __LOCAL __ATTR_CONST __ATTR_WUNUSED __UINT64_TYPE__
 __NOTHROW(__LIBCCALL __libc_unicode_getnumeric64)(__CHAR32_TYPE__ __ch) {
 	struct __unitraits const *__traits = __libc___unicode_descriptor(__ch);
-	if __likely(__traits->__ut_digit_idx <= __UNICODE_DIGIT_IDENTITY_MAX)
+#ifndef __OPTIMIZE_SIZE__
+	if __likely(__traits->__ut_digit_idx < __UNICODE_DIGIT_IDENTITY_COUNT)
 		return __traits->__ut_digit_idx;
+#endif /* !__OPTIMIZE_SIZE__ */
 #ifdef ____libc___unicode_descriptor_digit64_defined
 	return __libc___unicode_descriptor_digit64(__traits->__ut_digit_idx);
 #elif defined(____libc___unicode_descriptor_digit_defined)
@@ -2645,8 +2673,10 @@ __NOTHROW(__LIBCCALL __libc_unicode_getnumeric64)(__CHAR32_TYPE__ __ch) {
 __LOCAL __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __libc_unicode_getnumericdbl)(__CHAR32_TYPE__ __ch) {
 	struct __unitraits const *__traits = __libc___unicode_descriptor(__ch);
-	if __likely(__traits->__ut_digit_idx <= __UNICODE_DIGIT_IDENTITY_MAX)
+#ifndef __OPTIMIZE_SIZE__
+	if __likely(__traits->__ut_digit_idx < __UNICODE_DIGIT_IDENTITY_COUNT)
 		return (double)__traits->__ut_digit_idx;
+#endif /* !__OPTIMIZE_SIZE__ */
 #ifdef ____libc___unicode_descriptor_digitd_defined
 	return __libc___unicode_descriptor_digitd(__traits->__ut_digit_idx);
 #else /* ____libc___unicode_descriptor_digitd_defined */
@@ -2662,8 +2692,10 @@ __NOTHROW(__LIBCCALL __libc_unicode_getnumericdbl)(__CHAR32_TYPE__ __ch) {
 __LOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __libc_unicode_getnumericldbl)(__CHAR32_TYPE__ __ch) {
 	struct __unitraits const *__traits = __libc___unicode_descriptor(__ch);
-	if __likely(__traits->__ut_digit_idx <= __UNICODE_DIGIT_IDENTITY_MAX)
+#ifndef __OPTIMIZE_SIZE__
+	if __likely(__traits->__ut_digit_idx < __UNICODE_DIGIT_IDENTITY_COUNT)
 		return (__LONGDOUBLE)__traits->__ut_digit_idx;
+#endif /* !__OPTIMIZE_SIZE__ */
 #ifdef ____libc___unicode_descriptor_digitld_defined
 	return __libc___unicode_descriptor_digitld(__traits->__ut_digit_idx);
 #elif defined(____libc___unicode_descriptor_digitd_defined)

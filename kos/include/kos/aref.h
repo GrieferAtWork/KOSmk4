@@ -829,22 +829,22 @@
 #define arref_cmpxch_inherit_new_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_arref_cmpxch_inherit_new_nopr_, (__VA_ARGS__))(__VA_ARGS__)
 /* >> bool arref_cmpxch_inherit_new_nokill(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj);
  * >> void arref_cmpxch_inherit_new_nokill(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
- * Same as `arref_cmpxch_inherit_new()', but assume that the caller is holding a reference to `oldobj' */
+ * Same as `arref_cmpxch_inherit_new()', but assume that the  caller is holding a reference to  `oldobj' */
 #define arref_cmpxch_inherit_new_nokill(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_arref_cmpxch_inherit_new_nokill_, (__VA_ARGS__))(__VA_ARGS__)
 /* >> bool arref_cmpxch_inherit_new_nokill_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj);
  * >> void arref_cmpxch_inherit_new_nokill_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
- * Same as `arref_cmpxch_inherit_new_nopr()', but assume that the caller is holding a reference to `oldobj' */
+ * Same as `arref_cmpxch_inherit_new_nopr()', but assume that the  caller is holding a reference to  `oldobj' */
 #define arref_cmpxch_inherit_new_nokill_nopr(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_arref_cmpxch_inherit_new_nokill_nopr_, (__VA_ARGS__))(__VA_ARGS__)
 #else /* __HYBRID_PP_VA_OVERLOAD */
 /* >> void arref_cmpxch_inherit_new(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
 #define arref_cmpxch_inherit_new __PRIVATE_arref_cmpxch_inherit_new_5
 /* >> void arref_cmpxch_inherit_new_nokill(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
- * Same as `arref_cmpxch_inherit_new()', but assume that the caller is holding a reference to `oldobj' */
+ * Same as `arref_cmpxch_inherit_new()', but assume that the  caller is holding a reference to  `oldobj' */
 #define arref_cmpxch_inherit_new_nokill __PRIVATE_arref_cmpxch_inherit_new_nokill_4
 /* >> void arref_cmpxch_inherit_new_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok, void decref(T *)); */
 #define arref_cmpxch_inherit_new_nopr __PRIVATE_arref_cmpxch_inherit_new_nopr_5
 /* >> void arref_cmpxch_inherit_new_nokill_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
- * Same as `arref_cmpxch_inherit_new_nopr()', but assume that the caller is holding a reference to `oldobj' */
+ * Same as `arref_cmpxch_inherit_new_nopr()', but assume that the  caller is holding a reference to  `oldobj' */
 #define arref_cmpxch_inherit_new_nokill_nopr __PRIVATE_arref_cmpxch_inherit_new_nokill_nopr_4
 #endif /* !__HYBRID_PP_VA_OVERLOAD */
 #else /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
@@ -862,10 +862,10 @@
 #define arref_cmpxch_inherit_new_nopr __PRIVATE_arref_cmpxch_inherit_new_nopr_5
 #endif /* !__HYBRID_PP_VA_OVERLOAD */
 /* >> void arref_cmpxch_inherit_new_nokill(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
- * Same as `arref_cmpxch_inherit_new()', but assume that the caller is holding a reference to `oldobj' */
+ * Same as `arref_cmpxch_inherit_new()', but assume that the  caller is holding a reference to  `oldobj' */
 #define arref_cmpxch_inherit_new_nokill __PRIVATE_arref_cmpxch_inherit_new_nokill_4
 /* >> void arref_cmpxch_inherit_new_nokill_nopr(ARREF(T) *self, T *oldobj, [[in]] REF T *newobj, bool *p_ok);
- * Same as `arref_cmpxch_inherit_new_nopr()', but assume that the caller is holding a reference to `oldobj' */
+ * Same as `arref_cmpxch_inherit_new_nopr()', but assume that the  caller is holding a reference to  `oldobj' */
 #define arref_cmpxch_inherit_new_nokill_nopr __PRIVATE_arref_cmpxch_inherit_new_nokill_nopr_4
 #endif /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
 

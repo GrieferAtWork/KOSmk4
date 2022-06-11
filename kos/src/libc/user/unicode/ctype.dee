@@ -481,9 +481,9 @@ function generateUnicodeDatabase() {
 	/* Generate the unicode digit decode table. */
 	local digit2Index: {int | string | none: int} = Dict();
 	local index2Digit: {(int | string | none)...} = [];
-	/* Special case: the first 50+1 digits have one-on-one mapping!
-	 * NOTE: This 50 is hard-coded as `__UNICODE_DIGIT_IDENTITY_MAX' */
-	for (local x: [:50+1]) {
+	/* Special case: the first 51 digits have one-on-one mapping!
+	 * NOTE: This 51 is hard-coded as `__UNICODE_DIGIT_IDENTITY_COUNT' */
+	for (local x: [:51]) {
 		digit2Index[x] = x;
 		assert #index2Digit == x;
 		index2Digit.append(x);

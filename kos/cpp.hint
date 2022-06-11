@@ -2327,4 +2327,3 @@
 #define __IEEE754_FLOAT_TYPE__ float
 #define __IEEE754_DOUBLE_TYPE__ double
 #define __IEEE854_LONG_DOUBLE_TYPE__ long double
-

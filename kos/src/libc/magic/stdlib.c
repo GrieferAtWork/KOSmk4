@@ -1189,9 +1189,9 @@ $int64_t strto64_r([[in]] char const *__restrict nptr,
 	[[impl_include("<libc/template/hex.h>", "<hybrid/limitcore.h>")]]
 	[[impl_include("<libc/unicode.h>")]]
 {
-@@exec global SIGNED = !"${T}".@startswith@("u");@@
-@@exec global BITS = "${T}".@strip@("uint_t");@@
-@@exec global su = SIGNED ? "s" : "u";@@
+@@exec /*   */ global SIGNED = !"${T}".@startswith@("u");@@
+@@exec /*   */ global BITS = "${T}".@strip@("uint_t");@@
+@@exec /*   */ global su = SIGNED ? "s" : "u";@@
 @@if SIGNED@@
 	char sign;
 @@endif@@
@@ -1270,7 +1270,7 @@ $int64_t strto64_r([[in]] char const *__restrict nptr,
 			++num_iter;
 		}
 		if unlikely(@@yield("__hybrid_overflow_" + su + "mul")@@(result, (unsigned int)${base}, &result) ||
-		            @@yield("__hybrid_overflow_" + su + "add")@@(result, digit, &result)) {
+		/*       */ @@yield("__hybrid_overflow_" + su + "add")@@(result, digit, &result)) {
 @@if SIGNED@@
 handle_overflow:
 @@endif@@

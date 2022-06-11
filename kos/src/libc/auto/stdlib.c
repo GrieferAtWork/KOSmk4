@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbaaa1603 */
+/* HASH CRC-32:0xc6a5b39 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -859,7 +859,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
 			++num_iter;
 		}
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
-		            __hybrid_overflow_uadd(result, digit, &result)) {
+		/*       */ __hybrid_overflow_uadd(result, digit, &result)) {
 
 
 
@@ -1079,7 +1079,7 @@ NOTHROW_NCX(LIBCCALL libc_strto32_r)(char const *__restrict nptr,
 			++num_iter;
 		}
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
-		            __hybrid_overflow_sadd(result, digit, &result)) {
+		/*       */ __hybrid_overflow_sadd(result, digit, &result)) {
 
 handle_overflow:
 
@@ -1299,7 +1299,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
 			++num_iter;
 		}
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
-		            __hybrid_overflow_uadd(result, digit, &result)) {
+		/*       */ __hybrid_overflow_uadd(result, digit, &result)) {
 
 
 
@@ -1519,7 +1519,7 @@ NOTHROW_NCX(LIBCCALL libc_strto64_r)(char const *__restrict nptr,
 			++num_iter;
 		}
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
-		            __hybrid_overflow_sadd(result, digit, &result)) {
+		/*       */ __hybrid_overflow_sadd(result, digit, &result)) {
 
 handle_overflow:
 

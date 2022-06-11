@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba47203a */
+/* HASH CRC-32:0xc38b862c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3024,7 +3024,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsto32_r)(char16_t const *__restrict nptr,
 			++num_iter;
 		}
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
-		            __hybrid_overflow_sadd(result, digit, &result)) {
+		/*       */ __hybrid_overflow_sadd(result, digit, &result)) {
 
 handle_overflow:
 
@@ -3234,7 +3234,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsto32_r)(char32_t const *__restrict nptr,
 			++num_iter;
 		}
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
-		            __hybrid_overflow_sadd(result, digit, &result)) {
+		/*       */ __hybrid_overflow_sadd(result, digit, &result)) {
 
 handle_overflow:
 
@@ -3444,7 +3444,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 			++num_iter;
 		}
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
-		            __hybrid_overflow_uadd(result, digit, &result)) {
+		/*       */ __hybrid_overflow_uadd(result, digit, &result)) {
 
 
 
@@ -3654,7 +3654,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
 			++num_iter;
 		}
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
-		            __hybrid_overflow_uadd(result, digit, &result)) {
+		/*       */ __hybrid_overflow_uadd(result, digit, &result)) {
 
 
 
@@ -3932,7 +3932,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsto64_r)(char16_t const *__restrict nptr,
 			++num_iter;
 		}
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
-		            __hybrid_overflow_sadd(result, digit, &result)) {
+		/*       */ __hybrid_overflow_sadd(result, digit, &result)) {
 
 handle_overflow:
 
@@ -4142,7 +4142,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsto64_r)(char32_t const *__restrict nptr,
 			++num_iter;
 		}
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
-		            __hybrid_overflow_sadd(result, digit, &result)) {
+		/*       */ __hybrid_overflow_sadd(result, digit, &result)) {
 
 handle_overflow:
 
@@ -4352,7 +4352,7 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 			++num_iter;
 		}
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
-		            __hybrid_overflow_uadd(result, digit, &result)) {
+		/*       */ __hybrid_overflow_uadd(result, digit, &result)) {
 
 
 
@@ -4562,7 +4562,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
 			++num_iter;
 		}
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
-		            __hybrid_overflow_uadd(result, digit, &result)) {
+		/*       */ __hybrid_overflow_uadd(result, digit, &result)) {
 
 
 

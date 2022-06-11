@@ -36,7 +36,7 @@ class UserString {
 	public member text: string;
 
 	@@Return a (line, column) pair describing the origin
-	@@of this UserString within the file @filename
+	@@of  this  UserString  within  the  file  @filename
 	public property lc: (int, int) = {
 		get(): (int, int) {
 			return parser.lcAt(start);

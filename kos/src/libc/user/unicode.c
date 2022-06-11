@@ -40,7 +40,7 @@ typedef union {
 	uint64_t ud_whole;   /* Whole number (masked by `_UNIDIGIT_WHOLE_MASK') */
 	uint32_t ud_frac[2]; /* Fraction numerator/denominator */
 #define unidigit_iswhole(self)             (!((self)->ud_whole & _UNIDIGIT_ISFRAC))
-#define unidigit_getwhole(self)            ((self)->ud_whole & _UNIDIGIT_WHOLE_MASK)
+#define unidigit_getwhole(self)            ((self)->ud_whole /*& _UNIDIGIT_WHOLE_MASK*/)
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define unidigit_getfrac_numerator(self)   ((int32_t)((self)->ud_frac[0]))
 #define unidigit_getfrac_denominator(self) ((int32_t)((self)->ud_frac[1] & UINT32_C(0x7fffffff)))
@@ -133,8 +133,8 @@ NOTHROW(LIBCCALL libc___unicode_descriptor_digit64)(uint8_t digit_idx)
 	digit = &unicode_digits[digit_idx];
 	if likely(unidigit_iswhole(digit))
 		return (uint64_t)unidigit_getwhole(digit);
-	return (uint64_t)(unidigit_getfrac_numerator(digit) /
-	                  unidigit_getfrac_denominator(digit));
+	return (uint64_t)unidigit_getfrac_numerator(digit) /
+	       (uint64_t)unidigit_getfrac_denominator(digit);
 }
 /*[[[end:libc___unicode_descriptor_digit64]]]*/
 
@@ -190,7 +190,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_fold)(char32_t ch,
 	struct unifold const *fold;
 	trt = libc___unicode_descriptor(ch);
 	if (trt->__ut_fold_idx >= UNICODE_FOLD_COUNT) {
-		buf[0] = unicode_tolower(ch);
+		buf[0] = ch + trt->__ut_lower; /* tolower */
 		return buf + 1;
 	}
 	fold   = &unicode_fold_descriptors[trt->__ut_fold_idx];

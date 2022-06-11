@@ -57,15 +57,15 @@ __DECL_BEGIN
 #define __UNICODE_ISSYMCONT  0x4000 /* Symbol continue character */
 /*efine __UNICODE_IS         0x8000  * ... */
 
-/* When `__ut_digit_idx <= __UNICODE_DIGIT_IDENTITY_MAX', then the associated unicode
- * character has a digit value equal to `__ut_digit_idx' (iow: the digit decode  step
+/* When `__ut_digit_idx < __UNICODE_DIGIT_IDENTITY_COUNT', then the associated unicode
+ * character  has a digit value equal to  `__ut_digit_idx' (iow: the digit decode step
  * can be skipped, since `__ut_digit_idx' _is_ the digit value) */
-#define __UNICODE_DIGIT_IDENTITY_MAX 50
+#define __UNICODE_DIGIT_IDENTITY_COUNT 51
 
 struct __unitraits {
 	__UINT16_TYPE__ const __ut_flags;     /* Character flags (Set of `__UNICODE_IS*') */
 	__UINT8_TYPE__  const __ut_digit_idx; /* Digit/decimal extension index, or `0xff'.
-	                                       * When `<= __UNICODE_DIGIT_IDENTITY_MAX', this _is_ the digit value. */
+	                                       * When `< __UNICODE_DIGIT_IDENTITY_COUNT', this _is_ the digit value. */
 	__UINT8_TYPE__  const __ut_fold_idx;  /* Unicode fold extension index, or `0xff'. */
 	__INT32_TYPE__  const __ut_lower;     /* Delta added to the character to convert it to lowercase, or 0. */
 	__INT32_TYPE__  const __ut_upper;     /* Delta added to the character to convert it to uppercase, or 0. */

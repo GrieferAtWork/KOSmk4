@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x243dd10e */
+/* HASH CRC-32:0x2fa346fd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -132,7 +132,7 @@ __NOTHROW_NCX(__LIBDCALL __LIBC_LOCAL_NAME(c16stou64_r))(__CHAR16_TYPE__ const *
 			++__num_iter;
 		}
 		if __unlikely(__hybrid_overflow_umul(__result, (unsigned int)__base, &__result) ||
-		            __hybrid_overflow_uadd(__result, __digit, &__result)) {
+		/*       */ __hybrid_overflow_uadd(__result, __digit, &__result)) {
 
 
 

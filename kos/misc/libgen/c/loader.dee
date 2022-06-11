@@ -2912,7 +2912,7 @@ again:
 		}
 	}
 
-	@@Define function implementation templates
+	@@Define    function    implementation   templates
 	@@>%[define_template(tpl_strtoi<SIGNED, T, BITS> =
 	@@>	[[impl_include("<asm/os/errno.h>", "<hybrid/__overflow.h>")]]
 	@@>	[[impl_include("<hybrid/limitcore.h>")]]

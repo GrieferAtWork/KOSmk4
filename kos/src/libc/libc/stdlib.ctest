@@ -124,6 +124,7 @@ DEFINE_TEST(strtoi) {
 	ASSERT_STRTOI(INTMAX_C(9876543210), "𝟫𝟪𝟩𝟨𝟧𝟦𝟥𝟤𝟣𝟢");
 	ASSERT_STRTOI(INTMAX_C(9876543210), "𝟵𝟴𝟳𝟲𝟱𝟰𝟯𝟮𝟭𝟬");
 	ASSERT_STRTOI(INTMAX_C(9876543210), "𝟿𝟾𝟽𝟼𝟻𝟺𝟹𝟸𝟷𝟶");
+	ASSERT_STRTOI(INTMAX_C(9876543210), "９８７６５４３２１０");
 }
 
 DECL_END

@@ -926,8 +926,3 @@ class Template {
 
 @@Mapping of template name to template
 global templates: {string: Template} = Dict();
-
-
-
-
-
