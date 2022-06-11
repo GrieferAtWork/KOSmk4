@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x143dc3ad */
+/* HASH CRC-32:0x2ad92c53 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2219,6 +2219,12 @@ INTDEF ATTR_LEAF ATTR_RETNONNULL ATTR_INOUTS(1, 2) NONNULL((1)) char *NOTHROW_NC
 INTDEF ATTR_LEAF ATTR_RETNONNULL ATTR_INOUTS(1, 2) NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strnupr)(char *__restrict str, size_t maxlen);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_LEAF ATTR_RETNONNULL ATTR_INOUTS(1, 2) NONNULL((1)) void *NOTHROW_NCX(LIBDCALL libd_memrev)(void *__restrict base, size_t n_bytes);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+INTDEF ATTR_LEAF ATTR_RETNONNULL ATTR_INOUTS(1, 2) NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_memrev)(void *__restrict base, size_t n_bytes);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_strncoll_l)(char const *s1, char const *s2, size_t maxlen, locale_t locale);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -2259,12 +2265,6 @@ INTDEF ATTR_LEAF ATTR_RETNONNULL ATTR_INOUTS(1, 2) NONNULL((1)) char *NOTHROW_NC
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 INTDEF ATTR_LEAF ATTR_RETNONNULL ATTR_INOUTS(1, 2) NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strnupr_l)(char *__restrict str, size_t maxlen, locale_t locale);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_LEAF ATTR_RETNONNULL ATTR_INOUTS(1, 2) NONNULL((1)) void *NOTHROW_NCX(LIBDCALL libd_memrev)(void *__restrict base, size_t n_bytes);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_LEAF ATTR_RETNONNULL ATTR_INOUTS(1, 2) NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_memrev)(void *__restrict base, size_t n_bytes);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_LEAF ATTR_INOUT(1) uint16_t *NOTHROW_NCX(LIBDCALL libd_memrevw)(void *__restrict base, size_t n_words);
@@ -2342,6 +2342,18 @@ INTDEF ATTR_IN(3) ATTR_OUT(1) void NOTHROW_NCX(LIBDCALL libd_bitcpy)(void *__res
  * >> bitcpy(dst, 4, src, 0, 4);
  * >> assert(dst == 0b10010000); */
 INTDEF ATTR_IN(3) ATTR_OUT(1) void NOTHROW_NCX(LIBCCALL libc_bitcpy)(void *__restrict dst_base, size_t dst_bit_offset, void const *__restrict src_base, size_t src_bit_offset, size_t num_bits);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> strrstr(3)
+ * Find the last instance of `needle' appearing as a sub-string within `haystack'
+ * If no such needle exists, return `NULL' */
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) char *NOTHROW_NCX(LIBDCALL libd_strrstr)(char const *haystack, char const *needle);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> strrstr(3)
+ * Find the last instance of `needle' appearing as a sub-string within `haystack'
+ * If no such needle exists, return `NULL' */
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) char *NOTHROW_NCX(LIBCCALL libc_strrstr)(char const *haystack, char const *needle);
+#endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_INOUT(1) char *NOTHROW_NCX(LIBDCALL libd_strlwr)(char *__restrict str);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */

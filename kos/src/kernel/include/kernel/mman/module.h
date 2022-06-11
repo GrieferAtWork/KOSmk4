@@ -272,7 +272,7 @@ DEFINE_WEAKREFCNT_FUNCTIONS(struct module, md_weakrefcnt, module_free)
  * NOTE: This function inherits a weak reference to `self->md_mman',
  *       as well as a weak reference to `self'! */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL module_clear_mnode_pointers_and_destroy)(struct module *__restrict self);
+NOTHROW(FCALL module_clear_mnode_pointers_and_destroy)(WEAK REF struct module *__restrict self);
 
 
 /* Wrappers for module operators. */

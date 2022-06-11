@@ -420,10 +420,10 @@ NOTHROW(FCALL cmodule_reloc_units)(struct cmodule *new_addr,
 	/* When relocating a cmodule causes its base-address to change,
 	 * then we must fix-up the abbreviation cache list pointers  of
 	 * already-initialized compilation units.
-	 * Otherwise,  (if those pointers  referenced the static abbreviation
-	 * cache), those points would still point to the old object position,
-	 * which  is  no longer  valid, as  the static  cache will  have been
-	 * moved as well. */
+	 * Otherwise, (if those pointers referenced the static abbreviation
+	 * cache), they would still point to the old object position, which
+	 * is no longer valid, as the static cache will have been moved  as
+	 * well. */
 	for (i = 0; i < cuc; ++i) {
 		struct cmodunit *new_cu, *old_cu;
 		new_cu = &new_addr->cm_cuv[i];
@@ -680,8 +680,9 @@ NOTHROW(FCALL cmodule_locate)(module_t *__restrict mod) {
 	return result;
 }
 
-/* Return the CModule descriptor for a given `addr', which should be a program counter, or data-pointer.
- * If  no  such  module  exists, or  its  descriptor  could  not be  allocated,  return  `NULL' instead.
+/* Return the CModule descriptor for  a given `addr', which  should
+ * be a program counter, or data-pointer. If no such module exists,
+ * or its descriptor could not be allocated, return `NULL' instead.
  * This function is a thin wrapper around `module_fromaddr_nx()' + `cmodule_locate()' */
 PUBLIC WUNUSED NONNULL((1)) REF struct cmodule *
 NOTHROW(FCALL cmodule_ataddr)(void const *addr) {
@@ -2145,17 +2146,17 @@ done:
  * symbols  had yet to  be loaded, then this  function will make a
  * call to `cmodule_loadsyms()'. If that call fails, this function
  * will simply return `NULL'.
- * To do its job, this function will first look at the  per-module
- * symbol   table    of    `self'    (iow:    `self->cm_symbols').
- * If this table  contains a symbol  matching `name', that  symbol
- * is  then returned, unless it has the `CMODSYM_DIP_NS_FCONFLICT'
- * flag set,  in which  case `dbg_getpcreg(DBG_REGLEVEL_VIEW)'  is
- * check for being apart of `self'. If  it is, try to find the  CU
- * associated with that address. If  such a CU exists, check  that
- * CU's symbol table for `name' once again. If that table contains
- * the given `name'  also, return that  symbol. Otherwise (if  any
- * of the above  failed), simply return  the symbol already  found
- * within the module's global symbol table.
+ * To do its job, this function  will first look at the  per-module
+ * symbol table of `self' (iow: `self->cm_symbols'). If this  table
+ * contains a symbol matching `name', that symbol is then returned,
+ * unless it has the `CMODSYM_DIP_NS_FCONFLICT' flag set, in  which
+ * case  `dbg_getpcreg(DBG_REGLEVEL_VIEW)'  is  checked  for  being
+ * apart of `self'. If  it is, try to  find the CU associated  with
+ * that address. If such a CU exists, check that CU's symbol  table
+ * for `name' once again. If  that table contains the given  `name'
+ * also,  return  that  symbol.  Otherwise  (if  any  of  the above
+ * failed), simply  return  the  symbol already  found  within  the
+ * module's global symbol table.
  * @param: ns: When different from `CMODSYM_DIP_NS_NORMAL',  restrict
  *             the search to only  return symbols from the  indicated
  *             namespace. Otherwise, ~try~ to return symbols from the
@@ -2273,10 +2274,11 @@ NOTHROW(FCALL cmodule_getsym_withhint)(struct cmodule *start_module,
 
 
 
-/* Initialize a debug information CU parser to load debug information for a component located
- * at  `dip' within the `.debug_info' mapping of `self'. For this purpose, this function will
- * locate  the CU that contains `dip', and  proceed to call `cmodunit_parser()' to initialize
- * `result'. If the given `dip' is not apart of any of the CUs of `self', then `result'  will
+/* Initialize a debug information CU parser to load debug information for a
+ * component located at `dip' within  the `.debug_info' mapping of  `self'.
+ * For this purpose, this function will locate the CU that contains  `dip',
+ * and proceed to call `cmodunit_parser()'  to initialize `result'. If  the
+ * given `dip' is not apart of any of the CUs of `self', then `result' will
  * be initialized to always indicate EOF.
  * @param: dip: DebugInfoPointer. (s.a. `cmodunit_parser_from_dip()') */
 PUBLIC NONNULL((1, 2, 3)) void
@@ -3393,8 +3395,8 @@ err:
  * will instead fill them in itself, as well as clean them up afterwards.
  * NOTE: _DONT_ call `cmod_syminfo_local_fini(info)' after this function returns!
  *       Any cleanup will  have already  been done internally  by this  function!
- * NOTE: The `in(oob_only)' means that only out-of-band data that is used by `cb'
- *       must   be   initialized   prior   to   this   function   being   called.
+ * NOTE: The `in(oob_only)' means that only out-of-band data that is used
+ *       by `cb' must be initialized prior to this function being called.
  * NOTE: The `out(undef)' that all non-[const]  fields are undefined upon  return,
  *       with the exception of out-of-band fields (if any), who's contents depends
  *       on what `cb' may or may not have done.

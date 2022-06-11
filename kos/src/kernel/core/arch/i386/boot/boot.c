@@ -551,8 +551,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *     If so, use that  header to create  a faux section  object that is  returned
 	 *     when requesting ".eh_frame_hdr"
 	 *   - The .eh_frame_hdr section isn't being processed / parsed. Note that
-	 *     it  behaves similar to  .eh_frame, but differs  in that it contains
-	 *     a lookup-table like:
+	 *     it  is auxiliarly to  .eh_frame, but differs in  that it contains a
+	 *     lookup-table like:
 	 *         >> [{ pc_min: pointer, pc_max: pointer, eh_frame_data: pointer }...]
 	 *     I  couldn't find documentation on the actual format, but glibc has
 	 *     a file that is used to parse this table, so it can tell how that's
@@ -797,7 +797,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *
 	 * As per `man 2 open', O_PATH is also allowed to return regular files (in the
 	 * case of KOS, that would be the raw `struct mfile' objects). Currently,  our
-	 * implementation restricts O_PATH to only work for directories. */
+	 * implementation restricts O_PATH to only work for directories (in which case
+	 * we return the `struct path' objects). */
 
 	/* TODO: Enable `-Wpadded' (warns about implicit padding in structures; on KOS,
 	 *       structs should be  declared with hidden  padding made visible  through

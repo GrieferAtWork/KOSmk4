@@ -1143,6 +1143,13 @@ typedef struct elf64_syminfo /*[PREFIX(si_)]*/ {
 #define ELF64_ST_TYPE(st_info)          ELF32_ST_TYPE(st_info)
 #define ELF64_ST_INFO(bind, type)       ELF32_ST_INFO(bind, type)
 
+/* So portable code doesn't have to include a miss-leading `32' or `64' in identifier names. */
+#ifdef __USE_KOS
+#define ELF_ST_BIND ELF32_ST_BIND
+#define ELF_ST_TYPE ELF32_ST_TYPE
+#define ELF_ST_INFO ELF32_ST_INFO
+#endif /* __USE_KOS */
+
 /* Legal values for ST_BIND subfield of st_info (symbol binding). */
 #define STB_LOCAL       0               /* Local symbol */
 #define STB_GLOBAL      1               /* Global symbol */
@@ -1226,10 +1233,15 @@ typedef struct elf64_syminfo /*[PREFIX(si_)]*/ {
 
 
 /* How to extract and insert information held in the st_other field. */
-#define ELF32_ST_VISIBILITY(o)  ((o) & 0x03)
+#define ELF32_ST_VISIBILITY(o) ((o) & 0x03)
 
 /* For ELF64 the definitions are the same. */
-#define ELF64_ST_VISIBILITY(o)  ELF32_ST_VISIBILITY (o)
+#define ELF64_ST_VISIBILITY(o) ELF32_ST_VISIBILITY(o)
+
+/* So portable code doesn't have to include a miss-leading `32' or `64' in identifier names. */
+#ifdef __USE_KOS
+#define ELF_ST_VISIBILITY ELF32_ST_VISIBILITY
+#endif /* __USE_KOS */
 
 /* Symbol visibility specification encoded in the st_other field. */
 #define STV_DEFAULT     0               /* Default symbol visibility rules */
@@ -1329,6 +1341,15 @@ typedef struct elf32_phdr /*[PREFIX(p_)]*/ {
 
 #define ELF32_PHDR_INIT(type, offset, vaddr, paddr, filesz, memsz, flags, align) \
 	{ type, offset, vaddr, paddr, filesz, memsz, flags, align }
+#define ELF32_PHDR_TO64(dst, src)     \
+	((dst).p_type   = (src).p_type,   \
+	 (dst).p_offset = (src).p_offset, \
+	 (dst).p_vaddr  = (src).p_vaddr,  \
+	 (dst).p_paddr  = (src).p_paddr,  \
+	 (dst).p_filesz = (src).p_filesz, \
+	 (dst).p_memsz  = (src).p_memsz,  \
+	 (dst).p_flags  = (src).p_flags,  \
+	 (dst).p_align  = (src).p_align)
 #endif /* __CC__ */
 
 
@@ -1356,7 +1377,7 @@ typedef struct elf64_phdr /*[PREFIX(p_)]*/ {
 
 #define ELF64_PHDR_INIT(type, offset, vaddr, paddr, filesz, memsz, flags, align) \
 	{ type, flags, offset, vaddr, paddr, filesz, memsz, align }
-#define ELF_PHDR32TO64(dst, src)      \
+#define ELF64_PHDR_TO32(dst, src)     \
 	((dst).p_type   = (src).p_type,   \
 	 (dst).p_flags  = (src).p_flags,  \
 	 (dst).p_offset = (src).p_offset, \
@@ -1500,6 +1521,10 @@ typedef struct elf32_dyn /*[PREFIX(d_)]*/ {
 	} d_un;
 } Elf32_Dyn;
 
+#define ELF32_DYN_TO64(dst, src)     \
+	((dst).d_tag      = (src).d_tag, \
+	 (dst).d_un.d_val = (src).d_un.d_val)
+
 typedef struct elf64_dyn /*[PREFIX(d_)]*/ {
 	Elf64_Sxword d_tag; /* Dynamic entry type */
 	union {
@@ -1507,7 +1532,8 @@ typedef struct elf64_dyn /*[PREFIX(d_)]*/ {
 		Elf64_Addr  d_ptr; /* Address value */
 	} d_un;
 } Elf64_Dyn;
-#define ELF_DYN32TO64(dst, src)      \
+
+#define ELF64_DYN_TO32(dst, src)     \
 	((dst).d_tag      = (src).d_tag, \
 	 (dst).d_un.d_val = (src).d_un.d_val)
 #endif /* __CC__ */

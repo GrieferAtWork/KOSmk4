@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ea6c983 */
+/* HASH CRC-32:0xdc19bdd9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2353,6 +2353,7 @@ DFUN(".text.crt.dos.unicode.static.memory", libd_strncasecoll, libc_strncasecoll
 DFUN(".text.crt.dos.string.memory", libd_strnrev, libc_strnrev, TP, 2, TP, TI)
 DFUN(".text.crt.dos.unicode.static.memory", libd_strnlwr, libc_strnlwr, TP, 2, TP, TI)
 DFUN(".text.crt.dos.unicode.static.memory", libd_strnupr, libc_strnupr, TP, 2, TP, TI)
+DFUN(".text.crt.dos.string.memory", libd_memrev, libc_memrev, TP, 2, TP, TI)
 DFUN(".text.crt.dos.unicode.locale.memory", libd_strncoll_l, libc_strncoll_l, TD, 4, TP, TP, TI, TP)
 DFUN(".text.crt.dos.unicode.locale.memory", libd_strcasecoll_l, libc_strcasecoll_l, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.unicode.locale.memory", libd_strncasecoll_l, libc_strncasecoll_l, TD, 4, TP, TP, TI, TP)
@@ -2360,7 +2361,6 @@ DFUN(".text.crt.dos.unicode.locale.memory", libd_strlwr_l, libc_strlwr_l, TP, 2,
 DFUN(".text.crt.dos.unicode.locale.memory", libd_strupr_l, libc_strupr_l, TP, 2, TP, TP)
 DFUN(".text.crt.dos.unicode.locale.memory", libd_strnlwr_l, libc_strnlwr_l, TP, 3, TP, TI, TP)
 DFUN(".text.crt.dos.unicode.locale.memory", libd_strnupr_l, libc_strnupr_l, TP, 3, TP, TI, TP)
-DFUN(".text.crt.dos.string.memory", libd_memrev, libc_memrev, TP, 2, TP, TI)
 DFUN(".text.crt.dos.string.memory", libd_memrevw, libc_memrevw, TP, 2, TP, TI)
 DFUN(".text.crt.dos.string.memory", libd_memrevl, libc_memrevl, TP, 2, TP, TI)
 DFUN(".text.crt.dos.string.memory", libd_memrevq, libc_memrevq, TP, 2, TP, TI)
@@ -2368,6 +2368,7 @@ DFUN(".text.crt.dos.string.memory", libd_strcmpz, libc_strcmpz, TD, 3, TP, TP, T
 DFUN(".text.crt.dos.string.memory", libd_strstartcmp, libc_strstartcmp, TD, 2, TP, TP)
 DFUN(".text.crt.dos.string.memory", libd_strstartcmpz, libc_strstartcmpz, TD, 3, TP, TP, TI)
 DFUN(".text.crt.dos.string.memory", libd_bitcpy, libc_bitcpy, TV, 5, TP, TI, TP, TI, TI)
+DFUN(".text.crt.dos.string.memory", libd_strrstr, libc_strrstr, TP, 2, TP, TP)
 DFUN(".text.crt.dos.unicode.static.memory", libd_strlwr, libc_strlwr, TP, 1, TP)
 DFUN(".text.crt.dos.unicode.static.memory", libd_strupr, libc_strupr, TP, 1, TP)
 DFUN(".text.crt.dos.string.memory", libd_strset, libc_strset, TP, 2, TP, TD)

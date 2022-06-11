@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe98fc49 */
+/* HASH CRC-32:0x8f389ca9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7503,6 +7503,12 @@ __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_INOUTS(1, 2) __ATTR_NONNULL((1))
 #include <libc/local/string/strnupr.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(strnupr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_INOUTS(1, 2) __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL strnupr)(char *__restrict __str, __SIZE_TYPE__ __maxlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnupr))(__str, __maxlen); })
 #endif /* !__CRT_HAVE_strnupr */
+#ifdef __CRT_HAVE_memrev
+__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_INOUTS(1, 2) __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,memrev,(void *__restrict __base, __SIZE_TYPE__ __n_bytes),(__base,__n_bytes))
+#else /* __CRT_HAVE_memrev */
+#include <libc/local/string/memrev.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(memrev, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_INOUTS(1, 2) __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBCCALL memrev)(void *__restrict __base, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrev))(__base, __n_bytes); })
+#endif /* !__CRT_HAVE_memrev */
 #ifdef __USE_XOPEN2K8
 #ifdef __CRT_HAVE_strncoll_l
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strncoll_l,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),(__s1,__s2,__maxlen,__locale))
@@ -7562,12 +7568,6 @@ __CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_INOUTS(1, 2) __ATTR_NONNULL((1))
 #include <libc/local/string/strnupr_l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(strnupr_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_INOUTS(1, 2) __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL strnupr_l)(char *__restrict __str, __SIZE_TYPE__ __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strnupr_l))(__str, __maxlen, __locale); })
 #endif /* !__CRT_HAVE_strnupr_l */
-#ifdef __CRT_HAVE_memrev
-__CDECLARE(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_INOUTS(1, 2) __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,memrev,(void *__restrict __base, __SIZE_TYPE__ __n_bytes),(__base,__n_bytes))
-#else /* __CRT_HAVE_memrev */
-#include <libc/local/string/memrev.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(memrev, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_INOUTS(1, 2) __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBCCALL memrev)(void *__restrict __base, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrev))(__base, __n_bytes); })
-#endif /* !__CRT_HAVE_memrev */
 #endif /* __USE_XOPEN2K8 */
 #ifdef __USE_STRING_BWLQ
 #ifdef __CRT_HAVE_memrev
@@ -7663,6 +7663,44 @@ __CDECLARE_VOID(__ATTR_IN(3) __ATTR_OUT(1),__NOTHROW_NCX,bitcpy,(void *__restric
  * >> assert(dst == 0b10010000); */
 __NAMESPACE_LOCAL_USING_OR_IMPL(bitcpy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_OUT(1) void __NOTHROW_NCX(__LIBCCALL bitcpy)(void *__restrict __dst_base, size_t __dst_bit_offset, void const *__restrict __src_base, size_t __src_bit_offset, size_t __num_bits) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bitcpy))(__dst_base, __dst_bit_offset, __src_base, __src_bit_offset, __num_bits); })
 #endif /* !__CRT_HAVE_bitcpy */
+#ifdef __CRT_HAVE_strrstr
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
+extern "C++" {
+/* >> strrstr(3)
+ * Find the last instance of `needle' appearing as a sub-string within `haystack'
+ * If no such needle exists, return `NULL' */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),char *,__NOTHROW_NCX,strrstr,(char *__haystack, char const *__needle),strrstr,(__haystack,__needle))
+/* >> strrstr(3)
+ * Find the last instance of `needle' appearing as a sub-string within `haystack'
+ * If no such needle exists, return `NULL' */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),char const *,__NOTHROW_NCX,strrstr,(char const *__haystack, char const *__needle),strrstr,(__haystack,__needle))
+} /* extern "C++" */
+#else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
+/* >> strrstr(3)
+ * Find the last instance of `needle' appearing as a sub-string within `haystack'
+ * If no such needle exists, return `NULL' */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),char *,__NOTHROW_NCX,strrstr,(char const *__haystack, char const *__needle),(__haystack,__needle))
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
+#else /* __CRT_HAVE_strrstr */
+#include <libc/local/string/strrstr.h>
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
+extern "C++" {
+/* >> strrstr(3)
+ * Find the last instance of `needle' appearing as a sub-string within `haystack'
+ * If no such needle exists, return `NULL' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) char *__NOTHROW_NCX(__LIBCCALL strrstr)(char *__haystack, char const *__needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strrstr))(__haystack, __needle); }
+/* >> strrstr(3)
+ * Find the last instance of `needle' appearing as a sub-string within `haystack'
+ * If no such needle exists, return `NULL' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) char const *__NOTHROW_NCX(__LIBCCALL strrstr)(char const *__haystack, char const *__needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strrstr))(__haystack, __needle); }
+} /* extern "C++" */
+#else /* __cplusplus && __CORRECT_ISO_CPP_STRING_H_PROTO */
+/* >> strrstr(3)
+ * Find the last instance of `needle' appearing as a sub-string within `haystack'
+ * If no such needle exists, return `NULL' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(strrstr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) char *__NOTHROW_NCX(__LIBCCALL strrstr)(char const *__haystack, char const *__needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strrstr))(__haystack, __needle); })
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
+#endif /* !__CRT_HAVE_strrstr */
 #endif /* __USE_KOS */
 
 

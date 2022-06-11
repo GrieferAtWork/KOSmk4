@@ -335,7 +335,7 @@ NOTHROW(FCALL module_mman_cleanup_lop)(Toblockop(mman) *__restrict self,
  * NOTE: This function inherits a weak reference to `self->md_mman',
  *       as well as a weak reference to `self'! */
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL module_clear_mnode_pointers_and_destroy)(struct module *__restrict self) {
+NOTHROW(FCALL module_clear_mnode_pointers_and_destroy)(WEAK REF struct module *__restrict self) {
 	REF struct mman *mm;
 	mm = self->md_mman;
 

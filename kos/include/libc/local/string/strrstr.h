@@ -1,3 +1,4 @@
+/* HASH CRC-32:0xcbd999b6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,56 +18,33 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODNE2K_UTIL_C
-#define GUARD_MODNE2K_UTIL_C 1
-#define _KOS_SOURCE 1
-
-#include <kernel/compiler.h>
-
-#include <kernel/driver.h>
-#include <kernel/except.h>
-#include <kernel/isr.h>
-#include <kernel/printk.h>
-#include <sched/cpu.h>
-#include <sched/task.h>
-
-#include <hw/net/ne2k.h>
-#include <kos/except/reason/io.h>
-#include <sys/io.h>
-
-#include <stddef.h>
-#include <string.h>
-
-#include "ne2k.h"
-
-DECL_BEGIN
-
-INTERN void KCALL Ne2k_ResetCard(port_t iobase) THROWS(E_IOERROR_TIMEOUT) {
-	struct timespec timeout;
-	u8 reset_word;
-	/* Select page #0 */
-	outb(E8390_CMD(iobase), E8390_STOP | E8390_PAGE0 | E8390_NODMA);
-
-	/* Set the card */
-	reset_word = inb(NE_RESET(iobase));
-	outb(NE_RESET(iobase), reset_word);
-
-	/* Wait for the reset to be completed. */
-	timeout = realtime();
-	timeout.add_milliseconds(400);
-	while (!(inb(EN0_ISR(iobase)) & ENISR_RESET)) {
-		if (realtime() > timeout) {
-			printk(KERN_WARNING "[ne2k] Card at %#I16x failed to acknowledge reset\n",
-			       iobase);
-			THROW(E_IOERROR_TIMEOUT,
-			      E_IOERROR_SUBSYSTEM_NET,
-			      E_IOERROR_REASON_NE2K_RESET_ACK);
+#ifndef __local_strrstr_defined
+#define __local_strrstr_defined
+#include <__crt.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(strrstr) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) char *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strrstr))(char const *__haystack, char const *__needle) {
+	char *__result = __NULLPTR;
+	char __ch, __needle_start = *__needle++;
+	while ((__ch = *__haystack++) != '\0') {
+		if (__ch == __needle_start) {
+			char const *__hay2, *__ned_iter;
+			__hay2     = __haystack;
+			__ned_iter = __needle;
+			while ((__ch = *__ned_iter++) != '\0') {
+				if (*__hay2++ != __ch)
+					goto __miss;
+			}
+			__result = (char *)__haystack - 1;
 		}
-		task_tryyield_or_pause();
+__miss:
+		;
 	}
+	return __result;
 }
-
-
-DECL_END
-
-#endif /* !GUARD_MODNE2K_UTIL_C */
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_strrstr_defined
+#define __local___localdep_strrstr_defined
+#define __localdep_strrstr __LIBC_LOCAL_NAME(strrstr)
+#endif /* !__local___localdep_strrstr_defined */
+#endif /* !__local_strrstr_defined */

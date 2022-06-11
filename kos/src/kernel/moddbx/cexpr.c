@@ -202,7 +202,7 @@ PUBLIC size_t cexpr_stacksize = 0;
  * During a debugger reset, this option is reset to `false' */
 PUBLIC bool cexpr_readonly = false;
 
-/* Don't calculate/keep track of c expression values, but
+/* Don't calculate/keep track of C expression values, but
  * only simulate the effective expression type. - Used to
  * implement `typeof()' in C expressions, as well as  for
  * the  purpose of auto-completion of struct member names
@@ -385,8 +385,12 @@ NOTHROW(FCALL module_scan_reloc_for_DlModule)(struct module *__restrict self,
                                               struct libdl_dlmodule **__restrict presult,
                                               uintptr_t r_offset, uintptr_t r_info,
                                               uintptr_t r_addend) {
+	uintptr_t r_type;
 	(void)r_addend;
-	switch (ELF32_R_TYPE(r_info)) {
+	r_type = module_sizeof_pointer(self) == 4
+	         ? ELF32_R_TYPE(r_info)
+	         : ELF64_R_TYPE(r_info);
+	switch (r_type) {
 
 #ifdef __x86_64__
 	case R_X86_64_DTPMOD64: {
@@ -1395,14 +1399,14 @@ FUNDEF NONNULL((1, 2)) dbx_errno_t /* Push `(typ)(*(typ const *)data)' */
 NOTHROW(FCALL cexpr_pushdata)(struct ctyperef const *__restrict typ,
                               void const *__restrict data) {
 	struct cvalue *valp;
-	void *buffer;
-	size_t buflen;
 	valp = _cexpr_pushalloc();
 	if unlikely(!valp)
 		return DBX_ENOMEM;
 	if (cexpr_typeonly) {
 		valp->cv_kind = CVALUE_KIND_VOID;
 	} else {
+		void *buffer;
+		size_t buflen;
 		buflen = ctype_sizeof(typ->ct_typ);
 		if (buflen <= sizeof(valp->cv_idata)) {
 			buffer        = valp->cv_idata;
@@ -1425,13 +1429,13 @@ FUNDEF NONNULL((1)) dbx_errno_t /* Push `(typ)value' */
 NOTHROW(FCALL cexpr_pushint)(struct ctyperef const *__restrict typ,
                              uintmax_t value) {
 	struct cvalue *valp;
-	size_t buflen;
 	valp = _cexpr_pushalloc();
 	if unlikely(!valp)
 		return DBX_ENOMEM;
 	if (cexpr_typeonly) {
 		valp->cv_kind = CVALUE_KIND_VOID;
 	} else {
+		size_t buflen;
 		buflen = ctype_sizeof(typ->ct_typ);
 		switch (buflen) {
 		case 1: *(uint8_t *)valp->cv_idata = (uint8_t)value; break;
@@ -1549,7 +1553,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_dup)(void) {
 
 #define MOVE_CVALUE(dst, src) memcpy(&(dst), &(src), sizeof(struct cvalue))
 
-/* Swap the two 2 c expression stack elements.
+/* Swap the two 2 C expression stack elements.
  * @return: DBX_EOK:     Success
  * @return: DBX_EINTERN: The stack size is < 2 */
 PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_swap)(void) {
@@ -1562,7 +1566,7 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_swap)(void) {
 	return DBX_EOK;
 }
 
-/* Rotate the top n c expression stack elements left/right.
+/* Rotate the top n C expression stack elements left/right.
  * When  `n <= 1', these  calls are  a no-op  in regards to
  * @return: DBX_EOK:     Success
  * @return: DBX_EINTERN: The stack size is < n */
@@ -2284,7 +2288,7 @@ NOTHROW(FCALL cvalue_setbool)(struct cvalue *__restrict self,
 	bzero(self->cv_idata, sizeof(self->cv_idata));
 	ctyperef_fini(&self->cv_type);
 	bzero(&self->cv_type, sizeof(self->cv_type));
-	self->cv_type.ct_typ    = incref(&ctype_bool);
+	self->cv_type.ct_typ = incref(&ctype_bool);
 	*(bool *)self->cv_idata = value;
 }
 
@@ -2301,7 +2305,7 @@ NOTHROW(FCALL cvalue_setptrdiff_t)(struct cvalue *__restrict self,
 	bzero(self->cv_idata, sizeof(self->cv_idata));
 	ctyperef_fini(&self->cv_type);
 	bzero(&self->cv_type, sizeof(self->cv_type));
-	self->cv_type.ct_typ    = incref(&ctype_ptrdiff_t);
+	self->cv_type.ct_typ = incref(&ctype_ptrdiff_t);
 	*(ptrdiff_t *)self->cv_idata = value;
 }
 
@@ -2592,7 +2596,7 @@ swap_operands_and_again:
 			return result;
 		goto again;
 	}
-	/* And with that, everything relating to boolean types is off the table.
+	/* And with that, everything relating to floating-point types is off the table.
 	 * Next up: Deal with pointer types. */
 	if (CTYPE_KIND_ISPOINTER(lhs_typ->ct_kind)) {
 		uintptr_t lhs_value, rhs_value;
@@ -2634,11 +2638,11 @@ swap_operands_and_again:
 			}
 		}
 		if (CTYPE_KIND_ISPOINTER(rhs_typ->ct_kind)) {
-			/* Makre sure that pointer bases are identical. */
+			/* Make sure that pointer bases are identical. */
 			if (!ctype_equal(lhs_typ->ct_pointer.cp_base.ct_typ,
 			                 rhs_typ->ct_pointer.cp_base.ct_typ))
 				return DBX_ESYNTAX;
-			/* Only '-' and compare operators can be used with both operands are pointers. */
+			/* Only '-' and compare operators can be used when both operands are pointers. */
 do_pointer_pointer_op:
 			switch (op) {
 
@@ -2748,10 +2752,10 @@ do_pointer_pointer_op:
 			/* NON_PONITER + POINTER -> POINTER + NON_PONITER */
 			goto swap_operands_and_again;
 
-			/* We now that `lhs_typ' isn't a pointer, but `rhs_typ' is.
-			 * For  the comparison operators, simply flip the operands,
-			 * as  well as the  operation so we  can re-use the special
-			 * handling already done when the LHS-operand is a pointer. */
+			/* We know that `lhs_typ' isn't a pointer, but `rhs_typ' is.
+			 * For  the comparison operators,  simply flip the operands,
+			 * as well as  the operation  so we can  re-use the  special
+			 * handling already done when the LHS-operand is a  pointer. */
 		case CTOKEN_TOK_EQUALS_EQUALS:
 		case CTOKEN_TOK_XCLAIM_EQUALS: goto swap_operands_and_again;
 		case '<': /*                */ op = '>'; /*                */ goto swap_operands_and_again;
@@ -3201,7 +3205,14 @@ NOTHROW(FCALL cexpr_pushsymbol)(struct cmodsyminfo *__restrict sym,
 		 * through the debug information of those modules in search of one that
 		 * makes  a reference to an external symbol of the same name, and if we
 		 * manage to find such a  reference, then we can  make use of its  type
-		 * information to complete what we couldn't find earlier! */
+		 * information to complete what we couldn't find earlier!
+		 *
+		 * This  can happen if `sym' is exported from hard-written assembly, in
+		 * which case there won't be  any C-style debug information  associated
+		 * with it, but it probably can still be accessed using a C-type (after
+		 * all: everything can), so if some other module does so, we can re-use
+		 * it's debug information!
+		 */
 	}
 
 	if (!sym->clv_data.s_var.v_typeinfo && cmodsyminfo_issip(sym)) {
@@ -3211,13 +3222,13 @@ NOTHROW(FCALL cexpr_pushsymbol)(struct cmodsyminfo *__restrict sym,
 		 * the symbol's Elf(32|64)_Sym entry.
 		 *
 		 * Using that entry, we can:
-		 *   - Determine if  it's  a  function,  and  if  it  is:
-		 *     Use `void(...)' as type (i.e. void-return+varargs)
-		 *   - Figure  out  the  symbol's  size,  and  select an
-		 *     appropriate integer type based on that knowledge:
-		 *      - If the size is the same as that of a pointer, assume that it's a pointer
-		 *      - Otherwise, select the proper 1,2,4 or 8-byte unsigned integer type
-		 *      - Otherwise, interpret as an array of byte_t-s. */
+		 *  - Determine if  it's a  function,  and if  it  is:
+		 *    Use `int(...)' as type (i.e. int-return+varargs)
+		 *  - Figure  out  the  symbol's  size,  and  select an
+		 *    appropriate integer type based on that knowledge:
+		 *     - If the size is the same as that of a pointer, assume that it's a pointer
+		 *     - Otherwise, select the proper 1,2,4 or 8-byte unsigned integer type
+		 *     - Otherwise, interpret as an array of byte_t-s. */
 		CLinkerSymbol const *sip;
 		unsigned char st_info;
 		size_t st_size;
@@ -3232,13 +3243,13 @@ NOTHROW(FCALL cexpr_pushsymbol)(struct cmodsyminfo *__restrict sym,
 			goto fallback_load_opt_type;
 		}
 		bzero(&symtype, sizeof(symtype));
-		if (ELF32_ST_TYPE(st_info) == STT_FUNC) {
+		if (ELF_ST_TYPE(st_info) == STT_FUNC) {
 			symtype.ct_typ = &ctype_int;
 			symtype.ct_typ = ctype_function(&symtype, 0, NULL,
 			                                CTYPE_KIND_FUNPROTO_VARARGS);
 			if unlikely(!symtype.ct_typ)
 				goto err_csym_nomem;
-		} else if (ELF32_ST_TYPE(st_info) == STT_OBJECT) {
+		} else if (ELF_ST_TYPE(st_info) == STT_OBJECT) {
 			if (st_size == dbg_current_sizeof_pointer()) {
 				symtype.ct_typ = incref(&ctype_void_ptr);
 			} else {
@@ -3358,7 +3369,7 @@ got_symbol_type:
 					}
 				}
 
-				/* Do special handling for this[|mman|cpu]_* globals from the kernel core!
+				/* Do special handling for this(|mman|cpu)_* globals from the kernel core.
 				 * When accessed, automatically include an  addend to the relevant  object
 				 * in relation to dbg_current, such  that the user can directly  reference
 				 * these objects without having to manually sym@object them.

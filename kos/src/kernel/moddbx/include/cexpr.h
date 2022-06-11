@@ -46,7 +46,7 @@ DECL_BEGIN
 
 #define CVALUE_INLINE_MAXSIZE 16 /* Max buffer size for in-line R-value data. */
 
-#define CVALUE_KIND_VOID     0 /* No value */
+#define CVALUE_KIND_VOID     0 /* No value (s.a. `cexpr_typeonly') */
 #define CVALUE_KIND_ADDR     1 /* L-value: Value is stored in-memory */
 #define CVALUE_KIND_EXPR     2 /* LR-value: Value uses a custom CFI expression */
 #define CVALUE_KIND_IEXPR    3 /* LR-value: Value uses a custom CFI expression (with an in-line buffer) */
@@ -96,14 +96,14 @@ struct cvalue {
 		byte_t  cv_idata[CVALUE_INLINE_MAXSIZE]; /* [valid_if(CVALUE_KIND_IDATA)] In-line data. */
 
 		struct {
-			struct cvalue_cfiexpr   v_expr;   /* CFI expression. */
-			size_t                  v_buflen; /* Buffer length */
-			size_t                  v_bufoff; /* Offset into `v_buffer' */
+			struct cvalue_cfiexpr v_expr;   /* CFI expression. */
+			size_t                v_buflen; /* Buffer length */
+			size_t                v_bufoff; /* Offset into `v_buffer' */
 			union {
-				void               *v_buffer; /* [0..v_buflen][owned] Lazily allocated expression data-buffer. */
-				byte_t              v_ibuffer[sizeof(void *)]; /* [valid_if(CVALUE_KIND_IEXPR)] In-line buffer. */
+				void             *v_buffer; /* [0..v_buflen][owned] Lazily allocated expression data-buffer. */
+				byte_t            v_ibuffer[sizeof(void *)]; /* [valid_if(CVALUE_KIND_IEXPR)] In-line buffer. */
 			};
-		}            cv_expr;     /* [valid_if(CVALUE_KIND_EXPR | CVALUE_KIND_IEXPR)] CFI expression. */
+		} cv_expr; /* [valid_if(CVALUE_KIND_EXPR | CVALUE_KIND_IEXPR)] CFI expression. */
 		struct {
 			unsigned int r_regid;                          /* Arch-specific register index. */
 			size_t       r_buflen;                         /* Buffer length. */
@@ -146,7 +146,7 @@ DATDEF size_t cexpr_stacksize;
  * During a debugger reset, this option is reset to `false' */
 DATDEF __BOOL cexpr_readonly;
 
-/* Don't calculate/keep track of c expression values, but
+/* Don't calculate/keep track of C expression values, but
  * only simulate the effective expression type. - Used to
  * implement `typeof()' in C expressions, as well as  for
  * the  purpose of auto-completion of struct member names
@@ -209,12 +209,12 @@ FUNDEF void NOTHROW(FCALL cexpr_empty)(void);
  * @return: DBX_EINTERN: The stack is empty. */
 FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_dup)(void);
 
-/* Swap the two 2 c expression stack elements.
+/* Swap the two 2 C expression stack elements.
  * @return: DBX_EOK:     Success
  * @return: DBX_EINTERN: The stack size is < 2 */
 FUNDEF dbx_errno_t NOTHROW(FCALL cexpr_swap)(void);
 
-/* Rotate the top n c expression stack elements left/right.
+/* Rotate the top n C expression stack elements left/right.
  * When  `n <= 1', these  calls are  a no-op  in regards to
  * @return: DBX_EOK:     Success
  * @return: DBX_EINTERN: The stack size is < n */

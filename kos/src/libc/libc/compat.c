@@ -1783,13 +1783,20 @@ libc_siginfolist_init(char const **list, unsigned int count, signo_t signo) {
 	return list;
 }
 
-#define DEFINE_LIBC_SIGINFO_LIST(name, N, signo)                                         \
-	PRIVATE ATTR_SECTION(".bss.crt.solaris") char const *libc_##name[N] = {};            \
-	DEFINE_PUBLIC_IDATA_G(name, libc_##name##_init, N * __SIZEOF_POINTER__);             \
-	INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.solaris")           \
-	char const **LIBCCALL libc_##name##_init(void) {                                     \
-		return libc_siginfolist_init(libc_##name, N, signo);                             \
-	}                                                                                    \
+#if defined(__OPTIMIZE_SIZE__) || 1
+/* No need to  cache symbol  addresses. -  These only  get used  by
+ * `libc__sys_siginfolistp_init()', and (ignoring race conditions),
+ * that function only needs them once. */
+#define DEFINE_LIBC_SIGINFO_LIST_LOOKUP(name)                                            \
+	PRIVATE ATTR_SECTION(".rodata.crt.solaris") char const libc_##name##_name[] = #name; \
+	PRIVATE ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.solaris")          \
+	char const **LIBCCALL libc_##name##_lookup(void) {                                   \
+		char const **result = (char const **)dlsym(RTLD_DEFAULT, libc_##name##_name);    \
+		assert(result);                                                                  \
+		return result;                                                                   \
+	}
+#else /* ... */
+#define DEFINE_LIBC_SIGINFO_LIST_LOOKUP(name)                                            \
 	PRIVATE ATTR_SECTION(".rodata.crt.solaris") char const libc_##name##_name[] = #name; \
 	PRIVATE ATTR_SECTION(".bss.crt.solaris") char const **libc_##name##_addr = NULL;     \
 	PRIVATE ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.solaris")          \
@@ -1800,6 +1807,15 @@ libc_siginfolist_init(char const **list, unsigned int count, signo_t signo) {
 		}                                                                                \
 		return libc_##name##_addr;                                                       \
 	}
+#endif /* !... */
+#define DEFINE_LIBC_SIGINFO_LIST(name, N, signo)                                         \
+	PRIVATE ATTR_SECTION(".bss.crt.solaris") char const *libc_##name[N] = {};            \
+	DEFINE_PUBLIC_IDATA_G(name, libc_##name##_init, N * __SIZEOF_POINTER__);             \
+	INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.solaris")           \
+	char const **LIBCCALL libc_##name##_init(void) {                                     \
+		return libc_siginfolist_init(libc_##name, N, signo);                             \
+	}                                                                                    \
+	DEFINE_LIBC_SIGINFO_LIST_LOOKUP(name)
 #undef _sys_illlist
 #undef _sys_fpelist
 #undef _sys_segvlist
@@ -1821,6 +1837,7 @@ DEFINE_LIBC_SIGINFO_LIST(_sys_polllist, N_SYS_POLLLIST, SIGPOLL)
 #define _sys_traplist libc__sys_traplist_lookup()
 #define _sys_cldlist  libc__sys_cldlist_lookup()
 #define _sys_polllist libc__sys_polllist_lookup()
+#undef DEFINE_LIBC_SIGINFO_LIST_LOOKUP
 #undef DEFINE_LIBC_SIGINFO_LIST
 
 /* Define the per-signal information lookup table. */
@@ -1851,11 +1868,6 @@ struct siginfolist const **LIBCCALL libc__sys_siginfolistp_init(void) {
 	}
 	return &libc__sys_siginfolistp;
 }
-
-
-
-
-
 
 DECL_END
 

@@ -7200,6 +7200,19 @@ strnupr:([[inout(strnlen(., maxlen))]] char *__restrict str, $size_t maxlen) -> 
 	return str;
 }
 
+[[leaf, decl_include("<hybrid/typecore.h>")]]
+memrev:([[inout(n_bytes)]] void *__restrict base,
+        $size_t n_bytes) -> [[== base]] void * {
+	byte_t *iter, *end;
+	end = (iter = (byte_t *)base) + n_bytes;
+	while (iter < end) {
+		byte_t temp = *iter;
+		*iter++ = *--end;
+		*end = temp;
+	}
+	return base;
+}
+
 
 %#ifdef __USE_XOPEN2K8
 [[decl_include("<hybrid/typecore.h>")]]
@@ -7270,19 +7283,6 @@ strnupr_l:([[inout(strnlen(., maxlen))]] char *__restrict str,
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
 		*iter = (char)toupper_l((unsigned char)ch, locale);
 	return str;
-}
-
-[[leaf, decl_include("<hybrid/typecore.h>")]]
-memrev:([[inout(n_bytes)]] void *__restrict base,
-        $size_t n_bytes) -> [[== base]] void * {
-	byte_t *iter, *end;
-	end = (iter = (byte_t *)base) + n_bytes;
-	while (iter < end) {
-		byte_t temp = *iter;
-		*iter++ = *--end;
-		*end = temp;
-	}
-	return base;
 }
 %#endif /* __USE_XOPEN2K8 */
 
@@ -7457,6 +7457,34 @@ void bitcpy([[out]] void *__restrict dst_base, size_t dst_bit_offset,
 	}
 }
 
+
+@@>> strrstr(3)
+@@Find the last instance of `needle' appearing as a sub-string within `haystack'
+@@If no such needle exists, return `NULL'
+[[wunused, pure]]
+[[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_STRRSTR))]]
+char *strrstr([[in]] char const *haystack, [[in]] char const *needle)
+	[([[in]] char *haystack, [[in]] char const *needle): char *]
+	[([[in]] char const *haystack, [[in]] char const *needle): char const *]
+{
+	char *result = NULL;
+	char ch, needle_start = *needle++;
+	while ((ch = *haystack++) != '\0') {
+		if (ch == needle_start) {
+			char const *hay2, *ned_iter;
+			hay2     = haystack;
+			ned_iter = needle;
+			while ((ch = *ned_iter++) != '\0') {
+				if (*hay2++ != ch)
+					goto miss;
+			}
+			result = (char *)haystack - 1;
+		}
+miss:
+		;
+	}
+	return result;
+}
 
 %#endif /* __USE_KOS */
 

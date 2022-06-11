@@ -191,14 +191,14 @@ struct ctype {
 	uintptr_half_t ct_kind;     /* The kind of type (one of `CTYPE_KIND_*'). */
 	struct ctype  *ct_children; /* [0..1] Derived types (all of these have `CTYPE_KIND_HASSIBLING()') */
 	union {
-		struct cmoduledip ct_enum; /* [valid_if(CTYPE_KIND_ISENUM)] Enum    information.    Points    just
-		                            * past the `DW_TAG_enumeration_type' tag of the surrounding enumerator
+		struct cmoduledip ct_enum; /* [valid_if(CTYPE_KIND_ISENUM)] Enum information. Points just past
+		                            * the  `DW_TAG_enumeration_type' tag of the surrounding enumerator
 		                            * (scan this region for `DW_TAG_enumerator' child elements). */
 
 		struct {
 			struct cmoduledip ct_info;   /* Struct information. Points just past the `DW_TAG_structure_type'
-			                              * (or   similar)   tag   of   the   surrounding   structure  (scan
-			                              * this region for `DW_TAG_member' child elements). */
+			                              * (or similar) tag of the surrounding structure (scan this  region
+			                              * for `DW_TAG_member' child elements). */
 			size_t            ct_sizeof; /* Sizeof() this struct. */
 		} ct_struct; /* [valid_if(CTYPE_KIND_ISSTRUCT)] */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18013a55 */
+/* HASH CRC-32:0xa5a5b105 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5711,6 +5711,18 @@ NOTHROW_NCX(LIBCCALL libc_strnupr)(char *__restrict str,
 		*iter = (char)libc_toupper((unsigned char)ch);
 	return str;
 }
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL ATTR_INOUTS(1, 2) NONNULL((1)) void *
+NOTHROW_NCX(LIBCCALL libc_memrev)(void *__restrict base,
+                                  size_t n_bytes) {
+	byte_t *iter, *end;
+	end = (iter = (byte_t *)base) + n_bytes;
+	while (iter < end) {
+		byte_t temp = *iter;
+		*iter++ = *--end;
+		*end = temp;
+	}
+	return base;
+}
 INTERN ATTR_SECTION(".text.crt.unicode.locale.memory") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_strncoll_l)(char const *s1,
                                       char const *s2,
@@ -5769,18 +5781,6 @@ NOTHROW_NCX(LIBCCALL libc_strnupr_l)(char *__restrict str,
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
 		*iter = (char)libc_toupper_l((unsigned char)ch, locale);
 	return str;
-}
-INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL ATTR_INOUTS(1, 2) NONNULL((1)) void *
-NOTHROW_NCX(LIBCCALL libc_memrev)(void *__restrict base,
-                                  size_t n_bytes) {
-	byte_t *iter, *end;
-	end = (iter = (byte_t *)base) + n_bytes;
-	while (iter < end) {
-		byte_t temp = *iter;
-		*iter++ = *--end;
-		*end = temp;
-	}
-	return base;
 }
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_INOUT(1) uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memrevw)(void *__restrict base,
@@ -5945,6 +5945,32 @@ NOTHROW_NCX(LIBCCALL libc_bitcpy)(void *__restrict dst_base,
 	}
 }
 #ifndef __KERNEL__
+#ifndef LIBC_ARCH_HAVE_STRRSTR
+/* >> strrstr(3)
+ * Find the last instance of `needle' appearing as a sub-string within `haystack'
+ * If no such needle exists, return `NULL' */
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) char *
+NOTHROW_NCX(LIBCCALL libc_strrstr)(char const *haystack,
+                                   char const *needle) {
+	char *result = NULL;
+	char ch, needle_start = *needle++;
+	while ((ch = *haystack++) != '\0') {
+		if (ch == needle_start) {
+			char const *hay2, *ned_iter;
+			hay2     = haystack;
+			ned_iter = needle;
+			while ((ch = *ned_iter++) != '\0') {
+				if (*hay2++ != ch)
+					goto miss;
+			}
+			result = (char *)haystack - 1;
+		}
+miss:
+		;
+	}
+	return result;
+}
+#endif /* !LIBC_ARCH_HAVE_STRRSTR */
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_INOUT(1) char *
 NOTHROW_NCX(LIBCCALL libc_strlwr)(char *__restrict str) {
 	char *iter, ch;
@@ -7436,6 +7462,7 @@ DEFINE_PUBLIC_ALIAS(strncasecoll, libc_strncasecoll);
 DEFINE_PUBLIC_ALIAS(strnrev, libc_strnrev);
 DEFINE_PUBLIC_ALIAS(strnlwr, libc_strnlwr);
 DEFINE_PUBLIC_ALIAS(strnupr, libc_strnupr);
+DEFINE_PUBLIC_ALIAS(memrev, libc_memrev);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strncoll_l, libc_strncoll_l);
 #endif /* __LIBCCALL_IS_LIBDCALL */
@@ -7458,7 +7485,6 @@ DEFINE_PUBLIC_ALIAS(_strupr_l, libc_strupr_l);
 DEFINE_PUBLIC_ALIAS(strupr_l, libc_strupr_l);
 DEFINE_PUBLIC_ALIAS(strnlwr_l, libc_strnlwr_l);
 DEFINE_PUBLIC_ALIAS(strnupr_l, libc_strnupr_l);
-DEFINE_PUBLIC_ALIAS(memrev, libc_memrev);
 DEFINE_PUBLIC_ALIAS(memrevw, libc_memrevw);
 DEFINE_PUBLIC_ALIAS(memrevl, libc_memrevl);
 DEFINE_PUBLIC_ALIAS(memrevq, libc_memrevq);
@@ -7467,6 +7493,9 @@ DEFINE_PUBLIC_ALIAS(strcmpz, libc_strcmpz);
 DEFINE_PUBLIC_ALIAS(strstartcmp, libc_strstartcmp);
 DEFINE_PUBLIC_ALIAS(strstartcmpz, libc_strstartcmpz);
 DEFINE_PUBLIC_ALIAS(bitcpy, libc_bitcpy);
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_STRRSTR)
+DEFINE_PUBLIC_ALIAS(strrstr, libc_strrstr);
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_STRRSTR */
 #ifndef __KERNEL__
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strlwr, libc_strlwr);

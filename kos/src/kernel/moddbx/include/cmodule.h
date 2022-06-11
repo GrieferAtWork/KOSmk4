@@ -73,14 +73,13 @@ DECL_BEGIN
  *           is represented as  CMODSYM_DIP_NS_MIXED, where type  info
  *           for  the symbol originates  from .debug_info, but address
  *           information originates from .symtab
- *         - If the symbol  from .debug_info  has a type  and a  location,
- *           that    location    is   (attempted    to    be)   evaluated.
- *           If  the  location isn't  an  address, the  address  cannot be
- *           calculated (e.g. because it's TLS), or if its address differs
- *           from the  symbol's  address  from .symtab,  then  the  symbol
- *           from .debug_info  is  added  to  the  current  per-CU  symbol
- *           table,  and  the  original  .symtab  symbol  is  marked  with
- *           `CMODSYM_DIP_NS_FCONFLICT'
+ *         - If the symbol from .debug_info has a type and a location,  that
+ *           location is (attempted to be) evaluated. If the location  isn't
+ *           an address, the address cannot be calculated (e.g. because it's
+ *           TLS),  or if its address differs from the symbol's address from
+ *           .symtab,  then  the symbol  from  .debug_info is  added  to the
+ *           current per-CU symbol  table, and the  original .symtab  symbol
+ *           is marked with `CMODSYM_DIP_NS_FCONFLICT'
  *         - If the address from .debug_info could be evaluated, and  that
  *           address matches the symbol's  address from .symtab, then  the
  *           symbol entry simply becomes a normal `CMODSYM_DIP_NS_NORMAL',
@@ -294,10 +293,10 @@ struct cmodule {
 	struct cmodsymtab                        cm_symbols;  /* Per-module debug symbol. */
 	struct cmodmixsymtab                     cm_mixed;    /* Information about mixed symbols. */
 	size_t                                   cm_cuc;      /* [const] # of compilation units. */
-	COMPILER_FLEXIBLE_ARRAY(struct cmodunit, cm_cuv);     /* Complication   units.    (sorted   by    `cu_di_start')
-	                                                       * Note  that `cm_cuv[cm_cuc]' exists only partially, such
-	                                                       * that only its `cu_di_start' may be accessed, which will
-	                                                       * usually  be  equal  to  `cm_sections.ds_debug_info_end' */
+	COMPILER_FLEXIBLE_ARRAY(struct cmodunit, cm_cuv);     /* Complication units. (sorted by `cu_di_start'). Note that
+	                                                       * `cm_cuv[cm_cuc]' exists only  partially, such that  only
+	                                                       * its `cu_di_start' may be accessed, which will usually be
+	                                                       * equal to `cm_sections.ds_debug_info_end' */
 };
 #define cmodule_getloadaddr(self) (self)->cm_module->md_loadaddr
 #define cmodule_getloadmin(self)  (self)->cm_module->md_loadmin
@@ -378,8 +377,9 @@ FUNDEF size_t NOTHROW(FCALL cmodule_clearcache)(__BOOL keep_loaded DFL(0));
 FUNDEF WUNUSED NONNULL((1)) REF struct cmodule *
 NOTHROW(FCALL cmodule_locate)(module_t *__restrict mod);
 
-/* Return the CModule descriptor for a given `addr', which should be a program counter, or data-pointer.
- * If  no  such  module  exists, or  its  descriptor  could  not be  allocated,  return  `NULL' instead.
+/* Return the CModule descriptor for  a given `addr', which  should
+ * be a program counter, or data-pointer. If no such module exists,
+ * or its descriptor could not be allocated, return `NULL' instead.
  * This function is a thin wrapper around `module_fromaddr_nx()' + `cmodule_locate()' */
 FUNDEF WUNUSED NONNULL((1)) REF struct cmodule *
 NOTHROW(FCALL cmodule_ataddr)(void const *addr);
@@ -408,17 +408,17 @@ NOTHROW(FCALL cmodule_loadsyms)(struct cmodule *__restrict self);
  * symbols  had yet to  be loaded, then this  function will make a
  * call to `cmodule_loadsyms()'. If that call fails, this function
  * will simply return `NULL'.
- * To do its job, this function will first look at the  per-module
- * symbol   table    of    `self'    (iow:    `self->cm_symbols').
- * If this table  contains a symbol  matching `name', that  symbol
- * is  then returned, unless it has the `CMODSYM_DIP_NS_FCONFLICT'
- * flag set,  in which  case `dbg_getpcreg(DBG_REGLEVEL_VIEW)'  is
- * checked for being apart of `self'. If it is, try to find the CU
- * associated with that address. If  such a CU exists, check  that
- * CU's symbol table for `name' once again. If that table contains
- * the given `name'  also, return that  symbol. Otherwise (if  any
- * of the above  failed), simply return  the symbol already  found
- * within the module's global symbol table.
+ * To do its job, this function  will first look at the  per-module
+ * symbol table of `self' (iow: `self->cm_symbols'). If this  table
+ * contains a symbol matching `name', that symbol is then returned,
+ * unless it has the `CMODSYM_DIP_NS_FCONFLICT' flag set, in  which
+ * case  `dbg_getpcreg(DBG_REGLEVEL_VIEW)'  is  checked  for  being
+ * apart of `self'. If  it is, try to  find the CU associated  with
+ * that address. If such a CU exists, check that CU's symbol  table
+ * for `name' once again. If  that table contains the given  `name'
+ * also,  return  that  symbol.  Otherwise  (if  any  of  the above
+ * failed), simply  return  the  symbol already  found  within  the
+ * module's global symbol table.
  * @param: ns: When different from `CMODSYM_DIP_NS_NORMAL',  restrict
  *             the search to only  return symbols from the  indicated
  *             namespace. Otherwise, ~try~ to return symbols from the
@@ -455,10 +455,11 @@ NOTHROW(FCALL cmodule_getsym_withhint)(struct cmodule *start_module,
                                        REF struct cmodule **__restrict presult_module,
                                        uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
 
-/* Initialize a debug information CU parser to load debug information for a component located
- * at  `dip' within the `.debug_info' mapping of `self'. For this purpose, this function will
- * locate  the CU that contains `dip', and  proceed to call `cmodunit_parser()' to initialize
- * `result'. If the given `dip' is not apart of any of the CUs of `self', then `result'  will
+/* Initialize a debug information CU parser to load debug information for a
+ * component located at `dip' within  the `.debug_info' mapping of  `self'.
+ * For this purpose, this function will locate the CU that contains  `dip',
+ * and proceed to call `cmodunit_parser()'  to initialize `result'. If  the
+ * given `dip' is not apart of any of the CUs of `self', then `result' will
  * be initialized to always indicate EOF.
  * @param: dip: DebugInfoPointer. (s.a. `cmodunit_parser_from_dip()') */
 FUNDEF NONNULL((1, 2, 3)) void
@@ -566,10 +567,10 @@ NOTHROW(FCALL cmod_syminfo_local)(/*out*/ struct cmodsyminfo *__restrict info,
 
 
 /* Symbol enumeration callback prototype (see functions below)
- * NOTE: This   callback   must  not   modify  `info->clv_parser'   before  returning.
- *       If  it  needs   to  parse   additional  debug  information,   this  must   be
- *       done  via  a   different  parser,   which  may  be   constructed  by   doing:
- *       >> cmodunit_parser_from_dip(info->clv_unit, info->clv_mod, &NEW_PARSER, DIP);
+ * NOTE: This callback must not modify `info->clv_parser' before returning.
+ *       If  it needs to  parse additional debug  information, this must be
+ *       done via a different parser, which may be constructed by doing:
+ * >> cmodunit_parser_from_dip(info->clv_unit, info->clv_mod, &NEW_PARSER, DIP);
  * NOTE: This callback must not modify `info->clv_mod' before returning.
  * NOTE: This callback must not modify `info->clv_unit' before returning,
  *       unless `info_loaded' was  false when then  callback was  called.
@@ -632,8 +633,8 @@ NOTHROW(FCALL cmod_symenum)(/*in|out(undef)*/ struct cmodsyminfo *__restrict inf
  * will instead fill them in itself, as well as clean them up afterwards.
  * NOTE: _DONT_ call `cmod_syminfo_local_fini(info)' after this function returns!
  *       Any cleanup will  have already  been done internally  by this  function!
- * NOTE: The `in(oob_only)' means that only out-of-band data that is used by `cb'
- *       must   be   initialized   prior   to   this   function   being   called.
+ * NOTE: The `in(oob_only)' means that only out-of-band data that is used
+ *       by `cb' must be initialized prior to this function being called.
  * NOTE: The `out(undef)' that all non-[const]  fields are undefined upon  return,
  *       with the exception of out-of-band fields (if any), who's contents depends
  *       on what `cb' may or may not have done.

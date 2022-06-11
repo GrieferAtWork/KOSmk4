@@ -50,23 +50,23 @@ __NAMESPACE_STD_BEGIN
 
 namespace rel_ops {
 template<class __T> __CXX_CLASSMEMBER bool __LIBCCALL
-operator!=(__T const &lhs, __T const &rhs) __CXX_NOEXCEPT_IFNX((bool)!(lhs == rhs)) {
-	return !(lhs == rhs);
+operator!=(__T const &__lhs, __T const &__rhs) __CXX_NOEXCEPT_IFNX((bool)!(__lhs == __rhs)) {
+	return !(__lhs == __rhs);
 }
 
 template<class __T> __CXX_CLASSMEMBER bool __LIBCCALL
-operator>(__T const &lhs, __T const &rhs) __CXX_NOEXCEPT_IFNX((bool)(rhs < lhs)) {
-	return rhs < lhs;
+operator>(__T const &__lhs, __T const &__rhs) __CXX_NOEXCEPT_IFNX((bool)(__rhs < __lhs)) {
+	return __rhs < __lhs;
 }
 
 template<class __T> __CXX_CLASSMEMBER bool __LIBCCALL
-operator<=(__T const &lhs, __T const &rhs) __CXX_NOEXCEPT_IFNX((bool)!(rhs < lhs)) {
-	return !(rhs < lhs);
+operator<=(__T const &__lhs, __T const &__rhs) __CXX_NOEXCEPT_IFNX((bool)!(__rhs < __lhs)) {
+	return !(__rhs < __lhs);
 }
 
 template<class __T> __CXX_CLASSMEMBER bool __LIBCCALL
-operator>=(__T const &lhs, __T const &rhs) __CXX_NOEXCEPT_IFNX((bool)!(lhs < rhs)) {
-	return !(lhs < rhs);
+operator>=(__T const &__lhs, __T const &__rhs) __CXX_NOEXCEPT_IFNX((bool)!(__lhs < __rhs)) {
+	return !(__lhs < __rhs);
 }
 
 } /* namespace rel_ops */
@@ -118,7 +118,7 @@ static __CXX11_CONSTEXPR in_place_type_t in_place_type {};
 
 #ifdef __COMPILER_HAVE_CXX_TEMPLATE_CONSTEXPR
 template<__SIZE_TYPE__ __I> struct in_place_index_t { explicit __CXX_DEFAULT_CTOR(in_place_index_t); };
-template<__SIZE_TYPE__ __I> static __CXX11_CONSTEXPR in_place_index_t<__I> in_place_type {};
+template<__SIZE_TYPE__ __I> static __CXX11_CONSTEXPR in_place_index_t<__I> in_place_index {};
 #endif /* __COMPILER_HAVE_CXX_TEMPLATE_CONSTEXPR */
 #endif /* __USE_ISOCXX17 */
 

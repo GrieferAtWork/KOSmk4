@@ -55,9 +55,9 @@ DECL_BEGIN
  *                  the given `pointer'  isn't a valid  instance of  the
  *                  expected object.
  * @return: * :     The usual pformatprinter return value. */
-typedef NONNULL_T((1, 3, 4)) ssize_t
+typedef NONNULL_T((1, 4)) ssize_t
 (KCALL *obnote_callback_t)(__pformatprinter printer, void *arg,
-                           KERNEL CHECKED void const *pointer,
+                           CHECKED void const *pointer,
                            unsigned int *__restrict pstatus);
 
 struct obnote_entry {
@@ -69,9 +69,9 @@ struct obnote_entry {
  * that   related   to  the   given  `name'.
  * @param: pstatus: [out] Set to one of `OBNOTE_PRINT_STATUS_*'.
  * @return: * :     The usual pformatprinter return value. */
-FUNDEF NONNULL((1, 3, 4, 5)) ssize_t
+FUNDEF NONNULL((1, 4, 5)) ssize_t
 NOTHROW(KCALL obnote_print)(__pformatprinter printer, void *arg,
-                            KERNEL CHECKED void const *pointer,
+                            CHECKED void const *pointer,
                             char const *__restrict name,
                             unsigned int *__restrict pstatus);
 

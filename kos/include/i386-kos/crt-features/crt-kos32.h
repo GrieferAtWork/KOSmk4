@@ -4801,6 +4801,7 @@
 #define __CRT_HAVE_strrev
 #define __CRT_HAVE_strroff
 #define __CRT_HAVE_strrspn
+#define __CRT_HAVE_strrstr
 #define __CRT_HAVE_strsep
 #define __CRT_HAVE_strset
 #define __CRT_HAVE_strsignal

@@ -847,7 +847,7 @@ NOTHROW(KCALL transform_gsbase_register_indices)(unsigned int level, unsigned in
  *       dbg_setregbyname: The register was not written.
  * NOTE: Accepted register names are those found in comments in `<asm/registers.h>'
  * @param: regno: One of `X86_REGISTER_*' (from <asm/registers.h>) or one of `X86_DBGREGISTER_*'
- * @return: * :   The required buffer size, or 0 when `name' isn't recognized. */
+ * @return: * :   The required buffer size, or 0 when `regno' isn't recognized. */
 PUBLIC size_t
 NOTHROW(KCALL x86_dbg_getregbyid)(unsigned int level, unsigned int regno,
                                   void *__restrict buf, size_t buflen) {
