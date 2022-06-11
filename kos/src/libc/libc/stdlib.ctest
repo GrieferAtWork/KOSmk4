@@ -92,6 +92,8 @@ PRIVATE void assert_c32toi(intmax_t expected, char32_t const *str) {
 DEFINE_TEST(strtoi) {
 	ASSERT_STRTOI(0, "0");
 	ASSERT_STRTOI(42, "42");
+	ASSERT_STRTOI(42, "+42");
+	ASSERT_STRTOI(-42, "-42");
 	ASSERT_STRTOI(0, "  0");
 	ASSERT_STRTOI(42, "  42");
 	ASSERT_STRTOI(42, "\n\t 42");
