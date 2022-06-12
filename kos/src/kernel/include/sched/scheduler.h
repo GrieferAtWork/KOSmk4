@@ -90,9 +90,9 @@
  *
  */
 
+#ifdef __CC__
 DECL_BEGIN
 
-#ifdef __CC__
 struct cpu;
 struct task;
 
@@ -421,8 +421,7 @@ FUNDEF NOBLOCK WUNUSED __BOOL NOTHROW(FCALL sched_super_override_trystart)(void)
  * where a completely different thread is the one who engaged the super-override. */
 FUNDEF NOBLOCK ATTR_PURE __BOOL NOTHROW(FCALL sched_super_override_active)(void);
 
-#endif /* __CC__ */
-
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_SCHED_SCHEDULER_H */

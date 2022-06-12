@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16932ce7 */
+/* HASH CRC-32:0xf57ae83a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1046,9 +1046,9 @@ NOTHROW_NCX(LIBCCALL libc_unicode_32to16_n)(char16_t *__restrict utf16_dst,
  *                      a surrogate was written)
  * @return: (size_t)-1: Unicode error (the given input string isn't
  *                      a valid unicode sequence)
- * @return: (size_t)-2: Success, but  no  character  was  generated
- *                      (`s...+=n', together with `mbs' doesn't for
- *                      a full  character, but  `mbs' was  updated) */
+ * @return: (size_t)-2: Success,  but  no  character  was  generated
+ *                      (`s...+=n', together with `mbs' doesn't form
+ *                      a  full  character, but  `mbs'  was updated) */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_INOUT(4) ATTR_INS(2, 3) ATTR_OUT(1) size_t
 NOTHROW_NCX(LIBCCALL libc_unicode_c8toc16)(char16_t *__restrict pc16,
                                            char const *__restrict s,
@@ -1184,9 +1184,9 @@ done:
  *                      is  the  number  of bytes  taken  from `s')
  * @return: (size_t)-1: Unicode error (the given input string isn't
  *                      a valid unicode sequence)
- * @return: (size_t)-2: Success, but  no  character  was  generated
- *                      (`s...+=n', together with `mbs' doesn't for
- *                      a full  character, but  `mbs' was  updated) */
+ * @return: (size_t)-2: Success,  but  no  character  was  generated
+ *                      (`s...+=n', together with `mbs' doesn't form
+ *                      a  full  character, but  `mbs'  was updated) */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_INOUT(4) ATTR_INS(2, 3) ATTR_OUT(1) size_t
 NOTHROW_NCX(LIBCCALL libc_unicode_c8toc32)(char32_t *__restrict pc32,
                                            char const *__restrict s,

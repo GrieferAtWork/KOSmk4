@@ -282,12 +282,12 @@ typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void
 
 [[throws, wunused]]
 [[decl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.utility.stdlib")]]
 [[crt_dos_variant(callback(
 	cook: struct { auto compar = compar; auto arg = arg; },
 	wrap: (void const *a, void const *b, $cook *c): int { return (*c->compar)(a, b, c->arg); },
 	impl: bsearch_r(pkey, pbase, item_count, item_size, (int (LIBCCALL *)(void const *, void const *, void *))&$wrap, &$cook),
 ))]]
-[[section(".text.crt{|.dos}.utility.stdlib")]]
 void *bsearch_r([[in]] void const *pkey, [[in(item_count * item_size)]] void const *pbase, $size_t item_count, $size_t item_size, [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b, void *arg), void *arg)
 	[([[in]] void const *pkey, [[in(item_count * item_size)]] void *pbase, $size_t item_count, $size_t item_size, [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b, void *arg), void *arg): void *]
 	[([[in]] void const *pkey, [[in(item_count * item_size)]] void const *pbase, $size_t item_count, $size_t item_size, [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b, void *arg), void *arg): void const *]
@@ -351,15 +351,15 @@ __LOCAL_LIBC(__invoke_compare_helper) int
 @@pp_endif@@
 )]
 
-[[guard]]
+[[throws, std, kernel, guard]]
 [[decl_include("<hybrid/typecore.h>")]]
-[[throws, std, kernel, crt_dos_variant(callback(
+[[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER)]]
+[[section(".text.crt{|.dos}.utility.stdlib")]]
+[[crt_dos_variant(callback(
 	cook: auto = compar,
 	wrap: (void const *a, void const *b, $cook c): int { return (*c)(a, b); },
 	impl: qsort_r(pbase, item_count, item_size, (int (LIBCCALL *)(void const *, void const *, void *))&$wrap, (void *)$cook),
 ))]]
-[[section(".text.crt{|.dos}.utility.stdlib")]]
-[[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER)]]
 void qsort([[inout(item_count * item_size)]] void *pbase, size_t item_count, size_t item_size,
            [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b)) {
 @@pp_ifdef __LIBCCALL_CALLER_CLEANUP@@
@@ -375,13 +375,13 @@ void qsort([[inout(item_count * item_size)]] void *pbase, size_t item_count, siz
 
 [[wunused, std, throws, guard]]
 [[decl_include("<hybrid/typecore.h>")]]
+[[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER)]]
+[[section(".text.crt{|.dos}.utility.stdlib")]]
 [[crt_dos_variant(callback(
 	cook: auto = compar,
 	wrap: (void const *a, void const *b, $cook c): int { return (*c)(a, b); },
 	impl: bsearch_r(pkey, pbase, item_count, item_size, (int (LIBCCALL *)(void const *, void const *, void *))&$wrap, (void *)$cook),
 ))]]
-[[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER)]]
-[[section(".text.crt{|.dos}.utility.stdlib")]]
 void *bsearch([[in]] void const *pkey, [[in(item_count * item_size)]] void const *pbase, size_t item_count, size_t item_size, [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b))
 	[([[in]] void const *pkey, [[in(item_count * item_size)]] void *pbase, size_t item_count, size_t item_size, [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b)): void *]
 	[([[in]] void const *pkey, [[in(item_count * item_size)]] void const *pbase, size_t item_count, size_t item_size, [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b)): void const *]
@@ -562,9 +562,9 @@ $lldiv_t lldiv(__LONGLONG numer, __LONGLONG denom) {
 %(std)#endif /* __CORRECT_ISO_CPP_MATH_H_PROTO && !__NO_FPU */
 %(std)#endif /* __cplusplus */
 
-[[std, wunused, crt_dos_variant]]
+[[std, wunused, crt_dos_variant, userimpl]]
 [[requires_include("<libc/template/environ.h>")]]
-[[userimpl, requires(defined(__LOCAL_environ))]]
+[[requires(defined(__LOCAL_environ))]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(
 @@pp_ifndef __OPTIMIZE_SIZE__@@
@@ -810,8 +810,8 @@ void *calloc(size_t count, size_t num_bytes) {
 
 [[guard, std, libc, decl_include("<hybrid/typecore.h>")]]
 [[crtbuiltin, export_alias("__libc_realloc")]]
-[[section(".text.crt{|.dos}.heap.malloc")]]
 [[wunused, ATTR_MALL_DEFAULT_ALIGNED, ATTR_ALLOC_SIZE((2))]]
+[[section(".text.crt{|.dos}.heap.malloc")]]
 void *realloc(void *mallptr, size_t num_bytes);
 
 [[guard, std, libc]]
@@ -1811,9 +1811,9 @@ __CSDECLARE2(,char const _itoa_upper_digits[37],_itoa_upper_digits)
 
 
 %#ifndef __NO_FPU
-[[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[wunused, dos_only_export_alias("_gcvt")]]
 [[impl_include("<hybrid/floatcore.h>")]]
+[[section(".text.crt{|.dos}.unicode.static.convert")]]
 char *gcvt(double val, int ndigit, [[out]] char *buf) {
 @@pp_ifndef     DBL_NDIGIT_MAX@@
 @@pp_if __DBL_MANT_DIG__ == 53@@
@@ -1917,8 +1917,8 @@ int fcvt_r(double val, int ndigit,
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[impl_include("<hybrid/floatcore.h>")]]
-[[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias("gcvt", "_gcvt")]]
+[[section(".text.crt{|.dos}.unicode.static.convert")]]
 char *qgcvt(__LONGDOUBLE val, int ndigit, [[out]] char *buf) {
 @@pp_ifndef     LDBG_NDIGIT_MAX@@
 @@pp_if __LDBL_MANT_DIG__ == 53@@
@@ -1988,8 +1988,8 @@ static char qcvt_buffer[32];
 
 
 [[wunused]]
-[[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias("ecvt", "_ecvt")]]
+[[section(".text.crt{|.dos}.unicode.static.convert")]]
 char *qecvt(__LONGDOUBLE val, int ndigit,
             [[out]] int *__restrict decptr,
             [[out]] int *__restrict sign) {
@@ -2002,8 +2002,8 @@ char *qecvt(__LONGDOUBLE val, int ndigit,
 }
 
 [[wunused]]
-[[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias("fcvt", "_fcvt")]]
+[[section(".text.crt{|.dos}.unicode.static.convert")]]
 char *qfcvt(__LONGDOUBLE val, int ndigit,
             [[out]] int *__restrict decptr,
             [[out]] int *__restrict sign) {
@@ -2089,13 +2089,14 @@ int setstate_r([[nonnull]] char *__restrict statebuf,
                [[nonnull]] struct random_data *__restrict buf);
 
 
+[[crt_dos_variant]]
 [[crt_dos_impl_if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL))]]
-[[crt_dos_variant, section(".text.crt{|.dos}.sched.process")]]
+[[section(".text.crt{|.dos}.sched.process")]]
 int on_exit([[nonnull]] void (LIBCCALL *func)(int status, void *arg), void *arg);
 
-[[section(".text.crt{|.dos}.fs.environ")]]
 [[requires_include("<libc/template/environ.h>")]]
 [[userimpl, requires(defined(__LOCAL_environ))]]
+[[section(".text.crt{|.dos}.fs.environ")]]
 int clearenv(void) {
 	__LOCAL_environ = NULL;
 	return 0;
@@ -2139,6 +2140,7 @@ int rpmatch([[in]] char const *response) {
 [[decl_include("<features.h>", "<bits/types.h>")]]
 [[preferred_largefile64_variant_of(mkstemps)]]
 [[requires_function(mkostemps64)]]
+[[section(".text.crt{|.dos}.fs.utility")]]
 $fd_t mkstemps64([[inout]] char *template_, __STDC_INT_AS_SIZE_T suffixlen) {
 	return mkostemps64(template_, suffixlen, 0);
 }
@@ -2276,8 +2278,8 @@ void lcong48([[nonnull]] unsigned short param[7]);
 
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN) || defined(__USE_DOS)
-[[section(".text.crt{|.dos}.fs.environ")]]
 [[crt_dos_variant, dos_export_alias("_putenv")]]
+[[section(".text.crt{|.dos}.fs.environ")]]
 int putenv([[/*async*/inout]] char *string);
 %#endif /* __USE_MISC || __USE_XOPEN || __USE_DOS */
 
@@ -2286,14 +2288,16 @@ int putenv([[/*async*/inout]] char *string);
 
 [[export_alias("__random")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), alias("rand")]]
-[[userimpl, section(".text.crt{|.dos}.random")]]
+[[userimpl]]
+[[section(".text.crt{|.dos}.random")]]
 long random() {
 	return (long)rand();
 }
 
 [[export_alias("__srandom")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), alias("srand")]]
-[[userimpl, section(".text.crt{|.dos}.random")]]
+[[userimpl]]
+[[section(".text.crt{|.dos}.random")]]
 void srandom(unsigned int seed) {
 	srand((long)seed);
 }
@@ -2310,8 +2314,9 @@ char *setstate([[nonnull]] char *statebuf);
 
 @@>> l64a(3), a64l(3)
 @@Convert between `long' and base-64 encoded integer strings.
-[[wunused, section(".text.crt{|.dos}.bsd")]]
-[[nonnull, impl_include("<hybrid/typecore.h>")]]
+[[nonnull, wunused]]
+[[impl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.bsd")]]
 char *l64a(long n) {
 	/* l64a_r() encodes 6 bytes from `n' into 1 character, followed
 	 * by 1 trailing NUL-character. So we can can calculate the max
@@ -2322,8 +2327,8 @@ char *l64a(long n) {
 }
 
 [[pure, wunused, doc_alias("l64a")]]
-[[section(".text.crt{|.dos}.bsd")]]
 [[impl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.bsd")]]
 long a64l([[in]] char const *s) {
 	unsigned long digit, result = 0;
 	shift_t shift = 0;
@@ -2356,10 +2361,11 @@ long a64l([[in]] char const *s) {
 @@@param: resolved: A buffer of `PATH_MAX' bytes to-be filled with the resulting
 @@                  path, or NULL  to automatically `malloc()'ate  and return  a
 @@                  buffer of sufficient size.
-[[crt_dos_variant, cp, wunused, section(".text.crt{|.dos}.fs.property")]]
+[[crt_dos_variant, cp, wunused]]
 [[requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(frealpathat))]]
 [[impl_include("<asm/os/fcntl.h>", "<asm/os/limits.h>")]]
+[[section(".text.crt{|.dos}.fs.property")]]
 char *realpath([[in]] char const *filename, char *resolved) {
 @@pp_if defined(__PATH_MAX) && __PATH_MAX != -1@@
 	return frealpathat(__AT_FDCWD, filename, resolved, resolved ? __PATH_MAX : 0, 0);
@@ -2381,9 +2387,10 @@ char *realpath([[in]] char const *filename, char *resolved) {
 @@NOTE: You may  also pass  `NULL' for  `resolved' to  have a  buffer of  `buflen'
 @@      bytes  automatically allocated  in the heap,  ontop of which  you may also
 @@      pass `0' for `buflen' to automatically determine the required buffer size.
-[[cp, wunused, decl_include("<bits/types.h>")]]
+[[cp, wunused, crt_dos_variant]]
+[[decl_include("<bits/types.h>")]]
 [[requires_function(frealpath4)]]
-[[crt_dos_variant, section(".text.crt{|.dos}.fs.property")]]
+[[section(".text.crt{|.dos}.fs.property")]]
 char *frealpath($fd_t fd, [[out_opt]] char *resolved, $size_t buflen) {
 	return frealpath4(fd, resolved, buflen, 0);
 }
@@ -2403,7 +2410,8 @@ char *frealpath($fd_t fd, [[out_opt]] char *resolved, $size_t buflen) {
 @@      bytes  automatically allocated  in the heap,  ontop of which  you may also
 @@      pass `0' for `buflen' to automatically determine the required buffer size.
 [[cp, wunused, decl_include("<bits/types.h>")]]
-[[crt_dos_variant, section(".text.crt{|.dos}.fs.property")]]
+[[crt_dos_variant]]
+[[section(".text.crt{|.dos}.fs.property")]]
 char *frealpath4($fd_t fd, [[out_opt/*(buflen)*/]] char *resolved, $size_t buflen, $atflag_t flags);
 
 @@>> frealpathat(2)
@@ -2421,7 +2429,8 @@ char *frealpath4($fd_t fd, [[out_opt/*(buflen)*/]] char *resolved, $size_t bufle
 @@@param flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
 @@@return: NULL: [errno=ERANGE]: `buflen' is too small to fit the entire path
 [[cp, wunused, decl_include("<bits/types.h>")]]
-[[crt_dos_variant, section(".text.crt{|.dos}.fs.property")]]
+[[crt_dos_variant]]
+[[section(".text.crt{|.dos}.fs.property")]]
 char *frealpathat($fd_t dirfd, [[in]] char const *filename,
                   [[out_opt/*(buflen)*/]] char *resolved,
                   $size_t buflen, $atflag_t flags);
@@ -2441,10 +2450,10 @@ char *frealpathat($fd_t dirfd, [[in]] char const *filename,
 @@      returning something  sensible like  `NULL', this  function
 @@      will instead set `template_' to an empty string, and still
 @@      re-return it like it would if everything had worked!
-[[section(".text.crt{|.dos}.fs.utility")]]
-[[guard, dos_only_export_alias("_mktemp"), export_alias("__mktemp")]]
+[[nonnull, guard, dos_only_export_alias("_mktemp"), export_alias("__mktemp")]]
 [[requires(($has_function(open) || $has_function(stat)) && $has_function(system_mktemp))]]
-[[nonnull]] char *mktemp([[inout]] char *template_) {
+[[section(".text.crt{|.dos}.fs.utility")]]
+char *mktemp([[inout]] char *template_) {
 	if (system_mktemp(2, template_, 0, 0))
 		*template_ = 0;
 	return template_;
@@ -2555,6 +2564,7 @@ $fd_t mkstemp([[inout]] char *template_) {
 [[decl_include("<bits/types.h>")]]
 [[preferred_largefile64_variant_of(mkstemp)]]
 [[requires_function(mkstemps64)]]
+[[section(".text.crt{|.dos}.fs.utility")]]
 $fd_t mkstemp64([[inout]] char *template_) {
 	return mkstemps64(template_, 0);
 }
@@ -2603,8 +2613,8 @@ int unlockpt($fd_t fd) {
 @@Returns the name of the PTY slave (Pseudo TTY slave)
 @@associated   with   the   master   descriptor   `fd'
 [[wunused, decl_include("<bits/types.h>")]]
-[[requires_function(ptsname_r)]]
-[[crt_dos_variant, section(".text.crt{|.dos}.io.tty")]]
+[[crt_dos_variant, requires_function(ptsname_r)]]
+[[section(".text.crt{|.dos}.io.tty")]]
 char *ptsname($fd_t fd) {
 	static char buf[64];
 	if unlikely(ptsname_r(fd, buf, sizeof(buf)))
@@ -2624,8 +2634,8 @@ $fd_t posix_openpt($oflag_t oflags);
 %#if defined(__USE_GNU) || defined(__USE_NETBSD)
 @@Returns the name of the PTY slave (Pseudo TTY slave)
 @@associated   with   the   master   descriptor   `fd'
-[[decl_include("<bits/types.h>")]]
-[[crt_dos_variant, section(".text.crt{|.dos}.io.tty")]]
+[[crt_dos_variant, decl_include("<bits/types.h>")]]
+[[section(".text.crt{|.dos}.io.tty")]]
 int ptsname_r($fd_t fd, [[out(? <= buflen)]] char *buf, $size_t buflen);
 %#endif /* __USE_GNU || __USE_NETBSD */
 
@@ -2715,17 +2725,17 @@ __ULONGLONG strtoull_l([[in]] char const *__restrict nptr,
 %#endif /* __LONGLONG */
 
 %#ifndef __NO_FPU
-[[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[dos_only_export_alias("_strtod_l"), export_alias("__strtod_l")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias("strtold_l", "_strtold_l", "__strtold_l")]]
+[[section(".text.crt{|.dos}.unicode.static.convert")]]
 double strtod_l([[in]] char const *__restrict nptr,
                 [[out_opt]] char **endptr, $locale_t locale) {
 	(void)locale;
 	return strtod(nptr, endptr);
 }
 
-[[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[dos_only_export_alias("_strtof_l"), export_alias("__strtof_l")]]
+[[section(".text.crt{|.dos}.unicode.static.convert")]]
 float strtof_l([[in]] char const *__restrict nptr,
                [[out_opt]] char **endptr, $locale_t locale) {
 	(void)locale;
@@ -2733,10 +2743,10 @@ float strtof_l([[in]] char const *__restrict nptr,
 }
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[dos_only_export_alias("_strtold_l"), export_alias("__strtold_l")]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__, strtod_l)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias("_strtod_l", "__strtod_l")]]
+[[section(".text.crt{|.dos}.unicode.static.convert")]]
 __LONGDOUBLE strtold_l([[in]] char const *__restrict nptr,
                        [[out_opt]] char **endptr, $locale_t locale) {
 	(void)locale;
@@ -2748,13 +2758,15 @@ __LONGDOUBLE strtold_l([[in]] char const *__restrict nptr,
 @@>> secure_getenv(3)
 @@Same as `getenv(3)', but always  return `NULL' if the  caller
 @@is running in set-ugid mode (s.a. `__libc_enable_secure(3)').
-[[crt_dos_variant, wunused, section(".text.crt{|.dos}.fs.environ")]]
+[[crt_dos_variant, wunused]]
 [[export_alias("__secure_getenv", "__libc_secure_getenv")]]
 [[if($extended_include_prefix("<libc/template/__libc_enable_secure.h>")
      !defined(__LOCAL___libc_enable_secure)), alias("getenv")]]
 [[if($extended_include_prefix("<libc/template/environ.h>", "<libc/template/__libc_enable_secure.h>")
      defined(__LOCAL_environ) && !defined(__LOCAL___libc_enable_secure)), bind_local_function(getenv)]]
-[[impl_include("<libc/template/__libc_enable_secure.h>"), requires_function(getenv)]]
+[[requires_function(getenv)]]
+[[impl_include("<libc/template/__libc_enable_secure.h>")]]
+[[section(".text.crt{|.dos}.fs.environ")]]
 char *secure_getenv([[in]] char const *varname) {
 @@pp_ifdef __LOCAL___libc_enable_secure@@
 	if (__LOCAL___libc_enable_secure)
@@ -2769,7 +2781,8 @@ int getpt();
 @@>> canonicalize_file_name(3)
 @@Return the result of `realpath(filename)' as a `malloc()'-
 @@allocated  buffer. Upon error, `NULL' is returned instead.
-[[crt_dos_variant, cp, ATTR_MALLOC, wunused, section(".text.crt{|.dos}.fs.property")]]
+[[crt_dos_variant, cp, ATTR_MALLOC, wunused]]
+[[section(".text.crt{|.dos}.fs.property")]]
 char *canonicalize_file_name([[in]] char const *filename);
 
 @@Internal implementation for creating temporary files.
@@ -3091,8 +3104,9 @@ void *__NOTHROW_NCX(__LIBCCALL calloc)(__SIZE_TYPE__ __num_bytes) { return (call
 @@The shell paths attempted by this function are system-dependent, but before any
 @@of them are tested, this function will try to use `secure_getenv("SHELL")',  if
 @@and only if that variable is defined and starts with a '/'-character.
-[[cp, guard, section(".text.crt{|.dos}.fs.exec.system")]]
+[[cp, guard]]
 [[requires_function(execl)]]
+[[section(".text.crt{|.dos}.fs.exec.system")]]
 int shexec([[in_opt]] char const *command) {
 	static char const arg_sh[] = "sh";
 	static char const arg__c[] = "-c";
@@ -3107,17 +3121,10 @@ int shexec([[in_opt]] char const *command) {
 		      arg__c, command, (char *)NULL);
 	}
 @@pp_endif@@
-
-@@pp_ifdef __KOS__@@
-	/* By default, KOS uses busybox, so try to invoke that first. */
-	execl("/bin/busybox", arg_sh, arg__c, command, (char *)NULL);
 	execl("/bin/sh", arg_sh, arg__c, command, (char *)NULL);
-	execl("/bin/bash", arg_sh, arg__c, command, (char *)NULL);
-@@pp_else@@
-	execl("/bin/sh", arg_sh, arg__c, command, (char *)NULL);
-	execl("/bin/bash", arg_sh, arg__c, command, (char *)NULL);
+	execl("/bin/csh", "csh", arg__c, command, (char *)NULL);
+	execl("/bin/bash", "bash", arg__c, command, (char *)NULL);
 	execl("/bin/busybox", arg_sh, arg__c, command, (char *)NULL);
-@@pp_endif@@
 	return -1;
 }
 %#endif /* __USE_KOS */
@@ -3395,8 +3402,8 @@ int daemonfd($fd_t chdirfd, $fd_t nullfd) {
 @@@param: bufsize: Buffer size (including a trailing NUL-character)
 @@@return: 0 : Success
 @@@return: -1: Buffer too small (`errno' was not modified)
-[[section(".text.crt{|.dos}.bsd")]]
 [[decl_include("<features.h>")]]
+[[section(".text.crt{|.dos}.bsd")]]
 int l64a_r(long n, char *buf, __STDC_INT_AS_SIZE_T bufsize) {
 	unsigned long un;
 	/* Mapping from digit values --> base-64 characters. */
@@ -3448,7 +3455,8 @@ void setprogname(char const *name) {
 }
 
 
-[[/*TODO:crt_dos_variant,*/ guard, throws, decl_include("<hybrid/typecore.h>")]]
+[[/*TODO:crt_dos_variant,*/ guard, throws]]
+[[decl_include("<hybrid/typecore.h>")]]
 int heapsort([[inout(item_count * item_size)]] void *pbase, $size_t item_count, $size_t item_size,
              [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b)) {
 	/* TODO: Actually do heap-sort! */
@@ -3456,7 +3464,8 @@ int heapsort([[inout(item_count * item_size)]] void *pbase, $size_t item_count, 
 	return 0;
 }
 
-[[/*TODO:crt_dos_variant,*/ guard, throws, decl_include("<hybrid/typecore.h>")]]
+[[/*TODO:crt_dos_variant,*/ guard, throws]]
+[[decl_include("<hybrid/typecore.h>")]]
 int mergesort([[inout(item_count * item_size)]] void *pbase, $size_t item_count, $size_t item_size,
               [[nonnull]] int (LIBCCALL *compar)(void const *a, void const *b)) {
 	/* TODO: Actually do merge-sort! */
@@ -3492,7 +3501,8 @@ int sradixsort([[inout(item_count)]] unsigned char const **base, int item_count,
 @@@return: 0 : [*p_errstr != NULL] Error
 @@@return: 0 : [*p_errstr == NULL] Success
 @@@return: * : [*p_errstr == NULL] Success
-[[guard, wunused, impl_include("<bits/types.h>", "<asm/os/errno.h>")]]
+[[guard, wunused]]
+[[impl_include("<bits/types.h>", "<asm/os/errno.h>")]]
 __LONGLONG strtonum([[in]] char const *nptr,
                     __LONGLONG lo, __LONGLONG hi,
                     [[out]] char const **p_errstr) {
@@ -3532,10 +3542,12 @@ typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void
 
 
 @@>> qsort_r(3)
-[[decl_include("<hybrid/typecore.h>"), alias("_quicksort")]]
-[[impl_include("<hybrid/typecore.h>")]]
-[[throws, kernel, section(".text.crt{|.dos}.utility.stdlib")]]
+[[throws, kernel]]
+[[decl_include("<hybrid/typecore.h>")]]
+[[alias("_quicksort")]]
 [[if(!defined(__KERNEL__)), export_as("_quicksort")]] /* NOTE: `_quicksort' is the old libc4/5 name of this function. */
+[[impl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.utility.stdlib")]]
 [[throws, crt_dos_variant(callback(
 	cook: struct { auto compar = compar; auto arg = arg; },
 	wrap: (void const *a, void const *b, $cook *c): int { return (*c->compar)(a, b, c->arg); },
@@ -3606,20 +3618,22 @@ void qsort_r([[inout(item_count * item_size)]] void *pbase, $size_t item_count, 
 @@descriptor of that file.
 @@@param: flags: Additional  flags  to pass  to `open(2)',
 @@               but `O_ACCMODE' is always set to `O_RDWR'
-[[wunused, section(".text.crt{|.dos}.fs.utility")]]
-[[decl_include("<bits/types.h>"), no_crt_self_import]]
+[[wunused, no_crt_self_import]]
+[[decl_include("<bits/types.h>")]]
 [[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("mkostemp")]]
 [[                                                                                                                                                     alias("mkostemp64")]]
 [[requires_function(mkostemps)]]
+[[section(".text.crt{|.dos}.fs.utility")]]
 $fd_t mkostemp([[inout]] char *template_, $oflag_t flags) {
 	return mkostemps(template_, 0, flags);
 }
 
-[[wunused, section(".text.crt{|.dos}.fs.utility")]]
-[[decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import]]
+[[wunused, no_crt_self_import]]
+[[decl_include("<features.h>", "<bits/types.h>")]]
 [[if($extended_include_prefix("<features.h>", "<asm/os/oflags.h>")!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias("mkostemps")]]
 [[                                                                                                                                                     alias("mkostemps64")]]
 [[requires_function(open, system_mktemp)]]
+[[section(".text.crt{|.dos}.fs.utility")]]
 $fd_t mkostemps([[inout]] char *template_,
                 __STDC_INT_AS_SIZE_T suffixlen,
                 $oflag_t flags) {
@@ -3627,16 +3641,21 @@ $fd_t mkostemps([[inout]] char *template_,
 }
 
 %#ifdef __USE_LARGEFILE64
-[[wunused, preferred_largefile64_variant_of(mkostemp), doc_alias("mkostemp")]]
-[[requires_function(mkostemps64), decl_include("<bits/types.h>")]]
+[[wunused, doc_alias("mkostemp")]]
+[[decl_include("<bits/types.h>")]]
+[[preferred_largefile64_variant_of(mkostemp)]]
+[[requires_function(mkostemps64)]]
+[[section(".text.crt{|.dos}.fs.utility")]]
 $fd_t mkostemp64([[inout]] char *template_, $oflag_t flags) {
 	return mkostemps64(template_, 0, flags);
 }
 
-[[wunused, preferred_largefile64_variant_of(mkostemps), doc_alias("mkostemps")]]
+[[wunused, doc_alias("mkostemps")]]
 [[decl_include("<features.h>", "<bits/types.h>")]]
-[[impl_include("<asm/os/oflags.h>")]]
+[[preferred_largefile64_variant_of(mkostemps)]]
 [[requires_function(open, system_mktemp)]]
+[[impl_include("<asm/os/oflags.h>")]]
+[[section(".text.crt{|.dos}.fs.utility")]]
 $fd_t mkostemps64([[inout]] char *template_,
                   __STDC_INT_AS_SIZE_T suffixlen,
                   $oflag_t flags) {
@@ -3669,8 +3688,9 @@ typedef __mode_t mode_t;
 //TODO:void csetexpandtc(int);
 
 @@>> devname(3), devname_r(3)
-[[const, alias("__devname50"), requires_function(devname_r)]]
-[[decl_include("<bits/types.h>")]]
+[[const, decl_include("<bits/types.h>")]]
+[[alias("__devname50")]]
+[[requires_function(devname_r)]]
 char *devname(dev_t dev, mode_t type) {
 	static char buf[64];
 	return devname_r(dev, type, buf, sizeof(buf)) ? NULL : buf;
@@ -3779,8 +3799,9 @@ void setproctitle([[in, format("printf")]] char const *format, ...)
 @@Same as `strsuftollx(3)', but if an error happens, make
 @@use of `errx(3)' to terminate the program, rather  than
 @@return to the caller.
-[[wunused, requires_function(errx)]]
+[[wunused]]
 [[decl_include("<hybrid/typecore.h>")]]
+[[requires_function(strsuftollx, errx)]]
 [[impl_include("<asm/os/stdlib.h>")]]
 __LONGLONG strsuftoll([[in]] char const *desc,
                       [[in]] char const *val,
@@ -3901,12 +3922,14 @@ typedef int (__LIBDCALL *_onexit_t)(void);
 %#endif /* ____errno_location_defined */
 %#endif /* !errno */
 
+[[decl_include("<bits/types.h>")]]
+[[crt_dos_variant]]
 [[section(".text.crt.dos.errno_access")]]
-[[crt_dos_variant, decl_include("<bits/types.h>")]]
 errno_t _get_errno(errno_t *perr);
 
+[[decl_include("<bits/types.h>")]]
+[[crt_dos_variant]]
 [[section(".text.crt.dos.errno_access")]]
-[[crt_dos_variant, decl_include("<bits/types.h>")]]
 errno_t _set_errno(errno_t err);
 %#endif /* !_CRT_ERRNO_DEFINED */
 
@@ -3918,11 +3941,12 @@ errno_t _set_errno(errno_t err);
 $u32 *__doserrno();
 
 [[decl_include("<bits/types.h>")]]
-[[crt_dos_variant, section(".text.crt.dos.errno")]]
+[[crt_dos_variant]]
+[[section(".text.crt.dos.errno")]]
 errno_t _get_doserrno($u32 *perr);
 
-[[section(".text.crt.dos.errno")]]
 [[decl_include("<bits/types.h>")]]
+[[section(".text.crt.dos.errno")]]
 errno_t _set_doserrno($u32 err);
 
 %{
@@ -3997,9 +4021,9 @@ __CSDECLARE(,int,__argc)
 #define __argc __argc
 #else /* __CRT_HAVE___argc */
 }
-[[guard, const, wunused]]
+[[nonnull, guard, const, wunused]]
 [[section(".text.crt.dos.application.init")]]
-[[nonnull]] int *__p___argc();
+int *__p___argc();
 %{
 #ifdef ____p___argc_defined
 #define __argc (*__p___argc())
@@ -4012,9 +4036,9 @@ __CSDECLARE(,int,__argc)
 __CSDECLARE(,char **,__argv)
 #else /* __CRT_HAVE___argv */
 }
-[[guard, const, wunused]]
+[[nonnull, guard, const, wunused]]
 [[section(".text.crt.dos.application.init")]]
-[[nonnull]] char ***__p___argv();
+char ***__p___argv();
 %{
 #ifdef ____p___argv_defined
 #define __argv (*__p___argv())
@@ -4028,10 +4052,10 @@ __CSDECLARE(,wchar_t **,__wargv)
 #define __wargv __wargv
 #else /* __CRT_HAVE___wargv */
 }
-[[guard, const, wunused, wchar]]
+[[nonnull, guard, const, wunused, wchar]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt.dos.wchar.application.init")]]
-[[nonnull]] wchar_t ***__p___wargv();
+wchar_t ***__p___wargv();
 %{
 #ifdef ____p___wargv_defined
 #define __wargv (*__p___wargv())
@@ -4045,10 +4069,10 @@ __CSDECLARE(,wchar_t **,_wenviron)
 #define _wenviron _wenviron
 #else /* __CRT_HAVE__wenviron */
 }
-[[guard, const, wunused, wchar]]
+[[nonnull, guard, const, wunused, wchar]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt.dos.wchar.fs.environ")]]
-[[nonnull]] wchar_t ***__p__wenviron();
+wchar_t ***__p__wenviron();
 %{
 #ifdef ____p__wenviron_defined
 #define _wenviron (*__p__wenviron())
@@ -4062,10 +4086,10 @@ __CSDECLARE(,wchar_t *,_wpgmptr)
 #define _wpgmptr _wpgmptr
 #else /* __CRT_HAVE__wpgmptr */
 }
-[[guard, const, wunused, wchar]]
+[[nonnull, guard, const, wunused, wchar]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt.dos.wchar.application.init")]]
-[[nonnull]] wchar_t **__p__wpgmptr();
+wchar_t **__p__wpgmptr();
 %{
 #ifdef ____p__wpgmptr_defined
 #define _wpgmptr (*__p__wpgmptr())
@@ -4105,12 +4129,12 @@ __CSDECLARE(,char *,__progname_full)
 }
 
 @@Alias for argv[0], as passed to main()
-[[guard, const, wunused]]
+[[nonnull, guard, const, wunused]]
 [[export_alias("__p_program_invocation_name")]]
-[[impl_include("<libc/template/program_invocation_name.h>")]]
 [[requires_include("<libc/template/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_program_invocation_name_p))]]
-[[nonnull, section(".text.crt.dos.application.init")]]
+[[impl_include("<libc/template/program_invocation_name.h>")]]
+[[section(".text.crt.dos.application.init")]]
 char **__p__pgmptr() {
 	return &__LOCAL_program_invocation_name_p;
 }
@@ -4133,9 +4157,9 @@ __CSDECLARE(,char **,__initenv)
 #else /* __CRT_HAVE___initenv */
 }
 @@Access to the initial environment block
-[[crt_dos_variant, guard, const, wunused]]
+[[nonnull, crt_dos_variant, guard, const, wunused]]
 [[section(".text.crt.dos.fs.environ")]]
-[[nonnull]] char ***__p___initenv();
+char ***__p___initenv();
 %{
 #ifdef ____p___initenv_defined
 #define __initenv (*__p___initenv())
@@ -4149,10 +4173,10 @@ __CSDECLARE(,wchar_t **,__winitenv)
 #else /* __CRT_HAVE___winitenv */
 }
 @@Access to the initial environment block
-[[guard, const, wunused, wchar]]
+[[nonnull, guard, const, wunused, wchar]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt.dos.wchar.fs.environ")]]
-[[nonnull]] wchar_t ***__p___winitenv();
+wchar_t ***__p___winitenv();
 %{
 #ifdef ____p___winitenv_defined
 #define __winitenv (*__p___winitenv())
@@ -4184,12 +4208,12 @@ typedef void (__LIBDCALL *_purecall_handler)(void);
 %
 %[insert:prefix(DEFINE_PURECALL_HANDLER)]
 
-[[section(".text.crt.dos.errno")]]
 [[decl_prefix(DEFINE_PURECALL_HANDLER)]]
+[[section(".text.crt.dos.errno")]]
 _purecall_handler _set_purecall_handler(_purecall_handler __handler);
 
-[[section(".text.crt.dos.errno")]]
 [[decl_prefix(DEFINE_PURECALL_HANDLER)]]
+[[section(".text.crt.dos.errno")]]
 _purecall_handler _get_purecall_handler();
 
 %[define(DEFINE_INVALID_PARAMETER_HANDLER =
@@ -4208,28 +4232,28 @@ typedef void (__LIBDCALL *_invalid_parameter_handler)(__WCHAR16_TYPE__ const *__
 %
 %[insert:prefix(DEFINE_INVALID_PARAMETER_HANDLER)]
 
-[[section(".text.crt.dos.errno")]]
 [[decl_prefix(DEFINE_INVALID_PARAMETER_HANDLER)]]
+[[section(".text.crt.dos.errno")]]
 _invalid_parameter_handler _set_invalid_parameter_handler(_invalid_parameter_handler handler);
 
-[[section(".text.crt.dos.errno")]]
 [[decl_prefix(DEFINE_INVALID_PARAMETER_HANDLER)]]
+[[section(".text.crt.dos.errno")]]
 _invalid_parameter_handler _get_invalid_parameter_handler();
 
 
 [[decl_include("<bits/types.h>")]]
-[[section(".text.crt.dos.application.init")]]
-[[impl_include("<libc/template/program_invocation_name.h>")]]
 [[requires_include("<libc/template/program_invocation_name.h>")]]
 [[requires(defined(__LOCAL_program_invocation_name))]]
+[[impl_include("<libc/template/program_invocation_name.h>")]]
+[[section(".text.crt.dos.application.init")]]
 errno_t _get_pgmptr(char **pvalue) {
 	*pvalue = __LOCAL_program_invocation_name;
 	return EOK;
 }
 
-[[decl_include("<bits/types.h>")]]
-[[wchar, section(".text.crt.dos.wchar.application.init")]]
+[[wchar, decl_include("<bits/types.h>")]]
 [[requires_function(__p__wpgmptr)]]
+[[section(".text.crt.dos.wchar.application.init")]]
 errno_t _get_wpgmptr(wchar_t **pvalue) {
 	*pvalue = *__p__wpgmptr();
 	return EOK;
@@ -4290,28 +4314,32 @@ __INT64_TYPE__ _abs64(__INT64_TYPE__ x) {
 
 
 %#ifndef __NO_FPU
-[[pure, wunused, section(".text.crt.dos.unicode.locale.convert")]]
+[[pure, wunused]]
+[[section(".text.crt.dos.unicode.locale.convert")]]
 double _atof_l([[in]] char const *__restrict nptr, $locale_t locale) {
 	return strtod_l(nptr, NULL, locale);
 }
 %#endif /* !__NO_FPU */
 
-[[pure, wunused, section(".text.crt.dos.unicode.locale.convert")]]
+[[pure, wunused]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__),      alias("_atol_l")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias("_atoll_l")]]
+[[section(".text.crt.dos.unicode.locale.convert")]]
 int _atoi_l([[in]] char const *__restrict nptr, $locale_t locale) {
 	return (int)strtol_l(nptr, NULL, 10, locale);
 }
-[[pure, wunused, section(".text.crt.dos.unicode.locale.convert")]]
+[[pure, wunused]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__, _atoi_l)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("_atoll_l")]]
+[[section(".text.crt.dos.unicode.locale.convert")]]
 long int _atol_l([[in]] char const *__restrict nptr, $locale_t locale) {
 	return strtol_l(nptr, NULL, 10, locale);
 }
 %#ifdef __LONGLONG
-[[pure, wunused, section(".text.crt.dos.unicode.locale.convert")]]
+[[pure, wunused]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__, _atol_l)]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == __SIZEOF_INT__, _atoi_l)]]
+[[section(".text.crt.dos.unicode.locale.convert")]]
 __LONGLONG _atoll_l([[in]] char const *__restrict nptr, $locale_t locale) {
 	return strtoll_l(nptr, NULL, 10, locale);
 }
@@ -4405,9 +4433,10 @@ __LOCAL_LIBC(__invoke_compare_helper_s) int
 @@pp_endif@@
 )]
 
-[[guard, throws, wunused, section(".text.crt.dos.utility")]]
+[[guard, throws, wunused]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER_S)]]
+[[section(".text.crt.dos.utility")]]
 [[crt_dos_variant(callback(
 	cook: struct { auto compar = compar; auto arg = arg; },
 	wrap: (void const *a, void const *b, $cook *c): int { return (*c->compar)(c->arg, a, b); },
@@ -4425,9 +4454,10 @@ void *bsearch_s([[in]] void const *key,
 	                         &data);
 }
 
-[[guard, throws, section(".text.crt.dos.utility")]]
+[[guard, throws]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(DEFINE_INVOKE_COMPARE_HELPER_S)]]
+[[section(".text.crt.dos.utility")]]
 [[crt_dos_variant(callback(
 	cook: struct { auto compar = compar; auto arg = arg; },
 	wrap: (void const *a, void const *b, $cook *c): int { return (*c->compar)(c->arg, a, b); },
@@ -4446,9 +4476,11 @@ void qsort_s([[inout(elem_count * elem_size)]] void *base, $size_t elem_count, $
 %#endif  /* _CRT_ALGO_DEFINED */
 %
 
+[[decl_include("<bits/types.h>")]]
+[[crt_dos_variant]]
+[[requires_function(getenv)]]
+[[impl_include("<libc/errno.h>")]]
 [[section(".text.crt.dos.utility")]]
-[[crt_dos_variant, decl_include("<bits/types.h>")]]
-[[requires_function(getenv), impl_include("<libc/errno.h>")]]
 errno_t getenv_s([[out]] $size_t *preqsize,
                  [[out(? <= bufsize)]] char *buf, rsize_t bufsize,
                  [[in]] char const *varname) {
@@ -4473,9 +4505,11 @@ errno_t getenv_s([[out]] $size_t *preqsize,
 	return EOK;
 }
 
+[[decl_include("<bits/types.h>")]]
+[[crt_dos_variant]]
+[[requires_function(getenv, strdup)]]
+[[impl_include("<libc/errno.h>")]]
 [[section(".text.crt.dos.utility")]]
-[[crt_dos_variant, decl_include("<bits/types.h>")]]
-[[requires_function(getenv, strdup), impl_include("<libc/errno.h>")]]
 errno_t _dupenv_s([[out]] char **__restrict pbuf,
                   [[out]] $size_t *pbuflen,
                   [[in]] char const *varname) {
@@ -4507,9 +4541,8 @@ errno_t _dupenv_s([[out]] char **__restrict pbuf,
 [[decl_include("<bits/types.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_ltoa_s")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_i64toa_s")]]
+[[impl_include("<libc/errno.h>", "<libc/template/itoa_digits.h>")]]
 [[section(".text.crt.dos.unicode.static.convert")]]
-[[impl_include("<libc/errno.h>")]]
-[[impl_include("<libc/template/itoa_digits.h>")]]
 [[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
 errno_t _itoa_s(int val, [[out(? <= buflen)]] char *buf, $size_t buflen, int radix) {
 	char *p;
@@ -4552,10 +4585,9 @@ errno_t _itoa_s(int val, [[out(? <= buflen)]] char *buf, $size_t buflen, int rad
 [[decl_include("<bits/types.h>")]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__, "_itoa_s")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_i64toa_s")]]
-[[impl_include("<libc/errno.h>")]]
-[[impl_include("<libc/template/itoa_digits.h>")]]
-[[section(".text.crt.dos.unicode.static.convert")]]
 [[crt_intern_dos_alias(libd__itoa_s)]]
+[[impl_include("<libc/errno.h>", "<libc/template/itoa_digits.h>")]]
+[[section(".text.crt.dos.unicode.static.convert")]]
 //[[crt_dos_variant({ impl: libd_errno_kos2dosinvoke_libclibc]); })]]
 errno_t _ltoa_s(long val, [[out(? <= buflen)]] char *buf, $size_t buflen, int radix) {
 	char *p;
@@ -4597,9 +4629,9 @@ errno_t _ltoa_s(long val, [[out(? <= buflen)]] char *buf, $size_t buflen, int ra
 
 [[decl_include("<bits/types.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_ui64toa_s")]]
-[[section(".text.crt.dos.unicode.static.convert")]]
 [[impl_include("<hybrid/typecore.h>", "<libc/errno.h>")]]
 [[impl_include("<libc/template/itoa_digits.h>")]]
+[[section(".text.crt.dos.unicode.static.convert")]]
 [[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
 errno_t _ultoa_s(unsigned long val, [[out(? <= buflen)]] char *buf, $size_t buflen, int radix) {
 	char *p;
@@ -4631,11 +4663,11 @@ errno_t _ultoa_s(unsigned long val, [[out(? <= buflen)]] char *buf, $size_t bufl
 
 %
 %#ifdef __UINT64_TYPE__
+[[decl_include("<hybrid/typecore.h>")]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8, itoa)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_itoa")]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8, ltoa)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_ltoa")]]
-[[decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt.dos.unicode.static.convert")]]
 char *_i64toa($s64 val, [[out]] char *buf, int radix) {
@@ -4643,10 +4675,10 @@ char *_i64toa($s64 val, [[out]] char *buf, int radix) {
 	return buf;
 }
 
+[[decl_include("<hybrid/typecore.h>")]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8, "ultoa")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_ultoa")]]
 [[section(".text.crt.dos.unicode.static.convert")]]
-[[decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
 char *_ui64toa($u64 val, [[out]] char *buf, int radix) {
 	_ui64toa_s(val, buf, ($size_t)-1, radix);
@@ -4700,9 +4732,9 @@ errno_t _i64toa_s($s64 val, [[out(? <= buflen)]] char *buf, $size_t buflen, int 
 
 [[decl_include("<bits/types.h>")]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8, _ultoa_s)]]
-[[section(".text.crt.dos.unicode.static.convert")]]
 [[impl_include("<bits/types.h>", "<libc/errno.h>")]]
 [[impl_include("<libc/template/itoa_digits.h>")]]
+[[section(".text.crt.dos.unicode.static.convert")]]
 [[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
 errno_t _ui64toa_s($u64 val, [[out(? <= buflen)]] char *buf, $size_t buflen, int radix) {
 	char *p;
@@ -4740,29 +4772,30 @@ errno_t _ui64toa_s($u64 val, [[out(? <= buflen)]] char *buf, $size_t buflen, int
 
 [[pure, wunused]]
 [[decl_include("<hybrid/typecore.h>")]]
-[[section(".text.crt.dos.unicode.static.convert")]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8, "atoi")]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8, "atol")]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8, "atoll")]]
+[[section(".text.crt.dos.unicode.static.convert")]]
 $s64 _atoi64([[in]] char const *__restrict nptr) {
 	return strto64(nptr, NULL, 10);
 }
 
 [[pure, wunused]]
 [[decl_include("<hybrid/typecore.h>")]]
-[[section(".text.crt.dos.unicode.static.convert")]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8, _atoi_l)]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8, _atol_l)]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_LONG__ == 8, _atoll_l)]]
+[[section(".text.crt.dos.unicode.static.convert")]]
 $s64 _atoi64_l([[in]] char const *__restrict nptr, $locale_t locale) {
 	return strto64_l(nptr, NULL, 10, locale);
 }
 %#endif /* __UINT64_TYPE__ */
 
 
-[[pure, wunused, section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
+[[pure, wunused]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 $size_t _mbstrlen([[in]] char const *str) {
 	size_t result = 0;
 	while (unicode_readutf8((char const **)&str))
@@ -4770,9 +4803,10 @@ $size_t _mbstrlen([[in]] char const *str) {
 	return result;
 }
 
-[[pure, wunused, section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
+[[pure, wunused]]
 [[decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 $size_t _mbstrnlen([[in(? <= maxlen)]] char const *str, $size_t maxlen) {
 	size_t result = 0;
 	char const *endptr = str + maxlen;
@@ -4781,37 +4815,37 @@ $size_t _mbstrnlen([[in(? <= maxlen)]] char const *str, $size_t maxlen) {
 	return result;
 }
 
-[[pure, wunused, section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
-[[decl_include("<hybrid/typecore.h>")]]
+[[pure, wunused, decl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 $size_t _mbstrlen_l([[in]] char const *str, $locale_t locale) {
 	(void)locale;
 	return _mbstrlen(str);
 }
 
-[[pure, wunused, section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
-[[decl_include("<hybrid/typecore.h>")]]
+[[pure, wunused, decl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 $size_t _mbstrnlen_l([[in(? <= maxlen)]] char const *str, $size_t maxlen, $locale_t locale) {
 	(void)locale;
 	return _mbstrnlen(str, maxlen);
 }
 
-[[pure, wunused, section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
-[[decl_include("<hybrid/typecore.h>")]]
+[[pure, wunused, decl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 int _mblen_l([[in(? <= maxlen)]] char const *str, $size_t maxlen, $locale_t locale) {
 	(void)locale;
 	return mblen(str, maxlen);
 }
 
-[[wchar, section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
-[[decl_include("<hybrid/typecore.h>")]]
+[[wchar, decl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 int _mbtowc_l(wchar_t *dst, char const *src,
               $size_t srclen, $locale_t locale) {
 	(void)locale;
 	return mbtowc(dst, src, srclen);
 }
 
-[[wchar, section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
-[[decl_include("<hybrid/typecore.h>")]]
+[[wchar, decl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.wchar.unicode.static.mbs")]]
 $size_t _mbstowcs_l(wchar_t *dst, char const *src,
                     $size_t dstlen, $locale_t locale) {
 	(void)locale;
@@ -4866,8 +4900,9 @@ errno_t _mbstowcs_s_l($size_t *presult,
 
 
 [[decl_include("<bits/types.h>")]]
+[[requires_function(rand)]]
 [[impl_include("<libc/errno.h>")]]
-[[section(".text.crt.dos.random"), requires_function(rand)]]
+[[section(".text.crt.dos.random")]]
 [[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
 errno_t rand_s([[out]] unsigned int *__restrict randval) {
 	if (!randval) {
@@ -4996,17 +5031,20 @@ errno_t wcstombs_s([[out_opt]] $size_t *presult,
 %#define _CVTBUFSIZE   349
 @@>> _fullpath(3)
 @@s.a. `realpath(3)', `frealpathat(3)'
-[[crt_dos_variant, cp, section(".text.crt.dos.fs.utility")]]
-[[requires_include("<asm/os/fcntl.h>"), decl_include("<hybrid/typecore.h>")]]
+[[cp, wunused, crt_dos_variant]]
+[[decl_include("<hybrid/typecore.h>")]]
+[[requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(frealpathat))]]
-[[impl_include("<asm/os/fcntl.h>"), wunused]]
+[[impl_include("<asm/os/fcntl.h>")]]
+[[section(".text.crt.dos.fs.utility")]]
 char *_fullpath([[out(? <= buflen)]] char *buf, [[in]] char const *path, $size_t buflen) {
 	return frealpathat(__AT_FDCWD, path, buf, buflen, 0);
 }
 
 %#ifndef __NO_FPU
+[[decl_include("<bits/types.h>")]]
+[[impl_include("<libc/errno.h>")]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
-[[decl_include("<bits/types.h>"), impl_include("<libc/errno.h>")]]
 [[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
 errno_t _ecvt_s([[out(? <= buflen)]] char *buf, $size_t buflen,
                 double val, int ndigit,
@@ -5023,8 +5061,9 @@ errno_t _ecvt_s([[out(? <= buflen)]] char *buf, $size_t buflen,
 	return $EOK;
 }
 
+[[decl_include("<bits/types.h>")]]
+[[impl_include("<libc/errno.h>")]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
-[[decl_include("<bits/types.h>"), impl_include("<libc/errno.h>")]]
 [[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
 errno_t _fcvt_s([[out(? <= buflen)]] char *buf, $size_t buflen,
                 double val, int ndigit,
@@ -5041,8 +5080,9 @@ errno_t _fcvt_s([[out(? <= buflen)]] char *buf, $size_t buflen,
 	return $EOK;
 }
 
+[[decl_include("<bits/types.h>")]]
+[[impl_include("<libc/errno.h>")]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
-[[decl_include("<bits/types.h>"), impl_include("<libc/errno.h>")]]
 [[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
 errno_t _gcvt_s([[out(? <= buflen)]] char *buf, $size_t buflen,
                 double val, int ndigit) {
@@ -5080,8 +5120,8 @@ int _atoflt_l([[out]] float *__restrict result,
 %[define_c_language_keyword(__KOS_FIXED_CONST)]
 
 [[decl_include("<features.h>")]]
-[[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__), alias("_atoldbl")]]
+[[section(".text.crt{|.dos}.unicode.static.convert")]]
 int _atodbl([[out]] double *__restrict result,
             [[in]] char __KOS_FIXED_CONST *__restrict nptr) {
 	*result = strtod(nptr, NULL);
@@ -5089,8 +5129,8 @@ int _atodbl([[out]] double *__restrict result,
 }
 
 [[decl_include("<features.h>")]]
-[[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__), alias("_atoldbl_l")]]
+[[section(".text.crt{|.dos}.unicode.static.convert")]]
 int _atodbl_l([[out]] double *__restrict result,
               [[in]] char __KOS_FIXED_CONST *__restrict nptr, $locale_t locale) {
 	*result = strtod_l(nptr, NULL, locale);
@@ -5099,8 +5139,8 @@ int _atodbl_l([[out]] double *__restrict result,
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[decl_include("<features.h>")]]
-[[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__), alias("_atodbl")]]
+[[section(".text.crt{|.dos}.unicode.static.convert")]]
 int _atoldbl([[out]] __LONGDOUBLE *__restrict result,
              [[in]] char __KOS_FIXED_CONST *__restrict nptr) {
 	*result = strtold(nptr, NULL);
@@ -5108,8 +5148,8 @@ int _atoldbl([[out]] __LONGDOUBLE *__restrict result,
 }
 
 [[decl_include("<features.h>")]]
-[[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__), alias("_atodbl_l")]]
+[[section(".text.crt{|.dos}.unicode.static.convert")]]
 int _atoldbl_l([[out]] __LONGDOUBLE *__restrict result,
                [[in]] char __KOS_FIXED_CONST *__restrict nptr,
                $locale_t locale) {
@@ -5121,46 +5161,50 @@ int _atoldbl_l([[out]] __LONGDOUBLE *__restrict result,
 
 
 %#if !__has_builtin(_rotl)
-[[const, nothrow, section(".text.crt.dos.math.utility")]]
-[[impl_include("<hybrid/__rotate.h>")]]
+[[const, nothrow]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_lrotl")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_rotl64")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), crt_intern_alias("_rotl64")]]
+[[impl_include("<hybrid/__rotate.h>")]]
+[[section(".text.crt.dos.math.utility")]]
 unsigned int _rotl(unsigned int val, int shift) {
 	return __hybrid_rol(val, (shift_t)(unsigned int)shift);
 }
 %#endif /* !__has_builtin(_rotl) */
 
 %#if !__has_builtin(_rotr)
-[[const, nothrow, section(".text.crt.dos.math.utility")]]
-[[impl_include("<hybrid/__rotate.h>")]]
+[[const, nothrow]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_lrotr")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_rotr64")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), crt_intern_alias("_rotr64")]]
+[[impl_include("<hybrid/__rotate.h>")]]
+[[section(".text.crt.dos.math.utility")]]
 unsigned int _rotr(unsigned int val, int shift) {
 	return __hybrid_ror(val, (shift_t)(unsigned int)shift);
 }
 %#endif /* !__has_builtin(_rotr) */
 
 %#if !__has_builtin(_lrotl)
-[[const, nothrow, section(".text.crt.dos.math.utility")]]
-[[impl_include("<hybrid/__rotate.h>")]]
+[[const, nothrow]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), alias("_rotl")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_rotl64")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), crt_intern_alias("_rotl")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), crt_intern_alias("_rotl64")]]
+[[impl_include("<hybrid/__rotate.h>")]]
+[[section(".text.crt.dos.math.utility")]]
 unsigned long _lrotl(unsigned long val, int shift) {
 	return __hybrid_rol(val, (shift_t)(unsigned int)shift);
 }
 %#endif /* !__has_builtin(_lrotl) */
 
 %#if !__has_builtin(_lrotr)
-[[const, nothrow, section(".text.crt.dos.math.utility")]]
-[[impl_include("<hybrid/__rotate.h>")]]
+[[const, nothrow]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), alias("_rotr")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_rotr64")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), crt_intern_alias("_rotr")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), crt_intern_alias("_rotr64")]]
+[[impl_include("<hybrid/__rotate.h>")]]
+[[section(".text.crt.dos.math.utility")]]
 unsigned long _lrotr(unsigned long val, int shift) {
 	return __hybrid_ror(val, (shift_t)(unsigned int)shift);
 }
@@ -5168,22 +5212,24 @@ unsigned long _lrotr(unsigned long val, int shift) {
 
 %#ifdef __UINT64_TYPE__
 %#if !__has_builtin(_rotl64)
-[[const, nothrow, section(".text.crt.dos.math.utility")]]
+[[const, nothrow]]
 [[decl_include("<hybrid/typecore.h>")]]
-[[impl_include("<hybrid/typecore.h>", "<hybrid/__rotate.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_lrotl")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_rotl")]]
+[[impl_include("<hybrid/typecore.h>", "<hybrid/__rotate.h>")]]
+[[section(".text.crt.dos.math.utility")]]
 $u64 _rotl64($u64 val, int shift) {
 	return __hybrid_rol64(val, (shift_t)(unsigned int)shift);
 }
 %#endif /* !__has_builtin(_rotl64) */
 
 %#if !__has_builtin(_rotr64)
-[[const, nothrow, section(".text.crt.dos.math.utility")]]
+[[const, nothrow]]
 [[decl_include("<hybrid/typecore.h>")]]
-[[impl_include("<hybrid/typecore.h>", "<hybrid/__rotate.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_lrotr")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_rotr")]]
+[[impl_include("<hybrid/typecore.h>", "<hybrid/__rotate.h>")]]
+[[section(".text.crt.dos.math.utility")]]
 $u64 _rotr64($u64 val, int shift) {
 	return __hybrid_ror64(val, (shift_t)(unsigned int)shift);
 }
@@ -5201,8 +5247,10 @@ $u64 _rotr64($u64 val, int shift) {
 %[insert:function(_swab = swab)]
 
 [[decl_include("<bits/types.h>")]]
+[[crt_dos_variant]]
+[[requires_function(setenv)]]
+[[impl_include("<libc/errno.h>")]]
 [[section(".text.crt.dos.fs.environ")]]
-[[crt_dos_variant, requires_function(setenv), impl_include("<libc/errno.h>")]]
 errno_t _putenv_s(char const *varname, char const *val) {
 	return setenv(varname, val, 1)
 @@pp_ifdef EINVAL@@
@@ -5214,24 +5262,25 @@ errno_t _putenv_s(char const *varname, char const *val) {
 }
 
 
-[[section(".text.crt.dos.fs.utility")]]
-[[cp, requires_function(_searchenv_s)]]
+[[cp]]
+[[requires_function(_searchenv_s)]]
 [[impl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt.dos.fs.utility")]]
 void _searchenv([[in]] char const *file,
                 [[in]] char const *envvar,
                 [[out]] char *__restrict resultpath) {
 	_searchenv_s(file, envvar, resultpath, ($size_t)-1);
 }
 
-[[section(".text.crt.dos.fs.utility")]]
 [[cp, decl_include("<bits/types.h>")]]
+[[section(".text.crt.dos.fs.utility")]]
 errno_t _searchenv_s([[in]] char const *file,
                      [[in]] char const *envvar,
                      [[out(? <= resultpath_len)]] char *__restrict resultpath,
                      $size_t resultpath_len);
 
-[[section(".text.crt.dos.fs.utility")]]
 [[impl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt.dos.fs.utility")]]
 void _makepath([[out]] char *__restrict buf,
                [[in_opt]] char const *drive,
                [[in_opt]] char const *dir,
@@ -5253,9 +5302,9 @@ void _splitpath([[in]] char const *__restrict abspath,
 	             ext, ext ? 256 : 0);
 }
 
-[[section(".text.crt.dos.fs.utility")]]
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<hybrid/typecore.h>", "<libc/errno.h>")]]
+[[section(".text.crt.dos.fs.utility")]]
 [[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
 errno_t _makepath_s([[out(? <= buflen)]] char *buf, $size_t buflen,
                     [[in_opt]] char const *drive,
@@ -5306,9 +5355,9 @@ err_buflen:
 #undef path_putc
 }
 
-[[section(".text.crt.dos.fs.utility")]]
 [[decl_include("<bits/types.h>")]]
 [[impl_include("<hybrid/typecore.h>", "<libc/errno.h>")]]
+[[section(".text.crt.dos.fs.utility")]]
 [[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
 errno_t _splitpath_s([[in]] char const *__restrict abspath,
                      [[out(drivelen)]] char *drive, $size_t drivelen,
@@ -5502,30 +5551,30 @@ __NOTHROW(__LIBCCALL ___get_environ_wrapper)(void) {
 %
 
 [[dos_only_export_alias("_itoa")]]
-[[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_ltoa", "ltoa")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_i64toa")]]
 [[impl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.unicode.static.convert")]]
 char *itoa(int val, [[out]] char *buf, int radix) {
 	_itoa_s(val, buf, ($size_t)-1, radix);
 	return buf;
 }
 
 [[dos_only_export_alias("_ltoa")]]
-[[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__, "itoa")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__), alias("_itoa")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_i64toa")]]
 [[impl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.unicode.static.convert")]]
 char *ltoa(long val, [[out]] char *buf, int radix) {
 	_ltoa_s(val, buf, ($size_t)-1, radix);
 	return buf;
 }
 
 [[dos_only_export_alias("_ultoa")]]
-[[section(".text.crt{|.dos}.unicode.static.convert")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_ui64toa")]]
 [[impl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.unicode.static.convert")]]
 char *ultoa(unsigned long val, [[out]] char *buf, int radix) {
 	_ultoa_s(val, buf, ($size_t)-1, radix);
 	return buf;
@@ -5544,8 +5593,9 @@ typedef int (__LIBDCALL *_onexit_t)(void);
 %[define_type_class(onexit_t  = "TP")]
 %[define_type_class(_onexit_t = "TP")]
 
+[[decl_prefix(DEFINE_ONEXIT_T)]]
+[[dos_only_export_alias("_onexit")]]
 [[section(".text.crt.dos.sched.process")]]
-[[dos_only_export_alias("_onexit"), decl_prefix(DEFINE_ONEXIT_T)]]
 onexit_t onexit(onexit_t func);
 
 
@@ -5570,17 +5620,20 @@ onexit_t onexit(onexit_t func);
 [[section(".text.crt.dos.wchar.fs.environ")]]
 wchar_t *_wgetenv([[in]] wchar_t const *varname);
 
-//[[wchar, section(".text.crt.dos.wchar.fs.environ")]]
+//[[wchar]]
+//[[section(".text.crt.dos.wchar.fs.environ")]]
 //_wgetenv(*) %{generate(str2wcs("getenv"))}
 
-[[wchar, section(".text.crt.dos.wchar.fs.environ")]]
+[[wchar]]
+[[section(".text.crt.dos.wchar.fs.environ")]]
 _wgetenv_s(*) %{generate(str2wcs("getenv_s"))}
 
-[[wchar, section(".text.crt.dos.wchar.fs.environ")]]
+[[wchar]]
+[[section(".text.crt.dos.wchar.fs.environ")]]
 _wdupenv_s(*) %{generate(str2wcs("_dupenv_s"))}
 
-[[wchar, section(".text.crt.dos.wchar.fs.environ")]]
-[[decl_include("<hybrid/typecore.h>")]]
+[[wchar, decl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt.dos.wchar.fs.environ")]]
 int _wputenv([[inout]] wchar_t *string);
 
 [[wchar, decl_include("<bits/types.h>")]]
@@ -5596,18 +5649,18 @@ errno_t _wsearchenv_s([[in]] wchar_t const *file,
 
 
 [[cp, decl_include("<bits/types.h>")]]
-[[section(".text.crt.dos.fs.environ")]]
-[[impl_include("<libc/template/environ.h>")]]
 [[requires_include("<libc/template/environ.h>")]]
 [[requires(defined(__LOCAL_environ))]]
+[[impl_include("<libc/template/environ.h>")]]
+[[section(".text.crt.dos.fs.environ")]]
 errno_t _get_environ([[out]] char ***p_environ) {
 	*p_environ = __LOCAL_environ;
 	return 0;
 }
 
 [[cp, wchar, decl_include("<bits/types.h>")]]
-[[section(".text.crt.dos.wchar.fs.environ")]]
 [[requires_function(__p__wenviron)]]
+[[section(".text.crt.dos.wchar.fs.environ")]]
 errno_t _get_wenviron([[out]] wchar_t ***p_wenviron) {
 	*p_wenviron = *__p__wenviron();
 	return 0;

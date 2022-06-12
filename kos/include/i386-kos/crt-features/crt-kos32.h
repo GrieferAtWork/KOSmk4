@@ -2386,8 +2386,11 @@
 #define __CRT_HAVE_b64_ntop
 #define __CRT_HAVE_b64_pton
 #define __CRT_HAVE_backtrace
+#define __CRT_HAVE_backtrace_symbol_printf
 #define __CRT_HAVE_backtrace_symbols
 #define __CRT_HAVE_backtrace_symbols_fd
+#define __CRT_HAVE_backtrace_symbols_fd_fmt
+#define __CRT_HAVE_backtrace_symbols_fmt
 #define __CRT_HAVE_basename
 #define __CRT_HAVE_bcmp
 #define __CRT_HAVE_bcmpl

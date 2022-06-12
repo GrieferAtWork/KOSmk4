@@ -2233,8 +2233,11 @@
 #define __CRT_HAVE_b64_ntop
 #define __CRT_HAVE_b64_pton
 #define __CRT_HAVE_backtrace
+#define __CRT_HAVE_backtrace_symbol_printf
 #define __CRT_HAVE_backtrace_symbols
 #define __CRT_HAVE_backtrace_symbols_fd
+#define __CRT_HAVE_backtrace_symbols_fd_fmt
+#define __CRT_HAVE_backtrace_symbols_fmt
 #define __CRT_HAVE_basename
 #define __CRT_HAVE_bcmp
 #define __CRT_HAVE_bcmpl
@@ -8101,8 +8104,11 @@
 #define __CRT_HAVE_KOS$b64_ntop
 #define __CRT_HAVE_KOS$b64_pton
 #define __CRT_HAVE_KOS$backtrace
+#define __CRT_HAVE_KOS$backtrace_symbol_printf
 #define __CRT_HAVE_KOS$backtrace_symbols
 #define __CRT_HAVE_KOS$backtrace_symbols_fd
+#define __CRT_HAVE_KOS$backtrace_symbols_fd_fmt
+#define __CRT_HAVE_KOS$backtrace_symbols_fmt
 #define __CRT_HAVE_KOS$basename
 #define __CRT_HAVE_KOS$bcmp
 #define __CRT_HAVE_KOS$bcopy
@@ -12692,8 +12698,11 @@
 #define __CRT_HAVE_DOS$b64_ntop
 #define __CRT_HAVE_DOS$b64_pton
 #define __CRT_HAVE_DOS$backtrace
+#define __CRT_HAVE_DOS$backtrace_symbol_printf
 #define __CRT_HAVE_DOS$backtrace_symbols
 #define __CRT_HAVE_DOS$backtrace_symbols_fd
+#define __CRT_HAVE_DOS$backtrace_symbols_fd_fmt
+#define __CRT_HAVE_DOS$backtrace_symbols_fmt
 #define __CRT_HAVE_DOS$basename
 #define __CRT_HAVE_DOS$bcmp
 #define __CRT_HAVE_DOS$bcopy

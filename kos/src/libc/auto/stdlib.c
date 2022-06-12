@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6a5b39 */
+/* HASH CRC-32:0x4f6f2790 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2026,7 +2026,7 @@ DEFINE_INTERN_ALIAS(libc_mkstemps64, libc_mkstemps);
  * descriptor of that file.
  * @param: suffixlen: The #  of trailing  characters to-be  ignored
  *                    after the required 6 trailing 'X'-characters. */
-INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED ATTR_INOUT(1) fd_t
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED ATTR_INOUT(1) fd_t
 NOTHROW_RPC(LIBCCALL libc_mkstemps64)(char *template_,
                                       __STDC_INT_AS_SIZE_T suffixlen) {
 	return libc_mkostemps64(template_, suffixlen, 0);
@@ -2232,7 +2232,7 @@ DEFINE_INTERN_ALIAS(libc_mkstemp64, libc_mkstemp);
  * with random characters  such that the  filename described by  `template_'
  * will not already exists. Then, create a new file with `O_RDWR' and return
  * the file descriptor of that file. */
-INTERN ATTR_SECTION(".text.crt.unsorted") WUNUSED ATTR_INOUT(1) fd_t
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED ATTR_INOUT(1) fd_t
 NOTHROW_RPC(LIBCCALL libc_mkstemp64)(char *template_) {
 	return libc_mkstemps64(template_, 0);
 }
@@ -2626,17 +2626,10 @@ NOTHROW_RPC(LIBCCALL libc_shexec)(char const *command) {
 		      arg__c, command, (char *)NULL);
 	}
 
-
-
-	/* By default, KOS uses busybox, so try to invoke that first. */
-	libc_execl("/bin/busybox", arg_sh, arg__c, command, (char *)NULL);
 	libc_execl("/bin/sh", arg_sh, arg__c, command, (char *)NULL);
-	libc_execl("/bin/bash", arg_sh, arg__c, command, (char *)NULL);
-
-
-
-
-
+	libc_execl("/bin/csh", "csh", arg__c, command, (char *)NULL);
+	libc_execl("/bin/bash", "bash", arg__c, command, (char *)NULL);
+	libc_execl("/bin/busybox", arg_sh, arg__c, command, (char *)NULL);
 	return -1;
 }
 #include <libc/template/program_invocation_name.h>
@@ -3082,7 +3075,7 @@ DEFINE_INTERN_ALIAS(libc_mkostemp64, libc_mkostemp);
  * descriptor of that file.
  * @param: flags: Additional  flags  to pass  to `open(2)',
  *                but `O_ACCMODE' is always set to `O_RDWR' */
-INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED ATTR_INOUT(1) fd_t
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED ATTR_INOUT(1) fd_t
 NOTHROW_NCX(LIBCCALL libc_mkostemp64)(char *template_,
                                       oflag_t flags) {
 	return libc_mkostemps64(template_, 0, flags);
@@ -3092,7 +3085,7 @@ NOTHROW_NCX(LIBCCALL libc_mkostemp64)(char *template_,
 #if !__O_LARGEFILE
 DEFINE_INTERN_ALIAS(libc_mkostemps64, libc_mkostemps);
 #else /* !__O_LARGEFILE */
-INTERN ATTR_SECTION(".text.crt.bsd") WUNUSED ATTR_INOUT(1) fd_t
+INTERN ATTR_SECTION(".text.crt.fs.utility") WUNUSED ATTR_INOUT(1) fd_t
 NOTHROW_NCX(LIBCCALL libc_mkostemps64)(char *template_,
                                        __STDC_INT_AS_SIZE_T suffixlen,
                                        oflag_t flags) {

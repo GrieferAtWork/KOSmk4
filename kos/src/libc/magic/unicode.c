@@ -1502,9 +1502,9 @@ char16_t *unicode_32to16_n([[out(? <= utf16_maxwords)]] /*utf-16*/ char16_t *__r
 @@                     a surrogate was written)
 @@@return: (size_t)-1: Unicode error (the given input string isn't
 @@                     a valid unicode sequence)
-@@@return: (size_t)-2: Success, but  no  character  was  generated
-@@                     (`s...+=n', together with `mbs' doesn't for
-@@                     a full  character, but  `mbs' was  updated)
+@@@return: (size_t)-2: Success,  but  no  character  was  generated
+@@                     (`s...+=n', together with `mbs' doesn't form
+@@                     a  full  character, but  `mbs'  was updated)
 [[decl_include("<bits/crt/mbstate.h>")]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 $size_t unicode_c8toc16([[out]] char16_t *__restrict pc16,
@@ -1642,9 +1642,9 @@ done:
 @@                     is  the  number  of bytes  taken  from `s')
 @@@return: (size_t)-1: Unicode error (the given input string isn't
 @@                     a valid unicode sequence)
-@@@return: (size_t)-2: Success, but  no  character  was  generated
-@@                     (`s...+=n', together with `mbs' doesn't for
-@@                     a full  character, but  `mbs' was  updated)
+@@@return: (size_t)-2: Success,  but  no  character  was  generated
+@@                     (`s...+=n', together with `mbs' doesn't form
+@@                     a  full  character, but  `mbs'  was updated)
 [[decl_include("<bits/crt/mbstate.h>")]]
 [[decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 $size_t unicode_c8toc32([[out]] char32_t *__restrict pc32,

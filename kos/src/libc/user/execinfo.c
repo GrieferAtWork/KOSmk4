@@ -180,149 +180,159 @@ NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array,
 }
 /*[[[end:libc_backtrace]]]*/
 
-PRIVATE ATTR_SECTION(".text.crt.debug") ssize_t
-NOTHROW_NCX(LIBCCALL print_function_name)(void *pc,
-                                          pformatprinter printer,
-                                          void *arg) {
-	void *mod;
-	ssize_t result;
-	di_addr2line_sections_t sections;
-    di_addr2line_dl_sections_t dl_sections;
-	di_debug_addr2line_t a2l;
-	/* Figure out the module mapped at the given program counter. */
-	mod = dlgethandle(pc, DLGETHANDLE_FINCREF);
-	if unlikely(!mod)
-		goto err0;
-	/* Load debug sections for that module. */
-	if (debug_addr2line_sections_lock(mod, &sections, &dl_sections) != DEBUG_INFO_ERROR_SUCCESS)
-		goto err0_handle;
-	/* Try to extract debug information about the given address. */
-	if (debug_addr2line(&sections, &a2l,
-	                             (uintptr_t)pc - (uintptr_t)dlmodulebase(mod),
-	                             DEBUG_ADDR2LINE_LEVEL_SOURCE,
-	                             DEBUG_ADDR2LINE_FNORMAL) != DEBUG_INFO_ERROR_SUCCESS)
-		goto err0_sect;
-	if (!a2l.al_rawname)
-		a2l.al_rawname = a2l.al_name;
-	if (!a2l.al_rawname)
-		goto err0_sect;
-	/* Print the function's name. */
-	result = (*printer)(arg, a2l.al_rawname, strlen(a2l.al_rawname));
-	/* Release references to acquired data. */
-	debug_addr2line_sections_unlock(&dl_sections);
-	dlclose(mod);
-	return result;
-err0_sect:
-	debug_addr2line_sections_unlock(&dl_sections);
-err0_handle:
-	dlclose(mod);
-err0:
-	return 0;
-}
+PRIVATE ATTR_SECTION(".rodata.crt.debug") char const
+backtrace_default_fmt[] = "%a <%n%D> at %f";
+PRIVATE ATTR_SECTION(".rodata.crt.debug") char const
+backtrace_missing_str[] = "??" "?";
 
-/*[[[head:libc_backtrace_symbols,hash:CRC-32=0x7c3f0001]]]*/
-/* >> backtrace_symbols(3)
- * Return  an  array  of  exactly  `size'  elements  that  contains  the
- * names   associated  with  program-counters  from  the  given  `array'
- * This  function  is meant  to  be used  together  with `backtrace(3)'.
- * On KOS,  the  names  of  functions are  gathered  with  the  help  of
- * functions  from  `<libdebuginfo/...>', meaning  that many  sources of
- * function names are looked  at, including `.dynsym' and  `.debug_info'
- * On other systems,  this function  is fairly  dumb and  only looks  at
- * names from `.dynsym', meaning that functions not declared as `PUBLIC'
- * would not show up.
- * The returned pointer  is a size-element  long vector of  strings
- * describing the names of functions,  and should be freed()  using
- * `free(3)'. Note however that you must _ONLY_ `free(return)', and
- * not the individual strings pointed-to by that vector!
- * @return: * :   A heap pointer to a vector of function names
- * @return: NULL: Insufficient heap memory available */
-INTERN ATTR_SECTION(".text.crt.debug") ATTR_INS(1, 2) char **
-NOTHROW_NCX(LIBCCALL libc_backtrace_symbols)(void *const *array,
-                                             __STDC_INT_AS_SIZE_T size)
-/*[[[body:libc_backtrace_symbols]]]*/
+
+/*[[[head:libc_backtrace_symbol_printf,hash:CRC-32=0x5f5899fe]]]*/
+/* >> backtrace_symbol_printf(3)
+ * Print the formatted representation of `address' to `printer'
+ *  - The used format is `format' (or "%a <%n%D> at %f" if NULL)
+ *  - No trailing linefeed is printed
+ *  - If debug information could not be loaded, use "???" for strings
+ * @return: * : pformatprinter-compatible return value */
+INTERN ATTR_SECTION(".text.crt.debug") ATTR_IN_OPT(4) NONNULL((1)) ssize_t
+NOTHROW_NCX(LIBCCALL libc_backtrace_symbol_printf)(pformatprinter printer,
+                                                   void *arg,
+                                                   void const *address,
+                                                   char const *format)
+/*[[[body:libc_backtrace_symbol_printf]]]*/
 {
-	char **result;
-	unsigned int i;
-	struct format_aprintf_data data;
-	if unlikely((int)size < 0) {
-		libc_seterrno(EINVAL);
-		goto err_nodata;
+	ssize_t temp, result = 0;
+	module_t *mod;
+	di_addr2line_dl_sections_t dl_sections;
+	Dl_info info;
+	char const *flush_start;
+
+	/* Load generic ELF symbol information. */
+	bzero(&info, sizeof(info));
+	dladdr(address, &info);
+	if (!info.dli_fname)
+		info.dli_fname = backtrace_missing_str;
+	if (!info.dli_sname) {
+		info.dli_sname = backtrace_missing_str;
+		info.dli_saddr = (void *)address;
 	}
-	if (!init_libdebuginfo()) {
-		libc_seterrno(ENOENT);
-		goto err_nodata;
+
+	/* Try to load extended addr2line information */
+	mod = NULL;
+	if ((init_libdebuginfo()) &&
+	    (mod = dlgethandle(address, DLGETHANDLE_FINCREF)) != NULL) {
+		di_addr2line_sections_t sections;
+		di_debug_addr2line_t a2l;
+		uintptr_t modbase = (uintptr_t)dlmodulebase(mod);
+
+		/* Try to extract debug information about the given address.
+		 * HINT: Upon failure, `debug_addr2line_sections_lock()'  fills
+		 *       in `dl_sections' for `debug_addr2line_sections_unlock'
+		 *       to become a no-op! */
+		if (debug_addr2line_sections_lock(mod, &sections, &dl_sections) == DEBUG_INFO_ERROR_SUCCESS &&
+		    debug_addr2line(&sections, &a2l, (uintptr_t)address - modbase,
+		                    DEBUG_ADDR2LINE_LEVEL_SOURCE,
+		                    DEBUG_ADDR2LINE_FNORMAL) == DEBUG_INFO_ERROR_SUCCESS) {
+			/* Use debug information strings. */
+			if (!a2l.al_rawname)
+				a2l.al_rawname = a2l.al_name;
+			if (a2l.al_rawname) {
+				info.dli_sname = a2l.al_rawname;
+				info.dli_saddr = (void *)(modbase + a2l.al_symstart);
+				info.dli_fname = dlmodulename(mod);
+			}
+		}
 	}
-	format_aprintf_data_init(&data);
-	/* Make space for the string array itself. */
-	if unlikely(!format_aprintf_alloc(&data, CEILDIV((size + 1) * sizeof(char *), sizeof(char))))
-		goto err;
-	for (i = 0; i < size; ++i) {
-		PRIVATE ATTR_SECTION(SECTION_DEBUG_STRING) char const debug_empty_string[1] = { 0 };
-		if unlikely(print_function_name(array[i], &format_aprintf_printer, &data) < 0)
+
+	/* Time for the meat of it all: processing the format string. */
+	if (format == NULL)
+		format = backtrace_default_fmt;
+	flush_start = format;
+	for (;;) {
+		char ch = *format;
+		if (ch == '\0')
+			break;
+		if (ch != '%') {
+			++format;
+			continue;
+		}
+		/* Flush until here! */
+		if (format > flush_start) {
+			temp = (*printer)(arg, flush_start,
+			                  (size_t)(format - flush_start));
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
+		}
+
+		/* Load the format character. */
+		ch = *++format;
+		++format;
+		switch (ch) {
+
+		case 'a':
+			temp = format_printf(printer, arg, "%p", address);
+			break;
+
+		case 'n':
+			temp = (*printer)(arg, info.dli_sname, strlen(info.dli_sname));
+			break;
+
+		case 'd':
+			temp = format_printf(printer, arg, "%#" PRIxSIZ,
+			                     (size_t)((uintptr_t)address -
+			                              (uintptr_t)info.dli_saddr));
+			break;
+
+		case 'D':
+			temp = (ssize_t)(size_t)((uintptr_t)address -
+			                         (uintptr_t)info.dli_saddr);
+			if (temp != 0)
+				temp = format_printf(printer, arg, "+%#" PRIxSIZ, (size_t)temp);
+			break;
+
+		case 'f':
+			temp = (*printer)(arg, info.dli_fname, strlen(info.dli_fname));
+			break;
+
+		case '\0':
+			--format; /* Special handling for an unescaped, trailing '%' */
+			ATTR_FALLTHROUGH
+		default:
+			/* Skip over the leading '%', but print the following character as-is */
+			flush_start = format - 1;
+			continue;
+		}
+		if unlikely(temp < 0)
 			goto err;
-		if unlikely(format_aprintf_printer(array[i], debug_empty_string, 1) < 0)
-			goto err;
+		result += temp;
+		flush_start = format;
 	}
-	result = (char **)format_aprintf_pack(&data, NULL);
-	if likely(result) {
-		char *name = (char *)result + CEILDIV((size + 1) *
-		                                      sizeof(char *),
-		                                      sizeof(char));
-		for (i = 0; i < size; ++i, name = strend(name) + 1)
-			result[i] = name;
-		result[i] = NULL;
+
+	/* Flush trailing data. */
+	if (format > flush_start) {
+		temp = (*printer)(arg, flush_start,
+		                  (size_t)(format - flush_start));
+		if unlikely(temp < 0)
+			goto err;
+		result += temp;
+	}
+out:
+	if (mod) {
+		debug_addr2line_sections_unlock(&dl_sections);
+		dlclose(mod);
 	}
 	return result;
 err:
-	format_aprintf_data_fini(&data);
-err_nodata:
-	return NULL;
+	result = temp;
+	goto out;
 }
-/*[[[end:libc_backtrace_symbols]]]*/
-
-/*[[[head:libc_backtrace_symbols_fd,hash:CRC-32=0x43200c40]]]*/
-/* >> backtrace_symbols_fd(3)
- * Same as `backtrace_symbols()', but rather than return a vector
- * of symbol names, print the  names directly to `fd', such  that
- * one  function name will be written per line, with `size' lines
- * written in total. */
-INTERN ATTR_SECTION(".text.crt.debug") ATTR_INS(1, 2) void
-NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array,
-                                                __STDC_INT_AS_SIZE_T size,
-                                                fd_t fd)
-/*[[[body:libc_backtrace_symbols_fd]]]*/
-{
-	ssize_t error;
-	unsigned int i;
-	if unlikely((int)size < 0)
-		return;
-	if (!init_libdebuginfo())
-		return;
-	for (i = 0; i < size; ++i) {
-		PRIVATE ATTR_SECTION(SECTION_DEBUG_STRING) char const debug_lf[1] = { '\n' };
-		PRIVATE ATTR_SECTION(SECTION_DEBUG_STRING) char const debug_unknown_name[1] = { '?' };
-		error = print_function_name(array[i], &libc_write_printer, WRITE_PRINTER_ARG(fd));
-		if unlikely(error < 0)
-			break;
-		if (!error)
-			write(fd, debug_unknown_name, sizeof(debug_unknown_name));
-		write(fd, debug_lf, sizeof(debug_lf));
-	}
-}
-/*[[[end:libc_backtrace_symbols_fd]]]*/
+/*[[[end:libc_backtrace_symbol_printf]]]*/
 
 
-
-
-
-/*[[[start:exports,hash:CRC-32=0xf511d171]]]*/
+/*[[[start:exports,hash:CRC-32=0xa014b7f7]]]*/
 DEFINE_PUBLIC_ALIAS(__backtrace, libc_backtrace);
 DEFINE_PUBLIC_ALIAS(backtrace, libc_backtrace);
-DEFINE_PUBLIC_ALIAS(__backtrace_symbols, libc_backtrace_symbols);
-DEFINE_PUBLIC_ALIAS(backtrace_symbols, libc_backtrace_symbols);
-DEFINE_PUBLIC_ALIAS(__backtrace_symbols_fd, libc_backtrace_symbols_fd);
-DEFINE_PUBLIC_ALIAS(backtrace_symbols_fd, libc_backtrace_symbols_fd);
+DEFINE_PUBLIC_ALIAS(backtrace_symbol_printf, libc_backtrace_symbol_printf);
 /*[[[end:exports]]]*/
 
 DECL_END

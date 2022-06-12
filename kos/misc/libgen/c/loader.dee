@@ -1302,8 +1302,8 @@ class FunctionFeatures {
 			"no_auto_dependency_scanning"  : ("noAutoDependencyScanning", true),
 			"no_crt_kos_attr"              : ("crt_kosExtraAttr", none),
 			"no_crt_dos_attr"              : ("crt_dosExtraAttr", none),
-			"crt_dos_optimize_size"    : ("crt_dosNoOptimizeSize", false),
-			"no_crt_dos_optimize_size" : ("crt_dosNoOptimizeSize", true),
+			"crt_dos_optimize_size"        : ("crt_dosNoOptimizeSize", false),
+			"no_crt_dos_optimize_size"     : ("crt_dosNoOptimizeSize", true),
 		};
 
 		switch (tok) {
@@ -2139,41 +2139,40 @@ class LoaderContext {
 	@@List of pushed macros, in the form of tuples of @(locationList, macroList)
 	public member pushedMacros: {({string...}, {string...})...} | none = none;
 
+	@@This directive has a somewhat weird syntax that is the result of its history:
+	@@   '%' '[' 'push_macro' ['(' groups ')'] [@option...] '(' macros... ')' ']'
+	@@   '%' '[' 'push_macro' ['(' groups ')'] [@option...] '{' macros... '}' ']'
+	@@ - Where "macros..." is a space-seperated list of keywords  or
+	@@   C-strings, with ","-tokens in-between simply being ignored.
+	@@ - The only recognized value for @option is the literal  token
+	@@   sequence '@' 'undef', which will cause all pushed macros to
+	@@   be #undef'ed after being pushed
+	@@
+	@@Example:
+	@@>> %[push_macro(c, std) @undef { foo bar }]
+	@@>> %(c, std){
+	@@>> struct foo {
+	@@>>     int bar;
+	@@>> };
+	@@>> }
+	@@>> %[push_macro(c, std) @undef { foo bar }]
+	@@Output  (in  locations   "c"  and   "std"):
+	@@>> #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+	@@>> #pragma push_macro("foo")
+	@@>> #pragma push_macro("bar")
+	@@>> #endif // __COMPILER_HAVE_PRAGMA_PUSHMACRO
+	@@>> #undef foo
+	@@>> #undef bar
+	@@>> struct foo {
+	@@>>     int bar;
+	@@>> };
+	@@>> #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+	@@>> #pragma pop_macro("bar")
+	@@>> #pragma pop_macro("foo")
+	@@>> #endif // __COMPILER_HAVE_PRAGMA_PUSHMACRO
 	public function parseDirective_push_macro() {
 		local self = this.self;
 		local tok = self.tok;
-		/* This directive has a somewhat weird syntax that is the result of its history:
-		 *    '%' '[' 'push_macro' ['(' groups ')'] [@option...] '(' macros... ')' ']'
-		 *    '%' '[' 'push_macro' ['(' groups ')'] [@option...] '{' macros... '}' ']'
-		 *  - Where "macros..." is a space-seperated list of keywords  or
-		 *    C-strings, with ","-tokens in-between simply being ignored.
-		 *  - The only recognized value for @option is the literal  token
-		 *    sequence '@' 'undef', which will cause all pushed macros to
-		 *    be #undef'ed after being pushed
-		 *
-		 * Example:
-		 * >> %[push_macro(c, std) @undef { foo bar }]
-		 * >> %(c, std){
-		 * >> struct foo {
-		 * >>     int bar;
-		 * >> };
-		 * >> }
-		 * >> %[push_macro(c, std) @undef { foo bar }]
-		 * Output  (in  locations   "c"  and   "std"):
-		 * >> #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-		 * >> #pragma push_macro("foo")
-		 * >> #pragma push_macro("bar")
-		 * >> #endif // __COMPILER_HAVE_PRAGMA_PUSHMACRO
-		 * >> #undef foo
-		 * >> #undef bar
-		 * >> struct foo {
-		 * >>     int bar;
-		 * >> };
-		 * >> #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-		 * >> #pragma pop_macro("bar")
-		 * >> #pragma pop_macro("foo")
-		 * >> #endif // __COMPILER_HAVE_PRAGMA_PUSHMACRO
-		 */
 		final local DEFAULT_LOCATION_LIST = ("c", );
 		local macroList;
 		local locationList = DEFAULT_LOCATION_LIST;
@@ -2317,8 +2316,9 @@ do_push_macroList:
 		self.next();
 	}
 
+	@@Set default function annotations:
+	@@>>%[default:...]
 	public function parseDirective_default() {
-		/* %[default:...] Set default function annotations */
 		self.next();
 		self.skip(":");
 again_parse_default_annotation:
@@ -2335,8 +2335,9 @@ again_parse_default_annotation:
 		}
 	}
 
+	@@Include contents of another file here:
+	@@>>%[include(...)]
 	public function parseDirective_include() {
-		/* %[include(...)] include contents of another file here */
 		local self = this.self;
 		self.next();
 		self.skip("(");
@@ -2352,7 +2353,7 @@ again_parse_default_annotation:
 			}
 			incFileName = fs.abspath(incFileName, baseDir);
 		}
-		local incFileParser;
+		local incFileParser: CParser;
 		with (local fp = File.open(incFileName))
 			incFileParser = CParser(fp, filename: incFileName);
 		try {
@@ -2376,12 +2377,12 @@ again_parse_default_annotation:
 			.format({ tok }));
 	}
 
+	@@Print a given prefix, but mark it as already having been printed for this header
 	@@>> %[insert:prefix(
 	@@>> #ifdef __LIBC_BIND_OPTIMIZATIONS
 	@@>> #include <optimized/string.h>
 	@@>> #endif /* __LIBC_BIND_OPTIMIZATIONS */
 	@@>> )]
-	@@Print a given prefix, but mark it as already having been printed for this header
 	public function parseInsertDirective_prefix(functionName: string = "printPrefix") {
 		local self = this.self;
 		self.next();
@@ -2565,10 +2566,10 @@ again:
 		self.skip(")");
 	}
 
+	@@>> %[insert:extern(foo)]
+	@@Alias for:
+	@@>> %[insert:function(foo, guardName: true)]
 	public function parseInsertDirective_extern() {
-		/* >> %[insert:extern(foo)]
-		 * Alias for:
-		 * >> %[insert:function(foo, guardName: true)] */
 		local self = this.self;
 		self.next();
 		self.skip("(");
@@ -2592,8 +2593,8 @@ again:
 		self.skip(")");
 	}
 
+	@@>> %[insert:std]
 	public function parseInsertDirective_std() {
-		/* %[insert:std] */
 		if (result_order_headerStd !is none)
 			self.err("Multiple '%[insert:std]' directives");
 		else {
@@ -2619,13 +2620,12 @@ again:
 		self.next();
 	}
 
+	@@Define headers needed for type declarations:
+	@@>> %[define_decl_include(["struct partition_def"] = "<bits/crt/partition.h>")]
+	@@>> %[define_decl_include("struct partition_def" = "<bits/crt/partition.h>")]
+	@@>> %[define_decl_include("<bits/crt/partition.h>": "struct partition_def")]
+	@@>> %[define_decl_include("<bits/crt/partition.h>": ["struct partition_def"])]
 	public function parseDirective_define_decl_include() {
-		/* Define headers needed for type declarations
-		 * >> %[define_decl_include(["struct partition_def"] = "<bits/crt/partition.h>")]
-		 * >> %[define_decl_include("struct partition_def" = "<bits/crt/partition.h>")]
-		 * >> %[define_decl_include("<bits/crt/partition.h>": "struct partition_def")]
-		 * >> %[define_decl_include("<bits/crt/partition.h>": ["struct partition_def"])]
-		 */
 		self.next();
 		self.skip("(");
 		local decls: {string...} = [];
@@ -2912,14 +2912,14 @@ again:
 		}
 	}
 
-	@@Define    function    implementation   templates
-	@@>%[define_template(tpl_strtoi<SIGNED, T, BITS> =
-	@@>	[[impl_include("<asm/os/errno.h>", "<hybrid/__overflow.h>")]]
-	@@>	[[impl_include("<hybrid/limitcore.h>")]]
-	@@>	[[impl_include("<libc/template/hex.h>")]]
-	@@>{
-	@@>	BODY
-	@@>}
+	@@Define    function    implementation   templates:
+	@@>>%[define_template(tpl_strtoi<SIGNED, T, BITS> =
+	@@>>	[[impl_include("<asm/os/errno.h>", "<hybrid/__overflow.h>")]]
+	@@>>	[[impl_include("<hybrid/limitcore.h>")]]
+	@@>>	[[impl_include("<libc/template/hex.h>")]]
+	@@>>{
+	@@>>	BODY
+	@@>>}
 	public function parseDirective_define_template() {
 		self.next();
 		self.skip("(");
@@ -2968,13 +2968,12 @@ again:
 	@@is  replaced in  all situations, regardless  of escape mode,  as well as
 	@@the fact that the replacement text will be re-parsed for further macros,
 	@@as well as replacements.
-	@@Note that macros defined using this directive are expanded at the same
-	@@time    as   special   builtin   macros   such   as   @"$has_function"
+	@@Note that macros defined using this directive are expanded at the
+	@@same time  as special  builtin macros  such as  @"$has_function".
 	public function parseDirective_define() {
 		parseDirective_define_replacement(keywordMacros);
 	}
 
-	@@NOTE: The int-value is one of `CRT_NAME_LIST_*`
 	public member crtNameLists: {string: {string...}} = none;
 
 	@@Parse `foo` or `foo...`, and return { "foo" } for
@@ -2995,9 +2994,11 @@ again:
 
 	@@Define a list of CRT symbol names for use in alias() and similar attributes
 	@@>%[define_crt_name_list(NAME = [FIRST_NAME, SECOND_NAME, ...])]
-	@@The    list    of   names    can    then   be    used    in   declarations:
+	@@
+	@@The list of names can then be used in declarations:
 	@@>[[alias(NAME...)]]
 	@@>foo();
+	@@
 	@@Which behaves the same as:
 	@@>[[alias(FIRST_NAME, SECOND_NAME, ...)]]
 	@@>foo();

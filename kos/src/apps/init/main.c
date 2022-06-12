@@ -299,10 +299,10 @@ done_tmpfs:
 			}
 
 			/* Try some fallback paths. */
-			execle("/bin/busybox", "bash", (char *)NULL, init_envp);
 			execle("/bin/sh", "sh", (char *)NULL, init_envp);
 			execle("/bin/csh", "csh", (char *)NULL, init_envp);
 			execle("/bin/bash", "bash", (char *)NULL, init_envp);
+			execle("/bin/busybox", "bash", (char *)NULL, init_envp);
 
 			/* Display an error if we were unable to launch a shell. */
 			dprintf(STDOUT_FILENO, "Failed to launch shell: %m\n");

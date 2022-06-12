@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1484c35 */
+/* HASH CRC-32:0x44650632 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,8 +21,8 @@
 #ifndef __local_qsort_defined
 #define __local_qsort_defined
 #include <__crt.h>
-#include <hybrid/typecore.h>
 #include <kos/anno.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_qsort_r_defined
 #define __local___localdep_qsort_r_defined

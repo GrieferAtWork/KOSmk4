@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc9dbdcd */
+/* HASH CRC-32:0x847c3874 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1123,9 +1123,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_32to16_n, __FORCELOCAL __ATTR_ARTIFICIAL
  *                      a surrogate was written)
  * @return: (size_t)-1: Unicode error (the given input string isn't
  *                      a valid unicode sequence)
- * @return: (size_t)-2: Success, but  no  character  was  generated
- *                      (`s...+=n', together with `mbs' doesn't for
- *                      a full  character, but  `mbs' was  updated) */
+ * @return: (size_t)-2: Success,  but  no  character  was  generated
+ *                      (`s...+=n', together with `mbs' doesn't form
+ *                      a  full  character, but  `mbs'  was updated) */
 __CDECLARE(__ATTR_INOUT(4) __ATTR_INS(2, 3) __ATTR_OUT(1),__SIZE_TYPE__,__NOTHROW_NCX,unicode_c8toc16,(char16_t *__restrict __pc16, char const *__restrict __s, __SIZE_TYPE__ __n, mbstate_t *__restrict __mbs),(__pc16,__s,__n,__mbs))
 #else /* __CRT_HAVE_unicode_c8toc16 */
 #include <libc/local/unicode/unicode_c8toc16.h>
@@ -1137,9 +1137,9 @@ __CDECLARE(__ATTR_INOUT(4) __ATTR_INS(2, 3) __ATTR_OUT(1),__SIZE_TYPE__,__NOTHRO
  *                      a surrogate was written)
  * @return: (size_t)-1: Unicode error (the given input string isn't
  *                      a valid unicode sequence)
- * @return: (size_t)-2: Success, but  no  character  was  generated
- *                      (`s...+=n', together with `mbs' doesn't for
- *                      a full  character, but  `mbs' was  updated) */
+ * @return: (size_t)-2: Success,  but  no  character  was  generated
+ *                      (`s...+=n', together with `mbs' doesn't form
+ *                      a  full  character, but  `mbs'  was updated) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_c8toc16, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(4) __ATTR_INS(2, 3) __ATTR_OUT(1) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL unicode_c8toc16)(char16_t *__restrict __pc16, char const *__restrict __s, __SIZE_TYPE__ __n, mbstate_t *__restrict __mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_c8toc16))(__pc16, __s, __n, __mbs); })
 #endif /* !__CRT_HAVE_unicode_c8toc16 */
 #ifdef __CRT_HAVE_unicode_c8toc32
@@ -1148,9 +1148,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_c8toc16, __FORCELOCAL __ATTR_ARTIFICIAL 
  *                      is  the  number  of bytes  taken  from `s')
  * @return: (size_t)-1: Unicode error (the given input string isn't
  *                      a valid unicode sequence)
- * @return: (size_t)-2: Success, but  no  character  was  generated
- *                      (`s...+=n', together with `mbs' doesn't for
- *                      a full  character, but  `mbs' was  updated) */
+ * @return: (size_t)-2: Success,  but  no  character  was  generated
+ *                      (`s...+=n', together with `mbs' doesn't form
+ *                      a  full  character, but  `mbs'  was updated) */
 __CDECLARE(__ATTR_INOUT(4) __ATTR_INS(2, 3) __ATTR_OUT(1),__SIZE_TYPE__,__NOTHROW_NCX,unicode_c8toc32,(char32_t *__restrict __pc32, char const *__restrict __s, __SIZE_TYPE__ __n, mbstate_t *__restrict __mbs),(__pc32,__s,__n,__mbs))
 #else /* __CRT_HAVE_unicode_c8toc32 */
 #include <libc/local/unicode/unicode_c8toc32.h>
@@ -1159,9 +1159,9 @@ __CDECLARE(__ATTR_INOUT(4) __ATTR_INS(2, 3) __ATTR_OUT(1),__SIZE_TYPE__,__NOTHRO
  *                      is  the  number  of bytes  taken  from `s')
  * @return: (size_t)-1: Unicode error (the given input string isn't
  *                      a valid unicode sequence)
- * @return: (size_t)-2: Success, but  no  character  was  generated
- *                      (`s...+=n', together with `mbs' doesn't for
- *                      a full  character, but  `mbs' was  updated) */
+ * @return: (size_t)-2: Success,  but  no  character  was  generated
+ *                      (`s...+=n', together with `mbs' doesn't form
+ *                      a  full  character, but  `mbs'  was updated) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_c8toc32, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(4) __ATTR_INS(2, 3) __ATTR_OUT(1) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL unicode_c8toc32)(char32_t *__restrict __pc32, char const *__restrict __s, __SIZE_TYPE__ __n, mbstate_t *__restrict __mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_c8toc32))(__pc32, __s, __n, __mbs); })
 #endif /* !__CRT_HAVE_unicode_c8toc32 */
 #ifdef __CRT_HAVE_unicode_c16toc8

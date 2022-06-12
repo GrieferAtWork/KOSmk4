@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fa45c13 */
+/* HASH CRC-32:0x84e9e339 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -401,6 +401,11 @@ DEFINE_PUBLIC_ALIAS(DOS$__backtrace_symbols, libd_backtrace_symbols);
 DEFINE_PUBLIC_ALIAS(DOS$backtrace_symbols, libd_backtrace_symbols);
 DEFINE_PUBLIC_ALIAS(DOS$__backtrace_symbols_fd, libd_backtrace_symbols_fd);
 DEFINE_PUBLIC_ALIAS(DOS$backtrace_symbols_fd, libd_backtrace_symbols_fd);
+DEFINE_PUBLIC_ALIAS(DOS$__backtrace_symbols, libd_backtrace_symbols_fmt);
+DEFINE_PUBLIC_ALIAS(DOS$backtrace_symbols_fmt, libd_backtrace_symbols_fmt);
+DEFINE_PUBLIC_ALIAS(DOS$__backtrace_symbols_fd, libd_backtrace_symbols_fd_fmt);
+DEFINE_PUBLIC_ALIAS(DOS$backtrace_symbols_fd_fmt, libd_backtrace_symbols_fd_fmt);
+DEFINE_PUBLIC_ALIAS(DOS$backtrace_symbol_printf, libd_backtrace_symbol_printf);
 
 /* fcntl */
 DEFINE_PUBLIC_ALIAS(DOS$readahead, libd_readahead);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2bb43dd */
+/* HASH CRC-32:0x89d18a00 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -471,9 +471,9 @@ INTDEF ATTR_RETNONNULL ATTR_INS(3, 4) ATTR_OUTS(1, 2) char16_t *NOTHROW_NCX(LIBC
  *                      a surrogate was written)
  * @return: (size_t)-1: Unicode error (the given input string isn't
  *                      a valid unicode sequence)
- * @return: (size_t)-2: Success, but  no  character  was  generated
- *                      (`s...+=n', together with `mbs' doesn't for
- *                      a full  character, but  `mbs' was  updated) */
+ * @return: (size_t)-2: Success,  but  no  character  was  generated
+ *                      (`s...+=n', together with `mbs' doesn't form
+ *                      a  full  character, but  `mbs'  was updated) */
 INTDEF ATTR_INOUT(4) ATTR_INS(2, 3) ATTR_OUT(1) size_t NOTHROW_NCX(LIBDCALL libd_unicode_c8toc16)(char16_t *__restrict pc16, char const *__restrict s, size_t n, mbstate_t *__restrict mbs);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -485,9 +485,9 @@ INTDEF ATTR_INOUT(4) ATTR_INS(2, 3) ATTR_OUT(1) size_t NOTHROW_NCX(LIBDCALL libd
  *                      a surrogate was written)
  * @return: (size_t)-1: Unicode error (the given input string isn't
  *                      a valid unicode sequence)
- * @return: (size_t)-2: Success, but  no  character  was  generated
- *                      (`s...+=n', together with `mbs' doesn't for
- *                      a full  character, but  `mbs' was  updated) */
+ * @return: (size_t)-2: Success,  but  no  character  was  generated
+ *                      (`s...+=n', together with `mbs' doesn't form
+ *                      a  full  character, but  `mbs'  was updated) */
 INTDEF ATTR_INOUT(4) ATTR_INS(2, 3) ATTR_OUT(1) size_t NOTHROW_NCX(LIBCCALL libc_unicode_c8toc16)(char16_t *__restrict pc16, char const *__restrict s, size_t n, mbstate_t *__restrict mbs);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
@@ -496,9 +496,9 @@ INTDEF ATTR_INOUT(4) ATTR_INS(2, 3) ATTR_OUT(1) size_t NOTHROW_NCX(LIBCCALL libc
  *                      is  the  number  of bytes  taken  from `s')
  * @return: (size_t)-1: Unicode error (the given input string isn't
  *                      a valid unicode sequence)
- * @return: (size_t)-2: Success, but  no  character  was  generated
- *                      (`s...+=n', together with `mbs' doesn't for
- *                      a full  character, but  `mbs' was  updated) */
+ * @return: (size_t)-2: Success,  but  no  character  was  generated
+ *                      (`s...+=n', together with `mbs' doesn't form
+ *                      a  full  character, but  `mbs'  was updated) */
 INTDEF ATTR_INOUT(4) ATTR_INS(2, 3) ATTR_OUT(1) size_t NOTHROW_NCX(LIBDCALL libd_unicode_c8toc32)(char32_t *__restrict pc32, char const *__restrict s, size_t n, mbstate_t *__restrict mbs);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -507,9 +507,9 @@ INTDEF ATTR_INOUT(4) ATTR_INS(2, 3) ATTR_OUT(1) size_t NOTHROW_NCX(LIBDCALL libd
  *                      is  the  number  of bytes  taken  from `s')
  * @return: (size_t)-1: Unicode error (the given input string isn't
  *                      a valid unicode sequence)
- * @return: (size_t)-2: Success, but  no  character  was  generated
- *                      (`s...+=n', together with `mbs' doesn't for
- *                      a full  character, but  `mbs' was  updated) */
+ * @return: (size_t)-2: Success,  but  no  character  was  generated
+ *                      (`s...+=n', together with `mbs' doesn't form
+ *                      a  full  character, but  `mbs'  was updated) */
 INTDEF ATTR_INOUT(4) ATTR_INS(2, 3) ATTR_OUT(1) size_t NOTHROW_NCX(LIBCCALL libc_unicode_c8toc32)(char32_t *__restrict pc32, char const *__restrict s, size_t n, mbstate_t *__restrict mbs);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x616e7022 */
+/* HASH CRC-32:0xa08e623e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,9 +32,12 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-#include <features.h> /* __STDC_INT_AS_UINT_T */
+#include <features.h>
+#include <bits/types.h>
 
-#include <bits/types.h> /* $fd_t */
+#ifdef __USE_KOS
+#include <bits/crt/format-printer.h>
+#endif /* __USE_KOS */
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -62,56 +65,172 @@ __CREDIRECT(__ATTR_OUTS(1, 2),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,backtrace,(void
 #endif /* ... */
 #ifdef __CRT_HAVE_backtrace_symbols
 /* >> backtrace_symbols(3)
- * Return  an  array  of  exactly  `size'  elements  that  contains  the
- * names   associated  with  program-counters  from  the  given  `array'
- * This  function  is meant  to  be used  together  with `backtrace(3)'.
- * On KOS,  the  names  of  functions are  gathered  with  the  help  of
- * functions  from  `<libdebuginfo/...>', meaning  that many  sources of
- * function names are looked  at, including `.dynsym' and  `.debug_info'
- * On other systems,  this function  is fairly  dumb and  only looks  at
- * names from `.dynsym', meaning that functions not declared as `PUBLIC'
- * would not show up.
- * The returned pointer  is a size-element  long vector of  strings
- * describing the names of functions,  and should be freed()  using
- * `free(3)'. Note however that you must _ONLY_ `free(return)', and
- * not the individual strings pointed-to by that vector!
+ * Same as `backtrace_symbols_fmt(array, size, NULL)'
+ *
+ * The returned  pointer is  a size-element  long vector  of  strings
+ * describing the  addresses  from  `array', and  should  be  freed()
+ * using `free(3)'. Note however that you must _ONLY_ `free(return)',
+ * and not the individual strings pointed-to by that vector!
  * @return: * :   A heap pointer to a vector of function names
  * @return: NULL: Insufficient heap memory available */
 __CDECLARE(__ATTR_INS(1, 2),char **,__NOTHROW_NCX,backtrace_symbols,(void *const *__array, __STDC_INT_AS_SIZE_T __size),(__array,__size))
 #elif defined(__CRT_HAVE___backtrace_symbols)
 /* >> backtrace_symbols(3)
- * Return  an  array  of  exactly  `size'  elements  that  contains  the
- * names   associated  with  program-counters  from  the  given  `array'
- * This  function  is meant  to  be used  together  with `backtrace(3)'.
- * On KOS,  the  names  of  functions are  gathered  with  the  help  of
- * functions  from  `<libdebuginfo/...>', meaning  that many  sources of
- * function names are looked  at, including `.dynsym' and  `.debug_info'
- * On other systems,  this function  is fairly  dumb and  only looks  at
- * names from `.dynsym', meaning that functions not declared as `PUBLIC'
- * would not show up.
- * The returned pointer  is a size-element  long vector of  strings
- * describing the names of functions,  and should be freed()  using
- * `free(3)'. Note however that you must _ONLY_ `free(return)', and
- * not the individual strings pointed-to by that vector!
+ * Same as `backtrace_symbols_fmt(array, size, NULL)'
+ *
+ * The returned  pointer is  a size-element  long vector  of  strings
+ * describing the  addresses  from  `array', and  should  be  freed()
+ * using `free(3)'. Note however that you must _ONLY_ `free(return)',
+ * and not the individual strings pointed-to by that vector!
  * @return: * :   A heap pointer to a vector of function names
  * @return: NULL: Insufficient heap memory available */
 __CREDIRECT(__ATTR_INS(1, 2),char **,__NOTHROW_NCX,backtrace_symbols,(void *const *__array, __STDC_INT_AS_SIZE_T __size),__backtrace_symbols,(__array,__size))
+#elif defined(__CRT_HAVE_backtrace_symbols_fmt) || (defined(__CRT_HAVE_backtrace_symbol_printf) && (defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
+#include <libc/local/execinfo/backtrace_symbols.h>
+/* >> backtrace_symbols(3)
+ * Same as `backtrace_symbols_fmt(array, size, NULL)'
+ *
+ * The returned  pointer is  a size-element  long vector  of  strings
+ * describing the  addresses  from  `array', and  should  be  freed()
+ * using `free(3)'. Note however that you must _ONLY_ `free(return)',
+ * and not the individual strings pointed-to by that vector!
+ * @return: * :   A heap pointer to a vector of function names
+ * @return: NULL: Insufficient heap memory available */
+__NAMESPACE_LOCAL_USING_OR_IMPL(backtrace_symbols, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(1, 2) char **__NOTHROW_NCX(__LIBCCALL backtrace_symbols)(void *const *__array, __STDC_INT_AS_SIZE_T __size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(backtrace_symbols))(__array, __size); })
 #endif /* ... */
 #ifdef __CRT_HAVE_backtrace_symbols_fd
 /* >> backtrace_symbols_fd(3)
- * Same as `backtrace_symbols()', but rather than return a vector
- * of symbol names, print the  names directly to `fd', such  that
- * one  function name will be written per line, with `size' lines
- * written in total. */
-__CDECLARE_VOID(__ATTR_INS(1, 2),__NOTHROW_NCX,backtrace_symbols_fd,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd),(__array,__size,__fd))
+ * Same as `backtrace_symbols_fd_fmt(array, size, fd, NULL)'
+ * @return: 0 : Success
+ * @return: -1: Error */
+__CDECLARE(__ATTR_INS(1, 2),int,__NOTHROW_NCX,backtrace_symbols_fd,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd),(__array,__size,__fd))
 #elif defined(__CRT_HAVE___backtrace_symbols_fd)
 /* >> backtrace_symbols_fd(3)
- * Same as `backtrace_symbols()', but rather than return a vector
- * of symbol names, print the  names directly to `fd', such  that
- * one  function name will be written per line, with `size' lines
- * written in total. */
-__CREDIRECT_VOID(__ATTR_INS(1, 2),__NOTHROW_NCX,backtrace_symbols_fd,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd),__backtrace_symbols_fd,(__array,__size,__fd))
+ * Same as `backtrace_symbols_fd_fmt(array, size, fd, NULL)'
+ * @return: 0 : Success
+ * @return: -1: Error */
+__CREDIRECT(__ATTR_INS(1, 2),int,__NOTHROW_NCX,backtrace_symbols_fd,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd),__backtrace_symbols_fd,(__array,__size,__fd))
+#else /* ... */
+#include <hybrid/typecore.h>
+#include <bits/crt/format-printer.h>
+#if defined(__CRT_HAVE_backtrace_symbols_fd_fmt) || ((defined(__CRT_HAVE_write_printer) || defined(__CRT_HAVE_writeall) || defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)) && defined(__CRT_HAVE_backtrace_symbol_printf))
+#include <libc/local/execinfo/backtrace_symbols_fd.h>
+/* >> backtrace_symbols_fd(3)
+ * Same as `backtrace_symbols_fd_fmt(array, size, fd, NULL)'
+ * @return: 0 : Success
+ * @return: -1: Error */
+__NAMESPACE_LOCAL_USING_OR_IMPL(backtrace_symbols_fd, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(1, 2) int __NOTHROW_NCX(__LIBCCALL backtrace_symbols_fd)(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(backtrace_symbols_fd))(__array, __size, __fd); })
+#endif /* __CRT_HAVE_backtrace_symbols_fd_fmt || ((__CRT_HAVE_write_printer || __CRT_HAVE_writeall || __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write) && __CRT_HAVE_backtrace_symbol_printf) */
+#endif /* !... */
+#ifdef __CRT_HAVE_backtrace_symbols_fmt
+/* >> backtrace_symbols_fmt(3)
+ * Format the given `array' of addresses into backtrace strings,
+ * where   each  line  is  constructed  according  to  `format':
+ *  - '%a': printf("%p", array[i])
+ *  - '%n': printf("%s", NAME_OF_CONTAINING_FUNCTION(array[i]))
+ *  - '%d': off = array[i] - START_OF_CONTAINING_FUNCTION(array[i]); printf("%#tx", off)
+ *  - '%D': off = array[i] - START_OF_CONTAINING_FUNCTION(array[i]); if (off) printf("%+#tx", off)
+ *  - '%f': printf("%s", dlmodulename(dlgethandle(array[i])))
+ *  - '%%': A single '%'
+ *  - ...:  Anything else is copied from `format' as-is.
+ * When `format == NULL', use "%a <%n%D> at %f" instead
+ *
+ * The returned  pointer is  a size-element  long vector  of  strings
+ * describing the  addresses  from  `array', and  should  be  freed()
+ * using `free(3)'. Note however that you must _ONLY_ `free(return)',
+ * and not the individual strings pointed-to by that vector!
+ * @return: * :   A heap pointer to a vector of function names
+ * @return: NULL: Insufficient heap memory available */
+__CDECLARE(__ATTR_INS(1, 2) __ATTR_IN_OPT(3),char **,__NOTHROW_NCX,backtrace_symbols_fmt,(void *const *__array, __STDC_INT_AS_SIZE_T __size, char const *__format),(__array,__size,__format))
+#elif defined(__CRT_HAVE___backtrace_symbols)
+/* >> backtrace_symbols_fmt(3)
+ * Format the given `array' of addresses into backtrace strings,
+ * where   each  line  is  constructed  according  to  `format':
+ *  - '%a': printf("%p", array[i])
+ *  - '%n': printf("%s", NAME_OF_CONTAINING_FUNCTION(array[i]))
+ *  - '%d': off = array[i] - START_OF_CONTAINING_FUNCTION(array[i]); printf("%#tx", off)
+ *  - '%D': off = array[i] - START_OF_CONTAINING_FUNCTION(array[i]); if (off) printf("%+#tx", off)
+ *  - '%f': printf("%s", dlmodulename(dlgethandle(array[i])))
+ *  - '%%': A single '%'
+ *  - ...:  Anything else is copied from `format' as-is.
+ * When `format == NULL', use "%a <%n%D> at %f" instead
+ *
+ * The returned  pointer is  a size-element  long vector  of  strings
+ * describing the  addresses  from  `array', and  should  be  freed()
+ * using `free(3)'. Note however that you must _ONLY_ `free(return)',
+ * and not the individual strings pointed-to by that vector!
+ * @return: * :   A heap pointer to a vector of function names
+ * @return: NULL: Insufficient heap memory available */
+__CREDIRECT(__ATTR_INS(1, 2) __ATTR_IN_OPT(3),char **,__NOTHROW_NCX,backtrace_symbols_fmt,(void *const *__array, __STDC_INT_AS_SIZE_T __size, char const *__format),__backtrace_symbols,(__array,__size,__format))
+#elif defined(__CRT_HAVE_backtrace_symbol_printf) && (defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
+#include <libc/local/execinfo/backtrace_symbols_fmt.h>
+/* >> backtrace_symbols_fmt(3)
+ * Format the given `array' of addresses into backtrace strings,
+ * where   each  line  is  constructed  according  to  `format':
+ *  - '%a': printf("%p", array[i])
+ *  - '%n': printf("%s", NAME_OF_CONTAINING_FUNCTION(array[i]))
+ *  - '%d': off = array[i] - START_OF_CONTAINING_FUNCTION(array[i]); printf("%#tx", off)
+ *  - '%D': off = array[i] - START_OF_CONTAINING_FUNCTION(array[i]); if (off) printf("%+#tx", off)
+ *  - '%f': printf("%s", dlmodulename(dlgethandle(array[i])))
+ *  - '%%': A single '%'
+ *  - ...:  Anything else is copied from `format' as-is.
+ * When `format == NULL', use "%a <%n%D> at %f" instead
+ *
+ * The returned  pointer is  a size-element  long vector  of  strings
+ * describing the  addresses  from  `array', and  should  be  freed()
+ * using `free(3)'. Note however that you must _ONLY_ `free(return)',
+ * and not the individual strings pointed-to by that vector!
+ * @return: * :   A heap pointer to a vector of function names
+ * @return: NULL: Insufficient heap memory available */
+__NAMESPACE_LOCAL_USING_OR_IMPL(backtrace_symbols_fmt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(1, 2) __ATTR_IN_OPT(3) char **__NOTHROW_NCX(__LIBCCALL backtrace_symbols_fmt)(void *const *__array, __STDC_INT_AS_SIZE_T __size, char const *__format) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(backtrace_symbols_fmt))(__array, __size, __format); })
 #endif /* ... */
+#ifdef __CRT_HAVE_backtrace_symbols_fd_fmt
+/* >> backtrace_symbols_fd_fmt(3)
+ * Same as `backtrace_symbols_fmt()', but rather than return a vector
+ * of  symbol  names, print  the names  directly  to `fd',  such that
+ * one function  name will  be written  per line,  with `size'  lines
+ * written in total.
+ * @return: 0 : Success
+ * @return: -1: Error */
+__CDECLARE(__ATTR_INS(1, 2) __ATTR_IN_OPT(4),int,__NOTHROW_NCX,backtrace_symbols_fd_fmt,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd, char const *__format),(__array,__size,__fd,__format))
+#elif defined(__CRT_HAVE___backtrace_symbols_fd)
+/* >> backtrace_symbols_fd_fmt(3)
+ * Same as `backtrace_symbols_fmt()', but rather than return a vector
+ * of  symbol  names, print  the names  directly  to `fd',  such that
+ * one function  name will  be written  per line,  with `size'  lines
+ * written in total.
+ * @return: 0 : Success
+ * @return: -1: Error */
+__CREDIRECT(__ATTR_INS(1, 2) __ATTR_IN_OPT(4),int,__NOTHROW_NCX,backtrace_symbols_fd_fmt,(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd, char const *__format),__backtrace_symbols_fd,(__array,__size,__fd,__format))
+#else /* ... */
+#include <hybrid/typecore.h>
+#include <bits/crt/format-printer.h>
+#if (defined(__CRT_HAVE_write_printer) || defined(__CRT_HAVE_writeall) || defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write) || defined(__CRT_HAVE___libc_write)) && defined(__CRT_HAVE_backtrace_symbol_printf)
+#include <libc/local/execinfo/backtrace_symbols_fd_fmt.h>
+/* >> backtrace_symbols_fd_fmt(3)
+ * Same as `backtrace_symbols_fmt()', but rather than return a vector
+ * of  symbol  names, print  the names  directly  to `fd',  such that
+ * one function  name will  be written  per line,  with `size'  lines
+ * written in total.
+ * @return: 0 : Success
+ * @return: -1: Error */
+__NAMESPACE_LOCAL_USING_OR_IMPL(backtrace_symbols_fd_fmt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(1, 2) __ATTR_IN_OPT(4) int __NOTHROW_NCX(__LIBCCALL backtrace_symbols_fd_fmt)(void *const *__array, __STDC_INT_AS_SIZE_T __size, __fd_t __fd, char const *__format) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(backtrace_symbols_fd_fmt))(__array, __size, __fd, __format); })
+#endif /* (__CRT_HAVE_write_printer || __CRT_HAVE_writeall || __CRT_HAVE_write || __CRT_HAVE__write || __CRT_HAVE___write || __CRT_HAVE___libc_write) && __CRT_HAVE_backtrace_symbol_printf */
+#endif /* !... */
+
+#ifdef __USE_KOS
+#ifndef __ssize_t_defined
+#define __ssize_t_defined
+typedef __ssize_t ssize_t;
+#endif /* !__ssize_t_defined */
+/* >> backtrace_symbol_printf(3)
+ * Print the formatted representation of `address' to `printer'
+ *  - The used format is `format' (or "%a <%n%D> at %f" if NULL)
+ *  - No trailing linefeed is printed
+ *  - If debug information could not be loaded, use "???" for strings
+ * @return: * : pformatprinter-compatible return value */
+__CDECLARE_OPT(__ATTR_IN_OPT(4) __ATTR_NONNULL((1)),ssize_t,__NOTHROW_NCX,backtrace_symbol_printf,(__pformatprinter __printer, void *__arg, void const *__address, char const *__format),(__printer,__arg,__address,__format))
+#endif /* __USE_KOS */
 
 __SYSDECL_END
 #endif /* __CC__ */

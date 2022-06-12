@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc10b8387 */
+/* HASH CRC-32:0xc2909c59 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -96,17 +96,10 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(shexec))(char const *__command) {
 		      __arg__c, __command, (char *)__NULLPTR);
 	}
 #endif /* __CRT_HAVE_secure_getenv || __CRT_HAVE___secure_getenv || __CRT_HAVE___libc_secure_getenv || __CRT_HAVE_getenv || __LOCAL_environ */
-
-#ifdef __KOS__
-	/* By default, KOS uses busybox, so try to invoke that first. */
-	(__NAMESPACE_LOCAL_SYM __localdep_execl)("/bin/busybox", __arg_sh, __arg__c, __command, (char *)__NULLPTR);
 	(__NAMESPACE_LOCAL_SYM __localdep_execl)("/bin/sh", __arg_sh, __arg__c, __command, (char *)__NULLPTR);
-	(__NAMESPACE_LOCAL_SYM __localdep_execl)("/bin/bash", __arg_sh, __arg__c, __command, (char *)__NULLPTR);
-#else /* __KOS__ */
-	(__NAMESPACE_LOCAL_SYM __localdep_execl)("/bin/sh", __arg_sh, __arg__c, __command, (char *)__NULLPTR);
-	(__NAMESPACE_LOCAL_SYM __localdep_execl)("/bin/bash", __arg_sh, __arg__c, __command, (char *)__NULLPTR);
+	(__NAMESPACE_LOCAL_SYM __localdep_execl)("/bin/csh", "csh", __arg__c, __command, (char *)__NULLPTR);
+	(__NAMESPACE_LOCAL_SYM __localdep_execl)("/bin/bash", "bash", __arg__c, __command, (char *)__NULLPTR);
 	(__NAMESPACE_LOCAL_SYM __localdep_execl)("/bin/busybox", __arg_sh, __arg__c, __command, (char *)__NULLPTR);
-#endif /* !__KOS__ */
 	return -1;
 }
 __NAMESPACE_LOCAL_END

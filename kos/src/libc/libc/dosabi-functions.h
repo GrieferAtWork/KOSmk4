@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a1c47b1 */
+/* HASH CRC-32:0x8e9546f2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -444,7 +444,10 @@ DFUN(".text.crt.dos.error", libd_verrx, libc_verrx, TV, 3, TD, TP, TP)
 /* execinfo */
 DFUN(".text.crt.dos.debug", libd_backtrace, libc_backtrace, TD, 2, TP, TD)
 DFUN(".text.crt.dos.debug", libd_backtrace_symbols, libc_backtrace_symbols, TP, 2, TP, TD)
-DFUN(".text.crt.dos.debug", libd_backtrace_symbols_fd, libc_backtrace_symbols_fd, TV, 3, TP, TD, TIn(__SIZEOF_FD_T__))
+DFUN(".text.crt.dos.debug", libd_backtrace_symbols_fd, libc_backtrace_symbols_fd, TD, 3, TP, TD, TIn(__SIZEOF_FD_T__))
+DFUN(".text.crt.dos.debug", libd_backtrace_symbols_fmt, libc_backtrace_symbols_fmt, TP, 3, TP, TD, TP)
+DFUN(".text.crt.dos.debug", libd_backtrace_symbols_fd_fmt, libc_backtrace_symbols_fd_fmt, TD, 4, TP, TD, TIn(__SIZEOF_FD_T__), TP)
+DFUN(".text.crt.dos.debug", libd_backtrace_symbol_printf, libc_backtrace_symbol_printf, TI, 4, TP, TP, TP, TP)
 
 /* fcntl */
 DFUN(".text.crt.dos.io.utility", libd_readahead, libc_readahead, TI, 3, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_OFF64_T__), TI)
@@ -2002,7 +2005,7 @@ DFUN(".text.crt.dos.random", libd_initstate_r, libc_initstate_r, TD, 4, TD, TP, 
 DFUN(".text.crt.dos.random", libd_setstate_r, libc_setstate_r, TD, 2, TP, TP)
 DFUN(".text.crt.dos.fs.utility", libd_mkstemps, libc_mkstemps, TIn(__SIZEOF_FD_T__), 2, TP, TD)
 DFUN(".text.crt.dos.utility.locale", libd_rpmatch, libc_rpmatch, TD, 1, TP)
-DFUN(".text.crt.dos.unsorted", libd_mkstemps64, libc_mkstemps64, TIn(__SIZEOF_FD_T__), 2, TP, TD)
+DFUN(".text.crt.dos.fs.utility", libd_mkstemps64, libc_mkstemps64, TIn(__SIZEOF_FD_T__), 2, TP, TD)
 DFUN(".text.crt.dos.random", libd_erand48, libc_erand48, TFD, 1, TP)
 DFUN(".text.crt.dos.random", libd_nrand48, libc_nrand48, TL, 1, TP)
 DFUN(".text.crt.dos.random", libd_jrand48, libc_jrand48, TL, 1, TP)
@@ -2019,7 +2022,7 @@ DFUN(".text.crt.dos.unicode.static.convert", libd_ecvt, libc_ecvt, TP, 4, TFD, T
 DFUN(".text.crt.dos.unicode.static.convert", libd_fcvt, libc_fcvt, TP, 4, TFD, TD, TP, TP)
 DFUN(".text.crt.dos.application.options", libd_getsubopt, libc_getsubopt, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.fs.utility", libd_mkstemp, libc_mkstemp, TIn(__SIZEOF_FD_T__), 1, TP)
-DFUN(".text.crt.dos.unsorted", libd_mkstemp64, libc_mkstemp64, TIn(__SIZEOF_FD_T__), 1, TP)
+DFUN(".text.crt.dos.fs.utility", libd_mkstemp64, libc_mkstemp64, TIn(__SIZEOF_FD_T__), 1, TP)
 DFUN(".text.crt.dos.fs.utility", libd_mkdtemp, libc_mkdtemp, TP, 1, TP)
 DFUN(".text.crt.dos.io.tty", libd_grantpt, libc_grantpt, TD, 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.io.tty", libd_unlockpt, libc_unlockpt, TD, 1, TIn(__SIZEOF_FD_T__))
@@ -2048,8 +2051,8 @@ DFUN(".text.crt.dos.bsd", libd_sradixsort, libc_sradixsort, TD, 4, TP, TD, TP, T
 DFUN(".text.crt.dos.bsd", libd_strtonum, libc_strtonum, TLL, 4, TP, TLL, TLL, TP)
 DFUN(".text.crt.dos.fs.utility", libd_mkostemp, libc_mkostemp, TIn(__SIZEOF_FD_T__), 2, TP, TIn(__SIZEOF_OFLAG_T__))
 DFUN(".text.crt.dos.fs.utility", libd_mkostemps, libc_mkostemps, TIn(__SIZEOF_FD_T__), 3, TP, TD, TIn(__SIZEOF_OFLAG_T__))
-DFUN(".text.crt.dos.bsd", libd_mkostemp64, libc_mkostemp64, TIn(__SIZEOF_FD_T__), 2, TP, TIn(__SIZEOF_OFLAG_T__))
-DFUN(".text.crt.dos.bsd", libd_mkostemps64, libc_mkostemps64, TIn(__SIZEOF_FD_T__), 3, TP, TD, TIn(__SIZEOF_OFLAG_T__))
+DFUN(".text.crt.dos.fs.utility", libd_mkostemp64, libc_mkostemp64, TIn(__SIZEOF_FD_T__), 2, TP, TIn(__SIZEOF_OFLAG_T__))
+DFUN(".text.crt.dos.fs.utility", libd_mkostemps64, libc_mkostemps64, TIn(__SIZEOF_FD_T__), 3, TP, TD, TIn(__SIZEOF_OFLAG_T__))
 DFUN(".text.crt.dos.bsd", libd_devname, libc_devname, TP, 2, TIn(__SIZEOF_DEV_T__), TIn(__SIZEOF_MODE_T__))
 DFUN(".text.crt.dos.bsd", libd_devname_r, libc_devname_r, TD, 4, TIn(__SIZEOF_DEV_T__), TIn(__SIZEOF_MODE_T__), TP, TI)
 DFUN(".text.crt.dos.bsd", libd_humanize_number, libc_humanize_number, TD, 6, TP, TI, TI64, TP, TD, TD)
