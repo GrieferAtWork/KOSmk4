@@ -92,6 +92,8 @@ function scanFolderForFiles(path: string) {
 			local ext = fs.extof(e);
 			local typ = HEADER_MAPPING.get(ext, FILE_KIND_MSC);
 			if (typ != FILE_KIND_IGN) {
+				if (typ == FILE_KIND_SRC && e.startswith("kos/src/libc/magic/"))
+					typ = FILE_KIND_MSC; /* Despite their .c extension, these aren't C files! */
 				FILES[e] = typ;
 			}
 		}
@@ -212,10 +214,10 @@ createVsFile("kos.vcxproj", [](fp) {
 			if (name.startswith(r"..\kos\src\kernel")) {
 				fp <<
 "		<ClCompile Include=\"" << name << "\">
-			<AdditionalOptions>$(AdditionalOptions) /D__KERNEL__";
+			<PreprocessorDefinitions>$(NMakePreprocessorDefinitions);__KERNEL__";
 				if (name.startswith(r"..\kos\src\kernel\core"))
-					fp << " /DCONFIG_BUILDING_KERNEL_CORE";
-				fp << "</AdditionalOptions>
+					fp << ";CONFIG_BUILDING_KERNEL_CORE";
+				fp << "</PreprocessorDefinitions>
 		</ClCompile>
 ";
 			} else {
@@ -286,6 +288,14 @@ createVsFile("kos.vcxproj", [](fp) {
 		<LibraryWPath />
 		<SourcePath />
 		<ExcludePath />
+";
+		/* This is where the actual magic happens in terms of tricking
+		 * Intellisense into using its linux/gcc-compatibler sub-system
+		 * https://github.com/AntonioColino/Clang/blob/f18080410d89b93da1e9e81059f39dc1081ce654/InstallShield%202015%20Projects/x64/PlatformToolsets/Clang/1033/llvm-general.xml#L160
+		 */
+		fp <<
+"		<ToolsetISenseIdentifier>Linux</ToolsetISenseIdentifier>
+		<ToolsetISenseIdentifierType>Linux</ToolsetISenseIdentifierType>
 		<NMakeBuildCommandLine>C:\\Windows\\system32\\cmd.exe /C \"" << ROOTDIR << "\\binutils\\deemon\\deemon.exe"
 			" " << ROOTDIR << "\\magic.dee"
 			" --build-only"     /* Force rebuild */
@@ -305,10 +315,11 @@ createVsFile("kos.vcxproj", [](fp) {
 			"</NMakeCleanCommandLine>
 		<NMakeOutput>" << ROOTDIR << "\\bin\\" << target << "-" << configShortHand << "\\os\\kernel.bin</NMakeOutput>
 		<NMakePreprocessorDefinitions>" << ";".join(defines) << "</NMakePreprocessorDefinitions>
-		<NMakeForcedIncludes>" << ROOTDIR << "\\kos\\include\\compiler\\intellisense-msvc.h</NMakeForcedIncludes>
-		<AdditionalOptions>/TP</AdditionalOptions>
+		<NMakeForcedIncludes>" << ROOTDIR << "\\kos\\include\\compiler\\intellisense-gcc.h</NMakeForcedIncludes>
+		<AdditionalOptions>-x c++ -std=c++17 -undef -nostdlib -nostdinc</AdditionalOptions>
 	</PropertyGroup>
-";		}
+";
+		}
 	}
 
 	for (local config: PROJ_CONFIGS.keys.sorted()) {
@@ -317,6 +328,11 @@ createVsFile("kos.vcxproj", [](fp) {
 			fp <<
 "	<ItemDefinitionGroup Condition=\"'$(Configuration)|$(Platform)'=='" << config << "|" << target_int << "'\">
 		<ClCompile>
+";
+			/* This `<ClangMode>true</ClangMode>' causes `AdditionalOptions' to accept -foo style switches */
+			fp <<
+"			<ClangMode>true</ClangMode>
+			<TreatWarningAsError>true</TreatWarningAsError>
 			<WarningLevel>Level3</WarningLevel>
 			<Optimization>" << ("Optimize" in config ? "MaxSpeed" : "Disabled") << "</Optimization>
 ";
@@ -387,7 +403,8 @@ createVsFile("kos.vcxproj.filters", [](fp) {
 
 	fp <<
 "	</ItemGroup>
-	<ItemGroup>";
+	<ItemGroup>
+";
 
 	function printFileFilterLocation(fp: File, decl: string, name: string) {
 		local filter = projFilterOf(name);

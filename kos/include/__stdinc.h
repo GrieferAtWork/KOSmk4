@@ -323,7 +323,22 @@
 #endif /* !... */
 
 #ifndef __DEFINE_PUBLIC_ALIAS
-#ifdef __COMPILER_HAVE_GCC_ASM
+#ifdef __INTELLISENSE_GCC__
+#define __DEFINE_PRIVATE_ALIAS(new, old)      static __typeof__(old) new __attribute__((__alias__(#old)))
+#define __DEFINE_PUBLIC_ALIAS(new, old)       __typeof__(old) new __attribute__((__alias__(#old)))
+#define __DEFINE_INTERN_ALIAS(new, old)       __typeof__(old) new __attribute__((__alias__(#old)))
+#define __DEFINE_PRIVATE_WEAK_ALIAS(new, old) static __typeof__(old) new __attribute__((__alias__(#old)))
+#define __DEFINE_PUBLIC_WEAK_ALIAS(new, old)  __typeof__(old) new __attribute__((__alias__(#old)))
+#define __DEFINE_INTERN_WEAK_ALIAS(new, old)  __typeof__(old) new __attribute__((__alias__(#old)))
+#elif defined(__INTELLISENSE__)
+#define __NO_DEFINE_ALIAS
+#define __DEFINE_PRIVATE_ALIAS(new, old)      /* nothing */
+#define __DEFINE_PUBLIC_ALIAS(new, old)       /* nothing */
+#define __DEFINE_INTERN_ALIAS(new, old)       /* nothing */
+#define __DEFINE_PRIVATE_WEAK_ALIAS(new, old) /* nothing */
+#define __DEFINE_PUBLIC_WEAK_ALIAS(new, old)  /* nothing */
+#define __DEFINE_INTERN_WEAK_ALIAS(new, old)  /* nothing */
+#elif defined(__COMPILER_HAVE_GCC_ASM)
 #ifdef __PE__
 #if 1 /* PE doesn't have .pushsection, .popsection,  or even .previous, however we'd  need
        * to change sections in order  to write to the `.drectve'  section that we want  to
