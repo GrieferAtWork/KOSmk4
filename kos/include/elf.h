@@ -1940,6 +1940,7 @@ typedef struct elf64_auxv_t /*[NAME(elf64_auxv)][PREFIX(a_)]*/ {
 #define AT_EUID              12         /* Effective uid */
 #define AT_GID               13         /* Real gid */
 #define AT_EGID              14         /* Effective gid */
+/* Everything from here on seems to be non-portable (linux- (and KOS) specific?) */
 #define AT_PLATFORM          15         /* String identifying platform. */
 #define AT_HWCAP             16         /* Machine dependent hints about processor capabilities. */
 #define AT_CLKTCK            17         /* Frequency of times() */

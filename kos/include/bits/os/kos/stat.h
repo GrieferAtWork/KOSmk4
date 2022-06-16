@@ -110,8 +110,8 @@
 #endif /* __USE_TIME64 */
 
 #ifdef __USE_LARGEFILE64
-/* Even though `struct stat64'  is the same  as `struct stat', we  can't
- * simply `#define stat64 stat' because there function definitions using
+/* Even though `struct stat64' is the same as `struct stat', we can't
+ * simply `#define stat64 stat' because of function definitions using
  * the same name in <sys/stat.h>... */
 //#define stat64 stat
 #define __kos_stat_alias64          stat64

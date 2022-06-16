@@ -51,7 +51,7 @@
 
 
 #if defined(__i386__) && !defined(__x86_64__)
-#define LIBVIO_CC __ATTR_STDCALL
+#define LIBVIO_CC __ATTR_FASTCALL
 #else /* ... */
 #define LIBVIO_CC /* nothing */
 #endif /* !... */

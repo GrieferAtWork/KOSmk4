@@ -441,7 +441,7 @@ spawn_uvio_service_thread(fd_t fd,
 	struct uvio_service_startup_args *args;
 	args = (struct uvio_service_startup_args *)malloc(sizeof(struct uvio_service_startup_args));
 	if unlikely(!args)
-		goto err0;
+		goto err;
 	args->ssa_fd     = fd;
 	args->ssa_ops    = ops;
 	args->ssa_cookie = cookie;
@@ -456,7 +456,7 @@ spawn_uvio_service_thread(fd_t fd,
 err_args:
 	free(args);
 	errno = error;
-err0:
+err:
 	return -1;
 }
 

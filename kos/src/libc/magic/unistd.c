@@ -2409,6 +2409,13 @@ __STDC_INT_AS_SIZE_T getpagesize() {
 #endif /* __ARCH_PAGESIZE */
 }
 
+%(auto_header){
+#include <asm/pagesize.h>
+#ifdef __ARCH_PAGESIZE
+#define libc_getpagesize() __ARCH_PAGESIZE
+#endif /* __ARCH_PAGESIZE */
+}
+
 @@>> getdtablesize(3)
 [[const, wunused, nothrow, decl_include("<features.h>")]]
 [[export_alias("__getdtablesize")]]

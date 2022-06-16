@@ -24,7 +24,6 @@
 #include "../api.h"
 /**/
 
-#include <asm/pagesize.h> /* __ARCH_PAGESIZE */
 #include <kos/exec/elf.h> /* ELF_ARCH_DATA */
 #include <kos/exec/idata.h>
 #include <kos/exec/rtld.h> /* RTLD_PLATFORM */
@@ -34,6 +33,7 @@
 
 #include <fcntl.h>
 #include <pthread.h>
+#include <signal.h> /* SIGSTKSZ */
 #include <stddef.h> /* offsetafter */
 #include <stdlib.h>
 #include <syscall.h>
@@ -130,16 +130,10 @@ DECL_BEGIN
 PRIVATE ATTR_SECTION(".rodata.crt.system.getauxval") char const
 rtld_platform[] = RTLD_PLATFORM;
 
-#ifdef __ARCH_PAGESIZE
-#define OS_PAGESIZE __ARCH_PAGESIZE
-#else /* __ARCH_PAGESIZE */
-#define OS_PAGESIZE getpagesize()
-#endif /* !__ARCH_PAGESIZE */
-
-
 #if defined(__i386__) && !defined(__x86_64__)
 PRIVATE ATTR_SECTION(".rodata.crt.system.getauxval") char const
 elf_host_platform_string_x86_64[] = "x86_64";
+#define kernel64_tag (elf_host_platform_string_x86_64 + 4) /* "64" */
 
 /* Check if the kernel is running in 64-bit mode */
 PRIVATE bool LIBCCALL libc_has_kernel64(void) {
@@ -148,7 +142,7 @@ PRIVATE bool LIBCCALL libc_has_kernel64(void) {
 	error = sys_uname(&uname);
 	if unlikely(E_ISERR(error))
 		return false; /* Shouldn't happen... */
-	if (strcmp(uname.machine, elf_host_platform_string_x86_64) == 0)
+	if (strstr(uname.machine, kernel64_tag) != NULL)
 		return true; /* Yup. It's an x86_64-kernel. */
 	return false;
 }
@@ -240,7 +234,7 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 	}	break;
 
 	case AT_PAGESZ:
-		result = OS_PAGESIZE;
+		result = getpagesize();
 		break;
 
 	case AT_BASE: {
@@ -327,7 +321,6 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 		}
 		ATTR_FALLTHROUGH
 #endif /* __i386__ && !__x86_64__ */
-
 	case AT_PLATFORM:
 		result = (ulongptr_t)(void *)rtld_platform;
 		break;
@@ -349,6 +342,9 @@ NOTHROW_NCX(LIBCCALL libc_getauxval)(ulongptr_t type)
 #endif
 		return __libc_enable_secure;
 	}	break;
+
+	case AT_MINSIGSTKSZ:
+		return SIGSTKSZ;
 
 	default:
 not_found:

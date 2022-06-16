@@ -88,8 +88,8 @@ int backtrace_symbols_fd([[in(size)]] void *const *array,
 }
 
 
-/* The following are extensions from FreeBSD, but in their original header
- * they're  not put a  restricted *_SOURCE namespace,  so we don't either. */
+/* The following are extensions from FreeBSD (and NetBSD), but in their original
+ * headers they're not put a restricted *_SOURCE namespace, so we don't  either. */
 
 @@>> backtrace_symbols_fmt(3)
 @@Format the given `array' of addresses into backtrace strings,

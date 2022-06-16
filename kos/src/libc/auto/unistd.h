@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4fa760ce */
+/* HASH CRC-32:0xbc20de67 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -484,6 +484,12 @@ INTDEF WUNUSED longptr_t NOTHROW_NCX(LIBCCALL libc_gethostid)(void);
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
 INTDEF ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T NOTHROW(LIBCCALL libc_getpagesize)(void);
+#endif /* !__KERNEL__ */
+#include <asm/pagesize.h>
+#ifdef __ARCH_PAGESIZE
+#define libc_getpagesize() __ARCH_PAGESIZE
+#endif /* __ARCH_PAGESIZE */
+#ifndef __KERNEL__
 /* >> getdtablesize(3) */
 INTDEF ATTR_CONST WUNUSED __STDC_INT_AS_SIZE_T NOTHROW(LIBCCALL libc_getdtablesize)(void);
 #endif /* !__KERNEL__ */
