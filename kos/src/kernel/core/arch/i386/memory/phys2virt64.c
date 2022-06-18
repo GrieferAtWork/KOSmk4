@@ -66,7 +66,7 @@
 DECL_BEGIN
 
 /* Make sure that the phys2virt segment is located within kernel-share memory. */
-STATIC_ASSERT(P64_PDIR_VEC4INDEX(KERNEL_PHYS2VIRT_BASE) >= 256);
+static_assert(P64_PDIR_VEC4INDEX(KERNEL_PHYS2VIRT_BASE) >= 256);
 
 /* End address of the phys2virt segment. */
 #define KERNEL_PHYS2VIRT_END (KERNEL_PHYS2VIRT_BASE + KERNEL_PHYS2VIRT_SIZE)

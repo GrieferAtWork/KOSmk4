@@ -38,6 +38,82 @@ DECL_BEGIN
 /************************************************************************/
 /* <STRING.H>-STYLE FUNCTIONS                                           */
 /************************************************************************/
+INTERN ATTR_PURE int WINAPI
+libk32_lstrcmpA(LPCSTR lpString1, LPCSTR lpString2) {
+	return strcmp(lpString1, lpString2);
+}
+
+INTERN ATTR_PURE int WINAPI
+libk32_lstrcmpW(LPCWSTR lpString1, LPCWSTR lpString2) {
+	return c16cmp(lpString1, lpString2);
+}
+
+INTERN ATTR_PURE int WINAPI
+libk32_lstrcmpiA(LPCSTR lpString1, LPCSTR lpString2) {
+	return strcasecmp(lpString1, lpString2);
+}
+
+INTERN ATTR_PURE int WINAPI
+libk32_lstrcmpiW(LPCWSTR lpString1, LPCWSTR lpString2) {
+	return c16casecmp(lpString1, lpString2);
+}
+
+INTERN LPSTR WINAPI
+libk32_lstrcpynA(LPSTR lpString1, LPCSTR lpString2, int iMaxLength) {
+	TRY {
+		return strncpy(lpString1, lpString2, (size_t)(unsigned int)iMaxLength);
+	} EXCEPT {
+	}
+	return NULL;
+}
+
+INTERN LPWSTR WINAPI
+libk32_lstrcpynW(LPWSTR lpString1, LPCWSTR lpString2, int iMaxLength) {
+	TRY {
+		return c16ncpy(lpString1, lpString2, (size_t)(unsigned int)iMaxLength);
+	} EXCEPT {
+	}
+	return NULL;
+}
+
+INTERN LPSTR WINAPI
+libk32_lstrcpyA(LPSTR lpString1, LPCSTR lpString2) {
+	TRY {
+		return strcpy(lpString1, lpString2);
+	} EXCEPT {
+	}
+	return NULL;
+}
+
+INTERN LPWSTR WINAPI
+libk32_lstrcpyW(LPWSTR lpString1, LPCWSTR lpString2) {
+	TRY {
+		return c16cpy(lpString1, lpString2);
+	} EXCEPT {
+	}
+	return NULL;
+}
+
+INTERN LPSTR WINAPI
+libk32_lstrcatA(LPSTR lpString1, LPCSTR lpString2) {
+	return strcat(lpString1, lpString2);
+}
+
+INTERN LPWSTR WINAPI
+libk32_lstrcatW(LPWSTR lpString1, LPCWSTR lpString2) {
+	return c16cat(lpString1, lpString2);
+}
+
+INTERN ATTR_PURE int WINAPI
+libk32_lstrlenA(LPCSTR lpString) {
+	return !lpString ? 0 : (int)(unsigned int)strlen(lpString);
+}
+
+INTERN ATTR_PURE int WINAPI
+libk32_lstrlenW(LPCWSTR lpString) {
+	return !lpString ? 0 : (int)(unsigned int)c16len(lpString);
+}
+
 DEFINE_PUBLIC_ALIAS(lstrcmpA, libk32_lstrcmpA);
 DEFINE_PUBLIC_ALIAS(lstrcmpW, libk32_lstrcmpW);
 DEFINE_PUBLIC_ALIAS(lstrcmpiA, libk32_lstrcmpiA);
@@ -50,68 +126,14 @@ DEFINE_PUBLIC_ALIAS(lstrcatA, libk32_lstrcatA);
 DEFINE_PUBLIC_ALIAS(lstrcatW, libk32_lstrcatW);
 DEFINE_PUBLIC_ALIAS(lstrlenA, libk32_lstrlenA);
 DEFINE_PUBLIC_ALIAS(lstrlenW, libk32_lstrlenW);
+/************************************************************************/
 
-INTERN ATTR_PURE int WINAPI libk32_lstrcmpA(LPCSTR lpString1, LPCSTR lpString2) {
-	return strcmp(lpString1, lpString2);
-}
-INTERN ATTR_PURE int WINAPI libk32_lstrcmpW(LPCWSTR lpString1, LPCWSTR lpString2) {
-	return c16cmp(lpString1, lpString2);
-}
-INTERN ATTR_PURE int WINAPI libk32_lstrcmpiA(LPCSTR lpString1, LPCSTR lpString2) {
-	return strcasecmp(lpString1, lpString2);
-}
-INTERN ATTR_PURE int WINAPI libk32_lstrcmpiW(LPCWSTR lpString1, LPCWSTR lpString2) {
-	return c16casecmp(lpString1, lpString2);
-}
-INTERN LPSTR WINAPI libk32_lstrcpynA(LPSTR lpString1, LPCSTR lpString2, int iMaxLength) {
-	TRY {
-		return strncpy(lpString1, lpString2, (size_t)(unsigned int)iMaxLength);
-	} EXCEPT {
-	}
-	return NULL;
-}
-INTERN LPWSTR WINAPI libk32_lstrcpynW(LPWSTR lpString1, LPCWSTR lpString2, int iMaxLength) {
-	TRY {
-		return c16ncpy(lpString1, lpString2, (size_t)(unsigned int)iMaxLength);
-	} EXCEPT {
-	}
-	return NULL;
-}
-INTERN LPSTR WINAPI libk32_lstrcpyA(LPSTR lpString1, LPCSTR lpString2) {
-	TRY {
-		return strcpy(lpString1, lpString2);
-	} EXCEPT {
-	}
-	return NULL;
-}
-INTERN LPWSTR WINAPI libk32_lstrcpyW(LPWSTR lpString1, LPCWSTR lpString2) {
-	TRY {
-		return c16cpy(lpString1, lpString2);
-	} EXCEPT {
-	}
-	return NULL;
-}
-INTERN LPSTR WINAPI libk32_lstrcatA(LPSTR lpString1, LPCSTR lpString2) {
-	return strcat(lpString1, lpString2);
-}
-INTERN LPWSTR WINAPI libk32_lstrcatW(LPWSTR lpString1, LPCWSTR lpString2) {
-	return c16cat(lpString1, lpString2);
-}
-INTERN ATTR_PURE int WINAPI libk32_lstrlenA(LPCSTR lpString) {
-	return !lpString ? 0 : (int)(unsigned int)strlen(lpString);
-}
-INTERN ATTR_PURE int WINAPI libk32_lstrlenW(LPCWSTR lpString) {
-	return !lpString ? 0 : (int)(unsigned int)c16len(lpString);
-}
 
 
 
 /************************************************************************/
 /* CODEC CONVERSION                                                     */
 /************************************************************************/
-DEFINE_PUBLIC_ALIAS(MultiByteToWideChar, libk32_MultiByteToWideChar);
-DEFINE_PUBLIC_ALIAS(WideCharToMultiByte, libk32_WideCharToMultiByte);
-
 INTERN int WINAPI
 libk32_MultiByteToWideChar(UINT uCodePage, DWORD dwFlags,
                            LPCCH lpMultiByteStr, int cbMultiByte,
@@ -139,6 +161,10 @@ libk32_WideCharToMultiByte(UINT uCodePage, DWORD dwFlags,
 	/* TODO */
 	return 0;
 }
+
+DEFINE_PUBLIC_ALIAS(MultiByteToWideChar, libk32_MultiByteToWideChar);
+DEFINE_PUBLIC_ALIAS(WideCharToMultiByte, libk32_WideCharToMultiByte);
+/************************************************************************/
 
 DECL_END
 

@@ -45,20 +45,9 @@
 
 DECL_BEGIN
 
+/************************************************************************/
 __IMPDEF NONNULL((1)) REF void *LIBDL_CC /* From "libdl-pe.so" */
 PeLoadLibrary(char const *__restrict filename, unsigned int flags);
-
-DEFINE_PUBLIC_ALIAS(LoadLibraryExA, libk32_LoadLibraryExA);
-DEFINE_PUBLIC_ALIAS(LoadLibraryExW, libk32_LoadLibraryExW);
-DEFINE_PUBLIC_ALIAS(GetModuleHandleExA, libk32_GetModuleHandleExA);
-DEFINE_PUBLIC_ALIAS(GetModuleHandleExW, libk32_GetModuleHandleExW);
-DEFINE_PUBLIC_ALIAS(GetModuleHandleA, libk32_GetModuleHandleA);
-DEFINE_PUBLIC_ALIAS(GetModuleHandleW, libk32_GetModuleHandleW);
-DEFINE_PUBLIC_ALIAS(LoadLibraryA, libk32_LoadLibraryA);
-DEFINE_PUBLIC_ALIAS(LoadLibraryW, libk32_LoadLibraryW);
-/*DEFINE_PUBLIC_ALIAS(GetProcAddress, libk32_GetProcAddress);*/ /* Implicitly forwarded from "libdl-pe.so" */
-DEFINE_PUBLIC_ALIAS(FreeLibrary, libk32_FreeLibrary);
-DEFINE_PUBLIC_ALIAS(FreeLibraryAndExitThread, libk32_FreeLibraryAndExitThread);
 
 #ifndef LOADLIBRARY_DLOPEN_FLAGS
 #define LOADLIBRARY_DLOPEN_FLAGS (RTLD_LAZY | RTLD_GLOBAL)
@@ -177,9 +166,24 @@ libk32_FreeLibraryAndExitThread(HMODULE hLibModule, DWORD dwExitCode) {
 	libk32_ExitThread(dwExitCode);
 }
 
-DEFINE_PUBLIC_ALIAS(GetModuleFileNameA, libk32_GetModuleFileNameA);
-DEFINE_PUBLIC_ALIAS(GetModuleFileNameW, libk32_GetModuleFileNameW);
+DEFINE_PUBLIC_ALIAS(LoadLibraryExA, libk32_LoadLibraryExA);
+DEFINE_PUBLIC_ALIAS(LoadLibraryExW, libk32_LoadLibraryExW);
+DEFINE_PUBLIC_ALIAS(GetModuleHandleExA, libk32_GetModuleHandleExA);
+DEFINE_PUBLIC_ALIAS(GetModuleHandleExW, libk32_GetModuleHandleExW);
+DEFINE_PUBLIC_ALIAS(GetModuleHandleA, libk32_GetModuleHandleA);
+DEFINE_PUBLIC_ALIAS(GetModuleHandleW, libk32_GetModuleHandleW);
+DEFINE_PUBLIC_ALIAS(LoadLibraryA, libk32_LoadLibraryA);
+DEFINE_PUBLIC_ALIAS(LoadLibraryW, libk32_LoadLibraryW);
+/*DEFINE_PUBLIC_ALIAS(GetProcAddress, libk32_GetProcAddress);*/ /* Implicitly forwarded from "libdl-pe.so" */
+DEFINE_PUBLIC_ALIAS(FreeLibrary, libk32_FreeLibrary);
+DEFINE_PUBLIC_ALIAS(FreeLibraryAndExitThread, libk32_FreeLibraryAndExitThread);
+/************************************************************************/
 
+
+
+
+
+/************************************************************************/
 __LIBC WUNUSED NONNULL((1)) char *LIBDCALL DOS$realpath(char const *filename, char *resolved);
 
 /* Return the DOS-name for the module name of a given handle.
@@ -237,6 +241,9 @@ libk32_GetModuleFileNameW(HMODULE hModule, LPWSTR lpFilename, DWORD nSize) {
 	return len - 1;
 }
 
+DEFINE_PUBLIC_ALIAS(GetModuleFileNameA, libk32_GetModuleFileNameA);
+DEFINE_PUBLIC_ALIAS(GetModuleFileNameW, libk32_GetModuleFileNameW);
+/************************************************************************/
 
 DECL_END
 

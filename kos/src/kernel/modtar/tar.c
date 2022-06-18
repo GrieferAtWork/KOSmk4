@@ -63,12 +63,11 @@
 #include <stdio.h>
 #include <string.h>
 
-
 DECL_BEGIN
 
-STATIC_ASSERT(offsetof(struct tarhdr, th_type) == 156);
-STATIC_ASSERT(offsetof(struct tarhdr, th_devmajor) == 329);
-STATIC_ASSERT(sizeof(struct tarhdr) == 500);
+static_assert(offsetof(struct tarhdr, th_type) == 156);
+static_assert(offsetof(struct tarhdr, th_devmajor) == 329);
+static_assert(sizeof(struct tarhdr) == 500);
 
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset

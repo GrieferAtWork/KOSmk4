@@ -650,7 +650,7 @@ NOTHROW(KCALL system_cc_handle)(uintptr_half_t handle_typ,
 
 	case HANDLE_TYPE_PIPE_READER:
 	case HANDLE_TYPE_PIPE_WRITER: {
-		STATIC_ASSERT(offsetof(struct pipe_reader, pr_pipe) ==
+		static_assert(offsetof(struct pipe_reader, pr_pipe) ==
 		              offsetof(struct pipe_writer, pw_pipe));
 		handle_ptr = ((struct pipe_reader *)handle_ptr)->pr_pipe;
 	}	ATTR_FALLTHROUGH

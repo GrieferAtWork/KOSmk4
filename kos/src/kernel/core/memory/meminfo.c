@@ -70,8 +70,8 @@ DECL_BEGIN
 #endif /* __SIZEOF_POINTER__ != 4 */
 #endif /* PMEMZONE_ISFREEBIT != 0 */
 #define PMEMBITSET_UNDFMASK (~PMEMBITSET_FREEMASK)
-STATIC_ASSERT_MSG(PMEMZONE_BITSPERPAGE == 2,"Must re-do the logic above");
-STATIC_ASSERT((BITSOF(uintptr_t) % PMEMZONE_BITSPERPAGE) == 0);
+static_assert(PMEMZONE_BITSPERPAGE == 2,"Must re-do the logic above");
+static_assert((BITSOF(uintptr_t) % PMEMZONE_BITSPERPAGE) == 0);
 
 
 PRIVATE ATTR_FREERODATA struct pmemzone const empty_mzone = {

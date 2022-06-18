@@ -26,12 +26,7 @@
 
 DECL_BEGIN
 
-DEFINE_PUBLIC_ALIAS(IsValidCodePage, libk32_IsValidCodePage);
-DEFINE_PUBLIC_ALIAS(GetACP, libk32_GetACP);
-DEFINE_PUBLIC_ALIAS(GetOEMCP, libk32_GetOEMCP);
-DEFINE_PUBLIC_ALIAS(IsDBCSLeadByte, libk32_IsDBCSLeadByte);
-DEFINE_PUBLIC_ALIAS(IsDBCSLeadByteEx, libk32_IsDBCSLeadByteEx);
-
+/************************************************************************/
 INTERN WINBOOL WINAPI
 libk32_IsValidCodePage(UINT uCodePage) {
 	TRACE("IsValidCodePage(%u)", uCodePage);
@@ -68,6 +63,13 @@ libk32_IsDBCSLeadByteEx(UINT uCodePage, BYTE bTestChar) {
 	COMPILER_IMPURE();
 	return libk32_IsDBCSLeadByte(bTestChar);
 }
+
+DEFINE_PUBLIC_ALIAS(IsValidCodePage, libk32_IsValidCodePage);
+DEFINE_PUBLIC_ALIAS(GetACP, libk32_GetACP);
+DEFINE_PUBLIC_ALIAS(GetOEMCP, libk32_GetOEMCP);
+DEFINE_PUBLIC_ALIAS(IsDBCSLeadByte, libk32_IsDBCSLeadByte);
+DEFINE_PUBLIC_ALIAS(IsDBCSLeadByteEx, libk32_IsDBCSLeadByteEx);
+/************************************************************************/
 
 DECL_END
 

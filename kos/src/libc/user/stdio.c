@@ -69,15 +69,15 @@ DECL_BEGIN
 #define libc_ferror_unlocked libc_ferror
 #define libc_feof_unlocked   libc_feof
 
-STATIC_ASSERT(offsetof(FILE, if_ptr) == __OFFSET_IO_FILE_PTR);
-STATIC_ASSERT(offsetof(FILE, if_cnt) == __OFFSET_IO_FILE_CNT);
-STATIC_ASSERT(offsetof(FILE, if_base) == __OFFSET_IO_FILE_BASE);
-STATIC_ASSERT(offsetof(FILE, if_flag) == __OFFSET_IO_FILE_FLAG);
-STATIC_ASSERT(offsetof(FILE, if_fd) == __OFFSET_IO_FILE_FD);
-STATIC_ASSERT(offsetof(FILE, if_charbuf) == __OFFSET_IO_FILE_CHARBUF);
-STATIC_ASSERT(offsetof(FILE, if_bufsiz) == __OFFSET_IO_FILE_BUFSIZ);
-STATIC_ASSERT(offsetof(FILE, if_exdata) == __OFFSET_IO_FILE_EXDATA);
-STATIC_ASSERT(sizeof(FILE) == __SIZEOF_IO_FILE);
+static_assert(offsetof(FILE, if_ptr) == __OFFSET_IO_FILE_PTR);
+static_assert(offsetof(FILE, if_cnt) == __OFFSET_IO_FILE_CNT);
+static_assert(offsetof(FILE, if_base) == __OFFSET_IO_FILE_BASE);
+static_assert(offsetof(FILE, if_flag) == __OFFSET_IO_FILE_FLAG);
+static_assert(offsetof(FILE, if_fd) == __OFFSET_IO_FILE_FD);
+static_assert(offsetof(FILE, if_charbuf) == __OFFSET_IO_FILE_CHARBUF);
+static_assert(offsetof(FILE, if_bufsiz) == __OFFSET_IO_FILE_BUFSIZ);
+static_assert(offsetof(FILE, if_exdata) == __OFFSET_IO_FILE_EXDATA);
+static_assert(sizeof(FILE) == __SIZEOF_IO_FILE);
 
 typedef LIST_HEAD_P(FILE) FileList;
 

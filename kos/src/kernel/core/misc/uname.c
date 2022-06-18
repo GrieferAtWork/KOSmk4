@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MISC_SYSCALL_UNAME_C
-#define GUARD_KERNEL_SRC_MISC_SYSCALL_UNAME_C 1
+#ifndef GUARD_KERNEL_SRC_MISC_UNAME_C
+#define GUARD_KERNEL_SRC_MISC_UNAME_C 1
 #define _GNU_SOURCE 1 /* domainname */
 #define _KOS_SOURCE 1
 
@@ -30,12 +30,14 @@
 #include <kernel/uname.h>
 #include <kernel/user.h>
 #include <kernel/version.h>
+#include <sched/cred.h>
 
 #include <hybrid/host.h>
 
+#include <kos/build-config.h>
 #include <sys/utsname.h>
-#include <sched/cred.h>
 
+#include <assert.h>
 #include <errno.h>
 #include <string.h>
 #include <syscall.h>
@@ -61,12 +63,12 @@ PUBLIC_CONST u32 const kernel_version = KOS_VERSION_CODE;
 #define MACHINE_NAME "x86_64"
 #elif defined(__i386__)
 #define MACHINE_NAME "i386"
-#elif defined(__arm__)
-#define MACHINE_NAME "arm"
-#else
+#elif defined(KOS_BUILD_CONFIG_TOOLCHAIN_BUILD_ARCH)
+#define MACHINE_NAME KOS_BUILD_CONFIG_TOOLCHAIN_BUILD_ARCH
+#else /* ... */
 #warning "Unknown host architecture"
 #define MACHINE_NAME "UNKNOWN"
-#endif
+#endif /* !... */
 
 
 
@@ -89,15 +91,21 @@ PUBLIC struct utsname kernel_uname = {
 /************************************************************************/
 /* oldolduname(), olduname(), uname()                                   */
 /************************************************************************/
+#define COPY_UNAME_FIELD(dst, src)                 \
+	do {                                           \
+		static_assert(sizeof(dst) <= sizeof(src)); \
+		memcpy(dst, src, sizeof(dst));             \
+	}	__WHILE0
+
 #ifdef __ARCH_WANT_SYSCALL_OLDOLDUNAME
 DEFINE_SYSCALL1(errno_t, oldolduname,
                 USER UNCHECKED struct linux_oldolduname *, name) {
 	validate_writable(name, sizeof(*name));
-	memcpy(name->sysname, kernel_uname.sysname, sizeof(name->sysname));
-	memcpy(name->nodename, kernel_uname.nodename, sizeof(name->nodename));
-	memcpy(name->release, kernel_uname.release, sizeof(name->release));
-	memcpy(name->version, kernel_uname.version, sizeof(name->version));
-	memcpy(name->machine, kernel_uname.machine, sizeof(name->machine));
+	COPY_UNAME_FIELD(name->sysname, kernel_uname.sysname);
+	COPY_UNAME_FIELD(name->nodename, kernel_uname.nodename);
+	COPY_UNAME_FIELD(name->release, kernel_uname.release);
+	COPY_UNAME_FIELD(name->version, kernel_uname.version);
+	COPY_UNAME_FIELD(name->machine, kernel_uname.machine);
 	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_OLDOLDUNAME */
@@ -106,11 +114,11 @@ DEFINE_SYSCALL1(errno_t, oldolduname,
 DEFINE_COMPAT_SYSCALL1(errno_t, oldolduname,
                        USER UNCHECKED struct linux_oldolduname *, name) {
 	compat_validate_writable(name, sizeof(*name));
-	memcpy(name->sysname, kernel_uname.sysname, sizeof(name->sysname));
-	memcpy(name->nodename, kernel_uname.nodename, sizeof(name->nodename));
-	memcpy(name->release, kernel_uname.release, sizeof(name->release));
-	memcpy(name->version, kernel_uname.version, sizeof(name->version));
-	memcpy(name->machine, kernel_uname.machine, sizeof(name->machine));
+	COPY_UNAME_FIELD(name->sysname, kernel_uname.sysname);
+	COPY_UNAME_FIELD(name->nodename, kernel_uname.nodename);
+	COPY_UNAME_FIELD(name->release, kernel_uname.release);
+	COPY_UNAME_FIELD(name->version, kernel_uname.version);
+	COPY_UNAME_FIELD(name->machine, kernel_uname.machine);
 	return -EOK;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_OLDOLDUNAME */
@@ -119,11 +127,11 @@ DEFINE_COMPAT_SYSCALL1(errno_t, oldolduname,
 DEFINE_SYSCALL1(errno_t, olduname,
                 USER UNCHECKED struct linux_olduname *, name) {
 	validate_writable(name, sizeof(*name));
-	memcpy(name->sysname, kernel_uname.sysname, sizeof(name->sysname));
-	memcpy(name->nodename, kernel_uname.nodename, sizeof(name->nodename));
-	memcpy(name->release, kernel_uname.release, sizeof(name->release));
-	memcpy(name->version, kernel_uname.version, sizeof(name->version));
-	memcpy(name->machine, kernel_uname.machine, sizeof(name->machine));
+	COPY_UNAME_FIELD(name->sysname, kernel_uname.sysname);
+	COPY_UNAME_FIELD(name->nodename, kernel_uname.nodename);
+	COPY_UNAME_FIELD(name->release, kernel_uname.release);
+	COPY_UNAME_FIELD(name->version, kernel_uname.version);
+	COPY_UNAME_FIELD(name->machine, kernel_uname.machine);
 	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_OLDUNAME */
@@ -132,14 +140,15 @@ DEFINE_SYSCALL1(errno_t, olduname,
 DEFINE_COMPAT_SYSCALL1(errno_t, olduname,
                        USER UNCHECKED struct linux_olduname *, name) {
 	compat_validate_writable(name, sizeof(*name));
-	memcpy(name->sysname, kernel_uname.sysname, sizeof(name->sysname));
-	memcpy(name->nodename, kernel_uname.nodename, sizeof(name->nodename));
-	memcpy(name->release, kernel_uname.release, sizeof(name->release));
-	memcpy(name->version, kernel_uname.version, sizeof(name->version));
-	memcpy(name->machine, kernel_uname.machine, sizeof(name->machine));
+	COPY_UNAME_FIELD(name->sysname, kernel_uname.sysname);
+	COPY_UNAME_FIELD(name->nodename, kernel_uname.nodename);
+	COPY_UNAME_FIELD(name->release, kernel_uname.release);
+	COPY_UNAME_FIELD(name->version, kernel_uname.version);
+	COPY_UNAME_FIELD(name->machine, kernel_uname.machine);
 	return -EOK;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_OLDUNAME */
+#undef COPY_UNAME_FIELD
 
 #ifdef __ARCH_WANT_SYSCALL_UNAME
 DEFINE_SYSCALL1(errno_t, uname,
@@ -191,8 +200,6 @@ DEFINE_SYSCALL2(errno_t, setdomainname,
 }
 #endif /* __ARCH_WANT_SYSCALL_SETDOMAINNAME */
 
-
-
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_MISC_SYSCALL_UNAME_C */
+#endif /* !GUARD_KERNEL_SRC_MISC_UNAME_C */

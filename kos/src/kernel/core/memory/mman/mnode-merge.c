@@ -2130,7 +2130,7 @@ NOTHROW(FCALL async_waitfor_ftxlck_and_mergepart)(struct mpart *part_to_wait,
 
 /* Called after a lock to `file' becomes available. */
 #if 1
-STATIC_ASSERT(offsetof(struct async_merge_part, amp_file_post_lop) ==
+static_assert(offsetof(struct async_merge_part, amp_file_post_lop) ==
               offsetof(struct async_merge_part, amp_part_post_lop));
 #define async_merge_file_post_cb \
 	(*(Tobpostlockop_callback_t(mfile))&async_merge_part_post_cb)
@@ -2181,7 +2181,7 @@ NOTHROW(FCALL async_waitfor_file_and_mergepart)(struct mfile *file_to_wait,
 
 /* Called after a lock to `mm' becomes available. */
 #if 1
-STATIC_ASSERT(offsetof(struct async_merge_part, amp_mman_post_lop) ==
+static_assert(offsetof(struct async_merge_part, amp_mman_post_lop) ==
               offsetof(struct async_merge_part, amp_part_post_lop));
 #define async_merge_mman_post_cb \
 	(*(Tobpostlockop_callback_t(mman))&async_merge_part_post_cb)

@@ -43,6 +43,7 @@
 
 #include <sys/param.h>
 
+#include <assert.h>
 #include <ctype.h>
 #include <format-printer.h>
 #include <inttypes.h>
@@ -234,7 +235,7 @@ again:
 
 		case CTYPE_KIND_CLASSOF(CTYPE_KIND_PTR):
 		case CTYPE_KIND_CLASSOF(CTYPE_KIND_FUNCTION): {
-			STATIC_ASSERT(offsetof(struct ctype, ct_pointer.cp_base) ==
+			static_assert(offsetof(struct ctype, ct_pointer.cp_base) ==
 			              offsetof(struct ctype, ct_function.cf_base));
 			self = &typ->ct_pointer.cp_base;
 			goto again;

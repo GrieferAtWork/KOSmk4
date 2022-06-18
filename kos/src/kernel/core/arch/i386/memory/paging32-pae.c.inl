@@ -68,9 +68,9 @@ template<class T, size_t len> using my_array_t = T[len];
 typedef int TYPE_X[2];
 typedef int TYPE_Y[2][3]; /* This is array<array<int, 3>, 2> */
 typedef TYPE_X TYPE_Z[3]; /* This is array<array<int, 2>, 3> */
-STATIC_ASSERT(__builtin_types_compatible_p(TYPE_X, my_array_t<int, 2>));
-STATIC_ASSERT(__builtin_types_compatible_p(TYPE_Y, my_array_t<my_array_t<int, 3>, 2>));
-STATIC_ASSERT(__builtin_types_compatible_p(TYPE_Z, my_array_t<my_array_t<int, 2>, 3>));
+static_assert(__builtin_types_compatible_p(TYPE_X, my_array_t<int, 2>));
+static_assert(__builtin_types_compatible_p(TYPE_Y, my_array_t<my_array_t<int, 3>, 2>));
+static_assert(__builtin_types_compatible_p(TYPE_Z, my_array_t<my_array_t<int, 2>, 3>));
 #endif /* __cplusplus */
 
 /* I always find recursive array declarations in C to be extremely confusing,
@@ -80,9 +80,9 @@ STATIC_ASSERT(__builtin_types_compatible_p(TYPE_Z, my_array_t<my_array_t<int, 2>
 struct pae_pdir_e1_identity_t_struct { pae_pdir_e1_identity_t x; };
 struct pae_pdir_e2_identity_t_struct { pae_pdir_e2_identity_t x; };
 struct pae_pdir_e3_identity_t_struct { pae_pdir_e3_identity_t x; };
-STATIC_ASSERT(offsetof(struct pae_pdir_e1_identity_t_struct, x[1][0][0]) == 512 * 512 * 8);
-STATIC_ASSERT(offsetof(struct pae_pdir_e2_identity_t_struct, x[1][0])    == 512 * 8);
-STATIC_ASSERT(offsetof(struct pae_pdir_e3_identity_t_struct, x[1])       == 8);
+static_assert(offsetof(struct pae_pdir_e1_identity_t_struct, x[1][0][0]) == 512 * 512 * 8);
+static_assert(offsetof(struct pae_pdir_e2_identity_t_struct, x[1][0])    == 512 * 8);
+static_assert(offsetof(struct pae_pdir_e3_identity_t_struct, x[1])       == 8);
 
 
 #ifndef __x86_64__
@@ -142,12 +142,12 @@ STATIC_ASSERT(offsetof(struct pae_pdir_e3_identity_t_struct, x[1])       == 8);
 #endif /* !ATOMIC_READ64_ALLOW_CORRUPT */
 
 
-STATIC_ASSERT(sizeof(struct pae_pdir) == PAE_PDIR_SIZE);
-STATIC_ASSERT(sizeof(struct pae_pdir) == 32);
-STATIC_ASSERT(sizeof(union pae_pdir_e3) == 8);
-STATIC_ASSERT(sizeof(union pae_pdir_e2) == 8);
-STATIC_ASSERT(sizeof(union pae_pdir_e1) == 8);
-STATIC_ASSERT(PAE_PDIR_E1_IDENTITY_BASE == PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE);
+static_assert(sizeof(struct pae_pdir) == PAE_PDIR_SIZE);
+static_assert(sizeof(struct pae_pdir) == 32);
+static_assert(sizeof(union pae_pdir_e3) == 8);
+static_assert(sizeof(union pae_pdir_e2) == 8);
+static_assert(sizeof(union pae_pdir_e1) == 8);
+static_assert(PAE_PDIR_E1_IDENTITY_BASE == PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE);
 
 
 
@@ -159,9 +159,9 @@ PRIVATE NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL pae_pagedir_tryinit)(VIRT struct pae_pdir *__restrict self) {
 	u64 e3[4];
 	/* Assert constants that are used below. */
-	STATIC_ASSERT(PAE_PDIR_VEC3INDEX(PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 3);
-	STATIC_ASSERT(PAE_PDIR_VEC2INDEX(PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 508);
-	STATIC_ASSERT(PAE_PDIR_VEC1INDEX(PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 0);
+	static_assert(PAE_PDIR_VEC3INDEX(PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 3);
+	static_assert(PAE_PDIR_VEC2INDEX(PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 508);
+	static_assert(PAE_PDIR_VEC1INDEX(PAE_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 0);
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
 
 	e3[0] = (u64)page_mallocone_for_paging();

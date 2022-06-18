@@ -293,10 +293,10 @@ usersigmask_ismasked_chk(signo_t signo) THROWS(E_SEGFAULT) {
 /* Make sure that casting boolean expressions to
  * integers  yields the expected results of 0/1.
  * This is assumed by code below */
-STATIC_ASSERT(SIGMASK_ISMASKED_NOPF_NO == (int)false);
-STATIC_ASSERT(SIGMASK_ISMASKED_NOPF_NO == (int)(10 == 0));
-STATIC_ASSERT(SIGMASK_ISMASKED_NOPF_YES == (int)true);
-STATIC_ASSERT(SIGMASK_ISMASKED_NOPF_YES == (int)(10 != 0));
+static_assert(SIGMASK_ISMASKED_NOPF_NO == (int)false);
+static_assert(SIGMASK_ISMASKED_NOPF_NO == (int)(10 == 0));
+static_assert(SIGMASK_ISMASKED_NOPF_YES == (int)true);
+static_assert(SIGMASK_ISMASKED_NOPF_YES == (int)(10 != 0));
 
 #ifdef CONFIG_HAVE_USERPROCMASK
 /* Try  to  switch  page  directory  to  that  of  `self',  and  make  use

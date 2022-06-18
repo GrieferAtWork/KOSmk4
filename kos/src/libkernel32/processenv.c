@@ -45,11 +45,6 @@ DECL_BEGIN
 /************************************************************************/
 /* GetCurrentDirectory() / SetCurrentDirectory()                        */
 /************************************************************************/
-DEFINE_PUBLIC_ALIAS(SetCurrentDirectoryA, libk32_SetCurrentDirectoryA);
-DEFINE_PUBLIC_ALIAS(SetCurrentDirectoryW, libk32_SetCurrentDirectoryW);
-DEFINE_PUBLIC_ALIAS(GetCurrentDirectoryA, libk32_GetCurrentDirectoryA);
-DEFINE_PUBLIC_ALIAS(GetCurrentDirectoryW, libk32_GetCurrentDirectoryW);
-
 __LIBC int LIBDCALL DOS$chdir(char const *dir);
 __LIBC int LIBDCALL DOS$_wchdir(char16_t const *dir);
 __LIBC char *LIBDCALL DOS$_getcwd(char *buf, size_t bufsize);
@@ -99,15 +94,17 @@ libk32_GetCurrentDirectoryW(DWORD nBufferLength, LPWSTR lpBuffer) {
 	return len;
 }
 
+DEFINE_PUBLIC_ALIAS(SetCurrentDirectoryA, libk32_SetCurrentDirectoryA);
+DEFINE_PUBLIC_ALIAS(SetCurrentDirectoryW, libk32_SetCurrentDirectoryW);
+DEFINE_PUBLIC_ALIAS(GetCurrentDirectoryA, libk32_GetCurrentDirectoryA);
+DEFINE_PUBLIC_ALIAS(GetCurrentDirectoryW, libk32_GetCurrentDirectoryW);
+/************************************************************************/
+
 
 
 /************************************************************************/
 /* GetStdHandle() / SetStdHandle()                                      */
 /************************************************************************/
-DEFINE_PUBLIC_ALIAS(GetStdHandle, libk32_GetStdHandle);
-DEFINE_PUBLIC_ALIAS(SetStdHandle, libk32_SetStdHandle);
-DEFINE_PUBLIC_ALIAS(SetStdHandleEx, libk32_SetStdHandleEx);
-
 INTERN HANDLE WINAPI
 libk32_GetStdHandle(DWORD nStdHandle) {
 	TRACE("GetStdHandle(%#x)", nStdHandle);
@@ -169,6 +166,13 @@ libk32_SetStdHandle(DWORD nStdHandle, HANDLE hHandle) {
 	return libk32_SetStdHandleEx(nStdHandle, hHandle, NULL);
 }
 
+DEFINE_PUBLIC_ALIAS(GetStdHandle, libk32_GetStdHandle);
+DEFINE_PUBLIC_ALIAS(SetStdHandle, libk32_SetStdHandle);
+DEFINE_PUBLIC_ALIAS(SetStdHandleEx, libk32_SetStdHandleEx);
+/************************************************************************/
+
+
+
 
 
 /************************************************************************/
@@ -176,32 +180,28 @@ libk32_SetStdHandle(DWORD nStdHandle, HANDLE hHandle) {
 /************************************************************************/
 __LIBC char **LIBDCALL DOS$__p__acmdln(void);
 __LIBC char16_t **LIBDCALL DOS$__p__wcmdln(void);
-DEFINE_PUBLIC_ALIAS(GetCommandLineA, libk32_GetCommandLineA);
-DEFINE_PUBLIC_ALIAS(GetCommandLineW, libk32_GetCommandLineW);
+
 INTERN LPSTR WINAPI libk32_GetCommandLineA(VOID) {
 	TRACE("GetCommandLineA()");
 	return *DOS$__p__acmdln();
 }
+
 INTERN LPWSTR WINAPI libk32_GetCommandLineW(VOID) {
 	TRACE("GetCommandLineW()");
 	return *DOS$__p__wcmdln();
 }
+
+DEFINE_PUBLIC_ALIAS(GetCommandLineA, libk32_GetCommandLineA);
+DEFINE_PUBLIC_ALIAS(GetCommandLineW, libk32_GetCommandLineW);
+/************************************************************************/
+
+
 
 
 
 /************************************************************************/
 /* ENVIRON                                                              */
 /************************************************************************/
-DEFINE_PUBLIC_ALIAS(GetEnvironmentStrings, libk32_GetEnvironmentStrings);
-DEFINE_PUBLIC_ALIAS(GetEnvironmentStringsW, libk32_GetEnvironmentStringsW);
-DEFINE_PUBLIC_ALIAS(FreeEnvironmentStringsA, libk32_FreeEnvironmentStringsA);
-DEFINE_PUBLIC_ALIAS(FreeEnvironmentStringsW, libk32_FreeEnvironmentStringsW);
-DEFINE_PUBLIC_ALIAS(GetEnvironmentVariableA, libk32_GetEnvironmentVariableA);
-DEFINE_PUBLIC_ALIAS(GetEnvironmentVariableW, libk32_GetEnvironmentVariableW);
-DEFINE_PUBLIC_ALIAS(SetEnvironmentVariableA, libk32_SetEnvironmentVariableA);
-DEFINE_PUBLIC_ALIAS(SetEnvironmentVariableW, libk32_SetEnvironmentVariableW);
-DEFINE_PUBLIC_ALIAS(ExpandEnvironmentStringsA, libk32_ExpandEnvironmentStringsA);
-DEFINE_PUBLIC_ALIAS(ExpandEnvironmentStringsW, libk32_ExpandEnvironmentStringsW);
 
 /* Let libc deal  with converting  stuff like  `$PATH'
  * from "/bin:/usr/bin" to "C:\bin;C:\usr\bin", etc... */
@@ -417,6 +417,17 @@ libk32_ExpandEnvironmentStringsW(LPCWSTR lpSrc, LPWSTR lpDst, DWORD nSize) {
 	return len;
 }
 
+DEFINE_PUBLIC_ALIAS(GetEnvironmentStrings, libk32_GetEnvironmentStrings);
+DEFINE_PUBLIC_ALIAS(GetEnvironmentStringsW, libk32_GetEnvironmentStringsW);
+DEFINE_PUBLIC_ALIAS(FreeEnvironmentStringsA, libk32_FreeEnvironmentStringsA);
+DEFINE_PUBLIC_ALIAS(FreeEnvironmentStringsW, libk32_FreeEnvironmentStringsW);
+DEFINE_PUBLIC_ALIAS(GetEnvironmentVariableA, libk32_GetEnvironmentVariableA);
+DEFINE_PUBLIC_ALIAS(GetEnvironmentVariableW, libk32_GetEnvironmentVariableW);
+DEFINE_PUBLIC_ALIAS(SetEnvironmentVariableA, libk32_SetEnvironmentVariableA);
+DEFINE_PUBLIC_ALIAS(SetEnvironmentVariableW, libk32_SetEnvironmentVariableW);
+DEFINE_PUBLIC_ALIAS(ExpandEnvironmentStringsA, libk32_ExpandEnvironmentStringsA);
+DEFINE_PUBLIC_ALIAS(ExpandEnvironmentStringsW, libk32_ExpandEnvironmentStringsW);
+/************************************************************************/
 
 DECL_END
 

@@ -399,7 +399,7 @@ fnode_getugid(struct fnode *__restrict self,
  * Note that the default `fnode_v_destroy()' includes correct handling for this. */
 PUBLIC NOBLOCK NONNULL((1)) struct postlockop *
 NOTHROW(LOCKOP_CC fnode_addtoall_lop)(struct lockop *__restrict self) {
-	STATIC_ASSERT(offsetof(struct fnode, fn_allnodes.le_prev) == offsetof(struct fnode, _fn_alllop.lo_func));
+	static_assert(offsetof(struct fnode, fn_allnodes.le_prev) == offsetof(struct fnode, _fn_alllop.lo_func));
 	struct fnode *me = container_of(self, struct fnode, _fn_alllop);
 	assert(me->_fn_alllop.lo_func == &fnode_addtoall_lop);
 	ATOMIC_WRITE(me->fn_allnodes.le_prev, &fallnodes_list.lh_first); /* This write needs to be atomic */

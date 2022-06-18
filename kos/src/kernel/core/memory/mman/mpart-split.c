@@ -1332,8 +1332,8 @@ clear_hipart_changed_bit:
 	/* Truncate a dynamically allocated chunk-vector. */
 #if 0 /* Already (implicitly) done above */
 	if (self->mp_state == MPART_ST_SWP_SC || self->mp_state == MPART_ST_MEM_SC) {
-		STATIC_ASSERT(offsetof(struct mpart, mp_mem_sc.ms_c) == offsetof(struct mpart, mp_swp_sc.ms_c));
-		STATIC_ASSERT(offsetof(struct mpart, mp_mem_sc.ms_v) == offsetof(struct mpart, mp_swp_sc.ms_v));
+		static_assert(offsetof(struct mpart, mp_mem_sc.ms_c) == offsetof(struct mpart, mp_swp_sc.ms_c));
+		static_assert(offsetof(struct mpart, mp_mem_sc.ms_v) == offsetof(struct mpart, mp_swp_sc.ms_v));
 		struct mchunk *vec;
 		vec = self->mp_mem_sc.ms_v;
 		vec = (struct mchunk *)krealloc_nx(vec,

@@ -50,6 +50,7 @@
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
+#include <assert.h>
 #include <sched.h>
 #include <stddef.h>
 #include <string.h>
@@ -206,7 +207,7 @@ again:
 INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_segment_not_present(struct icpustate *__restrict state,
                                uintptr_t ecode) {
-	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x0b)); /* #NP  Segment not present */
+	static_assert(IDT_CONFIG_ISTRAP(0x0b)); /* #NP  Segment not present */
 	struct emu86_modrm mod;
 	unsigned int i;
 	emu86_opcode_t tiny_opcode;

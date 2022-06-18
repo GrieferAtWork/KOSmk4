@@ -25,6 +25,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
  */
 #ifndef GUARD_LIBC_LIBC_COMPAT_C
 #define GUARD_LIBC_LIBC_COMPAT_C 1
+#define _KOS_SOURCE 1
 
 /*
  * Misc functions needed for ABI compatibility with other platforms.
@@ -50,6 +51,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <nt/sysinfoapi.h>
 #include <nt/types.h>
 
+#include <assert.h>
 #include <elf.h>
 #include <fcntl.h>
 #include <format-printer.h>
@@ -290,8 +292,8 @@ struct linux_default_stdio_file {
 #endif /* __SIZEOF_POINTER__ != ... */
 };
 
-STATIC_ASSERT(sizeof(struct IO_FILE_84) == sizeof(struct linux_default_stdio_file));
-STATIC_ASSERT(sizeof(struct IO_FILE_84) == SIZEOF_IO_FILE_84);
+static_assert(sizeof(struct IO_FILE_84) == sizeof(struct linux_default_stdio_file));
+static_assert(sizeof(struct IO_FILE_84) == SIZEOF_IO_FILE_84);
 
 #if __SIZEOF_POINTER__ == 4
 #ifndef FILE_HAVE_UOFFSET
@@ -1719,55 +1721,55 @@ libd__outpd(uint16_t port, uint32_t value) {
 /* OpenSolaris's string arrays from <siginfo.h>                         */
 /************************************************************************/
 #define N_SYS_ILLLIST 8
-STATIC_ASSERT(ILL_ILLOPC < (N_SYS_ILLLIST + 1));
-STATIC_ASSERT(ILL_ILLOPN < (N_SYS_ILLLIST + 1));
-STATIC_ASSERT(ILL_ILLADR < (N_SYS_ILLLIST + 1));
-STATIC_ASSERT(ILL_ILLTRP < (N_SYS_ILLLIST + 1));
-STATIC_ASSERT(ILL_PRVOPC < (N_SYS_ILLLIST + 1));
-STATIC_ASSERT(ILL_PRVREG < (N_SYS_ILLLIST + 1));
-STATIC_ASSERT(ILL_COPROC < (N_SYS_ILLLIST + 1));
-STATIC_ASSERT(ILL_BADSTK < (N_SYS_ILLLIST + 1));
+static_assert(ILL_ILLOPC < (N_SYS_ILLLIST + 1));
+static_assert(ILL_ILLOPN < (N_SYS_ILLLIST + 1));
+static_assert(ILL_ILLADR < (N_SYS_ILLLIST + 1));
+static_assert(ILL_ILLTRP < (N_SYS_ILLLIST + 1));
+static_assert(ILL_PRVOPC < (N_SYS_ILLLIST + 1));
+static_assert(ILL_PRVREG < (N_SYS_ILLLIST + 1));
+static_assert(ILL_COPROC < (N_SYS_ILLLIST + 1));
+static_assert(ILL_BADSTK < (N_SYS_ILLLIST + 1));
 
 #define N_SYS_FPELIST 8
-STATIC_ASSERT(FPE_INTDIV < (N_SYS_FPELIST + 1));
-STATIC_ASSERT(FPE_INTOVF < (N_SYS_FPELIST + 1));
-STATIC_ASSERT(FPE_FLTDIV < (N_SYS_FPELIST + 1));
-STATIC_ASSERT(FPE_FLTOVF < (N_SYS_FPELIST + 1));
-STATIC_ASSERT(FPE_FLTUND < (N_SYS_FPELIST + 1));
-STATIC_ASSERT(FPE_FLTRES < (N_SYS_FPELIST + 1));
-STATIC_ASSERT(FPE_FLTINV < (N_SYS_FPELIST + 1));
-STATIC_ASSERT(FPE_FLTSUB < (N_SYS_FPELIST + 1));
+static_assert(FPE_INTDIV < (N_SYS_FPELIST + 1));
+static_assert(FPE_INTOVF < (N_SYS_FPELIST + 1));
+static_assert(FPE_FLTDIV < (N_SYS_FPELIST + 1));
+static_assert(FPE_FLTOVF < (N_SYS_FPELIST + 1));
+static_assert(FPE_FLTUND < (N_SYS_FPELIST + 1));
+static_assert(FPE_FLTRES < (N_SYS_FPELIST + 1));
+static_assert(FPE_FLTINV < (N_SYS_FPELIST + 1));
+static_assert(FPE_FLTSUB < (N_SYS_FPELIST + 1));
 
 #define N_SYS_SEGVLIST 2
-STATIC_ASSERT(SEGV_MAPERR < (N_SYS_SEGVLIST + 1));
-STATIC_ASSERT(SEGV_ACCERR < (N_SYS_SEGVLIST + 1));
+static_assert(SEGV_MAPERR < (N_SYS_SEGVLIST + 1));
+static_assert(SEGV_ACCERR < (N_SYS_SEGVLIST + 1));
 
 #define N_SYS_BUSLIST 5
-STATIC_ASSERT(BUS_ADRALN < (N_SYS_BUSLIST + 1));
-STATIC_ASSERT(BUS_ADRERR < (N_SYS_BUSLIST + 1));
-STATIC_ASSERT(BUS_OBJERR < (N_SYS_BUSLIST + 1));
-STATIC_ASSERT(BUS_MCEERR_AR < (N_SYS_BUSLIST + 1));
-STATIC_ASSERT(BUS_MCEERR_AO < (N_SYS_BUSLIST + 1));
+static_assert(BUS_ADRALN < (N_SYS_BUSLIST + 1));
+static_assert(BUS_ADRERR < (N_SYS_BUSLIST + 1));
+static_assert(BUS_OBJERR < (N_SYS_BUSLIST + 1));
+static_assert(BUS_MCEERR_AR < (N_SYS_BUSLIST + 1));
+static_assert(BUS_MCEERR_AO < (N_SYS_BUSLIST + 1));
 
 #define N_SYS_TRAPLIST 2
-STATIC_ASSERT(TRAP_BRKPT < (N_SYS_TRAPLIST + 1));
-STATIC_ASSERT(TRAP_TRACE < (N_SYS_TRAPLIST + 1));
+static_assert(TRAP_BRKPT < (N_SYS_TRAPLIST + 1));
+static_assert(TRAP_TRACE < (N_SYS_TRAPLIST + 1));
 
 #define N_SYS_CLDLIST 6
-STATIC_ASSERT(CLD_EXITED < (N_SYS_CLDLIST + 1));
-STATIC_ASSERT(CLD_KILLED < (N_SYS_CLDLIST + 1));
-STATIC_ASSERT(CLD_DUMPED < (N_SYS_CLDLIST + 1));
-STATIC_ASSERT(CLD_TRAPPED < (N_SYS_CLDLIST + 1));
-STATIC_ASSERT(CLD_STOPPED < (N_SYS_CLDLIST + 1));
-STATIC_ASSERT(CLD_CONTINUED < (N_SYS_CLDLIST + 1));
+static_assert(CLD_EXITED < (N_SYS_CLDLIST + 1));
+static_assert(CLD_KILLED < (N_SYS_CLDLIST + 1));
+static_assert(CLD_DUMPED < (N_SYS_CLDLIST + 1));
+static_assert(CLD_TRAPPED < (N_SYS_CLDLIST + 1));
+static_assert(CLD_STOPPED < (N_SYS_CLDLIST + 1));
+static_assert(CLD_CONTINUED < (N_SYS_CLDLIST + 1));
 
 #define N_SYS_POLLLIST 6
-STATIC_ASSERT(POLL_IN < (N_SYS_POLLLIST + 1));
-STATIC_ASSERT(POLL_OUT < (N_SYS_POLLLIST + 1));
-STATIC_ASSERT(POLL_MSG < (N_SYS_POLLLIST + 1));
-STATIC_ASSERT(POLL_ERR < (N_SYS_POLLLIST + 1));
-STATIC_ASSERT(POLL_PRI < (N_SYS_POLLLIST + 1));
-STATIC_ASSERT(POLL_HUP < (N_SYS_POLLLIST + 1));
+static_assert(POLL_IN < (N_SYS_POLLLIST + 1));
+static_assert(POLL_OUT < (N_SYS_POLLLIST + 1));
+static_assert(POLL_MSG < (N_SYS_POLLLIST + 1));
+static_assert(POLL_ERR < (N_SYS_POLLLIST + 1));
+static_assert(POLL_PRI < (N_SYS_POLLLIST + 1));
+static_assert(POLL_HUP < (N_SYS_POLLLIST + 1));
 
 PRIVATE ATTR_SECTION(".text.crt.solaris") ATTR_RETNONNULL NONNULL((1)) char const **LIBCCALL
 libc_siginfolist_init(char const **list, unsigned int count, signo_t signo) {

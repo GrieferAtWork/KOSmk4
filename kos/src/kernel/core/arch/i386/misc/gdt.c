@@ -25,6 +25,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_MISC_GDT_C
 #define GUARD_KERNEL_CORE_ARCH_I386_MISC_GDT_C 1
 #define DISABLE_BRANCH_PROFILING /* Don't profile this file */
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -34,19 +35,20 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <sched/pertask.h>
 #include <sched/task.h>
 
+#include <assert.h>
 #include <asm/cpu-flags.h>
 
 DECL_BEGIN
 
 /* Assert architectural requirements for segment indices. */
-STATIC_ASSERT(SEGMENT_KERNEL_CODE == SEGMENT_KERNEL_CODE);
-STATIC_ASSERT(SEGMENT_KERNEL_DATA == SEGMENT_KERNEL_CODE + 8);
-STATIC_ASSERT(SEGMENT_USER_CODE32 == SEGMENT_KERNEL_CODE + 16);
-STATIC_ASSERT(SEGMENT_USER_DATA32 == SEGMENT_KERNEL_CODE + 24);
-STATIC_ASSERT(SEGMENT_USER_CODE32 == SEGMENT_USER_CODE32);
-STATIC_ASSERT(SEGMENT_USER_DATA32 == SEGMENT_USER_CODE32 + 8);
+static_assert(SEGMENT_KERNEL_CODE == SEGMENT_KERNEL_CODE);
+static_assert(SEGMENT_KERNEL_DATA == SEGMENT_KERNEL_CODE + 8);
+static_assert(SEGMENT_USER_CODE32 == SEGMENT_KERNEL_CODE + 16);
+static_assert(SEGMENT_USER_DATA32 == SEGMENT_KERNEL_CODE + 24);
+static_assert(SEGMENT_USER_CODE32 == SEGMENT_USER_CODE32);
+static_assert(SEGMENT_USER_DATA32 == SEGMENT_USER_CODE32 + 8);
 #ifdef __x86_64__
-STATIC_ASSERT(SEGMENT_USER_CODE64 == SEGMENT_USER_CODE32 + 16);
+static_assert(SEGMENT_USER_CODE64 == SEGMENT_USER_CODE32 + 16);
 #endif /* __x86_64__ */
 
 

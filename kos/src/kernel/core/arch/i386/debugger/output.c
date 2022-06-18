@@ -43,6 +43,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <hw/video/vga.h>
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -91,13 +92,13 @@ PRIVATE ATTR_DBGRODATA byte_t const cp437_encode_a0_ff[] = {
 	0x85,0xa0,0x83,0x00,0x84,0x86,0x91,0x87,0x8a,0x82,0x88,0x89,0x8d,0xa1,0x8c,0x8b,
 	0x00,0xa4,0x95,0xa2,0x93,0x00,0x94,0xf6,0x00,0x97,0xa3,0x96,0x81,0x00,0x00,0x98
 };
-STATIC_ASSERT(sizeof(cp437_encode_a0_ff) == ((0xff - 0xa0) + 1));
+static_assert(sizeof(cp437_encode_a0_ff) == ((0xff - 0xa0) + 1));
 
 PRIVATE ATTR_DBGRODATA byte_t const cp437_encode_2550_256C[] = {
 	205,186,213,214,201,184,183,187,212,211,200,190,189,188,198,
 	199,204,181,182,185,209,210,203,207,208,202,216,215,206,
 };
-STATIC_ASSERT(sizeof(cp437_encode_2550_256C) == ((0x256C - 0x2550) + 1));
+static_assert(sizeof(cp437_encode_2550_256C) == ((0x256C - 0x2550) + 1));
 
 PRIVATE NOBLOCK ATTR_DBGTEXT ATTR_CONST WUNUSED byte_t
 NOTHROW(FCALL cp437_encode)(char32_t unicode) {

@@ -1033,8 +1033,8 @@ ext2_openfs(struct ffilesys *__restrict UNUSED(filesys),
 	/* Read the Ext2 disk header. */
 #if PAGESIZE >= 256
 	{
-		STATIC_ASSERT((EXT2_SUPERBLOCK_OFFSET % 256) == 0);
-		STATIC_ASSERT(sizeof(Ext2DiskSuperblock) > 128 && sizeof(Ext2DiskSuperblock) <= 256);
+		static_assert((EXT2_SUPERBLOCK_OFFSET % 256) == 0);
+		static_assert(sizeof(Ext2DiskSuperblock) > 128 && sizeof(Ext2DiskSuperblock) <= 256);
 	}
 	(mfile_getblocksize(dev) <= 256)
 	? (desc = (Ext2DiskSuperblock *)aligned_alloca(256, 256),

@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_FILESYS_FILEHANDLE_C
 #define GUARD_KERNEL_CORE_FILESYS_FILEHANDLE_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -43,6 +44,7 @@
 #include <kos/except/reason/inval.h>
 #include <kos/kernel/handle.h>
 
+#include <assert.h>
 #include <format-printer.h>
 #include <stddef.h>
 
@@ -316,8 +318,8 @@ handle_filehandle_tryas(struct filehandle *__restrict self,
 
 
 
-STATIC_ASSERT(offsetof(struct filehandle, fh_path) == offsetof(struct fifohandle, fu_path));
-STATIC_ASSERT(offsetof(struct filehandle, fh_dirent) == offsetof(struct fifohandle, fu_dirent));
+static_assert(offsetof(struct filehandle, fh_path) == offsetof(struct fifohandle, fu_path));
+static_assert(offsetof(struct filehandle, fh_dirent) == offsetof(struct fifohandle, fu_dirent));
 DEFINE_INTERN_ALIAS(handle_fifohandle_printlink, handle_filehandle_printlink);
 INTERN NONNULL((1, 2)) ssize_t KCALL
 handle_filehandle_printlink(struct filehandle *__restrict self,

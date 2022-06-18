@@ -60,12 +60,12 @@ DECL_BEGIN
 
 
 /* Ensure binary compatibility between `struct pending_rpc' and `struct pending_rpc_head'. */
-STATIC_ASSERT(offsetof(struct pending_rpc, pr_link) == offsetof(struct pending_rpc_head, prh_link));
-STATIC_ASSERT(offsetafter(struct pending_rpc, pr_link) == offsetafter(struct pending_rpc_head, prh_link));
-STATIC_ASSERT(offsetof(struct pending_rpc, pr_flags) == offsetof(struct pending_rpc_head, prh_flags));
-STATIC_ASSERT(offsetafter(struct pending_rpc, pr_flags) == offsetafter(struct pending_rpc_head, prh_flags));
-STATIC_ASSERT(offsetof(struct pending_rpc, pr_kern.k_func) == offsetof(struct pending_rpc_head, prh_func));
-STATIC_ASSERT(offsetafter(struct pending_rpc, pr_kern.k_func) == offsetafter(struct pending_rpc_head, prh_func));
+static_assert(offsetof(struct pending_rpc, pr_link) == offsetof(struct pending_rpc_head, prh_link));
+static_assert(offsetafter(struct pending_rpc, pr_link) == offsetafter(struct pending_rpc_head, prh_link));
+static_assert(offsetof(struct pending_rpc, pr_flags) == offsetof(struct pending_rpc_head, prh_flags));
+static_assert(offsetafter(struct pending_rpc, pr_flags) == offsetafter(struct pending_rpc_head, prh_flags));
+static_assert(offsetof(struct pending_rpc, pr_kern.k_func) == offsetof(struct pending_rpc_head, prh_func));
+static_assert(offsetafter(struct pending_rpc, pr_kern.k_func) == offsetafter(struct pending_rpc_head, prh_func));
 
 /* [0..n][lock(INSERT(ATOMIC), CLEAR(ATOMIC && THIS_TASK))]
  * Pending RPCs. (Set of `THIS_RPCS_TERMINATED' when RPCs may no longer
@@ -191,7 +191,7 @@ task_rpc_exec(struct task *__restrict thread, syscall_ulong_t flags,
 	 * the same thing, but  also works then the  thread hosted by another  CPU. */
 	if (thread->t_flags & TASK_FKERNTHREAD) {
 		assertf(!(flags & RPC_SYNCMODE_F_USER), "Can't send user-return RPC to kernel-only thread");
-		STATIC_ASSERT(RPC_PRIORITY_F_HIGH == TASK_WAKE_FHIGHPRIO);
+		static_assert(RPC_PRIORITY_F_HIGH == TASK_WAKE_FHIGHPRIO);
 		return task_wake(thread, flags);
 	} else {
 		userexcept_sysret_inject_safe(thread, flags);
@@ -771,13 +771,13 @@ NOTHROW(FCALL proc_rpc_trypending_oneof)(sigset_t const *__restrict these) {
 		return PROC_RPC_TRYPENDING_ONEOF_WOULDBLOCK;
 	first = ATOMIC_READ(proc->pc_sig_list.slh_first);
 	if (first != THIS_RPCS_TERMINATED) {
-		STATIC_ASSERT(PROC_RPC_TRYPENDING_ONEOF_NO == (int)false);
-		STATIC_ASSERT(PROC_RPC_TRYPENDING_ONEOF_YES == (int)true);
+		static_assert(PROC_RPC_TRYPENDING_ONEOF_NO == (int)false);
+		static_assert(PROC_RPC_TRYPENDING_ONEOF_YES == (int)true);
 		result = (int)is_one_of_these_pending(these, first);
 	}
 	if (result == PROC_RPC_TRYPENDING_ONEOF_NO) {
-		STATIC_ASSERT(PROC_RPC_TRYPENDING_ONEOF_NO == (int)false);
-		STATIC_ASSERT(PROC_RPC_TRYPENDING_ONEOF_YES == (int)true);
+		static_assert(PROC_RPC_TRYPENDING_ONEOF_NO == (int)false);
+		static_assert(PROC_RPC_TRYPENDING_ONEOF_YES == (int)true);
 		uint32_t pending_bitset = ATOMIC_READ(proc->pc_sig_pend);
 		if (!(pending_bitset & 1))
 			result = (int)(((pending_bitset >> 1) & (uint32_t)these->__val[0]) != 0);

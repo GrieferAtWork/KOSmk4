@@ -2310,7 +2310,7 @@ NOTHROW(KCALL flatsuper_v_free)(struct fnode *__restrict self) {
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL flatsuper_v_destroy)(struct mfile *__restrict self) {
 	struct flatsuper *me = mfile_asflatsuper(self);
-	STATIC_ASSERT((offsetof(struct flatsuper, ffs_rootdata) -
+	static_assert((offsetof(struct flatsuper, ffs_rootdata) -
 	               offsetof(struct flatsuper, ffs_super.fs_root)) ==
 	              offsetof(struct flatdirnode, fdn_data));
 	flatdirdata_fini(&me->ffs_rootdata);

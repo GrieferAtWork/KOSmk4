@@ -447,11 +447,10 @@ NOTHROW(FCALL syslog_packet_broadcast)(struct syslog_packet const *__restrict se
 #undef WANT_SYSLOG_LOCK
 #endif /* CONFIG_NO_SMP */
 
-
-STATIC_ASSERT(offsetof(struct syslog_packet, sp_time) == OFFSET_SYSLOG_PACKET_TIME);
-STATIC_ASSERT(offsetof(struct syslog_packet, sp_nsec) == OFFSET_SYSLOG_PACKET_NSEC);
-STATIC_ASSERT(offsetof(struct syslog_packet, sp_len) == OFFSET_SYSLOG_PACKET_LEN);
-STATIC_ASSERT(offsetof(struct syslog_packet, sp_msg) == OFFSET_SYSLOG_PACKET_MSG);
+static_assert(offsetof(struct syslog_packet, sp_time) == OFFSET_SYSLOG_PACKET_TIME);
+static_assert(offsetof(struct syslog_packet, sp_nsec) == OFFSET_SYSLOG_PACKET_NSEC);
+static_assert(offsetof(struct syslog_packet, sp_len) == OFFSET_SYSLOG_PACKET_LEN);
+static_assert(offsetof(struct syslog_packet, sp_msg) == OFFSET_SYSLOG_PACKET_MSG);
 
 struct syslog_buffer {
 	struct syslog_packet sb_packet; /* Pending packet */

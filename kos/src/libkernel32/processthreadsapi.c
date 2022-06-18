@@ -57,19 +57,6 @@ DECL_BEGIN
 /************************************************************************/
 /* INTER-PROCESS CONTROL                                                */
 /************************************************************************/
-DEFINE_PUBLIC_ALIAS(TerminateProcess, libk32_TerminateProcess);
-DEFINE_PUBLIC_ALIAS(TerminateThread, libk32_TerminateThread);
-DEFINE_PUBLIC_ALIAS(OpenProcess, libk32_OpenProcess);
-DEFINE_PUBLIC_ALIAS(GetExitCodeProcess, libk32_GetExitCodeProcess);
-DEFINE_PUBLIC_ALIAS(GetExitCodeThread, libk32_GetExitCodeThread);
-DEFINE_PUBLIC_ALIAS(OpenThread, libk32_OpenThread);
-DEFINE_PUBLIC_ALIAS(GetProcessId, libk32_GetProcessId);
-DEFINE_PUBLIC_ALIAS(GetThreadId, libk32_GetThreadId);
-DEFINE_PUBLIC_ALIAS(GetProcessHandleCount, libk32_GetProcessHandleCount);
-DEFINE_PUBLIC_ALIAS(GetProcessIdOfThread, libk32_GetProcessIdOfThread);
-DEFINE_PUBLIC_ALIAS(GetCurrentProcess, libk32_GetCurrentProcess);
-DEFINE_PUBLIC_ALIAS(GetCurrentThread, libk32_GetCurrentThread);
-
 INTERN WINBOOL WINAPI
 libk32_TerminateProcess(HANDLE hProcess, UINT uExitCode) {
 	errno_t error;
@@ -167,7 +154,6 @@ libk32_OpenThread(DWORD dwDesiredAccess, WINBOOL bInheritHandle, DWORD dwThreadI
 	return NTHANDLE_FROMFD(cast.fc_resfd.of_hint);
 }
 
-DEFINE_INTERN_ALIAS(libk32_GetProcessIdOfThread, libk32_GetProcessId);
 INTERN DWORD WINAPI
 libk32_GetProcessId(HANDLE hProcess) {
 	pid_t result;
@@ -180,6 +166,8 @@ libk32_GetProcessId(HANDLE hProcess) {
 		return 0;
 	return result;
 }
+
+DEFINE_INTERN_ALIAS(libk32_GetProcessIdOfThread, libk32_GetProcessId);
 
 INTERN DWORD WINAPI
 libk32_GetThreadId(HANDLE hThread) {
@@ -225,29 +213,26 @@ INTERN HANDLE WINAPI libk32_GetCurrentThread(VOID) {
 	return NTHANDLE_FROMFD(AT_FDTHRD);
 }
 
+DEFINE_PUBLIC_ALIAS(TerminateProcess, libk32_TerminateProcess);
+DEFINE_PUBLIC_ALIAS(TerminateThread, libk32_TerminateThread);
+DEFINE_PUBLIC_ALIAS(OpenProcess, libk32_OpenProcess);
+DEFINE_PUBLIC_ALIAS(GetExitCodeProcess, libk32_GetExitCodeProcess);
+DEFINE_PUBLIC_ALIAS(GetExitCodeThread, libk32_GetExitCodeThread);
+DEFINE_PUBLIC_ALIAS(OpenThread, libk32_OpenThread);
+DEFINE_PUBLIC_ALIAS(GetProcessId, libk32_GetProcessId);
+DEFINE_PUBLIC_ALIAS(GetThreadId, libk32_GetThreadId);
+DEFINE_PUBLIC_ALIAS(GetProcessHandleCount, libk32_GetProcessHandleCount);
+DEFINE_PUBLIC_ALIAS(GetProcessIdOfThread, libk32_GetProcessIdOfThread);
+DEFINE_PUBLIC_ALIAS(GetCurrentProcess, libk32_GetCurrentProcess);
+DEFINE_PUBLIC_ALIAS(GetCurrentThread, libk32_GetCurrentThread);
+/************************************************************************/
+
+
 
 
 /************************************************************************/
 /* SIMPLE PROC/THREAD CONTROL                                           */
 /************************************************************************/
-DEFINE_PUBLIC_ALIAS(CreateThread, libk32_CreateThread);
-DEFINE_PUBLIC_ALIAS(ExitThread, libk32_ExitThread);
-DEFINE_PUBLIC_ALIAS(ExitProcess, libk32_ExitProcess);
-DEFINE_PUBLIC_ALIAS(SwitchToThread, libk32_SwitchToThread);
-DEFINE_PUBLIC_ALIAS(GetCurrentProcessorNumber, libk32_GetCurrentProcessorNumber);
-DEFINE_PUBLIC_ALIAS(ProcessIdToSessionId, libk32_ProcessIdToSessionId);
-DEFINE_PUBLIC_ALIAS(GetCurrentProcessId, libk32_GetCurrentProcessId);
-DEFINE_PUBLIC_ALIAS(GetCurrentThreadId, libk32_GetCurrentThreadId);
-DEFINE_PUBLIC_ALIAS(IsProcessorFeaturePresent, libk32_IsProcessorFeaturePresent);
-DEFINE_PUBLIC_ALIAS(FlushProcessWriteBuffers, libk32_FlushProcessWriteBuffers);
-DEFINE_PUBLIC_ALIAS(FlushInstructionCache, libk32_FlushInstructionCache);
-DEFINE_PUBLIC_ALIAS(QueueUserAPC, libk32_QueueUserAPC);
-DEFINE_PUBLIC_ALIAS(QueueUserAPC2, libk32_QueueUserAPC2);
-DEFINE_PUBLIC_ALIAS(SuspendThread, libk32_SuspendThread);
-DEFINE_PUBLIC_ALIAS(ResumeThread, libk32_ResumeThread);
-DEFINE_PUBLIC_ALIAS(GetThreadContext, libk32_GetThreadContext);
-DEFINE_PUBLIC_ALIAS(SetThreadContext, libk32_SetThreadContext);
-
 struct k32_thread_start_data {
 	LPTHREAD_START_ROUTINE lpStartAddress;
 	LPVOID                 lpParameter;
@@ -514,6 +499,25 @@ libk32_SetThreadContext(HANDLE hThread, CONST CONTEXT *lpContext) {
 	return FALSE;
 }
 
+DEFINE_PUBLIC_ALIAS(CreateThread, libk32_CreateThread);
+DEFINE_PUBLIC_ALIAS(ExitThread, libk32_ExitThread);
+DEFINE_PUBLIC_ALIAS(ExitProcess, libk32_ExitProcess);
+DEFINE_PUBLIC_ALIAS(SwitchToThread, libk32_SwitchToThread);
+DEFINE_PUBLIC_ALIAS(GetCurrentProcessorNumber, libk32_GetCurrentProcessorNumber);
+DEFINE_PUBLIC_ALIAS(ProcessIdToSessionId, libk32_ProcessIdToSessionId);
+DEFINE_PUBLIC_ALIAS(GetCurrentProcessId, libk32_GetCurrentProcessId);
+DEFINE_PUBLIC_ALIAS(GetCurrentThreadId, libk32_GetCurrentThreadId);
+DEFINE_PUBLIC_ALIAS(IsProcessorFeaturePresent, libk32_IsProcessorFeaturePresent);
+DEFINE_PUBLIC_ALIAS(FlushProcessWriteBuffers, libk32_FlushProcessWriteBuffers);
+DEFINE_PUBLIC_ALIAS(FlushInstructionCache, libk32_FlushInstructionCache);
+DEFINE_PUBLIC_ALIAS(QueueUserAPC, libk32_QueueUserAPC);
+DEFINE_PUBLIC_ALIAS(QueueUserAPC2, libk32_QueueUserAPC2);
+DEFINE_PUBLIC_ALIAS(SuspendThread, libk32_SuspendThread);
+DEFINE_PUBLIC_ALIAS(ResumeThread, libk32_ResumeThread);
+DEFINE_PUBLIC_ALIAS(GetThreadContext, libk32_GetThreadContext);
+DEFINE_PUBLIC_ALIAS(SetThreadContext, libk32_SetThreadContext);
+/************************************************************************/
+
 
 
 
@@ -526,11 +530,6 @@ libk32_SetThreadContext(HANDLE hThread, CONST CONTEXT *lpContext) {
 /************************************************************************/
 /* TLS                                                                  */
 /************************************************************************/
-DEFINE_PUBLIC_ALIAS(TlsAlloc, libk32_TlsAlloc);
-DEFINE_PUBLIC_ALIAS(TlsGetValue, libk32_TlsGetValue);
-DEFINE_PUBLIC_ALIAS(TlsSetValue, libk32_TlsSetValue);
-DEFINE_PUBLIC_ALIAS(TlsFree, libk32_TlsFree);
-
 INTERN DWORD WINAPI
 libk32_TlsAlloc(VOID) {
 	pthread_key_t key;
@@ -571,6 +570,12 @@ libk32_TlsFree(DWORD dwTlsIndex) {
 	errno = error;
 	return FALSE;
 }
+
+DEFINE_PUBLIC_ALIAS(TlsAlloc, libk32_TlsAlloc);
+DEFINE_PUBLIC_ALIAS(TlsGetValue, libk32_TlsGetValue);
+DEFINE_PUBLIC_ALIAS(TlsSetValue, libk32_TlsSetValue);
+DEFINE_PUBLIC_ALIAS(TlsFree, libk32_TlsFree);
+/************************************************************************/
 
 DECL_END
 

@@ -551,10 +551,9 @@ handle_pipe_writer_ioctl(struct pipe_writer *__restrict self, ioctl_t cmd,
 	return handle_pipe_ioctl(self->pw_pipe, cmd, arg, (mode & ~IO_ACCMODE) | IO_WRONLY);
 }
 
-
-STATIC_ASSERT(IO_CLOEXEC == IO_FROM_OPENFLAG(O_CLOEXEC));
-STATIC_ASSERT(IO_CLOFORK == IO_FROM_OPENFLAG(O_CLOFORK));
-STATIC_ASSERT(IO_NONBLOCK == IO_FROM_OPENFLAG(O_NONBLOCK));
+static_assert(IO_CLOEXEC == IO_FROM_OPENFLAG(O_CLOEXEC));
+static_assert(IO_CLOFORK == IO_FROM_OPENFLAG(O_CLOFORK));
+static_assert(IO_NONBLOCK == IO_FROM_OPENFLAG(O_NONBLOCK));
 
 
 

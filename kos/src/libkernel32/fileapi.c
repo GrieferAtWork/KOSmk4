@@ -33,6 +33,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 
+#include <assert.h>
 #include <direct.h>
 #include <dirent.h>
 #include <errno.h>
@@ -84,18 +85,12 @@ libk32_FileAttributesFromStat(struct stat64 const *__restrict st) {
 }
 
 
+
+
+
 /************************************************************************/
 /* DIRECTORY ENUMERATION                                                */
 /************************************************************************/
-DEFINE_PUBLIC_ALIAS(FindFirstFileA, libk32_FindFirstFileA);
-DEFINE_PUBLIC_ALIAS(FindFirstFileW, libk32_FindFirstFileW);
-DEFINE_PUBLIC_ALIAS(FindNextFileA, libk32_FindNextFileA);
-DEFINE_PUBLIC_ALIAS(FindNextFileW, libk32_FindNextFileW);
-DEFINE_PUBLIC_ALIAS(FindClose, libk32_FindClose);
-DEFINE_PUBLIC_ALIAS(GetLogicalDrives, libk32_GetLogicalDrives);
-DEFINE_PUBLIC_ALIAS(GetLogicalDriveStringsA, libk32_GetLogicalDriveStringsA);
-DEFINE_PUBLIC_ALIAS(GetLogicalDriveStringsW, libk32_GetLogicalDriveStringsW);
-
 struct dfind {
 	DIR  *df_dir;   /* [1..1][owned] The underlying directory stream. */
 	char *df_query; /* [1..1][owned] The wildcard-enabled query pattern. */
@@ -210,7 +205,18 @@ libk32_FindFirstFileW(LPCWSTR lpFileName, LPWIN32_FIND_DATAW lpFindFileData) {
 	return (HANDLE)find;
 }
 
+DEFINE_PUBLIC_ALIAS(FindFirstFileA, libk32_FindFirstFileA);
+DEFINE_PUBLIC_ALIAS(FindFirstFileW, libk32_FindFirstFileW);
+DEFINE_PUBLIC_ALIAS(FindNextFileA, libk32_FindNextFileA);
+DEFINE_PUBLIC_ALIAS(FindNextFileW, libk32_FindNextFileW);
+DEFINE_PUBLIC_ALIAS(FindClose, libk32_FindClose);
+/************************************************************************/
 
+
+
+
+
+/************************************************************************/
 INTERN DWORD WINAPI
 libk32_GetLogicalDrives(VOID) {
 	TRACE("GetLogicalDrives()");
@@ -241,6 +247,7 @@ libk32_GetLogicalDriveStringsA(DWORD nBufferLength, LPSTR lpBuffer) {
 	}
 	return result;
 }
+
 INTERN DWORD WINAPI
 libk32_GetLogicalDriveStringsW(DWORD nBufferLength, LPWSTR lpBuffer) {
 	char buf[MAX_LOGICAL_DRIVE_STRINGS], *iter = buf;
@@ -267,21 +274,17 @@ libk32_GetLogicalDriveStringsW(DWORD nBufferLength, LPWSTR lpBuffer) {
 	return result;
 }
 
+DEFINE_PUBLIC_ALIAS(GetLogicalDrives, libk32_GetLogicalDrives);
+DEFINE_PUBLIC_ALIAS(GetLogicalDriveStringsA, libk32_GetLogicalDriveStringsA);
+DEFINE_PUBLIC_ALIAS(GetLogicalDriveStringsW, libk32_GetLogicalDriveStringsW);
+/************************************************************************/
+
 
 
 
 /************************************************************************/
 /* FILE MANAGEMENT                                                      */
 /************************************************************************/
-DEFINE_PUBLIC_ALIAS(GetFullPathNameA, libk32_GetFullPathNameA);
-DEFINE_PUBLIC_ALIAS(GetFullPathNameW, libk32_GetFullPathNameW);
-DEFINE_PUBLIC_ALIAS(CreateDirectoryA, libk32_CreateDirectoryA);
-DEFINE_PUBLIC_ALIAS(CreateDirectoryW, libk32_CreateDirectoryW);
-DEFINE_PUBLIC_ALIAS(DeleteFileA, libk32_DeleteFileA);
-DEFINE_PUBLIC_ALIAS(DeleteFileW, libk32_DeleteFileW);
-DEFINE_PUBLIC_ALIAS(RemoveDirectoryA, libk32_RemoveDirectoryA);
-DEFINE_PUBLIC_ALIAS(RemoveDirectoryW, libk32_RemoveDirectoryW);
-
 __LIBC WUNUSED NONNULL((1)) char *LIBDCALL DOS$realpath(char const *filename, char *resolved);
 
 INTERN DWORD WINAPI
@@ -378,24 +381,22 @@ libk32_RemoveDirectoryW(LPCWSTR lpPathName) {
 	return DOS$_wrmdir(lpPathName) == 0;
 }
 
+DEFINE_PUBLIC_ALIAS(GetFullPathNameA, libk32_GetFullPathNameA);
+DEFINE_PUBLIC_ALIAS(GetFullPathNameW, libk32_GetFullPathNameW);
+DEFINE_PUBLIC_ALIAS(CreateDirectoryA, libk32_CreateDirectoryA);
+DEFINE_PUBLIC_ALIAS(CreateDirectoryW, libk32_CreateDirectoryW);
+DEFINE_PUBLIC_ALIAS(DeleteFileA, libk32_DeleteFileA);
+DEFINE_PUBLIC_ALIAS(DeleteFileW, libk32_DeleteFileW);
+DEFINE_PUBLIC_ALIAS(RemoveDirectoryA, libk32_RemoveDirectoryA);
+DEFINE_PUBLIC_ALIAS(RemoveDirectoryW, libk32_RemoveDirectoryW);
+/************************************************************************/
+
 
 
 
 /************************************************************************/
 /* FILE I/O                                                             */
 /************************************************************************/
-DEFINE_PUBLIC_ALIAS(CreateFile2, libk32_CreateFile2);
-DEFINE_PUBLIC_ALIAS(CreateFileA, libk32_CreateFileA);
-DEFINE_PUBLIC_ALIAS(CreateFileW, libk32_CreateFileW);
-DEFINE_PUBLIC_ALIAS(SetFilePointer, libk32_SetFilePointer);
-DEFINE_PUBLIC_ALIAS(SetFilePointerEx, libk32_SetFilePointerEx);
-DEFINE_PUBLIC_ALIAS(ReadFile, libk32_ReadFile);
-DEFINE_PUBLIC_ALIAS(WriteFile, libk32_WriteFile);
-DEFINE_PUBLIC_ALIAS(GetFinalPathNameByHandleA, libk32_GetFinalPathNameByHandleA);
-DEFINE_PUBLIC_ALIAS(GetFinalPathNameByHandleW, libk32_GetFinalPathNameByHandleW);
-DEFINE_PUBLIC_ALIAS(FlushFileBuffers, libk32_FlushFileBuffers);
-DEFINE_PUBLIC_ALIAS(SetEndOfFile, libk32_SetEndOfFile);
-
 INTERN HANDLE WINAPI
 libk32_CreateFileA(LPCSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
                    LPSECURITY_ATTRIBUTES lpSecurityAttributes, DWORD dwCreationDisposition,
@@ -498,9 +499,9 @@ libk32_CreateFile2(LPCWSTR lpFileName, DWORD dwDesiredAccess,
 }
 
 
-STATIC_ASSERT(FILE_BEGIN == SEEK_SET);
-STATIC_ASSERT(FILE_CURRENT == SEEK_CUR);
-STATIC_ASSERT(FILE_END == SEEK_END);
+static_assert(FILE_BEGIN == SEEK_SET);
+static_assert(FILE_CURRENT == SEEK_CUR);
+static_assert(FILE_END == SEEK_END);
 INTERN DWORD WINAPI
 libk32_SetFilePointer(HANDLE hFile, LONG lDistanceToMove,
                       PLONG lpDistanceToMoveHigh, DWORD dwMoveMethod) {
@@ -668,6 +669,20 @@ libk32_SetEndOfFile(HANDLE hFile) {
 	return ftruncate64(NTHANDLE_ASFD(hFile), (pos64_t)offset);
 }
 
+DEFINE_PUBLIC_ALIAS(CreateFile2, libk32_CreateFile2);
+DEFINE_PUBLIC_ALIAS(CreateFileA, libk32_CreateFileA);
+DEFINE_PUBLIC_ALIAS(CreateFileW, libk32_CreateFileW);
+DEFINE_PUBLIC_ALIAS(SetFilePointer, libk32_SetFilePointer);
+DEFINE_PUBLIC_ALIAS(SetFilePointerEx, libk32_SetFilePointerEx);
+DEFINE_PUBLIC_ALIAS(ReadFile, libk32_ReadFile);
+DEFINE_PUBLIC_ALIAS(WriteFile, libk32_WriteFile);
+DEFINE_PUBLIC_ALIAS(GetFinalPathNameByHandleA, libk32_GetFinalPathNameByHandleA);
+DEFINE_PUBLIC_ALIAS(GetFinalPathNameByHandleW, libk32_GetFinalPathNameByHandleW);
+DEFINE_PUBLIC_ALIAS(FlushFileBuffers, libk32_FlushFileBuffers);
+DEFINE_PUBLIC_ALIAS(SetEndOfFile, libk32_SetEndOfFile);
+/************************************************************************/
+
+
 
 
 
@@ -677,22 +692,6 @@ libk32_SetEndOfFile(HANDLE hFile) {
 /************************************************************************/
 /* FILE ATTRIBUTES                                                      */
 /************************************************************************/
-DEFINE_PUBLIC_ALIAS(GetFileAttributesA, libk32_GetFileAttributesA);
-DEFINE_PUBLIC_ALIAS(GetFileAttributesW, libk32_GetFileAttributesW);
-DEFINE_PUBLIC_ALIAS(GetFileAttributesExA, libk32_GetFileAttributesExA);
-DEFINE_PUBLIC_ALIAS(GetFileAttributesExW, libk32_GetFileAttributesExW);
-DEFINE_PUBLIC_ALIAS(SetFileAttributesA, libk32_SetFileAttributesA);
-DEFINE_PUBLIC_ALIAS(SetFileAttributesW, libk32_SetFileAttributesW);
-DEFINE_PUBLIC_ALIAS(GetFileInformationByHandle, libk32_GetFileInformationByHandle);
-DEFINE_PUBLIC_ALIAS(CompareFileTime, libk32_CompareFileTime);
-DEFINE_PUBLIC_ALIAS(GetFileSize, libk32_GetFileSize);
-DEFINE_PUBLIC_ALIAS(GetFileSizeEx, libk32_GetFileSizeEx);
-DEFINE_PUBLIC_ALIAS(GetFileTime, libk32_GetFileTime);
-DEFINE_PUBLIC_ALIAS(SetFileTime, libk32_SetFileTime);
-DEFINE_PUBLIC_ALIAS(GetFileType, libk32_GetFileType);
-DEFINE_PUBLIC_ALIAS(FileTimeToLocalFileTime, libk32_FileTimeToLocalFileTime);
-DEFINE_PUBLIC_ALIAS(LocalFileTimeToFileTime, libk32_LocalFileTimeToFileTime);
-
 __LIBC NONNULL((2)) int LIBDCALL DOS$kstat64(char const *__restrict filename, struct stat64 *__restrict buf);
 __LIBC NONNULL((2)) int LIBDCALL DOS$klstat64(char const *__restrict filename, struct stat64 *__restrict buf);
 
@@ -951,6 +950,22 @@ libk32_LocalFileTimeToFileTime(CONST FILETIME *lpLocalFileTime,
 	return TRUE;
 }
 
+DEFINE_PUBLIC_ALIAS(GetFileAttributesA, libk32_GetFileAttributesA);
+DEFINE_PUBLIC_ALIAS(GetFileAttributesW, libk32_GetFileAttributesW);
+DEFINE_PUBLIC_ALIAS(GetFileAttributesExA, libk32_GetFileAttributesExA);
+DEFINE_PUBLIC_ALIAS(GetFileAttributesExW, libk32_GetFileAttributesExW);
+DEFINE_PUBLIC_ALIAS(SetFileAttributesA, libk32_SetFileAttributesA);
+DEFINE_PUBLIC_ALIAS(SetFileAttributesW, libk32_SetFileAttributesW);
+DEFINE_PUBLIC_ALIAS(GetFileInformationByHandle, libk32_GetFileInformationByHandle);
+DEFINE_PUBLIC_ALIAS(CompareFileTime, libk32_CompareFileTime);
+DEFINE_PUBLIC_ALIAS(GetFileSize, libk32_GetFileSize);
+DEFINE_PUBLIC_ALIAS(GetFileSizeEx, libk32_GetFileSizeEx);
+DEFINE_PUBLIC_ALIAS(GetFileTime, libk32_GetFileTime);
+DEFINE_PUBLIC_ALIAS(SetFileTime, libk32_SetFileTime);
+DEFINE_PUBLIC_ALIAS(GetFileType, libk32_GetFileType);
+DEFINE_PUBLIC_ALIAS(FileTimeToLocalFileTime, libk32_FileTimeToLocalFileTime);
+DEFINE_PUBLIC_ALIAS(LocalFileTimeToFileTime, libk32_LocalFileTimeToFileTime);
+/************************************************************************/
 
 DECL_END
 

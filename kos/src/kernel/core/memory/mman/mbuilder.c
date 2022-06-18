@@ -51,22 +51,22 @@ DECL_BEGIN
 
 /* Assert that struct offsets between `struct mbnode' and `struct mnode'
  * are such that binary compatibility is possible. */
-STATIC_ASSERT(sizeof(struct mnode) == sizeof(struct mbnode));
-STATIC_ASSERT(alignof(struct mnode) <= alignof(struct mbnode));
-STATIC_ASSERT(offsetof(struct mnode, mn_flags) == offsetof(struct mbnode, mbn_flags));
-STATIC_ASSERT(offsetof(struct mnode, mn_minaddr) == offsetof(struct mbnode, mbn_minaddr));
-STATIC_ASSERT(offsetof(struct mnode, mn_maxaddr) == offsetof(struct mbnode, mbn_maxaddr));
-STATIC_ASSERT(offsetof(struct mnode, mn_mement) == offsetof(struct mbnode, mbn_mement));
-STATIC_ASSERT(offsetof(struct mnode, mn_part) == offsetof(struct mbnode, mbn_part));
-STATIC_ASSERT(offsetof(struct mnode, mn_fspath) == offsetof(struct mbnode, mbn_fspath));
-STATIC_ASSERT(offsetof(struct mnode, mn_fsname) == offsetof(struct mbnode, mbn_fsname));
-STATIC_ASSERT(offsetof(struct mnode, _mn_alloc) == offsetof(struct mbnode, _mbn_alloc));
-STATIC_ASSERT(offsetof(struct mnode, _mn_alloc.sle_next) == offsetof(struct mbnode, mbn_filnxt));
-STATIC_ASSERT(offsetof(struct mnode, mn_mman) == offsetof(struct mbnode, _mbn_mman));
-STATIC_ASSERT(offsetof(struct mnode, mn_partoff) == offsetof(struct mbnode, _mbn_partoff));
-STATIC_ASSERT(offsetof(struct mnode, mn_link) == offsetof(struct mbnode, _mbn_link));
-STATIC_ASSERT(offsetof(struct mnode, mn_writable) == offsetof(struct mbnode, _mbn_writable));
-STATIC_ASSERT(offsetof(struct mnode, mn_module) == offsetof(struct mbnode, _mbn_module));
+static_assert(sizeof(struct mnode) == sizeof(struct mbnode));
+static_assert(alignof(struct mnode) <= alignof(struct mbnode));
+static_assert(offsetof(struct mnode, mn_flags) == offsetof(struct mbnode, mbn_flags));
+static_assert(offsetof(struct mnode, mn_minaddr) == offsetof(struct mbnode, mbn_minaddr));
+static_assert(offsetof(struct mnode, mn_maxaddr) == offsetof(struct mbnode, mbn_maxaddr));
+static_assert(offsetof(struct mnode, mn_mement) == offsetof(struct mbnode, mbn_mement));
+static_assert(offsetof(struct mnode, mn_part) == offsetof(struct mbnode, mbn_part));
+static_assert(offsetof(struct mnode, mn_fspath) == offsetof(struct mbnode, mbn_fspath));
+static_assert(offsetof(struct mnode, mn_fsname) == offsetof(struct mbnode, mbn_fsname));
+static_assert(offsetof(struct mnode, _mn_alloc) == offsetof(struct mbnode, _mbn_alloc));
+static_assert(offsetof(struct mnode, _mn_alloc.sle_next) == offsetof(struct mbnode, mbn_filnxt));
+static_assert(offsetof(struct mnode, mn_mman) == offsetof(struct mbnode, _mbn_mman));
+static_assert(offsetof(struct mnode, mn_partoff) == offsetof(struct mbnode, _mbn_partoff));
+static_assert(offsetof(struct mnode, mn_link) == offsetof(struct mbnode, _mbn_link));
+static_assert(offsetof(struct mnode, mn_writable) == offsetof(struct mbnode, _mbn_writable));
+static_assert(offsetof(struct mnode, mn_module) == offsetof(struct mbnode, _mbn_module));
 STATIC_ASSERT_MSG(offsetof(struct mnode, mn_writable) == offsetof(struct mbnode, mbn_nxtuprt),
                   "This is needed so that all non-unique-part nodes already have their writable "
                   "link initialized as unbound, and all unique-part nodes can still be enumerated "

@@ -48,8 +48,8 @@ DECL_BEGIN
 #endif /* NDEBUG || NDEBUG_FINI */
 
 /* Assert consistency of `__WANT_MFUTEX__mfu_lop' */
-STATIC_ASSERT(sizeof(struct sig) + sizeof(void *) == sizeof(Toblockop(mpart)));
-STATIC_ASSERT(sizeof(struct sig) + sizeof(void *) == sizeof(Tobpostlockop(mpart)));
+static_assert(sizeof(struct sig) + sizeof(void *) == sizeof(Toblockop(mpart)));
+static_assert(sizeof(struct sig) + sizeof(void *) == sizeof(Tobpostlockop(mpart)));
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(FCALL mfutex_remove_from_mpart_postlop)(Tobpostlockop(mpart) *__restrict _lop,

@@ -26,6 +26,20 @@
  * could thus be used to write kernel drivers that can be
  * made portable to both KOSmk4 and KOSmk3 (and  possibly
  * even earlier)
+ *
+ * Detecting any version of KOS:
+ * >> #if __has_include(<kernel/version.h>)
+ * >> #include <kernel/version.h>
+ * >> #if KOS_VERSION_MAJOR >= 3
+ * >> #define KOS_VERSION KOS_VERSION_MAJOR // Mk3 & above
+ * >> #elif KOS_VERSION_MAJOR == 0 // This was actually Mk2
+ * >> #define KOS_VERSION 2
+ * >> #else
+ * >> #error "UNKNOWN VERSION!"
+ * >> #endif
+ * >> #else
+ * >> #define KOS_VERSION 1 // Mk1
+ * >> #endif
  */
 
 #include <kernel/compiler.h>

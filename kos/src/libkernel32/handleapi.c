@@ -36,13 +36,7 @@
 
 DECL_BEGIN
 
-DEFINE_PUBLIC_ALIAS(CloseHandle, libk32_CloseHandle);
-DEFINE_PUBLIC_ALIAS(DuplicateHandle, libk32_DuplicateHandle);
-DEFINE_PUBLIC_ALIAS(CompareObjectHandles, libk32_CompareObjectHandles);
-DEFINE_PUBLIC_ALIAS(GetHandleInformation, libk32_GetHandleInformation);
-DEFINE_PUBLIC_ALIAS(SetHandleInformation, libk32_SetHandleInformation);
-
-
+/************************************************************************/
 INTERN WINBOOL WINAPI
 libk32_CloseHandle(HANDLE hObject) {
 	TRACE("CloseHandle(%p)", hObject);
@@ -148,6 +142,12 @@ libk32_SetHandleInformation(HANDLE hObject, DWORD dwMask, DWORD dwFlags) {
 	return fcntl(NTHANDLE_ASFD(hObject), F_SETFD, new_flags) == 0;
 }
 
+DEFINE_PUBLIC_ALIAS(CloseHandle, libk32_CloseHandle);
+DEFINE_PUBLIC_ALIAS(DuplicateHandle, libk32_DuplicateHandle);
+DEFINE_PUBLIC_ALIAS(CompareObjectHandles, libk32_CompareObjectHandles);
+DEFINE_PUBLIC_ALIAS(GetHandleInformation, libk32_GetHandleInformation);
+DEFINE_PUBLIC_ALIAS(SetHandleInformation, libk32_SetHandleInformation);
+/************************************************************************/
 
 DECL_END
 

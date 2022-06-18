@@ -48,10 +48,9 @@
 #define assertf_poison(expr, ...) assertf((expr) || kernel_poisoned(), __VA_ARGS__)
 
 DECL_BEGIN
+
 typedef __CRT_PRIVATE_UINT(__SIZEOF_TIME64_T__) unsigned_time_t;
 typedef __CRT_PRIVATE_UINT(__SIZEOF_SUSECONDS_T__) unsigned_suseconds_t;
-
-
 
 /* [const] Initial timestamp of when this thread started. */
 PUBLIC ATTR_PERTASK ATTR_ALIGN(ktime_t) this_starttime = 0;
@@ -89,7 +88,7 @@ struct timestamp {
 /* CPU uptime calculations.                                             */
 /************************************************************************/
 PRIVATE ATTR_PERCPU struct timestamp thiscpu_startup = { 0, 0 }; /* Startup timestamp (for the last time the CPU came online). */
-//PRIVATE ATTR_PERCPU tsc_t thiscpu_uptime_tsc         = 0;        /* Uptime addend (updated when the CPU goes offline). */
+//PRIVATE ATTR_PERCPU tsc_t thiscpu_uptime_tsc       = 0;        /* Uptime addend (updated when the CPU goes offline). */
 /* TODO: `thiscpu_uptime_tsc' must be updated from within `cpu_enter_deepsleep()' as:
  *     >> thiscpu_uptime_tsc += tsc_get() - thiscpu_startup_tsc; */
 

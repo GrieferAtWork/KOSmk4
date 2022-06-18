@@ -85,7 +85,7 @@
 
 DECL_BEGIN
 
-STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree, mf_data));
+static_assert(SIZEOF_MFREE == offsetof(struct mfree, mf_data));
 
 #if defined(NDEBUG) || 0
 #define heap_validate(heap) (void)0
@@ -1362,7 +1362,7 @@ NOTHROW(KCALL heap_free_underallocation)(struct heap *__restrict self,
 		 * within the same page, if `underallocation_end' isn't located at the
 		 * start of a page. */
 		if ((underallocation_end & PAGEMASK) != 0) {
-			STATIC_ASSERT(SIZEOF_MFREE >= 7);
+			static_assert(SIZEOF_MFREE >= 7);
 			if (IS_FRESH_MEMORY((underallocation_end & ~(4 - 1)) - 4)) {
 				uintptr_t clear_size;
 				clear_size = underallocation_end & PAGEMASK;

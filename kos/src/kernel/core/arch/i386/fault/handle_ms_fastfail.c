@@ -32,6 +32,7 @@
 #include <kos/kernel/cpu-state.h>
 #include <sys/wait.h>
 
+#include <assert.h>
 #include <signal.h>
 
 DECL_BEGIN
@@ -42,7 +43,7 @@ DECL_BEGIN
  * It doesn't get much simpler than this... */
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_ms_fastfail(struct icpustate *__restrict state) {
-	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x29)); /* ms_fastfail */
+	static_assert(IDT_CONFIG_ISTRAP(0x29)); /* ms_fastfail */
 	enum { SIGNO = SIGABRT };
 	if (kernel_debugtrap_enabled())
 		kernel_debugtrap(state, SIGNO);

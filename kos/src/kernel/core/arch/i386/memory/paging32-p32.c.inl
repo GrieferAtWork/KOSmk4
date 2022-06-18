@@ -52,12 +52,12 @@
 
 DECL_BEGIN
 
-STATIC_ASSERT(sizeof(struct p32_pdir) == P32_PDIR_SIZE);
-STATIC_ASSERT(sizeof(struct p32_pdir) == 4096);
-STATIC_ASSERT(sizeof(union p32_pdir_e2) == 4);
-STATIC_ASSERT(sizeof(union p32_pdir_e1) == 4);
-STATIC_ASSERT(P32_PDIR_E1_IDENTITY_BASE == P32_MMAN_KERNEL_PDIR_IDENTITY_BASE);
-STATIC_ASSERT(P32_PDIR_E2_IDENTITY_BASE == (P32_PDIR_E1_IDENTITY_BASE + (P32_PDIR_VEC2INDEX(P32_PDIR_E1_IDENTITY_BASE) * P32_PDIR_E1_SIZE)));
+static_assert(sizeof(struct p32_pdir) == P32_PDIR_SIZE);
+static_assert(sizeof(struct p32_pdir) == 4096);
+static_assert(sizeof(union p32_pdir_e2) == 4);
+static_assert(sizeof(union p32_pdir_e1) == 4);
+static_assert(P32_PDIR_E1_IDENTITY_BASE == P32_MMAN_KERNEL_PDIR_IDENTITY_BASE);
+static_assert(P32_PDIR_E2_IDENTITY_BASE == (P32_PDIR_E1_IDENTITY_BASE + (P32_PDIR_VEC2INDEX(P32_PDIR_E1_IDENTITY_BASE) * P32_PDIR_E1_SIZE)));
 
 /* Return the physical page ID of a given physical address. */
 #define ppageof(paddr) (physpage_t)((paddr) / PAGESIZE)
@@ -70,10 +70,10 @@ INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL p32_pagedir_init)(VIRT struct p32_pdir *__restrict self,
                                 PHYS struct p32_pdir *phys_self) {
 	/* Assert some constants assumed below. */
-	STATIC_ASSERT(P32_PDIR_VEC2INDEX(KERNELSPACE_BASE) == 768);
-	STATIC_ASSERT(P32_PDIR_VEC1INDEX(KERNELSPACE_BASE) == 0);
-	STATIC_ASSERT(P32_PDIR_VEC2INDEX(P32_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 1023);
-	STATIC_ASSERT(P32_PDIR_VEC1INDEX(P32_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 0);
+	static_assert(P32_PDIR_VEC2INDEX(KERNELSPACE_BASE) == 768);
+	static_assert(P32_PDIR_VEC1INDEX(KERNELSPACE_BASE) == 0);
+	static_assert(P32_PDIR_VEC2INDEX(P32_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 1023);
+	static_assert(P32_PDIR_VEC1INDEX(P32_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 0);
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));
 	assert(IS_ALIGNED((uintptr_t)phys_self, PAGESIZE));
 

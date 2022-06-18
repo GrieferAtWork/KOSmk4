@@ -153,12 +153,12 @@ NOTHROW(KCALL mouse_buffer_putpackets_nopr)(struct mousebuf *__restrict self,
 #define INT6_MIN  (-(1 << 5))
 #define INT6_MAX  ((1 << 5) - 1)
 
-STATIC_ASSERT((int32_t)INT24_MIN == (int32_t)0xff800000);
-STATIC_ASSERT((int32_t)INT24_MAX == (int32_t)0x007fffff);
-STATIC_ASSERT((int32_t)INT12_MIN == (int32_t)0xfffff800);
-STATIC_ASSERT((int32_t)INT12_MAX == (int32_t)0x000007ff);
-STATIC_ASSERT((int32_t)INT6_MIN  == (int32_t)0xffffffe0);
-STATIC_ASSERT((int32_t)INT6_MAX  == (int32_t)0x0000001f);
+static_assert((int32_t)INT24_MIN == (int32_t)0xff800000);
+static_assert((int32_t)INT24_MAX == (int32_t)0x007fffff);
+static_assert((int32_t)INT12_MIN == (int32_t)0xfffff800);
+static_assert((int32_t)INT12_MAX == (int32_t)0x000007ff);
+static_assert((int32_t)INT6_MIN  == (int32_t)0xffffffe0);
+static_assert((int32_t)INT6_MAX  == (int32_t)0x0000001f);
 
 PRIVATE NOBLOCK bool
 NOTHROW(KCALL mouse_device_do_post_s32s32s32s32)(struct mousedev *__restrict self,

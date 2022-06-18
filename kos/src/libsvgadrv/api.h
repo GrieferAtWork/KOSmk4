@@ -41,18 +41,9 @@
 #define NOTHROW_KERNEL __NOTHROW_KERNEL
 #endif /* !NOTHROW_KERNEL */
 
-/* Shut up GCC! I'm using offsetof() in a completely sensical way and
- * I  won't make my  code unreadable just because  you don't like it! */
-#if defined(__cplusplus) && defined(__GNUC__) && __GNUC__ >= 6
-#pragma GCC diagnostic ignored "-Winvalid-offsetof"
-#endif
-
-
-
 /* Configure supported chipsets. */
 #define CONFIG_SVGA_HAVE_CHIPSET_BOCHSVBE
 #define CONFIG_SVGA_HAVE_CHIPSET_VESA
 #define CONFIG_SVGA_HAVE_CHIPSET_VGA
-
 
 #endif /* !GUARD_LIBSVGADRV_API_H */

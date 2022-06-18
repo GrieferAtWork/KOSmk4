@@ -607,7 +607,7 @@ NOTHROW(FCALL notifyfd_postfsevent_raw_impl)(struct notifyfd *__restrict self,
 	++self->nf_eventc; /* Allocate one more event */
 	if (self->nf_eventc >= self->nf_eventa) {
 		/* Last slot allocated -> must fill with `IN_Q_OVERFLOW' */
-		STATIC_ASSERT(!((unsigned int)INT_MAX & NOTIFYFD_EVENT_ISDIR_FLAG));
+		static_assert(!((unsigned int)INT_MAX & NOTIFYFD_EVENT_ISDIR_FLAG));
 		slot->nfe_wd     = (unsigned int)INT_MAX; /* Don't set most significant bit! */
 		slot->mfe_mask   = IN_Q_OVERFLOW;
 		slot->mfe_cookie = 0;

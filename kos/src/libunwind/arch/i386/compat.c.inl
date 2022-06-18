@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBUNWIND_ARCH_I386_COMPAT_C_INL
 #define GUARD_LIBUNWIND_ARCH_I386_COMPAT_C_INL 1
+#define _KOS_SOURCE 1
 
 #include "../../api.h"
 /**/
@@ -33,6 +34,7 @@
 #include <libunwind/cfi/x86_64.h>
 #include <libunwind/unwind.h>
 
+#include <assert.h>
 #include <stddef.h>
 
 DECL_BEGIN
@@ -99,9 +101,9 @@ NOTHROW_NCX(CC libuw_unwind_getreg_compat)(/*struct unwind_getreg_compat_data **
 /* Abuse  the fact that getreg/setreg are actually the same here, and
  * the only difference lies in what's the deal with the function that
  * is being called. */
-STATIC_ASSERT(offsetof(struct unwind_setreg_compat_data, uscd_setreg) ==
+static_assert(offsetof(struct unwind_setreg_compat_data, uscd_setreg) ==
               offsetof(struct unwind_getreg_compat_data, ugcd_getreg));
-STATIC_ASSERT(offsetof(struct unwind_setreg_compat_data, uscd_arg) ==
+static_assert(offsetof(struct unwind_setreg_compat_data, uscd_arg) ==
               offsetof(struct unwind_getreg_compat_data, ugcd_arg));
 DEFINE_INTERN_ALIAS(libuw_unwind_setreg_compat, libuw_unwind_getreg_compat);
 #else

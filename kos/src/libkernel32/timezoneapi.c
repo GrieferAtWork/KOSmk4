@@ -33,12 +33,7 @@
 
 DECL_BEGIN
 
-DEFINE_PUBLIC_ALIAS(SystemTimeToTzSpecificLocalTime, libk32_SystemTimeToTzSpecificLocalTime);
-DEFINE_PUBLIC_ALIAS(TzSpecificLocalTimeToSystemTime, libk32_TzSpecificLocalTimeToSystemTime);
-DEFINE_PUBLIC_ALIAS(FileTimeToSystemTime, libk32_FileTimeToSystemTime);
-DEFINE_PUBLIC_ALIAS(SystemTimeToFileTime, libk32_SystemTimeToFileTime);
-DEFINE_PUBLIC_ALIAS(GetTimeZoneInformation, libk32_GetTimeZoneInformation);
-
+/************************************************************************/
 INTDEF FILETIME CC libk32_TimeSpecToFileTime(struct timespec64 const *ts);
 INTDEF struct timespec64 CC libk32_FileTimeToTimeSpec(CONST FILETIME *ft);
 
@@ -126,6 +121,12 @@ libk32_GetTimeZoneInformation(LPTIME_ZONE_INFORMATION lpTimeZoneInformation) {
 	return TIME_ZONE_ID_STANDARD;
 }
 
+DEFINE_PUBLIC_ALIAS(SystemTimeToTzSpecificLocalTime, libk32_SystemTimeToTzSpecificLocalTime);
+DEFINE_PUBLIC_ALIAS(TzSpecificLocalTimeToSystemTime, libk32_TzSpecificLocalTimeToSystemTime);
+DEFINE_PUBLIC_ALIAS(FileTimeToSystemTime, libk32_FileTimeToSystemTime);
+DEFINE_PUBLIC_ALIAS(SystemTimeToFileTime, libk32_SystemTimeToFileTime);
+DEFINE_PUBLIC_ALIAS(GetTimeZoneInformation, libk32_GetTimeZoneInformation);
+/************************************************************************/
 
 DECL_END
 

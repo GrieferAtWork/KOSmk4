@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBC_USER_CORECRT_STARTUP_C
 #define GUARD_LIBC_USER_CORECRT_STARTUP_C 1
+#define _KOS_SOURCE 1
 
 #include "../api.h"
 /**/
@@ -26,6 +27,7 @@
 #include <kos/exec/idata.h>
 #include <kos/exec/peb.h>
 
+#include <assert.h>
 #include <format-printer.h>
 #include <math.h>
 #include <pthread.h>
@@ -108,22 +110,22 @@ struct _exception {
 #define _PLOSS     6
 
 /* Assert that DOS's `struct _exception' is ABI-compatible with ours (which it should be) */
-STATIC_ASSERT(offsetof(struct _exception, type) == offsetof(STRUCT_EXCEPTION, type));
-STATIC_ASSERT(offsetafter(struct _exception, type) == offsetafter(STRUCT_EXCEPTION, type));
-STATIC_ASSERT(offsetof(struct _exception, name) == offsetof(STRUCT_EXCEPTION, name));
-STATIC_ASSERT(offsetafter(struct _exception, name) == offsetafter(STRUCT_EXCEPTION, name));
-STATIC_ASSERT(offsetof(struct _exception, arg1) == offsetof(STRUCT_EXCEPTION, arg1));
-STATIC_ASSERT(offsetafter(struct _exception, arg1) == offsetafter(STRUCT_EXCEPTION, arg1));
-STATIC_ASSERT(offsetof(struct _exception, arg2) == offsetof(STRUCT_EXCEPTION, arg2));
-STATIC_ASSERT(offsetafter(struct _exception, arg2) == offsetafter(STRUCT_EXCEPTION, arg2));
-STATIC_ASSERT(offsetof(struct _exception, retval) == offsetof(STRUCT_EXCEPTION, retval));
-STATIC_ASSERT(offsetafter(struct _exception, retval) == offsetafter(STRUCT_EXCEPTION, retval));
-STATIC_ASSERT(_DOMAIN == __MATH_EXCEPT_DOMAIN);
-STATIC_ASSERT(_SING == __MATH_EXCEPT_SING);
-STATIC_ASSERT(_OVERFLOW == __MATH_EXCEPT_OVERFLOW);
-STATIC_ASSERT(_UNDERFLOW == __MATH_EXCEPT_UNDERFLOW);
-STATIC_ASSERT(_TLOSS == __MATH_EXCEPT_TLOSS);
-STATIC_ASSERT(_PLOSS == __MATH_EXCEPT_PLOSS);
+static_assert(offsetof(struct _exception, type) == offsetof(STRUCT_EXCEPTION, type));
+static_assert(offsetafter(struct _exception, type) == offsetafter(STRUCT_EXCEPTION, type));
+static_assert(offsetof(struct _exception, name) == offsetof(STRUCT_EXCEPTION, name));
+static_assert(offsetafter(struct _exception, name) == offsetafter(STRUCT_EXCEPTION, name));
+static_assert(offsetof(struct _exception, arg1) == offsetof(STRUCT_EXCEPTION, arg1));
+static_assert(offsetafter(struct _exception, arg1) == offsetafter(STRUCT_EXCEPTION, arg1));
+static_assert(offsetof(struct _exception, arg2) == offsetof(STRUCT_EXCEPTION, arg2));
+static_assert(offsetafter(struct _exception, arg2) == offsetafter(STRUCT_EXCEPTION, arg2));
+static_assert(offsetof(struct _exception, retval) == offsetof(STRUCT_EXCEPTION, retval));
+static_assert(offsetafter(struct _exception, retval) == offsetafter(STRUCT_EXCEPTION, retval));
+static_assert(_DOMAIN == __MATH_EXCEPT_DOMAIN);
+static_assert(_SING == __MATH_EXCEPT_SING);
+static_assert(_OVERFLOW == __MATH_EXCEPT_OVERFLOW);
+static_assert(_UNDERFLOW == __MATH_EXCEPT_UNDERFLOW);
+static_assert(_TLOSS == __MATH_EXCEPT_TLOSS);
+static_assert(_PLOSS == __MATH_EXCEPT_PLOSS);
 
 /* If non-NULL, the currently used `matherr(3)' handler in  "libc/matherr.c"
  * When `NULL', lazily load the matherr handler via `dlsym()', and fall back

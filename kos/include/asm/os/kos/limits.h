@@ -44,7 +44,7 @@
 #define __LINK_MAX           (-1)       /* Max # of links a file may have (fs-dependent) */
 #define __MAX_CANON          (-1)       /* Max size of the canonical input queue */
 #define __MAX_INPUT          (-1)       /* Max size of the type-ahead buffer */
-#define __NAME_MAX           65535      /* Max # of chars in a file name (2^16) */
+#define __NAME_MAX           65535      /* Max # of chars in a file name (2^16-1) */
 #define __PATH_MAX           (-1)       /* Max # of chars in a path name including nul */
 #define __PIPE_BUF           4096       /* Max # of bytes in atomic write to a pipe (Default value, assuming that backing memory isn't VIO or re-mapped during a write) */
 #define __XATTR_NAME_MAX     255        /* Max # of chars in an extended attribute name */

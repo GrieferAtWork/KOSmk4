@@ -18,6 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifdef __INTELLISENSE__
+#define _KOS_SOURCE 1
+#define _KOS_KERNEL_SOURCE 1
 #include "posix-signal.c"
 #define DEFINE_x86_userexcept_callsignal32
 //#define DEFINE_x86_userexcept_callsignal64
@@ -29,6 +31,11 @@
 #include <sched/x86/eflags-mask.h>
 
 #include <hybrid/align.h>
+
+#include <bits/os/sigaction.h>
+
+#include <assert.h>
+#include <signal.h>
 
 #if (defined(DEFINE_x86_userexcept_callsignal32) + \
      defined(DEFINE_x86_userexcept_callsignal64)) != 1
@@ -201,8 +208,8 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 		size_t sigsetsize = sizeof(sigset_t);
 
 		/* In 3-argument mode, we always have to push everything... */
-		STATIC_ASSERT(LOCAL_SIX_USER_MAX_SIZE >= LOCAL_SIX_KERNEL_MAX_SIZE);
-		STATIC_ASSERT(LOCAL_SIX_KERNEL_MAX_SIZE == sizeof(LOCAL_siginfo_t));
+		static_assert(LOCAL_SIX_USER_MAX_SIZE >= LOCAL_SIX_KERNEL_MAX_SIZE);
+		static_assert(LOCAL_SIX_KERNEL_MAX_SIZE == sizeof(LOCAL_siginfo_t));
 
 		/* Try to have the padding of `siginfo_t' overlap with `ucontextN_t' */
 #define sizeof_LOCAL_ucontext_t (offsetof(LOCAL_ucontext_t, uc_sigmask) + sigsetsize)

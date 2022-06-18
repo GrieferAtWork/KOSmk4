@@ -48,10 +48,6 @@
 #define CONFIG_HAVE_FS_NOTIFY
 #endif
 
-#if defined(__CC__) && defined(__cplusplus) && defined(__GNUC__) && __GNUC__ >= 6
-#pragma GCC diagnostic ignored "-Winvalid-offsetof"
-#endif
-
 /*
  * The meaning of NOBLOCK vs. <neither> vs. BLOCKING
  *

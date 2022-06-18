@@ -19,21 +19,22 @@
  */
 #ifndef GUARD_LIBKERNEL32_STARTUP_C
 #define GUARD_LIBKERNEL32_STARTUP_C 1
+#define _KOS_SOURCE 1
 
 #include "api.h"
 
 #include <nt/handleapi.h>
 #include <nt/startup.h>
 
+#include <assert.h>
 #include <string.h>
 #include <unistd.h>
 
 DECL_BEGIN
 
-STATIC_ASSERT(sizeof(STARTUPINFOA) == sizeof(STARTUPINFOW));
+/************************************************************************/
+static_assert(sizeof(STARTUPINFOA) == sizeof(STARTUPINFOW));
 
-DEFINE_PUBLIC_ALIAS(GetStartupInfoA, libk32_GetStartupInfo);
-DEFINE_PUBLIC_ALIAS(GetStartupInfoW, libk32_GetStartupInfo);
 INTERN VOID WINAPI
 libk32_GetStartupInfo(LPSTARTUPINFO lpStartupInfo) {
 	TRACE("GetStartupInfo(%p)", lpStartupInfo);
@@ -45,6 +46,9 @@ libk32_GetStartupInfo(LPSTARTUPINFO lpStartupInfo) {
 	lpStartupInfo->hStdError  = NTHANDLE_FROMFD(STDERR_FILENO);
 }
 
+DEFINE_PUBLIC_ALIAS(GetStartupInfoA, libk32_GetStartupInfo);
+DEFINE_PUBLIC_ALIAS(GetStartupInfoW, libk32_GetStartupInfo);
+/************************************************************************/
 
 DECL_END
 

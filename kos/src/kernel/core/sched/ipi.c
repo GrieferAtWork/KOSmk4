@@ -206,7 +206,7 @@ NOTHROW(FCALL task_wake_ipi)(struct icpustate *__restrict state,
 
 
 #ifndef CONFIG_NO_SMP
-STATIC_ASSERT(CPU_IPI_FWAITFOR == TASK_WAKE_FWAITFOR);
+static_assert(CPU_IPI_FWAITFOR == TASK_WAKE_FWAITFOR);
 #endif /* !CONFIG_NO_SMP */
 
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC

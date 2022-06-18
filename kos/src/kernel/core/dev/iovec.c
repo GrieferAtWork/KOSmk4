@@ -33,22 +33,22 @@
 DECL_BEGIN
 
 /* Verify static offset constants. */
-STATIC_ASSERT(offsetof(struct iov_entry, ive_base) == OFFSET_IOV_ENTRY_BASE);
-STATIC_ASSERT(offsetof(struct iov_entry, ive_size) == OFFSET_IOV_ENTRY_SIZE);
-STATIC_ASSERT(sizeof(struct iov_entry) == SIZEOF_IOV_ENTRY);
-STATIC_ASSERT(offsetof(struct iov_buffer, iv_entc) == OFFSET_IOV_BUFFER_ENTC);
-STATIC_ASSERT(offsetof(struct iov_buffer, iv_entv) == OFFSET_IOV_BUFFER_ENTV);
-STATIC_ASSERT(offsetof(struct iov_buffer, iv_head) == OFFSET_IOV_BUFFER_HEAD);
-STATIC_ASSERT(offsetof(struct iov_buffer, iv_last) == OFFSET_IOV_BUFFER_LAST);
-STATIC_ASSERT(sizeof(struct iov_buffer) == SIZEOF_IOV_BUFFER);
-STATIC_ASSERT(offsetof(struct iov_physentry, ive_base) == OFFSET_IOV_PHYSENTRY_BASE);
-STATIC_ASSERT(offsetof(struct iov_physentry, ive_size) == OFFSET_IOV_PHYSENTRY_SIZE);
-STATIC_ASSERT(sizeof(struct iov_physentry) == SIZEOF_IOV_PHYSENTRY);
-STATIC_ASSERT(offsetof(struct iov_physbuffer, iv_entc) == OFFSET_IOV_PHYSBUFFER_ENTC);
-STATIC_ASSERT(offsetof(struct iov_physbuffer, iv_entv) == OFFSET_IOV_PHYSBUFFER_ENTV);
-STATIC_ASSERT(offsetof(struct iov_physbuffer, iv_head) == OFFSET_IOV_PHYSBUFFER_HEAD);
-STATIC_ASSERT(offsetof(struct iov_physbuffer, iv_last) == OFFSET_IOV_PHYSBUFFER_LAST);
-STATIC_ASSERT(sizeof(struct iov_physbuffer) == SIZEOF_IOV_PHYSBUFFER);
+static_assert(offsetof(struct iov_entry, ive_base) == OFFSET_IOV_ENTRY_BASE);
+static_assert(offsetof(struct iov_entry, ive_size) == OFFSET_IOV_ENTRY_SIZE);
+static_assert(sizeof(struct iov_entry) == SIZEOF_IOV_ENTRY);
+static_assert(offsetof(struct iov_buffer, iv_entc) == OFFSET_IOV_BUFFER_ENTC);
+static_assert(offsetof(struct iov_buffer, iv_entv) == OFFSET_IOV_BUFFER_ENTV);
+static_assert(offsetof(struct iov_buffer, iv_head) == OFFSET_IOV_BUFFER_HEAD);
+static_assert(offsetof(struct iov_buffer, iv_last) == OFFSET_IOV_BUFFER_LAST);
+static_assert(sizeof(struct iov_buffer) == SIZEOF_IOV_BUFFER);
+static_assert(offsetof(struct iov_physentry, ive_base) == OFFSET_IOV_PHYSENTRY_BASE);
+static_assert(offsetof(struct iov_physentry, ive_size) == OFFSET_IOV_PHYSENTRY_SIZE);
+static_assert(sizeof(struct iov_physentry) == SIZEOF_IOV_PHYSENTRY);
+static_assert(offsetof(struct iov_physbuffer, iv_entc) == OFFSET_IOV_PHYSBUFFER_ENTC);
+static_assert(offsetof(struct iov_physbuffer, iv_entv) == OFFSET_IOV_PHYSBUFFER_ENTV);
+static_assert(offsetof(struct iov_physbuffer, iv_head) == OFFSET_IOV_PHYSBUFFER_HEAD);
+static_assert(offsetof(struct iov_physbuffer, iv_last) == OFFSET_IOV_PHYSBUFFER_LAST);
+static_assert(sizeof(struct iov_physbuffer) == SIZEOF_IOV_PHYSBUFFER);
 
 
 

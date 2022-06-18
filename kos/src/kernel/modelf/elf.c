@@ -184,9 +184,9 @@ compat_elf_exec_impl(/*in|out*/ struct execargs *__restrict args)
 /* Exec-abi callback for ELF files */
 INTERN WUNUSED NONNULL((1)) unsigned int FCALL
 elfabi_exec(/*in|out*/ struct execargs *__restrict args) {
-	STATIC_ASSERT(CONFIG_EXECABI_MAXHEADER >= sizeof(ElfW(Ehdr)));
+	static_assert(CONFIG_EXECABI_MAXHEADER >= sizeof(ElfW(Ehdr)));
 #ifdef __ARCH_HAVE_COMPAT
-	STATIC_ASSERT(CONFIG_EXECABI_MAXHEADER >= sizeof(COMPAT_ElfW(Ehdr)));
+	static_assert(CONFIG_EXECABI_MAXHEADER >= sizeof(COMPAT_ElfW(Ehdr)));
 #endif /* __ARCH_HAVE_COMPAT */
 	uintptr_t reason;
 	reason = elf_validate_ehdr((ElfW(Ehdr) const *)args->ea_header);

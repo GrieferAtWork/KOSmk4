@@ -123,7 +123,7 @@ DECL_BEGIN
 #endif /* !__INTELLISENSE__ */
 
 
-PRIVATE void KCALL
+PRIVATE void LIBVIO_CC
 userkern_segment_call(struct vioargs *__restrict args,
                       vio_addr_t addr) {
 	uintptr_t reladdr;

@@ -675,7 +675,7 @@ decref_job_and_again:
 struct async_aio_data {
 	REF struct async *aad_job; /* [1..1] A reference to  the associated job. */
 };
-STATIC_ASSERT(AIO_HANDLE_DRIVER_POINTER_COUNT >= 1);
+static_assert(AIO_HANDLE_DRIVER_POINTER_COUNT >= 1);
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL async_aio_fini)(struct aio_handle *__restrict self) {

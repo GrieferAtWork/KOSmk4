@@ -44,6 +44,7 @@ opt.append("-Os");
 
 #include <kos/kernel/cpu-state-helpers.h>
 
+#include <assert.h>
 #include <inttypes.h>
 #include <signal.h>
 #include <stddef.h>
@@ -110,7 +111,7 @@ dbg_handle_breakpoint(void *faultpc, void *resumepc) {
 
 INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_breakpoint(struct icpustate *__restrict state) {
-	STATIC_ASSERT(!IDT_CONFIG_ISTRAP(0x03)); /* #BP  Breakpoint */
+	static_assert(!IDT_CONFIG_ISTRAP(0x03)); /* #BP  Breakpoint */
 	byte_t const *pc, *faultpc;
 	bool isuser;
 	pc      = icpustate_getpc(state);

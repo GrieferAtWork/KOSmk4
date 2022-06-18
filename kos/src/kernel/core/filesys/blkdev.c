@@ -76,9 +76,9 @@ DECL_BEGIN
 #endif /* NDEBUG || NDEBUG_FINI */
 
 /* Assert that string buffers from `blkdev' are big enough for what they're meant to hold. */
-STATIC_ASSERT(COMPILER_LENOF(((struct blkdev *)0)->bd_rootinfo.br_mbr_diskuid) ==
+static_assert(COMPILER_LENOF(((struct blkdev *)0)->bd_rootinfo.br_mbr_diskuid) ==
               COMPILER_LENOF(((struct mbr_sector *)0)->mbr_diskuid));
-STATIC_ASSERT(COMPILER_LENOF(((struct blkdev *)0)->bd_partinfo.bp_efi_name) >
+static_assert(COMPILER_LENOF(((struct blkdev *)0)->bd_partinfo.bp_efi_name) >
               UNICODE_16TO8_MAXBUF(COMPILER_LENOF(((struct efi_partition *)0)->p_name)));
 
 /* Check if 2 given ranges overlap (that is: share at least 1 common address) */
@@ -391,10 +391,10 @@ blkdev_makeparts_loadefi(struct blkdev *__restrict self,
 	uint32_t efi_entcnt;
 	uint32_t efi_entsize;
 	pos_t efi_entbase;
-	STATIC_ASSERT(sizeof(struct mbr_sector) == 512);
-	STATIC_ASSERT(PAGESIZE >= sizeof(struct mbr_sector));
-	STATIC_ASSERT(sizeof(struct efi_descriptor) <= sizeof(struct mbr_sector));
-	STATIC_ASSERT(sizeof(struct efi_partition) <= sizeof(struct mbr_sector));
+	static_assert(sizeof(struct mbr_sector) == 512);
+	static_assert(PAGESIZE >= sizeof(struct mbr_sector));
+	static_assert(sizeof(struct efi_descriptor) <= sizeof(struct mbr_sector));
+	static_assert(sizeof(struct efi_partition) <= sizeof(struct mbr_sector));
 
 	/* Read the EFI table */
 	efi_pos = (pos_t)efipart_sectormin << blkdev_getsectorshift(self);
@@ -584,9 +584,9 @@ blkdev_makeparts_loadembr(struct blkdev *__restrict self,
                           struct blkdev_list *__restrict parts,
                           uint64_t embr_sectormin)
 		THROWS(E_BADALLOC, ...) {
-	STATIC_ASSERT(sizeof(struct embr_partition) == 512);
-	STATIC_ASSERT((512 % sizeof(struct embr_parthdr)) == 0);
-	STATIC_ASSERT((512 % sizeof(struct embr_partent)) == 0);
+	static_assert(sizeof(struct embr_partition) == 512);
+	static_assert((512 % sizeof(struct embr_parthdr)) == 0);
+	static_assert((512 % sizeof(struct embr_partent)) == 0);
 	struct embr_partition *embr;
 	struct embr_parthdr *phdr;
 	struct embr_partent *pent;
@@ -597,7 +597,7 @@ blkdev_makeparts_loadembr(struct blkdev *__restrict self,
 
 	/* Read the eMBR partition */
 	embr_pos = (pos_t)embr_sectormin << blkdev_getsectorshift(self);
-	STATIC_ASSERT(PAGESIZE >= 512);
+	static_assert(PAGESIZE >= 512);
 	likely(blkdev_getsectorsize(self) == 512)
 	? (embr = (struct embr_partition *)aligned_alloca(512, 512),
 	   blkdev_rdsectors(self, embr_pos, pagedir_translate(embr), 512))
@@ -902,7 +902,7 @@ blkdev_makeparts_loadmbr(struct blkdev *__restrict self,
 	/* Read the MBR */
 	mbr_pos = (pos_t)subpart_sectormin << blkdev_getsectorshift(self);
 	if likely(blkdev_getsectorsize(self) == sizeof(struct mbr_sector)) {
-		STATIC_ASSERT(PAGESIZE >= sizeof(struct mbr_sector));
+		static_assert(PAGESIZE >= sizeof(struct mbr_sector));
 		mbr = (struct mbr_sector *)aligned_alloca(sizeof(struct mbr_sector),
 		                                          sizeof(struct mbr_sector));
 		DBG_memset(mbr, 0xcc, sizeof(struct mbr_sector));

@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_FILESYS_DEVNODE_C
 #define GUARD_KERNEL_CORE_FILESYS_DEVNODE_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -66,8 +67,8 @@ fdevnode_v_open(struct mfile *__restrict self,
 
 	/* Handle with lookup failures */
 	if unlikely(!node) {
-		STATIC_ASSERT(E_NO_DEVICE_KIND_BLKDEV == S_IFBLK);
-		STATIC_ASSERT(E_NO_DEVICE_KIND_CHRDEV == S_IFCHR);
+		static_assert(E_NO_DEVICE_KIND_BLKDEV == S_IFBLK);
+		static_assert(E_NO_DEVICE_KIND_CHRDEV == S_IFCHR);
 		THROW(E_NO_DEVICE, me->fn_mode & S_IFMT, me->dn_devno);
 	}
 

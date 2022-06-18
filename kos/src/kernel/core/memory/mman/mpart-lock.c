@@ -1716,9 +1716,9 @@ free_unused_block_status:
 			void *addr;
 			size_t size;
 			pagedir_prot_t prot;
-			STATIC_ASSERT(PAGEDIR_PROT_EXEC == MNODE_F_PEXEC);
-			STATIC_ASSERT(PAGEDIR_PROT_WRITE == MNODE_F_PWRITE);
-			STATIC_ASSERT(PAGEDIR_PROT_READ == MNODE_F_PREAD);
+			static_assert(PAGEDIR_PROT_EXEC == MNODE_F_PEXEC);
+			static_assert(PAGEDIR_PROT_WRITE == MNODE_F_PWRITE);
+			static_assert(PAGEDIR_PROT_READ == MNODE_F_PREAD);
 			assert(mnode_ismapping(node, partrel_minaddr, partrel_maxaddr));
 			mm = node->mn_mman;
 			assert(!wasdestroyed(mm));

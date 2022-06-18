@@ -79,8 +79,8 @@
 
 DECL_BEGIN
 
-STATIC_ASSERT(HANDRANGE_FREESLOTS_SPLIT_THRESHOLD > HANDRANGE_FREESLOTS_TRUNC_THRESHOLD);
-STATIC_ASSERT(sizeof(union handslot) == sizeof(struct handle));
+static_assert(HANDRANGE_FREESLOTS_SPLIT_THRESHOLD > HANDRANGE_FREESLOTS_TRUNC_THRESHOLD);
+static_assert(sizeof(union handslot) == sizeof(struct handle));
 
 
 /* Check if 2 given ranges overlap (that is: share at least 1 common address) */

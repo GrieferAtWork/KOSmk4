@@ -640,13 +640,10 @@ __DECL_END
 #undef __pos64_t
 #undef __clock_t
 #undef __SIZEOF_DEV_T__
-#undef __SIZEOF_INO_T__
-#undef __SIZEOF_OFF_T__
+#undef __SIZEOF_INO32_T__
+#undef __SIZEOF_INO64_T__
 #undef __SIZEOF_OFF32_T__
 #undef __SIZEOF_OFF64_T__
-#undef __SIZEOF_POS_T__
-#undef __SIZEOF_POS32_T__
-#undef __SIZEOF_POS64_T__
 #undef __SIZEOF_CLOCK_T__
 #define __dev_t            __UINT32_TYPE__
 #define __ino32_t          __UINT16_TYPE__
@@ -657,13 +654,10 @@ __DECL_END
 #define __pos64_t          __UINT32_TYPE__
 #define __clock_t          __LONG32_TYPE__
 #define __SIZEOF_DEV_T__   4
-#define __SIZEOF_INO_T__   2
-#define __SIZEOF_OFF_T__   4
+#define __SIZEOF_INO32_T__ 2
+#define __SIZEOF_INO64_T__ 2
 #define __SIZEOF_OFF32_T__ 4
 #define __SIZEOF_OFF64_T__ 4
-#define __SIZEOF_POS_T__   4
-#define __SIZEOF_POS32_T__ 4
-#define __SIZEOF_POS64_T__ 4
 #define __SIZEOF_CLOCK_T__ 4
 #endif /* __CRT_DOS_PRIMARY */
 

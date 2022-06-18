@@ -37,9 +37,7 @@
 
 DECL_BEGIN
 
-DEFINE_PUBLIC_ALIAS(FormatMessageA, libk32_FormatMessageA);
-DEFINE_PUBLIC_ALIAS(FormatMessageW, libk32_FormatMessageW);
-
+/************************************************************************/
 __LIBC NOBLOCK ATTR_CONST /*kos*/ errno_t NOTHROW(LIBDCALL errno_nt2dos)(/*nt*/ errno_t value);
 __LIBC NOBLOCK ATTR_CONST /*nt*/ errno_t NOTHROW(LIBDCALL errno_kos2nt)(/*kos*/ errno_t value);
 __LIBC NOBLOCK ATTR_CONST /*dos*/ errno_t NOTHROW(LIBDCALL errno_nt2dos)(/*nt*/ errno_t value);
@@ -155,6 +153,10 @@ libk32_FormatMessageW(DWORD dwFlags, LPCVOID lpSource, DWORD dwMessageId,
 	free(msg);
 	return len;
 }
+
+DEFINE_PUBLIC_ALIAS(FormatMessageA, libk32_FormatMessageA);
+DEFINE_PUBLIC_ALIAS(FormatMessageW, libk32_FormatMessageW);
+/************************************************************************/
 
 DECL_END
 

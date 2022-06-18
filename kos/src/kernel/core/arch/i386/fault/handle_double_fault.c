@@ -42,6 +42,7 @@
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
+#include <assert.h>
 #include <signal.h>
 #include <stddef.h>
 #include <string.h>
@@ -125,7 +126,7 @@ PRIVATE ATTR_DBGTEXT void KCALL
 panic_df_dbg_main(void *cr3)
 #endif /* !__x86_64__ */
 {
-	STATIC_ASSERT(!IDT_CONFIG_ISTRAP(0x08)); /* #DF  Double Fault. */
+	static_assert(!IDT_CONFIG_ISTRAP(0x08)); /* #DF  Double Fault. */
 	/* Inject the correct information about the CR3 register */
 #ifndef __x86_64__
 	x86_dbg_exitstate.de_state.fcs_coregs.co_cr3 = (uintptr_t)cr3;

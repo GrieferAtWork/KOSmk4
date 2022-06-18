@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBC_USER_UNISTD_C
 #define GUARD_LIBC_USER_UNISTD_C 1
+#define _KOS_SOURCE 1
 
 #include "../api.h"
 /**/
@@ -3090,7 +3091,7 @@ for (local id: [:idCount]) {
 #endif /* !_POSIX_THREAD_ROBUST_PRIO_PROTECT */
 /*[[[end]]]*/
 };
-STATIC_ASSERT(COMPILER_LENOF(sysconf_table) <= _SC_COUNT);
+static_assert(COMPILER_LENOF(sysconf_table) <= _SC_COUNT);
 
 
 

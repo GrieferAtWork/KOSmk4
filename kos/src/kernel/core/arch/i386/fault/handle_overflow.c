@@ -32,6 +32,7 @@
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
+#include <assert.h>
 #include <stddef.h>
 
 #include <libinstrlen/instrlen.h>
@@ -41,7 +42,7 @@ DECL_BEGIN
 INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_overflow(struct icpustate *__restrict state) {
 	unsigned int i;
-	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x04)); /* #OF  Overflow */
+	static_assert(IDT_CONFIG_ISTRAP(0x04)); /* #OF  Overflow */
 	PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_OVERFLOW));
 	for (i = 0; i < EXCEPTION_DATA_POINTERS; ++i)
 		PERTASK_SET(this_exception_args.e_pointers[i], 0);

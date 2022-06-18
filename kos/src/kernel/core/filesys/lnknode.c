@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_FILESYS_LNKNODE_C
 #define GUARD_KERNEL_CORE_FILESYS_LNKNODE_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 

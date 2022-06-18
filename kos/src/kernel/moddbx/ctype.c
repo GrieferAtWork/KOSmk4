@@ -58,7 +58,7 @@ DECL_BEGIN
 
 PUBLIC NONNULL((1)) void
 NOTHROW(FCALL ctype_destroy)(struct ctype *__restrict self) {
-	STATIC_ASSERT(offsetof(struct ctype, ct_enum) == offsetof(struct ctype, ct_struct));
+	static_assert(offsetof(struct ctype, ct_enum) == offsetof(struct ctype, ct_struct));
 	switch (CTYPE_KIND_CLASSOF(self->ct_kind)) {
 
 	case CTYPE_KIND_CLASSOF(CTYPE_KIND_ENUM):
@@ -75,9 +75,9 @@ NOTHROW(FCALL ctype_destroy)(struct ctype *__restrict self) {
 	}	ATTR_FALLTHROUGH
 	case CTYPE_KIND_CLASSOF(CTYPE_KIND_PTR):
 	case CTYPE_KIND_CLASSOF(CTYPE_KIND_ARRAY): {
-		STATIC_ASSERT(offsetof(struct ctype, ct_pointer.cp_base.ct_typ) == offsetof(struct ctype, ct_function.cf_base));
-		STATIC_ASSERT(offsetof(struct ctype, ct_pointer.cp_base.ct_typ) == offsetof(struct ctype, ct_array.ca_elem));
-		STATIC_ASSERT(offsetof(struct ctype, ct_pointer.cp_base.ct_info) == offsetof(struct ctype, ct_array.ca_eleminfo));
+		static_assert(offsetof(struct ctype, ct_pointer.cp_base.ct_typ) == offsetof(struct ctype, ct_function.cf_base));
+		static_assert(offsetof(struct ctype, ct_pointer.cp_base.ct_typ) == offsetof(struct ctype, ct_array.ca_elem));
+		static_assert(offsetof(struct ctype, ct_pointer.cp_base.ct_info) == offsetof(struct ctype, ct_array.ca_eleminfo));
 		if (self->ct_pointer.cp_base.ct_typ != NULL) {
 			/* Remove `self' from its sibling-chain. */
 			struct ctype **piter, *iter;

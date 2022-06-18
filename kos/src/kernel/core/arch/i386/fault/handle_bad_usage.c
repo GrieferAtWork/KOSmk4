@@ -1998,19 +1998,19 @@ DECL_BEGIN
 
 INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_stackfault(struct icpustate *__restrict state, uintptr_t ecode) THROWS(...) {
-	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x0c)); /* #SS  Stack segment fault. */
+	static_assert(IDT_CONFIG_ISTRAP(0x0c)); /* #SS  Stack segment fault. */
 	return x86_handle_bad_usage(state, BAD_USAGE_REASON_SS | (ecode & 0xffff));
 }
 
 INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_gpf(struct icpustate *__restrict state, uintptr_t ecode) THROWS(...) {
-	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x0d)); /* #GP  General Protection Fault. */
+	static_assert(IDT_CONFIG_ISTRAP(0x0d)); /* #GP  General Protection Fault. */
 	return x86_handle_bad_usage(state, BAD_USAGE_REASON_GFP | (ecode & 0xffff));
 }
 
 INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_illegal_instruction(struct icpustate *__restrict state) THROWS(...) {
-	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x06)); /* #UD  Illegal Instruction */
+	static_assert(IDT_CONFIG_ISTRAP(0x06)); /* #UD  Illegal Instruction */
 	return x86_handle_bad_usage(state, BAD_USAGE_REASON_UD);
 }
 

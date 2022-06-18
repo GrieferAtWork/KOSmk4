@@ -23,7 +23,10 @@
 //#define DEFINE_IO_WRITE 1
 #endif /* __INTELLISENSE__ */
 
+#include <sched/group.h>
+#include <sched/pid.h>
 #include <sched/task.h>
+
 #include <kos/except/reason/illop.h>
 
 #if (defined(DEFINE_IO_READ) + defined(DEFINE_IO_WRITE)) != 1
@@ -50,24 +53,24 @@ DECL_BEGIN
 #ifdef DEFINE_IO_READ
 #if USERKERN_WIDTH == 4
 #define VALUE_TYPE   u32
-PRIVATE NONNULL((1)) u32 KCALL
+PRIVATE NONNULL((1)) u32 LIBVIO_CC
 userkern_segment_readl(struct vioargs *__restrict args,
                        pos_t addr)
 #elif USERKERN_WIDTH == 8
 #define VALUE_TYPE   u64
-PRIVATE NONNULL((1)) u64 KCALL
+PRIVATE NONNULL((1)) u64 LIBVIO_CC
 userkern_segment_readq(struct vioargs *__restrict args,
                        pos_t addr)
 #endif /* USERKERN_WIDTH == ... */
 #elif defined(DEFINE_IO_WRITE)
 #if USERKERN_WIDTH == 4
 #define VALUE_TYPE   u32
-PRIVATE NONNULL((1)) void KCALL
+PRIVATE NONNULL((1)) void LIBVIO_CC
 userkern_segment_writel(struct vioargs *__restrict args,
                         pos_t addr, u32 value)
 #elif USERKERN_WIDTH == 8
 #define VALUE_TYPE   u64
-PRIVATE NONNULL((1)) void KCALL
+PRIVATE NONNULL((1)) void LIBVIO_CC
 userkern_segment_writeq(struct vioargs *__restrict args,
                         pos_t addr, u64 value)
 #endif /* USERKERN_WIDTH == ... */

@@ -32,13 +32,15 @@
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
+#include <assert.h>
+
 #include <libinstrlen/instrlen.h>
 
 DECL_BEGIN
 
 INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_divide_by_zero(struct icpustate *__restrict state) {
-	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x00)); /* #DE  Divide by zero */
+	static_assert(IDT_CONFIG_ISTRAP(0x00)); /* #DE  Divide by zero */
 	byte_t const *curr_pc, *next_pc;
 	unsigned int i;
 	/* NOTE: Must load `next_pc' before setting the exception code,

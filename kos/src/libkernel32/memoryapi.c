@@ -39,15 +39,7 @@
 
 DECL_BEGIN
 
-DEFINE_PUBLIC_ALIAS(VirtualQuery, libk32_VirtualQuery);
-DEFINE_PUBLIC_ALIAS(VirtualProtect, libk32_VirtualProtect);
-DEFINE_PUBLIC_ALIAS(VirtualProtectEx, libk32_VirtualProtectEx);
-DEFINE_PUBLIC_ALIAS(ReadProcessMemory, libk32_ReadProcessMemory);
-DEFINE_PUBLIC_ALIAS(WriteProcessMemory, libk32_WriteProcessMemory);
-DEFINE_PUBLIC_ALIAS(VirtualLock, libk32_VirtualLock);
-DEFINE_PUBLIC_ALIAS(VirtualUnlock, libk32_VirtualUnlock);
-DEFINE_PUBLIC_ALIAS(VirtualUnlockEx, libk32_VirtualUnlockEx);
-
+/************************************************************************/
 INTERN SIZE_T WINAPI
 libk32_VirtualQuery(LPCVOID lpAddress, PMEMORY_BASIC_INFORMATION lpBuffer, SIZE_T dwLength) {
 	TRACE("VirtualQuery(%p, %p, %#Ix)", lpAddress, lpBuffer, dwLength);
@@ -170,15 +162,22 @@ libk32_VirtualUnlockEx(HANDLE hProcess, LPVOID lpAddress, SIZE_T dwSize) {
 	return libk32_VirtualUnlock(lpAddress, dwSize);
 }
 
+DEFINE_PUBLIC_ALIAS(VirtualQuery, libk32_VirtualQuery);
+DEFINE_PUBLIC_ALIAS(VirtualProtect, libk32_VirtualProtect);
+DEFINE_PUBLIC_ALIAS(VirtualProtectEx, libk32_VirtualProtectEx);
+DEFINE_PUBLIC_ALIAS(ReadProcessMemory, libk32_ReadProcessMemory);
+DEFINE_PUBLIC_ALIAS(WriteProcessMemory, libk32_WriteProcessMemory);
+DEFINE_PUBLIC_ALIAS(VirtualLock, libk32_VirtualLock);
+DEFINE_PUBLIC_ALIAS(VirtualUnlock, libk32_VirtualUnlock);
+DEFINE_PUBLIC_ALIAS(VirtualUnlockEx, libk32_VirtualUnlockEx);
+/************************************************************************/
+
+
 
 
 /************************************************************************/
 /* ALLOC / FREE                                                         */
 /************************************************************************/
-DEFINE_PUBLIC_ALIAS(VirtualAlloc, libk32_VirtualAlloc);
-DEFINE_PUBLIC_ALIAS(VirtualAllocEx, libk32_VirtualAllocEx);
-DEFINE_PUBLIC_ALIAS(VirtualFree, libk32_VirtualFree);
-
 INTERN LPVOID WINAPI
 libk32_VirtualAlloc(LPVOID lpAddress, SIZE_T dwSize,
                     DWORD flAllocationType, DWORD flProtect) {
@@ -223,6 +222,10 @@ libk32_VirtualAllocEx(HANDLE hProcess, LPVOID lpAddress,
 	return libk32_VirtualAlloc(lpAddress, dwSize, flAllocationType, flProtect);
 }
 
+DEFINE_PUBLIC_ALIAS(VirtualAlloc, libk32_VirtualAlloc);
+DEFINE_PUBLIC_ALIAS(VirtualAllocEx, libk32_VirtualAllocEx);
+DEFINE_PUBLIC_ALIAS(VirtualFree, libk32_VirtualFree);
+/************************************************************************/
 
 DECL_END
 

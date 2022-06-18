@@ -76,7 +76,7 @@ DECL_BEGIN
 #pragma GCC diagnostic ignored "-Waddress-of-packed-member"
 #endif /* __GNUC__ */
 
-STATIC_ASSERT(SIZEOF_POINTER == sizeof(void *));
+static_assert(SIZEOF_POINTER == sizeof(void *));
 
 
 /* When the currently set exception is RT-level, return `false'.
@@ -89,10 +89,10 @@ INTERN bool NOTHROW(FCALL libservice_aux_com_discard_nonrt_exception)(void) {
 	return true;
 }
 
-STATIC_ASSERT(offsetof(struct service_com_exceptinfo, e_code) == offsetof(struct exception_data, e_code));
-STATIC_ASSERT(offsetof(struct service_com_exceptinfo, e_class) == offsetof(struct exception_data, e_class));
-STATIC_ASSERT(offsetof(struct service_com_exceptinfo, e_subclass) == offsetof(struct exception_data, e_subclass));
-STATIC_ASSERT(offsetof(struct service_com_exceptinfo, e_args) == offsetof(struct exception_data, e_args));
+static_assert(offsetof(struct service_com_exceptinfo, e_code) == offsetof(struct exception_data, e_code));
+static_assert(offsetof(struct service_com_exceptinfo, e_class) == offsetof(struct exception_data, e_class));
+static_assert(offsetof(struct service_com_exceptinfo, e_subclass) == offsetof(struct exception_data, e_subclass));
+static_assert(offsetof(struct service_com_exceptinfo, e_args) == offsetof(struct exception_data, e_args));
 
 /* Set `errno' to the error code associated with `info' */
 INTERN NOBLOCK NONNULL((2)) void
@@ -132,7 +132,7 @@ NOTHROW(FCALL libservice_aux_load_except_as_error)(uintptr_t status,
 PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) int
 compar_com_inline_buffer_param(void const *_a, void const *_b) {
 #define _MASK (COM_INLINE_BUFFER_PARAM_FIN | COM_INLINE_BUFFER_PARAM_FOUT)
-	STATIC_ASSERT(COM_INLINE_BUFFER_PARAM_FIN < COM_INLINE_BUFFER_PARAM_FOUT);
+	static_assert(COM_INLINE_BUFFER_PARAM_FIN < COM_INLINE_BUFFER_PARAM_FOUT);
 	struct com_inline_buffer_param const *a, *b;
 	a = (struct com_inline_buffer_param const *)_a;
 	b = (struct com_inline_buffer_param const *)_b;
@@ -167,7 +167,7 @@ compar_com_inline_buffer_param(void const *_a, void const *_b) {
 PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) int
 compar_com_buffer_param(void const *_a, void const *_b) {
 #define _MASK (COM_BUFFER_PARAM_FIN | COM_BUFFER_PARAM_FOUT)
-	STATIC_ASSERT(COM_BUFFER_PARAM_FIN < COM_BUFFER_PARAM_FOUT);
+	static_assert(COM_BUFFER_PARAM_FIN < COM_BUFFER_PARAM_FOUT);
 	struct com_buffer_param const *a, *b;
 	a = (struct com_buffer_param const *)_a;
 	b = (struct com_buffer_param const *)_b;
@@ -378,8 +378,8 @@ do_flexible_inbuf_argument:
 			} else {
 				/* Use a dynamically allocated buffer. */
 				struct com_buffer_param *par;
-				STATIC_ASSERT(COM_INLINE_BUFFER_PARAM_FIN == COM_BUFFER_PARAM_FIN);
-				STATIC_ASSERT(COM_INLINE_BUFFER_PARAM_FOUT == COM_BUFFER_PARAM_FOUT);
+				static_assert(COM_INLINE_BUFFER_PARAM_FIN == COM_BUFFER_PARAM_FIN);
+				static_assert(COM_INLINE_BUFFER_PARAM_FOUT == COM_BUFFER_PARAM_FOUT);
 				par = &self->cg_buf_paramv[self->cg_buf_paramc++];
 				par->cbp_flags         = flags | COM_BUFFER_PARAM_FFIXED;
 				par->cbp_param_index   = i;

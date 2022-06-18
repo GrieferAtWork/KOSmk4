@@ -32,6 +32,7 @@
 #include <kos/syscalls.h>
 #include <sys/ioctl.h>
 
+#include <assert.h>
 #include <elf.h>
 #include <inttypes.h>
 #include <stddef.h>
@@ -462,10 +463,10 @@ done:
 #ifdef ELF_ARCH_IS_R_JMP_SLOT
 /* Assert  that the offset/info fields of relocation descriptors are at the
  * same location, regardless if the relocation has, or hasn't got an addend */
-STATIC_ASSERT(offsetof(Elf32_Rel, r_offset) == offsetof(Elf32_Rela, r_offset));
-STATIC_ASSERT(offsetof(Elf64_Rel, r_offset) == offsetof(Elf64_Rela, r_offset));
-STATIC_ASSERT(offsetof(Elf32_Rel, r_info) == offsetof(Elf32_Rela, r_info));
-STATIC_ASSERT(offsetof(Elf64_Rel, r_info) == offsetof(Elf64_Rela, r_info));
+static_assert(offsetof(Elf32_Rel, r_offset) == offsetof(Elf32_Rela, r_offset));
+static_assert(offsetof(Elf64_Rel, r_offset) == offsetof(Elf64_Rela, r_offset));
+static_assert(offsetof(Elf32_Rel, r_info) == offsetof(Elf32_Rela, r_info));
+static_assert(offsetof(Elf64_Rel, r_info) == offsetof(Elf64_Rela, r_info));
 
 #ifndef ELF_ARCH_NAME_R_JMP_SLOT
 #ifdef ELF_ARCH_R_JMP_SLOT

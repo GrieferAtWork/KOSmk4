@@ -1416,7 +1416,7 @@ PRIVATE WUNUSED NONNULL((1)) REF struct fsuper *KCALL
 ramfs_open(struct ffilesys *__restrict UNUSED(filesys),
            struct mfile *UNUSED(dev),
            UNCHECKED USER char *UNUSED(args)) {
-	STATIC_ASSERT((offsetof(struct ramfs_super, rs_dat) -
+	static_assert((offsetof(struct ramfs_super, rs_dat) -
 	               offsetof(struct ramfs_super, fs_root)) ==
 	              offsetof(struct ramfs_dirnode, rdn_dat));
 	REF struct ramfs_super *result;

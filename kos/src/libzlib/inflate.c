@@ -325,7 +325,7 @@ NOTHROW_NCX(CC zlib_tree_find_slow)(struct zlib_tree *__restrict tree,
 	}
 
 
-STATIC_ASSERT(sizeof(struct zlib_treeent) == __SIZEOF_ZLIB_TREEENT);
+static_assert(sizeof(struct zlib_treeent) == __SIZEOF_ZLIB_TREEENT);
 #if __SIZEOF_ZLIB_TREEENT == 2
 #define ZLIB_TREEENT_WORD(te_len)               ENCODE_INT16(te_len, 0, 0)
 #define ZLIB_TREEENT_MEMSET(base, word, count)  ((struct zlib_treeent *)memsetw(base, word, count))

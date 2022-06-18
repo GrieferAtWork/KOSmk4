@@ -62,7 +62,7 @@
 
 DECL_BEGIN
 
-STATIC_ASSERT(NBBY == __CHAR_BIT__);
+static_assert(NBBY == __CHAR_BIT__);
 
 /* Helper macros for working with bitsets */
 #define _bitset_word(base, i)       ((base)[(i) / NBBY])
@@ -517,15 +517,15 @@ execute_eh_frame_expression(unwind_fde_t *__restrict fde, /* Only non-const for 
 	return result;
 }
 
-STATIC_ASSERT(CFI_REGISTER_SIZE(sizeof(void *), CFI_UNWIND_REGISTER_SP(sizeof(void *))) == sizeof(uintptr_t));
-STATIC_ASSERT(CFI_REGISTER_SIZE(sizeof(void *), CFI_UNWIND_REGISTER_PC(sizeof(void *))) == sizeof(void *));
-STATIC_ASSERT(CFI_REGISTER_MEMSIZE(sizeof(void *), CFI_UNWIND_REGISTER_SP(sizeof(void *))) == sizeof(uintptr_t));
-STATIC_ASSERT(CFI_REGISTER_MEMSIZE(sizeof(void *), CFI_UNWIND_REGISTER_PC(sizeof(void *))) == sizeof(void *));
+static_assert(CFI_REGISTER_SIZE(sizeof(void *), CFI_UNWIND_REGISTER_SP(sizeof(void *))) == sizeof(uintptr_t));
+static_assert(CFI_REGISTER_SIZE(sizeof(void *), CFI_UNWIND_REGISTER_PC(sizeof(void *))) == sizeof(void *));
+static_assert(CFI_REGISTER_MEMSIZE(sizeof(void *), CFI_UNWIND_REGISTER_SP(sizeof(void *))) == sizeof(uintptr_t));
+static_assert(CFI_REGISTER_MEMSIZE(sizeof(void *), CFI_UNWIND_REGISTER_PC(sizeof(void *))) == sizeof(void *));
 #ifdef LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER
-STATIC_ASSERT(CFI_REGISTER_SIZE(__ARCH_COMPAT_SIZEOF_POINTER, CFI_UNWIND_REGISTER_SP(__ARCH_COMPAT_SIZEOF_POINTER)) == sizeof(uintptr_t));
-STATIC_ASSERT(CFI_REGISTER_SIZE(__ARCH_COMPAT_SIZEOF_POINTER, CFI_UNWIND_REGISTER_PC(__ARCH_COMPAT_SIZEOF_POINTER)) == sizeof(void *));
-STATIC_ASSERT(CFI_REGISTER_MEMSIZE(__ARCH_COMPAT_SIZEOF_POINTER, CFI_UNWIND_REGISTER_SP(__ARCH_COMPAT_SIZEOF_POINTER)) == __ARCH_COMPAT_SIZEOF_POINTER);
-STATIC_ASSERT(CFI_REGISTER_MEMSIZE(__ARCH_COMPAT_SIZEOF_POINTER, CFI_UNWIND_REGISTER_PC(__ARCH_COMPAT_SIZEOF_POINTER)) == __ARCH_COMPAT_SIZEOF_POINTER);
+static_assert(CFI_REGISTER_SIZE(__ARCH_COMPAT_SIZEOF_POINTER, CFI_UNWIND_REGISTER_SP(__ARCH_COMPAT_SIZEOF_POINTER)) == sizeof(uintptr_t));
+static_assert(CFI_REGISTER_SIZE(__ARCH_COMPAT_SIZEOF_POINTER, CFI_UNWIND_REGISTER_PC(__ARCH_COMPAT_SIZEOF_POINTER)) == sizeof(void *));
+static_assert(CFI_REGISTER_MEMSIZE(__ARCH_COMPAT_SIZEOF_POINTER, CFI_UNWIND_REGISTER_SP(__ARCH_COMPAT_SIZEOF_POINTER)) == __ARCH_COMPAT_SIZEOF_POINTER);
+static_assert(CFI_REGISTER_MEMSIZE(__ARCH_COMPAT_SIZEOF_POINTER, CFI_UNWIND_REGISTER_PC(__ARCH_COMPAT_SIZEOF_POINTER)) == __ARCH_COMPAT_SIZEOF_POINTER);
 #endif /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
 
 
@@ -902,8 +902,8 @@ no_capsules:
 	if likely(error == UNWIND_SUCCESS) {
 		IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t common_init_regs[CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT];)
 		IF_CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT(byte_t uncommon_init_regs[(CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT + NBBY) / NBBY];)
-		IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(STATIC_ASSERT(sizeof(common_init_regs) == sizeof(result->cs_state.cs_regs));)
-		IF_CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT(STATIC_ASSERT(sizeof(uncommon_init_regs) == sizeof(result->cs_state.cs_uncommon));)
+		IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(static_assert(sizeof(common_init_regs) == sizeof(result->cs_state.cs_regs));)
+		IF_CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT(static_assert(sizeof(uncommon_init_regs) == sizeof(result->cs_state.cs_uncommon));)
 		IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(memcpy(common_init_regs, result->cs_state.cs_regs, sizeof(result->cs_state.cs_regs));)
 		IF_CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT(memcpy(uncommon_init_regs, result->cs_state.cs_uncommon, sizeof(result->cs_state.cs_uncommon));)
 		/* Execute the eval-body */

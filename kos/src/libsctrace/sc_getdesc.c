@@ -44,6 +44,7 @@ gcc_opt.remove("-g"); // Disable debug informations for this file!
 #include <kos/asm/rpc-method.h>
 #include <sys/mman.h>
 
+#include <assert.h>
 #include <fcntl.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -324,12 +325,12 @@ typedef uint16_t syscalldb_offset_t;
  * 16-bit, any of these assertions failing is rather likely to be caused
  * by some kind of problem with the system call table distribution. */
 #define ASSERT_OFFSET_OK(table_id) \
-	STATIC_ASSERT((syscalldb_offset_t)-1 >= sizeof(syscalldb##table_id));
+	static_assert((syscalldb_offset_t)-1 >= sizeof(syscalldb##table_id));
 __NRFEAT_SYSCALL_TABLE_FOREACH(ASSERT_OFFSET_OK)
 #undef ASSERT_OFFSET_OK
 #ifdef __ARCH_HAVE_COMPAT
 #define COMPAT_ASSERT_OFFSET_OK(table_id) \
-	STATIC_ASSERT((syscalldb_offset_t)-1 >= sizeof(compat_syscalldb##table_id));
+	static_assert((syscalldb_offset_t)-1 >= sizeof(compat_syscalldb##table_id));
 #if __ARCH_COMPAT_SIZEOF_POINTER == 4
 __NR32FEAT_SYSCALL_TABLE_FOREACH(COMPAT_ASSERT_OFFSET_OK)
 #elif __ARCH_COMPAT_SIZEOF_POINTER == 8

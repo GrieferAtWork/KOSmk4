@@ -180,7 +180,7 @@ rpc_membank_create(USER CHECKED byte_t *addr, size_t num_bytes)
 		THROWS(E_BADALLOC) {
 	struct rpc_membank *result;
 	size_t struct_size, data_offset, bitset_size;
-	STATIC_ASSERT(RPC_MEMBANK_STATUS_UNDEF == 0);
+	static_assert(RPC_MEMBANK_STATUS_UNDEF == 0);
 	data_offset = offsetof(struct rpc_membank, rmb_status);
 	bitset_size = CEILDIV(num_bytes, NBBY / RPC_MEMBANK_STATUS_BITS);
 	data_offset += bitset_size;

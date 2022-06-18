@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_SCHED_CPUID_C
 #define GUARD_KERNEL_CORE_ARCH_I386_SCHED_CPUID_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -26,6 +27,7 @@
 
 #include <hybrid/host.h>
 
+#include <assert.h>
 #include <stddef.h>
 
 DECL_BEGIN
@@ -34,34 +36,34 @@ DECL_BEGIN
 PUBLIC ATTR_PERCPU u16 _thiscpu_x86_cpufeatures ASMNAME("thiscpu_x86_cpufeatures") = CPU_FEATURE_FNONE;
 PUBLIC ATTR_PERCPU struct cpuinfo _thiscpu_x86_cpuid ASMNAME("thiscpu_x86_cpuid") = {};
 
-STATIC_ASSERT(OFFSET_CPUID_0A        == offsetof(struct cpuinfo, ci_0a));
-STATIC_ASSERT(OFFSET_CPUID_80000000A == offsetof(struct cpuinfo, ci_80000000a));
-STATIC_ASSERT(OFFSET_CPUID_1A        == offsetof(struct cpuinfo, ci_1a));
-STATIC_ASSERT(OFFSET_CPUID_1B        == offsetof(struct cpuinfo, ci_1b));
-STATIC_ASSERT(OFFSET_CPUID_1D        == offsetof(struct cpuinfo, ci_1d));
-STATIC_ASSERT(OFFSET_CPUID_1C        == offsetof(struct cpuinfo, ci_1c));
-STATIC_ASSERT(OFFSET_CPUID_7D        == offsetof(struct cpuinfo, ci_7d));
-STATIC_ASSERT(OFFSET_CPUID_7C        == offsetof(struct cpuinfo, ci_7c));
-STATIC_ASSERT(OFFSET_CPUID_7B        == offsetof(struct cpuinfo, ci_7b));
-STATIC_ASSERT(OFFSET_CPUID_80000001C == offsetof(struct cpuinfo, ci_80000001c));
-STATIC_ASSERT(OFFSET_CPUID_80000001D == offsetof(struct cpuinfo, ci_80000001d));
-STATIC_ASSERT(OFFSET_CPUID_0B        == offsetof(struct cpuinfo, ci_0b));
-STATIC_ASSERT(OFFSET_CPUID_0D        == offsetof(struct cpuinfo, ci_0d));
-STATIC_ASSERT(OFFSET_CPUID_0C        == offsetof(struct cpuinfo, ci_0c));
-STATIC_ASSERT(OFFSET_CPUID_80000002A == offsetof(struct cpuinfo, ci_80000002a));
-STATIC_ASSERT(OFFSET_CPUID_80000002B == offsetof(struct cpuinfo, ci_80000002b));
-STATIC_ASSERT(OFFSET_CPUID_80000002C == offsetof(struct cpuinfo, ci_80000002c));
-STATIC_ASSERT(OFFSET_CPUID_80000002D == offsetof(struct cpuinfo, ci_80000002d));
-STATIC_ASSERT(OFFSET_CPUID_80000003A == offsetof(struct cpuinfo, ci_80000003a));
-STATIC_ASSERT(OFFSET_CPUID_80000003B == offsetof(struct cpuinfo, ci_80000003b));
-STATIC_ASSERT(OFFSET_CPUID_80000003C == offsetof(struct cpuinfo, ci_80000003c));
-STATIC_ASSERT(OFFSET_CPUID_80000003D == offsetof(struct cpuinfo, ci_80000003d));
-STATIC_ASSERT(OFFSET_CPUID_80000004A == offsetof(struct cpuinfo, ci_80000004a));
-STATIC_ASSERT(OFFSET_CPUID_80000004B == offsetof(struct cpuinfo, ci_80000004b));
-STATIC_ASSERT(OFFSET_CPUID_80000004C == offsetof(struct cpuinfo, ci_80000004c));
-STATIC_ASSERT(OFFSET_CPUID_80000004D == offsetof(struct cpuinfo, ci_80000004d));
-STATIC_ASSERT(OFFSET_CPUID_80000007D == offsetof(struct cpuinfo, ci_80000007d));
-STATIC_ASSERT(SIZEOF_CPUID_CPUINFO   == sizeof(struct cpuinfo));
+static_assert(OFFSET_CPUID_0A        == offsetof(struct cpuinfo, ci_0a));
+static_assert(OFFSET_CPUID_80000000A == offsetof(struct cpuinfo, ci_80000000a));
+static_assert(OFFSET_CPUID_1A        == offsetof(struct cpuinfo, ci_1a));
+static_assert(OFFSET_CPUID_1B        == offsetof(struct cpuinfo, ci_1b));
+static_assert(OFFSET_CPUID_1D        == offsetof(struct cpuinfo, ci_1d));
+static_assert(OFFSET_CPUID_1C        == offsetof(struct cpuinfo, ci_1c));
+static_assert(OFFSET_CPUID_7D        == offsetof(struct cpuinfo, ci_7d));
+static_assert(OFFSET_CPUID_7C        == offsetof(struct cpuinfo, ci_7c));
+static_assert(OFFSET_CPUID_7B        == offsetof(struct cpuinfo, ci_7b));
+static_assert(OFFSET_CPUID_80000001C == offsetof(struct cpuinfo, ci_80000001c));
+static_assert(OFFSET_CPUID_80000001D == offsetof(struct cpuinfo, ci_80000001d));
+static_assert(OFFSET_CPUID_0B        == offsetof(struct cpuinfo, ci_0b));
+static_assert(OFFSET_CPUID_0D        == offsetof(struct cpuinfo, ci_0d));
+static_assert(OFFSET_CPUID_0C        == offsetof(struct cpuinfo, ci_0c));
+static_assert(OFFSET_CPUID_80000002A == offsetof(struct cpuinfo, ci_80000002a));
+static_assert(OFFSET_CPUID_80000002B == offsetof(struct cpuinfo, ci_80000002b));
+static_assert(OFFSET_CPUID_80000002C == offsetof(struct cpuinfo, ci_80000002c));
+static_assert(OFFSET_CPUID_80000002D == offsetof(struct cpuinfo, ci_80000002d));
+static_assert(OFFSET_CPUID_80000003A == offsetof(struct cpuinfo, ci_80000003a));
+static_assert(OFFSET_CPUID_80000003B == offsetof(struct cpuinfo, ci_80000003b));
+static_assert(OFFSET_CPUID_80000003C == offsetof(struct cpuinfo, ci_80000003c));
+static_assert(OFFSET_CPUID_80000003D == offsetof(struct cpuinfo, ci_80000003d));
+static_assert(OFFSET_CPUID_80000004A == offsetof(struct cpuinfo, ci_80000004a));
+static_assert(OFFSET_CPUID_80000004B == offsetof(struct cpuinfo, ci_80000004b));
+static_assert(OFFSET_CPUID_80000004C == offsetof(struct cpuinfo, ci_80000004c));
+static_assert(OFFSET_CPUID_80000004D == offsetof(struct cpuinfo, ci_80000004d));
+static_assert(OFFSET_CPUID_80000007D == offsetof(struct cpuinfo, ci_80000007d));
+static_assert(SIZEOF_CPUID_CPUINFO   == sizeof(struct cpuinfo));
 
 DECL_END
 

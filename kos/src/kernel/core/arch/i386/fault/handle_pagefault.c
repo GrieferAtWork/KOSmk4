@@ -387,7 +387,7 @@ rethrow_exception_from_pf_handler(struct icpustate *__restrict state, void const
 INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_pagefault(struct icpustate *__restrict state,
                      uintptr_t ecode, void *addr) {
-	STATIC_ASSERT(!IDT_CONFIG_ISTRAP(0x0e)); /* #PF  Page Fault */
+	static_assert(!IDT_CONFIG_ISTRAP(0x0e)); /* #PF  Page Fault */
 #if 1
 #define FAULT_IS_USER ((ecode & X86_PAGEFAULT_ECODE_USERSPACE) != 0)
 #else

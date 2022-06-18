@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBC_USER_PTHREAD_C
 #define GUARD_LIBC_USER_PTHREAD_C 1
+#define _KOS_SOURCE 1
 
 #include "../api.h"
 /**/
@@ -73,93 +74,93 @@ DECL_BEGIN
 /* Verify that pthread offset constants are correct */
 #ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
 #define pt_tid pt_pmask.lpm_pmask.pm_mytid
-STATIC_ASSERT(offsetof(struct pthread, pt_pmask) == __OFFSET_PTHREAD_PMASK);
+static_assert(offsetof(struct pthread, pt_pmask) == __OFFSET_PTHREAD_PMASK);
 #endif /* __LIBC_CONFIG_HAVE_USERPROCMASK */
-STATIC_ASSERT(offsetof(struct pthread, pt_tid) == __OFFSET_PTHREAD_TID);
-STATIC_ASSERT(offsetof(struct pthread, pt_refcnt) == __OFFSET_PTHREAD_REFCNT);
-STATIC_ASSERT(offsetof(struct pthread, pt_retval) == __OFFSET_PTHREAD_RETVAL);
-STATIC_ASSERT(offsetof(struct pthread, pt_tls) == __OFFSET_PTHREAD_TLS);
-STATIC_ASSERT(offsetof(struct pthread, pt_stackaddr) == __OFFSET_PTHREAD_STACKADDR);
-STATIC_ASSERT(offsetof(struct pthread, pt_stacksize) == __OFFSET_PTHREAD_STACKSIZE);
-STATIC_ASSERT(offsetof(struct pthread, pt_flags) == __OFFSET_PTHREAD_FLAGS);
+static_assert(offsetof(struct pthread, pt_tid) == __OFFSET_PTHREAD_TID);
+static_assert(offsetof(struct pthread, pt_refcnt) == __OFFSET_PTHREAD_REFCNT);
+static_assert(offsetof(struct pthread, pt_retval) == __OFFSET_PTHREAD_RETVAL);
+static_assert(offsetof(struct pthread, pt_tls) == __OFFSET_PTHREAD_TLS);
+static_assert(offsetof(struct pthread, pt_stackaddr) == __OFFSET_PTHREAD_STACKADDR);
+static_assert(offsetof(struct pthread, pt_stacksize) == __OFFSET_PTHREAD_STACKSIZE);
+static_assert(offsetof(struct pthread, pt_flags) == __OFFSET_PTHREAD_FLAGS);
 
 /* pthread_attr_t */
-STATIC_ASSERT(sizeof(pthread_attr_t) <= __SIZEOF_PTHREAD_ATTR_T);
-STATIC_ASSERT(offsetof(pthread_attr_t, pa_schedparam) == __OFFSET_PTHREAD_ATTR_SCHEDPARAM);
-STATIC_ASSERT(offsetof(pthread_attr_t, pa_schedpolicy) == __OFFSET_PTHREAD_ATTR_SCHEDPOLICY);
-STATIC_ASSERT(offsetof(pthread_attr_t, pa_flags) == __OFFSET_PTHREAD_ATTR_FLAGS);
-STATIC_ASSERT(offsetof(pthread_attr_t, pa_guardsize) == __OFFSET_PTHREAD_ATTR_GUARDSIZE);
-STATIC_ASSERT(offsetof(pthread_attr_t, pa_stackaddr) == __OFFSET_PTHREAD_ATTR_STACKADDR);
-STATIC_ASSERT(offsetof(pthread_attr_t, pa_stacksize) == __OFFSET_PTHREAD_ATTR_STACKSIZE);
-STATIC_ASSERT(offsetof(pthread_attr_t, pa_cpuset) == __OFFSET_PTHREAD_ATTR_CPUSET);
-STATIC_ASSERT(offsetof(pthread_attr_t, pa_cpusetsize) == __OFFSET_PTHREAD_ATTR_CPUSETSIZE);
+static_assert(sizeof(pthread_attr_t) <= __SIZEOF_PTHREAD_ATTR_T);
+static_assert(offsetof(pthread_attr_t, pa_schedparam) == __OFFSET_PTHREAD_ATTR_SCHEDPARAM);
+static_assert(offsetof(pthread_attr_t, pa_schedpolicy) == __OFFSET_PTHREAD_ATTR_SCHEDPOLICY);
+static_assert(offsetof(pthread_attr_t, pa_flags) == __OFFSET_PTHREAD_ATTR_FLAGS);
+static_assert(offsetof(pthread_attr_t, pa_guardsize) == __OFFSET_PTHREAD_ATTR_GUARDSIZE);
+static_assert(offsetof(pthread_attr_t, pa_stackaddr) == __OFFSET_PTHREAD_ATTR_STACKADDR);
+static_assert(offsetof(pthread_attr_t, pa_stacksize) == __OFFSET_PTHREAD_ATTR_STACKSIZE);
+static_assert(offsetof(pthread_attr_t, pa_cpuset) == __OFFSET_PTHREAD_ATTR_CPUSET);
+static_assert(offsetof(pthread_attr_t, pa_cpusetsize) == __OFFSET_PTHREAD_ATTR_CPUSETSIZE);
 
 /* pthread_mutexattr_t */
-STATIC_ASSERT(sizeof(pthread_mutexattr_t) <= __SIZEOF_PTHREAD_MUTEXATTR_T);
-STATIC_ASSERT(offsetof(pthread_mutexattr_t, ma_kind) == __OFFSET_PTHREAD_MUTEXATTR_KIND);
+static_assert(sizeof(pthread_mutexattr_t) <= __SIZEOF_PTHREAD_MUTEXATTR_T);
+static_assert(offsetof(pthread_mutexattr_t, ma_kind) == __OFFSET_PTHREAD_MUTEXATTR_KIND);
 
 /* pthread_mutex_t */
-STATIC_ASSERT(sizeof(pthread_mutex_t) <= __SIZEOF_PTHREAD_MUTEX_T);
-STATIC_ASSERT(offsetof(pthread_mutex_t, m_lock) == __OFFSET_PTHREAD_MUTEX_LOCK);
-STATIC_ASSERT(offsetof(pthread_mutex_t, m_count) == __OFFSET_PTHREAD_MUTEX_COUNT);
-STATIC_ASSERT(offsetof(pthread_mutex_t, _m_owner) == __OFFSET_PTHREAD_MUTEX_OWNER);
-STATIC_ASSERT(offsetof(pthread_mutex_t, m_kind) == __OFFSET_PTHREAD_MUTEX_KIND);
-STATIC_ASSERT(offsetof(pthread_mutex_t, _m_nusers) == __OFFSET_PTHREAD_MUTEX_NUSERS);
-STATIC_ASSERT(offsetof(pthread_mutex_t, _m_spins) == __OFFSET_PTHREAD_MUTEX_SPINS);
-STATIC_ASSERT(offsetof(pthread_mutex_t, _m_elision) == __OFFSET_PTHREAD_MUTEX_ELISION);
-STATIC_ASSERT(offsetof(pthread_mutex_t, _m_list) == __OFFSET_PTHREAD_MUTEX_LIST);
-STATIC_ASSERT(offsetof(pthread_mutex_t, _m_list._l_next) == __OFFSET_PTHREAD_MUTEX_LIST_NEXT);
+static_assert(sizeof(pthread_mutex_t) <= __SIZEOF_PTHREAD_MUTEX_T);
+static_assert(offsetof(pthread_mutex_t, m_lock) == __OFFSET_PTHREAD_MUTEX_LOCK);
+static_assert(offsetof(pthread_mutex_t, m_count) == __OFFSET_PTHREAD_MUTEX_COUNT);
+static_assert(offsetof(pthread_mutex_t, _m_owner) == __OFFSET_PTHREAD_MUTEX_OWNER);
+static_assert(offsetof(pthread_mutex_t, m_kind) == __OFFSET_PTHREAD_MUTEX_KIND);
+static_assert(offsetof(pthread_mutex_t, _m_nusers) == __OFFSET_PTHREAD_MUTEX_NUSERS);
+static_assert(offsetof(pthread_mutex_t, _m_spins) == __OFFSET_PTHREAD_MUTEX_SPINS);
+static_assert(offsetof(pthread_mutex_t, _m_elision) == __OFFSET_PTHREAD_MUTEX_ELISION);
+static_assert(offsetof(pthread_mutex_t, _m_list) == __OFFSET_PTHREAD_MUTEX_LIST);
+static_assert(offsetof(pthread_mutex_t, _m_list._l_next) == __OFFSET_PTHREAD_MUTEX_LIST_NEXT);
 #ifdef __OFFSET_PTHREAD_MUTEX_LIST_PREV
-STATIC_ASSERT(offsetof(pthread_mutex_t, _m_list._l_prev) == __OFFSET_PTHREAD_MUTEX_LIST_PREV);
+static_assert(offsetof(pthread_mutex_t, _m_list._l_prev) == __OFFSET_PTHREAD_MUTEX_LIST_PREV);
 #endif /* !__OFFSET_PTHREAD_MUTEX_LIST_PREV */
 
 /* pthread_condattr_t */
-STATIC_ASSERT(sizeof(pthread_condattr_t) <= __SIZEOF_PTHREAD_CONDATTR_T);
-STATIC_ASSERT(offsetof(pthread_condattr_t, ca_value) == __OFFSET_PTHREAD_CONDATTR_VALUE);
+static_assert(sizeof(pthread_condattr_t) <= __SIZEOF_PTHREAD_CONDATTR_T);
+static_assert(offsetof(pthread_condattr_t, ca_value) == __OFFSET_PTHREAD_CONDATTR_VALUE);
 
 /* pthread_cond_t */
-STATIC_ASSERT(sizeof(pthread_cond_t) <= __SIZEOF_PTHREAD_COND_T);
-STATIC_ASSERT(offsetof(pthread_cond_t, _c_lock) == __OFFSET_PTHREAD_COND_LOCK);
-STATIC_ASSERT(offsetof(pthread_cond_t, c_futex) == __OFFSET_PTHREAD_COND_FUTEX);
-STATIC_ASSERT(offsetof(pthread_cond_t, _c_total_seq) == __OFFSET_PTHREAD_COND_TOTAL_SEQ);
-STATIC_ASSERT(offsetof(pthread_cond_t, _c_wakeup_seq) == __OFFSET_PTHREAD_COND_WAKEUP_SEQ);
-STATIC_ASSERT(offsetof(pthread_cond_t, _c_woken_seq) == __OFFSET_PTHREAD_COND_WOKEN_SEQ);
-STATIC_ASSERT(offsetof(pthread_cond_t, _c_mutex) == __OFFSET_PTHREAD_COND_MUTEX);
-STATIC_ASSERT(offsetof(pthread_cond_t, _c_nwaiters) == __OFFSET_PTHREAD_COND_NWAITERS);
-STATIC_ASSERT(offsetof(pthread_cond_t, _c_broadcast_seq) == __OFFSET_PTHREAD_COND_BROADCAST_SEQ);
+static_assert(sizeof(pthread_cond_t) <= __SIZEOF_PTHREAD_COND_T);
+static_assert(offsetof(pthread_cond_t, _c_lock) == __OFFSET_PTHREAD_COND_LOCK);
+static_assert(offsetof(pthread_cond_t, c_futex) == __OFFSET_PTHREAD_COND_FUTEX);
+static_assert(offsetof(pthread_cond_t, _c_total_seq) == __OFFSET_PTHREAD_COND_TOTAL_SEQ);
+static_assert(offsetof(pthread_cond_t, _c_wakeup_seq) == __OFFSET_PTHREAD_COND_WAKEUP_SEQ);
+static_assert(offsetof(pthread_cond_t, _c_woken_seq) == __OFFSET_PTHREAD_COND_WOKEN_SEQ);
+static_assert(offsetof(pthread_cond_t, _c_mutex) == __OFFSET_PTHREAD_COND_MUTEX);
+static_assert(offsetof(pthread_cond_t, _c_nwaiters) == __OFFSET_PTHREAD_COND_NWAITERS);
+static_assert(offsetof(pthread_cond_t, _c_broadcast_seq) == __OFFSET_PTHREAD_COND_BROADCAST_SEQ);
 
 /* pthread_rwlockattr_t */
-STATIC_ASSERT(sizeof(pthread_rwlockattr_t) <= __SIZEOF_PTHREAD_RWLOCKATTR_T);
-STATIC_ASSERT(offsetof(pthread_rwlockattr_t, rwa_kind) == __OFFSET_PTHREAD_RWLOCKATTR_KIND);
-STATIC_ASSERT(offsetof(pthread_rwlockattr_t, rwa_shared) == __OFFSET_PTHREAD_RWLOCKATTR_SHARED);
+static_assert(sizeof(pthread_rwlockattr_t) <= __SIZEOF_PTHREAD_RWLOCKATTR_T);
+static_assert(offsetof(pthread_rwlockattr_t, rwa_kind) == __OFFSET_PTHREAD_RWLOCKATTR_KIND);
+static_assert(offsetof(pthread_rwlockattr_t, rwa_shared) == __OFFSET_PTHREAD_RWLOCKATTR_SHARED);
 
 /* pthread_rwlock_t */
-STATIC_ASSERT(sizeof(pthread_rwlock_t) <= __SIZEOF_PTHREAD_RWLOCK_T);
-STATIC_ASSERT(offsetof(pthread_rwlock_t, rw_lock) == __OFFSET_PTHREAD_RWLOCK_LOCK);
-STATIC_ASSERT(offsetof(pthread_rwlock_t, _rw_nr_readers) == __OFFSET_PTHREAD_RWLOCK_NR_READERS);
-STATIC_ASSERT(offsetof(pthread_rwlock_t, rw_readers_wakeup) == __OFFSET_PTHREAD_RWLOCK_READERS_WAKEUP);
-STATIC_ASSERT(offsetof(pthread_rwlock_t, rw_writer_wakeup) == __OFFSET_PTHREAD_RWLOCK_WRITER_WAKEUP);
-STATIC_ASSERT(offsetof(pthread_rwlock_t, rw_nr_writers) == __OFFSET_PTHREAD_RWLOCK_NR_WRITERS);
-STATIC_ASSERT(offsetof(pthread_rwlock_t, _rw_nr_writers_queued) == __OFFSET_PTHREAD_RWLOCK_NR_WRITERS_QUEUED);
-STATIC_ASSERT(offsetof(pthread_rwlock_t, rw_flags) == __OFFSET_PTHREAD_RWLOCK_FLAGS);
-STATIC_ASSERT(offsetof(pthread_rwlock_t, _rw_shared) == __OFFSET_PTHREAD_RWLOCK_SHARED);
-STATIC_ASSERT(offsetof(pthread_rwlock_t, _rw_rwelision) == __OFFSET_PTHREAD_RWLOCK_RWELISION);
-STATIC_ASSERT(offsetof(pthread_rwlock_t, rw_writer) == __OFFSET_PTHREAD_RWLOCK_WRITER);
+static_assert(sizeof(pthread_rwlock_t) <= __SIZEOF_PTHREAD_RWLOCK_T);
+static_assert(offsetof(pthread_rwlock_t, rw_lock) == __OFFSET_PTHREAD_RWLOCK_LOCK);
+static_assert(offsetof(pthread_rwlock_t, _rw_nr_readers) == __OFFSET_PTHREAD_RWLOCK_NR_READERS);
+static_assert(offsetof(pthread_rwlock_t, rw_readers_wakeup) == __OFFSET_PTHREAD_RWLOCK_READERS_WAKEUP);
+static_assert(offsetof(pthread_rwlock_t, rw_writer_wakeup) == __OFFSET_PTHREAD_RWLOCK_WRITER_WAKEUP);
+static_assert(offsetof(pthread_rwlock_t, rw_nr_writers) == __OFFSET_PTHREAD_RWLOCK_NR_WRITERS);
+static_assert(offsetof(pthread_rwlock_t, _rw_nr_writers_queued) == __OFFSET_PTHREAD_RWLOCK_NR_WRITERS_QUEUED);
+static_assert(offsetof(pthread_rwlock_t, rw_flags) == __OFFSET_PTHREAD_RWLOCK_FLAGS);
+static_assert(offsetof(pthread_rwlock_t, _rw_shared) == __OFFSET_PTHREAD_RWLOCK_SHARED);
+static_assert(offsetof(pthread_rwlock_t, _rw_rwelision) == __OFFSET_PTHREAD_RWLOCK_RWELISION);
+static_assert(offsetof(pthread_rwlock_t, rw_writer) == __OFFSET_PTHREAD_RWLOCK_WRITER);
 
 /* pthread_spinlock_t */
-STATIC_ASSERT(sizeof(pthread_spinlock_t) <= __SIZEOF_PTHREAD_SPINLOCK_T);
+static_assert(sizeof(pthread_spinlock_t) <= __SIZEOF_PTHREAD_SPINLOCK_T);
 
 /* pthread_barrierattr_t */
-STATIC_ASSERT(sizeof(pthread_barrierattr_t) <= __SIZEOF_PTHREAD_BARRIERATTR_T);
-STATIC_ASSERT(offsetof(pthread_barrierattr_t, ba_pshared) == __OFFSET_PTHREAD_BARRIERATTR_PSHARED);
+static_assert(sizeof(pthread_barrierattr_t) <= __SIZEOF_PTHREAD_BARRIERATTR_T);
+static_assert(offsetof(pthread_barrierattr_t, ba_pshared) == __OFFSET_PTHREAD_BARRIERATTR_PSHARED);
 
 /* pthread_barrier_t */
-STATIC_ASSERT(sizeof(pthread_barrier_t) <= __SIZEOF_PTHREAD_BARRIER_T);
-STATIC_ASSERT(offsetof(pthread_barrier_t, b_in) == __OFFSET_PTHREAD_BARRIER_IN);
-STATIC_ASSERT(offsetof(pthread_barrier_t, b_current_round) == __OFFSET_PTHREAD_BARRIER_CURRENT_ROUND);
-STATIC_ASSERT(offsetof(pthread_barrier_t, b_count) == __OFFSET_PTHREAD_BARRIER_COUNT);
-STATIC_ASSERT(offsetof(pthread_barrier_t, b_shared) == __OFFSET_PTHREAD_BARRIER_SHARED);
-STATIC_ASSERT(offsetof(pthread_barrier_t, b_out) == __OFFSET_PTHREAD_BARRIER_OUT);
+static_assert(sizeof(pthread_barrier_t) <= __SIZEOF_PTHREAD_BARRIER_T);
+static_assert(offsetof(pthread_barrier_t, b_in) == __OFFSET_PTHREAD_BARRIER_IN);
+static_assert(offsetof(pthread_barrier_t, b_current_round) == __OFFSET_PTHREAD_BARRIER_CURRENT_ROUND);
+static_assert(offsetof(pthread_barrier_t, b_count) == __OFFSET_PTHREAD_BARRIER_COUNT);
+static_assert(offsetof(pthread_barrier_t, b_shared) == __OFFSET_PTHREAD_BARRIER_SHARED);
+static_assert(offsetof(pthread_barrier_t, b_out) == __OFFSET_PTHREAD_BARRIER_OUT);
 
 
 /* Destroy a given `pthread' `self' */

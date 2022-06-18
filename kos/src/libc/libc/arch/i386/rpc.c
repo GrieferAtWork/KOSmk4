@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBC_LIBC_ARCH_I386_RPC_C
 #define GUARD_LIBC_LIBC_ARCH_I386_RPC_C 1
+#define _KOS_SOURCE 1
 
 #include "../../../api.h"
 /**/
@@ -27,15 +28,17 @@
 
 #include <kos/rpc.h>
 
+#include <assert.h>
+
 #include <libunwind/cfi/i386.h>
 #include <libunwind/cfi/x86_64.h>
 
 DECL_BEGIN
 
 /* These offsets are assumed by code in `rpc.S' */
-STATIC_ASSERT(offsetof(struct rpc_context, rc_context) == 0 * __SIZEOF_POINTER__);
-STATIC_ASSERT(offsetof(struct rpc_context, rc_state) == 1 * __SIZEOF_POINTER__);
-STATIC_ASSERT(offsetof(struct rpc_context, rc_scinfo) == 2 * __SIZEOF_POINTER__);
+static_assert(offsetof(struct rpc_context, rc_context) == 0 * __SIZEOF_POINTER__);
+static_assert(offsetof(struct rpc_context, rc_state) == 1 * __SIZEOF_POINTER__);
+static_assert(offsetof(struct rpc_context, rc_scinfo) == 2 * __SIZEOF_POINTER__);
 
 
 /* Restorer wrapper function for `rpc_exec_program' and `rpc_interrupt_program' */

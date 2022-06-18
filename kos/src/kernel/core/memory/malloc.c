@@ -48,7 +48,7 @@ DECL_BEGIN
 struct ATTR_PACKED mptr {
 	uintptr_t mp_data; /* Size and heap of the mptr. */
 };
-STATIC_ASSERT(sizeof(struct mptr) == HEAP_ALIGNMENT);
+static_assert(sizeof(struct mptr) == HEAP_ALIGNMENT);
 #define MPTR_HEAP_SHIFT ((__SIZEOF_SIZE_T__ * 8) - 1)
 #define MPTR_HEAP_MASK  ((uintptr_t)1 << MPTR_HEAP_SHIFT)
 #define MPTR_SIZE_MASK  (((uintptr_t)1 << MPTR_HEAP_SHIFT) - 1)
@@ -73,7 +73,7 @@ struct ATTR_PACKED mptr {
 		byte_t     mp_align[HEAP_ALIGNMENT]; /* ... */
 	};
 };
-STATIC_ASSERT(sizeof(struct mptr) == HEAP_ALIGNMENT);
+static_assert(sizeof(struct mptr) == HEAP_ALIGNMENT);
 
 #define mptr_init(x, size, heap) ((x)->mp_size = (size), (x)->mp_heap = (heap))
 #define mptr_size(x)             (x)->mp_size

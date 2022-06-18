@@ -1110,7 +1110,7 @@ done_unschedule:
 	aio_handle_complete(self, AIO_COMPLETION_CANCEL);
 }
 
-STATIC_ASSERT(sizeof(Ne2kAIOHandleData) <= (AIO_HANDLE_DRIVER_POINTER_COUNT * sizeof(void *)));
+static_assert(sizeof(Ne2kAIOHandleData) <= (AIO_HANDLE_DRIVER_POINTER_COUNT * sizeof(void *)));
 PRIVATE struct aio_handle_type Ne2k_TxAioType = {
 	.ht_fini   = &Ne2k_TxAioFini,
 	.ht_cancel = &Ne2k_TxAioCancel,

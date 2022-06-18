@@ -1088,7 +1088,7 @@ DEFINE_SYSCALL3(ssize_t, recvmsg, fd_t, sockfd,
 		if (sock.h_mode & IO_NONBLOCK)
 			msg_flags |= MSG_DONTWAIT;
 		if (msg.msg_controllen) {
-			STATIC_ASSERT(sizeof(message->msg_controllen) == sizeof(size_t));
+			static_assert(sizeof(message->msg_controllen) == sizeof(size_t));
 			/* Load message control buffers. */
 			pcontrol               = &control;
 			control.am_control     = msg.msg_control;
@@ -1303,7 +1303,7 @@ sys_recvmmsg_impl(fd_t sockfd,
 		validate_writable_opt(msg.msg_control, msg.msg_controllen);
 		pcontrol = NULL;
 		if (msg.msg_controllen) {
-			STATIC_ASSERT(sizeof(vmessages[i].msg_hdr.msg_controllen) == sizeof(size_t));
+			static_assert(sizeof(vmessages[i].msg_hdr.msg_controllen) == sizeof(size_t));
 			/* Load message control buffers. */
 			pcontrol               = &control;
 			control.am_control     = msg.msg_control;

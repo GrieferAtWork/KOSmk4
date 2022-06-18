@@ -30,14 +30,7 @@
 
 DECL_BEGIN
 
-DEFINE_PUBLIC_ALIAS(InitializeSListHead, libk32_InitializeSListHead);
-DEFINE_PUBLIC_ALIAS(InterlockedPopEntrySList, libk32_InterlockedPopEntrySList);
-DEFINE_PUBLIC_ALIAS(InterlockedPushEntrySList, libk32_InterlockedPushEntrySList);
-DEFINE_PUBLIC_ALIAS(InterlockedFlushSList, libk32_InterlockedFlushSList);
-DEFINE_PUBLIC_ALIAS(QueryDepthSList, libk32_QueryDepthSList);
-DEFINE_PUBLIC_ALIAS(InterlockedPushListSListEx, libk32_InterlockedPushListSListEx);
-
-
+/************************************************************************/
 INTERN VOID WINAPI
 libk32_InitializeSListHead(PSLIST_HEADER ListHead) {
 	bzero(ListHead, sizeof(*ListHead));
@@ -74,6 +67,14 @@ libk32_InterlockedPushListSListEx(PSLIST_HEADER ListHead, PSLIST_ENTRY List,
 	       ListHead, List, ListEnd, Count);
 	return 0;
 }
+
+DEFINE_PUBLIC_ALIAS(InitializeSListHead, libk32_InitializeSListHead);
+DEFINE_PUBLIC_ALIAS(InterlockedPopEntrySList, libk32_InterlockedPopEntrySList);
+DEFINE_PUBLIC_ALIAS(InterlockedPushEntrySList, libk32_InterlockedPushEntrySList);
+DEFINE_PUBLIC_ALIAS(InterlockedFlushSList, libk32_InterlockedFlushSList);
+DEFINE_PUBLIC_ALIAS(QueryDepthSList, libk32_QueryDepthSList);
+DEFINE_PUBLIC_ALIAS(InterlockedPushListSListEx, libk32_InterlockedPushListSListEx);
+/************************************************************************/
 
 DECL_END
 

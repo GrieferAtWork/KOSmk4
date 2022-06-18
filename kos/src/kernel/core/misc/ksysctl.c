@@ -49,6 +49,7 @@
 #include <kos/ioctl/_openfd.h>
 #include <kos/ksysctl.h>
 
+#include <assert.h>
 #include <errno.h>
 #include <stddef.h>
 #include <string.h>
@@ -307,13 +308,13 @@ DEFINE_SYSCALL2(syscall_slong_t, ksysctl,
 		size_t struct_size;
 		u16 format;
 		unsigned int delmod_flags, error;
-		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_FNORMAL == DRIVER_DELMOD_F_NORMAL);
-		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_FNODEPEND == DRIVER_DELMOD_F_NODEPEND);
-		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_FFORCE == DRIVER_DELMOD_F_FORCE);
-		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_FNONBLOCK == DRIVER_DELMOD_F_NONBLOCK);
-		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_SUCCESS == DRIVER_DELMOD_ST_SUCCESS);
-		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_UNKNOWN == DRIVER_DELMOD_ST_UNKNOWN);
-		STATIC_ASSERT(KSYSCTL_DRIVER_DELMOD_INUSE == DRIVER_DELMOD_ST_INUSE);
+		static_assert(KSYSCTL_DRIVER_DELMOD_FNORMAL == DRIVER_DELMOD_F_NORMAL);
+		static_assert(KSYSCTL_DRIVER_DELMOD_FNODEPEND == DRIVER_DELMOD_F_NODEPEND);
+		static_assert(KSYSCTL_DRIVER_DELMOD_FFORCE == DRIVER_DELMOD_F_FORCE);
+		static_assert(KSYSCTL_DRIVER_DELMOD_FNONBLOCK == DRIVER_DELMOD_F_NONBLOCK);
+		static_assert(KSYSCTL_DRIVER_DELMOD_SUCCESS == DRIVER_DELMOD_ST_SUCCESS);
+		static_assert(KSYSCTL_DRIVER_DELMOD_UNKNOWN == DRIVER_DELMOD_ST_UNKNOWN);
+		static_assert(KSYSCTL_DRIVER_DELMOD_INUSE == DRIVER_DELMOD_ST_INUSE);
 		validate_readwrite(arg, sizeof(struct ksysctl_driver_delmod));
 		data        = (struct ksysctl_driver_delmod *)arg;
 		struct_size = data->dm_struct_size;

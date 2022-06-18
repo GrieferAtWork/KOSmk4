@@ -349,7 +349,7 @@ NOTHROW(FCALL set_pty_name_minor)(struct devdirent *__restrict name,
                                   minor_t minor) {
 	if (minor >= PTY_DEVCNT) {
 		/* KOS-specific, extended PTY device. */
-		STATIC_ASSERT(MINORBITS / 4 == 5);
+		static_assert(MINORBITS / 4 == 5);
 		sprintf(name->dd_dirent.fd_name + 3,
 		        "X%.5" PRIxN(__SIZEOF_MINOR_T__), minor);
 		name->dd_dirent.fd_namelen = 9;
@@ -382,7 +382,7 @@ register_pty_pair(struct ptymaster *__restrict master,
 	 * MASTER: /dev/ptyX12345
 	 * SLAVE:  /dev/ttyX12345
 	 * NOTE: The 12345 is the hex value of the minor device number, using lower-case letters. */
-	STATIC_ASSERT(MINORBITS / 4 == 5);
+	static_assert(MINORBITS / 4 == 5);
 	master_name = devdirent_newf("ptyX.....");
 	TRY {
 		slave_name = devdirent_newf("ttyX.....");

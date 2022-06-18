@@ -179,7 +179,7 @@ struct rf_object {
 	bool                     ro_isarray;  /* True if this is an array */
 };
 
-STATIC_ASSERT(sizeof(struct rf_object) <= 6 * sizeof(void *));
+static_assert(sizeof(struct rf_object) <= 6 * sizeof(void *));
 
 struct dwarf_eh_bases {
 	void const *deb_tbase; /* [0..1] .text base address */

@@ -129,6 +129,39 @@ typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !offsetof */
 
 #ifdef __USE_KOS
+/* Disable warnings about using `offsetof()' in c++ on structures that use
+ * inheritance. The standards normally don't  allow this, but the KOS  abi
+ * relies  on-, and requires that such uses  behave the same as though the
+ * super-class appeared as  the first  member of the  sub-class, like  so:
+ * >> struct a {
+ * >>     int a_field;
+ * >> };
+ * >> struct b: a {
+ * >>     int b_field;
+ * >> };
+ * >> struct c {
+ * >>     struct a _super;
+ * >>     int b_field;
+ * >> };
+ * In  this example, the  KOS ABI requires  that `struct b' and `struct c'
+ * be binary-compatible. - The warning  we're suppressing here comes  into
+ * play when someone  does `offsetof(struct b, a_field)'.  Here, GCC  will
+ * warn  about the  fact that the  C standard doesn't  require the offsets
+ * of members of base classes to be constant (and in the case of multiple-
+ * inheritance, they actually aren't), however since the KOS ABI  requires
+ * that in the case of  single-inheritance, offsets of a super-class  must
+ * be equivalent to what can be  seen in `struct c', such warnings  become
+ * meaningless.
+ *
+ * As such, we disable the relevant  warning if we're compiling code  for
+ * KOS in c++-mode, the caller has _KOS_SOURCE enabled (thus stating that
+ * they want to take advantage of KOS-specific behavior and  extensions),
+ * and includes <stddef.h> (to get access to `offsetof(3)').
+ */
+#if defined(__KOS__) && defined(__cplusplus) && defined(__GNUC__) && __GNUC__ >= 6
+#pragma GCC diagnostic ignored "-Winvalid-offsetof"
+#endif /* __KOS__ && __cplusplus && __GNUC__ && __GNUC__ >= 6 */
+
 #define offsetafter(s, m)               __COMPILER_OFFSETAFTER(s, m)
 #define container_of(ptr, type, member) __COMPILER_CONTAINER_OF(ptr, type, member)
 

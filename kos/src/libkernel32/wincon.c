@@ -52,30 +52,7 @@
 
 DECL_BEGIN
 
-DEFINE_PUBLIC_ALIAS(GetConsoleCursorInfo, libk32_GetConsoleCursorInfo);
-DEFINE_PUBLIC_ALIAS(SetConsoleCursorInfo, libk32_SetConsoleCursorInfo);
-DEFINE_PUBLIC_ALIAS(GetLargestConsoleWindowSize, libk32_GetLargestConsoleWindowSize);
-DEFINE_PUBLIC_ALIAS(GetConsoleScreenBufferInfo, libk32_GetConsoleScreenBufferInfo);
-DEFINE_PUBLIC_ALIAS(GetConsoleScreenBufferInfoEx, libk32_GetConsoleScreenBufferInfoEx);
-DEFINE_PUBLIC_ALIAS(SetConsoleScreenBufferInfoEx, libk32_SetConsoleScreenBufferInfoEx);
-DEFINE_PUBLIC_ALIAS(GetNumberOfConsoleMouseButtons, libk32_GetNumberOfConsoleMouseButtons);
-DEFINE_PUBLIC_ALIAS(SetConsoleActiveScreenBuffer, libk32_SetConsoleActiveScreenBuffer);
-DEFINE_PUBLIC_ALIAS(FlushConsoleInputBuffer, libk32_FlushConsoleInputBuffer);
-DEFINE_PUBLIC_ALIAS(SetConsoleCursorPosition, libk32_SetConsoleCursorPosition);
-DEFINE_PUBLIC_ALIAS(SetConsoleTextAttribute, libk32_SetConsoleTextAttribute);
-DEFINE_PUBLIC_ALIAS(SetConsoleCtrlHandler, libk32_SetConsoleCtrlHandler);
-DEFINE_PUBLIC_ALIAS(GenerateConsoleCtrlEvent, libk32_GenerateConsoleCtrlEvent);
-DEFINE_PUBLIC_ALIAS(SetConsoleTitleA, libk32_SetConsoleTitleA);
-DEFINE_PUBLIC_ALIAS(SetConsoleTitleW, libk32_SetConsoleTitleW);
-DEFINE_PUBLIC_ALIAS(ReadConsoleA, libk32_ReadConsoleA);
-DEFINE_PUBLIC_ALIAS(ReadConsoleW, libk32_ReadConsoleW);
-DEFINE_PUBLIC_ALIAS(WriteConsoleA, libk32_WriteConsoleA);
-DEFINE_PUBLIC_ALIAS(WriteConsoleW, libk32_WriteConsoleW);
-DEFINE_PUBLIC_ALIAS(GetConsoleCP, libk32_GetConsoleCP);
-DEFINE_PUBLIC_ALIAS(SetConsoleCP, libk32_SetConsoleCP);
-DEFINE_PUBLIC_ALIAS(GetConsoleOutputCP, libk32_GetConsoleOutputCP);
-DEFINE_PUBLIC_ALIAS(SetConsoleOutputCP, libk32_SetConsoleOutputCP);
-
+/************************************************************************/
 #ifndef _PATH_TTY
 #define _PATH_TTY "/dev/tty"
 #endif /* !_PATH_TTY */
@@ -593,6 +570,30 @@ libk32_SetConsoleOutputCP(UINT wCodePageID) {
 	return TRUE;
 }
 
+DEFINE_PUBLIC_ALIAS(GetConsoleCursorInfo, libk32_GetConsoleCursorInfo);
+DEFINE_PUBLIC_ALIAS(SetConsoleCursorInfo, libk32_SetConsoleCursorInfo);
+DEFINE_PUBLIC_ALIAS(GetLargestConsoleWindowSize, libk32_GetLargestConsoleWindowSize);
+DEFINE_PUBLIC_ALIAS(GetConsoleScreenBufferInfo, libk32_GetConsoleScreenBufferInfo);
+DEFINE_PUBLIC_ALIAS(GetConsoleScreenBufferInfoEx, libk32_GetConsoleScreenBufferInfoEx);
+DEFINE_PUBLIC_ALIAS(SetConsoleScreenBufferInfoEx, libk32_SetConsoleScreenBufferInfoEx);
+DEFINE_PUBLIC_ALIAS(GetNumberOfConsoleMouseButtons, libk32_GetNumberOfConsoleMouseButtons);
+DEFINE_PUBLIC_ALIAS(SetConsoleActiveScreenBuffer, libk32_SetConsoleActiveScreenBuffer);
+DEFINE_PUBLIC_ALIAS(FlushConsoleInputBuffer, libk32_FlushConsoleInputBuffer);
+DEFINE_PUBLIC_ALIAS(SetConsoleCursorPosition, libk32_SetConsoleCursorPosition);
+DEFINE_PUBLIC_ALIAS(SetConsoleTextAttribute, libk32_SetConsoleTextAttribute);
+DEFINE_PUBLIC_ALIAS(SetConsoleCtrlHandler, libk32_SetConsoleCtrlHandler);
+DEFINE_PUBLIC_ALIAS(GenerateConsoleCtrlEvent, libk32_GenerateConsoleCtrlEvent);
+DEFINE_PUBLIC_ALIAS(SetConsoleTitleA, libk32_SetConsoleTitleA);
+DEFINE_PUBLIC_ALIAS(SetConsoleTitleW, libk32_SetConsoleTitleW);
+DEFINE_PUBLIC_ALIAS(ReadConsoleA, libk32_ReadConsoleA);
+DEFINE_PUBLIC_ALIAS(ReadConsoleW, libk32_ReadConsoleW);
+DEFINE_PUBLIC_ALIAS(WriteConsoleA, libk32_WriteConsoleA);
+DEFINE_PUBLIC_ALIAS(WriteConsoleW, libk32_WriteConsoleW);
+DEFINE_PUBLIC_ALIAS(GetConsoleCP, libk32_GetConsoleCP);
+DEFINE_PUBLIC_ALIAS(SetConsoleCP, libk32_SetConsoleCP);
+DEFINE_PUBLIC_ALIAS(GetConsoleOutputCP, libk32_GetConsoleOutputCP);
+DEFINE_PUBLIC_ALIAS(SetConsoleOutputCP, libk32_SetConsoleOutputCP);
+/************************************************************************/
 
 DECL_END
 

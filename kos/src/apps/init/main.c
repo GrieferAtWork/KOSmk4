@@ -158,12 +158,12 @@ done_tmpfs:
 	{
 		struct svga_maketty tty;
 		fd_t i, console, display, keyboard;
-		keyboard = open("/dev/usbkba", O_RDONLY | O_CLOEXEC, 0);
+		keyboard = open("/dev/usbkba", O_RDONLY | O_CLOEXEC);
 		if (keyboard < 0)
-			keyboard = open("/dev/ps2kbd1", O_RDONLY | O_CLOEXEC, 0);
+			keyboard = open("/dev/ps2kbd1", O_RDONLY | O_CLOEXEC);
 		if (keyboard < 0)
-			keyboard = Open("/dev/ps2kbd2", O_RDONLY | O_CLOEXEC, 0);
-		display = Open("/dev/svga", O_WRONLY | O_CLOEXEC, 0);
+			keyboard = Open("/dev/ps2kbd2", O_RDONLY | O_CLOEXEC);
+		display = Open("/dev/svga", O_WRONLY | O_CLOEXEC);
 
 		/* Construct ansitty device /dev/svga1 */
 		bzero(&tty, sizeof(tty));

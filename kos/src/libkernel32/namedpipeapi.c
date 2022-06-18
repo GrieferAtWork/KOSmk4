@@ -41,9 +41,7 @@
 
 DECL_BEGIN
 
-DEFINE_PUBLIC_ALIAS(CreatePipe, libk32_CreatePipe);
-DEFINE_PUBLIC_ALIAS(PeekNamedPipe, libk32_PeekNamedPipe);
-
+/************************************************************************/
 INTERN WINBOOL WINAPI
 libk32_CreatePipe(PHANDLE hReadPipe, PHANDLE hWritePipe,
                   LPSECURITY_ATTRIBUTES lpPipeAttributes, DWORD nSize) {
@@ -87,6 +85,9 @@ libk32_PeekNamedPipe(HANDLE hNamedPipe, LPVOID lpBuffer,
 	return TRUE;
 }
 
+DEFINE_PUBLIC_ALIAS(CreatePipe, libk32_CreatePipe);
+DEFINE_PUBLIC_ALIAS(PeekNamedPipe, libk32_PeekNamedPipe);
+/************************************************************************/
 
 DECL_END
 

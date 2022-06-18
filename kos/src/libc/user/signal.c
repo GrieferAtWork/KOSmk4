@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBC_USER_SIGNAL_C
 #define GUARD_LIBC_USER_SIGNAL_C 1
+#define _KOS_SOURCE 1
 
 #include "../api.h"
 /**/
@@ -233,7 +234,6 @@ DEFINE_PUBLIC_ALIAS(sys_nsig, libc_sys_nsig);
 
 /* Weird function exported by  gLibc that's a (kind-of)  wrapper
  * around `sys_rt_sigqueueinfo(2)'. Seems related to <resolv.h>? */
-DEFINE_PUBLIC_ALIAS(__gai_sigqueue, libc___gai_sigqueue);
 INTERN ATTR_SECTION(".text.crt.compat.glibc") int
 NOTHROW_NCX(LIBCCALL libc___gai_sigqueue)(signo_t signo,
                                           union sigval const value,
@@ -250,6 +250,7 @@ NOTHROW_NCX(LIBCCALL libc___gai_sigqueue)(signo_t signo,
 	error = sys_rt_sigqueueinfo(target_pid, signo, &info);
 	return libc_seterrno_syserr(error);
 }
+DEFINE_PUBLIC_ALIAS(__gai_sigqueue, libc___gai_sigqueue);
 
 
 
@@ -514,7 +515,7 @@ do_legacy_sigprocmask:
 
 
 #ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
-STATIC_ASSERT(sizeof(sigset_t) >= sizeof(void *));
+static_assert(sizeof(sigset_t) >= sizeof(void *));
 #define FALLBACK_SIGMASKPTR(me) (*(struct __sigset_struct **)((byte_t *)(me) + __OFFSET_PTHREAD_PMASK + __OFFSET_USERPROCMASK_PENDING))
 #define INITIAL_SIGMASKBUF(me)  ((me)->pt_pmask.lpm_masks[0])
 #else /* __LIBC_CONFIG_HAVE_USERPROCMASK */

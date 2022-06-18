@@ -31,9 +31,7 @@
 
 DECL_BEGIN
 
-DEFINE_PUBLIC_ALIAS(QueryPerformanceCounter, libk32_QueryPerformanceCounter);
-DEFINE_PUBLIC_ALIAS(QueryPerformanceFrequency, libk32_QueryPerformanceFrequency);
-
+/************************************************************************/
 INTERN WINBOOL WINAPI
 libk32_QueryPerformanceCounter(LARGE_INTEGER *lpPerformanceCount) {
 	struct timeval tv;
@@ -51,6 +49,10 @@ libk32_QueryPerformanceFrequency(LARGE_INTEGER *lpFrequency) {
 	lpFrequency->QuadPart = 1000000;
 	return TRUE;
 }
+
+DEFINE_PUBLIC_ALIAS(QueryPerformanceCounter, libk32_QueryPerformanceCounter);
+DEFINE_PUBLIC_ALIAS(QueryPerformanceFrequency, libk32_QueryPerformanceFrequency);
+/************************************************************************/
 
 DECL_END
 

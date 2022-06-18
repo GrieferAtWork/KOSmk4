@@ -39,6 +39,7 @@
 #include <kos/types.h>
 #include <sys/ucontext.h>
 
+#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
@@ -650,56 +651,56 @@ badreg:
 
 #else /* __x86_64__ */
 
-STATIC_ASSERT(offsetof(struct gpregs, gp_edi) == OFFSET_GPREGS_EDI);
-STATIC_ASSERT(offsetof(struct gpregs, gp_esi) == OFFSET_GPREGS_ESI);
-STATIC_ASSERT(offsetof(struct gpregs, gp_ebp) == OFFSET_GPREGS_EBP);
-STATIC_ASSERT(offsetof(struct gpregs, gp_esp) == OFFSET_GPREGS_ESP);
-STATIC_ASSERT(offsetof(struct gpregs, gp_ebx) == OFFSET_GPREGS_EBX);
-STATIC_ASSERT(offsetof(struct gpregs, gp_edx) == OFFSET_GPREGS_EDX);
-STATIC_ASSERT(offsetof(struct gpregs, gp_ecx) == OFFSET_GPREGS_ECX);
-STATIC_ASSERT(offsetof(struct gpregs, gp_eax) == OFFSET_GPREGS_EAX);
-STATIC_ASSERT(sizeof(struct gpregs)           == SIZEOF_GPREGS);
+static_assert(offsetof(struct gpregs, gp_edi) == OFFSET_GPREGS_EDI);
+static_assert(offsetof(struct gpregs, gp_esi) == OFFSET_GPREGS_ESI);
+static_assert(offsetof(struct gpregs, gp_ebp) == OFFSET_GPREGS_EBP);
+static_assert(offsetof(struct gpregs, gp_esp) == OFFSET_GPREGS_ESP);
+static_assert(offsetof(struct gpregs, gp_ebx) == OFFSET_GPREGS_EBX);
+static_assert(offsetof(struct gpregs, gp_edx) == OFFSET_GPREGS_EDX);
+static_assert(offsetof(struct gpregs, gp_ecx) == OFFSET_GPREGS_ECX);
+static_assert(offsetof(struct gpregs, gp_eax) == OFFSET_GPREGS_EAX);
+static_assert(sizeof(struct gpregs)           == SIZEOF_GPREGS);
 
-STATIC_ASSERT(offsetof(struct sgregs, sg_gs) == OFFSET_SGREGS_GS);
-STATIC_ASSERT(offsetof(struct sgregs, sg_fs) == OFFSET_SGREGS_FS);
-STATIC_ASSERT(offsetof(struct sgregs, sg_es) == OFFSET_SGREGS_ES);
-STATIC_ASSERT(offsetof(struct sgregs, sg_ds) == OFFSET_SGREGS_DS);
-STATIC_ASSERT(sizeof(struct sgregs)          == SIZEOF_SGREGS);
+static_assert(offsetof(struct sgregs, sg_gs) == OFFSET_SGREGS_GS);
+static_assert(offsetof(struct sgregs, sg_fs) == OFFSET_SGREGS_FS);
+static_assert(offsetof(struct sgregs, sg_es) == OFFSET_SGREGS_ES);
+static_assert(offsetof(struct sgregs, sg_ds) == OFFSET_SGREGS_DS);
+static_assert(sizeof(struct sgregs)          == SIZEOF_SGREGS);
 
-STATIC_ASSERT(offsetof(struct coregs, co_cr0) == OFFSET_COREGS_CR0);
-STATIC_ASSERT(offsetof(struct coregs, co_cr2) == OFFSET_COREGS_CR2);
-STATIC_ASSERT(offsetof(struct coregs, co_cr3) == OFFSET_COREGS_CR3);
-STATIC_ASSERT(offsetof(struct coregs, co_cr4) == OFFSET_COREGS_CR4);
-STATIC_ASSERT(sizeof(struct coregs)           == SIZEOF_COREGS);
+static_assert(offsetof(struct coregs, co_cr0) == OFFSET_COREGS_CR0);
+static_assert(offsetof(struct coregs, co_cr2) == OFFSET_COREGS_CR2);
+static_assert(offsetof(struct coregs, co_cr3) == OFFSET_COREGS_CR3);
+static_assert(offsetof(struct coregs, co_cr4) == OFFSET_COREGS_CR4);
+static_assert(sizeof(struct coregs)           == SIZEOF_COREGS);
 
-STATIC_ASSERT(offsetof(struct drregs, dr_dr0) == OFFSET_DRREGS_DR0);
-STATIC_ASSERT(offsetof(struct drregs, dr_dr1) == OFFSET_DRREGS_DR1);
-STATIC_ASSERT(offsetof(struct drregs, dr_dr2) == OFFSET_DRREGS_DR2);
-STATIC_ASSERT(offsetof(struct drregs, dr_dr3) == OFFSET_DRREGS_DR3);
-STATIC_ASSERT(offsetof(struct drregs, dr_dr6) == OFFSET_DRREGS_DR6);
-STATIC_ASSERT(offsetof(struct drregs, dr_dr7) == OFFSET_DRREGS_DR7);
-STATIC_ASSERT(sizeof(struct drregs)           == SIZEOF_DRREGS);
+static_assert(offsetof(struct drregs, dr_dr0) == OFFSET_DRREGS_DR0);
+static_assert(offsetof(struct drregs, dr_dr1) == OFFSET_DRREGS_DR1);
+static_assert(offsetof(struct drregs, dr_dr2) == OFFSET_DRREGS_DR2);
+static_assert(offsetof(struct drregs, dr_dr3) == OFFSET_DRREGS_DR3);
+static_assert(offsetof(struct drregs, dr_dr6) == OFFSET_DRREGS_DR6);
+static_assert(offsetof(struct drregs, dr_dr7) == OFFSET_DRREGS_DR7);
+static_assert(sizeof(struct drregs)           == SIZEOF_DRREGS);
 
-STATIC_ASSERT(sizeof(struct irregs_kernel)              == SIZEOF_IRREGS_KERNEL);
-STATIC_ASSERT(sizeof(struct irregs_user)                == SIZEOF_IRREGS_USER);
-STATIC_ASSERT(sizeof(struct irregs_vm86)                == SIZEOF_IRREGS_VM86);
-STATIC_ASSERT(offsetof(struct irregs_kernel, ir_eip)    == OFFSET_IRREGS_EIP);
-STATIC_ASSERT(offsetof(struct irregs_user, ir_eip)      == OFFSET_IRREGS_EIP);
-STATIC_ASSERT(offsetof(struct irregs_vm86, ir_eip)      == OFFSET_IRREGS_EIP);
-STATIC_ASSERT(offsetof(struct irregs_kernel, ir_cs)     == OFFSET_IRREGS_CS);
-STATIC_ASSERT(offsetof(struct irregs_user, ir_cs)       == OFFSET_IRREGS_CS);
-STATIC_ASSERT(offsetof(struct irregs_vm86, ir_cs)       == OFFSET_IRREGS_CS);
-STATIC_ASSERT(offsetof(struct irregs_kernel, ir_eflags) == OFFSET_IRREGS_EFLAGS);
-STATIC_ASSERT(offsetof(struct irregs_user, ir_eflags)   == OFFSET_IRREGS_EFLAGS);
-STATIC_ASSERT(offsetof(struct irregs_vm86, ir_eflags)   == OFFSET_IRREGS_EFLAGS);
-STATIC_ASSERT(offsetof(struct irregs_user, ir_esp)      == OFFSET_IRREGS_ESP);
-STATIC_ASSERT(offsetof(struct irregs_vm86, ir_esp)      == OFFSET_IRREGS_ESP);
-STATIC_ASSERT(offsetof(struct irregs_user, ir_ss)       == OFFSET_IRREGS_SS);
-STATIC_ASSERT(offsetof(struct irregs_vm86, ir_ss)       == OFFSET_IRREGS_SS);
-STATIC_ASSERT(offsetof(struct irregs_vm86, ir_es)       == OFFSET_IRREGS_ES);
-STATIC_ASSERT(offsetof(struct irregs_vm86, ir_ds)       == OFFSET_IRREGS_DS);
-STATIC_ASSERT(offsetof(struct irregs_vm86, ir_fs)       == OFFSET_IRREGS_FS);
-STATIC_ASSERT(offsetof(struct irregs_vm86, ir_gs)       == OFFSET_IRREGS_GS);
+static_assert(sizeof(struct irregs_kernel)              == SIZEOF_IRREGS_KERNEL);
+static_assert(sizeof(struct irregs_user)                == SIZEOF_IRREGS_USER);
+static_assert(sizeof(struct irregs_vm86)                == SIZEOF_IRREGS_VM86);
+static_assert(offsetof(struct irregs_kernel, ir_eip)    == OFFSET_IRREGS_EIP);
+static_assert(offsetof(struct irregs_user, ir_eip)      == OFFSET_IRREGS_EIP);
+static_assert(offsetof(struct irregs_vm86, ir_eip)      == OFFSET_IRREGS_EIP);
+static_assert(offsetof(struct irregs_kernel, ir_cs)     == OFFSET_IRREGS_CS);
+static_assert(offsetof(struct irregs_user, ir_cs)       == OFFSET_IRREGS_CS);
+static_assert(offsetof(struct irregs_vm86, ir_cs)       == OFFSET_IRREGS_CS);
+static_assert(offsetof(struct irregs_kernel, ir_eflags) == OFFSET_IRREGS_EFLAGS);
+static_assert(offsetof(struct irregs_user, ir_eflags)   == OFFSET_IRREGS_EFLAGS);
+static_assert(offsetof(struct irregs_vm86, ir_eflags)   == OFFSET_IRREGS_EFLAGS);
+static_assert(offsetof(struct irregs_user, ir_esp)      == OFFSET_IRREGS_ESP);
+static_assert(offsetof(struct irregs_vm86, ir_esp)      == OFFSET_IRREGS_ESP);
+static_assert(offsetof(struct irregs_user, ir_ss)       == OFFSET_IRREGS_SS);
+static_assert(offsetof(struct irregs_vm86, ir_ss)       == OFFSET_IRREGS_SS);
+static_assert(offsetof(struct irregs_vm86, ir_es)       == OFFSET_IRREGS_ES);
+static_assert(offsetof(struct irregs_vm86, ir_ds)       == OFFSET_IRREGS_DS);
+static_assert(offsetof(struct irregs_vm86, ir_fs)       == OFFSET_IRREGS_FS);
+static_assert(offsetof(struct irregs_vm86, ir_gs)       == OFFSET_IRREGS_GS);
 
 
 LOCAL NONNULL((1, 3)) unsigned int

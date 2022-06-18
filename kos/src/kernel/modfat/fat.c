@@ -236,7 +236,7 @@ Fat_FindFreeCluster(FatSuperblock *__restrict self) {
 			goto found_one;
 	}
 	/* Scan everything before our previous location. */
-	STATIC_ASSERT(FAT_CLUSTER_UNUSED == 0);
+	static_assert(FAT_CLUSTER_UNUSED == 0);
 	result = 1; /* 1: Don't allow use of `FAT_CLUSTER_UNUSED' (which is `0') */
 	for (; result < self->ft_free_pos; ++result) {
 		if (Fat_GetFatIndirection(self, result) == FAT_CLUSTER_UNUSED)
@@ -2914,7 +2914,7 @@ PRIVATE BLOCKING WUNUSED NONNULL((1)) bool KCALL
 fatsuper_v_getlabel(struct fsuper *__restrict self,
                     USER CHECKED char buf[FSLABEL_MAX])
 		THROWS(E_IOERROR, E_SEGFAULT, ...) {
-	STATIC_ASSERT(FSLABEL_MAX >= 12);
+	static_assert(FSLABEL_MAX >= 12);
 	FatSuperblock *me = fsuper_asfat(self);
 	char label[12];
 
@@ -3451,10 +3451,10 @@ PRIVATE struct ffilesys fat_filesys = {
 	/* .ffs_name = */ "fat",
 };
 
-STATIC_ASSERT((offsetof(FatSuperblock, ft_super.ffs_rootdata) -
+static_assert((offsetof(FatSuperblock, ft_super.ffs_rootdata) -
                offsetof(FatSuperblock, ft_super.ffs_super.fs_root)) ==
               offsetof(FatDirNode, fdn_data));
-STATIC_ASSERT((offsetof(FatSuperblock, ft_fdat) -
+static_assert((offsetof(FatSuperblock, ft_fdat) -
                offsetof(FatSuperblock, ft_super.ffs_super.fs_root)) ==
               offsetof(FatDirNode, fdn_fdat));
 

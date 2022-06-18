@@ -89,23 +89,23 @@ struct p64_pdir_e1_identity_t_struct { p64_pdir_e1_identity_t x; };
 struct p64_pdir_e2_identity_t_struct { p64_pdir_e2_identity_t x; };
 struct p64_pdir_e3_identity_t_struct { p64_pdir_e3_identity_t x; };
 struct p64_pdir_e4_identity_t_struct { p64_pdir_e4_identity_t x; };
-STATIC_ASSERT(offsetof(struct p64_pdir_e1_identity_t_struct, x[1][0][0][0]) == 512 * 512 * 512 * 8);
-STATIC_ASSERT(offsetof(struct p64_pdir_e2_identity_t_struct, x[1][0][0])    == 512 * 512 * 8);
-STATIC_ASSERT(offsetof(struct p64_pdir_e3_identity_t_struct, x[1][0])       == 512 * 8);
-STATIC_ASSERT(offsetof(struct p64_pdir_e4_identity_t_struct, x[1])          == 8);
+static_assert(offsetof(struct p64_pdir_e1_identity_t_struct, x[1][0][0][0]) == 512 * 512 * 512 * 8);
+static_assert(offsetof(struct p64_pdir_e2_identity_t_struct, x[1][0][0])    == 512 * 512 * 8);
+static_assert(offsetof(struct p64_pdir_e3_identity_t_struct, x[1][0])       == 512 * 8);
+static_assert(offsetof(struct p64_pdir_e4_identity_t_struct, x[1])          == 8);
 
 
-STATIC_ASSERT(sizeof(struct p64_pdir) == P64_PDIR_SIZE);
-STATIC_ASSERT(sizeof(struct p64_pdir) == 4096);
-STATIC_ASSERT(sizeof(union p64_pdir_e4) == 8);
-STATIC_ASSERT(sizeof(union p64_pdir_e3) == 8);
-STATIC_ASSERT(sizeof(union p64_pdir_e2) == 8);
-STATIC_ASSERT(sizeof(union p64_pdir_e1) == 8);
+static_assert(sizeof(struct p64_pdir) == P64_PDIR_SIZE);
+static_assert(sizeof(struct p64_pdir) == 4096);
+static_assert(sizeof(union p64_pdir_e4) == 8);
+static_assert(sizeof(union p64_pdir_e3) == 8);
+static_assert(sizeof(union p64_pdir_e2) == 8);
+static_assert(sizeof(union p64_pdir_e1) == 8);
 
-STATIC_ASSERT(P64_PDIR_E1_IDENTITY_BASE == P64_MMAN_KERNEL_PDIR_IDENTITY_BASE);
-STATIC_ASSERT(P64_PDIR_E2_IDENTITY_BASE == P64_PDIR_E1_IDENTITY_BASE + (P64_PDIR_VEC4INDEX(P64_PDIR_E1_IDENTITY_BASE) * P64_PDIR_E3_SIZE));
-STATIC_ASSERT(P64_PDIR_E3_IDENTITY_BASE == P64_PDIR_E2_IDENTITY_BASE + (P64_PDIR_VEC3INDEX(P64_PDIR_E2_IDENTITY_BASE) * P64_PDIR_E2_SIZE));
-STATIC_ASSERT(P64_PDIR_E4_IDENTITY_BASE == P64_PDIR_E3_IDENTITY_BASE + (P64_PDIR_VEC2INDEX(P64_PDIR_E3_IDENTITY_BASE) * P64_PDIR_E1_SIZE));
+static_assert(P64_PDIR_E1_IDENTITY_BASE == P64_MMAN_KERNEL_PDIR_IDENTITY_BASE);
+static_assert(P64_PDIR_E2_IDENTITY_BASE == P64_PDIR_E1_IDENTITY_BASE + (P64_PDIR_VEC4INDEX(P64_PDIR_E1_IDENTITY_BASE) * P64_PDIR_E3_SIZE));
+static_assert(P64_PDIR_E3_IDENTITY_BASE == P64_PDIR_E2_IDENTITY_BASE + (P64_PDIR_VEC3INDEX(P64_PDIR_E2_IDENTITY_BASE) * P64_PDIR_E2_SIZE));
+static_assert(P64_PDIR_E4_IDENTITY_BASE == P64_PDIR_E3_IDENTITY_BASE + (P64_PDIR_VEC2INDEX(P64_PDIR_E3_IDENTITY_BASE) * P64_PDIR_E1_SIZE));
 
 
 
@@ -229,10 +229,10 @@ NOTHROW(FCALL p64_pagedir_init)(VIRT struct p64_pdir *__restrict self,
 	 * of  it (we intentionally don't use `KERNELSPACE_BASE' itself as base address in order to
 	 * keep the first page  of kernel-space unmapped (meaning  that given the 512GiB  alignment
 	 * requirements of the identity mapping, we end up with `KERNELSPACE_BASE + 512GiB')) */
-	STATIC_ASSERT(P64_PDIR_VEC4INDEX(P64_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 257);
-	STATIC_ASSERT(P64_PDIR_VEC3INDEX(P64_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 0);
-	STATIC_ASSERT(P64_PDIR_VEC2INDEX(P64_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 0);
-	STATIC_ASSERT(P64_PDIR_VEC1INDEX(P64_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 0);
+	static_assert(P64_PDIR_VEC4INDEX(P64_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 257);
+	static_assert(P64_PDIR_VEC3INDEX(P64_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 0);
+	static_assert(P64_PDIR_VEC2INDEX(P64_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 0);
+	static_assert(P64_PDIR_VEC1INDEX(P64_MMAN_KERNEL_PDIR_IDENTITY_BASE) == 0);
 
 	/* Assert that the page directory is properly aligned. */
 	assert(IS_ALIGNED((uintptr_t)self, PAGESIZE));

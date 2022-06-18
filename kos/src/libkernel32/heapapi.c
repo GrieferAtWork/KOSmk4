@@ -36,26 +36,12 @@
 
 DECL_BEGIN
 
+/************************************************************************/
 struct ntheap {
 	int placeholder;
 };
 
 static struct ntheap procheap = { 0 };
-
-
-DEFINE_PUBLIC_ALIAS(HeapValidate, libk32_HeapValidate);
-DEFINE_PUBLIC_ALIAS(HeapSummary, libk32_HeapSummary);
-DEFINE_PUBLIC_ALIAS(GetProcessHeaps, libk32_GetProcessHeaps);
-DEFINE_PUBLIC_ALIAS(HeapLock, libk32_HeapLock);
-DEFINE_PUBLIC_ALIAS(HeapUnlock, libk32_HeapUnlock);
-DEFINE_PUBLIC_ALIAS(HeapCreate, libk32_HeapCreate);
-DEFINE_PUBLIC_ALIAS(HeapCompact, libk32_HeapCompact);
-DEFINE_PUBLIC_ALIAS(HeapDestroy, libk32_HeapDestroy);
-DEFINE_PUBLIC_ALIAS(HeapAlloc, libk32_HeapAlloc);
-DEFINE_PUBLIC_ALIAS(HeapReAlloc, libk32_HeapReAlloc);
-DEFINE_PUBLIC_ALIAS(HeapFree, libk32_HeapFree);
-DEFINE_PUBLIC_ALIAS(HeapSize, libk32_HeapSize);
-DEFINE_PUBLIC_ALIAS(GetProcessHeap, libk32_GetProcessHeap);
 
 INTERN WINBOOL WINAPI
 libk32_HeapValidate(HANDLE hHeap, DWORD dwFlags, LPCVOID lpMem) {
@@ -206,23 +192,27 @@ libk32_GetProcessHeap(VOID) {
 	return &procheap;
 }
 
+DEFINE_PUBLIC_ALIAS(HeapValidate, libk32_HeapValidate);
+DEFINE_PUBLIC_ALIAS(HeapSummary, libk32_HeapSummary);
+DEFINE_PUBLIC_ALIAS(GetProcessHeaps, libk32_GetProcessHeaps);
+DEFINE_PUBLIC_ALIAS(HeapLock, libk32_HeapLock);
+DEFINE_PUBLIC_ALIAS(HeapUnlock, libk32_HeapUnlock);
+DEFINE_PUBLIC_ALIAS(HeapCreate, libk32_HeapCreate);
+DEFINE_PUBLIC_ALIAS(HeapCompact, libk32_HeapCompact);
+DEFINE_PUBLIC_ALIAS(HeapDestroy, libk32_HeapDestroy);
+DEFINE_PUBLIC_ALIAS(HeapAlloc, libk32_HeapAlloc);
+DEFINE_PUBLIC_ALIAS(HeapReAlloc, libk32_HeapReAlloc);
+DEFINE_PUBLIC_ALIAS(HeapFree, libk32_HeapFree);
+DEFINE_PUBLIC_ALIAS(HeapSize, libk32_HeapSize);
+DEFINE_PUBLIC_ALIAS(GetProcessHeap, libk32_GetProcessHeap);
+/************************************************************************/
 
-DEFINE_PUBLIC_ALIAS(LocalAlloc, libk32_LocalAlloc);
-DEFINE_PUBLIC_ALIAS(LocalReAlloc, libk32_LocalReAlloc);
-DEFINE_PUBLIC_ALIAS(LocalShrink, libk32_LocalShrink);
-DEFINE_PUBLIC_ALIAS(LocalFree, libk32_LocalFree);
-DEFINE_PUBLIC_ALIAS(LocalHandle, libk32_LocalHandle);
-DEFINE_PUBLIC_ALIAS(LocalLock, libk32_LocalLock);
-DEFINE_PUBLIC_ALIAS(LocalUnlock, libk32_LocalUnlock);
-DEFINE_PUBLIC_ALIAS(LocalSize, libk32_LocalSize);
-DEFINE_PUBLIC_ALIAS(GlobalAlloc, libk32_GlobalAlloc);
-DEFINE_PUBLIC_ALIAS(GlobalReAlloc, libk32_GlobalReAlloc);
-DEFINE_PUBLIC_ALIAS(GlobalFree, libk32_GlobalFree);
-DEFINE_PUBLIC_ALIAS(GlobalHandle, libk32_GlobalHandle);
-DEFINE_PUBLIC_ALIAS(GlobalLock, libk32_GlobalLock);
-DEFINE_PUBLIC_ALIAS(GlobalUnlock, libk32_GlobalUnlock);
-DEFINE_PUBLIC_ALIAS(GlobalSize, libk32_GlobalSize);
 
+
+
+
+
+/************************************************************************/
 INTERN ATTR_MALLOC HLOCAL WINAPI
 libk32_LocalAlloc(UINT uFlags, SIZE_T uBytes) {
 	void *result;
@@ -286,6 +276,23 @@ DEFINE_INTERN_ALIAS(libk32_GlobalHandle, libk32_LocalHandle);
 DEFINE_INTERN_ALIAS(libk32_GlobalLock, libk32_LocalLock);
 DEFINE_INTERN_ALIAS(libk32_GlobalUnlock, libk32_LocalUnlock);
 DEFINE_INTERN_ALIAS(libk32_GlobalSize, libk32_LocalSize);
+
+DEFINE_PUBLIC_ALIAS(LocalAlloc, libk32_LocalAlloc);
+DEFINE_PUBLIC_ALIAS(LocalReAlloc, libk32_LocalReAlloc);
+DEFINE_PUBLIC_ALIAS(LocalShrink, libk32_LocalShrink);
+DEFINE_PUBLIC_ALIAS(LocalFree, libk32_LocalFree);
+DEFINE_PUBLIC_ALIAS(LocalHandle, libk32_LocalHandle);
+DEFINE_PUBLIC_ALIAS(LocalLock, libk32_LocalLock);
+DEFINE_PUBLIC_ALIAS(LocalUnlock, libk32_LocalUnlock);
+DEFINE_PUBLIC_ALIAS(LocalSize, libk32_LocalSize);
+DEFINE_PUBLIC_ALIAS(GlobalAlloc, libk32_GlobalAlloc);
+DEFINE_PUBLIC_ALIAS(GlobalReAlloc, libk32_GlobalReAlloc);
+DEFINE_PUBLIC_ALIAS(GlobalFree, libk32_GlobalFree);
+DEFINE_PUBLIC_ALIAS(GlobalHandle, libk32_GlobalHandle);
+DEFINE_PUBLIC_ALIAS(GlobalLock, libk32_GlobalLock);
+DEFINE_PUBLIC_ALIAS(GlobalUnlock, libk32_GlobalUnlock);
+DEFINE_PUBLIC_ALIAS(GlobalSize, libk32_GlobalSize);
+/************************************************************************/
 
 
 DECL_END

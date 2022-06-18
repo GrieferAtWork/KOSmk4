@@ -244,8 +244,8 @@ DEFINE_SYSCALL5(errno_t, rpc_schedule,
 
 	/* Set the default signal number `SIGRPC' if none was specified. */
 	if ((mode & RPC_SIGNO_MASK) == 0) {
-		STATIC_ASSERT(SIGRPC != SIGKILL);
-		STATIC_ASSERT(SIGRPC != SIGSTOP);
+		static_assert(SIGRPC != SIGKILL);
+		static_assert(SIGRPC != SIGSTOP);
 		mode |= RPC_SIGNO(SIGRPC);
 	} else {
 		signo_t signo = _RPC_GETSIGNO(mode);

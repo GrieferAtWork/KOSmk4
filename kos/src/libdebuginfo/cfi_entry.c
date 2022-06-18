@@ -212,15 +212,6 @@ struct cfientry {
 #define cfientry_as_unwind_emulator_sections_t(self)        cfientry_sections_as_unwind_emulator_sections_t(&(self)->ce_sections)
 #define cfientry_as_di_debuginfo_cu_parser_sections_t(self) cfientry_sections_as_di_debuginfo_cu_parser_sections_t(&(self)->ce_sections)
 
-
-/* Ignore bogus (at least to me) warning about using `offsetof(struct cfientry, ...)'
- * The  cause is  that `di_debuginfo_cu_parser_t' is  technically a c++  class with a
- * custom base. However, we already assume that a c++ class base simply gets inserted
- * at the start of a structure, meaning that this warning is meaningless to us! */
-#if defined(__GNUC__) && __GNUC__ >= 6
-#pragma GCC diagnostic ignored "-Winvalid-offsetof"
-#endif /* __GNUC__ >= 6 */
-
 #define cfientry_alloc(unwind_rega)                                        \
 	((struct cfientry *)alloca(offsetof(struct cfientry, ce_unwind_regv) + \
 	                           (unwind_rega) *                             \

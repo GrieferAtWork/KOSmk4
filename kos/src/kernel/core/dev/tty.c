@@ -326,7 +326,7 @@ termios_to_termios2(USER CHECKED struct termios2 *__restrict dst,
 	dst->c_lflag = src->c_lflag;
 	dst->c_line  = src->c_line;
 	{
-		STATIC_ASSERT(sizeof(dst->c_cc) <= sizeof(src->c_cc));
+		static_assert(sizeof(dst->c_cc) <= sizeof(src->c_cc));
 		memcpy(dst->c_cc, src->c_cc, sizeof(dst->c_cc));
 	}
 	dst->c_ispeed = src->c_ispeed;
@@ -342,7 +342,7 @@ termios2_to_termios(USER CHECKED struct termios *__restrict dst,
 	dst->c_lflag = src->c_lflag;
 	dst->c_line  = src->c_line;
 	{
-		STATIC_ASSERT(sizeof(src->c_cc) <= sizeof(dst->c_cc));
+		static_assert(sizeof(src->c_cc) <= sizeof(dst->c_cc));
 		bzero(mempcpy(dst->c_cc, src->c_cc, sizeof(src->c_cc)),
 		      sizeof(dst->c_cc) - sizeof(src->c_cc));
 	}
@@ -359,7 +359,7 @@ termios_to_termio(USER CHECKED struct termio *__restrict dst,
 	dst->c_lflag = (u16)src->c_lflag;
 	dst->c_line  = (u8)src->c_line;
 	{
-		STATIC_ASSERT(sizeof(dst->c_cc) <= sizeof(src->c_cc));
+		static_assert(sizeof(dst->c_cc) <= sizeof(src->c_cc));
 		memcpy(dst->c_cc, src->c_cc, sizeof(dst->c_cc));
 	}
 }
@@ -373,7 +373,7 @@ termio_to_termios(USER CHECKED struct termios *__restrict dst,
 	dst->c_lflag = src->c_lflag;
 	dst->c_line  = src->c_line;
 	{
-		STATIC_ASSERT(sizeof(src->c_cc) <= sizeof(dst->c_cc));
+		static_assert(sizeof(src->c_cc) <= sizeof(dst->c_cc));
 		bzero(mempcpy(dst->c_cc, src->c_cc, sizeof(src->c_cc)),
 		      sizeof(dst->c_cc) - sizeof(src->c_cc));
 	}
@@ -389,7 +389,7 @@ termios_to_termiox(USER CHECKED struct termiox *__restrict dst,
 	dst->x_cflag = (u16)src->c_oflag;
 	dst->x_sflag = (u16)src->c_lflag;
 	{
-		STATIC_ASSERT(sizeof(dst->x_rflag) <= sizeof(src->c_cc));
+		static_assert(sizeof(dst->x_rflag) <= sizeof(src->c_cc));
 		memcpy(dst->x_rflag, src->c_cc, sizeof(dst->x_rflag));
 	}
 }
@@ -403,7 +403,7 @@ termiox_to_termios(USER CHECKED struct termios *__restrict dst,
 	dst->c_cflag = 0;
 	dst->c_line  = 0;
 	{
-		STATIC_ASSERT(sizeof(src->x_rflag) <= sizeof(dst->c_cc));
+		static_assert(sizeof(src->x_rflag) <= sizeof(dst->c_cc));
 		bzero(mempcpy(dst->c_cc, src->x_rflag, sizeof(src->x_rflag)),
 		      sizeof(dst->c_cc) - sizeof(src->x_rflag));
 	}

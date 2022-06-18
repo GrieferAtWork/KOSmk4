@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_FAULT_HANDLE_INVALID_TSS_C
 #define GUARD_KERNEL_CORE_ARCH_I386_FAULT_HANDLE_INVALID_TSS_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -36,12 +37,13 @@
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/gdt.h>
 
+#include <assert.h>
 
 DECL_BEGIN
 
 INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_invalid_tss(struct icpustate *__restrict state, uintptr_t ecode) {
-	STATIC_ASSERT(!IDT_CONFIG_ISTRAP(X86_E_SYSTEM_TS & 0xff)); /* #TS  Invalid TSS */
+	static_assert(!IDT_CONFIG_ISTRAP(X86_E_SYSTEM_TS & 0xff)); /* #TS  Invalid TSS */
 
 	/* TODO:
 	 * """

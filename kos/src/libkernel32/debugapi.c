@@ -37,11 +37,7 @@
 
 DECL_BEGIN
 
-DEFINE_PUBLIC_ALIAS(DebugBreak, libk32_DebugBreak);
-DEFINE_PUBLIC_ALIAS(IsDebuggerPresent, libk32_IsDebuggerPresent);
-DEFINE_PUBLIC_ALIAS(OutputDebugStringA, libk32_OutputDebugStringA);
-DEFINE_PUBLIC_ALIAS(OutputDebugStringW, libk32_OutputDebugStringW);
-
+/************************************************************************/
 INTERN VOID WINAPI
 libk32_DebugBreak(VOID) {
 	TRACE("DebugBreak()");
@@ -74,6 +70,11 @@ libk32_OutputDebugStringW(LPCWSTR lpOutputString) {
 	format_16to8(&libk32_OutputDebugStringW_printer, lpOutputString, c16len(lpOutputString));
 }
 
+DEFINE_PUBLIC_ALIAS(DebugBreak, libk32_DebugBreak);
+DEFINE_PUBLIC_ALIAS(IsDebuggerPresent, libk32_IsDebuggerPresent);
+DEFINE_PUBLIC_ALIAS(OutputDebugStringA, libk32_OutputDebugStringA);
+DEFINE_PUBLIC_ALIAS(OutputDebugStringW, libk32_OutputDebugStringW);
+/************************************************************************/
 
 DECL_END
 

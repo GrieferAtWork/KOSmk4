@@ -77,6 +77,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <sys/uio.h>
 #include <sys/wait.h>
 
+#include <assert.h>
 #include <ctype.h>
 #include <fcntl.h>
 #include <format-printer.h>
@@ -1219,8 +1220,8 @@ PRIVATE NONNULL((1)) ssize_t CC
 print_atflag_t_impl(pformatprinter printer, void *arg,
                     atflag_t atflags,
                     char const *nameof_AT_READLINK_REQSIZE) {
-	STATIC_ASSERT(AT_READLINK_REQSIZE == AT_CHANGE_BTIME);
-	STATIC_ASSERT(AT_READLINK_REQSIZE == AT_EACCESS);
+	static_assert(AT_READLINK_REQSIZE == AT_CHANGE_BTIME);
+	static_assert(AT_READLINK_REQSIZE == AT_EACCESS);
 	ssize_t temp, result = 0;
 	bool is_first = true;
 	unsigned int i;
@@ -3694,11 +3695,11 @@ err:
 
 
 #ifdef NEED_print_kreaddir_mode
-STATIC_ASSERT(READDIR_DEFAULT == 0);
-STATIC_ASSERT(READDIR_CONTINUE == 1);
-STATIC_ASSERT(READDIR_PEEK == 2);
-STATIC_ASSERT(READDIR_MULTIPLE == 3);
-STATIC_ASSERT(READDIR_MODEMAX == 3);
+static_assert(READDIR_DEFAULT == 0);
+static_assert(READDIR_CONTINUE == 1);
+static_assert(READDIR_PEEK == 2);
+static_assert(READDIR_MULTIPLE == 3);
+static_assert(READDIR_MODEMAX == 3);
 PRIVATE char const repr_READDIR_0h[] =
 "DEFAULT\0CONTINUE\0PEEK\0MULTIPLE";
 

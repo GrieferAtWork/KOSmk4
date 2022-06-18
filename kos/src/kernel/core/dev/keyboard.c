@@ -344,9 +344,9 @@ NOTHROW(KCALL keyboard_device_trygetkey_locked_noled)(struct kbddev *__restrict 
 }
 
 
-STATIC_ASSERT(KEYBOARD_LED_CAPSLOCK == KEYMOD_CAPSLOCK);
-STATIC_ASSERT(KEYBOARD_LED_NUMLOCK == KEYMOD_NUMLOCK);
-STATIC_ASSERT(KEYBOARD_LED_SCROLLLOCK == KEYMOD_SCROLLLOCK);
+static_assert(KEYBOARD_LED_CAPSLOCK == KEYMOD_CAPSLOCK);
+static_assert(KEYBOARD_LED_NUMLOCK == KEYMOD_NUMLOCK);
+static_assert(KEYBOARD_LED_SCROLLLOCK == KEYMOD_SCROLLLOCK);
 
 #define KEYMOD_LEDMASK (KEYMOD_CAPSLOCK | KEYMOD_NUMLOCK | KEYMOD_SCROLLLOCK)
 
@@ -1342,9 +1342,9 @@ continue_copy_keymap:
 	case _IO_WITHSIZE(KDGETLED, 0):
 	case _IO_WITHSIZE(KDGETLED, 0) | _IOC_OUT: {
 		uintptr_t leds;
-		STATIC_ASSERT(KEYBOARD_LED_SCROLLLOCK >> 8 == LED_SCR);
-		STATIC_ASSERT(KEYBOARD_LED_NUMLOCK >> 8 == LED_NUM);
-		STATIC_ASSERT(KEYBOARD_LED_CAPSLOCK >> 8 == LED_CAP);
+		static_assert(KEYBOARD_LED_SCROLLLOCK >> 8 == LED_SCR);
+		static_assert(KEYBOARD_LED_NUMLOCK >> 8 == LED_NUM);
+		static_assert(KEYBOARD_LED_CAPSLOCK >> 8 == LED_CAP);
 		leds = ATOMIC_READ(me->kd_leds);
 		return ioctl_intarg_setu8(cmd, arg, (u8)((leds >> 8) & (LED_SCR | LED_NUM | LED_CAP)));
 	}	break;
@@ -1395,9 +1395,9 @@ continue_copy_keymap:
 	case _IO_WITHSIZE(KDGKBLED, 0):
 	case _IO_WITHSIZE(KDGKBLED, 0) | _IOC_OUT: {
 		uintptr_t mods;
-		STATIC_ASSERT(KEYMOD_SCROLLLOCK >> 8 == K_SCROLLLOCK);
-		STATIC_ASSERT(KEYMOD_NUMLOCK >> 8 == K_NUMLOCK);
-		STATIC_ASSERT(KEYMOD_CAPSLOCK >> 8 == K_CAPSLOCK);
+		static_assert(KEYMOD_SCROLLLOCK >> 8 == K_SCROLLLOCK);
+		static_assert(KEYMOD_NUMLOCK >> 8 == K_NUMLOCK);
+		static_assert(KEYMOD_CAPSLOCK >> 8 == K_CAPSLOCK);
 		mods = ATOMIC_READ(me->kd_mods);
 		return ioctl_intarg_setu8(cmd, arg, (u8)((mods >> 8) & (K_SCROLLLOCK | K_NUMLOCK | K_CAPSLOCK)));
 	}	break;

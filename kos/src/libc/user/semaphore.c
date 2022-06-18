@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBC_USER_SEMAPHORE_C
 #define GUARD_LIBC_USER_SEMAPHORE_C 1
+#define _KOS_SOURCE 1
 
 #include "../api.h"
 /**/
@@ -31,6 +32,7 @@
 #include <sys/mman.h>
 #include <sys/time.h>
 
+#include <assert.h>
 #include <fcntl.h>
 #include <inttypes.h>
 #include <limits.h>
@@ -72,10 +74,10 @@ DECL_BEGIN
 typedef typeof(((sem_t *)0)->s_count) sem_count_t;
 
 /* Ensure that `sem_t' has the correct size. */
-STATIC_ASSERT(sizeof(sem_t) == __SIZEOF_SEM_T);
+static_assert(sizeof(sem_t) == __SIZEOF_SEM_T);
 
 /* Ensure that `sem_t's counter value has the correct width. */
-STATIC_ASSERT(sizeof(sem_count_t) == SEM_COUNT_SIZE);
+static_assert(sizeof(sem_count_t) == SEM_COUNT_SIZE);
 
 
 

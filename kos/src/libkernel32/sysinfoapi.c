@@ -34,15 +34,7 @@
 
 DECL_BEGIN
 
-DEFINE_PUBLIC_ALIAS(GetSystemTime, libk32_GetSystemTime);
-DEFINE_PUBLIC_ALIAS(GetSystemTimeAsFileTime, libk32_GetSystemTimeAsFileTime);
-DEFINE_PUBLIC_ALIAS(GetSystemTimePreciseAsFileTime, libk32_GetSystemTimePreciseAsFileTime);
-DEFINE_PUBLIC_ALIAS(GetLocalTime, libk32_GetLocalTime);
-DEFINE_PUBLIC_ALIAS(GetSystemInfo, libk32_GetSystemInfo);
-DEFINE_PUBLIC_ALIAS(GetNativeSystemInfo, libk32_GetNativeSystemInfo);
-DEFINE_PUBLIC_ALIAS(GetTickCount, libk32_GetTickCount);
-DEFINE_PUBLIC_ALIAS(GetTickCount64, libk32_GetTickCount64);
-
+/************************************************************************/
 INTDEF FILETIME CC libk32_TimeSpecToFileTime(struct timespec const *ts);
 
 INTERN VOID WINAPI
@@ -131,6 +123,16 @@ libk32_GetTickCount(VOID) {
 	TRACE("GetTickCount()");
 	return (DWORD)libk32_GetTickCount64();
 }
+
+DEFINE_PUBLIC_ALIAS(GetSystemTime, libk32_GetSystemTime);
+DEFINE_PUBLIC_ALIAS(GetSystemTimeAsFileTime, libk32_GetSystemTimeAsFileTime);
+DEFINE_PUBLIC_ALIAS(GetSystemTimePreciseAsFileTime, libk32_GetSystemTimePreciseAsFileTime);
+DEFINE_PUBLIC_ALIAS(GetLocalTime, libk32_GetLocalTime);
+DEFINE_PUBLIC_ALIAS(GetSystemInfo, libk32_GetSystemInfo);
+DEFINE_PUBLIC_ALIAS(GetNativeSystemInfo, libk32_GetNativeSystemInfo);
+DEFINE_PUBLIC_ALIAS(GetTickCount, libk32_GetTickCount);
+DEFINE_PUBLIC_ALIAS(GetTickCount64, libk32_GetTickCount64);
+/************************************************************************/
 
 
 DECL_END

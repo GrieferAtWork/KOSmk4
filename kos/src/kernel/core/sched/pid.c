@@ -95,18 +95,18 @@ DECL_END
 DECL_BEGIN
 
 /* Assert binary compatibility between `struct _pidtree_slot' and `struct taskpid_slot' */
-STATIC_ASSERT((offsetof(struct taskpid, tp_pids[1]) - offsetof(struct taskpid, tp_pids[0])) == sizeof(struct taskpid_slot));
-STATIC_ASSERT(offsetof(struct _pidtree_slot, pts_link) == offsetof(struct taskpid_slot, tps_link));
-STATIC_ASSERT(sizeof(((struct _pidtree_slot *)0)->pts_link) == sizeof(((struct taskpid_slot *)0)->tps_link));
-STATIC_ASSERT(offsetof(struct _pidtree_slot, pts_pid) == offsetof(struct taskpid_slot, tps_pid));
-STATIC_ASSERT(sizeof(((struct _pidtree_slot *)0)->pts_pid) == sizeof(((struct taskpid_slot *)0)->tps_pid));
+static_assert((offsetof(struct taskpid, tp_pids[1]) - offsetof(struct taskpid, tp_pids[0])) == sizeof(struct taskpid_slot));
+static_assert(offsetof(struct _pidtree_slot, pts_link) == offsetof(struct taskpid_slot, tps_link));
+static_assert(sizeof(((struct _pidtree_slot *)0)->pts_link) == sizeof(((struct taskpid_slot *)0)->tps_link));
+static_assert(offsetof(struct _pidtree_slot, pts_pid) == offsetof(struct taskpid_slot, tps_pid));
+static_assert(sizeof(((struct _pidtree_slot *)0)->pts_pid) == sizeof(((struct taskpid_slot *)0)->tps_pid));
 
 /* Assert binary compatibility between `struct _pidtree_slot' and `struct procgrp_slot' */
-STATIC_ASSERT((offsetof(struct procgrp, pgr_pids[1]) - offsetof(struct procgrp, pgr_pids[0])) == sizeof(struct procgrp_slot));
-STATIC_ASSERT(offsetof(struct _pidtree_slot, pts_link) == offsetof(struct procgrp_slot, pgs_link));
-STATIC_ASSERT(sizeof(((struct _pidtree_slot *)0)->pts_link) == sizeof(((struct procgrp_slot *)0)->pgs_link));
-STATIC_ASSERT(offsetof(struct _pidtree_slot, pts_pid) == offsetof(struct procgrp_slot, pgs_pid));
-STATIC_ASSERT(sizeof(((struct _pidtree_slot *)0)->pts_pid) == sizeof(((struct procgrp_slot *)0)->pgs_pid));
+static_assert((offsetof(struct procgrp, pgr_pids[1]) - offsetof(struct procgrp, pgr_pids[0])) == sizeof(struct procgrp_slot));
+static_assert(offsetof(struct _pidtree_slot, pts_link) == offsetof(struct procgrp_slot, pgs_link));
+static_assert(sizeof(((struct _pidtree_slot *)0)->pts_link) == sizeof(((struct procgrp_slot *)0)->pgs_link));
+static_assert(offsetof(struct _pidtree_slot, pts_pid) == offsetof(struct procgrp_slot, pgs_pid));
+static_assert(sizeof(((struct _pidtree_slot *)0)->pts_pid) == sizeof(((struct procgrp_slot *)0)->pgs_pid));
 
 
 /************************************************************************/

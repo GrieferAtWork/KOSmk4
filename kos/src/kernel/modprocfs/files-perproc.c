@@ -1924,10 +1924,10 @@ procfs_fd_lnknode_v_openlink(struct flnknode *__restrict self,
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	struct procfs_fd_lnknode *me;
 	unsigned int access_mode;
-	STATIC_ASSERT(O_RDONLY == IO_RDONLY);
-	STATIC_ASSERT(O_WRONLY == IO_WRONLY);
-	STATIC_ASSERT(O_RDWR == IO_RDWR);
-	STATIC_ASSERT(O_ACCMODE == IO_ACCMODE);
+	static_assert(O_RDONLY == IO_RDONLY);
+	static_assert(O_WRONLY == IO_WRONLY);
+	static_assert(O_RDWR == IO_RDWR);
+	static_assert(O_ACCMODE == IO_ACCMODE);
 
 	/* This is the function that implements the magic for open("/proc/[pid]/fd/[no]"),
 	 * such  that  such a  call  behaves as  a  dup(2), rather  than open(readlink())! */
@@ -1964,9 +1964,9 @@ procfs_fd_lnknode_v_openlink(struct flnknode *__restrict self,
 		case HANDLE_TYPE_TEMPHANDLE:
 		case HANDLE_TYPE_FIFOHANDLE: {
 			struct filehandle *obj;
-			STATIC_ASSERT(offsetof(struct filehandle, fh_path) == offsetof(struct fifohandle, fu_path));
-			STATIC_ASSERT(offsetof(struct filehandle, fh_dirent) == offsetof(struct fifohandle, fu_dirent));
-			STATIC_ASSERT(offsetof(struct filehandle, fh_file) == offsetof(struct fifohandle, fu_fifo));
+			static_assert(offsetof(struct filehandle, fh_path) == offsetof(struct fifohandle, fu_path));
+			static_assert(offsetof(struct filehandle, fh_dirent) == offsetof(struct fifohandle, fu_dirent));
+			static_assert(offsetof(struct filehandle, fh_file) == offsetof(struct fifohandle, fu_fifo));
 			obj = (struct filehandle *)me->pfl_hand.h_data;
 			if (mfile_isnode(obj->fh_file))
 				fnode_access(mfile_asnode(obj->fh_file), access_mode);
@@ -2011,9 +2011,9 @@ procfs_fd_lnknode_v_expandlink(struct flnknode *__restrict self,
 	case HANDLE_TYPE_TEMPHANDLE:
 	case HANDLE_TYPE_FIFOHANDLE: {
 		struct filehandle *hand;
-		STATIC_ASSERT(offsetof(struct filehandle, fh_path) == offsetof(struct fifohandle, fu_path));
-		STATIC_ASSERT(offsetof(struct filehandle, fh_dirent) == offsetof(struct fifohandle, fu_dirent));
-		STATIC_ASSERT(offsetof(struct filehandle, fh_file) == offsetof(struct fifohandle, fu_fifo));
+		static_assert(offsetof(struct filehandle, fh_path) == offsetof(struct fifohandle, fu_path));
+		static_assert(offsetof(struct filehandle, fh_dirent) == offsetof(struct fifohandle, fu_dirent));
+		static_assert(offsetof(struct filehandle, fh_file) == offsetof(struct fifohandle, fu_fifo));
 		hand = (struct filehandle *)me->pfl_hand.h_data;
 		if (hand->fh_path && hand->fh_dirent && mfile_isnode(hand->fh_file)) {
 			*presult_path   = incref(hand->fh_path);

@@ -53,14 +53,6 @@ DECL_BEGIN
 /* CRITICAL_SECTION                                                     */
 /************************************************************************/
 #define DEFAULT_SPIN_COUNT 8
-DEFINE_PUBLIC_ALIAS(EnterCriticalSection, libk32_EnterCriticalSection);
-DEFINE_PUBLIC_ALIAS(LeaveCriticalSection, libk32_LeaveCriticalSection);
-DEFINE_PUBLIC_ALIAS(TryEnterCriticalSection, libk32_TryEnterCriticalSection);
-DEFINE_PUBLIC_ALIAS(DeleteCriticalSection, libk32_DeleteCriticalSection);
-DEFINE_PUBLIC_ALIAS(SetCriticalSectionSpinCount, libk32_SetCriticalSectionSpinCount);
-DEFINE_PUBLIC_ALIAS(InitializeCriticalSectionEx, libk32_InitializeCriticalSectionEx);
-DEFINE_PUBLIC_ALIAS(InitializeCriticalSectionAndSpinCount, libk32_InitializeCriticalSectionAndSpinCount);
-DEFINE_PUBLIC_ALIAS(InitializeCriticalSection, libk32_InitializeCriticalSection);
 
 INTERN WINBOOL WINAPI
 libk32_TryEnterCriticalSection(LPCRITICAL_SECTION lpCriticalSection) {
@@ -150,6 +142,15 @@ libk32_InitializeCriticalSection(LPCRITICAL_SECTION lpCriticalSection) {
 	TRACE("InitializeCriticalSection(%p)", lpCriticalSection);
 	libk32_InitializeCriticalSectionEx(lpCriticalSection, DEFAULT_SPIN_COUNT, 0);
 }
+
+DEFINE_PUBLIC_ALIAS(EnterCriticalSection, libk32_EnterCriticalSection);
+DEFINE_PUBLIC_ALIAS(LeaveCriticalSection, libk32_LeaveCriticalSection);
+DEFINE_PUBLIC_ALIAS(TryEnterCriticalSection, libk32_TryEnterCriticalSection);
+DEFINE_PUBLIC_ALIAS(DeleteCriticalSection, libk32_DeleteCriticalSection);
+DEFINE_PUBLIC_ALIAS(SetCriticalSectionSpinCount, libk32_SetCriticalSectionSpinCount);
+DEFINE_PUBLIC_ALIAS(InitializeCriticalSectionEx, libk32_InitializeCriticalSectionEx);
+DEFINE_PUBLIC_ALIAS(InitializeCriticalSectionAndSpinCount, libk32_InitializeCriticalSectionAndSpinCount);
+DEFINE_PUBLIC_ALIAS(InitializeCriticalSection, libk32_InitializeCriticalSection);
 /************************************************************************/
 
 
@@ -160,17 +161,11 @@ libk32_InitializeCriticalSection(LPCRITICAL_SECTION lpCriticalSection) {
 /************************************************************************/
 /* SRWLOCK                                                              */
 /************************************************************************/
-DEFINE_PUBLIC_ALIAS(InitializeSRWLock, libk32_InitializeSRWLock);
-DEFINE_PUBLIC_ALIAS(ReleaseSRWLockExclusive, libk32_ReleaseSRWLockExclusive);
-DEFINE_PUBLIC_ALIAS(ReleaseSRWLockShared, libk32_ReleaseSRWLockShared);
-DEFINE_PUBLIC_ALIAS(AcquireSRWLockExclusive, libk32_AcquireSRWLockExclusive);
-DEFINE_PUBLIC_ALIAS(AcquireSRWLockShared, libk32_AcquireSRWLockShared);
-DEFINE_PUBLIC_ALIAS(TryAcquireSRWLockExclusive, libk32_TryAcquireSRWLockExclusive);
-DEFINE_PUBLIC_ALIAS(TryAcquireSRWLockShared, libk32_TryAcquireSRWLockShared);
 INTERN VOID WINAPI
 libk32_InitializeSRWLock(PSRWLOCK SRWLock) {
 	SRWLock->Ptr = NULL;
 }
+
 INTERN VOID WINAPI
 libk32_ReleaseSRWLockExclusive(PSRWLOCK SRWLock) {
 	struct atomic_rwlock *me = (struct atomic_rwlock *)SRWLock;
@@ -179,6 +174,7 @@ libk32_ReleaseSRWLockExclusive(PSRWLOCK SRWLock) {
 	 * -- Note the inefficiency: this _always_ makes a system call */
 	futex_wakeall(&me->arw_lock);
 }
+
 INTERN VOID WINAPI
 libk32_ReleaseSRWLockShared(PSRWLOCK SRWLock) {
 	struct atomic_rwlock *me = (struct atomic_rwlock *)SRWLock;
@@ -192,28 +188,41 @@ libk32_ReleaseSRWLockShared(PSRWLOCK SRWLock) {
 	if (atomic_rwlock_endread(me))
 		futex_wakeall(&me->arw_lock);
 }
+
 INTERN VOID WINAPI
 libk32_AcquireSRWLockExclusive(PSRWLOCK SRWLock) {
 	struct atomic_rwlock *me = (struct atomic_rwlock *)SRWLock;
 	while (!atomic_rwlock_trywrite(me))
 		futex_waituntil(&me->arw_lock, 0); /* ... While in locks are present */
 }
+
 INTERN VOID WINAPI
 libk32_AcquireSRWLockShared(PSRWLOCK SRWLock) {
 	struct atomic_rwlock *me = (struct atomic_rwlock *)SRWLock;
 	while (!atomic_rwlock_tryread(me))
 		futex_waitwhile(&me->arw_lock, (uintptr_t)-1); /* ... While in write-mode */
 }
+
 INTERN BOOLEAN WINAPI
 libk32_TryAcquireSRWLockExclusive(PSRWLOCK SRWLock) {
 	struct atomic_rwlock *me = (struct atomic_rwlock *)SRWLock;
 	return atomic_rwlock_trywrite(me);
 }
+
 INTERN BOOLEAN WINAPI
 libk32_TryAcquireSRWLockShared(PSRWLOCK SRWLock) {
 	struct atomic_rwlock *me = (struct atomic_rwlock *)SRWLock;
 	return atomic_rwlock_tryread(me);
 }
+
+DEFINE_PUBLIC_ALIAS(InitializeSRWLock, libk32_InitializeSRWLock);
+DEFINE_PUBLIC_ALIAS(ReleaseSRWLockExclusive, libk32_ReleaseSRWLockExclusive);
+DEFINE_PUBLIC_ALIAS(ReleaseSRWLockShared, libk32_ReleaseSRWLockShared);
+DEFINE_PUBLIC_ALIAS(AcquireSRWLockExclusive, libk32_AcquireSRWLockExclusive);
+DEFINE_PUBLIC_ALIAS(AcquireSRWLockShared, libk32_AcquireSRWLockShared);
+DEFINE_PUBLIC_ALIAS(TryAcquireSRWLockExclusive, libk32_TryAcquireSRWLockExclusive);
+DEFINE_PUBLIC_ALIAS(TryAcquireSRWLockShared, libk32_TryAcquireSRWLockShared);
+/************************************************************************/
 
 
 
@@ -221,9 +230,6 @@ libk32_TryAcquireSRWLockShared(PSRWLOCK SRWLock) {
 /************************************************************************/
 /* FUTEX                                                                */
 /************************************************************************/
-DEFINE_PUBLIC_ALIAS(WaitOnAddress, libk32_WaitOnAddress);
-DEFINE_PUBLIC_ALIAS(WakeByAddressSingle, libk32_WakeByAddressSingle);
-DEFINE_PUBLIC_ALIAS(WakeByAddressAll, libk32_WakeByAddressAll);
 INTERN WINBOOL WINAPI
 libk32_WaitOnAddress(volatile VOID *Address, PVOID CompareAddress,
                      SIZE_T AddressSize, DWORD dwMilliseconds) {
@@ -241,14 +247,22 @@ libk32_WaitOnAddress(volatile VOID *Address, PVOID CompareAddress,
 	return lfutex64((lfutex_t *)Address, LFUTEX_WAIT_WHILE_EX,
 	                (lfutex_t)CompareAddress, &ts, AddressSize) == 0;
 }
+
 INTERN VOID WINAPI libk32_WakeByAddressSingle(PVOID Address) {
 	TRACE("WakeByAddressSingle(%p)", Address);
 	futex_wake((lfutex_t *)Address, 1);
 }
+
 INTERN VOID WINAPI libk32_WakeByAddressAll(PVOID Address) {
 	TRACE("WakeByAddressAll(%p)", Address);
 	futex_wakeall((lfutex_t *)Address);
 }
+
+DEFINE_PUBLIC_ALIAS(WaitOnAddress, libk32_WaitOnAddress);
+DEFINE_PUBLIC_ALIAS(WakeByAddressSingle, libk32_WakeByAddressSingle);
+DEFINE_PUBLIC_ALIAS(WakeByAddressAll, libk32_WakeByAddressAll);
+/************************************************************************/
+
 
 
 
@@ -256,13 +270,6 @@ INTERN VOID WINAPI libk32_WakeByAddressAll(PVOID Address) {
 /************************************************************************/
 /* MISC                                                                 */
 /************************************************************************/
-DEFINE_PUBLIC_ALIAS(WaitForMultipleObjects, libk32_WaitForMultipleObjects);
-DEFINE_PUBLIC_ALIAS(WaitForMultipleObjectsEx, libk32_WaitForMultipleObjectsEx);
-DEFINE_PUBLIC_ALIAS(WaitForSingleObject, libk32_WaitForSingleObject);
-DEFINE_PUBLIC_ALIAS(WaitForSingleObjectEx, libk32_WaitForSingleObjectEx);
-DEFINE_PUBLIC_ALIAS(SleepEx, libk32_SleepEx);
-DEFINE_PUBLIC_ALIAS(Sleep, libk32_Sleep);
-
 PRIVATE DWORD WINAPI
 libk32_WaitForObjects(DWORD nCount, CONST HANDLE *lpHandles,
                       DWORD dwMilliseconds) {
@@ -382,6 +389,13 @@ libk32_Sleep(DWORD dwMilliseconds) {
 	TRACE("Sleep(%#x)", dwMilliseconds);
 	libk32_SleepEx(dwMilliseconds, FALSE);
 }
+
+DEFINE_PUBLIC_ALIAS(WaitForMultipleObjects, libk32_WaitForMultipleObjects);
+DEFINE_PUBLIC_ALIAS(WaitForMultipleObjectsEx, libk32_WaitForMultipleObjectsEx);
+DEFINE_PUBLIC_ALIAS(WaitForSingleObject, libk32_WaitForSingleObject);
+DEFINE_PUBLIC_ALIAS(WaitForSingleObjectEx, libk32_WaitForSingleObjectEx);
+DEFINE_PUBLIC_ALIAS(SleepEx, libk32_SleepEx);
+DEFINE_PUBLIC_ALIAS(Sleep, libk32_Sleep);
 /************************************************************************/
 
 

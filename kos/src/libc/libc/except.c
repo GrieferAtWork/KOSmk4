@@ -67,14 +67,14 @@
 
 DECL_BEGIN
 
-STATIC_ASSERT(offsetof(struct exception_info, ei_state) == OFFSET_EXCEPTION_INFO_STATE);
+static_assert(offsetof(struct exception_info, ei_state) == OFFSET_EXCEPTION_INFO_STATE);
 #if EXCEPT_BACKTRACE_SIZE != 0
-STATIC_ASSERT(offsetof(struct exception_info, ei_trace) == OFFSET_EXCEPTION_INFO_TRACE);
+static_assert(offsetof(struct exception_info, ei_trace) == OFFSET_EXCEPTION_INFO_TRACE);
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
-STATIC_ASSERT(offsetof(struct exception_info, ei_flags) == OFFSET_EXCEPTION_INFO_FLAGS);
-STATIC_ASSERT(offsetof(struct exception_info, ei_code)  == OFFSET_EXCEPTION_INFO_CODE);
-STATIC_ASSERT(offsetof(struct exception_info, ei_data) == OFFSET_EXCEPTION_INFO_DATA);
-STATIC_ASSERT(offsetof(struct exception_info, ei_data.e_args.e_pointers) == OFFSET_EXCEPTION_INFO_POINTERS);
+static_assert(offsetof(struct exception_info, ei_flags) == OFFSET_EXCEPTION_INFO_FLAGS);
+static_assert(offsetof(struct exception_info, ei_code)  == OFFSET_EXCEPTION_INFO_CODE);
+static_assert(offsetof(struct exception_info, ei_data) == OFFSET_EXCEPTION_INFO_DATA);
+static_assert(offsetof(struct exception_info, ei_data.e_args.e_pointers) == OFFSET_EXCEPTION_INFO_POINTERS);
 
 
 INTERN SECTION_EXCEPT_TEXT ATTR_CONST ATTR_RETNONNULL WUNUSED

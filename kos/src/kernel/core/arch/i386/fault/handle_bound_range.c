@@ -40,6 +40,7 @@
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
+#include <assert.h>
 #include <stddef.h>
 
 #include <libinstrlen/instrlen.h>
@@ -51,7 +52,7 @@ DECL_BEGIN
 
 INTERN ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
 x86_handle_bound_range(struct icpustate *__restrict state) {
-	STATIC_ASSERT(IDT_CONFIG_ISTRAP(0x05)); /* #BR  Bound Range */
+	static_assert(IDT_CONFIG_ISTRAP(0x05)); /* #BR  Bound Range */
 	byte_t const *curr_pc, *next_pc;
 	emu86_opcode_t opcode;
 	emu86_opflags_t flags;

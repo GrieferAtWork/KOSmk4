@@ -509,8 +509,8 @@ uvio_server_readone_nonblock(struct uvio *__restrict self,
 		req->uq_reqid = (u16)reqid | (slot->kur_uid << 8);
 #if SIZEOF_KERNEL_UVIO_UINTMAX_T >= 16
 		{
-			STATIC_ASSERT(sizeof(union uvio_request_argument) == 16);
-			STATIC_ASSERT(sizeof(union kernel_uvio_argument) == 16);
+			static_assert(sizeof(union uvio_request_argument) == 16);
+			static_assert(sizeof(union kernel_uvio_argument) == 16);
 			memcpy(req->uq_args, slot->kur_argv, 2, 16);
 		}
 #elif SIZEOF_KERNEL_UVIO_UINTMAX_T >= 8
@@ -661,7 +661,7 @@ uvio_server_write(struct mfile *__restrict self,
 	case UVIO_OPCODE_EXCEPT: {
 		struct kernel_uvio_except except;
 		USER CHECKED struct uvio_response_except *full_response;
-		STATIC_ASSERT(sizeof(except_code_t) == sizeof(uintptr_t));
+		static_assert(sizeof(except_code_t) == sizeof(uintptr_t));
 		result = sizeof(struct uvio_response_except);
 		if unlikely(num_bytes < result) {
 err_buffer_too_small:

@@ -32,8 +32,7 @@
 
 DECL_BEGIN
 
-DEFINE_PUBLIC_ALIAS(SetUnhandledExceptionFilter, libk32_SetUnhandledExceptionFilter);
-DEFINE_PUBLIC_ALIAS(UnhandledExceptionFilter, libk32_UnhandledExceptionFilter);
+/************************************************************************/
 INTERN LPTOP_LEVEL_EXCEPTION_FILTER WINAPI
 libk32_SetUnhandledExceptionFilter(LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter) {
 	TRACE("SetUnhandledExceptionFilter(%p)", lpTopLevelExceptionFilter);
@@ -48,15 +47,14 @@ libk32_UnhandledExceptionFilter(struct _EXCEPTION_POINTERS *pExceptionInfo) {
 	return 0;
 }
 
+DEFINE_PUBLIC_ALIAS(SetUnhandledExceptionFilter, libk32_SetUnhandledExceptionFilter);
+DEFINE_PUBLIC_ALIAS(UnhandledExceptionFilter, libk32_UnhandledExceptionFilter);
 
 
 /* Special functions exported by `libc.so' */
 __LIBC NOBLOCK ATTR_PURE /*nt*/ errno_t NOTHROW(LIBDCALL __get_nterrno)(void);
 __LIBC NOBLOCK syscall_slong_t NOTHROW(LIBDCALL __set_nterrno)(/*nt*/ errno_t value);
 
-DEFINE_PUBLIC_ALIAS(GetLastError, libk32_GetLastError);
-DEFINE_PUBLIC_ALIAS(SetLastError, libk32_SetLastError);
-DEFINE_PUBLIC_ALIAS(RestoreLastError, libk32_SetLastError);
 INTERN DWORD WINAPI
 libk32_GetLastError(VOID) {
 	TRACE("GetLastError()");
@@ -69,13 +67,15 @@ libk32_SetLastError(DWORD dwErrCode) {
 	__set_nterrno((errno_t)dwErrCode);
 }
 
+DEFINE_PUBLIC_ALIAS(GetLastError, libk32_GetLastError);
+DEFINE_PUBLIC_ALIAS(SetLastError, libk32_SetLastError);
+DEFINE_PUBLIC_ALIAS(RestoreLastError, libk32_SetLastError);
+/************************************************************************/
 
-DEFINE_PUBLIC_ALIAS(GetErrorMode, libk32_GetErrorMode);
-DEFINE_PUBLIC_ALIAS(GetThreadErrorMode, libk32_GetThreadErrorMode);
-DEFINE_PUBLIC_ALIAS(SetErrorMode, libk32_SetErrorMode);
-DEFINE_PUBLIC_ALIAS(SetThreadErrorMode, libk32_SetThreadErrorMode);
-DEFINE_PUBLIC_ALIAS(RaiseException, libk32_RaiseException);
 
+
+
+/************************************************************************/
 INTERN UINT WINAPI
 libk32_GetErrorMode(VOID) {
 	TRACE("GetErrorMode()");
@@ -125,6 +125,13 @@ libk32_RaiseException(DWORD dwExceptionCode, DWORD dwExceptionFlags,
 	       dwExceptionCode, dwExceptionFlags,
 	       nNumberOfArguments, lpArguments);
 }
+
+DEFINE_PUBLIC_ALIAS(GetErrorMode, libk32_GetErrorMode);
+DEFINE_PUBLIC_ALIAS(GetThreadErrorMode, libk32_GetThreadErrorMode);
+DEFINE_PUBLIC_ALIAS(SetErrorMode, libk32_SetErrorMode);
+DEFINE_PUBLIC_ALIAS(SetThreadErrorMode, libk32_SetThreadErrorMode);
+DEFINE_PUBLIC_ALIAS(RaiseException, libk32_RaiseException);
+/************************************************************************/
 
 DECL_END
 

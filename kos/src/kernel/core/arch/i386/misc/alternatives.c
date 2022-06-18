@@ -21,6 +21,7 @@
 #define GUARD_KERNEL_CORE_ARCH_I386_MISC_ALTERNATIVES_C 1
 #define DISABLE_BRANCH_PROFILING /* Don't profile this file */
 #define _GNU_SOURCE 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -73,7 +74,7 @@ NOTHROW(FCALL has_feature)(u32 feature) {
 
 	case X86_FEATURE_TYP_CPUID: {
 		/* Feature detection via CPUID word bittest. */
-		STATIC_ASSERT(X86_FEATURE_TYP_CPUID == 0);
+		static_assert(X86_FEATURE_TYP_CPUID == 0);
 		u32 word = 0;
 		unsigned int i;
 
@@ -105,7 +106,7 @@ got_feature_word:
 #ifdef __x86_64__
 		result = true; /* All misc. feature are currently supported unconditionally on x86_64! */
 #else /* __x86_64__ */
-		STATIC_ASSERT((X86_FEAT_486 & ~X86_FEATURE_TYPMASK) == CPU_FEATURE_FI486);
+		static_assert((X86_FEAT_486 & ~X86_FEATURE_TYPMASK) == CPU_FEATURE_FI486);
 		result = (bootcpu_x86_cpufeatures & (feature & ~X86_FEATURE_TYPMASK)) != 0;
 #endif /* !__x86_64__ */
 	}	break;

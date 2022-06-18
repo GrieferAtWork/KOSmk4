@@ -646,7 +646,7 @@ PRIVATE NOBLOCK NONNULL((1)) void NOTHROW(KCALL uhci_aio_fini)(struct aio_handle
 PRIVATE NOBLOCK NONNULL((1)) void NOTHROW(KCALL uhci_aio_cancel)(struct aio_handle *__restrict self);
 PRIVATE NOBLOCK NONNULL((1, 2)) unsigned int NOTHROW(KCALL uhci_aio_progress)(struct aio_handle *__restrict self, struct aio_handle_stat *__restrict stat);
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) size_t NOTHROW(KCALL uhci_aio_retsize)(struct aio_handle *__restrict self);
-STATIC_ASSERT(sizeof(struct uhci_aio_data) <= (AIO_HANDLE_DRIVER_POINTER_COUNT * sizeof(void *)));
+static_assert(sizeof(struct uhci_aio_data) <= (AIO_HANDLE_DRIVER_POINTER_COUNT * sizeof(void *)));
 PRIVATE struct aio_handle_type uhci_aio_type = {
 	.ht_fini     = &uhci_aio_fini,
 	.ht_cancel   = &uhci_aio_cancel,
@@ -2508,7 +2508,7 @@ uhci_register_interrupt(struct usb_controller *__restrict self, struct usb_endpo
 	TRY {
 		u32 tok, orig_tok, cs;
 		u16 maxpck;
-		STATIC_ASSERT(offsetof(struct uhci_interrupt, ui_reg) ==
+		static_assert(offsetof(struct uhci_interrupt, ui_reg) ==
 		              offsetof(struct uhci_interrupt, ui_iso[0]));
 		tok = UHCI_TDTOK_PID_IN;
 		tok |= ((u32)endp->ue_dev << UHCI_TDTOK_DEVS) & UHCI_TDTOK_DEVM;

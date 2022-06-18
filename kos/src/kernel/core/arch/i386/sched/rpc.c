@@ -43,11 +43,11 @@
 DECL_BEGIN
 
 /* The following offsets are currently being hard-coded in `rpc.S' */
-STATIC_ASSERT(offsetof(struct rpc_context, rc_context) == 0);
+static_assert(offsetof(struct rpc_context, rc_context) == 0);
 #ifdef __x86_64__
-STATIC_ASSERT(offsetof(struct rpc_context, rc_state) == 8);
+static_assert(offsetof(struct rpc_context, rc_state) == 8);
 #else /* __x86_64__ */
-STATIC_ASSERT(offsetof(struct rpc_context, rc_state) == 4);
+static_assert(offsetof(struct rpc_context, rc_state) == 4);
 #endif /* !__x86_64__ */
 
 /* Restore function for functions pushed by `task_asyncrpc_push()'
@@ -72,9 +72,9 @@ NOTHROW(FCALL task_asyncrpc_push)(struct scpustate *__restrict state,
 #ifdef __x86_64__
 	/* Convert `state' into a `struct icpustate'. On x86_64, that can
 	 * easily  be done by  skipping over the  first couple of fields. */
-	STATIC_ASSERT(SIZEOF_SCPUSTATE64 - OFFSET_SCPUSTATE64_GPREGSNSP == SIZEOF_ICPUSTATE64);
-	STATIC_ASSERT(OFFSET_SCPUSTATE64_GPREGSNSP - OFFSET_SCPUSTATE64_GPREGSNSP == OFFSET_ICPUSTATE64_GPREGSNSP);
-	STATIC_ASSERT(OFFSET_SCPUSTATE64_IRREGS - OFFSET_SCPUSTATE64_GPREGSNSP == OFFSET_ICPUSTATE64_IRREGS);
+	static_assert(SIZEOF_SCPUSTATE64 - OFFSET_SCPUSTATE64_GPREGSNSP == SIZEOF_ICPUSTATE64);
+	static_assert(OFFSET_SCPUSTATE64_GPREGSNSP - OFFSET_SCPUSTATE64_GPREGSNSP == OFFSET_ICPUSTATE64_GPREGSNSP);
+	static_assert(OFFSET_SCPUSTATE64_IRREGS - OFFSET_SCPUSTATE64_GPREGSNSP == OFFSET_ICPUSTATE64_IRREGS);
 	sp = (byte_t *)&state->scs_gpregs; /* Have `sp' point at the `icpustate' portion of `state' */
 	COMPILER_DELETE_ASSUMPTIONS(sp);
 	rc_state = (struct icpustate *)sp;
@@ -85,10 +85,10 @@ NOTHROW(FCALL task_asyncrpc_push)(struct scpustate *__restrict state,
 	/* Copy everything except the IRET tail into the new CPU state. */
 	memcpy(result_sstate, state, OFFSET_SCPUSTATE64_IRREGS);
 #else /* __x86_64__ */
-	STATIC_ASSERT(OFFSET_SCPUSTATE32_GPREGS == OFFSET_ICPUSTATE32_GPREGS);
-	STATIC_ASSERT(OFFSET_SCPUSTATE32_SGREGS + OFFSET_SGREGS32_FS == OFFSET_ICPUSTATE32_FS + 4);
-	STATIC_ASSERT(OFFSET_SCPUSTATE32_SGREGS + OFFSET_SGREGS32_ES == OFFSET_ICPUSTATE32_ES + 4);
-	STATIC_ASSERT(OFFSET_SCPUSTATE32_SGREGS + OFFSET_SGREGS32_DS == OFFSET_ICPUSTATE32_DS + 4);
+	static_assert(OFFSET_SCPUSTATE32_GPREGS == OFFSET_ICPUSTATE32_GPREGS);
+	static_assert(OFFSET_SCPUSTATE32_SGREGS + OFFSET_SGREGS32_FS == OFFSET_ICPUSTATE32_FS + 4);
+	static_assert(OFFSET_SCPUSTATE32_SGREGS + OFFSET_SGREGS32_ES == OFFSET_ICPUSTATE32_ES + 4);
+	static_assert(OFFSET_SCPUSTATE32_SGREGS + OFFSET_SGREGS32_DS == OFFSET_ICPUSTATE32_DS + 4);
 	u32 saved_gs = state->scs_sgregs.sg_gs;
 	/* To inplace-convert a `struct scpustate' into `struct icpustate', we essentially
 	 * just have to pluck out the `scs_sgregs.sg_gs' field by memmoveup-ing everything

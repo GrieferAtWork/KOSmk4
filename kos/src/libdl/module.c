@@ -30,6 +30,7 @@
 #include <kos/debugtrap.h>
 #include <kos/syscalls.h>
 
+#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
@@ -50,15 +51,13 @@ DECL_BEGIN
 
 
 /* Make sure that offsets in `struct link_map' are correct. */
-STATIC_ASSERT(offsetof(struct link_map, l_addr) == offsetof(DlModule, dm_loadaddr));
-STATIC_ASSERT(offsetof(struct link_map, l_name) == offsetof(DlModule, dm_filename));
-STATIC_ASSERT(offsetof(struct link_map, l_ld) == offsetof(DlModule, dm_dynhdr));
-STATIC_ASSERT(offsetof(struct link_map, l_next) == offsetof(DlModule, dm_modules.dle_next));
-STATIC_ASSERT(offsetof(struct link_map, l_prev) == offsetof(DlModule, dm_modules.dle_prev));
-
+static_assert(offsetof(struct link_map, l_addr) == offsetof(DlModule, dm_loadaddr));
+static_assert(offsetof(struct link_map, l_name) == offsetof(DlModule, dm_filename));
+static_assert(offsetof(struct link_map, l_ld) == offsetof(DlModule, dm_dynhdr));
+static_assert(offsetof(struct link_map, l_next) == offsetof(DlModule, dm_modules.dle_next));
+static_assert(offsetof(struct link_map, l_prev) == offsetof(DlModule, dm_modules.dle_prev));
 
 INTERN ElfW(Shdr) empty_shdr[1] = { 0 };
-
 
 /* Module finalizer functions. */
 INTDEF NONNULL((1)) void CC

@@ -69,16 +69,16 @@ INTDEF byte_t __kernel_pertask_start[];
 INTDEF byte_t __kernel_pertask_size[];
 
 /* Assert that static task-offsets are correct */
-STATIC_ASSERT(offsetof(struct task, t_self) == OFFSET_TASK_SELF);
-STATIC_ASSERT(offsetof(struct task, t_refcnt) == OFFSET_TASK_REFCNT);
-STATIC_ASSERT(offsetof(struct task, t_flags) == OFFSET_TASK_FLAGS);
-STATIC_ASSERT(offsetof(struct task, t_cpu) == OFFSET_TASK_CPU);
-STATIC_ASSERT(offsetof(struct task, t_mman) == OFFSET_TASK_MMAN);
-STATIC_ASSERT(offsetof(struct task, t_mman_tasks.le_next) == OFFSET_TASK_MMAN_TASKS_NEXT);
-STATIC_ASSERT(offsetof(struct task, t_mman_tasks.le_prev) == OFFSET_TASK_MMAN_TASKS_PREV);
-STATIC_ASSERT(offsetof(struct task, t_heapsz) == OFFSET_TASK_HEAPSZ);
-STATIC_ASSERT(offsetof(struct task, t_state) == OFFSET_TASK_STATE);
-STATIC_ASSERT(offsetof(struct task, _t_next) == OFFSET_TASK__NEXT);
+static_assert(offsetof(struct task, t_self) == OFFSET_TASK_SELF);
+static_assert(offsetof(struct task, t_refcnt) == OFFSET_TASK_REFCNT);
+static_assert(offsetof(struct task, t_flags) == OFFSET_TASK_FLAGS);
+static_assert(offsetof(struct task, t_cpu) == OFFSET_TASK_CPU);
+static_assert(offsetof(struct task, t_mman) == OFFSET_TASK_MMAN);
+static_assert(offsetof(struct task, t_mman_tasks.le_next) == OFFSET_TASK_MMAN_TASKS_NEXT);
+static_assert(offsetof(struct task, t_mman_tasks.le_prev) == OFFSET_TASK_MMAN_TASKS_PREV);
+static_assert(offsetof(struct task, t_heapsz) == OFFSET_TASK_HEAPSZ);
+static_assert(offsetof(struct task, t_state) == OFFSET_TASK_STATE);
+static_assert(offsetof(struct task, _t_next) == OFFSET_TASK__NEXT);
 
 
 PRIVATE ATTR_USED ATTR_SECTION(".data.pertask.head")

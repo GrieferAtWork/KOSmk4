@@ -20,6 +20,7 @@
 #ifndef GUARD_MODGDBSERVER_GDB_INFO_C
 #define GUARD_MODGDBSERVER_GDB_INFO_C 1
 #define _GNU_SOURCE 1
+#define _KOS_SOURCE 1
 
 #include "gdb-info.h"
 
@@ -933,8 +934,8 @@ XML_VERSION_HEADER
 	"<architecture>i386</architecture>"
 //	"<osabi>KOS</osabi>"
 ;
-STATIC_ASSERT(GDB_REGISTER_I386_FSBASE == 48);
-STATIC_ASSERT(GDB_REGISTER_I386_GSBASE == 49);
+static_assert(GDB_REGISTER_I386_FSBASE == 48);
+static_assert(GDB_REGISTER_I386_GSBASE == 49);
 PRIVATE char const GDBFeatures_target_xml2[] =
 	"<feature name=\"de.kos.gdb.i386.sgbase\">"
 		"<reg name=\"fs_base\" bitsize=\"32\" type=\"data_ptr\" regnum=\"48\"/>" /* GDB_REGISTER_I386_FSBASE */

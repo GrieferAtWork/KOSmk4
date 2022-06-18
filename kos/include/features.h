@@ -86,7 +86,11 @@
  * This is wrong, since `size_t' might not appear in the global namespace,
  * but only within the  std:: namespace. I tried  to fix this by  patching
  * its source, but  after realizing how  often it does  this, I just  gave
- * up and made this */
+ * up and made this
+ *
+ * When  this feature is enabled, <cstddef> will just behave the same
+ * as <stddef.h>, meaning all symbols are declared in `::' and `std'!
+ */
 #if defined(_BROKEN_CCOMPAT_SOURCE) || defined(_GLIBCXX_SHARED)
 #undef __USE_BROKEN_CCOMPAT
 #define __USE_BROKEN_CCOMPAT 1
@@ -112,7 +116,9 @@
 #define __USE_KOS              1 /* Various KOS extensions (e.g. `strend()') */
 #define __USE_STRING_BWLQ      1 /* `memcpy[bwlq]()' */
 #define __USE_STRING_XCHR      1 /* `memxchr()' */
-#define __USE_STRING_OVERLOADS 1 /* 4-argument `memcpy(dst, src, elem_count, elem_size)' */
+#define __USE_STRING_OVERLOADS 1 /* 4-argument `memcpy(dst, src, elem_count, elem_size)'
+                                  * Also overloads `malloc()', `calloc()', and some more
+                                  * libc functions. */
 #endif /* _KOS_SOURCE */
 
 /* KOS Kernel extensions/kernel-level data structures/functions
@@ -124,9 +130,9 @@
 #if (defined(_KOS_KERNEL_SOURCE) || \
      (defined(__KOS__) && defined(__KERNEL__) && !defined(__USE_ISOC_PURE)))
 #define __USE_KOS_KERNEL 1
-#if !defined(_KOS_PURE_SOURCE) || (_KOS_PURE_SOURCE + 0) != 0
+#if !defined(_KOS_PURE_SOURCE) || (-_KOS_PURE_SOURCE - 1) != -1
 #define __USE_KOS_PURE 1
-#endif /* !defined(_KOS_PURE_SOURCE) || _KOS_PURE_SOURCE != 0 */
+#endif /* !_KOS_PURE_SOURCE || (-_KOS_PURE_SOURCE - 1) != -1 */
 #else /* _KOS_KERNEL_SOURCE || (__KOS__ && __KERNEL__ && !__USE_ISOC_PURE) */
 /* KOS header purification.
  * This feature causes some old, or badly namespace'd macros, structs and
@@ -141,16 +147,16 @@
  * are  also enabled  (i.e. the default  when compiling code  for use within
  * the kernel; though in can be disabled with `#define _KOS_PURE_SOURCE 0'),
  * and disabled otherwise (i.e. when  compiling code for user-space;  though
- * can manually be enabled by `#define _KOS_PURE_SOURCE 1') */
-#if defined(_KOS_PURE_SOURCE) && (_KOS_PURE_SOURCE + 0) != 0
+ * can be enabled manually by `#define _KOS_PURE_SOURCE 1') */
+#if defined(_KOS_PURE_SOURCE) && (-_KOS_PURE_SOURCE - 1) != -1
 #define __USE_KOS_PURE 1
-#endif /* _KOS_PURE_SOURCE != 0 */
+#endif /* _KOS_PURE_SOURCE && (-_KOS_PURE_SOURCE - 1) != -1 */
 #endif /* !_KOS_KERNEL_SOURCE && (!__KOS__ || !__KERNEL__ || __USE_ISOC_PURE) */
 
 /* Certain KOS extensions may alter the prototyping or invocation behavior
  * or functions or data structures.  By default, this behavior is  enabled
  * for kernel-space (when `_KOS_KERNEL_SOURCE' is also implied), but  must
- * explicitly be enabled for user-space.
+ * be enabled explicitly for user-space.
  * Alterations include:
  *    - int sprintf() ->  size_t sprintf()
  *    - int printf()  -> ssize_t printf()

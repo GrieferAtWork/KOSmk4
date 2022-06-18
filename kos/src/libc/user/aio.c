@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBC_USER_AIO_C
 #define GUARD_LIBC_USER_AIO_C 1
+#define _KOS_SOURCE 1
 
 #include "../api.h"
 /**/
@@ -108,7 +109,7 @@ NOTHROW_NCX(LIBCCALL sigevent_notify)(struct sigevent const *__restrict self) {
 		break;
 
 	case SIGEV_THREAD: {
-		STATIC_ASSERT((sizeof(sigval_t) == sizeof(void *)));
+		static_assert((sizeof(sigval_t) == sizeof(void *)));
 		pthread_t p;
 		pthread_attr_t _attr;
 		pthread_attr_t *attr;
@@ -282,18 +283,18 @@ struct aio {
 	 sizeof(((struct aio *)0)->a) == sizeof(((struct aiocb *)0)->b) && \
 	 offsetof(struct aio, a) == offsetof(struct aiocb64, b) &&         \
 	 sizeof(((struct aio *)0)->a) == sizeof(((struct aiocb64 *)0)->b))
-STATIC_ASSERT(SAME_FIELD(aio_fildes, aio_fildes));
-STATIC_ASSERT(SAME_FIELD(aio_lio_opcode, aio_lio_opcode));
-STATIC_ASSERT(SAME_FIELD(aio_reqprio, aio_reqprio));
-STATIC_ASSERT(SAME_FIELD(aio_buf, aio_buf));
-STATIC_ASSERT(SAME_FIELD(aio_nbytes, aio_nbytes));
-STATIC_ASSERT(SAME_FIELD(aio_sigevent, aio_sigevent));
-STATIC_ASSERT(SAME_FIELD(aio_status.as_word, __error_code));
-STATIC_ASSERT(SAME_FIELD(aio_retval, __return_value));
-STATIC_ASSERT(offsetof(struct aio, aio_offset) == offsetof(struct aiocb, aio_offset));
-STATIC_ASSERT(offsetof(struct aio, aio_offset) == offsetof(struct aiocb64, aio_offset));
-STATIC_ASSERT(sizeof(struct aio) <= sizeof(struct aiocb));
-STATIC_ASSERT(sizeof(struct aio) <= sizeof(struct aiocb64));
+static_assert(SAME_FIELD(aio_fildes, aio_fildes));
+static_assert(SAME_FIELD(aio_lio_opcode, aio_lio_opcode));
+static_assert(SAME_FIELD(aio_reqprio, aio_reqprio));
+static_assert(SAME_FIELD(aio_buf, aio_buf));
+static_assert(SAME_FIELD(aio_nbytes, aio_nbytes));
+static_assert(SAME_FIELD(aio_sigevent, aio_sigevent));
+static_assert(SAME_FIELD(aio_status.as_word, __error_code));
+static_assert(SAME_FIELD(aio_retval, __return_value));
+static_assert(offsetof(struct aio, aio_offset) == offsetof(struct aiocb, aio_offset));
+static_assert(offsetof(struct aio, aio_offset) == offsetof(struct aiocb64, aio_offset));
+static_assert(sizeof(struct aio) <= sizeof(struct aiocb));
+static_assert(sizeof(struct aio) <= sizeof(struct aiocb64));
 
 /* Helper macros to unify `struct aiocb' variants into `struct aio' */
 #define aiocb_as_aio(self)   ((struct aio *)(self))

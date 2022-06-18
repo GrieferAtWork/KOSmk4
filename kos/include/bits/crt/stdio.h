@@ -25,8 +25,8 @@
 
 #include <bits/types.h>
 
-#define __SIZEOF_FPOS32_T__ __SIZEOF_POS32_T__
-#define __SIZEOF_FPOS64_T__ __SIZEOF_POS64_T__
+#define __SIZEOF_FPOS32_T__ __SIZEOF_OFF32_T__
+#define __SIZEOF_FPOS64_T__ __SIZEOF_OFF64_T__
 #define __SIZEOF_FPOS_T__   __FS_SIZEOF(FPOS)
 
 #ifdef __CC__
