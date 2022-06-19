@@ -673,6 +673,17 @@ NOTHROW(KCALL ktime)(void) {
 	return result;
 }
 
+PUBLIC NOBLOCK NOPREEMPT WUNUSED ktime_t
+NOTHROW(KCALL ktime_nopr)(void) {
+	ktime_t result;
+	struct cpu *me;
+	tsc_t now;
+	me     = THIS_CPU;
+	now    = tsc_get(me);
+	result = tsc_now_to_ktime(me, now);
+	return result;
+}
+
 
 PRIVATE atomic64_t last_stable_ktime = ATOMIC64_INIT(0);
 

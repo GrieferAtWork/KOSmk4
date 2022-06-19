@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26e7b84d */
+/* HASH CRC-32:0xfbf64b0d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -331,41 +331,52 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGPTR_TYPE__,__NOTHROW_RPC,__os_sysconf,(__STDC_I
 
 
 #ifdef __USE_POSIX199309
+/* Possible values for `clockid_t' arguments, as taken by:
+ * - clock_getres(2), clock_getres64(2)
+ * - clock_gettime(2), clock_gettime64(2)
+ * - clock_settime(2), clock_settime64(2)
+ * - clock_nanosleep(2), clock_nanosleep64(2)
+ * - timer_create(2) */
 #if !defined(CLOCK_REALTIME) && defined(__CLOCK_REALTIME)
-#define CLOCK_REALTIME           __CLOCK_REALTIME           /* TODO: Doc */
+#define CLOCK_REALTIME           __CLOCK_REALTIME           /* [rw] Realtime (wall) clock, in UTC (also used by `time(2)' and `gettimeofday(2)') */
 #endif /* !CLOCK_REALTIME && __CLOCK_REALTIME */
 #if !defined(CLOCK_MONOTONIC) && defined(__CLOCK_MONOTONIC)
-#define CLOCK_MONOTONIC          __CLOCK_MONOTONIC          /* TODO: Doc */
+#define CLOCK_MONOTONIC          __CLOCK_MONOTONIC          /* [ro] Time since system was booted (unaffected by system
+                                                             * time  changes)  Paused while  the system  is suspended. */
 #endif /* !CLOCK_MONOTONIC && __CLOCK_MONOTONIC */
 #if !defined(CLOCK_PROCESS_CPUTIME_ID) && defined(__CLOCK_PROCESS_CPUTIME_ID)
-#define CLOCK_PROCESS_CPUTIME_ID __CLOCK_PROCESS_CPUTIME_ID /* TODO: Doc */
+#define CLOCK_PROCESS_CPUTIME_ID __CLOCK_PROCESS_CPUTIME_ID /* [ro] Sum of CPU time consumed by all threads in calling process */
 #endif /* !CLOCK_PROCESS_CPUTIME_ID && __CLOCK_PROCESS_CPUTIME_ID */
 #if !defined(CLOCK_THREAD_CPUTIME_ID) && defined(__CLOCK_THREAD_CPUTIME_ID)
-#define CLOCK_THREAD_CPUTIME_ID  __CLOCK_THREAD_CPUTIME_ID  /* TODO: Doc */
+#define CLOCK_THREAD_CPUTIME_ID  __CLOCK_THREAD_CPUTIME_ID  /* [ro] Sum of CPU time consumed by calling thread */
 #endif /* !CLOCK_THREAD_CPUTIME_ID && __CLOCK_THREAD_CPUTIME_ID */
 #if !defined(CLOCK_MONOTONIC_RAW) && defined(__CLOCK_MONOTONIC_RAW)
-#define CLOCK_MONOTONIC_RAW      __CLOCK_MONOTONIC_RAW      /* TODO: Doc */
+#define CLOCK_MONOTONIC_RAW      __CLOCK_MONOTONIC_RAW      /* [ro] Raw,  hardware time since  system was started (stopped
+                                                             * while system is suspended), and unaffected by anything done
+                                                             * by `adjtime(3)' */
 #endif /* !CLOCK_MONOTONIC_RAW && __CLOCK_MONOTONIC_RAW */
 #if !defined(CLOCK_REALTIME_COARSE) && defined(__CLOCK_REALTIME_COARSE)
-#define CLOCK_REALTIME_COARSE    __CLOCK_REALTIME_COARSE    /* TODO: Doc */
+#define CLOCK_REALTIME_COARSE    __CLOCK_REALTIME_COARSE    /* [ro] Same as `CLOCK_REALTIME', but may be less precise, yet faster to query. */
 #endif /* !CLOCK_REALTIME_COARSE && __CLOCK_REALTIME_COARSE */
 #if !defined(CLOCK_MONOTONIC_COARSE) && defined(__CLOCK_MONOTONIC_COARSE)
-#define CLOCK_MONOTONIC_COARSE   __CLOCK_MONOTONIC_COARSE   /* TODO: Doc */
+#define CLOCK_MONOTONIC_COARSE   __CLOCK_MONOTONIC_COARSE   /* [ro] Same as `CLOCK_MONOTONIC', but may be less precise, yet faster to query. */
 #endif /* !CLOCK_MONOTONIC_COARSE && __CLOCK_MONOTONIC_COARSE */
 #if !defined(CLOCK_BOOTTIME) && defined(__CLOCK_BOOTTIME)
-#define CLOCK_BOOTTIME           __CLOCK_BOOTTIME           /* TODO: Doc */
+#define CLOCK_BOOTTIME           __CLOCK_BOOTTIME           /* [ro] Same as `CLOCK_MONOTONIC', but includes time the system was suspended. */
 #endif /* !CLOCK_BOOTTIME && __CLOCK_BOOTTIME */
 #if !defined(CLOCK_REALTIME_ALARM) && defined(__CLOCK_REALTIME_ALARM)
-#define CLOCK_REALTIME_ALARM     __CLOCK_REALTIME_ALARM     /* TODO: Doc */
+#define CLOCK_REALTIME_ALARM     __CLOCK_REALTIME_ALARM     /* [ro] Like `CLOCK_REALTIME'. If used with `timer_create()', system will leave suspension when timer is triggered */
 #endif /* !CLOCK_REALTIME_ALARM && __CLOCK_REALTIME_ALARM */
 #if !defined(CLOCK_BOOTTIME_ALARM) && defined(__CLOCK_BOOTTIME_ALARM)
-#define CLOCK_BOOTTIME_ALARM     __CLOCK_BOOTTIME_ALARM     /* TODO: Doc */
+#define CLOCK_BOOTTIME_ALARM     __CLOCK_BOOTTIME_ALARM     /* [ro] Like `CLOCK_BOOTTIME'. If used with `timer_create()', system will leave suspension when timer is triggered */
 #endif /* !CLOCK_BOOTTIME_ALARM && __CLOCK_BOOTTIME_ALARM */
 #if !defined(CLOCK_TAI) && defined(__CLOCK_TAI)
-#define CLOCK_TAI                __CLOCK_TAI                /* TODO: Doc */
+#define CLOCK_TAI                __CLOCK_TAI                /* [ro] Time.Atomic.International -- Like `CLOCK_REALTIME', but isn't affected by leap seconds. */
 #endif /* !CLOCK_TAI && __CLOCK_TAI */
+
+/* Flag for `timer_settime(2)' */
 #if !defined(TIMER_ABSTIME) && defined(__TIMER_ABSTIME)
-#define TIMER_ABSTIME            __TIMER_ABSTIME            /* TODO: Doc */
+#define TIMER_ABSTIME __TIMER_ABSTIME /* TODO: Doc */
 #endif /* !TIMER_ABSTIME && __TIMER_ABSTIME */
 #endif /* __USE_POSIX199309 */
 

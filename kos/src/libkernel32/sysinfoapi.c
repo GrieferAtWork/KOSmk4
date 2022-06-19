@@ -110,12 +110,19 @@ DEFINE_INTERN_ALIAS(libk32_GetNativeSystemInfo, libk32_GetSystemInfo);
 
 INTERN ULONGLONG WINAPI
 libk32_GetTickCount64(VOID) {
-	struct timeval tv;
+	struct timespec ts;
 	TRACE("GetTickCount64()");
-	/* TODO: We're supposed to return time since system was started */
-	gettimeofday(&tv, NULL);
-	return ((ULONGLONG)tv.tv_sec * 1000 +
-	        (ULONGLONG)tv.tv_usec / 1000);
+	if unlikely(clock_gettime(CLOCK_BOOTTIME, &ts)) {
+		struct timeval tv;
+		if unlikely(gettimeofday(&tv, NULL)) {
+			ts.tv_sec  = time(NULL);
+			ts.tv_nsec = 0;
+		}
+		ts.tv_sec  = tv.tv_sec;
+		ts.tv_nsec = tv.tv_usec * 1000;
+	}
+	return ((ULONGLONG)ts.tv_sec * 1000 +
+	        (ULONGLONG)ts.tv_nsec / 1000000);
 }
 
 INTERN DWORD WINAPI

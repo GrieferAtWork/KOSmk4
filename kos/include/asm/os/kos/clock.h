@@ -27,17 +27,22 @@
 /************************************************************************/
 #define __CLOCKS_PER_SEC 1000000
 
-#define __CLOCK_REALTIME           0  /* TODO: Doc */
-#define __CLOCK_MONOTONIC          1  /* TODO: Doc */
-#define __CLOCK_PROCESS_CPUTIME_ID 2  /* TODO: Doc */
-#define __CLOCK_THREAD_CPUTIME_ID  3  /* TODO: Doc */
-#define __CLOCK_MONOTONIC_RAW      4  /* TODO: Doc */
-#define __CLOCK_REALTIME_COARSE    5  /* TODO: Doc */
-#define __CLOCK_MONOTONIC_COARSE   6  /* TODO: Doc */
-#define __CLOCK_BOOTTIME           7  /* TODO: Doc */
-#define __CLOCK_REALTIME_ALARM     8  /* TODO: Doc */
-#define __CLOCK_BOOTTIME_ALARM     9  /* TODO: Doc */
-#define __CLOCK_TAI                11 /* TODO: Doc */
-#define __TIMER_ABSTIME            1  /* TODO: Doc */
+#define __CLOCK_REALTIME           0  /* [rw] Realtime (wall) clock, in UTC (also used by `time(2)' and `gettimeofday(2)') */
+#define __CLOCK_MONOTONIC          1  /* [ro] Time since system was booted (unaffected by system
+                                       * time  changes)  Paused while  the system  is suspended. */
+#define __CLOCK_PROCESS_CPUTIME_ID 2  /* [ro] Sum of CPU time consumed by all threads in calling process */
+#define __CLOCK_THREAD_CPUTIME_ID  3  /* [ro] Sum of CPU time consumed by calling thread */
+#define __CLOCK_MONOTONIC_RAW      4  /* [ro] Raw,  hardware time since  system was started (stopped
+                                       * while system is suspended), and unaffected by anything done
+                                       * by `adjtime(3)' */
+#define __CLOCK_REALTIME_COARSE    5  /* [ro] Same as `CLOCK_REALTIME', but may be less precise, yet faster to query. */
+#define __CLOCK_MONOTONIC_COARSE   6  /* [ro] Same as `CLOCK_MONOTONIC', but may be less precise, yet faster to query. */
+#define __CLOCK_BOOTTIME           7  /* [ro] Same as `CLOCK_MONOTONIC', but includes time the system was suspended. */
+#define __CLOCK_REALTIME_ALARM     8  /* [ro] Like `CLOCK_REALTIME'. If used with `timer_create()', system will leave suspension when timer is triggered */
+#define __CLOCK_BOOTTIME_ALARM     9  /* [ro] Like `CLOCK_BOOTTIME'. If used with `timer_create()', system will leave suspension when timer is triggered */
+#define __CLOCK_TAI                11 /* [ro] Time.Atomic.International -- Like `CLOCK_REALTIME', but isn't affected by leap seconds. */
+
+/* Flag for `timer_settime(2)' */
+#define __TIMER_ABSTIME 1 /* TODO: Doc */
 
 #endif /* !_ASM_OS_KOS_CLOCK_H */

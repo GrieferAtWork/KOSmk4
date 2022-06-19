@@ -214,6 +214,7 @@ NOTHROW(FCALL tsc_offset_to_ktime)(struct cpu const *__restrict me,
  * NOTE: This function is the same as doing `tsc_now_to_ktime(tsc_now())'
  *       while having preemption disabled. */
 FUNDEF NOBLOCK WUNUSED ktime_t NOTHROW(KCALL ktime)(void);
+FUNDEF NOBLOCK NOPREEMPT WUNUSED ktime_t NOTHROW(KCALL ktime_nopr)(void);
 
 /* Same as `ktime()', but ensure that the `return >= <any-previous-return>' */
 FUNDEF NOBLOCK WUNUSED ktime_t NOTHROW(KCALL ktime_stable)(void);

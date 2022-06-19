@@ -187,6 +187,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS,       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `getrandom(2)' isn't a set of `GRND_NONBLOCK | GRND_RANDOM' */
 	E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_RESOURCE,      /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown/unsupported `resource' argument passed to `prlimit64(2)', `getrlimit(2)' or `setrlimit(2)' */
 	E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_BADLIMIT,      /* E_INVALID_ARGUMENT_BAD_VALUE: `new_rlim->rlim_cur > new_rlim->rlim_max' in call to `prlimit64(2)' or `setrlimit(2)' */
+	E_INVALID_ARGUMENT_CONTEXT_BAD_CLOCKID,           /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `clockid_t' passed to system call */
 
 	/* system call: `fcntl(2)' */
 	E_INVALID_ARGUMENT_CONTEXT_FCNTL_COMMAND = 0x1000, /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown fcntl() command */
@@ -469,6 +470,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS                  E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS                  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `getrandom(2)' isn't a set of `GRND_NONBLOCK | GRND_RANDOM' */
 #define E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_RESOURCE                 E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_RESOURCE                 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown/unsupported `resource' argument passed to `prlimit64(2)', `getrlimit(2)' or `setrlimit(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_BADLIMIT                 E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_BADLIMIT                 /* E_INVALID_ARGUMENT_BAD_VALUE: `new_rlim->rlim_cur > new_rlim->rlim_max' in call to `prlimit64(2)' or `setrlimit(2)' */
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_CLOCKID                      E_INVALID_ARGUMENT_CONTEXT_BAD_CLOCKID                      /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `clockid_t' passed to system call */
 /* system call: `fcntl(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_FCNTL_COMMAND                    E_INVALID_ARGUMENT_CONTEXT_FCNTL_COMMAND                    /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown fcntl() command */
 #define E_INVALID_ARGUMENT_CONTEXT_F_SETFD_FDFLAGS                  E_INVALID_ARGUMENT_CONTEXT_F_SETFD_FDFLAGS                  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -730,6 +732,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS                  3078 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `getrandom(2)' isn't a set of `GRND_NONBLOCK | GRND_RANDOM' */
 #define E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_RESOURCE                 3079 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown/unsupported `resource' argument passed to `prlimit64(2)', `getrlimit(2)' or `setrlimit(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_BADLIMIT                 3080 /* E_INVALID_ARGUMENT_BAD_VALUE: `new_rlim->rlim_cur > new_rlim->rlim_max' in call to `prlimit64(2)' or `setrlimit(2)' */
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_CLOCKID                      3081 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `clockid_t' passed to system call */
 /* system call: `fcntl(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_FCNTL_COMMAND                    4096 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown fcntl() command */
 #define E_INVALID_ARGUMENT_CONTEXT_F_SETFD_FDFLAGS                  4097 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
