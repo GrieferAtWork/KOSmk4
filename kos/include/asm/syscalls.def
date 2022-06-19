@@ -1940,21 +1940,21 @@ clock_settimex64:(clockid_t clock_id, [tostr(STRUCT_TIMESPECX64)] struct timespe
 %[endgroup]
 
 %[startgroup]
-clock_gettime:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPEC)] struct timespec *tp) -> errno_t;                   /* UNIMPLEMENTED! */
-clock_gettime32:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPEC32)] struct timespec32 *tp) -> errno_t;             /* UNIMPLEMENTED! */
-clock_gettime64:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPEC64)] struct timespec64 *tp) -> errno_t;             /* UNIMPLEMENTED! */
-clock_gettimex32:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPECX32)] struct timespecx32 *tp) -> errno_t;          /* UNIMPLEMENTED! */
-clock_gettimex32_64:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPECX32_64)] struct timespecx32_64 *tp) -> errno_t; /* UNIMPLEMENTED! */
-clock_gettimex64:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPECX64)] struct timespecx64 *tp) -> errno_t;          /* UNIMPLEMENTED! */
+clock_gettime:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPEC)] struct timespec *tp) -> errno_t;
+clock_gettime32:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPEC32)] struct timespec32 *tp) -> errno_t;
+clock_gettime64:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPEC64)] struct timespec64 *tp) -> errno_t;
+clock_gettimex32:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPECX32)] struct timespecx32 *tp) -> errno_t;
+clock_gettimex32_64:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPECX32_64)] struct timespecx32_64 *tp) -> errno_t;
+clock_gettimex64:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPECX64)] struct timespecx64 *tp) -> errno_t;
 %[endgroup]
 
 %[startgroup]
-clock_getres:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPEC)] struct timespec *res) -> errno_t;                   /* UNIMPLEMENTED! */
-clock_getres32:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPEC32)] struct timespec32 *res) -> errno_t;             /* UNIMPLEMENTED! */
-clock_getres64:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPEC64)] struct timespec64 *res) -> errno_t;             /* UNIMPLEMENTED! */
-clock_getresx32:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPECX32)] struct timespecx32 *res) -> errno_t;          /* UNIMPLEMENTED! */
-clock_getresx32_64:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPECX32_64)] struct timespecx32_64 *res) -> errno_t; /* UNIMPLEMENTED! */
-clock_getresx64:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPECX64)] struct timespecx64 *res) -> errno_t;          /* UNIMPLEMENTED! */
+clock_getres:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPEC)] struct timespec *res) -> errno_t;
+clock_getres32:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPEC32)] struct timespec32 *res) -> errno_t;
+clock_getres64:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPEC64)] struct timespec64 *res) -> errno_t;
+clock_getresx32:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPECX32)] struct timespecx32 *res) -> errno_t;
+clock_getresx32_64:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPECX32_64)] struct timespecx32_64 *res) -> errno_t;
+clock_getresx64:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPECX64)] struct timespecx64 *res) -> errno_t;
 %[endgroup]
 
 %[startgroup]
@@ -1963,12 +1963,12 @@ clock_getresx64:(clockid_t clock_id, [tostr(out:STRUCT_TIMESPECX64)] struct time
 @@@param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
 @@                  Other clock IDs cannot be used with this system call!
 @@@param: flags:    Set of `0 | TIMER_ABSTIME'
-[cp][restart(dont)] clock_nanosleep:(clockid_t clock_id, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPEC)] struct timespec const *requested_time, [tostr(out:STRUCT_TIMESPEC)] struct timespec *remaining) -> errno_t;                               /* UNIMPLEMENTED! */
-[cp][restart(dont)] clock_nanosleep32:(clockid_t clock_id, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *requested_time, [tostr(out:STRUCT_TIMESPEC32)] struct timespec32 *remaining) -> errno_t;                     /* UNIMPLEMENTED! */
-[cp][restart(dont)] clock_nanosleep64:(clockid_t clock_id, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *requested_time, [tostr(out:STRUCT_TIMESPEC64)] struct timespec64 *remaining) -> errno_t;                     /* UNIMPLEMENTED! */
-[cp][restart(dont)] clock_nanosleepx32:(clockid_t clock_id, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *requested_time, [tostr(out:STRUCT_TIMESPECX32)] struct timespecx32 *remaining) -> errno_t;                /* UNIMPLEMENTED! */
-[cp][restart(dont)] clock_nanosleepx32_64:(clockid_t clock_id, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *requested_time, [tostr(out:STRUCT_TIMESPECX32_64)] struct timespecx32_64 *remaining) -> errno_t; /* UNIMPLEMENTED! */
-[cp][restart(dont)] clock_nanosleepx64:(clockid_t clock_id, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *requested_time, [tostr(out:STRUCT_TIMESPECX64)] struct timespecx64 *remaining) -> errno_t;                /* UNIMPLEMENTED! */
+[cp][restart(dont)] clock_nanosleep:(clockid_t clock_id, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPEC)] struct timespec const *requested_time, [tostr(out:STRUCT_TIMESPEC)] struct timespec *remaining) -> errno_t;
+[cp][restart(dont)] clock_nanosleep32:(clockid_t clock_id, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *requested_time, [tostr(out:STRUCT_TIMESPEC32)] struct timespec32 *remaining) -> errno_t;
+[cp][restart(dont)] clock_nanosleep64:(clockid_t clock_id, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *requested_time, [tostr(out:STRUCT_TIMESPEC64)] struct timespec64 *remaining) -> errno_t;
+[cp][restart(dont)] clock_nanosleepx32:(clockid_t clock_id, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *requested_time, [tostr(out:STRUCT_TIMESPECX32)] struct timespecx32 *remaining) -> errno_t;
+[cp][restart(dont)] clock_nanosleepx32_64:(clockid_t clock_id, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *requested_time, [tostr(out:STRUCT_TIMESPECX32_64)] struct timespecx32_64 *remaining) -> errno_t;
+[cp][restart(dont)] clock_nanosleepx64:(clockid_t clock_id, [tostr(TIMER_FLAGS)] syscall_ulong_t flags, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *requested_time, [tostr(out:STRUCT_TIMESPECX64)] struct timespecx64 *remaining) -> errno_t;
 %[endgroup]
 
 
