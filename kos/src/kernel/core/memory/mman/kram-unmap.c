@@ -71,11 +71,11 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
-STATIC_ASSERT_MSG(sizeof(struct mman_unmap_kram_job) <= PAGESIZE,
-                  "There's really no reason for this to fail, but you should "
-                  "be aware that code below assumes that an unmap-job can be "
-                  "stored in a single page, thus allowing it to be stored in "
-                  "its own unmap-area (s.a. `mman_unmap_kram()')");
+static_assert(sizeof(struct mman_unmap_kram_job) <= PAGESIZE,
+              "There's really no reason for this to fail, but you should "
+              "be aware that code below assumes that an unmap-job can be "
+              "stored in a single page, thus allowing it to be stored in "
+              "its own unmap-area (s.a. `mman_unmap_kram()')");
 
 #ifndef CONFIG_NO_SMP
 /* Atomic counter for how many CPUs are currently initializing hinted pages (s.a. `MNODE_F_MHINT').

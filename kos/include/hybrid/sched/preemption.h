@@ -64,7 +64,7 @@
  *   - If  doing so grants  improved performance (iow: `preemption_tryyield()'
  *     and `preemption_tryyield_nopr()' are different functions), then briefly
  *     restore the preemption behavior of `p_flag', follow this up with a call
- *     to  `preemption_tryyield()',  before finally  disabling  preemption one
+ *     to `preemption_tryyield()',  before finally  disabling preemption  once
  *     again with a call to `preemption_pushoff()'.
  *     When  `preemption_tryyield()'  and `preemption_tryyield_nopr()'  are the
  *     same function, `p_flag' is ignored and `preemption_tryyield()' is called
@@ -82,6 +82,11 @@
  *     to  become the only thread that's still running in the caller's
  *     address space. (Iow:  anything that's done  at this point  will
  *     appear to have happened atomically to other threads)
+ *   - This is the case in 2 situations:
+ *     - When building kernel-code for an operating system
+ *       configured  to  now  support  more  than  one CPU
+ *     - When building user-code when  threads aren't used, or  the
+ *       threading library is based on signal + alarm + swapcontext
  *
  * - #define PREEMPTION_NO_CONTROL
  *   - Defined if preemption cannot be controlled (in this case, all of the

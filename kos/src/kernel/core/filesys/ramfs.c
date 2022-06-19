@@ -1213,11 +1213,11 @@ NOTHROW(KCALL ramfs_super_v_destroy)(struct mfile *__restrict self) {
 PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) bool
 NOTHROW(KCALL ramfs_delete_all_files)(struct ramfs_dirnode *dir,
                                       /*inherit(always)*/ REF struct ramfs_super *super);
-STATIC_ASSERT_MSG(offsetof(struct ramfs_dirent, _rde_dead) ==
-                  offsetof(struct ramfs_dirent, rde_treenode.rb_rhs),
-                  "This ensures that .rb_lhs == RAMFS_DIRENT_TREENODE_DELETED can still "
-                  "be used as normal, together with the fact that the containing dir has "
-                  "been deleted, which combines into giving us free reign over `rb_rhs'");
+static_assert(offsetof(struct ramfs_dirent, _rde_dead) ==
+              offsetof(struct ramfs_dirent, rde_treenode.rb_rhs),
+              "This ensures that .rb_lhs == RAMFS_DIRENT_TREENODE_DELETED can still "
+              "be used as normal, together with the fact that the containing dir has "
+              "been deleted, which combines into giving us free reign over `rb_rhs'");
 
 
 

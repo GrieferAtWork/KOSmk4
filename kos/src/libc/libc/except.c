@@ -196,8 +196,8 @@ void LIBCCALL initialize_libunwind(void) {
 	*(void **)&pdyn_unwind_fde_sigframe_exec  = dlsym(handle, name_unwind_fde_sigframe_exec);
 	*(void **)&pdyn_unwind_cfa_sigframe_apply = dlsym(handle, name_unwind_cfa_sigframe_apply);
 	if unlikely(!pdyn_unwind_fde_sigframe_exec || !pdyn_unwind_cfa_sigframe_apply) {
-		STATIC_ASSERT_MSG(sizeof(unwind_cfa_sigframe_state_t) >= sizeof(unwind_cfa_state_t),
-		                  "This is a requirement for this substitution (see usage of these functions)");
+		static_assert(sizeof(unwind_cfa_sigframe_state_t) >= sizeof(unwind_cfa_state_t),
+		              "This is a requirement for this substitution (see usage of these functions)");
 		pdyn_unwind_fde_sigframe_exec  = (PUNWIND_FDE_SIGFRAME_EXEC)pdyn_unwind_fde_exec;
 		pdyn_unwind_cfa_sigframe_apply = (PUNWIND_CFA_SIGFRAME_APPLY)pdyn_unwind_cfa_apply;
 	}

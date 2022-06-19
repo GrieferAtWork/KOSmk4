@@ -32,6 +32,7 @@
 
 #include <kos/syscalls.h>
 
+#include <assert.h>
 #include <inttypes.h>
 #include <malloc.h>
 #include <stddef.h>
@@ -63,8 +64,8 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
-STATIC_ASSERT_MSG(offsetof(struct dltls_segment, ts_self) == 0,
-                  "The self-pointer being at offset=0 is ABI mandated");
+static_assert(offsetof(struct dltls_segment, ts_self) == 0,
+              "The self-pointer being at offset=0 is ABI mandated");
 
 /* Minimum alignment of the static TLS segment. */
 PRIVATE size_t tls_segment_align = COMPILER_ALIGNOF(struct dltls_segment);

@@ -58,11 +58,11 @@
 
 DECL_BEGIN
 
-STATIC_ASSERT_MSG(NSIG - 1 <= 0xff,
-                  "This is an ABI requirement imposed by:\n"
-                  " - clone(2)\n"
-                  " - RPC_SIGNO_MASK\n"
-                  " - RPC_OP_sigblock");
+static_assert(NSIG - 1 <= 0xff,
+              "This is an ABI requirement imposed by:\n"
+              " - clone(2)\n"
+              " - RPC_SIGNO_MASK\n"
+              " - RPC_OP_sigblock");
 
 
 /* Raise a posix signal within a given thread `target'

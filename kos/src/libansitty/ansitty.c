@@ -236,9 +236,9 @@ DECL_BEGIN
 #define CP_SWEDISH         12 /* \e(7  \e(H         -- Swedish, VT200. */
 #define CP_SWISS           13 /* \e(=               -- Swiss, VT200. */
 
-STATIC_ASSERT_MSG(CP_UTF8 == 0,
-                  "CP=0 meaning UTF-8 appears in documentation "
-                  "and is therefor part of the API/ABI");
+static_assert(CP_UTF8 == 0,
+              "CP=0 meaning UTF-8 appears in documentation "
+              "and is therefor part of the API/ABI");
 
 
 /* Anything in this range (should) exit escape mode. */

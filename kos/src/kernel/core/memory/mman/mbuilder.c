@@ -67,11 +67,11 @@ static_assert(offsetof(struct mnode, mn_partoff) == offsetof(struct mbnode, _mbn
 static_assert(offsetof(struct mnode, mn_link) == offsetof(struct mbnode, _mbn_link));
 static_assert(offsetof(struct mnode, mn_writable) == offsetof(struct mbnode, _mbn_writable));
 static_assert(offsetof(struct mnode, mn_module) == offsetof(struct mbnode, _mbn_module));
-STATIC_ASSERT_MSG(offsetof(struct mnode, mn_writable) == offsetof(struct mbnode, mbn_nxtuprt),
-                  "This is needed so that all non-unique-part nodes already have their writable "
-                  "link initialized as unbound, and all unique-part nodes can still be enumerated "
-                  "in `mbuilder_apply_impl' after the new node-tree has been assigned to the target "
-                  "mman, and all of the part<->node links have been set-up.");
+static_assert(offsetof(struct mnode, mn_writable) == offsetof(struct mbnode, mbn_nxtuprt),
+              "This is needed so that all non-unique-part nodes already have their writable "
+              "link initialized as unbound, and all unique-part nodes can still be enumerated "
+              "in `mbuilder_apply_impl' after the new node-tree has been assigned to the target "
+              "mman, and all of the part<->node links have been set-up.");
 
 
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)

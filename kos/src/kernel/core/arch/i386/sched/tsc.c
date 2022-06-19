@@ -671,8 +671,8 @@ done:
 
 /* Make sure that the PIT HZ value that we're to use for calibration can
  * even be represented as a constant to be passed to the PIT  circuitry. */
-STATIC_ASSERT_MSG(PIT_HZ_DIV(X86_TSC_CALIBRATE_DELAY_HZ) <= UINT16_MAX,
-                  "X86_TSC_CALIBRATE_DELAY_HZ is too low");
+static_assert(PIT_HZ_DIV(X86_TSC_CALIBRATE_DELAY_HZ) <= UINT16_MAX,
+              "X86_TSC_CALIBRATE_DELAY_HZ is too low");
 
 /* (Re-)calibrate `thiscpu_tsc_hz' for the calling CPU.
  * This function is arch-specific and called once for each CPU during bootup.

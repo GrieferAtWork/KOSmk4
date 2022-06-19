@@ -945,18 +945,18 @@ NOTHROW(FCALL mpart_all_list_insert)(struct mpart *__restrict self) {
 		_mpart_all_list_insert(self);
 		mpart_all_release();
 	} else {
-		STATIC_ASSERT_MSG(offsetof(struct mpart, mp_allparts.le_prev) ==
-		                  offsetof(struct mpart, _mp_lopall.lo_func),
-		                  "This is an implementation default that is required, such that "
-		                  "a mem-part that's still being added to the all-parts list via "
-		                  "async means can still be tested via `LIST_ISBOUND()' for being "
-		                  "apart of the all-parts list:\n"
-		                  "While the async `async_add2all_mpart_lop_cb()' is pending, the "
-		                  "lo_func field of the lop will be non-NULL, and `LIST_ISBOUND()' "
-		                  "is implemented to check if `le_prev' is non-NULL.\n"
-		                  "So we put the 2 together such that `le_prev' will also appear as "
-		                  "non-NULL for as long as the async add2all hasn't been serviced "
-		                  "yet, thus keeping everything consistent.");
+		static_assert(offsetof(struct mpart, mp_allparts.le_prev) ==
+		              offsetof(struct mpart, _mp_lopall.lo_func),
+		              "This is an implementation default that is required, such that "
+		              "a mem-part that's still being added to the all-parts list via "
+		              "async means can still be tested via `LIST_ISBOUND()' for being "
+		              "apart of the all-parts list:\n"
+		              "While the async `async_add2all_mpart_lop_cb()' is pending, the "
+		              "lo_func field of the lop will be non-NULL, and `LIST_ISBOUND()' "
+		              "is implemented to check if `le_prev' is non-NULL.\n"
+		              "So we put the 2 together such that `le_prev' will also appear as "
+		              "non-NULL for as long as the async add2all hasn't been serviced "
+		              "yet, thus keeping everything consistent.");
 
 		/* Enqueue `self' as a pending globally visible part. */
 		incref(self); /* This reference is inherited by `mpart_all_pending' */

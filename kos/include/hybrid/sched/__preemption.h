@@ -64,7 +64,7 @@
  *   - If  doing so grants  improved performance (iow: `__hybrid_preemption_tryyield()'
  *     and `__hybrid_preemption_tryyield_nopr()' are different functions), then briefly
  *     restore the  preemption behavior  of `p_flag',  follow this  up with  a call  to
- *     `__hybrid_preemption_tryyield()',  before finally disabling preemption one again
+ *     `__hybrid_preemption_tryyield()', before finally disabling preemption once again
  *     with a call to `__hybrid_preemption_pushoff()'.
  *     When `__hybrid_preemption_tryyield()' and `__hybrid_preemption_tryyield_nopr()'
  *     are the same function, `p_flag' is ignored and `__hybrid_preemption_tryyield()'
@@ -82,6 +82,11 @@
  *     to become the only thread that's  still running in the caller's  address
  *     space. (Iow: anything  that's done  at this  point will  appear to  have
  *     happened atomically to other threads)
+ *   - This is the case in 2 situations:
+ *     - When building kernel-code for an operating system
+ *       configured  to  now  support  more  than  one CPU
+ *     - When building user-code when  threads aren't used, or  the
+ *       threading library is based on signal + alarm + swapcontext
  *
  * - #define __HYBRID_PREEMPTION_NO_CONTROL
  *   - Defined if preemption cannot be controlled (in this case, all of the
@@ -247,9 +252,9 @@ __NOTHROW(__hybrid_private_preemption_pushoff)(sigset_t *__restrict __p_flag) {
 }
 __LOCAL __ATTR_PURE __ATTR_WUNUSED __BOOL
 __NOTHROW(__hybrid_private_preemption_ison)(void) {
-	sigset_t __hpp_nss;
-	__libc_sigprocmask(SIG_SETMASK, __NULLPTR, &__hpp_nss);
-	return !__hybrid_sigisemptyset(&__hpp_nss)
+	sigset_t __hpio_nss;
+	__libc_sigprocmask(SIG_SETMASK, __NULLPTR, &__hpio_nss);
+	return !__hybrid_sigisemptyset(&__hpio_nss)
 }
 __NAMESPACE_INT_END
 __DECL_END
@@ -260,11 +265,11 @@ __DECL_END
 		__libc_sigfillset(&__hpp_nss);                         \
 		__libc_sigprocmask(__SIG_SETMASK, p_flag, &__hpp_nss); \
 	})
-#define __hybrid_preemption_ison()                                \
-	__XBLOCK({                                                    \
-		struct __sigset_struct __hpp_nss;                         \
-		__libc_sigprocmask(__SIG_SETMASK, __NULLPTR, &__hpp_nss); \
-		__XRETURN !__libc_sigisemptyset(&__hpp_nss);              \
+#define __hybrid_preemption_ison()                                 \
+	__XBLOCK({                                                     \
+		struct __sigset_struct __hpio_nss;                         \
+		__libc_sigprocmask(__SIG_SETMASK, __NULLPTR, &__hpio_nss); \
+		__XRETURN !__libc_sigisemptyset(&__hpio_nss);              \
 	})
 #endif /* !__NO_XBLOCK */
 #endif /* ... */
@@ -328,9 +333,9 @@ __NOTHROW(__hybrid_private_preemption_pushoff)(sigset_t *__restrict __p_flag) {
 }
 __LOCAL __ATTR_PURE __ATTR_WUNUSED __BOOL
 __NOTHROW(__hybrid_private_preemption_ison)(void) {
-	sigset_t __hpp_nss;
-	sigprocmask(SIG_SETMASK, __NULLPTR, &__hpp_nss);
-	return !__hybrid_sigisemptyset(&__hpp_nss)
+	sigset_t __hpio_nss;
+	sigprocmask(SIG_SETMASK, __NULLPTR, &__hpio_nss);
+	return !__hybrid_sigisemptyset(&__hpio_nss)
 }
 __NAMESPACE_INT_END
 __DECL_END
@@ -341,11 +346,11 @@ __DECL_END
 		__hybrid_sigfillset(&__hpp_nss);              \
 		sigprocmask(SIG_SETMASK, p_flag, &__hpp_nss); \
 	})
-#define __hybrid_preemption_ison()                       \
-	__XBLOCK({                                           \
-		struct __sigset_struct __hpp_nss;                \
-		sigprocmask(SIG_SETMASK, __NULLPTR, &__hpp_nss); \
-		__XRETURN !__hybrid_sigisemptyset(&__hpp_nss);   \
+#define __hybrid_preemption_ison()                        \
+	__XBLOCK({                                            \
+		struct __sigset_struct __hpio_nss;                \
+		sigprocmask(SIG_SETMASK, __NULLPTR, &__hpio_nss); \
+		__XRETURN !__hybrid_sigisemptyset(&__hpio_nss);   \
 	})
 #endif /* !__NO_XBLOCK */
 

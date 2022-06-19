@@ -19,10 +19,12 @@
  */
 #ifndef GUARD_LIBC_USER_UNICODE_C
 #define GUARD_LIBC_USER_UNICODE_C 1
+#define _KOS_SOURCE 1
 
 #include "../api.h"
 /**/
 
+#include <assert.h>
 #include <stdio.h>
 
 #include "unicode.h"
@@ -77,8 +79,8 @@ PRIVATE uint16_t const unicode_tab2[42];
 #include "unicode/db.dat"
 #endif /* !__INTELLISENSE__ */
 
-STATIC_ASSERT_MSG(UNICODE_FOLD_MAXLEN <= UNICODE_FOLDED_MAX,
-                  "UNICODE_FOLDED_MAX must be increased!");
+static_assert(UNICODE_FOLD_MAXLEN <= UNICODE_FOLDED_MAX,
+              "UNICODE_FOLDED_MAX must be increased!");
 
 /*[[[head:libc___unicode_descriptor,hash:CRC-32=0x5884f74e]]]*/
 /* >> __unicode_descriptor(3)

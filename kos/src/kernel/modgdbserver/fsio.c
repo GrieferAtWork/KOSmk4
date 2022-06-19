@@ -217,8 +217,8 @@ NOTHROW(KCALL GDBFs_RegisterHandle)(/*inherit(on_success)*/ REF struct handle co
 	                                   new_count * sizeof(struct handle),
 	                                   GFP_NORMAL | GFP_CALLOC);
 	if unlikely(!vec) {
-		STATIC_ASSERT_MSG(HANDLE_TYPE_UNDEFINED == 0,
-		                  "We pass `GFP_CALLOC' because of this");
+		static_assert(HANDLE_TYPE_UNDEFINED == 0,
+		              "We pass `GFP_CALLOC' because of this");
 		new_count = GDBFs.fi_halloc + 1;
 		vec = (struct handle *)krealloc_nx(GDBFs.fi_hvector,
 		                                   new_count * sizeof(struct handle),

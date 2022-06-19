@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBC_USER_DIRENT_C
 #define GUARD_LIBC_USER_DIRENT_C 1
+#define _KOS_SOURCE 1
 
 #include "../api.h"
 /**/
@@ -1138,8 +1139,8 @@ NOTHROW_NCX(LIBCCALL libc_versionsortk64)(struct dirent64 const **e1,
 /*[[[end:libc_versionsortk64]]]*/
 
 
-STATIC_ASSERT_MSG(offsetof(struct glibc_dirent64, d_name) != offsetof(struct dirent64, d_name),
-                  "If this fails, then there is either ");
+static_assert(offsetof(struct glibc_dirent64, d_name) != offsetof(struct dirent64, d_name),
+              "If this fails, then there is either ");
 INTERN ATTR_SECTION(".text.crt.fs.dir") ATTR_PURE NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_alphasort64)(struct glibc_dirent64 const **e1,
                                        struct glibc_dirent64 const **e2) {

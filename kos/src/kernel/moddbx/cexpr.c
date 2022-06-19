@@ -1927,9 +1927,9 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_rvalue)(void) {
 	if (CTYPE_KIND_ISARRAY(top->cv_type.ct_typ->ct_kind)) {
 		struct ctyperef array_elem_type;
 		REF struct ctype *array_elem_pointer_type;
-		STATIC_ASSERT_MSG(offsetof(struct cvalue, cv_addr) == offsetof(struct cvalue, cv_idata),
-		                  "This is required so we don't have to copy the old address into the "
-		                  "new inline-data field");
+		static_assert(offsetof(struct cvalue, cv_addr) == offsetof(struct cvalue, cv_idata),
+		              "This is required so we don't have to copy the old address into the "
+		              "new inline-data field");
 		/* Try to load the address of a CFI expression. */
 		if (top->cv_kind == CVALUE_KIND_EXPR ||
 		    top->cv_kind == CVALUE_KIND_IEXPR) {
@@ -2177,9 +2177,9 @@ NOTHROW(FCALL cexpr_field)(char const *__restrict name,
 PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_ref)(void) {
 	struct cvalue *top;
 	struct ctype *typ;
-	STATIC_ASSERT_MSG(offsetof(struct cvalue, cv_addr) == offsetof(struct cvalue, cv_idata),
-	                  "This is required so we don't have to copy the old address into the "
-	                  "new inline-data field");
+	static_assert(offsetof(struct cvalue, cv_addr) == offsetof(struct cvalue, cv_idata),
+	              "This is required so we don't have to copy the old address into the "
+	              "new inline-data field");
 	if unlikely(!cexpr_stacksize)
 		return DBX_EINTERN;
 	top = &cexpr_stacktop;

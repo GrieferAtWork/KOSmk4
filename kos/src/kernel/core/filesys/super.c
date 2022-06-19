@@ -81,10 +81,10 @@ NOTHROW(FCALL fsuper_add2changed)(struct fsuper *__restrict self) {
 	if (!fsuper_haschanged(self))
 #endif /* !__OPTIMIZE_SIZE__ */
 	{
-		STATIC_ASSERT_MSG(offsetof(struct fsuper, fs_changedsuper.le_prev) ==
-		                  offsetof(struct fsuper, _fs_changedsuper_lop.lo_func),
-		                  "This is required for the ATOMIC_CMPXCH below to "
-		                  "be thread- and async-safe");
+		static_assert(offsetof(struct fsuper, fs_changedsuper.le_prev) ==
+		              offsetof(struct fsuper, _fs_changedsuper_lop.lo_func),
+		              "This is required for the ATOMIC_CMPXCH below to "
+		              "be thread- and async-safe");
 
 		/* Try to acquire a lock to the list of changed superblocks */
 		if (fchangedsuper_tryacquire()) {

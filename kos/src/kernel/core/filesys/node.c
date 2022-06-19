@@ -111,10 +111,10 @@ NOTHROW(LOCKOP_CC fnode_add2changed_lop)(Toblockop(fsuper) *__restrict self,
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL fnode_add2changed)(struct fnode *__restrict self) {
 	struct fsuper *super = self->fn_super;
-	STATIC_ASSERT_MSG(offsetof(struct fnode, fn_changed.le_prev) ==
-	                  offsetof(struct fnode, _fn_chnglop.olo_func),
-	                  "This is required for the ATOMIC_CMPXCH "
-	                  "below to be thread- and async-safe");
+	static_assert(offsetof(struct fnode, fn_changed.le_prev) ==
+	              offsetof(struct fnode, _fn_chnglop.olo_func),
+	              "This is required for the ATOMIC_CMPXCH "
+	              "below to be thread- and async-safe");
 
 	/* Try to acquire a lock to the list of changed superblocks */
 	if (fsuper_changednodes_tryacquire(super)) {
@@ -524,7 +524,7 @@ NOTHROW(FCALL fnode_init_addtosuper_and_all)(struct fnode *__restrict self) {
 		/* Release the super-nodes lock. */
 		fsuper_nodes_endwrite(super);
 	} else {
-		STATIC_ASSERT_MSG(offsetof(struct fnode, _fn_suplop.olo_func) ==
+		static_assert(offsetof(struct fnode, _fn_suplop.olo_func) ==
 		                  offsetof(struct fnode, fn_supent.rb_rhs),
 		                  "This is a requirement to ensure that the node can't "
 		                  "accidentally appear as `rb_rhs == FSUPER_NODES_DELETED', "
