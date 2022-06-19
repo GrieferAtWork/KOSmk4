@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfbf64b0d */
+/* HASH CRC-32:0xa39281de */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1359,20 +1359,32 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,timer_getoverrun,(timer_t __timerid),(__timeri
 #ifdef __USE_XOPEN2K
 #if defined(__CRT_HAVE_clock_nanosleep) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> clock_nanosleep(2), clock_nanosleep64(2)
- * High-resolution sleep with the specified clock */
+ * High-resolution sleep with the specified clock
+ * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
+ *                   Other clock IDs cannot be used with this system call!
+ * @param: flags:    Set of `0 | TIMER_ABSTIME' */
 __CDECLARE(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_RPC,clock_nanosleep,(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec const *__restrict __requested_time, struct timespec *__remaining),(__clock_id,__flags,__requested_time,__remaining))
 #elif defined(__CRT_HAVE___clock_nanosleep) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> clock_nanosleep(2), clock_nanosleep64(2)
- * High-resolution sleep with the specified clock */
+ * High-resolution sleep with the specified clock
+ * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
+ *                   Other clock IDs cannot be used with this system call!
+ * @param: flags:    Set of `0 | TIMER_ABSTIME' */
 __CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_RPC,clock_nanosleep,(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec const *__restrict __requested_time, struct timespec *__remaining),__clock_nanosleep,(__clock_id,__flags,__requested_time,__remaining))
 #elif defined(__CRT_HAVE_clock_nanosleep64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> clock_nanosleep(2), clock_nanosleep64(2)
- * High-resolution sleep with the specified clock */
+ * High-resolution sleep with the specified clock
+ * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
+ *                   Other clock IDs cannot be used with this system call!
+ * @param: flags:    Set of `0 | TIMER_ABSTIME' */
 __CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_RPC,clock_nanosleep,(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec const *__restrict __requested_time, struct timespec *__remaining),clock_nanosleep64,(__clock_id,__flags,__requested_time,__remaining))
 #elif defined(__CRT_HAVE_clock_nanosleep64) || defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE___clock_nanosleep)
 #include <libc/local/time/clock_nanosleep.h>
 /* >> clock_nanosleep(2), clock_nanosleep64(2)
- * High-resolution sleep with the specified clock */
+ * High-resolution sleep with the specified clock
+ * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
+ *                   Other clock IDs cannot be used with this system call!
+ * @param: flags:    Set of `0 | TIMER_ABSTIME' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(clock_nanosleep, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_OUT_OPT(4) int __NOTHROW_RPC(__LIBCCALL clock_nanosleep)(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec const *__restrict __requested_time, struct timespec *__remaining) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clock_nanosleep))(__clock_id, __flags, __requested_time, __remaining); })
 #endif /* ... */
 #ifdef __CRT_HAVE_clock_getcpuclockid
@@ -1495,16 +1507,25 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(timer_gettime64, __FORCELOCAL __ATTR_ARTIFICIAL 
 #ifdef __USE_XOPEN2K
 #if defined(__CRT_HAVE_clock_nanosleep) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> clock_nanosleep(2), clock_nanosleep64(2)
- * High-resolution sleep with the specified clock */
+ * High-resolution sleep with the specified clock
+ * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
+ *                   Other clock IDs cannot be used with this system call!
+ * @param: flags:    Set of `0 | TIMER_ABSTIME' */
 __CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_RPC,clock_nanosleep64,(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec64 const *__requested_time, struct timespec64 *__remaining),clock_nanosleep,(__clock_id,__flags,__requested_time,__remaining))
 #elif defined(__CRT_HAVE_clock_nanosleep64)
 /* >> clock_nanosleep(2), clock_nanosleep64(2)
- * High-resolution sleep with the specified clock */
+ * High-resolution sleep with the specified clock
+ * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
+ *                   Other clock IDs cannot be used with this system call!
+ * @param: flags:    Set of `0 | TIMER_ABSTIME' */
 __CDECLARE(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_RPC,clock_nanosleep64,(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec64 const *__requested_time, struct timespec64 *__remaining),(__clock_id,__flags,__requested_time,__remaining))
 #elif defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE___clock_nanosleep)
 #include <libc/local/time/clock_nanosleep64.h>
 /* >> clock_nanosleep(2), clock_nanosleep64(2)
- * High-resolution sleep with the specified clock */
+ * High-resolution sleep with the specified clock
+ * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
+ *                   Other clock IDs cannot be used with this system call!
+ * @param: flags:    Set of `0 | TIMER_ABSTIME' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(clock_nanosleep64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_OUT_OPT(4) int __NOTHROW_RPC(__LIBCCALL clock_nanosleep64)(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec64 const *__requested_time, struct timespec64 *__remaining) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clock_nanosleep64))(__clock_id, __flags, __requested_time, __remaining); })
 #endif /* ... */
 #endif /* __USE_XOPEN2K */

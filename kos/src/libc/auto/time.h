@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1296d224 */
+/* HASH CRC-32:0x98bec8d2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -241,7 +241,10 @@ INTDEF ATTR_OUT_OPT(2) int NOTHROW_NCX(LIBDCALL libd_timer_gettime)(timer_t time
  * Get expiration overrun for timer `timerid' */
 INTDEF int NOTHROW_NCX(LIBDCALL libd_timer_getoverrun)(timer_t timerid);
 /* >> clock_nanosleep(2), clock_nanosleep64(2)
- * High-resolution sleep with the specified clock */
+ * High-resolution sleep with the specified clock
+ * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
+ *                   Other clock IDs cannot be used with this system call!
+ * @param: flags:    Set of `0 | TIMER_ABSTIME' */
 INTDEF ATTR_IN(3) ATTR_OUT_OPT(4) int NOTHROW_RPC(LIBDCALL libd_clock_nanosleep)(clockid_t clock_id, __STDC_INT_AS_UINT_T flags, struct timespec const *__restrict requested_time, struct timespec *remaining);
 /* >> clock_getcpuclockid(2)
  * Return clock ID for CPU-time clock */
@@ -265,7 +268,10 @@ INTDEF ATTR_IN(3) ATTR_OUT_OPT(4) int NOTHROW_NCX(LIBDCALL libd_timer_settime64)
  * Get current value of timer `timerid' and store it in `value' */
 INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_timer_gettime64)(timer_t timerid, struct itimerspec64 *value);
 /* >> clock_nanosleep(2), clock_nanosleep64(2)
- * High-resolution sleep with the specified clock */
+ * High-resolution sleep with the specified clock
+ * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
+ *                   Other clock IDs cannot be used with this system call!
+ * @param: flags:    Set of `0 | TIMER_ABSTIME' */
 INTDEF ATTR_IN(3) ATTR_OUT_OPT(4) int NOTHROW_RPC(LIBDCALL libd_clock_nanosleep64)(clockid_t clock_id, __STDC_INT_AS_UINT_T flags, struct timespec64 const *requested_time, struct timespec64 *remaining);
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */

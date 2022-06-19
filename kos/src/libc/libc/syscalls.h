@@ -252,4 +252,15 @@
 	sys_setregid((SYSCALL_ARG_TYPE_OF(setregid, 0))(rgid), (SYSCALL_ARG_TYPE_OF(setregid, 1))(egid))
 #endif /* !SYS_setreuid32 */
 
+#if defined(SYS_clock_getres64) && !defined(SYS_clock_getres_time64)
+#define SYS_clock_getres_time64 SYS_clock_getres64
+#define sys_clock_getres_time64 sys_clock_getres64
+#endif /* SYS_clock_getres64 && SYS_clock_getres_time64 */
+
+#if defined(SYS_clock_nanosleep64) && !defined(SYS_clock_nanosleep_time64)
+#define SYS_clock_nanosleep_time64 SYS_clock_nanosleep64
+#define sys_clock_nanosleep_time64 sys_clock_nanosleep64
+#endif /* SYS_clock_nanosleep64 && SYS_clock_nanosleep_time64 */
+
+
 #endif /* !GUARD_LIBC_LIBC_SYSCALLS_H */

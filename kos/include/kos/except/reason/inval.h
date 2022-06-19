@@ -177,17 +177,19 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_ARCH_PRCTL_COMMAND,  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown `arch_prctl(2)' command */
 
 	/* System calls: misc... */
-	E_INVALID_ARGUMENT_CONTEXT_SYSLOG_LEVEL = 0x0c00, /* E_INVALID_ARGUMENT_BAD_VALUE: The `level' argument passed to `syslog()' wasn't recognized. */
-	E_INVALID_ARGUMENT_CONTEXT_KSYSCTL_COMMAND,       /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `cmd' passed to `ksysctl()' wasn't recognized */
-	E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON,          /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t reason] Bad reason code passed to `debugtrap()' */
-	E_INVALID_ARGUMENT_CONTEXT_DEBUG_TRAPNO,          /* E_INVALID_ARGUMENT_BAD_VALUE: Bad trap number passed to `debugtrap()' */
-	E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY,       /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t perso] Bad personality code passed to `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
-	                                                   * E_INVALID_ARGUMENT_UNKNOWN_FLAG: The least significant argument-bit of `SYSCTL_SYSCALL_GET_PERSONALITY' was set (arg should be `kp << 1') */
-	E_INVALID_ARGUMENT_CONTEXT_KCMP_TYPE,             /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `type' argument passed to `kcmp(2)' isn't one of `KCMP_*' from `<linux/kcmp.h>' */
-	E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS,       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `getrandom(2)' isn't a set of `GRND_NONBLOCK | GRND_RANDOM' */
-	E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_RESOURCE,      /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown/unsupported `resource' argument passed to `prlimit64(2)', `getrlimit(2)' or `setrlimit(2)' */
-	E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_BADLIMIT,      /* E_INVALID_ARGUMENT_BAD_VALUE: `new_rlim->rlim_cur > new_rlim->rlim_max' in call to `prlimit64(2)' or `setrlimit(2)' */
-	E_INVALID_ARGUMENT_CONTEXT_BAD_CLOCKID,           /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `clockid_t' passed to system call */
+	E_INVALID_ARGUMENT_CONTEXT_SYSLOG_LEVEL = 0x0c00,   /* E_INVALID_ARGUMENT_BAD_VALUE: The `level' argument passed to `syslog()' wasn't recognized. */
+	E_INVALID_ARGUMENT_CONTEXT_KSYSCTL_COMMAND,         /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `cmd' passed to `ksysctl()' wasn't recognized */
+	E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON,            /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t reason] Bad reason code passed to `debugtrap()' */
+	E_INVALID_ARGUMENT_CONTEXT_DEBUG_TRAPNO,            /* E_INVALID_ARGUMENT_BAD_VALUE: Bad trap number passed to `debugtrap()' */
+	E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY,         /* E_INVALID_ARGUMENT_BAD_VALUE: [uintptr_t perso] Bad personality code passed to `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
+	                                                     * E_INVALID_ARGUMENT_UNKNOWN_FLAG: The least significant argument-bit of `SYSCTL_SYSCALL_GET_PERSONALITY' was set (arg should be `kp << 1') */
+	E_INVALID_ARGUMENT_CONTEXT_KCMP_TYPE,               /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `type' argument passed to `kcmp(2)' isn't one of `KCMP_*' from `<linux/kcmp.h>' */
+	E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS,         /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `getrandom(2)' isn't a set of `GRND_NONBLOCK | GRND_RANDOM' */
+	E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_RESOURCE,        /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown/unsupported `resource' argument passed to `prlimit64(2)', `getrlimit(2)' or `setrlimit(2)' */
+	E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_BADLIMIT,        /* E_INVALID_ARGUMENT_BAD_VALUE: `new_rlim->rlim_cur > new_rlim->rlim_max' in call to `prlimit64(2)' or `setrlimit(2)' */
+	E_INVALID_ARGUMENT_CONTEXT_CLOCK_GET_CLOCKID,       /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `clockid_t' passed to the `clock_gettime(2)' or `clock_getres(2)' system call */
+	E_INVALID_ARGUMENT_CONTEXT_CLOCK_NANOSLEEP_CLOCKID, /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `clockid_t' passed to the `clock_nanosleep(2)' system call */
+	E_INVALID_ARGUMENT_CONTEXT_TIMER_FLAGS,             /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `clock_nanosleep(2)' or `timer_create(2)' isn't a set of `0 | TIMER_ABSTIME' */
 
 	/* system call: `fcntl(2)' */
 	E_INVALID_ARGUMENT_CONTEXT_FCNTL_COMMAND = 0x1000, /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown fcntl() command */
@@ -470,7 +472,9 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS                  E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS                  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `getrandom(2)' isn't a set of `GRND_NONBLOCK | GRND_RANDOM' */
 #define E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_RESOURCE                 E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_RESOURCE                 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown/unsupported `resource' argument passed to `prlimit64(2)', `getrlimit(2)' or `setrlimit(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_BADLIMIT                 E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_BADLIMIT                 /* E_INVALID_ARGUMENT_BAD_VALUE: `new_rlim->rlim_cur > new_rlim->rlim_max' in call to `prlimit64(2)' or `setrlimit(2)' */
-#define E_INVALID_ARGUMENT_CONTEXT_BAD_CLOCKID                      E_INVALID_ARGUMENT_CONTEXT_BAD_CLOCKID                      /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `clockid_t' passed to system call */
+#define E_INVALID_ARGUMENT_CONTEXT_CLOCK_GET_CLOCKID                E_INVALID_ARGUMENT_CONTEXT_CLOCK_GET_CLOCKID                /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `clockid_t' passed to the `clock_gettime(2)' or `clock_getres(2)' system call */
+#define E_INVALID_ARGUMENT_CONTEXT_CLOCK_NANOSLEEP_CLOCKID          E_INVALID_ARGUMENT_CONTEXT_CLOCK_NANOSLEEP_CLOCKID          /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `clockid_t' passed to the `clock_nanosleep(2)' system call */
+#define E_INVALID_ARGUMENT_CONTEXT_TIMER_FLAGS                      E_INVALID_ARGUMENT_CONTEXT_TIMER_FLAGS                      /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `clock_nanosleep(2)' or `timer_create(2)' isn't a set of `0 | TIMER_ABSTIME' */
 /* system call: `fcntl(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_FCNTL_COMMAND                    E_INVALID_ARGUMENT_CONTEXT_FCNTL_COMMAND                    /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown fcntl() command */
 #define E_INVALID_ARGUMENT_CONTEXT_F_SETFD_FDFLAGS                  E_INVALID_ARGUMENT_CONTEXT_F_SETFD_FDFLAGS                  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -732,7 +736,9 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS                  3078 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `getrandom(2)' isn't a set of `GRND_NONBLOCK | GRND_RANDOM' */
 #define E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_RESOURCE                 3079 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown/unsupported `resource' argument passed to `prlimit64(2)', `getrlimit(2)' or `setrlimit(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_BADLIMIT                 3080 /* E_INVALID_ARGUMENT_BAD_VALUE: `new_rlim->rlim_cur > new_rlim->rlim_max' in call to `prlimit64(2)' or `setrlimit(2)' */
-#define E_INVALID_ARGUMENT_CONTEXT_BAD_CLOCKID                      3081 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `clockid_t' passed to system call */
+#define E_INVALID_ARGUMENT_CONTEXT_CLOCK_GET_CLOCKID                3081 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `clockid_t' passed to the `clock_gettime(2)' or `clock_getres(2)' system call */
+#define E_INVALID_ARGUMENT_CONTEXT_CLOCK_NANOSLEEP_CLOCKID          3082 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `clockid_t' passed to the `clock_nanosleep(2)' system call */
+#define E_INVALID_ARGUMENT_CONTEXT_TIMER_FLAGS                      3083 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `clock_nanosleep(2)' or `timer_create(2)' isn't a set of `0 | TIMER_ABSTIME' */
 /* system call: `fcntl(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_FCNTL_COMMAND                    4096 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown fcntl() command */
 #define E_INVALID_ARGUMENT_CONTEXT_F_SETFD_FDFLAGS                  4097 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */

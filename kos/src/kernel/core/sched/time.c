@@ -25,6 +25,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/except.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
@@ -494,7 +495,6 @@ DEFINE_COMPAT_SYSCALL2(errno_t, nanosleep64,
 /************************************************************************/
 /* clock_gettime(2), clock_getres(2)                                    */
 /************************************************************************/
-
 #if (defined(__ARCH_WANT_SYSCALL_CLOCK_GETTIME) ||        \
      defined(__ARCH_WANT_SYSCALL_CLOCK_GETTIME_TIME64) || \
      defined(__ARCH_WANT_COMPAT_SYSCALL_CLOCK_GETTIME) || \
@@ -600,8 +600,9 @@ serve_and_yield:
 
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-		      E_INVALID_ARGUMENT_CONTEXT_BAD_CLOCKID,
+		      E_INVALID_ARGUMENT_CONTEXT_CLOCK_GET_CLOCKID,
 		      clockid);
+		break;
 	}
 	return -EOK;
 }
@@ -632,8 +633,9 @@ sys_clock_getres_impl(clockid_t clockid,
 
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-		      E_INVALID_ARGUMENT_CONTEXT_BAD_CLOCKID,
+		      E_INVALID_ARGUMENT_CONTEXT_CLOCK_GET_CLOCKID,
 		      clockid);
+		break;
 	}
 
 	/* All of our clocks have 1-nanosecond precision (although
@@ -771,6 +773,193 @@ DEFINE_COMPAT_SYSCALL2(errno_t, clock_getres_time64,
 	return result;
 }
 #endif /* __ARCH_WANT_COMPAT_SYSCALL_CLOCK_GETRES_TIME64 */
+
+
+
+
+/************************************************************************/
+/* clock_nanosleep(2)                                                   */
+/************************************************************************/
+
+#if (defined(__ARCH_WANT_SYSCALL_CLOCK_NANOSLEEP) ||        \
+     defined(__ARCH_WANT_SYSCALL_CLOCK_NANOSLEEP_TIME64) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_CLOCK_NANOSLEEP) || \
+     defined(__ARCH_WANT_COMPAT_SYSCALL_CLOCK_NANOSLEEP_TIME64))
+typedef NONNULL((1, 2)) void
+(FCALL *PCLOCK_NANOSLEEP_WRITE_REMAINING)(void *arg, struct timespec const *__restrict remaining)
+		THROWS(...);
+
+PRIVATE NONNULL((3, 4)) errno_t KCALL
+sys_clock_nanosleep_impl(clockid_t clockid, syscall_ulong_t flags,
+                         struct timespec const *__restrict requested_time,
+                         PCLOCK_NANOSLEEP_WRITE_REMAINING write_remaining,
+                         void *write_remaining_arg) {
+	ktime_t timeout;
+	/* Calculate timeout. */
+	VALIDATE_FLAGSET(flags, 0 | TIMER_ABSTIME,
+	                 E_INVALID_ARGUMENT_CONTEXT_TIMER_FLAGS);
+	switch (clockid) {
+
+	case CLOCK_REALTIME:
+	case CLOCK_TAI:
+		if (flags & TIMER_ABSTIME) {
+			/* The given timespec is measured in realtime, so we have
+			 * to use `bootime' to convert it into a ktime timestamp. */
+			timeout = timespec_to_ktime(*requested_time);
+		} else {
+			timeout = reltimespec_to_relktime(requested_time);
+			timeout += ktime();
+		}
+		break;
+
+	case CLOCK_MONOTONIC:
+	case CLOCK_BOOTTIME:
+		/* The given timespec is relative to boottime, as is out ktime_t.
+		 * As such, we don't have to do any special addend-calculation! */
+		timeout = reltimespec_to_relktime(requested_time);
+		if (!(flags & TIMER_ABSTIME))
+			timeout += ktime();
+		break;
+
+	//TODO: case CLOCK_PROCESS_CPUTIME_ID:
+
+	default:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_CLOCK_NANOSLEEP_CLOCKID,
+		      clockid);
+		break;
+	}
+	TRY {
+		for (;;) {
+			PREEMPTION_DISABLE();
+			/* Service RPC functions */
+			if (task_serve())
+				continue;
+			if (!task_sleep(timeout))
+				break; /* Timeout */
+		}
+	} EXCEPT {
+		if ((write_remaining_arg != NULL) &&
+		    (flags & TIMER_ABSTIME) == 0 &&
+		    (was_thrown(E_INTERRUPT_USER_RPC))) {
+			/* Write back the remaining time to user-space.
+			 * NOTE: If `rem'  is  a  faulty pointer,  it  is  undefined  what
+			 *       will  happen  to  that E_SEGFAULT  exception,  however it
+			 *       is guarantied that an E_INTERRUPT caused by a  user-space
+			 *       RPC or POSIX signal will invoke the RPC/signal's handler! */
+			ktime_t now = ktime();
+			struct timespec tsrem;
+			if (now > timeout)
+				now = timeout;
+			tsrem = relktime_to_reltimespec(timeout - now);
+			NESTED_EXCEPTION;
+			(*write_remaining)(write_remaining_arg, &tsrem);
+		}
+		RETHROW();
+	}
+	return -EOK;
+}
+#endif /* __ARCH_WANT_SYSCALL_CLOCK_NANOSLEEP... */
+
+#ifdef __ARCH_WANT_SYSCALL_CLOCK_NANOSLEEP
+PRIVATE NONNULL((1, 2)) void FCALL
+sys_clock_nanosleep_encode_remaining(void *arg, struct timespec const *__restrict remaining) {
+	USER CHECKED struct timespec32 *res;
+	res = (USER CHECKED struct timespec32 *)arg;
+	res->tv_sec  = (typeof(res->tv_sec))remaining->tv_sec;
+	res->tv_nsec = (typeof(res->tv_nsec))remaining->tv_nsec;
+}
+
+DEFINE_SYSCALL4(errno_t, clock_nanosleep,
+                clockid_t, clockid, syscall_ulong_t, flags,
+                USER UNCHECKED struct timespec32 const *, requested_time,
+                USER UNCHECKED struct timespec32 *, remaining) {
+	struct timespec req;
+	validate_readable(requested_time, sizeof(*requested_time));
+	validate_writable_opt(remaining, sizeof(*remaining));
+	req.tv_sec  = (typeof(req.tv_sec))requested_time->tv_sec;
+	req.tv_nsec = (typeof(req.tv_nsec))requested_time->tv_nsec;
+	COMPILER_READ_BARRIER();
+	return sys_clock_nanosleep_impl(clockid, flags, &req,
+	                                &sys_clock_nanosleep_encode_remaining,
+	                                remaining);
+}
+#endif /* __ARCH_WANT_SYSCALL_CLOCK_NANOSLEEP */
+
+#ifdef __ARCH_WANT_SYSCALL_CLOCK_NANOSLEEP_TIME64
+PRIVATE NONNULL((1, 2)) void FCALL
+sys_clock_nanosleep_time64_encode_remaining(void *arg, struct timespec const *__restrict remaining) {
+	USER CHECKED struct timespec64 *res;
+	res = (USER CHECKED struct timespec64 *)arg;
+	res->tv_sec  = (typeof(res->tv_sec))remaining->tv_sec;
+	res->tv_nsec = (typeof(res->tv_nsec))remaining->tv_nsec;
+}
+
+DEFINE_SYSCALL4(errno_t, clock_nanosleep_time64,
+                clockid_t, clockid, syscall_ulong_t, flags,
+                USER UNCHECKED struct timespec64 const *, requested_time,
+                USER UNCHECKED struct timespec64 *, remaining) {
+	struct timespec req;
+	validate_readable(requested_time, sizeof(*requested_time));
+	validate_writable_opt(remaining, sizeof(*remaining));
+	req.tv_sec  = (typeof(req.tv_sec))requested_time->tv_sec;
+	req.tv_nsec = (typeof(req.tv_nsec))requested_time->tv_nsec;
+	COMPILER_READ_BARRIER();
+	return sys_clock_nanosleep_impl(clockid, flags, &req,
+	                                &sys_clock_nanosleep_time64_encode_remaining,
+	                                remaining);
+}
+#endif /* __ARCH_WANT_SYSCALL_CLOCK_NANOSLEEP_TIME64 */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_CLOCK_NANOSLEEP
+PRIVATE NONNULL((1, 2)) void FCALL
+sys_clock_nanosleep_compat_encode_remaining(void *arg, struct timespec const *__restrict remaining) {
+	USER CHECKED struct compat_timespec32 *res;
+	res = (USER CHECKED struct compat_timespec32 *)arg;
+	res->tv_sec  = (typeof(res->tv_sec))remaining->tv_sec;
+	res->tv_nsec = (typeof(res->tv_nsec))remaining->tv_nsec;
+}
+
+DEFINE_COMPAT_SYSCALL4(errno_t, clock_nanosleep,
+                       clockid_t, clockid, syscall_ulong_t, flags,
+                       USER UNCHECKED struct compat_timespec32 const *, requested_time,
+                       USER UNCHECKED struct compat_timespec32 *, remaining) {
+	struct timespec req;
+	validate_readable(requested_time, sizeof(*requested_time));
+	validate_writable_opt(remaining, sizeof(*remaining));
+	req.tv_sec  = (typeof(req.tv_sec))requested_time->tv_sec;
+	req.tv_nsec = (typeof(req.tv_nsec))requested_time->tv_nsec;
+	COMPILER_READ_BARRIER();
+	return sys_clock_nanosleep_impl(clockid, flags, &req,
+	                                &sys_clock_nanosleep_compat_encode_remaining,
+	                                remaining);
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_CLOCK_NANOSLEEP */
+
+#ifdef __ARCH_WANT_COMPAT_SYSCALL_CLOCK_NANOSLEEP_TIME64
+PRIVATE NONNULL((1, 2)) void FCALL
+sys_clock_nanosleep_time64_compat_encode_remaining(void *arg, struct timespec const *__restrict remaining) {
+	USER CHECKED struct compat_timespec64 *res;
+	res = (USER CHECKED struct compat_timespec64 *)arg;
+	res->tv_sec  = (typeof(res->tv_sec))remaining->tv_sec;
+	res->tv_nsec = (typeof(res->tv_nsec))remaining->tv_nsec;
+}
+
+DEFINE_COMPAT_SYSCALL4(errno_t, clock_nanosleep_time64,
+                       clockid_t, clockid, syscall_ulong_t, flags,
+                       USER UNCHECKED struct compat_timespec64 const *, requested_time,
+                       USER UNCHECKED struct compat_timespec64 *, remaining) {
+	struct timespec req;
+	validate_readable(requested_time, sizeof(*requested_time));
+	validate_writable_opt(remaining, sizeof(*remaining));
+	req.tv_sec  = (typeof(req.tv_sec))requested_time->tv_sec;
+	req.tv_nsec = (typeof(req.tv_nsec))requested_time->tv_nsec;
+	COMPILER_READ_BARRIER();
+	return sys_clock_nanosleep_impl(clockid, flags, &req,
+	                                &sys_clock_nanosleep_time64_compat_encode_remaining,
+	                                remaining);
+}
+#endif /* __ARCH_WANT_COMPAT_SYSCALL_CLOCK_NANOSLEEP_TIME64 */
 
 /* TODO: __ARCH_WANT_SYSCALL_CLOCK_NANOSLEEP */
 /* TODO: __ARCH_WANT_SYSCALL_CLOCK_SETTIME */

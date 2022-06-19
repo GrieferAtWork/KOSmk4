@@ -1508,6 +1508,9 @@ int clock_nanosleep32(clockid_t clock_id, __STDC_INT_AS_UINT_T flags,
 
 @@>> clock_nanosleep(2), clock_nanosleep64(2)
 @@High-resolution sleep with the specified clock
+@@@param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
+@@                  Other clock IDs cannot be used with this system call!
+@@@param: flags:    Set of `0 | TIMER_ABSTIME'
 [[cp, decl_include("<features.h>", "<bits/os/timespec.h>", "<bits/types.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("clock_nanosleep", "__clock_nanosleep")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("clock_nanosleep64")]]

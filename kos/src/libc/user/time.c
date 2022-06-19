@@ -24,15 +24,12 @@
 /**/
 
 #include <kos/exec/idata.h>
-#include <kos/syscalls.h>
 
 #include <stdlib.h>
-#include <syscall.h>
 
-#include "time.h"
-
-/**/
 #include "../libc/globals.h"
+#include "../libc/syscalls.h"
+#include "time.h"
 
 DECL_BEGIN
 
@@ -220,14 +217,14 @@ NOTHROW_NCX(LIBCCALL libc_stime)(time_t const *when)
 /*[[[body:libc_stime]]]*/
 {
 	errno_t error;
-#ifdef __NR_stime
+#ifdef SYS_stime
 	error = sys_stime(when);
-#else /* __NR_stime */
+#else /* SYS_stime */
 	struct timeval tv;
 	tv.tv_sec  = *when;
 	tv.tv_usec = 0;
 	error = sys_settimeofday(&tv, NULL);
-#endif /* !__NR_stime */
+#endif /* !SYS_stime */
 	return libc_seterrno_syserr(error);
 }
 /*[[[end:libc_stime]]]*/
@@ -243,14 +240,14 @@ NOTHROW_NCX(LIBCCALL libc_stime64)(time64_t const *when)
 /*[[[body:libc_stime64]]]*/
 {
 	errno_t error;
-#ifdef __NR_stime
+#ifdef SYS_stime64
 	error = sys_stime64(when);
-#else /* __NR_stime */
+#else /* SYS_stime64 */
 	struct timeval64 tv;
 	tv.tv_sec  = *when;
 	tv.tv_usec = 0;
 	error = sys_settimeofday64(&tv, NULL);
-#endif /* !__NR_stime */
+#endif /* !SYS_stime64 */
 	return libc_seterrno_syserr(error);
 }
 #endif /* MAGIC:alias */
@@ -394,21 +391,18 @@ NOTHROW_NCX(LIBCCALL libc_clock_getres64)(clockid_t clock_id,
 /*[[[body:libc_clock_getres64]]]*/
 {
 	errno_t error;
-#ifdef SYS_clock_getres64
-	error = sys_clock_getres64(clock_id, res);
-#elif defined(SYS_clock_getres_time64)
 	error = sys_clock_getres_time64(clock_id, res);
-#else /* ... */
-#error "No way to implement `clock_getres64()'"
-#endif /* !... */
 	return libc_seterrno_syserr(error);
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_clock_getres64]]]*/
 
-/*[[[head:libc_clock_nanosleep,hash:CRC-32=0x7648a4c8]]]*/
+/*[[[head:libc_clock_nanosleep,hash:CRC-32=0x13e7372b]]]*/
 /* >> clock_nanosleep(2), clock_nanosleep64(2)
- * High-resolution sleep with the specified clock */
+ * High-resolution sleep with the specified clock
+ * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
+ *                   Other clock IDs cannot be used with this system call!
+ * @param: flags:    Set of `0 | TIMER_ABSTIME' */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_IN(3) ATTR_OUT_OPT(4) int
 NOTHROW_RPC(LIBCCALL libc_clock_nanosleep)(clockid_t clock_id,
                                            __STDC_INT_AS_UINT_T flags,
@@ -424,12 +418,15 @@ NOTHROW_RPC(LIBCCALL libc_clock_nanosleep)(clockid_t clock_id,
 }
 /*[[[end:libc_clock_nanosleep]]]*/
 
-/*[[[head:libc_clock_nanosleep64,hash:CRC-32=0x631ff180]]]*/
+/*[[[head:libc_clock_nanosleep64,hash:CRC-32=0xa6245921]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_clock_nanosleep64, libc_clock_nanosleep);
 #else /* MAGIC:alias */
 /* >> clock_nanosleep(2), clock_nanosleep64(2)
- * High-resolution sleep with the specified clock */
+ * High-resolution sleep with the specified clock
+ * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
+ *                   Other clock IDs cannot be used with this system call!
+ * @param: flags:    Set of `0 | TIMER_ABSTIME' */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_IN(3) ATTR_OUT_OPT(4) int
 NOTHROW_RPC(LIBCCALL libc_clock_nanosleep64)(clockid_t clock_id,
                                              __STDC_INT_AS_UINT_T flags,
@@ -438,17 +435,9 @@ NOTHROW_RPC(LIBCCALL libc_clock_nanosleep64)(clockid_t clock_id,
 /*[[[body:libc_clock_nanosleep64]]]*/
 {
 	errno_t error;
-#ifdef SYS_clock_nanosleep64
-	error = sys_clock_nanosleep64(clock_id,
-	                              (syscall_ulong_t)(unsigned int)flags,
-	                              requested_time, remaining);
-#elif defined(SYS_clock_nanosleep_time64)
 	error = sys_clock_nanosleep_time64(clock_id,
                                        (syscall_ulong_t)(unsigned int)flags,
                                        requested_time, remaining);
-#else /* ... */
-#error "No way to implement `clock_nanosleep64()'"
-#endif /* !... */
 	return libc_seterrno_syserr(error);
 }
 #endif /* MAGIC:alias */

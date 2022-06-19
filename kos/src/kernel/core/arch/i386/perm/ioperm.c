@@ -49,7 +49,13 @@ iob_maskbyte(byte_t *pbyte, u8 byte_mask, u8 byte_flag) {
 	u8 oldval;
 	do {
 		oldval = ATOMIC_READ(*pbyte);
+		/* FIXME: A rare (and random) E_SEGFAULT has been observed that originates from the following line:
+		 * >> [2022-06-19T15:19:18.457399057:trace ][16] sys_ioperm(from: 1016, num: 1, turn_on: 1)
+		 * >> [2022-06-19T15:19:18.458021345:debug ][16][segfault] Fault at FFFFFFFF8095907F (page FFFFFFFF80959000) [pc=FFFFFFFF803D7B9C,FFFFFFFF803D7BA0] [ecode=0x3]
+		 * >> [2022-06-19T15:19:18.458376352:trace ][16][except] Translate exception 0xff0e:0x2,E_SEGFAULT_READONLY[0xffffffff8095907f,0x3] into errno=-EFAULT
+		 */
 	} while (!ATOMIC_CMPXCH_WEAK(*pbyte, oldval, (oldval & byte_mask) | byte_flag));
+
 }
 
 LOCAL NONNULL((1)) void KCALL

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87f38511 */
+/* HASH CRC-32:0x7f6070b1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,7 +79,10 @@ INTDEF ATTR_OUT_OPT(2) int NOTHROW_NCX(LIBCCALL libc_timer_gettime)(timer_t time
  * Get expiration overrun for timer `timerid' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_timer_getoverrun)(timer_t timerid);
 /* >> clock_nanosleep(2), clock_nanosleep64(2)
- * High-resolution sleep with the specified clock */
+ * High-resolution sleep with the specified clock
+ * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
+ *                   Other clock IDs cannot be used with this system call!
+ * @param: flags:    Set of `0 | TIMER_ABSTIME' */
 INTDEF ATTR_IN(3) ATTR_OUT_OPT(4) int NOTHROW_RPC(LIBCCALL libc_clock_nanosleep)(clockid_t clock_id, __STDC_INT_AS_UINT_T flags, struct timespec const *__restrict requested_time, struct timespec *remaining);
 /* >> clock_getcpuclockid(2)
  * Return clock ID for CPU-time clock */
@@ -103,7 +106,10 @@ INTDEF ATTR_IN(3) ATTR_OUT_OPT(4) int NOTHROW_NCX(LIBCCALL libc_timer_settime64)
  * Get current value of timer `timerid' and store it in `value' */
 INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_timer_gettime64)(timer_t timerid, struct itimerspec64 *value);
 /* >> clock_nanosleep(2), clock_nanosleep64(2)
- * High-resolution sleep with the specified clock */
+ * High-resolution sleep with the specified clock
+ * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
+ *                   Other clock IDs cannot be used with this system call!
+ * @param: flags:    Set of `0 | TIMER_ABSTIME' */
 INTDEF ATTR_IN(3) ATTR_OUT_OPT(4) int NOTHROW_RPC(LIBCCALL libc_clock_nanosleep64)(clockid_t clock_id, __STDC_INT_AS_UINT_T flags, struct timespec64 const *requested_time, struct timespec64 *remaining);
 #endif /* !__KERNEL__ */
 INTDEF char *libc_tzname[2];

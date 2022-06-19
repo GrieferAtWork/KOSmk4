@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x757b10e7 */
+/* HASH CRC-32:0x81315dbf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -275,7 +275,11 @@
 #define __NR_clock_settime          0x70  /* errno_t clock_settime(clockid_t clock_id, struct timespec const *tp) */
 #define __NR_clock_gettime          0x71  /* errno_t clock_gettime(clockid_t clock_id, struct timespec *tp) */
 #define __NR_clock_getres           0x72  /* errno_t clock_getres(clockid_t clock_id, struct timespec *res) */
-/* @param: flags: Set of `0 | TIMER_ABSTIME' */
+/* >> clock_nanosleep(2), clock_nanosleep64(2)
+ * High-resolution sleep with the specified clock
+ * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
+ *                   Other clock IDs cannot be used with this system call!
+ * @param: flags:    Set of `0 | TIMER_ABSTIME' */
 #define __NR_clock_nanosleep        0x73  /* errno_t clock_nanosleep(clockid_t clock_id, syscall_ulong_t flags, struct timespec const *requested_time, struct timespec *remaining) */
 #define __NR_syslog                 0x74  /* ssize_t syslog(syscall_ulong_t level, char const *str, size_t len) */
 #define __NR_ptrace                 0x75  /* syscall_slong_t ptrace(syscall_ulong_t request, pid_t pid, void *addr, void *data) */

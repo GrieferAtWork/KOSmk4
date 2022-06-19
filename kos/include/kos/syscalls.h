@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfeadfcaa */
+/* HASH CRC-32:0x154feac9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -227,7 +227,11 @@ __CDECLARE_SC(,__errno_t,clock_getres,(__clockid_t __clock_id, struct timespec *
 __CDECLARE_SC(,__errno_t,clock_gettime,(__clockid_t __clock_id, struct timespec *__tp),(__clock_id,__tp))
 #endif /* __CRT_HAVE_SC(clock_gettime) */
 #if __CRT_HAVE_SC(clock_nanosleep)
-/* @param: flags: Set of `0 | TIMER_ABSTIME' */
+/* >> clock_nanosleep(2), clock_nanosleep64(2)
+ * High-resolution sleep with the specified clock
+ * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
+ *                   Other clock IDs cannot be used with this system call!
+ * @param: flags:    Set of `0 | TIMER_ABSTIME' */
 __CDECLARE_SC(,__errno_t,clock_nanosleep,(__clockid_t __clock_id, __syscall_ulong_t __flags, struct timespec const *__requested_time, struct timespec *__remaining),(__clock_id,__flags,__requested_time,__remaining))
 #endif /* __CRT_HAVE_SC(clock_nanosleep) */
 #if __CRT_HAVE_SC(clock_settime)
@@ -1707,7 +1711,11 @@ __CDECLARE_XSC(,__errno_t,clock_getres,(__clockid_t __clock_id, struct timespec 
 __CDECLARE_XSC(,__errno_t,clock_gettime,(__clockid_t __clock_id, struct timespec *__tp),(__clock_id,__tp))
 #endif /* __CRT_HAVE_XSC(clock_gettime) */
 #if __CRT_HAVE_XSC(clock_nanosleep)
-/* @param: flags: Set of `0 | TIMER_ABSTIME' */
+/* >> clock_nanosleep(2), clock_nanosleep64(2)
+ * High-resolution sleep with the specified clock
+ * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
+ *                   Other clock IDs cannot be used with this system call!
+ * @param: flags:    Set of `0 | TIMER_ABSTIME' */
 __CDECLARE_XSC(,__errno_t,clock_nanosleep,(__clockid_t __clock_id, __syscall_ulong_t __flags, struct timespec const *__requested_time, struct timespec *__remaining),(__clock_id,__flags,__requested_time,__remaining))
 #endif /* __CRT_HAVE_XSC(clock_nanosleep) */
 #if __CRT_HAVE_XSC(clock_settime)
