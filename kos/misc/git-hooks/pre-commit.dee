@@ -1,0 +1,213 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import * from ..libgen.autom8;
+import fs;
+import ipc;
+
+function readLines(fp: File): {Bytes...} {
+	local r = fp.read();
+	for (;;) {
+		while (r && "\n" !in r) {
+			local more = fp.read();
+			if (!more)
+				break;
+			r += more;
+		}
+		if ("\n" !in r)
+			break;
+		local blob;
+		blob, none, r = r.rpartition("\n")...;
+		yield blob.splitlines(false)...;
+	}
+	if (r)
+		yield r;
+}
+
+function joinProc(proc: ipc.Process) {
+	local code = proc.join();
+	if (code != 0) {
+		print File.stderr: "Process", proc.cmdline, "failed with", code;
+		Error.AppExit.exit(code);
+	}
+}
+
+/* Navigate to root directory */
+fs.chdir(fs.headof(__FILE__) + "../../..");
+
+final class PreventAutom8Writeback {}
+
+/* Invoke autom8 on all staged files */
+global stagedFiles: List with string = List();
+local r, w = ipc.Pipe.new()...;
+local diffProc = ipc.Process("git", { "diff", "--name-only", "--cached" });
+diffProc.stdout = w;
+diffProc.start();
+w.close();
+global changesMade = false;
+global hasErrors = false;
+for (local filename: readLines(r)) {
+	filename = filename.decode("utf-8")
+		.replace("\\", "/")
+		.strip("/")
+		.lsstrip("./");
+	stagedFiles.append(filename);
+	if (fs.extof(filename) in SHOULD_FORMAT_FILE_EXTENSIONS) {
+		try {
+			changesMade |= autom8File(filename, quiet: true, beforeWriteHook: []{
+				/* Check if `filename' is fully staged. - If it isn't, then the fact that
+				 * we  just altered the  file's contents means that  it's no longer clear
+				 * what should actually be committed. */
+				local m8Proc = ipc.Process("git", { "diff", "--raw", "--", filename });
+				local r, w = ipc.Pipe.new()...;
+				m8Proc.stdout = w;
+				m8Proc.start();
+				w.close();
+				local blob = r.read();
+				r.close();
+				joinProc(m8Proc);
+				if (blob) {
+					/* There are unstaged changes to `filename' -> can't allow commit to happen! */
+					print File.stderr: (
+						"ERROR: autom8 alters file with unstaged changes: ",
+						repr filename);
+					hasErrors = true;
+					/* Prevent autom8 from updating the file */
+					throw PreventAutom8Writeback();
+				} else {
+					print("info: autom8 ", filename);
+				}
+			});
+		} catch (PreventAutom8Writeback) {
+		}
+	}
+}
+r.close();
+joinProc(diffProc);
+if (changesMade) {
+	/* Run `git add -u' to update the staging status of files already put on-stage */
+	local addProc = ipc.Process("git", { "add", "-u" });
+	addProc.start();
+	joinProc(addProc);
+}
+
+global libwin32 = try import("win32") catch (...) none;
+if (!hasattr(libwin32, "CreateFile"))
+	libwin32 = none;
+function getLastModfiedTime(filename: string) {
+	try {
+		if (libwin32 is none) {
+			/* FIXME: fs.stat() isn't as precise as win32.GetFileTime() is.
+			 *        In a perfect world, time.Time() would be able to hold
+			 *        timestamps of infinite precision... */
+			return fs.stat(filename).st_mtime;
+		} else {
+			/* Hack around a bit to get UNC paths working properly... */
+			local handle = libwin32.CreateFile(
+				lpFileName: filename,
+				dwDesiredAccess: libwin32.FILE_GENERIC_READ,
+				dwCreationDisposition: libwin32.OPEN_EXISTING);
+			if (handle is none) {
+				handle = libwin32.CreateFile(
+					lpFileName: fs.abspath(filename),
+					dwDesiredAccess: libwin32.FILE_GENERIC_READ,
+					dwCreationDisposition: libwin32.OPEN_EXISTING);
+				if (handle is none) {
+					handle = libwin32.CreateFile(
+						lpFileName: r"\\.\" + fs.abspath(filename),
+						dwDesiredAccess: libwin32.FILE_GENERIC_READ,
+						dwCreationDisposition: libwin32.OPEN_EXISTING);
+				}
+			}
+			if (handle is none)
+				return none;
+			try {
+				/* GetFileTime() has a precision of 100 nanoseconds (or 0.1 microseconds)
+				 * However, time.Time() only  has microsecond-precision  (so this  method
+				 * is 10x more precise) */
+				return libwin32.GetFileTime(handle)[2];
+			} finally {
+				libwin32.CloseHandle(handle);
+			}
+		}
+	} catch (...) {
+	}
+	return none;
+}
+
+function mustRunScript(lastRunMarkerFilename: string, inputFiles: {string...}): {string...} {
+	local lastRun = getLastModfiedTime(lastRunMarkerFilename);
+	if (lastRun is none) {
+		yield "";
+	} else {
+		for (local inputFile: inputFiles) {
+			local ts = getLastModfiedTime(inputFile);
+			if (ts !is none && ts > lastRun)
+				yield inputFile;
+		}
+	}
+}
+
+function checkMustRunScript(
+		scriptName: string,
+		lastRunMarkerFilename: string,
+		inputFiles: {string...}) {
+	local changedFileIter = mustRunScript(lastRunMarkerFilename, inputFiles).operator iter();
+	local changedFileFirst = none;
+	foreach(changedFileFirst: changedFileIter) break;
+	if (changedFileFirst !is none) {
+		print File.stderr: ("ERROR: Must run script ", repr scriptName),;
+		if (changedFileFirst) {
+			print File.stderr: (": changed files are:");
+			print File.stderr: ("\t", changedFileFirst);
+			foreach(changedFileFirst: changedFileIter)
+				print File.stderr: ("\t", changedFileFirst);
+		} else {
+			print File.stderr: (": never run");
+		}
+		hasErrors = true;
+	}
+}
+
+/* Sort staged files so we can do binary search on them! */
+stagedFiles.sort();
+
+/* Check if generate_headers.dee needs to be run */
+final global LIBC_MAGIC_SOURCE_PATH = "kos/src/libc/magic/";
+local stagedMagicSourceFiles = stagedFiles.blocateall(
+	LIBC_MAGIC_SOURCE_PATH, [](x) -> x.substr(0, #LIBC_MAGIC_SOURCE_PATH));
+if (stagedMagicSourceFiles) {
+	checkMustRunScript(
+		"kos/misc/magicgenerator/generate_headers.dee",
+		"kos/misc/magicgenerator/.generate_headers.dee.latest",
+		stagedMagicSourceFiles);
+}
+
+/* Check if generate_syscalls.dee needs to be run */
+if (stagedFiles.bcontains("kos/include/asm/syscalls.def")) {
+	checkMustRunScript(
+		"kos/misc/magicgenerator/generate_syscalls.dee",
+		"kos/misc/magicgenerator/.generate_syscalls.dee.latest",
+		{ "kos/include/asm/syscalls.def" });
+}
+
+/* If there were errors, don't allow the commit to happen */
+return hasErrors;

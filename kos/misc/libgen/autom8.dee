@@ -1032,7 +1032,10 @@ function trimTrailingSpaces(text: string): string {
 	return result.string;
 }
 
-function autom8File(filename: string) {
+@@Do autom8 formating on @filename
+@@@return: true:  The contents of the named file changed
+@@@return: false: The file was already properly formatted
+function autom8File(filename: string, beforeWriteHook: Callable = none, quiet: bool = false): bool {
 	local parser = Autom8Parser();
 	local oldBytes;
 	try {
@@ -1051,10 +1054,12 @@ function autom8File(filename: string) {
 	parser.len = #parser.text;
 	parser.filename = filename;
 	if (!autom8Worker(parser, getAutom8Command))
-		return;
+		return false;
 	local newBytes = parser.newText.string.encode("utf-8");
 	if (newBytes != oldBytes) {
-		print("Updating file: ", repr filename);
+		beforeWriteHook();
+		if (!quiet)
+			print("Updating file: ", repr filename);
 		local backupFilename = fs.headof(filename) + "." + fs.tailof(filename) + ".old";
 		fs.rename(filename, backupFilename);
 		try {
@@ -1069,7 +1074,9 @@ function autom8File(filename: string) {
 			throw;
 		}
 		fs.unlink(backupFilename);
+		return true;
 	}
+	return false;
 }
 
 global final SHOULD_FORMAT_FILE_EXTENSIONS: {string...} = HashSet.Frozen({

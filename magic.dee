@@ -73,7 +73,7 @@ global TARGET: Module = none;    /* Target configuration module */
 global TARGET_BINPATH: string;   /* Target binpath (e.g. "/bin/i386-kos-OD") */
 global KERNEL_BINARY: string;
 
-@@Called by emulators once the emulator has been started.
+@@Called  by  emulators  once   the  emulator  has  been   started.
 @@Preferrably called _after_ a GDB stub (if any) becomes available.
 function onEmulatorStarted() {
 	assert CONFIG_EMULATOR_STARTED_PATTERN !== false;

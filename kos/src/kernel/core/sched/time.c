@@ -815,7 +815,7 @@ sys_clock_nanosleep_impl(clockid_t clockid, syscall_ulong_t flags,
 	case CLOCK_MONOTONIC:
 	case CLOCK_BOOTTIME:
 		/* The given timespec is relative to boottime, as is out ktime_t.
-		 * As such, we don't have to do any special addend-calculation! */
+		 * As such, we don't have  to do any special  addend-calculation! */
 		timeout = reltimespec_to_relktime(requested_time);
 		if (!(flags & TIMER_ABSTIME))
 			timeout += ktime();

@@ -84,7 +84,7 @@ function splitTables(tab: {int: int}, errorValue: int) {
 			table.resize(key + 1, errorValue);
 		table[key] = value;
 	}
-	assert table.nonempty;
+	assert table;
 	{
 		local len = #table - 1;
 		while (len) {

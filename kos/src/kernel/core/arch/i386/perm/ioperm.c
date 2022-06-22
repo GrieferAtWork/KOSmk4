@@ -55,7 +55,6 @@ iob_maskbyte(byte_t *pbyte, u8 byte_mask, u8 byte_flag) {
 		 * >> [2022-06-19T15:19:18.458376352:trace ][16][except] Translate exception 0xff0e:0x2,E_SEGFAULT_READONLY[0xffffffff8095907f,0x3] into errno=-EFAULT
 		 */
 	} while (!ATOMIC_CMPXCH_WEAK(*pbyte, oldval, (oldval & byte_mask) | byte_flag));
-
 }
 
 LOCAL NONNULL((1)) void KCALL

@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Change Sequence.empty and nonempty to properties"
-DEEMON_VERSION="35b8e4799319bb4842b0618a9e82f4477a6a95e4"
+#     v -- "Add function `Sequence.bcontains()'"
+DEEMON_VERSION="db9bb6dcb3b05963b5f75da7f10d5f275ba645f9"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
@@ -962,4 +962,17 @@ if [[ "$(uname -s)" == *"CYGWIN"* ]]; then
 			exit $error
 		}
 	fi
+fi
+
+
+# Because this is as good'a place as any, use our
+# chance here to set-up our custom git pre-commit hook.
+echo "Check for git pre-commit hook"
+if ! [ -d "$KOS_ROOT/.git" ]; then
+	echo "	disabled: No .git folder"
+else
+	cmd chmod +x "$KOS_ROOT/kos/misc/git-hooks/pre-commit"
+	#cmd ln -s "../../kos/misc/git-hooks/pre-commit" "$KOS_ROOT/.git/hooks/pre-commit"
+	cmd git config --local core.hooksPath "kos/misc/git-hooks"
+	echo "	now hooked"
 fi

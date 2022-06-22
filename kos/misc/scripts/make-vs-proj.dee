@@ -20,14 +20,14 @@
 
 /* Experimental (as in: not really working) support for GDB
  * (UGH! I remember this problem from way back: open-folder
- * is the only officially supported method of getting gdb
+ * is the only officially  supported method of getting  gdb
  * debug support without having to go through some dumb ssh
  * indirection)
  * Idea:
  *  - Try to buils sshd under cygwin and see where that gets us...
  *
- * Again: The reason I'm trying to get away from open-folder is
- *        because it's insanely laggy, where-as regular VS proj
+ * Again: The reason I'm trying to  get away from open-folder  is
+ *        because  it's insanely laggy,  where-as regular VS proj
  *        files are much faster (and have less bugs when it comes
  *        to intellisense figuring out what's going on)
  */
@@ -306,7 +306,7 @@ createVsFile("kos.vcxproj", [](fp) {
 "		<LibraryWPath />\n"
 "		<SourcePath />\n"
 "		<ExcludePath />\n";
-		/* This is where the actual magic happens in terms of tricking
+		/* This  is where the actual magic happens in terms of tricking
 		 * Intellisense into using its linux/gcc-compatibler sub-system
 		 * https://github.com/AntonioColino/Clang/blob/f18080410d89b93da1e9e81059f39dc1081ce654/InstallShield%202015%20Projects/x64/PlatformToolsets/Clang/1033/llvm-general.xml#L160
 		 */
