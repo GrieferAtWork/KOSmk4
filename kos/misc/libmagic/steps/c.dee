@@ -577,7 +577,7 @@ final local function COMPILE_WITH_ASM_FILTER_run(
 	local options = getCompileOptions(self, self.userData);
 	local secondary = options.get(OPT_COMPILE_SECONDARY);
 	if (!secondary) {
-		local th = Thread([](self: BoundStep, options: {string: Object}) {
+		local th = Thread((self: BoundStep, options: {string: Object}) -> {
 			local srcFile = self.userData;
 			local toolchain = self.toolchain;
 			local config = toolchain.config;
@@ -680,7 +680,7 @@ function COMPILE_WITH_ASM_FILTER(filter: Callable with (File, File)): Step {
 			OPT_COMPILE_OBJFILE
 		},
 		split: COMPILE_split,
-		run: [](self: BoundStep): {Waitable...} -> COMPILE_WITH_ASM_FILTER_run(self, filter),
+		run: (self: BoundStep): {Waitable...} -> COMPILE_WITH_ASM_FILTER_run(self, filter),
 		getRequiredFiles: COMPILE_getRequiredFiles,
 		getProducedFiles: COMPILE_WITH_ASM_FILTER_getProducedFiles,
 		getProducedOutputFiles: COMPILE_WITH_ASM_FILTER_getProducedOutputFiles,

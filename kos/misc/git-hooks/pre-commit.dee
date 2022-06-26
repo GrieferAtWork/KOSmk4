@@ -72,7 +72,7 @@ for (local filename: readLines(r)) {
 	stagedFiles.append(filename);
 	if (fs.extof(filename) in SHOULD_FORMAT_FILE_EXTENSIONS) {
 		try {
-			changesMade |= autom8File(filename, quiet: true, beforeWriteHook: []{
+			changesMade |= autom8File(filename, quiet: true, beforeWriteHook: () -> {
 				/* Check if `filename' is fully staged. - If it isn't, then the fact that
 				 * we  just altered the  file's contents means that  it's no longer clear
 				 * what should actually be committed. */
@@ -193,7 +193,7 @@ stagedFiles.sort();
 /* Check if generate_headers.dee needs to be run */
 final global LIBC_MAGIC_SOURCE_PATH = "kos/src/libc/magic/";
 local stagedMagicSourceFiles = stagedFiles.blocateall(
-	LIBC_MAGIC_SOURCE_PATH, [](x) -> x.substr(0, #LIBC_MAGIC_SOURCE_PATH));
+	LIBC_MAGIC_SOURCE_PATH, x -> x.substr(0, #LIBC_MAGIC_SOURCE_PATH));
 if (stagedMagicSourceFiles) {
 	checkMustRunScript(
 		"kos/misc/magicgenerator/generate_headers.dee",

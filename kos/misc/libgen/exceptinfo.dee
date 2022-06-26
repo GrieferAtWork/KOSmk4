@@ -255,7 +255,7 @@ yes:
 			fp: File, cbField: Callable with string = none)
 			: File {
 		if (cbField is none) {
-			cbField = [](name: string): string {
+			cbField = (name: string): string -> {
 				fp << "except_data()->e_args." << findFieldByName(name)[0];
 			};
 		}
@@ -1398,7 +1398,7 @@ function printExceptNameFunctionBody(
 	if (ppCondMappings is none)
 		ppCondMappings = getExceptionCodeMappings();
 	if (keyExceptClassName is none)
-		keyExceptClassName = [](x: ExceptClass) -> x.name;
+		keyExceptClassName = (x: ExceptClass) -> x.name;
 	/* Use ppexpr optimizations to turn a sequence of:
 	 * >> #if FOO
 	 * >> a

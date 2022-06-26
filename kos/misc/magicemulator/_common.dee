@@ -354,7 +354,7 @@ function reOpenProcessStdoutAndWrapAsGdbMIMessageStream(processName: string): Ca
 			/* Overwrite the write-to-stdout callback to
 			 * instead perform writes to `hMyGDBStdout'! */
 			local write2gdb = File.System(hMyGDBStdout, inherit: true).write;
-			return [](data: string | Bytes) {
+			return (data: string | Bytes) -> {
 				local final MAX_PACKET_SIZE = 512;
 #if 1 /* Technically, this is incorrect. GDB documents that the  ~-stream
        * should be used for "[...] the textual responses to CLI commands"
@@ -403,7 +403,7 @@ function processKosDebugOutput(
 		/* Setup the writeStdout function to re-direct itself to inject
 		 * its output into gdb.exe:stdout,  such that all future  calls
 		 * are simply forwarded to that handle. */
-		writeStdout = [](data) {
+		writeStdout = (data) -> {
 			/* Capture the stdout of `processName' to inject our output into it. */
 			writeStdout = reOpenProcessStdoutAndWrapAsGdbMIMessageStream(processName);
 			if (writeStdout is none) {

@@ -124,7 +124,7 @@ final local function MCOPY_getOutputFilename(
 }
 
 final local function MCOPY_run(self: BoundStep): {Waitable...} {
-	local th = Thread([](self: BoundStep) {
+	local th = Thread((self: BoundStep) -> {
 		local group: Group = self.group;
 		local options: {string: Object} = group.options;
 		local input: string = self.userData;

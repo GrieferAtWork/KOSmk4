@@ -49,7 +49,7 @@ function qemuMonitorBackend(addr: string, monitorPipe: File) {
 		}
 		Thread.sleep(milliseconds from time(1));
 	}
-	Thread([]{
+	Thread(() -> {
 		local isFirst = true;
 		final local prefix = "monitor>: ";
 		for (;;) {

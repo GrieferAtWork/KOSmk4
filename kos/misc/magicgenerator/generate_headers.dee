@@ -786,8 +786,10 @@ function doPrint_src_libc_crtOrder() {
 		sectionsOutputOrder.append(blockSections);
 	}
 	/* Resolve wildcard rules. */
-	wildcardRules.sort([](x) -> x.pattern);
-	wildcardRules.sort([](x) -> x.pattern.length);
+	wildcardRules.sort(key: x -> {
+		x.pattern.length, /* Sort by length first... */
+		x.pattern,        /* ... and then alphabetically */
+	});
 	for (local rule: wildcardRules) {
 		local sections: {string...} = [];
 		local pattern = rule.pattern;
@@ -1294,7 +1296,7 @@ try {
 	for (local name /*: string*/, header /*: SystemHeader*/: allSystemHeaders) {
 		startTask(updateHashedFile, (
 			"include/{}.h".format({ name.replace(".", "/") }),
-			[](fp: File) {
+			(fp: File) -> {
 				fp << COPYRIGHT << "\n";
 				local cWriter = CWriter(fp, ppAssume: ppAssumeHeaderFiles);
 				header.cprintHeader(cWriter, ESCAPE_MODE_PART);
@@ -1308,7 +1310,7 @@ try {
 			continue;
 		startTask(updateHashedFile, (
 			"include/libc/{}.h".format({ name }),
-			[](fp: File) {
+			(fp: File) -> {
 				fp << COPYRIGHT << "\n";
 				local cWriter = CWriter(fp, ppAssume: ppAssumeHeaderFiles);
 				header.cprintLibcHeader(cWriter);
@@ -1316,7 +1318,7 @@ try {
 			}));
 		startTask(updateHashedFile, (
 			"include/libc/core/{}.h".format({ name }),
-			[](fp: File) {
+			(fp: File) -> {
 				fp << COPYRIGHT << "\n";
 				local cWriter = CWriter(fp, ppAssume: ppAssumeHeaderFiles);
 				header.cprintLibcCoreHeader(cWriter);
@@ -1339,7 +1341,7 @@ try {
 		if (header.order_libcAutoHeader) {
 			startTask(updateHashedFile, (
 				"src/libc/auto/{}.h".format({ name }),
-				[](fp: File) {
+				(fp: File) -> {
 					fp << COPYRIGHT << "\n";
 					local cWriter = CWriter(fp, ppAssume: ppAssumeSourceFiles);
 					header.cprintLibraryAutoHeader(cWriter);
@@ -1349,7 +1351,7 @@ try {
 		if (header.order_libcAutoSource) {
 			startTask(updateHashedFile, (
 				"src/libc/auto/{}.c".format({ name }),
-				[](fp: File) {
+				(fp: File) -> {
 					fp << COPYRIGHT << "\n";
 					local cWriter = CWriter(fp, ppAssume: ppAssumeSourceFiles);
 					header.cprintLibraryAutoSource(cWriter);
@@ -1363,7 +1365,7 @@ try {
 		if (header.order_libcUserHeader) {
 			startTask(updateHashedFile, (
 				"src/libc/user/{}.h".format({ name }),
-				[](fp: File) {
+				(fp: File) -> {
 					fp << COPYRIGHT << "\n";
 					local cWriter = CWriter(fp, ppAssume: ppAssumeSourceFiles);
 					header.cprintLibraryUserHeader(cWriter);
@@ -1393,7 +1395,7 @@ try {
 					lfun.originalSystemHeaderName,
 					lfun.name,
 				}),
-				[](fp: File) {
+				(fp: File) -> {
 					local cWriter = CWriter(fp, ppAssume: ppAssumeHeaderFiles);
 					lfun.cprintLocalFunctionHeader(
 						cWriter, ESCAPE_MODE_FULL,

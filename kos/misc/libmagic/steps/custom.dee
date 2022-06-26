@@ -25,7 +25,7 @@ import * from ..libmagic;
 @@Create a wrapper from @step to extend its required files to dependencies
 function stepWithDependencies(step: Step, dependencies: {string...}): Step {
 	local result = copy step;
-	result.getRequiredFiles = [](self: BoundStep): {string...} {
+	result.getRequiredFiles = (self: BoundStep): {string...} -> {
 		yield step.getRequiredFiles(self)...;
 		yield self.group.fixFilenames(dependencies)...;
 	};

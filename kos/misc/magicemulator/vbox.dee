@@ -128,7 +128,7 @@ function createNamePipeAndStartLogProcessingThread(
 		vboxcmd: List) {
 	local hNamedPipe = win32.CreateNamedPipe(
 		namedPipeName, win32.PIPE_ACCESS_INBOUND, win32.PIPE_TYPE_BYTE, 1);
-	Thread([](proc, hNamedPipe, groups, config, connectedSemaphore, vboxcmd) {
+	Thread((proc, hNamedPipe, groups, config, connectedSemaphore, vboxcmd) -> {
 		function runCommand(command: Bytes) {
 			print "[vbox] Embedded command:", repr command;
 			if (command.startswith("vboxgdb:")) {

@@ -1522,7 +1522,7 @@ class FunctionImplementation {
 			for (local x: implPrefix) {
 				escapeNonRepeatingTextIntoFile(
 					fp, x, escapeMode,
-					keyEscape: [](keyword: string): string {
+					keyEscape: (keyword: string): string -> {
 						if (keyword in deps) {
 							local res = keyDependency(keyword);
 							if (LOCAL_NAMESPACE.prefix)
@@ -1560,7 +1560,7 @@ class FunctionImplementation {
 		fp << " ";
 		local selfName = this.name;
 		escapeTextIntoFile(fp, body, escapeMode,
-			keyEscape: [](keyword: string): string {
+			keyEscape: (keyword: string): string -> {
 				if (keyword == selfName) {
 					if (LOCAL_NAMESPACE.prefix) {
 						/* Must always wrap in parenthesis to guard against user-defined function-like macros. */
@@ -1827,7 +1827,7 @@ class LocalFunction {
 				fp.ppIf(usedPrototype.hasEllipsis
 					? "defined(__cplusplus) && __has_builtin(__builtin_va_arg_pack)"
 					: "defined(__cplusplus)");
-				LOCAL_NAMESPACE.keyUsingOrImpl(fp, exposedName, []{
+				LOCAL_NAMESPACE.keyUsingOrImpl(fp, exposedName, () -> {
 					prototypes.first.cprintCallToFunction(
 						fp, escapeMode, NAMESPACE_IMPORT_DECL,
 						exposedName, callToLocalName, usedPrototype,
@@ -1868,7 +1868,7 @@ class LocalFunction {
 			                   ptype.compatibleWith(usedPrototype);
 			if (allowUsing) {
 				/* Can only be done if the prototypes match up! */
-				LOCAL_NAMESPACE.keyUsingOrImpl(fp, exposedName, []{
+				LOCAL_NAMESPACE.keyUsingOrImpl(fp, exposedName, () -> {
 					ptype.cprintCallToFunction(
 						fp, escapeMode, NAMESPACE_IMPORT_DECL,
 						exposedName, callToLocalName, usedPrototype,
@@ -1942,7 +1942,7 @@ class InlineFunction {
 				dependenciesNamespace = NAMESPACES["local"];
 			if (keyDependency is none)
 				keyDependency = keyLocalDep;
-			depKey = [](keyword: string): string {
+			depKey = (keyword: string): string -> {
 				if (keyword == implName)
 					return exposedName;
 				if (keyword in deps) {
@@ -1970,7 +1970,7 @@ class InlineFunction {
 			fp.namespace = oldNs;
 			fp.externLinkage = oldExternLinkage;
 		} else {
-			depKey = [](keyword: string): string {
+			depKey = (keyword: string): string -> {
 				if (keyword == implName)
 					return exposedName;
 				return none;
@@ -1985,7 +1985,7 @@ class InlineFunction {
 			for (local x: impl.implPrefix) {
 				escapeNonRepeatingTextIntoFile(
 					fp, x, escapeMode,
-					keyEscape: [](keyword: string): string {
+					keyEscape: (keyword: string): string -> {
 						if (keyword in deps) {
 							local res = keyDependency(keyword);
 							if (!dependenciesNamespace.prefix)
@@ -2172,7 +2172,7 @@ class NamespaceBinding {
 					}
 				}
 				(isFirst ? fp.ppIf : fp.ppElif)(doUsingPpCond);
-				namespace.keyUsingOrImpl(fp, exposedName, []{
+				namespace.keyUsingOrImpl(fp, exposedName, () -> {
 					if (#prototypes == 1) {
 						local callToPrototype = prototypes.first;
 						if (prototype is bound)
@@ -2284,7 +2284,7 @@ class NamespaceBinding {
 				if (usedPrototype.hasEllipsis)
 					doUsingPpCond = "__has_builtin(__builtin_va_arg_pack)";
 				fp.ppIf(doUsingPpCond);
-				namespace.keyUsingOrImpl(fp, exposedName, []{
+				namespace.keyUsingOrImpl(fp, exposedName, () -> {
 					usedPrototype.cprintCallToFunction(
 						fp, escapeMode, NAMESPACE_IMPORT_DECL,
 						exposedName, cSymbolName, usedCallToPrototype,
@@ -3382,7 +3382,7 @@ class LibraryFunction {
 				local impl: FunctionImplementation | string | UserString = bind.functionBinding;
 				if (impl is FunctionImplementation) {
 					local deps: {string: Function} = impl.dependencyFunctions;
-					local keyEscape = [](keyword: string): string {
+					local keyEscape = (keyword: string): string -> {
 						if (keyword == impl.name)
 							return this.name;
 						local depFun = deps.get(keyword);

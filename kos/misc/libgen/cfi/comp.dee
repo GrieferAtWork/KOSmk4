@@ -1466,8 +1466,7 @@ again_with_less_limits:
 		this.inLimits = Dict();
 		local fullyLimited = HashSet();
 		local all = List(this.doAssemble(outputRegister, fullyLimited));
-		all.sort();
-		all.sort([](x) -> #x.last);
+		all.sort(key: x -> { #x.last, x });
 		local result = [];
 		local usedConditions = HashSet();
 		for (local cond, bytes: all) {
@@ -1551,4 +1550,4 @@ assert #encodeULeb128(ULEB128_3BYTE_MAX + 1) == 4;
 assert #encodeSLeb128(SLEB128_3BYTE_MIN) == 3;
 assert #encodeSLeb128(SLEB128_3BYTE_MIN - 1) == 4;
 
-Error.AppExit.atexit([]{ Error.AppExit.exit(0); });
+Error.AppExit.atexit(() -> Error.AppExit.exit(0));

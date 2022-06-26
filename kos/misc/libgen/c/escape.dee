@@ -1515,7 +1515,7 @@ function scanForNamesOfDependentFunctions(
 		forcedDependencies: {string...} = none,
 		unforcedDependencies: {string...} = none,
 		noAutoDependencyScanning: bool = false): Callable {
-	return []{
+	return () -> {
 		local usedPrototype = prototype;
 		if (usedPrototype is Callable)
 			usedPrototype = usedPrototype();

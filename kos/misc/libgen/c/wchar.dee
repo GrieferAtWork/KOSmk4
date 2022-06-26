@@ -386,7 +386,7 @@ function replaceWcharFunctionImplementation(
 		prototype: FunctionPrototype,
 		forInLibraryImplementation: bool): FunctionImplementation {
 	local oldFunctionName: string = str(self.name);
-	local keyOverride = [](keyword: string): string | none {
+	local keyOverride = (keyword: string): string | none -> {
 		/* Special handling: References to the function's own name
 		 * must  be replaced with `functionName', rather than with
 		 * the default uchar-replacement */

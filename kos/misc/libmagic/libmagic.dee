@@ -378,17 +378,17 @@ class Step {
 
 
 	final function withRequiredFiles(files: {string...}): Step {
-		getRequiredFiles = [](self: BoundStep) -> self.group.fixFilenames(files);
+		getRequiredFiles = (self: BoundStep) -> self.group.fixFilenames(files);
 		return this;
 	}
 
 	final function withModifiedOutputFiles(files: {string...}): Step {
-		getModifiedOutputFiles = [](self: BoundStep) -> self.group.fixFilenames(files);
+		getModifiedOutputFiles = (self: BoundStep) -> self.group.fixFilenames(files);
 		return this;
 	}
 
 	final function withMaybeModifiedOutputFiles(files: {string...}): Step {
-		getMaybeModifiedOutputFiles = [](self: BoundStep) -> self.group.fixFilenames(files);
+		getMaybeModifiedOutputFiles = (self: BoundStep) -> self.group.fixFilenames(files);
 		return this;
 	}
 
@@ -965,7 +965,7 @@ function combineSteps(steps...: Step): Step {
 		return steps[0];
 	return Step(
 		/* Just use the split mechanism to expand this step. */
-		split: [](self: BoundStep): {BoundStep...} {
+		split: (self: BoundStep): {BoundStep...} -> {
 			for (local s: steps) {
 				local bs = self.createChildStep(none);
 				bs.step = s;
@@ -1546,7 +1546,7 @@ function buildGroupsWithOutputWhitelist(
 		outputWhiteList: {(bool,string)...} = none, maxParallelSteps: int = 8) {
 	if (outputWhiteList is none)
 		return buildGroups(toolchainsAndGroups, maxParallelSteps);
-	return buildGroupsWithStepFilter(toolchainsAndGroups, [](step: BoundStep) {
+	return buildGroupsWithStepFilter(toolchainsAndGroups, (step: BoundStep) -> {
 		/* `outputWhiteList'  must contain a regex pattern for
 		 * any of the step's following output file categories:
 		 *   - producedOutputFiles
@@ -1572,7 +1572,7 @@ function buildGroupsWithGroupWhitelist(
 		groupWhiteList: {string...} = none, maxParallelSteps: int = 8) {
 	if (groupWhiteList is none)
 		return buildGroups(toolchainsAndGroups, maxParallelSteps);
-	return buildGroupsWithStepFilter(toolchainsAndGroups, [](step: BoundStep) {
+	return buildGroupsWithStepFilter(toolchainsAndGroups, (step: BoundStep) -> {
 		return step.group.name in groupWhiteList;
 	}, maxParallelSteps);
 }
@@ -1602,6 +1602,6 @@ next_step:
 	}
 	/* Apply a filter to only run steps apart of the whitelisted groups. */
 	steps = filterStepsWithCallbackWithDepdendencies(steps,
-		[](step: BoundStep) -> step.group.name in whiteListGroupNames);
+		(step: BoundStep) -> step.group.name in whiteListGroupNames);
 	return executeBuildSteps(steps, recheck, maxParallelSteps);
 }

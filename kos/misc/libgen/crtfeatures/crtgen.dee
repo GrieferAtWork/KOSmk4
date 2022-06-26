@@ -23,14 +23,14 @@ import * from .crtfeatures;
 
 local p = CParser();
 
-p.ignoredMacrosPred.append([](x) {
+p.ignoredMacrosPred.append(x -> {
 	return x.startswith("_") &&
 	       (x.endswith("_H") || x.endswith("_H_") ||
 	        x.endswith("_H__") || x.endswith("_H___")) &&
 	       x.upper() == x;
 });
-p.ignoredMacrosPred.append([](x) -> x.startswith("__need_"));
-p.ignoredMacrosPred.append([](x) -> x.startswith("__") && x.endswith("_defined"));
+p.ignoredMacrosPred.append(x -> x.startswith("__need_"));
+p.ignoredMacrosPred.append(x -> x.startswith("__") && x.endswith("_defined"));
 
 #if 1
 

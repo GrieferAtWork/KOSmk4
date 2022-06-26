@@ -1575,7 +1575,7 @@ function simpOptimizeElems(config: SimpConfig, assume: PPAssume, elems: {SimpPPE
 	}
 
 	/* Remove empty string elements. */
-	result.removeif([](e) -> e is string && e.isspace());
+	result.removeif(e -> e is string && e.isspace());
 
 	/* Merge adjacent `SimpPPIfCapsule' with equal/inverse conditions */
 	local n = #result - 1;

@@ -760,7 +760,7 @@ access_annotation_parse_multiply_rhs:
 								local stringArg = str self.parseCStringOrKeyword();
 								local expectedArgIndex = #result.argv;
 								local errLog = self.tokStart;
-								extraAttributes.append([]{
+								extraAttributes.append(() -> {
 									local realArgName = str result.argv[expectedArgIndex].name;
 									if (stringArg != realArgName) {
 										self.errAt(errLog, "[[<access>(strlen({}))]] attached to wrong argument {!r}"
@@ -781,7 +781,7 @@ access_annotation_parse_multiply_rhs:
 
 						}
 						self.skip(")");
-						extraAttributes.append([]{
+						extraAttributes.append(() -> {
 							local sizeArg = result.argsByName[str sizeArgumentName];
 							local sizeIndex = str(result.argv.index(sizeArg) + 1);
 							result.attributes.append("{}S({}, {})"
@@ -1806,7 +1806,7 @@ function defineFunctionInMapping(
 
 #define DELAY_printDefaultLibraryImplementationForPrototype
 #ifdef DELAY_printDefaultLibraryImplementationForPrototype
-#define DELAY_cb []->
+#define DELAY_cb () ->
 #else /* DELAY_printDefaultLibraryImplementationForPrototype */
 #define DELAY_cb /* nothing */
 #endif /* !DELAY_printDefaultLibraryImplementationForPrototype */
@@ -2388,7 +2388,7 @@ again_parse_default_annotation:
 		self.next();
 		self.skip("(");
 		local text = self.parseAllUntilRParenAsString();
-		result.order_header.append([](fp: CWriter, escapeMode: int) {
+		result.order_header.append((fp: CWriter, escapeMode: int) -> {
 			fp.forceStartOfLine();
 			local extendedPrefixes = [];
 			local usedText = escapeText(
@@ -2419,7 +2419,7 @@ again:
 	public function parseInsertDirective_pp_else(functionName: string = "ppElse") {
 		local self = this.self;
 		self.next();
-		result.order_header.append([](fp: CWriter, escapeMode: int) -> fp.operator . (functionName)());
+		result.order_header.append((fp: CWriter, escapeMode: int) -> fp.operator . (functionName)());
 	}
 	public function parseInsertDirective_pp_endif() {
 		parseInsertDirective_pp_else("ppEndif");
@@ -2478,7 +2478,7 @@ again:
 			insertedFunctionNameStart = self.tokStart;
 			insertedFunctionName = self.parseCStringOrKeyword();
 		}
-		exposedFunction.func = []{
+		exposedFunction.func = () -> {
 			try {
 				return findFunctionByName(insertedFunctionName);
 			} catch (Error as e) {
@@ -2531,7 +2531,7 @@ again:
 				local importFunction = Function(
 					name:                     exposedName,
 					originalSystemHeaderName: headerName,
-					bindings: []{
+					bindings: () -> {
 						local protos = exposedFunction.exposedFunc
 							.functionBindings.first.prototypes;
 						yield FunctionBinding(
@@ -2581,7 +2581,7 @@ again:
 			result_order_header_in_CXX_SYSTEM_HEADER = false;
 		}
 		result.order_header.append(ExposedFunction(
-			func: [] {
+			func: () -> {
 				try {
 					return findFunctionByName(functionName);
 				} catch (Error as e) {
@@ -2602,7 +2602,7 @@ again:
 			assert result_order_header_in_CXX_SYSTEM_HEADER === false;
 			result_order_headerStd = [];
 			/* Inject a printer callback for generating std:: declarations */
-			result.order_header.append([](fp: CWriter, escapeMode: int) {
+			result.order_header.append((fp: CWriter, escapeMode: int) -> {
 				local oldNs = fp.namespace;
 				fp.namespace = NAMESPACES["std"];
 				for (local part: result_order_headerStd) {
@@ -3166,7 +3166,7 @@ function Arguments_replaceDefaultCCWithDosCC(argv: {Argument...}): {Argument...}
 function replaceFunctionPrototypeDefaultCCWithDefaultDosCC(
 		prototype: FunctionPrototype | Callable): FunctionPrototype | Callable {
 	if (prototype is Callable)
-		return [] -> replaceFunctionPrototypeDefaultCCWithDefaultDosCC(prototype());
+		return () -> replaceFunctionPrototypeDefaultCCWithDefaultDosCC(prototype());
 	local result: FunctionPrototype = prototype;
 	local didCopy: bool = false;
 	if (result.cc === DEFAULT_CC) {
@@ -3501,7 +3501,7 @@ class CrtDosVariantCallbackMetadata: CrtDosVariantMetadata {
 		this.cookie.replaceAutoTypes(dosProto);
 
 		/* Do the remaining work asynchronously once everything has been loaded. */
-		return []{
+		return () -> {
 			local result = FunctionImplementation(name: name);
 			local dosBody = CWriter(File.Writer());
 			local dosPrefix = CWriter(File.Writer());
@@ -3606,7 +3606,7 @@ class CrtDosVariantCallbackMetadata: CrtDosVariantMetadata {
 			/* Finalize the used FunctionImplementation */
 			result.implPrefix = (dosPrefix,);
 			result.body = dosBody;
-			result.dependencies = []{
+			result.dependencies = () -> {
 				for (local body: { usedWrapperBody, usedImplBody }) {
 					local deps = scanForNamesOfDependentFunctions(body, name, dosProto);
 					if (deps is Callable)
@@ -3745,7 +3745,7 @@ class CrtDosVariantCustomMetadata: CrtDosVariantMetadata {
 		applyDosProtoOverrides(dosProto, this.dosProto);
 
 		/* Do the remaining work asynchronously once everything has been loaded. */
-		return []{
+		return () -> {
 			local result = FunctionImplementation(name: name);
 			result.implPrefix = implPrefix;
 			local implBodyStr = str(implBody);
@@ -3763,7 +3763,7 @@ class CrtDosVariantCustomMetadata: CrtDosVariantMetadata {
 			} else {
 				result.body = "{{\n\treturn {};\n}}".format({ implBodyStr });
 			}
-			result.dependencies = []{
+			result.dependencies = () -> {
 				for (local body: { implBody, implPrefix... }) {
 					local deps = scanForNamesOfDependentFunctions(str(body), name, dosProto);
 					if (deps is Callable)
@@ -4100,7 +4100,7 @@ again_parse_annotations:
 					local funcNameStart: int = self.tokStart;
 					local funcName: string = self.parseCStringOrKeyword();
 					self.skip(")");
-					current.documentation = [](): string {
+					current.documentation = (): string -> {
 						local func: Function;
 						try {
 							func = findFunctionByName(funcName);
@@ -4328,7 +4328,7 @@ again_parse_annotations:
 						local binding = FunctionBinding(
 							ppCond:     currentConditions is none ? "1" : currentConditions,
 							prototypes: currentPrototypes,
-							binding:    [] -> findLocalFunctionByName(functionName));
+							binding:    () -> findLocalFunctionByName(functionName));
 						if (tok.startswith("preferred_")) {
 							current.bindings.insert(numPreferredBindings, binding);
 							++numPreferredBindings;
@@ -4377,7 +4377,7 @@ again_parse_annotations:
 					self.next();
 					if (self.tok != "(") {
 						/* Most simplified case: deduce everything automatically */
-						local bindingsGenerator = []{
+						local bindingsGenerator = () -> {
 							local fastFunctionName = current.name;
 							local baseCond = IF_FAST_DEFINED_PATTERN;
 							if (tok.endswith("_always"))
@@ -4407,7 +4407,7 @@ again_parse_annotations:
 							yield FunctionBinding(
 								ppCond:     "{}&&{}".format({ baseCond, keyCrtHave(fastFunctionName) }),
 								prototypes: currentPrototypes,
-								binding:    [] -> InlineFunction(
+								binding:    () -> InlineFunction(
 									mode:                "__EXTERN_INLINE",
 									impl:                fastWrapperImpl,
 									externInlineAsmname: fastFunctionName,
@@ -4415,7 +4415,7 @@ again_parse_annotations:
 							yield FunctionBinding(
 								ppCond:     baseCond,
 								prototypes: currentPrototypes,
-								binding:    [] -> InlineFunction(
+								binding:    () -> InlineFunction(
 									mode:          "FORCELOCAL",
 									impl:          fastWrapperImpl,
 									isFastBinding: true));
@@ -4513,7 +4513,7 @@ again_parse_annotations:
 						local binding = FunctionBinding(
 							ppCond:     bindingCond,
 							prototypes: currentPrototypes,
-							binding:    [] -> InlineFunction(
+							binding:    () -> InlineFunction(
 								mode:                "__EXTERN_INLINE",
 								impl:                getInlineImplementation(),
 								externInlineAsmname: eiAsmname,
@@ -4528,7 +4528,7 @@ again_parse_annotations:
 					local binding = FunctionBinding(
 						ppCond:     baseCond,
 						prototypes: currentPrototypes,
-						binding:    [] -> InlineFunction(
+						binding:    () -> InlineFunction(
 							mode:          "FORCELOCAL",
 							impl:          getInlineImplementation(),
 							isFastBinding: true));
@@ -4588,7 +4588,7 @@ again_parse_annotations:
 						local binding = FunctionBinding(
 							ppCond:     bindingCond,
 							prototypes: currentPrototypes,
-							binding:    []{
+							binding:    () -> {
 								local ifun = InlineFunction(
 									impl: FunctionImplementation(
 										body: body,
@@ -5347,7 +5347,7 @@ got_chkExpr:
 					}
 					if (currentPrototype is none) {
 						local replacedPrototypeCell: Cell with FunctionPrototype = Cell();
-						currentPrototype = []{
+						currentPrototype = () -> {
 							if (!replacedPrototypeCell) {
 								local origProto: FunctionPrototype;
 								try {
@@ -5382,7 +5382,7 @@ got_chkExpr:
 						};
 					}
 					if (currentPrototypes is none) {
-						currentPrototypes = [] -> {
+						currentPrototypes = () -> {
 							("1", {
 								currentPrototype is Callable
 									? currentPrototype()
@@ -5460,7 +5460,7 @@ got_chkExpr:
 					}
 					self.skip(">");
 					self.skip(")");
-					loaderImpl = [](): LoaderFunctionImplementation {
+					loaderImpl = (): LoaderFunctionImplementation -> {
 						local usedTemplate: Template = templates.get(templateName);
 						if (usedTemplate is none)
 							self.error(templateNameStart, "Unknown template {!r}".format({ templateName }));
@@ -5549,7 +5549,7 @@ got_chkExpr:
 					}
 					if (currentPrototype is none) {
 						local replacedPrototypeCell: Cell with FunctionPrototype = Cell();
-						currentPrototype = []{
+						currentPrototype = () -> {
 							if (!replacedPrototypeCell) {
 								local result: FunctionPrototype =
 									getBaseLocalFunction().functionPrototype;
@@ -5574,7 +5574,7 @@ got_chkExpr:
 						};
 					}
 					if (currentPrototypes is none) {
-						currentPrototypes = [] -> {
+						currentPrototypes = () -> {
 							("1", {
 								currentPrototype is Callable
 									? currentPrototype()
@@ -5590,7 +5590,7 @@ got_chkExpr:
 					}
 					if (current.documentation is string && !current.documentation) {
 						local baseDocumentationTextCell: Cell with string = Cell();
-						current.documentation = []{
+						current.documentation = () -> {
 							if (!baseDocumentationTextCell) {
 								local result: Function;
 								try {
@@ -5612,7 +5612,7 @@ got_chkExpr:
 					local feat_forcedDependencies       = currentFeatures.forcedDependencies;
 					local feat_unforcedDependencies     = currentFeatures.unforcedDependencies;
 					local generatedLoaderImplCell: Cell with (LoaderFunctionImplementation | none) = Cell();
-					loaderImpl = [](): LoaderFunctionImplementation | none {
+					loaderImpl = (): LoaderFunctionImplementation | none -> {
 						if (!generatedLoaderImplCell) {
 							local baseLocalFunction: LocalFunction | none = getBaseLocalFunction();
 							local result: LoaderFunctionImplementation | none;
@@ -5777,7 +5777,7 @@ got_chkExpr:
 						if (!result.localFunctionsByName.setnew(xcLocalFunction.name, xcLocalFunction))
 							self.errAt(currentNameTokStart, "Duplicate local function: {!r}"
 								.format({ xcLocalFunction.name }));
-						xcLocalFunction.prototype = []{
+						xcLocalFunction.prototype = () -> {
 							local usedPrototype: FunctionPrototype = currentPrototype;
 							local xc: XcharImplementation = wcharFunction
 								.getXCharImplementation(currentName, mode, false);
@@ -5797,7 +5797,7 @@ got_chkExpr:
 							}
 							return usedPrototype;
 						};
-						xcLocalFunction.impl = []{
+						xcLocalFunction.impl = () -> {
 							local xc: XcharImplementation = wcharFunction
 								.getXCharImplementation(currentName, mode, false);
 							local xcImpl: none | Callable | LoaderFunctionImplementation = xc.loaderImpl;
@@ -5807,17 +5807,17 @@ got_chkExpr:
 							xcLocalFunction.ppCondPrefix = xcImpl.ppCondPrefix;
 							return xcImpl.impl;
 						};
-						xcLocalFunction.documentation = []{
+						xcLocalFunction.documentation = () -> {
 							return getWcharFunction().documentation;
 						};
 					}
 					if (current.documentation is string && !current.documentation) {
 						/* Automatically inherit the documentation from @wcharFunction */
-						current.documentation = [](): string {
+						current.documentation = (): string -> {
 							return getWcharFunction().documentationString;
 						};
 					}
-					current.internalName = [] {
+					current.internalName = () -> {
 						if (wcharFunction.wc_internal_uchar !is bound) {
 							/* Associated   [[wchar]]-function   was  marked   as  [[ignore]]
 							 * In this case, the uchar-variant doesn't have an internal name! */
@@ -5826,7 +5826,7 @@ got_chkExpr:
 						return wcharFunction.wc_internal_uchar[mode].name;
 					};
 					/* Lazily construct function bindings upon first access */
-					current.bindings = [](): {FunctionBinding...} {
+					current.bindings = (): {FunctionBinding...} -> {
 						@@The referenced [[wchar]]-Function
 						local wc: Function = getWcharFunction();
 						@@The Xchar-function implementation
@@ -6283,7 +6283,7 @@ with_primaryImplementation:
 							prototype:                currentPrototype,
 							documentation:            current.documentation,
 							impl: loaderImpl is Callable
-								? [] -> loaderImpl().impl
+								? () -> loaderImpl().impl
 								: loaderImpl
 						);
 						defineFunctionInMapping(allLocalFunctionsByName, localFunc);
@@ -6292,7 +6292,7 @@ with_primaryImplementation:
 								.format({ localFunc.name }));
 						}
 					}
-					current.bindings = []{
+					current.bindings = () -> {
 						local usedImpl: LoaderFunctionImplementation = loaderImpl;
 						local usedExistingBindings = existingBindings;
 						if (usedImpl is Callable)
@@ -6488,12 +6488,12 @@ again_lookup_wcsCurrent:
 							self.errAt(currentNameTokStart, "Custom dos implementation cannot be used with [wchar]");
 						wcsCurrent.wc_internal_uchar = { currentDosLibraryFunction, currentKosLibraryFunction };
 						if (currentDosLibraryFunction.prototype !is bound) {
-							currentDosLibraryFunction.prototype = [] -> wcsCurrent
+							currentDosLibraryFunction.prototype = () -> wcsCurrent
 								.getXCharImplementation(libc_dosName, WCHAR_REPLACEMENT_CHAR16, true)
 								.prototype;
 						}
 						if (currentKosLibraryFunction.prototype !is bound) {
-							currentKosLibraryFunction.prototype = [] -> wcsCurrent
+							currentKosLibraryFunction.prototype = () -> wcsCurrent
 								.getXCharImplementation(libc_kosName, WCHAR_REPLACEMENT_CHAR32, true)
 								.prototype;
 						}
@@ -6503,7 +6503,7 @@ again_lookup_wcsCurrent:
 								crtName: string | UserString, mode: int,
 								implSection: UserString | string | none,
 								extraAttrib: {UserString | string...} | none): Callable {
-							return []{
+							return () -> {
 								local xc: XcharImplementation = wcsCurrent
 									.getXCharImplementation(functionName, mode, true);
 								local xcLoaderImpl: LoaderFunctionImplementation = xc.loaderImpl;
@@ -6540,13 +6540,13 @@ again_lookup_wcsCurrent:
 						local dosLibImpl: FunctionImplementation | Callable;
 						if (loaderImpl !is none) {
 							kosLibImpl = loaderImpl is Callable
-								? [] -> loaderImpl().impl
+								? () -> loaderImpl().impl
 								: loaderImpl.impl;
 						} else {
 							/* Create a default implementation for user-sources */
 							local kosProto = currentKosLibraryFunction.prototype;
 							kosLibImpl = kosProto is Callable
-								? [] -> getDefaultLibraryImplementationForPrototype(kosProto(), crtName)
+								? () -> getDefaultLibraryImplementationForPrototype(kosProto(), crtName)
 								: DELAY_cb getDefaultLibraryImplementationForPrototype(kosProto, crtName);
 						}
 						if (currentFeatures.crt_dosVariant !is bool) {
@@ -6556,7 +6556,7 @@ again_lookup_wcsCurrent:
 						} else if (loaderImpl !is none) {
 							/* Replace "libc_" prefix in calls to functions with DOS variants with "libd_"
 							 * Do this by explicitly replacing dependencies. */
-							dosLibImpl = []{
+							dosLibImpl = () -> {
 								local usedKosLibImpl: FunctionImplementation = kosLibImpl;
 								if (usedKosLibImpl is Callable)
 									usedKosLibImpl = usedKosLibImpl();
@@ -6567,7 +6567,7 @@ again_lookup_wcsCurrent:
 						} else {
 							local dosProto = currentDosLibraryFunction.prototype;
 							dosLibImpl = dosProto is Callable
-								? [] -> getDefaultLibraryImplementationForPrototype(dosProto(), crtName)
+								? () -> getDefaultLibraryImplementationForPrototype(dosProto(), crtName)
 								: DELAY_cb getDefaultLibraryImplementationForPrototype(dosProto, crtName);
 						}
 						currentDosLibraryFunction.bindings.append(LibraryFunctionBinding(
@@ -6596,12 +6596,12 @@ again_lookup_wcsCurrent:
 					local kosProto: FunctionPrototype | Callable = currentKosLibraryFunction.prototype;
 					if (loaderImpl !is none) {
 						libImpl = loaderImpl is Callable
-							? [] -> loaderImpl().impl
+							? () -> loaderImpl().impl
 							: loaderImpl.impl;
 					} else {
 						/* Create a default implementation for user-sources */
 						libImpl = kosProto is Callable
-							? [] -> getDefaultLibraryImplementationForPrototype(kosProto(), crtName)
+							? () -> getDefaultLibraryImplementationForPrototype(kosProto(), crtName)
 							: DELAY_cb getDefaultLibraryImplementationForPrototype(kosProto, crtName);
 					}
 					currentKosLibraryFunction.bindings.append(LibraryFunctionBinding(
@@ -6677,7 +6677,7 @@ again_lookup_wcsCurrent:
 							if (dosProto is Callable ||
 							    (kosProto is Callable && dosProto.hasEllipsis &&
 							     dosProto.ellipsisArgumentTypes is none)) {
-								dosLibImpl = []{
+								dosLibImpl = () -> {
 									local usedDosProto: FunctionPrototype;
 									usedDosProto = dosProto is Callable ? dosProto() : dosProto;
 									if (!usedDosProto.hasEllipsis || usedDosProto.ellipsisArgumentTypes !is none) {
@@ -6770,17 +6770,17 @@ handle_eq_after_prototype:
 			}
 			/* Inherit the documentation so-long as none was specified for this function. */
 			if (current.documentation is string && !current.documentation)
-				current.documentation = [] -> getBoundFunction().documentationString;
-			current.internalName = [] -> getBoundFunction().internalFunctionName;
+				current.documentation = () -> getBoundFunction().documentationString;
+			current.internalName = () -> getBoundFunction().internalFunctionName;
 			if (currentPrototypes is none) {
 				/* Simple case: Also inherit all prototypes (in which case we can
 				 *              also  simply inherit all  bindings from the other
 				 *              function) */
-				current.bindings = [] -> getBoundFunction().functionBindings;
+				current.bindings = () -> getBoundFunction().functionBindings;
 				/* Need to bind @currentPrototypes properly, as it may
 				 * still  be used for @(NamespaceBinding)s down below! */
 				if (currentFeatures.namespaces) {
-					currentPrototypes = []{
+					currentPrototypes = () -> {
 						local bfun: Function = getBoundFunction();
 						local result = bfun.onlyPrototypes;
 						if (result !is none)
@@ -6802,7 +6802,7 @@ handle_eq_after_prototype:
 			} else {
 				/* Difficult case: We must inherit bindings, but override them
 				 *                 with our  own, custom  list of  prototypes! */
-				current.bindings = []{
+				current.bindings = () -> {
 					local func = getBoundFunction();
 					for (local otherBind /*: FunctionBinding*/ : func.functionBindings) {
 						if (otherBind.binding is Callable)
@@ -7022,7 +7022,7 @@ done_function:
 			if (moreBindings) {
 				local oldBindings = current.bindings;
 				if (oldBindings is Callable) {
-					current.bindings = []{
+					current.bindings = () -> {
 						yield moreBindings...;
 						yield oldBindings()...;
 					};
@@ -7151,7 +7151,7 @@ done_function:
 				headerName.replace(".", "/"),
 				context.result_ccompatHeaderName
 			}));
-		result.order_header.insert(1, [](fp: CWriter, escapeMode: int)
+		result.order_header.insert(1, (fp: CWriter, escapeMode: int)
 			-> fp.clearGlobalPrintedPrefixes());
 		result.order_header.insert(1,
 			"#undef {0}\n"

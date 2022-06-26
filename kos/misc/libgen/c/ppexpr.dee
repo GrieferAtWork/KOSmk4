@@ -825,7 +825,7 @@ have_non_boolean_in_brt_all:
 						? operator *
 						: typ == BRT_BITAND
 						? operator &
-						: [](a, b) -> a && b;
+						: (a, b) -> a && b;
 					local nonConstants: {PPBranch...} = [];
 					local constantsProd: int = 1;
 					for (local e: data) {
@@ -941,7 +941,7 @@ have_non_boolean_in_brt_any:
 						? operator +
 						: typ == BRT_BITOR
 						? operator |
-						: [](a, b) -> a || b;
+						: (a, b) -> a || b;
 					local nonConstants: {PPBranch...} = [];
 					local constantsSum: int = 0;
 					for (local e: data) {

@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Add function `Sequence.bcontains()'"
-DEEMON_VERSION="db9bb6dcb3b05963b5f75da7f10d5f275ba645f9"
+#     v -- "Minor fixes & new compiler quality warnings"
+DEEMON_VERSION="7a4ecd266397728c958ef04797f4165d27bde786"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 

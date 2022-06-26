@@ -1098,4 +1098,4 @@ function assemble(arch: string, code: string): {int | string...} {
 	return Assembler(arch, code).assemble();
 }
 
-Error.AppExit.atexit([]{ Error.AppExit.exit(0); });
+Error.AppExit.atexit(() -> Error.AppExit.exit(0));

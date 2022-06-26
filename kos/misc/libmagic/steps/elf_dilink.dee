@@ -65,7 +65,7 @@ final local function DILINK_run(self: BoundStep): string {
 	local script = options.get(OPT_LINK_SCRIPT);
 	if (script is none)
 		throw Error("DILINK with custom bindings, but no linker script!");
-	local th = Thread([]{
+	local th = Thread(() -> {
 		@@Our current guess on section offsets and sizes
 		local guessedSectionOffsetsAndSizes: {string: (int, int)} = Dict();
 		@@This  is  a   cache  file  containing   the  last-correct  sizes   of  sections  in   the

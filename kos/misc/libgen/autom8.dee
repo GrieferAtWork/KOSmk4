@@ -951,15 +951,15 @@ do_line_wise_comment_block:
 							goto normal_reflow;
 					}
 					local longestLineLength = (commentLines.each.length > ...) - 1;
-					commentLines = List([]{
+					commentLines = List(
 						for (local l: commentLines)
-							yield l[:-1].rstrip();
-					}());
+							l[:-1].rstrip()
+					);
 					commentLines = List(reflowBlockComment(commentLines));
-					commentLines = List([]{
+					commentLines = List(
 						for (local l: commentLines)
-							yield l.ljust(longestLineLength) + "\\";
-					}());
+							l.ljust(longestLineLength) + "\\"
+					);
 				} else {
 					local linesExceptLast = commentLines[:-1];
 					for (local l: linesExceptLast) {

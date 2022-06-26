@@ -45,7 +45,7 @@ final local function KEYMAP_split(self: BoundStep): {BoundStep...} {
 	}
 }
 final local function KEYMAP_run(self: BoundStep): {Waitable...} {
-	local th = Thread([](self: BoundStep) {
+	local th = Thread((self: BoundStep) -> {
 		libkeymap_compiler.compileKeymap(
 			self.userData,
 			KEYMAP_getOutputFilename(self));

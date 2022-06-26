@@ -1919,7 +1919,7 @@ function calculateSyscallTableRanges(ids: {int...}, arch/*: SyscallArch*/): {(in
 		}
 	}
 	/* Sort by gap starting index. */
-	usedGaps.sort([](x) -> x[0]);
+	usedGaps.sort(x -> x[0]);
 	local result = [];
 	local prevEnd = ids.first;
 	for (local min, max: usedGaps) {
@@ -2925,7 +2925,7 @@ function main(archNames: {string...}) {
 		local c = archContexts[name];
 		writeHashedFile(a.formatPath(
 			"include/{name}/kos/syscalls{suffix}.h"
-		), [](fp){
+		), (fp: File) -> {
 			generateKosSyscallHeader(
 				fp,
 				for (local name, none: c.nameMappings)
@@ -2935,7 +2935,7 @@ function main(archNames: {string...}) {
 				false);
 		});
 	}
-	writeHashedFile("include/kos/syscalls.h", [](fp){
+	writeHashedFile("include/kos/syscalls.h", (fp: File) -> {
 		generateKosSyscallHeader(
 			fp,
 			for (local name, none: baseContext.nameMappings)
@@ -2951,13 +2951,13 @@ function main(archNames: {string...}) {
 		local c = archContexts[name];
 		writeHashedFile(a.formatPath(
 			"include/{name}/crt-features/crt-kos-syscalls{suffix}.h"
-		), [](fp){
+		), (fp: File) -> {
 			generateCrtFeaturesCrtKosSyscallsHeader(fp,
 				for (local none, decl: c.sysidMappings)
 					c.functions[decl[2]]);
 		});
 	}
-	writeHashedFile("include/crt-features/crt-kos-syscalls.h", [](fp){
+	writeHashedFile("include/crt-features/crt-kos-syscalls.h", (fp: File) -> {
 		generateCrtFeaturesCrtKosSyscallsHeader(fp,
 			for (local none, decl: baseContext.sysidMappings)
 				baseContext.functions[decl[2]]);
@@ -2971,57 +2971,57 @@ function main(archNames: {string...}) {
 		local c = archContexts[name];
 		writeHashedFile(a.formatPath(
 			"include/{name}/asm/syscalls{suffix}.h"
-		), [](fp){
+		), (fp: File) -> {
 			generateAsmSyscallsHeaders(fp, c, a);
 		});
 		writeHashedFile(a.formatPath(
 			"include/{name}/asm/syscalls-proto{suffix}.h"
-		), [](fp){
+		), (fp: File) -> {
 			generateAsmSyscallsProtoHeader(fp, c, a);
 		});
 		writeHashedFile(a.formatPath(
 			"include/{name}/asm/syscalls-trace{suffix}.h"
-		), [](fp){
+		), (fp: File) -> {
 			generateAsmSyscallsTraceHeader(fp, c, a, name);
 		});
 		writeHashedFile(a.formatPath(
 			"include/{name}/asm/syscalls-types{suffix}.h"
-		), [](fp){
+		), (fp: File) -> {
 			generateAsmSyscallsTypesHeader(fp, { (c, a, name) });
 		});
 		if (a.platformSuffix) {
 			writeHashedFile(a.formatPath(
 				"include/{name}/asm/syscalls{suffix}_d.h"
-			), [](fp){
+			), (fp: File) -> {
 				generateAsmSyscallsHeaders(fp, c, a, "__NR" + a.platformSuffix);
 			});
 			writeHashedFile(a.formatPath(
 				"include/{name}/asm/syscalls-proto{suffix}_d.h"
-			), [](fp){
+			), (fp: File) -> {
 				generateAsmSyscallsProtoHeader(fp, c, a, "__NR" + a.platformSuffix);
 			});
 			writeHashedFile(a.formatPath(
 				"include/{name}/asm/syscalls-trace{suffix}_d.h"
-			), [](fp){
+			), (fp: File) -> {
 				generateAsmSyscallsTraceHeader(fp, c, a, name, "__NR" + a.platformSuffix);
 			});
 			writeHashedFile(a.formatPath(
 				"include/{name}/asm/syscalls-types{suffix}_d.h"
-			), [](fp){
+			), (fp: File) -> {
 				generateAsmSyscallsTypesHeader(fp, { (c, a, name) });
 			});
 		}
 	}
-	writeHashedFile("include/asm/syscalls.h", [](fp){
+	writeHashedFile("include/asm/syscalls.h", (fp: File) -> {
 		generateAsmSyscallsHeaders(fp, baseContext, none);
 	});
-	writeHashedFile("include/asm/syscalls-proto.h", [](fp){
+	writeHashedFile("include/asm/syscalls-proto.h", (fp: File) -> {
 		generateAsmSyscallsProtoHeader(fp, baseContext, none);
 	});
-	writeHashedFile("include/asm/syscalls-trace.h", [](fp){
+	writeHashedFile("include/asm/syscalls-trace.h", (fp: File) -> {
 		generateAsmSyscallsTraceHeader(fp, baseContext, none, none);
 	});
-	writeHashedFile("include/asm/syscalls-types.h", [](fp){
+	writeHashedFile("include/asm/syscalls-types.h", (fp: File) -> {
 		generateAsmSyscallsTypesHeader(fp, { (baseContext, none, none) });
 	});
 
@@ -3029,14 +3029,14 @@ function main(archNames: {string...}) {
 		local c = archContexts[name];
 		writeHashedFile(a.formatPath(
 			"include/{name}/asm/ls-syscalls{suffix}.h"
-		), [](fp){
+		), (fp: File) -> {
 			generateAsmLsSyscallsHeader(fp, c, a);
 		});
 	}
-	writeHashedFile("include/asm/ls-syscalls.h", [](fp){
+	writeHashedFile("include/asm/ls-syscalls.h", (fp: File) -> {
 		generateAsmLsSyscallsHeader(fp, baseContext, none);
 	});
-	writeHashedFile("include/kos/kernel/syscalls.h", [](fp){
+	writeHashedFile("include/kos/kernel/syscalls.h", (fp: File) -> {
 		generateKosKernelSyscallsRequestHeader(fp, baseContext, none, none);
 	});
 
@@ -3044,7 +3044,7 @@ function main(archNames: {string...}) {
 		local archContext = archContexts[name];
 		writeHashedFile(a.formatPath(
 			"include/{name}/kos/kernel/syscalls{suffix}.h"
-		), [](fp){
+		), (fp: File) -> {
 			local compatArchName = a.platformSyscallCompatRequest;
 			if (compatArchName is none) {
 				generateKosKernelSyscallsRequestHeader(fp, archContext, a, name);
@@ -3082,7 +3082,7 @@ function main(archNames: {string...}) {
 				archContexts[compatArchName] = c;
 			}
 			local compatContext = archContexts[compatArchName];
-			writeHashedFile(headerName, [](fp){
+			writeHashedFile(headerName, (fp: File) -> {
 				generateSyscallCompatibilityHeader(
 					fp, prefix,
 					archContext, a, name,
@@ -3107,7 +3107,7 @@ function main(archNames: {string...}) {
 				archContexts[compatArchName] = c;
 			}
 			local compatContext = archContexts[compatArchName];
-			writeHashedFile(headerName, [](fp){
+			writeHashedFile(headerName, (fp: File) -> {
 				generateAsmSyscallsTypesHeader(fp, {
 					(archContext, a, name),
 					(compatContext, compatArch, compatArchName),
@@ -3120,13 +3120,13 @@ function main(archNames: {string...}) {
 		local c = archContexts[name];
 		writeHashedFile(a.formatPath(
 			"include/{name}/bits/syscalls{suffix}.h"
-		), [](fp){
+		), (fp: File) -> {
 			generateBitsSyscallsHeader(fp, c, a,
 				sanitizeIncludeGuard("_{}_BITS_SYSCALLS{}_H"
 					.format({ a.platformName, a.platformSuffix })));
 		});
 	}
-	writeHashedFile("include/bits/syscalls.h", [](fp){
+	writeHashedFile("include/bits/syscalls.h", (fp: File) -> {
 		generateBitsSyscallsHeader(fp, baseContext, none, "_BITS_SYSCALLS_H");
 	});
 
@@ -3134,7 +3134,7 @@ function main(archNames: {string...}) {
 		local c = archContexts[name];
 		writeHashedFile(a.formatPath(
 			"src/kernel/core/arch/{arch}/syscall/wrappers{suffix}.S"
-		), [](fp){
+		), (fp: File) -> {
 			generateKernelCoreArchSyscallWrappersAssembly(
 				fp, c, a, ALL_ARCH, archContexts);
 		});
@@ -3144,7 +3144,7 @@ function main(archNames: {string...}) {
 		local c = archContexts[name];
 		writeHashedFile(a.formatPath(
 			"src/libc/libc/arch/{arch}/syscalls{suffix}.S"
-		), [](fp){
+		), (fp: File) -> {
 			generateLibcArchSyscallAssembly(fp, c, a);
 		});
 	}

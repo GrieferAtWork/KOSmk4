@@ -43,13 +43,13 @@ class Namespace {
 	public member prefix: string;
 
 	@@Namespace using (at the start of its own line)
-	@@> [](fp: File, name: string) {
+	@@> (fp: File, name: string) -> {
 	@@>     fp << "__NAMESPACE_FAST_USING(" << name << ")\n";
 	@@> };
 	public member keyUsing: Callable with string;
 
 	@@Namespace using, or implementation begin (at the start of its own line)
-	@@> [](fp: File, name: string, impl: Callable) {
+	@@> (fp: File, name: string, impl: Callable) -> {
 	@@>     fp << "__NAMESPACE_FAST_USING_OR_IMPL(" << name << ", ";
 	@@>     impl();
 	@@>     fp << ")\n";
@@ -61,11 +61,11 @@ class Namespace {
 	@@always  assumed to be  equal to the  symbol's actual name. Otherwise,
 	@@this assumption is only made on a per-symbol basis when this function
 	@@returns an equal string for some given symbol name.
-	@@e.g. @([](name) -> "__LIBC_FAST_NAME({})".format({ name }))
+	@@e.g. @(name -> "__LIBC_FAST_NAME({})".format({ name }))
 	public member keyCSymbolName: Callable with string;
 
 	@@Returns the macro name for the default guard for the given symbol
-	@@e.g.  @([](name)   ->   "__fast_{}_defined".format({   name   }))
+	@@e.g.    @(name    ->   "__fast_{}_defined".format({    name   }))
 	public member keyDefaultGuard: Callable with string;
 
 	public operator hash(): int -> Object.id(this);
@@ -76,16 +76,16 @@ class Namespace {
 @@The default, global/root namespace (the only existing namespace in C)
 global final GLOBAL_NAMESPACE: Namespace = Namespace(
 	name: "", enter: "", leave: "", prefix: "",
-	keyUsing: [](fp: File, name: string) {
+	keyUsing: (fp: File, name: string) -> {
 		fp << "__NAMESPACE_GLB_USING(" << name << ")\n";
 	},
-	keyUsingOrImpl: [](fp: File, name: string, impl: Callable) {
+	keyUsingOrImpl: (fp: File, name: string, impl: Callable) -> {
 		fp << "__NAMESPACE_GLB_USING_OR_IMPL(" << name << ", ";
 		impl();
 		fp << ")\n";
 	},
 	keyCSymbolName: functools.identity,
-	keyDefaultGuard: [](symbolName: string): string {
+	keyDefaultGuard: (symbolName: string): string -> {
 		return "__{}_defined".format({ symbolName });
 	});
 
@@ -95,18 +95,18 @@ global final LOCAL_NAMESPACE: Namespace = Namespace(
 	enter:    "__NAMESPACE_LOCAL_BEGIN\n",
 	leave:    "__NAMESPACE_LOCAL_END\n",
 	prefix:   "__NAMESPACE_LOCAL_SYM",
-	keyUsing: [](fp: File, name: string) {
+	keyUsing: (fp: File, name: string) -> {
 		fp << "__NAMESPACE_LOCAL_USING(" << name << ")\n";
 	},
-	keyUsingOrImpl: [](fp: File, name: string, impl: Callable) {
+	keyUsingOrImpl: (fp: File, name: string, impl: Callable) -> {
 		fp << "__NAMESPACE_LOCAL_USING_OR_IMPL(" << name << ", ";
 		impl();
 		fp << ")\n";
 	},
-	keyCSymbolName: [](symbolName: string): string {
+	keyCSymbolName: (symbolName: string): string -> {
 		return "__LIBC_LOCAL_NAME({})".format({ symbolName });
 	},
-	keyDefaultGuard: [](symbolName: string): string {
+	keyDefaultGuard: (symbolName: string): string -> {
 		return "__local_{}_defined".format({ symbolName });
 	});
 
@@ -116,18 +116,18 @@ global final FAST_NAMESPACE: Namespace = Namespace(
 	enter:    "__NAMESPACE_FAST_BEGIN\n",
 	leave:    "__NAMESPACE_FAST_END\n",
 	prefix:   "__NAMESPACE_FAST_SYM",
-	keyUsing: [](fp: File, name: string) {
+	keyUsing: (fp: File, name: string) -> {
 		fp << "__NAMESPACE_FAST_USING(" << name << ")\n";
 	},
-	keyUsingOrImpl: [](fp: File, name: string, impl: Callable) {
+	keyUsingOrImpl: (fp: File, name: string, impl: Callable) -> {
 		fp << "__NAMESPACE_FAST_USING_OR_IMPL(" << name << ", ";
 		impl();
 		fp << ")\n";
 	},
-	keyCSymbolName: [](symbolName: string): string {
+	keyCSymbolName: (symbolName: string): string -> {
 		return "__LIBC_FAST_NAME({})".format({ symbolName });
 	},
-	keyDefaultGuard: [](symbolName: string): string {
+	keyDefaultGuard: (symbolName: string): string -> {
 		return "__fast_{}_defined".format({ symbolName });
 	});
 
@@ -136,10 +136,10 @@ global final STD_NAMESPACE: Namespace = Namespace(
 	enter:          "__NAMESPACE_STD_BEGIN\n",
 	leave:          "__NAMESPACE_STD_END\n",
 	prefix:         "__NAMESPACE_STD_SYM",
-	keyUsing:       [](fp: File, name: string) {
+	keyUsing:       (fp: File, name: string) -> {
 		fp << "__NAMESPACE_STD_USING(" << name << ")\n";
 	},
-	keyUsingOrImpl: [](fp: File, name: string, impl: Callable) {
+	keyUsingOrImpl: (fp: File, name: string, impl: Callable) -> {
 		/* Never   need  an  implementation   when  importing  from  std!
 		 * With `__COMPILER_HAVE_BUG_BLOATY_CXX_USING', the std namespace
 		 * is always overlayed ontop of the global namespace, and outside
@@ -147,7 +147,7 @@ global final STD_NAMESPACE: Namespace = Namespace(
 		fp << "__NAMESPACE_STD_USING(" << name << ")\n";
 	},
 	keyCSymbolName: functools.identity,
-	keyDefaultGuard: [](symbolName: string) {
+	keyDefaultGuard: (symbolName: string) -> {
 		return "__std_{}_defined".format({ symbolName });
 	});
 

@@ -182,7 +182,7 @@ function flattenElfBinary(
 
 
 local final function ELF_FLATTEN_run(self: BoundStep): {Waitable...} {
-	local th = Thread([](self: BoundStep) {
+	local th = Thread((self: BoundStep) -> {
 		local group = self.group;
 		local options = group.options;
 		local input = options.get(OPT_ELF_FLATTEN_INPUT);
@@ -268,10 +268,10 @@ function enumerateSymbolsStep(elfBinary: string, callback: Callable): Step {
 	local result = Step();
 	result.name = "ENUM_SYMBOLS";
 	result.options = {};
-	result.tostr = [](self: BoundStep): string {
+	result.tostr = (self: BoundStep): string -> {
 		return "Enum symbols of {!r}".format({ self.group.fixFilename(elfBinary) });
 	};
-	result.run = [](self: BoundStep): {Waitable...} {
+	result.run = (self: BoundStep): {Waitable...} -> {
 		local readelf_bin = HOST_EXE(self.toolchain.config.CROSS_PREFIX + "readelf");
 		local readelf = ipc.Process(readelf_bin, { "-s", "-W", self.group.fixFilename(elfBinary) });
 		local r, w = ipc.Pipe.new()...;
@@ -280,7 +280,7 @@ function enumerateSymbolsStep(elfBinary: string, callback: Callable): Step {
 		readelf.start();
 		w.close();
 		try {
-			callback(self, []{
+			callback(self, () -> {
 				/* FIXME: for (local l: r)
 				 * Deemon's line-based file reader is unbelievably slow! */
 				while (local d = getLines(r))

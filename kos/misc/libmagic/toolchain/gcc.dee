@@ -213,7 +213,7 @@ global class GCCToolchain: Toolchain {
 			p.start();
 			return WaitableJoin(p);
 		}
-		local t = Thread([](p) {
+		local t = Thread((p: ipc.Process) -> {
 			local r, w = ipc.Pipe.new()...;
 			p.stdout = w;
 			p.stderr = w;
@@ -526,7 +526,7 @@ again_handle_col:
 		if (language == "assembler") {
 			/* Special case: The user's  file  already  is  the  raw  assembly  file.
 			 *               In this case, simply copy the user's file to the target. */
-			local th = Thread([](src, dst, dep) {
+			local th = Thread((src: string, dst: string, dep: string) -> {
 				with (local fp = File.open(dep, "w"))
 					fp.write("{}: {}\n".format({ dst, src }));
 				try fs.unlink(dst); catch (...);

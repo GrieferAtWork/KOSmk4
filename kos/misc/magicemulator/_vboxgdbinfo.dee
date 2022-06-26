@@ -142,7 +142,7 @@ function di(argv: {string...}) {
 
 
 global final OSDATAFILES: {string: string | Callable} = {
-	"keepstepping" : [](argv: {string...}) {
+	"keepstepping" : (argv: {string...}) -> {
 		assert #argv == 1;
 		gdbSocket.send("$l#6c");
 		for (;;) {
@@ -152,7 +152,7 @@ global final OSDATAFILES: {string: string | Callable} = {
 		}
 	},
 
-	"keepreading" : [](argv: {string...}) {
+	"keepreading" : (argv: {string...}) -> {
 		assert #argv == 1;
 		gdbSocket.send("$l#6c");
 		local addr = vmGetRegister("rip");
@@ -166,7 +166,7 @@ global final OSDATAFILES: {string: string | Callable} = {
 		}
 	},
 
-	"bl" : [](argv: {string...}) {
+	"bl" : (argv: {string...}) -> {
 		assert #argv == 1;
 		File.Writer fp;
 		for (local l: vBoxTelnetExecNoError("bl").splitlines()) {

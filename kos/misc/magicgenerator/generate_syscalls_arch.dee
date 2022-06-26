@@ -663,7 +663,7 @@ function x86_64_printKernelSyscallWrapper_transformArguments(
 		for (local i: [:argumentCount])
 			if (f.args[i][0].isReg64)
 				i);
-	local signedRegisters = Tuple([]{
+	local signedRegisters = Tuple(() -> {
 		for (local i: [:argumentCount]) {
 			if (i in doubleWideArguments) {
 				yield false;
@@ -673,7 +673,7 @@ function x86_64_printKernelSyscallWrapper_transformArguments(
 			yield f.args[i][0].isSigned;
 		}
 	}());
-	local registerSizeValues = Tuple([]{
+	local registerSizeValues = Tuple(() -> {
 		for (local i: [:argumentCount]) {
 			if (i in doubleWideArguments) {
 				yield 4;
@@ -1161,7 +1161,7 @@ function x86_64_printKernelSyscallWrapper_asm32_sysrun32(fp: File, f: Function, 
 		for (local i: [:argumentCount])
 			if (f.args[i][0].isReg64)
 				i);
-	local registerSizeValues = Tuple([]{
+	local registerSizeValues = Tuple(() -> {
 		for (local i: [:argumentCount]) {
 			if (i in doubleWideArguments) {
 				yield 4;

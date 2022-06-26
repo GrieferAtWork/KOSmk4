@@ -141,7 +141,7 @@ function injectPath(): string {
 	return "\"--environ=PATH={}\"".format({ fs.environ["PATH"] });
 }
 
-createVsFile("kos.sln", [](fp) {
+createVsFile("kos.sln", (fp: File) -> {
 	fp <<
 "\n"
 "Microsoft Visual Studio Solution File, Format Version 12.00\n"
@@ -181,7 +181,7 @@ createVsFile("kos.sln", [](fp) {
 });
 
 
-createVsFile("kos.vcxproj", [](fp) {
+createVsFile("kos.vcxproj", (fp: File) -> {
 	fp <<
 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 "<Project DefaultTargets=\"Build\" ToolsVersion=\"15.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">\n"
@@ -378,7 +378,7 @@ createVsFile("kos.vcxproj", [](fp) {
 });
 
 
-createVsFile("kos.vcxproj.filters", [](fp) {
+createVsFile("kos.vcxproj.filters", (fp: File) -> {
 	fp <<
 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 "<Project ToolsVersion=\"4.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">\n"
@@ -462,7 +462,7 @@ createVsFile("kos.vcxproj.filters", [](fp) {
 });
 
 
-createVsFile("kos.vcxproj.user", [](fp) {
+createVsFile("kos.vcxproj.user", (fp: File) -> {
 	fp <<
 "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 "<Project ToolsVersion=\"15.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">\n";

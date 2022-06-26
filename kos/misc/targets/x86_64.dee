@@ -78,7 +78,7 @@ function build(magic: Module) {
 
 	/* Generate build steps for i386 */
 	local binTargetName = "x86_64-kos-" + magic.getConfig();
-	magic.build(reconfigure: [](magic: Module) {
+	magic.build(reconfigure: (magic: Module) -> {
 		import TOOLCHAIN_MTOOLS_DISK from ..libmagic.steps.mtools;
 		/* Re-configure to output files into the x86_64 binpath */
 		magic.KERNEL_BINARY               = none;
