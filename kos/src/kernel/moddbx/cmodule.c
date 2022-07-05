@@ -229,7 +229,7 @@ NOTHROW(FCALL cmodule_enum_usermman_except)(struct mman *__restrict self,
 			result = DBX_EINTR;
 			break;
 		}
-	} while (um != NULL);
+	}
 done:
 	return result;
 err:

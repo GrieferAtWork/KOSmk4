@@ -1,6 +1,6 @@
 /*[[[magic
 local cflags = options.get("COMPILE.cflags");
-for (o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3", "-mno-mmx", "-mno-3dnow", "-mno-avx" })
+for (local o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3", "-mno-mmx", "-mno-3dnow", "-mno-avx" })
 	cflags.remove(o);
 ]]]*/
 /* Copyright (c) 2019-2022 Griefer@Work                                       *

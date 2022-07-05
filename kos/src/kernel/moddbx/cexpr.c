@@ -1,6 +1,6 @@
 /*[[[magic
 local cflags = options.get("COMPILE.cflags");
-for (o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3", "-mno-mmx", "-mno-3dnow", "-mno-avx" })
+for (local o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3", "-mno-mmx", "-mno-3dnow", "-mno-avx" })
 	cflags.remove(o);
 ]]]*/
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
@@ -657,6 +657,8 @@ NOTHROW(FCALL module_get_user_tls_base)(struct module *__restrict self,
 	 *       at  runtime (as is  the case in  shared libraries), but would
 	 *       break  when the `R_386_TLS_DTPMOD32' relocation is missing... */
 
+	/* FIXME: This doesn't work for TLS variables from the main executable! */
+
 	/* Start by calculating the user-space `DlModule *' pointer. */
 	if (!module_get_libdl_DlModule_address(self, &dlmod))
 		goto nope;
@@ -1012,7 +1014,7 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 				/* TODO: Proper user-space  support for  `unwind_emulator_t::ue_tlsbase'
 				 *       When used by the expression, then we mustn't rely on the native
 				 *       TLS-base  calculation function from libunwind, but must instead
-				 *       make use of `usermod_get_user_tls_base()' from above. */
+				 *       make use of `module_get_user_tls_base()' from above. */
 #ifdef __ARCH_HAVE_COMPAT
 				if (dbg_current_iscompat()) {
 					struct unwind_getreg_compat_data compat_getreg_data;
