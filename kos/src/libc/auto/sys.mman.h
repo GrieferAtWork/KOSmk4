@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c3312fc */
+/* HASH CRC-32:0xf2d8b9d5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -127,18 +127,26 @@ INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBDCALL libd_pkey_mprotect)(void *ad
  *  - malloc(3) + read(2):            When lseek(2) returns an error, use read(2) to skip `offset',
  *                                    after which  up  to  `max_bytes'  bytes  are  read  normally.
  * Upon success (return == 0), the given `mapping' must be deleted using `unmapfile(3)'
- * @param: fd:        The  file that should be loaded into memory.  Upon entry to this function it is
- *                    assumed that the file position of `fd' is `0'. If it isn't, then incorrect data
- *                    may be mapped. Upon return, the file position of `fd' is undefined.
+ * @param: fd:        The file that should be loaded into memory.
  * @param: mapping:   Filled with mapping information. This structure contains at least 2 fields:
  *                     - mf_addr: Filled with the base address of a mapping of the file's contents
  *                     - mf_size: The actual number of mapped bytes (excluding `num_trailing_nulbytes')
- *                                This will always be `<= max_bytes'.
+ *                                This will always be `>= min_bytes && <= max_bytes'.
  *                     - Other fields are implementation-specific
  *                    Note that the memory located at `mapping->mf_addr' is writable, though changes  to
  *                    it are guarantied not to be written back to `fd'. iow: it behaves like MAP_PRIVATE
  *                    mapped as PROT_READ|PROT_WRITE.
- * @param: offset:    File offset / number of leading bytes that should not be mapped
+ * @param: offset:    File offset / number of leading bytes that should not be  mapped
+ *                    When set to `(Dee_pos_t)-1', use the fd's current file position.
+ * @param: min_bytes: The  min number of bytes (excluding num_trailing_nulbytes) that should be mapped
+ *                    starting  at `offset'. If the file is smaller than this, or indicates EOF before
+ *                    this number of bytes has been reached,  nul bytes are mapped for its  remainder.
+ *                    Note that this doesn't include `num_trailing_nulbytes', meaning that (e.g.) when
+ *                    an entirely empty file is mapped you get a buffer like:
+ *                    >> mf_addr = calloc(min_size + num_trailing_nulbytes);
+ *                    >> mf_size = min_size;
+ *                    This argument essentially acts as if `fd' was at least `min_bytes' bytes large
+ *                    by filling the non-present address range with all zeroes.
  * @param: max_bytes: The  max number of bytes (excluding num_trailing_nulbytes) that should be mapped
  *                    starting  at `offset'. If the file is smaller than this, or indicates EOF before
  *                    this number of bytes has been reached, simply stop there. - The actual number of
@@ -149,12 +157,17 @@ INTDEF ATTR_ACCESS_NONE(1) int NOTHROW_NCX(LIBDCALL libd_pkey_mprotect)(void *ad
  *                    string,  in which case you can specify `1' to always have a trailing '\0' be
  *                    appended:
  *                    >> bzero(mapping->mf_addr + mapping->mf_size, num_trailing_nulbytes);
+ * @param: flags:     Set of `FMAPFILE_*'
  * @return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
- * @return: -1: [errno=EPERM]  `fd' doesn't support read(2)ing
- * @return: -1: [errno=ENOMEM] Out of memory
- * @return: -1: [errno=EBADF]  Invalid `fd'
- * @return: -1: [errno=*]      Read error */
-INTDEF WUNUSED ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_fmapfile)(struct mapfile *__restrict mapping, fd_t fd, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
+ * @return: -1: [errno=EINVAL]  The given `flags' contains invalid bits.
+ * @return: -1: [errno=EINVAL]  `FMAPFILE_MAPSHARED'  as  set, an  mmap was
+ *                              attempted, and `num_trailing_nulbytes != 0'
+ * @return: -1: [errno=EPERM]   `fd' doesn't support read(2)ing
+ * @return: -1: [errno=ENOMEM]  Out of memory
+ * @return: -1: [errno=EBADF]   Invalid `fd'
+ * @return: -1: [errno=ENOTSUP] `FMAPFILE_ONLYMMAP' was given, and mmap wasn't possible
+ * @return: -1: [errno=*]       Read error */
+INTDEF WUNUSED ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_fmapfile)(struct mapfile *__restrict mapping, fd_t fd, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> fmapfile(3)
@@ -166,18 +179,26 @@ INTDEF WUNUSED ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_fmapfile)(struct mapfil
  *  - malloc(3) + read(2):            When lseek(2) returns an error, use read(2) to skip `offset',
  *                                    after which  up  to  `max_bytes'  bytes  are  read  normally.
  * Upon success (return == 0), the given `mapping' must be deleted using `unmapfile(3)'
- * @param: fd:        The  file that should be loaded into memory.  Upon entry to this function it is
- *                    assumed that the file position of `fd' is `0'. If it isn't, then incorrect data
- *                    may be mapped. Upon return, the file position of `fd' is undefined.
+ * @param: fd:        The file that should be loaded into memory.
  * @param: mapping:   Filled with mapping information. This structure contains at least 2 fields:
  *                     - mf_addr: Filled with the base address of a mapping of the file's contents
  *                     - mf_size: The actual number of mapped bytes (excluding `num_trailing_nulbytes')
- *                                This will always be `<= max_bytes'.
+ *                                This will always be `>= min_bytes && <= max_bytes'.
  *                     - Other fields are implementation-specific
  *                    Note that the memory located at `mapping->mf_addr' is writable, though changes  to
  *                    it are guarantied not to be written back to `fd'. iow: it behaves like MAP_PRIVATE
  *                    mapped as PROT_READ|PROT_WRITE.
- * @param: offset:    File offset / number of leading bytes that should not be mapped
+ * @param: offset:    File offset / number of leading bytes that should not be  mapped
+ *                    When set to `(Dee_pos_t)-1', use the fd's current file position.
+ * @param: min_bytes: The  min number of bytes (excluding num_trailing_nulbytes) that should be mapped
+ *                    starting  at `offset'. If the file is smaller than this, or indicates EOF before
+ *                    this number of bytes has been reached,  nul bytes are mapped for its  remainder.
+ *                    Note that this doesn't include `num_trailing_nulbytes', meaning that (e.g.) when
+ *                    an entirely empty file is mapped you get a buffer like:
+ *                    >> mf_addr = calloc(min_size + num_trailing_nulbytes);
+ *                    >> mf_size = min_size;
+ *                    This argument essentially acts as if `fd' was at least `min_bytes' bytes large
+ *                    by filling the non-present address range with all zeroes.
  * @param: max_bytes: The  max number of bytes (excluding num_trailing_nulbytes) that should be mapped
  *                    starting  at `offset'. If the file is smaller than this, or indicates EOF before
  *                    this number of bytes has been reached, simply stop there. - The actual number of
@@ -188,34 +209,31 @@ INTDEF WUNUSED ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_fmapfile)(struct mapfil
  *                    string,  in which case you can specify `1' to always have a trailing '\0' be
  *                    appended:
  *                    >> bzero(mapping->mf_addr + mapping->mf_size, num_trailing_nulbytes);
+ * @param: flags:     Set of `FMAPFILE_*'
  * @return: 0 : Success (the given `mapping' must be deleted using `unmapfile(3)')
- * @return: -1: [errno=EPERM]  `fd' doesn't support read(2)ing
- * @return: -1: [errno=ENOMEM] Out of memory
- * @return: -1: [errno=EBADF]  Invalid `fd'
- * @return: -1: [errno=*]      Read error */
-INTDEF WUNUSED ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_fmapfile)(struct mapfile *__restrict mapping, fd_t fd, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+ * @return: -1: [errno=EINVAL]  The given `flags' contains invalid bits.
+ * @return: -1: [errno=EINVAL]  `FMAPFILE_MAPSHARED'  as  set, an  mmap was
+ *                              attempted, and `num_trailing_nulbytes != 0'
+ * @return: -1: [errno=EPERM]   `fd' doesn't support read(2)ing
+ * @return: -1: [errno=ENOMEM]  Out of memory
+ * @return: -1: [errno=EBADF]   Invalid `fd'
+ * @return: -1: [errno=ENOTSUP] `FMAPFILE_ONLYMMAP' was given, and mmap wasn't possible
+ * @return: -1: [errno=*]       Read error */
+INTDEF WUNUSED ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_fmapfile)(struct mapfile *__restrict mapping, fd_t fd, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags);
 /* >> fmapfileat(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)'
  * @param: atflags: Set of `0 | AT_DOSPATH | AT_EMPTY_PATH' */
-INTDEF WUNUSED ATTR_IN(3) ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_fmapfileat)(struct mapfile *__restrict mapping, fd_t dirfd, char const *filename, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes, atflag_t atflags);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
+INTDEF WUNUSED ATTR_IN(3) ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_fmapfileat)(struct mapfile *__restrict mapping, fd_t dirfd, char const *filename, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags, atflag_t atflags);
 /* >> fmapfileat(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)'
  * @param: atflags: Set of `0 | AT_DOSPATH | AT_EMPTY_PATH' */
-INTDEF WUNUSED ATTR_IN(3) ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_fmapfileat)(struct mapfile *__restrict mapping, fd_t dirfd, char const *filename, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes, atflag_t atflags);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF WUNUSED ATTR_IN(3) ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_fmapfileat)(struct mapfile *__restrict mapping, fd_t dirfd, char const *filename, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags, atflag_t atflags);
 /* >> mapfile(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)' */
-INTDEF WUNUSED ATTR_IN(2) ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_mapfile)(struct mapfile *__restrict mapping, char const *filename, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
+INTDEF WUNUSED ATTR_IN(2) ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_mapfile)(struct mapfile *__restrict mapping, char const *filename, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags);
 /* >> mapfile(3)
  * Map the specified `filename' into memory. s.a. `fmapfile(3)' */
-INTDEF WUNUSED ATTR_IN(2) ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_mapfile)(struct mapfile *__restrict mapping, char const *filename, pos64_t offset, size_t max_bytes, size_t num_trailing_nulbytes);
+INTDEF WUNUSED ATTR_IN(2) ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_mapfile)(struct mapfile *__restrict mapping, char const *filename, pos64_t offset, size_t min_bytes, size_t max_bytes, size_t num_trailing_nulbytes, unsigned int flags);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unmapfile(3)

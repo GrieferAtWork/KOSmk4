@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59e2d627 */
+/* HASH CRC-32:0xd102ce5d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/mapfile.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_OUT(1),int,__NOTHROW_NCX,__localdep_mapfile,(struct mapfile *__restrict __mapping, char const *__filename, __pos64_t __offset, __SIZE_TYPE__ __max_bytes, __SIZE_TYPE__ __num_trailing_nulbytes),mapfile,(__mapping,__filename,__offset,__max_bytes,__num_trailing_nulbytes))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_OUT(1),int,__NOTHROW_NCX,__localdep_mapfile,(struct mapfile *__restrict __mapping, char const *__filename, __pos64_t __offset, __SIZE_TYPE__ __min_bytes, __SIZE_TYPE__ __max_bytes, __SIZE_TYPE__ __num_trailing_nulbytes, unsigned int __flags),mapfile,(__mapping,__filename,__offset,__min_bytes,__max_bytes,__num_trailing_nulbytes,__flags))
 #elif (defined(__AT_FDCWD) && (defined(__CRT_HAVE_fmapfileat) || (defined(__O_RDONLY) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)) && (defined(__CRT_HAVE_fmapfile) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))))))) || (defined(__O_RDONLY) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_fmapfile) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))))
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.mman/mapfile.h>
@@ -187,7 +187,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(expandargv))(int *__p_argc, char ***_
 		/* Map  the specified file  into memory. -  If doing so fails,
 		 * (due to something other than out-of-memory), then we simply
 		 * ignore the @-directive. */
-		if ((__NAMESPACE_LOCAL_SYM __localdep_mapfile)(&__mf, __arg, 0, (__SIZE_TYPE__)-1, 1) != 0) {
+		if ((__NAMESPACE_LOCAL_SYM __localdep_mapfile)(&__mf, __arg, 0, 0, (__SIZE_TYPE__)-1, 1, 0) != 0) {
 #if defined(__libc_geterrno) && defined(__CRT_HAVE_xmalloc_failed)
 			if (__libc_geterrno() == __ENOMEM)
 				(__NAMESPACE_LOCAL_SYM __localdep_xmalloc_failed)(1);

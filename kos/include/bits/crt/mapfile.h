@@ -24,6 +24,12 @@
 
 #include <hybrid/typecore.h>
 
+/* Flags for `fmapfile(3)' */
+#define __FMAPFILE_READALL   0x0001 /* Flag: use `preadall(3)' / `readall(3)' instead of `pread(2)' / `read(2)' */
+#define __FMAPFILE_MUSTMMAP  0x0002 /* Flag: require the use of a mmap(2) */
+#define __FMAPFILE_MAPSHARED 0x0004 /* Flag: when using mmap, don't map as MAP_PRIVATE, but use MAP_SHARED (don't pass a non-zero `num_trailing_nulbytes' in this case!) */
+#define __FMAPFILE_ATSTART   0x0008 /* Flag: assume that the given file's pointer is located at the file's beginning (pass `offset=0' when using this flag) */
+
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -43,7 +49,10 @@ struct mapfile {
  *       Instead, this macro is only provided as an optimization hint meaning
  *       that (when being true) that memory pointed-to by `mf_addr' *may* get
  *       initialized lazily upon first access. */
-#define mapfile_usesmmap(self) ((self)->__mf_mapsize != 0)
+#define mapfile_usesmmap(self)  ((self)->__mf_mapsize != 0)
+
+/* Configure `self' to do `free(self->mf_addr)' in `unmapfile(3)' */
+#define __mapfile_setheap(self) (void)((self)->__mf_mapsize = 0)
 
 
 __DECL_END

@@ -668,6 +668,10 @@ typedef __pthread_barrierattr_t pthread_barrierattr_t;
 #endif /* !__pthread_barrierattr_t_defined */
 #endif /* __USE_XOPEN2K */
 
+#ifndef __size_t_defined
+#define __size_t_defined
+typedef __size_t size_t;
+#endif /* !__size_t_defined */
 
 }
 

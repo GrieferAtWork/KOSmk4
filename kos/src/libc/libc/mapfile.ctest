@@ -75,12 +75,12 @@ DEFINE_TEST(mapfile) {
 	LEd(0, file);
 	EQss(7, write(file, "Content", 7));
 	EQd(0, close(file));
-	EQd(0, mapfile(&mf, "/tmp/test-mapfile", 0, (size_t)-1, 1));
+	EQd(0, mapfile(&mf, "/tmp/test-mapfile", 0, 0, (size_t)-1, 1, 0));
 	EQstr("Content", (char *)mf.mf_addr);
 	assert(mapfile_usesmmap(&mf)); /* Should have used mmap! */
 	EQs(7, mf.mf_size);
 	EQd(0, unmapfile(&mf));
-	EQd(0, mapfile(&mf, "/tmp/test-mapfile", 1, (size_t)-1, 1));
+	EQd(0, mapfile(&mf, "/tmp/test-mapfile", 1, 0, (size_t)-1, 1, 0));
 	EQstr("ontent", (char *)mf.mf_addr);
 	assert(mapfile_usesmmap(&mf)); /* Should have used mmap! */
 	EQs(6, mf.mf_size);
@@ -90,11 +90,11 @@ DEFINE_TEST(mapfile) {
 	/* Test mapfile() on special procfs files.
 	 * case: [mmap:no,pread:yes,read:yes] */
 	expected = readfile("/proc/cmdline");
-	EQd(0, mapfile(&mf, "/proc/cmdline", 0, (size_t)-1, 1));
+	EQd(0, mapfile(&mf, "/proc/cmdline", 0, 0, (size_t)-1, 1, 0));
 	EQstr(expected, (char *)mf.mf_addr);
 	assert(!mapfile_usesmmap(&mf)); /* Should have used malloc! */
 	EQd(0, unmapfile(&mf));
-	EQd(0, mapfile(&mf, "/proc/cmdline", 1, (size_t)-1, 1));
+	EQd(0, mapfile(&mf, "/proc/cmdline", 1, 0, (size_t)-1, 1, 0));
 	EQstr(expected + 1, (char *)mf.mf_addr);
 	assert(!mapfile_usesmmap(&mf)); /* Should have used malloc! */
 	EQd(0, unmapfile(&mf));
@@ -105,7 +105,7 @@ DEFINE_TEST(mapfile) {
 	EQd(0, pipe(pipes)); /* NOLINT */
 	EQss(7, write(pipes[1], "Content", 7));
 	EQd(0, close(pipes[1]));
-	EQd(0, fmapfile(&mf, pipes[0], 0, (size_t)-1, 1));
+	EQd(0, fmapfile(&mf, pipes[0], 0, 0, (size_t)-1, 1, 0));
 	EQd(0, close(pipes[0]));
 	EQstr("Content", (char *)mf.mf_addr);
 	EQs(7, mf.mf_size);
@@ -114,7 +114,7 @@ DEFINE_TEST(mapfile) {
 	EQd(0, pipe(pipes)); /* NOLINT */
 	EQss(7, write(pipes[1], "Content", 7));
 	EQd(0, close(pipes[1]));
-	EQd(0, fmapfile(&mf, pipes[0], 1, (size_t)-1, 1));
+	EQd(0, fmapfile(&mf, pipes[0], 1, 0, (size_t)-1, 1, 0));
 	EQd(0, close(pipes[0]));
 	EQstr("ontent", (char *)mf.mf_addr);
 	EQs(6, mf.mf_size);

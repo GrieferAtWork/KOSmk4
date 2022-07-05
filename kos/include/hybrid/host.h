@@ -27,7 +27,7 @@
 /************************************************************************/
 #if (!defined(__pic__) && \
      (defined(__PIC__) || defined(__PIE__) || defined(__pie__)))
-#define __pic__ 1
+#define __pic__ 1 /* PositionIndependentCode (try to minimize relocations) */
 #endif /* __pic__... */
 
 
@@ -59,11 +59,12 @@
      (defined(WIN16) || defined(__WIN16) || defined(__WIN16__)))
 #define _WIN16 1
 #endif /* _WIN16... */
-#if (!defined(__WINNT__) &&                                                \
-     (defined(_WIN32) || defined(_WIN16) || defined(_WIN64) ||             \
-      defined(__TOS_WIN__) || defined(__WINDOWS__) || defined(_MSC_VER) || \
-      defined(_WIN32_WCE) || defined(WIN32_WCE) || defined(__WINNT) ||     \
-      defined(WINNT) || defined(__MINGW32__) || defined(__CYGWIN__) ||     \
+#if (!defined(__WINNT__) &&                                               \
+     (defined(_WIN32) || defined(_WIN16) || defined(_WIN64) ||            \
+      defined(__TOS_WIN__) || defined(__WINDOWS__) ||                     \
+      (defined(_MSC_VER) && !defined(__clang__) && !defined(__GNUC__)) || \
+      defined(_WIN32_WCE) || defined(WIN32_WCE) || defined(__WINNT) ||    \
+      defined(WINNT) || defined(__MINGW32__) || defined(__CYGWIN__) ||    \
       defined(__CYGWIN32__)))
 #define __WINNT__ 1
 #endif /* __WINNT__... */
@@ -79,11 +80,11 @@
      (defined(__phoenix) || defined(phoenix)))
 #define __phoenix__ 1
 #endif /* __phoenix__... */
-#if (!defined(__unix__) &&                                                     \
-     (defined(__unix) || defined(__unix) || defined(__linux__) ||              \
-      defined(__KOS__) || defined(__OpenBSD__) || defined(__FreeBSD__) ||      \
-      defined(__NetBSD__) || defined(__uClinux__) || defined(__DragonFly__) || \
-      defined(__gnu_hurd__) || defined(__GNU__) || defined(__hpux__) ||        \
+#if (!defined(__unix__) &&                                                         \
+     (defined(__unix) || defined(__unix) || defined(unix) || defined(__linux__) || \
+      defined(__KOS__) || defined(__OpenBSD__) || defined(__FreeBSD__) ||          \
+      defined(__NetBSD__) || defined(__uClinux__) || defined(__DragonFly__) ||     \
+      defined(__gnu_hurd__) || defined(__GNU__) || defined(__hpux__) ||            \
       defined(__phoenix__)))
 #define __unix__ 1
 #endif /* __unix__... */

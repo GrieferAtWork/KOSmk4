@@ -7071,6 +7071,7 @@
 #define __CRT_HAVE_KOS$fgetws_unlocked
 #define __CRT_HAVE_KOS$file_wprinter
 #define __CRT_HAVE_KOS$file_wprinter_unlocked
+#define __CRT_HAVE_KOS$fmapfileat
 #define __CRT_HAVE_KOS$fmkdirat
 #define __CRT_HAVE_KOS$fmknodat
 #define __CRT_HAVE_KOS$fopen
@@ -7183,6 +7184,7 @@
 #define __CRT_HAVE_KOS$lpathconf
 #define __CRT_HAVE_KOS$lstat
 #define __CRT_HAVE_KOS$lstat64
+#define __CRT_HAVE_KOS$mapfile
 #define __CRT_HAVE_KOS$mbrlen
 #define __CRT_HAVE_KOS$mbrtowc
 #define __CRT_HAVE_KOS$mbsnrtowcs
@@ -8113,6 +8115,7 @@
 #define __CRT_HAVE_DOS$fgetws_unlocked
 #define __CRT_HAVE_DOS$file_wprinter
 #define __CRT_HAVE_DOS$file_wprinter_unlocked
+#define __CRT_HAVE_DOS$fmapfileat
 #define __CRT_HAVE_DOS$fmkdirat
 #define __CRT_HAVE_DOS$fmknodat
 #define __CRT_HAVE_DOS$fopen
@@ -8225,6 +8228,7 @@
 #define __CRT_HAVE_DOS$lpathconf
 #define __CRT_HAVE_DOS$lstat
 #define __CRT_HAVE_DOS$lstat64
+#define __CRT_HAVE_DOS$mapfile
 #define __CRT_HAVE_DOS$mbrlen
 #define __CRT_HAVE_DOS$mbrtowc
 #define __CRT_HAVE_DOS$mbsnrtowcs

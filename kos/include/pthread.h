@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcde59be9 */
+/* HASH CRC-32:0x11d6fe3f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -621,6 +621,10 @@ typedef __pthread_barrierattr_t pthread_barrierattr_t;
 #endif /* !__pthread_barrierattr_t_defined */
 #endif /* __USE_XOPEN2K */
 
+#ifndef __size_t_defined
+#define __size_t_defined
+typedef __size_t size_t;
+#endif /* !__size_t_defined */
 
 /* >> pthread_create(3)
  * Create a  new thread,  starting with  execution of  `start_routine'

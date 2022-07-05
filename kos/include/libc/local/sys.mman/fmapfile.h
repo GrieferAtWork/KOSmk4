@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f674d2e */
+/* HASH CRC-32:0x86b4bc65 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -327,74 +327,146 @@ __NAMESPACE_LOCAL_END
 #include <asm/os/mman.h>
 #include <libc/errno.h>
 #include <asm/os/stdio.h>
+#include <hybrid/__overflow.h>
+#include <asm/crt/malloc.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fmapfile) __ATTR_WUNUSED __ATTR_OUT(1) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfile))(struct mapfile *__restrict __mapping, __fd_t __fd, __pos64_t __offset, __SIZE_TYPE__ __max_bytes, __SIZE_TYPE__ __num_trailing_nulbytes) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfile))(struct mapfile *__restrict __mapping, __fd_t __fd, __pos64_t __offset, __SIZE_TYPE__ __min_bytes, __SIZE_TYPE__ __max_bytes, __SIZE_TYPE__ __num_trailing_nulbytes, unsigned int __flags) {
 	__BYTE_TYPE__ *__buf;
 	__SIZE_TYPE__ __bufsize;
 	__SIZE_TYPE__ __bufused;
 	__SIZE_TYPE__ __buffree;
 
+	/* Validate the given `flags' */
+	if __unlikely(__flags & ~(__FMAPFILE_READALL | __FMAPFILE_MUSTMMAP |
+	                      __FMAPFILE_MAPSHARED | __FMAPFILE_ATSTART)) {
+#ifdef __EINVAL
+		return __libc_seterrno(__EINVAL);
+#else /* __EINVAL */
+		return __libc_seterrno(1);
+#endif /* !__EINVAL */
+	}
+
 	/* Try to use mmap(2) */
-#if defined(__PROT_READ) && defined(__PROT_WRITE) && defined(__MAP_PRIVATE) && (defined(__CRT_HAVE_mmap64) || defined(__CRT_HAVE_mmap)) && ((defined(__CRT_HAVE_kfstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kfstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__fstat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__fstat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__fstati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__fstat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE_fstat) && defined(__STAT32_MATCHES_STAT64)) || defined(__CRT_HAVE_fstat64))
-	struct stat64 __st;
-	if ((__NAMESPACE_LOCAL_SYM __localdep_fstat64)(__fd, &__st) == 0) {
+#if defined(__PROT_READ) && defined(__PROT_WRITE) && defined(__MAP_PRIVATE) && defined(__SEEK_SET) && (defined(__CRT_HAVE_mmap64) || defined(__CRT_HAVE_mmap)) && ((defined(__CRT_HAVE_kfstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kfstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__fstat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__fstat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__fstati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__fstat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE_fstat) && defined(__STAT32_MATCHES_STAT64)) || defined(__CRT_HAVE_fstat64)) && (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek))
+	{
+		struct stat64 __st;
+		if ((__NAMESPACE_LOCAL_SYM __localdep_fstat64)(__fd, &__st) == 0) {
 #if defined(__libc_geterrno) && defined(__libc_seterrno)
-		__errno_t __saved_errno = __libc_geterrno();
+			__errno_t __saved_errno = __libc_geterrno();
 #endif /* __libc_geterrno && __libc_seterrno */
-		__pos64_t __map_offset = __offset;
-		__SIZE_TYPE__  __map_bytes  = __max_bytes;
-		if (__map_offset > (__SIZE_TYPE__)__st.st_size) {
-			__map_offset = 0;
-			__map_bytes  = 0;
-		}
-		if (__map_bytes > (__SIZE_TYPE__)(__st.st_size - __map_offset))
-			__map_bytes = (__SIZE_TYPE__)(__st.st_size - __map_offset);
-		if (__map_bytes) {
-			/* Map file into memory. */
-			__SIZE_TYPE__ __mapsize = __map_bytes + __num_trailing_nulbytes;
-			__buf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_mmap64)(__NULLPTR, __mapsize,
-			                       __PROT_READ | __PROT_WRITE,
-			                       __MAP_PRIVATE, __fd, (__PIO_OFFSET64)__offset);
-			if (__buf != (__BYTE_TYPE__ *)__MAP_FAILED) {
-				/* Clear out the caller-required trailing NUL bytes.
-				 * We  do this in a kind-of special was that try not
-				 * to write-fault memory if it already contains NULs */
-				__BYTE_TYPE__ *__nul = __buf + __map_bytes;
-				while (__num_trailing_nulbytes) {
-					if (*__nul) {
-						(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__nul, __num_trailing_nulbytes);
-						break;
-					}
-					--__num_trailing_nulbytes;
-					++__nul;
+			__pos64_t __map_offset = __offset;
+			__SIZE_TYPE__ __map_bytes;
+			if (__map_offset == (__pos64_t)-1) {
+				if __unlikely(__flags & __FMAPFILE_ATSTART) {
+					__map_offset = 0;
+				} else {
+					/* Use the file descriptors current offset. */
+					__map_offset = (__pos64_t)(__NAMESPACE_LOCAL_SYM __localdep_lseek64)(__fd, 0, __SEEK_CUR);
+					if (__map_offset == (__pos64_t)-1)
+						goto __after_mmap_attempt;
 				}
-				__mapping->mf_addr = __buf;
-				__mapping->mf_size = __map_bytes;
-				__mapping->__mf_mapsize = __mapsize;
-				return 0;
 			}
+			if (__hybrid_overflow_usub(__st.st_size, __map_offset, &__map_bytes))
+				__map_bytes = 0;
+			if (__map_bytes > __max_bytes)
+				__map_bytes = __max_bytes;
+			if (__map_bytes) {
+				/* Map file into memory. */
+				__SIZE_TYPE__ __mapsize, __used_nulbytes;
+				__used_nulbytes = __num_trailing_nulbytes;
+				if (__min_bytes > __map_bytes)
+					__used_nulbytes += __min_bytes - __map_bytes;
+				__mapsize = __map_bytes + __used_nulbytes;
+#ifdef __MAP_SHARED
+				if (__flags & __FMAPFILE_MAPSHARED) {
+					if __unlikely(__num_trailing_nulbytes) {
+#ifdef __EINVAL
+						return __libc_seterrno(__EINVAL);
+#else /* __EINVAL */
+						return __libc_seterrno(1);
+#endif /* !__EINVAL */
+					}
+					__buf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_mmap64)(__NULLPTR, __mapsize, __PROT_READ | __PROT_WRITE,
+					                       __MAP_SHARED, __fd, (__PIO_OFFSET64)__map_offset);
+				} else {
+					__buf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_mmap64)(__NULLPTR, __mapsize, __PROT_READ | __PROT_WRITE,
+					                       __MAP_PRIVATE, __fd, (__PIO_OFFSET64)__map_offset);
+				}
+#else /* __MAP_SHARED */
+				if __unlikely(__flags & __FMAPFILE_MAPSHARED) {
+					/* Shared memory mappings aren't supposed :( */
+#ifdef __ENOSYS
+					return __libc_seterrno(__ENOSYS);
+#elif defined(__ENOTSUP)
+					return __libc_seterrno(__ENOTSUP);
+#elif defined(__EOPNOTSUPP)
+					return __libc_seterrno(__EOPNOTSUPP);
+#else /* ... */
+					return __libc_seterrno(1);
+#endif /* !... */
+				}
+				__buf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_mmap64)(__NULLPTR, __mapsize,
+				                       __PROT_READ | __PROT_WRITE,
+				                       __MAP_PRIVATE, __fd,
+				                       (__PIO_OFFSET64)__map_offset);
+#endif /* !__MAP_SHARED */
+				if (__buf != (__BYTE_TYPE__ *)__MAP_FAILED) {
+					/* Clear  out the caller-required trailing NUL bytes.
+					 * We do this in a kind-of special way that tries not
+					 * to write-fault memory if it already contains NULs. */
+					__BYTE_TYPE__ *__nul = __buf + __map_bytes;
+					while (__used_nulbytes) {
+						if (*__nul) {
+							(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__nul, __used_nulbytes);
+							break;
+						}
+						--__used_nulbytes;
+						++__nul;
+					}
+					__mapping->mf_addr = __buf;
+					__mapping->mf_size = __map_bytes;
+					__mapping->__mf_mapsize = __mapsize;
+					return 0;
+				}
 #if defined(__libc_geterrno) && defined(__libc_seterrno)
-			__libc_seterrno(__saved_errno);
+				__libc_seterrno(__saved_errno);
 #endif /* __libc_geterrno && __libc_seterrno */
-		} else {
-			/* Special files from procfs indicate their size as `0',  even
-			 * though they aren't actually empty. - As such, we can't just
-			 * use the normal approach of read(2)-ing the file.
-			 *
-			 * Only if at that point it still indicates being empty, are we
-			 * actually allowed to believe that claim! */
+			} else {
+				/* Special files from procfs indicate their size as `0',  even
+				 * though they aren't actually empty. - As such, we can't just
+				 * use the normal approach of read(2)-ing the file.
+				 *
+				 * Only if at that point it still indicates being empty, are we
+				 * actually allowed to believe that claim! */
+			}
 		}
 	}
-#endif /* __PROT_READ && __PROT_WRITE && __MAP_PRIVATE && (__CRT_HAVE_mmap64 || __CRT_HAVE_mmap) && ((__CRT_HAVE_kfstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kfstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__fstat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__fstat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__fstati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64) || (__CRT_HAVE__fstat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64) || (__CRT_HAVE_fstat && __STAT32_MATCHES_STAT64) || __CRT_HAVE_fstat64) */
+__after_mmap_attempt:
+#endif /* __PROT_READ && __PROT_WRITE && __MAP_PRIVATE && __SEEK_SET && (__CRT_HAVE_mmap64 || __CRT_HAVE_mmap) && ((__CRT_HAVE_kfstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kfstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__fstat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__fstat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__fstati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64) || (__CRT_HAVE__fstat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64) || (__CRT_HAVE_fstat && __STAT32_MATCHES_STAT64) || __CRT_HAVE_fstat64) && (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_llseek || __CRT_HAVE___llseek || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE___libc_lseek) */
+
+	/* Check if we're to error out if mmap can't be used */
+	if (__flags & __FMAPFILE_MUSTMMAP) {
+#ifdef __ENOTSUP
+		return __libc_seterrno(__ENOTSUP);
+#elif defined(__EOPNOTSUPP)
+		return __libc_seterrno(__EOPNOTSUPP);
+#else /* ... */
+		return __libc_seterrno(1);
+#endif /* !... */
+	}
 
 	/* Allocate a heap buffer. */
 	__bufsize = __max_bytes;
 	if (__bufsize > 0x10000)
 		__bufsize = 0x10000;
+	if (__bufsize < __min_bytes)
+		__bufsize = __min_bytes;
 	__buf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_malloc)(__bufsize + __num_trailing_nulbytes);
 	if __unlikely(!__buf) {
 		__bufsize = 1;
+		if (__bufsize < __min_bytes)
+			__bufsize = __min_bytes;
 		__buf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_malloc)(__bufsize + __num_trailing_nulbytes);
 		if __unlikely(!__buf)
 			return -1;
@@ -402,21 +474,25 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfile))(struct mapfile *__restrict
 	__bufused = 0;
 	__buffree = __bufsize;
 
-	if (__offset != 0) {
+	if (__offset != (__pos64_t)-1 && (__offset != 0 || !(__flags & __FMAPFILE_ATSTART))) {
 		/* Try to use pread(2) */
 #if defined(__CRT_HAVE_pread64) || defined(__CRT_HAVE___pread64) || defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)) && defined(__SEEK_CUR) && defined(__SEEK_SET))
 		for (;;) {
 			__SSIZE_TYPE__ __error;
 			__error = (__NAMESPACE_LOCAL_SYM __localdep_pread64)(__fd, __buf + __bufused, __buffree, __offset);
-			if ((__SIZE_TYPE__)__error != __buffree) {
-				if (__error >= 0) {
+			if (__error <= 0 || (!(__flags & __FMAPFILE_READALL) && (__SIZE_TYPE__)__error < __buffree)) {
+				if ((__SIZE_TYPE__)__error < __buffree) {
 					/* End-of-file! */
 					__BYTE_TYPE__ *__newbuf;
+					__SIZE_TYPE__ __used_nulbytes;
 					__bufused += (__SIZE_TYPE__)__error;
-					__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __bufused + __num_trailing_nulbytes);
+					__used_nulbytes = __num_trailing_nulbytes;
+					if (__min_bytes > __bufused)
+						__used_nulbytes += __min_bytes - __bufused;
+					__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __bufused + __used_nulbytes);
 					if __likely(__newbuf)
 						__buf = __newbuf;
-					(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__buf + __bufused, __num_trailing_nulbytes); /* Trailing NUL-bytes */
+					(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__buf + __bufused, __used_nulbytes); /* Trailing NUL-bytes */
 					__mapping->mf_addr = __buf;
 					__mapping->mf_size = __bufused;
 					__mapping->__mf_mapsize = 0;
@@ -438,10 +514,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfile))(struct mapfile *__restrict
 					__newsize = __bufsize + 1024;
 					__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __newsize + __num_trailing_nulbytes);
 					if (!__newbuf) {
-						if (!__buffree)
-							goto __err_buf;
-						__newsize = __bufsize;
-						__newbuf  = __buf;
+						if (!__buffree) {
+							__newsize = __bufsize + 1;
+							__newbuf  = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __newsize + __num_trailing_nulbytes);
+							if __unlikely(!__newbuf)
+								goto __err_buf;
+						} else {
+							__newsize = __bufsize;
+							__newbuf  = __buf;
+						}
 					}
 				}
 				__buffree += __newsize - __bufsize;
@@ -451,7 +532,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfile))(struct mapfile *__restrict
 		}
 #endif /* __CRT_HAVE_pread64 || __CRT_HAVE___pread64 || __CRT_HAVE_pread || ((__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_llseek || __CRT_HAVE___llseek || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE___libc_lseek) && __SEEK_CUR && __SEEK_SET) */
 
-		/* For a non-zero offset, try to use lseek() (or read()) */
+		/* For a custom offset, try to use lseek() (or read()) */
 #if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)) && defined(__SEEK_SET)
 		if ((__NAMESPACE_LOCAL_SYM __localdep_lseek64)(__fd, (__off64_t)__offset, __SEEK_SET) != -1) {
 			/* Was able to lseek(2) */
@@ -465,7 +546,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfile))(struct mapfile *__restrict
 				if ((__pos64_t)__skip > __offset)
 					__skip = (__SIZE_TYPE__)__offset;
 				__error = (__NAMESPACE_LOCAL_SYM __localdep_read)(__fd, __buf, __skip);
-				if (__error < (__SSIZE_TYPE__)__skip) {
+				if (__error <= 0 || (!(__flags & __FMAPFILE_READALL) && (__SIZE_TYPE__)__error < __skip)) {
 					if (__error < 0)
 						goto __err_buf;
 					goto __empty_file; /* EOF reached before `offset' */
@@ -479,15 +560,19 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfile))(struct mapfile *__restrict
 	for (;;) {
 		__SSIZE_TYPE__ __error;
 		__error = (__NAMESPACE_LOCAL_SYM __localdep_read)(__fd, __buf + __bufused, __buffree);
-		if ((__SIZE_TYPE__)__error != __buffree) {
+		if (__error <= 0 || (!(__flags & __FMAPFILE_READALL) && (__SIZE_TYPE__)__error < __buffree)) {
 			if (__error >= 0) {
 				/* End-of-file! */
 				__BYTE_TYPE__ *__newbuf;
+				__SIZE_TYPE__ __used_nulbytes;
 				__bufused += (__SIZE_TYPE__)__error;
-				__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __bufused + __num_trailing_nulbytes);
+				__used_nulbytes = __num_trailing_nulbytes;
+				if (__min_bytes > __bufused)
+					__used_nulbytes += __min_bytes - __bufused;
+				__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __bufused + __used_nulbytes);
 				if __likely(__newbuf)
 					__buf = __newbuf;
-				(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__buf + __bufused, __num_trailing_nulbytes); /* Trailing NUL-bytes */
+				(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__buf + __bufused, __used_nulbytes); /* Trailing NUL-bytes */
 				__mapping->mf_addr = __buf;
 				__mapping->mf_size = __bufused;
 				__mapping->__mf_mapsize = 0;
@@ -506,8 +591,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfile))(struct mapfile *__restrict
 				__newsize = __bufsize + 1024;
 				__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __newsize + __num_trailing_nulbytes);
 				if (!__newbuf) {
-					if (!__buffree)
-						goto __err_buf;
+					if (!__buffree) {
+						__newsize = __bufsize + 1;
+						__newbuf  = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __newsize + __num_trailing_nulbytes);
+						if __unlikely(!__newbuf)
+							goto __err_buf;
+					} else {
+						__newsize = __bufsize;
+						__newbuf  = __buf;
+					}
 					__newsize = __bufsize;
 					__newbuf  = __buf;
 				}
@@ -518,9 +610,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfile))(struct mapfile *__restrict
 		}
 	}
 
-__empty_file:
+	/*--------------------------------------------------------------------*/
 	{
 		__BYTE_TYPE__ *__newbuf;
+		__SIZE_TYPE__ __used_nulbytes;
 		/* Because of how large our original buffer was, and because at this
 		 * point all  we want  to do  is return  a  `num_trailing_nulbytes'-
 		 * large buffer of  all NUL-bytes, it's  probably more efficient  to
@@ -529,16 +622,22 @@ __empty_file:
 		 * we're  trying to do  is truncate the buffer,  and so might choose
 		 * not to alter its base  address, which (if done repeatedly)  might
 		 * lead to memory becoming very badly fragmented. */
-		__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_calloc)(1, __num_trailing_nulbytes);
+__empty_file:
+		__used_nulbytes = __min_bytes + __num_trailing_nulbytes;
+		__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_calloc)(1, __used_nulbytes);
 		if __likely(__newbuf) {
 #if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
 			(__NAMESPACE_LOCAL_SYM __localdep_free)(__buf);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 		} else {
-			__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __num_trailing_nulbytes);
+#ifndef __REALLOC_ZERO_IS_NONNULL
+			if __unlikely(!__used_nulbytes)
+				__used_nulbytes = 1;
+#endif /* !__REALLOC_ZERO_IS_NONNULL */
+			__newbuf = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_realloc)(__buf, __used_nulbytes);
 			if (!__newbuf)
 				__newbuf = __buf;
-			(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__newbuf, __num_trailing_nulbytes);
+			(__NAMESPACE_LOCAL_SYM __localdep_bzero)(__newbuf, __used_nulbytes);
 		}
 		__mapping->mf_addr = __newbuf;
 		__mapping->mf_size = 0;

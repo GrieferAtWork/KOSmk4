@@ -374,7 +374,14 @@
 #endif /* !... */
 
 #if defined(__x86_64__) || defined(__x86_64)
+#if (defined(__PE__) || defined(__CYGWIN__) || defined(__CYGWIN32__) || defined(__MINGW32__) || \
+     defined(__WINDOWS__) || defined(_WIN16) || defined(WIN16) || defined(_WIN32) ||            \
+     defined(WIN32) || defined(_WIN64) || defined(WIN64) || defined(__WIN32__) ||               \
+     defined(__TOS_WIN__) || defined(_WIN32_WCE) || defined(WIN32_WCE))
+#undef __VA_LIST_IS_ARRAY /* No on this platform, it's not... */
+#else /* ... */
 #define __VA_LIST_IS_ARRAY
+#endif /* !... */
 #define __ATTR_MSABI   __attribute__((__ms_abi__))
 #define __ATTR_SYSVABI __attribute__((__sysv_abi__))
 #else /* ... */

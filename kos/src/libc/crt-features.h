@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f19248c */
+/* HASH CRC-32:0xa1ffb3d6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1557,7 +1557,11 @@
 #define __CRT_HAVE_DOS$fmaf
 #define __CRT_HAVE_DOS$fmal
 #define __CRT_HAVE_DOS$fmapfile
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$fmapfileat
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$fmax
 #define __CRT_HAVE_DOS$fmaxf
 #define __CRT_HAVE_DOS$fmaxl
@@ -2239,7 +2243,11 @@
 #define __CRT_HAVE_DOS$malloc_trim
 #define __CRT_HAVE_DOS$malloc_usable_size
 #define __CRT_HAVE_DOS$mallopt
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
 #define __CRT_HAVE_DOS$mapfile
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$mblen
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__

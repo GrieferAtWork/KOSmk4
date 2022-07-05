@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9d00589 */
+/* HASH CRC-32:0x3476580c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -520,7 +520,7 @@ NOTHROW_NCX(LIBCCALL libc_expandargv)(int *p_argc,
 		/* Map  the specified file  into memory. -  If doing so fails,
 		 * (due to something other than out-of-memory), then we simply
 		 * ignore the @-directive. */
-		if (libc_mapfile(&mf, arg, 0, (size_t)-1, 1) != 0) {
+		if (libc_mapfile(&mf, arg, 0, 0, (size_t)-1, 1, 0) != 0) {
 #ifdef libc_geterrno
 			if (libc_geterrno() == ENOMEM)
 				libc_xmalloc_failed(1);
