@@ -131,8 +131,12 @@ NOTHROW_RPC(CC DlModule_InitStaticTLSBindings)(void) {
 	/* Assign static TLS offsets to all currently loaded modules.
 	 * NOTE: Since we've yet to invoke a  user-defined code (other than IFUNC  selectors),
 	 *       we are allowed to assume that no threads other than the calling (main) thread
-	 *       are currently running, meaning we don't have to do any sort of lock for this! */
-	DLIST_FOREACH (iter, &dl_globals.dg_alllist, dm_modules) {
+	 *       are currently running, meaning we don't have to do any sort of lock for this!
+	 * NOTE: The order of iteration here is important, as we need to assign the TLS offset
+	 *       of  the main program first, since it's allowed to assume that it's TLS offset
+	 *       is fixed! */
+	for (iter = DLIST_PREV(&dl_rtld_module, dm_modules);
+	     iter; iter = DLIST_PREV(iter, dm_modules)) {
 		if (!iter->dm_tlsmsize)
 			continue;
 		if (iter->dm_ops)
