@@ -141,11 +141,11 @@ class Addr2line {
 
 	@@Convert a given address to a (filename, line, function) triple
 	function addr2line(addr: int | string): {(string, string, string)...} {
-		writer.write("{}\n".format({
+		writer.write(f"{
 			addr is string
 				? addr
 				: addr.hex()
-		}));
+		}\n");
 		local text = reader.read();
 		while (text) {
 			local func,data;
@@ -232,9 +232,9 @@ class TraceController {
 			if (added || removed) {
 				err("Missmatched address sets");
 				for (local x: added)
-					err("Leaked {}".format({ addrFormat % x }));
+					err(f"Leaked {addrFormat % x}");
 				for (local x: removed)
-					err("Freed {}".format({ addrFormat % x }));
+					err(f"Freed {addrFormat % x}");
 			}
 	}
 
@@ -609,11 +609,9 @@ again_find_match:
 							line: 0,
 							func: "??" "?",
 							addr: req_address);
-						writeData(" (a2l:{!r}:{!r}:{})".format({
-							findDiskFileOrigin(groups, binary),
-							binary,
-							address
-						}));
+						writeData(f" (a2l:{
+							repr findDiskFileOrigin(groups, binary)
+						}:{repr binary}:{address})");
 					}
 				}	break;
 

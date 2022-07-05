@@ -101,7 +101,7 @@ BEGIN
 		})
 
 		SOURCE({
-			"arch/" + XARCH + "/*.c",
+			f"arch/{XARCH}/*.c",
 			"./*.c",
 			/* Use dlmalloc to get an malloc() function. */
 			"../libdlmalloc/*.c",
@@ -117,11 +117,11 @@ BEGIN
 		options[OPT_ELF_FLATTEN_ALLOWED_HEADERS]        = [0, 1]; /* text + data (don't include rel + dynamic) */
 		options[OPT_ELF_FLATTEN_REQUIRE_NO_RELOCATIONS] = true;
 		STATIC_USELIBGCC()
-		LINKER_SCRIPT("arch/" + XARCH + "/_rtld.ld")
+		LINKER_SCRIPT(f"arch/{XARCH}/_rtld.ld")
 		SET_OUTPUT_LIBDLL("libdl")
 		SOURCE({
 			"./*.c",
-			"arch/" + XARCH + "/*.c",
+			f"arch/{XARCH}/*.c",
 			"arch/" + XARCH_ASMFILES,
 			"../libdlmalloc/dlmalloc.c",
 		})

@@ -1056,10 +1056,10 @@ fallback:
 				throw;
 		} catch (InvalidOperands) {
 		}
-		throw Error("Invalid operands for {!r}: {}".format({
-			mnemonic,
-			", ".join(for (local o: i.operands) repr o)
-		}));
+		throw Error(
+			f"Invalid operands for {repr mnemonic}: {
+				', '.join(for (local o: i.operands) repr o)
+			}");
 	}
 
 	function assembleWithRelocations(): {string | int | Relocation | Symbol...} {

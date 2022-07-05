@@ -25,7 +25,7 @@ import fs;
 
 function updateKernelShadow(KERNEL: string, TARGET_ARCH: string): string {
 	local kernelShadowFilename = fs.joinpath(fs.headof(KERNEL),
-		".{}-flat.{}".format({ fs.fileof(KERNEL), fs.extof(KERNEL) }));
+		f".{fs.fileof(KERNEL)}-flat.{fs.extof(KERNEL)}");
 	local shadowLastModified = getLastModfiedTime(kernelShadowFilename);
 	if (shadowLastModified is none ||
 	    shadowLastModified < getLastModfiedTime(KERNEL)) {

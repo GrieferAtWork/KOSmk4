@@ -164,7 +164,7 @@ class CParser {
 	}
 
 	public operator str(): string -> text[:end];
-	public operator repr(): string -> "CParser({!r})".format({ str this });
+	public operator repr(): string -> f"CParser({repr str this})";
 
 	@@Offset added to line number counters (aka. line-number at @text[0])
 	private member _firstLineOffset: int;
@@ -205,7 +205,7 @@ class CParser {
 	@@Print an error @message at offset @offset and throw an @Error object
 	public function errAt(offset: int, message: string) {
 		local l, c = lcAt(offset)...;
-		local text = "{}({},{}) : Error : {}".format({ filename, l, c, message });
+		local text = f"{filename}({l},{c}) : Error : {message}";
 		print File.stderr: text;
 		throw Error(text);
 	}
@@ -218,7 +218,7 @@ class CParser {
 	@@Print an warning @message at offset @offset
 	public function warnAt(offset: int, message: string) {
 		local l, c = lcAt(offset)...;
-		local text = "{}({},{}) : Warning : {}".format({ filename, l, c, message });
+		local text = f"{filename}({l},{c}) : Warning : {message}";
 		print File.stderr: text;
 	}
 
@@ -239,7 +239,7 @@ class CParser {
 			unexpected(tok);
 	}
 	public function unexpected(expected: string) {
-		err("Unexpected token (expected {!r}, but got {!r})".format({ expected, this.tok }));
+		err(f"Unexpected token (expected {repr expected}, but got {repr this.tok})");
 	}
 
 	@@Skip pairs of @open/@close tokens, where the caller should position
@@ -272,8 +272,9 @@ class CParser {
 					break;
 				--recursion;
 			} else if (!tok) {
-				errAt(startPos, "Token {!r} is not matched by another {!r}"
-					.format({ open, close }));
+				errAt(startPos,
+					f"Token {repr open} is not matched "
+					f"by another {repr close}");
 			}
 			tok = next();
 		}
@@ -470,8 +471,7 @@ twochar:
 			next();
 			return tok.decode("c-escape");
 		}
-		err("Expected keyword or string, but got {!r}"
-			.format({ tok }));
+		err(f"Expected keyword or string, but got {repr tok}");
 	}
 
 	@@Same as @parseAllUntilRParen, but only ever return a @string
@@ -629,8 +629,7 @@ twochar:
 		} else if (isCString(tok)) {
 			tok = tok.decode("c-escape");
 		} else {
-			err("Expected keyword or C-string, but got {!r}"
-				.format({ tok }));
+			err(f"Expected keyword or C-string, but got {repr tok}");
 		}
 		next();
 		return tok;
@@ -642,8 +641,7 @@ twochar:
 		} else if (isCString(tok)) {
 			tok = tok.decode("c-escape");
 		} else {
-			err("Expected keyword or C-string, but got {!r}"
-				.format({ tok }));
+			err(f"Expected keyword or C-string, but got {repr tok}");
 		}
 		next();
 		return tok;
@@ -653,8 +651,7 @@ twochar:
 	function parseCString(): string {
 		local tok = this.tok;
 		if (!isCString(tok)) {
-			err("Expected a C-string, but got {!r}"
-				.format({ tok }));
+			err(f"Expected a C-string, but got {repr tok}");
 		}
 		tok = tok.decode("c-escape");
 		next();

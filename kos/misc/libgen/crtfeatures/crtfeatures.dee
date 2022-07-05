@@ -77,16 +77,14 @@ function replaceMacroInvocationKeywords(
 				ch = text[i];
 			}
 			if (!ch.issymstrt())
-				err('Expected "##" or "#<keyword>", but got "#{}"'
-					.format({ repr(ch)[1:-1] }));
+				err(f'Expected "##" or "#<keyword>", but got "#{repr(ch)[1:-1]}"');
 			local nameEnd = i + 1;
 			while (nameEnd < len && text.issymcont(nameEnd))
 				++nameEnd;
 			local name = text[i:nameEnd];
 			i = nameEnd;
 			if (name !in arguments)
-				err("Unknown macro argument: {!r}"
-					.format({ name }));
+				err(f"Unknown macro argument: {repr name}");
 			if (flushStart < strReprBegin)
 				fp << text[flushStart:strReprBegin];
 			flushStart = nameEnd;
@@ -131,8 +129,8 @@ final class CMacro {
 
 	public function defRepr(name: string): string {
 		if (args is none)
-			return "{} {}".format({ name, text });
-		return "{}({}) {}".format({ name, ", ".join(args), text });
+			return f"{name} {text}";
+		return f"{name}({', '.join(args)}) {text}";
 	}
 	public function invokeFunction(
 			myName: string,
@@ -790,10 +788,10 @@ function tryEvalPreprocessorExpression(
 	/* Try to evaluate the expression */
 	local result = parser.evalExpr();
 	if (parser.tok[0] != TOK_EOF)
-		parser.warn(WARN_TRAILING_DATA, "Trailing data: {!r} in {!r}".format({
-			parser.file.text[parser.file.tokend:],
-			parser.file.text,
-		}));
+		parser.warn(WARN_TRAILING_DATA,
+			f"Trailing data: {repr parser.file.text[parser.file.tokend:]} "
+			f"in f{repr parser.file.text}"
+		);
 	if (result !is none) {
 		result = !!result; /* force-to-bool */
 		assert result === true || result === false;
@@ -873,7 +871,7 @@ final class CParser {
 						local oldCond = fDefs2.get(mac);
 						if (oldCond !is none) {
 							cond = optimizePreprocessorExpression(
-								"({}) || ({})".format({ oldCond, cond }));
+								f"({oldCond})||({cond})");
 						}
 						fDefs2[mac] = cond;
 					}
@@ -948,8 +946,9 @@ again_scan_cond:
 			++parser.pos;
 		if (parser.pos < parser.end) {
 			throw Error(
-				"Unused tail {!r} in expression {!r}".format({
-					parser.expr[parser.pos:parser.end], parser.expr }));
+				f"Unused tail {repr parser.expr[parser.pos:parser.end]} "
+				f"in expression {repr parser.expr}"
+			);
 		}
 		branch = removedIgnoredMacrosFromPPBranch(branch);
 		if (branch is none)
@@ -1025,7 +1024,7 @@ again_scan_cond:
 
 	public function tryIncludeFileWithPath(path: string, name: string): bool {
 		local fp;
-		local filename = "{}/{}".format({ path, name });
+		local filename = f"{path}/{name}";
 		filename = replaceAll(filename, "//", "/");
 		if (filename in ignoredHeaderNames)
 			return none; /* Ignored */
@@ -1119,13 +1118,13 @@ do_ignore_once:
 			newMacro: CMacro, cond: string = none) {
 		if (oldMacro != newMacro) {
 			warnat(WARN_MACRO_REDEFINED, file.directive_cmd_begin,
-				"Macro {!r} (previously: `#define {}') "
-				"re-defined as `#define {}'{}".format({
-					macName,
-					oldMacro.defRepr(macName),
-					newMacro.defRepr(macName),
-					cond !is none ? (" assuming that " + repr(cond)) : ""
-				}));
+				f"Macro {repr macName} (previously: `#define {oldMacro.defRepr(macName)}') "
+				f"re-defined as `#define {newMacro.defRepr(macName)}'{
+					cond !is none
+						? (' assuming that ' + repr(cond))
+						: ''
+				}"
+			);
 		}
 	}
 
@@ -1298,7 +1297,7 @@ do_undef_args:
 				else {
 					evalMode = none;
 				}
-				args = "defined({})".format({ args });
+				args = f"defined({args})";
 				if (evalMode is none)
 					evalMode = args;
 				goto do_if_expression;
@@ -1311,7 +1310,7 @@ do_undef_args:
 				else {
 					evalMode = none;
 				}
-				args = "!defined({})".format({ args });
+				args = f"!defined({args})";
 				if (evalMode is none)
 					evalMode = args;
 				goto do_if_expression;
@@ -1364,11 +1363,8 @@ do_skip_inner_block:
 					local myPreprocessorAssumptions;
 					myPreprocessorAssumptions =
 						optimizePreprocessorExpression(
-							"({}) && ({})".format({
-								preprocessorAssumptions,
-								evalMode
-							}),
-						sortBranches: true);
+							f"({preprocessorAssumptions})&&({evalMode})",
+							sortBranches: true);
 do_cond_inner_block:
 					if (myPreprocessorAssumptions == "1")
 						goto do_parse_inner_block;
@@ -1390,10 +1386,9 @@ do_cond_inner_block:
 					if (evalMode is none)
 						err("Expected #endif after #else");
 					if (pastBranchConditions != "0") {
-						pastBranchConditions = "{} || ({})".format({
-							pastBranchConditions, evalMode });
+						pastBranchConditions = f"{pastBranchConditions} || ({evalMode})";
 					} else {
-						pastBranchConditions = "({})".format({ evalMode });
+						pastBranchConditions = f"({evalMode})";
 					}
 					if (cmd == "elif") {
 						/* parse the elif-expression */
@@ -1409,12 +1404,10 @@ do_cond_inner_block:
 						args = tr[1];
 						myPreprocessorAssumptions =
 							optimizePreprocessorExpression(
-								"({}) && !({}) && ({})".format({
-									preprocessorAssumptions,
-									pastBranchConditions,
-									args
-								}),
-							sortBranches: true);
+								f"({preprocessorAssumptions})&&"
+								f"!({pastBranchConditions})&&"
+								f"({args})",
+								sortBranches: true);
 						evalMode = evalutePreprocessorExpression(
 							myPreprocessorAssumptions, knownMacros,
 							knownDeletedMacros);
@@ -1431,11 +1424,9 @@ do_cond_inner_block:
 						 */
 						myPreprocessorAssumptions =
 							optimizePreprocessorExpression(
-								"({}) && !({})".format({
-									preprocessorAssumptions,
-									pastBranchConditions
-								}),
-							sortBranches: true);
+								f"({preprocessorAssumptions})&&"
+								f"!({pastBranchConditions})",
+								sortBranches: true);
 						if (myPreprocessorAssumptions == preprocessorAssumptions) {
 							evalMode = true;
 						} else if (myPreprocessorAssumptions == "0") {

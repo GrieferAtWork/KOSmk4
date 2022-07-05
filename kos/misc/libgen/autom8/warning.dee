@@ -79,7 +79,7 @@ function operator_warn(fp: File, body: string, error: bool = false) {
 	body = body.replace(r'"', r'\"').replace("\n", " \\\n");
 	if ("\n" in body)
 		body = "\\\n" + body;
-	body = '"{}"'.format({ body });
+	body = f'"{body}"';
 	fp << "#ifndef __NO_WARNINGS\n";
 	fp << "#ifdef __PREPROCESSOR_HAVE_WARNING\n";
 	fp << "#warning " << body << "\n";

@@ -91,7 +91,7 @@ function runVBoxManageCommandAndCaptureOutput(argv: {string...}): {string...} {
 
 function createVmdkDescriptor(diskFile: string): string {
 	local resultFilename = fs.joinpath(fs.headof(diskFile),
-		".{}.vmdk".format({ fs.fileof(diskFile).lstrip(".") }));
+		f".{fs.fileof(diskFile).lstrip('.')}.vmdk");
 	if (!fs.stat.exists(resultFilename)) {
 		/* Lazily create the VBox descriptor for the disk image. */
 		fs.chdir(fs.headof(resultFilename));

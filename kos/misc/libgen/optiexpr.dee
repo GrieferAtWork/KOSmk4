@@ -288,7 +288,7 @@ class PPBranchNot: PPBranch {
 	this = default;
 	operator str() {
 		if (branch is PPBranchAnd || branch is PPBranchOr)
-			return "!({})".format({ branch });
+			return f"!({branch})";
 		return "!" + branch;
 	}
 }
@@ -299,7 +299,7 @@ class PPBranchAnd: PPBranch {
 		conditions = List(branches);
 	}
 	operator repr() {
-		return "PPBranchAnd({!r})".format({ conditions });
+		return f"PPBranchAnd({repr conditions})";
 	}
 	operator str() {
 		File.Writer fp;
@@ -370,7 +370,7 @@ class PPBranchOr: PPBranch {
 		conditions = List(branches);
 	}
 	operator repr() {
-		return "PPBranchOr({!r})".format({ conditions });
+		return f"PPBranchOr({repr conditions})";
 	}
 	operator str() {
 		File.Writer fp;
@@ -505,8 +505,9 @@ function parsePPBranchUnary(parser: PPBranchParser): Object {
 
 	case "":
 		throw Error(
-			"Expected expression `)' after `(' (got {!r} in {!r})"
-				.format({ parser.tok, parser.expr }));
+			f"Expected expression `)' after `(' "
+			f"(got {repr parser.tok} in {repr parser.expr})"
+		);
 		break;
 
 	case "!": {
@@ -524,8 +525,9 @@ function parsePPBranchUnary(parser: PPBranchParser): Object {
 		local inner = parsePPBranch(parser);
 		if (parser.tok != ")") {
 			throw Error(
-				"Missing `)' after `(' following {!r} (got {!r} in {!r})"
-					.format({ inner, parser.tok, parser.expr }));
+				f"Missing `)' after `(' following {repr inner} "
+				f"(got {repr parser.tok} in {repr parser.expr})"
+			);
 		}
 		tok = parser.next();
 		if (tok !in ["", "||", "&&", ")"])
@@ -535,7 +537,7 @@ function parsePPBranchUnary(parser: PPBranchParser): Object {
 			if (!inner.startswith("(") ||
 			    !inner.endswith(")") ||
 			    inner.findmatch("(", ")", 1) != #inner - 1)
-				inner = optimizeStringBranch("({})".format({ inner }));
+				inner = optimizeStringBranch(f"({inner})");
 		}
 		return inner;
 	}	break;
@@ -613,8 +615,9 @@ function optimizePreprocessorExpression(
 		++parser.pos;
 	if (parser.pos < parser.end) {
 		throw Error(
-			"Unused tail {!r} in expression {!r}".format({
-				parser.expr[parser.pos:parser.end], parser.expr }));
+			f"Unused tail {repr parser.expr[parser.pos:parser.end]} "
+			f"in expression {repr parser.expr}"
+		);
 	}
 	branch = optimizePPBranch(branch);
 	if (sortBranches)
@@ -632,8 +635,9 @@ function optimizePreprocessorExpressionAndRemoveDefined(expr: string): string {
 		++parser.pos;
 	if (parser.pos < parser.end) {
 		throw Error(
-			"Unused tail {!r} in expression {!r}".format({
-				parser.expr[parser.pos:parser.end], parser.expr }));
+			f"Unused tail {repr parser.expr[parser.pos:parser.end]} "
+			f"in expression {repr parser.expr}"
+		);
 	}
 	branch = optimizePPBranch(branch);
 	branch = replaceDefinedBranches(branch);

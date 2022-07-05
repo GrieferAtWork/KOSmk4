@@ -111,10 +111,8 @@ function loadMissingSettings() {
 
 
 function getConfig(): string {
-	return "{}{}".format({
-		CONFIG_OPTIMIZE ? "O" : "nO",
-		CONFIG_DEBUG ? "D" : "nD",
-	});
+	return f"{CONFIG_OPTIMIZE ? "O" : "nO"}"
+	       f"{CONFIG_DEBUG ? "D" : "nD"}";
 }
 
 function generateFile(filename: string, isRegEx: bool) {
@@ -177,7 +175,7 @@ function buildToolchainsAndGroups() {
 
 function setBinTargetLink(target_arch: string, target_name: string) {
 	/* Make sure that the correct bin-config is selected. */
-	local selConfigFile = "bin/{}-kos".format({ target_arch });
+	local selConfigFile = f"bin/{target_arch}-kos";
 	local selConfig = readlink(selConfigFile);
 	if (selConfig !is string || selConfig != target_name) {
 		if (selConfig !is none) {
@@ -188,7 +186,7 @@ function setBinTargetLink(target_arch: string, target_name: string) {
 		}
 		print("Changing libpath: `ln -s ", repr(target_name), " ", repr(selConfigFile), "`");
 		local p = ipc.Process(HOST_EXE("bash"), [ "-c",
-			"ln -s {!r} {!r}".format({ target_name, selConfigFile })
+			f"ln -s {repr target_name} {repr selConfigFile}"
 		]);
 		p.start();
 		joinProcess(p);
@@ -196,7 +194,7 @@ function setBinTargetLink(target_arch: string, target_name: string) {
 }
 
 function build(reconfigure: Callable = none, binTargetName: string = none) {
-	TARGET_NAME = "{}-kos-{}".format({ TARGET_ARCH, getConfig() });
+	TARGET_NAME = f"{TARGET_ARCH}-kos-{getConfig()}";
 	if (binTargetName is none)
 		binTargetName = TARGET_NAME;
 	setBinTargetLink(TARGET_ARCH, binTargetName);
@@ -223,7 +221,7 @@ function build(reconfigure: Callable = none, binTargetName: string = none) {
 		final local XARCH  = TARGET.XARCH;
 		final local SUFFIX = TARGET.SUFFIX;
 		final local ASMFILES = TARGET.ASMFILES;
-		final local XARCH_ASMFILES = "{}/{}".format({ XARCH, ASMFILES });
+		final local XARCH_ASMFILES = f"{XARCH}/{ASMFILES}";
 		final local DISK_LIBPATH = TARGET.DISK_LIBPATH;
 		final local DISK_USRLIBPATH = TARGET.DISK_USRLIBPATH;
 #define BEGIN           { local options = deepcopy __nth(2) options;
@@ -436,7 +434,7 @@ _err_unknown_argument:
 		for (local i, elem: util.enumerate(CONFIG_MULTIBOOT_DRIVERS)) {
 			local name, cmdline = elem...;
 			if ("/" !in name && "\\" !in name) {
-				name = "bin/{}/os/drivers/{}".format({ TARGET_NAME, name });
+				name = f"bin/{TARGET_NAME}/os/drivers/{name}";
 				CONFIG_MULTIBOOT_DRIVERS[i] = (name, cmdline);
 			}
 		}

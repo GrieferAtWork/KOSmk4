@@ -607,7 +607,7 @@ function keyCrtHave(symbolName: string | UserString): string {
 	local usedSymbolName = str symbolName;
 	if (usedSymbolName.startswith("?")) /* Encode DOS special symbol characters */
 		usedSymbolName = usedSymbolName.replace("?", "$Q").replace("@", "$A");
-	return "defined(__CRT_HAVE_{})".format({ usedSymbolName });
+	return f"defined(__CRT_HAVE_{usedSymbolName})";
 }
 
 
@@ -620,8 +620,7 @@ function builtin_has_function(
 	if (isCString(tok))
 		tok = tok.decode("c-escape");
 	else if (!tok.issymbol()) {
-		self.err("Expected keyword or in after '$has_function(...)', but got {!r}"
-			.format({ tok }));
+		self.err(f"Expected keyword or in after '$has_function(...)', but got {repr tok}");
 	}
 	local fun;
 	try {
@@ -671,8 +670,7 @@ function builtin_crt_has_function(
 	if (isCString(tok))
 		tok = tok.decode("c-escape");
 	else if (!tok.issymbol()) {
-		self.err("Expected keyword or in after '$crt_has_function(...)', but got {!r}"
-			.format({ tok }));
+		self.err(f"Expected keyword or in after '$crt_has_function(...)', but got {repr tok}");
 	}
 	self.next();
 	local result = self.tokEnd;
@@ -1156,9 +1154,9 @@ parse_if_or_elif_condition:
 				}
 				cond = self.text[exprStart:exprEnd];
 				if (tok.endswith("ndef")) {
-					cond = "!defined({})".format({ cond });
+					cond = f"!defined({cond})";
 				} else if (tok.endswith("def")) {
-					cond = "defined({})".format({ cond });
+					cond = f"defined({cond})";
 				}
 				cond = escapeText(cond, mode);
 				if (tok.startswith("pp_if")) {
@@ -1242,9 +1240,9 @@ handle_numLines_after_pp_directive:
 					local srcExpr = self.parseAllUntilRParenAsString();
 					self.skip(",");
 					if (!dstExpr.issymbol())
-						dstExpr = "({})".format({ dstExpr.strip() });
+						dstExpr = f"({dstExpr.strip()})";
 					if (!srcExpr.issymbol())
-						srcExpr = "({})".format({ srcExpr.strip() });
+						srcExpr = f"({srcExpr.strip()})";
 					local offset = 0;
 					local isFirst = true;
 					for (;;) {
@@ -1273,8 +1271,8 @@ handle_numLines_after_pp_directive:
 							local usedDst = dstExpr;
 							local usedSrc = srcExpr;
 							if (typeOff != 0) {
-								usedDst = "((u8 *){} + {})".format({ usedDst, typeOff });
-								usedSrc = "((u8 const *){} + {})".format({ usedSrc, typeOff });
+								usedDst = f"((u8 *){usedDst} + {typeOff})";
+								usedSrc = f"((u8 const *){usedSrc} + {typeOff})";
 							}
 							if (!isFirst)
 								fp << ", ";
@@ -1292,15 +1290,13 @@ handle_numLines_after_pp_directive:
 				}	break;
 
 				default:
-					self.err("Unknown directive: {!r}"
-						.format({ "c:" + tok }));
+					self.err(f"Unknown directive: {repr f'c:{tok}'}");
 					break;
 				}
 				break;
 
 			default:
-				self.err("Unknown directive: {!r}"
-					.format({ tok }));
+				self.err(f"Unknown directive: {repr tok}");
 				break;
 			}
 			flushStart = self.tokEnd;
@@ -1593,7 +1589,8 @@ with_next_token:
 					}
 				}
 				/* Error, unless the function was explicitly annotated as _NOT_ being a dependency! */
-				parser.err("Ambiguous dependency {0!r} (consider clarifying with "
+				parser.err(
+					"Ambiguous dependency {0!r} (consider clarifying with "
 					"[dependency({0!r})] or [not_dependency({0!r})])"
 					.format({ tok }));
 				continue;

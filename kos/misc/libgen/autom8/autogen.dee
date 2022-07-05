@@ -125,7 +125,7 @@ function do_wrap3264_x32_and_x32_64(
 		altname64: string, name32If: string,
 		name64If: string, link64If: string,
 		macro64If: string) {
-	local dontLinkIf = "!({})".format({ linkIf });
+	local dontLinkIf = f"!({linkIf})";
 	local fp = File.stdout;
 	fp << "#undef " << name32 << "\n";
 	fp << "#undef " << name64 << "\n";
@@ -142,32 +142,38 @@ function do_wrap3264_x32_and_x32_64(
 	fp << " *   - `" << name64 << "' as `" << name << "'\n";
 	fp << " *   - `" << name32 << "' as `__" << name << "32' */\n";
 	defineMacros({
-		(name32, "__{}32".format({ name })),
+		(name32, f"__{name}32"),
 		(name64, name),
-		("__{}".format({ name32 }), "__{}32".format({ name })),
-		("__{}".format({ name64 }), name),
-		("__{}32".format({ name }), "__{}32".format({ name })),
-		("__{}_alt".format({ name }), "__{}32".format({ name })),
+		(f"__{name32}", f"__{name}32"),
+		(f"__{name64}", name),
+		(f"__{name}32", f"__{name}32"),
+		(f"__{name}_alt", f"__{name}32"),
 	});
 	fp << optimizeAndWrapProcessorExpressionForIf(name32If) << "\n";
-	defineMacros({ ("{}32".format({ name }), "__{}32".format({ name })), });
-	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined("!({})".format({ name32If })) << " */\n";
+	defineMacros({ (f"{name}32", f"__{name}32"), });
+	fp << "#endif /* "
+		<< optimizePreprocessorExpressionAndRemoveDefined(f"!({name32If})")
+		<< " */\n";
 
 	fp << optimizeAndWrapProcessorExpressionForIf(name64If) << "\n";
 	fp << optimizeAndWrapProcessorExpressionForIf(macro64If) << "\n";
 	defineMacros({
-		("{}64".format({ name }), name),
-		("__{}64".format({ name }), name),
+		(f"{name}64", name),
+		(f"__{name}64", name),
 	});
 	fp << "#else /* " << optimizePreprocessorExpressionAndRemoveDefined(macro64If) << " */\n";
 	defineMacros({
-		(altname64, "{}64".format({ name })),
-		("__{}64".format({ name }), "{}64".format({ name })),
+		(altname64, f"{name}64"),
+		(f"__{name}64", f"{name}64"),
 	});
-	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined("!({})".format({ macro64If })) << " */\n";
+	fp << "#endif /* "
+		<< optimizePreprocessorExpressionAndRemoveDefined(f"!({macro64If})")
+		<< " */\n";
 	fp << "#else /* " << optimizePreprocessorExpressionAndRemoveDefined(name64If) << " */\n";
-	defineMacros({ ("__{}64".format({ name }), name) });
-	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined("!({})".format({ name64If })) << " */\n";
+	defineMacros({ (f"__{name}64", name) });
+	fp << "#endif /* "
+		<< optimizePreprocessorExpressionAndRemoveDefined(f"!({name64If})")
+		<< " */\n";
 
 	local nameUpper   = name.upper();
 	local name32Upper = name32.upper();
@@ -190,34 +196,38 @@ function do_wrap3264_x32_and_x32_64(
 	fp << " *   - `" << name32 << "' as `" << name << "' */\n";
 	defineMacros({
 		(name32, name),
-		("__{}32".format({ name }), name),
-		("__{}".format({ name32 }), name),
+		(f"__{name}32", name),
+		(f"__{name32}", name),
 	});
 	fp << optimizeAndWrapProcessorExpressionForIf(name32If) << "\n";
-	defineMacros({ ("{}32".format({ name }), name), });
+	defineMacros({ (f"{name}32", name), });
 	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined(name32If) << " */\n";
 	fp << optimizeAndWrapProcessorExpressionForIf(name64If) << "\n";
 	defineMacros({
-		("__{}".format({ name64 }), "{}64".format({ name })),
-		(name64, "{}64".format({ name })),
-		("__{}64".format({ name }), "{}64".format({ name })),
-		("__{}_alt".format({ name }), "{}64".format({ name })),
+		(f"__{name64}", f"{name}64"),
+		(name64, f"{name}64"),
+		(f"__{name}64", f"{name}64"),
+		(f"__{name}_alt", f"{name}64"),
 	});
 	fp << "#else /* " << optimizePreprocessorExpressionAndRemoveDefined(name64If) << " */\n";
 	defineMacros({
-		("__{}".format({ name64 }), "__{}64".format({ name })),
-		(name64, "__{}64".format({ name })),
-		("__{}64".format({ name }), "__{}64".format({ name })),
-		("__{}_alt".format({ name }), "__{}64".format({ name })),
+		(f"__{name64}", f"__{name}64"),
+		(name64, f"__{name}64"),
+		(f"__{name}64", f"__{name}64"),
+		(f"__{name}_alt", f"__{name}64"),
 	});
-	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined("!({})".format({ name64If })) << " */\n";
+	fp << "#endif /* "
+		<< optimizePreprocessorExpressionAndRemoveDefined(f"!({name64If})")
+		<< " */\n";
 	fp << "\n";
 	defineMacros(for (local pattern, matchedPattern, macroName: type32Macros) (
 		pattern.format({ .typ = nameUpper }) + macroName[#matchedPattern:],
 		macroName,
 	));
 	fp << "\n";
-	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined("!({})".format({ link64If })) << " */\n";
+	fp << "#endif /* "
+		<< optimizePreprocessorExpressionAndRemoveDefined(f"!({link64If})")
+		<< " */\n";
 	fp << "\n";
 	defineMacros((for (local pattern, matchedPattern, macroName: type32Macros) (
 		pattern.format({ .typ = nameUpper + "32" }) + macroName[#matchedPattern:],
@@ -244,11 +254,11 @@ function do_wrap3264_x64(
 		linkIf: string, name: string, name64: string,
 		altname64: string, name32If: string,
 		name64If: string, macro64If: string) {
-	local dontLinkIf = "!({})".format({ linkIf });
+	local dontLinkIf = f"!({linkIf})";
 	local fp = File.stdout;
 	fp << "#undef " << name64 << "\n";
 	fp << optimizeAndWrapProcessorExpressionForIf(dontLinkIf) << "\n";
-	defineMacros({ (name64, "__{}".format({ name64 })), });
+	defineMacros({ (name64, f"__{name64}"), });
 	fp << "#else /* " << optimizePreprocessorExpressionAndRemoveDefined(dontLinkIf) << " */\n";
 	if ("__USE_" in name32If || "__USE_" in name64If)
 		fp << "#include <features.h>\n";
@@ -266,31 +276,33 @@ function do_wrap3264_x64(
 		macroName,
 	)) + {
 		(name64, name),
-		("__{}".format({ name64 }), name),
-		("__{}32".format({ name }), name),
-		("__{}_alt".format({ name }), name),
+		(f"__{name64}", name),
+		(f"__{name}32", name),
+		(f"__{name}_alt", name),
 	});
-	defineMacros({ ("_{0}_MATCHES_{0}64".format({ nameUpper }), "1"), });
+	defineMacros({ (f"_{nameUpper}_MATCHES_{nameUpper}64", "1"), });
 	fp << optimizeAndWrapProcessorExpressionForIf(name32If) << "\n";
-	defineMacros({ ("{}32".format({ name }), name), });
+	defineMacros({ (f"{name}32", name), });
 	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined(name32If) << " */\n";
 	fp << optimizeAndWrapProcessorExpressionForIf(name64If) << "\n";
 	fp << optimizeAndWrapProcessorExpressionForIf(macro64If) << "\n";
 	defineMacros({
-		("{}64".format({ name }), name),
-		("__{}64".format({ name }), name),
+		(f"{name}64", name),
+		(f"__{name}64", name),
 	});
 	fp << "#else /* " << optimizePreprocessorExpressionAndRemoveDefined(macro64If) << " */\n";
 	defineMacros({
-		(altname64, "{}64".format({ name })),
-		("__{}64".format({ name }), "{}64".format({ name })),
+		(altname64, f"{name}64"),
+		(f"__{name}64", f"{name}64"),
 	});
 	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined(
-		"!({})".format({ macro64If })) << " */\n";
+		f"!({macro64If})") << " */\n";
 	fp << "#else /* " << optimizePreprocessorExpressionAndRemoveDefined(name64If) << " */\n";
-	defineMacros({ ("__{}64".format({ name }), name), });
-	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined("!({})".format({ name64If })) << " */\n";
-	defineMacros({ ("__{}_defined".format({ name }), ""), });
+	defineMacros({ (f"__{name}64", name), });
+	fp << "#endif /* "
+		<< optimizePreprocessorExpressionAndRemoveDefined(f"!({name64If})")
+		<< " */\n";
+	defineMacros({ (f"__{name}_defined", ""), });
 	fp << "#endif /* " << optimizePreprocessorExpressionAndRemoveDefined(linkIf) << " */\n";
 }
 

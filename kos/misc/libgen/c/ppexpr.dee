@@ -1272,10 +1272,8 @@ again:
 		local hasParen: bool = tok == "(";
 		if (hasParen)
 			tok = self.next();
-		if (!tok.issymbol()) {
-			self.err("Expected keyword for 'defined(...)', but got {!r}"
-				.format({ tok }));
-		}
+		if (!tok.issymbol())
+			self.err(f"Expected keyword for 'defined(...)', but got {repr tok}");
 		self.next();
 		if (hasParen)
 			self.skip(")");
@@ -1310,10 +1308,8 @@ do_return_const:
 		}
 		break;
 	}
-	if (!tok.issymbol()) {
-		self.err("Unexpected token in preprocessor expression: {!r}"
-			.format({ tok }));
-	}
+	if (!tok.issymbol())
+		self.err(f"Unexpected token in preprocessor expression: {repr tok}");
 	/* Fallback: Return a BRT_UNDEF branch. */
 	{
 		local escapeStart = self.tokStart;
@@ -1542,10 +1538,8 @@ function ppParse(self: string | UserString | CParser | File): PPBranch {
 			break;
 		}
 /*
-		if (self.tok) {
-			self.err("Cannot parse PP-expression: {!r}"
-				.format({ self.text[self.tokStart:] }));
-		}
+		if (self.tok)
+			self.err(f"Cannot parse PP-expression: {repr self.text[self.tokStart:]}");
 */
 		return result;
 	} catch (Error as e) {
@@ -1579,23 +1573,23 @@ function optimizeForIfdef(expr: string): string {
 	    result.findmatch("(", ")", 8) == #result - 1) {
 		local definedName = result[8:-1].strip();
 		if (definedName.issymbol())
-			return "#ifdef {}\n".format({ definedName });
+			return f"#ifdef {definedName}\n";
 	}
 	if (result.startswith("!defined(") && result.endswith(")") &&
 	    result.findmatch("(", ")", 9) == #result - 1) {
 		local definedName = result[9:-1].strip();
 		if (definedName.issymbol())
-			return "#ifndef {}\n".format({ definedName });
+			return f"#ifndef {definedName}\n";
 	}
-	return "#if {}\n".format({ result });
+	return f"#if {result}\n";
 }
 
 function optimizeForEndif(expr: string): string {
-	return "#endif /* {} */\n".format({
+	return f"#endif /* {
 		ppParse(expr)
 			.optimize()
 			.tostr(removeDefined: true)
-	});
+	} */\n";
 }
 
 

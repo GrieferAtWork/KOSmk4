@@ -23,7 +23,7 @@ BEGIN
 	DEFINE({ "__KERNEL__" : "1" })
 	INCLUDE({
 		"/kos/src/kernel/include",
-		"/kos/src/kernel/include/" + XARCH + "-kos",
+		f"/kos/src/kernel/include/{XARCH}-kos",
 	})
 	//LD_FLAGS({ "--gc-sections" })
 	GCC_FLAGS({
@@ -60,7 +60,7 @@ BEGIN
 
 	BEGIN GROUP("kernelspace._verify") { COMPILE };
 		SOURCE({
-			"../_verify/arch/" + XARCH + "/*.c",
+			f"../_verify/arch/{XARCH}/*.c",
 			"../_verify/*.c",
 		})
 	END

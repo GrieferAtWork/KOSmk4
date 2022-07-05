@@ -22,7 +22,7 @@ BEGIN
 	DEFINE({ "CONFIG_BUILDING_KERNEL_CORE" : "1" })
 	SET_NOSTDLIB()
 
-	local KENREL_LIBDL_BINARY_SOURCE = "arch/" + XARCH + "/exec/libdl.S";
+	local KENREL_LIBDL_BINARY_SOURCE = f"arch/{XARCH}/exec/libdl.S";
 	local KERNEL_ASM_SOURCES = [
 		"../../libc/hybrid/arch/" + XARCH_ASMFILES,
 		"../../libunwind/arch/" + XARCH_ASMFILES,
@@ -35,7 +35,7 @@ BEGIN
 		 *       define anything outside of `#ifndef __KERNEL__'. - This should  be
 		 *       automated by `generate_headers.dee' */
 		"../../libc/auto/*.c",
-		"../../libc/hybrid/arch/" + XARCH + "/*.c",
+		f"../../libc/hybrid/arch/{XARCH}/*.c",
 		"../../libc/hybrid/*.c",
 
 		/* Compile a couple of user-space libraries as part of the kernel core */
@@ -54,15 +54,15 @@ BEGIN
 		"../../libinstrlen/*.c",
 
 		/* Required for: Exception handling, as well as tracebacks */
-		"../../libunwind/arch/" + XARCH + "/*.c",
+		f"../../libunwind/arch/{XARCH}/*.c",
 		"../../libunwind/*.c",
 
 		/* Required for: Kernel panic error logging */
-		"../../libregdump/arch/" + XARCH + "/*.c",
+		f"../../libregdump/arch/{XARCH}/*.c",
 		"../../libregdump/*.c",
 
 		/* Required for: General purpose cpu state operations */
-		"../../libcpustate/arch/" + XARCH + "/*.c",
+		f"../../libcpustate/arch/{XARCH}/*.c",
 		"../../libcpustate/*.c",
 
 		/* Required for: High-level ANSI TTY escape codes (`\e[0m') */
@@ -86,12 +86,12 @@ BEGIN
 		/* Required for: VIO support */
 		"../../libvio/*.c",
 //		"../../libviocore/*.c", /* Empty folder... */
-		"../../libviocore/arch/" + XARCH + "/*.c",
+		f"../../libviocore/arch/{XARCH}/*.c",
 
 		/* Pull in some hard-coded drivers */
 
 		/* Required for: executing ELF files. */
-		"../modelf/arch/" + XARCH + "/*.c",
+		f"../modelf/arch/{XARCH}/*.c",
 		"../modelf/*.c",
 
 		/* Required for: executing #!-files. */
@@ -116,7 +116,7 @@ BEGIN
 		"sched/*.c",
 
 		/* Do arch-specific files last */
-		"arch/" + XARCH + "/*.c",
+		f"arch/{XARCH}/*.c",
 	];
 	for (local x: fs.dir("kos/src/kernel/core/arch/" + XARCH)) {
 		if ("." in x || x.startswith("__"))
@@ -176,7 +176,7 @@ BEGIN
 	 *               needs to have an artificial dependency on rtld-flat.bin */
 	BEGIN GROUP("kernel") {
 			stepWithDependencies(COMPILE, {
-				TARGET_BINPATH + DISK_LIBPATH + "libdl.rtld-flat.bin" }) };
+				f"{TARGET_BINPATH}{DISK_LIBPATH}libdl.rtld-flat.bin" }) };
 		SET_LANGUAGE("assembler-with-cpp")
 		SOURCE({ KENREL_LIBDL_BINARY_SOURCE })
 	END
@@ -186,11 +186,11 @@ BEGIN
 				stepWithDependencies(COMPILE, {
 					TARGET_BINPATH + "/lib/libdl.rtld-flat.bin" }) };
 			SET_LANGUAGE("assembler-with-cpp")
-			SOURCE({ "arch/" + XARCH + "/exec/libdl-compat.S" })
+			SOURCE({ f"arch/{XARCH}/exec/libdl-compat.S" })
 		END
 	}
 
-	final local KERNEL_EXPORTS_SOURCE = "/" + config.BUILD_PATH + "/kernel-symtab.S";
+	final local KERNEL_EXPORTS_SOURCE = f"/{config.BUILD_PATH}/kernel-symtab.S";
 	BEGIN GROUP("kernel") { DILINK, MCOPY,
 			enumerateSymbolsStep(
 				elfBinary: KERNEL_BINARY,
@@ -299,7 +299,7 @@ BEGIN
 			(".debug_loc",      "__kernel_debug_loc_start",      "__kernel_debug_loc_size"),
 		};
 
-		LINKER_SCRIPT("arch/" + XARCH + "/_kernel.ld")
+		LINKER_SCRIPT(f"arch/{XARCH}/_kernel.ld")
 		SET_OUTPUT("/os/kernel.bin")
 		STATIC_USELIBGCC()
 		SOURCE(KERNEL_ASM_SOURCES)
@@ -307,7 +307,7 @@ BEGIN
 		SOURCE({ KENREL_LIBDL_BINARY_SOURCE })
 		if (TARGET_ARCH == "x86_64") {
 			/* For compatibility-mode (include the 32-bit version of libdl.so) */
-			SOURCE({ "arch/" + XARCH + "/exec/libdl-compat.S" })
+			SOURCE({ f"arch/{XARCH}/exec/libdl-compat.S" })
 		}
 	END
 

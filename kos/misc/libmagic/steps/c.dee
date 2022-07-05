@@ -205,7 +205,7 @@ exec_content:
 	}
 	return result;
 err_bad_magic_tag:
-	throw Error("Bad magic tag in {!r}".format({ srcFile }));
+	throw Error(f"Bad magic tag in {repr srcFile}");
 }
 
 
@@ -243,7 +243,7 @@ final local function PREPROCESS_getProducedOutputFiles(self: BoundStep): {string
 }
 
 final local function PREPROCESS_tostr(self: BoundStep): string {
-	return "Preprocess {!r}".format({ self.group.fixFilename(self.userData) });
+	return f"Preprocess {repr self.group.fixFilename(self.userData)}";
 }
 
 final local function ASSEMBLE_run(self: BoundStep): {Waitable...} {
@@ -281,7 +281,7 @@ final local function ASSEMBLE_getProducedOutputFiles(self: BoundStep): {string..
 }
 
 final local function ASSEMBLE_tostr(self: BoundStep): string {
-	return "Assemble {!r}".format({ self.group.fixFilename(self.userData) });
+	return f"Assemble {repr self.group.fixFilename(self.userData)}";
 }
 
 
@@ -451,7 +451,7 @@ final local function COMPILE_getProducedFiles(self: BoundStep): {string...} {
 	yield COMPILE_getProducedOutputFiles(self)...;
 }
 final local function COMPILE_tostr(self: BoundStep): string {
-	return "Compile {!r}".format({ self.userData });
+	return f"Compile {repr self.userData}";
 }
 
 
@@ -528,7 +528,7 @@ final global function LINK_getProducedFiles(self: BoundStep): string {
 }
 final local function LINK_tostr(self: BoundStep): string {
 	local group = self.group;
-	return "Link {!r}".format({ group.fixFilename(group.options[OPT_LINK_OUTPUT]) });
+	return f"Link {repr group.fixFilename(group.options[OPT_LINK_OUTPUT])}";
 }
 
 
@@ -564,7 +564,7 @@ final local function ARCHIVE_getProducedFiles(self: BoundStep): string {
 }
 final local function ARCHIVE_tostr(self: BoundStep): string {
 	local group = self.group;
-	return "Archive {!r}".format({ group.fixFilename(group.options[OPT_ARCHIVE_OUTPUT]) });
+	return f"Archive {repr group.fixFilename(group.options[OPT_ARCHIVE_OUTPUT])}";
 }
 
 
@@ -655,7 +655,7 @@ final local function COMPILE_WITH_ASM_FILTER_getProducedFiles(self: BoundStep): 
 	yield COMPILE_WITH_ASM_FILTER_getProducedOutputFiles(self)...;
 }
 final local function COMPILE_WITH_ASM_FILTER_tostr(self: BoundStep): string {
-	return "Compile with asm filter {!r}".format({ self.userData });
+	return f"Compile with asm filter {repr self.userData}";
 }
 
 

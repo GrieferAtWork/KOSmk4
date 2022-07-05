@@ -82,7 +82,7 @@ function updateUserImplementationSourceFile(
 	@@  - string: Some other string that is inserted between locations
 	local userSourceLayout: {(UserSourceFunction | _UserSourceExportTable | string)...} = [];
 	local skippedFunctionNames: {string...} = HashSet();
-	printUpdateMessage("Printing: {!r}".format({ filename }));
+	printUpdateMessage(f"Printing: {repr filename}");
 
 	/* Gather the names of all user-source-functions that need to exist */
 	local missingSourceFunctionsByName: {string: LibraryFunction} = Dict();
@@ -99,8 +99,7 @@ function updateUserImplementationSourceFile(
 			local line = 1 + origText.count("\n", 0, offset);
 			local startOfLine = origText.rfind("\n", 0, offset) + 1;
 			local column = 1 + (offset - startOfLine);
-			local emsg = "{}({},{}) : Error : {}"
-				.format({ fs.abspath(filename), line, column, message });
+			local emsg = f"{fs.abspath(filename)}({line},{column}) : Error : {message}";
 			print emsg;
 			throw Error(emsg);
 		}
@@ -126,18 +125,19 @@ function updateUserImplementationSourceFile(
 				local functionDeclHashMethod: string;
 				local functionDeclHashValue: int;
 				try {
-					functionName, functionDeclHashMethod, functionDeclHashValue =
+					local functionDeclHashValue_;
+					functionName, functionDeclHashMethod, functionDeclHashValue_ =
 						tagBody.scanf("head:%[^,],hash:%[^=]=%[^]")...;
-					functionDeclHashValue = int(functionDeclHashValue);
+					functionDeclHashValue = int(functionDeclHashValue_);
 				} catch (Error as e) {
 					errAt(tagStart, e.message);
 				}
 				local functionDeclStart = tagEnd + 6;
 				local functionDeclEnd;
-				local bodyMarker = "/*[[[body:{}]]]*/".format({ functionName });
+				local bodyMarker = f"/*[[[body:{functionName}]]]*/";
 				functionDeclEnd = origText.find(bodyMarker, functionDeclStart);
 				if (functionDeclEnd < 0)
-					errAt(tagStart, "Missing tag: {!r}".format({ bodyMarker }));
+					errAt(tagStart, f"Missing tag: {repr bodyMarker}");
 				local functionDecl = origText[functionDeclStart:functionDeclEnd];
 				if (functionDeclHashMethod != "0") {
 					local functionDeclHash: int;
@@ -146,15 +146,18 @@ function updateUserImplementationSourceFile(
 					} catch (Error as e) {
 						errAt(tagStart, e.message);
 					}
-					if (functionDeclHash != functionDeclHashValue && !functionDecl.isspace())
-						errAt(functionDeclStart, "Declaration of function {!r} has an incorrect hash (expected {}, but is {})"
-							.format({ functionName, functionDeclHashValue.hex(), functionDeclHash.hex() }));
+					if (functionDeclHash != functionDeclHashValue && !functionDecl.isspace()) {
+						errAt(functionDeclStart,
+							f"Declaration of function {repr functionName} has an incorrect "
+							f"hash (expected {functionDeclHashValue.hex()}, "
+							f"but is {functionDeclHash.hex()})");
+					}
 				}
 				local bodyStart = functionDeclEnd + #bodyMarker;
-				local endMarker = "/*[[[end:{}]]]*/\n".format({ functionName });
+				local endMarker = f"/*[[[end:{functionName}]]]*/\n";
 				local bodyEnd = origText.find(endMarker, bodyStart);
 				if (bodyEnd < 0)
-					errAt(bodyStart, "Missing tag: {!r}".format({ bodyEnd }));
+					errAt(bodyStart, f"Missing tag: {repr bodyEnd}");
 				if (flushStart < tagStart)
 					userSourceLayout.append(origText[flushStart:tagStart]);
 				local func = missingSourceFunctionsByName.pop(functionName, none);
@@ -166,11 +169,10 @@ function updateUserImplementationSourceFile(
 				if (func is none) {
 					/* Discard the function if its body is auto-generated */
 					if (isFunctionBodyGenerated(none, bodyText)) {
-						printUpdateMessage("Removing deleted function: {!r}"
-							.format({ functionName }));
+						printUpdateMessage(f"Removing deleted function: {repr functionName}");
 						goto discard_function_during_scan;
 					}
-					errAt(tagStart, "Unknown function {!r}".format({ functionName }));
+					errAt(tagStart, f"Unknown function {repr functionName}");
 				}
 				/* Delete the body (thus forcing it to be re-generated)
 				 * if   the   old  body   was   simply  auto-generated. */
@@ -207,9 +209,11 @@ discard_function_during_scan:
 					} catch (Error as e) {
 						errAt(tagStart, e.message);
 					}
-					if (exportTableHash != hashValue && !exportTableText.isspace())
-						errAt(exportsBodyStart, "Export table has an incorrect hash (expected {}, but is {})"
-							.format({ hashValue.hex(), exportTableHash.hex() }));
+					if (exportTableHash != hashValue && !exportTableText.isspace()) {
+						errAt(exportsBodyStart,
+							f"Export table has an incorrect hash (expected "
+							f"{hashValue.hex()}, but is {exportTableHash.hex()})");
+					}
 				}
 				if (flushStart < tagStart)
 					userSourceLayout.append(origText[flushStart:tagStart]);
@@ -232,9 +236,9 @@ discard_function_during_scan:
 							break;
 						}
 					}
-					errAt(tagStart, "{} function {!r}".format({
-						isKnown ? "Duplicate" : "Unknown",
-						functionName }));
+					errAt(tagStart,
+						f"{isKnown ? "Duplicate" : "Unknown"} "
+						f"function {repr functionName}");
 				}
 				if (isSkip)
 					skippedFunctionNames.insert(functionName);
@@ -251,8 +255,8 @@ discard_function_during_scan:
 	if (!userSourceLayout) {
 		/* Generate the initial file layout */
 		local fp = File.Writer();
-		local guardName = "GUARD_LIBC_USER_{}_C"
-			.format({ header.name.replace(".", "_").replace("/", "_").upper() });
+		local guardName = f"GUARD_LIBC_USER_{
+			header.name.replace(".", "_").replace("/", "_").upper()}_C";
 		fp << COPYRIGHT << "\n"
 			"#ifndef " << guardName << "\n"
 			"#define " << guardName << " 1\n"
@@ -371,8 +375,7 @@ again_find_nextPresentFunction:
 					func: f, body: none));
 				userSourceLayout.insert(i, "\n");
 			}
-			printUpdateMessage("Injecting missing function: {!r}"
-				.format({ f.name }));
+			printUpdateMessage(f"Injecting missing function: {repr f.name}");
 			prevPresentFunction = f;
 		}
 		missingSourceFunctionsByName = none;
@@ -456,7 +459,7 @@ again_find_nextPresentFunction:
 					if (extraAttributes is none)
 						extraAttributes = ();
 					extraAttributes = List(extraAttributes);
-					extraAttributes.append("ATTR_SECTION({!r})".format({ implBinding.implSection }));
+					extraAttributes.append(f"ATTR_SECTION({repr implBinding.implSection})");
 				}
 				func.functionPrototype.cprintDeclarationWithoutTerminator(
 					headWriter, ESCAPE_MODE_NONE,
@@ -501,7 +504,7 @@ again_find_nextPresentFunction:
 	if (fp == origText)
 		return; /* No change -> Nothing to do here! */
 	if (!origText) {
-		printUpdateMessage("Creating: {!r}".format({ filename }));
+		printUpdateMessage(f"Creating: {repr filename}");
 		with (criticalSection) {
 			with (local newfp = File.open(filename, "wb"))
 				newfp.write(fp.encode("utf-8"));
@@ -509,12 +512,14 @@ again_find_nextPresentFunction:
 		return;
 	}
 	/* If the content differ, then write the new contents back to the file. */
-	printUpdateMessage("Updating: {!r}".format({ filename }));
+	printUpdateMessage(f"Updating: {repr filename}");
 	/* Use a temporary file to guaranty that deemon crashing  will
 	 * not  cause a us  to end up lost  data, instead allowing the
 	 * user to manually rename files in order to recover any data. */
-	local tempFileFilename = "{}.{}.latest".format({ fs.headof(filename), fs.tailof(filename) });
-	local oldFileFilename = "{}.{}.old.latest".format({ fs.headof(filename), fs.tailof(filename) });
+	local filenameHead = fs.headof(filename);
+	local filenameTail = fs.tailof(filename);
+	local tempFileFilename = f"{filenameHead}.{filenameTail}.latest";
+	local oldFileFilename = f"{filenameHead}.{filenameTail}.old.latest";
 	with (local newfp = File.open(tempFileFilename, "wb"))
 		newfp.write(fp.encode("utf-8"));
 	with (criticalSection) {

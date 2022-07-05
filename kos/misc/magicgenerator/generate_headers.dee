@@ -302,9 +302,9 @@ again:
 @@Update the contents of @filename, using a file-printer callback @cb
 function updateHashedFile(filename: string, cb: Callable with File) {
 	local fp: File = File.Writer();
-	printMessage("Printing: {!r} (begin)".format({ filename }));
+	printMessage(f"Printing: {repr filename} (begin)");
 	local result = cb(fp);
-	printMessage("Printing: {!r} (end)".format({ filename }));
+	printMessage(f"Printing: {repr filename} (end)");
 	local newText: Bytes = fp.string.encode("utf-8");
 	local newTextHash: int = hash(HASH_FUNCTION, newText);
 again:
@@ -322,7 +322,7 @@ again_create_new:
 			throw;
 		}
 		/* Create a previously non-existent file */
-		printMessage("Creating: {!r}".format({ filename }));
+		printMessage(f"Creating: {repr filename}");
 		with (criticalSection) {
 			try {
 				with (fp) {
@@ -358,14 +358,15 @@ again_create_new:
 		oldTextHash         = int(oldTextHash.strip());
 		oldTextRealHash     = hash(oldTextHashFunction, oldText);
 	} catch (...) {
-		throw Error("File {!r} is lacking, or has a broken hash header"
-			.format({ filename }));
+		throw Error(f"File {repr filename} is lacking, or has a broken hash header");
 	}
 	if (oldTextHash != oldTextRealHash) {
 		if (oldText == newText)
 			goto do_update_file;
-		throw Error("File {!r} has been modified (hash miss-match: expected {!r}, but got {!r})"
-			.format({ filename, oldTextRealHash.hex(), oldTextHash.hex() }));
+		throw Error(
+			f"File {repr filename} has been modified (hash miss-match: "
+			f"expected {repr oldTextRealHash.hex()}, but got {repr oldTextHash.hex()})"
+		);
 	}
 	if (oldTextHash == newTextHash) {
 		if (oldText == newText)
@@ -373,7 +374,7 @@ again_create_new:
 	}
 do_update_file:
 	try {
-		printMessage("Updating: {!r}".format({ filename }));
+		printMessage(f"Updating: {repr filename}");
 		fp.rewind();
 		with (criticalSection) {
 			with (fp) {
@@ -533,13 +534,13 @@ function customDirectivesParser(context: LoaderContext): bool {
 
 @@Compile a given system header source file @filename
 function compileSystemHeaderSourceFile(filename: string, headerName: string) {
-	printMessage("Compiling: {!r} (begin)".format({ filename }));
+	printMessage(f"Compiling: {repr filename} (begin)");
 	local parser = CParser(File.open(filename), filename: filename);
 	loadSystemHeaderDefinitions(
 		self:                   parser,
 		headerName:             headerName,
 		customDirectivesParser: customDirectivesParser);
-	printMessage("Compiling: {!r} (end)".format({ filename }));
+	printMessage(f"Compiling: {repr filename} (end)");
 }
 
 
@@ -591,8 +592,7 @@ function doPrint_src_libc_crtFeatures(fp: File) {
 						continue; /* New condition was universal */
 					}
 					/* Merge defined-if conditions */
-					crtFeatureConditions[effectiveAsmName] =
-						"({})||({})".format({ oldCond, newCond });
+					crtFeatureConditions[effectiveAsmName] = f"({oldCond})||({newCond})";
 				}
 			}
 		}
@@ -643,17 +643,16 @@ function doPrint_include_crtFeatures_crtKosKernel(fp: File) {
 				if (NOT_DEFINED_KERNEL in exportPpCond)
 					continue;
 				if (partPpCond != "1") {
-					exportPpCond = "({})&&({})".format({
-						partPpCond, exportPpCond });
+					exportPpCond = f"({partPpCond})&&({exportPpCond})";
 				}
 				if (exportPpCond == "0")
 					continue;
 				if (!crtFeatureConditions.setnew(exportAsmname, exportPpCond)) {
-					if (exportPpCond == "1")
+					if (exportPpCond == "1") {
 						crtFeatureConditions[exportAsmname] = "1";
-					else {
-						crtFeatureConditions[exportAsmname] = "({})||({})".format({
-							crtFeatureConditions[exportAsmname], exportPpCond });
+					} else {
+						crtFeatureConditions[exportAsmname] =
+							f"({crtFeatureConditions[exportAsmname]})||({exportPpCond})";
 					}
 				}
 			}
@@ -694,7 +693,7 @@ function resolveLine(line: {string | WildcardRule...}): {string...} {
 @@Update the file "/src/libc/crt-order.h"
 function doPrint_src_libc_crtOrder() {
 	final local ORDER_FILENAME = "src/libc/crt-order.h";
-	printMessage("Parsing crt-order: {!r} (begin)".format({ ORDER_FILENAME }));
+	printMessage(f"Parsing crt-order: {repr ORDER_FILENAME} (begin)");
 	local usedSectionNames: HashSet with string = copy knownLibcSections;
 	for (local header: allSystemHeaders.values) {
 		for (local field: { "order_libcAutoSource", "order_libcDosabiSource", "order_libcUserSource" }) {
@@ -824,17 +823,13 @@ again_search_wildcard:
 			<< ") \\\n";
 	}
 	newMacroText = newMacroText.string[:-3] + "\n";
-	local newData = "{}{}{}".format({
-		data[:orderOutputStart],
-		newMacroText,
-		data[orderOutputEnd:],
-	}).encode("utf-8");
+	local newData = f"{data[:orderOutputStart]}{newMacroText}{data[orderOutputEnd:]}".encode("utf-8");
 	if (newData != oldData) {
-		printMessage("Updating crt-order: {!r}".format({ ORDER_FILENAME }));
+		printMessage(f"Updating crt-order: {repr ORDER_FILENAME}");
 		with (local fp = File.open(ORDER_FILENAME, "w"))
 			fp.write(newData);
 	}
-	printMessage("Parsing crt-order: {!r} (end)".format({ ORDER_FILENAME }));
+	printMessage(f"Parsing crt-order: {repr ORDER_FILENAME} (end)");
 }
 
 @@Print the file "/kos/src/libc/libc/dosabi-functions.h"
@@ -1033,10 +1028,8 @@ function doPrint_include_gnu_stubs(fp: File) {
 		for (local ppCond, symbolName: f.exportSymbolNames) {
 			if (symbolName.startswith("?"))
 				symbolName = symbolName.replace("?", "$Q").replace("@", "$A");
-			if ("$" in symbolName) {
-				ppCond = "({})&&!defined(__COMPILER_NO_DOLLAR_IN_SYMBOL)"
-					.format({ ppCond });
-			}
+			if ("$" in symbolName)
+				ppCond = f"({ppCond})&&!defined(__COMPILER_NO_DOLLAR_IN_SYMBOL)";
 			CWriter_ppIfEscaped(cWriter, ppCond, ESCAPE_MODE_FULL);
 			cWriter << "#define __stub_" << symbolName << "\n";
 			cWriter.ppEndif();
@@ -1061,7 +1054,7 @@ function handleSectionName(name: string) {
 }
 
 function scanFileForSectionNames(filename: string) {
-	printMessage("Scanning for section names: {!r} (begin)".format({ filename }));
+	printMessage(f"Scanning for section names: {repr filename} (begin)");
 	local data = File.open(filename, "rb").read();
 	local i = 0, len = #data;
 	while (i < len) {
@@ -1212,7 +1205,7 @@ handle_asm_section_directive:
 		}
 	}
 done:
-	printMessage("Scanning for section names: {!r} (end)".format({ filename }));
+	printMessage(f"Scanning for section names: {repr filename} (end)");
 }
 
 
@@ -1295,7 +1288,7 @@ try {
 	/* Generate the actual system headers (i.e. <string.h>) */
 	for (local name /*: string*/, header /*: SystemHeader*/: allSystemHeaders) {
 		startTask(updateHashedFile, (
-			"include/{}.h".format({ name.replace(".", "/") }),
+			f"include/{name.replace('.', '/')}.h",
 			(fp: File) -> {
 				fp << COPYRIGHT << "\n";
 				local cWriter = CWriter(fp, ppAssume: ppAssumeHeaderFiles);
@@ -1309,7 +1302,7 @@ try {
 		if (!header.order_libcHeader)
 			continue;
 		startTask(updateHashedFile, (
-			"include/libc/{}.h".format({ name }),
+			f"include/libc/{name}.h",
 			(fp: File) -> {
 				fp << COPYRIGHT << "\n";
 				local cWriter = CWriter(fp, ppAssume: ppAssumeHeaderFiles);
@@ -1317,7 +1310,7 @@ try {
 				cWriter.flush();
 			}));
 		startTask(updateHashedFile, (
-			"include/libc/core/{}.h".format({ name }),
+			f"include/libc/core/{name}.h",
 			(fp: File) -> {
 				fp << COPYRIGHT << "\n";
 				local cWriter = CWriter(fp, ppAssume: ppAssumeHeaderFiles);
@@ -1340,7 +1333,7 @@ try {
 	for (local name, header /*: SystemHeader*/: allSystemHeaders) {
 		if (header.order_libcAutoHeader) {
 			startTask(updateHashedFile, (
-				"src/libc/auto/{}.h".format({ name }),
+				f"src/libc/auto/{name}.h",
 				(fp: File) -> {
 					fp << COPYRIGHT << "\n";
 					local cWriter = CWriter(fp, ppAssume: ppAssumeSourceFiles);
@@ -1350,7 +1343,7 @@ try {
 		}
 		if (header.order_libcAutoSource) {
 			startTask(updateHashedFile, (
-				"src/libc/auto/{}.c".format({ name }),
+				f"src/libc/auto/{name}.c",
 				(fp: File) -> {
 					fp << COPYRIGHT << "\n";
 					local cWriter = CWriter(fp, ppAssume: ppAssumeSourceFiles);
@@ -1364,7 +1357,7 @@ try {
 	for (local name, header /*: SystemHeader*/: allSystemHeaders) {
 		if (header.order_libcUserHeader) {
 			startTask(updateHashedFile, (
-				"src/libc/user/{}.h".format({ name }),
+				f"src/libc/user/{name}.h",
 				(fp: File) -> {
 					fp << COPYRIGHT << "\n";
 					local cWriter = CWriter(fp, ppAssume: ppAssumeSourceFiles);
@@ -1372,7 +1365,7 @@ try {
 					cWriter.flush();
 				}));
 			startTask(updateUserImplementationSourceFile, (
-				"src/libc/user/{}.c".format({ name }),
+				f"src/libc/user/{name}.c",
 				header, printMessage, criticalSection,
 				HASH_FUNCTION, ppAssumeUserSourceFiles));
 		}
@@ -1391,10 +1384,7 @@ try {
 				continue;
 			printedLocalFunctions.insert(lfun);
 			startTask(updateHashedFile, (
-				"include/libc/local/{}/{}.h".format({
-					lfun.originalSystemHeaderName,
-					lfun.name,
-				}),
+				f"include/libc/local/{lfun.originalSystemHeaderName}/{lfun.name}.h",
 				(fp: File) -> {
 					local cWriter = CWriter(fp, ppAssume: ppAssumeHeaderFiles);
 					lfun.cprintLocalFunctionHeader(

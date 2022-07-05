@@ -179,7 +179,7 @@ class CType {
 			local result = typeClass;
 			if (result !is none)
 				return result;
-			throw Error("Unable to deduce typeclass of {!r}".format({ this }));
+			throw Error(f"Unable to deduce typeclass of {repr this}");
 		}
 	}
 
@@ -234,7 +234,7 @@ again:
 			if (typename.startswith("struct ")) {
 				typename = typename[7:];
 do_handle_struct_type:
-				return "TS(__SIZEOF_{})".format({ typename.lstrip().lstrip("_").upper() });
+				return f"TS(__SIZEOF_{typename.lstrip().lstrip("_").upper()})";
 			}
 			if (typename.startswith("union ")) {
 				typename = typename[6:];
@@ -1526,7 +1526,7 @@ class FunctionImplementation {
 						if (keyword in deps) {
 							local res = keyDependency(keyword);
 							if (LOCAL_NAMESPACE.prefix)
-								res = "({} {})".format({ LOCAL_NAMESPACE.prefix, res });
+								res = f"({LOCAL_NAMESPACE.prefix} {res})";
 							return res;
 						}
 						return none;
@@ -1564,7 +1564,7 @@ class FunctionImplementation {
 				if (keyword == selfName) {
 					if (LOCAL_NAMESPACE.prefix) {
 						/* Must always wrap in parenthesis to guard against user-defined function-like macros. */
-						return "({} {})".format({ LOCAL_NAMESPACE.prefix, csymbolName });
+						return f"({LOCAL_NAMESPACE.prefix} {csymbolName})";
 					}
 					return csymbolName;
 				}
@@ -1612,7 +1612,7 @@ class FunctionImplementation {
 					local res = keyDependency(keyword);
 					if (LOCAL_NAMESPACE.prefix) {
 						/* Must always wrap in parenthesis to guard against user-defined function-like macros. */
-						res = "({} {})".format({ LOCAL_NAMESPACE.prefix, res });
+						res = f"({LOCAL_NAMESPACE.prefix} {res})";
 					}
 					return res;
 				}
@@ -1641,7 +1641,7 @@ class LoaderFunctionImplementation {
 
 @@Name of the return-type used by the using-import-return-type trick.
 function usingImportReturnTypeNameOf(exposedName: string): string {
-	return "__PRIVATE_{}_rt".format({ exposedName });
+	return f"__PRIVATE_{exposedName}_rt";
 }
 
 @@Set  of functions that are imported from the global namespace. Functions
@@ -1785,8 +1785,7 @@ class LocalFunction {
 		local oldNs = fp.namespace;
 		fp.namespace = GLOBAL_NAMESPACE;
 		/* Include the local-header for this function */
-		fp.ppInclude("<libc/local/{}/{}.h>".format({
-			originalSystemHeaderName, name }));
+		fp.ppInclude(f"<libc/local/{originalSystemHeaderName}/{name}.h>");
 		/* Remember that we'll be needing the local implementation of this function */
 		neededLocalFunction.insert(this);
 		fp.namespace = oldNs;
@@ -1818,7 +1817,7 @@ class LocalFunction {
 			return;
 		}
 		if (oldNs !== LOCAL_NAMESPACE && LOCAL_NAMESPACE.prefix)
-			callToLocalName = "({} {})".format({ LOCAL_NAMESPACE.prefix, callToLocalName });
+			callToLocalName = f"({LOCAL_NAMESPACE.prefix} {callToLocalName})";
 		if (prototypes.each.hasEllipsis || ...) {
 			/* _Must_ (try to) use keyUsing for c++, or a macro for C */
 			if (doc)
@@ -1948,8 +1947,8 @@ class InlineFunction {
 				if (keyword in deps) {
 					local res = keyDependency(keyword);
 					if (fp.namespace === dependenciesNamespace || !dependenciesNamespace.prefix)
-						return "({})".format({ res });
-					return "({} {})".format({ dependenciesNamespace.prefix, res });
+						return f"({res})";
+					return f"({dependenciesNamespace.prefix} {res})";
 				}
 				return none;
 			};
@@ -1989,8 +1988,8 @@ class InlineFunction {
 						if (keyword in deps) {
 							local res = keyDependency(keyword);
 							if (!dependenciesNamespace.prefix)
-								return "({})".format({ res });
-							return "({} {})".format({ dependenciesNamespace.prefix, res });
+								return f"({res})";
+							return f"({dependenciesNamespace.prefix} {res})";
 						}
 						return none;
 					},
@@ -2153,7 +2152,7 @@ class NamespaceBinding {
 			if (namespace === GLOBAL_NAMESPACE)
 				nsPrefix = "::";
 			if (nsPrefix)
-				cSymbolName = "{} {}".format({ nsPrefix, cSymbolName });
+				cSymbolName = f"{nsPrefix} {cSymbolName}";
 			if (#conditionalPrototypes == 1 && conditionalPrototypes.first[0] == "1") {
 				local prototypes = conditionalPrototypes.first[1];
 				local doUsingPpCond = "1";
@@ -2262,8 +2261,8 @@ class NamespaceBinding {
 		if (!conditionalPrototypes)
 			return; /* Shouldn't happen... */
 		if (namespace.prefix)
-			cSymbolName = "{} {}".format({ namespace.prefix, cSymbolName });
-		cSymbolName = "({})".format({ cSymbolName });
+			cSymbolName = f"{namespace.prefix} {cSymbolName}";
+		cSymbolName = f"({cSymbolName})";
 		local isFirst = true;
 		local numAdditionalEndifs = 0;
 		for (local ppCond, prototypes: conditionalPrototypes) {
@@ -2554,9 +2553,9 @@ do_universal_binding:
 					local oldNs = fp.namespace;
 					fp.namespace = GLOBAL_NAMESPACE;
 					/* Include the local-header for this function */
-					fp.ppInclude("<libc/local/{}/{}.h>".format({
-						usedBinding.originalSystemHeaderName,
-						usedBinding.name }));
+					fp.ppInclude(f"<libc/local/{
+						usedBinding.originalSystemHeaderName
+					}/{usedBinding.name}.h>");
 					fp.namespace = oldNs;
 					fp.externLinkage = oldExternLinkage;
 				}
@@ -2963,10 +2962,9 @@ again_check_extendedPrefixes:
 						extendedPrefixes = newExtendedPrefixes;
 						goto again_check_extendedPrefixes;
 					}
-					fp.ppIf("!defined({}) && ({})".format({
-						guardName,
+					fp.ppIf(f"!defined({guardName}) && ({
 						escapeText(bind.ppCond, escapeMode)
-					}));
+					})");
 					fp.ppDefine(guardName, "");
 					bind.cprintBindFunction(
 						fp, escapeMode, decl, exposedName, guardName,
@@ -2986,7 +2984,7 @@ normal_guardName_binding:
 					local bindBinding = bind.functionBinding;
 					if (bindBinding is string || bindBinding is UserString) {
 						bindBinding = str bindBinding;
-						if (bind.ppCond == "defined(__CRT_HAVE_{})".format({ bindBinding })) {
+						if (bind.ppCond == f"defined(__CRT_HAVE_{bindBinding})") {
 							local bindingPrototypes: {(string | UserString, {FunctionPrototype...})...}
 								= bind.functionPrototypes;
 							if (#bindingPrototypes == 1) {
@@ -3275,15 +3273,13 @@ class LibraryFunction {
 			for (local b: functionBindings) {
 				if (b.ppCond == "0")
 					continue;
-				bindingConditions.append("({})".format({ b.ppCond }));
+				bindingConditions.append(f"({b.ppCond})");
 			}
 			bindingConditions = "||".join(bindingConditions);
 			if (!bindingConditions)
 				return "0";
-			if (ppCond != "1") {
-				bindingConditions = "({})&&({})"
-					.format({ ppCond, bindingConditions });
-			}
+			if (ppCond != "1")
+				bindingConditions = f"({ppCond})&&({bindingConditions})";
 			return bindingConditions;
 		}
 	}
@@ -3406,7 +3402,7 @@ class LibraryFunction {
 						if (extraAttributes is none)
 							extraAttributes = ();
 						extraAttributes = List(extraAttributes);
-						extraAttributes.append("ATTR_SECTION({!r})".format({ bind.implSection }));
+						extraAttributes.append(f"ATTR_SECTION({repr bind.implSection})");
 					}
 					proto.cprintDeclarationWithoutTerminator(
 						fp, escapeMode,
@@ -3555,8 +3551,7 @@ class SystemHeader {
 	@@Print the header <libc/string.h>
 	public function cprintLibcHeader(fp: CWriter) {
 		local nsFast = NAMESPACES["fast"];
-		local guardName = "_LIBC_{}_H"
-			.format({ name.replace("-", "_").replace(".", "_").upper() });
+		local guardName = f"_LIBC_{name.replace("-", "_").replace(".", "_").upper()}_H";
 		fp << "#ifndef " << guardName << "\n"
 			"#define " << guardName << " 1\n" /* This "1" must stay for compat */
 			"\n"
@@ -3589,8 +3584,8 @@ class SystemHeader {
 			local partFast = part.hasFastBindings;
 			if (rc is none) {
 				/* Conditionally link against some guard. */
-				local coreGuardName = "____libc_core_{}_defined".format({ partName });
-				local myGuardName = "____libc_{}_defined".format({ partName });
+				local coreGuardName = f"____libc_core_{partName}_defined";
+				local myGuardName = f"____libc_{partName}_defined";
 				if (partFast) {
 					fp << "#ifndef " << myGuardName << "\n"
 						"#ifdef __fast_" << partName << "_defined\n"
@@ -3638,8 +3633,7 @@ class SystemHeader {
 			if (part !is Function)
 				continue;
 		}
-		local guardName = "_LIBC_CORE_{}_H"
-			.format({ name.replace("-", "_").replace(".", "_").upper() });
+		local guardName = f"_LIBC_CORE_{name.replace("-", "_").replace(".", "_").upper()}_H";
 		fp << "#ifndef " << guardName << "\n"
 			"#define " << guardName << " 1\n" /* This "1" must stay for compat */
 			"\n"
@@ -3660,7 +3654,7 @@ class SystemHeader {
 			local guardName = none;
 			local exposedName = "__libc_core_" + part.name;
 			if (rc is none)
-				guardName = "__{}_defined".format({ exposedName });
+				guardName = f"__{exposedName}_defined";
 			part.cprintHeaderDeclaration(
 				fp, ESCAPE_MODE_FULL, "__LIBC",
 				exposedName:               exposedName,
@@ -3680,10 +3674,9 @@ class SystemHeader {
 	}
 
 	private function cprintInternalLibraryHeader(fp: CWriter, isAuto: bool) {
-		local guardName = "GUARD_LIBC_{}_{}_H".format({
-			isAuto ? "AUTO" : "USER",
+		local guardName = f"GUARD_LIBC_{isAuto ? "AUTO" : "USER"}_{
 			name.replace("-", "_").replace(".", "_").upper()
-		});
+		}_H";
 		fp << "#ifndef " << guardName << "\n"
 			"#define " << guardName << " 1\n" /* This "1" must stay for compat */
 			"\n"
@@ -3717,9 +3710,8 @@ class SystemHeader {
 
 	@@Print the implementations from /kos/src/libc/auto/string.c
 	public function cprintLibraryAutoSource(fp: CWriter) {
-		local guardName = "GUARD_LIBC_AUTO_{}_C".format({
-			name.replace("-", "_").replace(".", "_").upper(),
-		});
+		local guardName = f"GUARD_LIBC_AUTO_{
+			name.replace("-", "_").replace(".", "_").upper()}_C";
 		fp << "#ifndef " << guardName << "\n"
 			"#define " << guardName << " 1\n" /* This "1" must stay for compat */
 			"\n"
@@ -3770,9 +3762,9 @@ class SystemHeader {
 				if (shdr === this)
 					continue; /* Not needed! */
 				if (shdr.order_libcUserHeader) {
-					hdr = "\"../user/{}.h\"".format({ hdr });
+					hdr = f'"../user/{hdr}.h"';
 				} else {
-					hdr = "\"{}.h\"".format({ hdr });
+					hdr = f'"{hdr}.h"';
 				}
 				fp.ppInclude(hdr);
 			}

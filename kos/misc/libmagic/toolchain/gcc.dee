@@ -93,7 +93,7 @@ function getCCForLanguage(language: string): (string, {string...}) {
 		"brig"               : ("g++", { "-x", "brig" }),
 	}.get(language);
 	if (cc is none)
-		throw Error("Unknown language {}".format({ language }));
+		throw Error(f"Unknown language {language}");
 	return cc;
 }
 
@@ -179,9 +179,9 @@ local function splitCommandline(cmdline: string): {string...} {
 function constructMacroDefinitions(macros: {string: string | none}): {string...} {
 	for (local name, val: macros) {
 		if (val !is none && val != "1")
-			yield "-D{}={}".format({ name, val });
+			yield f"-D{name}={val}";
 		else {
-			yield "-D" + name;
+			yield f"-D{name}";
 		}
 	}
 }
@@ -528,7 +528,7 @@ again_handle_col:
 			 *               In this case, simply copy the user's file to the target. */
 			local th = Thread((src: string, dst: string, dep: string) -> {
 				with (local fp = File.open(dep, "w"))
-					fp.write("{}: {}\n".format({ dst, src }));
+					fp.write(f"{dst}: {src}\n");
 				try fs.unlink(dst); catch (...);
 				fs.copyfile(src, dst);
 			}, (srcFile, asmFile, depFile));
@@ -713,13 +713,21 @@ again_handle_col:
 				continue;
 			if (("-o testOutputFilename") !in l)
 				continue;
-			if (collect2Cmdline !is none)
-				throw Error("Multiple collect2 commandlines:\n1:{}\n2:{}"
-					.format({ collect2Cmdline, l }));
+			if (collect2Cmdline !is none) {
+				throw Error(
+					f"Multiple collect2 commandlines:\n"
+					f"1:{collect2Cmdline}\n"
+					f"2:{l}"
+				);
+			}
 			collect2Cmdline = l;
 		}
-		if (collect2Cmdline is none)
-			throw Error("No collect2 commandlines in:\n{}".format({ output }));
+		if (collect2Cmdline is none) {
+			throw Error(
+				f"No collect2 commandlines in:\n"
+				f"{output}"
+			);
+		}
 		collect2Cmdline = collect2Cmdline.partition("-o testOutputFilename")[2].strip();
 		collect2Cmdline = Tuple(splitCommandline(collect2Cmdline));
 		local result = (
@@ -783,11 +791,11 @@ again_handle_col:
 					if (do_static is none)
 						do_static = "-static" in gccOptions;
 					if (do_static) {
-						locations.append(joinpath(path, "lib{}.a".format({ lib })));
-						locations.append(joinpath(path, "lib{}{}".format({ lib, libext })));
+						locations.append(joinpath(path, f"lib{lib}.a"));
+						locations.append(joinpath(path, f"lib{lib}{libext}"));
 					} else {
-						locations.append(joinpath(path, "lib{}{}".format({ lib, libext })));
-						locations.append(joinpath(path, "lib{}.a".format({ lib })));
+						locations.append(joinpath(path, f"lib{lib}{libext}"));
+						locations.append(joinpath(path, f"lib{lib}.a"));
 					}
 				}
 			}

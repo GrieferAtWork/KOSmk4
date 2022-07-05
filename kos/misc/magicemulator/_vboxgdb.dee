@@ -264,11 +264,10 @@ function vBoxTelnetExecNoError(command: Bytes, restartOnTimeout: bool = true): B
 	local response = vBoxTelnetExec(command, restartOnTimeout);
 	if ("error:" in response || "Error:" in response) {
 		local i = response.find("Failed to disassemble instruction");
-		if (i >= 0)
+		if (i >= 0) {
 			response = response[:i].strip("\r\n") + "\r\n";
-		else {
-			throw Error("Response for {!r} indicates an error {!r}"
-				.format({ command, response }));
+		} else {
+			throw Error(f"Response for {repr command} indicates an error {repr response}");
 		}
 	}
 	return response;
@@ -360,10 +359,8 @@ function vmReadMemoryAt(addr: int | string): Bytes {
 			}
 		}
 		if ("error:" in response || "Error:" in response)
-			throw Error("Response for {!r} indicates an error {!r}"
-				.format({ "dd " + hexaddr, response }));
-		throw Error("Failed to read memory at {!r} (response was {!r})"
-			.format({ hexaddr, response }));
+			throw Error(f"Response for {repr('dd ' + hexaddr)} indicates an error {repr response}");
+		throw Error(f"Failed to read memory at {repr hexaddr} (response was {repr response})");
 	}
 	return result[:offset];
 }
@@ -388,8 +385,7 @@ function vmReadMemory(addr: int, count: int): Bytes {
 function vmWriteMemoryWord(addr: string, wordType: string, value: int) {
 	local resp;
 	do {
-		resp = vBoxTelnetExecNoError("e{} {} {}"
-			.format({ wordType, addr, value.hex() }));
+		resp = vBoxTelnetExecNoError(f"e{wordType} {addr} {value.hex()}");
 	} while (resp is none);
 }
 
@@ -498,13 +494,11 @@ again_delete_breakpoint:
 			response = vBoxTelnetExecNoError("bp " + addr.hex());
 			vmReadMemoryAt(addr);
 		} else {
-			response = vBoxTelnetExecNoError("ba {} {} {}".format({
-				{
-					GDB_BREAKPOINT_TYPE_HWBREAK   : "e",
-					GDB_BREAKPOINT_TYPE_READWRITE : "r",
-					GDB_BREAKPOINT_TYPE_WRITE     : "w",
-				}[typ], len, addr.hex()
-			}));
+			response = vBoxTelnetExecNoError(f"ba { {
+				GDB_BREAKPOINT_TYPE_HWBREAK   : 'e',
+				GDB_BREAKPOINT_TYPE_READWRITE : 'r',
+				GDB_BREAKPOINT_TYPE_WRITE     : 'w',
+			}[typ]} {len} {addr.hex()}");
 		}
 	}
 	response = response.strip().lower();
@@ -513,10 +507,8 @@ again_delete_breakpoint:
 	local idEnd = 0;
 	while (idEnd < #response && response.isnumeric(idEnd))
 		++idEnd;
-	if (!idEnd) {
-		throw Error("Invalid breakpoint id in response {!r}"
-			.format({ response }));
-	}
+	if (!idEnd)
+		throw Error(f"Invalid breakpoint id in response {repr response}");
 	id = int(response[:idEnd]);
 	vmDefinedBreakpoints[id] = (typ, addr, len);
 }
@@ -526,8 +518,7 @@ function _vmGetRegisterAsHex(name: string): Bytes {
 	local resp = vBoxTelnetExecNoError("rg " + name, 1)
 		.strip().splitlines(false);
 	if (#resp != 1)
-		throw Error("Unexpected # of lines in response to {!r} (response: {!r})"
-			.format({ "rg " + name, resp }));
+		throw Error(f"Unexpected # of lines in response to {repr('rg ' + name)} (response: {repr resp})");
 	resp = resp[0];
 	resp = resp[resp.index("=") + 1:].strip().lower();
 	if (resp.startswith("0x"))
@@ -550,11 +541,10 @@ function _vmSetRegister(name: string, value: string | int) {
 			value = value[2:];
 		value = value.lstrip("0");
 		if (oldval != value)
-			throw Error("Cannot set register {!r} = {!r} (oldval = {!r})"
-				.format({ name, value, oldval }));
+			throw Error(f"Cannot set register {repr name} = {repr value} (oldval = {repr oldval})");
 		return;
 	}
-	vBoxTelnetExecNoError("rg {} = {}".format({ name, value }));
+	vBoxTelnetExecNoError(f"rg {name} = {value}");
 }
 
 @@When @_vmIsStepLoopPaused is @none, determine its
@@ -762,8 +752,11 @@ function vmSetRegister(name: string, value: string | int) {
 					local oldSp = vmGetRegister("rsp");
 					if (oldSp == value)
 						return;
-					throw Error("Cannot move kernel stack-pointer (oldesp: 0x{}, newesp: 0x{})"
-						.format({ oldSp.hex()[2:].zfill(8), value.hex()[2:].zfill(8) }));
+					throw Error(
+						f"Cannot move kernel stack-pointer ("
+						f"oldesp: 0x{oldSp.hex()[2:].zfill(8)}, "
+						f"newesp: 0x{value.hex()[2:].zfill(8)})"
+					);
 				}
 			}
 			return;
@@ -1265,10 +1258,7 @@ function decodeHex(b: Bytes, i: int, nBytes: int): int {
 function gdbConstructStopReply(): Bytes {
 	if (gdbStopReason is none)
 		gdbStopReason = "T02"; /* SIGINT */
-	return "{}thread:{};".format({
-		gdbStopReason,
-		gdbEncodeThreadId(vmCurrentCpu)
-	});
+	return f"{gdbStopReason}thread:{gdbEncodeThreadId(vmCurrentCpu)};";
 }
 
 
@@ -1437,8 +1427,7 @@ function GDBEvaluateQXferRead(name: string, annex: string): Bytes | none {
 			if (#argv != 1)
 				return false;
 		}
-		return "<osdata type=\"{}\">{}</osdata>"
-			.format({ annex, res });
+		return f"<osdata type=\"{annex}\">{res}</osdata>";
 	}
 	default:
 		break;
@@ -1802,8 +1791,8 @@ function GDBHandleVBoxCommand(command: Bytes): string {
 	}
 
 	default:
-		throw Error("Unknown command {!r} in {!r}".
-			format({ name, command }));
+		throw Error(f"Unknown command {repr name} in {repr command}");
+		break;
 	}
 }
 
@@ -1829,10 +1818,8 @@ function GDBHandleVirtualBoxEvent(event: Bytes): string {
 		local idEnd = 0;
 		while (idEnd < #id && id.isnumeric(idEnd))
 			++idEnd;
-		if (!idEnd) {
-			throw Error("Invalid breakpoint id in event {!r}"
-				.format({ event }));
-		}
+		if (!idEnd)
+			throw Error(f"Invalid breakpoint id in event {repr event}");
 		id = int(id[:idEnd]);
 		local data = vmDefinedBreakpoints[id];
 

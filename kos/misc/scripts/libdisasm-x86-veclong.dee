@@ -60,7 +60,7 @@ function getLongReprLength(iRepr: string): int {
 			} while (i < len && iRepr.issymcont(i));
 			continue;
 		}
-		throw Error("Unexpected character {!r} in {!r}".format({ c, iRepr }));
+		throw Error(f"Unexpected character {repr c} in {repr iRepr}");
 	}
 	return result;
 }
@@ -91,7 +91,7 @@ for (local l: File.stdin) {
 			local iName = iRepr[1:iNameEnd];
 			local longName = mappedRepr.get(iRepr);
 			if (longName is none) {
-				longName = "LO_{}".format({ iName.upper() });
+				longName = f"LO_{iName.upper()}";
 				if (containsAny(iRepr, {
 					"OP_RXMM OP_RM128_XMM_MASK",
 					"OP_RM128_XMM OP_RXMM_MASK",
@@ -176,10 +176,10 @@ for (local l: File.stdin) {
 					longName = longName + "_R64";
 				}
 				if (longName in usedNames)
-					throw Error("Name {!r} reused by {!r}".format({ longName, l }));
+					throw Error(f"Name {repr longName} reused by {repr l}");
 				usedNames.insert(longName);
 				mappedRepr[iRepr] = longName;
-				local lop = "LONGOP({}, {}".format({ longName, l[rStart:] });
+				local lop = f"LONGOP({longName}, {l[rStart:]}";
 				local lopc = lop.rindex("),", 0, lop.index("/*")) + 1;
 				lop = lop[:lopc] + lop[lopc + 1:];
 				longOpLines.append(lop);
@@ -189,12 +189,9 @@ for (local l: File.stdin) {
 			local p = prefix.find("OP_VEX_B0");
 			local oldCommentOffset = l.index("/*");
 			if (p >= 0) {
-				l = "{}LONGREPR_B(B_{}, {}){}".format({
-					prefix[:p], prefix[p:].rstrip(),
-					longName, l[rEnd:]
-				});
+				l = f"{prefix[:p]}LONGREPR_B(B_{prefix[p:].rstrip()}, {longName}){l[rEnd:]}";
 			} else {
-				l = "{}LONGREPR({}){}".format({ l[:rStart], longName, l[rEnd:] });
+				l = f"{l[:rStart]}LONGREPR({longName}){l[rEnd:]}";
 			}
 			local ci = l.index("/*");
 			if (oldCommentOffset > ci)
@@ -208,7 +205,7 @@ for (local l: File.stdin) {
 		for (local i = 0; i < #currentGroup; ++i) {
 			local l = currentGroup[i];
 			local c = l.rindex("/*");
-			l = "{} {}".format({ l[:c].rstrip().ljust(longestIndent), l[c:] });
+			l = f"{l[:c].rstrip().ljust(longestIndent)} {l[c:]}";
 			currentGroup[i] = l;
 		}
 		if (hasAnyLongRepr)

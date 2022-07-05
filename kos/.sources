@@ -193,12 +193,12 @@ END
 /* Copy libgcc.so.1 and libstdc++.so.1 to the disk */
 BEGIN_ANONYMOUS GROUP("libs.libgcc") { MCOPY };
 	options[OPT_MCOPY_OUTPUT] = DISK_LIBPATH + "libgcc_s.so.1";
-	options[OPT_MCOPY_INPUT]  = "/bin/" + TARGET_ARCH + "-kos-common" + DISK_LIBPATH + "libgcc_s.so.1";
+	options[OPT_MCOPY_INPUT]  = f"/bin/{TARGET_ARCH}-kos-common{DISK_LIBPATH}libgcc_s.so.1";
 END
 
 BEGIN_ANONYMOUS GROUP("libs.libstdc++") { MCOPY };
 	options[OPT_MCOPY_OUTPUT] = DISK_LIBPATH + "libstdc++.so.6";
-	options[OPT_MCOPY_INPUT]  = "/bin/" + TARGET_ARCH + "-kos-common" + DISK_LIBPATH + "libstdc++.so.6";
+	options[OPT_MCOPY_INPUT]  = f"/bin/{TARGET_ARCH}-kos-common{DISK_LIBPATH}libstdc++.so.6";
 END
 
 #if __has_include("ammend.sources")

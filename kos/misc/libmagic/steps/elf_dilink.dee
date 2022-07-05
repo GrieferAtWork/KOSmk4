@@ -106,10 +106,8 @@ link_again_with_new_guesses:
 			local totalDebugSize = 1;
 			for (local sectionName, startSymbolName, sizeSymbolName: bindings) {
 				local offsetAndSize = guessedSectionOffsetsAndSizes[sectionName];
-				opt_ldFlags.append("--defsym={}={}+{}".format({ /* Start */
-					startSymbolName, diLinkStartSymbol, offsetAndSize[0].hex() }));
-				opt_ldFlags.append("--defsym={}={}".format({    /* Size */
-					sizeSymbolName, offsetAndSize[1].hex() }));
+				opt_ldFlags.append(f"--defsym={startSymbolName}={diLinkStartSymbol}+{offsetAndSize[0].hex()}"); /* Start */
+				opt_ldFlags.append(f"--defsym={sizeSymbolName}={offsetAndSize[1].hex()}");                      /* Size */
 				offsetAndSize = offsetAndSize[0] + offsetAndSize[1];
 				if (totalDebugSize < offsetAndSize)
 					totalDebugSize = offsetAndSize;
@@ -127,7 +125,7 @@ link_again_with_new_guesses:
 				totalDebugSize = prevTotalDebugSize;
 			prevTotalDebugSize = totalDebugSize;
 			/* Total size (== offset+size of the greatest section) */
-			opt_ldFlags.append("--defsym={}={}".format({ diLinkSizeSymbol, totalDebugSize }));
+			opt_ldFlags.append(f"--defsym={diLinkSizeSymbol}={totalDebugSize}");
 			toolchain.createLinkerProcess(
 				step:         self,
 				exeFile:      linkAttemptOutput,
@@ -240,8 +238,7 @@ link_again_with_new_guesses:
 #if 1
 					correctSectionOffsetsAndSizes[name] = (0, 0);
 #else
-					throw Error("Section {!r} not present in final link ({!r})"
-						.format({ name, correctSectionOffsetsAndSizes }));
+					throw Error(f"Section {repr name} not present in final link ({repr correctSectionOffsetsAndSizes})");
 #endif
 				}
 			}
@@ -294,8 +291,7 @@ link_again_with_new_guesses:
 					fp.seek(phdrOffset + __OFFSET_ELF64_PHDR_FILESZ);
 					fp.write(totalDebugSize.tobytes(8, endian, false));
 				} else {
-					throw Error("Uncorected ELF class: {} in {!r}"
-						.format({ e_ident[EI_CLASS].hex(), linkAttemptOutput }));
+					throw Error(f"Uncorected ELF class: {e_ident[EI_CLASS].hex()} in {repr linkAttemptOutput}");
 				}
 			}
 			break;
@@ -324,7 +320,7 @@ link_again_with_new_guesses:
 
 final local function DILINK_tostr(self: BoundStep): string {
 	local group = self.group;
-	return "di-Link {!r}".format({ group.fixFilename(group.options[OPT_LINK_OUTPUT]) });
+	return f"di-Link {repr group.fixFilename(group.options[OPT_LINK_OUTPUT])}";
 }
 
 @@DILINK

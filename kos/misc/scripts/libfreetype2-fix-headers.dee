@@ -98,7 +98,7 @@ function replaceIncludeMacrosInFile(filename: string) {
 				print "Warning: Unrecognized #include-macro:", repr macname;
 				goto unchanged;
 			}
-			l = "#include {}\n".format({ incmacros[macname] });
+			l = f"#include {incmacros[macname]}\n";
 			changed = true;
 		}
 unchanged:

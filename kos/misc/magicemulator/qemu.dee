@@ -136,10 +136,7 @@ function start(
 	}
 	if (TARGET_ARCH == "x86_64") {
 		/* Must create+use a custom kernel binary with e_machine = EM_386 */
-		local kernel386 = "{}.em386-{}".format({
-			fs.headof(KERNEL),
-			fs.tailof(KERNEL),
-		});
+		local kernel386 = f"{fs.headof(KERNEL)}.em386-{fs.tailof(KERNEL)}";
 		local x32modified = getLastModfiedTime(kernel386);
 		if (x32modified !is none) {
 			local x64modified = getLastModfiedTime(KERNEL);
@@ -208,21 +205,20 @@ did_update_x86_64_kernel:
 		case "drive3":
 			qemuArgs.extend({
 				"-drive",
-				"file={},format=raw,index={},media=disk"
-					.format({ arg, cmd.last })
+				f"file={arg},format=raw,index={cmd.last},media=disk"
 			});
 			break;
 		case "args":
 			qemuArgs.extend(arg.split(" "));
 			break;
 		default:
-			throw Error("Unknown qemu conf option: {!r}".format({ cmd }));
+			throw Error(f"Unknown qemu conf option: {repr cmd}");
 			break;
 		}
 	}
 	qemuArgs.extend({
 		"-kernel", KERNEL,
-		"-drive", "file=" + DISK_FILENAME + ",format=raw,index=0,media=disk",
+		"-drive", f"file={DISK_FILENAME},format=raw,index=0,media=disk",
 		"-smp", options.get(opt.SMP, opt.SMP_DEFAULT),
 		"-display", "gtk",
 		"-device", "isa-debug-exit,iobase=0xf4,iosize=0x04",

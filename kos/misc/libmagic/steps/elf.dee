@@ -141,13 +141,12 @@ function flattenElfBinary(
 						/* TODO */
 						continue;
 					}
-					print "PHDR: v:{}, p:{}, o:{}, ms:{}, fs:{}".format({
-						p_vaddr.hex(), p_paddr.hex(), p_offset.hex(),
-						p_memsz.hex(), p_filesz.hex()
-					});
+					print("PHDR: v:", p_vaddr.hex(), ", p:", p_paddr.hex(),
+						", o:", p_offset.hex(), ", ms:", p_memsz.hex(),
+						", fs:", p_filesz.hex());
 					if (p_paddr < physBase) {
-						print "Error: {!r}.PHDR[{}].p_paddr({}) < {}"
-							.format({ inputFile, phi, p_paddr.hex(), physBase.hex() });
+						print("Error: ", repr inputFile, ".PHDR[", phi, "].p_paddr(",
+							p_paddr.hex(), ") < ", physBase.hex());
 						throw Error("Program header physical address is out of bounds");
 					}
 					i.seek(p_offset);
@@ -208,10 +207,11 @@ local final function ELF_FLATTEN_tostr(self: BoundStep): string {
 	local input = options.get(OPT_ELF_FLATTEN_INPUT);
 	if (input is none)
 		input = options[OPT_LINK_OUTPUT];
-	return "Flatten {!r} to {!r}".format({
-		group.fixFilename(input),
-		group.fixFilename(options[OPT_ELF_FLATTEN_OUTPUT]),
-	});
+	return f"Flatten {
+		repr group.fixFilename(input)
+	} to {
+		repr group.fixFilename(options[OPT_ELF_FLATTEN_OUTPUT])
+	}";
 }
 local final function ELF_FLATTEN_getRequiredFiles(self: BoundStep): {string...} {
 	local group = self.group;
@@ -269,7 +269,7 @@ function enumerateSymbolsStep(elfBinary: string, callback: Callable): Step {
 	result.name = "ENUM_SYMBOLS";
 	result.options = {};
 	result.tostr = (self: BoundStep): string -> {
-		return "Enum symbols of {!r}".format({ self.group.fixFilename(elfBinary) });
+		return f"Enum symbols of {repr self.group.fixFilename(elfBinary)}";
 	};
 	result.run = (self: BoundStep): {Waitable...} -> {
 		local readelf_bin = HOST_EXE(self.toolchain.config.CROSS_PREFIX + "readelf");

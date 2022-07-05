@@ -190,7 +190,7 @@ function normalizePath(path: string, expand_symlinks: bool = true): string {
 		if (path.startswith(pfx)) {
 			path = path[#pfx:];
 			path = path.partition("/");
-			path = "{}:/{}".format({ path[0], path[2] });
+			path = f"{path[0]}:/{path[2]}";
 			break;
 		}
 	}
@@ -525,10 +525,8 @@ class Waitable {
 
 function joinProcess(p: ipc.Process) {
 	local error = p.join();
-	if (error != 0) {
-		throw Error("Process {!r} exited with {}"
-			.format({ p.cmdline, error }));
-	}
+	if (error != 0)
+		throw Error(f"Process {repr p.cmdline} exited with {error}");
 }
 
 function tryJoinProcess(p: ipc.Process): bool {
@@ -536,8 +534,7 @@ function tryJoinProcess(p: ipc.Process): bool {
 	if (error is none)
 		return false;
 	if (error != 0)
-		throw Error("Process {!r} exited with {}"
-			.format({ p.cmdline, error }));
+		throw Error(f"Process {repr p.cmdline} exited with {error}");
 	return true;
 }
 
@@ -595,7 +592,7 @@ class BoundStep {
 	operator str(): string {
 		if (step.tostr !is none)
 			return step.tostr(this);
-		return "[{}] {}".format({ group.name, step.name });
+		return f"[{group.name}] {step.name}";
 	}
 
 	@@Create a new child-step of @this with @userData
@@ -1004,11 +1001,11 @@ function orderGroups(toolchainsAndGroups: {(Toolchain, {Group...})...}): ({Bound
 		for (local f: s.producedFiles) {
 			if (!fileProducers.setnew(f, s)) {
 				local o = fileProducers[f];
-				throw Error("File {!r} is produced by multiple steps {}:{}.{} and {}:{}.{}"
-					.format({ f,
-						s.toolchain.name, s.group.name, s.step.name,
-						s.toolchain.name, o.group.name, o.step.name,
-					}));
+				throw Error(
+					f"File {repr f} is produced by multiple steps "
+					f"{s.toolchain.name}:{s.group.name}.{s.step.name} and "
+					f"{s.toolchain.name}:{o.group.name}.{o.step.name}"
+				);
 			}
 		}
 		for (local f, none: s.allModifiedOutputFiles) {
@@ -1111,23 +1108,17 @@ function executeBuildSteps(steps: {BoundStep...}, recheck: {BoundStep...}, maxPa
 	}
 	function printStepStatus(marker: string, step: BoundStep, message: string) {
 		printStatus(marker, "[{}] {} ({})".format({
-			step.toolchain.name !is none ? ("{}:{}".format({
-				step.toolchain.name,
-				step.group.name
-			})) : step.group.name,
+			step.toolchain.name !is none
+				? f"{step.toolchain.name}:{step.group.name}"
+				: step.group.name,
 			step,
 			message
 		}));
 	}
 	function waitforAnyStep() {
 		assert runningSteps,
-			"missingSteps: {!r}\n"
-			"finishedSteps: {!r}\n"
-			.format({
-				for (local x: missingSteps) str(x),
-				for (local x: finishedSteps) str(x),
-			})
-		;
+			f"missingSteps: {repr(for (local x: missingSteps) str(x))}\n"
+			f"finishedSteps: {repr(for (local x: finishedSteps) str(x))}\n";
 		local unchangedIterations = 0;
 again:
 		if (#runningSteps == 1) {
@@ -1243,7 +1234,7 @@ search_next_step:
 				local temp = getLastModfiedTime(o);
 				if (temp is none) {
 					/* Create missing folders leading up to all output files. */
-					startStep(s, "output {!r} is missing".format({ o }));
+					startStep(s, f"output {repr o} is missing");
 					goto search_next_step;
 				}
 				if (lmod is none || temp > lmod)
@@ -1252,7 +1243,7 @@ search_next_step:
 			for (local o, temp: s.modifiedOutputFiles) {
 				if (temp is none) {
 					/* The modified file didn't exist when dependencies were ordered */
-					startStep(s, "file {!r} didn't exist".format({ o }));
+					startStep(s, f"file {repr o} didn't exist");
 					goto search_next_step;
 				}
 				if (lmod is none || temp > lmod)
@@ -1260,7 +1251,7 @@ search_next_step:
 			}
 			for (local o, temp: s.maybeModifiedOutputFiles) {
 				if (temp is none) {
-					startStep(s, "file {!r} was never updated".format({ o }));
+					startStep(s, f"file {repr o} was never updated");
 					goto search_next_step;
 				}
 				if (lmod is none || temp > lmod)
@@ -1284,11 +1275,11 @@ search_next_step:
 						temp = getLastModfiedTime(filename);
 					}
 					if (temp is none) {
-						startStep(s, "{!r} was deleted".format({ filename }));
+						startStep(s, f"{repr filename} was deleted");
 						goto search_next_step;
 					}
 					if (temp > lmod) {
-						startStep(s, "{!r} has changed".format({ filename }));
+						startStep(s, f"{repr filename} has changed");
 						goto search_next_step;
 					}
 				}
@@ -1357,7 +1348,7 @@ try_next_step:
 				assert o in s.producedFiles;
 				local temp = getLastModfiedTime(o);
 				if (temp is none) {
-					recheck_reason = "output {!r} is missing".format({ o });
+					recheck_reason = f"output {repr o} is missing";
 					goto do_reset_step;
 				}
 				if (lmod is none || temp > lmod)
@@ -1365,7 +1356,7 @@ try_next_step:
 			}
 			for (local o, temp: s.modifiedOutputFiles) {
 				if (temp is none) {
-					recheck_reason = "file {!r} didn't exist".format({ o });
+					recheck_reason = f"file {repr o} didn't exist";
 					goto do_reset_step;
 				}
 				if (lmod is none || temp > lmod)
@@ -1373,7 +1364,7 @@ try_next_step:
 			}
 			for (local o, temp: s.maybeModifiedOutputFiles) {
 				if (temp is none) {
-					recheck_reason = "file {!r} was never updated".format({ o });
+					recheck_reason = f"file {repr o} was never updated";
 					goto do_reset_step;
 				}
 				if (lmod is none || temp > lmod)
@@ -1397,18 +1388,18 @@ try_next_step:
 						temp = getLastModfiedTime(filename);
 					}
 					if (temp is none) {
-						recheck_reason = "{!r} was deleted".format({ filename });
+						recheck_reason = f"{repr filename} was deleted";
 						goto do_reset_step;
 					}
 					if (temp > lmod) {
-						recheck_reason = "{!r} has changed".format({ filename });
+						recheck_reason = f"{repr filename} has changed";
 						goto do_reset_step;
 					}
 				}
 			}
 			continue;
 do_reset_step:
-			printStepStatus(LOG_UPDATE_MARKER, s, "Restarting: " + recheck_reason);
+			printStepStatus(LOG_UPDATE_MARKER, s, f"Restarting: {recheck_reason}");
 			missingSteps.insert(s);
 			finishedSteps.remove(s);
 			s.reset();

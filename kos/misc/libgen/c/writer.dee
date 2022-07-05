@@ -190,7 +190,7 @@ done:
 				 * >> #if !FOO && BAR
 				 * >> ... */
 				pendingParts.popback();
-				cond = ppParse("!({}) && ({})".format({ lastPart[1], cond }))
+				cond = ppParse(f"!({lastPart[1]})&&({cond})")
 					.optimize().tostr();
 				pendingParts.append((lastPart[0], cond));
 				return this;
@@ -214,7 +214,7 @@ done:
 				 * >> #if !FOO
 				 * >> ... */
 				pendingParts.popback();
-				local cond = ppParse("!({})".format({ lastPart[1] }))
+				local cond = ppParse(f"!({lastPart[1]})")
 					.optimize().tostr();
 				pendingParts.append((lastPart[0], cond));
 				return this;
@@ -707,12 +707,12 @@ done:
 
 	@@@return: * : The # of printed new-line characters
 	public function ppIfdef(macroName: string): int {
-		return ppIf("defined({})".format({ macroName }));
+		return ppIf(f"defined({macroName})");
 	}
 
 	@@@return: * : The # of printed new-line characters
 	public function ppIfndef(macroName: string): int {
-		return ppIf("!defined({})".format({ macroName }));
+		return ppIf(f"!defined({macroName})");
 	}
 
 	public function ppUndef(macroName: string): CWriter {
@@ -805,7 +805,7 @@ done:
 	}
 
 	public function ppInclude(header: string): CWriter {
-		return printPrefix("#include {}".format({ header }));
+		return printPrefix(f"#include {header}");
 	}
 
 	@@Remember the inclusion of a given @header

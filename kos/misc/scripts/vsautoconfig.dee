@@ -84,14 +84,13 @@ function parseCurrentVsConfiguration(filename: string): (string,string) {
 				optimize = true;
 				break;
 			default:
-				throw Error("Unrecgonized config option " + repr(opt) + " in " + repr(name));
+				throw Error(f"Unrecgonized config option {repr(opt)} in {repr(name)}");
 			}
 		}
-		config = "{}{}".format({
-			optimize ? "O" : "nO",
-			debug ? "D" : "nD",
-		});
+		config =
+			f"{optimize ? "O" : "n"}"
+			f"{debug ? "D" : "nD"}";
 		return (target, config);
 	}
-	throw Error("Failed to parse current configuration from " + repr(filename));
+	throw Error(f"Failed to parse current configuration from {repr filename}");
 }

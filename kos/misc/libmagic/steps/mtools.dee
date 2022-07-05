@@ -87,7 +87,7 @@ final local function MFORMAT_run(self: BoundStep): {Waitable...} {
 }
 
 final local function MFORMAT_tostr(self: BoundStep): string {
-	return "Mformat {!r}".format({ self.toolchain.options[TOOLCHAIN_MTOOLS_DISK] });
+	return f"Mformat {repr self.toolchain.options[TOOLCHAIN_MTOOLS_DISK]}";
 }
 
 
@@ -157,10 +157,7 @@ final local function MCOPY_getRequiredFiles(self: BoundStep): {string...} {
 final local function MCOPY_tostr(self: BoundStep): string {
 	local group = self.group;
 	local options = group.options;
-	return "Mcopy {}:{}".format({
-		self.toolchain.options[TOOLCHAIN_MTOOLS_DISK],
-		group.options[OPT_MCOPY_OUTPUT],
-	});
+	return f"Mcopy {self.toolchain.options[TOOLCHAIN_MTOOLS_DISK]}:{group.options[OPT_MCOPY_OUTPUT]}";
 }
 
 

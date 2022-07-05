@@ -218,10 +218,8 @@ class CType {
 					++e;
 				if (s < e) {
 					local esc = syscallTypeEscapedStructTypes.get(typename[s:e]);
-					if (esc !is none) {
-						return "{}{}{}".format({
-							typename[:s], esc, typename[e:] });
-					}
+					if (esc !is none)
+						return f"{typename[:s]}{esc}{typename[e:]}";
 				}
 				return typename;
 			}
@@ -642,7 +640,7 @@ function parseTypeExpression(
 				if (ch == "]")
 					break;
 				if (!ch.issymstrt())
-					err(i - 1, "Unexpected character {!r} in attribute".format({ ch }));
+					err(i - 1, f"Unexpected character {repr ch} in attribute");
 				do {
 					++i;
 				} while (i < len && text.issymcont(i));
@@ -650,26 +648,26 @@ function parseTypeExpression(
 				while (i < len && text.isspace(i))
 					++i;
 				if (i >= len)
-					err(i, "Unexpected EOF in attribute {!r}".format({ directive_name }));
+					err(i, f"Unexpected EOF in attribute {repr directive_name}");
 				ch = text[i];
 				local directive_args = "";
 				if (ch == "(") {
 					++i;
 					local args_end = text.findmatch("(", ")", i);
 					if (args_end < 0)
-						err(i, "Unmatched `(' in attribute {!r}".format({ directive_name }));
+						err(i, f"Unmatched `(' in attribute {repr directive_name}");
 					directive_args = text[i:args_end].strip();
 					i = args_end + 1;
 					while (i < len && text.isspace(i))
 						++i;
 					if (i >= len)
-						err(i, "Unexpected EOF after attribute {!r}".format({ directive_name }));
+						err(i, f"Unexpected EOF after attribute {repr directive_name}");
 				}
 				function argsToBool() {
 					local r = BOOL_MAP.get(directive_args);
 					if (r !is none)
 						return r;
-					err(i, "Invalid bool constant: {!r}".format({ directive_args }));
+					err(i, f"Invalid bool constant: {repr directive_args}");
 				}
 				switch (directive_name) {
 				case "reg64": returnType.isReg64 = argsToBool(); break;
@@ -677,24 +675,23 @@ function parseTypeExpression(
 				case "tostr":
 					if (!directive_args || !directive_args.issymbol()) {
 						if (":" !in directive_args)
-							err(name_start, "Bad tostr() attribute: {!r}".format({ directive_args }));
+							err(name_start, f"Bad tostr() attribute: {repr directive_args}");
 						local a, none, b = directive_args.partition(":")...;
 						if (a == "out")
 							break; /* output-argument (ignored for how) */
 						if (!a.strip().issymbol() || !b.strip().issymbol())
-							err(name_start, "Bad tostr() attribute: {!r}".format({ directive_args }));
+							err(name_start, f"Bad tostr() attribute: {repr directive_args}");
 					}
 					returnType.tostrMethod = directive_args;
 					break;
 				default:
-					err(name_start, "Unknown attribute {!r}".format({ directive_name }));
+					err(name_start, f"Unknown attribute {repr directive_name}");
 				}
 				ch = text[i];
 				if (ch == "]")
 					break;
 				if (ch != ",")
-					err(name_start, "Unknown character after attribute {!r}: {!r}"
-						.format({ directive_name, ch }));
+					err(name_start, f"Unknown character after attribute {repr directive_name}: {repr ch}");
 				++i;
 			}
 			++i;
@@ -714,7 +711,7 @@ function parseTypeExpression(
 				"{" : "}",
 			}[ch], i);
 			if (end < 0)
-				err(i, "Unmatched {!r}".format({ ch }));
+				err(i, f"Unmatched {repr ch}");
 			i = end + 1;
 			continue;
 		}
@@ -1086,7 +1083,7 @@ function parseSyscallDefs(
 					if (ch == "]")
 						break;
 					if (!ch.issymstrt())
-						err(i - 1, "Unexpected character {!r} in directive".format({ ch }));
+						err(i - 1, f"Unexpected character {repr ch} in directive");
 					do {
 						++i;
 					} while (i < len && text.issymcont(i));
@@ -1094,20 +1091,20 @@ function parseSyscallDefs(
 					while (i < len && text.isspace(i))
 						++i;
 					if (i >= len)
-						err(i, "Unexpected EOF in directive {!r}".format({ directive_name }));
+						err(i, f"Unexpected EOF in directive {repr directive_name}");
 					ch = text[i];
 					local directive_args = "";
 					if (ch == "(") {
 						++i;
 						local args_end = text.findmatch("(", ")", i);
 						if (args_end < 0)
-							err(i, "Unmatched `(' in directive {!r}".format({ directive_name }));
+							err(i, f"Unmatched `(' in directive {repr directive_name}");
 						directive_args = text[i:args_end].strip();
 						i = args_end + 1;
 						while (i < len && text.isspace(i))
 							++i;
 						if (i >= len)
-							err(i, "Unexpected EOF after directive {!r}".format({ directive_name }));
+							err(i, f"Unexpected EOF after directive {repr directive_name}");
 					}
 					switch (directive_name) {
 
@@ -1120,8 +1117,9 @@ function parseSyscallDefs(
 						expr = expr.strip();
 						if (typename in syscallTostrExpressions &&
 						    syscallTostrExpressions[typename] != expr) {
-							err(i, "define_tostr: redefined for {!r} (was: {!r}, is: {!r})"
-								.format({ typename, syscallTostrExpressions[typename], expr }));
+							err(i, f"define_tostr: redefined for {repr typename} "
+							       f"(was: {repr syscallTostrExpressions[typename]}, "
+							       f"is: {repr expr})");
 						}
 						syscallTostrExpressions[typename] = expr;
 					}	break;
@@ -1147,9 +1145,10 @@ function parseSyscallDefs(
 						if (currentGroup is none)
 							err(i, "Not inside of a group");
 						for (local x: currentGroup) {
-							if (x in possiblyCompatibleFunctionGroups)
-								err(i, "Function {!r} is already apart of different group {!r}"
-									.format({ x, possiblyCompatibleFunctionGroups[x] }));
+							if (x in possiblyCompatibleFunctionGroups) {
+								err(i, f"Function {repr x} is already apart of different "
+								       f"group {repr possiblyCompatibleFunctionGroups[x]}");
+							}
 							possiblyCompatibleFunctionGroups[x] = currentGroup;
 						}
 						currentGroup = none;
@@ -1161,9 +1160,10 @@ function parseSyscallDefs(
 						 * such that binary compatibility ~may~ be possible. */
 						local group = HashSet(directive_args.split(",").each.strip());
 						for (local x: group) {
-							if (x in possiblyCompatibleFunctionGroups)
-								err(i, "Function {!r} is already apart of different group {!r}"
-									.format({ x, possiblyCompatibleFunctionGroups[x] }));
+							if (x in possiblyCompatibleFunctionGroups) {
+								err(i, f"Function {repr x} is already apart of different "
+								       f"group {repr possiblyCompatibleFunctionGroups[x]}");
+							}
 							possiblyCompatibleFunctionGroups[x] = group;
 						}
 					}	break;
@@ -1191,57 +1191,68 @@ function parseSyscallDefs(
 							if (j >= dlen)
 								break;
 							local aArchNameStart = j;
-							if (!directive_args.issymstrt(j) && directive_args[j] != "*")
-								err(i + j, "Expected aArchName after %[typecompat(, but got {!r}"
-									.format({ directive_args[j] }));
+							if (!directive_args.issymstrt(j) && directive_args[j] != "*") {
+								err(i + j, f"Expected aArchName after `%[typecompat(', "
+								           f"but got {repr directive_args[j]}");
+							}
 							++j;
 							while (j < dlen && directive_args.issymcont(j))
 								++j;
 							local aArchName = directive_args[aArchNameStart:j];
 							j = skipSpace(directive_args, j);
-							if (j >= dlen || directive_args[j] != ":")
-								err(i + j, "Expected ':' after aArchName, but got {!r}"
-									.format({ directive_args.substr(j, j + 1) }));
+							if (j >= dlen || directive_args[j] != ":") {
+								err(i + j, f"Expected ':' after aArchName, but got "
+								           f"{repr directive_args.substr(j, j + 1)}");
+							}
 							++j;
 							j = skipSpace(directive_args, j);
 							local aArchTypeList: {string...};
 							j, aArchTypeList = parseTypeCompatTypeList(directive_args, j)...;
-							if (aArchTypeList is none)
-								err(i + j, "Expected 'aArchTypeList', but got {!r}"
-									.format({ directive_args.substr(j) }));
+							if (aArchTypeList is none) {
+								err(i + j, f"Expected `aArchTypeList', but got "
+								           f"{repr directive_args.substr(j)}");
+							}
 							j = skipSpace(directive_args, j);
-							if (j >= dlen || directive_args[j] != "=")
-								err(i + j, "Expected '=' after aArchTypeList, but got {!r}"
-									.format({ directive_args.substr(j, j + 1) }));
+							if (j >= dlen || directive_args[j] != "=") {
+								err(i + j, f"Expected '=' after aArchTypeList, but got "
+								           f"{repr directive_args.substr(j, j + 1)}");
+							}
 							++j;
 							j = skipSpace(directive_args, j);
-							if (j >= dlen || (!directive_args.issymstrt(j) && directive_args[j] != "*"))
-								err(i + j, "Expected bArchName after `%[typecompat({}:{} =' but got {!r}"
-									.format({ aArchName, List(aArchTypeList), directive_args.substr(j, j + 1) }));
+							if (j >= dlen || (!directive_args.issymstrt(j) && directive_args[j] != "*")) {
+								err(i + j, f"Expected bArchName after `%[typecompat({
+									aArchName
+								}:{
+									List(aArchTypeList)
+								} =' but got {repr directive_args.substr(j, j + 1)}");
+							}
 							local bArchNameStart = j;
 							++j;
 							while (j < dlen && directive_args.issymcont(j))
 								++j;
 							local bArchName = directive_args[bArchNameStart:j];
 							j = skipSpace(directive_args, j);
-							if (j >= dlen || directive_args[j] != ":")
-								err(i + j, "Expected ':' after bArchName, but got {!r}"
-									.format({ directive_args.substr(j, j + 1) }));
+							if (j >= dlen || directive_args[j] != ":") {
+								err(i + j, f"Expected ':' after bArchName, but got "
+								           f"{repr directive_args.substr(j, j + 1)}");
+							}
 							++j;
 							j = skipSpace(directive_args, j);
 							local bArchTypeList: {string...};
 							j, bArchTypeList = parseTypeCompatTypeList(directive_args, j)...;
-							if (bArchTypeList is none)
-								err(i + j, "Expected 'bArchTypeList', but got {!r}"
-									.format({ directive_args.substr(j) }));
+							if (bArchTypeList is none) {
+								err(i + j, f"Expected 'bArchTypeList', but got "
+								           f"{repr directive_args.substr(j)}");
+							}
 							registerXArchBinaryTypeCompatibilities(
 								aArchName, aArchTypeList, bArchName, bArchTypeList);
 							j = skipSpace(directive_args, j);
 							if (j >= dlen)
 								break;
-							if (directive_args[j] != ",")
-								err(i + j, "Expected ',' to define further type compatibilities, but got {!r}"
-									.format({ directive_args[j] }));
+							if (directive_args[j] != ",") {
+								err(i + j, f"Expected ',' to define further type compatibilities, "
+								           f"but got {repr directive_args[j]}");
+							}
 							++j;
 						}
 					}	break;
@@ -1260,33 +1271,43 @@ function parseSyscallDefs(
 							if (j >= dlen)
 								break;
 							local archNameStart = j;
-							if (!directive_args.issymstrt(j) && directive_args[j] != "*")
-								err(i + j, "Expected archName after %[typesize(, but got {!r}"
-									.format({ directive_args[j] }));
+							if (!directive_args.issymstrt(j) && directive_args[j] != "*") {
+								err(i + j, f"Expected archName after `%[typesize(', "
+								           f"but got {repr directive_args[j]}");
+							}
 							++j;
 							while (j < dlen && directive_args.issymcont(j))
 								++j;
 							local archName = directive_args[archNameStart:j];
 							j = skipSpace(directive_args, j);
-							if (j >= dlen || directive_args[j] != ":")
-								err(i + j, "Expected ':' after archName, but got {!r}"
-									.format({ directive_args.substr(j, j + 1) }));
+							if (j >= dlen || directive_args[j] != ":") {
+								err(i + j, f"Expected ':' after archName, but got "
+								           f"{repr directive_args.substr(j, j + 1)}");
+							}
 							++j;
 							j = skipSpace(directive_args, j);
 							local archTypeList: {string...};
 							j, archTypeList = parseTypeCompatTypeList(directive_args, j)...;
-							if (archTypeList is none)
-								err(i + j, "Expected 'archTypeList', but got {!r}"
-									.format({ directive_args.substr(j) }));
+							if (archTypeList is none) {
+								err(i + j, f"Expected 'archTypeList', but got "
+								           f"{repr directive_args.substr(j)}");
+							}
 							j = skipSpace(directive_args, j);
-							if (j >= dlen || directive_args[j] != "=")
-								err(i + j, "Expected '=' after archTypeList, but got {!r}"
-									.format({ directive_args.substr(j, j + 1) }));
+							if (j >= dlen || directive_args[j] != "=") {
+								err(i + j, f"Expected '=' after archTypeList, but got "
+								           f"{repr directive_args.substr(j, j + 1)}");
+							}
 							++j;
 							j = skipSpace(directive_args, j);
-							if (j >= dlen || (!directive_args.isnumeric(j) && !directive_args.issymstrt(j)))
-								err(i + j, "Expected integer after `%[typesize({}:{} =' but got {!r}"
-									.format({ archName, List(archTypeList), directive_args.substr(j, j + 1) }));
+							if (j >= dlen || (!directive_args.isnumeric(j) && !directive_args.issymstrt(j))) {
+								err(i + j, f"Expected integer after `%[typesize({
+									archName
+								}:{
+									List(archTypeList)
+								} =' but got {
+									repr directive_args.substr(j, j + 1)
+								}");
+							}
 							local archTypeSizeStart = j;
 							++j;
 							while (j < dlen && directive_args.issymcont(j))
@@ -1294,9 +1315,9 @@ function parseSyscallDefs(
 							local archTypeSize = directive_args[archTypeSizeStart:j];
 							if (archTypeSize.isnumeric()) {
 								archTypeSize = try int(archTypeSize) catch (...) none;
-								if (archTypeSize is none)
-									err(i + j, "Malformed integer: {!r}"
-										.format({ directive_args[archTypeSizeStart:j] }));
+								if (archTypeSize is none) {
+									err(i + j, f"Malformed integer: {repr directive_args[archTypeSizeStart:j]}");
+								}
 							}
 							local usedArchName = { "*" : "" }.get(archName, archName);
 							for (local typ: archTypeList) {
@@ -1306,8 +1327,8 @@ function parseSyscallDefs(
 								local archValue = archMaps.get(usedArchName);
 								if (archValue !is none && (
 								    type(archValue) != type(archTypeSize) || archValue != archTypeSize)) {
-									err(i + j, "Incompatible {}:sizeof({}) (was {!r}, now {!r})"
-										.format({ archName, typ, archValue, archTypeSize }));
+									err(i + j, f"Incompatible {archName}:sizeof({typ}) "
+									           f"(was {repr archValue}, now {repr archTypeSize})");
 								}
 								archMaps[usedArchName] = archTypeSize;
 							}
@@ -1315,8 +1336,8 @@ function parseSyscallDefs(
 							if (j >= dlen)
 								break;
 							if (directive_args[j] != ",")
-								err(i + j, "Expected ',' to define further type sizes, but got {!r}"
-									.format({ directive_args[j] }));
+								err(i + j, f"Expected ',' to define further type sizes, "
+								           f"but got {repr directive_args[j]}");
 							++j;
 						}
 					}	break;
@@ -1330,9 +1351,11 @@ function parseSyscallDefs(
 						for (local x: types.split(",")) {
 							x = x.strip();
 							if (x in syscallTypeDeclarationOrigins) {
-								if (syscallTypeDeclarationOrigins[x] != headerName)
-									err(i, "Origin of type {!r} redefined (was: {!r}, is: {!r})"
-										.format({ x, syscallTypeDeclarationOrigins[x], headerName }));
+								if (syscallTypeDeclarationOrigins[x] != headerName) {
+									err(i, f"Origin of type {repr x} redefined ("
+									       f"was: {repr syscallTypeDeclarationOrigins[x]}, "
+									       f"is: {repr headerName})");
+								}
 							} else {
 								syscallTypeDeclarationOrigins[x] = headerName;
 							}
@@ -1354,22 +1377,22 @@ function parseSyscallDefs(
 							if (origName in syscallTypeEscapedStructTypes) {
 								local o = syscallTypeEscapedStructTypes[origName];
 								if (o != escapedName)
-									err(i, "Struct name escape for {!r} re-defined as {!r} (old definition was {!r})"
-										.format({ origName, escapedName, o }));
+									err(i, f"Struct name escape for {repr origName} re-defined "
+									       f"as {repr escapedName} (old definition was {repr o})");
 							}
 							syscallTypeEscapedStructTypes[origName] = escapedName;
 						}
 					}	break;
 
 					default:
-						err(name_start, "Unknown directive {!r}".format({ directive_name }));
+						err(name_start, f"Unknown directive {repr directive_name}");
+						break;
 					}
 					ch = text[i];
 					if (ch == "]")
 						break;
 					if (ch != ",")
-						err(name_start, "Unknown character after directive {!r}: {!r}"
-							.format({ directive_name, ch }));
+						err(name_start, f"Unknown character after directive {repr directive_name}: {repr ch}");
 					++i;
 				}
 				++i;
@@ -1386,8 +1409,7 @@ function parseSyscallDefs(
 			try {
 				syscall_number = int(syscall_number);
 			} catch (e...) {
-				err(number_start, "Invalid number: {!r}\n{!r}"
-					.format({ syscall_number, e }));
+				err(number_start, f"Invalid number: {repr syscall_number}\n{repr e}");
 			}
 			/* Deal with negative (extended) system call numbers */
 			if (syscall_number < 0) {
@@ -1424,19 +1446,19 @@ function parseSyscallDefs(
 			local existing = context.sysidMappings.get(syscall_number);
 			if (existing !is none) {
 				if (existing[2] != syscall_name) {
-					err(name_start, "Syscall vector {} redefined (was: {}:{}, is: {}:{})"
-						.format({ syscall_number.hex(),
-						          syscall_number.hex(), existing[2],
-						          syscall_number.hex(), syscall_name }));
+					err(name_start,
+						f"Syscall vector {syscall_number.hex()} redefined "
+						f"(was: {syscall_number.hex()}:{existing[2]}, "
+						f"is: {syscall_number.hex()}:{syscall_name})");
 				}
 			}
 			local existing = context.nameMappings.get(syscall_name);
 			if (existing !is none) {
 				if (existing != syscall_number) {
-					err(name_start, "Syscall name {} redefined (was: {}:{}, is: {}:{})"
-						.format({ syscall_name,
-						          existing.hex(), syscall_name,
-						          syscall_number.hex(), syscall_name }));
+					err(name_start,
+						f"Syscall name {syscall_name} redefined ("
+						f"was: {existing.hex()}:{syscall_name}, "
+						f"is: {syscall_number.hex()}:{syscall_name})");
 				}
 			}
 			context.sysidMappings[syscall_number] = (filename, line, syscall_name);
@@ -1475,7 +1497,7 @@ function parseSyscallDefs(
 				if (ch == "]")
 					break;
 				if (!ch.issymstrt())
-					err(i - 1, "Unexpected character {!r} in attribute".format({ ch }));
+					err(i - 1, f"Unexpected character {repr ch} in attribute");
 				do {
 					++i;
 				} while (i < len && text.issymcont(i));
@@ -1483,26 +1505,26 @@ function parseSyscallDefs(
 				while (i < len && text.isspace(i))
 					++i;
 				if (i >= len)
-					err(i, "Unexpected EOF in attribute {!r}".format({ directive_name }));
+					err(i, f"Unexpected EOF in attribute {repr directive_name}");
 				ch = text[i];
 				local directive_args = "";
 				if (ch == "(") {
 					++i;
 					local args_end = text.findmatch("(", ")", i);
 					if (args_end < 0)
-						err(i, "Unmatched `(' in attribute {!r}".format({ directive_name }));
+						err(i, f"Unmatched `(' in attribute {repr directive_name}");
 					directive_args = text[i:args_end].strip();
 					i = args_end + 1;
 					while (i < len && text.isspace(i))
 						++i;
 					if (i >= len)
-						err(i, "Unexpected EOF after attribute {!r}".format({ directive_name }));
+						err(i, f"Unexpected EOF after attribute {repr directive_name}");
 				}
 				function argsToBool() {
 					local r = BOOL_MAP.get(directive_args);
 					if (r !is none)
 						return r;
-					err(i, "Invalid bool constant: {!r}".format({ directive_args }));
+					err(i, f"Invalid bool constant: {repr directive_args}");
 				}
 				switch (directive_name) {
 
@@ -1512,7 +1534,7 @@ function parseSyscallDefs(
 				case "doc_alias": {
 					local alias = context.functions.get(directive_args);
 					if (alias is none)
-						err(name_start, "Unknown function {!r}".format({ directive_args }));
+						err(name_start, f"Unknown function {repr directive_args}");
 					currentFunction.doc = alias.doc;
 				}	break;
 
@@ -1524,19 +1546,19 @@ function parseSyscallDefs(
 					};
 					local mode = MODE_NAMES.get(directive_args);
 					if (mode is none)
-						err(name_start, "Unknown restart mode: {!r}".format({ directive_args }));
+						err(name_start, f"Unknown restart mode: {repr directive_args}");
 					currentFunction.restartMode = mode;
 				}	break;
 
 				default:
-					err(name_start, "Unknown attribute {!r}".format({ directive_name }));
+					err(name_start, f"Unknown attribute {repr directive_name}");
+					break;
 				}
 				ch = text[i];
 				if (ch == "]")
 					break;
 				if (ch != ",")
-					err(name_start, "Unknown character after attribute {!r}: {!r}"
-						.format({ directive_name, ch }));
+					err(name_start, f"Unknown character after attribute {repr directive_name}: {repr ch}");
 				++i;
 			}
 			++i;
@@ -1557,7 +1579,7 @@ function parseSyscallDefs(
 			while (i < len && text.isspace(i))
 				++i;
 			if (i >= len)
-				err(i, "Unexpected EOF in definition of function {!r}".format({ currentFunction.name }));
+				err(i, f"Unexpected EOF in definition of function {repr currentFunction.name}");
 			ch = text[i];
 			if (ch == "=") {
 				/* Function alias definition:
@@ -1570,9 +1592,9 @@ function parseSyscallDefs(
 				while (i < len && text.isspace(i))
 					++i;
 				if (i >= len)
-					err(i, "Unexpected EOF in definition of function {!r}".format({ currentFunction }));
+					err(i, f"Unexpected EOF in definition of function {repr currentFunction}");
 				if (!text.issymstrt(i))
-					err(i, "Expected alias name after `{}='".format({ currentFunction }));
+					err(i, f"Expected alias name after `{currentFunction}='");
 				local aliasStart = i;
 				do {
 					++i;
@@ -1581,18 +1603,20 @@ function parseSyscallDefs(
 				while (i < len && text.isspace(i))
 					++i;
 				if (i >= len)
-					err(i, "Unexpected EOF in definition of function {!r}".format({ currentFunction }));
-				if (text[i] != ";")
-					err(i, "Expected `;' after definition of function alias `{} = {}', but got {!r}"
-						.format({ currentFunction, aliasName, text[i] }));
+					err(i, f"Unexpected EOF in definition of function {repr currentFunction}");
+				if (text[i] != ";") {
+					err(i, f"Expected `;' after definition of function alias "
+					       f"`{currentFunction} = {aliasName}', but got {repr text[i]}");
+				}
 				local aliasFunc = context.functions.get(aliasName);
-				if (aliasFunc is none)
-					err(i, "Cannot alias `{} = {}'. Function {!r} isn't defined"
-						.format({ currentFunction, aliasName, aliasName }));
+				if (aliasFunc is none) {
+					err(i, f"Cannot alias `{currentFunction} = {aliasName}'. "
+					       f"Function {repr aliasName} isn't defined");
+				}
 				if (currentFunction != aliasName) {
 					if (currentFunction in disallowFunctionOverride &&
 					    currentFunction in context.functions)
-						err(i, "Function {!r} was already defined".format({ currentFunction }));
+						err(i, f"Function {repr currentFunction} was already defined");
 					aliasFunc = copy aliasFunc;
 					aliasFunc.name = currentFunction;
 					context.functions[currentFunction] = aliasFunc;
@@ -1606,21 +1630,21 @@ function parseSyscallDefs(
 			}
 			if (currentFunction.name in disallowFunctionOverride &&
 			    currentFunction.name in context.functions)
-				err(i, "Function {!r} was already defined".format({ currentFunction.name }));
+				err(i, f"Function {repr currentFunction.name} was already defined");
 			if (ch != ":")
-				err(i, "Expected `:' after function name {!r}".format({ currentFunction.name }));
+				err(i, f"Expected `:' after function name {repr currentFunction.name}");
 			++i;
 			while (i < len && text.isspace(i))
 				++i;
 			if (i >= len)
-				err(i, "Unexpected EOF in definition of function {!r}".format({ currentFunction.name }));
+				err(i, f"Unexpected EOF in definition of function {repr currentFunction.name}");
 			if (text[i] != "(")
-				err(i, "Expected `:' after function name {!r}".format({ currentFunction.name }));
+				err(i, f"Expected `:' after function name {repr currentFunction.name}");
 			++i;
 			while (i < len && text.isspace(i))
 				++i;
 			if (i >= len)
-				err(i, "Unexpected EOF in argument list of function {!r}".format({ currentFunction.name }));
+				err(i, f"Unexpected EOF in argument list of function {repr currentFunction.name}");
 			ch = text[i];
 			if (ch != ")") {
 				if (text.substr(i, i + 4) == "void") {
@@ -1640,13 +1664,12 @@ function parseSyscallDefs(
 					while (i < len && text.isspace(i))
 						++i;
 					if (i >= len)
-						err(i, "Unexpected EOF in argument list of function {!r}".format({ currentFunction.name }));
+						err(i, f"Unexpected EOF in argument list of function {repr currentFunction.name}");
 					ch = text[i];
 					if (ch == ")")
 						break;
 					if (ch != ",")
-						err(i, "Unexpected character {!r} in argument listof function {!r}"
-							.format({ ch, currentFunction.name }));
+						err(i, f"Unexpected character {repr ch} in argument listof function {repr currentFunction.name}");
 					++i;
 					while (i < len && text.isspace(i))
 						++i;
@@ -1657,21 +1680,20 @@ done_argument_list:
 			while (i < len && text.isspace(i))
 				++i;
 			if (i >= len)
-				err(i, "Unexpected EOF in definition of function {!r}".format({ currentFunction.name }));
+				err(i, f"Unexpected EOF in definition of function {repr currentFunction.name}");
 			if (text.substr(i, i + 2) == "->") {
 				i += 2;
 				while (i < len && text.isspace(i))
 					++i;
 				if (i >= len)
-					err(i, "Unexpected EOF in definition of function {!r}".format({ currentFunction.name }));
+					err(i, f"Unexpected EOF in definition of function {repr currentFunction.name}");
 				currentFunction.returnType, none, i =
 					parseTypeExpression(filename, text, i, false)...;
 			}
 			if (currentFunction.returnType !is bound)
 				currentFunction.returnType = CType();
 			if (text[i] != ";")
-				err(i, "Expected `;' after definition of function {!r}, but got {!r}"
-					.format({ currentFunction.name, text[i] }));
+				err(i, f"Expected `;' after definition of function {repr currentFunction.name}, but got {repr text[i]}");
 			++i;
 			print filename,;
 			print ": function:", currentFunction.name;
@@ -1682,7 +1704,7 @@ done_argument_list:
 			currentFunctionPos = -1;
 			continue;
 		}
-		err(i - 1, "Unexpected character: {!r}".format({ ch }));
+		err(i - 1, f"Unexpected character: {repr ch}");
 	}
 	if (currentFunction !is none)
 		err(currentFunctionPos, "Unused function meta-data");
@@ -1868,8 +1890,8 @@ function sysnoHexRepr(x: int): string {
 	if (x <= 0xffff)
 		return x.hex();
 	if (x > 0xffffffff)
-		return "__UINT64_C({})".format({ x.hex() });
-	return "__UINT32_C({})".format({ x.hex() });
+		return f"__UINT64_C({x.hex()})";
+	return f"__UINT32_C({x.hex()})";
 }
 
 
@@ -2316,9 +2338,8 @@ function generateAsmSyscallsTraceHeader(
 	}
 	fp << copyright << "\n\n";
 	printMessageBox(fp,
-		"SYSCALL ARGUMENT NAMES\n"
-		" - {prefix}AN<argI>_<name> : ArgumentName\n"
-		.format({ "prefix" : prefix }));
+		f"SYSCALL ARGUMENT NAMES\n"
+		f" - {prefix}AN<argI>_<name> : ArgumentName\n");
 	fp << "#ifdef __WANT_SYSCALL_ARGUMENT_NAMES\n";
 	fp << "#ifndef " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_NAMES\n";
 	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_NAMES\n";
@@ -2334,11 +2355,10 @@ function generateAsmSyscallsTraceHeader(
 	fp << "#endif /* __WANT_SYSCALL_ARGUMENT_NAMES */\n";
 	fp << "\n\n";
 	printMessageBox(fp,
-		"SYSCALL ARGUMENT FORMAT\n"
-		" - {prefix}RTR_<name>       : ReturnTypeRepresentation\n"
-		" - {prefix}ATR<argI>_<name> : ArgumentTypeRepresentation\n"
-		" - {prefix}ATL<argI>_<name> : ArgumentTypeLink\n"
-		.format({ "prefix" : prefix }));
+		f"SYSCALL ARGUMENT FORMAT\n"
+		f" - {prefix}RTR_<name>       : ReturnTypeRepresentation\n"
+		f" - {prefix}ATR<argI>_<name> : ArgumentTypeRepresentation\n"
+		f" - {prefix}ATL<argI>_<name> : ArgumentTypeLink\n");
 	fp << "#ifdef __WANT_SYSCALL_ARGUMENT_FORMAT\n";
 	fp << "#ifndef " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT\n";
 	fp << "#define " << prefix << "FEAT_DEFINED_SYSCALL_ARGUMENT_FORMAT\n";
@@ -2376,7 +2396,7 @@ function generateAsmSyscallsTraceHeader(
 				linkedName = linkedName.strip();
 			}
 			if (!reprType.issymbol())
-				throw Error("Bad representation name: {!r}".format({ reprType }));
+				throw Error(f"Bad representation name: {repr reprType}");
 			fp << "#define " << prefix << "ATR" << i << "_"
 				<< f.name
 				<< (" " * (longestNameLen - #f.name))
@@ -2391,7 +2411,7 @@ function generateAsmSyscallsTraceHeader(
 					++j;
 				}
 				if (j >= #f.args)
-					throw Error("Unknown linked argument: {!r}".format({ linkedName }));
+					throw Error(f"Unknown linked argument: {repr linkedName}");
 				fp << "#define " << prefix << "ATL" << i << "_"
 					<< f.name
 					<< (" " * (longestNameLen - #f.name))
@@ -2423,7 +2443,7 @@ function generateAsmSyscallsTraceHeader(
 		for (local t, none: f.args) {
 			if ((t.isReg128 && arch.platformGpRegisterSizeInBits && arch.platformGpRegisterSizeInBits < 128) ||
 			    (t.isReg64 && arch.platformGpRegisterSizeInBits && arch.platformGpRegisterSizeInBits < 64)) {
-				doubleWideMacros.append("{}DW{}_{}".format({ prefix, i, f.name }));
+				doubleWideMacros.append(f"{prefix}DW{i}_{f.name}");
 			}
 			++i;
 		}
@@ -2505,7 +2525,7 @@ function nth(i: int): string {
 	}.get(i);
 	if (r !is none)
 		return r;
-	return "{}th".format({ i });
+	return f"{i}th";
 }
 
 @@Generate include/asm/ls-syscalls.h
@@ -2593,7 +2613,7 @@ function generateAsmLsSyscallsHeader(
 	print repr ranges;
 	for (local i, data: util.enumerate(ranges)) {
 		local minsysno, maxsysno = data...;
-		printMessageBox(fp, "Contents of the {} table".format({ nth(i + 1) }));
+		printMessageBox(fp, f"Contents of the {nth(i + 1)} table");
 		local minsysno_used = minsysno;
 		local maxsysno_used = maxsysno;
 		while (minsysno_used < maxsysno_used &&
@@ -2918,7 +2938,7 @@ function main(archNames: {string...}) {
 	for (local name, c: archContexts) {
 		for (local x, data: c.nameMappings) {
 			if (x !in c.functions)
-				c.errSysID(data, "Undefined function {!r}".format({ x }));
+				c.errSysID(data, f"Undefined function {repr x}");
 		}
 	}
 	for (local name, a: ARCH) {
@@ -3121,9 +3141,8 @@ function main(archNames: {string...}) {
 		writeHashedFile(a.formatPath(
 			"include/{name}/bits/syscalls{suffix}.h"
 		), (fp: File) -> {
-			generateBitsSyscallsHeader(fp, c, a,
-				sanitizeIncludeGuard("_{}_BITS_SYSCALLS{}_H"
-					.format({ a.platformName, a.platformSuffix })));
+			generateBitsSyscallsHeader(fp, c, a, sanitizeIncludeGuard(
+				f"_{a.platformName}_BITS_SYSCALLS{a.platformSuffix}_H");
 		});
 	}
 	writeHashedFile("include/bits/syscalls.h", (fp: File) -> {

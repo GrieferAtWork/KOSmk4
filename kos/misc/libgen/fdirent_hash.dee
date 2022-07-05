@@ -52,9 +52,9 @@ class fdirent_hash {
 		local common = values.first;
 		for (local x: values) {
 			if (common != x) {
-				return "FDIRENT_HASH_INIT({})".format({
-					", ".join(values.each.hex())
-				});
+				return f"FDIRENT_HASH_INIT({
+					', '.join(values.each.hex())
+				})";
 			}
 		}
 		return common.hex();

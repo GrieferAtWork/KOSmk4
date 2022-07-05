@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Minor fixes & new compiler quality warnings"
-DEEMON_VERSION="7a4ecd266397728c958ef04797f4165d27bde786"
+#     v -- "Add support (and automatically do) mmap(2) files"
+DEEMON_VERSION="a1c50d67c787e3e4da703c4c013535eb3525eb7f"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 

@@ -157,8 +157,7 @@ class ExceptClass: WeakRefAble {
 			if (_exceptionDataStructName !is bound) {
 				_exceptionDataStructName = baseClass !is none
 					? baseClass.exceptionDataStructName
-					: "exception_{}_data"
-						.format({ name.lower().lsstrip("e_") });
+					: f"exception_{name.lower().lsstrip('e_')}_data";
 			}
 			return _exceptionDataStructName;
 		}
@@ -218,11 +217,8 @@ yes:
 	@@     returns: "e_badalloc.ba_insufficient_heap_memory.ihm_"
 	public function getFieldPrefix(): string {
 		if (baseClass is none)
-			return "{}.{}".format({ name.lower(), prefix });
-		return "{}{}.{}".format({
-			baseClass.getFieldPrefix(),
-			getClassMemberShortName(),
-			prefix });
+			return f"{name.lower()}.{prefix}";
+		return f"{baseClass.getFieldPrefix()}{getClassMemberShortName()}.{prefix}";
 	}
 
 
@@ -245,8 +241,7 @@ yes:
 				return (getFieldPrefix() + name, index);
 			++index;
 		}
-		throw Error("Error class {} does not have a field {!r}"
-			.format({ this, name }));
+		throw Error(f"Error class {this} does not have a field {repr name}");
 	}
 
 	@@Print  the  errno  expression.   The  given  @cbField  is   called
@@ -390,10 +385,9 @@ yes:
 			if (doc) {
 				fp << (" " * (longestFieldName - #name))
 					<< " /* ";
-				local docPrefix = "\n{}{}    * ".format({
-					linePrefix,
-					" " * (longestFieldType + longestFieldName)
-				});
+				local docPrefix = f"\n{linePrefix}{
+					' ' * (longestFieldType + longestFieldName)
+				}    * ";
 				fp << docPrefix.join(
 					for (local l: doc.splitlines(false))
 						l.rstrip());
@@ -478,13 +472,11 @@ function decodeMultiPartCString(s: string): string {
 			break;
 		local ch = s[partStart];
 		if (ch !in "\"\'")
-			throw Error.ValueError("Bad string character {!r}"
-				.format({ ch }));
+			throw Error.ValueError(f"Bad string character {repr ch}");
 		++partStart;
 		local partEnd = s.find(ch, partStart);
 		if (partEnd < 0)
-			throw Error.ValueError("Unmatched {!r} in {!r}"
-				.format({ ch, s[partStart:] }));
+			throw Error.ValueError(f"Unmatched {repr ch} in {repr s[partStart:]}");
 		result << s[partStart:partEnd].decode("c-escape");
 		partStart = partEnd + 1;
 	}
@@ -547,18 +539,15 @@ function parseExceptionClasses(
 			if (i >= end)
 				break;
 			local ch = text[i];
-			if (ch != "#") {
-				errAt(i, "Unexpected character {!r} in exception-code region"
-					.format({ ch }));
-			}
+			if (ch != "#")
+				errAt(i, f"Unexpected character {repr ch} in exception-code region");
 			i = skipWhitespaceAndCommentsNoLf(text, i + 1, end);
 			if (i >= end)
 				break;
 			if (text.islf(i))
 				continue;
 			if (!text.issymstrt(i))
-				errAt(i, "Unexpected character {!r} after '#'"
-					.format({ text[i] }));
+				errAt(i, f"Unexpected character {repr text[i]} after '#'");
 			local directiveStart = i;
 			++i;
 			while (i < end && text.issymcont(i))
@@ -583,22 +572,20 @@ do_pp_if:
 					ppExpressionStack.append(expr);
 					break;
 				case "ifdef":
-					expr = "defined({})".format({ expr });
+					expr = f"defined({expr})";
 					goto do_pp_if;
 				case "ifndef":
-					expr = "!defined({})".format({ expr });
+					expr = f"!defined({expr})";
 					goto do_pp_if;
 				case "elif":
 					if (!ppExpressionStack)
 						errAt(directiveStart, "Empty pp-stack");
-					expr = "!({}) && ({})".format({
-						ppExpressionStack.popback(),
-						expr });
+					expr = f"!({ppExpressionStack.popback()}) && ({expr})";
 					goto do_pp_if;
 				case "else":
 					if (!ppExpressionStack)
 						errAt(directiveStart, "Empty pp-stack");
-					expr = "!({})".format({ ppExpressionStack.popback() });
+					expr = f"!({ppExpressionStack.popback()})";
 					goto do_pp_if;
 				case "endif":
 					if (!ppExpressionStack)
@@ -612,35 +599,36 @@ do_pp_if:
 			case "define": {
 				local macroNameStart = i;
 				if (i >= end || !text.issymstrt(i))
-					errAt(i, "Unexpected character {!r} after #define"
-						.format({ text.substr(i, i + 1) }));
+					errAt(i, f"Unexpected character {repr text.substr(i, i + 1)} after #define");
 				++i;
 				while (i < end && text.issymcont(i))
 					++i;
 				local macroNameEnd = i;
 				local macroName = text[macroNameStart:macroNameEnd];
-				local ifNdefMacroName = "!defined({})".format({ macroName });
+				local ifNdefMacroName = f"!defined({macroName})";
 				local ppCond = "&&".join(
 					for (local e: ppExpressionStack)
 						if (e != ifNdefMacroName)
-							"({})".format({ e }));
+							f"({e})"
+				);
 				if (!ppCond)
 					ppCond = "1";
 				if (ppCond != "1") {
 					try {
 						ppCond = ppexpr.optimize(ppCond);
 					} catch (Error as e) {
-						errAt(macroNameStart, "Error while parsing pp expression {!r}: {}"
-							.format({ ppCond, e.message }));
+						errAt(macroNameStart,
+							f"Error while parsing pp expression {repr ppCond}: {e.message}");
 					}
 				}
 				local map = result.get(macroName);
 				if (map is none)
 					result[macroName] = map = Dict();
 				else {
-					if (ppCond in map)
-						errAt(macroNameStart, "Duplicate exception class: {!r} with {!r}"
-							.format({ macroName, ppCond }));
+					if (ppCond in map) {
+						errAt(macroNameStart,
+							f"Duplicate exception class: {repr macroName} with {repr ppCond}");
+					}
 				}
 				local e_class: ExceptClass = ExceptClass(
 					name:   macroName,
@@ -656,13 +644,11 @@ do_pp_if:
 				map[ppCond] = e_class;
 				i = skipWhitespaceAndCommentsNoLf(text, i, end);
 				if (i >= end || text[i] != "(")
-					errAt(i, "Expected '(' after '#define {}', but got {!r}"
-						.format({ macroName, text.substr(i, i + 1) }));
+					errAt(i, f"Expected '(' after '#define {macroName}', but got {repr text.substr(i, i + 1)}");
 				++i;
 				local rParenIndex = text.findmatch("(", ")", i, end);
 				if (rParenIndex < 0)
-					errAt(i, "Missing ')' after '#define {} ('"
-						.format({ macroName }));
+					errAt(i, f"Missing ')' after '#define {macroName} ('");
 				local baseAndCode = text[i:rParenIndex].strip();
 				if ("," in baseAndCode) {
 					local baseName, none, resultCode = baseAndCode.partition(",")...;
@@ -672,8 +658,7 @@ do_pp_if:
 					if (e_class.baseClass is none)
 						e_class.baseClass = result.get(baseName).get("1");
 					if (e_class.baseClass is none)
-						errAt(i, "Unknown base class name: {!r}"
-							.format({ baseName }));
+						errAt(i, f"Unknown base class name: {repr baseName}");
 					e_class.baseClass._subClasses.append(WeakRef(e_class));
 				} else {
 					e_class.code = baseAndCode.strip();
@@ -681,8 +666,7 @@ do_pp_if:
 				try {
 					e_class.code = int(e_class.code);
 				} catch (Error as e) {
-					errAt(i, "Bad exception code {!r}: {}"
-						.format({ e_class.code, e.message }));
+					errAt(i, f"Bad exception code {repr e_class.code}: {e.message}");
 				}
 				i = rParenIndex + 1;
 				while (i < end && text.isspace(i) && !text.islf(i))
@@ -762,8 +746,7 @@ again_parse_tag_directive:
 							++tagStart;
 						if (tagStart < tagEnd) {
 							if (!commentText.issymstrt(tagStart))
-								errAtComment(tagStart, "Unexpected character {!r} after '['"
-									.format({ commentText[tagStart] }));
+								errAtComment(tagStart, f"Unexpected character {repr commentText[tagStart]} after '['");
 							local tagDirectiveEnd = tagStart + 1;
 							while (tagDirectiveEnd < tagEnd && commentText.issymcont(tagDirectiveEnd))
 								++tagDirectiveEnd;
@@ -810,8 +793,7 @@ again_parse_tag_directive:
 									/* [fld(num_bytes: size_t, "The number of bytes that could not be allocated")] */
 									local fieldNameEnd = tagArgs.find(":");
 									if (fieldNameEnd < 0)
-										errAtComment(tagArgsStart, "Missing ':' in argument {!r}"
-											.format({ tagArgs }));
+										errAtComment(tagArgsStart, f"Missing ':' in argument {repr tagArgs}");
 									local fieldTypeEnd = tagArgs.find(",", fieldNameEnd);
 									local fieldCommentStart = #tagArgs;
 									if (fieldTypeEnd < 0)
@@ -826,13 +808,15 @@ again_parse_tag_directive:
 								}	break;
 
 								default:
-									errAtComment(tagStart, "Unrecognized tag directive {}({})"
-										.format({ tagDirective, tagArgs }));
+									errAtComment(tagStart,
+										f"Unrecognized tag directive {tagDirective}({tagArgs})");
+									break;
 								}
 							} catch (Error as e) {
-								if (e is Error && type(e) !== Error)
-									errAtComment(tagStart, "Error during {}-directive: {}"
-										.format({ tagDirective, e.message }));
+								if (e is Error && type(e) !== Error) {
+									errAtComment(tagStart,
+										f"Error during {tagDirective}-directive: {e.message}");
+								}
 								throw;
 							}
 							if (commentIndex < tagEnd && commentText[commentIndex] == ",") {
@@ -846,8 +830,8 @@ again_parse_tag_directive:
 			}	break;
 
 			default:
-				errAt(directiveStart, "Unexpected directive {!r}"
-					.format({ directive }));
+				errAt(directiveStart, f"Unexpected directive {repr directive}");
+				break;
 			}
 		}
 		i = end + #END;
@@ -1018,9 +1002,13 @@ again:
 				if (cls.codeOverrides is none)
 					cls.codeOverrides = Dict();
 				if (ppCond in cls.codeOverrides) {
-					if (cls.codeOverrides[ppCond] != newOverride)
-						throw Error("Incompatible error code overrides for {!r} (old: {}, new: {})"
-							.format({ name, cls.codeOverrides[ppCond].hex(), newOverride.hex() }));
+					if (cls.codeOverrides[ppCond] != newOverride) {
+						throw Error(
+							f"Incompatible error code overrides for {repr name} ("
+							f"old: {cls.codeOverrides[ppCond].hex()}, "
+							f"new: {newOverride.hex()})"
+						);
+					}
 					continue;
 				}
 				cls.codeOverrides[ppCond] = newOverride;
@@ -1075,15 +1063,11 @@ function getExceptionCodeMappings(
 		local existingEntry = errorSubClassToName.get(errorSubClass);
 		if (existingEntry !is none) {
 			if (!skipIfAlreadyExists && existingEntry.name != cls.name) {
-				throw Error("Inconsistent mapping with {!r} for "
-				            "0x{}:0x{} (is both {!r} and {!r})"
-				.format({
-					fullPpCond,
-					errorClass.hex()[2:].zfill(4),
-					errorSubClass.hex()[2:].zfill(4),
-					existingEntry.name,
-					cls.name
-				}));
+				throw Error(
+					f"Inconsistent mapping with {repr fullPpCond} for "
+					f"0x{errorClass.hex()[2:].zfill(4)}:0x{errorSubClass.hex()[2:].zfill(4)} "
+					f"(is both {repr existingEntry.name} and {repr cls.name})"
+				);
 			}
 			return;
 		}
@@ -1095,8 +1079,7 @@ function getExceptionCodeMappings(
 			for (local codePpCond, code: cls.allCodes) {
 				if (codePpCond == "1")
 					continue;
-				local fullPpCond = ppexpr.optimize("({}) && ({})"
-					.format({ classPpCond, codePpCond }));
+				local fullPpCond = ppexpr.optimize(f"({classPpCond}) && ({codePpCond})");
 				if (fullPpCond == "0")
 					continue;
 				addClass(fullPpCond, cls, code);
@@ -1143,7 +1126,7 @@ again_merge_dups:
 			if (mappings != mappings2)
 				continue;
 			// Merge ppCond and ppCond2
-			ppCond = ppexpr.optimize("({}) || ({})".format({ ppCond, ppCond2 }));
+			ppCond = ppexpr.optimize(f"({ppCond}) || ({ppCond2})");
 			del nameMappings[ppCond];
 			del nameMappings[ppCond2];
 			if (ppCond == "0")
@@ -1164,7 +1147,8 @@ again_merge_dups:
 		}
 		allConditions = ppexpr.optimize("||".join(
 			for (local cond: allConditions)
-				"({})".format({ cond })));
+				f"({cond})"
+		));
 		if (allConditions == "1") {
 			/* All right! we don't need nameMappings["1"] */
 			del nameMappings["1"];

@@ -54,7 +54,11 @@ final local function KEYMAP_run(self: BoundStep): {Waitable...} {
 	yield WaitableJoin(th);
 }
 final local function KEYMAP_tostr(self: BoundStep): string {
-	return "Link keymap file {!r} to {!r}".format({ self.userData, KEYMAP_getOutputFilename(self) });
+	return f"Link keymap file {
+		repr self.userData
+	} to {
+		repr KEYMAP_getOutputFilename(self)
+	}";
 }
 final local function KEYMAP_getRequiredFiles(self: BoundStep): {string...} {
 	yield self.userData;

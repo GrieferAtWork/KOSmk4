@@ -27,13 +27,13 @@
 
 /* Crt0 */
 BEGIN GROUP("libs.crt0") { COMPILE };
-	options[OPT_COMPILE_OBJFILE] = TARGET_BINPATH + DISK_LIBPATH + "crt0.o";
-	SOURCE({ "crt0/" + XARCH + "/crt0_" + SUFFIX + ".S" })
+	options[OPT_COMPILE_OBJFILE] = f"{TARGET_BINPATH}{DISK_LIBPATH}crt0.o";
+	SOURCE({ f"crt0/{XARCH}/crt0_{SUFFIX}.S" })
 	SET_LANGUAGE("assembler-with-cpp")
 END
 BEGIN GROUP("libs.crt0") { COMPILE };
-	options[OPT_COMPILE_OBJFILE] = TARGET_BINPATH + DISK_LIBPATH + "crt0S.o";
-	SOURCE({ "crt0/" + XARCH + "/crt0S_" + SUFFIX + ".S" })
+	options[OPT_COMPILE_OBJFILE] = f"{TARGET_BINPATH}{DISK_LIBPATH}crt0S.o";
+	SOURCE({ f"crt0/{XARCH}/crt0S_{SUFFIX}.S" })
 	SET_LANGUAGE("assembler-with-cpp")
 END
 
@@ -51,7 +51,7 @@ if (!CONFIG_ONLY_BUILD_LIBRARIES) {
 
 BEGIN GROUP("userspace._verify") { COMPILE };
 	SOURCE({
-		"_verify/arch/" + XARCH + "/*.c",
+		f"_verify/arch/{XARCH}/*.c",
 		"_verify/*.c",
 	})
 END
@@ -174,8 +174,8 @@ END
 /* Libssp */
 BEGIN GROUP("libs.libssp") { COPYFILE };
 	/* GCC expects a library `ssp_nonshared' in its library path... */
-	options[OPT_COPYFILE_SRC] = TARGET_BINPATH + DISK_LIBPATH + "libssp.a";
-	options[OPT_COPYFILE_DST] = TARGET_BINPATH + DISK_LIBPATH + "libssp_nonshared.a";
+	options[OPT_COPYFILE_SRC] = f"{TARGET_BINPATH}{DISK_LIBPATH}libssp.a";
+	options[OPT_COPYFILE_DST] = f"{TARGET_BINPATH}{DISK_LIBPATH}libssp_nonshared.a";
 END
 
 BEGIN GROUP("libs.libssp") { COMPILE, LINK, ARCHIVE, MCOPY };

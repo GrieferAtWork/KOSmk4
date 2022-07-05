@@ -109,7 +109,7 @@ class SyscallArch {
 	@@        are then going to be wrapped.
 	member platformKernelSyscallWrappers: {string: (Callable, string)};
 
-	formatPath(f: string): string {
+	function formatPath(f: string): string {
 		return f.format({
 			.name   = platformName,
 			.arch   = platformArch,
@@ -170,7 +170,7 @@ function i386_printLibcSyscallWrapperPrefix(fp: File) {
 	for (local enableExcept: { false, true }) {
 		local conditionalX = enableExcept ? "X" : "";
 		for (local registerCount: [1:6+1]) {
-			local name = "x86_exec_{}syscall{}".format({ conditionalX, registerCount });
+			local name = f"x86_exec_{conditionalX}syscall{registerCount}";
 			fp << ".section .text.crt.syscalls\n";
 			fp << "INTERN_FUNCTION(libc_" << name << ")\n";
 			fp << "	.cfi_startproc\n";

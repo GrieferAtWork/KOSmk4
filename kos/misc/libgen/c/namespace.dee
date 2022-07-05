@@ -61,11 +61,11 @@ class Namespace {
 	@@always  assumed to be  equal to the  symbol's actual name. Otherwise,
 	@@this assumption is only made on a per-symbol basis when this function
 	@@returns an equal string for some given symbol name.
-	@@e.g. @(name -> "__LIBC_FAST_NAME({})".format({ name }))
+	@@e.g. @(name -> f"__LIBC_FAST_NAME({name})")
 	public member keyCSymbolName: Callable with string;
 
 	@@Returns the macro name for the default guard for the given symbol
-	@@e.g.    @(name    ->   "__fast_{}_defined".format({    name   }))
+	@@e.g. @(name -> f"__fast_{name}_defined")
 	public member keyDefaultGuard: Callable with string;
 
 	public operator hash(): int -> Object.id(this);
@@ -86,7 +86,7 @@ global final GLOBAL_NAMESPACE: Namespace = Namespace(
 	},
 	keyCSymbolName: functools.identity,
 	keyDefaultGuard: (symbolName: string): string -> {
-		return "__{}_defined".format({ symbolName });
+		return f"__{symbolName}_defined";
 	});
 
 @@The namespace used to encapsulate <libc/local/...> functions
@@ -104,10 +104,10 @@ global final LOCAL_NAMESPACE: Namespace = Namespace(
 		fp << ")\n";
 	},
 	keyCSymbolName: (symbolName: string): string -> {
-		return "__LIBC_LOCAL_NAME({})".format({ symbolName });
+		return f"__LIBC_LOCAL_NAME({symbolName})";
 	},
 	keyDefaultGuard: (symbolName: string): string -> {
-		return "__local_{}_defined".format({ symbolName });
+		return f"__local_{symbolName}_defined";
 	});
 
 @@The namespace used to encapsulate <optimized/...> functions
@@ -125,10 +125,10 @@ global final FAST_NAMESPACE: Namespace = Namespace(
 		fp << ")\n";
 	},
 	keyCSymbolName: (symbolName: string): string -> {
-		return "__LIBC_FAST_NAME({})".format({ symbolName });
+		return f"__LIBC_FAST_NAME({symbolName})";
 	},
 	keyDefaultGuard: (symbolName: string): string -> {
-		return "__fast_{}_defined".format({ symbolName });
+		return f"__fast_{symbolName}_defined";
 	});
 
 global final STD_NAMESPACE: Namespace = Namespace(
@@ -148,7 +148,7 @@ global final STD_NAMESPACE: Namespace = Namespace(
 	},
 	keyCSymbolName: functools.identity,
 	keyDefaultGuard: (symbolName: string) -> {
-		return "__std_{}_defined".format({ symbolName });
+		return f"__std_{symbolName}_defined";
 	});
 
 global NAMESPACES: {string: Namespace} = Dict {

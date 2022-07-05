@@ -514,10 +514,8 @@ again_skip_leading_space:
 			local ch = text[i];
 			if (ch in "([{") {
 				i = text.findmatch(ch, PAREN_MATCH[ch], i + 1, instrEnd);
-				if (i < 0) {
-					throw Error("Unmatched {!r} in {!r}"
-						.format({ ch, text[instrStart:instrEnd] }));
-				}
+				if (i < 0)
+					throw Error(f"Unmatched {repr ch} in {repr text[instrStart:instrEnd]}");
 				++i;
 				continue;
 			}
@@ -785,15 +783,15 @@ class Assembler {
 			return base + arg;
 		local totalAddend = base + arg.last;
 		if (totalAddend == 0)
-			return "{}\\{}{}".format({ asmArgPrefix, arg.first, asmArgSuffix });
-		return "{}\\{}{}+{}".format({ asmArgPrefix, arg.first, asmArgSuffix, totalAddend });
+			return f"{asmArgPrefix}\\{arg.first}{asmArgSuffix}";
+		return f"{asmArgPrefix}\\{arg.first}{asmArgSuffix}+{totalAddend}";
 	}
 	function encodeX1(arg: int | (string, int), signed: bool): int | string {
 		if (arg is int)
 			return arg.tobytes(1, byteorder: arch.byteorder, signed: signed)[0];
 		if (arg.last == 0)
-			return "{}\\{}{}".format({ asmArgPrefix, arg.first, asmArgSuffix });
-		return "{}\\{}{}+{}".format({ asmArgPrefix, arg.first, asmArgSuffix, arg.last });
+			return f"{asmArgPrefix}\\{arg.first}{asmArgSuffix}";
+		return f"{asmArgPrefix}\\{arg.first}{asmArgSuffix}+{arg.last}";
 	}
 	function encodeX2(arg: int | (string, int), signed: bool): {int | string...} {
 		if (arg is int)
@@ -1335,10 +1333,9 @@ handle_fixed_operand_size:
 				throw;
 		} catch (InvalidOperands) {
 		}
-		throw Error("Invalid operands for {!r}: {}".format({
-			mnemonic,
-			", ".join(for (local o: i.operands) repr o)
-		}));
+		throw Error(f"Invalid operands for {repr mnemonic}: {
+			', '.join(for (local o: i.operands) repr o)
+		}");
 	}
 
 	function assembleOnceWithRelocations(): {string | int | Relocation | Symbol...} {

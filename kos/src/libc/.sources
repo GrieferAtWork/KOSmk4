@@ -61,8 +61,8 @@ BEGIN
 
 	BEGIN GROUP("libs.libc") { COMPILE };
 		SOURCE({
-			"hybrid/arch/" + XARCH + "/*.c",
-			"libc/arch/" + XARCH + "/*.c",
+			f"hybrid/arch/{XARCH}/*.c",
+			f"libc/arch/{XARCH}/*.c",
 			"libc/*.c",
 			"hybrid/*.c",
 			"auto/*.c",
@@ -70,7 +70,7 @@ BEGIN
 		})
 #if 0 /* Enable this and run clang-tidy to test-compile libc/local headers. */
 		for (local dir: fs.dir("kos/include/libc/local")) {
-			SOURCE({ "/kos/include/libc/local/" + dir + "/*.h" })
+			SOURCE({ f"/kos/include/libc/local/{dir}/*.h" })
 		}
 #endif
 	END
@@ -82,10 +82,10 @@ BEGIN
 		})
 	END
 
-	final local LIBC_FEATURES_HEADER = "/kos/include/" + XARCH + "-kos/crt-features/crt-kos" + SUFFIX + ".h";
+	final local LIBC_FEATURES_HEADER = f"/kos/include/{XARCH}-kos/crt-features/crt-kos{SUFFIX}.h";
 	BEGIN GROUP("libs.libc") { LINK, ARCHIVE, MCOPY,
 			enumerateSymbolsStep(
-				elfBinary: TARGET_BINPATH + DISK_LIBPATH + "libc.so",
+				elfBinary: f"{TARGET_BINPATH}{DISK_LIBPATH}libc.so",
 				callback: [](self: BoundStep, symbols: {(string, string, string, string, string)...}) {
 					local symbols_set: {string...} = HashSet();
 					final local CRT_DLSUBST_GLOBALS = {
@@ -191,18 +191,18 @@ BEGIN
 		};
 		SET_OUTPUT_LIBDLL("libc")
 		LD_FLAGS({ "--gc-sections" })
-		LINKER_SCRIPT("libc/arch/" + XARCH + "/_libc.ld")
+		LINKER_SCRIPT(f"libc/arch/{XARCH}/_libc.ld")
 
 		/* `libc' as a static library (link as `OBJECT("$OUTPATH/lib/libc.a")')
 		 * NOTE: Don't forget to turn on `L_FLAGS("-Wl,--gc-sections")', to prevent
 		 *       any  function  that you  didn't  use from  clobbering  your binary */
-		SET_STATIC_OUTPUT(TARGET_BINPATH + DISK_LIBPATH + "libc.a")
+		SET_STATIC_OUTPUT(f"{TARGET_BINPATH}{DISK_LIBPATH}libc.a")
 
 		SOURCE({
-			"hybrid/arch/" + XARCH + "/*.c",
+			f"hybrid/arch/{XARCH}/*.c",
 			"hybrid/arch/" + XARCH_ASMFILES,
 			"hybrid/*.c",
-			"libc/arch/" + XARCH + "/*.c",
+			f"libc/arch/{XARCH}/*.c",
 			"libc/arch/" + XARCH_ASMFILES,
 			"libc/*.c",
 			"user/*.c",

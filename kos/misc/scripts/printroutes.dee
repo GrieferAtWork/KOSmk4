@@ -66,10 +66,8 @@ function runProc(exe: string, args: {string...}, callback: Callable with {string
 	}
 	r.close();
 	local error = p.join();
-	if (error != 0) {
-		throw Error("Process {!r} exited with {}"
-			.format({ p.cmdline, error }));
-	}
+	if (error != 0)
+		throw Error(f"Process {repr p.cmdline} exited with {error}");
 	return result;
 }
 
@@ -119,7 +117,7 @@ function dumpTables(filename: string, tableNames: {string...}) {
 			if (name == tableName)
 				goto got_name;
 		}
-		throw Error("Unknown tableName: {!r}".format({ tableName }));
+		throw Error(f"Unknown tableName: {repr tableName}");
 got_name:
 		print "BEGIN_TABLE:", repr tableName;
 		runProc(OBJDUMP, [

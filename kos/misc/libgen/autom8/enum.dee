@@ -230,7 +230,7 @@ function main(parser: Autom8Parser, none) {
 		}
 		if (enumValue is int) {
 			if (enumValue < 0)
-				enumValue = "({})".format({ enumValue });
+				enumValue = f"({enumValue})";
 			else {
 				enumValue = str(enumValue);
 			}

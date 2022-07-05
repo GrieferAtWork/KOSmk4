@@ -158,8 +158,9 @@ final class CFile {
 
 	public function errat(offset: int, message: string, warn: bool = false) {
 		local l, c = lcat(offset)...;
-		local disp = "{}({},{}) : {} : {}\n".format({
-			filename, l, c, warn ? "Warning" : "Error", message });
+		local disp = f"{filename}({l},{c}) : {
+			warn ? 'Warning' : 'Error'
+		} : {message}\n";
 		print File.stderr: disp,;
 		if (!warn)
 			throw Error(disp);

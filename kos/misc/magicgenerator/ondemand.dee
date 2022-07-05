@@ -43,7 +43,7 @@ function doRunDeemonScriptIfFilesAreOutOfDate(
 		additionalArguments: {string...} = none): (string, ipc.Process) | none {
 	assert inputs;
 	local latest = normalizePath(getLatestFilenameOf(
-		latestSuffix is none ? script : "{}.{}".format({ script, latestSuffix })), false);
+		latestSuffix is none ? script : f"{script}.{latestSuffix}"), false);
 	local oldestOutput = getLastModfiedTime(latest);
 	if (oldestOutput is none) {
 		print "[PRE] Running script", repr script, "because it hasn't been run, yet";
@@ -61,9 +61,8 @@ function doRunDeemonScriptIfFilesAreOutOfDate(
 
 function listQueryFiles(query: string): {string...} {
 	local head = fs.headof(query);
-	for (local x: fs.query(query)) {
-		yield "{}/{}".format({ head, x });
-	}
+	for (local x: fs.query(query))
+		yield f"{head}/{x}";
 }
 
 function runGenerateSyscalls(
@@ -75,7 +74,7 @@ function runGenerateSyscalls(
 	if (result is none) {
 		result = doRunDeemonScriptIfFilesAreOutOfDate(
 			script: "kos/misc/magicgenerator/generate_syscalls.dee",
-			inputs: { "{}/asm/syscalls{}.def".format({ xarch_path, TARGET.SUFFIX }), },
+			inputs: { f"{xarch_path}/asm/syscalls{TARGET.SUFFIX}.def" },
 			latestSuffix: TARGET_ARCH,
 			additionalArguments: { TARGET_ARCH });
 	}
@@ -95,7 +94,7 @@ function updateAutomaticSourcesOnDemand(TARGET_ARCH: string, TARGET: Module) {
 		if (x !is none)
 			autoScripts.append(x);
 	}
-	local xarch_path = "kos/include/{}-kos".format({ TARGET.XARCH });
+	local xarch_path = f"kos/include/{TARGET.XARCH}-kos";
 
 	collect(runGenerateSyscalls(xarch_path, TARGET_ARCH, TARGET));
 	collect(runGenerateHeaders());

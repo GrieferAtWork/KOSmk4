@@ -44,8 +44,7 @@ function tlftLink(self: TLFT, fp: File) {
 	local chsize = 1 << self.log2chsize;
 	for (local ord, d: self.map) {
 		if (#d != chsize)
-			throw Error("Character {} has invalid data size: {} != {}"
-				.format({ ord, #d, chsize }));
+			throw Error(f"Character {ord} has invalid data size: {#d} != {chsize}");
 		if (ord >= 0x20 && ord <= 0x7e)
 			continue;
 		if (minOrd > ord)
@@ -54,7 +53,7 @@ function tlftLink(self: TLFT, fp: File) {
 			maxOrd = ord;
 	}
 	if (maxOrd > 0xffff)
-		throw Error("Ordinal too great: {}".format({ maxOrd }));
+		throw Error(f"Ordinal too great: {maxOrd}");
 	local ranges = [];
 	local currentRangeMin = minOrd;
 	for (local ord: [minOrd:maxOrd+1]) {

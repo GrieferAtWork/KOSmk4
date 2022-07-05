@@ -36,9 +36,9 @@ function enumerateBochsInstallationLocations(): {string...} {
 	yield "binutils/build-bochs-2.6.11";
 #ifdef __WINDOWS__
 	for (local ver: ["2.6.11", "2.6.9", "2.6.8"]) {
-		yield "D:\\Bochs-{}\\".format({ ver });
-		yield "C:\\Program Files\\Bochs-{}".format({ ver });
-		yield "C:\\Program Files (x86)\\Bochs-{}".format({ ver });
+		yield f"D:\\Bochs-{ver}\\";
+		yield f"C:\\Program Files\\Bochs-{ver}";
+		yield f"C:\\Program Files (x86)\\Bochs-{ver}";
 	}
 #endif /* __WINDOWS__ */
 	yield fs.environ["PATH"].split(fs.DELIM)...;

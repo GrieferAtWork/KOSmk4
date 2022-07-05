@@ -82,7 +82,7 @@ function makeGlibIncludesRelativeInFile(filename: string) {
 #ifdef __WINDOWS__
 							fullname = fullname.replace("\\", "/");
 #endif /* __WINDOWS__ */
-							inctext = "\"{}\"".format({ fullname });
+							inctext = f'"{fullname}"';
 							break;
 						}
 					}

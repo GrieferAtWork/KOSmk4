@@ -50,9 +50,9 @@ function getRequirementsForCases(
 		return none;
 	if (#commonConditions == 1)
 		return commonConditions.first;
-	return "({})".format({
-		") || (".join(commonConditions.sorted())
-	});
+	return f"({
+		') || ('.join(commonConditions.sorted())
+	})";
 }
 
 function fixExpression(expr: string, indent: string): string {

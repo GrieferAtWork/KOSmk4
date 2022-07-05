@@ -57,10 +57,12 @@ function getBool(options: {string: string}, name: string, defl: bool): bool {
 	local val = options.get(name);
 	if (val is none)
 		return defl;
-	if (val !in ["true", "false"])
-		throw Error("Bad value for --emulator-setopt={}={} "
-		            "(must be \"true\" or \"false\")"
-			.format({ name, val }));
+	if (val !in ["true", "false"]) {
+		throw Error(
+			f"Bad value for --emulator-setopt={name}={val} "
+			f"(must be \"true\" or \"false\")"
+		);
+	}
 	return val == "true";
 }
 

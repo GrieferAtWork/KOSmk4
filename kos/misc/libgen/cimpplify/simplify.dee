@@ -223,10 +223,8 @@ again:
 		local hasParen: bool = tok == "(";
 		if (hasParen)
 			tok = self.next();
-		if (!tok.issymbol()) {
-			self.err("Expected keyword for '__has_builtin(...)', but got {!r}"
-				.format({ tok }));
-		}
+		if (!tok.issymbol())
+			self.err(f"Expected keyword for '__has_builtin(...)', but got {repr tok}");
 		self.next();
 		if (hasParen)
 			self.skip(")");
@@ -243,10 +241,8 @@ again:
 		local hasParen: bool = tok == "(";
 		if (hasParen)
 			tok = self.next();
-		if (!tok.issymbol()) {
-			self.err("Expected keyword for 'defined(...)', but got {!r}"
-				.format({ tok }));
-		}
+		if (!tok.issymbol())
+			self.err(f"Expected keyword for 'defined(...)', but got {repr tok}");
 		self.next();
 		if (hasParen)
 			self.skip(")");
@@ -284,10 +280,8 @@ do_return_const:
 		}
 		break;
 	}
-	if (!tok.issymbol()) {
-		self.err("Unexpected token in preprocessor expression: {!r}"
-			.format({ tok }));
-	}
+	if (!tok.issymbol())
+		self.err(f"Unexpected token in preprocessor expression: {repr tok}");
 	/* Check for a known macro. */
 	{
 		local macDef = config.getMacroDefinition(tok);
@@ -297,8 +291,10 @@ do_return_const:
 				innserParser.next();
 				result = _simpPpParse_unary(innserParser, config);
 				if (innserParser.tok) {
-					innserParser.err("Cannot parse garbage after expression: {!r}"
-						.format({ innserParser.text[innserParser.tokStart:] }));
+					innserParser.err(
+						f"Cannot parse garbage after expression: "
+						f"{repr innserParser.text[innserParser.tokStart:]}"
+					);
 				}
 				self.next();
 				return result;
@@ -337,8 +333,10 @@ do_return_const:
 					innserParser.next();
 					result = _simpPpParse_unary(innserParser, config);
 					if (innserParser.tok) {
-						innserParser.err("Cannot parse garbage after expression: {!r}"
-							.format({ innserParser.text[innserParser.tokStart:] }));
+						innserParser.err(
+							f"Cannot parse garbage after expression: "
+							f"{repr innserParser.text[innserParser.tokStart:]}"
+						);
 					}
 					return result;
 				}
@@ -625,8 +623,10 @@ function CParser_SkipPPBlock(self: CParser, startPos: int): string {
 		if (directiveStart >= directiveEnd)
 			goto next_directive; /* Empty directive */
 		if (!textText.issymstrt(directiveStart)) {
-			self.errAt(directiveStart, "Expected keyword after '#', but got {!r}"
-				.format({ textText[directiveStart:directiveEnd] }));
+			self.errAt(directiveStart,
+				f"Expected keyword after '#', but got "
+				f"{repr textText[directiveStart:directiveEnd]}"
+			);
 		}
 		local directiveKeywordEnd = directiveStart + 1;
 		while (directiveKeywordEnd < directiveEnd &&
@@ -694,8 +694,10 @@ function parseSimpConfigFile(
 		if (directiveStart >= directiveEnd)
 			goto next_directive; /* Empty directive */
 		if (!textText.issymstrt(directiveStart)) {
-			text.errAt(directiveStart, "Expected keyword after '#', but got {!r}"
-				.format({ textText[directiveStart:directiveEnd] }));
+			text.errAt(directiveStart,
+				f"Expected keyword after '#', but got "
+				f"{repr textText[directiveStart:directiveEnd]}"
+			);
 		}
 		local directiveKeywordEnd = directiveStart + 1;
 		while (directiveKeywordEnd < directiveEnd &&
@@ -731,15 +733,17 @@ function parseSimpConfigFile(
 				local macName = textText[pragmaBodyStart:directiveEnd];
 				if (!macName.issymbol()) {
 					text.errAt(pragmaBodyStart,
-						"Expected a keyword after #pragma defined, but got {!r}"
-						.format({ macName }));
+						f"Expected a keyword after #pragma defined, "
+						f"but got {repr macName}"
+					);
 				}
 				local oldDef = config.macros.get(macName);
 				if (oldDef is none || oldDef === false) {
 					if (oldDef !is none && oldDef !== true) {
 						text.warnAt(directiveArgsStart,
-							"Macro {!r} re-definition (old: {}, new: {})"
-							.format({ macName, oldDef, true }));
+							f"Macro {repr macName} re-definition "
+							f"(old: {oldDef}, new: {true})"
+						);
 					}
 					config.macros[macName] = true;
 				}
@@ -771,9 +775,9 @@ function parseSimpConfigFile(
 				local keyName = textText[keyNameStart:keyNameEnd];
 				if (!keyName || !keyName.issymbol()) {
 					text.errAt(keyNameStart,
-						"Expected keyword as argument for "
-						"#pragma define|undef <NS>, but got {!r}"
-						.format({ keyName }));
+						f"Expected keyword as argument for "
+						f"#pragma define|undef <NS>, but got {repr keyName}"
+					);
 				}
 				local ns: {string: int};
 				switch (namespaceName) {
@@ -781,8 +785,8 @@ function parseSimpConfigFile(
 					ns = config.known___has_builtin;
 					break;
 				default:
-					text.errAt(pragmaBodyStart, "Unknown namespace {!r}"
-						.format({ namespaceName }));
+					text.errAt(pragmaBodyStart, f"Unknown namespace {repr namespaceName}");
+					break;
 				}
 				ns[keyName.strip("_")] = { "define" : 1, "undef" : 0 }[pragmaName];
 			}	break;
@@ -800,20 +804,21 @@ parse_if_expression:
 			if (directiveName == "if") {
 				expr = text.getUserString(directiveArgsStart, directiveEnd);
 			} else {
-				expr = "defined({})".format({ textText[directiveArgsStart:directiveEnd] });
+				expr = f"defined({textText[directiveArgsStart:directiveEnd]})";
 				if (directiveName == "ifndef")
 					expr = "!" + expr;
 			}
 			expr = simpPpParse(expr, config).optimize();
 			if (expr is none) {
 				text.errAt(directiveArgsStart,
-					"Cannot parse PP-expression {!r}"
-					.format({ textText[directiveArgsStart:directiveEnd] }));
+					f"Cannot parse PP-expression {
+						repr textText[directiveArgsStart:directiveEnd]
+					}");
 			}
 			if (expr.typ != BRT_CONST) {
 				text.errAt(directiveArgsStart,
-					"Cannot reduce PP-expression to constant. (Best I can do is {!r})"
-					.format({ expr.tostr() }));
+					f"Cannot reduce PP-expression to constant. "
+					f"(Best I can do is {repr expr.tostr()})");
 			}
 			expr = expr.data;
 			if (!expr) {
@@ -842,8 +847,9 @@ parse_if_expression:
 					if (directiveStart >= directiveEnd)
 						goto next_directive; /* Empty directive */
 					if (!textText.issymstrt(directiveStart)) {
-						text.errAt(directiveStart, "Expected keyword after '#', but got {!r}"
-							.format({ textText[directiveStart:directiveEnd] }));
+						text.errAt(directiveStart,
+							f"Expected keyword after '#', but got "
+							f"{repr textText[directiveStart:directiveEnd]}");
 					}
 					directiveKeywordEnd = directiveStart + 1;
 					while (directiveKeywordEnd < directiveEnd &&
@@ -901,8 +907,7 @@ parse_if_expression:
 				filename = fs.joinpath(fs.headof(text.filename), filename[1:-1]);
 			} else {
 				text.errAt(directiveArgsStart,
-					"Invalid filename {!r} after #include"
-					.format({ filename }));
+					f"Invalid filename {repr filename} after #include");
 			}
 			/* Recursively include and parse. */
 			parseSimpConfigFile(File.open(filename), config);
@@ -917,8 +922,7 @@ parse_if_expression:
 			}
 			if (!macName || !macName.issymbol()) {
 				text.errAt(directiveArgsStart,
-					"Expected symbol name after '#undef', but got {!r}"
-					.format({ macName }));
+					f"Expected symbol name after '#undef', but got {repr macName}");
 			}
 			if (undefAll) {
 				config.undefMacrosStartsWith.append(macName);
@@ -932,8 +936,9 @@ parse_if_expression:
 			if (directiveArgsStart >= directiveEnd ||
 			    !textText.issymstrt(directiveArgsStart)) {
 				text.errAt(directiveArgsStart,
-					"Expected symbol name after '#define', but got {!r}"
-					.format({ textText[directiveArgsStart:directiveEnd] }));
+					f"Expected symbol name after '#define', but "
+					f"got {repr textText[directiveArgsStart:directiveEnd]}"
+				);
 			}
 			local macNameEnd = directiveArgsStart + 1;
 			while (macNameEnd < directiveEnd &&
@@ -950,10 +955,8 @@ parse_if_expression:
 			} else if (macBodyStart == macNameEnd && textText[macBodyStart] == "(") {
 				/* Function-like macro */
 				local macArgvEnd = textText.find(")", macBodyStart, directiveEnd);
-				if (macArgvEnd < 0) {
-					text.errAt(macBodyStart, "Missing `)' after `#define {}(..."
-						.format({ macName }));
-				}
+				if (macArgvEnd < 0)
+					text.errAt(macBodyStart, f"Missing `)' after `#define {macName}(...");
 				local macroArgv = Tuple(textText[macBodyStart+1:macArgvEnd]
 					.split(",").each.strip());
 				++macArgvEnd;
@@ -976,16 +979,16 @@ parse_if_expression:
 					if (directiveName == "xdefine")
 						break; /* Ignore re-definition */
 					text.warnAt(directiveArgsStart,
-						"Macro {!r} re-definition (old: {}, new: {})"
-						.format({ macName, oldDef, macDef }));
+						f"Macro {repr macName} re-definition "
+						f"(old: {oldDef}, new: {macDef})");
 				}
 			}
 			config.macros[macName] = macDef;
 		}	break;
 
 		default:
-			text.errAt(directiveStart, "Unsupported directive {!r}"
-				.format({ directiveName }));
+			text.errAt(directiveStart, f"Unsupported directive {repr directiveName}");
+			break;
 		}
 next_directive:
 		text.tokEnd = directiveEnd;
@@ -994,7 +997,7 @@ continue_parsing:
 		;
 	}
 	if (ifdefBlocks)
-		text.err("Unclosed #if-blocks ({} in total)".format({ #ifdefBlocks }));
+		text.err(f"Unclosed #if-blocks ({#ifdefBlocks} in total)");
 	if (didCreateConfig)
 		config.undefMacrosStartsWith.sort();
 	return config;
@@ -1205,7 +1208,7 @@ do_next_function_macro_argument:
 				yield inputText[flushStart:input.tokStart].replace("\\\n", "");
 			local capsule = inputText[directiveArgsStart:directiveEnd].replace("\\\n", "");
 			if (directiveName != "if") {
-				capsule = "defined({})".format({ capsule });
+				capsule = f"defined({capsule})";
 				if (directiveName == "ifndef")
 					capsule = "!" + capsule;
 			}
@@ -1263,8 +1266,8 @@ parse_ppif_body:
 					++directiveKeywordEnd;
 				directiveName = inputText[directiveStart:directiveKeywordEnd];
 				if (directiveName != "endif")
-					input.errAt(directiveStart, "Unmatched #endif after #else, but got {!r}"
-						.format({ directiveName }));
+					input.errAt(directiveStart,
+						f"Unmatched #endif after #else, but got {repr directiveName}");
 				break;
 
 			case "endif":
@@ -1272,8 +1275,8 @@ parse_ppif_body:
 				break;
 
 			default:
-				input.errAt(directiveStart, "Expected #endif, #else or #elif after #if, but got {!r}"
-					.format({ directiveName }));
+				input.errAt(directiveStart,
+					f"Expected #endif, #else or #elif after #if, but got {repr directiveName}");
 				break;
 			}
 			flushStart = directiveEnd;
@@ -1441,12 +1444,12 @@ handle_string_token:
 				local cond = e.cond;
 				if (cond.startswith("defined(") && cond.endswith(")") &&
 				    cond.findmatch("(", ")", 8) == #cond - 1) {
-					write("#ifdef {}\n".format({ cond[8:-1] }));
+					write(f"#ifdef {cond[8:-1]}\n");
 				} else if (cond.startswith("!defined(") && cond.endswith(")") &&
 				           cond.findmatch("(", ")", 9) == #cond - 1) {
-					write("#ifndef {}\n".format({ cond[9:-1] }));
+					write(f"#ifndef {cond[9:-1]}\n");
 				} else {
-					write("#if {}\n".format({ cond }));
+					write(f"#if {cond}\n");
 				}
 do_write_ppif_elem:
 				writeElements(e.tt);
@@ -1454,7 +1457,7 @@ do_write_ppif_elem:
 					if (#e.ff == 1) {
 						local firstFF = e.ff.first;
 						if (firstFF is SimpPPIfCapsule) {
-							write("#elif {}\n".format({ firstFF.cond }));
+							write(f"#elif {firstFF.cond}\n");
 							e = firstFF;
 							goto do_write_ppif_elem;
 						}
@@ -1480,7 +1483,7 @@ again_optimize_ppif:
 do_inverse_condition:
 			if (!elem.ff)
 				return {};
-			elem.cond = "!({})".format({ elem.cond });
+			elem.cond = f"!({elem.cond})";
 			elem.tt   = elem.ff;
 			elem.ff   = {};
 		}
@@ -1508,7 +1511,7 @@ do_inverse_condition:
 				 * >> A                   >> #endif
 				 * >> #endif              >>
 				 * >> #endif              >> */
-				elem.cond = "({}) && ({})".format({ elem.cond, firstTT.cond });
+				elem.cond = f"({elem.cond}) && ({firstTT.cond})";
 				elem.tt   = firstTT.tt;
 				goto again_optimize_ppif;
 			}

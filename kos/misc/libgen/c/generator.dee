@@ -541,9 +541,9 @@ function math_defineReplacement(
 				if (oldDef != repl) {
 err_redef:
 					throw Error(
-						"%[define_double2{}_replacement]: "
-						"Re-definition of {!r} as {!r} (was: {!r})"
-						.format({ MATH_REPLACEMENT_NAMES[mode], keyword, repl, oldDef }));
+						f"%[define_double2{MATH_REPLACEMENT_NAMES[mode]}_replacement]: "
+						f"Re-definition of {repr keyword} as {repr repl} (was: {repr oldDef})"
+					);
 				}
 				return;
 			}
@@ -690,19 +690,15 @@ function math_generateLoaderFunctionImplementation(
 		if (prototype is Callable)
 			prototype = prototype();
 		local result = FunctionImplementation(
-			body: "{{\n"
-				"@@pp_if {convertedPpCond}@@\n"
-				"	{convertedBody}\n"
-				"@@pp_else@@\n"
-				"	{callBase};\n"
-				"@@pp_endif@@\n"
-				"}}".format({
-					"convertedPpCond" : convertedPpCond,
-					"convertedBody"   : convertedBody,
-					"callBase"        : math_constructCallToBaseExpression(
+			body: f"\{\n"
+				f"@@pp_if {convertedPpCond}@@\n"
+				f"	{convertedBody}\n"
+				f"@@pp_else@@\n"
+				f"	{math_constructCallToBaseExpression(
 						mode, prototype, baseLocalFunction.functionPrototype,
-						baseLocalFunction.name),
-				}),
+						baseLocalFunction.name)};\n"
+				f"@@pp_endif@@\n"
+				f"\}",
 			name:       newFunctionName,
 			implPrefix: gen.replaceTextArray(baseLocalFunctionImplementation.implPrefix));
 		/* Scan for dependencies within @convertedBody */
@@ -719,7 +715,7 @@ function math_generateLoaderFunctionImplementation(
 		return LoaderFunctionImplementation(
 			impl:         result,
 			/* Include mention of the call-to-base variant in implementation's requires */
-			ppCond:       "{} || $has_function({})".format({ convertedPpCond, baseFunction.name }),
+			ppCond:       f"{convertedPpCond} || $has_function({baseFunction.name})",
 			ppCondPrefix: gen.replaceTextArray(baseLocalFunction.ppCondPrefix));
 	} else {
 		/* Simply generate a call to the base-function:
@@ -731,23 +727,24 @@ function math_generateLoaderFunctionImplementation(
 		local baseName: string = baseFunction.name;
 		local basePrototype: FunctionPrototype = baseFunction.onlyPrototype;
 		if (basePrototype is none) {
-			throw Error("Cannot generate math implementation for {!r}: Base function {!r} "
-			            "has no local variant, and is exposed through multiple prototypes"
-				.format({ newFunctionName, baseName }));
+			throw Error(
+				f"Cannot generate math implementation for {repr newFunctionName}: "
+				f"Base function {repr baseName} has no local variant, and is exposed "
+				f"through multiple prototypes"
+			);
 		}
 		if (prototype is Callable)
 			prototype = prototype();
 		return LoaderFunctionImplementation(
 			impl:   FunctionImplementation(
-				body: "{{\n"
-					"	{};\n"
-					"}}".format({
-						math_constructCallToBaseExpression(
-							mode, prototype, basePrototype, baseName),
-					}),
+				body: f"\{\n"
+					f"	{math_constructCallToBaseExpression(
+							mode, prototype, basePrototype, baseName)};\n"
+					f"\}",
 				name:         newFunctionName,
 				dependencies: { baseName : baseFunction }),
-			ppCond: "$has_function({})".format({ baseFunction.name }));
+			ppCond: f"$has_function({baseFunction.name})"
+		);
 	}
 }
 
@@ -843,10 +840,8 @@ function _templateInjectArguments(body: string | UserString, args: {string: stri
 		local argName = bodyStr[i:nameEnd];
 		local argValue = args.get(argName);
 		if (argValue is none) {
-			if (body is UserString) {
-				body.errAt(i, "Undefined template argument {!r}"
-					.format({ argName }));
-			}
+			if (body is UserString)
+				body.errAt(i, f"Undefined template argument {repr argName}");
 			argValue = args[argName]; /* Force an exception */
 		}
 		fp << argValue;
@@ -901,8 +896,9 @@ class Template {
 	@@Instantiate this template with the given @instArgs
 	public function instantiate(instArgs: {string | UserString...}): TemplateInstantiation {
 		if (#instArgs > #this.args) {
-			this._err("Too many arguments for template {!r} (takes {!r}, but given {!r})"
-				.format({ this.name, #this.args, #instArgs }));
+			this._err(
+				f"Too many arguments for template {repr this.name} "
+				f"(takes {#this.args}, but given {#instArgs})");
 		}
 		local usedArgs: {string: string} = Dict();
 		for (local i, arg: util.enumerate(this.args)) {
@@ -910,8 +906,8 @@ class Template {
 			if (i < #instArgs)
 				value = str instArgs[i];
 			if (value is none) {
-				this._err("Missing template argument {!r} needed by {!r}"
-					.format({ arg.name, this.name }));
+				this._err(
+					f"Missing template argument {repr arg.name} needed by {repr this.name}");
 			}
 			usedArgs[str arg.name] = value;
 		}

@@ -281,7 +281,7 @@ function createClangTidyProcess(
 		"-isystem", "kos/include",
 		"-D__KOS__",
 		"-D__ELF__",
-		"-D__{}__".format({ TARGET }),
+		f"-D__{TARGET}__",
 		"-D__clang__",
 		"-D__clang_tidy__",
 #ifdef __WINDOWS__ /* Assume the use of clang-tidy build for windows (so re-inject some stuff we can't override) */

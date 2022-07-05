@@ -102,8 +102,9 @@ function replaceWcharTextKeyword(keyword: string, mode: int,
 		repl = allWcharFunctionsByName[keyword];
 		/* Complain if referencing a  [[wchar]] function function some  uchar
 		 * variant, but no uchar variant exists for that referenced function. */
-		throw Error("Missing %{{uchar{}}}-variant of [[wchar]] Function {!r}"
-			.format({ WCHAR_REPLACEMENT_WIDTH[mode], repl.wc_func.name }));
+		throw Error(f"Missing %\{uchar{
+			WCHAR_REPLACEMENT_WIDTH[mode]
+		}\}-variant of [[wchar]] Function {repr repl.wc_func.name}");
 	}
 	if (keyword.startswith("$")) {
 		if (#keyword >= 2 && keyword[1] != "$") {
@@ -435,8 +436,9 @@ function replaceWcharFunctionImplementation(
 			if (wcs !is none) {
 				func = wcs.wc_header_uchar[mode];
 				if (func is none) {
-					throw Error("Missing %{{uchar{}}}-variant of [[wchar]] Function {!r}"
-						.format({ WCHAR_REPLACEMENT_WIDTH[mode], func.name }));
+					throw Error(f"Missing %\{uchar{
+						WCHAR_REPLACEMENT_WIDTH[mode]
+					}\}-variant of [[wchar]] Function {repr func.name}");
 				}
 				newDeps[replacedName] = func;
 				continue;
