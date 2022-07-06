@@ -260,7 +260,7 @@ function define_feature(macro, condition) {
 	print("%[insert:pp_endif]");
 }
 function define_has_function(name) {
-	define_feature("HAVE_" + name.upper(), "$has_function({})".format({ name }));
+	define_feature("HAVE_" + name.upper(), f"$has_function({name})");
 }
 
 define_has_function("bcmp");

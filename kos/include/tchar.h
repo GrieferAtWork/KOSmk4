@@ -630,7 +630,7 @@ function printMappings(table, index) {
 		if (decl.startswith("(")) {
 			local a;
 			a, none, decl = decl.partition(")")...;
-			name = "{}{})".format({ name, a });
+			name = f"{name}{a})";
 			decl = decl.lstrip();
 		}
 		pairs.append((name, decl));

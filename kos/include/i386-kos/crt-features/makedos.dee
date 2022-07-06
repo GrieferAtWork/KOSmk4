@@ -191,14 +191,16 @@ function getPpCondForArchVersions(vers: {int...}): string {
 		if (max == KNOWN_VERSION_MAX) {
 			if (min == KNOWN_VERSION_MIN)
 				return "1";
-			return "__MSVCRT_VERSION__ >= {}".format({ min });
+			return f"__MSVCRT_VERSION__ >= {min}";
 		}
 		if (min == max)
-			return "__MSVCRT_VERSION__ == {}".format({ min });
-		return "__MSVCRT_VERSION__ >= {} && __MSVCRT_VERSION__ <= {}".format({ min, max });
+			return f"__MSVCRT_VERSION__ == {min}";
+		return f"__MSVCRT_VERSION__ >= {min} && __MSVCRT_VERSION__ <= {max}";
 	}
-	return " || ".join(for (local ver: vers)
-		"__MSVCRT_VERSION__ {} {}".format({ ver == KNOWN_VERSION_MAX ? ">=" : "==", ver }));
+	return " || ".join(
+		for (local ver: vers)
+			f"__MSVCRT_VERSION__ {ver == KNOWN_VERSION_MAX ? ">=" : "=="} {ver}"
+	);
 }
 
 function mergeConditions(bIf: string, aCond: string, bCond: string): string {
@@ -207,18 +209,18 @@ function mergeConditions(bIf: string, aCond: string, bCond: string): string {
 	if (aCond == "0") {
 		if (bCond == "1")
 			return bIf;
-		return "({}) && ({})".format({ bIf, bCond });
+		return f"({bIf}) && ({bCond})";
 	}
 	if (bCond == "0") {
 		if (aCond == "1")
-			return "!({})".format({ bIf });
-		return "!({}) && ({})".format({ bIf, aCond });
+			return f"!({bIf})";
+		return f"!({bIf}) && ({aCond})";
 	}
 	if (aCond == "1")
-		return "!({}) || ({})".format({ bIf, bCond });
+		return f"!({bIf}) || ({bCond})";
 	if (bCond == "1")
-		return "({}) || ({})".format({ bIf, aCond });
-	return "(({}) ? ({}) : ({}))" .format({ bIf, bCond, aCond });
+		return f"({bIf}) || ({aCond})";
+	return f"(({bIf}) ? ({bCond}) : ({aCond}))";
 }
 
 function getPpCondForVersions(vers: {int...}): string {

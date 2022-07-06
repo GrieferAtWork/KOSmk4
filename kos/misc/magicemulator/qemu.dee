@@ -159,10 +159,7 @@ did_update_x86_64_kernel:
 			for (local name, cmdline: bootDrivers)
 				!cmdline
 					? name.replace(",", ",,")
-					: "{} {}".format({
-						name.replace(",", ",,"),
-						cmdline.replace(",", ",,")
-					})
+					: "{name.replace(",", ",,")} {cmdline.replace(",", ",,"}"
 		));
 	}
 	try {

@@ -2838,7 +2838,7 @@ print("@@pp_endif@@");
 
 // Generate names+descriptors for real-time signals.
 for (local id: [rtmin:rtmax]) {
-	local desc = "RTMIN+{}".format({ id-rtmin });
+	local desc = f"RTMIN+{id - rtmin}";
 	kosSignoMappings[id] = (desc, desc.lower());
 }
 kosSignoMappings[rtmin] = ("RTMIN", "rtmin");

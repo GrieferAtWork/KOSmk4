@@ -154,9 +154,8 @@ print("#define __CCAST(T) (uint64_t)");
 // Assert that our generated INO numbers are correct
 for (local name, st_mode, st_rdev: DEVICES) {
 	print("static_assert(devfs_devnode_makeino(", STMODE_MAP[st_mode & ~07777],
-		", MKDEV(", MAJOR(st_rdev), ", ", MINOR(st_rdev), ")) == (__FS_TYPE(ino))_SELECT_INO(", ", ".join(
-		for (local c, fun: MAKEINO_FUNCTIONS)
-			"{}({})".format({ c, fun(st_mode, st_rdev).hex() })),
+		", MKDEV(", MAJOR(st_rdev), ", ", MINOR(st_rdev), ")) == (__FS_TYPE(ino))_SELECT_INO(",
+		", ".join(for (local c, fun: MAKEINO_FUNCTIONS) f"{c}({fun(st_mode, st_rdev).hex()})"),
 	"));");
 }
 print("#undef __CCAST");
@@ -171,7 +170,7 @@ for (local name, st_mode, st_rdev: DEVICES) {
 	print("		.fd_ops     = &devdirent_ops,");
 	print("		.fd_ino     = (ino_t)_SELECT_INO(", ", ".join(
 		for (local c, fun: MAKEINO_FUNCTIONS)
-			"{}({})".format({ c, fun(st_mode, st_rdev).hex() })),
+			f"{c}({fun(st_mode, st_rdev).hex()})"),
 	"),");
 	print("		.fd_hash    = ", fdirent_hash(name), ",");
 	print("		.fd_namelen = ", #name, ",");
@@ -184,8 +183,7 @@ for (local name, st_mode, st_rdev: DEVICES) {
 // Print static initialization symbols
 print("_SELECT_INO(", ",\n             ".join(
 	for (local none, none, tree: byInoTrees)
-		"DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, {})"
-			.format({ tree.value.val.partition(".").first })
+		f"DEFINE_INTERN_ALIAS(_devfs__fs_nodes__INIT, {tree.value.val.partition(".").first})"
 ), ");");
 print("DEFINE_INTERN_ALIAS(_devfs_byname_tree__INIT, ", byNameTree.value.val, ");");
 
@@ -244,8 +242,8 @@ for (local name, st_mode, st_rdev: DEVICES) {
 	print("			.fn_gid   = 0,");
 	print("			.fn_ino   = (ino_t)_SELECT_INO(", ", ".join(
 		for (local c, node: inoNodes)
-			"{}({})".format({ c, node.minkey.hex() })),
-	"),");
+			f"{c}({node.minkey.hex()})"
+	), "),");
 	print("			.fn_super = &devfs.rs_sup,");
 	print("			FNODE_INIT_fn_changed,");
 	print("			.fn_supent = {");

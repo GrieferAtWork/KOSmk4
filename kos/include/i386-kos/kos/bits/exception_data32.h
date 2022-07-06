@@ -91,7 +91,7 @@ local usedStructNames = [];
 	keyStructName:  [](x) {
 		if (x !in usedStructNames)
 			usedStructNames.append(x);
-		return "__{}32".format({ x });
+		return f"__{x}32";
 	},
 	exceptionDataPointerType: "__UINT32_TYPE__",
 );

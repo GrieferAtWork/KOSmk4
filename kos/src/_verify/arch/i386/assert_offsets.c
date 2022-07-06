@@ -162,26 +162,26 @@ for (local f: files)
 	genAsserts(f);
 
 for (local i: [:8]) {
-	print "static_assert(offsetof(struct sfpustate, fs_regs[{i}]) == OFFSET_SFPUSTATE_ST({i}));".format({ .i = i });
-	print "static_assert(offsetof(struct sfpustate, fs_regs[{i}]) == OFFSET_SFPUSTATE_MM({i}));".format({ .i = i });
+	print f"static_assert(offsetof(struct sfpustate, fs_regs[{i}]) == OFFSET_SFPUSTATE_ST({i}));";
+	print f"static_assert(offsetof(struct sfpustate, fs_regs[{i}]) == OFFSET_SFPUSTATE_MM({i}));";
 }
 for (local i: [:8]) {
-	print "static_assert(offsetof(struct xfpustate32, fx_regs[{i}]) == OFFSET_XFPUSTATE32_ST({i}));".format({ .i = i });
-	print "static_assert(offsetof(struct xfpustate32, fx_regs[{i}]) == OFFSET_XFPUSTATE32_MM({i}));".format({ .i = i });
+	print f"static_assert(offsetof(struct xfpustate32, fx_regs[{i}]) == OFFSET_XFPUSTATE32_ST({i}));";
+	print f"static_assert(offsetof(struct xfpustate32, fx_regs[{i}]) == OFFSET_XFPUSTATE32_MM({i}));";
 }
 for (local i: [:8])
-	print "static_assert(offsetof(struct xfpustate32, fx_xmm[{i}]) == OFFSET_XFPUSTATE32_XMM({i}));".format({ .i = i });
+	print f"static_assert(offsetof(struct xfpustate32, fx_xmm[{i}]) == OFFSET_XFPUSTATE32_XMM({i}));";
 for (local i: [:8]) {
-	print "static_assert(offsetof(struct xfpustate64, fx_regs[{i}]) == OFFSET_XFPUSTATE64_ST({i}));".format({ .i = i });
-	print "static_assert(offsetof(struct xfpustate64, fx_regs[{i}]) == OFFSET_XFPUSTATE64_MM({i}));".format({ .i = i });
+	print f"static_assert(offsetof(struct xfpustate64, fx_regs[{i}]) == OFFSET_XFPUSTATE64_ST({i}));";
+	print f"static_assert(offsetof(struct xfpustate64, fx_regs[{i}]) == OFFSET_XFPUSTATE64_MM({i}));";
 }
 for (local i: [:16])
-	print "static_assert(offsetof(struct xfpustate64, fx_xmm[{i}]) == OFFSET_XFPUSTATE64_XMM({i}));".format({ .i = i });
+	print f"static_assert(offsetof(struct xfpustate64, fx_xmm[{i}]) == OFFSET_XFPUSTATE64_XMM({i}));";
 for (local i: [1:8])
-	print "static_assert(OFFSET_TSS64_IST{i} == OFFSET_TSS64_IST({i}));".format({ .i = i });
+	print f"static_assert(OFFSET_TSS64_IST{i} == OFFSET_TSS64_IST({i}));";
 for (local i: [:16]) {
 	print "#if X86_64_VA_LIST_XMM_COUNT >=",i;
-	print "static_assert(offsetof(struct x86_64_va_list_reg_save_area, rsa_xmm[{i}]) == OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_XMM({i}));".format({ .i = i });
+	print f"static_assert(offsetof(struct x86_64_va_list_reg_save_area, rsa_xmm[{i}]) == OFFSET_X86_64_VA_LIST_REG_SAVE_AREA_XMM({i}));";
 	print "#endif";
 }
 

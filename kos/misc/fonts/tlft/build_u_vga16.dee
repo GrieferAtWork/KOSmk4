@@ -34,7 +34,7 @@ function runBashProcess(cmdline: string) {
 	p.start();
 	local err = p.join();
 	if (err != 0)
-		throw Error("Process {!r} returned {}".format({ p, err }));
+		throw Error(f"Process {repr p} returned {err}");
 }
 
 local bdf = try fs.stat("uni_vga/u_vga16.bdf") catch (...) none;

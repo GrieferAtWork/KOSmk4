@@ -1289,9 +1289,9 @@ NOTHROW_RPC(LIBCCALL libc_aio_suspend)(struct aiocb const *const list[],
 }
 /*[[[end:libc_aio_suspend]]]*/
 
-/*[[[head:libc_aio_fsync,hash:CRC-32=0x1f05b6a9]]]*/
+/*[[[head:libc_aio_fsync,hash:CRC-32=0x1d1d6c68]]]*/
 /* >> aio_fsync(3), aio_fsync64(3)
- * Begin an async `fsync(2)' operation:
+ * Begin an async `fsync(2)' or `fdatasync(2)' operation:
  * >> if (operation == O_SYNC) {
  * >>     fsync(self->aio_fildes);
  * >> } else if (operation == O_DSYNC) {

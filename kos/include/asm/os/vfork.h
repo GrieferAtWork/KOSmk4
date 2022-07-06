@@ -61,7 +61,7 @@
  *    close a file handle that remains open for the parent).
  * >> On KOS this problem is handled  differently, such that a thread  with
  *    the `TASK_FVFORK' flag set is handled as though `this_kernel_sigmask'
- *    always were a signal mask identical to `&sigmask_full'
+ *    always were a signal mask identical to `sigmask_full'
  * >> As far as semantics go, you can think of `__ARCH_HAVE_SIGBLOCK_VFORK'
  *    like this:
  *    >> #ifdef __ARCH_HAVE_SIGBLOCK_VFORK
@@ -85,7 +85,7 @@
  *    >> //     sigmask, launching the new executable with the contents
  *    >> //     of the userprocmask at the time of the exec(). Then, when
  *    >> //     the parent awakes from waiting for the child in clone,
- *    >> //     it will write a copy it took of the userprocmask prior
+ *    >> //     it will write the copy it took of the userprocmask prior
  *    >> //     to staring the child, such that changes made to it before
  *    >> //     doing exec() or exit() don't remain visible in the parent)
  *    >> #define vfork_with_sigmask()                             \

@@ -337,7 +337,7 @@ local nodes = {
 local staticPidTree = Cell(none);
 for (local x: nodes)
 	llrbtree.insert(staticPidTree, x);
-function pidof(x) -> x is none ? "NULL" : x.val == "thiscpu_idle" ? "&bootidle_pid" : "&{}_pid".format({ x.val });
+function pidof(x) -> x is none ? "NULL" : x.val == "thiscpu_idle" ? "&bootidle_pid" : f"&{x.val}_pid";
 for (local x: nodes) {
 	print("INTERN ", (x.val == "thiscpu_idle" ? "ATTR_PERCPU " : ""), "struct taskpid ", x.val, "_pid = {");
 	print("	.tp_refcnt = 2, /" "* +1: ", x.val, "_pid, +1: FORTASK(", x.val, ", this_taskpid) *" "/");

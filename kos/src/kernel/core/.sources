@@ -121,7 +121,7 @@ BEGIN
 	for (local x: fs.dir("kos/src/kernel/core/arch/" + XARCH)) {
 		if ("." in x || x.startswith("__"))
 			continue; /* Not a directory */
-		local path = "arch/{}/{}/".format({ XARCH, x });
+		local path = f"arch/{XARCH}/{x}/";
 		KERNEL_ASM_SOURCES.append(path + ASMFILES);
 		KERNEL_C_SOURCES.append(path + "*.c");
 	}

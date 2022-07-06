@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40329543 */
+/* HASH CRC-32:0xcfc3d269 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_aio_read)(struct aiocb *self);
  * then `write(2)' is called instead (in which case `self->aio_offset' is ignored) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_aio_write)(struct aiocb *self);
 /* >> aio_fsync(3), aio_fsync64(3)
- * Begin an async `fsync(2)' operation:
+ * Begin an async `fsync(2)' or `fdatasync(2)' operation:
  * >> if (operation == O_SYNC) {
  * >>     fsync(self->aio_fildes);
  * >> } else if (operation == O_DSYNC) {
@@ -153,7 +153,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_aio_read64)(struct aiocb64 *se
  * then `write(2)' is called instead (in which case `self->aio_offset' is ignored) */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_aio_write64)(struct aiocb64 *self);
 /* >> aio_fsync(3), aio_fsync64(3)
- * Begin an async `fsync(2)' operation:
+ * Begin an async `fsync(2)' or `fdatasync(2)' operation:
  * >> if (operation == O_SYNC) {
  * >>     fsync(self->aio_fildes);
  * >> } else if (operation == O_DSYNC) {

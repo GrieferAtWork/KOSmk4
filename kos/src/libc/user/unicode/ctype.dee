@@ -256,7 +256,7 @@ for (local line: readLines("UnicodeData.txt")) {
 		local intval = fields[8];
 		if ("/" in intval) {
 			local a, none, b = intval.partition("/")...;
-			digit = "D_FRAC({},{})".format({ a.strip(), b.strip() });
+			digit = f"D_FRAC({a.strip()},{b.strip()})";
 		} else {
 			digit = int(intval);
 		}
@@ -502,7 +502,7 @@ function generateUnicodeDatabase() {
 	print("PRIVATE ATTR_SECTION(\".rodata.crt.unicode.UTF\")");
 	print("unidigit_t const unicode_digits[", #index2Digit, "] = {");
 	for (local digit: index2Digit) {
-		print("	", digit !is int ? digit : "D_INT({})".format({ digit }), ",");
+		print("	", digit !is int ? digit : f"D_INT({digit})", ",");
 	}
 	print("};");
 

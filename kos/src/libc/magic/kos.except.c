@@ -360,11 +360,11 @@ for (local name: classes.keys.sorted()) {
 			continue;
 		if (!hasSubClassErrnoExpr) {
 			local expr, reqMacros = formatErrnoExpr(cls)...;
-			reqMacros = " && ".join(for (local x: reqMacros) "defined({})".format({ x }));
+			reqMacros = " && ".join(for (local x: reqMacros) f"defined({x})");
 			if (!reqMacros)
 				reqMacros = cls.ppCond;
 			else if (cls.ppCond != "1") {
-				reqMacros = "({}) && ({})".format({ reqMacros, cls.ppCond });
+				reqMacros = f"({reqMacros}) && ({cls.ppCond})";
 			}
 			if (reqMacros != "1")
 				print("@@pp_if ", reqMacros, "@@");
@@ -381,7 +381,7 @@ for (local name: classes.keys.sorted()) {
 		print("\tcase @", cls.name, "@:");
 		if (isCustomErrnoExpr(cls.errnoExpr)) {
 			local expr, reqMacros = formatErrnoExpr(cls)...;
-			reqMacros = " && ".join(for (local x: reqMacros) "defined({})".format({ x }));
+			reqMacros = " && ".join(for (local x: reqMacros) f"defined({x})");
 			if (reqMacros)
 				print("@@pp_if ", reqMacros, "@@");
 			print("\t\tresult = ", expr.replace("\n", "\n\t\t"), ";");
@@ -394,7 +394,7 @@ for (local name: classes.keys.sorted()) {
 			if (!isCustomErrnoExpr(c.errnoExpr))
 				continue;
 			local expr, reqMacros = formatErrnoExpr(c)...;
-			reqMacros = " && ".join(for (local x: reqMacros) "defined({})".format({ x }));
+			reqMacros = " && ".join(for (local x: reqMacros) f"defined({x})");
 			if (reqMacros)
 				print("@@pp_if ", reqMacros, "@@");
 			print("\t\tcase @EXCEPT_SUBCLASS@(@EXCEPT_CODEOF@(@", c.name, "@)):");

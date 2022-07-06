@@ -79,7 +79,7 @@ local usedStructNames = [];
 	keyStructName:  [](x) {
 		if (x !in usedStructNames)
 			usedStructNames.append(x);
-		return "__{}64".format({ x });
+		return f"__{x}64";
 	},
 	exceptionDataPointerType: "__UINT64_TYPE__",
 );

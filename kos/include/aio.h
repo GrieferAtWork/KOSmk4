@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6abcb27 */
+/* HASH CRC-32:0xb9fb7f12 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -167,10 +167,10 @@ typedef struct sigevent sigevent_t;
  * WARNING: ONCE STARTED, YOU MUST NOT FREE THE BACKING STRUCTURE
  *          OF `struct aiocb' UNTIL `aio_error() != EINPROGRESS'!
  *
- * Until  that point, the address of structure itself may be used
- * internally as part of linked lists which will become corrupted
- * if one of their elements isn't properly removed prior to being
- * deallocated.
+ * Until that point, the address of the structure itself may be
+ * used internally as  part of linked  lists which will  become
+ * corrupted if one  of their elements  isn't properly  removed
+ * prior to being free'd.
  */
 
 
@@ -210,7 +210,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_write,(struct aiocb *__sel
 #endif /* ... */
 #if defined(__CRT_HAVE_aio_fsync) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> aio_fsync(3), aio_fsync64(3)
- * Begin an async `fsync(2)' operation:
+ * Begin an async `fsync(2)' or `fdatasync(2)' operation:
  * >> if (operation == O_SYNC) {
  * >>     fsync(self->aio_fildes);
  * >> } else if (operation == O_DSYNC) {
@@ -225,7 +225,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_write,(struct aiocb *__sel
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_fsync,(__oflag_t __operation, struct aiocb *__self),(__operation,__self))
 #elif defined(__CRT_HAVE_aio_fsync64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> aio_fsync(3), aio_fsync64(3)
- * Begin an async `fsync(2)' operation:
+ * Begin an async `fsync(2)' or `fdatasync(2)' operation:
  * >> if (operation == O_SYNC) {
  * >>     fsync(self->aio_fildes);
  * >> } else if (operation == O_DSYNC) {
@@ -483,7 +483,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_write64,(struct aiocb64 *__
 #endif /* ... */
 #if defined(__CRT_HAVE_aio_fsync) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> aio_fsync(3), aio_fsync64(3)
- * Begin an async `fsync(2)' operation:
+ * Begin an async `fsync(2)' or `fdatasync(2)' operation:
  * >> if (operation == O_SYNC) {
  * >>     fsync(self->aio_fildes);
  * >> } else if (operation == O_DSYNC) {
@@ -498,7 +498,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,aio_write64,(struct aiocb64 *__
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,aio_fsync64,(int __operation, struct aiocb64 *__self),aio_fsync,(__operation,__self))
 #elif defined(__CRT_HAVE_aio_fsync64)
 /* >> aio_fsync(3), aio_fsync64(3)
- * Begin an async `fsync(2)' operation:
+ * Begin an async `fsync(2)' or `fdatasync(2)' operation:
  * >> if (operation == O_SYNC) {
  * >>     fsync(self->aio_fildes);
  * >> } else if (operation == O_DSYNC) {

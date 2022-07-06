@@ -59,7 +59,7 @@ void timeval_sub([[out]] struct timeval *result,
                  [[in]] struct timeval const *rhs) {
 	result->@tv_sec@  = lhs->@tv_sec@  - rhs->@tv_sec@;
 	result->@tv_usec@ = lhs->@tv_usec@ - rhs->@tv_usec@;
-	if ((__suseconds_t)result->@tv_usec@ < (__suseconds_t)USEC_PER_SEC) {
+	if ((__suseconds_t)result->@tv_usec@ < 0) {
 		result->@tv_usec@ += USEC_PER_SEC;
 		--result->@tv_sec@;
 	}

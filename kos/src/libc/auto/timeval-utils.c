@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb858aa2 */
+/* HASH CRC-32:0xfff8c1ae */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ NOTHROW_NCX(LIBCCALL libc_timeval_sub)(struct timeval *result,
                                        struct timeval const *rhs) {
 	result->tv_sec  = lhs->tv_sec  - rhs->tv_sec;
 	result->tv_usec = lhs->tv_usec - rhs->tv_usec;
-	if ((__suseconds_t)result->tv_usec < (__suseconds_t)__UINT32_C(1000000)) {
+	if ((__suseconds_t)result->tv_usec < 0) {
 		result->tv_usec += __UINT32_C(1000000);
 		--result->tv_sec;
 	}

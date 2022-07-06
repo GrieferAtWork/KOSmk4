@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc77f345a */
+/* HASH CRC-32:0xbe5dc4c4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ for (local field, add, flags: ops) {
 	print("	/" "* ", field, " (", add ? "addend" : "remove", ")", " *" "/");
 	print("@@pp_if "),;
 	print(" || ".join(for (local f: flags) "defined(__" + f + ")"), "@@");
-	local head = "termios_p->@{}@ {}(" .format({ field, add ? "|= " : "&= ~" });
+	local head = f"termios_p->@{field}@ {add ? "|= " : "&= ~"}(";
 	print("	", head, "0");
 	head = " " * #head;
 	for (local f: flags) {

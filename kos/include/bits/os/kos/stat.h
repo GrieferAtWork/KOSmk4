@@ -269,21 +269,21 @@ function _printTypedNameWithCommentAndForcedPad(
 function Tfield(T: string, name: string, sizeofT: string, wantedSize: string | int | none, comment: string) {
 	if (doStat64) {
 		if (T.startswith("__FS_TYPE(") && T.endswith(")"))
-			T = "__{}64_t".format({ T[10:-1] });
+			T = f"__{T[10:-1]}64_t";
 		if (sizeofT.startswith("__FS_SIZEOF(") && sizeofT.endswith(")"))
-			sizeofT = "__SIZEOF_{}64_T__".format({ sizeofT[12:-1] });
+			sizeofT = f"__SIZEOF_{sizeofT[12:-1]}64_T__";
 	}
 	_printTypedNameWithCommentAndPad(T, name, comment, sizeofT, wantedSize);
 }
 function Tfsfield(Tname: string, name: string, comment: string) {
 	local SIZEOF_NAME = { "pos" : "off" }.get(Tname, Tname).upper();
-	local TX         = "__FS_TYPE({})".format({ Tname });
-	local TX_SIZEOF  = "__FS_SIZEOF({})".format({ SIZEOF_NAME });
-	local T32        = "__{}32_t".format({ Tname });
-	local T64        = "__{}64_t".format({ Tname });
-	local T32_SIZEOF = "__SIZEOF_{}32_TYPE__".format({ SIZEOF_NAME });
+	local TX         = f"__FS_TYPE({Tname})";
+	local TX_SIZEOF  = f"__FS_SIZEOF({SIZEOF_NAME})";
+	local T32        = f"__{Tname}32_t";
+	local T64        = f"__{Tname}64_t";
+	local T32_SIZEOF = f"__SIZEOF_{SIZEOF_NAME}32_TYPE__";
 	local T64_SIZEOF = "8";
-//	local T64_SIZEOF = "__SIZEOF_{}64_TYPE__".format({ SIZEOF_NAME });
+//	local T64_SIZEOF = f"__SIZEOF_{SIZEOF_NAME}64_TYPE__";
 	if (doStat64) {
 		print("#ifdef __USE_KOS");
 		print("	union {");

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10a229d3 */
+/* HASH CRC-32:0x4894405c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,7 +95,7 @@ print("@@pp_endif@@");
 
 // Generate names+descriptors for real-time signals.
 for (local id: [rtmin:rtmax]) {
-	local desc = "RTMIN+{}".format({ id-rtmin });
+	local desc = f"RTMIN+{id - rtmin}";
 	kosSignoMappings[id] = (desc, desc.lower());
 }
 kosSignoMappings[rtmin] = ("RTMIN", "rtmin");

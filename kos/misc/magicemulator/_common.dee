@@ -323,7 +323,7 @@ class TraceController {
 @@>> //       the ~-stream (except for the initial greeting after startup)
 @@>> //       As such, we're pretty safe in using it for our own purposes!
 @@>> WriteFile(hGDBStdout, "~{!r}\n".format({
-@@>>     "Hello World (from " + GetCurrentProcessId() + ")\n"
+@@>>     f"Hello World (from {GetCurrentProcessId()})\n"
 @@>> }));
 @@>> CloseHandle(hGDB);
 @@Output written with this method will appear unfiltered in the Output window

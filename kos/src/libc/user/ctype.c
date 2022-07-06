@@ -102,7 +102,7 @@ for (local x: [-128: 255+1]) {
 		if (chk(ord))
 			flags.append(f);
 	}
-	print "\t/" "* [{}] = *" "/ {},".format({ str(x).rjust(4), flags ? " | ".join(flags) : "0" });
+	print("\t/" "* [", str(x).rjust(4), "] = *" "/ ", flags ? " | ".join(flags) : "0", ",");
 }
 ]]]*/
 	/* [-128] = */ 0,
@@ -500,7 +500,7 @@ import * from deemon;
 
 for (local x: [-128: 255+1]) {
 	local result = ASCII_TOLOWER(x);
-	print "\t/" "* [{}] = *" "/ {},".format({ str(x).rjust(4), result });
+	print("\t/" "* [", str(x).rjust(4), "] = *" "/ ", result, ",");
 }
 ]]]*/
 	/* [-128] = */ -128,
@@ -897,7 +897,7 @@ import * from deemon;
 
 for (local x: [-128: 255+1]) {
 	local result = ASCII_TOUPPER(x);
-	print "\t/" "* [{}] = *" "/ {},".format({ str(x).rjust(4), result });
+	print("\t/" "* [", str(x).rjust(4), "] = *" "/ ", result, ",");
 }
 ]]]*/
 	/* [-128] = */ -128,

@@ -89,9 +89,7 @@ function start(
 got_bios:
 	local bochs_arguments = [];
 	local kernelShadowFilename = shadow.updateKernelShadow(KERNEL, TARGET_ARCH);
-	local bxrcFilename = "{}{}.bxrc".format({
-		fs.headof(kernelShadowFilename),
-		fs.fileof(kernelShadowFilename) });
+	local bxrcFilename = "{fs.headof(kernelShadowFilename)}{fs.fileof(kernelShadowFilename)}.bxrc";
 	try fs.unlink(DISK_FILENAME + ".lock"); catch (...);
 	try fs.unlink(kernelShadowFilename + ".lock"); catch (...);
 	with (local rc = File.open(bxrcFilename, "w")) {

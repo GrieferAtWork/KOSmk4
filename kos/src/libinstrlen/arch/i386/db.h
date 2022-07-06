@@ -169,10 +169,10 @@ got_line:
 										firstByte = try int(firstByte) catch (...) none;
 										if (firstByte !is none) {
 											firstByte = r'"\x{}"'.format({ firstByte.hex()[2:] });
-											if (decl2.startswith("\""))
+											if (decl2.startswith("\"")) {
 												decl2 = firstByte[:-1] + decl2[1:];
-											else {
-												decl2 = "{} {}".format({ firstByte, decl2 });
+											} else {
+												decl2 = f"{firstByte} {decl2}";
 											}
 										}
 									}

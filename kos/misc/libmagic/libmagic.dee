@@ -138,10 +138,7 @@ function joinpath(paths...: string): string {
 @@Returns the .latest-name of `filename':
 @@> getLatestFilenameOf("/foo/bar.c"); // "/foo/.bar.c.latest"
 function getLatestFilenameOf(filename: string): string {
-	return "{}.{}.latest".format({
-		fs.headof(filename),
-		fs.tailof(filename),
-	});
+	return f"{fs.headof(filename)}.{fs.tailof(filename)}.latest";
 }
 
 
@@ -1107,13 +1104,12 @@ function executeBuildSteps(steps: {BoundStep...}, recheck: {BoundStep...}, maxPa
 		print message;
 	}
 	function printStepStatus(marker: string, step: BoundStep, message: string) {
-		printStatus(marker, "[{}] {} ({})".format({
-			step.toolchain.name !is none
+		printStatus(marker,
+			f"[{step.toolchain.name !is none
 				? f"{step.toolchain.name}:{step.group.name}"
-				: step.group.name,
-			step,
-			message
-		}));
+				: step.group.name
+			}] {step} ({message})"
+		);
 	}
 	function waitforAnyStep() {
 		assert runningSteps,

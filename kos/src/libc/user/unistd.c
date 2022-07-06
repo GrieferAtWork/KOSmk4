@@ -2422,10 +2422,10 @@ for (local id: [:idCount]) {
 			local need_undefined = false;
 			if (v in SYSCONF_VALUES_HI_INT32) {
 				need_undefined = true;
-				ppBeginIf("{} <= INT32_MAX".format({ v }));
+				ppBeginIf(f"{v} <= INT32_MAX");
 			} else if (v in SYSCONF_VALUES_LO_INT32) {
 				need_undefined = true;
-				ppBeginIf("{} > INT32_MIN".format({ v }));
+				ppBeginIf(f"{v} > INT32_MIN");
 			} else if (i != nvalues - 1) {
 				ppBeginIfDef(v);
 			} else if (endifComment) {

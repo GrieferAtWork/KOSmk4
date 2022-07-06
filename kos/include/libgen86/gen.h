@@ -1923,8 +1923,8 @@ function printInstruction(name, params) {
 	local param_names = ", ".join(params);
 	local arg_names   = ", ".join(for (local p: params) { "..." : "__VA_ARGS__" }.get(p, p));
 	for (local tname, cc: tests) {
-		local a = "gen86_{}(p_pc, {})".format({ name.format({ tname }), param_names });
-		local b = "gen86_{}(p_pc, {}, {})".format({ name.format({ "cc" }), cc, arg_names });
+		local a = f"gen86_{name.format({ tname })}(p_pc, {param_names})";
+		local b = f"gen86_{name.format({ "cc" })}(p_pc, {cc}, {arg_names})";
 		macros.append((a, b));
 	}
 }

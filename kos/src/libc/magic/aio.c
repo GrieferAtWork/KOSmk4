@@ -180,10 +180,10 @@ typedef struct sigevent sigevent_t;
  * WARNING: ONCE STARTED, YOU MUST NOT FREE THE BACKING STRUCTURE
  *          OF `struct aiocb' UNTIL `aio_error() != EINPROGRESS'!
  *
- * Until  that point, the address of structure itself may be used
- * internally as part of linked lists which will become corrupted
- * if one of their elements isn't properly removed prior to being
- * deallocated.
+ * Until that point, the address of the structure itself may be
+ * used internally as  part of linked  lists which will  become
+ * corrupted if one  of their elements  isn't properly  removed
+ * prior to being free'd.
  */
 
 
@@ -215,7 +215,7 @@ int aio_write([[nonnull]] struct aiocb *self);
 
 
 @@>> aio_fsync(3), aio_fsync64(3)
-@@Begin an async `fsync(2)' operation:
+@@Begin an async `fsync(2)' or `fdatasync(2)' operation:
 @@>> if (operation == O_SYNC) {
 @@>>     fsync(self->aio_fildes);
 @@>> } else if (operation == O_DSYNC) {

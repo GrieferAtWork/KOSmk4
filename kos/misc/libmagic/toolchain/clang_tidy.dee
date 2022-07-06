@@ -275,9 +275,9 @@ function createClangTidyProcess(
 		"-undef",
 		"-nostdinc",
 		"-mno-ms-bitfields",
-		"-isystem", "kos/include/{}-kos".format({
+		"-isystem", f"kos/include/{
 			{ "x86_64" : "i386" }.get(TARGET, TARGET)
-		}),
+		}-kos",
 		"-isystem", "kos/include",
 		"-D__KOS__",
 		"-D__ELF__",

@@ -835,7 +835,7 @@ for (local field, add, flags: ops) {
 	print("	/" "* ", field, " (", add ? "addend" : "remove", ")", " *" "/");
 	print("@@pp_if "),;
 	print(" || ".join(for (local f: flags) "defined(__" + f + ")"), "@@");
-	local head = "termios_p->@{}@ {}(" .format({ field, add ? "|= " : "&= ~" });
+	local head = f"termios_p->@{field}@ {add ? "|= " : "&= ~"}(";
 	print("	", head, "0");
 	head = " " * #head;
 	for (local f: flags) {
