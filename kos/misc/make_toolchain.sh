@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Add support (and automatically do) mmap(2) files"
-DEEMON_VERSION="a1c50d67c787e3e4da703c4c013535eb3525eb7f"
+#     v -- "Fix a problem with `TPPLexerPosition'"
+DEEMON_VERSION="b6385671d3c8da83d3e2d258fe255822921ca86f"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 

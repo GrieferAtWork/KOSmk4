@@ -3142,7 +3142,7 @@ function main(archNames: {string...}) {
 			"include/{name}/bits/syscalls{suffix}.h"
 		), (fp: File) -> {
 			generateBitsSyscallsHeader(fp, c, a, sanitizeIncludeGuard(
-				f"_{a.platformName}_BITS_SYSCALLS{a.platformSuffix}_H");
+				f"_{a.platformName}_BITS_SYSCALLS{a.platformSuffix}_H"));
 		});
 	}
 	writeHashedFile("include/bits/syscalls.h", (fp: File) -> {
