@@ -136,11 +136,11 @@
  * `-fnon-call-exceptions' is disabled  (NCX --  NonCallExceptions)
  * This applies to a huge  set of functions, including  practically
  * everything from <string.h>, as well as a lot of other functions.
- *     So many as a matter of fact, that it is the default nothrow-mode
- *     used  by   magic  headers   created  by   `generated_header.dee'
+ *     So many as a matter of fact, that it is the default nothrow-
+ *     mode used by magic headers created by `generated_header.dee'
  * Basically, anything that is designed to interact with user-provided
- * memory  buffers applies  for this, as  the user may  have defined a
- * signal handler to throw an  exception upon `SIGSEGV', or the  like.
+ * memory buffers qualifies for this, as  the user may have defined  a
+ * signal handler to throw an exception upon `SIGSEGV', or the like.
  * Or alternatively, has KOS kernel exceptions enabled (s.a. <kos/except-handler.h>) */
 #if (!defined(__NO_NON_CALL_EXCEPTIONS) || \
      (defined(__NON_CALL_EXCEPTIONS) && (__NON_CALL_EXCEPTIONS + 0) != 0) || \

@@ -88,7 +88,7 @@ function parseCurrentVsConfiguration(filename: string): (string,string) {
 			}
 		}
 		config =
-			f"{optimize ? "O" : "n"}"
+			f"{optimize ? "O" : "nO"}"
 			f"{debug ? "D" : "nD"}";
 		return (target, config);
 	}
