@@ -211,11 +211,9 @@ again:
 		if (!libdi_debuginfo_cu_parser_loadattr_compile_unit(self, &cu))
 			goto err_corrupt;
 		if (!assume_correct_cu) {
-			error = libdi_debuginfo_ranges_contains(&cu.cu_ranges, self,
-			                                        cu.cu_ranges.r_startpc,
-			                                        module_relative_pc,
-			                                        sections->ds_debug_ranges_start,
-			                                        sections->ds_debug_ranges_end);
+			error = libdi_debuginfo_rnglists_contains(&cu.cu_ranges, self,
+			                                        cu.cu_ranges.r_startpc, module_relative_pc,
+			                                        di_addr2line_sections_as_di_rnglists_sections(sections));
 			if (error == DEBUG_INFO_ERROR_NOFRAME)
 				goto next_root;
 		}
@@ -242,13 +240,10 @@ again_cu_component:
 				subprogram_depth = self->dup_child_depth;
 
 				/* Check if the given pointer is apart of this sub-program. */
-				error = libdi_debuginfo_ranges_contains_ex(&sp.sp_ranges, self,
-				                                           cu.cu_ranges.r_startpc,
-				                                           module_relative_pc,
-				                                           sections->ds_debug_ranges_start,
-				                                           sections->ds_debug_ranges_end,
-				                                           &result->al_symstart,
-				                                           &result->al_symend);
+				error = libdi_debuginfo_rnglists_contains_ex(&sp.sp_ranges, self,
+				                                           cu.cu_ranges.r_startpc, module_relative_pc,
+				                                           di_addr2line_sections_as_di_rnglists_sections(sections),
+				                                           &result->al_symstart, &result->al_symend);
 				if (error != DEBUG_INFO_ERROR_SUCCESS) {
 					/* Must be apart of a different sub-program. */
 					for (;;) {
@@ -359,11 +354,10 @@ fill_result_sp_any_cu:
 						if (!libdi_debuginfo_cu_parser_loadattr_inlined_subroutine(self, &is))
 							break;
 						/* Check if our PC is apart of the inline-function's body. */
-						error = libdi_debuginfo_ranges_contains_ex(&is.is_ranges, self,
+						error = libdi_debuginfo_rnglists_contains_ex(&is.is_ranges, self,
 						                                           cu.cu_ranges.r_startpc,
 						                                           module_relative_pc,
-						                                           sections->ds_debug_ranges_start,
-						                                           sections->ds_debug_ranges_end,
+						                                           di_addr2line_sections_as_di_rnglists_sections(sections),
 						                                           &innermost_inline_symstart,
 						                                           &innermost_inline_symend);
 						if (error == DEBUG_INFO_ERROR_SUCCESS) {
@@ -438,11 +432,10 @@ fill_result_sp_any_cu:
 						if (!libdi_debuginfo_cu_parser_loadattr_inlined_subroutine(self, &is))
 							break;
 						/* Check if our PC is apart of the inline-function's body. */
-						error = libdi_debuginfo_ranges_contains_ex(&is.is_ranges, self,
+						error = libdi_debuginfo_rnglists_contains_ex(&is.is_ranges, self,
 						                                           cu.cu_ranges.r_startpc,
 						                                           module_relative_pc,
-						                                           sections->ds_debug_ranges_start,
-						                                           sections->ds_debug_ranges_end,
+						                                           di_addr2line_sections_as_di_rnglists_sections(sections),
 						                                           &result->al_linestart,
 						                                           &result->al_lineend);
 						if (error == DEBUG_INFO_ERROR_SUCCESS) {
@@ -623,6 +616,8 @@ err_nodata:
 		cu_sections.cps_debug_abbrev_end     = sections->ds_debug_abbrev_end;
 		cu_sections.cps_debug_info_start     = sections->ds_debug_info_start;
 		cu_sections.cps_debug_info_end       = sections->ds_debug_info_end;
+		cu_sections.cps_debug_loclists_start = NULL;
+		cu_sections.cps_debug_loclists_end   = NULL;
 		cu_sections.cps_debug_loc_start      = NULL;
 		cu_sections.cps_debug_loc_end        = NULL;
 		cu_sections.cps_debug_str_start      = sections->ds_debug_str_start;
@@ -812,6 +807,7 @@ INTERN_CONST STRINGSECTION char const secname_debug_abbrev[]   = ".debug_abbrev"
 INTERN_CONST STRINGSECTION char const secname_debug_aranges[]  = ".debug_aranges";
 INTERN_CONST STRINGSECTION char const secname_debug_str[]      = ".debug_str";
 INTERN_CONST STRINGSECTION char const secname_debug_line_str[] = ".debug_line_str";
+INTERN_CONST STRINGSECTION char const secname_debug_rnglists[] = ".debug_rnglists";
 INTERN_CONST STRINGSECTION char const secname_debug_ranges[]   = ".debug_ranges";
 INTERN_CONST STRINGSECTION char const secname_symtab[]         = ".symtab";
 INTERN_CONST STRINGSECTION char const secname_strtab[]         = ".strtab";
@@ -848,6 +844,7 @@ set_no_extened_debug_info:
 		dl_sections->dl_debug_aranges  = NULL;
 		dl_sections->dl_debug_str      = NULL;
 		dl_sections->dl_debug_line_str = NULL;
+		dl_sections->dl_debug_rnglists = NULL;
 		dl_sections->dl_debug_ranges   = NULL;
 	} else {
 		/* Load .debug_info and .dl_debug_abbrev */
@@ -863,6 +860,7 @@ set_no_extened_debug_info:
 		dl_sections->dl_debug_aranges  = locksection(secname_debug_aranges);
 		dl_sections->dl_debug_str      = locksection(secname_debug_str);
 		dl_sections->dl_debug_line_str = locksection(secname_debug_line_str);
+		dl_sections->dl_debug_rnglists = locksection(secname_debug_rnglists);
 		dl_sections->dl_debug_ranges   = locksection(secname_debug_ranges);
 	}
 	dl_sections->dl_symtab = locksection(secname_symtab);
@@ -934,6 +932,11 @@ err_no_data:
 		             sections->ds_debug_line_str_start,
 		             sections->ds_debug_line_str_end);
 	}
+	if (dl_sections->dl_debug_rnglists) {
+		LOAD_SECTION(dl_sections->dl_debug_rnglists,
+		             sections->ds_debug_rnglists_start,
+		             sections->ds_debug_rnglists_end);
+	}
 	if (dl_sections->dl_debug_ranges) {
 		LOAD_SECTION(dl_sections->dl_debug_ranges,
 		             sections->ds_debug_ranges_start,
@@ -961,6 +964,7 @@ NOTHROW_NCX(CC libdi_debug_addr2line_sections_unlock)(di_addr2line_dl_sections_t
 	module_section_xdecref(dl_sections->dl_strtab);
 	module_section_xdecref(dl_sections->dl_symtab);
 	module_section_xdecref(dl_sections->dl_debug_ranges);
+	module_section_xdecref(dl_sections->dl_debug_rnglists);
 	module_section_xdecref(dl_sections->dl_debug_str);
 	module_section_xdecref(dl_sections->dl_debug_line_str);
 	module_section_xdecref(dl_sections->dl_debug_aranges);

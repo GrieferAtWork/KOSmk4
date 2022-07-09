@@ -633,27 +633,30 @@ typedef struct unwind_emulator_sections_struct {
 	/* NOTE: When individual sections are empty, the associated instructions become illegal
 	 * NOTE: The order of members in this struct is important!
 	 *       s.a. `Section containers & overlap' in `/kos/include/libdebuginfo/debug_info.h' */
-	__byte_t const *ues_eh_frame_hdr_start; /* [0..1][const] `.eh_frame_hdr' start (for `DW_OP_call_frame_cfa') */
-	__byte_t const *ues_eh_frame_hdr_end;   /* [0..1][const] `.eh_frame_hdr' end */
-	__byte_t const *ues_eh_frame_start;     /* [0..1][const] `.eh_frame' start (for `DW_OP_call_frame_cfa') */
-	__byte_t const *ues_eh_frame_end;       /* [0..1][const] `.eh_frame' end */
-	__byte_t const *ues_debug_frame_start;  /* [0..1][const] `.debug_frame' start (for `DW_OP_call_frame_cfa') */
-	__byte_t const *ues_debug_frame_end;    /* [0..1][const] `.debug_frame' end */
-	__byte_t const *ues_debug_addr_start;   /* [0..1][const] `.debug_addr' start (for `DW_OP_addrx' / `DW_OP_constx') */
-	__byte_t const *ues_debug_addr_end;     /* [0..1][const] `.debug_addr' end */
-	__byte_t const *ues_debug_loc_start;    /* [0..1][const] `.debug_loc' start (for `DW_OP_call2' / `DW_OP_call4') */
-	__byte_t const *ues_debug_loc_end;      /* [0..1][const] `.debug_loc' end */
-	__byte_t const *ues_debug_abbrev_start; /* [0..1][const] `.debug_abbrev' start (for `DW_OP_call2' / `DW_OP_call4') */
-	__byte_t const *ues_debug_abbrev_end;   /* [0..1][const] `.debug_abbrev' end */
-	__byte_t const *ues_debug_info_start;   /* [0..1][const] `.debug_info' start (for `DW_OP_call2' / `DW_OP_call4') */
-	__byte_t const *ues_debug_info_end;     /* [0..1][const] `.debug_info' end */
+	__byte_t const *ues_eh_frame_hdr_start;   /* [0..1][const] `.eh_frame_hdr' start (for `DW_OP_call_frame_cfa') */
+	__byte_t const *ues_eh_frame_hdr_end;     /* [0..1][const] `.eh_frame_hdr' end */
+	__byte_t const *ues_eh_frame_start;       /* [0..1][const] `.eh_frame' start (for `DW_OP_call_frame_cfa') */
+	__byte_t const *ues_eh_frame_end;         /* [0..1][const] `.eh_frame' end */
+	__byte_t const *ues_debug_frame_start;    /* [0..1][const] `.debug_frame' start (for `DW_OP_call_frame_cfa') */
+	__byte_t const *ues_debug_frame_end;      /* [0..1][const] `.debug_frame' end */
+	__byte_t const *ues_debug_addr_start;     /* [0..1][const] `.debug_addr' start (for `DW_OP_addrx' / `DW_OP_constx') */
+	__byte_t const *ues_debug_addr_end;       /* [0..1][const] `.debug_addr' end */
+	__byte_t const *ues_debug_loclists_start; /* [0..1][const] `.debug_loclists' start (for `DW_OP_call2' / `DW_OP_call4') */
+	__byte_t const *ues_debug_loclists_end;   /* [0..1][const] `.debug_loclists' end */
+	__byte_t const *ues_debug_loc_start;      /* [0..1][const] `.debug_loc' start (for `DW_OP_call2' / `DW_OP_call4') */
+	__byte_t const *ues_debug_loc_end;        /* [0..1][const] `.debug_loc' end */
+	__byte_t const *ues_debug_abbrev_start;   /* [0..1][const] `.debug_abbrev' start (for `DW_OP_call2' / `DW_OP_call4') */
+	__byte_t const *ues_debug_abbrev_end;     /* [0..1][const] `.debug_abbrev' end */
+	__byte_t const *ues_debug_info_start;     /* [0..1][const] `.debug_info' start (for `DW_OP_call2' / `DW_OP_call4') */
+	__byte_t const *ues_debug_info_end;       /* [0..1][const] `.debug_info' end */
 } unwind_emulator_sections_t;
 
 #ifndef __di_debuginfo_location_t_defined
 #define __di_debuginfo_location_t_defined
 typedef struct di_debuginfo_location_struct {
-	__byte_t const *l_expr;  /* [0..1] Pointer to a CFI expression (for use with `unwind_emulator_exec') for the pointed-to expression. */
-	__byte_t const *l_llist; /* [0..1] Pointer to a CFI location list (points into the `.debug_loc' section). */
+	__byte_t const *l_expr;   /* [0..1] Pointer to a CFI expression (for use with `unwind_emulator_exec') for the pointed-to expression. */
+	__byte_t const *l_llist4; /* [0..1] Pointer to a CFI location list (points into the `.debug_loc' section). */
+	__byte_t const *l_llist5; /* [0..1] Pointer to a CFI location list (points into the `.debug_loclists' section). */
 } di_debuginfo_location_t;
 #endif /* !__di_debuginfo_location_t_defined */
 
@@ -826,7 +829,7 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_instruction_succ)(__byte_t const *__restrict _
                                                     __uint8_t __addrsize, __uint8_t __ptrsize);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
-/* Return a pointer to a CFI expression that is applicable for `cu_base + module_relative_pc'
+/* Return a pointer to a CFI expression that is applicable for `module_relative_pc'
  * If no such expression exists, return `NULL' instead. */
 typedef __ATTR_PURE_T __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 5)) __byte_t *
 __NOTHROW_NCX_T(LIBUNWIND_CC *PDEBUGINFO_LOCATION_SELECT)(di_debuginfo_location_t const *__restrict __self,

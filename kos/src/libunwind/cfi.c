@@ -72,6 +72,12 @@
 
 DECL_BEGIN
 
+#if __SIZEOF_POINTER__ > 4
+#define addrsize_isvalid(v) ((v) == 1 || (v) == 2 || (v) == 4 || (v) == 8)
+#else /* __SIZEOF_POINTER__ > 4 */
+#define addrsize_isvalid(v) ((v) == 1 || (v) == 2 || (v) == 4)
+#endif /* __SIZEOF_POINTER__ <= 4 */
+
 PRIVATE WUNUSED NONNULL((2)) bool
 NOTHROW(CC guarded_readb)(uint8_t *ptr, uintptr_t *__restrict result) {
 	uint8_t value;
@@ -317,6 +323,8 @@ libuw_unwind_call_function(unwind_emulator_t *__restrict self,
 	sect.cps_debug_str_end        = NULL;
 	sect.cps_debug_line_str_start = NULL;
 	sect.cps_debug_line_str_end   = NULL;
+	sect.cps_debug_loclists_start = self->ue_sectinfo->ues_debug_loclists_start;
+	sect.cps_debug_loclists_end   = self->ue_sectinfo->ues_debug_loclists_end;
 	sect.cps_debug_loc_start      = self->ue_sectinfo->ues_debug_loc_start;
 	sect.cps_debug_loc_end        = self->ue_sectinfo->ues_debug_loc_end;
 	di_error = debuginfo_cu_parser_loadunit(&di_reader, self->ue_sectinfo->ues_debug_info_end,
@@ -2014,7 +2022,7 @@ skip_1_uleb128:
 
 
 
-/* Return a pointer to a CFI expression that is applicable for `cu_base + module_relative_pc'
+/* Return a pointer to a CFI expression that is applicable for `module_relative_pc'
  * If no such expression exists, return `NULL' instead. */
 INTERN WUNUSED NONNULL((1, 5)) byte_t const *
 NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *__restrict self,
@@ -2022,72 +2030,204 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
                                                 uintptr_t module_relative_pc,
                                                 uint8_t addrsize,
                                                 size_t *__restrict pexpr_length) {
+	assert(addrsize_isvalid(addrsize));
+
 	/* Check for simple case: Only a single, universal expression is defined */
-	byte_t const *reader;
-	if (self->l_expr) {
-		reader        = self->l_expr;
-		*pexpr_length = dwarf_decode_uleb128(&reader);
-		return reader;
+	if (self->l_expr != NULL) {
+		byte_t const *iter;
+		iter          = self->l_expr;
+		*pexpr_length = dwarf_decode_uleb128(&iter);
+		return iter;
 	}
-	if (self->l_llist) {
-		/* Scan the location list for a match for `module_relative_pc' */
-		uintptr_t range_start, range_end;
-		reader = self->l_llist;
+
+	/************************************************************************/
+	/* DWARF-5                                                              */
+	/************************************************************************/
+	if (self->l_llist5 != NULL) {
+		byte_t const *default_location = NULL;
+		size_t default_location_length = 0;
+		byte_t const *iter = self->l_llist5;
 		for (;;) {
-			if (addrsize >= sizeof(uintptr_t)) {
-				range_start = UNALIGNED_GET((uintptr_t const *)reader);
-				reader += addrsize;
-				range_end = UNALIGNED_GET((uintptr_t const *)reader);
-				reader += addrsize;
+			size_t expr_length;
+			uintptr_t range_start, range_end;
+			byte_t type = *iter++; /* One of `DW_LLE_*' */
+			switch (type) {
+
+			case DW_LLE_end_of_list:
+				/* End-of-list without finding a dedicated expression -> use default (if present) */
+				*pexpr_length = default_location_length;
+				return default_location;
+
+			case DW_LLE_offset_pair:
+				range_start = dwarf_decode_uleb128(&iter);
+				range_end   = dwarf_decode_uleb128(&iter);
+				range_start += cu_base;
+				range_end   += cu_base;
+				break;
+
+			case DW_LLE_default_location:
+				default_location_length = dwarf_decode_uleb128(&iter);
+				default_location        = iter;
+				iter += default_location_length;
+				continue;
+
+			case DW_LLE_base_address:
+				switch (addrsize) {
+				case 1: cu_base = *(uint8_t const *)iter, iter += 1; break;
+				case 2: cu_base = UNALIGNED_GET16((uint16_t const *)iter), iter += 2; break;
+				case 4: cu_base = UNALIGNED_GET32((uint32_t const *)iter), iter += 4; break;
 #if __SIZEOF_POINTER__ > 4
-			} else if (addrsize >= 4) {
-				range_start = UNALIGNED_GET32((uint32_t const *)reader);
-				reader += addrsize;
-				range_end = UNALIGNED_GET32((uint32_t const *)reader);
-				reader += addrsize;
+				case 8: cu_base = UNALIGNED_GET64((uint64_t const *)iter), iter += 8; break;
 #endif /* __SIZEOF_POINTER__ > 4 */
-			} else if (addrsize >= 2) {
-				range_start = UNALIGNED_GET16((uint16_t const *)reader);
-				reader += addrsize;
-				range_end = UNALIGNED_GET16((uint16_t const *)reader);
-				reader += addrsize;
-			} else {
-				range_start = *(uint8_t const *)reader;
-				reader += addrsize;
-				range_end = *(uint8_t const *)reader;
-				reader += addrsize;
+				default: __builtin_unreachable();
+				}
+				continue;
+
+			case DW_LLE_start_end:
+				switch (addrsize) {
+
+				case 1:
+					range_start = *(uint8_t const *)iter;
+					iter += 1;
+					range_end = *(uint8_t const *)iter;
+					iter += 1;
+					break;
+
+				case 2:
+					range_start = UNALIGNED_GET16((uint16_t const *)iter);
+					iter += 2;
+					range_end = UNALIGNED_GET16((uint16_t const *)iter);
+					iter += 2;
+					break;
+
+				case 4:
+					range_start = UNALIGNED_GET32((uint32_t const *)iter);
+					iter += 4;
+					range_end = UNALIGNED_GET32((uint32_t const *)iter);
+					iter += 4;
+					break;
+
+#if __SIZEOF_POINTER__ > 4
+				case 8:
+					range_start = UNALIGNED_GET64((uint64_t const *)iter);
+					iter += 8;
+					range_end = UNALIGNED_GET64((uint64_t const *)iter);
+					iter += 8;
+					break;
+#endif /* __SIZEOF_POINTER__ > 4 */
+
+				default:
+					__builtin_unreachable();
+				}
+				break;
+
+			case DW_LLE_start_length:
+				switch (addrsize) {
+				case 1: range_start = *(uint8_t const *)iter, iter += 1; break;
+				case 2: range_start = UNALIGNED_GET16((uint16_t const *)iter), iter += 2; break;
+				case 4: range_start = UNALIGNED_GET32((uint32_t const *)iter), iter += 4; break;
+#if __SIZEOF_POINTER__ > 4
+				case 8: range_start = UNALIGNED_GET64((uint64_t const *)iter), iter += 8; break;
+#endif /* __SIZEOF_POINTER__ > 4 */
+				default: __builtin_unreachable();
+				}
+				range_end = range_start + dwarf_decode_uleb128(&iter);
+				break;
+
+			default:
+				ERROR(err);
 			}
+
+			/* Decode expression length. */
+			expr_length = dwarf_decode_uleb128(&iter);
+			TRACE("%p: RANGE(%p-%p) with %" PRIuSIZ "\n",
+			      iter, range_start, range_end, expr_length);
+			if (module_relative_pc >= range_start &&
+			    module_relative_pc < range_end) {
+				*pexpr_length = expr_length;
+				return iter; /* Found it! */
+			}
+
+			/* Skip the associated expression. */
+			iter += expr_length;
+		}
+	}
+
+	/************************************************************************/
+	/* DWARF-4                                                              */
+	/************************************************************************/
+	if (self->l_llist4 != NULL) {
+		/* Scan the location list for a match for `module_relative_pc' */
+		byte_t const *iter = self->l_llist4;
+		for (;;) {
+			uintptr_t range_start, range_end;
+			switch (addrsize) {
+
+			case 1:
+				range_start = *(uint8_t const *)iter;
+				iter += 1;
+				range_end = *(uint8_t const *)iter;
+				iter += 1;
+				break;
+
+			case 2:
+				range_start = UNALIGNED_GET16((uint16_t const *)iter);
+				iter += 2;
+				range_end = UNALIGNED_GET16((uint16_t const *)iter);
+				iter += 2;
+				break;
+
+			case 4:
+				range_start = UNALIGNED_GET32((uint32_t const *)iter);
+				iter += 4;
+				range_end = UNALIGNED_GET32((uint32_t const *)iter);
+				iter += 4;
+				break;
+
+#if __SIZEOF_POINTER__ > 4
+			case 8:
+				range_start = UNALIGNED_GET64((uint64_t const *)iter);
+				iter += 8;
+				range_end = UNALIGNED_GET64((uint64_t const *)iter);
+				iter += 8;
+				break;
+#endif /* __SIZEOF_POINTER__ > 4 */
+
+			default:
+				__builtin_unreachable();
+			}
+
 			/* Handle special entries */
 			if (range_start == (uintptr_t)-1) {
 				/* Base address selection entry! */
 				cu_base = range_end;
-				goto skip_entry;
+				goto skip_entry_4;
 			}
 			if (!range_start && !range_end)
 				break; /* Location list end entry. */
 			range_start += cu_base;
 			range_end += cu_base;
 			TRACE("%p: RANGE(%p-%p) with %" PRIu16 "\n",
-			      reader - 2 * addrsize,
-			      range_start,
-			      range_end,
-			      UNALIGNED_GET16((uint16_t const *)reader));
+			      iter + 2, range_start, range_end,
+			      UNALIGNED_GET16((uint16_t const *)iter));
 			if (module_relative_pc >= range_start &&
 			    module_relative_pc < range_end) {
-				*pexpr_length = (size_t)UNALIGNED_GET16((uint16_t const *)reader);
-				reader += 2;
-				return reader; /* Found it! */
+				*pexpr_length = (size_t)UNALIGNED_GET16((uint16_t const *)iter);
+				iter += 2;
+				return iter; /* Found it! */
 			}
 			/* Skip the associated expression. */
 			{
 				uint16_t expr_length;
-skip_entry:
-				expr_length = UNALIGNED_GET16((uint16_t const *)reader);
-				reader += 2;
-				reader += expr_length;
+skip_entry_4:
+				expr_length = UNALIGNED_GET16((uint16_t const *)iter);
+				iter += 2;
+				iter += expr_length;
 			}
 		}
 	}
+
+err:
 	*pexpr_length = 0;
 	return NULL;
 }

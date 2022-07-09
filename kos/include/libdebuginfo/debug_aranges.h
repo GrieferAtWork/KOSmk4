@@ -28,7 +28,7 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-/* NOTE: `.debug_ranges' and `.debug_aranges' may sound similar, but are 2 different sections! */
+/* NOTE: `.debug_(rnglists|ranges)' and `.debug_aranges' may sound similar, but are 2 different sections! */
 
 
 /* Scan through  the given  debug_aranges blob  for a  descriptor referring  to

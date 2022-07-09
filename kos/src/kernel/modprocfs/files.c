@@ -1132,7 +1132,7 @@ procfs_kos_kstat_printer(pformatprinter printer, void *arg,
 		".gcc_except_table", ".eh_frame", ".data", ".bss",
 		".dbg.hooks", ".shstrtab", ".debug_line", ".debug_info",
 		".debug_aranges", ".debug_abbrev", ".debug_str",
-		".debug_line_str", ".debug_ranges", ".debug_loc",
+		".debug_line_str", ".debug_rnglists", ".debug_loclists",
 	};
 	unsigned int i;
 	for (i = 0; i < COMPILER_LENOF(section_names); ++i) {

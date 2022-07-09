@@ -38,43 +38,39 @@ DECL_BEGIN
 
 /* Initialize an iterator for enumerating ranges stored within a given debug_info range selector.
  * >> uintptr_t start_pc, end_pc;
- * >> di_debuginfo_ranges_iterator_t iter;
- * >> di_debuginfo_ranges_iterator_init(&iter, ...);
- * >> while (di_debuginfo_ranges_iterator_next(&iter, &start_pc, &end_pc)) {
+ * >> di_debuginfo_rnglists_iterator_t iter;
+ * >> di_debuginfo_rnglists_iterator_init(&iter, ...);
+ * >> while (di_debuginfo_rnglists_iterator_next(&iter, &start_pc, &end_pc)) {
  * >>     ...
  * >> }
- * @param: debug_ranges_start: Starting address of the `.debug_ranges' section.
- * @param: debug_ranges_end:   End address of the `.debug_ranges' section. */
-INTDEF NONNULL((1, 2, 3, 5, 6)) void
-NOTHROW_NCX(CC libdi_debuginfo_ranges_iterator_init)(di_debuginfo_ranges_iterator_t *__restrict self,
-                                                     di_debuginfo_ranges_t const *__restrict ranges,
+ * @param: sections: Mapping for `.debug_rnglists' and `.debug_ranges' */
+INTDEF NONNULL((1, 2, 3, 5)) void
+NOTHROW_NCX(CC libdi_debuginfo_rnglists_iterator_init)(di_debuginfo_rnglists_iterator_t *__restrict self,
+                                                     di_debuginfo_rnglists_t const *__restrict ranges,
                                                      di_debuginfo_cu_parser_t const *__restrict parser,
                                                      uintptr_t cu_base,
-                                                     byte_t const *__restrict debug_ranges_start,
-                                                     byte_t const *__restrict debug_ranges_end);
+                                                     di_rnglists_sections_t const *__restrict sections);
 
 /* Yield the next range accessible through a given debug-ranges iterator. */
 INTDEF NONNULL((1, 2, 3)) bool
-NOTHROW_NCX(CC libdi_debuginfo_ranges_iterator_next)(di_debuginfo_ranges_iterator_t *__restrict self,
+NOTHROW_NCX(CC libdi_debuginfo_rnglists_iterator_next)(di_debuginfo_rnglists_iterator_t *__restrict self,
                                                      uintptr_t *__restrict pmodule_relative_start_pc,
                                                      uintptr_t *__restrict pmodule_relative_end_pc);
 
 /* Check if a given `module_relative_pc' is apart of the given range selector.
  * @param: self: The ranges object to query for `module_relative_pc' */
-INTDEF NONNULL((1, 2, 5, 6)) unsigned int
-NOTHROW_NCX(CC libdi_debuginfo_ranges_contains)(di_debuginfo_ranges_t const *__restrict self,
+INTDEF NONNULL((1, 2, 5)) unsigned int
+NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains)(di_debuginfo_rnglists_t const *__restrict self,
                                                 di_debuginfo_cu_parser_t const *__restrict parser,
                                                 uintptr_t cu_base,
                                                 uintptr_t module_relative_pc,
-                                                byte_t const *__restrict debug_ranges_start,
-                                                byte_t const *__restrict debug_ranges_end);
-INTDEF NONNULL((1, 2, 5, 6, 7, 8)) unsigned int
-NOTHROW_NCX(CC libdi_debuginfo_ranges_contains_ex)(di_debuginfo_ranges_t const *__restrict self,
+                                                di_rnglists_sections_t const *__restrict sections);
+INTDEF NONNULL((1, 2, 5, 6, 7)) unsigned int
+NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains_ex)(di_debuginfo_rnglists_t const *__restrict self,
                                                    di_debuginfo_cu_parser_t const *__restrict parser,
                                                    uintptr_t cu_base,
                                                    uintptr_t module_relative_pc,
-                                                   byte_t const *__restrict debug_ranges_start,
-                                                   byte_t const *__restrict debug_ranges_end,
+                                                   di_rnglists_sections_t const *__restrict sections,
                                                    uintptr_t *__restrict poverlap_start,
                                                    uintptr_t *__restrict poverlap_end);
 

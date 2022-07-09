@@ -48,10 +48,10 @@ INTDEF byte_t __kernel_debug_str_start[];
 INTDEF byte_t __kernel_debug_str_size[];
 INTDEF byte_t __kernel_debug_line_str_start[];
 INTDEF byte_t __kernel_debug_line_str_size[];
-INTDEF byte_t __kernel_debug_ranges_start[];
-INTDEF byte_t __kernel_debug_ranges_size[];
-INTDEF byte_t __kernel_debug_loc_start[];
-INTDEF byte_t __kernel_debug_loc_size[];
+INTDEF byte_t __kernel_debug_rnglists_start[];
+INTDEF byte_t __kernel_debug_rnglists_size[];
+INTDEF byte_t __kernel_debug_loclists_start[];
+INTDEF byte_t __kernel_debug_loclists_size[];
 INTDEF byte_t __kernel_pertask_start[];
 INTDEF byte_t __kernel_pertask_size[];
 INTDEF byte_t __kernel_permman_start[];
@@ -81,8 +81,8 @@ INTERN_SECTION(kernel_section_debug_aranges, ".debug_aranges", SHT_PROGBITS, SHF
 INTERN_SECTION(kernel_section_debug_abbrev, ".debug_abbrev", SHT_PROGBITS, SHF_ALLOC | SHF_COMPRESSED, __kernel_debug_abbrev_start, __kernel_debug_abbrev_size, 0, 0, 0)
 INTERN_SECTION(kernel_section_debug_str, ".debug_str", SHT_PROGBITS, SHF_ALLOC | SHF_COMPRESSED, __kernel_debug_str_start, __kernel_debug_str_size, 0, 0, 0)
 INTERN_SECTION(kernel_section_debug_line_str, ".debug_line_str", SHT_PROGBITS, SHF_ALLOC | SHF_COMPRESSED, __kernel_debug_line_str_start, __kernel_debug_line_str_size, 0, 0, 0)
-INTERN_SECTION(kernel_section_debug_ranges, ".debug_ranges", SHT_PROGBITS, SHF_ALLOC | SHF_COMPRESSED, __kernel_debug_ranges_start, __kernel_debug_ranges_size, 0, 0, 0)
-INTERN_SECTION(kernel_section_debug_loc, ".debug_loc", SHT_PROGBITS, SHF_ALLOC | SHF_COMPRESSED, __kernel_debug_loc_start, __kernel_debug_loc_size, 0, 0, 0)
+INTERN_SECTION(kernel_section_debug_rnglists, ".debug_rnglists", SHT_PROGBITS, SHF_ALLOC | SHF_COMPRESSED, __kernel_debug_rnglists_start, __kernel_debug_rnglists_size, 0, 0, 0)
+INTERN_SECTION(kernel_section_debug_loclists, ".debug_loclists", SHT_PROGBITS, SHF_ALLOC | SHF_COMPRESSED, __kernel_debug_loclists_start, __kernel_debug_loclists_size, 0, 0, 0)
 INTERN_SECTION(kernel_section_pertask, ".pertask", SHT_PROGBITS, SHF_ALLOC | SHF_TLS, __kernel_pertask_start, __kernel_pertask_size, 0, 0, 0)
 INTERN_SECTION(kernel_section_permman, ".permman", SHT_PROGBITS, SHF_ALLOC | SHF_TLS, __kernel_permman_start, __kernel_permman_size, 0, 0, 0)
 INTERN_SECTION(kernel_section_percpu, ".percpu", SHT_PROGBITS, SHF_ALLOC | SHF_TLS, __kernel_percpu_start, __kernel_percpu_size, 0, 0, 0)

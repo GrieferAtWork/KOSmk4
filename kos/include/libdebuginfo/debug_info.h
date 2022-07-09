@@ -37,11 +37,11 @@
 
 /* Section containers & overlap:
  *
- * unwind_emulator_sections_t: .eh_frame_hdr, .eh_frame, .debug_frame, .debug_addr, .debug_loc, .debug_abbrev, .debug_info
- * di_addr2line_sections_t:                                                                     .debug_abbrev, .debug_info, .debug_str, .debug_line_str, .debug_aranges, .debug_ranges, .debug_line, .strtab, .symtab
- * di_enum_locals_sections_t:                                          .debug_addr, .debug_loc, .debug_abbrev, .debug_info, .debug_str, .debug_line_str, .debug_aranges, .debug_ranges
- * di_debuginfo_cu_parser_sections_t:                                               .debug_loc, .debug_abbrev, .debug_info, .debug_str, .debug_line_str
- * di_string_sections_t:                                                                                                    .debug_str, .debug_line_str
+ * unwind_emulator_sections_t: .eh_frame_hdr, .eh_frame, .debug_frame, .debug_addr, .debug_loclists, .debug_loc, .debug_abbrev, .debug_info
+ * di_addr2line_sections_t:                                                                                      .debug_abbrev, .debug_info, .debug_str, .debug_line_str, .debug_aranges, .debug_rnglists, .debug_ranges, .debug_line, .strtab, .symtab
+ * di_enum_locals_sections_t:                                          .debug_addr, .debug_loclists, .debug_loc, .debug_abbrev, .debug_info, .debug_str, .debug_line_str, .debug_aranges, .debug_rnglists, .debug_ranges
+ * di_debuginfo_cu_parser_sections_t:                                               .debug_loclists, .debug_loc, .debug_abbrev, .debug_info, .debug_str, .debug_line_str
+ * di_string_sections_t:                                                                                                                     .debug_str, .debug_line_str
  */
 
 
@@ -147,6 +147,15 @@ typedef struct di_debuginfo_component_struct {
 	                                                         *        of this entry. This list is terminated by a pair (0, 0). */
 } di_debuginfo_component_t;
 
+typedef struct di_rnglists_sections_struct {
+	/* NOTE: The order of members in this struct is important!
+	 *       s.a. `Section containers & overlap' in `/kos/include/libdebuginfo/debug_info.h' */
+	__byte_t const *drs_debug_rnglists_start;  /* [0..1] `.debug_rnglists' start */
+	__byte_t const *drs_debug_rnglists_end;    /* [0..1] `.debug_rnglists' end */
+	__byte_t const *drs_debug_ranges_start;    /* [0..1] `.debug_ranges' start */
+	__byte_t const *drs_debug_ranges_end;      /* [0..1] `.debug_ranges' end */
+} di_rnglists_sections_t;
+
 typedef struct di_string_sections_struct {
 	/* NOTE: The order of members in this struct is important!
 	 *       s.a. `Section containers & overlap' in `/kos/include/libdebuginfo/debug_info.h' */
@@ -159,10 +168,9 @@ typedef struct di_string_sections_struct {
 typedef struct di_debuginfo_cu_parser_sections_struct {
 	/* NOTE: The order of members in this struct is important!
 	 *       s.a. `Section containers & overlap' in `/kos/include/libdebuginfo/debug_info.h' */
-	__byte_t const *cps_debug_loc_start;      /* [0..1][const] `.debug_loc' start
-	                                           * NOTE: When  set equal to `cps_debug_loc_end', location list expression
-	                                           *       cannot be used and will appear as though they weren't present at
-	                                           *       all. */
+	__byte_t const *cps_debug_loclists_start; /* [0..1][const] `.debug_loclists' start */
+	__byte_t const *cps_debug_loclists_end;   /* [0..1][const] `.debug_loclists' end */
+	__byte_t const *cps_debug_loc_start;      /* [0..1][const] `.debug_loc' start */
 	__byte_t const *cps_debug_loc_end;        /* [0..1][const] `.debug_loc' end */
 	__byte_t const *cps_debug_abbrev_start;   /* [1..1][const] `.debug_abbrev' start */
 	__byte_t const *cps_debug_abbrev_end;     /* [1..1][const] `.debug_abbrev' end */
@@ -240,8 +248,9 @@ typedef struct di_debuginfo_cu_parser_struct
 /* NOTE: The user-interface API for this type is exported
  *       by  `libunwind',  rather  than   `libdebuginfo'! */
 typedef struct di_debuginfo_location_struct {
-	__byte_t const *l_expr;  /* [0..1] Pointer to a CFI expression (for use with `unwind_emulator_exec') for the pointed-to expression. */
-	__byte_t const *l_llist; /* [0..1] Pointer to a CFI location list (points into the `.debug_loc' section). */
+	__byte_t const *l_expr;   /* [0..1] Pointer to a CFI expression (for use with `unwind_emulator_exec') for the pointed-to expression. */
+	__byte_t const *l_llist4; /* [0..1] Pointer to a CFI location list (points into the `.debug_loc' section). */
+	__byte_t const *l_llist5; /* [0..1] Pointer to a CFI location list (points into the `.debug_loclists' section). */
 } di_debuginfo_location_t;
 #endif /* !__di_debuginfo_location_t_defined */
 
@@ -424,93 +433,87 @@ LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBDEBUGINFO_CC de
 
 
 typedef struct {
-	__uintptr_t r_ranges_offset; /* Offset to into .debug_ranges to a list of exact ranges, or `(uintptr_t)-1' if unused. */
+	__uintptr_t r_ranges_offset; /* Offset to into `.debug_(rnglists|ranges)' to a list of exact ranges, or `(uintptr_t)-1' if unused. */
 	__uintptr_t r_startpc;       /* Starting program counter position (or `r_ranges != (uintptr_t)-1 ? 0 : (uintptr_t)-1' if unknown). */
 	__uintptr_t r_endpc;         /* Ending program counter position (or `0' if unknown). */
-} di_debuginfo_ranges_t;
+} di_debuginfo_rnglists_t;
 #define DI_DEBUGINFO_RANGES_ISSINGLERANGE(x) ((x)->r_ranges_offset == (__uintptr_t)-1)
 
 typedef struct {
-	di_debuginfo_ranges_t const *ri_ranges;   /* [1..1][const] The underlying range object. */
-	__byte_t const              *ri_pos;      /* [1..1] Current iterator position (or >= ri_end if the iterator was exhausted) */
-	__byte_t const              *ri_end;      /* [1..1][const] Iterator end position */
-	__uintptr_t                  ri_initbase; /* Initial base */
-	__uint8_t                    ri_addrsize; /* [const] Address size. */
-} di_debuginfo_ranges_iterator_t;
+	di_debuginfo_rnglists_t const *ri_ranges;   /* [1..1][const] The underlying range object. */
+	__byte_t const                *ri_pos;      /* [1..1] Current iterator position (or >= ri_end if the iterator was exhausted) */
+	__byte_t const                *ri_end;      /* [1..1][const] Iterator end position */
+	__uintptr_t                    ri_cubase;   /* Initial base */
+	__uint8_t                      ri_addrsize; /* [const] Address size. */
+	__uint8_t                      ri_isranges; /* [const] Non-zero if using the old `.debug_ranges'. */
+} di_debuginfo_rnglists_iterator_t;
 
 /* Initialize an iterator for enumerating ranges stored within a given debug_info range selector.
  * >> uintptr_t start_pc, end_pc;
- * >> di_debuginfo_ranges_iterator_t iter;
- * >> di_debuginfo_ranges_iterator_init(&iter, ...);
- * >> while (di_debuginfo_ranges_iterator_next(&iter, &start_pc, &end_pc)) {
+ * >> di_debuginfo_rnglists_iterator_t iter;
+ * >> di_debuginfo_rnglists_iterator_init(&iter, ...);
+ * >> while (di_debuginfo_rnglists_iterator_next(&iter, &start_pc, &end_pc)) {
  * >>     ...
  * >> }
- * @param: debug_ranges_start: Starting address of the `.debug_ranges' section.
- * @param: debug_ranges_end:   End address of the `.debug_ranges' section. */
-typedef __ATTR_NONNULL_T((1, 2, 3, 5, 6)) void
-__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_RANGES_ITERATOR_INIT)(di_debuginfo_ranges_iterator_t *__restrict self,
-                                                                  di_debuginfo_ranges_t const *__restrict ranges,
-                                                                  di_debuginfo_cu_parser_t const *__restrict parser,
-                                                                  __uintptr_t cu_base,
-                                                                  __byte_t const *__restrict debug_ranges_start,
-                                                                  __byte_t const *__restrict debug_ranges_end);
+ * @param: sections: Mapping for `.debug_rnglists' and `.debug_ranges' */
+typedef __ATTR_NONNULL_T((1, 2, 3, 5)) void
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_RNGLISTS_ITERATOR_INIT)(di_debuginfo_rnglists_iterator_t *__restrict self,
+                                                                    di_debuginfo_rnglists_t const *__restrict ranges,
+                                                                    di_debuginfo_cu_parser_t const *__restrict parser,
+                                                                    __uintptr_t cu_base,
+                                                                    di_rnglists_sections_t const *__restrict sections);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
-LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 3, 5, 6)) void
-__NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_ranges_iterator_init)(di_debuginfo_ranges_iterator_t *__restrict self,
-                                                              di_debuginfo_ranges_t const *__restrict ranges,
-                                                              di_debuginfo_cu_parser_t const *__restrict parser,
-                                                              __uintptr_t cu_base,
-                                                              __byte_t const *__restrict debug_ranges_start,
-                                                              __byte_t const *__restrict debug_ranges_end);
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 3, 5)) void
+__NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_rnglists_iterator_init)(di_debuginfo_rnglists_iterator_t *__restrict self,
+                                                                di_debuginfo_rnglists_t const *__restrict ranges,
+                                                                di_debuginfo_cu_parser_t const *__restrict parser,
+                                                                __uintptr_t cu_base,
+                                                                di_rnglists_sections_t const *__restrict sections);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 /* Yield the next range accessible through a given debug-ranges iterator. */
 typedef __ATTR_NONNULL_T((1, 2, 3)) __BOOL
-__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_RANGES_ITERATOR_NEXT)(di_debuginfo_ranges_iterator_t *__restrict self,
-                                                                  __uintptr_t *__restrict pmodule_relative_start_pc,
-                                                                  __uintptr_t *__restrict pmodule_relative_end_pc);
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_RNGLISTS_ITERATOR_NEXT)(di_debuginfo_rnglists_iterator_t *__restrict self,
+                                                                    __uintptr_t *__restrict pmodule_relative_start_pc,
+                                                                    __uintptr_t *__restrict pmodule_relative_end_pc);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 3)) __BOOL
-__NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_ranges_iterator_next)(di_debuginfo_ranges_iterator_t *__restrict self,
-                                                              __uintptr_t *__restrict pmodule_relative_start_pc,
-                                                              __uintptr_t *__restrict pmodule_relative_end_pc);
+__NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_rnglists_iterator_next)(di_debuginfo_rnglists_iterator_t *__restrict self,
+                                                                __uintptr_t *__restrict pmodule_relative_start_pc,
+                                                                __uintptr_t *__restrict pmodule_relative_end_pc);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 /* Check if a given `module_relative_pc' is apart of the given range selector.
  * @param: self: The ranges object to query for `module_relative_pc' */
-typedef __ATTR_NONNULL_T((1, 2, 5, 6)) unsigned int
-__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_RANGES_CONTAINS)(di_debuginfo_ranges_t const *__restrict self,
-                                                             di_debuginfo_cu_parser_t const *__restrict parser,
-                                                             __uintptr_t cu_base,
-                                                             __uintptr_t module_relative_pc,
-                                                             __byte_t const *__restrict debug_ranges_start,
-                                                             __byte_t const *__restrict debug_ranges_end);
-typedef __ATTR_NONNULL_T((1, 2, 5, 6, 7, 8)) unsigned int
-__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_RANGES_CONTAINS_EX)(di_debuginfo_ranges_t const *__restrict self,
-                                                                di_debuginfo_cu_parser_t const *__restrict parser,
-                                                                __uintptr_t cu_base,
-                                                                __uintptr_t module_relative_pc,
-                                                                __byte_t const *__restrict debug_ranges_start,
-                                                                __byte_t const *__restrict debug_ranges_end,
-                                                                __uintptr_t *__restrict poverlap_start,
-                                                                __uintptr_t *__restrict poverlap_end);
+typedef __ATTR_NONNULL_T((1, 2, 5)) unsigned int
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_RNGLISTS_CONTAINS)(di_debuginfo_rnglists_t const *__restrict self,
+                                                               di_debuginfo_cu_parser_t const *__restrict parser,
+                                                               __uintptr_t cu_base,
+                                                               __uintptr_t module_relative_pc,
+                                                               di_rnglists_sections_t const *__restrict sections);
+typedef __ATTR_NONNULL_T((1, 2, 5, 6, 7)) unsigned int
+__NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_RNGLISTS_CONTAINS_EX)(di_debuginfo_rnglists_t const *__restrict self,
+                                                                  di_debuginfo_cu_parser_t const *__restrict parser,
+                                                                  __uintptr_t cu_base,
+                                                                  __uintptr_t module_relative_pc,
+                                                                  di_rnglists_sections_t const *__restrict sections,
+                                                                  __uintptr_t *__restrict poverlap_start,
+                                                                  __uintptr_t *__restrict poverlap_end);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
-LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 5, 6)) unsigned int
-__NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_ranges_contains)(di_debuginfo_ranges_t const *__restrict self,
-                                                         di_debuginfo_cu_parser_t const *__restrict parser,
-                                                         __uintptr_t cu_base,
-                                                         __uintptr_t module_relative_pc,
-                                                         __byte_t const *__restrict debug_ranges_start,
-                                                         __byte_t const *__restrict debug_ranges_end);
-LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 5, 6, 7, 8)) unsigned int
-__NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_ranges_contains_ex)(di_debuginfo_ranges_t const *__restrict self,
-                                                            di_debuginfo_cu_parser_t const *__restrict parser,
-                                                            __uintptr_t cu_base,
-                                                            __uintptr_t module_relative_pc,
-                                                            __byte_t const *__restrict debug_ranges_start,
-                                                            __byte_t const *__restrict debug_ranges_end,
-                                                            __uintptr_t *__restrict poverlap_start,
-                                                            __uintptr_t *__restrict poverlap_end);
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 5)) unsigned int
+__NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_rnglists_contains)(di_debuginfo_rnglists_t const *__restrict self,
+                                                           di_debuginfo_cu_parser_t const *__restrict parser,
+                                                           __uintptr_t cu_base,
+                                                           __uintptr_t module_relative_pc,
+                                                           di_rnglists_sections_t const *__restrict sections);
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 5, 6, 7)) unsigned int
+__NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_rnglists_contains_ex)(di_debuginfo_rnglists_t const *__restrict self,
+                                                              di_debuginfo_cu_parser_t const *__restrict parser,
+                                                              __uintptr_t cu_base,
+                                                              __uintptr_t module_relative_pc,
+                                                              di_rnglists_sections_t const *__restrict sections,
+                                                              __uintptr_t *__restrict poverlap_start,
+                                                              __uintptr_t *__restrict poverlap_end);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 
@@ -537,7 +540,7 @@ typedef struct di_debuginfo_compile_unit_struct {
 	 * >> // Usually, these are definition components for types and the like, which
 	 * >> // are referred to by other components found previously.
 	 */
-	di_debuginfo_ranges_t cu_ranges;    /* List of debug ranges associated with addresses apart of this CU. */
+	di_debuginfo_rnglists_t cu_ranges;    /* List of debug ranges associated with addresses apart of this CU. */
 	__uintptr_t           cu_addr_base; /* Base address for `DW_OP_addrx' offsets (s.a. `DW_AT_addr_base') */
 	__uintptr_t           cu_stmt_list; /* Offset into `.debug_line' (to-be used with `debugline_loadunit')
 	                                     * to this CU's address-to-line data blob.
@@ -551,7 +554,7 @@ typedef struct di_debuginfo_compile_unit_struct {
 
 typedef struct di_debuginfo_compile_unit_simple_struct {
 	/* For `DW_TAG_compile_unit' (simplified) */
-	di_debuginfo_ranges_t cu_ranges;    /* List of debug ranges associated with addresses apart of this CU. */
+	di_debuginfo_rnglists_t cu_ranges;    /* List of debug ranges associated with addresses apart of this CU. */
 	__uintptr_t           cu_addr_base; /* Base address for `DW_OP_addrx' offsets (s.a. `DW_AT_addr_base') */
 } di_debuginfo_compile_unit_simple_t;
 
@@ -564,7 +567,7 @@ typedef struct di_debuginfo_subprogram_struct {
 	char const             *sp_name;         /* [0..1] Name of the function. */
 	char const             *sp_rawname;      /* [0..1] Raw (linkage) name of the function. */
 	di_debuginfo_location_t sp_frame_base;   /* Frame base expression. */
-	di_debuginfo_ranges_t   sp_ranges;       /* Program counter ranges. */
+	di_debuginfo_rnglists_t   sp_ranges;       /* Program counter ranges. */
 	__uintptr_t             sp_decl_file;    /* Declaring file index (used with the addr2line program pointed
 	                                          * to by the associated CU's `cu_stmt_list') (or 0 if undefined) */
 	__uintptr_t             sp_decl_line;    /* Declaring line number (or 0 if undefined) */
@@ -586,7 +589,7 @@ typedef struct di_debuginfo_inlined_subroutine_struct {
 	                                         * >>         }
 	                                         * >>     }
 	                                         * >> } */
-	di_debuginfo_ranges_t is_ranges;        /* Program counter ranges. */
+	di_debuginfo_rnglists_t is_ranges;        /* Program counter ranges. */
 	__uintptr_t           is_call_file;     /* Call source file index (used with the addr2line program pointed
 	                                         * to by the associated CU's  `cu_stmt_list') (or 0 if  undefined) */
 	__uintptr_t           is_call_line;     /* Call source line number (or 0 if undefined) */
@@ -595,7 +598,7 @@ typedef struct di_debuginfo_inlined_subroutine_struct {
 
 typedef struct di_debuginfo_lexical_block_struct {
 	/* For `DW_TAG_lexical_block' / `DW_TAG_try_block' / `DW_TAG_catch_block' */
-	di_debuginfo_ranges_t lb_ranges;        /* Program counter ranges. */
+	di_debuginfo_rnglists_t lb_ranges;        /* Program counter ranges. */
 } di_debuginfo_lexical_block_t;
 
 typedef struct di_debuginfo_type_struct {
@@ -763,6 +766,8 @@ typedef struct di_enum_locals_sections_struct {
 	__byte_t const *el_debug_addr_start;     /* [0..1] `.debug_addr' start */
 	__byte_t const *el_debug_addr_end;       /* [0..1] `.debug_addr' end */
 	/*BEGIN:compat(di_debuginfo_cu_parser_sections_t)*/
+	__byte_t const *el_debug_loclists_start; /* [0..1] `.debug_loclists' start */
+	__byte_t const *el_debug_loclists_end;   /* [0..1] `.debug_loclists' end */
 	__byte_t const *el_debug_loc_start;      /* [0..1] `.debug_loc' start */
 	__byte_t const *el_debug_loc_end;        /* [0..1] `.debug_loc' end */
 	__byte_t const *el_debug_abbrev_start;   /* [0..1] `.debug_abbrev' start */
@@ -778,12 +783,18 @@ typedef struct di_enum_locals_sections_struct {
 	/*END:compat(di_debuginfo_cu_parser_sections_t)*/
 	__byte_t const *el_debug_aranges_start;  /* [0..1] `.debug_aranges' start */
 	__byte_t const *el_debug_aranges_end;    /* [0..1] `.debug_aranges' end */
+	/*BEGIN:compat(di_rnglists_sections_t)*/
+	__byte_t const *el_debug_rnglists_start; /* [0..1] `.debug_rnglists' start */
+	__byte_t const *el_debug_rnglists_end;   /* [0..1] `.debug_rnglists' end */
 	__byte_t const *el_debug_ranges_start;   /* [0..1] `.debug_ranges' start */
 	__byte_t const *el_debug_ranges_end;     /* [0..1] `.debug_ranges' end */
+	/*END:compat(di_rnglists_sections_t)*/
 } di_enum_locals_sections_t;
 
 #define di_enum_locals_sections_as_di_debuginfo_cu_parser_sections(x) \
-	((struct di_debuginfo_cu_parser_sections_struct *)&(x)->el_debug_loc_start)
+	((struct di_debuginfo_cu_parser_sections_struct *)&(x)->el_debug_loclists_start)
+#define di_enum_locals_sections_as_di_rnglists_sections(x) \
+	((struct di_rnglists_sections_struct *)&(x)->el_debug_rnglists_start)
 
 /* Callback for `debuginfo_enum_locals()' */
 typedef __ATTR_NONNULL_T((2, 3, 4, 5, 6, 7)) __ssize_t
@@ -824,6 +835,8 @@ typedef struct di_debug_sections_struct {
 	__byte_t const *ds_debug_addr_start;     /* [0..1] `.debug_addr' start */
 	__byte_t const *ds_debug_addr_end;       /* [0..1] `.debug_addr' end */
 	/*BEGIN:compat(di_debuginfo_cu_parser_sections_t)*/
+	__byte_t const *ds_debug_loclists_start; /* [0..1] `.debug_loclists' start */
+	__byte_t const *ds_debug_loclists_end;   /* [0..1] `.debug_loclists' end */
 	__byte_t const *ds_debug_loc_start;      /* [0..1] `.debug_loc' start */
 	__byte_t const *ds_debug_loc_end;        /* [0..1] `.debug_loc' end */
 	/*BEGIN:compat(di_addr2line_sections_t)*/
@@ -841,8 +854,12 @@ typedef struct di_debug_sections_struct {
 	/*END:compat(di_debuginfo_cu_parser_sections_t)*/
 	__byte_t const *ds_debug_aranges_start;  /* [0..1] `.debug_aranges' start */
 	__byte_t const *ds_debug_aranges_end;    /* [0..1] `.debug_aranges' end */
+	/*BEGIN:compat(di_rnglists_sections_t)*/
+	__byte_t const *ds_debug_rnglists_start; /* [0..1] `.debug_rnglists' start */
+	__byte_t const *ds_debug_rnglists_end;   /* [0..1] `.debug_rnglists' end */
 	__byte_t const *ds_debug_ranges_start;   /* [0..1] `.debug_ranges' start */
 	__byte_t const *ds_debug_ranges_end;     /* [0..1] `.debug_ranges' end */
+	/*END:compat(di_rnglists_sections_t)*/
 	/*END:compat(di_enum_locals_sections_t)*/
 	__byte_t const *ds_debug_line_start;     /* [0..1] `.debug_line' start */
 	__byte_t const *ds_debug_line_end;       /* [0..1] `.debug_line' end */
@@ -857,8 +874,9 @@ typedef struct di_debug_sections_struct {
 #define di_debug_sections_as_unwind_emulator_sections(x)        ((unwind_emulator_sections_t *)&(x)->ds_eh_frame_hdr_start)
 #define di_debug_sections_as_di_string_sections(x)              ((di_string_sections_t *)&(x)->ds_debug_str_start)
 #define di_debug_sections_as_di_enum_locals_sections(x)         ((di_enum_locals_sections_t *)&(x)->ds_debug_addr_start)
-#define di_debug_sections_as_di_debuginfo_cu_parser_sections(x) ((di_debuginfo_cu_parser_sections_t *)&(x)->ds_debug_loc_start)
+#define di_debug_sections_as_di_debuginfo_cu_parser_sections(x) ((di_debuginfo_cu_parser_sections_t *)&(x)->ds_debug_loclists_start)
 #define di_debug_sections_as_di_addr2line_sections(x)           ((di_addr2line_sections_t *)&(x)->ds_debug_abbrev_start)
+#define di_debug_sections_as_di_rnglists_sections(x)            ((di_rnglists_sections_t *)&(x)->ds_debug_rnglists_start)
 #define di_debug_sections_from_di_enum_locals_sections(x)       __COMPILER_CONTAINER_OF((__byte_t const **)(x), di_debug_sections_t, ds_debug_addr_start)
 
 typedef struct di_debug_dl_sections_struct {
@@ -866,12 +884,14 @@ typedef struct di_debug_dl_sections_struct {
 	__REF module_section_t *ds_eh_frame;       /* [0..1] `.eh_frame' */
 	__REF module_section_t *ds_debug_frame;    /* [0..1] `.debug_frame' */
 	__REF module_section_t *ds_debug_addr;     /* [0..1] `.debug_addr' */
+	__REF module_section_t *ds_debug_loclists; /* [0..1] `.debug_loclists' */
 	__REF module_section_t *ds_debug_loc;      /* [0..1] `.debug_loc' */
 	__REF module_section_t *ds_debug_abbrev;   /* [0..1] `.debug_abbrev' */
 	__REF module_section_t *ds_debug_info;     /* [0..1] `.debug_info' */
 	__REF module_section_t *ds_debug_str;      /* [0..1] `.debug_str' */
 	__REF module_section_t *ds_debug_line_str; /* [0..1] `.debug_line_str' */
 	__REF module_section_t *ds_debug_aranges;  /* [0..1] `.debug_aranges' */
+	__REF module_section_t *ds_debug_rnglists; /* [0..1] `.debug_rnglists' */
 	__REF module_section_t *ds_debug_ranges;   /* [0..1] `.debug_ranges' */
 	__REF module_section_t *ds_debug_line;     /* [0..1] `.debug_line' */
 	__REF module_section_t *ds_strtab;         /* [0..1] `.strtab' / `.dynstr' */

@@ -325,8 +325,7 @@ NOTHROW(CC get_string_by_index)(char const *__restrict base, dwarf_uleb128_t ind
  *  - debug_repr_DW_ATE():   Returns the `*' portion for one of `DW_ATE_*' (iow. excluding the `DW_ATE_' prefix)
  *  - debug_repr_DW_OP():    Returns the `*' portion for one of `DW_OP_*' (iow. excluding the `DW_OP_' prefix)
  *  - debug_repr_DW_CFA():   Returns the `*' portion for one of `DW_CFA_*' (iow. excluding the `DW_CFA_' prefix)
- *  - debug_repr_DW_EH_PE(): Returns the `*' portion for one of `DW_EH_PE_*' (iow. excluding the `DW_EH_PE_' prefix)
- */
+ *  - debug_repr_DW_EH_PE(): Returns the `*' portion for one of `DW_EH_PE_*' (iow. excluding the `DW_EH_PE_' prefix) */
 INTERN REPR_TEXTSECTION ATTR_CONST WUNUSED char const *
 NOTHROW(CC libdi_debug_repr_DW_TAG)(dwarf_uleb128_t value) {
 	char const *result = NULL;
@@ -844,26 +843,28 @@ libdl_debug_repr_cfi_expression(pformatprinter printer, void *arg,
 
 /* Dump the given debug information in a human-readable format to `printer':
  * >> void *dump_module = dlgetmodule("libc");
- * >> size_t debug_info_size, debug_abbrev_size, debug_str_size, debug_line_str_size, debug_loc_size;
- * >> byte_t const *debug_info_data, *debug_abbrev_data, *debug_str_data, *debug_line_str_data, *debug_loc_data;
+ * >> size_t debug_info_size, debug_abbrev_size, debug_str_size, debug_loclists_size, debug_loc_size, debug_line_str_size;
+ * >> byte_t const *debug_info_data, *debug_abbrev_data, *debug_str_data, *debug_loclists_data, *debug_loc_data, *debug_line_str_data;
  * >> PDEBUG_REPR_DUMP debug_repr_dump;
  * >> *(void **)&debug_repr_dump = dlsym(dlopen(LIBDEBUGINFO_LIBRARY_NAME, RTLD_LOCAL), "debug_repr_dump");
  * >> debug_info_data     = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_info"), &debug_info_size);
  * >> debug_abbrev_data   = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_abbrev"), &debug_abbrev_size);
  * >> debug_str_data      = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_str"), &debug_str_size);
- * >> debug_line_str_data = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_line_str"), &debug_line_str_size);
  * >> debug_loc_data      = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_loc"), &debug_loc_size);
+ * >> debug_loclists_data = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_loclists"), &debug_loclists_size);
+ * >> debug_line_str_data = (byte_t const *)dlinflatesection(dllocksection(dump_module, ".debug_line_str"), &debug_line_str_size);
  * >> debug_repr_dump(&file_printer, stdout,
  * >>                 debug_info_data, debug_info_data + debug_info_size,
  * >>                 debug_abbrev_data, debug_abbrev_data + debug_abbrev_size,
  * >>                 debug_loc_data, debug_loc_data + debug_loc_size,
- * >>                 debug_str_data, debug_str_data + debug_str_size,
- * >>                 debug_line_str_data, debug_line_str_data + debug_line_str_size); */
+ * >>                 debug_loclists_data, debug_loclists_data + debug_loclists_size,
+ * >>                 debug_str_data, debug_str_data + debug_str_size); */
 INTERN REPR_TEXTSECTION NONNULL((1)) ssize_t CC
 libdi_debug_repr_dump(pformatprinter printer, void *arg,
                       byte_t const *debug_info_start, byte_t const *debug_info_end,
                       byte_t const *debug_abbrev_start, byte_t const *debug_abbrev_end,
                       byte_t const *debug_loc_start, byte_t const *debug_loc_end,
+                      byte_t const *debug_loclists_start, byte_t const *debug_loclists_end,
                       byte_t const *debug_str_start, byte_t const *debug_str_end,
                       byte_t const *debug_line_str_start, byte_t const *debug_line_str_end) {
 	ssize_t temp, result = 0;
@@ -879,6 +880,8 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 	cu_sections.cps_debug_info_end       = debug_info_end;
 	cu_sections.cps_debug_loc_start      = debug_loc_start;
 	cu_sections.cps_debug_loc_end        = debug_loc_end;
+	cu_sections.cps_debug_loclists_start = debug_loclists_start;
+	cu_sections.cps_debug_loclists_end   = debug_loclists_end;
 	cu_sections.cps_debug_str_start      = debug_str_start;
 	cu_sections.cps_debug_str_end        = debug_str_end;
 	cu_sections.cps_debug_line_str_start = debug_line_str_start;
@@ -1044,13 +1047,15 @@ decode_form:
 					di_debuginfo_location_t value;
 					if (!libdi_debuginfo_cu_parser_getexpr(&parser, attr.dica_form, &value))
 						goto err_bad_value;
-					assert(value.l_llist || value.l_expr);
-					assert(!(value.l_llist && value.l_expr));
+					assert((value.l_llist4 || value.l_llist5) || value.l_expr);
+					assert(!((value.l_llist4 || value.l_llist5) && value.l_expr));
 					if (value.l_expr) {
 						DO(libdl_debug_repr_cfi_expression(printer, arg, value.l_expr,
 						                                   parser.dup_child_depth + 1,
 						                                   parser.dsp_addrsize,
 						                                   parser.dsp_ptrsize));
+					} else if (value.l_llist5) {
+						/* TODO */
 					} else {
 						uintptr_t cu_base;
 						size_t indent;
@@ -1062,30 +1067,30 @@ decode_form:
 							uint16_t length;
 							uintptr_t range_start, range_end;
 							if (parser.dsp_addrsize >= sizeof(uintptr_t)) {
-								range_start = UNALIGNED_GET((uintptr_t const *)value.l_llist);
-								value.l_llist += parser.dsp_addrsize;
-								range_end = UNALIGNED_GET((uintptr_t const *)value.l_llist);
-								value.l_llist += parser.dsp_addrsize;
+								range_start = UNALIGNED_GET((uintptr_t const *)value.l_llist4);
+								value.l_llist4 += parser.dsp_addrsize;
+								range_end = UNALIGNED_GET((uintptr_t const *)value.l_llist4);
+								value.l_llist4 += parser.dsp_addrsize;
 #if __SIZEOF_POINTER__ > 4
 							} else if (parser.dsp_addrsize >= 4) {
-								range_start = UNALIGNED_GET32((uint32_t const *)value.l_llist);
-								value.l_llist += parser.dsp_addrsize;
-								range_end = UNALIGNED_GET32((uint32_t const *)value.l_llist);
-								value.l_llist += parser.dsp_addrsize;
+								range_start = UNALIGNED_GET32((uint32_t const *)value.l_llist4);
+								value.l_llist4 += parser.dsp_addrsize;
+								range_end = UNALIGNED_GET32((uint32_t const *)value.l_llist4);
+								value.l_llist4 += parser.dsp_addrsize;
 #endif /* __SIZEOF_POINTER__ > 4 */
 							} else if (parser.dsp_addrsize >= 2) {
-								range_start = UNALIGNED_GET16((uint16_t const *)value.l_llist);
-								value.l_llist += parser.dsp_addrsize;
-								range_end = UNALIGNED_GET16((uint16_t const *)value.l_llist);
-								value.l_llist += parser.dsp_addrsize;
+								range_start = UNALIGNED_GET16((uint16_t const *)value.l_llist4);
+								value.l_llist4 += parser.dsp_addrsize;
+								range_end = UNALIGNED_GET16((uint16_t const *)value.l_llist4);
+								value.l_llist4 += parser.dsp_addrsize;
 							} else {
-								range_start = *(uint8_t const *)value.l_llist;
-								value.l_llist += parser.dsp_addrsize;
-								range_end = *(uint8_t const *)value.l_llist;
-								value.l_llist += parser.dsp_addrsize;
+								range_start = *(uint8_t const *)value.l_llist4;
+								value.l_llist4 += parser.dsp_addrsize;
+								range_end = *(uint8_t const *)value.l_llist4;
+								value.l_llist4 += parser.dsp_addrsize;
 							}
-							length = UNALIGNED_GET16((uint16_t const *)value.l_llist);
-							value.l_llist += 2;
+							length = UNALIGNED_GET16((uint16_t const *)value.l_llist4);
+							value.l_llist4 += 2;
 							if (range_start == (uintptr_t)-1) {
 								/* Base address selection entry! */
 								cu_base = range_end;
@@ -1100,12 +1105,12 @@ decode_form:
 								range_end += cu_base;
 								DO(format_repeat(printer, arg, '\t', indent));
 								PRINTF("%#" PRIxPTR "-%#" PRIxPTR ": ", range_start, range_end);
-								DO(libdl_debug_repr_cfi_expression_with_length(printer, arg, value.l_llist,
+								DO(libdl_debug_repr_cfi_expression_with_length(printer, arg, value.l_llist4,
 								                                               length, indent,
 								                                               parser.dsp_addrsize,
 								                                               parser.dsp_ptrsize));
 							}
-							value.l_llist += length;
+							value.l_llist4 += length;
 						}
 						if unlikely(isfirst) {
 							PRINT("{}");

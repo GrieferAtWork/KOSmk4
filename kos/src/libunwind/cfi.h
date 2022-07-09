@@ -71,7 +71,7 @@ INTDEF ATTR_PURE WUNUSED NONNULL((1)) byte_t const *
 NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc,
                                               uint8_t addrsize, uint8_t ptrsize);
 
-/* Return a pointer to a CFI expression that is applicable for `cu_base + module_relative_pc'
+/* Return a pointer to a CFI expression that is applicable for `module_relative_pc'
  * If no such expression exists, return `NULL' instead. */
 INTDEF WUNUSED NONNULL((1, 5)) byte_t const *
 NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *__restrict self,

@@ -49,8 +49,12 @@ typedef struct di_addr2line_sections_struct {
 	/*END:compat(di_string_sections_t)*/
 	__byte_t const *ds_debug_aranges_start;  /* [0..1] `.debug_aranges' start */
 	__byte_t const *ds_debug_aranges_end;    /* [0..1] `.debug_aranges' end */
+	/*BEGIN:compat(di_rnglists_sections_t)*/
+	__byte_t const *ds_debug_rnglists_start; /* [0..1] `.debug_rnglists' start */
+	__byte_t const *ds_debug_rnglists_end;   /* [0..1] `.debug_rnglists' end */
 	__byte_t const *ds_debug_ranges_start;   /* [0..1] `.debug_ranges' start */
 	__byte_t const *ds_debug_ranges_end;     /* [0..1] `.debug_ranges' end */
+	/*END:compat(di_rnglists_sections_t)*/
 	__byte_t const *ds_debug_line_start;     /* [0..1] `.debug_line' start */
 	__byte_t const *ds_debug_line_end;       /* [0..1] `.debug_line' end */
 	__byte_t const *ds_strtab_start;         /* [0..1] `.strtab' / `.dynstr' start */
@@ -61,6 +65,8 @@ typedef struct di_addr2line_sections_struct {
 } di_addr2line_sections_t;
 #define di_addr2line_sections_as_di_string_sections(x) \
 	((di_string_sections_t *)&(x)->ds_debug_str_start)
+#define di_addr2line_sections_as_di_rnglists_sections(x) \
+	((di_rnglists_sections_t *)&(x)->ds_debug_rnglists_start)
 
 typedef struct di_addr2line_dl_sections_struct {
 	__REF module_section_t *dl_debug_abbrev;   /* [0..1] Reference to the `.debug_abbrev' section */
@@ -68,6 +74,7 @@ typedef struct di_addr2line_dl_sections_struct {
 	__REF module_section_t *dl_debug_str;      /* [0..1] Reference to the `.debug_str' section */
 	__REF module_section_t *dl_debug_line_str; /* [0..1] Reference to the `.debug_line_str' section */
 	__REF module_section_t *dl_debug_aranges;  /* [0..1] Reference to the `.debug_aranges' section */
+	__REF module_section_t *dl_debug_rnglists; /* [0..1] Reference to the `.debug_rnglists' section */
 	__REF module_section_t *dl_debug_ranges;   /* [0..1] Reference to the `.debug_ranges' section */
 	__REF module_section_t *dl_debug_line;     /* [0..1] Reference to the `.debug_line' section */
 	__REF module_section_t *dl_strtab;         /* [0..1] Reference to the `.strtab' or `.dynstr' section */

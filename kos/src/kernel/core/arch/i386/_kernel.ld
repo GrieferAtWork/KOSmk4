@@ -242,8 +242,8 @@ SECTIONS {
 	PROVIDE_HIDDEN(__kernel_debug_abbrev_end = ABSOLUTE(__kernel_debug_abbrev_start + __kernel_debug_abbrev_size));
 	PROVIDE_HIDDEN(__kernel_debug_str_end = ABSOLUTE(__kernel_debug_str_start + __kernel_debug_str_size));
 	PROVIDE_HIDDEN(__kernel_debug_line_str_end = ABSOLUTE(__kernel_debug_line_str_start + __kernel_debug_line_str_size));
-	PROVIDE_HIDDEN(__kernel_debug_ranges_end = ABSOLUTE(__kernel_debug_ranges_start + __kernel_debug_ranges_size));
-	PROVIDE_HIDDEN(__kernel_debug_loc_end = ABSOLUTE(__kernel_debug_loc_start + __kernel_debug_loc_size));
+	PROVIDE_HIDDEN(__kernel_debug_rnglists_end = ABSOLUTE(__kernel_debug_rnglists_start + __kernel_debug_rnglists_size));
+	PROVIDE_HIDDEN(__kernel_debug_loclists_end = ABSOLUTE(__kernel_debug_loclists_start + __kernel_debug_loclists_size));
 
 
 	IP_ALIGN(PAGESIZE);
@@ -648,8 +648,8 @@ SECTIONS {
 	.debug_abbrev 0 : { *(.debug_abbrev) }
 	.debug_str 0 : { *(.debug_str) }
 	.debug_line_str 0 : { *(.debug_line_str) }
-	.debug_ranges 0 : { *(.debug_ranges) }
-	.debug_loc 0 : { *(.debug_loc) }
+	.debug_rnglists 0 : { *(.debug_rnglists) }
+	.debug_loclists 0 : { *(.debug_loclists) }
 
 	/DISCARD/ : {
 		*(.rel*)

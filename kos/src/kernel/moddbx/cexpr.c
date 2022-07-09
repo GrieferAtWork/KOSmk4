@@ -966,7 +966,8 @@ NOTHROW(FCALL cexpr_cfi_to_address)(struct cvalue *__restrict self) {
 	    self->cv_kind != CVALUE_KIND_IEXPR)
 		return DBX_EOK;
 	if (!self->cv_expr.v_expr.v_expr.l_expr &&
-	    !self->cv_expr.v_expr.v_expr.l_llist) {
+	    !self->cv_expr.v_expr.v_expr.l_llist4 &&
+	    !self->cv_expr.v_expr.v_expr.l_llist5) {
 		/* Special case: We're already been given the address.
 		 *               it's `self->cv_expr.v_expr.v_objaddr' */
 		return cexpr_cfi_set_address(self, self->cv_expr.v_expr.v_objaddr);
@@ -1005,7 +1006,9 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
                                         void *buf, size_t buflen, bool write) {
 	unsigned int error;
 	TRY {
-		if (!self->v_expr.l_expr && !self->v_expr.l_llist) {
+		if (!self->v_expr.l_expr &&
+		    !self->v_expr.l_llist4 &&
+		    !self->v_expr.l_llist5) {
 			size_t copy_error;
 			copy_error = write ? dbg_writememory(self->v_objaddr, buf, buflen, cexpr_forcewrite)
 			                   : dbg_readmemory(self->v_objaddr, buf, buflen);
@@ -1409,7 +1412,10 @@ NOTHROW(FCALL cexpr_pushexpr)(struct ctyperef const *__restrict typ,
 	ctyperef_initcopy(&valp->cv_type, typ);
 	if (cexpr_typeonly) {
 		valp->cv_kind = CVALUE_KIND_VOID;
-	} else if (/*expr->v_objaddr &&*/ !expr->v_expr.l_expr && !expr->v_expr.l_llist) {
+	} else if (/*expr->v_objaddr &&*/
+	           !expr->v_expr.l_expr &&
+	           !expr->v_expr.l_llist4 &&
+	           !expr->v_expr.l_llist5) {
 		/* Special case: non-CFI object-address expression. */
 		valp->cv_kind = CVALUE_KIND_ADDR;
 		valp->cv_addr = (byte_t *)expr->v_objaddr + bufoff;

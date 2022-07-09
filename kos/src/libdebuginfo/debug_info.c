@@ -86,253 +86,57 @@ DECL_BEGIN
 
 /* Initialize an iterator for enumerating ranges stored within a given debug_info range selector.
  * >> uintptr_t start_pc, end_pc;
- * >> di_debuginfo_ranges_iterator_t iter;
- * >> di_debuginfo_ranges_iterator_init(&iter, ...);
- * >> while (di_debuginfo_ranges_iterator_next(&iter, &start_pc, &end_pc)) {
+ * >> di_debuginfo_rnglists_iterator_t iter;
+ * >> di_debuginfo_rnglists_iterator_init(&iter, ...);
+ * >> while (di_debuginfo_rnglists_iterator_next(&iter, &start_pc, &end_pc)) {
  * >>     ...
  * >> }
- * @param: debug_ranges_start: Starting address of the `.debug_ranges' section.
- * @param: debug_ranges_end:   End address of the `.debug_ranges' section. */
-INTERN NONNULL((1, 2, 3, 5, 6)) void
-NOTHROW_NCX(CC libdi_debuginfo_ranges_iterator_init)(di_debuginfo_ranges_iterator_t *__restrict self,
-                                                     di_debuginfo_ranges_t const *__restrict ranges,
+ * @param: sections: Mapping for `.debug_rnglists' and `.debug_ranges' */
+INTERN NONNULL((1, 2, 3, 5)) void
+NOTHROW_NCX(CC libdi_debuginfo_rnglists_iterator_init)(di_debuginfo_rnglists_iterator_t *__restrict self,
+                                                     di_debuginfo_rnglists_t const *__restrict ranges,
                                                      di_debuginfo_cu_parser_t const *__restrict parser,
                                                      uintptr_t cu_base,
-                                                     byte_t const *__restrict debug_ranges_start,
-                                                     byte_t const *__restrict debug_ranges_end) {
+                                                     di_rnglists_sections_t const *__restrict sections) {
 	self->ri_ranges   = ranges;
+	self->ri_cubase   = ranges->r_startpc != (uintptr_t)-1 ? ranges->r_startpc : cu_base;
 	self->ri_addrsize = parser->dsp_addrsize;
-	self->ri_initbase = ranges->r_startpc != (uintptr_t)-1 ? ranges->r_startpc : cu_base;
+	self->ri_isranges = 0;
 	if (DI_DEBUGINFO_RANGES_ISSINGLERANGE(ranges)) {
-		self->ri_pos = self->ri_end = (byte_t const *)-1;
-	} else if (ranges->r_ranges_offset >= (size_t)(debug_ranges_end - debug_ranges_start)) {
-		self->ri_pos = self->ri_end = NULL;
+		self->ri_pos = (byte_t const *)-1;
+		self->ri_end = (byte_t const *)-1;
+	} else if (sections->drs_debug_rnglists_start < sections->drs_debug_rnglists_end) {
+		size_t sectsize = (size_t)(sections->drs_debug_rnglists_end -
+		                           sections->drs_debug_rnglists_start);
+		if (ranges->r_ranges_offset >= sectsize)
+			goto setup_empty_iterator;
+		self->ri_pos = sections->drs_debug_rnglists_start + ranges->r_ranges_offset;
+		self->ri_end = sections->drs_debug_rnglists_end;
+	} else if (sections->drs_debug_ranges_start < sections->drs_debug_ranges_end) {
+		size_t sectsize = (size_t)(sections->drs_debug_ranges_end -
+		                           sections->drs_debug_ranges_start);
+		if (ranges->r_ranges_offset >= sectsize)
+			goto setup_empty_iterator;
+		self->ri_pos = sections->drs_debug_ranges_start + ranges->r_ranges_offset;
+		self->ri_end = sections->drs_debug_ranges_end;
+		self->ri_isranges = 1; /* Using old `.debug_ranges' */
 	} else {
-		self->ri_pos = debug_ranges_start + ranges->r_ranges_offset;
-		self->ri_end = debug_ranges_end;
+setup_empty_iterator:
+		self->ri_pos = NULL;
+		self->ri_end = NULL;
 	}
 }
 
-/* Yield the next range accessible through a given debug-ranges iterator. */
-INTERN NONNULL((1, 2, 3)) bool
-NOTHROW_NCX(CC libdi_debuginfo_ranges_iterator_next)(di_debuginfo_ranges_iterator_t *__restrict self,
-                                                     uintptr_t *__restrict pmodule_relative_start_pc,
-                                                     uintptr_t *__restrict pmodule_relative_end_pc) {
-	uintptr_t range_start, range_end;
-again:
-	if (self->ri_pos >= self->ri_end) {
-		if (self->ri_end == (byte_t const *)-1) {
-			*pmodule_relative_start_pc = self->ri_ranges->r_startpc;
-			*pmodule_relative_end_pc   = self->ri_ranges->r_endpc;
-			self->ri_end = NULL;
-			return 1;
-		}
-		return 0;
-	}
-	switch (self->ri_addrsize) {
-	case 1:
-		range_start   = *(uint8_t const *)self->ri_pos;
-		self->ri_pos += 1;
-		range_end     = *(uint8_t const *)self->ri_pos;
-		self->ri_pos += 1;
-		break;
-	case 2:
-		range_start   = UNALIGNED_GET16((uint16_t const *)self->ri_pos);
-		self->ri_pos += 2;
-		range_end     = UNALIGNED_GET16((uint16_t const *)self->ri_pos);
-		self->ri_pos += 2;
-		break;
-	case 4:
-		range_start   = UNALIGNED_GET32((uint32_t const *)self->ri_pos);
-		self->ri_pos += 4;
-		range_end     = UNALIGNED_GET32((uint32_t const *)self->ri_pos);
-		self->ri_pos += 4;
-		break;
-#if __SIZEOF_POINTER__ > 4
-	case 8:
-		range_start   = UNALIGNED_GET64((uint64_t const *)self->ri_pos);
-		self->ri_pos += 8;
-		range_end     = UNALIGNED_GET64((uint64_t const *)self->ri_pos);
-		self->ri_pos += 8;
-		break;
-#endif
-	default: __builtin_unreachable();
-	}
-	if (range_start == (uintptr_t)-1) {
-		/* Base address selection entry! */
-		self->ri_initbase = range_end;
-		goto again;
-	} else if (!range_start && !range_end) {
-		/* Range list end entry. */
-		self->ri_pos = self->ri_end;
-		return 0;
-	} else {
-		range_start += self->ri_initbase;
-		range_end   += self->ri_initbase;
-	}
-	*pmodule_relative_start_pc = range_start;
-	*pmodule_relative_end_pc   = range_end;
-	return 1;
-}
-
-
-
-/* Check if a given `module_relative_pc' is apart of the given range selector.
- * @param: self: The ranges object to query for `module_relative_pc' */
-INTERN NONNULL((1, 2, 5, 6)) unsigned int
-NOTHROW_NCX(CC libdi_debuginfo_ranges_contains)(di_debuginfo_ranges_t const *__restrict self,
-                                                di_debuginfo_cu_parser_t const *__restrict parser,
-                                                uintptr_t cu_base,
-                                                uintptr_t module_relative_pc,
-                                                byte_t const *__restrict debug_ranges_start,
-                                                byte_t const *__restrict debug_ranges_end) {
-	byte_t const *iter;
-	if (DI_DEBUGINFO_RANGES_ISSINGLERANGE(self)) {
-		return (module_relative_pc >= self->r_startpc &&
-		        module_relative_pc < self->r_endpc)
-		       ? DEBUG_INFO_ERROR_SUCCESS
-		       : DEBUG_INFO_ERROR_NOFRAME;
-	}
-	if unlikely(self->r_ranges_offset >= (size_t)(debug_ranges_end - debug_ranges_start))
-		return DEBUG_INFO_ERROR_CORRUPT;
-	if (self->r_startpc != (uintptr_t)-1)
-		cu_base = self->r_startpc;
-	iter = debug_ranges_start + self->r_ranges_offset;
-	while (iter < debug_ranges_end) {
-		uintptr_t range_start,range_end;
-		switch (parser->dsp_addrsize) {
-
-		case 1:
-			range_start = *(uint8_t const *)iter;
-			iter       += 1;
-			range_end   = *(uint8_t const *)iter;
-			iter       += 1;
-			break;
-
-		case 2:
-			range_start = UNALIGNED_GET16((uint16_t const *)iter);
-			iter       += 2;
-			range_end   = UNALIGNED_GET16((uint16_t const *)iter);
-			iter       += 2;
-			break;
-
-		case 4:
-			range_start = UNALIGNED_GET32((uint32_t const *)iter);
-			iter       += 4;
-			range_end   = UNALIGNED_GET32((uint32_t const *)iter);
-			iter       += 4;
-			break;
-
-#if __SIZEOF_POINTER__ > 4
-		case 8:
-			range_start = UNALIGNED_GET64((uint64_t const *)iter);
-			iter       += 8;
-			range_end   = UNALIGNED_GET64((uint64_t const *)iter);
-			iter       += 8;
-			break;
-#endif /* __SIZEOF_POINTER__ > 4 */
-
-		default:
-			__builtin_unreachable();
-		}
-		if (range_start == (uintptr_t)-1) {
-			/* Base address selection entry! */
-			cu_base = range_end;
-			continue;
-		} else if (!range_start && !range_end) {
-			/* Range list end entry. */
-			break;
-		} else {
-			range_start += cu_base;
-			range_end   += cu_base;
-		}
-		if (module_relative_pc >= range_start &&
-		    module_relative_pc < range_end)
-			return DEBUG_INFO_ERROR_SUCCESS;
-	}
-	return DEBUG_INFO_ERROR_NOFRAME;
-}
-
-INTERN NONNULL((1, 2, 5, 6, 7, 8)) unsigned int
-NOTHROW_NCX(CC libdi_debuginfo_ranges_contains_ex)(di_debuginfo_ranges_t const *__restrict self,
-                                                   di_debuginfo_cu_parser_t const *__restrict parser,
-                                                   uintptr_t cu_base,
-                                                   uintptr_t module_relative_pc,
-                                                   byte_t const *__restrict debug_ranges_start,
-                                                   byte_t const *__restrict debug_ranges_end,
-                                                   uintptr_t *__restrict poverlap_start,
-                                                   uintptr_t *__restrict poverlap_end) {
-	byte_t const *iter;
-	if (DI_DEBUGINFO_RANGES_ISSINGLERANGE(self)) {
-		if (module_relative_pc < self->r_startpc ||
-		    module_relative_pc >= self->r_endpc)
-			return DEBUG_INFO_ERROR_NOFRAME;
-		*poverlap_start = self->r_startpc;
-		*poverlap_end   = self->r_endpc;
-		return DEBUG_INFO_ERROR_SUCCESS;
-	}
-	if unlikely(self->r_ranges_offset >= (size_t)(debug_ranges_end - debug_ranges_start))
-		return DEBUG_INFO_ERROR_CORRUPT;
-	if (self->r_startpc != (uintptr_t)-1)
-		cu_base = self->r_startpc;
-	iter = debug_ranges_start + self->r_ranges_offset;
-	while (iter < debug_ranges_end) {
-		uintptr_t range_start,range_end;
-		switch (parser->dsp_addrsize) {
-
-		case 1:
-			range_start = *(uint8_t const *)iter;
-			iter       += 1;
-			range_end   = *(uint8_t const *)iter;
-			iter       += 1;
-			break;
-
-		case 2:
-			range_start = UNALIGNED_GET16((uint16_t const *)iter);
-			iter       += 2;
-			range_end   = UNALIGNED_GET16((uint16_t const *)iter);
-			iter       += 2;
-			break;
-
-		case 4:
-			range_start = UNALIGNED_GET32((uint32_t const *)iter);
-			iter       += 4;
-			range_end   = UNALIGNED_GET32((uint32_t const *)iter);
-			iter       += 4;
-			break;
-
-#if __SIZEOF_POINTER__ > 4
-		case 8:
-			range_start = UNALIGNED_GET64((uint64_t const *)iter);
-			iter       += 8;
-			range_end   = UNALIGNED_GET64((uint64_t const *)iter);
-			iter       += 8;
-			break;
-#endif /* __SIZEOF_POINTER__ > 4 */
-
-		default:
-			__builtin_unreachable();
-		}
-		if (range_start == (uintptr_t)-1) {
-			/* Base address selection entry! */
-			cu_base = range_end;
-			continue;
-		} else if (!range_start && !range_end) {
-			/* Range list end entry. */
-			break;
-		} else {
-			range_start += cu_base;
-			range_end   += cu_base;
-		}
-		if (module_relative_pc >= range_start &&
-		    module_relative_pc < range_end) {
-			*poverlap_start = range_start;
-			*poverlap_end   = range_end;
-			return DEBUG_INFO_ERROR_SUCCESS;
-		}
-	}
-	return DEBUG_INFO_ERROR_NOFRAME;
-}
+#ifndef __INTELLISENSE__
+DECL_END
+#define DEFINE_libdi_debuginfo_rnglists_iterator_next
+#include "debug_info-debug_ranges.c.inl"
+#define DEFINE_libdi_debuginfo_rnglists_contains
+#include "debug_info-debug_ranges.c.inl"
+#define DEFINE_libdi_debuginfo_rnglists_contains_ex
+#include "debug_info-debug_ranges.c.inl"
+DECL_BEGIN
+#endif /* !__INTELLISENSE__ */
 
 
 
@@ -1575,22 +1379,29 @@ decode_form:
 		case 8: offset = (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader); break;
 		default: __builtin_unreachable();
 		}
-		result->l_expr  = NULL;
-		result->l_llist = NULL;
-		if (self->dup_sections->cps_debug_loc_start <
-		    self->dup_sections->cps_debug_loc_end) {
-			/* Location list information was loaded by the caller. */
-			result->l_llist = self->dup_sections->cps_debug_loc_start + offset;
-			/* Check for corrupted location list offsets. */
-			if unlikely(result->l_llist >= self->dup_sections->cps_debug_loc_end)
+		result->l_expr   = NULL;
+		result->l_llist4 = NULL;
+		result->l_llist5 = NULL;
+		/* Check for DWARF-5 (and above) */
+		if (self->dup_sections->cps_debug_loclists_start < self->dup_sections->cps_debug_loclists_end) {
+			result->l_llist5 = self->dup_sections->cps_debug_loclists_start + offset;
+			if unlikely(result->l_llist5 >= self->dup_sections->cps_debug_loclists_end)
+				ERROR(err);
+			return true;
+		}
+		/* Check for DWARF-4 (and below) */
+		if (self->dup_sections->cps_debug_loc_start < self->dup_sections->cps_debug_loc_end) {
+			result->l_llist4 = self->dup_sections->cps_debug_loc_start + offset;
+			if unlikely(result->l_llist4 >= self->dup_sections->cps_debug_loc_end)
 				ERROR(err);
 			return true;
 		}
 	}	break;
 
 	case DW_FORM_exprloc:
-		result->l_expr  = reader;
-		result->l_llist = NULL;
+		result->l_expr   = reader;
+		result->l_llist4 = NULL;
+		result->l_llist5 = NULL;
 		return true;
 
 	case DW_FORM_indirect:
@@ -1810,7 +1621,8 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_subprogram)(di_debuginfo_cu_pa
 	result->sp_name                   = NULL;
 	result->sp_rawname                = NULL;
 	result->sp_frame_base.l_expr      = NULL;
-	result->sp_frame_base.l_llist     = NULL;
+	result->sp_frame_base.l_llist4    = NULL;
+	result->sp_frame_base.l_llist5    = NULL;
 	result->sp_ranges.r_ranges_offset = (uintptr_t)-1;
 	result->sp_ranges.r_startpc       = (uintptr_t)-1;
 	result->sp_ranges.r_endpc         = 0;
@@ -2313,14 +2125,15 @@ INTERN TEXTSECTION NONNULL((1, 2)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_variable)(di_debuginfo_cu_parser_t *__restrict self,
                                                             di_debuginfo_variable_t *__restrict result) {
 	di_debuginfo_component_attrib_t attr;
-	result->v_location.l_expr  = NULL;
-	result->v_location.l_llist = NULL;
-	result->v_type             = NULL;
-	result->v_name             = NULL;
-	result->v_rawname          = NULL;
-	result->v_decl_file        = 0;
-	result->v_decl_line        = 0;
-	result->v_decl_column      = 0;
+	result->v_location.l_expr   = NULL;
+	result->v_location.l_llist4 = NULL;
+	result->v_location.l_llist5 = NULL;
+	result->v_type              = NULL;
+	result->v_name              = NULL;
+	result->v_rawname           = NULL;
+	result->v_decl_file         = 0;
+	result->v_decl_line         = 0;
+	result->v_decl_column       = 0;
 	DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, self) {
 		switch (attr.dica_name) {
 
@@ -3670,11 +3483,10 @@ again:
 		if (!libdi_debuginfo_cu_parser_loadattr_compile_unit(self, &cu))
 			goto err;
 		if (!assume_correct_cu) {
-			error = libdi_debuginfo_ranges_contains(&cu.cu_ranges, self,
+			error = libdi_debuginfo_rnglists_contains(&cu.cu_ranges, self,
 			                                        cu.cu_ranges.r_startpc,
 			                                        module_relative_pc,
-			                                        sectinfo->el_debug_ranges_start,
-			                                        sectinfo->el_debug_ranges_end);
+			                                        di_enum_locals_sections_as_di_rnglists_sections(sectinfo));
 			if (error == DEBUG_INFO_ERROR_NOFRAME)
 				goto next_root;
 		}
@@ -3693,11 +3505,10 @@ again_cu_component:
 					goto err;
 				subprogram_depth = self->dup_child_depth;
 				/* Check if the given pointer is apart of this sub-program. */
-				error = libdi_debuginfo_ranges_contains(&sp.sp_ranges, self,
+				error = libdi_debuginfo_rnglists_contains(&sp.sp_ranges, self,
 				                                        cu.cu_ranges.r_startpc,
 				                                        module_relative_pc,
-				                                        sectinfo->el_debug_ranges_start,
-				                                        sectinfo->el_debug_ranges_end);
+				                                        di_enum_locals_sections_as_di_rnglists_sections(sectinfo));
 				if (error != DEBUG_INFO_ERROR_SUCCESS) {
 					/* Must be apart of a different sub-program. */
 					for (;;) {
@@ -3754,11 +3565,10 @@ again_subprogram_component:
 						di_debuginfo_lexical_block_t block;
 						if (!libdi_debuginfo_cu_parser_loadattr_lexical_block(self, &block))
 							goto err;
-						error = libdi_debuginfo_ranges_contains(&block.lb_ranges, self,
+						error = libdi_debuginfo_rnglists_contains(&block.lb_ranges, self,
 						                                        cu.cu_ranges.r_startpc,
 						                                        module_relative_pc,
-						                                        sectinfo->el_debug_ranges_start,
-						                                        sectinfo->el_debug_ranges_end);
+						                                        di_enum_locals_sections_as_di_rnglists_sections(sectinfo));
 						if (error != DEBUG_INFO_ERROR_SUCCESS) {
 							/* Must be apart of a different scope. */
 							uintptr_t block_depth;
@@ -3869,17 +3679,19 @@ done:
 }
 
 
-INTERN_CONST STRINGSECTION char const secname_eh_frame_hdr[] = ".eh_frame_hdr";
-INTERN_CONST STRINGSECTION char const secname_eh_frame[]     = ".eh_frame";
-INTERN_CONST STRINGSECTION char const secname_debug_frame[]  = ".debug_frame";
-INTERN_CONST STRINGSECTION char const secname_debug_addr[]   = ".debug_addr";
-INTERN_CONST STRINGSECTION char const secname_debug_loc[]    = ".debug_loc";
+INTERN_CONST STRINGSECTION char const secname_eh_frame_hdr[]   = ".eh_frame_hdr";
+INTERN_CONST STRINGSECTION char const secname_eh_frame[]       = ".eh_frame";
+INTERN_CONST STRINGSECTION char const secname_debug_frame[]    = ".debug_frame";
+INTERN_CONST STRINGSECTION char const secname_debug_addr[]     = ".debug_addr";
+INTERN_CONST STRINGSECTION char const secname_debug_loc[]      = ".debug_loc";
+INTERN_CONST STRINGSECTION char const secname_debug_loclists[] = ".debug_loclists";
 INTDEF char const secname_debug_line[];
 INTDEF char const secname_debug_info[];
 INTDEF char const secname_debug_abbrev[];
 INTDEF char const secname_debug_aranges[];
 INTDEF char const secname_debug_str[];
 INTDEF char const secname_debug_line_str[];
+INTDEF char const secname_debug_rnglists[];
 INTDEF char const secname_debug_ranges[];
 INTDEF char const secname_symtab[];
 INTDEF char const secname_strtab[];
@@ -3914,22 +3726,24 @@ NOTHROW_NCX(CC libdi_debug_sections_lock)(module_t *dl_handle,
 	}
 
 	/* Lock sections into memory */
-#define LOCK_SECTION(name) module_locksection_nx(dl_handle, name, MODULE_LOCKSECTION_FNORMAL)
-	dl_sections->ds_debug_frame    = LOCK_SECTION(secname_debug_frame);
-	dl_sections->ds_debug_addr     = LOCK_SECTION(secname_debug_addr);
-	dl_sections->ds_debug_loc      = LOCK_SECTION(secname_debug_loc);
-	dl_sections->ds_debug_abbrev   = LOCK_SECTION(secname_debug_abbrev);
-	dl_sections->ds_debug_info     = LOCK_SECTION(secname_debug_info);
-	dl_sections->ds_debug_str      = LOCK_SECTION(secname_debug_str);
-	dl_sections->ds_debug_line_str = LOCK_SECTION(secname_debug_line_str);
-	dl_sections->ds_debug_aranges  = LOCK_SECTION(secname_debug_aranges);
-	dl_sections->ds_debug_ranges   = LOCK_SECTION(secname_debug_ranges);
-	dl_sections->ds_debug_line     = LOCK_SECTION(secname_debug_line);
+#define locksection(name) module_locksection_nx(dl_handle, name, MODULE_LOCKSECTION_FNORMAL)
+	dl_sections->ds_debug_frame    = locksection(secname_debug_frame);
+	dl_sections->ds_debug_addr     = locksection(secname_debug_addr);
+	dl_sections->ds_debug_loclists = locksection(secname_debug_loclists);
+	dl_sections->ds_debug_loc      = locksection(secname_debug_loc);
+	dl_sections->ds_debug_abbrev   = locksection(secname_debug_abbrev);
+	dl_sections->ds_debug_info     = locksection(secname_debug_info);
+	dl_sections->ds_debug_str      = locksection(secname_debug_str);
+	dl_sections->ds_debug_line_str = locksection(secname_debug_line_str);
+	dl_sections->ds_debug_aranges  = locksection(secname_debug_aranges);
+	dl_sections->ds_debug_rnglists = locksection(secname_debug_rnglists);
+	dl_sections->ds_debug_ranges   = locksection(secname_debug_ranges);
+	dl_sections->ds_debug_line     = locksection(secname_debug_line);
 
 	/* Special handling for loading `.symtab'/`.strtab' vs. `.dynsym'/`.dynstr' */
-	dl_sections->ds_symtab = LOCK_SECTION(secname_symtab);
+	dl_sections->ds_symtab = locksection(secname_symtab);
 	if (dl_sections->ds_symtab) {
-		dl_sections->ds_strtab = LOCK_SECTION(secname_strtab);
+		dl_sections->ds_strtab = locksection(secname_strtab);
 		if unlikely(!dl_sections->ds_strtab) {
 			module_section_decref(dl_sections->ds_symtab);
 			goto try_load_dynsym;
@@ -3937,16 +3751,16 @@ NOTHROW_NCX(CC libdi_debug_sections_lock)(module_t *dl_handle,
 	} else {
 try_load_dynsym:
 		dl_sections->ds_strtab = NULL;
-		dl_sections->ds_symtab = LOCK_SECTION(secname_dynsym);
+		dl_sections->ds_symtab = locksection(secname_dynsym);
 		if (dl_sections->ds_symtab) {
-			dl_sections->ds_strtab = LOCK_SECTION(secname_dynstr);
+			dl_sections->ds_strtab = locksection(secname_dynstr);
 			if unlikely(!dl_sections->ds_strtab) {
 				module_section_decref(dl_sections->ds_symtab);
 				dl_sections->ds_symtab = NULL;
 			}
 		}
 	}
-#undef LOCK_SECTION
+#undef locksection
 	/* Bind section data */
 	if (dl_sections->ds_eh_frame_hdr) {
 		sections->ds_eh_frame_hdr_start = (byte_t const *)module_section_getaddr(dl_sections->ds_eh_frame_hdr);
@@ -3956,23 +3770,25 @@ try_load_dynsym:
 		sections->ds_eh_frame_start = (byte_t const *)module_section_getaddr(dl_sections->ds_eh_frame);
 		sections->ds_eh_frame_end   = sections->ds_eh_frame_start + module_section_getsize(dl_sections->ds_eh_frame);
 	}
-#define BIND_SECTION(sect, lv_start, lv_end)                                         \
-	if (sect) {                                                                      \
-		size_t size;                                                                 \
-		(lv_start) = (byte_t const *)module_section_getaddr_inflate_nx(sect, &size); \
-		(lv_end)   = (lv_start) + size;                                              \
+#define xbindsection(sect, lv_start, lv_end)                                          \
+	if (sect) {                                                                       \
+		size_t size;                                                                  \
+		*(lv_start) = (byte_t const *)module_section_getaddr_inflate_nx(sect, &size); \
+		*(lv_end)   = *(lv_start) + size;                                             \
 	}
-	BIND_SECTION(dl_sections->ds_debug_frame, sections->ds_debug_frame_start, sections->ds_debug_frame_end);
-	BIND_SECTION(dl_sections->ds_debug_addr, sections->ds_debug_addr_start, sections->ds_debug_addr_end);
-	BIND_SECTION(dl_sections->ds_debug_loc, sections->ds_debug_loc_start, sections->ds_debug_loc_end);
-	BIND_SECTION(dl_sections->ds_debug_abbrev, sections->ds_debug_abbrev_start, sections->ds_debug_abbrev_end);
-	BIND_SECTION(dl_sections->ds_debug_info, sections->ds_debug_info_start, sections->ds_debug_info_end);
-	BIND_SECTION(dl_sections->ds_debug_str, sections->ds_debug_str_start, sections->ds_debug_str_end);
-	BIND_SECTION(dl_sections->ds_debug_line_str, sections->ds_debug_line_str_start, sections->ds_debug_line_str_end);
-	BIND_SECTION(dl_sections->ds_debug_aranges, sections->ds_debug_aranges_start, sections->ds_debug_aranges_end);
-	BIND_SECTION(dl_sections->ds_debug_ranges, sections->ds_debug_ranges_start, sections->ds_debug_ranges_end);
-	BIND_SECTION(dl_sections->ds_debug_line, sections->ds_debug_line_start, sections->ds_debug_line_end);
-#undef BIND_SECTION
+	xbindsection(dl_sections->ds_debug_frame, &sections->ds_debug_frame_start, &sections->ds_debug_frame_end);
+	xbindsection(dl_sections->ds_debug_addr, &sections->ds_debug_addr_start, &sections->ds_debug_addr_end);
+	xbindsection(dl_sections->ds_debug_loclists, &sections->ds_debug_loclists_start, &sections->ds_debug_loclists_end);
+	xbindsection(dl_sections->ds_debug_loc, &sections->ds_debug_loc_start, &sections->ds_debug_loc_end);
+	xbindsection(dl_sections->ds_debug_abbrev, &sections->ds_debug_abbrev_start, &sections->ds_debug_abbrev_end);
+	xbindsection(dl_sections->ds_debug_info, &sections->ds_debug_info_start, &sections->ds_debug_info_end);
+	xbindsection(dl_sections->ds_debug_str, &sections->ds_debug_str_start, &sections->ds_debug_str_end);
+	xbindsection(dl_sections->ds_debug_line_str, &sections->ds_debug_line_str_start, &sections->ds_debug_line_str_end);
+	xbindsection(dl_sections->ds_debug_aranges, &sections->ds_debug_aranges_start, &sections->ds_debug_aranges_end);
+	xbindsection(dl_sections->ds_debug_rnglists, &sections->ds_debug_rnglists_start, &sections->ds_debug_rnglists_end);
+	xbindsection(dl_sections->ds_debug_ranges, &sections->ds_debug_ranges_start, &sections->ds_debug_ranges_end);
+	xbindsection(dl_sections->ds_debug_line, &sections->ds_debug_line_start, &sections->ds_debug_line_end);
+#undef xbindsection
 	/* Bind symbol/string sections. */
 	if (dl_sections->ds_symtab) {
 		size_t size;
@@ -3998,10 +3814,10 @@ NOTHROW_NCX(CC libdi_debug_sections_unlock)(di_debug_dl_sections_t *__restrict d
 
 
 #undef debuginfo_cu_parser_skipform
-DEFINE_PUBLIC_ALIAS(debuginfo_ranges_iterator_init, libdi_debuginfo_ranges_iterator_init);
-DEFINE_PUBLIC_ALIAS(debuginfo_ranges_iterator_next, libdi_debuginfo_ranges_iterator_next);
-DEFINE_PUBLIC_ALIAS(debuginfo_ranges_contains, libdi_debuginfo_ranges_contains);
-DEFINE_PUBLIC_ALIAS(debuginfo_ranges_contains_ex, libdi_debuginfo_ranges_contains_ex);
+DEFINE_PUBLIC_ALIAS(debuginfo_rnglists_iterator_init, libdi_debuginfo_rnglists_iterator_init);
+DEFINE_PUBLIC_ALIAS(debuginfo_rnglists_iterator_next, libdi_debuginfo_rnglists_iterator_next);
+DEFINE_PUBLIC_ALIAS(debuginfo_rnglists_contains, libdi_debuginfo_rnglists_contains);
+DEFINE_PUBLIC_ALIAS(debuginfo_rnglists_contains_ex, libdi_debuginfo_rnglists_contains_ex);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_abbrev_fini, libdi_debuginfo_cu_abbrev_fini);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_loadunit, libdi_debuginfo_cu_parser_loadunit);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_skipform, libdi_debuginfo_cu_parser_skipform);

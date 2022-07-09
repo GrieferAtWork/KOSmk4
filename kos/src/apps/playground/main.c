@@ -1055,17 +1055,17 @@ int main_dumpdebug(int argc, char *argv[], char *envp[]) {
 		return 1;
 	}
 	{
-		size_t debug_info_size, debug_abbrev_size, debug_str_size, debug_line_str_size, debug_loc_size;
-		byte_t const *debug_info_data, *debug_abbrev_data, *debug_str_data, *debug_line_str_data, *debug_loc_data;
+		size_t debug_info_size, debug_abbrev_size, debug_str_size, debug_line_str_size, debug_loclists_size;
+		byte_t const *debug_info_data, *debug_abbrev_data, *debug_str_data, *debug_line_str_data, *debug_loclists_data;
 		debug_info_data     = (byte_t const *)dlinflatesection(dllocksection(dlmod, ".debug_info"), &debug_info_size);
 		debug_abbrev_data   = (byte_t const *)dlinflatesection(dllocksection(dlmod, ".debug_abbrev"), &debug_abbrev_size);
 		debug_str_data      = (byte_t const *)dlinflatesection(dllocksection(dlmod, ".debug_str"), &debug_str_size);
 		debug_line_str_data = (byte_t const *)dlinflatesection(dllocksection(dlmod, ".debug_line_str"), &debug_line_str_size);
-		debug_loc_data      = (byte_t const *)dlinflatesection(dllocksection(dlmod, ".debug_loc"), &debug_loc_size);
+		debug_loclists_data = (byte_t const *)dlinflatesection(dllocksection(dlmod, ".debug_loclists"), &debug_loclists_size);
 		debug_repr_dump(&file_printer, stdout,
 		                debug_info_data, debug_info_data + debug_info_size,
 		                debug_abbrev_data, debug_abbrev_data + debug_abbrev_size,
-		                debug_loc_data, debug_loc_data + debug_loc_size,
+		                debug_loclists_data, debug_loclists_data + debug_loclists_size, NULL, NULL,
 		                debug_str_data, debug_str_data + debug_str_size,
 		                debug_line_str_data, debug_line_str_data + debug_str_size);
 	}

@@ -85,6 +85,7 @@ LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) __ssize_t
 (LIBDEBUGINFO_CC debug_repr_dump)(__pformatprinter printer, void *arg,
                                   __byte_t const *debug_info_start, __byte_t const *debug_info_end,
                                   __byte_t const *debug_abbrev_start, __byte_t const *debug_abbrev_end,
+                                  __byte_t const *debug_loclists_start, __byte_t const *debug_loclists_end,
                                   __byte_t const *debug_loc_start, __byte_t const *debug_loc_end,
                                   __byte_t const *debug_str_start, __byte_t const *debug_str_end,
                                   __byte_t const *debug_line_str_start, __byte_t const *debug_line_str_end);
@@ -94,13 +95,14 @@ PRIVATE void dump_debuginfo() {
 	size_t si, sa, sl, ss, sS;
 	di = module_section_getaddr_inflate(&kernel_section_debug_info, &si);
 	da = module_section_getaddr_inflate(&kernel_section_debug_abbrev, &sa);
-	dl = module_section_getaddr_inflate(&kernel_section_debug_loc, &sl);
+	dl = module_section_getaddr_inflate(&kernel_section_debug_loclists, &sl);
 	ds = module_section_getaddr_inflate(&kernel_section_debug_str, &ss);
 	dS = module_section_getaddr_inflate(&kernel_section_debug_line_str, &sS);
 	debug_repr_dump(&syslog_printer, SYSLOG_LEVEL_RAW,
 	                di, di + si,
 	                da, da + sa,
 	                dl, dl + sl,
+	                NULL, NULL,
 	                ds, ds + ss,
 	                dS, dS + sS);
 }
@@ -821,14 +823,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* TODO: Support for `__has_c_attribute()' in <__stdinc.h> and <compiler/generic.h> */
 
 	/* TODO: Check if we support `__STDC_WANT_IEC_60559_EXT__' in <float.h> */
-
-	/* TODO: dwarf-5 removes  `.debug_loc'  and  `.debug_ranges',  while
-	 *       replacing them with `.debug_loclists' and `.debug_rnglists'
-	 * Our libdebuginfo still references (and consumes) the former!
-	 *
-	 * Note that both of these sections only act to speed up debug info
-	 * queries, such that even though  we're currently unable to  parse
-	 * them, everything still works none-the-less! */
 
 	/* TODO: New library: `libinject'
 	 *

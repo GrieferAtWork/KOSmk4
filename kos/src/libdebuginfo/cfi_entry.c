@@ -132,6 +132,8 @@ struct cfientry_sections {
 	__byte_t const *ds_debug_addr_start;     /* [0..1][valid_if(:ce_s_debug_addr)] `.debug_addr' start */
 	__byte_t const *ds_debug_addr_end;       /* [0..1][valid_if(:ce_s_debug_addr)] `.debug_addr' end */
 	/*BEGIN:compat(di_debuginfo_cu_parser_sections_t)*/
+	__byte_t const *ds_debug_loclists_start; /* [0..1][valid_if(:ce_s_debug_loclists)] `.debug_loclists' start */
+	__byte_t const *ds_debug_loclists_end;   /* [0..1][valid_if(:ce_s_debug_loclists)] `.debug_loclists' end */
 	__byte_t const *ds_debug_loc_start;      /* [0..1][valid_if(:ce_s_debug_loc)] `.debug_loc' start */
 	__byte_t const *ds_debug_loc_end;        /* [0..1][valid_if(:ce_s_debug_loc)] `.debug_loc' end */
 	__byte_t const *ds_debug_abbrev_start;   /* [0..1][const] `.debug_abbrev' start */
@@ -148,12 +150,17 @@ struct cfientry_sections {
 	/*END:compat(di_debuginfo_cu_parser_sections_t)*/
 	__byte_t const *ds_debug_aranges_start;  /* [0..1][const] `.debug_aranges' start */
 	__byte_t const *ds_debug_aranges_end;    /* [0..1][const] `.debug_aranges' end */
+	/*BEGIN:compat(di_rnglists_sections_t)*/
+	__byte_t const *ds_debug_rnglists_start; /* [0..1][valid_if(:ce_s_debug_rnglists)] `.debug_rnglists' start */
+	__byte_t const *ds_debug_rnglists_end;   /* [0..1][valid_if(:ce_s_debug_rnglists)] `.debug_rnglists' end */
 	__byte_t const *ds_debug_ranges_start;   /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' start */
 	__byte_t const *ds_debug_ranges_end;     /* [0..1][valid_if(:ce_s_debug_ranges)] `.debug_ranges' end */
+	/*END:compat(di_rnglists_sections_t)*/
 };
-#define cfientry_sections_as_unwind_emulator_sections_t(self)        ((unwind_emulator_sections_t *)&(self)->ds_eh_frame_hdr_start)
-#define cfientry_sections_as_di_debuginfo_cu_parser_sections_t(self) ((di_debuginfo_cu_parser_sections_t *)&(self)->ds_debug_loc_start)
-#define cfientry_sections_as_di_string_sections_t(self)              ((di_string_sections_t *)&(self)->ds_debug_str_start)
+#define cfientry_sections_as_unwind_emulator_sections(self)        ((unwind_emulator_sections_t *)&(self)->ds_eh_frame_hdr_start)
+#define cfientry_sections_as_di_debuginfo_cu_parser_sections(self) ((di_debuginfo_cu_parser_sections_t *)&(self)->ds_debug_loclists_start)
+#define cfientry_sections_as_di_string_sections(self)              ((di_string_sections_t *)&(self)->ds_debug_str_start)
+#define cfientry_sections_as_di_rnglists_sections(self)            ((di_rnglists_sections_t *)&(self)->ds_debug_rnglists_start)
 
 struct cfientry {
 	unwind_getreg_t ce_regget;     /* [1..1][const]  Callback for  reading out  the value  of a register.
@@ -170,17 +177,19 @@ struct cfientry {
 	unwind_emulator_t                 *ce_emulator;              /* [1..1][const] The instruction emulator that is being used. */
 	REF module_t                      *ce_module;                /* [0..1][lock(WRITE_ONCE)] The module associated with the PC-register from `ce_unwind_regv' */
 	uintptr_t                          ce_modrelpc;              /* [valid_if(ce_module)][const] Module-relative PC-offset (of the PC-register from `ce_unwind_regv') */
-	REF module_section_t              *ce_s_eh_frame_hdr;        /* [0..1][valid_if(ce_module)] The .eh_frame_hdr section of `ce_module' */
-	REF module_section_t              *ce_s_eh_frame;            /* [0..1][valid_if(ce_module)] The .eh_frame section of `ce_module' */
-	REF module_section_t              *ce_s_debug_frame;         /* [0..1][valid_if(ce_module)] The .debug_frame section of `ce_module' */
-	REF module_section_t              *ce_s_debug_addr;          /* [0..1][valid_if(ce_module)] The .debug_addr section of `ce_module' */
-	REF module_section_t              *ce_s_debug_loc;           /* [0..1][valid_if(ce_module)] The .debug_loc section of `ce_module' */
-	REF module_section_t              *ce_s_debug_abbrev;        /* [1..1][valid_if(ce_module)][const] The .debug_abbrev section of `ce_module' */
-	REF module_section_t              *ce_s_debug_info;          /* [1..1][valid_if(ce_module)][const] The .debug_info section of `ce_module' */
-	REF module_section_t              *ce_s_debug_aranges;       /* [0..1][valid_if(ce_module)][const] The .debug_info section of `ce_module' */
-	REF module_section_t              *ce_s_debug_ranges;        /* [0..1][valid_if(ce_module)] The .debug_info section of `ce_module' */
-	struct cfientry_sections           ce_sections;              /* [valid_if(ce_module)] Mappings for relevant .debug_* sections.
-	                                                              * Note that the mapping for `cps_debug_loc_start' is loaded lazily, and on a as-needed basis. */
+	REF module_section_t              *ce_s_eh_frame_hdr;        /* [0..1][valid_if(ce_module)] The `.eh_frame_hdr' section of `ce_module' */
+	REF module_section_t              *ce_s_eh_frame;            /* [0..1][valid_if(ce_module)] The `.eh_frame' section of `ce_module' */
+	REF module_section_t              *ce_s_debug_frame;         /* [0..1][valid_if(ce_module)] The `.debug_frame' section of `ce_module' */
+	REF module_section_t              *ce_s_debug_addr;          /* [0..1][valid_if(ce_module)] The `.debug_addr' section of `ce_module' */
+	REF module_section_t              *ce_s_debug_loclists;      /* [0..1][valid_if(ce_module)] The `.debug_loclists' section of `ce_module' */
+	REF module_section_t              *ce_s_debug_loc;           /* [0..1][valid_if(ce_module)] The `.debug_loc' section of `ce_module' */
+	REF module_section_t              *ce_s_debug_abbrev;        /* [1..1][valid_if(ce_module)][const] The `.debug_abbrev' section of `ce_module' */
+	REF module_section_t              *ce_s_debug_info;          /* [1..1][valid_if(ce_module)][const] The `.debug_info' section of `ce_module' */
+	REF module_section_t              *ce_s_debug_aranges;       /* [0..1][valid_if(ce_module)][const] The `.debug_aranges' section of `ce_module' */
+	REF module_section_t              *ce_s_debug_rnglists;      /* [0..1][valid_if(ce_module)] The `.debug_rnglists' section of `ce_module' */
+	REF module_section_t              *ce_s_debug_ranges;        /* [0..1][valid_if(ce_module)] The `.debug_ranges' section of `ce_module' */
+	struct cfientry_sections           ce_sections;              /* [valid_if(ce_module)] Mappings for relevant `.debug_*' sections.
+	                                                              * Note that the mapping for `cps_debug_loclists_start' is loaded lazily, and on a as-needed basis. */
 	di_debuginfo_cu_abbrev_t           ce_abbrev;                /* [valid_if(ce_module)] Debug-info abbreviation information. */
 	di_debuginfo_cu_parser_t           ce_parser;                /* [valid_if(ce_module)] Debug-info parser. */
 	di_debuginfo_location_t            ce_subprogram_frame_base; /* [valid_if(ce_module)] Frame base expression of the sub-program containing `ce_modrelpc'. */
@@ -209,8 +218,8 @@ struct cfientry {
 	                                                                  * an entry's `ur_regno', meaning you can use bsearch
 	                                                                  * to find a specific entry within. */
 };
-#define cfientry_as_unwind_emulator_sections_t(self)        cfientry_sections_as_unwind_emulator_sections_t(&(self)->ce_sections)
-#define cfientry_as_di_debuginfo_cu_parser_sections_t(self) cfientry_sections_as_di_debuginfo_cu_parser_sections_t(&(self)->ce_sections)
+#define cfientry_as_unwind_emulator_sections_t(self)        cfientry_sections_as_unwind_emulator_sections(&(self)->ce_sections)
+#define cfientry_as_di_debuginfo_cu_parser_sections_t(self) cfientry_sections_as_di_debuginfo_cu_parser_sections(&(self)->ce_sections)
 
 #define cfientry_alloc(unwind_rega)                                        \
 	((struct cfientry *)alloca(offsetof(struct cfientry, ce_unwind_regv) + \
@@ -229,11 +238,15 @@ NOTHROW_NCX(CC cfientry_fini)(struct cfientry *__restrict self) {
 			module_section_xdecref(self->ce_s_debug_frame);
 		if (self->ce_s_debug_addr != (REF module_section_t *)-1)
 			module_section_xdecref(self->ce_s_debug_addr);
+		if (self->ce_s_debug_loclists != (REF module_section_t *)-1)
+			module_section_xdecref(self->ce_s_debug_loclists);
 		if (self->ce_s_debug_loc != (REF module_section_t *)-1)
 			module_section_xdecref(self->ce_s_debug_loc);
 		module_section_decref(self->ce_s_debug_abbrev);
 		module_section_decref(self->ce_s_debug_info);
 		module_section_xdecref(self->ce_s_debug_aranges);
+		if (self->ce_s_debug_rnglists != (REF module_section_t *)-1)
+			module_section_xdecref(self->ce_s_debug_rnglists);
 		if (self->ce_s_debug_ranges != (REF module_section_t *)-1)
 			module_section_xdecref(self->ce_s_debug_ranges);
 		module_decref(self->ce_module);
@@ -281,14 +294,16 @@ NOTHROW_NCX(LIBUNWIND_CC after_unwind_getreg)(/*struct cfientry **/ void const *
 INTDEF char const secname_debug_aranges[];
 INTDEF char const secname_debug_info[];
 INTDEF char const secname_debug_abbrev[];
+INTDEF char const secname_debug_loclists[];
 INTDEF char const secname_debug_loc[];
+INTDEF char const secname_debug_rnglists[];
 INTDEF char const secname_debug_ranges[];
 INTDEF char const secname_eh_frame_hdr[];
 INTDEF char const secname_eh_frame[];
 INTDEF char const secname_debug_frame[];
 INTDEF char const secname_debug_addr[];
 
-#define LOAD_SECTION(sect, lv_start, lv_end)                                          \
+#define bindsection(sect, lv_start, lv_end)                                           \
 	do {                                                                              \
 		size_t size;                                                                  \
 		*(lv_start) = (byte_t const *)module_section_getaddr_inflate_nx(sect, &size); \
@@ -296,11 +311,21 @@ INTDEF char const secname_debug_addr[];
 	}	__WHILE0
 
 
-/* Bind the .debug_ranges section. */
+/* Bind the .debug_(rnglists|ranges) section. */
 PRIVATE NONNULL((1)) void
-NOTHROW_NCX(CC cfientry_bind_debug_ranges)(struct cfientry *__restrict self) {
-	if (self->ce_s_debug_ranges)
+NOTHROW_NCX(CC cfientry_bind_debug_rnglists)(struct cfientry *__restrict self) {
+	if (self->ce_s_debug_rnglists || self->ce_s_debug_ranges)
 		return;
+	self->ce_s_debug_rnglists = module_locksection(self->ce_module,
+	                                               secname_debug_rnglists,
+	                                               MODULE_LOCKSECTION_FNORMAL);
+	if (self->ce_s_debug_rnglists) {
+		bindsection(self->ce_s_debug_rnglists,
+		            &self->ce_sections.ds_debug_rnglists_start,
+		            &self->ce_sections.ds_debug_rnglists_end);
+		return;
+	}
+	self->ce_s_debug_rnglists = (REF module_section_t *)-1;
 	self->ce_s_debug_ranges = module_locksection(self->ce_module,
 	                                             secname_debug_ranges,
 	                                             MODULE_LOCKSECTION_FNORMAL);
@@ -308,9 +333,9 @@ NOTHROW_NCX(CC cfientry_bind_debug_ranges)(struct cfientry *__restrict self) {
 		self->ce_s_debug_ranges = (REF module_section_t *)-1;
 		return;
 	}
-	LOAD_SECTION(self->ce_s_debug_ranges,
-	             &self->ce_sections.ds_debug_ranges_start,
-	             &self->ce_sections.ds_debug_ranges_end);
+	bindsection(self->ce_s_debug_ranges,
+	            &self->ce_sections.ds_debug_ranges_start,
+	            &self->ce_sections.ds_debug_ranges_end);
 }
 
 /* Parse attributes of `self' in order to fill in  `range'
@@ -318,7 +343,7 @@ NOTHROW_NCX(CC cfientry_bind_debug_ranges)(struct cfientry *__restrict self) {
  * @return: * : One of `DEBUG_INFO_ERROR_*' */
 PRIVATE NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC parse_attributes_for_ranges)(di_debuginfo_cu_parser_t *__restrict self,
-                                            di_debuginfo_ranges_t *__restrict range,
+                                            di_debuginfo_rnglists_t *__restrict range,
                                             di_debuginfo_location_t *pframe_base) {
 	di_debuginfo_component_attrib_t attr;
 	unsigned int error       = DEBUG_INFO_ERROR_NOFRAME;
@@ -396,12 +421,10 @@ NOTHROW_NCX(CC cfientry_locate_callsite)(struct cfientry *__restrict self,
 				if (assume_correct_cu)
 					break;
 				if (self->cr_cu.cu_ranges.r_ranges_offset != (uintptr_t)-1)
-					cfientry_bind_debug_ranges(self);
-				error = libdi_debuginfo_ranges_contains(&self->cr_cu.cu_ranges, &self->ce_parser,
-				                                        self->cr_cu.cu_ranges.r_startpc,
-				                                        self->ce_modrelpc,
-				                                        self->ce_sections.ds_debug_ranges_start,
-				                                        self->ce_sections.ds_debug_ranges_end);
+					cfientry_bind_debug_rnglists(self);
+				error = libdi_debuginfo_rnglists_contains(&self->cr_cu.cu_ranges, &self->ce_parser,
+				                                        self->cr_cu.cu_ranges.r_startpc, self->ce_modrelpc,
+				                                        cfientry_sections_as_di_rnglists_sections(&self->ce_sections));
 				if (error != DEBUG_INFO_ERROR_SUCCESS)
 					ERROR(err_function_not_found);
 				break;
@@ -422,20 +445,18 @@ NOTHROW_NCX(CC cfientry_locate_callsite)(struct cfientry *__restrict self,
 	while (self->ce_parser.dup_child_depth > cu_depth) {
 		if (self->ce_parser.dup_comp.dic_tag == DW_TAG_subprogram) {
 			/* Parse attributes of the sub-program */
-			di_debuginfo_ranges_t ranges;
-			self->ce_subprogram_frame_base.l_expr  = NULL;
-			self->ce_subprogram_frame_base.l_llist = NULL;
+			di_debuginfo_rnglists_t ranges;
+			self->ce_subprogram_frame_base.l_expr   = NULL;
+			self->ce_subprogram_frame_base.l_llist4 = NULL;
+			self->ce_subprogram_frame_base.l_llist5 = NULL;
 			error = parse_attributes_for_ranges(&self->ce_parser, &ranges,
 			                                    &self->ce_subprogram_frame_base);
 			if (error == DEBUG_INFO_ERROR_SUCCESS) {
 				/* Check if this might be the function we're looking for. */
 				if (ranges.r_ranges_offset != (uintptr_t)-1)
-					cfientry_bind_debug_ranges(self);
-				error = libdi_debuginfo_ranges_contains(&ranges, &self->ce_parser,
-				                                        ranges.r_startpc,
-				                                        self->ce_modrelpc,
-				                                        self->ce_sections.ds_debug_ranges_start,
-				                                        self->ce_sections.ds_debug_ranges_end);
+					cfientry_bind_debug_rnglists(self);
+				error = libdi_debuginfo_rnglists_contains(&ranges, &self->ce_parser, ranges.r_startpc, self->ce_modrelpc,
+				                                        cfientry_sections_as_di_rnglists_sections(&self->ce_sections));
 				if (error == DEBUG_INFO_ERROR_SUCCESS) {
 					size_t sp_element_depth;
 					/* Found the relevant containing function! */
@@ -528,26 +549,28 @@ NOTHROW_NCX(CC cfientry_loadmodule)(struct cfientry *__restrict self) {
 		goto noinfo_fail_module_debug_info;
 	self->ce_s_debug_aranges = locksection(secname_debug_aranges);
 #undef locksection
-	self->ce_s_eh_frame_hdr = NULL; /* Loaded lazily. */
-	self->ce_s_eh_frame     = NULL; /* Loaded lazily. */
-	self->ce_s_debug_frame  = NULL; /* Loaded lazily. */
-	self->ce_s_debug_addr   = NULL; /* Loaded lazily. */
-	self->ce_s_debug_loc    = NULL; /* Loaded lazily. */
-	self->ce_s_debug_ranges = NULL; /* Loaded lazily. */
+	self->ce_s_eh_frame_hdr   = NULL; /* Loaded lazily. */
+	self->ce_s_eh_frame       = NULL; /* Loaded lazily. */
+	self->ce_s_debug_frame    = NULL; /* Loaded lazily. */
+	self->ce_s_debug_addr     = NULL; /* Loaded lazily. */
+	self->ce_s_debug_loclists = NULL; /* Loaded lazily. */
+	self->ce_s_debug_loc      = NULL; /* Loaded lazily. */
+	self->ce_s_debug_rnglists = NULL; /* Loaded lazily. */
+	self->ce_s_debug_ranges   = NULL; /* Loaded lazily. */
 	bzero(&self->ce_sections, sizeof(self->ce_sections));
 
 	/* Bind sections. */
 	if (self->ce_s_debug_aranges) {
-		LOAD_SECTION(self->ce_s_debug_aranges,
-		             &self->ce_sections.ds_debug_aranges_start,
-		             &self->ce_sections.ds_debug_aranges_end);
+		bindsection(self->ce_s_debug_aranges,
+		            &self->ce_sections.ds_debug_aranges_start,
+		            &self->ce_sections.ds_debug_aranges_end);
 	}
-	LOAD_SECTION(self->ce_s_debug_abbrev,
-	             &self->ce_sections.ds_debug_abbrev_start,
-	             &self->ce_sections.ds_debug_abbrev_end);
-	LOAD_SECTION(self->ce_s_debug_info,
-	             &self->ce_sections.ds_debug_info_start,
-	             &self->ce_sections.ds_debug_info_end);
+	bindsection(self->ce_s_debug_abbrev,
+	            &self->ce_sections.ds_debug_abbrev_start,
+	            &self->ce_sections.ds_debug_abbrev_end);
+	bindsection(self->ce_s_debug_info,
+	            &self->ce_sections.ds_debug_info_start,
+	            &self->ce_sections.ds_debug_info_end);
 
 	/* Find the proper compilation-unit for `self->ce_modrelpc' */
 	{
@@ -767,48 +790,56 @@ again_runexpr:
 	    error == UNWIND_EMULATOR_NO_CFA) {
 		if (!self->ce_s_eh_frame_hdr && !self->ce_s_eh_frame &&
 		    !self->ce_s_debug_frame && !self->ce_s_debug_addr &&
-		    !self->ce_s_debug_loc) {
+		    !self->ce_s_debug_loclists && !self->ce_s_debug_loc) {
 #define locksection(name) module_locksection(self->ce_module, name, MODULE_LOCKSECTION_FNORMAL)
-			self->ce_s_eh_frame_hdr = locksection(secname_eh_frame_hdr);
-			self->ce_s_eh_frame     = locksection(secname_eh_frame);
-			self->ce_s_debug_frame  = locksection(secname_debug_frame);
-			self->ce_s_debug_addr   = locksection(secname_debug_addr);
-			self->ce_s_debug_loc    = locksection(secname_debug_loc);
+			self->ce_s_eh_frame_hdr   = locksection(secname_eh_frame_hdr);
+			self->ce_s_eh_frame       = locksection(secname_eh_frame);
+			self->ce_s_debug_frame    = locksection(secname_debug_frame);
+			self->ce_s_debug_addr     = locksection(secname_debug_addr);
+			self->ce_s_debug_loclists = locksection(secname_debug_loclists);
+			self->ce_s_debug_loc      = locksection(secname_debug_loc);
 #undef locksection
 			if (!self->ce_s_eh_frame_hdr) {
 				self->ce_s_eh_frame_hdr = (REF module_section_t *)-1;
 			} else {
-				LOAD_SECTION(self->ce_s_eh_frame_hdr,
-				             &self->ce_sections.ds_eh_frame_hdr_start,
-				             &self->ce_sections.ds_eh_frame_hdr_end);
+				bindsection(self->ce_s_eh_frame_hdr,
+				            &self->ce_sections.ds_eh_frame_hdr_start,
+				            &self->ce_sections.ds_eh_frame_hdr_end);
 			}
 			if (!self->ce_s_eh_frame) {
 				self->ce_s_eh_frame = (REF module_section_t *)-1;
 			} else {
-				LOAD_SECTION(self->ce_s_eh_frame,
-				             &self->ce_sections.ds_eh_frame_start,
-				             &self->ce_sections.ds_eh_frame_end);
+				bindsection(self->ce_s_eh_frame,
+				            &self->ce_sections.ds_eh_frame_start,
+				            &self->ce_sections.ds_eh_frame_end);
 			}
 			if (!self->ce_s_debug_frame) {
 				self->ce_s_debug_frame = (REF module_section_t *)-1;
 			} else {
-				LOAD_SECTION(self->ce_s_debug_frame,
-				             &self->ce_sections.ds_debug_frame_start,
-				             &self->ce_sections.ds_debug_frame_end);
+				bindsection(self->ce_s_debug_frame,
+				            &self->ce_sections.ds_debug_frame_start,
+				            &self->ce_sections.ds_debug_frame_end);
 			}
 			if (!self->ce_s_debug_addr) {
 				self->ce_s_debug_addr = (REF module_section_t *)-1;
 			} else {
-				LOAD_SECTION(self->ce_s_debug_addr,
-				             &self->ce_sections.ds_debug_addr_start,
-				             &self->ce_sections.ds_debug_addr_end);
+				bindsection(self->ce_s_debug_addr,
+				            &self->ce_sections.ds_debug_addr_start,
+				            &self->ce_sections.ds_debug_addr_end);
+			}
+			if (!self->ce_s_debug_loclists) {
+				self->ce_s_debug_loclists = (REF module_section_t *)-1;
+			} else {
+				bindsection(self->ce_s_debug_loclists,
+				            &self->ce_sections.ds_debug_loclists_start,
+				            &self->ce_sections.ds_debug_loclists_end);
 			}
 			if (!self->ce_s_debug_loc) {
 				self->ce_s_debug_loc = (REF module_section_t *)-1;
 			} else {
-				LOAD_SECTION(self->ce_s_debug_loc,
-				             &self->ce_sections.ds_debug_loc_start,
-				             &self->ce_sections.ds_debug_loc_end);
+				bindsection(self->ce_s_debug_loc,
+				            &self->ce_sections.ds_debug_loc_start,
+				            &self->ce_sections.ds_debug_loc_end);
 			}
 			goto again_runexpr;
 		}
@@ -870,11 +901,9 @@ NOTHROW_NCX(LIBUNWIND_CC cfi_getreg)(/*struct cfientry **/ void const *arg,
 			if (DW_IS_TAG_call_site_parameter(self->ce_parser.dup_comp.dic_tag)) {
 				di_debuginfo_component_attrib_t attr;
 				di_debuginfo_location_t location, call_site_value;
-				bool deref_result       = false;
-				location.l_expr         = NULL;
-				location.l_llist        = NULL;
-				call_site_value.l_expr  = NULL;
-				call_site_value.l_llist = NULL;
+				bool deref_result        = false;
+				bzero(&location, sizeof(location));
+				bzero(&call_site_value, sizeof(call_site_value));
 				DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &self->ce_parser) {
 					if (attr.dica_name == DW_AT_location) {
 						if unlikely(!libdi_debuginfo_cu_parser_getexpr(&self->ce_parser, attr.dica_form,

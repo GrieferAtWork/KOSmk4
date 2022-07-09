@@ -1503,7 +1503,7 @@ again:
 			size_t length;
 			if unlikely(!debuginfo_cu_parser_getexpr(&parser, attr.dica_form, &loc))
 				goto nope;
-			if (!loc.l_expr || loc.l_llist)
+			if (!loc.l_expr || (loc.l_llist4 || loc.l_llist5))
 				goto nope;
 			length = (size_t)dwarf_decode_uleb128(&loc.l_expr);
 			if (length != ((size_t)1 + parser.dsp_addrsize))
@@ -2320,10 +2320,8 @@ NOTHROW(FCALL cmodule_findunit_from_pc_fallback)(struct cmodule const *__restric
 		if (!debuginfo_cu_parser_loadattr_compile_unit_simple(&parser, &cu))
 			goto next_cu;
 		/* Check if the given `module_relative_pc' is contained by this CU. */
-		error = debuginfo_ranges_contains(&cu.cu_ranges, &parser,
-		                                  cu.cu_ranges.r_startpc, module_relative_pc,
-		                                  self->cm_sections.ds_debug_ranges_start,
-		                                  self->cm_sections.ds_debug_ranges_end);
+		error = debuginfo_rnglists_contains(&cu.cu_ranges, &parser, cu.cu_ranges.r_startpc, module_relative_pc,
+		                                  di_debug_sections_as_di_rnglists_sections(&self->cm_sections));
 		if (error == DEBUG_INFO_ERROR_SUCCESS)
 			return (struct cmodunit *)&self->cm_cuv[i]; /* Found it! */
 next_cu:
@@ -2649,7 +2647,7 @@ again:
 			size_t length;
 			if unlikely(!debuginfo_cu_parser_getexpr(parser, attr.dica_form, &loc))
 				break;
-			if (!loc.l_expr || loc.l_llist)
+			if (!loc.l_expr || (loc.l_llist4 || loc.l_llist5))
 				break;
 			length = (size_t)dwarf_decode_uleb128(&loc.l_expr);
 			if (length != ((size_t)1 + parser->dsp_addrsize))
@@ -3143,11 +3141,9 @@ again_cu_component:
 				goto generic_cu_child;
 			subprogram_depth = info->clv_parser.dup_child_depth;
 			/* Check if the given pointer is apart of this sub-program. */
-			error = debuginfo_ranges_contains(&sp.sp_ranges, &info->clv_parser,
-			                                  info->clv_cu.cu_ranges.r_startpc,
-			                                  info->clv_modrel_pc,
-			                                  info->clv_mod->cm_sections.ds_debug_ranges_start,
-			                                  info->clv_mod->cm_sections.ds_debug_ranges_end);
+			error = debuginfo_rnglists_contains(&sp.sp_ranges, &info->clv_parser,
+			                                  info->clv_cu.cu_ranges.r_startpc, info->clv_modrel_pc,
+			                                  di_debug_sections_as_di_rnglists_sections(&info->clv_mod->cm_sections));
 			if (error != DEBUG_INFO_ERROR_SUCCESS) {
 				/* Must be apart of a different sub-program. */
 				for (;;) {
@@ -3205,11 +3201,9 @@ again_subprogram_component:
 				case DW_TAG_lexical_block: {
 					di_debuginfo_lexical_block_t block;
 					if (debuginfo_cu_parser_loadattr_lexical_block(&info->clv_parser, &block)) {
-						error = debuginfo_ranges_contains(&block.lb_ranges, &info->clv_parser,
-						                                  info->clv_cu.cu_ranges.r_startpc,
-						                                  info->clv_modrel_pc,
-						                                  info->clv_mod->cm_sections.ds_debug_ranges_start,
-						                                  info->clv_mod->cm_sections.ds_debug_ranges_end);
+						error = debuginfo_rnglists_contains(&block.lb_ranges, &info->clv_parser,
+						                                  info->clv_cu.cu_ranges.r_startpc, info->clv_modrel_pc,
+						                                  di_debug_sections_as_di_rnglists_sections(&info->clv_mod->cm_sections));
 						if (error != DEBUG_INFO_ERROR_SUCCESS) {
 							/* Must be apart of a different scope. */
 							uintptr_t block_depth;
