@@ -102,6 +102,7 @@ BEGIN
 
 		/* Required for: disk file access */
 		"../modfat/*.c",
+		"../moddbx/*.c", // TODO: REMOVE ME
 
 		/* Pull in the actual kernel sources */
 		"debugger/*.c",

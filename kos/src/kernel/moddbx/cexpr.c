@@ -547,14 +547,22 @@ nope:
 	return false;
 }
 
-/* Calculate the value of the user-space `DlModule' for `self' */
-PRIVATE NONNULL((1, 2)) bool
-NOTHROW(FCALL module_get_libdl_DlModule_address)(struct module *__restrict self,
-                                                 struct libdl_dlmodule **__restrict presult) {
+/* Calculate the value of the user-space `DlModule' for `self' by looking at relocations.
+ * @param: p_tls_msize: Fill with the size of the PT_TLS segment when returning `false',
+ *                      or `0' on error, or if no PT_TLS segment exists (undefined  when
+ *                      returning `true')
+ * @param: p_ehdr_type: Filled with the value of `ehdr.e_type' when returning `false'. */
+PRIVATE NONNULL((1, 2, 3, 4)) bool
+NOTHROW(FCALL module_get_libdl_DlModule_address_byrel)(struct module *__restrict self,
+                                                       struct libdl_dlmodule **__restrict presult,
+                                                       size_t *__restrict p_tls_msize,
+                                                       uint16_t *__restrict p_ehdr_type) {
 	ElfV_Dyn const *dyn_start, *dyn_end;
 	ElfV_PhdrP phdr;
 	ElfV_Ehdr ehdr;
 	uint16_t pt_dyn_header;
+	*p_tls_msize = 0;
+	*p_ehdr_type = ET_NONE;
 
 	if unlikely(!self->md_file)
 		goto nope;
@@ -574,6 +582,7 @@ NOTHROW(FCALL module_get_libdl_DlModule_address)(struct module *__restrict self,
 		goto nope;
 	if (ElfV_field(self, ehdr, e_phentsize) != ElfV_sizeof(self, Phdr))
 		goto nope;
+	*p_ehdr_type = ElfV_field(self, ehdr, e_type);
 
 	ElfV_any(phdr) = (typeof(ElfV_any(phdr)))dbx_malloc(ElfV_field(self, ehdr, e_phnum) *
 	                                                    ElfV_field(self, ehdr, e_phentsize));
@@ -591,8 +600,16 @@ NOTHROW(FCALL module_get_libdl_DlModule_address)(struct module *__restrict self,
 		goto nope_phdr;
 	}
 
+	/* Check if there is a PT_TLS segment. */
+	for (pt_dyn_header = 0; pt_dyn_header < ElfV_field(self, ehdr, e_phnum); ++pt_dyn_header) {
+		if (ElfV_fieldP(self, phdr, [pt_dyn_header].p_type) == PT_TLS) {
+			*p_tls_msize = ElfV_fieldP(self, phdr, [pt_dyn_header].p_memsz);
+			break;
+		}
+	}
+
 	/* Find the PT_DYNAMIC header. */
-	for (pt_dyn_header = 0; pt_dyn_header < ElfV_field(self, ehdr, e_phnum); pt_dyn_header += 1) {
+	for (pt_dyn_header = 0; pt_dyn_header < ElfV_field(self, ehdr, e_phnum); ++pt_dyn_header) {
 		if (ElfV_fieldP(self, phdr, [pt_dyn_header].p_type) == PT_DYNAMIC)
 			goto got_pt_dynamic;
 	}
@@ -624,6 +641,8 @@ NOTHROW(FCALL module_get_user_tls_base)(struct module *__restrict self,
                                         byte_t **__restrict ptls_base) {
 	struct libdl_tls_segment *utls;
 	struct libdl_dlmodule *dlmod;
+	size_t tls_msize;
+	uint16_t ehdr_type;
 
 	/* Don't do all of this trickery when the kernel's been poisoned.
 	 * The below code may call-back to (possibly) faulty kernel  code
@@ -649,19 +668,27 @@ NOTHROW(FCALL module_get_user_tls_base)(struct module *__restrict self,
 	 *  #3: With the  `DlModule *'  pointer  at hand,  we  can  proceed  to
 	 *      essentially re-implement `dltlsaddr2(tls_handle, tls_segment)',
 	 *      using the `DlModule *' we've discovered above for `tls_handle',
-	 *      and simply using `utls_base' for `tls_segment'
-	 *
-	 * TODO: Check  if this  way of  calculating TLS  locations would also
-	 *       work for  TLS variables  from modules  using the  static  TLS
-	 *       model. - The above only works when tls offsets are calculated
-	 *       at  runtime (as is  the case in  shared libraries), but would
-	 *       break  when the `R_386_TLS_DTPMOD32' relocation is missing... */
-
-	/* FIXME: This doesn't work for TLS variables from the main executable! */
+	 *      and simply using `utls_base' for `tls_segment' */
 
 	/* Start by calculating the user-space `DlModule *' pointer. */
-	if (!module_get_libdl_DlModule_address(self, &dlmod))
+	if (!module_get_libdl_DlModule_address_byrel(self, &dlmod, &tls_msize, &ehdr_type)) {
+		/* Determining the libdl handle by relocations only works for  shared
+		 * libraries, but not if the main program also uses TLS variables, or
+		 * a library was (for some reason) compiled to use static TLS.
+		 *
+		 * In this case, we assume that an `ET_EXEC' module uses static TLS. */
+		if (ehdr_type == ET_EXEC && tls_msize > 0) {
+			utls = (struct libdl_tls_segment *)get_user_tls_base_register();
+			if (!ADDR_ISUSER(utls))
+				goto nope;
+			*ptls_base = (byte_t *)utls - tls_msize; /* XXX: This '-' is arch-specific I believe... */
+			return ADDR_ISUSER(*ptls_base);
+		}
+
+		/* TODO: Enumerate libdl's module list (~ala `dl_globals.dg_alllist')
+		 *       in search  of  a  module  matching  `self->md_load(min|max)' */
 		goto nope;
+	}
 
 	if unlikely(!dlmod || !ADDR_ISUSER(dlmod))
 		goto nope;
@@ -687,15 +714,15 @@ NOTHROW(FCALL module_get_user_tls_base)(struct module *__restrict self,
 		}
 	}
 
-	/* The module uses the dynamic  TLS model. As such, we  must
-	 * scan the  TLS  extension  table for  a  matching  module.
-	 * Note that user-space uses a binary tree for this purpose,
-	 * so we can use that to find the module that we're  looking
-	 * for.
-	 * Also note that we set a max indirection limit of `BITSOF(void *)'
-	 * before we  error out,  thus  preventing infinite  recursion  when
-	 * user-space has  set-up  their  TLS extension  table  to  form  an
-	 * infinite loop. */
+	/* The module uses the dynamic TLS model. As such, we must scan the
+	 * TLS extension table for a matching module. Note that  user-space
+	 * uses  a binary tree for this purpose, so we can use that to find
+	 * the module that we're looking for.
+	 *
+	 * Also  note that we set a max indirection limit of `BITSOF(void *)'
+	 * before we error out, thus preventing infinite recursion when user-
+	 * space has set-up  their TLS  extension table to  form an  infinite
+	 * loop. */
 	{
 		struct libdl_dtls_extension *ext;
 		unsigned int max_indirection;
