@@ -417,6 +417,13 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, 
 				reader += 4;
 				break;
 
+#if __SIZEOF_POINTER__ >= 8
+			CASE(DW_CFA_MIPS_advance_loc8)
+				current_pc += (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader) * self->f_codealign;
+				reader += 8;
+				break;
+#endif /* __SIZEOF_POINTER__ >= 8 */
+
 #if (defined(EH_FRAME_FDE_EXEC_CFA_STATE) ||          \
      defined(EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE) || \
      defined(EH_FRAME_FDE_EXEC_CFA_LANDING_STATE) ||  \

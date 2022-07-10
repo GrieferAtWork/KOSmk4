@@ -69,7 +69,10 @@ NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains_ex)(di_debuginfo_rnglists_t con
 #endif /* !DEFINE_libdi_debuginfo_rnglists_contains */
 {
 #ifdef DEFINE_libdi_debuginfo_rnglists_iterator_next
+	/************************************************************************/
+	/* LOCAL_* macros                                                       */
 #define LOCAL_iter                       self->ri_pos
+#define LOCAL_is_runglists               !self->ri_isranges
 #define LOCAL_rnglists_end               self->ri_end
 #define LOCAL_ranges_end                 self->ri_end
 #define LOCAL_addrsize                   self->ri_addrsize
@@ -77,6 +80,12 @@ NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains_ex)(di_debuginfo_rnglists_t con
 #define LOCAL_R_DEBUG_INFO_ERROR_SUCCESS true
 #define LOCAL_R_DEBUG_INFO_ERROR_NOFRAME false
 #define LOCAL_R_DEBUG_INFO_ERROR_CORRUPT false
+#define LOCAL_checkrange(range_start, range_end) \
+	*pmodule_relative_start_pc = range_start;    \
+	*pmodule_relative_end_pc   = range_end;      \
+	return LOCAL_R_DEBUG_INFO_ERROR_SUCCESS
+	/************************************************************************/
+
 	if (self->ri_pos >= self->ri_end) {
 		if (self->ri_end == (byte_t const *)-1) {
 			*pmodule_relative_start_pc = self->ri_ranges->r_startpc;
@@ -87,7 +96,11 @@ NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains_ex)(di_debuginfo_rnglists_t con
 		return false;
 	}
 #else /* DEFINE_libdi_debuginfo_rnglists_iterator_next */
+	byte_t const *iter;
+	/************************************************************************/
+	/* LOCAL_* macros                                                       */
 #define LOCAL_iter                       iter
+#define LOCAL_is_runglists               sections->drs_debug_rnglists_start < LOCAL_rnglists_end
 #define LOCAL_rnglists_end               sections->drs_debug_rnglists_end
 #define LOCAL_ranges_end                 sections->drs_debug_ranges_end
 #define LOCAL_addrsize                   parser->dsp_addrsize
@@ -95,7 +108,21 @@ NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains_ex)(di_debuginfo_rnglists_t con
 #define LOCAL_R_DEBUG_INFO_ERROR_SUCCESS DEBUG_INFO_ERROR_SUCCESS
 #define LOCAL_R_DEBUG_INFO_ERROR_NOFRAME DEBUG_INFO_ERROR_NOFRAME
 #define LOCAL_R_DEBUG_INFO_ERROR_CORRUPT DEBUG_INFO_ERROR_CORRUPT
-	byte_t const *iter;
+#ifdef DEFINE_libdi_debuginfo_rnglists_contains_ex
+#define _LOCAL_saverange(range_start, range_end) \
+	*poverlap_start = range_start;               \
+	*poverlap_end   = range_end;
+#else /* DEFINE_libdi_debuginfo_rnglists_contains_ex */
+#define _LOCAL_saverange(range_start, range_end)
+#endif /* !DEFINE_libdi_debuginfo_rnglists_contains_ex */
+#define LOCAL_checkrange(range_start, range_end) \
+	if (module_relative_pc >= range_start &&     \
+	    module_relative_pc < range_end) {        \
+		_LOCAL_saverange(range_start, range_end) \
+		return LOCAL_R_DEBUG_INFO_ERROR_SUCCESS; \
+	}
+	/************************************************************************/
+
 	if (DI_DEBUGINFO_RANGES_ISSINGLERANGE(self)) {
 		if (module_relative_pc < self->r_startpc ||
 		    module_relative_pc >= self->r_endpc)
@@ -112,12 +139,7 @@ NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains_ex)(di_debuginfo_rnglists_t con
 	assert(addrsize_isvalid(LOCAL_addrsize));
 
 	/* Check if we're using new-style .debug_rnglists */
-#ifdef DEFINE_libdi_debuginfo_rnglists_iterator_next
-	if (!self->ri_isranges)
-#else /* DEFINE_libdi_debuginfo_rnglists_iterator_next */
-	if (sections->drs_debug_rnglists_start < LOCAL_rnglists_end)
-#endif /* !DEFINE_libdi_debuginfo_rnglists_iterator_next */
-	{
+	if (LOCAL_is_runglists) {
 #ifndef DEFINE_libdi_debuginfo_rnglists_iterator_next
 		if unlikely(self->r_ranges_offset >= (size_t)(LOCAL_rnglists_end -
 		                                              sections->drs_debug_rnglists_start))
@@ -212,20 +234,7 @@ NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains_ex)(di_debuginfo_rnglists_t con
 			}
 
 			/* Check if address is contained in given range. */
-#ifdef DEFINE_libdi_debuginfo_rnglists_iterator_next
-			*pmodule_relative_start_pc = range_start;
-			*pmodule_relative_end_pc   = range_end;
-			return LOCAL_R_DEBUG_INFO_ERROR_SUCCESS;
-#else /* DEFINE_libdi_debuginfo_rnglists_iterator_next */
-			if (module_relative_pc >= range_start &&
-			    module_relative_pc < range_end) {
-#ifdef DEFINE_libdi_debuginfo_rnglists_contains_ex
-				*poverlap_start = range_start;
-				*poverlap_end   = range_end;
-#endif /* DEFINE_libdi_debuginfo_rnglists_contains_ex */
-				return LOCAL_R_DEBUG_INFO_ERROR_SUCCESS;
-			}
-#endif /* !DEFINE_libdi_debuginfo_rnglists_iterator_next */
+			LOCAL_checkrange(range_start, range_end);
 		}
 	}
 
@@ -284,25 +293,13 @@ NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains_ex)(di_debuginfo_rnglists_t con
 			range_end   += LOCAL_cu_base;
 		}
 
-#ifdef DEFINE_libdi_debuginfo_rnglists_iterator_next
-		*pmodule_relative_start_pc = range_start;
-		*pmodule_relative_end_pc   = range_end;
-		return LOCAL_R_DEBUG_INFO_ERROR_SUCCESS;
-#else /* DEFINE_libdi_debuginfo_rnglists_iterator_next */
-		if (module_relative_pc >= range_start &&
-		    module_relative_pc < range_end) {
-#ifdef DEFINE_libdi_debuginfo_rnglists_contains_ex
-			*poverlap_start = range_start;
-			*poverlap_end   = range_end;
-#endif /* DEFINE_libdi_debuginfo_rnglists_contains_ex */
-			return LOCAL_R_DEBUG_INFO_ERROR_SUCCESS;
-		}
-#endif /* !DEFINE_libdi_debuginfo_rnglists_iterator_next */
+		LOCAL_checkrange(range_start, range_end);
 	}
 	return LOCAL_R_DEBUG_INFO_ERROR_NOFRAME;
 err:
 	return LOCAL_R_DEBUG_INFO_ERROR_CORRUPT;
 #undef LOCAL_iter
+#undef LOCAL_is_runglists
 #undef LOCAL_rnglists_end
 #undef LOCAL_ranges_end
 #undef LOCAL_addrsize
@@ -310,6 +307,8 @@ err:
 #undef LOCAL_R_DEBUG_INFO_ERROR_SUCCESS
 #undef LOCAL_R_DEBUG_INFO_ERROR_NOFRAME
 #undef LOCAL_R_DEBUG_INFO_ERROR_CORRUPT
+#undef _LOCAL_saverange
+#undef LOCAL_checkrange
 }
 
 DECL_END

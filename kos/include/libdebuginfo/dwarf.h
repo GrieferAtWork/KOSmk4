@@ -94,17 +94,17 @@
 /*      DW_LNE_                            0x1d */
 /*      DW_LNE_                            0x1e */
 /*      DW_LNE_                            0x1f */
-#define DW_LNE_HP_define_proc              0x20
+#define DW_LNE_HP_define_proc              0x20 /* ??? */
 /*      DW_LNE_                            0x21 */
 /*      DW_LNE_                            .... */
 /*      DW_LNE_                            0x7f */
-#define DW_LNE_HP_source_file_correlation  0x80
+#define DW_LNE_HP_source_file_correlation  0x80 /* ??? */
 #define DW_LNE_lo_user                     0x80
 #define DW_LNE_hi_user                     0xff
 
-#define DW_LNE_HP_SFC_formfeed         1
-#define DW_LNE_HP_SFC_set_listing_line 2
-#define DW_LNE_HP_SFC_associate        3
+#define DW_LNE_HP_SFC_formfeed         1 /* ??? */
+#define DW_LNE_HP_SFC_set_listing_line 2 /* ??? */
+#define DW_LNE_HP_SFC_associate        3 /* ??? */
 
 
 /* DWARF .debug_loclists codes. */
@@ -112,21 +112,21 @@
 #define DW_LLE_base_addressx    0x01
 #define DW_LLE_startx_endx      0x02
 #define DW_LLE_startx_length    0x03
-#define DW_LLE_offset_pair      0x04 /* [+ULEB128+ULEB128] ULEB-encoded start/end pair */
+#define DW_LLE_offset_pair      0x04 /* [+uleb128+uleb128] ULEB-encoded start/end pair */
 #define DW_LLE_default_location 0x05
-#define DW_LLE_base_address     0x06 /* [+ULEB128] Set base address for `DW_RLE_offset_pair' */
+#define DW_LLE_base_address     0x06 /* [+uleb128] Set base address for `DW_RLE_offset_pair' */
 #define DW_LLE_start_end        0x07 /* [+dsp_addrsize+dsp_addrsize] Followed by address pair */
-#define DW_LLE_start_length     0x08 /* [+dsp_addrsize+ULEB128] Followed by base-address + length */
+#define DW_LLE_start_length     0x08 /* [+dsp_addrsize+uleb128] Followed by base-address + length */
 
 /* DWARF .debug_rnglists codes. */
 #define DW_RLE_end_of_list   0x00 /* End-of-list */
 #define DW_RLE_base_addressx 0x01
 #define DW_RLE_startx_endx   0x02
 #define DW_RLE_startx_length 0x03
-#define DW_RLE_offset_pair   0x04 /* [+ULEB128+ULEB128] ULEB-encoded start/end pair */
-#define DW_RLE_base_address  0x05 /* [+ULEB128] Set base address for `DW_RLE_offset_pair' */
+#define DW_RLE_offset_pair   0x04 /* [+uleb128+uleb128] ULEB-encoded start/end pair */
+#define DW_RLE_base_address  0x05 /* [+uleb128] Set base address for `DW_RLE_offset_pair' */
 #define DW_RLE_start_end     0x06 /* [+dsp_addrsize+dsp_addrsize] Followed by address pair */
-#define DW_RLE_start_length  0x07 /* [+dsp_addrsize+ULEB128] Followed by base-address + length */
+#define DW_RLE_start_length  0x07 /* [+dsp_addrsize+uleb128] Followed by base-address + length */
 
 /* DWARF .debug_info component tags. */
 #define DW_TAG_padding                0x00 /* - */

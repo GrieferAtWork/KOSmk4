@@ -364,7 +364,7 @@
 /* DWARF Call Frame Instruction (CFI) Extensions (section 10.5.2) */
 #define DW_CFA_lo_user                      0x1c /* First extension/custom opcode */
 /*      DW_CFA_                             0x1c  * ... */
-#define DW_CFA_MIPS_advance_loc8            0x1d /* ??? */
+#define DW_CFA_MIPS_advance_loc8            0x1d /* upc += *(u64 const *)pc; pc += 8; */
 /*      DW_CFA_                             0x1e  * ... */
 /*      DW_CFA_                             0x1f  * ... */
 /*      DW_CFA_                             0x20  * ... */

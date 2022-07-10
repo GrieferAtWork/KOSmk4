@@ -130,11 +130,11 @@ setup_empty_iterator:
 #ifndef __INTELLISENSE__
 DECL_END
 #define DEFINE_libdi_debuginfo_rnglists_iterator_next
-#include "debug_info-debug_ranges.c.inl"
+#include "debug_info-debug_rnglists.c.inl"
 #define DEFINE_libdi_debuginfo_rnglists_contains
-#include "debug_info-debug_ranges.c.inl"
+#include "debug_info-debug_rnglists.c.inl"
 #define DEFINE_libdi_debuginfo_rnglists_contains_ex
-#include "debug_info-debug_ranges.c.inl"
+#include "debug_info-debug_rnglists.c.inl"
 DECL_BEGIN
 #endif /* !__INTELLISENSE__ */
 

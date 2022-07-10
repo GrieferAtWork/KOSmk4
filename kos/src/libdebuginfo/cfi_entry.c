@@ -1,3 +1,8 @@
+/*[[[magic
+local gcc_opt = options.setdefault("GCC.options", []);
+if (gcc_opt.removeif([](x) -> x.startswith("-O")))
+	gcc_opt.append("-Os");
+]]]*/
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -218,8 +223,8 @@ struct cfientry {
 	                                                                  * an entry's `ur_regno', meaning you can use bsearch
 	                                                                  * to find a specific entry within. */
 };
-#define cfientry_as_unwind_emulator_sections_t(self)        cfientry_sections_as_unwind_emulator_sections(&(self)->ce_sections)
-#define cfientry_as_di_debuginfo_cu_parser_sections_t(self) cfientry_sections_as_di_debuginfo_cu_parser_sections(&(self)->ce_sections)
+#define cfientry_as_unwind_emulator_sections(self)        cfientry_sections_as_unwind_emulator_sections(&(self)->ce_sections)
+#define cfientry_as_di_debuginfo_cu_parser_sections(self) cfientry_sections_as_di_debuginfo_cu_parser_sections(&(self)->ce_sections)
 
 #define cfientry_alloc(unwind_rega)                                        \
 	((struct cfientry *)alloca(offsetof(struct cfientry, ce_unwind_regv) + \
@@ -586,7 +591,7 @@ NOTHROW_NCX(CC cfientry_loadmodule)(struct cfientry *__restrict self) {
 
 			/* Load the relevant CU. */
 			error = libdi_debuginfo_cu_parser_loadunit(&reader, self->ce_sections.ds_debug_info_end,
-			                                           cfientry_as_di_debuginfo_cu_parser_sections_t(self),
+			                                           cfientry_as_di_debuginfo_cu_parser_sections(self),
 			                                           &self->ce_parser,
 			                                           &self->ce_abbrev,
 			                                           NULL);
@@ -603,7 +608,7 @@ NOTHROW_NCX(CC cfientry_loadmodule)(struct cfientry *__restrict self) {
 			reader = self->ce_sections.ds_debug_info_start;
 			for (;;) {
 				error = libdi_debuginfo_cu_parser_loadunit(&reader, self->ce_sections.ds_debug_info_end,
-				                                           cfientry_as_di_debuginfo_cu_parser_sections_t(self),
+				                                           cfientry_as_di_debuginfo_cu_parser_sections(self),
 				                                           &self->ce_parser,
 				                                           &self->ce_abbrev,
 				                                           NULL);
@@ -734,7 +739,7 @@ again_runexpr:
 	emulator.ue_pc                 = expr;
 	emulator.ue_pc_start           = expr;
 	emulator.ue_pc_end             = expr_end;
-	emulator.ue_sectinfo           = cfientry_as_unwind_emulator_sections_t(self);
+	emulator.ue_sectinfo           = cfientry_as_unwind_emulator_sections(self);
 	emulator.ue_regget             = &after_unwind_getreg;
 	emulator.ue_regset             = NULL;
 	emulator.ue_regget_arg         = self;
