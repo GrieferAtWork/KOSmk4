@@ -1,0 +1,49 @@
+{
+	"version": "2.0.0",
+	"command": "build",
+	"isBackground": false,
+	"echoCommand": false,
+	"presentation": {
+		"echo": true,
+		"reveal": "always",
+		"focus": false,
+		"panel": "shared",
+		"showReuseMessage": false,
+		"clear": true
+	},
+	"inputs": [{
+		"id": "CONFIG",
+		"type": "command",
+		"command": "cpptools.activeConfigCustomVariable",
+		"args": "CONFIG"
+	}, {
+		"id": "TARGET",
+		"type": "command",
+		"command": "cpptools.activeConfigCustomVariable",
+		"args": "TARGET"
+	}],
+	"tasks": [{
+		"label": "Build",
+		"icon": {
+			"id": "target",
+			"color": "terminal.ansiGreen"
+		},
+		"type": "process",
+		"command": "${workspaceFolder}/../binutils/deemon/deemon.exe",
+		"problemMatcher": [
+			"$msCompile"
+		],
+		"args": [
+			"${workspaceFolder}/../magic.dee",
+			"--build-only",
+			"--format-error-messages",
+			"--target=${input:TARGET}",
+			"--config=${input:CONFIG}"
+		],
+		"group": {
+			"kind": "build",
+			"isDefault": true,
+		},
+		"detail": "Build KOS"
+	}]
+}

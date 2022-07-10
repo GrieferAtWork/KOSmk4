@@ -1,5 +1,16 @@
 {
 	"version": "0.2.0",
+	"inputs": [{
+		"id": "CONFIG",
+		"type": "command",
+		"command": "cpptools.activeConfigCustomVariable",
+		"args": "CONFIG"
+	}, {
+		"id": "TARGET",
+		"type": "command",
+		"command": "cpptools.activeConfigCustomVariable",
+		"args": "TARGET"
+	}],
 	"configurations": [
 		{
 			"type": "cppdbg",
@@ -20,7 +31,7 @@
 				"/cygdrive/y": "Y:\\",
 				"/cygdrive/z": "Z:\\"
 			},
-			"program": "ABSOLUTE_KOS_NT_PROJECT_ROOT/bin/i386-kos-nOD/os/kernel.bin",
+			"program": "ABSOLUTE_KOS_NT_PROJECT_ROOT/bin/${input:TARGET}-kos-${input:CONFIG}/os/kernel.bin",
 			"cwd": ".",
 			"MIMode": "gdb",
 			"miDebuggerPath": "gdb.exe",
@@ -29,12 +40,12 @@
 			"miDebuggerServerAddress": ".",
 			"customLaunchSetupCommands": [
 				{ "text": "cd ABSOLUTE_KOS_NT_PROJECT_ROOT", "ignoreFailures": false },
-				{ "text": "set sysroot ABSOLUTE_KOS_NT_PROJECT_ROOT/bin/i386-kos-nOD", "ignoreFailures": false },
-				{ "text": "set solib-search-path bin/i386-kos-nOD/lib:bin/i386-kos-nOD/os/drivers", "ignoreFailures": false },
+				{ "text": "set sysroot ABSOLUTE_KOS_NT_PROJECT_ROOT/bin/${input:TARGET}-kos-${input:CONFIG}", "ignoreFailures": false },
+				{ "text": "set solib-search-path bin/${input:TARGET}-kos-${input:CONFIG}/lib:bin/${input:TARGET}-kos-${input:CONFIG}/os/drivers", "ignoreFailures": false },
 				{ "text": "set auto-solib-add on", "ignoreFailures": false },
-				{ "text": "set architecture i386", "ignoreFailures": false },
+				{ "text": "set architecture ${input:TARGET}", "ignoreFailures": false },
 				{ "text": "-target-select remote localhost:1234", "ignoreFailures": false },
-				{ "text": "file bin/i386-kos-nOD/os/kernel.bin", "ignoreFailures": true }
+				{ "text": "file bin/${input:TARGET}-kos-${input:CONFIG}/os/kernel.bin", "ignoreFailures": true }
 			],
 			"setupCommands": [
 				{ "text": "-enable-pretty-printing", "ignoreFailures": true },

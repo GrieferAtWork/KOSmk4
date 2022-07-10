@@ -5,5 +5,12 @@
 		"**.dec": true,
 		"**.latest": true,
 		"**/__ice__": true
+	},
+	"C_Cpp.autoAddFileAssociations": false,
+	"files.associations": {
+		"*.c" : "cpp",
+		"*.h" : "cpp",
+		"*.c.inl" : "cpp",
+		"*.sh" : "shellscript",
 	}
 }
