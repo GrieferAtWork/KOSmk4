@@ -320,10 +320,10 @@ KOS_PATCHES="${KOS_MISC}/patches"
 cmd cd "$KOS_MISC/../../"
 KOS_ROOT="$(pwd)"
 
-if [ -f "${KOS_ROOT}/kos/misc/config/launch.vs.json" ]; then
-	if [ "${KOS_ROOT}/kos/misc/config/launch.vs.json" -nt "${KOS_ROOT}/kos/.vs/launch.vs.json" ]; then
+if [ -f "${KOS_ROOT}/kos/misc/config/vs-launch.vs.json" ]; then
+	if [ "${KOS_ROOT}/kos/misc/config/vs-launch.vs.json" -nt "${KOS_ROOT}/kos/.vs/launch.vs.json" ]; then
 		unlink "${KOS_ROOT}/kos/.vs/launch.vs.json" > /dev/null 2>&1
-		cmd cp "${KOS_ROOT}/kos/misc/config/launch.vs.json" "${KOS_ROOT}/kos/.vs/launch.vs.json"
+		cmd cp "${KOS_ROOT}/kos/misc/config/vs-launch.vs.json" "${KOS_ROOT}/kos/.vs/launch.vs.json"
 		NT_KOS_ROOT="$KOS_ROOT"
 		if [[ `uname -s` == *CYGWIN* ]]; then
 			NT_KOS_ROOT="$(cygpath -w "$KOS_ROOT")"
@@ -331,6 +331,20 @@ if [ -f "${KOS_ROOT}/kos/misc/config/launch.vs.json" ]; then
 		NT_KOS_ROOT="${NT_KOS_ROOT//\\/\\\\\\\\}"
 		cmd sed -i -e "s?ABSOLUTE_KOS_PROJECT_ROOT?${KOS_ROOT}?g" "${KOS_ROOT}/kos/.vs/launch.vs.json"
 		cmd sed -i -e "s?ABSOLUTE_KOS_NT_PROJECT_ROOT?${NT_KOS_ROOT}?g" "${KOS_ROOT}/kos/.vs/launch.vs.json"
+	fi
+fi
+
+if [ -f "${KOS_ROOT}/kos/misc/config/vscode-launch.json" ]; then
+	if [ "${KOS_ROOT}/kos/misc/config/vscode-launch.json" -nt "${KOS_ROOT}/kos/.vscode/launch.json" ]; then
+		unlink "${KOS_ROOT}/kos/.vscode/launch.json" > /dev/null 2>&1
+		cmd cp "${KOS_ROOT}/kos/misc/config/vscode-launch.json" "${KOS_ROOT}/kos/.vscode/launch.json"
+		NT_KOS_ROOT="$KOS_ROOT"
+		if [[ `uname -s` == *CYGWIN* ]]; then
+			NT_KOS_ROOT="$(cygpath -w "$KOS_ROOT")"
+		fi
+		NT_KOS_ROOT="${NT_KOS_ROOT//\\/\\\\\\\\}"
+		cmd sed -i -e "s?ABSOLUTE_KOS_PROJECT_ROOT?${KOS_ROOT}?g" "${KOS_ROOT}/kos/.vscode/launch.json"
+		cmd sed -i -e "s?ABSOLUTE_KOS_NT_PROJECT_ROOT?${NT_KOS_ROOT}?g" "${KOS_ROOT}/kos/.vscode/launch.json"
 	fi
 fi
 

@@ -8,6 +8,7 @@
 /kos/.vs/slnx.sqlite
 /kos/.vs/slnx.sqlite-journal
 /kos/.vs/launch.vs.json
+/kos/.vscode/launch.json
 /kos/.vs/ProjectSettings.json
 /kos/.vs/VSWorkspaceState.json
 /qemu.netdump

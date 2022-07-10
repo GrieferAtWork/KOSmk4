@@ -1,0 +1,51 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "cppdbg",
+			"name": "extern[localhost:1234]",
+			"request": "launch",
+			"sourceFileMap": {
+				"ABSOLUTE_KOS_PROJECT_ROOT": "ABSOLUTE_KOS_NT_PROJECT_ROOT",
+				"/cygdrive/c": "C:\\",
+				"/cygdrive/d": "D:\\",
+				"/cygdrive/e": "E:\\",
+				"/cygdrive/f": "F:\\",
+				"/cygdrive/g": "G:\\",
+				"/cygdrive/h": "H:\\",
+				"/cygdrive/i": "I:\\",
+				"/cygdrive/j": "J:\\",
+				"/cygdrive/k": "K:\\",
+				"/cygdrive/x": "X:\\",
+				"/cygdrive/y": "Y:\\",
+				"/cygdrive/z": "Z:\\"
+			},
+			"program": "ABSOLUTE_KOS_NT_PROJECT_ROOT/bin/i386-kos-nOD/os/kernel.bin",
+			"cwd": ".",
+			"MIMode": "gdb",
+			"miDebuggerPath": "gdb.exe",
+			"targetArchitecture": "x86",
+			"launchCompleteCommand": "None",
+			"miDebuggerServerAddress": ".",
+			"customLaunchSetupCommands": [
+				{ "text": "cd ABSOLUTE_KOS_NT_PROJECT_ROOT", "ignoreFailures": false },
+				{ "text": "set sysroot ABSOLUTE_KOS_NT_PROJECT_ROOT/bin/i386-kos-nOD", "ignoreFailures": false },
+				{ "text": "set solib-search-path bin/i386-kos-nOD/lib:bin/i386-kos-nOD/os/drivers", "ignoreFailures": false },
+				{ "text": "set auto-solib-add on", "ignoreFailures": false },
+				{ "text": "set architecture i386", "ignoreFailures": false },
+				{ "text": "-target-select remote localhost:1234", "ignoreFailures": false },
+				{ "text": "file bin/i386-kos-nOD/os/kernel.bin", "ignoreFailures": true }
+			],
+			"setupCommands": [
+				{ "text": "-enable-pretty-printing", "ignoreFailures": true },
+				{ "text": "set print pretty on", "ignoreFailures": true },
+				{ "text": "set print object on", "ignoreFailures": true },
+				{ "text": "set print static-members on", "ignoreFailures": true },
+				{ "text": "set print vtbl on", "ignoreFailures": true },
+				{ "text": "set print demangle on", "ignoreFailures": true },
+				{ "text": "set demangle-style gnu-v3", "ignoreFailures": true },
+				{ "text": "set print sevenbit-strings off", "ignoreFailures": true }
+			]
+		},
+	]
+}
