@@ -991,19 +991,10 @@ again:
 	/* Wait for the bus to become ready. */
 	TRY {
 again_waitfor:
-		for (;;) {
-			state = ATOMIC_READ(self->ab_state);
-			if ((state & ATA_BUS_STATE_MASK) == ATA_BUS_STATE_READY)
-				break;
-			task_connect(&self->ab_ready);
-			state = ATOMIC_READ(self->ab_state);
-			if unlikely((state & ATA_BUS_STATE_MASK) == ATA_BUS_STATE_READY) {
-				task_disconnectall();
-				break;
-			}
-			/* Wait for PIO to become available. */
-			task_waitfor();
-		}
+		/* Wait for PIO to become available. */
+		task_waitwhile(&self->ab_ready,
+		               (state = ATOMIC_READ(self->ab_state),
+		                (state & ATA_BUS_STATE_MASK) != ATA_BUS_STATE_READY));
 
 		/* Atomically switch to PIO mode, and release our PIO request ticket. */
 #if ATA_BUS_STATE_READY == 0

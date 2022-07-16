@@ -568,11 +568,11 @@ dlmodule_search_symbol_in_dependencies(DlModule *__restrict self,
  * WARNING: If  the actual address of the symbol is `NULL', then this
  *          function will still return `NULL', though will not modify
  *          the return value of `dlerror()'.
- *          In normal applications, this would  normally never be the  case,
- *          as libdl, as  well as `ld',  will take care  not to link  object
- *          files such that  symbols could end  up overlapping with  `NULL'.
- *          However,  with  the  existence  of  `STT_GNU_IFUNC'  (as  usable
- *          via `__attribute__((ifunc("resolver")))'), it is easily possible
+ *          In normal applications, this would normally never be the case,
+ *          as  libdl, as well as `ld', will  take care not to link object
+ *          files such that symbols could end up overlapping with  `NULL'.
+ *          However, with the existence of `STT_GNU_IFUNC' (as usable  via
+ *          `__attribute__((ifunc("resolver")))'), it  is easily  possible
  *          to force some symbol to overlap with NULL.
  *          Also  note that  upon success,  `dlerror()' will  not have been
  *          modified, meaning that if a prior error has yet to be consumed,
@@ -1670,7 +1670,7 @@ create_section_from_addr:
 
 		case AUX_SECTION_DYNSYM: /* .dynsym */
 			result->ds_data    = (void *)self->dm_elf.de_dynsym_tab;
-			result->ds_size    = DlModule_ElfGetDynSymCnt(self);
+			result->ds_size    = sizeof(ElfW(Sym)) * DlModule_ElfGetDynSymCnt(self);
 			result->ds_entsize = sizeof(ElfW(Sym));
 			return result;
 
@@ -3387,12 +3387,8 @@ NOTHROW_NCX(FCALL dlget_p_program_invocation_short_name)(void) THROWS(E_SEGFAULT
 		char *progname = dl_globals.dg_peb->pp_argv
 		                 ? dl_globals.dg_peb->pp_argv[0]
 		                 : NULL;
-		if (progname) {
-			char *end;
-			end = strrchr(progname, '/');
-			if (end)
-				progname = end + 1;
-		}
+		if (progname)
+			progname = strrchrnul(progname, '/') + 1;
 		ATOMIC_CMPXCH(dl_program_invocation_short_name,
 		              NULL, progname);
 	}

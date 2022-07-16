@@ -144,14 +144,10 @@ task_setcomm_of(struct task *__restrict self, char const *__restrict name)
 	 * to wait for that RPC to complete. */
 	FINALLY_DECREF(rpc);
 	TRY {
-		for (;;) {
-			task_waitfor();
-			status = ATOMIC_READ(rpc->tscr_state);
-			if (status != TASK_SETCOMM_RPC_ST_PENDING &&
-			    status != TASK_SETCOMM_RPC_ST_WORKING)
-				break;
-			task_connect(&rpc->tscr_done);
-		}
+		task_waitwhile(&rpc->tscr_done,
+		               (status = ATOMIC_READ(rpc->tscr_state),
+		                status == TASK_SETCOMM_RPC_ST_PENDING ||
+		                status == TASK_SETCOMM_RPC_ST_WORKING));
 	} EXCEPT {
 		/* Try to abort the rename operation. */
 		if (!ATOMIC_CMPXCH(rpc->tscr_state,
@@ -165,8 +161,9 @@ task_setcomm_of(struct task *__restrict self, char const *__restrict name)
 	/* Success is indicated by `task_setcomm_rpcfun()' */
 	return status == TASK_SETCOMM_RPC_ST_DONE;
 force_wait_for:
-	while (ATOMIC_READ(rpc->tscr_state) == TASK_SETCOMM_RPC_ST_WORKING)
-		preemption_tryyield();
+	task_waitwhile_norpc_small(&rpc->tscr_done,
+	                           (status = ATOMIC_READ(rpc->tscr_state),
+	                            status == TASK_SETCOMM_RPC_ST_WORKING));
 	return true;
 }
 

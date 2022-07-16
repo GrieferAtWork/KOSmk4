@@ -38,25 +38,41 @@
 
 /* [weak]incref() */
 #ifndef __PRIVATE_NONATOMIC_REFCNT_IMPL_INCREF
+#if defined(NDEBUG) || defined(NDEBUG_REFCNT)
+#define __PRIVATE_NONATOMIC_REFCNT_IMPL_INCREF(T, function, destroy_, refcnt_t, refcnt_field) \
+	++refcnt_field;
+#else /* NDEBUG || NDEBUG_REFCNT */
 #define __PRIVATE_NONATOMIC_REFCNT_IMPL_INCREF(T, function, destroy_, refcnt_t, refcnt_field)           \
 	__hybrid_assertf(refcnt_field > 0, #T "::" #function "(%p): Object was already destroyed", __self); \
 	++refcnt_field;
+#endif /* !NDEBUG && !NDEBUG_REFCNT */
 #endif /* !__PRIVATE_NONATOMIC_REFCNT_IMPL_INCREF */
 
 /* [weak]decref() */
 #ifndef __PRIVATE_NONATOMIC_REFCNT_IMPL_DECREF
+#if defined(NDEBUG) || defined(NDEBUG_REFCNT)
+#define __PRIVATE_NONATOMIC_REFCNT_IMPL_DECREF(T, function, destroy_, refcnt_t, refcnt_field, destroy_likelyhood) \
+	if destroy_likelyhood(!(--refcnt_field > 0))                                                                  \
+		destroy_(__self);
+#else /* NDEBUG || NDEBUG_REFCNT */
 #define __PRIVATE_NONATOMIC_REFCNT_IMPL_DECREF(T, function, destroy_, refcnt_t, refcnt_field, destroy_likelyhood) \
 	__hybrid_assertf(refcnt_field > 0, #T "::" #function "(%p): Object was already destroyed", __self);           \
 	if destroy_likelyhood(!(--refcnt_field > 0))                                                                  \
 		destroy_(__self);
+#endif /* !NDEBUG && !NDEBUG_REFCNT */
 #endif /* !__PRIVATE_NONATOMIC_REFCNT_IMPL_DECREF */
 
 /* [weak]decref_nokill() */
 #ifndef __PRIVATE_NONATOMIC_REFCNT_IMPL_DECREF_NOKILL
+#if defined(NDEBUG) || defined(NDEBUG_REFCNT)
+#define __PRIVATE_NONATOMIC_REFCNT_IMPL_DECREF_NOKILL(T, function, destroy_, refcnt_t, refcnt_field) \
+	--refcnt_field;
+#else /* NDEBUG || NDEBUG_REFCNT */
 #define __PRIVATE_NONATOMIC_REFCNT_IMPL_DECREF_NOKILL(T, function, destroy_, refcnt_t, refcnt_field)         \
 	__hybrid_assertf(refcnt_field > 0, #T "::" #function "(%p): Object was already destroyed", __self);      \
 	__hybrid_assertf(refcnt_field > 1, #T "::" #function "(%p): Object should have been destroyed", __self); \
 	--refcnt_field;
+#endif /* !NDEBUG && !NDEBUG_REFCNT */
 #endif /* !__PRIVATE_NONATOMIC_REFCNT_IMPL_DECREF_NOKILL */
 
 /* [weak]destroy() */

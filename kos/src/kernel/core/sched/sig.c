@@ -1548,7 +1548,8 @@ NOTHROW(FCALL task_wasconnected_to)(struct sig const *target) {
  * this was the case.
  * @return: NULL: No signal is available.
  * @return: * :   The signal that was delivered (for `sig_altsend', the "sender" argument) */
-PUBLIC NOBLOCK struct sig *NOTHROW(FCALL task_trywait)(void) {
+PUBLIC NOBLOCK WUNUSED struct sig *
+NOTHROW(FCALL task_trywait)(void) {
 	struct task_connections *self;
 	struct sig *result;
 	self   = THIS_CONNECTIONS;

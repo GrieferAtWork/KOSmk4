@@ -94,7 +94,7 @@ template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T 
 template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T volatile *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> const volatile &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
 template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T const volatile *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
 template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T const volatile *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> const volatile &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
-}
+} /* extern "C++" */
 
 #if __SIZEOF_POINTER__ != 4
 #ifndef __COMPILER_HAVE_TRANSPARENT_NONCLASS

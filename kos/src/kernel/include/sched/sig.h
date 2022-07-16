@@ -676,7 +676,8 @@ NOTHROW(FCALL task_wasconnected)(struct sig const *target)
  * this was the case.
  * @return: NULL: No signal is available.
  * @return: * :   The signal that was delivered (for `sig_altsend', the "sender" argument) */
-FUNDEF NOBLOCK struct sig *NOTHROW(FCALL task_trywait)(void);
+FUNDEF NOBLOCK WUNUSED struct sig *
+NOTHROW(FCALL task_trywait)(void);
 
 /* Wait for the first signal to be delivered, unconditionally
  * disconnecting   all    connected    signals    thereafter.
@@ -890,6 +891,51 @@ unsigned int NOTHROW(KCALL task_tryyield)(void);
 #define TASK_POLL_BEFORE_CONNECT(...) (void)0
 #endif /* !CONFIG_YIELD_BEFORE_CONNECT */
 #endif /* __CC__ */
+
+
+/************************************************************************/
+/* SIGNAL WAITING HELPER MACROS                                         */
+/************************************************************************/
+#define _task_waituntil_ex_small(wait_if_false_expr, _connect, _task_waitfor) \
+	do {                                                                      \
+		_connect;                                                             \
+		if ((wait_if_false_expr)) {                                           \
+			task_disconnectall();                                             \
+			break;                                                            \
+		}                                                                     \
+		_task_waitfor;                                                        \
+	}	__WHILE1
+#define _task_waituntil_ex_fast(wait_if_false_expr, _connect, _task_waitfor) \
+	do {                                                                     \
+		if ((wait_if_false_expr))                                            \
+			break;                                                           \
+		_connect;                                                            \
+		if ((wait_if_false_expr)) {                                          \
+			task_disconnectall();                                            \
+			break;                                                           \
+		}                                                                    \
+		_task_waitfor;                                                       \
+	}	__WHILE1
+#ifdef __OPTIMIZE_SIZE__
+#define _task_waituntil_ex _task_waituntil_ex_small
+#else /* __OPTIMIZE_SIZE__ */
+#define _task_waituntil_ex _task_waituntil_ex_fast
+#endif /* !__OPTIMIZE_SIZE__ */
+
+/* Wait for a given signal while/until a given expression becomes true. */
+#define task_waituntil(signal, wait_if_false_expr)             _task_waituntil_ex(wait_if_false_expr, task_connect(signal), task_waitfor())
+#define task_waitwhile(signal, wait_if_true_expr)              task_waituntil(signal, !(wait_if_true_expr))
+#define task_waituntil_norpc(signal, wait_if_false_expr)       _task_waituntil_ex(wait_if_false_expr, task_connect(signal), task_waitfor_norpc())
+#define task_waitwhile_norpc(signal, wait_if_true_expr)        task_waituntil_norpc(signal, !(wait_if_true_expr))
+#define task_waituntil_small(signal, wait_if_false_expr)       _task_waituntil_ex_small(wait_if_false_expr, task_connect(signal), task_waitfor())
+#define task_waitwhile_small(signal, wait_if_true_expr)        task_waituntil_small(signal, !(wait_if_true_expr))
+#define task_waituntil_norpc_small(signal, wait_if_false_expr) _task_waituntil_ex_small(wait_if_false_expr, task_connect(signal), task_waitfor_norpc())
+#define task_waitwhile_norpc_small(signal, wait_if_true_expr)  task_waituntil_norpc_small(signal, !(wait_if_true_expr))
+#define task_waituntil_fast(signal, wait_if_false_expr)        _task_waituntil_ex_fast(wait_if_false_expr, task_connect(signal), task_waitfor())
+#define task_waitwhile_fast(signal, wait_if_true_expr)         task_waituntil_fast(signal, !(wait_if_true_expr))
+#define task_waituntil_norpc_fast(signal, wait_if_false_expr)  _task_waituntil_ex_fast(wait_if_false_expr, task_connect(signal), task_waitfor_norpc())
+#define task_waitwhile_norpc_fast(signal, wait_if_true_expr)   task_waituntil_norpc_fast(signal, !(wait_if_true_expr))
+
 
 DECL_END
 

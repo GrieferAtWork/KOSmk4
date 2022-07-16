@@ -127,6 +127,9 @@ NOTHROW_NCX(CC search_symtab)(di_addr2line_sections_t const *__restrict sections
 	 * TODO: A similar special case should exist for `libdl.so'! */
 #ifdef __KERNEL__
 	else if (sections->ds_debug_line_start == __kernel_debug_line_start) {
+		/* FIXME: `__kernel_debug_line_start' is compressed data, but `sections->ds_debug_line_start'
+		 *        points at a decompressed, dynamically allocated blob (meaning this compare is never
+		 *        met) */
 		struct driver_symaddr info;
 		if (driver_dladdr_local(&kernel_driver, module_relative_pc, &info)) {
 			result->al_symstart = (uintptr_t)info.dsa_addr;

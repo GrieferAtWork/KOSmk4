@@ -314,11 +314,11 @@ libdl_dlclose(USER REF_IF(!(self->dm_flags & RTLD_NODELETE)) DlModule *handle)
  * WARNING: If  the actual address of the symbol is `NULL', then this
  *          function will still return `NULL', though will not modify
  *          the return value of `dlerror()'.
- *          In normal applications, this would  normally never be the  case,
- *          as libdl, as  well as `ld',  will take care  not to link  object
- *          files such that  symbols could end  up overlapping with  `NULL'.
- *          However,  with  the  existence  of  `STT_GNU_IFUNC'  (as  usable
- *          via `__attribute__((ifunc("resolver")))'), it is easily possible
+ *          In normal applications, this would normally never be the case,
+ *          as  libdl, as well as `ld', will  take care not to link object
+ *          files such that symbols could end up overlapping with  `NULL'.
+ *          However, with the existence of `STT_GNU_IFUNC' (as usable  via
+ *          `__attribute__((ifunc("resolver")))'), it  is easily  possible
  *          to force some symbol to overlap with NULL.
  *          Also  note that  upon success,  `dlerror()' will  not have been
  *          modified, meaning that if a prior error has yet to be consumed,

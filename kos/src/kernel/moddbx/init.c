@@ -73,7 +73,7 @@ DBG_RESET(reset) {
 	cexpr_typeonly           = false;
 	cexpr_forcewrite         = false;
 
-	/* Set-up `cexpr_stack' that `cexpr_stacktop' could be used. */
+	/* Set-up `cexpr_stack' such that `cexpr_stacktop' could be used. */
 	cexpr_stack     = cexpr_stack_stub + 1;
 	cexpr_stacksize = 0;
 	bzero(cexpr_stack_stub, sizeof(cexpr_stack_stub));

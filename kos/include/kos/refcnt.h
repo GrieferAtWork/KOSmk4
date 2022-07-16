@@ -247,10 +247,10 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 #define __PRIVATE_REFCNT_IMPL_DECREF_NOKILL(T, function, destroy_, refcnt_t, refcnt_field) \
 	__hybrid_atomic_dec(refcnt_field, __ATOMIC_SEQ_CST);
 #else /* NDEBUG || NDEBUG_REFCNT */
-#define __PRIVATE_REFCNT_IMPL_DECREF_NOKILL(T, function, destroy_, refcnt_t, refcnt_field)         \
-	refcnt_t __old_refcnt = __hybrid_atomic_fetchdec(refcnt_field, __ATOMIC_SEQ_CST);              \
-	__hybrid_assertf(__old_refcnt > 0, "decref_nokill(%p): Object was already destroyed", __self); \
-	__hybrid_assertf(__old_refcnt > 1, "decref_nokill(%p): Object should have been destroyed", __self);
+#define __PRIVATE_REFCNT_IMPL_DECREF_NOKILL(T, function, destroy_, refcnt_t, refcnt_field)              \
+	refcnt_t __old_refcnt = __hybrid_atomic_fetchdec(refcnt_field, __ATOMIC_SEQ_CST);                   \
+	__hybrid_assertf(__old_refcnt > 0, #T "::" #function "(%p): Object was already destroyed", __self); \
+	__hybrid_assertf(__old_refcnt > 1, #T "::" #function "(%p): Object should have been destroyed", __self);
 #endif /* !NDEBUG && !NDEBUG_REFCNT */
 #endif /* !__PRIVATE_REFCNT_IMPL_DECREF_NOKILL */
 
@@ -261,6 +261,7 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 	destroy_(self);
 #else /* NDEBUG || NDEBUG_REFCNT */
 #define __PRIVATE_REFCNT_IMPL_DESTROY(T, function, destroy_, refcnt_t, refcnt_field) \
+	/* Satisfy refcnt assertions within `destroy_()' */                              \
 	__hybrid_atomic_store(refcnt_field, (refcnt_t)0, __ATOMIC_RELEASE);              \
 	destroy_(__self);
 #endif /* !NDEBUG && !NDEBUG_REFCNT */
@@ -531,12 +532,12 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 	extern "C++" {                                        \
 	__DEFINE_REFCNT_TEMPLATE_X(T, destroy_, X, _)         \
 	__DEFINE_REFCNT_GLOBAL_FUNCTIONS_X(T, destroy_, X, _) \
-	}
+	} /* extern "C++" */
 #define __DEFINE_WEAKREFCNT_FUNCTIONS_X(T, destroy_, X, _)    \
 	extern "C++" {                                            \
 	__DEFINE_WEAKREFCNT_TEMPLATE_X(T, destroy_, X, _)         \
 	__DEFINE_WEAKREFCNT_GLOBAL_FUNCTIONS_X(T, destroy_, X, _) \
-	}
+	} /* extern "C++" */
 #else /* __cplusplus && __CC__ */
 #define __DEFINE_REFCNT_FUNCTIONS_X(T, destroy_, X, _)     /* nothing */
 #define __DEFINE_WEAKREFCNT_FUNCTIONS_X(T, destroy_, X, _) /* nothing */
