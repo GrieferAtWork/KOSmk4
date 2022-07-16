@@ -34,9 +34,11 @@
 
 DECL_BEGIN
 
-#ifndef CONFIG_MOUSE_BUFFER_SIZE
-#define CONFIG_MOUSE_BUFFER_SIZE 256
-#endif /* !CONFIG_MOUSE_BUFFER_SIZE */
+/*[[[config CONFIG_KERNEL_MOUSE_BUFFER_SIZE! = 256]]]*/
+#ifndef CONFIG_KERNEL_MOUSE_BUFFER_SIZE
+#define CONFIG_KERNEL_MOUSE_BUFFER_SIZE 256
+#endif /* !CONFIG_KERNEL_MOUSE_BUFFER_SIZE */
+/*[[[end]]]*/
 
 
 #ifdef __CC__
@@ -51,7 +53,7 @@ union mousebuf_state {
 
 struct mousebuf {
 	union mousebuf_state mb_bufstate;                         /* Buffer state */
-	WEAK mouse_packet_t  mb_buffer[CONFIG_MOUSE_BUFFER_SIZE]; /* Buffer of unread mouse inputs. */
+	WEAK mouse_packet_t  mb_buffer[CONFIG_KERNEL_MOUSE_BUFFER_SIZE]; /* Buffer of unread mouse inputs. */
 	struct sig           mb_avail;                            /* Signal send for every packet added to the buffer. */
 };
 

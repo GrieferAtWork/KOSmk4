@@ -26,6 +26,7 @@
 
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/dirnode.h>
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/fs/path.h>
 #include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
@@ -64,9 +65,9 @@ PRIVATE struct fsuper_ops const fsuper_unmounted_ops = {
 		.dno_mkfile = &ramfs_super_v_mkfile,
 		.dno_unlink = &ramfs_super_v_unlink,
 		.dno_rename = &ramfs_super_v_rename,
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 		.dno_attach_notify = &ramfs_super_v_attach_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 	},
 };
 
@@ -115,9 +116,9 @@ PUBLIC struct ramfs_super fsuper_unmounted = {
 					MFILE_INIT_mf_lockops,
 					MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 					MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 					MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 					MFILE_INIT_mf_flags(MFILE_FS_NOSUID | MFILE_FS_NOEXEC |
 					                    MFILE_F_NOATIME | MFILE_FN_NODIRATIME |
 					                    MFILE_F_NOUSRMMAP | MFILE_F_NOUSRIO |

@@ -59,10 +59,10 @@ task_clone_procpid(struct task *__restrict result,
 #endif /* !LOCAL_IS_PROC */
 	REF struct task *parent_proc;
 	struct taskpid *parent_pid;
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 	sigset_t caller_sigmask;
 	bool have_caller_sigmask = false;
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 
 	/* Figure out the caller's PID relationship */
 	caller_pid = task_gettaskpid_of(caller);
@@ -449,7 +449,7 @@ sig_endread_and_release_locks_and_force_do_task_serve:
 					status = sigmask_ismasked_nopf(_RPC_GETSIGNO(rpc->pr_flags));
 					if (status == SIGMASK_ISMASKED_NOPF_NO)
 						goto sig_endread_and_release_locks_and_force_do_task_serve; /* Unmasked, pending RPC! */
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 					if (status != SIGMASK_ISMASKED_NOPF_FAULT)
 						continue;
 					if (!have_caller_sigmask) {
@@ -481,7 +481,7 @@ unlock_everything_and_do_load_userprocmask:
 					}
 					if (!sigismember(&caller_sigmask, _RPC_GETSIGNO(rpc->pr_flags)))
 						goto sig_endread_and_release_locks_and_force_do_task_serve; /* Unmasked, pending RPC! */
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 				}
 				if (pending_bitset != 0) {
 					signo_t signo;
@@ -492,14 +492,14 @@ unlock_everything_and_do_load_userprocmask:
 						status = sigmask_ismasked_nopf(signo);
 						if (status == SIGMASK_ISMASKED_NOPF_NO)
 							goto sig_endread_and_release_locks_and_force_do_task_serve; /* Unmasked, pending RPC! */
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 						if (status != SIGMASK_ISMASKED_NOPF_FAULT)
 							continue;
 						if (!have_caller_sigmask)
 							goto unlock_everything_and_do_load_userprocmask;
 						if (!sigismember(&caller_sigmask, signo))
 							goto sig_endread_and_release_locks_and_force_do_task_serve; /* Unmasked, pending RPC! */
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 					}
 				}
 				procctl_sig_endread(caller_ctl);

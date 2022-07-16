@@ -27,13 +27,15 @@
 
 #include <bits/crt/format-printer.h>
 
-DECL_BEGIN
+
+/*[[[config CONFIG_KERNEL_DMESG_BUFFER_SIZE! = 16384]]]*/
+#ifndef CONFIG_KERNEL_DMESG_BUFFER_SIZE
+#define CONFIG_KERNEL_DMESG_BUFFER_SIZE 16384
+#endif /* !CONFIG_KERNEL_DMESG_BUFFER_SIZE */
+/*[[[end]]]*/
 
 #ifdef __CC__
-
-#ifndef CONFIG_DMESG_BUFFER_SIZE
-#define CONFIG_DMESG_BUFFER_SIZE 16384
-#endif /* !CONFIG_DMESG_BUFFER_SIZE */
+DECL_BEGIN
 
 /* The dmesg buffer is a wrap-around buffer of tightly packed, consecutive  packets
  * written as a continuous stream to the `dmesg_buffer' buffer, with any index that
@@ -69,14 +71,14 @@ DECL_BEGIN
  * within  this buffer. However, be aware that  the buffer can change at any
  * time, meaning that any packet decoding errors must be considered the same
  * as having fully wrapped around the buffer. */
-DATDEF byte_t dmesg_buffer[CONFIG_DMESG_BUFFER_SIZE];
+DATDEF byte_t dmesg_buffer[CONFIG_KERNEL_DMESG_BUFFER_SIZE];
 
 /* Base-line seconds for all cached dmesg packets. */
 DATDEF time_t dmesg_secondsbase;
 
 /* Total number  of bytes  ever written  to `dmesg_buffer'  in the  past.
  * A pointer to the end of the last-written packet can thus be calculated
- * as `&dmesg_buffer[dmesg_size % CONFIG_DMESG_BUFFER_SIZE]' */
+ * as `&dmesg_buffer[dmesg_size % CONFIG_KERNEL_DMESG_BUFFER_SIZE]' */
 DATDEF size_t dmesg_size;
 
 /* Non-zero if `dmesg_buffer' may be in an inconsistent state. */
@@ -97,10 +99,10 @@ DATDEF struct syslog_sink dmesg_sink;
  *          These chances are extremely slim, however still non-zero,
  *          so be aware that the produced message may not be what was
  *          originally written!
- * HINT: Please note  that  while  this function  technically  allows  you
- *       to  extract messages that are longer than `CONFIG_SYSLOG_LINEMAX'
- *       bytes of  raw text  (without the  trailing \n-character),  it  is
- *       impossible to write messages longer than this to the dmesg buffer
+ * HINT: Please  note   that  while   this  function   technically  allows   you
+ *       to extract messages that are longer than `CONFIG_KERNEL_SYSLOG_LINEMAX'
+ *       bytes  of  raw  text  (without   the  trailing  \n-character),  it   is
+ *       impossible  to  write messages  longer than  this  to the  dmesg buffer
  * @param: buffer:         The target buffer (with enough space for at least `message_length' bytes)
  * @param: message_offset: Offset into the dmesg buffer where the message starts.
  * @param: message_length: The length of the written message.
@@ -157,9 +159,7 @@ dmesg_getpacket(USER CHECKED struct syslog_packet *buf,
                 USER CHECKED unsigned int *plevel,
                 u16 msg_buflen, unsigned int nth);
 
-#endif /* __CC__ */
-
-
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_DMESG_H */

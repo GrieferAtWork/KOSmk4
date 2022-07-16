@@ -22,7 +22,7 @@
 
 #include <debugger/rt.h>
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <asm/cpu-flags.h>
 #include <asm/instr/interrupt.h>
 #include <kos/kernel/cpu-state-asm.h>
@@ -197,6 +197,6 @@ END(dbg_exit)
 #include "rt64-enter.S.inl"
 #endif /* !__INTELLISENSE__ */
 
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_RT32_S */

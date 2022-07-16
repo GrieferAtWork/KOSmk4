@@ -34,7 +34,7 @@
 
 #include <hybrid/host.h>
 
-#include <kos/build-config.h>
+#include <kos/config/toolchain.h> /* KOS_BUILD_CONFIG_TOOLCHAIN_BUILD_ARCH */
 #include <sys/utsname.h>
 
 #include <assert.h>

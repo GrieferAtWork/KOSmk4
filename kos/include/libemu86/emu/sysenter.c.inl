@@ -30,13 +30,13 @@ EMU86_INTELLISENSE_BEGIN(sysenter) {
 case EMU86_OPCODE_ENCODE(0x0f34): {
 	/* 0F 34     SYSENTER     Fast call to privilege level 0 system procedures. */
 #if EMU86_EMULATE_CONFIG_WANT_SYSENTER && defined(EMU86_EMULATE_RETURN_AFTER_SYSENTER)
-#if CONFIG_LIBEMU86_WANT_16BIT
+#if LIBEMU86_CONFIG_WANT_16BIT
 	/* Intel  documents that sysenter  cannot be used from
 	 * real-mode (i.e. 16-bit mode, or in this case: vm86) */
 	if unlikely(EMU86_F_IS16(op_flags))
 		goto return_unsupported_instruction;
 #define NEED_return_unsupported_instruction
-#endif /* CONFIG_LIBEMU86_WANT_16BIT */
+#endif /* LIBEMU86_CONFIG_WANT_16BIT */
 	/* Canonically, sysenter override the return IP, so no need to write it back here! */
 	/*EMU86_SETPCPTR(REAL_IP());*/
 	EMU86_EMULATE_RETURN_AFTER_SYSENTER();

@@ -31,7 +31,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
 #include <kernel/heap.h>
 #include <kernel/types.h>
@@ -63,6 +63,6 @@ FUNDEF void NOTHROW(FCALL dbx_heap_free)(void *base, size_t num_bytes);
 FUNDEF WUNUSED size_t NOTHROW(FCALL dbx_heap_allocat)(void *addr, size_t num_bytes);
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_MODDBX_INCLUDE_MALLOC_H */

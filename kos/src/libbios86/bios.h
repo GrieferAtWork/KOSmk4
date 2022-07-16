@@ -87,7 +87,7 @@ libbios86_emulator_int(struct bios86_emulator *__restrict self,
 /* Same as  above,  but  must be  used  if  `dbg_onstack()'
  * Also note that `bios86_init()' becomes  NOBLOCK+NOTHROW,
  * but may return `-1' if insufficient memory is available. */
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 INTDEF NOBLOCK WUNUSED NONNULL((1)) int
 NOTHROW(CC libbios86_init_for_debugger)(struct bios86_for_debugger *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void
@@ -96,7 +96,7 @@ INTDEF NOBLOCK WUNUSED NONNULL((1)) int
 NOTHROW(CC libbios86_emulator_init_for_debugger)(struct bios86_emulator_for_debugger *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(CC libbios86_emulator_fini_for_debugger)(struct bios86_emulator_for_debugger *__restrict self);
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 #endif /* __KERNEL__ */
 
 DECL_END

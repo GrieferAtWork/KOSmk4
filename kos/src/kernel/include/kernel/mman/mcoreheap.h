@@ -82,11 +82,11 @@ union mcorepart {
 #define _MCOREPAGE_PARTCOUNT             ((PAGESIZE - (2 * __SIZEOF_POINTER__)) / __SIZEOF_MCOREPART)
 #endif /* __ALIGNOF_MCOREPART <= __SIZEOF_POINTER__ */
 #define _MCOREPAGE_BITSET_LENGTH         ((_MCOREPAGE_PARTCOUNT + (__SIZEOF_POINTER__ * __CHAR_BIT__) - 1) / (__SIZEOF_POINTER__ * __CHAR_BIT__))
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 #define _MCOREPAGE_BITSET_SIZE           (_MCOREPAGE_BITSET_LENGTH * __SIZEOF_POINTER__ * 2)
-#else /* CONFIG_TRACE_MALLOC */
+#else /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 #define _MCOREPAGE_BITSET_SIZE           (_MCOREPAGE_BITSET_LENGTH * __SIZEOF_POINTER__)
-#endif /* !CONFIG_TRACE_MALLOC */
+#endif /* !CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 #define _MCOREPAGE_HEADER_SIZE_UNALIGNED ((1 * __SIZEOF_POINTER__) + _MCOREPAGE_BITSET_SIZE)
 #if __ALIGNOF_MCOREPART > __SIZEOF_POINTER__
 #define _MCOREPAGE_HEADER_SIZE ((_MCOREPAGE_HEADER_SIZE_UNALIGNED + __ALIGNOF_MCOREPART - 1) & ~(__ALIGNOF_MCOREPART - 1))
@@ -112,9 +112,9 @@ SLIST_HEAD(mcorepage_slist, mcorepage);
 struct mcorepage {
 	SLIST_ENTRY(mcorepage) mcp_link;                            /* [lock(mman_kernel.mm_lock)] Chain of allocated/free core pages. */
 	uintptr_t              mcp_used[_MCOREPAGE_BITSET_LENGTH];  /* [lock(mman_kernel.mm_lock)] Bitset of currently allocated parts. */
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 	uintptr_t             _mcp_reach[_MCOREPAGE_BITSET_LENGTH]; /* Used internally to mark reachable parts. */
-#endif /* CONFIG_TRACE_MALLOC */
+#endif /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 #if _MCOREPAGE_HEADER_SIZE > _MCOREPAGE_HEADER_SIZE_UNALIGNED
 	byte_t               __mcp_pad[_MCOREPAGE_HEADER_SIZE - _MCOREPAGE_HEADER_SIZE_UNALIGNED]; /* ... */
 #endif /* _MCOREPAGE_HEADER_SIZE > _MCOREPAGE_HEADER_SIZE_UNALIGNED */

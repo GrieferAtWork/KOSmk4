@@ -30,7 +30,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <debugger/config.h>
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <debugger/rt.h>
 
 #include <hybrid/host.h>
@@ -717,6 +717,6 @@ done:
 
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_REGISTER_BY_NAME_C */

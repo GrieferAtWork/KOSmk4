@@ -1,0 +1,129 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+import * from deemon;
+import * from ..autom8;
+import * from ...config.options;
+import * from ..c.ppexpr;
+
+global configCheckedFilenames: {string...} = HashSet();
+
+function main(parser: Autom8Parser, body: string) {
+	local autoEnd = parser.text.find("/*[[[end]]]*/", parser.commentEnd);
+	if (autoEnd < 0)
+		parser.errAt(parser.commentStart, "Missing /*[[[end]]]*/ tag");
+	/* TODO: Apply autom8 formatting to the rest of the tag body (except for
+	 *       the first line), as the rest  of the body is the  documentation
+	 *       string for the config option in question! */
+	parser.newText << parser.text[parser.flushStart:parser.commentEnd+2];
+	parser.flushStart = autoEnd + 13;
+	body = body.strip();
+
+	@@configLine has one of the following formats:
+	@@ - @"CONFIG_HAVE_KERNEL_MNODE_MERGE = true"
+	@@ - @"CONFIG_HAVE_KERNEL_MNODE_MERGE = 42"
+	@@ - @"CONFIG_HAVE_KERNEL_MNODE_MERGE = 'foo'"
+	@@ - @"CONFIG_HAVE_KERNEL_MNODE_MERGE = \"foo\""
+	@@ - @"CONFIG_HAVE_KERNEL_MNODE_MERGE: bool = true"
+	@@ - @"CONFIG_HAVE_KERNEL_MNODE_MERGE: int = 42"
+	@@ - @"CONFIG_HAVE_KERNEL_MNODE_MERGE: string = 'foo'"
+	@@ - @"CONFIG_HAVE_KERNEL_MNODE_MERGE: string = \"foo\""
+	local configLine = body.partition("\n")[0].strip();
+	local colPos = configLine.find(":");
+	local eqPos = configLine.find("=");
+	if (eqPos < 0)
+		parser.errAt(parser.commentStart, f"Missing '=' in {repr configLine}");
+	local configType: string;
+	local configName: string;
+	local configValue: string = configLine[eqPos+1:].lstrip();
+	local required: bool = false;
+	if (colPos >= 0) {
+		configName = configLine[:colPos].rstrip();
+		configType = configLine[colPos+1:eqPos].strip();
+	} else {
+		configName = configLine[:eqPos].rstrip();
+		if (configValue.startswith("'") || configValue.startswith('"')) {
+			configType = "string";
+		} else if (configValue in ["true", "false"]) {
+			configType = "bool";
+		} else {
+			configType = "int";
+		}
+	}
+	if (configName.endswith("!")) {
+		configName = configName[:-1].rstrip();
+		required = true;
+	}
+
+	if (configValue.startswith("'") && configValue.endswith("'"))
+		configValue = f'"{configValue[1:-1].replace(r'"', r'\"')}"';
+	parser.newText << "\n";
+	if (configType == "bool") {
+		local noName = getConfigInverseName(configName);
+		parser.newText <<
+			"#ifdef " << noName << "\n"
+			"#undef " << configName << "\n"
+			"#elif !defined(" << configName << ")\n";
+		if (configValue in ["true", "false"]) {
+			parser.newText <<
+				"#define " << (configValue == "true" ? configName : noName) << "\n";
+		} else {
+			configValue = optimize(configValue);
+			parser.newText << optimizeForIfdef(configValue) <<
+				"#define " << configName << "\n"
+				<< optimizeForElse(configValue) <<
+				"#define " << noName << "\n"
+				<< optimizeForEndif(f"!({configValue})");
+		}
+		parser.newText <<
+			"#elif (-" << configName << " - 1) == -1\n"
+			"#undef " << configName << "\n"
+			"#define " << noName << "\n"
+			"#endif /* ... */\n";
+	} else if (configType == "int" && !required) {
+		local noName = getConfigInverseName(configName);
+		local disabledValue = getConfigDisabledIntegerValue(configName);
+		parser.newText <<
+			"#ifdef " << noName << "\n"
+			"#undef " << configName << "\n"
+			"#define " << configName << " " << disabledValue << "\n"
+			"#elif !defined(" << configName << ")\n"
+			"#define " << configName << " " << configValue << "\n";
+		if (configValue == "0")
+			parser.newText << "#define " << noName << " 1\n";
+		parser.newText <<
+			"#elif (" << configName << " + 0) <= " << disabledValue << "\n"
+			"#undef " << configName << "\n"
+			"#define " << noName << "\n"
+			"#define " << configName << " " << disabledValue << "\n"
+			"#endif /* ... */\n";
+	} else {
+		parser.newText <<
+			"#ifndef " << configName << "\n"
+			"#define " << configName << " " << configValue << "\n"
+			"#endif /* !" << configName << " */\n";
+	}
+	parser.newText << "/*[[[end]]]*/";
+
+	/* Register the config option with the options database */
+	local callerFilename = normalizeFilename(parser.filename);
+	if (configCheckedFilenames.insert(callerFilename))
+		clearFileConfig(callerFilename);
+	addFileConfigOption(callerFilename, f"{configName}:{configType}={configValue}");
+}

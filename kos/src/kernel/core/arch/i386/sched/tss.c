@@ -182,10 +182,10 @@ NOTHROW(KCALL get_stack_avail)(void) {
 	node  = THIS_KERNEL_STACK;
 	if (mnode_containsaddr(node, sp))
 		return (uintptr_t)sp - (uintptr_t)mnode_getaddr(node);
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	if (sp >= dbg_stack && sp < COMPILER_ENDOF(dbg_stack))
 		return (uintptr_t)sp - (uintptr_t)dbg_stack;
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 #ifdef CONFIG_NO_SMP
 	node = &FORCPU(&bootcpu, thiscpu_x86_dfstacknode);
 	if (mnode_containsaddr(node, sp))
@@ -213,10 +213,10 @@ NOTHROW(KCALL get_stack_inuse)(void) {
 	node  = THIS_KERNEL_STACK;
 	if (mnode_containsaddr(node, sp))
 		return (uintptr_t)mnode_getendaddr(node) - (uintptr_t)sp;
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	if (sp >= dbg_stack && sp < COMPILER_ENDOF(dbg_stack))
 		return (uintptr_t)COMPILER_ENDOF(dbg_stack) - (uintptr_t)sp;
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 #ifdef CONFIG_NO_SMP
 	node = &FORCPU(&bootcpu, thiscpu_x86_dfstacknode);
 	if (mnode_containsaddr(node, sp))
@@ -246,13 +246,13 @@ NOTHROW(KCALL get_stack_for)(void **pbase, void **pend, void *sp) {
 		*pend  = mnode_getendaddr(node);
 		return;
 	}
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	if (sp >= dbg_stack && sp < COMPILER_ENDOF(dbg_stack)) {
 		*pbase = dbg_stack;
 		*pend  = COMPILER_ENDOF(dbg_stack);
 		return;
 	}
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 #ifdef CONFIG_NO_SMP
 	node = &FORCPU(&bootcpu, thiscpu_x86_dfstacknode);
 	if (mnode_containsaddr(node, sp)) {

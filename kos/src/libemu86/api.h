@@ -23,18 +23,18 @@
 #include <hybrid/host.h>
 
 #define LIBEMU86_WANT_PROTOTYPES
-#define CONFIG_LIBEMU86_WANT_32BIT 1
+#define LIBEMU86_CONFIG_WANT_32BIT 1
 #ifdef __x86_64__
 /* Disable 16-bit support on 64-bit x86_64 targets by default. */
-#define CONFIG_LIBEMU86_WANT_16BIT 0
-#define CONFIG_LIBEMU86_WANT_64BIT 1
+#define LIBEMU86_CONFIG_WANT_16BIT 0
+#define LIBEMU86_CONFIG_WANT_64BIT 1
 #elif defined(__i386__)
-#define CONFIG_LIBEMU86_WANT_16BIT 1
+#define LIBEMU86_CONFIG_WANT_16BIT 1
 /* Disable 64-bit support on 32-bit i386 targets by default. */
-#define CONFIG_LIBEMU86_WANT_64BIT 0
+#define LIBEMU86_CONFIG_WANT_64BIT 0
 #else /* __x86_64__ */
-#define CONFIG_LIBEMU86_WANT_16BIT 1
-#define CONFIG_LIBEMU86_WANT_64BIT 1
+#define LIBEMU86_CONFIG_WANT_16BIT 1
+#define LIBEMU86_CONFIG_WANT_64BIT 1
 #endif /* !__x86_64__ */
 
 #include <libemu86/api.h>

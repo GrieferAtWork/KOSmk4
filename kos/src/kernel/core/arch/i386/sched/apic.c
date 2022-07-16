@@ -263,18 +263,18 @@ INTDEF FREE ATTR_CONST WUNUSED NONNULL((1)) union p64_pdir_e1 *
 NOTHROW(FCALL x86_get_cpu_iob_pointer_p64)(struct cpu const *__restrict self);
 #define x86_get_cpu_iob_pointer  x86_get_cpu_iob_pointer_p64
 #else /* __x86_64__ */
-#ifndef CONFIG_NO_PAGING_P32
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_P32
 INTDEF FREE ATTR_CONST WUNUSED NONNULL((1)) union p32_pdir_e1 *
 NOTHROW(FCALL x86_get_cpu_iob_pointer_p32)(struct cpu const *__restrict self);
-#endif /* !CONFIG_NO_PAGING_P32 */
-#ifndef CONFIG_NO_PAGING_PAE
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_P32 */
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_PAE
 INTDEF FREE ATTR_CONST WUNUSED NONNULL((1)) union pae_pdir_e1 *
 NOTHROW(FCALL x86_get_cpu_iob_pointer_pae)(struct cpu const *__restrict self);
-#endif /* !CONFIG_NO_PAGING_PAE */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_PAE */
 
-#ifdef CONFIG_NO_PAGING_P32
+#ifdef CONFIG_NO_KERNEL_X86_PAGING_P32
 #define x86_get_cpu_iob_pointer  x86_get_cpu_iob_pointer_p32
-#elif defined(CONFIG_NO_PAGING_PAE)
+#elif defined(CONFIG_NO_KERNEL_X86_PAGING_PAE)
 #define x86_get_cpu_iob_pointer  x86_get_cpu_iob_pointer_pae
 #else /* ... */
 #define x86_get_cpu_iob_pointer(self)                                   \
@@ -523,10 +523,10 @@ i386_allocate_secondary_cores(void) {
 		/*FORTASK(altidle, this_sched_link).le_next = NULL;*/
 
 		/* Assign name to IDLE thread. */
-#ifdef CONFIG_HAVE_TASK_COMM
+#ifdef CONFIG_HAVE_KERNEL_TASK_COMM
 		/* XXX: This assumes that `TASK_COMM_LEN' is large enough (which it is, but... this could be done better) */
 		sprintf(FORTASK(altidle, this_comm), "idle%u", i);
-#endif /* CONFIG_HAVE_TASK_COMM */
+#endif /* CONFIG_HAVE_KERNEL_TASK_COMM */
 
 		/* Allocate a PID for the IDLE thread. */
 		FORTASK(altidle, this_taskpid) = &FORCPU(altcore, thiscpu_idle_pid);
@@ -719,13 +719,13 @@ DATDEF cpuset_t ___cpuset_full_mask ASMNAME("__cpuset_full_mask");
 #endif /* __HAVE_CPUSET_FULL_MASK */
 
 
-#ifndef CONFIG_HAVE_DEBUGGER
+#ifndef CONFIG_HAVE_KERNEL_DEBUGGER
 INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_pic)(void)
-#else /* !CONFIG_HAVE_DEBUGGER */
+#else /* !CONFIG_HAVE_KERNEL_DEBUGGER */
 /* The  debugger  calls this  function during
  * init, so we can't mark it as ATTR_FREETEXT */
 INTERN void NOTHROW(KCALL x86_initialize_pic)(void)
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 {
 	/* >> (re-)initialize the master & slave PICs.
 	 * Following this, each PIC will expect 3 additional "initialization words". */
@@ -744,12 +744,12 @@ INTERN void NOTHROW(KCALL x86_initialize_pic)(void)
 	outb_p(X86_PIC1_DATA, X86_ICW4_8086);
 	outb_p(X86_PIC2_DATA, X86_ICW4_8086);
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	/* This   function  should  only  ever  be  called  once  (I've  seen  the
 	 * PIC stop  working  properly  if it's  initialized  more  than  once...)
 	 * To ensure this, we re-write our own entry-point with a ret-instruction. */
 	*(u8 *)(void *)&x86_initialize_pic = 0xc3; /* ret */
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 }
 
 extern byte_t x86_arch_cpu_hwipi_pending_nopr[] ASMNAME("arch_cpu_hwipi_pending_nopr");

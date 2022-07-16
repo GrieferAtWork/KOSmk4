@@ -76,39 +76,39 @@
 #endif
 #endif /* EMU86_F_BITMASK */
 #ifndef instrlen_isa_from_emu86_opflags_t
-#if (CONFIG_LIBEMU86_WANT_16BIT && CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_64BIT)
-#elif (CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_64BIT)
+#if (LIBEMU86_CONFIG_WANT_16BIT && LIBEMU86_CONFIG_WANT_32BIT && LIBEMU86_CONFIG_WANT_64BIT)
+#elif (LIBEMU86_CONFIG_WANT_32BIT && LIBEMU86_CONFIG_WANT_64BIT)
 #if defined(INSTRLEN_ISA_X86_64) && defined(INSTRLEN_ISA_I386)
 #define instrlen_isa_from_emu86_opflags_t(/*emu86_opflags_t*/ flags) \
 	(EMU86_F_IS32(flags) ? INSTRLEN_ISA_I386 : INSTRLEN_ISA_X86_64)
 #define instrlen_isa_to_emu86_opflags_t(isa) \
 	((isa) == INSTRLEN_ISA_X86_64 ? EMU86_F_64BIT : EMU86_F_32BIT)
 #endif /* INSTRLEN_ISA_X86_64 && INSTRLEN_ISA_I386 */
-#elif (CONFIG_LIBEMU86_WANT_16BIT && CONFIG_LIBEMU86_WANT_32BIT)
+#elif (LIBEMU86_CONFIG_WANT_16BIT && LIBEMU86_CONFIG_WANT_32BIT)
 #if defined(INSTRLEN_ISA_8086) && defined(INSTRLEN_ISA_I386)
 #define instrlen_isa_from_emu86_opflags_t(/*emu86_opflags_t*/ flags) \
 	(EMU86_F_IS32(flags) ? INSTRLEN_ISA_I386 : INSTRLEN_ISA_8086)
 #define instrlen_isa_to_emu86_opflags_t(isa) \
 	((isa) == INSTRLEN_ISA_I386 ? EMU86_F_32BIT : EMU86_F_16BIT)
 #endif /* INSTRLEN_ISA_8086 && INSTRLEN_ISA_I386 */
-#elif (CONFIG_LIBEMU86_WANT_16BIT && CONFIG_LIBEMU86_WANT_64BIT)
+#elif (LIBEMU86_CONFIG_WANT_16BIT && LIBEMU86_CONFIG_WANT_64BIT)
 #if defined(INSTRLEN_ISA_X86_64) && defined(INSTRLEN_ISA_8086)
 #define instrlen_isa_from_emu86_opflags_t(/*emu86_opflags_t*/ flags) \
 	(EMU86_F_IS64(flags) ? INSTRLEN_ISA_X86_64 : INSTRLEN_ISA_8086)
 #define instrlen_isa_to_emu86_opflags_t(isa) \
 	((isa) == INSTRLEN_ISA_X86_64 ? EMU86_F_16BIT : EMU86_F_32BIT)
 #endif /* INSTRLEN_ISA_X86_64 && INSTRLEN_ISA_8086 */
-#elif CONFIG_LIBEMU86_WANT_64BIT
+#elif LIBEMU86_CONFIG_WANT_64BIT
 #ifdef INSTRLEN_ISA_X86_64
 #define instrlen_isa_from_emu86_opflags_t(/*emu86_opflags_t*/ flags) INSTRLEN_ISA_X86_64
 #define instrlen_isa_to_emu86_opflags_t(isa) EMU86_F_64BIT
 #endif /* INSTRLEN_ISA_X86_64 */
-#elif CONFIG_LIBEMU86_WANT_32BIT
+#elif LIBEMU86_CONFIG_WANT_32BIT
 #ifdef INSTRLEN_ISA_I386
 #define instrlen_isa_from_emu86_opflags_t(/*emu86_opflags_t*/ flags) INSTRLEN_ISA_I386
 #define instrlen_isa_to_emu86_opflags_t(isa) EMU86_F_32BIT
 #endif /* INSTRLEN_ISA_I386 */
-#elif CONFIG_LIBEMU86_WANT_16BIT
+#elif LIBEMU86_CONFIG_WANT_16BIT
 #ifdef INSTRLEN_ISA_8086
 #define instrlen_isa_from_emu86_opflags_t(/*emu86_opflags_t*/ flags) INSTRLEN_ISA_8086
 #define instrlen_isa_to_emu86_opflags_t(isa) EMU86_F_16BIT

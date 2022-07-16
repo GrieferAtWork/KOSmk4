@@ -146,7 +146,7 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 	cli
 #endif /* !CONFIG_NO_SMP */
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	/* Special  case: calling `task_yield()' whilst in debugger-mode.
 	 * Assuming that the caller wants to wait for something  specific
 	 * to  happen, and knowing that the system is running in debugger
@@ -159,7 +159,7 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 	EXTERN(dbg_active)
 	cmpb   $0, dbg_active
 	jne    .Ldbg_active_task_yield
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #ifdef __x86_64__
 	EXTERN(x86_load_scpustate_rsp_gsbase_rax_nopr)
@@ -169,14 +169,14 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 	jmp    x86_load_scpustate_esp_nopr
 #endif /* !__x86_64__ */
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 .Ldbg_active_task_yield:
 	/* Throw an exception if the builtin debugger is active. */
 	movP   $(EXCEPT_CODEOF(E_WOULDBLOCK)), %R_fcall0P
 	EXTERN(except_throw)
 	call   except_throw
 	nop
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 	.cfi_restore_state
 .Lillegal_task_yield:
@@ -244,11 +244,11 @@ PUBLIC_FUNCTION(task_yield_nx)
 	ttest  mask=EFLAGS_IF, loc=0(%Psp)
 	.cfi_remember_state
 	jz     .Lillegal_task_yield_nx
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	EXTERN(dbg_active)
 	cmpb   $0, dbg_active
 	jne    .Lillegal_task_yield_nx
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 	pushP_cfi_r_kernel_cs             /* ir_cs */
 	pushP_cfi %Pax                    /* ir_rip */

@@ -26,6 +26,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/fs/flat.h>
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/fs/notify.h>
 #include <kernel/fs/path.h>
 #include <kernel/malloc.h>
@@ -153,9 +154,9 @@ again:
 	        "As per documentation, `ffso_makenode()' may only set these flags!");
 	result->mf_flags |= dir->mf_flags & (MFILE_F_READONLY | MFILE_F_NOATIME | MFILE_F_NOMTIME);
 	atomic_rwlock_init(&result->mf_lock);
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 	result->mf_notify = NULL;
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 	sig_init(&result->mf_initdone);
 	SLIST_INIT(&result->mf_lockops);
 	SLIST_INIT(&result->mf_changed);
@@ -931,9 +932,9 @@ handle_existing:
 		node->mf_flags |= me->mf_flags & (MFILE_F_READONLY | MFILE_F_NOATIME | MFILE_F_NOMTIME);
 		node->mf_refcnt = 2; /* +1: MFILE_FN_GLOBAL_REF, +1: info->mkf_rnode */
 		atomic_rwlock_init(&node->mf_lock);
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 		node->mf_notify = NULL;
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 		sig_init(&node->mf_initdone);
 		SLIST_INIT(&node->mf_lockops);
 		SLIST_INIT(&node->mf_changed);
@@ -1628,7 +1629,7 @@ err_exists_fill_in_repnode:
 }
 
 
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 
 /* Return values for `flatdirnode_dirent_traced()' */
 #define FLATDIRNODE_DIRENT_TRACED_NO    0 /* Not traced */
@@ -1703,7 +1704,7 @@ again:
 	}
 	flatdirnode_endread(me);
 }
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 
 
@@ -1948,9 +1949,11 @@ NOTHROW(FCALL flatdirdata_fini)(struct flatdirdata *__restrict self) {
 }
 
 
-#ifndef CONFIG_FFLATDIR_FILESLIST_INITIAL_MASK
-#define CONFIG_FFLATDIR_FILESLIST_INITIAL_MASK 7
-#endif /* !CONFIG_FFLATDIR_FILESLIST_INITIAL_MASK */
+/*[[[config CONFIG_KERNEL_FFLATDIR_FILESLIST_INITIAL_MASK! = 7]]]*/
+#ifndef CONFIG_KERNEL_FFLATDIR_FILESLIST_INITIAL_MASK
+#define CONFIG_KERNEL_FFLATDIR_FILESLIST_INITIAL_MASK 7
+#endif /* !CONFIG_KERNEL_FFLATDIR_FILESLIST_INITIAL_MASK */
+/*[[[end]]]*/
 
 /* Work-around for compiler error:
  * >> "initialization of flexible array member in a nested context"
@@ -2134,9 +2137,9 @@ NOTHROW(FCALL flatdirnode_fileslist_rehash_with)(struct flatdirnode *__restrict 
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL flatdirnode_fileslist_rehash_after_remove)(struct flatdirnode *__restrict self) {
 	if ((self->fdn_data.fdd_filesused < (self->fdn_data.fdd_filesmask / 3)) &&
-	    self->fdn_data.fdd_filesmask > CONFIG_FFLATDIR_FILESLIST_INITIAL_MASK) {
+	    self->fdn_data.fdd_filesmask > CONFIG_KERNEL_FFLATDIR_FILESLIST_INITIAL_MASK) {
 		/* Try to shrink the hash-vector's mask size. */
-		size_t new_mask = CONFIG_FFLATDIR_FILESLIST_INITIAL_MASK;
+		size_t new_mask = CONFIG_KERNEL_FFLATDIR_FILESLIST_INITIAL_MASK;
 		size_t thresh   = ((self->fdn_data.fdd_filesused + 1) * 3) / 2;
 		while (thresh >= new_mask)
 			new_mask = (new_mask << 1) | 1;
@@ -2159,7 +2162,7 @@ flatdirnode_fileslist_rehash_before_insert(struct flatdirnode *__restrict self)
 	if (((self->fdn_data.fdd_filessize + 1) * 3) / 2 >= self->fdn_data.fdd_filesmask) {
 		/* Must rehash! */
 		struct flatdir_bucket *new_list;
-		size_t new_mask = CONFIG_FFLATDIR_FILESLIST_INITIAL_MASK;
+		size_t new_mask = CONFIG_KERNEL_FFLATDIR_FILESLIST_INITIAL_MASK;
 		size_t thresh   = ((self->fdn_data.fdd_filesused + 1) * 3) / 2;
 		while (thresh >= new_mask)
 			new_mask = (new_mask << 1) | 1;
@@ -2169,7 +2172,7 @@ flatdirnode_fileslist_rehash_before_insert(struct flatdirnode *__restrict self)
 		if unlikely(!new_list) {
 			if ((self->fdn_data.fdd_filessize + 1) <= self->fdn_data.fdd_filesmask)
 				return;
-			new_mask = CONFIG_FFLATDIR_FILESLIST_INITIAL_MASK;
+			new_mask = CONFIG_KERNEL_FFLATDIR_FILESLIST_INITIAL_MASK;
 			while ((self->fdn_data.fdd_filesused + 1) > self->fdn_data.fdd_filesmask)
 				new_mask = (new_mask << 1) | 1;
 			new_list = (struct flatdir_bucket *)kmalloc((new_mask + 1) *

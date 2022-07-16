@@ -26,7 +26,9 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 #include <kernel/except.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/dirnode.h>
@@ -1530,6 +1532,6 @@ DEFINE_SYSCALL2(errno_t, inotify_rm_watch, fd_t, notify_fd, int, wd) {
 
 
 DECL_END
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 #endif /* !GUARD_KERNEL_CORE_FILESYS_NOTIFY_C */

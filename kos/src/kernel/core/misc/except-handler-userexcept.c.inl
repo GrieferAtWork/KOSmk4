@@ -24,7 +24,7 @@
 //#define DEFINE_userexcept_sysret
 #endif /* __INTELLISENSE__ */
 
-#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
+#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 #include <sched/group.h>
 #include <sched/sigmask.h>
 
@@ -222,7 +222,7 @@ handle_pending:
 				 *       before, meaning that the last one executed (iow: the first one
 				 *       originally scheduled) will have the last word when it comes to
 				 *       where execution should continue. */
-#if !defined(LOCAL_HAVE_SIGMASK) && defined(CONFIG_HAVE_USERPROCMASK)
+#if !defined(LOCAL_HAVE_SIGMASK) && defined(CONFIG_HAVE_KERNEL_USERPROCMASK)
 				bool is_masked;
 				TRY {
 					is_masked = sigmask_ismasked(_RPC_GETSIGNO(rpc->pr_flags));
@@ -309,7 +309,7 @@ make_inactive:
 				 *       before, meaning that the last one executed (iow: the first one
 				 *       originally scheduled) will have the last word when it comes to
 				 *       where execution should continue. */
-#if !defined(LOCAL_HAVE_SIGMASK) && defined(CONFIG_HAVE_USERPROCMASK)
+#if !defined(LOCAL_HAVE_SIGMASK) && defined(CONFIG_HAVE_KERNEL_USERPROCMASK)
 				bool is_masked;
 				TRY {
 					is_masked = sigmask_ismasked(signo);
@@ -365,12 +365,12 @@ make_inactive:
 		if ((rpc != NULL && rpc != THIS_RPCS_TERMINATED) || pending_bitset) {
 			struct pending_rpc **p_rpc;
 			bool has_write_lock;
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 			sigset_t known_unmasked_signals;
 			sigset_t known_masked_signals;
 			sigemptyset(&known_unmasked_signals);
 			sigemptyset(&known_masked_signals);
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 again_lock_proc_rpcs:
 			has_write_lock = false;
 			procctl_sig_read(proc);
@@ -397,7 +397,7 @@ again_scan_proc_rpcs:
 
 						/* Check if the signal number used by this RPC is currently masked. */
 						signo = _RPC_GETSIGNO(rpc->pr_flags);
-#if !defined(LOCAL_HAVE_SIGMASK) && defined(CONFIG_HAVE_USERPROCMASK)
+#if !defined(LOCAL_HAVE_SIGMASK) && defined(CONFIG_HAVE_KERNEL_USERPROCMASK)
 						if (sigismember(&known_masked_signals, signo))
 							goto check_next_proc_rpc; /* Known-masked signal */
 						if (!sigismember(&known_unmasked_signals, signo)) {
@@ -497,7 +497,7 @@ check_next_proc_rpc:
 					if (!(pending_bitset & signo_mask))
 						continue;
 					/* Figure out if we should handle this RPC. */
-#if !defined(LOCAL_HAVE_SIGMASK) && defined(CONFIG_HAVE_USERPROCMASK)
+#if !defined(LOCAL_HAVE_SIGMASK) && defined(CONFIG_HAVE_KERNEL_USERPROCMASK)
 					if (sigismember(&known_masked_signals, signo))
 						continue; /* Known-masked signal */
 					if (!sigismember(&known_unmasked_signals, signo)) {

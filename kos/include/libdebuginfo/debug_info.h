@@ -200,19 +200,41 @@ typedef struct di_debuginfo_cu_abbrev_cache_entry_struct {
 	                           * >> component.dic_attrib      = reader; */
 } di_debuginfo_cu_abbrev_cache_entry_t;
 
-#ifndef CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE
-#define CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE 16 /* This equates to ~256 (on 32-bit) bytes allocated for the cache. */
-#endif /* !CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE */
-#ifndef CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE
+
+/* This `16' equates to ~256 (on 32-bit) bytes allocated for the cache. */
+/*[[[config CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE = 16]]]*/
+#ifdef CONFIG_NO_DEBUGINFO_ABBREV_CACHE_MINSIZE
+#undef CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE
+#define CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE 0
+#elif !defined(CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE)
+#define CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE 16
+#elif (CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE + 0) <= 0
+#undef CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE
+#define CONFIG_NO_DEBUGINFO_ABBREV_CACHE_MINSIZE
+#define CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE 0
+#endif /* ... */
+/*[[[end]]]*/
+/*[[[config CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE = 256]]]*/
+#ifdef CONFIG_NO_DEBUGINFO_ABBREV_CACHE_MAXSIZE
+#undef CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE
+#define CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE 0
+#elif !defined(CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE)
 #define CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE 256
-#endif /* !CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE */
+#elif (CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE + 0) <= 0
+#undef CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE
+#define CONFIG_NO_DEBUGINFO_ABBREV_CACHE_MAXSIZE
+#define CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE 0
+#endif /* ... */
+/*[[[end]]]*/
 
 typedef struct di_debuginfo_cu_abbrev_struct {
 	__byte_t const                       *dua_abbrev;     /* [1..1][const] Starting address of debug abbreviations (in .debug_abbrev). */
 	di_debuginfo_cu_abbrev_cache_entry_t *dua_cache_list; /* [1..dua_cache_size][owned_if(!= dua_stcache)] Cache vector, or (di_debuginfo_cu_abbrev_cache_entry_t *)-1 if unused. */
 	__size_t                              dua_cache_size; /* Allocated (dua_cache_list != dua_stcache) or initialiezd (dua_cache_list == dua_stcache) cache size. */
 	__size_t                              dua_cache_next; /* Index to the cache entry that should be overwritten next. */
+#if CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE != 0
 	di_debuginfo_cu_abbrev_cache_entry_t  dua_stcache[CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE]; /* Statically allocated cache. */
+#endif /* CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE != 0 */
 } di_debuginfo_cu_abbrev_t;
 
 typedef struct di_debuginfo_cu_simple_parser_struct {

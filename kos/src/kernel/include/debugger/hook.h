@@ -24,7 +24,7 @@
 
 #include <debugger/config.h>
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <kernel/mman/driver.h>
 #include <kernel/types.h>
 
@@ -620,6 +620,6 @@ dbg_lookup_command_startswith(char const *__restrict name_start);
 
 DECL_END
 
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_INCLUDE_DEBUGGER_HOOK_H */

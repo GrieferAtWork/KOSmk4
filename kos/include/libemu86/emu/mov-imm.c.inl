@@ -243,10 +243,10 @@ case EMU86_OPCODE_ENCODE(0xc7):
 case EMU86_OPCODE_ENCODE(0xb0) ... EMU86_OPCODE_ENCODE(0xb7): {
 	u8 value;
 	u8 regno = tiny_opcode - EMU86_OPCODE_ENCODE(0xb0);
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 	if (op_flags & EMU86_F_REX_B)
 		regno |= 0x8;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	/* B0+ rb ib    MOV r8, imm8      OI     Valid     Valid     Move imm8 to r8. */
 	value = *pc;
 	++pc;
@@ -266,10 +266,10 @@ case EMU86_OPCODE_ENCODE(0xb8) ... EMU86_OPCODE_ENCODE(0xbf): {
 	 *         B8+ rd id    MOV r32, imm32   OI   Valid    Valid    Move imm32 to r32.
 	 * REX.W + B8+ rd io    MOV r64, imm64   OI   Valid    N.E.     Move imm64 to r64. */
 	u8 regno = tiny_opcode - EMU86_OPCODE_ENCODE(0xb8);
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 	if (op_flags & EMU86_F_REX_B)
 		regno |= 0x8;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	IF_64BIT(if (IS_64BIT()) {
 		u64 value;
 		value = UNALIGNED_GETLE64((u64 const *)pc);

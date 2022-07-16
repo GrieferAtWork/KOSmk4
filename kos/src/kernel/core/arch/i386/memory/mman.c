@@ -97,12 +97,12 @@ INTDEF byte_t __kernel_bss_numpages[];
 INTDEF byte_t __kernel_bootiob_start[] ASMNAME("__x86_iob_empty_base");
 INTDEF byte_t __kernel_bootiob_startpage_p[] ASMNAME("__x86_iob_empty_page_p");
 
-#undef CONFIG_BOOTCPU_IOB_LIES_IN_BSS
-#undef CONFIG_BOOTCPU_IOB_LIES_IN_DATA
+#undef OPT_BOOTCPU_IOB_LIES_IN_BSS
+#undef OPT_BOOTCPU_IOB_LIES_IN_DATA
 #ifndef CONFIG_NO_SMP
-#define CONFIG_BOOTCPU_IOB_LIES_IN_BSS 1
+#define OPT_BOOTCPU_IOB_LIES_IN_BSS 1
 #else /* !CONFIG_NO_SMP */
-#define CONFIG_BOOTCPU_IOB_LIES_IN_DATA 1
+#define OPT_BOOTCPU_IOB_LIES_IN_DATA 1
 #endif /* CONFIG_NO_SMP */
 
 
@@ -113,7 +113,7 @@ INTDEF byte_t __kernel_bootiob_startpage_p[] ASMNAME("__x86_iob_empty_page_p");
  * byte is read for every 4096 bytes being advanced. */
 #define X86_KERNEL_MMAPPING_CORE_TEXT        0 /* .text */
 #define X86_KERNEL_MMAPPING_CORE_RODATA      1 /* .rodata */
-#ifdef CONFIG_BOOTCPU_IOB_LIES_IN_BSS
+#ifdef OPT_BOOTCPU_IOB_LIES_IN_BSS
 #define X86_KERNEL_MMAPPING_CORE_DATA        2 /* .data */
 #define X86_KERNEL_MMAPPING_CORE_XDATA       3 /* .xdata / .xbss */
 #define X86_KERNEL_MMAPPING_CORE_BSS1        4 /* .bss */
@@ -132,7 +132,7 @@ INTDEF byte_t __x86_kernel_bss_after_iob_pages[];
 #define __kernel_bss2_end         __kernel_bss_end
 #define __kernel_bss2_size        (__x86_kernel_bss_after_iob_size - 2 * PAGESIZE)
 #define __kernel_bss2_numpages    (__x86_kernel_bss_after_iob_pages - 2)
-#else /* CONFIG_BOOTCPU_IOB_LIES_IN_BSS */
+#else /* OPT_BOOTCPU_IOB_LIES_IN_BSS */
 #define X86_KERNEL_MMAPPING_CORE_DATA1       2 /* .data */
 #define X86_KERNEL_MMAPPING_CORE_DATA2       3 /* .data */
 #define X86_KERNEL_MMAPPING_CORE_XDATA       4 /* .xdata / .xbss */
@@ -151,7 +151,7 @@ INTDEF byte_t __x86_kernel_data_after_iob_pages[];
 #define __kernel_data2_end         __kernel_data_end
 #define __kernel_data2_size        (__x86_kernel_data_after_iob_size - 2 * PAGESIZE)
 #define __kernel_data2_numpages    (__x86_kernel_data_after_iob_pages - 2)
-#endif /* !CONFIG_BOOTCPU_IOB_LIES_IN_BSS */
+#endif /* !OPT_BOOTCPU_IOB_LIES_IN_BSS */
 #define X86_KERNEL_MMAPPING_IDENTITY_RESERVE 6 /* A memory reservation made for the page directory identity mapping. */
 
 

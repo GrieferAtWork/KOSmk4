@@ -468,8 +468,8 @@ NOTHROW(KCALL kmalloc_trace_nx)(void *base, size_t num_bytes,
 	node_size = (size_t)(uend - umin) / sizeof(void *);          /* node_size = REQ_BITS */
 	node_size = CEILDIV(node_size, BITSOF(trace_node_bitset_t)); /* node_size = REQ_BITSET_WORDS */
 	node_size *= sizeof(trace_node_bitset_t);                    /* node_size = sizeof(BITSET) */
-	if (node_size < CONFIG_TRACE_MALLOC_MIN_TRACEBACK * sizeof(void *))
-		node_size = CONFIG_TRACE_MALLOC_MIN_TRACEBACK * sizeof(void *);
+	if (node_size < CONFIG_KERNEL_TRACE_MALLOC_MIN_TRACEBACK * sizeof(void *))
+		node_size = CONFIG_KERNEL_TRACE_MALLOC_MIN_TRACEBACK * sizeof(void *);
 	node_size += offsetof(struct trace_node, tn_trace);          /* Header addend. */
 	/* Allocate the tracing node. */
 	node_ptr = LOCAL_heap_alloc_untraced(&trace_heap, node_size,

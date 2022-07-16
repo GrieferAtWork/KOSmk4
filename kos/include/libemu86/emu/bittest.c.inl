@@ -217,12 +217,12 @@ case EMU86_OPCODE_ENCODE(0x0fba):
 	break;
 #else /* EMU86_EMULATE_CONFIG_WANT_BITTEST */
 	MODRM_DECODE();
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 	if (modrm.mi_reg >= 8) {
 		goto return_unknown_instruction_rmreg;
 #define NEED_return_unknown_instruction_rmreg
 	}
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	if (modrm.mi_reg >= 1 && modrm.mi_reg <= 3) {
 		goto return_unknown_instruction_rmreg;
 #define NEED_return_unknown_instruction_rmreg

@@ -21,12 +21,12 @@
 #define GUARD_KERNEL_SRC_DEBUGGER_APPS_DMESG_C 1
 #define DISABLE_BRANCH_PROFILING /* Don't profile this file */
 #define _KOS_SOURCE 1
-#define SYSLOG_LINEMAX CONFIG_SYSLOG_LINEMAX
+#define SYSLOG_LINEMAX CONFIG_KERNEL_SYSLOG_LINEMAX
 
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
 #include <debugger/debugger.h>
 #include <kernel/dmesg.h>
@@ -221,7 +221,7 @@ dbg_dmesg_render(struct dbg_dmesg_render_data *__restrict data) {
 	bool must_rerender;
 	/* The packet detail area must be large enough  to
 	 * fit all the text of a max-length syslog packet. */
-	data->rd_packet_area_height = CEILDIV(CONFIG_SYSLOG_LINEMAX, dbg_screen_width);
+	data->rd_packet_area_height = CEILDIV(CONFIG_KERNEL_SYSLOG_LINEMAX, dbg_screen_width);
 	/* Need at least 3 additional lines of vertical screen estate. */
 	if unlikely(dbg_screen_width < 2 || dbg_screen_height < data->rd_packet_area_height + 3)
 		return; /* I can't work like this :( */
@@ -462,6 +462,6 @@ DBG_COMMAND(dmesg,
 
 DECL_END
 
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_SRC_DEBUGGER_APPS_DMESG_C */

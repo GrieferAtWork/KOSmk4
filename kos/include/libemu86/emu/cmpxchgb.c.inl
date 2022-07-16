@@ -37,7 +37,7 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 			goto return_expected_memory_modrm;
 #define NEED_return_expected_memory_modrm
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (IS_64BIT()) {
 #if EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B && defined(EMU86_MEM_ATOMIC_CMPXCHX)
 			union {
@@ -107,7 +107,7 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 #endif /* !EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B || !EMU86_EMULATE_CONFIG_IGNORE_LOCK */
 #endif /* !EMU86_EMULATE_CONFIG_WANT_CMPXCHG16B || !EMU86_MEM_ATOMIC_CMPXCHX */
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		{
 #if EMU86_EMULATE_CONFIG_WANT_CMPXCHG8B && defined(EMU86_MEM_ATOMIC_CMPXCHQ)
 			union {
@@ -155,12 +155,12 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 				newval.dwords[1]      = EMU86_GETECX();
 				addr                  = MODRM_MEMADDR();
 				EMU86_READWRITE_USER_MEMORY(addr, 8);
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 				real_oldval.qword = EMU86_MEMREADQ(addr);
-#else /* CONFIG_LIBEMU86_WANT_64BIT */
+#else /* LIBEMU86_CONFIG_WANT_64BIT */
 				real_oldval.dwords[0] = EMU86_MEMREADL(addr + 0);
 				real_oldval.dwords[1] = EMU86_MEMREADL(addr + 4);
-#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* !LIBEMU86_CONFIG_WANT_64BIT */
 #if __SIZEOF_POINTER__ >= 8
 				if (real_oldval.qword == want_oldval.qword)
 #else /* __SIZEOF_POINTER__ >= 8 */
@@ -168,12 +168,12 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 				    real_oldval.dwords[1] == want_oldval.dwords[1])
 #endif /* __SIZEOF_POINTER__ < 8 */
 				{
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 					EMU86_MEMWRITEQ(addr, newval.qword);
-#else /* CONFIG_LIBEMU86_WANT_64BIT */
+#else /* LIBEMU86_CONFIG_WANT_64BIT */
 					EMU86_MEMWRITEL(addr + 0, newval.dwords[0]);
 					EMU86_MEMWRITEL(addr + 4, newval.dwords[1]);
-#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* !LIBEMU86_CONFIG_WANT_64BIT */
 					EMU86_MSKFLAGS(~EFLAGS_ZF, EFLAGS_ZF);
 				} else {
 					EMU86_MSKFLAGS(~EFLAGS_ZF, 0);
@@ -217,7 +217,7 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
       defined(EMU86_EMULATE_RDRAND64)))
 		{
 			bool ok;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 			if (IS_64BIT()) {
 #ifdef EMU86_EMULATE_RDRAND64
 				u64 value;
@@ -230,7 +230,7 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* !EMU86_EMULATE_RDRAND64 */
 			} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 			{
 				if (!IS_16BIT()) {
 #ifdef EMU86_EMULATE_RDRAND32
@@ -297,7 +297,7 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
      (defined(EMU86_EMULATE_RDSEED16) || defined(EMU86_EMULATE_RDSEED32) || \
       defined(EMU86_EMULATE_RDSEED64)))
 			bool ok;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 			if (IS_64BIT()) {
 #ifdef EMU86_EMULATE_RDSEED64
 				u64 value;
@@ -310,7 +310,7 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* !EMU86_EMULATE_RDSEED64 */
 			} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 			{
 				if (!IS_16BIT()) {
 #ifdef EMU86_EMULATE_RDSEED32

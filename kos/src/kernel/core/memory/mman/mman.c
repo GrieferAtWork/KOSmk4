@@ -86,16 +86,16 @@ PUBLIC ATTR_PERMMAN ATTR_ALIGN(struct mnode) thismman_kernel_reservation = {
 	MNODE_INIT_mn_mement({}),
 	MNODE_INIT_mn_minaddr(KS_MINADDR),
 	MNODE_INIT_mn_maxaddr(KS_MAXADDR),
-#ifdef CONFIG_NO_USERKERN_SEGMENT
+#ifdef CONFIG_NO_KERNEL_USERKERN_SEGMENT
 	MNODE_INIT_mn_flags(MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
 	                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_KERNPART),
 	MNODE_INIT_mn_part(NULL), /* Reserved node */
-#else /* CONFIG_NO_USERKERN_SEGMENT */
+#else /* CONFIG_NO_KERNEL_USERKERN_SEGMENT */
 	MNODE_INIT_mn_flags(MNODE_F_NOSPLIT | MNODE_F_NOMERGE |
 	                    MNODE_F_PREAD | MNODE_F_PWRITE | MNODE_F_PEXEC |
 	                    _MNODE_F_MPREPARED_KERNEL | MNODE_F_KERNPART),
 	MNODE_INIT_mn_part(&userkern_segment_part),
-#endif /* !CONFIG_NO_USERKERN_SEGMENT */
+#endif /* !CONFIG_NO_KERNEL_USERKERN_SEGMENT */
 	MNODE_INIT_mn_fspath(NULL),
 	MNODE_INIT_mn_fsname(NULL),
 	MNODE_INIT_mn_mman(NULL), /* Filled in during init */
@@ -154,7 +154,7 @@ extern byte_t __kernel_permman_size[];
 	mman_unmap_kram(self, _sizeof_mman)
 
 /* Raw alloc/free functions for `struct mman' */
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 PRIVATE ATTR_RETNONNULL WUNUSED struct mman *KCALL _mman_alloc(void) {
 	void *result;
 	result = _mman_alloc_untraced();
@@ -171,10 +171,10 @@ PRIVATE ATTR_RETNONNULL WUNUSED struct mman *KCALL _mman_alloc(void) {
 }
 #define _mman_free(self) \
 	(kmalloc_untrace((byte_t *)(self) + PAGEDIR_SIZE), _mman_free_untraced(self))
-#else /* CONFIG_TRACE_MALLOC */
+#else /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 #define _mman_alloc _mman_alloc_untraced
 #define _mman_free  _mman_free_untraced
-#endif /* !CONFIG_TRACE_MALLOC */
+#endif /* !CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 
 
 
@@ -257,11 +257,11 @@ mman_new(void) THROWS(E_BADALLOC) {
 	result->mm_refcnt     = 1;
 	result->mm_weakrefcnt = 1;
 	_mman_init_wrlockpc_(result)
-#ifdef CONFIG_USE_RWLOCK_FOR_MMAN
+#ifdef CONFIG_KERNEL_USES_RWLOCK_FOR_MMAN
 	atomic_rwlock_init(&result->mm_lock);
-#else /* CONFIG_USE_RWLOCK_FOR_MMAN */
+#else /* CONFIG_KERNEL_USES_RWLOCK_FOR_MMAN */
 	atomic_lock_init(&result->mm_lock);
-#endif /* !CONFIG_USE_RWLOCK_FOR_MMAN */
+#endif /* !CONFIG_KERNEL_USES_RWLOCK_FOR_MMAN */
 	FORMMAN(result, thismman_kernel_reservation).mn_mman = result;
 	result->mm_mappings = &FORMMAN(result, thismman_kernel_reservation);
 	/*LIST_INIT(&result->mm_writable);*/ /* Already done by the `memcpy()' */

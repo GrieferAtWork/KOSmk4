@@ -32,7 +32,8 @@
 
 DECL_BEGIN
 
-/* The max # of pages which may be allocated for the purpose of
+/*[[[config CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC = 4
+ * The max # of pages which may be allocated for the purpose of
  * describing  the mappings required  for the physical identity
  * mapping.
  * Because the identity area is as  large as it is (64TiB),  one
@@ -44,7 +45,7 @@ DECL_BEGIN
  * mechanism doesn't actually end up being used when this config
  * is found to be possible at runtime)
  * Anyways: In  order  to limit  the  memory consumption  of  the phys.
- *          identity area, at most `CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC'
+ *          identity area, at most `CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC'
  *          E1+E2 vectors  (and thereby  physical  pages) can  ever  be
  *          allocated at the  same time. When  another E1 vector  needs
  *          to be  allocated at  a point  when there  are already  this
@@ -52,10 +53,53 @@ DECL_BEGIN
  *          and the  one  currently  being  accessed  will  get  mapped
  *          (all of  this happens  lazily during  #PF handling,  except
  *          the physical memory available for this purpose is allocated
- *          during early boot) */
-#ifndef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
-#define CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC 4
-#endif /* !CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
+ *          during early boot)
+ * ]]]*/
+#ifdef CONFIG_NO_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC
+#undef CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC
+#define CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC 0
+#elif !defined(CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC)
+#define CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC 4
+#elif (CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC + 0) <= 0
+#undef CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC
+#define CONFIG_NO_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC
+#define CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC 0
+#endif /* ... */
+/*[[[end]]]*/
+
+/*[[[config CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MINALLOC = 2
+ * Need at least 2 control vectors to allow for the case
+ * where  an unaligned physical memory access happens to
+ * cross a 1GiB  boundary, in which  case 2 vectors  are
+ * needed to allow the request to complete successfully.
+ * ]]]*/
+#ifdef CONFIG_NO_KERNEL_X86_PHYS2VIRT_IDENTITY_MINALLOC
+#undef CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MINALLOC
+#define CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MINALLOC 0
+#elif !defined(CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MINALLOC)
+#define CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MINALLOC 2
+#elif (CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MINALLOC + 0) <= 0
+#undef CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MINALLOC
+#define CONFIG_NO_KERNEL_X86_PHYS2VIRT_IDENTITY_MINALLOC
+#define CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MINALLOC 0
+#endif /* ... */
+/*[[[end]]]*/
+
+#if (!defined(CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MINALLOC) || \
+     (CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MINALLOC + 0) < 2)
+#undef CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MINALLOC
+#define CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MINALLOC 2
+#endif /* !CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MINALLOC */
+
+
+
+#if CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC == 0
+#undef CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC
+#undef CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MINALLOC
+#elif CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MINALLOC > CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC
+#undef CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MINALLOC
+#define CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MINALLOC CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC
+#endif /* ... */
 
 #ifdef __CC__
 
@@ -84,7 +128,7 @@ DATDEF struct mnode x86_phys2virt64_node;
 DECL_END
 
 #else /* __x86_64__ && KERNEL_PHYS2VIRT_BASE */
-#undef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
+#undef CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC
 #endif /* !__x86_64__ || !KERNEL_PHYS2VIRT_BASE */
 
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_PHYS2VIRT64_H */

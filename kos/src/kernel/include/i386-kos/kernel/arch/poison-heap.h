@@ -22,7 +22,7 @@
 
 #include <kernel/compiler.h>
 
-#undef CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS /* Don't need void-function overrides */
-#undef CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS /* Don't need zero-function overrides */
+#undef POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS /* Don't need void-function overrides */
+#undef POISON_HEAP_CONFIG_NEED_ZERO_FUNCTIONS /* Don't need zero-function overrides */
 
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_POISON_HEAP_H */

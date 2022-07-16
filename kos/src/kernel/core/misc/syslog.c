@@ -21,7 +21,7 @@
 #define GUARD_KERNEL_SRC_MISC_SYSLOG_C 1
 #define DISABLE_BRANCH_PROFILING /* Don't profile this file */
 #define _KOS_SOURCE 1
-#define SYSLOG_LINEMAX CONFIG_SYSLOG_LINEMAX
+#define SYSLOG_LINEMAX CONFIG_KERNEL_SYSLOG_LINEMAX
 
 /* NOTE: Don't add any assertion checks to this file!
  *       The  syslog  is  used  excessively  by  all  kernel  panic/assert/check
@@ -313,7 +313,7 @@ DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(kernel_configure_syslog_levels,
 
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 PRIVATE ATTR_DBGTEXT ATTR_PURE unsigned int DBG_CALL
 dbg_loglevel_from_name(char const *__restrict name) {
 	unsigned int i;
@@ -391,7 +391,7 @@ DBG_COMMAND_AUTO(loglevel, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
 	}
 	return 0;
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 

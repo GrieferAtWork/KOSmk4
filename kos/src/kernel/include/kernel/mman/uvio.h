@@ -104,11 +104,14 @@
 #include <libvio/userviofd.h>
 #include <libvio/vio.h>
 
-/* Max # of UVIO requests  that can be in use  at
- * the same time for any given UVIO mfile object. */
-#ifndef CONFIG_UVIO_MAX_PARALLEL_REQUESTS
-#define CONFIG_UVIO_MAX_PARALLEL_REQUESTS 4
-#endif /* !CONFIG_UVIO_MAX_PARALLEL_REQUESTS */
+/*[[[config CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS! = 4
+ * Max # of UVIO requests  that can be in use  at
+ * the same time for any given UVIO mfile object.
+ * ]]]*/
+#ifndef CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS
+#define CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS 4
+#endif /* !CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS */
+/*[[[end]]]*/
 
 
 /* 255 is the upper limit on how many parallel requests are physically possible
@@ -117,10 +120,10 @@
  * actually being 16-bit,  only has the  lower 8 bits  available for slot  IDs,
  * while the upper 8 bits  are used as a version  counter that must be  matched
  * in order to reduce the chance of miss-matching aborted requests) */
-#if CONFIG_UVIO_MAX_PARALLEL_REQUESTS > 0xff
-#undef CONFIG_UVIO_MAX_PARALLEL_REQUESTS
-#define CONFIG_UVIO_MAX_PARALLEL_REQUESTS 0xff
-#endif /* CONFIG_UVIO_MAX_PARALLEL_REQUESTS > 0xff */
+#if CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS > 0xff
+#undef CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS
+#define CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS 0xff
+#endif /* CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS > 0xff */
 
 
 #undef SIZEOF_KERNEL_UVIO_UINTMAX_T
@@ -332,7 +335,7 @@ struct uvio
 	struct sig                 uv_reqdlvr; /* Signal broadcast when a new request becomes `KERNEL_UVIO_REQUEST_STATUS_DELIVERED'. */
 	struct sig                 uv_reqdone; /* Signal broadcast when a new request becomes `KERNEL_UVIO_REQUEST_STATUS_COMPLETE' or `KERNEL_UVIO_REQUEST_STATUS_EXCEPT'. */
 	struct sig                 uv_reqfree; /* Signal send when a request slot is freed. */
-	struct kernel_uvio_request uv_req[CONFIG_UVIO_MAX_PARALLEL_REQUESTS]; /* Vector of UVIO requests. */
+	struct kernel_uvio_request uv_req[CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS]; /* Vector of UVIO requests. */
 };
 
 #define mfile_asuvio(self) ((struct uvio *)(self))

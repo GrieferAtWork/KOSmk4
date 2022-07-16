@@ -25,7 +25,7 @@
 
 #include <kernel/fpu.h>
 
-#ifdef CONFIG_FPU
+#ifdef CONFIG_HAVE_FPU
 #include <hybrid/host.h>
 
 #include <asm/cfi.h>
@@ -342,6 +342,6 @@ END(x86_fxrstor_section_loadxmm)
 	ret
 	.cfi_endproc
 END(x86_fxrstor)
-#endif /* CONFIG_FPU */
+#endif /* CONFIG_HAVE_FPU */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_FPU_S */

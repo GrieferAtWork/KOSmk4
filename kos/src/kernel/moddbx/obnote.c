@@ -27,7 +27,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
 /**/
 #include <debugger/rt.h>
@@ -43,6 +43,7 @@
 #include <kernel/fs/flat.h>
 #include <kernel/fs/fs.h>
 #include <kernel/fs/node.h>
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/fs/path.h>
 #include <kernel/fs/ramfs.h>
 #include <kernel/fs/vfs.h>
@@ -688,10 +689,10 @@ NOTHROW(FCALL mfile_known_name)(struct mfile *__restrict self,
 	} else if (self == &compat_execabi_system_rtld_file.mrf_file) {
 		result = "[" COMPAT_RTLD_LIBDL "]";
 #endif /* __ARCH_HAVE_COMPAT */
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 	} else if (self == &mfile_dbgheap) {
 		result = "[dbgheap]";
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 	} else if (self == &mfile_zero) {
 		result = "/dev/zero";
 	} else if (self >= mfile_anon && self < COMPILER_ENDOF(mfile_anon)) {
@@ -900,11 +901,11 @@ mfile_extract_name(struct mfile const *self,
 				goto badobj;
 		}
 	}
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 	/* TODO: If a dnotify_controller is attached to the inotify_controller of `self',
 	 *       then we can determine (at least 1) name of `self' in some directory. But
 	 *       in this case we still can't determine where that directory is... */
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 	return true;
 badobj:
 	return false;
@@ -1929,6 +1930,6 @@ NOTHROW(KCALL obnote_print)(pformatprinter printer, void *arg,
 
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_MODDBX_OBNOTE_C */

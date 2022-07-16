@@ -27,7 +27,8 @@
 #include <kernel/malloc-defs.h>
 /**/
 
-/* Config option:  When the  kernel becomes  poisoned, re-direct  all
+/*[[[config CONFIG_HAVE_KERNEL_POISON_HEAP: bool = defined(CONFIG_HAVE_KERNEL_DEBUGGER)
+ * Config option:  When the  kernel becomes  poisoned, re-direct  all
  * of the following functions to  use a small, secondary heap  system
  * that  is  designed for  simplicity,  being as  robust  as possible
  * against further corruption, whilst ignoring any noticeable illegal
@@ -67,11 +68,11 @@
  *   - heap_truncate
  *   - heap_truncate_untraced
  *   - heap_trim
- * #ifdef CONFIG_DEBUG_HEAP
+ * #ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
  *   - heap_validate
  *   - heap_validate_all
  * #endif
- * #ifdef CONFIG_USE_SLAB_ALLOCATORS
+ * #ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
  *   - slab_free
  *   - slab_ffree
  *   - slab_malloc[NNN]         (SLAB_FOREACH_SIZE)
@@ -83,7 +84,7 @@
  * #endif
  *   - kmalloc
  *   - kmalloc_nx
- * #ifdef CONFIG_USE_SLAB_ALLOCATORS
+ * #ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
  *   - kmalloc_noslab
  *   - kmalloc_noslab_nx
  * #endif
@@ -102,7 +103,7 @@
  *   - kmalloc_usable_size
  *   - kfree
  *   - kffree
- * #ifdef CONFIG_TRACE_MALLOC
+ * #ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
  *   - mall_dump_leaks
  *   - mall_trace
  *   - mall_validate_padding
@@ -110,41 +111,48 @@
  *   - mall_untrace
  *   - mall_untrace_n
  * #endif
- */
-#ifdef CONFIG_NO_POISON_HEAP
-#undef CONFIG_HAVE_POISON_HEAP
-#elif defined(CONFIG_HAVE_DEBUGGER)
-#undef CONFIG_HAVE_POISON_HEAP
-#define CONFIG_HAVE_POISON_HEAP 1
+ * ]]]*/
+#ifdef CONFIG_NO_KERNEL_POISON_HEAP
+#undef CONFIG_HAVE_KERNEL_POISON_HEAP
+#elif !defined(CONFIG_HAVE_KERNEL_POISON_HEAP)
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
+#define CONFIG_HAVE_KERNEL_POISON_HEAP
+#else /* CONFIG_HAVE_KERNEL_DEBUGGER */
+#define CONFIG_NO_KERNEL_POISON_HEAP
+#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
+#elif (-CONFIG_HAVE_KERNEL_POISON_HEAP - 1) == -1
+#undef CONFIG_HAVE_KERNEL_POISON_HEAP
+#define CONFIG_NO_KERNEL_POISON_HEAP
 #endif /* ... */
+/*[[[end]]]*/
 
 
-#ifdef CONFIG_HAVE_POISON_HEAP
 
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_POISON_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 #define __PH_IF_DEBUG_HEAP(x) x
-#else /* CONFIG_DEBUG_HEAP */
+#else /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 #define __PH_IF_DEBUG_HEAP(x) /* nothing */
-#endif /* !CONFIG_DEBUG_HEAP */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 #define __PH_IF_DEBUG_MALLOC(x) x
-#else /* CONFIG_TRACE_MALLOC */
+#else /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 #define __PH_IF_DEBUG_MALLOC(x) /* nothing */
-#endif /* !CONFIG_TRACE_MALLOC */
+#endif /* !CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 #define __PH_IF_USE_SLAB_ALLOCATORS(x) x
 #define __PH_IF_USE_SLAB_ALLOCATORS_FOREACH1(sz, _) \
 	_(slab_malloc##sz, /*    */ ph_slab_malloc##sz, 1)
 #define __PH_IF_USE_SLAB_ALLOCATORS_FOREACH2(sz, _)  \
 	_(slab_kmalloc##sz, /*   */ ph_slab_kmalloc##sz) \
 	_(slab_kmalloc_nx##sz, /**/ ph_slab_kmalloc_nx##sz)
-#else /* CONFIG_USE_SLAB_ALLOCATORS */
+#else /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 #define __PH_IF_USE_SLAB_ALLOCATORS(x)             /* nothing */
 #define __PH_IF_USE_SLAB_ALLOCATORS_FOREACH1(i, _) /* nothing */
 #define __PH_IF_USE_SLAB_ALLOCATORS_FOREACH2(i, _) /* nothing */
-#endif /* !CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* !CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 #ifndef SLAB_FOREACH_SIZE
 #define SLAB_FOREACH_SIZE(func, _) /* nothing */
@@ -239,7 +247,7 @@ DECL_END
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 #endif /* __CC__ */
 
-#endif /* CONFIG_HAVE_POISON_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_POISON_HEAP */
 
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_POISON_HEAP_H */

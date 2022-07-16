@@ -48,12 +48,12 @@ struct usbhubdev
 #define mfile_asusbhub(self)  chrdev_asusbhub(mfile_aschrdev(self))
 
 
-#ifdef CONFIG_BUILDING_MODUSB
+#ifdef BUILDING_MODUSB
 INTDEF bool KCALL
 usbhubdev_probe(struct usb_controller *__restrict self,
                 struct usb_interface *__restrict intf,
                 size_t endpc, struct usb_endpoint *const endpv[]);
-#endif /* CONFIG_BUILDING_MODUSB */
+#endif /* BUILDING_MODUSB */
 
 DECL_END
 

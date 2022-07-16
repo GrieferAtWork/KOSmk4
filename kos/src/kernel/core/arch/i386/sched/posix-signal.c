@@ -27,7 +27,7 @@
 #include <kernel/except.h>
 #include <kernel/fpu.h>
 #include <kernel/rt/except-handler.h>
-#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
+#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 #include <kernel/syscall-properties.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>

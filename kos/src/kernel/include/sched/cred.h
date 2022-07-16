@@ -153,10 +153,16 @@
  */
 
 
-#undef CONFIG_EVERYONE_IS_ROOT
-#if 0
-#define CONFIG_EVERYONE_IS_ROOT 1
-#endif
+/*[[[config CONFIG_KERNEL_EVERYONE_IS_ROOT = false]]]*/
+#ifdef CONFIG_NO_KERNEL_EVERYONE_IS_ROOT
+#undef CONFIG_KERNEL_EVERYONE_IS_ROOT
+#elif !defined(CONFIG_KERNEL_EVERYONE_IS_ROOT)
+#define CONFIG_NO_KERNEL_EVERYONE_IS_ROOT
+#elif (-CONFIG_KERNEL_EVERYONE_IS_ROOT - 1) == -1
+#undef CONFIG_KERNEL_EVERYONE_IS_ROOT
+#define CONFIG_NO_KERNEL_EVERYONE_IS_ROOT
+#endif /* ... */
+/*[[[end]]]*/
 
 /* Credential checking. */
 
@@ -164,7 +170,7 @@ DECL_BEGIN
 
 #ifdef __CC__
 
-#ifndef CONFIG_EVERYONE_IS_ROOT
+#ifndef CONFIG_KERNEL_EVERYONE_IS_ROOT
 /* Credential-Capabilities */
 #define CREDCAP_COUNT ((CAP_LAST_CAP - CAP_FIRST_CAP) + 1)
 #define CREDCAP_ENCODE(capno)          __CCAST(syscall_ulong_t)((capno) - CAP_FIRST_CAP)
@@ -494,7 +500,7 @@ EIDECLARE(NOBLOCK ATTR_PURE WUNUSED, __BOOL, NOTHROW, FCALL,
 	return result;
 })
 
-#else /* !CONFIG_EVERYONE_IS_ROOT */
+#else /* !CONFIG_KERNEL_EVERYONE_IS_ROOT */
 #define capable(capno)                            1
 #define require(capno)                            (void)0
 #define cred_getruid()                            (uid_t)0
@@ -509,7 +515,7 @@ EIDECLARE(NOBLOCK ATTR_PURE WUNUSED, __BOOL, NOTHROW, FCALL,
 #define cred_setgid(rgid, egid, sgid, fsgid, ...) (void)0
 #define cred_setgroups(ngroups, groups)           (void)0
 #define cred_isfsgroupmember(gid)                 0 /* Yes, this has to be `0'! */
-#endif /* CONFIG_EVERYONE_IS_ROOT */
+#endif /* CONFIG_KERNEL_EVERYONE_IS_ROOT */
 
 /* Helper macros for only setting specific IDs */
 #define cred_setruid(/*uid_t*/ ruid)                                   cred_setuid(ruid, (uid_t)-1, (uid_t)-1, (uid_t)-1, 1)

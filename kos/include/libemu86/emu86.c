@@ -50,15 +50,15 @@ next_byte:
 	opcode = *pc++;
 	switch (opcode) {
 
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 	/* EVEX Prefix */
 	case 0x62: {
 		__uint32_t evex;
-#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
+#if LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT
 		/* EVEX only exists in 64-bit mode! */
 		if (!EMU86_F_IS64(*pflags))
 			break;
-#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
+#endif /* LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT */
 		evex = *pc++;
 		evex <<= 8;
 		evex |= *pc++;
@@ -110,7 +110,7 @@ next_byte:
 		/* The actual instruction opcode byte */
 		opcode |= *pc++;
 	}	break;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 
 
 	/* VEX Prefix (3-byte form) */
@@ -119,10 +119,10 @@ next_byte:
 		vex = *pc++;
 		vex <<= 8;
 		vex |= *pc++;
-#if CONFIG_LIBEMU86_WANT_64BIT
-#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT
 		if (EMU86_F_IS64(*pflags))
-#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
+#endif /* LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT */
 		{
 			if (!(vex & EMU86_VEX3B_R))
 				*pflags |= EMU86_F_REX_R;
@@ -131,11 +131,11 @@ next_byte:
 			if (!(vex & EMU86_VEX3B_B))
 				*pflags |= EMU86_F_REX_B;
 		}
-#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
+#if LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT
 		else
-#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
-#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
+#endif /* LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
+#if LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT
 		{
 			if (!(vex & (EMU86_VEX3B_R | EMU86_VEX3B_X))) {
 				pc -= 2;
@@ -143,7 +143,7 @@ next_byte:
 				goto done;
 			}
 		}
-#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
+#endif /* LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT */
 		*pflags |= EMU86_F_HASVEX;
 		if (vex & EMU86_VEX3B_L)
 			*pflags |= 1 << EMU86_F_VEX_LL_S;
@@ -172,19 +172,19 @@ next_byte:
 	/* VEX Prefix (2-byte form) */
 	case 0xc5:
 		opcode = *pc++;
-#if CONFIG_LIBEMU86_WANT_64BIT
-#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT
 		if (EMU86_F_IS64(*pflags))
-#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
+#endif /* LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT */
 		{
 			if (!(opcode & EMU86_VEX2B_R))
 				*pflags |= EMU86_F_REX_R;
 		}
-#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
+#if LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT
 		else
-#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
-#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
+#endif /* LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
+#if LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT
 		{
 			if (!(opcode & (EMU86_VEX2B_R | EMU86_VEX2B_1))) {
 				--pc;
@@ -192,7 +192,7 @@ next_byte:
 				break;
 			}
 		}
-#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
+#endif /* LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT */
 		*pflags |= EMU86_F_HASVEX;
 		if (opcode & EMU86_VEX2B_L)
 			*pflags |= 1 << EMU86_F_VEX_LL_S;
@@ -214,49 +214,49 @@ next_byte:
 	case 0xf2: *pflags |= EMU86_F_f2; goto next_byte;
 	case 0xf3: *pflags |= EMU86_F_f3; goto next_byte;
 
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 	case 0x40 ... 0x4f:
-#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
+#if LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT
 		if (!EMU86_F_IS64(*pflags))
 			break;
-#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
+#endif /* LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT */
 		*pflags |= EMU86_F_HASREX | ((opcode & 0xf) << EMU86_F_REXSHFT);
 		goto next_byte;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 
-#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
+#if LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT
 	case 0x26:
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (EMU86_F_IS64(*pflags))
 			goto done;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		*pflags = (*pflags & ~EMU86_F_SEGMASK) | EMU86_F_SEGES;
 		goto next_byte;
 
 	case 0x2e:
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (EMU86_F_IS64(*pflags))
 			goto done;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		*pflags = (*pflags & ~EMU86_F_SEGMASK) | EMU86_F_SEGCS;
 		goto next_byte;
 
 	case 0x36:
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (EMU86_F_IS64(*pflags))
 			goto done;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		*pflags = (*pflags & ~EMU86_F_SEGMASK) | EMU86_F_SEGSS;
 		goto next_byte;
 
 	case 0x3e:
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (EMU86_F_IS64(*pflags))
 			goto done;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		*pflags = (*pflags & ~EMU86_F_SEGMASK) | EMU86_F_SEGDS;
 		goto next_byte;
-#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
+#endif /* LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT */
 
 	case 0x64:
 		*pflags = (*pflags & ~EMU86_F_SEGMASK) | EMU86_F_SEGFS;
@@ -295,7 +295,7 @@ __NOTHROW_NCX(LIBEMU86_CC emu86_modrm_decode)(__byte_t const *__restrict pc,
 	__uint8_t rmbyte = *pc++;
 	__uint8_t sibbyte;
 	result->mi_reg = EMU86_MODRM_GETREG(rmbyte);
-#if CONFIG_LIBEMU86_WANT_16BIT
+#if LIBEMU86_CONFIG_WANT_16BIT
 	if (!EMU86_F_IS64(flags) && (EMU86_F_IS16(flags) ^ ((flags & EMU86_F_67) != 0))) {
 		/* HINT: This handling is OK, since there aren't any mandatory 67h prefix bytes! */
 		result->mi_shift = 0;
@@ -367,15 +367,15 @@ __NOTHROW_NCX(LIBEMU86_CC emu86_modrm_decode)(__byte_t const *__restrict pc,
 			}
 		}
 	} else
-#endif /* CONFIG_LIBEMU86_WANT_16BIT */
+#endif /* LIBEMU86_CONFIG_WANT_16BIT */
 	{
 		result->mi_rm = EMU86_MODRM_GETRM(rmbyte);
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (flags & EMU86_F_REX_R)
 			result->mi_reg |= 0x8;
 		if (flags & EMU86_F_EVEX_R)
 			result->mi_reg |= 0x10;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		switch (rmbyte & EMU86_MODRM_MOD_MASK) {
 
 		case 0x0 << EMU86_MODRM_MOD_SHIFT:
@@ -386,10 +386,10 @@ __NOTHROW_NCX(LIBEMU86_CC emu86_modrm_decode)(__byte_t const *__restrict pc,
 				result->mi_index  = 0xff;
 				result->mi_offset = (__int32_t)__hybrid_unaligned_getle32((__uint32_t const *)pc);
 				pc += 4;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 				if (EMU86_F_IS64(flags))
 					result->mi_rm = EMU86_R_RIP; /* RIP-relative addressing */
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 			} else if (result->mi_rm == EMU86_R_ESP) {
 				sibbyte           = *pc++;
 				result->mi_offset = 0;
@@ -397,10 +397,10 @@ parse_sib_byte:
 				result->mi_shift = EMU86_MODRM_GETMOD(sibbyte);
 				result->mi_index = EMU86_MODRM_GETREG(sibbyte);
 				result->mi_rm    = EMU86_MODRM_GETRM(sibbyte);
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 				if (flags & EMU86_F_REX_X)
 					result->mi_index |= 0x8;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 				if (result->mi_index == EMU86_R_ESP)
 					result->mi_index = 0xff;
 				if ((result->mi_rm == EMU86_R_EBP) &&
@@ -447,18 +447,18 @@ parse_sib_byte:
 			/* Register operand. */
 			result->mi_type  = EMU86_MODRM_REGISTER;
 			result->mi_index = 0xff;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 			if ((flags & (EMU86_F_REX_X | EMU86_F_HASVEX)) == (EMU86_F_REX_X | EMU86_F_HASVEX))
 				result->mi_rm |= 0x10;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 			break;
 
 		default: __builtin_unreachable();
 		}
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (flags & EMU86_F_REX_B)
 			result->mi_rm |= 0x8;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	}
 	return (__byte_t *)pc;
 }

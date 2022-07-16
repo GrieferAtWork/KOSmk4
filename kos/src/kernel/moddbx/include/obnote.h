@@ -35,7 +35,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
 #include <kernel/types.h>
 
@@ -76,6 +76,6 @@ NOTHROW(KCALL obnote_print)(__pformatprinter printer, void *arg,
                             unsigned int *__restrict pstatus);
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_MODDBX_INCLUDE_OBNOTE_H */

@@ -32,7 +32,7 @@
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/mman/rw.h>
 #include <kernel/rt/except-handler.h>
-#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
+#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/cred.h>
@@ -81,9 +81,9 @@
 #include <kernel/x86/gdt.h> /* x86_set_user_fsbase(), x86_set_user_gsbase() */
 #endif /* __i386__ && !__x86_64__ */
 
-#ifdef CONFIG_FPU
+#ifdef CONFIG_HAVE_FPU
 #include <kos/kernel/fpu-state.h>
-#endif /* CONFIG_FPU */
+#endif /* CONFIG_HAVE_FPU */
 
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/kos/bits/syscall-info.h>
@@ -584,10 +584,10 @@ rpc_mem_fill(struct rpc_mem *__restrict self,
 /* Flags for `struct rpc_vm::rv_flags' */
 #define RPC_VM_NORMAL      0x0000 /* Normal flags. */
 #define RPC_VM_HAVESIGMASK 0x0001 /* `rv_sigmask' must be or'd with the calling thread's signal mask. */
-#ifdef CONFIG_FPU
+#ifdef CONFIG_HAVE_FPU
 #define RPC_VM_HAVEFPU          0x0002 /* FPU state loaded */
 #define RPC_VM_HAVEFPU_MODIFIED 0x0004 /* FPU state was modified */
-#endif /* CONFIG_FPU */
+#endif /* CONFIG_HAVE_FPU */
 #if defined(__i386__) && !defined(__x86_64__)
 #define RPC_VM_HAVE_FSBASE 0x4000 /* `rv_386_fsbase' must be set during exit. */
 #define RPC_VM_HAVE_GSBASE 0x8000 /* `rv_386_gsbase' must be set during exit. */
@@ -601,9 +601,9 @@ struct rpc_vm {
 	struct rpc_syscall_info const *rv_sc_info;                   /* [1..1][valid_if(rv_reason == _RPC_REASONCTX_SYSCALL ||
 	                                                              *                 rv_reason == _RPC_REASONCTX_SYSINT)]
 	                                                              * [const] System call information */
-#ifdef CONFIG_FPU
+#ifdef CONFIG_HAVE_FPU
 	struct fpustate                rv_fpu;                       /* [valid_if(RPC_VM_HAVEFPU)] FPU context. */
-#endif /* CONFIG_FPU */
+#endif /* CONFIG_HAVE_FPU */
 	uintptr_t                      rv_flags;                     /* Set of `RPC_VM_*'. */
 	size_t                         rv_stacksz;                   /* # of in-use elements in `rv_stack' */
 	uintptr_t                      rv_stack[RPC_PROG_STACK_MAX]; /* [rv_stacksz] RPC program stack. */
@@ -662,7 +662,7 @@ rpc_vm_getreg_impl(void const *arg, unwind_regno_t dw_regno, void *__restrict ds
 	struct rpc_vm *me = (struct rpc_vm *)arg;
 	unsigned int result;
 	result = unwind_getreg_ucpustate(&me->rv_cpu, dw_regno, dst);
-#ifdef CONFIG_FPU
+#ifdef CONFIG_HAVE_FPU
 	/* Check for FPU register */
 	if (result == UNWIND_INVALID_REGISTER && CFI_UNWIND_IS_FPU_REGISTER(sizeof(void *), dw_regno)) {
 		if (!(me->rv_flags & RPC_VM_HAVEFPU)) {
@@ -677,7 +677,7 @@ rpc_vm_getreg_impl(void const *arg, unwind_regno_t dw_regno, void *__restrict ds
 		result = unwind_getreg_fpustate(&me->rv_fpu, dw_regno, dst);
 #endif /* !__x86_64__ && !__i386__ */
 	}
-#endif /* CONFIG_FPU */
+#endif /* CONFIG_HAVE_FPU */
 	return result;
 }
 
@@ -686,7 +686,7 @@ rpc_vm_setreg_impl(void *arg, unwind_regno_t dw_regno, void const *__restrict sr
 	struct rpc_vm *me = (struct rpc_vm *)arg;
 	unsigned int result;
 	result = unwind_setreg_ucpustate(&me->rv_cpu, dw_regno, src);
-#ifdef CONFIG_FPU
+#ifdef CONFIG_HAVE_FPU
 	/* Check for FPU register */
 	if (result == UNWIND_INVALID_REGISTER && CFI_UNWIND_IS_FPU_REGISTER(sizeof(void *), dw_regno)) {
 		if (!(me->rv_flags & RPC_VM_HAVEFPU)) {
@@ -703,7 +703,7 @@ rpc_vm_setreg_impl(void *arg, unwind_regno_t dw_regno, void const *__restrict sr
 		if (result == UNWIND_SUCCESS)
 			me->rv_flags |= RPC_VM_HAVEFPU_MODIFIED;
 	}
-#endif /* CONFIG_FPU */
+#endif /* CONFIG_HAVE_FPU */
 	return result;
 }
 
@@ -2027,9 +2027,9 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 
 		/* Check for special restore options. */
 		if (vm.rv_flags & (RPC_VM_HAVESIGMASK |
-#ifdef CONFIG_FPU
+#ifdef CONFIG_HAVE_FPU
 		                   RPC_VM_HAVEFPU_MODIFIED |
-#endif /* CONFIG_FPU */
+#endif /* CONFIG_HAVE_FPU */
 #if defined(__i386__) && !defined(__x86_64__)
 		                   RPC_VM_HAVE_FSBASE |
 		                   RPC_VM_HAVE_GSBASE |
@@ -2043,11 +2043,11 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 				sigmask_blockmask(&vm.rv_sigmask);
 			}
 
-#ifdef CONFIG_FPU
+#ifdef CONFIG_HAVE_FPU
 			/* Write-back FPU register modifications and masked signals. */
 			if (vm.rv_flags & RPC_VM_HAVEFPU_MODIFIED)
 				fpustate_loadfrom(&vm.rv_fpu);
-#endif /* CONFIG_FPU */
+#endif /* CONFIG_HAVE_FPU */
 
 #if defined(__i386__) && !defined(__x86_64__)
 			if (vm.rv_flags & RPC_VM_HAVE_FSBASE)

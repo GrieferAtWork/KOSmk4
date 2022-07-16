@@ -48,14 +48,17 @@
 #include <stddef.h>
 #include <string.h>
 
-#if defined(CONFIG_NO_MPART_TRIM)
-#undef CONFIG_HAVE_MPART_TRIM
-#elif !defined(CONFIG_HAVE_MPART_TRIM)
-#define CONFIG_HAVE_MPART_TRIM 1
-#elif (CONFIG_HAVE_MPART_TRIM + 0) == 0
-#undef CONFIG_HAVE_MPART_TRIM
-#define CONFIG_NO_MPART_TRIM 1
-#endif
+
+/*[[[config CONFIG_HAVE_KERNEL_MPART_TRIM = true]]]*/
+#ifdef CONFIG_NO_KERNEL_MPART_TRIM
+#undef CONFIG_HAVE_KERNEL_MPART_TRIM
+#elif !defined(CONFIG_HAVE_KERNEL_MPART_TRIM)
+#define CONFIG_HAVE_KERNEL_MPART_TRIM
+#elif (-CONFIG_HAVE_KERNEL_MPART_TRIM - 1) == -1
+#undef CONFIG_HAVE_KERNEL_MPART_TRIM
+#define CONFIG_NO_KERNEL_MPART_TRIM
+#endif /* ... */
+/*[[[end]]]*/
 
 
 
@@ -82,7 +85,7 @@
 
 DECL_BEGIN
 
-#ifdef CONFIG_HAVE_MPART_TRIM
+#ifdef CONFIG_HAVE_KERNEL_MPART_TRIM
 
 /* Check if `self' may be trimmed.
  * This macro may only be called while holding a lock to  `self',
@@ -244,7 +247,7 @@ NOTHROW(FCALL mnode_load_mhint)(struct mnode *__restrict self) {
 	iter = (byte_t *)mnode_getaddr(self);
 	end  = (byte_t *)mnode_getendaddr(self);
 	assert(iter < end);
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 	if (self->mn_part->mp_file == &mfile_dbgheap) {
 		preemption_flag_t was;
 		/* Super-ugly, hacky work-around because the heap system can't
@@ -262,7 +265,7 @@ NOTHROW(FCALL mnode_load_mhint)(struct mnode *__restrict self) {
 		ATOMIC_AND(THIS_TASK->t_flags, ~_TASK_FDBGHEAPDMEM);
 		heap_validate_all();
 	} else
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 	{
 		do {
 			__asm__ __volatile__("" : : "r" (*iter));
@@ -1757,7 +1760,7 @@ do_destroy:
 	mpart_destroy(self);
 }
 
-#else /* CONFIG_HAVE_MPART_TRIM */
+#else /* CONFIG_HAVE_KERNEL_MPART_TRIM */
 
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_trim)(/*inherit(always)*/ REF struct mpart *__restrict self) {
@@ -1765,7 +1768,7 @@ NOTHROW(FCALL mpart_trim)(/*inherit(always)*/ REF struct mpart *__restrict self)
 	decref(self);
 }
 
-#endif /* !CONFIG_HAVE_MPART_TRIM */
+#endif /* !CONFIG_HAVE_KERNEL_MPART_TRIM */
 
 DECL_END
 

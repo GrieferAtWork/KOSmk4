@@ -27,7 +27,7 @@
 /**/
 #include "module-userelf.h"
 
-#ifdef CONFIG_HAVE_USERELF_MODULES
+#ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
 
 #include <debugger/config.h>
 #include <debugger/hook.h>
@@ -77,11 +77,11 @@
 #include <compat/kos/exec/rtld.h>
 #endif /* __ARCH_HAVE_COMPAT */
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <kernel/mman/execinfo.h>
 
 #include <inttypes.h>
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset
@@ -443,7 +443,7 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 			struct zlib_reader reader;
 			zlib_reader_init(&reader, src_data + sizeof_cdhr, src_size);
 			/* Decompress data. */
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 			if (dbg_active) {
 				/* Display an on-screen message that we're decompressing stuff... */
 				void *screen_buffer;
@@ -475,9 +475,9 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 			} else {
 				error = zlib_reader_read(&reader, dst_data, dst_size);
 			}
-#else /* CONFIG_HAVE_DEBUGGER */
+#else /* CONFIG_HAVE_KERNEL_DEBUGGER */
 			error = zlib_reader_read(&reader, dst_data, dst_size);
-#endif /* !CONFIG_HAVE_DEBUGGER */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
 			zlib_reader_fini(&reader);
 			if unlikely(error < 0)
 				THROW(E_INVALID_ARGUMENT);
@@ -2386,7 +2386,7 @@ nextnode:
 }
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 DBG_COMMAND(lslib,
             "lslib\n"
             "\tEnumerate user-space libraries\n") {
@@ -2424,9 +2424,9 @@ DBG_COMMAND(lslib,
 	}
 	return 0;
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 DECL_END
-#endif /* CONFIG_HAVE_USERELF_MODULES */
+#endif /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_MODULE_USERELF_C */

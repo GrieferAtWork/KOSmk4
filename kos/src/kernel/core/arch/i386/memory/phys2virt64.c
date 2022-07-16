@@ -26,7 +26,7 @@
 
 #include <kernel/x86/phys2virt64.h>
 
-#ifdef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
+#ifdef CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC
 
 #include <kernel/boot.h>
 #include <kernel/except.h>
@@ -52,16 +52,6 @@
 #define KiB(n) ((n) * 1024)
 #define MiB(n) ((n) * 1024 * 1024)
 #define GiB(n) ((n) * 1024 * 1024 * 1024)
-
-/* Need at least 2 control vectors to allow for the case
- * where  an unaligned physical memory access happens to
- * cross a 1GiB  boundary, in which  case 2 vectors  are
- * needed to allow the request to complete successfully. */
-#if (!defined(CONFIG_PHYS2VIRT_IDENTITY_MINALLOC) || \
-     (CONFIG_PHYS2VIRT_IDENTITY_MINALLOC + 0) < 2)
-#undef CONFIG_PHYS2VIRT_IDENTITY_MINALLOC
-#define CONFIG_PHYS2VIRT_IDENTITY_MINALLOC 2
-#endif /* !CONFIG_PHYS2VIRT_IDENTITY_MINALLOC */
 
 DECL_BEGIN
 
@@ -108,8 +98,8 @@ NOTHROW(KCALL x86_initialize_phys2virt64)(void) {
 
 	/* Check if 1GiB pages are possible.
 	 * If they are, configure physident to use them.
-	 * Otherwise, pre-allocate up to `CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC'
-	 * pages  of  physical  memory  to-be  used  for  dynamic  mapping of
+	 * Otherwise, pre-allocate up to `CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC'
+	 * pages   of   physical   memory   to-be   used   for   dynamic   mapping    of
 	 * E1-vectors allocated by `x86_phys2virt64_require()' */
 	if (X86_HAVE_1GIB_PAGES) {
 		/* 1GiB pages are stored in E3-vector entries.
@@ -140,12 +130,12 @@ NOTHROW(KCALL x86_initialize_phys2virt64)(void) {
 		printk(FREESTR(KERN_INFO "[p2v] Use 2MiB pages for the phys2virt memory segment\n"));
 		/* TODO: Add a kernel commandline  option to select how  much
 		 *       memory should be reserved for the phys2virt mapping! */
-		metadata_size = CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC * PAGESIZE;
-		pp = page_malloc_for(page_usage.pu_static, CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC);
+		metadata_size = CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC * PAGESIZE;
+		pp = page_malloc_for(page_usage.pu_static, CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC);
 		if unlikely(pp == PHYSPAGE_INVALID) {
 			/* Try again with less memory... */
-			metadata_size = CONFIG_PHYS2VIRT_IDENTITY_MINALLOC * PAGESIZE;
-			pp = page_malloc_for(page_usage.pu_static, CONFIG_PHYS2VIRT_IDENTITY_MINALLOC);
+			metadata_size = CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MINALLOC * PAGESIZE;
+			pp = page_malloc_for(page_usage.pu_static, CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MINALLOC);
 			if unlikely(pp == PHYSPAGE_INVALID)
 				kernel_panic(FREESTR("Failed to allocate phys2virt control pages"));
 		}
@@ -333,6 +323,6 @@ PUBLIC struct mnode x86_phys2virt64_node = {
 
 
 DECL_END
-#endif /* CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
+#endif /* CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PHYS2VIRT64_C */

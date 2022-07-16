@@ -31,7 +31,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <kernel/poison-heap.h>
 
-#ifdef CONFIG_HAVE_POISON_HEAP
+#ifdef CONFIG_HAVE_KERNEL_POISON_HEAP
 #include <debugger/rt.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
@@ -53,6 +53,9 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <stddef.h>
 #include <string.h>
 
+/**/
+#include "trace-malloc.h"
+
 
 DECL_BEGIN
 
@@ -64,14 +67,8 @@ DECL_BEGIN
 
 
 /* Size = *(size_t)((byte_t *)ptr - HEAP_USABLE_SIZE_OFFSET) & HEAP_USABLE_SIZE_MASK; */
-#ifdef CONFIG_TRACE_MALLOC
-#ifndef CONFIG_MALL_PREFIX_SIZE
-#define CONFIG_MALL_PREFIX_SIZE (__SIZEOF_SIZE_T__)
-#endif /* !CONFIG_MALL_PREFIX_SIZE */
-#ifndef CONFIG_MALL_HEAD_SIZE
-#define CONFIG_MALL_HEAD_SIZE (HEAP_ALIGNMENT - __SIZEOF_SIZE_T__)
-#endif /* !CONFIG_MALL_HEAD_SIZE */
-#define HEAP_USABLE_SIZE_OFFSET (CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE)
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
+#define HEAP_USABLE_SIZE_OFFSET CONFIG_KERNEL_MALL_HEAD_SIZE
 #elif HEAP_ALIGNMENT < (__SIZEOF_SIZE_T__ + 1)
 #define HEAP_USABLE_SIZE_OFFSET __SIZEOF_POINTER__
 #define HEAP_USABLE_SIZE_MASK   (((uintptr_t)1 << ((__SIZEOF_SIZE_T__ * 8) - 1)) - 1)
@@ -84,22 +81,22 @@ PRIVATE ATTR_COLDTEXT PAGEDIR_PAGEALIGNED void *
 NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
                                     gfp_t flags) {
 #if 1
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	static int dbg_called_phcore = 0;
 	bool haslock;
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 	void *result;
 	struct mnode *node;
 	struct mpart *part;
 	union mcorepart *cp;
 	num_bytes = CEIL_ALIGN(num_bytes, PAGESIZE);
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	haslock = true;
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 	if (!mman_lock_tryacquire(&mman_kernel)) {
 		if (flags & GFP_ATOMIC)
 			goto err;
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 		if (dbg_active) {
 			/* If  the kernel mman can't be locked from within the debugger,
 			 * then yielding until it can be won't do anything since there's
@@ -118,18 +115,18 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 				return NULL;
 			haslock = false;
 		} else
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 		{
 			if (!mman_lock_acquire_nx(&mman_kernel))
 				goto err;
 		}
 	}
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	/* Keep track of recursive calls. */
 	if (dbg_active)
 		++dbg_called_phcore;
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 	/* Find a suitable free location.
 	 * NOTE: To aid in debugging, unconditionally disable ASLR
@@ -218,18 +215,18 @@ NOTHROW(KCALL phcore_page_alloc_nx)(PAGEDIR_PAGEALIGNED size_t num_bytes,
 	 * and not make any non-mandatory calls... */
 	/*mnode_merge(node);*/
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	if (haslock)
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 	{
 		mman_lock_release(&mman_kernel);
 	}
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	/* Keep track of recursive calls. */
 	if (dbg_active)
 		--dbg_called_phcore;
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 	/* Initialize resulting memory.
 	 * Note that technically, we could use `page_iszero()' to skip pages
@@ -247,17 +244,17 @@ err_unlock_node_part:
 err_unlock_node:
 	mcoreheap_free_locked(container_of(node, union mcorepart, mcp_node));
 err_unlock:
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	if (haslock)
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 	{
 		mman_lock_release(&mman_kernel);
 	}
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	/* Keep track of recursive calls. */
 	if (dbg_active)
 		--dbg_called_phcore;
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 err:
 	return NULL;
 #else
@@ -421,10 +418,12 @@ NOTHROW(KCALL phcore_usable_size)(void *ptr) {
 	if (!ptr)
 		return 0;
 	NESTED_TRY {
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 		if (KERNEL_SLAB_CHECKPTR(ptr))
 			return SLAB_GET(ptr)->s_size;
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
+		/* FIXME: Contrary  to documentation, I don't think this
+		 *        works with memory allocated by trace-malloc.c! */
 #ifdef HEAP_USABLE_SIZE_MASK
 		return *(size_t *)((byte_t *)ptr - HEAP_USABLE_SIZE_OFFSET) & HEAP_USABLE_SIZE_MASK;
 #else  /* HEAP_USABLE_SIZE_MASK */
@@ -487,34 +486,34 @@ INTDEF heapptr_t NOTHROW(KCALL ph_heap_alloc_nx)(struct heap *self, size_t num_b
 INTDEF heapptr_t NOTHROW(KCALL ph_heap_align_nx)(struct heap *self, size_t min_alignment, ptrdiff_t offset, size_t num_bytes, gfp_t flags);
 INTDEF heapptr_t NOTHROW(KCALL ph_heap_realloc_nx)(struct heap *self, void *old_ptr, size_t old_bytes, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags);
 INTDEF heapptr_t NOTHROW(KCALL ph_heap_realign_nx)(struct heap *self, void *old_ptr, size_t old_bytes, size_t min_alignment, ptrdiff_t offset, size_t new_bytes, gfp_t alloc_flags, gfp_t free_flags);
-#ifdef CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS
+#ifdef POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS
 INTDEF ATTR_CONST void NOTHROW(KCALL ph_heap_free)(struct heap *self, void *ptr, size_t num_bytes, gfp_t flags);
-#endif /* CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS */
-#ifdef CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS
+#endif /* POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS */
+#ifdef POISON_HEAP_CONFIG_NEED_ZERO_FUNCTIONS
 INTDEF ATTR_CONST size_t KCALL ph_heap_allat(struct heap *self, void *ptr, size_t num_bytes, gfp_t flags);
 INTDEF ATTR_CONST size_t NOTHROW(KCALL ph_heap_allat_nx)(struct heap *self, void *ptr, size_t num_bytes, gfp_t flags);
 INTDEF ATTR_CONST size_t NOTHROW(KCALL ph_heap_truncate)(struct heap *self, void *base, size_t old_size, size_t new_size, gfp_t free_flags);
 INTDEF ATTR_CONST size_t NOTHROW(KCALL ph_heap_trim)(struct heap *self, size_t threshold);
-#endif /* CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS */
-#ifdef CONFIG_DEBUG_HEAP
-#ifdef CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS
+#endif /* POISON_HEAP_CONFIG_NEED_ZERO_FUNCTIONS */
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
+#ifdef POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS
 INTDEF ATTR_CONST void NOTHROW(KCALL ph_heap_validate)(struct heap *self);
 INTDEF ATTR_CONST void NOTHROW(KCALL ph_heap_validate_all)(void);
-#endif /* CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS */
-#endif /* CONFIG_DEBUG_HEAP */
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
-#ifdef CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS
+#endif /* POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
+#ifdef POISON_HEAP_CONFIG_NEED_ZERO_FUNCTIONS
 #define DEFINE_SLAB_ALLOCATOR_FUNCTIONS(sz, _) \
 	INTDEF ATTR_CONST void *NOTHROW(KCALL ph_slab_malloc##sz)(gfp_t flags);
 SLAB_FOREACH_SIZE(DEFINE_SLAB_ALLOCATOR_FUNCTIONS, _)
 #undef DEFINE_SLAB_ALLOCATOR_FUNCTIONS
-#endif /* CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS */
+#endif /* POISON_HEAP_CONFIG_NEED_ZERO_FUNCTIONS */
 #define DEFINE_SLAB_ALLOCATOR_FUNCTIONS(sz, _)                           \
 	INTDEF ATTR_RETNONNULL void *KCALL ph_slab_kmalloc##sz(gfp_t flags); \
 	INTDEF void *NOTHROW(KCALL ph_slab_kmalloc_nx##sz)(gfp_t flags);
 SLAB_FOREACH_SIZE(DEFINE_SLAB_ALLOCATOR_FUNCTIONS, _)
 #undef DEFINE_SLAB_ALLOCATOR_FUNCTIONS
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 INTDEF ATTR_RETNONNULL void *KCALL ph_kmalloc(size_t n_bytes, gfp_t flags);
 INTDEF void *NOTHROW(KCALL ph_kmalloc_nx)(size_t n_bytes, gfp_t flags);
@@ -530,27 +529,27 @@ INTDEF ATTR_RETNONNULL void *KCALL ph_krealign_offset(void *ptr, size_t min_alig
 INTDEF void *NOTHROW(KCALL ph_krealign_offset_nx)(void *ptr, size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags);
 INTDEF void *KCALL ph_krealloc_in_place(void *ptr, size_t n_bytes, gfp_t flags);
 INTDEF size_t NOTHROW(KCALL ph_kmalloc_usable_size)(void *ptr);
-#ifdef CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS
+#ifdef POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS
 INTDEF ATTR_CONST void NOTHROW(KCALL ph_kfree)(void *ptr);
 INTDEF ATTR_CONST void NOTHROW(KCALL ph_kffree)(void *ptr, gfp_t flags);
-#endif /* CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS */
-#ifdef CONFIG_TRACE_MALLOC
+#endif /* POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS */
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED void *
 NOTHROW(KCALL ph_kmalloc_trace_nx)(void *base, size_t num_bytes,
                                    gfp_t gfp, unsigned int tb_skip);
-#ifdef CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS
+#ifdef POISON_HEAP_CONFIG_NEED_ZERO_FUNCTIONS
 INTDEF ATTR_CONST size_t KCALL ph_kmalloc_leaks(void);
 INTDEF ATTR_CONST kmalloc_leaks_t KCALL ph_kmalloc_leaks_collect(void);
 INTDEF ATTR_CONST ssize_t KCALL ph_kmalloc_leaks_print(kmalloc_leaks_t leaks, __pformatprinter printer, void *arg, size_t *pnum_leaks);
 INTDEF ATTR_CONST size_t KCALL ph_kmalloc_traceback(void *ptr, /*out*/ void **tb, size_t buflen, pid_t *p_alloc_roottid);
-#endif /* CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS */
-#ifdef CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS
+#endif /* POISON_HEAP_CONFIG_NEED_ZERO_FUNCTIONS */
+#ifdef POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS
 INTDEF void NOTHROW(KCALL ph_kmalloc_validate)(void);
 INTDEF void NOTHROW(KCALL ph_kmalloc_leaks_release)(kmalloc_leaks_t leaks);
 INTDEF void NOTHROW(KCALL ph_kmalloc_untrace)(void *ptr);
 INTDEF void NOTHROW(KCALL ph_kmalloc_untrace_n)(void *ptr, size_t num_bytes);
-#endif /* CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS */
-#endif /* !CONFIG_TRACE_MALLOC */
+#endif /* POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS */
+#endif /* !CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 
 
 
@@ -636,15 +635,15 @@ NOTHROW(KCALL ph_heap_realign_nx)(struct heap *UNUSED(self), void *old_ptr,
 	return heapptr_make(result_ptr, result_siz);
 }
 
-#ifdef CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS
+#ifdef POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS
 INTERN ATTR_CONST ATTR_COLDTEXT void
 NOTHROW(KCALL ph_heap_free)(struct heap *UNUSED(self), void *UNUSED(ptr),
                             size_t UNUSED(num_bytes), gfp_t UNUSED(flags)) {
 	/* no-op */
 }
-#endif /* CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS */
+#endif /* POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS */
 
-#ifdef CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS
+#ifdef POISON_HEAP_CONFIG_NEED_ZERO_FUNCTIONS
 INTERN ATTR_CONST ATTR_COLDTEXT size_t KCALL
 ph_heap_allat(struct heap *UNUSED(self), void *UNUSED(ptr),
               size_t UNUSED(num_bytes), gfp_t UNUSED(flags)) {
@@ -669,10 +668,10 @@ NOTHROW(KCALL ph_heap_trim)(struct heap *UNUSED(self),
                             size_t UNUSED(threshold)) {
 	return 0;
 }
-#endif /* CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS */
+#endif /* POISON_HEAP_CONFIG_NEED_ZERO_FUNCTIONS */
 
-#ifdef CONFIG_DEBUG_HEAP
-#ifdef CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
+#ifdef POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS
 INTERN ATTR_CONST ATTR_COLDTEXT void
 NOTHROW(KCALL ph_heap_validate)(struct heap *UNUSED(self)) {
 	/* no-op */
@@ -682,11 +681,11 @@ INTERN ATTR_CONST ATTR_COLDTEXT void
 NOTHROW(KCALL ph_heap_validate_all)(void) {
 	/* no-op */
 }
-#endif /* CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS */
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
-#ifdef CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
+#ifdef POISON_HEAP_CONFIG_NEED_ZERO_FUNCTIONS
 #define DEFINE_SLAB_ALLOCATOR_FUNCTIONS(sz, _)               \
 	INTERN ATTR_CONST ATTR_COLDTEXT void *                   \
 	NOTHROW(KCALL ph_slab_malloc##sz)(gfp_t UNUSED(flags)) { \
@@ -694,7 +693,7 @@ NOTHROW(KCALL ph_heap_validate_all)(void) {
 	}
 SLAB_FOREACH_SIZE(DEFINE_SLAB_ALLOCATOR_FUNCTIONS, _)
 #undef DEFINE_SLAB_ALLOCATOR_FUNCTIONS
-#endif /* CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS */
+#endif /* POISON_HEAP_CONFIG_NEED_ZERO_FUNCTIONS */
 #define DEFINE_SLAB_ALLOCATOR_FUNCTIONS(sz, _)           \
 	INTERN ATTR_COLDTEXT ATTR_RETNONNULL void *KCALL     \
 	ph_slab_kmalloc##sz(gfp_t flags) {                   \
@@ -706,7 +705,7 @@ SLAB_FOREACH_SIZE(DEFINE_SLAB_ALLOCATOR_FUNCTIONS, _)
 	}
 SLAB_FOREACH_SIZE(DEFINE_SLAB_ALLOCATOR_FUNCTIONS, _)
 #undef DEFINE_SLAB_ALLOCATOR_FUNCTIONS
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 INTERN ATTR_COLDTEXT ATTR_RETNONNULL void *KCALL
 ph_kmalloc(size_t n_bytes, gfp_t flags) {
@@ -785,7 +784,7 @@ NOTHROW(KCALL ph_kmalloc_usable_size)(void *ptr) {
 	return phcore_usable_size(ptr);
 }
 
-#ifdef CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS
+#ifdef POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS
 INTERN ATTR_CONST ATTR_COLDTEXT void
 NOTHROW(KCALL ph_kfree)(void *UNUSED(ptr)) {
 	/* no-op */
@@ -795,16 +794,16 @@ INTERN ATTR_CONST ATTR_COLDTEXT void
 NOTHROW(KCALL ph_kffree)(void *UNUSED(ptr), gfp_t UNUSED(flags)) {
 	/* no-op */
 }
-#endif /* CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS */
+#endif /* POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS */
 
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED void *
 NOTHROW(KCALL ph_kmalloc_trace_nx)(void *base, size_t UNUSED(num_bytes),
                                    gfp_t UNUSED(gfp), unsigned int UNUSED(tb_skip)) {
 	return base;
 }
 
-#ifdef CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS
+#ifdef POISON_HEAP_CONFIG_NEED_ZERO_FUNCTIONS
 INTERN ATTR_COLDTEXT ATTR_CONST size_t KCALL
 ph_kmalloc_leaks(void) {
 	return 0;
@@ -842,9 +841,9 @@ NOTHROW(FCALL ph_memleak_next)(kmalloc_leaks_t UNUSED(leaks), memleak_t UNUSED(p
 }
 
 DEFINE_INTERN_ALIAS(ph_memleak_getattr, ph_memleak_next);
-#endif /* CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS */
+#endif /* POISON_HEAP_CONFIG_NEED_ZERO_FUNCTIONS */
 
-#ifdef CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS
+#ifdef POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS
 INTERN ATTR_COLDTEXT void
 NOTHROW(KCALL ph_kmalloc_validate)(void) {
 	/* no-op */
@@ -865,11 +864,11 @@ INTERN ATTR_COLDTEXT void
 NOTHROW(KCALL ph_kmalloc_untrace_n)(void *UNUSED(ptr), size_t UNUSED(num_bytes)) {
 	/* no-op */
 }
-#endif /* CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS */
-#endif /* !CONFIG_TRACE_MALLOC */
+#endif /* POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS */
+#endif /* !CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 
 
 DECL_END
-#endif /* CONFIG_HAVE_POISON_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_POISON_HEAP */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_POISON_HEAP_C */

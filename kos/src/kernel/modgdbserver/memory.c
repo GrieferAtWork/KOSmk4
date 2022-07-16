@@ -32,7 +32,7 @@
 #include <string.h>
 
 #include "gdb.h"
-#include "server.h" /* CONFIG_GDBSERVER_PACKET_MAXLEN, GDBPacket_Start() */
+#include "server.h" /* CONFIG_MODGDBSERVER_PACKET_MAXLEN, GDBPacket_Start() */
 
 DECL_BEGIN
 
@@ -169,12 +169,12 @@ NOTHROW(FCALL GDB_FindMemory)(struct task *__restrict thread,
                               VIRT void const *haystack, size_t haystack_length,
                               void const *needle, size_t needle_length,
                               VIRT void const **__restrict presult) {
-	/* Since the length of `needle' is restricted  by the max length of a  packet,
-	 * we can assume that `needle_length < CONFIG_GDBSERVER_PACKET_MAXLEN / 2', as
-	 * well as that we are free to use `GDBPacket_Start()' as a temporary  buffer. */
+	/* Since the length  of `needle' is  restricted by  the max length  of a  packet,
+	 * we can assume that `needle_length < CONFIG_MODGDBSERVER_PACKET_MAXLEN / 2', as
+	 * well as that  we are free  to use `GDBPacket_Start()'  as a temporary  buffer. */
 	byte_t *buf;
 	byte_t firstbyte;
-	assert(needle_length < CONFIG_GDBSERVER_PACKET_MAXLEN / 2);
+	assert(needle_length < CONFIG_MODGDBSERVER_PACKET_MAXLEN / 2);
 	if unlikely(!needle_length)
 		return false;
 	buf = (byte_t *)GDBPacket_Start();
@@ -183,7 +183,7 @@ NOTHROW(FCALL GDB_FindMemory)(struct task *__restrict thread,
 		size_t maxcount, realcount;
 		if (needle_length > haystack_length)
 			break;
-		maxcount = CONFIG_GDBSERVER_PACKET_MAXLEN;
+		maxcount = CONFIG_MODGDBSERVER_PACKET_MAXLEN;
 		if (maxcount > haystack_length)
 			maxcount = haystack_length;
 		realcount = maxcount;
@@ -239,7 +239,7 @@ found_it_at_pos:
 					haystack_length -= maxcount;
 					if (missing_bytes > haystack_length)
 						goto not_found;
-					maxcount = CONFIG_GDBSERVER_PACKET_MAXLEN;
+					maxcount = CONFIG_MODGDBSERVER_PACKET_MAXLEN;
 					if (maxcount > haystack_length)
 						maxcount = haystack_length;
 					realcount = maxcount;
@@ -281,8 +281,8 @@ NOTHROW(FCALL GDB_CalculateCRC32)(struct task *__restrict thread,
 		buf = (byte_t *)GDBPacket_Start();
 		for (;;) {
 			size_t maxlen = length;
-			if (maxlen > CONFIG_GDBSERVER_PACKET_MAXLEN)
-				maxlen = CONFIG_GDBSERVER_PACKET_MAXLEN;
+			if (maxlen > CONFIG_MODGDBSERVER_PACKET_MAXLEN)
+				maxlen = CONFIG_MODGDBSERVER_PACKET_MAXLEN;
 			if (!GDB_ReadMemory(thread, addr, buf, maxlen))
 				return false;
 			result = libiberty_xcrc32(buf, maxlen, result);

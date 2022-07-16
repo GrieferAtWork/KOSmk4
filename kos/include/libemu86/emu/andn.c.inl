@@ -38,7 +38,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f2): {
 #define NEED_return_unexpected_prefix
 	MODRM_DECODE();
 #if EMU86_EMULATE_CONFIG_WANT_ANDN
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 	if (op_flags & EMU86_F_VEX_W) {
 		u64 lhs, rhs;
 		lhs = VEX_GETREGQ();
@@ -48,7 +48,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f2): {
 			eflags_addend |= EFLAGS_SF;
 		MODRM_SETREGQ(result);
 	} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	{
 		u32 lhs, rhs;
 		lhs = VEX_GETREGL();

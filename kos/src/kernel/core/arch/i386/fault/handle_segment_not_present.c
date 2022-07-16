@@ -29,7 +29,7 @@
 #include <kernel/rt/except-handler.h>
 #include <kernel/syscall-properties.h>
 #include <kernel/syscall-trace.h>
-#include <kernel/syscall.h>
+#include <kernel/syscall.h> /* CONFIG_NO_KERNEL_SYSCALL_TRACING */
 #include <kernel/user.h>
 #include <kernel/x86/fault.h>
 #include <kernel/x86/gdt.h>
@@ -71,9 +71,9 @@ NOTHROW(KERNEL_INTERRUPT_CALLBACK_CC lcall7_clone32)(struct icpustate *__restric
 	pid_t cpid;
 	struct rpc_syscall_info sc_info;
 	REF struct task *ctsk;
-#ifndef CONFIG_NO_SYSCALL_TRACING
+#ifndef CONFIG_NO_KERNEL_SYSCALL_TRACING
 	sc_info.rsi_sysno = __NR32_clone; /* Only needed for `syscall_trace()' */
-#endif /* !CONFIG_NO_SYSCALL_TRACING */
+#endif /* !CONFIG_NO_KERNEL_SYSCALL_TRACING */
 	sc_info.rsi_flags = RPC_SYSCALL_INFO_METHOD_LCALL7_32;
 again:
 	TRY {
@@ -89,11 +89,11 @@ again:
 			sc_info.rsi_flags |= RPC_SYSCALL_INFO_FREGVALID(i);
 		}
 
-#ifndef CONFIG_NO_SYSCALL_TRACING
+#ifndef CONFIG_NO_KERNEL_SYSCALL_TRACING
 		/* Trace the system call invocation. */
 		if (arch_syscall_tracing_getenabled())
 			syscall_trace(&sc_info);
-#endif /* !CONFIG_NO_SYSCALL_TRACING */
+#endif /* !CONFIG_NO_KERNEL_SYSCALL_TRACING */
 
 		bzero(&cargs, sizeof(cargs));
 		cargs.tca_flags       = sc_info.rsi_regs[0] & ~CSIGNAL;              /* clone_flags */
@@ -110,9 +110,9 @@ again:
 		/* Invoke the actual clone system call implementation. */
 		ctsk = task_clone(state, &cargs);
 	} EXCEPT {
-#ifdef CONFIG_NO_SYSCALL_TRACING
+#ifdef CONFIG_NO_KERNEL_SYSCALL_TRACING
 		sc_info.rsi_sysno = __NR32_clone;
-#endif /* CONFIG_NO_SYSCALL_TRACING */
+#endif /* CONFIG_NO_KERNEL_SYSCALL_TRACING */
 		if (icpustate_getpflags(state) & EFLAGS_DF)
 			sc_info.rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;
 		state = userexcept_handler(state, &sc_info);

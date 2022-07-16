@@ -178,7 +178,7 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 }
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 struct panic_args {
 	uintptr_t ecode;
 	uintptr_t intno;
@@ -213,7 +213,7 @@ panic_uhi_dbg_main(void *arg) {
 	           fcpustate_getpc(&x86_dbg_exitstate.de_state));
 	dbg_main(0);
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 INTERN ABNORMAL_RETURN WUNUSED NONNULL((1)) struct icpustate *FCALL
@@ -247,7 +247,7 @@ x86_handle_unhandled_idt(struct icpustate *__restrict state,
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_UNHANDLED_INTERRUPT))
 		kernel_debugtrap(state, SIGBUS);
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	{
 		struct panic_args args;
 		if (intno >= X86_INTERRUPT_PIC1_BASE)
@@ -256,9 +256,9 @@ x86_handle_unhandled_idt(struct icpustate *__restrict state,
 		args.intno = intno;
 		dbg_enter(&panic_uhi_dbg_main, &args, state);
 	}
-#else /* CONFIG_HAVE_DEBUGGER */
+#else /* CONFIG_HAVE_KERNEL_DEBUGGER */
 	PREEMPTION_HALT();
-#endif /* !CONFIG_HAVE_DEBUGGER */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
 	return state;
 }
 

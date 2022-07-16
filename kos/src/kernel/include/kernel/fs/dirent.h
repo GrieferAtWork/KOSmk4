@@ -22,7 +22,8 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/fs/notify.h> /* dnotify_controller_bindchild() */
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+#include <kernel/fs/notify.h>        /* dnotify_controller_bindchild() */
 #include <kernel/types.h>
 
 #include <hybrid/byteorder.h>
@@ -78,11 +79,11 @@ struct fdirent {
 DEFINE_REFCNT_FUNCTIONS(struct fdirent, fd_refcnt, fdirent_destroy)
 
 /* Open the node associated with this directory entry. */
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 #define fdirent_opennode(self, dir) dnotify_controller_bindchild(dir, self, (*(self)->fd_ops->fdo_opennode)(self, dir))
-#else /* CONFIG_HAVE_FS_NOTIFY */
+#else /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #define fdirent_opennode(self, dir) ((*(self)->fd_ops->fdo_opennode)(self, dir))
-#endif /* !CONFIG_HAVE_FS_NOTIFY */
+#endif /* !CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 /* Return the INode number of `self', potentially invoking the override operator. */
 #define fdirent_getino(self, dir)                                          \

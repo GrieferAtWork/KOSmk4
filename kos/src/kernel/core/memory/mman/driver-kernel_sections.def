@@ -62,17 +62,17 @@ INTDEF byte_t __kernel_sect_data_start[];
 INTDEF byte_t __kernel_sect_data_size[];
 INTDEF byte_t __kernel_sect_bss_start[];
 INTDEF byte_t __kernel_sect_bss_size[];
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 INTDEF byte_t __kernel_sect_dbg_hooks_start[];
 INTDEF byte_t __kernel_sect_dbg_hooks_size[];
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 #endif /* !SECTION_GLOBALS_DEFINED */
 
 EXPORT_SECTION(kernel_section_text, ".text", SHT_PROGBITS, SHF_ALLOC | SHF_EXECINSTR, __kernel_sect_text_start, __kernel_sect_text_size, 0, 0, 0)
 EXPORT_SECTION(kernel_section_rodata, ".rodata", SHT_PROGBITS, SHF_ALLOC, __kernel_sect_rodata_start, __kernel_sect_rodata_size, 0, 0, 0)
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 EXPORT_SECTION(kernel_section_dbg_hooks, ".dbg.hooks", SHT_PROGBITS, SHF_ALLOC, __kernel_sect_dbg_hooks_start, __kernel_sect_dbg_hooks_size, 0, 0, 0)
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 EXPORT_SECTION(kernel_section_gcc_except_table, ".gcc_except_table", SHT_PROGBITS, SHF_ALLOC, __kernel_sect_gcc_except_table_start, __kernel_sect_gcc_except_table_size, 0, 0, 0)
 EXPORT_SECTION(kernel_section_eh_frame, ".eh_frame", SHT_PROGBITS, SHF_ALLOC, __kernel_sect_eh_frame_start, __kernel_sect_eh_frame_size, 0, 0, 0)
 INTERN_SECTION(kernel_section_debug_line, ".debug_line", SHT_PROGBITS, SHF_ALLOC | SHF_COMPRESSED, __kernel_debug_line_start, __kernel_debug_line_size, 0, 0, 0)

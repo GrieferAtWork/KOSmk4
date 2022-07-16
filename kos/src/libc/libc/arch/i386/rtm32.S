@@ -35,16 +35,16 @@
 
 #include <syscall.h>
 
-#ifdef CONFIG_SUPPORT_HARDWARE_RTM
+#ifdef CONFIG_LIBC_SUPPORTS_HARDWARE_RTM
 #include <asm/cpu-cpuid.h>
-#endif /* CONFIG_SUPPORT_HARDWARE_RTM */
+#endif /* CONFIG_LIBC_SUPPORTS_HARDWARE_RTM */
 
 
-#ifdef CONFIG_SUPPORT_HARDWARE_RTM
+#ifdef CONFIG_LIBC_SUPPORTS_HARDWARE_RTM
 .section .xdata, "awx"
-#else /* CONFIG_SUPPORT_HARDWARE_RTM */
+#else /* CONFIG_LIBC_SUPPORTS_HARDWARE_RTM */
 .section .text.crt.system.rtm
-#endif /* !CONFIG_SUPPORT_HARDWARE_RTM */
+#endif /* !CONFIG_LIBC_SUPPORTS_HARDWARE_RTM */
 
 
 /* Begin  an  RTM operation.  Note that  if  the arch-specific  RTM driver
@@ -67,7 +67,7 @@
  * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
 INTERN_FUNCTION(libc_rtm_begin)
 	.cfi_startproc
-#ifdef CONFIG_SUPPORT_HARDWARE_RTM
+#ifdef CONFIG_LIBC_SUPPORTS_HARDWARE_RTM
 	.byte 0xb8            /* movl $(-1), %eax */
 .Lrtm_begin_maybe_syscall:
 	.long 0xffffffff
@@ -81,11 +81,11 @@ INTERN_FUNCTION(libc_rtm_begin)
 	/* Hardware RTM entered. */
 .Lrtm_begin_do_return:
 	ret
-#else /* CONFIG_SUPPORT_HARDWARE_RTM */
+#else /* CONFIG_LIBC_SUPPORTS_HARDWARE_RTM */
 	movl   $(SYS_rtm_begin), %eax
 	EXTERN(libc___i386_syscall)
 	jmp    libc___i386_syscall
-#endif /* !CONFIG_SUPPORT_HARDWARE_RTM */
+#endif /* !CONFIG_LIBC_SUPPORTS_HARDWARE_RTM */
 	.cfi_endproc
 END(libc_rtm_begin)
 DEFINE_PUBLIC_ALIAS(rtm_begin, libc_rtm_begin)
@@ -98,11 +98,11 @@ DEFINE_PUBLIC_ALIAS(rtm_begin, libc_rtm_begin)
  * function does not return normally, but returns from the original `rtm_begin()' */
 INTERN_FUNCTION(libc_rtm_abort)
 	.cfi_startproc
-#ifdef CONFIG_SUPPORT_HARDWARE_RTM
+#ifdef CONFIG_LIBC_SUPPORTS_HARDWARE_RTM
 	.byte  0xe9       /* jmp 1f; 1: */
 .Lrtm_abort_redirection:
 	.long  0x00000000
-#endif /* CONFIG_SUPPORT_HARDWARE_RTM */
+#endif /* CONFIG_LIBC_SUPPORTS_HARDWARE_RTM */
 	pushl_cfi_r %ebx
 	movl   %ecx, %ebx /* code */
 	movl   $(SYS_rtm_abort), %eax
@@ -136,7 +136,7 @@ END(libc_rtm_test)
 DEFINE_PUBLIC_ALIAS(rtm_test, libc_rtm_test)
 
 
-#ifdef CONFIG_SUPPORT_HARDWARE_RTM
+#ifdef CONFIG_LIBC_SUPPORTS_HARDWARE_RTM
 /* Check if a transaction is currently in progress
  * @return: ZF=1 : No RTM operation in progress
  * @return: ZF=0 : An RTM operation is currently in progress */
@@ -159,12 +159,12 @@ INTERN_FUNCTION(libc___x86_rtm_xtest)
 	.cfi_endproc
 END(libc___x86_rtm_xtest)
 DEFINE_PUBLIC_ALIAS(__x86_rtm_xtest, libc___x86_rtm_xtest)
-#endif /* CONFIG_SUPPORT_HARDWARE_RTM */
+#endif /* CONFIG_LIBC_SUPPORTS_HARDWARE_RTM */
 
 
 
 
-#ifdef CONFIG_SUPPORT_HARDWARE_RTM
+#ifdef CONFIG_LIBC_SUPPORTS_HARDWARE_RTM
 .pushsection .text.crt.system.rtm
 PRIVATE_FUNCTION(libc_hw_rtm_abort)
 	.cfi_startproc
@@ -319,7 +319,7 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 	.cfi_endproc
 END(libc_rtm_begin_init)
 .popsection
-#endif /* CONFIG_SUPPORT_HARDWARE_RTM */
+#endif /* CONFIG_LIBC_SUPPORTS_HARDWARE_RTM */
 
 
 

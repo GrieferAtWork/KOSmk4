@@ -203,7 +203,7 @@ uvio_request(/*in|out*/ struct vioargs *__restrict args, vio_addr_t addr, u16 co
 again:
 
 	/* Find a free request slot and try to allocate it. */
-	for (reqid = 0; reqid < CONFIG_UVIO_MAX_PARALLEL_REQUESTS; ++reqid) {
+	for (reqid = 0; reqid < CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS; ++reqid) {
 		slot = &self->uv_req[reqid];
 		kernel_uvio_request_write(slot);
 		if (self->uv_req[reqid].kur_args) {
@@ -227,7 +227,7 @@ got_free_slot:
 	/* Wait for more slots to become available. */
 	task_connect(&self->uv_reqfree);
 	TRY {
-		for (reqid = 0; reqid < CONFIG_UVIO_MAX_PARALLEL_REQUESTS; ++reqid) {
+		for (reqid = 0; reqid < CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS; ++reqid) {
 			slot = &self->uv_req[reqid];
 			kernel_uvio_request_write(slot);
 			if (self->uv_req[reqid].kur_args) {
@@ -466,7 +466,7 @@ PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL uvio_server_has_request_with_status)(struct uvio const *__restrict self,
                                                    u8 status) {
 	unsigned int i;
-	for (i = 0; i < CONFIG_UVIO_MAX_PARALLEL_REQUESTS; ++i) {
+	for (i = 0; i < CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS; ++i) {
 		u8 slot_status;
 		struct kernel_uvio_request const *slot;
 		slot = &self->uv_req[i];
@@ -495,7 +495,7 @@ uvio_server_readone_nonblock(struct uvio *__restrict self,
                              USER CHECKED struct uvio_request *req) THROWS(...) {
 	unsigned int reqid;
 	struct kernel_uvio_request *slot;
-	for (reqid = 0; reqid < CONFIG_UVIO_MAX_PARALLEL_REQUESTS; ++reqid) {
+	for (reqid = 0; reqid < CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS; ++reqid) {
 		slot = &self->uv_req[reqid];
 		if (!ATOMIC_READ(slot->kur_args))
 			continue; /* Unused slot. */
@@ -720,11 +720,11 @@ complete_slot_with_except:
 	case UVIO_OPCODE_WRITEQ:
 #endif /* LIBVIO_CONFIG_HAVE_QWORD */
 		result = sizeof(response_header);
-		if unlikely((response_header.ur_respid & 0xff) >= CONFIG_UVIO_MAX_PARALLEL_REQUESTS) {
+		if unlikely((response_header.ur_respid & 0xff) >= CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS) {
 err_bad_respid_lowbyte:
 			THROW(E_INDEX_ERROR_OUT_OF_BOUNDS,
 			      response_header.ur_respid & 0xff, 0,
-			      CONFIG_UVIO_MAX_PARALLEL_REQUESTS - 1);
+			      CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS - 1);
 		}
 
 		/* Verify the response ID */
@@ -761,7 +761,7 @@ complete_slot_nostatus:
 		result = sizeof(struct uvio_response_readb);
 		if unlikely(num_bytes < result)
 			goto err_buffer_too_small;
-		if unlikely((response_header.ur_respid & 0xff) >= CONFIG_UVIO_MAX_PARALLEL_REQUESTS)
+		if unlikely((response_header.ur_respid & 0xff) >= CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS)
 			goto err_bad_respid_lowbyte;
 
 		/* Read in the return value. */
@@ -797,7 +797,7 @@ complete_slot_nostatus:
 		result = sizeof(struct uvio_response_readw);
 		if unlikely(num_bytes < result)
 			goto err_buffer_too_small;
-		if unlikely((response_header.ur_respid & 0xff) >= CONFIG_UVIO_MAX_PARALLEL_REQUESTS)
+		if unlikely((response_header.ur_respid & 0xff) >= CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS)
 			goto err_bad_respid_lowbyte;
 
 		/* Read in the return value. */
@@ -833,7 +833,7 @@ complete_slot_nostatus:
 		result = sizeof(struct uvio_response_readl);
 		if unlikely(num_bytes < result)
 			goto err_buffer_too_small;
-		if unlikely((response_header.ur_respid & 0xff) >= CONFIG_UVIO_MAX_PARALLEL_REQUESTS)
+		if unlikely((response_header.ur_respid & 0xff) >= CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS)
 			goto err_bad_respid_lowbyte;
 
 		/* Read in the return value. */
@@ -875,7 +875,7 @@ complete_slot_nostatus:
 		result = sizeof(struct uvio_response_readq);
 		if unlikely(num_bytes < result)
 			goto err_buffer_too_small;
-		if unlikely((response_header.ur_respid & 0xff) >= CONFIG_UVIO_MAX_PARALLEL_REQUESTS)
+		if unlikely((response_header.ur_respid & 0xff) >= CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS)
 			goto err_bad_respid_lowbyte;
 
 		/* Read in the return value. */
@@ -906,7 +906,7 @@ complete_slot_nostatus:
 		result = sizeof(struct uvio_response_readx);
 		if unlikely(num_bytes < result)
 			goto err_buffer_too_small;
-		if unlikely((response_header.ur_respid & 0xff) >= CONFIG_UVIO_MAX_PARALLEL_REQUESTS)
+		if unlikely((response_header.ur_respid & 0xff) >= CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS)
 			goto err_bad_respid_lowbyte;
 
 		/* Read in the return value. */
@@ -999,7 +999,7 @@ PUBLIC REF struct uvio *KCALL uvio_create(void) THROWS(E_BADALLOC) {
 	sig_init(&result->uv_reqfree);
 	{
 		unsigned int reqid;
-		for (reqid = 0; reqid < CONFIG_UVIO_MAX_PARALLEL_REQUESTS; ++reqid) {
+		for (reqid = 0; reqid < CONFIG_KERNEL_UVIO_MAX_PARALLEL_REQUESTS; ++reqid) {
 			atomic_rwlock_init(&result->uv_req[reqid].kur_lock);
 			result->uv_req[reqid].kur_nextuid_seed = krand32();
 			result->uv_req[reqid].kur_args         = NULL; /* Free slot */

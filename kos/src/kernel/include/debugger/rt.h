@@ -24,7 +24,7 @@
 
 #include <debugger/config.h>
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <debugger/arch/rt.h>
 #include <kernel/paging.h>
 #include <kernel/types.h>
@@ -211,11 +211,11 @@ FUNDEF ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_changedview)(void);
 #endif /* __CC__ */
 
 DECL_END
-#else /* CONFIG_HAVE_DEBUGGER */
+#else /* CONFIG_HAVE_KERNEL_DEBUGGER */
 #ifndef __dbg_active_defined
 #define __dbg_active_defined
 #define dbg_active 0
 #endif /* !__dbg_active_defined */
-#endif /* !CONFIG_HAVE_DEBUGGER */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_INCLUDE_DEBUGGER_RT_H */

@@ -85,17 +85,27 @@ INTDEF void NOTHROW(FCALL GDB_Main)(void);
 INTDEF void NOTHROW(FCALL GDB_MainWithAlternateStack)(void);
 
 
-/* Max length of packet data (number of writable bytes returned by `GDBPacket_Start()') */
-#ifndef CONFIG_GDBSERVER_PACKET_MAXLEN
-#define CONFIG_GDBSERVER_PACKET_MAXLEN (1 << 14)
-#endif /* !CONFIG_GDBSERVER_PACKET_MAXLEN */
+/*[[[config CONFIG_MODGDBSERVER_PACKET_MAXLEN = (1 << 14)
+ * Max length of packet data (number of writable bytes returned by `GDBPacket_Start()')
+ * ]]]*/
+#ifdef CONFIG_NO_MODGDBSERVER_PACKET_MAXLEN
+#undef CONFIG_MODGDBSERVER_PACKET_MAXLEN
+#define CONFIG_MODGDBSERVER_PACKET_MAXLEN 0
+#elif !defined(CONFIG_MODGDBSERVER_PACKET_MAXLEN)
+#define CONFIG_MODGDBSERVER_PACKET_MAXLEN (1 << 14)
+#elif (CONFIG_MODGDBSERVER_PACKET_MAXLEN + 0) <= 0
+#undef CONFIG_MODGDBSERVER_PACKET_MAXLEN
+#define CONFIG_NO_MODGDBSERVER_PACKET_MAXLEN
+#define CONFIG_MODGDBSERVER_PACKET_MAXLEN 0
+#endif /* ... */
+/*[[[end]]]*/
 
 /* Packet API */
 
 /* Max # of times to attempt to transmit a packet before giving up. */
 INTDEF unsigned int GDBPacket_RetryTransmitLimit;
 
-/* Begin a new packet, returning a buffer of up to `CONFIG_GDBSERVER_PACKET_MAXLEN' bytes. */
+/* Begin a new packet, returning a buffer of up to `CONFIG_MODGDBSERVER_PACKET_MAXLEN' bytes. */
 INTERN char *NOTHROW(FCALL GDBPacket_Start)(void);
 
 /* Transmit a packet ending at `endptr'

@@ -23,7 +23,7 @@
 #include "api.h"
 /**/
 
-#ifdef CONFIG_SVGA_HAVE_CHIPSET_VGA
+#ifdef CONFIG_HAVE_LIBSVGADRV_CHIPSET_VGA
 #include <kos/types.h>
 
 #include <stdbool.h>
@@ -104,6 +104,6 @@ cs_vga_probe(struct svga_chipset *__restrict self);
 	}
 
 DECL_END
-#endif /* CONFIG_SVGA_HAVE_CHIPSET_VGA */
+#endif /* CONFIG_HAVE_LIBSVGADRV_CHIPSET_VGA */
 
 #endif /* !GUARD_LIBSVGADRV_CS_VGA_H */

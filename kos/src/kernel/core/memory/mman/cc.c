@@ -71,7 +71,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <string.h>
 
 /**/
-#include "module-userelf.h" /* CONFIG_HAVE_USERELF_MODULES */
+#include "module-userelf.h" /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
 
 DECL_BEGIN
 
@@ -92,13 +92,13 @@ INTDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_async_aio_handles)(struct ccinfo *__restrict info);
 INTDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_module_section_cache)(struct ccinfo *__restrict info);
-#ifdef CONFIG_HAVE_USERELF_MODULES
+#ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
 INTDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_rtld_fsfile)(struct ccinfo *__restrict info);
 INTDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(FCALL system_cc_mman_module_cache)(struct mman *__restrict self,
                                            struct ccinfo *__restrict info);
-#endif /* CONFIG_HAVE_USERELF_MODULES */
+#endif /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
 INTDEF NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_slab_prealloc)(struct ccinfo *__restrict info);
 /*...*/
@@ -713,9 +713,9 @@ NOTHROW(FCALL system_cc_mman_execinfo)(struct mman *__restrict self,
 PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(FCALL system_cc_permman)(struct mman *__restrict self,
                                  struct ccinfo *__restrict info) {
-#ifdef CONFIG_HAVE_USERELF_MODULES
+#ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
 	DOCC(system_cc_mman_module_cache(self, info));
-#endif /* CONFIG_HAVE_USERELF_MODULES */
+#endif /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
 
 	/* Files relating to exec-info */
 	DOCC(system_cc_mman_execinfo(self, info));
@@ -943,9 +943,9 @@ NOTHROW(KCALL system_cc_heap)(struct heap *__restrict self,
 	ccinfo_account(info, heap_trim(self, 0, info->ci_gfp));
 }
 
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 INTDEF ATTR_WEAK struct heap trace_heap;
-#endif /* CONFIG_TRACE_MALLOC */
+#endif /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 
 
 /* Trim system heaps. */
@@ -954,10 +954,10 @@ NOTHROW(KCALL system_cc_heaps)(struct ccinfo *__restrict info) {
 	size_t i;
 	for (i = 0; i < __GFP_HEAPCOUNT; ++i)
 		DOCC(system_cc_heap(&kernel_heaps[i], info));
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 	if (&trace_heap != NULL)
 		DOCC(system_cc_heap(&trace_heap, info));
-#endif /* CONFIG_TRACE_MALLOC */
+#endif /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 }
 
 
@@ -1372,9 +1372,9 @@ NOTHROW(FCALL system_cc_impl)(struct ccinfo *__restrict info) {
 	DOCC(system_cc_permman(&mman_kernel, info)); /* In case more can be done now... */
 	DOCC(system_cc_perfs(&fs_kernel, info));     /* In case not done already... */
 	DOCC(system_cc_module_section_cache(info));  /* Clear pre-loaded module sections (e.g. .debug_info, etc...) */
-#ifdef CONFIG_HAVE_USERELF_MODULES
+#ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
 	DOCC(system_cc_rtld_fsfile(info));
-#endif /* CONFIG_HAVE_USERELF_MODULES */
+#endif /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
 	DOCC(system_cc_slab_prealloc(info));
 	DOCC(system_cc_heaps(info));
 

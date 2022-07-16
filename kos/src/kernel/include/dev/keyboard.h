@@ -22,7 +22,7 @@
 
 #include <kernel/compiler.h>
 
-#include <debugger/config.h> /* CONFIG_HAVE_DEBUGGER */
+#include <debugger/config.h> /* CONFIG_HAVE_KERNEL_DEBUGGER */
 #include <dev/mktty.h>
 #include <kernel/types.h>
 #include <sched/sig.h>
@@ -43,9 +43,11 @@
 
 DECL_BEGIN
 
-#ifndef CONFIG_KEYBOARD_BUFFER_SIZE
-#define CONFIG_KEYBOARD_BUFFER_SIZE 128
-#endif /* !CONFIG_KEYBOARD_BUFFER_SIZE */
+/*[[[config CONFIG_KERNEL_KEYBOARD_BUFFER_SIZE! = 128]]]*/
+#ifndef CONFIG_KERNEL_KEYBOARD_BUFFER_SIZE
+#define CONFIG_KERNEL_KEYBOARD_BUFFER_SIZE 128
+#endif /* !CONFIG_KERNEL_KEYBOARD_BUFFER_SIZE */
+/*[[[end]]]*/
 
 
 #ifdef __CC__
@@ -59,7 +61,7 @@ union kbdbuf_state {
 
 struct kbdbuf {
 	union kbdbuf_state kb_bufstate; /* Buffer state */
-	WEAK u16           kb_buffer[CONFIG_KEYBOARD_BUFFER_SIZE]; /* Buffer of unread keyboard inputs. */
+	WEAK u16           kb_buffer[CONFIG_KERNEL_KEYBOARD_BUFFER_SIZE]; /* Buffer of unread keyboard inputs. */
 	struct sig         kb_avail;    /* Signal send for every key added to the buffer. */
 };
 #define kbdbuf_init(self) \
@@ -72,13 +74,13 @@ struct kbdbuf {
 
 #define KEYBOARD_DEVICE_FLAG_NORMAL  0x0000 /* Normal keyboard device flags. */
 #define KEYBOARD_DEVICE_FLAG_RDMODE  0x0007 /* Mask for the effective read-mode (one of `K_*' from <linux/kd.h>) */
-#ifndef CONFIG_NO_DEBUGGER
+#ifndef CONFIG_NO_KERNEL_DEBUGGER
 #define KEYBOARD_DEVICE_FLAG_DBGF12  0x2000 /* Pressing F12 4 times in a row on this keyboard will invoke `dbg()' */
 #define KEYBOARD_DEVICE_FLAG_DBGF12_ONCE   0x4000 /* F12 was pressed once */
 #define KEYBOARD_DEVICE_FLAG_DBGF12_TWICE  0x8000 /* F12 was pressed twice */
 #define KEYBOARD_DEVICE_FLAG_DBGF12_THRICE 0xc000 /* F12 was pressed thrice */
 #define KEYBOARD_DEVICE_FLAG_DBGF12_MASK   0xc000 /* Mask for the number of times F12 was pressed */
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* !CONFIG_NO_KERNEL_DEBUGGER */
 
 
 struct kbddev;
@@ -222,11 +224,11 @@ kbddev_v_polltest(struct mfile *__restrict self,
 DATDEF struct mfile_stream_ops const kbddev_v_stream_ops;
 
 
-#if !defined(CONFIG_NO_DEBUGGER) && defined(KEYBOARD_DEVICE_FLAG_DBGF12)
+#if !defined(CONFIG_NO_KERNEL_DEBUGGER) && defined(KEYBOARD_DEVICE_FLAG_DBGF12)
 #define _kbddev_init_flags(self) (self)->kd_flags = K_UNICODE | KEYBOARD_DEVICE_FLAG_DBGF12
-#else /* !CONFIG_NO_DEBUGGER && KEYBOARD_DEVICE_FLAG_DBGF12 */
+#else /* !CONFIG_NO_KERNEL_DEBUGGER && KEYBOARD_DEVICE_FLAG_DBGF12 */
 #define _kbddev_init_flags(self) (self)->kd_flags = K_UNICODE | KEYBOARD_DEVICE_FLAG_NORMAL
-#endif /* CONFIG_NO_DEBUGGER || !KEYBOARD_DEVICE_FLAG_DBGF12 */
+#endif /* CONFIG_NO_KERNEL_DEBUGGER || !KEYBOARD_DEVICE_FLAG_DBGF12 */
 #define _kbddev_cinit_flags _kbddev_init_flags
 
 
@@ -284,13 +286,13 @@ DATDEF struct mfile_stream_ops const kbddev_v_stream_ops;
  * @return: false: The buffer is already full and the key was not added. */
 FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL kbdbuf_putkey)(struct kbdbuf *__restrict self, u16 key);
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) __BOOL NOTHROW(FCALL kbdbuf_putkey_nopr)(struct kbdbuf *__restrict self, u16 key);
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 FUNDEF NOBLOCK NONNULL((1)) __BOOL NOTHROW(FCALL kbddev_putkey)(struct kbddev *__restrict self, u16 key);
 FUNDEF NOBLOCK NOPREEMPT NONNULL((1)) __BOOL NOTHROW(FCALL kbddev_putkey_nopr)(struct kbddev *__restrict self, u16 key);
-#else /* CONFIG_HAVE_DEBUGGER */
+#else /* CONFIG_HAVE_KERNEL_DEBUGGER */
 #define kbddev_putkey(self, key)      kbdbuf_putkey(&(self)->kd_buf, key)
 #define kbddev_putkey_nopr(self, key) kbdbuf_putkey_nopr(&(self)->kd_buf, key)
-#endif /* !CONFIG_HAVE_DEBUGGER */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 /* Try to read a key stroke from the given keyboard buffer.

@@ -46,18 +46,32 @@
 
 DECL_BEGIN
 
-/* Automatically  select  jcc  and  setcc   condition
- * representation based on the preceding instruction. */
-#undef CONFIG_AUTOSELECT_JCC
-#if 1
-#define CONFIG_AUTOSELECT_JCC  1
-#endif
+/*[[[config CONFIG_LIBDISASM_X86_AUTOSELECT_JCC = true
+ * Automatically  select  jcc  and  setcc   condition
+ * representation based on the preceding instruction.
+ * ]]]*/
+#ifdef CONFIG_NO_LIBDISASM_X86_AUTOSELECT_JCC
+#undef CONFIG_LIBDISASM_X86_AUTOSELECT_JCC
+#elif !defined(CONFIG_LIBDISASM_X86_AUTOSELECT_JCC)
+#define CONFIG_LIBDISASM_X86_AUTOSELECT_JCC
+#elif (-CONFIG_LIBDISASM_X86_AUTOSELECT_JCC - 1) == -1
+#undef CONFIG_LIBDISASM_X86_AUTOSELECT_JCC
+#define CONFIG_NO_LIBDISASM_X86_AUTOSELECT_JCC
+#endif /* ... */
+/*[[[end]]]*/
 
-/* Include implied operands of FPU instructions */
-#undef CONFIG_VERBOSE_FINST
-#if 1
-#define CONFIG_VERBOSE_FINST  1
-#endif
+/*[[[config CONFIG_LIBDISASM_X86_VERBOSE_FPUINSTR = true
+ * Include implied operands of FPU instructions
+ * ]]]*/
+#ifdef CONFIG_NO_LIBDISASM_X86_VERBOSE_FPUINSTR
+#undef CONFIG_LIBDISASM_X86_VERBOSE_FPUINSTR
+#elif !defined(CONFIG_LIBDISASM_X86_VERBOSE_FPUINSTR)
+#define CONFIG_LIBDISASM_X86_VERBOSE_FPUINSTR
+#elif (-CONFIG_LIBDISASM_X86_VERBOSE_FPUINSTR - 1) == -1
+#undef CONFIG_LIBDISASM_X86_VERBOSE_FPUINSTR
+#define CONFIG_NO_LIBDISASM_X86_VERBOSE_FPUINSTR
+#endif /* ... */
+/*[[[end]]]*/
 
 
 #define I(op, flags, repr) { flags, op, repr }
@@ -454,16 +468,16 @@ struct instruction {
 #define OP_XMM0 OP_ESC("%xmm0") /* %xmm0 */
 
 
-#ifdef CONFIG_VERBOSE_FINST
+#ifdef CONFIG_LIBDISASM_X86_VERBOSE_FPUINSTR
 #define OP_VERBOSE_ST0 OP_ST0
 #define OP_VERBOSE_ST1 OP_ST1
-#else /* CONFIG_VERBOSE_FINST */
+#else /* CONFIG_LIBDISASM_X86_VERBOSE_FPUINSTR */
 #define OP_VERBOSE_ST0 /* nothing */
 #define OP_VERBOSE_ST1 /* nothing */
-#endif /* !CONFIG_VERBOSE_FINST */
+#endif /* !CONFIG_LIBDISASM_X86_VERBOSE_FPUINSTR */
 
 
-#ifdef CONFIG_AUTOSELECT_JCC
+#ifdef CONFIG_LIBDISASM_X86_AUTOSELECT_JCC
 #define NAME_jc0 "o"   /* "o" */
 #define NAME_jc1 "no"  /* "no" */
 #define NAME_jc2 "[2]" /* "[b|c|nae]" */
@@ -480,7 +494,7 @@ struct instruction {
 #define NAME_jcd "[d]" /* "[ge|nl]" */
 #define NAME_jce "[e]" /* "[le|ng]" */
 #define NAME_jcf "[f]" /* "[g|nle]" */
-#else /* CONFIG_AUTOSELECT_JCC */
+#else /* CONFIG_LIBDISASM_X86_AUTOSELECT_JCC */
 #define NAME_jc0 "o"
 #define NAME_jc1 "no"
 #define NAME_jc2 "b"
@@ -497,7 +511,7 @@ struct instruction {
 #define NAME_jcd "ge"
 #define NAME_jce "le"
 #define NAME_jcf "g"
-#endif /* !CONFIG_AUTOSELECT_JCC */
+#endif /* !CONFIG_LIBDISASM_X86_AUTOSELECT_JCC */
 
 enum {
 #define LONGOP(name, repr) name, _LO_next##name = name + sizeof(repr) - 1,

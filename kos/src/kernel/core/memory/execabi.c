@@ -35,31 +35,31 @@
 #include <stddef.h>
 #include <string.h>
 
-#ifdef CONFIG_EXECABI_HAVE_BUILTIN_ELF
+#ifdef EXECABI_HAVE_BUILTIN_ELF
 #include "../../modelf/elf.h"
-#endif /* CONFIG_EXECABI_HAVE_BUILTIN_ELF */
+#endif /* EXECABI_HAVE_BUILTIN_ELF */
 
-#ifdef CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG
+#ifdef EXECABI_HAVE_BUILTIN_SHEBANG
 #include "../../modshebang/shebang.h"
-#endif /* CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG */
+#endif /* EXECABI_HAVE_BUILTIN_SHEBANG */
 
-#ifdef CONFIG_EXECABI_HAVE_BUILTIN_PE
+#ifdef EXECABI_HAVE_BUILTIN_PE
 #include "../../modpe/pe.h"
-#endif /* CONFIG_EXECABI_HAVE_BUILTIN_PE */
+#endif /* EXECABI_HAVE_BUILTIN_PE */
 
 DECL_BEGIN
 
 enum {
 	DEFAULT_EXECABIS_COUNT = (0
-#ifdef CONFIG_EXECABI_HAVE_BUILTIN_ELF
+#ifdef EXECABI_HAVE_BUILTIN_ELF
 	                          + 1
-#endif /* CONFIG_EXECABI_HAVE_BUILTIN_ELF */
-#ifdef CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG
+#endif /* EXECABI_HAVE_BUILTIN_ELF */
+#ifdef EXECABI_HAVE_BUILTIN_SHEBANG
 	                          + 1
-#endif /* CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG */
-#ifdef CONFIG_EXECABI_HAVE_BUILTIN_PE
+#endif /* EXECABI_HAVE_BUILTIN_SHEBANG */
+#ifdef EXECABI_HAVE_BUILTIN_PE
 	                          + 1
-#endif /* CONFIG_EXECABI_HAVE_BUILTIN_PE */
+#endif /* EXECABI_HAVE_BUILTIN_PE */
 	                          )
 };
 
@@ -68,15 +68,15 @@ PRIVATE struct execabis_struct default_execabis = {
 	.eas_refcnt = 2, /* +1: default_execabis, +1: execabis */
 	.eas_count  = DEFAULT_EXECABIS_COUNT,
 	.eas_abis   = {
-#ifdef CONFIG_EXECABI_HAVE_BUILTIN_ELF
+#ifdef EXECABI_HAVE_BUILTIN_ELF
 		EXECABI_INIT_ELF,
-#endif /* CONFIG_EXECABI_HAVE_BUILTIN_ELF */
-#ifdef CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG
+#endif /* EXECABI_HAVE_BUILTIN_ELF */
+#ifdef EXECABI_HAVE_BUILTIN_SHEBANG
 		EXECABI_INIT_SHEBANG,
-#endif /* CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG */
-#ifdef CONFIG_EXECABI_HAVE_BUILTIN_PE
+#endif /* EXECABI_HAVE_BUILTIN_SHEBANG */
+#ifdef EXECABI_HAVE_BUILTIN_PE
 		EXECABI_INIT_PE,
-#endif /* CONFIG_EXECABI_HAVE_BUILTIN_PE */
+#endif /* EXECABI_HAVE_BUILTIN_PE */
 	}
 };
 

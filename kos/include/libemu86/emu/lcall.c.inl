@@ -26,21 +26,21 @@
 EMU86_INTELLISENSE_BEGIN(lcall) {
 
 #if ((EMU86_EMULATE_CONFIG_CHECKERROR && !EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC) || \
-     (EMU86_EMULATE_CONFIG_WANT_LCALL && (CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT)))
+     (EMU86_EMULATE_CONFIG_WANT_LCALL && (LIBEMU86_CONFIG_WANT_16BIT || LIBEMU86_CONFIG_WANT_32BIT)))
 case EMU86_OPCODE_ENCODE(0x9a): {
 	/* 9A cd    CALL ptr16:16    Call far, absolute, address given in operand.
 	 * 9A cp    CALL ptr16:32    Call far, absolute, address given in operand. */
-#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
+#if LIBEMU86_CONFIG_WANT_16BIT || LIBEMU86_CONFIG_WANT_32BIT
 	byte_t *sp;
 #if EMU86_EMULATE_CONFIG_WANT_LCALL || EMU86_EMULATE_CONFIG_CHECKUSER
 	u32 offset;
 	u16 segment;
 #endif /* EMU86_EMULATE_CONFIG_WANT_LCALL || EMU86_EMULATE_CONFIG_CHECKUSER */
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
 		goto return_unsupported_instruction;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 #if EMU86_EMULATE_CONFIG_WANT_LCALL || EMU86_EMULATE_CONFIG_CHECKUSER
 	if (!IS_16BIT()) {
 		offset = UNALIGNED_GETLE32((u32 const *)pc);
@@ -95,10 +95,10 @@ case EMU86_OPCODE_ENCODE(0x9a): {
 #define NEED_return_unsupported_instruction
 	goto return_unsupported_instruction;
 #endif /* !EMU86_EMULATE_CONFIG_WANT_LCALL */
-#else /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
+#else /* LIBEMU86_CONFIG_WANT_16BIT || LIBEMU86_CONFIG_WANT_32BIT */
 #define NEED_return_unsupported_instruction
 	goto return_unsupported_instruction;
-#endif /* !CONFIG_LIBEMU86_WANT_16BIT && !CONFIG_LIBEMU86_WANT_32BIT */
+#endif /* !LIBEMU86_CONFIG_WANT_16BIT && !LIBEMU86_CONFIG_WANT_32BIT */
 	goto done_dont_set_pc;
 #define NEED_done_dont_set_pc
 }

@@ -125,11 +125,28 @@ for (local name: [
 
 
 
-#undef CONFIG_NO_CFA_SIGFRAME_STATE
-#if (defined(CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS) || \
-     defined(__OPTIMIZE_SIZE__))
-#define CONFIG_NO_CFA_SIGFRAME_STATE 1
+/*[[[config CONFIG_HAVE_LIBUNWIND_CFA_SIGFRAME_STATE: bool = !defined(__OPTIMIZE_SIZE__)
+ * Implement `unwind_fde_sigframe_exec(3)' and `unwind_cfa_sigframe_apply(3)' as
+ * dedicated functions, rather than aliases for the non-sigframe variants.
+ * ]]]*/
+#ifdef CONFIG_NO_LIBUNWIND_CFA_SIGFRAME_STATE
+#undef CONFIG_HAVE_LIBUNWIND_CFA_SIGFRAME_STATE
+#elif !defined(CONFIG_HAVE_LIBUNWIND_CFA_SIGFRAME_STATE)
+#ifndef __OPTIMIZE_SIZE__
+#define CONFIG_HAVE_LIBUNWIND_CFA_SIGFRAME_STATE
+#else /* !__OPTIMIZE_SIZE__ */
+#define CONFIG_NO_LIBUNWIND_CFA_SIGFRAME_STATE
+#endif /* __OPTIMIZE_SIZE__ */
+#elif (-CONFIG_HAVE_LIBUNWIND_CFA_SIGFRAME_STATE - 1) == -1
+#undef CONFIG_HAVE_LIBUNWIND_CFA_SIGFRAME_STATE
+#define CONFIG_NO_LIBUNWIND_CFA_SIGFRAME_STATE
 #endif /* ... */
+/*[[[end]]]*/
+#ifdef CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS
+#undef CONFIG_NO_LIBUNWIND_CFA_SIGFRAME_STATE
+#undef CONFIG_HAVE_LIBUNWIND_CFA_SIGFRAME_STATE
+#define CONFIG_NO_LIBUNWIND_CFA_SIGFRAME_STATE
+#endif /* CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS */
 
 #define _convert_with_array(arr, index, error) \
 	((index) >= COMPILER_LENOF(arr) ? (error) : arr[index])
@@ -311,10 +328,10 @@ DECL_END
 #define EH_FRAME_FDE_EXEC_CFA_STATE 1
 #include "eh_frame-fde_exec.c.inl"
 
-#ifndef CONFIG_NO_CFA_SIGFRAME_STATE
+#ifndef CONFIG_NO_LIBUNWIND_CFA_SIGFRAME_STATE
 #define EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE 1
 #include "eh_frame-fde_exec.c.inl"
-#endif /* !CONFIG_NO_CFA_SIGFRAME_STATE */
+#endif /* !CONFIG_NO_LIBUNWIND_CFA_SIGFRAME_STATE */
 
 #ifdef LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES
 #define EH_FRAME_FDE_EXEC_CFA_LANDING_STATE 1
@@ -346,7 +363,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_until)(unwind_fde_t *__restrict self, /* On
                                             unwind_cfa_state_t *__restrict result,
                                             void const *absolute_pc);
 
-#ifndef CONFIG_NO_CFA_SIGFRAME_STATE
+#ifndef CONFIG_NO_LIBUNWIND_CFA_SIGFRAME_STATE
 PRIVATE
 #if CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT != 0 && CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT != 0
 	NONNULL((1, 4, 5, 6))
@@ -363,7 +380,7 @@ NOTHROW_NCX(CC libuw_unwind_sigframe_fde_exec_until)(unwind_fde_t *__restrict se
                                                      byte_t const *end,
                                                      unwind_cfa_sigframe_state_t *__restrict result,
                                                      void const *absolute_pc);
-#endif /* !CONFIG_NO_CFA_SIGFRAME_STATE */
+#endif /* !CONFIG_NO_LIBUNWIND_CFA_SIGFRAME_STATE */
 
 /* Internal helper for calculating landing-pad rules. */
 #ifdef LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES
@@ -594,10 +611,10 @@ DECL_END
 #define EH_FRAME_CFA_APPLY 1
 #include "eh_frame-cfa_apply.c.inl"
 
-#ifndef CONFIG_NO_CFA_SIGFRAME_STATE
+#ifndef CONFIG_NO_LIBUNWIND_CFA_SIGFRAME_STATE
 #define EH_FRAME_CFA_SIGFRAME_APPLY 1
 #include "eh_frame-cfa_apply.c.inl"
-#endif /* !CONFIG_NO_CFA_SIGFRAME_STATE */
+#endif /* !CONFIG_NO_LIBUNWIND_CFA_SIGFRAME_STATE */
 
 #ifdef LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES
 #define EH_FRAME_CFA_LANDING_APPLY 1
@@ -1211,10 +1228,10 @@ err:
 
 
 /* Alias the sigframe variants on-top of the regular ones. */
-#ifdef CONFIG_NO_CFA_SIGFRAME_STATE
+#ifdef CONFIG_NO_LIBUNWIND_CFA_SIGFRAME_STATE
 DEFINE_INTERN_ALIAS(libuw_unwind_fde_sigframe_exec, libuw_unwind_fde_exec);
 DEFINE_INTERN_ALIAS(libuw_unwind_cfa_sigframe_apply, libuw_unwind_cfa_apply);
-#endif /* CONFIG_NO_CFA_SIGFRAME_STATE */
+#endif /* CONFIG_NO_LIBUNWIND_CFA_SIGFRAME_STATE */
 
 DEFINE_PUBLIC_ALIAS(unwind_fde_load, libuw_unwind_fde_load);
 DEFINE_PUBLIC_ALIAS(unwind_fde_scan, libuw_unwind_fde_scan);

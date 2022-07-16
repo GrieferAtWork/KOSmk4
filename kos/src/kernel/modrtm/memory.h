@@ -30,41 +30,52 @@
 
 #include "rtm.h"
 
-/* Config option: CONFIG_RTM_FAR_REGIONS
+/*[[[config CONFIG_MODRTM_FAR_REGIONS = true
+ * >> Config option: CONFIG_MODRTM_FAR_REGIONS
  * When enabled, so-called far regions can be made use of that
  * can alias the data parts of adjacent memory regions without
- * having to load all memory in-between accessed locations. */
-#ifdef CONFIG_NO_RTM_FAR_REGIONS
-#undef CONFIG_RTM_FAR_REGIONS
-#define CONFIG_RTM_FAR_REGIONS 0
-#elif !defined(CONFIG_RTM_FAR_REGIONS)
-#define CONFIG_RTM_FAR_REGIONS 1
-#elif (CONFIG_RTM_FAR_REGIONS + 0) == 0
-#undef CONFIG_RTM_FAR_REGIONS
-#define CONFIG_RTM_FAR_REGIONS 0
-#else /* ... */
-#undef CONFIG_RTM_FAR_REGIONS
-#define CONFIG_RTM_FAR_REGIONS 1
-#endif /* !... */
+ * having to load all memory in-between accessed locations.
+ * ]]]*/
+#ifdef CONFIG_NO_MODRTM_FAR_REGIONS
+#undef CONFIG_MODRTM_FAR_REGIONS
+#elif !defined(CONFIG_MODRTM_FAR_REGIONS)
+#define CONFIG_MODRTM_FAR_REGIONS
+#elif (-CONFIG_MODRTM_FAR_REGIONS - 1) == -1
+#undef CONFIG_MODRTM_FAR_REGIONS
+#define CONFIG_NO_MODRTM_FAR_REGIONS
+#endif /* ... */
+/*[[[end]]]*/
 
 
-#if CONFIG_RTM_FAR_REGIONS
-/* Threshold: Create far regions if the alternative require at  least
+#ifdef CONFIG_MODRTM_FAR_REGIONS
+/*[[[config CONFIG_MODRTM_FAR_REGION_CREATION_THRESHOLD! = 64
+ * Threshold: Create far regions if the alternative require at  least
  *            this  many bytes  of memory  to be  loaded, that hadn't
- *            actually been required by the user up until this point. */
-#ifndef CONFIG_RTM_FAR_REGION_CREATION_THRESHOLD
-#define CONFIG_RTM_FAR_REGION_CREATION_THRESHOLD 64
-#endif /* !CONFIG_RTM_FAR_REGION_CREATION_THRESHOLD */
-/* When defined as non-zero, re-merge far regions if/when they end
- * up running into each other. */
-#ifndef CONFIG_RTM_FAR_REGION_REMERGE
-#ifdef __OPTIMIZE_SIZE__
-#define CONFIG_RTM_FAR_REGION_REMERGE 0
-#else /* __OPTIMIZE_SIZE__ */
-#define CONFIG_RTM_FAR_REGION_REMERGE 1
-#endif /* !__OPTIMIZE_SIZE__ */
-#endif /* !CONFIG_RTM_FAR_REGION_REMERGE */
-#endif /* CONFIG_RTM_FAR_REGIONS */
+ *            actually been required by the user up until this point.
+ * ]]]*/
+#ifndef CONFIG_MODRTM_FAR_REGION_CREATION_THRESHOLD
+#define CONFIG_MODRTM_FAR_REGION_CREATION_THRESHOLD 64
+#endif /* !CONFIG_MODRTM_FAR_REGION_CREATION_THRESHOLD */
+/*[[[end]]]*/
+
+/*[[[config CONFIG_MODRTM_FAR_REGION_REMERGE: bool = !defined(__OPTIMIZE_SIZE__)
+ * When defined as non-zero, re-merge far regions
+ * if/when they end up running into each other.
+ * ]]]*/
+#ifdef CONFIG_NO_MODRTM_FAR_REGION_REMERGE
+#undef CONFIG_MODRTM_FAR_REGION_REMERGE
+#elif !defined(CONFIG_MODRTM_FAR_REGION_REMERGE)
+#ifndef __OPTIMIZE_SIZE__
+#define CONFIG_MODRTM_FAR_REGION_REMERGE
+#else /* !__OPTIMIZE_SIZE__ */
+#define CONFIG_NO_MODRTM_FAR_REGION_REMERGE
+#endif /* __OPTIMIZE_SIZE__ */
+#elif (-CONFIG_MODRTM_FAR_REGION_REMERGE - 1) == -1
+#undef CONFIG_MODRTM_FAR_REGION_REMERGE
+#define CONFIG_NO_MODRTM_FAR_REGION_REMERGE
+#endif /* ... */
+/*[[[end]]]*/
+#endif /* CONFIG_MODRTM_FAR_REGIONS */
 
 
 DECL_BEGIN
@@ -82,7 +93,7 @@ struct rtm_memory_region {
 #define RTM_MEMORY_REGION_CHANGED_FLAG      1 /* Flag for `mr_part': was changed */
 #define rtm_memory_region_waschanged(self)  (((uintptr_t)(self)->mr_part & 1) != 0)
 #define rtm_memory_region_setchanged(self)  (void)((self)->mr_part = (void *)((uintptr_t)(self)->mr_part | 1))
-#if CONFIG_RTM_FAR_REGIONS
+#ifdef CONFIG_MODRTM_FAR_REGIONS
 /* Far regions can be used to describe holes between RTM memory regions that don't have to
  * be  loaded  into  memory  when  data  from  both  ends  has  been  accessed.   However,
  * NOTE: Far  regions can only be marked as changed when the adjacent base region has also
@@ -94,13 +105,13 @@ struct rtm_memory_region {
 #define RTM_MEMORY_REGION_ISFARREGION_FLAG  2 /* Flag for `mr_part': far region */
 #define rtm_memory_region_isfarregion(self) (((uintptr_t)(self)->mr_part & 2) != 0)
 #define rtm_memory_region_waschanged_and_no_farregion(self) (((uintptr_t)(self)->mr_part & 3) == 1)
-#else /* CONFIG_RTM_FAR_REGIONS */
+#else /* CONFIG_MODRTM_FAR_REGIONS */
 #define rtm_memory_region_waschanged_and_no_farregion(self) rtm_memory_region_waschanged(self)
-#endif /* !CONFIG_RTM_FAR_REGIONS */
+#endif /* !CONFIG_MODRTM_FAR_REGIONS */
 
 
 
-#if CONFIG_RTM_PENDING_SYSTEM_CALLS
+#ifdef CONFIG_MODRTM_PENDING_SYSTEM_CALLS
 #define RTM_PENDING_SYSCALL_NONE   0x0000 /* No system call (never used) */
 #define RTM_PENDING_SYSCALL_SYSLOG 0x0001 /* Pending call to `sys_syslog()' (`rps_data' is the syslog level) */
 
@@ -114,7 +125,7 @@ struct rtm_pending_syscall {
 		} rps_syslog; /* RTM_PENDING_SYSCALL_SYSLOG */
 	};
 };
-#endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
+#endif /* CONFIG_MODRTM_PENDING_SYSTEM_CALLS */
 
 
 
@@ -127,15 +138,15 @@ struct rtm_memory {
 	                                         * regions. (though in practice, most programs will only ever use 2  regions:
 	                                         * one for the calling program's stack, and the other for the parts of memory
 	                                         * that the program is actually intending to modify) */
-#if CONFIG_RTM_PENDING_SYSTEM_CALLS
+#ifdef CONFIG_MODRTM_PENDING_SYSTEM_CALLS
 	size_t                      rm_sysc;    /* # of pending system calls. */
 	struct rtm_pending_syscall *rm_sysv;    /* [0..rm_sysc][owned] Vector of pending system calls. */
-#endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
-#if !CONFIG_RTM_USERSPACE_ONLY
+#endif /* CONFIG_MODRTM_PENDING_SYSTEM_CALLS */
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 	bool                        rm_chkuser; /* [const] When true, verify  that `addr' doesn't  point into  kernel-space
 	                                         * as part of the execution of `rtm_memory_read()' and `rtm_memory_write()'
 	                                         * before constructing a new, or  extending an existing RTM memory  region. */
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 };
 
 /* Max  amount of kernel heap memory that may be used by
@@ -143,7 +154,7 @@ struct rtm_memory {
 INTDEF size_t rtm_memory_limit;
 
 
-#if CONFIG_RTM_PENDING_SYSTEM_CALLS
+#ifdef CONFIG_MODRTM_PENDING_SYSTEM_CALLS
 #define _RTM_MEMBER_INIT_SYSV , 0, __NULLPTR
 #define _rtm_member_init_sysv(self) \
 	, (self)->rm_sysc = 0,          \
@@ -151,15 +162,15 @@ INTDEF size_t rtm_memory_limit;
 #define _rtm_member_cinit_sysv(self)         \
 	, __hybrid_assert((self)->rm_sysc == 0), \
 	__hybrid_assert((self)->rm_sysv == __NULLPTR)
-#else /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
+#else /* CONFIG_MODRTM_PENDING_SYSTEM_CALLS */
 #define _RTM_MEMBER_INIT_SYSV        /* nothing */
 #define _rtm_member_init_sysv(self)  /* nothing */
 #define _rtm_member_cinit_sysv(self) /* nothing */
-#endif /* !CONFIG_RTM_PENDING_SYSTEM_CALLS */
+#endif /* !CONFIG_MODRTM_PENDING_SYSTEM_CALLS */
 
 
 /* Initialize a given `struct rtm_memory' */
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 #define RTM_MEMORY_INIT(chkuser) { rtm_memory_limit, 0, __NULLPTR _RTM_MEMBER_INIT_SYSV, chkuser }
 #define rtm_memory_init(self, chkuser)      \
 	((self)->rm_mem_avl = rtm_memory_limit, \
@@ -174,7 +185,7 @@ INTDEF size_t rtm_memory_limit;
 	 _rtm_member_cinit_sysv(self),                    \
 	 (self)->rm_mem_avl = rtm_memory_limit,           \
 	 (self)->rm_chkuser = (chkuser))
-#else /* !CONFIG_RTM_USERSPACE_ONLY */
+#else /* !CONFIG_MODRTM_USERSPACE_ONLY */
 #define RTM_MEMORY_INIT(chkuser) { rtm_memory_limit, 0, __NULLPTR _RTM_MEMBER_INIT_SYSV }
 #define rtm_memory_init(self, chkuser)      \
 	((self)->rm_mem_avl = rtm_memory_limit, \
@@ -187,7 +198,7 @@ INTDEF size_t rtm_memory_limit;
 	 __hybrid_assert((self)->rm_regionv == __NULLPTR) \
 	 _rtm_member_cinit_sysv(self),                    \
 	 (self)->rm_mem_avl = rtm_memory_limit)
-#endif /* CONFIG_RTM_USERSPACE_ONLY */
+#endif /* CONFIG_MODRTM_USERSPACE_ONLY */
 
 /* Finalize a given `struct rtm_memory' */
 INTDEF NOBLOCK NONNULL((1)) void
@@ -229,14 +240,14 @@ rtm_memory_apply(struct rtm_memory const *__restrict self);
  * altered  behavior to  prevent any  possible modifications  from being performed
  * immediately, instead causing them to be done at a later point in time.
  *
- * #if CONFIG_RTM_PENDING_SYSTEM_CALLS
+ * #ifdef CONFIG_MODRTM_PENDING_SYSTEM_CALLS
  *  - sys_syslog:      Remember  arguments,  and copy  the  to-be printed  string  into a
  *                     buffer for pending system call operations that is stored alongside
  *                     the current `struct rtm_memory', to-be printed (in order) after  a
  *                     successful completion of RTM emulation.
  *                     The return value always indicates success (any error is instead
  *                     handled as an RTM abort reason)
- * #endif // CONFIG_RTM_PENDING_SYSTEM_CALLS
+ * #endif // CONFIG_MODRTM_PENDING_SYSTEM_CALLS
  *  - sys_rpc_service: Normal behavior
  *  - sys_gettid:      Normal behavior
  *  - sys_getpid:      Normal behavior
@@ -248,7 +259,7 @@ rtm_memory_apply(struct rtm_memory const *__restrict self);
  *                        and left after the signal handler returns.
  *                        Only allowed with a NULL-sc_info  argument
  */
-#if CONFIG_RTM_PENDING_SYSTEM_CALLS
+#ifdef CONFIG_MODRTM_PENDING_SYSTEM_CALLS
 
 /* Schedule   a  pending  call  to  `sys_syslog()',  to-be  executed
  * unconditionally just before a true-return of `rtm_memory_apply()' */
@@ -258,7 +269,7 @@ rtm_memory_schedule_sys_syslog(struct rtm_memory *__restrict self,
                                USER char const *str, size_t len);
 #define rtm_sys_syslog(mem, level, str, len) \
 	(rtm_memory_schedule_sys_syslog(mem, level, str, len), (ssize_t)(len))
-#endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
+#endif /* CONFIG_MODRTM_PENDING_SYSTEM_CALLS */
 #define rtm_sys_rpc_serve(mem) (task_serve() ? 1 : 0)
 #define rtm_sys_gettid(mem)    task_gettid()
 #define rtm_sys_getpid(mem)    task_getpid()

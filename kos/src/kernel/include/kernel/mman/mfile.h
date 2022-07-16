@@ -22,6 +22,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/memory.h>
 #include <kernel/types.h>
 #include <misc/unlockinfo.h>
@@ -29,9 +30,9 @@
 #include <sched/sig.h>
 
 #include <hybrid/sched/__preemption.h>
+#include <hybrid/sched/atomic-rwlock.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
-#include <hybrid/sched/atomic-rwlock.h>
 
 #include <bits/crt/format-printer.h>
 #include <bits/os/timespec.h>
@@ -51,11 +52,22 @@
 #include <hybrid/byteorder.h>
 #endif /* __SIZEOF_POINTER__ < 8 && __WANT_MFILE_INIT_mf_filesize_symbol && __WANT_FS_INIT */
 
-/* Trace program counters of write-locks to mfile objects. */
-#undef CONFIG_MFILE_TRACE_LOCKPC
-#if 1
-#define CONFIG_MFILE_TRACE_LOCKPC
-#endif
+/*[[[config CONFIG_KERNEL_MFILE_TRACES_LOCKPC: bool = !defined(NDEBUG)
+ * Trace program counters of write-locks to mfile objects.
+ * ]]]*/
+#ifdef CONFIG_NO_KERNEL_MFILE_TRACES_LOCKPC
+#undef CONFIG_KERNEL_MFILE_TRACES_LOCKPC
+#elif !defined(CONFIG_KERNEL_MFILE_TRACES_LOCKPC)
+#ifndef NDEBUG
+#define CONFIG_KERNEL_MFILE_TRACES_LOCKPC
+#else /* !NDEBUG */
+#define CONFIG_NO_KERNEL_MFILE_TRACES_LOCKPC
+#endif /* NDEBUG */
+#elif (-CONFIG_KERNEL_MFILE_TRACES_LOCKPC - 1) == -1
+#undef CONFIG_KERNEL_MFILE_TRACES_LOCKPC
+#define CONFIG_NO_KERNEL_MFILE_TRACES_LOCKPC
+#endif /* ... */
+/*[[[end]]]*/
 
 
 #ifdef __CC__
@@ -334,7 +346,7 @@ struct mfile_stream_ops {
 	NOTHROW_T(KCALL *mso_cc)(struct mfile *__restrict self,
 	                         struct ccinfo *__restrict info);
 
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 	/* [0..1] Operator pair used for creating/destroying additional cookie objects
 	 *        that remain alive for as long as `mf_notify != NULL' (iow: for as long
 	 *        as fs events are being tracked for a file)
@@ -363,7 +375,7 @@ struct mfile_stream_ops {
 	(KCALL *mso_notify_attach)(struct mfile *__restrict self) THROWS(E_BADALLOC, ...);
 	NOBLOCK NONNULL_T((1)) void
 	NOTHROW_T(KCALL *mso_notify_detach)(struct mfile *__restrict self, void *cookie);
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 };
 
@@ -725,18 +737,18 @@ SLIST_HEAD(ramfs_dirent_slist, ramfs_dirent);
 #endif /* !__ramfs_dirent_slist_defined */
 #endif /* __WANT_MFILE__mf_deadrament */
 
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 struct inotify_controller;
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 
 struct mfile {
 	WEAK refcnt_t                 mf_refcnt;     /* Reference counter. */
 	struct mfile_ops const       *mf_ops;        /* [1..1][const] File operators. */
 	struct atomic_rwlock          mf_lock;       /* Lock for this file. */
-#ifdef CONFIG_MFILE_TRACE_LOCKPC
+#ifdef CONFIG_KERNEL_MFILE_TRACES_LOCKPC
 	void const                  *_mf_wrlockpc;   /* [lock(mf_lock)] Write-lock program counter. */
-#endif /* CONFIG_MFILE_TRACE_LOCKPC */
+#endif /* CONFIG_KERNEL_MFILE_TRACES_LOCKPC */
 	RBTREE_ROOT(mpart)            mf_parts;      /* [0..n][lock(mf_lock)] File parts. (or `MFILE_PARTS_ANONYMOUS') */
 	struct sig                    mf_initdone;   /* Signal broadcast whenever one of the blocks of one of
 	                                              * the contained parts changes state from INIT to  LOAD. */
@@ -777,11 +789,11 @@ struct mfile {
 #ifdef __WANT_FS_INIT
 #define MFILE_INIT_mf_refcnt(mf_refcnt) mf_refcnt
 #define MFILE_INIT_mf_ops(mf_ops)       mf_ops
-#ifdef CONFIG_MFILE_TRACE_LOCKPC
+#ifdef CONFIG_KERNEL_MFILE_TRACES_LOCKPC
 #define MFILE_INIT_mf_lock ATOMIC_RWLOCK_INIT, __NULLPTR
-#else /* CONFIG_MFILE_TRACE_LOCKPC */
+#else /* CONFIG_KERNEL_MFILE_TRACES_LOCKPC */
 #define MFILE_INIT_mf_lock ATOMIC_RWLOCK_INIT
-#endif /* !CONFIG_MFILE_TRACE_LOCKPC */
+#endif /* !CONFIG_KERNEL_MFILE_TRACES_LOCKPC */
 #define MFILE_INIT_mf_parts(mf_parts)           mf_parts
 #define MFILE_INIT_mf_initdone                  SIG_INIT
 #define MFILE_INIT_mf_lockops                   SLIST_HEAD_INITIALIZER(~)
@@ -793,15 +805,15 @@ struct mfile {
 #define MFILE_INIT_mf_blockshift(mf_blockshift, mf_iobashift) \
 	__hybrid_max_c2(PAGESIZE, (size_t)1 << (mf_blockshift)) - 1, mf_blockshift, mf_iobashift
 #endif /* ((2 * __SIZEOF_SHIFT_T__) % __SIZEOF_SIZE_T__) == 0 */
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 #define MFILE_INIT_mf_notify                    __NULLPTR
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #define MFILE_INIT_mf_flags(mf_flags)           mf_flags
 #define MFILE_INIT_mf_trunclock                 0
 #endif /* __WANT_FS_INIT */
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 	struct inotify_controller    *mf_notify;     /* [0..1][owned][lock(!PREEMPTION && :notify_lock)] Notify controller. */
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 	uintptr_t                     mf_flags;      /* File flags (set of `MFILE_F_*') */
 	WEAK size_t                   mf_trunclock;  /* [lock(INC(RDLOCK(mf_lock) || mpart_lock_acquired(ANY(mf_parts))),
 	                                              *       DEC(ATOMIC))]
@@ -1053,21 +1065,21 @@ EIDECLARE(NOBLOCK NONNULL((1)), void, NOTHROW, FCALL,
 	                                        ? ((self)->mf_blockshift)           \
 	                                        : PAGESHIFT)) -                     \
 	                         1)
-#ifdef CONFIG_MFILE_TRACE_LOCKPC
+#ifdef CONFIG_KERNEL_MFILE_TRACES_LOCKPC
 #define _mfile_init_wrlockpc_(self)  (self)->_mf_wrlockpc = __NULLPTR,
 #define _mfile_cinit_wrlockpc_(self) __hybrid_assert((self)->_mf_wrlockpc == __NULLPTR),
-#else /* CONFIG_MFILE_TRACE_LOCKPC */
+#else /* CONFIG_KERNEL_MFILE_TRACES_LOCKPC */
 #define _mfile_init_wrlockpc_(self)  /* nothing */
 #define _mfile_cinit_wrlockpc_(self) /* nothing */
-#endif /* !CONFIG_MFILE_TRACE_LOCKPC */
+#endif /* !CONFIG_KERNEL_MFILE_TRACES_LOCKPC */
 
-#ifdef CONFIG_MFILE_TRACE_LOCKPC
+#ifdef CONFIG_KERNEL_MFILE_TRACES_LOCKPC
 #define _mfile_init_notify_(self)  (self)->mf_notify = __NULLPTR,
 #define _mfile_cinit_notify_(self) __hybrid_assert((self)->mf_notify == __NULLPTR),
-#else /* CONFIG_MFILE_TRACE_LOCKPC */
+#else /* CONFIG_KERNEL_MFILE_TRACES_LOCKPC */
 #define _mfile_init_notify_(self)  /* nothing */
 #define _mfile_cinit_notify_(self) /* nothing */
-#endif /* !CONFIG_MFILE_TRACE_LOCKPC */
+#endif /* !CONFIG_KERNEL_MFILE_TRACES_LOCKPC */
 
 
 /* Initialize common fields. The caller must still initialize:
@@ -1147,7 +1159,7 @@ DEFINE_REFCNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 #define mfile_lockops_mustreap(self) (__hybrid_atomic_load((self)->mf_lockops.slh_first, __ATOMIC_ACQUIRE) != __NULLPTR)
 
 /* Lock accessor helpers for `struct mfile' */
-#ifdef CONFIG_MFILE_TRACE_LOCKPC
+#ifdef CONFIG_KERNEL_MFILE_TRACES_LOCKPC
 #include <asm/intrin.h>
 #define _mfile_trace_wrlock_setpc(self) (void)((self)->_mf_wrlockpc = __rdip())
 #define _mfile_trace_wrlock_clrpc(self) (void)((self)->_mf_wrlockpc = __NULLPTR)
@@ -1162,7 +1174,7 @@ DEFINE_REFCNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 #define mfile_lock_upgrade_nx(self)     ({ unsigned int __ok = atomic_rwlock_upgrade_nx(&(self)->mf_lock); if (__ok != 0) _mfile_trace_wrlock_setpc(self); __ok; })
 #define mfile_lock_tryupgrade(self)     (atomic_rwlock_tryupgrade(&(self)->mf_lock) ? (_mfile_trace_wrlock_setpc(self), 1) : 0)
 #define mfile_lock_downgrade(self)      (_mfile_trace_wrlock_clrpc(self), atomic_rwlock_downgrade(&(self)->mf_lock))
-#else /* CONFIG_MFILE_TRACE_LOCKPC */
+#else /* CONFIG_KERNEL_MFILE_TRACES_LOCKPC */
 #define mfile_lock_write(self)      atomic_rwlock_write(&(self)->mf_lock)
 #define mfile_lock_write_nx(self)   atomic_rwlock_write_nx(&(self)->mf_lock)
 #define mfile_lock_trywrite(self)   atomic_rwlock_trywrite(&(self)->mf_lock)
@@ -1174,7 +1186,7 @@ DEFINE_REFCNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 #define mfile_lock_upgrade_nx(self) atomic_rwlock_upgrade_nx(&(self)->mf_lock)
 #define mfile_lock_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->mf_lock)
 #define mfile_lock_downgrade(self)  atomic_rwlock_downgrade(&(self)->mf_lock)
-#endif /* !CONFIG_MFILE_TRACE_LOCKPC */
+#endif /* !CONFIG_KERNEL_MFILE_TRACES_LOCKPC */
 #define mfile_lock_read(self)         atomic_rwlock_read(&(self)->mf_lock)
 #define mfile_lock_read_nx(self)      atomic_rwlock_read_nx(&(self)->mf_lock)
 #define mfile_lock_tryread(self)      atomic_rwlock_tryread(&(self)->mf_lock)

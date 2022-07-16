@@ -57,7 +57,7 @@ DECL_BEGIN
 
 #define FPU_GFP  (GFP_NORMAL)
 
-#ifdef CONFIG_FPU
+#ifdef CONFIG_HAVE_FPU
 
 /* [const] The type of FPU state used (One of `FPU_STATE_*') */
 PUBLIC unsigned int _x86_fpustate_variant ASMNAME("x86_fpustate_variant") = FPU_STATE_XSTATE;
@@ -548,7 +548,7 @@ setup_fpu_emulation:
 	__wrcr0(cr0 | CR0_TS);
 }
 
-#endif /* CONFIG_FPU */
+#endif /* CONFIG_HAVE_FPU */
 
 DECL_END
 

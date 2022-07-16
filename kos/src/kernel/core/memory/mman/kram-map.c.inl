@@ -81,8 +81,8 @@ DECL_BEGIN
  *     other calls to kmalloc() that may need to be made internally.
  * Returned memory will be initialized as:
  *   - GFP_CALLOC: All zero-initialized
- *   - else:       #ifdef CONFIG_DEBUG_HEAP: DEBUGHEAP_FRESH_MEMORY
- *                 #ifndef CONFIG_DEBUG_HEAP: Undefined
+ *   - else:       #ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP: DEBUGHEAP_FRESH_MEMORY
+ *                 #ifndef       CONFIG_HAVE_KERNEL_DEBUG_HEAP:       Undefined
  *
  * @param: hint:          Hint  for  where  the  mapping  should  go.  This  argument is
  *                        passed  onto  `mman_findunmapped()',  alongside  certain  bits
@@ -495,12 +495,12 @@ do_prefault:
 				}
 				part->mp_file = &mfile_zero;
 			} else {
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 				memsetl(result, DEBUGHEAP_FRESH_MEMORY, num_bytes / 4);
 				part->mp_file = &mfile_dbgheap;
-#else  /* CONFIG_DEBUG_HEAP */
+#else  /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 				part->mp_file = &mfile_ndef;
-#endif /* !CONFIG_DEBUG_HEAP */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 			}
 
 			/* After prefaulting, we can simply set the block-status
@@ -537,11 +537,11 @@ do_prefault:
 			if (flags & GFP_CALLOC) {
 				part->mp_file = &mfile_zero;
 			} else {
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 				part->mp_file = &mfile_dbgheap;
-#else  /* CONFIG_DEBUG_HEAP */
+#else  /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 				part->mp_file = &mfile_ndef;
-#endif /* !CONFIG_DEBUG_HEAP */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 			}
 			/* To ensure atomic initialization without prefaulting, we must
 			 * set-up the  new node/part  pair as  a page  directory  hint. */

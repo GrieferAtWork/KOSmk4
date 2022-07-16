@@ -156,20 +156,20 @@ struct svgalck: vidlck {
 #define vidlck_assvga(self)   ((struct svgalck *)(self))
 #define mfile_assvgalck(self) vidlck_assvga(mfile_asvidlck(self))
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 /* Register-save structure for the builtin debugger. */
 struct svga_dbgregs {
 	bool                            sdr_hasxregs; /* Set to true if `sdr_xdata' contains chipset registers. */
 	struct vga_regs                 sdr_vmode;    /* Saved standard VGA registers. */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, sdr_xdata);   /* Chipset register buffer + clobbered video-memory buffer (in that order) */
 };
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 struct svgadev: viddev {
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	REF struct svga_ttyaccess        *svd_dbgtty;   /* [1..1][const] TTY accessor for the builtin debugger. */
 	struct svga_dbgregs              *svd_dbgsav;   /* [1..1][const] Saved VGA registers while within the builtin debugger. */
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 	byte_t const                     *svd_supmodev; /* [0..n][const][owned] Array of supported video modes. */
 	size_t                            svd_supmodec; /* [!0][const] # of supported video modes. */
 	size_t                            svd_supmodeS; /* [const] Aligned sizeof() supported video modes. */
@@ -223,11 +223,11 @@ svgadev_newttyf(struct svgadev *__restrict self,
 		THROWS(E_WOULDBLOCK);
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 /* SVGA device debugger integration. */
 INTDEF FREE NONNULL((1)) void FCALL svgadev_dbg_init(struct svgadev *__restrict self);
 INTDEF NONNULL((1)) void NOTHROW(FCALL svgadev_dbg_fini)(struct svgadev *__restrict self);
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 

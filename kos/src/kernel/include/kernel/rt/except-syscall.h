@@ -27,23 +27,26 @@
 
 #include <kos/except-handler.h>
 
-/* Figure out if we want to support `sys_set_userprocmask_address(2)' */
-#ifdef CONFIG_NO_USERPROCMASK
-#undef CONFIG_HAVE_USERPROCMASK
-#elif !defined(CONFIG_HAVE_USERPROCMASK)
-#define CONFIG_HAVE_USERPROCMASK 1
-#elif (CONFIG_HAVE_USERPROCMASK + 0) == 0
-#undef CONFIG_HAVE_USERPROCMASK
-#define CONFIG_NO_USERPROCMASK 1
+/*[[[config CONFIG_HAVE_KERNEL_USERPROCMASK = true
+ * Do we want to support `sys_set_userprocmask_address(2)'?
+ * ]]]*/
+#ifdef CONFIG_NO_KERNEL_USERPROCMASK
+#undef CONFIG_HAVE_KERNEL_USERPROCMASK
+#elif !defined(CONFIG_HAVE_KERNEL_USERPROCMASK)
+#define CONFIG_HAVE_KERNEL_USERPROCMASK
+#elif (-CONFIG_HAVE_KERNEL_USERPROCMASK - 1) == -1
+#undef CONFIG_HAVE_KERNEL_USERPROCMASK
+#define CONFIG_NO_KERNEL_USERPROCMASK
 #endif /* ... */
+/*[[[end]]]*/
 
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 #include <kos/bits/userprocmask.h>
 
 #if __OFFSET_USERPROCMASK_MYTID != 0
 #error "Kernel code assumes that the TID address of a userprocmask is at offset=0"
 #endif /* __OFFSET_USERPROCMASK_MYTID != 0 */
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 
 DECL_BEGIN
 
@@ -364,11 +367,11 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  * >>     setsigmaskptr(oldset);                         // preemption_pop()
  * >> }
  */
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 /* [valid_if(THIS_TASK->t_flags & TASK_FUSERPROCMASK)][lock(PRIVATE(THIS_TASK))] */
 DATDEF ATTR_PERTASK USER CHECKED struct userprocmask *
 this_userprocmask_address ASMNAME("this_tid_address");
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 
 
 

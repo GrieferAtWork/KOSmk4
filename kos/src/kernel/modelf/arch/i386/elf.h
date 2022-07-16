@@ -29,8 +29,8 @@
 #include <elf.h>
 
 #ifdef __x86_64__
-#define CONFIG_EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_ENTRY 1
-#define CONFIG_EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_RTLD 1
+#define EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_ENTRY
+#define EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_RTLD
 #define compat_elfexec_init_entry elfexec_init_entry32
 #define compat_elfexec_init_rtld  elfexec_init_rtld32
 #endif /* __x86_64__ */

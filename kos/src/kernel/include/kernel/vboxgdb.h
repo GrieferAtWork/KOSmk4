@@ -25,18 +25,23 @@
 #include <kernel/types.h>
 #include <hybrid/host.h>
 
-#ifdef CONFIG_NO_VBOXGDB
-#undef CONFIG_VBOXGDB
-#elif (defined(CONFIG_VBOXGDB) && !(CONFIG_VBOXGDB + 0))
-#undef CONFIG_VBOXGDB
-#define CONFIG_NO_VBOXGDB 1
-#elif defined(__i386__) || defined(__x86_64__)
-/* VirtualBox can only emulate x86 machines, so there's no point
- * in trying to  support vboxgdb when  targeting anything  else! */
-#define CONFIG_VBOXGDB 1
-#else /* ... */
-#define CONFIG_NO_VBOXGDB 1
-#endif /* !... */
+/*[[[config CONFIG_HAVE_KERNEL_VBOXGDB: bool = defined(__i386__) || defined(__x86_64__)
+ * VirtualBox can only emulate x86 machines, so there's no point
+ * in trying to  support vboxgdb when  targeting anything  else!
+ * ]]]*/
+#ifdef CONFIG_NO_KERNEL_VBOXGDB
+#undef CONFIG_HAVE_KERNEL_VBOXGDB
+#elif !defined(CONFIG_HAVE_KERNEL_VBOXGDB)
+#if defined(__i386__) || defined(__x86_64__)
+#define CONFIG_HAVE_KERNEL_VBOXGDB
+#else /* __i386__ || __x86_64__ */
+#define CONFIG_NO_KERNEL_VBOXGDB
+#endif /* !__i386__ && !__x86_64__ */
+#elif (-CONFIG_HAVE_KERNEL_VBOXGDB - 1) == -1
+#undef CONFIG_HAVE_KERNEL_VBOXGDB
+#define CONFIG_NO_KERNEL_VBOXGDB
+#endif /* ... */
+/*[[[end]]]*/
 
 /* Known VBox GDB traps. */
 #define VBOXGDB_TRAP_STARTUP "startup" /* Invoked during kernel startup (starts the GDB stub & sets initial breakpoints) */
@@ -45,7 +50,7 @@
 #ifdef __CC__
 DECL_BEGIN
 
-#ifdef CONFIG_VBOXGDB
+#ifdef CONFIG_HAVE_KERNEL_VBOXGDB
 
 /* Trap into the vboxgdb sub-system by sending a command "%{vboxgdb:<name>}",
  * and entering the  vbox step-loop  until the vbox  debugger indicates  that
@@ -55,9 +60,9 @@ DECL_BEGIN
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL vboxgdb_trap)(char const *__restrict name);
 
-#else /* CONFIG_VBOXGDB */
+#else /* CONFIG_HAVE_KERNEL_VBOXGDB */
 #define vboxgdb_trap(name) (void)0
-#endif /* !CONFIG_VBOXGDB */
+#endif /* !CONFIG_HAVE_KERNEL_VBOXGDB */
 
 DECL_END
 #endif /* __CC__ */

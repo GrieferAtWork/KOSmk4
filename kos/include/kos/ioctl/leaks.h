@@ -45,9 +45,9 @@
 #define LEAK_ATTR_MINADDR  1 /* The lowest memory address apart of the leak */
 #define LEAK_ATTR_MAXADDR  2 /* The greatest memory address apart of the leak */
 #define LEAK_ATTR_LEAKSIZE 3 /* Total leak size (in bytes) */
-#define LEAK_ATTR_MINUSER  4 /* The lowest memory address apart of the leak's user-data area (following a possible `CONFIG_MALL_HEAD_SIZE') */
-#define LEAK_ATTR_MAXUSER  5 /* The greatest memory address apart of the leak's user-data area (ending before a possible `CONFIG_MALL_TAIL_SIZE') */
-#define LEAK_ATTR_USERSIZE 6 /* Total user-data area size (in bytes; w/o `CONFIG_MALL_HEAD_SIZE' or `CONFIG_MALL_TAIL_SIZE') */
+#define LEAK_ATTR_MINUSER  4 /* The lowest memory address apart of the leak's user-data area (following a possible `CONFIG_KERNEL_MALL_HEAD_SIZE') */
+#define LEAK_ATTR_MAXUSER  5 /* The greatest memory address apart of the leak's user-data area (ending before a possible `CONFIG_KERNEL_MALL_TAIL_SIZE') */
+#define LEAK_ATTR_USERSIZE 6 /* Total user-data area size (in bytes; w/o `CONFIG_KERNEL_MALL_HEAD_SIZE' or `CONFIG_KERNEL_MALL_TAIL_SIZE') */
 #define LEAK_ATTR_TID      7 /* Root-namespace TID of the original allocator thread. */
 #define LEAK_ATTR_TBSIZE   8 /* # of addresses within the traceback (enumerate through `LEAKS_IOC_LEAKTB') */
 #define LEAK_ATTR_NOWALK   9 /* Returns non-zero if `GFP_NOWALK' was set during the original allocation. */

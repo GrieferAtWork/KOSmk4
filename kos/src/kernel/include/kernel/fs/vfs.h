@@ -50,10 +50,6 @@ LIST_HEAD(pathmount_list, pathmount);
 FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
 #endif /* !____os_free_defined */
 
-#ifndef CONFIG_VFS_RECENT_MAX_DEFAULT
-#define CONFIG_VFS_RECENT_MAX_DEFAULT 128
-#endif /* !CONFIG_VFS_RECENT_MAX_DEFAULT */
-
 
 /* # of different DOS drives. */
 #ifndef VFS_DRIVECOUNT

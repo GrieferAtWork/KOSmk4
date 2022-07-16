@@ -31,9 +31,9 @@
 
 #ifdef __KERNEL__
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <kernel/paging.h>
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 #endif /* __KERNEL__ */
 
 /*
@@ -190,7 +190,7 @@ bios86_emulator_int(struct bios86_emulator *__restrict self,
 /* Same as  above,  but  must be  used  if  `dbg_onstack()'
  * Also note that `bios86_init()' becomes  NOBLOCK+NOTHROW,
  * but may return `-1' if insufficient memory is available. */
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 struct bios86_for_debugger
 #ifdef __cplusplus
     : bios86
@@ -235,7 +235,7 @@ __NOTHROW(LIBBIOS86_CC bios86_emulator_init_for_debugger)(struct bios86_emulator
 LIBBIOS86_DECL __NOBLOCK __ATTR_NONNULL((1)) void
 __NOTHROW(LIBBIOS86_CC bios86_emulator_fini_for_debugger)(struct bios86_emulator_for_debugger *__restrict self);
 #endif /* LIBBIOS86_WANT_PROTOTYPES */
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 #endif /* __KERNEL__ */
 
 

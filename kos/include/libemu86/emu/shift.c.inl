@@ -142,9 +142,9 @@ EMU86_EMULATE_IF_CONFIG_LOCK_SHIFT(do_shift##Nbits:, (void)0);                  
 			EMU86_MSKFLAGS(~eflags_mask, eflags_addend);                            \
 		}                                                                           \
 	}	__WHILE0
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define NEED_return_unknown_instruction_rmreg
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 
 
 case EMU86_OPCODE_ENCODE(0xd2): {

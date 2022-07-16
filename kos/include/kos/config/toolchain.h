@@ -17,13 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_KOS_BUILD_CONFIG_H
-#define _I386_KOS_KOS_BUILD_CONFIG_H 1
+#ifndef _KOS_CONFIG_TOOLCHAIN_H
+#define _KOS_CONFIG_TOOLCHAIN_H 1
 
 #include <__stdinc.h>
 #include <hybrid/typecore.h>
 
-#include <kos/_build-config.h>
+#include <kos/config/_toolchain.h>
 
 
 /* ----------------- Toolchain version of binutils
@@ -121,4 +121,4 @@
 	__PP_STR(_KOS_BUILD_CONFIG_TOOLCHAIN_DATE_PADDED_SECOND) "." \
 	__PP_STR(_KOS_BUILD_CONFIG_TOOLCHAIN_DATE_PADDED_NANO)
 
-#endif /* !_I386_KOS_KOS_BUILD_CONFIG_H */
+#endif /* !_KOS_CONFIG_TOOLCHAIN_H */

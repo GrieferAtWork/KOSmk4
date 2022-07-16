@@ -31,7 +31,7 @@ case EMU86_OPCODE_ENCODE(0x0fc8) ... EMU86_OPCODE_ENCODE(0x0fcf): {
 	 * REX.W + 0F C8+rd     BSWAP r64     Reverses the byte order of a 64-bit register. */
 	u8 regno;
 	regno = tiny_opcode - EMU86_OPCODE_ENCODE(0x0fc8);
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 	if (op_flags & EMU86_F_REX_B)
 		regno |= 0x8;
 	if (IS_64BIT()) {
@@ -57,7 +57,7 @@ case EMU86_OPCODE_ENCODE(0x0fc8) ... EMU86_OPCODE_ENCODE(0x0fcf): {
 		EMU86_SETREGQ(regno, temp);
 #endif /* !EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP */
 	} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	{
 #ifdef EMU86_EMULATE_CONFIG_DONT_USE_HYBRID_BYTESWAP
 		union {

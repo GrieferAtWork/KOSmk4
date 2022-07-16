@@ -24,8 +24,8 @@
 #include <kernel/types.h>
 #include <sched/atomic64.h>
 
-#ifndef CONFIG_ATOMIC64_SUPPORT_ALWAYS
-#ifndef ARCH_ATOMIC64_HAVE_PROTOTYPES
+#ifndef ARCH_HAVE_ATOMIC64_SUPPORT_ALWAYS
+#ifndef ARCH_HAVE_ATOMIC64_PROTOTYPES
 #include <sched/cpu.h>
 #include <sched/task.h>
 
@@ -35,37 +35,40 @@
 
 DECL_BEGIN
 
-#ifdef CONFIG_ATOMIC64_SUPPORT_DYNAMIC
+#ifdef ARCH_HAVE_ATOMIC64_SUPPORT_DYNAMIC
 #define DECL       INTERN
 #define FUNC(name) emulated_##name
-#else /* CONFIG_ATOMIC64_SUPPORT_DYNAMIC */
+#else /* ARCH_HAVE_ATOMIC64_SUPPORT_DYNAMIC */
 #define DECL       PUBLIC
 #define FUNC(name) name
-#endif /* !CONFIG_ATOMIC64_SUPPORT_DYNAMIC */
+#endif /* !ARCH_HAVE_ATOMIC64_SUPPORT_DYNAMIC */
 
 
 
 #ifndef CONFIG_NO_SMP
-/* >> CONFIG_ATOMIC64_LOG2_LOCK_COUNT == log2(LOCK_COUNT) */
-#ifndef CONFIG_ATOMIC64_LOG2_LOCK_COUNT
-#define CONFIG_ATOMIC64_LOG2_LOCK_COUNT 4
-#endif /* !CONFIG_ATOMIC64_LOG2_LOCK_COUNT */
+/*[[[config CONFIG_KERNEL_ATOMIC64_LOG2_LOCKCNT! = 4
+ * >> CONFIG_KERNEL_ATOMIC64_LOG2_LOCKCNT == log2(LOCK_COUNT)
+ * ]]]*/
+#ifndef CONFIG_KERNEL_ATOMIC64_LOG2_LOCKCNT
+#define CONFIG_KERNEL_ATOMIC64_LOG2_LOCKCNT 4
+#endif /* !CONFIG_KERNEL_ATOMIC64_LOG2_LOCKCNT */
+/*[[[end]]]*/
 
-PRIVATE struct atomic_rwlock locks[1 << CONFIG_ATOMIC64_LOG2_LOCK_COUNT] = {
+PRIVATE struct atomic_rwlock locks[1 << CONFIG_KERNEL_ATOMIC64_LOG2_LOCKCNT] = {
 	ATOMIC_RWLOCK_INIT,
 };
 
 PRIVATE NOBLOCK ATTR_CONST WUNUSED struct atomic_rwlock *
 NOTHROW(FCALL lockfor)(atomic64_t const *__restrict self) {
-#if CONFIG_ATOMIC64_LOG2_LOCK_COUNT == 4
+#if CONFIG_KERNEL_ATOMIC64_LOG2_LOCKCNT == 4
 	u16 index;
 	/* Only use the bottom 16 bits for indexing. */
 	index = (u16)(uintptr_t)self;
 	index = index >> 8;
 	index = index >> 4;
-#else /* CONFIG_ATOMIC64_LOG2_LOCK_COUNT == ... */
-#error "Unsupported `CONFIG_ATOMIC64_LOG2_LOCK_COUNT'"
-#endif /* CONFIG_ATOMIC64_LOG2_LOCK_COUNT != ... */
+#else /* CONFIG_KERNEL_ATOMIC64_LOG2_LOCKCNT == ... */
+#error "Unsupported `CONFIG_KERNEL_ATOMIC64_LOG2_LOCKCNT'"
+#endif /* CONFIG_KERNEL_ATOMIC64_LOG2_LOCKCNT != ... */
 	return &locks[index];
 }
 #endif /* !CONFIG_NO_SMP */
@@ -209,7 +212,7 @@ NOTHROW(FCALL FUNC(atomic64_fetchxor))(atomic64_t *__restrict self,
 
 DECL_END
 
-#endif /* !ARCH_ATOMIC64_HAVE_PROTOTYPES */
-#endif /* !CONFIG_ATOMIC64_SUPPORT_ALWAYS */
+#endif /* !ARCH_HAVE_ATOMIC64_PROTOTYPES */
+#endif /* !ARCH_HAVE_ATOMIC64_SUPPORT_ALWAYS */
 
 #endif /* !GUARD_KERNEL_SRC_SCHED_ATOMIC64_C */

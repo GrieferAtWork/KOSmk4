@@ -29,6 +29,7 @@
 #include <kernel/fs/dirhandle.h>
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/node.h>
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <sched/task.h>
@@ -384,16 +385,16 @@ fdirnode_mkfile(struct fdirnode *__restrict self,
 		THROWS(E_SEGFAULT, E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 		       E_FSERROR_READONLY, E_FSERROR_TOO_MANY_HARD_LINKS,
 		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 	struct inotify_controller *newfile_notcon;
 	struct dnotify_link *newfile_link;
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 	unsigned int result;
 	struct fdirnode_ops const *ops;
 	ops = fdirnode_getops(self);
-#ifndef CONFIG_HAVE_FS_NOTIFY
+#ifndef CONFIG_HAVE_KERNEL_FS_NOTIFY
 	if unlikely(!ops->dno_mkfile)
-#endif /* !CONFIG_HAVE_FS_NOTIFY */
+#endif /* !CONFIG_HAVE_KERNEL_FS_NOTIFY */
 	{
 		/* Check for an already-existing file. */
 		REF struct fdirent *ent;
@@ -417,9 +418,9 @@ again_lookup:
 			return FDIRNODE_MKFILE_EXISTS;
 		}
 
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 		if unlikely(!ops->dno_mkfile)
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 		{
 			/* If we don't have permissions to change files,
 			 * then don't throw READONLY, but ACCESS_DENIED. */
@@ -430,7 +431,7 @@ again_lookup:
 		}
 	}
 
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 	/* Because we have no way of knowing if the containing directory will  be
 	 * traced by the time the new file  has been created, we have to  prepare
 	 * for the case where it is, in which case we have to ensure that the new
@@ -452,15 +453,15 @@ again_lookup:
 		inotify_controller_free(newfile_notcon);
 		RETHROW();
 	}
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 	TRY {
 		result = (*ops->dno_mkfile)(self, info);
 	} EXCEPT {
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 		dnotify_link_free(newfile_link);
 		inotify_controller_free(newfile_notcon);
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 		/* If `dno_mkfile' throws `E_FSERROR_UNSUPPORTED_OPERATION', try to
 		 * fill  in the correct `E_FILESYSTEM_OPERATION_*' context based on
@@ -496,7 +497,7 @@ again_lookup:
 		RETHROW();
 	}
 
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 	/* Must lazily bind directory notifications to child
 	 * files,  like  also done  by `fdirent_opennode()':
 	 *  - info->mkf_rnode
@@ -575,7 +576,7 @@ again_acquire_notify_lock:
 	/* If a new file was created, post the relevant fs event. */
 	if (result == FDIRNODE_MKFILE_SUCCESS)
 		mfile_inotify_created(info->mkf_rnode); /* Post `IN_CREATE' */
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 	return result;
 }

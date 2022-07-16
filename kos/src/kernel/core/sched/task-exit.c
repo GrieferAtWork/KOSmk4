@@ -30,7 +30,7 @@
 #include <kernel/mman/mpartmeta.h>
 #include <kernel/panic.h>
 #include <kernel/printk.h>
-#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
+#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 #include <sched/cpu.h>
 #include <sched/group.h>
 #include <sched/rpc-internal.h>
@@ -75,7 +75,7 @@ NOTHROW(FCALL maybe_clear_tid_address)(struct task *__restrict caller) {
 		return;
 	TRY {
 		/* Special case for vfork when the kernel supports userprocmask. */
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 		uintptr_t my_flags = PERTASK_GET(this_task.t_flags);
 		if (my_flags & TASK_FVFORK) {
 			if unlikely(my_flags & TASK_FUSERPROCMASK_AFTER_VFORK) {
@@ -93,7 +93,7 @@ NOTHROW(FCALL maybe_clear_tid_address)(struct task *__restrict caller) {
 			}
 			return;
 		}
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 		ATOMIC_WRITE(*addr, 0);
 		mman_broadcastfutex(addr);
 	} EXCEPT {
@@ -469,11 +469,11 @@ again_get_ctty:
 	assertf(FORCPU(mycpu, thiscpu_sched_override) != caller, "Cannot exit while being the scheduling override");
 	assertf(caller != &FORCPU(mycpu, thiscpu_idle), "The IDLE task cannot be terminated");
 
-#ifdef CONFIG_FPU
+#ifdef CONFIG_HAVE_FPU
 	/* Unset the  calling thread  potentially holding  the FPU  state.
 	 * Since the task will go away, we don't actually have to save it. */
 	ATOMIC_CMPXCH(FORCPU(mycpu, thiscpu_fputhread), caller, NULL);
-#endif /* CONFIG_FPU */
+#endif /* CONFIG_HAVE_FPU */
 
 	/* Account for timings and scheduler internals, as well as figure out a successor thread. */
 	next = sched_intern_yield_onexit(mycpu, caller); /* NOTE: This causes us to inherit a reference to `caller' */

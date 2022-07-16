@@ -65,9 +65,11 @@ DECL_BEGIN
 #endif /* NDEBUG || NDEBUG_FINI */
 
 
-#ifndef CONFIG_PATH_CLDLIST_INITIAL_MASK
-#define CONFIG_PATH_CLDLIST_INITIAL_MASK 7
-#endif /* !CONFIG_PATH_CLDLIST_INITIAL_MASK */
+/*[[[config CONFIG_KERNEL_PATH_CLDLIST_INITIAL_MASK! = 7]]]*/
+#ifndef CONFIG_KERNEL_PATH_CLDLIST_INITIAL_MASK
+#define CONFIG_KERNEL_PATH_CLDLIST_INITIAL_MASK 7
+#endif /* !CONFIG_KERNEL_PATH_CLDLIST_INITIAL_MASK */
+/*[[[end]]]*/
 
 /* Check if `child' is a descendant of `root' (including `child == root') */
 PUBLIC NOBLOCK WUNUSED NONNULL((1, 2)) bool
@@ -400,7 +402,7 @@ path_cldlist_rehash_before_insert(struct path *__restrict self)
 	if (((self->p_cldsize + 1) * 3) / 2 >= self->p_cldmask) {
 		/* Must rehash! */
 		struct path_bucket *new_list;
-		size_t new_mask = CONFIG_PATH_CLDLIST_INITIAL_MASK;
+		size_t new_mask = CONFIG_KERNEL_PATH_CLDLIST_INITIAL_MASK;
 		size_t thresh   = ((self->p_cldused + 1) * 3) / 2;
 		while (thresh >= new_mask)
 			new_mask = (new_mask << 1) | 1;
@@ -410,7 +412,7 @@ path_cldlist_rehash_before_insert(struct path *__restrict self)
 		if unlikely(!new_list) {
 			if ((self->p_cldsize + 1) <= self->p_cldmask)
 				return;
-			new_mask = CONFIG_PATH_CLDLIST_INITIAL_MASK;
+			new_mask = CONFIG_KERNEL_PATH_CLDLIST_INITIAL_MASK;
 			while ((self->p_cldused + 1) > self->p_cldmask)
 				new_mask = (new_mask << 1) | 1;
 			new_list = (struct path_bucket *)kmalloc((new_mask + 1) *
@@ -427,9 +429,9 @@ path_cldlist_rehash_before_insert(struct path *__restrict self)
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL path_cldlist_rehash_after_remove)(struct path *__restrict self) {
 	if ((self->p_cldused < (self->p_cldmask / 3)) &&
-	    self->p_cldmask > CONFIG_PATH_CLDLIST_INITIAL_MASK) {
+	    self->p_cldmask > CONFIG_KERNEL_PATH_CLDLIST_INITIAL_MASK) {
 		/* Try to shrink the hash-vector's mask size. */
-		size_t new_mask = CONFIG_PATH_CLDLIST_INITIAL_MASK;
+		size_t new_mask = CONFIG_KERNEL_PATH_CLDLIST_INITIAL_MASK;
 		size_t thresh   = ((self->p_cldused + 1) * 3) / 2;
 		while (thresh >= new_mask)
 			new_mask = (new_mask << 1) | 1;

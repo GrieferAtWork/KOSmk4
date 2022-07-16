@@ -113,7 +113,7 @@ INTDEF void FCALL
 x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
                                   PHYS pagedir_t *cr3);
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 INTDEF struct task *x86_dbg_viewthread;
 INTDEF struct fcpustate x86_dbg_origstate;
 INTDEF struct fcpustate x86_dbg_viewstate;
@@ -145,7 +145,7 @@ panic_df_dbg_main(void *cr3)
 	           dbg_getpcreg(DBG_REGLEVEL_VIEW));
 	dbg_main(0);
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 PRIVATE NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct task *
@@ -213,15 +213,15 @@ x86_handle_double_fault(struct df_cpustate *__restrict state) {
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_shouldtrap(KERNEL_DEBUGTRAP_ON_UNHANDLED_INTERRUPT))
 		kernel_debugtrap(&state->dcs_regs, SIGBUS);
-#ifndef CONFIG_NO_DEBUGGER
+#ifndef CONFIG_NO_KERNEL_DEBUGGER
 #ifdef __x86_64__
 	dbg_enter(&panic_df_dbg_main, &state->dcs_regs);
 #else /* __x86_64__ */
 	dbg_enter(&panic_df_dbg_main, state->dcs_cr3, &state->dcs_regs);
 #endif /* !__x86_64__ */
-#else /* !CONFIG_NO_DEBUGGER */
+#else /* !CONFIG_NO_KERNEL_DEBUGGER */
 	PREEMPTION_HALT();
-#endif /* CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_NO_KERNEL_DEBUGGER */
 	__builtin_unreachable();
 }
 

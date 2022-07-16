@@ -49,7 +49,7 @@
 
 DECL_BEGIN
 
-#ifdef CONFIG_NO_DEBUGGER
+#ifdef CONFIG_NO_KERNEL_DEBUGGER
 #define ISR_DEFINE_HILO(id)           \
 	INTDEF byte_t __x86_idtlo_##id[]; \
 	INTDEF byte_t __x86_idthi_##id[];
@@ -59,7 +59,7 @@ DECL_BEGIN
 	INTDEF byte_t __x86_idthi_##id[];    \
 	INTDEF byte_t __x86_dbgidtlo_##id[]; \
 	INTDEF byte_t __x86_dbgidthi_##id[];
-#else /* CONFIG_NO_DEBUGGER */
+#else /* CONFIG_NO_KERNEL_DEBUGGER */
 #define ISR_DEFINE_HILO(id)                     \
 	INTDEF byte_t __x86_idtlo_##id[];           \
 	INTDEF byte_t __x86_idthi_##id[];           \
@@ -67,7 +67,7 @@ DECL_BEGIN
 	INTDEF byte_t __x86_dbgidthi_##id[];        \
 	INTDEF byte_t __x86_dbgaltcoreidtlo_##id[]; \
 	INTDEF byte_t __x86_dbgaltcoreidthi_##id[];
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* !CONFIG_NO_KERNEL_DEBUGGER */
 IDT_X86_FOREACH(ISR_DEFINE_HILO)
 #undef ISR_DEFINE_HILO
 #ifdef __x86_64__
@@ -109,7 +109,7 @@ PUBLIC_CONST ATTR_COLDRODATA struct desctab const x86_idt_ptr = {
 /************************************************************************/
 /* The InterruptDescriptorTable used by the builtin debugger            */
 /************************************************************************/
-#ifndef CONFIG_NO_DEBUGGER
+#ifndef CONFIG_NO_KERNEL_DEBUGGER
 PUBLIC ATTR_COLDDATA struct idt_segment x86_dbgidt[256] = {
 #define ISR_DEFINE(id) ISR_DEFINE_HILO(__x86_dbgidt, id)
 	IDT_X86_FOREACH(ISR_DEFINE)
@@ -133,7 +133,7 @@ PUBLIC_CONST ATTR_COLDRODATA struct desctab const x86_dbgaltcoreidt_ptr = {
 	.dt_base  = (uintptr_t)x86_dbgaltcoreidt
 };
 #endif /* !CONFIG_NO_SMP */
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* !CONFIG_NO_KERNEL_DEBUGGER */
 
 /* Lock used to guard against multiple threads modifying the IDT */
 PRIVATE ATTR_COLDBSS struct shared_lock x86_idt_modify_lock = SHARED_LOCK_INIT;
@@ -236,10 +236,10 @@ PUBLIC ATTR_COLDTEXT bool FCALL x86_idt_modify_begin(bool nx)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_INTERRUPT) {
 	struct idt_segment *copy;
 	struct desctab dt;
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	if unlikely(dbg_active)
 		return true; /* no-op */
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 	if (nx) {
 		copy = (struct idt_segment *)kmalloc_nx(256 * sizeof(struct idt_segment),
 		                                        GFP_LOCKED | GFP_PREFLT | GFP_ATOMIC);
@@ -275,14 +275,14 @@ PUBLIC ATTR_COLDTEXT bool FCALL x86_idt_modify_begin(bool nx)
 PUBLIC NOBLOCK ATTR_COLDTEXT void
 NOTHROW(FCALL x86_idt_modify_end)(bool discard_changes) {
 	struct idt_segment *copy;
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	if unlikely(dbg_active) {
 		assert(!discard_changes);
 		/* Simply force an IDT re-load */
 		x86_idt_setcurrent(&x86_idt_ptr);
 		return;
 	}
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 	assert(shared_lock_acquired(&x86_idt_modify_lock));
 	assert(x86_idt_modify_copy);
 	copy = x86_idt_modify_copy;

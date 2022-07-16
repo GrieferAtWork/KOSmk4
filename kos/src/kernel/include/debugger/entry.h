@@ -24,7 +24,7 @@
 
 #include <debugger/config.h>
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <kernel/types.h>
 
 #include <stdbool.h>
@@ -200,11 +200,11 @@ DATDEF uintptr_t volatile kernel_debug_on;
 #endif /* __CC__ */
 
 DECL_END
-#else /* CONFIG_HAVE_DEBUGGER */
+#else /* CONFIG_HAVE_KERNEL_DEBUGGER */
 #ifndef __dbg_active_defined
 #define __dbg_active_defined
 #define dbg_active 0
 #endif /* !__dbg_active_defined */
-#endif /* !CONFIG_HAVE_DEBUGGER */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_INCLUDE_DEBUGGER_ENTRY_H */

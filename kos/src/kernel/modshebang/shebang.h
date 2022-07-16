@@ -27,15 +27,18 @@
 
 DECL_BEGIN
 
-/* Max # of bytes from the  start of an executable file,  to
+/*[[[config CONFIG_MODSHEBANG_INTERPRETER_LINEMAX! = 1024
+ * Max # of bytes from the  start of an executable file,  to
  * immediately after the line-feed following the first line.
  *
  * If more bytes than this amount appear in the  first
  * line (not counting the leading #!), exec will  fail
- * with `E_NOT_EXECUTABLE_FAULTY_REASON_SHEBANG_TRUNC' */
-#ifndef CONFIG_SHEBANG_INTERPRETER_LINE_MAX
-#define CONFIG_SHEBANG_INTERPRETER_LINE_MAX 1024
-#endif /* !CONFIG_SHEBANG_INTERPRETER_LINE_MAX */
+ * with `E_NOT_EXECUTABLE_FAULTY_REASON_SHEBANG_TRUNC'
+ * ]]]*/
+#ifndef CONFIG_MODSHEBANG_INTERPRETER_LINEMAX
+#define CONFIG_MODSHEBANG_INTERPRETER_LINEMAX 1024
+#endif /* !CONFIG_MODSHEBANG_INTERPRETER_LINEMAX */
+/*[[[end]]]*/
 
 /* ABI exec function for #! */
 INTDEF WUNUSED NONNULL((1)) unsigned int FCALL

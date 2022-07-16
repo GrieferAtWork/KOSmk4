@@ -69,7 +69,7 @@
 
 DECL_BEGIN
 
-#ifndef CONFIG_EVERYONE_IS_ROOT
+#ifndef CONFIG_KERNEL_EVERYONE_IS_ROOT
 
 /* Default, empty set of supplementary groups. */
 PUBLIC struct cred_groups cred_groups_empty = {
@@ -647,7 +647,7 @@ again:
 		}
 	}
 }
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
+#endif /* !CONFIG_KERNEL_EVERYONE_IS_ROOT */
 
 
 #define SYSCALL_RETURN_TYPE_OF3(a, b) b
@@ -672,17 +672,17 @@ again:
 
 #define TYPEOF_DEREF(T) __typeof__(**(__typeof__(T) *)0)
 
-#ifdef CONFIG_EVERYONE_IS_ROOT
+#ifdef CONFIG_KERNEL_EVERYONE_IS_ROOT
 #define SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0()        COMPILER_IMPURE();
 #define SUPPRESS_EVERYONE_IS_ROOT_WARNINGS1(a)       COMPILER_IMPURE(); (void)a;
 #define SUPPRESS_EVERYONE_IS_ROOT_WARNINGS2(a, b)    COMPILER_IMPURE(); (void)a; (void)b;
 #define SUPPRESS_EVERYONE_IS_ROOT_WARNINGS3(a, b, c) COMPILER_IMPURE(); (void)a; (void)b; (void)c;
-#else /* CONFIG_EVERYONE_IS_ROOT */
+#else /* CONFIG_KERNEL_EVERYONE_IS_ROOT */
 #define SUPPRESS_EVERYONE_IS_ROOT_WARNINGS0()        /* nothing */
 #define SUPPRESS_EVERYONE_IS_ROOT_WARNINGS1(a)       /* nothing */
 #define SUPPRESS_EVERYONE_IS_ROOT_WARNINGS2(a, b)    /* nothing */
 #define SUPPRESS_EVERYONE_IS_ROOT_WARNINGS3(a, b, c) /* nothing */
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
+#endif /* !CONFIG_KERNEL_EVERYONE_IS_ROOT */
 
 
 
@@ -1054,13 +1054,13 @@ DEFINE_SYSCALL3(errno_t, getresuid,
                 USER UNCHECKED getresuid_id_t *, pruid,
                 USER UNCHECKED getresuid_id_t *, peuid,
                 USER UNCHECKED getresuid_id_t *, psuid) {
-#ifdef CONFIG_EVERYONE_IS_ROOT
+#ifdef CONFIG_KERNEL_EVERYONE_IS_ROOT
 	enum {
 		ruid = 0,
 		euid = 0,
 		suid = 0
 	};
-#else /* CONFIG_EVERYONE_IS_ROOT */
+#else /* CONFIG_KERNEL_EVERYONE_IS_ROOT */
 	getresuid_id_t ruid, euid, suid;
 	struct cred *self = THIS_CRED;
 	cred_read(self);
@@ -1068,7 +1068,7 @@ DEFINE_SYSCALL3(errno_t, getresuid,
 	euid = (getresuid_id_t)self->c_euid;
 	suid = (getresuid_id_t)self->c_suid;
 	cred_endread(self);
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
+#endif /* !CONFIG_KERNEL_EVERYONE_IS_ROOT */
 	COMPILER_WRITE_BARRIER();
 	/* Write back results to user-space. */
 	if (pruid) {
@@ -1093,13 +1093,13 @@ DEFINE_SYSCALL3(errno_t, getresuid32,
                 USER UNCHECKED getresuid32_id_t *, pruid,
                 USER UNCHECKED getresuid32_id_t *, peuid,
                 USER UNCHECKED getresuid32_id_t *, psuid) {
-#ifdef CONFIG_EVERYONE_IS_ROOT
+#ifdef CONFIG_KERNEL_EVERYONE_IS_ROOT
 	enum {
 		ruid = 0,
 		euid = 0,
 		suid = 0
 	};
-#else /* CONFIG_EVERYONE_IS_ROOT */
+#else /* CONFIG_KERNEL_EVERYONE_IS_ROOT */
 	getresuid32_id_t ruid, euid, suid;
 	struct cred *self = THIS_CRED;
 	cred_read(self);
@@ -1107,7 +1107,7 @@ DEFINE_SYSCALL3(errno_t, getresuid32,
 	euid = (getresuid32_id_t)self->c_euid;
 	suid = (getresuid32_id_t)self->c_suid;
 	cred_endread(self);
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
+#endif /* !CONFIG_KERNEL_EVERYONE_IS_ROOT */
 	COMPILER_WRITE_BARRIER();
 	/* Write back results to user-space. */
 	if (pruid) {
@@ -1132,13 +1132,13 @@ DEFINE_COMPAT_SYSCALL3(errno_t, getresuid,
                        USER UNCHECKED compat_getresuid_id_t *, pruid,
                        USER UNCHECKED compat_getresuid_id_t *, peuid,
                        USER UNCHECKED compat_getresuid_id_t *, psuid) {
-#ifdef CONFIG_EVERYONE_IS_ROOT
+#ifdef CONFIG_KERNEL_EVERYONE_IS_ROOT
 	enum {
 		ruid = 0,
 		euid = 0,
 		suid = 0
 	};
-#else /* CONFIG_EVERYONE_IS_ROOT */
+#else /* CONFIG_KERNEL_EVERYONE_IS_ROOT */
 	compat_getresuid_id_t ruid, euid, suid;
 	struct cred *self = THIS_CRED;
 	cred_read(self);
@@ -1146,7 +1146,7 @@ DEFINE_COMPAT_SYSCALL3(errno_t, getresuid,
 	euid = (compat_getresuid_id_t)self->c_euid;
 	suid = (compat_getresuid_id_t)self->c_suid;
 	cred_endread(self);
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
+#endif /* !CONFIG_KERNEL_EVERYONE_IS_ROOT */
 	COMPILER_WRITE_BARRIER();
 	/* Write back results to user-space. */
 	if (pruid) {
@@ -1171,13 +1171,13 @@ DEFINE_COMPAT_SYSCALL3(errno_t, getresuid32,
                        USER UNCHECKED compat_getresuid32_id_t *, pruid,
                        USER UNCHECKED compat_getresuid32_id_t *, peuid,
                        USER UNCHECKED compat_getresuid32_id_t *, psuid) {
-#ifdef CONFIG_EVERYONE_IS_ROOT
+#ifdef CONFIG_KERNEL_EVERYONE_IS_ROOT
 	enum {
 		ruid = 0,
 		euid = 0,
 		suid = 0
 	};
-#else /* CONFIG_EVERYONE_IS_ROOT */
+#else /* CONFIG_KERNEL_EVERYONE_IS_ROOT */
 	compat_getresuid32_id_t ruid, euid, suid;
 	struct cred *self = THIS_CRED;
 	cred_read(self);
@@ -1185,7 +1185,7 @@ DEFINE_COMPAT_SYSCALL3(errno_t, getresuid32,
 	euid = (compat_getresuid32_id_t)self->c_euid;
 	suid = (compat_getresuid32_id_t)self->c_suid;
 	cred_endread(self);
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
+#endif /* !CONFIG_KERNEL_EVERYONE_IS_ROOT */
 	COMPILER_WRITE_BARRIER();
 	/* Write back results to user-space. */
 	if (pruid) {
@@ -1214,13 +1214,13 @@ DEFINE_SYSCALL3(errno_t, getresgid,
                 USER UNCHECKED getresgid_id_t *, prgid,
                 USER UNCHECKED getresgid_id_t *, pegid,
                 USER UNCHECKED getresgid_id_t *, psgid) {
-#ifdef CONFIG_EVERYONE_IS_ROOT
+#ifdef CONFIG_KERNEL_EVERYONE_IS_ROOT
 	enum {
 		rgid = 0,
 		egid = 0,
 		sgid = 0
 	};
-#else /* CONFIG_EVERYONE_IS_ROOT */
+#else /* CONFIG_KERNEL_EVERYONE_IS_ROOT */
 	getresgid_id_t rgid, egid, sgid;
 	struct cred *self = THIS_CRED;
 	cred_read(self);
@@ -1228,7 +1228,7 @@ DEFINE_SYSCALL3(errno_t, getresgid,
 	egid = (getresgid_id_t)self->c_egid;
 	sgid = (getresgid_id_t)self->c_sgid;
 	cred_endread(self);
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
+#endif /* !CONFIG_KERNEL_EVERYONE_IS_ROOT */
 	COMPILER_WRITE_BARRIER();
 	/* Write back results to user-space. */
 	if (prgid) {
@@ -1253,13 +1253,13 @@ DEFINE_SYSCALL3(errno_t, getresgid32,
                 USER UNCHECKED getresgid32_id_t *, prgid,
                 USER UNCHECKED getresgid32_id_t *, pegid,
                 USER UNCHECKED getresgid32_id_t *, psgid) {
-#ifdef CONFIG_EVERYONE_IS_ROOT
+#ifdef CONFIG_KERNEL_EVERYONE_IS_ROOT
 	enum {
 		rgid = 0,
 		egid = 0,
 		sgid = 0
 	};
-#else /* CONFIG_EVERYONE_IS_ROOT */
+#else /* CONFIG_KERNEL_EVERYONE_IS_ROOT */
 	getresgid32_id_t rgid, egid, sgid;
 	struct cred *self = THIS_CRED;
 	cred_read(self);
@@ -1267,7 +1267,7 @@ DEFINE_SYSCALL3(errno_t, getresgid32,
 	egid = (getresgid32_id_t)self->c_egid;
 	sgid = (getresgid32_id_t)self->c_sgid;
 	cred_endread(self);
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
+#endif /* !CONFIG_KERNEL_EVERYONE_IS_ROOT */
 	COMPILER_WRITE_BARRIER();
 	/* Write back results to user-space. */
 	if (prgid) {
@@ -1292,13 +1292,13 @@ DEFINE_COMPAT_SYSCALL3(errno_t, getresgid,
                        USER UNCHECKED compat_getresgid_id_t *, prgid,
                        USER UNCHECKED compat_getresgid_id_t *, pegid,
                        USER UNCHECKED compat_getresgid_id_t *, psgid) {
-#ifdef CONFIG_EVERYONE_IS_ROOT
+#ifdef CONFIG_KERNEL_EVERYONE_IS_ROOT
 	enum {
 		rgid = 0,
 		egid = 0,
 		sgid = 0
 	};
-#else /* CONFIG_EVERYONE_IS_ROOT */
+#else /* CONFIG_KERNEL_EVERYONE_IS_ROOT */
 	compat_getresgid_id_t rgid, egid, sgid;
 	struct cred *self = THIS_CRED;
 	cred_read(self);
@@ -1306,7 +1306,7 @@ DEFINE_COMPAT_SYSCALL3(errno_t, getresgid,
 	egid = (compat_getresgid_id_t)self->c_egid;
 	sgid = (compat_getresgid_id_t)self->c_sgid;
 	cred_endread(self);
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
+#endif /* !CONFIG_KERNEL_EVERYONE_IS_ROOT */
 	COMPILER_WRITE_BARRIER();
 	/* Write back results to user-space. */
 	if (prgid) {
@@ -1373,10 +1373,10 @@ extern "C++" {
 template<class GID_T>
 PRIVATE ssize_t KCALL
 sys_getgroups_impl(size_t count, USER UNCHECKED GID_T *list) {
-#ifdef CONFIG_EVERYONE_IS_ROOT
+#ifdef CONFIG_KERNEL_EVERYONE_IS_ROOT
 	validate_writablem(list, count, sizeof(GID_T));
 	return 0;
-#else /* CONFIG_EVERYONE_IS_ROOT */
+#else /* CONFIG_KERNEL_EVERYONE_IS_ROOT */
 	size_t result;
 	REF struct cred_groups *groups;
 	validate_writablem(list, count, sizeof(GID_T));
@@ -1397,7 +1397,7 @@ sys_getgroups_impl(size_t count, USER UNCHECKED GID_T *list) {
 			list[i] = (GID_T)groups->cg_groups[i];
 	}
 	return (ssize_t)result;
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
+#endif /* !CONFIG_KERNEL_EVERYONE_IS_ROOT */
 }
 #endif /* __ARCH_WANT_SYSCALL_GETGROUPS */
 
@@ -1446,7 +1446,7 @@ DEFINE_COMPAT_SYSCALL2(ssize_t, getgroups32, size_t, count,
 
 extern "C++" {
 
-#ifndef CONFIG_EVERYONE_IS_ROOT
+#ifndef CONFIG_KERNEL_EVERYONE_IS_ROOT
 /* Create a new set of groups that may consist of at most `max_ngroups'
  * groups (duplicate groups  are ignored). If  more than  `max_ngroups'
  * unique groups are given, and  the caller doesn't have  `CAP_SETGID',
@@ -1530,7 +1530,7 @@ next_gid:
 	result->cg_refcnt = 1;
 	return result;
 }
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
+#endif /* !CONFIG_KERNEL_EVERYONE_IS_ROOT */
 
 template<class GID_T>
 PRIVATE errno_t KCALL

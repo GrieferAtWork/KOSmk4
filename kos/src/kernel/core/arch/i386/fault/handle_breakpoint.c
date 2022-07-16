@@ -53,7 +53,7 @@ opt.append("-Os");
 
 DECL_BEGIN
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 PRIVATE void KCALL
 dbg_handle_breakpoint(void *faultpc, void *resumepc) {
 	/* We are now in debugger-mode. */
@@ -105,7 +105,7 @@ dbg_handle_breakpoint(void *faultpc, void *resumepc) {
 	/* Switch over to the debugger CLI */
 	dbg_main(0);
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 
@@ -146,7 +146,7 @@ x86_handle_breakpoint(struct icpustate *__restrict state) {
 	}
 
 	/* Next up: Let the builtin debugger deal with it. */
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	if (isuser ? (kernel_debug_on & KERNEL_DEBUG_ON_USER_BREAKPOINT)
 	           : (kernel_debug_on & KERNEL_DEBUG_ON_KERNEL_BREAKPOINT)) {
 		STRUCT_DBG_ENTRY_INFO(2) entry;
@@ -158,7 +158,7 @@ x86_handle_breakpoint(struct icpustate *__restrict state) {
 		dbg_enter((struct dbg_entry_info *)&entry, state);
 		__builtin_unreachable();
 	}
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 	/* Fallback: Throw an E_BREAKPOINT exception. */
 	PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_BREAKPOINT));

@@ -908,10 +908,10 @@ NOTHROW(FCALL nameof_special_file)(struct mfile *__restrict self) {
 		return "[anon]";
 	if (self == &mfile_ndef)
 		return "[undef]";
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 	if (self == &mfile_dbgheap)
 		return "[dbgheap]";
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 	return NULL;
 }
 
@@ -1297,9 +1297,9 @@ procfs_pp_stat_print(struct printnode *__restrict self,
 	REF struct task *thread;
 	REF struct mman *mm = NULL;
 	struct taskpid *tpid;
-#ifdef CONFIG_HAVE_TASK_COMM
+#ifdef CONFIG_HAVE_KERNEL_TASK_COMM
 	char comm_name[TASK_COMM_LEN];
-#endif /* CONFIG_HAVE_TASK_COMM */
+#endif /* CONFIG_HAVE_KERNEL_TASK_COMM */
 	tpid   = self->fn_fsdata;
 	thread = taskpid_gettask(tpid);
 	FINALLY_XDECREF_UNLIKELY(thread);
@@ -1309,7 +1309,7 @@ procfs_pp_stat_print(struct printnode *__restrict self,
 	if (printf("%" PRIuN(__SIZEOF_PID_T__) " (",
 	           taskpid_gettid_s(tpid)) < 0)
 		return;
-#ifdef CONFIG_HAVE_TASK_COMM
+#ifdef CONFIG_HAVE_KERNEL_TASK_COMM
 	comm_name[0] = '\0';
 	if (thread)
 		task_getcomm_of(thread, comm_name);
@@ -1317,7 +1317,7 @@ procfs_pp_stat_print(struct printnode *__restrict self,
 		/* Print custom thread command name. */
 		printf("%#q", comm_name);
 	} else
-#endif /* CONFIG_HAVE_TASK_COMM */
+#endif /* CONFIG_HAVE_KERNEL_TASK_COMM */
 	if (mm) {
 		bool has_path;
 		REF struct fdirent *exec_name;
@@ -2471,9 +2471,9 @@ procfs_pp_fdinfo_v_print(struct printnode *__restrict self,
 			REF void *mon_hand_ptr;
 			REF struct mfile *mon_hand_mf;
 			pos_t mon_hand_fpos;
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 			bool mon_isrpc;
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 			epoll_controller_lock_acquire(hand);
 epoll_nextmon_locked:
 			if (i > hand->ec_mask) {
@@ -2490,20 +2490,20 @@ epoll_nextmon_locked:
 			mon_hand_typ = mon->ehm_handtyp;
 			mon_hand_ptr = mon->ehm_handptr;
 			(*handle_type_db.h_incref[mon_hand_typ])(mon_hand_ptr);
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 			mon_isrpc = epoll_handle_monitor_isrpc(mon);
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 			epoll_controller_lock_release(hand);
 			RAII_FINALLY { (*handle_type_db.h_decref[mon_hand_typ])(mon_hand_ptr); };
 			printf("tfd: %8" PRIu32 " events: %8" PRIx32 " ", mon_fdkey, mon_events);
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 			/* For RPC monitors, this would be `mon_data' becomes `ehm_rpc',
 			 * which is a pointers to internal kernel data that must not  be
 			 * exposed! */
 			if (mon_isrpc) {
 				PRINT("rpc: 1 ");
 			} else
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 			{
 				printf("data: %16" PRIx64 " ", mon_data.u64);
 			}

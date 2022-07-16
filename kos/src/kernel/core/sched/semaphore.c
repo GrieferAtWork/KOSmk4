@@ -57,10 +57,10 @@ again:
 			}
 			task_disconnectall();
 		}
-#ifdef CONFIG_YIELD_BEFORE_CONNECT
+#ifdef CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT
 do_exchange:
 		;
-#endif /* CONFIG_YIELD_BEFORE_CONNECT */
+#endif /* CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT */
 	} while (!ATOMIC_CMPXCH_WEAK(self->s_count, count, count - 1));
 	return true;
 }
@@ -94,10 +94,10 @@ again:
 			}
 			task_disconnectall();
 		}
-#ifdef CONFIG_YIELD_BEFORE_CONNECT
+#ifdef CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT
 do_exchange:
 		;
-#endif /* CONFIG_YIELD_BEFORE_CONNECT */
+#endif /* CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT */
 	} while (!ATOMIC_CMPXCH_WEAK(self->s_count, count, count - 1));
 	return true;
 }

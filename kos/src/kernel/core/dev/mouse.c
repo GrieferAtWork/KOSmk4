@@ -56,11 +56,11 @@ NOTHROW(KCALL mouse_buffer_putpacket_nopr)(struct mousebuf *__restrict self,
 	for (;;) {
 		size_t index;
 		oldstate.bs_word = ATOMIC_READ(self->mb_bufstate.bs_word);
-		if (oldstate.bs_state.s_used >= CONFIG_MOUSE_BUFFER_SIZE)
+		if (oldstate.bs_state.s_used >= CONFIG_KERNEL_MOUSE_BUFFER_SIZE)
 			return false;
 		index = (oldstate.bs_state.s_start +
 		         oldstate.bs_state.s_used) %
-		        CONFIG_MOUSE_BUFFER_SIZE;
+		        CONFIG_KERNEL_MOUSE_BUFFER_SIZE;
 		if (!ATOMIC_CMPXCH_WEAK(self->mb_buffer[index].mp_word, 0, packet.mp_word))
 			continue;
 		newstate = oldstate;
@@ -96,13 +96,13 @@ NOTHROW(KCALL mouse_buffer_putpackets_nopr)(struct mousebuf *__restrict self,
 	for (;;) {
 		size_t i, index;
 		oldstate.bs_word = ATOMIC_READ(self->mb_bufstate.bs_word);
-		if ((oldstate.bs_state.s_used + packetc) > CONFIG_MOUSE_BUFFER_SIZE)
+		if ((oldstate.bs_state.s_used + packetc) > CONFIG_KERNEL_MOUSE_BUFFER_SIZE)
 			return false;
 		for (i = 0; i < packetc; ++i) {
-			index = (oldstate.bs_state.s_start + oldstate.bs_state.s_used + i) % CONFIG_MOUSE_BUFFER_SIZE;
+			index = (oldstate.bs_state.s_start + oldstate.bs_state.s_used + i) % CONFIG_KERNEL_MOUSE_BUFFER_SIZE;
 			if (!ATOMIC_CMPXCH(self->mb_buffer[index].mp_word, 0, packetv[i].mp_word)) {
 				while (i--) {
-					index = (oldstate.bs_state.s_start + oldstate.bs_state.s_used + i) % CONFIG_MOUSE_BUFFER_SIZE;
+					index = (oldstate.bs_state.s_start + oldstate.bs_state.s_used + i) % CONFIG_KERNEL_MOUSE_BUFFER_SIZE;
 #ifdef NDEBUG
 					ATOMIC_WRITE(self->mb_buffer[index].mp_word, 0);
 #else /* NDEBUG */
@@ -124,7 +124,7 @@ NOTHROW(KCALL mouse_buffer_putpackets_nopr)(struct mousebuf *__restrict self,
 			break;
 		i = packetc;
 		while (i--) {
-			index = (oldstate.bs_state.s_start + oldstate.bs_state.s_used + i) % CONFIG_MOUSE_BUFFER_SIZE;
+			index = (oldstate.bs_state.s_start + oldstate.bs_state.s_used + i) % CONFIG_KERNEL_MOUSE_BUFFER_SIZE;
 #ifdef NDEBUG
 			ATOMIC_WRITE(self->mb_buffer[index].mp_word, 0);
 #else /* NDEBUG */
@@ -461,14 +461,14 @@ NOTHROW(KCALL mousebuf_trygetpacket)(struct mousebuf *__restrict self) {
 			result.mp_word = 0;
 			break;
 		}
-		assert(oldstate.bs_state.s_start < CONFIG_MOUSE_BUFFER_SIZE);
+		assert(oldstate.bs_state.s_start < CONFIG_KERNEL_MOUSE_BUFFER_SIZE);
 		newstate = oldstate;
 		++newstate.bs_state.s_start;
 		--newstate.bs_state.s_used;
-#if IS_POWER_OF_TWO(CONFIG_MOUSE_BUFFER_SIZE)
-		newstate.bs_state.s_start &= CONFIG_MOUSE_BUFFER_SIZE - 1;
+#if IS_POWER_OF_TWO(CONFIG_KERNEL_MOUSE_BUFFER_SIZE)
+		newstate.bs_state.s_start &= CONFIG_KERNEL_MOUSE_BUFFER_SIZE - 1;
 #else
-		if (newstate.bs_state.s_start == CONFIG_MOUSE_BUFFER_SIZE)
+		if (newstate.bs_state.s_start == CONFIG_KERNEL_MOUSE_BUFFER_SIZE)
 			newstate.bs_state.s_start = 0;
 #endif
 		if (!ATOMIC_CMPXCH_WEAK(self->mb_bufstate.bs_word,

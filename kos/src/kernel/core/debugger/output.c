@@ -31,7 +31,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <debugger/output.h>
 #include <debugger/hook.h>
 #include <debugger/io.h>
@@ -1365,6 +1365,6 @@ NOTHROW(FCALL dbg_fillrect2)(int x, int y, unsigned int size_x, unsigned int siz
 
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_SRC_DEBUGGER_OUTPUT_C */

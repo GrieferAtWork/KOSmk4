@@ -24,38 +24,45 @@
 
 DECL_BEGIN
 
-//#define CONFIG_NO_DEBUG_HEAP             1
-//#define CONFIG_NO_HEAP_RANDOMIZE_OFFSETS 1
-//#define CONFIG_NO_HEAP_TRACE_DANGLE      1
-//#define CONFIG_NO_TRACE_MALLOC           1
+//#define CONFIG_NO_KERNEL_DEBUG_HEAP             1
+//#define CONFIG_NO_KERNEL_HEAP_RANDOMIZE_OFFSETS 1
+//#define CONFIG_NO_KERNEL_HEAP_TRACE_DANGLE      1
+//#define CONFIG_NO_KERNEL_TRACE_MALLOC           1
 
 
-/* Enable heap memory  pre-initialization, as  well as  special
+/*[[[config CONFIG_HAVE_KERNEL_DEBUG_HEAP: bool = !defined(NDEBUG) && !defined(NDEBUG_HEAP)
+ * Enable heap memory  pre-initialization, as  well as  special
  * data patterns  for unallocated  memory, in  addition to  the
  * ability of tracking use-after-free through `heap_validate()'
  * Note  that `heap_validate()' attempts to optimize itself not
  * to check data  blocks that haven't  been modified since  the
  * previous check, making use of `pagedir_haschanged()', should
- * the host support that function (`ARCH_PAGEDIR_HAVE_CHANGED') */
-#ifndef CONFIG_DEBUG_HEAP
-#if !defined(CONFIG_NO_DEBUG_HEAP) && !defined(NDEBUG)
-#define CONFIG_DEBUG_HEAP 1
-#elif !defined(CONFIG_NO_DEBUG_HEAP)
-#define CONFIG_NO_DEBUG_HEAP 1
-#endif
-#elif defined(CONFIG_NO_DEBUG_HEAP)
-#undef CONFIG_DEBUG_HEAP
-#endif
+ * the host support that function (`ARCH_PAGEDIR_HAVE_CHANGED')
+ *]]]*/
+#ifdef CONFIG_NO_KERNEL_DEBUG_HEAP
+#undef CONFIG_HAVE_KERNEL_DEBUG_HEAP
+#elif !defined(CONFIG_HAVE_KERNEL_DEBUG_HEAP)
+#if !defined(NDEBUG) && !defined(NDEBUG_HEAP)
+#define CONFIG_HAVE_KERNEL_DEBUG_HEAP
+#else /* !NDEBUG && !NDEBUG_HEAP */
+#define CONFIG_NO_KERNEL_DEBUG_HEAP
+#endif /* NDEBUG || NDEBUG_HEAP */
+#elif (-CONFIG_HAVE_KERNEL_DEBUG_HEAP - 1) == -1
+#undef CONFIG_HAVE_KERNEL_DEBUG_HEAP
+#define CONFIG_NO_KERNEL_DEBUG_HEAP
+#endif /* ... */
+/*[[[end]]]*/
 
 
-/* Randomize in-heap allocation offsets (using `rand()') when
+/*[[[config CONFIG_HAVE_KERNEL_HEAP_RANDOMIZE_OFFSETS: bool = defined(CONFIG_HAVE_KERNEL_DEBUG_HEAP)
+ * Randomize in-heap allocation offsets (using `rand()') when
  * less memory than the best  matching free slot contains  is
  * allocated:
  * >> slot(48 bytes):  FREEFREEFREEFREEFREEFREEFREEFREEFREEFREEFREEFREE
- * >> alloc(16 bytes): FREEFREEFREEFREE                                 (Without `CONFIG_HEAP_RANDOMIZE_OFFSETS')
- * >> alloc(16 bytes):                                 FREEFREEFREEFREE (With `CONFIG_HEAP_RANDOMIZE_OFFSETS')
- * >> alloc(16 bytes):                 FREEFREEFREEFREE                 (With `CONFIG_HEAP_RANDOMIZE_OFFSETS')
- * >> alloc(16 bytes): FREEFREEFREEFREE                                 (With `CONFIG_HEAP_RANDOMIZE_OFFSETS')
+ * >> alloc(16 bytes): FREEFREEFREEFREE                                 (Without `CONFIG_HAVE_KERNEL_HEAP_RANDOMIZE_OFFSETS')
+ * >> alloc(16 bytes):                                 FREEFREEFREEFREE (With `CONFIG_HAVE_KERNEL_HEAP_RANDOMIZE_OFFSETS')
+ * >> alloc(16 bytes):                 FREEFREEFREEFREE                 (With `CONFIG_HAVE_KERNEL_HEAP_RANDOMIZE_OFFSETS')
+ * >> alloc(16 bytes): FREEFREEFREEFREE                                 (With `CONFIG_HAVE_KERNEL_HEAP_RANDOMIZE_OFFSETS')
  * This configuration option affects the results of `heap_alloc()' and `heap_align()'
  * Reasoning:
  *   - Although even without this option, we are randomizing the kernel heap  location
@@ -69,20 +76,24 @@ DECL_BEGIN
  *     would   be    predictably   consistent    for   consecutive    allocations.
  *     That might be another cause for buggy code that might accidentally rely  on
  *     those bits never changing.
- */
-#ifndef CONFIG_HEAP_RANDOMIZE_OFFSETS
-#if !defined(CONFIG_NO_HEAP_RANDOMIZE_OFFSETS) && \
-     defined(CONFIG_DEBUG_HEAP)
-#define CONFIG_HEAP_RANDOMIZE_OFFSETS 1
-#elif !defined(CONFIG_NO_HEAP_RANDOMIZE_OFFSETS)
-#define CONFIG_NO_HEAP_RANDOMIZE_OFFSETS 1
-#endif
-#elif defined(CONFIG_NO_HEAP_RANDOMIZE_OFFSETS)
-#undef CONFIG_HEAP_RANDOMIZE_OFFSETS
-#endif
+ *]]]*/
+#ifdef CONFIG_NO_KERNEL_HEAP_RANDOMIZE_OFFSETS
+#undef CONFIG_HAVE_KERNEL_HEAP_RANDOMIZE_OFFSETS
+#elif !defined(CONFIG_HAVE_KERNEL_HEAP_RANDOMIZE_OFFSETS)
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
+#define CONFIG_HAVE_KERNEL_HEAP_RANDOMIZE_OFFSETS
+#else /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
+#define CONFIG_NO_KERNEL_HEAP_RANDOMIZE_OFFSETS
+#endif /* !CONFIG_HAVE_KERNEL_DEBUG_HEAP */
+#elif (-CONFIG_HAVE_KERNEL_HEAP_RANDOMIZE_OFFSETS - 1) == -1
+#undef CONFIG_HAVE_KERNEL_HEAP_RANDOMIZE_OFFSETS
+#define CONFIG_NO_KERNEL_HEAP_RANDOMIZE_OFFSETS
+#endif /* ... */
+/*[[[end]]]*/
 
 
-/* Trace dangling heap data in  order to minimize unnecessary  allocations:
+/*[[[config CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE: bool = true
+ * Trace dangling heap data in  order to minimize unnecessary  allocations:
  * Since the  introduction of  `CONFIG_ATOMIC_HEAP'  and it  having  become
  * mandatory shortly after, one problem arose that could potentially result
  * in unnecessary and excessive core allocations when there is still enough
@@ -98,7 +109,7 @@ DECL_BEGIN
  *     operating as lock-less as possible)
  *   - With that in mind, what `heap_alloc()' must do is allocate the entirety
  *     of that data  block before  releasing any portion  that isn't  actually
- *     being  used  (this is  also where  `CONFIG_HEAP_RANDOMIZE_OFFSETS' into
+ *     being  used  (this is  also where  `CONFIG_HAVE_KERNEL_HEAP_RANDOMIZE_OFFSETS' into
  *     play, as it  chooses a  random position in  that larger  data block  to
  *     return as  newly allocated  memory, rather  than always  returning  its
  *     starting address, which while be faster  as at most one remaining  data
@@ -127,19 +138,23 @@ DECL_BEGIN
  *       being allocated in other threads.
  *      (Such a situation could arise from excessive use of `fork()' and
  *       the consequentially required duplication of the caller's VM needing
- *       at  least  a   couple  of   pages  of  virtual   memory  at   once) */
-#ifndef CONFIG_HEAP_TRACE_DANGLE
-#ifndef CONFIG_NO_HEAP_TRACE_DANGLE
-#define CONFIG_HEAP_TRACE_DANGLE 1
-#endif
-#elif defined(CONFIG_NO_HEAP_TRACE_DANGLE)
-#undef CONFIG_HEAP_TRACE_DANGLE
-#endif
+ *       at  least  a   couple  of   pages  of  virtual   memory  at   once)
+ *]]]*/
+#ifdef CONFIG_NO_KERNEL_HEAP_TRACE_DANGLE
+#undef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
+#elif !defined(CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE)
+#define CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
+#elif (-CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE - 1) == -1
+#undef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
+#define CONFIG_NO_KERNEL_HEAP_TRACE_DANGLE
+#endif /* ... */
+/*[[[end]]]*/
 
 
 
 
-/* Configuration option to enable/disable a debug functionality
+/*[[[config CONFIG_HAVE_KERNEL_TRACE_MALLOC: bool = !defined(NDEBUG) && !defined(NDEBUG_LEAK)
+ * Configuration option to enable/disable a debug functionality
  * of `kmalloc()', as well as make it much more robust than  it
  * would otherwise be:
  *   - Enable  GC-style  tracing  of  reachable  memory  blocks,  including  the   ability
@@ -156,35 +171,39 @@ DECL_BEGIN
  *    `krealloc()' (and friends) or `kmalloc_usable_size()'
  *     Alternatively, `mall_validate_padding()' or the user-space kernel
  *     control command `KERNEL_CONTROL_DBG_CHECK_PADDING' can be used to
- *     verify this ~padding~ for all allocated data blocks. */
-#ifndef CONFIG_TRACE_MALLOC
-#if !defined(CONFIG_NO_TRACE_MALLOC) && !defined(NDEBUG)
-#define CONFIG_TRACE_MALLOC 1
-#elif !defined(CONFIG_NO_TRACE_MALLOC)
-#define CONFIG_NO_TRACE_MALLOC 1
-#endif
-#elif defined(CONFIG_NO_TRACE_MALLOC)
-#undef CONFIG_TRACE_MALLOC
-#endif
+ *     verify this ~padding~ for all allocated data blocks.
+ *]]]*/
+#ifdef CONFIG_NO_KERNEL_TRACE_MALLOC
+#undef CONFIG_HAVE_KERNEL_TRACE_MALLOC
+#elif !defined(CONFIG_HAVE_KERNEL_TRACE_MALLOC)
+#if !defined(NDEBUG) && !defined(NDEBUG_LEAK)
+#define CONFIG_HAVE_KERNEL_TRACE_MALLOC
+#else /* !NDEBUG && !NDEBUG_LEAK */
+#define CONFIG_NO_KERNEL_TRACE_MALLOC
+#endif /* NDEBUG || NDEBUG_LEAK */
+#elif (-CONFIG_HAVE_KERNEL_TRACE_MALLOC - 1) == -1
+#undef CONFIG_HAVE_KERNEL_TRACE_MALLOC
+#define CONFIG_NO_KERNEL_TRACE_MALLOC
+#endif /* ... */
+/*[[[end]]]*/
 
 
 /* Minimum alignment of all heap pointers. */
+/*[[[config CONFIG_KERNEL_HEAP_ALIGNMENT! = __ALIGNOF_POINTER__]]]*/
+#ifndef CONFIG_KERNEL_HEAP_ALIGNMENT
+#define CONFIG_KERNEL_HEAP_ALIGNMENT __ALIGNOF_POINTER__
+#endif /* !CONFIG_KERNEL_HEAP_ALIGNMENT */
+/*[[[end]]]*/
+
 #ifndef HEAP_ALIGNMENT
-#ifdef CONFIG_HEAP_ALIGNMENT
-#   define HEAP_ALIGNMENT  CONFIG_HEAP_ALIGNMENT
-#elif 1
-#   define HEAP_ALIGNMENT  __SIZEOF_POINTER__
-#elif __SIZEOF_POINTER__ == 4/* && !defined(CONFIG_DEBUG_HEAP)*/
-#   define HEAP_ALIGNMENT  8
-#else
-/* Using 16 allows a human to quickly notice heap pointers by realizing
- * that the  last digit  in a  hexadecimal representation  is  ZERO(0). */
-#   define HEAP_ALIGNMENT 16
+#define HEAP_ALIGNMENT  CONFIG_KERNEL_HEAP_ALIGNMENT
 #endif
-#endif
-#if (HEAP_ALIGNMENT & (HEAP_ALIGNMENT-1))
+#if HEAP_ALIGNMENT < __ALIGNOF_POINTER__
+#error "The kernel heap must support at least pointer alignment"
+#endif /* HEAP_ALIGNMENT < __ALIGNOF_POINTER__ */
+#if (HEAP_ALIGNMENT & (HEAP_ALIGNMENT - 1)) != 0
 #error "Invalid `HEAP_ALIGNMENT' must be a power-of-2 number"
-#endif
+#endif /* (HEAP_ALIGNMENT & (HEAP_ALIGNMENT - 1)) != 0 */
 
 
 /* Kernel-space dynamic memory management. */
@@ -264,53 +283,61 @@ typedef unsigned int gfp_t;
 	 GFP_NOSWAP | GFP_NOCLRC | GFP_MCHEAP)
 
 
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 #define GFP_NOLEAK 0x10000 /* Don't consider the data-blob a leak, even if it cannot be reached. */
 #define GFP_NOWALK 0x20000 /* When searching for memory leaks, don't search the data-blob for
                             * pointers that may point to other heap-blocks. */
-#else /* CONFIG_TRACE_MALLOC */
+#else /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 #define GFP_NOLEAK 0       /* Don't consider the data-blob a leak, even if it cannot be reached. */
 #define GFP_NOWALK 0       /* When searching for memory leaks, don't search the data-blob for
                             * pointers that may point to other heap-blocks. */
-#endif /* !CONFIG_TRACE_MALLOC */
+#endif /* !CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 
 
 
 
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 #define SIZEOF_MFREE (__SIZE_C(5) * __SIZEOF_POINTER__ + __SIZE_C(2))
-#else /* CONFIG_DEBUG_HEAP */
+#else /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 #define SIZEOF_MFREE (__SIZE_C(5) * __SIZEOF_POINTER__ + __SIZE_C(1))
-#endif /* !CONFIG_DEBUG_HEAP */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 #define HEAP_MINSIZE ((SIZEOF_MFREE + (HEAP_ALIGNMENT - 1)) & ~(HEAP_ALIGNMENT - 1u))
 
 
-#undef CONFIG_USE_SLAB_ALLOCATORS
-#if 1
-#define CONFIG_USE_SLAB_ALLOCATORS 1
-#endif
-
-
-#if 0 /* Only use slabs for allocations smaller than the minimum allowed allocation. */
-#define SLAB_MAXSIZE   (HEAP_MINSIZE - HEAP_ALIGNMENT)
-#else
-#define SLAB_MAXSIZE   (__SIZE_C(8) * __SIZEOF_POINTER__)
-#endif
-
-#if SLAB_MAXSIZE < (HEAP_MINSIZE - HEAP_ALIGNMENT)
-#undef SLAB_MAXSIZE
-#define SLAB_MAXSIZE   (HEAP_MINSIZE - HEAP_ALIGNMENT)
-#endif /* SLAB_MAXSIZE < (HEAP_MINSIZE - HEAP_ALIGNMENT) */
+/*[[[config CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS = true]]]*/
+#ifdef CONFIG_NO_KERNEL_SLAB_ALLOCATORS
+#undef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
+#elif !defined(CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS)
+#define CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
+#elif (-CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS - 1) == -1
+#undef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
+#define CONFIG_NO_KERNEL_SLAB_ALLOCATORS
+#endif /* ... */
+/*[[[end]]]*/
 
 
 
-#if SLAB_MAXSIZE <= HEAP_ALIGNMENT
+/*[[[config CONFIG_KERNEL_SLAB_MAXSIZE!: int = (__SIZE_C(8) * __SIZEOF_POINTER__)]]]*/
+#ifndef CONFIG_KERNEL_SLAB_MAXSIZE
+#define CONFIG_KERNEL_SLAB_MAXSIZE (__SIZE_C(8) * __SIZEOF_POINTER__)
+#endif /* !CONFIG_KERNEL_SLAB_MAXSIZE */
+/*[[[end]]]*/
+
+#if CONFIG_KERNEL_SLAB_MAXSIZE < (HEAP_MINSIZE - HEAP_ALIGNMENT)
+#undef CONFIG_KERNEL_SLAB_MAXSIZE
+#undef CONFIG_NO_KERNEL_SLAB_MAXSIZE
+#define CONFIG_KERNEL_SLAB_MAXSIZE   (HEAP_MINSIZE - HEAP_ALIGNMENT)
+#endif /* CONFIG_KERNEL_SLAB_MAXSIZE < (HEAP_MINSIZE - HEAP_ALIGNMENT) */
+
+
+
+#if CONFIG_KERNEL_SLAB_MAXSIZE <= HEAP_ALIGNMENT
 /* No point in using slab allocators now... */
-#undef CONFIG_USE_SLAB_ALLOCATORS
-#endif /* SLAB_MAXSIZE <= HEAP_ALIGNMENT */
+#undef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
+#endif /* CONFIG_KERNEL_SLAB_MAXSIZE <= HEAP_ALIGNMENT */
 
-#if defined(CONFIG_USE_SLAB_ALLOCATORS) || defined(__DEEMON__)
-#define KERNEL_SLAB_COUNT      (SLAB_MAXSIZE / HEAP_ALIGNMENT)
+#if defined(CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS) || defined(__DEEMON__)
+#define KERNEL_SLAB_COUNT      (CONFIG_KERNEL_SLAB_MAXSIZE / HEAP_ALIGNMENT)
 
 /*[[[deemon
 local is_first = true;

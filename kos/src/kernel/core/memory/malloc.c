@@ -101,10 +101,10 @@ NOTHROW(KCALL untraced_kmalloc_usable_size)(VIRT void *ptr) {
 	struct mptr *mblock;
 	if (!ptr)
 		return 0;
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr))
 		return SLAB_GET(ptr)->s_size;
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
 	mblock = mptr_get(ptr);
 	mptr_assert(mblock);
@@ -116,12 +116,12 @@ NOTHROW(KCALL untraced_kfree)(VIRT void *ptr) {
 	struct mptr *mblock;
 	if (!ptr)
 		return; /* Ignore NULL-pointers. */
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr)) {
 		slab_free(ptr);
 		return;
 	}
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
 	mblock = mptr_get(ptr);
 	mptr_assert(mblock);
@@ -134,12 +134,12 @@ NOTHROW(KCALL untraced_kffree)(VIRT void *ptr, gfp_t flags) {
 	struct mptr *mblock;
 	if (!ptr)
 		return; /* Ignore NULL-pointers. */
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr)) {
 		slab_ffree(ptr, flags);
 		return;
 	}
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
 	mblock = mptr_get(ptr);
 	mptr_assert(mblock);
@@ -230,10 +230,10 @@ untraced_kmalloc_printtrace(void *UNUSED(ptr),
 
 
 DEFINE_INTERN_ALIAS(untraced_kmalloc_trace, untraced_kmalloc_trace_nx);
-#ifndef CONFIG_USE_SLAB_ALLOCATORS
+#ifndef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 DEFINE_INTERN_ALIAS(untraced_kmalloc_noslab, untraced_kmalloc);
 DEFINE_INTERN_ALIAS(untraced_kmalloc_noslab_nx, untraced_kmalloc_nx);
-#endif /* !CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* !CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 DECL_END
 
@@ -245,9 +245,9 @@ DECL_END
 #endif /* !__INTELLISENSE__ */
 
 #include <asm/redirect.h>
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 #include <kernel/driver-param.h>
-#endif /* CONFIG_TRACE_MALLOC */
+#endif /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 
 DECL_BEGIN
 
@@ -288,16 +288,16 @@ DECL_BEGIN
 	cb(krealign_offset_nx, untraced_krealign_offset_nx)
 
 /* Define public symbols for untraced malloc functions. */
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 #define EXPORT(new, old) DEFINE_PUBLIC_WEAK_ALIAS(new, old); /* Allow override from "trace-malloc.c" */
-#else /* CONFIG_TRACE_MALLOC */
+#else /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 #define EXPORT(new, old) DEFINE_PUBLIC_ALIAS(new, old);
-#endif /* !CONFIG_TRACE_MALLOC */
+#endif /* !CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 MALLOC_EXPORT_TABLE(EXPORT)
 #undef EXPORT
 
 
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 #if __ARCH_REDIRECT_MAXBYTES != 0
 
 /* No-op replacements for `heap_validate()' and `heap_validate_all()' */
@@ -369,7 +369,7 @@ DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(kernel_disable_trace_malloc,
                                             KERNEL_COMMANDLINE_OPTION_TYPE_PRESENT,
                                             "nomall");
 #endif /* __ARCH_REDIRECT_MAXBYTES != 0 */
-#endif /* CONFIG_TRACE_MALLOC */
+#endif /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 
 DECL_END
 

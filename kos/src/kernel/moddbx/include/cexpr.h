@@ -25,7 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
 #include <kernel/types.h>
 
@@ -392,6 +392,6 @@ FUNDEF NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL cexpr_pushregister)(char const *__restrict name, size_t namelen);
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_MODDBX_INCLUDE_CEXPR_H */

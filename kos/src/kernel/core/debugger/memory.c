@@ -30,7 +30,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <debugger/hook.h>
 #include <debugger/rt.h>
 #include <kernel/mman.h>
@@ -391,6 +391,6 @@ NOTHROW(KCALL dbg_movememory)(void *dst, void const *src,
 
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_SRC_DEBUGGER_MEMORY_C */

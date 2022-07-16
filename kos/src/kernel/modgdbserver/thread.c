@@ -26,7 +26,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/except.h>
-#include <kernel/fpu.h> /* CONFIG_FPU */
+#include <kernel/fpu.h> /* CONFIG_HAVE_FPU */
 #include <kernel/printk.h>
 #include <sched/cpu.h>
 #include <sched/group.h>
@@ -122,9 +122,9 @@ NOTHROW(FCALL GDBThread_StopRPCImpl)(uintptr_t flags,
 	uintptr_t old_flags;
 	assert(!PREEMPTION_ENABLED());
 	task_pushconnections(&stop_event.e.tse_oldcon);
-#ifdef CONFIG_FPU
+#ifdef CONFIG_HAVE_FPU
 	fpustate_save();
-#endif /* CONFIG_FPU */
+#endif /* CONFIG_HAVE_FPU */
 	stop_event.e.tse_reason = NULL; /* Manual suspend -> No explicit reason */
 	if (flags & GDBTHREAD_STOPRPCIMPL_F_SETREASON) {
 		stop_event.r.dtr_signo  = 0;

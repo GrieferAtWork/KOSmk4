@@ -117,7 +117,7 @@ END(x86_syscall64_syscall)
 /************************************************************************/
 /* INT 80H TRACED ENTRY                                                 */
 /************************************************************************/
-#ifndef CONFIG_NO_SYSCALL_TRACING
+#ifndef CONFIG_NO_KERNEL_SYSCALL_TRACING
 .section .text.hot
 PUBLIC_FUNCTION(x86_syscall64_syscall_traced)
 	.cfi_startproc simple
@@ -193,7 +193,7 @@ PUBLIC_FUNCTION(x86_syscall64_syscall_traced)
 	jmp    .Lsyscall_syscall_64bit
 	.cfi_endproc
 END(x86_syscall64_syscall_traced)
-#endif /* !CONFIG_NO_SYSCALL_TRACING */
+#endif /* !CONFIG_NO_KERNEL_SYSCALL_TRACING */
 
 
 

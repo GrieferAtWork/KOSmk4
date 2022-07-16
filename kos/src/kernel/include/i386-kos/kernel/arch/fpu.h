@@ -22,20 +22,7 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_NO_FPU
-#ifdef CONFIG_FPU
-#if (CONFIG_FPU + 0) == 0
-#undef CONFIG_FPU
-#define CONFIG_NO_FPU 1
-#endif /* (CONFIG_FPU + 0) == 0 */
-#else /* CONFIG_FPU */
-#define CONFIG_FPU 1
-#endif /* CONFIG_FPU */
-#else /* !CONFIG_NO_FPU */
-#undef CONFIG_FPU
-#endif /* CONFIG_NO_FPU */
-
-#ifdef CONFIG_FPU
+#ifdef CONFIG_HAVE_FPU
 #include <kernel/types.h>
 #include <kos/kernel/fpu-state.h>
 
@@ -43,7 +30,6 @@
 #define FPU_STATE_XSTATE 1 /* `struct xfpustate' is used */
 
 #ifdef __CC__
-
 DECL_BEGIN
 
 /* [const] The type of FPU state used (One of `FPU_STATE_*') */
@@ -79,7 +65,6 @@ FUNDEF NOBLOCK void FCALL x86_fxrstor32(USER CHECKED struct xfpustate const *sta
 /* The value that will always be written to `struct xfpustate::fs_mxcsr_mask' */
 DATDEF u32 const x86_fxsave_mxcsr_mask;
 
-
 #ifdef __x86_64__
 struct fpustate32;
 FUNDEF NOBLOCK void FCALL
@@ -96,10 +81,7 @@ fpustate32_saveinto(USER CHECKED struct fpustate32 *state)
 #endif /* !__x86_64__ */
 
 DECL_END
-
 #endif /* __CC__ */
-
-#endif /* CONFIG_FPU */
-
+#endif /* CONFIG_HAVE_FPU */
 
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_FPU_H */

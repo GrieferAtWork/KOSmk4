@@ -26,7 +26,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
 #include <debugger/input.h>
 #include <debugger/rt.h>
@@ -3428,6 +3428,6 @@ NOTHROW(FCALL cmod_symenum_local)(/*in(oob_only)|out(undef)*/ struct cmodsyminfo
 
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_MODDBX_CMODULE_C */

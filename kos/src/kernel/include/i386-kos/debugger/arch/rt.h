@@ -24,7 +24,7 @@
 
 #include <debugger/config.h>
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <kernel/except.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
@@ -293,6 +293,6 @@ enum {
 #define X86_DBG_STATEKIND_SCPU 6 /* `struct scpustate' */
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_DEBUGGER_ARCH_RT_H */

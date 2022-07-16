@@ -39,7 +39,7 @@
 #include "include/cparser.h"
 #include "include/malloc.h"
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 DECL_BEGIN
 
 /* Try to auto-complete the given parser's expression by appending `str...+=len'
@@ -327,6 +327,6 @@ do_integer_or_float:
 }
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_MODDBX_CPARSER_C */

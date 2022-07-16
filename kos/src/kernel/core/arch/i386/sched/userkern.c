@@ -24,7 +24,7 @@
 #include <kernel/compiler.h>
 
 #include <sched/userkern.h>
-#ifndef CONFIG_NO_USERKERN_SEGMENT
+#ifndef CONFIG_NO_KERNEL_USERKERN_SEGMENT
 #ifndef __INTELLISENSE__
 #include <hybrid/host.h>
 
@@ -44,6 +44,6 @@
 #endif /* __x86_64__ */
 
 #endif /* !__INTELLISENSE__ */
-#endif /* !CONFIG_NO_USERKERN_SEGMENT */
+#endif /* !CONFIG_NO_KERNEL_USERKERN_SEGMENT */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_USERKERN_C */

@@ -158,7 +158,7 @@ NOTHROW(VCALL except_printf)(char const *__restrict reason, ...) {
 	va_end(args);
 }
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 PRIVATE ATTR_DBGTEXT void KCALL
 panic_uhe_dbg_main(unsigned int unwind_error,
                    void const *last_pc,
@@ -229,7 +229,7 @@ panic_uhe_dbg_main(unsigned int unwind_error,
 	dbg_main(0);
 }
 
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 INTDEF ATTR_COLD NONNULL((1, 3)) void KCALL
@@ -293,7 +293,7 @@ halt_unhandled_exception(unsigned int unwind_error,
 			si.si_signo = SIGABRT;
 		kernel_debugtrap(&info->ei_state, si.si_signo);
 	}
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	{
 		STRUCT_DBG_ENTRY_INFO(3) einfo;
 		/* Enter the debugger */
@@ -304,9 +304,9 @@ halt_unhandled_exception(unsigned int unwind_error,
 		einfo.ei_argv[2] = (void *)info;
 		dbg_enter((struct dbg_entry_info *)&einfo, unwind_state);
 	}
-#else /* CONFIG_HAVE_DEBUGGER */
+#else /* CONFIG_HAVE_KERNEL_DEBUGGER */
 	kernel_panic(unwind_state, "Unhandled exception\n");
-#endif /* !CONFIG_HAVE_DEBUGGER */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
 }
 
 

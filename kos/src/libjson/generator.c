@@ -42,9 +42,16 @@
 
 DECL_BEGIN
 
-#undef CONFIG_JSON_GENERATOR_PRINTS_WARNINGS
-#define CONFIG_JSON_GENERATOR_PRINTS_WARNINGS 1
-
+/*[[[config CONFIG_LIBJSON_GENERATOR_PRINTS_WARNINGS = true]]]*/
+#ifdef CONFIG_NO_LIBJSON_GENERATOR_PRINTS_WARNINGS
+#undef CONFIG_LIBJSON_GENERATOR_PRINTS_WARNINGS
+#elif !defined(CONFIG_LIBJSON_GENERATOR_PRINTS_WARNINGS)
+#define CONFIG_LIBJSON_GENERATOR_PRINTS_WARNINGS
+#elif (-CONFIG_LIBJSON_GENERATOR_PRINTS_WARNINGS - 1) == -1
+#undef CONFIG_LIBJSON_GENERATOR_PRINTS_WARNINGS
+#define CONFIG_NO_LIBJSON_GENERATOR_PRINTS_WARNINGS
+#endif /* ... */
+/*[[[end]]]*/
 
 #define DO(x)                           \
 	do {                                \
@@ -54,7 +61,7 @@ DECL_BEGIN
 
 
 
-#ifdef CONFIG_JSON_GENERATOR_PRINTS_WARNINGS
+#ifdef CONFIG_LIBJSON_GENERATOR_PRINTS_WARNINGS
 #define MESSAGE(...) libjson_output_message(writer, __VA_ARGS__)
 PRIVATE NONNULL((1, 2)) int CC
 libjson_output_message(struct json_writer *__restrict writer,
@@ -84,9 +91,9 @@ err_printer:
 	writer->jw_result = temp;
 	return -1;
 }
-#else /* CONFIG_JSON_GENERATOR_PRINTS_WARNINGS */
+#else /* CONFIG_LIBJSON_GENERATOR_PRINTS_WARNINGS */
 #define MESSAGE(...) (void)0
-#endif /* !CONFIG_JSON_GENERATOR_PRINTS_WARNINGS */
+#endif /* !CONFIG_LIBJSON_GENERATOR_PRINTS_WARNINGS */
 
 
 #define GENFLAG_NORMAL   0x0000

@@ -32,28 +32,39 @@
 #include <sys/epoll.h>
 
 
-/* Kernel feature: EPOLL monitors can be used to send RPCs */
-#undef CONFIG_HAVE_EPOLL_RPC
-#if 1
-#define CONFIG_HAVE_EPOLL_RPC 1
-#endif
+/*[[[config CONFIG_HAVE_KERNEL_EPOLL_RPC = true
+ * Kernel feature: EPOLL monitors can be used to send RPCs.
+ * ]]]*/
+#ifdef CONFIG_NO_KERNEL_EPOLL_RPC
+#undef CONFIG_HAVE_KERNEL_EPOLL_RPC
+#elif !defined(CONFIG_HAVE_KERNEL_EPOLL_RPC)
+#define CONFIG_HAVE_KERNEL_EPOLL_RPC
+#elif (-CONFIG_HAVE_KERNEL_EPOLL_RPC - 1) == -1
+#undef CONFIG_HAVE_KERNEL_EPOLL_RPC
+#define CONFIG_NO_KERNEL_EPOLL_RPC
+#endif /* ... */
+/*[[[end]]]*/
 
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 #include <sched/rpc-internal.h> /* struct pending_rpc */
 #include <kos/lockop.h>
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
 #ifdef __CC__
 DECL_BEGIN
 
 
-#ifndef CONFIG_EPOLL_MAX_NESTING
-#define CONFIG_EPOLL_MAX_NESTING 4 /* NOTE: Linux also uses `4' for this */
-#endif /* !CONFIG_EPOLL_MAX_NESTING */
+/*[[[config CONFIG_KERNEL_EPOLL_MAX_NESTING! = 4
+ * NOTE: Linux also uses `4' for this
+ * ]]]*/
+#ifndef CONFIG_KERNEL_EPOLL_MAX_NESTING
+#define CONFIG_KERNEL_EPOLL_MAX_NESTING 4
+#endif /* !CONFIG_KERNEL_EPOLL_MAX_NESTING */
+/*[[[end]]]*/
 
 struct epoll_controller;
 
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 struct taskpid;
 struct epoll_monitor_rpc {
 	union {
@@ -69,10 +80,10 @@ struct epoll_monitor_rpc {
 #endif /* OFFSET_PENDING_RPC_LINK != 0 */
 	};
 };
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
 struct epoll_handle_monitor {
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 	union {
 		struct {
 			struct epoll_controller     *ehm_ctrl;  /* [1..1][const][valid_if(!epoll_handle_monitor_isrpc || ehm_rpc != NULL)]
@@ -85,14 +96,14 @@ struct epoll_handle_monitor {
 		Tobpostlockop(epoll_controller) _ehm_plop;  /* Used internally... */
 		Toblockop(epoll_controller)     _ehm_lop;   /* Used internally... */
 	};
-#else /* CONFIG_HAVE_EPOLL_RPC */
+#else /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 	struct epoll_controller     *ehm_ctrl;  /* [1..1][const][valid_if(!epoll_handle_monitor_isrpc || ehm_rpc != NULL)]
 	                                         * The  primary epoll controller  (exists once for  every epoll-fd that is
 	                                         * created  by  user-space,  whereas  this   `struct epoll_handle_monitor'
 	                                         * exists once for every monitored file descriptor, aka. handle) */
 	struct epoll_handle_monitor *ehm_rnext; /* [0..1][valid_if(!epoll_handle_monitor_isrpc)]
 	                                         * Next   monitor   that   has   been    raised. */
-#endif /* !CONFIG_HAVE_EPOLL_RPC */
+#endif /* !CONFIG_HAVE_KERNEL_EPOLL_RPC */
 	uintptr_half_t               ehm_raised;  /* [lock(ATOMIC)][valid_if(!epoll_handle_monitor_isrpc)]
 	                                           * Incremented  once the monitored  condition is met.  When this happens, the
 	                                           * monitor is added to the chain of raised monitors, and `ehm_ctrl->ec_avail'
@@ -107,14 +118,14 @@ struct epoll_handle_monitor {
 	WEAK REF void               *ehm_handptr; /* [const][1..1] Handle type pointer. (always valid in the context of `ehm_handtyp') */
 	uint32_t                     ehm_fdkey;   /* [const] FD-key used to differentiate monitors for the same file. */
 	uint32_t                     ehm_events;  /* [lock(ehm_ctrl->ec_lock)] Epoll events (Set of `EPOLL*'; s.a. `EPOLL_EVENTS') */
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 	union {
 		union epoll_data          ehm_data;   /* [lock(ehm_ctrl->ec_lock)][valid_if(!epoll_handle_monitor_isrpc)] Epoll user data. */
 		struct epoll_monitor_rpc *ehm_rpc;    /* [0..1][owned][lock(CLEAR_ONCE(ATOMIC))][valid_if(epoll_handle_monitor_isrpc)] RPC send on rising edge. */
 	};
-#else /* CONFIG_HAVE_EPOLL_RPC */
+#else /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 	union epoll_data             ehm_data;    /* [lock(ehm_ctrl->ec_lock)] Epoll user data. */
-#endif /* !CONFIG_HAVE_EPOLL_RPC */
+#endif /* !CONFIG_HAVE_KERNEL_EPOLL_RPC */
 	struct sig_multicompletion   ehm_comp;    /* Completion controller attached to pollable signals of `ehm_hand'
 	                                           * Signals monitored by this controller are established by doing  a
 	                                           * regular `handle_poll()' on `ehm_hand', followed by making use of
@@ -129,9 +140,9 @@ struct epoll_handle_monitor {
 	((self)->ehm_comp.sm_set.sms_routes[0].tc_signext = (struct task_connection *)(uintptr_t)(uint32_t)(value))
 
 /* Check if a given monitor is an RPC event (as opposed to a pollable event) */
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 #define epoll_handle_monitor_isrpc(self) ((self)->ehm_raised == (uintptr_half_t)-1)
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
 
 struct epoll_controller_ent {
@@ -154,9 +165,9 @@ struct epoll_controller {
 	                                                  * descriptors. Additionally, `epoll_wait(2)' will temporarily acquire
 	                                                  * a this lock while searching for handle monitors that may have  been
 	                                                  * raised in the mean time. */
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 	Toblockop_slist(epoll_controller) ec_lops;       /* Lock operations. */
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 	WEAK struct epoll_handle_monitor *ec_raised;     /* [0..1][lock(APPEND(ATOMIC), CLEAR(ec_lock))]
 	                                                  * Singly linked list  of raised monitors  (chained via  `ehm_rnext').
 	                                                  * By taking an element from this chain, you implicitly acquire a lock
@@ -175,13 +186,13 @@ struct epoll_controller {
 	                                                  * For  hashing,  the  `h_data'  pointer  of  handles  is  used. */
 };
 
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL _epoll_controller_lock_reap)(struct epoll_controller *__restrict self);
 #define epoll_controller_lock_reap(self)    (void)(!oblockop_mustreap(&(self)->ec_lops) || (_epoll_controller_lock_reap(self), 0))
 #define epoll_controller_lock_release(self) (shared_lock_release(&(self)->ec_lock), epoll_controller_lock_reap(self))
-#else /* CONFIG_HAVE_EPOLL_RPC */
+#else /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 #define epoll_controller_lock_release(self) shared_lock_release(&(self)->ec_lock)
-#endif /* !CONFIG_HAVE_EPOLL_RPC */
+#endif /* !CONFIG_HAVE_KERNEL_EPOLL_RPC */
 #define _epoll_controller_lock_release(self)   shared_lock_release(&(self)->ec_lock)
 #define epoll_controller_lock_tryacquire(self) shared_lock_tryacquire(&(self)->ec_lock)
 #define epoll_controller_lock_acquire(self)    shared_lock_acquire(&(self)->ec_lock)
@@ -212,7 +223,7 @@ epoll_controller_create(void) THROWS(E_BADALLOC);
  * @throw: E_ILLEGAL_REFERENCE_LOOP: `hand' is another epoll controller that is either the same
  *                                   as `self', or is already monitoring `self'. Also thrown if
  *                                   the max depth of nested epoll controllers would exceed the
- *                                   compile-time `CONFIG_EPOLL_MAX_NESTING' limit.
+ *                                   compile-time `CONFIG_KERNEL_EPOLL_MAX_NESTING' limit.
  * @return: true:  Success
  * @return: false: Another monitor for `hand:fd_key' already exists. */
 FUNDEF NONNULL((1, 2)) bool KCALL
@@ -223,7 +234,7 @@ epoll_controller_addmonitor(struct epoll_controller *__restrict self,
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_SEGFAULT,
 		       E_ILLEGAL_REFERENCE_LOOP);
 
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 /* Add a monitor for `hand' to the given epoll controller. When a raising edge
  * for the monitored conditions is detected (or if the conditions are  already
  * met at the time of the this function being called), trigger delivery of the
@@ -237,7 +248,7 @@ epoll_controller_addmonitor(struct epoll_controller *__restrict self,
  * @throw: E_ILLEGAL_REFERENCE_LOOP: `hand' is another epoll controller that is either the same
  *                                   as `self', or is already monitoring `self'. Also thrown if
  *                                   the max depth of nested epoll controllers would exceed the
- *                                   compile-time `CONFIG_EPOLL_MAX_NESTING' limit.
+ *                                   compile-time `CONFIG_KERNEL_EPOLL_MAX_NESTING' limit.
  * @return: true:  Success
  * @return: false: Another monitor for `hand:fd_key' already exists. */
 FUNDEF NONNULL((1, 2, 5)) bool KCALL
@@ -246,7 +257,7 @@ epoll_controller_addmonitor_rpc(struct epoll_controller *__restrict self,
                                 uint32_t fd_key, uint32_t events,
                                 /*inherit(always)*/ struct epoll_monitor_rpc *__restrict rpc)
 		THROWS(E_BADALLOC, E_WOULDBLOCK, E_ILLEGAL_REFERENCE_LOOP);
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
 
 /* Modify the monitor for `hand:fd_key' within the given epoll controller.

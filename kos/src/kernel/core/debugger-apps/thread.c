@@ -30,7 +30,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
@@ -82,11 +82,11 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 	if (task_getprocpid_of(thread) == task_getprocpid_of(dbg_current))
 		dbg_setbgcolor(ANSITTY_CL_DARK_GRAY);
 	ei = &FORMMAN(thread->t_mman, thismman_execinfo);
-#ifdef CONFIG_HAVE_TASK_COMM
+#ifdef CONFIG_HAVE_KERNEL_TASK_COMM
 	if (FORTASK(thread, this_comm[0]) != '\0') {
 		len = dbg_print(FORTASK(thread, this_comm));
 	} else
-#endif /* CONFIG_HAVE_TASK_COMM */
+#endif /* CONFIG_HAVE_KERNEL_TASK_COMM */
 	if (ei->mei_dent) {
 		len = dbg_printer(NULL,
 		                  ei->mei_dent->fd_name,
@@ -321,6 +321,6 @@ DBG_COMMAND_AUTO(thread, DBG_HOOKFLAG_NORMAL,
 }
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_SRC_DEBUGGER_APPS_THREAD_C */

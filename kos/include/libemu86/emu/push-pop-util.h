@@ -27,7 +27,7 @@
 /* 66 XX push16
  *    XX push32 (in 32-bit  mode)
  *    XX illegal (in 64-bit mode) */
-#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
+#if LIBEMU86_CONFIG_WANT_16BIT || LIBEMU86_CONFIG_WANT_32BIT
 #define EMU86_PUSH1632(T, value)                     \
 	do {                                             \
 		byte_t *sp;                                  \
@@ -79,7 +79,7 @@
 /* 66 XX pop16
  *    XX pop32   (in 32-bit mode)
  *    XX illegal (in 64-bit mode) */
-#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
+#if LIBEMU86_CONFIG_WANT_16BIT || LIBEMU86_CONFIG_WANT_32BIT
 #define EMU86_POP1632(T, setter)                     \
 	do {                                             \
 		byte_t *sp;                                  \

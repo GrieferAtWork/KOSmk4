@@ -47,7 +47,7 @@ DECL_BEGIN
 #define HAVE_INSTR_INVLPG          X86_HAVE_INSTR_INVLPG
 #define HAVE_INSTR_INVPCID         X86_HAVE_INSTR_INVPCID
 
-#if !defined(CONFIG_NO_PAGING_P32) && !defined(CONFIG_NO_PAGING_PAE)
+#if !defined(CONFIG_NO_KERNEL_X86_PAGING_P32) && !defined(CONFIG_NO_KERNEL_X86_PAGING_PAE)
 STATIC_ASSERT((u64)P32_PAGE_FGLOBAL == (u64)PAE_PAGE_FGLOBAL);
 #if PAE_PAGE_FGLOBAL <= 0xffffffff /* This is faster because GCC can assume that the upper 32 bits are 0 */
 INTERN ATTR_PAGING_READMOSTLY u32 used_pxx_page_fglobal = (u32)PAE_PAGE_FGLOBAL;
@@ -61,10 +61,10 @@ INTERN ATTR_PAGING_READMOSTLY union {
 #define USED_P32_PAGE_FGLOBAL     used_pxx_page_fglobal.p32
 #define USED_PAE_PAGE_FGLOBAL     used_pxx_page_fglobal.pae
 #endif /* PAE_PAGE_FGLOBAL > 0xffffffff */
-#elif !defined(CONFIG_NO_PAGING_P32)
+#elif !defined(CONFIG_NO_KERNEL_X86_PAGING_P32)
 INTERN ATTR_PAGING_READMOSTLY u32 used_pxx_page_fglobal = P32_PAGE_FGLOBAL; /* Cleared during init if unsupported */
 #define USED_P32_PAGE_FGLOBAL     used_pxx_page_fglobal
-#elif !defined(CONFIG_NO_PAGING_PAE)
+#elif !defined(CONFIG_NO_KERNEL_X86_PAGING_PAE)
 #if PAE_PAGE_FGLOBAL <= 0xffffffff /* This is faster because GCC can assume that the upper 32 bits are 0 */
 INTERN ATTR_PAGING_READMOSTLY u32 used_pxx_page_fglobal = (u32)PAE_PAGE_FGLOBAL; /* Cleared during init if unsupported */
 #else /* PAE_PAGE_FGLOBAL <= 0xffffffff */
@@ -74,18 +74,18 @@ INTERN ATTR_PAGING_READMOSTLY u64 used_pxx_page_fglobal = PAE_PAGE_FGLOBAL; /* C
 #endif /* ... */
 
 
-#ifndef CONFIG_NO_PAGING_P32
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_P32
 #define HAVE_4MIB_PAGES           X86_HAVE_4MIB_PAGES
-#endif /* !CONFIG_NO_PAGING_P32 */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_P32 */
 
-#ifndef CONFIG_NO_PAGING_PAE
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_PAE
 #define HAVE_2MIB_PAGES           1 /* Always supported */
 /* TODO: Take this into account:  When you set  bit 34 of  the 0x01A0 MSR  on an Intel  processor
  *                                you clear the bit 20 of EDX for CPUID/EAX=800000001h, disabling
  *                                your ability to enable the execute disable bit
  * From: https://forum.osdev.org/viewtopic.php?f=1&t=18945 */
 #define HAVE_EXECUTE_DISABLE      X86_HAVE_EXECUTE_DISABLE
-#endif /* !CONFIG_NO_PAGING_PAE */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_PAE */
 
 
 /* Lock counter to indicate that some thread somewhere is setting the

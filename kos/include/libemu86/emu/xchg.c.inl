@@ -138,13 +138,13 @@ case EMU86_OPCODE_ENCODE(0x90) ... EMU86_OPCODE_ENCODE(0x97):
 	 * REX.W + 90+rd     XCHG r64, RAX     Exchange RAX with r64. */
 	u8 regno;
 	regno = tiny_opcode - EMU86_OPCODE_ENCODE(0x90);
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 	if (op_flags & EMU86_F_REX_B)
 		regno |= 0x8;
 	if (IS_64BIT()) {
 		DEFINE_XCHG_reg(Q, 64, regno, RAX)
 	} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	if (!IS_16BIT()) {
 		DEFINE_XCHG_reg(L, 32, regno, EAX)
 	} else {

@@ -32,7 +32,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <debugger/debugger.h>
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <kernel/except.h>
 
 #include <hybrid/align.h>
@@ -50,7 +50,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 DECL_BEGIN
 
 
-/* Always display a list above of the commandline containing the
+/*[[[config CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE = true
+ * Always display a list above of the commandline containing the
  * names of all commands start with the currently entered  word.
  *
  * ```
@@ -61,11 +62,16 @@ DECL_BEGIN
  *
  * Where uppercase letter are printed in a different color. (and _ is the cursor)
  * Without this  option,  this list  is  only  displayed after  TAB  is  pressed.
- */
-#undef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
-#if 1
-#define CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE 1
-#endif
+ * ]]]*/
+#ifdef CONFIG_NO_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE
+#undef CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE
+#elif !defined(CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE)
+#define CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE
+#elif (-CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE - 1) == -1
+#undef CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE
+#define CONFIG_NO_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE
+#endif /* ... */
+/*[[[end]]]*/
 
 
 /* ColorConfiguration for the auto-completion box. */
@@ -493,11 +499,11 @@ NOTHROW(KCALL dbg_waitforinput)(void) {
 PRIVATE ATTR_DBGTEXT ATTR_NOINLINE size_t
 NOTHROW(KCALL dbg_autocomplete)(size_t cursor,
                                 u32 screen_cursor_pos
-#ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
+#ifdef CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE
                                 ,
                                 bool *pbad_cmd,
                                 bool insert_match
-#endif /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+#endif /* CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE */
                                 ) {
 	size_t argc, effective_argc;
 	dbg_autocomplete_t autofun;
@@ -547,10 +553,10 @@ do_autocomplete:
 			/* No such command (can't auto-complete).
 			 * -> Re-print the command name in red */
 setcolor_badcmd:
-#ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
+#ifdef CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE
 			if (pbad_cmd)
 				*pbad_cmd = true;
-#endif /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+#endif /* CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE */
 			goto done;
 		}
 		if (!dbg_commandhook_hasauto(command)) {
@@ -585,9 +591,9 @@ set_starts_empty_string:
 			goto setcolor_badcmd;
 		goto done; /* Nothing to do here! */
 	}
-#ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
+#ifdef CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE
 	if (insert_match)
-#endif /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+#endif /* CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE */
 	{
 		if (cookie.cnt.acc_common[0] != '\0' &&
 		    (memchr(cookie.cnt.acc_common, '\0', sizeof(cookie.cnt.acc_common)) != NULL ||
@@ -892,9 +898,9 @@ again_readline:
 		dbg_setcolor(ANSITTY_CL_WHITE, ANSITTY_CL_DARK_GRAY);
 		dbg_setcur_visible(true);
 		{
-#ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
+#ifdef CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE
 			bool should_print_autocomplete, did_press_tab;
-#endif /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+#endif /* CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE */
 			unsigned int code, field_width;
 			u32 cur = dbg_getcur();
 			size_t cursor_pos, screen_left;
@@ -903,13 +909,13 @@ again_readline:
 			cmdline_current = cmdline_latest;
 /*continue_readline_sol:*/
 			cursor_pos = screen_left = 0;
-#ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
+#ifdef CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE
 			should_print_autocomplete = true;
 			did_press_tab             = false;
-#endif /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+#endif /* CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE */
 continue_readline:
 			field_width = dbg_screen_width - DBG_GETCUR_X(cur);
-#ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
+#ifdef CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE
 			if (should_print_autocomplete || did_press_tab) {
 				bool badcmd = false;
 				/* Don't  allow  auto-completion to  be aborted
@@ -935,37 +941,37 @@ continue_readline:
 			}
 			did_press_tab             = false;
 			should_print_autocomplete = true;
-#endif /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+#endif /* CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE */
 			code = dbg_editfield(DBG_GETCUR_X(cur), DBG_GETCUR_Y(cur),
 			                     field_width, cmdline, DBG_MAXLINE,
 			                     &cursor_pos, &screen_left,
-#ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
+#ifdef CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE
 			                     true
-#else /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+#else /* CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE */
 			                     false
-#endif /* !CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+#endif /* !CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE */
 			                     );
 			switch (code) {
 
-#ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
+#ifdef CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE
 			case DBG_EDITFIELD_RETURN_ESC:
 				/* Re-print while hiding the auto completion menu. */
 				should_print_autocomplete = false;
 				goto continue_readline;
-#endif /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+#endif /* CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE */
 
 			case DBG_EDITFIELD_RETURN_ENTER:
 				break;
 
 			case DBG_EDITFIELD_RETURN_TAB:
-#ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
+#ifdef CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE
 				did_press_tab = true;
-#else /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+#else /* CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE */
 				cursor_pos = dbg_autocomplete(cursor_pos,
 				                              DBG_MAKECUR(DBG_GETCUR_X(cur) + (cursor_pos -
 				                                                               screen_left),
 				                                          DBG_GETCUR_Y(cur)));
-#endif /* !CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+#endif /* !CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE */
 				goto continue_readline;
 
 			case DBG_EDITFIELD_RETURN_CTRL_C: {
@@ -998,14 +1004,14 @@ continue_readline_eol:
 					cursor_pos  = strlen(cmdline);
 					screen_left = 0;
 				}
-#ifdef CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE
+#ifdef CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE
 continue_readline_noauto:
 				should_print_autocomplete = false;
 				goto continue_readline;
-#else /* CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+#else /* CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE */
 #define continue_readline_noauto continue_readline
 				goto continue_readline;
-#endif /* !CONFIG_DBG_ALWAYS_SHOW_AUTOCOMLETE */
+#endif /* !CONFIG_KERNEL_DEBUGGER_ALWAYS_SHOW_AUTOCOMLETE */
 
 			case DBG_EDITFIELD_RETURN_DOWN:
 				if (cmdline_backlog_next())
@@ -1061,6 +1067,6 @@ continue_readline_noauto:
 
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_SRC_DEBUGGER_APPS_DBG_MAIN_C */

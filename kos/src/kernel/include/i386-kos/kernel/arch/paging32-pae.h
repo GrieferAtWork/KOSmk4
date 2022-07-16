@@ -29,7 +29,7 @@
 
 #include <stdbool.h>
 
-#ifndef CONFIG_NO_PAGING_PAE
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_PAE
 
 DECL_BEGIN
 
@@ -432,6 +432,6 @@ INTDEF NOBLOCK void NOTHROW(FCALL pae_pagedir_unsetchanged)(VIRT void *addrvpage
 
 DECL_END
 
-#endif /* !CONFIG_NO_PAGING_PAE */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_PAE */
 
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_PAGING32_PAE_H */

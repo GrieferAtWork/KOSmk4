@@ -228,10 +228,10 @@ NOTHROW(KCALL kernel_initialize_scheduler_after_smp)(void) {
 	FORTASK(task_template, this_kernel_stackpart_).mp_state = MPART_ST_VOID;
 	FORTASK(task_template, this_fs)                         = NULL;
 	FORTASK(task_template, this_handman)                    = NULL;
-#ifndef CONFIG_EVERYONE_IS_ROOT
+#ifndef CONFIG_KERNEL_EVERYONE_IS_ROOT
 	assert(FORTASK(task_template, this_cred) == &cred_kernel);
 	FORTASK(task_template, this_cred) = NULL;
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
+#endif /* !CONFIG_KERNEL_EVERYONE_IS_ROOT */
 }
 
 /* Define in "mman/driver.c" -- dirent with the string "/os/kernel.bin" */
@@ -281,7 +281,7 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	FORTASK(&asyncwork, this_taskpid) = &asyncwork_pid;
 
 	/* Assign task command names. */
-#ifdef CONFIG_HAVE_TASK_COMM
+#ifdef CONFIG_HAVE_KERNEL_TASK_COMM
 #define SET_TASK_NAME(thread, name)                         \
 	memcpy(FORTASK(thread, this_comm), name,                \
 	       MIN_C(COMPILER_STRLEN(name), TASK_COMM_LEN - 1), \
@@ -290,7 +290,7 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	SET_TASK_NAME(&bootidle, "idle0");
 	SET_TASK_NAME(&asyncwork, "async0");
 #undef SET_TASK_NAME
-#endif /* CONFIG_HAVE_TASK_COMM */
+#endif /* CONFIG_HAVE_KERNEL_TASK_COMM */
 
 	/* Assign exec information to `mman_kernel'.
 	 * This might not be the perfect place to do so, but since I don't want to  add

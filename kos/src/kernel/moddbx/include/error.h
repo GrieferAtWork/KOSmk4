@@ -26,7 +26,7 @@
 
 #include <debugger/config.h>
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 DECL_BEGIN
 
 #define DBX_EISERR(x) ((x) < 0) /* Check for error */
@@ -52,6 +52,6 @@ FUNDEF ATTR_CONST WUNUSED char const *
 NOTHROW(FCALL dbx_strerror)(dbx_errno_t error);
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_MODDBX_INCLUDE_ERROR_H */

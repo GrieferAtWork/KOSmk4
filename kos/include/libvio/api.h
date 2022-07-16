@@ -24,17 +24,30 @@
 
 #include <hybrid/host.h>
 
+#ifdef __KERNEL__
+/*[[[config CONFIG_HAVE_KERNEL_VIO = true]]]*/
+#ifdef CONFIG_NO_KERNEL_VIO
+#undef CONFIG_HAVE_KERNEL_VIO
+#elif !defined(CONFIG_HAVE_KERNEL_VIO)
+#define CONFIG_HAVE_KERNEL_VIO
+#elif (-CONFIG_HAVE_KERNEL_VIO - 1) == -1
+#undef CONFIG_HAVE_KERNEL_VIO
+#define CONFIG_NO_KERNEL_VIO
+#endif /* ... */
+/*[[[end]]]*/
+#endif /* __KERNEL__ */
+
 
 /* Configure optional features based on architecture */
+#undef LIBVIO_CONFIG_ENABLED
+#if !defined(__KERNEL__) || !defined(CONFIG_NO_KERNEL_VIO)
 #define LIBVIO_CONFIG_ENABLED 1
+#endif /* !__KERNEL__ || !CONFIG_NO_KERNEL_VIO */
+
 #undef LIBVIO_CONFIG_HAVE_QWORD
 #undef LIBVIO_CONFIG_HAVE_QWORD_CMPXCH
 #undef LIBVIO_CONFIG_HAVE_XWORD_CMPXCH
-
-#if defined(__KERNEL__) && defined(CONFIG_NO_VIO)
-#undef LIBVIO_CONFIG_ENABLED
-#endif /* __KERNEL__ && CONFIG_NO_VIO */
-
+#ifdef LIBVIO_CONFIG_ENABLED
 #if defined(__x86_64__)
 #define LIBVIO_CONFIG_HAVE_QWORD        1
 #define LIBVIO_CONFIG_HAVE_QWORD_CMPXCH 1
@@ -48,6 +61,7 @@
 #define LIBVIO_CONFIG_HAVE_QWORD_CMPXCH 1
 #endif /* __SIZEOF_POINTER__ >= 8 */
 #endif /* !Arch... */
+#endif /* LIBVIO_CONFIG_ENABLED */
 
 
 #if defined(__i386__) && !defined(__x86_64__)

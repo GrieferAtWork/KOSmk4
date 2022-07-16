@@ -116,7 +116,7 @@ NOTHROW_NCX(CC json_ungetc)(struct json_parser *__restrict self) {
 	return result;
 }
 
-#ifndef CONFIG_NO_JSON_C_COMMENT_SUPPORT
+#ifndef CONFIG_NO_LIBJSON_SUPPORTS_C_COMMENT
 /* Skip a comment after already having parsed `/' and `*', with
  * the parser currently pointing at the first character of  the
  * comment body. */
@@ -297,21 +297,21 @@ comment_syn:
 	json_getc(self); /* '/' */
 	return JSON_ERROR_SYNTAX;
 }
-#endif /* !CONFIG_NO_JSON_C_COMMENT_SUPPORT */
+#endif /* !CONFIG_NO_LIBJSON_SUPPORTS_C_COMMENT */
 
 
 LOCAL NONNULL((1)) void
 NOTHROW_NCX(CC json_skip_whitespace)(struct json_parser *__restrict self) {
 	char const *prev;
 	char32_t ch;
-#ifndef CONFIG_NO_JSON_C_COMMENT_SUPPORT
+#ifndef CONFIG_NO_LIBJSON_SUPPORTS_C_COMMENT
 again:
-#endif /* !CONFIG_NO_JSON_C_COMMENT_SUPPORT */
+#endif /* !CONFIG_NO_LIBJSON_SUPPORTS_C_COMMENT */
 	do {
 		prev = self->jp_pos;
 		ch   = json_getc(self);
 	} while (unicode_isspace(ch));
-#ifndef CONFIG_NO_JSON_C_COMMENT_SUPPORT
+#ifndef CONFIG_NO_LIBJSON_SUPPORTS_C_COMMENT
 	if (ch == '/') {
 		ch = json_getc(self);
 		if (ch == '*') {
@@ -319,7 +319,7 @@ again:
 				goto again;
 		}
 	}
-#endif /* !CONFIG_NO_JSON_C_COMMENT_SUPPORT */
+#endif /* !CONFIG_NO_LIBJSON_SUPPORTS_C_COMMENT */
 	self->jp_pos = prev;
 }
 
@@ -327,13 +327,13 @@ LOCAL NONNULL((1)) void
 NOTHROW_NCX(CC json_skip_whitespace_at)(struct json_parser *__restrict self,
                                         char32_t ch, char const *prev) {
 	while (unicode_isspace(ch)) {
-#ifndef CONFIG_NO_JSON_C_COMMENT_SUPPORT
+#ifndef CONFIG_NO_LIBJSON_SUPPORTS_C_COMMENT
 again:
-#endif /* !CONFIG_NO_JSON_C_COMMENT_SUPPORT */
+#endif /* !CONFIG_NO_LIBJSON_SUPPORTS_C_COMMENT */
 		prev = self->jp_pos;
 		ch   = json_getc(self);
 	}
-#ifndef CONFIG_NO_JSON_C_COMMENT_SUPPORT
+#ifndef CONFIG_NO_LIBJSON_SUPPORTS_C_COMMENT
 	if (ch == '/') {
 		ch = json_getc(self);
 		if (ch == '*') {
@@ -341,7 +341,7 @@ again:
 				goto again;
 		}
 	}
-#endif /* !CONFIG_NO_JSON_C_COMMENT_SUPPORT */
+#endif /* !CONFIG_NO_LIBJSON_SUPPORTS_C_COMMENT */
 	self->jp_pos = prev;
 }
 
@@ -472,7 +472,7 @@ again:
 		result = JSON_PARSER_STRING;
 		break;
 
-#ifndef CONFIG_NO_JSON_C_COMMENT_SUPPORT
+#ifndef CONFIG_NO_LIBJSON_SUPPORTS_C_COMMENT
 	case '/':
 		ch = json_getc(self);
 		if (ch != '*')
@@ -481,7 +481,7 @@ again:
 		if (result == JSON_ERROR_OK)
 			goto again;
 		goto done;
-#endif /* !CONFIG_NO_JSON_C_COMMENT_SUPPORT */
+#endif /* !CONFIG_NO_LIBJSON_SUPPORTS_C_COMMENT */
 
 		/* Single-character tokens. */
 	case '[': case ']':
@@ -595,9 +595,9 @@ do_digit_inner:
 	}
 	/* Skip trailing whitespace. */
 	json_skip_whitespace(self);
-#ifndef CONFIG_NO_JSON_C_COMMENT_SUPPORT
+#ifndef CONFIG_NO_LIBJSON_SUPPORTS_C_COMMENT
 done:
-#endif /* !CONFIG_NO_JSON_C_COMMENT_SUPPORT */
+#endif /* !CONFIG_NO_LIBJSON_SUPPORTS_C_COMMENT */
 	return result;
 syn5:
 	json_ungetc(self);
@@ -660,7 +660,7 @@ again:
 		result = JSON_PARSER_STRING;
 	}	break;
 
-#ifndef CONFIG_NO_JSON_C_COMMENT_SUPPORT
+#ifndef CONFIG_NO_LIBJSON_SUPPORTS_C_COMMENT
 	case '/':
 		ch = json_ungetc(self);
 		if (ch != '*')
@@ -669,7 +669,7 @@ again:
 		if (result == JSON_ERROR_OK)
 			goto again;
 		goto done;
-#endif /* !CONFIG_NO_JSON_C_COMMENT_SUPPORT */
+#endif /* !CONFIG_NO_LIBJSON_SUPPORTS_C_COMMENT */
 
 	case '\"': /* String */
 		for (;;) {
@@ -782,9 +782,9 @@ do_decimal:
 		/* Anything else isn't allowed and indicates a syntax error. */
 		goto syn1;
 	}
-#ifndef CONFIG_NO_JSON_C_COMMENT_SUPPORT
+#ifndef CONFIG_NO_LIBJSON_SUPPORTS_C_COMMENT
 done:
-#endif /* !CONFIG_NO_JSON_C_COMMENT_SUPPORT */
+#endif /* !CONFIG_NO_LIBJSON_SUPPORTS_C_COMMENT */
 	return result;
 syn5:
 	json_getc(self);

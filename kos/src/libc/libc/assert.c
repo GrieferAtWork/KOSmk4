@@ -216,7 +216,7 @@ NOTHROW(FCALL libc_assertion_failure_core)(struct assert_args *__restrict args) 
 	                 UNWIND_USER_ASSERT);
 }
 
-#ifdef CONFIG_LOG_LIBC_UNIMPLEMENTED
+#ifdef LIBC_HAVE_LOG_UNIMPLEMENTED
 INTERN ATTR_SECTION(".text.crt.assert") void CC
 libc_unimplemented(char const *__restrict name) {
 	syslog(LOG_WARN, "[libc] Unimplemented function called: `%#q()'\n", name);
@@ -231,7 +231,7 @@ libc_unimplementedf(char const *__restrict format, ...) {
 	va_end(args);
 	syslog(LOG_WARN, "'\n");
 }
-#endif /* CONFIG_LOG_LIBC_UNIMPLEMENTED */
+#endif /* LIBC_HAVE_LOG_UNIMPLEMENTED */
 
 
 #ifndef __KERNEL__

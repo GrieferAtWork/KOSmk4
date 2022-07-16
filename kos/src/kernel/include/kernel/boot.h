@@ -23,7 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/arch/boot.h>
-#include <kernel/selftest.h> /* CONFIG_SELFTEST */
+#include <kernel/selftest.h> /* CONFIG_HAVE_KERNEL_SELFTEST */
 #include <kernel/types.h>
 
 DECL_BEGIN
@@ -59,9 +59,9 @@ INTDEF FREE void NOTHROW(KCALL kernel_initialize_ide_driver)(void);
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_fat_driver)(void);
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_rootfs)(void);
 
-#ifdef CONFIG_SELFTEST
+#ifdef CONFIG_HAVE_KERNEL_SELFTEST
 INTDEF FREE void NOTHROW(KCALL kernel_initialize_selftest)(void);
-#endif /* CONFIG_SELFTEST */
+#endif /* CONFIG_HAVE_KERNEL_SELFTEST */
 
 /* Update the given cpu state to start executing /bin/init, or whatever
  * was passed as  argument in a  `init=...' kernel commandline  option. */

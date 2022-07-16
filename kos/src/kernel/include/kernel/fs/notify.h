@@ -22,7 +22,9 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 #include <kernel/mman/mfile.h>
 #include <kernel/types.h>
 #include <sched/sig.h>
@@ -411,7 +413,7 @@ NOTHROW(FCALL mfile_inotify_ignored)(struct mfile *__restrict self);
 
 DECL_END
 #endif /* __CC__ */
-#else /* CONFIG_HAVE_FS_NOTIFY */
+#else /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 /* No-op directory-child-bind */
 #define dnotify_controller_bindchild(dir, child_dent, child_file) (child_file)
 
@@ -429,6 +431,6 @@ DECL_END
 #define mfile_inotify_deleted(self)          (void)0
 #define mfile_inotify_unmount(self)          (void)0
 #define mfile_inotify_ignored(self)          (void)0
-#endif /* !CONFIG_HAVE_FS_NOTIFY */
+#endif /* !CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FS_NOTIFY_H */

@@ -53,9 +53,9 @@ DECL_BEGIN
 INTERN struct slab_descriptor LOCAL_desc = {
 	.sd_lock = ATOMIC_LOCK_INIT,
 	.sd_free = LIST_HEAD_INITIALIZER(LOCAL_desc.sd_free),
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 	.sd_used = LIST_HEAD_INITIALIZER(LOCAL_desc.sd_used),
-#endif /* CONFIG_TRACE_MALLOC */
+#endif /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 	.sd_pend = SLIST_HEAD_INITIALIZER(LOCAL_desc.sd_pend),
 };
 
@@ -98,10 +98,10 @@ NOTHROW(KCALL LOCAL_slab_dofreeptr)(struct slab *__restrict self,
 	} else if (self->s_free == 1) {
 		/* Slab was fully allocated, but became partially allocated. */
 
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 		/* Unlink from `sd_used' */
 		LIST_REMOVE(self, s_link);
-#endif /* CONFIG_TRACE_MALLOC */
+#endif /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 
 		/* Insert into `LOCAL_desc.sd_free' */
 		LIST_INSERT_HEAD(&LOCAL_desc.sd_free, self, s_link);
@@ -131,9 +131,9 @@ again:
 	}
 	do {
 		next = SLIST_NEXT(pend, spf_link);
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 		mempatl(&pend->spf_link, DEBUGHEAP_NO_MANS_LAND, sizeof(pend->spf_link));
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 		LOCAL_slab_dofreeptr(SLAB_GET(pend), pend, GFP_NORMAL);
 		pend = next;
 	} while (pend);
@@ -147,10 +147,10 @@ NOTHROW(KCALL LOCAL_slab_freeptr)(struct slab *__restrict self,
                                   void *__restrict ptr,
                                   gfp_t flags) {
 	assert(self->s_size == SEGMENT_SIZE);
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 	if (!(flags & GFP_CALLOC))
 		mempatl(ptr, DEBUGHEAP_NO_MANS_LAND, SEGMENT_SIZE);
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 	if likely(slab_descriptor_tryacquire(&LOCAL_desc)) {
 		LOCAL_slab_dofreeptr(self, ptr, flags);
 		slab_descriptor_release(&LOCAL_desc);
@@ -158,14 +158,14 @@ NOTHROW(KCALL LOCAL_slab_freeptr)(struct slab *__restrict self,
 		/* Free asynchronously once the lock becomes available. */
 		struct slab_pending_free *pend;
 		pend = (struct slab_pending_free *)ptr;
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 #if SEGMENT_SIZE > __SIZEOF_POINTER__
 		if (flags & GFP_CALLOC) {
 			mempatl(pend + 1, DEBUGHEAP_NO_MANS_LAND,
 			        SEGMENT_SIZE - sizeof(*pend));
 		}
 #endif /* SEGMENT_SIZE > __SIZEOF_POINTER__ */
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 		SLIST_ATOMIC_INSERT(&LOCAL_desc.sd_pend, pend, spf_link);
 		LOCAL_slab_descriptor_service_pending();
 	}
@@ -218,12 +218,12 @@ again:
 			result = &SEGMENTS(result_page)[j + i * (BITS_PER_POINTER / SLAB_SEGMENT_STATUS_BITS)];
 			if (--result_page->s_free == 0) {
 				LIST_REMOVE(result_page, s_link);
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 				LIST_INSERT_HEAD(&LOCAL_desc.sd_used, result_page, s_link);
-#endif /* CONFIG_TRACE_MALLOC */
+#endif /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 			}
 			slab_descriptor_release(&LOCAL_desc);
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 			if (page_flags & SLAB_FCALLOC) {
 				if (!(flags & GFP_CALLOC))
 					mempatl(result, DEBUGHEAP_FRESH_MEMORY, SEGMENT_SIZE);
@@ -232,10 +232,10 @@ again:
 			} else {
 				mempatl(result, DEBUGHEAP_FRESH_MEMORY, SEGMENT_SIZE);
 			}
-#else /* CONFIG_DEBUG_HEAP */
+#else /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 			if ((flags & GFP_CALLOC) && !(page_flags & SLAB_FCALLOC))
 				bzero(result, SEGMENT_SIZE);
-#endif /* !CONFIG_DEBUG_HEAP */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 			return result;
 		}
 	}
@@ -302,9 +302,9 @@ err:
 PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
 LOCAL_slab_kmalloc(gfp_t flags) {
 	void *result;
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 	/* XXX: When `GFP_NOLEAK / GFP_NOWALK' are given, never allocate slab memory? */
-#endif /* !CONFIG_TRACE_MALLOC */
+#endif /* !CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 
 	/* Try to allocate from slab memory */
 	result = LOCAL_slab_malloc(flags);
@@ -320,9 +320,9 @@ LOCAL_slab_kmalloc(gfp_t flags) {
 PUBLIC ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW(KCALL LOCAL_slab_kmalloc_nx)(gfp_t flags) {
 	void *result;
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 	/* XXX: When `GFP_NOLEAK / GFP_NOWALK' are given, never allocate slab memory? */
-#endif /* !CONFIG_TRACE_MALLOC */
+#endif /* !CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 
 	/* Try to allocate from slab memory */
 	result = LOCAL_slab_malloc(flags);

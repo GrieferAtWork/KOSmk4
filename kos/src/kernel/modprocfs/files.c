@@ -31,6 +31,7 @@
 #include <kernel/fs/filehandle.h>
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/fs.h>
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/fs/notify.h>
 #include <kernel/fs/path.h>
 #include <kernel/fs/super.h>
@@ -1493,7 +1494,7 @@ procfs_sys_fs_pipemaxsize_write(USER CHECKED void const *buf,
 }
 
 
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 /************************************************************************/
 /* /proc/sys/fs/inotify/max_queued_events                               */
 /************************************************************************/
@@ -1510,7 +1511,7 @@ procfs_sys_fs_inotify_maxqueuedevents_write(USER CHECKED void const *buf,
 	new_maxevents = ProcFS_ParseUInt(buf, bufsize, 1, (unsigned int)0x10000);
 	ATOMIC_WRITE(notifyfd_default_maxevents, new_maxevents);
 }
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 
 /************************************************************************/
@@ -1712,7 +1713,7 @@ ProcFS_Sys_Net_Core_WmemMax_Write(USER CHECKED void const *buf, size_t bufsize) 
 /************************************************************************/
 /* /proc/kos/leaks                                                      */
 /************************************************************************/
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 
 struct memleaks: printnode {
 	kmalloc_leaks_t ml_leaks;   /* [0..1][const] Memory leaks. */
@@ -2017,7 +2018,7 @@ INTERN_CONST struct fregnode_ops const procfs_r_kos_leaks_ops = {
 		.no_wrattr = &fnode_v_wrattr_noop,
 	},
 };
-#endif /* CONFIG_TRACE_MALLOC */
+#endif /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 
 
 DECL_END

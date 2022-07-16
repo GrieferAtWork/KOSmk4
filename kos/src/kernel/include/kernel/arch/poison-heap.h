@@ -22,9 +22,9 @@
 
 #include <kernel/compiler.h>
 
-#undef CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS
-#undef CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS
-#define CONFIG_POISON_HEAP_NEED_VOID_FUNCTIONS 1 /* Need void-function overrides */
-#define CONFIG_POISON_HEAP_NEED_ZERO_FUNCTIONS 1 /* Need zero-function overrides */
+#undef POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS
+#undef POISON_HEAP_CONFIG_NEED_ZERO_FUNCTIONS
+#define POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS 1 /* Need void-function overrides */
+#define POISON_HEAP_CONFIG_NEED_ZERO_FUNCTIONS 1 /* Need zero-function overrides */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_ARCH_POISON_HEAP_H */

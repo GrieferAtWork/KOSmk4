@@ -475,7 +475,7 @@ struct viddev_ops {
 	                      struct vidtty *active_tty)
 			THROWS(E_IOERROR, E_WOULDBLOCK);
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	/* [0..1] Activate and return a video tty object for use within the builtin debugger.
 	 * - Called while the debugger is already active (dbg_active).
 	 * - Must _NOT_ clear the contents of the display buffer of the returned  tty.
@@ -494,7 +494,7 @@ struct viddev_ops {
 	 * - This function and `vdo_enterdbg()' are also used to implement the `screen' command */
 	NONNULL_T((1)) void
 	NOTHROW_T(FCALL *vdo_leavedbg)(struct viddev *__restrict self);
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 };
 

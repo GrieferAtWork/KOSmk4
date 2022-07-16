@@ -23,6 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/fs/node.h>
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/types.h>
 
 #include <hybrid/__alloca.h>
@@ -427,7 +428,7 @@ struct fdirnode_ops {
 			THROWS(E_SEGFAULT, E_FSERROR_ILLEGAL_PATH, E_FSERROR_DISK_FULL,
 			       E_FSERROR_READONLY, E_IOERROR, ...);
 
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 	/* [0..1]
 	 * Attach the notify-controller of `self' to the controllers
 	 * all currently-loaded (i.e. cached) child-files of `self':
@@ -450,7 +451,7 @@ struct fdirnode_ops {
 	BLOCKING NONNULL_T((1)) void
 	(KCALL *dno_attach_notify)(struct fdirnode *__restrict self)
 			THROWS(E_BADALLOC, ...);
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 };
 

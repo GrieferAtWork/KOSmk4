@@ -34,6 +34,7 @@
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/node.h>
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
 #include <kernel/malloc.h>
@@ -500,9 +501,9 @@ PUBLIC_CONST struct fdirnode_ops const ramfs_dirnode_ops = {
 	.dno_mkfile = &ramfs_dirnode_v_mkfile,
 	.dno_unlink = &ramfs_dirnode_v_unlink,
 	.dno_rename = &ramfs_dirnode_v_rename,
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 	.dno_attach_notify = &ramfs_dirnode_v_attach_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 };
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) struct ramfs_dirent *KCALL
@@ -1104,7 +1105,7 @@ again_acquire_locks:
 }
 
 
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 /* Return values for `ramfs_dirnode_dirent_traced()' */
 #define RAMFS_DIRNODE_DIRENT_TRACED_NO    0 /* Not traced */
 #define RAMFS_DIRNODE_DIRENT_TRACED_YES   1 /* Is traced */
@@ -1185,7 +1186,7 @@ ramfs_dirnode_v_attach_notify(struct fdirnode *__restrict self)
 		ramfs_dirnode_v_attach_notify_impl(me, me->rdn_dat.rdd_tree);
 	ramfs_dirnode_endread(me);
 }
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 
 
@@ -1406,9 +1407,9 @@ PUBLIC_CONST struct fsuper_ops const ramfs_super_ops = {
 		.dno_mkfile = &ramfs_super_v_mkfile,
 		.dno_unlink = &ramfs_super_v_unlink,
 		.dno_rename = &ramfs_super_v_rename,
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 		.dno_attach_notify = &ramfs_super_v_attach_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 	},
 };
 

@@ -85,7 +85,7 @@ DATDEF uint8_t __kernel_poisoned ASMNAME("_kernel_poisoned");
 PUBLIC uint8_t __kernel_poisoned = false;
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 DBG_COMMAND(unpoison,
             "unpoison\n"
             "\tClears the PANIC bit after kernel panic\n"
@@ -93,7 +93,7 @@ DBG_COMMAND(unpoison,
 	ATOMIC_AND(__kernel_poisoned, ~_KERNEL_POISON_PANIC);
 	return 0;
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 #undef LOG_STACK_REMAINDER
@@ -157,9 +157,9 @@ NOTHROW(KCALL _kernel_poison)(void) {
 	COMPILER_WRITE_BARRIER();
 
 	/* Redirect heap functions to use the poison heap */
-#ifdef CONFIG_HAVE_POISON_HEAP
+#ifdef CONFIG_HAVE_KERNEL_POISON_HEAP
 	ph_install();
-#endif /* CONFIG_HAVE_POISON_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_POISON_HEAP */
 
 	/* TODO: Turn system_clearcache() into a no-op.
 	 *       With the poison-heap, kfree() also becomes a no-op,
@@ -302,7 +302,7 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 }
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 PRIVATE ATTR_DBGTEXT void KCALL
 panic_assert_dbg_main(void *arg) {
 	struct assert_args *args;
@@ -331,7 +331,7 @@ panic_assert_dbg_main(void *arg) {
 	           kcpustate_getpc(&args->aa_state));
 	dbg_main(0);
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 INTERN ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NOINLINE ATTR_NORETURN void
@@ -365,19 +365,19 @@ NOTHROW(FCALL libc_assertion_failure_core)(struct assert_args *__restrict args) 
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled())
 		kernel_debugtrap(&args->aa_state, SIGTRAP);
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	/* Enter the debugger */
 	dbg_enter(&panic_assert_dbg_main, args,
 	          sizeof(*args), &args->aa_state);
-#else /* CONFIG_HAVE_DEBUGGER */
+#else /* CONFIG_HAVE_KERNEL_DEBUGGER */
 	PREEMPTION_HALT();
-#endif /* !CONFIG_HAVE_DEBUGGER */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
 }
 
 
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 PRIVATE ATTR_DBGTEXT void KCALL
 panic_assert_chk_print_message(void *arg) {
 	struct assert_args *args;
@@ -486,12 +486,12 @@ handle_retry_or_ignore:
 	dbg_setcur(0, 0);
 	panic_assert_dbg_main(arg);
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 INTERN ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_RETNONNULL WUNUSED NONNULL((1)) struct kcpustate *
 NOTHROW(FCALL libc_assertion_check_core)(struct assert_args *__restrict args) {
 	/* Check if assertion failures at the caller's PC should always be ignored. */
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	if (is_pc_always_ignored(kcpustate_getpc(&args->aa_state))) {
 		/* TODO: Make this part arch-independent */
 #ifdef __x86_64__
@@ -503,7 +503,7 @@ NOTHROW(FCALL libc_assertion_check_core)(struct assert_args *__restrict args) {
 #endif
 		return &args->aa_state;
 	}
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 	PREEMPTION_DISABLE();
 	_kernel_poison();
 	printk(KERN_RAW "\n\n\n");
@@ -534,19 +534,19 @@ NOTHROW(FCALL libc_assertion_check_core)(struct assert_args *__restrict args) {
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled())
 		kernel_debugtrap(&args->aa_state, SIGTRAP);
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	/* Enter the debugger */
 	dbg_enter(&panic_assert_chk_dbg_main,
 	          args, sizeof(*args),
 	          &args->aa_state);
-#else /* CONFIG_HAVE_DEBUGGER */
+#else /* CONFIG_HAVE_KERNEL_DEBUGGER */
 	PREEMPTION_HALT();
-#endif /* !CONFIG_HAVE_DEBUGGER */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
 }
 
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 PRIVATE ATTR_DBGTEXT void KCALL
 panic_genfail_dbg_main(/*char const **/ void *message) {
 	void const *pc, *prev_pc;
@@ -562,7 +562,7 @@ panic_genfail_dbg_main(/*char const **/ void *message) {
 	           (size_t)((byte_t const *)pc - (byte_t const *)prev_pc));
 	dbg_main(0);
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 /* The `__stack_chk_guard' global is read _very_ often,
@@ -587,14 +587,14 @@ NOTHROW(FCALL libc_stack_failure_core)(struct kcpustate *__restrict state) {
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled())
 		kernel_debugtrap(state, SIGSEGV);
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	/* Enter the debugger */
 	dbg_enter(&panic_genfail_dbg_main,
 	          (void *)DBGSTR("Stack check failure (corrupted cookie)\n"),
 	          state);
-#else /* CONFIG_HAVE_DEBUGGER */
+#else /* CONFIG_HAVE_KERNEL_DEBUGGER */
 	PREEMPTION_HALT();
-#endif /* !CONFIG_HAVE_DEBUGGER */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
 }
 
 INTERN ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN void
@@ -609,18 +609,18 @@ NOTHROW(FCALL libc_abort_failure_core)(struct kcpustate *__restrict state) {
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled())
 		kernel_debugtrap(state, SIGABRT);
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	/* Enter the debugger */
 	dbg_enter(&panic_genfail_dbg_main,
 	          (void *)DBGSTR("Kernel called abort()\n"),
 	          state);
-#else /* CONFIG_HAVE_DEBUGGER */
+#else /* CONFIG_HAVE_KERNEL_DEBUGGER */
 	PREEMPTION_HALT();
-#endif /* !CONFIG_HAVE_DEBUGGER */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
 }
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 struct panic_args {
 	char const *format;
 	va_list     args;
@@ -654,7 +654,7 @@ panic_kernel_dbg_main(void *arg) {
 	           prev_pc, (size_t)((byte_t const *)pc - (byte_t const *)prev_pc));
 	dbg_main(0);
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN void
 NOTHROW(FCALL kernel_vpanic_ucpustate_n)(unsigned int n_skip,
@@ -681,7 +681,7 @@ NOTHROW(FCALL kernel_vpanic_ucpustate_n)(unsigned int n_skip,
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled())
 		kernel_debugtrap(state, SIGABRT);
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	/* Enter the debugger */
 	{
 		struct panic_args pargs;
@@ -690,9 +690,9 @@ NOTHROW(FCALL kernel_vpanic_ucpustate_n)(unsigned int n_skip,
 		pargs.format = format;
 		dbg_enter(&panic_kernel_dbg_main, &pargs, state);
 	}
-#else /* CONFIG_HAVE_DEBUGGER */
+#else /* CONFIG_HAVE_KERNEL_DEBUGGER */
 	PREEMPTION_HALT();
-#endif /* !CONFIG_HAVE_DEBUGGER */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
 }
 
 PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN void

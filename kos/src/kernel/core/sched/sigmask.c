@@ -30,7 +30,7 @@
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/rt/except-handler.h>
-#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
+#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
@@ -190,7 +190,7 @@ this_kernel_sigmask = SIGSET_INIT_EMPTY;
 
 
 
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 PRIVATE ATTR_PURE WUNUSED bool FCALL
 usersigmask_ismasked_chk(signo_t signo) THROWS(E_SEGFAULT) {
 	ulongptr_t mask, word;
@@ -228,7 +228,7 @@ usersigmask_ismasked_chk(signo_t signo) THROWS(E_SEGFAULT) {
 	}
 	return result;
 }
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 
 
 /* NMI Signals (NonMaskableInterrupt)
@@ -298,7 +298,7 @@ static_assert(SIGMASK_ISMASKED_NOPF_NO == (int)(10 == 0));
 static_assert(SIGMASK_ISMASKED_NOPF_YES == (int)true);
 static_assert(SIGMASK_ISMASKED_NOPF_YES == (int)(10 != 0));
 
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 /* Try  to  switch  page  directory  to  that  of  `self',  and  make  use
  * of  memcpy_nopf()   to  try   to  read   its  user-space   userprocmask
  * to  determine  if  the  given   `signo'  is  currently  being   masked.
@@ -454,7 +454,7 @@ set_maybe_and_return:
 done:
 	return result;
 }
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 
 
 /* Helper  function that can  be used to determine  the masking status for
@@ -468,25 +468,25 @@ done:
  *              and this argument is true, then this call is allowed
  *              to block, as well as throw exceptions.
  * @return: * : One of `SIGMASK_ISMASKED_*' (see above) */
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 PUBLIC NOBLOCK_IF(!allow_blocking_and_exception_when_self_is_THIS_TASK || self != THIS_TASK)
 ATTR_PURE WUNUSED NONNULL((1)) int FCALL
 sigmask_ismasked_in(struct task *__restrict self, signo_t signo,
                     bool allow_blocking_and_exception_when_self_is_THIS_TASK)
 		THROWS(E_SEGFAULT)
-#else /* CONFIG_HAVE_USERPROCMASK */
+#else /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) int
 NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo)
 #define sigmask_ismasked_in(self, signo, _) sigmask_ismasked_in(self, signo)
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+#endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 {
 	int result;
 	uintptr_t thread_flags = ATOMIC_READ(self->t_flags);
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 	if (thread_flags & (TASK_FVFORK | TASK_FUSERPROCMASK))
-#else /* CONFIG_HAVE_USERPROCMASK */
+#else /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 	if (thread_flags & TASK_FVFORK)
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+#endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 	{
 		/* Special case for NMI signals, which are assumed to always be
 		 * unmasked, no matter what the thread's userprocmask may  say. */
@@ -494,9 +494,9 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo)
 			return SIGMASK_ISMASKED_NOPF_NO; /* Cannot be masked. */
 
 		/* A vfork'd thread always has all signals masked. */
-#ifndef CONFIG_HAVE_USERPROCMASK
+#ifndef CONFIG_HAVE_KERNEL_USERPROCMASK
 		return SIGMASK_ISMASKED_NOPF_YES;
-#else /* !CONFIG_HAVE_USERPROCMASK */
+#else /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 		if unlikely(thread_flags & TASK_FVFORK)
 			return SIGMASK_ISMASKED_NOPF_YES;
 
@@ -593,7 +593,7 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo)
 			preemption_pop(&was);
 		}
 		return result;
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 	}
 
 	/* Use the normal per-thread kernel sigmask. */
@@ -616,44 +616,44 @@ NOTHROW(FCALL sigmask_ismasked_in)(struct task *__restrict self, signo_t signo)
  * handles all of the special cases, including TASK_VFORK  and
  * TASK_USERPROCMASK, as well as making sure that SIGSTOP  and
  * SIGKILL are never considered to be masked. */
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 PUBLIC ATTR_PURE WUNUSED bool FCALL
 sigmask_ismasked(signo_t signo) THROWS(E_SEGFAULT)
-#else /* CONFIG_HAVE_USERPROCMASK */
+#else /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED bool
 NOTHROW(FCALL sigmask_ismasked)(signo_t signo)
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+#endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 {
 	bool result;
 	uintptr_t thread_flags;
 	thread_flags = PERTASK_GET(this_task.t_flags);
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 	if (thread_flags & (TASK_FVFORK | TASK_FUSERPROCMASK))
-#else /* CONFIG_HAVE_USERPROCMASK */
+#else /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 	if (thread_flags & TASK_FVFORK)
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+#endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 	{
 		/* Always behave as though this was `sigmask_full'. */
 		if (isnmi(signo))
 			return false; /* Cannot be masked. */
 
 		/* A vfork'd thread always has all signals masked. */
-#ifndef CONFIG_HAVE_USERPROCMASK
+#ifndef CONFIG_HAVE_KERNEL_USERPROCMASK
 		return true;
-#else /* !CONFIG_HAVE_USERPROCMASK */
+#else /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 		if unlikely(thread_flags & TASK_FVFORK)
 			return true;
 		/* The nitty-gritty case: The thread is using a userprocmask... */
 		result = usersigmask_ismasked_chk(signo);
 		return result;
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 	}
 	result = this_kernel_sigmask_ismember(signo) != 0;
 	return result;
 }
 
 
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 /* Non-faulting version of `sigmask_ismasked()'.
  * @return: * : One of `SIGMASK_ISMASKED_NOPF_*' */
 PUBLIC NOBLOCK ATTR_PURE WUNUSED int
@@ -675,7 +675,7 @@ NOTHROW(FCALL sigmask_ismasked_nopf)(signo_t signo) {
 		return SIGMASK_ISMASKED_NOPF_YES;
 	return SIGMASK_ISMASKED_NOPF_NO;
 }
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 
 
 /* Prepare the calling thread for a sigsuspend operation.
@@ -759,17 +759,17 @@ NOTHROW(FCALL sigmask_prepare_sigsuspend)(void) {
  *                 user-space (unless it  is known  that the  signal
  *                 mask didn't get less restrictive)
  * @return: false: The caller's signal mask remains unchanged. */
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 PUBLIC NONNULL((1)) bool FCALL
 sigmask_setmask(sigset_t const *__restrict mask)
 		THROWS(E_SEGFAULT)
-#else /* CONFIG_HAVE_USERPROCMASK */
+#else /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL sigmask_setmask)(sigset_t const *__restrict mask)
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+#endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 {
 	bool changed;
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 		USER CHECKED struct userprocmask *um;
 		USER UNCHECKED sigset_t *umask;
@@ -812,7 +812,7 @@ NOTHROW(FCALL sigmask_setmask)(sigset_t const *__restrict mask)
 		if (changed)
 			memcpy(umask, mask, umasksize);
 	} else
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+#endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 	{
 		sigset_t *mymask;
 		mymask  = &THIS_KERNEL_SIGMASK;
@@ -842,7 +842,7 @@ sigmask_setmask_from_user(USER CHECKED sigset_t const *mask, size_t size)
 
 
 /* Get the calling thread's current signal mask. */
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 PUBLIC NONNULL((1)) void FCALL
 sigmask_getmask(sigset_t *__restrict mask)
 		THROWS(E_SEGFAULT) {
@@ -867,10 +867,10 @@ sigmask_getmask(sigset_t *__restrict mask)
 		memcpy(mask, &THIS_KERNEL_SIGMASK, sizeof(sigset_t));
 	}
 }
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 
 /* Return the first word from the calling thread's signal mask. */
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 PUBLIC ATTR_PURE WUNUSED ulongptr_t FCALL
 sigmask_getmask_word0(void) THROWS(E_SEGFAULT) {
 	union {
@@ -901,11 +901,11 @@ sigmask_getmask_word0(void) THROWS(E_SEGFAULT) {
 	}
 	return result.word;
 }
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 
 /* Return the `index' word from the calling thread's signal mask.
  * @param: index: Index into the caller's sigmask mask sigset (`< SIGSET_NWORDS') */
-#if defined(CONFIG_HAVE_USERPROCMASK) && SIGSET_NWORDS > 1
+#if defined(CONFIG_HAVE_KERNEL_USERPROCMASK) && SIGSET_NWORDS > 1
 PUBLIC ATTR_PURE WUNUSED ulongptr_t FCALL
 sigmask_getmask_word(size_t index)
 		THROWS(E_SEGFAULT) {
@@ -941,9 +941,9 @@ sigmask_getmask_word(size_t index)
 	}
 	return result.word;
 }
-#endif /* CONFIG_HAVE_USERPROCMASK && SIGSET_NWORDS > 1 */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK && SIGSET_NWORDS > 1 */
 
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 /* Copy masking bits for `SIGKILL' and `SIGSTOP' from `src' to `dst',
  * and return the new value for `dst'. Both `dst' and `src' are  mask
  * words who's least significant bit represents `signal_word_base'. */
@@ -964,20 +964,20 @@ NOTHROW(FCALL copy_nmi_signal_mask_bits)(ulongptr_t dst,
 #undef RELATIVE_SIGNAL_MASK
 #undef IS_SIGNAL_IN_RANGE
 }
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 
 /* Or the given set of signals `these' with the calling thread's
  * signal mask, thus effectively blocking all of those  signals. */
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 PUBLIC NONNULL((1)) void FCALL
 sigmask_blockmask(sigset_t const *__restrict these)
 		THROWS(E_SEGFAULT)
-#else /* CONFIG_HAVE_USERPROCMASK */
+#else /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL sigmask_blockmask)(sigset_t const *__restrict these)
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+#endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 {
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 		signo_t sigbase;
 		USER CHECKED struct userprocmask *um;
@@ -1021,7 +1021,7 @@ NOTHROW(FCALL sigmask_blockmask)(sigset_t const *__restrict these)
 			umasksize -= 1;
 		}
 	} else
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+#endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 	{
 		sigset_t *mymask;
 		mymask = &THIS_KERNEL_SIGMASK;
@@ -1039,17 +1039,17 @@ NOTHROW(FCALL sigmask_blockmask)(sigset_t const *__restrict these)
  *                 user-space (unless it  is known  that the  signal
  *                 mask didn't get less restrictive)
  * @return: false: The caller's signal mask remains unchanged. */
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 PUBLIC NONNULL((1)) bool FCALL
 sigmask_unblockmask(sigset_t const *__restrict these)
 		THROWS(E_SEGFAULT)
-#else /* CONFIG_HAVE_USERPROCMASK */
+#else /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL sigmask_unblockmask)(sigset_t const *__restrict these)
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+#endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 {
 	bool result;
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 		signo_t sigbase;
 		USER CHECKED struct userprocmask *um;
@@ -1098,7 +1098,7 @@ NOTHROW(FCALL sigmask_unblockmask)(sigset_t const *__restrict these)
 			umasksize -= 1;
 		}
 	} else
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+#endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 	{
 		size_t i;
 		sigset_t *mymask;
@@ -1127,20 +1127,20 @@ NOTHROW(FCALL sigmask_unblockmask)(sigset_t const *__restrict these)
  *                 user-space (unless it  is known  that the  signal
  *                 mask didn't get less restrictive)
  * @return: false: The caller's signal mask remains unchanged. */
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 PUBLIC NONNULL((1, 2)) bool FCALL
 sigmask_getmask_and_setmask(sigset_t *__restrict oldmask,
                             sigset_t const *__restrict newmask)
 		THROWS(E_SEGFAULT)
-#else /* CONFIG_HAVE_USERPROCMASK */
+#else /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 PUBLIC NOBLOCK NONNULL((1, 2)) bool
 NOTHROW(FCALL sigmask_getmask_and_setmask)(sigset_t *__restrict oldmask,
                                            sigset_t const *__restrict newmask)
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+#endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 {
 	bool result;
 	assert(!nmiismember(newmask));
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 		USER CHECKED struct userprocmask *um;
 		USER UNCHECKED sigset_t *umask;
@@ -1170,7 +1170,7 @@ NOTHROW(FCALL sigmask_getmask_and_setmask)(sigset_t *__restrict oldmask,
 		/* Don't tell the caller if these were masked in the userprocmask. */
 		nmidelset(oldmask);
 	} else
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+#endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 	{
 		sigset_t *mymask = &THIS_KERNEL_SIGMASK;
 		memcpy(oldmask, mymask, sizeof(sigset_t)); /* Get old mask */
@@ -1185,20 +1185,20 @@ NOTHROW(FCALL sigmask_getmask_and_setmask)(sigset_t *__restrict oldmask,
 /* Combination of `sigmask_getmask()' and `sigmask_blockmask()'
  * @return: true:  Changes were made to the caller's signal mask.
  * @return: false: The caller's signal mask remains unchanged. */
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 PUBLIC NONNULL((1, 2)) bool FCALL
 sigmask_getmask_and_blockmask(sigset_t *__restrict oldmask,
                               sigset_t const *__restrict these)
 		THROWS(E_SEGFAULT)
-#else /* CONFIG_HAVE_USERPROCMASK */
+#else /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 PUBLIC NOBLOCK NONNULL((1, 2)) bool
 NOTHROW(FCALL sigmask_getmask_and_blockmask)(sigset_t *__restrict oldmask,
                                              sigset_t const *__restrict these)
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+#endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 {
 	bool result;
 	assert(!nmiismember(these));
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 		sigset_t newmask;
 		USER CHECKED struct userprocmask *um;
@@ -1223,7 +1223,7 @@ NOTHROW(FCALL sigmask_getmask_and_blockmask)(sigset_t *__restrict oldmask,
 		/* Don't tell the caller if these were masked in the userprocmask. */
 		nmidelset(oldmask);
 	} else
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+#endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 	{
 		sigset_t *mymask = &THIS_KERNEL_SIGMASK;
 		memcpy(oldmask, mymask, sizeof(sigset_t));
@@ -1243,19 +1243,19 @@ NOTHROW(FCALL sigmask_getmask_and_blockmask)(sigset_t *__restrict oldmask,
  *                 user-space (unless it  is known  that the  signal
  *                 mask didn't get less restrictive)
  * @return: false: The caller's signal mask remains unchanged. */
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 PUBLIC NONNULL((1, 2)) bool FCALL
 sigmask_getmask_and_unblockmask(sigset_t *__restrict oldmask,
                                 sigset_t const *__restrict these)
 		THROWS(E_SEGFAULT)
-#else /* CONFIG_HAVE_USERPROCMASK */
+#else /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 PUBLIC NOBLOCK NONNULL((1, 2)) bool
 NOTHROW(FCALL sigmask_getmask_and_unblockmask)(sigset_t *__restrict oldmask,
                                                sigset_t const *__restrict these)
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+#endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 {
 	bool result;
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 	if (PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 		sigset_t newmask;
 		USER CHECKED struct userprocmask *um;
@@ -1288,7 +1288,7 @@ NOTHROW(FCALL sigmask_getmask_and_unblockmask)(sigset_t *__restrict oldmask,
 		/* Don't tell the caller if these were masked in the userprocmask. */
 		nmidelset(oldmask);
 	} else
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+#endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 	{
 		sigset_t *mymask = &THIS_KERNEL_SIGMASK;
 		memcpy(oldmask, mymask, sizeof(sigset_t));

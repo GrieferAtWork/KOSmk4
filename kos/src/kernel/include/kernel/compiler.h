@@ -28,25 +28,27 @@
 
 #include "compiler-branch-tracer.h"
 
-/* Configure SMP-behavior. */
-#ifdef CONFIG_NO_SMP
-#   undef CONFIG_MAX_CPU_COUNT
-#   define CONFIG_MAX_CPU_COUNT 1
-#else /* CONFIG_NO_SMP */
-/* Configuration option: The max number of CPUs supported by KOS. */
-#   ifndef CONFIG_MAX_CPU_COUNT
-#      define CONFIG_MAX_CPU_COUNT 16
-#   elif (CONFIG_MAX_CPU_COUNT+0) <= 1
-#      undef CONFIG_MAX_CPU_COUNT
-#      define CONFIG_MAX_CPU_COUNT 1
-#      define CONFIG_NO_SMP 1
-#   endif
-#endif /* !CONFIG_NO_SMP */
+/************************************************************************/
+/* GENERAL KERNEL CONFIGURATION OPTIONS                                 */
+/************************************************************************/
 
-#undef CONFIG_HAVE_FS_NOTIFY
-#if 1
-#define CONFIG_HAVE_FS_NOTIFY
-#endif
+/* Configuration option: The max number of CPUs supported by KOS. */
+/*[[[config CONFIG_MAX_CPU_COUNT = 16]]]*/
+#ifdef CONFIG_NO_SMP
+#undef CONFIG_MAX_CPU_COUNT
+#define CONFIG_MAX_CPU_COUNT 1
+#elif !defined(CONFIG_MAX_CPU_COUNT)
+#define CONFIG_MAX_CPU_COUNT 16
+#elif (CONFIG_MAX_CPU_COUNT + 0) <= 1
+#undef CONFIG_MAX_CPU_COUNT
+#define CONFIG_NO_SMP
+#define CONFIG_MAX_CPU_COUNT 1
+#endif /* ... */
+/*[[[end]]]*/
+
+/************************************************************************/
+
+
 
 /*
  * The meaning of NOBLOCK vs. <neither> vs. BLOCKING
@@ -234,11 +236,11 @@ FUNDEF void NOTHROW(KCALL BREAKPOINT)(void);
 #define BREAKPOINT        BREAKPOINT
 #else /* ... */
 #include <debugger/config.h>
-#ifndef CONFIG_NO_DEBUGGER
+#ifndef CONFIG_NO_KERNEL_DEBUGGER
 #define BREAKPOINT() ({ FUNDEF void KCALL dbg(void); dbg(); })
-#else /* !CONFIG_NO_DEBUGGER */
+#else /* !CONFIG_NO_KERNEL_DEBUGGER */
 #define BREAKPOINT() (void)0 /* ??? */
-#endif /* CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_NO_KERNEL_DEBUGGER */
 #endif /* !... */
 
 

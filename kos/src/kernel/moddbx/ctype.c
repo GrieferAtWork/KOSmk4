@@ -26,7 +26,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
 #include <debugger/rt.h>
 #include <kernel/types.h>
@@ -1384,6 +1384,6 @@ NOTHROW(FCALL ctype_enumname)(struct ctype const *__restrict self,
 
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_MODDBX_CTYPE_C */

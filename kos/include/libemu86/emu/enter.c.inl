@@ -154,10 +154,10 @@ case EMU86_OPCODE_ENCODE(0xc8): {
 #if EMU86_EMULATE_CONFIG_WANT_ENTER
 	if (IS_16BIT()) {
 		/* The upper 16 bits of RBP/EBP don't get modified by this! */
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		EMU86_SETRBP((EMU86_GETRBP() & ~0xffff) |
 		             (frameTemp & 0xffff));
-#elif CONFIG_LIBEMU86_WANT_32BIT
+#elif LIBEMU86_CONFIG_WANT_32BIT
 		EMU86_SETEBP((EMU86_GETEBP() & ~0xffff) |
 		             (frameTemp & 0xffff));
 #else /* ... */

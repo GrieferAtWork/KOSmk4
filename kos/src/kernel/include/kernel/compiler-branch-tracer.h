@@ -25,16 +25,27 @@
 #include <hybrid/__atomic.h>
 #include <hybrid/typecore.h>
 
-#define CONFIG_NO_BRANCH_PROFILING 1 /* Disable (for now...) */
+/*[[[config CONFIG_HAVE_KERNEL_BRANCH_PROFILING = false
+ * Disable (for now...)
+ * ]]]*/
+#ifdef CONFIG_NO_KERNEL_BRANCH_PROFILING
+#undef CONFIG_HAVE_KERNEL_BRANCH_PROFILING
+#elif !defined(CONFIG_HAVE_KERNEL_BRANCH_PROFILING)
+#define CONFIG_NO_KERNEL_BRANCH_PROFILING
+#elif (-CONFIG_HAVE_KERNEL_BRANCH_PROFILING - 1) == -1
+#undef CONFIG_HAVE_KERNEL_BRANCH_PROFILING
+#define CONFIG_NO_KERNEL_BRANCH_PROFILING
+#endif /* ... */
+/*[[[end]]]*/
 
 #ifdef __CC__
 
-#if defined(CONFIG_NO_BRANCH_PROFILING) || \
+#if defined(CONFIG_NO_KERNEL_BRANCH_PROFILING) || \
     defined(DISABLE_BRANCH_PROFILING) || \
     defined(__INTELLISENSE__)
 #else /* Branch profiling disabled... */
 #include <kernel/arch/compiler-branch-tracer.h>
-#if defined(CONFIG_NO_BRANCH_PROFILING) || \
+#if defined(CONFIG_NO_KERNEL_BRANCH_PROFILING) || \
     defined(DISABLE_BRANCH_PROFILING)
 #else /* Disabled... */
 

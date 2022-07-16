@@ -26,7 +26,7 @@
 #include <kernel/except.h>
 #include <kernel/malloc.h>
 #include <kernel/rt/except-handler.h>
-#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
+#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 #include <kernel/types.h>
 #include <sched/group.h>
 #include <sched/rpc-internal.h>
@@ -277,7 +277,7 @@ NOTHROW(FCALL unwind_current_exception_at_icpustate)(struct icpustate *__restric
 INTDEF NOBLOCK void /* From "misc/except-handler.c" */
 NOTHROW(FCALL restore_pending_rpcs)(struct pending_rpc *restore);
 
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 /* Same  as `are_any_unmasked_process_rpcs_pending()', but keep a pair
  * of internal signal  sets to track  which signals are  known-masked,
  * and known-unmasked (this allows us to work around the locking issue
@@ -359,17 +359,17 @@ bitset_maybe_consume_if_ignored_else_return_true:
 	procctl_sig_endread(proc);
 	return false;
 }
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 
 
 /* Check if there are any unmasked process RPCs that are currently pending. */
 PRIVATE WUNUSED bool FCALL
 are_any_unmasked_process_rpcs_pending(void)
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 		THROWS(E_WOULDBLOCK, E_SEGFAULT)
-#else /* CONFIG_HAVE_USERPROCMASK */
+#else /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 		THROWS(E_WOULDBLOCK)
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+#endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 {
 	struct procctl *proc = task_getprocctl();
 	procctl_sig_read(proc);
@@ -380,13 +380,13 @@ are_any_unmasked_process_rpcs_pending(void)
 			status = sigmask_ismasked_nopf(_RPC_GETSIGNO(rpc->pr_flags));
 			if (status == SIGMASK_ISMASKED_NOPF_YES)
 				continue;
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 			if (status == SIGMASK_ISMASKED_NOPF_FAULT) {
 				signo_t signo = _RPC_GETSIGNO(rpc->pr_flags);
 				procctl_sig_endread(proc);
 				return are_any_unmasked_signals_pending_with_faulty(proc, signo);
 			}
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 			/* TODO: If it's a POSIX signal RPC, check if our thread's sighand
 			 *       disposition  indicates that the signal should be ignored.
 			 *       If so, consume and discard the associated RPC! */
@@ -404,12 +404,12 @@ are_any_unmasked_process_rpcs_pending(void)
 			status = sigmask_ismasked_nopf(signo);
 			if (status == SIGMASK_ISMASKED_NOPF_YES)
 				continue;
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 			if (status == SIGMASK_ISMASKED_NOPF_FAULT) {
 				procctl_sig_endread(proc);
 				return are_any_unmasked_signals_pending_with_faulty(proc, signo);
 			}
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 			/* TODO: Check if our thread's sighand disposition indicates that
 			 *       the signal should be ignored. If so, consume and discard
 			 *       the signal! */

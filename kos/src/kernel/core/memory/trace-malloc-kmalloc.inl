@@ -54,36 +54,36 @@ DECL_BEGIN
 
 
 #ifndef INITIALIZE_USER_POINTER
-#if CONFIG_MALL_HEAD_SIZE != 0
-#if (CONFIG_MALL_HEAD_SIZE & 3) == 0
+#if CONFIG_KERNEL_MALL_HEAD_SIZE != 0
+#if (CONFIG_KERNEL_MALL_HEAD_SIZE & 3) == 0
 #define INITIALIZE_USER_POINTER_HEAD(base, size) \
-	memsetl((byte_t *)(base), CONFIG_MALL_HEAD_PATTERN, CONFIG_MALL_HEAD_SIZE / 4)
-#else /* (CONFIG_MALL_HEAD_SIZE & 3) == 0 */
+	memsetl((byte_t *)(base), CONFIG_KERNEL_MALL_HEAD_PATTERN, CONFIG_KERNEL_MALL_HEAD_SIZE / 4)
+#else /* (CONFIG_KERNEL_MALL_HEAD_SIZE & 3) == 0 */
 #define INITIALIZE_USER_POINTER_HEAD(base, size) \
-	mempatl((byte_t *)(base), CONFIG_MALL_HEAD_PATTERN, CONFIG_MALL_HEAD_SIZE)
-#endif /* (CONFIG_MALL_HEAD_SIZE & 3) != 0 */
+	mempatl((byte_t *)(base), CONFIG_KERNEL_MALL_HEAD_PATTERN, CONFIG_KERNEL_MALL_HEAD_SIZE)
+#endif /* (CONFIG_KERNEL_MALL_HEAD_SIZE & 3) != 0 */
 #define BZERO_USER_POINTER_HEAD(base, size) \
-	bzero((byte_t *)(base), CONFIG_MALL_HEAD_SIZE)
-#else /* CONFIG_MALL_HEAD_SIZE != 0 */
+	bzero((byte_t *)(base), CONFIG_KERNEL_MALL_HEAD_SIZE)
+#else /* CONFIG_KERNEL_MALL_HEAD_SIZE != 0 */
 #define INITIALIZE_USER_POINTER_HEAD(base, size) (void)0
 #define BZERO_USER_POINTER_HEAD(base, size)      (void)0
-#endif /* CONFIG_MALL_HEAD_SIZE == 0 */
-#if CONFIG_MALL_TAIL_SIZE != 0
-#if (CONFIG_MALL_TAIL_SIZE & 3) == 0
+#endif /* CONFIG_KERNEL_MALL_HEAD_SIZE == 0 */
+#if CONFIG_KERNEL_MALL_TAIL_SIZE != 0
+#if (CONFIG_KERNEL_MALL_TAIL_SIZE & 3) == 0
 #define INITIALIZE_USER_POINTER_TAIL(base, size)             \
-	memsetl((byte_t *)(base) + (size)-CONFIG_MALL_TAIL_SIZE, \
-	        CONFIG_MALL_TAIL_PATTERN, CONFIG_MALL_TAIL_SIZE / 4)
-#else /* (CONFIG_MALL_TAIL_SIZE & 3) == 0 */
+	memsetl((byte_t *)(base) + (size)-CONFIG_KERNEL_MALL_TAIL_SIZE, \
+	        CONFIG_KERNEL_MALL_TAIL_PATTERN, CONFIG_KERNEL_MALL_TAIL_SIZE / 4)
+#else /* (CONFIG_KERNEL_MALL_TAIL_SIZE & 3) == 0 */
 #define INITIALIZE_USER_POINTER_TAIL(base, size)             \
-	mempatl((byte_t *)(base) + (size)-CONFIG_MALL_TAIL_SIZE, \
-	        CONFIG_MALL_TAIL_PATTERN, CONFIG_MALL_TAIL_SIZE)
-#endif /* (CONFIG_MALL_TAIL_SIZE & 3) != 0 */
+	mempatl((byte_t *)(base) + (size)-CONFIG_KERNEL_MALL_TAIL_SIZE, \
+	        CONFIG_KERNEL_MALL_TAIL_PATTERN, CONFIG_KERNEL_MALL_TAIL_SIZE)
+#endif /* (CONFIG_KERNEL_MALL_TAIL_SIZE & 3) != 0 */
 #define BZERO_USER_POINTER_TAIL(base, size) \
-	bzero((byte_t *)(base) + (size)-CONFIG_MALL_TAIL_SIZE, CONFIG_MALL_TAIL_SIZE)
-#else /* CONFIG_MALL_TAIL_SIZE != 0 */
+	bzero((byte_t *)(base) + (size)-CONFIG_KERNEL_MALL_TAIL_SIZE, CONFIG_KERNEL_MALL_TAIL_SIZE)
+#else /* CONFIG_KERNEL_MALL_TAIL_SIZE != 0 */
 #define INITIALIZE_USER_POINTER_TAIL(base, size) (void)0
 #define BZERO_USER_POINTER_TAIL(base, size)      (void)0
-#endif /* CONFIG_MALL_TAIL_SIZE == 0 */
+#endif /* CONFIG_KERNEL_MALL_TAIL_SIZE == 0 */
 #define INITIALIZE_USER_POINTER(base, size)    \
 	(INITIALIZE_USER_POINTER_HEAD(base, size), \
 	 INITIALIZE_USER_POINTER_TAIL(base, size))
@@ -101,14 +101,14 @@ DECL_BEGIN
 	LOCAL_heap_align_untraced(&kernel_heaps[(flags) & __GFP_HEAPMASK], \
 	                          min_alignment,                           \
 	                          offset +                                 \
-	                          CONFIG_MALL_HEAD_SIZE,                   \
+	                          CONFIG_KERNEL_MALL_HEAD_SIZE,                   \
 	                          n_bytes,                                 \
 	                          flags)
 #else /* LOCAL_HAVE_offset */
 #define MY_heap_alloc_untraced(n_bytes, flags)                         \
 	LOCAL_heap_align_untraced(&kernel_heaps[(flags) & __GFP_HEAPMASK], \
 	                          min_alignment,                           \
-	                          CONFIG_MALL_HEAD_SIZE,                   \
+	                          CONFIG_KERNEL_MALL_HEAD_SIZE,                   \
 	                          n_bytes,                                 \
 	                          flags)
 #endif /* !LOCAL_HAVE_offset */
@@ -151,9 +151,9 @@ LOCAL_NOTHROW(KCALL LOCAL_METHOD_malloc)(
                                          gfp_t flags) {
 	heapptr_t result;
 	struct trace_node *node;
-	result = MY_heap_alloc_untraced(CONFIG_MALL_HEAD_SIZE +
+	result = MY_heap_alloc_untraced(CONFIG_KERNEL_MALL_HEAD_SIZE +
 	                                n_bytes +
-	                                CONFIG_MALL_TAIL_SIZE,
+	                                CONFIG_KERNEL_MALL_TAIL_SIZE,
 	                                flags);
 #ifdef DEFINE_X_noexcept
 	if unlikely(heapptr_getsiz(result) == 0)
@@ -170,7 +170,7 @@ LOCAL_NOTHROW(KCALL LOCAL_METHOD_malloc)(
 		heapptr_t node_ptr;
 		node_ptr = LOCAL_heap_alloc_untraced(&trace_heap,
 		                                     offsetof(struct trace_node, tn_trace) +
-		                                     CONFIG_TRACE_MALLOC_MIN_TRACEBACK * sizeof(void *),
+		                                     CONFIG_KERNEL_TRACE_MALLOC_MIN_TRACEBACK * sizeof(void *),
 		                                     TRACE_HEAP_FLAGS | (flags & GFP_INHERIT));
 #ifdef DEFINE_X_noexcept
 		if unlikely(!heapptr_getsiz(node_ptr))
@@ -204,7 +204,7 @@ LOCAL_NOTHROW(KCALL LOCAL_METHOD_malloc)(
 		RETHROW();
 	}
 #endif /* DEFINE_X_noexcept */
-	return (byte_t *)heapptr_getptr(result) + CONFIG_MALL_HEAD_SIZE;
+	return (byte_t *)heapptr_getptr(result) + CONFIG_KERNEL_MALL_HEAD_SIZE;
 #ifdef DEFINE_X_noexcept
 err_result_node:
 	trace_node_free(node);
@@ -260,9 +260,9 @@ do_normal_malloc:
 #ifdef DEFINE_METHOD_kmalloc_in_place
 		goto err;
 #else /* DEFINE_METHOD_kmalloc_in_place */
-		result = MY_heap_alloc_untraced(CONFIG_MALL_HEAD_SIZE +
+		result = MY_heap_alloc_untraced(CONFIG_KERNEL_MALL_HEAD_SIZE +
 		                                n_bytes +
-		                                CONFIG_MALL_TAIL_SIZE,
+		                                CONFIG_KERNEL_MALL_TAIL_SIZE,
 		                                flags);
 #ifdef DEFINE_X_noexcept
 		if unlikely(heapptr_getsiz(result) == 0)
@@ -279,7 +279,7 @@ do_normal_malloc:
 			heapptr_t node_ptr;
 			node_ptr = LOCAL_heap_alloc_untraced(&trace_heap,
 			                                     offsetof(struct trace_node, tn_trace) +
-			                                     CONFIG_TRACE_MALLOC_MIN_TRACEBACK * sizeof(void *),
+			                                     CONFIG_KERNEL_TRACE_MALLOC_MIN_TRACEBACK * sizeof(void *),
 			                                     TRACE_HEAP_FLAGS | (flags & GFP_INHERIT));
 #ifdef DEFINE_X_noexcept
 			if unlikely(!heapptr_getsiz(node_ptr))
@@ -313,24 +313,28 @@ do_normal_malloc:
 			RETHROW();
 		}
 #endif /* DEFINE_X_noexcept */
-		return (byte_t *)heapptr_getptr(result) + CONFIG_MALL_HEAD_SIZE;
+		return (byte_t *)heapptr_getptr(result) + CONFIG_KERNEL_MALL_HEAD_SIZE;
 #endif /* !DEFINE_METHOD_kmalloc_in_place */
 	}
 again_nonnull_ptr:
 
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 	/* Special case: krealloc() a slab pointer */
 	if unlikely(KERNEL_SLAB_CHECKPTR(ptr)) {
 		old_user_size = SLAB_GET(ptr)->s_size;
-		if (old_user_size >= n_bytes)
+		if (old_user_size >= n_bytes) {
+#ifndef __OPTIMIZE_SIZE__
+			/* TODO: Try to move the heap-blob into smaller slab! */
+#endif /* !__OPTIMIZE_SIZE__ */
 			return ptr; /* The slab is still large enough */
+		}
 #ifdef DEFINE_METHOD_kmalloc_in_place
 		goto err; /* Cannot realloc-in-place */
 #else /* DEFINE_METHOD_kmalloc_in_place */
 		/* Allocate a new, non-slab chunk, and copy existing data into it. */
-		result = MY_heap_alloc_untraced(CONFIG_MALL_HEAD_SIZE +
+		result = MY_heap_alloc_untraced(CONFIG_KERNEL_MALL_HEAD_SIZE +
 		                                n_bytes +
-		                                CONFIG_MALL_TAIL_SIZE,
+		                                CONFIG_KERNEL_MALL_TAIL_SIZE,
 		                                flags);
 #ifdef DEFINE_X_noexcept
 		if unlikely(heapptr_getsiz(result) == 0)
@@ -346,7 +350,7 @@ again_nonnull_ptr:
 			heapptr_t node_ptr;
 			node_ptr = LOCAL_heap_alloc_untraced(&trace_heap,
 			                                     offsetof(struct trace_node, tn_trace) +
-			                                     CONFIG_TRACE_MALLOC_MIN_TRACEBACK * sizeof(void *),
+			                                     CONFIG_KERNEL_TRACE_MALLOC_MIN_TRACEBACK * sizeof(void *),
 			                                     TRACE_HEAP_FLAGS | (flags & GFP_INHERIT));
 #ifdef DEFINE_X_noexcept
 			if unlikely(!heapptr_getsiz(node_ptr))
@@ -382,14 +386,14 @@ again_nonnull_ptr:
 #endif /* DEFINE_X_noexcept */
 		{
 			byte_t *result_ptr;
-			result_ptr = (byte_t *)heapptr_getptr(result) + CONFIG_MALL_HEAD_SIZE;
+			result_ptr = (byte_t *)heapptr_getptr(result) + CONFIG_KERNEL_MALL_HEAD_SIZE;
 			result_ptr = (byte_t *)memcpy(result_ptr, ptr, old_user_size);
 			slab_free(ptr);
 			return result_ptr;
 		}
 #endif /* !DEFINE_METHOD_kmalloc_in_place */
 	}
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 	/* The actual meat of the krealloc() function: Resizing an existing pointer */
 	lock_acquire();
@@ -415,7 +419,7 @@ again_nonnull_ptr:
 		goto do_normal_malloc;
 	}
 
-	if unlikely(ptr != trace_node_uaddr(node) + CONFIG_MALL_HEAD_SIZE) {
+	if unlikely(ptr != trace_node_uaddr(node) + CONFIG_KERNEL_MALL_HEAD_SIZE) {
 		node = trace_node_dupa_tb(node);
 		lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
@@ -423,8 +427,8 @@ again_nonnull_ptr:
 		               "start of containing node %p...%p (%p...%p)\n"
 		               "%[gen:c]",
 		               LOCAL_realloc_PRIARG,
-		               trace_node_umin(node) + CONFIG_MALL_HEAD_SIZE,
-		               trace_node_umax(node) - CONFIG_MALL_TAIL_SIZE,
+		               trace_node_umin(node) + CONFIG_KERNEL_MALL_HEAD_SIZE,
+		               trace_node_umax(node) - CONFIG_KERNEL_MALL_TAIL_SIZE,
 		               trace_node_umin(node), trace_node_umax(node),
 		               &trace_node_print_traceback, node);
 		goto do_normal_malloc;
@@ -441,8 +445,8 @@ again_nonnull_ptr:
 #endif /* HAVE_kmalloc_validate_node */
 
 	/* Calculate the old user-size */
-	old_user_size = trace_node_usize(node) - (CONFIG_MALL_HEAD_SIZE +
-	                                          CONFIG_MALL_TAIL_SIZE);
+	old_user_size = trace_node_usize(node) - (CONFIG_KERNEL_MALL_HEAD_SIZE +
+	                                          CONFIG_KERNEL_MALL_TAIL_SIZE);
 	if (n_bytes <= old_user_size) {
 		/* Size should be decreased (just try to truncate the node) */
 		size_t num_free;
@@ -466,17 +470,17 @@ again_nonnull_ptr:
 			free_base = trace_node_uend(node);
 			new_user_size = old_user_size - num_free;
 			/* Re-initialize the tail. */
-#if CONFIG_MALL_TAIL_SIZE != 0
-#if (CONFIG_MALL_TAIL_SIZE & 3) == 0
+#if CONFIG_KERNEL_MALL_TAIL_SIZE != 0
+#if (CONFIG_KERNEL_MALL_TAIL_SIZE & 3) == 0
 			memsetl((byte_t *)ptr + new_user_size,
-			        CONFIG_MALL_TAIL_PATTERN,
-			        CONFIG_MALL_TAIL_SIZE / 4);
-#else /* (CONFIG_MALL_TAIL_SIZE & 3) == 0 */
+			        CONFIG_KERNEL_MALL_TAIL_PATTERN,
+			        CONFIG_KERNEL_MALL_TAIL_SIZE / 4);
+#else /* (CONFIG_KERNEL_MALL_TAIL_SIZE & 3) == 0 */
 			mempatl((byte_t *)ptr + new_user_size,
-			        CONFIG_MALL_TAIL_PATTERN,
-			        CONFIG_MALL_TAIL_SIZE);
-#endif /* (CONFIG_MALL_TAIL_SIZE & 3) != 0 */
-#endif /* CONFIG_MALL_TAIL_SIZE != 0 */
+			        CONFIG_KERNEL_MALL_TAIL_PATTERN,
+			        CONFIG_KERNEL_MALL_TAIL_SIZE);
+#endif /* (CONFIG_KERNEL_MALL_TAIL_SIZE & 3) != 0 */
+#endif /* CONFIG_KERNEL_MALL_TAIL_SIZE != 0 */
 
 			/* Re-insert the node, so-as to continue tracking it. */
 			tm_nodes_insert(node);
@@ -520,9 +524,9 @@ realloc_unchanged:
 			void *oldblock_base;
 			size_t oldblock_size;
 			/* Must allocate a new block */
-			result = MY_heap_alloc_untraced(CONFIG_MALL_HEAD_SIZE +
+			result = MY_heap_alloc_untraced(CONFIG_KERNEL_MALL_HEAD_SIZE +
 			                                n_bytes +
-			                                CONFIG_MALL_TAIL_SIZE,
+			                                CONFIG_KERNEL_MALL_TAIL_SIZE,
 			                                flags);
 #ifdef DEFINE_X_noexcept
 			if unlikely(heapptr_getsiz(result) == 0)
@@ -536,7 +540,7 @@ again_remove_node_for_newchunk:
 			/* Check to make sure that the associated node hasn't changed. */
 			if unlikely(!node ||
 			            (node->tn_kind != TRACE_NODE_KIND_MALL) ||
-			            (ptr != trace_node_uaddr(node) + CONFIG_MALL_HEAD_SIZE) ||
+			            (ptr != trace_node_uaddr(node) + CONFIG_KERNEL_MALL_HEAD_SIZE) ||
 			            (extension_base != trace_node_uend(node)) ||
 			            ((extension_flags & __GFP_HEAPMASK) != (node->tn_flags & __GFP_HEAPMASK))) {
 				if (node)
@@ -557,7 +561,7 @@ again_remove_node_for_newchunk:
 			                  (flags & ~(__GFP_HEAPMASK | GFP_CALLOC));
 			oldblock_base = trace_node_uaddr(node);
 			oldblock_size = trace_node_usize(node);
-			assert(oldblock_base == (byte_t *)ptr - CONFIG_MALL_HEAD_SIZE);
+			assert(oldblock_base == (byte_t *)ptr - CONFIG_KERNEL_MALL_HEAD_SIZE);
 
 			/* Re-write the contents of the node to fit the new block. */
 			node->tn_flags = flags & __GFP_HEAPMASK; /* Remember the heap bits now used by the allocation. */
@@ -596,7 +600,7 @@ again_remove_node_for_newchunk:
 			lock_break();
 
 			/* Copy all of the old data into the block. */
-			result_ptr = (byte_t *)heapptr_getptr(result) + CONFIG_MALL_HEAD_SIZE;
+			result_ptr = (byte_t *)heapptr_getptr(result) + CONFIG_KERNEL_MALL_HEAD_SIZE;
 			result_ptr = (byte_t *)memcpy(result_ptr, ptr, old_user_size);
 			/* Free the old block. */
 			assert(!(extension_flags & GFP_CALLOC));
@@ -611,7 +615,7 @@ again_remove_node_for_oldchunk:
 		/* Check to make sure that the associated node hasn't changed. */
 		if unlikely(!node ||
 		            (node->tn_kind != TRACE_NODE_KIND_MALL) ||
-		            (ptr != trace_node_uaddr(node) + CONFIG_MALL_HEAD_SIZE) ||
+		            (ptr != trace_node_uaddr(node) + CONFIG_KERNEL_MALL_HEAD_SIZE) ||
 		            (extension_base != trace_node_uend(node)) ||
 		            ((extension_flags & __GFP_HEAPMASK) != (node->tn_flags & __GFP_HEAPMASK))) {
 			if (node)
@@ -626,17 +630,17 @@ again_remove_node_for_oldchunk:
 		new_user_size = old_user_size + num_allocated;
 		node->tn_link.rb_max += num_allocated;
 		/* Re-initialize the tail. */
-#if CONFIG_MALL_TAIL_SIZE != 0
-#if (CONFIG_MALL_TAIL_SIZE & 3) == 0
+#if CONFIG_KERNEL_MALL_TAIL_SIZE != 0
+#if (CONFIG_KERNEL_MALL_TAIL_SIZE & 3) == 0
 		memsetl((byte_t *)ptr + new_user_size,
-		        CONFIG_MALL_TAIL_PATTERN,
-		        CONFIG_MALL_TAIL_SIZE / 4);
-#else /* (CONFIG_MALL_TAIL_SIZE & 3) == 0 */
+		        CONFIG_KERNEL_MALL_TAIL_PATTERN,
+		        CONFIG_KERNEL_MALL_TAIL_SIZE / 4);
+#else /* (CONFIG_KERNEL_MALL_TAIL_SIZE & 3) == 0 */
 		mempatl((byte_t *)ptr + new_user_size,
-		        CONFIG_MALL_TAIL_PATTERN,
-		        CONFIG_MALL_TAIL_SIZE);
-#endif /* (CONFIG_MALL_TAIL_SIZE & 3) != 0 */
-#endif /* CONFIG_MALL_TAIL_SIZE != 0 */
+		        CONFIG_KERNEL_MALL_TAIL_PATTERN,
+		        CONFIG_KERNEL_MALL_TAIL_SIZE);
+#endif /* (CONFIG_KERNEL_MALL_TAIL_SIZE & 3) != 0 */
+#endif /* CONFIG_KERNEL_MALL_TAIL_SIZE != 0 */
 		/* Re-insert the node, so-as to continue tracking it. */
 
 		/* This can fail due to other bitset nodes, and we must handle it when that happens! */
@@ -671,14 +675,14 @@ again_remove_node_for_oldchunk:
 	}
 	lock_release();
 	/* Re-write the old tail into becoming ZERO-bytes, when GFP_CALLOC was set. */
-#if CONFIG_MALL_TAIL_SIZE != 0
+#if CONFIG_KERNEL_MALL_TAIL_SIZE != 0
 	if (flags & GFP_CALLOC) {
 		size_t num_clear = num_allocated;
-		if (num_clear > CONFIG_MALL_TAIL_SIZE)
-			num_clear = CONFIG_MALL_TAIL_SIZE;
+		if (num_clear > CONFIG_KERNEL_MALL_TAIL_SIZE)
+			num_clear = CONFIG_KERNEL_MALL_TAIL_SIZE;
 		bzero((byte_t *)ptr + old_user_size, num_clear);
 	}
-#endif /* CONFIG_MALL_TAIL_SIZE != 0 */
+#endif /* CONFIG_KERNEL_MALL_TAIL_SIZE != 0 */
 	/* Re-return the old pointer, because we were able to extend it! */
 	return ptr;
 

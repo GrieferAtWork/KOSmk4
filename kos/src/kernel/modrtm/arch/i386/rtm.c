@@ -24,13 +24,13 @@
 #include <hybrid/host.h>
 
 #ifdef __x86_64__
-#define CONFIG_LIBEMU86_WANT_16BIT 0
-#define CONFIG_LIBEMU86_WANT_32BIT 1
-#define CONFIG_LIBEMU86_WANT_64BIT 1
+#define LIBEMU86_CONFIG_WANT_16BIT 0
+#define LIBEMU86_CONFIG_WANT_32BIT 1
+#define LIBEMU86_CONFIG_WANT_64BIT 1
 #else /* __x86_64__ */
-#define CONFIG_LIBEMU86_WANT_16BIT 1
-#define CONFIG_LIBEMU86_WANT_32BIT 1
-#define CONFIG_LIBEMU86_WANT_64BIT 0
+#define LIBEMU86_CONFIG_WANT_16BIT 1
+#define LIBEMU86_CONFIG_WANT_32BIT 1
+#define LIBEMU86_CONFIG_WANT_64BIT 0
 #endif /* !__x86_64__ */
 
 #include <kernel/compiler.h>
@@ -558,15 +558,15 @@ struct rtm_machstate {
 #define rtm_machstate_get_csbase(self) 0
 #define rtm_machstate_get_ssbase(self) 0
 DEFINE_SEGMENT_BASE_GETTER(rtm_machstate_get_fsbase, r_fsbase, (uintptr_t)__rdfsbase())
-#if CONFIG_RTM_USERSPACE_ONLY
+#ifdef CONFIG_MODRTM_USERSPACE_ONLY
 DEFINE_SEGMENT_BASE_GETTER(rtm_machstate_get_gsbase, r_gsbase,
                            (uintptr_t)__rdmsr(IA32_KERNEL_GS_BASE))
-#else /* CONFIG_RTM_USERSPACE_ONLY */
+#else /* CONFIG_MODRTM_USERSPACE_ONLY */
 DEFINE_SEGMENT_BASE_GETTER(rtm_machstate_get_gsbase, r_gsbase,
                            self->r_mem.rm_chkuser
                            ? (uintptr_t)__rdmsr(IA32_KERNEL_GS_BASE)
                            : (uintptr_t)__rdgsbase())
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 #else /* __x86_64__ */
 DEFINE_SEGMENT_BASE_GETTER(rtm_machstate_get_esbase, r_esbase, i386_getsegment_base(self->r_icstate, EMU86_R_ES))
 #define rtm_machstate_get_csbase(self) (uintptr_t)(self)->r_csbase /* i386_getsegment_base(self->r_icstate, EMU86_R_CS)) */
@@ -918,12 +918,12 @@ emulate_rdtscp(u32 *__restrict p_tsc_aux) {
 #define EMU86_GETCR4_PCE_IS_ZERO 1 /* Allow user-space use of `rdpmc' */
 
 
-#if CONFIG_RTM_USERSPACE_ONLY
+#ifdef CONFIG_MODRTM_USERSPACE_ONLY
 #define EMU86_ISUSER() 1
 #define EMU86_ISUSER_IS_ONE 1
-#else /* CONFIG_RTM_USERSPACE_ONLY */
+#else /* CONFIG_MODRTM_USERSPACE_ONLY */
 #define EMU86_ISUSER() self->r_mem.rm_chkuser
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 
 #if defined(__x86_64__) || defined(__I386_NO_VM86)
 #define EMU86_EMULATE_CONFIG_VM86 0
@@ -936,11 +936,11 @@ emulate_rdtscp(u32 *__restrict p_tsc_aux) {
 #define EMU86_EMULATE_VM86_GETIF()            0 /* TODO */
 #define EMU86_EMULATE_VM86_SETIF(v)           (void)0
 #define EMU86_EMULATE_RETURN_AFTER_HLT_VM86() DONT_USE
-#if CONFIG_RTM_USERSPACE_ONLY
+#ifdef CONFIG_MODRTM_USERSPACE_ONLY
 #define EMU86_ISUSER_NOVM86()                 (!icpustate32_isvm86(self->r_icstate))
-#else /* CONFIG_RTM_USERSPACE_ONLY */
+#else /* CONFIG_MODRTM_USERSPACE_ONLY */
 #define EMU86_ISUSER_NOVM86()                 (self->r_mem.rm_chkuser && !icpustate32_isvm86(self->r_icstate))
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 #define EMU86_ISVM86()                        (icpustate32_isvm86(self->r_icstate))
 #endif /* !__x86_64__ && !__I386_NO_VM86 */
 
@@ -1050,7 +1050,7 @@ NOTHROW(KCALL i386_get_rtm_segment_base)(struct rtm_machstate *__restrict self,
 #define EMU86_EMULATE_OUTL(portno, value)    DONT_USE
 
 
-#if EMU86_EMULATE_CONFIG_WANT_CPUID
+#ifdef EMU86_EMULATE_CONFIG_WANT_CPUID
 #define EMU86_EMULATE_HANDLE_CPUID() cpuid(self)
 PRIVATE WUNUSED NONNULL((1)) void
 NOTHROW(KCALL cpuid)(struct rtm_machstate *__restrict self) {
@@ -1372,16 +1372,16 @@ DEFINE_CMPXCH_FUNCTIONS(x, uint128_t)
 /* Verify that we only ever run user-space code in user-space
  * TODO: When the  PC-pointer is  part  of kernel-space,  we  should
  *       instead dispatch to UKERN and emulate `userkern_syscall()'! */
-#if CONFIG_RTM_USERSPACE_ONLY
+#ifdef CONFIG_MODRTM_USERSPACE_ONLY
 #define EMU86_EMULATE_VALIDATE_BEFORE_OPCODE_DECODE(start_pc) \
 	validate_executable((void *)(start_pc))
-#else /* CONFIG_RTM_USERSPACE_ONLY */
+#else /* CONFIG_MODRTM_USERSPACE_ONLY */
 #define EMU86_EMULATE_VALIDATE_BEFORE_OPCODE_DECODE(start_pc) \
 	do {                                                      \
 		if (mach.r_mem.rm_mem_avl.rm_chkuser)                 \
 			validate_executable((void *)(start_pc));          \
 	}	__WHILE0
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 
 
 /* RTM instruction emulation to allow for nesting. */

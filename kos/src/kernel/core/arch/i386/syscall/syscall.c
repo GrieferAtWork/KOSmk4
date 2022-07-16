@@ -118,7 +118,7 @@ NOTHROW(FCALL __asm32_bad_sysenter_extension_impl)(struct icpustate *__restrict 
 #endif /* !__x86_64__ */
 
 
-#ifndef CONFIG_NO_SYSCALL_TRACING
+#ifndef CONFIG_NO_KERNEL_SYSCALL_TRACING
 INTERN ATTR_COLDBSS bool syscall_tracing_enabled = false;
 PRIVATE ATTR_COLDBSS struct shared_lock syscall_tracing_lock = SHARED_LOCK_INIT;
 
@@ -279,7 +279,7 @@ PUBLIC WUNUSED bool
 NOTHROW(KCALL arch_syscall_tracing_getenabled)(void) {
 	return ATOMIC_READ(syscall_tracing_enabled);
 }
-#endif /* !CONFIG_NO_SYSCALL_TRACING */
+#endif /* !CONFIG_NO_KERNEL_SYSCALL_TRACING */
 
 
 

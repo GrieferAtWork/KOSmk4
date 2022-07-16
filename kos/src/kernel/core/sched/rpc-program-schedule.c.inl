@@ -29,7 +29,7 @@
 #include <kernel/malloc.h>
 #include <kernel/mman.h>
 #include <kernel/rt/except-handler.h>
-#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
+#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/group.h>
@@ -77,15 +77,15 @@ DECL_BEGIN
 
 #ifndef SIGMASK_ISMASKED_WITH_NESTING_DEFINED
 #define SIGMASK_ISMASKED_WITH_NESTING_DEFINED
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 PRIVATE ATTR_NOINLINE ATTR_PURE WUNUSED bool FCALL
 sigmask_ismasked_with_nesting(signo_t signo) THROWS(E_SEGFAULT) {
 	NESTED_EXCEPTION;
 	return sigmask_ismasked(signo);
 }
-#else /* CONFIG_HAVE_USERPROCMASK */
+#else /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 #define sigmask_ismasked_with_nesting sigmask_ismasked
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+#endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 #endif /* !SIGMASK_ISMASKED_WITH_NESTING_DEFINED */
 
 

@@ -31,7 +31,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <debugger/config.h>
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <debugger/hook.h>
 #include <kernel/x86/gdt.h>
 
@@ -98,6 +98,6 @@ PUBLIC_CONST ATTR_DBGRODATA struct desctab const x86_dbggdt_ptr = {
 };
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_GDT_C */

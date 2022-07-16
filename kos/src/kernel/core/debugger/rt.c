@@ -30,7 +30,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <debugger/entry.h>
 #include <debugger/hook.h>
 #include <debugger/rt.h>
@@ -111,6 +111,6 @@ NOTHROW(KCALL dbg_setregbynamep)(unsigned int level, char const *__restrict name
 
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_SRC_DEBUGGER_RT_C */

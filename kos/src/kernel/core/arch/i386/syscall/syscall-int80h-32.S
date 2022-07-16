@@ -77,7 +77,7 @@ END(x86_idt_syscall)
 /************************************************************************/
 /* INT 80H TRACED ENTRY                                                 */
 /************************************************************************/
-#ifndef CONFIG_NO_SYSCALL_TRACING
+#ifndef CONFIG_NO_KERNEL_SYSCALL_TRACING
 .section .text.hot
 PUBLIC_FUNCTION(x86_idt_syscall_traced)
 	.cfi_startproc simple
@@ -153,7 +153,7 @@ PUBLIC_FUNCTION(x86_idt_syscall_traced)
 	jmpl   *%ss:x86_sysroute1_asm32_int80 - ((__NR_syscall1_min * 4) & 0xffffffff)(,%eax,4)
 	.cfi_endproc
 END(x86_idt_syscall_traced)
-#endif /* !CONFIG_NO_SYSCALL_TRACING */
+#endif /* !CONFIG_NO_KERNEL_SYSCALL_TRACING */
 
 
 

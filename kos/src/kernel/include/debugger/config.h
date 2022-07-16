@@ -22,14 +22,20 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_NO_DEBUGGER
-#undef CONFIG_HAVE_DEBUGGER
-#elif !defined(NDEBUG) || 1
-#undef CONFIG_HAVE_DEBUGGER
-#define CONFIG_HAVE_DEBUGGER 1
-#else
-#undef CONFIG_NO_DEBUGGER
-#define CONFIG_NO_DEBUGGER 1
-#endif
+/*[[[config CONFIG_HAVE_KERNEL_DEBUGGER = true
+ * Enable the builtin kernel debugger:
+ *  - Activated upon kernel panic
+ *  - Activated when pressing F12 4 times in a row
+ *  - Activated when a user-space program faults (configurable)
+ * ]]]*/
+#ifdef CONFIG_NO_KERNEL_DEBUGGER
+#undef CONFIG_HAVE_KERNEL_DEBUGGER
+#elif !defined(CONFIG_HAVE_KERNEL_DEBUGGER)
+#define CONFIG_HAVE_KERNEL_DEBUGGER
+#elif (-CONFIG_HAVE_KERNEL_DEBUGGER - 1) == -1
+#undef CONFIG_HAVE_KERNEL_DEBUGGER
+#define CONFIG_NO_KERNEL_DEBUGGER
+#endif /* ... */
+/*[[[end]]]*/
 
 #endif /* !GUARD_KERNEL_INCLUDE_DEBUGGER_CONFIG_H */

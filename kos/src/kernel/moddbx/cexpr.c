@@ -32,7 +32,7 @@ for (local o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3",
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
 #include <debugger/rt.h>
 #include <kernel/fs/dirent.h>
@@ -3522,6 +3522,6 @@ NOTHROW(FCALL cexpr_pushregister)(char const *__restrict name, size_t namelen) {
 
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_MODDBX_CEXPR_C */

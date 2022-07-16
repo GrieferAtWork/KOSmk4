@@ -43,15 +43,15 @@
 #include <assert.h>
 
 #ifdef __x86_64__
-#if !(CONFIG_LIBEMU86_WANT_16BIT == 0 && \
-      CONFIG_LIBEMU86_WANT_32BIT == 1 && \
-      CONFIG_LIBEMU86_WANT_64BIT == 1)
+#if !(LIBEMU86_CONFIG_WANT_16BIT == 0 && \
+      LIBEMU86_CONFIG_WANT_32BIT == 1 && \
+      LIBEMU86_CONFIG_WANT_64BIT == 1)
 #error "Bad emu86 configuration on x86_64"
 #endif
 #else /* __x86_64__ */
-#if !(CONFIG_LIBEMU86_WANT_16BIT == 1 && \
-      CONFIG_LIBEMU86_WANT_32BIT == 1 && \
-      CONFIG_LIBEMU86_WANT_64BIT == 0)
+#if !(LIBEMU86_CONFIG_WANT_16BIT == 1 && \
+      LIBEMU86_CONFIG_WANT_32BIT == 1 && \
+      LIBEMU86_CONFIG_WANT_64BIT == 0)
 #error "Bad emu86 configuration on i386"
 #endif
 #endif /* !__x86_64__ */

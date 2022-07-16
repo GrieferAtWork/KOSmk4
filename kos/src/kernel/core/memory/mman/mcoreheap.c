@@ -93,9 +93,9 @@ static_assert(sizeof(struct mcorepage) <= PAGESIZE);
 
 
 /* The initial mem-core page. (needed to kick-start the mem-core system) */
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 ATTR_MALL_UNTRACKED
-#endif /* CONFIG_TRACE_MALLOC */
+#endif /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 PRIVATE ATTR_ALIGNED(PAGESIZE) struct mcorepage _mcore_initpage = {
 	.mcp_link = { NULL },
 	.mcp_used = { 0, },
@@ -637,9 +637,9 @@ NOTHROW(FCALL mcoreheap_alloc_locked_nx)(void) {
 	assert(mcoreheap_freecount >= 3);
 	result = mcoreheap_alloc_impl();
 done:
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 	mempatl(result, DEBUGHEAP_FRESH_MEMORY, sizeof(*result));
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 	return result;
 }
 
@@ -705,9 +705,9 @@ NOTHROW(FCALL mcoreheap_free_locked)(union mcorepart *__restrict part) {
 	assertf(INUSE_BITSET_GET(page, index),
 	        "Part at %p (index %u in page at %p) not marked as allocated",
 	        part, index, page);
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 	mempatl(part, DEBUGHEAP_NO_MANS_LAND, sizeof(*part));
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 
 	was_all_used = mcorepage_allused(page);
 

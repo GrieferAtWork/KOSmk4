@@ -35,12 +35,15 @@
 /* Entropy (aka. true random) management                                */
 /************************************************************************/
 
-/* Max # of bytes which may be stored in the entropy buffer.
+/*[[[config CONFIG_KERNEL_ENTROPY_BUFFER_SIZE! = 4096
+ * Max # of bytes which may be stored in the entropy buffer.
  * Note that all other entropy  APIs (usually) operate on  a
- * bit-basis! */
-#ifndef CONFIG_ENTROPY_BUFFER_SIZE
-#define CONFIG_ENTROPY_BUFFER_SIZE 4096
-#endif /* !CONFIG_ENTROPY_BUFFER_SIZE */
+ * bit-basis!
+ * ]]]*/
+#ifndef CONFIG_KERNEL_ENTROPY_BUFFER_SIZE
+#define CONFIG_KERNEL_ENTROPY_BUFFER_SIZE 4096
+#endif /* !CONFIG_KERNEL_ENTROPY_BUFFER_SIZE */
+/*[[[end]]]*/
 
 
 #ifdef __CC__
@@ -57,7 +60,7 @@ DATDEF struct atomic_lock entropy_lock;
  * the first `entropy_bits' bits (iow: the first `entropy_bits/8'
  * bytes,  as well as  bits masked by `(1 << (entropy_bits&7))-1'
  * within the last byte) */
-DATDEF byte_t entropy_data[CONFIG_ENTROPY_BUFFER_SIZE];
+DATDEF byte_t entropy_data[CONFIG_KERNEL_ENTROPY_BUFFER_SIZE];
 
 /* [lock(!PREEMPTION && entropy_lock)] # of bits in `entropy_data' */
 DATDEF size_t entropy_bits;

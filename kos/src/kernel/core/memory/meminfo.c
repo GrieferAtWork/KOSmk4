@@ -898,7 +898,7 @@ DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(kernel_handle_ram_cmdline,
                                             "ram");
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 PRIVATE char const pmembank_type_colors[PMEMBANK_TYPE_COUNT][6] = {
 	/* [PMEMBANK_TYPE_UNDEF]     = */ AC_FG(ANSITTY_CL_GREY),
 	/* [PMEMBANK_TYPE_RAM]       = */ AC_FG(ANSITTY_CL_LIME),
@@ -930,7 +930,7 @@ DBG_COMMAND(lsmem,
 	}
 	return 0;
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 DECL_END
 

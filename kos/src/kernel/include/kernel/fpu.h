@@ -22,28 +22,24 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_NO_FPU
-#ifdef CONFIG_FPU
-#if (CONFIG_FPU + 0) == 0
-#undef CONFIG_FPU
-#define CONFIG_NO_FPU 1
-#endif /* (CONFIG_FPU + 0) == 0 */
-#else /* CONFIG_FPU */
-#define CONFIG_FPU 1
-#endif /* CONFIG_FPU */
-#else /* !CONFIG_NO_FPU */
-#undef CONFIG_FPU
-#endif /* CONFIG_NO_FPU */
+/*[[[config CONFIG_HAVE_FPU = true]]]*/
+#ifdef CONFIG_NO_FPU
+#undef CONFIG_HAVE_FPU
+#elif !defined(CONFIG_HAVE_FPU)
+#define CONFIG_HAVE_FPU
+#elif (-CONFIG_HAVE_FPU - 1) == -1
+#undef CONFIG_HAVE_FPU
+#define CONFIG_NO_FPU
+#endif /* ... */
+/*[[[end]]]*/
 
-#ifdef CONFIG_FPU
+#ifdef CONFIG_HAVE_FPU
 #include <kernel/arch/fpu.h>
-
-#ifdef CONFIG_FPU
+#ifdef CONFIG_HAVE_FPU
 #include <kos/kernel/fpu-state.h>
 
-DECL_BEGIN
-
 #ifdef __CC__
+DECL_BEGIN
 
 struct fpustate;
 
@@ -113,11 +109,9 @@ fpustate_saveinto(USER CHECKED struct fpustate *state)
 		THROWS(E_SEGFAULT);
 #endif /* !ARCH_FPU_ARCHHEADER_DEFINES_FPUSTATE_SAVEINTO */
 
-
-#endif /* __CC__ */
-
 DECL_END
-#endif /* CONFIG_FPU */
-#endif /* CONFIG_FPU */
+#endif /* __CC__ */
+#endif /* CONFIG_HAVE_FPU */
+#endif /* CONFIG_HAVE_FPU */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_FPU_H */

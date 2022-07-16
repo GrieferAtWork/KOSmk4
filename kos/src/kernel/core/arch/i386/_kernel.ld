@@ -41,6 +41,9 @@
 #include <kos/kernel/gdt.h>
 #include <kos/kernel/segment.h>
 
+/**/
+#include "boot/start.h" /* CONFIG_NO_KERNEL_X86_BOOT0 */
+
 #undef likely
 #undef unlikely
 
@@ -69,12 +72,12 @@ SECTIONS {
 
 	PROVIDE_HIDDEN(__kernel_start = ABSOLUTE(.));
 
-#ifndef CONFIG_NO_BOOT0
+#ifndef CONFIG_NO_KERNEL_X86_BOOT0
 	SECTION(.x86.boot0) {
 		KEEP(*(.x86.boot0))
 	}
 	. = KERNEL_CORE_BASE + 0x100200;
-#endif /* !CONFIG_NO_BOOT0 */
+#endif /* !CONFIG_NO_KERNEL_X86_BOOT0 */
 
 	/* Boot header */
 	SECTION(.x86.mb) {
@@ -151,12 +154,12 @@ SECTIONS {
 		*(.rodata .rodata.kernel_symtab .rodata.cst*)
 		*(.rodata.str* .rodata.*.str* .rodata.kernel_strtab)
 
-#ifndef CONFIG_NO_DEBUGGER
+#ifndef CONFIG_NO_KERNEL_DEBUGGER
 		IP_ALIGN(__SIZEOF_POINTER__);
 		PROVIDE_HIDDEN(__kernel_sect_dbg_hooks_start = ABSOLUTE(.));
 		KEEP(*(.dbg.hooks))
 		PROVIDE_HIDDEN(__kernel_sect_dbg_hooks_size = ABSOLUTE(. - __kernel_sect_dbg_hooks_start));
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* !CONFIG_NO_KERNEL_DEBUGGER */
 
 #define DEFINE_VECTOR(name,section)                            \
 		IP_ALIGN(__SIZEOF_POINTER__);                          \
@@ -295,19 +298,19 @@ SECTIONS {
 		. += 1;    /* Trailing FFh-byte */
 #endif /* CONFIG_NO_SMP */
 
-#ifndef CONFIG_NO_BRANCH_PROFILING
+#ifndef CONFIG_NO_KERNEL_BRANCH_PROFILING
 		PROVIDE_HIDDEN(kernel_profile_branch_start = ABSOLUTE(.));
 		KEEP(*(.data.profile_branch))
 		PROVIDE_HIDDEN(kernel_profile_branch_end = ABSOLUTE(.));
 		PROVIDE_HIDDEN(kernel_profile_branch_annotated_start = ABSOLUTE(.));
 		KEEP(*(.data.profile_branch_annotated))
 		PROVIDE_HIDDEN(kernel_profile_branch_annotated_end = ABSOLUTE(.));
-#else /* !CONFIG_NO_BRANCH_PROFILING */
+#else /* !CONFIG_NO_KERNEL_BRANCH_PROFILING */
 		PROVIDE_HIDDEN(kernel_profile_branch_start = ABSOLUTE(.));
 		PROVIDE_HIDDEN(kernel_profile_branch_end = ABSOLUTE(.));
 		PROVIDE_HIDDEN(kernel_profile_branch_annotated_start = ABSOLUTE(.));
 		PROVIDE_HIDDEN(kernel_profile_branch_annotated_end = ABSOLUTE(.));
-#endif /* CONFIG_NO_BRANCH_PROFILING */
+#endif /* CONFIG_NO_KERNEL_BRANCH_PROFILING */
 		*(.data.cold .data.unlikely .data.cold.*)
 
 		IP_ALIGN(PAGESIZE);
@@ -515,11 +518,11 @@ SECTIONS {
 		KEEP(*(.alternatives))
 		PROVIDE_HIDDEN(__x86_alternatives_end = ABSOLUTE(.));
 
-#ifdef CONFIG_SELFTEST
+#ifdef CONFIG_HAVE_KERNEL_SELFTEST
 		PROVIDE_HIDDEN(__kernel_selftest_start = ABSOLUTE(.));
 		KEEP(*(.rodata.free.callback.selftest))
 		PROVIDE_HIDDEN(__kernel_selftest_end = ABSOLUTE(.));
-#endif /* CONFIG_SELFTEST */
+#endif /* CONFIG_HAVE_KERNEL_SELFTEST */
 
 		*(.rodata.free)
 		*(.rodata.str.free)
@@ -545,9 +548,9 @@ SECTIONS {
 	PROVIDE(bootcpu_x86_cpuid = ABSOLUTE(bootcpu + thiscpu_x86_cpuid));
 	PROVIDE(bootcpu_x86_gdt = ABSOLUTE(bootcpu + thiscpu_x86_gdt));
 
-#ifndef CONFIG_NO_BOOT0
+#ifndef CONFIG_NO_KERNEL_X86_BOOT0
 	PROVIDE_HIDDEN(__kernel_sector_count = ABSOLUTE((__kernel_size + 511) / 512));
-#endif /* !CONFIG_NO_BOOT0 */
+#endif /* !CONFIG_NO_KERNEL_X86_BOOT0 */
 
 #ifdef CONFIG_NO_SMP
 #define TSS_BASE    thiscpu_x86_tss
@@ -618,17 +621,17 @@ SECTIONS {
 	PROVIDE_HIDDEN(bootidle_pid = ABSOLUTE(bootcpu + thiscpu_idle_pid));
 
 #ifndef __x86_64__
-#ifndef CONFIG_NO_PAGING_P32
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_P32
 	PROVIDE_HIDDEN(__x86_p32_identity_mapped_text_4mib_index = (ABSOLUTE(__x86_paging_init_identity_mapped_text) - KERNEL_CORE_BASE) / 0x400000);
 	PROVIDE_HIDDEN(__x86_p32_identity_mapped_text_4mib_e2_word = ABSOLUTE(pagedir_kernel + (__x86_p32_identity_mapped_text_4mib_index * 4)));
 	PROVIDE_HIDDEN(__x86_p32_identity_mapped_text_4mib_ks_share = ABSOLUTE((__x86_pagedir_kernel_share - KERNEL_CORE_BASE) + (__x86_p32_identity_mapped_text_4mib_index * 0x1000)));
-#endif /* !CONFIG_NO_PAGING_P32 */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_P32 */
 #endif /* !__x86_64__ */
 
 	/* The main IDT used during normal operations */
 #include "idt/idt.ld"
 
-#ifndef CONFIG_NO_DEBUGGER
+#ifndef CONFIG_NO_KERNEL_DEBUGGER
 
 	/* The IDT active for `dbg_cpu' while the debugger is in use */
 #define PREFIX x86_dbg
@@ -639,7 +642,7 @@ SECTIONS {
 #define PREFIX x86_dbgaltcore
 #include "idt/idt.ld"
 #endif /* !CONFIG_NO_SMP */
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* !CONFIG_NO_KERNEL_DEBUGGER */
 
 	/* Allocate debug sections alongside each other. */
 	.debug_line 0 : { *(.debug_line) }

@@ -589,7 +589,7 @@ fnode_chmod(struct fnode *__restrict self, mode_t perm_mask,
 	/* These bits must be preserved at all cost (they contain file type information) */
 	perm_mask |= ~07777;
 
-#ifndef CONFIG_EVERYONE_IS_ROOT
+#ifndef CONFIG_KERNEL_EVERYONE_IS_ROOT
 	if (check_permissions) {
 		struct fnode_perm_ops const *perm_ops;
 		perm_ops = fnode_getops(self)->no_perm;
@@ -611,9 +611,9 @@ fnode_chmod(struct fnode *__restrict self, mode_t perm_mask,
 		}
 	}
 again:
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
+#endif /* !CONFIG_KERNEL_EVERYONE_IS_ROOT */
 	mfile_tslock_acquire(self);
-#ifndef CONFIG_EVERYONE_IS_ROOT
+#ifndef CONFIG_KERNEL_EVERYONE_IS_ROOT
 	if (check_permissions) {
 		/* Permission restrictions:
 		 *   - `fn_uid' must match the caller's fsuid, or the caller must have `CAP_FOWNER'
@@ -648,9 +648,9 @@ again_check_permissions:
 			}
 		}
 	}
-#else /* !CONFIG_EVERYONE_IS_ROOT */
+#else /* !CONFIG_KERNEL_EVERYONE_IS_ROOT */
 	(void)check_permissions;
-#endif /* CONFIG_EVERYONE_IS_ROOT */
+#endif /* CONFIG_KERNEL_EVERYONE_IS_ROOT */
 
 	old_mode = self->fn_mode;
 	new_mode = (old_mode & perm_mask) | perm_flag;
@@ -749,7 +749,7 @@ again_read_old_values:
 			THROW(E_FSERROR_READONLY);
 		}
 
-#ifndef CONFIG_EVERYONE_IS_ROOT
+#ifndef CONFIG_KERNEL_EVERYONE_IS_ROOT
 		if (check_permissions) {
 			/* Permission restrictions:
 			 *   - `new_owner' must match `old_owner', or the caller needs `CAP_CHOWN'
@@ -771,9 +771,9 @@ again_read_old_values:
 				}
 			}
 		}
-#else /* !CONFIG_EVERYONE_IS_ROOT */
+#else /* !CONFIG_KERNEL_EVERYONE_IS_ROOT */
 		(void)check_permissions;
-#endif /* CONFIG_EVERYONE_IS_ROOT */
+#endif /* CONFIG_KERNEL_EVERYONE_IS_ROOT */
 
 		mode = self->fn_mode;
 		if (mode & 0111) {

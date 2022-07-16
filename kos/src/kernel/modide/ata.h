@@ -153,7 +153,7 @@ struct ata_drive: blkdev {
 #define _AtaDrive_Free(self) kfree(self)
 
 #if defined(__INTELLISENSE__) || 0
-#define CONFIG_ATA_DYNAMIC_SECTOR_SIZE 1
+#define ATADRIVE_HAVE_DYNAMIC_SECTOR_SIZE 1
 #define AtaDrive_GetSectorSize(dev)  blkdev_getsectormask(dev)
 #define AtaDrive_GetSectorMask(dev)  blkdev_getsectorsize(dev)
 #define AtaDrive_GetSectorShift(dev) blkdev_getsectorshift(dev)

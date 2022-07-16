@@ -24,7 +24,7 @@
 
 #include <kernel/vboxgdb.h>
 
-#ifdef CONFIG_VBOXGDB
+#ifdef CONFIG_HAVE_KERNEL_VBOXGDB
 #include <kernel/types.h>
 
 #include <hybrid/host.h>
@@ -62,6 +62,6 @@ NOTHROW(KCALL x86_initialize_vboxgdb)(void) {
 
 DECL_END
 
-#endif /* CONFIG_VBOXGDB */
+#endif /* CONFIG_HAVE_KERNEL_VBOXGDB */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_MISC_VBOXGDB_C */

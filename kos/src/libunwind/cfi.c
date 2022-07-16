@@ -1483,10 +1483,10 @@ do_read_bit_pieces:
 			if (self->ue_tlsbase == (byte_t *)-1) {
 #ifdef __KERNEL__
 				RD_TLS_BASE_REGISTER(*(void **)&self->ue_tlsbase);
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 				if unlikely(dbg_active)
 					self->ue_tlsbase = (byte_t *)dbg_current;
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 #else /* __KERNEL__ */
 				{
 					/* Try to use the TLS-base of the associated module */

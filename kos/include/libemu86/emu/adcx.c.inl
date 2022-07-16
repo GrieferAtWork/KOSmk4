@@ -35,7 +35,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f6): {
 			goto return_unexpected_prefix;
 #define NEED_return_unexpected_prefix
 #if EMU86_EMULATE_CONFIG_WANT_MULX
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (op_flags & EMU86_F_VEX_W) {
 #ifdef __UINT128_TYPE__
 			union {
@@ -59,7 +59,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f6): {
 #define NEED_return_unsupported_instruction
 #endif /* !__UINT128_TYPE__ */
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		{
 			union {
 				u64 q;
@@ -96,7 +96,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f6): {
 #define NEED_return_unexpected_prefix
 #if EMU86_EMULATE_CONFIG_WANT_ADCX
 			new_eflags &= ~EFLAGS_CF;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 			if (IS_64BIT()) {
 				u64 lhs, rhs, result;
 				lhs = MODRM_GETREGQ();
@@ -109,7 +109,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f6): {
 				}
 				MODRM_SETREGQ(result);
 			} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 			{
 				u32 lhs, rhs, result;
 				lhs = MODRM_GETREGL();
@@ -134,7 +134,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f6): {
 #define NEED_return_unexpected_prefix
 #if EMU86_EMULATE_CONFIG_WANT_ADOX
 			new_eflags &= ~EFLAGS_OF;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 			if (IS_64BIT()) {
 				u64 lhs, rhs, result;
 				lhs = MODRM_GETREGQ();
@@ -147,7 +147,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f6): {
 				}
 				MODRM_SETREGQ(result);
 			} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 			{
 				u32 lhs, rhs, result;
 				lhs = MODRM_GETREGL();

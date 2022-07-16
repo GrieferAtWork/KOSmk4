@@ -37,7 +37,7 @@ __DECL_BEGIN
 #define EMU86_R_CH      5 /* Counter register. (upper byte; used when _NO_ REX prefix is given) */
 #define EMU86_R_DH      6 /* General purpose d-register. (upper byte; used when _NO_ REX prefix is given) */
 #define EMU86_R_BH      7 /* General purpose b-register. (upper byte; used when _NO_ REX prefix is given) */
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define EMU86_R_SPL     4 /* Stack pointer. (lower byte; used when _ANY_ REX prefix is given) */
 #define EMU86_R_BPL     5 /* Stack base pointer. (lower byte; used when _ANY_ REX prefix is given) */
 #define EMU86_R_SIL     6 /* Source pointer. (lower byte; used when _ANY_ REX prefix is given) */
@@ -50,7 +50,7 @@ __DECL_BEGIN
 #define EMU86_R_R13L   13 /* %r13l */
 #define EMU86_R_R14L   14 /* %r14l */
 #define EMU86_R_R15L   15 /* %r15l */
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 
 #define EMU86_R_AX      0 /* Accumulator. */
 #define EMU86_R_CX      1 /* Counter register. */
@@ -60,7 +60,7 @@ __DECL_BEGIN
 #define EMU86_R_BP      5 /* Stack base pointer. */
 #define EMU86_R_SI      6 /* Source pointer. */
 #define EMU86_R_DI      7 /* Destination pointer. */
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define EMU86_R_R8W     8 /* %r8w */
 #define EMU86_R_R9W     9 /* %r9w */
 #define EMU86_R_R10W   10 /* %r10w */
@@ -69,7 +69,7 @@ __DECL_BEGIN
 #define EMU86_R_R13W   13 /* %r13w */
 #define EMU86_R_R14W   14 /* %r14w */
 #define EMU86_R_R15W   15 /* %r15w */
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 
 #define EMU86_R_EAX     0 /* Accumulator. */
 #define EMU86_R_ECX     1 /* Counter register. */
@@ -79,7 +79,7 @@ __DECL_BEGIN
 #define EMU86_R_EBP     5 /* Stack base pointer. */
 #define EMU86_R_ESI     6 /* Source pointer. */
 #define EMU86_R_EDI     7 /* Destination pointer. */
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define EMU86_R_R8D     8 /* %r8d */
 #define EMU86_R_R9D     9 /* %r9d */
 #define EMU86_R_R10D   10 /* %r10d */
@@ -88,9 +88,9 @@ __DECL_BEGIN
 #define EMU86_R_R13D   13 /* %r13d */
 #define EMU86_R_R14D   14 /* %r14d */
 #define EMU86_R_R15D   15 /* %r15d */
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define EMU86_R_RAX     0 /* Accumulator. */
 #define EMU86_R_RCX     1 /* Counter register. */
 #define EMU86_R_RDX     2 /* General purpose d-register. */
@@ -108,7 +108,7 @@ __DECL_BEGIN
 #define EMU86_R_R14    14 /* %r14 */
 #define EMU86_R_R15    15 /* %r15 */
 #define EMU86_R_RIP    16 /* %rip (special value that may appear in `mi_rm') */
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 
 #define EMU86_R_ES 0 /* %es */
 #define EMU86_R_CS 1 /* %cs */
@@ -120,7 +120,7 @@ __DECL_BEGIN
 
 
 /* Layout of an EVEX prefix (64-bit only) */
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define EMU86_EVEX_IDENT_M  0x0c0400 /* Mask of constant bits */
 #define EMU86_EVEX_IDENT_V  0x000400 /* Value of constant bits */
 #define EMU86_EVEX_aaa_M    0x000007 /* MASK:  EVEX.aaa */
@@ -141,7 +141,7 @@ __DECL_BEGIN
 #define EMU86_EVEX_B        0x200000 /* FLAG:  VEX.B */
 #define EMU86_EVEX_X        0x400000 /* FLAG:  VEX.X */
 #define EMU86_EVEX_R        0x800000 /* FLAG:  VEX.R */
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 
 /* Layout of a 3-byte VEX prefix */
 #define EMU86_VEX3B_PP_M    0x0003 /* MASK:  3-byte VEX.PP */
@@ -174,7 +174,7 @@ __DECL_BEGIN
 #define EMU86_F_LOCK        0x00000010 /* The `lock' (0xf0) prefix is being used. */
 #define EMU86_F_REPNE       0x00000020 /* The `repne' (0xf2) prefix is being used. */
 #define EMU86_F_REP         0x00000040 /* The `rep' (0xf3) prefix is being used. */
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define EMU86_F_AD64        EMU86_F_AD16 /* The 0x67 prefix is being used. (alias for `EMU86_F_AD16') */
 #define EMU86_F_HASREX      0x00000080 /* A REX prefix is being used. */
 #define EMU86_F_REX_B       0x00000100 /* The REX.B flag (1-bit extension to MODRM.rm). */
@@ -183,39 +183,39 @@ __DECL_BEGIN
 #define EMU86_F_REX_W       0x00000800 /* The REX.W flag (Indicates 64-bit operands). */
 #define EMU86_F_REXMASK     0x00000f00 /* Mask of the REX prefix byte. */
 #define EMU86_F_REXSHFT              8 /* Shift for the REX prefix byte. */
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 #define EMU86_F_SEGMASK     0x00007000 /* Mask for segment overrides. */
 #define EMU86_F_SEGSHIFT            12 /* Shift for segment overrides. */
 #define EMU86_F_SEGREG(x)   ((((x) & EMU86_F_SEGMASK) >> EMU86_F_SEGSHIFT) - 1)
 #define EMU86_F_HASSEG(x)   (((x) & EMU86_F_SEGMASK) != 0)
-#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
+#if LIBEMU86_CONFIG_WANT_16BIT || LIBEMU86_CONFIG_WANT_32BIT
 #define EMU86_F_SEGES       0x00001000 /* ES override. */
 #define EMU86_F_SEGCS       0x00002000 /* CS override. */
 #define EMU86_F_SEGSS       0x00003000 /* SS override. */
 #define EMU86_F_SEGDS       0x00004000 /* DS override. */
-#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
+#endif /* LIBEMU86_CONFIG_WANT_16BIT || LIBEMU86_CONFIG_WANT_32BIT */
 #define EMU86_F_SEGFS       0x00005000 /* FS override. */
 #define EMU86_F_SEGGS       0x00006000 /* GS override. */
 /*      EMU86_F_SEG6        0x00007000  * ... */
 #define EMU86_F_HASVEX      0x00008000 /* A VEX prefix was given. */
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define EMU86_F_VEX_VVVVV_M 0x001f0000 /* Mask for EVEX.~Vi + VEX.~VVVV */
-#else /* CONFIG_LIBEMU86_WANT_64BIT */
+#else /* LIBEMU86_CONFIG_WANT_64BIT */
 #define EMU86_F_VEX_VVVVV_M 0x000f0000 /* Mask for VEX.~VVVV */
 /*      EMU86_F_            0x00100000  * ... */
-#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* !LIBEMU86_CONFIG_WANT_64BIT */
 #define EMU86_F_VEX_VVVVV_S         16 /* Shift for EVEX.~Vi + VEX.~VVVV */
 #define EMU86_F_VEX_VVVVV(x) (((x) & EMU86_F_VEX_VVVVV_M) >> EMU86_F_VEX_VVVVV_S)
 #define EMU86_F_VEX_W       0x00200000 /* Value of VEX.W */
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define EMU86_F_VEX_LL_M    0x00c00000 /* Value of EVEX.Li + VEX.L */
-#else /* CONFIG_LIBEMU86_WANT_64BIT */
+#else /* LIBEMU86_CONFIG_WANT_64BIT */
 #define EMU86_F_VEX_LL_M    0x00400000 /* Value of VEX.L */
 /*      EMU86_F_            0x00800000  * ... */
-#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* !LIBEMU86_CONFIG_WANT_64BIT */
 #define EMU86_F_VEX_LL_S            22 /* Shift for EVEX.Li + VEX.L */
 #define EMU86_F_VEX_LL(x)   (((x) & EMU86_F_VEX_LL_M) >> EMU86_F_VEX_LL_S)
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define EMU86_F_EVEX_z      0x01000000 /* Value of EVEX.z */
 #define EMU86_F_EVEX_b      0x02000000 /* Value of EVEX.b */
 #define EMU86_F_EVEX_R      0x04000000 /* The EVEX.R flag (a second 1-bit extension to MODRM.reg; use with `EMU86_F_REX_R'). */
@@ -223,7 +223,7 @@ __DECL_BEGIN
 #define EMU86_F_EVEX_aaa_S          27 /* Shift for EVEX.aaa */
 #define EMU86_F_EVEX_aaa(x) (((x) & EMU86_F_EVEX_aaa_M) >> EMU86_F_EVEX_aaa_S)
 #define EMU86_F_HASEVEX     0x40000000 /* An EVEX prefix was given. */
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 /*      EMU86_F_            0x80000000  * ... */
 
 /* Explicit prefix byte flags. */
@@ -237,11 +237,11 @@ __DECL_BEGIN
 #define EMU86_F_NORMAL 0
 
 
-#ifdef CONFIG_LIBEMU86_NEED_ARCHMODE
+#ifdef LIBEMU86_CONFIG_NEED_ARCHMODE
 #undef EMU86_F_16BIT
 #undef EMU86_F_32BIT
 #undef EMU86_F_64BIT
-#if (CONFIG_LIBEMU86_WANT_16BIT && CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_64BIT)
+#if (LIBEMU86_CONFIG_WANT_16BIT && LIBEMU86_CONFIG_WANT_32BIT && LIBEMU86_CONFIG_WANT_64BIT)
 #ifdef __x86_64__
 #define EMU86_F_64BIT   0x00000000 /* 64-bit mode */
 #define EMU86_F_32BIT   0x00000001 /* 32-bit mode */
@@ -254,7 +254,7 @@ __DECL_BEGIN
 #define EMU86_F_IS16(x) (((x) & 3) >= 2)
 #define EMU86_F_IS32(x) (((x) & 3) == EMU86_F_32BIT)
 #define EMU86_F_IS64(x) (((x) & 3) == EMU86_F_64BIT)
-#elif (CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_64BIT)
+#elif (LIBEMU86_CONFIG_WANT_32BIT && LIBEMU86_CONFIG_WANT_64BIT)
 #ifdef __x86_64__
 #define EMU86_F_64BIT   0x00000000 /* 64-bit mode */
 #define EMU86_F_32BIT   0x00000001 /* 32-bit mode */
@@ -262,10 +262,10 @@ __DECL_BEGIN
 #define EMU86_F_32BIT   0x00000000 /* 32-bit mode */
 #define EMU86_F_64BIT   0x00000001 /* 64-bit mode */
 #endif /* !__x86_64__ */
-#elif (CONFIG_LIBEMU86_WANT_16BIT && CONFIG_LIBEMU86_WANT_32BIT)
+#elif (LIBEMU86_CONFIG_WANT_16BIT && LIBEMU86_CONFIG_WANT_32BIT)
 #define EMU86_F_32BIT   0x00000000 /* 32-bit mode */
 #define EMU86_F_16BIT   0x00000001 /* 16-bit mode */
-#elif (CONFIG_LIBEMU86_WANT_16BIT && CONFIG_LIBEMU86_WANT_64BIT)
+#elif (LIBEMU86_CONFIG_WANT_16BIT && LIBEMU86_CONFIG_WANT_64BIT)
 #define EMU86_F_64BIT   0x00000000 /* 64-bit mode */
 #define EMU86_F_16BIT   0x00000001 /* 16-bit mode */
 #else
@@ -289,11 +289,11 @@ __DECL_BEGIN
 #define EMU86_F_IS64(x) 0
 #endif /* !EMU86_F_64BIT */
 #endif /* !EMU86_F_BITMASK */
-#else /* CONFIG_LIBEMU86_NEED_ARCHMODE */
-#define EMU86_F_IS16(x) CONFIG_LIBEMU86_WANT_16BIT
-#define EMU86_F_IS32(x) CONFIG_LIBEMU86_WANT_32BIT
-#define EMU86_F_IS64(x) CONFIG_LIBEMU86_WANT_64BIT
-#endif /* !CONFIG_LIBEMU86_NEED_ARCHMODE */
+#else /* LIBEMU86_CONFIG_NEED_ARCHMODE */
+#define EMU86_F_IS16(x) LIBEMU86_CONFIG_WANT_16BIT
+#define EMU86_F_IS32(x) LIBEMU86_CONFIG_WANT_32BIT
+#define EMU86_F_IS64(x) LIBEMU86_CONFIG_WANT_64BIT
+#endif /* !LIBEMU86_CONFIG_NEED_ARCHMODE */
 
 
 
@@ -412,30 +412,30 @@ __DECL_END
 #include <hybrid/host.h>
 
 #if defined(__x86_64__) || defined(__i386__)
-#ifndef CONFIG_LIBEMU86_NEED_ARCHMODE
+#ifndef LIBEMU86_CONFIG_NEED_ARCHMODE
 #define emu86_opflags_from_icpustate(state) EMU86_F_NORMAL
 #define emu86_opflags_from_scpustate(state) EMU86_F_NORMAL
 #define emu86_opflags_from_ucpustate(state) EMU86_F_NORMAL
 #define emu86_opflags_from_fcpustate(state) EMU86_F_NORMAL
-#else /* !CONFIG_LIBEMU86_NEED_ARCHMODE */
+#else /* !LIBEMU86_CONFIG_NEED_ARCHMODE */
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state-helpers.h>
-#if (CONFIG_LIBEMU86_WANT_16BIT && CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_64BIT)
+#if (LIBEMU86_CONFIG_WANT_16BIT && LIBEMU86_CONFIG_WANT_32BIT && LIBEMU86_CONFIG_WANT_64BIT)
 #define emu86_opflags_from_icpustate(state) (icpustate_isvm86(state) ? EMU86_F_16BIT : icpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
 #define emu86_opflags_from_scpustate(state) (scpustate_isvm86(state) ? EMU86_F_16BIT : scpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
 #define emu86_opflags_from_ucpustate(state) (ucpustate_isvm86(state) ? EMU86_F_16BIT : ucpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
 #define emu86_opflags_from_fcpustate(state) (fcpustate_isvm86(state) ? EMU86_F_16BIT : fcpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
-#elif (CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_64BIT)
+#elif (LIBEMU86_CONFIG_WANT_32BIT && LIBEMU86_CONFIG_WANT_64BIT)
 #define emu86_opflags_from_icpustate(state) (icpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
 #define emu86_opflags_from_scpustate(state) (scpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
 #define emu86_opflags_from_ucpustate(state) (ucpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
 #define emu86_opflags_from_fcpustate(state) (fcpustate_is32bit(state) ? EMU86_F_32BIT : EMU86_F_64BIT)
-#elif (CONFIG_LIBEMU86_WANT_16BIT && CONFIG_LIBEMU86_WANT_32BIT)
+#elif (LIBEMU86_CONFIG_WANT_16BIT && LIBEMU86_CONFIG_WANT_32BIT)
 #define emu86_opflags_from_icpustate(state) (icpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_32BIT)
 #define emu86_opflags_from_scpustate(state) (scpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_32BIT)
 #define emu86_opflags_from_ucpustate(state) (ucpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_32BIT)
 #define emu86_opflags_from_fcpustate(state) (fcpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_32BIT)
-#elif (CONFIG_LIBEMU86_WANT_16BIT && CONFIG_LIBEMU86_WANT_64BIT)
+#elif (LIBEMU86_CONFIG_WANT_16BIT && LIBEMU86_CONFIG_WANT_64BIT)
 #define emu86_opflags_from_icpustate(state) (icpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_64BIT)
 #define emu86_opflags_from_scpustate(state) (scpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_64BIT)
 #define emu86_opflags_from_ucpustate(state) (ucpustate_isvm86(state) ? EMU86_F_16BIT : EMU86_F_64BIT)
@@ -443,7 +443,7 @@ __DECL_END
 #else /* ... */
 #error "Invalid configuration"
 #endif /* !... */
-#endif /* CONFIG_LIBEMU86_NEED_ARCHMODE */
+#endif /* LIBEMU86_CONFIG_NEED_ARCHMODE */
 #endif /* __x86_64__ || __i386__ */
 
 

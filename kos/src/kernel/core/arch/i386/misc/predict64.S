@@ -24,7 +24,7 @@
 
 #include <asm/cfi.h>
 
-#ifdef CONFIG_NO_BRANCH_PROFILING
+#ifdef CONFIG_NO_KERNEL_BRANCH_PROFILING
 
 /* struct branch_prediction *pred = %rdi */
 .section .text.cold
@@ -64,7 +64,7 @@ END(__predict_update_si)
 END(__predict_update_sil)
 .cfi_endproc
 
-#else /* CONFIG_NO_BRANCH_PROFILING */
+#else /* CONFIG_NO_KERNEL_BRANCH_PROFILING */
 
 /* struct branch_prediction *pred = %rdi */
 .section .text.hot
@@ -112,6 +112,6 @@ PUBLIC_FUNCTION(__predict_update_rax)
 END(__predict_update_rax)
 .cfi_endproc
 
-#endif /* !CONFIG_NO_BRANCH_PROFILING */
+#endif /* !CONFIG_NO_KERNEL_BRANCH_PROFILING */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_MISC_PREDICT64_S */

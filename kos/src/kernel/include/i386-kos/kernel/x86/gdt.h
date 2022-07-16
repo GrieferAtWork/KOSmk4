@@ -46,7 +46,7 @@ DATDEF ATTR_PERCPU struct segment thiscpu_x86_gdt[SEGMENT_COUNT];
 DATDEF ATTR_PERCPU struct segment thiscpu_x86_ldt[LDT_SEGMENT_COUNT];
 DATDEF struct segment bootcpu_x86_gdt[SEGMENT_COUNT];
 
-#ifndef CONFIG_NO_USERKERN_SEGMENT
+#ifndef CONFIG_NO_KERNEL_USERKERN_SEGMENT
 #ifdef __x86_64__
 FUNDEF u32 NOTHROW(KCALL x86_get_random_userkern_address32)(void);
 FUNDEF uintptr_t NOTHROW(KCALL x86_get_random_userkern_address)(void);
@@ -55,7 +55,7 @@ FUNDEF uintptr_t NOTHROW(KCALL x86_get_random_userkern_address)(void);
 FUNDEF uintptr_t NOTHROW(KCALL x86_get_random_userkern_address)(void);
 #define x86_get_random_userkern_address32 x86_get_random_userkern_address
 #endif /* !__x86_64__ */
-#endif /* !CONFIG_NO_USERKERN_SEGMENT */
+#endif /* !CONFIG_NO_KERNEL_USERKERN_SEGMENT */
 
 #ifndef ___this_x86_kernel_psp0_defined
 #define ___this_x86_kernel_psp0_defined

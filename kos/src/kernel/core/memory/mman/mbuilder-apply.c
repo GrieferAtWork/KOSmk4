@@ -213,7 +213,7 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 	 *
 	 * >> PF_HANDLER:
 	 * >>     if (ATTEMTED_TO_ACCESS_UNMAPPED_ADDRESS) {
-	 * >> #if !defined(CONFIG_NO_USERKERN_SEGMENT) && defined(__ARCH_HAVE_COMPAT)
+	 * >> #if !defined(CONFIG_NO_KERNEL_USERKERN_SEGMENT) && defined(__ARCH_HAVE_COMPAT)
 	 * >>         if (IN_COMPAT_MODE() &&
 	 * >>             FAULT_ADDR < KERNELSPACE_BASE &&
 	 * >>             FAULT_ADDR >= COMPAT_KERNELSPACE_BASE) {
@@ -234,7 +234,7 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 	 * >> #endif // ...
 	 * >>     }
 	 */
-#if defined(__ARCH_HAVE_COMPAT) && !defined(CONFIG_NO_USERKERN_SEGMENT)
+#if defined(__ARCH_HAVE_COMPAT) && !defined(CONFIG_NO_KERNEL_USERKERN_SEGMENT)
 	if (FORMMAN(target, thismman_kernel_reservation).mn_part == &userkern_segment_part_compat) {
 #ifdef KERNELSPACE_HIGHMEM
 #if defined(COMPAT_KERNELSPACE_BASE) && COMPAT_KERNELSPACE_BASE != KERNELSPACE_BASE
@@ -247,7 +247,7 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 #endif /* !KERNELSPACE_HIGHMEM */
 		FORMMAN(target, thismman_kernel_reservation).mn_part = &userkern_segment_part;
 	}
-#endif /* __ARCH_HAVE_COMPAT && !CONFIG_NO_USERKERN_SEGMENT */
+#endif /* __ARCH_HAVE_COMPAT && !CONFIG_NO_KERNEL_USERKERN_SEGMENT */
 
 	/* Step #8: Re-insert the kernel-reserve node into the new tree */
 	mman_mappings_insert(target, &FORMMAN(target, thismman_kernel_reservation));

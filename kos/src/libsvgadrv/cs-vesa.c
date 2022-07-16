@@ -24,7 +24,7 @@
 #include "api.h"
 /**/
 
-#ifdef CONFIG_SVGA_HAVE_CHIPSET_VESA
+#ifdef CONFIG_HAVE_LIBSVGADRV_CHIPSET_VESA
 #include <hybrid/align.h>
 #include <hybrid/bit.h>
 
@@ -665,6 +665,6 @@ err_emu:
 }
 
 DECL_END
-#endif /* CONFIG_SVGA_HAVE_CHIPSET_VESA */
+#endif /* CONFIG_HAVE_LIBSVGADRV_CHIPSET_VESA */
 
 #endif /* !GUARD_LIBSVGADRV_CS_VESA_C */

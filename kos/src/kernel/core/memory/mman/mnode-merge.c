@@ -49,18 +49,20 @@
 #include <stdint.h>
 #include <string.h>
 
-#if defined(CONFIG_NO_MNODE_MERGE)
-#undef CONFIG_HAVE_MNODE_MERGE
-#elif !defined(CONFIG_HAVE_MNODE_MERGE)
-#define CONFIG_HAVE_MNODE_MERGE 1
-#elif (CONFIG_HAVE_MNODE_MERGE + 0) == 0
-#undef CONFIG_HAVE_MNODE_MERGE
-#define CONFIG_NO_MNODE_MERGE 1
-#endif
+/*[[[config CONFIG_HAVE_KERNEL_MNODE_MERGE = true]]]*/
+#ifdef CONFIG_NO_KERNEL_MNODE_MERGE
+#undef CONFIG_HAVE_KERNEL_MNODE_MERGE
+#elif !defined(CONFIG_HAVE_KERNEL_MNODE_MERGE)
+#define CONFIG_HAVE_KERNEL_MNODE_MERGE
+#elif (-CONFIG_HAVE_KERNEL_MNODE_MERGE - 1) == -1
+#undef CONFIG_HAVE_KERNEL_MNODE_MERGE
+#define CONFIG_NO_KERNEL_MNODE_MERGE
+#endif /* ... */
+/*[[[end]]]*/
 
 DECL_BEGIN
 
-#ifdef CONFIG_HAVE_MNODE_MERGE
+#ifdef CONFIG_HAVE_KERNEL_MNODE_MERGE
 
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset
@@ -2354,7 +2356,7 @@ domerge_locked:
 	return self;
 }
 
-#else /* CONFIG_HAVE_MNODE_MERGE */
+#else /* CONFIG_HAVE_KERNEL_MNODE_MERGE */
 
 /* Same as `mnode_merge()', but the  caller must also be holding  a
  * lock to `self->mn_part' (which may  be assumed to be  non-NULL).
@@ -2428,7 +2430,7 @@ DEFINE_PUBLIC_ALIAS(mpart_merge_locked, mnode_merge_with_partlock);
  * @return: * : A pointer to the (possibly merged) mem-part. */
 DEFINE_PUBLIC_ALIAS(mpart_merge, mnode_merge_with_partlock);
 
-#endif /* !CONFIG_HAVE_MNODE_MERGE */
+#endif /* !CONFIG_HAVE_KERNEL_MNODE_MERGE */
 
 DECL_END
 

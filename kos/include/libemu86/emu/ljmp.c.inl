@@ -28,18 +28,18 @@ EMU86_INTELLISENSE_BEGIN(ljmp) {
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
 #if (EMU86_EMULATE_CONFIG_CHECKERROR || \
      (EMU86_EMULATE_CONFIG_WANT_LJMP && \
-      (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT)))
+      (LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT)))
 
 case EMU86_OPCODE_ENCODE(0xea): {
 	/* EA cd    JMP ptr16:16    Jump far, absolute, address given in operand
 	 * EA cp    JMP ptr16:32    Jump far, absolute, address given in operand */
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
 		goto return_unsupported_instruction;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 #if ((EMU86_EMULATE_CONFIG_WANT_LJMP || (EMU86_EMULATE_CONFIG_CHECKERROR && defined(EMU86_VALIDATE_IPCS))) && \
-     (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT))
+     (LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT))
 	{
 		u32 offset;
 		u16 cs;
@@ -76,10 +76,10 @@ case EMU86_OPCODE_ENCODE(0xea): {
 		goto return_unsupported_instruction;
 #endif /* !EMU86_EMULATE_CONFIG_WANT_LJMP */
 	}
-#else /* EMU86_EMULATE_CONFIG_WANT_LJMP && (CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT) */
+#else /* EMU86_EMULATE_CONFIG_WANT_LJMP && (LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT) */
 #define NEED_return_unsupported_instruction
 	goto return_unsupported_instruction;
-#endif /* !EMU86_EMULATE_CONFIG_WANT_LJMP || (!CONFIG_LIBEMU86_WANT_32BIT && !CONFIG_LIBEMU86_WANT_16BIT) */
+#endif /* !EMU86_EMULATE_CONFIG_WANT_LJMP || (!LIBEMU86_CONFIG_WANT_32BIT && !LIBEMU86_CONFIG_WANT_16BIT) */
 }
 
 #endif /* ... */

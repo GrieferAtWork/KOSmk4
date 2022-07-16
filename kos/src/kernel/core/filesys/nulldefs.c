@@ -34,6 +34,7 @@ gcc_opt.remove("-g"); // Disable debug informations for this file!
 #include <kernel/fs/allnodes.h>
 #include <kernel/fs/chrdev.h>
 #include <kernel/fs/devfs.h>
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/fs/null.h>
 #include <kernel/fs/ramfs.h>
 #include <kernel/mman/driver.h>
@@ -215,9 +216,9 @@ for (local name, st_mode, st_rdev: DEVICES) {
 	print("				MFILE_INIT_mf_lockops,");
 	print("				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),");
 	print("				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),");
-	print("#ifdef CONFIG_HAVE_FS_NOTIFY");
+	print("#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY");
 	print("				MFILE_INIT_mf_notify,");
-	print("#endif /" "* CONFIG_HAVE_FS_NOTIFY *" "/");
+	print("#endif /" "* CONFIG_HAVE_KERNEL_FS_NOTIFY *" "/");
 	print("				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |");
 	print("				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |");
 	print("				                    MFILE_F_FIXEDFILESIZE |");
@@ -428,9 +429,9 @@ PUBLIC struct device dev_mem = {
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 				MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
 				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 				                    MFILE_F_FIXEDFILESIZE |
@@ -480,9 +481,9 @@ PUBLIC struct device dev_kmem = {
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 				MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
 				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 				                    MFILE_F_FIXEDFILESIZE |
@@ -532,9 +533,9 @@ PUBLIC struct device dev_null = {
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 				MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
 				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 				                    MFILE_F_FIXEDFILESIZE |
@@ -584,9 +585,9 @@ PUBLIC struct device dev_port = {
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 				MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
 				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 				                    MFILE_F_FIXEDFILESIZE |
@@ -636,9 +637,9 @@ PUBLIC struct device dev_zero = {
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 				MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
 				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 				                    MFILE_F_FIXEDFILESIZE |
@@ -687,9 +688,9 @@ PUBLIC struct device dev_full = {
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 				MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
 				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 				                    MFILE_F_FIXEDFILESIZE |
@@ -740,9 +741,9 @@ PUBLIC struct device dev_random = {
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 				MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
 				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 				                    MFILE_F_FIXEDFILESIZE |
@@ -792,9 +793,9 @@ PUBLIC struct device dev_urandom = {
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 				MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
 				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 				                    MFILE_F_FIXEDFILESIZE |
@@ -845,9 +846,9 @@ PUBLIC struct device dev_kmsg = {
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 				MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
 				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 				                    MFILE_F_FIXEDFILESIZE |
@@ -898,9 +899,9 @@ PUBLIC struct device dev_tty = {
 				MFILE_INIT_mf_lockops,
 				MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 				MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 				MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 				MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
 				                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 				                    MFILE_F_FIXEDFILESIZE |

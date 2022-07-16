@@ -30,7 +30,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
@@ -53,10 +53,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <libdisasm/format.h>
 #include <libinstrlen/instrlen.h>
 
-
-#undef CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER
-
-/* Use the disassembly printer to determine the length  of
+/*[[[config CONFIG_KERNEL_DEBUGGER_ASMVIEW_INSTRLEN_USES_DISASM_PRINTER = true
+ * Use the disassembly printer to determine the length  of
  * instructions,  rather than making  use of libdisasm. In
  * theory, this shouldn't really make a difference, but in
  * practice, there can easily occur cases where the length
@@ -66,12 +64,38 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
  *
  * So to prevent inconsistencies during disassembly printing, we
  * instead always make use of the disassembly printer to provide
- * us with information about the length of an instruction. */
-#define CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER 1
+ * us with information about the length of an instruction.
+ * ]]]*/
+#ifdef CONFIG_NO_KERNEL_DEBUGGER_ASMVIEW_INSTRLEN_USES_DISASM_PRINTER
+#undef CONFIG_KERNEL_DEBUGGER_ASMVIEW_INSTRLEN_USES_DISASM_PRINTER
+#elif !defined(CONFIG_KERNEL_DEBUGGER_ASMVIEW_INSTRLEN_USES_DISASM_PRINTER)
+#define CONFIG_KERNEL_DEBUGGER_ASMVIEW_INSTRLEN_USES_DISASM_PRINTER
+#elif (-CONFIG_KERNEL_DEBUGGER_ASMVIEW_INSTRLEN_USES_DISASM_PRINTER - 1) == -1
+#undef CONFIG_KERNEL_DEBUGGER_ASMVIEW_INSTRLEN_USES_DISASM_PRINTER
+#define CONFIG_NO_KERNEL_DEBUGGER_ASMVIEW_INSTRLEN_USES_DISASM_PRINTER
+#endif /* ... */
+/*[[[end]]]*/
 
-#ifndef CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER
+
+/*[[[config CONFIG_KERNEL_DEBUGGER_ASMVIEW_ADDR2LINE_IS_KERNEL_ONLY = false
+ * The building addr2line function of the debugger's disasm viewer only
+ * translates kernel-space addresses to their source locations (user-
+ * space addresses aren't translated)
+ * ]]]*/
+#ifdef CONFIG_NO_KERNEL_DEBUGGER_ASMVIEW_ADDR2LINE_IS_KERNEL_ONLY
+#undef CONFIG_KERNEL_DEBUGGER_ASMVIEW_ADDR2LINE_IS_KERNEL_ONLY
+#elif !defined(CONFIG_KERNEL_DEBUGGER_ASMVIEW_ADDR2LINE_IS_KERNEL_ONLY)
+#define CONFIG_NO_KERNEL_DEBUGGER_ASMVIEW_ADDR2LINE_IS_KERNEL_ONLY
+#elif (-CONFIG_KERNEL_DEBUGGER_ASMVIEW_ADDR2LINE_IS_KERNEL_ONLY - 1) == -1
+#undef CONFIG_KERNEL_DEBUGGER_ASMVIEW_ADDR2LINE_IS_KERNEL_ONLY
+#define CONFIG_NO_KERNEL_DEBUGGER_ASMVIEW_ADDR2LINE_IS_KERNEL_ONLY
+#endif /* ... */
+/*[[[end]]]*/
+
+
+#ifndef CONFIG_KERNEL_DEBUGGER_ASMVIEW_INSTRLEN_USES_DISASM_PRINTER
 #include <libinstrlen/instrlen.h>
-#endif /* !CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER */
+#endif /* !CONFIG_KERNEL_DEBUGGER_ASMVIEW_INSTRLEN_USES_DISASM_PRINTER */
 
 #if defined(__i386__) && !defined(__x86_64__)
 #include <asm/cpu-flags.h>
@@ -79,11 +103,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 DECL_BEGIN
 
-
-#undef CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY
-#if 0
-#define CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY 1
-#endif
 
 
 PRIVATE ATTR_DBGTEXT bool
@@ -122,7 +141,7 @@ NOTHROW(FCALL av_disasm_print_instruction)(struct disassembler *__restrict self)
 
 
 
-#ifdef CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER
+#ifdef CONFIG_KERNEL_DEBUGGER_ASMVIEW_INSTRLEN_USES_DISASM_PRINTER
 
 /* # of  instructions  to  unwind  for  the  purpose  of
  * verifying the program counter when walking backwards. */
@@ -209,7 +228,7 @@ NOTHROW(FCALL av_instr_pred_n)(void *addr, unsigned int n) {
 	return addr;
 }
 
-#else /* CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER */
+#else /* CONFIG_KERNEL_DEBUGGER_ASMVIEW_INSTRLEN_USES_DISASM_PRINTER */
 
 #define av_instr_succ(addr) ((void *)dbg_instruction_trysucc(addr, INSTRLEN_ISA_DEFAULT))
 #define av_instr_pred(addr) ((void *)dbg_instruction_trypred(addr, INSTRLEN_ISA_DEFAULT))
@@ -221,7 +240,7 @@ NOTHROW(FCALL av_instr_pred_n)(void *addr, unsigned int n) {
 	return addr;
 }
 
-#endif /* !CONFIG_ASMVIEW_INSTRLEN_USE_DISASM_PRINTER */
+#endif /* !CONFIG_KERNEL_DEBUGGER_ASMVIEW_INSTRLEN_USES_DISASM_PRINTER */
 
 
 
@@ -314,10 +333,10 @@ PRIVATE ATTR_DBGTEXT struct av_sections_lock *
 NOTHROW(FCALL av_lock_sections)(void const *symbol_addr) {
 	unsigned int i;
 	struct av_sections_lock *resent = NULL;
-#ifdef CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY
+#ifdef CONFIG_KERNEL_DEBUGGER_ASMVIEW_ADDR2LINE_IS_KERNEL_ONLY
 	if unlikely(!ADDR_ISKERN(symbol_addr))
 		goto done;
-#endif /* CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY */
+#endif /* CONFIG_KERNEL_DEBUGGER_ASMVIEW_ADDR2LINE_IS_KERNEL_ONLY */
 	for (i = 0; i < COMPILER_LENOF(av_sections_cache); ++i) {
 		if (!av_sections_cache[i].sl_module) {
 			if (!resent)
@@ -338,9 +357,9 @@ NOTHROW(FCALL av_lock_sections)(void const *symbol_addr) {
 	resent->sl_module = NULL;
 	if (!av_do_lock_sections(resent, symbol_addr))
 		resent = NULL;
-#ifdef CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY
+#ifdef CONFIG_KERNEL_DEBUGGER_ASMVIEW_ADDR2LINE_IS_KERNEL_ONLY
 done:
-#endif /* CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY */
+#endif /* CONFIG_KERNEL_DEBUGGER_ASMVIEW_ADDR2LINE_IS_KERNEL_ONLY */
 	return resent;
 }
 
@@ -385,10 +404,10 @@ PRIVATE ATTR_DBGTEXT struct av_symbol *
 NOTHROW(FCALL av_lookup_symbol)(void const *symbol_addr) {
 	unsigned int i;
 	struct av_symbol *resent = NULL;
-#ifdef CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY
+#ifdef CONFIG_KERNEL_DEBUGGER_ASMVIEW_ADDR2LINE_IS_KERNEL_ONLY
 	if unlikely(!ADDR_ISKERN(symbol_addr))
 		goto done;
-#endif /* CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY */
+#endif /* CONFIG_KERNEL_DEBUGGER_ASMVIEW_ADDR2LINE_IS_KERNEL_ONLY */
 	for (i = 0; i < COMPILER_LENOF(av_symbol_cache); ++i) {
 		if (!av_symbol_cache[i].s_name) {
 			if (!resent)
@@ -416,9 +435,9 @@ NOTHROW(FCALL av_lookup_symbol)(void const *symbol_addr) {
 		resent->s_end   = (byte_t const *)symbol_addr + 1;
 		resent = NULL;
 	}
-#ifdef CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY
+#ifdef CONFIG_KERNEL_DEBUGGER_ASMVIEW_ADDR2LINE_IS_KERNEL_ONLY
 done:
-#endif /* CONFIG_ASMVIEW_ADDR2LINE_KERNEL_ONLY */
+#endif /* CONFIG_KERNEL_DEBUGGER_ASMVIEW_ADDR2LINE_IS_KERNEL_ONLY */
 	return resent;
 }
 
@@ -777,6 +796,6 @@ DBG_COMMAND(a,
 
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_SRC_DEBUGGER_APPS_ASMVIEW_C */

@@ -35,7 +35,7 @@
 #include <kernel/mman/phys.h> /* this_trampoline_node */
 #include <kernel/mman/unmapped.h>
 #include <kernel/rt/except-handler.h>
-#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
+#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/cpu.h>
@@ -169,7 +169,7 @@ waitfor_vfork_completion(struct task *__restrict thread)
 }
 
 
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 PRIVATE NONNULL((4)) void KCALL
 restore_userprocmask_after_vfork(USER CHECKED struct userprocmask *um,
                                  USER CHECKED sigset_t *umask,
@@ -210,7 +210,7 @@ restore_userprocmask_after_vfork(USER CHECKED struct userprocmask *um,
 	 * go back to what it was before they called vfork(2)) */
 	ATOMIC_WRITE(um->pm_sigmask, umask);
 }
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 
 
 /* Clone the calling thread's signal mask into `result'. */
@@ -220,7 +220,7 @@ task_clone_sigmask(struct task *__restrict result,
                    uint64_t clone_flags) {
 	/* Clone the current signal mask. */
 	(void)clone_flags;
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 	if (caller->t_flags & TASK_FUSERPROCMASK) {
 		struct userprocmask *um;
 		um = FORTASK(caller, this_userprocmask_address);
@@ -272,7 +272,7 @@ inherit_parent_userprocmask:
 			       0xff, sizeof(sigset_t) - parent_umasksize);
 		}
 	} else
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 	{
 		memcpy(&FORTASK(result, this_kernel_sigmask),
 		       &FORTASK(caller, this_kernel_sigmask),
@@ -836,7 +836,7 @@ do_clone_pid:
 	/* Deal with vfork() */
 	if (clone_flags & CLONE_VFORK) {
 		TRY {
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 			/* Special case for when the parent thread was using USERPROCMASK.
 			 * In this case we have to save+restore both the contents of--, as
 			 * well  as the pointer to the signal  mask as it was active prior
@@ -878,7 +878,7 @@ do_clone_pid:
 				 * mask, as it was prior to the vfork-child being started. */
 				restore_userprocmask_after_vfork(um, umask, umasksize, &saved_umask);
 			} else
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 			{
 				/* Actually start execution of the newly created thread. */
 				task_start(result);

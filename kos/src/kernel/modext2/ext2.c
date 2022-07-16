@@ -32,6 +32,7 @@
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/flat.h>
 #include <kernel/fs/node.h>
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/fs/regnode.h>
 #include <kernel/fs/super.h>
 #include <kernel/malloc.h>
@@ -841,9 +842,9 @@ PRIVATE struct flatdirnode_ops const ext2_dirops = {
 		.dno_mkfile = &flatdirnode_v_mkfile,
 		.dno_unlink = &flatdirnode_v_unlink,
 		.dno_rename = &flatdirnode_v_rename,
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 		.dno_attach_notify = &flatdirnode_v_attach_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 	},
 	.fdno_flat = {
 		.fdnx_readdir       = &ext2_dir_v_readdir,
@@ -992,9 +993,9 @@ PRIVATE struct flatsuper_ops const ext2_super_ops = {
 			.dno_mkfile = &flatdirnode_v_mkfile,
 			.dno_unlink = &flatdirnode_v_unlink,
 			.dno_rename = &flatdirnode_v_rename,
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 			.dno_attach_notify = &flatdirnode_v_attach_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 		},
 	},
 	.ffso_flat = {

@@ -71,16 +71,16 @@ elfexec_init_rtld(struct icpustate *__restrict user_state,
 
 #ifdef __ARCH_HAVE_COMPAT
 /* Initialize user-space for program execution. */
-#ifndef CONFIG_EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_ENTRY
+#ifndef EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_ENTRY
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *KCALL
 compat_elfexec_init_entry(struct icpustate *__restrict user_state,
                           KERNEL COMPAT_ElfW(Ehdr) const *__restrict ehdr,
                           USER void *peb_address, USER void *ustack_base,
                           size_t ustack_size, USER void const *entry_pc);
-#endif /* !CONFIG_EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_ENTRY */
+#endif /* !EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_ENTRY */
 
 /* Initialize the RTLD user-space library for runtime linking. */
-#ifndef CONFIG_EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_RTLD
+#ifndef EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_RTLD
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 4, 5, 6)) struct icpustate *KCALL
 compat_elfexec_init_rtld(struct icpustate *__restrict user_state,
                          struct path *exec_path,
@@ -92,7 +92,7 @@ compat_elfexec_init_rtld(struct icpustate *__restrict user_state,
                          void *application_loadaddr, void *linker_loadaddr,
                          USER void *peb_address, USER void *ustack_base,
                          size_t ustack_size, USER void const *entry_pc);
-#endif /* !CONFIG_EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_RTLD */
+#endif /* !EXEC_ARCH_HEADER_DEFINES_COMPAT_ELFEXEC_INIT_RTLD */
 #endif /* __ARCH_HAVE_COMPAT */
 
 

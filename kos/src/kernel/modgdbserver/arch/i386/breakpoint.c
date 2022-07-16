@@ -39,9 +39,11 @@ DECL_BEGIN
 
 #define OP_INT3 0xcc /* int3 opcode */
 
-#ifndef CONFIG_GDBSERVER_SWBREAK_MAX_COUNT
-#define CONFIG_GDBSERVER_SWBREAK_MAX_COUNT 256
-#endif /* !CONFIG_GDBSERVER_SWBREAK_MAX_COUNT */
+/*[[[config CONFIG_MODGDBSERVER_SWBREAK_MAXCNT! = 256]]]*/
+#ifndef CONFIG_MODGDBSERVER_SWBREAK_MAXCNT
+#define CONFIG_MODGDBSERVER_SWBREAK_MAXCNT 256
+#endif /* !CONFIG_MODGDBSERVER_SWBREAK_MAXCNT */
+/*[[[end]]]*/
 
 struct sw_brk {
 	struct mman *sb_vm;   /* [0..1] The VM inside of which this breakpoint exists.
@@ -54,7 +56,7 @@ struct sw_brk {
 /* [lock(append(PRIVATE(GDB_HOST_THREAD)),
  *       remove(PRIVATE(GDB_HOST_THREAD) || wasdestroyed(->sb_vm)))]
  * List of defined software breakpoints. */
-PRIVATE struct sw_brk GDBBreak_SwList[CONFIG_GDBSERVER_SWBREAK_MAX_COUNT];
+PRIVATE struct sw_brk GDBBreak_SwList[CONFIG_MODGDBSERVER_SWBREAK_MAXCNT];
 
 /* [lock(PRIVATE(GDB_HOST_THREAD) || ATOMIC(NEWVAL < OLDVAL))]
  * Index of the lowest sw-breakpoint slot which may be free (sb_vm == NULL) */
@@ -108,7 +110,7 @@ NOTHROW(FCALL GDBBreak_SwPush)(struct mman *effective_mm,
 	start = ATOMIC_READ(GDBBreak_SwMinFree);
 again:
 	for (i = start;
-	     i < CONFIG_GDBSERVER_SWBREAK_MAX_COUNT; ++i) {
+	     i < CONFIG_MODGDBSERVER_SWBREAK_MAXCNT; ++i) {
 		if (GDBBreak_SwList[i].sb_vm)
 			continue; /* Already in use. */
 		/* Use this slot! */

@@ -919,7 +919,7 @@ for name in *.h; do
 	libiconv_mirror_include "$name"
 done
 
-BUILD_CONFIG_HEADER="$KOS_ROOT/kos/include/$INCLUDE_NAME/kos/_build-config${SYSHEADER_BUILD_CONFIG_SUFFIX}.h"
+BUILD_CONFIG_HEADER="$KOS_ROOT/kos/include/$INCLUDE_NAME/kos/config/_toolchain${SYSHEADER_BUILD_CONFIG_SUFFIX}.h"
 echo "Updating build configuration: $BUILD_CONFIG_HEADER"
 DI=($(date -u +"%-s %0Y %0m %0d %0H %0M %0S %0N"))
 lstrip() { echo -n "${1#"${1%%[1-9]*}"}"; }

@@ -31,7 +31,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <debugger/config.h>
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/output.h>
@@ -380,6 +380,6 @@ NOTHROW(FCALL dbg_fallback_releasetty)(void) {
 
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_OUTPUT_C */

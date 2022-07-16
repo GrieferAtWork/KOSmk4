@@ -48,23 +48,27 @@
 #include <syslog.h>
 #include <unistd.h>
 
-/************************************************************************/
-/* Config option: enable support for libservice modules                 */
-/************************************************************************/
-#undef CONFIG_DLOPEN_LIBSERVICE_SUPPORT
-#if 1
-#define CONFIG_DLOPEN_LIBSERVICE_SUPPORT 1
-#endif
+/*[[[config CONFIG_LIBDL_DLOPEN_SUPPORTS_LIBSERVICE = true
+ * Enable support for libservice modules
+ * ]]]*/
+#ifdef CONFIG_NO_LIBDL_DLOPEN_SUPPORTS_LIBSERVICE
+#undef CONFIG_LIBDL_DLOPEN_SUPPORTS_LIBSERVICE
+#elif !defined(CONFIG_LIBDL_DLOPEN_SUPPORTS_LIBSERVICE)
+#define CONFIG_LIBDL_DLOPEN_SUPPORTS_LIBSERVICE
+#elif (-CONFIG_LIBDL_DLOPEN_SUPPORTS_LIBSERVICE - 1) == -1
+#undef CONFIG_LIBDL_DLOPEN_SUPPORTS_LIBSERVICE
+#define CONFIG_NO_LIBDL_DLOPEN_SUPPORTS_LIBSERVICE
+#endif /* ... */
+/*[[[end]]]*/
 
-
-#ifdef CONFIG_DLOPEN_LIBSERVICE_SUPPORT
+#ifdef CONFIG_LIBDL_DLOPEN_SUPPORTS_LIBSERVICE
 #include <libservice/client.h>
-#endif /* CONFIG_DLOPEN_LIBSERVICE_SUPPORT */
+#endif /* CONFIG_LIBDL_DLOPEN_SUPPORTS_LIBSERVICE */
 
 DECL_BEGIN
 
 
-#ifdef CONFIG_DLOPEN_LIBSERVICE_SUPPORT
+#ifdef CONFIG_LIBDL_DLOPEN_SUPPORTS_LIBSERVICE
 struct dl_service_module {
 	byte_t          dsm_module[offsetof(DlModule, dm_elf)]; /* Standard module fields. */
 	struct service *dsm_service; /* [1..1] The associated service controller (defined in libservice). */
@@ -309,7 +313,7 @@ err_nomem:
 	return NULL;
 }
 
-#endif /* CONFIG_DLOPEN_LIBSERVICE_SUPPORT */
+#endif /* CONFIG_LIBDL_DLOPEN_SUPPORTS_LIBSERVICE */
 
 INTERN WUNUSED fd_t NOTHROW_RPC(CC reopen_bigfd)(fd_t fd) {
 	enum { MAX_RESERVED_FD = MAX_C(STDIN_FILENO, STDOUT_FILENO, STDERR_FILENO) };
@@ -437,10 +441,10 @@ DlModule_OpenFilename(USER char const *filename,
 		goto done_existing;
 	fd = sys_open(filename, O_RDONLY | O_CLOEXEC, 0);
 	if unlikely(E_ISERR(fd)) {
-#ifdef CONFIG_DLOPEN_LIBSERVICE_SUPPORT
+#ifdef CONFIG_LIBDL_DLOPEN_SUPPORTS_LIBSERVICE
 		if (fd == -ENXIO) /* Produced as the result of `E_ILLEGAL_OPERATION_CONTEXT_OPEN_S_IFSOCK' */
 			return DlModule_OpenService(filename, mode);
-#endif /* CONFIG_DLOPEN_LIBSERVICE_SUPPORT */
+#endif /* CONFIG_LIBDL_DLOPEN_SUPPORTS_LIBSERVICE */
 		goto err; /* No error on file-access-failure! */
 	}
 	/* Make sure to only use big file descriptor indices, so-as
@@ -667,10 +671,20 @@ NOTHROW_NCX(CC DlModule_FindFilenameInPathListFromAll)(USER char const *filename
 	return result;
 }
 
-#undef CONFIG_DLOPEN_TRYHARD_NO_VERSION_SUFFIX
-#if 1
-#define CONFIG_DLOPEN_TRYHARD_NO_VERSION_SUFFIX 1
-#endif
+/*[[[config CONFIG_LIBDL_DLOPEN_TRYHARD_NO_VERSION_SUFFIX = true
+ * Upon failure, dlopen(3) will try to open shared libraries with
+ * version extensions a second time, but with the version extension
+ * stripped. This is needed for compatibility in some cases.
+ * ]]]*/
+#ifdef CONFIG_NO_LIBDL_DLOPEN_TRYHARD_NO_VERSION_SUFFIX
+#undef CONFIG_LIBDL_DLOPEN_TRYHARD_NO_VERSION_SUFFIX
+#elif !defined(CONFIG_LIBDL_DLOPEN_TRYHARD_NO_VERSION_SUFFIX)
+#define CONFIG_LIBDL_DLOPEN_TRYHARD_NO_VERSION_SUFFIX
+#elif (-CONFIG_LIBDL_DLOPEN_TRYHARD_NO_VERSION_SUFFIX - 1) == -1
+#undef CONFIG_LIBDL_DLOPEN_TRYHARD_NO_VERSION_SUFFIX
+#define CONFIG_NO_LIBDL_DLOPEN_TRYHARD_NO_VERSION_SUFFIX
+#endif /* ... */
+/*[[[end]]]*/
 
 INTERN WUNUSED NONNULL((1, 2)) REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
 DlModule_OpenFilenameInPathList(char const *__restrict path, USER char const *filename,
@@ -679,14 +693,14 @@ DlModule_OpenFilenameInPathList(char const *__restrict path, USER char const *fi
 	REF DlModule *result;
 	char const *sep;
 	size_t filenamelen;
-#ifdef CONFIG_DLOPEN_TRYHARD_NO_VERSION_SUFFIX
+#ifdef CONFIG_LIBDL_DLOPEN_TRYHARD_NO_VERSION_SUFFIX
 	char const *orig_path;
-#endif /* CONFIG_DLOPEN_TRYHARD_NO_VERSION_SUFFIX */
+#endif /* CONFIG_LIBDL_DLOPEN_TRYHARD_NO_VERSION_SUFFIX */
 	filenamelen = strlen(filename);
-#ifdef CONFIG_DLOPEN_TRYHARD_NO_VERSION_SUFFIX
+#ifdef CONFIG_LIBDL_DLOPEN_TRYHARD_NO_VERSION_SUFFIX
 	orig_path = path;
 again:
-#endif /* CONFIG_DLOPEN_TRYHARD_NO_VERSION_SUFFIX */
+#endif /* CONFIG_LIBDL_DLOPEN_TRYHARD_NO_VERSION_SUFFIX */
 	for (;;) {
 		char ch;
 		sep = path;
@@ -705,7 +719,7 @@ again:
 			break;
 		path = sep + 1;
 	}
-#ifdef CONFIG_DLOPEN_TRYHARD_NO_VERSION_SUFFIX
+#ifdef CONFIG_LIBDL_DLOPEN_TRYHARD_NO_VERSION_SUFFIX
 	/* Check if the filename ends with `.<number>'.
 	 * If  so,  strip  that number  and  try again. */
 	if (filenamelen && isdigit(filename[filenamelen - 1])) {
@@ -718,7 +732,7 @@ again:
 			goto again;
 		}
 	}
-#endif /* CONFIG_DLOPEN_TRYHARD_NO_VERSION_SUFFIX */
+#endif /* CONFIG_LIBDL_DLOPEN_TRYHARD_NO_VERSION_SUFFIX */
 done:
 	return result;
 }

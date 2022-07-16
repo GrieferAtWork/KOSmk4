@@ -25,7 +25,7 @@
 //#define DEFINE_x86_userexcept_callsignal64
 #endif /* __INTELLISENSE__ */
 
-#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
+#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 #include <sched/sigaction.h>
 #include <sched/sigmask.h>
 #include <sched/x86/eflags-mask.h>

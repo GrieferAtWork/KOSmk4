@@ -29,14 +29,14 @@
 #error "Must not #include <libsctrace/sctrace.h> before including this header!"
 #endif /* _LIBSCTRACE_SCTRACE_H */
 
-#ifdef CONFIG_BUILDING_MODSCTRACE
+#ifdef BUILDING_MODSCTRACE
 #undef LIBSCTRACE_DECL
 /* Link the lib-internal variants to prevent
  * unnecessary relocations against  ourself. */
 #define LIBSCTRACE_DECL INTDEF
 #define sc_getdesc    libsc_getdesc
 #define sc_printvalue libsc_printvalue
-#endif /* CONFIG_BUILDING_MODSCTRACE */
+#endif /* BUILDING_MODSCTRACE */
 
 #include <libsctrace/sctrace.h>
 /**/

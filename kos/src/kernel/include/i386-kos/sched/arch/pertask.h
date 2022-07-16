@@ -28,9 +28,9 @@
 
 DECL_BEGIN
 
-#undef CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE
+#undef OPT_PERTASK_USE_SWITCH_SIZEOF_VARIABLE
 #if defined(__GNUC__) || 1
-#define CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE 1
+#define OPT_PERTASK_USE_SWITCH_SIZEOF_VARIABLE 1
 #endif
 
 #ifdef __x86_64__
@@ -271,7 +271,7 @@ template<class __T> using __pt_remove_cv_t = typename __pt_remove_cv<__T>::__typ
 __NAMESPACE_INT_END
 }
 
-#ifdef CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE
+#ifdef OPT_PERTASK_USE_SWITCH_SIZEOF_VARIABLE
 #ifdef __pertask_get64_r
 #define PERTASK_GET(x)                                                \
 	XBLOCK({                                                          \
@@ -298,7 +298,7 @@ __NAMESPACE_INT_END
 		XRETURN __pt_res;                                             \
 	})
 #endif /* !__pertask_get64_r */
-#else /* CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE */
+#else /* OPT_PERTASK_USE_SWITCH_SIZEOF_VARIABLE */
 #ifdef __pertask_get64_r
 #define PERTASK_GET(x)                                                \
 	XBLOCK({                                                          \
@@ -332,7 +332,7 @@ __NAMESPACE_INT_END
 		XRETURN __pt_res;                                             \
 	})
 #endif /* !__pertask_get64_r */
-#endif /* !CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE */
+#endif /* !OPT_PERTASK_USE_SWITCH_SIZEOF_VARIABLE */
 
 
 #else /* __cplusplus */
@@ -375,7 +375,7 @@ __NAMESPACE_INT_END
 	__builtin_choose_expr(sizeof(x) == 4, __pertask_set32(x, (__UINT32_TYPE__)(v)), \
 	                     (__invalid_pertask_object_size(), 0))))
 #endif /* !__pertask_get64_r */
-#elif defined(CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE)
+#elif defined(OPT_PERTASK_USE_SWITCH_SIZEOF_VARIABLE)
 #ifdef __pertask_set64
 #define PERTASK_SET(x, v)                         \
 	XBLOCK({                                      \
@@ -400,7 +400,7 @@ __NAMESPACE_INT_END
 		(void)0;                                  \
 	})
 #endif /* !__pertask_set64 */
-#else /* CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE */
+#else /* OPT_PERTASK_USE_SWITCH_SIZEOF_VARIABLE */
 #ifdef __pertask_set64
 #define PERTASK_SET(x, v)                      \
 	XBLOCK({                                   \
@@ -432,14 +432,14 @@ __NAMESPACE_INT_END
 		(void)0;                               \
 	})
 #endif /* !__pertask_set64 */
-#endif /* !CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE */
+#endif /* !OPT_PERTASK_USE_SWITCH_SIZEOF_VARIABLE */
 
 /************************************************************************/
 /* Define __X86_PERTASK_CMP()                                           */
 /************************************************************************/
 #ifdef __NO_XBLOCK
 /* TODO */
-#elif defined(CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE)
+#elif defined(OPT_PERTASK_USE_SWITCH_SIZEOF_VARIABLE)
 #ifdef __pertask_cmp64_r
 #define __X86_PERTASK_CMP(x, rhs, cc)                            \
 	XBLOCK({                                                     \
@@ -466,7 +466,7 @@ __NAMESPACE_INT_END
 		XRETURN __xpc_res;                                       \
 	})
 #endif /* !__pertask_cmp64_r */
-#else /* CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE */
+#else /* OPT_PERTASK_USE_SWITCH_SIZEOF_VARIABLE */
 #ifdef __pertask_cmp64_r
 #define __X86_PERTASK_CMP(x, rhs, cc)                 \
 	XBLOCK({                                          \
@@ -500,7 +500,7 @@ __NAMESPACE_INT_END
 		XRETURN __xpc_res;                            \
 	})
 #endif /* !__pertask_cmp64_r */
-#endif /* !CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE */
+#endif /* !OPT_PERTASK_USE_SWITCH_SIZEOF_VARIABLE */
 
 
 #ifdef __X86_PERTASK_CMP
@@ -515,7 +515,7 @@ __NAMESPACE_INT_END
 /************************************************************************/
 #ifdef __NO_XBLOCK
 /* TODO */
-#elif defined(CONFIG_PERTASK_USE_SWITCH_SIZEOF_VARIABLE)
+#elif defined(OPT_PERTASK_USE_SWITCH_SIZEOF_VARIABLE)
 #ifdef __pertask_test64_r
 #define __X86_PERTASK_TEST(x, rhs)                            \
 	XBLOCK({                                                  \

@@ -453,11 +453,18 @@ struct task_connection {
 };
 
 
-/* Max number of signal connections guarantied to not invoke `kmalloc()'
- * and   potentially   throw   exceptions,  or   serve   RPC  functions. */
+/*[[[config CONFIG_TASK_STATIC_CONNECTIONS! = 3
+ * Max number of signal connections guarantied to not invoke `kmalloc()'
+ * and   potentially   throw   exceptions,  or   serve   RPC  functions.
+ * ]]]*/
 #ifndef CONFIG_TASK_STATIC_CONNECTIONS
 #define CONFIG_TASK_STATIC_CONNECTIONS 3
 #endif /* !CONFIG_TASK_STATIC_CONNECTIONS */
+/*[[[end]]]*/
+
+#if CONFIG_TASK_STATIC_CONNECTIONS < 2
+#error "Need at least 2 statically allocatable connections per task!"
+#endif /* CONFIG_TASK_STATIC_CONNECTIONS < 2 */
 
 struct task_connections {
 	struct task_connections *tsc_prev;   /* [0..1][lock(PRIVATE(THIS_TASK))]
@@ -730,7 +737,8 @@ NOTHROW(KCALL pertask_fix_task_connections)(struct task *__restrict self);
 #endif /* __CC__ */
 
 
-/* Configuration option for standard synchronization  primitives.
+/*[[[config CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT: int = 4
+ * Configuration option for standard synchronization  primitives.
  * Before connecting to a signal, try to yield a couple of  times
  * to try and get other threads to release some kind of lock,  as
  * `task_yield()' is a much faster operation than task_connect()+
@@ -743,18 +751,19 @@ NOTHROW(KCALL pertask_fix_task_connections)(struct task *__restrict self);
  * NOTE: The number that this is defined to describes the
  *       max  number of times `task_yield()' is attempted
  *       (implementing a kind-of spin-locking mechanism),
- *       before a signal is actually connected. */
-#ifndef CONFIG_YIELD_BEFORE_CONNECT
-#ifndef CONFIG_NO_YIELD_BEFORE_CONNECT
-#define CONFIG_YIELD_BEFORE_CONNECT 4
-#endif /* !CONFIG_NO_YIELD_BEFORE_CONNECT */
-#elif defined(CONFIG_NO_YIELD_BEFORE_CONNECT)
-#undef CONFIG_YIELD_BEFORE_CONNECT
+ *       before a signal is actually connected.
+ * ]]]*/
+#ifdef CONFIG_NO_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT
+#undef CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT
+#define CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT 0
+#elif !defined(CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT)
+#define CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT 4
+#elif (CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT + 0) <= 0
+#undef CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT
+#define CONFIG_NO_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT
+#define CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT 0
 #endif /* ... */
-
-#if defined(CONFIG_YIELD_BEFORE_CONNECT) && (CONFIG_YIELD_BEFORE_CONNECT+0) == 0
-#undef CONFIG_YIELD_BEFORE_CONNECT
-#endif /* CONFIG_YIELD_BEFORE_CONNECT && (CONFIG_YIELD_BEFORE_CONNECT+0) == 0 */
+/*[[[end]]]*/
 
 
 /* Helper macro to implement spin-locking before connecting a signal:
@@ -783,30 +792,20 @@ NOTHROW(KCALL pertask_fix_task_connections)(struct task *__restrict self);
  * >> return true;
  */
 #ifdef __CC__
-#ifdef CONFIG_YIELD_BEFORE_CONNECT
+#ifdef CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT
 #ifndef __task_tryyield_defined
 #define __task_tryyield_defined
 FUNDEF NOBLOCK_IF(!PREEMPTION_ENABLED())
 unsigned int NOTHROW(KCALL task_tryyield)(void);
 #endif /* !__task_tryyield_defined */
-#if CONFIG_YIELD_BEFORE_CONNECT == 1
+#if CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT == 1
 #define TASK_POLL_BEFORE_CONNECT(...) \
 	do {                              \
 		if (task_tryyield() != 0)     \
 			break;                    \
 		__VA_ARGS__;                  \
 	}	__WHILE0
-#elif CONFIG_YIELD_BEFORE_CONNECT == 2
-#define TASK_POLL_BEFORE_CONNECT(...) \
-	do {                              \
-		if (task_tryyield() != 0)     \
-			break;                    \
-		__VA_ARGS__;                  \
-		if (task_tryyield() != 0)     \
-			break;                    \
-		__VA_ARGS__;                  \
-	}	__WHILE0
-#elif CONFIG_YIELD_BEFORE_CONNECT == 3
+#elif CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT == 2
 #define TASK_POLL_BEFORE_CONNECT(...) \
 	do {                              \
 		if (task_tryyield() != 0)     \
@@ -815,11 +814,8 @@ unsigned int NOTHROW(KCALL task_tryyield)(void);
 		if (task_tryyield() != 0)     \
 			break;                    \
 		__VA_ARGS__;                  \
-		if (task_tryyield() != 0)     \
-			break;                    \
-		__VA_ARGS__;                  \
 	}	__WHILE0
-#elif CONFIG_YIELD_BEFORE_CONNECT == 4
+#elif CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT == 3
 #define TASK_POLL_BEFORE_CONNECT(...) \
 	do {                              \
 		if (task_tryyield() != 0)     \
@@ -831,11 +827,8 @@ unsigned int NOTHROW(KCALL task_tryyield)(void);
 		if (task_tryyield() != 0)     \
 			break;                    \
 		__VA_ARGS__;                  \
-		if (task_tryyield() != 0)     \
-			break;                    \
-		__VA_ARGS__;                  \
 	}	__WHILE0
-#elif CONFIG_YIELD_BEFORE_CONNECT == 5
+#elif CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT == 4
 #define TASK_POLL_BEFORE_CONNECT(...) \
 	do {                              \
 		if (task_tryyield() != 0)     \
@@ -850,11 +843,8 @@ unsigned int NOTHROW(KCALL task_tryyield)(void);
 		if (task_tryyield() != 0)     \
 			break;                    \
 		__VA_ARGS__;                  \
-		if (task_tryyield() != 0)     \
-			break;                    \
-		__VA_ARGS__;                  \
 	}	__WHILE0
-#elif CONFIG_YIELD_BEFORE_CONNECT == 6
+#elif CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT == 5
 #define TASK_POLL_BEFORE_CONNECT(...) \
 	do {                              \
 		if (task_tryyield() != 0)     \
@@ -872,24 +862,43 @@ unsigned int NOTHROW(KCALL task_tryyield)(void);
 		if (task_tryyield() != 0)     \
 			break;                    \
 		__VA_ARGS__;                  \
+	}	__WHILE0
+#elif CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT == 6
+#define TASK_POLL_BEFORE_CONNECT(...) \
+	do {                              \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
+		if (task_tryyield() != 0)     \
+			break;                    \
+		__VA_ARGS__;                  \
 		if (task_tryyield() != 0)     \
 			break;                    \
 		__VA_ARGS__;                  \
 	}	__WHILE0
-#else /* CONFIG_YIELD_BEFORE_CONNECT == ... */
-#define TASK_POLL_BEFORE_CONNECT(...)                            \
-	do {                                                         \
-		unsigned int __poll_count = CONFIG_YIELD_BEFORE_CONNECT; \
-		do {                                                     \
-			if (task_tryyield() != 0)                            \
-				break;                                           \
-			__VA_ARGS__;                                         \
-		} while (--__poll_count);                                \
+#else /* CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT == ... */
+#define TASK_POLL_BEFORE_CONNECT(...)                                             \
+	do {                                                                          \
+		unsigned int __poll_count = CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT; \
+		do {                                                                      \
+			if (task_tryyield() != 0)                                             \
+				break;                                                            \
+			__VA_ARGS__;                                                          \
+		} while (--__poll_count);                                                 \
 	}	__WHILE0
-#endif /* CONFIG_YIELD_BEFORE_CONNECT != ... */
-#else /* CONFIG_YIELD_BEFORE_CONNECT */
+#endif /* CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT != ... */
+#else /* CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT */
 #define TASK_POLL_BEFORE_CONNECT(...) (void)0
-#endif /* !CONFIG_YIELD_BEFORE_CONNECT */
+#endif /* !CONFIG_KERNEL_SCHED_NUM_YIELD_BEFORE_CONNECT */
 #endif /* __CC__ */
 
 

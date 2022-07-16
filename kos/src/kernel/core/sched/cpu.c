@@ -23,12 +23,12 @@
 
 #include <kernel/compiler.h>
 
-#include <debugger/config.h> /* CONFIG_HAVE_DEBUGGER */
+#include <debugger/config.h> /* CONFIG_HAVE_KERNEL_DEBUGGER */
 #include <sched/cpu.h>
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <debugger/rt.h> /* dbg_active */
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 DECL_BEGIN
 

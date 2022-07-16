@@ -84,20 +84,20 @@ shebang_exec(struct execargs *__restrict args) {
 
 	/* Check for simple case: the linefeed is already apart of the pre-loaded `exec_header' */
 	execfile     = (char *)args->ea_header + 2;
-	execline_end = find_eol(execfile, CONFIG_EXECABI_MAXHEADER - 2);
+	execline_end = find_eol(execfile, EXECABI_MAXHEADER - 2);
 	if unlikely(!execline_end) {
 		size_t extlen;
 		char *ptr;
 		/* The end of the leading line may be apart of an extended header. */
-		ext_header = (char *)kmalloc(CONFIG_SHEBANG_INTERPRETER_LINE_MAX, GFP_NORMAL);
-		ptr        = (char *)mempcpy(ext_header, args->ea_header + 2, CONFIG_EXECABI_MAXHEADER - 2);
-#define MAX_EXTSIZE (CONFIG_SHEBANG_INTERPRETER_LINE_MAX - (CONFIG_EXECABI_MAXHEADER - 2))
-		extlen = mfile_read(args->ea_xfile, ptr, MAX_EXTSIZE, (pos_t)(CONFIG_EXECABI_MAXHEADER - 2));
+		ext_header = (char *)kmalloc(CONFIG_MODSHEBANG_INTERPRETER_LINEMAX, GFP_NORMAL);
+		ptr        = (char *)mempcpy(ext_header, args->ea_header + 2, EXECABI_MAXHEADER - 2);
+#define MAX_EXTSIZE (CONFIG_MODSHEBANG_INTERPRETER_LINEMAX - (EXECABI_MAXHEADER - 2))
+		extlen = mfile_read(args->ea_xfile, ptr, MAX_EXTSIZE, (pos_t)(EXECABI_MAXHEADER - 2));
 		if (extlen < MAX_EXTSIZE)
 			bzero(ptr + extlen, MAX_EXTSIZE - extlen);
 #undef MAX_EXTSIZE
 		execfile     = ext_header;
-		execline_end = find_eol(execfile, CONFIG_SHEBANG_INTERPRETER_LINE_MAX);
+		execline_end = find_eol(execfile, CONFIG_MODSHEBANG_INTERPRETER_LINEMAX);
 		if unlikely(!execline_end) {
 			/* NOTE: `kfree(ext_header);' is called by an EXCEPT below! */
 			THROW(E_NOT_EXECUTABLE_FAULTY,

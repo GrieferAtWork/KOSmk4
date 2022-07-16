@@ -41,6 +41,7 @@
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/fs.h>
 #include <kernel/fs/node.h>
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/fs/notify.h>
 #include <kernel/fs/path.h>
 #include <kernel/fs/ramfs.h>
@@ -69,13 +70,13 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <debugger/hook.h>
 #include <debugger/io.h>
 
 #include <format-printer.h>
 #include <inttypes.h>
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 /* Devfs by-name tree operations. (For `devfs_byname_tree') */
 #undef RBTREE_LEFT_LEANING
@@ -546,9 +547,9 @@ PUBLIC_CONST struct fdirnode_ops const devfs_dirnode_ops = {
 	.dno_mkfile = &ramfs_dirnode_v_mkfile,
 	.dno_unlink = &ramfs_dirnode_v_unlink,
 	.dno_rename = &devfs_dirnode_v_rename,
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 	.dno_attach_notify = &ramfs_dirnode_v_attach_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 };
 
 
@@ -1145,7 +1146,7 @@ again_acquire_locks:
 
 
 
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 /* Return values for `devfs_super_dirent_traced()' */
 #define DEVFS_SUPER_DIRENT_TRACED_NO    0 /* Not traced */
 #define DEVFS_SUPER_DIRENT_TRACED_YES   1 /* Is traced */
@@ -1223,7 +1224,7 @@ devfs_super_v_attach_notify(struct fdirnode *__restrict self)
 		devfs_super_v_attach_notify_impl(devfs_byname_tree);
 	devfs_byname_endread();
 }
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 
 #define devfs_super_v_changed    ramfs_super_v_changed
@@ -1266,9 +1267,9 @@ INTERN_CONST struct fsuper_ops const devfs_super_ops = {
 		.dno_mkfile = &devfs_super_v_mkfile,
 		.dno_unlink = &devfs_super_v_unlink,
 		.dno_rename = &devfs_super_v_rename,
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 		.dno_attach_notify = &devfs_super_v_attach_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 	},
 };
 
@@ -2093,7 +2094,7 @@ done:
 
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 PRIVATE ATTR_DBGTEXT void KCALL
 do_dump_blkdev(struct blkdev *__restrict self,
                size_t longest_device_name,
@@ -2342,7 +2343,7 @@ DBG_COMMAND(lschr,
 	return 0;
 }
 
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 DECL_END

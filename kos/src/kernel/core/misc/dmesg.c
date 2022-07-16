@@ -21,7 +21,7 @@
 #define GUARD_KERNEL_SRC_MISC_DMESG_C 1
 #define DISABLE_BRANCH_PROFILING /* Don't profile this file */
 #define _KOS_SOURCE 1
-#define SYSLOG_LINEMAX CONFIG_SYSLOG_LINEMAX
+#define SYSLOG_LINEMAX CONFIG_KERNEL_SYSLOG_LINEMAX
 
 /* NOTE: Don't add any assertion checks to this file!
  *       Because the syslog is used excessively by all kernel panic/assert/check
@@ -84,7 +84,7 @@ DECL_BEGIN
  * within  this buffer. However, be aware that  the buffer can change at any
  * time, meaning that any packet decoding errors must be considered the same
  * as having fully wrapped around the buffer. */
-PUBLIC ATTR_BSS ATTR_ALIGNED(1) byte_t dmesg_buffer[CONFIG_DMESG_BUFFER_SIZE] = {};
+PUBLIC ATTR_BSS ATTR_ALIGNED(1) byte_t dmesg_buffer[CONFIG_KERNEL_DMESG_BUFFER_SIZE] = {};
 
 /* Base-line seconds for all cached dmesg packets. */
 PUBLIC ATTR_BSS time_t dmesg_secondsbase = 0;
@@ -94,10 +94,10 @@ PUBLIC ATTR_BSS WEAK unsigned int dmesg_consistent = 0;
 
 /* Total number  of bytes  ever written  to `dmesg_buffer'  in the  past.
  * A pointer to the end of the last-written packet can thus be calculated
- * as `&dmesg_buffer[dmesg_size % CONFIG_DMESG_BUFFER_SIZE]' */
+ * as `&dmesg_buffer[dmesg_size % CONFIG_KERNEL_DMESG_BUFFER_SIZE]' */
 PUBLIC ATTR_BSS size_t dmesg_size = 0;
 
-#define getb() (dmesg_buffer[(offset++) % CONFIG_DMESG_BUFFER_SIZE])
+#define getb() (dmesg_buffer[(offset++) % CONFIG_KERNEL_DMESG_BUFFER_SIZE])
 PRIVATE NOBLOCK ATTR_COLD ATTR_COLDTEXT ATTR_NOINLINE size_t
 NOTHROW(FCALL decode_rel_seconds)(size_t offset, s64 *__restrict presult) {
 	shift_t shift = 0;
@@ -130,8 +130,8 @@ again:
 	offset_from_start   = total_size;
 #define getb()                               \
 	(++offset_from_end, --offset_from_start, \
-	 dmesg_buffer[offset_from_start % CONFIG_DMESG_BUFFER_SIZE])
-	while (offset_from_end < CONFIG_DMESG_BUFFER_SIZE) {
+	 dmesg_buffer[offset_from_start % CONFIG_KERNEL_DMESG_BUFFER_SIZE])
+	while (offset_from_end < CONFIG_KERNEL_DMESG_BUFFER_SIZE) {
 		byte_t b = getb();
 		if (b != 0)
 			continue;
@@ -151,8 +151,8 @@ again:
 	COMPILER_BARRIER();
 	read_offset  = oldest_packet_start;
 	write_offset = oldest_packet_start;
-#define getb()     (dmesg_buffer[(read_offset++) % CONFIG_DMESG_BUFFER_SIZE])
-#define putb(byte) (dmesg_buffer[write_offset % CONFIG_DMESG_BUFFER_SIZE] = (byte), ++write_offset)
+#define getb()     (dmesg_buffer[(read_offset++) % CONFIG_KERNEL_DMESG_BUFFER_SIZE])
+#define putb(byte) (dmesg_buffer[write_offset % CONFIG_KERNEL_DMESG_BUFFER_SIZE] = (byte), ++write_offset)
 	for (;;) {
 		s64 seconds;
 		u8 seconds_neg;
@@ -205,10 +205,10 @@ NOTHROW(FCALL dmesg_post)(struct syslog_packet const *__restrict packet,
 	if unlikely(!len)
 		return; /* Ignore empty messages. */
 	--len; /* Trim the trailing \n-character. */
-	if unlikely(len > CONFIG_SYSLOG_LINEMAX)
-		return; /* Disallow messages longer than `CONFIG_SYSLOG_LINEMAX' */
+	if unlikely(len > CONFIG_KERNEL_SYSLOG_LINEMAX)
+		return; /* Disallow messages longer than `CONFIG_KERNEL_SYSLOG_LINEMAX' */
 	COMPILER_BARRIER();
-#define putb(byte) (dmesg_buffer[offset % CONFIG_DMESG_BUFFER_SIZE] = (byte), ++offset)
+#define putb(byte) (dmesg_buffer[offset % CONFIG_KERNEL_DMESG_BUFFER_SIZE] = (byte), ++offset)
 again_header:
 	rel_seconds = (s64)(packet->sp_time - dmesg_secondsbase);
 	rel_seconds_neg = 0;
@@ -307,9 +307,9 @@ DEFINE_DBG_BZERO_OBJECT(dmesg_consistent);
  *          These chances are extremely slim, however still non-zero,
  *          so be aware that the produced message may not be what was
  *          originally written!
- * HINT: Please note  that  while  this function  technically  allows  you
- *       to  extract messages that are longer than `CONFIG_SYSLOG_LINEMAX'
- *       bytes of raw text, it is impossible to write messages longer than
+ * HINT: Please  note   that  while   this  function   technically  allows   you
+ *       to extract messages that are longer than `CONFIG_KERNEL_SYSLOG_LINEMAX'
+ *       bytes  of  raw text,  it is  impossible to  write messages  longer than
  *       this to the dmesg buffer
  * @param: buffer:         The target buffer (with enough space for at least `message_length' bytes)
  * @param: message_offset: Offset into the dmesg buffer where the message starts.
@@ -327,12 +327,12 @@ dmesg_getmessage(USER CHECKED char *buffer,
 	u8 nul, chksum, real_chksum = 0;
 	for (i = 0; i < message_length; ++i, ++message_offset) {
 		byte_t b;
-		b = dmesg_buffer[message_offset % CONFIG_DMESG_BUFFER_SIZE];
+		b = dmesg_buffer[message_offset % CONFIG_KERNEL_DMESG_BUFFER_SIZE];
 		real_chksum += b;
 		buffer[i] = (char)b;
 	}
-	chksum = dmesg_buffer[(message_offset++) % CONFIG_DMESG_BUFFER_SIZE]; /* checksum */
-	nul    = dmesg_buffer[(message_offset++) % CONFIG_DMESG_BUFFER_SIZE]; /* trailing NUL-byte */
+	chksum = dmesg_buffer[(message_offset++) % CONFIG_KERNEL_DMESG_BUFFER_SIZE]; /* checksum */
+	nul    = dmesg_buffer[(message_offset++) % CONFIG_KERNEL_DMESG_BUFFER_SIZE]; /* trailing NUL-byte */
 	if unlikely(nul != '\0')
 		return false; /* Missing trailing NUL-byte */
 	real_chksum = 0xff - real_chksum;
@@ -379,25 +379,25 @@ dmesg_enum(dmesg_enum_t callback, void *arg,
 	message_end_offset = ATOMIC_READ(dmesg_size);
 #define getb()                                \
 	(++offset_from_end, --message_end_offset, \
-	 dmesg_buffer[message_end_offset % CONFIG_DMESG_BUFFER_SIZE])
+	 dmesg_buffer[message_end_offset % CONFIG_KERNEL_DMESG_BUFFER_SIZE])
 	temp = getb(); /* NUL-temrinator */
 	if (temp != 0)
 		goto done; /* Missing NUL packet-terminator. */
 	for (nth = 0; limit; --limit, ++nth) {
 		getb(); /* checksum */
-		if (offset_from_end >= CONFIG_DMESG_BUFFER_SIZE)
+		if (offset_from_end >= CONFIG_KERNEL_DMESG_BUFFER_SIZE)
 			goto done;
 #undef getb
 		packet_start_offset = message_end_offset;
 #define getb()                                 \
 	(++offset_from_end, --packet_start_offset, \
-	 dmesg_buffer[packet_start_offset % CONFIG_DMESG_BUFFER_SIZE])
+	 dmesg_buffer[packet_start_offset % CONFIG_KERNEL_DMESG_BUFFER_SIZE])
 		for (;;) {
 			byte_t b;
 			b = getb();
 			if (!b)
 				break;
-			if (offset_from_end >= CONFIG_DMESG_BUFFER_SIZE)
+			if (offset_from_end >= CONFIG_KERNEL_DMESG_BUFFER_SIZE)
 				goto done;
 		}
 		++packet_start_offset;
@@ -405,11 +405,11 @@ dmesg_enum(dmesg_enum_t callback, void *arg,
 		/* Decode the message's timestamp. */
 		message_start_offset = decode_rel_seconds(message_start_offset, &rel_seconds);
 		packet.sp_time = dmesg_secondsbase + rel_seconds;
-		nano[0] = dmesg_buffer[(message_start_offset++) % CONFIG_DMESG_BUFFER_SIZE];
-		nano[1] = dmesg_buffer[(message_start_offset++) % CONFIG_DMESG_BUFFER_SIZE];
-		nano[2] = dmesg_buffer[(message_start_offset++) % CONFIG_DMESG_BUFFER_SIZE];
-		nano[3] = dmesg_buffer[(message_start_offset++) % CONFIG_DMESG_BUFFER_SIZE];
-		nano[4] = dmesg_buffer[(message_start_offset++) % CONFIG_DMESG_BUFFER_SIZE];
+		nano[0] = dmesg_buffer[(message_start_offset++) % CONFIG_KERNEL_DMESG_BUFFER_SIZE];
+		nano[1] = dmesg_buffer[(message_start_offset++) % CONFIG_KERNEL_DMESG_BUFFER_SIZE];
+		nano[2] = dmesg_buffer[(message_start_offset++) % CONFIG_KERNEL_DMESG_BUFFER_SIZE];
+		nano[3] = dmesg_buffer[(message_start_offset++) % CONFIG_KERNEL_DMESG_BUFFER_SIZE];
+		nano[4] = dmesg_buffer[(message_start_offset++) % CONFIG_KERNEL_DMESG_BUFFER_SIZE];
 		/* Decode the message's level. */
 		level = (nano[4] & 0x7c) >> 2;
 		if (level > SYSLOG_LEVEL_COUNT)
@@ -428,7 +428,7 @@ dmesg_enum(dmesg_enum_t callback, void *arg,
 			unsigned int i = 0;
 			for (;; i += 6) {
 				uint8_t b;
-				b = dmesg_buffer[(message_start_offset++) % CONFIG_DMESG_BUFFER_SIZE];
+				b = dmesg_buffer[(message_start_offset++) % CONFIG_KERNEL_DMESG_BUFFER_SIZE];
 				tid |= (u32)(b & 0x3f) << i;
 				if ((b & 0xc0) != 0xc0)
 					break;
@@ -436,7 +436,7 @@ dmesg_enum(dmesg_enum_t callback, void *arg,
 			packet.sp_tid = tid;
 		}
 		message_length = message_end_offset - message_start_offset;
-		if unlikely(message_length > CONFIG_SYSLOG_LINEMAX)
+		if unlikely(message_length > CONFIG_KERNEL_SYSLOG_LINEMAX)
 			goto done; /* Message too long */
 		/* Extract the entry's message and verify its checksum. */
 		if (!dmesg_getmessage(packet.sp_msg,

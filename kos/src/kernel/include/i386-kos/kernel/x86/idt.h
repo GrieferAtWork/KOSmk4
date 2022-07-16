@@ -81,7 +81,7 @@ struct desctab;     /* From <kos/kernel/cpu-state.h> */
 DATDEF struct idt_segment x86_idt[256];
 DATDEF struct desctab const x86_idt_ptr;
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #ifndef __x86_dbgidt_defined
 #define __x86_dbgidt_defined
 DATDEF struct idt_segment x86_dbgidt[256];
@@ -92,7 +92,7 @@ DATDEF struct desctab const x86_dbgaltcoreidt_ptr;
 #endif /* !CONFIG_NO_SMP */
 #endif /* !__x86_dbgidt_defined */
 
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 /* Start modifying `x86_idt'
  * This function must be called prior to making modifications to `x86_idt'.

@@ -340,7 +340,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, sigaltstack,
 
 
 
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 PRIVATE void KCALL
 load_userprocmask_into_kernelspace(USER CHECKED struct userprocmask *ctl) {
 	USER UNCHECKED sigset_t *old_sigset;
@@ -364,7 +364,7 @@ load_userprocmask_into_kernelspace(USER CHECKED struct userprocmask *ctl) {
 	/* Install the updated signal mask. */
 	memcpy(&THIS_KERNEL_SIGMASK, &newmask, sizeof(sigset_t));
 }
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 
 
 
@@ -378,7 +378,7 @@ load_userprocmask_into_kernelspace(USER CHECKED struct userprocmask *ctl) {
 DEFINE_SYSCALL1(pid_t, set_tid_address,
                 USER UNCHECKED pid_t *, tidptr) {
 	validate_writable_opt(tidptr, sizeof(*tidptr));
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 	/* Disable userprocmask, if it was enabled. */
 	if unlikely(PERTASK_TESTMASK(this_task.t_flags, TASK_FUSERPROCMASK)) {
 		USER CHECKED struct userprocmask *old_ctl;
@@ -394,7 +394,7 @@ DEFINE_SYSCALL1(pid_t, set_tid_address,
 		           ~(TASK_FUSERPROCMASK |
 		             TASK_FUSERPROCMASK_AFTER_VFORK));
 	}
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 	PERTASK_SET(this_tid_address, tidptr);
 	return task_gettid();
 }
@@ -403,7 +403,7 @@ DEFINE_SYSCALL1(pid_t, set_tid_address,
 
 
 
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 #ifdef __ARCH_WANT_SYSCALL_SET_USERPROCMASK_ADDRESS
 DEFINE_SYSCALL1(errno_t, set_userprocmask_address,
                 USER UNCHECKED struct userprocmask *, ctl) {
@@ -510,7 +510,7 @@ done:
 	return -EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_SET_USERPROCMASK_ADDRESS */
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 
 
 DECL_END

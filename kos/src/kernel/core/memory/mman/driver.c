@@ -138,9 +138,9 @@ PRIVATE struct driver_loadlist default_loaded_drivers = {
  *       get rid of drivers that  have been destroyed, but  were
  *       unable to remove themselves from the load-list. */
 PUBLIC struct driver_loadlist_arref drivers = ARREF_INIT(&default_loaded_drivers);
-#ifdef CONFIG_VBOXGDB
+#ifdef CONFIG_HAVE_KERNEL_VBOXGDB
 DEFINE_PUBLIC_ALIAS(_vboxgdb_kos_driver_state, drivers);
-#endif /* CONFIG_VBOXGDB */
+#endif /* CONFIG_HAVE_KERNEL_VBOXGDB */
 
 /* Set to true if `drivers' may contain drivers
  * that  have been destroyed,  but could not be
@@ -446,7 +446,7 @@ driver_section_getaddr_inflate(struct driver_section *__restrict self,
 			zlib_reader_init(&reader, chdr + 1, src_size);
 
 			/* Decompress data. */
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 			if (dbg_active) {
 				/* Display an on-screen message that we're decompressing stuff... */
 				void *screen_buffer;
@@ -478,9 +478,9 @@ driver_section_getaddr_inflate(struct driver_section *__restrict self,
 			} else {
 				error = zlib_reader_read(&reader, dst_data, dst_size);
 			}
-#else /* CONFIG_HAVE_DEBUGGER */
+#else /* CONFIG_HAVE_KERNEL_DEBUGGER */
 			error = zlib_reader_read(&reader, dst_data, dst_size);
-#endif /* !CONFIG_HAVE_DEBUGGER */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
 			zlib_reader_fini(&reader);
 			if unlikely(error < 0)
 				THROW(E_INVALID_ARGUMENT);
@@ -3325,9 +3325,9 @@ again:
 			 * NOTE: This is done after relocations, but before initializers, so that
 			 *       a debugger is able to safely set breakpoints without  overriding
 			 *       memory locations possibly affected by relocations. */
-#ifdef CONFIG_VBOXGDB
+#ifdef CONFIG_HAVE_KERNEL_VBOXGDB
 			vboxgdb_trap(VBOXGDB_TRAP_LIBRARY);
-#endif /* CONFIG_VBOXGDB */
+#endif /* CONFIG_HAVE_KERNEL_VBOXGDB */
 			if (kernel_debugtrap_enabled()) {
 				struct debugtrap_reason r;
 				r.dtr_signo  = SIGTRAP;
@@ -6135,7 +6135,7 @@ again:
 #endif /* !CONFIG_NO_BOOTLOADER_DRIVERS */
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 DBG_COMMAND(lsmod,
             "lsmod\n"
             "\tList all currently loaded drivers\n") {
@@ -6214,7 +6214,7 @@ DBG_COMMAND(cmdline,
 	dbg_putc('\n');
 	return 0;
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 DECL_END
 

@@ -42,7 +42,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#ifndef CONFIG_NO_SYSCALL_TRACING
+#ifndef CONFIG_NO_KERNEL_SYSCALL_TRACING
 DECL_BEGIN
 
 #ifndef CONFIG_NO_SMP
@@ -407,7 +407,7 @@ syscall_trace(struct rpc_syscall_info const *__restrict info) {
 
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 PRIVATE ATTR_DBGRODATA char const sctrace_str_0[] = "0";
 PRIVATE ATTR_DBGRODATA char const sctrace_str_1[] = "1";
 
@@ -443,9 +443,9 @@ DBG_COMMAND_AUTO(sctrace, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
 	arch_syscall_tracing_setenabled(enabled, false);
 	return 0;
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 DECL_END
-#endif /* !CONFIG_NO_SYSCALL_TRACING */
+#endif /* !CONFIG_NO_KERNEL_SYSCALL_TRACING */
 
 #endif /* !GUARD_KERNEL_SRC_MISC_SYSCALL_TRACE_C */

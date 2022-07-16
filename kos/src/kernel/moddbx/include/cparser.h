@@ -25,7 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
 #include <debugger/hook.h>
 #include <kernel/types.h>
@@ -107,6 +107,6 @@ NOTHROW(FCALL cparser_yield)(struct cparser *__restrict self);
 	((self)->c_tokend = (pos), cparser_yield(self))
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_MODDBX_INCLUDE_CPARSER_H */

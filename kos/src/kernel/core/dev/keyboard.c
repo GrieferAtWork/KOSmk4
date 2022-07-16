@@ -55,7 +55,7 @@
 
 DECL_BEGIN
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 PUBLIC NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL kbddev_putkey)(struct kbddev *__restrict self, u16 key) {
 	preemption_flag_t was;
@@ -84,7 +84,7 @@ again_read_flags:
 	}
 	return kbdbuf_putkey_nopr(&self->kd_buf, key);
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 /* Add a given key to the keyboard user-input buffer.
  * NOTE: The caller must not pass `KEY_NONE' for `key'
@@ -109,11 +109,11 @@ NOTHROW(FCALL kbdbuf_putkey_nopr)(struct kbdbuf *__restrict self, u16 key) {
 	for (;;) {
 		size_t index;
 		oldstate.bs_word = ATOMIC_READ(self->kb_bufstate.bs_word);
-		if (oldstate.bs_state.s_used >= CONFIG_KEYBOARD_BUFFER_SIZE)
+		if (oldstate.bs_state.s_used >= CONFIG_KERNEL_KEYBOARD_BUFFER_SIZE)
 			return false;
 		index = (oldstate.bs_state.s_start +
 		         oldstate.bs_state.s_used) %
-		        CONFIG_KEYBOARD_BUFFER_SIZE;
+		        CONFIG_KERNEL_KEYBOARD_BUFFER_SIZE;
 		if (!ATOMIC_CMPXCH(self->kb_buffer[index], KEY_NONE, key))
 			continue;
 		newstate = oldstate;
@@ -148,14 +148,14 @@ NOTHROW(KCALL kbdbuf_trygetkey)(struct kbdbuf *__restrict self) {
 		oldstate.bs_word = ATOMIC_READ(self->kb_bufstate.bs_word);
 		if (oldstate.bs_state.s_used == 0)
 			return KEY_NONE;
-		assert(oldstate.bs_state.s_start < CONFIG_KEYBOARD_BUFFER_SIZE);
+		assert(oldstate.bs_state.s_start < CONFIG_KERNEL_KEYBOARD_BUFFER_SIZE);
 		newstate = oldstate;
 		++newstate.bs_state.s_start;
 		--newstate.bs_state.s_used;
-#if IS_POWER_OF_TWO(CONFIG_KEYBOARD_BUFFER_SIZE)
-		newstate.bs_state.s_start &= CONFIG_KEYBOARD_BUFFER_SIZE - 1;
+#if IS_POWER_OF_TWO(CONFIG_KERNEL_KEYBOARD_BUFFER_SIZE)
+		newstate.bs_state.s_start &= CONFIG_KERNEL_KEYBOARD_BUFFER_SIZE - 1;
 #else
-		if (newstate.bs_state.s_start == CONFIG_KEYBOARD_BUFFER_SIZE)
+		if (newstate.bs_state.s_start == CONFIG_KERNEL_KEYBOARD_BUFFER_SIZE)
 			newstate.bs_state.s_start = 0;
 #endif
 		if (!ATOMIC_CMPXCH_WEAK(self->kb_bufstate.bs_word,

@@ -32,30 +32,40 @@
 
 #include <kos/lockop.h>
 
-/* Configuration option: Use a read/write lock for `struct mman::mm_lock' */
-#ifdef CONFIG_NO_USE_RWLOCK_FOR_MMAN
-#undef CONFIG_USE_RWLOCK_FOR_MMAN
-#elif defined(CONFIG_USE_RWLOCK_FOR_MMAN)
-#if (CONFIG_USE_RWLOCK_FOR_MMAN + 0) == 0
-#undef CONFIG_USE_RWLOCK_FOR_MMAN
-#define CONFIG_NO_USE_RWLOCK_FOR_MMAN 1
-#else /* CONFIG_USE_RWLOCK_FOR_MMAN == 0 */
-#undef CONFIG_USE_RWLOCK_FOR_MMAN
-#define CONFIG_USE_RWLOCK_FOR_MMAN 1
-#endif /* CONFIG_USE_RWLOCK_FOR_MMAN != 0 */
-#else /* ... */
-/*#define CONFIG_USE_RWLOCK_FOR_MMAN 1*/
-#endif /* !... */
+/*[[[config CONFIG_KERNEL_USES_RWLOCK_FOR_MMAN = false
+ * Configuration option: Use a read/write lock for `struct mman::mm_lock'
+ * ]]]*/
+#ifdef CONFIG_NO_KERNEL_USES_RWLOCK_FOR_MMAN
+#undef CONFIG_KERNEL_USES_RWLOCK_FOR_MMAN
+#elif !defined(CONFIG_KERNEL_USES_RWLOCK_FOR_MMAN)
+#define CONFIG_NO_KERNEL_USES_RWLOCK_FOR_MMAN
+#elif (-CONFIG_KERNEL_USES_RWLOCK_FOR_MMAN - 1) == -1
+#undef CONFIG_KERNEL_USES_RWLOCK_FOR_MMAN
+#define CONFIG_NO_KERNEL_USES_RWLOCK_FOR_MMAN
+#endif /* ... */
+/*[[[end]]]*/
 
-#ifdef CONFIG_USE_RWLOCK_FOR_MMAN
+#ifdef CONFIG_KERNEL_USES_RWLOCK_FOR_MMAN
 #include <hybrid/sched/atomic-rwlock.h>
-#endif /* CONFIG_USE_RWLOCK_FOR_MMAN */
+#endif /* CONFIG_KERNEL_USES_RWLOCK_FOR_MMAN */
 
-/* Trace program counters of write-locks to mfile objects. */
-#undef CONFIG_MMAN_TRACE_LOCKPC
-#if 1
-#define CONFIG_MMAN_TRACE_LOCKPC
-#endif
+
+/*[[[config CONFIG_KERNEL_MMAN_TRACES_LOCKPC: bool = !defined(NDEBUG)
+ * Trace program counters of write-locks to mfile objects.
+ * ]]]*/
+#ifdef CONFIG_NO_KERNEL_MMAN_TRACES_LOCKPC
+#undef CONFIG_KERNEL_MMAN_TRACES_LOCKPC
+#elif !defined(CONFIG_KERNEL_MMAN_TRACES_LOCKPC)
+#ifndef NDEBUG
+#define CONFIG_KERNEL_MMAN_TRACES_LOCKPC
+#else /* !NDEBUG */
+#define CONFIG_NO_KERNEL_MMAN_TRACES_LOCKPC
+#endif /* NDEBUG */
+#elif (-CONFIG_KERNEL_MMAN_TRACES_LOCKPC - 1) == -1
+#undef CONFIG_KERNEL_MMAN_TRACES_LOCKPC
+#define CONFIG_NO_KERNEL_MMAN_TRACES_LOCKPC
+#endif /* ... */
+/*[[[end]]]*/
 
 
 #ifdef __CC__
@@ -83,14 +93,14 @@ struct mman {
 #endif /* !__WANT_MMAN_EXCLUDE_PAGEDIR */
 	WEAK refcnt_t        mm_refcnt;      /* Reference counter. */
 	WEAK refcnt_t        mm_weakrefcnt;  /* Weak reference counter */
-#ifdef CONFIG_USE_RWLOCK_FOR_MMAN
+#ifdef CONFIG_KERNEL_USES_RWLOCK_FOR_MMAN
 	struct atomic_rwlock mm_lock;        /* Lock for this mman. */
-#else /* CONFIG_USE_RWLOCK_FOR_MMAN */
+#else /* CONFIG_KERNEL_USES_RWLOCK_FOR_MMAN */
 	struct atomic_lock   mm_lock;        /* Lock for this mman. */
-#endif /* !CONFIG_USE_RWLOCK_FOR_MMAN */
-#ifdef CONFIG_MMAN_TRACE_LOCKPC
+#endif /* !CONFIG_KERNEL_USES_RWLOCK_FOR_MMAN */
+#ifdef CONFIG_KERNEL_MMAN_TRACES_LOCKPC
 	void const         *_mm_wrlockpc;    /* [lock(mm_lock)] Write-lock program counter. */
-#endif /* CONFIG_MMAN_TRACE_LOCKPC */
+#endif /* CONFIG_KERNEL_MMAN_TRACES_LOCKPC */
 	RBTREE_ROOT(mnode)   mm_mappings;    /* [owned][0..n][lock(mm_lock)] Known file mappings. */
 	PHYS pagedir_phys_t  mm_pagedir_p;   /* [1..1][const] Physical pointer of the page directory */
 	struct mnode_list    mm_writable;    /* [0..n][lock(mm_lock)] List of nodes that contain writable mappings. */
@@ -201,26 +211,26 @@ NOTHROW(FCALL _mman_lockops_reap)(struct mman *__restrict self);
 #define mman_threadslock_release_b(self) atomic_lock_release_smp_b(&(self)->mm_threadslock)
 
 
-#ifdef CONFIG_MMAN_TRACE_LOCKPC
+#ifdef CONFIG_KERNEL_MMAN_TRACES_LOCKPC
 #define _MMAN_INIT_WRLOCKPC_        __NULLPTR,
 #define _mman_init_wrlockpc_(self)  (self)->_mm_wrlockpc = __NULLPTR,
 #define _mman_cinit_wrlockpc_(self) __hybrid_assert((self)->_mm_wrlockpc == __NULLPTR),
-#else /* CONFIG_MMAN_TRACE_LOCKPC */
+#else /* CONFIG_KERNEL_MMAN_TRACES_LOCKPC */
 #define _MMAN_INIT_WRLOCKPC_        /* nothing */
 #define _mman_init_wrlockpc_(self)  /* nothing */
 #define _mman_cinit_wrlockpc_(self) /* nothing */
-#endif /* !CONFIG_MMAN_TRACE_LOCKPC */
+#endif /* !CONFIG_KERNEL_MMAN_TRACES_LOCKPC */
 
-#ifdef CONFIG_MMAN_TRACE_LOCKPC
+#ifdef CONFIG_KERNEL_MMAN_TRACES_LOCKPC
 #include <asm/intrin.h>
 #define _mman_trace_wrlock_setpc(self) (self)->_mm_wrlockpc = __rdip()
 #define _mman_trace_wrlock_clrpc(self) (self)->_mm_wrlockpc = __NULLPTR
-#endif /* CONFIG_MMAN_TRACE_LOCKPC */
+#endif /* CONFIG_KERNEL_MMAN_TRACES_LOCKPC */
 
 
 /* Lock accessor helpers for `struct mman' */
-#ifdef CONFIG_USE_RWLOCK_FOR_MMAN
-#ifdef CONFIG_MMAN_TRACE_LOCKPC
+#ifdef CONFIG_KERNEL_USES_RWLOCK_FOR_MMAN
+#ifdef CONFIG_KERNEL_MMAN_TRACES_LOCKPC
 #define mman_lock_trywrite(self)   (atomic_rwlock_trywrite(&(self)->mm_lock) && (_mman_trace_wrlock_setpc(self), 1))
 #define mman_lock_write(self)      (atomic_rwlock_write(&(self)->mm_lock), _mman_trace_wrlock_setpc(self))
 #define mman_lock_write_nx(self)   (atomic_rwlock_write_nx(&(self)->mm_lock) && (_mman_trace_wrlock_setpc(self), 1))
@@ -229,7 +239,7 @@ NOTHROW(FCALL _mman_lockops_reap)(struct mman *__restrict self);
 #define mman_lock_tryupgrade(self) (atomic_rwlock_tryupgrade(&(self)->mm_lock) && (_mman_trace_wrlock_setpc(self), 1))
 #define mman_lock_upgrade(self)    (atomic_rwlock_upgrade(&(self)->mm_lock), _mman_trace_wrlock_setpc(self))
 #define mman_lock_downgrade(self)  (_mman_trace_wrlock_clrpc(self), atomic_rwlock_downgrade(&(self)->mm_lock))
-#else /* CONFIG_MMAN_TRACE_LOCKPC */
+#else /* CONFIG_KERNEL_MMAN_TRACES_LOCKPC */
 #define mman_lock_trywrite(self)   atomic_rwlock_trywrite(&(self)->mm_lock)
 #define mman_lock_write(self)      atomic_rwlock_write(&(self)->mm_lock)
 #define mman_lock_write_nx(self)   atomic_rwlock_write_nx(&(self)->mm_lock)
@@ -238,7 +248,7 @@ NOTHROW(FCALL _mman_lockops_reap)(struct mman *__restrict self);
 #define mman_lock_tryupgrade(self) atomic_rwlock_tryupgrade(&(self)->mm_lock)
 #define mman_lock_upgrade(self)    atomic_rwlock_upgrade(&(self)->mm_lock)
 #define mman_lock_downgrade(self)  atomic_rwlock_downgrade(&(self)->mm_lock)
-#endif /* !CONFIG_MMAN_TRACE_LOCKPC */
+#endif /* !CONFIG_KERNEL_MMAN_TRACES_LOCKPC */
 #define mman_lock_tryread(self)      atomic_rwlock_tryread(&(self)->mm_lock)
 #define mman_lock_read(self)         atomic_rwlock_read(&(self)->mm_lock)
 #define mman_lock_read_nx(self)      atomic_rwlock_read_nx(&(self)->mm_lock)
@@ -255,7 +265,7 @@ NOTHROW(FCALL _mman_lockops_reap)(struct mman *__restrict self);
 #define mman_lock_waitread_nx(self)  atomic_rwlock_waitread_nx(&(self)->mm_lock)
 #define mman_lock_waitwrite_nx(self) atomic_rwlock_waitwrite_nx(&(self)->mm_lock)
 
-/* Aliases for !CONFIG_USE_RWLOCK_FOR_MMAN-mode
+/* Aliases  for  !CONFIG_KERNEL_USES_RWLOCK_FOR_MMAN  -  mode
  * Use write-locks for all of these since those are exclusive */
 #define mman_lock_tryacquire mman_lock_trywrite
 #define mman_lock_acquire    mman_lock_write
@@ -266,18 +276,18 @@ NOTHROW(FCALL _mman_lockops_reap)(struct mman *__restrict self);
 #define mman_lock_available  mman_lock_canwrite
 #define mman_lock_waitfor    mman_lock_waitwrite
 #define mman_lock_waitfor_nx mman_lock_waitwrite_nx
-#else /* CONFIG_USE_RWLOCK_FOR_MMAN */
-#ifdef CONFIG_MMAN_TRACE_LOCKPC
+#else /* CONFIG_KERNEL_USES_RWLOCK_FOR_MMAN */
+#ifdef CONFIG_KERNEL_MMAN_TRACES_LOCKPC
 #define mman_lock_tryacquire(self) (atomic_lock_tryacquire(&(self)->mm_lock) && (_mman_trace_wrlock_setpc(self), 1))
 #define mman_lock_acquire(self)    (atomic_lock_acquire(&(self)->mm_lock), _mman_trace_wrlock_setpc(self))
 #define mman_lock_acquire_nx(self) (atomic_lock_acquire_nx(&(self)->mm_lock) && (_mman_trace_wrlock_setpc(self), 1))
 #define _mman_lock_release(self)   (_mman_trace_wrlock_clrpc(self), atomic_lock_release(&(self)->mm_lock))
-#else /* CONFIG_MMAN_TRACE_LOCKPC */
+#else /* CONFIG_KERNEL_MMAN_TRACES_LOCKPC */
 #define mman_lock_tryacquire(self) atomic_lock_tryacquire(&(self)->mm_lock)
 #define mman_lock_acquire(self)    atomic_lock_acquire(&(self)->mm_lock)
 #define mman_lock_acquire_nx(self) atomic_lock_acquire_nx(&(self)->mm_lock)
 #define _mman_lock_release(self)   atomic_lock_release(&(self)->mm_lock)
-#endif /* !CONFIG_MMAN_TRACE_LOCKPC */
+#endif /* !CONFIG_KERNEL_MMAN_TRACES_LOCKPC */
 #define mman_lock_release(self)    (_mman_lock_release(self), mman_lockops_reap(self))
 #define mman_lock_acquired(self)   atomic_lock_acquired(&(self)->mm_lock)
 #define mman_lock_available(self)  atomic_lock_available(&(self)->mm_lock)
@@ -308,7 +318,7 @@ NOTHROW(FCALL _mman_lockops_reap)(struct mman *__restrict self);
 #define mman_lock_tryupgrade(self) 1
 #define mman_lock_upgrade(self)    1
 #define mman_lock_downgrade(self)  (void)0
-#endif /* !CONFIG_USE_RWLOCK_FOR_MMAN */
+#endif /* !CONFIG_KERNEL_USES_RWLOCK_FOR_MMAN */
 
 DECL_END
 #endif /* __CC__ */

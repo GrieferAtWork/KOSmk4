@@ -321,10 +321,20 @@
 #include "__overflow.h"
 #include "byteorder.h"
 
+/*[[[config __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC: bool = defined(__UINT64_TYPE__) && __SIZEOF_BUSINT__ >= 8]]]*/
+#ifdef __HYBRID_INT128_CONFIG_NO_64BIT_ARITHMETIC
 #undef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
+#elif !defined(__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC)
 #if defined(__UINT64_TYPE__) && __SIZEOF_BUSINT__ >= 8
 #define __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
-#endif /* __UINT64_TYPE__ && __SIZEOF_BUSINT__ >= 8 */
+#else /* __UINT64_TYPE__ && __SIZEOF_BUSINT__ >= 8 */
+#define __HYBRID_INT128_CONFIG_NO_64BIT_ARITHMETIC
+#endif /* !__UINT64_TYPE__ || __SIZEOF_BUSINT__ < 8 */
+#elif (-__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC - 1) == -1
+#undef __HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC
+#define __HYBRID_INT128_CONFIG_NO_64BIT_ARITHMETIC
+#endif /* ... */
+/*[[[end]]]*/
 
 #define __hybrid_int128_vec8(var)    (var).__i128_s8
 #define __hybrid_int128_vec16(var)   (var).__i128_s16

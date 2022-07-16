@@ -72,10 +72,19 @@
 #define strtoui (unsigned int)strtoul
 #endif /* __SIZEOF_INT__ != ... */
 
-#undef CONFIG_HIDE_CURSOR_DURING_NAVIGATION
-/* Hide the  terminal cursor  while  navigating to  gather  information
- * about the terminal, or moving it to perform some specific operation. */
-#define CONFIG_HIDE_CURSOR_DURING_NAVIGATION 1
+/*[[[config CONFIG_LIBANSITTY_HIDE_CURSOR_DURING_NAVIGATION = true
+ * Hide the  terminal cursor  while  navigating to  gather  information
+ * about the terminal, or moving it to perform some specific operation.
+ * ]]]*/
+#ifdef CONFIG_NO_LIBANSITTY_HIDE_CURSOR_DURING_NAVIGATION
+#undef CONFIG_LIBANSITTY_HIDE_CURSOR_DURING_NAVIGATION
+#elif !defined(CONFIG_LIBANSITTY_HIDE_CURSOR_DURING_NAVIGATION)
+#define CONFIG_LIBANSITTY_HIDE_CURSOR_DURING_NAVIGATION
+#elif (-CONFIG_LIBANSITTY_HIDE_CURSOR_DURING_NAVIGATION - 1) == -1
+#undef CONFIG_LIBANSITTY_HIDE_CURSOR_DURING_NAVIGATION
+#define CONFIG_NO_LIBANSITTY_HIDE_CURSOR_DURING_NAVIGATION
+#endif /* ... */
+/*[[[end]]]*/
 
 DECL_BEGIN
 
@@ -250,7 +259,7 @@ static_assert(CP_UTF8 == 0,
 #ifdef __INTELLISENSE__
 #define HIDECURSOR_BEGIN() do
 #define HIDECURSOR_END()   __WHILE0
-#elif defined(CONFIG_HIDE_CURSOR_DURING_NAVIGATION)
+#elif defined(CONFIG_LIBANSITTY_HIDE_CURSOR_DURING_NAVIGATION)
 #define HIDECURSOR_BEGIN()                                                   \
 	do {                                                                     \
 		uint16_t _old_ttymode = self->at_ttymode;                            \
@@ -267,10 +276,10 @@ static_assert(CP_UTF8 == 0,
 			NOTIFY_SETTTYMODE();                         \
 		}                                                \
 	}	__WHILE0
-#else /* CONFIG_HIDE_CURSOR_DURING_NAVIGATION */
+#else /* CONFIG_LIBANSITTY_HIDE_CURSOR_DURING_NAVIGATION */
 #define HIDECURSOR_BEGIN() do
 #define HIDECURSOR_END()   __WHILE0
-#endif /* !CONFIG_HIDE_CURSOR_DURING_NAVIGATION */
+#endif /* !CONFIG_LIBANSITTY_HIDE_CURSOR_DURING_NAVIGATION */
 
 
 

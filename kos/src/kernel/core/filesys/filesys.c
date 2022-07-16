@@ -28,6 +28,7 @@
 #include <kernel/fs/devfs.h>
 #include <kernel/fs/dirnode.h>
 #include <kernel/fs/filesys.h>
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/fs/ramfs.h>
 #include <kernel/fs/super.h>
 #include <kernel/malloc.h>
@@ -485,9 +486,9 @@ err_cannot_open_file:
 		assert(ADDR_ISKERN(result->fs_root.mf_ops->mo_destroy));
 		result->fs_root.mf_refcnt = 1;
 		atomic_rwlock_init(&result->fs_root.mf_lock);
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 		result->fs_root.mf_notify = NULL;
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 		sig_init(&result->fs_root.mf_initdone);
 		SLIST_INIT(&result->fs_root.mf_lockops);
 		SLIST_INIT(&result->fs_root.mf_changed);

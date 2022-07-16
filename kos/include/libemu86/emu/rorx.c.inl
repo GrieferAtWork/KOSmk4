@@ -38,7 +38,7 @@ case EMU86_OPCODE_ENCODE(0x0f3af0): {
 		u8 num_bits;
 		num_bits = *(u8 const *)pc;
 		pc += 1;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (op_flags & EMU86_F_VEX_W) {
 			u64 value;
 			value = MODRM_GETRMQ();
@@ -46,7 +46,7 @@ case EMU86_OPCODE_ENCODE(0x0f3af0): {
 			value = __hybrid_ror64(value, num_bits);
 			MODRM_SETREGQ(value);
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		{
 			u32 value;
 			value = MODRM_GETRML();

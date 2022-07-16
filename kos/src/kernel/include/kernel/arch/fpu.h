@@ -23,7 +23,7 @@
 #include <kernel/compiler.h>
 
 #undef CONFIG_NO_FPU
-#undef CONFIG_FPU
-#define CONFIG_NO_FPU 1
+#undef CONFIG_HAVE_FPU
+#define CONFIG_NO_FPU
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_ARCH_FPU_H */

@@ -27,7 +27,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
 #include <kernel/driver.h>
 #include <kernel/except.h>
@@ -65,9 +65,9 @@
 #undef HAVE_X86_PHYS2VIRT64_NODE
 #if defined(__i386__) || defined(__x86_64__)
 #include <kernel/x86/phys2virt64.h> /* x86_phys2virt64_node */
-#ifdef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
+#ifdef CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC
 #define HAVE_X86_PHYS2VIRT64_NODE
-#endif /* CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
+#endif /* CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC */
 #endif /* __i386__ || __x86_64__ */
 
 DECL_BEGIN
@@ -2242,6 +2242,6 @@ err_segfault:
 
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_MODDBX_CPRINTER_C */

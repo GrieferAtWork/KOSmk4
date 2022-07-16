@@ -29,7 +29,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <kernel/poison-heap.h>
 
-#ifdef CONFIG_HAVE_POISON_HEAP
+#ifdef CONFIG_HAVE_KERNEL_POISON_HEAP
 #include <kernel/driver-param.h>
 #include <kernel/types.h>
 #include <kernel/mman/phys.h>
@@ -141,6 +141,6 @@ INTERN NOBLOCK ATTR_COLDTEXT void NOTHROW(KCALL ph_install)(void) {
 }
 
 DECL_END
-#endif /* CONFIG_HAVE_POISON_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_POISON_HEAP */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_MEMORY_POISON_HEAP_C */

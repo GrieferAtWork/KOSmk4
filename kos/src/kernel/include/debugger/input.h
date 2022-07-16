@@ -24,7 +24,7 @@
 
 #include <debugger/config.h>
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <kernel/types.h>
 
 #include <stdbool.h>
@@ -119,6 +119,6 @@ FUNDEF NOBLOCK ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_awaituser)(void);
 #endif /* __CC__ */
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_INCLUDE_DEBUGGER_INPUT_H */

@@ -142,7 +142,7 @@ DECL_BEGIN
 
 #ifdef __KERNEL__
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 /* Lock  to keep track of attempts to allocate memory for the
  * purposes of abbreviation code caches. Because libdebuginfo
  * is heavily used by the kernel's builtin debugger, we  have
@@ -170,23 +170,23 @@ PRIVATE struct atomic_rwlock kernel_debug_info_inside_malloc = ATOMIC_RWLOCK_INI
 #define MY_KMALLOC_RELEASE_LOCK() \
 	atomic_rwlock_end(&kernel_debug_info_inside_malloc)
 
-#else /* CONFIG_HAVE_DEBUGGER */
+#else /* CONFIG_HAVE_KERNEL_DEBUGGER */
 #define MY_KMALLOC_ACQUIRE_LOCK() (void)0
 #define MY_KMALLOC_RELEASE_LOCK() (void)0
-#endif /* !CONFIG_HAVE_DEBUGGER */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
 
 /* The debugger overrides the #PF handler to disable any form of lazy initialization
  * of  memory, meaning that  if we're being called  from there, the  only way we can
  * safely allocate memory is  by allocating from the  LOCKED heap with the  PREFAULT
  * flag  set (thus preventing any possibility of  triggering a pagefault in case new
  * memory had to be allocated) */
-#ifndef CONFIG_NO_DEBUGGER
+#ifndef CONFIG_NO_KERNEL_DEBUGGER
 #define MY_KMALLOC_HEAP (&kernel_locked_heap)
 #define MY_KMALLOC_GFP  (GFP_LOCKED | GFP_PREFLT)
-#else /* !CONFIG_NO_DEBUGGER */
+#else /* !CONFIG_NO_KERNEL_DEBUGGER */
 #define MY_KMALLOC_HEAP (&kernel_default_heap)
 #define MY_KMALLOC_GFP  (GFP_NORMAL)
-#endif /* CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_NO_KERNEL_DEBUGGER */
 
 
 PRIVATE NOBLOCK ATTR_MALLOC WUNUSED void *

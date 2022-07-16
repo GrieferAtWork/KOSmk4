@@ -38,15 +38,16 @@
 #include <kos/kernel/segment.h>
 #include <kos/kernel/tss.h>
 
-#ifndef CONFIG_NO_PAGING_P32
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_P32
 #include <kernel/arch/paging32-p32.h>
-#endif /* !CONFIG_NO_PAGING_P32 */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_P32 */
 
-#ifndef CONFIG_NO_PAGING_PAE
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_PAE
 #include <kernel/arch/paging32-pae.h>
-#endif /* !CONFIG_NO_PAGING_PAE */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_PAE */
 
 /**/
+#include "start.h"
 #include "_objects.S"
 /**/
 
@@ -69,9 +70,9 @@ EXTERN(__kernel_boottask_stack)
 EXTERN(bootcpu_x86_cpufeatures)
 EXTERN(bootcpu_x86_cpuid)
 
-#ifndef CONFIG_NO_BOOT0
+#ifndef CONFIG_NO_KERNEL_X86_BOOT0
 #include "_boot0.S"
-#endif /* !CONFIG_NO_BOOT0 */
+#endif /* !CONFIG_NO_KERNEL_X86_BOOT0 */
 
 .section .text.free
 INTERN_FUNCTION(_start)
@@ -326,7 +327,7 @@ INTERN_FUNCTION(_start)
 	ttest  mask=CPUID_1D_PGE, loc=(V2P(bootcpu_x86_cpuid) + OFFSET_CPUID_1D)
 	jnz    1f
 	movl   $(0), V2P(used_pxx_page_fglobal)
-#if !defined(CONFIG_NO_PAGING_PAE) && (PAE_PAGE_FGLOBAL > 0xffffffff)
+#if !defined(CONFIG_NO_KERNEL_X86_PAGING_PAE) && (PAE_PAGE_FGLOBAL > 0xffffffff)
 	movl   $(0), V2P(used_pxx_page_fglobal) + 4
 #endif
 	jmp    2f
@@ -336,10 +337,10 @@ INTERN_FUNCTION(_start)
 	movl   %eax, %cr4
 2:
 
-#if !defined(CONFIG_NO_PAGING_P32) && \
-    !defined(CONFIG_NO_PAGING_PAE)
+#if !defined(CONFIG_NO_KERNEL_X86_PAGING_P32) && \
+    !defined(CONFIG_NO_KERNEL_X86_PAGING_PAE)
 #define HYBRID_PAGING_MODE 1
-#endif /* !CONFIG_NO_PAGING_P32 */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_P32 */
 
 
 	EXTERN(__x86_pagedir_kernel_share)
@@ -359,7 +360,7 @@ INTERN_FUNCTION(_start)
 
 
 	/* Initialize the kernel's paging structures for PAE-mode. */
-#ifndef CONFIG_NO_PAGING_PAE
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_PAE
 .Linit_paging_pae:
 #ifdef HYBRID_PAGING_MODE
 	/* Check  if the host  supports the cmpxchg8b instruction  (our PAE paging implementation
@@ -461,7 +462,7 @@ INTERN_FUNCTION(_start)
 #endif /* HYBRID_PAGING_MODE */
 #undef PAGE_FLAGS
 #undef VECTOR_FLAGS
-#endif /* !CONFIG_NO_PAGING_PAE */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_PAE */
 
 
 
@@ -469,7 +470,7 @@ INTERN_FUNCTION(_start)
 
 
 	/* Initialize the kernel's paging structures for P32-mode. */
-#ifndef CONFIG_NO_PAGING_P32
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_P32
 .Linit_paging_p32:
 #ifdef HYBRID_PAGING_MODE
 	/* Manually clear the PAE-support  flag (it shouldn't actually  be set, but someone  may
@@ -528,7 +529,7 @@ INTERN_FUNCTION(_start)
 	movl   $(__x86_p32_identity_mapped_text_4mib_ks_share + VECTOR_FLAGS), V2P(__x86_p32_identity_mapped_text_4mib_e2_word)
 #undef PAGE_FLAGS
 #undef VECTOR_FLAGS
-#endif /* !CONFIG_NO_PAGING_P32 */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_P32 */
 
 
 
@@ -581,18 +582,18 @@ END(__x86_paging_init_identity_mapped_text)
 	/* Fallthrough to `.Lcleanup_paging_pae' */
 #endif /* HYBRID_PAGING_MODE */
 
-#ifndef CONFIG_NO_PAGING_PAE
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_PAE
 .Lcleanup_paging_pae:
 	movl   $(PAE_KS_SHARE_E2(0, 0) + PAE_PAGE_FPRESENT), PAE_PAGEDIR_KERNEL_P_E3(0)
 #ifdef HYBRID_PAGING_MODE
 	jmp    .Ldone_cleanup_paging
 #endif /* HYBRID_PAGING_MODE */
-#endif /* !CONFIG_NO_PAGING_PAE */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_PAE */
 
-#ifndef CONFIG_NO_PAGING_P32
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_P32
 .Lcleanup_paging_p32:
 	movl   $(0), __x86_p32_identity_mapped_text_4mib_e2_word
-#endif /* !CONFIG_NO_PAGING_P32 */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_P32 */
 .Ldone_cleanup_paging:
 
 	/* Reload the page directory to flush any stale caches for removed physical memory. */

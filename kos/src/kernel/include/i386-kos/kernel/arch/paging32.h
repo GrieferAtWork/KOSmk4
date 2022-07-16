@@ -28,6 +28,29 @@
 
 #include <stdbool.h>
 
+/*[[[config CONFIG_HAVE_KERNEL_X86_PAGING_PAE = true]]]*/
+#ifdef CONFIG_NO_KERNEL_X86_PAGING_PAE
+#undef CONFIG_HAVE_KERNEL_X86_PAGING_PAE
+#elif !defined(CONFIG_HAVE_KERNEL_X86_PAGING_PAE)
+#define CONFIG_HAVE_KERNEL_X86_PAGING_PAE
+#elif (-CONFIG_HAVE_KERNEL_X86_PAGING_PAE - 1) == -1
+#undef CONFIG_HAVE_KERNEL_X86_PAGING_PAE
+#define CONFIG_NO_KERNEL_X86_PAGING_PAE
+#endif /* ... */
+/*[[[end]]]*/
+
+/*[[[config CONFIG_HAVE_KERNEL_X86_PAGING_P32 = true]]]*/
+#ifdef CONFIG_NO_KERNEL_X86_PAGING_P32
+#undef CONFIG_HAVE_KERNEL_X86_PAGING_P32
+#elif !defined(CONFIG_HAVE_KERNEL_X86_PAGING_P32)
+#define CONFIG_HAVE_KERNEL_X86_PAGING_P32
+#elif (-CONFIG_HAVE_KERNEL_X86_PAGING_P32 - 1) == -1
+#undef CONFIG_HAVE_KERNEL_X86_PAGING_P32
+#define CONFIG_NO_KERNEL_X86_PAGING_P32
+#endif /* ... */
+/*[[[end]]]*/
+
+
 
 /* Since the entire kernel-space has its E1-vectors pre-allocated  (so-as
  * to allow them to be share across all page-directories), page directory
@@ -44,9 +67,9 @@
 #undef ARCH_PAGEDIR_HAVE_DENYWRITE
 #define ARCH_PAGEDIR_HAVE_DENYWRITE 1
 
-#if defined(CONFIG_NO_PAGING_PAE) && defined(CONFIG_NO_PAGING_P32)
+#if defined(CONFIG_NO_KERNEL_X86_PAGING_PAE) && defined(CONFIG_NO_KERNEL_X86_PAGING_P32)
 #error "You can't disable PAE and P32 paging! - I need at least either to work properly!"
-#elif defined(CONFIG_NO_PAGING_PAE)
+#elif defined(CONFIG_NO_KERNEL_X86_PAGING_PAE)
 /* P32-paging only */
 #include "paging32-p32.h"
 
@@ -72,7 +95,7 @@
 #define PAGEDIR_ALIGN P32_PDIR_ALIGN
 #define PAGEDIR_SIZE  P32_PDIR_SIZE
 
-#elif defined(CONFIG_NO_PAGING_P32)
+#elif defined(CONFIG_NO_KERNEL_X86_PAGING_P32)
 /* PAE-paging only */
 #include "paging32-pae.h"
 
@@ -196,12 +219,12 @@ DECL_BEGIN
 
 #ifdef __CC__
 typedef union {
-#ifndef CONFIG_NO_PAGING_P32
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_P32
 	struct p32_pdir pd_p32; /* P32 page directory */
-#endif /* !CONFIG_NO_PAGING_P32 */
-#ifndef CONFIG_NO_PAGING_PAE
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_P32 */
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_PAE
 	struct pae_pdir pd_pae; /* PAE page directory */
-#endif /* !CONFIG_NO_PAGING_PAE */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_PAE */
 } pagedir_t;
 #endif /* __CC__ */
 
@@ -262,13 +285,13 @@ NOTHROW(KCALL pagedir_set)(PHYS pagedir_t *__restrict value) {
 
 #ifndef __pagedir_pushval_t_defined
 #define __pagedir_pushval_t_defined
-#ifdef CONFIG_NO_PAGING_PAE
+#ifdef CONFIG_NO_KERNEL_X86_PAGING_PAE
 #define PAGEDIR_PUSHVAL_INVALID PAE_PAGEDIR_PUSHVAL_INVALID
 #define SIZEOF_PAGEDIR_PUSHVAL  SIZEOF_PAE_PAGEDIR_PUSHVAL
 #ifdef __CC__
 typedef p32_pagedir_pushval_t pagedir_pushval_t;
 #endif /* __CC__ */
-#elif defined(CONFIG_NO_PAGING_P32)
+#elif defined(CONFIG_NO_KERNEL_X86_PAGING_P32)
 #define PAGEDIR_PUSHVAL_INVALID P32_PAGEDIR_PUSHVAL_INVALID
 #define SIZEOF_PAGEDIR_PUSHVAL  SIZEOF_P32_PAGEDIR_PUSHVAL
 #ifdef __CC__

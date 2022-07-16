@@ -40,7 +40,11 @@
 
 DECL_BEGIN
 
-#define CONFIG_GDBSERVER_REMOTE_BUFFER_SIZE (1 << 10)
+/*[[[config CONFIG_MODGDBSERVER_REMOTE_BUFSIZE! = (1 << 10)]]]*/
+#ifndef CONFIG_MODGDBSERVER_REMOTE_BUFSIZE
+#define CONFIG_MODGDBSERVER_REMOTE_BUFSIZE (1 << 10)
+#endif /* !CONFIG_MODGDBSERVER_REMOTE_BUFSIZE */
+/*[[[end]]]*/
 
 /* Signal  that  gets  broadcast  with  whenever  the
  * connection back-end data buffer becomes non-empty. */
@@ -56,7 +60,7 @@ typedef union {
 } BufferState;
 
 /* Remote data input buffer. */
-PRIVATE byte_t GDBRemote_BufferData[CONFIG_GDBSERVER_REMOTE_BUFFER_SIZE];
+PRIVATE byte_t GDBRemote_BufferData[CONFIG_MODGDBSERVER_REMOTE_BUFSIZE];
 PRIVATE WEAK BufferState GDBRemote_BufferState = { 0 };
 
 
@@ -77,12 +81,12 @@ NOTHROW(FCALL GDBRemote_PostByte)(byte_t b) {
 	assert(!PREEMPTION_ENABLED());
 	for (;;) {
 		state.b_word = ATOMIC_READ(GDBRemote_BufferState.b_word);
-		if unlikely(state.b_state.s_used >= CONFIG_GDBSERVER_REMOTE_BUFFER_SIZE) {
+		if unlikely(state.b_state.s_used >= CONFIG_MODGDBSERVER_REMOTE_BUFSIZE) {
 			printk(KERN_WARNING "[gdb] Remote buffer is full (dropping %Q)", b);
 			return;
 		}
 		GDBRemote_BufferData[(state.b_state.s_start + state.b_state.s_used) %
-		                     CONFIG_GDBSERVER_REMOTE_BUFFER_SIZE] = b;
+		                     CONFIG_MODGDBSERVER_REMOTE_BUFSIZE] = b;
 		newstate = state;
 		++newstate.b_state.s_used;
 		if (ATOMIC_CMPXCH_WEAK(GDBRemote_BufferState.b_word,
@@ -160,14 +164,14 @@ INTERN NOBLOCK int NOTHROW(FCALL GDBRemote_TryGetByte)(void) {
 		state.b_word = ATOMIC_READ(GDBRemote_BufferState.b_word);
 		if (state.b_state.s_used == 0)
 			return -1;
-		assert(state.b_state.s_start < CONFIG_GDBSERVER_REMOTE_BUFFER_SIZE);
+		assert(state.b_state.s_start < CONFIG_MODGDBSERVER_REMOTE_BUFSIZE);
 		COMPILER_READ_BARRIER();
 		result = GDBRemote_BufferData[state.b_state.s_start];
 		COMPILER_READ_BARRIER();
 		newstate = state;
 		++newstate.b_state.s_start;
 		--newstate.b_state.s_used;
-		newstate.b_state.s_start %= CONFIG_GDBSERVER_REMOTE_BUFFER_SIZE;
+		newstate.b_state.s_start %= CONFIG_MODGDBSERVER_REMOTE_BUFSIZE;
 		if (ATOMIC_CMPXCH_WEAK(GDBRemote_BufferState.b_word,
 		                       state.b_word, newstate.b_word))
 			break;

@@ -31,7 +31,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <kernel/boot.h>
 #include <kernel/driver-param.h>
-#include <kernel/fpu.h> /* CONFIG_FPU */
+#include <kernel/fpu.h> /* CONFIG_HAVE_FPU */
 #include <kernel/malloc.h>
 #include <kernel/mman/driver.h>
 #include <kernel/memory.h>
@@ -66,13 +66,13 @@ DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(x86_force_detect_moreram,
                                             "force-detect-moreram");
 
 
-#ifndef CONFIG_NO_DEBUGGER
+#ifndef CONFIG_NO_KERNEL_DEBUGGER
 /* Define options for entering debugger mode at various stages, rather than booting normally. */
 DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(dbg, KERNEL_COMMANDLINE_OPTION_TYPE_PRESENT, "dbg-very-early");
 /**/ DEFINE_EARLY_KERNEL_COMMANDLINE_OPTION(dbg, KERNEL_COMMANDLINE_OPTION_TYPE_PRESENT, "dbg-early");
 /*      */ DEFINE_KERNEL_COMMANDLINE_OPTION(dbg, KERNEL_COMMANDLINE_OPTION_TYPE_PRESENT, "dbg");
 /* */ DEFINE_LATE_KERNEL_COMMANDLINE_OPTION(dbg, KERNEL_COMMANDLINE_OPTION_TYPE_PRESENT, "dbg-late");
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* !CONFIG_NO_KERNEL_DEBUGGER */
 
 
 #if 0
@@ -124,10 +124,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 		x86_syslog_port = (port_t)0xe9;
 	} else if (sys86_isvbox()) {
 		x86_syslog_port = (port_t)0x504;
-#ifdef CONFIG_VBOXGDB
+#ifdef CONFIG_HAVE_KERNEL_VBOXGDB
 		if (_sys86_isvboxgdb())
 			x86_initialize_vboxgdb();
-#endif /* CONFIG_VBOXGDB */
+#endif /* CONFIG_HAVE_KERNEL_VBOXGDB */
 	}
 	x86_initialize_cmos();
 
@@ -247,7 +247,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Initialize  the x86_64 physical memory identity memory mapping.
 	 * This can only be done _after_ we've loaded available RAM, since
 	 * this function may need to allocate some of that memory... */
-#ifdef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
+#ifdef CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC
 	x86_initialize_phys2virt64();
 #endif /* !ONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
 
@@ -295,10 +295,10 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 
 	/* XXX: ioapic support (ioapic is the modern equivalent of the pic) */
 
-#ifdef CONFIG_FPU
+#ifdef CONFIG_HAVE_FPU
 	/* Initialize the FPU sub-system. */
 	x86_initialize_fpu();
-#endif /* CONFIG_FPU */
+#endif /* CONFIG_HAVE_FPU */
 
 	/* Make the kernel's .text and .rodata sections read-only. */
 	x86_initialize_mman_kernel_rdonly();
@@ -345,9 +345,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	kernel_initialize_rootfs();
 
 	/* Run self-tests. (if enabled) */
-#ifdef CONFIG_SELFTEST
+#ifdef CONFIG_HAVE_KERNEL_SELFTEST
 	kernel_initialize_selftest();
-#endif /* CONFIG_SELFTEST */
+#endif /* CONFIG_HAVE_KERNEL_SELFTEST */
 
 	__hybrid_assert(!kmalloc_leaks());
 

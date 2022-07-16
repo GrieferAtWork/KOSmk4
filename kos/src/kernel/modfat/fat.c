@@ -35,6 +35,7 @@
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/lnknode.h>
 #include <kernel/fs/node.h>
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/fs/regnode.h>
 #include <kernel/fs/super.h>
 #include <kernel/malloc.h>
@@ -845,7 +846,7 @@ NOTHROW(KCALL fatdir_v_destroy)(struct mfile *__restrict self) {
 	flatdirnode_v_destroy(self);
 }
 
-#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+#ifdef CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL fatlnk_v_destroy)(struct mfile *__restrict self) {
 	FatLnkNode *me = mfile_asfatlnk(self);
@@ -915,7 +916,7 @@ fatlnk_v_stat(struct mfile *__restrict self,
 	result->st_size = _atomic64_val(me->mf_filesize) -
 	                  (sizeof(Fat_CygwinSymlinkMagic) + 1);
 }
-#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
+#endif /* CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS */
 
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL strlwrz)(char *__restrict str, size_t len) {
@@ -1157,7 +1158,7 @@ dos_8dot3:
 	} else {
 		result->fad_ent.fde_ent.fd_type = DT_REG;
 
-#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+#ifdef CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS
 		/* Check if this is actually a symbolic link. */
 		if ((ent.f_attr & FATATTR_SYS) &&
 		    LETOH32(ent.f_size) >= FAT_SYMLINK_FILE_MINSIZE) {
@@ -1182,7 +1183,7 @@ dos_8dot3:
 				}
 			}
 		}
-#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
+#endif /* CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS */
 	}
 
 	return &result->fad_ent;
@@ -1321,10 +1322,10 @@ Fat_GenerateFileEntries(struct fat_dirent files[FAT_DIRENT_PER_FILE_MAXCOUNT],
 	ent->fad_dos.f_attr    = FATATTR_ARCH;
 	if (fnode_isdir(file))
 		ent->fad_dos.f_attr |= FATATTR_DIR;
-#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+#ifdef CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS
 	if (fnode_islnk(file))
 		ent->fad_dos.f_attr |= FATATTR_SYS;
-#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
+#endif /* CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS */
 	if (ent->fad_ent.fde_ent.fd_name[0] == '.')
 		ent->fad_dos.f_attr |= FATATTR_HIDDEN;
 	mfile_tslock_acquire(file);
@@ -1868,7 +1869,7 @@ fatdir_v_allocfile(struct flatdirnode *__restrict self,
 		ATOMIC_WRITE(fdir->fdn_1dot, 0 * sizeof(struct fat_dirent));
 		ATOMIC_WRITE(fdir->fdn_2dot, 1 * sizeof(struct fat_dirent));
 	}
-#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+#ifdef CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS
 	else if (fnode_islnk(file)) {
 		/* Write the link's file contents (the string from `info'). */
 		pos_t ptr = 0;
@@ -1878,7 +1879,7 @@ fatdir_v_allocfile(struct flatdirnode *__restrict self,
 		ptr += info->mkf_creat.c_symlink.s_size;
 		mfile_writeall(file, "", 1, ptr); /* Trailing NUL */
 	}
-#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
+#endif /* CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS */
 }
 
 PRIVATE NONNULL((1, 2, 3)) void KCALL
@@ -2065,11 +2066,11 @@ fat_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		} else if (fnode_isreg(me)) {
 			super_ioctl = &fregnode_v_ioctl;
 		} else
-#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+#ifdef CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS
 		if (fnode_islnk(me)) {
 			super_ioctl = &flnknode_v_ioctl;
 		} else
-#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
+#endif /* CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS */
 		{
 			super_ioctl = &fnode_v_ioctl;
 		}
@@ -2453,9 +2454,9 @@ PRIVATE struct flatdirnode_ops const Fat_DirOps = {
 		.dno_mkfile = &flatdirnode_v_mkfile,
 		.dno_unlink = &flatdirnode_v_unlink,
 		.dno_rename = &flatdirnode_v_rename,
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 		.dno_attach_notify = &flatdirnode_v_attach_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 	},
 	.fdno_flat = {
 		.fdnx_readdir       = &fatdir_v_readdir,
@@ -2468,7 +2469,7 @@ PRIVATE struct flatdirnode_ops const Fat_DirOps = {
 		.fdnx_direntchanged = &fatdir_v_direntchanged,
 	},
 };
-#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+#ifdef CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS
 PRIVATE struct mfile_stream_ops const fatlnk_v_stream_ops = {
 	.mso_stat      = &fatlnk_v_stat,
 	.mso_ioctl     = &fat_v_ioctl,
@@ -2488,7 +2489,7 @@ PRIVATE struct flnknode_ops const Fat_LnkOps = {
 	},
 	.lno_readlink = &fatlnk_v_readlink,
 };
-#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
+#endif /* CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS */
 
 
 /************************************************************************/
@@ -2677,7 +2678,7 @@ fatdir_v_mkfile(struct flatdirnode *__restrict self,
 		result = node;
 	}	break;
 
-#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+#ifdef CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS
 	case S_IFLNK: {
 		FatLnkNode *node;
 		node = (FatLnkNode *)kmalloc(sizeof(FatLnkNode), GFP_NORMAL);
@@ -2687,7 +2688,7 @@ fatdir_v_mkfile(struct flatdirnode *__restrict self,
 		node->fn_fsdata = &node->fln_fdat;
 		result = node;
 	}	break;
-#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
+#endif /* CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS */
 
 	default:
 		THROW(E_FSERROR_UNSUPPORTED_OPERATION);
@@ -2747,7 +2748,7 @@ fatsuper_v_makenode(struct flatsuper *__restrict self,
 		result = node;
 	}	break;
 
-#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+#ifdef CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS
 	case DT_LNK: {
 		FatLnkNode *node;
 		node = (FatLnkNode *)kmalloc(sizeof(FatLnkNode), GFP_NORMAL);
@@ -2756,7 +2757,7 @@ fatsuper_v_makenode(struct flatsuper *__restrict self,
 		node->fn_fsdata = &node->fln_fdat;
 		result = node;
 	}	break;
-#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
+#endif /* CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS */
 
 	default: __builtin_unreachable();
 	}
@@ -2990,9 +2991,9 @@ PRIVATE struct flatsuper_ops const Fat16_SuperOps = {
 			.dno_mkfile = &flatdirnode_v_mkfile,
 			.dno_unlink = &flatdirnode_v_unlink,
 			.dno_rename = &flatdirnode_v_rename,
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 			.dno_attach_notify = &flatdirnode_v_attach_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 		},
 	},
 	.ffso_flat = {
@@ -3035,9 +3036,9 @@ PRIVATE struct flatsuper_ops const Fat32_SuperOps = {
 			.dno_mkfile = &flatdirnode_v_mkfile,
 			.dno_unlink = &flatdirnode_v_unlink,
 			.dno_rename = &flatdirnode_v_rename,
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 			.dno_attach_notify = &flatdirnode_v_attach_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 		},
 	},
 	.ffso_flat = {
@@ -3417,10 +3418,10 @@ fatfs_open(struct ffilesys *__restrict UNUSED(filesys),
 		result->ft_super.ffs_super.fs_feat.sf_uid_max = (uid_t)0xff;
 		result->ft_super.ffs_super.fs_feat.sf_gid_max = (gid_t)0xff;
 	}
-#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+#ifdef CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS
 	if (!(result->ft_features & FAT_FEATURE_NO_CYGWIN_SYMLINK))
 		result->ft_super.ffs_super.fs_feat.sf_symlink_max = (pos_t)FAT_SYMLINK_FILE_TEXTLEN(UINT32_MAX);
-#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
+#endif /* CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS */
 
 	/* Select root directory operators. */
 	result->ft_super.ffs_super.fs_root.mf_ops = result->ft_type == FAT32

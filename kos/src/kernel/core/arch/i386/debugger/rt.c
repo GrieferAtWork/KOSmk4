@@ -31,7 +31,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
 #include <debugger/entry.h>
 #include <debugger/hook.h>
@@ -137,16 +137,18 @@ union ac_int { /* AltCore_Interrupt */
 		               * The sending CPU id +1 */
 		u8 ai_vector; /* The interrupt that was triggered. */
 	};
-	u16    ai_word;    /* Control word. */
+	u16    ai_word;   /* Control word. */
 };
 
-#ifndef CONFIG_DBG_ALTCORE_MAX_INTERRUPTS
-#define CONFIG_DBG_ALTCORE_MAX_INTERRUPTS 2
-#endif /* !CONFIG_DBG_ALTCORE_MAX_INTERRUPTS */
+/*[[[config CONFIG_KERNEL_X86_DEBUGGER_ALTCORE_MAX_INTERRUPTS! = 2]]]*/
+#ifndef CONFIG_KERNEL_X86_DEBUGGER_ALTCORE_MAX_INTERRUPTS
+#define CONFIG_KERNEL_X86_DEBUGGER_ALTCORE_MAX_INTERRUPTS 2
+#endif /* !CONFIG_KERNEL_X86_DEBUGGER_ALTCORE_MAX_INTERRUPTS */
+/*[[[end]]]*/
 
 /* Pending interrupt from a secondary CPU. */
 PRIVATE ATTR_DBGBSS union ac_int
-ac_ints[CONFIG_DBG_ALTCORE_MAX_INTERRUPTS] = { };
+ac_ints[CONFIG_KERNEL_X86_DEBUGGER_ALTCORE_MAX_INTERRUPTS] = { };
 
 /* Handle  an  interrupt happening  on  a CPU  that  isn't `dbg_cpu'
  * while  the  debugger is  active.  When this  function  is called,
@@ -163,7 +165,7 @@ NOTHROW(FCALL x86_dbg_altcore_interrupt)(u8 vector) {
 	aint.ai_vector = vector;
 	for (;;) {
 		unsigned int i;
-		for (i = 0; i < CONFIG_DBG_ALTCORE_MAX_INTERRUPTS; ++i) {
+		for (i = 0; i < CONFIG_KERNEL_X86_DEBUGGER_ALTCORE_MAX_INTERRUPTS; ++i) {
 			union ac_int existing;
 again_index_i:
 			existing.ai_word = ATOMIC_READ(ac_ints[i].ai_word);
@@ -231,7 +233,7 @@ NOTHROW(FCALL x86_dbg_handle_altcore_interrupt)(void) {
 again:
 	did_something = false;
 	/* Look for something to do. */
-	for (i = 0; i < CONFIG_DBG_ALTCORE_MAX_INTERRUPTS; ++i) {
+	for (i = 0; i < CONFIG_KERNEL_X86_DEBUGGER_ALTCORE_MAX_INTERRUPTS; ++i) {
 		union ac_int job;
 		struct cpu *sender_cpu;
 		struct x86_dbg_cpuammend *sender_ammend;
@@ -799,7 +801,7 @@ reset_pdir_p64(struct p64_pdir *__restrict self, u64 phys_self) {
 	self->p_e4[257].p_word = (u64)phys_self | P64_PAGE_FACCESSED | P64_PAGE_FWRITE | P64_PAGE_FPRESENT;
 }
 #else /* __x86_64__ */
-#ifndef CONFIG_NO_PAGING_PAE
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_PAE
 PRIVATE ATTR_DBGTEXT bool KCALL
 reset_pdir_pae(struct pae_pdir *__restrict self) {
 	u64 e3[4];
@@ -823,9 +825,9 @@ reset_pdir_pae(struct pae_pdir *__restrict self) {
 	                   4 * 8); /* Identity mapping */
 	return true;
 }
-#endif /* !CONFIG_NO_PAGING_PAE */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_PAE */
 
-#ifndef CONFIG_NO_PAGING_P32
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_P32
 PRIVATE ATTR_DBGTEXT void KCALL
 reset_pdir_p32(struct p32_pdir *__restrict self, u32 phys_self) {
 	/* Copy P2 pointers that are shared with the kernel. */
@@ -836,7 +838,7 @@ reset_pdir_p32(struct p32_pdir *__restrict self, u32 phys_self) {
 	                           (P32_PAGE_FACCESSED | P32_PAGE_FWRITE |
 	                            P32_PAGE_FPRESENT));
 }
-#endif /* !CONFIG_NO_PAGING_P32 */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_P32 */
 #endif /* !__x86_64__ */
 
 PRIVATE ATTR_DBGTEXT void KCALL
@@ -855,9 +857,9 @@ reset_pdir(struct task *mythread) {
 	/* Make sure that the kernel-share segment of `mymm' is initialized correctly! */
 #ifdef __x86_64__
 	reset_pdir_p64(&mymm->mm_pagedir, (u64)mymm->mm_pagedir_p);
-#elif defined(CONFIG_NO_PAGING_PAE)
+#elif defined(CONFIG_NO_KERNEL_X86_PAGING_PAE)
 	reset_pdir_p32(&mymm->mm_pagedir.pd_p32, (u32)mymm->mm_pagedir_p);
-#elif defined(CONFIG_NO_PAGING_P32)
+#elif defined(CONFIG_NO_KERNEL_X86_PAGING_P32)
 	if (!reset_pdir_pae(&mymm->mm_pagedir.pd_pae))
 		return;
 #else
@@ -1220,10 +1222,8 @@ dbg_enter_scpustate_c(dbg_entry_c_t entry, void const *data,
 	cpu_apply_scpustate(new_state);
 }
 
-
-
 DECL_END
 
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_RT_C */

@@ -172,7 +172,7 @@ case EMU86_OPCODE_ENCODE(0x0f30): {
 	 * this case, manually check if we're dealing with one of these MSRs,
 	 * and the written value is such a pointer.
 	 * s.a. Intel instruction set reference for `WRMSR' (Vol. 2C) */
-#if CONFIG_LIBEMU86_WANT_64BIT && !defined(EMU86_VALIDATE_CANONICAL_IS_NOOP)
+#if LIBEMU86_CONFIG_WANT_64BIT && !defined(EMU86_VALIDATE_CANONICAL_IS_NOOP)
 	if (EMU86_F_IS64(op_flags)) {
 		if (index == IA32_DS_AREA || index == IA32_FS_BASE ||
 		    index == IA32_GS_BASE || index == IA32_KERNEL_GS_BASE ||
@@ -180,7 +180,7 @@ case EMU86_OPCODE_ENCODE(0x0f30): {
 		    index == IA32_SYSENTER_ESP)
 			EMU86_VALIDATE_CANONICAL(value);
 	}
-#endif /* CONFIG_LIBEMU86_WANT_64BIT && !EMU86_VALIDATE_CANONICAL_IS_NOOP */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT && !EMU86_VALIDATE_CANONICAL_IS_NOOP */
 
 	/* Emulate wrmsr for certain registers */
 #if EMU86_EMULATE_CONFIG_WANT_WRMSR_EMULATED

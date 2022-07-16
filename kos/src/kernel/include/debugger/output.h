@@ -24,7 +24,7 @@
 
 #include <debugger/config.h>
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <kernel/types.h>
 
 #include <hybrid/pp/__va_nargs.h>
@@ -244,6 +244,6 @@ typedef u8 dbg_color_t;
 #endif /* __CC__ */
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_INCLUDE_DEBUGGER_OUTPUT_H */

@@ -29,40 +29,38 @@
 #error "Architecture doesn't have RTM support (please don't compile this driver for this architecture)"
 #endif /* !ARCH_HAVE_RTM */
 
-/* Config     option:      CONFIG_RTM_USERSPACE_ONLY
+/*[[[config CONFIG_MODRTM_USERSPACE_ONLY = true
+ * >> Config option: CONFIG_MODRTM_USERSPACE_ONLY
  * When enabled, RTM can only be used in user-space.
  * This is enforced by making all conditional is-user checks mandatory,
- * as well as simplifying a lot of code by removing is-kernel branches. */
-#ifdef CONFIG_NO_RTM_USERSPACE_ONLY
-#undef CONFIG_RTM_USERSPACE_ONLY
-#define CONFIG_RTM_USERSPACE_ONLY 0
-#elif !defined(CONFIG_RTM_USERSPACE_ONLY)
-#define CONFIG_RTM_USERSPACE_ONLY 1
-#elif (CONFIG_RTM_USERSPACE_ONLY + 0) == 0
-#undef CONFIG_RTM_USERSPACE_ONLY
-#define CONFIG_RTM_USERSPACE_ONLY 0
-#else /* ... */
-#undef CONFIG_RTM_USERSPACE_ONLY
-#define CONFIG_RTM_USERSPACE_ONLY 1
-#endif /* !... */
+ * as well as simplifying a lot of code by removing is-kernel branches.
+ * ]]]*/
+#ifdef CONFIG_NO_MODRTM_USERSPACE_ONLY
+#undef CONFIG_MODRTM_USERSPACE_ONLY
+#elif !defined(CONFIG_MODRTM_USERSPACE_ONLY)
+#define CONFIG_MODRTM_USERSPACE_ONLY
+#elif (-CONFIG_MODRTM_USERSPACE_ONLY - 1) == -1
+#undef CONFIG_MODRTM_USERSPACE_ONLY
+#define CONFIG_NO_MODRTM_USERSPACE_ONLY
+#endif /* ... */
+/*[[[end]]]*/
 
 
-/* Config option: CONFIG_RTM_PENDING_SYSTEM_CALLS
+/*[[[config CONFIG_MODRTM_PENDING_SYSTEM_CALLS = true
+ * >> Config option: CONFIG_MODRTM_PENDING_SYSTEM_CALLS
  * When enabled, certain system calls will be tracked as  pending,
  * such that they will be executed only upon successful completion
- * of RTM emulation. */
-#ifdef CONFIG_NO_RTM_PENDING_SYSTEM_CALLS
-#undef CONFIG_RTM_PENDING_SYSTEM_CALLS
-#define CONFIG_RTM_PENDING_SYSTEM_CALLS 0
-#elif !defined(CONFIG_RTM_PENDING_SYSTEM_CALLS)
-#define CONFIG_RTM_PENDING_SYSTEM_CALLS 1
-#elif (CONFIG_RTM_PENDING_SYSTEM_CALLS + 0) == 0
-#undef CONFIG_RTM_PENDING_SYSTEM_CALLS
-#define CONFIG_RTM_PENDING_SYSTEM_CALLS 0
-#else /* ... */
-#undef CONFIG_RTM_PENDING_SYSTEM_CALLS
-#define CONFIG_RTM_PENDING_SYSTEM_CALLS 1
-#endif /* !... */
+ * of RTM emulation.
+ * ]]]*/
+#ifdef CONFIG_NO_MODRTM_PENDING_SYSTEM_CALLS
+#undef CONFIG_MODRTM_PENDING_SYSTEM_CALLS
+#elif !defined(CONFIG_MODRTM_PENDING_SYSTEM_CALLS)
+#define CONFIG_MODRTM_PENDING_SYSTEM_CALLS
+#elif (-CONFIG_MODRTM_PENDING_SYSTEM_CALLS - 1) == -1
+#undef CONFIG_MODRTM_PENDING_SYSTEM_CALLS
+#define CONFIG_NO_MODRTM_PENDING_SYSTEM_CALLS
+#endif /* ... */
+/*[[[end]]]*/
 
 
 DECL_BEGIN

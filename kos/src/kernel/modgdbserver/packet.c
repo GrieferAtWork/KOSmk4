@@ -37,12 +37,12 @@
 DECL_BEGIN
 
 /* Buffer used to store the contents of remote command packets. */
-INTDEF char GDBRemote_CommandBuffer[CONFIG_GDBSERVER_PACKET_MAXLEN];
+INTDEF char GDBRemote_CommandBuffer[CONFIG_MODGDBSERVER_PACKET_MAXLEN];
 
 /* Buffer for out-bound packets. */
-PRIVATE char GDBServer_PacketBuffer[CONFIG_GDBSERVER_PACKET_MAXLEN + 4];
+PRIVATE char GDBServer_PacketBuffer[CONFIG_MODGDBSERVER_PACKET_MAXLEN + 4];
 
-/* Begin a new packet, returning a buffer of up to `CONFIG_GDBSERVER_PACKET_MAXLEN' bytes. */
+/* Begin a new packet, returning a buffer of up to `CONFIG_MODGDBSERVER_PACKET_MAXLEN' bytes. */
 INTERN ATTR_CONST char *NOTHROW(FCALL GDBPacket_Start)(void) {
 	return GDBServer_PacketBuffer + 1;
 }
@@ -122,7 +122,7 @@ NOTHROW(FCALL GDBPacket_TransmitAsync)(char *endptr, char firstChar) {
 	byte_t checksum;
 	size_t len;
 	assert(endptr >= GDBServer_PacketBuffer + 1);
-	assert(endptr <= (GDBServer_PacketBuffer + 1 + CONFIG_GDBSERVER_PACKET_MAXLEN));
+	assert(endptr <= (GDBServer_PacketBuffer + 1 + CONFIG_MODGDBSERVER_PACKET_MAXLEN));
 	len = (size_t)(endptr - (GDBServer_PacketBuffer + 1));
 	checksum = GDBPacket_GetCheckSum(GDBServer_PacketBuffer + 1, len);
 	GDBServer_PacketBuffer[0]   = firstChar;
@@ -222,7 +222,7 @@ NOTHROW(FCALL GDBPacket_TransmitAsyncEscape)(char *endptr) {
 	byte_t checksum;
 	size_t len;
 	assert(endptr >= GDBServer_PacketBuffer + 1);
-	assert(endptr <= (GDBServer_PacketBuffer + 1 + CONFIG_GDBSERVER_PACKET_MAXLEN));
+	assert(endptr <= (GDBServer_PacketBuffer + 1 + CONFIG_MODGDBSERVER_PACKET_MAXLEN));
 	len = (size_t)(endptr - (GDBServer_PacketBuffer + 1));
 	checksum = GDBPacket_GetCheckSumEscape(GDBServer_PacketBuffer + 1, len);
 	GDB_DEBUG("[gdb] reply: %$q\n", len, GDBServer_PacketBuffer + 1);

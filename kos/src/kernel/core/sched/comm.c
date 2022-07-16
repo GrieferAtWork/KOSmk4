@@ -25,7 +25,7 @@
 
 #include <sched/comm.h>
 
-#ifdef CONFIG_HAVE_TASK_COMM
+#ifdef CONFIG_HAVE_KERNEL_TASK_COMM
 #include <kernel/malloc.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
@@ -212,6 +212,6 @@ NOTHROW(FCALL task_setcomm)(char const *__restrict name) {
 
 
 DECL_END
-#endif /* CONFIG_HAVE_TASK_COMM */
+#endif /* CONFIG_HAVE_KERNEL_TASK_COMM */
 
 #endif /* !GUARD_KERNEL_SRC_SCHED_COMM_C */

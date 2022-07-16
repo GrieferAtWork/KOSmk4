@@ -42,7 +42,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f7): {
 			start  = (u8)(source);
 			len    = (u8)(source >> 8);
 		}
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (op_flags & EMU86_F_VEX_W) {
 			u64 value, result;
 			if (start >= 64)
@@ -55,15 +55,15 @@ case EMU86_OPCODE_ENCODE(0x0f38f7): {
 				eflags_addend |= EFLAGS_ZF;
 			MODRM_SETREGQ(result);
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		{
 			if (start >= 32) {
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 bextr_write_dst_0:
 				MODRM_SETREGQ(0);
-#else /* CONFIG_LIBEMU86_WANT_64BIT */
+#else /* LIBEMU86_CONFIG_WANT_64BIT */
 				MODRM_SETREGL(0);
-#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* !LIBEMU86_CONFIG_WANT_64BIT */
 				eflags_addend |= EFLAGS_ZF; /* Result is 0 */
 			} else {
 				u32 value, result;
@@ -96,7 +96,7 @@ bextr_write_dst_0:
 		 * VEX.LZ.F3.0F38.W1 F7 /r     SARX r64a, r/m64, r64b     Shift r/m64 arithmetically right with count specified in r64b. */
 		u8 num_bits;
 		num_bits = VEX_GETREGB();
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (op_flags & EMU86_F_VEX_W) {
 			u64 value;
 			num_bits %= 64;
@@ -110,7 +110,7 @@ bextr_write_dst_0:
 			}
 			MODRM_SETREGQ(value);
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		{
 			u32 value;
 			num_bits %= 32;

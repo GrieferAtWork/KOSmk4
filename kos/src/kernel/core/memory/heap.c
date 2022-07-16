@@ -79,8 +79,8 @@
 
 
 #if 0 /* Quick toggle to disable all debugging aids. */
-#undef CONFIG_DEBUG_HEAP
-#undef CONFIG_HEAP_RANDOMIZE_OFFSETS
+#undef CONFIG_HAVE_KERNEL_DEBUG_HEAP
+#undef CONFIG_HAVE_KERNEL_HEAP_RANDOMIZE_OFFSETS
 #endif
 
 DECL_BEGIN
@@ -185,7 +185,7 @@ PUBLIC struct heap kernel_heaps[__GFP_HEAPCOUNT] = {
 };
 
 
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 PRIVATE WUNUSED byte_t *
 NOTHROW(KCALL find_modified_address)(byte_t *start, u32 pattern, size_t num_bytes) {
 	while ((uintptr_t)start & 3) {
@@ -398,7 +398,7 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 	}
 	atomic_lock_release(&self->h_lock);
 }
-#else /* CONFIG_DEBUG_HEAP */
+#else /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 #define mfree_set_checksum(self) (void)0
 
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -408,10 +408,10 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict UNUSED(self)) {
 PUBLIC NOBLOCK void
 NOTHROW(KCALL heap_validate_all)(void) {
 }
-#endif /* !CONFIG_DEBUG_HEAP */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 
 
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 PRIVATE NOBLOCK void
 NOTHROW(KCALL reset_heap_data)(byte_t *ptr, u32 pattern, size_t num_bytes) {
 	if (num_bytes < PAGESIZE)
@@ -439,7 +439,7 @@ do_remainder:
 		mempatl(ptr, pattern, num_bytes);
 	}
 }
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 
 
 
@@ -518,12 +518,12 @@ NOTHROW(KCALL heap_serve_pending)(struct heap *__restrict self,
 		/* Bring the pending free block back into a consistent state! */
 		if (pend_flags & GFP_CALLOC)
 			bzero(pend, sizeof(struct heap_pending_free));
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 		else {
 			mempatl(pend, DEBUGHEAP_NO_MANS_LAND,
 			        sizeof(struct heap_pending_free));
 		}
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 		still_locked = heap_free_raw_and_unlock_impl(self, pend, pend_size, pend_flags);
 		if (!still_locked) {
 			/* Try to re-acquire the lock. */
@@ -648,7 +648,7 @@ NOTHROW(KCALL heap_free_raw)(struct heap *__restrict self,
 }
 
 
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 /* Wrapper  for `mman_unmap_kram()' that handles the special case
  * of unmapping parts of a HINTED debug-heap mapping that has yet
  * to be fully initialized. */
@@ -704,10 +704,10 @@ NOTHROW(KCALL heap_unmap_kram)(struct heap *__restrict self,
 
 	mman_unmap_kram(addr, num_bytes, flags);
 }
-#else /* CONFIG_DEBUG_HEAP */
+#else /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 #define heap_unmap_kram(self, addr, num_bytes, flags) \
 	mman_unmap_kram(addr, num_bytes, flags)
-#endif /* !CONFIG_DEBUG_HEAP */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 
 
 
@@ -719,11 +719,11 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
                                              VIRT void *ptr, size_t num_bytes,
                                              gfp_t flags) {
 	struct mfree *slot, *new_slot;
-#ifdef CONFIG_DEBUG_HEAP
-#ifdef CONFIG_HEAP_TRACE_DANGLE
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
 	size_t dandle_size = 0;
-#endif /* CONFIG_HEAP_TRACE_DANGLE */
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 	HEAP_ASSERTF(num_bytes >= HEAP_MINSIZE,
 	             "Invalid heap_free(): Too few bytes (%" PRIuSIZ " < %" PRIuSIZ ")",
 	             num_bytes, HEAP_MINSIZE);
@@ -744,18 +744,18 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 		LIST_REMOVE(slot, mf_lsize);
 
 		/* Extend this node above. */
-#ifndef CONFIG_DEBUG_HEAP
+#ifndef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 		slot->mf_flags &= flags & GFP_CALLOC;
 		slot->mf_size += num_bytes;
-#else /* !CONFIG_DEBUG_HEAP */
+#else /* !CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 		if ((flags & GFP_CALLOC) && (slot->mf_flags & GFP_CALLOC)) {
 			slot->mf_size += num_bytes;
 		} else {
-#ifdef CONFIG_HEAP_TRACE_DANGLE
+#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
 			bool result;
 			HEAP_ADD_DANGLE(self, slot->mf_size);
 			dandle_size += slot->mf_size;
-#endif /* CONFIG_HEAP_TRACE_DANGLE */
+#endif /* CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
 			atomic_lock_release(&self->h_lock);
 			if (flags & GFP_CALLOC) {
 				heap_validate_all_paranoid();
@@ -772,37 +772,37 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 			ptr = (VIRT void *)slot;
 			num_bytes += slot->mf_size;
 			mempatl(ptr, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);
-#ifdef CONFIG_HEAP_TRACE_DANGLE
+#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
 			result = heap_free_raw_lock_and_maybe_unlock_impl(self, ptr, num_bytes, flags);
 			HEAP_SUB_DANGLE(self, dandle_size);
 			return result;
-#else /* CONFIG_HEAP_TRACE_DANGLE */
+#else /* CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
 			return heap_free_raw_lock_and_maybe_unlock_impl(self, ptr, num_bytes, flags);
-#endif /* !CONFIG_HEAP_TRACE_DANGLE */
+#endif /* !CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
 		}
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 
 		/* Check if there is another node above that we must now merge with. */
 		high_slot = mfree_tree_remove(&self->h_addr, (uintptr_t)ptr + num_bytes);
 		if unlikely(high_slot) {
 			/* Include this high-slot in the union that will be freed. */
 			LIST_REMOVE(high_slot, mf_lsize);
-#ifndef CONFIG_DEBUG_HEAP
+#ifndef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 			slot->mf_flags &= high_slot->mf_flags & GFP_CALLOC;
 			slot->mf_size += high_slot->mf_size;
 			if (slot->mf_flags & GFP_CALLOC)
 				bzero(high_slot, SIZEOF_MFREE);
-#else /* !CONFIG_DEBUG_HEAP */
+#else /* !CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 			if ((slot->mf_flags & GFP_CALLOC) &&
 			    (high_slot->mf_flags & GFP_CALLOC)) {
 				slot->mf_size += high_slot->mf_size;
 				bzero(high_slot, SIZEOF_MFREE);
 			} else {
-#ifdef CONFIG_HEAP_TRACE_DANGLE
+#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
 				bool result;
 				HEAP_ADD_DANGLE(self, high_slot->mf_size);
 				dandle_size += high_slot->mf_size;
-#endif /* CONFIG_HEAP_TRACE_DANGLE */
+#endif /* CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
 				atomic_lock_release(&self->h_lock);
 				if (slot->mf_flags & GFP_CALLOC) {
 					heap_validate_all_paranoid();
@@ -823,15 +823,15 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 				flags &= ~GFP_CALLOC;
 				mempatl(slot, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);
 				mempatl(high_slot, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);
-#ifdef CONFIG_HEAP_TRACE_DANGLE
+#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
 				result = heap_free_raw_lock_and_maybe_unlock_impl(self, ptr, num_bytes, flags);
 				HEAP_SUB_DANGLE(self, dandle_size);
 				return result;
-#else /* CONFIG_HEAP_TRACE_DANGLE */
+#else /* CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
 				return heap_free_raw_lock_and_maybe_unlock_impl(self, ptr, num_bytes, flags);
-#endif /* !CONFIG_HEAP_TRACE_DANGLE */
+#endif /* !CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
 			}
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 		}
 
 		/* No high-slot. Just re-insert our new, bigger node. */
@@ -847,7 +847,7 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 		LIST_REMOVE(slot, mf_lsize);
 
 		/* Extend this node below. */
-#ifndef CONFIG_DEBUG_HEAP
+#ifndef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 		slot_flags = slot->mf_flags & flags;
 		slot_size  = slot->mf_size;
 		if (slot_flags & GFP_CALLOC)
@@ -855,7 +855,7 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 		new_slot           = (struct mfree *)ptr;
 		new_slot->mf_size  = slot_size + num_bytes;
 		new_slot->mf_flags = slot_flags;
-#else /* !CONFIG_DEBUG_HEAP */
+#else /* !CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 		slot_flags = slot->mf_flags;
 		slot_size  = slot->mf_size;
 		if ((slot_flags & GFP_CALLOC) && (flags & GFP_CALLOC)) {
@@ -864,11 +864,11 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 			new_slot->mf_size  = slot_size + num_bytes;
 			new_slot->mf_flags = slot_flags;
 		} else {
-#ifdef CONFIG_HEAP_TRACE_DANGLE
+#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
 			bool result;
 			HEAP_ADD_DANGLE(self, slot_size);
 			dandle_size += slot_size;
-#endif /* CONFIG_HEAP_TRACE_DANGLE */
+#endif /* CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
 			atomic_lock_release(&self->h_lock);
 			if (flags & GFP_CALLOC)
 				reset_heap_data((byte_t *)ptr, DEBUGHEAP_NO_MANS_LAND, num_bytes);
@@ -878,15 +878,15 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 				mempatl(slot, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);
 			flags &= ~GFP_CALLOC;
 			num_bytes += slot_size;
-#ifdef CONFIG_HEAP_TRACE_DANGLE
+#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
 			result = heap_free_raw_lock_and_maybe_unlock_impl(self, ptr, num_bytes, flags);
 			HEAP_SUB_DANGLE(self, dandle_size);
 			return result;
-#else /* CONFIG_HEAP_TRACE_DANGLE */
+#else /* CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
 			return heap_free_raw_lock_and_maybe_unlock_impl(self, ptr, num_bytes, flags);
-#endif /* !CONFIG_HEAP_TRACE_DANGLE */
+#endif /* !CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
 		}
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 
 		/* Re-insert our new, bigger node. */
 		goto load_new_slot;
@@ -898,12 +898,12 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 	new_slot->mf_flags = flags & MFREE_FMASK;
 
 load_new_slot:
-#ifdef CONFIG_DEBUG_HEAP
-#ifdef CONFIG_HEAP_TRACE_DANGLE
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
 	/* Untrack danging heap data. */
 	HEAP_SUB_DANGLE(self, dandle_size);
-#endif /* CONFIG_HEAP_TRACE_DANGLE */
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 
 	if (!(flags & GFP_NOMMAP) &&
 	    new_slot->mf_size >= self->h_freethresh) {
@@ -948,20 +948,20 @@ load_new_slot:
 			if (hkeep_size) {
 				if (flags & GFP_CALLOC)
 					bzero(hkeep, SIZEOF_MFREE);
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 				else {
 					mempatl(hkeep, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);
 				}
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 			}
 			if (tkeep_size) {
 				if (flags & GFP_CALLOC)
 					bzero(tkeep, SIZEOF_MFREE);
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 				else {
 					mempatl(tkeep, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);
 				}
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 			}
 			PRINTK_SYSTEM_ALLOCATION("[heap] Release kernel heap: [%p+%#" PRIxSIZ " head] %p...%p [%p+%#" PRIxSIZ " tail]\n",
 			                         hkeep, hkeep_size,
@@ -1074,10 +1074,10 @@ again_lock_mman:
 #endif /* !NDEBUG */
 
 	/* Reset debug information. */
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 	if (!(flags & GFP_CALLOC))
 		reset_heap_data((byte_t *)ptr, DEBUGHEAP_NO_MANS_LAND, num_bytes);
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 	heap_free_raw(self, ptr, num_bytes, flags);
 }
 
@@ -1188,11 +1188,11 @@ again:
 		/* Reset memory contained within the header of the data block we just allocated. */
 		if (free_flags & GFP_CALLOC)
 			bzero(chain, SIZEOF_MFREE);
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 		else {
 			mempatl(chain, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);
 		}
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 
 		/* Re-release the unused portions of the head and tail data blocks. */
 		if (head_keep)
@@ -1221,7 +1221,7 @@ again:
  * allocated yet,  in  a  way that  prevent  the  associated
  * pages from  being allocated  during `heap_free_raw()'  in
  * a way that would produce invalid (use-after-free) memory. */
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 #define IS_FRESH_MEMORY(p) (*(u32 *)(p) == 0 || *(u32 *)(p) == DEBUGHEAP_FRESH_MEMORY)
 
 PRIVATE NONNULL((1)) void
@@ -1380,7 +1380,7 @@ NOTHROW(KCALL heap_free_underallocation)(struct heap *__restrict self,
 	              num_free_bytes, flags);
 }
 
-#else /* CONFIG_DEBUG_HEAP */
+#else /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 
 /* Without debug initialization, this isn't a problem! */
 #define heap_free_overallocation(self, overallocation_base, num_free_bytes, flags) \
@@ -1388,7 +1388,7 @@ NOTHROW(KCALL heap_free_underallocation)(struct heap *__restrict self,
 #define heap_free_underallocation(self, underallocation_base, num_free_bytes, flags) \
 	heap_free_raw(self, underallocation_base, num_free_bytes, flags)
 
-#endif /* !CONFIG_DEBUG_HEAP */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 
 
 DECL_END

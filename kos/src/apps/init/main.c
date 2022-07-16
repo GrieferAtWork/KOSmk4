@@ -25,7 +25,7 @@
 
 #include <hybrid/compiler.h>
 
-#include <kos/build-config.h>
+#include <kos/config/toolchain.h>
 #include <kos/fcntl.h> /* Open() */
 #include <kos/io.h>
 #include <kos/ioctl/svga.h>
@@ -244,7 +244,7 @@ done_tmpfs:
 					pause();
 			}
 		}
-		ksysctl(0xcccc0001); /* reboot (requires `CONFIG_HAVE_HACKY_REBOOT') */
+		ksysctl(0xcccc0001); /* reboot (requires `CONFIG_HAVE_KERNEL_HACKY_REBOOT') */
 		for (;;)
 			pause();
 	}

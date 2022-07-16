@@ -1584,6 +1584,14 @@ function optimizeForIfdef(expr: string): string {
 	return f"#if {result}\n";
 }
 
+function optimizeForElse(expr: string): string {
+	return f"#else /* {
+		ppParse(expr)
+			.optimize()
+			.tostr(removeDefined: true)
+	} */\n";
+}
+
 function optimizeForEndif(expr: string): string {
 	return f"#endif /* {
 		ppParse(expr)

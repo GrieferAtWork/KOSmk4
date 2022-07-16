@@ -504,9 +504,9 @@ DATDEF struct driver_section kernel_section_gcc_except_table;
 DATDEF struct driver_section kernel_section_eh_frame;
 DATDEF struct driver_section kernel_section_data;
 DATDEF struct driver_section kernel_section_bss;
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 DATDEF struct driver_section kernel_section_dbg_hooks;
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 INTDEF struct driver_section kernel_section_debug_line;
 INTDEF struct driver_section kernel_section_debug_info;

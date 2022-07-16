@@ -35,7 +35,7 @@
  * the (rd|wr)(fs|gs)base instructions, then we always link against the
  * equivalent system calls. */
 #if !defined(__KERNEL__) && (defined(__KOS__) || !defined(__x86_64__))
-#if !defined(__x86_64__) || defined(CONFIG_NO_NATIVE_RDWRFSGSBASE)
+#if !defined(__x86_64__) || defined(CONFIG_NO_X86_NATIVE_RDWRFSGSBASE)
 #include <asm/prctl.h>
 #include <kos/syscalls.h>
 #if __CRT_HAVE_XSC(arch_prctl)

@@ -17,15 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_KOS__BUILD_CONFIG_H
-#define _I386_KOS_KOS__BUILD_CONFIG_H 1
+#ifndef _I386_KOS_KOS_CONFIG__TOOLCHAIN_H
+#define _I386_KOS_KOS_CONFIG__TOOLCHAIN_H 1
 
 #include <hybrid/host.h>
 
 #ifdef __x86_64__
-#include "_build-config64.h"
+#include "_toolchain64.h"
 #else /* __x86_64__ */
-#include "_build-config32.h"
+#include "_toolchain32.h"
 #endif /* !__x86_64__ */
 
-#endif /* !_I386_KOS_KOS__BUILD_CONFIG_H */
+#endif /* !_I386_KOS_KOS_CONFIG__TOOLCHAIN_H */

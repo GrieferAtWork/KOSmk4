@@ -25,7 +25,7 @@
 
 DECL_BEGIN
 
-#ifndef CONFIG_NO_PAGING_P32
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_P32
 struct ATTR_ALIGNED(4096) p32_kernel_share {
 	/* These 255 E1-vectors are  used to fill  in the last  1GiB of virtual  memory
 	 * with mappings to identity-map the first 1GiB of physical memory during boot.
@@ -51,9 +51,9 @@ struct ATTR_ALIGNED(4096) p32_kernel_share {
 	 */
 	union p32_pdir_e1 ks_share[255][1024];
 };
-#endif /* !CONFIG_NO_PAGING_P32 */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_P32 */
 
-#ifndef CONFIG_NO_PAGING_PAE
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_PAE
 struct ATTR_ALIGNED(4096) pae_kernel_share {
 	/* `ks_share_e1' here is the same deal as `p32_kernel_share', used to fill in
 	 * the  last 1GiB of virtual memory with an identity-map of the first 1GiB of
@@ -88,16 +88,16 @@ struct ATTR_ALIGNED(4096) pae_kernel_share {
 	union pae_pdir_e1 ks_share_e1[508][512];
 };
 
-#endif /* !CONFIG_NO_PAGING_PAE */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_PAE */
 
 
 typedef union {
-#ifndef CONFIG_NO_PAGING_P32
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_P32
 	struct p32_kernel_share ks_p32;
-#endif /* !CONFIG_NO_PAGING_P32 */
-#ifndef CONFIG_NO_PAGING_PAE
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_P32 */
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_PAE
 	struct pae_kernel_share ks_pae;
-#endif /* !CONFIG_NO_PAGING_PAE */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_PAE */
 } kernel_share_t;
 
 /* Allocate BSS memory for the initial shared+identity mapping

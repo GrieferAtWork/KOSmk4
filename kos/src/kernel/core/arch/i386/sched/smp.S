@@ -24,7 +24,7 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/fpu.h> /* CONFIG_FPU */
+#include <kernel/fpu.h> /* CONFIG_HAVE_FPU */
 #include <kernel/x86/alternatives.h>
 #include <kernel/x86/apic.h>
 #include <kernel/x86/breakpoint.h> /* reload_x86_debug_registers */
@@ -58,7 +58,7 @@
 #endif /* __x86_64__ */
 
 /**/
-#include "tsc.h" /* CONFIG_TSC_ASSERT_FORWARD */
+#include "tsc.h" /* CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD */
 
 #define PS __SIZEOF_POINTER__
 
@@ -553,7 +553,7 @@ PRIVATE_FUNCTION(x86_smp_init_cpuid)
 	movP   %cr0, %Pax
 	movP   %cr4, %Pcx
 
-#ifdef CONFIG_FPU
+#ifdef CONFIG_HAVE_FPU
 	/* Check if KOS was booted with `nofpu' */
 	EXTERN(x86_config_nofpu)
 	cmpb   $(0), x86_config_nofpu
@@ -604,7 +604,7 @@ PRIVATE_FUNCTION(x86_smp_init_cpuid)
 	orP    $(CR4_OSFXSR/* | CR4_OSXMMEXCPT*/), %Pcx /* TODO: CR4_OSXMMEXCPT */
 1:
 .Lsmp_ini_crN_donefpu:
-#endif /* CONFIG_FPU */
+#endif /* CONFIG_HAVE_FPU */
 
 	/* Store results */
 	EXTERN(thiscpu_x86_saved_cr0)
@@ -753,13 +753,13 @@ INTERN_FUNCTION(x86_smp_entry32)
 	 * the P32 page table.
 	 * XXX: This assumes that all CPUs have the same feature-set as the boot cpu... */
 	movl   %cr4, %esp
-#ifndef CONFIG_NO_PAGING_PAE
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_PAE
 	/* Enable PAE support (if necessary for setting the page directory) */
-#ifndef CONFIG_NO_PAGING_P32
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_P32
 	EXTERN(bootcpu_x86_cpuid)
 	ttest  mask=CPUID_1D_PAE, loc=((bootcpu_x86_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_1D)
 	jz     1f
-#endif /* !CONFIG_NO_PAGING_P32 */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_P32 */
 	orl    $(CR4_PAE), %esp
 	/* Enable NX support (if necessary for setting the page directory) */
 	EXTERN(bootcpu_x86_cpuid)
@@ -775,7 +775,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 	jz     1f
 	orl    $(CR4_SMEP), %esp
 1:
-#endif /* !CONFIG_NO_PAGING_PAE */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_PAE */
 	/* Enable PGE support (if necessary for setting the page directory) */
 	ttest  mask=CPUID_1D_PGE, loc=((bootcpu_x86_cpuid - KERNEL_CORE_BASE) + OFFSET_CPUID_1D)
 	jz     1f
@@ -938,9 +938,9 @@ INTERN_FUNCTION(x86_smp_entry64)
 
 	/* Load saved %cr0 and %cr4 registers. */
 	movP   thiscpu_x86_saved_cr0(R_CPU), %Pax
-#ifdef CONFIG_FPU
+#ifdef CONFIG_HAVE_FPU
 	orP    $(CR0_TS), %Pax /* Force a lazy FPU context switch */
-#endif /* CONFIG_FPU */
+#endif /* CONFIG_HAVE_FPU */
 	movP   %Pax, %cr0
 	movP   thiscpu_x86_saved_cr4(R_CPU), %Pax
 	movP   %Pax, %cr4
@@ -971,14 +971,14 @@ INTERN_FUNCTION(x86_smp_entry64)
 	/* __wrmsr(IA32_SYSENTER_EIP, (uintptr_t)x86_syscall32_sysenter[_traced]); */
 	EXTERN(x86_syscall32_sysenter)
 	movP   $(x86_syscall32_sysenter), %Pax
-#ifndef CONFIG_NO_SYSCALL_TRACING
+#ifndef CONFIG_NO_KERNEL_SYSCALL_TRACING
 	EXTERN(syscall_tracing_enabled)
 	cmpb   $(0), syscall_tracing_enabled
 	je     1f
 	EXTERN(x86_syscall32_sysenter_traced)
 	movP   $(x86_syscall32_sysenter_traced), %Pax
 1:
-#endif /* !CONFIG_NO_SYSCALL_TRACING */
+#endif /* !CONFIG_NO_KERNEL_SYSCALL_TRACING */
 #ifdef __x86_64__
 	movq   %rax, %rdx
 	shrq   $(32), %rdx
@@ -1013,14 +1013,14 @@ INTERN_FUNCTION(x86_smp_entry64)
 	/* __wrmsr(IA32_LSTAR, (u64)&x86_syscall64_syscall[_traced]); */
 	EXTERN(x86_syscall64_syscall)
 	movq   $(x86_syscall64_syscall), %rax
-#ifndef CONFIG_NO_SYSCALL_TRACING
+#ifndef CONFIG_NO_KERNEL_SYSCALL_TRACING
 	EXTERN(syscall_tracing_enabled)
 	cmpb   $(0), syscall_tracing_enabled
 	je     1f
 	EXTERN(x86_syscall64_syscall_traced)
 	movq   $(x86_syscall64_syscall_traced), %rax
 1:
-#endif /* !CONFIG_NO_SYSCALL_TRACING */
+#endif /* !CONFIG_NO_KERNEL_SYSCALL_TRACING */
 	movq   %rax, %rdx
 	shrq   $(32), %rdx
 	movzlq %eax, %rax
@@ -1127,13 +1127,13 @@ INTERN_FUNCTION(x86_smp_entry64)
 #undef GDT
 #endif /* !__x86_64__ */
 
-#ifdef CONFIG_FPU
+#ifdef CONFIG_HAVE_FPU
 	/* Indicate that no task is currently holding an FPU context.
 	 * NOTE: Technically, we could also move this part into `cpu_enter_deepsleep()',
 	 *       however it's safer  to unconditionally do  this during  initialization! */
 	EXTERN(thiscpu_fputhread)
 	movP   $(0), thiscpu_fputhread(R_CPU)
-#endif /* CONFIG_FPU */
+#endif /* CONFIG_HAVE_FPU */
 
 	/* Enable the APIC/TSC of this CPU, thus also enabling preemptive interrupts. */
 .alt_if X86_FEAT_TSC_DEADLINE
@@ -1170,16 +1170,16 @@ INTERN_FUNCTION(x86_smp_entry64)
 	xorP   %Pax, %Pax
 #ifdef __x86_64__
 	movq   %rax, thiscpu_x86_apic_emutsc_tscbase(R_CPU)
-#ifdef CONFIG_TSC_ASSERT_FORWARD
+#ifdef CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD
 	movq   %rax, thiscpu_x86_last_tsc(R_CPU)
-#endif /* CONFIG_TSC_ASSERT_FORWARD */
+#endif /* CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD */
 #else /* __x86_64__ */
 	movl   %eax, thiscpu_x86_apic_emutsc_tscbase(R_CPU)
 	movl   %eax, thiscpu_x86_apic_emutsc_tscbase+4(R_CPU)
-#ifdef CONFIG_TSC_ASSERT_FORWARD
+#ifdef CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD
 	movl   %eax, thiscpu_x86_last_tsc(R_CPU)
 	movl   %eax, thiscpu_x86_last_tsc+4(R_CPU)
-#endif /* CONFIG_TSC_ASSERT_FORWARD */
+#endif /* CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD */
 #endif /* !__x86_64__ */
 	movb   %al, thiscpu_x86_apic_emutsc_early_interrupt(R_CPU)
 	movb   $(7), thiscpu_x86_apic_emutsc_divide(R_CPU)
@@ -1311,7 +1311,7 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	ASM_PUSH_SCPUSTATE_AFTER_HW_IRET_CFI_R
 #endif /* !__x86_64__ */
 
-#ifdef CONFIG_FPU
+#ifdef CONFIG_HAVE_FPU
 	/* With the CPU about to go OFFLINE, make sure to also save the current
 	 * FPU state (if the FPU was used), so-as to not lose that  information
 	 * and have it still be available when we come back online. */
@@ -1328,7 +1328,7 @@ PUBLIC_FUNCTION(cpu_enter_deepsleep)
 	call   x86_fpustate_save
 	movP   %Pbx, %R_fcall0P /* Restore THIS_CPU */
 1:
-#endif /* CONFIG_FPU */
+#endif /* CONFIG_HAVE_FPU */
 
 	/* Save   the   current   RGDT/IDTR/LDTR/TR   in   some   PERCPU   field.
 	 * There  are  system  functions   that  will  temporarily  alter   these

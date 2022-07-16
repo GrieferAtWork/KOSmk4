@@ -23,7 +23,7 @@
 
 #include <debugger/config.h>
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <kernel/compiler.h>
 
 #include <kernel/x86/apic.h>
@@ -465,6 +465,6 @@ END(x86_dbgidt_specific_00h)
 
 
 
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_ISR_S */

@@ -755,9 +755,9 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL svgadev_v_destroy)(struct mfile *__restrict self) {
 	struct svgadev *me;
 	me = (struct svgadev *)mfile_aschrdev(self);
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	svgadev_dbg_fini(me);
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 	kfree((void *)me->svd_supmodev);
 	(*me->svd_chipset.sc_ops.sco_fini)(&me->svd_chipset);
 	chrdev_v_destroy(self);
@@ -872,7 +872,7 @@ PRIVATE struct mfile_stream_ops const svgadev_v_stream_ops = {
 };
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
 PRIVATE NOBLOCK ATTR_FREETEXT ATTR_PURE WUNUSED NONNULL((1)) uint64_t
 NOTHROW(FCALL calculate_dbgmode_cost)(struct svga_modeinfo const *__restrict mode) {
@@ -1115,7 +1115,7 @@ NOTHROW(FCALL svgadev_v_leavedbg)(struct viddev *__restrict self) {
 	/* Restore basic VGA registers. */
 	basevga_setregs(&sav->sdr_vmode);
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 /* Operators for `struct svgadev' */
@@ -1130,10 +1130,10 @@ INTERN_CONST struct viddev_ops const svgadev_ops = {
 	}}}},
 	.vdo_setttyvideomode = &svgadev_v_setttyvideomode,
 	.vdo_alloclck        = &svgadev_v_alloclck,
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	.vdo_enterdbg = &svgadev_v_enterdbg,
 	.vdo_leavedbg = &svgadev_v_leavedbg,
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 };
 
 

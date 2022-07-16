@@ -56,7 +56,7 @@
 
 DECL_BEGIN
 
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 INTERN ATTR_MALLOC WUNUSED VIRT void *
 LOCAL_NOTHROW(KCALL LOCAL_untraced_kmalloc_noslab)(size_t n_bytes, gfp_t flags) {
 	heapptr_t hptr;
@@ -87,14 +87,14 @@ LOCAL_NOTHROW(KCALL LOCAL_untraced_kmalloc)(size_t n_bytes, gfp_t flags) {
 	size_t alloc_size;
 	if unlikely(OVERFLOW_UADD(sizeof(struct mptr), n_bytes, &alloc_size))
 		goto LOCAL_IF_NX_ELSE(err, err_overflow);
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
-	if (n_bytes <= SLAB_MAXSIZE) {
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
+	if (n_bytes <= CONFIG_KERNEL_SLAB_MAXSIZE) {
 		void *slab_ptr;
 		slab_ptr = slab_malloc(n_bytes, flags);
 		if (slab_ptr)
 			return slab_ptr;
 	}
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 	hptr = LOCAL_heap_alloc_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
 	                                 alloc_size, flags);
 	LOCAL_IF_NX_ELSE(if unlikely(!heapptr_getsiz(hptr)) goto err;, )
@@ -176,10 +176,10 @@ LOCAL_NOTHROW(KCALL LOCAL_untraced_krealloc_in_place)(VIRT void *ptr,
 	if unlikely(!ptr)
 		goto err;
 	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr))
 		return n_bytes <= SLAB_GET(ptr)->s_size ? ptr : NULL;
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 	/* Align the given n_bytes and add the overhead caused by the mptr. */
 	n_bytes = LOCAL_get_realloc_size(n_bytes);
@@ -230,13 +230,13 @@ LOCAL_NOTHROW(KCALL LOCAL_untraced_krealloc)(VIRT void *ptr,
 	size_t more_size;
 	assert(!(flags & GFP_NOMOVE));
 	if (!ptr) {
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 		return LOCAL_untraced_kmalloc_noslab(n_bytes, flags);
-#else /* CONFIG_USE_SLAB_ALLOCATORS */
+#else /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 		return LOCAL_untraced_kmalloc(n_bytes, flags);
-#endif /* !CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* !CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 	}
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr)) {
 		void *resptr;
 		u8 old_size = SLAB_GET(ptr)->s_size;
@@ -251,7 +251,7 @@ LOCAL_NOTHROW(KCALL LOCAL_untraced_krealloc)(VIRT void *ptr,
 		slab_free(ptr);
 		return resptr;
 	}
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
 
 	/* Align the given n_bytes and add the overhead caused by the mptr. */
@@ -321,7 +321,7 @@ LOCAL_NOTHROW(KCALL LOCAL_untraced_krealign)(VIRT void *ptr, size_t min_alignmen
 	if (!ptr)
 		return LOCAL_untraced_kmemalign(min_alignment, n_bytes, flags);
 	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr)) {
 		void *resptr;
 		u8 old_size = SLAB_GET(ptr)->s_size;
@@ -336,7 +336,7 @@ LOCAL_NOTHROW(KCALL LOCAL_untraced_krealign)(VIRT void *ptr, size_t min_alignmen
 		slab_free(ptr);
 		return resptr;
 	}
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 	/* Align the given n_bytes and add the overhead caused by the mptr. */
 	n_bytes = LOCAL_get_realloc_size(n_bytes);
@@ -410,7 +410,7 @@ LOCAL_NOTHROW(KCALL LOCAL_untraced_krealign_offset)(VIRT void *ptr, size_t min_a
 	if (!ptr)
 		return LOCAL_untraced_kmemalign_offset(min_alignment, offset, n_bytes, flags);
 	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr)) {
 		void *resptr;
 		u8 old_size = SLAB_GET(ptr)->s_size;
@@ -425,7 +425,7 @@ LOCAL_NOTHROW(KCALL LOCAL_untraced_krealign_offset)(VIRT void *ptr, size_t min_a
 		slab_free(ptr);
 		return resptr;
 	}
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 	/* Align the given n_bytes and add the overhead caused by the mptr. */
 	n_bytes = LOCAL_get_realloc_size(n_bytes);

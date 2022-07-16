@@ -36,27 +36,28 @@
 /* Max  #  of ~magic~  bytes that  may be  provided by  exec ABIs.
  * Also specifies the # of bytes that get pre-read by the exec-ABI
  * invocation machinery before the ABI's exec callback is invoked. */
-#ifndef CONFIG_EXECABI_MAXHEADER
+#ifndef EXECABI_MAXHEADER
 #include <elf.h>
 #include <hybrid/typecore.h>
 #if defined(__ARCH_HAVE_COMPAT) && __ARCH_COMPAT_SIZEOF_POINTER != __SIZEOF_POINTER__
 #if __SIZEOF_ELF64_EHDR > __SIZEOF_ELF32_EHDR
-#define CONFIG_EXECABI_MAXHEADER __SIZEOF_ELF64_EHDR
+#define EXECABI_MAXHEADER __SIZEOF_ELF64_EHDR
 #else /* __SIZEOF_ELF64_EHDR > __SIZEOF_ELF32_EHDR */
-#define CONFIG_EXECABI_MAXHEADER __SIZEOF_ELF32_EHDR
+#define EXECABI_MAXHEADER __SIZEOF_ELF32_EHDR
 #endif /* __SIZEOF_ELF64_EHDR <= __SIZEOF_ELF32_EHDR */
 #elif __SIZEOF_POINTER__ == 8
-#define CONFIG_EXECABI_MAXHEADER __SIZEOF_ELF64_EHDR
+#define EXECABI_MAXHEADER __SIZEOF_ELF64_EHDR
 #else /* ... */
-#define CONFIG_EXECABI_MAXHEADER __SIZEOF_ELF32_EHDR
+#define EXECABI_MAXHEADER __SIZEOF_ELF32_EHDR
 #endif /* !... */
-#endif /* !CONFIG_EXECABI_MAXHEADER */
+#endif /* !EXECABI_MAXHEADER */
 
-/* Define feature test macros for ABIs built into the kernel core */
-#undef CONFIG_EXECABI_HAVE_BUILTIN_ELF
-#define CONFIG_EXECABI_HAVE_BUILTIN_ELF 1
-#undef CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG
-#define CONFIG_EXECABI_HAVE_BUILTIN_SHEBANG 1
+
+ /* Define feature test macros for ABIs built into the kernel core */
+#undef EXECABI_HAVE_BUILTIN_ELF
+#define EXECABI_HAVE_BUILTIN_ELF 1
+#undef EXECABI_HAVE_BUILTIN_SHEBANG
+#define EXECABI_HAVE_BUILTIN_SHEBANG 1
 
 
 #ifdef __CC__
@@ -146,10 +147,10 @@ struct execargs {
 	REF struct path    *ea_xpath;       /* [0..1] Filesystem path for the directory inside of which `ea_xfile' is located. */
 	REF struct fdirent *ea_xdentry;     /* [0..1] Directory entry containing the filename of `ea_xfile'. */
 	REF struct mfile   *ea_xfile;       /* [1..1] The filesystem node which should be loaded as an executable binary. */
-	byte_t              ea_header[CONFIG_EXECABI_MAXHEADER];
-	                                    /* The first `CONFIG_EXECABI_MAXHEADER' bytes of `ea_xfile'. Of this  buffer,
-	                                     * the leading `ea_magsiz' bytes are known to be equal to `ea_magic'. If  the
-	                                     * executable file is smaller than `CONFIG_EXECABI_MAXHEADER', trailing bytes
+	byte_t              ea_header[EXECABI_MAXHEADER];
+	                                    /* The first `EXECABI_MAXHEADER' bytes of `ea_xfile'. Of this buffer, the
+	                                     * leading `ea_magsiz' bytes are known to be equal to `ea_magic'. If  the
+	                                     * executable file is  smaller than  `EXECABI_MAXHEADER', trailing  bytes
 	                                     * are simply zero-initialized. */
 	bool                ea_change_mman_to_effective_mman;
 	                                    /* When set to `true', `ea_mman' should be set as the effective mman upon a
@@ -217,7 +218,7 @@ struct execabi {
 	                                    * start with a byte sequence identical to `ea_magic[:ea_magsiz]'
 	                                    * When set to  0, all files  are considered suitable  candidates
 	                                    * for this ABI. */
-	byte_t                  ea_magic[CONFIG_EXECABI_MAXHEADER]; /* ABI ~magic~ */
+	byte_t                  ea_magic[EXECABI_MAXHEADER]; /* ABI ~magic~ */
 
 	/* [1..1] ABI execution callback.
 	 * @param: args: Exec arguments

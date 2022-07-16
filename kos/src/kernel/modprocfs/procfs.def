@@ -45,6 +45,7 @@
 #include <__stdinc.h>
 #include <hybrid/compiler.h>
 
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/malloc.h>
 
 #include <hybrid/host.h>
@@ -84,9 +85,9 @@ MKDIR_BEGIN(procfs_r_kos, 0555)
 	MKDIR_ENT("fs",              DT_DIR, &procfs_r_kos_fs,              /*[[[fdirent_hash]]]*/0x7366/*[[[end]]]*/)
 	MKDIR_ENT("futexfd-maxexpr", DT_REG, &procfs_r_kos_futexfd_maxexpr, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xd71498bb, 0x98fa0ab3f6908203, 0xb5bdd1df, 0x9a938809a111e702)/*[[[end]]]*/)
 	MKDIR_ENT("kstat",           DT_REG, &procfs_r_kos_kstat,           /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x6d180f37, 0x746174736b, 0xc70f17dd, 0x746174736b)/*[[[end]]]*/)
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 	MKDIR_ENT("leaks",           DT_REG, &procfs_r_kos_leaks,           /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xc66c913f, 0x736b61656c, 0xcf906d36, 0x736b61656c)/*[[[end]]]*/)
-#endif /* CONFIG_TRACE_MALLOC */
+#endif /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 	MKDIR_ENT("meminfo",         DT_REG, &procfs_r_kos_meminfo,         /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xb547f743, 0x6f666e696d656d, 0xd9003f1f, 0x6f666e696d656d)/*[[[end]]]*/)
 	MKDIR_ENT("mm",              DT_DIR, &procfs_r_kos_mm,              /*[[[fdirent_hash]]]*/0x6d6d/*[[[end]]]*/)
 	MKDIR_ENT("raminfo",         DT_REG, &procfs_r_kos_raminfo,         /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0xb547d370, 0x6f666e696d6172, 0x5dc3f1f, 0x6f666e696d6172)/*[[[end]]]*/)
@@ -153,15 +154,15 @@ MKREG_RW(procfs_r_sys_x86_keepiopl_fork, 0644, ProcFS_Sys_X86_KeepIopl_Fork_Prin
 
 /* /proc/sys/fs */
 MKDIR_BEGIN(procfs_r_sys_fs, 0555)
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 	MKDIR_ENT("inotify",       DT_DIR, &procfs_r_sys_fs_inotify,       /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x1864481a, 0x796669746f6e69, 0xb55b517d, 0x796669746f6e69)/*[[[end]]]*/)
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 	MKDIR_ENT("pipe-max-size", DT_REG, &procfs_r_sys_fs_pipe_max_size, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x41a4d827, 0x3b6cd6fe0b5d281d, 0x14eb9c44, 0xf3b4f3f41341e065)/*[[[end]]]*/)
 MKDIR_END
 MKREG_RW(procfs_r_sys_fs_pipe_max_size, 0644, procfs_sys_fs_pipemaxsize_print, procfs_sys_fs_pipemaxsize_write)
 
 
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 /* /proc/sys/fs/inotify */
 MKDIR_BEGIN(procfs_r_sys_fs_inotify, 0555)
 	MKDIR_ENT("max_queued_events", DT_REG, &procfs_r_sys_fs_inotify_max_queued_events, /*[[[fdirent_hash]]]*/FDIRENT_HASH_INIT(0x4534aee4, 0x3cfbba08c5715b7d, 0xa4aef668, 0x2c5e70c40fb5fc8c)/*[[[end]]]*/)
@@ -169,7 +170,7 @@ MKDIR_END
 MKREG_RW(procfs_r_sys_fs_inotify_max_queued_events, 0644,
          procfs_sys_fs_inotify_maxqueuedevents_print,
          procfs_sys_fs_inotify_maxqueuedevents_write)
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 
 /* /proc/sys/kernel */

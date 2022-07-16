@@ -49,7 +49,7 @@
 #include <sched/cpu.h>
 #include <sched/group.h>
 #include <sched/task.h>
-#include <sched/userkern.h>
+#include <sched/userkern.h> /* CONFIG_NO_KERNEL_USERKERN_SEGMENT */
 #include <sched/x86/iobm.h>
 #include <sched/x86/tss.h>
 
@@ -516,7 +516,7 @@ x86_handle_pagefault(struct icpustate *__restrict state,
 
 		/* Acquire a lock to the mman in charge. */
 again_lock_mman:
-#ifdef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
+#ifdef CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC
 		if unlikely(!mman_lock_tryacquire(mf.mfl_mman)) {
 			/* Access to the phys2virt section is allowed while preemption is disabled.
 			 * However,  when preemption is  disabled, locking the  kernel VM may fail,
@@ -531,9 +531,9 @@ again_lock_mman:
 			}
 			mman_lock_acquire(mf.mfl_mman);
 		}
-#else /* CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
+#else /* CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC */
 		mman_lock_acquire(mf.mfl_mman);
-#endif /* !CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
+#endif /* !CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC */
 
 		/* Lookup the mapping for the accessed address. */
 		mf.mfl_node = mnode_tree_locate(mf.mfl_mman->mm_mappings,
@@ -569,7 +569,7 @@ again_lock_mman:
 						}
 					}
 				}
-#if !defined(CONFIG_NO_USERKERN_SEGMENT) && defined(__x86_64__)
+#if !defined(CONFIG_NO_KERNEL_USERKERN_SEGMENT) && defined(__x86_64__)
 				else {
 					/* We can get here if the calling program is running in  compatibility
 					 * mode, and has just attempted to perform a memory access/call to its
@@ -641,7 +641,7 @@ again_lock_mman:
 						mman_lock_release(mm);
 					}
 				}
-#endif /* !CONFIG_NO_USERKERN_SEGMENT && __x86_64__ */
+#endif /* !CONFIG_NO_KERNEL_USERKERN_SEGMENT && __x86_64__ */
 			}
 			goto pop_connections_and_throw_segfault;
 		}
@@ -665,7 +665,7 @@ got_node_and_lock:
 				mf.mfl_node = node;
 			}
 
-#ifdef CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC
+#ifdef CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC
 			/* Check for special case: `mf.mfl_node' belongs to the physical identity area. */
 			if (mf.mfl_node == &x86_phys2virt64_node) {
 				PREEMPTION_DISABLE();
@@ -674,7 +674,7 @@ got_node_and_lock:
 					PREEMPTION_ENABLE();
 				goto pop_connections_and_return;
 			}
-#endif /* CONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
+#endif /* CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC */
 
 			/* Check for special case: `mf.mfl_node' may be the `thiscpu_x86_iobnode' of some CPU */
 do_handle_iob_node_access:
@@ -797,14 +797,14 @@ do_handle_iob_node_access:
 			uintptr_t node_flags;
 			REF struct mpart *part;
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 			/* Don't dispatch VIO while in debugger-mode. */
 			if unlikely(dbg_active) {
 				mman_lock_release(mf.mfl_mman);
 				mfault_fini(&mf);
 				goto pop_connections_and_throw_segfault;
 			}
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 			/* Fill in VIO callback arguments. */
 			node_flags                    = mf.mfl_node->mn_flags;

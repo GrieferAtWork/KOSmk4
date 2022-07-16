@@ -24,13 +24,13 @@
 EMU86_INTELLISENSE_BEGIN(incdec) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#if EMU86_EMULATE_CONFIG_WANT_INC_REG && (CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT)
+#if EMU86_EMULATE_CONFIG_WANT_INC_REG && (LIBEMU86_CONFIG_WANT_16BIT || LIBEMU86_CONFIG_WANT_32BIT)
 case EMU86_OPCODE_ENCODE(0x40) ... EMU86_OPCODE_ENCODE(0x47): {
 	/* 40+ rw    INC r16      Increment word register by 1.
 	 * 40+ rd    INC r32      Increment doubleword register by 1. */
 	u8 regno;
 	regno = tiny_opcode - EMU86_OPCODE_ENCODE(0x40);
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
 		goto return_unsupported_instruction;
@@ -38,7 +38,7 @@ case EMU86_OPCODE_ENCODE(0x40) ... EMU86_OPCODE_ENCODE(0x47): {
 	if (op_flags & EMU86_F_REX_B)
 		regno |= 0x8;
 #endif
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	if (!IS_16BIT()) {
 		u32 oldval, newval;
 		u32 eflags_addend = 0;
@@ -71,13 +71,13 @@ case EMU86_OPCODE_ENCODE(0x40) ... EMU86_OPCODE_ENCODE(0x47):
 #endif
 
 
-#if EMU86_EMULATE_CONFIG_WANT_DEC_REG && (CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT)
+#if EMU86_EMULATE_CONFIG_WANT_DEC_REG && (LIBEMU86_CONFIG_WANT_16BIT || LIBEMU86_CONFIG_WANT_32BIT)
 case EMU86_OPCODE_ENCODE(0x48) ... EMU86_OPCODE_ENCODE(0x4f): {
 	/* 48+ rw    DEC r16      Decrement word register by 1.
 	 * 48+ rd    DEC r32      Decrement doubleword register by 1. */
 	u8 regno;
 	regno = tiny_opcode - EMU86_OPCODE_ENCODE(0x48);
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
 		goto return_unsupported_instruction;
@@ -85,7 +85,7 @@ case EMU86_OPCODE_ENCODE(0x48) ... EMU86_OPCODE_ENCODE(0x4f): {
 	if (op_flags & EMU86_F_REX_B)
 		regno |= 0x8;
 #endif
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	if (!IS_16BIT()) {
 		u32 oldval, newval;
 		u32 eflags_addend = 0;

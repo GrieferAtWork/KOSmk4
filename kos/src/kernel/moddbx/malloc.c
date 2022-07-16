@@ -26,7 +26,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
 #include <debugger/hook.h>
 #include <debugger/output.h>
@@ -653,6 +653,6 @@ DBG_NAMED_COMMAND(dbx_heapinfo, "dbx.heapinfo",
 
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_MODDBX_MALLOC_C */

@@ -33,10 +33,10 @@
  *       commandline, which  redirects all  traced malloc  functions to  untraced
  *       counterparts during early boot. */
 #if 0
-#undef CONFIG_TRACE_MALLOC
+#undef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 #endif
 
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 #include <debugger/config.h>
 #include <debugger/hook.h>
 #include <debugger/io.h>
@@ -85,29 +85,10 @@
 #include <libinstrlen/instrlen.h>
 #include <libunwind/unwind.h>
 
-/* The minimum amount of traceback entries that MALL
- * should attempt to include in debug information of
- * allocated pointers. */
-#ifndef CONFIG_TRACE_MALLOC_MIN_TRACEBACK
-#define CONFIG_TRACE_MALLOC_MIN_TRACEBACK 4
-#endif /* !CONFIG_TRACE_MALLOC_MIN_TRACEBACK */
-
+/**/
+#include "trace-malloc.h"
 
 DECL_BEGIN
-
-#ifndef CONFIG_MALL_HEAD_PATTERN
-#define CONFIG_MALL_HEAD_PATTERN 0x33333333
-#endif /* !CONFIG_MALL_HEAD_PATTERN */
-#ifndef CONFIG_MALL_TAIL_PATTERN
-#define CONFIG_MALL_TAIL_PATTERN 0x77777777
-#endif /* !CONFIG_MALL_TAIL_PATTERN */
-#ifndef CONFIG_MALL_HEAD_SIZE
-#define CONFIG_MALL_HEAD_SIZE HEAP_ALIGNMENT
-#endif /* !CONFIG_MALL_HEAD_SIZE */
-#ifndef CONFIG_MALL_TAIL_SIZE
-#define CONFIG_MALL_TAIL_SIZE HEAP_ALIGNMENT
-#endif /* !CONFIG_MALL_TAIL_SIZE */
-
 
 #define TRACE_NODE_KIND_MALL   0x00 /* Normal kmalloc() memory */
 #define TRACE_NODE_KIND_USER   0x01 /* Custom, mall_trace()'d memory */
@@ -121,10 +102,10 @@ DECL_BEGIN
                                      * a secondary node, the original node it transformed into this kind,
                                      * and given a  bitset of POINTER-aligned  memory locations that  are
                                      * still considered as traced. */
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 #define TRACE_NODE_KIND_SLAB   0x03 /* Does not actually appear in the nodes tree.
                                      * Only used  when  dumping/discarding  leaks. */
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 #define TRACE_NODE_KIND_CORE   0x04 /* Like slab, referencing `mcoreheap_alloc()' */
 #define TRACE_NODE_KIND_MNODE  0x05 /* Unreachable kernel mman mnode. */
 
@@ -170,18 +151,18 @@ struct trace_node {
 #define trace_node_leak_next(self)            ((self)->tn_link.rb_lhs)
 #define trace_node_leak_getxrefs(self)        ((size_t)(self)->tn_link.rb_rhs)
 #define trace_node_leak_setxrefs(self, value) ((self)->tn_link.rb_rhs = (struct trace_node *)(size_t)(value))
-#if CONFIG_MALL_HEAD_SIZE != 0 || CONFIG_MALL_TAIL_SIZE != 0
+#if CONFIG_KERNEL_MALL_HEAD_SIZE != 0 || CONFIG_KERNEL_MALL_TAIL_SIZE != 0
 #define trace_node_leak_getscan_uminmax(self, scan_umin, scan_umax)        \
 	((self)->tn_kind == TRACE_NODE_KIND_MALL                               \
-	 ? (void)((scan_umin) = trace_node_umin(self) + CONFIG_MALL_HEAD_SIZE, \
-	          (scan_umax) = trace_node_umax(self) - CONFIG_MALL_TAIL_SIZE) \
+	 ? (void)((scan_umin) = trace_node_umin(self) + CONFIG_KERNEL_MALL_HEAD_SIZE, \
+	          (scan_umax) = trace_node_umax(self) - CONFIG_KERNEL_MALL_TAIL_SIZE) \
 	 : (void)((scan_umin) = trace_node_umin(self),                         \
 	          (scan_umax) = trace_node_umax(self)))
-#else /* CONFIG_MALL_HEAD_SIZE != 0 || CONFIG_MALL_TAIL_SIZE != 0 */
+#else /* CONFIG_KERNEL_MALL_HEAD_SIZE != 0 || CONFIG_KERNEL_MALL_TAIL_SIZE != 0 */
 #define trace_node_leak_getscan_uminmax(self, scan_umin, scan_umax) \
 	(void)((scan_umin) = trace_node_umin(self),                     \
 	       (scan_umax) = trace_node_umax(self))
-#endif /* CONFIG_MALL_HEAD_SIZE == 0 && CONFIG_MALL_TAIL_SIZE == 0 */
+#endif /* CONFIG_KERNEL_MALL_HEAD_SIZE == 0 && CONFIG_KERNEL_MALL_TAIL_SIZE == 0 */
 
 
 /************************************************************************/
@@ -726,7 +707,7 @@ kmalloc_printtrace(void *ptr, __pformatprinter printer, void *arg) {
 
 
 
-#if CONFIG_MALL_HEAD_SIZE != 0 || CONFIG_MALL_TAIL_SIZE != 0
+#if CONFIG_KERNEL_MALL_HEAD_SIZE != 0 || CONFIG_KERNEL_MALL_TAIL_SIZE != 0
 #define HAVE_kmalloc_validate_node
 PRIVATE NOBLOCK ATTR_NOINLINE NONNULL((2)) bool
 NOTHROW(KCALL kmalloc_validate_node)(unsigned int n_skip,
@@ -737,11 +718,11 @@ NOTHROW(KCALL kmalloc_validate_node)(unsigned int n_skip,
 	if (!TRACE_NODE_KIND_HAS_PADDING(node->tn_kind))
 		goto done;
 	base = (u32 const *)trace_node_uaddr(node);
-#if CONFIG_MALL_HEAD_SIZE != 0
-	for (i = sizeof(size_t) / 4; i < CONFIG_MALL_HEAD_SIZE / 4; ++i) {
-		if (base[i] != CONFIG_MALL_HEAD_PATTERN) {
+#if CONFIG_KERNEL_MALL_HEAD_SIZE != 0
+	for (i = sizeof(size_t) / 4; i < CONFIG_KERNEL_MALL_HEAD_SIZE / 4; ++i) {
+		if (base[i] != CONFIG_KERNEL_MALL_HEAD_PATTERN) {
 			u32 word;
-			word = CONFIG_MALL_HEAD_PATTERN;
+			word = CONFIG_KERNEL_MALL_HEAD_PATTERN;
 			base += i;
 			while (*(byte_t const *)base == ((byte_t const *)&word)[(uintptr_t)base & 3])
 				base = (u32 const *)((byte_t const *)base + 1);
@@ -749,21 +730,21 @@ NOTHROW(KCALL kmalloc_validate_node)(unsigned int n_skip,
 			               "Corrupted MALL header in at %p (offset %" PRIdSIZ " from %p...%p)\n"
 			               "%$[hex]\n"
 			               "%[gen:c]",
-			               base, (uintptr_t)base - (trace_node_umin(node) + CONFIG_MALL_HEAD_SIZE),
-			               trace_node_uaddr(node) + CONFIG_MALL_HEAD_SIZE,
-			               trace_node_uend(node) - CONFIG_MALL_TAIL_SIZE,
+			               base, (uintptr_t)base - (trace_node_umin(node) + CONFIG_KERNEL_MALL_HEAD_SIZE),
+			               trace_node_uaddr(node) + CONFIG_KERNEL_MALL_HEAD_SIZE,
+			               trace_node_uend(node) - CONFIG_KERNEL_MALL_TAIL_SIZE,
 			               /* %$[hex]  */ trace_node_usize(node), trace_node_uaddr(node),
 			               /* %[gen:c] */ &trace_node_print_traceback, node);
 			return false;
 		}
 	}
-#endif /* CONFIG_MALL_HEAD_SIZE != 0 */
-#if CONFIG_MALL_TAIL_SIZE != 0
-	base = (u32 const *)(trace_node_umax(node) + 1 - CONFIG_MALL_TAIL_SIZE);
-	for (i = 0; i < CONFIG_MALL_TAIL_SIZE / 4; ++i) {
-		if (base[i] != CONFIG_MALL_TAIL_PATTERN) {
+#endif /* CONFIG_KERNEL_MALL_HEAD_SIZE != 0 */
+#if CONFIG_KERNEL_MALL_TAIL_SIZE != 0
+	base = (u32 const *)(trace_node_umax(node) + 1 - CONFIG_KERNEL_MALL_TAIL_SIZE);
+	for (i = 0; i < CONFIG_KERNEL_MALL_TAIL_SIZE / 4; ++i) {
+		if (base[i] != CONFIG_KERNEL_MALL_TAIL_PATTERN) {
 			u32 word;
-			word = CONFIG_MALL_TAIL_PATTERN;
+			word = CONFIG_KERNEL_MALL_TAIL_PATTERN;
 			base += i;
 			while (*(byte_t const *)base == ((byte_t const *)&word)[(uintptr_t)base & 3])
 				base = (u32 const *)((byte_t const *)base + 1);
@@ -772,16 +753,16 @@ NOTHROW(KCALL kmalloc_validate_node)(unsigned int n_skip,
 			               "offset %" PRIuSIZ " from end of usable memory)\n"
 			               "%$[hex]\n"
 			               "%[gen:c]",
-			               base, (uintptr_t)base - (trace_node_umin(node) + CONFIG_MALL_HEAD_SIZE),
-			               trace_node_uaddr(node) + CONFIG_MALL_HEAD_SIZE,
-			               trace_node_uend(node) - CONFIG_MALL_TAIL_SIZE,
-			               (uintptr_t)base - (trace_node_umax(node) + 1 - CONFIG_MALL_TAIL_SIZE),
+			               base, (uintptr_t)base - (trace_node_umin(node) + CONFIG_KERNEL_MALL_HEAD_SIZE),
+			               trace_node_uaddr(node) + CONFIG_KERNEL_MALL_HEAD_SIZE,
+			               trace_node_uend(node) - CONFIG_KERNEL_MALL_TAIL_SIZE,
+			               (uintptr_t)base - (trace_node_umax(node) + 1 - CONFIG_KERNEL_MALL_TAIL_SIZE),
 			               /* %$[hex]  */ trace_node_usize(node), trace_node_uaddr(node),
 			               /* %[gen:c] */ &trace_node_print_traceback, node);
 			return false;
 		}
 	}
-#endif /* CONFIG_MALL_TAIL_SIZE != 0 */
+#endif /* CONFIG_KERNEL_MALL_TAIL_SIZE != 0 */
 done:
 	return true;
 }
@@ -803,7 +784,7 @@ again:
 		goto again;
 	}
 }
-#endif /* CONFIG_MALL_HEAD_SIZE != 0 || CONFIG_MALL_TAIL_SIZE != 0 */
+#endif /* CONFIG_KERNEL_MALL_HEAD_SIZE != 0 || CONFIG_KERNEL_MALL_TAIL_SIZE != 0 */
 
 /* Validate that headers/footers of data blocks returned by kmalloc() haven't
  * been  modified (which can accidentally happen as the result of programming
@@ -812,14 +793,14 @@ again:
  * s.a.  `heap_validate()'  and   `heap_validate_all()' */
 PUBLIC NOBLOCK ATTR_NOINLINE void
 NOTHROW(KCALL kmalloc_validate)(void) {
-#if CONFIG_MALL_HEAD_SIZE != 0 || CONFIG_MALL_TAIL_SIZE != 0
+#if CONFIG_KERNEL_MALL_HEAD_SIZE != 0 || CONFIG_KERNEL_MALL_TAIL_SIZE != 0
 	lock_acquire();
 	if (tm_nodes != NULL)
 		kmalloc_validate_walktree(1, tm_nodes);
 	lock_release();
-#else /* CONFIG_MALL_HEAD_SIZE != 0 || CONFIG_MALL_TAIL_SIZE != 0 */
+#else /* CONFIG_KERNEL_MALL_HEAD_SIZE != 0 || CONFIG_KERNEL_MALL_TAIL_SIZE != 0 */
 	/* nothing... */
-#endif /* CONFIG_MALL_HEAD_SIZE == 0 && CONFIG_MALL_TAIL_SIZE == 0 */
+#endif /* CONFIG_KERNEL_MALL_HEAD_SIZE == 0 && CONFIG_KERNEL_MALL_TAIL_SIZE == 0 */
 }
 
 
@@ -841,7 +822,7 @@ PRIVATE NOBLOCK ATTR_COLDTEXT size_t
 NOTHROW(KCALL gc_reachable_data)(void const *base, size_t num_bytes);
 
 
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 #define DECLARE_SLAB_DESCRIPTOR(size, _) \
 	INTDEF struct slab_descriptor slab_desc##size;
 SLAB_FOREACH_SIZE(DECLARE_SLAB_DESCRIPTOR, _)
@@ -935,7 +916,7 @@ NOTHROW(KCALL gc_reachable_slab_pointer)(void *ptr) {
 	                           s->s_size);
 	return result + 1;
 }
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 
 
@@ -1041,32 +1022,32 @@ NOTHROW(KCALL gc_reachable_pointer)(void *ptr) {
 		return 0;
 
 #if __SIZEOF_POINTER__ == 4
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 	if ((uintptr_t)ptr == DEBUGHEAP_NO_MANS_LAND)
 		return 0; /* Optimization: No mans land */
 	if ((uintptr_t)ptr == DEBUGHEAP_FRESH_MEMORY)
 		return 0; /* Optimization: Fresh memory. */
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 	if ((uintptr_t)ptr == UINT32_C(0xcccccccc))
 		return 0; /* Optimization: debug filler. */
 #elif __SIZEOF_POINTER__ == 8
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 	if ((uintptr_t)ptr == ((uint64_t)DEBUGHEAP_NO_MANS_LAND |
 	                       (uint64_t)DEBUGHEAP_NO_MANS_LAND << 32))
 		return 0; /* Optimization: No mans land */
 	if ((uintptr_t)ptr == ((uint64_t)DEBUGHEAP_FRESH_MEMORY |
 	                       (uint64_t)DEBUGHEAP_FRESH_MEMORY << 32))
 		return 0; /* Optimization: Fresh memory. */
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 	if ((uintptr_t)ptr == UINT32_C(0xcccccccccccccccc))
 		return 0; /* Optimization: debug filler. */
 #endif /* __SIZEOF_POINTER__ == ... */
 
 	/* Special handling for slab pointers. */
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr))
 		return gc_reachable_slab_pointer(ptr);
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 	node = tm_nodes_locate(ptr);
 	if (!node) {
@@ -1309,8 +1290,8 @@ again:
 
 		case TRACE_NODE_KIND_MALL:
 			/* Don't scan the header- or tail-area! */
-			minaddr += CONFIG_MALL_HEAD_SIZE;
-			maxaddr -= CONFIG_MALL_TAIL_SIZE;
+			minaddr += CONFIG_KERNEL_MALL_HEAD_SIZE;
+			maxaddr -= CONFIG_KERNEL_MALL_TAIL_SIZE;
 			ATTR_FALLTHROUGH
 		default:
 			assert(minaddr <= maxaddr);
@@ -1810,7 +1791,7 @@ gc_gather_explicit_leak(struct trace_node **__restrict pleaks,
 	*pleaks = node;
 }
 
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 PRIVATE ATTR_COLDTEXT NONNULL((1, 2)) void KCALL
 gc_gather_unreachable_slab(struct trace_node **__restrict pleaks,
                            struct slab *__restrict self) {
@@ -1857,7 +1838,7 @@ gc_gather_unreachable_slabs(struct trace_node **__restrict pleaks) {
 		gc_gather_unreachable_slab_descriptor(pleaks, gc_slab_descs[i]);
 	}
 }
-#endif /* !CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* !CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 
 PRIVATE ATTR_COLDTEXT NONNULL((1)) void KCALL
@@ -2025,9 +2006,9 @@ kmalloc_leaks_gather(void) {
 
 	/* Clear the  is-reachable bits  from all  of
 	 * the different slabs that could be reached. */
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 	RAII_FINALLY { gc_slab_reset_reach(); };
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 	/* Search for reachable data. */
 	gc_find_reachable();
@@ -2038,11 +2019,11 @@ kmalloc_leaks_gather(void) {
 		/* Gather memory leaks from `mcoreheap_alloc()' */
 		gc_gather_unreachable_coreheap(&result);
 
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 		/* Gather memory leaks from slabs.
 		 * NOTE: This right here may cause new memory to be allocated. */
 		gc_gather_unreachable_slabs(&result);
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 		/* Gather nodes within the kernel mman who's pointed-to memory
 		 * isn't reachable. */
@@ -2286,9 +2267,9 @@ again:
 	return result;
 }
 
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 PRIVATE ATTR_COLDBSS bool gc_slab_leak_did_notify_noslab_boot_option = false;
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 PUBLIC ATTR_COLDTEXT ssize_t KCALL
 kmalloc_leaks_print(kmalloc_leaks_t leaks,
@@ -2334,8 +2315,8 @@ kmalloc_leaks_print(kmalloc_leaks_t leaks,
 		switch (iter->tn_kind) {
 
 		case TRACE_NODE_KIND_MALL:
-			umin += CONFIG_MALL_HEAD_SIZE;
-			umax -= CONFIG_MALL_TAIL_SIZE;
+			umin += CONFIG_KERNEL_MALL_HEAD_SIZE;
+			umax -= CONFIG_KERNEL_MALL_TAIL_SIZE;
 			method = "kmalloc-memory";
 			break;
 
@@ -2345,7 +2326,7 @@ kmalloc_leaks_print(kmalloc_leaks_t leaks,
 			tracesize = 0; /* No traceback */
 			break;
 
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 		case TRACE_NODE_KIND_SLAB:
 			/* Slab allocations are way too light-weight to be able to support tracebacks.
 			 * As such, while we _are_ able to detect slab memory leaks, we aren't able to
@@ -2377,7 +2358,7 @@ kmalloc_leaks_print(kmalloc_leaks_t leaks,
 			}
 			method = "slab-memory";
 			break;
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 		case TRACE_NODE_KIND_CORE:
 			method = "coreheap-memory";
@@ -2485,9 +2466,9 @@ NOTHROW(KCALL kmalloc_leaks_release)(kmalloc_leaks_t leaks,
 				                   flags);
 			}	break;
 
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 			case TRACE_NODE_KIND_SLAB:
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 				slab_free(trace_node_uaddr(node));
 				break;
 
@@ -2500,9 +2481,9 @@ NOTHROW(KCALL kmalloc_leaks_release)(kmalloc_leaks_t leaks,
 			}
 		}
 		if (how == KMALLOC_LEAKS_RELEASE_RESTORE &&
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 		    node->tn_kind != TRACE_NODE_KIND_SLAB &&
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 		    node->tn_kind != TRACE_NODE_KIND_CORE &&
 		    node->tn_kind != TRACE_NODE_KIND_MNODE &&
 		    1) {
@@ -2567,21 +2548,21 @@ memleak_getattr(memleak_t self, uintptr_t attr) {
 	case MEMLEAK_ATTR_MINUSER: {
 		uintptr_t result = trace_node_umin(self);
 		if (self->tn_kind == TRACE_NODE_KIND_MALL)
-			result += CONFIG_MALL_HEAD_SIZE;
+			result += CONFIG_KERNEL_MALL_HEAD_SIZE;
 		return (void *)result;
 	}	break;
 
 	case MEMLEAK_ATTR_MAXUSER: {
 		uintptr_t result = trace_node_umax(self);
 		if (self->tn_kind == TRACE_NODE_KIND_MALL)
-			result -= CONFIG_MALL_TAIL_SIZE;
+			result -= CONFIG_KERNEL_MALL_TAIL_SIZE;
 		return (void *)result;
 	}	break;
 
 	case MEMLEAK_ATTR_USERSIZE: {
 		size_t result = trace_node_usize(self);
 		if (self->tn_kind == TRACE_NODE_KIND_MALL)
-			result -= (CONFIG_MALL_HEAD_SIZE + CONFIG_MALL_TAIL_SIZE);
+			result -= (CONFIG_KERNEL_MALL_HEAD_SIZE + CONFIG_KERNEL_MALL_TAIL_SIZE);
 		return (void *)result;
 	}	break;
 
@@ -2774,10 +2755,10 @@ NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 	if (!ptr)
 		return 0;
 	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr))
 		return SLAB_GET(ptr)->s_size;
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 	lock_acquire();
 	node = tm_nodes_locate(ptr);
 	if unlikely(!node) {
@@ -2797,7 +2778,7 @@ NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 		               &trace_node_print_traceback, node);
 		return 0;
 	}
-	if unlikely(ptr != trace_node_uaddr(node) + CONFIG_MALL_HEAD_SIZE) {
+	if unlikely(ptr != trace_node_uaddr(node) + CONFIG_KERNEL_MALL_HEAD_SIZE) {
 		node = trace_node_dupa_tb(node);
 		lock_break();
 		kernel_panic_n(/* n_skip: */ 1,
@@ -2805,8 +2786,8 @@ NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 		               "match start of containing node %p...%p (%p...%p)\n"
 		               "%[gen:c]",
 		               ptr,
-		               trace_node_umin(node) + CONFIG_MALL_HEAD_SIZE,
-		               trace_node_umax(node) - CONFIG_MALL_TAIL_SIZE,
+		               trace_node_umin(node) + CONFIG_KERNEL_MALL_HEAD_SIZE,
+		               trace_node_umax(node) - CONFIG_KERNEL_MALL_TAIL_SIZE,
 		               trace_node_umin(node), trace_node_umax(node),
 		               &trace_node_print_traceback, node);
 		return 0;
@@ -2821,8 +2802,8 @@ NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 #endif /* HAVE_kmalloc_validate_node */
 
 	/* Calculate the user-payload-size from the trace-node. */
-	result = trace_node_usize(node) - (CONFIG_MALL_HEAD_SIZE +
-	                                   CONFIG_MALL_TAIL_SIZE);
+	result = trace_node_usize(node) - (CONFIG_KERNEL_MALL_HEAD_SIZE +
+	                                   CONFIG_KERNEL_MALL_TAIL_SIZE);
 	lock_release();
 	return result;
 }
@@ -2834,12 +2815,12 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 	struct trace_node *node;
 	if (!ptr)
 		return; /* Ignore NULL-pointers. */
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr)) {
 		slab_ffree(ptr, flags);
 		return;
 	}
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 	lock_acquire();
 	node = tm_nodes_remove(ptr);
 	if unlikely(!node) {
@@ -2860,7 +2841,7 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 		               &trace_node_print_traceback, node);
 		return;
 	}
-	if unlikely(ptr != trace_node_uaddr(node) + CONFIG_MALL_HEAD_SIZE) {
+	if unlikely(ptr != trace_node_uaddr(node) + CONFIG_KERNEL_MALL_HEAD_SIZE) {
 		tm_nodes_insert(node);
 		node = trace_node_dupa_tb(node);
 		lock_break();
@@ -2869,8 +2850,8 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 		               "start of containing node %p...%p (%p...%p)\n"
 		               "%[gen:c]",
 		               ptr, flags,
-		               trace_node_umin(node) + CONFIG_MALL_HEAD_SIZE,
-		               trace_node_umax(node) - CONFIG_MALL_TAIL_SIZE,
+		               trace_node_umin(node) + CONFIG_KERNEL_MALL_HEAD_SIZE,
+		               trace_node_umax(node) - CONFIG_KERNEL_MALL_TAIL_SIZE,
 		               trace_node_umin(node), trace_node_umax(node),
 		               &trace_node_print_traceback, node);
 		return;
@@ -2896,16 +2877,16 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 	/* Load heap-flag properties from the node itself. */
 	flags = (flags & ~__GFP_HEAPMASK) | (node->tn_flags & __GFP_HEAPMASK);
 	assert(user_area_siz >=
-	       MAX(HEAP_MINSIZE, CONFIG_MALL_HEAD_SIZE +
-	                         CONFIG_MALL_TAIL_SIZE));
+	       MAX(HEAP_MINSIZE, CONFIG_KERNEL_MALL_HEAD_SIZE +
+	                         CONFIG_KERNEL_MALL_TAIL_SIZE));
 
 	/* When freeing zero-initialized  memory,
 	 * clean up the head & tail blocks first! */
 	if (flags & GFP_CALLOC) {
-		bzero(user_area_ptr, CONFIG_MALL_HEAD_SIZE);
+		bzero(user_area_ptr, CONFIG_KERNEL_MALL_HEAD_SIZE);
 		bzero((byte_t *)user_area_ptr +
-		      (user_area_siz - CONFIG_MALL_TAIL_SIZE),
-		      CONFIG_MALL_TAIL_SIZE);
+		      (user_area_siz - CONFIG_KERNEL_MALL_TAIL_SIZE),
+		      CONFIG_KERNEL_MALL_TAIL_SIZE);
 	}
 
 	/* Finally, free the actual payload */
@@ -2922,12 +2903,12 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 	gfp_t flags;
 	if (!ptr)
 		return; /* Ignore NULL-pointers. */
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr)) {
 		slab_free(ptr);
 		return;
 	}
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 	lock_acquire();
 	node = tm_nodes_remove(ptr);
 	if unlikely(!node) {
@@ -2948,7 +2929,7 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 		               &trace_node_print_traceback, node);
 		return;
 	}
-	if unlikely(ptr != trace_node_uaddr(node) + CONFIG_MALL_HEAD_SIZE) {
+	if unlikely(ptr != trace_node_uaddr(node) + CONFIG_KERNEL_MALL_HEAD_SIZE) {
 		tm_nodes_insert(node);
 		node = trace_node_dupa_tb(node);
 		lock_break();
@@ -2957,8 +2938,8 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 		               "start of containing node %p...%p (%p...%p)\n"
 		               "%[gen:c]",
 		               ptr,
-		               trace_node_umin(node) + CONFIG_MALL_HEAD_SIZE,
-		               trace_node_umax(node) - CONFIG_MALL_TAIL_SIZE,
+		               trace_node_umin(node) + CONFIG_KERNEL_MALL_HEAD_SIZE,
+		               trace_node_umax(node) - CONFIG_KERNEL_MALL_TAIL_SIZE,
 		               trace_node_umin(node), trace_node_umax(node),
 		               &trace_node_print_traceback, node);
 		return;
@@ -2984,8 +2965,8 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 	/* Load heap-flag properties from the node itself. */
 	flags = node->tn_flags & __GFP_HEAPMASK;
 	assert(user_area_siz >=
-	       MAX(HEAP_MINSIZE, CONFIG_MALL_HEAD_SIZE +
-	                         CONFIG_MALL_TAIL_SIZE));
+	       MAX(HEAP_MINSIZE, CONFIG_KERNEL_MALL_HEAD_SIZE +
+	                         CONFIG_KERNEL_MALL_TAIL_SIZE));
 
 	/* Finally, free the actual payload */
 	heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
@@ -2993,7 +2974,7 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 	trace_node_free(node);
 }
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 DBG_COMMAND(kmtrace,
             "kmtrace ptr...\n"
             "\tPrint tracebacks for where ptr was allocated from\n",
@@ -3025,7 +3006,7 @@ DBG_COMMAND(kmtrace,
 	}
 	return 0;
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 DECL_END
@@ -3039,14 +3020,14 @@ DECL_END
 
 DECL_BEGIN
 
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 /* Must also override the default `kmalloc_noslab()' with our trace-enabled variant. */
 DEFINE_PUBLIC_ALIAS(kmalloc_noslab, kmalloc);
 DEFINE_PUBLIC_ALIAS(kmalloc_noslab_nx, kmalloc_nx);
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 DECL_END
 
-#endif /* CONFIG_TRACE_MALLOC */
+#endif /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_TRACE_MALLOC_C */

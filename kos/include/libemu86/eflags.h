@@ -37,16 +37,16 @@ __DECL_BEGIN
 #define emu86_sarb(val, num_bits) ((__int8_t)(val) >> (num_bits))
 #define emu86_sarw(val, num_bits) ((__int16_t)(val) >> (num_bits))
 #define emu86_sarl(val, num_bits) ((__int32_t)(val) >> (num_bits))
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define emu86_sarq(val, num_bits) ((__int64_t)(val) >> (num_bits))
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 #else
 #define emu86_sarb(val, num_bits) ((__uint8_t)(val) >> (num_bits) | ((__uint8_t)(val) & __UINT8_C(0x80)))
 #define emu86_sarw(val, num_bits) ((__uint16_t)(val) >> (num_bits) | ((__uint16_t)(val) & __UINT16_C(0x8000)))
 #define emu86_sarl(val, num_bits) ((__uint32_t)(val) >> (num_bits) | ((__uint32_t)(val) & __UINT32_C(0x80000000)))
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define emu86_sarq(val, num_bits) ((__uint64_t)(val) >> (num_bits) | ((__uint64_t)(val) & __UINT64_C(0x8000000000000000)))
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 #endif
 
 #define emu86_geteflags_SFb(value) ((__int8_t)(value) < 0 ? EFLAGS_SF : 0)
@@ -73,19 +73,19 @@ __NOTHROW(LIBEMU86_CC emu86_geteflags_PFb)(__uint8_t value) {
  * least significant bit  in the calculation  of the parity  flag. */
 #define emu86_geteflags_PFw(v) emu86_geteflags_PFb((__uint8_t)(v))
 #define emu86_geteflags_PFl(v) emu86_geteflags_PFb((__uint8_t)(v))
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define emu86_geteflags_SFq(value) ((__int64_t)(value) < 0 ? EFLAGS_SF : 0)
 #define emu86_geteflags_ZFq(value) ((__uint64_t)(value) == 0 ? EFLAGS_ZF : 0)
 #define emu86_geteflags_PFq(v) emu86_geteflags_PFb((__uint8_t)(v))
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 
 /* Return a set of `EFLAGS_(SF|ZF|PF)' */
 #define emu86_geteflags_testb(value) (emu86_geteflags_SFb(value) | emu86_geteflags_ZFb(value) | emu86_geteflags_PFb(value))
 #define emu86_geteflags_testw(value) (emu86_geteflags_SFw(value) | emu86_geteflags_ZFw(value) | emu86_geteflags_PFw(value))
 #define emu86_geteflags_testl(value) (emu86_geteflags_SFl(value) | emu86_geteflags_ZFl(value) | emu86_geteflags_PFl(value))
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define emu86_geteflags_testq(value) (emu86_geteflags_SFq(value) | emu86_geteflags_ZFq(value) | emu86_geteflags_PFq(value))
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 
 #define emu86_getflags_AF_add(lhs, rhs) \
 	((__uint8_t)((__uint8_t)(lhs & 0xf) + (__uint8_t)(rhs & 0xf)) >= (__uint8_t)0x10)
@@ -117,9 +117,9 @@ __NOTHROW(LIBEMU86_CC emu86_geteflags_PFb)(__uint8_t value) {
 EMU86_DEFINE_CMP(b, 8)
 EMU86_DEFINE_CMP(w, 16)
 EMU86_DEFINE_CMP(l, 32)
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 EMU86_DEFINE_CMP(q, 64)
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 #undef EMU86_DEFINE_CMP
 
 

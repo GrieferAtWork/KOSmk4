@@ -26,7 +26,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/malloc-defs.h>
-#if defined(CONFIG_USE_SLAB_ALLOCATORS) || defined(__DEEMON__)
+#if defined(CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS) || defined(__DEEMON__)
 
 #include <kernel/except.h>
 #include <kernel/heap.h>
@@ -229,16 +229,16 @@ NOTHROW(KCALL system_cc_slab_prealloc)(struct ccinfo *__restrict info) {
 
 
 /* [lock(mman_kernel.mm_lock)]
- * The pointer to either the lowest (CONFIG_SLAB_GROWS_DOWNWARDS), or
- * one past the greatest (CONFIG_SLAB_GROWS_UPWARDS) address that was
+ * The pointer to either the lowest (SLAB_CONFIG_GROWS_DOWNWARDS), or
+ * one past the greatest (SLAB_CONFIG_GROWS_UPWARDS) address that was
  * ever allocated for slab memory.
  * Since slab allocations don't carry any meta-data, they are actually
  * identified by their address, meaning that we need to keep track  of
  * the max range of pointers associated with the slab allocator.
- * NOTE: This value starts out as `KERNEL_SLAB_INITIAL', and is only
- *       ever extended in  one direction, based  on the slab  growth
+ * NOTE: This value starts out as `SLAB_CONFIG_INITIAL_BREAK', and is only
+ *       ever  extended  in  one  direction,  based  on  the  slab  growth
  *       direction. */
-PUBLIC void *kernel_slab_break = KERNEL_SLAB_INITIAL;
+PUBLIC void *kernel_slab_break = SLAB_CONFIG_INITIAL_BREAK;
 
 PRIVATE WUNUSED VIRT struct slab *
 NOTHROW(KCALL slab_alloc_page)(gfp_t flags) {
@@ -265,7 +265,7 @@ again:
 		slab_pool_release(pool);
 
 		/* Pre-initialize the resulting slab page. */
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 #if GFP_CALLOC == SLAB_FCALLOC
 		if ((flags & GFP_CALLOC) != (result->s_flags & SLAB_FCALLOC))
 #else /* GFP_CALLOC == SLAB_FCALLOC */
@@ -278,10 +278,10 @@ again:
 				mempatl(result, DEBUGHEAP_NO_MANS_LAND, PAGESIZE);
 			}
 		}
-#else /* CONFIG_DEBUG_HEAP */
+#else /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 		if ((flags & GFP_CALLOC) && !(result->s_flags & SLAB_FCALLOC))
 			bzero(result, PAGESIZE);
-#endif /* !CONFIG_DEBUG_HEAP */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 		return result;
 	}
 	slab_pool_release(pool);
@@ -308,11 +308,11 @@ again_lock_mman_kernel:
 		                                   MHINT_GETMODE(KERNEL_MHINT_SLAB));
 		mman_lock_release(&mman_kernel);
 
-#ifdef CONFIG_SLAB_GROWS_DOWNWARDS
+#ifdef SLAB_CONFIG_GROWS_DOWNWARDS
 		if (next_slab_addr == MAP_FAILED || next_slab_addr < (byte_t *)slab_end_addr - PAGESIZE)
-#else /* CONFIG_SLAB_GROWS_DOWNWARDS */
+#else /* SLAB_CONFIG_GROWS_DOWNWARDS */
 		if (next_slab_addr == MAP_FAILED || next_slab_addr > (byte_t *)slab_end_addr)
-#endif /* !CONFIG_SLAB_GROWS_DOWNWARDS */
+#endif /* !SLAB_CONFIG_GROWS_DOWNWARDS */
 		{
 			syscache_version_t version = SYSCACHE_VERSION_INIT;
 			mman_lock_release(&mman_kernel);
@@ -327,15 +327,15 @@ again_next_slab_page_tryhard:
 			                                   MHINT_GETADDR(KERNEL_MHINT_SLAB), PAGESIZE,
 			                                   MHINT_GETMODE(KERNEL_MHINT_SLAB));
 			mman_lock_release(&mman_kernel);
-#ifdef CONFIG_SLAB_GROWS_DOWNWARDS
+#ifdef SLAB_CONFIG_GROWS_DOWNWARDS
 			if (next_slab_addr != MAP_FAILED &&
 			    next_slab_addr >= (byte_t *)slab_end_addr - PAGESIZE)
 				goto gotaddr;
-#else /* CONFIG_SLAB_GROWS_DOWNWARDS */
+#else /* SLAB_CONFIG_GROWS_DOWNWARDS */
 			if (next_slab_addr != VM_PAGED_GETFREE_ERROR &&
 			    next_slab_addr <= (byte_t *)slab_end_addr)
 				goto gotaddr;
-#endif /* !CONFIG_SLAB_GROWS_DOWNWARDS */
+#endif /* !SLAB_CONFIG_GROWS_DOWNWARDS */
 			if (syscache_clear_s(&version))
 				goto again_next_slab_page_tryhard;
 			goto err;
@@ -351,7 +351,7 @@ gotaddr:
 			goto err; /* Allocation failed :( */
 
 		/* Update the slab-break end-pointer if necessary. */
-#ifdef CONFIG_SLAB_GROWS_DOWNWARDS
+#ifdef SLAB_CONFIG_GROWS_DOWNWARDS
 		if ((byte_t *)result < (byte_t *)slab_end_addr) {
 			while (!ATOMIC_CMPXCH_WEAK(kernel_slab_break, slab_end_addr, result)) {
 				slab_end_addr = ATOMIC_READ(kernel_slab_break);
@@ -359,7 +359,7 @@ gotaddr:
 					break;
 			}
 		}
-#else /* CONFIG_SLAB_GROWS_DOWNWARDS */
+#else /* SLAB_CONFIG_GROWS_DOWNWARDS */
 		if ((byte_t *)result >= (byte_t *)slab_end_addr) {
 			while (!ATOMIC_CMPXCH_WEAK(kernel_slab_break, slab_end_addr,
 			                           (byte_t *)result + PAGESIZE)) {
@@ -368,7 +368,7 @@ gotaddr:
 					break;
 			}
 		}
-#endif /* !CONFIG_SLAB_GROWS_DOWNWARDS */
+#endif /* !SLAB_CONFIG_GROWS_DOWNWARDS */
 
 		return result;
 	}
@@ -745,6 +745,6 @@ NOTHROW(KCALL __os_slab_kmalloc_nx)(size_t num_bytes, gfp_t flags) {
 
 DECL_END
 
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_SLAB_C */

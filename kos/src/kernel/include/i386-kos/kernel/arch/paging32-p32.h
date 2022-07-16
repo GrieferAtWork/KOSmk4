@@ -29,7 +29,7 @@
 
 #include <stdbool.h>
 
-#ifndef CONFIG_NO_PAGING_P32
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_P32
 
 DECL_BEGIN
 
@@ -258,11 +258,11 @@ p32_pdir_e2_identity_t[1024 /* P32_PDIR_VEC2INDEX(pointer) */];
 
 
 /* A special value that is never returned by `p32_pagedir_push_mapone()' */
-#if defined(CONFIG_NO_PAGING_PAE) || defined(CONFIG_NO_PAGING_P32)
+#if defined(CONFIG_NO_KERNEL_X86_PAGING_PAE) || defined(CONFIG_NO_KERNEL_X86_PAGING_P32)
 #define SIZEOF_P32_PAGEDIR_PUSHVAL  4
-#else /* CONFIG_NO_PAGING_PAE || CONFIG_NO_PAGING_P32 */
+#else /* CONFIG_NO_KERNEL_X86_PAGING_PAE || CONFIG_NO_KERNEL_X86_PAGING_P32 */
 #define SIZEOF_P32_PAGEDIR_PUSHVAL  8 /* For binary compatibility with PAE paging! */
-#endif /* !CONFIG_NO_PAGING_PAE && !CONFIG_NO_PAGING_P32 */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_PAE && !CONFIG_NO_KERNEL_X86_PAGING_P32 */
 #define P32_PAGEDIR_PUSHVAL_INVALID (__CCAST(p32_pagedir_pushval_t)-1)
 #ifdef __CC__
 #if SIZEOF_P32_PAGEDIR_PUSHVAL == 4
@@ -399,6 +399,6 @@ INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unsetchanged)(VIRT void *addr);
 
 DECL_END
 
-#endif /* !CONFIG_NO_PAGING_P32 */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_P32 */
 
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_PAGING32_P32_H */

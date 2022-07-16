@@ -38,15 +38,15 @@
 #include <syscall.h>
 
 
-#ifdef CONFIG_SUPPORT_HARDWARE_RTM
+#ifdef CONFIG_LIBC_SUPPORTS_HARDWARE_RTM
 #include <asm/cpu-cpuid.h>
-#endif /* CONFIG_SUPPORT_HARDWARE_RTM */
+#endif /* CONFIG_LIBC_SUPPORTS_HARDWARE_RTM */
 
 
 .section .text.crt.system.rtm
-#ifdef CONFIG_SUPPORT_HARDWARE_RTM
+#ifdef CONFIG_LIBC_SUPPORTS_HARDWARE_RTM
 PRIVATE_LABEL(rtm_selfmod_start):
-#endif /* CONFIG_SUPPORT_HARDWARE_RTM */
+#endif /* CONFIG_LIBC_SUPPORTS_HARDWARE_RTM */
 
 /* Begin  an  RTM operation.  Note that  if  the arch-specific  RTM driver
  * wasn't already loaded into the kernel, it will be loaded automatically,
@@ -68,7 +68,7 @@ PRIVATE_LABEL(rtm_selfmod_start):
  * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
 INTERN_FUNCTION(libc_rtm_begin)
 	.cfi_startproc
-#ifdef CONFIG_SUPPORT_HARDWARE_RTM
+#ifdef CONFIG_LIBC_SUPPORTS_HARDWARE_RTM
 	.byte 0x48 /* movq $(-1), %rax */
 	.byte 0xc7
 	.byte 0xc0
@@ -84,11 +84,11 @@ INTERN_FUNCTION(libc_rtm_begin)
 	/* Hardware RTM entered. */
 .Lrtm_begin_do_return:
 	ret
-#else /* CONFIG_SUPPORT_HARDWARE_RTM */
+#else /* CONFIG_LIBC_SUPPORTS_HARDWARE_RTM */
 	movq   $(SYS_rtm_begin), %rax
 	syscall
 	ret
-#endif /* !CONFIG_SUPPORT_HARDWARE_RTM */
+#endif /* !CONFIG_LIBC_SUPPORTS_HARDWARE_RTM */
 	.cfi_endproc
 END(libc_rtm_begin)
 DEFINE_PUBLIC_ALIAS(rtm_begin, libc_rtm_begin)
@@ -127,7 +127,7 @@ END(libc_rtm_test)
 DEFINE_PUBLIC_ALIAS(rtm_test, libc_rtm_test)
 
 
-#ifdef CONFIG_SUPPORT_HARDWARE_RTM
+#ifdef CONFIG_LIBC_SUPPORTS_HARDWARE_RTM
 /* Check if a transaction is currently in progress
  * @return: ZF=1 : No RTM operation in progress
  * @return: ZF=0 : An RTM operation is currently in progress */
@@ -143,16 +143,16 @@ INTERN_FUNCTION(libc___x86_rtm_xtest)
 	.cfi_endproc
 END(libc___x86_rtm_xtest)
 DEFINE_PUBLIC_ALIAS(__x86_rtm_xtest, libc___x86_rtm_xtest)
-#endif /* CONFIG_SUPPORT_HARDWARE_RTM */
+#endif /* CONFIG_LIBC_SUPPORTS_HARDWARE_RTM */
 
-#ifdef CONFIG_SUPPORT_HARDWARE_RTM
+#ifdef CONFIG_LIBC_SUPPORTS_HARDWARE_RTM
 PRIVATE_LABEL(rtm_selfmod_end):
-#endif /* CONFIG_SUPPORT_HARDWARE_RTM */
+#endif /* CONFIG_LIBC_SUPPORTS_HARDWARE_RTM */
 
 
 
 
-#ifdef CONFIG_SUPPORT_HARDWARE_RTM
+#ifdef CONFIG_LIBC_SUPPORTS_HARDWARE_RTM
 .section .text.crt.system.rtm
 PRIVATE_FUNCTION(libc_hw_rtm_abort)
 	.cfi_startproc
@@ -371,7 +371,7 @@ PRIVATE_FUNCTION(libc_rtm_begin_init)
 	jmp    .Lpop_rbx_disable_writable_and_begin_rtm
 	.cfi_endproc
 END(libc_rtm_begin_init)
-#endif /* CONFIG_SUPPORT_HARDWARE_RTM */
+#endif /* CONFIG_LIBC_SUPPORTS_HARDWARE_RTM */
 
 
 

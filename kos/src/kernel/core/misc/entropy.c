@@ -55,7 +55,7 @@
 #include <hybrid/sched/atomic-lock.h>
 #endif /* !CONFIG_NO_SMP */
 
-#define ENTROPY_BITS (CONFIG_ENTROPY_BUFFER_SIZE * NBBY)
+#define ENTROPY_BITS (CONFIG_KERNEL_ENTROPY_BUFFER_SIZE * NBBY)
 
 DECL_BEGIN
 
@@ -75,7 +75,7 @@ PUBLIC struct atomic_lock entropy_lock = ATOMIC_LOCK_INIT;
  * the first `entropy_bits' bits (iow: the first `entropy_bits/8'
  * bytes,  as well as  bits masked by `(1 << (entropy_bits&7))-1'
  * within the last byte) */
-PUBLIC byte_t entropy_data[CONFIG_ENTROPY_BUFFER_SIZE] = { 0 };
+PUBLIC byte_t entropy_data[CONFIG_KERNEL_ENTROPY_BUFFER_SIZE] = { 0 };
 
 /* [lock(!PREEMPTION && entropy_lock)] # of bits in `entropy_data' */
 PUBLIC size_t entropy_bits = 0;
@@ -385,7 +385,7 @@ DEFINE_SYSCALL3(ssize_t, getrandom,
 
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 /* Debugger functions to display  entropy information (including a  representation
  * of how well entropy bits are distributed, as in: count how often any given byte
  * appears within the entropy  buffer and check if  some bytes exist that  deviate
@@ -461,7 +461,7 @@ DBG_COMMAND(entropy,
 	}
 	return 0;
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 DECL_END
 

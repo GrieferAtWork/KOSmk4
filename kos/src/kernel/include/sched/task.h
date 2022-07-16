@@ -34,13 +34,20 @@
 #include <bits/os/wait.h> /* `union wait' */
 #endif /* __cplusplus */
 
+/*[[[config CONFIG_HAVE_KERNEL_STACK_GUARD: bool = !defined(NDEBUG)]]]*/
 #ifdef CONFIG_NO_KERNEL_STACK_GUARD
 #undef CONFIG_HAVE_KERNEL_STACK_GUARD
 #elif !defined(CONFIG_HAVE_KERNEL_STACK_GUARD)
-#if !defined(NDEBUG) && 1
-#define CONFIG_HAVE_KERNEL_STACK_GUARD 1
-#endif /* !NDEBUG */
-#endif /* !CONFIG_HAVE_KERNEL_STACK_GUARD */
+#ifndef NDEBUG
+#define CONFIG_HAVE_KERNEL_STACK_GUARD
+#else /* !NDEBUG */
+#define CONFIG_NO_KERNEL_STACK_GUARD
+#endif /* NDEBUG */
+#elif (-CONFIG_HAVE_KERNEL_STACK_GUARD - 1) == -1
+#undef CONFIG_HAVE_KERNEL_STACK_GUARD
+#define CONFIG_NO_KERNEL_STACK_GUARD
+#endif /* ... */
+/*[[[end]]]*/
 
 
 DECL_BEGIN

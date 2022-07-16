@@ -52,7 +52,7 @@
 #include <kernel/mman/execinfo.h>
 #include <kernel/personality.h>
 #include <kernel/printk.h>
-#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_USERPROCMASK */
+#include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <sched/comm.h>
@@ -2130,7 +2130,7 @@ PRIVATE void KCALL
 kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 	uintptr_t thread_flags;
 	thread_flags = PERTASK_GET(this_task.t_flags);
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 	/* If the calling  thread uses userprocmask,  we must  copy
 	 * their final process mask into kernel-space before we  do
 	 * the exec. Note that the `TASK_FUSERPROCMASK' flag itself
@@ -2154,7 +2154,7 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 		memset(mempcpy(&THIS_KERNEL_SIGMASK, um_sigset, um_sigsiz),
 		       0xff, sizeof(sigset_t) - um_sigsiz);
 	}
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 
 	/* Deal with the special VFORK mode. */
 	args->ea_change_mman_to_effective_mman = true;
@@ -2171,7 +2171,7 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 		}
 		/* ==== Point of no  return: This  is where  we
 		 *      indicate success to our parent process. */
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 		{
 			uintptr_t old_flags;
 			old_flags = ATOMIC_FETCHAND(THIS_TASK->t_flags,
@@ -2201,9 +2201,9 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 				}
 			}
 		}
-#else /* CONFIG_HAVE_USERPROCMASK */
+#else /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 		ATOMIC_AND(THIS_TASK->t_flags, ~TASK_FVFORK);
-#endif /* !CONFIG_HAVE_USERPROCMASK */
+#endif /* !CONFIG_HAVE_KERNEL_USERPROCMASK */
 		{
 			struct taskpid *mypid = THIS_TASKPID;
 			if likely(mypid)
@@ -2215,7 +2215,7 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 		task_serve();
 	} else {
 		args->ea_mman = THIS_MMAN;
-#ifdef CONFIG_HAVE_USERPROCMASK
+#ifdef CONFIG_HAVE_KERNEL_USERPROCMASK
 		if (thread_flags & TASK_FUSERPROCMASK) {
 			/* Disable USERPROCMASK during the exec.
 			 * This is necessary so the task_serve() below, as well as any such
@@ -2240,7 +2240,7 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 			 * from during the call...) */
 			task_serve();
 		} else
-#endif /* CONFIG_HAVE_USERPROCMASK */
+#endif /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 		{
 			mman_exec(args);
 		}
@@ -2252,9 +2252,9 @@ kernel_do_execveat_impl(/*in|out*/ struct execargs *__restrict args) {
 	/* Upon success, run onexec callbacks (which will clear all CLOEXEC handles). */
 	run_permman_onexec();
 
-#ifndef CONFIG_EVERYONE_IS_ROOT
+#ifndef CONFIG_KERNEL_EVERYONE_IS_ROOT
 	cred_onexec(args->ea_xfile);
-#endif /* !CONFIG_EVERYONE_IS_ROOT */
+#endif /* !CONFIG_KERNEL_EVERYONE_IS_ROOT */
 }
 
 PRIVATE void KCALL

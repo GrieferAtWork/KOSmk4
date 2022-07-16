@@ -26,6 +26,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/fs/dirent.h>
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/fs/notify.h>
 #include <kernel/fs/null.h>
 #include <kernel/malloc.h>
@@ -134,12 +135,12 @@ NOTHROW(FCALL mfile_changed)(struct mfile *__restrict self, uintptr_t what) {
 }
 
 
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 #ifndef __dnotify_link_slist_defined
 #define __dnotify_link_slist_defined
 SLIST_HEAD(dnotify_link_slist, dnotify_link);
 #endif /* !__dnotify_link_slist_defined */
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 
 /* Destroy a given mem-file */
@@ -158,7 +159,7 @@ NOTHROW(FCALL mfile_destroy)(struct mfile *__restrict self) {
 
 	/* The  file may still  have a notify controller
 	 * if its containing directory is being watched. */
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 	if (self->mf_notify != NULL) {
 		struct inotify_controller *notify;
 		struct dnotify_link_slist deadlinks;
@@ -205,7 +206,7 @@ NOTHROW(FCALL mfile_destroy)(struct mfile *__restrict self) {
 			dnotify_link_destroy(link);
 		}
 	}
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 	sig_broadcast_for_fini(&self->mf_initdone);
 	if (self->mf_ops->mo_destroy) {
@@ -316,9 +317,9 @@ PUBLIC struct mfile mfile_ndef = {
 	MFILE_INIT_mf_lockops,
 	MFILE_INIT_mf_changed(MFILE_PARTS_ANONYMOUS),
 	MFILE_INIT_mf_blockshift(PAGESHIFT, PAGESHIFT),
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 	MFILE_INIT_mf_notify,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 	MFILE_INIT_mf_flags(MFILE_F_ATTRCHANGED | MFILE_F_CHANGED |
 	                    MFILE_F_NOATIME | MFILE_F_NOMTIME |
 	                    MFILE_F_FIXEDFILESIZE),
@@ -331,11 +332,11 @@ PUBLIC struct mfile mfile_ndef = {
 };
 
 
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 #define MFILE_INIT_mf_notify_ MFILE_INIT_mf_notify,
-#else /* CONFIG_HAVE_FS_NOTIFY */
+#else /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #define MFILE_INIT_mf_notify_ /* nothing */
-#endif /* !CONFIG_HAVE_FS_NOTIFY */
+#endif /* !CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 
 /* Fallback  files for anonymous memory. These behave the same as `mfile_zero',

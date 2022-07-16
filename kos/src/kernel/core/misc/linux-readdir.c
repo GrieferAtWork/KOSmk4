@@ -121,16 +121,19 @@ DECL_BEGIN
 
 
 
-/* NOTE: The  readdir lock system is designed to  have as small of a memory
+/*[[[config CONFIG_KERNEL_LINUX_READDIR_LOCKCNT! = 512
+ * NOTE: The  readdir lock system is designed to  have as small of a memory
  *       footprint as possible. - It's not (even meant to be) designed  for
  *       performance. (since this whole file is only meant for binary linux
- *       compatibility) */
-#ifndef CONFIG_READDIR_LOCK_COUNT
-#define CONFIG_READDIR_LOCK_COUNT 512
-#endif /* !CONFIG_READDIR_LOCK_COUNT */
+ *       compatibility)
+ * ]]]*/
+#ifndef CONFIG_KERNEL_LINUX_READDIR_LOCKCNT
+#define CONFIG_KERNEL_LINUX_READDIR_LOCKCNT 512
+#endif /* !CONFIG_KERNEL_LINUX_READDIR_LOCKCNT */
+/*[[[end]]]*/
 
 /* Bitset of linux readdir lock-bits. */
-PRIVATE uintptr_t readdir_lockbits[CONFIG_READDIR_LOCK_COUNT / BITSOF(uintptr_t)] = { 0, };
+PRIVATE uintptr_t readdir_lockbits[CONFIG_KERNEL_LINUX_READDIR_LOCKCNT / BITSOF(uintptr_t)] = { 0, };
 
 /* Signal broadcast whenever one of `readdir_lockbits' is cleared. */
 PRIVATE struct sig readdir_locksig = SIG_INIT;
@@ -143,20 +146,20 @@ PRIVATE ATTR_CONST WUNUSED unsigned int
 NOTHROW(KCALL readdir_lock_index)(void *h_data) {
 	uintptr_t result;
 	result = (uintptr_t)h_data;
-#if __SIZEOF_POINTER__ > 4 && CONFIG_READDIR_LOCK_COUNT <= UINT32_MAX
+#if __SIZEOF_POINTER__ > 4 && CONFIG_KERNEL_LINUX_READDIR_LOCKCNT <= UINT32_MAX
 	result ^= result >> 32;
-#endif /* __SIZEOF_POINTER__ > 4 && CONFIG_READDIR_LOCK_COUNT <= UINT32_MAX */
-#if CONFIG_READDIR_LOCK_COUNT <= UINT16_MAX
+#endif /* __SIZEOF_POINTER__ > 4 && CONFIG_KERNEL_LINUX_READDIR_LOCKCNT <= UINT32_MAX */
+#if CONFIG_KERNEL_LINUX_READDIR_LOCKCNT <= UINT16_MAX
 	result ^= result >> 16;
-#endif /* CONFIG_READDIR_LOCK_COUNT <= UINT16_MAX */
-#if CONFIG_READDIR_LOCK_COUNT <= UINT8_MAX
+#endif /* CONFIG_KERNEL_LINUX_READDIR_LOCKCNT <= UINT16_MAX */
+#if CONFIG_KERNEL_LINUX_READDIR_LOCKCNT <= UINT8_MAX
 	result ^= result >> 8;
-#endif /* CONFIG_READDIR_LOCK_COUNT <= UINT8_MAX */
-#if IS_POWER_OF_TWO(CONFIG_READDIR_LOCK_COUNT)
-	return (unsigned int)result & (CONFIG_READDIR_LOCK_COUNT - 1);
-#else /* IS_POWER_OF_TWO(CONFIG_READDIR_LOCK_COUNT) */
-	return (unsigned int)result % CONFIG_READDIR_LOCK_COUNT;
-#endif /* !IS_POWER_OF_TWO(CONFIG_READDIR_LOCK_COUNT) */
+#endif /* CONFIG_KERNEL_LINUX_READDIR_LOCKCNT <= UINT8_MAX */
+#if IS_POWER_OF_TWO(CONFIG_KERNEL_LINUX_READDIR_LOCKCNT)
+	return (unsigned int)result & (CONFIG_KERNEL_LINUX_READDIR_LOCKCNT - 1);
+#else /* IS_POWER_OF_TWO(CONFIG_KERNEL_LINUX_READDIR_LOCKCNT) */
+	return (unsigned int)result % CONFIG_KERNEL_LINUX_READDIR_LOCKCNT;
+#endif /* !IS_POWER_OF_TWO(CONFIG_KERNEL_LINUX_READDIR_LOCKCNT) */
 }
 
 /* Acquire a readdir lock */

@@ -126,7 +126,7 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 		}
 		break;
 
-#ifdef CONFIG_HAVE_TASK_COMM
+#ifdef CONFIG_HAVE_KERNEL_TASK_COMM
 	case PR_SET_NAME: {
 		char buf[TASK_COMM_LEN];
 		USER CHECKED char const *name;
@@ -142,7 +142,7 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 		name = (USER CHECKED char *)validate_writableaddr((USER UNCHECKED char *)arg2);
 		memcpy(name, buf, strlen(buf) + 1, sizeof(char));
 	}	break;
-#endif /* CONFIG_HAVE_TASK_COMM */
+#endif /* CONFIG_HAVE_KERNEL_TASK_COMM */
 
 	case PR_GET_ENDIAN: {
 		USER CHECKED int *pmode;

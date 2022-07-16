@@ -23,18 +23,18 @@
 #include <kernel/compiler.h>
 #include <hybrid/host.h>
 
-#undef CONFIG_ATOMIC64_SUPPORT_NEVER
-#undef CONFIG_ATOMIC64_SUPPORT_ALWAYS
-#undef CONFIG_ATOMIC64_SUPPORT_DYNAMIC
+#undef ARCH_HAVE_ATOMIC64_SUPPORT_NEVER
+#undef ARCH_HAVE_ATOMIC64_SUPPORT_ALWAYS
+#undef ARCH_HAVE_ATOMIC64_SUPPORT_DYNAMIC
 
 #ifdef __x86_64__
-#define CONFIG_ATOMIC64_SUPPORT_ALWAYS 1 /* There always is an instruction `cmpxchgq' */
+#define ARCH_HAVE_ATOMIC64_SUPPORT_ALWAYS /* There always is an instruction `cmpxchgq' */
 #else /* __x86_64__ */
-#define CONFIG_ATOMIC64_SUPPORT_DYNAMIC 1 /* Dynamically determine support for `cmpxchg8b' */
+#define ARCH_HAVE_ATOMIC64_SUPPORT_DYNAMIC /* Dynamically determine support for `cmpxchg8b' */
 
 #include <kernel/types.h>
 
-#define ARCH_ATOMIC64_HAVE_PROTOTYPES 1
+#define ARCH_HAVE_ATOMIC64_PROTOTYPES
 #ifdef __CC__
 DECL_BEGIN
 
@@ -302,7 +302,7 @@ NOTHROW(atomic64_fetchxor)(atomic64_t *__restrict self,
 #define atomic64_and(self, value) (void)atomic64_fetchand(self, value)
 #define atomic64_or(self, value)  (void)atomic64_fetchor(self, value)
 #define atomic64_xor(self, value) (void)atomic64_fetchxor(self, value)
-#define atomic64_cmpxch_weak atomic64_cmpxch
+#define atomic64_cmpxch_weak      atomic64_cmpxch
 
 DECL_END
 #endif /* __CC__ */

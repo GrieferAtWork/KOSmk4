@@ -23,7 +23,7 @@
 
 EMU86_INTELLISENSE_BEGIN(iret) {
 
-#if CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_16BIT
+#if LIBEMU86_CONFIG_WANT_32BIT && LIBEMU86_CONFIG_WANT_16BIT
 #ifndef EMU86_SETCS_VM86
 #define EMU86_SETCS_VM86 EMU86_SETCS
 #endif /* !EMU86_SETCS_VM86 */
@@ -48,7 +48,7 @@ EMU86_INTELLISENSE_BEGIN(iret) {
 #ifndef EMU86_SETGS_VM86
 #define EMU86_SETGS_VM86 EMU86_SETGS
 #endif /* !EMU86_SETGS_VM86 */
-#endif /* CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_16BIT */
+#endif /* LIBEMU86_CONFIG_WANT_32BIT && LIBEMU86_CONFIG_WANT_16BIT */
 
 
 #ifndef EMU86_VALIDATE_IRREGS5
@@ -87,7 +87,7 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 #define EMU86_IRET_NEED_NEW_IP
 #elif defined(EMU86_VALIDATE_IRREGS3)
 #define EMU86_IRET_NEED_NEW_IP
-#elif defined(EMU86_VALIDATE_IRREGS9) && CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_16BIT
+#elif defined(EMU86_VALIDATE_IRREGS9) && LIBEMU86_CONFIG_WANT_32BIT && LIBEMU86_CONFIG_WANT_16BIT
 #define EMU86_IRET_NEED_NEW_IP
 #endif /* ... */
 #endif /* ... */
@@ -99,7 +99,7 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 	byte_t *sp;
 
 	sp = EMU86_GETSTACKPTR();
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 	if (IS_64BIT()) {
 		EMU86_EMULATE_POP(sp, 40);
 		EMU86_READ_USER_MEMORY(sp, 40);
@@ -110,7 +110,7 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 		new_eflags = EMU86_MEMREADQASL(sp + 16);
 		sp += 24;
 	} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	if (!IS_16BIT()) {
 		EMU86_EMULATE_POP(sp, 12);
 		EMU86_READ_USER_MEMORY(sp, 12);
@@ -131,7 +131,7 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 		sp += 6;
 	}
 	(void)new_eflags;
-#if CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_16BIT
+#if LIBEMU86_CONFIG_WANT_32BIT && LIBEMU86_CONFIG_WANT_16BIT
 	if (!EMU86_F_IS64(op_flags)) {
 		u32 old_eflags = EMU86_GETFLAGS();
 		if (old_eflags & EFLAGS_VM) {
@@ -197,7 +197,7 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 #define WANT_return_unsupported_instruction
 #endif /* !EMU86_EMULATE_CONFIG_WANT_IRET && (!EMU86_EMULATE_CONFIG_CHECKERROR || !EMU86_VALIDATE_IRREGS9) */
 	}
-#endif /* CONFIG_LIBEMU86_WANT_32BIT && CONFIG_LIBEMU86_WANT_16BIT */
+#endif /* LIBEMU86_CONFIG_WANT_32BIT && LIBEMU86_CONFIG_WANT_16BIT */
 
 	/* Restrict user-space IRET EFLAGS to only update this mask */
 #define USERIRET_EFLAGS_MASK                                     \
@@ -206,9 +206,9 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 
 	/* Return to outer privilege level, or return from 64-bit mode.
 	 * In  this  case,  always  pop   (|E|R)SP  and  SS  as   well! */
-#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
+#if LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT
 	if (EMU86_F_IS64(op_flags) || ((new_cs & 3) && !EMU86_ISUSER()))
-#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
+#endif /* LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT */
 	{
 #undef EMU86_IRET_NEED_NEW_SP
 		/* Figure out if we'll be needing `new_sp' */
@@ -221,7 +221,7 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 		EMU86_UREG_TYPE new_sp;
 #endif /* EMU86_IRET_NEED_NEW_SP */
 		u16 new_ss;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (IS_64BIT()) {
 			/* EMU86_EMULATE_POP()  and  EMU86_READ_USER_MEMORY()
 			 * were already invoked with the proper values above! */
@@ -232,7 +232,7 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 #endif /* EMU86_IRET_NEED_NEW_SP */
 			new_ss = EMU86_MEMREADQASW(sp + 8);
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		if (!IS_16BIT()) {
 			EMU86_EMULATE_POP(sp - 12, 8 + 12);
 			EMU86_READ_USER_MEMORY(sp - 12, 8 + 12);
@@ -251,7 +251,7 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 #ifdef EMU86_IRET_NEED_NEW_SP
 		(void)new_sp;
 #endif /* EMU86_IRET_NEED_NEW_SP */
-#if EMU86_EMULATE_CONFIG_CHECKUSER && CONFIG_LIBEMU86_WANT_64BIT
+#if EMU86_EMULATE_CONFIG_CHECKUSER && LIBEMU86_CONFIG_WANT_64BIT
 		/* Verify segment registers.
 		 * NOTE: We can only get here with `EMU86_ISUSER() == true'
 		 *       when the calling code  is running in 64-bit  mode,
@@ -282,16 +282,16 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 			new_eflags |= EMU86_GETFLAGS() & ~USERIRET_EFLAGS_MASK;
 #endif /* EMU86_EMULATE_CONFIG_WANT_IRET */
 		}
-#endif /* EMU86_EMULATE_CONFIG_CHECKUSER && CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* EMU86_EMULATE_CONFIG_CHECKUSER && LIBEMU86_CONFIG_WANT_64BIT */
 #if EMU86_EMULATE_CONFIG_WANT_IRET
 		EMU86_SETFLAGS(new_eflags);
 		EMU86_SETCS(new_cs);
 		EMU86_SETIPREG(new_ip);
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		EMU86_SETRSP(new_sp);
-#else /* CONFIG_LIBEMU86_WANT_64BIT */
+#else /* LIBEMU86_CONFIG_WANT_64BIT */
 		EMU86_SETESP(new_sp);
-#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* !LIBEMU86_CONFIG_WANT_64BIT */
 		EMU86_SETSS(new_ss);
 		goto done_dont_set_pc;
 #define NEED_done_dont_set_pc
@@ -308,7 +308,7 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 #endif /* !EMU86_EMULATE_CONFIG_WANT_IRET */
 #undef EMU86_IRET_NEED_NEW_SP
 	}
-#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
+#if LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT
 	/* Return to same privilege level. */
 #if EMU86_EMULATE_CONFIG_CHECKUSER
 	/* Verify segment registers. */
@@ -344,7 +344,7 @@ case EMU86_OPCODE_ENCODE(0xcf): {
 	goto return_unsupported_instruction;
 #define WANT_return_unsupported_instruction
 #endif /* !EMU86_EMULATE_CONFIG_WANT_IRET */
-#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
+#endif /* LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT */
 #undef USERIRET_EFLAGS_MASK
 }
 #undef EMU86_IRET_NEED_NEW_IP

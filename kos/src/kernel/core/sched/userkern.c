@@ -24,17 +24,18 @@
 #include <kernel/compiler.h>
 
 #include <sched/userkern.h>
-#ifndef CONFIG_NO_USERKERN_SEGMENT
+#ifndef CONFIG_NO_KERNEL_USERKERN_SEGMENT
 
 #include <kernel/except.h>
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/syscall.h>
 #include <sched/cred.h>
-#include <sched/pertask.h>
 #include <sched/group.h>
+#include <sched/pertask.h>
 
 #include <compat/config.h>
 #include <kos/bits/ukern-struct.h>
@@ -221,9 +222,9 @@ PUBLIC struct mfile userkern_segment_file = {
 	.mf_part_amask = PAGEMASK,
 	.mf_blockshift = PAGESHIFT,
 	.mf_iobashift  = PAGESHIFT,
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 	.mf_notify     = NULL,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 	.mf_flags      = MFILE_F_FIXEDFILESIZE | MFILE_F_NOMTIME | MFILE_F_NOATIME,
 	.mf_trunclock  = 0,
 	.mf_filesize   = ATOMIC64_INIT(((uint64_t)KS_MAXADDR - (uint64_t)KS_MINADDR) + 1),
@@ -351,9 +352,9 @@ PUBLIC struct mfile userkern_segment_file_compat = {
 	.mf_part_amask = PAGEMASK,
 	.mf_blockshift = PAGESHIFT,
 	.mf_iobashift  = PAGESHIFT,
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 	.mf_notify     = NULL,
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 	.mf_flags      = MFILE_F_FIXEDFILESIZE | MFILE_F_NOMTIME | MFILE_F_NOATIME,
 	.mf_trunclock  = 0,
 	.mf_filesize   = ATOMIC64_INIT(((uint64_t)KS_MAXADDR - (uint64_t)KS_MINADDR) + 1),
@@ -367,7 +368,7 @@ PUBLIC struct mfile userkern_segment_file_compat = {
 
 DECL_END
 
-#endif /* !CONFIG_NO_USERKERN_SEGMENT */
+#endif /* !CONFIG_NO_KERNEL_USERKERN_SEGMENT */
 
 
 #endif /* !GUARD_KERNEL_SRC_SCHED_USERKERN_C */

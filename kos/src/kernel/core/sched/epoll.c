@@ -60,11 +60,11 @@
 #include <stdint.h>
 #include <string.h>
 
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 #include <kernel/compat.h> /* __ARCH_HAVE_COMPAT, syscall_iscompat() */
 #include <kernel/mman.h>
 #include <sched/group.h>
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
 #undef sigmask
 
@@ -195,23 +195,23 @@ NOTHROW(FCALL epoll_completion)(struct sig_completion *__restrict self,
 	 *  - `epoll_controller_destroy()' */
 	monitor = container_of(sig_multicompletion_controller(self),
 	                       struct epoll_handle_monitor, ehm_comp);
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 	assertf(!epoll_handle_monitor_isrpc(monitor),
 	        "RPC monitors should be using a different completion function");
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
 	/* Increment the raise-counter, but make sure not to overrun it. */
 	do {
 		oldraise = ATOMIC_READ(monitor->ehm_raised);
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 		/* NOTE: `-1' mustn't be reached, either because that's
 		 *       the marker for  `epoll_handle_monitor_isrpc()' */
 		if unlikely(oldraise >= (uintptr_half_t)-2)
 			break;
-#else /* CONFIG_HAVE_EPOLL_RPC */
+#else /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 		if unlikely(oldraise >= (uintptr_half_t)-1)
 			break;
-#endif /* !CONFIG_HAVE_EPOLL_RPC */
+#endif /* !CONFIG_HAVE_KERNEL_EPOLL_RPC */
 		if (oldraise == 0 && bufsize < sizeof(void *))
 			return sizeof(void *);
 	} while (!ATOMIC_CMPXCH_WEAK(monitor->ehm_raised,
@@ -249,24 +249,24 @@ NOTHROW(FCALL epoll_completion)(struct sig_completion *__restrict self,
 
 /************************************************************************/
 /* EPOLL monitor helpers                                                */
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL epoll_monitor_rpc_destroy)(struct epoll_monitor_rpc *__restrict self) {
 	decref_unlikely(self->emr_target);
 	task_asyncrpc_destroy_for_shutdown(&self->emr_rpc);
 }
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
 /* Destroy the given monitor */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL epoll_handle_monitor_destroy)(struct epoll_handle_monitor *__restrict self) {
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 	if (epoll_handle_monitor_isrpc(self)) {
 		struct epoll_monitor_rpc *rpc = self->ehm_rpc;
 		if (rpc)
 			epoll_monitor_rpc_destroy(rpc);
 	}
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
 	/* NOTE: The caller must ensure that `&self->ehm_comp'
 	 *       has  been  disconnected before  we  get here! */
@@ -388,25 +388,25 @@ was_asserted:
 
 /* Special monitor used to represent deleted entries. */
 PRIVATE struct epoll_handle_monitor deleted_monitor = {
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 	{{
 	/* .ehm_ctrl    = */ NULL,
 	/* .ehm_rnext   = */ NULL
 	}},
-#else /* CONFIG_HAVE_EPOLL_RPC */
+#else /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 	/* .ehm_ctrl    = */ NULL,
 	/* .ehm_rnext   = */ NULL,
-#endif /* !CONFIG_HAVE_EPOLL_RPC */
+#endif /* !CONFIG_HAVE_KERNEL_EPOLL_RPC */
 	/* .ehm_raised  = */ 0,
 	/* .ehm_handtyp = */ HANDLE_TYPE_UNDEFINED,
 	/* .ehm_handptr = */ NULL,
 	/* .ehm_fdkey   = */ (unsigned int)-1,
 	/* .ehm_events  = */ EPOLL_WHATMASK,
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 	/* .ehm_data    = */ {{ NULL }},
-#else /* CONFIG_HAVE_EPOLL_RPC */
+#else /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 	/* .ehm_data    = */ { NULL },
-#endif /* !CONFIG_HAVE_EPOLL_RPC */
+#endif /* !CONFIG_HAVE_KERNEL_EPOLL_RPC */
 	/* .ehm_comp    = */ { /* ... */ }
 };
 
@@ -435,10 +435,13 @@ NOTHROW(FCALL epoll_controller_destroy)(struct epoll_controller *__restrict self
 }
 
 
-/* Initial mask for the monitor hash-vector. */
-#ifndef CONFIG_EPOLL_CONTROLLER_INITIAL_MASK
-#define CONFIG_EPOLL_CONTROLLER_INITIAL_MASK 7
-#endif /* !CONFIG_EPOLL_CONTROLLER_INITIAL_MASK */
+/*[[[config CONFIG_KERNEL_EPOLL_CONTROLLER_INITIAL_MASK! = 7
+ * Initial mask for the monitor hash-vector.
+ * ]]]*/
+#ifndef CONFIG_KERNEL_EPOLL_CONTROLLER_INITIAL_MASK
+#define CONFIG_KERNEL_EPOLL_CONTROLLER_INITIAL_MASK 7
+#endif /* !CONFIG_KERNEL_EPOLL_CONTROLLER_INITIAL_MASK */
+/*[[[end]]]*/
 
 /* Create  a new epoll  controller and return  a reference to it.
  * This function is used by the `epoll_create(2)' syscall family. */
@@ -449,18 +452,18 @@ epoll_controller_create(void) THROWS(E_BADALLOC) {
 	                                                GFP_NORMAL);
 	result->ec_refcnt     = 1;
 	result->ec_weakrefcnt = 1;
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 	SLIST_INIT(&result->ec_lops);
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 	shared_lock_init(&result->ec_lock);
 	result->ec_raised  = NULL;
 	result->ec_pending = NULL;
 	sig_init(&result->ec_avail);
 	result->ec_used = 0;
 	result->ec_size = 0;
-	result->ec_mask = CONFIG_EPOLL_CONTROLLER_INITIAL_MASK;
+	result->ec_mask = CONFIG_KERNEL_EPOLL_CONTROLLER_INITIAL_MASK;
 	TRY {
-		result->ec_list = (struct epoll_controller_ent *)kmalloc((CONFIG_EPOLL_CONTROLLER_INITIAL_MASK + 1) *
+		result->ec_list = (struct epoll_controller_ent *)kmalloc((CONFIG_KERNEL_EPOLL_CONTROLLER_INITIAL_MASK + 1) *
 		                                                         sizeof(struct epoll_controller_ent),
 		                                                         GFP_CALLOC);
 	} EXCEPT {
@@ -470,7 +473,7 @@ epoll_controller_create(void) THROWS(E_BADALLOC) {
 	return result;
 }
 
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL _epoll_controller_lock_reap)(struct epoll_controller *__restrict self) {
 #ifndef __INTELLISENSE__
@@ -482,7 +485,7 @@ NOTHROW(FCALL _epoll_controller_lock_reap)(struct epoll_controller *__restrict s
 #include <libc/template/lockop.h>
 #endif /* !__INTELLISENSE__ */
 }
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
 
 
@@ -515,7 +518,7 @@ epoll_controller_checkloop(struct epoll_controller *self,
 			struct epoll_controller *inner;
 			inner = (struct epoll_controller *)mon->ehm_handptr;
 			/* TODO: Currently, user-space can do the following to circumvent the
-			 *       CONFIG_EPOLL_MAX_NESTING restriction:
+			 *       CONFIG_KERNEL_EPOLL_MAX_NESTING restriction:
 			 * Instead of adding an already-deeply nested epoll-fd to a new epoll-fd,
 			 * which is caught and handled by this code right here, do the following:
 			 * >> epfd_outer = epoll_create();
@@ -525,7 +528,7 @@ epoll_controller_checkloop(struct epoll_controller *self,
 			 * >>     epfd_outer = epfd_inner;
 			 * >> }
 			 */
-			if (inner == findme || current_depth >= CONFIG_EPOLL_MAX_NESTING) {
+			if (inner == findme || current_depth >= CONFIG_KERNEL_EPOLL_MAX_NESTING) {
 				result = EPOLL_LOOP;
 				goto done;
 			}
@@ -634,11 +637,11 @@ NOTHROW(FCALL epoll_controller_intern_rehash_with)(struct epoll_controller *__re
  *   - epoll_controller_intern_addmon */
 #define EPOLL_CONTROLLER_INTERN_ADD_SUCCESS   0 /* Success */
 #define EPOLL_CONTROLLER_INTERN_ADD_EXISTS    1 /* The associated handle is already being monitored. */
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 #define EPOLL_CONTROLLER_INTERN_ADD_MUSTREAP  2 /* The  monitor already exists, but it's an already-triggered
                                                  * RPC that should go away the next time you reap the lockops
                                                  * of `self' */
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
 /* @return: * : One of `EPOLL_CONTROLLER_INTERN_ADD_*' */
 PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) unsigned int
@@ -665,11 +668,11 @@ NOTHROW(FCALL epoll_controller_intern_doadd)(struct epoll_controller *__restrict
 		/* Check if this is an identical monitor. */
 		if (emon->ehm_handptr == monitor->ehm_handptr &&
 		    emon->ehm_fdkey == monitor->ehm_fdkey) {
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 			/* Special return value for already-triggered RPC monitors. */
 			if (epoll_handle_monitor_isrpc(emon) && ATOMIC_READ(emon->ehm_rpc) == NULL)
 				return EPOLL_CONTROLLER_INTERN_ADD_MUSTREAP;
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
 			/* Identical monitor already exists (cannot add) */
 			return EPOLL_CONTROLLER_INTERN_ADD_EXISTS;
@@ -680,7 +683,7 @@ NOTHROW(FCALL epoll_controller_intern_doadd)(struct epoll_controller *__restrict
 	return EPOLL_CONTROLLER_INTERN_ADD_SUCCESS;
 }
 
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 PRIVATE NOBLOCK WUNUSED NONNULL((1, 2)) void
 NOTHROW(FCALL epoll_controller_intern_doadd_force)(struct epoll_controller *__restrict self,
                                                    /*inherit(always)*/ struct epoll_handle_monitor *__restrict monitor) {
@@ -709,7 +712,7 @@ NOTHROW(FCALL epoll_controller_intern_doadd_force)(struct epoll_controller *__re
 	ent->ece_mon = monitor; /* Inherit */
 	++self->ec_used;
 }
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
 /* Add the given `monitor' to `self'
  * @return: * : One of `EPOLL_CONTROLLER_INTERN_ADD_*' */
@@ -720,7 +723,7 @@ epoll_controller_intern_addmon(struct epoll_controller *__restrict self,
 	if (((self->ec_size + 1) * 3) / 2 >= self->ec_mask) {
 		/* Must rehash! */
 		struct epoll_controller_ent *new_list;
-		size_t new_mask = CONFIG_EPOLL_CONTROLLER_INITIAL_MASK;
+		size_t new_mask = CONFIG_KERNEL_EPOLL_CONTROLLER_INITIAL_MASK;
 		size_t thresh   = ((self->ec_used + 1) * 3) / 2;
 		while (thresh >= new_mask)
 			new_mask = (new_mask << 1) | 1;
@@ -730,7 +733,7 @@ epoll_controller_intern_addmon(struct epoll_controller *__restrict self,
 		if unlikely(!new_list) {
 			if ((self->ec_size + 1) <= self->ec_mask)
 				goto doadd;
-			new_mask = CONFIG_EPOLL_CONTROLLER_INITIAL_MASK;
+			new_mask = CONFIG_KERNEL_EPOLL_CONTROLLER_INITIAL_MASK;
 			while ((self->ec_used + 1) > self->ec_mask)
 				new_mask = (new_mask << 1) | 1;
 			new_list = (struct epoll_controller_ent *)kmalloc((new_mask + 1) *
@@ -749,9 +752,9 @@ doadd:
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL epoll_controller_intern_rehash_after_remove)(struct epoll_controller *__restrict self) {
 	if ((self->ec_used < (self->ec_mask / 3)) &&
-	    self->ec_mask > CONFIG_EPOLL_CONTROLLER_INITIAL_MASK) {
+	    self->ec_mask > CONFIG_KERNEL_EPOLL_CONTROLLER_INITIAL_MASK) {
 		/* Try to shrink the hash-vector's mask size. */
-		size_t new_mask = CONFIG_EPOLL_CONTROLLER_INITIAL_MASK;
+		size_t new_mask = CONFIG_KERNEL_EPOLL_CONTROLLER_INITIAL_MASK;
 		size_t thresh   = ((self->ec_used + 1) * 3) / 2;
 		while (thresh >= new_mask)
 			new_mask = (new_mask << 1) | 1;
@@ -854,7 +857,7 @@ NOTHROW(FCALL epoll_controller_intern_lookup)(struct epoll_controller *__restric
  * @throw: E_ILLEGAL_REFERENCE_LOOP: `hand' is another epoll controller that is either the same
  *                                   as `self', or is already monitoring `self'. Also thrown if
  *                                   the max depth of nested epoll controllers would exceed the
- *                                   compile-time `CONFIG_EPOLL_MAX_NESTING' limit.
+ *                                   compile-time `CONFIG_KERNEL_EPOLL_MAX_NESTING' limit.
  * @return: true:  Success
  * @return: false: Another monitor for `hand:fd_key' already exists. */
 PUBLIC NONNULL((1, 2)) bool KCALL
@@ -895,9 +898,9 @@ epoll_controller_addmonitor(struct epoll_controller *__restrict self,
 		 * should be strong enough to correctly deal with a signal that
 		 * is  sending  itself,  so-long as  the  associated completion
 		 * function didn't attempt to re-prime itself. */
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 again_acquire:
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 		epoll_controller_acquire_for_monitor_add(self, hand);
 		TRY {
 			/* Acquire a weak reference to the given handle. */
@@ -911,10 +914,10 @@ again_acquire:
 				if unlikely(status != EPOLL_CONTROLLER_INTERN_ADD_SUCCESS) {
 					/* Cannot add: An identical monitor had already been added in the past... */
 					epoll_controller_lock_release(self);
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 					if (status == EPOLL_CONTROLLER_INTERN_ADD_MUSTREAP)
 						goto again_acquire;
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 					(*handle_type_db.h_weakdecref[newmon->ehm_handtyp])(newmon->ehm_handptr);
 					sig_multicompletion_fini(&newmon->ehm_comp);
 					kfree(newmon);
@@ -946,7 +949,7 @@ again_acquire:
 	return true;
 }
 
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL epoll_rpc_trigger)(/*inherit(always)*/ struct epoll_monitor_rpc *__restrict rpc) {
 	bool ok = false;
@@ -1106,7 +1109,7 @@ NOTHROW(FCALL epoll_rpc_completion)(struct sig_completion *__restrict self,
  * @throw: E_ILLEGAL_REFERENCE_LOOP: `hand' is another epoll controller that is either the same
  *                                   as `self', or is already monitoring `self'. Also thrown if
  *                                   the max depth of nested epoll controllers would exceed the
- *                                   compile-time `CONFIG_EPOLL_MAX_NESTING' limit.
+ *                                   compile-time `CONFIG_KERNEL_EPOLL_MAX_NESTING' limit.
  * @return: true:  Success
  * @return: false: Another monitor for `hand:fd_key' already exists. */
 PUBLIC NONNULL((1, 2, 5)) bool KCALL
@@ -1242,7 +1245,7 @@ done:
 	epoll_controller_lock_release(self);
 	return true;
 }
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
 
 PRIVATE NOBLOCK NONNULL((1, 2)) void
@@ -1292,14 +1295,14 @@ epoll_controller_modmonitor(struct epoll_controller *__restrict self,
 			return false;
 		}
 
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 		if unlikely(epoll_handle_monitor_isrpc(monitor)) {
 			/* Error: `EPOLL_CTL_MOD' cannot be used to alter an RPC monitor. */
 			epoll_controller_lock_release(self);
 			THROW(E_INVALID_OPERATION,
 			      E_ILLEGAL_OPERATION_CONTEXT_EPOLL_MOD_RPC);
 		}
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
 		if (((monitor->ehm_events & EPOLL_WHATMASK) != (new_events.events & EPOLL_WHATMASK)) ||
 		    /* Special case: Re-arm a ONESHOT monitor after that monitor has been left
@@ -1378,7 +1381,7 @@ epoll_controller_delmonitor(struct epoll_controller *__restrict self,
 	/* Note that we've just inherited `monitor', so now we have to destroy it! */
 	sig_multicompletion_disconnectall(&monitor->ehm_comp);
 
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 	if (epoll_handle_monitor_isrpc(monitor)) {
 		/* Try to cancel the RPC.  If the cancel failed, the  we must re-add the  monitor
 		 * to `self' and indicate that deletion  failed. The monitor itself is  currently
@@ -1405,7 +1408,7 @@ epoll_controller_delmonitor(struct epoll_controller *__restrict self,
 		epoll_monitor_rpc_destroy(rpc);
 		return true;
 	}
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
 	/* With signal completion callbacks all diconnected (by `sig_multicompletion_disconnectall()'),
 	 * we must also ensure that `monitor' isn't apart  of the raised monitor chain. If it is,  then
@@ -1510,10 +1513,10 @@ scan_monitors:
 					REF void *monitor_handptr;
 					next = monitor->ehm_rnext;
 					assert(monitor->ehm_raised != 0);
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 					assertf(!epoll_handle_monitor_isrpc(monitor),
 					        "RPC monitors should never appear in `ec_raised'");
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
 					/* First of all: Ensure that `monitor' isn't connected. */
 					sig_multicompletion_disconnectall(&monitor->ehm_comp);
@@ -1831,7 +1834,7 @@ DEFINE_SYSCALL1(fd_t, epoll_create, syscall_ulong_t, size) {
 #endif /* __ARCH_WANT_SYSCALL_EPOLL_CREATE */
 
 #ifdef __ARCH_WANT_SYSCALL_EPOLL_CTL
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 PRIVATE NONNULL((1, 2)) bool KCALL
 epoll_create_rpc_monitor(struct epoll_controller *__restrict self,
                          struct handle const *__restrict fd_handle,
@@ -1922,7 +1925,7 @@ epoll_create_rpc_monitor(struct epoll_controller *__restrict self,
 	 * NOTE: This function _always_, _unconditionally_ inherits the given `rpc'! */
 	return epoll_controller_addmonitor_rpc(self, fd_handle, fd, events, rpc);
 }
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
 DEFINE_SYSCALL4(errno_t, epoll_ctl,
                 fd_t, epfd, syscall_ulong_t, op, fd_t, fd,
@@ -1953,7 +1956,7 @@ DEFINE_SYSCALL4(errno_t, epoll_ctl,
 			result = -ENOENT; /* TODO: Use an exception for this! */
 		break;
 
-#ifdef CONFIG_HAVE_EPOLL_RPC
+#ifdef CONFIG_HAVE_KERNEL_EPOLL_RPC
 	case EPOLL_CTL_RPC_PROG: {
 		struct epoll_event eventinfo;
 		USER CHECKED struct epoll_rpc_program const *program;
@@ -1966,7 +1969,7 @@ DEFINE_SYSCALL4(errno_t, epoll_ctl,
 		                              eventinfo.events, program))
 			result = -EEXIST; /* TODO: Use an exception for this! */
 	}	break;
-#endif /* CONFIG_HAVE_EPOLL_RPC */
+#endif /* CONFIG_HAVE_KERNEL_EPOLL_RPC */
 
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,

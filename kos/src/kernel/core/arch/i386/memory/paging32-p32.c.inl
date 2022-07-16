@@ -45,7 +45,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#ifndef CONFIG_NO_PAGING_P32
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_P32
 
 #include "paging.h"
 #include "paging32-com.h"
@@ -1168,7 +1168,7 @@ NOTHROW(FCALL p32_pagedir_unsetchanged)(VIRT void *addr) {
 }
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
 /* NOTE: This function must do its own tracing of continuous page ranges.
  *       The caller is may not necessary ensure that the function is only
@@ -1446,11 +1446,11 @@ INTERN ATTR_DBGTEXT void FCALL p32_dbg_lspd(pagedir_phys_t pdir) {
 	}
 	PAGEDIR_P_ENDUSE(pdir);
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 DECL_END
 
-#endif /* !CONFIG_NO_PAGING_P32 */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_P32 */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_MEMORY_PAGING32_P32_C_INL */

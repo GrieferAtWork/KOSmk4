@@ -83,12 +83,12 @@
 
 DECL_BEGIN
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #define __PAGEDIR_MAYBE_DBG_LSPD(callback) callback(dbg_lspd);
 INTDEF ATTR_DBGTEXT void FCALL dbg_lspd(pagedir_phys_t pdir);
-#else /* CONFIG_HAVE_DEBUGGER */
+#else /* CONFIG_HAVE_KERNEL_DEBUGGER */
 #define __PAGEDIR_MAYBE_DBG_LSPD(callback) /* nothing */
-#endif /* !CONFIG_HAVE_DEBUGGER */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 /* Define the kernel mman */
@@ -106,7 +106,7 @@ kernel_share_t __x86_pagedir_kernel_share = {};
 DECL_END
 
 
-#ifdef CONFIG_NO_PAGING_PAE
+#ifdef CONFIG_NO_KERNEL_X86_PAGING_PAE
 /* P32 only */
 
 #ifndef __INTELLISENSE__
@@ -118,7 +118,7 @@ DECL_END
 FOREACH_PAGING_FUNCTION(DEFINE_PUBLIC_ALIAS_PAGING_P32)
 #undef DEFINE_PUBLIC_ALIAS_PAGING_P32
 
-#elif defined(CONFIG_NO_PAGING_P32)
+#elif defined(CONFIG_NO_KERNEL_X86_PAGING_P32)
 /* PAE only */
 
 #ifndef __INTELLISENSE__
@@ -157,24 +157,43 @@ NOTHROW(FCALL pagedir_install_jmp)(void *redirection_addr,
 #endif /* HYBRID_PAGING_MODE */
 
 
+/*[[[config CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_P32 = false]]]*/
+#ifdef CONFIG_NO_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_P32
+#undef CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_P32
+#elif !defined(CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_P32)
+#define CONFIG_NO_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_P32
+#elif (-CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_P32 - 1) == -1
+#undef CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_P32
+#define CONFIG_NO_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_P32
+#endif /* ... */
+/*[[[end]]]*/
+/*[[[config CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_PAE = true]]]*/
+#ifdef CONFIG_NO_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_PAE
+#undef CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_PAE
+#elif !defined(CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_PAE)
+#define CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_PAE
+#elif (-CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_PAE - 1) == -1
+#undef CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_PAE
+#define CONFIG_NO_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_PAE
+#endif /* ... */
+/*[[[end]]]*/
 
-#if (!defined(CONFIG_BOOTUP_OPTIMIZE_FOR_P32) && \
-     !defined(CONFIG_BOOTUP_OPTIMIZE_FOR_PAE))
-#if defined(CONFIG_NO_PAGING_P32)
-#define CONFIG_BOOTUP_OPTIMIZE_FOR_PAE 1
-#elif defined(CONFIG_NO_PAGING_PAE)
-#define CONFIG_BOOTUP_OPTIMIZE_FOR_P32 1
-#else /* ... */
-#define CONFIG_BOOTUP_OPTIMIZE_FOR_PAE 1
-#endif /* !... */
-#endif /* !CONFIG_BOOTUP_OPTIMIZE_FOR_* */
+#if defined(CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_PAE) && defined(CONFIG_NO_KERNEL_X86_PAGING_PAE)
+#undef CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_PAE
+#endif /* CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_PAE && CONFIG_NO_KERNEL_X86_PAGING_PAE */
+#if defined(CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_P32) && defined(CONFIG_NO_KERNEL_X86_PAGING_P32)
+#undef CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_P32
+#endif /* CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_P32 && CONFIG_NO_KERNEL_X86_PAGING_P32 */
+#if defined(CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_P32) && defined(CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_PAE)
+#error "You can't optimize for both P32 and PAE paging (pick one!)"
+#endif /* CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_P32 && CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_PAE */
 
-#ifdef CONFIG_BOOTUP_OPTIMIZE_FOR_PAE
+#ifdef CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_PAE
 #define DEFINE_PUBLIC_ALIAS_PAGING_PAE(name) \
 	DEFINE_PUBLIC_ALIAS(name, pae_##name);
 FOREACH_PAGING_FUNCTION(DEFINE_PUBLIC_ALIAS_PAGING_PAE)
 #undef DEFINE_PUBLIC_ALIAS_PAGING_PAE
-#elif defined(CONFIG_BOOTUP_OPTIMIZE_FOR_P32)
+#elif defined(CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_P32)
 #define DEFINE_PUBLIC_ALIAS_PAGING_P32(name) \
 	DEFINE_PUBLIC_ALIAS(name, p32_##name);
 FOREACH_PAGING_FUNCTION(DEFINE_PUBLIC_ALIAS_PAGING_P32)
@@ -182,7 +201,7 @@ FOREACH_PAGING_FUNCTION(DEFINE_PUBLIC_ALIAS_PAGING_P32)
 #endif /* ... */
 
 
-#ifndef CONFIG_NO_PAGING_P32
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_P32
 INTDEF u32 p32_pageperm_matrix_[0x40] ASMNAME("p32_pageprot_table");
 
 INTERN ATTR_FREETEXT void
@@ -203,9 +222,9 @@ NOTHROW(KCALL kernel_initialize_paging_p32)(void) {
 			p32_pageperm_matrix_[i] &= ~(P32_PAGE_FPWT | P32_PAGE_FPCD | P32_PAGE_FPAT_4KIB);
 	}
 }
-#endif /* !CONFIG_NO_PAGING_P32 */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_P32 */
 
-#ifndef CONFIG_NO_PAGING_PAE
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_PAE
 INTDEF u64 pae_pageprot_table_[0x40] ASMNAME("pae_pageprot_table");
 
 INTERN ATTR_FREETEXT void
@@ -233,7 +252,7 @@ NOTHROW(KCALL kernel_initialize_paging_pae)(void) {
 			pae_pageprot_table_[i] &= ~(PAE_PAGE_FPWT | PAE_PAGE_FPCD | PAE_PAGE_FPAT_4KIB);
 	}
 }
-#endif /* !CONFIG_NO_PAGING_PAE */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_PAE */
 
 
 INTDEF byte_t const x86_pagedir_syncall_cr3[];
@@ -242,7 +261,7 @@ INTDEF byte_t const x86_pagedir_syncall_cr4[];
 INTDEF byte_t x86_pagedir_syncall_cr4_size[];
 
 
-#ifndef CONFIG_NO_PAGING_P32
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_P32
 INTERN ATTR_FREETEXT ATTR_CONST WUNUSED NONNULL((1)) union p32_pdir_e1 *
 NOTHROW(FCALL x86_get_cpu_iob_pointer_p32)(struct cpu *__restrict self) {
 	union p32_pdir_e1 *e1_pointer;
@@ -257,7 +276,7 @@ LOCAL ATTR_FREETEXT void
 NOTHROW(KCALL ioperm_preemption_set_p32_unmap)(void) {
 	/* Initialize the `bootcpu.thiscpu_x86_iobnode_pagedir_identity' pointer. */
 	FORCPU(&bootcpu, thiscpu_x86_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer_p32(&bootcpu);
-#ifndef CONFIG_NO_PAGING_PAE
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_PAE
 	/* Re-write the assembly of `__x86_lazy_disable_ioperm_bitmap_pae',  as
 	 * found in `arch/i386/sched/sched32.S' to only clear 8 bytes of memory
 	 * in order to unmap the IOB vector, rather than clearing 16 bytes  (as
@@ -271,11 +290,11 @@ NOTHROW(KCALL ioperm_preemption_set_p32_unmap)(void) {
 		*(u8 *)(__x86_lazy_disable_ioperm_bitmap_pae + 0)  = 0xe9;
 		*(s32 *)(__x86_lazy_disable_ioperm_bitmap_pae + 1) = rel_offset;
 	}
-#endif /* !CONFIG_NO_PAGING_PAE */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_PAE */
 }
-#endif /* !CONFIG_NO_PAGING_P32 */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_P32 */
 
-#ifndef CONFIG_NO_PAGING_PAE
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_PAE
 INTERN ATTR_FREETEXT ATTR_CONST WUNUSED NONNULL((1)) union pae_pdir_e1 *
 NOTHROW(FCALL x86_get_cpu_iob_pointer_pae)(struct cpu *__restrict self) {
 	union pae_pdir_e1 *e1_pointer;
@@ -292,24 +311,24 @@ NOTHROW(KCALL ioperm_preemption_set_pae_unmap)(void) {
 	/* Initialize the `bootcpu.thiscpu_x86_iobnode_pagedir_identity' pointer. */
 	FORCPU(&bootcpu, thiscpu_x86_iobnode_pagedir_identity) = x86_get_cpu_iob_pointer_pae(&bootcpu);
 }
-#endif /* !CONFIG_NO_PAGING_PAE */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_PAE */
 
 /* Enable use of p32 paging */
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_paging)(void) {
-#ifndef CONFIG_NO_PAGING_P32
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_P32
 #ifdef HYBRID_PAGING_MODE
 	if __untraced(X86_PAGEDIR_USES_P32())
 #endif /* HYBRID_PAGING_MODE */
 	{
 #ifdef HYBRID_PAGING_MODE
-#ifdef CONFIG_BOOTUP_OPTIMIZE_FOR_PAE
+#ifdef CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_PAE
 		/* Must redirect `pagedir_*' functions to use the `p32_pagedir_*' variants. */
 #define REDIRECT_PAGING_FUNCTION_P32(name) \
 		pagedir_install_jmp((void *)&name, (void const *)&p32_##name);
 		FOREACH_PAGING_FUNCTION(REDIRECT_PAGING_FUNCTION_P32)
 #undef REDIRECT_PAGING_FUNCTION_P32
-#endif /* CONFIG_BOOTUP_OPTIMIZE_FOR_PAE */
+#endif /* CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_PAE */
 #endif /* HYBRID_PAGING_MODE */
 		kernel_initialize_paging_p32();
 		ioperm_preemption_set_p32_unmap();
@@ -317,20 +336,20 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 #ifdef HYBRID_PAGING_MODE
 	else
 #endif /* HYBRID_PAGING_MODE */
-#endif /* !CONFIG_NO_PAGING_P32 */
-#ifndef CONFIG_NO_PAGING_PAE
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_P32 */
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_PAE
 	{
-#ifdef CONFIG_BOOTUP_OPTIMIZE_FOR_P32
+#ifdef CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_P32
 		/* Must redirect `pagedir_*' functions to use the `pae_pagedir_*' variants. */
 #define REDIRECT_PAGING_FUNCTION_PAE(name) \
 		pagedir_install_jmp((void *)&name, (void const *)&pae_##name);
 		FOREACH_PAGING_FUNCTION(REDIRECT_PAGING_FUNCTION_PAE)
 #undef REDIRECT_PAGING_FUNCTION_PAE
-#endif /* CONFIG_BOOTUP_OPTIMIZE_FOR_P32 */
+#endif /* CONFIG_HAVE_KERNEL_X86_BOOTUP_OPTIMIZE_FOR_P32 */
 		kernel_initialize_paging_pae();
 		ioperm_preemption_set_pae_unmap();
 	}
-#endif /* !CONFIG_NO_PAGING_PAE */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_PAE */
 
 	/* Check if we must re-write our implementation of `pagedir_syncall()'.
 	 * Currently, it looks like this:
@@ -372,7 +391,7 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 PRIVATE ATTR_DBGRODATA char const lspd_str_kernel[] = "kernel";
 PRIVATE ATTR_DBGRODATA char const lspd_str_user[]   = "user";
 
@@ -408,7 +427,7 @@ DBG_COMMAND_AUTO(lspd, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
 	dbg_lspd(pdir);
 	return 0;
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 DECL_END

@@ -1232,7 +1232,7 @@ PUBLIC struct page_usage_struct page_usage = { 0, };
 
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 DBG_COMMAND(lsram,
             "lsram\n"
             "\tList page allocation zones, as well as the amount of available ram\n"
@@ -1263,7 +1263,7 @@ DBG_COMMAND(lsram,
 	}
 	return 0;
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 DECL_END

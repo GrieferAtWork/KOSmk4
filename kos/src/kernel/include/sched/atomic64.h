@@ -34,11 +34,11 @@
  * doesn't  even define the lock, and always just defines the raw 64-bit value if
  * the   host   always   supports   64-bit   atomics   (such   as   on    x86_64)
  * These are 3 configuration modes:
- *   - CONFIG_ATOMIC64_SUPPORT_NEVER:
+ *   - ARCH_HAVE_ATOMIC64_SUPPORT_NEVER:
  *         64-bit atomics are never supported and always have to be emulated
- *   - CONFIG_ATOMIC64_SUPPORT_ALWAYS:
+ *   - ARCH_HAVE_ATOMIC64_SUPPORT_ALWAYS:
  *         64-bit atomics are always supported and never have to be emulated
- *   - CONFIG_ATOMIC64_SUPPORT_DYNAMIC:
+ *   - ARCH_HAVE_ATOMIC64_SUPPORT_DYNAMIC:
  *         64-bit atomic operations must  go through api functions  that
  *         dynamically get re-written based on native support determined
  *         at runtime.
@@ -48,9 +48,9 @@
 /* TODO: Also use `atomic64_t' for `struct fs::f_mode'
  *       Then gcc can stop generating fpu-instructions to facilitate atomic reads/writes */
 
-#if (defined(CONFIG_ATOMIC64_SUPPORT_ALWAYS) + \
-     defined(CONFIG_ATOMIC64_SUPPORT_NEVER) +  \
-     defined(CONFIG_ATOMIC64_SUPPORT_DYNAMIC)) != 1
+#if (defined(ARCH_HAVE_ATOMIC64_SUPPORT_ALWAYS) + \
+     defined(ARCH_HAVE_ATOMIC64_SUPPORT_NEVER) +  \
+     defined(ARCH_HAVE_ATOMIC64_SUPPORT_DYNAMIC)) != 1
 #error "Invalid arch-specific atomic64 support configuration"
 #endif
 
@@ -84,8 +84,8 @@ typedef u64 atomic64_t;
  *       always return whole values in regards to other reads/writes to the
  *       same memory location that are also made using the atomic64* APIs. */
 
-#ifndef ARCH_ATOMIC64_HAVE_PROTOTYPES
-#ifdef CONFIG_ATOMIC64_SUPPORT_ALWAYS
+#ifndef ARCH_HAVE_ATOMIC64_PROTOTYPES
+#ifdef ARCH_HAVE_ATOMIC64_SUPPORT_ALWAYS
 
 /* Atomically read a 64-bit data word from `self' */
 #define atomic64_read(self) \
@@ -143,7 +143,7 @@ typedef u64 atomic64_t;
 #define atomic64_xor(self, value) \
 	__hybrid_atomic_xor(_atomic64_val(*(self)), value, __ATOMIC_SEQ_CST)
 
-#else /* CONFIG_ATOMIC64_SUPPORT_ALWAYS */
+#else /* ARCH_HAVE_ATOMIC64_SUPPORT_ALWAYS */
 
 /* Atomically read a 64-bit data word from `self' */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) u64
@@ -198,8 +198,8 @@ NOTHROW(FCALL atomic64_or)(atomic64_t *__restrict self, u64 value);
 /* Atomically xor a 64-bit data word from `self' */
 FUNDEF NOBLOCK ATTR_LEAF NONNULL((1)) void
 NOTHROW(FCALL atomic64_xor)(atomic64_t *__restrict self, u64 value);
-#endif /* !CONFIG_ATOMIC64_SUPPORT_ALWAYS */
-#endif /* !ARCH_ATOMIC64_HAVE_PROTOTYPES */
+#endif /* !ARCH_HAVE_ATOMIC64_SUPPORT_ALWAYS */
+#endif /* !ARCH_HAVE_ATOMIC64_PROTOTYPES */
 
 #ifndef atomic64_cmpxch_weak
 #define atomic64_cmpxch_weak atomic64_cmpxch

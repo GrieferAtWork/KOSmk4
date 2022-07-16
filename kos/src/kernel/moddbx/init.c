@@ -26,7 +26,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/debugger.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
 #include <format-printer.h>
 #include <stddef.h>
@@ -235,6 +235,6 @@ DBG_COMMAND_AUTO(eval,
 }
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_MODDBX_INIT_C */

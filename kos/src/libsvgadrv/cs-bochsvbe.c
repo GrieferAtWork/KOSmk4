@@ -25,7 +25,7 @@
 #include "api.h"
 /**/
 
-#ifdef CONFIG_SVGA_HAVE_CHIPSET_BOCHSVBE
+#ifdef CONFIG_HAVE_LIBSVGADRV_CHIPSET_BOCHSVBE
 #include <hybrid/align.h>
 #include <hybrid/minmax.h>
 #include <hybrid/sequence/list.h>
@@ -511,6 +511,6 @@ err_initfailed:
 }
 
 DECL_END
-#endif /* CONFIG_SVGA_HAVE_CHIPSET_BOCHSVBE */
+#endif /* CONFIG_HAVE_LIBSVGADRV_CHIPSET_BOCHSVBE */
 
 #endif /* !GUARD_LIBSVGADRV_CS_BOCHSVBE_C */

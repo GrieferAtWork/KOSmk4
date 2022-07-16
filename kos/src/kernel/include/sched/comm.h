@@ -25,12 +25,16 @@
 #include <kernel/types.h>
 #include <sched/pertask.h>
 
-#ifdef CONFIG_NO_TASK_COMM
-#undef CONFIG_HAVE_TASK_COMM
-#else /* CONFIG_NO_TASK_COMM */
-#undef CONFIG_HAVE_TASK_COMM
-#define CONFIG_HAVE_TASK_COMM 1
-#endif /* !CONFIG_NO_TASK_COMM */
+/*[[[config CONFIG_HAVE_KERNEL_TASK_COMM = true]]]*/
+#ifdef CONFIG_NO_KERNEL_TASK_COMM
+#undef CONFIG_HAVE_KERNEL_TASK_COMM
+#elif !defined(CONFIG_HAVE_KERNEL_TASK_COMM)
+#define CONFIG_HAVE_KERNEL_TASK_COMM
+#elif (-CONFIG_HAVE_KERNEL_TASK_COMM - 1) == -1
+#undef CONFIG_HAVE_KERNEL_TASK_COMM
+#define CONFIG_NO_KERNEL_TASK_COMM
+#endif /* ... */
+/*[[[end]]]*/
 
 /* The max length of the task command name (including the trailing NUL) */
 #ifndef TASK_COMM_LEN
@@ -46,7 +50,7 @@
 #ifdef __CC__
 DECL_BEGIN
 
-#ifdef CONFIG_HAVE_TASK_COMM
+#ifdef CONFIG_HAVE_KERNEL_TASK_COMM
 
 /* [lock(PRIVATE(THIS_TASK))]
  * Task command name.
@@ -87,14 +91,14 @@ task_setcomm_of(struct task *__restrict self, char const *__restrict name)
 FUNDEF NONNULL((1)) void
 NOTHROW(FCALL task_setcomm)(char const *__restrict name);
 
-#else /* CONFIG_HAVE_TASK_COMM */
+#else /* CONFIG_HAVE_KERNEL_TASK_COMM */
 
 #define task_getcomm()              ""
 #define task_setcomm(name)          (void)0
 #define task_getcomm_of(self, buf)  (void)((buf)[0] = '\0')
 #define task_setcomm_of(self, name) 1
 
-#endif /* !CONFIG_HAVE_TASK_COMM */
+#endif /* !CONFIG_HAVE_KERNEL_TASK_COMM */
 
 DECL_END
 #endif /* __CC__ */

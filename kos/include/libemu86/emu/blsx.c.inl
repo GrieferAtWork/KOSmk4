@@ -39,7 +39,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f3): {
 		/* VEX.LZ.0F38.W0 F3 /1     BLSR r32, r/m32     Reset lowest set bit of r/m32, keep all other bits of r/m32 and write result to r32.
 		 * VEX.LZ.0F38.W1 F3 /1     BLSR r64, r/m64     Reset lowest set bit of r/m64, keep all other bits of r/m64 and write result to r64. */
 		u32 eflags_addend = 0;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (op_flags & EMU86_F_VEX_W) {
 			u64 src, result;
 			src = MODRM_GETRMQ();
@@ -52,7 +52,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f3): {
 				eflags_addend |= EFLAGS_CF;
 			VEX_SETREGQ(result);
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		{
 			u32 src, result;
 			src = MODRM_GETRML();
@@ -81,7 +81,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f3): {
 		/* VEX.LZ.0F38.W0 F3 /2     BLSMSK r32, r/m32     Set all lower bits in r32 to "1" starting from bit 0 to lowest set bit in r/m32.
 		 * VEX.LZ.0F38.W1 F3 /2     BLSMSK r64, r/m64     Set all lower bits in r64 to "1" starting from bit 0 to lowest set bit in r/m64. */
 		u32 eflags_addend = 0;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (op_flags & EMU86_F_VEX_W) {
 			u64 src, result;
 			src = MODRM_GETRMQ();
@@ -92,7 +92,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f3): {
 				eflags_addend |= EFLAGS_CF;
 			VEX_SETREGQ(result);
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		{
 			u32 src, result;
 			src = MODRM_GETRML();
@@ -119,7 +119,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f3): {
 		/* VEX.LZ.0F38.W0 F3 /3     BLSI r32, r/m32     Extract lowest set bit from r/m32 and set that bit in r32.
 		 * VEX.LZ.0F38.W1 F3 /3     BLSI r64, r/m64     Extract lowest set bit from r/m64, and set that bit in r64. */
 		u32 eflags_addend = 0;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (op_flags & EMU86_F_VEX_W) {
 			u64 src, result;
 			src = MODRM_GETRMQ();
@@ -132,7 +132,7 @@ case EMU86_OPCODE_ENCODE(0x0f38f3): {
 				eflags_addend |= EFLAGS_CF;
 			VEX_SETREGQ(result);
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		{
 			u32 src, result;
 			src = MODRM_GETRML();

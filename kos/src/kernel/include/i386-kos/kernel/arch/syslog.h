@@ -49,21 +49,21 @@ FUNDEF NOBLOCK NONNULL((1)) __SSIZE_TYPE__ __FORMATPRINTER_CC
 x86_syslog_printer(void *ignored_arg,
                    /*utf-8*/ char const *__restrict data,
                    __SIZE_TYPE__ datalen)
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 		ASMNAME("dbg_logecho_printer")
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 		;
 
 /* Helpers for printf-style writing to the raw X86 system log port. */
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 FUNDEF NOBLOCK NONNULL((1)) __SIZE_TYPE__ FCALL x86_syslog_print(/*utf-8*/ char const *__restrict text) ASMNAME("dbg_logecho");
 FUNDEF NOBLOCK NONNULL((1)) __SIZE_TYPE__ VCALL x86_syslog_printf(/*utf-8*/ char const *__restrict format, ...) ASMNAME("dbg_logechof");
 FUNDEF NOBLOCK NONNULL((1)) __SIZE_TYPE__ FCALL x86_syslog_vprintf(/*utf-8*/ char const *__restrict format, __builtin_va_list args) ASMNAME("dbg_vlogechof");
-#else /* CONFIG_HAVE_DEBUGGER */
+#else /* CONFIG_HAVE_KERNEL_DEBUGGER */
 FUNDEF NOBLOCK NONNULL((1)) __SIZE_TYPE__ FCALL x86_syslog_print(/*utf-8*/ char const *__restrict text);
 FUNDEF NOBLOCK NONNULL((1)) __SIZE_TYPE__ VCALL x86_syslog_printf(/*utf-8*/ char const *__restrict format, ...);
 FUNDEF NOBLOCK NONNULL((1)) __SIZE_TYPE__ FCALL x86_syslog_vprintf(/*utf-8*/ char const *__restrict format, __builtin_va_list args);
-#endif /* !CONFIG_HAVE_DEBUGGER */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 #endif /* __CC__ */

@@ -31,7 +31,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <debugger/config.h>
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <debugger/entry.h>
 #include <debugger/hook.h>
 #include <debugger/io.h>
@@ -117,12 +117,14 @@ NOTHROW(FCALL ps2_write_data)(u8 data) {
 	return true;
 }
 
-#ifndef CONFIG_PS2_KEYBOARD_BUFFER_SIZE
-#define CONFIG_PS2_KEYBOARD_BUFFER_SIZE 256
-#endif /* !CONFIG_PS2_KEYBOARD_BUFFER_SIZE */
+/*[[[config CONFIG_KERNEL_X86_DEBUGGER_PS2_KEYBOARD_BUFFER_SIZE! = 256]]]*/
+#ifndef CONFIG_KERNEL_X86_DEBUGGER_PS2_KEYBOARD_BUFFER_SIZE
+#define CONFIG_KERNEL_X86_DEBUGGER_PS2_KEYBOARD_BUFFER_SIZE 256
+#endif /* !CONFIG_KERNEL_X86_DEBUGGER_PS2_KEYBOARD_BUFFER_SIZE */
+/*[[[end]]]*/
 
 /* Buffer to pressed, but not read key codes. */
-PRIVATE ATTR_DBGBSS u8 ps2_keyboard_buffer[CONFIG_PS2_KEYBOARD_BUFFER_SIZE] = { 0, };
+PRIVATE ATTR_DBGBSS u8 ps2_keyboard_buffer[CONFIG_KERNEL_X86_DEBUGGER_PS2_KEYBOARD_BUFFER_SIZE] = { 0, };
 PRIVATE ATTR_DBGBSS unsigned int ps2_keyboard_buffer_pos = 0; /* Index into `ps2_keyboard_buffer', where the next received by is stored */
 PRIVATE ATTR_DBGBSS unsigned int ps2_keyboard_buffer_siz = 0; /* Amount of unread bytes in `ps2_keyboard_buffer' */
 
@@ -161,7 +163,7 @@ NOTHROW(FCALL ps2_keyboard_getbyte)(void) {
 		index = ps2_keyboard_buffer_pos - ps2_keyboard_buffer_siz;
 	} else {
 		index = ps2_keyboard_buffer_siz - ps2_keyboard_buffer_pos;
-		index = CONFIG_PS2_KEYBOARD_BUFFER_SIZE - index;
+		index = CONFIG_KERNEL_X86_DEBUGGER_PS2_KEYBOARD_BUFFER_SIZE - index;
 	}
 	result = ps2_keyboard_buffer[index];
 	--ps2_keyboard_buffer_siz;
@@ -183,7 +185,7 @@ NOTHROW(FCALL ps2_keyboard_getbyte_nb)(void) {
 		index = ps2_keyboard_buffer_pos - ps2_keyboard_buffer_siz;
 	} else {
 		index = ps2_keyboard_buffer_siz - ps2_keyboard_buffer_pos;
-		index = CONFIG_PS2_KEYBOARD_BUFFER_SIZE - index;
+		index = CONFIG_KERNEL_X86_DEBUGGER_PS2_KEYBOARD_BUFFER_SIZE - index;
 	}
 	result = ps2_keyboard_buffer[index];
 	--ps2_keyboard_buffer_siz;
@@ -209,12 +211,12 @@ PRIVATE ATTR_DBGTEXT void
 NOTHROW(FCALL ps2_keyboard_ungetbyte)(u8 byte) {
 	unsigned int index;
 	__cli();
-	if (ps2_keyboard_buffer_siz < CONFIG_PS2_KEYBOARD_BUFFER_SIZE) {
+	if (ps2_keyboard_buffer_siz < CONFIG_KERNEL_X86_DEBUGGER_PS2_KEYBOARD_BUFFER_SIZE) {
 		if (ps2_keyboard_buffer_pos >= ps2_keyboard_buffer_siz) {
 			index = ps2_keyboard_buffer_pos - ps2_keyboard_buffer_siz;
 		} else {
 			index = ps2_keyboard_buffer_siz - ps2_keyboard_buffer_pos;
-			index = CONFIG_PS2_KEYBOARD_BUFFER_SIZE - index;
+			index = CONFIG_KERNEL_X86_DEBUGGER_PS2_KEYBOARD_BUFFER_SIZE - index;
 		}
 		ps2_keyboard_buffer[index] = byte;
 		++ps2_keyboard_buffer_siz;
@@ -230,12 +232,12 @@ NOTHROW(FCALL check_reset)(u8 f12) {
 		return;
 	prev = ps2_keyboard_buffer_pos;
 	if (!prev)
-		prev = CONFIG_PS2_KEYBOARD_BUFFER_SIZE;
+		prev = CONFIG_KERNEL_X86_DEBUGGER_PS2_KEYBOARD_BUFFER_SIZE;
 	--prev;
 	if (ps2_keyboard_buffer[prev] != f12)
 		return;
 	if (!prev)
-		prev = CONFIG_PS2_KEYBOARD_BUFFER_SIZE;
+		prev = CONFIG_KERNEL_X86_DEBUGGER_PS2_KEYBOARD_BUFFER_SIZE;
 	--prev;
 	if (ps2_keyboard_buffer[prev] != f12)
 		return;
@@ -267,11 +269,11 @@ NOTHROW(FCALL ps2_keyboard_putbyte)(u8 byte) {
 
 	default: break;
 	}
-	if (ps2_keyboard_buffer_pos >= CONFIG_PS2_KEYBOARD_BUFFER_SIZE)
+	if (ps2_keyboard_buffer_pos >= CONFIG_KERNEL_X86_DEBUGGER_PS2_KEYBOARD_BUFFER_SIZE)
 		ps2_keyboard_buffer_pos = 0;
 	ps2_keyboard_buffer[ps2_keyboard_buffer_pos] = byte;
 	++ps2_keyboard_buffer_pos;
-	if (ps2_keyboard_buffer_siz < CONFIG_PS2_KEYBOARD_BUFFER_SIZE)
+	if (ps2_keyboard_buffer_siz < CONFIG_KERNEL_X86_DEBUGGER_PS2_KEYBOARD_BUFFER_SIZE)
 		++ps2_keyboard_buffer_siz;
 }
 
@@ -1594,6 +1596,6 @@ NOTHROW(KCALL x86_debug_finalize_ps2_keyboard)(void) {
 
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_INPUT_C */

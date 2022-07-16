@@ -30,17 +30,20 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <debugger/debugger.h>
 #include <debugger/io.h>
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/fs/super.h>
 #include <kernel/malloc-defs.h>
 #include <kernel/uname.h>
 
-#include <kos/build-config.h>
+#include <kos/config/toolchain.h>
 
 DECL_BEGIN
 
+
+/* TODO: automatically generate from `kos/misc/config/options.dat' */
 PRIVATE ATTR_DBGSTRINGS char const build_config[] =
 "toolchain:\n"
 "	binutils: " AC_WHITE(KOS_BUILD_CONFIG_TOOLCHAIN_BINUTILS_VERSION) "\n"
@@ -55,14 +58,14 @@ PRIVATE ATTR_DBGSTRINGS char const build_config[] =
 local CONFIGS = {
 	"NDEBUG",
 	"__OPTIMIZE__",
-	"CONFIG_HAVE_FS_NOTIFY",
-	"CONFIG_HAVE_DEBUGGER",
+	"CONFIG_HAVE_KERNEL_FS_NOTIFY",
+	"CONFIG_HAVE_KERNEL_DEBUGGER",
 	"?CONFIG_MAX_CPU_COUNT",
-	"CONFIG_DEBUG_HEAP",
-	"CONFIG_HEAP_RANDOMIZE_OFFSETS",
-	"CONFIG_HEAP_TRACE_DANGLE",
-	"CONFIG_TRACE_MALLOC",
-	"CONFIG_USE_SLAB_ALLOCATORS",
+	"CONFIG_HAVE_KERNEL_DEBUG_HEAP",
+	"CONFIG_HAVE_KERNEL_HEAP_RANDOMIZE_OFFSETS",
+	"CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE",
+	"CONFIG_HAVE_KERNEL_TRACE_MALLOC",
+	"CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS",
 }.sorted([](x) -> x.lstrip("?"));
 
 local longestNameLen = CONFIGS.each.lstrip("?").length > ...;
@@ -81,46 +84,46 @@ for (local config: CONFIGS) {
 	print("#endif /" "* !", name, " *" "/");
 }
 ]]]*/
-#ifdef CONFIG_DEBUG_HEAP
-"	CONFIG_DEBUG_HEAP:             " AC_WHITE("yes") "\n"
-#else /* CONFIG_DEBUG_HEAP */
-"	CONFIG_DEBUG_HEAP:             " AC_WHITE("no") "\n"
-#endif /* !CONFIG_DEBUG_HEAP */
-#ifdef CONFIG_HAVE_DEBUGGER
-"	CONFIG_HAVE_DEBUGGER:          " AC_WHITE("yes") "\n"
-#else /* CONFIG_HAVE_DEBUGGER */
-"	CONFIG_HAVE_DEBUGGER:          " AC_WHITE("no") "\n"
-#endif /* !CONFIG_HAVE_DEBUGGER */
-#ifdef CONFIG_HAVE_FS_NOTIFY
-"	CONFIG_HAVE_FS_NOTIFY:         " AC_WHITE("yes") "\n"
-#else /* CONFIG_HAVE_FS_NOTIFY */
-"	CONFIG_HAVE_FS_NOTIFY:         " AC_WHITE("no") "\n"
-#endif /* !CONFIG_HAVE_FS_NOTIFY */
-#ifdef CONFIG_HEAP_RANDOMIZE_OFFSETS
-"	CONFIG_HEAP_RANDOMIZE_OFFSETS: " AC_WHITE("yes") "\n"
-#else /* CONFIG_HEAP_RANDOMIZE_OFFSETS */
-"	CONFIG_HEAP_RANDOMIZE_OFFSETS: " AC_WHITE("no") "\n"
-#endif /* !CONFIG_HEAP_RANDOMIZE_OFFSETS */
-#ifdef CONFIG_HEAP_TRACE_DANGLE
-"	CONFIG_HEAP_TRACE_DANGLE:      " AC_WHITE("yes") "\n"
-#else /* CONFIG_HEAP_TRACE_DANGLE */
-"	CONFIG_HEAP_TRACE_DANGLE:      " AC_WHITE("no") "\n"
-#endif /* !CONFIG_HEAP_TRACE_DANGLE */
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
+"	CONFIG_HAVE_KERNEL_DEBUG_HEAP:             " AC_WHITE("yes") "\n"
+#else /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
+"	CONFIG_HAVE_KERNEL_DEBUG_HEAP:             " AC_WHITE("no") "\n"
+#endif /* !CONFIG_HAVE_KERNEL_DEBUG_HEAP */
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
+"	CONFIG_HAVE_KERNEL_DEBUGGER:          " AC_WHITE("yes") "\n"
+#else /* CONFIG_HAVE_KERNEL_DEBUGGER */
+"	CONFIG_HAVE_KERNEL_DEBUGGER:          " AC_WHITE("no") "\n"
+#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
+"	CONFIG_HAVE_KERNEL_FS_NOTIFY:         " AC_WHITE("yes") "\n"
+#else /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
+"	CONFIG_HAVE_KERNEL_FS_NOTIFY:         " AC_WHITE("no") "\n"
+#endif /* !CONFIG_HAVE_KERNEL_FS_NOTIFY */
+#ifdef CONFIG_HAVE_KERNEL_HEAP_RANDOMIZE_OFFSETS
+"	CONFIG_HAVE_KERNEL_HEAP_RANDOMIZE_OFFSETS: " AC_WHITE("yes") "\n"
+#else /* CONFIG_HAVE_KERNEL_HEAP_RANDOMIZE_OFFSETS */
+"	CONFIG_HAVE_KERNEL_HEAP_RANDOMIZE_OFFSETS: " AC_WHITE("no") "\n"
+#endif /* !CONFIG_HAVE_KERNEL_HEAP_RANDOMIZE_OFFSETS */
+#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
+"	CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE:      " AC_WHITE("yes") "\n"
+#else /* CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
+"	CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE:      " AC_WHITE("no") "\n"
+#endif /* !CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
 #ifdef CONFIG_MAX_CPU_COUNT
 "	CONFIG_MAX_CPU_COUNT:          " AC_WHITE("yes (" PP_STR(CONFIG_MAX_CPU_COUNT) ")") "\n"
 #else /* CONFIG_MAX_CPU_COUNT */
 "	CONFIG_MAX_CPU_COUNT:          " AC_WHITE("no") "\n"
 #endif /* !CONFIG_MAX_CPU_COUNT */
-#ifdef CONFIG_TRACE_MALLOC
-"	CONFIG_TRACE_MALLOC:           " AC_WHITE("yes") "\n"
-#else /* CONFIG_TRACE_MALLOC */
-"	CONFIG_TRACE_MALLOC:           " AC_WHITE("no") "\n"
-#endif /* !CONFIG_TRACE_MALLOC */
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
-"	CONFIG_USE_SLAB_ALLOCATORS:    " AC_WHITE("yes") "\n"
-#else /* CONFIG_USE_SLAB_ALLOCATORS */
-"	CONFIG_USE_SLAB_ALLOCATORS:    " AC_WHITE("no") "\n"
-#endif /* !CONFIG_USE_SLAB_ALLOCATORS */
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
+"	CONFIG_HAVE_KERNEL_TRACE_MALLOC:           " AC_WHITE("yes") "\n"
+#else /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
+"	CONFIG_HAVE_KERNEL_TRACE_MALLOC:           " AC_WHITE("no") "\n"
+#endif /* !CONFIG_HAVE_KERNEL_TRACE_MALLOC */
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
+"	CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS:    " AC_WHITE("yes") "\n"
+#else /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
+"	CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS:    " AC_WHITE("no") "\n"
+#endif /* !CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 #ifdef NDEBUG
 "	NDEBUG:                        " AC_WHITE("yes") "\n"
 #else /* NDEBUG */
@@ -160,6 +163,6 @@ DBG_NAMED_COMMAND(build_config, "build-config",
 }
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_SRC_DEBUGGER_APPS_BUILD_CONFIG_C */

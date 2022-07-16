@@ -25,7 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
 #include <debugger/rt.h>
 #include <kernel/types.h>
@@ -644,6 +644,6 @@ NOTHROW(FCALL ctype_fromdw_subroutine)(struct cmodule *__restrict mod,
 	             cmodsyminfo_getdip(self), presult)
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_MODDBX_INCLUDE_CTYPE_H */

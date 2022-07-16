@@ -46,7 +46,7 @@ for (local o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3",
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
 #include <debugger/rt.h>
 #include <kernel/types.h>
@@ -2987,7 +2987,7 @@ NOTHROW(FCALL ctype_eval)(struct cparser *__restrict self,
 
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 #endif /* !__clang_tidy__ */
 
 #endif /* !GUARD_MODDBX_CEVAL_C */

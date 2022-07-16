@@ -78,8 +78,8 @@ again_loadheader:
 		/* Load the file header. */
 		read_bytes = mfile_read(args->ea_xfile, args->ea_header,
 		                        sizeof(args->ea_header), 0);
-		if unlikely(read_bytes < CONFIG_EXECABI_MAXHEADER)
-			bzero(args->ea_header + read_bytes, CONFIG_EXECABI_MAXHEADER - read_bytes);
+		if unlikely(read_bytes < EXECABI_MAXHEADER)
+			bzero(args->ea_header + read_bytes, EXECABI_MAXHEADER - read_bytes);
 	} EXCEPT {
 		decref_unlikely(abis);
 		RETHROW();
@@ -145,12 +145,14 @@ again_loadheader:
 /* System initialization loader (initial-exec for /bin/init)            */
 /************************************************************************/
 
-#ifndef CONFIG_DEFAULT_USERSPACE_INIT
-#define CONFIG_DEFAULT_USERSPACE_INIT "/bin/init"
-#endif /* !CONFIG_DEFAULT_USERSPACE_INIT */
+/*[[[config CONFIG_KERNEL_DEFAULT_USERSPACE_INIT = '/bin/init']]]*/
+#ifndef CONFIG_KERNEL_DEFAULT_USERSPACE_INIT
+#define CONFIG_KERNEL_DEFAULT_USERSPACE_INIT "/bin/init"
+#endif /* !CONFIG_KERNEL_DEFAULT_USERSPACE_INIT */
+/*[[[end]]]*/
 
 /* Commandline configuration for the initial user-space binary to execute. */
-INTERN_CONST ATTR_FREERODATA char const kernel_init_binary_default[] = CONFIG_DEFAULT_USERSPACE_INIT;
+INTERN_CONST ATTR_FREERODATA char const kernel_init_binary_default[] = CONFIG_KERNEL_DEFAULT_USERSPACE_INIT;
 INTERN ATTR_FREEDATA char const *kernel_init_binary = kernel_init_binary_default;
 DEFINE_KERNEL_COMMANDLINE_OPTION(kernel_init_binary,
                                  KERNEL_COMMANDLINE_OPTION_TYPE_STRING, "init");

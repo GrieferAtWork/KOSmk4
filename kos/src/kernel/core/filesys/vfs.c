@@ -65,6 +65,12 @@ NOTHROW(FCALL vfs_destroy)(struct vfs *__restrict self) {
 }
 
 
+/*[[[config CONFIG_KERNEL_VFS_RECENT_MAX_DEFAULT! = 128]]]*/
+#ifndef CONFIG_KERNEL_VFS_RECENT_MAX_DEFAULT
+#define CONFIG_KERNEL_VFS_RECENT_MAX_DEFAULT 128
+#endif /* !CONFIG_KERNEL_VFS_RECENT_MAX_DEFAULT */
+/*[[[end]]]*/
+
 
 /* Default kernel and /bin/init VFS controller. */
 PUBLIC struct vfs vfs_kernel = {
@@ -77,7 +83,7 @@ PUBLIC struct vfs vfs_kernel = {
 	.vf_mountslock = ATOMIC_LOCK_INIT,
 	.vf_recent     = TAILQ_HEAD_INITIALIZER(vfs_kernel.vf_recent),
 	.vf_recentcnt  = 0,
-	.vf_recentmax  = CONFIG_VFS_RECENT_MAX_DEFAULT,
+	.vf_recentmax  = CONFIG_KERNEL_VFS_RECENT_MAX_DEFAULT,
 	.vf_recentlock = ATOMIC_LOCK_INIT,
 	.vf_recentlops = SLIST_HEAD_INITIALIZER(vfs_kernel.vf_recentlops),
 	.vf_drives     = { NULL, },

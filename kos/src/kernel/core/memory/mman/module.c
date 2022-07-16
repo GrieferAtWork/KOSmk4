@@ -46,26 +46,26 @@
 #include <libunwind/arch-register.h>
 #endif /* __ARCH_HAVE_COMPAT */
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <sched/task.h>
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 /**/
 #include "module-userelf.h"
 
 /* Support for `unwind_for_debug(3)' */
-#ifdef CONFIG_HAVE_USERELF_MODULES
+#ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
 #include <libunwind/unwind.h>
 #include <libdebuginfo/debug_frame.h>
-#endif /* CONFIG_HAVE_USERELF_MODULES */
+#endif /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
 
 DECL_BEGIN
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #define CURRENT_MMAN (unlikely(dbg_active) ? dbg_current->t_mman : THIS_MMAN)
-#else /* CONFIG_HAVE_DEBUGGER */
+#else /* CONFIG_HAVE_KERNEL_DEBUGGER */
 #define CURRENT_MMAN THIS_MMAN
-#endif /* !CONFIG_HAVE_DEBUGGER */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset
@@ -384,12 +384,12 @@ NOTHROW(FCALL module_clear_mnode_pointers_and_destroy)(WEAK REF struct module *_
  * If no module exists at `addr', return `NULL'. */
 PUBLIC BLOCKING WUNUSED REF struct module *FCALL
 module_fromaddr(USER CHECKED void const *addr) {
-#ifdef CONFIG_HAVE_USERELF_MODULES
+#ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
 	if (ADDR_ISUSER(addr))
 		return uem_fromaddr(CURRENT_MMAN, addr);
-#else /* CONFIG_HAVE_USERELF_MODULES */
+#else /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
 #define _MODULE_FROMADDR_IS_NOTHROW
-#endif /* !CONFIG_HAVE_USERELF_MODULES */
+#endif /* !CONFIG_HAVE_KERNEL_USERELF_MODULES */
 	return driver_fromaddr(addr);
 }
 
@@ -398,7 +398,7 @@ module_fromaddr(USER CHECKED void const *addr) {
  * return `NULL' instead. */
 PUBLIC BLOCKING WUNUSED REF struct module *FCALL
 module_aboveaddr(USER CHECKED void const *addr) {
-#ifdef CONFIG_HAVE_USERELF_MODULES
+#ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
 #ifdef KERNELSPACE_HIGHMEM
 	if (ADDR_ISUSER(addr)) {
 		REF struct module *result;
@@ -418,10 +418,10 @@ module_aboveaddr(USER CHECKED void const *addr) {
 	}
 	return uem_aboveaddr(CURRENT_MMAN, addr);
 #endif /* !KERNELSPACE_HIGHMEM */
-#else /* CONFIG_HAVE_USERELF_MODULES */
+#else /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
 #define _MODULE_ABOVEADDR_IS_NOTHROW
 	return driver_aboveaddr(addr);
-#endif /* !CONFIG_HAVE_USERELF_MODULES */
+#endif /* !CONFIG_HAVE_KERNEL_USERELF_MODULES */
 }
 
 /* Return  a  reference  to  the  first  module  different  from  `prev',  such  that
@@ -429,7 +429,7 @@ module_aboveaddr(USER CHECKED void const *addr) {
  * first module, which is the same as returned by `module_aboveaddr((void const *)0)' */
 PUBLIC BLOCKING WUNUSED REF struct module *FCALL
 module_next(struct module *prev) {
-#ifdef CONFIG_HAVE_USERELF_MODULES
+#ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
 	if (!prev)
 		return module_aboveaddr((void const *)0);
 	if (prev->md_ops == &uem_ops) {
@@ -458,10 +458,10 @@ module_next(struct module *prev) {
 	}
 	return uem_aboveaddr(CURRENT_MMAN, (void const *)USERSPACE_START);
 #endif /* !KERNELSPACE_HIGHMEM */
-#else /* CONFIG_HAVE_USERELF_MODULES */
+#else /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
 #define _MODULE_NEXT_IS_NOTHROW
 	return driver_next((struct driver *)prev);
-#endif /* !CONFIG_HAVE_USERELF_MODULES */
+#endif /* !CONFIG_HAVE_KERNEL_USERELF_MODULES */
 }
 
 
@@ -520,17 +520,17 @@ NOTHROW(FCALL module_next_nx)(struct module *prev) {
  * usual THIS_MMAN/mman_kernel hybrid-combo, based on the given
  * `addr', operate exclusively on the given mman `self'
  * @param: self: The mman who's modules should be enumerated. */
-#ifdef CONFIG_HAVE_USERELF_MODULES
+#ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
 PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL
 mman_module_fromaddr(struct mman *__restrict self,
                      USER CHECKED void const *addr) {
 	if (self == &mman_kernel)
 		return driver_fromaddr(addr);
-#ifdef CONFIG_HAVE_USERELF_MODULES
+#ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
 	return uem_fromaddr(self, addr);
-#else /* CONFIG_HAVE_USERELF_MODULES */
+#else /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
 	return NULL;
-#endif /* !CONFIG_HAVE_USERELF_MODULES */
+#endif /* !CONFIG_HAVE_KERNEL_USERELF_MODULES */
 }
 
 PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL
@@ -538,22 +538,22 @@ mman_module_aboveaddr(struct mman *__restrict self,
                       USER CHECKED void const *addr) {
 	if (self == &mman_kernel)
 		return driver_aboveaddr(addr);
-#ifdef CONFIG_HAVE_USERELF_MODULES
+#ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
 	return uem_aboveaddr(self, addr);
-#else /* CONFIG_HAVE_USERELF_MODULES */
+#else /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
 	return NULL;
-#endif /* !CONFIG_HAVE_USERELF_MODULES */
+#endif /* !CONFIG_HAVE_KERNEL_USERELF_MODULES */
 }
 
 PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL
 mman_module_next(struct mman *__restrict self, struct module *prev) {
 	if (self == &mman_kernel)
 		return driver_next(prev);
-#ifdef CONFIG_HAVE_USERELF_MODULES
+#ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
 	return uem_next(self, prev);
-#else /* CONFIG_HAVE_USERELF_MODULES */
+#else /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
 	return NULL;
-#endif /* !CONFIG_HAVE_USERELF_MODULES */
+#endif /* !CONFIG_HAVE_KERNEL_USERELF_MODULES */
 }
 
 PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *
@@ -592,7 +592,7 @@ NOTHROW(FCALL mman_module_next_nx)(struct mman *__restrict self,
 	return result;
 }
 
-#else /* CONFIG_HAVE_USERELF_MODULES */
+#else /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
 PUBLIC BLOCKING WUNUSED NONNULL((1)) REF struct module *FCALL
 mman_module_fromaddr(struct mman *__restrict self,
                      USER CHECKED void const *addr) {
@@ -618,10 +618,10 @@ mman_module_next(struct mman *__restrict self, struct module *prev) {
 DEFINE_PUBLIC_ALIAS(mman_module_fromaddr_nx, mman_module_fromaddr);
 DEFINE_PUBLIC_ALIAS(mman_module_aboveaddr_nx, mman_module_aboveaddr);
 DEFINE_PUBLIC_ALIAS(mman_module_next_nx, mman_module_next);
-#endif /* !CONFIG_HAVE_USERELF_MODULES */
+#endif /* !CONFIG_HAVE_KERNEL_USERELF_MODULES */
 
 
-#ifdef CONFIG_HAVE_USERELF_MODULES
+#ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
 LOCAL NONNULL((1, 5, 7)) unsigned int KCALL
 unwind_userspace_with_section(struct module *__restrict mod, void const *absolute_pc,
                               byte_t const *eh_frame_data, size_t eh_frame_size,
@@ -770,7 +770,7 @@ unwind_for_debug(void const *absolute_pc,
 	}
 	return result;
 }
-#else /* CONFIG_HAVE_USERELF_MODULES */
+#else /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
 PUBLIC NONNULL((2, 4)) unsigned int LIBDEBUGINFO_CC
 unwind_for_debug(void const *absolute_pc,
                  unwind_getreg_t reg_getter, void const *reg_getter_arg,
@@ -780,7 +780,7 @@ unwind_for_debug(void const *absolute_pc,
 	              reg_getter, reg_getter_arg,
 	              reg_setter, reg_setter_arg);
 }
-#endif /* !CONFIG_HAVE_USERELF_MODULES */
+#endif /* !CONFIG_HAVE_KERNEL_USERELF_MODULES */
 
 DECL_END
 

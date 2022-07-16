@@ -22,10 +22,21 @@
 
 #include <kernel/compiler.h>
 
-/* CONFIG: Enable some sanity checks to assert that `tsc_get()' never runs backwards. */
-#undef CONFIG_TSC_ASSERT_FORWARD
+/*[[[config CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD: bool = !defined(NDEBUG)
+ * Enable some sanity checks to assert that `tsc_get()' never runs backwards.
+ * ]]]*/
+#ifdef CONFIG_NO_KERNEL_X86_TSC_ASSERT_FORWARD
+#undef CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD
+#elif !defined(CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD)
 #ifndef NDEBUG
-#define CONFIG_TSC_ASSERT_FORWARD 1
-#endif /* !NDEBUG */
+#define CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD
+#else /* !NDEBUG */
+#define CONFIG_NO_KERNEL_X86_TSC_ASSERT_FORWARD
+#endif /* NDEBUG */
+#elif (-CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD - 1) == -1
+#undef CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD
+#define CONFIG_NO_KERNEL_X86_TSC_ASSERT_FORWARD
+#endif /* ... */
+/*[[[end]]]*/
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_SCHED_TSC_H */

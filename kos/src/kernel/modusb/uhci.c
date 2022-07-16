@@ -19,7 +19,7 @@
  */
 #ifndef GUARD_MODUSB_UHCI_C
 #define GUARD_MODUSB_UHCI_C 1
-#define CONFIG_BUILDING_MODUSB 1
+#define BUILDING_MODUSB
 #define _KOS_SOURCE 1
 
 #include "uhci.h"

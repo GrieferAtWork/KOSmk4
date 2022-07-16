@@ -25,7 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <kernel/malloc-defs.h>
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 
 #include <kernel/driver-param.h>
 #include <kernel/heap.h>
@@ -135,6 +135,6 @@ DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(kernel_disable_slab,
 
 DECL_END
 
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_MEMORY_SLAB_C */

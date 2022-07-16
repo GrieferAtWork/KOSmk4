@@ -3093,9 +3093,11 @@ readlock_tls_data_doadd_impl(struct readlock_tls_data *__restrict self,
 	return EOK;
 }
 
-#ifndef CONFIG_READLOCK_TLS_DATA_INITIAL_MASK
-#define CONFIG_READLOCK_TLS_DATA_INITIAL_MASK 7
-#endif /* !CONFIG_READLOCK_TLS_DATA_INITIAL_MASK */
+/*[[[config CONFIG_LIBC_READLOCK_TLS_DATA_INITIAL_MASK! = 7]]]*/
+#ifndef CONFIG_LIBC_READLOCK_TLS_DATA_INITIAL_MASK
+#define CONFIG_LIBC_READLOCK_TLS_DATA_INITIAL_MASK 7
+#endif /* !CONFIG_LIBC_READLOCK_TLS_DATA_INITIAL_MASK */
+/*[[[end]]]*/
 
 /* Add the given `lck' to `self' */
 PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1, 2)) errno_t CC
@@ -3105,7 +3107,7 @@ readlock_tls_data_doadd(struct readlock_tls_data *__restrict self,
 	if (((self->rtd_rdlock_size + 1) * 3) / 2 >= self->rtd_rdlock_mask) {
 		/* Must rehash! */
 		struct readlock_bucket *new_list;
-		size_t new_mask = CONFIG_READLOCK_TLS_DATA_INITIAL_MASK;
+		size_t new_mask = CONFIG_LIBC_READLOCK_TLS_DATA_INITIAL_MASK;
 		size_t thresh   = ((self->rtd_rdlock_used + 1) * 3) / 2;
 		while (thresh >= new_mask)
 			new_mask = (new_mask << 1) | 1;
@@ -3113,7 +3115,7 @@ readlock_tls_data_doadd(struct readlock_tls_data *__restrict self,
 		if unlikely(!new_list) {
 			if ((self->rtd_rdlock_size + 1) <= self->rtd_rdlock_mask)
 				goto doadd;
-			new_mask = CONFIG_READLOCK_TLS_DATA_INITIAL_MASK;
+			new_mask = CONFIG_LIBC_READLOCK_TLS_DATA_INITIAL_MASK;
 			while ((self->rtd_rdlock_used + 1) > self->rtd_rdlock_mask)
 				new_mask = (new_mask << 1) | 1;
 			new_list = (struct readlock_bucket *)calloc(new_mask + 1, sizeof(struct readlock_bucket));
@@ -3132,9 +3134,9 @@ doadd:
 PRIVATE ATTR_SECTION(".text.crt.sched.pthread") NONNULL((1)) void CC
 readlock_tls_data_rehash_after_remove(struct readlock_tls_data *__restrict self) {
 	if ((self->rtd_rdlock_used < (self->rtd_rdlock_mask / 3)) &&
-	    self->rtd_rdlock_mask > CONFIG_READLOCK_TLS_DATA_INITIAL_MASK) {
+	    self->rtd_rdlock_mask > CONFIG_LIBC_READLOCK_TLS_DATA_INITIAL_MASK) {
 		/* Try to shrink the hash-vector's mask size. */
-		size_t new_mask = CONFIG_READLOCK_TLS_DATA_INITIAL_MASK;
+		size_t new_mask = CONFIG_LIBC_READLOCK_TLS_DATA_INITIAL_MASK;
 		size_t thresh   = ((self->rtd_rdlock_used + 1) * 3) / 2;
 		while (thresh >= new_mask)
 			new_mask = (new_mask << 1) | 1;

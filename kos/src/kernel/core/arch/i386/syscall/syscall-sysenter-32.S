@@ -110,7 +110,7 @@ END(x86_syscall32_sysenter)
 /************************************************************************/
 /* SYSENTER TRACED ENTRY                                                */
 /************************************************************************/
-#ifndef CONFIG_NO_SYSCALL_TRACING
+#ifndef CONFIG_NO_KERNEL_SYSCALL_TRACING
 .section .text.hot
 PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	.cfi_startproc simple
@@ -259,7 +259,7 @@ PUBLIC_FUNCTION(x86_syscall32_sysenter_traced)
 	jmp    __asm32_bad_sysenter_extension
 	.cfi_endproc
 END(x86_syscall32_sysenter_traced)
-#endif /* !CONFIG_NO_SYSCALL_TRACING */
+#endif /* !CONFIG_NO_KERNEL_SYSCALL_TRACING */
 
 
 
@@ -333,11 +333,11 @@ PUBLIC_FUNCTION(x86_syscall_emulate_sysenter_r)
 	 *    though the CPU had supported the instruction from the get-go, using
 	 *    the same assembly-level  wrappers that would  normally be used  for
 	 *    routing a real sysenter system call invocation. */
-#ifndef CONFIG_NO_SYSCALL_TRACING
+#ifndef CONFIG_NO_KERNEL_SYSCALL_TRACING
 	EXTERN(syscall_tracing_enabled)
 	cmpb   $(0), %ss:syscall_tracing_enabled
 	jne    .Ldo_prepared_sysenter_traced /* With tracing enabled... */
-#endif /* !CONFIG_NO_SYSCALL_TRACING */
+#endif /* !CONFIG_NO_KERNEL_SYSCALL_TRACING */
 	jmp    .Ldo_prepared_sysenter
 	.cfi_endproc
 END(x86_syscall_emulate_sysenter_r)

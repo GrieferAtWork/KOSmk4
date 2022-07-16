@@ -52,9 +52,9 @@
  * - Once a slab page contains no further in-use segments, it is added to the pool
  *   of  free pages. If the pool would then exceed its limit, the oldest free page
  *   is released to the core.
- * - Slab allocators are used for all fixed-length allocations `<= SLAB_MAXSIZE'
+ * - Slab allocators are used for all fixed-length allocations `<= CONFIG_KERNEL_SLAB_MAXSIZE'
  * - Slab sizes have a granularity of `sizeof(void *)', with all possible values
- *   that are `<= SLAB_MAXSIZE' having a dedicated slab.
+ *   that   are   `<= CONFIG_KERNEL_SLAB_MAXSIZE'  having   a   dedicated  slab.
  * - Since slab-memory  cannot be  realloc()'ed,  by default  only  kmalloc()
  *   will allocate  slab memory,  while krealloc()  will only  ever  allocate
  *   actual heap memory.  However, krealloc(SLAB_PTR) still  works, but  will
@@ -62,7 +62,7 @@
  *   block  size didn't change (and even then:  it's not guarantied to do so) */
 
 
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 #ifdef __CC__
 DECL_BEGIN
 
@@ -95,19 +95,19 @@ struct slab {
 #define PRIVATE_SLAB_SEGMENT_COUNT(segment_size) \
 	((PAGESIZE - 4 * __SIZEOF_POINTER__) / (segment_size))
 
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 #define SLAB_SEGMENT_STATUS_FREE  0 /* Segment is free. */
 #define SLAB_SEGMENT_STATUS_ALLOC 1 /* Segment is allocated. */
 /*      SLAB_SEGMENT_STATUS_      2  * ... */
 #define SLAB_SEGMENT_STATUS_REACH 3 /* Segment is reachable. */
 #define SLAB_SEGMENT_STATUS_MASK  3 /* Mask of bits */
 #define SLAB_SEGMENT_STATUS_BITS  2 /* # of status bits per slab. */
-#else /* CONFIG_TRACE_MALLOC */
+#else /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 #define SLAB_SEGMENT_STATUS_FREE  0 /* Segment is free. */
 #define SLAB_SEGMENT_STATUS_ALLOC 1 /* Segment is allocated. */
 #define SLAB_SEGMENT_STATUS_MASK  1 /* Mask of bits */
 #define SLAB_SEGMENT_STATUS_BITS  1 /* # of status bits per slab. */
-#endif /* !CONFIG_TRACE_MALLOC */
+#endif /* !CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 
 /* Return a base-pointer to the status-bitset of `self' */
 #define _SLAB_SEGMENT_STATUS_BITSET(self) ((uintptr_t *)((struct slab *)(self) + 1))
@@ -174,43 +174,42 @@ struct slab {
 #define PRIVATE_SLAB_GET_HINT2(a, b) b
 #define PRIVATE_SLAB_GET_HINT(x)     PRIVATE_SLAB_GET_HINT2 x
 
-#undef CONFIG_SLAB_GROWS_UPWARDS
-#undef CONFIG_SLAB_GROWS_DOWNWARDS
+#undef SLAB_CONFIG_GROWS_UPWARDS
+#undef SLAB_CONFIG_GROWS_DOWNWARDS
 #if (PRIVATE_SLAB_GET_HINT(KERNEL_MHINT_SLAB) & (__MAP_GROWSUP | __MAP_GROWSDOWN)) == __MAP_GROWSDOWN
-#define CONFIG_SLAB_GROWS_DOWNWARDS 1
+#define SLAB_CONFIG_GROWS_DOWNWARDS 1
 #else /* (PRIVATE_SLAB_GET_HINT(KERNEL_MHINT_SLAB) & (__MAP_GROWSUP | __MAP_GROWSDOWN)) == __MAP_GROWSDOWN */
-#define CONFIG_SLAB_GROWS_UPWARDS 1
+#define SLAB_CONFIG_GROWS_UPWARDS 1
 #endif /* (PRIVATE_SLAB_GET_HINT(KERNEL_MHINT_SLAB) & (__MAP_GROWSUP | __MAP_GROWSDOWN)) != __MAP_GROWSDOWN */
 
-
-#define KERNEL_SLAB_INITIAL \
+#define SLAB_CONFIG_INITIAL_BREAK \
 	PRIVATE_SLAB_GET_ADDR(KERNEL_MHINT_SLAB)
 
 /* [lock(mman_kernel.mm_lock)]
- * The pointer to either the lowest (CONFIG_SLAB_GROWS_DOWNWARDS), or
- * one past the greatest (CONFIG_SLAB_GROWS_UPWARDS) address that was
+ * The pointer to either the lowest (SLAB_CONFIG_GROWS_DOWNWARDS), or
+ * one past the greatest (SLAB_CONFIG_GROWS_UPWARDS) address that was
  * ever allocated for slab memory.
  * Since slab allocations don't carry any meta-data, they are actually
  * identified by their address, meaning that we need to keep track  of
  * the max range of pointers associated with the slab allocator.
- * NOTE: This value starts out as `KERNEL_SLAB_INITIAL', and is only
- *       ever extended in  one direction, based  on the slab  growth
+ * NOTE: This  value starts out as `SLAB_CONFIG_INITIAL_BREAK', and is
+ *       only ever extended in one direction, based on the slab growth
  *       direction. */
 DATDEF void *kernel_slab_break;
 
 
 /* The starting/end address of slab allocated memory. */
-#ifdef CONFIG_SLAB_GROWS_DOWNWARDS
+#ifdef SLAB_CONFIG_GROWS_DOWNWARDS
 #define KERNEL_SLAB_START kernel_slab_break
-#define KERNEL_SLAB_END   KERNEL_SLAB_INITIAL
+#define KERNEL_SLAB_END   SLAB_CONFIG_INITIAL_BREAK
 #define KERNEL_SLAB_MIN   kernel_slab_break
-#define KERNEL_SLAB_MAX   __CCAST(void *)(__CCAST(byte_t *)KERNEL_SLAB_INITIAL - PAGESIZE)
-#else /* CONFIG_SLAB_GROWS_DOWNWARDS */
-#define KERNEL_SLAB_START KERNEL_SLAB_INITIAL
+#define KERNEL_SLAB_MAX   __CCAST(void *)(__CCAST(byte_t *)SLAB_CONFIG_INITIAL_BREAK - PAGESIZE)
+#else /* SLAB_CONFIG_GROWS_DOWNWARDS */
+#define KERNEL_SLAB_START SLAB_CONFIG_INITIAL_BREAK
 #define KERNEL_SLAB_END   kernel_slab_break
-#define KERNEL_SLAB_MIN   KERNEL_SLAB_INITIAL
+#define KERNEL_SLAB_MIN   SLAB_CONFIG_INITIAL_BREAK
 #define KERNEL_SLAB_MAX   __CCAST(void *)(__CCAST(byte_t *)kernel_slab_break - PAGESIZE)
-#endif /* !CONFIG_SLAB_GROWS_DOWNWARDS */
+#endif /* !SLAB_CONFIG_GROWS_DOWNWARDS */
 
 /* Check if a given pointer belongs to the slab allocator,
  * and can be passed to `SLAB_GET()' in order to determine
@@ -246,9 +245,9 @@ struct slab_descriptor {
 	/* Data descriptor for some fixed-length-segment slab. */
 	struct atomic_lock                  sd_lock; /* Lock for this slab descriptor. */
 	struct slab_list                    sd_free; /* [0..n][lock(sd_lock)] Chain of partially free slab pages. */
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 	struct slab_list                    sd_used; /* [0..n][lock(sd_lock)] Chain of fully allocated slab pages. */
-#endif /* CONFIG_TRACE_MALLOC */
+#endif /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 	WEAK struct slab_pending_free_slist sd_pend; /* [0..1] Chain of pending free segments. (pseudo-lockop list) */
 };
 
@@ -270,6 +269,6 @@ struct slab_descriptor {
 
 DECL_END
 #endif /* __CC__ */
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_SLAB_H */

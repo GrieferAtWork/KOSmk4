@@ -39,7 +39,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x01): {
 		/* BLCFILL reg32, reg/mem32             8F RXB.09 0.dest.0.00 01 /1
 		 * BLCFILL reg64, reg/mem64             8F RXB.09 1.dest.0.00 01 /1 */
 		u32 eflags_addend = 0;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (op_flags & EMU86_F_VEX_W) {
 			/* 64-bit */
 			u64 temp, src;
@@ -51,7 +51,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x01): {
 			eflags_addend |= emu86_geteflags_SFq(temp);
 			eflags_addend |= emu86_geteflags_ZFq(temp);
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		{
 			/* 32-bit */
 			u32 temp, src;
@@ -79,7 +79,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x01): {
 		/* BLSFILL reg32, reg/mem32             8F RXB.09 0.dest.0.00 01 /2
 		 * BLSFILL reg64, reg/mem64             8F RXB.09 1.dest.0.00 01 /2 */
 		u32 eflags_addend = 0;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (op_flags & EMU86_F_VEX_W) {
 			/* 64-bit */
 			u64 temp, src;
@@ -91,7 +91,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x01): {
 			eflags_addend |= emu86_geteflags_SFq(temp);
 			eflags_addend |= emu86_geteflags_ZFq(temp);
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		{
 			/* 32-bit */
 			u32 temp, src;
@@ -119,7 +119,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x01): {
 		/* BLCS reg32, reg/mem32                8F RXB.09 0.dest.0.00 01 /3
 		 * BLCS reg64, reg/mem64                8F RXB.09 1.dest.0.00 01 /3 */
 		u32 eflags_addend = 0;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (op_flags & EMU86_F_VEX_W) {
 			/* 64-bit */
 			u64 temp, src;
@@ -131,7 +131,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x01): {
 			eflags_addend |= emu86_geteflags_SFq(temp);
 			eflags_addend |= emu86_geteflags_ZFq(temp);
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		{
 			/* 32-bit */
 			u32 temp, src;
@@ -159,7 +159,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x01): {
 		/* TZMSK reg32, reg/mem32               8F RXB.09 0.dest.0.00 01 /4
 		 * TZMSK reg64, reg/mem64               8F RXB.09 1.dest.0.00 01 /4 */
 		u32 eflags_addend = 0;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (op_flags & EMU86_F_VEX_W) {
 			/* 64-bit */
 			u64 temp, src;
@@ -171,7 +171,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x01): {
 			eflags_addend |= emu86_geteflags_SFq(temp);
 			eflags_addend |= emu86_geteflags_ZFq(temp);
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		{
 			/* 32-bit */
 			u32 temp, src;
@@ -199,7 +199,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x01): {
 		/* BLCIC reg32, reg/mem32               8F RXB.09 0.dest.0.00 01 /5
 		 * BLCIC reg64, reg/mem64               8F RXB.09 1.dest.0.00 01 /5 */
 		u32 eflags_addend = 0;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (op_flags & EMU86_F_VEX_W) {
 			/* 64-bit */
 			u64 temp, src;
@@ -211,7 +211,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x01): {
 			eflags_addend |= emu86_geteflags_SFq(temp);
 			eflags_addend |= emu86_geteflags_ZFq(temp);
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		{
 			/* 32-bit */
 			u32 temp, src;
@@ -239,7 +239,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x01): {
 		/* BLSIC reg32, reg/mem32               8F RXB.09 0.dest.0.00 01 /6
 		 * BLSIC reg64, reg/mem64               8F RXB.09 1.dest.0.00 01 /6 */
 		u32 eflags_addend = 0;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (op_flags & EMU86_F_VEX_W) {
 			/* 64-bit */
 			u64 temp, src;
@@ -251,7 +251,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x01): {
 			eflags_addend |= emu86_geteflags_SFq(temp);
 			eflags_addend |= emu86_geteflags_ZFq(temp);
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		{
 			/* 32-bit */
 			u32 temp, src;
@@ -279,7 +279,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x01): {
 		/* T1MSKC reg32, reg/mem32              8F RXB.09 0.dest.0.00 01 /7
 		 * T1MSKC reg64, reg/mem64              8F RXB.09 1.dest.0.00 01 /7 */
 		u32 eflags_addend = 0;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (op_flags & EMU86_F_VEX_W) {
 			/* 64-bit */
 			u64 temp, src;
@@ -291,7 +291,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x01): {
 			eflags_addend |= emu86_geteflags_SFq(temp);
 			eflags_addend |= emu86_geteflags_ZFq(temp);
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		{
 			/* 32-bit */
 			u32 temp, src;
@@ -340,7 +340,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x02): {
 		/* BLCMSK reg32, reg/mem32              8F RXB.09 0.dest.0.00 02 /1
 		 * BLCMSK reg64, reg/mem64              8F RXB.09 1.dest.0.00 02 /1 */
 		u32 eflags_addend = 0;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (op_flags & EMU86_F_VEX_W) {
 			/* 64-bit */
 			u64 temp, src;
@@ -352,7 +352,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x02): {
 			eflags_addend |= emu86_geteflags_SFq(temp);
 			eflags_addend |= emu86_geteflags_ZFq(temp);
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		{
 			/* 32-bit */
 			u32 temp, src;
@@ -381,7 +381,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x02): {
 		/* BLCI reg32, reg/mem32                8F RXB.09 0.dest.0.00 02 /6
 		 * BLCI reg64, reg/mem64                8F RXB.09 1.dest.0.00 02 /6 */
 		u32 eflags_addend = 0;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (op_flags & EMU86_F_VEX_W) {
 			/* 64-bit */
 			u64 temp, src;
@@ -393,7 +393,7 @@ case EMU86_OPCODE_ENCODE_XOP(9, 0x02): {
 			eflags_addend |= emu86_geteflags_SFq(temp);
 			eflags_addend |= emu86_geteflags_ZFq(temp);
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		{
 			/* 32-bit */
 			u32 temp, src;
@@ -454,7 +454,7 @@ case EMU86_OPCODE_ENCODE_XOP(0xa, 0x10): {
 	imm.word = UNALIGNED_GETLE16((u16 const *)pc);
 	pc += 4;
 	eflags_addend = 0;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 	if (op_flags & EMU86_F_VEX_W) {
 		u64 value, result;
 		if (imm.start >= 64)
@@ -467,15 +467,15 @@ case EMU86_OPCODE_ENCODE_XOP(0xa, 0x10): {
 			eflags_addend |= EFLAGS_ZF;
 		MODRM_SETREGQ(result);
 	} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	{
 		if (imm.start >= 32) {
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 bextr_imm_write_dst_0:
 			MODRM_SETREGQ(0);
-#else /* CONFIG_LIBEMU86_WANT_64BIT */
+#else /* LIBEMU86_CONFIG_WANT_64BIT */
 			MODRM_SETREGL(0);
-#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* !LIBEMU86_CONFIG_WANT_64BIT */
 			eflags_addend |= EFLAGS_ZF; /* Result is 0 */
 		} else {
 			u32 value, result;

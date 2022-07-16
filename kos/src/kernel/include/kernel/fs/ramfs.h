@@ -29,6 +29,7 @@
 #include <kernel/fs/fifonode.h>
 #include <kernel/fs/filesys.h>
 #include <kernel/fs/node.h>
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/fs/regnode.h>
 #include <kernel/fs/socknode.h>
 #include <kernel/fs/super.h>
@@ -333,11 +334,11 @@ FUNDEF BLOCKING NONNULL((1, 2)) unsigned int KCALL
 ramfs_dirnode_v_rename(struct fdirnode *__restrict self,
                        struct frename_info *__restrict info)
 		THROWS(E_FSERROR_ILLEGAL_PATH, ...);
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 FUNDEF BLOCKING NONNULL((1)) void KCALL
 ramfs_dirnode_v_attach_notify(struct fdirnode *__restrict self)
 		THROWS(E_BADALLOC, ...);
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 
 
@@ -394,9 +395,9 @@ NOTHROW(KCALL ramfs_super_v_delete)(REF struct fsuper *__restrict self);
 #define ramfs_super_v_mkfile        ramfs_dirnode_v_mkfile
 #define ramfs_super_v_unlink        ramfs_dirnode_v_unlink
 #define ramfs_super_v_rename        ramfs_dirnode_v_rename
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 #define ramfs_super_v_attach_notify ramfs_dirnode_v_attach_notify
-#endif /* CONFIG_HAVE_FS_NOTIFY */
+#endif /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 /* Top-level ram filesystem descriptor. */
 DATDEF struct ffilesys ramfs_filesys;

@@ -125,10 +125,10 @@ __asm__("__ubsan_handle_builtin_unreachable = libc___ubsan_handle_builtin_unreac
 #include <crt-features/crt-kos-syscalls.h>
 #else /* !__KERNEL__ */
 
-#if defined(CONFIG_NO_ASSERT_RESTARTABLE) || defined(CONFIG_NO_DEBUGGER)
+#if defined(CONFIG_NO_ASSERT_RESTARTABLE) || defined(CONFIG_NO_KERNEL_DEBUGGER)
 #undef __CRT_HAVE___acheck
 #undef __CRT_HAVE___acheckf
-#endif /* CONFIG_NO_ASSERT_RESTARTABLE || CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_NO_ASSERT_RESTARTABLE || CONFIG_NO_KERNEL_DEBUGGER */
 
 #endif /* __KERNEL__ */
 
@@ -321,7 +321,7 @@ INTDEF atflag_t libd_AT_DOSPATH; /* Either `0' or `AT_DOSPATH' */
 
 
 #if 1
-#define CONFIG_LOG_LIBC_UNIMPLEMENTED 1
+#define LIBC_HAVE_LOG_UNIMPLEMENTED 1
 INTDEF void LIBCCALL libc_unimplemented(char const *__restrict name);
 INTDEF void VLIBCCALL libc_unimplementedf(char const *__restrict format, ...);
 #define CRT_UNIMPLEMENTED(name) libc_unimplemented(name)

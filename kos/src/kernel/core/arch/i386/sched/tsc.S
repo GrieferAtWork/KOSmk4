@@ -618,7 +618,7 @@ INTERN_FUNCTION(x86_load_thread_Pax_cpu_Pbx)
 #endif /* __x86_64__ */
 
 
-#ifdef CONFIG_FPU
+#ifdef CONFIG_HAVE_FPU
 	/* Disable the FPU, preparing it to be loaded lazily. */
 	movP   %cr0, %Pcx
 	andP   $(~CR0_TS), %Pcx
@@ -629,7 +629,7 @@ INTERN_FUNCTION(x86_load_thread_Pax_cpu_Pbx)
 	/* Only disable if the target thread isn't holding the active FPU-context */
 	orP    $(CR0_TS), %Pcx
 1:	movP   %Pcx, %cr0
-#endif /* CONFIG_FPU */
+#endif /* CONFIG_HAVE_FPU */
 
 	/* Check if the old thread had its I/O permissions bitmap loaded. */
 	EXTERN(thiscpu_x86_ioperm_bitmap)
@@ -746,14 +746,14 @@ END(x86_unwind_scpustate_Psp)
 	movl   %ecx, thiscpu_x86_ioperm_bitmap(%ebx)
 	movl   %ecx, 0x0(%Pdx)
 	movl   %ecx, 0x4(%Pdx)
-#ifndef CONFIG_NO_PAGING_PAE
+#ifndef CONFIG_NO_KERNEL_X86_PAGING_PAE
 INTERN_FUNCTION(__x86_lazy_disable_ioperm_bitmap_pae)
 	/* When  PAE  paging  is  disabled,  paging  initialization  overrides  this
 	 * instruction location with a `jmp __x86_lazy_disable_ioperm_bitmap_return' */
 	movl   %ecx, 0x8(%Pdx)
 	movl   %ecx, 0xc(%Pdx)
 END(__x86_lazy_disable_ioperm_bitmap_pae)
-#endif /* !CONFIG_NO_PAGING_PAE */
+#endif /* !CONFIG_NO_KERNEL_X86_PAGING_PAE */
 .alt_if X86_FEAT_INVLPG
 	invlpg (thiscpu_x86_iob + 0 * PAGESIZE)(%Pbx)
 	invlpg (thiscpu_x86_iob + 1 * PAGESIZE)(%Pbx)
@@ -768,7 +768,7 @@ END(x86_idt_preemption)
 
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 .section .text.cold
 INTERN_FUNCTION(x86_dbgidt_preemption) /* ISR_X86_f0 */
 	.cfi_startproc simple
@@ -884,7 +884,7 @@ INTERN_FUNCTION(x86_dbgidt_preemption) /* ISR_X86_f0 */
 #endif /* !__x86_64__ */
 	.cfi_endproc
 END(x86_dbgidt_preemption)
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 

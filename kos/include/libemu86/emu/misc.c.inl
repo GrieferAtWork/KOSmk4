@@ -301,11 +301,11 @@ case EMU86_OPCODE_ENCODE(0xff):
 		 *       FF /5    JMP m16:32    Jump far, absolute indirect, address given in m16:32.
 		 * REX.W FF /5    JMP m16:64    Jump far, absolute indirect, address given in m16:64. */
 #if EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LJMP_RM
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		u64 offset;
-#else /* CONFIG_LIBEMU86_WANT_64BIT */
+#else /* LIBEMU86_CONFIG_WANT_64BIT */
 		u32 offset;
-#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* !LIBEMU86_CONFIG_WANT_64BIT */
 		u16 cs;
 		byte_t *addr;
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY

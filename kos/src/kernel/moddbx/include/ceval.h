@@ -25,7 +25,7 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
 #include <kernel/types.h>
 
@@ -99,6 +99,6 @@ NOTHROW(FCALL ctype_eval)(struct cparser *__restrict self,
                           char const **p_varname, size_t *p_varname_len);
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_MODDBX_INCLUDE_CEVAL_H */

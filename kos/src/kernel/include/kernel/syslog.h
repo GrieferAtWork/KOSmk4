@@ -27,9 +27,13 @@
 
 #include <bits/crt/format-printer.h>
 
-#ifndef CONFIG_SYSLOG_LINEMAX
-#define CONFIG_SYSLOG_LINEMAX 498 /* Max length of a single syslog line */
-#endif /* !CONFIG_SYSLOG_LINEMAX */
+/*[[[config CONFIG_KERNEL_SYSLOG_LINEMAX! = 498
+ * Max length of a single syslog line
+ * ]]]*/
+#ifndef CONFIG_KERNEL_SYSLOG_LINEMAX
+#define CONFIG_KERNEL_SYSLOG_LINEMAX 498
+#endif /* !CONFIG_KERNEL_SYSLOG_LINEMAX */
+/*[[[end]]]*/
 
 #define SYSLOG_LEVEL_EMERG   __CCAST(void *)0
 #define SYSLOG_LEVEL_ALERT   __CCAST(void *)1

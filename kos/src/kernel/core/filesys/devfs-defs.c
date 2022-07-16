@@ -30,6 +30,7 @@
 #include <kernel/fs/devfs-disk.h>
 #include <kernel/fs/devfs-spec.h>
 #include <kernel/fs/devfs.h>
+#include <kernel/fs/notify-config.h> /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #include <kernel/fs/ramfs.h>
 
 #include <linux/magic.h>
@@ -44,11 +45,11 @@ INTDEF struct fdirnode_ops const devfs_char_ops;
 INTDEF struct fdirnode_ops const devfs_cpu_ops;
 INTDEF struct fdirnode_ops const devfs_disk_ops;
 
-#ifdef CONFIG_HAVE_FS_NOTIFY
+#ifdef CONFIG_HAVE_KERNEL_FS_NOTIFY
 #define MFILE_INIT_mf_notify_ MFILE_INIT_mf_notify,
-#else /* CONFIG_HAVE_FS_NOTIFY */
+#else /* CONFIG_HAVE_KERNEL_FS_NOTIFY */
 #define MFILE_INIT_mf_notify_ /* nothing */
-#endif /* !CONFIG_HAVE_FS_NOTIFY */
+#endif /* !CONFIG_HAVE_KERNEL_FS_NOTIFY */
 
 #define INIT_SPECIAL_DEVFS_SUBDIR(ops, ino)                                         \
 	{                                                                               \

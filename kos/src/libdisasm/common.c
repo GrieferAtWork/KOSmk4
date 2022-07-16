@@ -208,11 +208,21 @@ libda_single_generic(struct disassembler *__restrict self) {
 	disasm_printf(self, " %#.2" PRIx8, *self->d_pc++);
 }
 
-#undef CONFIG_LOOKUP_SYMBOL_NAME
-#define CONFIG_LOOKUP_SYMBOL_NAME 1
 
 
-#ifdef CONFIG_LOOKUP_SYMBOL_NAME
+/*[[[config CONFIG_LIBDISASM_PRINT_SYMBOL_NAMES = true]]]*/
+#ifdef CONFIG_NO_LIBDISASM_PRINT_SYMBOL_NAMES
+#undef CONFIG_LIBDISASM_PRINT_SYMBOL_NAMES
+#elif !defined(CONFIG_LIBDISASM_PRINT_SYMBOL_NAMES)
+#define CONFIG_LIBDISASM_PRINT_SYMBOL_NAMES
+#elif (-CONFIG_LIBDISASM_PRINT_SYMBOL_NAMES - 1) == -1
+#undef CONFIG_LIBDISASM_PRINT_SYMBOL_NAMES
+#define CONFIG_NO_LIBDISASM_PRINT_SYMBOL_NAMES
+#endif /* ... */
+/*[[[end]]]*/
+
+
+#ifdef CONFIG_LIBDISASM_PRINT_SYMBOL_NAMES
 #ifndef __KERNEL__
 PRIVATE void *pdyn_libdebuginfo = NULL;
 PRIVATE ATTR_NOINLINE WUNUSED void *CC get_libdebuginfo(void) {
@@ -270,7 +280,7 @@ PRIVATE void fini_libdebuginfo() {
 };
 
 #endif /* !__KERNEL__ */
-#endif /* CONFIG_LOOKUP_SYMBOL_NAME */
+#endif /* CONFIG_LIBDISASM_PRINT_SYMBOL_NAMES */
 
 PRIVATE ATTR_CONST WUNUSED unsigned int CC
 address_width(uintptr_half_t target) {
@@ -314,7 +324,7 @@ libda_disasm_print_symbol(struct disassembler *__restrict self,
 				self->d_result += error;
 			}
 		} else {
-#ifdef CONFIG_LOOKUP_SYMBOL_NAME
+#ifdef CONFIG_LIBDISASM_PRINT_SYMBOL_NAMES
 #ifndef __KERNEL__
 			if (init_libdebuginfo())
 #else /* !__KERNEL__ */
@@ -362,9 +372,9 @@ libda_disasm_print_symbol(struct disassembler *__restrict self,
 				disasm_print(self, ">", 1);
 			} else
 generic_print_symbol_addr:
-#endif /* CONFIG_LOOKUP_SYMBOL_NAME */
+#endif /* CONFIG_LIBDISASM_PRINT_SYMBOL_NAMES */
 			{
-#ifdef CONFIG_LOOKUP_SYMBOL_NAME
+#ifdef CONFIG_LIBDISASM_PRINT_SYMBOL_NAMES
 #ifndef __KERNEL__
 				Dl_info info;
 				if (dladdr(symbol_addr, &info) == 0 &&
@@ -374,7 +384,7 @@ generic_print_symbol_addr:
 					              (uintptr_t)((byte_t *)symbol_addr - (byte_t *)info.dli_saddr));
 				} else
 #endif /* !__KERNEL__ */
-#endif /* CONFIG_LOOKUP_SYMBOL_NAME */
+#endif /* CONFIG_LIBDISASM_PRINT_SYMBOL_NAMES */
 				{
 					disasm_printf(self, "%#.*p",
 					              address_width(self->d_target),

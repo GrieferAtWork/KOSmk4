@@ -28,6 +28,7 @@
 #include <sched/cpu.h>
 #include <sched/scheduler.h>
 #include <sched/sig.h>
+#include <sched/task.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/sched/preemption.h>
@@ -90,9 +91,9 @@ NOTHROW(FCALL sched_super_override_ipi)(void) {
 	/* Ensure  that our  CPU's current  FPU state  is written to
 	 * memory, thus allowing the super-override holder to modify
 	 * the associated thread's FPU registers. */
-#ifdef CONFIG_FPU
+#ifdef CONFIG_HAVE_FPU
 	fpustate_savecpu();
-#endif /* CONFIG_FPU */
+#endif /* CONFIG_HAVE_FPU */
 
 	/* Make sure that other IPIs also get handled!
 	 * This is important because HW-IPIs may only be send when there  aren't

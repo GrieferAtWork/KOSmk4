@@ -57,9 +57,9 @@
  * over the course of a process's lifetime. - As such, we must do special
  * handling for it when it comes to forking an mman. */
 #undef NEED_EXPLICIT_KERN_RESERVE_CHECK
-#if defined(__ARCH_HAVE_COMPAT) && !defined(CONFIG_NO_USERKERN_SEGMENT)
+#if defined(__ARCH_HAVE_COMPAT) && !defined(CONFIG_NO_KERNEL_USERKERN_SEGMENT)
 #define NEED_EXPLICIT_KERN_RESERVE_CHECK
-#endif /* __ARCH_HAVE_COMPAT && !CONFIG_NO_USERKERN_SEGMENT */
+#endif /* __ARCH_HAVE_COMPAT && !CONFIG_NO_KERNEL_USERKERN_SEGMENT */
 
 DECL_BEGIN
 

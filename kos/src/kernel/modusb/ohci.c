@@ -19,7 +19,7 @@
  */
 #ifndef GUARD_MODUSB_OHCI_C
 #define GUARD_MODUSB_OHCI_C 1
-#define CONFIG_BUILDING_MODUSB 1
+#define BUILDING_MODUSB
 
 #include "ohci.h"
 

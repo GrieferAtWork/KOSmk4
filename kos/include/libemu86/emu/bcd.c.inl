@@ -24,18 +24,18 @@
 EMU86_INTELLISENSE_BEGIN(bcd) {
 
 #if !EMU86_EMULATE_CONFIG_ONLY_MEMORY
-#if EMU86_EMULATE_CONFIG_CHECKERROR || CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
+#if EMU86_EMULATE_CONFIG_CHECKERROR || LIBEMU86_CONFIG_WANT_16BIT || LIBEMU86_CONFIG_WANT_32BIT
 
 #if EMU86_EMULATE_CONFIG_WANT_DAA
 case EMU86_OPCODE_ENCODE(0x27): {
 	/* 27     DAA     Decimal adjust AL after addition. */
 	uintptr_t old_flags, new_flags;
 	u8 old_al, new_al;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
 		goto return_unsupported_instruction;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	old_al    = EMU86_GETAL();
 	old_flags = EMU86_GETFLAGS();
 	new_al    = old_al;
@@ -70,11 +70,11 @@ case EMU86_OPCODE_ENCODE(0x2f): {
 	/* 2F     DAS     Decimal adjust AL after subtraction. */
 	uintptr_t old_flags, new_flags;
 	u8 old_al, new_al;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
 		goto return_unsupported_instruction;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	old_al    = EMU86_GETAL();
 	old_flags = EMU86_GETFLAGS();
 	new_al    = old_al;
@@ -108,11 +108,11 @@ case EMU86_OPCODE_ENCODE(0x37): {
 	/* 37     AAA     ASCII adjust AL after addition. */
 	uintptr_t flags;
 	u16 ax;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
 		goto return_unsupported_instruction;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	ax    = EMU86_GETAX();
 	flags = EMU86_GETFLAGS();
 	if ((ax & 0xf) > 9 || (flags & EFLAGS_AF)) {
@@ -139,11 +139,11 @@ case EMU86_OPCODE_ENCODE(0x3f): {
 	 * s.a. https://www.youtube.com/watch?v=c2ia8T4E2Mc */
 	uintptr_t flags;
 	u16 ax;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
 		goto return_unsupported_instruction;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	ax    = EMU86_GETAX();
 	flags = EMU86_GETFLAGS();
 	if ((ax & 0xf) > 9 || (flags & EFLAGS_AF)) {
@@ -179,11 +179,11 @@ case EMU86_OPCODE_ENCODE(0xd4): {
 	 * D4 ib     AAM imm8     Adjust AX after multiply to number base imm8. */
 	u8 base;
 	u8 ah, al;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
 		goto return_unsupported_instruction;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	base = *(u8 const *)pc;
 	pc += 1;
 	al = EMU86_GETAL();
@@ -214,11 +214,11 @@ case EMU86_OPCODE_ENCODE(0xd5): {
 	 * D5 ib     AAD imm8     Adjust AX before division to number base imm8. */
 	u8 base;
 	u8 ah, al;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
 		goto return_unsupported_instruction;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	base = *(u8 const *)pc;
 	pc += 1;
 	al = EMU86_GETAL();
@@ -236,7 +236,7 @@ case EMU86_OPCODE_ENCODE(0xd5):
 	goto return_unsupported_instruction;
 #endif /* ... */
 
-#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
+#endif /* EMU86_EMULATE_CONFIG_CHECKERROR || LIBEMU86_CONFIG_WANT_16BIT || LIBEMU86_CONFIG_WANT_32BIT */
 #endif /* !EMU86_EMULATE_CONFIG_ONLY_MEMORY */
 
 }

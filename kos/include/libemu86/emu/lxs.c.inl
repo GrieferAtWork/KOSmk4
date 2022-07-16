@@ -31,15 +31,15 @@ EMU86_INTELLISENSE_BEGIN(lxs) {
 
 #if (EMU86_EMULATE_CONFIG_CHECKERROR || \
      (EMU86_EMULATE_CONFIG_WANT_LXS &&  \
-      (CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT)))
+      (LIBEMU86_CONFIG_WANT_16BIT || LIBEMU86_CONFIG_WANT_32BIT)))
 case EMU86_OPCODE_ENCODE(0xc4): {
 	/* C4 /r     LES r16,m16:16     Load ES:r16 with far pointer from memory.
 	 * C4 /r     LES r32,m16:32     Load ES:r32 with far pointer from memory. */
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
 		goto return_unsupported_instruction;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	segment_regno = EMU86_R_ES;
 	goto do_lxs;
 }
@@ -47,11 +47,11 @@ case EMU86_OPCODE_ENCODE(0xc4): {
 case EMU86_OPCODE_ENCODE(0xc5): {
 	/* C5 /r     LDS r16,m16:16     Load DS:r16 with far pointer from memory.
 	 * C5 /r     LDS r32,m16:32     Load DS:r32 with far pointer from memory. */
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define NEED_return_unsupported_instruction
 	if (EMU86_F_IS64(op_flags))
 		goto return_unsupported_instruction;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	segment_regno = EMU86_R_DS;
 	goto do_lxs;
 }
@@ -121,11 +121,11 @@ do_lxs:
 #endif /* EMU86_EMULATE_CONFIG_CHECKUSER || EMU86_EMULATE_CONFIG_WANT_LXS */
 #if EMU86_EMULATE_CONFIG_WANT_LXS
 	EMU86_SETSEG(segment_regno, segment);
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 	MODRM_SETREGQ(offset);
-#else /* CONFIG_LIBEMU86_WANT_64BIT */
+#else /* LIBEMU86_CONFIG_WANT_64BIT */
 	MODRM_SETREGL(offset);
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	goto done;
 #else /* EMU86_EMULATE_CONFIG_WANT_LXS */
 	goto return_unsupported_instruction;

@@ -46,7 +46,7 @@ DECL_BEGIN
 #define krecalloc_nx(ptr, n_bytes, flags)                krealloc_nx(ptr, n_bytes, (flags) | GFP_CALLOC)
 #define krecalloc_in_place_nx(ptr, n_bytes, flags)       krealloc_in_place_nx(ptr, n_bytes, (flags) | GFP_CALLOC)
 #define kfree_unlikely(ptr)                              kfree(ptr)
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 #define slab_free            kfree
 #define slab_ffree           kffree
 #define __os_slab_malloc     kmalloc
@@ -54,7 +54,7 @@ DECL_BEGIN
 #define slab_malloc          kmalloc
 #define slab_kmalloc         kmalloc
 #define slab_kmalloc_nx      kmalloc_nx
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 #define __os_malloc              kmalloc
 #define __os_malloc_noslab       kmalloc
 #define __os_memalign            kmemalign
@@ -111,7 +111,7 @@ DECL_BEGIN
 
 #else /* __clang_tidy__ && !NO_INSTRUMENT_KMALLOC */
 
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 
 /* Free (non-null) slab pointers. */
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL slab_free)(void *__restrict ptr);
@@ -133,7 +133,7 @@ SLAB_FOREACH_SIZE(DEFINE_SLAB_ALLOCATOR_FUNCTIONS, _)
 
 
 /* Slab allocators for dynamic sizes.
- * NOTE: The caller is required to ensure that `num_bytes < SLAB_MAXSIZE' */
+ * NOTE: The caller is required to ensure that `num_bytes < CONFIG_KERNEL_SLAB_MAXSIZE' */
 FUNDEF NOBLOCK ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_slab_malloc)(size_t num_bytes, gfp_t flags) ASMNAME("slab_malloc");
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_slab_kmalloc(size_t num_bytes, gfp_t flags) ASMNAME("slab_kmalloc");
 FUNDEF ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_slab_kmalloc_nx)(size_t num_bytes, gfp_t flags) ASMNAME("slab_kmalloc_nx");
@@ -180,7 +180,7 @@ NOTHROW(KCALL slab_kmalloc_nx)(size_t num_bytes, gfp_t flags) {
 	return __os_slab_kmalloc_nx(num_bytes, flags);
 }
 #endif /* !__OMIT_SLAB_MALLOC_CONSTANT_P_WRAPPERS */
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 
 
 
@@ -188,11 +188,11 @@ NOTHROW(KCALL slab_kmalloc_nx)(size_t num_bytes, gfp_t flags) {
  * @throw: E_BADALLOC:   Not enough available memory.
  * @throw: E_WOULDBLOCK: The operation would have blocked. (implied) */
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_malloc(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("kmalloc");
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_malloc_noslab(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("kmalloc_noslab");
-#else /* CONFIG_USE_SLAB_ALLOCATORS */
+#else /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_malloc_noslab(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("kmalloc");
-#endif /* !CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* !CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_memalign(size_t min_alignment, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("kmemalign");
 FUNDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_memalign_offset(size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("kmemalign_offset");
 FUNDEF ATTR_RETNONNULL WUNUSED VIRT void *KCALL __os_realloc(VIRT void *ptr, size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) ASMNAME("krealloc");
@@ -206,11 +206,11 @@ FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
 #endif /* !____os_free_defined */
 FUNDEF NOBLOCK void NOTHROW(KCALL __os_ffree)(VIRT void *ptr, gfp_t flags) ASMNAME("kffree");
 FUNDEF ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_malloc_nx)(size_t n_bytes, gfp_t flags) ASMNAME("kmalloc_nx");
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
 FUNDEF ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_malloc_noslab_nx)(size_t n_bytes, gfp_t flags) ASMNAME("kmalloc_noslab_nx");
-#else /* CONFIG_USE_SLAB_ALLOCATORS */
+#else /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 FUNDEF ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_malloc_noslab_nx)(size_t n_bytes, gfp_t flags) ASMNAME("kmalloc_nx");
-#endif /* !CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* !CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 FUNDEF ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_memalign_nx)(size_t min_alignment, size_t n_bytes, gfp_t flags) ASMNAME("kmemalign_nx");
 FUNDEF ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_memalign_offset_nx)(size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags) ASMNAME("kmemalign_offset_nx");
 FUNDEF WUNUSED VIRT void *NOTHROW(KCALL __os_realloc_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags) ASMNAME("krealloc_nx");
@@ -242,15 +242,15 @@ VIRT void *NOTHROW(KCALL krecalloc_in_place_nx)(VIRT void *ptr, size_t n_bytes, 
 FORCELOCAL ATTR_ARTIFICIAL ATTR_MALLOC ATTR_RETNONNULL WUNUSED VIRT void *KCALL
 kmalloc(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC) {
 	if (__builtin_constant_p(n_bytes)) {
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
-		if (n_bytes < SLAB_MAXSIZE) {
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
+		if (n_bytes < CONFIG_KERNEL_SLAB_MAXSIZE) {
 #ifdef __OMIT_SLAB_MALLOC_CONSTANT_P_WRAPPERS
 			return __os_slab_kmalloc(n_bytes, flags);
 #else /* __OMIT_SLAB_MALLOC_CONSTANT_P_WRAPPERS */
 			return slab_kmalloc(n_bytes, flags);
 #endif /* !__OMIT_SLAB_MALLOC_CONSTANT_P_WRAPPERS */
 		}
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 		/* Pre-align `n_bytes' so that heap functions don't need to. */
 		return __os_malloc((n_bytes + HEAP_ALIGNMENT - 1) & ~(HEAP_ALIGNMENT - 1), flags);
 	}
@@ -348,15 +348,15 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 FORCELOCAL ATTR_ARTIFICIAL ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW(KCALL kmalloc_nx)(size_t n_bytes, gfp_t flags) {
 	if (__builtin_constant_p(n_bytes)) {
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
-		if (n_bytes < SLAB_MAXSIZE) {
+#ifdef CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS
+		if (n_bytes < CONFIG_KERNEL_SLAB_MAXSIZE) {
 #ifdef __OMIT_SLAB_MALLOC_CONSTANT_P_WRAPPERS
 			return __os_slab_kmalloc_nx(n_bytes, flags);
 #else /* __OMIT_SLAB_MALLOC_CONSTANT_P_WRAPPERS */
 			return slab_kmalloc_nx(n_bytes, flags);
 #endif /* !__OMIT_SLAB_MALLOC_CONSTANT_P_WRAPPERS */
 		}
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
+#endif /* CONFIG_HAVE_KERNEL_SLAB_ALLOCATORS */
 		/* Pre-align `n_bytes' so that heap functions don't need to. */
 		return __os_malloc_nx((n_bytes + HEAP_ALIGNMENT - 1) & ~(HEAP_ALIGNMENT - 1), flags);
 	}
@@ -427,7 +427,7 @@ DECL_END
 #endif /* __CC__ */
 
 
-#ifdef CONFIG_TRACE_MALLOC
+#ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
 #ifdef __CC__
 DECL_BEGIN
 
@@ -564,7 +564,7 @@ memleak_getattr(memleak_t self, uintptr_t attr);
 DECL_END
 #endif /* __CC__ */
 #define ATTR_MALL_UNTRACKED ATTR_SECTION(".bss.mall.untracked")
-#else /* CONFIG_TRACE_MALLOC */
+#else /* CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 #ifdef __CC__
 #define memleak_t                                         void *
 #define kmalloc_leaks_t                                   void *
@@ -581,7 +581,7 @@ DECL_END
 #define kmalloc_leaks_release(leaks, how) (void)0
 #endif /* __CC__ */
 #define ATTR_MALL_UNTRACKED ATTR_SECTION(".bss")
-#endif /* !CONFIG_TRACE_MALLOC */
+#endif /* !CONFIG_HAVE_KERNEL_TRACE_MALLOC */
 
 /* Memory leak release modes. (For use with `kmalloc_leaks_release()') */
 #define KMALLOC_LEAKS_RELEASE_RESTORE 0 /* Restore leaks; future calls to `kmalloc_leaks_collect()' will re-yield them. */
@@ -592,9 +592,9 @@ DECL_END
 #define MEMLEAK_ATTR_MINADDR   1             /* The lowest memory address apart of the leak */
 #define MEMLEAK_ATTR_MAXADDR   2             /* The greatest memory address apart of the leak */
 #define MEMLEAK_ATTR_LEAKSIZE  3             /* Total leak size (in bytes) */
-#define MEMLEAK_ATTR_MINUSER   4             /* The lowest memory address apart of the leak's user-data area (following a possible `CONFIG_MALL_HEAD_SIZE') */
-#define MEMLEAK_ATTR_MAXUSER   5             /* The greatest memory address apart of the leak's user-data area (ending before a possible `CONFIG_MALL_TAIL_SIZE') */
-#define MEMLEAK_ATTR_USERSIZE  6             /* Total user-data area size (in bytes; w/o `CONFIG_MALL_HEAD_SIZE' or `CONFIG_MALL_TAIL_SIZE') */
+#define MEMLEAK_ATTR_MINUSER   4             /* The lowest memory address apart of the leak's user-data area (following a possible `CONFIG_KERNEL_MALL_HEAD_SIZE') */
+#define MEMLEAK_ATTR_MAXUSER   5             /* The greatest memory address apart of the leak's user-data area (ending before a possible `CONFIG_KERNEL_MALL_TAIL_SIZE') */
+#define MEMLEAK_ATTR_USERSIZE  6             /* Total user-data area size (in bytes; w/o `CONFIG_KERNEL_MALL_HEAD_SIZE' or `CONFIG_KERNEL_MALL_TAIL_SIZE') */
 #define MEMLEAK_ATTR_TID       7             /* Root-namespace TID of the original allocator thread. */
 #define MEMLEAK_ATTR_TBSIZE    8             /* # of addresses within the traceback (enumerate through `MEMLEAK_ATTR_TBADDR()') */
 #define MEMLEAK_ATTR_NOWALK    9             /* Returns non-NULL if `GFP_NOWALK' was set during the original allocation. */

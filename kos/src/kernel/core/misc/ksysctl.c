@@ -54,15 +54,21 @@
 #include <stddef.h>
 #include <string.h>
 
-#undef CONFIG_HAVE_HACKY_REBOOT
-#if 0
-#define CONFIG_HAVE_HACKY_REBOOT
-#endif
+/*[[[config CONFIG_HAVE_KERNEL_HACKY_REBOOT = false]]]*/
+#ifdef CONFIG_NO_KERNEL_HACKY_REBOOT
+#undef CONFIG_HAVE_KERNEL_HACKY_REBOOT
+#elif !defined(CONFIG_HAVE_KERNEL_HACKY_REBOOT)
+#define CONFIG_NO_KERNEL_HACKY_REBOOT
+#elif (-CONFIG_HAVE_KERNEL_HACKY_REBOOT - 1) == -1
+#undef CONFIG_HAVE_KERNEL_HACKY_REBOOT
+#define CONFIG_NO_KERNEL_HACKY_REBOOT
+#endif /* ... */
+/*[[[end]]]*/
 
-#ifdef CONFIG_HAVE_HACKY_REBOOT
+#ifdef CONFIG_HAVE_KERNEL_HACKY_REBOOT
 #include <kernel/printk.h>
 #include <sys/io.h>
-#endif /* CONFIG_HAVE_HACKY_REBOOT */
+#endif /* CONFIG_HAVE_KERNEL_HACKY_REBOOT */
 
 DECL_BEGIN
 
@@ -546,7 +552,7 @@ again_get_oldpath:
 		return handles_install_openfd(temp, (USER UNCHECKED struct openfd *)arg);
 	}	break;
 
-#ifdef CONFIG_HAVE_HACKY_REBOOT
+#ifdef CONFIG_HAVE_KERNEL_HACKY_REBOOT
 	case 0xcccc0001: {
 		PREEMPTION_DISABLE();
 		printk(KERN_RAW "Reboot\n\n\n\n\n\n\n\n\n\n\n\n\n"
@@ -555,7 +561,7 @@ again_get_oldpath:
 		outb((port_t)0x64, 0xfe);
 		PREEMPTION_HALT();
 	}	break;
-#endif /* CONFIG_HAVE_HACKY_REBOOT */
+#endif /* CONFIG_HAVE_KERNEL_HACKY_REBOOT */
 
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,

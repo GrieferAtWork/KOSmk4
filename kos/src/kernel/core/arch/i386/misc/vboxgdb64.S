@@ -24,7 +24,7 @@
 #include <kernel/compiler.h>
 #include <kernel/vboxgdb.h>
 
-#ifdef CONFIG_VBOXGDB
+#ifdef CONFIG_HAVE_KERNEL_VBOXGDB
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
 #include <asm/instr/ttest.h>
@@ -198,6 +198,6 @@ PUBLIC_FUNCTION(vboxgdb_trap)
 END(vboxgdb_trap)
 
 
-#endif /* CONFIG_VBOXGDB */
+#endif /* CONFIG_HAVE_KERNEL_VBOXGDB */
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_I386_MISC_VBOXGDB64_S */

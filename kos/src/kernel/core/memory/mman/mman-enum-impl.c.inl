@@ -140,7 +140,7 @@ again_lookup_node:
 		mi.mmix_changed = 0;
 		mi.mmix_swap    = 0;
 #endif /* DEFINE_mman_enum_ex */
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 		if unlikely(dbg_active) {
 			/* Do everything while ignoring all of the locks (or refs).
 			 *
@@ -234,7 +234,7 @@ again_lookup_node:
 			/* Invoke the given callback. */
 			temp = (*cb)(arg, &mi);
 		} else
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 		{
 			mman_lock_read(self);
 			mnode_tree_minmaxlocate(self->mm_mappings,

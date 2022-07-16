@@ -22,14 +22,21 @@
 
 #include <hybrid/compiler.h>
 
-/* Enable support for hardware RTM (s.a. `CPUID_7B_RTM') */
-#undef CONFIG_SUPPORT_HARDWARE_RTM
-#if 1
-#define CONFIG_SUPPORT_HARDWARE_RTM 1
-#endif
+/*[[[config CONFIG_LIBC_SUPPORTS_HARDWARE_RTM = true
+ * Enable support for hardware RTM (s.a. `CPUID_7B_RTM')
+ * ]]]*/
+#ifdef CONFIG_NO_LIBC_SUPPORTS_HARDWARE_RTM
+#undef CONFIG_LIBC_SUPPORTS_HARDWARE_RTM
+#elif !defined(CONFIG_LIBC_SUPPORTS_HARDWARE_RTM)
+#define CONFIG_LIBC_SUPPORTS_HARDWARE_RTM
+#elif (-CONFIG_LIBC_SUPPORTS_HARDWARE_RTM - 1) == -1
+#undef CONFIG_LIBC_SUPPORTS_HARDWARE_RTM
+#define CONFIG_NO_LIBC_SUPPORTS_HARDWARE_RTM
+#endif /* ... */
+/*[[[end]]]*/
 
 
-#ifdef CONFIG_SUPPORT_HARDWARE_RTM
+#ifdef CONFIG_LIBC_SUPPORTS_HARDWARE_RTM
 /* environ variable:
  * The  first  time  that `rtm_begin()'  is  called, this
  * variable is searched for via `getenv(ENVIRON_HW_RTM)'.
@@ -48,7 +55,7 @@
  *    for RTM support
  */
 #define ENVIRON_HW_RTM "HW_RTM"
-#endif /* CONFIG_SUPPORT_HARDWARE_RTM */
+#endif /* CONFIG_LIBC_SUPPORTS_HARDWARE_RTM */
 
 
 #endif /* GUARD_LIBC_LIBC_ARCH_I386_RTM_H */

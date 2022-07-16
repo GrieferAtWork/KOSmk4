@@ -46,7 +46,7 @@
 
 #include <libunwind/unwind.h>
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <debugger/debugger.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/path.h>
@@ -55,11 +55,11 @@
 #include <sched/task.h>
 
 #include <libinstrlen/instrlen.h>
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 DECL_BEGIN
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 PRIVATE void KCALL
 dbg_print_siginfo(siginfo_t const *__restrict info) {
 	dbg_printf(DBGSTR("signal %" PRIuN(__SIZEOF_SIGNO_T__)
@@ -229,7 +229,7 @@ do_dbg_coredump(struct ucpustate const *curr_ustate,
 	                          (struct ucpustate *)curr_ustate);
 	return curr_ustate;
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 PRIVATE void KCALL
@@ -401,7 +401,7 @@ coredump_create(struct ucpustate const *curr_ustate,
 		curr_ustate = kernel_debugtrap_r((struct ucpustate *)curr_ustate, siginfo.si_signo);
 #endif
 	} else {
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 		/* Check if we should enter the builtin debugger. */
 		if (kernel_debug_on & KERNEL_DEBUG_ON_COREDUMP) {
 			orig_ustate = do_dbg_coredump(curr_ustate,
@@ -414,7 +414,7 @@ coredump_create(struct ucpustate const *curr_ustate,
 			                              reason,
 			                              unwind_error);
 		}
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 	}
 
 	/* TODO: Generate an ELF core file for use with gdb. */

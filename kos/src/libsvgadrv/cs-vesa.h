@@ -23,7 +23,7 @@
 #include "api.h"
 /**/
 
-#ifdef CONFIG_SVGA_HAVE_CHIPSET_VESA
+#ifdef CONFIG_HAVE_LIBSVGADRV_CHIPSET_VESA
 #include <stdbool.h>
 
 #include <libbios86/bios.h>
@@ -84,6 +84,6 @@ cs_vesa_probe(struct svga_chipset *__restrict self);
 	}
 
 DECL_END
-#endif /* CONFIG_SVGA_HAVE_CHIPSET_VESA */
+#endif /* CONFIG_HAVE_LIBSVGADRV_CHIPSET_VESA */
 
 #endif /* !GUARD_LIBSVGADRV_CS_VESA_H */

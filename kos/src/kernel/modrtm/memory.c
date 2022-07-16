@@ -142,7 +142,7 @@ NOTHROW(FCALL rtm_memory_truncate)(struct rtm_memory *__restrict self,
 	return true;
 }
 
-#if CONFIG_RTM_PENDING_SYSTEM_CALLS
+#ifdef CONFIG_MODRTM_PENDING_SYSTEM_CALLS
 /* Try to reclaim memory from the given pending system call. */
 PRIVATE NONNULL((1)) bool
 NOTHROW(FCALL rtm_pending_syscall_reclaim)(struct rtm_memory *__restrict self,
@@ -163,7 +163,7 @@ NOTHROW(FCALL rtm_pending_syscall_reclaim)(struct rtm_memory *__restrict self,
 	}
 	return result;
 }
-#endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
+#endif /* CONFIG_MODRTM_PENDING_SYSTEM_CALLS */
 
 
 /* Try to reclaim unused memory by truncating heap pointers reachable from `self'
@@ -187,7 +187,7 @@ NOTHROW(FCALL rtm_memory_reclaim)(struct rtm_memory *__restrict self,
 		                              rtm_memory_region_getsize(*pregion),
 		                              protected_pointer);
 	}
-#if CONFIG_RTM_PENDING_SYSTEM_CALLS
+#ifdef CONFIG_MODRTM_PENDING_SYSTEM_CALLS
 	if (self->rm_sysc) {
 		for (i = 0; i < self->rm_sysc; ++i) {
 			result |= rtm_pending_syscall_reclaim(self,
@@ -198,7 +198,7 @@ NOTHROW(FCALL rtm_memory_reclaim)(struct rtm_memory *__restrict self,
 		                              self->rm_sysc * sizeof(struct rtm_pending_syscall),
 		                              protected_pointer);
 	}
-#endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
+#endif /* CONFIG_MODRTM_PENDING_SYSTEM_CALLS */
 	return result;
 }
 
@@ -334,7 +334,7 @@ rtm_memory_realloc_region(struct rtm_memory *__restrict self,
 }
 
 
-#if CONFIG_RTM_PENDING_SYSTEM_CALLS
+#ifdef CONFIG_MODRTM_PENDING_SYSTEM_CALLS
 /* Finalize the given pending system call. */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL rtm_pending_syscall_fini)(struct rtm_pending_syscall *__restrict self) {
@@ -348,7 +348,7 @@ NOTHROW(FCALL rtm_pending_syscall_fini)(struct rtm_pending_syscall *__restrict s
 		break;
 	}
 }
-#endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
+#endif /* CONFIG_MODRTM_PENDING_SYSTEM_CALLS */
 
 /* Finalize a given `struct rtm_memory' */
 INTERN NOBLOCK NONNULL((1)) void
@@ -363,18 +363,18 @@ NOTHROW(FCALL rtm_memory_fini)(struct rtm_memory *__restrict self) {
 		kfree(region);
 	}
 	kfree(self->rm_regionv);
-#if CONFIG_RTM_PENDING_SYSTEM_CALLS
+#ifdef CONFIG_MODRTM_PENDING_SYSTEM_CALLS
 	if (self->rm_sysc) {
 		for (i = 0; i < self->rm_sysc; ++i)
 			rtm_pending_syscall_fini(&self->rm_sysv[i]);
 		kfree(self->rm_sysv);
 	}
-#endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
+#endif /* CONFIG_MODRTM_PENDING_SYSTEM_CALLS */
 }
 
 
 
-#if CONFIG_RTM_PENDING_SYSTEM_CALLS
+#ifdef CONFIG_MODRTM_PENDING_SYSTEM_CALLS
 
 /* Allocate a new entry for a pending system call in `self'
  * The returned entry isn't initialized yet, but is already
@@ -450,10 +450,10 @@ NOTHROW(FCALL rtm_memory_exec_pending_syscalls)(struct rtm_memory const *__restr
 		}
 	}
 }
-#endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
+#endif /* CONFIG_MODRTM_PENDING_SYSTEM_CALLS */
 
 
-#if CONFIG_RTM_FAR_REGIONS
+#ifdef CONFIG_MODRTM_FAR_REGIONS
 /* Mark the given `region' as changed whilst correctly accounting for far regions. */
 PRIVATE NOBLOCK NONNULL((1, 3)) void
 NOTHROW(FCALL rtm_memory_mark_region_as_changed)(struct rtm_memory *__restrict self,
@@ -516,7 +516,7 @@ found_base_region:
 	region->mr_part      = (REF void *)((uintptr_t)mypart | RTM_MEMORY_REGION_CHANGED_FLAG);
 }
 
-#if CONFIG_RTM_FAR_REGION_REMERGE
+#ifdef CONFIG_MODRTM_FAR_REGION_REMERGE
 /* Try to merge 2 adjacent regions into a singular, new one. */
 PRIVATE NONNULL((1, 3)) bool
 NOTHROW(FCALL rtm_memory_try_merge_regions)(struct rtm_memory *__restrict self,
@@ -603,13 +603,13 @@ NOTHROW(FCALL rtm_memory_try_merge_regions)(struct rtm_memory *__restrict self,
 	             sizeof(struct rtm_memory_region *));
 	return true;
 }
-#endif /* CONFIG_RTM_FAR_REGION_REMERGE */
+#endif /* CONFIG_MODRTM_FAR_REGION_REMERGE */
 
 
-#else /* CONFIG_RTM_FAR_REGIONS */
+#else /* CONFIG_MODRTM_FAR_REGIONS */
 #define rtm_memory_mark_region_as_changed(self, region_index, region) \
 	rtm_memory_region_setchanged(region)
-#endif /* !CONFIG_RTM_FAR_REGIONS */
+#endif /* !CONFIG_MODRTM_FAR_REGIONS */
 
 
 /* Copy `num_bytes' from `src', but throw an exception if VIO memory is accessed. */
@@ -681,7 +681,7 @@ rtm_memory_insert_region(struct rtm_memory *__restrict self, size_t index,
 }
 
 
-#if CONFIG_RTM_FAR_REGIONS
+#ifdef CONFIG_MODRTM_FAR_REGIONS
 PRIVATE ATTR_RETNONNULL struct rtm_memory_region *FCALL
 rtm_memory_create_far_region(struct rtm_memory *__restrict self,
                              size_t region_insert_index,
@@ -718,7 +718,7 @@ rtm_memory_create_far_region(struct rtm_memory *__restrict self,
 	return result;
 }
 
-#endif /* CONFIG_RTM_FAR_REGIONS */
+#endif /* CONFIG_MODRTM_FAR_REGIONS */
 
 
 
@@ -791,9 +791,9 @@ again_rw_region:
 	 * -> Must allocate a new one, or try to extend an existing one.
 	 *
 	 * But first off: Check that the given `addr' is valid when `rm_chkuser' is set. */
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 	if likely(self->rm_chkuser)
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 	{
 		if (write) {
 			validate_writable(addr, num_bytes);
@@ -809,10 +809,10 @@ again_rw_region:
 		size_t j, access_bytes;
 		/* Next, acquire a lock to the effective MMan */
 #ifdef KERNELSPACE_HIGHMEM
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 		effective_mm = &mman_kernel;
 		if (ADDR_ISUSER(addr))
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 		{
 			size_t maxsize;
 			effective_mm = THIS_MMAN;
@@ -835,10 +835,10 @@ again_rw_region:
 				          E_SEGFAULT_CONTEXT_USERCODE;
 				if (write)
 					context |= E_SEGFAULT_CONTEXT_WRITING;
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 				if unlikely(!self->rm_chkuser)
 					context &= ~E_SEGFAULT_CONTEXT_USERCODE;
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 				THROW(E_SEGFAULT_UNMAPPED,
 				      (byte_t *)addr + num_bytes - 1,
 				      context);
@@ -847,7 +847,7 @@ again_rw_region:
 		}
 #else /* KERNELSPACE_HIGHMEM */
 		effective_mm = THIS_MMAN;
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 		if (ADDR_ISKERN(addr)) {
 			size_t maxsize;
 			if unlikely((byte_t *)addr + num_bytes < (byte_t *)addr) {
@@ -856,10 +856,10 @@ again_rw_region:
 				          E_SEGFAULT_CONTEXT_USERCODE;
 				if (write)
 					context |= E_SEGFAULT_CONTEXT_WRITING;
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 				if unlikely(!self->rm_chkuser)
 					context &= ~E_SEGFAULT_CONTEXT_USERCODE;
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 				THROW(E_SEGFAULT_UNMAPPED, 0, context);
 			}
 			effective_mm = &mman_kernel;
@@ -874,10 +874,10 @@ again_rw_region:
 					          E_SEGFAULT_CONTEXT_USERCODE;
 					if (write)
 						context |= E_SEGFAULT_CONTEXT_WRITING;
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 					if unlikely(!self->rm_chkuser)
 						context &= ~E_SEGFAULT_CONTEXT_USERCODE;
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 					THROW(E_SEGFAULT_UNMAPPED,
 					      (byte_t *)KERNELSPACE_END,
 					      context);
@@ -892,14 +892,14 @@ again_rw_region:
 				num_bytes = maxsize;
 			}
 		}
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 #endif /* !KERNELSPACE_HIGHMEM */
 		/* Force the address range to be faulted. */
 		mman_forcefault(effective_mm, addr, num_bytes,
 		                MMAN_FAULT_F_NOVIO);
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 again_lock_effective_mman:
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 		mman_lock_read(effective_mm);
 		/* Locate the mnode that is backing the storage for `addr' */
 		node = mman_mappings_locate(effective_mm, addr);
@@ -921,10 +921,10 @@ again_lock_effective_mman:
 #endif /* LIBVIO_CONFIG_ENABLED */
 			mman_lock_endread(effective_mm);
 			/* Unmapped address! */
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 			if unlikely(!self->rm_chkuser)
 				context &= ~E_SEGFAULT_CONTEXT_USERCODE;
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 			if (write)
 				context |= E_SEGFAULT_CONTEXT_WRITING;
 			THROW(E_SEGFAULT_UNMAPPED, addr, context);
@@ -939,10 +939,10 @@ again_lock_effective_mman:
 			mman_lock_endread(effective_mm);
 			/* Unmapped address! */
 			context = E_SEGFAULT_CONTEXT_USERCODE;
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 			if unlikely(!self->rm_chkuser)
 				context &= ~E_SEGFAULT_CONTEXT_USERCODE;
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 			if (write) {
 				THROW(E_SEGFAULT_READONLY, addr,
 				      E_SEGFAULT_CONTEXT_WRITING |
@@ -1008,9 +1008,9 @@ verify_access_range:
 		 * make sure that no other region already describes this one! */
 		for (j = 0; j < self->rm_regionc; ++j) {
 			struct mnode *aliasing_node;
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 			struct mman *aliasing_node_mm;
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 			size_t access_offset_into_node;
 			byte_t *aliasing_region_node_start;
 			region = self->rm_regionv[j];
@@ -1019,7 +1019,7 @@ verify_access_range:
 			/* Welp... There's an overlap with this region's mpart. */
 			assert((byte_t *)region->mr_addrhi < (byte_t *)addr ||
 			       (byte_t *)region->mr_addrlo > (byte_t *)addr + access_bytes - 1);
-#if CONFIG_RTM_FAR_REGIONS
+#ifdef CONFIG_MODRTM_FAR_REGIONS
 			/* In order to properly deal with far regions, we must select the region
 			 * that is closest to the accessed address range, so we may then  either
 			 * extend it, or create yet another far region.
@@ -1059,7 +1059,7 @@ verify_access_range:
 					break;
 				}
 			}
-#endif /* CONFIG_RTM_FAR_REGIONS */
+#endif /* CONFIG_MODRTM_FAR_REGIONS */
 			/* Check  if this region  is mapped by the  same mnode. -  If it is, then
 			 * we have to extend this region to also contain `addr...+=access_bytes'.
 			 * Otherwise,  we  have to  perform an  address  translation so  that the
@@ -1067,12 +1067,12 @@ verify_access_range:
 			 * that if  the  data  parts  are  identical,  then  both  of  the  mnode
 			 * mappings  will  have identical  sizes, since  the size  of a  mnode is
 			 * always identical to the size of an associated mpart!) */
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 			aliasing_node_mm = &mman_kernel;
 			if (ADDR_ISUSER(region->mr_addrlo))
 				aliasing_node_mm = THIS_MMAN;
 			if likely(aliasing_node_mm == effective_mm)
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 			{
 				aliasing_node = mman_mappings_locate(effective_mm, region->mr_addrlo);
 				if (aliasing_node == node) {
@@ -1085,12 +1085,12 @@ verify_access_range:
 						size_t missing_bytes;
 						missing_bytes = (size_t)((byte_t *)region->mr_addrlo - (byte_t *)addr);
 						assert(missing_bytes);
-#if CONFIG_RTM_FAR_REGIONS
+#ifdef CONFIG_MODRTM_FAR_REGIONS
 						/* Check if we should create a far region instead of extending an existing region. */
 						if ((byte_t *)addr + access_bytes < (byte_t *)region->mr_addrlo) {
 							size_t filler_bytes;
 							filler_bytes = (size_t)((byte_t *)region->mr_addrlo - ((byte_t *)addr + access_bytes));
-							if (filler_bytes >= CONFIG_RTM_FAR_REGION_CREATION_THRESHOLD) {
+							if (filler_bytes >= CONFIG_MODRTM_FAR_REGION_CREATION_THRESHOLD) {
 								/* Create a new far region. */
 do_create_far_region:
 								i = j; /* Index may later be needed by `rtm_memory_mark_region_as_changed()' */
@@ -1102,7 +1102,7 @@ do_create_far_region:
 								goto do_access_region;
 							}
 						}
-#endif /* CONFIG_RTM_FAR_REGIONS */
+#endif /* CONFIG_MODRTM_FAR_REGIONS */
 						region = rtm_memory_realloc_region(self, region,
 						                                   old_region_size +
 						                                   missing_bytes);
@@ -1131,7 +1131,7 @@ do_create_far_region:
 							RETHROW();
 						}
 						assert((byte_t *)addr == (byte_t *)region->mr_addrlo);
-#if CONFIG_RTM_FAR_REGIONS && CONFIG_RTM_FAR_REGION_REMERGE
+#if defined(CONFIG_MODRTM_FAR_REGIONS) && defined(CONFIG_MODRTM_FAR_REGION_REMERGE)
 						/* With far regions, check for the case where we've run into another region. */
 						if (j > 0) {
 							struct rtm_memory_region *lower_region;
@@ -1146,7 +1146,7 @@ do_create_far_region:
 								region = self->rm_regionv[j];
 							}
 						}
-#endif /* CONFIG_RTM_FAR_REGIONS && CONFIG_RTM_FAR_REGION_REMERGE */
+#endif /* CONFIG_MODRTM_FAR_REGIONS && CONFIG_MODRTM_FAR_REGION_REMERGE */
 					} else {
 						/* Extend upwards */
 						size_t missing_bytes;
@@ -1159,18 +1159,18 @@ do_create_far_region:
 						missing_bytes = (size_t)(((byte_t *)addr + access_bytes) -
 						                         ((byte_t *)region->mr_addrhi + 1));
 						assert(missing_bytes);
-#if CONFIG_RTM_FAR_REGIONS
+#ifdef CONFIG_MODRTM_FAR_REGIONS
 						/* Check if we should create a far region instead of extending an existing region. */
 						if (addr > region->mr_addrhi) {
 							size_t filler_bytes;
 							filler_bytes = (size_t)((byte_t *)addr - ((byte_t *)region->mr_addrhi + 1));
-							if (filler_bytes >= CONFIG_RTM_FAR_REGION_CREATION_THRESHOLD) {
+							if (filler_bytes >= CONFIG_MODRTM_FAR_REGION_CREATION_THRESHOLD) {
 								/* Create a new far region. */
 								++j; /* Insert above `region' */
 								goto do_create_far_region;
 							}
 						}
-#endif /* CONFIG_RTM_FAR_REGIONS */
+#endif /* CONFIG_MODRTM_FAR_REGIONS */
 						region = rtm_memory_realloc_region(self, region,
 						                                   old_region_size +
 						                                   missing_bytes);
@@ -1193,7 +1193,7 @@ do_create_far_region:
 							RETHROW();
 						}
 						assert((byte_t *)addr + access_bytes - 1 == (byte_t *)region->mr_addrhi);
-#if CONFIG_RTM_FAR_REGIONS && CONFIG_RTM_FAR_REGION_REMERGE
+#if defined(CONFIG_MODRTM_FAR_REGIONS) && defined(CONFIG_MODRTM_FAR_REGION_REMERGE)
 						/* With far regions, check for the case where we've run into another region. */
 						if ((j + 1) < self->rm_regionc) {
 							struct rtm_memory_region *upper_region;
@@ -1208,16 +1208,16 @@ do_create_far_region:
 							}
 						}
 
-#endif /* CONFIG_RTM_FAR_REGIONS && CONFIG_RTM_FAR_REGION_REMERGE */
+#endif /* CONFIG_MODRTM_FAR_REGIONS && CONFIG_MODRTM_FAR_REGION_REMERGE */
 					}
-#if CONFIG_RTM_FAR_REGIONS
+#ifdef CONFIG_MODRTM_FAR_REGIONS
 					/* Far region set-modified code requires that `self->rm_regionv[i] == region' */
 					i = j;
-#endif /* CONFIG_RTM_FAR_REGIONS */
+#endif /* CONFIG_MODRTM_FAR_REGIONS */
 					goto do_access_region;
 				}
 			}
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 			else {
 				if unlikely(!mman_lock_tryread(aliasing_node_mm)) {
 					mman_lock_endread(effective_mm);
@@ -1226,7 +1226,7 @@ do_create_far_region:
 				}
 				aliasing_node = mman_mappings_locate(effective_mm, region->mr_addrlo);
 			}
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 			assert(aliasing_node != node);
 			/* Figure out access offsets so we can translate `addr' */
 			access_offset_into_node    = (size_t)((byte_t *)addr - (byte_t *)mnode_getendaddr(node));
@@ -1235,10 +1235,10 @@ do_create_far_region:
 			          mnode_getminaddr(node), mnode_getmaxaddr(node),
 			          mnode_getminaddr(aliasing_node), mnode_getmaxaddr(aliasing_node),
 			          addr, aliasing_region_node_start + access_offset_into_node);
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 			if unlikely(aliasing_node_mm != effective_mm)
 				mman_lock_endread(aliasing_node_mm);
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 			mman_lock_endread(effective_mm);
 			/* Calculate the translated address for the aliasing mapping, and try again. */
 			addr = aliasing_region_node_start +
@@ -1375,17 +1375,17 @@ rtm_memory_write(struct rtm_memory *__restrict self, USER void *addr,
 PRIVATE void FCALL
 prefault_memory_for_writing(struct mman *__restrict mymm,
                             USER void *addr, size_t num_bytes) {
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 	mman_forcefault(ADDR_ISKERN(addr) ? &mman_kernel
 	                                  : mymm,
 	                addr, num_bytes,
 	                MMAN_FAULT_F_WRITE |
 	                MMAN_FAULT_F_NOVIO);
-#else /* !CONFIG_RTM_USERSPACE_ONLY */
+#else /* !CONFIG_MODRTM_USERSPACE_ONLY */
 	mman_forcefault(mymm, addr, num_bytes,
 	                MMAN_FAULT_F_WRITE |
 	                MMAN_FAULT_F_NOVIO);
-#endif /* CONFIG_RTM_USERSPACE_ONLY */
+#endif /* CONFIG_MODRTM_USERSPACE_ONLY */
 }
 
 
@@ -1430,15 +1430,15 @@ rtm_memory_apply(struct rtm_memory const *__restrict self) {
 	 *       when writing to mem-parts, rather than keeping ahold of the much  too
 	 *       powerful `MPART_F_LOCKBIT' in order to accomplish the same! */
 
-#if CONFIG_RTM_USERSPACE_ONLY
+#ifdef CONFIG_MODRTM_USERSPACE_ONLY
 #define effective_mm mymm
-#endif /* CONFIG_RTM_USERSPACE_ONLY */
+#endif /* CONFIG_MODRTM_USERSPACE_ONLY */
 	struct mman *mymm;
 	size_t i;
 	bool must_allocate_missing_futex_controllers;
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 	bool has_modified_kern;
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 	bool has_modified_user;
 	mymm  = THIS_MMAN;
 again_forcefault:
@@ -1467,11 +1467,11 @@ again_acquire_region_locks:
 			struct mnode *node;
 			size_t node_size_after_addr;
 			byte_t *region_start_addr;
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 			struct mman *effective_mm = mymm;
 			if unlikely(ADDR_ISKERN(region->mr_addrlo))
 				effective_mm = &mman_kernel;
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 			region_start_addr = (byte_t *)region->mr_addrlo;
 			if unlikely(!mman_lock_tryread(effective_mm)) {
 				rtm_memory_endwrite_modified_parts(self, i);
@@ -1492,11 +1492,11 @@ again_acquire_region_locks:
 			if unlikely(rtm_memory_region_getsize(region) > node_size_after_addr)
 				goto partially_release_locks_and_retry;
 		}
-#if CONFIG_RTM_FAR_REGIONS
+#ifdef CONFIG_MODRTM_FAR_REGIONS
 		if (rtm_memory_region_isfarregion(region)) {
 			/* Far regions are checked implicitly through an adjacent base region. */
 		} else
-#endif /* CONFIG_RTM_FAR_REGIONS */
+#endif /* CONFIG_MODRTM_FAR_REGIONS */
 		if (rtm_memory_region_waschanged(region)) {
 			struct mpartmeta *fxc;
 			if (!mpart_lock_tryacquire(part)) {
@@ -1605,21 +1605,21 @@ again_allocate_ftx_controller_for_part:
 	/* Step #3: Verify that all  modified in-memory data  ranges can  be
 	 *          written to without any chance of triggering a pagefault. */
 	has_modified_user = false;
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 	has_modified_kern = false;
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 	for (i = 0; i < self->rm_regionc; ++i) {
 		struct rtm_memory_region *region;
 		struct mpart *part;
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 		struct mman *effective_mm;
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 		region = self->rm_regionv[i];
 		if (!rtm_memory_region_waschanged(region))
 			continue; /* Unchanged region. */
 		part = rtm_memory_region_getpart(region);
 		assert(mpart_lock_acquired(part));
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 		effective_mm = mymm;
 		if unlikely(ADDR_ISKERN(region->mr_addrlo))
 			effective_mm = &mman_kernel;
@@ -1631,14 +1631,14 @@ again_allocate_ftx_controller_for_part:
 				has_modified_kern = true;
 			}
 		} else
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 		{
 			/* Ensure that we've for a read-lock to the user's MMan */
 			if (!has_modified_user) {
 				if unlikely(!mman_lock_tryread(effective_mm)) {
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 again_acquire_region_locks_for_mman_lock:
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 					rtm_memory_endwrite_modified_parts(self, self->rm_regionc);
 					mman_lock_waitread(effective_mm);
 					goto again_acquire_region_locks;
@@ -1651,10 +1651,10 @@ again_acquire_region_locks_for_mman_lock:
 		 * which we'd have to jump back to if memory isn't writable any more. */
 		if unlikely(!rtm_verify_writable_nopf(region->mr_addrlo,
 		                                      rtm_memory_region_getsize(region))) {
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 			if unlikely(has_modified_kern)
 				mman_lock_endread(&mman_kernel);
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 			if (has_modified_user)
 				mman_lock_endread(mymm);
 			rtm_memory_endwrite_modified_parts(self, self->rm_regionc);
@@ -1708,20 +1708,20 @@ again_acquire_region_locks_for_mman_lock:
 #endif /* !NDEBUG */
 		/* Increment the RTM version counter of this part. */
 		assert(part->mp_meta);
-#if CONFIG_RTM_FAR_REGIONS
+#ifdef CONFIG_MODRTM_FAR_REGIONS
 		/* Only increase the version counter if this isn't an aliasing far region! */
 		if (!rtm_memory_region_isfarregion(region))
-#endif /* CONFIG_RTM_FAR_REGIONS */
+#endif /* CONFIG_MODRTM_FAR_REGIONS */
 		{
 			++part->mp_meta->mpm_rtm_vers;
 		}
 		COMPILER_BARRIER();
 		/* Release our lock to this part. */
-#if !CONFIG_RTM_FAR_REGIONS
+#ifndef CONFIG_MODRTM_FAR_REGIONS
 		mpart_lock_release(part);
-#endif /* !CONFIG_RTM_FAR_REGIONS */
+#endif /* !CONFIG_MODRTM_FAR_REGIONS */
 	}
-#if CONFIG_RTM_FAR_REGIONS
+#ifdef CONFIG_MODRTM_FAR_REGIONS
 	/* With far regions, we must release mpart locks during a second
 	 * pass,  as far  regions may  re-use locks  of adjacent mparts! */
 	i = self->rm_regionc;
@@ -1738,24 +1738,24 @@ again_acquire_region_locks_for_mman_lock:
 		        part, region->mr_addrlo, region->mr_addrhi);
 		mpart_lock_release(part);
 	}
-#endif /* CONFIG_RTM_FAR_REGIONS */
+#endif /* CONFIG_MODRTM_FAR_REGIONS */
 
-#if !CONFIG_RTM_USERSPACE_ONLY
+#ifndef CONFIG_MODRTM_USERSPACE_ONLY
 	if unlikely(has_modified_kern)
 		mman_lock_endread(&mman_kernel);
-#endif /* !CONFIG_RTM_USERSPACE_ONLY */
+#endif /* !CONFIG_MODRTM_USERSPACE_ONLY */
 	if (has_modified_user)
 		mman_lock_endread(mymm);
-#if CONFIG_RTM_PENDING_SYSTEM_CALLS
+#ifdef CONFIG_MODRTM_PENDING_SYSTEM_CALLS
 	rtm_memory_exec_pending_syscalls(self);
-#endif /* CONFIG_RTM_PENDING_SYSTEM_CALLS */
+#endif /* CONFIG_MODRTM_PENDING_SYSTEM_CALLS */
 	return true;
 partially_release_locks_and_retry:
 	rtm_memory_endwrite_modified_parts(self, i);
 	return false;
-#if CONFIG_RTM_USERSPACE_ONLY
+#ifdef CONFIG_MODRTM_USERSPACE_ONLY
 #undef effective_mm
-#endif /* CONFIG_RTM_USERSPACE_ONLY */
+#endif /* CONFIG_MODRTM_USERSPACE_ONLY */
 }
 
 

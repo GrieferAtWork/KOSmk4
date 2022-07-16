@@ -600,7 +600,7 @@ usb_register_device(struct usb_device *__restrict usb_dev,
                     struct device *__restrict dev);
 
 
-#ifdef CONFIG_BUILDING_MODUSB
+#ifdef BUILDING_MODUSB
 struct pci_device;
 
 /* Probe (and initialize if OK) for different types of USB controllers. */
@@ -610,7 +610,7 @@ INTDEF FREE void KCALL usb_probe_ohci(struct pci_device *__restrict dev);
 INTDEF FREE void KCALL usb_probe_ehci(struct pci_device *__restrict dev);
 INTDEF FREE void KCALL usb_probe_xhci(struct pci_device *__restrict dev);
 #endif
-#endif /* CONFIG_BUILDING_MODUSB */
+#endif /* BUILDING_MODUSB */
 
 DECL_END
 

@@ -258,8 +258,8 @@ GDBServer_PrintMessageInAllStopMode(USER CHECKED char const *message,
 			char *p;
 			maxlen = message_length;
 			/* Make sure not to exceed out packet size. */
-			if (maxlen > (CONFIG_GDBSERVER_PACKET_MAXLEN - 1) / 2)
-				maxlen = (CONFIG_GDBSERVER_PACKET_MAXLEN - 1) / 2;
+			if (maxlen > (CONFIG_MODGDBSERVER_PACKET_MAXLEN - 1) / 2)
+				maxlen = (CONFIG_MODGDBSERVER_PACKET_MAXLEN - 1) / 2;
 			/* Send a special packet */
 			p = GDBPacket_Start();
 			*p++ = 'O';
@@ -625,7 +625,7 @@ NOTHROW(FCALL GDBThreadSel_Resume)(GDBThreadSel *__restrict thread) {
 
 
 /* Buffer used to store the contents of remote command packets. */
-INTERN char GDBRemote_CommandBuffer[CONFIG_GDBSERVER_PACKET_MAXLEN + 1];
+INTERN char GDBRemote_CommandBuffer[CONFIG_MODGDBSERVER_PACKET_MAXLEN + 1];
 
 LOCAL void NOTHROW(FCALL GDBServer_SetRemoteAttached)(void) {
 	if (GDBServer_Features & GDB_SERVER_FEATURE_ATTACHED)
@@ -954,19 +954,19 @@ NOTHROW(KCALL GDBFs_EncodeCurrentError)(char *o) {
 }
 
 
-#if CONFIG_GDBSERVER_PACKET_MAXLEN >= 0x10000000
+#if CONFIG_MODGDBSERVER_PACKET_MAXLEN >= 0x10000000
 #define PACKETLEN_MAX_HEXLEN 8
-#elif CONFIG_GDBSERVER_PACKET_MAXLEN >= 0x1000000
+#elif CONFIG_MODGDBSERVER_PACKET_MAXLEN >= 0x1000000
 #define PACKETLEN_MAX_HEXLEN 7
-#elif CONFIG_GDBSERVER_PACKET_MAXLEN >= 0x100000
+#elif CONFIG_MODGDBSERVER_PACKET_MAXLEN >= 0x100000
 #define PACKETLEN_MAX_HEXLEN 6
-#elif CONFIG_GDBSERVER_PACKET_MAXLEN >= 0x10000
+#elif CONFIG_MODGDBSERVER_PACKET_MAXLEN >= 0x10000
 #define PACKETLEN_MAX_HEXLEN 5
-#elif CONFIG_GDBSERVER_PACKET_MAXLEN >= 0x1000
+#elif CONFIG_MODGDBSERVER_PACKET_MAXLEN >= 0x1000
 #define PACKETLEN_MAX_HEXLEN 4
-#elif CONFIG_GDBSERVER_PACKET_MAXLEN >= 0x100
+#elif CONFIG_MODGDBSERVER_PACKET_MAXLEN >= 0x100
 #define PACKETLEN_MAX_HEXLEN 3
-#elif CONFIG_GDBSERVER_PACKET_MAXLEN >= 0x10
+#elif CONFIG_MODGDBSERVER_PACKET_MAXLEN >= 0x10
 #define PACKETLEN_MAX_HEXLEN 2
 #else
 #define PACKETLEN_MAX_HEXLEN 1
@@ -1079,8 +1079,8 @@ return_zero:
 		h = GDBFs_LookupHandle((fd_t)fd);
 		if unlikely(!h)
 			goto err_BADF;
-		if (count > (CONFIG_GDBSERVER_PACKET_MAXLEN - (2 + PACKETLEN_MAX_HEXLEN)))
-			count = (CONFIG_GDBSERVER_PACKET_MAXLEN - (2 + PACKETLEN_MAX_HEXLEN));
+		if (count > (CONFIG_MODGDBSERVER_PACKET_MAXLEN - (2 + PACKETLEN_MAX_HEXLEN)))
+			count = (CONFIG_MODGDBSERVER_PACKET_MAXLEN - (2 + PACKETLEN_MAX_HEXLEN));
 		if unlikely((h->h_mode & IO_ACCMODE) == IO_WRONLY)
 			goto err_EINVAL; /* `E_INVALID_HANDLE_OPERATION' translates to `EINVAL' */
 		TRY {
@@ -1092,7 +1092,7 @@ return_zero:
 		}
 		datastart = o + sprintf(o, "F%" PRIxSIZ ";", count);
 		dataend = GDB_EncodeEscapedBinaryEx(datastart,
-		                                    o + CONFIG_GDBSERVER_PACKET_MAXLEN,
+		                                    o + CONFIG_MODGDBSERVER_PACKET_MAXLEN,
 		                                    GDBRemote_CommandBuffer, count,
 		                                    &used_count);
 		if unlikely(used_count != count) {
@@ -1194,7 +1194,7 @@ return_zero:
 		if unlikely(args != endptr)
 			ERROR(err_syntax);
 		linktext = o + 4;
-		buflen   = CONFIG_GDBSERVER_PACKET_MAXLEN - 4;
+		buflen   = CONFIG_MODGDBSERVER_PACKET_MAXLEN - 4;
 		error    = GDBFs_Readlink(filename, linktext, &buflen);
 		if unlikely(error != 0) {
 			o = GDBFs_EncodeErrno(o, error);
@@ -1215,7 +1215,7 @@ return_zero:
 			size_t lenlen;
 			lenlen = sprintf(temp, "%" PRIxSIZ, buflen);
 			assert(lenlen >= 3);
-			if (buflen >= CONFIG_GDBSERVER_PACKET_MAXLEN - 4) {
+			if (buflen >= CONFIG_MODGDBSERVER_PACKET_MAXLEN - 4) {
 				char temp2[PACKETLEN_MAX_HEXLEN + 1];
 				size_t lenlen2;
 				buflen -= lenlen - 2;
@@ -1481,7 +1481,7 @@ resume_dostep:
 		length = strtou(i, &i, 16);
 		if (i != endptr)
 			ERROR(err_syntax);
-		if unlikely(length > CONFIG_GDBSERVER_PACKET_MAXLEN / 2)
+		if unlikely(length > CONFIG_MODGDBSERVER_PACKET_MAXLEN / 2)
 			ERROR(err_MSGSIZE);
 		error = GDB_ReadMemory(GDB_CurrentThread_general.ts_thread,
 		                       addr, o, length);
@@ -2217,7 +2217,7 @@ do_return_attached_everything:
 			}
 			if (i != endptr)
 				ERRORF(err_syntax, "i=%$q, %Iu\n", (size_t)(endptr - i), i, (size_t)(endptr - i));
-			o += sprintf(o, "PacketSize=%" PRIxSIZ, (size_t)(CONFIG_GDBSERVER_PACKET_MAXLEN/* + 4*/));
+			o += sprintf(o, "PacketSize=%" PRIxSIZ, (size_t)(CONFIG_MODGDBSERVER_PACKET_MAXLEN/* + 4*/));
 			o = STPCAT(o, ";QNonStop+");
 			/* Always indicate that we support NoAck mode.
 			 * Another  option would be to only indicate so when hosted by an emulator (which
@@ -2260,21 +2260,29 @@ do_return_attached_everything:
 				*o++ = 'l';
 				threadinfo_nth = (size_t)-1;
 			} else {
-#undef CONFIG_GDBSERVER_QTHREADINFO_ONE_PER_PACKET
-//#define CONFIG_GDBSERVER_QTHREADINFO_ONE_PER_PACKET 1
+/*[[[config CONFIG_MODGDBSERVER_QTHREADINFO_ONE_PER_PACKET = false]]]*/
+#ifdef CONFIG_NO_MODGDBSERVER_QTHREADINFO_ONE_PER_PACKET
+#undef CONFIG_MODGDBSERVER_QTHREADINFO_ONE_PER_PACKET
+#elif !defined(CONFIG_MODGDBSERVER_QTHREADINFO_ONE_PER_PACKET)
+#define CONFIG_NO_MODGDBSERVER_QTHREADINFO_ONE_PER_PACKET
+#elif (-CONFIG_MODGDBSERVER_QTHREADINFO_ONE_PER_PACKET - 1) == -1
+#undef CONFIG_MODGDBSERVER_QTHREADINFO_ONE_PER_PACKET
+#define CONFIG_NO_MODGDBSERVER_QTHREADINFO_ONE_PER_PACKET
+#endif /* ... */
+/*[[[end]]]*/
 
-#ifndef CONFIG_GDBSERVER_QTHREADINFO_ONE_PER_PACKET
+#ifndef CONFIG_MODGDBSERVER_QTHREADINFO_ONE_PER_PACKET
 				char *bufmax;
-#endif /* !CONFIG_GDBSERVER_QTHREADINFO_ONE_PER_PACKET */
+#endif /* !CONFIG_MODGDBSERVER_QTHREADINFO_ONE_PER_PACKET */
 				++threadinfo_nth;
-#ifndef CONFIG_GDBSERVER_QTHREADINFO_ONE_PER_PACKET
-				bufmax = (o + CONFIG_GDBSERVER_PACKET_MAXLEN) -
+#ifndef CONFIG_MODGDBSERVER_QTHREADINFO_ONE_PER_PACKET
+				bufmax = (o + CONFIG_MODGDBSERVER_PACKET_MAXLEN) -
 				         (GDBTHREAD_ENCODETHREADID_MAXCHARS + 1);
-#endif /* !CONFIG_GDBSERVER_QTHREADINFO_ONE_PER_PACKET */
+#endif /* !CONFIG_MODGDBSERVER_QTHREADINFO_ONE_PER_PACKET */
 				*o++ = 'm';
 				o = GDBThread_EncodeThreadID(o, thread);
 				decref_unlikely(thread);
-#ifndef CONFIG_GDBSERVER_QTHREADINFO_ONE_PER_PACKET
+#ifndef CONFIG_MODGDBSERVER_QTHREADINFO_ONE_PER_PACKET
 				while (o < bufmax) {
 					thread = GDBThread_GetNth(threadinfo_nth);
 					if (!thread) {
@@ -2286,7 +2294,7 @@ do_return_attached_everything:
 					o    = GDBThread_EncodeThreadID(o, thread);
 					decref_unlikely(thread);
 				}
-#endif /* !CONFIG_GDBSERVER_QTHREADINFO_ONE_PER_PACKET */
+#endif /* !CONFIG_MODGDBSERVER_QTHREADINFO_ONE_PER_PACKET */
 			}
 		} else if (ISNAME("DisableRandomization")) {
 			if (nameEnd != endptr)
@@ -2770,7 +2778,7 @@ err_command_length_overflow_escape:
 					}
 				}
 				printk(KERN_ERR "[gdb] Command packet \"%#$q[...]\" is too large\n",
-				       CONFIG_GDBSERVER_PACKET_MAXLEN, GDBRemote_CommandBuffer);
+				       CONFIG_MODGDBSERVER_PACKET_MAXLEN, GDBRemote_CommandBuffer);
 				goto send_nack_and_wait_for_next_packet;
 			}
 			*endptr++ = (char)(byte_t)bi;

@@ -35,14 +35,14 @@
 DECL_BEGIN
 
 /* Heap debug initialization DWORDs */
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 #ifndef DEBUGHEAP_NO_MANS_LAND
 #define DEBUGHEAP_NO_MANS_LAND __UINT32_C(0xdeadbeef) /* Debug initialization of unallocated memory. */
 #endif /* !DEBUGHEAP_NO_MANS_LAND */
 #ifndef DEBUGHEAP_FRESH_MEMORY
 #define DEBUGHEAP_FRESH_MEMORY __UINT32_C(0xaaaaaaaa) /* Debug initialization of freshly allocated memory. */
 #endif /* !DEBUGHEAP_FRESH_MEMORY */
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 
 
 #ifdef __CC__
@@ -59,9 +59,9 @@ struct mfree {
 #define MFREE_FMASK      MFREE_FZERO /* Mask of known flags. */
 #define MFREE_FRED       0x80        /* This is a red node. */
 	u8                   mf_flags;   /* Set of `MFREE_F*' */
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 	u8                   mf_szchk;   /* Checksum for `mf_size' */
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, mf_data); /* Block data. */
 };
 #define MFREE_MIN(self)   ((uintptr_t)(self))
@@ -128,7 +128,7 @@ struct heap {
 	                                         * -> Used to ensure that `heap_free()' is always an atomic
 	                                         *    operation, even when `h_lock' couldn't be acquired at
 	                                         *    the time. */
-#ifdef CONFIG_HEAP_TRACE_DANGLE
+#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
 	WEAK size_t               h_dangle;     /* [lock(INCREMENT(h_lock),DECREMENT(atomic),READ(atomic))]
 	                                         * Amount  of dangling bytes  of memory (memory that  was allocated, but may
 	                                         * be release again  shortly) When  new memory  would have  to be  requested
@@ -140,7 +140,7 @@ struct heap {
 	                                         * allocating memory at  the same  time may then  think that  the cache  has
 	                                         * grown  too small for the allocation and unnecessarily request more memory
 	                                         * from the core. */
-#endif /* CONFIG_HEAP_TRACE_DANGLE */
+#endif /* CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
 };
 
 
@@ -169,9 +169,9 @@ DATDEF struct heap kernel_heaps[__GFP_HEAPCOUNT];
 DATDEF struct heap kernel_default_heap; /* == &kernel_heaps[GFP_NORMAL] */
 DATDEF struct heap kernel_locked_heap;  /* == &kernel_heaps[GFP_LOCKED] */
 
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 DATDEF struct mfile mfile_dbgheap;
-#endif /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 
 
 
@@ -234,9 +234,9 @@ FUNDEF WUNUSED NONNULL((1)) heapptr_t NOTHROW(KCALL __os_heap_realign_nx)(struct
  *       is either postponed until the next call to a heap function
  *       that is allowed to block, or  is simply kept in cache,  as
  *       though `GFP_NOMAP' has been passed.
- * NOTE: The `*_traced' family of functions will automatically call `kmalloc_trace'  /
- *       `kmalloc_untrace' in order to register / unregister the data blocks as a MALL
- *       GC search data block. When  building without `CONFIG_TRACE_MALLOC', they  are
+ * NOTE: The  `*_traced'  family  of  functions   will  automatically  call  `kmalloc_trace'   /
+ *       `kmalloc_untrace' in  order  to  register  /  unregister the  data  blocks  as  a  MALL
+ *       GC search data block. When building without `CONFIG_HAVE_KERNEL_TRACE_MALLOC', they are
  *       aliasing the regular versions.
  * @param: flags: Set of `GFP_*' flags used for allocation.
  * @throw: E_BADALLOC:   Failed to allocate memory.
@@ -647,17 +647,17 @@ FUNDEF NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) size_t
 NOTHROW(KCALL heap_trim)(struct heap *__restrict self, size_t threshold, gfp_t flags);
 
 
-#ifdef CONFIG_DEBUG_HEAP
+#ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 /* Validate   the  memory  of  the  given  heap  for
  * consistency, checking for invalid use-after-free. */
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL heap_validate)(struct heap *__restrict self);
 FUNDEF NOBLOCK void NOTHROW(KCALL heap_validate_all)(void);
 #define DEFINE_VALIDATABLE_HEAP(x) DEFINE_CALLBACK(".rodata.heaps.validatable", x)
-#else /* CONFIG_DEBUG_HEAP */
+#else /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 #define heap_validate(self)        (void)0
 #define heap_validate_all()        (void)0
 #define DEFINE_VALIDATABLE_HEAP(x) /* nothing */
-#endif /* !CONFIG_DEBUG_HEAP */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 
 #endif /* __CC__ */
 

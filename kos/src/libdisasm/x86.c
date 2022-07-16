@@ -28,9 +28,9 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define DISABLE_BRANCH_PROFILING
 #define _GNU_SOURCE                1
 #define _KOS_SOURCE                1
-#define CONFIG_LIBEMU86_WANT_16BIT 1
-#define CONFIG_LIBEMU86_WANT_32BIT 1
-#define CONFIG_LIBEMU86_WANT_64BIT 1
+#define LIBEMU86_CONFIG_WANT_16BIT 1
+#define LIBEMU86_CONFIG_WANT_32BIT 1
+#define LIBEMU86_CONFIG_WANT_64BIT 1
 #define LIBEMU86_WANT_PROTOTYPES   1
 #define __LIBEMU86_STATIC          1
 
@@ -553,7 +553,7 @@ da_print_modrm_rmNNN_Xmm(struct disassembler *__restrict self,
 
 
 
-#ifdef CONFIG_AUTOSELECT_JCC
+#ifdef CONFIG_LIBDISASM_X86_AUTOSELECT_JCC
 PRIVATE ATTR_CONST bool CC
 is_carry_instruction(u32 opcode, u8 reg) {
 	switch (opcode) {
@@ -698,7 +698,7 @@ libda_select_jcc(struct disassembler *__restrict self,
 	}
 	disasm_print(self, repr, strlen(repr));
 }
-#endif /* CONFIG_AUTOSELECT_JCC */
+#endif /* CONFIG_LIBDISASM_X86_AUTOSELECT_JCC */
 
 #ifdef __GNUC__
 /* GCC  emits  a false  warning about  `self->d_pad1[0] = (void *)(uintptr_t)whole_opcode' supposedly
@@ -713,9 +713,9 @@ libda_select_jcc(struct disassembler *__restrict self,
 
 INTERN NONNULL((1)) void CC
 libda_single_x86(struct disassembler *__restrict self) {
-#ifdef CONFIG_AUTOSELECT_JCC
+#ifdef CONFIG_LIBDISASM_X86_AUTOSELECT_JCC
 	emu86_opcode_t whole_opcode;
-#endif /* CONFIG_AUTOSELECT_JCC */
+#endif /* CONFIG_LIBDISASM_X86_AUTOSELECT_JCC */
 	emu86_opcode_t opcode;
 	emu86_opflags_t op_flags;
 	byte_t const *text_start = self->d_pc;
@@ -736,9 +736,9 @@ libda_single_x86(struct disassembler *__restrict self) {
 	default: __builtin_unreachable();
 	}
 	self->d_pc = emu86_opcode_decode(self->d_pc, &opcode, &op_flags);
-#ifdef CONFIG_AUTOSELECT_JCC
+#ifdef CONFIG_LIBDISASM_X86_AUTOSELECT_JCC
 	whole_opcode = opcode;
-#endif /* CONFIG_AUTOSELECT_JCC */
+#endif /* CONFIG_LIBDISASM_X86_AUTOSELECT_JCC */
 	/* Print the instruction. */
 	if (opcode < EMU86_OPCODE_BASE0f) {
 #if EMU86_OPCODE_BASE0 != 0
@@ -897,7 +897,7 @@ search_chain:
 			if (op_flags & EMU86_F_LOCK)
 				disasm_print(self, "lock ", 5);
 			{
-#ifdef CONFIG_AUTOSELECT_JCC
+#ifdef CONFIG_LIBDISASM_X86_AUTOSELECT_JCC
 				char const *sel_start;
 again_instruction_part:
 				sel_start = (char *)memchr(start, '[', (size_t)(p - start));
@@ -919,7 +919,7 @@ again_instruction_part:
 					goto again_instruction_part;
 				}
 no_jcc_sel:
-#endif /* CONFIG_AUTOSELECT_JCC */
+#endif /* CONFIG_LIBDISASM_X86_AUTOSELECT_JCC */
 				disasm_print(self, start,
 				             (size_t)(p - start));
 			}
@@ -1589,11 +1589,11 @@ nextop_nocomma:
 done_operands:
 			;
 		}
-#ifdef CONFIG_AUTOSELECT_JCC
+#ifdef CONFIG_LIBDISASM_X86_AUTOSELECT_JCC
 		/* Remember the last-written opcode (for selecting JCC encodings) */
 		self->d_pad1[0] = (void *)(uintptr_t)whole_opcode;
 		self->d_pad1[1] = (void *)(uintptr_t)rm.mi_reg;
-#endif /* CONFIG_AUTOSELECT_JCC */
+#endif /* CONFIG_LIBDISASM_X86_AUTOSELECT_JCC */
 		return;
 	}
 unknown_opcode:
@@ -1657,9 +1657,9 @@ unknown_opcode:
 			goto print_byte;
 		}
 		self->d_pc = pc;
-#ifdef CONFIG_AUTOSELECT_JCC
+#ifdef CONFIG_LIBDISASM_X86_AUTOSELECT_JCC
 		whole_opcode = 0;
-#endif /* CONFIG_AUTOSELECT_JCC */
+#endif /* CONFIG_LIBDISASM_X86_AUTOSELECT_JCC */
 		args_start = NULL;
 		goto search_chain;
 	}
@@ -1672,9 +1672,9 @@ unknown_opcode:
 		 * as such, all together, they behave more akin to a single instruction:
 		 *    >> I(0x0f0f, IF_MODRM, "3dnow\t" OP_U8 OP_RMxx OP_Rxx) */
 		opcode     = *self->d_pc++;
-#ifdef CONFIG_AUTOSELECT_JCC
+#ifdef CONFIG_LIBDISASM_X86_AUTOSELECT_JCC
 		whole_opcode = 0;
-#endif /* CONFIG_AUTOSELECT_JCC */
+#endif /* CONFIG_LIBDISASM_X86_AUTOSELECT_JCC */
 		goto search_chain;
 	}
 print_byte:

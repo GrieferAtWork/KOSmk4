@@ -22,39 +22,38 @@
 
 #include <kernel/compiler.h>
 
-#ifdef NDEBUG
-/* _always_ disable self-tests when NDEBUG is defined! */
-#undef CONFIG_SELFTEST
-#undef CONFIG_NO_SELFTEST
-#define CONFIG_SELFTEST 1
-#define CONFIG_NO_SELFTEST 1
-#elif ! defined(CONFIG_NO_SELFTEST)
-#ifdef CONFIG_SELFTEST
-#if (CONFIG_SELFTEST + 0) == 0
-#undef CONFIG_SELFTEST
-#define CONFIG_NO_SELFTEST 1
-#endif /* (CONFIG_SELFTEST + 0) == 0 */
-#else /* CONFIG_SELFTEST */
-#define CONFIG_SELFTEST 1
-#endif /* CONFIG_SELFTEST */
-#else /* !CONFIG_NO_SELFTEST */
-#undef CONFIG_SELFTEST
-#endif /* CONFIG_NO_SELFTEST */
+
+/*[[[config CONFIG_HAVE_KERNEL_SELFTEST: bool = !defined(NDEBUG)
+ * _always_ disable self-tests when NDEBUG is defined!
+ * ]]]*/
+#ifdef CONFIG_NO_KERNEL_SELFTEST
+#undef CONFIG_HAVE_KERNEL_SELFTEST
+#elif !defined(CONFIG_HAVE_KERNEL_SELFTEST)
+#ifndef NDEBUG
+#define CONFIG_HAVE_KERNEL_SELFTEST
+#else /* !NDEBUG */
+#define CONFIG_NO_KERNEL_SELFTEST
+#endif /* NDEBUG */
+#elif (-CONFIG_HAVE_KERNEL_SELFTEST - 1) == -1
+#undef CONFIG_HAVE_KERNEL_SELFTEST
+#define CONFIG_NO_KERNEL_SELFTEST
+#endif /* ... */
+/*[[[end]]]*/
 
 #undef DEFINE_TEST
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 /* >> void KCALL func(void);
  * A self-test that gets invoked during late bootup */
-#ifdef CONFIG_SELFTEST
+#ifdef CONFIG_HAVE_KERNEL_SELFTEST
 #define DEFINE_SELFTEST_FUNCTION(func) \
 	DEFINE_CALLBACK(".rodata.free.callback.selftest", func)
 #define DEFINE_TEST(name)                  \
 	DEFINE_SELFTEST_FUNCTION(test_##name); \
 	PRIVATE ATTR_USED ATTR_FREETEXT void   \
 	NOTHROW(KCALL test_##name)(void)
-#else /* CONFIG_SELFTEST */
+#else /* CONFIG_HAVE_KERNEL_SELFTEST */
 #define DEFINE_SELFTEST_FUNCTION(func) /* nothing */
-#endif /* !CONFIG_SELFTEST */
+#endif /* !CONFIG_HAVE_KERNEL_SELFTEST */
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_SELFTEST_H */

@@ -54,10 +54,10 @@ EXTERN(__kernel_boottask_stack)
 EXTERN(bootcpu_x86_cpufeatures)
 EXTERN(bootcpu_x86_cpuid)
 
-#ifndef CONFIG_NO_BOOT0
+#ifndef CONFIG_NO_KERNEL_X86_BOOT0
 /* Include builtin bootloader support */
 #include "_boot0.S"
-#endif /* !CONFIG_NO_BOOT0 */
+#endif /* !CONFIG_NO_KERNEL_X86_BOOT0 */
 
 
 

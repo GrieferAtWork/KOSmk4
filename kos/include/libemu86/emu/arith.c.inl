@@ -29,9 +29,9 @@ EMU86_INTELLISENSE_BEGIN(arith) {
 	u8 op8;
 	u16 op16;
 	u32 op32;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 	u64 op64;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 #endif /* EMU86_EMULATE_CONFIG_WANT_ARITH */
 
 #if EMU86_EMULATE_CONFIG_WANT_ARITH
@@ -212,23 +212,23 @@ do_cmp##Nbits:                                                                  
 		             __builtin_unreachable());                                       \
 	}
 #endif /* EMU86_EMULATE_CONFIG_WANT_ARITH */
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define NEED_return_unknown_instruction_rmreg
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 
 
 /* ======================================================================== */
 /*    BINARY ARITHMATIC                                                     */
 /* ======================================================================== */
-#if CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT
+#if LIBEMU86_CONFIG_WANT_16BIT || LIBEMU86_CONFIG_WANT_32BIT
 case EMU86_OPCODE_ENCODE(0x82): /* Undocumented alias (doesn't exist on x86_64) */
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 	if (EMU86_F_IS64(op_flags))
 		goto return_unsupported_instruction;
 #define NEED_return_unsupported_instruction
 	ATTR_FALLTHROUGH
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
-#endif /* CONFIG_LIBEMU86_WANT_16BIT || CONFIG_LIBEMU86_WANT_32BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_16BIT || LIBEMU86_CONFIG_WANT_32BIT */
 case EMU86_OPCODE_ENCODE(0x80): {
 	MODRM_DECODE();
 #if EMU86_EMULATE_CONFIG_WANT_ARITH
@@ -246,11 +246,11 @@ case EMU86_OPCODE_ENCODE(0x80): {
 	DO_ARITH_SWITCH_rmdst_mi_reg(b, B, 1, 8, op8)
 	goto done;
 #else /* EMU86_EMULATE_CONFIG_WANT_ARITH */
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 	if (modrm.mi_reg >= 8)
 		goto return_unknown_instruction_rmreg;
 #define NEED_return_unknown_instruction_rmreg
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	if (modrm.mi_reg == 7) {
 		MODRM_NOSUP_GETRMB();
 	} else {
@@ -268,7 +268,7 @@ case EMU86_OPCODE_ENCODE(0x83):
 #endif /* !EMU86_EMULATE_CONFIG_WANT_ARITH */
 	MODRM_DECODE();
 #if EMU86_EMULATE_CONFIG_WANT_ARITH
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 	if (IS_64BIT()) {
 		op64 = (u64)(s64)(s32)UNALIGNED_GETLE32((u32 const *)pc);
 		pc += 4;
@@ -283,7 +283,7 @@ do_op64:
 		 * 81 /7 iq      CMP r/m64,Simm32      Compare Simm32 with r/m64 */
 		DO_ARITH_SWITCH_rmdst_mi_reg(q, Q, 8, 64, op64)
 	} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	if (!IS_16BIT()) {
 		op32 = UNALIGNED_GETLE32((u32 const *)pc);
 		pc += 4;
@@ -313,11 +313,11 @@ do_op16:
 	}
 	goto done;
 #else /* EMU86_EMULATE_CONFIG_WANT_ARITH */
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 	if (modrm.mi_reg >= 8)
 		goto return_unknown_instruction_rmreg;
 #define NEED_return_unknown_instruction_rmreg
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	if (modrm.mi_reg == 7) {
 		MODRM_NOSUP_GETRMWLQ();
 	} else {
@@ -331,7 +331,7 @@ do_op16:
 #if EMU86_EMULATE_CONFIG_WANT_ARITH
 case EMU86_OPCODE_ENCODE(0x83):
 	MODRM_DECODE();
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 	if (IS_64BIT()) {
 		/* 83 /0 ib      ADD r/m64,Simm8      Add sign-extended imm8 to r/m64 */
 		/* 83 /1 ib      OR r/m64,Simm8       r/m64 OR imm8 (sign-extended) */
@@ -345,7 +345,7 @@ case EMU86_OPCODE_ENCODE(0x83):
 		pc += 1;
 		goto do_op64;
 	} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	if (!IS_16BIT()) {
 		/* 83 /0 ib      ADD r/m32,Simm8      Add sign-extended imm8 to r/m32 */
 		/* 83 /1 ib      OR r/m32,Simm8       r/m32 OR imm8 (sign-extended) */

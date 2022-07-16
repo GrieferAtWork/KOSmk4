@@ -23,7 +23,7 @@
 #include <kernel/compiler.h>
 #include <kernel/selftest.h>
 
-#ifdef CONFIG_SELFTEST
+#ifdef CONFIG_HAVE_KERNEL_SELFTEST
 #include <kernel/boot.h>
 #include <kernel/driver-param.h>
 #include <kernel/printk.h>
@@ -55,6 +55,6 @@ NOTHROW(KCALL kernel_initialize_selftest)(void) {
 }
 
 DECL_END
-#endif /* CONFIG_SELFTEST */
+#endif /* CONFIG_HAVE_KERNEL_SELFTEST */
 
 #endif /* !GUARD_KERNEL_SRC_MISC_SELFTEST_C */

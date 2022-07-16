@@ -24,7 +24,7 @@
 
 #include <debugger/config.h>
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <kernel/types.h>
 
 #include <stdbool.h>
@@ -160,6 +160,6 @@ FUNDEF ATTR_PURE ATTR_RETNONNULL WUNUSED byte_t *NOTHROW(LIBINSTRLEN_CC dbg_inst
 #endif /* __CC__ */
 
 DECL_END
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_INCLUDE_DEBUGGER_UTIL_H */

@@ -31,7 +31,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <debugger/config.h>
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
@@ -245,6 +245,6 @@ DBG_COMMAND_AUTO(aslr, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
 
 DECL_END
 
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_MMAN_DEBUGGER_C */

@@ -19,8 +19,8 @@
  */
 #ifndef GUARD_MODUSB_INIT_C
 #define GUARD_MODUSB_INIT_C 1
+#define BUILDING_MODUSB
 #define _KOS_SOURCE 1
-#define CONFIG_BUILDING_MODUSB 1
 
 #include <kernel/compiler.h>
 

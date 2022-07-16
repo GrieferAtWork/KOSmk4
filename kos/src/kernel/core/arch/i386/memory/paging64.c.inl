@@ -2516,7 +2516,7 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 
 /* NOTE: This function must do its own tracing of continuous page ranges.
  *       The caller is may not necessary ensure that the function is only
@@ -2919,7 +2919,7 @@ do_ls_kernel:
 	PAGEDIR_P_ENDUSE(pdir);
 	return 0;
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 DECL_END

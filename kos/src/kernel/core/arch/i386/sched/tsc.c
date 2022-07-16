@@ -49,9 +49,9 @@
 #include <string.h>
 
 /**/
-#include "tsc.h" /* CONFIG_TSC_ASSERT_FORWARD */
+#include "tsc.h" /* CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD */
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <debugger/hook.h>
 #include <debugger/io.h>
 #include <debugger/rt.h>
@@ -60,7 +60,7 @@
 
 #include <alloca.h>
 #include <time.h>
-#endif /* !CONFIG_HAVE_DEBUGGER */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #define assert_poison(expr)       assert((expr) || kernel_poisoned())
 #define assertf_poison(expr, ...) assertf((expr) || kernel_poisoned(), __VA_ARGS__)
@@ -343,9 +343,9 @@ NOTHROW(KCALL x86_calibrate_tsc_cmpxch_delay_stable)(void) {
 }
 
 
-#ifdef CONFIG_TSC_ASSERT_FORWARD
+#ifdef CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD
 INTERN ATTR_PERCPU tsc_t thiscpu_x86_last_tsc = 0;
-#endif /* CONFIG_TSC_ASSERT_FORWARD */
+#endif /* CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD */
 
 
 /* Read  and return the current timestamp counter of the calling CPU.
@@ -376,13 +376,13 @@ NOTHROW(FCALL tsc_get)(struct cpu *__restrict me) {
 	FORCPU(me, thiscpu_x86_apic_emutsc_prev_current) = current;
 	current = FORCPU(me, thiscpu_x86_apic_emutsc_initial) - current;
 	result = tscbase + ((u64)current << FORCPU(me, thiscpu_x86_apic_emutsc_divide));
-#ifdef CONFIG_TSC_ASSERT_FORWARD
+#ifdef CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD
 	assertf_poison(result >= FORCPU(me, thiscpu_x86_last_tsc),
 	               "result = %#" PRIxN(__SIZEOF_TSC_HZ_T__) "\n"
 	               "last   = %#" PRIxN(__SIZEOF_TSC_HZ_T__) "\n",
 	               result, FORCPU(me, thiscpu_x86_last_tsc));
 	FORCPU(me, thiscpu_x86_last_tsc) = result;
-#endif /* CONFIG_TSC_ASSERT_FORWARD */
+#endif /* CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD */
 	return result;
 }
 
@@ -395,9 +395,9 @@ NOTHROW(FCALL tsc_nodeadline)(struct cpu *__restrict me) {
 	u32 old_current_reg;
 	u32 new_current_reg;
 	u32 delay;
-#ifdef CONFIG_TSC_ASSERT_FORWARD
+#ifdef CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD
 	COMPILER_UNUSED(tsc_get(me));
-#endif /* CONFIG_TSC_ASSERT_FORWARD */
+#endif /* CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD */
 	/* TODO: Support for PIC-mode */
 	FORCPU(me, thiscpu_x86_apic_emutsc_deadline) = (u64)-1;
 	/* Check for simple case: If  initial+divide  didn't change,
@@ -462,9 +462,9 @@ again_with_timer:
 	FORCPU(me, thiscpu_x86_apic_emutsc_divide)          = 7; /* ilog2(128) */
 	FORCPU(me, thiscpu_x86_apic_emutsc_initial)         = UINT32_MAX;
 	FORCPU(me, thiscpu_x86_apic_emutsc_initial_shifted) = (u64)UINT32_MAX << 7;
-#ifdef CONFIG_TSC_ASSERT_FORWARD
+#ifdef CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD
 	COMPILER_UNUSED(tsc_get(me));
-#endif /* CONFIG_TSC_ASSERT_FORWARD */
+#endif /* CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD */
 }
 
 /* Set the TSC deadline, that is: the point in time when `tsc_interrupt()'
@@ -490,9 +490,9 @@ NOTHROW(FCALL tsc_deadline)(struct cpu *__restrict me,
 	u8 i, divide;
 	tsc_t tsc_current;
 	tsc_t tsc_distance;
-#ifdef CONFIG_TSC_ASSERT_FORWARD
+#ifdef CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD
 	COMPILER_UNUSED(tsc_get(me));
-#endif /* CONFIG_TSC_ASSERT_FORWARD */
+#endif /* CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD */
 	/* TODO: Support for PIC-mode */
 	delay = 1; /* Initial guess */
 again:
@@ -542,9 +542,9 @@ again_with_timer:
 #if 0 /* Not required */
 		tsc_nodeadline(me);
 #endif
-#ifdef CONFIG_TSC_ASSERT_FORWARD
+#ifdef CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD
 		COMPILER_UNUSED(tsc_get(me));
-#endif /* CONFIG_TSC_ASSERT_FORWARD */
+#endif /* CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD */
 		return tsc_current;
 	}
 
@@ -639,9 +639,9 @@ again_with_timer:
 	FORCPU(me, thiscpu_x86_apic_emutsc_initial_shifted) = (u64)initial << divide;
 done:
 	FORCPU(me, thiscpu_x86_apic_emutsc_deadline) = deadline;
-#ifdef CONFIG_TSC_ASSERT_FORWARD
+#ifdef CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD
 	COMPILER_UNUSED(tsc_get(me));
-#endif /* CONFIG_TSC_ASSERT_FORWARD */
+#endif /* CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD */
 	return tsc_current;
 }
 
@@ -853,9 +853,9 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_altcore_entry)(void) {
 	/* Store the initial TSC-hz result. */
 	FORCPU(me, thiscpu_tsc_hz)                      = hz;
 	FORCPU(me, thiscpu_x86_apic_emutsc_mindistance) = hz / TSC_MIN_DISTANCE_HZ;
-#ifdef CONFIG_TSC_ASSERT_FORWARD
+#ifdef CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD
 	FORCPU(me, thiscpu_x86_last_tsc) = 0;
-#endif /* CONFIG_TSC_ASSERT_FORWARD */
+#endif /* CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD */
 
 	if (!X86_HAVE_TSC_DEADLINE) {
 		/* Calibrate the TSC-cmpxch delay. */
@@ -898,9 +898,9 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_calibrate_boottsc)(void) {
 	FORCPU(&bootcpu, thiscpu_x86_apic_emutsc_initial_shifted) = (u64)UINT32_MAX << 7;
 	FORCPU(&bootcpu, thiscpu_x86_apic_emutsc_early_interrupt) = false;
 	FORCPU(&bootcpu, thiscpu_x86_apic_emutsc_mindistance)     = hz / TSC_MIN_DISTANCE_HZ;
-#ifdef CONFIG_TSC_ASSERT_FORWARD
+#ifdef CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD
 	FORCPU(&bootcpu, thiscpu_x86_last_tsc) = 0;
-#endif /* CONFIG_TSC_ASSERT_FORWARD */
+#endif /* CONFIG_HAVE_KERNEL_X86_TSC_ASSERT_FORWARD */
 	if (!X86_HAVE_TSC_DEADLINE) {
 		/* Calibrate the TSC-cmpxch delay.
 		 * On QEMU, this ends up being either 200 or 300 (the actual result appears
@@ -979,7 +979,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_tsc)(void) {
 }
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 DBG_COMMAND(clockinfo,
             "clockinfo\n"
             "\tDisplay information about hardware timings") {
@@ -1054,7 +1054,7 @@ DBG_COMMAND(clockinfo,
 	dbg_setcur_visible(was_cursor_visible);
 	return 0;
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 DECL_END

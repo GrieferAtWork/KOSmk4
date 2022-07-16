@@ -98,12 +98,12 @@ NOTHROW(FCALL GDBServer_HasStopEvent)(GDBThreadStopEvent const *chain,
 #endif /* !NDEBUG */
 
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 PRIVATE void KCALL GDBServer_RecursiveEntryDebuggerMain(void) {
 	dbg_printf(AC_COLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON)
 	           "Recursive GDB trap" AC_DEFATTR "\n");
 }
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 
 LOCAL NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
@@ -196,7 +196,7 @@ do_print_message_in_nonstop_mode:
 		GDBThreadStopEvent *next_notif;
 		if (oldhost == stop_event.tse_thread) {
 			kernel_debugtraps_uninstall(&GDBServer_DebugTraps);
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 			switch (state_kind) {
 			case CPUSTATE_KIND_ICPUSTATE:
 				dbg_enter(&GDBServer_RecursiveEntryDebuggerMain, (struct icpustate *)state);
@@ -212,7 +212,7 @@ do_print_message_in_nonstop_mode:
 				dbg_enter(&GDBServer_RecursiveEntryDebuggerMain, (struct fcpustate *)state);
 			default: break;
 			}
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 			switch (state_kind) {
 			case CPUSTATE_KIND_ICPUSTATE:
 				kernel_panic((struct icpustate *)state, "Recursive GDB trap\n");

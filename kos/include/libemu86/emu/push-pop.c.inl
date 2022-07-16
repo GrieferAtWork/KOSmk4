@@ -33,10 +33,10 @@ case EMU86_OPCODE_ENCODE(0x50) ... EMU86_OPCODE_ENCODE(0x57): {
 	 * 50+rd     PUSH r64     Push r64. */
 	u8 regno;
 	regno = tiny_opcode - EMU86_OPCODE_ENCODE(0x50);
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 	if (op_flags & EMU86_F_REX_B)
 		regno |= 0x8;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	EMU86_PUSH163264(EMU86_GETREGW(regno),
 	                 EMU86_GETREGL(regno),
 	                 EMU86_GETREGQ(regno));
@@ -57,10 +57,10 @@ case EMU86_OPCODE_ENCODE(0x58) ... EMU86_OPCODE_ENCODE(0x5f): {
 	 * 50+rd     POP r64     Pop r64. */
 	u8 regno;
 	regno = tiny_opcode - EMU86_OPCODE_ENCODE(0x58);
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 	if (op_flags & EMU86_F_REX_B)
 		regno |= 0x8;
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 #define SETREGW(v) EMU86_SETREGW(regno, v)
 #define SETREGL(v) EMU86_SETREGL(regno, v)
 #define SETREGQ(v) EMU86_SETREGQ(regno, v)
@@ -101,7 +101,7 @@ case EMU86_OPCODE_ENCODE(0x8f): {
 			vex <<= 8;
 			vex |= *pc++;
 			/*op_flags |= EMU86_F_HASVEX;*/ /* Not needed */
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 			IF_16BIT_OR_32BIT(if (EMU86_F_IS64(op_flags))) {
 				if (!(vex & EMU86_VEX3B_R))
 					op_flags |= EMU86_F_REX_R;
@@ -110,14 +110,14 @@ case EMU86_OPCODE_ENCODE(0x8f): {
 				if (!(vex & EMU86_VEX3B_B))
 					op_flags |= EMU86_F_REX_B;
 			} IF_16BIT_OR_32BIT(else)
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
-#if CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
+#if LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT
 			{
 				if unlikely((vex & (EMU86_VEX3B_R | EMU86_VEX3B_X | EMU86_VEX3B_B)) !=
 				            /*  */ (EMU86_VEX3B_R | EMU86_VEX3B_X | EMU86_VEX3B_B))
 					goto xop_fallback;
 			}
-#endif /* CONFIG_LIBEMU86_WANT_32BIT || CONFIG_LIBEMU86_WANT_16BIT */
+#endif /* LIBEMU86_CONFIG_WANT_32BIT || LIBEMU86_CONFIG_WANT_16BIT */
 			if (vex & EMU86_VEX3B_L)
 				op_flags |= 1 << EMU86_F_VEX_LL_S;
 			if (vex & EMU86_VEX3B_W)

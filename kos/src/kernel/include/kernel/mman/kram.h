@@ -98,8 +98,8 @@ typedef unsigned int gfp_t;
  *     other calls to kmalloc() that may need to be made internally.
  * Returned memory will be initialized as:
  *   - GFP_CALLOC: All zero-initialized
- *   - else:       #ifdef CONFIG_DEBUG_HEAP: DEBUGHEAP_FRESH_MEMORY
- *                 #ifndef CONFIG_DEBUG_HEAP: Undefined
+ *   - else:       #ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP: DEBUGHEAP_FRESH_MEMORY
+ *                 #ifndef       CONFIG_HAVE_KERNEL_DEBUG_HEAP:       Undefined
  *
  * @param: hint:          Hint  for  where  the  mapping  should  go.  This  argument is
  *                        passed  onto  `mman_findunmapped()',  alongside  certain  bits

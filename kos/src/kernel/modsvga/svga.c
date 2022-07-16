@@ -264,11 +264,11 @@ again_load_mode:
 				self->fn_mode   = S_IFCHR | 0600;
 				self->dv_driver = incref(&drv_self);
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 				/* Allocate+initialize a tty for the builtin debugger. */
 				svgadev_dbg_init(self);
 				TRY
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 				{
 					/* Register the device. */
 					TRY {
@@ -278,12 +278,12 @@ again_load_mode:
 						RETHROW();
 					}
 				}
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 				EXCEPT {
 					svgadev_dbg_fini(self);
 					RETHROW();
 				}
-#endif /* CONFIG_HAVE_DEBUGGER */
+#endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 			} EXCEPT {
 				kfree(modev);
 				RETHROW();

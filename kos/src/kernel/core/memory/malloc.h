@@ -30,8 +30,8 @@ DECL_BEGIN
 /*
  * Untraced kmalloc() functions
  *
- * These  are used when  "nomall" is given  on the kernel commandline,
- * or when the kernel was built with `CONFIG_NO_TRACE_MALLOC' defined.
+ * These  are  used  when  "nomall"  is  given  on  the  kernel  commandline,
+ * or when the kernel was built with `CONFIG_NO_KERNEL_TRACE_MALLOC' defined.
  */
 
 INTDEF WUNUSED size_t NOTHROW(KCALL untraced_kmalloc_usable_size)(void *ptr);

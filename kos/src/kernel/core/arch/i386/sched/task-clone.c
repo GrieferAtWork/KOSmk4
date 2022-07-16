@@ -38,17 +38,17 @@
 #include <stddef.h>
 #include <string.h>
 
-#ifndef CONFIG_NO_USERKERN_SEGMENT
+#ifndef CONFIG_NO_KERNEL_USERKERN_SEGMENT
 #include <kernel/rand.h>
 #include <sched/userkern.h>
 
 #include <kos/kernel/paging.h>
 #include <kos/ukern.h>
-#endif /* !CONFIG_NO_USERKERN_SEGMENT */
+#endif /* !CONFIG_NO_KERNEL_USERKERN_SEGMENT */
 
 DECL_BEGIN
 
-#ifndef CONFIG_NO_USERKERN_SEGMENT
+#ifndef CONFIG_NO_KERNEL_USERKERN_SEGMENT
 PUBLIC NOBLOCK uintptr_t
 NOTHROW(KCALL x86_get_random_userkern_address)(void) {
 	uintptr_t offset;
@@ -72,7 +72,7 @@ NOTHROW(KCALL x86_get_random_userkern_address32)(void) {
 	return offset;
 }
 #endif /* __x86_64__ */
-#endif /* !CONFIG_NO_USERKERN_SEGMENT */
+#endif /* !CONFIG_NO_KERNEL_USERKERN_SEGMENT */
 
 
 DATDEF ATTR_PERTASK uintptr_t this_x86_kernel_psp0_ ASMNAME("this_x86_kernel_psp0");

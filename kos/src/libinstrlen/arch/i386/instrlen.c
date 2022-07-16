@@ -23,13 +23,13 @@
 #include <hybrid/host.h>
 
 #ifdef __x86_64__
-#define CONFIG_LIBEMU86_WANT_64BIT 1
-#define CONFIG_LIBEMU86_WANT_32BIT 1
-#define CONFIG_LIBEMU86_WANT_16BIT 0
+#define LIBEMU86_CONFIG_WANT_64BIT 1
+#define LIBEMU86_CONFIG_WANT_32BIT 1
+#define LIBEMU86_CONFIG_WANT_16BIT 0
 #else /* __x86_64__ */
-#define CONFIG_LIBEMU86_WANT_64BIT 0
-#define CONFIG_LIBEMU86_WANT_32BIT 1
-#define CONFIG_LIBEMU86_WANT_16BIT 1
+#define LIBEMU86_CONFIG_WANT_64BIT 0
+#define LIBEMU86_CONFIG_WANT_32BIT 1
+#define LIBEMU86_CONFIG_WANT_16BIT 1
 #endif /* !__x86_64__ */
 
 #include "../../api.h"
@@ -183,13 +183,13 @@ NOTHROW_NCX(CC libil_instruction_succ)(void const *pc,
 	emu86_opflags_t op_flags;
 	unsigned int type;
 	struct emu86_modrm modrm;
-#if CONFIG_LIBEMU86_WANT_16BIT
+#if LIBEMU86_CONFIG_WANT_16BIT
 #define IS_OP16() (!!(op_flags & EMU86_F_OP16) ^ !!EMU86_F_IS16(op_flags))
 #define IS_AD16() (!!(op_flags & EMU86_F_AD16) ^ !!EMU86_F_IS16(op_flags))
-#else /* CONFIG_LIBEMU86_WANT_16BIT */
+#else /* LIBEMU86_CONFIG_WANT_16BIT */
 #define IS_OP16() (op_flags & EMU86_F_OP16)
 #define IS_AD16() (op_flags & EMU86_F_AD16)
-#endif /* !CONFIG_LIBEMU86_WANT_16BIT */
+#endif /* !LIBEMU86_CONFIG_WANT_16BIT */
 #ifndef __KERNEL__
 	if unlikely(!libemu86_init())
 		return NULL;

@@ -51,7 +51,7 @@ typedef union {
 #endif /* !VFS_DRIVECOUNT */
 
 /* Default value for `struct fs::fs_umask' */
-#define CONFIG_FS_UMASK_DEFAULT 0022 /* S_IWGRP|S_IWOTH */
+#define FS_CONFIG_UMASK_DEFAULT 0022 /* S_IWGRP|S_IWOTH */
 
 /* FS is the high-level filesystem controller that expands upon VFS by
  * adding commonly thought-of as "per-process" variables such as  PWD,

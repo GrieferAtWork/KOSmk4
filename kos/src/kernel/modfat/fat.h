@@ -41,20 +41,24 @@ DECL_END
 
 #include <kos/sched/shared-rwlock.h>
 
-/* Configuration option: Support cygwin-style symbolic links.
+/*[[[config CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS = true
+ * Configuration option: Support cygwin-style symbolic links.
  * NOTE: Those weird  wide-character  symlinks  referenced  by  the
  *       cygwin source code aren't supported. Only regular symlinks
  *       are, and those are always assumed to represent UTF-8 text.
  *       But also note that I've never seen cygwin actually  create
- *       one of those wide-character symlinks... */
-#ifdef CONFIG_NO_FAT_CYGWIN_SYMLINKS
-#undef CONFIG_FAT_CYGWIN_SYMLINKS
-#elif !defined(CONFIG_FAT_CYGWIN_SYMLINKS)
-#define CONFIG_FAT_CYGWIN_SYMLINKS 1
-#elif (CONFIG_FAT_CYGWIN_SYMLINKS + 0) == 0
-#undef CONFIG_FAT_CYGWIN_SYMLINKS
-#define CONFIG_NO_FAT_CYGWIN_SYMLINKS 1
+ *       one of those wide-character symlinks...
+ * ]]]*/
+#ifdef CONFIG_NO_MODFAT_CYGWIN_SYMLINKS
+#undef CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS
+#elif !defined(CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS)
+#define CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS
+#elif (-CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS - 1) == -1
+#undef CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS
+#define CONFIG_NO_MODFAT_CYGWIN_SYMLINKS
 #endif /* ... */
+/*[[[end]]]*/
+
 
 /* NOTE: This implementation uses the absolute on-disk location of a  FAT
  *       directory entry (The  `struct fat_dirent' structure) as  `ino_t'
@@ -362,20 +366,20 @@ struct fatdirnode: flatdirnode {
 #define FatDirNode_AsSuper(self) \
 	flatsuper_asfat(flatdirnode_assuper((struct flatdirnode *)(self)))
 
-#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+#ifdef CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS
 typedef struct fatlnknode FatLnkNode;
 struct fatlnknode: flnknode {
 	FatNodeData fln_fdat; /* Fat node data. */
 };
-#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
+#endif /* CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS */
 
 #define fregnode_asfat(self)    ((FatRegNode *)(self))
 #define flatdirnode_asfat(self) ((FatDirNode *)(self))
 #define fdirnode_asfat(self)    flatdirnode_asfat(fdirnode_asflat(self))
 #define fdirnode_asfatsup(self) FatDirNode_AsSuper(fdirnode_asfat(self))
-#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+#ifdef CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS
 #define flnknode_asfat(self) ((FatLnkNode *)(self))
-#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
+#endif /* CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS */
 #define fnode_asfatreg(self) fregnode_asfat(fnode_asreg(self))
 #define fnode_asfatdir(self) flatdirnode_asfat(fnode_asflatdir(self))
 #define fnode_asfatlnk(self) flnknode_asfat(fnode_aslnk(self))
@@ -398,9 +402,9 @@ struct fatsuper {
 #define FAT_FEATURE_ARB               0x0001 /* struct fat_dirent+0x14: 16-bit access rights bitmap (set of `FAT_ARB_NO_*') */
 #define FAT_FEATURE_ATIME             0x0000 /* struct fat_dirent+0x12: 16-bit last-access timestamp */
 #define FAT_FEATURE_UGID              0x0002 /* struct fat_dirent+0x12: 8-bit user/group IDs */
-#ifdef CONFIG_FAT_CYGWIN_SYMLINKS
+#ifdef CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS
 #define FAT_FEATURE_NO_CYGWIN_SYMLINK 0x8000 /* Disable cygwin symlink support */
-#endif /* CONFIG_FAT_CYGWIN_SYMLINKS */
+#endif /* CONFIG_HAVE_MODFAT_CYGWIN_SYMLINKS */
 	u16                     ft_features;    /* [const] Fat features (Set of `FAT_FEATURE_*'). */
 #ifndef CONFIG_NO_SMP
 	struct atomic_lock      fs_stringslock; /* SMP-Lock for `ft_oem', `ft_label' and `ft_sysname' */

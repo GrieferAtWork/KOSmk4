@@ -183,21 +183,21 @@ case EMU86_OPCODE_ENCODE(0xf6):
 	}
 
 	default:
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define NEED_return_unknown_instruction_rmreg
 		goto return_unknown_instruction_rmreg;
-#else /* CONFIG_LIBEMU86_WANT_64BIT */
+#else /* LIBEMU86_CONFIG_WANT_64BIT */
 		__builtin_unreachable();
-#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* !LIBEMU86_CONFIG_WANT_64BIT */
 	}
 #else /* EMU86_EMULATE_CONFIG_WANT_ARITH2 */
 	MODRM_DECODE();
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 	if (modrm.mi_reg >= 8) {
 #define NEED_return_unknown_instruction_rmreg
 		goto return_unknown_instruction_rmreg;
 	}
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	if (modrm.mi_reg == 0) {
 		MODRM_NOSUP_GETRMB();
 	} else {
@@ -278,7 +278,7 @@ case EMU86_OPCODE_ENCODE(0xf7):
 		 * F7 /4      MUL r/m32      Unsigned multiply (EDX:EAX = EAX * r/m32)
 		 * F7 /4      MUL r/m64      Unsigned multiply (RDX:RAX = RAX * r/m64) */
 		bool is_upper_half_needed;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (IS_64BIT()) {
 #ifdef __UINT128_TYPE__
 			u64 rhs = MODRM_GETRMQ();
@@ -298,7 +298,7 @@ case EMU86_OPCODE_ENCODE(0xf7):
 			goto return_unsupported_instruction_rmreg;
 #endif /* !__UINT128_TYPE__ */
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		if (!IS_16BIT()) {
 			u32 rhs = MODRM_GETRML();
 			u32 lhs = EMU86_GETEAX();
@@ -334,7 +334,7 @@ case EMU86_OPCODE_ENCODE(0xf7):
 		 * F7 /5      IMUL r/m32      EDX:EAX = EAX * r/m doubleword
 		 * F7 /5      IMUL r/m64      RDX:RAX = RAX * r/m doubleword */
 		bool is_upper_half_needed;
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (IS_64BIT()) {
 #ifdef __UINT128_TYPE__
 			s64 rhs = (s64)MODRM_GETRMQ();
@@ -357,7 +357,7 @@ case EMU86_OPCODE_ENCODE(0xf7):
 			goto return_unsupported_instruction_rmreg;
 #endif /* !__UINT128_TYPE__ */
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		if (!IS_16BIT()) {
 			s32 rhs = (s32)MODRM_GETRML();
 			s32 lhs = (s32)EMU86_GETEAX();
@@ -397,7 +397,7 @@ case EMU86_OPCODE_ENCODE(0xf7):
 		/* F7 /6      DIV r/m16      Unsigned divide DX:AX by r/m16, with result stored in AX = Quotient, DX = Remainder
 		 * F7 /6      DIV r/m32      Unsigned divide EDX:EAX by r/m32, with result stored in EAX = Quotient, EDX = Remainder
 		 * F7 /6      DIV r/m64      Unsigned divide RDX:RAX by r/m64, with result stored in RAX = Quotient, RDX = Remainder */
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (IS_64BIT()) {
 #ifdef __UINT128_TYPE__
 			union {
@@ -425,7 +425,7 @@ case EMU86_OPCODE_ENCODE(0xf7):
 			goto return_unsupported_instruction_rmreg;
 #endif /* !__UINT128_TYPE__ */
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		if (!IS_16BIT()) {
 			union {
 				u64 qword;
@@ -475,7 +475,7 @@ case EMU86_OPCODE_ENCODE(0xf7):
 		/* F7 /7      IDIV r/m16      Signed divide DX:AX by r/m16, with result stored in AX = Quotient, DX = Remainder
 		 * F7 /7      IDIV r/m32      Signed divide EDX:EAX by r/m32, with result stored in EAX = Quotient, EDX = Remainder
 		 * F7 /7      IDIV r/m64      Signed divide RDX:RAX by r/m64, with result stored in RAX = Quotient, RDX = Remainder */
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 		if (IS_64BIT()) {
 #ifdef __UINT128_TYPE__
 			union {
@@ -507,7 +507,7 @@ case EMU86_OPCODE_ENCODE(0xf7):
 			goto return_unsupported_instruction_rmreg;
 #endif /* !__UINT128_TYPE__ */
 		} else
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 		if (!IS_16BIT()) {
 			union {
 				s64 qword;
@@ -554,21 +554,21 @@ case EMU86_OPCODE_ENCODE(0xf7):
 		goto done;
 
 	default:
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 #define NEED_return_unknown_instruction_rmreg
 		goto return_unknown_instruction_rmreg;
-#else /* CONFIG_LIBEMU86_WANT_64BIT */
+#else /* LIBEMU86_CONFIG_WANT_64BIT */
 		__builtin_unreachable();
-#endif /* !CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* !LIBEMU86_CONFIG_WANT_64BIT */
 	}
 #else /* EMU86_EMULATE_CONFIG_WANT_ARITH2 */
 	MODRM_DECODE();
-#if CONFIG_LIBEMU86_WANT_64BIT
+#if LIBEMU86_CONFIG_WANT_64BIT
 	if (modrm.mi_reg >= 8) {
 #define NEED_return_unknown_instruction_rmreg
 		goto return_unknown_instruction_rmreg;
 	}
-#endif /* CONFIG_LIBEMU86_WANT_64BIT */
+#endif /* LIBEMU86_CONFIG_WANT_64BIT */
 	if (modrm.mi_reg == 0) {
 		MODRM_NOSUP_GETRMWLQ();
 	} else {

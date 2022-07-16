@@ -82,11 +82,11 @@ DATDEF __UINT8_TYPE__ const _kernel_poisoned;
  * kernel has become unstable) */
 FUNDEF NOBLOCK ATTR_COLD void NOTHROW(KCALL _kernel_poison)(void);
 
-#ifdef CONFIG_HAVE_DEBUGGER
+#ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #define ATTR_KERNEL_PANIC_NORETURN /* nothing */
-#else /* CONFIG_HAVE_DEBUGGER */
+#else /* CONFIG_HAVE_KERNEL_DEBUGGER */
 #define ATTR_KERNEL_PANIC_NORETURN ATTR_NORETURN
-#endif /* !CONFIG_HAVE_DEBUGGER */
+#endif /* !CONFIG_HAVE_KERNEL_DEBUGGER */
 
 /* Set kernel poison bits. */
 #define kernel_poison(what) __hybrid_atomic_or(_kernel_private_poisoned_wr, what, __ATOMIC_SEQ_CST)
