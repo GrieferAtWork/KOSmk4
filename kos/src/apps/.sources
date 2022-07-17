@@ -48,13 +48,12 @@ if (TARGET_ARCH in ["i386", "x86_64"]) {
 }
 
 /* Super-simple, statically linked (freestanding) applications. */
-#define DEFINE_FREESTANDING_C_APPLICATION(name)          \
-	BEGIN GROUP("apps." name) { COMPILE, LINK, MCOPY };  \
-		REMOVE_GCC_FLAGS({ "-fstack-protector-strong" }) \
-		SET_NOSTDLIB()                                   \
-		SET_LANGUAGE("c")                                \
-		SET_OUTPUT("/bin/" name)                         \
-		SOURCE({ "misc/" name ".c" })                    \
+#define DEFINE_FREESTANDING_C_APPLICATION(name)         \
+	BEGIN GROUP("apps." name) { COMPILE, LINK, MCOPY }; \
+		SET_NOSTDLIB()                                  \
+		SET_LANGUAGE("c")                               \
+		SET_OUTPUT("/bin/" name)                        \
+		SOURCE({ "misc/" name ".c" })                   \
 	END
 DEFINE_FREESTANDING_C_APPLICATION("leaks")
 DEFINE_FREESTANDING_C_APPLICATION("cc")

@@ -55,8 +55,6 @@ __SYSDECL_BEGIN
 #endif /* __SIZEOF_POINTER__ >= 8 */
 
 
-/* Kernel system control command codes. (For use with `ksysctl()') */
-
 #define KSYSCTL_DRIVER_FORMAT_BLOB  1 /* Load a driver from an given data-blob  (which should represent a valid ELF  binary)
                                        * For more information on driver binaries, see the documentation in <kernel/driver.h> */
 #define KSYSCTL_DRIVER_FORMAT_FILE  2 /* Load a driver from a given INode handle (or INode-compatible handle) */
@@ -262,6 +260,11 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
 #endif /* __CC__ */
 #undef __KSYSCTL_PAD_POINTER
 
+
+/************************************************************************/
+/* Kernel system control command codes. (For use with `ksysctl()')      */
+/************************************************************************/
+
 /* Generic kernel house-keeping */
 #define KSYSCTL_SYSTEM_CLEARCACHES             0xc05e0001 /* Invoke cache clear callbacks for each and every globally reachable
                                                            * component within the entire kernel.
@@ -303,6 +306,7 @@ struct ksysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
                                                            * @return: == result->of_hint */
 #define KSYSCTL_OPEN_BOOT_TASK                 0xfffe0002 /* [struct openfd *result] Open a handle `HANDLE_TYPE_PIDFD' to `boottask'
                                                            * @return: == result->of_hint */
+/************************************************************************/
 
 
 #ifdef __CC__

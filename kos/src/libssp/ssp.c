@@ -1,3 +1,9 @@
+/*[[[magic
+// Libssp is the one responsible for stack-smash-protection, so prevent
+// a dependency loop by getting rid  of SSP within the library  itself.
+local opt = options.setdefault("GCC.options", []);
+opt.removeif([](e) -> e.startswith("-fstack-protector"));
+]]]*/
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,8 +39,6 @@ DECL_BEGIN
 
 IMPDAT uintptr_t __stack_chk_guard;               /* from `libc.so' */
 IMPDEF ATTR_NORETURN void __stack_chk_fail(void); /* from `libc.so' */
-
-/* TODO: Library initializer to assign a random value to `__stack_chk_guard()' */
 
 #define SECTION_CRT_ASSERT ".text.crt.assert"
 

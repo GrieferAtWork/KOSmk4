@@ -179,9 +179,6 @@ END
 BEGIN GROUP("libs.libssp") { COMPILE, LINK, ARCHIVE, MCOPY };
 	/* Use the C compiler, so we don't have to deal with c++ meta data... */
 	SET_LANGUAGE("c")
-	/* Libssp is the one responsible for stack-smash-protection, so prevent
-	 * a dependency loop by getting rid  of SSP within the library  itself. */
-	REMOVE_GCC_FLAGS({ "-fstack-protector-strong" })
 	LD_FLAGS({ "--hash-style=gnu" })
 	SET_OUTPUT_LIBDLL("libssp")
 	SET_SHARED()

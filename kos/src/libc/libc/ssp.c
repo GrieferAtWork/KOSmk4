@@ -24,6 +24,7 @@
 
 DECL_BEGIN
 
+/* XXX: Library initializer to assign a random value to `__stack_chk_guard()' */
 INTERN uintptr_t libc_stack_chk_guard = 0x123baf37;
 
 /* XXX: Maybe define as PUBLIC_IDATA and use a custom initializer

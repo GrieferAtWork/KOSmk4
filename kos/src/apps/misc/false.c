@@ -1,3 +1,7 @@
+/*[[[magic
+local opt = options.setdefault("GCC.options", []);
+opt.removeif([](e) -> e.startswith("-fstack-protector"));
+]]]*/
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
