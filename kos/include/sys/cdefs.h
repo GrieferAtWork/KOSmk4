@@ -578,21 +578,11 @@
  * which  defines  a  bunch of  arch-specific  configuration helpers.
  * Since programs might therefor expect <sys/cdefs.h> to define those
  * same macros on  other platforms, emulate  macros from that  header
- * here, since KOS doesn't have <bits/wordsize.h> (any more) */
+ * here. */
 
 /* __WORDSIZE = __SIZEOF_POINTER__ * __CHAR_BIT__ */
 #ifndef __WORDSIZE
-#if __SIZEOF_POINTER__ == 1
-#define __WORDSIZE 8
-#elif __SIZEOF_POINTER__ == 2
-#define __WORDSIZE 16
-#elif __SIZEOF_POINTER__ == 4
-#define __WORDSIZE 32
-#elif __SIZEOF_POINTER__ == 8
-#define __WORDSIZE 64
-#else /* __SIZEOF_POINTER__ == ... */
-#define __WORDSIZE (__SIZEOF_POINTER__ * 8)
-#endif /* __SIZEOF_POINTER__ != ... */
+#define __WORDSIZE __INTPTR_WIDTH__
 #endif /* !__WORDSIZE */
 
 #ifndef __SIZEOF_SYSCALL_LONG_T__
@@ -600,24 +590,16 @@
 #endif /* !__SIZEOF_SYSCALL_LONG_T__ */
 
 #ifndef __SIZEOF_TIME32_T__
-#define __SIZEOF_TIME32_T__         4
+#define __SIZEOF_TIME32_T__ 4
 #endif /* !__SIZEOF_TIME32_T__ */
 #ifndef __SIZEOF_TIME64_T__
-#define __SIZEOF_TIME64_T__         8
+#define __SIZEOF_TIME64_T__ 8
 #endif /* !__SIZEOF_TIME64_T__ */
 
 /* __SYSCALL_WORDSIZE = __SIZEOF_SYSCALL_LONG_T__ * __CHAR_BIT__ */
-#if __SIZEOF_SYSCALL_LONG_T__ == 1
-#define __SYSCALL_WORDSIZE 8
-#elif __SIZEOF_SYSCALL_LONG_T__ == 2
-#define __SYSCALL_WORDSIZE 16
-#elif __SIZEOF_SYSCALL_LONG_T__ == 4
-#define __SYSCALL_WORDSIZE 32
-#elif __SIZEOF_SYSCALL_LONG_T__ == 8
-#define __SYSCALL_WORDSIZE 64
-#else /* __SIZEOF_SYSCALL_LONG_T__ == ... */
-#define __SYSCALL_WORDSIZE (__SIZEOF_SYSCALL_LONG_T__ * 8)
-#endif /* __SIZEOF_SYSCALL_LONG_T__ != ... */
+#ifndef __SYSCALL_WORDSIZE
+#define __SYSCALL_WORDSIZE __PRIVATE_WIDTH(__SIZEOF_SYSCALL_LONG_T__)
+#endif /* !__SYSCALL_WORDSIZE */
 
 /* defined(__WORDSIZE_TIME64_COMPAT32) = __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__

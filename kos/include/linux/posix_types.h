@@ -36,17 +36,7 @@
 
 #ifndef __BITS_PER_LONG
 #include <hybrid/typecore.h>
-#if __CHAR_BIT__ == 8 && __SIZEOF_POINTER__ == 4
-#define __BITS_PER_LONG 32
-#elif __CHAR_BIT__ == 8 && __SIZEOF_POINTER__ == 8
-#define __BITS_PER_LONG 64
-#elif __CHAR_BIT__ == 8 && __SIZEOF_POINTER__ == 2
-#define __BITS_PER_LONG 16
-#elif __CHAR_BIT__ == 8 && __SIZEOF_POINTER__ == 1
-#define __BITS_PER_LONG 8
-#else /* __CHAR_BIT__ == 8 && __SIZEOF_POINTER__ == ... */
-#define __BITS_PER_LONG (__CHAR_BIT__ * __SIZEOF_POINTER__)
-#endif /* __CHAR_BIT__ == 8 && __SIZEOF_POINTER__ != ... */
+#define __BITS_PER_LONG __INTPTR_WIDTH__
 #endif /* !__BITS_PER_LONG */
 
 #ifdef __CC__

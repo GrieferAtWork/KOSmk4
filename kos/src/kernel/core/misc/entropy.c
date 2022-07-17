@@ -190,18 +190,18 @@ NOTHROW(KCALL bitxor)(void *__restrict dst_base, size_t dst_bit_offset,
                       size_t num_bits) {
 	while (num_bits) {
 		byte_t remaining, src_value, remaining_temp;
-		src_base = (byte_t const *)src_base + (src_bit_offset / __CHAR_BIT__);
-		src_bit_offset %= __CHAR_BIT__;
-		remaining = __CHAR_BIT__ - src_bit_offset;
+		src_base = (byte_t const *)src_base + (src_bit_offset / NBBY);
+		src_bit_offset %= NBBY;
+		remaining = NBBY - src_bit_offset;
 		if (remaining > num_bits)
 			remaining = num_bits;
 		src_value      = *(byte_t const *)src_base >> src_bit_offset;
 		remaining_temp = remaining;
 		while (remaining_temp) {
 			byte_t avail;
-			dst_base = (byte_t *)dst_base + (dst_bit_offset / __CHAR_BIT__);
-			dst_bit_offset %= __CHAR_BIT__;
-			avail = __CHAR_BIT__ - dst_bit_offset;
+			dst_base = (byte_t *)dst_base + (dst_bit_offset / NBBY);
+			dst_bit_offset %= NBBY;
+			avail = NBBY - dst_bit_offset;
 			if (avail > remaining_temp)
 				avail = remaining_temp;
 			*(byte_t *)dst_base ^= (src_value & ((1 << avail) - 1)) << dst_bit_offset;
