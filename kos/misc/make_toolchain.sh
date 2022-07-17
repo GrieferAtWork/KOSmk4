@@ -394,6 +394,7 @@ else
 fi
 
 # Generate project files and configurations
+echo "Updating VS/VSC configuration files..."
 cmd cd ".."
 cmd "$DEEMON" "kos/misc/config/files.dee"
 cmd cd "binutils"

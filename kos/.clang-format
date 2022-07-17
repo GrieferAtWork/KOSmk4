@@ -244,6 +244,8 @@ IfMacros:
   - __ATTR_INOUT
   - ATTR_INOUT_T
   - __ATTR_INOUT_T
+  - ATTR_SECTION
+  - __ATTR_SECTION
   - THROWS
   - __THROWS
 IncludeBlocks: Regroup

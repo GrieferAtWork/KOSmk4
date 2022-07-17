@@ -9,6 +9,7 @@
 	"C_Cpp.autoAddFileAssociations": false,
 	"files.associations": {
 		"*.c" : "cpp",
+		"*.ctest" : "cpp",
 		"*.h" : "cpp",
 		"*.c.inl" : "cpp",
 		"*.sh" : "shellscript",

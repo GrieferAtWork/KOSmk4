@@ -73,7 +73,7 @@ global final GDBARCH = "i386:intel";
 @@Intellisense mode for visual studio / vs-code
 global final VS_INTELLISENSE_MODE = "linux-gcc-x86";
 
-@@Take target name for visual studio
+@@Fake target name for visual studio
 global final VS_PROJECT_TARGET = "Win32";
 
 @@Provide a cache for the toolchain.

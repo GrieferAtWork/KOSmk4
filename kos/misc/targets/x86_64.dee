@@ -73,7 +73,7 @@ global final GDBARCH = "i386:x86-64:intel";
 @@Intellisense mode for visual studio / vs-code
 global final VS_INTELLISENSE_MODE = "linux-gcc-x64";
 
-@@Take target name for visual studio
+@@Fake target name for visual studio
 global final VS_PROJECT_TARGET = "x64";
 
 @@An optional function called before building is started
