@@ -41,8 +41,12 @@ function generateFile(filename: string, cb: Callable with File) {
 	File.Writer tempfp;
 	cb(tempfp);
 	local data = tempfp.string.bytes();
-	with (local fp = File.open(fs.joinpath(getKosRootDir(), filename), "w"))
-		fp.write(data);
+	local absFilename = fs.joinpath(getKosRootDir(), filename);
+	local oldData = try File.open(absFilename).read() catch (...) none;
+	if (oldData is none || data != oldData) {
+		with (local fp = File.open(fs.joinpath(getKosRootDir(), filename), "w"))
+			fp.write(data);
+	}
 }
 
 
@@ -68,6 +72,7 @@ function enumerateConfigSpecificMacros(CONFIG: Configuration): {(string, string)
 			value = "1";
 		yield (name, value);
 	}
+
 	/* GCC option-specific predefined macros. */
 	local gccOptions = options.get(OPT_GCC_OPTIONS);
 	if (gccOptions !is none) {
@@ -76,6 +81,12 @@ function enumerateConfigSpecificMacros(CONFIG: Configuration): {(string, string)
 				yield ("__OPTIMIZE_SIZE__", "1");
 			} else if (opt.startswith("-O")) {
 				yield ("__OPTIMIZE__", "1");
+			} else if (opt.startswith("-D")) {
+				opt = opt[2:];
+				local a, none, b = opt.partition("=")...;
+				if (!b)
+					b = "1";
+				yield (a, b);
 			}
 		}
 	}

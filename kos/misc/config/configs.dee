@@ -20,48 +20,151 @@
 
 /* Enumerate+load defined system configurations
  *
- * System configurations are defined by files in `/kos/include/kos/config/features/xxx.h',
- * where `xxx' is the name of the configuration.  Aside from these, there is a total of  4
- * default  configurations  `OD', `OnD',  `nOD'  and `nOnD'  that  use the  default values
- * everywhere, but with/without `NDEBUG' / `-O2' (or `-O3').
+ * System configurations are defined by files in `/kos/include/kos/config/configurations/xxx.h',
+ * where `xxx' is the name of the configuration. Aside from these, there is a total of 4 default
+ * configurations `OD', `OnD',  `nOD' and  `nOnD' that use  the default  values everywhere,  but
+ * with/without `NDEBUG' / `-O2' (or `-O3').
  */
 
 import * from deemon;
-//import * from .utils;
+import * from .utils;
 import * from ..libmagic.libmagic;
 import OPT_COMPILE_MACROS from ..libmagic.steps.c;
-import OPT_GCC_OPTIONS from ..libmagic.toolchain.gcc;
+import fs;
 
-@@Enumerate available configurations by name
-function listConfigurationNames(): {string...} {
-	yield "OD";
-	yield "nOD";
-	yield "OnD";
-	yield "nOnD";
-	/* TODO: Custom configurations */
+function getBytesLineColumnAt(bytes: Bytes, offset: int): (int, int) {
+	local sol  = bytes.rfind("\n", 0, offset) + 1;
+	local line = bytes.count("\n", 0, sol);
+	return (line + 1, (sol - offset) + 1);
+}
+
+function getConfigFilename(configName: string): string {
+	return fs.joinpath(
+		getKosRootDir(),
+		f"kos/include/kos/config/configurations/{configName}.h");
 }
 
 
-function getPrettyConfigName(config: Configuration): string {
-	/* TODO: Custom configurations */
-	return {
-		"OD"   : "Optimize, DEBUG",
-		"nOD"  : "DEBUG",
-		"OnD"  : "Optimize, NDEBUG",
-		"nOnD" : "NDEBUG",
-	}.get(config.name, config.name);
-}
+@@Descriptor for custom user-defined configurations
+final class CustomConfiguration: Configuration {
+	public member configFile: File;
 
-
-@@Simple configuration class used to describe builtin configurations
-final class SimpleCustomConfiguration: Configuration {
-	public member extraOptions: {string: Object};
-
-	this(name: string, extraOptions: {string: Object})
-		: super(name)
-	{
-		this.extraOptions = extraOptions;
+	this(configName: string): super(configName) {
+		this.configFile = File.open(getConfigFilename(configName), "r");
 	}
+
+	@@Return the data of @configFile
+	public property configFileData: Bytes = {
+		get(): Bytes {
+			if (m_configFileData !is bound)
+				m_configFileData = configFile.read().unifylines();
+			return m_configFileData;
+		}
+	}
+	private member m_configFileData: Bytes;
+
+	private function errAt(offset: int, message: string) {
+		local l, c = getBytesLineColumnAt(configFileData, offset)...;
+		local errMsg = f"{getConfigFilename(this.name)}({l},{c}) : Error : {message}";
+		print errMsg;
+		throw Error(errMsg);
+	}
+
+	@@Return the `[[[magic ...]]]` script defined by the configuration (if any)
+	public property magic: Bytes | none = {
+		get(): Bytes | none {
+			if (m_magic !is bound) {
+				local bytes = configFileData;
+				final local PREFIX = "/*" "[[[magic";
+				local magicOffset = bytes.find(PREFIX);
+				if (magicOffset < 0) {
+					m_magic = none;
+				} else {
+					magicOffset += #PREFIX;
+					local magicEnd = bytes.find("]]]*/");
+					if (magicEnd < 0)
+						errAt(magicOffset, "Magic tag not closed");
+					local extraPos = bytes.find(PREFIX, magicEnd);
+					if (extraPos >= 0)
+						errAt(extraPos, "Only a single [[[magic ...]]] tag can be defined");
+					m_magic = bytes[magicOffset:magicEnd];
+				}
+			}
+			return m_magic;
+		}
+	}
+	private member m_magic: Bytes | none;
+
+	@@Return extra options defined via @magic
+	public property extraOptions: {string: Object} = {
+		get(): {string: Object} {
+			if (m_extraOptions !is bound) {
+				local globals = Dict({ "options": Dict() });
+				exec(magic, globals: globals);
+				local options = globals["options"];
+				/* Default configurations  are auto-detected  in
+				 * headers, so don't need custom include macros! */
+				if (this.name !in ["OD", "OnD", "nOD", "nOnD"]) {
+					local macros = options.setdefault(OPT_COMPILE_MACROS, Dict());
+					macros["CONFIG_HEADER"] = f'"configurations/{this.name}.h"';
+				}
+				m_extraOptions = options;
+			}
+			return m_extraOptions;
+		}
+	}
+	private member m_extraOptions: {string: Object};
+
+	@@Return the macros defined by this configuration
+	public property macros: {string: string} = {
+		get(): {string: string} {
+			if (m_macros !is bound) {
+				local macros = Dict();
+				for (local line: configFileData.replace("\\\n", "").splitlines()) {
+					line = line.lstrip();
+					if (!line.startswith("#"))
+						continue;
+					line = line[1:].lstrip();
+					if (!line.startswith("define"))
+						continue;
+					line = line[6:].lstrip();
+					local macroNameEnd = 0;
+					while (macroNameEnd < #line && line.issymcont(macroNameEnd))
+						++macroNameEnd;
+					if (macroNameEnd >= #line)
+						continue;
+					if (!line.isspace(macroNameEnd))
+						continue;
+					local macroName = line[:macroNameEnd];
+					while (macroNameEnd < #line && line.isspace(macroNameEnd))
+						++macroNameEnd;
+					local macroValue = line[macroNameEnd:];
+					macros[macroName] = macroValue;
+				}
+				m_macros = macros;
+			}
+			return m_macros;
+		}
+	}
+	private member m_macros: {string: string};
+
+	@@Return the configuration's pretty name (as defined by `#define CONFIG_PRETTY_NAME`)
+	@@If   not   overwritten,   simply   return   the   configuration's   normal    name.
+	public property prettyName: string = {
+		get(): string {
+			if (m_prettyName !is bound) {
+				local prettyName = macros.get("CONFIG_PRETTY_NAME");
+				if (prettyName !is none) {
+					prettyName = prettyName.decode("c-escape");
+				} else {
+					prettyName = this.name;
+				}
+				m_prettyName = prettyName;
+			}
+			return m_prettyName;
+		}
+	}
+	private member m_prettyName: string;
 
 	@@Return extra options that should always apply
 	function getExtraOptions(self: BoundStep): {string: Object} {
@@ -70,40 +173,21 @@ final class SimpleCustomConfiguration: Configuration {
 }
 
 
+@@Enumerate available configurations by name
+function listConfigurationNames(): {string...} {
+	for (local filename: fs.query(fs.joinpath(getKosRootDir(), "kos/include/kos/config/configurations/*.h")))
+		yield filename[:-2];
+}
+
+
+function getPrettyConfigName(config: Configuration): string {
+	if (config is CustomConfiguration)
+		return config.prettyName;
+	return config.name;
+}
+
+
 @@Lookup a configuration, given its name
 function getConfiguration(name: string): Configuration {
-	switch (name) {
-
-	case "OD":
-	case "nOD":
-	case "OnD":
-	case "nOnD": {
-		local c_optimize = "nO" !in name;
-		local c_debug    = "nD" !in name;
-
-		/* Load default configuration. */
-		local options = Dict();
-		if (c_debug) {
-			if (c_optimize) {
-				options[OPT_GCC_OPTIONS] = { "-fstack-protector-strong", "-O2" };
-			} else {
-				options[OPT_GCC_OPTIONS] = { "-fstack-protector-strong" };
-			}
-		} else {
-			if (c_optimize) {
-				options[OPT_GCC_OPTIONS] = { "-O3" };
-			}
-			options[OPT_COMPILE_MACROS] = { "NDEBUG" : "1" };
-		}
-
-		return SimpleCustomConfiguration(
-			name:         name,
-			extraOptions: options);
-	}	break;
-
-	default:
-		break;
-	}
-	/* TODO: Custom configurations */
-	throw Error(f"No such configuration: {repr name}");
+	return CustomConfiguration(name);
 }

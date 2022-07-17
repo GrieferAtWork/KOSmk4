@@ -28,6 +28,13 @@ __ice__
 *.stackdump
 *.tmp
 
+# Custom user-defined configurations
+/kos/include/kos/config/configurations/*.h
+!/kos/include/kos/config/configurations/OD.h
+!/kos/include/kos/config/configurations/OnD.h
+!/kos/include/kos/config/configurations/nOD.h
+!/kos/include/kos/config/configurations/nOnD.h
+
 # These headers are installed by `make_toolchain.sh`
 /kos/include/i386-kos/kos/config/_toolchain32.h
 /kos/include/i386-kos/kos/config/_toolchain64.h

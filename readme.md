@@ -29,6 +29,7 @@ git clone --recursive https://github.com/GrieferAtWork/KOSmk4
 	- [Recommended Build Environment](#build-env)
 	- [Building 3rd party programs](#building_3rd_party_programs)
 	- [`deemon magic.dee`](#magic)
+	- [Configuring KOS](#configuring)
 - [Programming KOS with an IDE](#programming)
 - [Notes on building KOS](#building-notes)
 - [Using various emulators to run KOS](#emulators)
@@ -649,11 +650,7 @@ To help you understand how this script works to do what it does, here is a docum
 - `--target=TARGET` (Defaults to automatic detection; see below)
 	- Set the target architecture to `TARGET` (which must be one of `i386`, `x86_64`, ...)
 - `--config=CONFIG` (Defaults to automatic detection; see below)
-	- Set the build configuration, which must be one of
-		- `OD`: Optimizations enabled (`__OPTIMIZE__` is defined), Debug enabled
-		- `nOD`: Optimizations disabled, Debug enabled
-		- `OnD`: Optimizations enabled (`__OPTIMIZE__` is defined), Debug disabled (`NDEBUG` is defined)
-		- `nOnD`: Optimizations disabled, Debug disabled (`NDEBUG` is defined)
+	- Set the build configuration (s.a. [Configuring KOS](#configuring))
 	- Warning: I usually only build KOS in `OD` and `nOD`, so there is a high chance that the other two configurations won't even build...
 - `--gen=FILE`
 	- Only execute build steps that lead up to the creation of `FILE` instead of executing everything
@@ -706,8 +703,54 @@ To help you understand how this script works to do what it does, here is a docum
 
 
 
+<a name="configuring"></a>
+## Configuring KOS
+
+Many KOS system features can be configured before you start building KOS for real. For this purpose, you can create custom configurations (or use the one of the 4 default configurations). Configurations are created by you writing a new header file `/kos/include/kos/config/configurations/myconfig.h`. For more information on the contents of this file, see the associated [README.md](kos/include/kos/config/configurations/README.md).
+
+Files in this folder are interpreted as configurations, which can then be used with `magic.dee` to build KOS using your custom configuration.
+
+```sh
+deemon magic.dee --target=i386 --config=myconfig
+```
+
+Additionally, custom configurations also appear in VS/VSC project files (though only once you re-generate them). For this, you can simply re-run `make_toolchain.sh` for any configuration, or directly execute the relevant script (`deemon kos/misc/config/files.dee`).
+
+Build files, binary output, as well as disk images all exist on a per-configuration basis, meaning that after creating a new configuration, you will have to re-install 3rd party library into the new disk images, as well as allow KOS to be re-build from scratch (this is automatically done by `magic.dee`).
+
+As such, when executed, your custom config will produce files under the following paths:
+
+- `/build/i386-kos-myconfig` (temporary build files)
+- `/bin/i386-kos-myconfig` (generated binaries, including your disk image)
+
+The following configurations are provided by default:
+
+Name   | Commandline options
+=======|====================
+`nOD`  | `-fstack-protector-strong`
+`nOnD` | `-DNDEBUG`
+`OD`   | `-O2 -fstack-protector-strong`
+`OnD`  | `-O3 -DNDEBUG`
+
+
+
+
+
+
 <a name="programming"></a>
 ## Programming KOS with an IDE
+
+### VS Code
+
+You will need to install the `C/C++` extension (just search for `C/C++` under extensions)
+
+Afterwards, make sure that `make_toolchain.sh` has already been executed at least once, as it will generate required configuration files for VS code.
+
+### Visual Studio
+
+Make sure that `make_toolchain.sh` has already been executed at least once, as it will generate required configuration files for Visual Studio. Once this has been done, you can use the `Open Folder` function under the file-tab (`CTRL+SHIFT+ALT+O`) to open the `/kos` sub-folder. - DONT OPEN THE ACTUAL ROOT FOLDER (see notes below).
+
+#### Rant on Visual Studio
 
 I personally use Visual Studio 2017 Community Edition for this, as it actually has a fairly unknown feature `Open Folder` which allows for a hacky way to get full support for GDB debugging without having to pay an insane sum of up to $340 for [VisualGDB](https://visualgdb.com/buy/) (I'm doing this as a hobby; I don't have that kind of money; Jeez: I could barely scrape together $10 if that was the asking price)
 
@@ -716,6 +759,8 @@ I mean seriously: Even when you scoure the osdev wiki you'll come across referen
 Anyways. - Even though practically no documentation on this feature of Visual Studio (of which you can get the Community Edition for free by the way) exists, I managed to get it working through trial and error.
 
 And if you don't like Visual Studio (or aren't using Windows) I do know for a fact that Visual Studio Code also includes functionality for connecting to a GDB server/stub when you start diving into extensions
+
+### Debugging
 
 So here are your options:
 

@@ -62,7 +62,6 @@ MTOOLS_VERSION_NUMBER="4.0.23"
 
 # The KOS configuration used for generating libc/libm/crt0 for libgcc_s and libstdc++
 KOS_CONFIG_FOR_LINKING="nOD"
-KOS_VALID_BUILD_CONFIGS=("OD" "nOD" "OnD" "nOnD")
 CXX_COMPAT_HEADER_NAMES=(
 	"assert" "ctype" "errno" "fenv" "float"
 	"inttypes" "iso646" "limits" "locale"
@@ -771,7 +770,9 @@ install_libstdcxx_symlinks() {
 }
 
 install_libstdcxx "${KOS_ROOT}/bin/${NAME}-common/$BINLIBDIRNAME"
-for BUILD_CONFIG in "${KOS_VALID_BUILD_CONFIGS[@]}"; do
+cmd cd "${KOS_ROOT}/kos/include/kos/config/configurations"
+for BUILD_CONFIG in *.h; do
+	BUILD_CONFIG="${BUILD_CONFIG::-2}"
 	install_libstdcxx_symlinks "${KOS_ROOT}/bin/${NAME}-${BUILD_CONFIG}/$BINLIBDIRNAME"
 done
 
