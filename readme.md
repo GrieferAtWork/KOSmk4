@@ -725,12 +725,12 @@ As such, when executed, your custom config will produce files under the followin
 
 The following configurations are provided by default:
 
-Name   | Commandline options
--------|-------------------------------
-`nOD`  | `-fstack-protector-strong`
-`nOnD` | `-DNDEBUG`
-`OD`   | `-O2 -fstack-protector-strong`
-`OnD`  | `-O3 -DNDEBUG`
+Name   | Pretty name        | Extra GCC commandline options
+-------|--------------------|-------------------------------
+`nOD`  | `DEBUG`            | `-fstack-protector-strong`
+`nOnD` | `NDEBUG`           | `-DNDEBUG`
+`OD`   | `Optimize, DEBUG`  | `-O2 -fstack-protector-strong`
+`OnD`  | `Optimize, NDEBUG` | `-O3 -DNDEBUG`
 
 
 
@@ -742,9 +742,11 @@ Name   | Commandline options
 
 ### VS Code
 
-You will need to install the `C/C++` extension (just search for `C/C++` under extensions)
+You will need to install the `C/C++` extension (just search for `C++` under extensions)
 
 Afterwards, make sure that `make_toolchain.sh` has already been executed at least once, as it will generate required configuration files for VS code.
+
+Finally, use the `Open Folder` function to open the `/kos` sub-folder.
 
 ### Visual Studio
 
