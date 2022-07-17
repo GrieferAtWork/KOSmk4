@@ -30,7 +30,7 @@ import fs;
  *       last  config option from  a file that  previously contained some, or
  *       after fully removing/renaming a file that contained config options),
  *       you may use the following commandline:
- * >> rm -f kos/misc/config/options-db.txt && grep -lr '\[\[\[config' kos | grep -v '\.dec' | xargs deemon kos/misc/libgen/autom8.dee
+ * >> rm -f kos/misc/config/options-db.txt && grep -lr '\[\[\[config' kos | grep -v '\.dec' | grep -v '\.md' | xargs deemon kos/misc/libgen/autom8.dee
  */
 
 function loadOptions(): {string: {Bytes...}} {
