@@ -1,0 +1,180 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import * from errors;
+import * from .configs;
+import * from .utils;
+import * from ..libmagic.libmagic;
+import OPT_COMPILE_MACROS from ..libmagic.steps.c;
+import OPT_GCC_OPTIONS from ..libmagic.toolchain.gcc;
+import fs;
+
+@@Version of the linked libstdc++
+global final LIBSTDCXX_VERSION = "12.1.0";
+
+
+@@Return the names of all supported targets (CPU architectures)
+function listTargetNames(): {string...} {
+	for (local filename: fs.query(fs.joinpath(getKosRootDir(), "kos/misc/targets/*.dee")))
+		yield filename[:-4];
+}
+
+function generateFile(filename: string, cb: Callable with File) {
+	File.Writer tempfp;
+	cb(tempfp);
+	local data = tempfp.string.bytes();
+	with (local fp = File.open(fs.joinpath(getKosRootDir(), filename), "w"))
+		fp.write(data);
+}
+
+
+@@Enumerate architecture-specific predefine macros
+function enumerateTargetSpecificMacros(
+		targetName: string, TARGET: Module): {(string, string)...} {
+	/* XXX: This may need to be adjusted in the future */
+	yield ((f"__{targetName}__", "1"));
+}
+
+function createFakeBoundStep(CONFIG: Configuration): BoundStep {
+	local fakeConfig = Config(CONFIG: CONFIG);
+	local fakeToolchain = Toolchain(config: fakeConfig, name: "fakeToolchain");
+	local fakeStep = Step(name: "fakeStep");
+	local fakeGroup = Group(name: "fakeGroup", steps: { fakeStep });
+	return BoundStep(group: fakeGroup, step: fakeStep, toolchain: fakeToolchain);
+}
+
+function enumerateConfigSpecificMacros(CONFIG: Configuration): {(string, string)...} {
+	local options = CONFIG.getExtraCCompileOptions(createFakeBoundStep(CONFIG), "-");
+	for (local name, value: options.get(OPT_COMPILE_MACROS)) {
+		if (value is none)
+			value = "1";
+		yield (name, value);
+	}
+	/* GCC option-specific predefined macros. */
+	local gccOptions = options.get(OPT_GCC_OPTIONS);
+	if (gccOptions !is none) {
+		for (local opt: gccOptions) {
+			if (opt == "-Os") {
+				yield ("__OPTIMIZE_SIZE__", "1");
+			} else if (opt.startswith("-O")) {
+				yield ("__OPTIMIZE__", "1");
+			}
+		}
+	}
+}
+
+function enumerateTargetAndConfigSpecificMacros(
+		targetName: string, TARGET: Module, CONFIG: Configuration): {(string, string)...} {
+	yield enumerateTargetSpecificMacros(targetName, TARGET)...;
+	yield enumerateConfigSpecificMacros(CONFIG)...;
+}
+
+
+function generateCppPropertiesJson(
+		filename: string,
+		forVsCode: bool = false,
+		isRoot: bool = false,
+		haveLibstdcxxIncludes: bool = false,
+		haveKernelIncludes: bool = false,
+		defineBuildingKernelCore: bool = false) {
+	generateFile(filename, (fp: File) -> {
+		fp << '{\n';
+		if (isRoot && !forVsCode)
+			fp << '	"projectName": "kos",\n';
+		fp << '	"configurations": [{\n';
+		local isFirst = true;
+		for (local targetName: listTargetNames().sorted()) {
+			local TARGET = import(f"..targets.{targetName}");
+			for (local configName: listConfigurationNames().sorted()) {
+				local CONFIG = getConfiguration(configName);
+				local prettyConfigName = getPrettyConfigName(CONFIG);
+				if (!isFirst)
+					fp << '	}, {\n';
+				isFirst = false;
+				fp << '		"name": "' << targetName << '-kos (' << prettyConfigName << ')",\n';
+				if (forVsCode) {
+					fp << '		"customConfigurationVariables": {\n'
+						'			"TARGET": "' << targetName << '",\n'
+						'			"GDBARCH": "' << TARGET.GDBARCH << '",\n'
+						'			"CONFIG": "' << configName << '"\n'
+						'		},\n';
+				} else if (isRoot) {
+					fp << '		"environments": [{\n'
+						'			"namespace": "env",\n'
+						'			"environment": "' << targetName << '-kos (' << prettyConfigName << ')",\n'
+						'			"TARGET": "' << targetName << '",\n'
+						'			"GDBARCH": "' << TARGET.GDBARCH << '",\n'
+						'			"CONFIG": "' << configName << '"\n'
+						'		}],\n';
+				}
+				fp << '		"includePath": [\n';
+				if (haveLibstdcxxIncludes) {
+					fp << '			"${workspaceRoot}\\\\include\\\\' << TARGET.XARCH << '-kos\\\\c++\\\\' << LIBSTDCXX_VERSION << '",\n'
+						'			"${workspaceRoot}\\\\include\\\\' << TARGET.XARCH << '-kos\\\\c++\\\\' << LIBSTDCXX_VERSION << '\\\\' << TARGET.CPUNAME << '-kos",\n'
+						'			"${workspaceRoot}\\\\include\\\\' << TARGET.XARCH << '-kos\\\\c++\\\\' << LIBSTDCXX_VERSION << '\\\\backward",\n';
+				}
+				if (haveKernelIncludes) {
+					fp << '			"${workspaceRoot}\\\\src\\\\kernel\\\\include\\\\' << TARGET.XARCH << '-kos",\n'
+						'			"${workspaceRoot}\\\\src\\\\kernel\\\\include",\n';
+				}
+				fp << '			"${workspaceRoot}\\\\include\\\\' << TARGET.XARCH << '-kos",\n'
+					'			"${workspaceRoot}\\\\include"\n'
+					'		],\n'
+					'		"defines": [\n';
+				for (local name, value: enumerateTargetAndConfigSpecificMacros(targetName, TARGET, CONFIG).sorted())
+					fp << '			' << repr(value == "1" ? name : f"{name}={value}") << ',\n';
+				if (haveKernelIncludes)
+					fp << '			"__KERNEL__",\n';
+				if (defineBuildingKernelCore)
+					fp << '			"BUILDING_KERNEL_CORE",\n';
+				fp << '			"__cplusplus=201406L",\n'
+					'			"__KOS__"\n'
+					'		],\n'
+					'		"forcedInclude": ["${workspaceRoot}\\\\include\\\\compiler\\\\intellisense-gcc.h"],\n'
+					'		"intelliSenseMode": ' << repr(TARGET.VS_INTELLISENSE_MODE) << ',\n';
+				if (forVsCode) {
+					fp << '		"compilerPath": "${workspaceFolder}/../' << TARGET.CROSS_PREFIX << 'g++",\n'
+						'		"compilerArgs": ["-x", "c++", "-std=c++17", "-undef"],\n'
+						'		"cppStandard": "c++17"\n';
+				} else {
+					fp << '		"compilerSwitches": "-x c++ -std=c++17 -undef"\n';
+				}
+			}
+		}
+		fp << '	}]\n'
+			'}';
+	});
+}
+
+
+@@Generate VS and VSC project files
+function generateAllProjectFiles() {
+	/* Generate files for VS open-folder */
+	generateCppPropertiesJson("kos/CppProperties.json", isRoot: true, haveLibstdcxxIncludes: true);
+	generateCppPropertiesJson("kos/src/kernel/CppProperties.json", haveKernelIncludes: true);
+	generateCppPropertiesJson("kos/src/kernel/core/CppProperties.json", haveKernelIncludes: true, defineBuildingKernelCore: true);
+	generateCppPropertiesJson("kos/.vscode/c_cpp_properties.json", isRoot: true, forVsCode: true, haveLibstdcxxIncludes: true);
+}
+
+
+#ifdef __MAIN__
+generateAllProjectFiles();
+#endif /* __MAIN__ */

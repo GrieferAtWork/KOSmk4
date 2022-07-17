@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix a problem with `TPPLexerPosition'"
-DEEMON_VERSION="b6385671d3c8da83d3e2d258fe255822921ca86f"
+#     v -- "Fix a problem in `Dict.Frozen.constructor()`"
+DEEMON_VERSION="e387f15eef47334a4cd0605e32581f62df4e8ffa"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
@@ -394,6 +394,10 @@ else
 	fi
 fi
 
+# Generate project files and configurations
+cmd cd ".."
+cmd "$DEEMON" "kos/misc/config/files.dee"
+cmd cd "binutils"
 
 # Download sources
 download_binutils

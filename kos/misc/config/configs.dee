@@ -23,12 +23,14 @@
  * System configurations are defined by files in `/kos/include/kos/config/features/xxx.h',
  * where `xxx' is the name of the configuration.  Aside from these, there is a total of  4
  * default  configurations  `OD', `OnD',  `nOD'  and `nOnD'  that  use the  default values
- * everywhere, but with/without `NDEBUG' / `-O2'.
+ * everywhere, but with/without `NDEBUG' / `-O2' (or `-O3').
  */
 
 import * from deemon;
 //import * from .utils;
 import * from ..libmagic.libmagic;
+import OPT_COMPILE_MACROS from ..libmagic.steps.c;
+import OPT_GCC_OPTIONS from ..libmagic.toolchain.gcc;
 
 @@Enumerate available configurations by name
 function listConfigurationNames(): {string...} {
@@ -39,6 +41,16 @@ function listConfigurationNames(): {string...} {
 	/* TODO: Custom configurations */
 }
 
+
+function getPrettyConfigName(config: Configuration): string {
+	/* TODO: Custom configurations */
+	return {
+		"OD"   : "Optimize, DEBUG",
+		"nOD"  : "DEBUG",
+		"OnD"  : "Optimize, NDEBUG",
+		"nOnD" : "NDEBUG",
+	}.get(config.name, config.name);
+}
 
 
 @@Simple configuration class used to describe builtin configurations
@@ -73,15 +85,15 @@ function getConfiguration(name: string): Configuration {
 		local options = Dict();
 		if (c_debug) {
 			if (c_optimize) {
-				options["GCC.options"] = { "-fstack-protector-strong", "-O2" };
+				options[OPT_GCC_OPTIONS] = { "-fstack-protector-strong", "-O2" };
 			} else {
-				options["GCC.options"] = { "-fstack-protector-strong" };
+				options[OPT_GCC_OPTIONS] = { "-fstack-protector-strong" };
 			}
 		} else {
 			if (c_optimize) {
-				options["GCC.options"] = { "-O3" };
+				options[OPT_GCC_OPTIONS] = { "-O3" };
 			}
-			options["COMPILE.macros"] = { "NDEBUG" : "1" };
+			options[OPT_COMPILE_MACROS] = { "NDEBUG" : "1" };
 		}
 
 		return SimpleCustomConfiguration(

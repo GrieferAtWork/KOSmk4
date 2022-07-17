@@ -8,9 +8,13 @@
 /kos/.vs/slnx.sqlite
 /kos/.vs/slnx.sqlite-journal
 /kos/.vs/launch.vs.json
-/kos/.vscode/launch.json
 /kos/.vs/ProjectSettings.json
 /kos/.vs/VSWorkspaceState.json
+/kos/.vscode/launch.json
+/kos/.vscode/c_cpp_properties.json
+/kos/CppProperties.json
+/kos/src/kernel/CppProperties.json
+/kos/src/kernel/core/CppProperties.json
 /qemu.netdump
 /qemu.events
 /qemu.conf
@@ -25,8 +29,8 @@ __ice__
 *.tmp
 
 # These headers are installed by `make_toolchain.sh`
-/kos/include/i386-kos/kos/_build-config32.h
-/kos/include/i386-kos/kos/_build-config64.h
+/kos/include/i386-kos/kos/config/_toolchain32.h
+/kos/include/i386-kos/kos/config/_toolchain64.h
 
 # These headers are installed by `make_utility.sh ... ncurses`
 /kos/include/bsd/curses.h

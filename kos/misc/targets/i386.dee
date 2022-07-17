@@ -27,6 +27,11 @@ import * from deemon;
 @@  - ...
 global final XARCH = "i386";
 
+@@Cross-Arch CPU name:
+@@  - @"/kos/include/{XARCH}-kos/c++/12.1.0/{CPUNAME}-kos
+@@  - ...
+global final CPUNAME = "i686";
+
 @@The GCC cross-compiler prefix
 global final CROSS_PREFIX = "binutils/i386-kos/bin/i686-kos-";
 
@@ -61,6 +66,15 @@ global final AS_I32 = ".int";
 
 @@Libdl implements the PE-compatibility mode system
 global final DL_HAVE_PE_COMPAT = true;
+
+@@GDB architecture name for this target
+global final GDBARCH = "i386:intel";
+
+@@Intellisense mode for visual studio / vs-code
+global final VS_INTELLISENSE_MODE = "linux-gcc-x86";
+
+@@Take target name for visual studio
+global final VS_PROJECT_TARGET = "Win32";
 
 @@Provide a cache for the toolchain.
 function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {

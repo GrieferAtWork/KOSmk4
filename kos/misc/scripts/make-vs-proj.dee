@@ -37,6 +37,9 @@
 #endif
 
 import * from deemon;
+import * from ..config.configs;
+import * from ..config.utils;
+import * from ..config.files;
 import fs;
 import util;
 
@@ -45,21 +48,42 @@ fs.chdir(fs.headof(__FILE__) + "/../../.."); /* $PROJPATH */
 global final ROOTDIR = fs.getcwd().replace("/", "\\").rstrip("\\");
 
 global final PROJ_GUID = "3CFDCE40-7387-4CB8-BC7A-79666A98C8A6";
-global final PROJ_TARGETS = {
-	"i386-kos"   : ("Win32", { "kos/include/i386-kos", "kos/src/kernel/include/i386-kos" }, { "__i386__=1" }),
-	"x86_64-kos" : ("x64",   { "kos/include/i386-kos", "kos/src/kernel/include/i386-kos" }, { "__x86_64__=1" })
-};
+global final PROJ_TARGETS = Dict.Frozen(() -> {
+	for (local targetName: listTargetNames()) {
+		local TARGET = import(f"..targets.{targetName}");
+		local VS_PROJECT_TARGET = try
+			TARGET.VS_PROJECT_TARGET
+		catch (...) {
+			4 : "Win32",
+			8 : "x64",
+		}[TARGET.POINTER_SIZE];
+		yield (
+			f"{targetName}-kos",
+			(VS_PROJECT_TARGET, {
+				f"kos/include/{TARGET.XARCH}-kos",
+				f"kos/src/kernel/include/{TARGET.XARCH}-kos"
+			}, Tuple(
+				for (local name, value: enumerateTargetSpecificMacros(targetName, TARGET))
+					f"{name}={value}"
+			))
+		);
+	}
+}());
 #define PORJ_TARGETS_INTERNAL_NAME(name) PROJ_TARGETS[name][0]
 #define PORJ_TARGETS_INC_PATHS(name)     PROJ_TARGETS[name][1]
 #define PORJ_TARGETS_DEFINES(name)       PROJ_TARGETS[name][2]
 #define PORJ_TARGETS_MAGIC_NAME(name)    (name).rsstrip("-kos")
 
-global final PROJ_CONFIGS = {
-	"DEBUG"              : { "nOD",  { } },
-	"NDEBUG"             : { "nOnD", { "NDEBUG=1" } },
-	"Optimize, DEBUG"    : { "OD",   { "__OPTIMIZE__=1" } },
-	"Optimize, NDEBUG"   : { "nOnD", { "__OPTIMIZE__=1", "NDEBUG=1" } },
-};
+global final PROJ_CONFIGS = Dict.Frozen(() -> {
+	for (local configName: listConfigurationNames()) {
+		local CONFIG = getConfiguration(configName);
+		local prettyName = getPrettyConfigName(CONFIG);
+		yield (prettyName, {configName, Tuple(
+			for (local name, value: enumerateConfigSpecificMacros(CONFIG))
+				f"{name}={value}"
+		)});
+	}
+}());
 #define PROJ_CONFIGS_SHORTHAND(name) PROJ_CONFIGS[name][0]
 #define PROJ_CONFIGS_DEFINES(name)   PROJ_CONFIGS[name][1]
 
