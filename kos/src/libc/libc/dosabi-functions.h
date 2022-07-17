@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93d42152 */
+/* HASH CRC-32:0xee2d1abd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -366,7 +366,7 @@ DFUN(".text.crt.dos.unicode.static.ctype", libd_toascii, libc_toascii, TD, 1, TD
 DFUN(".text.crt.dos.unicode.static.ctype", libd__tolower, libc__tolower, TD, 1, TD)
 DFUN(".text.crt.dos.unicode.static.ctype", libd__toupper, libc__toupper, TD, 1, TD)
 #ifdef __LIBDCALL_CALLER_CLEANUP
-DEFINE_INTERN_ALIAS(libd____mb_cur_max_l_func, libd____mb_cur_max_func);
+DEFINE_INTERN_ALIAS(libd____mb_cur_max_l_func, libd___ctype_get_mb_cur_max);
 #else /* __LIBDCALL_CALLER_CLEANUP */
 DFUN(".text.crt.dos.unicode.static.ctype", libd____mb_cur_max_l_func, libc____mb_cur_max_l_func, TD, 1, TP)
 #endif /* !__LIBDCALL_CALLER_CLEANUP */

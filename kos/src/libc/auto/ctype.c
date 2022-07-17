@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f9d8e55 */
+/* HASH CRC-32:0xcd316df2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -438,7 +438,7 @@ NOTHROW_NCX(LIBCCALL libc___ctype_get_mb_cur_max)(void) {
 	return __LOCAL_MB_CUR_MAX;
 }
 #ifdef __LIBKCALL_CALLER_CLEANUP
-DEFINE_INTERN_ALIAS(libc____mb_cur_max_l_func, libc____mb_cur_max_func);
+DEFINE_INTERN_ALIAS(libc____mb_cur_max_l_func, libc___ctype_get_mb_cur_max);
 #else /* __LIBKCALL_CALLER_CLEANUP */
 #include <libc/template/MB_CUR_MAX.h>
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.ctype") int

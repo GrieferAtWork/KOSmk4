@@ -1059,8 +1059,8 @@ $size_t __ctype_get_mb_cur_max(void) {
 int ___mb_cur_max_func(void) = __ctype_get_mb_cur_max;
 
 [[impl_include("<libc/template/MB_CUR_MAX.h>")]]
-[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc____mb_cur_max_func")]]
-[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd____mb_cur_max_func")]]
+[[if(defined(__LIBKCALL_CALLER_CLEANUP)), crt_intern_kos_alias("libc___ctype_get_mb_cur_max")]]
+[[if(defined(__LIBDCALL_CALLER_CLEANUP)), crt_intern_dos_alias("libd___ctype_get_mb_cur_max")]]
 int ___mb_cur_max_l_func($locale_t locale) {
 	(void)locale;
 	return __LOCAL_MB_CUR_MAX;

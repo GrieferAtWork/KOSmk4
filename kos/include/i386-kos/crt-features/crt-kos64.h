@@ -304,6 +304,7 @@
 #define __CRT_HAVE____lc_collate_cp_func
 #define __CRT_HAVE____lc_locale_name_func
 #define __CRT_HAVE____mb_cur_max_func
+#define __CRT_HAVE____mb_cur_max_l_func
 #define __CRT_HAVE___access
 #define __CRT_HAVE___acct
 #define __CRT_HAVE___acos
