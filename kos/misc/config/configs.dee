@@ -100,7 +100,16 @@ final class CustomConfiguration: Configuration {
 		get(): {string: Object} {
 			if (m_extraOptions !is bound) {
 				local globals = Dict({ "options": Dict() });
-				exec(magic, globals: globals);
+				local magic = this.magic;
+				if (magic !is none) {
+					try {
+						exec(magic, globals: globals);
+					} catch (...) {
+						print("While running (", this.name, "):");
+						print("> ", magic.replace("\n", "\n> "));
+						throw;
+					}
+				}
 				local options = globals["options"];
 				/* Default configurations  are auto-detected  in
 				 * headers, so don't need custom include macros! */

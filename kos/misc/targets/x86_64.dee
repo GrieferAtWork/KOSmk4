@@ -87,7 +87,11 @@ function build(magic: Module) {
 	local saved_OPT_DONT_BUILD = magic.OPT_DONT_BUILD;
 	local x64Options = deepcopy magic.options;
 	local x64Toolchain = deepcopy magic.toolchain;
+	local x64CONFIG = magic.config.CONFIG;
+	magic.config.CONFIG = none;
 	local x64Config = deepcopy magic.config;
+	magic.config.CONFIG = x64CONFIG;
+	x64Config.CONFIG = x64CONFIG;
 	magic.OPT_DONT_BUILD = true;
 
 	/* Generate build steps for i386 */
