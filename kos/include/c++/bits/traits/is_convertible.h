@@ -65,7 +65,7 @@ template<class __From, class __To> struct is_convertible
 #ifdef __COMPILER_HAVE_CXX11_NOEXCEPT
 template<class __From, class __To> struct is_nothrow_convertible
     : public __NAMESPACE_INT_SYM __is_nothrow_convertible_helper<__From, __To>::type {};
-#else  /* __COMPILER_HAVE_CXX11_NOEXCEPT */
+#else /* __COMPILER_HAVE_CXX11_NOEXCEPT */
 template<class __From, class __To> struct is_nothrow_convertible
     : public __NAMESPACE_STD_SYM false_type {}; /* XXX: Integer/float types are noexcept convertible! */
 #endif /* !__COMPILER_HAVE_CXX11_NOEXCEPT */

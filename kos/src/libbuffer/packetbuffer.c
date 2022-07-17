@@ -158,7 +158,7 @@ lib_pb_buffer_startwrite(struct pb_buffer *__restrict self,
                          size_t payload_size,
                          size_t ancillary_size)
 		__THROWS(E_BADALLOC)
-#else  /* __KERNEL__ */
+#else /* __KERNEL__ */
 INTERN WUNUSED NONNULL((1)) struct pb_packet *
 NOTHROW(CC lib_pb_buffer_startwrite)(struct pb_buffer *__restrict self,
                                      size_t payload_size,
@@ -415,7 +415,7 @@ allocate_buffer_extension:
 			                                                (size_t)(self->pb_bend - self->pb_bbas),
 			                                                final_size);
 			self->pb_bend = self->pb_bbas + final_size;
-#else  /* ... */
+#else /* ... */
 			HEAP_NONBLOCK_TRUNCATE_IN_PLACE_NX(self->pb_bbas,
 			                                   (size_t)(self->pb_bend - self->pb_bbas),
 			                                   final_size);
@@ -487,7 +487,7 @@ NOTHROW(CC lib_pb_buffer_endwrite_abort)(struct pb_buffer *__restrict self,
 INTERN WUNUSED NONNULL((1)) struct pb_packet *CC
 lib_pb_buffer_startread(struct pb_buffer *__restrict self)
 		__THROWS(E_WOULDBLOCK)
-#else  /* __KERNEL__ */
+#else /* __KERNEL__ */
 INTERN WUNUSED NONNULL((1)) struct pb_packet *
 NOTHROW(CC lib_pb_buffer_startread)(struct pb_buffer *__restrict self)
 #endif /* !__KERNEL__ */

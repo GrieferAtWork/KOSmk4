@@ -498,7 +498,7 @@ do_prefault:
 #ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 				memsetl(result, DEBUGHEAP_FRESH_MEMORY, num_bytes / 4);
 				part->mp_file = &mfile_dbgheap;
-#else  /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
+#else /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 				part->mp_file = &mfile_ndef;
 #endif /* !CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 			}
@@ -539,7 +539,7 @@ do_prefault:
 			} else {
 #ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
 				part->mp_file = &mfile_dbgheap;
-#else  /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
+#else /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 				part->mp_file = &mfile_ndef;
 #endif /* !CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 			}
@@ -574,7 +574,7 @@ do_prefault:
 		part->mp_flags |= MPART_F_NORMAL |
 #if MNODE_F_MLOCK == MPART_F_MLOCK
 		                  ((node->mn_flags & MNODE_F_MLOCK))
-#else  /* MNODE_F_MLOCK == MPART_F_MLOCK */
+#else /* MNODE_F_MLOCK == MPART_F_MLOCK */
 		                  ((node->mn_flags & MNODE_F_MLOCK) ? MPART_F_MLOCK : 0)
 #endif /* MNODE_F_MLOCK != MPART_F_MLOCK */
 		                  ;

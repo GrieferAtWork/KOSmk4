@@ -426,7 +426,7 @@ NOTHROW(KCALL phcore_usable_size)(void *ptr) {
 		 *        works with memory allocated by trace-malloc.c! */
 #ifdef HEAP_USABLE_SIZE_MASK
 		return *(size_t *)((byte_t *)ptr - HEAP_USABLE_SIZE_OFFSET) & HEAP_USABLE_SIZE_MASK;
-#else  /* HEAP_USABLE_SIZE_MASK */
+#else /* HEAP_USABLE_SIZE_MASK */
 		return *(size_t *)((byte_t *)ptr - HEAP_USABLE_SIZE_OFFSET);
 #endif /* !HEAP_USABLE_SIZE_MASK */
 	} EXCEPT {

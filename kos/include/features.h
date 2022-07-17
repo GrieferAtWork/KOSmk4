@@ -516,7 +516,7 @@
 #else /* _XOPEN_SOURCE >= 700 */
 #define __XSI_VISIBLE 500
 #endif /* _XOPEN_SOURCE >= 600 */
-#else  /* _XOPEN_SOURCE >= 500 */
+#else /* _XOPEN_SOURCE >= 500 */
 #ifdef _XOPEN_SOURCE_EXTENDED
 #define __USE_XOPEN_EXTENDED 1
 #define __XSI_VISIBLE        4 /* API alias (don't use in headers!) */

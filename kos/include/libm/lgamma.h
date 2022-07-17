@@ -186,7 +186,7 @@ __LIBM_LOCAL_FUNC(lgamma_sin_pif) __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
 		__y = __ieee754_sinf(__LIBM_LOCAL_VALUE(pif) * (__y - __IEEE754_FLOAT_C(2.0)));
 		break;
 	}
-#else  /* __ieee754_sinf */
+#else /* __ieee754_sinf */
 	switch ((int)__n) {
 	case 0:
 		__y = __ieee754_kernel_sinf(__LIBM_LOCAL_VALUE(pif) * __y, __LIBM_LOCAL_VALUE(zerof), 0);

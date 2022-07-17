@@ -830,7 +830,7 @@ void const *____intellisense_reqcptr(void const *);
 #define __hybrid_unaligned_set128_swap(ptr, v) (void)(*(__UINT128_TYPE__ *)::__intern::____intellisense_reqptr(ptr) = (__UINT128_TYPE__)(v))
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */
-#else  /* __INTELLISENSE__ */
+#else /* __INTELLISENSE__ */
 #define __hybrid_unaligned_get16(ptr)         __hybrid_unaligned_get((__UINT16_TYPE__ const *)(ptr))
 #define __hybrid_unaligned_set16(ptr, v)      __hybrid_unaligned_set((__UINT16_TYPE__ *)(ptr), v)
 #define __hybrid_unaligned_get16_swap(ptr)    __hybrid_unaligned_get_swap((__UINT16_TYPE__ const *)(ptr))

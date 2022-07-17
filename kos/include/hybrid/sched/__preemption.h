@@ -220,7 +220,7 @@ __DECL_END
 #ifdef CONFIG_NO_SMP
 #define __HYBRID_PREEMPTION_NO_SMP
 #endif /* CONFIG_NO_SMP */
-#else  /* ... */
+#else /* ... */
 
 /* KOS system headers expose all functions we need in an escaped namespace,
  * meaning  we  don't have  to include  <signal.h>  and clobber  the global

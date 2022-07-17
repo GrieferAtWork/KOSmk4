@@ -62,7 +62,7 @@
 #define __SIZEOF_PTHREAD_BARRIER_T     20
 #define __SIZEOF_PTHREAD_BARRIERATTR_T 4
 #endif /* __SIZEOF_POINTER__ != 8 */
-#else  /* __x86_64__ */
+#else /* __x86_64__ */
 #define __SIZEOF_PTHREAD_ATTR_T        36
 #define __SIZEOF_PTHREAD_MUTEX_T       24
 #define __SIZEOF_PTHREAD_MUTEXATTR_T   4

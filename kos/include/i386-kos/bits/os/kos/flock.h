@@ -26,7 +26,7 @@
 
 #ifdef __x86_64__
 #include "flock64.h"
-#else  /* __x86_64__ */
+#else /* __x86_64__ */
 #include "flock32.h"
 #endif /* !__x86_64__ */
 

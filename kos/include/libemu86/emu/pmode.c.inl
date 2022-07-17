@@ -997,11 +997,11 @@ case EMU86_OPCODE_ENCODE(0x0f01): {
 #elif EMU86_EMULATE_CONFIG_WANT_STGI
 				EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRINV,
 				                                                 X86_REGISTER_MISC_GI, 0, 1, 0);
-#else  /* ... */
+#else /* ... */
 				EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(E_ILLEGAL_INSTRUCTION_REGISTER_WRINV,
 				                                                 X86_REGISTER_MISC_GI, 0, 0, 0);
 #endif /* !... */
-#else  /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
+#else /* EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */
 				goto return_unsupported_instruction_rmreg;
 #define NEED_return_unsupported_instruction_rmreg
 #endif /* !EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER */

@@ -38,7 +38,7 @@ __CSDECLARE2(,__IEEE854_LONG_DOUBLE_TYPE__ const __sincosl_table[],__sincosl_tab
 /* Included during build of libc.so from a file other than "auto/math.c" */
 __INTDEF __IEEE854_LONG_DOUBLE_TYPE__ const libc___sincosl_table[];
 #define __sincosl_table libc___sincosl_table
-#else  /* __CRT_HAVE___sincosl_table */
+#else /* __CRT_HAVE___sincosl_table */
 
 /************************************************************************/
 /* TAKEN FROM GLIBC (since it wasn't defined in fdlibm)                 */

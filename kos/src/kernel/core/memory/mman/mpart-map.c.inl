@@ -200,7 +200,7 @@ do_load_small_pages_readonly:
 			shift_t block_to_page_shift;
 #ifdef __OPTIMIZE_SIZE__
 			assert(shift >= PAGESHIFT);
-#else  /* __OPTIMIZE_SIZE__ */
+#else /* __OPTIMIZE_SIZE__ */
 			assert(shift > PAGESHIFT);
 #endif /* !__OPTIMIZE_SIZE__ */
 			block_to_page_shift = PAGESHIFT - shift;

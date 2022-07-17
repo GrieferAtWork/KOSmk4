@@ -399,7 +399,7 @@ DEFINE_SYSCALL2(errno_t, debugtrap,
 		/* Send an RPC to ourself, so we can gain access to the user-space register state. */
 #ifdef __x86_64__
 		task_rpc_userunwind(&sys_debugtrap_rpc64, NULL);
-#else  /* __x86_64__ */
+#else /* __x86_64__ */
 		task_rpc_userunwind(&sys_debugtrap_rpc32, NULL);
 #endif /* !__x86_64__ */
 	}

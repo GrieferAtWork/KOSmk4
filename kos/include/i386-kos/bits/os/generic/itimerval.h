@@ -26,7 +26,7 @@
 
 #ifdef __x86_64__
 #include "itimerval64.h"
-#else  /* __x86_64__ */
+#else /* __x86_64__ */
 #include "itimerval32.h"
 #endif /* !__x86_64__ */
 

@@ -128,7 +128,7 @@ __ATTR_NONNULL((1)) void (bit_nset)(bitstr_t *__restrict self, int minbitno, int
 		__bit_nset(__self, __minbitno, __maxbitno); \
 		(void)0;                                    \
 	})
-#else  /* ... */
+#else /* ... */
 __LOCAL __ATTR_NONNULL((1)) void
 (bit_nclear)(bitstr_t *__restrict __self, int __minbitno, int __maxbitno) {
 	__bit_nclear(__self, __minbitno, __maxbitno);
@@ -197,7 +197,7 @@ __ATTR_NONNULL((1, 3)) void (bit_ffs)(bitstr_t *__restrict self, int nbits, int 
 		*(value) = __result;                        \
 		(void)0;                                    \
 	})
-#else  /* ... */
+#else /* ... */
 __LOCAL __ATTR_NONNULL((1, 3)) void
 (bit_ffc)(bitstr_t *__restrict __self, int __nbits, int *__value) {
 	__register int __result;

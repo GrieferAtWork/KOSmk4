@@ -423,7 +423,7 @@ NOTHROW(FCALL reltimespec_to_relktime)(struct timespec const &__restrict rel_tim
 #define __ASMNAME_relktime_from_user_compat_reltimespec32 "relktime_from_user_compat_reltimespec"
 #define __ASMNAME_relktime_from_user_compat_reltimespec64 "relktime_from_user_compat_reltimespec"
 #endif /* !... */
-#else  /* __HAVE_COMPAT_TIMESPEC32_IS_COMPAT_TIMESPEC64 */
+#else /* __HAVE_COMPAT_TIMESPEC32_IS_COMPAT_TIMESPEC64 */
 #if defined(__HAVE_COMPAT_TIMESPEC32_IS_TIMESPEC32)
 #define __ASMNAME_ktime_from_user_compat_timespec32       __ASMNAME_ktime_from_user_timespec32
 #define __ASMNAME_relktime_from_user_compat_reltimespec32 __ASMNAME_relktime_from_user_reltimespec32
@@ -463,7 +463,7 @@ NOTHROW(FCALL reltimespec_to_relktime)(struct timespec const &__restrict rel_tim
 #define __ASMNAME_relktime_from_user_compat_reltimeval32 "relktime_from_user_compat_reltimeval"
 #define __ASMNAME_relktime_from_user_compat_reltimeval64 "relktime_from_user_compat_reltimeval"
 #endif /* !... */
-#else  /* __HAVE_COMPAT_TIMEVAL32_IS_COMPAT_TIMEVAL64 */
+#else /* __HAVE_COMPAT_TIMEVAL32_IS_COMPAT_TIMEVAL64 */
 #if defined(__HAVE_COMPAT_TIMEVAL32_IS_TIMEVAL32)
 #define __ASMNAME_ktime_from_user_compat_timeval32       __ASMNAME_ktime_from_user_timeval32
 #define __ASMNAME_relktime_from_user_compat_reltimeval32 __ASMNAME_relktime_from_user_reltimeval32

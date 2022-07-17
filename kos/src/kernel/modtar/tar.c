@@ -1888,7 +1888,7 @@ PRIVATE struct ffilesys tarfs_filesys = {
 
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 INTERN ATTR_FREETEXT void KCALL kernel_initialize_tar_driver(void)
-#else  /* CONFIG_BUILDING_KERNEL_CORE */
+#else /* CONFIG_BUILDING_KERNEL_CORE */
 PRIVATE DRIVER_INIT ATTR_FREETEXT void KCALL init(void)
 #endif /* !CONFIG_BUILDING_KERNEL_CORE */
 {

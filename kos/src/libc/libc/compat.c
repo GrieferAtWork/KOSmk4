@@ -933,7 +933,7 @@ DECL_BEGIN
  * Control word set during startup of old linux applications. */
 #if _FPU_DEFAULT == 0
 INTERN ATTR_SECTION(".bss.crt.math.float") fpu_control_t libc___fpu_control = _FPU_DEFAULT;
-#else  /* _FPU_DEFAULT == 0 */
+#else /* _FPU_DEFAULT == 0 */
 INTERN ATTR_SECTION(".data.crt.math.float") fpu_control_t libc___fpu_control = _FPU_DEFAULT;
 #endif /* _FPU_DEFAULT != 0 */
 DEFINE_PUBLIC_ALIAS(__fpu_control, libc___fpu_control);
@@ -957,7 +957,7 @@ NOTHROW_NCX(LIBCCALL libc___setfpucw)(fpu_control_t ctrl) {
 	word &= _FPU_RESERVED;
 	word |= ctrl & ~_FPU_RESERVED;
 	_FPU_SETCW(word);
-#else  /* _FPU_RESERVED != 0 */
+#else /* _FPU_RESERVED != 0 */
 	_FPU_SETCW(ctrl);
 #endif /* _FPU_RESERVED == 0 */
 }

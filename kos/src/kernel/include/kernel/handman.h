@@ -885,7 +885,7 @@ HANDLE_FOREACH_TYPE(__FOREACH_HANDLES_INSTALL_COMMIT)
 #undef __FOREACH_HANDLES_INSTALL_COMMIT
 } /* extern "C++" */
 #endif /* __cplusplus */
-#else  /* __INTELLISENSE__ */
+#else /* __INTELLISENSE__ */
 #define _handman_private_install_commit_inherit4(self, h_data, h_mode, h_type)        \
 	(__hybrid_atomic_store((self)->hid_slot->_mh_words[0], h_data, __ATOMIC_RELEASE), \
 	 _handman_install_commit_inherit(self, h_mode, h_type))

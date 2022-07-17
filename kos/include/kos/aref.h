@@ -292,7 +292,7 @@
 		struct type *awr_obj; /* [0..1] Referenced object. */ \
 	}
 #endif /* !__cplusplus */
-#else  /* __HYBRID_PREEMPTION_NO_SMP */
+#else /* __HYBRID_PREEMPTION_NO_SMP */
 #ifdef __cplusplus
 #define __PRIVATE_ARREF_1(type)                                                             \
 	struct {                                                                                \
@@ -529,7 +529,7 @@
 /* >> void arref_xch_inherit_nopr(ARREF(T) *self, [[in]] REF T *newobj, [[out]] REF T **p_oldobj); */
 #define arref_xch_inherit_nopr __PRIVATE_arref_xch_inherit_nopr_3
 #endif /* !__HYBRID_PP_VA_OVERLOAD */
-#else  /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
+#else /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
 /* >> void arref_xch_inherit(ARREF(T) *self, [[in]] REF T *newobj, [[out]] REF T **p_oldobj); */
 #define arref_xch_inherit __PRIVATE_arref_xch_inherit_3
 /* >> void arref_xch_inherit_nopr(ARREF(T) *self, [[in]] REF T *newobj, [[out]] REF T **p_oldobj); */
@@ -754,7 +754,7 @@
 /* >> void arref_cmpxch_inherit_nopr(ARREF(T) *self, [[out]] REF T *oldobj, [[in]] REF T *newobj, bool *p_ok); */
 #define arref_cmpxch_inherit_nopr __PRIVATE_arref_cmpxch_inherit_nopr_4
 #endif /* !__HYBRID_PP_VA_OVERLOAD */
-#else  /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
+#else /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
 /* >> void arref_cmpxch_inherit(ARREF(T) *self, [[out]] REF T *oldobj, [[in]] REF T *newobj, bool *p_ok); */
 #define arref_cmpxch_inherit __PRIVATE_arref_cmpxch_inherit_4
 /* >> void arref_cmpxch_inherit_nopr(ARREF(T) *self, [[out]] REF T *oldobj, [[in]] REF T *newobj, bool *p_ok); */
@@ -1066,7 +1066,7 @@
 /* >> void axref_xch_inherit_nopr(AXREF(T) *self, [[in]] REF T *newobj, [[out]] REF T **p_oldobj); */
 #define axref_xch_inherit_nopr __PRIVATE_axref_xch_inherit_nopr_3
 #endif /* !__HYBRID_PP_VA_OVERLOAD */
-#else  /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
+#else /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
 /* >> void axref_xch_inherit(AXREF(T) *self, [[in]] REF T *newobj, [[out]] REF T **p_oldobj); */
 #define axref_xch_inherit __PRIVATE_axref_xch_inherit_3
 /* >> void axref_xch_inherit_nopr(AXREF(T) *self, [[in]] REF T *newobj, [[out]] REF T **p_oldobj); */
@@ -1112,7 +1112,7 @@
 /* >> void axref_steal_nopr(AXREF(T) *self, [[out]] REF T **p_oldobj); */
 #define axref_steal_nopr __PRIVATE_axref_steal_nopr_2
 #endif /* !__HYBRID_PP_VA_OVERLOAD */
-#else  /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
+#else /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
 /* >> void axref_steal(AXREF(T) *self, [[out]] REF T **p_oldobj); */
 #define axref_steal __PRIVATE_axref_steal_2
 /* >> void axref_steal_nopr(AXREF(T) *self, [[out]] REF T **p_oldobj); */
@@ -1406,7 +1406,7 @@
 /* >> void axref_cmpxch_inherit_nopr(AXREF(T) *self, [[out]] REF T *oldobj, [[in]] REF T *newobj, bool *p_ok); */
 #define axref_cmpxch_inherit_nopr __PRIVATE_axref_cmpxch_inherit_nopr_4
 #endif /* !__HYBRID_PP_VA_OVERLOAD */
-#else  /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
+#else /* !__NO_XBLOCK && __COMPILER_HAVE_TYPEOF */
 /* >> void axref_cmpxch_inherit(AXREF(T) *self, [[out]] REF T *oldobj, [[in]] REF T *newobj, bool *p_ok); */
 #define axref_cmpxch_inherit __PRIVATE_axref_cmpxch_inherit_4
 /* >> void axref_cmpxch_inherit_nopr(AXREF(T) *self, [[out]] REF T *oldobj, [[in]] REF T *newobj, bool *p_ok); */

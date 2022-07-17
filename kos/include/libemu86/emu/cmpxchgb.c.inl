@@ -342,7 +342,7 @@ case EMU86_OPCODE_ENCODE(0x0fc7):
 					if (!ok)
 						value = 0;
 					MODRM_SETRMREGW((u16)value);
-#else  /* ... */
+#else /* ... */
 					u64 value;
 					ok = EMU86_EMULATE_RDSEED64(value);
 					if (!ok)

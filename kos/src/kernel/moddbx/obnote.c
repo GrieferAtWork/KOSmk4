@@ -1683,7 +1683,7 @@ DEFINE_TIMESTRUCT_NOTE(note_compat_timespec32, struct compat_timespec32, note_ti
 #define note_compat_timespec64 note_timespec32
 #elif defined(__HAVE_COMPAT_TIMESPEC64_IS_TIMESPEC64)
 #define note_compat_timespec64 note_timespec64
-#else  /* ... */
+#else /* ... */
 DEFINE_TIMESTRUCT_NOTE(note_compat_timespec64, struct compat_timespec64, note_timespec_value, tv_sec, tv_nsec)
 #endif /* !... */
 
@@ -1701,7 +1701,7 @@ DEFINE_TIMESTRUCT_NOTE(note_compat_timeval32, struct compat_timeval32, note_time
 #define note_compat_timeval64 note_timeval32
 #elif defined(__HAVE_COMPAT_TIMEVAL64_IS_TIMEVAL64)
 #define note_compat_timeval64 note_timeval64
-#else  /* ... */
+#else /* ... */
 DEFINE_TIMESTRUCT_NOTE(note_compat_timeval64, struct compat_timeval64, note_timeval_value, tv_sec, tv_usec)
 #endif /* !... */
 #endif /* __ARCH_HAVE_COMPAT */

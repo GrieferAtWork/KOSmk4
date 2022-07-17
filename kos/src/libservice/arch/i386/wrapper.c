@@ -3986,7 +3986,7 @@ NOTHROW(FCALL comgen_custom_status_return)(struct com_generator *__restrict self
 		comgen_instr(self, gen86_movP_db_r(&self->cg_txptr,
 		                                   self->cg_cfa_offset - SIZEOF_POINTER,
 		                                   GEN86_R_PSP, GEN86_R_RDX)); /* %rdx <=> %R_sysvabi2P */
-#else  /* __x86_64__ */
+#else /* __x86_64__ */
 		/* >> pushP_cfi <cg_cfa_offset-P>(%Psp) */
 		comgen_instr(self, gen86_pushP_mod(&self->cg_txptr, gen86_modrm_db,
 		                                   self->cg_cfa_offset - SIZEOF_POINTER,

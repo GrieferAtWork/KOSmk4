@@ -70,7 +70,7 @@
 	 ? __hybrid_max_c2(a, b)                              \
 	 : __hybrid_max_r2(a, b))
 #endif /* __NO_builtin_choose_expr */
-#else  /* ... */
+#else /* ... */
 #define __hybrid_min2 __hybrid_min_r2
 #define __hybrid_max2 __hybrid_max_r2
 #endif /* !... */

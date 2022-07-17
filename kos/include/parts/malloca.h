@@ -310,7 +310,7 @@ __LOCAL void __NOTHROW(__local_freea)(void *__p) {
 	if (__MALLOCA_MUSTFREE(__p))
 		__os_free((void *)((__BYTE_TYPE__ *)__p - __MALLOCA_ALIGN));
 }
-#else  /* __OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
+#else /* __OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
 #undef __malloca_mayfail
 __LOCAL void *(__local_malloca_heap)(__SIZE_TYPE__ __s) {
 	__BYTE_TYPE__ *__res;
@@ -331,7 +331,7 @@ __LOCAL void __NOTHROW(__local_freea)(void *__p) {
 		kfree((void *)((__BYTE_TYPE__ *)__p - __MALLOCA_ALIGN));
 }
 #endif /* !__OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
-#else  /* __KOS__ && __KERNEL__ */
+#else /* __KOS__ && __KERNEL__ */
 #define __malloca_mayfail 1
 __LOCAL void *__NOTHROW_NCX(__local_malloca_heap)(__SIZE_TYPE__ __s) {
 	__BYTE_TYPE__ *__res;
@@ -449,7 +449,7 @@ __NAMESPACE_INT_END
 		*(void **)&(result) = __cath_res;                                                                      \
 	}	__WHILE0
 #endif /* !__OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
-#else  /* __KOS__ && __KERNEL__ */
+#else /* __KOS__ && __KERNEL__ */
 #define __malloca_tryhard(result, s)                                                                            \
 	do {                                                                                                        \
 		__SIZE_TYPE__ const __math_s = (s) + __MALLOCA_ALIGN;                                                   \

@@ -128,7 +128,7 @@
 #define assert_noreturnf(expr, format...) __builtin_assume(!!(expr))
 #endif /* ... */
 #endif /* __USE_KOS */
-#else  /* !__builtin_assume_has_sideeffects && (CONFIG_ASSERT_ASSUME_EVERYTHING || ASSERT_ASSUME_EVERYTHING) */
+#else /* !__builtin_assume_has_sideeffects && (CONFIG_ASSERT_ASSUME_EVERYTHING || ASSERT_ASSUME_EVERYTHING) */
 #define assert(expr)            (void)0
 #define __assert_noreturn(expr) (void)0
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS

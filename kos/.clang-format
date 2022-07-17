@@ -73,6 +73,10 @@
 #    >> me->fs_root._ = d;  // This needs to be a new group since the amount of spaces needed for
 #    >>                     // alignment (12) when compared to the amount of spaces in the previous
 #    >>                     // line (0) (meaning delta = 12 - 0 = 12) is greater than 6
+#
+#  - Declarations should get aligned, but only within structs (and then: for the entire struct).
+#    However, local variable declarations DON'T get aligned! (though there is no way to configure
+#    clang-format to align declarations in structs/classes/unions, but not elsewhere)
 #############################################################################################
 
 AccessModifierOffset: -4

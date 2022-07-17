@@ -31,7 +31,7 @@ __DECL_BEGIN
 union service_com_retval {
 #ifdef __x86_64__
 	__UINT64_TYPE__ scr_rax; /* Value for %rax */
-#else  /* __x86_64__ */
+#else /* __x86_64__ */
 	__UINT64_TYPE__ scr_64b; /* 64-bit return value */
 	struct {
 		__UINT32_TYPE__ scr_eax; /* Value for %eax */
