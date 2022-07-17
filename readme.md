@@ -726,7 +726,7 @@ As such, when executed, your custom config will produce files under the followin
 The following configurations are provided by default:
 
 Name   | Commandline options
-=======|====================
+-------|-------------------------------
 `nOD`  | `-fstack-protector-strong`
 `nOnD` | `-DNDEBUG`
 `OD`   | `-O2 -fstack-protector-strong`
