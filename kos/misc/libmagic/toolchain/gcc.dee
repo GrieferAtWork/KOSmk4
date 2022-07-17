@@ -178,9 +178,9 @@ local function splitCommandline(cmdline: string): {string...} {
 
 function constructMacroDefinitions(macros: {string: string | none}): {string...} {
 	for (local name, val: macros) {
-		if (val !is none && val != "1")
+		if (val !is none && val != "1") {
 			yield f"-D{name}={val}";
-		else {
+		} else {
 			yield f"-D{name}";
 		}
 	}
@@ -503,6 +503,7 @@ again_handle_col:
 		if (ppFlags)
 			arguments.extend(joinGccArguments(ppFlags, "-Wp", "-Xpreprocessor"));
 		arguments.append(srcFile);
+		this.config.CONFIG.callHook("GCC.createPreprocessorProcess", step, options, arguments);
 		return createWaitableProcess(step, options, "gcc", ipc.Process(cc, arguments));
 	}
 
@@ -559,6 +560,7 @@ again_handle_col:
 		if (ppFlags)
 			arguments.extend(joinGccArguments(ppFlags, "-Wp", "-Xpreprocessor"));
 		arguments.append(srcFile);
+		this.config.CONFIG.callHook("GCC.createAssemblerProcess", step, options, arguments);
 		return createWaitableProcess(step, options, "gcc", ipc.Process(cc, arguments));
 	}
 
@@ -632,6 +634,7 @@ again_handle_col:
 		if (asFlags)
 			arguments.extend(joinGccArguments(asFlags, "-Wa", "-Xassembler"));
 		arguments.append(srcFile);
+		this.config.CONFIG.callHook("GCC.createCompilerProcess", step, options, arguments);
 		return createWaitableProcess(step, options, "gcc", ipc.Process(cc, arguments));
 	}
 
@@ -806,6 +809,7 @@ again_handle_col:
 
 	@@Create a linker process
 	function createLinkerProcess(step: BoundStep,
+	                             options: {string: Object},
 	                             exeFile: string,
 	                             objFiles: {string...},
 	                             ldFlags: {string...} = none,
@@ -817,7 +821,7 @@ again_handle_col:
 		if (language is none)
 			language = getDefaultLinkerLanguage(step);
 		local cc = EXE_FORMAT.format({ this.config.CROSS_PREFIX, getCCForLanguage(language)[0] });
-		local arguments = ["-o", exeFile, step.group.options.get(OPT_GCC_OPTIONS)...];
+		local arguments = ["-o", exeFile, options.get(OPT_GCC_OPTIONS)...];
 		if (noStdLib)
 			arguments.append("-nostdlib");
 		if (libPath) {
@@ -855,6 +859,7 @@ again_handle_col:
 		}
 		for (local l: libraries)
 			arguments.append("-l" + l);
+		this.config.CONFIG.callHook("GCC.createLinkerProcess", step, options, arguments);
 		return createWaitableProcess(step, none, "ld", ipc.Process(cc, arguments));
 	}
 

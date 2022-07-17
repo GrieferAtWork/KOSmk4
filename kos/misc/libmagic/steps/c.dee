@@ -137,6 +137,9 @@ final local function readFileUntil(fp: File, end_pattern: string): string | none
 
 final local function getCompileOptions(self: BoundStep, srcFile: string): {string: Object} {
 	local result = self.group.options;
+	local extra = self.toolchain.config.CONFIG.getExtraCCompileOptions(self, srcFile);
+	if (extra !is none)
+		result = mergeOptions(result, extra);
 	if (result.get(OPT_COMPILE_INLINE_SOURCE_FLAGS)) {
 		local fp = try File.open(srcFile, "r,nobuf") catch (...) none;
 		if (fp !is none) {
@@ -487,14 +490,18 @@ final global function LINK_run(self: BoundStep): string {
 	local config = toolchain.config;
 	local group = self.group;
 	local options = group.options;
+	local extra = config.CONFIG.getExtraCLinkOptions(self);
+	if (extra !is none)
+		options = mergeOptions(options, extra);
 	local script = options.get(OPT_LINK_SCRIPT);
 	yield toolchain.createLinkerProcess(
 		step:     self,
+		options:  options,
 		exeFile:  group.fixFilename(options[OPT_LINK_OUTPUT]),
 		objFiles: LINK_enumerate_objects(self),
 		ldFlags:  options.get(OPT_LINK_LDFLAGS),
 		language: options.get(OPT_COMPILE_LANGUAGE),
-		linkerScript: \
+		linkerScript:
 			if (script !is none)
 				config.getPreprocessedFilename(group, group.fixFilename(script)),
 		libPath: group.fixFilenames(options.get(OPT_LINK_LIBPATH)),
@@ -539,6 +546,9 @@ final local function ARCHIVE_run(self: BoundStep): string {
 	local config = toolchain.config;
 	local group = self.group;
 	local options = group.options;
+	local extra = config.CONFIG.getExtraCArchiveOptions(self);
+	if (extra !is none)
+		options = mergeOptions(options, extra);
 	yield toolchain.createArchiveProcess(
 		step:     self,
 		arcFile:  group.fixFilename(options[OPT_ARCHIVE_OUTPUT]),

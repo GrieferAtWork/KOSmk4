@@ -472,6 +472,72 @@ class Group {
 	}
 }
 
+
+@@Merge @overrides into a given set of @base options
+function mergeOptions(base: {string: Object}, overrides: {string: Object}): {string: Object} {
+	if (!base)
+		return overrides;
+	if (!overrides)
+		return base;
+	local result = copy base;
+	for (local key, value: overrides) {
+		local old = result.get(key);
+		if (old is none) {
+			result[key] = value;
+		} else if (old is Sequence) {
+			old = List(old);
+			old.extend(value);
+			result[key] = old;
+		} else if (old is Mapping) {
+			old = Dict(old);
+			for (local newKey, newValue: value)
+				old[newKey] = newValue;
+			result[key] = old;
+		} else {
+			result[key] = overrides;
+		}
+	}
+	return result;
+}
+
+
+@@Descriptor for an available system configuration
+class Configuration {
+	this = default;
+
+	@@Configuration name
+	public member name: string;
+
+	@@Call a custom configuration. Available hooks are:
+	@@ - @callHook("GCC.createPreprocessorProcess", step: BoundStep, options: {string: Object}, arguments: List with string)
+	@@ - @callHook("GCC.createAssemblerProcess", step: BoundStep, options: {string: Object}, arguments: List with string)
+	@@ - @callHook("GCC.createCompilerProcess", step: BoundStep, options: {string: Object}, arguments: List with string)
+	@@ - @callHook("GCC.createLinkerProcess", step: BoundStep, options: {string: Object}, arguments: List with string)
+	function callHook(name: string, ...) {
+	}
+
+	@@Return extra C compile options
+	function getExtraCCompileOptions(self: BoundStep, srcFile: string): {string: Object} | none {
+		return getExtraOptions(self);
+	}
+
+	@@Return extra C link options
+	function getExtraCLinkOptions(self: BoundStep): {string: Object} | none {
+		return getExtraOptions(self);
+	}
+
+	@@Return extra C archive options
+	function getExtraCArchiveOptions(self: BoundStep): {string: Object} | none {
+		return getExtraOptions(self);
+	}
+
+	@@Return extra options that should always apply
+	function getExtraOptions(self: BoundStep): {string: Object} | none {
+		return none;
+	}
+}
+
+
 @@Build configuration controller
 class Config {
 	this = default;
@@ -499,6 +565,9 @@ class Config {
 
 	@@Enable verbose mode (print executed commands)
 	public final member VERBOSE: bool = false;
+
+	@@Extra hooks for configuration-specific compile/link overrides
+	public final member CONFIG: Configuration = none;
 
 	@@Return the location of a some build artifact
 	final function getBuildArtifact(group: Group, srcFile: string, ext: string): string {
@@ -572,13 +641,6 @@ class Toolchain {
 
 	@@Storage for toolchain extension configurations (e.g. mtools)
 	member options: { string: Object } = Dict();
-
-	/* C/C++ toolchain implementation prototypes */
-	//function parseDependencyFile(text: string): {string...};
-	//function createProcessorProcess(srcFile: string, ppFlags: {string...}): Waitable;
-	//function createCompilerProcess(srcFile: string, ccFlags: {string...} = none, ppFlags: {string...} = none, asFlags: {string...} = none, depFile: string = none, objFile: string = none, language: string | none = none): Waitable;
-	//function createArchiveProcess(exeFile: string, objFiles: {string...}, ldFlags: {string...} = none): Waitable;
-	//function createLinkerProcess(exeFile: string, objFiles: {string...}, ldFlags: {string...} = none, language: string | none = none): Waitable;
 }
 
 

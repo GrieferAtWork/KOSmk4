@@ -20,9 +20,10 @@
 
 import * from deemon;
 import * from errors;
+import * from ..libgen.c.ppexpr;
 import fs;
 
-global final OPTIONS_DAT_FILENAME = fs.joinpath(fs.headof(__FILE__), "options.txt");
+global final OPTIONS_DB_FILENAME = fs.joinpath(fs.headof(__FILE__), "options-db.txt");
 
 global _KOS_ROOTDIR = none;
 function getKosRootDir(): string {
@@ -62,4 +63,50 @@ function getConfigInverseName(configName: string): string {
 			.rsstrip("HAVE_")
 			.rsstrip("USE_")
 	}NO_{configName[configPos:]}";
+}
+
+
+function printConfigLoader(
+		fp: File, configName: string, configType: string,
+		configValue: string, required: bool) {
+	if (configType == "bool") {
+		local noName = getConfigInverseName(configName);
+		fp << "#ifdef " << noName << "\n"
+			"#undef " << configName << "\n"
+			"#elif !defined(" << configName << ")\n";
+		if (configValue in ["true", "false"]) {
+			fp <<
+				"#define " << (configValue == "true" ? configName : noName) << "\n";
+		} else {
+			configValue = optimize(configValue);
+			fp << optimizeForIfdef(configValue) <<
+				"#define " << configName << "\n"
+				<< optimizeForElse(configValue) <<
+				"#define " << noName << "\n"
+				<< optimizeForEndif(f"!({configValue})");
+		}
+		fp << "#elif (-" << configName << " - 1) == -1\n"
+			"#undef " << configName << "\n"
+			"#define " << noName << "\n"
+			"#endif /* ... */\n";
+	} else if (configType == "int" && !required) {
+		local noName = getConfigInverseName(configName);
+		local disabledValue = getConfigDisabledIntegerValue(configName);
+		fp << "#ifdef " << noName << "\n"
+			"#undef " << configName << "\n"
+			"#define " << configName << " " << disabledValue << "\n"
+			"#elif !defined(" << configName << ")\n"
+			"#define " << configName << " " << configValue << "\n";
+		if (configValue == "0")
+			fp << "#define " << noName << " 1\n";
+		fp << "#elif (" << configName << " + 0) <= " << disabledValue << "\n"
+			"#undef " << configName << "\n"
+			"#define " << noName << "\n"
+			"#define " << configName << " " << disabledValue << "\n"
+			"#endif /* ... */\n";
+	} else {
+		fp << "#ifndef " << configName << "\n"
+			"#define " << configName << " " << configValue << "\n"
+			"#endif /* !" << configName << " */\n";
+	}
 }

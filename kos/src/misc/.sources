@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-if (!CONFIG_ONLY_BUILD_LIBRARIES) {
+if (!OPT_ONLY_BUILD_LIBRARIES) {
 /* Compile keymap files. */
 for (local x: fs.dir("kos/src/misc/keymaps")) {
 	BEGIN GROUP("keymaps." + x) { KEYMAP, MCOPY };

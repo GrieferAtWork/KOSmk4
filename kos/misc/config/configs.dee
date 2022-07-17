@@ -1,0 +1,97 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+/* Enumerate+load defined system configurations
+ *
+ * System configurations are defined by files in `/kos/include/kos/config/features/xxx.h',
+ * where `xxx' is the name of the configuration.  Aside from these, there is a total of  4
+ * default  configurations  `OD', `OnD',  `nOD'  and `nOnD'  that  use the  default values
+ * everywhere, but with/without `NDEBUG' / `-O2'.
+ */
+
+import * from deemon;
+//import * from .utils;
+import * from ..libmagic.libmagic;
+
+@@Enumerate available configurations by name
+function listConfigurationNames(): {string...} {
+	yield "OD";
+	yield "nOD";
+	yield "OnD";
+	yield "nOnD";
+	/* TODO: Custom configurations */
+}
+
+
+
+@@Simple configuration class used to describe builtin configurations
+final class SimpleCustomConfiguration: Configuration {
+	public member extraOptions: {string: Object};
+
+	this(name: string, extraOptions: {string: Object})
+		: super(name)
+	{
+		this.extraOptions = extraOptions;
+	}
+
+	@@Return extra options that should always apply
+	function getExtraOptions(self: BoundStep): {string: Object} {
+		return extraOptions;
+	}
+}
+
+
+@@Lookup a configuration, given its name
+function getConfiguration(name: string): Configuration {
+	switch (name) {
+
+	case "OD":
+	case "nOD":
+	case "OnD":
+	case "nOnD": {
+		local c_optimize = "nO" !in name;
+		local c_debug    = "nD" !in name;
+
+		/* Load default configuration. */
+		local options = Dict();
+		if (c_debug) {
+			if (c_optimize) {
+				options["GCC.options"] = { "-fstack-protector-strong", "-O2" };
+			} else {
+				options["GCC.options"] = { "-fstack-protector-strong" };
+			}
+		} else {
+			if (c_optimize) {
+				options["GCC.options"] = { "-O3" };
+			}
+			options["COMPILE.macros"] = { "NDEBUG" : "1" };
+		}
+
+		return SimpleCustomConfiguration(
+			name:         name,
+			extraOptions: options);
+	}	break;
+
+	default:
+		break;
+	}
+	/* TODO: Custom configurations */
+	throw Error(f"No such configuration: {repr name}");
+}

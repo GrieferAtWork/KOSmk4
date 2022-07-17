@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-if (!CONFIG_ONLY_BUILD_LIBRARIES) {
+if (!OPT_ONLY_BUILD_LIBRARIES) {
 
 #define DEFINE_SIMPLE_C_APPLICATION(name, ...)          \
 	BEGIN GROUP("apps." name) { COMPILE, LINK, MCOPY }; \

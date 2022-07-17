@@ -21,5 +21,36 @@
 #define _KOS_CONFIG_CONFIG_H 1
 
 /* Config-specific macro overrides (e.g. '#define CONFIG_NO_KERNEL_EPOLL_RPC') go here */
+#ifdef __KOS__
+#ifdef CONFIG_HEADER
+/* Pull in the config header (one of <kos/config/features/xxx.h>)
+ * This  macro should  have be  defined on  the commandline like:
+ * - `-DCONFIG_HEADER="features/myconfig.h"'
+ */
+#include CONFIG_HEADER
+
+#ifndef CONFIG_NAME
+#error "`#include CONFIG_HEADER' should have at least set the configuration's name"
+#endif /* !CONFIG_NAME */
+#else /* CONFIG_HEADER */
+
+/* No explicit configuration given; must be one of the default configs
+ * -> Figure out its name! */
+#ifdef __OPTIMIZE__
+#ifdef NDEBUG
+#define CONFIG_NAME "OnD"
+#else /* NDEBUG */
+#define CONFIG_NAME "OD"
+#endif /* !NDEBUG */
+#else /* __OPTIMIZE__ */
+#ifdef NDEBUG
+#define CONFIG_NAME "nOnD"
+#else /* NDEBUG */
+#define CONFIG_NAME "nOD"
+#endif /* !NDEBUG */
+#endif /* !__OPTIMIZE__ */
+
+#endif /* !CONFIG_HEADER */
+#endif /* __KOS__ */
 
 #endif /* !_KOS_CONFIG_CONFIG_H */

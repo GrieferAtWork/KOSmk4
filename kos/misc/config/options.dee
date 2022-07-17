@@ -18,133 +18,157 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
+/* List available config options from the database and query associated metadata. */
+
 import * from deemon;
 import * from errors;
 import * from .utils;
 import fs;
 
-function loadOptions(): {string: {Bytes...}} {
-	local result = Dict();
-	local currentFilename: string | none = none;
-	local currentOptions: {Bytes...} = [];
+@@Return the documentation string for the given config option
+function getConfigDocString(declFilename: string, configName: string): string {
+	with (local fp = File.open(fs.joinpath(getKosRootDir(), declFilename), "r")) {
+		local data = fp.read().unifylines();
+		final local PREFIX = "/*" "[[[config";
+		for (local configStart: data.findall(PREFIX)) {
+			configStart += #PREFIX;
+			while (configStart < #data && data.isspace(configStart))
+				++configStart;
+			local configEnd = data.index("]]]*/", configStart);
+			while (configEnd > configStart && data.isspace(configEnd - 1))
+				--configEnd;
+			local docText = data[configStart:configEnd];
+			local configLine, none, docText = docText.partition("\n")...;
+			configLine = configLine.rstrip();
+			local configNameEnd = configLine.find(":");
+			if (configNameEnd < 0) {
+				configNameEnd = configLine.find("=");
+				if (configNameEnd < 0)
+					continue;
+			}
+			while (configNameEnd > 0 && configLine.isspace(configNameEnd - 1))
+				--configNameEnd;
+			configLine = configLine[:configNameEnd];
+			configLine = configLine.decode("utf-8");
+			if (configLine == configName) {
+				@@Characters  removed from the start of @docText, so-
+				@@long as all of its lines start with that character.
+				final local LSTRIP_COMMON_CHARS = "\t *".bytes();
+				for (;;) {
+					docText = docText.rstrip("\n");
+					local commonPrefix = none;
+					for (local line: docText.splitlines()) {
+						if (commonPrefix is none) {
+							local n = 0;
+							while (n < #line && line[n] in LSTRIP_COMMON_CHARS)
+								++n;
+							commonPrefix = line[:n];
+						} else {
+							local n = 0;
+							while (n < #line && n < #commonPrefix &&
+							       line[n] == commonPrefix[n])
+								++n;
+							commonPrefix = line[:n];
+						}
+					}
+					if (!commonPrefix)
+						break;
+					local commonPrefixLen = #commonPrefix;
+					docText = "\n".bytes().join(
+						for (local line: docText.splitlines())
+							line[commonPrefixLen:]);
+				}
+				return docText;
+			}
+		}
+	}
+	return "";
+}
+
+final class ConfigOption {
+	this = default;
+
+	@@Config name
+	public member name: string;
+
+	@@Set to @true in case of an integer config that cannot be disabled (only configured)
+	public member required: bool;
+
+	@@The inverse name of this config option
+	public property inverseName: string = {
+		get(): string {
+			if (m_inverseName !is bound)
+				m_inverseName = getConfigInverseName(name);
+			return m_inverseName;
+		}
+	}
+	private member m_inverseName: string;
+
+	@@The integer value to-be used when this config is @(typ == "int"),
+	@@but has been disabled via @inverseName
+	public property disabledIntegerValue: int = {
+		get(): int {
+			return getConfigDisabledIntegerValue(name);
+		}
+	}
+
+	@@Config value type. One of:
+	@@ - @"string"
+	@@ - @"bool"
+	@@ - @"int"
+	public member typ: string;
+
+	@@Config default value
+	public member defl: string;
+
+	@@Filename of the file that declares this config
+	public member declFilename: string;
+
+	@@Return the config option's documentation string.
+	public property docString: string = {
+		get(): string {
+			if (m_docString !is bound)
+				m_docString = getConfigDocString(declFilename, name);
+			return m_docString;
+		}
+	}
+	private member m_docString: string;
+
+}
+
+function loadConfigs(): {string: ConfigOption} {
+	local result: {string: ConfigOption} = Dict();
+	local declFilename: string | none = none;
 	try {
-		for (local line: File.open(OPTIONS_DAT_FILENAME).read().splitlines(false)) {
+		for (local line: File.open(OPTIONS_DB_FILENAME).read().splitlines(false)) {
 			if (line.startswith("#"))
 				continue; /* Comment */
 			if (line.startswith("\t")) {
-				currentOptions.append(line[1:]);
-			} else if (line) {
-				if (currentFilename !is none)
-					result[currentFilename] = currentOptions;
-				currentFilename = line.decode("utf-8");
-				currentOptions  = [];
-			}
-		}
-	} catch (FileNotFound) {
-	}
-	if (currentFilename !is none)
-		result[currentFilename] = currentOptions;
-	return result;
-}
-
-function copyOptions(opt: {string: {Bytes...}}): {string: {Bytes...}} {
-	local result = Dict();
-	for (local filename, opts: opt)
-		result[filename] = copy opts;
-	return result;
-}
-
-@@Mapping for FILENAME->OPTION_LINES
-global final varying OPTIONS: {string: {Bytes...}} = loadOptions();
-global final varying _ORIG_OPTIONS: {string: {Bytes...}} = copyOptions(OPTIONS);
-
-@@Set to true if @OPTIONS may have been modified
-global maybeModified: bool = false;
-
-
-function forceSave() {
-	maybeModified = false;
-	local newOptionsFilename = fs.joinpath(fs.headof(OPTIONS_DAT_FILENAME), "options-new.txt");
-	local oldOptionsFilename = fs.joinpath(fs.headof(OPTIONS_DAT_FILENAME), "options-old.txt");
-	with (local fp = File.open(newOptionsFilename, "wb")) {
-		fp << "# Autogenerated file (by `options.dee') - DO NOT EDIT!\n";
-		for (local filename: OPTIONS.keys.sorted()) {
-			local opts = OPTIONS[filename];
-			fp << filename << "\n";
-			for (local opt: opts)
-				fp << "\t" << opt << "\n";
-			fp << "\n";
-		}
-	}
-	try {
-		fs.rename(OPTIONS_DAT_FILENAME, oldOptionsFilename);
-	} catch (FileNotFound) {
-		fs.rename(newOptionsFilename, OPTIONS_DAT_FILENAME);
-		return;
-	} @[interrupt] catch (...) {
-		try fs.unlink(newOptionsFilename); catch (...);
-		throw;
-	}
-	try {
-		fs.rename(newOptionsFilename, OPTIONS_DAT_FILENAME);
-		try {
-			fs.unlink(oldOptionsFilename);
-		} @[interrupt] catch (...) {
-			try fs.rename(OPTIONS_DAT_FILENAME, newOptionsFilename); catch (...);
-			throw;
-		}
-	} @[interrupt] catch (...) {
-		try fs.rename(oldOptionsFilename, OPTIONS_DAT_FILENAME); catch (...);
-		try fs.unlink(newOptionsFilename); catch (...);
-		throw;
-	}
-}
-
-function save() {
-	if (maybeModified) {
-		if (#_ORIG_OPTIONS != #OPTIONS) {
-			forceSave();
-		} else {
-			for (local filename, opts: OPTIONS) {
-				local oldOpts = _ORIG_OPTIONS.get(filename);
-				if (oldOpts is none || oldOpts != opts) {
-					forceSave();
-					return;
+				local configLine = line[1:].decode("utf-8");
+				local name, none, typ = configLine.partition(":")...;
+				local typ, none, defl = typ.partition("=")...;
+				local required = false;
+				if (name.endswith("!")) {
+					required = true;
+					name = name[:-1];
 				}
+				result[name] = ConfigOption(name, required, typ, defl, declFilename);
+			} else if (line) {
+				declFilename = line.decode("utf-8");
 			}
 		}
+	} catch (FileNotFound) {
 	}
-}
-
-function setMaybeModified() {
-	if (!maybeModified) {
-		AppExit.atexit(save);
-		maybeModified = true;
-	}
+	return result;
 }
 
 
-function normalizeFilename(filename: string): string {
-	return fs.relpath(filename, getKosRootDir())
-#ifdef __WINDOWS__
-		.replace(r"\", r"/")
-#endif /* __WINDOWS__ */
-		;
-}
+@@Still marked as @varying, so other modules don't hard-code the value in .dec files
+global final varying CONFIG_OPTIONS: {string: ConfigOption} = loadConfigs();
 
-function clearFileConfig(filename: string) {
-	try {
-		del OPTIONS[filename];
-	} catch (...) {
-	}
-	setMaybeModified();
+#ifdef __MAIN__
+for (local name: CONFIG_OPTIONS.keys.sorted()) {
+	print name;
+	print("\t", CONFIG_OPTIONS[name].docString.replace("\n", "\n\t"));
 }
-
-function addFileConfigOption(filename: string, optionLine: string | Bytes) {
-	local opts = OPTIONS.get(filename, none);
-	if (opts is none)
-		OPTIONS[filename] = opts = [];
-	if (optionLine !in opts)
-		opts.append(optionLine.bytes());
-	setMaybeModified();
-}
+#endif /* __MAIN__ */

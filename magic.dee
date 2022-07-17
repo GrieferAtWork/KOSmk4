@@ -38,20 +38,20 @@ import * from .kos.misc.libmagic.steps.elf_dilink;
 import * from .kos.misc.libmagic.steps.custom;
 import * from .kos.misc.libmagic.steps.keymap;
 import * from .kos.misc.libmagic.toolchain.gcc;
+import .kos.misc.config.configs;
 import .kos.misc.magicemulator._options as emulatorOptions;
 import AppExit from errors;
 
 File.stdout.setbuf("line");
 File.stderr.setbuf("line");
 
-global CONFIG_MAX_COMPILERS: int = none;
-global CONFIG_EMULATOR_USED: string = "qemu"; /* none or "qemu" / "bochs" */
-global CONFIG_EMULATOR_OPTIONS: {string: string} = Dict();
-global CONFIG_DONT_BUILD: bool = false;
-global CONFIG_ONLY_BUILD_LIBRARIES: bool = false;
-global CONFIG_EMULATOR_STARTED_PATTERN: string = none;
-global CONFIG_EMULATOR_GDB_MODE: string = none;
-global CONFIG_MULTIBOOT_DRIVERS: {(string, string)...} = List();
+global OPT_MAX_COMPILERS: int = none;
+global OPT_EMULATOR_USED: string = "qemu"; /* none or "qemu" / "bochs" */
+global OPT_EMULATOR_OPTIONS: {string: string} = Dict();
+global OPT_DONT_BUILD: bool = false;
+global OPT_ONLY_BUILD_LIBRARIES: bool = false;
+global OPT_EMULATOR_STARTED_PATTERN: string = none;
+global OPT_MULTIBOOT_DRIVERS: {(string, string)...} = List();
 global requiredOutputWhiteList: {(bool, string)...} | none = none;
 global requiredGroupWhiteList: {string...} | none = none;
 global requiredGroupOfSourceFileWhiteList: {string...} | none = none;
@@ -60,10 +60,6 @@ global toolchain: Toolchain = GCCToolchain(config: config);
 global toolchainsAndGroups: {(Toolchain, {Group...})...};
 global groups: {Group...} = [];
 global options: {string: Object} = Dict();
-
-/* Build configuration */
-global CONFIG_OPTIMIZE: bool;
-global CONFIG_DEBUG: bool;
 
 /* Target configuration */
 global TARGET_REAL_ARCH: string; /* Real target architecture (e.g. "i386") */
@@ -76,43 +72,21 @@ global KERNEL_BINARY: string;
 @@Called  by  emulators  once   the  emulator  has  been   started.
 @@Preferrably called _after_ a GDB stub (if any) becomes available.
 function onEmulatorStarted() {
-	assert CONFIG_EMULATOR_STARTED_PATTERN !== false;
-	if (CONFIG_EMULATOR_STARTED_PATTERN)
-		print CONFIG_EMULATOR_STARTED_PATTERN;
-	CONFIG_EMULATOR_STARTED_PATTERN = false;
-}
-
-function parseConfig(config: string): (bool, bool) {
-	return {
-		"OD" : (true, true),
-		"OnD" : (true, false),
-		"nOD" : (false, true),
-		"nOnD" : (false, false),
-	}[config];
-}
-
-function setConfig(config: string) {
-	CONFIG_OPTIMIZE, CONFIG_DEBUG = parseConfig(config)...;
+	assert OPT_EMULATOR_STARTED_PATTERN !== false;
+	if (OPT_EMULATOR_STARTED_PATTERN)
+		print OPT_EMULATOR_STARTED_PATTERN;
+	OPT_EMULATOR_STARTED_PATTERN = false;
 }
 
 function loadMissingSettings() {
-	local target, config =
+	local targetName, configName =
 		import(".kos.misc.scripts.vsautoconfig")
 			.parseCurrentVsConfiguration("kos/.vs/ProjectSettings.json")...;
-	print "Automatically loaded settings:", repr target, repr config;
+	print "Automatically loaded settings:", repr targetName, repr configName;
 	if (TARGET_ARCH !is bound)
-		TARGET_ARCH = target;
-	local config_optimize, config_debug = parseConfig(config)...;
-	if (CONFIG_OPTIMIZE !is bound)
-		CONFIG_OPTIMIZE = config_optimize;
-	if (CONFIG_DEBUG !is bound)
-		CONFIG_DEBUG = config_debug;
-}
-
-
-function getConfig(): string {
-	return f"{CONFIG_OPTIMIZE ? "O" : "nO"}"
-	       f"{CONFIG_DEBUG ? "D" : "nD"}";
+		TARGET_ARCH = targetName;
+	if (config.CONFIG is none)
+		config.CONFIG = configs.getConfiguration(configName);
 }
 
 function generateFile(filename: string, isRegEx: bool) {
@@ -127,14 +101,14 @@ function generateFile(filename: string, isRegEx: bool) {
 		filename = normalizePath(filename, false);
 	}
 	requiredOutputWhiteList.insert((isRegEx, filename));
-	CONFIG_EMULATOR_USED = none;
+	OPT_EMULATOR_USED = none;
 }
 
 function generateGroup(name: string) {
 	if (requiredGroupWhiteList is none)
 		requiredGroupWhiteList = HashSet();
 	requiredGroupWhiteList.insert(name);
-	CONFIG_EMULATOR_USED = none;
+	OPT_EMULATOR_USED = none;
 }
 
 function generateProjectOfInputFile(filename: string) {
@@ -145,31 +119,31 @@ function generateProjectOfInputFile(filename: string) {
 		: fs.abspath(filename);
 	filename = normalizePath(filename, false);
 	requiredGroupOfSourceFileWhiteList.insert(filename);
-	CONFIG_EMULATOR_USED = none;
+	OPT_EMULATOR_USED = none;
 }
 
 function buildToolchainsAndGroups() {
-	if (CONFIG_MAX_COMPILERS is none)
-		CONFIG_MAX_COMPILERS = try import("posix").cpu_count() catch (...) 1;
+	if (OPT_MAX_COMPILERS is none)
+		OPT_MAX_COMPILERS = try import("posix").cpu_count() catch (...) 1;
 	if (requiredOutputWhiteList !is none) {
 		return buildGroupsWithOutputWhitelist(
 			toolchainsAndGroups: toolchainsAndGroups,
 			outputWhiteList:     requiredOutputWhiteList,
-			maxParallelSteps:    CONFIG_MAX_COMPILERS);
+			maxParallelSteps:    OPT_MAX_COMPILERS);
 	} else if (requiredGroupWhiteList !is none) {
 		return buildGroupsWithGroupWhitelist(
 			toolchainsAndGroups: toolchainsAndGroups,
 			groupWhiteList:      requiredGroupWhiteList,
-			maxParallelSteps:    CONFIG_MAX_COMPILERS);
+			maxParallelSteps:    OPT_MAX_COMPILERS);
 	} else if (requiredGroupOfSourceFileWhiteList !is none) {
 		return buildGroupsWithGroupOfInputFileWhitelist(
 			toolchainsAndGroups: toolchainsAndGroups,
 			inputFileWhitelist:  requiredGroupOfSourceFileWhiteList,
-			maxParallelSteps:    CONFIG_MAX_COMPILERS);
+			maxParallelSteps:    OPT_MAX_COMPILERS);
 	} else {
 		return buildGroups(
 			toolchainsAndGroups: toolchainsAndGroups,
-			maxParallelSteps:    CONFIG_MAX_COMPILERS);
+			maxParallelSteps:    OPT_MAX_COMPILERS);
 	}
 }
 
@@ -194,7 +168,7 @@ function setBinTargetLink(target_arch: string, target_name: string) {
 }
 
 function build(reconfigure: Callable = none, binTargetName: string = none) {
-	TARGET_NAME = f"{TARGET_ARCH}-kos-{getConfig()}";
+	TARGET_NAME = f"{TARGET_ARCH}-kos-{config.CONFIG.name}";
 	if (binTargetName is none)
 		binTargetName = TARGET_NAME;
 	setBinTargetLink(TARGET_ARCH, binTargetName);
@@ -233,7 +207,7 @@ function build(reconfigure: Callable = none, binTargetName: string = none) {
 	toolchainsAndGroups = { (toolchain, groups) };
 
 	/* NOTE: Must always load groups for stuff like like magic-driven %{vinfo} */
-	if (CONFIG_DONT_BUILD)
+	if (OPT_DONT_BUILD)
 		return;
 
 	/* Check that source generators are up-to-date. */
@@ -251,7 +225,7 @@ function main(argv: {string...}) {
 		local arg = args.pop(0);
 		switch (arg) {
 		case "-1":
-			CONFIG_MAX_COMPILERS = 1;
+			OPT_MAX_COMPILERS = 1;
 			break;
 		case "-v":
 		case "--verbose":
@@ -259,34 +233,40 @@ function main(argv: {string...}) {
 			break;
 		case "-E":
 			options.setdefault(OPT_COMPILE_SECONDARY, []).append("E");
-			CONFIG_EMULATOR_USED = none;
+			OPT_EMULATOR_USED = none;
 			break;
 		case "-S":
 			options.setdefault(OPT_COMPILE_SECONDARY, []).append("S");
-			CONFIG_EMULATOR_USED = none;
+			OPT_EMULATOR_USED = none;
 			break;
 		case "--run-only":
-			CONFIG_DONT_BUILD = true;
+			OPT_DONT_BUILD = true;
 			break;
 		case "--libraries-only":
-			CONFIG_ONLY_BUILD_LIBRARIES = true;
+			OPT_ONLY_BUILD_LIBRARIES = true;
 			break;
 		case "--build-only":
-			CONFIG_EMULATOR_USED = none;
+			OPT_EMULATOR_USED = none;
 			break;
 		case "-f":
 			config.FORCE = true;
 			break;
 		case "--emulator-hosted":
-			CONFIG_EMULATOR_OPTIONS[emulatorOptions.HOSTED] = "true";
+			OPT_EMULATOR_OPTIONS[emulatorOptions.HOSTED] = "true";
 			break;
 		case "--format-error-messages":
 			config.FORMAT_ERRORS = true;
 			break;
 		case "--":
-			CONFIG_EMULATOR_OPTIONS[emulatorOptions.CMDLINE] = " ".join(args);
+			OPT_EMULATOR_OPTIONS[emulatorOptions.CMDLINE] = " ".join(args);
 			args = { };
 			break;
+		case "--config":
+			/* List available configs */
+			print("Available configurations:");
+			for (local name: configs.listConfigurationNames())
+				print("\t", name);
+			AppExit.exit(0);
 		default:
 			if ("=" in arg) {
 				local name, none, value = arg.partition("=")...;
@@ -296,16 +276,16 @@ function main(argv: {string...}) {
 					print "ECHO:", repr(value);
 					break;
 				case "-n":
-					CONFIG_MAX_COMPILERS = int(value);
+					OPT_MAX_COMPILERS = int(value);
 					break;
 				case "--emulator-setopt": {
 					if ("=" !in value)
 						throw Error("--emulator-setopt requires the operand to contain \"=\", which isn't the case for " + repr(value));
 					local optnam, none, optval = value.partition("=")...;
-					CONFIG_EMULATOR_OPTIONS[optnam] = optval;
+					OPT_EMULATOR_OPTIONS[optnam] = optval;
 				}	break;
 				case "--emulator":
-					CONFIG_EMULATOR_USED = value;
+					OPT_EMULATOR_USED = value;
 					break;
 				case "--changed":
 					setForceChanged(normalizePath(value, true));
@@ -314,10 +294,10 @@ function main(argv: {string...}) {
 					config.VERBOSE = BOOLMAP[value];
 					break;
 				case "--gdb":
-					CONFIG_EMULATOR_OPTIONS[emulatorOptions.GDB] = value;
+					OPT_EMULATOR_OPTIONS[emulatorOptions.GDB] = value;
 					break;
 				case "--emulator-started-pattern":
-					CONFIG_EMULATOR_STARTED_PATTERN = value;
+					OPT_EMULATOR_STARTED_PATTERN = value;
 					break;
 				case "--target":
 					if (value != "${env.TARGET}")
@@ -325,7 +305,7 @@ function main(argv: {string...}) {
 					break;
 				case "--config":
 					if (value != "${env.CONFIG}")
-						setConfig(value);
+						config.CONFIG = configs.getConfiguration(value);
 					break;
 				case "--vsgengroup":
 					config.FORMAT_ERRORS = true;
@@ -333,11 +313,11 @@ function main(argv: {string...}) {
 					generateGroup(value);
 					break;
 				case "--vcautotargetconfig": {
-					local target, config =
+					local targetName, configName =
 						import(".kos.misc.scripts.vsautoconfig")
 						.parseCurrentVsConfiguration(value)...;
-					TARGET_ARCH = target;
-					setConfig(config);
+					TARGET_ARCH = targetName;
+					config.CONFIG = configs.getConfiguration(configName);
 				}	break;
 
 				case "--vsgengroup-of":
@@ -363,14 +343,14 @@ function main(argv: {string...}) {
 						local name = opt, cmdline = "";
 						if ("," in opt)
 							name, none, cmdline = opt.partition(",")...;
-						CONFIG_MULTIBOOT_DRIVERS.append((name, cmdline));
+						OPT_MULTIBOOT_DRIVERS.append((name, cmdline));
 					}
 				}	break;
 
 				case "--clang-tidy":
 					options.setdefault(OPT_COMPILE_SECONDARY, [])
 						.append("clang-tidy=" + value);
-					CONFIG_EMULATOR_USED = none;
+					OPT_EMULATOR_USED = none;
 					break;
 
 				case "--lint":
@@ -389,7 +369,7 @@ function main(argv: {string...}) {
 						"-Ikos/include/i386-kos", /* FIXME: Don't hardcode here! */
 						"-Ikos/include",
 					});
-					CONFIG_EMULATOR_USED = none;
+					OPT_EMULATOR_USED = none;
 					break;
 
 				case "--environ": {
@@ -410,13 +390,13 @@ _err_unknown_argument:
 		}
 	}
 	fs.chdir(ROOTDIR);
-	if (CONFIG_OPTIMIZE !is bound || CONFIG_DEBUG !is bound || TARGET_ARCH !is bound)
+	if (config.CONFIG is none || TARGET_ARCH !is bound)
 		loadMissingSettings();
 
 	TARGET_REAL_ARCH = TARGET_ARCH;
 	TARGET = import(".kos.misc.targets." + TARGET_ARCH);
 	/* Build everything that was selected. */
-	if (!CONFIG_DONT_BUILD) {
+	if (!OPT_DONT_BUILD) {
 		if (hasattr(TARGET, "build")) {
 			import . as me;
 			TARGET.build(me);
@@ -428,27 +408,27 @@ _err_unknown_argument:
 	}
 
 	/* Start KOS with the selected emulator (if any). */
-	if (CONFIG_EMULATOR_USED !is none) {
+	if (OPT_EMULATOR_USED !is none) {
 		/* Driver name without any slashes are automatically
 		 * loaded   from    the    /os/drivers    directory. */
-		for (local i, elem: util.enumerate(CONFIG_MULTIBOOT_DRIVERS)) {
+		for (local i, elem: util.enumerate(OPT_MULTIBOOT_DRIVERS)) {
 			local name, cmdline = elem...;
 			if ("/" !in name && "\\" !in name) {
 				name = f"bin/{TARGET_NAME}/os/drivers/{name}";
-				CONFIG_MULTIBOOT_DRIVERS[i] = (name, cmdline);
+				OPT_MULTIBOOT_DRIVERS[i] = (name, cmdline);
 			}
 		}
 		import . as me;
-		import(".kos.misc.magicemulator." + CONFIG_EMULATOR_USED).start(
+		import(".kos.misc.magicemulator." + OPT_EMULATOR_USED).start(
 			groups:        groups,
 			config:        config,
 			BINPATH:       TARGET_BINPATH[1:],
 			KERNEL:        KERNEL_BINARY[1:],
-			DRIVERS:       CONFIG_MULTIBOOT_DRIVERS,
+			DRIVERS:       OPT_MULTIBOOT_DRIVERS,
 			TARGET_ARCH:   TARGET_ARCH,
 			TARGET:        TARGET,
 			DISK_FILENAME: toolchain.options[TOOLCHAIN_MTOOLS_DISK],
-			options:       CONFIG_EMULATOR_OPTIONS,
+			options:       OPT_EMULATOR_OPTIONS,
 			magic:         me
 		);
 	}

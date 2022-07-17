@@ -69,29 +69,29 @@ function build(magic: Module) {
 	/* Re-configure for i386 settions */
 	magic.TARGET_ARCH = "i386";
 	magic.TARGET = import(".i386");
-	local saved_CONFIG_ONLY_BUILD_LIBRARIES = magic.CONFIG_ONLY_BUILD_LIBRARIES;
-	local saved_CONFIG_DONT_BUILD = magic.CONFIG_DONT_BUILD;
+	local saved_OPT_ONLY_BUILD_LIBRARIES = magic.OPT_ONLY_BUILD_LIBRARIES;
+	local saved_OPT_DONT_BUILD = magic.OPT_DONT_BUILD;
 	local x64Options = deepcopy magic.options;
 	local x64Toolchain = deepcopy magic.toolchain;
 	local x64Config = deepcopy magic.config;
-	magic.CONFIG_DONT_BUILD = true;
+	magic.OPT_DONT_BUILD = true;
 
 	/* Generate build steps for i386 */
-	local binTargetName = "x86_64-kos-" + magic.getConfig();
+	local binTargetName = f"x86_64-kos-{x64Config.CONFIG.name}";
 	magic.build(reconfigure: (magic: Module) -> {
 		import TOOLCHAIN_MTOOLS_DISK from ..libmagic.steps.mtools;
 		/* Re-configure to output files into the x86_64 binpath */
 		magic.KERNEL_BINARY               = none;
-		magic.CONFIG_ONLY_BUILD_LIBRARIES = true;
+		magic.OPT_ONLY_BUILD_LIBRARIES = true;
 		/* Also output files into the x86_64 disk image! */
 		magic.toolchain.options[TOOLCHAIN_MTOOLS_DISK] = magic.TARGET_BINPATH[1:] + "/disk.img";
 		/* Re-configure the toolchain cache to use x86_64 paths, rather than i386 ones.
 		 * This is required to properly  handle library dependencies for  compatibility
 		 * mode system libraries. */
 		magic.toolchain._stdlibCache.clear();
-		magic.toolchain.name = "x86_32-kos-" + magic.getConfig();
+		magic.toolchain.name = f"x86_32-kos-{x64Config.CONFIG.name}";
 		magic.TARGET.provideToolchainCache(
-			magic.toolchain, "x86_64-kos-" + magic.getConfig());
+			magic.toolchain, f"x86_64-kos-{x64Config.CONFIG.name}");
 	}, binTargetName: binTargetName);
 	/* Check that source generators are up-to-date. */
 	updateAutomaticSourcesOnDemand("i386", magic.TARGET);
@@ -103,7 +103,7 @@ function build(magic: Module) {
 	/* Restore x86_64 settings */
 	magic.toolchain = x64Toolchain;
 	magic.options = x64Options;
-	magic.CONFIG_ONLY_BUILD_LIBRARIES = saved_CONFIG_ONLY_BUILD_LIBRARIES;
+	magic.OPT_ONLY_BUILD_LIBRARIES = saved_OPT_ONLY_BUILD_LIBRARIES;
 	local x64Groups = [];
 	magic.groups = x64Groups;
 
@@ -113,7 +113,7 @@ function build(magic: Module) {
 	magic.config = x64Config;
 	x64Toolchain._stdlibCache.clear();
 	x64Toolchain.config = x64Config;
-	x64Toolchain.name = "x86_64-kos-" + magic.getConfig();
+	x64Toolchain.name = f"x86_64-kos-{x64Config.CONFIG.name}";
 
 	/* Generate build steps for x86_64 */
 	magic.build();
@@ -124,8 +124,8 @@ function build(magic: Module) {
 		(x64Toolchain, x64Groups),
 	};
 
-	magic.CONFIG_DONT_BUILD = saved_CONFIG_DONT_BUILD;
-	if (saved_CONFIG_DONT_BUILD)
+	magic.OPT_DONT_BUILD = saved_OPT_DONT_BUILD;
+	if (saved_OPT_DONT_BUILD)
 		return;
 
 	/* Check that source generators are up-to-date. */

@@ -19,6 +19,7 @@
  */
 
 import * from deemon;
+import * from errors;
 import * from ..libgen.autom8;
 import fs;
 import ipc;
@@ -97,6 +98,7 @@ for (local filename: readLines(r)) {
 				}
 			});
 		} catch (PreventAutom8Writeback) {
+		} catch (FileNotFound) {
 		}
 	}
 }

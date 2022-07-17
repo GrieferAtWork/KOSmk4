@@ -75,28 +75,8 @@ function getDefPath(filename: string) -> fs.relpath(fs.headof(filename),ROOTDIR)
 #define SET_SHARED()             GCC_FLAGS({ "-fPIC", "-shared" })
 #define SET_NOSTDLIB()           options[OPT_LINK_NOSTDLIB] = true;
 
-
 SET_LANGUAGE("c++")
 DEFINE({ "__ELF__" : "1" })
-
-if (CONFIG_OPTIMIZE) {
-#if 1
-	if (CONFIG_DEBUG) {
-		/* Only enable optimizations that don't hinder debugging with GDB (too much...) */
-		/* XXX: -Og _DOES_ degredate the debugging expirience, so disable it too, for now */
-		GCC_FLAGS({ "-O2" })
-	} else
-#endif
-	{
-		GCC_FLAGS({ "-O3" })
-	}
-}
-
-if (CONFIG_DEBUG) {
-	GCC_FLAGS({ "-fstack-protector-strong" })
-} else {
-	DEFINE({ "NDEBUG" : "1" })
-}
 
 GCC_FLAGS({
 	/* TODO: Add support for dwarf-5 in `libdebuginfo' */
@@ -176,7 +156,7 @@ options[OPT_COMPILE_INLINE_SOURCE_FLAGS] = true;
 
 #include "src/.sources"
 
-if (!CONFIG_ONLY_BUILD_LIBRARIES) {
+if (!OPT_ONLY_BUILD_LIBRARIES) {
 /* Define the DISK */
 BEGIN_ANONYMOUS GROUP("disk") { MFORMAT };
 	options[OPT_NOFORCE] = true; /* Don't re-create the disk when doing a forced re-build. */

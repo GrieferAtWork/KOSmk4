@@ -20,6 +20,8 @@
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_BOOT_START_H
 #define GUARD_KERNEL_CORE_ARCH_I386_BOOT_START_H 1
 
+#include <kos/config/config.h> /* Pull in config-specific macro overrides */
+
 /*[[[config CONFIG_HAVE_KERNEL_X86_BOOT0 = true]]]*/
 #ifdef CONFIG_NO_KERNEL_X86_BOOT0
 #undef CONFIG_HAVE_KERNEL_X86_BOOT0

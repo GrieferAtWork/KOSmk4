@@ -38,7 +38,7 @@ BEGIN GROUP("libs.crt0") { COMPILE };
 END
 
 /* kernel */
-if (!CONFIG_ONLY_BUILD_LIBRARIES) {
+if (!OPT_ONLY_BUILD_LIBRARIES) {
 #include "kernel/.sources"
 }
 
@@ -159,8 +159,6 @@ END
 BEGIN GROUP("libs.libdlmalloc") { COMPILE, LINK, ARCHIVE, MCOPY };
 	/* Use the C compiler, so we don't have to deal with c++ meta data... */
 	SET_LANGUAGE("c")
-	/* dlmalloc() has been heavily tested. - no need to turn on stack-smash protection! */
-	REMOVE_GCC_FLAGS({ "-fstack-protector-strong" })
 	LD_FLAGS({ "--hash-style=gnu" })
 	SET_OUTPUT_LIBDLL("libdlmalloc")
 	SET_SHARED()

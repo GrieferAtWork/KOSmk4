@@ -58,6 +58,9 @@ final local function DILINK_run(self: BoundStep): string {
 	local config = toolchain.config;
 	local group = self.group;
 	local options = group.options;
+	local extra = config.CONFIG.getExtraCLinkOptions(self);
+	if (extra !is none)
+		options = mergeOptions(options, extra);
 	@@Bindings for @(section_name, start_symbol, size_symbol)
 	local bindings: {(string, string, string)...} = options.get(DILINK_BINDINGS, ());
 	if (!bindings)
@@ -128,6 +131,7 @@ link_again_with_new_guesses:
 			opt_ldFlags.append(f"--defsym={diLinkSizeSymbol}={totalDebugSize}");
 			toolchain.createLinkerProcess(
 				step:         self,
+				options:      options,
 				exeFile:      linkAttemptOutput,
 				objFiles:     opt_objFiles,
 				ldFlags:      opt_ldFlags,
