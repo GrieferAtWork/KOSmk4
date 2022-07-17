@@ -70,6 +70,15 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 DECL_BEGIN
 
+/*[[[config CONFIG_LIBDEBUGINFO_ABBREV_CACHE_MAXSIZE! = 256
+ * Max size of the debug information abbreviation cache.
+ * ]]]*/
+#ifndef CONFIG_LIBDEBUGINFO_ABBREV_CACHE_MAXSIZE
+#define CONFIG_LIBDEBUGINFO_ABBREV_CACHE_MAXSIZE 256
+#endif /* !CONFIG_LIBDEBUGINFO_ABBREV_CACHE_MAXSIZE */
+/*[[[end]]]*/
+
+
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset
 #else /* !NDEBUG && !NDEBUG_FINI */
@@ -381,7 +390,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_lookup)(di_debuginfo_cu_abbrev_t *__res
 					/* Try to move into the territory of dynamically allocated caches. */
 					size_t initial_cache_size;
 					initial_cache_size = MIN_C(COMPILER_LENOF(self->dua_stcache) * 2,
-					                           CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE);
+					                           CONFIG_LIBDEBUGINFO_ABBREV_CACHE_MAXSIZE);
 					list = (di_debuginfo_cu_abbrev_cache_entry_t *)CACHE_CALLOC(initial_cache_size,
 					                                                            sizeof(di_debuginfo_cu_abbrev_cache_entry_t));
 					if (list) {
@@ -425,11 +434,11 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_lookup)(di_debuginfo_cu_abbrev_t *__res
 			}
 		}
 		if (self->dua_cache_next >= self->dua_cache_size) {
-			if (self->dua_cache_size < CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE &&
+			if (self->dua_cache_size < CONFIG_LIBDEBUGINFO_ABBREV_CACHE_MAXSIZE &&
 			    self->dua_stcache[0].ace_code == 0) {
 				size_t new_cache_size;
 				/* Increase the cache size. */
-				new_cache_size = MIN(self->dua_cache_size * 2, CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE);
+				new_cache_size = MIN(self->dua_cache_size * 2, CONFIG_LIBDEBUGINFO_ABBREV_CACHE_MAXSIZE);
 				list = (di_debuginfo_cu_abbrev_cache_entry_t *)CACHE_RECALLOC(list,
 				                                                              new_cache_size *
 				                                                              sizeof(di_debuginfo_cu_abbrev_cache_entry_t));

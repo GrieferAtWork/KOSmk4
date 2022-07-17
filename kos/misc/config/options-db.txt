@@ -2,10 +2,6 @@
 kos/include/hybrid/int128.h
 	__HYBRID_INT128_CONFIG_USE_64BIT_ARITHMETIC:bool=defined(__UINT64_TYPE__) && __SIZEOF_BUSINT__ >= 8
 
-kos/include/libdebuginfo/debug_info.h
-	CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE!:int=16
-	CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE!:int=256
-
 kos/include/libvio/api.h
 	CONFIG_HAVE_KERNEL_VIO:bool=true
 
@@ -199,6 +195,9 @@ kos/src/libc/libc/arch/i386/rtm.h
 
 kos/src/libc/user/pthread.c
 	CONFIG_LIBC_READLOCK_TLS_DATA_INITIAL_MASK!:int=7
+
+kos/src/libdebuginfo/debug_info.c
+	CONFIG_LIBDEBUGINFO_ABBREV_CACHE_MAXSIZE!:int=256
 
 kos/src/libdisasm/common.c
 	CONFIG_LIBDISASM_PRINT_SYMBOL_NAMES:bool=true
