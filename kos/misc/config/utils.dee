@@ -17,16 +17,49 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIO_API_H
-#define GUARD_LIBVIO_API_H 1
 
-#include <libvio/api.h>
-/**/
+import * from deemon;
+import * from errors;
+import fs;
 
-#include <hybrid/compiler.h>
+global final OPTIONS_DAT_FILENAME = fs.joinpath(fs.headof(__FILE__), "options.txt");
 
-#include <kos/config/config.h> /* Pull in config-specific macro overrides */
+global _KOS_ROOTDIR = none;
+function getKosRootDir(): string {
+	if (_KOS_ROOTDIR is none)
+		_KOS_ROOTDIR = fs.expand(fs.joinpath(fs.headof(__FILE__), "../../.."), "ap");
+	return _KOS_ROOTDIR;
+}
 
-#define CC LIBVIO_CC
+function getConfigDisabledIntegerValue(configName: string): int {
+	return {
+		"CONFIG_MAX_CPU_COUNT" : 1
+	}.get(configName, 0);
+}
 
-#endif /* !GUARD_LIBVIO_API_H */
+function getConfigInverseName(configName: string): string {
+	local result = {
+		"CONFIG_MAX_CPU_COUNT" : "CONFIG_NO_SMP"
+	}.get(configName);
+	if (result !is none)
+		return result;
+	local configPos = configName.find("CONFIG_");
+	if (configPos >= 0) {
+		configPos += 7;
+	} else {
+		configPos = 0;
+	}
+	local configPos2 = configName.find("HAVE_", configPos);
+	if (configPos2 >= 0)
+		configPos = configPos2 + 5;
+	local configPos2 = configName.find("USE_", configPos);
+	if (configPos2 >= 0)
+		configPos = configPos2 + 4;
+	if (configName.startswith("NO_", configPos))
+		return configName[:configPos] + configName[configPos+3:];
+	return f"{
+		configName[:configPos]
+			.rsstrip("HAVE_")
+			.rsstrip("USE_")
+	}NO_{configName[configPos:]}";
+}

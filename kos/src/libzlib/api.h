@@ -25,6 +25,8 @@
 
 #include <hybrid/compiler.h>
 
+#include <kos/config/config.h> /* Pull in config-specific macro overrides */
+
 #define CC LIBZLIB_CC
 
 #ifndef NOBLOCK

@@ -23,6 +23,8 @@
 #include <__stdinc.h>
 #include <hybrid/compiler.h>
 
+#include <kos/config/config.h> /* Pull in config-specific macro overrides */
+
 #include <libphys/api.h>
 
 #define CC LIBPHYS_CC

@@ -24,12 +24,13 @@
 /**/
 
 #include <hybrid/__unaligned.h>
-#include <hybrid/typecore.h>
 #include <hybrid/int128.h>
+#include <hybrid/typecore.h>
 
 #include <bits/crt/format-printer.h>
 #include <bits/types.h>
 #include <kos/anno.h>
+#include <kos/config/config.h> /* For `CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE' / `CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE' */
 #include <kos/exec/module.h>
 
 #include <libc/string.h>
@@ -201,8 +202,9 @@ typedef struct di_debuginfo_cu_abbrev_cache_entry_struct {
 } di_debuginfo_cu_abbrev_cache_entry_t;
 
 
-/* This `16' equates to ~256 (on 32-bit) bytes allocated for the cache. */
-/*[[[config CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE = 16]]]*/
+/*[[[config CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE = 16
+ * This `16' equates to ~128 (on 32-bit) bytes allocated for the cache.
+ * ]]]*/
 #ifdef CONFIG_NO_DEBUGINFO_ABBREV_CACHE_MINSIZE
 #undef CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE
 #define CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE 0
@@ -230,7 +232,7 @@ typedef struct di_debuginfo_cu_abbrev_cache_entry_struct {
 typedef struct di_debuginfo_cu_abbrev_struct {
 	__byte_t const                       *dua_abbrev;     /* [1..1][const] Starting address of debug abbreviations (in .debug_abbrev). */
 	di_debuginfo_cu_abbrev_cache_entry_t *dua_cache_list; /* [1..dua_cache_size][owned_if(!= dua_stcache)] Cache vector, or (di_debuginfo_cu_abbrev_cache_entry_t *)-1 if unused. */
-	__size_t                              dua_cache_size; /* Allocated (dua_cache_list != dua_stcache) or initialiezd (dua_cache_list == dua_stcache) cache size. */
+	__size_t                              dua_cache_size; /* Allocated (dua_cache_list != dua_stcache) or initialized (dua_cache_list == dua_stcache) cache size. */
 	__size_t                              dua_cache_next; /* Index to the cache entry that should be overwritten next. */
 #if CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE != 0
 	di_debuginfo_cu_abbrev_cache_entry_t  dua_stcache[CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE]; /* Statically allocated cache. */

@@ -20,6 +20,7 @@
 import * from deemon;
 import * from ..autom8;
 import * from ...config.options;
+import * from ...config.utils;
 import * from ..c.ppexpr;
 
 global configCheckedFilenames: {string...} = HashSet();

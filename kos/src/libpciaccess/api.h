@@ -25,6 +25,8 @@
 #include <__stdinc.h>
 #include <hybrid/compiler.h>
 
+#include <kos/config/config.h> /* Pull in config-specific macro overrides */
+
 #include <libpciaccess/api.h>
 
 #ifndef LIBPCIACCESS_SUPPORTED

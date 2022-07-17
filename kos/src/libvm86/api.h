@@ -23,9 +23,10 @@
 #include <libvm86/api.h>
 /**/
 
+#include <__crt.h>
 #include <hybrid/compiler.h>
 
-#include <__crt.h>
+#include <kos/config/config.h> /* Pull in config-specific macro overrides */
 
 #define CC LIBVM86_CC
 

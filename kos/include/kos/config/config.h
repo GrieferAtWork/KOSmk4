@@ -17,16 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBVIO_API_H
-#define GUARD_LIBVIO_API_H 1
+#ifndef _KOS_CONFIG_CONFIG_H
+#define _KOS_CONFIG_CONFIG_H 1
 
-#include <libvio/api.h>
-/**/
+/* Config-specific macro overrides (e.g. '#define CONFIG_NO_KERNEL_EPOLL_RPC') go here */
 
-#include <hybrid/compiler.h>
-
-#include <kos/config/config.h> /* Pull in config-specific macro overrides */
-
-#define CC LIBVIO_CC
-
-#endif /* !GUARD_LIBVIO_API_H */
+#endif /* !_KOS_CONFIG_CONFIG_H */

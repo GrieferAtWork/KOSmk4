@@ -20,17 +20,8 @@
 
 import * from deemon;
 import * from errors;
+import * from .utils;
 import fs;
-
-/*
- * NOTE: To fully re-generate `options.txt' (needed after you've removed  the
- *       last  config option from  a file that  previously contained some, or
- *       after fully removing/renaming a file that contained config options),
- *       you may use the following commandline:
- * >> rm -f kos/misc/config/options.txt && grep -lr "\[\[\[config" kos | xargs deemon kos/misc/libgen/autom8.dee
- */
-
-global final OPTIONS_DAT_FILENAME = fs.joinpath(fs.headof(__FILE__), "options.txt");
 
 function loadOptions(): {string: {Bytes...}} {
 	local result = Dict();
@@ -133,12 +124,8 @@ function setMaybeModified() {
 }
 
 
-global _KOS_ROOTDIR = none;
-
 function normalizeFilename(filename: string): string {
-	if (_KOS_ROOTDIR is none)
-		_KOS_ROOTDIR = fs.expand(fs.joinpath(fs.headof(__FILE__), "../../.."), "ap");
-	return fs.relpath(filename, _KOS_ROOTDIR)
+	return fs.relpath(filename, getKosRootDir())
 #ifdef __WINDOWS__
 		.replace(r"\", r"/")
 #endif /* __WINDOWS__ */
@@ -151,39 +138,6 @@ function clearFileConfig(filename: string) {
 	} catch (...) {
 	}
 	setMaybeModified();
-}
-
-function getConfigDisabledIntegerValue(configName: string): int {
-	return {
-		"CONFIG_MAX_CPU_COUNT" : 1
-	}.get(configName, 0);
-}
-
-function getConfigInverseName(configName: string): string {
-	local result = {
-		"CONFIG_MAX_CPU_COUNT" : "CONFIG_NO_SMP"
-	}.get(configName);
-	if (result !is none)
-		return result;
-	local configPos = configName.find("CONFIG_");
-	if (configPos >= 0) {
-		configPos += 7;
-	} else {
-		configPos = 0;
-	}
-	local configPos2 = configName.find("HAVE_", configPos);
-	if (configPos2 >= 0)
-		configPos = configPos2 + 5;
-	local configPos2 = configName.find("USE_", configPos);
-	if (configPos2 >= 0)
-		configPos = configPos2 + 4;
-	if (configName.startswith("NO_", configPos))
-		return configName[:configPos] + configName[configPos+3:];
-	return f"{
-		configName[:configPos]
-			.rsstrip("HAVE_")
-			.rsstrip("USE_")
-	}NO_{configName[configPos:]}";
 }
 
 function addFileConfigOption(filename: string, optionLine: string | Bytes) {

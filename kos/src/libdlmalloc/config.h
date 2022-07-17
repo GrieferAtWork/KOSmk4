@@ -131,6 +131,7 @@
 #include <hybrid/typecore.h>
 
 #include <asm/pagesize.h>
+#include <kos/config/config.h> /* Pull in config-specific macro overrides */
 
 #include <assert.h>
 #include <dlfcn.h>

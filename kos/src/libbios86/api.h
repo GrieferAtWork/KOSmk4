@@ -25,8 +25,10 @@
 #include <libbios86/api.h>
 /**/
 
-#include <kos/anno.h>
 #include <hybrid/compiler.h>
+
+#include <kos/anno.h>
+#include <kos/config/config.h> /* Pull in config-specific macro overrides */
 
 #define CC LIBBIOS86_CC
 

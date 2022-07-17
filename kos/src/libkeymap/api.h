@@ -23,6 +23,8 @@
 #include <__stdinc.h>
 #include <hybrid/compiler.h>
 
+#include <kos/config/config.h> /* Pull in config-specific macro overrides */
+
 #include <libkeymap/api.h>
 
 #define CC LIBKEYMAP_CC

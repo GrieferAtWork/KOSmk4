@@ -24,6 +24,8 @@
 
 #include <hybrid/host.h>
 
+#include <kos/config/config.h> /* Pull in config-specific macro overrides */
+
 #include <libinstrlen/api.h>
 
 #define CC LIBINSTRLEN_CC

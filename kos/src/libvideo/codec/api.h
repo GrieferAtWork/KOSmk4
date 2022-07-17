@@ -21,6 +21,9 @@
 #define GUARD_LIBVIDEO_CODEC_API_H 1
 
 #include <hybrid/compiler.h>
+
+#include <kos/config/config.h> /* Pull in config-specific macro overrides */
+
 #include <libvideo/codec/api.h>
 
 #define CC LIBVIDEO_CODEC_CC

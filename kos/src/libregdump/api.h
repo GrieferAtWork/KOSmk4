@@ -22,6 +22,8 @@
 
 #include <hybrid/compiler.h>
 
+#include <kos/config/config.h> /* Pull in config-specific macro overrides */
+
 #include <libregdump/api.h>
 
 #define CC LIBREGDUMP_CC

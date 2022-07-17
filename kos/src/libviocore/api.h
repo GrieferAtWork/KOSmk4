@@ -19,14 +19,15 @@
  */
 #ifndef GUARD_LIBVIOCORE_API_H
 #define GUARD_LIBVIOCORE_API_H 1
-
-#define LIBVIO_WANT_PROTOTYPES      1
+#define LIBVIO_WANT_PROTOTYPES
 #define LIBINSTRLEN_WANT_PROTOTYPES
 
 #include <libviocore/api.h>
 /**/
 
 #include <hybrid/compiler.h>
+
+#include <kos/config/config.h> /* Pull in config-specific macro overrides */
 
 #define CC LIBVIOCORE_CC
 

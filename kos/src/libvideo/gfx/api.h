@@ -21,12 +21,14 @@
 #define GUARD_LIBVIDEO_GFX_API_H 1
 
 #include <hybrid/compiler.h>
+
+#include <kos/config/config.h> /* Pull in config-specific macro overrides */
+
 #include <libvideo/gfx/api.h>
 
 #define CC LIBVIDEO_GFX_CC
 
 /* Our library is linked against libvideo-codec.so */
 #define LIBVIDEO_CODEC_WANT_PROTOTYPES
-
 
 #endif /* !GUARD_LIBVIDEO_GFX_API_H */

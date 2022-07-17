@@ -37,6 +37,8 @@
 #define LIBEMU86_CONFIG_WANT_64BIT 1
 #endif /* !__x86_64__ */
 
+#include <kos/config/config.h> /* Pull in config-specific macro overrides */
+
 #include <libemu86/api.h>
 
 #undef LIBEMU86_DECL

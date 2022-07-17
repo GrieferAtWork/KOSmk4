@@ -24,6 +24,7 @@
 #include <hybrid/compiler.h>
 
 #include <kos/anno.h>
+#include <kos/config/config.h> /* Pull in config-specific macro overrides */
 
 #include <libservice/api.h>
 
@@ -46,7 +47,8 @@
 #endif /* !THROWS */
 
 #ifndef NOPREEMPT
-#define NOPREEMPT __NOPREEMPT /* Here, this means that all posix signals are masked! */
+ /* Here, this means that all posix signals are masked! */
+#define NOPREEMPT __NOPREEMPT
 #endif /* !NOPREEMPT */
 
 #ifndef FCALL

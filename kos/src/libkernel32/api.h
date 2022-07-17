@@ -28,6 +28,7 @@
 
 #include <bits/types.h>
 #include <kos/anno.h>
+#include <kos/config/config.h> /* Pull in config-specific macro overrides */
 
 #define CC  ATTR_STDCALL /* WINAPI */
 #define VCC ATTR_CDECL

@@ -25,6 +25,8 @@
 
 #include <hybrid/compiler.h>
 
+#include <kos/config/config.h> /* Pull in config-specific macro overrides */
+
 #define CC LIBCPUSTATE_CC
 
 #endif /* !GUARD_LIBCPUSTATE_API_H */

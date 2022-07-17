@@ -1,0 +1,159 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import * from errors;
+import * from .utils;
+import fs;
+
+@@Return the documentation string for the given config option
+function getConfigDocString(declFilename: string, configName: string): string {
+	with (local fp = File.open(fs.joinpath(getKosRootDir(), declFilename), "r")) {
+		local data = fp.read().unifylines();
+		final local PREFIX = "/*" "[[[config";
+		for (local configStart: data.findall(PREFIX)) {
+			configStart += #PREFIX;
+			while (configStart < #data && data.isspace(configStart))
+				++configStart;
+			local configEnd = data.index("]]]*/", configStart);
+			while (configEnd > configStart && data.isspace(configEnd - 1))
+				--configEnd;
+			local docText = data[configStart:configEnd];
+			local configLine, none, docText = docText.partition("\n")...;
+			configLine = configLine.rstrip();
+			local configNameEnd = configLine.find(":");
+			if (configNameEnd < 0) {
+				configNameEnd = configLine.find("=");
+				if (configNameEnd < 0)
+					continue;
+			}
+			while (configNameEnd > 0 && configLine.isspace(configNameEnd - 1))
+				--configNameEnd;
+			configLine = configLine[:configNameEnd];
+			configLine = configLine.decode("utf-8");
+			if (configLine == configName) {
+				@@Characters  removed from the start of @docText, so-
+				@@long as all of its lines start with that character.
+				final local LSTRIP_COMMON_CHARS = "\t *".bytes();
+				for (;;) {
+					docText = docText.rstrip("\n");
+					local commonPrefix = none;
+					for (local line: docText.splitlines()) {
+						if (commonPrefix is none) {
+							local n = 0;
+							while (n < #line && line[n] in LSTRIP_COMMON_CHARS)
+								++n;
+							commonPrefix = line[:n];
+						} else {
+							local n = 0;
+							while (n < #line && n < #commonPrefix &&
+							       line[n] == commonPrefix[n])
+								++n;
+							commonPrefix = line[:n];
+						}
+					}
+					if (!commonPrefix)
+						break;
+					local commonPrefixLen = #commonPrefix;
+					docText = "\n".bytes().join(
+						for (local line: docText.splitlines())
+							line[commonPrefixLen:]);
+				}
+				return docText;
+			}
+		}
+	}
+	return "";
+}
+
+final class ConfigOption {
+	this = default;
+
+	@@Config name
+	public member name: string;
+
+	@@The inverse name of this config option
+	public property inverseName: string = {
+		get(): string {
+			if (m_inverseName !is bound)
+				m_inverseName = getConfigInverseName(name);
+			return m_inverseName;
+		}
+	}
+	private member m_inverseName: string;
+
+	@@The integer value to-be used when this config is @(typ == "int"),
+	@@but has been disabled via @inverseName
+	public property disabledIntegerValue: int = {
+		get(): int {
+			return getConfigDisabledIntegerValue(name);
+		}
+	}
+
+	@@Config value type. One of:
+	@@ - @"string"
+	@@ - @"bool"
+	@@ - @"int"
+	public member typ: string;
+
+	@@Config default value
+	public member defl: string;
+
+	@@Filename of the file that declares this config
+	public member declFilename: string;
+
+	@@Return the config option's documentation string.
+	public property docString: string = {
+		get(): string {
+			if (m_docString !is bound)
+				m_docString = getConfigDocString(declFilename, name);
+			return m_docString;
+		}
+	}
+	private member m_docString: string;
+
+}
+
+function loadConfigs(): {string: ConfigOption} {
+	local result: {string: ConfigOption} = Dict();
+	local declFilename: string | none = none;
+	try {
+		for (local line: File.open(OPTIONS_DAT_FILENAME).read().splitlines(false)) {
+			if (line.startswith("#"))
+				continue; /* Comment */
+			if (line.startswith("\t")) {
+				local configLine = line[1:].decode("utf-8");
+				local name, none, typ = configLine.partition(":")...;
+				local typ, none, defl = typ.partition("=")...;
+				result[name] = ConfigOption(name, typ, defl, declFilename);
+			} else if (line) {
+				declFilename = line.decode("utf-8");
+			}
+		}
+	} catch (FileNotFound) {
+	}
+	return result;
+}
+
+
+@@Still marked as @varying, so other modules don't hard-code the value in .dec files
+global final varying CONFIGS: {string: ConfigOption} = loadConfigs();
+
+print CONFIGS["CONFIG_HAVE_KERNEL_EPOLL_RPC"].docString;

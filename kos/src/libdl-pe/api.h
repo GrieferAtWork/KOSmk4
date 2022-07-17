@@ -24,6 +24,7 @@
 #include <hybrid/compiler.h>
 
 #include <kos/anno.h>
+#include <kos/config/config.h> /* Pull in config-specific macro overrides */
 
 #include <libdl/api.h>
 
@@ -40,7 +41,6 @@
 #ifndef DLFCN_VCC
 #define DLFCN_VCC __DLFCN_VCC
 #endif /* !DLFCN_VCC */
-
 
 #ifndef REF
 #define REF __REF

@@ -79,6 +79,8 @@
 
 #include <__stdinc.h>
 
+#include <kos/config/config.h> /* Pull in config-specific macro overrides */
+
 /* Do some assembler trickery to prevent some unnecessary relocations. */
 #ifdef __CC__
 #ifndef GUARD_LIBC_LIBC_SSP_C

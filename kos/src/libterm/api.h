@@ -19,13 +19,14 @@
  */
 #ifndef GUARD_LIBTERM_API_H
 #define GUARD_LIBTERM_API_H 1
-
 #define LIBBUFFER_WANT_PROTOTYPES
 
 #include <libterm/api.h>
 /**/
 
 #include <hybrid/compiler.h>
+
+#include <kos/config/config.h> /* Pull in config-specific macro overrides */
 
 #ifndef NOBLOCK
 #include <kos/anno.h>

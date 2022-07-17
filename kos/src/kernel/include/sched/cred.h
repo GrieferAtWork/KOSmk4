@@ -319,8 +319,8 @@ ARREF(cred_groups_arref, cred_groups);
 
 /* Thread credentials controller. */
 struct cred {
-	REF refcnt_t             c_refcnt;           /* Reference counter. */
-	struct cred_groups_arref c_groups;           /* [1..1] Supplementary group IDs. These are used as extensions to `c_fsgid'. */
+	REF refcnt_t             c_refcnt;          /* Reference counter. */
+	struct cred_groups_arref c_groups;          /* [1..1] Supplementary group IDs. These are used as extensions to `c_fsgid'. */
 	struct atomic_rwlock     c_lock;            /* Lock for the credentials controller. */
 	WEAK uid_t               c_ruid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Real user ID */
 	WEAK gid_t               c_rgid;            /* [lock(READ(ATOMIC), WRITE(c_lock))] Real group ID */
