@@ -106,10 +106,10 @@ devmem_v_newpart(struct mfile *__restrict UNUSED(self),
 	REF struct mpart *result;
 	result = (REF struct mpart *)kmalloc(sizeof(struct mpart), GFP_LOCKED | GFP_PREFLT);
 	/* (re-)configure the part to point to static, physical memory. */
-	result->mp_flags        = MPART_F_MLOCK | MPART_F_MLOCK_FROZEN | MPART_F_NOFREE;
-	result->mp_state        = MPART_ST_MEM;
-	result->mp_blkst_ptr    = NULL; /* Disable block status (thus having the system act like all
-	                                 * blocks  were using `MPART_BLOCK_ST_CHNG' as their status) */
+	result->mp_flags     = MPART_F_MLOCK | MPART_F_MLOCK_FROZEN | MPART_F_NOFREE;
+	result->mp_state     = MPART_ST_MEM;
+	result->mp_blkst_ptr = NULL; /* Disable block status (thus having the system act like all
+	                              * blocks  were using `MPART_BLOCK_ST_CHNG' as their status) */
 	result->mp_mem.mc_start = (physpage_t)minaddr >> PAGESHIFT;
 	result->mp_mem.mc_size  = num_bytes >> PAGESHIFT;
 	result->mp_meta         = NULL;

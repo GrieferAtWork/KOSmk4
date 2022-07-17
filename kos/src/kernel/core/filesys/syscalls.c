@@ -730,7 +730,7 @@ DEFINE_SYSCALL2(errno_t, rename,
 /* umount2(), umount()                                                  */
 /************************************************************************/
 #if (defined(__ARCH_WANT_SYSCALL_UMOUNT2) || \
-     defined(__ARCH_WANT_SYSCALL_UMOUNT) || \
+     defined(__ARCH_WANT_SYSCALL_UMOUNT) ||  \
      defined(__ARCH_WANT_COMPAT_SYSCALL_UMOUNT))
 PRIVATE errno_t KCALL
 sys_umount2_impl(fd_t dirfd, USER UNCHECKED char const *target,
@@ -1285,7 +1285,7 @@ sys_fchownat_impl(fd_t dirfd, USER UNCHECKED char const *filename,
                   uid_t owner, gid_t group, atflag_t atflags) {
 	REF struct fnode *node;
 	validate_readable(filename, 1);
-	VALIDATE_FLAGSET(atflags, 0| AT_SYMLINK_NOFOLLOW | AT_DOSPATH,
+	VALIDATE_FLAGSET(atflags, 0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH,
 	                 E_INVALID_ARGUMENT_CONTEXT_FCHOWNAT_FLAGS);
 	atflags = fs_atflags(atflags);
 	node    = path_traversefull(dirfd, filename, atflags);

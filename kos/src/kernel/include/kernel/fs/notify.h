@@ -29,9 +29,9 @@
 #include <kernel/types.h>
 #include <sched/sig.h>
 
+#include <hybrid/sched/atomic-lock.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
-#include <hybrid/sched/atomic-lock.h>
 
 #include <linux/inotify.h>
 

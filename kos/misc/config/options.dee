@@ -72,6 +72,7 @@ global maybeModified: bool = false;
 
 
 function forceSave() {
+	maybeModified = false;
 	local newOptionsFilename = fs.joinpath(fs.headof(OPTIONS_DAT_FILENAME), "options-new.txt");
 	local oldOptionsFilename = fs.joinpath(fs.headof(OPTIONS_DAT_FILENAME), "options-old.txt");
 	with (local fp = File.open(newOptionsFilename, "wb")) {

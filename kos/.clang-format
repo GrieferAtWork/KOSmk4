@@ -1,10 +1,23 @@
-
-# Find stuff that this format defines incorrectly:
+#############################################################################################
+# NEEDS: LLVM-14.0.6 -- clang-format
+#############################################################################################
+# Find stuff that this format still defines incorrectly:
 #  REPLACE:  "(?<=(|un)likely) \(", "("
 #             - Spaces after [un]likely (caused by 'SpaceBeforeParens: ControlStatements'),
 #               though with LLVM9, the produced formatting was waaay worse than this :)
 #  REPLACE:  "}[ \t]*\n[ \t]+(?=\bEXCEPT\b)" --> "} "
 #             - EXCEPT on a new line
+#  REPLACE:  "#else  +/\*" --> "#else /\*"
+#             - More than 1 whitespace before comment after `#else' (clang-format likes to
+#               introduce these non-sensical whitespaces because of AlignTrailingComments,
+#               which it does with the associated `#endif' for whatever reason).
+#             - I don't really know why it does that, since the following works fine:
+#               >> foo();    // Comment 1
+#               >> barfoo(); // Comment 2
+#               >> x = 10;
+#               >> baz(); // Comment 3
+#  REPLACE:  "} break" --> "}\tbreak"
+#             - Break on the same like as a closing '}' needs a tab.
 #  FIND:     "\t/\*[^\n]*\n [ ]+\*"
 #             - Block-comments that need to be re-aligned
 #
@@ -16,23 +29,68 @@
 # >>     Replacement: '('
 # >>   - Regex:       '}[ \t]*\n[ \t]+(?=\bEXCEPT\b)'
 # >>     Replacement: '} '
+#
+# Additionally, look out for:
+#  - `THROWS' annotations written on a separate line:
+#    >> PUBLIC BLOCKING NONNULL((1)) void KCALL
+#    >> fnode_syncattr(struct fnode *__restrict self)
+#    >> 		THROWS(E_WOULDBLOCK, E_IOERROR, ...) {
+#    >> 	...
+#    >> }
+#    Are always re-formatted to the following:
+#    >> PUBLIC BLOCKING NONNULL((1)) void KCALL
+#    >> fnode_syncattr(struct fnode *__restrict self) THROWS(E_WOULDBLOCK, E_IOERROR, ...) {
+#    >> 	...
+#    >> }
+#    Technically, this format is allowed (and should be used if declaration doesn't
+#    become too long as a result), but sadly in its current configuration, clang-
+#    format _always_ forced the later format (which is NOT intended).
+#
+#  - Something like:
+#    >> typedef void (KCALL *kernel_permman_onexec_t)(void);
+#    Gets formatted to:
+#    >> typedef void(KCALL *kernel_permman_onexec_t)(void);
+#    This is absolutely incorrect. Clang-format gets confused because of 'KCALL', but
+#    even after trying to add 'KCALL' to each of the different macro lists there are,
+#    the problem still persists and the whitespace is incorrectly removed.
+#    Note that the following is formatted correctly, though:
+#    >> typedef void (*kernel_permman_onexec_t)(void);
+#
+#  - Something like:
+#    >> me = container_of(self, struct fsuper, fs_root._mf_plop);
+#    >> me->fs_root._mf_delfnodes = NULL;
+#    Gets formatted to:
+#    >> me                        = container_of(self, struct fsuper, fs_root._mf_plop);
+#    >> me->fs_root._mf_delfnodes = NULL;
+#    This is technically correct (assignments should get aligned), but this should only
+#    happen when the amount of whitespace needed for the insertion doesn't differ by
+#    more than ~6 spaces from one of the surrounding lines also used during alignment:
+#                     [---------] Still OK: 11 spaces (delta: 11 - 6 = 5) inserted, but delta < 6
+#                          [----] Still OK: 6 spaces (delta: 6 - 0 = 6) inserted
+#    >> me->fs_root._m            = a;
+#    >> me->fs_root._mf_del       = b;
+#    >> me->fs_root._mf_delfnodes = c;
+#    >> me->fs_root._ = d;  // This needs to be a new group since the amount of spaces needed for
+#    >>                     // alignment (12) when compared to the amount of spaces in the previous
+#    >>                     // line (0) (meaning delta = 12 - 0 = 12) is greater than 6
+#############################################################################################
 
 AccessModifierOffset: -4
 AlignAfterOpenBracket: Align
-AlignConsecutiveAssignments: true
-# AlignConsecutiveBitFields: true
+#AlignArrayOfStructures: Left # Causes clang-format to crash in /kos/src/kernel/core/fd/router.c
+AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveBitFields: AcrossEmptyLinesAndComments
 AlignConsecutiveDeclarations: false
-AlignConsecutiveMacros: true
+AlignConsecutiveMacros: AcrossComments
 AlignEscapedNewlines: Left
 AlignOperands: true
 AlignTrailingComments: true
-AllowAllArgumentsOnNextLine: false
-AllowAllConstructorInitializersOnNextLine: false
-AllowAllParametersOfDeclarationOnNextLine: false
-AllowShortBlocksOnASingleLine: false
+AllowAllArgumentsOnNextLine: true
+AllowAllParametersOfDeclarationOnNextLine: true
+AllowShortBlocksOnASingleLine: Never
 AllowShortCaseLabelsOnASingleLine: true
-# AllowShortEnumsOnASingleLine: false
-AllowShortFunctionsOnASingleLine: Empty
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLambdasOnASingleLine: All
 AllowShortLoopsOnASingleLine: false
@@ -41,11 +99,11 @@ AlwaysBreakBeforeMultilineStrings: false
 AlwaysBreakTemplateDeclarations: No
 BinPackArguments: true
 BinPackParameters: true
-ExperimentalAutoDetectBinPacking: true
+BitFieldColonSpacing: After
 BraceWrapping:
   AfterCaseLabel: false
   AfterClass: false
-  AfterControlStatement: false
+  AfterControlStatement: Never
   AfterEnum: false
   AfterFunction: false
   AfterNamespace: false
@@ -55,8 +113,8 @@ BraceWrapping:
   AfterExternBlock: false
   BeforeCatch: false
   BeforeElse: false
-  # BeforeLambdaBody: false
-  # BeforeWhile: false
+  BeforeLambdaBody: false
+  BeforeWhile: false
   IndentBraces: false
   SplitEmptyFunction: false
   SplitEmptyRecord: false
@@ -71,16 +129,119 @@ BreakStringLiterals: false
 ColumnLimit: 0
 CommentPragmas: '^\[\[\['
 CompactNamespaces: false
-ConstructorInitializerAllOnOneLineOrOnePerLine: false
 ConstructorInitializerIndentWidth: 4
+
+# I wish I could set this to '4':
+# >> longFunctionName(
+# >>	a, b, c, d, e,
+# >>	f, g, h, "foo");
+# But that also breaks something like this:
+# >> foo(10 + 20 +
+# >>     30 + 40,
+# >>     "bar");
+# by changing it to this:
+# >> foo(10 + 20 +
+# >>         30 + 40,
+# >>     "bar");
+# Interestingly, the following isn't affected:
+# >> foo(10 + 20 +
+# >>     30 + 40);
+#ContinuationIndentWidth: 4
 ContinuationIndentWidth: 0
+
 Cpp11BracedListStyle: false
-DeriveLineEnding: true
+DeriveLineEnding: false
 DerivePointerAlignment: false
 DisableFormat: false
+EmptyLineBeforeAccessModifier: Leave
+EmptyLineAfterAccessModifier: Leave
 ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: false
-ForEachMacros: ['LIST_FOREACH', 'LIST_FOREACH_SAFE', 'LIST_P_FOREACH', 'LIST_P_FOREACH_SAFE', 'SLIST_FOREACH', 'SLIST_FOREACH_SAFE', 'SLIST_P_FOREACH', 'SLIST_P_FOREACH_SAFE', 'STAILQ_FOREACH', 'STAILQ_FOREACH_SAFE', 'STAILQ_P_FOREACH', 'STAILQ_P_FOREACH_SAFE', 'SIMPLEQ_FOREACH', 'SIMPLEQ_FOREACH_SAFE', 'SIMPLEQ_P_FOREACH', 'SIMPLEQ_P_FOREACH_SAFE', 'TAILQ_FOREACH', 'TAILQ_FOREACH_SAFE', 'TAILQ_FOREACH_REVERSE', 'TAILQ_FOREACH_REVERSE_SAFE', 'CIRCLEQ_FOREACH', 'CIRCLEQ_FOREACH_SAFE', 'CIRCLEQ_FOREACH_REVERSE', 'CIRCLEQ_FOREACH_REVERSE_SAFE', 'DLIST_FOREACH', 'DLIST_FOREACH_SAFE', 'BSEARCH', 'BSEARCH_RANGE', 'BSEARCH_RANGE_EX', 'BSEARCH_EX', 'PCI_FOREACH_DEVICE', 'PCI_FOREACH_DEVICE_CLASS', "__STATIC_IF", "__STATIC_ELSE"]
+ForEachMacros:
+  - EXCEPT
+  - LIST_FOREACH
+  - LIST_FOREACH_SAFE
+  - LIST_P_FOREACH
+  - LIST_P_FOREACH_SAFE
+  - SLIST_FOREACH
+  - SLIST_FOREACH_SAFE
+  - SLIST_P_FOREACH
+  - SLIST_P_FOREACH_SAFE
+  - STAILQ_FOREACH
+  - STAILQ_FOREACH_SAFE
+  - STAILQ_P_FOREACH
+  - STAILQ_P_FOREACH_SAFE
+  - SIMPLEQ_FOREACH
+  - SIMPLEQ_FOREACH_SAFE
+  - SIMPLEQ_P_FOREACH
+  - SIMPLEQ_P_FOREACH_SAFE
+  - TAILQ_FOREACH
+  - TAILQ_FOREACH_SAFE
+  - TAILQ_FOREACH_REVERSE
+  - TAILQ_FOREACH_REVERSE_SAFE
+  - CIRCLEQ_FOREACH
+  - CIRCLEQ_FOREACH_SAFE
+  - CIRCLEQ_FOREACH_REVERSE
+  - CIRCLEQ_FOREACH_REVERSE_SAFE
+  - DLIST_FOREACH
+  - DLIST_FOREACH_SAFE
+  - BSEARCH
+  - BSEARCH_RANGE
+  - BSEARCH_RANGE_EX
+  - BSEARCH_EX
+  - PCI_FOREACH_DEVICE
+  - PCI_FOREACH_DEVICE_CLASS
+  - __STATIC_IF
+  - __STATIC_ELSE
+# By putting paren-attributes as IfMacros, we prevent clang-format
+# from screwing up (more often than it would otherwise).
+IfMacros:
+  - NONNULL
+  - __ATTR_NONNULL
+  - NONNULL_T
+  - __ATTR_NONNULL_T
+  - ATTR_ACCESS_NONE
+  - __ATTR_ACCESS_NONE
+  - ATTR_ACCESS_NONE_T
+  - __ATTR_ACCESS_NONE_T
+  - ATTR_INS
+  - __ATTR_INS
+  - ATTR_INS_T
+  - __ATTR_INS_T
+  - ATTR_OUTS
+  - __ATTR_OUTS
+  - ATTR_OUTS_T
+  - __ATTR_OUTS_T
+  - ATTR_INOUTS
+  - __ATTR_INOUTS
+  - ATTR_INOUTS_T
+  - __ATTR_INOUTS_T
+  - ATTR_IN_OPT
+  - __ATTR_IN_OPT
+  - ATTR_IN_OPT_T
+  - __ATTR_IN_OPT_T
+  - ATTR_OUT_OPT
+  - __ATTR_OUT_OPT
+  - ATTR_OUT_OPT_T
+  - __ATTR_OUT_OPT_T
+  - ATTR_INOUT_OPT
+  - __ATTR_INOUT_OPT
+  - ATTR_INOUT_OPT_T
+  - __ATTR_INOUT_OPT_T
+  - ATTR_IN
+  - __ATTR_IN
+  - ATTR_IN_T
+  - __ATTR_IN_T
+  - ATTR_OUT
+  - __ATTR_OUT
+  - ATTR_OUT_T
+  - __ATTR_OUT_T
+  - ATTR_INOUT
+  - __ATTR_INOUT
+  - ATTR_INOUT_T
+  - __ATTR_INOUT_T
+  - THROWS
+  - __THROWS
 IncludeBlocks: Regroup
 IncludeCategories:
   - Regex:           '\"api.h\"'
@@ -102,7 +263,9 @@ IncludeCategories:
   - Regex:           '.*'
     Priority:        8
 IncludeIsMainRegex: '$'
+IndentAccessModifiers: false
 IndentCaseLabels: false
+IndentExternBlock: NoIndent
 IndentGotoLabels: false
 IndentPPDirectives: None
 IndentWidth: 4
@@ -110,6 +273,8 @@ IndentWrappedFunctionNames: false
 JavaScriptQuotes: Leave
 JavaScriptWrapImports: true
 KeepEmptyLinesAtTheStartOfBlocks: true
+LambdaBodyIndentation: Signature
+Language: Cpp
 MaxEmptyLinesToKeep: 8
 NamespaceIndentation: None
 ObjCBinPackProtocolList: Auto
@@ -118,14 +283,18 @@ ObjCSpaceAfterProperty: false
 ObjCSpaceBeforeProtocolList: false
 PenaltyBreakAssignment: 1
 PenaltyBreakBeforeFirstCallParameter: 1
-PenaltyBreakComment: 1
+PenaltyBreakComment: 100
 PenaltyBreakFirstLessLess: 1
-PenaltyBreakString: 0
-PenaltyBreakTemplateDeclaration: 1
+PenaltyBreakString: 100
+PenaltyBreakTemplateDeclaration: 0
 PenaltyExcessCharacter: 1
-PenaltyReturnTypeOnItsOwnLine: 1
+PenaltyIndentedWhitespace: 0
+PenaltyReturnTypeOnItsOwnLine: 0
 PointerAlignment: Right
-ReflowComments: true
+QualifierAlignment: Right
+#QualifierOrder: ['static', 'inline', 'constexpr', 'type', 'const', 'volatile', 'restrict']
+ReferenceAlignment: Right
+ReflowComments: false
 SortIncludes: true
 SortUsingDeclarations: true
 SpaceAfterCStyleCast: false
@@ -135,7 +304,18 @@ SpaceBeforeAssignmentOperators: true
 SpaceBeforeCpp11BracedList: true
 SpaceBeforeCtorInitializerColon: false
 SpaceBeforeInheritanceColon: false
-SpaceBeforeParens: ControlStatements
+#SpaceBeforeParens: ControlStatements
+SpaceBeforeParens: Custom
+SpaceBeforeParensOptions:
+  AfterControlStatements: true
+  AfterForeachMacros: true
+  AfterFunctionDeclarationName: false
+  AfterFunctionDefinitionName: false
+  AfterIfMacros: false  # Needed for our `IfMacros' hack above ;)
+  AfterOverloadedOperator: false
+  #AfterRequiresInClause: false
+  #AfterRequiresInExpression: false
+  BeforeNonEmptyParentheses: false
 SpaceBeforeRangeBasedForLoopColon: false
 SpaceInEmptyBlock: true
 SpaceInEmptyParentheses: false
@@ -148,6 +328,30 @@ SpacesInParentheses: false
 SpacesInSquareBrackets: false
 Standard: Cpp03
 TabWidth: 4
-TypenameMacros: ['ATREE_HEAD', 'ATREE_NODE', 'ATREE_NODE_SINGLE', 'ATREE_XNODE', 'ATREE_SEMI_T']
+TypenameMacros:
+  - RBTREE_NODE
+  - RBTREE_NODE_P
+  - LLRBTREE_NODE
+  - LLRBTREE_NODE_P
+  - RBTREE_NODE_WITH_KEY
+  - RBTREE_NODE_WITH_KEY_P
+  - LLRBTREE_NODE_WITH_KEY
+  - RBTREE_ROOT
+  - RBTREE_ROOT_P
+  - LLRBTREE_ROOT
+  - LLRBTREE_ROOT_P
+  - LIST_ENTRY
+  - SLIST_ENTRY
+  - STAILQ_ENTRY
+  - TAILQ_ENTRY
+  - CIRCLEQ_ENTRY
+  - RINGQ_ENTRY
+  - DLIST_ENTRY
+  - XSIMPLEQ_ENTRY
 UseCRLF: false
-UseTab: ForIndentation
+UseTab: AlignWithSpaces
+WhitespaceSensitiveMacros:
+  - PP_STR
+  - __PP_STR
+  - PP_PRIVATE_STR
+  - __PP_PRIVATE_STR

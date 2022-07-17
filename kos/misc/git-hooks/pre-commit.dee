@@ -100,6 +100,10 @@ for (local filename: readLines(r)) {
 		}
 	}
 }
+
+/* TODO: When files are being deleted, pass their names to `config.options.clearFileConfig()' */
+/* TODO: If it got modified, call `config.options.save()' (to flush the config options database) */
+
 r.close();
 joinProc(diffProc);
 if (changesMade) {

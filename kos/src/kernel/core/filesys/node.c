@@ -525,12 +525,12 @@ NOTHROW(FCALL fnode_init_addtosuper_and_all)(struct fnode *__restrict self) {
 		fsuper_nodes_endwrite(super);
 	} else {
 		static_assert(offsetof(struct fnode, _fn_suplop.olo_func) ==
-		                  offsetof(struct fnode, fn_supent.rb_rhs),
-		                  "This is a requirement to ensure that the node can't "
-		                  "accidentally appear as `rb_rhs == FSUPER_NODES_DELETED', "
-		                  "which would indicate that it had been removed from the "
-		                  "super's node tree, when in fact it's still in limbo as "
-		                  "to whether or not it's part of said tree.");
+		              offsetof(struct fnode, fn_supent.rb_rhs),
+		              "This is a requirement to ensure that the node can't "
+		              "accidentally appear as `rb_rhs == FSUPER_NODES_DELETED', "
+		              "which would indicate that it had been removed from the "
+		              "super's node tree, when in fact it's still in limbo as "
+		              "to whether or not it's part of said tree.");
 
 		/* Use lock operations to have the INode add itself to the  */
 		++self->mf_refcnt; /* +1: inherited by `fnode_add2sup_lop()' */
@@ -644,7 +644,6 @@ again_check_permissions:
 				mfile_tslock_acquire_br(self);
 				if (gid != self->fn_gid || uid != self->fn_uid)
 					goto again_check_permissions;
-
 			}
 		}
 	}

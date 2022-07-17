@@ -138,7 +138,7 @@ done_tmpfs:
 
 
 	/* Load some additional drivers that we need for the I/O console. */
-	KSysctlInsmod("ps2", NULL); /* Keyboard */
+	KSysctlInsmod("ps2", NULL);  /* Keyboard */
 	KSysctlInsmod("svga", NULL); /* Display */
 
 	/* TODO: Make it so that the PS/2 driver checks for (and disables) USB

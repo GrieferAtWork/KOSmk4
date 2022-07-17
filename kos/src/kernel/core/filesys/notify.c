@@ -47,9 +47,9 @@
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/sched/atomic-lock.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
-#include <hybrid/sched/atomic-lock.h>
 #include <hybrid/unaligned.h>
 
 #include <kos/except.h>
@@ -66,17 +66,17 @@
 
 #define RBTREE_LEFT_LEANING
 #define RBTREE_OMIT_REMOVE
-#define RBTREE(name)           dnotify_link_tree_##name
-#define RBTREE_T               struct dnotify_link
-#define RBTREE_Tkey            struct fdirent const *
-#define RBTREE_GETNODE(self)   (self)->dnl_dirnode
-#define RBTREE_GETKEY(self)    (self)->dnl_ent
-#define RBTREE_REDFIELD        _dnl_rbword
-#define RBTREE_REDBIT          1
-#define RBTREE_CC              FCALL
-#define RBTREE_NOTHROW         NOTHROW
-#define RBTREE_DECL            FUNDEF
-#define RBTREE_IMPL            PUBLIC
+#define RBTREE(name)         dnotify_link_tree_##name
+#define RBTREE_T             struct dnotify_link
+#define RBTREE_Tkey          struct fdirent const *
+#define RBTREE_GETNODE(self) (self)->dnl_dirnode
+#define RBTREE_GETKEY(self)  (self)->dnl_ent
+#define RBTREE_REDFIELD      _dnl_rbword
+#define RBTREE_REDBIT        1
+#define RBTREE_CC            FCALL
+#define RBTREE_NOTHROW       NOTHROW
+#define RBTREE_DECL          FUNDEF
+#define RBTREE_IMPL          PUBLIC
 #include <hybrid/sequence/rbtree-abi.h>
 
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
@@ -227,7 +227,7 @@ NOTHROW(FCALL notifyfd_destroy)(struct notifyfd *__restrict self) {
 			DBG_memset(&ent->nl_file, 0xcc, sizeof(ent->nl_file));
 			inot = file->mf_notify;
 			assertf(inot, "Must be non-NULL because the listener "
-			               "we're about to remove still exists");
+			              "we're about to remove still exists");
 			assertf(!LIST_EMPTY(&inot->inc_listeners),
 			        "Can't be empty because we're about to remove an element");
 			assertf(inot->inc_file == file, "Wrong file? (%p != %p)", inot->inc_file, file);
