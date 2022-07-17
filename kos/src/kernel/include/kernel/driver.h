@@ -71,7 +71,7 @@ DATDEF struct module _kernel_driver_as_module ASMNAME("kernel_driver");
 
 
 /* Special driver symbols */
-#ifndef CONFIG_BUILDING_KERNEL_CORE
+#ifndef BUILDING_KERNEL_CORE
 #ifndef __drv_self_defined
 #define __drv_self_defined
 /* Self-pointer to the current driver's descriptor */
@@ -102,14 +102,14 @@ NOTHROW(KCALL drv_cc)(struct ccinfo *__restrict info);
 #define DRIVER_INIT __attribute__((__constructor__))
 #define DRIVER_FINI __attribute__((__destructor__))
 #endif /* !DRIVER_INIT */
-#else /* !CONFIG_BUILDING_KERNEL_CORE */
+#else /* !BUILDING_KERNEL_CORE */
 #ifndef __drv_self_defined
 #define __drv_self_defined
 DATDEF struct driver drv_self ASMNAME("kernel_driver");
 DATDEF struct module _drv_self_as_module ASMNAME("kernel_driver");
 #define drv_self (*(struct driver *)&_drv_self_as_module)
 #endif /* !__drv_self_defined */
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 DECL_END
 #endif /* __CC__ */

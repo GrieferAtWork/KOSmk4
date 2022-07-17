@@ -557,12 +557,12 @@ done_bss:
 
 
 
-#ifndef CONFIG_BUILDING_KERNEL_CORE
+#ifndef BUILDING_KERNEL_CORE
 PRIVATE struct execabi peabi = EXECABI_INIT_PE;
 PRIVATE DRIVER_INIT void KCALL init(void) {
 	execabis_register(&peabi);
 }
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 DECL_END
 

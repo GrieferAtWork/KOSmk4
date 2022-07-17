@@ -238,7 +238,7 @@ for (local l: File.open("../../../../include/kos/kernel/handle.h")) {
 #define ARGS   name,attr,return_type,nothrow,cc,argv,throws,default_impl
 local ops = HANDLE_OPERATOR_PROTOTYPES;
 
-print "#ifdef CONFIG_BUILDING_KERNEL_CORE";
+print "#ifdef BUILDING_KERNEL_CORE";
 print "#ifdef __CC__";
 {
 	local knownTypes = HashSet();
@@ -309,10 +309,10 @@ for (local h_name, h_typ: handle_types) {
 	print;
 }
 print "#endif /" "* __CC__ *" "/";
-print "#endif /" "* CONFIG_BUILDING_KERNEL_CORE *" "/";
+print "#endif /" "* BUILDING_KERNEL_CORE *" "/";
 
 ]]]*/
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 #ifdef __CC__
 struct mfile;
 struct fdirent;
@@ -998,13 +998,13 @@ INTDEF BLOCKING NONNULL((1)) REF void *KCALL handle_dirhandlex_tryas(struct dirh
 INTDEF BLOCKING NONNULL((1, 2)) ssize_t KCALL handle_dirhandlex_printlink(struct dirhandlex *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 #endif /* __CC__ */
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 //[[[end]]]
 
 
 
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 #ifdef __CC__
 
 /* `name' must be the lower-case form of the `*' in one of the `HANDLE_TYPE_*' macros.
@@ -1070,7 +1070,7 @@ INTDEF BLOCKING NONNULL((1, 2)) ssize_t KCALL handle_dirhandlex_printlink(struct
 	}
 
 #endif /* __CC__ */
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 
 

@@ -273,7 +273,7 @@ typedef u64 p32_pagedir_pushval_t;
 #endif /* __CC__ */
 
 
-#if defined(__CC__) && defined(CONFIG_BUILDING_KERNEL_CORE)
+#if defined(__CC__) && defined(BUILDING_KERNEL_CORE)
 
 #ifndef PAGEDIR_PAGEALIGNED
 #define PAGEDIR_PAGEALIGNED /* Annotation for variables that need to be aligned on page boundaries. */
@@ -395,7 +395,7 @@ INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL p32_pagedir_isuserwritable)(VIRT void 
 INTDEF NOBLOCK WUNUSED bool NOTHROW(FCALL p32_pagedir_haschanged)(VIRT void *addr);
 INTDEF NOBLOCK void NOTHROW(FCALL p32_pagedir_unsetchanged)(VIRT void *addr);
 
-#endif /* __CC__ && CONFIG_BUILDING_KERNEL_CORE */
+#endif /* __CC__ && BUILDING_KERNEL_CORE */
 
 DECL_END
 

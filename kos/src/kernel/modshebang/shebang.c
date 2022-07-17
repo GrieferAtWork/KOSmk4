@@ -234,12 +234,12 @@ shebang_exec(struct execargs *__restrict args) {
 
 
 
-#ifndef CONFIG_BUILDING_KERNEL_CORE
+#ifndef BUILDING_KERNEL_CORE
 PRIVATE struct execabi bangabi = EXECABI_INIT_SHEBANG;
 PRIVATE DRIVER_INIT void KCALL init(void) {
 	execabis_register(&bangabi);
 }
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 DECL_END
 

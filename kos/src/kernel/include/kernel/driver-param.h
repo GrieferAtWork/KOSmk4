@@ -22,7 +22,7 @@
 
 #include <kernel/compiler.h>
 
-#ifndef CONFIG_BUILDING_KERNEL_CORE
+#ifndef BUILDING_KERNEL_CORE
 #ifndef DRIVER_INIT
 #define DRIVER_INIT __attribute__((__constructor__))
 #define DRIVER_FINI __attribute__((__destructor__))
@@ -58,7 +58,7 @@
 #define DEFINE_CMDLINE_PARAM_INTPTR_VAR(varname, parname, defl)   DEFINE_CMDLINE_PARAM_INTN_VAR(__SIZEOF_POINTER__)(varname, parname, defl)
 #define DEFINE_CMDLINE_PARAM_UINTPTR_VAR(varname, parname, defl)  DEFINE_CMDLINE_PARAM_UINTN_VAR(__SIZEOF_POINTER__)(varname, parname, defl)
 
-#else /* CONFIG_BUILDING_KERNEL_CORE */
+#else /* BUILDING_KERNEL_CORE */
 
 #include <kernel/arch/driver-param.h>
 
@@ -264,6 +264,6 @@ struct kernel_commandline_option {
 #define DEFINE_CMDLINE_PARAM_UINTPTR_VAR(varname, parname, defl)  DEFINE_CMDLINE_PARAM_UINTN_VAR(__SIZEOF_POINTER__)(varname, parname, defl)
 
 DECL_END
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_DRIVER_PARAM_H */

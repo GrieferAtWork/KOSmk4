@@ -35,7 +35,7 @@
                                                 *       by comparing `%eip' with `%cr2' */
 
 #ifdef __CC__
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 DECL_BEGIN
 
 /* Helpers and prototypes for c-level hardware fault handlers. */
@@ -100,7 +100,7 @@ INTDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FC
 INTDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL x86_handle_2fh(struct icpustate *__restrict state);
 
 DECL_END
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 #endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_X86_FAULT_H */

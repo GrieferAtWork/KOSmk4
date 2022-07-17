@@ -489,11 +489,11 @@ DATDEF struct driver kernel_driver;
 
 #ifndef __drv_self_defined
 #define __drv_self_defined
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 DATDEF struct driver drv_self ASMNAME("kernel_driver");
-#else /* CONFIG_BUILDING_KERNEL_CORE */
+#else /* BUILDING_KERNEL_CORE */
 DATDEF struct driver drv_self;
-#endif /* !CONFIG_BUILDING_KERNEL_CORE */
+#endif /* !BUILDING_KERNEL_CORE */
 #endif /* !__drv_self_defined */
 #undef drv_self
 
@@ -507,7 +507,7 @@ DATDEF struct driver_section kernel_section_bss;
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 DATDEF struct driver_section kernel_section_dbg_hooks;
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 INTDEF struct driver_section kernel_section_debug_line;
 INTDEF struct driver_section kernel_section_debug_info;
 INTDEF struct driver_section kernel_section_debug_aranges;
@@ -520,7 +520,7 @@ INTDEF struct driver_section kernel_section_pertask;
 INTDEF struct driver_section kernel_section_permman;
 INTDEF struct driver_section kernel_section_percpu;
 INTDEF struct driver_section kernel_section_shstrtab;
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 
 

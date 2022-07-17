@@ -34,7 +34,7 @@
 #include <kos/kernel/gdt.h>
 #endif /* __ASSEMBLER__ */
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 #ifdef __x86_64__
 #if !defined(__NR32FEAT_DEFINED_SYSCALL_ARGUMENT_COUNT) || \
     !defined(__NR32FEAT_DEFINED_SYSCALL_RETURN_TYPES) || \
@@ -60,7 +60,7 @@
 #endif /* __x86_64__ */
 
 #define ATTR_SECTION_SYSCALL(name_str)   ATTR_SECTION(".text.x86.syscall." name_str)
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 
 #ifdef __CC__
@@ -145,7 +145,7 @@ DECL_END
 
 
 /* Define compatibility-mode system calls. */
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 #ifdef __x86_64__
 /* When defining a 64-bit system call, alias compatible 32-bit variant(s) onto it,
  * thus implementing system  calls without  dedicated compatibility-mode  variants
@@ -362,7 +362,7 @@ DECL_END
 #define DEFINE_SYSCALL32_5 DEFINE_SYSCALL5
 #define DEFINE_SYSCALL32_6 DEFINE_SYSCALL6
 #endif /* !__x86_64__ */
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 
 #endif /* __CC__ */

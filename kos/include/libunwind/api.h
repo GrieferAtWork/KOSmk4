@@ -36,7 +36,7 @@
 #endif /* ... */
 
 #if (defined(__KOS__) && defined(__KERNEL__) && \
-     defined(CONFIG_BUILDING_KERNEL_CORE))
+     defined(BUILDING_KERNEL_CORE))
 #define LIBUNWIND_DECL __PUBDEF
 #elif defined(__LIBUNWIND_STATIC)
 #define LIBUNWIND_DECL __INTDEF

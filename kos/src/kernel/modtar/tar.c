@@ -1886,20 +1886,20 @@ PRIVATE struct ffilesys tarfs_filesys = {
 };
 
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 INTERN ATTR_FREETEXT void KCALL kernel_initialize_tar_driver(void)
-#else /* CONFIG_BUILDING_KERNEL_CORE */
+#else /* BUILDING_KERNEL_CORE */
 PRIVATE DRIVER_INIT ATTR_FREETEXT void KCALL init(void)
-#endif /* !CONFIG_BUILDING_KERNEL_CORE */
+#endif /* !BUILDING_KERNEL_CORE */
 {
 	ffilesys_register(&tarfs_filesys);
 }
 
-#ifndef CONFIG_BUILDING_KERNEL_CORE
+#ifndef BUILDING_KERNEL_CORE
 PRIVATE DRIVER_FINI void KCALL fini(void) {
 	ffilesys_unregister(&tarfs_filesys);
 }
-#endif /* !CONFIG_BUILDING_KERNEL_CORE */
+#endif /* !BUILDING_KERNEL_CORE */
 
 DECL_END
 

@@ -49,13 +49,13 @@ typedef __physpage_t physpagecnt_t;
 
 #define PMEMBANK_TYPE_UNDEF      0 /* Undefined memory (Handled identically to `PMEMBANK_TYPE_BADRAM') */
 #define PMEMBANK_TYPE_RAM        1 /* [USE] Dynamic; aka. RAM memory (Main source of memory for `page_malloc') */
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 #define PMEMBANK_TYPE_PRESERVE   2 /* [USE_LATER_0|MAP] Preserve  the  original content  of this  memory until
                                     * `mem_unpreserve()'  is  called,  at  which  point  the  memory  will  be
                                     * transformed into `PMEMBANK_TYPE_RAM', and made available to the physical
                                     * memory allocator. */
 #define PMEMBANK_TYPE_ALLOCATED  3 /* [USE_LATER_1|MAP] Same as 'PMEMBANK_TYPE_RAM', but don't make memory available to `page_malloc' */
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 #define PMEMBANK_TYPE_KFREE      4 /* [USE_LATER_2|MAP] Kernel memory later turned into `PMEMBANK_TYPE_RAM' (The `.free' section...) */
 #define PMEMBANK_TYPE_KERNEL     5 /* [MAP] Kernel core memory (mapped, not used) */
 #define PMEMBANK_TYPE_NVS        6 /* Non-volatile memory (that is: memory that doesn't get wiped after shutdown) */
@@ -93,7 +93,7 @@ struct pmeminfo {
 DATDEF char const pmembank_type_names[PMEMBANK_TYPE_COUNT][16];
 DATDEF struct pmeminfo minfo; /* Physical memory info. */
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 /* Returns the total number of usable pages of RAM */
 INTDEF FREE ATTR_PURE size_t
 NOTHROW(KCALL minfo_usable_ram_pages)(void);
@@ -125,7 +125,7 @@ INTDEF FREE void NOTHROW(KCALL kernel_initialize_minfo_relocate)(void);
  * bank  into `PMEMBANK_TYPE_RAM', and  (when possible) merge adjacent
  * banks of identical typing. */
 INTDEF FREE void NOTHROW(KCALL minfo_release_preservations)(void);
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 
 

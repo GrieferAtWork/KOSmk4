@@ -23,7 +23,7 @@
 #include <kernel/compiler.h>
 
 #ifdef __CC__
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 #include <kernel/mman.h>
 #include <kernel/paging.h>
 
@@ -55,7 +55,7 @@ DECL_BEGIN
 	_MMAN_KERNEL_INIT_MM_THREADSLOCK
 
 DECL_END
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 #endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_MMAN__ARCHINIT_H */

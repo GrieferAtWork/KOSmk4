@@ -75,9 +75,9 @@ DECL_BEGIN
 /************************************************************************/
 /* Driver parameters                                                    */
 /************************************************************************/
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 ATTR_FREEBSS
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 DEFINE_CMDLINE_FLAG_VAR(ide_nodma, "ide_nodma");
 
 
@@ -1585,11 +1585,11 @@ AtaInit_LoadPciIDE(struct pci_device *__restrict dev) {
 }
 
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 INTERN ATTR_FREETEXT void KCALL kernel_initialize_ide_driver(void)
-#else /* CONFIG_BUILDING_KERNEL_CORE */
+#else /* BUILDING_KERNEL_CORE */
 PRIVATE DRIVER_INIT ATTR_FREETEXT void KCALL AtaInit(void)
-#endif /* !CONFIG_BUILDING_KERNEL_CORE */
+#endif /* !BUILDING_KERNEL_CORE */
 {
 	bool has_primary = false;
 	struct pci_device *dev;

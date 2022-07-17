@@ -127,11 +127,11 @@ NOTHROW(FCALL get_default_video_mode)(struct svgadev *__restrict self) {
 }
 
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 INTERN ATTR_FREETEXT void KCALL kernel_initialize_svga_driver(void)
-#else /* CONFIG_BUILDING_KERNEL_CORE */
+#else /* BUILDING_KERNEL_CORE */
 PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL svga_init(void)
-#endif /* !CONFIG_BUILDING_KERNEL_CORE */
+#endif /* !BUILDING_KERNEL_CORE */
 {
 	struct svgadev *self;
 	struct svga_chipset_driver const *drivers;

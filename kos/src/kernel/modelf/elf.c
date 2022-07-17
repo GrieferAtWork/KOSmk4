@@ -202,12 +202,12 @@ elfabi_exec(/*in|out*/ struct execargs *__restrict args) {
 	      reason);
 }
 
-#ifndef CONFIG_BUILDING_KERNEL_CORE
+#ifndef BUILDING_KERNEL_CORE
 PRIVATE struct execabi elfabi = EXECABI_INIT_ELF;
 PRIVATE DRIVER_INIT void KCALL init(void) {
 	execabis_register(&elfabi);
 }
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 DECL_END
 

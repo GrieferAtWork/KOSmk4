@@ -265,11 +265,11 @@ FUNDEF NONNULL((1)) bool FCALL
 execabis_register(struct execabi const *__restrict abi)
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 INTDEF NONNULL((1)) bool FCALL
 driver_clear_execabis(struct driver *__restrict self)
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 
 #endif /* __CC__ */

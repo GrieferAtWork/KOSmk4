@@ -130,9 +130,9 @@ typedef struct ATTR_PACKED {
 } MpConfigurationEntry;
 
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 INTDEF u8 x86_smp_entry_page;
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 #endif /* __CC__ */
 

@@ -39,7 +39,7 @@ DATDEF CALLBACK_LIST(void FCALL(struct mman *)) mman_oninit_callbacks;
 DATDEF CALLBACK_LIST(void FCALL(struct mman *)) mman_onfini_callbacks;
 DATDEF CALLBACK_LIST(void FCALL(struct mman * /*newmman*/, struct mman * /*oldmman*/)) mman_onclone_callbacks;
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 /* >> void KCALL func(void);
  * Invoked before returning to user-space after a new application was loaded. */
 #define DEFINE_PERMMAN_ONEXEC(func) DEFINE_CALLBACK(".rodata.callback.permman.onexec", func)
@@ -49,7 +49,7 @@ DATDEF CALLBACK_LIST(void FCALL(struct mman * /*newmman*/, struct mman * /*oldmm
 #define DEFINE_PERMMAN_FINI(func)   DEFINE_CALLBACK(".rodata.callback.permman.fini", func)
 /* >> NOBLOCK void KCALL func(struct mman *__restrict newmman, struct mman *__restrict oldmman); */
 #define DEFINE_PERMMAN_CLONE(func)  DEFINE_CALLBACK(".rodata.callback.permman.clone", func)
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 
 DECL_END

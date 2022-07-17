@@ -41,9 +41,9 @@ struct driver;
 #ifndef __drv_self_defined
 #define __drv_self_defined
 DATDEF struct driver drv_self
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 	ASMNAME("kernel_driver")
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 ;
 #endif /* !__drv_self_defined */
 
@@ -142,7 +142,7 @@ struct callback_list<ReturnType FCALL(ArgumenTypes...)> {
 
 
 /* Helper macros for hooking driver-callbacks to-be invoked for certain events. */
-#ifndef CONFIG_BUILDING_KERNEL_CORE
+#ifndef BUILDING_KERNEL_CORE
 #ifndef DRIVER_INIT
 #define DRIVER_INIT     __attribute__((__constructor__))
 #define DRIVER_FINI     __attribute__((__destructor__))
@@ -159,7 +159,7 @@ struct callback_list<ReturnType FCALL(ArgumenTypes...)> {
 		callback_list_remove(&(list), &(func));          \
 	}
 #define REGISTER_CALLBACK(list, func) REGISTER_CALLBACK_EX(_driver_cb_, list, func)
-#endif /* !CONFIG_BUILDING_KERNEL_CORE */
+#endif /* !BUILDING_KERNEL_CORE */
 
 #endif /* __CC__ */
 

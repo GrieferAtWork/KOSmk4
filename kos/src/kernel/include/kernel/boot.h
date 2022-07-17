@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /* A collection of functions called as part of boot initialization. */
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 
 struct icpustate;
 
@@ -68,7 +68,7 @@ INTDEF FREE void NOTHROW(KCALL kernel_initialize_selftest)(void);
 INTDEF FREE ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *
 NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state);
 
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 
 DECL_END

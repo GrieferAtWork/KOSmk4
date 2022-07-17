@@ -30,9 +30,9 @@
 
 #include <kos/kernel/paging.h> /* KERNEL_MHINT_SLAB */
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 #include <hybrid/sched/atomic-lock.h>
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 #include "malloc-defs.h"
 #include "malloc.h"
@@ -218,7 +218,7 @@ DATDEF void *kernel_slab_break;
 	((x) >= KERNEL_SLAB_START && (x) < KERNEL_SLAB_END)
 
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 struct slab_pending_free {
 	/* Using an SLIST of pending-free objects here instead of a proper
 	 * lockop system might seem like bad  design, and on some level  I
@@ -265,7 +265,7 @@ struct slab_descriptor {
 #define slab_descriptor_waitfor(self)    atomic_lock_waitfor(&(self)->sd_lock)
 #define slab_descriptor_waitfor_nx(self) atomic_lock_waitfor_nx(&(self)->sd_lock)
 
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 DECL_END
 #endif /* __CC__ */

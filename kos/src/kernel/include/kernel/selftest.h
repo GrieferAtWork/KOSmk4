@@ -41,7 +41,7 @@
 /*[[[end]]]*/
 
 #undef DEFINE_TEST
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 /* >> void KCALL func(void);
  * A self-test that gets invoked during late bootup */
 #ifdef CONFIG_HAVE_KERNEL_SELFTEST
@@ -54,6 +54,6 @@
 #else /* CONFIG_HAVE_KERNEL_SELFTEST */
 #define DEFINE_SELFTEST_FUNCTION(func) /* nothing */
 #endif /* !CONFIG_HAVE_KERNEL_SELFTEST */
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_SELFTEST_H */

@@ -38,7 +38,7 @@
 #endif /* ... */
 
 #if (defined(__KOS__) && defined(__KERNEL__) && \
-     defined(CONFIG_BUILDING_KERNEL_CORE))
+     defined(BUILDING_KERNEL_CORE))
 #define LIBDEBUGINFO_DECL __PUBDEF
 #elif defined(__LIBDEBUGINFO_STATIC)
 #define LIBDEBUGINFO_DECL __INTDEF

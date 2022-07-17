@@ -115,15 +115,15 @@ DECL_BEGIN
 #define _DBG_HOOK_ASMWORD_SIZE .word32
 #endif /* __SIZEOF_POINTER__ > 4 */
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 #define _DBG_HOOK_ASMWORD_RELPTR .wordptr
 #define _DBG_HOOK_ASMWORD_RELPTRO(base, offset) .wordptr base + offset
 #define _DBG_HOOK_ASMWORD_FLAGS  0
-#else /* CONFIG_BUILDING_KERNEL_CORE */
+#else /* BUILDING_KERNEL_CORE */
 #define _DBG_HOOK_ASMWORD_RELPTR .wordrel
 #define _DBG_HOOK_ASMWORD_RELPTRO(base, offset) .wordrel base, offset
 #define _DBG_HOOK_ASMWORD_FLAGS  DBG_HOOKFLAG_RELATIVE
-#endif /* !CONFIG_BUILDING_KERNEL_CORE */
+#endif /* !BUILDING_KERNEL_CORE */
 
 
 #ifdef __CC__

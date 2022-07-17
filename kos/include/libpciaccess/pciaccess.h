@@ -77,9 +77,9 @@ struct pci_pcmcia_bridge_info;
  *       Within the kernel, `pci_system_init()' isn't exported to drivers,
  *       and  is unconditionally called during system boot initialization. */
 #ifdef __KERNEL__
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 __INTDEF void __NOTHROW(LIBPCIACCESS_CC pci_system_init)(void);
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 #else /* __KERNEL__ */
 LIBPCIACCESS_DECL __errno_t __NOTHROW(LIBPCIACCESS_CC pci_system_init)(void);
 LIBPCIACCESS_DECL void __NOTHROW(LIBPCIACCESS_CC pci_system_init_dev_mem)(__fd_t fd);

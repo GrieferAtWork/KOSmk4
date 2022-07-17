@@ -35,7 +35,7 @@
 #endif /* ... */
 
 #if defined(__KOS__) && defined(__KERNEL__) && \
-    defined(CONFIG_BUILDING_KERNEL_CORE)
+    defined(BUILDING_KERNEL_CORE)
 #define LIBCPUSTATE_DECL __PUBDEF
 #elif defined(__LIBCPUSTATE_STATIC)
 #define LIBCPUSTATE_DECL __INTDEF

@@ -33,7 +33,7 @@
 #endif /* ... */
 /*[[[end]]]*/
 
-#if (defined(CONFIG_HAVE_KERNEL_USERELF_MODULES) || !defined(CONFIG_BUILDING_KERNEL_CORE))
+#if (defined(CONFIG_HAVE_KERNEL_USERELF_MODULES) || !defined(BUILDING_KERNEL_CORE))
 #include <kernel/mman/module.h>
 
 #include <hybrid/sequence/list.h>
@@ -139,7 +139,7 @@ struct userelf_module: module {
 
 
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 /* Operator tables for userelf module objects. */
 INTDEF struct module_section_ops const uems_ops;
 INTDEF struct module_ops const uem_ops;
@@ -164,9 +164,9 @@ INTDEF BLOCKING WUNUSED NONNULL((1, 3)) bool FCALL uem_sectinfo(struct userelf_m
 INTDEF BLOCKING WUNUSED NONNULL((1)) REF struct userelf_module *FCALL uem_fromaddr(struct mman *__restrict self, USER CHECKED void const *addr);
 INTDEF BLOCKING WUNUSED NONNULL((1)) REF struct userelf_module *FCALL uem_aboveaddr(struct mman *__restrict self, USER CHECKED void const *addr);
 INTDEF BLOCKING WUNUSED NONNULL((1)) REF struct userelf_module *FCALL uem_next(struct mman *__restrict self, struct module *__restrict prev);
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 DECL_END
-#endif /* CONFIG_HAVE_KERNEL_USERELF_MODULES || !CONFIG_BUILDING_KERNEL_CORE */
+#endif /* CONFIG_HAVE_KERNEL_USERELF_MODULES || !BUILDING_KERNEL_CORE */
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_MODULE_USERELF_H */

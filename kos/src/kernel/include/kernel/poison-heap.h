@@ -235,7 +235,7 @@
 	__PH_IF_DEBUG_MALLOC(bind_zero(kmalloc_traceback, /*    */ ph_kmalloc_traceback, 4))
 
 #ifdef __CC__
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 DECL_BEGIN
 
 /* Install poison heap overrides.
@@ -244,7 +244,7 @@ DECL_BEGIN
 INTDEF NOBLOCK void NOTHROW(KCALL ph_install)(void);
 
 DECL_END
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 #endif /* __CC__ */
 
 #endif /* CONFIG_HAVE_KERNEL_POISON_HEAP */

@@ -16,7 +16,7 @@
 		<define name="__i386__"/>
 		<define name="__KERNEL__"/>
 		<define name="__KOS__"/>
-		<define name="CONFIG_BUILDING_KERNEL_CORE"/>
+		<define name="BUILDING_KERNEL_CORE"/>
 	</defines>
 	<paths>
 		<dir name="../../src/kernel/core"/>

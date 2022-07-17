@@ -50,10 +50,10 @@ DATDEF ATTR_PERCPU u8 thiscpu_x86_iob[65536 / 8];
 /* The VM node used to represent the IOB mapping of the current CPU */
 DATDEF ATTR_PERCPU struct mnode thiscpu_x86_iobnode;
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 /* [1..1][const] Page directory identity pointer for unmapping the IOB vector of the current CPU. */
 INTDEF ATTR_PERCPU void *thiscpu_x86_iobnode_pagedir_identity;
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 
 

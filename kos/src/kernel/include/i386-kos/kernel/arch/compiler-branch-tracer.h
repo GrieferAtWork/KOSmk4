@@ -72,7 +72,7 @@ DECL_BEGIN
 
 /* struct branch_prediction; */
 #ifdef __x86_64__
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 #define __predict_dotrace(section, expr, expected)      \
 	__asm__ __volatile__(".weak .Ltracepoint_%=\n\t"    \
 	                     ".local .Ltracepoint_%=\n\t"   \
@@ -91,7 +91,7 @@ DECL_BEGIN
 	                     : "X" (expected)               \
 	                     , "acdS" (expr)                \
 	                     : "rdi")
-#else /* CONFIG_BUILDING_KERNEL_CORE */
+#else /* BUILDING_KERNEL_CORE */
 /* NOTE: I am well aware that `R_X86_64_64' isn't the correct type here!
  *       However, LD will refuse to link `R_X86_64_32' or `R_X86_64_32S'
  *       relocations in ~shared libraries~ (drivers)
@@ -119,7 +119,7 @@ DECL_BEGIN
 	                     : "X" (expected)               \
 	                     , "acdS" (expr)                \
 	                     : "rdi")
-#endif /* !CONFIG_BUILDING_KERNEL_CORE */
+#endif /* !BUILDING_KERNEL_CORE */
 #else /* __x86_64__ */
 #define __predict_dotrace(section,expr,expected)        \
 	__asm__ __volatile__(".weak .Ltracepoint_%=\n\t"    \

@@ -1224,11 +1224,11 @@ PRIVATE struct ffilesys ext2_filesys = {
 };
 
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 INTERN ATTR_FREETEXT void KCALL kernel_initialize_ext2_driver(void) {
 	ffilesys_register(&ext2_filesys);
 }
-#else /* CONFIG_BUILDING_KERNEL_CORE */
+#else /* BUILDING_KERNEL_CORE */
 PRIVATE ATTR_FREETEXT DRIVER_INIT void init(void) {
 	ffilesys_register(&ext2_filesys);
 }
@@ -1236,7 +1236,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void init(void) {
 PRIVATE DRIVER_FINI void fini(void) {
 	ffilesys_unregister(&ext2_filesys);
 }
-#endif /* !CONFIG_BUILDING_KERNEL_CORE */
+#endif /* !BUILDING_KERNEL_CORE */
 
 DECL_END
 

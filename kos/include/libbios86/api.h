@@ -35,7 +35,7 @@
 #endif /* ... */
 
 #if (defined(__KOS__) && defined(__KERNEL__) && \
-     defined(CONFIG_BUILDING_KERNEL_CORE))
+     defined(BUILDING_KERNEL_CORE))
 #define LIBBIOS86_DECL __PUBDEF
 #elif defined(__LIBBIOS86_STATIC)
 #define LIBBIOS86_DECL __INTDEF

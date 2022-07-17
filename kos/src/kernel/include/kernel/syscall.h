@@ -30,7 +30,7 @@
 #include <kos/kernel/syscalls.h> /* __ARCH_WANT_SYSCALL_* */
 #include <kos/syscalls.h>        /* System call prototypes */
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 #if (!defined(__NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT) || \
      !defined(__NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES) || \
      !defined(__NRFEAT_DEFINED_SYSCALL_RETURN_TYPES))
@@ -42,7 +42,7 @@
 #define __WANT_SYSCALL_RETURN_TYPES   1
 #include <asm/syscalls-proto.h>
 #endif /* !... */
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 
 /* Need to get `__NRFEAT_SYSCALL_REGISTER_MAX_COUNT' */
@@ -67,7 +67,7 @@
 #ifdef __CC__
 DECL_BEGIN
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 #ifndef __PRIVATE_SYSCALL_GET_ESCAPED_TYPE
 #define __PRIVATE_SYSCALL_GET_ESCAPED_TYPE2(a, b) b
 #define __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(t) __PRIVATE_SYSCALL_GET_ESCAPED_TYPE2 t
@@ -136,7 +136,7 @@ DECL_BEGIN
 	__ARCH_DEFINE_SYSCALL_COMMON(_##name)                                                                                \
 	FUNDEF return_type __ARCH_SYSCALLCC impl_sys_##name(T0 N0, T1 N1, T2 N2, T3 N3, T4 N4, T5 N5) ASMNAME("sys_" #name); \
 	PUBLIC ATTR_SECTION_SYSCALL(#name) return_type __ARCH_SYSCALLCC impl_sys_##name(T0 N0, T1 N1, T2 N2, T3 N3, T4 N4, T5 N5)
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 /* Emulate the execution of a system call.
  * NOTE: `syscall_emulate_r()' is the same as `syscall_emulate()', however already

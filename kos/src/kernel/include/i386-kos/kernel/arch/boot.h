@@ -23,11 +23,11 @@
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 #include <kernel/x86/phys2virt64.h> /* CONFIG_KERNEL_X86_PHYS2VIRT_IDENTITY_MAXALLOC */
 #include <kernel/fpu.h>             /* CONFIG_HAVE_FPU */
 #include <kernel/vboxgdb.h>         /* CONFIG_HAVE_KERNEL_VBOXGDB */
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 #include <asm/pagesize.h>
 #include <kos/kernel/cpu-state32.h> /* fcpustate32 */
@@ -59,7 +59,7 @@ DATDEF struct boot_device_info boot_device;
 
 
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 #ifdef CONFIG_HAVE_KERNEL_VBOXGDB
 INTDEF FREE void NOTHROW(KCALL x86_initialize_vboxgdb)(void);
 #endif /* CONFIG_HAVE_KERNEL_VBOXGDB */
@@ -94,7 +94,7 @@ INTDEF FREE void NOTHROW(KCALL x86_initialize_phys2virt64)(void);
 #endif /* !ONFIG_PHYS2VIRT_IDENTITY_MAXALLOC */
 INTDEF FREE void NOTHROW(KCALL x86_initialize_commandline_himem)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_bootloader_drivers)(void);
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 #endif /* __CC__ */
 
 

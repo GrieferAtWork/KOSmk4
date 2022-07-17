@@ -38,11 +38,11 @@
 #ifdef __CC__
 DECL_BEGIN
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 struct task;
 INTDEF struct task asyncwork;
 INTDEF ATTR_NORETURN void KCALL _asyncmain(void);
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 
 struct aio_handle_stat;

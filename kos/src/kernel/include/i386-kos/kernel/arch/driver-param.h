@@ -22,7 +22,7 @@
 
 #include <kernel/compiler.h>
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 #include <hybrid/host.h>
 #ifdef __CC__
 #ifdef __x86_64__
@@ -53,6 +53,6 @@
 #define DEFINE_LATE_KERNEL_COMMANDLINE_OPTION(addr, type, name) \
 	DEFINE_KERNEL_COMMANDLINE_OPTION_IMPL(".rodata.free.commandline_options.late", addr, type, name)
 
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_DRIVER_PARAM_H */

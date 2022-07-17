@@ -729,10 +729,10 @@ task_waitfor_with_sigmask(sigset_t const *__restrict sigmask,
                           ktime_t abs_timeout DFL(KTIME_INFINITE))
 		THROWS(E_INTERRUPT_USER_RPC, E_WOULDBLOCK, ...);
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 INTDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pertask_fix_task_connections)(struct task *__restrict self);
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 #endif /* __CC__ */
 

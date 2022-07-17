@@ -228,7 +228,7 @@ createVsFile("kos.vcxproj", (fp: File) -> {
 "		<ClCompile Include=\"" << name << "\">\n"
 "			<PreprocessorDefinitions>$(NMakePreprocessorDefinitions);__KERNEL__";
 				if (name.startswith(r"..\kos\src\kernel\core"))
-					fp << ";CONFIG_BUILDING_KERNEL_CORE";
+					fp << ";BUILDING_KERNEL_CORE";
 				fp << "</PreprocessorDefinitions>\n"
 "		</ClCompile>\n";
 			} else {

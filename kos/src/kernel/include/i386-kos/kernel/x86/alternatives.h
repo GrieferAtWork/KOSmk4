@@ -44,10 +44,10 @@ struct x86_alternative {
 	uintptr_t xa_altcode; /* (Module-relative) starting address of the alternate code blob. */
 };
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 INTDEF FREE struct x86_alternative const __x86_alternatives_start[];
 INTDEF FREE struct x86_alternative const __x86_alternatives_end[];
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 DECL_END
 #endif /* __CC__ */
@@ -76,15 +76,15 @@ __ASM_L(.Lalt_maxlength = 0)
 __ASM_L(	.pushsection .alternatives, "a")
 __ASM_L(		.word32 __ASM_ARG(\feature))
 __ASM_L(		.word32 (773f - 772f))
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 __ASM_L(		.wordptr 771b)
 __ASM_L(		.wordptr 774f)
 __ASM_L(		.wordptr 772f)
-#else /* CONFIG_BUILDING_KERNEL_CORE */
+#else /* BUILDING_KERNEL_CORE */
 __ASM_L(		.wordrel 771b)
 __ASM_L(		.wordrel 774f)
 __ASM_L(		.wordrel 772f)
-#endif /* !CONFIG_BUILDING_KERNEL_CORE */
+#endif /* !BUILDING_KERNEL_CORE */
 __ASM_L(	.popsection)
 __ASM_L(	.pushsection .text.free.alternatives)
 __ASM_L(772:)
@@ -99,15 +99,15 @@ __ASM_L(	.popsection)
 __ASM_L(	.pushsection .alternatives, "a")
 __ASM_L(		.word32 __ASM_ARG(\feature))
 __ASM_L(		.word32 (773f - 772f))
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 __ASM_L(		.wordptr 771b)
 __ASM_L(		.wordptr 774f)
 __ASM_L(		.wordptr 772f)
-#else /* CONFIG_BUILDING_KERNEL_CORE */
+#else /* BUILDING_KERNEL_CORE */
 __ASM_L(		.wordrel 771b)
 __ASM_L(		.wordrel 774f)
 __ASM_L(		.wordrel 772f)
-#endif /* !CONFIG_BUILDING_KERNEL_CORE */
+#endif /* !BUILDING_KERNEL_CORE */
 __ASM_L(	.popsection)
 __ASM_L(	.pushsection .text.free.alternatives)
 __ASM_L(772:)

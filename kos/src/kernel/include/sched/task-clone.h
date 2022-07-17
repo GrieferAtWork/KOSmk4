@@ -188,7 +188,7 @@ task_clone_kthread(int (*thread_main)(), size_t argc, ...)
 
 
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 
 /* Arch-specific function  to construct  the initial  scpustate
  * that will execute the function descriptor encoded by `args'. */
@@ -222,7 +222,7 @@ NOTHROW(FCALL _task_init_relocations)(struct task *__restrict self);
 #define _task_init_arch_sstate(child, caller, p_sstate) (void)0
 #endif /* !_task_init_arch_sstate */
 
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 DECL_END
 #endif /* __CC__ */

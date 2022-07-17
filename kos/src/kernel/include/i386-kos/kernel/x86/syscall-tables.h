@@ -30,7 +30,7 @@
 #include <asm/syscalls32_d.h>
 #endif /* !__NR32FEAT_SYSCALL_TABLE_COUNT */
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 /* Mangled   names   for   assembly   wrappers   for   a  given
  * system  call,  when  invoked  via  the  specified mechanism.
  * Any possible  combination  of  these  is  pre-defined  as  a
@@ -77,7 +77,7 @@
 #define X86_ASMSYSCALL32_RUNC32(name)   __x86_asm32_sysrun32_##name /* Section: .text.x86.asm32_syscall_sysrun32.<name> */
 #define X86_ASMSYSCALL64(name)          __x86_asm64_syscall_##name  /* Section: .text.x86.asm64_syscall.<name> */
 #endif /* __x86_64__ */
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 
 #ifdef __CC__

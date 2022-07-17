@@ -55,7 +55,7 @@ __ASM_BEGIN
 #undef wrfsbase
 #undef wrgsbase
 
-#if defined(CONFIG_ASSUME_CPU_SUPPORTS_FSGSBASE) || !defined(CONFIG_BUILDING_KERNEL_CORE)
+#if defined(CONFIG_ASSUME_CPU_SUPPORTS_FSGSBASE) || !defined(BUILDING_KERNEL_CORE)
 __ASM_L(.macro safe_rdfsbase reg:req)
 __ASM_L(	rdfsbase __ASM_ARG(\reg))
 __ASM_L(.endm)
@@ -72,7 +72,7 @@ __ASM_L(.macro safe_wrgsbase reg:req)
 __ASM_L(	wrgsbase __ASM_ARG(\reg))
 __ASM_L(.endm)
 
-#else /* CONFIG_ASSUME_CPU_SUPPORTS_FSGSBASE || !CONFIG_BUILDING_KERNEL_CORE */
+#else /* CONFIG_ASSUME_CPU_SUPPORTS_FSGSBASE || !BUILDING_KERNEL_CORE */
 
 #define __MODREL_POINTER(x) .int x - KERNEL_CORE_BASE
 __ASM_L(.macro safe_rdfsbase reg:req)
@@ -103,7 +103,7 @@ __ASM_L(.popsection)
 __ASM_L(991: wrgsbase __ASM_ARG(\reg))
 __ASM_L(.endm)
 #undef __MODREL_POINTER
-#endif /* !CONFIG_ASSUME_CPU_SUPPORTS_FSGSBASE && CONFIG_BUILDING_KERNEL_CORE */
+#endif /* !CONFIG_ASSUME_CPU_SUPPORTS_FSGSBASE && BUILDING_KERNEL_CORE */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("wrgsbase")

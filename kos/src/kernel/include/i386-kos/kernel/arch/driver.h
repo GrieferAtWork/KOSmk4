@@ -44,7 +44,7 @@
 #ifdef __CC__
 DECL_BEGIN
 
-#ifdef CONFIG_BUILDING_KERNEL_CORE
+#ifdef BUILDING_KERNEL_CORE
 struct driver;
 
 /* Perform   arch-specific   driver    initialization.
@@ -54,7 +54,7 @@ INTDEF NONNULL((1)) void KCALL
 arch_driver_initialize(struct driver *__restrict self);
 
 #define ARCH_HAVE_ARCH_DRIVER_INITIALIZE 1
-#endif /* CONFIG_BUILDING_KERNEL_CORE */
+#endif /* BUILDING_KERNEL_CORE */
 
 DECL_END
 #endif /* __CC__ */
