@@ -340,9 +340,9 @@ NOTHROW(KCALL x86_load_mb1info)(PHYS u32 info) {
 		kernel_driver.d_cmdline = (char *)(uintptr_t)vinfo->cmdline;
 		if (kernel_driver.d_cmdline) {
 			kernel_driver.d_cmdline = (char *)((uintptr_t)kernel_driver.d_cmdline + KERNEL_CORE_BASE);
-			if (!kernel_driver.d_cmdline[0])
+			if (!kernel_driver.d_cmdline[0]) {
 				kernel_driver.d_cmdline = NULL;
-			else {
+			} else {
 				char *cmdline_end;
 				/* Reserve memory used by the kernel commandline. */
 				x86_kernel_cmdline_length = strlen(kernel_driver.d_cmdline);

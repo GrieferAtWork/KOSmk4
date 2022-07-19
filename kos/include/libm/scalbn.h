@@ -99,9 +99,9 @@ __LIBM_LOCAL_FUNC(scalbnf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	}
 	if (__k < __LIBM_FLT_SMALLEST_EXP) {
 		/* in case integer overflow in n+k */
-		if (__n > __LIBM_OVERFLOW_INT)
+		if (__n > __LIBM_OVERFLOW_INT) {
 			return __LIBM_LOCAL_VALUE(hugef) * __ieee754_copysignf(__LIBM_LOCAL_VALUE(hugef), __x); /*overflow*/
-		else {
+		} else {
 			return __LIBM_LOCAL_VALUE(tinyf) * __ieee754_copysignf(__LIBM_LOCAL_VALUE(tinyf), __x); /*underflow*/
 		}
 	}

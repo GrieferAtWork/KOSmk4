@@ -444,9 +444,9 @@ function customDirectivesParser(context: LoaderContext): bool {
 			fp << "#define " << a << (" " * ((#b + #bos + 31) - #a)) << " \\\n";
 			fp << "\t(" << bos << " != (__SIZE_TYPE__)-1 ? __builtin_" << b << " \\\n";
 			fp << "\t" << (" " * (#bos + 23)) << ": " << b << ")\n";
-			if (check_crt)
+			if (check_crt) {
 				fp << "#elif defined(__CRT_HAVE___" << baseFunctionName << "_chk)\n";
-			else {
+			} else {
 				fp << "#else /* ... */\n";
 			}
 		} else {
@@ -573,11 +573,11 @@ function doPrint_src_libc_crtFeatures(fp: File) {
 				if (part !is LibraryFunction)
 					continue;
 				local effectiveAsmName = str(part.name);
-				if (effectiveAsmName.startswith("libc_"))
+				if (effectiveAsmName.startswith("libc_")) {
 					effectiveAsmName = effectiveAsmName[5:];
-				else if (effectiveAsmName.startswith("libd_"))
+				} else if (effectiveAsmName.startswith("libd_")) {
 					effectiveAsmName = "DOS$" + effectiveAsmName[5:];
-				else {
+				} else {
 					continue; /* Shouldn't happen... */
 				}
 				local newCond = part.ppCond;

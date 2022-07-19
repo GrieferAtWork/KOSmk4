@@ -706,9 +706,9 @@ NOTHROW(FCALL GDBThread_Stop)(struct task *__restrict thread,
 	if (GDBThread_IsStopped(thread)) {
 		/* Make sure that  the thread is  explicitly stopped, in  case
 		 * it was implicitly stopped by a whole-cpu stop event before. */
-		if (GDBThread_FindStopEvent(thread))
+		if (GDBThread_FindStopEvent(thread)) {
 			ATOMIC_OR(thread->t_flags, TASK_FGDB_STOPPED);
-		else {
+		} else {
 			if (generateAsyncStopEvents)
 				GDBThread_CreateMissingAsyncStopNotification(thread);
 		}

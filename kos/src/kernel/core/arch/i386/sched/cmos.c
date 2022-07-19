@@ -171,9 +171,9 @@ got_time:
 
 	/* Figure out the proper year. */
 	year = cmos_year;
-	if (x86_cmos.cr_century)
+	if (x86_cmos.cr_century) {
 		year += (u16)cmos_cent * 100;
-	else {
+	} else {
 		if (year < (__DATE_YEAR__ % 100))
 			year += 100; /* 100 years into the future. */
 		year += (__DATE_YEAR__ - (__DATE_YEAR__ % 100));

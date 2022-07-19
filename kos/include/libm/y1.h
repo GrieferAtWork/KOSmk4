@@ -334,7 +334,7 @@ __LIBM_LOCAL_FUNC(y1l) __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
 		 * to compute the worse one. */
 		if (__ix > 0x4080) {
 			__z = (__LIBM_LOCAL_VALUE(invsqrtpil) * __ss) / __ieee854_sqrtl(__x);
-		} 		else {
+		} else {
 			__u = __ieee854_j1_y1_ponel(__x);
 			__v = __ieee854_j1_y1_qonel(__x);
 			__z = __LIBM_LOCAL_VALUE(invsqrtpil) * (__u * __ss + __v * __cc) / __ieee854_sqrtl(__x);

@@ -849,11 +849,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setdetachstate)(pthread_attr_t *attr,
                                                        int detachstate)
 /*[[[body:libc_pthread_attr_setdetachstate]]]*/
 {
-	if (detachstate == PTHREAD_CREATE_DETACHED)
+	if (detachstate == PTHREAD_CREATE_DETACHED) {
 		attr->pa_flags |= PTHREAD_ATTR_FLAG_DETACHSTATE;
-	else if (detachstate == PTHREAD_CREATE_JOINABLE)
+	} else if (detachstate == PTHREAD_CREATE_JOINABLE) {
 		attr->pa_flags &= ~PTHREAD_ATTR_FLAG_DETACHSTATE;
-	else {
+	} else {
 		return EINVAL;
 	}
 	return EOK;
@@ -975,11 +975,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setinheritsched)(pthread_attr_t *attr,
                                                         int inherit)
 /*[[[body:libc_pthread_attr_setinheritsched]]]*/
 {
-	if (inherit == PTHREAD_EXPLICIT_SCHED)
+	if (inherit == PTHREAD_EXPLICIT_SCHED) {
 		attr->pa_flags |= PTHREAD_ATTR_FLAG_NOTINHERITSCHED;
-	else if (inherit == PTHREAD_INHERIT_SCHED)
+	} else if (inherit == PTHREAD_INHERIT_SCHED) {
 		attr->pa_flags &= ~PTHREAD_ATTR_FLAG_NOTINHERITSCHED;
-	else {
+	} else {
 		return EINVAL;
 	}
 	return EOK;
@@ -1014,11 +1014,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setscope)(pthread_attr_t *attr,
                                                  int scope)
 /*[[[body:libc_pthread_attr_setscope]]]*/
 {
-	if (scope == PTHREAD_SCOPE_PROCESS)
+	if (scope == PTHREAD_SCOPE_PROCESS) {
 		attr->pa_flags |= PTHREAD_ATTR_FLAG_SCOPEPROCESS;
-	else if (scope == PTHREAD_SCOPE_SYSTEM)
+	} else if (scope == PTHREAD_SCOPE_SYSTEM) {
 		attr->pa_flags &= ~PTHREAD_ATTR_FLAG_SCOPEPROCESS;
-	else {
+	} else {
 		return EINVAL;
 	}
 	return EOK;

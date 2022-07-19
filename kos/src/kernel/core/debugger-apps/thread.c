@@ -141,7 +141,7 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 		dbg_print(status_indicator);
 		dbg_loadcolor();
 	}
-	dbg_printf(" #%-2u", thread->t_cpu->c_id);
+	dbg_printf(DBGSTR(" #%-2u"), thread->t_cpu->c_id);
 
 	/* When  the thread  is sleeping,  it's current  program location will
 	 * always be in `task_sleep()', so there's no need to print this info. */
@@ -173,13 +173,13 @@ task_enum_print_cb(void *UNUSED(arg), struct task *thread) {
 	unsigned int state;
 	uintptr_t flags;
 	flags = ATOMIC_READ(thread->t_flags);
-	if (flags & TASK_FRUNNING)
+	if (flags & TASK_FRUNNING) {
 		state = THREAD_STATE_RUNNING;
-	else if (flags & TASK_FTERMINATING)
+	} else if (flags & TASK_FTERMINATING) {
 		state = THREAD_STATE_TERMINATED;
-	else if (thread == &FORCPU(thread->t_cpu, thiscpu_idle))
+	} else if (thread == &FORCPU(thread->t_cpu, thiscpu_idle)) {
 		state = THREAD_STATE_IDLING;
-	else {
+	} else {
 		state = THREAD_STATE_SLEEPING;
 	}
 	enum_thread(thread, state);
@@ -277,17 +277,17 @@ DBG_AUTOCOMPLETE(thread,
 				format = DBGSTR("p0%" PRIoN(__SIZEOF_PID_T__));
 				if (starts_with_len >= 3) {
 					char ns = starts_with[2];
-					if (ns == 'x')
+					if (ns == 'x') {
 						format = DBGSTR("p0x%" PRIxN(__SIZEOF_PID_T__));
-					else if (ns == 'X')
+					} else if (ns == 'X') {
 						format = DBGSTR("p0X%" PRIXN(__SIZEOF_PID_T__));
-					else if (ns == 'b')
+					} else if (ns == 'b') {
 						format = DBGSTR("p0b%" PRIbN(__SIZEOF_PID_T__));
-					else if (ns == 'B')
+					} else if (ns == 'B') {
 						format = DBGSTR("p0B%" PRIbN(__SIZEOF_PID_T__));
-					else if (ns >= '0' && ns <= '7')
-						;
-					else {
+					} else if (ns >= '0' && ns <= '7') {
+						/* ... */
+					} else {
 						return;
 					}
 				}

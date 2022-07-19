@@ -1064,9 +1064,9 @@ fallback:
 
 	function assembleWithRelocations(): {string | int | Relocation | Symbol...} {
 		for (local i: this.instructions) {
-			if (i is Instruction)
+			if (i is Instruction) {
 				yield this.assembleInstruction(i)...;
-			else {
+			} else {
 				yield i;
 			}
 		}

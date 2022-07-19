@@ -251,9 +251,9 @@ DEFINE_SYSCALL2(errno_t, sigaltstack,
 	if (ss) {
 		validate_readable(ss, sizeof(*ss));
 		COMPILER_READ_BARRIER();
-		if (ss->ss_flags & SS_DISABLE)
+		if (ss->ss_flags & SS_DISABLE) {
 			sp = EXCEPT_HANDLER_SP_CURRENT;
-		else {
+		} else {
 			sp = ss->ss_sp;
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 			sp = (byte_t *)sp + ss->ss_size;
@@ -317,9 +317,9 @@ DEFINE_COMPAT_SYSCALL2(errno_t, sigaltstack,
 	if (ss) {
 		validate_readable(ss, sizeof(*ss));
 		COMPILER_READ_BARRIER();
-		if (ss->ss_flags & SS_DISABLE)
+		if (ss->ss_flags & SS_DISABLE) {
 			sp = EXCEPT_HANDLER_SP_CURRENT;
-		else {
+		} else {
 			sp = ss->ss_sp;
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 			sp = (byte_t *)sp + ss->ss_size;

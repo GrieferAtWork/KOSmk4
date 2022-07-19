@@ -395,19 +395,21 @@ NOTHROW(KCALL mouse_device_do_motion_nopr_locked)(struct mousedev *__restrict se
 		new_absx = relx < 0 ? self->md_rect.mr_minx
 		                    : self->md_rect.mr_maxx;
 	} else {
-		if (new_absx < self->md_rect.mr_minx)
+		if (new_absx < self->md_rect.mr_minx) {
 			new_absx = self->md_rect.mr_minx;
-		else if (new_absx > self->md_rect.mr_maxx)
+		} else if (new_absx > self->md_rect.mr_maxx) {
 			new_absx = self->md_rect.mr_maxx;
+		}
 	}
 	if (OVERFLOW_SADD(self->md_state.ms_abs_y, rely, &new_absy)) {
 		new_absy = rely < 0 ? self->md_rect.mr_miny
 		                    : self->md_rect.mr_maxy;
 	} else {
-		if (new_absy < self->md_rect.mr_miny)
+		if (new_absy < self->md_rect.mr_miny) {
 			new_absy = self->md_rect.mr_miny;
-		else if (new_absy > self->md_rect.mr_maxy)
+		} else if (new_absy > self->md_rect.mr_maxy) {
 			new_absy = self->md_rect.mr_maxy;
+		}
 	}
 	if (self->md_flags & MOUSE_DEVICE_FLAG_GENABS) {
 		result = mouse_device_do_post_s32s32s32s32(self, MOUSE_PACKET_TYPE_MOVED,

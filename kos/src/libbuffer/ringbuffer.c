@@ -864,9 +864,9 @@ libringbuffer_unread(struct ringbuffer *__restrict self,
 	if (result > num_bytes)
 		result = num_bytes;
 	if (result) {
-		if (self->rb_rptr >= result)
+		if (self->rb_rptr >= result) {
 			self->rb_rptr -= result;
-		else {
+		} else {
 			self->rb_rptr = self->rb_size - result;
 		}
 		was_empty = self->rb_avail == 0;

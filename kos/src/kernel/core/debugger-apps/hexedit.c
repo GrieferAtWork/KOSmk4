@@ -688,15 +688,15 @@ NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {
 
 		case KEY_TAB:
 			if (dbg_isholding_shift()) {
-				if (sel_region == HD_REGION_ADDR)
+				if (sel_region == HD_REGION_ADDR) {
 					sel_region = HD_REGION_ASCII;
-				else {
+				} else {
 					--sel_region;
 				}
 			} else {
-				if (sel_region == HD_REGION_ASCII)
+				if (sel_region == HD_REGION_ASCII) {
 					sel_region = HD_REGION_ADDR;
-				else {
+				} else {
 					++sel_region;
 				}
 			}
@@ -808,13 +808,13 @@ NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {
 				}
 			} else if (sel_region == HD_REGION_HEX) {
 				byte_t nibble;
-				if (uni >= '0' && uni <= '9')
+				if (uni >= '0' && uni <= '9') {
 					nibble = uni - '0';
-				else if (uni >= 'a' && uni <= 'f')
+				} else if (uni >= 'a' && uni <= 'f') {
 					nibble = 10 + (uni - 'a');
-				else if (uni >= 'A' && uni <= 'F')
+				} else if (uni >= 'A' && uni <= 'F') {
 					nibble = 10 + (uni - 'A');
-				else {
+				} else {
 					continue;
 				}
 				status = hd_setdata((byte_t *)addr + (hd_hex_nibble / 2),

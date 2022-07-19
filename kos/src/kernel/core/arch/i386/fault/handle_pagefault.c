@@ -700,9 +700,9 @@ do_handle_iob_node_access:
 						/* Check for special case: even if the IOPERM bitmap is already
 						 * mapped, allow a mapping upgrade  if it was mapped  read-only
 						 * before, but is now needed as read-write. */
-						if (FAULT_IS_WRITE && !pagedir_iswritable(addr))
-							; /* Upgrade the mapping */
-						else {
+						if (FAULT_IS_WRITE && !pagedir_iswritable(addr)) {
+							/* Upgrade the mapping */
+						} else {
 							goto pop_connections_and_throw_segfault;
 						}
 					}

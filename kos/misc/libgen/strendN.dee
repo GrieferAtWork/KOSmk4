@@ -29,9 +29,9 @@ function removeComments(text: string): string {
 		if (i < 0)
 			break;
 		local e = text.find("*/", i + 2);
-		if (e < 0)
+		if (e < 0) {
 			e = #text;
-		else {
+		} else {
 			e += 2;
 		}
 		text = text[:i] + text[e:];

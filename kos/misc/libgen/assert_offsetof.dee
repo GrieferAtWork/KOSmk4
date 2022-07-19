@@ -216,9 +216,9 @@ got_field:
 		for (local field: fields) {
 			local macro = knownFields[field];
 			local fieldOverride = knownMacros[macro];
-			if (fieldOverride !is none)
+			if (fieldOverride !is none) {
 				field = fieldOverride;
-			else {
+			} else {
 				local prefix = knownStructPrefixes.get(typ);
 				if (prefix is none) {
 					prefix = typ;
@@ -226,13 +226,13 @@ got_field:
 						prefix = prefix[:prefix.index("_")];
 					if (prefix.endswith("32") || prefix.endswith("64"))
 						prefix = prefix[:-2];
-					if (prefix.endswith("regs"))
+					if (prefix.endswith("regs")) {
 						prefix = prefix[:-#"regs"];
-					else if (prefix.endswith("cpustate"))
+					} else if (prefix.endswith("cpustate")) {
 						prefix = prefix[:-#"cpustate"] + "cs";
-					else if (prefix.endswith("context"))
+					} else if (prefix.endswith("context")) {
 						prefix = prefix[:-#"context"] + "c";
-					else {
+					} else {
 						/* ... */
 					}
 					prefix = prefix + "_";

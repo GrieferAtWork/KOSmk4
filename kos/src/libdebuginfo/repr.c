@@ -1004,11 +1004,11 @@ decode_form:
 						int digits;
 						size_t offset = 0;
 						PRINT("{\n");
-						if (block.b_size > 0xffff)
+						if (block.b_size > 0xffff) {
 							digits = 8;
-						else if (block.b_size > 0xff)
+						} else if (block.b_size > 0xff) {
 							digits = 4;
-						else {
+						} else {
 							digits = 2;
 						}
 						while (block.b_size) {

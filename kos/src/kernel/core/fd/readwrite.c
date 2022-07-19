@@ -355,9 +355,9 @@ DEFINE_COMPAT_SYSCALL3(ssize_t, readv, fd_t, fd,
 	RAII_FINALLY { decref_unlikely(hand); };
 	if unlikely(!IO_CANREAD(hand.h_mode))
 		THROW(E_INVALID_HANDLE_OPERATION, fd, E_INVALID_HANDLE_OPERATION_READ, hand.h_mode);
-	if unlikely(!count)
+	if unlikely(!count) {
 		result = 0;
-	else {
+	} else {
 		size_t i;
 		struct iov_entry *entries;
 		/* TODO: IOV_MAX limit (currently defined as "-1"; that should probably change...) */

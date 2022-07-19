@@ -1537,20 +1537,21 @@ again:
 					if (ch == '_')
 						break;
 					num *= 36;
-					if (ch >= '0' && ch <= '9')
+					if (ch >= '0' && ch <= '9') {
 						num += ch - '0';
-					else if (ch >= 'A' && ch <= 'Z')
+					} else if (ch >= 'A' && ch <= 'Z') {
 						num += 10 + (ch - 'A');
-					else
+					} else {
 						goto err;
+					}
 				}
-				if (num == 0)
+				if (num == 0) {
 					itanium_print(self, " (1st)");
-				else if (num == 1)
+				} else if (num == 1) {
 					itanium_print(self, " (2nd)");
-				else if (num == 2)
+				} else if (num == 2) {
 					itanium_print(self, " (3rd)");
-				else {
+				} else {
 					itanium_printf(self, " (%Iuth)", num + 1);
 				}
 			}

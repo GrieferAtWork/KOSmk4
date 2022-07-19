@@ -872,10 +872,11 @@ NOTHROW(KCALL heap_free_raw_and_unlock_impl)(struct heap *__restrict self,
 			atomic_lock_release(&self->h_lock);
 			if (flags & GFP_CALLOC)
 				reset_heap_data((byte_t *)ptr, DEBUGHEAP_NO_MANS_LAND, num_bytes);
-			if (slot_flags & GFP_CALLOC)
+			if (slot_flags & GFP_CALLOC) {
 				reset_heap_data((byte_t *)slot, DEBUGHEAP_NO_MANS_LAND, slot_size);
-			else
+			} else {
 				mempatl(slot, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);
+			}
 			flags &= ~GFP_CALLOC;
 			num_bytes += slot_size;
 #ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE

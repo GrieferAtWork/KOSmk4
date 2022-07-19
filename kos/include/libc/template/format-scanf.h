@@ -405,44 +405,44 @@ __store_integer_val:
 				switch (__type_size) {
 #if __SIZEOF_INT__ != 1
 				case 1:
-					if (__flags & __SCANF_FLAG_SIGNED)
+					if (__flags & __SCANF_FLAG_SIGNED) {
 						*(__INT8_TYPE__ *)__dest = -(__INT8_TYPE__)(__UINT8_TYPE__)__val;
-					else {
+					} else {
 						*(__UINT8_TYPE__ *)__dest = (__UINT8_TYPE__)__val;
 					}
 					break;
 #endif /* __SIZEOF_INT__ != 1 */
 #if __SIZEOF_INT__ != 2
 				case 2:
-					if (__flags & __SCANF_FLAG_SIGNED)
+					if (__flags & __SCANF_FLAG_SIGNED) {
 						*(__INT16_TYPE__ *)__dest = -(__INT16_TYPE__)(__UINT16_TYPE__)__val;
-					else {
+					} else {
 						*(__UINT16_TYPE__ *)__dest = (__UINT16_TYPE__)__val;
 					}
 					break;
 #endif /* __SIZEOF_INT__ != 2 */
 #if __SIZEOF_INT__ != 4
 				case 4:
-					if (__flags & __SCANF_FLAG_SIGNED)
+					if (__flags & __SCANF_FLAG_SIGNED) {
 						*(__INT32_TYPE__ *)__dest = -(__INT32_TYPE__)(__UINT32_TYPE__)__val;
-					else {
+					} else {
 						*(__UINT32_TYPE__ *)__dest = (__UINT32_TYPE__)__val;
 					}
 					break;
 #endif /* __SIZEOF_INT__ != 4 */
 #if defined(__UINT64_TYPE__) && __SIZEOF_INT__ != 8
 				case 8:
-					if (__flags & __SCANF_FLAG_SIGNED)
+					if (__flags & __SCANF_FLAG_SIGNED) {
 						*(__INT64_TYPE__ *)__dest = -(__INT64_TYPE__)(__UINT64_TYPE__)__val;
-					else {
+					} else {
 						*(__UINT64_TYPE__ *)__dest = (__UINT64_TYPE__)__val;
 					}
 					break;
 #endif /* __UINT64_TYPE__ && __SIZEOF_INT__ != 8 */
 				default:
-					if (__flags & __SCANF_FLAG_SIGNED)
+					if (__flags & __SCANF_FLAG_SIGNED) {
 						*(int *)__dest = -(int)(unsigned int)__val;
-					else {
+					} else {
 						*(unsigned int *)__dest = (unsigned int)__val;
 					}
 					break;

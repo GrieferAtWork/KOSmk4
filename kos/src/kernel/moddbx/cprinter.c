@@ -187,9 +187,9 @@ again:
 			break;
 
 		case CTYPE_KIND_CLASSOF(CTYPE_KIND_BOOL):
-			if (typ == &ctype_bool)
+			if (typ == &ctype_bool) {
 				type_name = "bool";
-			else {
+			} else {
 				/* Fallback: Variable-length-boolean type. */
 				FORMAT(DEBUGINFO_PRINT_FORMAT_TYPENAME_PREFIX);
 				PRINTF("BOOL%" PRIuSIZ, (size_t)(CTYPE_KIND_SIZEOF(typ->ct_kind) * 8));
@@ -199,9 +199,9 @@ again:
 			break;
 
 		case CTYPE_KIND_CLASSOF(CTYPE_KIND_ENUM):
-			if (CTYPE_KIND_ISENUM(typ->ct_kind))
+			if (CTYPE_KIND_ISENUM(typ->ct_kind)) {
 				type_name = ""; /* Unnamed enum. */
-			else {
+			} else {
 				/* Select names of known types. */
 				unsigned int i;
 				for (i = 0; i < COMPILER_LENOF(builtin_type_names); ++i) {
@@ -1503,7 +1503,7 @@ err:
  * @param: self:             The typing of `buf'
  * @param: printer:          The printer used to output data.
  * @param: buf:              The data buffer that should be printed.
- *                           This should point to a block of `ctype_sizeof(self)' types.
+ *                           This should point to a block of `ctype_sizeof(self)' bytes.
  * @param: flags:            Printing flags (set of `CTYPE_PRINTVALUE_FLAG_*')
  * @param: firstline_indent: # of SPC (' ') characters already printed on the current line.
  * @param: newline_indent:   # of SPC (' ') characters to print after every \n-character.
@@ -1513,7 +1513,7 @@ err:
  * @param: maxlinelen:       The max line  length that  should not be  exceeded by  when
  *                           placing   short  struct  initializers  on  the  same  line.
  *                           Ignored when `CTYPE_PRINTVALUE_FLAG_NOSHORTLINES' is given.
- *                           If sufficient space is available, do this:
+ *                           If insufficient space is available, do this:
  *                           >> {foo: {x: 10, y: 20}}
  *                           or this:
  *                           >> {
@@ -1825,7 +1825,7 @@ print_integer_value_as_hex:
 			data.im.maxlinelen       = maxlinelen;
 			data.im.out_field_count  = 0;
 			data.im.out_contains_lf  = false;
-			/* Enumerate field for the initial pass. */
+			/* Enumerate fields for the initial pass. */
 			ctype_struct_enumfields(me, &ctype_printstruct_ismultiline_callback, &data.im);
 			if (!data.im.out_field_count)
 				goto done_struct; /* Empty struct... */
@@ -1919,9 +1919,9 @@ done_struct:
 		}
 		if (string_kind != CSTRING_KIND_INVALID) {
 			size_t buflen = used_length;
-			if (string_kind == CSTRING_KIND_CHAR32)
+			if (string_kind == CSTRING_KIND_CHAR32) {
 				buflen *= 4;
-			else if (string_kind == CSTRING_KIND_CHAR16) {
+			} else if (string_kind == CSTRING_KIND_CHAR16) {
 				buflen *= 2;
 			}
 			/* Print as a string. */
@@ -1992,9 +1992,9 @@ do_print_no_recursion_dots_and_rbrace:
 								elem_length += 2;                          /* ", " */
 								elem_length *= (index_hi - i) + 1;         /* Repeat */
 								elem_length -= 2;                          /* Strip tailing ", " */
-								if (elem_length <= range_length)
+								if (elem_length <= range_length) {
 									index_hi = i; /* Don't use a range-expression */
-								else {
+								} else {
 									peek_indent += range_prefix;
 								}
 							}
@@ -2058,9 +2058,9 @@ do_print_no_recursion_dots_and_rbrace:
 							elem_length += 2;                          /* ", " */
 							elem_length *= (index_hi - i) + 1;         /* Repeat */
 							elem_length -= 2;                          /* Strip tailing ", " */
-							if (elem_length <= range_length)
+							if (elem_length <= range_length) {
 								index_hi = i; /* Don't use a range-expression */
-							else {
+							} else {
 								elem_indent += range_prefix;
 							}
 						}

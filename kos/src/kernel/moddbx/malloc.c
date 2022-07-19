@@ -625,20 +625,20 @@ DBG_NAMED_COMMAND(dbx_heapinfo, "dbx.heapinfo",
 	/* Calculate fragmentation percentage as suggested by this:
 	 * https://stackoverflow.com/questions/4586972/how-to-calculate-fragmentation/4587077#4587077
 	 */
-	if (!largest_fragment)
+	if (!largest_fragment || !total_freemem) {
 		frag_percent = 0;
-	else {
+	} else {
 		frag_percent = (size_t)(100 * 100000) -
 		               (size_t)(((u64)largest_fragment * 100 * 100000) / total_freemem);
 	}
 	total_usedmem = total_alloc - total_freemem;
 	used_percent  = (size_t)(((u64)total_usedmem * 100 * 100000) / total_alloc);
 	free_percent  = (size_t)(((u64)total_freemem * 100 * 100000) / total_alloc);
-	dbg_printf("\ttotal_freemem: " AC_WHITE("%#" PRIxSIZ) " bytes (" AC_WHITE("%" PRIuSIZ ".%.5" PRIuSIZ) "%%)\n"
-	           "\ttotal_usedmem: " AC_WHITE("%#" PRIxSIZ) " bytes (" AC_WHITE("%" PRIuSIZ ".%.5" PRIuSIZ) "%%)\n"
-	           "\ttotal_alloced: " AC_WHITE("%#" PRIxSIZ) " bytes (" AC_WHITE("%" PRIuSIZ) " heaps)\n"
-	           "\tlargest_fragm: " AC_WHITE("%#" PRIxSIZ) " bytes (" AC_WHITE("%" PRIuSIZ) " fragments)\n"
-	           "\tfragmentation: " AC_WHITE("%" PRIuSIZ ".%.5" PRIuSIZ) "%%\n",
+	dbg_printf(DBGSTR("\ttotal_freemem: " AC_WHITE("%#" PRIxSIZ) " bytes (" AC_WHITE("%" PRIuSIZ ".%.5" PRIuSIZ) "%%)\n"
+	                  "\ttotal_usedmem: " AC_WHITE("%#" PRIxSIZ) " bytes (" AC_WHITE("%" PRIuSIZ ".%.5" PRIuSIZ) "%%)\n"
+	                  "\ttotal_alloced: " AC_WHITE("%#" PRIxSIZ) " bytes (" AC_WHITE("%" PRIuSIZ) " heaps)\n"
+	                  "\tlargest_fragm: " AC_WHITE("%#" PRIxSIZ) " bytes (" AC_WHITE("%" PRIuSIZ) " fragments)\n"
+	                  "\tfragmentation: " AC_WHITE("%" PRIuSIZ ".%.5" PRIuSIZ) "%%\n"),
 	           total_freemem, (size_t)(free_percent / 100000), (size_t)(free_percent % 100000),
 	           total_usedmem, (size_t)(used_percent / 100000), (size_t)(used_percent % 100000),
 	           total_alloc, num_heaps,

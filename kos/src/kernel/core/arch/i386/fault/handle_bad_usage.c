@@ -907,11 +907,11 @@ PRIVATE void FCALL
 setfsbase(struct icpustate32 *__restrict state, uintptr_t value)
 		THROWS(E_ILLEGAL_INSTRUCTION_REGISTER) {
 	u16 myfs = icpustate_getfs_novm86(state) & ~3;
-	if (myfs == SEGMENT_USER_FSBASE)
+	if (myfs == SEGMENT_USER_FSBASE) {
 		x86_set_user_fsbase(value);
-	else if (myfs == SEGMENT_USER_GSBASE)
+	} else if (myfs == SEGMENT_USER_GSBASE) {
 		x86_set_user_gsbase(value);
-	else {
+	} else {
 		/* Don't allow user-space to set the bases of any other segment.
 		 * As such, throw an exception indicating a privileged register (which SOME_SEGMENT.base is) */
 		THROW(E_ILLEGAL_INSTRUCTION_REGISTER, 0,
@@ -924,11 +924,11 @@ PRIVATE void FCALL
 setgsbase(uintptr_t value)
 		THROWS(E_ILLEGAL_INSTRUCTION_REGISTER) {
 	u16 mygs = __rdgs() & ~3;
-	if (mygs == SEGMENT_USER_GSBASE)
+	if (mygs == SEGMENT_USER_GSBASE) {
 		x86_set_user_gsbase(value);
-	else if (mygs == SEGMENT_USER_FSBASE)
+	} else if (mygs == SEGMENT_USER_FSBASE) {
 		x86_set_user_fsbase(value);
-	else {
+	} else {
 		/* Don't allow user-space to set the bases of any other segment.
 		 * As such, throw an exception indicating a privileged register (which SOME_SEGMENT.base is) */
 		THROW(E_ILLEGAL_INSTRUCTION_REGISTER, 0,

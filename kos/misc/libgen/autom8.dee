@@ -64,9 +64,9 @@ function builtinSkip2End(parser: Autom8Parser, none) {
 		endTag += 13;
 	if (endTag2 >= 0)
 		endTag2 += 12;
-	if (endTag < 0)
+	if (endTag < 0) {
 		endTag = endTag2;
-	else if (endTag2 >= 0 && endTag > endTag2) {
+	} else if (endTag2 >= 0 && endTag > endTag2) {
 		endTag = endTag2;
 	}
 	if (endTag < 0) {
@@ -222,9 +222,9 @@ function containsUnevenSpaces(l: string): bool {
 			} else if (ch == "[") {
 				/* Special case: Don't re-flow syntax annotations. */
 				local e = l.findmatch("[", "]", i + 1);
-				if (e >= 0)
+				if (e >= 0) {
 					i = e + 1;
-				else {
+				} else {
 					++i;
 				}
 			} else if (ch == "-" && isFirst) {
@@ -278,9 +278,9 @@ function splitWords(l: string): {string...} {
 			} else if (ch == "[") {
 				/* Special case: Don't re-flow syntax annotations. */
 				local e = l.findmatch("[", "]", i + 1);
-				if (e >= 0)
+				if (e >= 0) {
 					i = e + 1;
-				else {
+				} else {
 					++i;
 				}
 			} else if (ch == "-" && isFirst) {
@@ -399,9 +399,9 @@ function reflowBlockComment(lines: {string...}, lineLength: int = -1): {string..
 		}
 		if (commonLineLength !is none) {
 			local lineLen = #l;
-			if (commonLineLength < 0)
+			if (commonLineLength < 0) {
 				commonLineLength = lineLen;
-			else if (commonLineLength != lineLen) {
+			} else if (commonLineLength != lineLen) {
 				commonLineLength = none;
 			}
 		}
@@ -834,9 +834,9 @@ do_line_wise_comment_block:
 					(" " * numLeadingSpaces) +
 					lineWiseCommentBlockPrefix;
 				local commentEnd = text.find("\n", commentStart);
-				if (commentEnd < 0)
+				if (commentEnd < 0) {
 					commentEnd = #text;
-				else {
+				} else {
 					++commentEnd;
 				}
 				local comLine = text[commentStart:commentEnd].rstrip();
@@ -845,9 +845,9 @@ do_line_wise_comment_block:
 					commentLines = none;
 				while (text.startswith(leadingPrefix, commentEnd)) {
 					local eol = text.find("\n", commentEnd);
-					if (eol < 0)
+					if (eol < 0) {
 						eol = #text;
-					else {
+					} else {
 						++eol;
 					}
 					comLine = text[commentEnd+#leadingPrefix:eol];
@@ -921,9 +921,9 @@ do_line_wise_comment_block:
 			local commentLines: {string...} = [];
 			local hasTrailingNewline: bool = false;
 			for (local l: commentBody.splitlines(false)) {
-				if (!commentLines)
+				if (!commentLines) {
 					commentLines.append(l);
-				else {
+				} else {
 					if (hasTrailingNewline)
 						goto done_comment;
 					if (l[:numLeadingTabs] != leadingTabs)

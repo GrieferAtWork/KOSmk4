@@ -269,14 +269,14 @@ __LIBM_LOCAL_FUNC(lgammaf) __ATTR_WUNUSED __ATTR_NONNULL((2)) __IEEE754_FLOAT_TY
 		} else {
 			__r = __LIBM_LOCAL_VALUE(zerof);
 			if (__ix >= __INT32_C(0x3fdda618)) {
+				/* [1.7316,2] */
 				__y = __IEEE754_FLOAT_C(2.0) - __x;
 				__i = 0;
-			} /* [1.7316,2] */
-			else if (__ix >= __INT32_C(0x3F9da620)) {
+			} else if (__ix >= __INT32_C(0x3f9da620)) {
+				/* [1.23,1.73] */
 				__y = __x - __LIBM_LOCAL_VALUE(tcf);
 				__i = 1;
-			} /* [1.23,1.73] */
-			else {
+			} else {
 				__y = __x - __LIBM_LOCAL_VALUE(onef);
 				__i = 2;
 			}

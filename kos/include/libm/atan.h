@@ -96,9 +96,9 @@ __LIBM_LOCAL_FUNC(atanf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	if (__ix >= 0x50800000) { /* if |x| >= 2^34 */
 		if (__LIBM_FLT_UWORD_IS_NAN(__ix))
 			return __x + __x; /* NaN */
-		if (__hx > 0)
+		if (__hx > 0) {
 			return __LIBM_LOCAL_VALUE(atanhif)[3] + __LIBM_LOCAL_VALUE(atanlof)[3];
-		else {
+		} else {
 			return -__LIBM_LOCAL_VALUE(atanhif)[3] - __LIBM_LOCAL_VALUE(atanlof)[3];
 		}
 	}
@@ -143,9 +143,9 @@ __LIBM_LOCAL_FUNC(atanf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	                     __w * (__LIBM_LOCAL_VALUE(aTf)[5] +
 	                            __w * (__LIBM_LOCAL_VALUE(aTf)[7] +
 	                                   __w * __LIBM_LOCAL_VALUE(aTf)[9]))));
-	if (__id < 0)
+	if (__id < 0) {
 		return __x - __x * (__s1 + __s2);
-	else {
+	} else {
 		__z = __LIBM_LOCAL_VALUE(atanhif)[__id] - ((__x * (__s1 + __s2) - __LIBM_LOCAL_VALUE(atanlof)[__id]) - __x);
 		return (__hx < 0) ? -__z : __z;
 	}
@@ -215,9 +215,9 @@ __LIBM_LOCAL_FUNC(atan) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 		if (__ix > 0x7ff00000 ||
 		    (__ix == 0x7ff00000 && (low != 0)))
 			return __x + __x; /* NaN */
-		if (__hx > 0)
+		if (__hx > 0) {
 			return __LIBM_LOCAL_VALUE(atanhi)[3] + __LIBM_LOCAL_VALUE(atanlo)[3];
-		else {
+		} else {
 			return -__LIBM_LOCAL_VALUE(atanhi)[3] - __LIBM_LOCAL_VALUE(atanlo)[3];
 		}
 	}
@@ -262,9 +262,9 @@ __LIBM_LOCAL_FUNC(atan) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	                     __w * (__LIBM_LOCAL_VALUE(aT)[5] +
 	                            __w * (__LIBM_LOCAL_VALUE(aT)[7] +
 	                                   __w * __LIBM_LOCAL_VALUE(aT)[9]))));
-	if (__id < 0)
+	if (__id < 0) {
 		return __x - __x * (__s1 + __s2);
-	else {
+	} else {
 		__z = __LIBM_LOCAL_VALUE(atanhi)[__id] - ((__x * (__s1 + __s2) - __LIBM_LOCAL_VALUE(atanlo)[__id]) - __x);
 		return (__hx < 0) ? -__z : __z;
 	}
@@ -409,9 +409,9 @@ __LIBM_LOCAL_FUNC(atanl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE_
 	__int32_t __k;
 	int __sign;
 	__LIBM_GET_LDOUBLE_EXP(__k, __x);
-	if (__k & 0x8000)
+	if (__k & 0x8000) {
 		__sign = 1;
-	else {
+	} else {
 		__sign = 0;
 	}
 	/* Check for IEEE special cases. */
@@ -421,9 +421,9 @@ __LIBM_LOCAL_FUNC(atanl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE_
 		if (__ieee854_isnanl(__x))
 			return (__x + __x);
 		/* Infinity. */
-		if (__sign)
+		if (__sign) {
 			return -__LIBM_LOCAL_VALUE(atantbll)[83];
-		else {
+		} else {
 			return __LIBM_LOCAL_VALUE(atantbll)[83];
 		}
 	}
@@ -434,9 +434,9 @@ __LIBM_LOCAL_FUNC(atanl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE_
 	}
 	if (__k >= 0x4072) { /* |x| > 2 ** 115 */
 		/* Saturate result to {-,+}pi/2 */
-		if (__sign)
+		if (__sign) {
 			return -__LIBM_LOCAL_VALUE(atantbll)[83];
-		else {
+		} else {
 			return __LIBM_LOCAL_VALUE(atantbll)[83];
 		}
 	}

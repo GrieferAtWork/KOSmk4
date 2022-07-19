@@ -593,21 +593,22 @@ CC find_rparen(char const *pattern_iter, char const *pattern_end) {
 	unsigned int paren_recursion = 0;
 	while (pattern_iter < pattern_end) {
 		char ch = *pattern_iter++;
-		if (ch == '\\' && pattern_iter < pattern_end)
+		if (ch == '\\' && pattern_iter < pattern_end) {
 			++pattern_iter;
-		else if (ch == '(')
+		} else if (ch == '(') {
 			++paren_recursion;
-		else if (ch == ')') {
+		} else if (ch == ')') {
 			if (!paren_recursion)
 				break;
 			--paren_recursion;
 		} else if (ch == '[') {
 			while (pattern_iter < pattern_end) {
 				ch = *pattern_iter++;
-				if (ch == '\\' && pattern_iter < pattern_end)
+				if (ch == '\\' && pattern_iter < pattern_end) {
 					++pattern_iter;
-				else if (ch == ']')
+				} else if (ch == ']') {
 					break;
+				}
 			}
 		}
 	}
@@ -621,9 +622,9 @@ CC find_rparen_escaped(char const *pattern_iter, char const *pattern_end) {
 		char ch = *pattern_iter++;
 		if (ch == '\\' && pattern_iter < pattern_end) {
 			ch = *pattern_iter++;
-			if (ch == '(')
+			if (ch == '(') {
 				++paren_recursion;
-			else if (ch == ')') {
+			} else if (ch == ')') {
 				if (!paren_recursion)
 					break;
 				--paren_recursion;
@@ -631,10 +632,11 @@ CC find_rparen_escaped(char const *pattern_iter, char const *pattern_end) {
 		} else if (ch == '[') {
 			while (pattern_iter < pattern_end) {
 				ch = *pattern_iter++;
-				if (ch == '\\' && pattern_iter < pattern_end)
+				if (ch == '\\' && pattern_iter < pattern_end) {
 					++pattern_iter;
-				else if (ch == ']')
+				} else if (ch == ']') {
 					break;
+				}
 			}
 		}
 	}
@@ -658,10 +660,11 @@ CC find_pipe(char const *pattern_iter, char const *pattern_end,
 				if (data->flags & REGEX_FLAG_ESCAPED_PIPE)
 					goto handle_pipe;
 			} else if (data->flags & REGEX_FLAG_ESCAPED_GROUPS) {
-				if (ch == '(')
+				if (ch == '(') {
 					++paren_recursion;
-				else if (ch == ')')
+				} else if (ch == ')') {
 					--paren_recursion;
+				}
 			}
 		} else if (ch == '|' && !(data->flags & REGEX_FLAG_ESCAPED_PIPE)) {
 handle_pipe:
@@ -671,17 +674,18 @@ handle_pipe:
 			if (ch == '\r' && *pattern_iter == '\n')
 				++pattern_iter;
 			goto handle_pipe;
-		} else if (ch == '(' && !(data->flags & REGEX_FLAG_ESCAPED_GROUPS))
+		} else if (ch == '(' && !(data->flags & REGEX_FLAG_ESCAPED_GROUPS)) {
 			++paren_recursion;
-		else if (ch == ')' && !(data->flags & REGEX_FLAG_ESCAPED_GROUPS))
+		} else if (ch == ')' && !(data->flags & REGEX_FLAG_ESCAPED_GROUPS)) {
 			--paren_recursion;
-		else if (ch == '[') {
+		} else if (ch == '[') {
 			while (pattern_iter < pattern_end) {
 				ch = *pattern_iter++;
-				if (ch == '\\' && pattern_iter < pattern_end)
+				if (ch == '\\' && pattern_iter < pattern_end) {
 					++pattern_iter;
-				else if (ch == ']')
+				} else if (ch == ']') {
 					break;
+				}
 			}
 		}
 	}
@@ -1055,9 +1059,9 @@ err_lookahead_must_be_nonzero:
 					default:
 						return REGEX_ERROR_UNKNOWN_FLAG;
 					}
-					if (should_invert)
+					if (should_invert) {
 						data->flags &= ~flag_value;
-					else {
+					} else {
 						data->flags |= flag_value;
 					}
 				}

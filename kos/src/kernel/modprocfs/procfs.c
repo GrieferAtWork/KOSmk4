@@ -108,11 +108,11 @@ ProcFS_ParseBool(USER CHECKED void const *buf, size_t bufsize)
 	if (bufsize != 1)
 		THROW(E_BUFFER_TOO_SMALL, 1, bufsize);
 	mode = ATOMIC_READ(*(USER CHECKED char *)buf);
-	if (mode == '0')
+	if (mode == '0') {
 		result = false;
-	else if (mode == '1')
+	} else if (mode == '1') {
 		result = true;
-	else {
+	} else {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER,
 		      (uintptr_t)(mode - '0')); /* This may underflow, but that's user-space problem! */

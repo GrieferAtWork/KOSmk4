@@ -1174,9 +1174,9 @@ handle_mfile_polltest(struct mfile *__restrict self,
 	poll_mode_t result;
 	struct mfile_stream_ops const *stream;
 	stream = self->mf_ops->mo_stream;
-	if (stream && stream->mso_polltest)
+	if (stream && stream->mso_polltest) {
 		result = (*stream->mso_polltest)(self, what);
-	else {
+	} else {
 		result = what & (POLLINMASK | POLLOUTMASK);
 		if (self->mf_flags & MFILE_F_NOUSRIO) {
 			result = 0;

@@ -95,9 +95,9 @@ function printMap(unmaskedSignals, bitsof_sigset, bits_per_word) {
 	local i, v;
 	import util;
 	for (i, v: util.enumerate(wordValues)) {
-		if ((i % 4) == 0)
+		if ((i % 4) == 0) {
 			print("\t"),;
-		else {
+		} else {
 			print(" "),;
 		}
 		print("SIGSET_WORD_C(", v.hex(), ")"),;

@@ -7,6 +7,10 @@
 		"**/__ice__": true
 	},
 	"C_Cpp.autoAddFileAssociations": false,
+	"C_Cpp.debugShortcut": false,
+	"C_Cpp.formatting": "clangFormat",
+	"C_Cpp.preferredPathSeparator": "Forward Slash",
+	"C_Cpp.workspaceSymbols": "Just My Code",
 	"files.associations": {
 		"*.c" : "cpp",
 		"*.ctest" : "cpp",

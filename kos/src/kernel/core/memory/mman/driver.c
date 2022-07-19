@@ -3103,9 +3103,9 @@ NOTHROW(FCALL driver_get_initfini_array)(struct driver *__restrict self,
 	}
 	if (result->difv_siz) {
 		/* Make sure that the array is in-bounds of the driver! */
-		if unlikely(!result->difv_vec)
+		if unlikely(!result->difv_vec) {
 			result->difv_siz = 0;
-		else {
+		} else {
 			if unlikely(!driver_ismapped(self, (void *)result->difv_vec,
 			                             result->difv_siz * sizeof(driver_initfini_t))) {
 				printk(KERN_WARNING "[mod][%s] Driver %s-array at %p-%p is not mapped in of %p-%p (loadaddr: %p)\n",

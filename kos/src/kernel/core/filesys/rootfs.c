@@ -121,9 +121,9 @@ PRIVATE ATTR_FREETEXT WUNUSED REF struct blkdev *
 NOTHROW(KCALL find_unique_blkdev)(unsigned int criteria) {
 	struct blkdev *result;
 	fsuper_nodes_read(&devfs);
-	if unlikely(!devfs.fs_nodes)
+	if unlikely(!devfs.fs_nodes) {
 		result = NULL;
-	else {
+	} else {
 		do {
 			result = find_unique_blkdev_intree(devfs.fs_nodes, criteria);
 			if (result == (struct blkdev *)-1)

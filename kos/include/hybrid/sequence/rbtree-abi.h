@@ -596,14 +596,14 @@ RBTREE_DEFINE_FUNCTION(__PRIVATE, __ATTR_NONNULL((1)),
 		++cur_black_nodes;
 	}
 	RBTREE_ASSERT(cur_black_nodes < exp_black_nodes);
-	if (RBTREE_NODE_NOT_ISNULL(lhs))
+	if (RBTREE_NODE_NOT_ISNULL(lhs)) {
 		(RBTREE(_intern_assert)(lhs, cur_black_nodes, exp_black_nodes RBTREE_SLOT__ARGS));
-	else {
+	} else {
 		RBTREE_ASSERT(cur_black_nodes == exp_black_nodes - 1);
 	}
-	if (RBTREE_NODE_NOT_ISNULL(rhs))
+	if (RBTREE_NODE_NOT_ISNULL(rhs)) {
 		(RBTREE(_intern_assert)(rhs, cur_black_nodes, exp_black_nodes RBTREE_SLOT__ARGS));
-	else {
+	} else {
 		RBTREE_ASSERT(cur_black_nodes == exp_black_nodes - 1);
 	}
 }
@@ -645,9 +645,9 @@ RBTREE_DEFINE_FUNCTION(__LOCAL, __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)), 
 	if (RBTREE_NODE_ISNULL(parent))
 		return RBTREE_NULL;
 	sibling = RBTREE_GETLHS(parent);
-	if (RBTREE_NODE_EQ(sibling, self))
+	if (RBTREE_NODE_EQ(sibling, self)) {
 		sibling = RBTREE_GETRHS(parent);
-	else {
+	} else {
 		RBTREE_ASSERT(RBTREE_NODE_EQ(self, RBTREE_GETRHS(parent)));
 	}
 	return sibling;

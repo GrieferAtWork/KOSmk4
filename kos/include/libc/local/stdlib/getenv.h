@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x478c4b2e */
+/* HASH CRC-32:0xd8fece23 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,9 +69,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getenv))(char const *__varname) {
 	if __unlikely(!__varname)
 		return __NULLPTR;
 	___envp = __LOCAL_environ;
-	if __unlikely(!___envp)
+	if __unlikely(!___envp) {
 		__result = __NULLPTR;
-	else {
+	} else {
 		__SIZE_TYPE__ __namelen = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__varname);
 #ifdef __OPTIMIZE_SIZE__
 		for (; (__result = *___envp) != __NULLPTR; ++___envp) {

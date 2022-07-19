@@ -230,9 +230,9 @@ NOTHROW(FCALL GDB_PrintRegisterName)(uintptr_t regno,
 	if (result >= 0) {
 		ssize_t temp;
 		temp = (*printer)(arg, name, strlen(name));
-		if (temp < 0)
+		if (temp < 0) {
 			result = temp;
-		else {
+		} else {
 			result += temp;
 		}
 	}

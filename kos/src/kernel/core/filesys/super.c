@@ -522,9 +522,9 @@ NOTHROW(LOCKOP_CC fsuper_clearnodes_postlop)(Tobpostlockop(fsuper) *__restrict s
 
 	/* Finalize deletion of the superblock by deleting the mfile backing its root directory. */
 	ops = fsuper_getops(me);
-	if (ops->so_delete)
+	if (ops->so_delete) {
 		(*ops->so_delete)(me);
-	else {
+	} else {
 		mfile_delete_impl(&me->fs_root);
 	}
 }

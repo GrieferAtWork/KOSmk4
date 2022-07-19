@@ -60,9 +60,9 @@ for (local l: File.stdin) {
 					.replace("ymm", "xmm")
 					.replace("EVEX.256", "EVEX.nnn")
 				);
-				if (newl != l_comment && newl == xmm_comment)
+				if (newl != l_comment && newl == xmm_comment) {
 					has_ymm_alias = i;
-				else {
+				} else {
 					newl = unifyMemoryAddend(l_comment
 						.replace("ZMM", "XMM")
 						.replace("zmm", "xmm")

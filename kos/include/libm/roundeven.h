@@ -70,10 +70,9 @@ __LIBM_LOCAL_FUNC(roundevenf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 			__i0 &= ~__i;
 		}
 	} else {
-		if (__j0 == (IEEE754_FLOAT_MAXEXP - IEEE754_FLOAT_BIAS))
-			/* Inf or NaN.  */
-			return __x + __x;
-		else {
+		if (__j0 == (IEEE754_FLOAT_MAXEXP - IEEE754_FLOAT_BIAS)) {
+			return __x + __x; /* Inf or NaN.  */
+		} else {
 			return __x;
 		}
 	}
@@ -132,9 +131,9 @@ __LIBM_LOCAL_FUNC(roundeven) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 			__i1 = 0;
 		}
 	} else if (__j0 > 51) {
-		if (__j0 == (IEEE754_DOUBLE_MAXEXP - IEEE754_DOUBLE_BIAS))
+		if (__j0 == (IEEE754_DOUBLE_MAXEXP - IEEE754_DOUBLE_BIAS)) {
 			return __x + __x; /* Inf or NaN */
-		else {
+		} else {
 			return __x; /* x is integral */
 		}
 	} else {
@@ -202,10 +201,9 @@ __LIBM_LOCAL_FUNC(roundevenl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_
 			__i1 = 0;
 		}
 	} else if (__j0 > 62) {
-		if (__j0 == (IEEE854_LONG_DOUBLE_MAXEXP - IEEE854_LONG_DOUBLE_BIAS))
-			/* Inf or NaN.  */
-			return __x + __x;
-		else {
+		if (__j0 == (IEEE854_LONG_DOUBLE_MAXEXP - IEEE854_LONG_DOUBLE_BIAS)) {
+			return __x + __x; /* Inf or NaN.  */
+		} else {
 			return __x;
 		}
 	} else {

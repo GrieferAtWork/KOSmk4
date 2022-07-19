@@ -385,18 +385,18 @@ __nextfmt:
 #endif /* !__NO_PRINTF_POSITIONAL */
 
 	case 'h':
-		if (*__FORMAT_FORMAT != 'h')
+		if (*__FORMAT_FORMAT != 'h') {
 			__length = __PRINTF_LENGTH_H;
-		else {
+		} else {
 			++__FORMAT_FORMAT;
 			__length = __PRINTF_LENGTH_HH;
 		}
 		goto __nextfmt;
 
 	case 'l':
-		if (*__FORMAT_FORMAT != 'l')
+		if (*__FORMAT_FORMAT != 'l') {
 			__length = __PRINTF_LENGTH_l;
-		else {
+		} else {
 			++__FORMAT_FORMAT;
 			__length = __PRINTF_LENGTH_LL;
 		}
@@ -416,9 +416,9 @@ __nextfmt:
 
 	case 'I':
 		__ch = *__FORMAT_FORMAT++;
-		if (__ch == '8')
+		if (__ch == '8') {
 			__length = __PRINTF_LENGTH_I8;
-		else if (__ch == '1' && *__FORMAT_FORMAT == '6') {
+		} else if (__ch == '1' && *__FORMAT_FORMAT == '6') {
 			++__FORMAT_FORMAT;
 			__length = __PRINTF_LENGTH_I16;
 		} else if (__ch == '3' && *__FORMAT_FORMAT == '2') {
@@ -588,12 +588,13 @@ __nextfmt:
 		{
 			__CHAR_TYPE __sign[3];
 			__CHAR_TYPE *__dst = __sign;
-			if (__is_neg)
+			if (__is_neg) {
 				*__dst++ = '-';
-			else if (__flags & __PRINTF_F_SIGN)
+			} else if (__flags & __PRINTF_F_SIGN) {
 				*__dst++ = '+';
-			else if (__flags & __PRINTF_F_SPACE)
+			} else if (__flags & __PRINTF_F_SPACE) {
 				*__dst++ = ' ';
+			}
 			if ((__flags & __PRINTF_F_PREFIX) && __numsys != 10) {
 				if (__numsys == 16) {
 					*__dst++ = '0';
@@ -748,11 +749,11 @@ __do_wchar:;
 				__format_data.__fd_arg = __FORMAT_ARG;
 				if __unlikely(!__string)
 					__string = (__CHAR_TYPE *)__null_str32;
-				if (__flags & __PRINTF_F_FIXBUF)
+				if (__flags & __PRINTF_F_FIXBUF) {
 					__string_length = __precision;
-				else if (__flags & __PRINTF_F_HASPREC)
+				} else if (__flags & __PRINTF_F_HASPREC) {
 					__string_length = __libc_c32nlen((__CHAR32_TYPE__ const *)__string, __precision);
-				else {
+				} else {
 					__string_length = __libc_c32len((__CHAR32_TYPE__ const *)__string);
 				}
 				__string_width = __string_length;
@@ -1057,11 +1058,11 @@ __check_string_error_and_print_tail:
 		__i = 1;
 		while ((__ch = *__FORMAT_FORMAT) != 0) {
 			++__FORMAT_FORMAT;
-			if (__ch == '\033' && *__FORMAT_FORMAT == '[')
+			if (__ch == '\033' && *__FORMAT_FORMAT == '[') {
 				++__FORMAT_FORMAT; /* Don't count ANSI escape sequences! */
-			else if (__ch == '[')
+			} else if (__ch == '[') {
 				++__i;
-			else if (__ch == ']') {
+			} else if (__ch == ']') {
 				if (!--__i)
 					break;
 			} else if (__ch == ':' && __i == 1 && !__xformat_arg) {
@@ -1663,12 +1664,13 @@ __do_special_float:
 				__result += __temp;
 			}
 			if (__total_len == 4) {
-				if (__is_negative)
+				if (__is_negative) {
 					__buf[0] = '-';
-				else if (__flags & __PRINTF_F_SIGN)
+				} else if (__flags & __PRINTF_F_SIGN) {
 					__buf[0] = '+';
-				else
+				} else {
 					__buf[0] = ' ';
+				}
 				__temp = (*__FORMAT_PRINTER)(__FORMAT_ARG, __buf, 4);
 			} else {
 				__temp = (*__FORMAT_PRINTER)(__FORMAT_ARG, __buf + 1, 3);
@@ -1797,11 +1799,11 @@ __do_special_float:
 			__result += __temp;
 		} else {
 __do_float_normal_width:
-			if (__is_negative)
+			if (__is_negative) {
 				__buf[--__len] = '-';
-			else if (__flags & __PRINTF_F_SIGN)
+			} else if (__flags & __PRINTF_F_SIGN) {
 				__buf[--__len] = '+';
-			else if (__flags & __PRINTF_F_SPACE) {
+			} else if (__flags & __PRINTF_F_SPACE) {
 				__buf[--__len] = ' ';
 			}
 		}
@@ -2094,17 +2096,17 @@ __again_posscan2_infmt:
 						}	break;
 
 						case 'h':
-							if (*__iter != 'h')
+							if (*__iter != 'h') {
 								__type_length = __PRINTF_LENGTH_H;
-							else {
+							} else {
 								++__iter;
 								__type_length = __PRINTF_LENGTH_HH;
 							}
 							goto __again_posscan2_infmt;
 						case 'l':
-							if (*__iter != 'l')
+							if (*__iter != 'l') {
 								__type_length = __PRINTF_LENGTH_l;
-							else {
+							} else {
 								++__iter;
 								__type_length = __PRINTF_LENGTH_LL;
 							}
@@ -2123,9 +2125,9 @@ __again_posscan2_infmt:
 
 						case 'I':
 							__ch = *__iter++;
-							if (__ch == '8')
+							if (__ch == '8') {
 								__type_length = __PRINTF_LENGTH_I8;
-							else if (__ch == '1' && *__iter == '6') {
+							} else if (__ch == '1' && *__iter == '6') {
 								++__iter;
 								__type_length = __PRINTF_LENGTH_I16;
 							} else if (__ch == '3' && *__iter == '2') {

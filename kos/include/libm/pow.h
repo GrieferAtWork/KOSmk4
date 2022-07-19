@@ -131,9 +131,9 @@ __LIBM_LOCAL_FUNC(powf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	/* x|y==NaN return NaN unless x==1 then return 1 */
 	if (__LIBM_FLT_UWORD_IS_NAN(__ix) ||
 	    __LIBM_FLT_UWORD_IS_NAN(__iy)) {
-		if (__ix == 0x3f800000)
+		if (__ix == 0x3f800000) {
 			return __LIBM_LOCAL_VALUE(onef);
-		else {
+		} else {
 #if defined(__NANF) && defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
 			return __NANF;
 #elif defined(__NAN) && defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
@@ -152,9 +152,9 @@ __LIBM_LOCAL_FUNC(powf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	 * yisint = 2   ... y is an even int */
 	__yisint = 0;
 	if (__hx < 0) {
-		if (__iy >= 0x4b800000)
+		if (__iy >= 0x4b800000) {
 			__yisint = 2; /* even integer y */
-		else if (__iy >= 0x3f800000) {
+		} else if (__iy >= 0x3f800000) {
 			__k = (__iy >> 23) - 0x7f; /* exponent */
 			__j = __iy >> (23 - __k);
 			if ((__j << (23 - __k)) == __iy)
@@ -164,18 +164,18 @@ __LIBM_LOCAL_FUNC(powf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 
 	/* special value of y */
 	if (__LIBM_FLT_UWORD_IS_INFINITE(__iy)) { /* y is +-inf */
-		if (__ix == 0x3f800000)
+		if (__ix == 0x3f800000) {
 			return __LIBM_LOCAL_VALUE(onef); /* +-1**+-inf = 1 */
-		else if (__ix > 0x3f800000) /* (|x|>1)**+-inf = inf,0 */
+		} else if (__ix > 0x3f800000) { /* (|x|>1)**+-inf = inf,0 */
 			return (__hy >= 0) ? __y : __LIBM_LOCAL_VALUE(zerof);
-		else { /* (|x| < 1)**-,+inf = inf,0 */
+		} else { /* (|x| < 1)**-,+inf = inf,0 */
 			return (__hy < 0) ? -__y : __LIBM_LOCAL_VALUE(zerof);
 		}
 	}
 	if (__iy == 0x3f800000) { /* y is  +-1 */
-		if (__hy < 0)
+		if (__hy < 0) {
 			return __LIBM_LOCAL_VALUE(onef) / __x;
-		else {
+		} else {
 			return __x;
 		}
 	}
@@ -241,11 +241,11 @@ __LIBM_LOCAL_FUNC(powf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 		__j = __ix & 0x007fffff;
 		/* determine interval */
 		__ix = __j | 0x3f800000; /* normalize ix */
-		if (__j <= 0x1cc471)
+		if (__j <= 0x1cc471) {
 			__k = 0; /* |x| < sqrt(3/2) */
-		else if (__j < 0x5db3d7)
+		} else if (__j < 0x5db3d7) {
 			__k = 1; /* |x| < sqrt(3)   */
-		else {
+		} else {
 			__k = 0;
 			__n += 1;
 			__ix -= 0x00800000;
@@ -309,16 +309,16 @@ __LIBM_LOCAL_FUNC(powf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	__LIBM_GET_FLOAT_WORD(__j, __z);
 	__i = __j & 0x7fffffff;
 	if (__j > 0) {
-		if (__i > __LIBM_FLT_UWORD_EXP_MAX)
+		if (__i > __LIBM_FLT_UWORD_EXP_MAX) {
 			return __s * __LIBM_LOCAL_VALUE(hugef) * __LIBM_LOCAL_VALUE(hugef); /* overflow */
-		else if (__i == __LIBM_FLT_UWORD_EXP_MAX) {
+		} else if (__i == __LIBM_FLT_UWORD_EXP_MAX) {
 			if (__p_l + __LIBM_LOCAL_VALUE(ovtf) > __z - __p_h)
 				return __s * __LIBM_LOCAL_VALUE(hugef) * __LIBM_LOCAL_VALUE(hugef); /* overflow */
 		}
 	} else {
-		if (__i > __LIBM_FLT_UWORD_EXP_MIN)
+		if (__i > __LIBM_FLT_UWORD_EXP_MIN) {
 			return __s * __LIBM_LOCAL_VALUE(tinyf) * __LIBM_LOCAL_VALUE(tinyf); /* underflow */
-		else if (__i == __LIBM_FLT_UWORD_EXP_MIN) {
+		} else if (__i == __LIBM_FLT_UWORD_EXP_MIN) {
 			if (__p_l <= __z - __p_h)
 				return __s * __LIBM_LOCAL_VALUE(tinyf) * __LIBM_LOCAL_VALUE(tinyf); /* underflow */
 		}
@@ -352,9 +352,9 @@ __LIBM_LOCAL_FUNC(powf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	__z  = __LIBM_LOCAL_VALUE(onef) - (__r - __z);
 	__LIBM_GET_FLOAT_WORD(__j, __z);
 	__j += (__n << 23);
-	if ((__j >> 23) <= 0)
+	if ((__j >> 23) <= 0) {
 		__z = __ieee754_scalbnf(__z, (int)__n); /* subnormal output */
-	else {
+	} else {
 		__LIBM_SET_FLOAT_WORD(__z, __j);
 	}
 	return __s * __z;
@@ -448,9 +448,9 @@ __LIBM_LOCAL_FUNC(pow) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	/* x|y==NaN return NaN unless x==1 then return 1 */
 	if (__ix > 0x7ff00000 || ((__ix == 0x7ff00000) && (__lx != 0)) ||
 	    __iy > 0x7ff00000 || ((__iy == 0x7ff00000) && (__ly != 0))) {
-		if (((__ix - 0x3ff00000) | __lx) == 0)
+		if (((__ix - 0x3ff00000) | __lx) == 0) {
 			return __LIBM_LOCAL_VALUE(one);
-		else {
+		} else {
 #if defined(__NAN) && defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__)
 			return __NAN;
 #elif defined(__NANF) && defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
@@ -469,9 +469,9 @@ __LIBM_LOCAL_FUNC(pow) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	 * yisint = 2    ... y is an even int */
 	__yisint = 0;
 	if (__hx < 0) {
-		if (__iy >= 0x43400000)
+		if (__iy >= 0x43400000) {
 			__yisint = 2; /* even integer y */
-		else if (__iy >= 0x3ff00000) {
+		} else if (__iy >= 0x3ff00000) {
 			__k = (__iy >> 20) - 0x3ff; /* exponent */
 			if (__k > 20) {
 				__j = __ly >> (52 - __k);
@@ -488,19 +488,19 @@ __LIBM_LOCAL_FUNC(pow) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	/* special value of y */
 	if (__ly == 0) {
 		if (__iy == 0x7ff00000) { /* y is +-inf */
-			if (((__ix - 0x3ff00000) | __lx) == 0)
+			if (((__ix - 0x3ff00000) | __lx) == 0) {
 				return __LIBM_LOCAL_VALUE(one); /* +-1**+-inf = 1 */
-			else if (__ix >= 0x3ff00000) /* (|x|>1)**+-inf = inf,0 */
+			} else if (__ix >= 0x3ff00000) { /* (|x|>1)**+-inf = inf,0 */
 				return (__hy >= 0) ? __y : __LIBM_LOCAL_VALUE(zero);
-			else {
+			} else {
 				/* (|x| < 1)**-,+inf = inf,0 */
 				return (__hy < 0) ? -__y : __LIBM_LOCAL_VALUE(zero);
 			}
 		}
 		if (__iy == 0x3ff00000) { /* y is  +-1 */
-			if (__hy < 0)
+			if (__hy < 0) {
 				return __LIBM_LOCAL_VALUE(one) / __x;
-			else {
+			} else {
 				return __x;
 			}
 		}
@@ -571,11 +571,11 @@ __LIBM_LOCAL_FUNC(pow) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 		__j = __ix & 0x000fffff;
 		/* determine interval */
 		__ix = __j | 0x3ff00000; /* normalize ix */
-		if (__j <= 0x3988E)
+		if (__j <= 0x3988E) {
 			__k = 0; /* |x| < sqrt(3/2) */
-		else if (__j < 0xBB67A)
+		} else if (__j < 0xBB67A) {
 			__k = 1; /* |x| < sqrt(3)   */
-		else {
+		} else {
 			__k = 0;
 			__n += 1;
 			__ix -= 0x00100000;
@@ -636,17 +636,17 @@ __LIBM_LOCAL_FUNC(pow) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	__p_h = __y1 * __t1;
 	__z   = __p_l + __p_h;
 	__LIBM_EXTRACT_WORDS(__j, __i, __z);
-	if (__j >= 0x40900000) {               /* z >= 1024 */
-		if (((__j - 0x40900000) | __i) != 0) /* if z > 1024 */
+	if (__j >= 0x40900000) {                   /* z >= 1024 */
+		if (((__j - 0x40900000) | __i) != 0) { /* if z > 1024 */
 			return __s * __LIBM_LOCAL_VALUE(huge) * __LIBM_LOCAL_VALUE(huge); /* overflow */
-		else {
+		} else {
 			if (__p_l + __LIBM_LOCAL_VALUE(ovt) > __z - __p_h)
 				return __s * __LIBM_LOCAL_VALUE(huge) * __LIBM_LOCAL_VALUE(huge); /* overflow */
 		}
 	} else if ((__j & 0x7fffffff) >= 0x4090cc00) { /* z <= -1075 */
-		if (((__j - 0xc090cc00) | __i) != 0)         /* z < -1075 */
+		if (((__j - 0xc090cc00) | __i) != 0) {     /* z < -1075 */
 			return __s * __LIBM_LOCAL_VALUE(tiny) * __LIBM_LOCAL_VALUE(tiny); /* underflow */
-		else {
+		} else {
 			if (__p_l <= __z - __p_h)
 				return __s * __LIBM_LOCAL_VALUE(tiny) * __LIBM_LOCAL_VALUE(tiny); /* underflow */
 		}
@@ -681,9 +681,9 @@ __LIBM_LOCAL_FUNC(pow) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	__z  = __LIBM_LOCAL_VALUE(one) - (__r - __z);
 	__LIBM_GET_HIGH_WORD(__j, __z);
 	__j += (__n << 20);
-	if ((__j >> 20) <= 0)
+	if ((__j >> 20) <= 0) {
 		__z = __ieee754_scalbn(__z, (int)__n); /* subnormal output */
-	else {
+	} else {
 		__LIBM_SET_HIGH_WORD(__z, __j);
 	}
 	return __s * __z;

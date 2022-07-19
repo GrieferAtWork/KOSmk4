@@ -326,9 +326,9 @@ file_buffer_realloc_dynscale(FILE *__restrict self,
                              size_t *__restrict pnew_size,
                              pos64_t fpos) {
 	size_t lower_limit;
-	if (fpos >= (pos64_t)IOBUF_MAX * IOBUF_FACTOR)
+	if (fpos >= (pos64_t)IOBUF_MAX * IOBUF_FACTOR) {
 		lower_limit = IOBUF_MAX;
-	else {
+	} else {
 		lower_limit = (size_t)(fpos / IOBUF_FACTOR);
 	}
 	if (*pnew_size < lower_limit)
@@ -347,11 +347,11 @@ file_setmode(FILE *__restrict self, void *buf, unsigned int mode, size_t size) {
 	if unlikely(mode == 0x0004)
 		mode = _IONBF;
 	/* Translate buffer mode into file flags. */
-	if (mode == _IONBF)
+	if (mode == _IONBF) {
 		mode = IO_NODYNSCALE;
-	else if (mode == _IOFBF)
+	} else if (mode == _IOFBF) {
 		mode = 0;
-	else {
+	} else {
 		mode = IO_LNBUF;
 	}
 	/* Set new file flags. */
@@ -861,9 +861,9 @@ read_through:
 		/* Make  use  of   the  current  file-offset   to  dynamically  increase   the
 		 * max  buffer  size,  such  that  we  try  to  keep  said  max  buffer   size
 		 * capped around `ftell() / IOBUF_FACTOR' (though still cap it with its limit) */
-		if (next_data >= (pos64_t)IOBUF_MAX * IOBUF_FACTOR)
+		if (next_data >= (pos64_t)IOBUF_MAX * IOBUF_FACTOR) {
 			new_bufsize = IOBUF_MAX;
-		else {
+		} else {
 			new_bufsize = (size_t)(next_data / IOBUF_FACTOR);
 		}
 		if (new_bufsize > self->if_bufsiz) {
@@ -986,9 +986,9 @@ again:
 
 		/* Update the file pointer. */
 		self->if_ptr += bufavail;
-		if (self->if_cnt >= bufavail)
+		if (self->if_cnt >= bufavail) {
 			self->if_cnt -= bufavail;
-		else {
+		} else {
 			self->if_cnt = 0;
 		}
 
@@ -1147,9 +1147,9 @@ file_seek(FILE *__restrict self, off64_t off, int whence) {
 			self->if_cnt = 0;
 		} else {
 			size_t skipsz = (size_t)(new_pos - self->if_ptr);
-			if (self->if_cnt >= skipsz)
+			if (self->if_cnt >= skipsz) {
 				self->if_cnt -= skipsz;
-			else {
+			} else {
 				self->if_cnt = 0;
 			}
 		}
@@ -1291,9 +1291,9 @@ read_through:
 	} else {
 		if (!(self->if_flag & (IO_NODYNSCALE | IO_READING))) {
 			/* Upscale the buffer. */
-			if (next_data >= (pos64_t)IOBUF_MAX * IOBUF_FACTOR)
+			if (next_data >= (pos64_t)IOBUF_MAX * IOBUF_FACTOR) {
 				new_bufsize = IOBUF_MAX;
-			else {
+			} else {
 				new_bufsize = (size_t)(next_data / IOBUF_FACTOR);
 				if (new_bufsize < IOBUF_MIN)
 					new_bufsize = IOBUF_MIN;
@@ -3271,9 +3271,9 @@ NOTHROW_NCX(LIBCCALL libc_funopen2)(void const *cookie,
 #else /* __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__ */
 	FILE *result;
 	struct funopen2_32_holder *holder;
-	if (!seekfn)
+	if (!seekfn) {
 		result = fp_funopen(cookie, readfn, writefn, NULL, flushfn, closefn);
-	else {
+	} else {
 		/* Need a custom wrapper for `seekfn'! */
 		holder = (struct funopen2_32_holder *)malloc(sizeof(struct funopen2_32_holder));
 		if unlikely(!holder)

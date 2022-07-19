@@ -1927,9 +1927,9 @@ send_empty:
 			GDB_DecodeHex(i, i, needle_length);
 			if (!GDB_FindMemory(GDB_CurrentThread_general.ts_thread,
 			                    haystack, haystack_length,
-			                    i, needle_length, &addr))
+			                    i, needle_length, &addr)) {
 				*o++ = '0';
-			else {
+			} else {
 				*o++ = '1';
 				*o++ = ',';
 				o += sprintf(o, "%" PRIxPTR, (uintptr_t)addr);
@@ -1989,9 +1989,9 @@ send_empty:
 				if unlikely(*annex != 0)
 					ERROR(err_qXfer_syntax);
 				proc = GDBThread_DoLookupPID(pid);
-				if unlikely(!proc)
+				if unlikely(!proc) {
 					error = -ESRCH;
-				else {
+				} else {
 					error = GDBInfo_PrintThreadExecFile(&GDB_OffsetAndLengthPrinter,
 					                                    &dst, proc, false);
 					decref_unlikely(proc);
@@ -2195,17 +2195,17 @@ do_return_attached_everything:
 					nameLen = (size_t)(nameEnd - i);
 					if (nameEnd[-1] == '+') {
 						--nameLen;
-						if (ISNAME("multiprocess"))
+						if (ISNAME("multiprocess")) {
 							ATOMIC_OR(GDBServer_Features, GDB_SERVER_FEATURE_MULTIPROCESS);
-						else if (ISNAME("swbreak"))
+						} else if (ISNAME("swbreak")) {
 							ATOMIC_OR(GDBRemote_Features, GDB_REMOTE_FEATURE_SWBREAK);
-						else if (ISNAME("hwbreak"))
+						} else if (ISNAME("hwbreak")) {
 							ATOMIC_OR(GDBRemote_Features, GDB_REMOTE_FEATURE_HWBREAK);
-						else if (ISNAME("fork-events"))
+						} else if (ISNAME("fork-events")) {
 							ATOMIC_OR(GDBRemote_Features, GDB_REMOTE_FEATURE_FORKEVENTS);
-						else if (ISNAME("vfork-events"))
+						} else if (ISNAME("vfork-events")) {
 							ATOMIC_OR(GDBRemote_Features, GDB_REMOTE_FEATURE_VFORKEVENTS);
-						else if (ISNAME("exec-events")) {
+						} else if (ISNAME("exec-events")) {
 							ATOMIC_OR(GDBRemote_Features, GDB_REMOTE_FEATURE_EXECEVENTS);
 						}
 					}

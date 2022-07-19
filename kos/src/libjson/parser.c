@@ -1727,11 +1727,11 @@ NOTHROW_NCX(CC libjson_parser_getbool)(struct json_parser *__restrict self,
                                        bool *__restrict presult) {
 	char const *initial = self->jp_pos;
 	int tok = libjson_parser_yield(self);
-	if (tok == JSON_PARSER_TRUE)
+	if (tok == JSON_PARSER_TRUE) {
 		*presult = true;
-	else if (tok == JSON_PARSER_FALSE)
+	} else if (tok == JSON_PARSER_FALSE) {
 		*presult = false;
-	else {
+	} else {
 		if (tok < 0)
 			return tok; /* JSON_ERROR_SYNTAX */
 		self->jp_pos = initial;
@@ -1750,9 +1750,9 @@ INTERN NONNULL((1)) int
 NOTHROW_NCX(CC libjson_parser_getnull)(struct json_parser *__restrict self) {
 	char const *initial = self->jp_pos;
 	int tok = libjson_parser_yield(self);
-	if (tok == JSON_PARSER_NULL)
-		;
-	else {
+	if (tok == JSON_PARSER_NULL) {
+		/* ... */
+	} else {
 		if (tok < 0)
 			return tok; /* JSON_ERROR_SYNTAX */
 		self->jp_pos = initial;

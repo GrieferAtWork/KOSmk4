@@ -694,7 +694,7 @@ NOTHROW(KCALL kmalloc_traceback)(void *ptr, /*out*/ void **tb, size_t buflen,
 /* Print a traceback for `ptr' to the given `printer'.
  * WARNING: Don't kfree(ptr) while this function is running! */
 PUBLIC NOBLOCK ssize_t KCALL
-kmalloc_printtrace(void *ptr, __pformatprinter printer, void *arg) {
+kmalloc_printtrace(void *ptr, pformatprinter printer, void *arg) {
 	ssize_t result = 0;
 	struct trace_node *node;
 	lock_acquire();

@@ -65,9 +65,9 @@ locals_format_printer(void *UNUSED(format_arg),
                       pformatprinter printer, void *arg,
                       unsigned int format_option) {
 	char const *format;
-	if (DEBUGINFO_PRINT_FORMAT_ISSUFFIX(format_option))
+	if (DEBUGINFO_PRINT_FORMAT_ISSUFFIX(format_option)) {
 		format = AC_DEFATTR;
-	else {
+	} else {
 		switch (format_option) {
 
 		case DEBUGINFO_PRINT_FORMAT_KEYWORD_PREFIX:  /* Prefix for `struct', `class', `union', `enum' */

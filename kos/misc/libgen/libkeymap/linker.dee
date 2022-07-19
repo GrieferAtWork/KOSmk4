@@ -277,11 +277,11 @@ function linkKeymap(fp: File, defs: {int: {int : string}}) {
 		if (#s == 1) {
 			local ch = s.first.ord();
 			if (firstStep) {
-				if (ch > 0xff)
+				if (ch > 0xff) {
 					setEncoding(KMP_ENCODING_UTF8);
-				else if (num_mappings_latin1 > num_mappings_nonlatin1)
+				} else if (num_mappings_latin1 > num_mappings_nonlatin1) {
 					setEncoding(KMP_ENCODING_LATIN1);
-				else {
+				} else {
 					setEncoding(KMP_ENCODING_UTF8);
 				}
 			} else {

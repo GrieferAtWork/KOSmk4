@@ -1965,9 +1965,9 @@ NOTHROW_NCX(CC IRREGS_NAME(libcpu_setreg_irregs))(LIBCPUSTATE_IRREGS_STRUCT_TYPE
 #ifdef __x86_64__
 		irregs_setuserpsp(self, value);
 #else /* __x86_64__ */
-		if (irregs_isuser(self))
+		if (irregs_isuser(self)) {
 			irregs_setuserpsp(self, value);
-		else {
+		} else {
 			struct irregs_kernel *new_irregs;
 			new_irregs = (struct irregs_kernel *)(value - SIZEOF_IRREGS32_KERNEL);
 			memcpy(new_irregs, self, SIZEOF_IRREGS32_KERNEL);

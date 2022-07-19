@@ -405,9 +405,9 @@ NOTHROW(FCALL unix_server_remove_acceptme)(struct unix_server *__restrict self,
 			/* Re-install all of the remaining clients. */
 			if (chain) {
 				/* Find the nearest, still-valid client descriptor. */
-				if (piter == &chain)
+				if (piter == &chain) {
 					iter = chain;
-				else {
+				} else {
 					iter = container_of(piter, struct unix_client, uc_next);
 				}
 				/* Walk forward until the last client descriptor. */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd34f634 */
+/* HASH CRC-32:0x6ac6548f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -185,10 +185,11 @@ NOTHROW_NCX(LIBCCALL libc_hsearch_r)(ENTRY item,
 		hval2 = 1 + hval % (htab->size - 2);
 		first_idx = idx;
 		do {
-			if (idx <= hval2)
+			if (idx <= hval2) {
 				idx = htab->size + idx - hval2;
-			else
+			} else {
 				idx -= hval2;
+			}
 			if (idx == first_idx)
 				break;
 			if (((entry_type *)htab->table)[idx].used == hval &&
@@ -606,9 +607,9 @@ INTERN ATTR_SECTION(".text.crt.utility.search") ATTR_INOUT_OPT(2) ATTR_IN_OPT(1)
 	root = *rootp;
 	r = root->right_node;
 	q = root->left_node;
-	if (q == NULL || r == NULL)
+	if (q == NULL || r == NULL) {
 		unchained = root;
-	else {
+	} else {
 		node *parentp = rootp, *up = &root->right_node;
 		node upn;
 		for (;;) {
@@ -636,14 +637,15 @@ INTERN ATTR_SECTION(".text.crt.utility.search") ATTR_INOUT_OPT(2) ATTR_IN_OPT(1)
 	r = unchained->left_node;
 	if (r == NULL)
 		r = unchained->right_node;
-	if (sp == 0)
+	if (sp == 0) {
 		*rootp = r;
-	else {
+	} else {
 		q = *nodestack[sp-1];
-		if (unchained == q->right_node)
+		if (unchained == q->right_node) {
 			q->right_node = r;
-		else
+		} else {
 			q->left_node = r;
+		}
 	}
 	if (unchained != root)
 		root->key = unchained->key;

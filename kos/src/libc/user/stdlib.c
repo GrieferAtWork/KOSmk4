@@ -327,9 +327,9 @@ NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname)
 		return NULL;
 	environ_read();
 	envp = environ;
-	if unlikely(!envp)
+	if unlikely(!envp) {
 		result = NULL;
-	else {
+	} else {
 		size_t namelen = strlen(varname);
 #ifdef __OPTIMIZE_SIZE__
 		for (; (result = *envp) != NULL; ++envp) {
@@ -359,9 +359,9 @@ NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname)
 		 * expected pattern based on the caller's `varname'.
 		 *
 		 * As far as portability goes, gLibc makes the same assumption. */
-		if unlikely(!namelen)
+		if unlikely(!namelen) {
 			result = NULL;
-		else {
+		} else {
 			pattern.word = UNALIGNED_GET16((uint16_t const *)varname);
 			if unlikely(namelen == 1) {
 				/* Single-character variable name -> Only need to search for
@@ -1549,9 +1549,9 @@ NOTHROW_NCX(LIBKCALL libc__wputenv)(char32_t *string)
 	if (!utf8)
 		return -1;
 	eq = strchr(utf8, '=');
-	if (!eq)
+	if (!eq) {
 		result = libc_unsetenv(utf8);
-	else {
+	} else {
 		*eq++ = '\0';
 		result = libc_setenv(utf8, eq, 1);
 	}

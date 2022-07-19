@@ -1227,9 +1227,9 @@ again:
 				info->mru_file += partsize;
 			exclusive_node = LIST_FIRST(&iter->mp_copy);
 			if (!LIST_EMPTY(&iter->mp_share)) {
-				if (exclusive_node)
+				if (exclusive_node) {
 					exclusive_node = NULL;
-				else {
+				} else {
 					exclusive_node = LIST_FIRST(&iter->mp_share);
 				}
 			}

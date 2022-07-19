@@ -205,7 +205,7 @@ __LIBM_LOCAL_FUNC(j1) __ATTR_WUNUSED __IEEE754_DOUBLE_TYPE__
 		 * y1(x) = 1/sqrt(pi) * (P(1,x)*ss + Q(1,x)*cc) / sqrt(x) */
 		if (__ix > __INT32_C(0x48000000)) {
 			__z = (__LIBM_LOCAL_VALUE(invsqrtpi) * __cc) / __ieee754_sqrt(__y);
-		} 		else {
+		} else {
 			__u = __ieee754_j1_y1_pone(__y);
 			__v = __ieee754_j1_y1_qone(__y);
 			__z = __LIBM_LOCAL_VALUE(invsqrtpi) * (__u * __cc - __v * __ss) / __ieee754_sqrt(__y);

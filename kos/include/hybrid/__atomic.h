@@ -786,11 +786,11 @@ __NOTHROW_NCX(__impl_hybrid_atomic_signal_fence)(int __order) {
 	 * HINT: If available, compiler barriers are implemented using intrinsic
 	 *       signal fences, meaning that they are literally the same  thing.
 	 * e.g.: When hosted by msvc, stuff like `_ReadWriteBarrier()' will appear below. */
-	if (__order >= __ATOMIC_ACQ_REL)
+	if (__order >= __ATOMIC_ACQ_REL) {
 		__COMPILER_BARRIER();
-	else if (__order >= __ATOMIC_RELEASE)
+	} else if (__order >= __ATOMIC_RELEASE) {
 		__COMPILER_WRITE_BARRIER();
-	else if (__order >= __ATOMIC_ACQUIRE) {
+	} else if (__order >= __ATOMIC_ACQUIRE) {
 		__COMPILER_READ_BARRIER();
 	}
 }

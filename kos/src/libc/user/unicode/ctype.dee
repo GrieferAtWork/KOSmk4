@@ -407,9 +407,9 @@ for (local ord: [:0x80]) {
 		flags |= UNICODE_ISSYMSTRT;
 	if (flags & UNICODE_ISALNUM)
 		flags |= UNICODE_ISSYMCONT;
-	if (flags || lower != ord || upper != ord)
+	if (flags || lower != ord || upper != ord) {
 		TRAITS[ord] = (flags, digit, none, lower, upper, upper);
-	else {
+	} else {
 		del TRAITS[ord];
 	}
 }

@@ -398,9 +398,9 @@ NOTHROW(FCALL dbg_process_key)(unsigned int key) {
 			unsigned int pos;
 			/* Scroll down */
 			pos = dbg_getscroll();
-			if (pos >= dbg_screen_height)
+			if (pos >= dbg_screen_height) {
 				pos -= dbg_screen_height;
-			else {
+			} else {
 				pos = 0;
 			}
 			dbg_setscroll(pos);

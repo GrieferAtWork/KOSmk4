@@ -1187,14 +1187,14 @@ again_lookup_dent:
 		} while (fnode_islnk(result));
 
 		/* Write-back results. */
-		if (presult_path)
+		if (presult_path) {
 			*presult_path = self; /* Inherit reference */
-		else {
+		} else {
 			decref_unlikely(self);
 		}
-		if (presult_dirent)
+		if (presult_dirent) {
 			*presult_dirent = dent; /* Inherit reference */
-		else {
+		} else {
 			decref_unlikely(dent);
 		}
 		return result;
@@ -1203,9 +1203,9 @@ again_lookup_dent:
 	/* Default case: return the pointed-to node. */
 	if (presult_path)
 		*presult_path = incref(self);
-	if (presult_dirent)
+	if (presult_dirent) {
 		*presult_dirent = dent; /* Inherit reference */
-	else {
+	} else {
 		decref_unlikely(dent);
 	}
 	return result;
@@ -1368,9 +1368,9 @@ do_drive_root_rel:
 				 * calling thread's root directory as fallback) */
 				struct fs *myfs = THIS_FS;
 				fs_pathlock_read(myfs);
-				if (!cwd)
+				if (!cwd) {
 					cwd = myfs->fs_cwd;
-				else {
+				} else {
 					/* Make sure that `cwd' is still a child of our current root. */
 					if unlikely(!path_isdescendantof(cwd, myfs->fs_root)) {
 						fs_pathlock_endread(myfs);

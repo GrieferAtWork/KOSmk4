@@ -665,9 +665,9 @@ NOTHROW_NCX(FCALL plural_unary)(struct plural_parser *__restrict self) {
 
 	case '(':
 		result = plural_cond(self);
-		if likely(self->pp_tok == ')')
+		if likely(self->pp_tok == ')') {
 			plural_yield(self);
-		else {
+		} else {
 			/* Force EOF */
 			self->pp_tok = PLURAL_TOK_EOF;
 			self->pp_ptr = strend(self->pp_ptr);

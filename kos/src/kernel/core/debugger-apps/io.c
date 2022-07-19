@@ -35,10 +35,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/io.h>
 #include <debugger/rt.h>
 #include <debugger/util.h>
-#include <kernel/paging.h>
-#include <kernel/printk.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/paging.h>
+#include <kernel/printk.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -203,18 +203,19 @@ DBG_COMMAND(m,
 	uintptr_t count, addr;
 	unsigned int size = 1;
 	while (argc > 2 && argv[1][0] == '-') {
-		if (strcmp(argv[1], DBGSTR("-p")) == 0)
+		if (strcmp(argv[1], DBGSTR("-p")) == 0) {
 			size = sizeof(void *);
-		else if (strcmp(argv[1], DBGSTR("-b")) == 0)
+		} else if (strcmp(argv[1], DBGSTR("-b")) == 0) {
 			size = 1;
-		else if (strcmp(argv[1], DBGSTR("-w")) == 0)
+		} else if (strcmp(argv[1], DBGSTR("-w")) == 0) {
 			size = 2;
-		else if (strcmp(argv[1], DBGSTR("-l")) == 0)
+		} else if (strcmp(argv[1], DBGSTR("-l")) == 0) {
 			size = 4;
-		else if (strcmp(argv[1], DBGSTR("-q")) == 0)
+		} else if (strcmp(argv[1], DBGSTR("-q")) == 0) {
 			size = 8;
-		else
+		} else {
 			return DBG_STATUS_INVALID_ARGUMENTS;
+		}
 		--argc;
 		++argv;
 	}
@@ -224,9 +225,9 @@ DBG_COMMAND(m,
 	if (!dbg_evaladdr(argv[1], &addr))
 		return DBG_STATUS_INVALID_ARGUMENTS;
 	if (argc >= 3) {
-		if (strcmp(argv[2], DBGSTR("page")) == 0)
+		if (strcmp(argv[2], DBGSTR("page")) == 0) {
 			count = PAGESIZE - (addr & PAGEMASK);
-		else if (!dbg_evalexpr(argv[2], &count)) {
+		} else if (!dbg_evalexpr(argv[2], &count)) {
 			return DBG_STATUS_INVALID_ARGUMENTS;
 		}
 	}
@@ -251,9 +252,9 @@ DBG_COMMAND(mp,
 	if (!dbg_evaladdr(argv[1], &addr))
 		return DBG_STATUS_INVALID_ARGUMENTS;
 	if (argc >= 3) {
-		if (strcmp(argv[2], DBGSTR("page")) == 0)
+		if (strcmp(argv[2], DBGSTR("page")) == 0) {
 			count = PAGESIZE - (addr & PAGEMASK);
-		else if (!dbg_evalexpr(argv[2], &count)) {
+		} else if (!dbg_evalexpr(argv[2], &count)) {
 			return DBG_STATUS_INVALID_ARGUMENTS;
 		}
 	}
@@ -279,17 +280,33 @@ PRIVATE ATTR_DBGTEXT NONNULL((1)) ssize_t LIBDISASM_CC
 debug_da_formater(struct disassembler *__restrict UNUSED(self),
                   unsigned int format_option) {
 	char const *string;
-	if (DISASSEMBLER_FORMAT_ISSUFFIX(format_option))
+	if (DISASSEMBLER_FORMAT_ISSUFFIX(format_option)) {
 		string = AC_DEFATTR;
-	else {
+	} else {
 		switch (format_option) {
-		case DISASSEMBLER_FORMAT_REGISTER_PREFIX: string = AC_COLOR(ANSITTY_CL_BLACK, ANSITTY_CL_LIGHT_GRAY); break;
+
+		case DISASSEMBLER_FORMAT_REGISTER_PREFIX:
+			string = AC_COLOR(ANSITTY_CL_BLACK, ANSITTY_CL_LIGHT_GRAY);
+			break;
+
 		case DISASSEMBLER_FORMAT_IMMEDIATE_PREFIX:
 		case DISASSEMBLER_FORMAT_OFFSET_PREFIX:
-		case DISASSEMBLER_FORMAT_SCALE_PREFIX: string = AC_FG(ANSITTY_CL_RED); break;
-		case DISASSEMBLER_FORMAT_SYMBOL_PREFIX: string = AC_FG_WHITE; break;
-		case DISASSEMBLER_FORMAT_PSEUDOOP_PREFIX: string = AC_FG(ANSITTY_CL_DARK_GRAY); break;
-		case DISASSEMBLER_FORMAT_MNEMONIC_PREFIX: string = AC_FG(ANSITTY_CL_PURPLE); break;
+		case DISASSEMBLER_FORMAT_SCALE_PREFIX:
+			string = AC_FG(ANSITTY_CL_RED);
+			break;
+
+		case DISASSEMBLER_FORMAT_SYMBOL_PREFIX:
+			string = AC_FG_WHITE;
+			break;
+
+		case DISASSEMBLER_FORMAT_PSEUDOOP_PREFIX:
+			string = AC_FG(ANSITTY_CL_DARK_GRAY);
+			break;
+
+		case DISASSEMBLER_FORMAT_MNEMONIC_PREFIX:
+			string = AC_FG(ANSITTY_CL_PURPLE);
+			break;
+
 		default: return 0;
 		}
 	}
@@ -493,7 +510,7 @@ DBG_COMMAND(_eval,
 		char *expr = argv[0];
 		if (!dbg_evalexpr(expr, &result))
 			return 1;
-		dbg_printf("%q: " AC_WHITE("%#" PRIxSIZ) " (" AC_WHITE("%" PRIuSIZ) ")\n",
+		dbg_printf(DBGSTR("%q: " AC_WHITE("%#" PRIxSIZ) " (" AC_WHITE("%" PRIuSIZ) ")\n"),
 		           expr, result, result);
 	}
 	return 0;

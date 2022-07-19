@@ -75,13 +75,13 @@ __LIBM_LOCAL_FUNC(kernel_tanf) __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
 	__int32_t __ix, __hx;
 	__LIBM_GET_FLOAT_WORD(__hx, __x);
 	__ix = __hx & __INT32_C(0x7fffffff); /* high word of |x| */
-	if (__ix < __INT32_C(0x31800000))    /* x < 2**-28 */
-	{
+	if (__ix < __INT32_C(0x31800000)) {  /* x < 2**-28 */
 		if ((__int32_t)__x == 0) { /* generate inexact */
-			if ((__ix | (__iy + 1)) == 0)
+			if ((__ix | (__iy + 1)) == 0) {
 				return __LIBM_LOCAL_VALUE(onef) / __ieee754_fabsf(__x);
-			else
+			} else {
 				return (__iy == 1) ? __x : -__LIBM_LOCAL_VALUE(onef) / __x;
+			}
 		}
 	}
 	if (__ix >= __INT32_C(0x3f2ca140)) { /* |x|>=0.6744 */

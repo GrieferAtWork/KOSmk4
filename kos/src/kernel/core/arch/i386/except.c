@@ -262,9 +262,9 @@ halt_unhandled_exception(unsigned int unwind_error,
 		}
 		prev_last_pc = i ? info->ei_trace[i - 1]
 		                 : kcpustate_getpc(&info->ei_state);
-		if (!my_last_pc)
+		if (!my_last_pc) {
 			my_last_pc = prev_last_pc;
-		else if (my_last_pc != prev_last_pc) {
+		} else if (my_last_pc != prev_last_pc) {
 			printk(KERN_RAW "...\n");
 			addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
 			                 instruction_trypred(my_last_pc, isa),

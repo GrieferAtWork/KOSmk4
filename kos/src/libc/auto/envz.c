@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf291ff9 */
+/* HASH CRC-32:0x34093ff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -122,9 +122,9 @@ NOTHROW_NCX(LIBCCALL libc_envz_merge)(char **__restrict penvz,
 	while (envz2_len && result == 0) {
 		char *existing = libc_envz_entry(*penvz, *penvz_len, envz2);
 		size_t newlen  = libc_strlen(envz2) + 1;
-		if (!existing)
+		if (!existing) {
 			result = libc_argz_append(penvz, penvz_len, envz2, newlen);
-		else if (override_) {
+		} else if (override_) {
 			libc_argz_delete(penvz, penvz_len, existing);
 			result = libc_argz_append(penvz, penvz_len, envz2, newlen);
 		}

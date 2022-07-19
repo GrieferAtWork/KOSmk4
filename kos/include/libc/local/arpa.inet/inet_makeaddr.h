@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61d6b5f6 */
+/* HASH CRC-32:0x61fa2ec9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,13 +30,13 @@ __LOCAL_LIBC(inet_makeaddr) __ATTR_CONST __ATTR_WUNUSED struct in_addr
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(inet_makeaddr))(__UINT32_TYPE__ __net, __UINT32_TYPE__ __host) {
 	struct in_addr __result;
 	__UINT32_TYPE__ __result_addr;
-	if (__net < IN_CLASSA_MAX)
+	if (__net < IN_CLASSA_MAX) {
 		__result_addr = (__net << IN_CLASSA_NSHIFT) | (__host & IN_CLASSA_HOST);
-	else if (__net < IN_CLASSB_MAX)
+	} else if (__net < IN_CLASSB_MAX) {
 		__result_addr = (__net << IN_CLASSB_NSHIFT) | (__host & IN_CLASSB_HOST);
-	else if (__net < IN_CLASSC_MAX)
+	} else if (__net < IN_CLASSC_MAX) {
 		__result_addr = (__net << IN_CLASSC_NSHIFT) | (__host & IN_CLASSC_HOST);
-	else {
+	} else {
 		__result_addr = __net | __host;
 	}
 	__result.s_addr = __hybrid_htobe32(__result_addr);

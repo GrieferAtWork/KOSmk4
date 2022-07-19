@@ -121,11 +121,11 @@ __LIBM_LOCAL_FUNC(atan2f) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 
 	/* compute y / x */
 	__k = (__iy - __ix) >> 23;
-	if (__k > 60)
+	if (__k > 60) {
 		__z = __LIBM_LOCAL_VALUE(pi_o_2f) + (float)0.5 * __LIBM_LOCAL_VALUE(pi_lof); /* |y / x| >  2 ** 60 */
-	else if (__hx < 0 && __k < -60)
+	} else if (__hx < 0 && __k < -60) {
 		__z = 0.0; /* |y|/x < -2 ** 60 */
-	else {
+	} else {
 		__z = __ieee754_atanf(__ieee754_fabsf(__y / __x)); /* safe to do y / x */
 	}
 	switch (__m) {
@@ -238,11 +238,11 @@ __LIBM_LOCAL_FUNC(atan2) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 
 	/* compute y / x */
 	__k = (__iy - __ix) >> 20;
-	if (__k > 60)
+	if (__k > 60) {
 		__z = __LIBM_LOCAL_VALUE(pi_o_2) + 0.5 * __LIBM_LOCAL_VALUE(pi_lo); /* |y / x| >  2 ** 60 */
-	else if (__hx < 0 && __k < -60)
+	} else if (__hx < 0 && __k < -60) {
 		__z = 0.0; /* |y|/x < -2 ** 60 */
-	else {
+	} else {
 		__z = __ieee754_atan(__ieee754_fabs(__y / __x)); /* safe to do y / x */
 	}
 	switch (__m) {
@@ -365,11 +365,11 @@ __LIBM_LOCAL_FUNC(atan2l) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE
 
 	/* compute y / x */
 	__k = __iy - __ix;
-	if (__k > 70)
+	if (__k > 70) {
 		__z = __LIBM_LOCAL_VALUE(pi_o_2l) + 0.5L * __LIBM_LOCAL_VALUE(pi_lol); /* |y / x| >  2 ** 70 */
-	else if ((__sx & 0x8000) && __k < -70)
+	} else if ((__sx & 0x8000) && __k < -70) {
 		__z = 0.0; /* |y|/x < -2 ** 70 */
-	else {
+	} else {
 		__z = __ieee854_atanl(__ieee854_fabsl(__y / __x)); /* safe to do y / x */
 	}
 	switch ((int)__m) {

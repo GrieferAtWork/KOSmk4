@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2b61813 */
+/* HASH CRC-32:0x3a3d0f93 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,13 +48,13 @@ __LOCAL_LIBC(bsearch_r) __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN_OPT(2) __ATTR_NONN
 		__item_addr  = (__BYTE_TYPE__ *)__pbase + (__test_index * __item_size);
 		/* Check if the requested item lies above, or below the selected one */
 		__difference = (*__compar)(__pkey, __item_addr, __arg);
-		if (__difference < 0)
+		if (__difference < 0) {
 			/* KEY < ITEM --> Narrow the search-area to everything below */
 			__hi = __test_index;
-		else if (__difference > 0)
+		} else if (__difference > 0) {
 			/* KEY > ITEM --> Narrow the search-area to everything above */
 			__lo = __test_index + 1;
-		else {
+		} else {
 			/* Found it! */
 			return __item_addr;
 		}

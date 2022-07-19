@@ -2374,9 +2374,9 @@ PUBLIC dbx_errno_t NOTHROW(FCALL cexpr_op1)(unsigned int op) {
 		return DBX_EINTERN; /* Shouldn't happen */
 	typ  = top->cv_type.ct_typ;
 	data = top->cv_idata;
-	if (top->cv_kind == CVALUE_KIND_DATA)
+	if (top->cv_kind == CVALUE_KIND_DATA) {
 		data = top->cv_data;
-	else if (top->cv_kind == CVALUE_KIND_VOID) {
+	} else if (top->cv_kind == CVALUE_KIND_VOID) {
 		data = NULL;
 	}
 	switch (op) {
@@ -2514,14 +2514,14 @@ again:
 	rhs_typ  = rhs->cv_type.ct_typ;
 	lhs_data = lhs->cv_idata;
 	rhs_data = rhs->cv_idata;
-	if (lhs->cv_kind == CVALUE_KIND_DATA)
+	if (lhs->cv_kind == CVALUE_KIND_DATA) {
 		lhs_data = lhs->cv_data;
-	else if (lhs->cv_kind == CVALUE_KIND_VOID) {
+	} else if (lhs->cv_kind == CVALUE_KIND_VOID) {
 		lhs_data = NULL;
 	}
-	if (rhs->cv_kind == CVALUE_KIND_DATA)
+	if (rhs->cv_kind == CVALUE_KIND_DATA) {
 		rhs_data = rhs->cv_data;
-	else if (rhs->cv_kind == CVALUE_KIND_VOID) {
+	} else if (rhs->cv_kind == CVALUE_KIND_VOID) {
 		rhs_data = NULL;
 	}
 	/* Swap operands such that a float always appears left. */
@@ -2931,11 +2931,11 @@ do_pointer_pointer_op:
 			bool retval;
 			if (!lhs_data)
 				goto done;
-			if (op == CTOKEN_TOK_EQUALS_EQUALS)
+			if (op == CTOKEN_TOK_EQUALS_EQUALS) {
 				retval = lhs_value == rhs_value;
-			else if (op == CTOKEN_TOK_XCLAIM_EQUALS)
+			} else if (op == CTOKEN_TOK_XCLAIM_EQUALS) {
 				retval = lhs_value != rhs_value;
-			else {
+			} else {
 				/* Must account for the sign when comparing lower/greater */
 				if (is_signed) {
 					/* Signed compare */
@@ -3044,9 +3044,9 @@ NOTHROW(FCALL cexpr_load_special_libdl_symbol)(char const *__restrict name) {
 		varid = LIBDL_VAR_environ;
 	} else if (memcmp(name, "program_invocation_", 19 * sizeof(char)) == 0) {
 		name += 19;
-		if (strcmp(name, "name") == 0)
+		if (strcmp(name, "name") == 0) {
 			varid = LIBDL_VAR_program_invocation_name;
-		else if (strcmp(name, "short_name") == 0) {
+		} else if (strcmp(name, "short_name") == 0) {
 			varid = LIBDL_VAR_program_invocation_short_name;
 		}
 	}

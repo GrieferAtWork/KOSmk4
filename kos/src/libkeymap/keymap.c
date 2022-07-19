@@ -389,9 +389,9 @@ do_check_surrogate:
 					}
 					/* Cache simple keys. */
 					if (cachable_character && basic) {
-						if (KEYMOD_ISNORMAL(mod))
+						if (KEYMOD_ISNORMAL(mod)) {
 							basic->bk_normal = cachable_character;
-						else if (KEYMOD_ISSHIFT(mod)) {
+						} else if (KEYMOD_ISSHIFT(mod)) {
 							basic->bk_shift = cachable_character;
 						}
 					}

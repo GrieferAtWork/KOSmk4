@@ -46,11 +46,11 @@ __LIBM_LOCAL_FUNC(fpclassifyf) __ATTR_WUNUSED __ATTR_CONST int
 	__uint32_t __wx;
 	__LIBM_GET_FLOAT_WORD(__wx, __x);
 	__wx &= __UINT32_C(0x7fffffff);
-	if (__wx == 0)
+	if (__wx == 0) {
 		__retval = __FP_ZERO;
-	else if (__wx < __UINT32_C(0x800000))
+	} else if (__wx < __UINT32_C(0x800000)) {
 		__retval = __FP_SUBNORMAL;
-	else if (__wx >= __UINT32_C(0x7f800000)) {
+	} else if (__wx >= __UINT32_C(0x7f800000)) {
 		__retval = __wx > __UINT32_C(0x7f800000) ? __FP_NAN : __FP_INFINITE;
 	}
 	return __retval;
@@ -72,11 +72,11 @@ __LIBM_LOCAL_FUNC(fpclassify) __ATTR_WUNUSED __ATTR_CONST int
 	__LIBM_GET_DOUBLE_WORDS(__msw, __lsw, __x);
 	__lsw |= __msw & __UINT32_C(0xfffff);
 	__msw &= __UINT32_C(0x7ff00000);
-	if ((__msw | __lsw) == 0)
+	if ((__msw | __lsw) == 0) {
 		__retval = __FP_ZERO;
-	else if (__msw == 0)
+	} else if (__msw == 0) {
 		__retval = __FP_SUBNORMAL;
-	else if (__msw == __UINT32_C(0x7ff00000)) {
+	} else if (__msw == __UINT32_C(0x7ff00000)) {
 		__retval = __lsw != 0 ? __FP_NAN : __FP_INFINITE;
 	}
 	return __retval;
@@ -98,11 +98,11 @@ __LIBM_LOCAL_FUNC(fpclassifyl) __ATTR_WUNUSED __ATTR_CONST int
 	__LIBM_GET_LDOUBLE_WORDS(__ex, __hx, __lx, __x);
 	__m = (__hx & __UINT32_C(0x7fffffff)) | __lx;
 	__ex &= IEEE854_LONG_DOUBLE_MAXEXP;
-	if ((__ex | __m) == 0)
+	if ((__ex | __m) == 0) {
 		__retval = __FP_ZERO;
-	else if (__ex == 0 && (__hx & __UINT32_C(0x80000000)) == 0)
+	} else if (__ex == 0 && (__hx & __UINT32_C(0x80000000)) == 0) {
 		__retval = __FP_SUBNORMAL;
-	else if (__ex == IEEE854_LONG_DOUBLE_MAXEXP) {
+	} else if (__ex == IEEE854_LONG_DOUBLE_MAXEXP) {
 		__retval = __m != 0 ? __FP_NAN : __FP_INFINITE;
 	}
 	return __retval;

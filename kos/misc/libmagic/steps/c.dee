@@ -164,13 +164,13 @@ exec_content:
 							goto err_bad_magic_tag;
 						File.Writer fixfp;
 						for (local l: content.splitlines(true)) {
-							if (l.startswith("//"))
+							if (l.startswith("//")) {
 								l = l[2:];
-							else {
+							} else {
 								l = l.lstrip();
-								if (l.startswith("//"))
+								if (l.startswith("//")) {
 									l = l[2:];
-								else {
+								} else {
 									goto err_bad_magic_tag;
 								}
 							}
@@ -187,13 +187,13 @@ exec_content:
 						content = header[10:] + content;
 						File.Writer fixfp;
 						for (local l: content.splitlines(true)) {
-							if (l.startswith("#"))
+							if (l.startswith("#")) {
 								l = l[1:];
-							else {
+							} else {
 								l = l.lstrip();
-								if (l.startswith("#"))
+								if (l.startswith("#")) {
 									l = l[1:];
-								else {
+								} else {
 									goto err_bad_magic_tag;
 								}
 							}

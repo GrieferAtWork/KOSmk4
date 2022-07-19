@@ -368,14 +368,14 @@ PRIVATE ATTR_DBGTEXT void KCALL dbg_dmesg_main(void) {
 			if (dbg_isholding_ctrl()) {
 				data.rd_selected = data.rd_minpacket;
 			} else {
-				if (data.rd_selected >= data.rd_scroll_area_height)
+				if (data.rd_selected >= data.rd_scroll_area_height) {
 					data.rd_selected -= data.rd_scroll_area_height;
-				else {
+				} else {
 					data.rd_selected = 0;
 				}
-				if (data.rd_minpacket >= data.rd_scroll_area_height)
+				if (data.rd_minpacket >= data.rd_scroll_area_height) {
 					data.rd_minpacket -= data.rd_scroll_area_height;
-				else {
+				} else {
 					data.rd_minpacket = 0;
 				}
 			}

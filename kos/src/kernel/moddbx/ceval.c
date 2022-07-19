@@ -422,9 +422,9 @@ NOTHROW(FCALL unicode_readutf8_unescape)(char const **__restrict ptext,
 			char32_t digit;
 			char const *iter = *ptext;
 			size_t n = (size_t)-1;
-			if (result == 'u')
+			if (result == 'u') {
 				n = 4;
-			else if (result == 'U') {
+			} else if (result == 'U') {
 				n = 8;
 			}
 			result = 0;
@@ -559,11 +559,11 @@ NOTHROW(FCALL autocomplete_symbols)(struct cparser *__restrict self,
 		if (count != 0)
 			break;
 		/* Change the scope to enumerate other things if we've failed to find anything. */
-		if (scope == (CMOD_SYMENUM_SCOPE_FNOGLOBAL | CMOD_SYMENUM_SCOPE_FNOFOREIGN))
+		if (scope == (CMOD_SYMENUM_SCOPE_FNOGLOBAL | CMOD_SYMENUM_SCOPE_FNOFOREIGN)) {
 			scope = CMOD_SYMENUM_SCOPE_FNOLOCAL | CMOD_SYMENUM_SCOPE_FNOFOREIGN;
-		else if (scope == (CMOD_SYMENUM_SCOPE_FNOLOCAL | CMOD_SYMENUM_SCOPE_FNOFOREIGN))
+		} else if (scope == (CMOD_SYMENUM_SCOPE_FNOLOCAL | CMOD_SYMENUM_SCOPE_FNOFOREIGN)) {
 			scope = CMOD_SYMENUM_SCOPE_FNOLOCAL | CMOD_SYMENUM_SCOPE_FNOGLOBAL;
-		else {
+		} else {
 			break;
 		}
 	}
@@ -583,9 +583,9 @@ NOTHROW(FCALL autocomplete_nontype_symbols)(struct cparser *__restrict self,
 	if (namelen < (COMPILER_LENOF(misc_expr_keywords[0]) - 1)) {
 		unsigned int i;
 		for (i = 0; i < COMPILER_LENOF(misc_expr_keywords); ++i) {
-			if (memcmp(misc_expr_keywords[i], name, namelen) == 0 &&
-			    misc_expr_keywords[i][namelen] != '\0') {
-				char const *cname_str = misc_expr_keywords[i];
+			char const *cname_str = misc_expr_keywords[i];
+			if (memcmp(cname_str, name, namelen) == 0 &&
+			    cname_str[namelen] != '\0') {
 				size_t cname_len = strlen(cname_str);
 				cparser_autocomplete(self,
 				                     cname_str + namelen,
@@ -785,11 +785,11 @@ doparen_expr:
 		result = parse_unary(self);
 		if unlikely(result != DBX_EOK)
 			goto done;
-		if (op == '&')
+		if (op == '&') {
 			result = cexpr_ref();
-		else if (op == '*')
+		} else if (op == '*') {
 			result = cexpr_deref();
-		else {
+		} else {
 			result = cexpr_op1(op);
 		}
 	}	break;
@@ -841,9 +841,10 @@ doparen_expr:
 		           KWD_CHECK(kwd_str, kwd_len, "offsetafter") ||
 		           KWD_CHECK(kwd_str, kwd_len, "__builtin_offsetof") ||
 		           KWD_CHECK(kwd_str, kwd_len, "__COMPILER_OFFSETAFTER")) {
-			/* For simplicity, and correctness, literally implement offsetof()
-			 * as its generic macro implementation:
-			 * >> #define offsetof(T, m) (size_t)&((T *)0)->m */
+			/* For simplicity, and correctness, literally implement
+			 * `offsetof()' like its generic macro implementation:
+			 * >> #define offsetof(T, m)    (size_t)&((T *)0)->m
+			 * >> #define offsetafter(T, m) (size_t)(&((T *)0)->m + 1) */
 			bool want_after;
 			struct ctyperef t;
 			REF struct ctype *t_ptr;
@@ -894,8 +895,8 @@ doparen_expr:
 			result = cparser_skip(self, ')');
 		} else if (KWD_CHECK(kwd_str, kwd_len, "container_of") ||
 		           KWD_CHECK(kwd_str, kwd_len, "__COMPILER_CONTAINER_OF")) {
-			/* For simplicity, and correctness, literally implement container_of()
-			 * as its generic macro implementation:
+			/* For  simplicity,  and correctness,  literally implement
+			 * `container_of()' like its generic macro implementation:
 			 * >> #define container_of(p, T, m) (T *)((uintptr_t)(p) - offsetof(T, m))
 			 * or fully expanded:
 			 * >> #define container_of(p, T, m) (T *)((uintptr_t)(p) - (size_t)&((T *)0)->m) */
@@ -1929,9 +1930,8 @@ again_after_comma:
 				goto again_after_comma;
 			}
 			/* Last comma reached, and our expression stack looks like this:
-			 * [...]  foo  16
-			 * for `foo, 16' */
-			/* As such, cast the top-expression (16) to `size_t' */
+			 * >> [...] foo 16      (for `foo, 16')
+			 * As such, cast the top-expression (16) to `size_t' */
 			result = cexpr_cast_simple(&ctype_size_t);
 			if unlikely(result != DBX_EOK) {
 				cexpr_typeonly = old_cexpr_typeonly;
@@ -2834,9 +2834,9 @@ err_fuction_argv:
 				byte_t *data;
 				result = cexpr_getdata(&data);
 				if likely(result == DBX_EOK) {
-					if unlikely(dbg_readmemory(data, &array_length, sizeof(array_length)) != 0)
+					if unlikely(dbg_readmemory(data, &array_length, sizeof(array_length)) != 0) {
 						result = DBX_EFAULT;
-					else {
+					} else {
 						result = cparser_skip(self, ']');
 					}
 				}

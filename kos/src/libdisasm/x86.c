@@ -509,13 +509,13 @@ da_print_modrm_rm(struct disassembler *__restrict self,
                   struct emu86_modrm const *__restrict rm,
                   emu86_opflags_t flags, unsigned int size) {
 	if (EMU86_MODRM_ISREG(rm->mi_type)) {
-		if (size == 8)
+		if (size == 8) {
 			da_print_reg64(self, rm->mi_rm);
-		else if (size == 4)
+		} else if (size == 4) {
 			da_print_reg32(self, rm->mi_rm);
-		else if (size == 2)
+		} else if (size == 2) {
 			da_print_reg16(self, rm->mi_rm);
-		else {
+		} else {
 			da_print_reg8(self, rm->mi_rm, flags);
 		}
 	} else {
@@ -903,13 +903,13 @@ again_instruction_part:
 				sel_start = (char *)memchr(start, '[', (size_t)(p - start));
 				if (sel_start && (sel_start + 2) < p && sel_start[2] == ']') {
 					unsigned int which;
-					if (sel_start[1] >= '0' && sel_start[1] <= '9')
+					if (sel_start[1] >= '0' && sel_start[1] <= '9') {
 						which = (unsigned int)(sel_start[1] - '0');
-					else if (sel_start[1] >= 'a' && sel_start[1] <= 'z')
+					} else if (sel_start[1] >= 'a' && sel_start[1] <= 'z') {
 						which = 10u + (unsigned int)(sel_start[1] - 'a');
-					else if (sel_start[1] >= 'A' && sel_start[1] <= 'Z')
+					} else if (sel_start[1] >= 'A' && sel_start[1] <= 'Z') {
 						which = 10u + (unsigned int)(sel_start[1] - 'A');
-					else {
+					} else {
 						goto no_jcc_sel;
 					}
 					disasm_print(self, start,

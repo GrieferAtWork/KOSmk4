@@ -56,11 +56,11 @@ function processX86AssemblyBodyLines(body: string, is386: bool): {string...} {
 			continue;
 		}
 		if (strippedLine.startswith("#else")) {
-			if (context == CONTEXT_AFTER_IF1)
+			if (context == CONTEXT_AFTER_IF1) {
 				context = CONTEXT_AFTER_ELSE0;
-			else if (context == CONTEXT_AFTER_IF0)
+			} else if (context == CONTEXT_AFTER_IF0) {
 				context = CONTEXT_AFTER_ELSE1;
-			else {
+			} else {
 				throw Error("#else directive in invalid context: " + repr strippedLine);
 			}
 			continue;

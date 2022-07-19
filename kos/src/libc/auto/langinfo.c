@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ad65222 */
+/* HASH CRC-32:0xc016e284 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,16 +64,16 @@ for (local l: File.open("../../../include/asm/crt/langinfo.h")) {
 	local val;
 	if (com.startswith("\"") && com.endswith("\"")) {
 		val = com[1:-1].decode("c-escape").bytes();
-		if (val == "...")
+		if (val == "...") {
 			val = Bytes({ 0 });
-		else {
+		} else {
 			val = val + Bytes({ 0 });
 		}
 	} else if (com.startswith("L\"") && com.endswith("\"")) {
 		val = com[2:-1].decode("c-escape");
-		if (val == "...")
+		if (val == "...") {
 			val = Bytes({ 0, 0, 0, 0 });
-		else {
+		} else {
 			val = val + "\0";
 			val = (val.encode("utf-32-le").bytes(), val.encode("utf-32-be").bytes());
 		}
@@ -189,11 +189,11 @@ for (local name, tab: nl_cat) {
 	}
 	local maxOffset = { byteOffsetTableLe > ..., byteOffsetTableBe > ... } > ...;
 	local blobOffsetType;
-	if (maxOffset >= 0x8000)
+	if (maxOffset >= 0x8000) {
 		blobOffsetType = "int32_t";
-	else if (maxOffset >= 0x80)
+	} else if (maxOffset >= 0x80) {
 		blobOffsetType = "int16_t";
-	else {
+	} else {
 		blobOffsetType = "int8_t";
 	}
 	local maxImmediateInteger = {
@@ -216,11 +216,11 @@ for (local name, tab: nl_cat) {
 	local indirectTableValues = [];
 	if (needIndirectIntegerTable > maxImmediateInteger) {
 		local indirectTableType;
-		if (maxOffset > 0xffff)
+		if (maxOffset > 0xffff) {
 			indirectTableType = "uint32_t";
-		else if (maxOffset > 0xff)
+		} else if (maxOffset > 0xff) {
 			indirectTableType = "uint16_t";
-		else {
+		} else {
 			indirectTableType = "uint8_t";
 		}
 		for (local idx: [:numIndices]) {

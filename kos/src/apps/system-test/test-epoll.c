@@ -109,9 +109,9 @@ DEFINE_TEST(epoll) {
 	 * monitors after they've become dormant. Note that by default,
 	 * this personality is off, but  as a kos-specific program,  we
 	 * also want to ensure that we can test all cases! */
-	if (!KSysctlGetPersonality(KP_EPOLL_DELETE_ONESHOT))
+	if (!KSysctlGetPersonality(KP_EPOLL_DELETE_ONESHOT)) {
 		EQd(0, epoll_ctl(epfd, EPOLL_CTL_DEL, pipes[0], NULL));
-	else {
+	} else {
 		/* Automatically deleted. */
 	}
 	EQd(-1, epoll_ctl(epfd, EPOLL_CTL_DEL, pipes[0], NULL));

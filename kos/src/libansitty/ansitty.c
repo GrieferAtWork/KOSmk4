@@ -1258,9 +1258,9 @@ ansi_CSI(struct ansitty *__restrict self,
 		if (arglen >= 1 && arg[arglen - 1] == ' ') {
 			/* SL - Scroll Left   \e[4 @   move everything over 4 columns, 4 new columns at right */
 			int n;
-			if (arglen == 1)
+			if (arglen == 1) {
 				n = 1;
-			else {
+			} else {
 				char *end;
 				n = strtoi(arg, &end, 10);
 				if unlikely(end != arg + arglen - 1)
@@ -1275,9 +1275,9 @@ ansi_CSI(struct ansitty *__restrict self,
 		if (arglen >= 1 && arg[arglen - 1] == ' ') {
 			/* SR  - Scroll Right   \e[2 A   move everything over 2 columns, 2 new columns at left */
 			int n;
-			if (arglen == 1)
+			if (arglen == 1) {
 				n = 1;
-			else {
+			} else {
 				char *end;
 				n = strtoi(arg, &end, 10);
 				if unlikely(end != arg + arglen - 1)
@@ -1308,9 +1308,9 @@ ansi_CSI(struct ansitty *__restrict self,
 	{
 		int n;
 do_single_argument_case:
-		if (!arglen)
+		if (!arglen) {
 			n = 1;
-		else {
+		} else {
 			char *end;
 			n = strtoi(arg, &end, 10);
 			if unlikely(end != arg + arglen)
@@ -1598,9 +1598,9 @@ done_insert_ansitty_flag_hedit:
 			break;
 
 		case '|': { /* DECTTC -- Transmit Termination Character */
-			if (n == 1)
+			if (n == 1) {
 				PUTUNI(0xc); /* form-feed */
-			else {
+			} else {
 				if (n != 0)
 					goto nope;
 			}
@@ -1617,15 +1617,15 @@ done_insert_ansitty_flag_hedit:
 	case 'H':   /* ANSI/VT100: CUP */
 	case 'f': { /* ANSI/VT100: HVP */
 		int y, x;
-		if (!arglen)
+		if (!arglen) {
 			y = x = 1; /* \e[f */
-		else {
+		} else {
 			char *end;
 			if (arg[0] == ';') {
 				y = 1; /* \e[;10f  --or-- \e[;f */
-				if (arglen == 1)
+				if (arglen == 1) {
 					x = 1;
-				else {
+				} else {
 					x = strtoi(arg + 1, &end, 10);
 					if unlikely(end != arg + arglen)
 						goto nope;
@@ -1656,9 +1656,9 @@ done_insert_ansitty_flag_hedit:
 
 
 	case 'J': /* ANSI/VT100: ED */
-		if (!arglen)
+		if (!arglen) {
 			CLS(ANSITTY_CLS_AFTER);
-		else {
+		} else {
 			ARGUMENT_CODE_SWITCH_BEGIN() {
 
 			case ANSITTY_CLS_AFTER:
@@ -1674,9 +1674,9 @@ done_insert_ansitty_flag_hedit:
 		break;
 
 	case 'K': /* ANSI/VT100: EL */
-		if (!arglen)
+		if (!arglen) {
 			EL(ANSITTY_EL_AFTER);
-		else {
+		} else {
 			ARGUMENT_CODE_SWITCH_BEGIN() {
 
 			case ANSITTY_EL_AFTER:
@@ -1692,9 +1692,9 @@ done_insert_ansitty_flag_hedit:
 
 
 	case 'Q': /* SEM Set Editing extent Mode (limits ICH & DCH) */
-		if (!arglen)
+		if (!arglen) {
 			self->at_ttyflag |= ANSITTY_FLAG_INSDEL_SCRN;
-		else {
+		} else {
 			ARGUMENT_CODE_SWITCH_BEGIN() {
 
 			case 0: /* \e[0Q   [Q = Insert/delete character affects rest of display */
@@ -2525,9 +2525,9 @@ done_insert_ansitty_flag_hedit:
 				if (*end != ';')
 					goto nope;
 				++end;
-				if (end == arg + arglen)
+				if (end == arg + arglen) {
 					endcolumn = MAXCOORD;
-				else {
+				} else {
 					endcolumn = (ansitty_coord_t)strtou32(end, &end, 10);
 					if (end != arg + arglen)
 						goto nope;
@@ -2569,9 +2569,9 @@ done_insert_ansitty_flag_hedit:
 			if (*end != ';')
 				goto nope;
 			++end;
-			if (end == arg + arglen)
+			if (end == arg + arglen) {
 				endline = MAXCOORD;
-			else {
+			} else {
 				endline = (ansitty_coord_t)strtou32(end, &end, 10);
 				if (end != arg + arglen)
 					goto nope;
@@ -2602,9 +2602,9 @@ done_insert_ansitty_flag_hedit:
 		unsigned int count, maxerase;
 		ansitty_coord_t xy[2];
 		ansitty_coord_t sxy[2];
-		if (!arglen)
+		if (!arglen) {
 			count = 1;
-		else {
+		} else {
 			char *end;
 			count = strtoui(arg, &end, 10);
 			if (end != arg + arglen)
@@ -3647,9 +3647,9 @@ NOTHROW_NCX(CC libansitty_translate_misc)(struct ansitty *self,
 		case KEY_KPDOT:
 			if (len == 1) {
 				/* Deal with internationalization */
-				if (buf[0] == '.')
+				if (buf[0] == '.') {
 					key = KEY_KPDOT;
-				else if (buf[0] == ',') {
+				} else if (buf[0] == ',') {
 					key = KEY_KPCOMMA;
 				}
 			}

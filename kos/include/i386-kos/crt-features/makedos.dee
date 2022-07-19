@@ -30,9 +30,9 @@ function loadSymbolsFromFile(filename: string | {string...}): {string...} {
 		local result = none;
 		for (local file: filename) {
 			local syms = loadSymbolsFromFile(file);
-			if (result is none)
+			if (result is none) {
 				result = syms;
-			else {
+			} else {
 				for (local sym: syms)
 					result.insert(sym);
 			}

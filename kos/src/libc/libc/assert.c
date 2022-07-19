@@ -170,7 +170,6 @@ NOTHROW(FCALL libc_abort_failure_core)(struct kcpustate *__restrict state) {
 	trap_application(state, NULL, UNWIND_USER_ABORT);
 }
 
-
 INTERN ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN ATTR_SECTION(".text.crt.assert") NONNULL((1)) void
 NOTHROW(FCALL libc_assertion_failure_core)(struct assert_args *__restrict args) {
 	struct coredump_assert cdinfo;

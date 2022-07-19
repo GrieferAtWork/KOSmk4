@@ -2972,9 +2972,9 @@ uhci_find_pci_bar_ex(struct pci_device const *__restrict dev,
 			result = i;
 			break;
 		}
-		if (result == COMPILER_LENOF(dev->pd_regions))
+		if (result == COMPILER_LENOF(dev->pd_regions)) {
 			result = i;
-		else {
+		} else {
 			result = COMPILER_LENOF(dev->pd_regions) + 1;
 			break;
 		}

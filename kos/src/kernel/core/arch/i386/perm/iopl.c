@@ -129,11 +129,11 @@ NOTHROW(FCALL cpl_setiopl_impl)(void *buf, struct task *__restrict thread) {
 	             ? irregs_getpflags(irregs)
 	             : irregs->ir_Pflags;
 	old_iopl   = EFLAGS_GTIOPL(old_pflags);
-	if (old_iopl == args->ia_new_iopl)
+	if (old_iopl == args->ia_new_iopl) {
 		was_set = true;
-	else if (!allow_change)
+	} else if (!allow_change) {
 		was_set = false;
-	else {
+	} else {
 		new_pflags = (old_pflags & ~EFLAGS_IOPLMASK) | EFLAGS_IOPL(args->ia_new_iopl);
 		was_set = true;
 		if (thread == THIS_TASK) {

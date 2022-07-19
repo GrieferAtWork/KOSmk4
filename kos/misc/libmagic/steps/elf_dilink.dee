@@ -210,9 +210,9 @@ link_again_with_new_guesses:
 								}
 								if (p_vaddr == 0 && p_memsz == totalDebugSize && p_filesz == 0) {
 									/* This is probably the one! */
-									if (programHeaderIndexToModify is none)
+									if (programHeaderIndexToModify is none) {
 										programHeaderIndexToModify = phdrIndex;
-									else {
+									} else {
 										/* Ambiguity! */
 										programHeaderIndexToModify = false;
 									}

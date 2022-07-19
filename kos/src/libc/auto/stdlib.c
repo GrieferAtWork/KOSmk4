@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f6f2790 */
+/* HASH CRC-32:0xa6947669 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -105,13 +105,13 @@ INTERN ATTR_SECTION(".text.crt.utility.stdlib") WUNUSED ATTR_IN(1) ATTR_IN_OPT(2
 		item_addr  = (byte_t *)pbase + (test_index * item_size);
 		/* Check if the requested item lies above, or below the selected one */
 		difference = (*compar)(pkey, item_addr, arg);
-		if (difference < 0)
+		if (difference < 0) {
 			/* KEY < ITEM --> Narrow the search-area to everything below */
 			hi = test_index;
-		else if (difference > 0)
+		} else if (difference > 0) {
 			/* KEY > ITEM --> Narrow the search-area to everything above */
 			lo = test_index + 1;
-		else {
+		} else {
 			/* Found it! */
 			return item_addr;
 		}

@@ -411,17 +411,17 @@ again:
 			ch = text[i + 1];
 			if (ch == "/") {
 				i = text.find("\n", i, end);
-				if (i < 0)
+				if (i < 0) {
 					i = end;
-				else {
+				} else {
 					++i;
 				}
 				goto again;
 			} else if (ch == "*") {
 				i = text.find("*/", i, end);
-				if (i < 0)
+				if (i < 0) {
 					i = end;
-				else {
+				} else {
 					i += 2;
 				}
 				goto again;
@@ -441,17 +441,17 @@ again:
 			ch = text[i + 1];
 			if (ch == "/") {
 				i = text.find("\n", i, end);
-				if (i < 0)
+				if (i < 0) {
 					i = end;
-				else {
+				} else {
 					++i;
 				}
 				goto again;
 			} else if (ch == "*") {
 				i = text.find("*/", i, end);
-				if (i < 0)
+				if (i < 0) {
 					i = end;
-				else {
+				} else {
 					i += 2;
 				}
 				goto again;
@@ -622,9 +622,9 @@ do_pp_if:
 					}
 				}
 				local map = result.get(macroName);
-				if (map is none)
+				if (map is none) {
 					result[macroName] = map = Dict();
-				else {
+				} else {
 					if (ppCond in map) {
 						errAt(macroNameStart,
 							f"Duplicate exception class: {repr macroName} with {repr ppCond}");
@@ -796,9 +796,9 @@ again_parse_tag_directive:
 										errAtComment(tagArgsStart, f"Missing ':' in argument {repr tagArgs}");
 									local fieldTypeEnd = tagArgs.find(",", fieldNameEnd);
 									local fieldCommentStart = #tagArgs;
-									if (fieldTypeEnd < 0)
+									if (fieldTypeEnd < 0) {
 										fieldTypeEnd = fieldCommentStart;
-									else {
+									} else {
 										fieldCommentStart = fieldTypeEnd + 1;
 									}
 									local fieldName = tagArgs[:fieldNameEnd].strip();
@@ -950,9 +950,9 @@ function parseExceptionCodeOverrides(
 					if (i < 0)
 						break;
 					local j = macroValue.find("*/", i);
-					if (j < 0)
+					if (j < 0) {
 						j = #macroValue;
-					else {
+					} else {
 						j += 2;
 					}
 					macroValue = macroValue[:i] + macroValue[j:];

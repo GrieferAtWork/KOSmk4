@@ -440,9 +440,9 @@ libk32_CreateFileA(LPCSTR lpFileName, DWORD dwDesiredAccess, DWORD dwShareMode,
 	if (dwFlagsAndAttributes & FILE_FLAG_WRITE_THROUGH)
 		oflags |= O_DSYNC;
 	if ((dwDesiredAccess & GENERIC_ALL) ||
-	    ((dwDesiredAccess & (GENERIC_READ | GENERIC_WRITE)) == (GENERIC_READ | GENERIC_WRITE)))
+	    ((dwDesiredAccess & (GENERIC_READ | GENERIC_WRITE)) == (GENERIC_READ | GENERIC_WRITE))) {
 		oflags |= O_RDWR;
-	else if (dwDesiredAccess & GENERIC_WRITE) {
+	} else if (dwDesiredAccess & GENERIC_WRITE) {
 		oflags |= O_WRONLY;
 	} else {
 		oflags |= O_RDONLY;

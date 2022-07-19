@@ -821,9 +821,9 @@ NOTHROW(FCALL cmodsymtab_lookup)(struct cmodsymtab const *__restrict self,
 			for (iter = match_min; iter <= match_max; ++iter) {
 				if (!want_symbol(iter, ns))
 					continue;
-				if (!result)
+				if (!result) {
 					result = iter;
-				else {
+				} else {
 					result = prefer_symbol(result, iter, ns);
 					if (!result)
 						break;
@@ -1005,9 +1005,9 @@ again:
 		}
 		if (!result)
 			result = name_attribute;
-		if (!(features & DEBUGINFO_VAR_FEATURE_HASTYPE))
+		if (!(features & DEBUGINFO_VAR_FEATURE_HASTYPE)) {
 			result = NULL; /* We always need a type! */
-		else {
+		} else {
 			*phas_location_information = (features & DEBUGINFO_VAR_FEATURE_HASLOCATION) != 0;
 		}
 		*pns = CMODSYM_DIP_NS_NORMAL;
@@ -2371,11 +2371,11 @@ NOTHROW(FCALL cmodule_findunit_from_dip)(struct cmodule const *__restrict self,
 		size_t index;
 		index  = (lo + hi) / 2;
 		result = &self->cm_cuv[index];
-		if (dip < cmodunit_di_start(result))
+		if (dip < cmodunit_di_start(result)) {
 			hi = index;
-		else if (dip >= cmodunit_di_maxend(result))
+		} else if (dip >= cmodunit_di_maxend(result)) {
 			lo = index + 1;
-		else {
+		} else {
 			/* Found it! */
 			return (struct cmodunit *)result;
 		}

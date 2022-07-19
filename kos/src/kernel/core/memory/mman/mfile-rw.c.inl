@@ -639,9 +639,9 @@ again:
 			max_file_size = mfile_asnode(self)->fn_super->fs_feat.sf_filesize_max;
 		if (OVERFLOW_USUB(max_file_size, offset, &result)) {
 #if __SIZEOF_POS_T__ < __SIZEOF_SIZE_T__
-			if (offset < max_file_size)
+			if (offset < max_file_size) {
 				result = (size_t)-1;
-			else
+			} else
 #endif /* __SIZEOF_POS_T__ < __SIZEOF_SIZE_T__ */
 			{
 				mfile_lock_endread(self);
@@ -700,9 +700,9 @@ again_read_old_filesize:
 		if (OVERFLOW_USUB(filesize, offset, &result)) {
 			result = 0;
 #if __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__
-			if (filesize > offset)
+			if (filesize > offset) {
 				result = (size_t)-1;
-			else
+			} else
 #endif /* __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__ */
 			{
 #ifdef LOCAL_WRITING
@@ -794,9 +794,9 @@ again:
 			filesize = mfile_getsize(self);
 			if (OVERFLOW_USUB(filesize, offset, &io_bytes)) {
 #if __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__
-				if (offset < filesize)
+				if (offset < filesize) {
 					io_bytes = (size_t)-1;
-				else
+				} else
 #endif /* __SIZEOF_POS_T__ > __SIZEOF_SIZE_T__ */
 				{
 					goto dont_handle_vio;

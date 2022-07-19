@@ -189,9 +189,9 @@ DEFINE_COMPAT_SYSCALL5(void *, maplibrary,
 					mapsize_gap = mapsize_fil & PAGEMASK;
 					mapsize_fil &= ~PAGEMASK;
 					mapsize_bss = 0;
-					if (mapsize_mem > mapsize_fil + PAGESIZE)
+					if (mapsize_mem > mapsize_fil + PAGESIZE) {
 						mapsize_bss = mapsize_mem - (mapsize_fil + PAGESIZE);
-					else if (phdr.p_memsz <= phdr.p_filesz) {
+					} else if (phdr.p_memsz <= phdr.p_filesz) {
 						/* No explicit .bss section (can just include the gap-page
 						 * as part of the file mapping portion!) */
 						mapsize_fil += PAGESIZE;

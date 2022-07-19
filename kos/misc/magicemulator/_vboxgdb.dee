@@ -131,9 +131,9 @@ function vBoxTelnetGetResponse(timeout_microseconds: int = -1): Bytes {
 		local d = vBoxTelnetSocket.recv(-1, timeout_microseconds);
 		if (d is none || (d is string && !d))
 			break; /* Timeout */
-		if (result is none)
+		if (result is none) {
 			result = d;
-		else {
+		} else {
 			result += d;
 		}
 		if (!result.endswith("\n") && !result.endswith("\r")) {
@@ -141,18 +141,18 @@ function vBoxTelnetGetResponse(timeout_microseconds: int = -1): Bytes {
 			local n = result.rfind("\n");
 			local r = result.rfind("\r");
 			if (n < 0) {
-				if (r < 0)
+				if (r < 0) {
 					n = 0;
-				else {
+				} else {
 					n = r + 1;
 				}
 			} else {
 				if (r < 0) {
 					++n;
 				} else {
-					if (r > n)
+					if (r > n) {
 						n = r + 1;
-					else {
+					} else {
 						++n;
 					}
 				}
@@ -454,12 +454,12 @@ function vmControlBreakpoint(add: bool, typ: int, addr: int, len: int) {
 	local response;
 	if (typ == GDB_BREAKPOINT_TYPE_READ)
 		typ = GDB_BREAKPOINT_TYPE_READWRITE;
-	if (typ == GDB_BREAKPOINT_TYPE_SWBREAK)
+	if (typ == GDB_BREAKPOINT_TYPE_SWBREAK) {
 		len = 0;
-	else if (typ == GDB_BREAKPOINT_TYPE_HWBREAK) {
-		if (TARGET_ARCH != "x86_64")
+	} else if (typ == GDB_BREAKPOINT_TYPE_HWBREAK) {
+		if (TARGET_ARCH != "x86_64") {
 			len = 1;
-		else if (len != 1 && len != 8) {
+		} else if (len != 1 && len != 8) {
 			throw Error("Invalid breakpoint exec-length: " + len);
 		}
 	} else {
@@ -951,11 +951,11 @@ function _vmResumeUi() {
 function _vmPause0() {
 again:
 	local response = vBoxTelnetExec("stop");
-	if ("The VM is already halted" in response)
-		;
-	else if ("error:" !in response && "Error:" !in response)
+	if ("The VM is already halted" in response) {
+		/* ... */
+	} else if ("error:" !in response && "Error:" !in response) {
 		goto again;
-	else {
+	} else {
 		throw Error("Failed to pause vm: " + repr(response));
 	}
 }
@@ -978,11 +978,11 @@ function _vmResume() {
 	_vmPauseUi();
 again:
 	local response = vBoxTelnetExec("g");
-	if ("already running" in response)
-		;
-	else if ("error:" !in response && "Error:" !in response)
+	if ("already running" in response) {
+		/* ... */
+	} else if ("error:" !in response && "Error:" !in response) {
 		goto again;
-	else {
+	} else {
 		throw Error("Failed to resume vm: " + repr(response));
 	}
 	_vmResumeUi();
@@ -1421,9 +1421,9 @@ function GDBEvaluateQXferRead(name: string, annex: string): Bytes | none {
 		local res = files.get(argv[0]);
 		if (res is none)
 			return false;
-		if (res !is string)
+		if (res !is string) {
 			res = res(argv);
-		else {
+		} else {
 			if (#argv != 1)
 				return false;
 		}
@@ -1635,11 +1635,11 @@ do_vmStep:
 			local stepRangeEnd = none;
 			for (local act: cmd[nameEnd + 1:].split(";")) {
 				local c = act[0];
-				if (c in ["c".ord(), "C".ord()])
-					;
-				else if (c in ["s".ord(), "S".ord()])
+				if (c in ["c".ord(), "C".ord()]) {
+					/* ... */
+				} else if (c in ["s".ord(), "S".ord()]) {
 					shouldStep = true;
-				else if (c == "r".ord()) {
+				} else if (c == "r".ord()) {
 					shouldStep = true;
 					local end = act.find(":");
 					if (end < 0)
@@ -1722,9 +1722,9 @@ do_vmStep:
 			for (local feat: features.split(";")) {
 				if (feat.endswith("+")) {
 					feat = feat[:-1];
-					if (feat == "swbreak")
+					if (feat == "swbreak") {
 						CONFIG_GDB_REMOTE_SUPPORTS_SWBREAK = true;
-					else if (feat == "hwbreak") {
+					} else if (feat == "hwbreak") {
 						CONFIG_GDB_REMOTE_SUPPORTS_HWBREAK = true;
 					}
 				}

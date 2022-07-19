@@ -519,9 +519,9 @@ NOTHROW(FCALL av_printscreen)(void const *start_addr,
 		if (ilen > maxbytes) {
 			for (i = 0; i < maxbytes - 1; ++i) {
 				byte_t value;
-				if (av_getbyte(da.d_pc + i, &value))
+				if (av_getbyte(da.d_pc + i, &value)) {
 					dbg_printf(DBGSTR("%.2" PRIx8 " "), value);
-				else {
+				} else {
 					dbg_print(DBGSTR("?? "));
 				}
 			}
@@ -529,9 +529,9 @@ NOTHROW(FCALL av_printscreen)(void const *start_addr,
 		} else {
 			for (i = 0; i < ilen; ++i) {
 				byte_t value;
-				if (av_getbyte(da.d_pc + i, &value))
+				if (av_getbyte(da.d_pc + i, &value)) {
 					dbg_printf(DBGSTR("%.2" PRIx8 " "), value);
-				else {
+				} else {
 					dbg_print(DBGSTR("?? "));
 				}
 			}
@@ -561,9 +561,9 @@ NOTHROW(FCALL av_printscreen)(void const *start_addr,
 			byte_t value;
 			if (i != 0)
 				dbg_putc(' ');
-			if (av_getbyte(current_line_base + i, &value))
+			if (av_getbyte(current_line_base + i, &value)) {
 				dbg_printf(DBGSTR("%.2" PRIx8), value);
-			else {
+			} else {
 				dbg_print(DBGSTR("??"));
 			}
 		}

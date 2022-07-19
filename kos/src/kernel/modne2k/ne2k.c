@@ -1162,9 +1162,9 @@ Ne2k_ApplyFlagsUnlocked(Ne2kDevice *__restrict self,
 	temp = 0;
 	if (flags & IFF_LOOPBACK)
 		temp |= ERXCR_MON;
-	if (flags & IFF_PROMISC) /* Accept all packages. */
+	if (flags & IFF_PROMISC) { /* Accept all packages. */
 		temp |= ERXCR_AR | ERXCR_AB | ERXCR_AM | ERXCR_PRO;
-	else {
+	} else {
 		if (flags & IFF_ALLMULTI)
 			temp |= ERXCR_AM;
 		if (flags & IFF_BROADCAST)

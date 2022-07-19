@@ -1864,9 +1864,9 @@ epoll_create_rpc_monitor(struct epoll_controller *__restrict self,
 	                 E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE);
 
 	/* Set the default signal number `SIGRPC' if none was specified. */
-	if ((mode & RPC_SIGNO_MASK) == 0)
+	if ((mode & RPC_SIGNO_MASK) == 0) {
 		mode |= RPC_SIGNO(SIGRPC);
-	else {
+	} else {
 		signo_t signo = _RPC_GETSIGNO(mode);
 		if unlikely(!sigvalid(signo)) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,

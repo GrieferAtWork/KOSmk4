@@ -229,9 +229,9 @@ function main(parser: Autom8Parser, none) {
 			i = enumDocEnd + 2;
 		}
 		if (enumValue is int) {
-			if (enumValue < 0)
+			if (enumValue < 0) {
 				enumValue = f"({enumValue})";
-			else {
+			} else {
 				enumValue = str(enumValue);
 			}
 		}

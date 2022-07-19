@@ -1088,9 +1088,9 @@ libterminal_do_iwrite(struct terminal *__restrict self,
 			ch = *iter;
 			if ((lflag & (ICANON | XCASE | __IXCASEING)) == (ICANON | XCASE | __IXCASEING)) {
 				lflag &= ~__IXCASEING;
-				if (ch >= 'A' && ch <= 'Z')
+				if (ch >= 'A' && ch <= 'Z') {
 					++iter; /* Keep this character as upper-case. */
-				else {
+				} else {
 					/* Print the missing backslash. */
 					temp = libterminal_do_iwrite_formatted(self, "\\", 1,
 					                                       mode, iflag, lflag);
@@ -1591,9 +1591,9 @@ again:
 		sched_signal_broadcast(&self->t_ibuf.rb_nempty);
 	if ((old.c_lflag & ICANON) != 0 && (tio->c_lflag & ICANON) == 0)
 		sched_signal_broadcast(&self->t_canon.lb_nful);
-	if (((old.c_iflag & IXOFF) != 0 && (tio->c_iflag & IXOFF) == 0) || echo_disabled)
+	if (((old.c_iflag & IXOFF) != 0 && (tio->c_iflag & IXOFF) == 0) || echo_disabled) {
 		sched_signal_broadcast(&self->t_opend.lb_nful);
-	else if ((old.c_iflag & IXOFF) == 0 && (tio->c_iflag & IXOFF) != 0) {
+	} else if ((old.c_iflag & IXOFF) == 0 && (tio->c_iflag & IXOFF) != 0) {
 		sched_signal_broadcast(&self->t_ioschange);
 	}
 	if (((old.c_iflag & __IIOFF) != 0 && (tio->c_iflag & __IIOFF) == 0) || echo_disabled)

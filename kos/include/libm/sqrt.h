@@ -116,9 +116,9 @@ __LIBM_LOCAL_FUNC(sqrtf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 		__z = __LIBM_LOCAL_VALUE(onef) - __LIBM_LOCAL_VALUE(tinyf); /* trigger inexact flag */
 		if (__z >= __LIBM_LOCAL_VALUE(onef)) {
 			__z = __LIBM_LOCAL_VALUE(onef) + __LIBM_LOCAL_VALUE(tinyf);
-			if (__z > __LIBM_LOCAL_VALUE(onef))
+			if (__z > __LIBM_LOCAL_VALUE(onef)) {
 				__q += 2;
-			else {
+			} else {
 				__q += (__q & 1);
 			}
 		}
@@ -170,9 +170,9 @@ __LIBM_LOCAL_FUNC(sqrt) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	}
 	/* take care of zero */
 	if (__ix0 <= 0) {
-		if (((__ix0 & (~__sign)) | __ix1) == 0)
+		if (((__ix0 & (~__sign)) | __ix1) == 0) {
 			return __x; /* sqrt(+-0) = +-0 */
-		else if (__ix0 < 0) {
+		} else if (__ix0 < 0) {
 			return (__x - __x) / (__x - __x); /* sqrt(-ve) = sNaN */
 		}
 	}

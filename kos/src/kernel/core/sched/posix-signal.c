@@ -784,9 +784,9 @@ DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
 	}
 	result = (syscall_slong_t)signal_waitfor(&these, &info,
 	                                         abs_timeout);
-	if (!result)
+	if (!result) {
 		result = -EAGAIN; /* Posix says EAGAIN for this. */
-	else {
+	} else {
 		siginfo_to_compat_siginfo(&info, uinfo);
 	}
 	return result;
@@ -831,9 +831,9 @@ DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait_time64,
 	}
 	result = (syscall_slong_t)signal_waitfor(uthese, &info,
 	                                         abs_timeout);
-	if (!result)
+	if (!result) {
 		result = -EAGAIN; /* Posix says EAGAIN for this. */
-	else {
+	} else {
 		siginfo_to_compat_siginfo(&info, uinfo);
 	}
 	return result;

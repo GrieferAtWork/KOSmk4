@@ -522,11 +522,11 @@ NOTHROW(KCALL get_control_key)(u8 ch) {
 		break;
 
 	default:
-		if (ch >= 0x40 && ch <= 0x5f)
+		if (ch >= 0x40 && ch <= 0x5f) {
 			ch -= 0x40;
-		else if (ch >= 0x60 && ch <= 0x7f)
+		} else if (ch >= 0x60 && ch <= 0x7f) {
 			ch -= 0x60;
-		else {
+		} else {
 			ch = 0xff;
 		}
 		break;

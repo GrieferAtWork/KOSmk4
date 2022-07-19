@@ -479,9 +479,9 @@ INTERN ATTR_SECTION(".text.crt.dos.compat.dos.errno")
 NOBLOCK ATTR_CONST /*dos*/ errno_t
 NOTHROW(LIBDCALL libd_errno_kos2dos)(/*kos*/ errno_t value) {
 	errno_t result;
-	if ((unsigned int)value > EMAX)
+	if ((unsigned int)value > EMAX) {
 		result = DOS_EOTHER;
-	else {
+	} else {
 		result = kos2dos_db[(unsigned int)value];
 	}
 	return result;
@@ -492,9 +492,9 @@ INTERN ATTR_SECTION(".text.crt.dos.compat.dos.errno")
 NOBLOCK ATTR_CONST /*kos*/ errno_t
 NOTHROW(LIBDCALL libd_errno_dos2kos)(/*dos*/ errno_t value) {
 	errno_t result;
-	if ((unsigned int)value > DOS_EMAX)
+	if ((unsigned int)value > DOS_EMAX) {
 		result = EPERM;
-	else {
+	} else {
 		result = dos2kos_db[(unsigned int)value];
 	}
 	return result;

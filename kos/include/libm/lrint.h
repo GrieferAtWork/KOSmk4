@@ -271,9 +271,9 @@ __LIBM_LOCAL_FUNC(lrint) __ATTR_WUNUSED __ATTR_CONST long int
 			case FE_DOWNWARD:
 				__i0 |= __UINT32_C(0x100000);
 				if (__sx && (__i1 & __i) != 0) {
-					if (__j0 == IEEE754_DOUBLE_SHIFT)
+					if (__j0 == IEEE754_DOUBLE_SHIFT) {
 						__i0 += 1;
-					else {
+					} else {
 						__j = __i1 + (__UINT32_C(1) << (52 - __j0));
 						if (__j < __i1)
 							__i0 += 1; /* got a carry */
@@ -284,9 +284,9 @@ __LIBM_LOCAL_FUNC(lrint) __ATTR_WUNUSED __ATTR_CONST long int
 			case FE_UPWARD:
 				__i0 |= __UINT32_C(0x100000);
 				if (!__sx && (__i1 & __i) != 0) {
-					if (__j0 == IEEE754_DOUBLE_SHIFT)
+					if (__j0 == IEEE754_DOUBLE_SHIFT) {
 						__i0 += 1;
-					else {
+					} else {
 						__j = __i1 + (__UINT32_C(1) << (52 - __j0));
 						if (__j < __i1)
 							__i0 += 1; /* got a carry */
@@ -407,9 +407,9 @@ __LIBM_LOCAL_FUNC(llrint) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 			case FE_DOWNWARD:
 				__i0 |= __UINT32_C(0x100000);
 				if (__sx && (__i1 & __i) != 0) {
-					if (__j0 == IEEE754_DOUBLE_SHIFT)
+					if (__j0 == IEEE754_DOUBLE_SHIFT) {
 						__i0 += 1;
-					else {
+					} else {
 						__j = __i1 + (__UINT32_C(1) << (52 - __j0));
 						if (__j < __i1)
 							__i0 += 1; /* got a carry */
@@ -420,9 +420,9 @@ __LIBM_LOCAL_FUNC(llrint) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 			case FE_UPWARD:
 				__i0 |= __UINT32_C(0x100000);
 				if (!__sx && (__i1 & __i) != 0) {
-					if (__j0 == IEEE754_DOUBLE_SHIFT)
+					if (__j0 == IEEE754_DOUBLE_SHIFT) {
 						__i0 += 1;
-					else {
+					} else {
 						__j = __i1 + (__UINT32_C(1) << (52 - __j0));
 						if (__j < __i1)
 							__i0 += 1; /* got a carry */
@@ -553,9 +553,9 @@ __LIBM_LOCAL_FUNC(lrintl) __ATTR_WUNUSED __ATTR_CONST long int
 				break;
 			case FE_DOWNWARD:
 				if (__sx && (__i1 & __i) != 0) {
-					if (__j0 == 31)
+					if (__j0 == 31) {
 						__i0 += 1;
-					else {
+					} else {
 						__j = __i1 + (__UINT32_C(1) << (63 - __j0));
 						if (__j < __i1) {
 							__i0 += 1; /* got a carry */
@@ -570,9 +570,9 @@ __LIBM_LOCAL_FUNC(lrintl) __ATTR_WUNUSED __ATTR_CONST long int
 				break;
 			case FE_UPWARD:
 				if (!__sx && (__i1 & __i) != 0) {
-					if (__j0 == 31)
+					if (__j0 == 31) {
 						__i0 += 1;
-					else {
+					} else {
 						__j = __i1 + (__UINT32_C(1) << (63 - __j0));
 						if (__j < __i1) {
 							__i0 += 1; /* got a carry */
@@ -708,9 +708,9 @@ __LIBM_LOCAL_FUNC(llrintl) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 				break;
 			case FE_DOWNWARD:
 				if (__sx && (__i1 & __i) != 0) {
-					if (__j0 == 31)
+					if (__j0 == 31) {
 						__i0 += 1;
-					else {
+					} else {
 						__j = __i1 + (__UINT32_C(1) << (63 - __j0));
 						if (__j < __i1) {
 							__i0 += 1; /* got a carry */
@@ -725,9 +725,9 @@ __LIBM_LOCAL_FUNC(llrintl) __ATTR_WUNUSED __ATTR_CONST __LONGLONG
 				break;
 			case FE_UPWARD:
 				if (!__sx && (__i1 & __i) != 0) {
-					if (__j0 == 31)
+					if (__j0 == 31) {
 						__i0 += 1;
-					else {
+					} else {
 						__j = __i1 + (__UINT32_C(1) << (63 - __j0));
 						if (__j < __i1) {
 							__i0 += 1; /* got a carry */

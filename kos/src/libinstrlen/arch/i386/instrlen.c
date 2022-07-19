@@ -261,9 +261,9 @@ NOTHROW_NCX(CC libil_instruction_succ)(void const *pc,
 #endif /* __x86_64__ */
 	case I_24:
 		/* Instruction has a 2- or 4-byte tail (based on EMU86_F_OP16) */
-		if (IS_OP16())
+		if (IS_OP16()) {
 			result += 2; /* 16-bit immediate operand */
-		else {
+		} else {
 			result += 4; /* 32-bit immediate operand */
 		}
 		break;
@@ -289,9 +289,9 @@ handle_rm1:
 		case I_RM24:
 			/* Instruction has a modr/m tail, followed by a 2- or 4-byte immediate operand (based on EMU86_F_OP16) */
 handle_rm24:
-			if (IS_OP16())
+			if (IS_OP16()) {
 				result += 2; /* 16-bit immediate operand */
-			else {
+			} else {
 				result += 4; /* 32-bit immediate operand */
 			}
 			break;
@@ -314,18 +314,18 @@ handle_rm24:
 
 	case I_AD24:
 		/* Instruction has a 2- or 4-byte tail (based on EMU86_F_AD16) */
-		if (IS_AD16())
+		if (IS_AD16()) {
 			result += 2; /* 16-bit immediate operand */
-		else {
+		} else {
 			result += 4; /* 32-bit immediate operand */
 		}
 		break;
 
 	case I_AD46:
 		/* Instruction has a 4- or 6-byte tail (based on EMU86_F_AD16) */
-		if (IS_AD16())
+		if (IS_AD16()) {
 			result += 4; /* 16+16-bit immediate operand */
-		else {
+		} else {
 			result += 6; /* 32+16-bit immediate operand */
 		}
 		break;

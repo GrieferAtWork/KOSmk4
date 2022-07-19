@@ -72,9 +72,9 @@ __NOTHROW(fpustate_ftwx2ftw_long_double)(__uint8_t __ftw, union ieee854_long_dou
 			} else if (__sti[__i].ieee_nan.exponent == 0) {
 				if (__sti[__i].ieee_nan.mantissa1 == 0 &&
 				    __sti[__i].ieee_nan.mantissa0 == 0 &&
-					__sti[__i].ieee_nan.one == 0)
+					__sti[__i].ieee_nan.one == 0) {
 					__res |= FTW_ZERO(__i); /* Fraction all 0's (and j == 0) */
-				else {
+				} else {
 					__res |= FTW_SPEC(__i);
 				}
 			} else if (__sti[__i].ieee_nan.one == 0) {
@@ -103,9 +103,9 @@ __NOTHROW(fpustate_ftwx2ftw_float80)(__uint8_t __ftw, union ieee854_float80 cons
 			} else if (__sti[__i].ieee_nan.exponent == 0) {
 				if (__sti[__i].ieee_nan.mantissa1 == 0 &&
 				    __sti[__i].ieee_nan.mantissa0 == 0 &&
-					__sti[__i].ieee_nan.one == 0)
+					__sti[__i].ieee_nan.one == 0) {
 					__res |= FTW_ZERO(__i); /* Fraction all 0's (and j == 0) */
-				else {
+				} else {
 					__res |= FTW_SPEC(__i);
 				}
 			} else if (__sti[__i].ieee_nan.one == 0) {

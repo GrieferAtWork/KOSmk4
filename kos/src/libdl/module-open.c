@@ -832,9 +832,9 @@ DlModule_ElfLoadLoadedProgramHeaders(DlModule *__restrict self)
 			if unlikely(self->dm_tlsfsize > self->dm_tlsmsize)
 				self->dm_tlsfsize = self->dm_tlsmsize;
 			/* Validate/Fix the TLS alignment requirements. */
-			if (!self->dm_tlsalign || self->dm_tlsalign < sizeof(void *))
+			if (!self->dm_tlsalign || self->dm_tlsalign < sizeof(void *)) {
 				self->dm_tlsalign = sizeof(void *);
-			else if unlikely(self->dm_tlsalign & (self->dm_tlsalign - 1)) {
+			} else if unlikely(self->dm_tlsalign & (self->dm_tlsalign - 1)) {
 				size_t real_align = sizeof(void *);
 				while (real_align < self->dm_tlsalign &&
 				       !(real_align & ((size_t)1 << ((sizeof(void *) * NBBY) - 1))))

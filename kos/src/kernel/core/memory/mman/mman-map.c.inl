@@ -323,9 +323,9 @@ er_bad_addr_alignment:
 		/* Check the upper bound. */
 		if (file_size > 0) {
 			size_t max_file_size;
-			if (file_pos >= file_map_maxaddr)
+			if (file_pos >= file_map_maxaddr) {
 				max_file_size = 0;
-			else {
+			} else {
 				if (OVERFLOW_USUB(file_map_maxaddr, file_pos, &max_file_size) ||
 				    OVERFLOW_UADD(max_file_size, 1, &max_file_size))
 					max_file_size = SIZE_MAX;

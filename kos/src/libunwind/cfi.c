@@ -2311,9 +2311,9 @@ libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self
 	/* Execute the emulator. */
 	result = libuw_unwind_emulator_exec_autostack(&emulator, NULL, &ste_top, NULL);
 	assert(emulator.ue_piecebits <= bufsize * NBBY);
-	if (result == UNWIND_EMULATOR_NO_RETURN_VALUE)
+	if (result == UNWIND_EMULATOR_NO_RETURN_VALUE) {
 		result = UNWIND_SUCCESS; /* No stack-entry location. */
-	else if (result == UNWIND_SUCCESS) {
+	} else if (result == UNWIND_SUCCESS) {
 		/* Dereference the last stack to fill in the missing data pieces. */
 		result = libuw_unwind_emulator_read_from_piece(&emulator,
 		                                               &ste_top,
@@ -2374,9 +2374,9 @@ libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self
 	/* Execute the emulator. */
 	result = libuw_unwind_emulator_exec_autostack(&emulator, NULL, &ste_top, NULL);
 	assert(emulator.ue_piecebits <= bufsize * NBBY);
-	if (result == UNWIND_EMULATOR_NO_RETURN_VALUE)
+	if (result == UNWIND_EMULATOR_NO_RETURN_VALUE) {
 		result = UNWIND_SUCCESS; /* No stack-entry location. */
-	else if (result == UNWIND_SUCCESS) {
+	} else if (result == UNWIND_SUCCESS) {
 		/* Dereference the last stack to fill in the missing data pieces. */
 		result = libuw_unwind_emulator_write_to_piece(&emulator,
 		                                              &ste_top,

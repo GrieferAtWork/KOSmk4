@@ -355,7 +355,8 @@ TypenameMacros:
   - DLIST_ENTRY
   - XSIMPLEQ_ENTRY
 UseCRLF: false
-UseTab: AlignWithSpaces
+#UseTab: AlignWithSpaces
+UseTab: ForIndentation
 WhitespaceSensitiveMacros:
   - PP_STR
   - __PP_STR

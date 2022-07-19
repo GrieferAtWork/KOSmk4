@@ -451,9 +451,9 @@ DEFINE_PUBLIC_ALIAS(errno_cyg2kos, libd_errno_cyg2kos);
 INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.compat.cyg.errno")
 NOBLOCK /*kos*/ errno_t NOTHROW(LIBDCALL libd_errno_cyg2kos)(/*cyg*/ errno_t value) {
 	errno_t result;
-	if ((unsigned int)value > CYG_EMAX)
+	if ((unsigned int)value > CYG_EMAX) {
 		result = EPERM;
-	else {
+	} else {
 		result = cyg2kos_db[(unsigned int)value];
 	}
 	return result;
@@ -463,9 +463,9 @@ DEFINE_PUBLIC_ALIAS(errno_kos2cyg, libd_errno_kos2cyg);
 INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.compat.cyg.errno")
 NOBLOCK /*cyg*/ errno_t NOTHROW(LIBDCALL libd_errno_kos2cyg)(/*kos*/ errno_t value) {
 	errno_t result;
-	if ((unsigned int)value > EMAX)
+	if ((unsigned int)value > EMAX) {
 		result = CYG_EPERM;
-	else {
+	} else {
 		result = kos2cyg_db[(unsigned int)value];
 	}
 	return result;

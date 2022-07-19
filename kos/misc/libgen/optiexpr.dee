@@ -563,9 +563,9 @@ handle_generic_expression:
 				tok = parser.next();
 				if (tok == "")
 					break;
-				if (tok == starttok)
+				if (tok == starttok) {
 					++recursion;
-				else if (tok == endtok) {
+				} else if (tok == endtok) {
 					if (!recursion)
 						break;
 					--recursion;

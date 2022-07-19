@@ -26,8 +26,9 @@
 #include <kernel/compiler.h>
 
 #include <debugger/config.h>
-#include <debugger/io.h>
 #include <debugger/entry.h>
+#include <debugger/hook.h>
+#include <debugger/io.h>
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
 #include <kernel/fpu.h>
@@ -100,8 +101,8 @@ NOTHROW(FCALL GDBServer_HasStopEvent)(GDBThreadStopEvent const *chain,
 
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 PRIVATE void KCALL GDBServer_RecursiveEntryDebuggerMain(void) {
-	dbg_printf(AC_COLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON)
-	           "Recursive GDB trap" AC_DEFATTR "\n");
+	dbg_printf(DBGSTR(AC_COLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON)
+	                  "Recursive GDB trap" AC_DEFATTR "\n"));
 }
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 

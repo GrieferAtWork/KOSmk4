@@ -38,9 +38,9 @@ for (local l: File.open(db_filename, "r")) {
 	l = l.strip().decode("utf-8");
 	if (l.startswith("/" "*[[[") && l.endswith("]]]*" "/")) {
 		l = l[5:-5];
-		if (l.startswith("end:"))
+		if (l.startswith("end:")) {
 			current_namespace = none;
-		else if (l.startswith("start:")) {
+		} else if (l.startswith("start:")) {
 			l = l[6:];
 			current_namespace = {
 				"ops"      : 0x000000,

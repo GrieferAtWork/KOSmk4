@@ -1802,23 +1802,23 @@ __NOTHROW_NCX(__private_bzero_constant)(void *__restrict __dst,
 		break;
 	}
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
-	if (!(__n_bytes & 7))
+	if (!(__n_bytes & 7)) {
 		__libc_core_bzeroq(__dst, __n_bytes >> 3);
-	else if (!(__n_bytes & 3))
+	} else if (!(__n_bytes & 3)) {
 		__libc_core_bzerol(__dst, __n_bytes >> 2);
-	else if (!(__n_bytes & 1))
+	} else if (!(__n_bytes & 1)) {
 		__libc_core_bzerow(__dst, __n_bytes >> 1);
-	else {
+	} else {
 		__libc_core_bzero(__dst, __n_bytes);
 	}
 #else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
-	if (!(__n_bytes & 7) && __alignment >= 8)
+	if (!(__n_bytes & 7) && __alignment >= 8) {
 		__libc_core_bzeroq(__dst, __n_bytes >> 3);
-	else if (!(__n_bytes & 3) && __alignment >= 4)
+	} else if (!(__n_bytes & 3) && __alignment >= 4) {
 		__libc_core_bzerol(__dst, __n_bytes >> 2);
-	else if (!(__n_bytes & 1) && __alignment >= 2)
+	} else if (!(__n_bytes & 1) && __alignment >= 2) {
 		__libc_core_bzerow(__dst, __n_bytes >> 1);
-	else {
+	} else {
 		__libc_core_bzero(__dst, __n_bytes);
 	}
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */

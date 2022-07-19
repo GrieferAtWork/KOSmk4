@@ -103,13 +103,13 @@ $uint32_t inet_lnaof(struct in_addr inaddr) {
 struct in_addr inet_makeaddr($uint32_t net, $uint32_t host) {
 	struct @in_addr@ result;
 	uint32_t result_addr;
-	if (net < @IN_CLASSA_MAX@)
+	if (net < @IN_CLASSA_MAX@) {
 		result_addr = (net << @IN_CLASSA_NSHIFT@) | (host & @IN_CLASSA_HOST@);
-	else if (net < @IN_CLASSB_MAX@)
+	} else if (net < @IN_CLASSB_MAX@) {
 		result_addr = (net << @IN_CLASSB_NSHIFT@) | (host & @IN_CLASSB_HOST@);
-	else if (net < @IN_CLASSC_MAX@)
+	} else if (net < @IN_CLASSC_MAX@) {
 		result_addr = (net << @IN_CLASSC_NSHIFT@) | (host & @IN_CLASSC_HOST@);
-	else {
+	} else {
 		result_addr = net | host;
 	}
 	result.@s_addr@ = __hybrid_htobe32(result_addr);

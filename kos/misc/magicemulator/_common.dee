@@ -66,9 +66,9 @@ function findExecutableInPath(path: string, name: string): string | none {
 				if (l.startswith("echo"))
 					continue;
 				if (l.endswith("%*")) {
-					if (res !is none)
+					if (res !is none) {
 						res = false;
-					else {
+					} else {
 						l = l[:-2].rstrip();
 						if (l.startswith("\"") && l.endswith("\""))
 							l = l[1:-1];
@@ -174,9 +174,9 @@ function printFormattedAddr2line(
 		func: string, addr: string) {
 	for (local i = 0; i < #format; ++i) {
 		local ch = format[i];
-		if (ch != "%" || i == #format-1)
+		if (ch != "%" || i == #format-1) {
 			writeStdout(ch);
-		else {
+		} else {
 			++i;
 			ch = format[i];
 			if (ch == "f") {
@@ -370,9 +370,9 @@ function reOpenProcessStdoutAndWrapAsGdbMIMessageStream(processName: string): Ca
 				local final FORMAT = "@{!r}\n";
 #endif
 				if (data !is string) {
-					if (data is Bytes)
+					if (data is Bytes) {
 						data = data.decode("utf-8", "ignore");
-					else {
+					} else {
 						data = str(data);
 					}
 				}

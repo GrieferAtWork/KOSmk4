@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d7b35a7 */
+/* HASH CRC-32:0x1abb859b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1737,10 +1737,11 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.write") ATTR_IN(1) __STDC_INT
 	result = libc_fputs_unlocked(string, stdout);
 	if (result >= 0) {
 		temp = libc_fputc_unlocked('\n', stdout);
-		if (temp <= 0)
+		if (temp <= 0) {
 			result = temp;
-		else
+		} else {
 			result += temp;
+		}
 	}
 	return result;
 }

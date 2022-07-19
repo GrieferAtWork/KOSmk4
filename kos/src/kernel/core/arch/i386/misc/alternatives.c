@@ -203,9 +203,9 @@ NOTHROW(KCALL x86_initialize_alternatives)(void) {
 	 *   CPUID_1D_TSC                  -> CPUID_1D_ACPI
 	 *
 	 */
-	if (x86_lapicbase_)
+	if (x86_lapicbase_) {
 		bootcpu_x86_cpuid_.ci_1d |= CPUID_1D_ACPI;
-	else {
+	} else {
 		/* NOTE: The  KOS kernel assumes that HAVE_TSC -> HAVE_APIC,
 		 *       so if we don't have an APIC, then we must hide TSC. */
 		bootcpu_x86_cpuid_.ci_1d &= ~(CPUID_1D_ACPI | CPUID_1D_TSC);

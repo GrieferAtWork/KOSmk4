@@ -408,9 +408,9 @@ again:
 	 *       we can unmap user-space without having to do SMP TLB shoot-downs. */
 #ifndef CONFIG_NO_SMP
 	if (!(additional_actions & MBUILDER_APPLY_AA_TERMTHREADS)) {
-		if (target == THIS_MMAN)
+		if (target == THIS_MMAN) {
 			pagedir_unmap_userspace();
-		else {
+		} else {
 			pagedir_unmap_userspace_p(target->mm_pagedir_p);
 		}
 	} else

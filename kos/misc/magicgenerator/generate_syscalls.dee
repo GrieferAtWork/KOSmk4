@@ -299,9 +299,9 @@ class CType {
 			if (s < e) {
 				local n = typename[s:e];
 				local org = syscallTypeDeclarationOrigins.get(n);
-				if (org !is none)
+				if (org !is none) {
 					headers.insert(org);
-				else {
+				} else {
 					n = syscallTypeEscapedStructTypes.get(n);
 					if (n !is none) {
 						local org = syscallTypeDeclarationOrigins.get(n);
@@ -442,9 +442,9 @@ class Function {
 		if (!returnType.typename.endswith("*"))
 			fp << " ";
 		fp << name << "(";
-		if (!args)
+		if (!args) {
 			fp << "void";
-		else {
+		} else {
 			local isFirst = true;
 			for (local t, n: args) {
 				if (!isFirst)
@@ -1413,15 +1413,15 @@ function parseSyscallDefs(
 			}
 			/* Deal with negative (extended) system call numbers */
 			if (syscall_number < 0) {
-				if (arch.platformMaxPossibleSysno >= 0xffffffffffffffffffffffffffffffff)
+				if (arch.platformMaxPossibleSysno >= 0xffffffffffffffffffffffffffffffff) {
 					syscall_number = syscall_number.unsigned128;
-				else if (arch.platformMaxPossibleSysno >= 0xffffffffffffffff)
+				} else if (arch.platformMaxPossibleSysno >= 0xffffffffffffffff) {
 					syscall_number = syscall_number.unsigned64;
-				else if (arch.platformMaxPossibleSysno >= 0xffffffff)
+				} else if (arch.platformMaxPossibleSysno >= 0xffffffff) {
 					syscall_number = syscall_number.unsigned32;
-				else if (arch.platformMaxPossibleSysno >= 0xffff)
+				} else if (arch.platformMaxPossibleSysno >= 0xffff) {
 					syscall_number = syscall_number.unsigned16;
-				else {
+				} else {
 					syscall_number = syscall_number.unsigned8;
 				}
 			}

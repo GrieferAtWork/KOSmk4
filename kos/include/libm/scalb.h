@@ -57,9 +57,9 @@ __LIBM_LOCAL_FUNC(scalbf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	if (__ieee754_isnanf(__x) || __ieee754_isnanf(__fn))
 		return __x * __fn;
 	if (!__ieee754_finitef(__fn)) {
-		if (__fn > __IEEE754_FLOAT_C(0.0))
+		if (__fn > __IEEE754_FLOAT_C(0.0)) {
 			return __x * __fn;
-		else {
+		} else {
 			return __x / (-__fn);
 		}
 	}
@@ -100,9 +100,9 @@ __LIBM_LOCAL_FUNC(scalb) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	if (__ieee754_isnan(__x) || __ieee754_isnan(__fn))
 		return __x * __fn;
 	if (!__ieee754_finite(__fn)) {
-		if (__fn > __IEEE754_DOUBLE_C(0.0))
+		if (__fn > __IEEE754_DOUBLE_C(0.0)) {
 			return __x * __fn;
-		else {
+		} else {
 			return __x / (-__fn);
 		}
 	}

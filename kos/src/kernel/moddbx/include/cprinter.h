@@ -64,7 +64,7 @@ ctype_printname(struct ctype const *__restrict self,
  * @param: self:             The typing of `buf'
  * @param: printer:          The printer used to output data.
  * @param: buf:              The data buffer that should be printed.
- *                           This should point to a block of `ctype_sizeof(self)' types.
+ *                           This should point to a block of `ctype_sizeof(self)' bytes.
  * @param: flags:            Printing flags (set of `CTYPE_PRINTVALUE_FLAG_*')
  * @param: firstline_indent: # of SPC (' ') characters already printed on the current line.
  * @param: newline_indent:   # of SPC (' ') characters to print after every \n-character.
@@ -74,7 +74,7 @@ ctype_printname(struct ctype const *__restrict self,
  * @param: maxlinelen:       The max line  length that  should not be  exceeded by  when
  *                           placing   short  struct  initializers  on  the  same  line.
  *                           Ignored when `CTYPE_PRINTVALUE_FLAG_NOSHORTLINES' is given.
- *                           If sufficient space is available, do this:
+ *                           If insufficient space is available, do this:
  *                           >> {foo: {x: 10, y: 20}}
  *                           or this:
  *                           >> {
@@ -110,7 +110,7 @@ ctype_printvalue(struct ctyperef const *__restrict self,
                                                          * in a manner that is supported by the C standard. Normally, the
                                                          * following types of pointers get assigned special names:
                                                          *   #1 The 0-pointer is printed as `NULL'
-                                                         *   #2 Text/data pointers  (points  into  static  memory  segments)
+                                                         *   #2 Text/data pointers  (pointers into  static memory  segments)
                                                          *      are attempted to be reversed  by looking at debug info,  and
                                                          *      will  be printed as `&base_symbol' or `&base_symbol+offset',
                                                          *      when `offset' can be cleanly divided by the pointed-to type,

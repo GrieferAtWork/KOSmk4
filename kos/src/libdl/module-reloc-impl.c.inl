@@ -146,9 +146,9 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 				 * Since builtin symbols don't have size information associated with themself,
 				 * we ignore import sizes and solely  rely on whatever the hosted  application
 				 * is telling us to be expecting. */
-				if (src_size == 0 && src_module == &dl_rtld_module)
+				if (src_size == 0 && src_module == &dl_rtld_module) {
 					src_size = dst_sym->st_size;
-				else {
+				} else {
 					syslog(LOG_WARN, "[rtld] %q: Symbol %q imported with %" PRIuSIZ " "
 					                 "bytes, but exported with %" PRIuSIZ " from %q\n",
 					       self->dm_filename, self->dm_elf.de_dynstr + dst_sym->st_name,

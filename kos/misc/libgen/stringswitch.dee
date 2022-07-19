@@ -40,9 +40,9 @@ function getRequirementsForCases(
 	local commonConditions = HashSet();
 	for (local none, data: cases) {
 		local none, cond = normalizeData(data)...;
-		if (cond)
+		if (cond) {
 			commonConditions.insert(cond);
-		else {
+		} else {
 			return none;
 		}
 	}
@@ -253,9 +253,9 @@ handle_single_case:
 				parentCommonCC: commonCC ? commonCC : parentCommonCC);
 			print indent,;
 			print "}",;
-			if (!is_last)
+			if (!is_last) {
 				print " else",;
-			else if (defaultCase !is none) {
+			} else if (defaultCase !is none) {
 				if (commonCC) {
 					print " else";
 					print "#endif /*",commonCC,"*/";

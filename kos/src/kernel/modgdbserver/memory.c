@@ -47,9 +47,9 @@ INTERN NONNULL((1, 3)) size_t
 NOTHROW(FCALL GDB_ReadMemory)(struct task *__restrict thread,
                               VIRT void const *addr, void *buf, size_t num_bytes) {
 	size_t result;
-	if (ADDR_ISKERN(addr))
+	if (ADDR_ISKERN(addr)) {
 		result = GDB_MMan_ReadMemory(&mman_kernel, addr, buf, num_bytes);
-	else {
+	} else {
 		REF struct mman *effective_mm;
 		effective_mm = task_getmman(thread);
 		result = GDB_MMan_ReadMemory(effective_mm, addr, buf, num_bytes);
@@ -62,9 +62,9 @@ INTERN NONNULL((1, 3)) size_t
 NOTHROW(FCALL GDB_WriteMemory)(struct task *__restrict thread,
                                VIRT void *addr, void *buf, size_t num_bytes) {
 	size_t result;
-	if (ADDR_ISKERN(addr))
+	if (ADDR_ISKERN(addr)) {
 		result = GDB_MMan_WriteMemory(&mman_kernel, addr, buf, num_bytes);
-	else {
+	} else {
 		REF struct mman *effective_mm;
 		effective_mm = task_getmman(thread);
 		result = GDB_MMan_WriteMemory(effective_mm, addr, buf, num_bytes);
@@ -78,9 +78,9 @@ NOTHROW(FCALL GDB_ReadMemoryWithoutSwBreak)(struct task *__restrict thread,
                                             VIRT void const *addr,
                                             void *buf, size_t num_bytes) {
 	size_t result;
-	if (ADDR_ISKERN(addr))
+	if (ADDR_ISKERN(addr)) {
 		result = GDB_MMan_ReadMemoryWithoutSwBreak(&mman_kernel, addr, buf, num_bytes);
-	else {
+	} else {
 		REF struct mman *effective_mm;
 		effective_mm = task_getmman(thread);
 		result = GDB_MMan_ReadMemoryWithoutSwBreak(effective_mm, addr, buf, num_bytes);
@@ -94,9 +94,9 @@ NOTHROW(FCALL GDB_WriteMemoryWithoutSwBreak)(struct task *__restrict thread,
                                              VIRT void *addr,
                                              void const *buf, size_t num_bytes) {
 	size_t result;
-	if (ADDR_ISKERN(addr))
+	if (ADDR_ISKERN(addr)) {
 		result = GDB_MMan_WriteMemoryWithoutSwBreak(&mman_kernel, addr, buf, num_bytes);
-	else {
+	} else {
 		REF struct mman *effective_mm;
 		effective_mm = task_getmman(thread);
 		result = GDB_MMan_WriteMemoryWithoutSwBreak(effective_mm, addr, buf, num_bytes);

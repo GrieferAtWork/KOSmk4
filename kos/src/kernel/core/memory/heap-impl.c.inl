@@ -225,9 +225,9 @@ search_heap:
 #endif /* CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
 		/* Initialize the result memory. */
 		if (flags & GFP_CALLOC) {
-			if (chain_flags & MFREE_FZERO)
+			if (chain_flags & MFREE_FZERO) {
 				bzero(result_ptr, SIZEOF_MFREE);
-			else {
+			} else {
 				bzero(result_ptr, result_siz);
 			}
 		}
@@ -433,9 +433,9 @@ again:
 		if ((slot_flags & GFP_CALLOC) && (flags & GFP_CALLOC))
 			bzero(slot, SIZEOF_MFREE);
 #else /* !CONFIG_HAVE_KERNEL_DEBUG_HEAP */
-		if (flags & GFP_CALLOC)
+		if (flags & GFP_CALLOC) {
 			bzero(slot, SIZEOF_MFREE);
-		else {
+		} else {
 			mempatl(slot, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);
 		}
 #endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
@@ -732,9 +732,9 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_align_untraced)(struct heap *__restrict self,
 #endif /* CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
 			/* Initialize the resulting memory. */
 			if (flags & GFP_CALLOC) {
-				if (chain_flags & MFREE_FZERO)
+				if (chain_flags & MFREE_FZERO) {
 					bzero(result_ptr, SIZEOF_MFREE);
-				else {
+				} else {
 					bzero(result_ptr, result_siz);
 				}
 			}

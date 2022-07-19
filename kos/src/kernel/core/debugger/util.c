@@ -329,7 +329,7 @@ again_printlevel:
 				p1 = p2;
 			if (!p1)
 				p1 = info.al_srcfile;
-			dbg_print(" [");
+			dbg_print(DBGSTR(" ["));
 			dbg_savecolor();
 			dbg_setfgcolor(fgcolor);
 			dbg_print(p1);
@@ -544,14 +544,14 @@ NOTHROW(KCALL dbg_messagebox)(char const *__restrict title,
 	}
 	box_sx = longest_line + 4;
 	box_sy = num_lines + 4;
-	if unlikely(box_sx >= dbg_screen_width)
+	if unlikely(box_sx >= dbg_screen_width) {
 		box_x = 0;
-	else {
+	} else {
 		box_x = (dbg_screen_width - box_sx) / 2;
 	}
-	if unlikely(box_sy >= dbg_screen_height)
+	if unlikely(box_sy >= dbg_screen_height) {
 		box_y = 0;
-	else {
+	} else {
 		box_y = (dbg_screen_height - box_sy) / 2;
 	}
 	dbg_fillrect_singlestroke(box_x, box_y, box_sx, box_sy);
@@ -564,9 +564,9 @@ NOTHROW(KCALL dbg_messagebox)(char const *__restrict title,
 			break;
 		iter = end + 1;
 	}
-	if unlikely(title_length >= dbg_screen_width)
+	if unlikely(title_length >= dbg_screen_width) {
 		box_x = 0;
-	else {
+	} else {
 		box_x = (dbg_screen_width - title_length) / 2;
 	}
 	dbg_pprint(box_x, box_y, title);

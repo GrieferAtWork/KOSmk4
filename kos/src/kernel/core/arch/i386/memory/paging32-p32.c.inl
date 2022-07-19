@@ -443,9 +443,9 @@ NOTHROW(FCALL p32_pagedir_unprepare_impl_flatten)(unsigned int vec2,
 again_try_exchange_e2_word:
 		must_restart = false;
 		X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_WRITE(was);
-		if unlikely(old_version != ATOMIC_READ(x86_pagedir_prepare_version))
+		if unlikely(old_version != ATOMIC_READ(x86_pagedir_prepare_version)) {
 			must_restart = true;
-		else if unlikely(!ATOMIC_CMPXCH(e2_p->p_word, e2.p_word, new_e2_word)) {
+		} else if unlikely(!ATOMIC_CMPXCH(e2_p->p_word, e2.p_word, new_e2_word)) {
 			must_restart = true;
 		}
 		X86_PAGEDIR_PREPARE_LOCK_RELEASE_WRITE(was);
@@ -1394,11 +1394,11 @@ p32_enumfun(void *arg, void *start, size_t num_bytes, u32 word) {
 		return;
 	if ((byte_t *)data->ed_prevstart + data->ed_prevsize == start) {
 		u32 expected_word;
-		if (!data->ed_prevsize)
+		if (!data->ed_prevsize) {
 			expected_word = 0;
-		else if (word & P32_PAGE_FPRESENT)
+		} else if (word & P32_PAGE_FPRESENT) {
 			expected_word = data->ed_prevword + data->ed_prevsize;
-		else {
+		} else {
 			assert(word & P32_PAGE_FISAHINT);
 			expected_word = data->ed_prevword;
 		}

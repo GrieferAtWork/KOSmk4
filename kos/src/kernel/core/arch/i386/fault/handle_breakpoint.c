@@ -92,9 +92,9 @@ dbg_handle_breakpoint(void *faultpc, void *resumepc) {
 		char const *reason_message = DBGSTR(AC_RED("Unknown cause"));
 		byte_t opcode_byte;
 		if (dbg_readmemory(faultpc, &opcode_byte, 1) == 0) {
-			if (opcode_byte == 0xcc)
+			if (opcode_byte == 0xcc) {
 				reason_message = DBGSTR(AC_WHITE("int3"));
-			else if (opcode_byte == 0xcd) {
+			} else if (opcode_byte == 0xcd) {
 				if (dbg_readmemory((byte_t *)faultpc + 1, &opcode_byte, 1) == 0 && opcode_byte == 0x03)
 					reason_message = DBGSTR(AC_WHITE("int $3"));
 			}

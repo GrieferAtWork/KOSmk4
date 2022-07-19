@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7fe9724a */
+/* HASH CRC-32:0x2ae87cd3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -117,9 +117,9 @@ for (local name: classes.keys.sorted()) {
 		if (!hasSubClassErrnoExpr) {
 			local expr, reqMacros = formatErrnoExpr(cls)...;
 			reqMacros = " && ".join(for (local x: reqMacros) f"defined({x})");
-			if (!reqMacros)
+			if (!reqMacros) {
 				reqMacros = cls.ppCond;
-			else if (cls.ppCond != "1") {
+			} else if (cls.ppCond != "1") {
 				reqMacros = f"({reqMacros}) && ({cls.ppCond})";
 			}
 			if (reqMacros != "1")

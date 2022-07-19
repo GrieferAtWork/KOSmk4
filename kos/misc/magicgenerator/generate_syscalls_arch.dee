@@ -221,9 +221,9 @@ function i386_restoreSyscallRegisters(fp: File, restoreRegisters: {string...}) {
 	while (restoreRegisters) {
 		local reg = restoreRegisters.pop();
 		if (reg.startswith("!")) {
-			if (restoreRegisters && isNoneRegister(restoreRegisters[#restoreRegisters - 1]))
+			if (restoreRegisters && isNoneRegister(restoreRegisters[#restoreRegisters - 1])) {
 				reg = none;
-			else {
+			} else {
 				reg = reg[1:];
 			}
 		}

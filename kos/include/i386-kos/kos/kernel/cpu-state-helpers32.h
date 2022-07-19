@@ -1087,11 +1087,11 @@ __NOTHROW_NCX(scpustate32_to_scpustate32_p)(struct scpustate32 const *__restrict
                                             void *__restrict __kernel_esp) {
 	__size_t __result_size;
 	struct scpustate32 *__result;
-	if (scpustate32_isvm86(__self))
+	if (scpustate32_isvm86(__self)) {
 		__result_size = OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_VM86;
-	else if (scpustate32_isuser_novm86(__self))
+	} else if (scpustate32_isuser_novm86(__self)) {
 		__result_size = OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_USER;
-	else {
+	} else {
 		__result_size = OFFSET_SCPUSTATE32_IRREGS + SIZEOF_IRREGS32_KERNEL;
 	}
 	__result = (struct scpustate32 *)((__byte_t *)__kernel_esp - __result_size);

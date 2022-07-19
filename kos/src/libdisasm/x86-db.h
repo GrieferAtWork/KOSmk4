@@ -5506,9 +5506,9 @@ function generateOffsetTable(name: string) {
 	print name,;
 	print "_offsets[256] = {";
 	for (local i: [:256]) {
-		if ((i % 16) == 0)
+		if ((i % 16) == 0) {
 			print "\t",;
-		else {
+		} else {
 			print " ",;
 		}
 		print offsets[i],;

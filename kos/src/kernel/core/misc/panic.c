@@ -308,10 +308,10 @@ panic_assert_dbg_main(void *arg) {
 	struct assert_args *args;
 	args = (struct assert_args *)arg;
 	TRY {
-		dbg_printf(AC_WITHCOLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON, "Assertion failure") "\n"
-		           "expr: "  AC_WITHFG(ANSITTY_CL_WHITE, "%s") "\n"
-		           "file: "  AC_WITHFG(ANSITTY_CL_WHITE, "%s")
-		           " (line " AC_WITHFG(ANSITTY_CL_WHITE, "%u") ")\n",
+		dbg_printf(DBGSTR(AC_WITHCOLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON, "Assertion failure") "\n"
+		                  "expr: "  AC_WITHFG(ANSITTY_CL_WHITE, "%s") "\n"
+		                  "file: "  AC_WITHFG(ANSITTY_CL_WHITE, "%s")
+		                  " (line " AC_WITHFG(ANSITTY_CL_WHITE, "%u") ")\n"),
 		           args->aa_expr,
 		           args->aa_file,
 		           args->aa_line);
@@ -648,7 +648,7 @@ panic_kernel_dbg_main(void *arg) {
 			handle_except_during_panic_info();
 		}
 		dbg_indent -= 6;
-		dbg_print(AC_DEFCOLOR "\n");
+		dbg_print(DBGSTR(AC_DEFCOLOR "\n"));
 	}
 	dbg_printf(DBGSTR("addr: " AC_WHITE("%p") "+" AC_WHITE("%" PRIuSIZ) "\n"),
 	           prev_pc, (size_t)((byte_t const *)pc - (byte_t const *)prev_pc));

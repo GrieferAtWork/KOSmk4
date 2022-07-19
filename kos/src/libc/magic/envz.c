@@ -136,9 +136,9 @@ error_t envz_merge([[inout]] char **__restrict penvz,
 	while (envz2_len && result == 0) {
 		char *existing = envz_entry(*penvz, *penvz_len, envz2);
 		size_t newlen  = strlen(envz2) + 1;
-		if (!existing)
+		if (!existing) {
 			result = argz_append(penvz, penvz_len, envz2, newlen);
-		else if (override_) {
+		} else if (override_) {
 			argz_delete(penvz, penvz_len, existing);
 			result = argz_append(penvz, penvz_len, envz2, newlen);
 		}

@@ -77,9 +77,9 @@ NOTHROW(FCALL GDBInfo_PrintThreadName)(pformatprinter printer, void *arg,
 	pid = task_getrootpid_of(thread);
 	tid = task_getroottid_of(thread);
 	PRINT(" (");
-	if (pid && tid && pid != tid)
+	if (pid && tid && pid != tid) {
 		PRINTF("%u.%u:", pid, tid);
-	else if (tid) {
+	} else if (tid) {
 		PRINTF("%u:", tid);
 	}
 	PRINTF("%p)", thread);
@@ -128,9 +128,9 @@ NOTHROW(FCALL GDBInfo_PrintThreadExecFile)(pformatprinter printer, void *arg,
 	    task_getroottid_of(thread) == 0)
 		return GDBInfo_PrintKernelFilename(printer, arg, filename_only);
 	v = task_getmman(thread);
-	if (v == &mman_kernel)
+	if (v == &mman_kernel) {
 		result = GDBInfo_PrintKernelFilename(printer, arg, filename_only);
-	else {
+	} else {
 		if (GDBThread_IsAllStopModeActive) {
 			dent = xincref(FORMMAN(v, thismman_execinfo).mei_dent);
 			path = xincref(FORMMAN(v, thismman_execinfo).mei_path);
@@ -162,9 +162,9 @@ NOTHROW(FCALL GDBInfo_PrintThreadExecFile)(pformatprinter printer, void *arg,
 				temp = (*printer)(arg,
 				                  dent->fd_name,
 				                  dent->fd_namelen);
-				if unlikely(temp < 0)
+				if unlikely(temp < 0) {
 					result = temp;
-				else {
+				} else {
 					result += temp;
 				}
 			}
@@ -354,15 +354,15 @@ NOTHROW(FCALL GDBInfo_PrintThreadList_Callback)(void *closure,
 	       thread->t_cpu->c_id);
 	DO(GDBInfo_PrintThreadName(printer, arg, thread));
 	flags = ATOMIC_READ(thread->t_flags);
-	if (flags & TASK_FTERMINATED)
+	if (flags & TASK_FTERMINATED) {
 		description = "terminated";
-	else if (flags & TASK_FTERMINATING)
+	} else if (flags & TASK_FTERMINATING) {
 		description = "terminating";
-	else if (thread == &FORCPU(thread->t_cpu, thiscpu_idle))
+	} else if (thread == &FORCPU(thread->t_cpu, thiscpu_idle)) {
 		description = "idle";
-	else if (flags & TASK_FRUNNING)
+	} else if (flags & TASK_FRUNNING) {
 		description = "running";
-	else {
+	} else {
 		description = "?";
 	}
 	PRINTF("\">%s</thread>", description);

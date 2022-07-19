@@ -162,9 +162,9 @@ NOTHROW_NCX(LIBCCALL libc_futimes)(fd_t fd,
 /*[[[body:libc_futimes]]]*/
 {
 	errno_t result;
-	if (!tvp)
+	if (!tvp) {
 		result = sys_utimensat(fd, NULL, NULL, AT_SYMLINK_NOFOLLOW);
-	else {
+	} else {
 		struct timespec ts[2];
 		TIMEVAL_TO_TIMESPEC(&tvp[0], &ts[0]);
 		TIMEVAL_TO_TIMESPEC(&tvp[1], &ts[1]);

@@ -93,14 +93,15 @@ get_interrupt_desc(uintptr_t intno, uintptr_t ecode) {
 	switch (intno & 0xff) {
 
 	case X86_E_SYSTEM_PF & 0xff:
-		if (!(ecode & 1))
+		if (!(ecode & 1)) {
 			result = "PAGE_NOT_PRESENT";
-		else if (ecode & 8)
+		} else if (ecode & 8) {
 			result = "RESERVED_PAGING_BIT_SET";
-		else if (ecode & 16)
+		} else if (ecode & 16) {
 			result = "INSTRUCTION_FETCH";
-		else if (ecode & 2)
+		} else if (ecode & 2) {
 			result = "ILLEGAL_WRITE";
+		}
 		break;
 
 	default:

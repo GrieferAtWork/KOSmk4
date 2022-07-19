@@ -437,9 +437,9 @@ again_acquire_cldlock:
 			/* Write-back information about what got deleted (if requested) */
 			if (pdeleted_node)
 				*pdeleted_node = mfile_asnode(incref(existing_path->p_dir));
-			if (pdeleted_path)
+			if (pdeleted_path) {
 				*pdeleted_path = existing_path;
-			else {
+			} else {
 				decref(existing_path);
 			}
 			return;
@@ -524,14 +524,14 @@ again_lookup_dent:
 	}
 
 	/* Write-back information about what got deleted (if requested) */
-	if (pdeleted_node)
+	if (pdeleted_node) {
 		*pdeleted_node = node;
-	else {
+	} else {
 		decref_unlikely(node);
 	}
-	if (pdeleted_dirent)
+	if (pdeleted_dirent) {
 		*pdeleted_dirent = dent;
-	else {
+	} else {
 		decref_unlikely(dent);
 	}
 	if (pdeleted_path)
@@ -1288,14 +1288,14 @@ again_rename:
 		xdecref_unlikely(replaced_node);
 		RETHROW();
 	}
-	if (pnew_dirent)
+	if (pnew_dirent) {
 		*pnew_dirent = info.frn_dent; /* Inherit reference */
-	else {
+	} else {
 		decref_unlikely(info.frn_dent);
 	}
-	if (preplaced_node)
+	if (preplaced_node) {
 		*preplaced_node = info.frn_repfile; /* Inherit reference */
-	else {
+	} else {
 		xdecref(info.frn_repfile);
 	}
 	if (newpath_ref) {

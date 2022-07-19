@@ -559,9 +559,9 @@ STRETCH_FUNC2(stretch_perpixel_fixed)(struct video_gfx *IF_BITFILL(__restrict) s
 				rel_x += src_x;
 				rel_y += src_y;
 				if unlikely(rel_x >= src->vx_xend ||
-				            rel_y >= src->vx_yend)
+				            rel_y >= src->vx_yend) {
 					color = 0; /* This can happen because of rounding */
-				else {
+				} else {
 					color = video_gfx_getabscolor(src,
 					                              rel_x,
 					                              rel_y);

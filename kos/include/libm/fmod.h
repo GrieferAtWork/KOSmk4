@@ -113,15 +113,15 @@ __LIBM_LOCAL_FUNC(fmodf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	}
 
 	/* set up {hx,lx}, {hy,ly} and align y to x */
-	if (__ix >= -126)
+	if (__ix >= -126) {
 		__hx = 0x00800000 | (0x007fffff & __hx);
-	else { /* subnormal x, shift x to normal */
+	} else { /* subnormal x, shift x to normal */
 		__n  = -126 - __ix;
 		__hx = __hx << __n;
 	}
-	if (__iy >= -126)
+	if (__iy >= -126) {
 		__hy = 0x00800000 | (0x007fffff & __hy);
-	else { /* subnormal y, shift y to normal */
+	} else { /* subnormal y, shift y to normal */
 		__n  = -126 - __iy;
 		__hy = __hy << __n;
 	}
@@ -245,9 +245,9 @@ __LIBM_LOCAL_FUNC(fmod) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	}
 
 	/* set up {hx,lx}, {hy,ly} and align y to x */
-	if (__ix >= -1022)
+	if (__ix >= -1022) {
 		__hx = 0x00100000 | (0x000fffff & __hx);
-	else { /* subnormal x, shift x to normal */
+	} else { /* subnormal x, shift x to normal */
 		__n = -1022 - __ix;
 		if (__n <= 31) {
 			__hx = (__hx << __n) | (__lx >> (32 - __n));
@@ -257,9 +257,9 @@ __LIBM_LOCAL_FUNC(fmod) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 			__lx   = 0;
 		}
 	}
-	if (__iy >= -1022)
+	if (__iy >= -1022) {
 		__hy = 0x00100000 | (0x000fffff & __hy);
-	else { /* subnormal y, shift y to normal */
+	} else { /* subnormal y, shift y to normal */
 		__n = -1022 - __iy;
 		if (__n <= 31) {
 			__hy = (__hy << __n) | (__ly >> (32 - __n));

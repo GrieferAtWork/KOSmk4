@@ -274,10 +274,10 @@ enum {
 
 
 #ifdef __x86_64__
-#define dbg_current_sizeof_pointer() \
-	(__KOS64_IS_CS32BIT(x86_dbg_getregbyidp(DBG_REGLEVEL_VIEW, X86_REGISTER_SEGMENT_CS)) ? 4 : 8)
 #define dbg_current_iscompat() \
 	__KOS64_IS_CS32BIT(x86_dbg_getregbyidp(DBG_REGLEVEL_VIEW, X86_REGISTER_SEGMENT_CS))
+#define dbg_current_sizeof_pointer() \
+	(dbg_current_iscompat() ? 4 : 8)
 #else /* __x86_64__ */
 #define dbg_current_sizeof_pointer() 4
 #endif /* !__x86_64__ */

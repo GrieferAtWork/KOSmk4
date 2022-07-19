@@ -412,12 +412,12 @@ again_find_nextPresentFunction:
 			local headFp = File.Writer();
 			if (funcCond != "1") {
 				if (funcCond.startswith("defined(") && funcCond.endswith(")") &&
-				    funcCond.findmatch("(", ")", 8) == #funcCond - 1)
+				    funcCond.findmatch("(", ")", 8) == #funcCond - 1) {
 					headFp << "#ifdef " << funcCond[8:-1];
-				else if (funcCond.startswith("!defined(") && funcCond.endswith(")") &&
-				         funcCond.findmatch("(", ")", 9) == #funcCond - 1)
+				} else if (funcCond.startswith("!defined(") && funcCond.endswith(")") &&
+				           funcCond.findmatch("(", ")", 9) == #funcCond - 1) {
 					headFp << "#ifndef " << funcCond[9:-1];
-				else {
+				} else {
 					headFp << "#if " << funcCond;
 				}
 				headFp << "\n";
@@ -432,12 +432,12 @@ again_find_nextPresentFunction:
 						.tostr();
 				if (isFirst) {
 					if (ppCond.startswith("defined(") && ppCond.endswith(")") &&
-					    ppCond.findmatch("(", ")", 8) == #ppCond - 1)
+					    ppCond.findmatch("(", ")", 8) == #ppCond - 1) {
 						headFp << "#ifdef " << ppCond[8:-1];
-					else if (ppCond.startswith("!defined(") && ppCond.endswith(")") &&
-					         ppCond.findmatch("(", ")", 9) == #ppCond - 1)
+					} else if (ppCond.startswith("!defined(") && ppCond.endswith(")") &&
+					           ppCond.findmatch("(", ")", 9) == #ppCond - 1) {
 						headFp << "#ifndef " << ppCond[9:-1];
-					else {
+					} else {
 						headFp << "#if " << ppCond;
 					}
 				} else {

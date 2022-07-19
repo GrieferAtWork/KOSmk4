@@ -289,7 +289,7 @@ DBG_COMMAND(help, autocomplete_help, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
 				hookhelp = NULL;
 				if (dbg_commandhook_hashelp(command))
 					hookhelp = command->dc_help;
-				dbg_printf(AC_FG(ANSITTY_CL_WHITE) "%s" AC_FGDEF ":\n",
+				dbg_printf(DBGSTR(AC_FG(ANSITTY_CL_WHITE) "%s" AC_FGDEF ":\n"),
 				           command->dc_name);
 				if (!hookhelp)
 					hookhelp = DBGSTR("\tNo help available\n");
@@ -783,9 +783,9 @@ again:
 		            cmdline_backlog + oldest_len,
 		            cmdline_latest - oldest_len,
 		            sizeof(char));
-		if (cmdline_current < oldest_len)
+		if (cmdline_current < oldest_len) {
 			cmdline_current = 0;
-		else {
+		} else {
 			cmdline_current -= oldest_len;
 		}
 		cmdline_latest -= oldest_len;
@@ -984,13 +984,13 @@ continue_readline:
 				           DBG_GETCUR_Y(cur));
 				curx = dbg_getcur_x();
 				dbg_setcolor(dbg_getdefaultcolor());
-				if (curx < dbg_screen_width - 2)
+				if (curx < dbg_screen_width - 2) {
 					dbg_print(DBGSTR("^C\n"));
-				else if (curx == dbg_screen_width - 2)
+				} else if (curx == dbg_screen_width - 2) {
 					dbg_print(DBGSTR("^C"));
-				else if (curx == dbg_screen_width - 1)
+				} else if (curx == dbg_screen_width - 1) {
 					dbg_putc('^');
-				else {
+				} else {
 					dbg_putc('\n');
 				}
 			}	goto again_readline;

@@ -598,13 +598,13 @@ found_state:
 
 					case DW_LNE_set_address: {
 						uintptr_t new_address;
-						if ((size_t)temp - 1 >= 8)
+						if ((size_t)temp - 1 >= 8) {
 							new_address = (uintptr_t)UNALIGNED_GET64((uint64_t const *)ext_data);
-						else if ((size_t)temp - 1 >= 4)
+						} else if ((size_t)temp - 1 >= 4) {
 							new_address = (uintptr_t)UNALIGNED_GET32((uint32_t const *)ext_data);
-						else if ((size_t)temp - 1 >= 2)
+						} else if ((size_t)temp - 1 >= 2) {
 							new_address = (uintptr_t)UNALIGNED_GET16((uint16_t const *)ext_data);
-						else {
+						} else {
 							new_address = (uintptr_t)(*(uint8_t const *)ext_data);
 						}
 						state.address  = new_address;

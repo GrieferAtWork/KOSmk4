@@ -133,9 +133,9 @@ locals_format_printer(void *UNUSED(format_arg),
                       pformatprinter printer, void *arg,
                       unsigned int format_option) {
 	char const *format;
-	if (DEBUGINFO_PRINT_FORMAT_ISSUFFIX(format_option))
+	if (DEBUGINFO_PRINT_FORMAT_ISSUFFIX(format_option)) {
 		format = AC_DEFATTR;
-	else {
+	} else {
 		switch (format_option) {
 
 		case DEBUGINFO_PRINT_FORMAT_KEYWORD_PREFIX:  /* Prefix for `struct', `class', `union', `enum' */
@@ -206,12 +206,12 @@ DBG_COMMAND_AUTO(eval,
 			char const *message;
 			message = dbx_strerror(error);
 			dbg_savecolor();
-			dbg_print("\terror: ");
+			dbg_print(DBGSTR("\terror: "));
 			dbg_setcolor(ANSITTY_CL_MAROON, ANSITTY_CL_LIGHT_GRAY);
 			if (message) {
 				dbg_print(message);
 			} else {
-				dbg_printf("%d", error);
+				dbg_printf(DBGSTR("%d"), error);
 			}
 			dbg_loadcolor();
 			dbg_putc('\n');
@@ -220,7 +220,7 @@ DBG_COMMAND_AUTO(eval,
 			cp.cp_printer = &dbg_printer;
 			cp.cp_format  = &locals_format_printer;
 			ctyperef_printname(&cexpr_stacktop.cv_type, &cp, NULL, 0);
-			dbg_print(":\n");
+			dbg_print(DBGSTR(":\n"));
 			/* Display the value of the expression. */
 			ctype_printvalue(&cexpr_stacktop.cv_type, &cp, data,
 			                 CTYPE_PRINTVALUE_FLAG_NORMAL,

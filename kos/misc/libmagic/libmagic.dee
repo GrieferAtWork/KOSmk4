@@ -160,9 +160,9 @@ again:
 	local result = _realpathCache.get(path);
 	if (result !is none)
 		return result;
-	if ("/" !in path)
+	if ("/" !in path) {
 		result = path;
-	else {
+	} else {
 		local link = readlink(path);
 		if (link is string) {
 			path = joinpath(fs.headof(path), link);
@@ -259,9 +259,9 @@ function getLastModfiedTime(filename: string): time.Time | none {
 							dwCreationDisposition: libwin32.OPEN_EXISTING);
 					}
 				}
-				if (handle is none)
+				if (handle is none) {
 					result = none;
-				else {
+				} else {
 					try {
 						/* GetFileTime() has a precision of 100 nanoseconds (or 0.1 microseconds)
 						 * However, time.Time() only  has microsecond-precision  (so this  method
@@ -449,9 +449,9 @@ class Group {
 		}
 		local head: string = fs.headof(pattern);
 		local tail: string = fs.tailof(pattern);
-		if (head.startswith("/"))
+		if (head.startswith("/")) {
 			head = head.lstrip("/");
-		else {
+		} else {
 			head = joinpath(defPath, head);
 		}
 		local files: {string...};
@@ -743,9 +743,9 @@ class BoundStep {
 #else /* ASYNC_FILE_ENUMERATION */
 			if (_producedOutputFiles !is bound) {
 				local fun = step.getProducedOutputFiles;
-				if (fun is none)
+				if (fun is none) {
 					_producedOutputFiles = producedFiles;
-				else {
+				} else {
 					_producedOutputFiles = HashSet(fun(this));
 				}
 			}
@@ -781,9 +781,9 @@ class BoundStep {
 #ifdef ASYNC_FILE_ENUMERATION
 			if (_modifiedOutputFiles !is bound) {
 				local fun = step.getModifiedOutputFiles;
-				if (fun is none)
+				if (fun is none) {
 					_modifiedOutputFiles = {};
-				else {
+				} else {
 					_modifiedOutputFiles = HashSet();
 					for (local f: fun(this)) {
 						local pair = (f, getLastModfiedTime(f));
@@ -797,9 +797,9 @@ class BoundStep {
 #else /* ASYNC_FILE_ENUMERATION */
 			if (_modifiedOutputFiles !is bound) {
 				local fun = step.getModifiedOutputFiles;
-				if (fun is none)
+				if (fun is none) {
 					_modifiedOutputFiles = {};
-				else {
+				} else {
 					_modifiedOutputFiles = HashSet(
 						for (local f: fun(this))
 							(f, getLastModfiedTime(f)));
@@ -857,9 +857,9 @@ class BoundStep {
 #ifdef ASYNC_FILE_ENUMERATION
 			if (_maybeModifiedOutputFiles !is bound) {
 				local fun = step.getMaybeModifiedOutputFiles;
-				if (fun is none)
+				if (fun is none) {
 					_maybeModifiedOutputFiles = {};
-				else {
+				} else {
 					_maybeModifiedOutputFiles = HashSet();
 					for (local f: fun(this)) {
 						local pair = (f, getLastModfiedTime(getLatestFilenameOf(f)));
@@ -873,9 +873,9 @@ class BoundStep {
 #else /* ASYNC_FILE_ENUMERATION */
 			if (_maybeModifiedOutputFiles !is bound) {
 				local fun = step.getMaybeModifiedOutputFiles;
-				if (fun is none)
+				if (fun is none) {
 					_maybeModifiedOutputFiles = {};
-				else {
+				} else {
 					_maybeModifiedOutputFiles = HashSet(
 						for (local f: fun(this))
 							(f, getLastModfiedTime(getLatestFilenameOf(f))));
@@ -1046,9 +1046,9 @@ function orderGroups(toolchainsAndGroups: {(Toolchain, {Group...})...}): ({Bound
 		for (local p: groups) {
 			for (local s: p.steps) {
 				local bs = BoundStep(p, s, toolchain);
-				if (s.split !is none)
+				if (s.split !is none) {
 					allsteps.update(s.split(bs));
-				else {
+				} else {
 					allsteps.insert(bs);
 				}
 			}
@@ -1157,9 +1157,9 @@ function executeBuildSteps(steps: {BoundStep...}, recheck: {BoundStep...}, maxPa
 		local avgFinished = (float)numFinished + (float)numRunning / 2;
 		local progress = try ((avgFinished / (avgMissing + avgFinished))) catch(...) 1.0;
 		print "[" + marker + numRunning + ":" + str(int(progress * 100.0)).rjust(3) + "%",;
-		if (!message.startswith("["))
+		if (!message.startswith("[")) {
 			print "] ",;
-		else {
+		} else {
 			print " ",;
 			message = message[1:];
 		}

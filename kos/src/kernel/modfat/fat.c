@@ -1252,9 +1252,9 @@ for (local x: [:128/(8 / BITS_PER_CHAR)]) {
 	if ((x % 8) == 0)
 		print("\t"),;
 	print("0x%.2I8x," % makeByte(x)),;
-	if ((x % 8) == 7)
+	if ((x % 8) == 7) {
 		print;
-	else {
+	} else {
 		print(" "),;
 	}
 }
@@ -3242,11 +3242,11 @@ fatfs_open(struct ffilesys *__restrict UNUSED(filesys),
 				THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
 			/* Calculate the total number of data clusters. */
 			total_clusters = data_sectors / disk->bpb.bpb_sectors_per_cluster;
-			if (total_clusters > FAT16_MAXCLUSTERS)
+			if (total_clusters > FAT16_MAXCLUSTERS) {
 				result->ft_type = FAT32;
-			else if (total_clusters > FAT12_MAXCLUSTERS)
+			} else if (total_clusters > FAT12_MAXCLUSTERS) {
 				result->ft_type = FAT16;
-			else {
+			} else {
 				result->ft_type = FAT12;
 			}
 		}

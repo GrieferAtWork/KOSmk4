@@ -66,9 +66,9 @@ static fd_t saved_ttyfd = -1;
 PRIVATE fd_t gettty(void) {
 	fd_t result = saved_ttyfd;
 	if (result == -1) {
-		if (isatty(STDIN_FILENO))
+		if (isatty(STDIN_FILENO)) {
 			result = STDIN_FILENO;
-		else {
+		} else {
 			result = open(_PATH_TTY, O_RDONLY);
 			if (result < 0)
 				result = STDIN_FILENO; /* Shouldn't happen... */

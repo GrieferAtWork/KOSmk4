@@ -217,9 +217,9 @@ again_header:
 		rel_seconds_neg = 0x20;
 	}
 	if unlikely((u64)rel_seconds > 0x7fffff) {
-		if unlikely(!offset) /* This should only happen once. */
+		if unlikely(!offset) { /* This should only happen once. */
 			dmesg_secondsbase = packet->sp_time;
-		else {
+		} else {
 			dmesg_compress_timestamps();
 		}
 		rel_seconds = (u64)(packet->sp_time - dmesg_secondsbase);

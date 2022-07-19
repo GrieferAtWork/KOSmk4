@@ -154,9 +154,9 @@ got_line:
 							nameStart = decl.find("(", i, nameEnd);
 						if (nameStart >= 0) {
 							local name = decl[nameStart + 1:nameEnd].strip();
-							if (name !in longreprs)
+							if (name !in longreprs) {
 								print File.stderr: ("Unknown long repr: ", repr name, " (in line: ", repr l, ")");
-							else {
+							} else {
 								local decl1 = decl[:i];
 								local decl2 = longreprs[name];
 								if (decl.find("LONGREPR_B") == i) {
@@ -320,11 +320,12 @@ function getOpcodeType(opcode: int, decls: HashSet with string): string {
 		local d_has64 = "OP_U64" in d;
 		local d_hasrm = declHasModrm(d);
 		local d_hasljmp = "OP_LJMP" in d;
-#define APPLY(dst, src)      \
-		if (dst is none)     \
-			dst = int(src);  \
-		else if (dst != src) \
-			dst = UNDEF;
+#define APPLY(dst, src)          \
+		if (dst is none) {       \
+			dst = int(src);      \
+		} else if (dst != src) { \
+			dst = UNDEF;         \
+		}
 		APPLY(has8, d_has8)
 		APPLY(has16, d_has16)
 		APPLY(has32, d_has32)
@@ -386,9 +387,9 @@ function getCommonOpcodeTypeForRange(min: int, max: int): string | none {
 		local temp = GETTYPE(opcode);
 		if (temp == "I_UD")
 			continue;
-		if (result is none)
+		if (result is none) {
 			result = temp;
-		else if (result != temp) {
+		} else if (result != temp) {
 			return none;
 		}
 	}

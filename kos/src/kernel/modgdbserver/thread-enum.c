@@ -115,9 +115,9 @@ NOTHROW(FCALL GDBThread_Enumerate)(PTHREAD_ENUM_CALLBACK callback,
 again_check_must_stop:
 	mustStopAll = GDBThread_IsNonStopModeActive &&
 	              ATOMIC_READ(cpu_online_count) > 1;
-	if (mustStopAll)
+	if (mustStopAll) {
 		GDBThread_StopAllCpus();
-	else {
+	} else {
 		/* In non-stop  mode, must  also disable  preemption in  order
 		 * to prevent other threads from running on our own CPU, which
 		 * could break thread enumeration. */

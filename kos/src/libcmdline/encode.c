@@ -233,9 +233,9 @@ libcmdline_encode_argument(pformatprinter printer, void *arg,
 	num_squote = 0; /* Number of '-characters */
 	num_slash  = 0; /* Number of \-characters */
 	for (iter = arg_start; (ch = unicode_readutf8_n(&iter, arg_end)) != 0; ) {
-		if (unicode_isspace(ch))
+		if (unicode_isspace(ch)) {
 			++num_spaces;
-		else {
+		} else {
 			if (ch == '\'') {
 				++num_squote;
 			} else if (ch == '\"') {

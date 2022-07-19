@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa886ff08 */
+/* HASH CRC-32:0x7845abbd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -103,10 +103,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hsearch_r))(struct entry __item, ACTI
 		__hval2 = 1 + __hval % (__htab->size - 2);
 		__first_idx = __idx;
 		do {
-			if (__idx <= __hval2)
+			if (__idx <= __hval2) {
 				__idx = __htab->size + __idx - __hval2;
-			else
+			} else {
 				__idx -= __hval2;
+			}
 			if (__idx == __first_idx)
 				break;
 			if (((__entry_type *)__htab->table)[__idx].___used == __hval &&

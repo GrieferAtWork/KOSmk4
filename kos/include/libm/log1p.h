@@ -155,18 +155,19 @@ __LIBM_LOCAL_FUNC(log1pf) __ATTR_WUNUSED __IEEE754_FLOAT_TYPE__
 
 	if (__hu == 0) { /* |f| < 2**-20 */
 		if (__f == __LIBM_LOCAL_VALUE(zerof)) {
-			if (__k == 0)
+			if (__k == 0) {
 				return __LIBM_LOCAL_VALUE(zerof);
-			else {
+			} else {
 				__c += __k * __LIBM_LOCAL_VALUE(ln2_lof);
 				return __k * __LIBM_LOCAL_VALUE(ln2_hif) + __c;
 			}
 		}
 		__R = __hfsq * (__IEEE754_FLOAT_C(1.0) - __IEEE754_FLOAT_C(0.66666666666666666) * __f);
-		if (__k == 0)
+		if (__k == 0) {
 			return __f - __R;
-		else
+		} else {
 			return __k * __LIBM_LOCAL_VALUE(ln2_hif) - ((__R - (__k * __LIBM_LOCAL_VALUE(ln2_lof) + __c)) - __f);
+		}
 	}
 	__s = __f / (__IEEE754_FLOAT_C(2.0) + __f);
 	__z = __s * __s;

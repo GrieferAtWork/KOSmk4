@@ -843,7 +843,11 @@ again:
 		def = dw_enumerate_find_struct_definition(self->ct_struct.ct_info.cd_mod,
 		                                          self->ct_struct.ct_info.cd_dip,
 		                                          &def_module);
-		if (def && def != self->ct_struct.ct_info.cd_dip) {
+		if (def == NULL) {
+			/* ... */
+		} else if (def == self->ct_struct.ct_info.cd_dip) {
+			decref(def_module);
+		} else {
 			/* Remember the new definition. */
 			decref(self->ct_struct.ct_info.cd_mod);
 			self->ct_struct.ct_info.cd_mod = def_module;
@@ -1135,15 +1139,15 @@ again:
 			}
 			if (typinfo.t_encoding == DW_ATE_signed) {
 do_signed:
-				if (typinfo.t_sizeof == 1)
+				if (typinfo.t_sizeof == 1) {
 					presult->ct_typ = incref(&ctype_s8);
-				else if (typinfo.t_sizeof == 2)
+				} else if (typinfo.t_sizeof == 2) {
 					presult->ct_typ = incref(&ctype_s16);
-				else if (typinfo.t_sizeof == 4)
+				} else if (typinfo.t_sizeof == 4) {
 					presult->ct_typ = incref(&ctype_s32);
-				else if (typinfo.t_sizeof == 8)
+				} else if (typinfo.t_sizeof == 8) {
 					presult->ct_typ = incref(&ctype_s64);
-				else {
+				} else {
 					goto err_corrupt;
 				}
 			} else {

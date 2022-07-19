@@ -786,9 +786,9 @@ again_handle_col:
 		for (local lib: allLibs) {
 			local locations = List();
 			for (local path: allLibPaths) {
-				if (lib.startswith(":"))
+				if (lib.startswith(":")) {
 					locations.append(joinpath(path, lib[1:]));
-				else {
+				} else {
 					if (libext is none)
 						libext = step.toolchain.config.LIBRARY_SUFFIX;
 					if (do_static is none)

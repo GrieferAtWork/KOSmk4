@@ -265,9 +265,9 @@ class CParser {
 			}[open];
 		}
 		for (;;) {
-			if (tok == open)
+			if (tok == open) {
 				++recursion;
-			else if (tok == close) {
+			} else if (tok == close) {
 				if (!recursion)
 					break;
 				--recursion;
@@ -347,9 +347,9 @@ done:
 					}
 					if (nextCh == "*") {
 						i = text.find("*/", i, end);
-						if (i < 0)
+						if (i < 0) {
 							i = end;
-						else {
+						} else {
 							i += 2;
 						}
 						goto again;

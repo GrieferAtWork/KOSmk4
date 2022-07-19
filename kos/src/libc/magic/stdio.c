@@ -3447,10 +3447,11 @@ __STDC_INT_AS_SSIZE_T puts_unlocked([[in]] char const *__restrict string) {
 	result = fputs_unlocked(string, stdout);
 	if (result >= 0) {
 		temp = fputc_unlocked('\n', stdout);
-		if (temp <= 0)
+		if (temp <= 0) {
 			result = temp;
-		else
+		} else {
 			result += temp;
+		}
 	}
 	return result;
 }

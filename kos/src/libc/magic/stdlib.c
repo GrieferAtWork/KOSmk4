@@ -314,13 +314,13 @@ void *bsearch_r([[in]] void const *pkey, [[in(item_count * item_size)]] void con
 		item_addr  = (byte_t *)pbase + (test_index * item_size);
 		/* Check if the requested item lies above, or below the selected one */
 		difference = (*compar)(pkey, item_addr, arg);
-		if (difference < 0)
+		if (difference < 0) {
 			/* KEY < ITEM --> Narrow the search-area to everything below */
 			hi = test_index;
-		else if (difference > 0)
+		} else if (difference > 0) {
 			/* KEY > ITEM --> Narrow the search-area to everything above */
 			lo = test_index + 1;
-		else {
+		} else {
 			/* Found it! */
 			return item_addr;
 		}
@@ -577,9 +577,9 @@ char *getenv([[in]] char const *varname) {
 	if unlikely(!varname)
 		return NULL;
 	envp = __LOCAL_environ;
-	if unlikely(!envp)
+	if unlikely(!envp) {
 		result = NULL;
-	else {
+	} else {
 		size_t namelen = strlen(varname);
 @@pp_ifdef __OPTIMIZE_SIZE__@@
 		for (; (result = *envp) != NULL; ++envp) {

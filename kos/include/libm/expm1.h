@@ -85,9 +85,9 @@ __LIBM_LOCAL_FUNC(expm1f) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	__uint32_t __hx;
 	__LIBM_GET_FLOAT_WORD(__hx, __x);
 	__xsb = __hx & __UINT32_C(0x80000000); /* sign bit of x */
-	if (__xsb == 0)
+	if (__xsb == 0) {
 		__y = __x;
-	else {
+	} else {
 		__y = -__x; /* y = |x| */
 	}
 	__hx &= __UINT32_C(0x7fffffff); /* high word of |x| */
@@ -147,18 +147,18 @@ __LIBM_LOCAL_FUNC(expm1f) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	                                           __hxs * __LIBM_LOCAL_VALUE(Q5f)))));
 	__t   = __IEEE754_FLOAT_C(3.0) - __r1 * __hfx;
 	__e   = __hxs * ((__r1 - __t) / (__IEEE754_FLOAT_C(6.0) - __x * __t));
-	if (__k == 0)
+	if (__k == 0) {
 		return __x - (__x * __e - __hxs); /* c is 0 */
-	else {
+	} else {
 		__e = (__x * (__e - __c) - __c);
 		__e -= __hxs;
 		if (__k == -1)
 			return __IEEE754_FLOAT_C(0.5) * (__x - __e) - __IEEE754_FLOAT_C(0.5);
 
 		if (__k == 1) {
-			if (__x < -__IEEE754_FLOAT_C(0.25))
+			if (__x < -__IEEE754_FLOAT_C(0.25)) {
 				return -__IEEE754_FLOAT_C(2.0) * (__e - (__x + __IEEE754_FLOAT_C(0.5)));
-			else {
+			} else {
 				return __LIBM_LOCAL_VALUE(onef) +
 				       __IEEE754_FLOAT_C(2.0) * (__x - __e);
 			}
@@ -244,9 +244,9 @@ __LIBM_LOCAL_FUNC(expm1) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	__uint32_t __hx;
 	__LIBM_GET_HIGH_WORD(__hx, __x);
 	__xsb = __hx & __INT32_C(0x80000000); /* sign bit of x */
-	if (__xsb == 0)
+	if (__xsb == 0) {
 		__y = __x;
-	else {
+	} else {
 		__y = -__x; /* y = |x| */
 	}
 	__hx &= __UINT32_C(0x7fffffff); /* high word of |x| */
@@ -312,17 +312,17 @@ __LIBM_LOCAL_FUNC(expm1) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	__r1 = __R1 + __h2 * __R2 + __h4 * __R3;
 	__t = 3.0 - __r1 * __hfx;
 	__e = __hxs * ((__r1 - __t) / (6.0 - __x * __t));
-	if (__k == 0)
+	if (__k == 0) {
 		return __x - (__x * __e - __hxs); /* c is 0 */
-	else {
+	} else {
 		__e = (__x * (__e - __c) - __c);
 		__e -= __hxs;
 		if (__k == -1)
 			return 0.5 * (__x - __e) - 0.5;
 		if (__k == 1) {
-			if (__x < -0.25)
+			if (__x < -0.25) {
 				return -2.0 * (__e - (__x + 0.5));
-			else {
+			} else {
 				return __LIBM_LOCAL_VALUE(Q)[0] + 2.0 * (__x - __e);
 			}
 		}
@@ -412,9 +412,9 @@ __LIBM_LOCAL_FUNC(expm1l) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE
 	if (__ix >= 0x7fff) {
 		/* Infinity. */
 		if (__lsw == 0) {
-			if (__sign)
+			if (__sign) {
 				return -1.0L;
-			else {
+			} else {
 				return __x;
 			}
 		}

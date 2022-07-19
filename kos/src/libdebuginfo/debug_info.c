@@ -1720,10 +1720,11 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_subprogram)(di_debuginfo_cu_pa
 		default: break;
 		}
 	}
-	if (!result->sp_rawname)
+	if (!result->sp_rawname) {
 		result->sp_rawname = result->sp_name;
-	else if (!result->sp_name)
+	} else if (!result->sp_name) {
 		result->sp_name = result->sp_rawname;
+	}
 	if (high_pc_is_relative)
 		result->sp_ranges.r_endpc += result->sp_ranges.r_startpc;
 	return true;
@@ -2822,17 +2823,17 @@ libdi_debuginfo_do_print_value(pformatprinter printer, void *arg,
 			uintptr_t addr;
 generic_print_address:
 #if __SIZEOF_POINTER__ >= 8
-			if (datasize >= 8)
+			if (datasize >= 8) {
 				addr = UNALIGNED_GET64((uint64_t const *)data);
-			else
+			} else
 #endif /* __SIZEOF_POINTER__ >= 8 */
-			if (datasize >= 4)
+			if (datasize >= 4) {
 				addr = UNALIGNED_GET32((uint32_t const *)data);
-			else if (datasize >= 2)
+			} else if (datasize >= 2) {
 				addr = UNALIGNED_GET16((uint16_t const *)data);
-			else if (datasize >= 1)
+			} else if (datasize >= 1) {
 				addr = *(uint8_t const *)data;
-			else {
+			} else {
 				addr = 0;
 			}
 			result = 0;
@@ -2843,15 +2844,15 @@ generic_print_address:
 
 		case DW_ATE_boolean: {
 			uint64_t value;
-			if (datasize >= 8)
+			if (datasize >= 8) {
 				value = UNALIGNED_GET64((uint64_t const *)data);
-			else if (datasize >= 4)
+			} else if (datasize >= 4) {
 				value = UNALIGNED_GET32((uint32_t const *)data);
-			else if (datasize >= 2)
+			} else if (datasize >= 2) {
 				value = UNALIGNED_GET16((uint16_t const *)data);
-			else if (datasize >= 1)
+			} else if (datasize >= 1) {
 				value = *(uint8_t const *)data;
-			else {
+			} else {
 				value = 0;
 			}
 			result = 0;
@@ -3087,11 +3088,11 @@ got_elem_count:
 					--elem_count;
 					for (i = 0; i < elem_count; ++i) {
 						uint32_t ch;
-						if (inner_type.t_sizeof == 1)
+						if (inner_type.t_sizeof == 1) {
 							ch = *((uint8_t *)data + i);
-						else if (inner_type.t_sizeof == 2)
+						} else if (inner_type.t_sizeof == 2) {
 							ch = UNALIGNED_GET16((uint16_t const *)data + i);
-						else {
+						} else {
 							ch = UNALIGNED_GET32((uint32_t const *)data + i);
 						}
 						DO(print_character(printer, arg, ch));

@@ -1178,9 +1178,9 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten)(unsigned int vec4,
 again_try_exchange_e2_word:
 		must_restart = false;
 		X86_PAGEDIR_PREPARE_LOCK_ACQUIRE_WRITE(was);
-		if unlikely(old_version != ATOMIC_READ(x86_pagedir_prepare_version))
+		if unlikely(old_version != ATOMIC_READ(x86_pagedir_prepare_version)) {
 			must_restart = true;
-		else if unlikely(!ATOMIC_CMPXCH(e2_p->p_word, e2.p_word, new_e2_word)) {
+		} else if unlikely(!ATOMIC_CMPXCH(e2_p->p_word, e2.p_word, new_e2_word)) {
 			must_restart = true;
 		}
 		X86_PAGEDIR_PREPARE_LOCK_RELEASE_WRITE(was);
@@ -1915,9 +1915,9 @@ NOTHROW(FCALL p64_pagedir_encode_4kib)(PAGEDIR_PAGEALIGNED VIRT void *addr,
 #endif /* PAGEDIR_PROT_MASK != 0x3f */
 
 	/* All kernel pages have the GLOBAL bit set, and all user pages the USER bit. */
-	if ((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE)
+	if ((byte_t *)addr >= (byte_t *)KERNELSPACE_BASE) {
 		result |= USED_P64_PAGE_FGLOBAL;
-	else {
+	} else {
 		result |= P64_PAGE_FUSER;
 	}
 	return result;
@@ -2833,11 +2833,11 @@ p64_enumfun(void *arg, void *start, size_t num_bytes, u64 word) {
 		return;
 	if ((byte_t *)data->ed_prevstart + data->ed_prevsize == start) {
 		u64 expected_word;
-		if (!data->ed_prevsize)
+		if (!data->ed_prevsize) {
 			expected_word = 0;
-		else if (word & P64_PAGE_FPRESENT)
+		} else if (word & P64_PAGE_FPRESENT) {
 			expected_word = data->ed_prevword + data->ed_prevsize;
-		else {
+		} else {
 			assert(word & P64_PAGE_FISAHINT);
 			expected_word = data->ed_prevword;
 		}

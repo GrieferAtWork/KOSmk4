@@ -73,17 +73,19 @@ GFX_FUNC(libvideo_gfx_defaultgfx_line)(struct video_gfx *__restrict self,
 	IF_OFFSET(y1 += self->vx_offt_y);
 	IF_OFFSET(x2 += self->vx_offt_x);
 	IF_OFFSET(y2 += self->vx_offt_y);
-#define COHSUTH_COMPUTEOUTCODE(x, y, result) \
-	do {                                     \
-		(result) = COHSUTH_INSIDE;           \
-		if ((x) < (intptr_t)GFX_XMIN)        \
-			(result) |= COHSUTH_XMIN;        \
-		else if ((x) >= (intptr_t)GFX_XEND)  \
-			(result) |= COHSUTH_XMAX;        \
-		if ((y) < (intptr_t)GFX_YMIN)        \
-			(result) |= COHSUTH_YMIN;        \
-		else if ((y) >= (intptr_t)GFX_YEND)  \
-			(result) |= COHSUTH_YMAX;        \
+#define COHSUTH_COMPUTEOUTCODE(x, y, result)    \
+	do {                                        \
+		(result) = COHSUTH_INSIDE;              \
+		if ((x) < (intptr_t)GFX_XMIN) {         \
+			(result) |= COHSUTH_XMIN;           \
+		} else if ((x) >= (intptr_t)GFX_XEND) { \
+			(result) |= COHSUTH_XMAX;           \
+		}                                       \
+		if ((y) < (intptr_t)GFX_YMIN) {         \
+			(result) |= COHSUTH_YMIN;           \
+		} else if ((y) >= (intptr_t)GFX_YEND) { \
+			(result) |= COHSUTH_YMAX;           \
+		}                                       \
 	}	__WHILE0
 	COHSUTH_COMPUTEOUTCODE(x1, y1, outcode0);
 	COHSUTH_COMPUTEOUTCODE(x2, y2, outcode1);

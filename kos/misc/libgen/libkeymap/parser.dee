@@ -783,9 +783,9 @@ function parseKeymap(fp: File): {int: {int : string}} {
 			keyName = keyName.rstrip();
 			modsString = modsString.lstrip();
 			local comb = knownModifierFlagCombinations.get(modsString);
-			if (comb !is none)
+			if (comb !is none) {
 				mods = comb;
-			else {
+			} else {
 				mods = [];
 				for (local flagset: modsString.split(",")) {
 					local flags_value = 0;

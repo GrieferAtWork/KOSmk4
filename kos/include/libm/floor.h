@@ -68,9 +68,9 @@ __LIBM_LOCAL_FUNC(floorf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 			__i0 &= (~__i);
 		}
 	} else {
-		if (__j0 == (IEEE754_FLOAT_MAXEXP - IEEE754_FLOAT_BIAS))
+		if (__j0 == (IEEE754_FLOAT_MAXEXP - IEEE754_FLOAT_BIAS)) {
 			return __x + __x; /* inf or NaN */
-		else {
+		} else {
 			return __x; /* x is integral */
 		}
 	}
@@ -118,9 +118,9 @@ __LIBM_LOCAL_FUNC(floor) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 			__i1 = 0;
 		}
 	} else if (__j0 > 51) {
-		if (__j0 == (IEEE754_DOUBLE_MAXEXP - IEEE754_DOUBLE_BIAS))
+		if (__j0 == (IEEE754_DOUBLE_MAXEXP - IEEE754_DOUBLE_BIAS)) {
 			return __x + __x; /* inf or NaN */
-		else {
+		} else {
 			return __x; /* x is integral */
 		}
 	} else {
@@ -129,9 +129,9 @@ __LIBM_LOCAL_FUNC(floor) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 			return __x; /* x is integral */
 		__libm_math_force_eval_r(__IEEE754_DOUBLE_TYPE__, __LIBM_LOCAL_VALUE(huge) + __x); /* raise inexact flag */
 		if (__i0 < 0) {
-			if (__j0 == IEEE754_DOUBLE_SHIFT)
+			if (__j0 == IEEE754_DOUBLE_SHIFT) {
 				__i0 += 1;
-			else {
+			} else {
 				__j = __i1 + (__UINT32_C(1) << (52 - __j0));
 				if (__j < __i1)
 					__i0 += 1; /* got a carry */
@@ -183,9 +183,9 @@ __LIBM_LOCAL_FUNC(floorl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE
 				return __x; /* x is integral */
 			if (__LIBM_LOCAL_VALUE(hugeval4930l) + __x > 0.0) { /* raise inexact flag */
 				if (__sx) {
-					if (__j0 > 0 && (__i0 + (__UINT32_C(0x80000000) >> __j0)) > __i0)
+					if (__j0 > 0 && (__i0 + (__UINT32_C(0x80000000) >> __j0)) > __i0) {
 						__i0 += __UINT32_C(0x80000000) >> __j0;
-					else {
+					} else {
 						__i = __UINT32_C(0x7fffffff);
 						++__se;
 					}
@@ -195,9 +195,9 @@ __LIBM_LOCAL_FUNC(floorl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE
 			}
 		}
 	} else if (__j0 > 62) {
-		if (__j0 == (IEEE854_LONG_DOUBLE_MAXEXP - IEEE854_LONG_DOUBLE_BIAS))
+		if (__j0 == (IEEE854_LONG_DOUBLE_MAXEXP - IEEE854_LONG_DOUBLE_BIAS)) {
 			return __x + __x; /* inf or NaN */
-		else {
+		} else {
 			return __x; /* x is integral */
 		}
 	} else {
@@ -206,9 +206,9 @@ __LIBM_LOCAL_FUNC(floorl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE
 			return __x; /* x is integral */
 		if (__LIBM_LOCAL_VALUE(hugeval4930l) + __x > 0.0) { /* raise inexact flag */
 			if (__sx) {
-				if (__j0 == 31)
+				if (__j0 == 31) {
 					__i0 += 1;
-				else {
+				} else {
 					__j = __i1 + (__UINT32_C(1) << (63 - __j0));
 					if (__j < __i1)
 						__i0 += 1; /* got a carry */

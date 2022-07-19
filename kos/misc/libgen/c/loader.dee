@@ -159,9 +159,9 @@ function parseCTypeAndName(self: CParser): (CType, UserString | string) {
 	if (isCString(tok)) {
 		local typename = tok.decode("c-escape");
 		tok = self.next();
-		if (isCString(tok))
+		if (isCString(tok)) {
 			varname = tok.decode("c-escape");
-		else {
+		} else {
 			if (!tok.issymbol())
 				self.err(f"Expected keyword or string for variable name, but got {repr tok}");
 			varname = self.userTok;
@@ -208,9 +208,9 @@ continue_typename_expression:
 		}
 		if (tok.issymbol() || isCString(tok)) {
 			ctype = CType(self.getUserString(typenameStart, typenameEnd));
-			if (isCString(tok))
+			if (isCString(tok)) {
 				varname = tok.decode("c-escape");
-			else {
+			} else {
 				varname = self.userTok;
 			}
 			tok = self.next();
@@ -1191,11 +1191,11 @@ class FunctionFeatures {
 
 	@@Enable a given namespace binding (via `using`)
 	public function addNamespaceUsingBinding(name: string) {
-		if (namespaces == ("",))
+		if (namespaces == ("",)) {
 			namespaces = ("", name,);
-		else if (name in namespaces)
-			;
-		else {
+		} else if (name in namespaces) {
+			/* ... */
+		} else {
 			namespaces = List(namespaces);
 			namespaces.append(name);
 		}
@@ -1203,9 +1203,9 @@ class FunctionFeatures {
 
 	@@Prevent a given namespace binding (via `using`)
 	public function delNamespaceUsingBinding(name: string) {
-		if (name !in namespaces)
-			;
-		else if (#namespaces == 2 && "" in namespaces) {
+		if (name !in namespaces) {
+			/* ... */
+		} else if (#namespaces == 2 && "" in namespaces) {
 			namespaces = ("", );
 		} else {
 			namespaces = List(namespaces);
@@ -1512,9 +1512,9 @@ class FunctionFeatures {
 			self.next();
 			self.skip("(");
 			local name = self.parseCStringOrAllUntilRParen();
-			if (tok == "kos_section")
+			if (tok == "kos_section") {
 				crt_kosSection = name;
-			else {
+			} else {
 				crt_dosSection = name;
 			}
 			self.skip(")");
@@ -2335,9 +2335,9 @@ again_parse_default_annotation:
 		import fs;
 		if (!fs.isabs(incFileName)) {
 			local baseDir = self.filename;
-			if (baseDir in ["", "?"])
+			if (baseDir in ["", "?"]) {
 				baseDir = fs.getcwd();
-			else {
+			} else {
 				baseDir = fs.headof(baseDir);
 			}
 			incFileName = fs.abspath(incFileName, baseDir);
@@ -2582,9 +2582,9 @@ again:
 
 	@@>> %[insert:std]
 	public function parseInsertDirective_std() {
-		if (result_order_headerStd !is none)
+		if (result_order_headerStd !is none) {
 			self.err("Multiple '%[insert:std]' directives");
-		else {
+		} else {
 			assert result_order_headerStd is none;
 			assert result_order_header_in_CXX_SYSTEM_HEADER === false;
 			result_order_headerStd = [];
@@ -3296,9 +3296,9 @@ function trySerializeDosCallbackWrapper(
 			}
 			local cl = ct.typeClass;
 			if (cl is none) {
-				if (ct.beforeName == "$cook" && ct.afterName == "")
+				if (ct.beforeName == "$cook" && ct.afterName == "") {
 					cl = "TP";
-				else {
+				} else {
 					SERIAL_FAIL;
 				}
 			}
@@ -3948,9 +3948,9 @@ function loadSystemHeaderDefinitions(
 					} else {
 						/* Single-line: %(tags...)TEXT  */
 						textEnd = self.text.find("\n", textStart, self.end);
-						if (textEnd < 0)
+						if (textEnd < 0) {
 							textEnd = self.end;
-						else {
+						} else {
 							++textEnd;
 						}
 						self.tokEnd = textEnd;
@@ -3990,9 +3990,9 @@ function loadSystemHeaderDefinitions(
 				 * default  target embedded string destined for <string.h> */
 				local textStart = self.tokEnd;
 				local textEnd = self.text.find("\n", textStart, self.end);
-				if (textEnd < 0)
+				if (textEnd < 0) {
 					textEnd = self.end;
-				else {
+				} else {
 					++textEnd;
 				}
 				if (context.result_order_header_in_CXX_SYSTEM_HEADER) {
@@ -4473,9 +4473,9 @@ again_parse_annotations:
 						bodyFp << fastFunctionReturnCast
 							<< "(__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@"
 							<< fastFunctionName << "@))(";
-						if (fastFunctionArgumentList !is none)
+						if (fastFunctionArgumentList !is none) {
 							bodyFp << fastFunctionArgumentList;
-						else {
+						} else {
 							/* Automatically pass all arguments from own prototype */
 							local isFirst: bool = true;
 							for (local a: currentPrototype.argv) {
@@ -4566,9 +4566,9 @@ again_parse_annotations:
 						local bindingCond = currentConditions is none ? "1" : currentConditions;
 						if (tok.endswith("extern_inline") && !tok.endswith("raw_extern_inline")) {
 							local ppHave = keyCrtHave(externSymbolName);
-							if (bindingCond == "1")
+							if (bindingCond == "1") {
 								bindingCond = ppHave;
-							else {
+							} else {
 								bindingCond = f"({bindingCond})&&{ppHave}";
 							}
 						}
@@ -5125,12 +5125,12 @@ again_skip_annotation_rbracket:
 		/* Default to having a void returnType */
 		if (currentPrototype.returnType !is bound)
 			currentPrototype.returnType = CType("void");
-		if (currentPrototype.cc !is bound)
+		if (currentPrototype.cc !is bound) {
 			currentPrototype.cc = currentPrototype.hasEllipsis ? DEFAULT_VCC : DEFAULT_CC;
-		else if (currentPrototype.hasEllipsis) {
-			if (currentPrototype.cc === DEFAULT_CC)
+		} else if (currentPrototype.hasEllipsis) {
+			if (currentPrototype.cc === DEFAULT_CC) {
 				currentPrototype.cc = DEFAULT_VCC;
-			else if (currentPrototype.cc === DEFAULT_DOS_CC) {
+			} else if (currentPrototype.cc === DEFAULT_DOS_CC) {
 				currentPrototype.cc = DEFAULT_DOS_VCC;
 			}
 		}
@@ -5618,9 +5618,9 @@ got_chkExpr:
 									unforcedDependencies:     feat_unforcedDependencies,
 									noAutoDependencyScanning: feat_noAutoDependencyScanning);
 							} else {
-								if (baseLocalFunction is none)
+								if (baseLocalFunction is none) {
 									result = none;
-								else {
+								} else {
 									result = LoaderFunctionImplementation(
 										ppCond:       gen.replaceText(baseLocalFunction.ppCond),
 										ppCondPrefix: gen.replaceTextArray(baseLocalFunction.ppCondPrefix),
@@ -5770,9 +5770,9 @@ got_chkExpr:
 							xcLocalFunction.ppCond        = xcImpl.ppCond;
 							xcLocalFunction.ppCondPrefix  = xcImpl.ppCondPrefix;
 							/* Replace default CC with the proper UCHAR-override */
-							if (usedPrototype.cc === DEFAULT_CC)
+							if (usedPrototype.cc === DEFAULT_CC) {
 								usedPrototype.cc = WCHAR_REPLACEMENT_CC[mode];
-							else if (usedPrototype.cc === DEFAULT_VCC) {
+							} else if (usedPrototype.cc === DEFAULT_VCC) {
 								usedPrototype.cc = WCHAR_REPLACEMENT_VCC[mode];
 							}
 							return usedPrototype;
@@ -6117,16 +6117,16 @@ wc_bind_continue_scan_bindings:
 						} else {
 							/* Figure out which prototypes should be used */
 							local usedPrototypes: {(string, {FunctionPrototype...})...} = currentPrototypes;
-							if (usedPrototypes is none)
+							if (usedPrototypes is none) {
 								usedPrototypes = xc.prototypes;
-							else {
+							} else {
 								/* Check if usedPrototypes uses DEFAULT_CC, and if so: Change
 								 * that to instead  make use of  `WCHAR_REPLACEMENT_CC[mode]' */
 								for (local none, protos: usedPrototypes) {
 									for (local p: protos) {
-										if (p.cc === DEFAULT_CC)
+										if (p.cc === DEFAULT_CC) {
 											p.cc = WCHAR_REPLACEMENT_CC[mode];
-										else if (p.cc === DEFAULT_VCC) {
+										} else if (p.cc === DEFAULT_VCC) {
 											p.cc = WCHAR_REPLACEMENT_VCC[mode];
 										}
 									}
@@ -6173,9 +6173,9 @@ wc_bind_continue_scan_bindings:
 								if (usedPrototype is none)
 									usedPrototype = xc.prototype;
 								/* Replace default CC with the proper UCHAR-override */
-								if (usedPrototype.cc === DEFAULT_CC)
+								if (usedPrototype.cc === DEFAULT_CC) {
 									usedPrototype.cc = WCHAR_REPLACEMENT_CC[mode];
-								else if (usedPrototype.cc === DEFAULT_VCC) {
+								} else if (usedPrototype.cc === DEFAULT_VCC) {
 									usedPrototype.cc = WCHAR_REPLACEMENT_VCC[mode];
 								}
 								assert xcLocalFunction !is none;
@@ -6895,33 +6895,33 @@ handle_eq_after_prototype:
 				}
 			}
 			local badField;
-			if (currentFeatures.std != context.defaultFeatures.std)
+			if (currentFeatures.std != context.defaultFeatures.std) {
 				badField = "[no_]std";
-			else if (currentFeatures.namespaces != context.defaultFeatures.namespaces)
+			} else if (currentFeatures.namespaces != context.defaultFeatures.namespaces) {
 				badField = "namespace";
-			else if (currentFeatures.libc != context.defaultFeatures.libc)
+			} else if (currentFeatures.libc != context.defaultFeatures.libc) {
 				badField = "[no_]libc";
-			else if (currentFeatures.exposedName != context.defaultFeatures.exposedName)
+			} else if (currentFeatures.exposedName != context.defaultFeatures.exposedName) {
 				badField = "[no_]exposed_name";
-			else if (currentFeatures.inline != context.defaultFeatures.inline)
+			} else if (currentFeatures.inline != context.defaultFeatures.inline) {
 				badField = "[no_]inline";
-			else if (currentFeatures.noInlineTruncate != context.defaultFeatures.noInlineTruncate)
+			} else if (currentFeatures.noInlineTruncate != context.defaultFeatures.noInlineTruncate) {
 				badField = "[no_]inline_truncate";
-			else if (currentFeatures.noExternInline != context.defaultFeatures.noExternInline)
+			} else if (currentFeatures.noExternInline != context.defaultFeatures.noExternInline) {
 				badField = "[no_]extern_inline";
-			else if (currentFeatures.noLocal != context.defaultFeatures.noLocal)
+			} else if (currentFeatures.noLocal != context.defaultFeatures.noLocal) {
 				badField = "[no_]local";
-			else if (currentFeatures.macroBinding != context.defaultFeatures.macroBinding)
+			} else if (currentFeatures.macroBinding != context.defaultFeatures.macroBinding) {
 				badField = "[no_]macros";
-			else if (currentFeatures.guard != context.defaultFeatures.guard)
+			} else if (currentFeatures.guard != context.defaultFeatures.guard) {
 				badField = "[no_]guard";
-			else if (currentFeatures.exposedName != context.defaultFeatures.exposedName)
+			} else if (currentFeatures.exposedName != context.defaultFeatures.exposedName) {
 				badField = "[default_]exposed_name";
-			else if (currentFeatures.wchar != context.defaultFeatures.wchar)
+			} else if (currentFeatures.wchar != context.defaultFeatures.wchar) {
 				badField = "[no_]wchar";
-			else if (currentFeatures.crt_userimpl != context.defaultFeatures.crt_userimpl)
+			} else if (currentFeatures.crt_userimpl != context.defaultFeatures.crt_userimpl) {
 				badField = "[no_]userimpl";
-			else {
+			} else {
 				badField = currentFeatures.assertSymbolicAliasOnly(context.defaultFeatures);
 			}
 			if (badField !is none) {

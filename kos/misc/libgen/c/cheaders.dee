@@ -746,9 +746,9 @@ class FunctionPrototype {
 	public function cprintArgumentListWithTypes(fp: CWriter, escapeMode: int) {
 		local isFirst = true;
 		fp << "(";
-		if (!argv)
+		if (!argv) {
 			fp << "void";
-		else {
+		} else {
 			for (local arg: argv) {
 				if (!isFirst)
 					fp << ", ";
@@ -2035,9 +2035,9 @@ function getCommonCCFromPrototypes(
 	for (local none, protos: prototypes) {
 		for (local proto: protos) {
 			local pcc = str(proto.cc);
-			if (result is none)
+			if (result is none) {
 				result = pcc;
-			else if (result != pcc) {
+			} else if (result != pcc) {
 				return none;
 			}
 		}
@@ -2693,9 +2693,9 @@ class Function {
 			for (local binding /*: FunctionBinding*/ : functionBindings) {
 				for (local none, protos /*: {FunctionPrototype...}*/ : binding.functionPrototypes) {
 					for (local proto /*: FunctionPrototype*/: protos) {
-						if (result is none)
+						if (result is none) {
 							result = proto;
-						else if (!result.compatibleWith(proto)) {
+						} else if (!result.compatibleWith(proto)) {
 							/* Incompatible prototypes! */
 							return none;
 						}
@@ -2736,9 +2736,9 @@ class Function {
 				for (local bind: usedBindings) {
 					if (bind is Callable) {
 						bind = bind();
-						if (bind is Sequence)
+						if (bind is Sequence) {
 							newBindings.extend(bind);
-						else if (bind !is none) {
+						} else if (bind !is none) {
 							newBindings.append(bind);
 						}
 					} else {

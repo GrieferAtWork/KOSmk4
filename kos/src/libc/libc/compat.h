@@ -74,11 +74,11 @@ for (local contextName: printed_contexts) {
 		contextName = "cyg";
 	local context_emax = contextMap.keys > ...;
 	local context_errno_t;
-	if (context_emax > 0xffff)
+	if (context_emax > 0xffff) {
 		context_errno_t = "uint32_t";
-	else if (context_emax > 0xff)
+	} else if (context_emax > 0xff) {
 		context_errno_t = "uint16_t";
-	else {
+	} else {
 		context_errno_t = "uint8_t";
 	}
 	print("#ifdef __CC__");

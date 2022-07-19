@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6907019 */
+/* HASH CRC-32:0xf7d93f2b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,9 +92,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_merge))(char **__restrict __penv
 	while (__envz2_len && __result == 0) {
 		char *__existing = (__NAMESPACE_LOCAL_SYM __localdep_envz_entry)(*__penvz, *__penvz_len, __envz2);
 		__SIZE_TYPE__ __newlen  = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__envz2) + 1;
-		if (!__existing)
+		if (!__existing) {
 			__result = (__NAMESPACE_LOCAL_SYM __localdep_argz_append)(__penvz, __penvz_len, __envz2, __newlen);
-		else if (__override_) {
+		} else if (__override_) {
 			(__NAMESPACE_LOCAL_SYM __localdep_argz_delete)(__penvz, __penvz_len, __existing);
 			__result = (__NAMESPACE_LOCAL_SYM __localdep_argz_append)(__penvz, __penvz_len, __envz2, __newlen);
 		}

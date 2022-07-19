@@ -639,9 +639,9 @@ again_search_globals_module:
 				if (error >= 0) {
 					if (error > 0) {
 						/* Weak definition. */
-						if (!weak_symbol.ds_mod)
+						if (!weak_symbol.ds_mod) {
 							weak_symbol = symbol; /* First weak def */
-						else {
+						} else {
 							decref(symbol.ds_mod); /* Second weak def */
 						}
 					} else {
@@ -662,9 +662,9 @@ again_search_globals_module:
 				    symbol.ds_sym->st_shndx != SHN_UNDEF) {
 					if (ELFW(ST_BIND)(symbol.ds_sym->st_info) == STB_WEAK) {
 						/* Weak definition. */
-						if (!weak_symbol.ds_mod)
+						if (!weak_symbol.ds_mod) {
 							weak_symbol = symbol; /* First weak def */
-						else {
+						} else {
 							decref(symbol.ds_mod); /* Second weak def */
 						}
 					} else {
@@ -2262,9 +2262,9 @@ err_mod_unloaded:
 		assert(sect->ds_index < mod->dm_shnum);
 		/* Support for formats other than ELF. */
 		if (mod->dm_ops) {
-			if unlikely(!mod->dm_ops->df_dlsectname)
+			if unlikely(!mod->dm_ops->df_dlsectname) {
 				result = "?";
-			else {
+			} else {
 				result = (*mod->dm_ops->df_dlsectname)(mod, sect->ds_index);
 			}
 		} else {

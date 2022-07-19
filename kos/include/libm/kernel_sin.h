@@ -249,9 +249,9 @@ __LIBM_LOCAL_FUNC(kernel_sinl) __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
 		                                 __IEEE854_LONG_DOUBLE_C(1.0) / __IEEE854_LONG_DOUBLE_C(256.0))));
 		__h     = __IEEE854_LONG_DOUBLE_C(0.1484375) + __index / __IEEE854_LONG_DOUBLE_C(128.0);
 		__index *= 4;
-		if (__iy)
+		if (__iy) {
 			__l = (__x < 0 ? -__y : __y) - (__h - __absx);
-		else {
+		} else {
 			__l = __absx - __h;
 		}
 		__z     = __l * __l;

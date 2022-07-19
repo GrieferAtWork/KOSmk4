@@ -949,8 +949,9 @@ NOTHROW(KCALL x86_dbg_setregbyid)(unsigned int level, unsigned int regno,
 	case DBG_REGLEVEL_VIEW:
 		loadview();
 		result = setreg(VIEWSTATE(level), regno, buf, buflen);
-		if (level == DBG_REGLEVEL_ORIG && result != 0)
+		if (level == DBG_REGLEVEL_ORIG && result != 0) {
 			saveorig();
+		}
 #ifdef __x86_64__
 		else if (level == DBG_REGLEVEL_ORIG && result == 0) {
 			if (regno == X86_REGISTER_MISC_KGSBASEL) {

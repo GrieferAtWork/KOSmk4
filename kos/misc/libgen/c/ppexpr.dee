@@ -405,11 +405,11 @@ class PPBranch {
 				data = -data;
 			}
 			fp << (data > 256 ? data.hex() : data);
-			if (data > 0x7fffffffffffffff)
+			if (data > 0x7fffffffffffffff) {
 				fp << "ULL";
-			else if (data > 0xffffffff)
+			} else if (data > 0xffffffff) {
 				fp << "LL";
-			else if (data > 0x7fffffff) {
+			} else if (data > 0x7fffffff) {
 				fp << "U";
 			}
 			break;

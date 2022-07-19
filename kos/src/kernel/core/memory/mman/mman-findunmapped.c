@@ -311,9 +311,9 @@ do_set_automatic_userspace_hint:
 			} else {
 				addr = mman_getunmapped_user_defbase;
 			}
-			if unlikely((byte_t *)addr < (byte_t *)allow_minaddr)
+			if unlikely((byte_t *)addr < (byte_t *)allow_minaddr) {
 				addr = allow_minaddr;
-			else {
+			} else {
 				if (HAS_EXTENDED_MIN_ALIGNMENT)
 					addr = ALIGN_EXTENDED_POINTER(addr);
 			}

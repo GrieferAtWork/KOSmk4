@@ -286,13 +286,13 @@ again_locked:
 	maxwrite = self->lb_line.lc_alloc - self->lb_line.lc_size;
 #ifdef __KERNEL__
 	assert(result <= num_bytes);
-	if (maxwrite >= num_bytes - result)
+	if (maxwrite >= num_bytes - result) {
 		maxwrite = num_bytes - result;
-	else
+	} else
 #else /* __KERNEL__ */
-	if (maxwrite >= num_bytes)
+	if (maxwrite >= num_bytes) {
 		maxwrite = num_bytes;
-	else
+	} else
 #endif /* !__KERNEL__ */
 	{
 		/* Allocate a new buffer.

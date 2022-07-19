@@ -541,9 +541,9 @@ __LIBM_LOCAL_FUNC(jnl) __ATTR_WUNUSED __IEEE854_LONG_DOUBLE_TYPE__
 		if (__ix < 0x3fde) { /* x < 2**-33 */
 			/* x is tiny, return the first Taylor expansion of J(n,x)
 			 * J(n,x) = 1/n!*(x/2)^n - ... */
-			if (__n >= 400) /* underflow, result < 10^-4952 */
+			if (__n >= 400) { /* underflow, result < 10^-4952 */
 				__b = __LIBM_LOCAL_VALUE(zerol);
-			else {
+			} else {
 				__temp = __x * __IEEE854_LONG_DOUBLE_C(0.5);
 				__b    = __temp;
 				for (__a = __LIBM_LOCAL_VALUE(onel), __i = 2; __i <= __n; ++__i) {

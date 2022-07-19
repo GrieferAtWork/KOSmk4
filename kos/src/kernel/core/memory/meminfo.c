@@ -767,9 +767,9 @@ NOTHROW(KCALL minfo_release_preservations)(void) {
 				while (j < minfo.mb_bankc - 1 &&
 				       (((physpage_t)CEILDIV(minfo.mb_banks[j + 1].mb_start, PAGESIZE) - 1) == maxpage)) {
 					if (minfo.mb_banks[j + 1].mb_type == PMEMBANK_TYPE_RAM ||
-					    minfo.mb_banks[j + 1].mb_type == PMEMBANK_TYPE_PRESERVE)
+					    minfo.mb_banks[j + 1].mb_type == PMEMBANK_TYPE_PRESERVE) {
 						++j;
-					else {
+					} else {
 						goto use_floordiv_maxpage;
 					}
 				}
@@ -852,9 +852,9 @@ kernel_handle_ram_cmdline(char *__restrict arg) {
 		json_error = json_decode(&parser, json_ram_definition_codec, &ramdef, NULL);
 		if (json_error != JSON_ERROR_OK)
 			goto parser_error;
-		if (!ramdef.rd_type)
+		if (!ramdef.rd_type) {
 			bank_type = PMEMBANK_TYPE_RAM;
-		else {
+		} else {
 			/* Translate the bank type. */
 			for (bank_type = 0;
 			     bank_type < (u16)COMPILER_LENOF(pmembank_type_names); ++bank_type) {

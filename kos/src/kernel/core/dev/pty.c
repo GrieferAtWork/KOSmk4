@@ -287,9 +287,9 @@ ptymaster_v_polltest(struct mfile *__restrict self,
 	REF struct ptyslave *slave;
 	poll_mode_t result = 0;
 	slave = awref_get(&me->pm_slave);
-	if (!slave)
+	if (!slave) {
 		result = what;
-	else {
+	} else {
 		FINALLY_DECREF_UNLIKELY(slave);
 		if ((what & POLLINMASK) && ringbuffer_canread(&slave->ps_obuf))
 			result |= POLLINMASK; /* Test for read() */
@@ -497,9 +497,9 @@ pty_alloc(REF struct ptymaster **__restrict p_master,
 			/* Load user-space provided initializers. */
 			if (termp != NULL)
 				memcpy(&slave->t_term.t_ios, termp, sizeof(struct termios));
-			if (winp != NULL)
+			if (winp != NULL) {
 				memcpy(&slave->ps_wsize, termp, sizeof(struct winsize));
-			else {
+			} else {
 				slave->ps_wsize.ws_xpixel = slave->ps_wsize.ws_col = 80;
 				slave->ps_wsize.ws_ypixel = slave->ps_wsize.ws_row = 25;
 			}

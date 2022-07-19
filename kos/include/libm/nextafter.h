@@ -60,9 +60,9 @@ __LIBM_LOCAL_FUNC(nextafterf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
 	if (__LIBM_FLT_UWORD_IS_ZERO(__ix)) { /* x == 0 */
 		__LIBM_SET_FLOAT_WORD(__x, (__hy & 0x80000000) | __LIBM_FLT_UWORD_MIN);
 		__y = __x * __x;
-		if (__y == __x)
+		if (__y == __x) {
 			return __y;
-		else {
+		} else {
 			return __x; /* raise underflow flag */
 		}
 	}
@@ -126,9 +126,9 @@ __LIBM_LOCAL_FUNC(nextafter) __ATTR_WUNUSED __ATTR_CONST __IEEE754_DOUBLE_TYPE__
 	if ((__ix | __lx) == 0) { /* x == 0 */
 		__LIBM_INSERT_WORDS(__x, __hy & 0x80000000, 1); /* return +-minsubnormal */
 		__y = __x * __x;
-		if (__y == __x)
+		if (__y == __x) {
 			return __y;
-		else {
+		} else {
 			return __x; /* raise underflow flag */
 		}
 	}

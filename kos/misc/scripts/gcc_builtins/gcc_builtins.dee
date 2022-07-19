@@ -247,9 +247,9 @@ class GCCFeatureSet {
 	public property usableBuiltins: {GCCBuiltin...} = {
 		get(): {GCCBuiltin...} {
 			for (local b: builtins) {
-				if (b.cond is none || !b.cond.startswith("?"))
+				if (b.cond is none || !b.cond.startswith("?")) {
 					yield b;
-				else {
+				} else {
 					local c = getPreprocessorChecksFor(b.name, b.cond[1:], version);
 					if (c !is none)
 						yield GCCBuiltin(b.name, c ? c : none, b.usesLibc);
@@ -535,9 +535,9 @@ function printFeatureSetDiff(out: File, hasBuiltinKey: Callable, old: GCCFeature
 	local oldMap = Dict(oldBuiltins.each.mapByName);
 	local newMap = Dict(newBuiltins.each.mapByName);
 	for (local x: oldBuiltins) {
-		if (x.name !in newMap)
+		if (x.name !in newMap) {
 			removed.append(x);
-		else {
+		} else {
 			local n = newMap[x.name];
 			if (!equal(n.cond, x.cond)) {
 				changed.append((x, n));

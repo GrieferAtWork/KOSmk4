@@ -62,15 +62,15 @@ usb_storage_probe(struct usb_controller *__restrict self,
 			    USB_ENDPOINT_ATTRIB_TRANSFERTYPE_BULK)
 				continue;
 			if (endp->ue_flags & USB_ENDPOINT_FLAG_INPUT) {
-				if (!in)
+				if (!in) {
 					in = endp;
-				else {
+				} else {
 					printk(KERN_WARNING "[usb-storage] SCSI interface with multiple in-endpoints\n");
 				}
 			} else {
-				if (!out)
+				if (!out) {
 					out = endp;
-				else {
+				} else {
 					printk(KERN_WARNING "[usb-storage] SCSI interface with multiple out-endpoints\n");
 				}
 			}

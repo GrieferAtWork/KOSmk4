@@ -148,9 +148,9 @@ disasm_print(struct disassembler *__restrict self,
 	if __likely(self->d_result >= 0) {
 		__ssize_t temp;
 		temp = (*self->d_printer)(self->d_arg, text, len);
-		if __unlikely(temp < 0)
+		if __unlikely(temp < 0) {
 			self->d_result = temp;
-		else {
+		} else {
 			self->d_result += temp;
 		}
 	}
@@ -188,9 +188,9 @@ disasm_print_format(struct disassembler *__restrict self,
 	if (self->d_format && __likely(self->d_result >= 0)) {
 		__ssize_t temp;
 		temp = (*self->d_format)(self, format_code);
-		if __unlikely(temp < 0)
+		if __unlikely(temp < 0) {
 			self->d_result = temp;
-		else {
+		} else {
 			self->d_result += temp;
 		}
 	}
@@ -333,9 +333,9 @@ disasm_vprintf(struct disassembler *__restrict self,
 	if (self->d_result >= 0) {
 		__ssize_t temp;
 		temp = DISASM_PRIVATE_FORMAT_VPRINTF(self->d_printer, self->d_arg, format, args);
-		if __unlikely(temp < 0)
+		if __unlikely(temp < 0) {
 			self->d_result = temp;
-		else {
+		} else {
 			self->d_result += temp;
 		}
 	}

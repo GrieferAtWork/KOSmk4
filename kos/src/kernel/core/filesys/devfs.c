@@ -2251,15 +2251,15 @@ do_dump_chrdev(struct chrdev *__restrict self,
                size_t longest_driver_name) {
 	char const *kind;
 	struct mfile_stream_ops const *ops;
-	if (chrdev_istty(self))
+	if (chrdev_istty(self)) {
 		kind = ttydev_isptyslave((struct ttydev *)self)
 		       ? DBGSTR("pty")
 		       : DBGSTR("tty");
-	else if (chrdev_iskbd(self))
+	} else if (chrdev_iskbd(self)) {
 		kind = DBGSTR("keyboard");
-	else if (chrdev_ismouse(self))
+	} else if (chrdev_ismouse(self)) {
 		kind = DBGSTR("mouse");
-	else {
+	} else {
 		kind = DBGSTR("other");
 	}
 	dbg_printf(DBGSTR("/dev/" AC_WHITE("%-*s") "  "

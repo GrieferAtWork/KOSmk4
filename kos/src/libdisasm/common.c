@@ -318,9 +318,9 @@ libda_disasm_print_symbol(struct disassembler *__restrict self,
 		if (self->d_symbol) {
 			ssize_t error;
 			error = (*self->d_symbol)(self, symbol_addr);
-			if unlikely(error < 0)
+			if unlikely(error < 0) {
 				self->d_result = error;
-			else {
+			} else {
 				self->d_result += error;
 			}
 		} else {

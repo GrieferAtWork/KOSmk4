@@ -95,9 +95,9 @@ for (local name: ["__hybrid_min", "__hybrid_max", "__hybrid_min_c", "__hybrid_ma
 			args.append(a);
 		}
 		print(") "),;
-		if (n == 1)
+		if (n == 1) {
 			print("a");
-		else {
+		} else {
 #define IS_POWER_OF_TWO(x)    (((x) & ((x)-1)) == 0)
 			local secondHalf = (n * 2) / 3;
 			while (!IS_POWER_OF_TWO(secondHalf))

@@ -73,9 +73,9 @@ function generateArrayMapping(
 			result.resize(value + 1, errorValue);
 		name = name[#fromPrefix:].lower();
 		local newval = toMacros.get(name, errorValue);
-		if (errorValue == result[value])
+		if (errorValue == result[value]) {
 			result[value] = newval;
-		else if (errorValue != newval && result[value] != newval) {
+		} else if (errorValue != newval && result[value] != newval) {
 			throw Error(
 				f"Ambiguous mapping for {repr name}={repr value} "
 				f"(both {repr result[value]} and {repr newval})"

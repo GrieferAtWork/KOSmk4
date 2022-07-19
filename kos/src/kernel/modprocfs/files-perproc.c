@@ -1350,13 +1350,13 @@ no_exec:
 		if (thread) {
 			uintptr_t flags;
 			flags = ATOMIC_READ(thread->t_flags);
-			if (flags & TASK_FRUNNING)
+			if (flags & TASK_FRUNNING) {
 				state = 'R'; /* Running */
-			else if (flags & (TASK_FSUSPENDED | TASK_FGDB_STOPPED))
+			} else if (flags & (TASK_FSUSPENDED | TASK_FGDB_STOPPED)) {
 				state = 'T'; /* Stopped */
-			else if (flags & TASK_FSTARTED)
+			} else if (flags & TASK_FSTARTED) {
 				state = 'S'; /* Sleeping */
-			else {
+			} else {
 				/* XXX: 'W' For waking??? */
 				state = 'P'; /* Parked? */
 			}
@@ -1583,13 +1583,13 @@ no_exec:
 	if (thread) {
 		uintptr_t flags;
 		flags = ATOMIC_READ(thread->t_flags);
-		if (flags & TASK_FRUNNING)
+		if (flags & TASK_FRUNNING) {
 			state = "R (running)"; /* Running */
-		else if (flags & (TASK_FSUSPENDED | TASK_FGDB_STOPPED))
+		} else if (flags & (TASK_FSUSPENDED | TASK_FGDB_STOPPED)) {
 			state = "T (stopped)"; /* Stopped */
-		else if (flags & TASK_FSTARTED)
+		} else if (flags & TASK_FSTARTED) {
 			state = "S (sleeping)"; /* Sleeping */
-		else {
+		} else {
 			/* XXX: 'W' For waking??? */
 			state = "P (parked)"; /* Parked? */
 		}

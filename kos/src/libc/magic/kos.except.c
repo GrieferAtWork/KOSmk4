@@ -361,9 +361,9 @@ for (local name: classes.keys.sorted()) {
 		if (!hasSubClassErrnoExpr) {
 			local expr, reqMacros = formatErrnoExpr(cls)...;
 			reqMacros = " && ".join(for (local x: reqMacros) f"defined({x})");
-			if (!reqMacros)
+			if (!reqMacros) {
 				reqMacros = cls.ppCond;
-			else if (cls.ppCond != "1") {
+			} else if (cls.ppCond != "1") {
 				reqMacros = f"({reqMacros}) && ({cls.ppCond})";
 			}
 			if (reqMacros != "1")

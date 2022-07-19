@@ -650,9 +650,9 @@ NOTHROW(KCALL note_mman)(pformatprinter printer, void *arg,
 #endif /* !ARCH_PAGEDIR_GETSET_USES_POINTER */
 		exec_path = FORMMAN(me, thismman_execinfo).mei_path;
 		exec_dent = FORMMAN(me, thismman_execinfo).mei_dent;
-		if (!exec_dent)
+		if (!exec_dent) {
 			exec_path = NULL;
-		else {
+		} else {
 			if (!ADDR_ISKERN(exec_dent))
 				goto badobj;
 			if (exec_path && !ADDR_ISKERN(exec_path))
@@ -771,9 +771,9 @@ NOTHROW(KCALL note_mnode)(pformatprinter printer, void *arg,
 				goto badobj;
 			file_path = me->mn_fspath;
 			file_dent = me->mn_fsname;
-			if (!file_dent)
+			if (!file_dent) {
 				file_path = NULL;
-			else {
+			} else {
 				if (!ADDR_ISKERN(file_dent))
 					goto badobj;
 				if (file_path && !ADDR_ISKERN(file_path))
@@ -1164,9 +1164,9 @@ NOTHROW(KCALL note_filehandle_impl)(pformatprinter printer, void *arg,
 			goto badobj;
 		file_path = me->fh_path;
 		file_dent = me->fh_dirent;
-		if (!file_dent)
+		if (!file_dent) {
 			file_path = NULL;
-		else {
+		} else {
 			if (!ADDR_ISKERN(file_dent))
 				goto badobj;
 			if (file_path && !ADDR_ISKERN(file_path))

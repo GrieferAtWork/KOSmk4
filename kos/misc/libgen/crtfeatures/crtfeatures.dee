@@ -156,10 +156,10 @@ final class CMacro {
 			effectiveReplacementStrings.last = ",".join(iArgs[nReqArgs - 1:]);
 			for (local i: [:nReqArgs - 1])
 				argsMapping[args[i]] = effectiveReplacementStrings[i];
-			if (args.last != "...")
+			if (args.last != "...") {
 				/* #define foo(args...) args */
 				argsMapping[args.last[:-3].rstrip()] = effectiveReplacementStrings.last;
-			else {
+			} else {
 				/* #define foo(...) __VA_ARGS__ */
 				argsMapping["__VA_ARGS__"] = effectiveReplacementStrings.last;
 			}
@@ -423,17 +423,19 @@ again:
 			_deferCurMiscBegin = file.tokbegin;
 			break;
 		case TOK_KEYWORD:
-			if (_deferLastTT == TOK_DIRECTIVE)
+			if (_deferLastTT == TOK_DIRECTIVE) {
 				_deferFile << "\n";
-			else if (_deferLastTT in [TOK_STRING, TOK_NUMBER, TOK_KEYWORD])
+			} else if (_deferLastTT in [TOK_STRING, TOK_NUMBER, TOK_KEYWORD]) {
 				_deferFile << " ";
+			}
 			_deferFile << tr;
 			break;
 		default:
-			if (_deferLastTT == TOK_DIRECTIVE)
+			if (_deferLastTT == TOK_DIRECTIVE) {
 				_deferFile << "\n";
-			else if (_deferLastTT in [TOK_STRING, TOK_NUMBER, TOK_KEYWORD])
+			} else if (_deferLastTT in [TOK_STRING, TOK_NUMBER, TOK_KEYWORD]) {
 				_deferFile << " ";
+			}
 			_deferFile << repr(tr);
 			break;
 		}
@@ -1065,9 +1067,9 @@ again:
 			LOG_INCLUDE(
 				"#include:pop(", 1 + #incstack, "->", #incstack,
 				", ", repr(file.filename), ")");
-			if (!incstack)
+			if (!incstack) {
 				file = none;
-			else {
+			} else {
 				file = incstack.popback();
 				goto again;
 			}
@@ -1290,11 +1292,11 @@ do_undef_args:
 				local evalMode: bool | string;
 			case "ifdef":
 				args = removeComments(args).strip();
-				if (args in knownMacros || args in PREDEF_MACROS)
+				if (args in knownMacros || args in PREDEF_MACROS) {
 					evalMode = true;
-				else if (args in knownDeletedMacros || args in PREDEF_DEL_MACROS)
+				} else if (args in knownDeletedMacros || args in PREDEF_DEL_MACROS) {
 					evalMode = false;
-				else {
+				} else {
 					evalMode = none;
 				}
 				args = f"defined({args})";
@@ -1303,11 +1305,11 @@ do_undef_args:
 				goto do_if_expression;
 			case "ifndef":
 				args = removeComments(args).strip();
-				if (args in knownMacros || args in PREDEF_MACROS)
+				if (args in knownMacros || args in PREDEF_MACROS) {
 					evalMode = false;
-				else if (args in knownDeletedMacros || args in PREDEF_DEL_MACROS)
+				} else if (args in knownDeletedMacros || args in PREDEF_DEL_MACROS) {
 					evalMode = true;
-				else {
+				} else {
 					evalMode = none;
 				}
 				args = f"!defined({args})";

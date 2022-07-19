@@ -542,9 +542,9 @@ usb_interface_discovered(struct usb_controller *__restrict self,
 /* Destroy the given USB endpoint descriptor */
 PUBLIC NOBLOCK void
 NOTHROW(KCALL usb_endpoint_destroy)(struct usb_endpoint *__restrict self) {
-	if (self->ue_interface != self)
+	if (self->ue_interface != self) {
 		decref(self->ue_interface);
-	else {
+	} else {
 		struct usb_interface *intf_me;
 		intf_me = (struct usb_interface *)self;
 		if (intf_me->ui_device != self) {
@@ -1252,9 +1252,9 @@ again_scanconfig:
 							endp->ue_refcnt    = 1;
 							endp->ue_interface = (REF struct usb_interface *)incref(intf);
 							endp->ue_maxpck    = device_max_packet_size;
-							if likely(size >= offsetafter(struct usb_endpoint_descriptor, ue_maxpacketsize))
+							if likely(size >= offsetafter(struct usb_endpoint_descriptor, ue_maxpacketsize)) {
 								endp->ue_maxpck = endp_desc->ue_maxpacketsize;
-							else {
+							} else {
 								/* Don't run any risks, and use the size limit from the control  channel.
 								 * However, for properly functioning devices, we shouldn't even get here. */
 								endp->ue_maxpck = intf->ue_maxpck;

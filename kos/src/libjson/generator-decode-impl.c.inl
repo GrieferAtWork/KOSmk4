@@ -72,9 +72,9 @@ NOTHROW_NCX(CC LOCAL_libjson_decode_INTO)(LOCAL_IF_DECODE(struct json_parser *__
 #ifdef MODE_DECODE
 		result = libjson_parser_getbool(parser, &value);
 		if likely(result == JSON_ERROR_OK) {
-			if (value)
+			if (value) {
 				*(uint8_t *)dst |= mask;
-			else {
+			} else {
 				*(uint8_t *)dst &= ~mask;
 			}
 		}

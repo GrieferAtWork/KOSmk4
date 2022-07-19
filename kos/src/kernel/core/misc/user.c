@@ -66,9 +66,9 @@ ioctl_intarg_setbool(ioctl_t cmd,
 	if (argsz == 0)
 		argsz = sizeof(int);
 	validate_writable(arg, argsz);
-	if likely(argsz == sizeof(int))
+	if likely(argsz == sizeof(int)) {
 		UNALIGNED_SET((USER CHECKED unsigned int *)arg, value ? 1 : 0);
-	else {
+	} else {
 		size_t i;
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 		((USER CHECKED byte_t *)arg)[0] = value ? 1 : 0;

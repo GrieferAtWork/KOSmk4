@@ -194,7 +194,7 @@ DBG_COMMAND(lgdt,
 	    sscanf(argv[1], DBGSTR("%" SCNU16), &limit) != 1 ||
 	    sscanf(argv[2], DBGSTR("%" SCNxPTR), &base) != 1)
 		return DBG_STATUS_INVALID_ARGUMENTS;
-	dbg_printf("lgdt #%.4" PRIx16 " (%" PRIu16 "), %p\n", limit, limit, base);
+	dbg_printf(DBGSTR("lgdt #%.4" PRIx16 " (%" PRIu16 "), %p\n"), limit, limit, base);
 	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
 	fst.fcs_gdt.dt_limit = limit;
 	fst.fcs_gdt.dt_base  = base;

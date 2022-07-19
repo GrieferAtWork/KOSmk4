@@ -617,9 +617,9 @@ function builtin_has_function(
 		extendedPrefixes: List | none): int {
 	self.next();
 	local tok = self.skip("(");
-	if (isCString(tok))
+	if (isCString(tok)) {
 		tok = tok.decode("c-escape");
-	else if (!tok.issymbol()) {
+	} else if (!tok.issymbol()) {
 		self.err(f"Expected keyword or in after '$has_function(...)', but got {repr tok}");
 	}
 	local fun;
@@ -667,9 +667,9 @@ function builtin_crt_has_function(
 		extendedPrefixes: List | none): int {
 	self.next();
 	local tok = self.skip("(");
-	if (isCString(tok))
+	if (isCString(tok)) {
 		tok = tok.decode("c-escape");
-	else if (!tok.issymbol()) {
+	} else if (!tok.issymbol()) {
 		self.err(f"Expected keyword or in after '$crt_has_function(...)', but got {repr tok}");
 	}
 	self.next();
@@ -784,9 +784,9 @@ function skipEscapingPreproessorBlock(self: CParser): int {
 			continue;
 		}
 		tok = self.next();
-		if (tok == "if")
+		if (tok == "if") {
 			++recursion;
-		else if (tok == "endif") {
+		} else if (tok == "endif") {
 			if (recursion == 0) {
 				self.next();
 				return 1; /* @@endif */
@@ -913,9 +913,9 @@ single_dont_escape:
 							}
 							escapedTok = partialKeywordEscapes.get(usedText);
 							if (escapedTok is none) {
-								if (usedText in keywordEscapes || usedText in cLanguageKeywords)
+								if (usedText in keywordEscapes || usedText in cLanguageKeywords) {
 									escapedTok = usedText;
-								else {
+								} else {
 									escapedTok = escapeKeywordIfNotAlreadyEscaped(usedText);
 								}
 							}
@@ -1373,9 +1373,9 @@ handle_numLines_after_pp_directive:
 						}
 						escapedTok = partialKeywordEscapes.get(tok);
 						if (escapedTok is none) {
-							if (tok in keywordEscapes || tok in cLanguageKeywords)
+							if (tok in keywordEscapes || tok in cLanguageKeywords) {
 								escapedTok = tok;
-							else {
+							} else {
 								escapedTok = escapeKeywordIfNotAlreadyEscaped(tok);
 							}
 						}

@@ -208,11 +208,11 @@ NOTHROW(FCALL GDB_MMan_AddBreak)(struct mman *__restrict effective_mm,
 	(void)kind;
 	if (type == GDB_BREAKPOINT_TYPE_SWBREAK)
 		return GDB_AddSwBreak(effective_mm, (byte_t *)addr);
-	if (type == GDB_BREAKPOINT_TYPE_HWBREAK)
+	if (type == GDB_BREAKPOINT_TYPE_HWBREAK) {
 		cond = DR_CEXEC;
-	else if (type == GDB_BREAKPOINT_TYPE_WRITE)
+	} else if (type == GDB_BREAKPOINT_TYPE_WRITE) {
 		cond = DR_CWRITE;
-	else {
+	} else {
 		cond = DR_CREADWRITE;
 	}
 	if (!mman_addhwbreak(effective_mm, addr, cond, DR_S1))
@@ -228,11 +228,11 @@ NOTHROW(FCALL GDB_MMan_DelBreak)(struct mman *__restrict effective_mm,
 	(void)kind;
 	if (type == GDB_BREAKPOINT_TYPE_SWBREAK)
 		return GDB_DelSwBreak(effective_mm, (byte_t *)addr);
-	if (type == GDB_BREAKPOINT_TYPE_HWBREAK)
+	if (type == GDB_BREAKPOINT_TYPE_HWBREAK) {
 		cond = DR_CEXEC;
-	else if (type == GDB_BREAKPOINT_TYPE_WRITE)
+	} else if (type == GDB_BREAKPOINT_TYPE_WRITE) {
 		cond = DR_CWRITE;
-	else {
+	} else {
 		cond = DR_CREADWRITE;
 	}
 	if (!mman_addhwbreak(effective_mm, addr, cond, DR_S1))

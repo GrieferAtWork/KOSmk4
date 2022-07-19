@@ -161,9 +161,9 @@ fdirenum_feedent(USER CHECKED struct dirent *buf,
 		buf->d_type   = (typeof(buf->d_type))ent->fd_type;
 		buf->d_namlen = (typeof(buf->d_namlen))ent->fd_namelen;
 		bufsize -= offsetof(struct dirent, d_name);
-		if (bufsize >= (size_t)(ent->fd_namelen + 1))
+		if (bufsize >= (size_t)(ent->fd_namelen + 1)) {
 			bufsize = (size_t)(ent->fd_namelen + 1);
-		else if ((readdir_mode & READDIR_MODEMASK) == READDIR_DEFAULT) {
+		} else if ((readdir_mode & READDIR_MODEMASK) == READDIR_DEFAULT) {
 			result ^= (size_t)-1; /* Don't yield */
 		}
 
@@ -195,9 +195,9 @@ fdirenum_feedent_fast(USER CHECKED struct dirent *buf,
 		buf->d_type   = (typeof(buf->d_type))ent->fd_type;
 		buf->d_namlen = (typeof(buf->d_namlen))ent->fd_namelen;
 		bufsize -= offsetof(struct dirent, d_name);
-		if (bufsize >= (size_t)(ent->fd_namelen + 1))
+		if (bufsize >= (size_t)(ent->fd_namelen + 1)) {
 			bufsize = (size_t)(ent->fd_namelen + 1);
-		else if ((readdir_mode & READDIR_MODEMASK) == READDIR_DEFAULT) {
+		} else if ((readdir_mode & READDIR_MODEMASK) == READDIR_DEFAULT) {
 			result ^= (size_t)-1; /* Don't yield */
 		}
 

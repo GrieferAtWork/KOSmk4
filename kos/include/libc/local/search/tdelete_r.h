@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8475d806 */
+/* HASH CRC-32:0x9684fd60 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -104,9 +104,9 @@ __LOCAL_LIBC(tdelete_r) __ATTR_INOUT_OPT(2) __ATTR_IN_OPT(1) __ATTR_NONNULL((3))
 	__root = *__rootp;
 	__r = __root->__right_node;
 	__q = __root->__left_node;
-	if (__q == __NULLPTR || __r == __NULLPTR)
+	if (__q == __NULLPTR || __r == __NULLPTR) {
 		__unchained = __root;
-	else {
+	} else {
 		__node *__parentp = __rootp, *__up = &__root->__right_node;
 		__node __upn;
 		for (;;) {
@@ -134,14 +134,15 @@ __LOCAL_LIBC(tdelete_r) __ATTR_INOUT_OPT(2) __ATTR_IN_OPT(1) __ATTR_NONNULL((3))
 	__r = __unchained->__left_node;
 	if (__r == __NULLPTR)
 		__r = __unchained->__right_node;
-	if (__sp == 0)
+	if (__sp == 0) {
 		*__rootp = __r;
-	else {
+	} else {
 		__q = *__nodestack[__sp-1];
-		if (__unchained == __q->__right_node)
+		if (__unchained == __q->__right_node) {
 			__q->__right_node = __r;
-		else
+		} else {
 			__q->__left_node = __r;
+		}
 	}
 	if (__unchained != __root)
 		__root->__key = __unchained->__key;
