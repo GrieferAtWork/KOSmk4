@@ -667,38 +667,39 @@ select64 = selectx32_64;
 0x000001b6:pidfd_getfd
 0x000001b7:faccessat2
 
+/* KOS-specific extended system calls */
 /*x00000001:...*/
 /*x00000002:...*/
--0x00000003:readf
--0x00000004:writef
--0x00000005:detach
--0x00000006:getdrives
--0x00000007:frealpath4
+-0x00000003:readf /* Extends: `read' */
+-0x00000004:writef /* Extends: `write' */
+-0x00000005:getdrives
+-0x00000006:frealpath4
+-0x00000007:detach /* Extends `waitpid' */
 -0x00000008:frealpathat
 -0x00000009:rpc_schedule
 -0x0000000b:openpty
--0x0000000c:fchdirat
--0x0000000d:time64
--0x0000000e:set_exception_handler
--0x0000000f:get_exception_handler
-/*x00000010:...*/
+-0x0000000c:fchdirat /* Extends: `chdir' */
+-0x0000000d:time64 /* Extends: `time' */
+-0x0000000e:mktty /* Extends: `mknod' */
+-0x0000000f:set_exception_handler
+-0x00000010:get_exception_handler
 -0x00000011:debugtrap
--0x00000012:lfutex
--0x00000013:lseek64
-/*x00000014:...*/
--0x00000015:lfutexexpr
--0x00000016:mktty
+-0x00000012:coredump
+-0x00000013:lseek64 /* Extends: `lseek' */
+-0x00000014:userviofd
+/*x00000015:...*/
+/*x00000015:...*/
 /*x00000017:...*/
--0x00000018:coredump
--0x00000019:stime64
+/*x00000018:...*/
+-0x00000019:stime64 /* Extends: `stime' */
 /*x0000001a:...*/
--0x0000001b:userviofd
--0x0000001e:utime64
+/*x0000001b:...*/
+-0x0000001e:utime64 /* Extends: `utime' */
 /*x0000001f:...*/
--0x00000020:set_userprocmask_address
--0x00000021:rpc_serve_sysret
+/*x00000020:...*/
+/*x00000021:...*/
 /*x00000022:...*/
--0x00000023:ftime64
+-0x00000023:ftime64 /* Extends: `ftime' */
 /*x00000024:...*/
 /*x00000025:...*/
 /*x00000026:...*/
@@ -717,13 +718,13 @@ select64 = selectx32_64;
 -0x00000033:rtm_test
 /*x00000034:...*/
 /*x00000035:...*/
--0x00000036:ioctlf
+-0x00000036:ioctlf /* Extends: `ioctl' */
 /*x00000037:...*/
 /*x00000038:...*/
 /*x00000039:...*/
 /*x0000003a:...*/
 /*x0000003b:...*/
--0x0000003c:fsmode
+-0x0000003c:fsmode /* Extends: `umask' */
 /*x0000003d:...*/
 /*x0000003e:...*/
 /*x0000003f:...*/
@@ -740,16 +741,16 @@ select64 = selectx32_64;
 /*x0000004a:...*/
 /*x0000004b:...*/
 /*x0000004c:...*/
--0x0000004d:getrusage64
--0x0000004e:gettimeofday64
--0x0000004f:settimeofday64
+-0x0000004d:getrusage64 /* Extends: `getrusage' */
+-0x0000004e:gettimeofday64 /* Extends: `gettimeofday' */
+-0x0000004f:settimeofday64 /* Extends: `settimeofday' */
 /*x00000050:...*/
 /*x00000051:...*/
--0x00000052:select64
+/*x00000052:...*/
 /*x00000053:...*/
 /*x00000054:...*/
 /*x00000055:...*/
--0x00000056:maplibrary
+-0x00000056:maplibrary /* Extends: `uselib' */
 /*x00000057:...*/
 /*x00000058:...*/
 /*x00000059:...*/
@@ -767,8 +768,8 @@ select64 = selectx32_64;
 /*x00000065:...*/
 /*x00000066:...*/
 /*x00000067:...*/
--0x00000068:setitimer64
--0x00000069:getitimer64
+-0x00000068:setitimer64 /* Extends: `setitimer' */
+-0x00000069:getitimer64 /* Extends: `getitimer' */
 /*x0000006a:...*/
 /*x0000006b:...*/
 /*x0000006c:...*/
@@ -777,7 +778,7 @@ select64 = selectx32_64;
 /*x0000006f:...*/
 /*x00000070:...*/
 /*x00000071:...*/
--0x00000072:wait4_64
+-0x00000072:wait4_64 /* Extends: `wait4' */
 /*x00000073:...*/
 /*x00000074:...*/
 /*x00000075:...*/
@@ -804,15 +805,15 @@ select64 = selectx32_64;
 /*x0000008a:...*/
 /*x0000008b:...*/
 /*x0000008c:...*/
--0x0000008d:kreaddir
-/*x0000008e:...*/
+/*x0000008d:...*/
+-0x0000008e:select64 /* Extends: `_newselect' */
 /*x0000008f:...*/
 /*x00000090:...*/
--0x00000091:readvf
--0x00000092:writevf
+-0x00000091:readvf /* Extends: `readv' */
+-0x00000092:writevf /* Extends: `writev' */
 /*x00000093:...*/
 /*x00000094:...*/
--0x00000095:ksysctl
+-0x00000095:ksysctl /* Extends: `_sysctl' */
 /*x00000096:...*/
 /*x00000097:...*/
 /*x00000098:...*/
@@ -821,11 +822,11 @@ select64 = selectx32_64;
 /*x0000009b:...*/
 /*x0000009c:...*/
 /*x0000009d:...*/
--0x0000009e:rpc_serve
-/*x0000009f:...*/
+-0x0000009e:rpc_serve /* Extends: `sched_yield' */
+-0x0000009f:rpc_serve_sysret
 /*x000000a0:...*/
 /*x000000a1:...*/
--0x000000a2:nanosleep64
+-0x000000a2:nanosleep64 /* Extends: `nanosleep' */
 /*x000000a3:...*/
 /*x000000a4:...*/
 /*x000000a5:...*/
@@ -836,24 +837,90 @@ select64 = selectx32_64;
 /*x000000aa:...*/
 /*x000000ab:...*/
 /*x000000ac:...*/
--0x000000ad:ksigreturn
+-0x000000ad:ksigreturn /* Extends: `rt_sigreturn' */
 /*x000000ae:...*/
 /*x000000af:...*/
 /*x000000b0:...*/
 /*x000000b1:...*/
--0x000000b4:pread64f
--0x000000b5:pwrite64f
--0x000000c3:kstat
--0x000000c4:klstat
--0x000000c5:kfstat
--0x000000dc:kreaddirf
+-0x000000b4:pread64f /* Extends: `pread64' */
+-0x000000b5:pwrite64f /* Extends: `pwrite64' */
+-0x000000c3:kstat /* Extends: `stat64' */
+-0x000000c4:klstat /* Extends: `lstat64' */
+-0x000000c5:kfstat /* Extends: `fstat64' */
+/*x000000c6:...*/
+/*x000000c7:...*/
+/*x000000c8:...*/
+/*x000000c9:...*/
+/*x000000ca:...*/
+/*x000000cb:...*/
+/*x000000cc:...*/
+/*x000000cd:...*/
+/*x000000ce:...*/
+/*x000000cf:...*/
+/*x000000d0:...*/
+/*x000000d1:...*/
+/*x000000d2:...*/
+/*x000000d3:...*/
+/*x000000d4:...*/
+/*x000000d5:...*/
+/*x000000d6:...*/
+/*x000000d7:...*/
+/*x000000d8:...*/
+/*x000000d9:...*/
+/*x000000da:...*/
+/*x000000db:...*/
+/*x000000dc:...*/
+/*x000000db:...*/
+-0x000000dc:kreaddir /* Extends: `getdents64' */
+-0x000000dd:kreaddirf
+/*x000000de:...*/
+/*x000000df:...*/
+/*x000000e0:...*/
+/*x000000e1:...*/
+/*x000000e2:...*/
+/*x000000e3:...*/
+/*x000000e4:...*/
+/*x000000e5:...*/
+/*x000000e6:...*/
+/*x000000e7:...*/
+/*x000000e8:...*/
+/*x000000e9:...*/
+/*x000000ea:...*/
+/*x000000eb:...*/
+/*x000000ec:...*/
+/*x000000ed:...*/
+/*x000000ee:...*/
+/*x000000ef:...*/
+-0x000000f0:lfutex /* Extends: futex */
+-0x000000f1:lfutexexpr
+/*x000000f2:...*/
+/*x000000f3:...*/
+/*x000000f4:...*/
+/*x000000f5:...*/
+/*x000000f6:...*/
+/*x000000f7:...*/
+/*x000000f8:...*/
+/*x000000f9:...*/
+/*x000000fa:...*/
+/*x000000fb:...*/
+/*x000000fc:...*/
+/*x000000fd:...*/
+/*x000000fe:...*/
+/*x000000ff:...*/
+/*x00000100:...*/
+/*x00000101:...*/
+-0x00000102:set_userprocmask_address /* Extends `set_tid_address' */
+/*x00000103:...*/
 /*x00000104:...*/
 /*x00000105:...*/
 /*x00000108:...*/
 /*x00000109:...*/
 /*x0000010a:...*/
 /*x0000010b:...*/
--0x0000010f:utimes64
+/*x0000010c:...*/
+/*x0000010d:...*/
+/*x0000010e:...*/
+-0x0000010f:utimes64 /* Extends `utimes' */
 /*x00000110:...*/
 /*x00000111:...*/
 /*x00000112:...*/
@@ -866,7 +933,7 @@ select64 = selectx32_64;
 /*x00000119:...*/
 /*x0000011a:...*/
 /*x0000011b:...*/
--0x0000011c:waitid64
+-0x0000011c:waitid64 /* Extends `waitid' */
 /*x0000011d:...*/
 /*x0000011e:...*/
 /*x0000011f:...*/
@@ -874,21 +941,20 @@ select64 = selectx32_64;
 /*x00000121:...*/
 /*x00000122:...*/
 /*x00000123:...*/
--0x00000124:inotify_add_watch_at
-/*x00000124:...*/
+-0x00000124:inotify_add_watch_at /* Extends `inotify_add_watch' */
 /*x00000125:...*/
 /*x00000126:...*/
 /*x00000127:...*/
--0x00000128:fmkdirat
--0x00000129:fmknodat
+-0x00000128:fmkdirat /* Extends `mkdirat' */
+-0x00000129:fmknodat /* Extends `mknodat' */
 /*x0000012a:...*/
--0x0000012b:futimesat64
--0x0000012c:kfstatat
+-0x0000012b:futimesat64 /* Extends `futimesat' */
+-0x0000012c:kfstatat /* Extends `fstatat64' */
 /*x0000012d:...*/
 /*x0000012e:...*/
 /*x0000012f:...*/
--0x00000130:fsymlinkat
--0x00000131:freadlinkat
+-0x00000130:fsymlinkat /* Extends `symlinkat' */
+-0x00000131:freadlinkat /* Extends `readlinkat' */
 /*x00000132:...*/
 /*x00000133:...*/
 /*x00000134:...*/
@@ -897,11 +963,17 @@ select64 = selectx32_64;
 /*x00000137:...*/
 /*x00000138:...*/
 /*x00000139:...*/
+/*x0000013a:...*/
+/*x0000013b:...*/
+/*x0000013c:...*/
+/*x0000013d:...*/
+/*x0000013e:...*/
+/*x0000013f:...*/
 /*x00000140:...*/
 /*x00000141:...*/
 /*x00000142:...*/
 /*x00000143:...*/
--0x00000144:fallocate64
+-0x00000144:fallocate64 /* Extends `fallocate' */
 /*x00000145:...*/
 /*x00000146:...*/
 /*x00000147:...*/
@@ -910,6 +982,6 @@ select64 = selectx32_64;
 /*x0000014a:...*/
 /*x0000014b:...*/
 /*x0000014c:...*/
--0x0000014d:preadvf
--0x0000014e:pwritevf
+-0x0000014d:preadvf /* Extends `preadv' */
+-0x0000014e:pwritevf /* Extends `pwritev' */
 /*x0000014f:...*/

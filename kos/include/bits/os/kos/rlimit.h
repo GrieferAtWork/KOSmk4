@@ -34,12 +34,15 @@ struct rlimit {
 };
 
 #ifdef __USE_LARGEFILE64
-struct rlimit64 {
+#define __rlimit64 rlimit64
+struct rlimit64
+#else /* __USE_LARGEFILE64 */
+struct __rlimit64
+#endif /* !__USE_LARGEFILE64 */
+{
 	__rlim64_t rlim_cur; /* The current (soft) limit. */
 	__rlim64_t rlim_max; /* The hard limit. */
 };
-#endif /* __USE_LARGEFILE64 */
-
 __DECL_END
 #endif /* __CC__ */
 

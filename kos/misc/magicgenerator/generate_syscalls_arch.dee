@@ -1365,6 +1365,39 @@ function x86_64_printKernelSyscallWrapper_asm32_sysrun32(fp: File, f: Function, 
 	fp << "END(__x86_asm32_sysrun32_" << f.name << ")\n";
 }
 
+
+
+
+
+
+function arm_printLibcSyscallWrapperPrefix(fp: File) {
+	fp << "/* TODO: arm_printLibcSyscallWrapperPrefix() */\n";
+}
+function arm_printLibcSyscallWrapperSuffix(fp: File) {
+	fp << "/* TODO: arm_printLibcSyscallWrapperSuffix() */\n";
+}
+function arm_printLibcSyscallWrapper(fp: File, f: Function, sysno: int, enableExcept: bool) {
+	fp << "	/* TODO: arm_printLibcSyscallWrapper(sysno: "
+		<< sysno << ", enableExcept: " << enableExcept << ") */\n";
+	fp << "	b .\n";
+}
+function arm_printKernelSyscallWrapperCommon(fp: File) {
+	fp << "/* TODO: arm_printKernelSyscallWrapperCommon() */\n";
+}
+function arm_printKernelSyscallWrapper_TODO(fp: File, f: Function, sysno: int) {
+	fp << "/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: " << sysno << ") */\n";
+}
+
+
+
+
+
+
+
+
+
+
+
 @@Listing  of  supported  system call  architectures,  as well
 @@as arch-specific configuration options, and code generators.
 global ARCH: {string: SyscallArch} = {
@@ -1435,20 +1468,21 @@ global ARCH: {string: SyscallArch} = {
 		},
 	),
 
-//	"arm" : SyscallArch(
-//		platformName: "arm-kos",
-//		platformArch: "arm",
-//		platformGpRegisterSizeInBits: 32,
-//		platformPointerSizeInBytes: 4,
-//		platformSyscallRegisterCount: 6,
-//		platformEndian: "le",
-//		platformSyscallTableCount: 2,
-//		platformMaxPossibleSysno: 0xffffffff,
-//		platformLibcSyscallPrefix: arm_printLibcSyscallWrapperCommon,
-//		platformLibcSyscallWrapper: arm_printLibcSyscallWrapper,
-//		platformKernelSyscallWrappersCommon: arm_printKernelSyscallWrapperCommon,
-//		platformKernelSyscallWrappers: {
-//			"__arm_syscall_" : ("INTERN", "arm", arm_printKernelSyscallWrapper),
-//		},
-//	),
+	"arm" : SyscallArch(
+		platformName: "arm-kos",
+		platformArch: "arm",
+		platformGpRegisterSizeInBits: 32,
+		platformPointerSizeInBytes: 4,
+		platformSyscallRegisterCount: 6,
+		platformEndian: "le", /* TODO: Variable! */
+		platformSyscallTableCount: 2,
+		platformMaxPossibleSysno: 0xffffffff,
+		platformLibcSyscallPrefix: arm_printLibcSyscallWrapperPrefix,
+		platformLibcSyscallSuffix: arm_printLibcSyscallWrapperSuffix,
+		platformLibcSyscallWrapper: arm_printLibcSyscallWrapper,
+		platformKernelSyscallWrappersCommon: arm_printKernelSyscallWrapperCommon,
+		platformKernelSyscallWrappers: {
+			(arm_printKernelSyscallWrapper_TODO, "arm"),
+		},
+	),
 };

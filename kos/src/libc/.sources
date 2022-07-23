@@ -191,7 +191,7 @@ BEGIN
 		};
 		SET_OUTPUT_LIBDLL("libc")
 		LD_FLAGS({ "--gc-sections" })
-		LINKER_SCRIPT(f"libc/arch/{XARCH}/_libc.ld")
+		LINKER_SCRIPT(f"libc/_libc.ld")
 
 		/* `libc' as a static library (link as `OBJECT("$OUTPATH/lib/libc.a")')
 		 * NOTE: Don't forget to turn on `L_FLAGS("-Wl,--gc-sections")', to prevent

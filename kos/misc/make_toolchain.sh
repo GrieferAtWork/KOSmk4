@@ -89,6 +89,7 @@ if (($# < 1)); then
 	echo "	TARGET must be one of:"
 	echo "		i386-kos"
 	echo "		x86_64-kos"
+	echo "		arm-kos"
 	exit 1
 fi
 
@@ -280,7 +281,6 @@ if [[ "$1" == i?86-kos ]]; then
 	TARGET_NAME="i386"
 	NAME="i386-kos"
 	INCLUDE_NAME="i386-kos"
-	TARGET_GDB="i686-elf"
 	BINLIBDIRNAME="lib"
 	SYSHEADER_BUILD_CONFIG_SUFFIX="32"
 	export TARGET="i686-kos"
@@ -293,13 +293,21 @@ elif [[ "$1" == x86_64-kos ]]; then
 	fi
 	TARGET_NAME="x86_64"
 	NAME="x86_64-kos"
-	TARGET_GDB="x86_64-elf"
 	INCLUDE_NAME="i386-kos"
 	BINLIBDIRNAME="lib64"
 	CONFIGURE_OPTIONS_BINUTILS+=("--enable-64-bit-bfd")
 	CONFIGURE_OPTIONS_GCC+=("--enable-64-bit-bfd")
 	SYSHEADER_BUILD_CONFIG_SUFFIX="64"
 	export TARGET="x86_64-kos"
+elif [[ "$1" == arm-kos ]]; then
+	TARGET_NAME="arm"
+	NAME="arm-kos"
+	INCLUDE_NAME="arm-kos"
+	BINLIBDIRNAME="lib"
+	SYSHEADER_BUILD_CONFIG_SUFFIX="32"
+	export TARGET="arm-kos"
+	CONFIGURE_OPTIONS_GCC+=("--with-arch=armv6")
+	CONFIGURE_OPTIONS_GCC+=("--with-fpu=vfp")
 else
 	echo "Unknown target: '$1'"
 	exit 1
@@ -574,7 +582,6 @@ remove_bad_fixinclude
 echo "Check if $GCC_VERSION:libgcc needs to be built"
 if ! [ -f "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" ] || \
    ! [ -f "$PREFIX/$TARGET/lib/libgcc_s.so.1" ]; then
-	echo "	Making crt0.o and crt0S.o for $GCC_VERSION:libgcc"
 	cmd cd "$KOS_ROOT"
 
 	# If this is the first time that "magic.dee" is being run after the git was cloned,
@@ -590,11 +597,15 @@ if ! [ -f "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" ] || \
 	[ -f "kos/misc/magicgenerator/.generate_syscalls.dee.$TARGET_NAME.latest" ] || \
 		cmd touch "kos/misc/magicgenerator/.generate_syscalls.dee.$TARGET_NAME.latest"
 
-	cmd "$DEEMON" "magic.dee" \
-		"--gen=bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0.o" \
-		"--gen=bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0S.o" \
-		"--target=$TARGET_NAME" \
-		"--config=$KOS_CONFIG_FOR_LINKING"
+	if ! [ -f "bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0.o" ] || \
+	   ! [ -f "bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0S.o" ]; then
+		echo "	Making crt0.o and crt0S.o for $GCC_VERSION:libgcc"
+		cmd "$DEEMON" "magic.dee" \
+			"--gen=bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0.o" \
+			"--gen=bin/$NAME-$KOS_CONFIG_FOR_LINKING/$BINLIBDIRNAME/crt0S.o" \
+			"--target=$TARGET_NAME" \
+			"--config=$KOS_CONFIG_FOR_LINKING"
+	fi
 	echo "	Making $GCC_VERSION:libgcc"
 	cmd cd "$PREFIX/gcc"
 	if ! make -j "$MAKE_PARALLEL_COUNT" "all-target-libgcc"; then

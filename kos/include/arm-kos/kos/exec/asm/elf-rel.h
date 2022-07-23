@@ -17,44 +17,25 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_CRT0_I386_CRT0_32_S
-#define GUARD_CRT0_I386_CRT0_32_S 1
-#define __ASSEMBLER__ 1
+#ifndef _ARM_KOS_KOS_EXEC_ASM_ELF_REL_H
+#define _ARM_KOS_KOS_EXEC_ASM_ELF_REL_H 1
 
-#include <hybrid/compiler.h>
+#include <elf.h>
 
-#include <kos/exec/asm/elf32.h>
-#include <kos/exec/peb.h>
+#define ELF_ARCH_R_NONE             R_ARM_NONE
+#define ELF_ARCH_R_8                R_ARM_ABS8
+#define ELF_ARCH_R_16               R_ARM_ABS16
+#define ELF_ARCH_R_32               R_ARM_ABS32
+#define ELF_ARCH_R_COPY             R_ARM_COPY
+#define ELF_ARCH_R_GLOB_DAT         R_ARM_GLOB_DAT
+#define ELF_ARCH_R_JMP_SLOT         R_ARM_JUMP_SLOT
+#define ELF_ARCH_NAME_R_JMP_SLOT    "R_ARM_JUMP_SLOT"
+#define ELF_ARCH_R_RELATIVE32       R_ARM_RELATIVE
+#define ELF_ARCH_R_DTPMOD32         R_ARM_TLS_DTPMOD32
+#define ELF_ARCH_R_DTPOFF32         R_ARM_TLS_DTPOFF32
+#define ELF_ARCH_R_NEG_TPOFF32      R_ARM_TLS_TPOFF32 /* `*addr = -(dm_tlsstoff + value)' */
+#define ELF_ARCH_NAME_R_NEG_TPOFF32 "R_ARM_TLS_TPOFF32"
+#define ELF_ARCH_R_TLSDESC          R_ARM_TLS_DESC
+#define ELF_ARCH_R_IRELATIVE32      R_ARM_IRELATIVE
 
-/* INTDEF int main(int argc, char *argv[], char *envp[]); */
-/* INTDEF ATTR_NORETURN void _start(void); */
-
-.section .text
-INTERN_FUNCTION(_start)
-	/* The PEB is initialized by the kernel */
-	pushl  OFFSET_PROCESS_PEB_ENVP(%ELF_ARCH386_PEB_REGISTER) /* envp */
-	pushl  OFFSET_PROCESS_PEB_ARGV(%ELF_ARCH386_PEB_REGISTER) /* argv */
-	pushl  OFFSET_PROCESS_PEB_ARGC(%ELF_ARCH386_PEB_REGISTER) /* argc */
-	INTERN(main)
-	call   main
-	movl   %eax, 0(%esp)
-
-	/* %ebx isn't required when we're not generating position-independent code. */
-#if defined(__pic__) || defined(__PIC__) || defined(__pie__) || defined(__PIE__)
-	/* @PLT requires %ebx to be loaded, so load it now */
-	call   1f
-1:	popl   %ebx
-	addl   $(_GLOBAL_OFFSET_TABLE_ + (. - 1b)), %ebx
-#endif /* ... */
-
-	EXTERN(exit)
-	call   exit@PLT
-END(_start)
-
-
-.section .bss.__dso_handle
-INTERN_OBJECT(__dso_handle)
-	.long 0
-END(__dso_handle)
-
-#endif /* !GUARD_CRT0_I386_CRT0_32_S */
+#endif /* !_ARM_KOS_KOS_EXEC_ASM_ELF_REL_H */

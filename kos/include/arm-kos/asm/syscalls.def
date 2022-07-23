@@ -1,0 +1,893 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+/* Define type sizes */
+%[typesize(arm:char  = 1)]
+%[typesize(arm:short = 2)]
+%[typesize(arm:int   = 4)]
+%[typesize(arm:long  = 8)]
+%[typesize(arm:llong = 8)]
+%[typesize(arm:socklen_t = 4)]
+%[typesize(arm:uintptr_t = 8)]
+%[typesize(arm:uintptr_half_t = 4)]
+
+/* Delete all generic definitions from include/asm/syscalls.def */
+%[clear_syscall_id_table]
+
+@@Syscall to call a syscall
+syscall:(int TODO_PROTOTYPE) -> errno_t;
+arm_fadvise64_64:(int TODO_PROTOTYPE) -> errno_t;
+
+/* Configure binding of multi-arch types in system calls. */
+time = time32;
+lchown = lchown16;
+setuid = setuid16;
+getuid = getuid16;
+stime = stime32;
+utime = utime32;
+setgid = setgid16;
+getgid = getgid16;
+geteuid = geteuid16;
+getegid = getegid16;
+setreuid = setreuid16;
+setregid = setregid16;
+getgroups = getgroups16;
+setgroups = setgroups16;
+fchown = fchown16;
+adjtimex = adjtimex32;
+setfsuid = setfsuid16;
+setfsgid = setfsgid16;
+sched_rr_get_interval = sched_rr_get_interval32;
+nanosleep = nanosleep32;
+setresuid = setresuid16;
+getresuid = getresuid16;
+setresgid = setresgid16;
+getresgid = getresgid16;
+rt_sigtimedwait = rt_sigtimedwait32;
+chown = chown16;
+futex = futex32;
+io_getevents = io_getevents32;
+timer_settime = timer_settime32;
+timer_gettime = timer_gettime32;
+clock_settime = clock_settime32;
+clock_gettime = clock_gettime32;
+clock_getres = clock_getres32;
+clock_nanosleep = clock_nanosleep32;
+utimes = utimes32;
+mq_timedsend = mq_timedsend32;
+mq_timedreceive = mq_timedreceive32;
+semtimedop = semtimedop32;
+futimesat = futimesat32;
+pselect6 = pselect6_32;
+ppoll = ppoll32;
+arm_sync_file_range = sync_file_range2;
+utimensat = utimensat32;
+timerfd_settime = timerfd_settime32;
+timerfd_gettime = timerfd_gettime32;
+recvmmsg = recvmmsg32;
+clock_adjtime = clock_adjtime32;
+io_pgetevents = io_pgetevents32;
+clock_gettime64 = clock_gettime64;
+clock_settime64 = clock_settime64;
+clock_adjtime64 = clock_adjtime64;
+clock_getres_time64 = clock_getres64;
+clock_nanosleep_time64 = clock_nanosleep64;
+timer_gettime64 = timer_gettime64;
+timer_settime64 = timer_settime64;
+timerfd_gettime64 = timerfd_gettime64;
+timerfd_settime64 = timerfd_settime64;
+utimensat_time64 = utimensat64;
+pselect6_time64 = pselect6_64;
+ppoll_time64 = ppoll64;
+io_pgetevents_time64 = io_pgetevents64;
+recvmmsg_time64 = recvmmsg64;
+mq_timedsend_time64 = mq_timedsend64;
+mq_timedreceive_time64 = mq_timedreceive64;
+semtimedop_time64 = semtimedop64;
+rt_sigtimedwait_time64 = rt_sigtimedwait64;
+futex_time64 = futex64;
+sched_rr_get_interval_time64 = sched_rr_get_interval64;
+
+lfutex = lfutex64;
+
+/* Deal with the whole new-vs-old select issue. */
+_newselect = select32;
+select = _oldselect;
+/*select64 = select64;*/
+
+
+
+
+
+/* Syscall definition syntax
+ * >> sysno:name
+ * This is used as:
+ * >> #define __NR_<name>  <sysno>      // In <asm/unistd.h>
+ * >> #define SYS_<name>   __NR_<name>  // In <sys/syscall.h>
+ * >> DEFINE_SYSCALLn(int, <name>, ...) // Somewhere in kernel-space
+ * >> int <name>(...);                  // In <kos/syscalls.h>
+ */
+
+0x00000000:restart_syscall
+0x00000001:exit
+0x00000002:fork
+0x00000003:read
+0x00000004:write
+0x00000005:open
+0x00000006:close
+/*00000007:waitpid*/
+0x00000008:creat
+0x00000009:link
+0x0000000a:unlink
+0x0000000b:execve
+0x0000000c:chdir
+0x0000000d:time
+0x0000000e:mknod
+0x0000000f:chmod
+0x00000010:lchown
+/*00000011:break*/
+/*00000012:stat*/
+0x00000013:lseek
+0x00000014:getpid
+0x00000015:mount
+0x00000016:umount
+0x00000017:setuid
+0x00000018:getuid
+0x00000019:stime
+0x0000001a:ptrace
+0x0000001b:alarm
+/*0000001c:fstat*/
+0x0000001d:pause
+0x0000001e:utime
+/*0000001f:stty*/
+/*00000020:gtty*/
+0x00000021:access
+0x00000022:nice
+/*00000023:ftime*/
+0x00000024:sync
+0x00000025:kill
+0x00000026:rename
+0x00000027:mkdir
+0x00000028:rmdir
+0x00000029:dup
+0x0000002a:pipe
+0x0000002b:times
+/*0000002c:prof*/
+0x0000002d:brk
+0x0000002e:setgid
+0x0000002f:getgid
+/*00000030:signal*/
+0x00000031:geteuid
+0x00000032:getegid
+0x00000033:acct
+0x00000034:umount2
+/*00000035:lock*/
+0x00000036:ioctl
+0x00000037:fcntl
+/*00000038:mpx*/
+0x00000039:setpgid
+/*0000003a:ulimit*/
+/*0000003b:olduname*/
+0x0000003c:umask
+0x0000003d:chroot
+0x0000003e:ustat
+0x0000003f:dup2
+0x00000040:getppid
+0x00000041:getpgrp
+0x00000042:setsid
+0x00000043:sigaction
+/*00000044:sgetmask*/
+/*00000045:ssetmask*/
+0x00000046:setreuid
+0x00000047:setregid
+0x00000048:sigsuspend
+0x00000049:sigpending
+0x0000004a:sethostname
+0x0000004b:setrlimit
+0x0000004c:getrlimit /* Back compat 2GB limited rlimit */
+0x0000004d:getrusage
+0x0000004e:gettimeofday
+0x0000004f:settimeofday
+0x00000050:getgroups
+0x00000051:setgroups
+0x00000052:select
+0x00000053:symlink
+/*00000054:lstat*/
+0x00000055:readlink
+0x00000056:uselib
+0x00000057:swapon
+0x00000058:reboot
+0x00000059:readdir
+0x0000005a:mmap
+0x0000005b:munmap
+0x0000005c:truncate
+0x0000005d:ftruncate
+0x0000005e:fchmod
+0x0000005f:fchown
+0x00000060:getpriority
+0x00000061:setpriority
+/*00000062:profil*/
+0x00000063:statfs
+0x00000064:fstatfs
+/*00000065:ioperm*/
+0x00000066:socketcall
+0x00000067:syslog
+0x00000068:setitimer
+0x00000069:getitimer
+0x0000006a:stat
+0x0000006b:lstat
+0x0000006c:fstat
+/*0000006d:uname*/
+/*0000006e:iopl*/
+0x0000006f:vhangup
+/*00000070:idle*/
+0x00000071:syscall
+0x00000072:wait4
+0x00000073:swapoff
+0x00000074:sysinfo
+0x00000075:ipc
+0x00000076:fsync
+0x00000077:sigreturn
+0x00000078:clone
+0x00000079:setdomainname
+0x0000007a:uname
+/*0000007b:modify_ldt*/
+0x0000007c:adjtimex
+0x0000007d:mprotect
+0x0000007e:sigprocmask
+/*0000007f:create_module*/
+0x00000080:init_module
+0x00000081:delete_module
+/*00000082:get_kernel_syms*/
+0x00000083:quotactl
+0x00000084:getpgid
+0x00000085:fchdir
+0x00000086:bdflush
+0x00000087:sysfs
+0x00000088:personality
+/*00000089:afs_syscall*/
+0x0000008a:setfsuid
+0x0000008b:setfsgid
+0x0000008c:_llseek
+0x0000008d:getdents
+0x0000008e:_newselect
+0x0000008f:flock
+0x00000090:msync
+0x00000091:readv
+0x00000092:writev
+0x00000093:getsid
+0x00000094:fdatasync
+0x00000095:_sysctl
+0x00000096:mlock
+0x00000097:munlock
+0x00000098:mlockall
+0x00000099:munlockall
+0x0000009a:sched_setparam
+0x0000009b:sched_getparam
+0x0000009c:sched_setscheduler
+0x0000009d:sched_getscheduler
+0x0000009e:sched_yield
+0x0000009f:sched_get_priority_max
+0x000000a0:sched_get_priority_min
+0x000000a1:sched_rr_get_interval
+0x000000a2:nanosleep
+0x000000a3:mremap
+0x000000a4:setresuid
+0x000000a5:getresuid
+/*000000a6:vm86*/
+/*000000a7:query_module*/
+0x000000a8:poll
+0x000000a9:nfsservctl
+0x000000aa:setresgid
+0x000000ab:getresgid
+0x000000ac:prctl
+0x000000ad:rt_sigreturn
+0x000000ae:rt_sigaction
+0x000000af:rt_sigprocmask
+0x000000b0:rt_sigpending
+0x000000b1:rt_sigtimedwait
+0x000000b2:rt_sigqueueinfo
+0x000000b3:rt_sigsuspend
+0x000000b4:pread64
+0x000000b5:pwrite64
+0x000000b6:chown
+0x000000b7:getcwd
+0x000000b8:capget
+0x000000b9:capset
+0x000000ba:sigaltstack
+0x000000bb:sendfile
+0x000000be:vfork
+0x000000bf:ugetrlimit
+0x000000c0:mmap2
+0x000000c1:truncate64
+0x000000c2:ftruncate64
+0x000000c3:stat64
+0x000000c4:lstat64
+0x000000c5:fstat64
+0x000000c6:lchown32
+0x000000c7:getuid32
+0x000000c8:getgid32
+0x000000c9:geteuid32
+0x000000ca:getegid32
+0x000000cb:setreuid32
+0x000000cc:setregid32
+0x000000cd:getgroups32
+0x000000ce:setgroups32
+0x000000cf:fchown32
+0x000000d0:setresuid32
+0x000000d1:getresuid32
+0x000000d2:setresgid32
+0x000000d3:getresgid32
+0x000000d4:chown32
+0x000000d5:setuid32
+0x000000d6:setgid32
+0x000000d7:setfsuid32
+0x000000d8:setfsgid32
+0x000000d9:getdents64
+0x000000da:pivot_root
+0x000000db:mincore
+0x000000dc:madvise
+0x000000dd:fcntl64
+0x000000e0:gettid
+0x000000e1:readahead
+0x000000e2:setxattr
+0x000000e3:lsetxattr
+0x000000e4:fsetxattr
+0x000000e5:getxattr
+0x000000e6:lgetxattr
+0x000000e7:fgetxattr
+0x000000e8:listxattr
+0x000000e9:llistxattr
+0x000000ea:flistxattr
+0x000000eb:removexattr
+0x000000ec:lremovexattr
+0x000000ed:fremovexattr
+0x000000ee:tkill
+0x000000ef:sendfile64
+0x000000f0:futex
+0x000000f1:sched_setaffinity
+0x000000f2:sched_getaffinity
+0x000000f3:io_setup
+0x000000f4:io_destroy
+0x000000f5:io_getevents
+0x000000f6:io_submit
+0x000000f7:io_cancel
+0x000000f8:exit_group
+0x000000f9:lookup_dcookie
+0x000000fa:epoll_create
+0x000000fb:epoll_ctl
+0x000000fc:epoll_wait
+0x000000fd:remap_file_pages
+0x00000100:set_tid_address
+0x00000101:timer_create
+0x00000102:timer_settime
+0x00000103:timer_gettime
+0x00000104:timer_getoverrun
+0x00000105:timer_delete
+0x00000106:clock_settime
+0x00000107:clock_gettime
+0x00000108:clock_getres
+0x00000109:clock_nanosleep
+0x0000010a:statfs64
+0x0000010b:fstatfs64
+0x0000010c:tgkill
+0x0000010d:utimes
+0x0000010e:arm_fadvise64_64
+0x0000010f:pciconfig_iobase
+0x00000110:pciconfig_read
+0x00000111:pciconfig_write
+0x00000112:mq_open
+0x00000113:mq_unlink
+0x00000114:mq_timedsend
+0x00000115:mq_timedreceive
+0x00000116:mq_notify
+0x00000117:mq_getsetattr
+0x00000118:waitid
+0x00000119:socket
+0x0000011a:bind
+0x0000011b:connect
+0x0000011c:listen
+0x0000011d:accept
+0x0000011e:getsockname
+0x0000011f:getpeername
+0x00000120:socketpair
+0x00000121:send
+0x00000122:sendto
+0x00000123:recv
+0x00000124:recvfrom
+0x00000125:shutdown
+0x00000126:setsockopt
+0x00000127:getsockopt
+0x00000128:sendmsg
+0x00000129:recvmsg
+0x0000012a:semop
+0x0000012b:semget
+0x0000012c:semctl
+0x0000012d:msgsnd
+0x0000012e:msgrcv
+0x0000012f:msgget
+0x00000130:msgctl
+0x00000131:shmat
+0x00000132:shmdt
+0x00000133:shmget
+0x00000134:shmctl
+0x00000135:add_key
+0x00000136:request_key
+0x00000137:keyctl
+0x00000138:semtimedop
+0x00000139:vserve
+0x0000013a:ioprio_set
+0x0000013b:ioprio_get
+0x0000013c:inotify_init
+0x0000013d:inotify_add_watch
+0x0000013e:inotify_rm_watch
+0x0000013f:mbind
+0x00000140:get_mempolicy
+0x00000141:set_mempolicy
+0x00000142:openat
+0x00000143:mkdirat
+0x00000144:mknodat
+0x00000145:fchownat
+0x00000146:futimesat
+0x00000147:fstatat64
+0x00000148:unlinkat
+0x00000149:renameat
+0x0000014a:linkat
+0x0000014b:symlinkat
+0x0000014c:readlinkat
+0x0000014d:fchmodat
+0x0000014e:faccessat
+0x0000014f:pselect6
+0x00000150:ppoll
+0x00000151:unshare
+0x00000152:set_robust_list
+0x00000153:get_robust_list
+0x00000154:splice
+0x00000155:arm_sync_file_range
+0x00000156:tee
+0x00000157:vmsplice
+0x00000158:move_pages
+0x00000159:getcpu
+0x0000015a:epoll_pwait
+0x0000015b:kexec_load
+0x0000015c:utimensat
+0x0000015d:signalfd
+0x0000015e:timerfd_create
+0x0000015f:eventfd
+0x00000160:fallocate
+0x00000161:timerfd_settime
+0x00000162:timerfd_gettime
+0x00000163:signalfd4
+0x00000164:eventfd2
+0x00000165:epoll_create1
+0x00000166:dup3
+0x00000167:pipe2
+0x00000168:inotify_init1
+0x00000169:preadv
+0x0000016a:pwritev
+0x0000016b:rt_tgsigqueueinfo
+0x0000016c:perf_event_open
+0x0000016d:recvmmsg
+0x0000016e:accept4
+0x0000016f:fanotify_init
+0x00000170:fanotify_mark
+0x00000171:prlimit64
+0x00000172:name_to_handle_at
+0x00000173:open_by_handle_at
+0x00000174:clock_adjtime
+0x00000175:syncfs
+0x00000176:sendmmsg
+0x00000177:setns
+0x00000178:process_vm_readv
+0x00000179:process_vm_writev
+0x0000017a:kcmp
+0x0000017b:finit_module
+0x0000017c:sched_setattr
+0x0000017d:sched_getattr
+0x0000017e:renameat2
+0x0000017f:seccomp
+0x00000180:getrandom
+0x00000181:memfd_create
+0x00000182:bpf
+0x00000183:execveat
+0x00000184:userfaultfd
+0x00000185:membarrier
+0x00000186:mlock2
+0x00000187:copy_file_range
+0x00000188:preadv2
+0x00000189:pwritev2
+0x0000018a:pkey_mprotect
+0x0000018b:pkey_alloc
+0x0000018c:pkey_free
+0x0000018d:statx
+0x0000018e:rseq
+0x0000018f:io_pgetevents
+0x00000190:migrate_pages
+0x00000191:kexec_file_load
+0x00000193:clock_gettime64
+0x00000194:clock_settime64
+0x00000195:clock_adjtime64
+0x00000196:clock_getres_time64
+0x00000197:clock_nanosleep_time64
+0x00000198:timer_gettime64
+0x00000199:timer_settime64
+0x0000019a:timerfd_gettime64
+0x0000019b:timerfd_settime64
+0x0000019c:utimensat_time64
+0x0000019d:pselect6_time64
+0x0000019e:ppoll_time64
+0x000001a0:io_pgetevents_time64
+0x000001a1:recvmmsg_time64
+0x000001a2:mq_timedsend_time64
+0x000001a3:mq_timedreceive_time64
+0x000001a4:semtimedop_time64
+0x000001a5:rt_sigtimedwait_time64
+0x000001a6:futex_time64
+0x000001a7:sched_rr_get_interval_time64
+0x000001a8:pidfd_send_signal
+0x000001a9:io_uring_setup
+0x000001aa:io_uring_enter
+0x000001ab:io_uring_register
+0x000001ac:open_tree
+0x000001ad:move_mount
+0x000001ae:fsopen
+0x000001af:fsconfig
+0x000001b0:fsmount
+0x000001b1:fspick
+0x000001b2:pidfd_open
+0x000001b3:clone3
+0x000001b4:close_range
+0x000001b5:openat2
+0x000001b6:pidfd_getfd
+0x000001b7:faccessat2
+0x000001b8:process_madvise
+
+/* KOS-specific extended system calls */
+/*x00000001:...*/
+/*x00000002:...*/
+-0x00000003:readf /* Extends: `read' */
+-0x00000004:writef /* Extends: `write' */
+-0x00000005:getdrives
+-0x00000006:frealpath4
+-0x00000007:detach /* Extends `waitpid' */
+-0x00000008:frealpathat
+-0x00000009:rpc_schedule
+-0x0000000b:openpty
+-0x0000000c:fchdirat /* Extends: `chdir' */
+-0x0000000d:time64 /* Extends: `time' */
+-0x0000000e:mktty /* Extends: `mknod' */
+-0x0000000f:set_exception_handler
+-0x00000010:get_exception_handler
+-0x00000011:debugtrap
+-0x00000012:coredump
+-0x00000013:lseek64 /* Extends: `lseek' */
+-0x00000014:userviofd
+/*x00000015:...*/
+/*x00000015:...*/
+/*x00000017:...*/
+/*x00000018:...*/
+-0x00000019:stime64 /* Extends: `stime' */
+/*x0000001a:...*/
+/*x0000001b:...*/
+-0x0000001e:utime64 /* Extends: `utime' */
+/*x0000001f:...*/
+/*x00000020:...*/
+/*x00000021:...*/
+/*x00000022:...*/
+-0x00000023:ftime64 /* Extends: `ftime' */
+/*x00000024:...*/
+/*x00000025:...*/
+/*x00000026:...*/
+/*x00000027:...*/
+/*x00000028:...*/
+/*x00000029:...*/
+/*x0000002a:...*/
+/*x0000002b:...*/
+/*x0000002c:...*/
+/*x0000002d:...*/
+/*x0000002e:...*/
+/*x0000002f:...*/
+-0x00000030:rtm_begin
+-0x00000031:rtm_end
+-0x00000032:rtm_abort
+-0x00000033:rtm_test
+/*x00000034:...*/
+/*x00000035:...*/
+-0x00000036:ioctlf /* Extends: `ioctl' */
+/*x00000037:...*/
+/*x00000038:...*/
+/*x00000039:...*/
+/*x0000003a:...*/
+/*x0000003b:...*/
+-0x0000003c:fsmode /* Extends: `umask' */
+/*x0000003d:...*/
+/*x0000003e:...*/
+/*x0000003f:...*/
+/*x00000040:...*/
+/*x00000041:...*/
+/*x00000042:...*/
+/*x00000043:...*/
+/*x00000044:...*/
+/*x00000045:...*/
+/*x00000046:...*/
+/*x00000047:...*/
+/*x00000048:...*/
+/*x00000049:...*/
+/*x0000004a:...*/
+/*x0000004b:...*/
+/*x0000004c:...*/
+-0x0000004d:getrusage64 /* Extends: `getrusage' */
+-0x0000004e:gettimeofday64 /* Extends: `gettimeofday' */
+-0x0000004f:settimeofday64 /* Extends: `settimeofday' */
+/*x00000050:...*/
+/*x00000051:...*/
+/*x00000052:...*/
+/*x00000053:...*/
+/*x00000054:...*/
+/*x00000055:...*/
+-0x00000056:maplibrary /* Extends: `uselib' */
+/*x00000057:...*/
+/*x00000058:...*/
+/*x00000059:...*/
+/*x0000005a:...*/
+/*x0000005b:...*/
+/*x0000005c:...*/
+/*x0000005d:...*/
+/*x0000005e:...*/
+/*x0000005f:...*/
+/*x00000060:...*/
+/*x00000061:...*/
+/*x00000062:...*/
+/*x00000063:...*/
+/*x00000064:...*/
+/*x00000065:...*/
+/*x00000066:...*/
+/*x00000067:...*/
+-0x00000068:setitimer64 /* Extends: `setitimer' */
+-0x00000069:getitimer64 /* Extends: `getitimer' */
+/*x0000006a:...*/
+/*x0000006b:...*/
+/*x0000006c:...*/
+/*x0000006d:...*/
+/*x0000006e:...*/
+/*x0000006f:...*/
+/*x00000070:...*/
+/*x00000071:...*/
+-0x00000072:wait4_64 /* Extends: `wait4' */
+/*x00000073:...*/
+/*x00000074:...*/
+/*x00000075:...*/
+/*x00000076:...*/
+/*x00000077:...*/
+/*x00000078:...*/
+/*x00000079:...*/
+/*x0000007a:...*/
+/*x0000007b:...*/
+/*x0000007c:...*/
+/*x0000007d:...*/
+/*x0000007e:...*/
+/*x0000007f:...*/
+/*x00000080:...*/
+/*x00000081:...*/
+/*x00000082:...*/
+/*x00000083:...*/
+/*x00000084:...*/
+/*x00000085:...*/
+/*x00000086:...*/
+/*x00000087:...*/
+/*x00000088:...*/
+/*x00000089:...*/
+/*x0000008a:...*/
+/*x0000008b:...*/
+/*x0000008c:...*/
+/*x0000008d:...*/
+-0x0000008e:select64 /* Extends: `_newselect' */
+/*x0000008f:...*/
+/*x00000090:...*/
+-0x00000091:readvf /* Extends: `readv' */
+-0x00000092:writevf /* Extends: `writev' */
+/*x00000093:...*/
+/*x00000094:...*/
+-0x00000095:ksysctl /* Extends: `_sysctl' */
+/*x00000096:...*/
+/*x00000097:...*/
+/*x00000098:...*/
+/*x00000099:...*/
+/*x0000009a:...*/
+/*x0000009b:...*/
+/*x0000009c:...*/
+/*x0000009d:...*/
+-0x0000009e:rpc_serve /* Extends: `sched_yield' */
+-0x0000009f:rpc_serve_sysret
+/*x000000a0:...*/
+/*x000000a1:...*/
+-0x000000a2:nanosleep64 /* Extends: `nanosleep' */
+/*x000000a3:...*/
+/*x000000a4:...*/
+/*x000000a5:...*/
+/*x000000a6:...*/
+/*x000000a7:...*/
+/*x000000a8:...*/
+/*x000000a9:...*/
+/*x000000aa:...*/
+/*x000000ab:...*/
+/*x000000ac:...*/
+-0x000000ad:ksigreturn /* Extends: `rt_sigreturn' */
+/*x000000ae:...*/
+/*x000000af:...*/
+/*x000000b0:...*/
+/*x000000b1:...*/
+-0x000000b4:pread64f /* Extends: `pread64' */
+-0x000000b5:pwrite64f /* Extends: `pwrite64' */
+-0x000000c3:kstat /* Extends: `stat64' */
+-0x000000c4:klstat /* Extends: `lstat64' */
+-0x000000c5:kfstat /* Extends: `fstat64' */
+/*x000000c6:...*/
+/*x000000c7:...*/
+/*x000000c8:...*/
+/*x000000c9:...*/
+/*x000000ca:...*/
+/*x000000cb:...*/
+/*x000000cc:...*/
+/*x000000cd:...*/
+/*x000000ce:...*/
+/*x000000cf:...*/
+/*x000000d0:...*/
+/*x000000d1:...*/
+/*x000000d2:...*/
+/*x000000d3:...*/
+/*x000000d4:...*/
+/*x000000d5:...*/
+/*x000000d6:...*/
+/*x000000d7:...*/
+/*x000000d8:...*/
+-0x000000d9:kreaddir /* Extends: `getdents64' */
+-0x000000da:kreaddirf
+/*x000000db:...*/
+/*x000000dc:...*/
+/*x000000de:...*/
+/*x000000df:...*/
+/*x000000e0:...*/
+/*x000000e1:...*/
+/*x000000e2:...*/
+/*x000000e3:...*/
+/*x000000e4:...*/
+/*x000000e5:...*/
+/*x000000e6:...*/
+/*x000000e7:...*/
+/*x000000e8:...*/
+/*x000000e9:...*/
+/*x000000ea:...*/
+/*x000000eb:...*/
+/*x000000ec:...*/
+/*x000000ed:...*/
+/*x000000ee:...*/
+/*x000000ef:...*/
+-0x000000f0:lfutex /* Extends: futex */
+-0x000000f1:lfutexexpr
+/*x000000f2:...*/
+/*x000000f3:...*/
+/*x000000f4:...*/
+/*x000000f5:...*/
+/*x000000f6:...*/
+/*x000000f7:...*/
+/*x000000f8:...*/
+/*x000000f9:...*/
+/*x000000fa:...*/
+/*x000000fb:...*/
+/*x000000fc:...*/
+/*x000000fd:...*/
+/*x000000fe:...*/
+/*x000000ff:...*/
+-0x00000100:set_userprocmask_address /* Extends `set_tid_address' */
+/*x00000101:...*/
+/*x00000102:...*/
+/*x00000103:...*/
+/*x00000104:...*/
+/*x00000105:...*/
+/*x00000108:...*/
+/*x00000109:...*/
+/*x0000010a:...*/
+/*x0000010b:...*/
+/*x0000010c:...*/
+-0x0000010d:utimes64 /* Extends `utimes' */
+/*x0000010e:...*/
+/*x0000010f:...*/
+/*x00000110:...*/
+/*x00000111:...*/
+/*x00000112:...*/
+/*x00000113:...*/
+/*x00000114:...*/
+/*x00000115:...*/
+/*x00000116:...*/
+/*x00000117:...*/
+-0x00000118:waitid64 /* Extends `waitid' */
+/*x00000119:...*/
+/*x0000011a:...*/
+/*x0000011b:...*/
+/*x0000011c:...*/
+/*x0000011d:...*/
+/*x0000011e:...*/
+/*x0000011f:...*/
+/*x00000120:...*/
+/*x00000121:...*/
+/*x00000122:...*/
+/*x00000123:...*/
+/*x00000124:...*/
+/*x00000125:...*/
+/*x00000126:...*/
+/*x00000127:...*/
+/*x00000128:...*/
+/*x00000129:...*/
+/*x0000012a:...*/
+/*x0000012b:...*/
+/*x0000012c:...*/
+/*x0000012d:...*/
+/*x0000012e:...*/
+/*x0000012f:...*/
+/*x00000130:...*/
+/*x00000131:...*/
+/*x00000132:...*/
+/*x00000133:...*/
+/*x00000134:...*/
+/*x00000135:...*/
+/*x00000136:...*/
+/*x00000137:...*/
+/*x00000138:...*/
+/*x00000139:...*/
+/*x0000013a:...*/
+/*x0000013b:...*/
+/*x0000013c:...*/
+-0x0000013d:inotify_add_watch_at /* Extends `inotify_add_watch' */
+/*x0000013e:...*/
+/*x0000013f:...*/
+/*x00000140:...*/
+/*x00000141:...*/
+/*x00000142:...*/
+-0x00000143:fmkdirat /* Extends `mkdirat' */
+-0x00000144:fmknodat /* Extends `mknodat' */
+/*x00000145:...*/
+-0x00000146:futimesat64 /* Extends `futimesat' */
+-0x00000147:kfstatat /* Extends `fstatat64' */
+/*x00000148:...*/
+/*x00000149:...*/
+/*x0000014a:...*/
+-0x0000014b:fsymlinkat /* Extends `symlinkat' */
+-0x0000014c:freadlinkat /* Extends `readlinkat' */
+-0x0000014d:preadvf /* Extends `preadv' */
+-0x0000014e:pwritevf /* Extends `pwritev' */
+/*x0000014f:...*/
+/*x00000150:...*/
+/*x00000151:...*/
+/*x00000152:...*/
+/*x00000153:...*/
+/*x00000154:...*/
+/*x00000155:...*/
+/*x00000156:...*/
+/*x00000157:...*/
+/*x00000158:...*/
+/*x00000159:...*/
+/*x0000015a:...*/
+/*x0000015b:...*/
+/*x0000015c:...*/
+/*x0000015d:...*/
+/*x0000015e:...*/
+/*x0000015f:...*/
+-0x00000160:fallocate64 /* Extends `fallocate' */
+/*x00000161:...*/

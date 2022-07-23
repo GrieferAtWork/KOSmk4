@@ -172,6 +172,8 @@ __asm__("__ubsan_handle_builtin_unreachable = libc___ubsan_handle_builtin_unreac
 /* Pull in arch-specific LIBC feature information */
 #if defined(__i386__) || defined(__x86_64__)
 #include "hybrid/arch/i386/config.h"
+#elif defined(__arm__)
+#include "hybrid/arch/arm/config.h"
 #endif /* ARCH... */
 
 

@@ -669,6 +669,7 @@ readahead:(fd_t fd, [reg64] uint64_t offset, size_t count) -> ssize_t; /* UNIMPL
 @@@param: flags: Set of `SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WRITE | SYNC_FILE_RANGE_WAIT_AFTER'
 [cp] sync_file_range:(fd_t fd, [reg64] uint64_t offset, [reg64] uint64_t count,
                       [tostr(SYNC_FILE_RANGE_FLAGS)] syscall_ulong_t flags) -> errno_t; /* UNIMPLEMENTED! */
+[cp] sync_file_range2:(int TODO_PROTOTYPE) -> errno_t; /* UNIMPLEMENTED! */
 
 %[startgroup]
 @@@param: mode: Set of `0 | FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_ZERO_RANGE'
@@ -1103,11 +1104,13 @@ rmdir:(char const *path) -> errno_t;
 
 %[startgroup]
 truncate:([tostr(FILENAME)] char const *filename, syscall_ulong_t length) -> errno_t;
+truncate32:([tostr(FILENAME)] char const *filename, uint32_t length) -> errno_t;
 truncate64:([tostr(FILENAME)] char const *filename, [reg64] uint64_t length) -> errno_t;
 %[endgroup]
 
 %[startgroup]
 ftruncate:(fd_t fd, syscall_ulong_t length) -> errno_t;
+ftruncate32:(fd_t fd, uint32_t length) -> errno_t;
 ftruncate64:(fd_t fd, [reg64] uint64_t length) -> errno_t;
 %[endgroup]
 
@@ -1870,6 +1873,7 @@ sched_rr_get_intervalx64:(pid_t pid, [tostr(out:STRUCT_TIMESPECX64)] struct time
 /************************************************************************/
 %[startgroup]
 time:(time32_t *timer) -> time32_t;
+time32:(time32_t *timer) -> time32_t;
 time64:(time64_t *timer) -> [reg64] time64_t;
 timex32:(int32_t *timer) -> [tostr(TIME_T)] int32_t;
 timex64:(int64_t *timer) -> [reg64][tostr(TIME_T)] int64_t;
@@ -1895,10 +1899,18 @@ settimeofdayx64:([tostr(STRUCT_TIMEVALX64)] struct timevalx64 const *tv, [tostr(
 
 %[startgroup]
 stime:([tostr(TIME32_T_PTR)] time32_t const *t) -> errno_t;   /* UNIMPLEMENTED! */
+stime32:([tostr(TIME32_T_PTR)] time32_t const *t) -> errno_t;   /* UNIMPLEMENTED! */
 stime64:([tostr(TIME64_T_PTR)] time64_t const *t) -> errno_t; /* UNIMPLEMENTED! */
 %[endgroup]
 
+%[startgroup]
 adjtimex:(struct timex *ntx) -> errno_t;
+adjtimex32:(struct timex32 *ntx) -> errno_t;
+adjtimex64:(struct timex64 *ntx) -> errno_t;
+adjtimexx32:(struct timexx32 *ntx) -> errno_t;
+adjtimexx32_64:(struct timexx32_64 *ntx) -> errno_t;
+adjtimexx64:(struct timexx64 *ntx) -> errno_t;
+%[endgroup]
 
 %[startgroup]
 ftime:([tostr(out:STRUCT_TIMEB)] struct timeb *tp) -> errno_t;
@@ -2687,8 +2699,8 @@ recvmsgx64:(fd_t sockfd, struct msghdrx64 *message,
 @@@throw: Error (s.a. `recvmsg(2)')
 @@@return: * : The # of datagrams successfully received.
 [cp][restart(dont)] recvmmsg:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDR:vlen:return)] struct mmsghdr *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPEC)] struct timespec const *tmo) -> ssize_t;
-[cp][doc_alias(recvmmsg)][restart(dont)] recvmmsg32:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX32:vlen:return)] struct mmsghdrx32 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *tmo) -> ssize_t;
-[cp][doc_alias(recvmmsg)][restart(dont)] recvmmsg64:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX64:vlen:return)] struct mmsghdrx64 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *tmo) -> ssize_t;
+[cp][doc_alias(recvmmsg)][restart(dont)] recvmmsg32:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDR32:vlen:return)] struct mmsghdr32 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *tmo) -> ssize_t;
+[cp][doc_alias(recvmmsg)][restart(dont)] recvmmsg64:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDR64:vlen:return)] struct mmsghdr64 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *tmo) -> ssize_t;
 [cp][doc_alias(recvmmsg)][restart(dont)] recvmmsgx32:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX32:vlen:return)] struct mmsghdrx32 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *tmo) -> ssize_t;
 [cp][doc_alias(recvmmsg)][restart(dont)] recvmmsgx32_64:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX32:vlen:return)] struct mmsghdrx32 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *tmo) -> ssize_t;
 [cp][doc_alias(recvmmsg)][restart(dont)] recvmmsgx64:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX64:vlen:return)] struct mmsghdrx64 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *tmo) -> ssize_t;
@@ -2902,7 +2914,16 @@ get_thread_area:(int TODO_PROTOTYPE) -> errno_t;
 
 io_setup:(int TODO_PROTOTYPE) -> errno_t;
 io_destroy:(int TODO_PROTOTYPE) -> errno_t;
+
+%[startgroup]
 [restart(dont)] io_getevents:(int TODO_PROTOTYPE) -> errno_t;
+[restart(dont)] io_getevents32:(int TODO_PROTOTYPE) -> errno_t;
+[restart(dont)] io_getevents64:(int TODO_PROTOTYPE) -> errno_t;
+[restart(dont)] io_geteventsx32:(int TODO_PROTOTYPE) -> errno_t;
+[restart(dont)] io_geteventsx32_64:(int TODO_PROTOTYPE) -> errno_t;
+[restart(dont)] io_geteventsx64:(int TODO_PROTOTYPE) -> errno_t;
+%[endgroup]
+
 io_submit:(int TODO_PROTOTYPE) -> errno_t;
 io_cancel:(int TODO_PROTOTYPE) -> errno_t;
 
@@ -2926,8 +2947,14 @@ get_robust_list:(int TODO_PROTOTYPE) -> errno_t;
 
 perf_event_open:(int TODO_PROTOTYPE) -> errno_t;
 
+%[startgroup]
 clock_adjtime:(int TODO_PROTOTYPE) -> errno_t;
+clock_adjtime32:(int TODO_PROTOTYPE) -> errno_t;
 clock_adjtime64:(int TODO_PROTOTYPE) -> errno_t;
+clock_adjtimex32:(int TODO_PROTOTYPE) -> errno_t;
+clock_adjtimex32_64:(int TODO_PROTOTYPE) -> errno_t;
+clock_adjtimex64:(int TODO_PROTOTYPE) -> errno_t;
+%[endgroup]
 
 sched_setattr:(int TODO_PROTOTYPE) -> errno_t;
 sched_getattr:(int TODO_PROTOTYPE) -> errno_t;
@@ -2988,6 +3015,11 @@ fsconfig:(int TODO_PROTOTYPE) -> errno_t;
 fsmount:(int TODO_PROTOTYPE) -> errno_t;
 fspick:(int TODO_PROTOTYPE) -> errno_t;
 openat2:(int TODO_PROTOTYPE) -> errno_t;
+pciconfig_iobase:(int TODO_PROTOTYPE) -> errno_t;
+pciconfig_read:(int TODO_PROTOTYPE) -> errno_t;
+pciconfig_write:(int TODO_PROTOTYPE) -> errno_t;
+vserve:(int TODO_PROTOTYPE) -> errno_t;
+process_madvise:(int TODO_PROTOTYPE) -> errno_t;
 
 
 

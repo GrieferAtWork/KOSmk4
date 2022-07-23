@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ded36ff */
+/* HASH CRC-32:0x91ddb67f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1019,11 +1019,26 @@
 #define __NR32AN4_waitid64                     ru
 #define __NR32AN0_utimes64                     filename
 #define __NR32AN1_utimes64                     times
+#define __NR32AN0_set_userprocmask_address     ctl
+#define __NR32AN0_lfutexexpr                   futexaddr
+#define __NR32AN1_lfutexexpr                   base
+#define __NR32AN2_lfutexexpr                   expr
+#define __NR32AN3_lfutexexpr                   timeout
+#define __NR32AN4_lfutexexpr                   flags
+#define __NR32AN0_lfutex                       uaddr
+#define __NR32AN1_lfutex                       futex_op
+#define __NR32AN2_lfutex                       val
+#define __NR32AN3_lfutex                       timeout
+#define __NR32AN4_lfutex                       val2
 #define __NR32AN0_kreaddirf                    fd
 #define __NR32AN1_kreaddirf                    buf
 #define __NR32AN2_kreaddirf                    bufsize
 #define __NR32AN3_kreaddirf                    mode
 #define __NR32AN4_kreaddirf                    iomode
+#define __NR32AN0_kreaddir                     fd
+#define __NR32AN1_kreaddir                     buf
+#define __NR32AN2_kreaddir                     bufsize
+#define __NR32AN3_kreaddir                     mode
 #define __NR32AN0_kfstat                       fd
 #define __NR32AN1_kfstat                       statbuf
 #define __NR32AN0_klstat                       filename
@@ -1058,10 +1073,11 @@
 #define __NR32AN1_readvf                       iovec
 #define __NR32AN2_readvf                       count
 #define __NR32AN3_readvf                       mode
-#define __NR32AN0_kreaddir                     fd
-#define __NR32AN1_kreaddir                     buf
-#define __NR32AN2_kreaddir                     bufsize
-#define __NR32AN3_kreaddir                     mode
+#define __NR32AN0_select64                     nfds
+#define __NR32AN1_select64                     readfds
+#define __NR32AN2_select64                     writefds
+#define __NR32AN3_select64                     exceptfds
+#define __NR32AN4_select64                     timeout
 #define __NR32AN0_wait4_64                     pid
 #define __NR32AN1_wait4_64                     stat_loc
 #define __NR32AN2_wait4_64                     options
@@ -1076,11 +1092,6 @@
 #define __NR32AN2_maplibrary                   fd
 #define __NR32AN3_maplibrary                   hdrv
 #define __NR32AN4_maplibrary                   hdrc
-#define __NR32AN0_select64                     nfds
-#define __NR32AN1_select64                     readfds
-#define __NR32AN2_select64                     writefds
-#define __NR32AN3_select64                     exceptfds
-#define __NR32AN4_select64                     timeout
 #define __NR32AN0_settimeofday64               tv
 #define __NR32AN1_settimeofday64               tz
 #define __NR32AN0_gettimeofday64               tv
@@ -1094,35 +1105,20 @@
 #define __NR32AN3_ioctlf                       arg
 #define __NR32AN0_rtm_abort                    code
 #define __NR32AN0_ftime64                      tp
-#define __NR32AN0_set_userprocmask_address     ctl
 #define __NR32AN0_utime64                      filename
 #define __NR32AN1_utime64                      times
+#define __NR32AN0_stime64                      t
 #define __NR32AN0_userviofd                    initial_size
 #define __NR32AN1_userviofd                    flags
-#define __NR32AN0_stime64                      t
+#define __NR32AN0_lseek64                      fd
+#define __NR32AN1_lseek64                      offset
+#define __NR32AN2_lseek64                      whence
 #define __NR32AN0_coredump                     curr_state
 #define __NR32AN1_coredump                     orig_state
 #define __NR32AN2_coredump                     traceback_vector
 #define __NR32AN3_coredump                     traceback_length
 #define __NR32AN4_coredump                     reason
 #define __NR32AN5_coredump                     unwind_error
-#define __NR32AN0_mktty                        name
-#define __NR32AN1_mktty                        keyboard
-#define __NR32AN2_mktty                        display
-#define __NR32AN3_mktty                        rsvd
-#define __NR32AN0_lfutexexpr                   futexaddr
-#define __NR32AN1_lfutexexpr                   base
-#define __NR32AN2_lfutexexpr                   expr
-#define __NR32AN3_lfutexexpr                   timeout
-#define __NR32AN4_lfutexexpr                   flags
-#define __NR32AN0_lseek64                      fd
-#define __NR32AN1_lseek64                      offset
-#define __NR32AN2_lseek64                      whence
-#define __NR32AN0_lfutex                       uaddr
-#define __NR32AN1_lfutex                       futex_op
-#define __NR32AN2_lfutex                       val
-#define __NR32AN3_lfutex                       timeout
-#define __NR32AN4_lfutex                       val2
 #define __NR32AN0_debugtrap                    state
 #define __NR32AN1_debugtrap                    reason
 #define __NR32AN0_get_exception_handler        pmode
@@ -1131,6 +1127,10 @@
 #define __NR32AN0_set_exception_handler        mode
 #define __NR32AN1_set_exception_handler        handler
 #define __NR32AN2_set_exception_handler        handler_sp
+#define __NR32AN0_mktty                        name
+#define __NR32AN1_mktty                        keyboard
+#define __NR32AN2_mktty                        display
+#define __NR32AN3_mktty                        rsvd
 #define __NR32AN0_time64                       timer
 #define __NR32AN0_fchdirat                     dirfd
 #define __NR32AN1_fchdirat                     path
@@ -1150,11 +1150,11 @@
 #define __NR32AN2_frealpathat                  buf
 #define __NR32AN3_frealpathat                  buflen
 #define __NR32AN4_frealpathat                  flags
+#define __NR32AN0_detach                       pid
 #define __NR32AN0_frealpath4                   fd
 #define __NR32AN1_frealpath4                   resolved
 #define __NR32AN2_frealpath4                   buflen
 #define __NR32AN3_frealpath4                   flags
-#define __NR32AN0_detach                       pid
 #define __NR32AN0_writef                       fd
 #define __NR32AN1_writef                       buf
 #define __NR32AN2_writef                       bufsize
@@ -2714,12 +2714,31 @@
 #define __NR32ATR0_utimes64                     SC_REPR_FILENAME                                                     /* filename */ 
 #define __NR32ATR1_utimes64                     SC_REPR_STRUCT_TIMEVALX32_64_VEC2                                    /* times */ 
 #define __NR32RTR_utimes64                      SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_set_userprocmask_address     SC_REPR_POINTER                                                      /* ctl */ 
+#define __NR32RTR_set_userprocmask_address      SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_lfutexexpr                   SC_REPR_POINTER                                                      /* futexaddr */ 
+#define __NR32ATR1_lfutexexpr                   SC_REPR_POINTER                                                      /* base */ 
+#define __NR32ATR2_lfutexexpr                   SC_REPR_STRUCT_LFUTEXEXPRX32_VECTOR                                  /* expr */ 
+#define __NR32ATR3_lfutexexpr                   SC_REPR_STRUCT_TIMESPECX32_64                                        /* timeout */ 
+#define __NR32ATR4_lfutexexpr                   SC_REPR_LFUTEX_TIMEOUT_FLAGS                                         /* flags */ 
+#define __NR32RTR_lfutexexpr                    SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_lfutex                       SC_REPR_POINTER                                                      /* uaddr */ 
+#define __NR32ATR1_lfutex                       SC_REPR_LFUTEX_OP                                                    /* futex_op */ 
+#define __NR32ATR2_lfutex                       SC_REPR_UINT32_T                                                     /* val */ 
+#define __NR32ATR3_lfutex                       SC_REPR_STRUCT_TIMESPECX32_64                                        /* timeout */ 
+#define __NR32ATR4_lfutex                       SC_REPR_UINT32_T                                                     /* val2 */ 
+#define __NR32RTR_lfutex                        SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR32ATR0_kreaddirf                    SC_REPR_FD_T                                                         /* fd */ 
 #define __NR32ATR1_kreaddirf                    SC_REPR_POINTER                                                      /* buf */ 
 #define __NR32ATR2_kreaddirf                    SC_REPR_SIZE_T                                                       /* bufsize */ 
 #define __NR32ATR3_kreaddirf                    SC_REPR_KREADDIR_MODE                                                /* mode */ 
 #define __NR32ATR4_kreaddirf                    SC_REPR_IOMODE_T                                                     /* iomode */ 
 #define __NR32RTR_kreaddirf                     SC_REPR_SSIZE_T                                                      /* return */
+#define __NR32ATR0_kreaddir                     SC_REPR_FD_T                                                         /* fd */ 
+#define __NR32ATR1_kreaddir                     SC_REPR_POINTER                                                      /* buf */ 
+#define __NR32ATR2_kreaddir                     SC_REPR_SIZE_T                                                       /* bufsize */ 
+#define __NR32ATR3_kreaddir                     SC_REPR_KREADDIR_MODE                                                /* mode */ 
+#define __NR32RTR_kreaddir                      SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_kfstat                       SC_REPR_FD_T                                                         /* fd */ 
 #define __NR32ATR1_kfstat                       SC_REPR_POINTER                                                      /* statbuf */ 
 #define __NR32RTR_kfstat                        SC_REPR_ERRNO_T                                                      /* return */
@@ -2752,6 +2771,7 @@
 #define __NR32ATR0_nanosleep64                  SC_REPR_STRUCT_TIMESPECX32_64                                        /* req */ 
 #define __NR32ATR1_nanosleep64                  SC_REPR_POINTER                                                      /* rem */ 
 #define __NR32RTR_nanosleep64                   SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32RTR_rpc_serve_sysret              SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32RTR_rpc_serve                     SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_ksysctl                      SC_REPR_KSYSCTL_COMMAND                                              /* command */ 
 #define __NR32ATR1_ksysctl                      SC_REPR_KSYSCTL_ARG                                                  /* arg */ 
@@ -2769,11 +2789,15 @@
 #define __NR32ATR2_readvf                       SC_REPR_SIZE_T                                                       /* count */ 
 #define __NR32ATR3_readvf                       SC_REPR_IOMODE_T                                                     /* mode */ 
 #define __NR32RTR_readvf                        SC_REPR_SSIZE_T                                                      /* return */
-#define __NR32ATR0_kreaddir                     SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_kreaddir                     SC_REPR_POINTER                                                      /* buf */ 
-#define __NR32ATR2_kreaddir                     SC_REPR_SIZE_T                                                       /* bufsize */ 
-#define __NR32ATR3_kreaddir                     SC_REPR_KREADDIR_MODE                                                /* mode */ 
-#define __NR32RTR_kreaddir                      SC_REPR_SSIZE_T                                                      /* return */
+#define __NR32ATR0_select64                     SC_REPR_SIZE_T                                                       /* nfds */ 
+#define __NR32ATR1_select64                     SC_REPR_STRUCT_FDSET                                                 /* readfds */ 
+#define __NR32ATL1_select64                     0                                                                    /* readfds -> nfds */ 
+#define __NR32ATR2_select64                     SC_REPR_STRUCT_FDSET                                                 /* writefds */ 
+#define __NR32ATL2_select64                     0                                                                    /* writefds -> nfds */ 
+#define __NR32ATR3_select64                     SC_REPR_STRUCT_FDSET                                                 /* exceptfds */ 
+#define __NR32ATL3_select64                     0                                                                    /* exceptfds -> nfds */ 
+#define __NR32ATR4_select64                     SC_REPR_STRUCT_TIMEVALX32_64                                         /* timeout */ 
+#define __NR32RTR_select64                      SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_wait4_64                     SC_REPR_PID_T                                                        /* pid */ 
 #define __NR32ATR1_wait4_64                     SC_REPR_POINTER                                                      /* stat_loc */ 
 #define __NR32ATR2_wait4_64                     SC_REPR_WAITFLAGS                                                    /* options */ 
@@ -2793,15 +2817,6 @@
 #define __NR32ATL3_maplibrary                   4                                                                    /* hdrv -> hdrc */ 
 #define __NR32ATR4_maplibrary                   SC_REPR_SIZE_T                                                       /* hdrc */ 
 #define __NR32RTR_maplibrary                    SC_REPR_POINTER                                                      /* return */
-#define __NR32ATR0_select64                     SC_REPR_SIZE_T                                                       /* nfds */ 
-#define __NR32ATR1_select64                     SC_REPR_STRUCT_FDSET                                                 /* readfds */ 
-#define __NR32ATL1_select64                     0                                                                    /* readfds -> nfds */ 
-#define __NR32ATR2_select64                     SC_REPR_STRUCT_FDSET                                                 /* writefds */ 
-#define __NR32ATL2_select64                     0                                                                    /* writefds -> nfds */ 
-#define __NR32ATR3_select64                     SC_REPR_STRUCT_FDSET                                                 /* exceptfds */ 
-#define __NR32ATL3_select64                     0                                                                    /* exceptfds -> nfds */ 
-#define __NR32ATR4_select64                     SC_REPR_STRUCT_TIMEVALX32_64                                         /* timeout */ 
-#define __NR32RTR_select64                      SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32ATR0_settimeofday64               SC_REPR_STRUCT_TIMEVALX32_64                                         /* tv */ 
 #define __NR32ATR1_settimeofday64               SC_REPR_STRUCT_TIMEZONE                                              /* tz */ 
 #define __NR32RTR_settimeofday64                SC_REPR_ERRNO_T                                                      /* return */
@@ -2826,17 +2841,18 @@
 #define __NR32RTR_rtm_begin                     SC_REPR_SIGNO_T                                                      /* return */
 #define __NR32ATR0_ftime64                      SC_REPR_POINTER                                                      /* tp */ 
 #define __NR32RTR_ftime64                       SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32RTR_rpc_serve_sysret              SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_set_userprocmask_address     SC_REPR_POINTER                                                      /* ctl */ 
-#define __NR32RTR_set_userprocmask_address      SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_utime64                      SC_REPR_FILENAME                                                     /* filename */ 
 #define __NR32ATR1_utime64                      SC_REPR_STRUCT_UTIMBUFX32_64                                         /* times */ 
 #define __NR32RTR_utime64                       SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_stime64                      SC_REPR_TIME64_T_PTR                                                 /* t */ 
+#define __NR32RTR_stime64                       SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_userviofd                    SC_REPR_SIZE_T                                                       /* initial_size */ 
 #define __NR32ATR1_userviofd                    SC_REPR_OFLAG__CLOEXEC__CLOFORK__NONBLOCK                            /* flags */ 
 #define __NR32RTR_userviofd                     SC_REPR_FD_T                                                         /* return */
-#define __NR32ATR0_stime64                      SC_REPR_TIME64_T_PTR                                                 /* t */ 
-#define __NR32RTR_stime64                       SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_lseek64                      SC_REPR_FD_T                                                         /* fd */ 
+#define __NR32ATR1_lseek64                      SC_REPR_INT64_T                                                      /* offset */ 
+#define __NR32ATR2_lseek64                      SC_REPR_SEEK_WHENCE                                                  /* whence */ 
+#define __NR32RTR_lseek64                       SC_REPR_INT64_T                                                      /* return */
 #define __NR32ATR0_coredump                     SC_REPR_STRUCT_UCPUSTATE32                                           /* curr_state */ 
 #define __NR32ATR1_coredump                     SC_REPR_STRUCT_UCPUSTATE32                                           /* orig_state */ 
 #define __NR32ATR2_coredump                     SC_REPR_VOID_VECTOR32                                                /* traceback_vector */ 
@@ -2845,27 +2861,6 @@
 #define __NR32ATR4_coredump                     SC_REPR_STRUCT_EXCEPTION_DATA32                                      /* reason */ 
 #define __NR32ATR5_coredump                     SC_REPR_UNWIND_ERROR                                                 /* unwind_error */ 
 #define __NR32RTR_coredump                      SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_mktty                        SC_REPR_STRING                                                       /* name */ 
-#define __NR32ATR1_mktty                        SC_REPR_FD_T                                                         /* keyboard */ 
-#define __NR32ATR2_mktty                        SC_REPR_FD_T                                                         /* display */ 
-#define __NR32ATR3_mktty                        SC_REPR_SYSCALL_ULONG_T                                              /* rsvd */ 
-#define __NR32RTR_mktty                         SC_REPR_FD_T                                                         /* return */
-#define __NR32ATR0_lfutexexpr                   SC_REPR_POINTER                                                      /* futexaddr */ 
-#define __NR32ATR1_lfutexexpr                   SC_REPR_POINTER                                                      /* base */ 
-#define __NR32ATR2_lfutexexpr                   SC_REPR_STRUCT_LFUTEXEXPRX32_VECTOR                                  /* expr */ 
-#define __NR32ATR3_lfutexexpr                   SC_REPR_STRUCT_TIMESPECX32_64                                        /* timeout */ 
-#define __NR32ATR4_lfutexexpr                   SC_REPR_LFUTEX_TIMEOUT_FLAGS                                         /* flags */ 
-#define __NR32RTR_lfutexexpr                    SC_REPR_ERRNO_T                                                      /* return */
-#define __NR32ATR0_lseek64                      SC_REPR_FD_T                                                         /* fd */ 
-#define __NR32ATR1_lseek64                      SC_REPR_INT64_T                                                      /* offset */ 
-#define __NR32ATR2_lseek64                      SC_REPR_SEEK_WHENCE                                                  /* whence */ 
-#define __NR32RTR_lseek64                       SC_REPR_INT64_T                                                      /* return */
-#define __NR32ATR0_lfutex                       SC_REPR_POINTER                                                      /* uaddr */ 
-#define __NR32ATR1_lfutex                       SC_REPR_LFUTEX_OP                                                    /* futex_op */ 
-#define __NR32ATR2_lfutex                       SC_REPR_UINT32_T                                                     /* val */ 
-#define __NR32ATR3_lfutex                       SC_REPR_STRUCT_TIMESPECX32_64                                        /* timeout */ 
-#define __NR32ATR4_lfutex                       SC_REPR_UINT32_T                                                     /* val2 */ 
-#define __NR32RTR_lfutex                        SC_REPR_SYSCALL_SLONG_T                                              /* return */
 #define __NR32ATR0_debugtrap                    SC_REPR_STRUCT_UCPUSTATE32                                           /* state */ 
 #define __NR32ATR1_debugtrap                    SC_REPR_STRUCT_DEBUGTRAP_REASON32                                    /* reason */ 
 #define __NR32RTR_debugtrap                     SC_REPR_ERRNO_T                                                      /* return */
@@ -2878,6 +2873,11 @@
 #define __NR32ATR2_set_exception_handler        SC_REPR_EXCEPTION_HANDLER_SP                                         /* handler_sp */ 
 #define __NR32ATL2_set_exception_handler        0                                                                    /* handler_sp -> mode */ 
 #define __NR32RTR_set_exception_handler         SC_REPR_ERRNO_T                                                      /* return */
+#define __NR32ATR0_mktty                        SC_REPR_STRING                                                       /* name */ 
+#define __NR32ATR1_mktty                        SC_REPR_FD_T                                                         /* keyboard */ 
+#define __NR32ATR2_mktty                        SC_REPR_FD_T                                                         /* display */ 
+#define __NR32ATR3_mktty                        SC_REPR_SYSCALL_ULONG_T                                              /* rsvd */ 
+#define __NR32RTR_mktty                         SC_REPR_FD_T                                                         /* return */
 #define __NR32ATR0_time64                       SC_REPR_POINTER                                                      /* timer */ 
 #define __NR32RTR_time64                        SC_REPR_TIME_T                                                       /* return */
 #define __NR32ATR0_fchdirat                     SC_REPR_FD_T                                                         /* dirfd */ 
@@ -2905,14 +2905,14 @@
 #define __NR32ATR3_frealpathat                  SC_REPR_SIZE_T                                                       /* buflen */ 
 #define __NR32ATR4_frealpathat                  SC_REPR_ATFLAG__ALTPATH__SYMLINK_NOFOLLOW__READLINK_REQSIZE__DOSPATH /* flags */ 
 #define __NR32RTR_frealpathat                   SC_REPR_SSIZE_T                                                      /* return */
+#define __NR32ATR0_detach                       SC_REPR_PID_T                                                        /* pid */ 
+#define __NR32RTR_detach                        SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_frealpath4                   SC_REPR_FD_T                                                         /* fd */ 
 #define __NR32ATR1_frealpath4                   SC_REPR_POINTER                                                      /* resolved */ 
 #define __NR32ATR2_frealpath4                   SC_REPR_SIZE_T                                                       /* buflen */ 
 #define __NR32ATR3_frealpath4                   SC_REPR_ATFLAG__ALTPATH__READLINK_REQSIZE__DOSPATH                   /* flags */ 
 #define __NR32RTR_frealpath4                    SC_REPR_SSIZE_T                                                      /* return */
 #define __NR32RTR_getdrives                     SC_REPR_SYSCALL_SLONG_T                                              /* return */
-#define __NR32ATR0_detach                       SC_REPR_PID_T                                                        /* pid */ 
-#define __NR32RTR_detach                        SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_writef                       SC_REPR_FD_T                                                         /* fd */ 
 #define __NR32ATR1_writef                       SC_REPR_BUFFER                                                       /* buf */ 
 #define __NR32ATL1_writef                       2                                                                    /* buf -> bufsize */ 

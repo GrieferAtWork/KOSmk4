@@ -31,6 +31,8 @@
 #include "cfi/x86_64.h"
 #elif defined(__i386__)
 #include "cfi/i386.h"
+#elif defined(__arm__)
+#include "cfi/arm.h"
 #else /* Arch... */
 #error "Unsupported architecture"
 #endif /* !Arch... */

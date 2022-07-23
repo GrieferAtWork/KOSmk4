@@ -140,11 +140,11 @@
      (defined(__bfin) || defined(bfin) || defined(__BFIN__) || \
       defined(__BFIN) || defined(BFIN)))
 #define __bfin__ 1
-#endif /* __arm__... */
+#endif /* __bfin__... */
 
 #if (!defined(__TMS320C6X__) && defined(_TMS320C6X))
 #define __TMS320C6X__ 1
-#endif /* __arm__... */
+#endif /* __TMS320C6X__... */
 
 #if (!defined(__csky__) && defined(__CSKY__))
 #define __csky__ __CSKY__

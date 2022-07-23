@@ -17,35 +17,5 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_CRT0_I386_CRT0_64_S
-#define GUARD_CRT0_I386_CRT0_64_S 1
-#define __ASSEMBLER__ 1
 
-#include <hybrid/compiler.h>
-
-#include <kos/exec/asm/elf64.h>
-#include <kos/exec/peb.h>
-
-/* INTDEF int main(int argc, char *argv[], char *envp[]); */
-/* INTDEF ATTR_NORETURN void _start(void); */
-
-.section .text
-INTERN_FUNCTION(_start)
-	/* The PEB is initialized by the kernel */
-	movq   OFFSET_PROCESS_PEB_ARGC(%ELF_ARCHX86_64_PEB_REGISTER), %rdi /* argc */
-	movq   OFFSET_PROCESS_PEB_ARGV(%ELF_ARCHX86_64_PEB_REGISTER), %rsi /* argv */
-	movq   OFFSET_PROCESS_PEB_ENVP(%ELF_ARCHX86_64_PEB_REGISTER), %rdx /* envp */
-	INTERN(main)
-	call   main
-	movq   %rax, %rdi
-	EXTERN(exit)
-	call   exit@PLT
-END(_start)
-
-
-.section .bss.__dso_handle
-INTERN_OBJECT(__dso_handle)
-	.quad 0
-END(__dso_handle)
-
-#endif /* !GUARD_CRT0_I386_CRT0_64_S */
+#include <i386-kos/crt-features/crt-kos32.h> /* TODO: Placeholder */

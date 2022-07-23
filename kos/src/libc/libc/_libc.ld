@@ -17,16 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_LIBC_ARCH_I386__LIBC_LD
-#define GUARD_LIBC_LIBC_ARCH_I386__LIBC_LD 1
+#ifndef GUARD_LIBC_LIBC__LIBC_LD
+#define GUARD_LIBC_LIBC__LIBC_LD 1
 
 #include <hybrid/compiler.h>
 
 #include <hybrid/host.h>
 
+#include <kos/exec/elf.h> /* ELF_ARCH_USESRELA */
 #include <asm/pagesize.h>
 
-#include "../../../crt-order.h"
+#include "../crt-order.h"
 
 #if 0
 #define PHDR(x) /* nothing */
@@ -60,6 +61,14 @@ PHDRS {
 	*(PREFIX.cold PREFIX.unlikely PREFIX.cold.* PREFIX.unlikely.*)
 
 
+#undef NEED___libc_errno_access_core_start
+#undef NEED_xdata
+#if !defined(__x86_64__) && defined(__i386__)
+#define NEED___libc_errno_access_core_start
+#define NEED_xdata
+#endif /* !__x86_64__ && __i386__ */
+
+
 SECTIONS {
 
 	. = SIZEOF_HEADERS;
@@ -70,9 +79,7 @@ SECTIONS {
 
 	.text : {
 		*(.text.__x86.*)
-#ifdef __x86_64__
-		ENUMERATE_SECTIONS(.text)
-#else /* __x86_64__ */
+#ifdef NEED___libc_errno_access_core_start
 		/* Hacky premature declaration of sections so we can let  the
 		 * linker calculate the bounding address range which needs to
 		 * be made writable for `nontls_errno_redirect()' */
@@ -83,18 +90,20 @@ SECTIONS {
 		*(.text.crt.errno_access.core)
 		PROVIDE_HIDDEN(__libc_errno_access_core_end = .);
 		ENUMERATE_SECTIONS(.text)
-#endif /* !__x86_64__ */
+#else /* NEED___libc_errno_access_core_start */
+		ENUMERATE_SECTIONS(.text)
+#endif /* !NEED___libc_errno_access_core_start */
 		*(.text.local.*)
 	} PHDR(text)
 	__etext = .;
 	_etext = .;
 
-#ifndef __x86_64__
+#ifdef NEED_xdata
 	. = ALIGN(__ARCH_PAGESIZE);
 	.xdata : {
 		*(.xdata)
 	} PHDR(xdata)
-#endif /* !__x86_64__ */
+#endif /* NEED_xdata */
 
 	. = ALIGN(__ARCH_PAGESIZE);
 	.rodata : {
@@ -115,7 +124,7 @@ SECTIONS {
 		KEEP(*(.eh_frame))
 	} PHDR(rodata)
 
-#ifdef __x86_64__
+#if ELF_ARCH_USESRELA
 	.rela.dyn : {
 		*(.rela.init)
 		*(.rela.text .rela.text.* .rela.gnu.linkonce.t.*)
@@ -137,7 +146,7 @@ SECTIONS {
 	.rela.plt : {
 		*(.rela.plt)
 	} PHDR(rodata)
-#else /* __x86_64__ */
+#else /* ELF_ARCH_USESRELA */
 	.rel.dyn : {
 		*(.rel.init)
 		*(.rel.text .rel.text.*)
@@ -157,7 +166,7 @@ SECTIONS {
 	.rel.plt : {
 		*(.rel.plt)
 	} PHDR(rodata)
-#endif /* !__x86_64__ */
+#endif /* !ELF_ARCH_USESRELA */
 
 	. = ALIGN(__ARCH_PAGESIZE);
 	.dynamic : {
@@ -221,4 +230,4 @@ SECTIONS {
 
 }
 
-#endif /* !GUARD_LIBC_LIBC_ARCH_I386__LIBC_LD */
+#endif /* !GUARD_LIBC_LIBC__LIBC_LD */

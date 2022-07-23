@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36c340bb */
+/* HASH CRC-32:0xad004c45 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1142,9 +1142,86 @@
  * @param: times[0]: New access time
  * @param: times[1]: New last-modified time */
 #define __NR32_utimes64                     __UINT32_C(0xfffffef1) /* errno_t utimes64(char const *filename, struct timevalx32_64 const[2] times) */
+/* Register the address of  the calling thread's userprocmask  controller.
+ * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
+ * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
+ * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
+ * is filled in with the equivalent of `sigpending(2)'
+ * Additionally,  the address  of `&ctl->pm_mytid'  is stored  as an override
+ * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
+ * and write to `ctl->pm_pending' (using  atomic-or for the later) from  this
+ * point forth.
+ * NOTE: Before calling this function, the caller must:
+ *       >> bzero(ctl, sizeof(struct userprocmask));
+ *       >> ctl->pm_sigsize = sizeof(sigset_t);
+ *       >> ctl->pm_sigmask = &initial_sigmask;
+ *       Where the initial bzero() is needed to initialize potential
+ *       additional,   arch-specific   fields    to   all    zeroes.
+ * NOTE: This system call will then initialize:
+ *       >> ctl->pm_mytid = gettid();
+ *       >> sigprocmask(0, NULL, ctl->pm_sigmask);
+ *       >> sigpending(&ctl->pm_pending);
+ * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
+ *       before this is done, the kernel will copy the  `pm_sigmask'
+ *       of the previously set  controller into its internal  signal
+ *       mask. (i.e. the one used outside of userprocmask-mode)
+ * Note though  that  `pm_sigmask'  is ignored  for  `SIGKILL'  and  `SIGSTOP'
+ * Note also  that  this  function replaces  `set_tid_address(2)',  such  that
+ * it negates a  prior call  to said  function, while  a future  call to  said
+ * function will once again disable userprocmask, same as passing `NULL' would */
+#define __NR32_set_userprocmask_address     __UINT32_C(0xfffffefe) /* errno_t set_userprocmask_address(struct userprocmask *ctl) */
+/* >> lfutexexpr(2)
+ * The lfutexexpr(2) system call can be used to specify arbitrarily complex
+ * expressions that must atomically (in relation to other futex operations)
+ * hold true before the scheduler will suspend the calling thread.
+ * @param: futexaddr: The futex on which to wait
+ * @param: base:      Base pointer added to the `fe_offset' fields of given expressions
+ * @param: expr:      Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
+ * @param: timeout:   Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ *                    When `LFUTEX_FDBIT'  is  set,  this argument  must  be  `NULL'.
+ * @param: flags:     Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*' or `LFUTEX_FDBIT'
+ * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
+ *              to see their  possible return  values, which are  always `0'  when they  would
+ *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ *              When `LFUTEX_FDBIT' is set, the return value is an `fd_t' for a futex fd that
+ *              can be used to poll for the specified `exprv'. Note that in this case `exprv'
+ *              is limited to `LFUTEXFD_DEFAULT_MAXEXPR' (`/proc/kos/futexfd-maxexpr')
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+#define __NR32_lfutexexpr                   __UINT32_C(0xffffff0f) /* errno_t lfutexexpr(uint32_t *futexaddr, void *base, struct lfutexexprx32 const *expr, struct timespecx32_64 const *timeout, syscall_ulong_t flags) */
+/* >> lfutex(2)
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
+ *    - LFUTEX_WAKE:                (lfutex_t *uaddr, LFUTEX_WAKE, size_t count)
+ *    - LFUTEX_WAKEMASK:            (lfutex_t *uaddr, LFUTEX_WAKEMASK, size_t count, lfutex_t mask_and, lfutex_t mask_or)
+ *    - LFUTEX_WAIT_WHILE:          (lfutex_t *uaddr, LFUTEX_WAIT_WHILE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:          (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_WHILE_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ *    - LFUTEX_WAIT_UNTIL_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ *    - LFUTEX_WAIT_WHILE_ABOVE_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ *    - LFUTEX_WAIT_WHILE_BELOW_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @return: * : Depending on `futex_op'
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
+ * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
+ * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
+#define __NR32_lfutex                       __UINT32_C(0xffffff10) /* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout, uint32_t val2) */
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
-#define __NR32_kreaddirf                    __UINT32_C(0xffffff24) /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
+#define __NR32_kreaddirf                    __UINT32_C(0xffffff23) /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
+/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
+ *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
+#define __NR32_kreaddir                     __UINT32_C(0xffffff24) /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
 #define __NR32_kfstat                       __UINT32_C(0xffffff3b) /* errno_t kfstat(fd_t fd, struct __kos_stat *statbuf) */
 #define __NR32_klstat                       __UINT32_C(0xffffff3c) /* errno_t klstat(char const *filename, struct __kos_stat *statbuf) */
 #define __NR32_kstat                        __UINT32_C(0xffffff3d) /* errno_t kstat(char const *filename, struct __kos_stat *statbuf) */
@@ -1159,6 +1236,22 @@
  * handler functions. */
 #define __NR32_ksigreturn                   __UINT32_C(0xffffff53) /* void ksigreturn(struct fpustate32 const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_with_sizex32 const *restore_sigmask, struct rpc_syscall_info32 const *sc_info, struct ucpustate32 const *restore_cpu) */
 #define __NR32_nanosleep64                  __UINT32_C(0xffffff5e) /* errno_t nanosleep64(struct timespecx32_64 const *req, struct timespecx32_64 *rem) */
+/* >> rpc_serve_sysret(2)
+ * Very similar to `rpc_serve(2)', but with the addition that this one
+ * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
+ * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
+ * ignores the state of the  internal `TASK_FRPC' flag, and should  be
+ * invoked  when  the calling  thread  makes use  of  the userprocmask
+ * mechanism, and the  signal mask became  less restrictive while  the
+ * `USERPROCMASK_FLAG_HASPENDING' flag was set.
+ * 
+ * When userprocmask is disabled, this system call is pretty much just
+ * a no-op (semnatically speaking, it does nothing). But when enabled,
+ * it is really only usable  in conjuction with the userprocmask.  The
+ * exact usage can be seen in `chkuserprocmask(3)'.
+ * 
+ * @return: 0 : Always, unconditionally returned. */
+#define __NR32_rpc_serve_sysret             __UINT32_C(0xffffff61) /* errno_t rpc_serve_sysret(void) */
 /* >> rpc_serve(2)
  * Check for pending signals and RPCs. This is a wrapper around the
  * kernel `task_serve()' function, which is always invoked before a
@@ -1191,9 +1284,7 @@
  * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
  * @return: 0                     : EOF */
 #define __NR32_readvf                       __UINT32_C(0xffffff6f) /* ssize_t readvf(fd_t fd, struct iovecx32 const *iovec, size_t count, iomode_t mode) */
-/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
- *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
-#define __NR32_kreaddir                     __UINT32_C(0xffffff73) /* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
+#define __NR32_select64                     __UINT32_C(0xffffff72) /* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32_64 *timeout) */
 /* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 #define __NR32_wait4_64                     __UINT32_C(0xffffff8e) /* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusagex32_64 *usage) */
@@ -1212,7 +1303,6 @@
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
 #define __NR32_maplibrary                   __UINT32_C(0xffffffaa) /* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr const *hdrv, size_t hdrc) */
-#define __NR32_select64                     __UINT32_C(0xffffffae) /* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32_64 *timeout) */
 #define __NR32_settimeofday64               __UINT32_C(0xffffffb1) /* errno_t settimeofday64(struct timevalx32_64 const *tv, struct timezone const *tz) */
 #define __NR32_gettimeofday64               __UINT32_C(0xffffffb2) /* errno_t gettimeofday64(struct timevalx32_64 *tv, struct timezone *tz) */
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
@@ -1255,52 +1345,9 @@
  * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
 #define __NR32_rtm_begin                    __UINT32_C(0xffffffd0) /* rtm_status_t rtm_begin(void) */
 #define __NR32_ftime64                      __UINT32_C(0xffffffdd) /* errno_t ftime64(struct timebx32_64 *tp) */
-/* >> rpc_serve_sysret(2)
- * Very similar to `rpc_serve(2)', but with the addition that this one
- * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
- * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
- * ignores the state of the  internal `TASK_FRPC' flag, and should  be
- * invoked  when  the calling  thread  makes use  of  the userprocmask
- * mechanism, and the  signal mask became  less restrictive while  the
- * `USERPROCMASK_FLAG_HASPENDING' flag was set.
- * 
- * When userprocmask is disabled, this system call is pretty much just
- * a no-op (semnatically speaking, it does nothing). But when enabled,
- * it is really only usable  in conjuction with the userprocmask.  The
- * exact usage can be seen in `chkuserprocmask(3)'.
- * 
- * @return: 0 : Always, unconditionally returned. */
-#define __NR32_rpc_serve_sysret             __UINT32_C(0xffffffdf) /* errno_t rpc_serve_sysret(void) */
-/* Register the address of  the calling thread's userprocmask  controller.
- * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
- * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
- * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
- * is filled in with the equivalent of `sigpending(2)'
- * Additionally,  the address  of `&ctl->pm_mytid'  is stored  as an override
- * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
- * and write to `ctl->pm_pending' (using  atomic-or for the later) from  this
- * point forth.
- * NOTE: Before calling this function, the caller must:
- *       >> bzero(ctl, sizeof(struct userprocmask));
- *       >> ctl->pm_sigsize = sizeof(sigset_t);
- *       >> ctl->pm_sigmask = &initial_sigmask;
- *       Where the initial bzero() is needed to initialize potential
- *       additional,   arch-specific   fields    to   all    zeroes.
- * NOTE: This system call will then initialize:
- *       >> ctl->pm_mytid = gettid();
- *       >> sigprocmask(0, NULL, ctl->pm_sigmask);
- *       >> sigpending(&ctl->pm_pending);
- * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
- *       before this is done, the kernel will copy the  `pm_sigmask'
- *       of the previously set  controller into its internal  signal
- *       mask. (i.e. the one used outside of userprocmask-mode)
- * Note though  that  `pm_sigmask'  is ignored  for  `SIGKILL'  and  `SIGSTOP'
- * Note also  that  this  function replaces  `set_tid_address(2)',  such  that
- * it negates a  prior call  to said  function, while  a future  call to  said
- * function will once again disable userprocmask, same as passing `NULL' would */
-#define __NR32_set_userprocmask_address     __UINT32_C(0xffffffe0) /* errno_t set_userprocmask_address(struct userprocmask *ctl) */
 /* @param: times: When NULL, set the current time */
 #define __NR32_utime64                      __UINT32_C(0xffffffe2) /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
+#define __NR32_stime64                      __UINT32_C(0xffffffe7) /* errno_t stime64(time64_t const *t) */
 /* Construct   a   user-vio-fd  object   supporting  mmap(2),   with  actual
  * memory  accesses  being dispatched  by  adding them  as  pending requests
  * to an internal  queue that  should be read(2)  from by  a worker  thread,
@@ -1314,8 +1361,8 @@
  *                       This  size may be  altered at a  later point in time
  *                       through use of `ftruncate(return)'
  * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK | O_NONBLOCK' */
-#define __NR32_userviofd                    __UINT32_C(0xffffffe5) /* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
-#define __NR32_stime64                      __UINT32_C(0xffffffe7) /* errno_t stime64(time64_t const *t) */
+#define __NR32_userviofd                    __UINT32_C(0xffffffec) /* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
+#define __NR32_lseek64                      __UINT32_C(0xffffffed) /* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
 /* Trigger a coredump of the calling process.
  * @param: curr_state:       The  state as is still valid after any possible unwinding has already been done
  *                           Note that this state does not necessarily point to the location that originally
@@ -1341,59 +1388,7 @@
  * @param: unwind_error:     The  unwind  error that  caused the  coredump,  or `UNWIND_SUCCESS'  if unwinding
  *                           was  never  actually  performed,  and   `reason'  is  actually  a   `siginfo_t *'
  *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
-#define __NR32_coredump                     __UINT32_C(0xffffffe8) /* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void const) const *traceback_vector, size_t traceback_length, union coredump_info32 const *reason, syscall_ulong_t unwind_error) */
-/* Create and return a new tty terminal controller connected to the given keyboard and display
- * The  newly created  device automatically gets  assigned an arbitrary  device number, before
- * being made available under a file `/dev/${name}'  (or rather: as ${name} within the  devfs)
- * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
-#define __NR32_mktty                        __UINT32_C(0xffffffea) /* fd_t mktty(char const *name, fd_t keyboard, fd_t display, syscall_ulong_t rsvd) */
-/* >> lfutexexpr(2)
- * The lfutexexpr(2) system call can be used to specify arbitrarily complex
- * expressions that must atomically (in relation to other futex operations)
- * hold true before the scheduler will suspend the calling thread.
- * @param: futexaddr: The futex on which to wait
- * @param: base:      Base pointer added to the `fe_offset' fields of given expressions
- * @param: expr:      Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
- * @param: timeout:   Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- *                    When `LFUTEX_FDBIT'  is  set,  this argument  must  be  `NULL'.
- * @param: flags:     Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*' or `LFUTEX_FDBIT'
- * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
- *              to see their  possible return  values, which are  always `0'  when they  would
- *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- *              When `LFUTEX_FDBIT' is set, the return value is an `fd_t' for a futex fd that
- *              can be used to poll for the specified `exprv'. Note that in this case `exprv'
- *              is limited to `LFUTEXFD_DEFAULT_MAXEXPR' (`/proc/kos/futexfd-maxexpr')
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-#define __NR32_lfutexexpr                   __UINT32_C(0xffffffeb) /* errno_t lfutexexpr(uint32_t *futexaddr, void *base, struct lfutexexprx32 const *expr, struct timespecx32_64 const *timeout, syscall_ulong_t flags) */
-#define __NR32_lseek64                      __UINT32_C(0xffffffed) /* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
-/* >> lfutex(2)
- * Provide the bottom-most API for implementing user-space synchronization on KOS
- * @param: futex_op: One of:
- *    - LFUTEX_WAKE:                (lfutex_t *uaddr, LFUTEX_WAKE, size_t count)
- *    - LFUTEX_WAKEMASK:            (lfutex_t *uaddr, LFUTEX_WAKEMASK, size_t count, lfutex_t mask_and, lfutex_t mask_or)
- *    - LFUTEX_WAIT_WHILE:          (lfutex_t *uaddr, LFUTEX_WAIT_WHILE, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:          (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_WHILE_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- *    - LFUTEX_WAIT_UNTIL_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- *    - LFUTEX_WAIT_WHILE_ABOVE_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- *    - LFUTEX_WAIT_WHILE_BELOW_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `futex_op'
- * @return: -1:EFAULT:    A faulty pointer was given
- * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
- * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
- * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
-#define __NR32_lfutex                       __UINT32_C(0xffffffee) /* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout, uint32_t val2) */
+#define __NR32_coredump                     __UINT32_C(0xffffffee) /* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void const) const *traceback_vector, size_t traceback_length, union coredump_info32 const *reason, syscall_ulong_t unwind_error) */
 /* Trigger a debugger trap `trapno', optionally extended with  `regs'
  * at either the system call return location, or at the given `state'
  * In the later case, this system call will by default return to  the
@@ -1418,7 +1413,7 @@
  *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
  * @return: 0 :         Success.
  * @return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty */
-#define __NR32_get_exception_handler        __UINT32_C(0xfffffff1) /* errno_t get_exception_handler(__ULONG32_TYPE__ *pmode, __except_handler32_t *phandler, __HYBRID_PTR32(void) *phandler_sp) */
+#define __NR32_get_exception_handler        __UINT32_C(0xfffffff0) /* errno_t get_exception_handler(__ULONG32_TYPE__ *pmode, __except_handler32_t *phandler, __HYBRID_PTR32(void) *phandler_sp) */
 /* Set the exception handler mode for the calling thread.
  * Examples:
  *   - Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
@@ -1430,7 +1425,12 @@
  * @param: handler_sp: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
  * @return: 0 :        Success.
  * @return: -1:EINVAL: The given `mode' is invalid */
-#define __NR32_set_exception_handler        __UINT32_C(0xfffffff2) /* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
+#define __NR32_set_exception_handler        __UINT32_C(0xfffffff1) /* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
+/* Create and return a new tty terminal controller connected to the given keyboard and display
+ * The  newly created  device automatically gets  assigned an arbitrary  device number, before
+ * being made available under a file `/dev/${name}'  (or rather: as ${name} within the  devfs)
+ * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
+#define __NR32_mktty                        __UINT32_C(0xfffffff2) /* fd_t mktty(char const *name, fd_t keyboard, fd_t display, syscall_ulong_t rsvd) */
 #define __NR32_time64                       __UINT32_C(0xfffffff3) /* int64_t time64(int64_t *timer) */
 /* @param: flags: Set of `0 | AT_DOSPATH' */
 #define __NR32_fchdirat                     __UINT32_C(0xfffffff4) /* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
@@ -1482,12 +1482,6 @@
  * the   required   buffer   size,   rather   than   the   used    size.
  * @param: flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_READLINK_REQSIZE | AT_DOSPATH' */
 #define __NR32_frealpathat                  __UINT32_C(0xfffffff8) /* ssize_t frealpathat(fd_t dirfd, char const *filename, char *buf, size_t buflen, atflag_t flags) */
-/* You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the   required   buffer   size,   rather   than   the   used    size.
- * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
-#define __NR32_frealpath4                   __UINT32_C(0xfffffff9) /* ssize_t frealpath4(fd_t fd, char *resolved, size_t buflen, atflag_t flags) */
-/* Returns a bitset of all of the currently mounted dos-drives */
-#define __NR32_getdrives                    __UINT32_C(0xfffffffa) /* syscall_slong_t getdrives(void) */
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
  * would have received a signal when it changes state,
@@ -1537,7 +1531,13 @@
  * @return: -ECHILD:         `PID' was equal to `-1', but no waitable children existed
  * @throw: E_PROCESS_EXITED: No such  thread/process exists,  or  the thread  isn't  isn't
  *                           a thread in your process, or a child process of your process. */
-#define __NR32_detach                       __UINT32_C(0xfffffffb) /* errno_t detach(pid_t pid) */
+#define __NR32_detach                       __UINT32_C(0xfffffff9) /* errno_t detach(pid_t pid) */
+/* You may pass `AT_READLINK_REQSIZE' to always have the function return
+ * the   required   buffer   size,   rather   than   the   used    size.
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
+#define __NR32_frealpath4                   __UINT32_C(0xfffffffa) /* ssize_t frealpath4(fd_t fd, char *resolved, size_t buflen, atflag_t flags) */
+/* Returns a bitset of all of the currently mounted dos-drives */
+#define __NR32_getdrives                    __UINT32_C(0xfffffffb) /* syscall_slong_t getdrives(void) */
 /* Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
  * possible at the time the call was made, and throw `E_WOULDBLOCK' if
@@ -2032,7 +2032,11 @@
 #define __NR32RM_inotify_add_watch_at         0
 #define __NR32RM_waitid64                     1
 #define __NR32RM_utimes64                     0
+#define __NR32RM_set_userprocmask_address     0
+#define __NR32RM_lfutexexpr                   1
+#define __NR32RM_lfutex                       1
 #define __NR32RM_kreaddirf                    0
+#define __NR32RM_kreaddir                     0
 #define __NR32RM_kfstat                       0
 #define __NR32RM_klstat                       0
 #define __NR32RM_kstat                        0
@@ -2040,16 +2044,16 @@
 #define __NR32RM_pread64f                     0
 #define __NR32RM_ksigreturn                   2
 #define __NR32RM_nanosleep64                  1
+#define __NR32RM_rpc_serve_sysret             1
 #define __NR32RM_rpc_serve                    1
 #define __NR32RM_ksysctl                      0
 #define __NR32RM_writevf                      0
 #define __NR32RM_readvf                       0
-#define __NR32RM_kreaddir                     0
+#define __NR32RM_select64                     1
 #define __NR32RM_wait4_64                     1
 #define __NR32RM_getitimer64                  0
 #define __NR32RM_setitimer64                  0
 #define __NR32RM_maplibrary                   0
-#define __NR32RM_select64                     1
 #define __NR32RM_settimeofday64               0
 #define __NR32RM_gettimeofday64               0
 #define __NR32RM_getrusage64                  0
@@ -2060,27 +2064,23 @@
 #define __NR32RM_rtm_end                      0
 #define __NR32RM_rtm_begin                    0
 #define __NR32RM_ftime64                      0
-#define __NR32RM_rpc_serve_sysret             1
-#define __NR32RM_set_userprocmask_address     0
 #define __NR32RM_utime64                      0
-#define __NR32RM_userviofd                    0
 #define __NR32RM_stime64                      0
-#define __NR32RM_coredump                     2
-#define __NR32RM_mktty                        0
-#define __NR32RM_lfutexexpr                   1
+#define __NR32RM_userviofd                    0
 #define __NR32RM_lseek64                      0
-#define __NR32RM_lfutex                       1
+#define __NR32RM_coredump                     2
 #define __NR32RM_debugtrap                    0
 #define __NR32RM_get_exception_handler        2
 #define __NR32RM_set_exception_handler        2
+#define __NR32RM_mktty                        0
 #define __NR32RM_time64                       0
 #define __NR32RM_fchdirat                     0
 #define __NR32RM_openpty                      0
 #define __NR32RM_rpc_schedule                 0
 #define __NR32RM_frealpathat                  0
+#define __NR32RM_detach                       2
 #define __NR32RM_frealpath4                   0
 #define __NR32RM_getdrives                    2
-#define __NR32RM_detach                       2
 #define __NR32RM_writef                       0
 #define __NR32RM_readf                        0
 #endif /* !__NR32FEAT_DEFINED_SYSCALL_RESTART_MODES */
@@ -2237,7 +2237,10 @@
 #define __NR32CP_fmkdirat
 #define __NR32CP_waitid64
 #define __NR32CP_utimes64
+#define __NR32CP_lfutexexpr
+#define __NR32CP_lfutex
 #define __NR32CP_kreaddirf
+#define __NR32CP_kreaddir
 #define __NR32CP_kfstat
 #define __NR32CP_klstat
 #define __NR32CP_kstat
@@ -2248,14 +2251,11 @@
 #define __NR32CP_ksysctl
 #define __NR32CP_writevf
 #define __NR32CP_readvf
-#define __NR32CP_kreaddir
-#define __NR32CP_wait4_64
 #define __NR32CP_select64
+#define __NR32CP_wait4_64
 #define __NR32CP_ioctlf
 #define __NR32CP_utime64
-#define __NR32CP_lfutexexpr
 #define __NR32CP_lseek64
-#define __NR32CP_lfutex
 #define __NR32CP_fchdirat
 #define __NR32CP_rpc_schedule
 #define __NR32CP_frealpathat
@@ -2715,7 +2715,11 @@
 #define __NR32RC_inotify_add_watch_at         5
 #define __NR32RC_waitid64                     5
 #define __NR32RC_utimes64                     2
+#define __NR32RC_set_userprocmask_address     1
+#define __NR32RC_lfutexexpr                   5
+#define __NR32RC_lfutex                       5
 #define __NR32RC_kreaddirf                    5
+#define __NR32RC_kreaddir                     4
 #define __NR32RC_kfstat                       2
 #define __NR32RC_klstat                       2
 #define __NR32RC_kstat                        2
@@ -2723,16 +2727,16 @@
 #define __NR32RC_pread64f                     6 /* __NR32AC_pread64f + 1 */
 #define __NR32RC_ksigreturn                   6
 #define __NR32RC_nanosleep64                  2
+#define __NR32RC_rpc_serve_sysret             0
 #define __NR32RC_rpc_serve                    0
 #define __NR32RC_ksysctl                      2
 #define __NR32RC_writevf                      4
 #define __NR32RC_readvf                       4
-#define __NR32RC_kreaddir                     4
+#define __NR32RC_select64                     5
 #define __NR32RC_wait4_64                     4
 #define __NR32RC_getitimer64                  2
 #define __NR32RC_setitimer64                  3
 #define __NR32RC_maplibrary                   5
-#define __NR32RC_select64                     5
 #define __NR32RC_settimeofday64               2
 #define __NR32RC_gettimeofday64               2
 #define __NR32RC_getrusage64                  2
@@ -2743,27 +2747,23 @@
 #define __NR32RC_rtm_end                      0
 #define __NR32RC_rtm_begin                    0
 #define __NR32RC_ftime64                      1
-#define __NR32RC_rpc_serve_sysret             0
-#define __NR32RC_set_userprocmask_address     1
 #define __NR32RC_utime64                      2
-#define __NR32RC_userviofd                    2
 #define __NR32RC_stime64                      1
-#define __NR32RC_coredump                     6
-#define __NR32RC_mktty                        4
-#define __NR32RC_lfutexexpr                   5
+#define __NR32RC_userviofd                    2
 #define __NR32RC_lseek64                      4 /* __NR32AC_lseek64 + 1 */
-#define __NR32RC_lfutex                       5
+#define __NR32RC_coredump                     6
 #define __NR32RC_debugtrap                    2
 #define __NR32RC_get_exception_handler        3
 #define __NR32RC_set_exception_handler        3
+#define __NR32RC_mktty                        4
 #define __NR32RC_time64                       1
 #define __NR32RC_fchdirat                     3
 #define __NR32RC_openpty                      5
 #define __NR32RC_rpc_schedule                 5
 #define __NR32RC_frealpathat                  5
+#define __NR32RC_detach                       1
 #define __NR32RC_frealpath4                   4
 #define __NR32RC_getdrives                    0
-#define __NR32RC_detach                       1
 #define __NR32RC_writef                       4
 #define __NR32RC_readf                        4
 #endif /* !__NR32FEAT_DEFINED_SYSCALL_REGISTER_COUNT */

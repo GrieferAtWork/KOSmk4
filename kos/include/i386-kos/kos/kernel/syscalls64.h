@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c654121 */
+/* HASH CRC-32:0x36ed5499 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -422,7 +422,6 @@
 #define __ARCH_WANT_COMPAT_SYSCALL_ARCH_PRCTL
 #define __ARCH_WANT_COMPAT_SYSCALL_BDFLUSH
 #define __ARCH_WANT_COMPAT_SYSCALL_BREAK
-#define __ARCH_WANT_COMPAT_SYSCALL_CLOCK_ADJTIME64
 #define __ARCH_WANT_COMPAT_SYSCALL_CLOCK_GETRES
 #define __ARCH_WANT_COMPAT_SYSCALL_CLOCK_GETRES_TIME64
 #define __ARCH_WANT_COMPAT_SYSCALL_CLOCK_GETTIME

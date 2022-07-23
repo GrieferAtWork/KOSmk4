@@ -1,0 +1,132 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+
+@@Cross-Arch name:
+@@  - @"/kos/src/libc/hybrid/arch/{XARCH}/...
+@@  - @"/kos/include/{XARCH}-kos/...
+@@  - @"/bin/{XARCH}-kos-{CONFIG}/...
+@@  - ...
+global final XARCH = "arm";
+
+@@Cross-Arch CPU name:
+@@  - @"/kos/include/{XARCH}-kos/c++/12.1.0/{CPUNAME}-kos
+@@  - ...
+global final CPUNAME = "arm";
+
+@@The GCC cross-compiler prefix
+global final CROSS_PREFIX = "binutils/arm-kos/bin/arm-kos-";
+
+@@sizeof(void *) of this target
+global final POINTER_SIZE = 4;
+
+@@Suffix for various files:
+@@  - Assembly files (e.g.: @"/kos/src/libc/hybrid/arch/{XARCH}/*{SUFFIX}.S")
+@@  - System call definition files (e.g. @"/kos/include/{XARCH}-kos/asm/syscalls{SUFFIX}.def")
+@@  - ...
+global final SUFFIX = "";
+
+@@Query pattern for matching assembly file names:
+@@  - @"/kos/src/libc/hybrid/arch/{XARCH}/{ASMFILES}"
+global final ASMFILES = "*.S";
+
+/* on-disk paths */
+global final DISK_LIBPATH = "/lib/";
+global final DISK_USRLIBPATH = "/usr/lib/";
+
+@@The value of @KERNEL_CORE_BASE for this target
+global final KERNEL_CORE_BASE = 0xc0000000;
+
+@@GNU AS pseudo-directive for emitting a pointer
+global final AS_PTR = ".long";
+
+@@GNU AS pseudo-directive for emitting a 32-bit integer
+global final AS_I32 = ".int";
+
+@@Libdl implements the PE-compatibility mode system
+global final DL_HAVE_PE_COMPAT = true;
+
+@@GDB architecture name for this target
+global final GDBARCH = "TODO";
+
+@@Intellisense mode for visual studio / vs-code
+global final VS_INTELLISENSE_MODE = "linux-gcc-arm";
+
+@@Fake target name for visual studio
+global final VS_PROJECT_TARGET = "Arm";
+
+@@Provide a cache for the toolchain.
+function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {
+	toolchain.provideStdlibCache(
+		("c++", ("-fstack-protector-strong", )), (
+			{	"binutils/arm-kos/lib/gcc/arm-kos/12.1.0",
+				"binutils/arm-kos/arm-kos/lib",
+				"binutils/arm-kos/lib",
+				"bin/" + TARGET_NAME + "/lib" },
+			{ "stdc++", "m", "ssp_nonshared", "ssp", "gcc", "c", "dl" },
+			{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
+		));
+	toolchain.provideStdlibCache(
+		("c++", ()), (
+			{	"binutils/arm-kos/lib/gcc/arm-kos/12.1.0",
+				"binutils/arm-kos/arm-kos/lib",
+				"binutils/arm-kos/lib",
+				"bin/" + TARGET_NAME + "/lib" },
+			{ "stdc++", "m", "gcc", "c", "dl" },
+			{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
+		));
+	toolchain.provideStdlibCache(
+		("c", ("-fstack-protector-strong",)), (
+			{	"binutils/arm-kos/lib/gcc/arm-kos/12.1.0",
+				"binutils/arm-kos/arm-kos/lib",
+				"binutils/arm-kos/lib",
+				"bin/" + TARGET_NAME + "/lib" },
+			{ "ssp_nonshared", "ssp", "gcc", "c", "dl" },
+			{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
+		));
+	toolchain.provideStdlibCache(
+		("c", ()), (
+			{	"binutils/arm-kos/lib/gcc/arm-kos/12.1.0",
+				"binutils/arm-kos/arm-kos/lib",
+				"binutils/arm-kos/lib",
+				"bin/" + TARGET_NAME + "/lib" },
+			{ "gcc", "c", "dl" },
+			{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
+		));
+	toolchain.provideStdlibCache(
+		("assembler-with-cpp", ()), (
+			{	"binutils/arm-kos/lib/gcc/arm-kos/12.1.0",
+				"binutils/arm-kos/arm-kos/lib",
+				"binutils/arm-kos/lib",
+				"bin/" + TARGET_NAME + "/lib" },
+			{ "gcc", "c", "dl" },
+			{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
+		));
+	toolchain.provideStdlibCache(
+		("assembler-with-cpp", ("-fstack-protector-strong",)), (
+			{	"binutils/arm-kos/lib/gcc/arm-kos/12.1.0",
+				"binutils/arm-kos/arm-kos/lib",
+				"binutils/arm-kos/lib",
+				"bin/" + TARGET_NAME + "/lib" },
+			{ "ssp_nonshared", "ssp", "gcc", "c", "dl", "gcc" },
+			{ "bin/" + TARGET_NAME + "/lib/crt0.o" }
+		));
+}

@@ -23,6 +23,7 @@
 #include "../api.h"
 /**/
 
+#include <bits/os/rusage-convert.h>
 #include <kos/syscalls.h>
 
 #include "sys.resource.h"
@@ -152,7 +153,14 @@ NOTHROW_NCX(LIBCCALL libc_getrusage64)(__rusage_who_t who,
 /*[[[body:libc_getrusage64]]]*/
 {
 	errno_t error;
+#ifdef SYS_getrusage64
 	error = sys_getrusage64((syscall_slong_t)who, usage);
+#else /* SYS_getrusage64 */
+	struct rusage ru;
+	error = sys_getrusage((syscall_slong_t)who, &ru);
+	if (E_ISOK(error))
+		rusage32_to_rusage64(&ru, usage);
+#endif /* !SYS_getrusage64 */
 	return libc_seterrno_syserr(error);
 }
 #endif /* MAGIC:alias */

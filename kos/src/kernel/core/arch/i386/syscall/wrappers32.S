@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe68e5bf3 */
+/* HASH CRC-32:0x61e2dff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17234,6 +17234,196 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utimes64)
 	.cfi_endproc
 END(__x86_asm32_int80_utimes64)
 
+/* Register the address of  the calling thread's userprocmask  controller.
+ * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
+ * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
+ * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
+ * is filled in with the equivalent of `sigpending(2)'
+ * Additionally,  the address  of `&ctl->pm_mytid'  is stored  as an override
+ * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
+ * and write to `ctl->pm_pending' (using  atomic-or for the later) from  this
+ * point forth.
+ * NOTE: Before calling this function, the caller must:
+ *       >> bzero(ctl, sizeof(struct userprocmask));
+ *       >> ctl->pm_sigsize = sizeof(sigset_t);
+ *       >> ctl->pm_sigmask = &initial_sigmask;
+ *       Where the initial bzero() is needed to initialize potential
+ *       additional,   arch-specific   fields    to   all    zeroes.
+ * NOTE: This system call will then initialize:
+ *       >> ctl->pm_mytid = gettid();
+ *       >> sigprocmask(0, NULL, ctl->pm_sigmask);
+ *       >> sigpending(&ctl->pm_pending);
+ * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
+ *       before this is done, the kernel will copy the  `pm_sigmask'
+ *       of the previously set  controller into its internal  signal
+ *       mask. (i.e. the one used outside of userprocmask-mode)
+ * Note though  that  `pm_sigmask'  is ignored  for  `SIGKILL'  and  `SIGSTOP'
+ * Note also  that  this  function replaces  `set_tid_address(2)',  such  that
+ * it negates a  prior call  to said  function, while  a future  call to  said
+ * function will once again disable userprocmask, same as passing `NULL' would */
+/* errno_t set_userprocmask_address(struct userprocmask *ctl) */
+.section .text.x86.asm32_syscall_int80.set_userprocmask_address
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_userprocmask_address)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffefe
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_set_userprocmask_address)
+	call   sys_set_userprocmask_address
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_set_userprocmask_address)
+
+/* >> lfutexexpr(2)
+ * The lfutexexpr(2) system call can be used to specify arbitrarily complex
+ * expressions that must atomically (in relation to other futex operations)
+ * hold true before the scheduler will suspend the calling thread.
+ * @param: futexaddr: The futex on which to wait
+ * @param: base:      Base pointer added to the `fe_offset' fields of given expressions
+ * @param: expr:      Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
+ * @param: timeout:   Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ *                    When `LFUTEX_FDBIT'  is  set,  this argument  must  be  `NULL'.
+ * @param: flags:     Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*' or `LFUTEX_FDBIT'
+ * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
+ *              to see their  possible return  values, which are  always `0'  when they  would
+ *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ *              When `LFUTEX_FDBIT' is set, the return value is an `fd_t' for a futex fd that
+ *              can be used to poll for the specified `exprv'. Note that in this case `exprv'
+ *              is limited to `LFUTEXFD_DEFAULT_MAXEXPR' (`/proc/kos/futexfd-maxexpr')
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+/* errno_t lfutexexpr(uint32_t *futexaddr, void *base, struct lfutexexprx32 const *expr, struct timespecx32_64 const *timeout, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_int80.lfutexexpr
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutexexpr)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff0f
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edi  /* Arg #4 */
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_lfutexexpr)
+	call   sys_lfutexexpr
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	addl   $(8), %esp
+	.cfi_adjust_cfa_offset -8
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_lfutexexpr)
+
+/* >> lfutex(2)
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
+ *    - LFUTEX_WAKE:                (lfutex_t *uaddr, LFUTEX_WAKE, size_t count)
+ *    - LFUTEX_WAKEMASK:            (lfutex_t *uaddr, LFUTEX_WAKEMASK, size_t count, lfutex_t mask_and, lfutex_t mask_or)
+ *    - LFUTEX_WAIT_WHILE:          (lfutex_t *uaddr, LFUTEX_WAIT_WHILE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:          (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_WHILE_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ *    - LFUTEX_WAIT_UNTIL_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ *    - LFUTEX_WAIT_WHILE_ABOVE_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ *    - LFUTEX_WAIT_WHILE_BELOW_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @return: * : Depending on `futex_op'
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
+ * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
+ * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
+/* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout, uint32_t val2) */
+.section .text.x86.asm32_syscall_int80.lfutex
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutex)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff10
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edi  /* Arg #4 */
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_lfutex)
+	call   sys_lfutex
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	addl   $(8), %esp
+	.cfi_adjust_cfa_offset -8
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_lfutex)
+
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
 /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
@@ -17241,7 +17431,7 @@ END(__x86_asm32_int80_utimes64)
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddirf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xffffff24
+	.cfi_lsda 0, 0xffffff23
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
@@ -17276,6 +17466,47 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddirf)
 	iret
 	.cfi_endproc
 END(__x86_asm32_int80_kreaddirf)
+
+/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
+ *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
+/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
+.section .text.x86.asm32_syscall_int80.kreaddir
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddir)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff24
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_kreaddir)
+	call   sys_kreaddir
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi_r %esi
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_kreaddir)
 
 /* errno_t kfstat(fd_t fd, struct __kos_stat *statbuf) */
 .section .text.x86.asm32_syscall_int80.kfstat
@@ -17558,6 +17789,56 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_nanosleep64)
 	.cfi_endproc
 END(__x86_asm32_int80_nanosleep64)
 
+/* >> rpc_serve_sysret(2)
+ * Very similar to `rpc_serve(2)', but with the addition that this one
+ * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
+ * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
+ * ignores the state of the  internal `TASK_FRPC' flag, and should  be
+ * invoked  when  the calling  thread  makes use  of  the userprocmask
+ * mechanism, and the  signal mask became  less restrictive while  the
+ * `USERPROCMASK_FLAG_HASPENDING' flag was set.
+ * 
+ * When userprocmask is disabled, this system call is pretty much just
+ * a no-op (semnatically speaking, it does nothing). But when enabled,
+ * it is really only usable  in conjuction with the userprocmask.  The
+ * exact usage can be seen in `chkuserprocmask(3)'.
+ * 
+ * @return: 0 : Always, unconditionally returned. */
+/* errno_t rpc_serve_sysret(void) */
+.section .text.x86.asm32_syscall_int80.rpc_serve_sysret
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_serve_sysret)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xffffff61
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	EXTERN(sys_rpc_serve_sysret)
+	call   sys_rpc_serve_sysret
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_rpc_serve_sysret)
+
 /* >> rpc_serve(2)
  * Check for pending signals and RPCs. This is a wrapper around the
  * kernel `task_serve()' function, which is always invoked before a
@@ -17736,14 +18017,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_readvf)
 	.cfi_endproc
 END(__x86_asm32_int80_readvf)
 
-/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
- *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
-/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
-.section .text.x86.asm32_syscall_int80.kreaddir
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddir)
+/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32_64 *timeout) */
+.section .text.x86.asm32_syscall_int80.select64
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_select64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xffffff73
+	.cfi_lsda 0, 0xffffff72
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
@@ -17757,16 +18036,18 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddir)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
+	pushl_cfi_r %edi  /* Arg #4 */
 	pushl_cfi_r %esi  /* Arg #3 */
 	pushl_cfi_r %edx  /* Arg #2 */
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_kreaddir)
-	call   sys_kreaddir
+	EXTERN(sys_select64)
+	call   sys_select64
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	popl_cfi_r %esi
+	addl   $(8), %esp
+	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -17775,7 +18056,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_kreaddir)
 	.cfi_restore_iret_ds
 	iret
 	.cfi_endproc
-END(__x86_asm32_int80_kreaddir)
+END(__x86_asm32_int80_select64)
 
 /* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
@@ -17944,47 +18225,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_maplibrary)
 	iret
 	.cfi_endproc
 END(__x86_asm32_int80_maplibrary)
-
-/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32_64 *timeout) */
-.section .text.x86.asm32_syscall_int80.select64
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_select64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xffffffae
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %edi  /* Arg #4 */
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_select64)
-	call   sys_select64
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	addl   $(8), %esp
-	.cfi_adjust_cfa_offset -8
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(__x86_asm32_int80_select64)
 
 /* errno_t settimeofday64(struct timevalx32_64 const *tv, struct timezone const *tz) */
 .section .text.x86.asm32_syscall_int80.settimeofday64
@@ -18382,120 +18622,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_ftime64)
 	.cfi_endproc
 END(__x86_asm32_int80_ftime64)
 
-/* >> rpc_serve_sysret(2)
- * Very similar to `rpc_serve(2)', but with the addition that this one
- * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
- * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
- * ignores the state of the  internal `TASK_FRPC' flag, and should  be
- * invoked  when  the calling  thread  makes use  of  the userprocmask
- * mechanism, and the  signal mask became  less restrictive while  the
- * `USERPROCMASK_FLAG_HASPENDING' flag was set.
- * 
- * When userprocmask is disabled, this system call is pretty much just
- * a no-op (semnatically speaking, it does nothing). But when enabled,
- * it is really only usable  in conjuction with the userprocmask.  The
- * exact usage can be seen in `chkuserprocmask(3)'.
- * 
- * @return: 0 : Always, unconditionally returned. */
-/* errno_t rpc_serve_sysret(void) */
-.section .text.x86.asm32_syscall_int80.rpc_serve_sysret
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_rpc_serve_sysret)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xffffffdf
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
-	EXTERN(sys_rpc_serve_sysret)
-	call   sys_rpc_serve_sysret
-	popl_cfi_r %edx
-	popl_cfi_r %ecx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(__x86_asm32_int80_rpc_serve_sysret)
-
-/* Register the address of  the calling thread's userprocmask  controller.
- * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
- * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
- * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
- * is filled in with the equivalent of `sigpending(2)'
- * Additionally,  the address  of `&ctl->pm_mytid'  is stored  as an override
- * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
- * and write to `ctl->pm_pending' (using  atomic-or for the later) from  this
- * point forth.
- * NOTE: Before calling this function, the caller must:
- *       >> bzero(ctl, sizeof(struct userprocmask));
- *       >> ctl->pm_sigsize = sizeof(sigset_t);
- *       >> ctl->pm_sigmask = &initial_sigmask;
- *       Where the initial bzero() is needed to initialize potential
- *       additional,   arch-specific   fields    to   all    zeroes.
- * NOTE: This system call will then initialize:
- *       >> ctl->pm_mytid = gettid();
- *       >> sigprocmask(0, NULL, ctl->pm_sigmask);
- *       >> sigpending(&ctl->pm_pending);
- * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
- *       before this is done, the kernel will copy the  `pm_sigmask'
- *       of the previously set  controller into its internal  signal
- *       mask. (i.e. the one used outside of userprocmask-mode)
- * Note though  that  `pm_sigmask'  is ignored  for  `SIGKILL'  and  `SIGSTOP'
- * Note also  that  this  function replaces  `set_tid_address(2)',  such  that
- * it negates a  prior call  to said  function, while  a future  call to  said
- * function will once again disable userprocmask, same as passing `NULL' would */
-/* errno_t set_userprocmask_address(struct userprocmask *ctl) */
-.section .text.x86.asm32_syscall_int80.set_userprocmask_address
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_userprocmask_address)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xffffffe0
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_set_userprocmask_address)
-	call   sys_set_userprocmask_address
-	popl_cfi_r %ebx
-	popl_cfi_r %edx
-	popl_cfi_r %ecx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(__x86_asm32_int80_set_userprocmask_address)
-
 /* @param: times: When NULL, set the current time */
 /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 .section .text.x86.asm32_syscall_int80.utime64
@@ -18534,56 +18660,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_utime64)
 	.cfi_endproc
 END(__x86_asm32_int80_utime64)
 
-/* Construct   a   user-vio-fd  object   supporting  mmap(2),   with  actual
- * memory  accesses  being dispatched  by  adding them  as  pending requests
- * to an internal  queue that  should be read(2)  from by  a worker  thread,
- * which should then service those requests before responding by write(2)ing
- * the results of the operation back to the same fd.
- * HINT: The format of the structures that are read(2) and
- *       write(2)en can be found in `<libvio/userviofd.h>'
- * NOTE: Don't use this system call directly. Use `vio_create(3)'
- *       from `<libvio/vio.h>' instead.
- * @param: initial_size: The initial mmap(2)able size of the returned handle.
- *                       This  size may be  altered at a  later point in time
- *                       through use of `ftruncate(return)'
- * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK | O_NONBLOCK' */
-/* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
-.section .text.x86.asm32_syscall_int80.userviofd
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_userviofd)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xffffffe5
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %edx
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_userviofd)
-	call   sys_userviofd
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(__x86_asm32_int80_userviofd)
-
 /* errno_t stime64(time64_t const *t) */
 .section .text.x86.asm32_syscall_int80.stime64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_stime64)
@@ -18621,37 +18697,25 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_stime64)
 	.cfi_endproc
 END(__x86_asm32_int80_stime64)
 
-/* Trigger a coredump of the calling process.
- * @param: curr_state:       The  state as is still valid after any possible unwinding has already been done
- *                           Note that this state does not necessarily point to the location that originally
- *                           caused the problem that escalated into a coredump, but is the last valid stack-
- *                           unwind location at which unwinding could no longer continue.
- *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- * @param: orig_state:       The original CPU state at where the associated `reason' got triggered
- *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- *                           When   `curr_state'   is   also   `NULL',   then   the   current   CPU   state   is   used   instead.
- * @param: traceback_vector: (potentially  incomplete)   vector  of   additional  program   pointers  that   were
- *                           traversed   when   the  stack   was   walked  from   `orig_state'   to  `curr_state'
- *                           Note that earlier  entries within this  vector are further  up the call-stack,  with
- *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
- *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
- *                           it  can  be  assumed  that  the  traceback is  complete  and  contains  all  traversed  instruction locations.
- *                           In   this   case,  a   traceback  displayed   to   a  human   should  not   include   the  text   location  at
- *                           `traceback_vector[traceback_length-1]',    since    that    location    would    also    be    printed    when
- *                           unwinding is completed for the purposes of displaying a traceback.
- * @param: traceback_length: The number of program counters stored within `traceback_vector'
- * @param: reason:           The reason that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
- *                           For certain `unwind_error' values, this can also  point to other things, but is  always
- *                           allowed to be `NULL' to indicate default/stub values.
- * @param: unwind_error:     The  unwind  error that  caused the  coredump,  or `UNWIND_SUCCESS'  if unwinding
- *                           was  never  actually  performed,  and   `reason'  is  actually  a   `siginfo_t *'
- *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
-/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void const) const *traceback_vector, size_t traceback_length, union coredump_info32 const *reason, syscall_ulong_t unwind_error) */
-.section .text.x86.asm32_syscall_int80.coredump
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_coredump)
+/* Construct   a   user-vio-fd  object   supporting  mmap(2),   with  actual
+ * memory  accesses  being dispatched  by  adding them  as  pending requests
+ * to an internal  queue that  should be read(2)  from by  a worker  thread,
+ * which should then service those requests before responding by write(2)ing
+ * the results of the operation back to the same fd.
+ * HINT: The format of the structures that are read(2) and
+ *       write(2)en can be found in `<libvio/userviofd.h>'
+ * NOTE: Don't use this system call directly. Use `vio_create(3)'
+ *       from `<libvio/vio.h>' instead.
+ * @param: initial_size: The initial mmap(2)able size of the returned handle.
+ *                       This  size may be  altered at a  later point in time
+ *                       through use of `ftruncate(return)'
+ * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK | O_NONBLOCK' */
+/* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_int80.userviofd
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_userviofd)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xffffffe8
+	.cfi_lsda 0, 0xffffffec
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
@@ -18665,19 +18729,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_coredump)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ebp  /* Arg #5 */
-	pushl_cfi_r %edi  /* Arg #4 */
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_coredump)
-	call   sys_coredump
+	EXTERN(sys_userviofd)
+	call   sys_userviofd
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $(12), %esp
-	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -18686,114 +18745,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_coredump)
 	.cfi_restore_iret_ds
 	iret
 	.cfi_endproc
-END(__x86_asm32_int80_coredump)
-
-/* Create and return a new tty terminal controller connected to the given keyboard and display
- * The  newly created  device automatically gets  assigned an arbitrary  device number, before
- * being made available under a file `/dev/${name}'  (or rather: as ${name} within the  devfs)
- * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
-/* fd_t mktty(char const *name, fd_t keyboard, fd_t display, syscall_ulong_t rsvd) */
-.section .text.x86.asm32_syscall_int80.mktty
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_mktty)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xffffffea
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_mktty)
-	call   sys_mktty
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi_r %esi
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(__x86_asm32_int80_mktty)
-
-/* >> lfutexexpr(2)
- * The lfutexexpr(2) system call can be used to specify arbitrarily complex
- * expressions that must atomically (in relation to other futex operations)
- * hold true before the scheduler will suspend the calling thread.
- * @param: futexaddr: The futex on which to wait
- * @param: base:      Base pointer added to the `fe_offset' fields of given expressions
- * @param: expr:      Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
- * @param: timeout:   Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- *                    When `LFUTEX_FDBIT'  is  set,  this argument  must  be  `NULL'.
- * @param: flags:     Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*' or `LFUTEX_FDBIT'
- * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
- *              to see their  possible return  values, which are  always `0'  when they  would
- *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- *              When `LFUTEX_FDBIT' is set, the return value is an `fd_t' for a futex fd that
- *              can be used to poll for the specified `exprv'. Note that in this case `exprv'
- *              is limited to `LFUTEXFD_DEFAULT_MAXEXPR' (`/proc/kos/futexfd-maxexpr')
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexexpr(uint32_t *futexaddr, void *base, struct lfutexexprx32 const *expr, struct timespecx32_64 const *timeout, syscall_ulong_t flags) */
-.section .text.x86.asm32_syscall_int80.lfutexexpr
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutexexpr)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xffffffeb
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %edi  /* Arg #4 */
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_lfutexexpr)
-	call   sys_lfutexexpr
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	addl   $(8), %esp
-	.cfi_adjust_cfa_offset -8
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(__x86_asm32_int80_lfutexexpr)
+END(__x86_asm32_int80_userviofd)
 
 /* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
 .section .text.x86.asm32_syscall_int80.lseek64
@@ -18834,30 +18786,34 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lseek64)
 	.cfi_endproc
 END(__x86_asm32_int80_lseek64)
 
-/* >> lfutex(2)
- * Provide the bottom-most API for implementing user-space synchronization on KOS
- * @param: futex_op: One of:
- *    - LFUTEX_WAKE:                (lfutex_t *uaddr, LFUTEX_WAKE, size_t count)
- *    - LFUTEX_WAKEMASK:            (lfutex_t *uaddr, LFUTEX_WAKEMASK, size_t count, lfutex_t mask_and, lfutex_t mask_or)
- *    - LFUTEX_WAIT_WHILE:          (lfutex_t *uaddr, LFUTEX_WAIT_WHILE, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:          (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_WHILE_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- *    - LFUTEX_WAIT_UNTIL_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- *    - LFUTEX_WAIT_WHILE_ABOVE_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- *    - LFUTEX_WAIT_WHILE_BELOW_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `futex_op'
- * @return: -1:EFAULT:    A faulty pointer was given
- * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
- * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
- * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
-/* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout, uint32_t val2) */
-.section .text.x86.asm32_syscall_int80.lfutex
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutex)
+/* Trigger a coredump of the calling process.
+ * @param: curr_state:       The  state as is still valid after any possible unwinding has already been done
+ *                           Note that this state does not necessarily point to the location that originally
+ *                           caused the problem that escalated into a coredump, but is the last valid stack-
+ *                           unwind location at which unwinding could no longer continue.
+ *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ * @param: orig_state:       The original CPU state at where the associated `reason' got triggered
+ *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ *                           When   `curr_state'   is   also   `NULL',   then   the   current   CPU   state   is   used   instead.
+ * @param: traceback_vector: (potentially  incomplete)   vector  of   additional  program   pointers  that   were
+ *                           traversed   when   the  stack   was   walked  from   `orig_state'   to  `curr_state'
+ *                           Note that earlier  entries within this  vector are further  up the call-stack,  with
+ *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
+ *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
+ *                           it  can  be  assumed  that  the  traceback is  complete  and  contains  all  traversed  instruction locations.
+ *                           In   this   case,  a   traceback  displayed   to   a  human   should  not   include   the  text   location  at
+ *                           `traceback_vector[traceback_length-1]',    since    that    location    would    also    be    printed    when
+ *                           unwinding is completed for the purposes of displaying a traceback.
+ * @param: traceback_length: The number of program counters stored within `traceback_vector'
+ * @param: reason:           The reason that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
+ *                           For certain `unwind_error' values, this can also  point to other things, but is  always
+ *                           allowed to be `NULL' to indicate default/stub values.
+ * @param: unwind_error:     The  unwind  error that  caused the  coredump,  or `UNWIND_SUCCESS'  if unwinding
+ *                           was  never  actually  performed,  and   `reason'  is  actually  a   `siginfo_t *'
+ *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
+/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void const) const *traceback_vector, size_t traceback_length, union coredump_info32 const *reason, syscall_ulong_t unwind_error) */
+.section .text.x86.asm32_syscall_int80.coredump
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_coredump)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
 	.cfi_lsda 0, 0xffffffee
@@ -18874,18 +18830,19 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutex)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
+	pushl_cfi_r %ebp  /* Arg #5 */
 	pushl_cfi_r %edi  /* Arg #4 */
 	pushl_cfi_r %esi  /* Arg #3 */
 	pushl_cfi_r %edx  /* Arg #2 */
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_lfutex)
-	call   sys_lfutex
+	EXTERN(sys_coredump)
+	call   sys_coredump
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $(8), %esp
-	.cfi_adjust_cfa_offset -8
+	addl   $(12), %esp
+	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -18894,7 +18851,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_lfutex)
 	.cfi_restore_iret_ds
 	iret
 	.cfi_endproc
-END(__x86_asm32_int80_lfutex)
+END(__x86_asm32_int80_coredump)
 
 /* Trigger a debugger trap `trapno', optionally extended with  `regs'
  * at either the system call return location, or at the given `state'
@@ -18961,7 +18918,7 @@ END(__x86_asm32_int80_debugtrap)
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_get_exception_handler)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffff1
+	.cfi_lsda 0, 0xfffffff0
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
@@ -19009,7 +18966,7 @@ END(__x86_asm32_int80_get_exception_handler)
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_exception_handler)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffff2
+	.cfi_lsda 0, 0xfffffff1
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
@@ -19040,6 +18997,49 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_set_exception_handler)
 	iret
 	.cfi_endproc
 END(__x86_asm32_int80_set_exception_handler)
+
+/* Create and return a new tty terminal controller connected to the given keyboard and display
+ * The  newly created  device automatically gets  assigned an arbitrary  device number, before
+ * being made available under a file `/dev/${name}'  (or rather: as ${name} within the  devfs)
+ * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
+/* fd_t mktty(char const *name, fd_t keyboard, fd_t display, syscall_ulong_t rsvd) */
+.section .text.x86.asm32_syscall_int80.mktty
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_mktty)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffff2
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_mktty)
+	call   sys_mktty
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi_r %esi
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_mktty)
 
 /* int64_t time64(int64_t *timer) */
 .section .text.x86.asm32_syscall_int80.time64
@@ -19282,84 +19282,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_frealpathat)
 	.cfi_endproc
 END(__x86_asm32_int80_frealpathat)
 
-/* You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the   required   buffer   size,   rather   than   the   used    size.
- * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpath4(fd_t fd, char *resolved, size_t buflen, atflag_t flags) */
-.section .text.x86.asm32_syscall_int80.frealpath4
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_frealpath4)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffff9
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_frealpath4)
-	call   sys_frealpath4
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi_r %esi
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(__x86_asm32_int80_frealpath4)
-
-/* Returns a bitset of all of the currently mounted dos-drives */
-/* syscall_slong_t getdrives(void) */
-.section .text.x86.asm32_syscall_int80.getdrives
-INTERN_WEAK_FUNCTION(__x86_asm32_int80_getdrives)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffffa
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
-	EXTERN(sys_getdrives)
-	call   sys_getdrives
-	popl_cfi_r %edx
-	popl_cfi_r %ecx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(__x86_asm32_int80_getdrives)
-
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
  * would have received a signal when it changes state,
@@ -19414,7 +19336,7 @@ END(__x86_asm32_int80_getdrives)
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_detach)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_int80
-	.cfi_lsda 0, 0xfffffffb
+	.cfi_lsda 0, 0xfffffff9
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
@@ -19445,6 +19367,84 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_detach)
 	iret
 	.cfi_endproc
 END(__x86_asm32_int80_detach)
+
+/* You may pass `AT_READLINK_REQSIZE' to always have the function return
+ * the   required   buffer   size,   rather   than   the   used    size.
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t frealpath4(fd_t fd, char *resolved, size_t buflen, atflag_t flags) */
+.section .text.x86.asm32_syscall_int80.frealpath4
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_frealpath4)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffffa
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_frealpath4)
+	call   sys_frealpath4
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi_r %esi
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_frealpath4)
+
+/* Returns a bitset of all of the currently mounted dos-drives */
+/* syscall_slong_t getdrives(void) */
+.section .text.x86.asm32_syscall_int80.getdrives
+INTERN_WEAK_FUNCTION(__x86_asm32_int80_getdrives)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_int80
+	.cfi_lsda 0, 0xfffffffb
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	EXTERN(sys_getdrives)
+	call   sys_getdrives
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__x86_asm32_int80_getdrives)
 
 /* Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
@@ -36842,6 +36842,200 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utimes64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_utimes64)
 
+/* Register the address of  the calling thread's userprocmask  controller.
+ * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
+ * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
+ * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
+ * is filled in with the equivalent of `sigpending(2)'
+ * Additionally,  the address  of `&ctl->pm_mytid'  is stored  as an override
+ * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
+ * and write to `ctl->pm_pending' (using  atomic-or for the later) from  this
+ * point forth.
+ * NOTE: Before calling this function, the caller must:
+ *       >> bzero(ctl, sizeof(struct userprocmask));
+ *       >> ctl->pm_sigsize = sizeof(sigset_t);
+ *       >> ctl->pm_sigmask = &initial_sigmask;
+ *       Where the initial bzero() is needed to initialize potential
+ *       additional,   arch-specific   fields    to   all    zeroes.
+ * NOTE: This system call will then initialize:
+ *       >> ctl->pm_mytid = gettid();
+ *       >> sigprocmask(0, NULL, ctl->pm_sigmask);
+ *       >> sigpending(&ctl->pm_pending);
+ * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
+ *       before this is done, the kernel will copy the  `pm_sigmask'
+ *       of the previously set  controller into its internal  signal
+ *       mask. (i.e. the one used outside of userprocmask-mode)
+ * Note though  that  `pm_sigmask'  is ignored  for  `SIGKILL'  and  `SIGSTOP'
+ * Note also  that  this  function replaces  `set_tid_address(2)',  such  that
+ * it negates a  prior call  to said  function, while  a future  call to  said
+ * function will once again disable userprocmask, same as passing `NULL' would */
+/* errno_t set_userprocmask_address(struct userprocmask *ctl) */
+.section .text.x86.asm32_syscall_sysenter.set_userprocmask_address
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_set_userprocmask_address)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xfffffefe
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_set_userprocmask_address)
+	call   sys_set_userprocmask_address
+	popl_cfi_r %ebx
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_set_userprocmask_address)
+
+/* >> lfutexexpr(2)
+ * The lfutexexpr(2) system call can be used to specify arbitrarily complex
+ * expressions that must atomically (in relation to other futex operations)
+ * hold true before the scheduler will suspend the calling thread.
+ * @param: futexaddr: The futex on which to wait
+ * @param: base:      Base pointer added to the `fe_offset' fields of given expressions
+ * @param: expr:      Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
+ * @param: timeout:   Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ *                    When `LFUTEX_FDBIT'  is  set,  this argument  must  be  `NULL'.
+ * @param: flags:     Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*' or `LFUTEX_FDBIT'
+ * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
+ *              to see their  possible return  values, which are  always `0'  when they  would
+ *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ *              When `LFUTEX_FDBIT' is set, the return value is an `fd_t' for a futex fd that
+ *              can be used to poll for the specified `exprv'. Note that in this case `exprv'
+ *              is limited to `LFUTEXFD_DEFAULT_MAXEXPR' (`/proc/kos/futexfd-maxexpr')
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+/* errno_t lfutexexpr(uint32_t *futexaddr, void *base, struct lfutexexprx32 const *expr, struct timespecx32_64 const *timeout, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysenter.lfutexexpr
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutexexpr)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xffffff0f
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	cmpl   $(KERNELSPACE_BASE), %ebp
+	jae    __asm32_bad_sysenter_extension
+	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_lfutexexpr)
+	call   sys_lfutexexpr
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	addl   $(8), %esp
+	.cfi_adjust_cfa_offset -8
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_lfutexexpr)
+
+/* >> lfutex(2)
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
+ *    - LFUTEX_WAKE:                (lfutex_t *uaddr, LFUTEX_WAKE, size_t count)
+ *    - LFUTEX_WAKEMASK:            (lfutex_t *uaddr, LFUTEX_WAKEMASK, size_t count, lfutex_t mask_and, lfutex_t mask_or)
+ *    - LFUTEX_WAIT_WHILE:          (lfutex_t *uaddr, LFUTEX_WAIT_WHILE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:          (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_WHILE_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ *    - LFUTEX_WAIT_UNTIL_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ *    - LFUTEX_WAIT_WHILE_ABOVE_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ *    - LFUTEX_WAIT_WHILE_BELOW_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @return: * : Depending on `futex_op'
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
+ * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
+ * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
+/* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout, uint32_t val2) */
+.section .text.x86.asm32_syscall_sysenter.lfutex
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutex)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xffffff10
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	cmpl   $(KERNELSPACE_BASE), %ebp
+	jae    __asm32_bad_sysenter_extension
+	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_lfutex)
+	call   sys_lfutex
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	addl   $(8), %esp
+	.cfi_adjust_cfa_offset -8
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_lfutex)
+
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
 /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
@@ -36849,7 +37043,7 @@ END(__x86_asm32_sysenter_utimes64)
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kreaddirf)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xffffff24
+	.cfi_lsda 0, 0xffffff23
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
@@ -36886,6 +37080,47 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kreaddirf)
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
 END(__x86_asm32_sysenter_kreaddirf)
+
+/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
+ *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
+/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
+.section .text.x86.asm32_syscall_sysenter.kreaddir
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kreaddir)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xffffff24
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_kreaddir)
+	call   sys_kreaddir
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi_r %esi
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_kreaddir)
 
 /* errno_t kfstat(fd_t fd, struct __kos_stat *statbuf) */
 .section .text.x86.asm32_syscall_sysenter.kfstat
@@ -37174,6 +37409,56 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_nanosleep64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_nanosleep64)
 
+/* >> rpc_serve_sysret(2)
+ * Very similar to `rpc_serve(2)', but with the addition that this one
+ * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
+ * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
+ * ignores the state of the  internal `TASK_FRPC' flag, and should  be
+ * invoked  when  the calling  thread  makes use  of  the userprocmask
+ * mechanism, and the  signal mask became  less restrictive while  the
+ * `USERPROCMASK_FLAG_HASPENDING' flag was set.
+ * 
+ * When userprocmask is disabled, this system call is pretty much just
+ * a no-op (semnatically speaking, it does nothing). But when enabled,
+ * it is really only usable  in conjuction with the userprocmask.  The
+ * exact usage can be seen in `chkuserprocmask(3)'.
+ * 
+ * @return: 0 : Always, unconditionally returned. */
+/* errno_t rpc_serve_sysret(void) */
+.section .text.x86.asm32_syscall_sysenter.rpc_serve_sysret
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rpc_serve_sysret)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xffffff61
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	EXTERN(sys_rpc_serve_sysret)
+	call   sys_rpc_serve_sysret
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_rpc_serve_sysret)
+
 /* >> rpc_serve(2)
  * Check for pending signals and RPCs. This is a wrapper around the
  * kernel `task_serve()' function, which is always invoked before a
@@ -37352,14 +37637,12 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_readvf)
 	.cfi_endproc
 END(__x86_asm32_sysenter_readvf)
 
-/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
- *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
-/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
-.section .text.x86.asm32_syscall_sysenter.kreaddir
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kreaddir)
+/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32_64 *timeout) */
+.section .text.x86.asm32_syscall_sysenter.select64
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_select64)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xffffff73
+	.cfi_lsda 0, 0xffffff72
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
@@ -37373,16 +37656,20 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kreaddir)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
+	cmpl   $(KERNELSPACE_BASE), %ebp
+	jae    __asm32_bad_sysenter_extension
+	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
 	pushl_cfi_r %edx  /* Arg #2 */
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_kreaddir)
-	call   sys_kreaddir
+	EXTERN(sys_select64)
+	call   sys_select64
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	popl_cfi_r %esi
+	addl   $(8), %esp
+	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -37391,7 +37678,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_kreaddir)
 	.cfi_restore_iret_ds
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
-END(__x86_asm32_sysenter_kreaddir)
+END(__x86_asm32_sysenter_select64)
 
 /* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
@@ -37562,49 +37849,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_maplibrary)
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
 END(__x86_asm32_sysenter_maplibrary)
-
-/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32_64 *timeout) */
-.section .text.x86.asm32_syscall_sysenter.select64
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_select64)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xffffffae
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	cmpl   $(KERNELSPACE_BASE), %ebp
-	jae    __asm32_bad_sysenter_extension
-	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_select64)
-	call   sys_select64
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	addl   $(8), %esp
-	.cfi_adjust_cfa_offset -8
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	X86_IRET_BUT_PREFER_SYSEXIT
-	.cfi_endproc
-END(__x86_asm32_sysenter_select64)
 
 /* errno_t settimeofday64(struct timevalx32_64 const *tv, struct timezone const *tz) */
 .section .text.x86.asm32_syscall_sysenter.settimeofday64
@@ -38002,120 +38246,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_ftime64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_ftime64)
 
-/* >> rpc_serve_sysret(2)
- * Very similar to `rpc_serve(2)', but with the addition that this one
- * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
- * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
- * ignores the state of the  internal `TASK_FRPC' flag, and should  be
- * invoked  when  the calling  thread  makes use  of  the userprocmask
- * mechanism, and the  signal mask became  less restrictive while  the
- * `USERPROCMASK_FLAG_HASPENDING' flag was set.
- * 
- * When userprocmask is disabled, this system call is pretty much just
- * a no-op (semnatically speaking, it does nothing). But when enabled,
- * it is really only usable  in conjuction with the userprocmask.  The
- * exact usage can be seen in `chkuserprocmask(3)'.
- * 
- * @return: 0 : Always, unconditionally returned. */
-/* errno_t rpc_serve_sysret(void) */
-.section .text.x86.asm32_syscall_sysenter.rpc_serve_sysret
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_rpc_serve_sysret)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xffffffdf
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
-	EXTERN(sys_rpc_serve_sysret)
-	call   sys_rpc_serve_sysret
-	popl_cfi_r %edx
-	popl_cfi_r %ecx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	X86_IRET_BUT_PREFER_SYSEXIT
-	.cfi_endproc
-END(__x86_asm32_sysenter_rpc_serve_sysret)
-
-/* Register the address of  the calling thread's userprocmask  controller.
- * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
- * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
- * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
- * is filled in with the equivalent of `sigpending(2)'
- * Additionally,  the address  of `&ctl->pm_mytid'  is stored  as an override
- * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
- * and write to `ctl->pm_pending' (using  atomic-or for the later) from  this
- * point forth.
- * NOTE: Before calling this function, the caller must:
- *       >> bzero(ctl, sizeof(struct userprocmask));
- *       >> ctl->pm_sigsize = sizeof(sigset_t);
- *       >> ctl->pm_sigmask = &initial_sigmask;
- *       Where the initial bzero() is needed to initialize potential
- *       additional,   arch-specific   fields    to   all    zeroes.
- * NOTE: This system call will then initialize:
- *       >> ctl->pm_mytid = gettid();
- *       >> sigprocmask(0, NULL, ctl->pm_sigmask);
- *       >> sigpending(&ctl->pm_pending);
- * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
- *       before this is done, the kernel will copy the  `pm_sigmask'
- *       of the previously set  controller into its internal  signal
- *       mask. (i.e. the one used outside of userprocmask-mode)
- * Note though  that  `pm_sigmask'  is ignored  for  `SIGKILL'  and  `SIGSTOP'
- * Note also  that  this  function replaces  `set_tid_address(2)',  such  that
- * it negates a  prior call  to said  function, while  a future  call to  said
- * function will once again disable userprocmask, same as passing `NULL' would */
-/* errno_t set_userprocmask_address(struct userprocmask *ctl) */
-.section .text.x86.asm32_syscall_sysenter.set_userprocmask_address
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_set_userprocmask_address)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xffffffe0
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_set_userprocmask_address)
-	call   sys_set_userprocmask_address
-	popl_cfi_r %ebx
-	popl_cfi_r %edx
-	popl_cfi_r %ecx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	X86_IRET_BUT_PREFER_SYSEXIT
-	.cfi_endproc
-END(__x86_asm32_sysenter_set_userprocmask_address)
-
 /* @param: times: When NULL, set the current time */
 /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 .section .text.x86.asm32_syscall_sysenter.utime64
@@ -38154,56 +38284,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_utime64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_utime64)
 
-/* Construct   a   user-vio-fd  object   supporting  mmap(2),   with  actual
- * memory  accesses  being dispatched  by  adding them  as  pending requests
- * to an internal  queue that  should be read(2)  from by  a worker  thread,
- * which should then service those requests before responding by write(2)ing
- * the results of the operation back to the same fd.
- * HINT: The format of the structures that are read(2) and
- *       write(2)en can be found in `<libvio/userviofd.h>'
- * NOTE: Don't use this system call directly. Use `vio_create(3)'
- *       from `<libvio/vio.h>' instead.
- * @param: initial_size: The initial mmap(2)able size of the returned handle.
- *                       This  size may be  altered at a  later point in time
- *                       through use of `ftruncate(return)'
- * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK | O_NONBLOCK' */
-/* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
-.section .text.x86.asm32_syscall_sysenter.userviofd
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_userviofd)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xffffffe5
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %edx
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_userviofd)
-	call   sys_userviofd
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	X86_IRET_BUT_PREFER_SYSEXIT
-	.cfi_endproc
-END(__x86_asm32_sysenter_userviofd)
-
 /* errno_t stime64(time64_t const *t) */
 .section .text.x86.asm32_syscall_sysenter.stime64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_stime64)
@@ -38241,37 +38321,25 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_stime64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_stime64)
 
-/* Trigger a coredump of the calling process.
- * @param: curr_state:       The  state as is still valid after any possible unwinding has already been done
- *                           Note that this state does not necessarily point to the location that originally
- *                           caused the problem that escalated into a coredump, but is the last valid stack-
- *                           unwind location at which unwinding could no longer continue.
- *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- * @param: orig_state:       The original CPU state at where the associated `reason' got triggered
- *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- *                           When   `curr_state'   is   also   `NULL',   then   the   current   CPU   state   is   used   instead.
- * @param: traceback_vector: (potentially  incomplete)   vector  of   additional  program   pointers  that   were
- *                           traversed   when   the  stack   was   walked  from   `orig_state'   to  `curr_state'
- *                           Note that earlier  entries within this  vector are further  up the call-stack,  with
- *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
- *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
- *                           it  can  be  assumed  that  the  traceback is  complete  and  contains  all  traversed  instruction locations.
- *                           In   this   case,  a   traceback  displayed   to   a  human   should  not   include   the  text   location  at
- *                           `traceback_vector[traceback_length-1]',    since    that    location    would    also    be    printed    when
- *                           unwinding is completed for the purposes of displaying a traceback.
- * @param: traceback_length: The number of program counters stored within `traceback_vector'
- * @param: reason:           The reason that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
- *                           For certain `unwind_error' values, this can also  point to other things, but is  always
- *                           allowed to be `NULL' to indicate default/stub values.
- * @param: unwind_error:     The  unwind  error that  caused the  coredump,  or `UNWIND_SUCCESS'  if unwinding
- *                           was  never  actually  performed,  and   `reason'  is  actually  a   `siginfo_t *'
- *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
-/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void const) const *traceback_vector, size_t traceback_length, union coredump_info32 const *reason, syscall_ulong_t unwind_error) */
-.section .text.x86.asm32_syscall_sysenter.coredump
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_coredump)
+/* Construct   a   user-vio-fd  object   supporting  mmap(2),   with  actual
+ * memory  accesses  being dispatched  by  adding them  as  pending requests
+ * to an internal  queue that  should be read(2)  from by  a worker  thread,
+ * which should then service those requests before responding by write(2)ing
+ * the results of the operation back to the same fd.
+ * HINT: The format of the structures that are read(2) and
+ *       write(2)en can be found in `<libvio/userviofd.h>'
+ * NOTE: Don't use this system call directly. Use `vio_create(3)'
+ *       from `<libvio/vio.h>' instead.
+ * @param: initial_size: The initial mmap(2)able size of the returned handle.
+ *                       This  size may be  altered at a  later point in time
+ *                       through use of `ftruncate(return)'
+ * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK | O_NONBLOCK' */
+/* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
+.section .text.x86.asm32_syscall_sysenter.userviofd
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_userviofd)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xffffffe8
+	.cfi_lsda 0, 0xffffffec
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
@@ -38285,21 +38353,14 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_coredump)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	cmpl   $(KERNELSPACE_BASE), %ebp
-	jae    __asm32_bad_sysenter_extension
-	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
-	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %edx
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_coredump)
-	call   sys_coredump
+	EXTERN(sys_userviofd)
+	call   sys_userviofd
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $(12), %esp
-	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -38308,116 +38369,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_coredump)
 	.cfi_restore_iret_ds
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
-END(__x86_asm32_sysenter_coredump)
-
-/* Create and return a new tty terminal controller connected to the given keyboard and display
- * The  newly created  device automatically gets  assigned an arbitrary  device number, before
- * being made available under a file `/dev/${name}'  (or rather: as ${name} within the  devfs)
- * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
-/* fd_t mktty(char const *name, fd_t keyboard, fd_t display, syscall_ulong_t rsvd) */
-.section .text.x86.asm32_syscall_sysenter.mktty
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mktty)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xffffffea
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_mktty)
-	call   sys_mktty
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi_r %esi
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	X86_IRET_BUT_PREFER_SYSEXIT
-	.cfi_endproc
-END(__x86_asm32_sysenter_mktty)
-
-/* >> lfutexexpr(2)
- * The lfutexexpr(2) system call can be used to specify arbitrarily complex
- * expressions that must atomically (in relation to other futex operations)
- * hold true before the scheduler will suspend the calling thread.
- * @param: futexaddr: The futex on which to wait
- * @param: base:      Base pointer added to the `fe_offset' fields of given expressions
- * @param: expr:      Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
- * @param: timeout:   Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- *                    When `LFUTEX_FDBIT'  is  set,  this argument  must  be  `NULL'.
- * @param: flags:     Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*' or `LFUTEX_FDBIT'
- * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
- *              to see their  possible return  values, which are  always `0'  when they  would
- *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- *              When `LFUTEX_FDBIT' is set, the return value is an `fd_t' for a futex fd that
- *              can be used to poll for the specified `exprv'. Note that in this case `exprv'
- *              is limited to `LFUTEXFD_DEFAULT_MAXEXPR' (`/proc/kos/futexfd-maxexpr')
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexexpr(uint32_t *futexaddr, void *base, struct lfutexexprx32 const *expr, struct timespecx32_64 const *timeout, syscall_ulong_t flags) */
-.section .text.x86.asm32_syscall_sysenter.lfutexexpr
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutexexpr)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xffffffeb
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	cmpl   $(KERNELSPACE_BASE), %ebp
-	jae    __asm32_bad_sysenter_extension
-	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_lfutexexpr)
-	call   sys_lfutexexpr
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	addl   $(8), %esp
-	.cfi_adjust_cfa_offset -8
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	X86_IRET_BUT_PREFER_SYSEXIT
-	.cfi_endproc
-END(__x86_asm32_sysenter_lfutexexpr)
+END(__x86_asm32_sysenter_userviofd)
 
 /* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
 .section .text.x86.asm32_syscall_sysenter.lseek64
@@ -38458,30 +38410,34 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lseek64)
 	.cfi_endproc
 END(__x86_asm32_sysenter_lseek64)
 
-/* >> lfutex(2)
- * Provide the bottom-most API for implementing user-space synchronization on KOS
- * @param: futex_op: One of:
- *    - LFUTEX_WAKE:                (lfutex_t *uaddr, LFUTEX_WAKE, size_t count)
- *    - LFUTEX_WAKEMASK:            (lfutex_t *uaddr, LFUTEX_WAKEMASK, size_t count, lfutex_t mask_and, lfutex_t mask_or)
- *    - LFUTEX_WAIT_WHILE:          (lfutex_t *uaddr, LFUTEX_WAIT_WHILE, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:          (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_WHILE_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- *    - LFUTEX_WAIT_UNTIL_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- *    - LFUTEX_WAIT_WHILE_ABOVE_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- *    - LFUTEX_WAIT_WHILE_BELOW_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `futex_op'
- * @return: -1:EFAULT:    A faulty pointer was given
- * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
- * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
- * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
-/* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout, uint32_t val2) */
-.section .text.x86.asm32_syscall_sysenter.lfutex
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutex)
+/* Trigger a coredump of the calling process.
+ * @param: curr_state:       The  state as is still valid after any possible unwinding has already been done
+ *                           Note that this state does not necessarily point to the location that originally
+ *                           caused the problem that escalated into a coredump, but is the last valid stack-
+ *                           unwind location at which unwinding could no longer continue.
+ *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ * @param: orig_state:       The original CPU state at where the associated `reason' got triggered
+ *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ *                           When   `curr_state'   is   also   `NULL',   then   the   current   CPU   state   is   used   instead.
+ * @param: traceback_vector: (potentially  incomplete)   vector  of   additional  program   pointers  that   were
+ *                           traversed   when   the  stack   was   walked  from   `orig_state'   to  `curr_state'
+ *                           Note that earlier  entries within this  vector are further  up the call-stack,  with
+ *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
+ *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
+ *                           it  can  be  assumed  that  the  traceback is  complete  and  contains  all  traversed  instruction locations.
+ *                           In   this   case,  a   traceback  displayed   to   a  human   should  not   include   the  text   location  at
+ *                           `traceback_vector[traceback_length-1]',    since    that    location    would    also    be    printed    when
+ *                           unwinding is completed for the purposes of displaying a traceback.
+ * @param: traceback_length: The number of program counters stored within `traceback_vector'
+ * @param: reason:           The reason that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
+ *                           For certain `unwind_error' values, this can also  point to other things, but is  always
+ *                           allowed to be `NULL' to indicate default/stub values.
+ * @param: unwind_error:     The  unwind  error that  caused the  coredump,  or `UNWIND_SUCCESS'  if unwinding
+ *                           was  never  actually  performed,  and   `reason'  is  actually  a   `siginfo_t *'
+ *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
+/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void const) const *traceback_vector, size_t traceback_length, union coredump_info32 const *reason, syscall_ulong_t unwind_error) */
+.section .text.x86.asm32_syscall_sysenter.coredump
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_coredump)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
 	.cfi_lsda 0, 0xffffffee
@@ -38500,18 +38456,19 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutex)
 	movw   %ax, %fs
 	cmpl   $(KERNELSPACE_BASE), %ebp
 	jae    __asm32_bad_sysenter_extension
+	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
 	pushl_cfi_r %edx  /* Arg #2 */
 	pushl_cfi_r %ecx  /* Arg #1 */
 	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_lfutex)
-	call   sys_lfutex
+	EXTERN(sys_coredump)
+	call   sys_coredump
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $(8), %esp
-	.cfi_adjust_cfa_offset -8
+	addl   $(12), %esp
+	.cfi_adjust_cfa_offset -12
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -38520,7 +38477,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_lfutex)
 	.cfi_restore_iret_ds
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
-END(__x86_asm32_sysenter_lfutex)
+END(__x86_asm32_sysenter_coredump)
 
 /* Trigger a debugger trap `trapno', optionally extended with  `regs'
  * at either the system call return location, or at the given `state'
@@ -38587,7 +38544,7 @@ END(__x86_asm32_sysenter_debugtrap)
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_get_exception_handler)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xfffffff1
+	.cfi_lsda 0, 0xfffffff0
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
@@ -38635,7 +38592,7 @@ END(__x86_asm32_sysenter_get_exception_handler)
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_set_exception_handler)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xfffffff2
+	.cfi_lsda 0, 0xfffffff1
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
@@ -38666,6 +38623,49 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_set_exception_handler)
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
 END(__x86_asm32_sysenter_set_exception_handler)
+
+/* Create and return a new tty terminal controller connected to the given keyboard and display
+ * The  newly created  device automatically gets  assigned an arbitrary  device number, before
+ * being made available under a file `/dev/${name}'  (or rather: as ${name} within the  devfs)
+ * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
+/* fd_t mktty(char const *name, fd_t keyboard, fd_t display, syscall_ulong_t rsvd) */
+.section .text.x86.asm32_syscall_sysenter.mktty
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_mktty)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xfffffff2
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_mktty)
+	call   sys_mktty
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi_r %esi
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_mktty)
 
 /* int64_t time64(int64_t *timer) */
 .section .text.x86.asm32_syscall_sysenter.time64
@@ -38914,84 +38914,6 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_frealpathat)
 	.cfi_endproc
 END(__x86_asm32_sysenter_frealpathat)
 
-/* You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the   required   buffer   size,   rather   than   the   used    size.
- * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpath4(fd_t fd, char *resolved, size_t buflen, atflag_t flags) */
-.section .text.x86.asm32_syscall_sysenter.frealpath4
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_frealpath4)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xfffffff9
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	EXTERN(sys_frealpath4)
-	call   sys_frealpath4
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	popl_cfi_r %esi
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	X86_IRET_BUT_PREFER_SYSEXIT
-	.cfi_endproc
-END(__x86_asm32_sysenter_frealpath4)
-
-/* Returns a bitset of all of the currently mounted dos-drives */
-/* syscall_slong_t getdrives(void) */
-.section .text.x86.asm32_syscall_sysenter.getdrives
-INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getdrives)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xfffffffa
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %ecx
-	pushl_cfi_r %edx
-	EXTERN(sys_getdrives)
-	call   sys_getdrives
-	popl_cfi_r %edx
-	popl_cfi_r %ecx
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	X86_IRET_BUT_PREFER_SYSEXIT
-	.cfi_endproc
-END(__x86_asm32_sysenter_getdrives)
-
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
  * would have received a signal when it changes state,
@@ -39046,7 +38968,7 @@ END(__x86_asm32_sysenter_getdrives)
 INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_detach)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
-	.cfi_lsda 0, 0xfffffffb
+	.cfi_lsda 0, 0xfffffff9
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
@@ -39077,6 +38999,84 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_detach)
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
 END(__x86_asm32_sysenter_detach)
+
+/* You may pass `AT_READLINK_REQSIZE' to always have the function return
+ * the   required   buffer   size,   rather   than   the   used    size.
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t frealpath4(fd_t fd, char *resolved, size_t buflen, atflag_t flags) */
+.section .text.x86.asm32_syscall_sysenter.frealpath4
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_frealpath4)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xfffffffa
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	EXTERN(sys_frealpath4)
+	call   sys_frealpath4
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi_r %esi
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_frealpath4)
+
+/* Returns a bitset of all of the currently mounted dos-drives */
+/* syscall_slong_t getdrives(void) */
+.section .text.x86.asm32_syscall_sysenter.getdrives
+INTERN_WEAK_FUNCTION(__x86_asm32_sysenter_getdrives)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality_asm32_sysenter
+	.cfi_lsda 0, 0xfffffffb
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ecx
+	pushl_cfi_r %edx
+	EXTERN(sys_getdrives)
+	call   sys_getdrives
+	popl_cfi_r %edx
+	popl_cfi_r %ecx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__x86_asm32_sysenter_getdrives)
 
 /* Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data as

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c8bad09 */
+/* HASH CRC-32:0x826f4717 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3972,14 +3972,115 @@ INTERN_FUNCTION(libc_sys_utimes64)
 END(libc_sys_utimes64)
 DEFINE_PUBLIC_ALIAS(sys_utimes64, libc_sys_utimes64)
 
+/* Register the address of  the calling thread's userprocmask  controller.
+ * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
+ * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
+ * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
+ * is filled in with the equivalent of `sigpending(2)'
+ * Additionally,  the address  of `&ctl->pm_mytid'  is stored  as an override
+ * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
+ * and write to `ctl->pm_pending' (using  atomic-or for the later) from  this
+ * point forth.
+ * NOTE: Before calling this function, the caller must:
+ *       >> bzero(ctl, sizeof(struct userprocmask));
+ *       >> ctl->pm_sigsize = sizeof(sigset_t);
+ *       >> ctl->pm_sigmask = &initial_sigmask;
+ *       Where the initial bzero() is needed to initialize potential
+ *       additional,   arch-specific   fields    to   all    zeroes.
+ * NOTE: This system call will then initialize:
+ *       >> ctl->pm_mytid = gettid();
+ *       >> sigprocmask(0, NULL, ctl->pm_sigmask);
+ *       >> sigpending(&ctl->pm_pending);
+ * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
+ *       before this is done, the kernel will copy the  `pm_sigmask'
+ *       of the previously set  controller into its internal  signal
+ *       mask. (i.e. the one used outside of userprocmask-mode)
+ * Note though  that  `pm_sigmask'  is ignored  for  `SIGKILL'  and  `SIGSTOP'
+ * Note also  that  this  function replaces  `set_tid_address(2)',  such  that
+ * it negates a  prior call  to said  function, while  a future  call to  said
+ * function will once again disable userprocmask, same as passing `NULL' would */
+/* errno_t set_userprocmask_address(struct userprocmask *ctl) */
+INTERN_FUNCTION(libc_sys_set_userprocmask_address)
+	movl   $(0xfffffefe), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_set_userprocmask_address)
+DEFINE_PUBLIC_ALIAS(sys_set_userprocmask_address, libc_sys_set_userprocmask_address)
+
+/* >> lfutexexpr(2)
+ * The lfutexexpr(2) system call can be used to specify arbitrarily complex
+ * expressions that must atomically (in relation to other futex operations)
+ * hold true before the scheduler will suspend the calling thread.
+ * @param: futexaddr: The futex on which to wait
+ * @param: base:      Base pointer added to the `fe_offset' fields of given expressions
+ * @param: expr:      Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
+ * @param: timeout:   Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ *                    When `LFUTEX_FDBIT'  is  set,  this argument  must  be  `NULL'.
+ * @param: flags:     Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*' or `LFUTEX_FDBIT'
+ * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
+ *              to see their  possible return  values, which are  always `0'  when they  would
+ *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ *              When `LFUTEX_FDBIT' is set, the return value is an `fd_t' for a futex fd that
+ *              can be used to poll for the specified `exprv'. Note that in this case `exprv'
+ *              is limited to `LFUTEXFD_DEFAULT_MAXEXPR' (`/proc/kos/futexfd-maxexpr')
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+/* errno_t lfutexexpr(uint32_t *futexaddr, void *base, struct lfutexexprx32 const *expr, struct timespecx32_64 const *timeout, syscall_ulong_t flags) */
+INTERN_FUNCTION(libc_sys_lfutexexpr)
+	movl   $(0xffffff0f), %eax
+	jmp    libc_x86_exec_syscall5
+END(libc_sys_lfutexexpr)
+DEFINE_PUBLIC_ALIAS(sys_lfutexexpr, libc_sys_lfutexexpr)
+
+/* >> lfutex(2)
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
+ *    - LFUTEX_WAKE:                (lfutex_t *uaddr, LFUTEX_WAKE, size_t count)
+ *    - LFUTEX_WAKEMASK:            (lfutex_t *uaddr, LFUTEX_WAKEMASK, size_t count, lfutex_t mask_and, lfutex_t mask_or)
+ *    - LFUTEX_WAIT_WHILE:          (lfutex_t *uaddr, LFUTEX_WAIT_WHILE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:          (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_WHILE_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ *    - LFUTEX_WAIT_UNTIL_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ *    - LFUTEX_WAIT_WHILE_ABOVE_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ *    - LFUTEX_WAIT_WHILE_BELOW_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @return: * : Depending on `futex_op'
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
+ * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
+ * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
+/* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout, uint32_t val2) */
+INTERN_FUNCTION(libc_sys_lfutex)
+	movl   $(0xffffff10), %eax
+	jmp    libc_x86_exec_syscall5
+END(libc_sys_lfutex)
+DEFINE_PUBLIC_ALIAS(sys_lfutex, libc_sys_lfutex)
+
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
 /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
 INTERN_FUNCTION(libc_sys_kreaddirf)
-	movl   $(0xffffff24), %eax
+	movl   $(0xffffff23), %eax
 	jmp    libc_x86_exec_syscall5
 END(libc_sys_kreaddirf)
 DEFINE_PUBLIC_ALIAS(sys_kreaddirf, libc_sys_kreaddirf)
+
+/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
+ *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
+/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
+INTERN_FUNCTION(libc_sys_kreaddir)
+	movl   $(0xffffff24), %eax
+	jmp    libc_x86_exec_syscall4
+END(libc_sys_kreaddir)
+DEFINE_PUBLIC_ALIAS(sys_kreaddir, libc_sys_kreaddir)
 
 /* errno_t kfstat(fd_t fd, struct __kos_stat *statbuf) */
 INTERN_FUNCTION(libc_sys_kfstat)
@@ -4037,6 +4138,28 @@ INTERN_FUNCTION(libc_sys_nanosleep64)
 END(libc_sys_nanosleep64)
 DEFINE_PUBLIC_ALIAS(sys_nanosleep64, libc_sys_nanosleep64)
 
+/* >> rpc_serve_sysret(2)
+ * Very similar to `rpc_serve(2)', but with the addition that this one
+ * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
+ * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
+ * ignores the state of the  internal `TASK_FRPC' flag, and should  be
+ * invoked  when  the calling  thread  makes use  of  the userprocmask
+ * mechanism, and the  signal mask became  less restrictive while  the
+ * `USERPROCMASK_FLAG_HASPENDING' flag was set.
+ * 
+ * When userprocmask is disabled, this system call is pretty much just
+ * a no-op (semnatically speaking, it does nothing). But when enabled,
+ * it is really only usable  in conjuction with the userprocmask.  The
+ * exact usage can be seen in `chkuserprocmask(3)'.
+ * 
+ * @return: 0 : Always, unconditionally returned. */
+/* errno_t rpc_serve_sysret(void) */
+INTERN_FUNCTION(libc_sys_rpc_serve_sysret)
+	movl   $(0xffffff61), %eax
+	jmp    libc___i386_syscall
+END(libc_sys_rpc_serve_sysret)
+DEFINE_PUBLIC_ALIAS(sys_rpc_serve_sysret, libc_sys_rpc_serve_sysret)
+
 /* >> rpc_serve(2)
  * Check for pending signals and RPCs. This is a wrapper around the
  * kernel `task_serve()' function, which is always invoked before a
@@ -4093,14 +4216,12 @@ INTERN_FUNCTION(libc_sys_readvf)
 END(libc_sys_readvf)
 DEFINE_PUBLIC_ALIAS(sys_readvf, libc_sys_readvf)
 
-/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
- *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
-/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
-INTERN_FUNCTION(libc_sys_kreaddir)
-	movl   $(0xffffff73), %eax
-	jmp    libc_x86_exec_syscall4
-END(libc_sys_kreaddir)
-DEFINE_PUBLIC_ALIAS(sys_kreaddir, libc_sys_kreaddir)
+/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32_64 *timeout) */
+INTERN_FUNCTION(libc_sys_select64)
+	movl   $(0xffffff72), %eax
+	jmp    libc_x86_exec_syscall5
+END(libc_sys_select64)
+DEFINE_PUBLIC_ALIAS(sys_select64, libc_sys_select64)
 
 /* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
@@ -4143,13 +4264,6 @@ INTERN_FUNCTION(libc_sys_maplibrary)
 	jmp    libc_x86_exec_syscall5
 END(libc_sys_maplibrary)
 DEFINE_PUBLIC_ALIAS(sys_maplibrary, libc_sys_maplibrary)
-
-/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32_64 *timeout) */
-INTERN_FUNCTION(libc_sys_select64)
-	movl   $(0xffffffae), %eax
-	jmp    libc_x86_exec_syscall5
-END(libc_sys_select64)
-DEFINE_PUBLIC_ALIAS(sys_select64, libc_sys_select64)
 
 /* errno_t settimeofday64(struct timevalx32_64 const *tv, struct timezone const *tz) */
 INTERN_FUNCTION(libc_sys_settimeofday64)
@@ -4253,62 +4367,6 @@ INTERN_FUNCTION(libc_sys_ftime64)
 END(libc_sys_ftime64)
 DEFINE_PUBLIC_ALIAS(sys_ftime64, libc_sys_ftime64)
 
-/* >> rpc_serve_sysret(2)
- * Very similar to `rpc_serve(2)', but with the addition that this one
- * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
- * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
- * ignores the state of the  internal `TASK_FRPC' flag, and should  be
- * invoked  when  the calling  thread  makes use  of  the userprocmask
- * mechanism, and the  signal mask became  less restrictive while  the
- * `USERPROCMASK_FLAG_HASPENDING' flag was set.
- * 
- * When userprocmask is disabled, this system call is pretty much just
- * a no-op (semnatically speaking, it does nothing). But when enabled,
- * it is really only usable  in conjuction with the userprocmask.  The
- * exact usage can be seen in `chkuserprocmask(3)'.
- * 
- * @return: 0 : Always, unconditionally returned. */
-/* errno_t rpc_serve_sysret(void) */
-INTERN_FUNCTION(libc_sys_rpc_serve_sysret)
-	movl   $(0xffffffdf), %eax
-	jmp    libc___i386_syscall
-END(libc_sys_rpc_serve_sysret)
-DEFINE_PUBLIC_ALIAS(sys_rpc_serve_sysret, libc_sys_rpc_serve_sysret)
-
-/* Register the address of  the calling thread's userprocmask  controller.
- * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
- * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
- * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
- * is filled in with the equivalent of `sigpending(2)'
- * Additionally,  the address  of `&ctl->pm_mytid'  is stored  as an override
- * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
- * and write to `ctl->pm_pending' (using  atomic-or for the later) from  this
- * point forth.
- * NOTE: Before calling this function, the caller must:
- *       >> bzero(ctl, sizeof(struct userprocmask));
- *       >> ctl->pm_sigsize = sizeof(sigset_t);
- *       >> ctl->pm_sigmask = &initial_sigmask;
- *       Where the initial bzero() is needed to initialize potential
- *       additional,   arch-specific   fields    to   all    zeroes.
- * NOTE: This system call will then initialize:
- *       >> ctl->pm_mytid = gettid();
- *       >> sigprocmask(0, NULL, ctl->pm_sigmask);
- *       >> sigpending(&ctl->pm_pending);
- * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
- *       before this is done, the kernel will copy the  `pm_sigmask'
- *       of the previously set  controller into its internal  signal
- *       mask. (i.e. the one used outside of userprocmask-mode)
- * Note though  that  `pm_sigmask'  is ignored  for  `SIGKILL'  and  `SIGSTOP'
- * Note also  that  this  function replaces  `set_tid_address(2)',  such  that
- * it negates a  prior call  to said  function, while  a future  call to  said
- * function will once again disable userprocmask, same as passing `NULL' would */
-/* errno_t set_userprocmask_address(struct userprocmask *ctl) */
-INTERN_FUNCTION(libc_sys_set_userprocmask_address)
-	movl   $(0xffffffe0), %eax
-	jmp    libc_x86_exec_syscall1
-END(libc_sys_set_userprocmask_address)
-DEFINE_PUBLIC_ALIAS(sys_set_userprocmask_address, libc_sys_set_userprocmask_address)
-
 /* @param: times: When NULL, set the current time */
 /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 INTERN_FUNCTION(libc_sys_utime64)
@@ -4316,6 +4374,13 @@ INTERN_FUNCTION(libc_sys_utime64)
 	jmp    libc_x86_exec_syscall2
 END(libc_sys_utime64)
 DEFINE_PUBLIC_ALIAS(sys_utime64, libc_sys_utime64)
+
+/* errno_t stime64(time64_t const *t) */
+INTERN_FUNCTION(libc_sys_stime64)
+	movl   $(0xffffffe7), %eax
+	jmp    libc_x86_exec_syscall1
+END(libc_sys_stime64)
+DEFINE_PUBLIC_ALIAS(sys_stime64, libc_sys_stime64)
 
 /* Construct   a   user-vio-fd  object   supporting  mmap(2),   with  actual
  * memory  accesses  being dispatched  by  adding them  as  pending requests
@@ -4332,17 +4397,17 @@ DEFINE_PUBLIC_ALIAS(sys_utime64, libc_sys_utime64)
  * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK | O_NONBLOCK' */
 /* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_userviofd)
-	movl   $(0xffffffe5), %eax
+	movl   $(0xffffffec), %eax
 	jmp    libc_x86_exec_syscall2
 END(libc_sys_userviofd)
 DEFINE_PUBLIC_ALIAS(sys_userviofd, libc_sys_userviofd)
 
-/* errno_t stime64(time64_t const *t) */
-INTERN_FUNCTION(libc_sys_stime64)
-	movl   $(0xffffffe7), %eax
-	jmp    libc_x86_exec_syscall1
-END(libc_sys_stime64)
-DEFINE_PUBLIC_ALIAS(sys_stime64, libc_sys_stime64)
+/* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
+INTERN_FUNCTION(libc_sys_lseek64)
+	movl   $(0xffffffed), %eax
+	jmp    libc_x86_exec_syscall4
+END(libc_sys_lseek64)
+DEFINE_PUBLIC_ALIAS(sys_lseek64, libc_sys_lseek64)
 
 /* Trigger a coredump of the calling process.
  * @param: curr_state:       The  state as is still valid after any possible unwinding has already been done
@@ -4371,86 +4436,10 @@ DEFINE_PUBLIC_ALIAS(sys_stime64, libc_sys_stime64)
  *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
 /* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void const) const *traceback_vector, size_t traceback_length, union coredump_info32 const *reason, syscall_ulong_t unwind_error) */
 INTERN_FUNCTION(libc_sys_coredump)
-	movl   $(0xffffffe8), %eax
+	movl   $(0xffffffee), %eax
 	jmp    libc_x86_exec_syscall6
 END(libc_sys_coredump)
 DEFINE_PUBLIC_ALIAS(sys_coredump, libc_sys_coredump)
-
-/* Create and return a new tty terminal controller connected to the given keyboard and display
- * The  newly created  device automatically gets  assigned an arbitrary  device number, before
- * being made available under a file `/dev/${name}'  (or rather: as ${name} within the  devfs)
- * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
-/* fd_t mktty(char const *name, fd_t keyboard, fd_t display, syscall_ulong_t rsvd) */
-INTERN_FUNCTION(libc_sys_mktty)
-	movl   $(0xffffffea), %eax
-	jmp    libc_x86_exec_syscall4
-END(libc_sys_mktty)
-DEFINE_PUBLIC_ALIAS(sys_mktty, libc_sys_mktty)
-
-/* >> lfutexexpr(2)
- * The lfutexexpr(2) system call can be used to specify arbitrarily complex
- * expressions that must atomically (in relation to other futex operations)
- * hold true before the scheduler will suspend the calling thread.
- * @param: futexaddr: The futex on which to wait
- * @param: base:      Base pointer added to the `fe_offset' fields of given expressions
- * @param: expr:      Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
- * @param: timeout:   Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- *                    When `LFUTEX_FDBIT'  is  set,  this argument  must  be  `NULL'.
- * @param: flags:     Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*' or `LFUTEX_FDBIT'
- * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
- *              to see their  possible return  values, which are  always `0'  when they  would
- *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- *              When `LFUTEX_FDBIT' is set, the return value is an `fd_t' for a futex fd that
- *              can be used to poll for the specified `exprv'. Note that in this case `exprv'
- *              is limited to `LFUTEXFD_DEFAULT_MAXEXPR' (`/proc/kos/futexfd-maxexpr')
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexexpr(uint32_t *futexaddr, void *base, struct lfutexexprx32 const *expr, struct timespecx32_64 const *timeout, syscall_ulong_t flags) */
-INTERN_FUNCTION(libc_sys_lfutexexpr)
-	movl   $(0xffffffeb), %eax
-	jmp    libc_x86_exec_syscall5
-END(libc_sys_lfutexexpr)
-DEFINE_PUBLIC_ALIAS(sys_lfutexexpr, libc_sys_lfutexexpr)
-
-/* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
-INTERN_FUNCTION(libc_sys_lseek64)
-	movl   $(0xffffffed), %eax
-	jmp    libc_x86_exec_syscall4
-END(libc_sys_lseek64)
-DEFINE_PUBLIC_ALIAS(sys_lseek64, libc_sys_lseek64)
-
-/* >> lfutex(2)
- * Provide the bottom-most API for implementing user-space synchronization on KOS
- * @param: futex_op: One of:
- *    - LFUTEX_WAKE:                (lfutex_t *uaddr, LFUTEX_WAKE, size_t count)
- *    - LFUTEX_WAKEMASK:            (lfutex_t *uaddr, LFUTEX_WAKEMASK, size_t count, lfutex_t mask_and, lfutex_t mask_or)
- *    - LFUTEX_WAIT_WHILE:          (lfutex_t *uaddr, LFUTEX_WAIT_WHILE, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:          (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_WHILE_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- *    - LFUTEX_WAIT_UNTIL_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- *    - LFUTEX_WAIT_WHILE_ABOVE_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- *    - LFUTEX_WAIT_WHILE_BELOW_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `futex_op'
- * @return: -1:EFAULT:    A faulty pointer was given
- * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
- * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
- * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
-/* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout, uint32_t val2) */
-INTERN_FUNCTION(libc_sys_lfutex)
-	movl   $(0xffffffee), %eax
-	jmp    libc_x86_exec_syscall5
-END(libc_sys_lfutex)
-DEFINE_PUBLIC_ALIAS(sys_lfutex, libc_sys_lfutex)
 
 /* Trigger a debugger trap `trapno', optionally extended with  `regs'
  * at either the system call return location, or at the given `state'
@@ -4484,7 +4473,7 @@ DEFINE_PUBLIC_ALIAS(sys_debugtrap, libc_sys_debugtrap)
  * @return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty */
 /* errno_t get_exception_handler(__ULONG32_TYPE__ *pmode, __except_handler32_t *phandler, __HYBRID_PTR32(void) *phandler_sp) */
 INTERN_FUNCTION(libc_sys_get_exception_handler)
-	movl   $(0xfffffff1), %eax
+	movl   $(0xfffffff0), %eax
 	jmp    libc_x86_exec_syscall3
 END(libc_sys_get_exception_handler)
 DEFINE_PUBLIC_ALIAS(sys_get_exception_handler, libc_sys_get_exception_handler)
@@ -4502,10 +4491,21 @@ DEFINE_PUBLIC_ALIAS(sys_get_exception_handler, libc_sys_get_exception_handler)
  * @return: -1:EINVAL: The given `mode' is invalid */
 /* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
 INTERN_FUNCTION(libc_sys_set_exception_handler)
-	movl   $(0xfffffff2), %eax
+	movl   $(0xfffffff1), %eax
 	jmp    libc_x86_exec_syscall3
 END(libc_sys_set_exception_handler)
 DEFINE_PUBLIC_ALIAS(sys_set_exception_handler, libc_sys_set_exception_handler)
+
+/* Create and return a new tty terminal controller connected to the given keyboard and display
+ * The  newly created  device automatically gets  assigned an arbitrary  device number, before
+ * being made available under a file `/dev/${name}'  (or rather: as ${name} within the  devfs)
+ * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
+/* fd_t mktty(char const *name, fd_t keyboard, fd_t display, syscall_ulong_t rsvd) */
+INTERN_FUNCTION(libc_sys_mktty)
+	movl   $(0xfffffff2), %eax
+	jmp    libc_x86_exec_syscall4
+END(libc_sys_mktty)
+DEFINE_PUBLIC_ALIAS(sys_mktty, libc_sys_mktty)
 
 /* int64_t time64(int64_t *timer) */
 INTERN_FUNCTION(libc_sys_time64)
@@ -4588,24 +4588,6 @@ INTERN_FUNCTION(libc_sys_frealpathat)
 END(libc_sys_frealpathat)
 DEFINE_PUBLIC_ALIAS(sys_frealpathat, libc_sys_frealpathat)
 
-/* You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the   required   buffer   size,   rather   than   the   used    size.
- * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpath4(fd_t fd, char *resolved, size_t buflen, atflag_t flags) */
-INTERN_FUNCTION(libc_sys_frealpath4)
-	movl   $(0xfffffff9), %eax
-	jmp    libc_x86_exec_syscall4
-END(libc_sys_frealpath4)
-DEFINE_PUBLIC_ALIAS(sys_frealpath4, libc_sys_frealpath4)
-
-/* Returns a bitset of all of the currently mounted dos-drives */
-/* syscall_slong_t getdrives(void) */
-INTERN_FUNCTION(libc_sys_getdrives)
-	movl   $(0xfffffffa), %eax
-	jmp    libc___i386_syscall
-END(libc_sys_getdrives)
-DEFINE_PUBLIC_ALIAS(sys_getdrives, libc_sys_getdrives)
-
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
  * would have received a signal when it changes state,
@@ -4657,10 +4639,28 @@ DEFINE_PUBLIC_ALIAS(sys_getdrives, libc_sys_getdrives)
  *                           a thread in your process, or a child process of your process. */
 /* errno_t detach(pid_t pid) */
 INTERN_FUNCTION(libc_sys_detach)
-	movl   $(0xfffffffb), %eax
+	movl   $(0xfffffff9), %eax
 	jmp    libc_x86_exec_syscall1
 END(libc_sys_detach)
 DEFINE_PUBLIC_ALIAS(sys_detach, libc_sys_detach)
+
+/* You may pass `AT_READLINK_REQSIZE' to always have the function return
+ * the   required   buffer   size,   rather   than   the   used    size.
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t frealpath4(fd_t fd, char *resolved, size_t buflen, atflag_t flags) */
+INTERN_FUNCTION(libc_sys_frealpath4)
+	movl   $(0xfffffffa), %eax
+	jmp    libc_x86_exec_syscall4
+END(libc_sys_frealpath4)
+DEFINE_PUBLIC_ALIAS(sys_frealpath4, libc_sys_frealpath4)
+
+/* Returns a bitset of all of the currently mounted dos-drives */
+/* syscall_slong_t getdrives(void) */
+INTERN_FUNCTION(libc_sys_getdrives)
+	movl   $(0xfffffffb), %eax
+	jmp    libc___i386_syscall
+END(libc_sys_getdrives)
+DEFINE_PUBLIC_ALIAS(sys_getdrives, libc_sys_getdrives)
 
 /* Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
@@ -8439,14 +8439,115 @@ INTERN_FUNCTION(libc_sys_Xutimes64)
 END(libc_sys_Xutimes64)
 DEFINE_PUBLIC_ALIAS(sys_Xutimes64, libc_sys_Xutimes64)
 
+/* Register the address of  the calling thread's userprocmask  controller.
+ * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
+ * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
+ * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
+ * is filled in with the equivalent of `sigpending(2)'
+ * Additionally,  the address  of `&ctl->pm_mytid'  is stored  as an override
+ * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
+ * and write to `ctl->pm_pending' (using  atomic-or for the later) from  this
+ * point forth.
+ * NOTE: Before calling this function, the caller must:
+ *       >> bzero(ctl, sizeof(struct userprocmask));
+ *       >> ctl->pm_sigsize = sizeof(sigset_t);
+ *       >> ctl->pm_sigmask = &initial_sigmask;
+ *       Where the initial bzero() is needed to initialize potential
+ *       additional,   arch-specific   fields    to   all    zeroes.
+ * NOTE: This system call will then initialize:
+ *       >> ctl->pm_mytid = gettid();
+ *       >> sigprocmask(0, NULL, ctl->pm_sigmask);
+ *       >> sigpending(&ctl->pm_pending);
+ * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
+ *       before this is done, the kernel will copy the  `pm_sigmask'
+ *       of the previously set  controller into its internal  signal
+ *       mask. (i.e. the one used outside of userprocmask-mode)
+ * Note though  that  `pm_sigmask'  is ignored  for  `SIGKILL'  and  `SIGSTOP'
+ * Note also  that  this  function replaces  `set_tid_address(2)',  such  that
+ * it negates a  prior call  to said  function, while  a future  call to  said
+ * function will once again disable userprocmask, same as passing `NULL' would */
+/* errno_t set_userprocmask_address(struct userprocmask *ctl) */
+INTERN_FUNCTION(libc_sys_Xset_userprocmask_address)
+	movl   $(0xfffffefe), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xset_userprocmask_address)
+DEFINE_PUBLIC_ALIAS(sys_Xset_userprocmask_address, libc_sys_Xset_userprocmask_address)
+
+/* >> lfutexexpr(2)
+ * The lfutexexpr(2) system call can be used to specify arbitrarily complex
+ * expressions that must atomically (in relation to other futex operations)
+ * hold true before the scheduler will suspend the calling thread.
+ * @param: futexaddr: The futex on which to wait
+ * @param: base:      Base pointer added to the `fe_offset' fields of given expressions
+ * @param: expr:      Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
+ * @param: timeout:   Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ *                    When `LFUTEX_FDBIT'  is  set,  this argument  must  be  `NULL'.
+ * @param: flags:     Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*' or `LFUTEX_FDBIT'
+ * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
+ *              to see their  possible return  values, which are  always `0'  when they  would
+ *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ *              When `LFUTEX_FDBIT' is set, the return value is an `fd_t' for a futex fd that
+ *              can be used to poll for the specified `exprv'. Note that in this case `exprv'
+ *              is limited to `LFUTEXFD_DEFAULT_MAXEXPR' (`/proc/kos/futexfd-maxexpr')
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+/* errno_t lfutexexpr(uint32_t *futexaddr, void *base, struct lfutexexprx32 const *expr, struct timespecx32_64 const *timeout, syscall_ulong_t flags) */
+INTERN_FUNCTION(libc_sys_Xlfutexexpr)
+	movl   $(0xffffff0f), %eax
+	jmp    libc_x86_exec_Xsyscall5
+END(libc_sys_Xlfutexexpr)
+DEFINE_PUBLIC_ALIAS(sys_Xlfutexexpr, libc_sys_Xlfutexexpr)
+
+/* >> lfutex(2)
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
+ *    - LFUTEX_WAKE:                (lfutex_t *uaddr, LFUTEX_WAKE, size_t count)
+ *    - LFUTEX_WAKEMASK:            (lfutex_t *uaddr, LFUTEX_WAKEMASK, size_t count, lfutex_t mask_and, lfutex_t mask_or)
+ *    - LFUTEX_WAIT_WHILE:          (lfutex_t *uaddr, LFUTEX_WAIT_WHILE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:          (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_WHILE_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ *    - LFUTEX_WAIT_UNTIL_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ *    - LFUTEX_WAIT_WHILE_ABOVE_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ *    - LFUTEX_WAIT_WHILE_BELOW_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @return: * : Depending on `futex_op'
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
+ * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
+ * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
+/* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout, uint32_t val2) */
+INTERN_FUNCTION(libc_sys_Xlfutex)
+	movl   $(0xffffff10), %eax
+	jmp    libc_x86_exec_Xsyscall5
+END(libc_sys_Xlfutex)
+DEFINE_PUBLIC_ALIAS(sys_Xlfutex, libc_sys_Xlfutex)
+
 /* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
  *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
 /* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
 INTERN_FUNCTION(libc_sys_Xkreaddirf)
-	movl   $(0xffffff24), %eax
+	movl   $(0xffffff23), %eax
 	jmp    libc_x86_exec_Xsyscall5
 END(libc_sys_Xkreaddirf)
 DEFINE_PUBLIC_ALIAS(sys_Xkreaddirf, libc_sys_Xkreaddirf)
+
+/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
+ *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
+/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
+INTERN_FUNCTION(libc_sys_Xkreaddir)
+	movl   $(0xffffff24), %eax
+	jmp    libc_x86_exec_Xsyscall4
+END(libc_sys_Xkreaddir)
+DEFINE_PUBLIC_ALIAS(sys_Xkreaddir, libc_sys_Xkreaddir)
 
 /* errno_t kfstat(fd_t fd, struct __kos_stat *statbuf) */
 INTERN_FUNCTION(libc_sys_Xkfstat)
@@ -8489,6 +8590,28 @@ INTERN_FUNCTION(libc_sys_Xnanosleep64)
 	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xnanosleep64)
 DEFINE_PUBLIC_ALIAS(sys_Xnanosleep64, libc_sys_Xnanosleep64)
+
+/* >> rpc_serve_sysret(2)
+ * Very similar to `rpc_serve(2)', but with the addition that this one
+ * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
+ * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
+ * ignores the state of the  internal `TASK_FRPC' flag, and should  be
+ * invoked  when  the calling  thread  makes use  of  the userprocmask
+ * mechanism, and the  signal mask became  less restrictive while  the
+ * `USERPROCMASK_FLAG_HASPENDING' flag was set.
+ * 
+ * When userprocmask is disabled, this system call is pretty much just
+ * a no-op (semnatically speaking, it does nothing). But when enabled,
+ * it is really only usable  in conjuction with the userprocmask.  The
+ * exact usage can be seen in `chkuserprocmask(3)'.
+ * 
+ * @return: 0 : Always, unconditionally returned. */
+/* errno_t rpc_serve_sysret(void) */
+INTERN_FUNCTION(libc_sys_Xrpc_serve_sysret)
+	movl   $(0xffffff61), %eax
+	jmp    libc___i386_Xsyscall
+END(libc_sys_Xrpc_serve_sysret)
+DEFINE_PUBLIC_ALIAS(sys_Xrpc_serve_sysret, libc_sys_Xrpc_serve_sysret)
 
 /* >> rpc_serve(2)
  * Check for pending signals and RPCs. This is a wrapper around the
@@ -8546,14 +8669,12 @@ INTERN_FUNCTION(libc_sys_Xreadvf)
 END(libc_sys_Xreadvf)
 DEFINE_PUBLIC_ALIAS(sys_Xreadvf, libc_sys_Xreadvf)
 
-/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
- *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
-/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
-INTERN_FUNCTION(libc_sys_Xkreaddir)
-	movl   $(0xffffff73), %eax
-	jmp    libc_x86_exec_Xsyscall4
-END(libc_sys_Xkreaddir)
-DEFINE_PUBLIC_ALIAS(sys_Xkreaddir, libc_sys_Xkreaddir)
+/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32_64 *timeout) */
+INTERN_FUNCTION(libc_sys_Xselect64)
+	movl   $(0xffffff72), %eax
+	jmp    libc_x86_exec_Xsyscall5
+END(libc_sys_Xselect64)
+DEFINE_PUBLIC_ALIAS(sys_Xselect64, libc_sys_Xselect64)
 
 /* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
@@ -8596,13 +8717,6 @@ INTERN_FUNCTION(libc_sys_Xmaplibrary)
 	jmp    libc_x86_exec_Xsyscall5
 END(libc_sys_Xmaplibrary)
 DEFINE_PUBLIC_ALIAS(sys_Xmaplibrary, libc_sys_Xmaplibrary)
-
-/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timevalx32_64 *timeout) */
-INTERN_FUNCTION(libc_sys_Xselect64)
-	movl   $(0xffffffae), %eax
-	jmp    libc_x86_exec_Xsyscall5
-END(libc_sys_Xselect64)
-DEFINE_PUBLIC_ALIAS(sys_Xselect64, libc_sys_Xselect64)
 
 /* errno_t settimeofday64(struct timevalx32_64 const *tv, struct timezone const *tz) */
 INTERN_FUNCTION(libc_sys_Xsettimeofday64)
@@ -8706,62 +8820,6 @@ INTERN_FUNCTION(libc_sys_Xftime64)
 END(libc_sys_Xftime64)
 DEFINE_PUBLIC_ALIAS(sys_Xftime64, libc_sys_Xftime64)
 
-/* >> rpc_serve_sysret(2)
- * Very similar to `rpc_serve(2)', but with the addition that this one
- * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
- * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
- * ignores the state of the  internal `TASK_FRPC' flag, and should  be
- * invoked  when  the calling  thread  makes use  of  the userprocmask
- * mechanism, and the  signal mask became  less restrictive while  the
- * `USERPROCMASK_FLAG_HASPENDING' flag was set.
- * 
- * When userprocmask is disabled, this system call is pretty much just
- * a no-op (semnatically speaking, it does nothing). But when enabled,
- * it is really only usable  in conjuction with the userprocmask.  The
- * exact usage can be seen in `chkuserprocmask(3)'.
- * 
- * @return: 0 : Always, unconditionally returned. */
-/* errno_t rpc_serve_sysret(void) */
-INTERN_FUNCTION(libc_sys_Xrpc_serve_sysret)
-	movl   $(0xffffffdf), %eax
-	jmp    libc___i386_Xsyscall
-END(libc_sys_Xrpc_serve_sysret)
-DEFINE_PUBLIC_ALIAS(sys_Xrpc_serve_sysret, libc_sys_Xrpc_serve_sysret)
-
-/* Register the address of  the calling thread's userprocmask  controller.
- * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
- * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
- * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
- * is filled in with the equivalent of `sigpending(2)'
- * Additionally,  the address  of `&ctl->pm_mytid'  is stored  as an override
- * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
- * and write to `ctl->pm_pending' (using  atomic-or for the later) from  this
- * point forth.
- * NOTE: Before calling this function, the caller must:
- *       >> bzero(ctl, sizeof(struct userprocmask));
- *       >> ctl->pm_sigsize = sizeof(sigset_t);
- *       >> ctl->pm_sigmask = &initial_sigmask;
- *       Where the initial bzero() is needed to initialize potential
- *       additional,   arch-specific   fields    to   all    zeroes.
- * NOTE: This system call will then initialize:
- *       >> ctl->pm_mytid = gettid();
- *       >> sigprocmask(0, NULL, ctl->pm_sigmask);
- *       >> sigpending(&ctl->pm_pending);
- * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
- *       before this is done, the kernel will copy the  `pm_sigmask'
- *       of the previously set  controller into its internal  signal
- *       mask. (i.e. the one used outside of userprocmask-mode)
- * Note though  that  `pm_sigmask'  is ignored  for  `SIGKILL'  and  `SIGSTOP'
- * Note also  that  this  function replaces  `set_tid_address(2)',  such  that
- * it negates a  prior call  to said  function, while  a future  call to  said
- * function will once again disable userprocmask, same as passing `NULL' would */
-/* errno_t set_userprocmask_address(struct userprocmask *ctl) */
-INTERN_FUNCTION(libc_sys_Xset_userprocmask_address)
-	movl   $(0xffffffe0), %eax
-	jmp    libc_x86_exec_Xsyscall1
-END(libc_sys_Xset_userprocmask_address)
-DEFINE_PUBLIC_ALIAS(sys_Xset_userprocmask_address, libc_sys_Xset_userprocmask_address)
-
 /* @param: times: When NULL, set the current time */
 /* errno_t utime64(char const *filename, struct utimbufx32_64 const *times) */
 INTERN_FUNCTION(libc_sys_Xutime64)
@@ -8769,6 +8827,13 @@ INTERN_FUNCTION(libc_sys_Xutime64)
 	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xutime64)
 DEFINE_PUBLIC_ALIAS(sys_Xutime64, libc_sys_Xutime64)
+
+/* errno_t stime64(time64_t const *t) */
+INTERN_FUNCTION(libc_sys_Xstime64)
+	movl   $(0xffffffe7), %eax
+	jmp    libc_x86_exec_Xsyscall1
+END(libc_sys_Xstime64)
+DEFINE_PUBLIC_ALIAS(sys_Xstime64, libc_sys_Xstime64)
 
 /* Construct   a   user-vio-fd  object   supporting  mmap(2),   with  actual
  * memory  accesses  being dispatched  by  adding them  as  pending requests
@@ -8785,17 +8850,17 @@ DEFINE_PUBLIC_ALIAS(sys_Xutime64, libc_sys_Xutime64)
  * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK | O_NONBLOCK' */
 /* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_Xuserviofd)
-	movl   $(0xffffffe5), %eax
+	movl   $(0xffffffec), %eax
 	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xuserviofd)
 DEFINE_PUBLIC_ALIAS(sys_Xuserviofd, libc_sys_Xuserviofd)
 
-/* errno_t stime64(time64_t const *t) */
-INTERN_FUNCTION(libc_sys_Xstime64)
-	movl   $(0xffffffe7), %eax
-	jmp    libc_x86_exec_Xsyscall1
-END(libc_sys_Xstime64)
-DEFINE_PUBLIC_ALIAS(sys_Xstime64, libc_sys_Xstime64)
+/* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
+INTERN_FUNCTION(libc_sys_Xlseek64)
+	movl   $(0xffffffed), %eax
+	jmp    libc_x86_exec_Xsyscall4
+END(libc_sys_Xlseek64)
+DEFINE_PUBLIC_ALIAS(sys_Xlseek64, libc_sys_Xlseek64)
 
 /* Trigger a coredump of the calling process.
  * @param: curr_state:       The  state as is still valid after any possible unwinding has already been done
@@ -8824,86 +8889,10 @@ DEFINE_PUBLIC_ALIAS(sys_Xstime64, libc_sys_Xstime64)
  *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
 /* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void const) const *traceback_vector, size_t traceback_length, union coredump_info32 const *reason, syscall_ulong_t unwind_error) */
 INTERN_FUNCTION(libc_sys_Xcoredump)
-	movl   $(0xffffffe8), %eax
+	movl   $(0xffffffee), %eax
 	jmp    libc_x86_exec_Xsyscall6
 END(libc_sys_Xcoredump)
 DEFINE_PUBLIC_ALIAS(sys_Xcoredump, libc_sys_Xcoredump)
-
-/* Create and return a new tty terminal controller connected to the given keyboard and display
- * The  newly created  device automatically gets  assigned an arbitrary  device number, before
- * being made available under a file `/dev/${name}'  (or rather: as ${name} within the  devfs)
- * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
-/* fd_t mktty(char const *name, fd_t keyboard, fd_t display, syscall_ulong_t rsvd) */
-INTERN_FUNCTION(libc_sys_Xmktty)
-	movl   $(0xffffffea), %eax
-	jmp    libc_x86_exec_Xsyscall4
-END(libc_sys_Xmktty)
-DEFINE_PUBLIC_ALIAS(sys_Xmktty, libc_sys_Xmktty)
-
-/* >> lfutexexpr(2)
- * The lfutexexpr(2) system call can be used to specify arbitrarily complex
- * expressions that must atomically (in relation to other futex operations)
- * hold true before the scheduler will suspend the calling thread.
- * @param: futexaddr: The futex on which to wait
- * @param: base:      Base pointer added to the `fe_offset' fields of given expressions
- * @param: expr:      Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
- * @param: timeout:   Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- *                    When `LFUTEX_FDBIT'  is  set,  this argument  must  be  `NULL'.
- * @param: flags:     Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*' or `LFUTEX_FDBIT'
- * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
- *              to see their  possible return  values, which are  always `0'  when they  would
- *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- *              When `LFUTEX_FDBIT' is set, the return value is an `fd_t' for a futex fd that
- *              can be used to poll for the specified `exprv'. Note that in this case `exprv'
- *              is limited to `LFUTEXFD_DEFAULT_MAXEXPR' (`/proc/kos/futexfd-maxexpr')
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexexpr(uint32_t *futexaddr, void *base, struct lfutexexprx32 const *expr, struct timespecx32_64 const *timeout, syscall_ulong_t flags) */
-INTERN_FUNCTION(libc_sys_Xlfutexexpr)
-	movl   $(0xffffffeb), %eax
-	jmp    libc_x86_exec_Xsyscall5
-END(libc_sys_Xlfutexexpr)
-DEFINE_PUBLIC_ALIAS(sys_Xlfutexexpr, libc_sys_Xlfutexexpr)
-
-/* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
-INTERN_FUNCTION(libc_sys_Xlseek64)
-	movl   $(0xffffffed), %eax
-	jmp    libc_x86_exec_Xsyscall4
-END(libc_sys_Xlseek64)
-DEFINE_PUBLIC_ALIAS(sys_Xlseek64, libc_sys_Xlseek64)
-
-/* >> lfutex(2)
- * Provide the bottom-most API for implementing user-space synchronization on KOS
- * @param: futex_op: One of:
- *    - LFUTEX_WAKE:                (lfutex_t *uaddr, LFUTEX_WAKE, size_t count)
- *    - LFUTEX_WAKEMASK:            (lfutex_t *uaddr, LFUTEX_WAKEMASK, size_t count, lfutex_t mask_and, lfutex_t mask_or)
- *    - LFUTEX_WAIT_WHILE:          (lfutex_t *uaddr, LFUTEX_WAIT_WHILE, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:          (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_WHILE_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- *    - LFUTEX_WAIT_UNTIL_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- *    - LFUTEX_WAIT_WHILE_ABOVE_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- *    - LFUTEX_WAIT_WHILE_BELOW_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `futex_op'
- * @return: -1:EFAULT:    A faulty pointer was given
- * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
- * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
- * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
-/* syscall_slong_t lfutex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct timespecx32_64 const *timeout, uint32_t val2) */
-INTERN_FUNCTION(libc_sys_Xlfutex)
-	movl   $(0xffffffee), %eax
-	jmp    libc_x86_exec_Xsyscall5
-END(libc_sys_Xlfutex)
-DEFINE_PUBLIC_ALIAS(sys_Xlfutex, libc_sys_Xlfutex)
 
 /* Trigger a debugger trap `trapno', optionally extended with  `regs'
  * at either the system call return location, or at the given `state'
@@ -8937,7 +8926,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xdebugtrap, libc_sys_Xdebugtrap)
  * @return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty */
 /* errno_t get_exception_handler(__ULONG32_TYPE__ *pmode, __except_handler32_t *phandler, __HYBRID_PTR32(void) *phandler_sp) */
 INTERN_FUNCTION(libc_sys_Xget_exception_handler)
-	movl   $(0xfffffff1), %eax
+	movl   $(0xfffffff0), %eax
 	jmp    libc_x86_exec_Xsyscall3
 END(libc_sys_Xget_exception_handler)
 DEFINE_PUBLIC_ALIAS(sys_Xget_exception_handler, libc_sys_Xget_exception_handler)
@@ -8955,10 +8944,21 @@ DEFINE_PUBLIC_ALIAS(sys_Xget_exception_handler, libc_sys_Xget_exception_handler)
  * @return: -1:EINVAL: The given `mode' is invalid */
 /* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
 INTERN_FUNCTION(libc_sys_Xset_exception_handler)
-	movl   $(0xfffffff2), %eax
+	movl   $(0xfffffff1), %eax
 	jmp    libc_x86_exec_Xsyscall3
 END(libc_sys_Xset_exception_handler)
 DEFINE_PUBLIC_ALIAS(sys_Xset_exception_handler, libc_sys_Xset_exception_handler)
+
+/* Create and return a new tty terminal controller connected to the given keyboard and display
+ * The  newly created  device automatically gets  assigned an arbitrary  device number, before
+ * being made available under a file `/dev/${name}'  (or rather: as ${name} within the  devfs)
+ * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
+/* fd_t mktty(char const *name, fd_t keyboard, fd_t display, syscall_ulong_t rsvd) */
+INTERN_FUNCTION(libc_sys_Xmktty)
+	movl   $(0xfffffff2), %eax
+	jmp    libc_x86_exec_Xsyscall4
+END(libc_sys_Xmktty)
+DEFINE_PUBLIC_ALIAS(sys_Xmktty, libc_sys_Xmktty)
 
 /* int64_t time64(int64_t *timer) */
 INTERN_FUNCTION(libc_sys_Xtime64)
@@ -9041,24 +9041,6 @@ INTERN_FUNCTION(libc_sys_Xfrealpathat)
 END(libc_sys_Xfrealpathat)
 DEFINE_PUBLIC_ALIAS(sys_Xfrealpathat, libc_sys_Xfrealpathat)
 
-/* You may pass `AT_READLINK_REQSIZE' to always have the function return
- * the   required   buffer   size,   rather   than   the   used    size.
- * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpath4(fd_t fd, char *resolved, size_t buflen, atflag_t flags) */
-INTERN_FUNCTION(libc_sys_Xfrealpath4)
-	movl   $(0xfffffff9), %eax
-	jmp    libc_x86_exec_Xsyscall4
-END(libc_sys_Xfrealpath4)
-DEFINE_PUBLIC_ALIAS(sys_Xfrealpath4, libc_sys_Xfrealpath4)
-
-/* Returns a bitset of all of the currently mounted dos-drives */
-/* syscall_slong_t getdrives(void) */
-INTERN_FUNCTION(libc_sys_Xgetdrives)
-	movl   $(0xfffffffa), %eax
-	jmp    libc___i386_Xsyscall
-END(libc_sys_Xgetdrives)
-DEFINE_PUBLIC_ALIAS(sys_Xgetdrives, libc_sys_Xgetdrives)
-
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
  * would have received a signal when it changes state,
@@ -9110,10 +9092,28 @@ DEFINE_PUBLIC_ALIAS(sys_Xgetdrives, libc_sys_Xgetdrives)
  *                           a thread in your process, or a child process of your process. */
 /* errno_t detach(pid_t pid) */
 INTERN_FUNCTION(libc_sys_Xdetach)
-	movl   $(0xfffffffb), %eax
+	movl   $(0xfffffff9), %eax
 	jmp    libc_x86_exec_Xsyscall1
 END(libc_sys_Xdetach)
 DEFINE_PUBLIC_ALIAS(sys_Xdetach, libc_sys_Xdetach)
+
+/* You may pass `AT_READLINK_REQSIZE' to always have the function return
+ * the   required   buffer   size,   rather   than   the   used    size.
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t frealpath4(fd_t fd, char *resolved, size_t buflen, atflag_t flags) */
+INTERN_FUNCTION(libc_sys_Xfrealpath4)
+	movl   $(0xfffffffa), %eax
+	jmp    libc_x86_exec_Xsyscall4
+END(libc_sys_Xfrealpath4)
+DEFINE_PUBLIC_ALIAS(sys_Xfrealpath4, libc_sys_Xfrealpath4)
+
+/* Returns a bitset of all of the currently mounted dos-drives */
+/* syscall_slong_t getdrives(void) */
+INTERN_FUNCTION(libc_sys_Xgetdrives)
+	movl   $(0xfffffffb), %eax
+	jmp    libc___i386_Xsyscall
+END(libc_sys_Xgetdrives)
+DEFINE_PUBLIC_ALIAS(sys_Xgetdrives, libc_sys_Xgetdrives)
 
 /* Write up to `bufsize' bytes from `buf' into `fd'
  * When `fd' has the `O_NONBLOCK' flag set, only write as much data as

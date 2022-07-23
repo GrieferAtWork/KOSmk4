@@ -31,6 +31,7 @@
 #ifdef __CC__
 DECL_BEGIN
 
+#ifdef __port_t
 #ifndef __port_t_defined
 #define __port_t_defined
 __HYBRID_ALTINT_TYPEDEF(__port_t, port_t, false);
@@ -40,6 +41,7 @@ __HYBRID_ALTINT_TYPEDEF(__port_t, port_t, false);
 #ifndef __IOPORT
 #define __IOPORT(x) ((__port_t)x)
 #endif /* !__IOPORT */
+#endif /* __port_t */
 
 /* Time (in Nano seconds == 1/1000000000 (1/1_000_000_000) seconds)
  * since the system was booted (s.a. `boottime')

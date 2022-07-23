@@ -60,7 +60,7 @@ struct sigevent /*[PREFIX(sigev_)]*/ {
 	union {
 		__INT32_TYPE__ _pad[__SIGEV_PAD_SIZE];
 		/* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP ID of the thread to receive the signal. */
-		__pid_t _tid;
+		__pid_t _sigev_tid;
 		struct {
 			void (__LIBKCALL     *sigev_notify_function)(union sigval __val); /* Function to start. */
 			union __pthread_attr *sigev_notify_attributes;                    /* Thread attributes. */
@@ -70,7 +70,7 @@ struct sigevent /*[PREFIX(sigev_)]*/ {
 	union {
 		__INT32_TYPE__ _pad[__SIGEV_PAD_SIZE];
 		/* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP ID of the thread to receive the signal. */
-		__pid_t _tid;
+		__pid_t _sigev_tid;
 		struct {
 			void (__LIBKCALL     *_function)(union sigval __val); /* Function to start. */
 			union __pthread_attr *_attribute;                     /* Thread attributes. */
@@ -88,6 +88,7 @@ struct sigevent /*[PREFIX(sigev_)]*/ {
 			union __pthread_attr *_attribute;                     /* Thread attributes. */
 		} _sigev_thread;
 	} _sigev_un;
+#define _sigev_tid              _sigev_un._sigev_un
 #define sigev_notify_function   _sigev_un._sigev_thread._function
 #define sigev_notify_attributes _sigev_un._sigev_thread._attribute
 #endif /* !__COMPILER_HAVE_TRANSPARENT_STRUCT || !__COMPILER_HAVE_TRANSPARENT_UNION */

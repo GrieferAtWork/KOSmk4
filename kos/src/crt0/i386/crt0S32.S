@@ -17,15 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_CRT0_I386_CRT0S_64_S
-#define GUARD_CRT0_I386_CRT0S_64_S 1
+#ifndef GUARD_CRT0_I386_CRT0S32_S
+#define GUARD_CRT0_I386_CRT0S32_S 1
 #define __ASSEMBLER__ 1
 
 #include <hybrid/compiler.h>
 
 .section .data.__dso_handle
 INTERN_OBJECT(__dso_handle)
-	.quad __dso_handle
+	.long __dso_handle
 END(__dso_handle)
 
-#endif /* !GUARD_CRT0_I386_CRT0S_64_S */
+#endif /* !GUARD_CRT0_I386_CRT0S32_S */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4308c8d8 */
+/* HASH CRC-32:0x1110f8ac */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@
 #define __NR3264COMPAT_chmod                    1(chmod)
 #define __NR3264COMPAT_chown                    2(chown,chown32)
 #define __NR3264COMPAT_chroot                   1(chroot)
-#define __NR3264COMPAT_clock_adjtime            1(clock_adjtime)
+#define __NR3264COMPAT_clock_adjtime            2(clock_adjtime,clock_adjtime64)
 #define __NR3264COMPAT_clone3                   1(clone3)
 #define __NR3264COMPAT_close                    1(close)
 #define __NR3264COMPAT_close_range              1(close_range)

@@ -1,6 +1,15 @@
 diff -Naur binutils-2.38-orig/bfd/config.bfd binutils-2.38/bfd/config.bfd
 --- binutils-2.38-orig/bfd/config.bfd	2022-01-22 13:14:07.000000000 +0100
-+++ binutils-2.38/bfd/config.bfd	2022-05-15 17:28:11.854578400 +0200
++++ binutils-2.38/bfd/config.bfd	2022-07-23 13:56:29.957264500 +0200
+@@ -409,7 +409,7 @@
+     targ_defvec=arm_elf32_le_vec
+     targ_selvecs=arm_elf32_be_vec
+     ;;
+-  arm-*-elf | arm*-*-freebsd* | arm*-*-linux-* | arm*-*-conix* | \
++  arm-*-elf | arm*-*-freebsd* | arm*-*-linux-* | arm*-*-kos* | arm*-*-conix* | \
+   arm*-*-uclinux* | arm-*-kfreebsd*-gnu | \
+   arm*-*-eabi* | arm-*-rtems* | arm*-*-uclinuxfdpiceabi)
+     targ_defvec=arm_elf32_le_vec
 @@ -578,7 +578,7 @@
      targ_selvecs=hppa_elf32_vec
      ;;
@@ -269,12 +278,13 @@ diff -Naur binutils-2.38-orig/gas/config/obj-elf.c binutils-2.38/gas/config/obj-
        const struct elf_backend_data *bed;
 diff -Naur binutils-2.38-orig/gas/configure.tgt binutils-2.38/gas/configure.tgt
 --- binutils-2.38-orig/gas/configure.tgt	2022-01-22 13:14:08.000000000 +0100
-+++ binutils-2.38/gas/configure.tgt	2022-05-15 17:36:47.731891000 +0200
-@@ -125,6 +125,7 @@
++++ binutils-2.38/gas/configure.tgt	2022-07-23 13:58:33.170514700 +0200
+@@ -125,6 +125,8 @@
  generic_target=${cpu_type}-$vendor-$os
  # Note: This table is alpha-sorted, please try to keep it that way.
  case ${generic_target} in
 +  i386-*-kos*)			fmt=elf em=linux ;;
++  arm-*-kos*)			fmt=elf em=linux ;;
    aarch64*-*-elf*)			fmt=elf;;
    aarch64*-*-fuchsia*)			fmt=elf;;
    aarch64*-*-haiku*)			fmt=elf em=haiku ;;
@@ -294,8 +304,24 @@ diff -Naur binutils-2.38-orig/include/dwarf2.def binutils-2.38/include/dwarf2.de
  /* Index attributes in the Abbreviations Table.  */
 diff -Naur binutils-2.38-orig/ld/Makefile.am binutils-2.38/ld/Makefile.am
 --- binutils-2.38-orig/ld/Makefile.am	2022-01-22 13:14:09.000000000 +0100
-+++ binutils-2.38/ld/Makefile.am	2022-05-15 17:48:38.205735500 +0200
-@@ -278,6 +278,7 @@
++++ binutils-2.38/ld/Makefile.am	2022-07-23 14:00:47.363570400 +0200
+@@ -168,6 +168,7 @@
+ 	earmelf_fbsd.c \
+ 	earmelf_fuchsia.c \
+ 	earmelf_haiku.c \
++	earmelf_kos.c \
+ 	earmelf_linux.c \
+ 	earmelf_linux_eabi.c \
+ 	earmelf_linux_fdpiceabi.c \
+@@ -178,6 +179,7 @@
+ 	earmelfb.c \
+ 	earmelfb_fbsd.c \
+ 	earmelfb_fuchsia.c \
++	earmelfb_kos.c \
+ 	earmelfb_linux.c \
+ 	earmelfb_linux_eabi.c \
+ 	earmelfb_linux_fdpiceabi.c \
+@@ -278,6 +280,7 @@
  	eelf32xtensa.c \
  	eelf32z80.c \
  	eelf_i386.c \
@@ -303,7 +329,7 @@ diff -Naur binutils-2.38-orig/ld/Makefile.am binutils-2.38/ld/Makefile.am
  	eelf_i386_be.c \
  	eelf_i386_fbsd.c \
  	eelf_i386_haiku.c \
-@@ -460,6 +461,7 @@
+@@ -460,6 +463,7 @@
  	eelf_l1om_fbsd.c \
  	eelf_mipsel_haiku.c \
  	eelf_x86_64.c \
@@ -311,7 +337,23 @@ diff -Naur binutils-2.38-orig/ld/Makefile.am binutils-2.38/ld/Makefile.am
  	eelf_x86_64_cloudabi.c \
  	eelf_x86_64_fbsd.c \
  	eelf_x86_64_haiku.c \
-@@ -776,6 +778,7 @@
+@@ -666,6 +670,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_fbsd.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_fuchsia.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_haiku.Pc@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_kos.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_linux.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_linux_eabi.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_linux_fdpiceabi.Pc@am__quote@
+@@ -676,6 +681,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_fbsd.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_fuchsia.Pc@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_kos.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_linux.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_linux_eabi.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_linux_fdpiceabi.Pc@am__quote@
+@@ -776,6 +782,7 @@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32xtensa.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32z80.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386.Pc@am__quote@
@@ -319,7 +361,7 @@ diff -Naur binutils-2.38-orig/ld/Makefile.am binutils-2.38/ld/Makefile.am
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_be.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_fbsd.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_haiku.Pc@am__quote@
-@@ -955,6 +958,7 @@
+@@ -955,6 +962,7 @@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_l1om_fbsd.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_mipsel_haiku.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64.Pc@am__quote@
@@ -329,8 +371,32 @@ diff -Naur binutils-2.38-orig/ld/Makefile.am binutils-2.38/ld/Makefile.am
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_haiku.Pc@am__quote@
 diff -Naur binutils-2.38-orig/ld/Makefile.in binutils-2.38/ld/Makefile.in
 --- binutils-2.38-orig/ld/Makefile.in	2022-02-09 12:49:03.000000000 +0100
-+++ binutils-2.38/ld/Makefile.in	2022-05-15 17:49:27.711736900 +0200
-@@ -769,6 +769,7 @@
++++ binutils-2.38/ld/Makefile.in	2022-07-23 14:02:18.508319800 +0200
+@@ -523,6 +523,7 @@
+ prefix = @prefix@
+ program_transform_name = @program_transform_name@
+ psdir = @psdir@
++runstatedir = @runstatedir@
+ sbindir = @sbindir@
+ sharedstatedir = @sharedstatedir@
+ srcdir = @srcdir@
+@@ -659,6 +660,7 @@
+ 	earmelf_fbsd.c \
+ 	earmelf_fuchsia.c \
+ 	earmelf_haiku.c \
++	earmelf_kos.c \
+ 	earmelf_linux.c \
+ 	earmelf_linux_eabi.c \
+ 	earmelf_linux_fdpiceabi.c \
+@@ -669,6 +671,7 @@
+ 	earmelfb.c \
+ 	earmelfb_fbsd.c \
+ 	earmelfb_fuchsia.c \
++	earmelfb_kos.c \
+ 	earmelfb_linux.c \
+ 	earmelfb_linux_eabi.c \
+ 	earmelfb_linux_fdpiceabi.c \
+@@ -769,6 +772,7 @@
  	eelf32xtensa.c \
  	eelf32z80.c \
  	eelf_i386.c \
@@ -338,7 +404,7 @@ diff -Naur binutils-2.38-orig/ld/Makefile.in binutils-2.38/ld/Makefile.in
  	eelf_i386_be.c \
  	eelf_i386_fbsd.c \
  	eelf_i386_haiku.c \
-@@ -950,6 +951,7 @@
+@@ -950,6 +954,7 @@
  	eelf_l1om_fbsd.c \
  	eelf_mipsel_haiku.c \
  	eelf_x86_64.c \
@@ -346,23 +412,55 @@ diff -Naur binutils-2.38-orig/ld/Makefile.in binutils-2.38/ld/Makefile.in
  	eelf_x86_64_cloudabi.c \
  	eelf_x86_64_fbsd.c \
  	eelf_x86_64_haiku.c \
-@@ -1445,6 +1447,7 @@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64tilegx.Po@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf64tilegx_be.Po@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386.Po@am__quote@
-+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_kos.Po@am__quote@
+@@ -1272,6 +1277,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_fbsd.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_fuchsia.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_haiku.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_kos.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_linux.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_linux_eabi.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_linux_fdpiceabi.Po@am__quote@
+@@ -1282,6 +1288,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_fbsd.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_fuchsia.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_kos.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_linux.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_linux_eabi.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_linux_fdpiceabi.Po@am__quote@
+@@ -1448,6 +1455,7 @@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_be.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_fbsd.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_haiku.Po@am__quote@
-@@ -1459,6 +1462,7 @@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_mipsel_haiku.Po@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_s390.Po@am__quote@
- @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64.Po@am__quote@
-+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_kos.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_kos.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_ldso.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_sol2.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_vxworks.Po@am__quote@
+@@ -1462,6 +1470,7 @@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_cloudabi.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_fbsd.Po@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_haiku.Po@am__quote@
-@@ -2443,6 +2447,7 @@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_kos.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_sol2.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eh8300elf.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eh8300elf_linux.Po@am__quote@
+@@ -2333,6 +2342,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_fbsd.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_fuchsia.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_haiku.Pc@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_kos.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_linux.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_linux_eabi.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelf_linux_fdpiceabi.Pc@am__quote@
+@@ -2343,6 +2353,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_fbsd.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_fuchsia.Pc@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_kos.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_linux.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_linux_eabi.Pc@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/earmelfb_linux_fdpiceabi.Pc@am__quote@
+@@ -2443,6 +2454,7 @@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32xtensa.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf32z80.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386.Pc@am__quote@
@@ -370,7 +468,7 @@ diff -Naur binutils-2.38-orig/ld/Makefile.in binutils-2.38/ld/Makefile.in
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_be.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_fbsd.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_haiku.Pc@am__quote@
-@@ -2622,6 +2627,7 @@
+@@ -2622,6 +2634,7 @@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_l1om_fbsd.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_mipsel_haiku.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64.Pc@am__quote@
@@ -378,13 +476,93 @@ diff -Naur binutils-2.38-orig/ld/Makefile.in binutils-2.38/ld/Makefile.in
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_cloudabi.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_fbsd.Pc@am__quote@
  @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_haiku.Pc@am__quote@
+diff -Naur binutils-2.38-orig/ld/configure binutils-2.38/ld/configure
+--- binutils-2.38-orig/ld/configure	2022-02-09 12:49:04.000000000 +0100
++++ binutils-2.38/ld/configure	2022-07-23 14:02:13.104187700 +0200
+@@ -793,6 +793,7 @@
+ docdir
+ oldincludedir
+ includedir
++runstatedir
+ localstatedir
+ sharedstatedir
+ sysconfdir
+@@ -900,6 +901,7 @@
+ sysconfdir='${prefix}/etc'
+ sharedstatedir='${prefix}/com'
+ localstatedir='${prefix}/var'
++runstatedir='${localstatedir}/run'
+ includedir='${prefix}/include'
+ oldincludedir='/usr/include'
+ docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
+@@ -1152,6 +1154,15 @@
+   | -silent | --silent | --silen | --sile | --sil)
+     silent=yes ;;
+ 
++  -runstatedir | --runstatedir | --runstatedi | --runstated \
++  | --runstate | --runstat | --runsta | --runst | --runs \
++  | --run | --ru | --r)
++    ac_prev=runstatedir ;;
++  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
++  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
++  | --run=* | --ru=* | --r=*)
++    runstatedir=$ac_optarg ;;
++
+   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
+     ac_prev=sbindir ;;
+   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
+@@ -1289,7 +1300,7 @@
+ for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
+ 		datadir sysconfdir sharedstatedir localstatedir includedir \
+ 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
+-		libdir localedir mandir
++		libdir localedir mandir runstatedir
+ do
+   eval ac_val=\$$ac_var
+   # Remove trailing slashes.
+@@ -1442,6 +1453,7 @@
+   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
+   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
+   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
++  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
+   --libdir=DIR            object code libraries [EPREFIX/lib]
+   --includedir=DIR        C header files [PREFIX/include]
+   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
+@@ -11454,7 +11466,7 @@
+   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
+   lt_status=$lt_dlunknown
+   cat > conftest.$ac_ext <<_LT_EOF
+-#line 11457 "configure"
++#line 11469 "configure"
+ #include "confdefs.h"
+ 
+ #if HAVE_DLFCN_H
+@@ -11560,7 +11572,7 @@
+   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
+   lt_status=$lt_dlunknown
+   cat > conftest.$ac_ext <<_LT_EOF
+-#line 11563 "configure"
++#line 11575 "configure"
+ #include "confdefs.h"
+ 
+ #if HAVE_DLFCN_H
 diff -Naur binutils-2.38-orig/ld/configure.tgt binutils-2.38/ld/configure.tgt
 --- binutils-2.38-orig/ld/configure.tgt	2022-01-22 15:19:36.000000000 +0100
-+++ binutils-2.38/ld/configure.tgt	2022-05-15 17:40:51.272198800 +0200
-@@ -43,6 +43,15 @@
++++ binutils-2.38/ld/configure.tgt	2022-07-23 14:04:09.114216400 +0200
+@@ -43,6 +43,25 @@
  # Please try to keep this table more or less in alphabetic order - it
  # makes it much easier to lookup a specific archictecture.
  case "${targ}" in
++arm*b-*-kos*)
++			targ_emul=armelfb_kos
++			targ_extra_emuls="armelfb armelf armelf_kos"
++			targ_extra_libpath="armelf_kos"
++			;;
++arm*-*-kos*)
++			targ_emul=armelf_kos
++			targ_extra_emuls="armelf armelfb armelfb_kos"
++			targ_extra_libpath="armelfb_kos"
++			;;
 +i[3-7]86-*-kos*)
 +			targ_emul=elf_i386_kos
 +			targ_extra_emuls=elf_i386
@@ -397,6 +575,40 @@ diff -Naur binutils-2.38-orig/ld/configure.tgt binutils-2.38/ld/configure.tgt
  aarch64_be-*-elf)	targ_emul=aarch64elfb
  			targ_extra_emuls="aarch64elf aarch64elf32 aarch64elf32b armelfb armelf"
  			;;
+diff -Naur binutils-2.38-orig/ld/emulparams/armelf_kos.sh binutils-2.38/ld/emulparams/armelf_kos.sh
+--- binutils-2.38-orig/ld/emulparams/armelf_kos.sh	1970-01-01 01:00:00.000000000 +0100
++++ binutils-2.38/ld/emulparams/armelf_kos.sh	2022-01-22 13:14:09.000000000 +0100
+@@ -0,0 +1,24 @@
++ARCH=arm
++SCRIPT_NAME=elf
++OUTPUT_FORMAT="elf32-littlearm"
++BIG_OUTPUT_FORMAT="elf32-bigarm"
++LITTLE_OUTPUT_FORMAT="elf32-littlearm"
++MAXPAGESIZE="CONSTANT (MAXPAGESIZE)"
++COMMONPAGESIZE="CONSTANT (COMMONPAGESIZE)"
++TEMPLATE_NAME=elf
++EXTRA_EM_FILE=armelf
++GENERATE_SHLIB_SCRIPT=yes
++GENERATE_PIE_SCRIPT=yes
++
++DATA_START_SYMBOLS='PROVIDE (__data_start = .);';
++OTHER_TEXT_SECTIONS='*(.glue_7t) *(.glue_7) *(.vfp11_veneer) *(.v4_bx)'
++OTHER_BSS_SYMBOLS="${CREATE_SHLIB+PROVIDE (}__bss_start__ = .${CREATE_SHLIB+)};"
++OTHER_BSS_END_SYMBOLS="${CREATE_SHLIB+PROVIDE (}_bss_end__ = .${CREATE_SHLIB+)}; ${CREATE_SHLIB+PROVIDE (}__bss_end__ = .${CREATE_SHLIB+)};"
++OTHER_END_SYMBOLS="${CREATE_SHLIB+PROVIDE (}__end__ = .${CREATE_SHLIB+)};"
++OTHER_SECTIONS='.note.gnu.arm.ident 0 : { KEEP (*(.note.gnu.arm.ident)) }'
++
++TEXT_START_ADDR=0x00010000
++TARGET2_TYPE=got-rel
++
++# ARM does not support .s* sections.
++NO_SMALL_DATA=yes
+diff -Naur binutils-2.38-orig/ld/emulparams/armelfb_kos.sh binutils-2.38/ld/emulparams/armelfb_kos.sh
+--- binutils-2.38-orig/ld/emulparams/armelfb_kos.sh	1970-01-01 01:00:00.000000000 +0100
++++ binutils-2.38/ld/emulparams/armelfb_kos.sh	2022-07-23 14:05:12.622420900 +0200
+@@ -0,0 +1,2 @@
++source_sh ${srcdir}/emulparams/armelf_kos.sh
++OUTPUT_FORMAT="elf32-bigarm"
 diff -Naur binutils-2.38-orig/ld/emulparams/elf_i386_kos.sh binutils-2.38/ld/emulparams/elf_i386_kos.sh
 --- binutils-2.38-orig/ld/emulparams/elf_i386_kos.sh	1970-01-01 01:00:00.000000000 +0100
 +++ binutils-2.38/ld/emulparams/elf_i386_kos.sh	2022-05-15 17:41:11.327858400 +0200

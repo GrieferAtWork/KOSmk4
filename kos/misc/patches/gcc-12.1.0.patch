@@ -73,9 +73,99 @@ diff -Naur gcc-12.1.0-orig/fixincludes/mkfixinc.sh gcc-12.1.0/fixincludes/mkfixi
      i?86-*-cygwin* | \
      i?86-*-mingw32* | \
      x86_64-*-mingw32* | \
+diff -Naur gcc-12.1.0-orig/gcc/config/arm/kos.h gcc-12.1.0/gcc/config/arm/kos.h
+--- gcc-12.1.0-orig/gcc/config/arm/kos.h	1970-01-01 01:00:00.000000000 +0100
++++ gcc-12.1.0/gcc/config/arm/kos.h	2022-07-23 16:22:07.270173200 +0200
+@@ -0,0 +1,55 @@
++
++#include "../kos.h"
++#include "linux-gas.h"
++
++#undef  TARGET_DEFAULT_FLOAT_ABI
++#define TARGET_DEFAULT_FLOAT_ABI ARM_FLOAT_ABI_SOFT
++
++#undef  ARM_DEFAULT_ABI
++#define ARM_DEFAULT_ABI ARM_ABI_AAPCS_LINUX
++
++#if TARGET_BIG_ENDIAN_DEFAULT
++#define TARGET_ENDIAN_DEFAULT    MASK_BIG_END
++#define TARGET_ENDIAN_OPTION     "mbig-endian"
++#define TARGET_LINKER_EMULATION  "armelfb_kos"
++#else
++#define TARGET_ENDIAN_DEFAULT    0
++#define TARGET_ENDIAN_OPTION     "mlittle-endian"
++#define TARGET_LINKER_EMULATION  "armelf_kos"
++#endif
++
++#undef  TARGET_DEFAULT
++#define TARGET_DEFAULT (TARGET_ENDIAN_DEFAULT)
++
++#undef  MULTILIB_DEFAULTS
++#undef  LIBGCC_SPEC
++#define LIBGCC_SPEC "-lgcc"
++//#define LIBGCC_SPEC "%{mfloat-abi=soft*:-lfloat} -lgcc"
++
++#undef  LINK_SPEC
++#define LINK_SPEC \
++	"%{shared:-shared} %{static:-static} " \
++	"%{!shared: %{!static: %{rdynamic:-export-dynamic} %{!dynamic-linker:-dynamic-linker /lib/libld.so}}} " \
++	"%{mbig-endian:-EB} %{mlittle-endian:-EL}"
++
++#undef  ARM_FUNCTION_PROFILER
++#define ARM_FUNCTION_PROFILER(STREAM, LABELNO)                  \
++	{                                                           \
++		fprintf(STREAM, "\tbl\tmcount%s\n",                     \
++		        (TARGET_ARM && NEED_PLT_RELOC) ? "(PLT)" : ""); \
++	}
++
++#define PROFILE_HOOK(X)						\
++  emit_clobber (gen_rtx_REG (SImode, LR_REGNUM))
++
++#undef SUBTARGET_FRAME_POINTER_REQUIRED
++#define SUBTARGET_FRAME_POINTER_REQUIRED crtl->profile
++
++#undef NEED_INDICATE_EXEC_STACK
++#define NEED_INDICATE_EXEC_STACK	1
++
++#undef TARGET_BINDS_LOCAL_P
++#define TARGET_BINDS_LOCAL_P default_binds_local_p_2
++
++#undef STACK_CHECK_STATIC_BUILTIN
++#define STACK_CHECK_STATIC_BUILTIN 1
+diff -Naur gcc-12.1.0-orig/gcc/config/arm/t-kos gcc-12.1.0/gcc/config/arm/t-kos
+--- gcc-12.1.0-orig/gcc/config/arm/t-kos	1970-01-01 01:00:00.000000000 +0100
++++ gcc-12.1.0/gcc/config/arm/t-kos	2022-07-23 14:30:15.661457000 +0200
+@@ -0,0 +1 @@
++MULTIARCH_DIRNAME = arm-kos
 diff -Naur gcc-12.1.0-orig/gcc/config/i386/kos.h gcc-12.1.0/gcc/config/i386/kos.h
 --- gcc-12.1.0-orig/gcc/config/i386/kos.h	1970-01-01 01:00:00.000000000 +0100
-+++ gcc-12.1.0/gcc/config/i386/kos.h	2022-05-17 16:39:48.928286400 +0200
++++ gcc-12.1.0/gcc/config/i386/kos.h	2022-07-23 14:12:52.055408000 +0200
+@@ -0,0 +1,2 @@
++
++#include "../kos.h"
+diff -Naur gcc-12.1.0-orig/gcc/config/i386/kos64.h gcc-12.1.0/gcc/config/i386/kos64.h
+--- gcc-12.1.0-orig/gcc/config/i386/kos64.h	1970-01-01 01:00:00.000000000 +0100
++++ gcc-12.1.0/gcc/config/i386/kos64.h	2022-05-17 16:39:42.678204000 +0200
+@@ -0,0 +1,6 @@
++#undef TARGET_KOS64
++#undef TARGET_KOS64_WITH_MULTIARCH
++#define TARGET_KOS64 1
++#define TARGET_KOS64_WITH_MULTIARCH 1
++
++#include "kos.h"
+diff -Naur gcc-12.1.0-orig/gcc/config/i386/t-kos gcc-12.1.0/gcc/config/i386/t-kos
+--- gcc-12.1.0-orig/gcc/config/i386/t-kos	1970-01-01 01:00:00.000000000 +0100
++++ gcc-12.1.0/gcc/config/i386/t-kos	2022-05-15 17:53:05.048178200 +0200
+@@ -0,0 +1 @@
++MULTIARCH_DIRNAME = i386-kos
+diff -Naur gcc-12.1.0-orig/gcc/config/i386/t-kos64 gcc-12.1.0/gcc/config/i386/t-kos64
+--- gcc-12.1.0-orig/gcc/config/i386/t-kos64	1970-01-01 01:00:00.000000000 +0100
++++ gcc-12.1.0/gcc/config/i386/t-kos64	2022-05-15 17:53:05.048178200 +0200
+@@ -0,0 +1 @@
++MULTIARCH_DIRNAME = i386-kos
+diff -Naur gcc-12.1.0-orig/gcc/config/kos.h gcc-12.1.0/gcc/config/kos.h
+--- gcc-12.1.0-orig/gcc/config/kos.h	1970-01-01 01:00:00.000000000 +0100
++++ gcc-12.1.0/gcc/config/kos.h	2022-05-17 16:39:48.928286400 +0200
 @@ -0,0 +1,38 @@
 +
 +#undef TARGET_KOS
@@ -115,9 +205,9 @@ diff -Naur gcc-12.1.0-orig/gcc/config/i386/kos.h gcc-12.1.0/gcc/config/i386/kos.
 +#else /* TARGET_KOS64_WITH_MULTIARCH */
 +#define LINK_SPEC "%{shared:-shared} %{static:-static} %{!shared: %{!static: %{rdynamic:-export-dynamic} %{!dynamic-linker:-dynamic-linker /lib/libld.so}}}"
 +#endif /* !TARGET_KOS64_WITH_MULTIARCH */
-diff -Naur gcc-12.1.0-orig/gcc/config/i386/kos.opt gcc-12.1.0/gcc/config/i386/kos.opt
---- gcc-12.1.0-orig/gcc/config/i386/kos.opt	1970-01-01 01:00:00.000000000 +0100
-+++ gcc-12.1.0/gcc/config/i386/kos.opt	2022-05-15 17:52:37.986345500 +0200
+diff -Naur gcc-12.1.0-orig/gcc/config/kos.opt gcc-12.1.0/gcc/config/kos.opt
+--- gcc-12.1.0-orig/gcc/config/kos.opt	1970-01-01 01:00:00.000000000 +0100
++++ gcc-12.1.0/gcc/config/kos.opt	2022-05-15 17:52:37.986345500 +0200
 @@ -0,0 +1,6 @@
 +; Kos-specific options.
 +
@@ -125,39 +215,9 @@ diff -Naur gcc-12.1.0-orig/gcc/config/i386/kos.opt gcc-12.1.0/gcc/config/i386/ko
 +Driver
 +
 +; Retain blank line above
-diff -Naur gcc-12.1.0-orig/gcc/config/i386/kos64.h gcc-12.1.0/gcc/config/i386/kos64.h
---- gcc-12.1.0-orig/gcc/config/i386/kos64.h	1970-01-01 01:00:00.000000000 +0100
-+++ gcc-12.1.0/gcc/config/i386/kos64.h	2022-05-17 16:39:42.678204000 +0200
-@@ -0,0 +1,6 @@
-+#undef TARGET_KOS64
-+#undef TARGET_KOS64_WITH_MULTIARCH
-+#define TARGET_KOS64 1
-+#define TARGET_KOS64_WITH_MULTIARCH 1
-+
-+#include "kos.h"
-diff -Naur gcc-12.1.0-orig/gcc/config/i386/t-kos gcc-12.1.0/gcc/config/i386/t-kos
---- gcc-12.1.0-orig/gcc/config/i386/t-kos	1970-01-01 01:00:00.000000000 +0100
-+++ gcc-12.1.0/gcc/config/i386/t-kos	2022-05-15 17:53:05.048178200 +0200
-@@ -0,0 +1 @@
-+MULTIARCH_DIRNAME = i386-kos
-diff -Naur gcc-12.1.0-orig/gcc/config/i386/t-kos64 gcc-12.1.0/gcc/config/i386/t-kos64
---- gcc-12.1.0-orig/gcc/config/i386/t-kos64	1970-01-01 01:00:00.000000000 +0100
-+++ gcc-12.1.0/gcc/config/i386/t-kos64	2022-05-15 17:53:05.048178200 +0200
-@@ -0,0 +1 @@
-+MULTIARCH_DIRNAME = i386-kos
-diff -Naur gcc-12.1.0-orig/gcc/config/t-kos gcc-12.1.0/gcc/config/t-kos
---- gcc-12.1.0-orig/gcc/config/t-kos	1970-01-01 01:00:00.000000000 +0100
-+++ gcc-12.1.0/gcc/config/t-kos	2022-05-15 17:53:05.048178200 +0200
-@@ -0,0 +1 @@
-+MULTIARCH_DIRNAME = i386-kos
-diff -Naur gcc-12.1.0-orig/gcc/config/t-kos64 gcc-12.1.0/gcc/config/t-kos64
---- gcc-12.1.0-orig/gcc/config/t-kos64	1970-01-01 01:00:00.000000000 +0100
-+++ gcc-12.1.0/gcc/config/t-kos64	2022-05-15 17:53:05.048178200 +0200
-@@ -0,0 +1 @@
-+MULTIARCH_DIRNAME = i386-kos
 diff -Naur gcc-12.1.0-orig/gcc/config.gcc gcc-12.1.0/gcc/config.gcc
 --- gcc-12.1.0-orig/gcc/config.gcc	2022-05-06 09:30:56.000000000 +0200
-+++ gcc-12.1.0/gcc/config.gcc	2022-05-15 17:54:05.396256200 +0200
++++ gcc-12.1.0/gcc/config.gcc	2022-07-23 15:28:39.283076900 +0200
 @@ -673,6 +673,12 @@
  
  # Common parts for widely ported systems.
@@ -171,19 +231,37 @@ diff -Naur gcc-12.1.0-orig/gcc/config.gcc gcc-12.1.0/gcc/config.gcc
  *-*-darwin*)
    tmake_file="t-darwin "
    tm_file="${tm_file} darwin.h"
-@@ -1087,6 +1093,16 @@
+@@ -1087,6 +1093,34 @@
  esac
  
  case ${target} in
++arm*-*-kos*)
++	tm_file="dbxelf.h elfos.h gnu-user.h glibc-stdint.h arm/elf.h"
++	tm_file="$tm_file arm/bpabi.h arm/aout.h arm/arm.h arm/kos.h"
++	extra_options="${extra_options} kos.opt"
++	case $target in
++	arm*b-*)
++	    tm_defines="${tm_defines} TARGET_BIG_ENDIAN_DEFAULT=1"
++	    ;;
++	esac
++	tmake_file="${tmake_file} arm/t-arm arm/t-arm-elf arm/t-bpabi arm/t-kos"
++	if [ "$with_float" = "hard" -o "$with_float" = "softfp" ] ; then
++	    target_cpu_cname="arm10e"
++	else
++	    target_cpu_cname="arm10tdmi"
++	fi
++	default_use_cxa_atexit=yes
++	with_tls=${with_tls:-gnu}
++	;;
 +i[34567]86-*-kos*)
 +    tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h glibc-stdint.h i386/i386elf.h i386/kos.h"
 +    tmake_file="${tmake_file} i386/t-kos"
-+    extra_options="${extra_options} i386/kos.opt"
++    extra_options="${extra_options} kos.opt"
 +    ;;
 +x86_64-*-kos*)
 +    tm_file="${tm_file} i386/unix.h i386/att.h dbxelf.h elfos.h glibc-stdint.h i386/i386elf.h i386/x86-64.h i386/kos64.h"
 +    tmake_file="${tmake_file} i386/t-kos64"
-+    extra_options="${extra_options} i386/kos.opt"
++    extra_options="${extra_options} kos.opt"
 +    ;;
  aarch64*-*-elf | aarch64*-*-fuchsia* | aarch64*-*-rtems*)
  	tm_file="${tm_file} dbxelf.h elfos.h newlib-stdint.h"
@@ -369,13 +447,55 @@ diff -Naur gcc-12.1.0-orig/include/dwarf2.def gcc-12.1.0/include/dwarf2.def
  DW_END_CFA
  
  /* Index attributes in the Abbreviations Table.  */
+diff -Naur gcc-12.1.0-orig/libgcc/config/arm/lib1funcs.S gcc-12.1.0/libgcc/config/arm/lib1funcs.S
+--- gcc-12.1.0-orig/libgcc/config/arm/lib1funcs.S	2022-05-06 09:30:59.000000000 +0200
++++ gcc-12.1.0/libgcc/config/arm/lib1funcs.S	2022-07-23 16:00:53.287193200 +0200
+@@ -27,10 +27,10 @@
+ 	.syntax unified
+ 
+ /* An executable stack is *not* required for these functions.  */
+-#if defined(__ELF__) && defined(__linux__)
++#if defined(__ELF__) && (defined(__linux__) || defined(__KOS__))
+ .section .note.GNU-stack,"",%progbits
+ .previous
+-#endif  /* __ELF__ and __linux__ */
++#endif  /* __ELF__ and (__linux__ || __KOS__) */
+ 
+ #ifdef __ARM_EABI__
+ /* Some attributes that are common to all routines in this file.  */
+@@ -1510,7 +1510,7 @@
+ 	
+ #endif /* L_dvmd_lnx */
+ #ifdef L_clear_cache
+-#if defined __ARM_EABI__ && defined __linux__
++#if defined __ARM_EABI__ && (defined __linux__ || defined(__KOS__))
+ @ EABI GNU/Linux call to cacheflush syscall.
+ 	ARM_FUNC_START clear_cache
+ 	do_push	{r7}
+@@ -1536,7 +1536,7 @@
+ #if __ARM_ARCH >= 7
+ 	isb
+ 	dsb sy
+-#elif defined __ARM_EABI__ && defined __linux__
++#elif defined __ARM_EABI__ && (defined __linux__ || defined(__KOS__))
+ 	/* We don't have a speculation barrier directly for this
+ 	   platform/architecture variant.  But we can use a kernel
+ 	   clear_cache service routine which will emit such instructions
 diff -Naur gcc-12.1.0-orig/libgcc/config.host gcc-12.1.0/libgcc/config.host
 --- gcc-12.1.0-orig/libgcc/config.host	2022-05-06 09:30:59.000000000 +0200
-+++ gcc-12.1.0/libgcc/config.host	2022-05-15 17:55:52.262592600 +0200
-@@ -376,6 +376,16 @@
++++ gcc-12.1.0/libgcc/config.host	2022-07-23 14:32:21.410176400 +0200
+@@ -376,6 +376,24 @@
  esac
  
  case ${host} in
++arm*-*-kos*)
++	tmake_file="${tmake_file} arm/t-arm t-fixedpoint-gnu-prefix t-crtfm"
++	tmake_file="${tmake_file} arm/t-elf arm/t-bpabi arm/t-linux-eabi t-slibgcc-libgcc"
++	tm_file="$tm_file arm/bpabi-lib.h"
++	unwind_header=config/arm/unwind-arm.h
++	tmake_file="$tmake_file t-softfp-sfdf t-softfp-excl arm/t-softfp t-softfp"
++	extra_parts="$extra_parts crtfastmath.o"
++	;;
 +i[34567]86-*-kos*)
 +	tmake_file="$tmake_file i386/t-crtstuff t-crtstuff-pic t-libgcc-pic"
 +	tmake_file="$tmake_file t-slibgcc t-slibgcc-gld t-slibgcc-elf-ver t-libgcc-pic"
