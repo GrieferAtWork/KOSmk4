@@ -154,19 +154,19 @@ INTDEF NOBLOCK void NOTHROW(KCALL GDBFs_Fini)(void);
 
 /* Open a file handle for GDB (returns 0 on success) */
 INTDEF WUNUSED gdb_errno_t
-NOTHROW(KCALL GDBFs_Open)(char *filename,
+NOTHROW(KCALL GDBFs_Open)(char const *filename,
                           gdb_oflag_t oflags, gdb_mode_t mode,
                           struct handle *__restrict result);
 
 /* Delete the file associated with `filename' */
 INTDEF WUNUSED gdb_errno_t
-NOTHROW(KCALL GDBFs_Unlink)(char *filename);
+NOTHROW(KCALL GDBFs_Unlink)(char const *filename);
 
 /* Resolve a symbolic link (don't include trailing NUL-characters, though...)
  * @param: pbuflen: [IN]  Available buffer size in `buf'
  *                  [OUT] Number of bytes written to `buf' */
 INTDEF WUNUSED gdb_errno_t
-NOTHROW(KCALL GDBFs_Readlink)(char *filename,
+NOTHROW(KCALL GDBFs_Readlink)(char const *filename,
                               char *buf,
                               size_t *__restrict pbuflen);
 

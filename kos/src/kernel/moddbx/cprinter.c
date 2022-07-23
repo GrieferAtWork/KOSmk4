@@ -1047,7 +1047,7 @@ NOTHROW(KCALL dbg_eqmemory)(void const *a, void const *b, size_t num_bytes) {
 	return true; /* Equal memory */
 }
 
-PRIVATE NONNULL((1)) ssize_t KCALL
+PRIVATE NONNULL((1, 3, 5)) ssize_t KCALL
 print_a2l_symbol(struct cprinter const *__restrict printer,
                  void const *ptr, char const *__restrict name,
                  uintptr_t offset, module_t *__restrict mod) {

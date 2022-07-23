@@ -215,20 +215,20 @@
  * Aliases:
  *
  * ```
- *     add    [...]         alias for 'plus'
- *     sub    [...]         alias for 'minus'
- *     pop                  alias for 'drop'
- *     push_tls_address     alias for 'GNU_push_tls_address'
- *     uninit               alias for 'GNU_uninit'
- *     jf     pop, <symbol> Alias for 'not; bra <symbol>;'
- *     jf     top, <symbol> Alias for 'dup; not; bra <symbol>;'
- *     jt     pop, <symbol> Alias for 'bra <symbol>;'
- *     jt     top, <symbol> Alias for 'dup; bra <symbol>;'
- *     jz     ...           Alias for 'jf ...'
- *     jnz    ...           Alias for 'jt ...'
- *     jmp    <symbol>      Alias for 'skip <symbol>;'
- *     regx   ...           alias for `reg ...'
- *     bregx  ...           alias for `breg ...'
+ *     add    [...]         Alias for `plus'
+ *     sub    [...]         Alias for `minus'
+ *     pop                  Alias for `drop'
+ *     push_tls_address     Alias for `GNU_push_tls_address'
+ *     uninit               Alias for `GNU_uninit'
+ *     jf     pop, <symbol> Alias for `not; bra <symbol>;'
+ *     jf     top, <symbol> Alias for `dup; not; bra <symbol>;'
+ *     jt     pop, <symbol> Alias for `bra <symbol>;'
+ *     jt     top, <symbol> Alias for `dup; bra <symbol>;'
+ *     jz     ...           Alias for `jf ...'
+ *     jnz    ...           Alias for `jt ...'
+ *     jmp    <symbol>      Alias for `skip <symbol>;'
+ *     regx   ...           Alias for `reg ...'
+ *     bregx  ...           Alias for `breg ...'
  * ```
  *
  */

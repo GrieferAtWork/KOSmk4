@@ -493,7 +493,7 @@ again_try_exchange_e2_word:
  * >> p32_pagedir_unmap(...);
  * >> p32_pagedir_unprepare(...);
  * @return: true:  Successfully allocated structures required for creating mappings.
- * @return: false: Insufficient physical memory to change mappings. */
+ * @return: false: Insufficient physical memory to prepare mappings. */
 INTERN NOBLOCK WUNUSED bool
 NOTHROW(FCALL p32_pagedir_prepareone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	bool result;

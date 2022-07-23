@@ -114,8 +114,8 @@ struct module_section {
 	WEAK REF struct module          *ms_module;  /* [1..1][const] Associated module. */
 	size_t                           ms_size;    /* [const] Size of the section (in bytes) */
 	size_t                           ms_entsize; /* [const] Section entity size (or 0 if unknown) */
-	unsigned int                     ms_type;    /* [const] Section type (s.a. `Elf_Shdr::sh_type'; one of `SHT_*') */
-	unsigned int                     ms_flags;   /* [const] Section flags (s.a. `Elf_Shdr::sh_flags'; set of `SHF_*') */
+	unsigned int                     ms_type;    /* [const] Section type (s.a. `Elf_Shdr::sh_type'; one of `SHT_*' from <elf.h>) */
+	unsigned int                     ms_flags;   /* [const] Section flags (s.a. `Elf_Shdr::sh_flags'; set of `SHF_*' from <elf.h>) */
 	unsigned int                     ms_link;    /* [const] Section link (s.a. `Elf_Shdr::sh_link') */
 	unsigned int                     ms_info;    /* [const] Section info (s.a. `Elf_Shdr::sh_info') */
 #ifdef __WANT_MODULE_SECTION__ms_dead

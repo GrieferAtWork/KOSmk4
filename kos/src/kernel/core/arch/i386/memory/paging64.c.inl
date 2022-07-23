@@ -1632,7 +1632,7 @@ NOTHROW(FCALL p64_pagedir_unprepare_impl_flatten_v4)(unsigned int vec4_min,
  * >> p64_pagedir_unmap(...);
  * >> p64_pagedir_unprepare(...);
  * @return: true:  Successfully allocated structures required for creating mappings.
- * @return: false: Insufficient physical memory to change mappings. */
+ * @return: false: Insufficient physical memory to prepare mappings. */
 INTERN NOBLOCK WUNUSED bool
 NOTHROW(FCALL p64_pagedir_prepareone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	bool result;

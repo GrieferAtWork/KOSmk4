@@ -89,4 +89,10 @@
 #define XFS_SUPER_MAGIC        0x58465342
 #define _XIAFS_SUPER_MAGIC     0x012fd16d
 
+
+/* <linux/magic.h> normally doesn't have constants for these, so we make our own... */
+#ifdef __KOS__
+#define TARFS_SUPER_MAGIC ('t' << 16 | 'a' << 8 | 'r')
+#endif /* __KOS__ */
+
 #endif /* !_LINUX_MAGIC_H */

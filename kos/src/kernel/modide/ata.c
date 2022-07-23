@@ -1329,6 +1329,8 @@ got_identify_signal:
 	}
 
 	/* Fix specifications to properly represent implications. */
+
+	/* If we don't have a DMA port, it doesn't matter what the specs say! */
 	if (bus->ab_dmaio == (port_t)-1)
 		specs.capability &= ~HD_DRIVEID_CAPABILITY_DMA;
 
@@ -1336,7 +1338,7 @@ got_identify_signal:
 	if (!(specs.capability & HD_DRIVEID_CAPABILITY_LBA))
 		specs.command_set_2 &= ~HD_DRIVEID_COMMAND_SET_2_LBA48;
 
-	/* Even if 48-bit LBA is supported, we don't want to use it if 28 bit is enough. */
+	/* Even if 48-bit LBA is supported, we don't want to use it if 28 bits are enough. */
 	if ((specs.capability & HD_DRIVEID_CAPABILITY_LBA) &&
 	    (u64)specs.lba_capacity_2 == (u64)specs.lba_capacity &&
 	    specs.lba_capacity < (u32)1 << 28)
@@ -1360,11 +1362,14 @@ got_identify_signal:
 			                         (uint64_t)(uint16_t)specs.cyls *
 			                         (uint64_t)(uint8_t)specs.sectors;
 		}
+
 		/* Remember non-DMA fallback operators. */
 #ifdef ATADRIVE_HAVE_PIO_IOSECTORS
 		drive->ad_pio_rdsectors = ops->bdo_dev.do_node.dvno_node.no_file.mo_loadblocks;
 		drive->ad_pio_wrsectors = ops->bdo_dev.do_node.dvno_node.no_file.mo_saveblocks;
 #endif /* ATADRIVE_HAVE_PIO_IOSECTORS */
+
+		/* If DMA is supported, use it! */
 		if (specs.capability & HD_DRIVEID_CAPABILITY_DMA)
 			ops = &AtaDrive_DmaOps;
 		_blkdev_init(drive, ops);
@@ -1382,7 +1387,7 @@ got_identify_signal:
 	 * during our  insw() /  outsw(), and  don't have  to worry  about
 	 * some individual word needing to be written to 2 pages (iow:  we
 	 * can use `insphysw()' and `outsphysw()' directly, both of  which
-	 * documents a 2-byte alignment requirement). */
+	 * have (and document) a 2-byte alignment requirement). */
 	drive->mf_iobashift = 1;
 
 	atomic64_init(&drive->mf_filesize, drive->ad_sector_count << AtaDrive_GetSectorShift(drive));
@@ -1409,17 +1414,27 @@ got_identify_signal:
 	FINALLY_DECREF_UNLIKELY(drive);
 
 	/* Fill in ATA serial information. */
-	*(char *)mempcpy(drive->bd_rootinfo.br_ata_serial_no, specs.serial_no, 20) = '\0';
-	*(char *)mempcpy(drive->bd_rootinfo.br_ata_fw_rev, specs.fw_rev, 8) = '\0';
-	*(char *)mempcpy(drive->bd_rootinfo.br_ata_model, specs.model, 40) = '\0';
+#define ata_setserial(dst, src)                                   \
+	do {                                                          \
+		static_assert(sizeof(dst) == sizeof(src) + sizeof(char)); \
+		*(char *)mempcpy(dst, src, sizeof(src)) = '\0';           \
+	}	__WHILE0
+	ata_setserial(drive->bd_rootinfo.br_ata_serial_no, specs.serial_no);
+	ata_setserial(drive->bd_rootinfo.br_ata_fw_rev, specs.fw_rev);
+	ata_setserial(drive->bd_rootinfo.br_ata_model, specs.model);
+#undef ata_setserial
 
 	/* Assign the devno & devfs filename for the device. */
 	{
 		dev_t devno;
 		REF struct devdirent *name;
+		bool is_master = drive_id == ATA_DRIVE_MASTER;
 		if (is_default_ide) {
-			devno = MKDEV(is_primary_bus ? 3 : 22, drive_id == ATA_DRIVE_MASTER ? 0 : 64);
-			name  = devdirent_newf("hd%c", (is_primary_bus ? 'a' : 'c') + (drive_id == ATA_DRIVE_MASTER ? 0 : 1));
+			devno = MKDEV((is_primary_bus ? 3 : 22),
+			              (is_master /**/ ? 0 : 64));
+			name  = devdirent_newf("hd%c",
+			                       (is_primary_bus ? 'a' : 'c') +
+			                       (is_master /**/ ? 0 : 1));
 		} else {
 			devno = MKDEV(DEV_MAJOR_AUTO, 0);
 			name  = devdirent_newf("hdX"
@@ -1427,8 +1442,10 @@ got_identify_signal:
 			                       "%" PRIxN(__SIZEOF_PORT_T__) "."
 			                       "%" PRIxN(__SIZEOF_PORT_T__) "."
 			                       "%c",
-			                       ports->a_bus, ports->a_ctrl, ports->a_dma,
-			                       drive_id == ATA_DRIVE_MASTER ? 'm' : 's');
+			                       ports->a_bus,
+			                       ports->a_ctrl,
+			                       ports->a_dma,
+			                       is_master ? 'm' : 's');
 		}
 		/* Initialize device fields relating to devfs integration. */
 		drive->dn_devno         = devno;

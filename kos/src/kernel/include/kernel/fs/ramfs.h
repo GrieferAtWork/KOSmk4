@@ -162,7 +162,16 @@ DEFINE_REFCNT_FUNCTIONS(struct ramfs_dirent, rde_ent.fd_refcnt, _struct_ramfs_di
 struct ramfs_dirnode;
 struct ramfs_dirdata {
 	struct shared_rwlock           rdd_lock; /* Lock for `rdd_tree' */
+#ifdef __INTELLISENSE__
+#ifdef __cplusplus
+	_Toblockop_slist<struct ramfs_dirnode>
+	                               rdd_lops; /* [0..n] Lockops for `rdd_lock' */
+#else /* __cplusplus */
+	struct oblockop_slist          rdd_lops; /* [0..n] Lockops for `rdd_lock' */
+#endif /* !__cplusplus */
+#else /* __INTELLISENSE__ */
 	Toblockop_slist(ramfs_dirnode) rdd_lops; /* [0..n] Lockops for `rdd_lock' */
+#endif /* !__INTELLISENSE__ */
 	RBTREE_ROOT(REF ramfs_dirent)  rdd_tree; /* [0..n][lock(rdd_lock)] Files in this directory (using the filename as key). */
 };
 

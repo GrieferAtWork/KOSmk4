@@ -22,14 +22,13 @@
 
 #include <__stdinc.h>
 
-#include <hybrid/host.h>
-
 /* Target execution context of generated code:
  *   16: realmode
  *   32: protected mode
  *   64: long mode
  */
 #ifndef LIBGEN86_TARGET_BITS
+#include <hybrid/host.h>
 #ifdef __x86_64__
 #define LIBGEN86_TARGET_BITS 64
 #elif defined(__i386__)

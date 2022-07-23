@@ -152,7 +152,7 @@ x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usag
 #define EMU86_EMULATE_CONFIG_CHECKUSER                1 /* Restrict system instructions in user-space */
 #define EMU86_EMULATE_CONFIG_CHECKERROR               1 /* Disabled instructions (`EMU86_EMULATE_CONFIG_WANT_* == 0') are still checked for usage errors */
 #define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR          0 /* Do more that just error checking */
-#define EMU86_EMULATE_CONFIG_CHECKLOCK                1 /* Make sure of that lock prefixes are used properly */
+#define EMU86_EMULATE_CONFIG_CHECKLOCK                1 /* Make sure that lock prefixes are used properly */
 #define EMU86_EMULATE_CONFIG_ALLOW_USER_STAC_CLAC     1 /* Allow user-space to make use of stac/clac */
 
 /* Configure ISA extensions */
@@ -166,8 +166,9 @@ x86_handle_bad_usage(struct icpustate *__restrict state, bad_usage_reason_t usag
 #define EMU86_EMULATE_CONFIG_LOCK_ARPL   0 /* [not enabled] Accept `lock' for arpl */
 #endif /* !CONFIG_X86ISA_ENABLE_LOCK_EXTENSIONS */
 
-/* Configure   for  which  instructions   emulation  should  be  attempted.
- * Any instruction enabled here will be emulated if not supported natively! */
+/* Configure instructions for which emulation should be attempted.
+ * Any instruction enabled here will be emulated if not  supported
+ * natively! */
 #define EMU86_EMULATE_CONFIG_WANT_ADCX          1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_ADOX          1 /* Emulate non-standard instructions */
 #define EMU86_EMULATE_CONFIG_WANT_MULX          1 /* Emulate non-standard instructions */
@@ -695,17 +696,17 @@ NOTHROW(FCALL throw_unsupported_instruction)(struct icpustate *__restrict state,
 #define EMU86_EMULATE_RETURN_UNEXPECTED_PREFIX_RMREG()       throw_illegal_instruction_exception(_state, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX), _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0, 0)
 #define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION()       throw_unsupported_instruction(_state, usage, _EMU86_GETOPCODE(), op_flags)
 #define EMU86_EMULATE_RETURN_UNSUPPORTED_INSTRUCTION_RMREG() throw_unsupported_instruction(_state, usage, _EMU86_GETOPCODE_RMREG(), op_flags)
-#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, offset, regval, regval2) \
+#define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER(how, regno, offset, regval, regval2)  \
 	throw_illegal_instruction_exception(_state, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER), \
-	                                    /* opcode:   */ _EMU86_GETOPCODE(),                   \
-	                                    /* op_flags: */ op_flags,                             \
-	                                    /* how:      */ how,                                  \
-	                                    /* regno:    */ regno,                                \
-	                                    /* offset:   */ offset,                               \
-	                                    /* regval:   */ regval,                               \
+	                                    /* opcode:   */ _EMU86_GETOPCODE(),                    \
+	                                    /* op_flags: */ op_flags,                              \
+	                                    /* how:      */ how,                                   \
+	                                    /* regno:    */ regno,                                 \
+	                                    /* offset:   */ offset,                                \
+	                                    /* regval:   */ regval,                                \
 	                                    /* regval2:  */ regval2)
 #define EMU86_EMULATE_THROW_ILLEGAL_INSTRUCTION_REGISTER_RMREG(how, regno, offset, regval, regval2) \
-	throw_illegal_instruction_exception(_state, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER),       \
+	throw_illegal_instruction_exception(_state, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER),      \
 	                                    /* opcode:   */ _EMU86_GETOPCODE_RMREG(),                   \
 	                                    /* op_flags: */ op_flags,                                   \
 	                                    /* how:      */ how,                                        \
@@ -713,7 +714,7 @@ NOTHROW(FCALL throw_unsupported_instruction)(struct icpustate *__restrict state,
 	                                    /* offset:   */ offset,                                     \
 	                                    /* regval:   */ regval,                                     \
 	                                    /* regval2:  */ regval2)
-#define EMU86_EMULATE_RETURN_AFTER_XEND()                                                               \
+#define EMU86_EMULATE_RETURN_AFTER_XEND()                                                                \
 	throw_illegal_instruction_exception(_state, EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE), \
 	                                    _EMU86_GETOPCODE_RMREG(), op_flags, 0, 0, 0, 0, 0)
 
@@ -955,12 +956,14 @@ setgsbase(uintptr_t value)
 
 
 
-/* Special    handling   for   user-space   address   range   validation:
+/* Special handling for user-space address range validation:
+ *
  * Because our version of libemu86  is the one responsible for  emulating
  * instruction that may not necessarily be  known to the host CPU,  there
  * also  exists the case  where user-space is trying  to perform a memory
  * access to its UKERN segment, using an instruction that is not natively
  * known to the host CPU.
+ *
  * In this case, when trying to emulate the instruction, we would  normally
  * notice  that  user-space is  trying  to access  a  kernel-space address.
  * However,  the UKERN segment exists as an overlay on-top of kernel-space,
@@ -1040,8 +1043,8 @@ assert_user_address_range(struct icpustate *__restrict state,
 	            endaddr > KERNELSPACE_BASE) {
 		struct mman *mymm = THIS_MMAN;
 		/* Dispatch the current instruction through VIO */
-		if ((byte_t *)addr >= mnode_getminaddr(&FORMMAN(mymm, thismman_kernel_reservation)) &&
-		    (byte_t *)addr <= mnode_getmaxaddr(&FORMMAN(mymm, thismman_kernel_reservation))) {
+		if ((byte_t *)addr + num_bytes - 1 >= mnode_getminaddr(&FORMMAN(mymm, thismman_kernel_reservation)) &&
+		    (byte_t *)addr /*           */ <= mnode_getmaxaddr(&FORMMAN(mymm, thismman_kernel_reservation))) {
 			/* Rewind the kernel stack such that `%(r|e)sp = state' before calling this function!
 			 * There is no need to keep the instruction emulation payload of `handle_bad_usage()'
 			 * on-stack when re-starting emulation for the purpose of dispatching userkern VIO. */

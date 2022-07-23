@@ -102,6 +102,8 @@ union __ATTR_PACKED mbr_partition {
 #define MBR_SIG1 0xaa /* Required value for `mbr_sig[1]' */
 
 
+#define SIZEOF_MBR_SECTOR 512
+
 /* offsetof `struct mbr_data' within the first sector. */
 #define MBR_DATA_OFFSET 436
 #ifdef __CC__

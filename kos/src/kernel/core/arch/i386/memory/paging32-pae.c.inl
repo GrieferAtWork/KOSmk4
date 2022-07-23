@@ -731,7 +731,7 @@ NOTHROW(KCALL assert_prepared)(PAGEDIR_PAGEALIGNED VIRT void *addr,
  * >> pae_pagedir_unmap(...);
  * >> pae_pagedir_unprepare(...);
  * @return: true:  Successfully allocated structures required for creating mappings.
- * @return: false: Insufficient physical memory to change mappings. */
+ * @return: false: Insufficient physical memory to prepare mappings. */
 INTERN NOBLOCK WUNUSED bool
 NOTHROW(FCALL pae_pagedir_prepareone)(PAGEDIR_PAGEALIGNED VIRT void *addr) {
 	bool result;

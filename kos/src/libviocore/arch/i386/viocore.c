@@ -2128,7 +2128,7 @@ NOTHROW(CC CS_setregl)(struct vio_emulate_args *__restrict self, u8 regno, u32 v
 #define EMU86_EMULATE_CONFIG_ONLY_MEMORY     1 /* _ONLY_ emulate memory-based instructions! */
 #define EMU86_EMULATE_CONFIG_CHECKERROR      0 /* Don't emulate error checks for instructions that are disabled */
 #define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR 0 /* Enable instruction emulator by default (though only for memory-based instruction) */
-#define EMU86_EMULATE_CONFIG_CHECKLOCK       1 /* Make sure of that lock prefixes are used properly */
+#define EMU86_EMULATE_CONFIG_CHECKLOCK       1 /* Make sure that lock prefixes are used properly */
 
 /* Configure ISA extensions */
 #define EMU86_EMULATE_CONFIG_FSGSBASE_32BIT       1 /* [enabled] Allow use of (rd|wr)(fs|gs)base from 32-bit */

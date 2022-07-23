@@ -896,21 +896,24 @@ blkdev_makeparts_loadmbr(struct blkdev *__restrict self,
                          uint64_t subpart_sectormin,
                          uint64_t subpart_sectorcnt)
 		THROWS(E_BADALLOC, ...) {
+	static_assert(SIZEOF_MBR_SECTOR == sizeof(struct mbr_sector));
 	struct mbr_sector *mbr;
 	pos_t mbr_pos;
 
 	/* Read the MBR */
 	mbr_pos = (pos_t)subpart_sectormin << blkdev_getsectorshift(self);
-	if likely(blkdev_getsectorsize(self) == sizeof(struct mbr_sector)) {
-		static_assert(PAGESIZE >= sizeof(struct mbr_sector));
-		mbr = (struct mbr_sector *)aligned_alloca(sizeof(struct mbr_sector),
-		                                          sizeof(struct mbr_sector));
-		DBG_memset(mbr, 0xcc, sizeof(struct mbr_sector));
-		blkdev_rdsectors(self, mbr_pos, pagedir_translate(mbr), sizeof(struct mbr_sector));
-	} else {
-		mbr = (struct mbr_sector *)alloca(sizeof(struct mbr_sector));
-		mfile_readall(self, mbr, sizeof(struct mbr_sector), mbr_pos);
-	}
+#if PAGESIZE >= SIZEOF_MBR_SECTOR
+	likely(blkdev_getsectorsize(self) == sizeof(struct mbr_sector))
+	? (mbr = (struct mbr_sector *)aligned_alloca(sizeof(struct mbr_sector),
+	                                             sizeof(struct mbr_sector)),
+	   DBG_memset(mbr, 0xcc, sizeof(struct mbr_sector)),
+	   blkdev_rdsectors(self, mbr_pos, pagedir_translate(mbr), sizeof(struct mbr_sector)))
+	: (mbr = (struct mbr_sector *)alloca(sizeof(struct mbr_sector)),
+	   mfile_readall(self, mbr, sizeof(struct mbr_sector), mbr_pos));
+#else /* PAGESIZE >= SIZEOF_MBR_SECTOR */
+	mbr = (struct mbr_sector *)alloca(sizeof(struct mbr_sector));
+	mfile_readall(self, mbr, sizeof(struct mbr_sector), mbr_pos);
+#endif /* PAGESIZE < SIZEOF_MBR_SECTOR */
 
 	/* Parse the MBR */
 	blkdev_makeparts_from_mbr(self, parts, info, mbr,

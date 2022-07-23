@@ -303,7 +303,7 @@ NOTHROW(FCALL p32_pagedir_fini)(VIRT struct p32_pdir *__restrict self);
  * >> p32_pagedir_unmap(...);
  * >> p32_pagedir_unprepare(...);
  * @return: true:  Successfully allocated structures required for creating mappings.
- * @return: false: Insufficient physical memory to change mappings. */
+ * @return: false: Insufficient physical memory to prepare mappings. */
 INTDEF NOBLOCK WUNUSED bool
 NOTHROW(FCALL p32_pagedir_prepareone)(PAGEDIR_PAGEALIGNED VIRT void *addr);
 INTDEF NOBLOCK WUNUSED bool

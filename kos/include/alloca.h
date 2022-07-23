@@ -51,7 +51,12 @@
  *
  * Note that GCC's `__builtin_alloca_with_align()' uses  BIT-based
  * alignment values (for whatever nonsensical reason), though this
- * function is sane and takes BYTE-based alignments. */
+ * function is sane and takes BYTE-based alignments.
+ *
+ * WARNING: Because of some dumb design which I don't really agree
+ *          with, don't use memory returned by this outside of the
+ *          SCOPE (yes: scope; not function) is was allocated from
+ */
 #define aligned_alloca(num_bytes, min_alignment) \
 	__builtin_alloca_with_align(num_bytes, (min_alignment) * 8)
 #endif /* __has_builtin(__builtin_alloca_with_align) || __INTELLISENSE_GCC__ */

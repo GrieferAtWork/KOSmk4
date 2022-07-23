@@ -116,7 +116,7 @@ struct dl_section {
 	__size_t    const ds_entsize; /* [const] Section entity size (or 0 if unknown) */
 	__uintptr_t const ds_link;    /* [const] Index of another section that is linked by this one (or `0' if unused) */
 	__uintptr_t const ds_info;    /* [const] Index of another section that is linked by this one (or `0' if unused) */
-	__uintptr_t const ds_flags;   /* [const] Section flags (set of `SHF_*') */
+	__uintptr_t const ds_flags;   /* [const] Section flags (set of `SHF_*' from <elf.h>) */
 };
 #endif /* !__dl_section_defined */
 typedef struct dl_section module_section_t;

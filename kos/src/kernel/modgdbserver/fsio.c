@@ -289,7 +289,7 @@ NOTHROW(KCALL GDBFs_HasMountedFileSystem)(void) {
 
 /* Open a file handle for GDB (returns 0 on success) */
 INTERN WUNUSED gdb_errno_t
-NOTHROW(KCALL GDBFs_Open)(char *filename,
+NOTHROW(KCALL GDBFs_Open)(char const *filename,
                           gdb_oflag_t oflags, gdb_mode_t mode,
                           struct handle *__restrict result) {
 	/* Validate flags */
@@ -353,7 +353,7 @@ NOTHROW(KCALL GDBFs_Open)(char *filename,
 
 /* Delete the file associated with `filename' */
 INTERN WUNUSED gdb_errno_t
-NOTHROW(KCALL GDBFs_Unlink)(char *filename) {
+NOTHROW(KCALL GDBFs_Unlink)(char const *filename) {
 	/* Ensure that a filesystem has been loaded. */
 	if unlikely(!GDBFs_HasMountedFileSystem()) {
 		GDB_DEBUG("[gdb] Cannot unlink(%q): No filesystem mounted\n", filename);
@@ -384,7 +384,7 @@ NOTHROW(KCALL GDBFs_Unlink)(char *filename) {
  * @param: pbuflen: [IN]  Available buffer size in `buf'
  *                  [OUT] Number of bytes written to `buf' */
 INTERN WUNUSED gdb_errno_t
-NOTHROW(KCALL GDBFs_Readlink)(char *filename, char *buf,
+NOTHROW(KCALL GDBFs_Readlink)(char const *filename, char *buf,
                               size_t *__restrict pbuflen) {
 	/* Ensure that a filesystem has been loaded. */
 	if unlikely(!GDBFs_HasMountedFileSystem()) {

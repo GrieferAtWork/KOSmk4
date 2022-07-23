@@ -176,7 +176,9 @@ BEGIN
 	 *               needs to have an artificial dependency on rtld-flat.bin */
 	BEGIN GROUP("kernel") {
 			stepWithDependencies(COMPILE, {
-				f"{TARGET_BINPATH}{DISK_LIBPATH}libdl.rtld-flat.bin" }) };
+				f"{TARGET_BINPATH}{DISK_LIBPATH}libdl.rtld-flat.bin"
+			})
+		};
 		SET_LANGUAGE("assembler-with-cpp")
 		SOURCE({ KENREL_LIBDL_BINARY_SOURCE })
 	END
@@ -184,7 +186,9 @@ BEGIN
 		/* For compatibility-mode (include the 32-bit version of libdl.so) */
 		BEGIN GROUP("kernel") {
 				stepWithDependencies(COMPILE, {
-					TARGET_BINPATH + "/lib/libdl.rtld-flat.bin" }) };
+					f"{TARGET_BINPATH}/lib/libdl.rtld-flat.bin"
+				})
+			};
 			SET_LANGUAGE("assembler-with-cpp")
 			SOURCE({ f"arch/{XARCH}/exec/libdl-compat.S" })
 		END

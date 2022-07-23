@@ -130,7 +130,7 @@ struct dl_sect_info {
 	size_t    dsi_entsize;  /* Section entry size (in bytes) (or 0 if unknown) */
 	uintptr_t dsi_link;     /* Index of another section that is linked by this one (or `0' if unused) */
 	uintptr_t dsi_info;     /* Index of another section that is linked by this one (or `0' if unused) */
-	uintptr_t dsi_elfflags; /* ELF section flags (set of `SHF_*') */
+	uintptr_t dsi_elfflags; /* ELF section flags (set of `SHF_*' from <elf.h>) */
 	pos64_t   dsi_offset;   /* Absolute file offset where section data starts. */
 };
 

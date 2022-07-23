@@ -141,6 +141,7 @@
 - `<sys/gmon.h>`            (linux)
 - `<sys/gmon_out.h>`        (linux: Only some macros, and structs)
 - `<sys/kdaemon.h>`         (uClibc)
+- `<sys/locking.h>`         (DOS)
 - `<sys/machine.h>`         (AIX???)
 - `<sys/mtio.h>`            (linux: Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
 - `<sys/personality.h>`     (linux)

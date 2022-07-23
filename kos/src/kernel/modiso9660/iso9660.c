@@ -323,14 +323,13 @@ iso9660_openfs(struct ffilesys *__restrict UNUSED(filesys),
 
 	/* Allocate disk data buffer. */
 #if PAGESHIFT >= ISO9660_SECTOR_SHIFT
-	if (dev->mf_blockshift <= ISO9660_SECTOR_SHIFT) {
-		desc = (VolumeDescriptor *)aligned_alloca(ISO9660_SECTOR_SIZE,
-		                                          ISO9660_SECTOR_SIZE);
-	} else
-#endif /* PAGESHIFT >= ISO9660_SECTOR_SHIFT */
-	{
-		desc = (VolumeDescriptor *)alloca(sizeof(VolumeDescriptor));
-	}
+	desc = (dev->mf_blockshift <= ISO9660_SECTOR_SHIFT)
+	       ? (VolumeDescriptor *)aligned_alloca(ISO9660_SECTOR_SIZE,
+	                                            ISO9660_SECTOR_SIZE)
+	       : (VolumeDescriptor *)alloca(sizeof(VolumeDescriptor));
+#else /* PAGESHIFT >= ISO9660_SECTOR_SHIFT */
+	desc = (VolumeDescriptor *)alloca(sizeof(VolumeDescriptor));
+#endif /* PAGESHIFT < ISO9660_SECTOR_SHIFT */
 
 	/* Search for the `VOLUME_DESCRIPTOR_TYPE_PRIMARY_VOLUME' descriptor. */
 	offset               = (pos_t)0x8000;

@@ -781,7 +781,7 @@ $1=$2"
 					*ac_cv_func__set_invalid_parameter_handler*) # We might emulate it, but not by default; plus: this tends to screw up a bunch of stuff...
 						_config_site_option "ac_cv_func__set_invalid_parameter_handler" "no"; ;;
 
-					*gl_cv_func_aligned_alloc_works*) # aligned_alloca()
+					*gl_cv_func_aligned_alloc_works*) # aligned_alloc()
 						_config_site_option "gl_cv_func_aligned_alloc_works" "yes"; ;;
 					*gl_cv_func_btowc_nul*) # assert(btowc(0) == 0)
 						_config_site_option "gl_cv_func_btowc_nul" "yes"; ;;

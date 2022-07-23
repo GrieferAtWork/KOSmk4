@@ -53,6 +53,7 @@
 #include <kos/dev.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <linux/magic.h>
 
 #include <alloca.h>
 #include <assert.h>
@@ -1678,7 +1679,7 @@ tarsuper_readdir_or_unlock(struct tarsuper *__restrict self)
 	/* Allocate buffer for the tar header. */
 	hdr = (struct tarhdr *)aligned_alloca(TBLOCKSIZE, TBLOCKSIZE);
 
-	/* Check for special case: the next file may already been loaded. */
+	/* Check for special case: the next file may have already been loaded. */
 again:
 	pos = self->ts_nfile;
 	if (!TAILQ_EMPTY(&self->ts_bypos)) {
@@ -1867,7 +1868,7 @@ tarfs_open(struct ffilesys *__restrict UNUSED(filesys),
 	result->ts_super.fs_feat.sf_gid_max            = (gid_t)UINT16_MAX;
 	result->ts_super.fs_feat.sf_symlink_max        = (pos_t)100;
 	result->ts_super.fs_feat.sf_link_max           = (nlink_t)-1;
-	result->ts_super.fs_feat.sf_magic              = ENCODE_INT32('t', 'a', 'r', 0); /* <linux/magic.h> doesn't have a constant for this, so we improvise... */
+	result->ts_super.fs_feat.sf_magic              = TARFS_SUPER_MAGIC;
 	result->ts_super.fs_feat.sf_rec_incr_xfer_size = TBLOCKSIZE;
 	result->ts_super.fs_feat.sf_rec_max_xfer_size  = TBLOCKSIZE;
 	result->ts_super.fs_feat.sf_rec_min_xfer_size  = TBLOCKSIZE;

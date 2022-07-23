@@ -3161,14 +3161,12 @@ fatfs_open(struct ffilesys *__restrict UNUSED(filesys),
 	assert(dev);
 
 	/* Read the FAT disk header. */
-	if (mfile_getblocksize(dev) == sizeof(FatDiskHeader)) {
-		disk = (FatDiskHeader *)aligned_alloca(sizeof(FatDiskHeader),
-		                                       sizeof(FatDiskHeader));
-		mfile_rdblocks(dev, 0, pagedir_translate(disk), sizeof(FatDiskHeader));
-	} else {
-		disk = (FatDiskHeader *)alloca(sizeof(FatDiskHeader));
-		mfile_readall(dev, disk, sizeof(FatDiskHeader), 0);
-	}
+	(mfile_getblocksize(dev) == sizeof(FatDiskHeader))
+	? (disk = (FatDiskHeader *)aligned_alloca(sizeof(FatDiskHeader),
+	                                          sizeof(FatDiskHeader)),
+	   mfile_rdblocks(dev, 0, pagedir_translate(disk), sizeof(FatDiskHeader)))
+	: (disk = (FatDiskHeader *)alloca(sizeof(FatDiskHeader)),
+	   mfile_readall(dev, disk, sizeof(FatDiskHeader), 0));
 
 	/* Validate the boot signature. */
 	if unlikely(disk->fat32.f32_bootsig[0] != 0x55 ||
