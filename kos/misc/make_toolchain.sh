@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix a problem in `Dict.Frozen.constructor()`"
-DEEMON_VERSION="e387f15eef47334a4cd0605e32581f62df4e8ffa"
+#     v -- "Fix label placement in `system.c`"
+DEEMON_VERSION="9f7a3a6413d6bd6c14643b547e92d12359e405c1"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
