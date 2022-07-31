@@ -123,7 +123,6 @@
 #define KCPUSTATE_IS_UCPUSTATE
 #define ICPUSTATE_IS_UCPUSTATE
 #define SCPUSTATE_IS_UCPUSTATE
-#define FCPUSTATE_IS_UCPUSTATE
 
 #ifdef __CC__
 __SYSDECL_BEGIN
@@ -165,7 +164,51 @@ struct lcpustate { /* l -- Little */
 #define kcpustate ucpustate /* k -- kernel */
 #define icpustate ucpustate /* i -- Interrupts */
 #define scpustate ucpustate /* s -- Scheduling */
-#define fcpustate ucpustate /* f -- Full */
+
+
+/* NOTE: Banked registers described here are based on the description from:
+ *
+ * file:    "DDI0406B_arm_architecture_reference_manual.pdf"
+ * section: "B1.3.2    ARM core registers"
+ * title:   "Figure B1-1 Organization of general-purpose registers and Program Status Registers"
+ */
+struct fcpustate { /* f -- Full */
+	struct ucpustate fcs_usr;      /* User-mode register state (r{0-15}_usr + CPSR)
+	                                * NOTE: _ONLY_ the described register state when
+	                                * `(fcs_usr.ucs_cpsr & CPSR_M) == CPSR_M_USR' */
+
+	/* Banked registers: FIQ */
+	__uint32_t       fcs_R8_fiq;   /* banked R8-register used instead of `fcs_usr.ucs_r8' in FIQ-mode */
+	__uint32_t       fcs_R9_fiq;   /* banked R9-register used instead of `fcs_usr.ucs_r9' in FIQ-mode */
+	__uint32_t       fcs_R10_fiq;  /* banked R10-register used instead of `fcs_usr.ucs_r10' in FIQ-mode */
+	__uint32_t       fcs_R11_fiq;  /* banked R11-register used instead of `fcs_usr.ucs_r11' in FIQ-mode */
+	__uint32_t       fcs_R12_fiq;  /* banked R12-register used instead of `fcs_usr.ucs_r12' in FIQ-mode */
+	__uint32_t       fcs_SP_fiq;   /* banked SP-register used instead of `fcs_usr.ucs_sp' in FIQ-mode */
+	__uint32_t       fcs_LR_fiq;   /* banked LR-register used instead of `fcs_usr.ucs_lr' in FIQ-mode */
+	__uint32_t       fcs_SPSR_fiq; /* SPSR for FIQ-mode (old CPSR upon mode-entry) */
+
+	/* Banked registers: IRQ */
+	__uint32_t       fcs_SP_irq;   /* banked SP-register used instead of `fcs_usr.ucs_sp' in IRQ-mode */
+	__uint32_t       fcs_LR_irq;   /* banked LR-register used instead of `fcs_usr.ucs_lr' in IRQ-mode */
+	__uint32_t       fcs_SPSR_irq; /* SPSR for IRQ-mode (old CPSR upon mode-entry) */
+
+	/* Banked registers: SVC */
+	__uint32_t       fcs_SP_svc;   /* banked SP-register used instead of `fcs_usr.ucs_sp' in SVC-mode */
+	__uint32_t       fcs_LR_svc;   /* banked LR-register used instead of `fcs_usr.ucs_lr' in SVC-mode */
+	__uint32_t       fcs_SPSR_svc; /* SPSR for SVC-mode (old CPSR upon mode-entry) */
+
+	/* Banked registers: ABT */
+	__uint32_t       fcs_SP_abt;   /* banked SP-register used instead of `fcs_usr.ucs_sp' in ABT-mode */
+	__uint32_t       fcs_LR_abt;   /* banked LR-register used instead of `fcs_usr.ucs_lr' in ABT-mode */
+	__uint32_t       fcs_SPSR_abt; /* SPSR for ABT-mode (old CPSR upon mode-entry) */
+
+	/* Banked registers: UND */
+	__uint32_t       fcs_SP_und;   /* banked SP-register used instead of `fcs_usr.ucs_sp' in UND-mode */
+	__uint32_t       fcs_LR_und;   /* banked LR-register used instead of `fcs_usr.ucs_lr' in UND-mode */
+	__uint32_t       fcs_SPSR_und; /* SPSR for UND-mode (old CPSR upon mode-entry) */
+};
+
+
 
 __SYSDECL_END
 #endif /* __CC__ */

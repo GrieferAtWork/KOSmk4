@@ -256,6 +256,9 @@ class Architecture {
 	@@True if this is a big endian architecture
 	public member bigEndian: bool = false;
 
+	@@True if register names are case-insensitive (names in @registers are all lower-case)
+	public member caseInsensitiveRegisterNames: bool = false;
+
 	@@Set of pre-defined arch macros
 	public member archMacros: {string: int} = none;
 
@@ -277,6 +280,26 @@ class Architecture {
 	private function _loadSysmacroFile(filename: string) {
 		for (local name, value: enumerateIntegerMacrosFromFile(filename))
 			this._sysmacroValueCache.setdefault(name, value);
+	}
+
+	@@Return the id of the given register
+	function tryGetRegisterByName(name: string): int | none {
+		local result = this.registers.get(name);
+		if (result is none && caseInsensitiveRegisterNames)
+			result = this.registers.get(name.lower());
+		if (result is none)
+			result = try int(name) catch (...) none;
+		return result;
+	}
+
+	@@Return the id of the given register
+	function getRegisterByName(name: string): int {
+		local result = this.registers.get(name);
+		if (result is none && caseInsensitiveRegisterNames)
+			result = this.registers.get(name.lower());
+		if (result is none)
+			result = int(name);
+		return result;
 	}
 
 	@@Return the name of the given register id, or re-return @id
@@ -862,7 +885,7 @@ class Assembler {
 				yield DW_OP_const1u;
 				yield removeSurroundingParenthesis(arg[1:]);
 			} else if (arg.startswith("&")) {
-				local regno = arch.registers[arg[1:]];
+				local regno = arch.getRegisterByName(arg[1:]);
 				if (regno <= 31) {
 					yield DW_OP_reg0 + regno;
 					yield encodeULeb128(regno)...;
@@ -879,7 +902,7 @@ class Assembler {
 					if (part.startswith("%")) {
 						if (registerId !is none)
 							throw InvalidOperands();
-						registerId = arch.registers[part[1:]];
+						registerId = arch.getRegisterByName(part[1:]);
 					} else if (part.startswith("\\")) {
 						if (variableName !is none)
 							throw InvalidOperands();
@@ -1107,7 +1130,7 @@ encode_suleb:
 		if (arg is string) {
 			if (!arg.startswith("&"))
 				throw InvalidOperands();
-			arg = arch.registers[arg[1:]];
+			arg = arch.getRegisterByName(arg[1:]);
 		}
 		if (testEncodeU5bit(arg)) {
 			yield encodeU5Bit(arg, DW_OP_reg0);
@@ -1145,7 +1168,7 @@ encode_suleb:
 		if (regno is string) {
 			if (!regno.startswith("%"))
 				throw InvalidOperands();
-			regno = arch.registers[regno[1:]];
+			regno = arch.getRegisterByName(regno[1:]);
 		}
 		if (testEncodeU5bit(regno)) {
 			yield encodeU5Bit(regno, DW_OP_breg0);
@@ -1386,7 +1409,7 @@ handle_fixed_operand_size:
 				}
 				return;
 			}
-			outputRegister = this.arch.registers[outputRegister];
+			outputRegister = this.arch.getRegisterByName(outputRegister);
 		}
 		yield isDerefAfter ? DW_CFA_expression : DW_CFA_val_expression;
 		yield encodeULeb128(outputRegister)...;

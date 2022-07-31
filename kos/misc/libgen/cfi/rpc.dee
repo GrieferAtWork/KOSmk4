@@ -541,7 +541,7 @@ again:
 				} else if (arg == "%gs.base" && arch.name == "i386") {
 					yield RPC_OP_386_pushreg_gsbase;
 				} else {
-					local registerId = arch.registers[arg[1:]];
+					local registerId = arch.getRegisterByName(arg[1:]);
 					if (registerId <= 31) {
 						yield RPC_OP_pushreg0 + registerId;
 					} else {
@@ -652,7 +652,7 @@ again:
 			} else if (arg == "%gs.base" && arch.name == "i386") {
 				yield RPC_OP_386_popreg_gsbase;
 			} else {
-				local registerId = arch.registers[arg[1:]];
+				local registerId = arch.getRegisterByName(arg[1:]);
 				if (registerId <= 31) {
 					yield RPC_OP_popreg0 + registerId;
 				} else {
@@ -683,7 +683,7 @@ again:
 			yield RPC_OP_sppush_const;
 			yield arg.tobytes(arch.addrsize, byteorder: arch.byteorder, signed: false)...;
 		} else if (arg.startswith("%")) {
-			local registerId = arch.registers.get(arg[1:]);
+			local registerId = arch.tryGetRegisterByName(arg[1:]);
 			if (registerId is none)
 				goto fallback;
 			if (registerId <= 31) {

@@ -36,11 +36,6 @@
 #define CFI_ARM_REGISTER_SIZE(regno)     4
 #define CFI_ARM_UNWIND_REGISTER_EXCEPTION CFI_ARM_UNWIND_REGISTER_R0 /* TODO: !!!UNCHECKED!!! */
 
-/* Aliases */
-#define CFI_ARM_UNWIND_REGISTER_SP CFI_ARM_UNWIND_REGISTER_R13 /* The register for the CFA. */
-#define CFI_ARM_UNWIND_REGISTER_LR CFI_ARM_UNWIND_REGISTER_R14 /* Link register (return address) */
-#define CFI_ARM_UNWIND_REGISTER_PC CFI_ARM_UNWIND_REGISTER_R15 /* The register containing the program counter. */
-
 /* GP Registers */
 #define CFI_ARM_UNWIND_REGISTER_R0  0
 #define CFI_ARM_UNWIND_REGISTER_R1  1
@@ -55,11 +50,58 @@
 #define CFI_ARM_UNWIND_REGISTER_R10 10
 #define CFI_ARM_UNWIND_REGISTER_R11 11
 #define CFI_ARM_UNWIND_REGISTER_R12 12
-#define CFI_ARM_UNWIND_REGISTER_R13 13
-#define CFI_ARM_UNWIND_REGISTER_R14 14
-#define CFI_ARM_UNWIND_REGISTER_R15 15
+#define CFI_ARM_UNWIND_REGISTER_SP  13 /* The register for the CFA. */
+#define CFI_ARM_UNWIND_REGISTER_LR  14 /* Link register (return address) */
+#define CFI_ARM_UNWIND_REGISTER_PC  15 /* The register containing the program counter. */
+#define CFI_ARM_UNWIND_REGISTER_R13 CFI_ARM_UNWIND_REGISTER_SP
+#define CFI_ARM_UNWIND_REGISTER_R14 CFI_ARM_UNWIND_REGISTER_LR
+#define CFI_ARM_UNWIND_REGISTER_R15 CFI_ARM_UNWIND_REGISTER_PC
 /* TODO: FPU Registers */
-#define CFI_ARM_UNWIND_REGISTER_COUNT 16
+
+#define CFI_ARM_UNWIND_REGISTER_CPSR 128 /* CPSR */
+
+/* Banked registers */
+#define CFI_ARM_UNWIND_REGISTER_SPSR_FIQ 129 /* SPSR for FIQ-mode (old CPSR upon mode-entry) */
+#define CFI_ARM_UNWIND_REGISTER_SPSR_IRQ 130 /* SPSR for IRQ-mode (old CPSR upon mode-entry) */
+#define CFI_ARM_UNWIND_REGISTER_SPSR_ABT 131 /* SPSR for ABT-mode (old CPSR upon mode-entry) */
+#define CFI_ARM_UNWIND_REGISTER_SPSR_UND 132 /* SPSR for UND-mode (old CPSR upon mode-entry) */
+#define CFI_ARM_UNWIND_REGISTER_SPSR_SVC 133 /* SPSR for SVC-mode (old CPSR upon mode-entry) */
+#define CFI_ARM_UNWIND_REGISTER_R8_USR   144 /* User-space r8 (same as `CFI_ARM_UNWIND_REGISTER_R8', except when in FIQ-mode) */
+#define CFI_ARM_UNWIND_REGISTER_R9_USR   145 /* User-space r9 (same as `CFI_ARM_UNWIND_REGISTER_R9', except when in FIQ-mode) */
+#define CFI_ARM_UNWIND_REGISTER_R10_USR  146 /* User-space r10 (same as `CFI_ARM_UNWIND_REGISTER_R10', except when in FIQ-mode) */
+#define CFI_ARM_UNWIND_REGISTER_R11_USR  147 /* User-space r11 (same as `CFI_ARM_UNWIND_REGISTER_R11', except when in FIQ-mode) */
+#define CFI_ARM_UNWIND_REGISTER_R12_USR  148 /* User-space r12 (same as `CFI_ARM_UNWIND_REGISTER_R12', except when in FIQ-mode) */
+#define CFI_ARM_UNWIND_REGISTER_SP_USR   149 /* User-space sp (same as `CFI_ARM_UNWIND_REGISTER_SP', except when in FIQ-mode) */
+#define CFI_ARM_UNWIND_REGISTER_LR_USR   150 /* User-space lr (same as `CFI_ARM_UNWIND_REGISTER_LR', except when in FIQ-mode) */
+#define CFI_ARM_UNWIND_REGISTER_R13_USR  CFI_ARM_UNWIND_REGISTER_SP_USR
+#define CFI_ARM_UNWIND_REGISTER_R14_USR  CFI_ARM_UNWIND_REGISTER_LR_USR
+#define CFI_ARM_UNWIND_REGISTER_R8_FIQ   151 /* banked R8-register used instead of `fcs_usr.ucs_r8' in FIQ-mode */
+#define CFI_ARM_UNWIND_REGISTER_R9_FIQ   152 /* banked R9-register used instead of `fcs_usr.ucs_r9' in FIQ-mode */
+#define CFI_ARM_UNWIND_REGISTER_R10_FIQ  153 /* banked R10-register used instead of `fcs_usr.ucs_r10' in FIQ-mode */
+#define CFI_ARM_UNWIND_REGISTER_R11_FIQ  154 /* banked R11-register used instead of `fcs_usr.ucs_r11' in FIQ-mode */
+#define CFI_ARM_UNWIND_REGISTER_R12_FIQ  155 /* banked R12-register used instead of `fcs_usr.ucs_r12' in FIQ-mode */
+#define CFI_ARM_UNWIND_REGISTER_SP_FIQ   156 /* banked SP-register used instead of `fcs_usr.ucs_sp' in FIQ-mode */
+#define CFI_ARM_UNWIND_REGISTER_LR_FIQ   157 /* banked LR-register used instead of `fcs_usr.ucs_lr' in FIQ-mode */
+#define CFI_ARM_UNWIND_REGISTER_R13_FIQ  CFI_ARM_UNWIND_REGISTER_SP_FIQ
+#define CFI_ARM_UNWIND_REGISTER_R14_FIQ  CFI_ARM_UNWIND_REGISTER_LR_FIQ
+#define CFI_ARM_UNWIND_REGISTER_SP_IRQ   158 /* banked SP-register used instead of `fcs_usr.ucs_sp' in IRQ-mode */
+#define CFI_ARM_UNWIND_REGISTER_LR_IRQ   159 /* banked LR-register used instead of `fcs_usr.ucs_lr' in IRQ-mode */
+#define CFI_ARM_UNWIND_REGISTER_R13_IRQ  CFI_ARM_UNWIND_REGISTER_SP_IRQ
+#define CFI_ARM_UNWIND_REGISTER_R14_IRQ  CFI_ARM_UNWIND_REGISTER_LR_IRQ
+#define CFI_ARM_UNWIND_REGISTER_SP_ABT   160 /* banked SP-register used instead of `fcs_usr.ucs_sp' in ABT-mode */
+#define CFI_ARM_UNWIND_REGISTER_LR_ABT   161 /* banked LR-register used instead of `fcs_usr.ucs_lr' in ABT-mode */
+#define CFI_ARM_UNWIND_REGISTER_R13_ABT  CFI_ARM_UNWIND_REGISTER_SP_ABT
+#define CFI_ARM_UNWIND_REGISTER_R14_ABT  CFI_ARM_UNWIND_REGISTER_LR_ABT
+#define CFI_ARM_UNWIND_REGISTER_SP_UND   162 /* banked SP-register used instead of `fcs_usr.ucs_sp' in UND-mode */
+#define CFI_ARM_UNWIND_REGISTER_LR_UND   163 /* banked LR-register used instead of `fcs_usr.ucs_lr' in UND-mode */
+#define CFI_ARM_UNWIND_REGISTER_R13_UND  CFI_ARM_UNWIND_REGISTER_SP_UND
+#define CFI_ARM_UNWIND_REGISTER_R14_UND  CFI_ARM_UNWIND_REGISTER_LR_UND
+#define CFI_ARM_UNWIND_REGISTER_SP_SVC   164 /* banked SP-register used instead of `fcs_usr.ucs_sp' in SVC-mode */
+#define CFI_ARM_UNWIND_REGISTER_LR_SVC   165 /* banked LR-register used instead of `fcs_usr.ucs_lr' in SVC-mode */
+#define CFI_ARM_UNWIND_REGISTER_R13_SVC  CFI_ARM_UNWIND_REGISTER_SP_SVC
+#define CFI_ARM_UNWIND_REGISTER_R14_SVC  CFI_ARM_UNWIND_REGISTER_LR_SVC
+
+#define CFI_ARM_UNWIND_REGISTER_COUNT 166 /* 1+ the greatest used register number */
 
 
 
@@ -69,8 +111,6 @@
  *            generate unwind instructions within normal assembly. */
 
 /* Common registers */
-#define CFI_ARM_UNWIND_COMMON_REGISTER_LR CFI_ARM_UNWIND_COMMON_REGISTER_R14 /* Link register (return address) */
-#define CFI_ARM_UNWIND_COMMON_REGISTER_PC CFI_ARM_UNWIND_COMMON_REGISTER_R15 /* The register containing the program counter. */
 #define CFI_ARM_UNWIND_COMMON_REGISTER_R4    0
 #define CFI_ARM_UNWIND_COMMON_REGISTER_R5    1
 #define CFI_ARM_UNWIND_COMMON_REGISTER_R6    2
@@ -79,182 +119,49 @@
 #define CFI_ARM_UNWIND_COMMON_REGISTER_R9    5
 #define CFI_ARM_UNWIND_COMMON_REGISTER_R10   6
 #define CFI_ARM_UNWIND_COMMON_REGISTER_R11   7
-#define CFI_ARM_UNWIND_COMMON_REGISTER_R14   8
-#define CFI_ARM_UNWIND_COMMON_REGISTER_R15   9
+#define CFI_ARM_UNWIND_COMMON_REGISTER_LR    8 /* Link register (return address) */
+#define CFI_ARM_UNWIND_COMMON_REGISTER_PC    9 /* The register containing the program counter. */
 #define CFI_ARM_UNWIND_COMMON_REGISTER_COUNT 10
+#define CFI_ARM_UNWIND_COMMON_REGISTER_R14   CFI_ARM_UNWIND_COMMON_REGISTER_LR
+#define CFI_ARM_UNWIND_COMMON_REGISTER_R15   CFI_ARM_UNWIND_COMMON_REGISTER_PC
 
 /* Uncommon registers */
-#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_SP    CFI_ARM_UNWIND_UNCOMMON_REGISTER_R13 /* The register for the CFA. */
-#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R0    0
-#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R1    1
-#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R2    2
-#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R3    3
-#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R12   4
-#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R13   5
-#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_COUNT 6
-
-
-
-
-
-/* The common/uncommon system  is optimized for  unwinding
- * regular C functions, since it only caches for registers
- * that have to be preserved when following the standard C
- * calling convention of the host.
- * However, at least within the kernel there is 1 additional
- * category  of registers that _very_ often appear alongside
- * each other, mainly when unwinding a system call:
- * arm:```
- *     Uncommon register used: 1 (1)
- *     Uncommon register used: 2 (2)
- *     Uncommon register used: 44 (36)
- *     Uncommon register used: 40 (32)
- *     Uncommon register used: 43 (35)
- *     Uncommon register used: 45 (37)
- *     Uncommon register used: 42 (34)
- *     Uncommon register used: 4 (3)
- *     Uncommon register used: 9 (4)
- *     Uncommon register used: 41 (33)
- * ```
- * To  optimize  for  stuff   like  this,  provide  an   optional,
- * secondary unwinding system specifically for sigframe functions.
- *  - When unwinding an FDE with the SIGNAL_FRAME flag set, use a different
- *    set of  COMMON registers  (mainly:  all GP-regs,  +  segments/eflags)
- *  - This  can then also  be implemented in user-space,  to only require a
- *    single evaluation-pass over the FDE body to gather all registers that
- *    are likely to ever be used.
- *  - This  entire sub-system is be implemented in parallel to the CFA_EXEC+
- *    CFA_APPLY functions and when building with __OPTIMIZE_SIZE__, we could
- *    simply implement these functions as aliases, since all they do is  add
- *    another layer of optimization.
- */
-
-/* Register <--> Sigframe Common/Uncommon-register mapping
- *
- * Signal  frames are  normally used  to unwind  to an interrupted
- * code location. - For this  purpose, they need to restore  _all_
- * GP registers, the FLAGS register, as well as all of the segment
- * registers. To speed  up this process,  define a special  unwind
- * register namespace specifically for signal frame functions. */
-#define CFI_ARM_UNWIND_SIGFRAME_COMMON_REGISTER_SP  CFI_ARM_UNWIND_SIGFRAME_COMMON_REGISTER_ESP
-#define CFI_ARM_UNWIND_SIGFRAME_COMMON_REGISTER_EAX    0
-#define CFI_ARM_UNWIND_SIGFRAME_COMMON_REGISTER_ECX    1
-#define CFI_ARM_UNWIND_SIGFRAME_COMMON_REGISTER_EDX    2
-#define CFI_ARM_UNWIND_SIGFRAME_COMMON_REGISTER_EBX    3
-#define CFI_ARM_UNWIND_SIGFRAME_COMMON_REGISTER_ESP    4
-#define CFI_ARM_UNWIND_SIGFRAME_COMMON_REGISTER_EBP    5
-#define CFI_ARM_UNWIND_SIGFRAME_COMMON_REGISTER_ESI    6
-#define CFI_ARM_UNWIND_SIGFRAME_COMMON_REGISTER_EDI    7
-#define CFI_ARM_UNWIND_SIGFRAME_COMMON_REGISTER_EIP    8
-#define CFI_ARM_UNWIND_SIGFRAME_COMMON_REGISTER_EFLAGS 9
-#define CFI_ARM_UNWIND_SIGFRAME_COMMON_REGISTER_ES     10
-#define CFI_ARM_UNWIND_SIGFRAME_COMMON_REGISTER_CS     11
-#define CFI_ARM_UNWIND_SIGFRAME_COMMON_REGISTER_SS     12
-#define CFI_ARM_UNWIND_SIGFRAME_COMMON_REGISTER_DS     13
-#define CFI_ARM_UNWIND_SIGFRAME_COMMON_REGISTER_FS     14
-#define CFI_ARM_UNWIND_SIGFRAME_COMMON_REGISTER_GS     15
-#define CFI_ARM_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT  16
-
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_ST0   0
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_ST1   1
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_ST2   2
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_ST3   3
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_ST4   4
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_ST5   5
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_ST6   6
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_ST7   7
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM0  8
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM1  9
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM2  10
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM3  11
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM4  12
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM5  13
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM6  14
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_XMM7  15
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MM0   16
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MM1   17
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MM2   18
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MM3   19
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MM4   20
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MM5   21
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MM6   22
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MM7   23
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_FCW   24
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_FSW   25
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MXCSR 26
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_TR    27
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_LDTR  28
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K0    29
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K1    30
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K2    31
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K3    32
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K4    33
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K5    34
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K6    35
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_K7    36
-#define CFI_ARM_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT 37
-
-
-
-/* Register <--> Landing-pad Common/Uncommon-register mapping */
-#define CFI_ARM_UNWIND_LANDING_COMMON_REGISTER_EFLAGS 0
-#define CFI_ARM_UNWIND_LANDING_COMMON_REGISTER_COUNT  1
-
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_SP    CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_ESP
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_EAX   0
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_ECX   1
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_EDX   2
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_EBX   3
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_ESP   4
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_EBP   5
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_ESI   6
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_EDI   7
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_EIP   8
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_ST0   9
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_ST1   10
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_ST2   11
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_ST3   12
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_ST4   13
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_ST5   14
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_ST6   15
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_ST7   16
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_XMM0  17
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_XMM1  18
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_XMM2  19
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_XMM3  20
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_XMM4  21
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_XMM5  22
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_XMM6  23
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_XMM7  24
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_MM0   25
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_MM1   26
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_MM2   27
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_MM3   28
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_MM4   29
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_MM5   30
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_MM6   31
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_MM7   32
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_FCW   33
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_FSW   34
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_MXCSR 35
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_ES    36
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_CS    37
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_SS    38
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_DS    39
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_FS    40
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_GS    41
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_TR    42
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_LDTR  43
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_K0    44
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_K1    45
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_K2    46
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_K3    47
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_K4    48
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_K5    49
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_K6    50
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_K7    51
-#define CFI_ARM_UNWIND_LANDING_UNCOMMON_REGISTER_COUNT 52
-
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R13      CFI_ARM_UNWIND_UNCOMMON_REGISTER_SP /* The register for the CFA. */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R0       0
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R1       1
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R2       2
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R3       3
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R12      4
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_SP       5
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_CPSR     6  /* CPSR */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_SPSR_FIQ 7  /* SPSR for FIQ-mode (old CPSR upon mode-entry) */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_SPSR_IRQ 8  /* SPSR for IRQ-mode (old CPSR upon mode-entry) */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_SPSR_ABT 9  /* SPSR for ABT-mode (old CPSR upon mode-entry) */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_SPSR_UND 10 /* SPSR for UND-mode (old CPSR upon mode-entry) */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_SPSR_SVC 11 /* SPSR for SVC-mode (old CPSR upon mode-entry) */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R8_USR   12 /* User-space r8 (same as `CFI_ARM_UNWIND_REGISTER_R8', except when in FIQ-mode) */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R9_USR   13 /* User-space r9 (same as `CFI_ARM_UNWIND_REGISTER_R9', except when in FIQ-mode) */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R10_USR  14 /* User-space r10 (same as `CFI_ARM_UNWIND_REGISTER_R10', except when in FIQ-mode) */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R11_USR  15 /* User-space r11 (same as `CFI_ARM_UNWIND_REGISTER_R11', except when in FIQ-mode) */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R12_USR  16 /* User-space r12 (same as `CFI_ARM_UNWIND_REGISTER_R12', except when in FIQ-mode) */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_SP_USR   17 /* User-space sp (same as `CFI_ARM_UNWIND_REGISTER_SP', except when in FIQ-mode) */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_LR_USR   18 /* User-space lr (same as `CFI_ARM_UNWIND_REGISTER_LR', except when in FIQ-mode) */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R8_FIQ   19 /* banked R8-register used instead of `fcs_usr.ucs_r8' in FIQ-mode */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R9_FIQ   20 /* banked R9-register used instead of `fcs_usr.ucs_r9' in FIQ-mode */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R10_FIQ  21 /* banked R10-register used instead of `fcs_usr.ucs_r10' in FIQ-mode */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R11_FIQ  22 /* banked R11-register used instead of `fcs_usr.ucs_r11' in FIQ-mode */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_R12_FIQ  23 /* banked R12-register used instead of `fcs_usr.ucs_r12' in FIQ-mode */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_SP_FIQ   24 /* banked SP-register used instead of `fcs_usr.ucs_sp' in FIQ-mode */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_LR_FIQ   25 /* banked LR-register used instead of `fcs_usr.ucs_lr' in FIQ-mode */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_SP_IRQ   26 /* banked SP-register used instead of `fcs_usr.ucs_sp' in IRQ-mode */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_LR_IRQ   27 /* banked LR-register used instead of `fcs_usr.ucs_lr' in IRQ-mode */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_SP_ABT   28 /* banked SP-register used instead of `fcs_usr.ucs_sp' in ABT-mode */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_LR_ABT   29 /* banked LR-register used instead of `fcs_usr.ucs_lr' in ABT-mode */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_SP_UND   30 /* banked SP-register used instead of `fcs_usr.ucs_sp' in UND-mode */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_LR_UND   31 /* banked LR-register used instead of `fcs_usr.ucs_lr' in UND-mode */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_SP_SVC   32 /* banked SP-register used instead of `fcs_usr.ucs_sp' in SVC-mode */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_LR_SVC   33 /* banked LR-register used instead of `fcs_usr.ucs_lr' in SVC-mode */
+#define CFI_ARM_UNWIND_UNCOMMON_REGISTER_COUNT    34
 
 /*[[[deemon
 import * from deemon;
@@ -266,16 +173,36 @@ printArrayDefineMacro("DEFINE_cfi_arm_unwind_register_dw2uncommon", generateArra
 printArrayDefineMacro("DEFINE_cfi_arm_unwind_register_common2dw", generateArrayMapping(macros, "CFI_ARM_UNWIND_COMMON_REGISTER_", "CFI_ARM_UNWIND_REGISTER_"));
 printArrayDefineMacro("DEFINE_cfi_arm_unwind_register_uncommon2dw", generateArrayMapping(macros, "CFI_ARM_UNWIND_UNCOMMON_REGISTER_", "CFI_ARM_UNWIND_REGISTER_"));
 ]]]*/
-#define DEFINE_cfi_arm_unwind_register_dw2common(name)                                                                \
-	__UINT8_TYPE__ const name[17] = { 255, 255, 255, 255, 0,   1,   2,   3,   4,   5,   6,   7,   255, 255, 8,   9,   \
-	                                  10 }
-#define DEFINE_cfi_arm_unwind_register_dw2uncommon(name)                                                              \
-	__UINT8_TYPE__ const name[17] = { 0,   1,   2,   3,   255, 255, 255, 255, 255, 255, 255, 255, 4,   5,   255, 255, \
-	                                  6 }
+#define DEFINE_cfi_arm_unwind_register_dw2common(name)                                                                 \
+	__UINT8_TYPE__ const name[167] = { 255, 255, 255, 255, 0,   1,   2,   3,   4,   5,   6,   7,   255, 255, 8,   9,   \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 10 }
+#define DEFINE_cfi_arm_unwind_register_dw2uncommon(name)                                                               \
+	__UINT8_TYPE__ const name[167] = { 0,   1,   2,   3,   255, 255, 255, 255, 255, 255, 255, 255, 4,   5,   255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   6,   7,   8,   9,   10,  11,  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   12,  13,  14,  15,  16,  17,  18,  19,  20,  21,  22,  23,  24,  25,  26,  27,  \
+	                                   28,  29,  30,  31,  32,  33,  34 }
 #define DEFINE_cfi_arm_unwind_register_common2dw(name) \
-	__UINT8_TYPE__ const name[11] = { 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 16 }
-#define DEFINE_cfi_arm_unwind_register_uncommon2dw(name) \
-	__UINT8_TYPE__ const name[7] = { 0, 1, 2, 3, 12, 13, 16 }
+	__UINT8_TYPE__ const name[11] = { 4, 5, 6, 7, 8, 9, 10, 11, 14, 15, 166 }
+#define DEFINE_cfi_arm_unwind_register_uncommon2dw(name)                                                              \
+	__UINT8_TYPE__ const name[35] = { 0,   1,   2,   3,   12,  13,  128, 129, 130, 131, 132, 133, 144, 145, 146, 147, \
+	                                  148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, \
+	                                  164, 165, 166 }
 /*[[[end]]]*/
 
 
