@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a51ced4 */
+/* HASH CRC-32:0x9e11d54 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -704,7 +704,10 @@
 #define __NRAN3_splice                       offout
 #define __NRAN4_splice                       length
 #define __NRAN5_splice                       flags
-#define __NRAN0_arm_sync_file_range          TODO_PROTOTYPE
+#define __NRAN0_sync_file_range2             fd
+#define __NRAN1_sync_file_range2             flags
+#define __NRAN2_sync_file_range2             offset
+#define __NRAN3_sync_file_range2             count
 #define __NRAN0_tee                          fdin
 #define __NRAN1_tee                          fdout
 #define __NRAN2_tee                          length
@@ -2218,8 +2221,11 @@
 #define __NRATR4_splice                       SC_REPR_SIZE_T                                                       /* length */ 
 #define __NRATR5_splice                       SC_REPR_SPLICE_FLAGS                                                 /* flags */ 
 #define __NRRTR_splice                        SC_REPR_SSIZE_T                                                      /* return */
-#define __NRATR0_arm_sync_file_range          SC_REPR_INT                                                          /* TODO_PROTOTYPE */ 
-#define __NRRTR_arm_sync_file_range           SC_REPR_ERRNO_T                                                      /* return */
+#define __NRATR0_sync_file_range2             SC_REPR_FD_T                                                         /* fd */ 
+#define __NRATR1_sync_file_range2             SC_REPR_SYNC_FILE_RANGE_FLAGS                                        /* flags */ 
+#define __NRATR2_sync_file_range2             SC_REPR_UINT64_T                                                     /* offset */ 
+#define __NRATR3_sync_file_range2             SC_REPR_UINT64_T                                                     /* count */ 
+#define __NRRTR_sync_file_range2              SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_tee                          SC_REPR_FD_T                                                         /* fdin */ 
 #define __NRATR1_tee                          SC_REPR_FD_T                                                         /* fdout */ 
 #define __NRATR2_tee                          SC_REPR_SIZE_T                                                       /* length */ 
@@ -2809,7 +2815,7 @@
 #define __NRATR0_lfutexexpr                   SC_REPR_POINTER                                                      /* futexaddr */ 
 #define __NRATR1_lfutexexpr                   SC_REPR_POINTER                                                      /* base */ 
 #define __NRATR2_lfutexexpr                   SC_REPR_STRUCT_LFUTEXEXPR_VECTOR                                     /* expr */ 
-#define __NRATR3_lfutexexpr                   SC_REPR_STRUCT_TIMESPEC                                              /* timeout */ 
+#define __NRATR3_lfutexexpr                   SC_REPR_STRUCT_TIMESPEC64                                            /* timeout */ 
 #define __NRATR4_lfutexexpr                   SC_REPR_LFUTEX_TIMEOUT_FLAGS                                         /* flags */ 
 #define __NRRTR_lfutexexpr                    SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_set_userprocmask_address     SC_REPR_POINTER                                                      /* ctl */ 
@@ -2903,6 +2909,8 @@
 #define __NRDW1_truncate64
 #define __NRDW1_ftruncate64
 #define __NRDW1_readahead
+#define __NRDW2_sync_file_range2
+#define __NRDW3_sync_file_range2
 #define __NRDW3_preadv
 #define __NRDW3_pwritev
 #define __NRDW1_lseek64

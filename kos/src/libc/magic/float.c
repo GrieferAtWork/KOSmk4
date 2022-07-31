@@ -284,7 +284,7 @@ $uint32_t _clearfp();
 $uint32_t _controlfp($uint32_t newval, $uint32_t mask) {
 	@fpu_control_t@ result;
 	@_FPU_GETCW@(result);
-@@pp_if _FPU_RESERVED != 0@@
+@@pp_if defined(_FPU_RESERVED) && _FPU_RESERVED != 0@@
 	mask &= ~_FPU_RESERVED; /* Don't allow modification of reserved words. */
 @@pp_endif@@
 	if (mask) {

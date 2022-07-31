@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf335ef03 */
+/* HASH CRC-32:0xc200a93b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,6 @@
 #define __CRT_HAVE_sys_adjtimex
 #define __CRT_HAVE_sys_alarm
 #define __CRT_HAVE_sys_arm_fadvise64_64
-#define __CRT_HAVE_sys_arm_sync_file_range
 #define __CRT_HAVE_sys_bdflush
 #define __CRT_HAVE_sys_bind
 #define __CRT_HAVE_sys_bpf
@@ -436,6 +435,7 @@
 #define __CRT_HAVE_sys_symlink
 #define __CRT_HAVE_sys_symlinkat
 #define __CRT_HAVE_sys_sync
+#define __CRT_HAVE_sys_sync_file_range2
 #define __CRT_HAVE_sys_syncfs
 #define __CRT_HAVE_sys_syscall
 #define __CRT_HAVE_sys_sysfs
@@ -504,7 +504,6 @@
 #define __CRT_HAVE_sys_Xadjtimex
 #define __CRT_HAVE_sys_Xalarm
 #define __CRT_HAVE_sys_Xarm_fadvise64_64
-#define __CRT_HAVE_sys_Xarm_sync_file_range
 #define __CRT_HAVE_sys_Xbdflush
 #define __CRT_HAVE_sys_Xbind
 #define __CRT_HAVE_sys_Xbpf
@@ -908,6 +907,7 @@
 #define __CRT_HAVE_sys_Xsymlink
 #define __CRT_HAVE_sys_Xsymlinkat
 #define __CRT_HAVE_sys_Xsync
+#define __CRT_HAVE_sys_Xsync_file_range2
 #define __CRT_HAVE_sys_Xsyncfs
 #define __CRT_HAVE_sys_Xsyscall
 #define __CRT_HAVE_sys_Xsysfs

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e6e26e0 */
+/* HASH CRC-32:0x54e9a084 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,9 @@ __LOCAL_LIBC(_controlfp) __UINT32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_controlfp))(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask) {
 	fpu_control_t __result;
 	_FPU_GETCW(__result);
-#if _FPU_RESERVED
+#if defined(_FPU_RESERVED) && _FPU_RESERVED
 	__mask &= ~_FPU_RESERVED; /* Don't allow modification of reserved words. */
-#endif /* _FPU_RESERVED */
+#endif /* _FPU_RESERVED && _FPU_RESERVED */
 	if (__mask) {
 		fpu_control_t __newword;
 		__newword = __result;

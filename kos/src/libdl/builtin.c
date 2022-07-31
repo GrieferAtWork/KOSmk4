@@ -2541,17 +2541,15 @@ DlModule_InvokeDlCacheFunctions(DlModule *__restrict self)
 		THROWS(...) {
 	int result = 0;
 	DlSection *sect;
-	sect = libdl_dllocksection(self, ".dl_caches",
-	                           DLLOCKSECTION_FNORMAL);
+	sect = libdl_dllocksection(self, ".dl_caches", DLLOCKSECTION_FNORMAL);
 	if unlikely(!sect)
 		goto done;
 	if likely(!(sect->ds_size & (sizeof(void *) - 1))) {
 		size_t i;
 		typedef int (*cache_func_t)(void);
 		for (i = 0; i < sect->ds_size; i += sizeof(void *)) {
-			cache_func_t func;
-			func = (cache_func_t)(void *)(self->dm_loadaddr +
-			                              *(uintptr_t *)((byte_t *)sect->ds_data + i));
+			byte_t *ptraddr   = (byte_t *)sect->ds_data + i;
+			cache_func_t func = (cache_func_t)(void *)(ptraddr + *(uintptr_t *)ptraddr);
 			if ((*func)())
 				result = 1;
 		}

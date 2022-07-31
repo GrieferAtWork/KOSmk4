@@ -24,6 +24,27 @@
 
 #include <bits/types.h>
 
+/* The following macros may be defined to indicate aliases.
+ * NOTE: Don't define macros to transitive aliases; iow: at most 1
+ *       `XCPUSTATE_IS_*' should be defined for every `XCPUSTATE'! */
+#if 0
+#define LCPUSTATE_IS_UCPUSTATE
+#define KCPUSTATE_IS_UCPUSTATE
+#define KCPUSTATE_IS_LCPUSTATE
+#define ICPUSTATE_IS_UCPUSTATE
+#define ICPUSTATE_IS_LCPUSTATE
+#define ICPUSTATE_IS_KCPUSTATE
+#define SCPUSTATE_IS_UCPUSTATE
+#define SCPUSTATE_IS_LCPUSTATE
+#define SCPUSTATE_IS_KCPUSTATE
+#define SCPUSTATE_IS_ICPUSTATE
+#define FCPUSTATE_IS_UCPUSTATE
+#define FCPUSTATE_IS_LCPUSTATE
+#define FCPUSTATE_IS_KCPUSTATE
+#define FCPUSTATE_IS_ICPUSTATE
+#define FCPUSTATE_IS_SCPUSTATE
+#endif
+
 #ifdef __CC__
 __SYSDECL_BEGIN
 

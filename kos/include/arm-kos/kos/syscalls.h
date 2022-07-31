@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e130a55 */
+/* HASH CRC-32:0x3c72e6cb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -143,8 +143,6 @@ struct linux_dirent64;
 struct linux_stat;
 struct linux_stat64;
 struct mmsghdr;
-struct mmsghdr32;
-struct mmsghdr64;
 struct mq_attr;
 struct msghdr;
 struct old_linux_dirent;
@@ -162,7 +160,6 @@ struct sockaddr;
 struct statfs;
 struct sysinfo;
 struct termios;
-struct timespec;
 struct timeval;
 struct timex32;
 struct timezone;
@@ -236,9 +233,6 @@ __CDECLARE_SC(,__syscall_ulong_t,alarm,(__syscall_ulong_t __seconds),(__seconds)
 #if __CRT_HAVE_SC(arm_fadvise64_64)
 __CDECLARE_SC(,__errno_t,arm_fadvise64_64,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(arm_fadvise64_64) */
-#if __CRT_HAVE_SC(arm_sync_file_range)
-__CDECLARE_SC(,__errno_t,arm_sync_file_range,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
-#endif /* __CRT_HAVE_SC(arm_sync_file_range) */
 #if __CRT_HAVE_SC(bdflush)
 __CDECLARE_SC(,__errno_t,bdflush,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(bdflush) */
@@ -1145,7 +1139,7 @@ __CDECLARE_SC(,__syscall_slong_t,lfutex,(__uintptr_t *__uaddr, __syscall_ulong_t
  * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CDECLARE_SC(,__errno_t,lfutexexpr,(__uintptr_t *__futexaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, __syscall_ulong_t __flags),(__futexaddr,__base,__expr,__timeout,__flags))
+__CDECLARE_SC(,__errno_t,lfutexexpr,(__uintptr_t *__futexaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, __syscall_ulong_t __flags),(__futexaddr,__base,__expr,__timeout,__flags))
 #endif /* __CRT_HAVE_SC(lfutexexpr) */
 #if __CRT_HAVE_SC(lgetxattr)
 __CDECLARE_SC(,__ssize_t,lgetxattr,(char const *__path, char const *__name, void *__buf, __size_t __bufsize),(__path,__name,__buf,__bufsize))
@@ -1661,7 +1655,7 @@ __CDECLARE_SC(,__ssize_t,recvfrom,(__fd_t __sockfd, void *__buf, __size_t __bufs
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
-__CDECLARE_SC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct mmsghdr32 *__vmessages, __size_t __vlen, __syscall_ulong_t __msg_flags, struct __timespec32 const *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+__CDECLARE_SC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __msg_flags, struct __timespec32 const *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #endif /* __CRT_HAVE_SC(recvmmsg) */
 #if __CRT_HAVE_SC(recvmmsg_time64)
 /* Same as `recvmsg(2)', but may be used to receive many
@@ -1672,7 +1666,7 @@ __CDECLARE_SC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct mmsghdr32 *__vmessage
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
-__CDECLARE_SC(,__ssize_t,recvmmsg_time64,(__fd_t __sockfd, struct mmsghdr64 *__vmessages, __size_t __vlen, __syscall_ulong_t __msg_flags, struct __timespec64 const *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+__CDECLARE_SC(,__ssize_t,recvmmsg_time64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __msg_flags, struct __timespec64 const *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #endif /* __CRT_HAVE_SC(recvmmsg_time64) */
 #if __CRT_HAVE_SC(recvmsg)
 /* Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
@@ -2375,6 +2369,9 @@ __CDECLARE_SC(,__errno_t,symlinkat,(char const *__link_text, __fd_t __tofd, char
 #if __CRT_HAVE_SC(sync)
 __CDECLARE_SC(,__errno_t,sync,(void),())
 #endif /* __CRT_HAVE_SC(sync) */
+#if __CRT_HAVE_SC(sync_file_range2)
+__CDECLARE_SC(,__errno_t,sync_file_range2,(__fd_t __fd, __syscall_ulong_t __flags, __uint64_t __offset, __uint64_t __count),(__fd,__flags,__offset,__count))
+#endif /* __CRT_HAVE_SC(sync_file_range2) */
 #if __CRT_HAVE_SC(syncfs)
 __CDECLARE_SC(,__errno_t,syncfs,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_SC(syncfs) */
@@ -2710,9 +2707,6 @@ __CDECLARE_XSC(,__syscall_ulong_t,alarm,(__syscall_ulong_t __seconds),(__seconds
 #if __CRT_HAVE_XSC(arm_fadvise64_64)
 __CDECLARE_XSC(,__errno_t,arm_fadvise64_64,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(arm_fadvise64_64) */
-#if __CRT_HAVE_XSC(arm_sync_file_range)
-__CDECLARE_XSC(,__errno_t,arm_sync_file_range,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
-#endif /* __CRT_HAVE_XSC(arm_sync_file_range) */
 #if __CRT_HAVE_XSC(bdflush)
 __CDECLARE_XSC(,__errno_t,bdflush,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(bdflush) */
@@ -3616,7 +3610,7 @@ __CDECLARE_XSC(,__syscall_slong_t,lfutex,(__uintptr_t *__uaddr, __syscall_ulong_
  * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CDECLARE_XSC(,__errno_t,lfutexexpr,(__uintptr_t *__futexaddr, void *__base, struct lfutexexpr const *__expr, struct timespec const *__timeout, __syscall_ulong_t __flags),(__futexaddr,__base,__expr,__timeout,__flags))
+__CDECLARE_XSC(,__errno_t,lfutexexpr,(__uintptr_t *__futexaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, __syscall_ulong_t __flags),(__futexaddr,__base,__expr,__timeout,__flags))
 #endif /* __CRT_HAVE_XSC(lfutexexpr) */
 #if __CRT_HAVE_XSC(lgetxattr)
 __CDECLARE_XSC(,__ssize_t,lgetxattr,(char const *__path, char const *__name, void *__buf, __size_t __bufsize),(__path,__name,__buf,__bufsize))
@@ -4132,7 +4126,7 @@ __CDECLARE_XSC(,__ssize_t,recvfrom,(__fd_t __sockfd, void *__buf, __size_t __buf
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
-__CDECLARE_XSC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct mmsghdr32 *__vmessages, __size_t __vlen, __syscall_ulong_t __msg_flags, struct __timespec32 const *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+__CDECLARE_XSC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __msg_flags, struct __timespec32 const *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #endif /* __CRT_HAVE_XSC(recvmmsg) */
 #if __CRT_HAVE_XSC(recvmmsg_time64)
 /* Same as `recvmsg(2)', but may be used to receive many
@@ -4143,7 +4137,7 @@ __CDECLARE_XSC(,__ssize_t,recvmmsg,(__fd_t __sockfd, struct mmsghdr32 *__vmessag
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
-__CDECLARE_XSC(,__ssize_t,recvmmsg_time64,(__fd_t __sockfd, struct mmsghdr64 *__vmessages, __size_t __vlen, __syscall_ulong_t __msg_flags, struct __timespec64 const *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
+__CDECLARE_XSC(,__ssize_t,recvmmsg_time64,(__fd_t __sockfd, struct mmsghdr *__vmessages, __size_t __vlen, __syscall_ulong_t __msg_flags, struct __timespec64 const *__tmo),(__sockfd,__vmessages,__vlen,__msg_flags,__tmo))
 #endif /* __CRT_HAVE_XSC(recvmmsg_time64) */
 #if __CRT_HAVE_XSC(recvmsg)
 /* Same as `recv(2)' and `recvfrom(2)', but also allows for receiving ancillary
@@ -4840,6 +4834,9 @@ __CDECLARE_XSC(,__errno_t,symlinkat,(char const *__link_text, __fd_t __tofd, cha
 #if __CRT_HAVE_XSC(sync)
 __CDECLARE_XSC(,__errno_t,sync,(void),())
 #endif /* __CRT_HAVE_XSC(sync) */
+#if __CRT_HAVE_XSC(sync_file_range2)
+__CDECLARE_XSC(,__errno_t,sync_file_range2,(__fd_t __fd, __syscall_ulong_t __flags, __uint64_t __offset, __uint64_t __count),(__fd,__flags,__offset,__count))
+#endif /* __CRT_HAVE_XSC(sync_file_range2) */
 #if __CRT_HAVE_XSC(syncfs)
 __CDECLARE_XSC(,__errno_t,syncfs,(__fd_t __fd),(__fd))
 #endif /* __CRT_HAVE_XSC(syncfs) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d4f7eb3 */
+/* HASH CRC-32:0x6381c15c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1475,7 +1475,7 @@
 /* ssize_t splice(fd_t fdin, uint64_t *offin, fd_t fdout, uint64_t *offout, size_t length, syscall_ulong_t flags) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 340) */
 
-/* errno_t arm_sync_file_range(int TODO_PROTOTYPE) */
+/* errno_t sync_file_range2(fd_t fd, syscall_ulong_t flags, uint64_t offset, uint64_t count) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 341) */
 
 /* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
@@ -1607,7 +1607,7 @@
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
-/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdr32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec32 const *tmo) */
+/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec32 const *tmo) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 365) */
 
 /* Accept incoming client (aka. peer) connection requests.
@@ -1817,7 +1817,7 @@
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
-/* ssize_t recvmmsg_time64(fd_t sockfd, struct mmsghdr64 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec64 const *tmo) */
+/* ssize_t recvmmsg_time64(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec64 const *tmo) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 417) */
 
 /* errno_t mq_timedsend_time64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespec64 const *abs_timeout) */
@@ -2421,7 +2421,7 @@
  * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexexpr(uintptr_t *futexaddr, void *base, struct lfutexexpr const *expr, struct timespec const *timeout, syscall_ulong_t flags) */
+/* errno_t lfutexexpr(uintptr_t *futexaddr, void *base, struct lfutexexpr const *expr, struct timespec64 const *timeout, syscall_ulong_t flags) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323313) */
 
 /* Register the address of  the calling thread's userprocmask  controller.

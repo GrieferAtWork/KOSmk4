@@ -119,6 +119,12 @@
 #define SIZEOF_SCPUSTATE      SIZEOF_UCPUSTATE
 #define ALIGNOF_SCPUSTATE     ALIGNOF_UCPUSTATE
 
+/* Define struct aliases */
+#define KCPUSTATE_IS_UCPUSTATE
+#define ICPUSTATE_IS_UCPUSTATE
+#define SCPUSTATE_IS_UCPUSTATE
+#define FCPUSTATE_IS_UCPUSTATE
+
 #ifdef __CC__
 __SYSDECL_BEGIN
 
@@ -159,11 +165,7 @@ struct lcpustate { /* l -- Little */
 #define kcpustate ucpustate /* k -- kernel */
 #define icpustate ucpustate /* i -- Interrupts */
 #define scpustate ucpustate /* s -- Scheduling */
-
-struct fcpustate { /* f -- Full */
-	struct ucpustate scs_ustate;
-	/* TODO: Other registers? */
-};
+#define fcpustate ucpustate /* f -- Full */
 
 __SYSDECL_END
 #endif /* __CC__ */

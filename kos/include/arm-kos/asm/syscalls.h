@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0bbb492 */
+/* HASH CRC-32:0x46e2505d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -848,7 +848,7 @@
 #define __NR_get_robust_list              0x153                /* errno_t get_robust_list(int TODO_PROTOTYPE) */
 /* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 #define __NR_splice                       0x154                /* ssize_t splice(fd_t fdin, uint64_t *offin, fd_t fdout, uint64_t *offout, size_t length, syscall_ulong_t flags) */
-#define __NR_arm_sync_file_range          0x155                /* errno_t arm_sync_file_range(int TODO_PROTOTYPE) */
+#define __NR_sync_file_range2             0x155                /* errno_t sync_file_range2(fd_t fd, syscall_ulong_t flags, uint64_t offset, uint64_t count) */
 /* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 #define __NR_tee                          0x156                /* ssize_t tee(fd_t fdin, fd_t fdout, size_t length, syscall_ulong_t flags) */
 /* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
@@ -932,7 +932,7 @@
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
-#define __NR_recvmmsg                     0x16d                /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdr32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec32 const *tmo) */
+#define __NR_recvmmsg                     0x16d                /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec32 const *tmo) */
 /* Accept incoming client (aka. peer) connection requests.
  * @param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')
  * @param: addr_len:   [NULL] Don't fill in the client's peer address
@@ -1042,7 +1042,7 @@
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
-#define __NR_recvmmsg_time64              0x1a1                /* ssize_t recvmmsg_time64(fd_t sockfd, struct mmsghdr64 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec64 const *tmo) */
+#define __NR_recvmmsg_time64              0x1a1                /* ssize_t recvmmsg_time64(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec64 const *tmo) */
 #define __NR_mq_timedsend_time64          0x1a2                /* errno_t mq_timedsend_time64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespec64 const *abs_timeout) */
 #define __NR_mq_timedreceive_time64       0x1a3                /* ssize_t mq_timedreceive_time64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespec64 const *abs_timeout) */
 #define __NR_semtimedop_time64            0x1a4                /* errno_t semtimedop_time64(int TODO_PROTOTYPE) */
@@ -1488,7 +1488,7 @@
  * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-#define __NR_lfutexexpr                   __UINT32_C(0x7f00f1) /* errno_t lfutexexpr(uintptr_t *futexaddr, void *base, struct lfutexexpr const *expr, struct timespec const *timeout, syscall_ulong_t flags) */
+#define __NR_lfutexexpr                   __UINT32_C(0x7f00f1) /* errno_t lfutexexpr(uintptr_t *futexaddr, void *base, struct lfutexexpr const *expr, struct timespec64 const *timeout, syscall_ulong_t flags) */
 /* Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
@@ -1898,7 +1898,7 @@
 #define __NRRM_set_robust_list              0
 #define __NRRM_get_robust_list              0
 #define __NRRM_splice                       0
-#define __NRRM_arm_sync_file_range          0
+#define __NRRM_sync_file_range2             0
 #define __NRRM_tee                          0
 #define __NRRM_vmsplice                     0
 #define __NRRM_move_pages                   0
@@ -2184,7 +2184,7 @@
 #define __NRCP_pselect6
 #define __NRCP_ppoll
 #define __NRCP_splice
-#define __NRCP_arm_sync_file_range
+#define __NRCP_sync_file_range2
 #define __NRCP_tee
 #define __NRCP_vmsplice
 #define __NRCP_epoll_pwait
@@ -2563,7 +2563,7 @@
 #define __NRRC_set_robust_list              1
 #define __NRRC_get_robust_list              1
 #define __NRRC_splice                       6
-#define __NRRC_arm_sync_file_range          1
+#define __NRRC_sync_file_range2             6 /* __NRAC_sync_file_range2 + 2 */
 #define __NRRC_tee                          4
 #define __NRRC_vmsplice                     4
 #define __NRRC_move_pages                   1

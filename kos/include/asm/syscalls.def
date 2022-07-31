@@ -669,7 +669,8 @@ readahead:(fd_t fd, [reg64] uint64_t offset, size_t count) -> ssize_t; /* UNIMPL
 @@@param: flags: Set of `SYNC_FILE_RANGE_WAIT_BEFORE | SYNC_FILE_RANGE_WRITE | SYNC_FILE_RANGE_WAIT_AFTER'
 [cp] sync_file_range:(fd_t fd, [reg64] uint64_t offset, [reg64] uint64_t count,
                       [tostr(SYNC_FILE_RANGE_FLAGS)] syscall_ulong_t flags) -> errno_t; /* UNIMPLEMENTED! */
-[cp] sync_file_range2:(int TODO_PROTOTYPE) -> errno_t; /* UNIMPLEMENTED! */
+[cp] sync_file_range2:(fd_t fd, [tostr(SYNC_FILE_RANGE_FLAGS)] syscall_ulong_t flags,
+                       [reg64] uint64_t offset, [reg64] uint64_t count) -> errno_t; /* UNIMPLEMENTED! */
 
 %[startgroup]
 @@@param: mode: Set of `0 | FALLOC_FL_KEEP_SIZE | FALLOC_FL_PUNCH_HOLE | FALLOC_FL_COLLAPSE_RANGE | FALLOC_FL_ZERO_RANGE'
@@ -931,10 +932,10 @@ process_vm_writevx64:(pid_t pid,
 @@@throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
 @@@throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
 @@@return: -ETIMEDOUT:         A blocking futex-wait operation has timed out
-[cp][restart(dont)] lfutex:(uintptr_t *uaddr, [tostr(LFUTEX_OP)] syscall_ulong_t futex_op, uintptr_t val, [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, uintptr_t val2) -> syscall_slong_t;
-[cp][restart(dont)][doc_alias(lfutex)] lfutex32:(uintptr_t *uaddr, [tostr(LFUTEX_OP)] syscall_ulong_t futex_op, uintptr_t val, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *timeout, uintptr_t val2) -> syscall_slong_t;
+[cp][restart(dont)]                    lfutex:(uintptr_t *uaddr, [tostr(LFUTEX_OP)] syscall_ulong_t futex_op, uintptr_t val, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout, uintptr_t val2) -> syscall_slong_t;
+[cp][restart(dont)][doc_alias(lfutex)] lfutex32:(uintptr_t *uaddr, [tostr(LFUTEX_OP)] syscall_ulong_t futex_op, uintptr_t val, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout, uintptr_t val2) -> syscall_slong_t;
 [cp][restart(dont)][doc_alias(lfutex)] lfutex64:(uintptr_t *uaddr, [tostr(LFUTEX_OP)] syscall_ulong_t futex_op, uintptr_t val, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout, uintptr_t val2) -> syscall_slong_t;
-[cp][restart(dont)][doc_alias(lfutex)] lfutexx32:(uint32_t *uaddr, [tostr(LFUTEX_OP)] syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *timeout, uint32_t val2) -> syscall_slong_t;
+[cp][restart(dont)][doc_alias(lfutex)] lfutexx32:(uint32_t *uaddr, [tostr(LFUTEX_OP)] syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *timeout, uint32_t val2) -> syscall_slong_t;
 [cp][restart(dont)][doc_alias(lfutex)] lfutexx32_64:(uint32_t *uaddr, [tostr(LFUTEX_OP)] syscall_ulong_t futex_op, uint32_t val, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *timeout, uint32_t val2) -> syscall_slong_t;
 [cp][restart(dont)][doc_alias(lfutex)] lfutexx64:(uint64_t *uaddr, [tostr(LFUTEX_OP)] syscall_ulong_t futex_op, uint64_t val, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *timeout, uint64_t val2) -> syscall_slong_t;
 %[endgroup]
@@ -964,12 +965,10 @@ process_vm_writevx64:(pid_t pid,
 @@@return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
 @@@return: -1:EINTR:     A blocking futex-wait operation was interrupted
 @@@return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out
-[cp][restart(dont)]
-lfutexexpr:(uintptr_t *futexaddr, void *base, [tostr(STRUCT_LFUTEXEXPR_VECTOR)] struct lfutexexpr const *expr,
-            [tostr(STRUCT_TIMESPEC)] struct timespec const *timeout, [tostr(LFUTEX_TIMEOUT_FLAGS)] syscall_ulong_t flags) -> errno_t;
-[cp][restart(dont)][doc_alias(lfutexexpr)] lfutexexpr32:(uint32_t *futexaddr, void *base, [tostr(STRUCT_LFUTEXEXPR_VECTOR)] struct lfutexexpr const *expr, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *timeout, [tostr(LFUTEX_TIMEOUT_FLAGS)] syscall_ulong_t flags) -> errno_t;
+[cp][restart(dont)]                        lfutexexpr:(uintptr_t *futexaddr, void *base, [tostr(STRUCT_LFUTEXEXPR_VECTOR)] struct lfutexexpr const *expr, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout, [tostr(LFUTEX_TIMEOUT_FLAGS)] syscall_ulong_t flags) -> errno_t;
+[cp][restart(dont)][doc_alias(lfutexexpr)] lfutexexpr32:(uint32_t *futexaddr, void *base, [tostr(STRUCT_LFUTEXEXPR_VECTOR)] struct lfutexexpr const *expr, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout, [tostr(LFUTEX_TIMEOUT_FLAGS)] syscall_ulong_t flags) -> errno_t;
 [cp][restart(dont)][doc_alias(lfutexexpr)] lfutexexpr64:(uint64_t *futexaddr, void *base, [tostr(STRUCT_LFUTEXEXPR_VECTOR)] struct lfutexexpr const *expr, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *timeout, [tostr(LFUTEX_TIMEOUT_FLAGS)] syscall_ulong_t flags) -> errno_t;
-[cp][restart(dont)][doc_alias(lfutexexpr)] lfutexexprx32:(uint32_t *futexaddr, void *base, [tostr(STRUCT_LFUTEXEXPRX32_VECTOR)] struct lfutexexprx32 const *expr, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *timeout, [tostr(LFUTEX_TIMEOUT_FLAGS)] syscall_ulong_t flags) -> errno_t;
+[cp][restart(dont)][doc_alias(lfutexexpr)] lfutexexprx32:(uint32_t *futexaddr, void *base, [tostr(STRUCT_LFUTEXEXPRX32_VECTOR)] struct lfutexexprx32 const *expr, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *timeout, [tostr(LFUTEX_TIMEOUT_FLAGS)] syscall_ulong_t flags) -> errno_t;
 [cp][restart(dont)][doc_alias(lfutexexpr)] lfutexexprx32_64:(uint32_t *futexaddr, void *base, [tostr(STRUCT_LFUTEXEXPRX32_VECTOR)] struct lfutexexprx32 const *expr, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *timeout, [tostr(LFUTEX_TIMEOUT_FLAGS)] syscall_ulong_t flags) -> errno_t;
 [cp][restart(dont)][doc_alias(lfutexexpr)] lfutexexprx64:(uint64_t *futexaddr, void *base, [tostr(STRUCT_LFUTEXEXPRX64_VECTOR)] struct lfutexexprx64 const *expr, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *timeout, [tostr(LFUTEX_TIMEOUT_FLAGS)] syscall_ulong_t flags) -> errno_t;
 %[endgroup]
@@ -2711,8 +2710,8 @@ recvmsgx64:(fd_t sockfd, struct msghdrx64 *message,
 @@@throw: Error (s.a. `recvmsg(2)')
 @@@return: * : The # of datagrams successfully received.
 [cp][restart(dont)] recvmmsg:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDR:vlen:return)] struct mmsghdr *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPEC)] struct timespec const *tmo) -> ssize_t;
-[cp][doc_alias(recvmmsg)][restart(dont)] recvmmsg32:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDR32:vlen:return)] struct mmsghdr32 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *tmo) -> ssize_t;
-[cp][doc_alias(recvmmsg)][restart(dont)] recvmmsg64:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDR64:vlen:return)] struct mmsghdr64 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *tmo) -> ssize_t;
+[cp][doc_alias(recvmmsg)][restart(dont)] recvmmsg32:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDR32:vlen:return)] struct mmsghdr *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPEC32)] struct timespec32 const *tmo) -> ssize_t;
+[cp][doc_alias(recvmmsg)][restart(dont)] recvmmsg64:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDR64:vlen:return)] struct mmsghdr *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPEC64)] struct timespec64 const *tmo) -> ssize_t;
 [cp][doc_alias(recvmmsg)][restart(dont)] recvmmsgx32:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX32:vlen:return)] struct mmsghdrx32 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPECX32)] struct timespecx32 const *tmo) -> ssize_t;
 [cp][doc_alias(recvmmsg)][restart(dont)] recvmmsgx32_64:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX32:vlen:return)] struct mmsghdrx32 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPECX32_64)] struct timespecx32_64 const *tmo) -> ssize_t;
 [cp][doc_alias(recvmmsg)][restart(dont)] recvmmsgx64:(fd_t sockfd, [tostr(out:STRUCT_MMSGHDRX64:vlen:return)] struct mmsghdrx64 *vmessages, size_t vlen, [tostr(SOCKET_RECVMSG_FLAGS3)] syscall_ulong_t msg_flags, [tostr(STRUCT_TIMESPECX64)] struct timespecx64 const *tmo) -> ssize_t;

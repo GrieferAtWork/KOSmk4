@@ -82,11 +82,17 @@ PRIVATE ATTR_COLD ATTR_NORETURN ATTR_SECTION(".text.crt.assert") NONNULL((1)) vo
 trap_application(struct kcpustate *__restrict state,
                  union coredump_info *info,
                  unsigned int unwind_error) {
-	struct ucpustate uc;
-	kcpustate_to_ucpustate(state, &uc);
 
 	/* Try to do a coredump */
-	sys_coredump(&uc, NULL, NULL, 0, info, unwind_error);
+#ifdef KCPUSTATE_IS_UCPUSTATE
+	sys_coredump(state, NULL, NULL, 0, info, unwind_error);
+#else /* KCPUSTATE_IS_UCPUSTATE */
+	{
+		struct ucpustate uc;
+		kcpustate_to_ucpustate(state, &uc);
+		sys_coredump(&uc, NULL, NULL, 0, info, unwind_error);
+	}
+#endif /* !KCPUSTATE_IS_UCPUSTATE */
 
 	/* If even the coredump  failed (which it shouldn't  have,
 	 * consequently meaning that shouldn't actually get here),
@@ -109,7 +115,9 @@ NOTHROW(FCALL libc_stack_failure_core)(struct kcpustate *__restrict state) {
 PRIVATE ATTR_NOINLINE ATTR_SECTION(".text.crt.assert") NONNULL((1)) void FCALL
 maybe_raise_SIGABRT(struct kcpustate *__restrict state) {
 	struct __kernel_sigaction sa;
+#ifndef KCPUSTATE_IS_UCPUSTATE
 	struct ucpustate uc;
+#endif /* !KCPUSTATE_IS_UCPUSTATE */
 	struct rpc_syscall_info sc_info;
 	siginfo_t si;
 	if (sys_rt_sigaction(SIGABRT, NULL, &sa, sizeof(sigset_t)) != EOK)
@@ -137,7 +145,9 @@ maybe_raise_SIGABRT(struct kcpustate *__restrict state) {
 	}
 
 	/* Custom handler has been defined. -> Raise a signal. */
+#ifndef KCPUSTATE_IS_UCPUSTATE
 	kcpustate_to_ucpustate(state, &uc);
+#endif /* !KCPUSTATE_IS_UCPUSTATE */
 	bzero(&si, sizeof(si));
 	si.si_signo = SIGABRT;
 	si.si_code  = SI_USER;
@@ -152,7 +162,11 @@ maybe_raise_SIGABRT(struct kcpustate *__restrict state) {
 	sc_info.rsi_regs[1] = (syscall_ulong_t)gettid();
 	sc_info.rsi_regs[2] = (syscall_ulong_t)si.si_signo;
 	sc_info.rsi_regs[3] = (syscall_ulong_t)&si;
+#ifdef KCPUSTATE_IS_UCPUSTATE
+	libc_sys_sigreturn(state, NULL, NULL, &sc_info);
+#else /* KCPUSTATE_IS_UCPUSTATE */
 	libc_sys_sigreturn(&uc, NULL, NULL, &sc_info);
+#endif /* !KCPUSTATE_IS_UCPUSTATE */
 	__builtin_unreachable();
 }
 

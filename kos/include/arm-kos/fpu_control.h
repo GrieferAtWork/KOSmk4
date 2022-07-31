@@ -20,51 +20,35 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/fpu_control.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/fpu_control.h) */
 /* (#) Portability: libc4/5       (/include/fpu_control.h) */
-#ifndef _I386_KOS_FPU_CONTROL_H
-#define _I386_KOS_FPU_CONTROL_H 1
+#ifndef _ARM_KOS_FPU_CONTROL_H
+#define _ARM_KOS_FPU_CONTROL_H 1
 
 #include <__crt.h>
 #include <__stdinc.h>
-#include <features.h>
 
 #include <hybrid/typecore.h>
 
-#include <asm/intrin-fpu.h>
-
 /* Interrupts */
-#define _FPU_MASK_IM 0x01
-#define _FPU_MASK_DM 0x02
-#define _FPU_MASK_ZM 0x04
-#define _FPU_MASK_OM 0x08
-#define _FPU_MASK_UM 0x10
-#define _FPU_MASK_PM 0x20
+#define _FPU_MASK_IM 0x00000100 /* invalid operation */
+#define _FPU_MASK_ZM 0x00000200 /* divide by zero */
+#define _FPU_MASK_OM 0x00000400 /* overflow */
+#define _FPU_MASK_UM 0x00000800 /* underflow */
+#define _FPU_MASK_PM 0x00001000 /* inexact */
 
-/* Precision */
-#define _FPU_EXTENDED 0x300
-#define _FPU_DOUBLE   0x200
-#define _FPU_SINGLE   0x000
-
-/* Rounding */
-#define _FPU_RC_NEAREST 0x000
-#define _FPU_RC_DOWN    0x400
-#define _FPU_RC_UP      0x800
-#define _FPU_RC_ZERO    0xc00
+#define _FPU_MASK_NZCV   0xf0000000 /* NZCV flags */
+#define _FPU_MASK_RM     0x00c00000 /* rounding mode */
+#define _FPU_MASK_EXCEPT 0x00001f1f /* all exception flags */
 
 /* Reserved bits in FPU control word */
-#define _FPU_RESERVED 0xf0c0
-
-#define _FPU_DEFAULT 0x137f /* Default FPU control word */
-#define _FPU_IEEE    0x137f /* IEEE-compliant FPU control word. */
+#define _FPU_RESERVED 0x00086060
+#define _FPU_DEFAULT  0x00000000                  /* Default FPU control word */
+#define _FPU_IEEE     (_FPU_DEFAULT | 0x00001f00) /* IEEE-compliant FPU control word. */
 
 #ifdef __CC__
 __SYSDECL_BEGIN
 
 /* Control word type */
-typedef __UINT16_TYPE__ fpu_control_t;
-
-/* Access hardware FPU control word. */
-#define _FPU_GETCW(cw) (void)((cw) = __fnstcw())
-#define _FPU_SETCW(cw) __fldcw(cw)
+typedef __UINT32_TYPE__ fpu_control_t;
 
 /* >> __fpu_control(3)
  * Control word set during startup of old linux applications. */
@@ -73,11 +57,16 @@ __CSDECLARE(,fpu_control_t,__fpu_control)
 #define __fpu_control __fpu_control
 #endif /* !__fpu_control && __CRT_HAVE___fpu_control */
 
-/* >> __setfpucw(3)
- * Function called by old linux applications to set `__fpu_control()'. */
-__CDECLARE_VOID_OPT(,__NOTHROW_NCX,__setfpucw,(fpu_control_t __ctrl),(__ctrl))
+/* Access hardware FPU control word. */
+#ifdef __SOFTFP__
+#define _FPU_GETCW(cw) __asm__ __volatile__("mrc p10, 7, %0, cr1, cr0, 0" : "=r" (cw))  /* fmrx %0, fpscr. */
+#define _FPU_SETCW(cw) __asm__ __volatile__("mcr p10, 7, %0, cr1, cr0, 0" : : "r" (cw)) /* fmxr fpscr, %0.  */
+#else /* __SOFTFP__ */
+#define _FPU_GETCW(cw) __asm__ __volatile__("vmrs %0, fpscr" : "=r" (cw))
+#define _FPU_SETCW(cw) __asm__ __volatile__("vmsr fpscr, %0" : : "r" (cw))
+#endif /* !__SOFTFP__ */
 
 __SYSDECL_END
 #endif /* __CC__ */
 
-#endif /* !_I386_KOS_FPU_CONTROL_H */
+#endif /* !_ARM_KOS_FPU_CONTROL_H */

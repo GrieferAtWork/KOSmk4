@@ -21,11 +21,16 @@
 #define GUARD_LIBC_USER_FCNTL_C 1
 
 #include "../api.h"
+/**/
+
 #include "fcntl.h"
+/**/
 
 #include <sys/stat.h>
-#include <kos/syscalls.h>
+
 #include <stdarg.h>
+
+#include "../libc/syscalls.h"
 
 DECL_BEGIN
 

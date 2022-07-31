@@ -45,6 +45,9 @@ NOTHROW_NCX(LIBCCALL libc_ioperm)(ulongptr_t from,
 	                   (syscall_ulong_t)(unsigned int)turn_on);
 	return libc_seterrno_syserr(error);
 #else /* SYS_ioperm */
+	(void)from;
+	(void)num;
+	(void)turn_on;
 	libc_seterrno(ENOSYS);
 	return -1;
 #endif /* !SYS_ioperm */
@@ -62,14 +65,12 @@ NOTHROW_NCX(LIBCCALL libc_iopl)(__STDC_INT_AS_UINT_T level)
 	error = sys_iopl((syscall_ulong_t)(unsigned int)level);
 	return libc_seterrno_syserr(error);
 #else /* SYS_iopl */
+	(void)level;
 	libc_seterrno(ENOSYS);
 	return -1;
 #endif /* !SYS_iopl */
 }
 /*[[[end:libc_iopl]]]*/
-
-
-
 
 
 /*[[[start:exports,hash:CRC-32=0x8c944090]]]*/

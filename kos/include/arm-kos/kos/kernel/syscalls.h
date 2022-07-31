@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74fa462c */
+/* HASH CRC-32:0xb94df4a4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,6 @@
 #define __ARCH_WANT_SYSCALL_ADJTIMEX
 #define __ARCH_WANT_SYSCALL_ALARM
 #define __ARCH_WANT_SYSCALL_ARM_FADVISE64_64
-#define __ARCH_WANT_SYSCALL_ARM_SYNC_FILE_RANGE
 #define __ARCH_WANT_SYSCALL_BDFLUSH
 #define __ARCH_WANT_SYSCALL_BIND
 #define __ARCH_WANT_SYSCALL_BPF
@@ -437,6 +436,7 @@
 #define __ARCH_WANT_SYSCALL_SYMLINK
 #define __ARCH_WANT_SYSCALL_SYMLINKAT
 #define __ARCH_WANT_SYSCALL_SYNC
+#define __ARCH_WANT_SYSCALL_SYNC_FILE_RANGE2
 #define __ARCH_WANT_SYSCALL_SYNCFS
 #define __ARCH_WANT_SYSCALL_SYSCALL
 #define __ARCH_WANT_SYSCALL_SYSFS

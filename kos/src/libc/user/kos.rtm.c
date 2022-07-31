@@ -85,13 +85,8 @@ NOTHROW(LIBCCALL libc_rtm_end)(void)
 /*[[[body:libc_rtm_end]]]*/
 {
 #ifdef OS_HAVE_RTM
-	errno_t error;
-	/* sys_rtm_end() doesn't return on success. */
-	error = sys_rtm_end();
-	return libc_seterrno_neg(error);
-#else /* OS_HAVE_RTM */
-	return libc_seterrno(ENOSYS);
-#endif /* !OS_HAVE_RTM */
+	sys_rtm_end();
+#endif /* OS_HAVE_RTM */
 }
 #endif /* MAGIC:impl_if */
 /*[[[end:libc_rtm_end]]]*/

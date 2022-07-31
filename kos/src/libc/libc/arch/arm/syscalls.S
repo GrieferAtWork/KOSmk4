@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb402d13a */
+/* HASH CRC-32:0x685f0e17 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2699,12 +2699,12 @@ INTERN_FUNCTION(libc_sys_splice)
 END(libc_sys_splice)
 DEFINE_PUBLIC_ALIAS(sys_splice, libc_sys_splice)
 
-/* errno_t arm_sync_file_range(int TODO_PROTOTYPE) */
-INTERN_FUNCTION(libc_sys_arm_sync_file_range)
+/* errno_t sync_file_range2(fd_t fd, syscall_ulong_t flags, uint64_t offset, uint64_t count) */
+INTERN_FUNCTION(libc_sys_sync_file_range2)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 341, enableExcept: false) */
 	b .
-END(libc_sys_arm_sync_file_range)
-DEFINE_PUBLIC_ALIAS(sys_arm_sync_file_range, libc_sys_arm_sync_file_range)
+END(libc_sys_sync_file_range2)
+DEFINE_PUBLIC_ALIAS(sys_sync_file_range2, libc_sys_sync_file_range2)
 
 /* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 /* ssize_t tee(fd_t fdin, fd_t fdout, size_t length, syscall_ulong_t flags) */
@@ -2927,7 +2927,7 @@ DEFINE_PUBLIC_ALIAS(sys_perf_event_open, libc_sys_perf_event_open)
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
-/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdr32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec32 const *tmo) */
+/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec32 const *tmo) */
 INTERN_FUNCTION(libc_sys_recvmmsg)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 365, enableExcept: false) */
 	b .
@@ -3337,7 +3337,7 @@ DEFINE_PUBLIC_ALIAS(sys_io_pgetevents_time64, libc_sys_io_pgetevents_time64)
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
-/* ssize_t recvmmsg_time64(fd_t sockfd, struct mmsghdr64 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec64 const *tmo) */
+/* ssize_t recvmmsg_time64(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec64 const *tmo) */
 INTERN_FUNCTION(libc_sys_recvmmsg_time64)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 417, enableExcept: false) */
 	b .
@@ -4257,7 +4257,7 @@ DEFINE_PUBLIC_ALIAS(sys_lfutex, libc_sys_lfutex)
  * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexexpr(uintptr_t *futexaddr, void *base, struct lfutexexpr const *expr, struct timespec const *timeout, syscall_ulong_t flags) */
+/* errno_t lfutexexpr(uintptr_t *futexaddr, void *base, struct lfutexexpr const *expr, struct timespec64 const *timeout, syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_lfutexexpr)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 8323313, enableExcept: false) */
 	b .
@@ -7059,12 +7059,12 @@ INTERN_FUNCTION(libc_sys_Xsplice)
 END(libc_sys_Xsplice)
 DEFINE_PUBLIC_ALIAS(sys_Xsplice, libc_sys_Xsplice)
 
-/* errno_t arm_sync_file_range(int TODO_PROTOTYPE) */
-INTERN_FUNCTION(libc_sys_Xarm_sync_file_range)
+/* errno_t sync_file_range2(fd_t fd, syscall_ulong_t flags, uint64_t offset, uint64_t count) */
+INTERN_FUNCTION(libc_sys_Xsync_file_range2)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 341, enableExcept: true) */
 	b .
-END(libc_sys_Xarm_sync_file_range)
-DEFINE_PUBLIC_ALIAS(sys_Xarm_sync_file_range, libc_sys_Xarm_sync_file_range)
+END(libc_sys_Xsync_file_range2)
+DEFINE_PUBLIC_ALIAS(sys_Xsync_file_range2, libc_sys_Xsync_file_range2)
 
 /* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 /* ssize_t tee(fd_t fdin, fd_t fdout, size_t length, syscall_ulong_t flags) */
@@ -7287,7 +7287,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xperf_event_open, libc_sys_Xperf_event_open)
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
-/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdr32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec32 const *tmo) */
+/* ssize_t recvmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec32 const *tmo) */
 INTERN_FUNCTION(libc_sys_Xrecvmmsg)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 365, enableExcept: true) */
 	b .
@@ -7697,7 +7697,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xio_pgetevents_time64, libc_sys_Xio_pgetevents_time64)
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
-/* ssize_t recvmmsg_time64(fd_t sockfd, struct mmsghdr64 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec64 const *tmo) */
+/* ssize_t recvmmsg_time64(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec64 const *tmo) */
 INTERN_FUNCTION(libc_sys_Xrecvmmsg_time64)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 417, enableExcept: true) */
 	b .
@@ -8610,7 +8610,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xlfutex, libc_sys_Xlfutex)
  * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexexpr(uintptr_t *futexaddr, void *base, struct lfutexexpr const *expr, struct timespec const *timeout, syscall_ulong_t flags) */
+/* errno_t lfutexexpr(uintptr_t *futexaddr, void *base, struct lfutexexpr const *expr, struct timespec64 const *timeout, syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_Xlfutexexpr)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 8323313, enableExcept: true) */
 	b .

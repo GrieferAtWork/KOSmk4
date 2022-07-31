@@ -26,15 +26,10 @@
 
 #include <hybrid/typecore.h>
 
-DECL_BEGIN
+#include <kos/kernel/cpu-state.h>
 
 #ifdef __CC__
-struct ucpustate;
-struct lcpustate;
-struct kcpustate;
-struct icpustate;
-struct scpustate;
-struct fcpustate;
+DECL_BEGIN
 
 /* Set of kernel poison flags. When the kernel panics, all bits
  * of this variable are set to 1, but some can be cleared  once
@@ -74,11 +69,12 @@ DATDEF __UINT8_TYPE__ const _kernel_poisoned;
 /* Poison the kernel.
  * This operation cannot be undone and may (under rare  circumstances)
  * itself cause the kernel to crash (due to race conditions with other
- * CPUs).  Use  with  caution,  or  better  yet:  Don't  use  at  all!
- * Additionally, this function will attempt to fix some common  system
- * integrity violations in order to  allow other kernel panic code  to
- * at least somewhat function correctly. (as far as that may still  be
- * possible,  given that  this function is  meant to be  used when the
+ * CPUs). Use with caution, or better yet: Don't use at all!
+ *
+ * Additionally, this function will attempt to fix some common system
+ * integrity  violations in order to allow other kernel panic code to
+ * at least somewhat function correctly. (as far as that may still be
+ * possible,  given that this  function is meant to  be used when the
  * kernel has become unstable) */
 FUNDEF NOBLOCK ATTR_COLD void NOTHROW(KCALL _kernel_poison)(void);
 
@@ -92,38 +88,128 @@ FUNDEF NOBLOCK ATTR_COLD void NOTHROW(KCALL _kernel_poison)(void);
 #define kernel_poison(what) __hybrid_atomic_or(_kernel_private_poisoned_wr, what, __ATOMIC_SEQ_CST)
 DATDEF __UINT8_TYPE__ _kernel_private_poisoned_wr ASMNAME("_kernel_poisoned");
 
-
 /* Cause kernel panic. */
 FUNDEF ATTR_KERNEL_PANIC_NORETURN ATTR_COLD void FCALL kernel_panic_here(void);
 FUNDEF ATTR_KERNEL_PANIC_NORETURN ATTR_COLD void FCALL kernel_panic_here_n(unsigned int n_skip);
 FUNDEF ATTR_KERNEL_PANIC_NORETURN ATTR_COLD void VCALL kernel_panic(char const *format, ...);
 FUNDEF ATTR_KERNEL_PANIC_NORETURN ATTR_COLD void VCALL kernel_panic_n(unsigned int n_skip, char const *format, ...);
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_ucpustate)(struct ucpustate *__restrict state, char const *format, ...);
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_ucpustate_n)(unsigned int n_skip, struct ucpustate *__restrict state, char const *format, ...);
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_lcpustate)(struct lcpustate *__restrict state, char const *format, ...);
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_lcpustate_n)(unsigned int n_skip, struct lcpustate *__restrict state, char const *format, ...);
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_kcpustate)(struct kcpustate *__restrict state, char const *format, ...);
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_kcpustate_n)(unsigned int n_skip, struct kcpustate *__restrict state, char const *format, ...);
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_icpustate)(struct icpustate *__restrict state, char const *format, ...);
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_icpustate_n)(unsigned int n_skip, struct icpustate *__restrict state, char const *format, ...);
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_scpustate)(struct scpustate *__restrict state, char const *format, ...);
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_scpustate_n)(unsigned int n_skip, struct scpustate *__restrict state, char const *format, ...);
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_fcpustate)(struct fcpustate *__restrict state, char const *format, ...);
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_fcpustate_n)(unsigned int n_skip, struct fcpustate *__restrict state, char const *format, ...);
 FUNDEF ATTR_KERNEL_PANIC_NORETURN ATTR_COLD void FCALL kernel_vpanic(char const *format, __builtin_va_list args);
 FUNDEF ATTR_KERNEL_PANIC_NORETURN ATTR_COLD void FCALL kernel_vpanic_n(unsigned int n_skip, char const *format, __builtin_va_list args);
+
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_ucpustate)(struct ucpustate *__restrict state, char const *format, ...);
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_ucpustate_n)(unsigned int n_skip, struct ucpustate *__restrict state, char const *format, ...);
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic_ucpustate)(struct ucpustate *__restrict state, char const *format, __builtin_va_list args);
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic_ucpustate_n)(unsigned int n_skip, struct ucpustate *__restrict state, char const *format, __builtin_va_list args);
+
+#ifdef LCPUSTATE_IS_UCPUSTATE
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_lcpustate)(struct lcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_ucpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_lcpustate_n)(unsigned int n_skip, struct lcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_ucpustate_n");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic_lcpustate)(struct lcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_ucpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic_lcpustate_n)(unsigned int n_skip, struct lcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_ucpustate_n");
+#else /* LCPUSTATE_IS_UCPUSTATE */
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_lcpustate)(struct lcpustate *__restrict state, char const *format, ...);
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_lcpustate_n)(unsigned int n_skip, struct lcpustate *__restrict state, char const *format, ...);
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic_lcpustate)(struct lcpustate *__restrict state, char const *format, __builtin_va_list args);
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic_lcpustate_n)(unsigned int n_skip, struct lcpustate *__restrict state, char const *format, __builtin_va_list args);
+#endif /* !LCPUSTATE_IS_UCPUSTATE */
+
+#ifdef KCPUSTATE_IS_UCPUSTATE
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_kcpustate)(struct kcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_ucpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_kcpustate_n)(unsigned int n_skip, struct kcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_ucpustate_n");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic_kcpustate)(struct kcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_ucpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic_kcpustate_n)(unsigned int n_skip, struct kcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_ucpustate_n");
+#elif defined(KCPUSTATE_IS_LCPUSTATE)
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_kcpustate)(struct kcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_lcpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_kcpustate_n)(unsigned int n_skip, struct kcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_lcpustate_n");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic_kcpustate)(struct kcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_lcpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic_kcpustate_n)(unsigned int n_skip, struct kcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_lcpustate_n");
+#else /* ... */
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_kcpustate)(struct kcpustate *__restrict state, char const *format, ...);
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_kcpustate_n)(unsigned int n_skip, struct kcpustate *__restrict state, char const *format, ...);
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic_kcpustate)(struct kcpustate *__restrict state, char const *format, __builtin_va_list args);
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic_kcpustate_n)(unsigned int n_skip, struct kcpustate *__restrict state, char const *format, __builtin_va_list args);
+#endif /* !... */
+
+#ifdef ICPUSTATE_IS_UCPUSTATE
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_icpustate)(struct icpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_ucpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_icpustate_n)(unsigned int n_skip, struct icpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_ucpustate_n");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic_icpustate)(struct icpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_ucpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic_icpustate_n)(unsigned int n_skip, struct icpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_ucpustate_n");
+#elif defined(ICPUSTATE_IS_LCPUSTATE)
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_icpustate)(struct icpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_lcpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_icpustate_n)(unsigned int n_skip, struct icpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_lcpustate_n");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic_icpustate)(struct icpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_lcpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic_icpustate_n)(unsigned int n_skip, struct icpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_lcpustate_n");
+#elif defined(ICPUSTATE_IS_KCPUSTATE)
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_icpustate)(struct icpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_kcpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_icpustate_n)(unsigned int n_skip, struct icpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_kcpustate_n");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic_icpustate)(struct icpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_kcpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic_icpustate_n)(unsigned int n_skip, struct icpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_kcpustate_n");
+#else /* ... */
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_icpustate)(struct icpustate *__restrict state, char const *format, ...);
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_icpustate_n)(unsigned int n_skip, struct icpustate *__restrict state, char const *format, ...);
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic_icpustate)(struct icpustate *__restrict state, char const *format, __builtin_va_list args);
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic_icpustate_n)(unsigned int n_skip, struct icpustate *__restrict state, char const *format, __builtin_va_list args);
+#endif /* !... */
+
+#ifdef SCPUSTATE_IS_UCPUSTATE
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_scpustate)(struct scpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_ucpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_scpustate_n)(unsigned int n_skip, struct scpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_ucpustate_n");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic_scpustate)(struct scpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_ucpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic_scpustate_n)(unsigned int n_skip, struct scpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_ucpustate_n");
+#elif defined(SCPUSTATE_IS_LCPUSTATE)
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_scpustate)(struct scpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_lcpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_scpustate_n)(unsigned int n_skip, struct scpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_lcpustate_n");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic_scpustate)(struct scpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_lcpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic_scpustate_n)(unsigned int n_skip, struct scpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_lcpustate_n");
+#elif defined(SCPUSTATE_IS_KCPUSTATE)
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_scpustate)(struct scpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_kcpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_scpustate_n)(unsigned int n_skip, struct scpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_kcpustate_n");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic_scpustate)(struct scpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_kcpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic_scpustate_n)(unsigned int n_skip, struct scpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_kcpustate_n");
+#elif defined(SCPUSTATE_IS_ICPUSTATE)
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_scpustate)(struct scpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_icpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_scpustate_n)(unsigned int n_skip, struct scpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_icpustate_n");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic_scpustate)(struct scpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_icpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic_scpustate_n)(unsigned int n_skip, struct scpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_icpustate_n");
+#else /* ... */
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_scpustate)(struct scpustate *__restrict state, char const *format, ...);
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_scpustate_n)(unsigned int n_skip, struct scpustate *__restrict state, char const *format, ...);
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic_scpustate)(struct scpustate *__restrict state, char const *format, __builtin_va_list args);
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic_scpustate_n)(unsigned int n_skip, struct scpustate *__restrict state, char const *format, __builtin_va_list args);
+#endif /* !... */
+
+#ifdef FCPUSTATE_IS_UCPUSTATE
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_fcpustate)(struct fcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_ucpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_fcpustate_n)(unsigned int n_skip, struct fcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_ucpustate_n");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic_fcpustate)(struct fcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_ucpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic_fcpustate_n)(unsigned int n_skip, struct fcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_ucpustate_n");
+#elif defined(FCPUSTATE_IS_LCPUSTATE)
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_fcpustate)(struct fcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_lcpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_fcpustate_n)(unsigned int n_skip, struct fcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_lcpustate_n");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic_fcpustate)(struct fcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_lcpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic_fcpustate_n)(unsigned int n_skip, struct fcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_lcpustate_n");
+#elif defined(FCPUSTATE_IS_KCPUSTATE)
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_fcpustate)(struct fcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_kcpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_fcpustate_n)(unsigned int n_skip, struct fcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_kcpustate_n");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic_fcpustate)(struct fcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_kcpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic_fcpustate_n)(unsigned int n_skip, struct fcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_kcpustate_n");
+#elif defined(FCPUSTATE_IS_ICPUSTATE)
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_fcpustate)(struct fcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_icpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_fcpustate_n)(unsigned int n_skip, struct fcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_icpustate_n");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic_fcpustate)(struct fcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_icpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic_fcpustate_n)(unsigned int n_skip, struct fcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_icpustate_n");
+#elif defined(FCPUSTATE_IS_SCPUSTATE)
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_fcpustate)(struct fcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_scpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_fcpustate_n)(unsigned int n_skip, struct fcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_scpustate_n");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic_fcpustate)(struct fcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_scpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic_fcpustate_n)(unsigned int n_skip, struct fcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_scpustate_n");
+#else /* ... */
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic_fcpustate)(struct fcpustate *__restrict state, char const *format, ...);
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic_fcpustate_n)(unsigned int n_skip, struct fcpustate *__restrict state, char const *format, ...);
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic_fcpustate)(struct fcpustate *__restrict state, char const *format, __builtin_va_list args);
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic_fcpustate_n)(unsigned int n_skip, struct fcpustate *__restrict state, char const *format, __builtin_va_list args);
+#endif /* !... */
 
 #ifdef __cplusplus
 extern "C++" {
@@ -133,33 +219,42 @@ FUNDEF ATTR_KERNEL_PANIC_NORETURN ATTR_COLD void VCALL kernel_panic(unsigned int
 FUNDEF ATTR_KERNEL_PANIC_NORETURN ATTR_COLD void FCALL kernel_vpanic(unsigned int n_skip, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_n");
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic)(struct ucpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_ucpustate");
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic)(unsigned int n_skip, struct ucpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_ucpustate_n");
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic)(struct lcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_lcpustate");
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic)(unsigned int n_skip, struct lcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_lcpustate_n");
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic)(struct kcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_kcpustate");
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic)(unsigned int n_skip, struct kcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_kcpustate_n");
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic)(struct icpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_icpustate");
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic)(unsigned int n_skip, struct icpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_icpustate_n");
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic)(struct scpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_scpustate");
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic)(unsigned int n_skip, struct scpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_scpustate_n");
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic)(struct fcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_fcpustate");
-FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic)(unsigned int n_skip, struct fcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_fcpustate_n");
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic)(struct ucpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_ucpustate");
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic)(unsigned int n_skip, struct ucpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_ucpustate_n");
+#ifndef LCPUSTATE_IS_UCPUSTATE
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic)(struct lcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_lcpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic)(unsigned int n_skip, struct lcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_lcpustate_n");
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic)(struct lcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_lcpustate");
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic)(unsigned int n_skip, struct lcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_lcpustate_n");
+#endif /* !LCPUSTATE_IS_UCPUSTATE */
+#if !defined(KCPUSTATE_IS_UCPUSTATE) && !defined(KCPUSTATE_IS_LCPUSTATE)
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic)(struct kcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_kcpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic)(unsigned int n_skip, struct kcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_kcpustate_n");
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic)(struct kcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_kcpustate");
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic)(unsigned int n_skip, struct kcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_kcpustate_n");
+#endif /* !KCPUSTATE_IS_UCPUSTATE && !KCPUSTATE_IS_LCPUSTATE */
+#if !defined(ICPUSTATE_IS_UCPUSTATE) && !defined(ICPUSTATE_IS_LCPUSTATE) && !defined(ICPUSTATE_IS_KCPUSTATE)
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic)(struct icpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_icpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic)(unsigned int n_skip, struct icpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_icpustate_n");
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic)(struct icpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_icpustate");
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic)(unsigned int n_skip, struct icpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_icpustate_n");
+#endif /* !ICPUSTATE_IS_UCPUSTATE && !ICPUSTATE_IS_LCPUSTATE && !ICPUSTATE_IS_KCPUSTATE */
+#if !defined(SCPUSTATE_IS_UCPUSTATE) && !defined(SCPUSTATE_IS_LCPUSTATE) && !defined(SCPUSTATE_IS_KCPUSTATE) && !defined(SCPUSTATE_IS_ICPUSTATE)
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic)(struct scpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_scpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic)(unsigned int n_skip, struct scpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_scpustate_n");
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic)(struct scpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_scpustate");
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic)(unsigned int n_skip, struct scpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_scpustate_n");
+#endif /* !SCPUSTATE_IS_UCPUSTATE && !SCPUSTATE_IS_LCPUSTATE && !SCPUSTATE_IS_KCPUSTATE && !SCPUSTATE_IS_ICPUSTATE */
+#if !defined(FCPUSTATE_IS_UCPUSTATE) && !defined(FCPUSTATE_IS_LCPUSTATE) && !defined(FCPUSTATE_IS_KCPUSTATE) && !defined(FCPUSTATE_IS_ICPUSTATE) && !defined(FCPUSTATE_IS_SCPUSTATE)
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(VCALL kernel_panic)(struct fcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_fcpustate");
+FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(VCALL kernel_panic)(unsigned int n_skip, struct fcpustate *__restrict state, char const *format, ...) ASMNAME("kernel_panic_fcpustate_n");
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((1)) void NOTHROW(FCALL kernel_vpanic)(struct fcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_fcpustate");
 FUNDEF ABNORMAL_RETURN ATTR_COLD ATTR_NORETURN NONNULL((2)) void NOTHROW(FCALL kernel_vpanic)(unsigned int n_skip, struct fcpustate *__restrict state, char const *format, __builtin_va_list args) ASMNAME("kernel_vpanic_fcpustate_n");
+#endif /* !FCPUSTATE_IS_UCPUSTATE && !FCPUSTATE_IS_LCPUSTATE && !FCPUSTATE_IS_KCPUSTATE && !FCPUSTATE_IS_ICPUSTATE && !FCPUSTATE_IS_SCPUSTATE */
 } /* extern "C++" */
 #endif /* __cplusplus */
 
-#endif /* __CC__ */
-
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_PANIC_H */

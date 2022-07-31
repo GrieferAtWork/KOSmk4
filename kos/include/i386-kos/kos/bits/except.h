@@ -34,9 +34,9 @@
 #define __EXCEPT_REGISTER_STATE_TYPE_RDPC(x)                       ((__BYTE_TYPE__ const *)(x).kcs_rip)
 #define __EXCEPT_REGISTER_STATE_TYPE_WRPC(x, value)                ((x).kcs_rip = (__u64)(value))
 #define __EXCEPT_REGISTER_STATE_TYPE_RDSP(x)                       ((__BYTE_TYPE__ const *)(x).kcs_gpregs.gp_rsp)
-#define __EXCEPT_REGISTER_STATE_TYPE_WRSP(x, value)                ((x).kcs_gpregs.gp_rsp = (value))
+#define __EXCEPT_REGISTER_STATE_TYPE_WRSP(x, value)                ((x).kcs_gpregs.gp_rsp = (__u64)(value))
 #define __EXCEPT_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)        ((__BYTE_TYPE__ const *)(x).kcs_gpregs.gp_rax)
-#define __EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x, value) ((x).kcs_gpregs.gp_rax = (value))
+#define __EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x, value) ((x).kcs_gpregs.gp_rax = (__u64)(value))
 #else /* __x86_64__ */
 #define __EXCEPT_REGISTER_STATE_TYPE_RDPC(x)                       ((__BYTE_TYPE__ const *)(x).kcs_eip)
 #define __EXCEPT_REGISTER_STATE_TYPE_WRPC(x, value)                ((x).kcs_eip = (__u32)(value))

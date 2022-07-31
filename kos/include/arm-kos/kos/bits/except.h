@@ -26,16 +26,16 @@
 #include <hybrid/host.h>
 
 /* Due to aliasing, all of the following are true */
-#define __EXCEPT_REGISTER_STATE_TYPE_IS_KCPUSTATE
 #define __EXCEPT_REGISTER_STATE_TYPE_IS_UCPUSTATE
+#define __EXCEPT_REGISTER_STATE_TYPE_IS_KCPUSTATE
 #define __EXCEPT_REGISTER_STATE_TYPE_IS_ICPUSTATE
 #define __EXCEPT_REGISTER_STATE_TYPE_IS_SCPUSTATE
-
+#define __EXCEPT_REGISTER_STATE_TYPE_IS_FCPUSTATE
 
 #ifdef __USE_KOS_KERNEL
 #include <kos/kernel/cpu-state.h>
-#define __EXCEPT_REGISTER_STATE_TYPE                               struct kcpustate
-#define __SIZEOF_EXCEPT_REGISTER_STATE                             SIZEOF_KCPUSTATE
+#define __EXCEPT_REGISTER_STATE_TYPE                               struct ucpustate
+#define __SIZEOF_EXCEPT_REGISTER_STATE                             SIZEOF_UCPUSTATE
 #define __EXCEPT_REGISTER_STATE_TYPE_RDPC(x)                       ((__BYTE_TYPE__ const *)(x).ucs_pc)
 #define __EXCEPT_REGISTER_STATE_TYPE_WRPC(x, value)                ((x).ucs_pc = (__UINT32_TYPE__)(value))
 #define __EXCEPT_REGISTER_STATE_TYPE_RDSP(x)                       ((__BYTE_TYPE__ const *)(x).ucs_sp)

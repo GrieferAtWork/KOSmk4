@@ -209,22 +209,22 @@ __DECL_BEGIN
 #ifndef __x86_64__
 __FORCELOCAL __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(lcpustate32_current)(struct lcpustate32 *__restrict __result) {
-	__asm__("movl %%edi, 0(%1)\n\t"
-			"movl %%esi, 4(%1)\n\t"
-			"movl %%ebp, 8(%1)\n\t"
-			"movl %%esp, 12(%1)\n\t"
-			"movl %%ebx, 16(%1)\n\t"
-#if defined(__pic__) || defined(__PIC__) || defined(__pie__) || defined(__PIE__)
-			"call 991f\n\t"
-			"991: .cfi_adjust_cfa_offset 4\n\t"
-			"popl 20(%1)\n\t"
-			".cfi_adjust_cfa_offset -4"
-#else
-			"movl $991f, 20(%1)\n\t"
-			"991:"
-#endif
-			: "=m" /*0*/ (*__result)
-			: "r" /*1*/ (__result));
+	__asm__ __volatile__("movl %%edi, 0(%1)\n\t"
+	                     "movl %%esi, 4(%1)\n\t"
+	                     "movl %%ebp, 8(%1)\n\t"
+	                     "movl %%esp, 12(%1)\n\t"
+	                     "movl %%ebx, 16(%1)\n\t"
+#ifdef __pic__
+	                     "call 991f\n\t"
+	                     "991: .cfi_adjust_cfa_offset 4\n\t"
+	                     "popl 20(%1)\n\t"
+	                     ".cfi_adjust_cfa_offset -4"
+#else  /* __pic__ */
+	                     "movl $991f, 20(%1)\n\t"
+	                     "991:"
+#endif /* !__pic__ */
+	                     : "=m" /*0*/ (*__result)
+	                     : "r" /*1*/ (__result));
 }
 #endif /* !__x86_64__ */
 __LOCAL __NOBLOCK __ATTR_NONNULL((1, 2)) void
@@ -1192,16 +1192,15 @@ __NOTHROW_NCX(ucpustate32_current)(struct ucpustate32 *__restrict __result) {
 	                     ".cfi_adjust_cfa_offset 4\n\t"
 	                     "popl 56(%1)\n\t"
 	                     ".cfi_adjust_cfa_offset -4\n\t"
-#if (defined(__pic__) || defined(__PIC__) || \
-     defined(__pie__) || defined(__PIE__)) && 0
+#if defined(__pic__) && 0 /* Can't rely on %esp being the CFI base-register */
 	                     "call 991f\n\t"
 	                     "991: .cfi_adjust_cfa_offset 4\n\t"
 	                     "popl 60(%1)\n\t"
 	                     ".cfi_adjust_cfa_offset -4"
-#else
+#else /* __pic__ */
 	                     "movl $991f, 60(%1)\n\t"
 	                     "991:"
-#endif
+#endif /* !__pic__ */
 	                     : "=m" /*0*/ (*__result)
 	                     : "r" /*1*/ (__result));
 	__result->ucs_cs           = SEGMENT_CURRENT_CODE_RPL;

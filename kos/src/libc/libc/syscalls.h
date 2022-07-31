@@ -262,5 +262,10 @@
 #define sys_clock_nanosleep_time64 sys_clock_nanosleep64
 #endif /* SYS_clock_nanosleep64 && SYS_clock_nanosleep_time64 */
 
+#if defined(SYS_sync_file_range2) && !defined(SYS_sync_file_range)
+#define sys_sync_file_range(fd, offset, count, flags) \
+	sys_sync_file_range2(fd, flags, offset, count)
+#endif /* SYS_sync_file_range2 && !SYS_sync_file_range */
+
 
 #endif /* !GUARD_LIBC_LIBC_SYSCALLS_H */

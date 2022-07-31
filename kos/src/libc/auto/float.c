@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9de5f076 */
+/* HASH CRC-32:0xca1ae0f1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,9 +39,9 @@ NOTHROW_NCX(LIBCCALL libc__controlfp)(uint32_t newval,
                                       uint32_t mask) {
 	fpu_control_t result;
 	_FPU_GETCW(result);
-#if _FPU_RESERVED
+#if defined(_FPU_RESERVED) && _FPU_RESERVED
 	mask &= ~_FPU_RESERVED; /* Don't allow modification of reserved words. */
-#endif /* _FPU_RESERVED */
+#endif /* _FPU_RESERVED && _FPU_RESERVED */
 	if (mask) {
 		fpu_control_t newword;
 		newword = result;

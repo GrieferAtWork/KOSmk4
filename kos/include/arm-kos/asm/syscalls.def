@@ -76,7 +76,6 @@ semtimedop = semtimedop32;
 futimesat = futimesat32;
 pselect6 = pselect6_32;
 ppoll = ppoll32;
-arm_sync_file_range = sync_file_range2;
 utimensat = utimensat32;
 timerfd_settime = timerfd_settime32;
 timerfd_gettime = timerfd_gettime32;
@@ -104,7 +103,6 @@ rt_sigtimedwait_time64 = rt_sigtimedwait64;
 futex_time64 = futex64;
 sched_rr_get_interval_time64 = sched_rr_get_interval64;
 
-lfutex = lfutex64;
 maplibrary = maplibraryx32;
 
 /* Deal with the whole new-vs-old select issue. */
@@ -461,7 +459,7 @@ select = _oldselect;
 0x000152:set_robust_list
 0x000153:get_robust_list
 0x000154:splice
-0x000155:arm_sync_file_range
+0x000155:sync_file_range2
 0x000156:tee
 0x000157:vmsplice
 0x000158:move_pages

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1d066c6 */
+/* HASH CRC-32:0x5e83f52c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -500,7 +500,7 @@ __TSYSCALL0(unshare, 0x151, 0x151)
 __TSYSCALL0(set_robust_list, 0x152, 0x152)
 __TSYSCALL0(get_robust_list, 0x153, 0x153)
 __TSYSCALL0(splice, 0x154, 0x154)
-__TSYSCALL0(arm_sync_file_range, 0x155, 0x155)
+__TSYSCALL0(sync_file_range2, 0x155, 0x155)
 __TSYSCALL0(tee, 0x156, 0x156)
 __TSYSCALL0(vmsplice, 0x157, 0x157)
 __TSYSCALL0(move_pages, 0x158, 0x158)

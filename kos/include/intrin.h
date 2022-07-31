@@ -25,6 +25,7 @@
 #include <__stdinc.h>
 #include <features.h>
 
+#include <hybrid/__atomic.h>
 #include <hybrid/__byteswap.h>
 #include <hybrid/__rotate.h>
 #include <hybrid/host.h>

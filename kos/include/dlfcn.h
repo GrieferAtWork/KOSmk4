@@ -60,7 +60,7 @@
 #include <hybrid/__asm.h>
 #include <hybrid/typecore.h>
 
-#include <asm/asmword.h> /* .wordrel */
+#include <asm/asmword.h> /* .wordptr */
 
 /* Register a  cache-clear  function  to-be  invoked
  * when system/application memory starts to run out.
@@ -84,7 +84,7 @@
 	__ASM_BEGIN                                       \
 	__ASM_L(.pushsection __DLCACHES_SECTION_NAME, "") \
 	__ASM_L(	.align __SIZEOF_POINTER__)            \
-	__ASM_L(	.wordrel func)                        \
+	__ASM_L(	.wordptr func)                        \
 	__ASM_L(.popsection)                              \
 	__ASM_END                                         \
 	__PRIVATE __ATTR_USED int (func)(void)

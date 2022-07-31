@@ -33,6 +33,49 @@ __DECL_BEGIN
 typedef __UINTPTR_HALF_TYPE__ unwind_regno_t;
 #endif /* !__unwind_regno_t_defined */
 
+#define UNWIND_GETREG_LCPUSTATE_NAME           "unwind_getreg_lcpustate"
+#define UNWIND_SETREG_LCPUSTATE_NAME           "unwind_setreg_lcpustate"
+#define UNWIND_GETREG_UCPUSTATE_NAME           "unwind_getreg_ucpustate"
+#define UNWIND_SETREG_UCPUSTATE_NAME           "unwind_setreg_ucpustate"
+#define UNWIND_GETREG_KCPUSTATE_NAME           "unwind_getreg_kcpustate"
+#define UNWIND_SETREG_KCPUSTATE_NAME           "unwind_setreg_kcpustate"
+#define UNWIND_GETREG_FCPUSTATE_NAME           "unwind_getreg_fcpustate"
+#define UNWIND_SETREG_FCPUSTATE_NAME           "unwind_setreg_fcpustate"
+#define UNWIND_GETREG_SFPUSTATE_NAME           "unwind_getreg_sfpustate"
+#define UNWIND_SETREG_SFPUSTATE_NAME           "unwind_setreg_sfpustate"
+#define UNWIND_GETREG_XFPUSTATE_NAME           "unwind_getreg_xfpustate"
+#define UNWIND_SETREG_XFPUSTATE_NAME           "unwind_setreg_xfpustate"
+#define UNWIND_GETREG_LCPUSTATE_EXCLUSIVE_NAME "unwind_getreg_lcpustate_exclusive"
+#define UNWIND_SETREG_LCPUSTATE_EXCLUSIVE_NAME "unwind_setreg_lcpustate_exclusive"
+#define UNWIND_GETREG_UCPUSTATE_EXCLUSIVE_NAME "unwind_getreg_ucpustate_exclusive"
+#define UNWIND_SETREG_UCPUSTATE_EXCLUSIVE_NAME "unwind_setreg_ucpustate_exclusive"
+#define UNWIND_GETREG_KCPUSTATE_EXCLUSIVE_NAME "unwind_getreg_kcpustate_exclusive"
+#define UNWIND_SETREG_KCPUSTATE_EXCLUSIVE_NAME "unwind_setreg_kcpustate_exclusive"
+#define UNWIND_GETREG_FCPUSTATE_EXCLUSIVE_NAME "unwind_getreg_fcpustate_exclusive"
+#define UNWIND_SETREG_FCPUSTATE_EXCLUSIVE_NAME "unwind_setreg_fcpustate_exclusive"
+#define UNWIND_GETREG_SFPUSTATE_EXCLUSIVE_NAME "unwind_getreg_sfpustate_exclusive"
+#define UNWIND_SETREG_SFPUSTATE_EXCLUSIVE_NAME "unwind_setreg_sfpustate_exclusive"
+#define UNWIND_GETREG_XFPUSTATE_EXCLUSIVE_NAME "unwind_getreg_xfpustate_exclusive"
+#define UNWIND_SETREG_XFPUSTATE_EXCLUSIVE_NAME "unwind_setreg_xfpustate_exclusive"
+#ifdef __KERNEL__
+#define UNWIND_GETREG_SCPUSTATE_NAME           "unwind_getreg_scpustate"
+#define UNWIND_GETREG_ICPUSTATE_NAME           "unwind_getreg_icpustate"
+#define UNWIND_GETREG_SCPUSTATE_EXCLUSIVE_NAME "unwind_getreg_scpustate_exclusive"
+#define UNWIND_GETREG_ICPUSTATE_EXCLUSIVE_NAME "unwind_getreg_icpustate_exclusive"
+#ifdef __x86_64__
+#define UNWIND_SETREG_SCPUSTATE_NAME           "unwind_setreg_scpustate"
+#define UNWIND_SETREG_ICPUSTATE_NAME           "unwind_setreg_icpustate"
+#define UNWIND_SETREG_SCPUSTATE_EXCLUSIVE_NAME "unwind_setreg_scpustate_exclusive"
+#define UNWIND_SETREG_ICPUSTATE_EXCLUSIVE_NAME "unwind_setreg_icpustate_exclusive"
+#else /* __x86_64__ */
+#define UNWIND_SETREG_SCPUSTATE_P_NAME           "unwind_setreg_scpustate_p"
+#define UNWIND_SETREG_ICPUSTATE_P_NAME           "unwind_setreg_icpustate_p"
+#define UNWIND_SETREG_SCPUSTATE_EXCLUSIVE_P_NAME "unwind_setreg_scpustate_exclusive_p"
+#define UNWIND_SETREG_ICPUSTATE_EXCLUSIVE_P_NAME "unwind_setreg_icpustate_exclusive_p"
+#endif /* !__x86_64__ */
+#endif /* __KERNEL__ */
+
+
 /* Register accessor callbacks for a variety of known cpu context structures.
  * NOTE: When the intent  is to unwind  both CPU  and FPU registers,  you must  create
  *       your own custom register get/set functions that call forward to the functions
@@ -209,6 +252,8 @@ struct unwind_setreg_compat_data {
 	((self)->uscd_setreg = (noncompat_setreg),                                \
 	 (self)->uscd_arg    = (noncompat_arg))
 
+#define UNWIND_GETREG_COMPAT_NAME "unwind_getreg_compat"
+#define UNWIND_SETREG_COMPAT_NAME "unwind_setreg_compat"
 
 /* Compatibility mode register get/set wrappers.
  * @param: regno: One of `CFI_386_UNWIND_REGISTER_*' */

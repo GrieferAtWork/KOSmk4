@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc94bbe46 */
+/* HASH CRC-32:0x33c43657 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -851,7 +851,7 @@
 #define SYS_get_robust_list              __NR_get_robust_list              /* errno_t get_robust_list(int TODO_PROTOTYPE) */
 /* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 #define SYS_splice                       __NR_splice                       /* ssize_t splice(fd_t fdin, uint64_t *offin, fd_t fdout, uint64_t *offout, size_t length, syscall_ulong_t flags) */
-#define SYS_arm_sync_file_range          __NR_arm_sync_file_range          /* errno_t arm_sync_file_range(int TODO_PROTOTYPE) */
+#define SYS_sync_file_range2             __NR_sync_file_range2             /* errno_t sync_file_range2(fd_t fd, syscall_ulong_t flags, uint64_t offset, uint64_t count) */
 /* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
 #define SYS_tee                          __NR_tee                          /* ssize_t tee(fd_t fdin, fd_t fdout, size_t length, syscall_ulong_t flags) */
 /* @param: flags: Set of `SPLICE_F_MOVE | SPLICE_F_NONBLOCK | SPLICE_F_MORE | SPLICE_F_GIFT' */
@@ -935,7 +935,7 @@
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
-#define SYS_recvmmsg                     __NR_recvmmsg                     /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdr32 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec32 const *tmo) */
+#define SYS_recvmmsg                     __NR_recvmmsg                     /* ssize_t recvmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec32 const *tmo) */
 /* Accept incoming client (aka. peer) connection requests.
  * @param: addr:       Peer address of the sender (or `NULL' when `addr_len' is `NULL')
  * @param: addr_len:   [NULL] Don't fill in the client's peer address
@@ -1045,7 +1045,7 @@
  *                            MSG_WAITFORONE'
  * @throw: Error (s.a. `recvmsg(2)')
  * @return: * : The # of datagrams successfully received. */
-#define SYS_recvmmsg_time64              __NR_recvmmsg_time64              /* ssize_t recvmmsg_time64(fd_t sockfd, struct mmsghdr64 *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec64 const *tmo) */
+#define SYS_recvmmsg_time64              __NR_recvmmsg_time64              /* ssize_t recvmmsg_time64(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t msg_flags, struct timespec64 const *tmo) */
 #define SYS_mq_timedsend_time64          __NR_mq_timedsend_time64          /* errno_t mq_timedsend_time64(fd_t mqdes, char const *msg_ptr, size_t msg_len, uint32_t msg_prio, struct timespec64 const *abs_timeout) */
 #define SYS_mq_timedreceive_time64       __NR_mq_timedreceive_time64       /* ssize_t mq_timedreceive_time64(fd_t mqdes, char *msg_ptr, size_t msg_len, uint32_t *pmsg_prio, struct timespec64 const *abs_timeout) */
 #define SYS_semtimedop_time64            __NR_semtimedop_time64            /* errno_t semtimedop_time64(int TODO_PROTOTYPE) */
@@ -1491,7 +1491,7 @@
  * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-#define SYS_lfutexexpr                   __NR_lfutexexpr                   /* errno_t lfutexexpr(uintptr_t *futexaddr, void *base, struct lfutexexpr const *expr, struct timespec const *timeout, syscall_ulong_t flags) */
+#define SYS_lfutexexpr                   __NR_lfutexexpr                   /* errno_t lfutexexpr(uintptr_t *futexaddr, void *base, struct lfutexexpr const *expr, struct timespec64 const *timeout, syscall_ulong_t flags) */
 /* Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
  * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal

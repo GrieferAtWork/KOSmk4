@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3c4976c */
+/* HASH CRC-32:0xfdce885a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -346,7 +346,7 @@
 #define __NRAC_set_robust_list              1
 #define __NRAC_get_robust_list              1
 #define __NRAC_splice                       6
-#define __NRAC_arm_sync_file_range          1
+#define __NRAC_sync_file_range2             4
 #define __NRAC_tee                          4
 #define __NRAC_vmsplice                     4
 #define __NRAC_move_pages                   1
@@ -831,7 +831,7 @@
 #define __NRRT_set_robust_list              (errno_t, __errno_t)
 #define __NRRT_get_robust_list              (errno_t, __errno_t)
 #define __NRRT_splice                       (ssize_t, __ssize_t)
-#define __NRRT_arm_sync_file_range          (errno_t, __errno_t)
+#define __NRRT_sync_file_range2             (errno_t, __errno_t)
 #define __NRRT_tee                          (ssize_t, __ssize_t)
 #define __NRRT_vmsplice                     (ssize_t, __ssize_t)
 #define __NRRT_move_pages                   (errno_t, __errno_t)
@@ -1686,7 +1686,10 @@
 #define __NRAT3_splice                       (uint64_t *, __uint64_t *)
 #define __NRAT4_splice                       (size_t, __size_t)
 #define __NRAT5_splice                       (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT0_arm_sync_file_range          (int, int)
+#define __NRAT0_sync_file_range2             (fd_t, __fd_t)
+#define __NRAT1_sync_file_range2             (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT2_sync_file_range2             (uint64_t, __uint64_t)
+#define __NRAT3_sync_file_range2             (uint64_t, __uint64_t)
 #define __NRAT0_tee                          (fd_t, __fd_t)
 #define __NRAT1_tee                          (fd_t, __fd_t)
 #define __NRAT2_tee                          (size_t, __size_t)
@@ -1753,7 +1756,7 @@
 #define __NRAT3_rt_tgsigqueueinfo            (struct __siginfo_struct const *, struct __siginfo_struct const *)
 #define __NRAT0_perf_event_open              (int, int)
 #define __NRAT0_recvmmsg                     (fd_t, __fd_t)
-#define __NRAT1_recvmmsg                     (struct mmsghdr32 *, struct mmsghdr32 *)
+#define __NRAT1_recvmmsg                     (struct mmsghdr *, struct mmsghdr *)
 #define __NRAT2_recvmmsg                     (size_t, __size_t)
 #define __NRAT3_recvmmsg                     (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT4_recvmmsg                     (struct timespec32 const *, struct __timespec32 const *)
@@ -1882,7 +1885,7 @@
 #define __NRAT4_ppoll_time64                 (size_t, __size_t)
 #define __NRAT0_io_pgetevents_time64         (int, int)
 #define __NRAT0_recvmmsg_time64              (fd_t, __fd_t)
-#define __NRAT1_recvmmsg_time64              (struct mmsghdr64 *, struct mmsghdr64 *)
+#define __NRAT1_recvmmsg_time64              (struct mmsghdr *, struct mmsghdr *)
 #define __NRAT2_recvmmsg_time64              (size_t, __size_t)
 #define __NRAT3_recvmmsg_time64              (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT4_recvmmsg_time64              (struct timespec64 const *, struct __timespec64 const *)
@@ -2081,7 +2084,7 @@
 #define __NRAT0_lfutexexpr                   (uintptr_t *, __uintptr_t *)
 #define __NRAT1_lfutexexpr                   (void *, void *)
 #define __NRAT2_lfutexexpr                   (struct lfutexexpr const *, struct lfutexexpr const *)
-#define __NRAT3_lfutexexpr                   (struct timespec const *, struct timespec const *)
+#define __NRAT3_lfutexexpr                   (struct timespec64 const *, struct __timespec64 const *)
 #define __NRAT4_lfutexexpr                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_set_userprocmask_address     (struct userprocmask *, struct userprocmask *)
 #define __NRAT0_utimes64                     (char const *, char const *)
@@ -2453,7 +2456,7 @@
 #define __NRAM_set_robust_list(a, b, c, d, e, f, g)              (int)a
 #define __NRAM_get_robust_list(a, b, c, d, e, f, g)              (int)a
 #define __NRAM_splice(a, b, c, d, e, f, g)                       (__fd_t)a, (__uint64_t *)b, (__fd_t)c, (__uint64_t *)d, (__size_t)e, (__syscall_ulong_t)f
-#define __NRAM_arm_sync_file_range(a, b, c, d, e, f, g)          (int)a
+#define __NRAM_sync_file_range2(a, b, c, d, e, f, g)             (__fd_t)a, (__syscall_ulong_t)b, (__uint64_t)((__uint64_t)c | (__uint64_t)d << 32), (__uint64_t)((__uint64_t)e | (__uint64_t)f << 32)
 #define __NRAM_tee(a, b, c, d, e, f, g)                          (__fd_t)a, (__fd_t)b, (__size_t)c, (__syscall_ulong_t)d
 #define __NRAM_vmsplice(a, b, c, d, e, f, g)                     (__fd_t)a, (struct iovec const *)b, (__size_t)c, (__syscall_ulong_t)d
 #define __NRAM_move_pages(a, b, c, d, e, f, g)                   (int)a
@@ -2477,7 +2480,7 @@
 #define __NRAM_pwritev(a, b, c, d, e, f, g)                      (__fd_t)a, (struct iovec const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32)
 #define __NRAM_rt_tgsigqueueinfo(a, b, c, d, e, f, g)            (__pid_t)a, (__pid_t)b, (__signo_t)c, (struct __siginfo_struct const *)d
 #define __NRAM_perf_event_open(a, b, c, d, e, f, g)              (int)a
-#define __NRAM_recvmmsg(a, b, c, d, e, f, g)                     (__fd_t)a, (struct mmsghdr32 *)b, (__size_t)c, (__syscall_ulong_t)d, (struct __timespec32 const *)e
+#define __NRAM_recvmmsg(a, b, c, d, e, f, g)                     (__fd_t)a, (struct mmsghdr *)b, (__size_t)c, (__syscall_ulong_t)d, (struct __timespec32 const *)e
 #define __NRAM_accept4(a, b, c, d, e, f, g)                      (__fd_t)a, (struct sockaddr *)b, (__socklen_t *)c, (__syscall_ulong_t)d
 #define __NRAM_fanotify_init(a, b, c, d, e, f, g)                (int)a
 #define __NRAM_fanotify_mark(a, b, c, d, e, f, g)                (int)a
@@ -2527,7 +2530,7 @@
 #define __NRAM_pselect6_time64(a, b, c, d, e, f, g)              (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct __timespec64 const *)e, (struct sigset_with_size const *)f
 #define __NRAM_ppoll_time64(a, b, c, d, e, f, g)                 (struct pollfd *)a, (__size_t)b, (struct __timespec64 const *)c, (struct __sigset_struct const *)d, (__size_t)e
 #define __NRAM_io_pgetevents_time64(a, b, c, d, e, f, g)         (int)a
-#define __NRAM_recvmmsg_time64(a, b, c, d, e, f, g)              (__fd_t)a, (struct mmsghdr64 *)b, (__size_t)c, (__syscall_ulong_t)d, (struct __timespec64 const *)e
+#define __NRAM_recvmmsg_time64(a, b, c, d, e, f, g)              (__fd_t)a, (struct mmsghdr *)b, (__size_t)c, (__syscall_ulong_t)d, (struct __timespec64 const *)e
 #define __NRAM_mq_timedsend_time64(a, b, c, d, e, f, g)          (__fd_t)a, (char const *)b, (__size_t)c, (__uint32_t)d, (struct __timespec64 const *)e
 #define __NRAM_mq_timedreceive_time64(a, b, c, d, e, f, g)       (__fd_t)a, (char *)b, (__size_t)c, (__uint32_t *)d, (struct __timespec64 const *)e
 #define __NRAM_semtimedop_time64(a, b, c, d, e, f, g)            (int)a
@@ -2606,7 +2609,7 @@
 #define __NRAM_kreaddir(a, b, c, d, e, f, g)                     (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d
 #define __NRAM_kreaddirf(a, b, c, d, e, f, g)                    (__fd_t)a, (struct dirent *)b, (__size_t)c, (__syscall_ulong_t)d, (__iomode_t)e
 #define __NRAM_lfutex(a, b, c, d, e, f, g)                       (__uintptr_t *)a, (__syscall_ulong_t)b, (__uintptr_t)c, (struct __timespec64 const *)d, (__uintptr_t)e
-#define __NRAM_lfutexexpr(a, b, c, d, e, f, g)                   (__uintptr_t *)a, (void *)b, (struct lfutexexpr const *)c, (struct timespec const *)d, (__syscall_ulong_t)e
+#define __NRAM_lfutexexpr(a, b, c, d, e, f, g)                   (__uintptr_t *)a, (void *)b, (struct lfutexexpr const *)c, (struct __timespec64 const *)d, (__syscall_ulong_t)e
 #define __NRAM_set_userprocmask_address(a, b, c, d, e, f, g)     (struct userprocmask *)a
 #define __NRAM_utimes64(a, b, c, d, e, f, g)                     (char const *)a, (struct __timeval64 const *)b
 #define __NRAM_waitid64(a, b, c, d, e, f, g)                     (__syscall_ulong_t)a, (__id_t)b, (struct __siginfo_struct *)c, (__syscall_ulong_t)d, (struct __rusage64 *)e
@@ -2938,7 +2941,7 @@
 #define __NRAP_set_robust_list(a)                                (__syscall_ulong_t)a
 #define __NRAP_get_robust_list(a)                                (__syscall_ulong_t)a
 #define __NRAP_splice(a, b, c, d, e, f)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
-#define __NRAP_arm_sync_file_range(a)                            (__syscall_ulong_t)a
+#define __NRAP_sync_file_range2(a, b, c, d)                      (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)((__uint64_t)c >> 32), (__syscall_ulong_t)d, (__syscall_ulong_t)((__uint64_t)d >> 32)
 #define __NRAP_tee(a, b, c, d)                                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_vmsplice(a, b, c, d)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_move_pages(a)                                     (__syscall_ulong_t)a
