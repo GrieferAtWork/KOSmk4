@@ -1935,6 +1935,7 @@ function calculateSyscallTableRanges(ids: {int...}, arch/*: SyscallArch*/): {(in
 				if (l)
 					break;
 				del sizes[0];
+				s = sizes[0];
 			}
 			local gapStart = l.pop(0);
 			usedGaps.append((gapStart, gapStart + s - 1));

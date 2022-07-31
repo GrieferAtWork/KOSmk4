@@ -28,6 +28,17 @@ Cheat sheet for someone that know a lot about x86 assembly, but is pretty much t
 | preserve | `r4, r5, r6, r7, r8, r9, r10, r11, r13=sp, r14=lr`
 
 
+### Syscall call calling convention
+
+| Category | Registers
+|----------|----------------------------------------------
+| args     | `r0, r1, r2, r3, r4, r5, r6` (yes: 7 argument registers)
+| return   | `r0, r1`
+| sysno    | `r7` (EABI), `swi #NR` (OABI)
+| except   | `(r7 & 0x800000) != 0`
+
+
+
 ### Push / pop
 
 - `push   {r0, r1, r2, r3}`

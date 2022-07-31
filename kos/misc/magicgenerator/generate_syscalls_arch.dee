@@ -1473,10 +1473,10 @@ global ARCH: {string: SyscallArch} = {
 		platformArch: "arm",
 		platformGpRegisterSizeInBits: 32,
 		platformPointerSizeInBytes: 4,
-		platformSyscallRegisterCount: 6,
+		platformSyscallRegisterCount: 7,
 		platformEndian: "le", /* TODO: Variable! */
-		platformSyscallTableCount: 2,
-		platformMaxPossibleSysno: 0xffffffff,
+		platformSyscallTableCount: 3,
+		platformMaxPossibleSysno: 0xffffff,
 		platformLibcSyscallPrefix: arm_printLibcSyscallWrapperPrefix,
 		platformLibcSyscallSuffix: arm_printLibcSyscallWrapperSuffix,
 		platformLibcSyscallWrapper: arm_printLibcSyscallWrapper,

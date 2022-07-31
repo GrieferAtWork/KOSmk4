@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ce2b203 */
+/* HASH CRC-32:0x9e130a55 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -255,9 +255,17 @@ __CDECLARE_SC(,__errno_t,bind,(__fd_t __sockfd, struct sockaddr const *__addr, _
 #if __CRT_HAVE_SC(bpf)
 __CDECLARE_SC(,__errno_t,bpf,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(bpf) */
+#if __CRT_HAVE_SC(breakpoint)
+/* Trigger a breakpoint */
+__CDECLARE_VOID_SC(,breakpoint,(void),())
+#endif /* __CRT_HAVE_SC(breakpoint) */
 #if __CRT_HAVE_SC(brk)
 __CDECLARE_SC(,__errno_t,brk,(void *__addr),(__addr))
 #endif /* __CRT_HAVE_SC(brk) */
+#if __CRT_HAVE_SC(cacheflush)
+/* Flush instruction cache */
+__CDECLARE_SC(,__errno_t,cacheflush,(void const *__start, void const *__end, __syscall_ulong_t __flags),(__start,__end,__flags))
+#endif /* __CRT_HAVE_SC(cacheflush) */
 #if __CRT_HAVE_SC(capget)
 __CDECLARE_SC(,__errno_t,capget,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(capget) */
@@ -759,6 +767,10 @@ __CDECLARE_SC(,__errno_t,get_mempolicy,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE)
 #if __CRT_HAVE_SC(get_robust_list)
 __CDECLARE_SC(,__errno_t,get_robust_list,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_SC(get_robust_list) */
+#if __CRT_HAVE_SC(get_tls)
+/* Get calling thread's TLS pointer */
+__CDECLARE_SC(,void *,get_tls,(void),())
+#endif /* __CRT_HAVE_SC(get_tls) */
 #if __CRT_HAVE_SC(getcpu)
 __CDECLARE_SC(,__errno_t,getcpu,(__uint32_t *__cpu, __uint32_t *__node, struct getcpu_cache *__tcache),(__cpu,__node,__tcache))
 #endif /* __CRT_HAVE_SC(getcpu) */
@@ -2028,6 +2040,10 @@ __CDECLARE_SC(,__errno_t,set_robust_list,(int __TODO_PROTOTYPE),(__TODO_PROTOTYP
 #if __CRT_HAVE_SC(set_tid_address)
 __CDECLARE_SC(,__pid_t,set_tid_address,(__pid_t *__tidptr),(__tidptr))
 #endif /* __CRT_HAVE_SC(set_tid_address) */
+#if __CRT_HAVE_SC(set_tls)
+/* Set calling thread's TLS pointer */
+__CDECLARE_SC(,__errno_t,set_tls,(void const *__tlsval),(__tlsval))
+#endif /* __CRT_HAVE_SC(set_tls) */
 #if __CRT_HAVE_SC(set_userprocmask_address)
 /* Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
@@ -2498,6 +2514,14 @@ __CDECLARE_SC(,__fd_t,userfaultfd,(__syscall_ulong_t __flags),(__flags))
  * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK | O_NONBLOCK' */
 __CDECLARE_SC(,__fd_t,userviofd,(__size_t __initial_size, __syscall_ulong_t __flags),(__initial_size,__flags))
 #endif /* __CRT_HAVE_SC(userviofd) */
+#if __CRT_HAVE_SC(usr26)
+/* Clear CPSR.T=0x10 */
+__CDECLARE_VOID_SC(,usr26,(void),())
+#endif /* __CRT_HAVE_SC(usr26) */
+#if __CRT_HAVE_SC(usr32)
+/* Set CPSR.T=0x10 */
+__CDECLARE_VOID_SC(,usr32,(void),())
+#endif /* __CRT_HAVE_SC(usr32) */
 #if __CRT_HAVE_SC(ustat)
 __CDECLARE_SC(,__errno_t,ustat,(__dev_t __dev, struct ustat *__ubuf),(__dev,__ubuf))
 #endif /* __CRT_HAVE_SC(ustat) */
@@ -2705,9 +2729,17 @@ __CDECLARE_XSC(,__errno_t,bind,(__fd_t __sockfd, struct sockaddr const *__addr, 
 #if __CRT_HAVE_XSC(bpf)
 __CDECLARE_XSC(,__errno_t,bpf,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(bpf) */
+#if __CRT_HAVE_XSC(breakpoint)
+/* Trigger a breakpoint */
+__CDECLARE_VOID_XSC(,breakpoint,(void),())
+#endif /* __CRT_HAVE_XSC(breakpoint) */
 #if __CRT_HAVE_XSC(brk)
 __CDECLARE_XSC(,__errno_t,brk,(void *__addr),(__addr))
 #endif /* __CRT_HAVE_XSC(brk) */
+#if __CRT_HAVE_XSC(cacheflush)
+/* Flush instruction cache */
+__CDECLARE_XSC(,__errno_t,cacheflush,(void const *__start, void const *__end, __syscall_ulong_t __flags),(__start,__end,__flags))
+#endif /* __CRT_HAVE_XSC(cacheflush) */
 #if __CRT_HAVE_XSC(capget)
 __CDECLARE_XSC(,__errno_t,capget,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(capget) */
@@ -3209,6 +3241,10 @@ __CDECLARE_XSC(,__errno_t,get_mempolicy,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE
 #if __CRT_HAVE_XSC(get_robust_list)
 __CDECLARE_XSC(,__errno_t,get_robust_list,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #endif /* __CRT_HAVE_XSC(get_robust_list) */
+#if __CRT_HAVE_XSC(get_tls)
+/* Get calling thread's TLS pointer */
+__CDECLARE_XSC(,void *,get_tls,(void),())
+#endif /* __CRT_HAVE_XSC(get_tls) */
 #if __CRT_HAVE_XSC(getcpu)
 __CDECLARE_XSC(,__errno_t,getcpu,(__uint32_t *__cpu, __uint32_t *__node, struct getcpu_cache *__tcache),(__cpu,__node,__tcache))
 #endif /* __CRT_HAVE_XSC(getcpu) */
@@ -4472,6 +4508,10 @@ __CDECLARE_XSC(,__errno_t,set_robust_list,(int __TODO_PROTOTYPE),(__TODO_PROTOTY
 #if __CRT_HAVE_XSC(set_tid_address)
 __CDECLARE_XSC(,__pid_t,set_tid_address,(__pid_t *__tidptr),(__tidptr))
 #endif /* __CRT_HAVE_XSC(set_tid_address) */
+#if __CRT_HAVE_XSC(set_tls)
+/* Set calling thread's TLS pointer */
+__CDECLARE_XSC(,__errno_t,set_tls,(void const *__tlsval),(__tlsval))
+#endif /* __CRT_HAVE_XSC(set_tls) */
 #if __CRT_HAVE_XSC(set_userprocmask_address)
 /* Register the address of  the calling thread's userprocmask  controller.
  * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
@@ -4939,6 +4979,14 @@ __CDECLARE_XSC(,__fd_t,userfaultfd,(__syscall_ulong_t __flags),(__flags))
  * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK | O_NONBLOCK' */
 __CDECLARE_XSC(,__fd_t,userviofd,(__size_t __initial_size, __syscall_ulong_t __flags),(__initial_size,__flags))
 #endif /* __CRT_HAVE_XSC(userviofd) */
+#if __CRT_HAVE_XSC(usr26)
+/* Clear CPSR.T=0x10 */
+__CDECLARE_VOID_XSC(,usr26,(void),())
+#endif /* __CRT_HAVE_XSC(usr26) */
+#if __CRT_HAVE_XSC(usr32)
+/* Set CPSR.T=0x10 */
+__CDECLARE_VOID_XSC(,usr32,(void),())
+#endif /* __CRT_HAVE_XSC(usr32) */
 #if __CRT_HAVE_XSC(ustat)
 __CDECLARE_XSC(,__errno_t,ustat,(__dev_t __dev, struct ustat *__ubuf),(__dev,__ubuf))
 #endif /* __CRT_HAVE_XSC(ustat) */

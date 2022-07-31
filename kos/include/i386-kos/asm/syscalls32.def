@@ -667,7 +667,8 @@ select64 = selectx32_64;
 0x000001b6:pidfd_getfd
 0x000001b7:faccessat2
 
-/* KOS-specific extended system calls */
+/* KOS-specific extended system calls
+ * - Extensions of linux system calls use the negative original number */
 /*x00000001:...*/
 /*x00000002:...*/
 -0x00000003:readf /* Extends: `read' */

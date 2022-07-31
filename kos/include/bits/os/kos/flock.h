@@ -37,11 +37,11 @@
 #endif /* __ALIGNOF_INTN(__FS_SIZEOF(OFF)) < 8 */
 #define __OFFSET_FLOCK_LEN    (__OFFSET_FLOCK_START + __FS_SIZEOF(OFF))
 #define __OFFSET_FLOCK_PID    (__OFFSET_FLOCK_START + __FS_SIZEOF(OFF) * 2)
-#if __ALIGNOF_INTN(__SIZEOF_OFF64_T__) >= 8 && __SIZEOF_PID_T__ < 8
+#if __ALIGNOF_INTN(__FS_SIZEOF(OFF)) > __ALIGNOF_INTN(__SIZEOF_PID_T__)
 #define __SIZEOF_FLOCK        (__OFFSET_FLOCK_START + __FS_SIZEOF(OFF) * 2 + __SIZEOF_PID_T__ + 4)
-#else /* __ALIGNOF_INTN(__SIZEOF_OFF64_T__) >= 8 && __SIZEOF_PID_T__ < 8 */
+#else /* __ALIGNOF_INTN(__FS_SIZEOF(OFF)) > __ALIGNOF_INTN(__SIZEOF_PID_T__) */
 #define __SIZEOF_FLOCK        (__OFFSET_FLOCK_START + __FS_SIZEOF(OFF) * 2 + __SIZEOF_PID_T__)
-#endif /* __ALIGNOF_INTN(__SIZEOF_OFF64_T__) < 8 || __SIZEOF_PID_T__ >= 8 */
+#endif /* __ALIGNOF_INTN(__FS_SIZEOF(OFF)) <= __ALIGNOF_INTN(__SIZEOF_PID_T__) */
 
 #define __OFFSET_FLOCK32_TYPE   0
 #define __OFFSET_FLOCK32_WHENCE 2
@@ -52,11 +52,11 @@
 #endif /* __ALIGNOF_INTN(__SIZEOF_OFF32_T__) < 8 */
 #define __OFFSET_FLOCK32_LEN    (__OFFSET_FLOCK32_START + __SIZEOF_OFF32_T__)
 #define __OFFSET_FLOCK32_PID    (__OFFSET_FLOCK32_START + __SIZEOF_OFF32_T__ * 2)
-#if __ALIGNOF_INTN(__SIZEOF_OFF64_T__) >= 8 && __SIZEOF_PID_T__ < 8
+#if __ALIGNOF_INTN(__SIZEOF_OFF32_T__) > __ALIGNOF_INTN(__SIZEOF_PID_T__)
 #define __SIZEOF_FLOCK32        (__OFFSET_FLOCK32_START + __SIZEOF_OFF32_T__ * 2 + __SIZEOF_PID_T__ + 4)
-#else /* __ALIGNOF_INTN(__SIZEOF_OFF64_T__) >= 8 && __SIZEOF_PID_T__ < 8 */
+#else /* __ALIGNOF_INTN(__SIZEOF_OFF32_T__) > __ALIGNOF_INTN(__SIZEOF_PID_T__) */
 #define __SIZEOF_FLOCK32        (__OFFSET_FLOCK32_START + __SIZEOF_OFF32_T__ * 2 + __SIZEOF_PID_T__)
-#endif /* __ALIGNOF_INTN(__SIZEOF_OFF64_T__) < 8 || __SIZEOF_PID_T__ >= 8 */
+#endif /* __ALIGNOF_INTN(__SIZEOF_OFF32_T__) <= __ALIGNOF_INTN(__SIZEOF_PID_T__) */
 
 #define __OFFSET_FLOCK64_TYPE   0
 #define __OFFSET_FLOCK64_WHENCE 2
@@ -90,9 +90,9 @@ struct flock /*[PREFIX(l_)]*/ {
 	__FS_TYPE(off) l_len;    /* Size of the locked area; zero means until EOF. */
 #endif /* !__USE_KOS_ALTERATIONS */
 	__pid_t        l_pid;    /* Process holding the lock. */
-#if __ALIGNOF_INTN(__FS_SIZEOF(OFF)) >= 8 && __SIZEOF_PID_T__ < 8
+#if __ALIGNOF_INTN(__FS_SIZEOF(OFF)) > __ALIGNOF_INTN(__SIZEOF_PID_T__)
 	__UINT32_TYPE__ __l_pad2; /* ... */
-#endif /* __ALIGNOF_INTN(__FS_SIZEOF(OFF)) >= 8 && __SIZEOF_PID_T__ < 8 */
+#endif /* __ALIGNOF_INTN(__FS_SIZEOF(OFF)) > __ALIGNOF_INTN(__SIZEOF_PID_T__) */
 };
 
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
@@ -155,9 +155,9 @@ struct __flock32 /*[NAME(flock32)][PREFIX(l_)]*/ {
 	__off32_t      l_len;    /* Size of the locked area; zero means until EOF. */
 #endif /* !__USE_KOS_ALTERATIONS */
 	__pid_t        l_pid;    /* Process holding the lock. */
-#if __ALIGNOF_INTN(__SIZEOF_OFF32_T__) >= 8 && __SIZEOF_PID_T__ < 8
+#if __ALIGNOF_INTN(__SIZEOF_OFF32_T__) > __ALIGNOF_INTN(__SIZEOF_PID_T__)
 	__UINT32_TYPE__ __l_pad2; /* ... */
-#endif /* __ALIGNOF_INTN(__SIZEOF_OFF32_T__) >= 8 && __SIZEOF_PID_T__ < 8 */
+#endif /* __ALIGNOF_INTN(__SIZEOF_OFF32_T__) > __ALIGNOF_INTN(__SIZEOF_PID_T__) */
 };
 #endif /* __USE_FILE_OFFSET64 && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__ */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaeb3e32 */
+/* HASH CRC-32:0xf335ef03 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,9 @@
 #define __CRT_HAVE_sys_bdflush
 #define __CRT_HAVE_sys_bind
 #define __CRT_HAVE_sys_bpf
+#define __CRT_HAVE_sys_breakpoint
 #define __CRT_HAVE_sys_brk
+#define __CRT_HAVE_sys_cacheflush
 #define __CRT_HAVE_sys_capget
 #define __CRT_HAVE_sys_capset
 #define __CRT_HAVE_sys_chdir
@@ -126,6 +128,7 @@
 #define __CRT_HAVE_sys_get_exception_handler
 #define __CRT_HAVE_sys_get_mempolicy
 #define __CRT_HAVE_sys_get_robust_list
+#define __CRT_HAVE_sys_get_tls
 #define __CRT_HAVE_sys_getcpu
 #define __CRT_HAVE_sys_getcwd
 #define __CRT_HAVE_sys_getdents
@@ -371,6 +374,7 @@
 #define __CRT_HAVE_sys_set_mempolicy
 #define __CRT_HAVE_sys_set_robust_list
 #define __CRT_HAVE_sys_set_tid_address
+#define __CRT_HAVE_sys_set_tls
 #define __CRT_HAVE_sys_set_userprocmask_address
 #define __CRT_HAVE_sys_setdomainname
 #define __CRT_HAVE_sys_setfsgid
@@ -468,6 +472,8 @@
 #define __CRT_HAVE_sys_uselib
 #define __CRT_HAVE_sys_userfaultfd
 #define __CRT_HAVE_sys_userviofd
+#define __CRT_HAVE_sys_usr26
+#define __CRT_HAVE_sys_usr32
 #define __CRT_HAVE_sys_ustat
 #define __CRT_HAVE_sys_utime
 #define __CRT_HAVE_sys_utime64
@@ -502,7 +508,9 @@
 #define __CRT_HAVE_sys_Xbdflush
 #define __CRT_HAVE_sys_Xbind
 #define __CRT_HAVE_sys_Xbpf
+#define __CRT_HAVE_sys_Xbreakpoint
 #define __CRT_HAVE_sys_Xbrk
+#define __CRT_HAVE_sys_Xcacheflush
 #define __CRT_HAVE_sys_Xcapget
 #define __CRT_HAVE_sys_Xcapset
 #define __CRT_HAVE_sys_Xchdir
@@ -595,6 +603,7 @@
 #define __CRT_HAVE_sys_Xget_exception_handler
 #define __CRT_HAVE_sys_Xget_mempolicy
 #define __CRT_HAVE_sys_Xget_robust_list
+#define __CRT_HAVE_sys_Xget_tls
 #define __CRT_HAVE_sys_Xgetcpu
 #define __CRT_HAVE_sys_Xgetcwd
 #define __CRT_HAVE_sys_Xgetdents
@@ -838,6 +847,7 @@
 #define __CRT_HAVE_sys_Xset_mempolicy
 #define __CRT_HAVE_sys_Xset_robust_list
 #define __CRT_HAVE_sys_Xset_tid_address
+#define __CRT_HAVE_sys_Xset_tls
 #define __CRT_HAVE_sys_Xset_userprocmask_address
 #define __CRT_HAVE_sys_Xsetdomainname
 #define __CRT_HAVE_sys_Xsetfsgid
@@ -934,6 +944,8 @@
 #define __CRT_HAVE_sys_Xuselib
 #define __CRT_HAVE_sys_Xuserfaultfd
 #define __CRT_HAVE_sys_Xuserviofd
+#define __CRT_HAVE_sys_Xusr26
+#define __CRT_HAVE_sys_Xusr32
 #define __CRT_HAVE_sys_Xustat
 #define __CRT_HAVE_sys_Xutime
 #define __CRT_HAVE_sys_Xutime64

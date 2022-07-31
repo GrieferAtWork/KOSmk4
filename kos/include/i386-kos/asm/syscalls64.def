@@ -725,6 +725,8 @@ arch_prctl = arch_prctlx64;
 //TODO:0x0000000000000223:x32_pwritev2
 
 
+/* KOS-specific extended system calls
+ * - Extensions of linux system calls use the negative original number */
 /* TODO: Revise system call numbers below (and document what each of them is extending) */
 -0x0000000000000001:writef
 /*x0000000000000002:...*/

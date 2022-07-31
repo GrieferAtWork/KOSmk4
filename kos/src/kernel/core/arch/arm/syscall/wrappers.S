@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a1edfc3 */
+/* HASH CRC-32:0x2d4f7eb3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1925,484 +1925,57 @@
 /* errno_t process_madvise(int TODO_PROTOTYPE) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 440) */
 
-/* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294966944) */
+/* Trigger a breakpoint */
+/* void breakpoint(void) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 983041) */
 
-/* Same as  `writev(2)', but  write data  to a  file at  a
- * specific `offset', rather than the current R/W position
- * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
-/* ssize_t pwritevf(fd_t fd, struct iovec const *iovec, size_t count, uint64_t offset, iomode_t mode) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294966962) */
+/* Flush instruction cache */
+/* errno_t cacheflush(void const *start, void const *end, syscall_ulong_t flags) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 983042) */
 
-/* Same as  `readv(2)', but  read data  from a  file at  a
- * specific `offset', rather than the current R/W position
- * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
-/* ssize_t preadvf(fd_t fd, struct iovec const *iovec, size_t count, uint64_t offset, iomode_t mode) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294966963) */
+/* Clear CPSR.T=0x10 */
+/* void usr26(void) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 983043) */
 
-/* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294966964) */
+/* Set CPSR.T=0x10 */
+/* void usr32(void) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 983044) */
 
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294966965) */
+/* Set calling thread's TLS pointer */
+/* errno_t set_tls(void const *tlsval) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 983045) */
 
-/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
-/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_stat *statbuf, atflag_t flags) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294966969) */
+/* Get calling thread's TLS pointer */
+/* void *get_tls(void) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 983046) */
 
-/* errno_t futimesat64(fd_t dirfd, char const *filename, struct timeval64 const[2] times) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294966970) */
+/* Read up to `bufsize' bytes from `fd' into `buf'
+ * When  `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at the time the call was made, and throw `E_WOULDBLOCK' if no
+ * data was available at the time.
+ * @return: <= bufsize: The actual amount of read bytes
+ * @return: 0         : EOF */
+/* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323075) */
 
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294966972) */
+/* Write up to `bufsize' bytes from `buf' into `fd'
+ * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
+ * possible at the time the call was made, and throw `E_WOULDBLOCK' if
+ * no data could be written at the time.
+ * @return: <= bufsize: The actual amount of written bytes
+ * @return: 0         : No more data can be written */
+/* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323076) */
 
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294966973) */
+/* Returns a bitset of all of the currently mounted dos-drives */
+/* syscall_slong_t getdrives(void) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323077) */
 
-/* @param: atflags: Set of `AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
- * @param: mask:    Set of `IN_ALL_EVENTS | ...' */
-/* int inotify_add_watch_at(fd_t notify_fd, fd_t dirfd, char const *pathname, atflag_t atflags, uint32_t mask) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294966979) */
-
-/* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
- * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, syscall_ulong_t options, struct rusage64 *ru) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967016) */
-
-/* @param: times:    When NULL, set the current time
- * @param: times[0]: New access time
- * @param: times[1]: New last-modified time */
-/* errno_t utimes64(char const *filename, struct timeval64 const[2] times) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967027) */
-
-/* Register the address of  the calling thread's userprocmask  controller.
- * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
- * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
- * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
- * is filled in with the equivalent of `sigpending(2)'
- * Additionally,  the address  of `&ctl->pm_mytid'  is stored  as an override
- * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
- * and write to `ctl->pm_pending' (using  atomic-or for the later) from  this
- * point forth.
- * NOTE: Before calling this function, the caller must:
- *       >> bzero(ctl, sizeof(struct userprocmask));
- *       >> ctl->pm_sigsize = sizeof(sigset_t);
- *       >> ctl->pm_sigmask = &initial_sigmask;
- *       Where the initial bzero() is needed to initialize potential
- *       additional,   arch-specific   fields    to   all    zeroes.
- * NOTE: This system call will then initialize:
- *       >> ctl->pm_mytid = gettid();
- *       >> sigprocmask(0, NULL, ctl->pm_sigmask);
- *       >> sigpending(&ctl->pm_pending);
- * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
- *       before this is done, the kernel will copy the  `pm_sigmask'
- *       of the previously set  controller into its internal  signal
- *       mask. (i.e. the one used outside of userprocmask-mode)
- * Note though  that  `pm_sigmask'  is ignored  for  `SIGKILL'  and  `SIGSTOP'
- * Note also  that  this  function replaces  `set_tid_address(2)',  such  that
- * it negates a  prior call  to said  function, while  a future  call to  said
- * function will once again disable userprocmask, same as passing `NULL' would */
-/* errno_t set_userprocmask_address(struct userprocmask *ctl) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967040) */
-
-/* >> lfutexexpr(2)
- * The lfutexexpr(2) system call can be used to specify arbitrarily complex
- * expressions that must atomically (in relation to other futex operations)
- * hold true before the scheduler will suspend the calling thread.
- * @param: futexaddr: The futex on which to wait
- * @param: base:      Base pointer added to the `fe_offset' fields of given expressions
- * @param: expr:      Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
- * @param: timeout:   Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- *                    When `LFUTEX_FDBIT'  is  set,  this argument  must  be  `NULL'.
- * @param: flags:     Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*' or `LFUTEX_FDBIT'
- * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
- *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
- *              to see their  possible return  values, which are  always `0'  when they  would
- *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
- *              thread had to perform a wait operation, at which point this function returning
- *              that value means that you've once again been re-awoken.
- *              When `LFUTEX_FDBIT' is set, the return value is an `fd_t' for a futex fd that
- *              can be used to poll for the specified `exprv'. Note that in this case `exprv'
- *              is limited to `LFUTEXFD_DEFAULT_MAXEXPR' (`/proc/kos/futexfd-maxexpr')
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-/* errno_t lfutexexpr(uintptr_t *futexaddr, void *base, struct lfutexexpr const *expr, struct timespec const *timeout, syscall_ulong_t flags) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967055) */
-
-/* >> lfutex(2)
- * Provide the bottom-most API for implementing user-space synchronization on KOS
- * @param: futex_op: One of:
- *    - LFUTEX_WAKE:                (lfutex_t *uaddr, LFUTEX_WAKE, size_t count)
- *    - LFUTEX_WAKEMASK:            (lfutex_t *uaddr, LFUTEX_WAKEMASK, size_t count, lfutex_t mask_and, lfutex_t mask_or)
- *    - LFUTEX_WAIT_WHILE:          (lfutex_t *uaddr, LFUTEX_WAIT_WHILE, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:          (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_WHILE_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- *    - LFUTEX_WAIT_UNTIL_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- *    - LFUTEX_WAIT_WHILE_ABOVE_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- *    - LFUTEX_WAIT_WHILE_BELOW_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
- * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `futex_op'
- * @return: -1:EFAULT:    A faulty pointer was given
- * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
- * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
- * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
-/* syscall_slong_t lfutex(uintptr_t *uaddr, syscall_ulong_t futex_op, uintptr_t val, struct timespec64 const *timeout, uintptr_t val2) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967056) */
-
-/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
- *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
-/* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967078) */
-
-/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
- *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
-/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967079) */
-
-/* errno_t kfstat(fd_t fd, struct __kos_stat *statbuf) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967099) */
-
-/* errno_t klstat(char const *filename, struct __kos_stat *statbuf) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967100) */
-
-/* errno_t kstat(char const *filename, struct __kos_stat *statbuf) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967101) */
-
-/* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967115) */
-
-/* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967116) */
-
-/* void ksigreturn(struct ucpustate const *restore_cpu, struct fpustate const *restore_fpu, struct sigset_with_size const *restore_sigmask, struct rpc_syscall_info const *restart_sc_info) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967123) */
-
-/* errno_t nanosleep64(struct timespec64 const *req, struct timespec64 *rem) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967134) */
-
-/* >> rpc_serve_sysret(2)
- * Very similar to `rpc_serve(2)', but with the addition that this one
- * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
- * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
- * ignores the state of the  internal `TASK_FRPC' flag, and should  be
- * invoked  when  the calling  thread  makes use  of  the userprocmask
- * mechanism, and the  signal mask became  less restrictive while  the
- * `USERPROCMASK_FLAG_HASPENDING' flag was set.
- * 
- * When userprocmask is disabled, this system call is pretty much just
- * a no-op (semnatically speaking, it does nothing). But when enabled,
- * it is really only usable  in conjuction with the userprocmask.  The
- * exact usage can be seen in `chkuserprocmask(3)'.
- * 
- * @return: 0 : Always, unconditionally returned. */
-/* errno_t rpc_serve_sysret(void) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967137) */
-
-/* >> rpc_serve(2)
- * Check for pending signals and RPCs. This is a wrapper around the
- * kernel `task_serve()' function, which is always invoked before a
- * thread begins waiting for a blocking operation. All system calls
- * marked as cancellation  points probably  call `task_serve()'  at
- * some point.
- * Note that unlike (say) `pause(2)', this function doesn't  block,
- * and may be used to implement `pthread_testcancel(3)' (should KOS
- * RPCs be used to facility pthread cancellation points, as done by
- * KOS's builtin libc)
- * @return: 0:      Nothing was handled.
- * @return: -EINTR: RPCs (or posix signals) were handled. */
-/* errno_t rpc_serve(void) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967138) */
-
-/* syscall_slong_t ksysctl(ioctl_t command, void *arg) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967147) */
-
-/* Same as `write(2)', but rather than specifying a single, continuous buffer,
- * write  data from `count'  separate buffers, though  still return the actual
- * number of written bytes.
- * When  `fd' has the  `O_NONBLOCK' flag set, only  write as much data
- * as possible at the time the call was made, and throw `E_WOULDBLOCK'
- * if no data could be written at the time.
- * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
- * @return: 0                     : No more data can be written */
-/* ssize_t writevf(fd_t fd, struct iovec const *iovec, size_t count, iomode_t mode) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967150) */
-
-/* Same as `read(2)', but rather than specifying a single, continuous buffer,
- * read  data into `count'  separate buffers, though  still return the actual
- * number of read bytes.
- * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at  the time  the call  was made,  and throw  `E_WOULDBLOCK'
- * no data was available at the time.
- * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
- * @return: 0                     : EOF */
-/* ssize_t readvf(fd_t fd, struct iovec const *iovec, size_t count, iomode_t mode) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967151) */
-
-/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timeval64 *timeout) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967154) */
-
-/* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
- * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-/* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage64 *usage) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967182) */
-
-/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
-/* errno_t getitimer64(syscall_ulong_t which, struct __itimerval64 *curr_value) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967191) */
-
-/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
-/* errno_t setitimer64(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967192) */
-
-/* Map the segments of a given library into memory
- * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
- * @param: flags: Set of `MAP_FIXED | MAP_32BIT | MAP_GROWSDOWN |
- *                MAP_GROWSUP  |  MAP_LOCKED  |  MAP_NORESERVE  |
- *                MAP_POPULATE  |  MAP_NONBLOCK   |  MAP_SYNC   |
- *                MAP_FIXED_NOREPLACE | MAP_NOASLR'
- * @param: fd:    A handle for the library file being mapped (must be mmap(2)-able)
- * @param: hdrv:  Pointer  to  a vector  of `Elf32_Phdr'  or `Elf64_Phdr'
- *                (depending on the caller running in 32- or 64-bit mode)
- * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr const *hdrv, size_t hdrc) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967210) */
-
-/* errno_t settimeofday64(struct timeval64 const *tv, struct timezone const *tz) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967217) */
-
-/* errno_t gettimeofday64(struct timeval64 *tv, struct timezone *tz) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967218) */
-
-/* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
-/* errno_t getrusage64(syscall_slong_t who, struct rusage64 *tv) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967219) */
-
-/* uint64_t fsmode(uint64_t mode) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967236) */
-
-/* syscall_slong_t ioctlf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967242) */
-
-/* Check if a transaction is currently in progress
- * @return: 0 : No RTM operation in progress
- * @return: 1 : An RTM operation is currently in progress */
-/* syscall_ulong_t rtm_test(void) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967245) */
-
-/* Abort the current transaction  by having `sys_rtm_begin()' return  with
- * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
- * If no transaction was in progress, behave as a no-op and return `-EOK'.
- * Otherwise,  this system call does not return normally, but returns from
- * the original `sys_rtm_begin()' */
-/* errno_t rtm_abort(syscall_ulong_t code) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967246) */
-
-/* End a transaction
- * If  the  transaction was  successful,  return normally  (by  returning `-EOK').
- * If    the   transaction   failed,   `sys_rtm_begin()'   returns   `RTM_ABORT_*'
- * If no transaction was in progress, an `E_ILLEGAL_OPERATION' exception is thrown */
-/* errno_t rtm_end(void) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967247) */
-
-/* Begin  an  RTM operation.  Note that  if  the arch-specific  RTM driver
- * wasn't already loaded into the kernel, it will be loaded automatically,
- * though any error that may happen during this will result in `RTM_NOSYS'
- * begin returned.
- * Note that while an RTM  operation is in progress,  only a very small  hand
- * full  of system calls are allowed to  be used. Attempting to use arbitrary
- * system calls will most likely  result in an `RTM_ABORT_FAILED' error,  and
- * attempting to access too much system memory in general will result in this
- * function returning  with  `RTM_ABORT_CAPACITY',  rather  than  succeeding.
- * The following is  a list  of system calls  which are  whitelisted for  use
- * during a transaction:
- *   - sys_rtm_begin:  Nested RTM operation
- *   - sys_rtm_end:    End an RTM operation
- *   - sys_rtm_abort:  Abort an RTM operation
- *   - sys_rtm_test:   Check if an RTM operation is in progress (always returns `1')
- * Anything else will most likely result in this system call returning `RTM_ABORT_FAILED'
- * @return: RTM_STARTED : RTM operation was started.
- * @return: RTM_NOSYS   : RTM isn't supposed because the RTM driver is missing, or cannot be loaded.
- * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
-/* rtm_status_t rtm_begin(void) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967248) */
-
-/* errno_t ftime64(struct timeb64 *tp) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967261) */
-
-/* @param: times: When NULL, set the current time */
-/* errno_t utime64(char const *filename, struct utimbuf64 const *times) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967266) */
-
-/* errno_t stime64(time64_t const *t) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967271) */
-
-/* Construct   a   user-vio-fd  object   supporting  mmap(2),   with  actual
- * memory  accesses  being dispatched  by  adding them  as  pending requests
- * to an internal  queue that  should be read(2)  from by  a worker  thread,
- * which should then service those requests before responding by write(2)ing
- * the results of the operation back to the same fd.
- * HINT: The format of the structures that are read(2) and
- *       write(2)en can be found in `<libvio/userviofd.h>'
- * NOTE: Don't use this system call directly. Use `vio_create(3)'
- *       from `<libvio/vio.h>' instead.
- * @param: initial_size: The initial mmap(2)able size of the returned handle.
- *                       This  size may be  altered at a  later point in time
- *                       through use of `ftruncate(return)'
- * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK | O_NONBLOCK' */
-/* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967276) */
-
-/* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967277) */
-
-/* Trigger a coredump of the calling process.
- * @param: curr_state:       The  state as is still valid after any possible unwinding has already been done
- *                           Note that this state does not necessarily point to the location that originally
- *                           caused the problem that escalated into a coredump, but is the last valid stack-
- *                           unwind location at which unwinding could no longer continue.
- *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- * @param: orig_state:       The original CPU state at where the associated `reason' got triggered
- *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- *                           When   `curr_state'   is   also   `NULL',   then   the   current   CPU   state   is   used   instead.
- * @param: traceback_vector: (potentially  incomplete)   vector  of   additional  program   pointers  that   were
- *                           traversed   when   the  stack   was   walked  from   `orig_state'   to  `curr_state'
- *                           Note that earlier  entries within this  vector are further  up the call-stack,  with
- *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
- *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
- *                           it  can  be  assumed  that  the  traceback is  complete  and  contains  all  traversed  instruction locations.
- *                           In   this   case,  a   traceback  displayed   to   a  human   should  not   include   the  text   location  at
- *                           `traceback_vector[traceback_length-1]',    since    that    location    would    also    be    printed    when
- *                           unwinding is completed for the purposes of displaying a traceback.
- * @param: traceback_length: The number of program counters stored within `traceback_vector'
- * @param: reason:           The reason that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
- *                           For certain `unwind_error' values, this can also  point to other things, but is  always
- *                           allowed to be `NULL' to indicate default/stub values.
- * @param: unwind_error:     The  unwind  error that  caused the  coredump,  or `UNWIND_SUCCESS'  if unwinding
- *                           was  never  actually  performed,  and   `reason'  is  actually  a   `siginfo_t *'
- *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
-/* errno_t coredump(struct ucpustate const *curr_state, struct ucpustate const *orig_state, void const *const *traceback_vector, size_t traceback_length, union coredump_info const *reason, syscall_ulong_t unwind_error) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967278) */
-
-/* Trigger a debugger trap `trapno', optionally extended with  `regs'
- * at either the system call return location, or at the given `state'
- * In the later case, this system call will by default return to  the
- * given  `state', though given the purpose of this system call being
- * to inform a connected debugger  of some breakable event,  allowing
- * it to do whatever it wishes before execution is resumed.
- * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
- * @param: state:    When non-NULL, the CPU state where the trap should return to by default
- * @return: -EOK:    `state' was NULL and the trap returned successfully
- * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
-/* errno_t debugtrap(struct ucpustate const *state, struct debugtrap_reason const *reason) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967279) */
-
-/* Get the current exception handler mode for the calling thread.
- * @param: pmode:       When non-`NULL', store the current mode, which is encoded as:
- *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
- *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
- * @param: phandler:    When   non-`NULL',   store  the   address   of  the   user-space   exception  handler.
- *                      Note that when no handler has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
- *                      then this pointer is set to `NULL'.
- * @param: phandler_sp: When non-`NULL', store the starting address of the user-space exception handler stack.
- *                      Note that  when no  stack has  been set  (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
- *                      or when the stack was defined to re-use the previous stack,
- *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
- * @return: 0 :         Success.
- * @return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty */
-/* errno_t get_exception_handler(syscall_ulong_t *pmode, except_handler_t *phandler, void **phandler_sp) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967280) */
-
-/* Set the exception handler mode for the calling thread.
- * Examples:
- *   - Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
- *   - Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
- *                                                           EXCEPT_HANDLER_FLAG_SETHANDLER,
- *                                                           &except_handler4, NULL)'
- * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
- * @param: handler:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
- * @param: handler_sp: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
- * @return: 0 :        Success.
- * @return: -1:EINVAL: The given `mode' is invalid */
-/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967281) */
-
-/* Create and return a new tty terminal controller connected to the given keyboard and display
- * The  newly created  device automatically gets  assigned an arbitrary  device number, before
- * being made available under a file `/dev/${name}'  (or rather: as ${name} within the  devfs)
- * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
-/* fd_t mktty(char const *name, fd_t keyboard, fd_t display, syscall_ulong_t rsvd) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967282) */
-
-/* time64_t time64(time64_t *timer) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967283) */
-
-/* @param: flags: Set of `0 | AT_DOSPATH' */
-/* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967284) */
-
-/* Create a new pseudo-terminal driver and store handles to both the
- * master  and slave ends  of the connection  in the given pointers. */
-/* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967285) */
-
-/* >> rpc_schedule(2)
- * Schedule an RPC program to-be executed by some other thread. This  function
- * cannot guaranty that  the RPC  program is  always executed,  as the  target
- * thread terminate before the  conditions for the RPC  to be served are  ever
- * met. Note that these  conditions depend on the  given `mode'. Note that  on
- * multi-arch  platforms (such as  x86), the register numbers,  as well as the
- * address size used by `program' depend on the execution mode of `target_tid'
- * 
- * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
- * 
- * @param: target_tid:      The TID of the targeted thread
- * @param: mode:            One of `RPC_SYNCMODE_*',  optionally or'd  with
- *                          one of `RPC_SYSRESTART_*', optionally or'd with
- *                          one of `RPC_PRIORITY_*',  optionally or'd  with
- *                          one of  `RPC_DOMAIN_*',  optionally  or'd  with
- *                          one of `RPC_JOIN_*'
- * @param: program:         The RPC program to execute (sequences of `RPC_OP_*')
- * @param: params:          RPC program parameters (for `RPC_OP_push_param')
- * @param: max_param_count: The max # of `params' used by `program'
- * 
- * @return: 0 :                Success
- * @throws: E_SEGFAULT:        Faulty pointers were given
- * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE:
- *                             The given `mode' is invalid.
- * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION:
- *                             The RPC program  contains illegal  instructions.
- *                             In this case, modifications made by instructions
- *                             encountered before the illegal one(s) will still
- *                             have  happened, meaning that the target thread's
- *                             state may have become inconsistent.
- * @throws: E_PROCESS_EXITED:  The target thread has already terminated, or
- *                             doesn't exist. Note  though that unless  the
- *                             thread  is  part  of your  own  process, are
- *                             still many reasons  outside of your  control
- *                             for why it  may terminate immediately  after
- *                             the RPC program finished. */
-/* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, void const *const *params, size_t max_param_count) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967287) */
-
-/* Returns  the  absolute   filesystem  path  for   the  specified   file
- * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is  dereferenced,
- * causing the pointed-to file location to be retrieved. - Otherwise, the
- * location of the link is printed instead.
- * You may pass `AT_READLINK_REQSIZE' to always have the function return
+/* You may pass `AT_READLINK_REQSIZE' to always have the function return
  * the   required   buffer   size,   rather   than   the   used    size.
- * @param: flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpathat(fd_t dirfd, char const *filename, char *buf, size_t buflen, atflag_t flags) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967288) */
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t frealpath4(fd_t fd, char *resolved, size_t buflen, atflag_t flags) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323078) */
 
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
@@ -2454,35 +2027,486 @@
  * @throw: E_PROCESS_EXITED: No such  thread/process exists,  or  the thread  isn't  isn't
  *                           a thread in your process, or a child process of your process. */
 /* errno_t detach(pid_t pid) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967289) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323079) */
 
-/* You may pass `AT_READLINK_REQSIZE' to always have the function return
+/* Returns  the  absolute   filesystem  path  for   the  specified   file
+ * When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is  dereferenced,
+ * causing the pointed-to file location to be retrieved. - Otherwise, the
+ * location of the link is printed instead.
+ * You may pass `AT_READLINK_REQSIZE' to always have the function return
  * the   required   buffer   size,   rather   than   the   used    size.
- * @param: flags: Set of `0 | AT_ALTPATH | AT_READLINK_REQSIZE | AT_DOSPATH' */
-/* ssize_t frealpath4(fd_t fd, char *resolved, size_t buflen, atflag_t flags) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967290) */
+ * @param: flags: Set of `0 | AT_ALTPATH | AT_SYMLINK_NOFOLLOW | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t frealpathat(fd_t dirfd, char const *filename, char *buf, size_t buflen, atflag_t flags) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323080) */
 
-/* Returns a bitset of all of the currently mounted dos-drives */
-/* syscall_slong_t getdrives(void) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967291) */
+/* >> rpc_schedule(2)
+ * Schedule an RPC program to-be executed by some other thread. This  function
+ * cannot guaranty that  the RPC  program is  always executed,  as the  target
+ * thread terminate before the  conditions for the RPC  to be served are  ever
+ * met. Note that these  conditions depend on the  given `mode'. Note that  on
+ * multi-arch  platforms (such as  x86), the register numbers,  as well as the
+ * address size used by `program' depend on the execution mode of `target_tid'
+ * 
+ * NOTE: Only a cancellation point when `RPC_JOIN_WAITFOR' is used!
+ * 
+ * @param: target_tid:      The TID of the targeted thread
+ * @param: mode:            One of `RPC_SYNCMODE_*',  optionally or'd  with
+ *                          one of `RPC_SYSRESTART_*', optionally or'd with
+ *                          one of `RPC_PRIORITY_*',  optionally or'd  with
+ *                          one of  `RPC_DOMAIN_*',  optionally  or'd  with
+ *                          one of `RPC_JOIN_*'
+ * @param: program:         The RPC program to execute (sequences of `RPC_OP_*')
+ * @param: params:          RPC program parameters (for `RPC_OP_push_param')
+ * @param: max_param_count: The max # of `params' used by `program'
+ * 
+ * @return: 0 :                Success
+ * @throws: E_SEGFAULT:        Faulty pointers were given
+ * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_SCHEDULE_MODE:
+ *                             The given `mode' is invalid.
+ * @throws: E_INVALID_ARGUMENT:E_INVALID_ARGUMENT_CONTEXT_RPC_PROGRAM_INSTRUCTION:
+ *                             The RPC program  contains illegal  instructions.
+ *                             In this case, modifications made by instructions
+ *                             encountered before the illegal one(s) will still
+ *                             have  happened, meaning that the target thread's
+ *                             state may have become inconsistent.
+ * @throws: E_PROCESS_EXITED:  The target thread has already terminated, or
+ *                             doesn't exist. Note  though that unless  the
+ *                             thread  is  part  of your  own  process, are
+ *                             still many reasons  outside of your  control
+ *                             for why it  may terminate immediately  after
+ *                             the RPC program finished. */
+/* errno_t rpc_schedule(pid_t target_tid, syscall_ulong_t mode, void const *program, void const *const *params, size_t max_param_count) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323081) */
 
-/* Write up to `bufsize' bytes from `buf' into `fd'
- * When `fd' has the `O_NONBLOCK' flag set, only write as much data as
- * possible at the time the call was made, and throw `E_WOULDBLOCK' if
- * no data could be written at the time.
- * @return: <= bufsize: The actual amount of written bytes
- * @return: 0         : No more data can be written */
-/* ssize_t writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967292) */
+/* Create a new pseudo-terminal driver and store handles to both the
+ * master  and slave ends  of the connection  in the given pointers. */
+/* errno_t openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323083) */
 
-/* Read up to `bufsize' bytes from `fd' into `buf'
- * When  `fd' has the `O_NONBLOCK' flag set, only read as much data as was
- * available at the time the call was made, and throw `E_WOULDBLOCK' if no
- * data was available at the time.
- * @return: <= bufsize: The actual amount of read bytes
- * @return: 0         : EOF */
-/* ssize_t readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode) */
-/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967293) */
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fchdirat(fd_t dirfd, char const *path, atflag_t flags) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323084) */
+
+/* time64_t time64(time64_t *timer) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323085) */
+
+/* Create and return a new tty terminal controller connected to the given keyboard and display
+ * The  newly created  device automatically gets  assigned an arbitrary  device number, before
+ * being made available under a file `/dev/${name}'  (or rather: as ${name} within the  devfs)
+ * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
+/* fd_t mktty(char const *name, fd_t keyboard, fd_t display, syscall_ulong_t rsvd) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323086) */
+
+/* Set the exception handler mode for the calling thread.
+ * Examples:
+ *   - Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND, NULL, NULL)'
+ *   - Set mode #4 (as done by libc): `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND |
+ *                                                           EXCEPT_HANDLER_FLAG_SETHANDLER,
+ *                                                           &except_handler4, NULL)'
+ * @param: mode:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+ * @param: handler:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+ * @param: handler_sp: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+ * @return: 0 :        Success.
+ * @return: -1:EINVAL: The given `mode' is invalid */
+/* errno_t set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323087) */
+
+/* Get the current exception handler mode for the calling thread.
+ * @param: pmode:       When non-`NULL', store the current mode, which is encoded as:
+ *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
+ *                       - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
+ * @param: phandler:    When   non-`NULL',   store  the   address   of  the   user-space   exception  handler.
+ *                      Note that when no handler has been set (`!(*pmode & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+ *                      then this pointer is set to `NULL'.
+ * @param: phandler_sp: When non-`NULL', store the starting address of the user-space exception handler stack.
+ *                      Note that  when no  stack has  been set  (`!(*pmode & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+ *                      or when the stack was defined to re-use the previous stack,
+ *                      then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
+ * @return: 0 :         Success.
+ * @return: -1:EFAULT:  One of the given pointers is non-`NULL' and faulty */
+/* errno_t get_exception_handler(syscall_ulong_t *pmode, except_handler_t *phandler, void **phandler_sp) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323088) */
+
+/* Trigger a debugger trap `trapno', optionally extended with  `regs'
+ * at either the system call return location, or at the given `state'
+ * In the later case, this system call will by default return to  the
+ * given  `state', though given the purpose of this system call being
+ * to inform a connected debugger  of some breakable event,  allowing
+ * it to do whatever it wishes before execution is resumed.
+ * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
+ * @param: state:    When non-NULL, the CPU state where the trap should return to by default
+ * @return: -EOK:    `state' was NULL and the trap returned successfully
+ * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
+/* errno_t debugtrap(struct ucpustate const *state, struct debugtrap_reason const *reason) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323089) */
+
+/* Trigger a coredump of the calling process.
+ * @param: curr_state:       The  state as is still valid after any possible unwinding has already been done
+ *                           Note that this state does not necessarily point to the location that originally
+ *                           caused the problem that escalated into a coredump, but is the last valid stack-
+ *                           unwind location at which unwinding could no longer continue.
+ *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ * @param: orig_state:       The original CPU state at where the associated `reason' got triggered
+ *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ *                           When   `curr_state'   is   also   `NULL',   then   the   current   CPU   state   is   used   instead.
+ * @param: traceback_vector: (potentially  incomplete)   vector  of   additional  program   pointers  that   were
+ *                           traversed   when   the  stack   was   walked  from   `orig_state'   to  `curr_state'
+ *                           Note that earlier  entries within this  vector are further  up the call-stack,  with
+ *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
+ *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == ucpustate_getpc(curr_state)',
+ *                           it  can  be  assumed  that  the  traceback is  complete  and  contains  all  traversed  instruction locations.
+ *                           In   this   case,  a   traceback  displayed   to   a  human   should  not   include   the  text   location  at
+ *                           `traceback_vector[traceback_length-1]',    since    that    location    would    also    be    printed    when
+ *                           unwinding is completed for the purposes of displaying a traceback.
+ * @param: traceback_length: The number of program counters stored within `traceback_vector'
+ * @param: reason:           The reason that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
+ *                           For certain `unwind_error' values, this can also  point to other things, but is  always
+ *                           allowed to be `NULL' to indicate default/stub values.
+ * @param: unwind_error:     The  unwind  error that  caused the  coredump,  or `UNWIND_SUCCESS'  if unwinding
+ *                           was  never  actually  performed,  and   `reason'  is  actually  a   `siginfo_t *'
+ *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
+/* errno_t coredump(struct ucpustate const *curr_state, struct ucpustate const *orig_state, void const *const *traceback_vector, size_t traceback_length, union coredump_info const *reason, syscall_ulong_t unwind_error) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323090) */
+
+/* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323091) */
+
+/* Construct   a   user-vio-fd  object   supporting  mmap(2),   with  actual
+ * memory  accesses  being dispatched  by  adding them  as  pending requests
+ * to an internal  queue that  should be read(2)  from by  a worker  thread,
+ * which should then service those requests before responding by write(2)ing
+ * the results of the operation back to the same fd.
+ * HINT: The format of the structures that are read(2) and
+ *       write(2)en can be found in `<libvio/userviofd.h>'
+ * NOTE: Don't use this system call directly. Use `vio_create(3)'
+ *       from `<libvio/vio.h>' instead.
+ * @param: initial_size: The initial mmap(2)able size of the returned handle.
+ *                       This  size may be  altered at a  later point in time
+ *                       through use of `ftruncate(return)'
+ * @param: flags:        Set of `0 | O_CLOEXEC | O_CLOFORK | O_NONBLOCK' */
+/* fd_t userviofd(size_t initial_size, syscall_ulong_t flags) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323092) */
+
+/* errno_t stime64(time64_t const *t) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323097) */
+
+/* @param: times: When NULL, set the current time */
+/* errno_t utime64(char const *filename, struct utimbuf64 const *times) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323102) */
+
+/* errno_t ftime64(struct timeb64 *tp) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323107) */
+
+/* Begin  an  RTM operation.  Note that  if  the arch-specific  RTM driver
+ * wasn't already loaded into the kernel, it will be loaded automatically,
+ * though any error that may happen during this will result in `RTM_NOSYS'
+ * begin returned.
+ * Note that while an RTM  operation is in progress,  only a very small  hand
+ * full  of system calls are allowed to  be used. Attempting to use arbitrary
+ * system calls will most likely  result in an `RTM_ABORT_FAILED' error,  and
+ * attempting to access too much system memory in general will result in this
+ * function returning  with  `RTM_ABORT_CAPACITY',  rather  than  succeeding.
+ * The following is  a list  of system calls  which are  whitelisted for  use
+ * during a transaction:
+ *   - sys_rtm_begin:  Nested RTM operation
+ *   - sys_rtm_end:    End an RTM operation
+ *   - sys_rtm_abort:  Abort an RTM operation
+ *   - sys_rtm_test:   Check if an RTM operation is in progress (always returns `1')
+ * Anything else will most likely result in this system call returning `RTM_ABORT_FAILED'
+ * @return: RTM_STARTED : RTM operation was started.
+ * @return: RTM_NOSYS   : RTM isn't supposed because the RTM driver is missing, or cannot be loaded.
+ * @return: RTM_ABORT_* : RTM operation failed (s.a. code from `<kos/rtm.h>') */
+/* rtm_status_t rtm_begin(void) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323120) */
+
+/* End a transaction
+ * If  the  transaction was  successful,  return normally  (by  returning `-EOK').
+ * If    the   transaction   failed,   `sys_rtm_begin()'   returns   `RTM_ABORT_*'
+ * If no transaction was in progress, an `E_ILLEGAL_OPERATION' exception is thrown */
+/* errno_t rtm_end(void) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323121) */
+
+/* Abort the current transaction  by having `sys_rtm_begin()' return  with
+ * `RTM_ABORT_EXPLICIT | ((code << RTM_ABORT_CODE_S) & RTM_ABORT_CODE_M)'
+ * If no transaction was in progress, behave as a no-op and return `-EOK'.
+ * Otherwise,  this system call does not return normally, but returns from
+ * the original `sys_rtm_begin()' */
+/* errno_t rtm_abort(syscall_ulong_t code) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323122) */
+
+/* Check if a transaction is currently in progress
+ * @return: 0 : No RTM operation in progress
+ * @return: 1 : An RTM operation is currently in progress */
+/* syscall_ulong_t rtm_test(void) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323123) */
+
+/* syscall_slong_t ioctlf(fd_t fd, ioctl_t command, iomode_t mode, void *arg) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323126) */
+
+/* uint64_t fsmode(uint64_t mode) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323132) */
+
+/* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
+/* errno_t getrusage64(syscall_slong_t who, struct rusage64 *tv) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323149) */
+
+/* errno_t gettimeofday64(struct timeval64 *tv, struct timezone *tz) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323150) */
+
+/* errno_t settimeofday64(struct timeval64 const *tv, struct timezone const *tz) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323151) */
+
+/* Map the segments of a given library into memory
+ * @param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
+ * @param: flags: Set of `MAP_FIXED | MAP_32BIT | MAP_GROWSDOWN |
+ *                MAP_GROWSUP  |  MAP_LOCKED  |  MAP_NORESERVE  |
+ *                MAP_POPULATE  |  MAP_NONBLOCK   |  MAP_SYNC   |
+ *                MAP_FIXED_NOREPLACE | MAP_NOASLR'
+ * @param: fd:    A handle for the library file being mapped (must be mmap(2)-able)
+ * @param: hdrv:  Pointer  to  a vector  of `Elf32_Phdr'  or `Elf64_Phdr'
+ *                (depending on the caller running in 32- or 64-bit mode)
+ * @param: hdrc:  The number of program headers */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr const *hdrv, size_t hdrc) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323158) */
+
+/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
+/* errno_t setitimer64(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323176) */
+
+/* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
+/* errno_t getitimer64(syscall_ulong_t which, struct __itimerval64 *curr_value) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323177) */
+
+/* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
+ * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+/* pid_t wait4_64(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage64 *usage) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323186) */
+
+/* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct timeval64 *timeout) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323214) */
+
+/* Same as `read(2)', but rather than specifying a single, continuous buffer,
+ * read  data into `count'  separate buffers, though  still return the actual
+ * number of read bytes.
+ * When `fd' has the `O_NONBLOCK' flag set, only read as much data as was
+ * available at  the time  the call  was made,  and throw  `E_WOULDBLOCK'
+ * no data was available at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes
+ * @return: 0                     : EOF */
+/* ssize_t readvf(fd_t fd, struct iovec const *iovec, size_t count, iomode_t mode) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323217) */
+
+/* Same as `write(2)', but rather than specifying a single, continuous buffer,
+ * write  data from `count'  separate buffers, though  still return the actual
+ * number of written bytes.
+ * When  `fd' has the  `O_NONBLOCK' flag set, only  write as much data
+ * as possible at the time the call was made, and throw `E_WOULDBLOCK'
+ * if no data could be written at the time.
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes
+ * @return: 0                     : No more data can be written */
+/* ssize_t writevf(fd_t fd, struct iovec const *iovec, size_t count, iomode_t mode) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323218) */
+
+/* syscall_slong_t ksysctl(ioctl_t command, void *arg) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323221) */
+
+/* >> rpc_serve(2)
+ * Check for pending signals and RPCs. This is a wrapper around the
+ * kernel `task_serve()' function, which is always invoked before a
+ * thread begins waiting for a blocking operation. All system calls
+ * marked as cancellation  points probably  call `task_serve()'  at
+ * some point.
+ * Note that unlike (say) `pause(2)', this function doesn't  block,
+ * and may be used to implement `pthread_testcancel(3)' (should KOS
+ * RPCs be used to facility pthread cancellation points, as done by
+ * KOS's builtin libc)
+ * @return: 0:      Nothing was handled.
+ * @return: -EINTR: RPCs (or posix signals) were handled. */
+/* errno_t rpc_serve(void) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323230) */
+
+/* >> rpc_serve_sysret(2)
+ * Very similar to `rpc_serve(2)', but with the addition that this one
+ * will only serve RPCs that can be handled in `RPC_REASONCTX_SYSRET',
+ * aka. `RPC_REASONCTX_ASYNC' contexts. Additionally, this system call
+ * ignores the state of the  internal `TASK_FRPC' flag, and should  be
+ * invoked  when  the calling  thread  makes use  of  the userprocmask
+ * mechanism, and the  signal mask became  less restrictive while  the
+ * `USERPROCMASK_FLAG_HASPENDING' flag was set.
+ * 
+ * When userprocmask is disabled, this system call is pretty much just
+ * a no-op (semnatically speaking, it does nothing). But when enabled,
+ * it is really only usable  in conjuction with the userprocmask.  The
+ * exact usage can be seen in `chkuserprocmask(3)'.
+ * 
+ * @return: 0 : Always, unconditionally returned. */
+/* errno_t rpc_serve_sysret(void) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323231) */
+
+/* errno_t nanosleep64(struct timespec64 const *req, struct timespec64 *rem) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323234) */
+
+/* void ksigreturn(struct ucpustate const *restore_cpu, struct fpustate const *restore_fpu, struct sigset_with_size const *restore_sigmask, struct rpc_syscall_info const *restart_sc_info) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323245) */
+
+/* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323252) */
+
+/* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323253) */
+
+/* errno_t kstat(char const *filename, struct __kos_stat *statbuf) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323267) */
+
+/* errno_t klstat(char const *filename, struct __kos_stat *statbuf) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323268) */
+
+/* errno_t kfstat(fd_t fd, struct __kos_stat *statbuf) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323269) */
+
+/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
+ *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
+/* ssize_t kreaddir(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323289) */
+
+/* @param: mode: One of `READDIR_DEFAULT', `READDIR_CONTINUE', `READDIR_PEEK' or `READDIR_MULTIPLE',
+ *               optionally     or'd     with     any     of     `READDIR_SKIPREL | READDIR_WANTEOF' */
+/* ssize_t kreaddirf(fd_t fd, struct dirent *buf, size_t bufsize, syscall_ulong_t mode, iomode_t iomode) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323290) */
+
+/* >> lfutex(2)
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
+ *    - LFUTEX_WAKE:                (lfutex_t *uaddr, LFUTEX_WAKE, size_t count)
+ *    - LFUTEX_WAKEMASK:            (lfutex_t *uaddr, LFUTEX_WAKEMASK, size_t count, lfutex_t mask_and, lfutex_t mask_or)
+ *    - LFUTEX_WAIT_WHILE:          (lfutex_t *uaddr, LFUTEX_WAIT_WHILE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:          (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:    (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK:  (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_WHILE_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ *    - LFUTEX_WAIT_UNTIL_EX:       (lfutex_t *uaddr, LFUTEX_WAIT_UNTIL_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ *    - LFUTEX_WAIT_WHILE_ABOVE_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_ABOVE_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ *    - LFUTEX_WAIT_WHILE_BELOW_EX: (lfutex_t *uaddr, LFUTEX_WAIT_WHILE_BELOW_EX, void const *rhs, struct timespec const *timeout, size_t num_bytes)
+ * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @return: * : Depending on `futex_op'
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
+ * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
+ * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
+/* syscall_slong_t lfutex(uintptr_t *uaddr, syscall_ulong_t futex_op, uintptr_t val, struct timespec64 const *timeout, uintptr_t val2) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323312) */
+
+/* >> lfutexexpr(2)
+ * The lfutexexpr(2) system call can be used to specify arbitrarily complex
+ * expressions that must atomically (in relation to other futex operations)
+ * hold true before the scheduler will suspend the calling thread.
+ * @param: futexaddr: The futex on which to wait
+ * @param: base:      Base pointer added to the `fe_offset' fields of given expressions
+ * @param: expr:      Vector of expressions for which to check, terminated by `LFUTEX_EXPREND'
+ * @param: timeout:   Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ *                    When `LFUTEX_FDBIT'  is  set,  this argument  must  be  `NULL'.
+ * @param: flags:     Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*' or `LFUTEX_FDBIT'
+ * @return: * : The first  non-zero  return value  from  executing  all of  the  given  `expr'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*'  functions
+ *              to see their  possible return  values, which are  always `0'  when they  would
+ *              perform a wait  operation, and usually  `1' otherwise) or  `0' if the  calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ *              When `LFUTEX_FDBIT' is set, the return value is an `fd_t' for a futex fd that
+ *              can be used to poll for the specified `exprv'. Note that in this case `exprv'
+ *              is limited to `LFUTEXFD_DEFAULT_MAXEXPR' (`/proc/kos/futexfd-maxexpr')
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `expr[0].fe_condition == LFUTEX_EXPREND'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+/* errno_t lfutexexpr(uintptr_t *futexaddr, void *base, struct lfutexexpr const *expr, struct timespec const *timeout, syscall_ulong_t flags) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323313) */
+
+/* Register the address of  the calling thread's userprocmask  controller.
+ * This also  initializes `*ctl->pm_sigmask'  and `ctl->pm_pending',  such
+ * that `*ctl->pm_sigmask' is filled with the current kernel-level  signal
+ * mask, as would be returned by `sigprocmask(2)', while `ctl->pm_pending'
+ * is filled in with the equivalent of `sigpending(2)'
+ * Additionally,  the address  of `&ctl->pm_mytid'  is stored  as an override
+ * for `set_tid_address(2)', and the kernel may read from `*ctl->pm_sigmask',
+ * and write to `ctl->pm_pending' (using  atomic-or for the later) from  this
+ * point forth.
+ * NOTE: Before calling this function, the caller must:
+ *       >> bzero(ctl, sizeof(struct userprocmask));
+ *       >> ctl->pm_sigsize = sizeof(sigset_t);
+ *       >> ctl->pm_sigmask = &initial_sigmask;
+ *       Where the initial bzero() is needed to initialize potential
+ *       additional,   arch-specific   fields    to   all    zeroes.
+ * NOTE: This system call will then initialize:
+ *       >> ctl->pm_mytid = gettid();
+ *       >> sigprocmask(0, NULL, ctl->pm_sigmask);
+ *       >> sigpending(&ctl->pm_pending);
+ * NOTE: Passing `NULL' for `ctl' disables userprocmask-mode, though
+ *       before this is done, the kernel will copy the  `pm_sigmask'
+ *       of the previously set  controller into its internal  signal
+ *       mask. (i.e. the one used outside of userprocmask-mode)
+ * Note though  that  `pm_sigmask'  is ignored  for  `SIGKILL'  and  `SIGSTOP'
+ * Note also  that  this  function replaces  `set_tid_address(2)',  such  that
+ * it negates a  prior call  to said  function, while  a future  call to  said
+ * function will once again disable userprocmask, same as passing `NULL' would */
+/* errno_t set_userprocmask_address(struct userprocmask *ctl) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323328) */
+
+/* @param: times:    When NULL, set the current time
+ * @param: times[0]: New access time
+ * @param: times[1]: New last-modified time */
+/* errno_t utimes64(char const *filename, struct timeval64 const[2] times) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323341) */
+
+/* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
+ * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
+/* errno_t waitid64(syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, syscall_ulong_t options, struct rusage64 *ru) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323352) */
+
+/* @param: atflags: Set of `AT_SYMLINK_NOFOLLOW | AT_DOSPATH'
+ * @param: mask:    Set of `IN_ALL_EVENTS | ...' */
+/* int inotify_add_watch_at(fd_t notify_fd, fd_t dirfd, char const *pathname, atflag_t atflags, uint32_t mask) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323389) */
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, atflag_t flags) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323395) */
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, atflag_t flags) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323396) */
+
+/* errno_t futimesat64(fd_t dirfd, char const *filename, struct timeval64 const[2] times) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323398) */
+
+/* @param: flags: Set of `0 | AT_SYMLINK_NOFOLLOW | AT_DOSPATH' */
+/* errno_t kfstatat(fd_t dirfd, char const *filename, struct __kos_stat *statbuf, atflag_t flags) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323399) */
+
+/* @param: flags: Set of `0 | AT_DOSPATH' */
+/* errno_t fsymlinkat(char const *link_text, fd_t tofd, char const *target_path, atflag_t flags) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323403) */
+
+/* @param: flags: Set of `0 | AT_READLINK_REQSIZE | AT_DOSPATH' */
+/* ssize_t freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen, atflag_t flags) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323404) */
+
+/* Same as  `readv(2)', but  read data  from a  file at  a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of read bytes */
+/* ssize_t preadvf(fd_t fd, struct iovec const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323405) */
+
+/* Same as  `writev(2)', but  write data  to a  file at  a
+ * specific `offset', rather than the current R/W position
+ * @return: <= SUM(iov[*].iov_len): The actual amount of written bytes */
+/* ssize_t pwritevf(fd_t fd, struct iovec const *iovec, size_t count, uint64_t offset, iomode_t mode) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323406) */
+
+/* errno_t fallocate64(fd_t fd, syscall_ulong_t mode, uint64_t offset, uint64_t length) */
+/* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323424) */
 
 
 #endif /* !GUARD_KERNEL_CORE_ARCH_ARM_SYSCALL_WRAPPERS_S */
