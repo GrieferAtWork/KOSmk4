@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca260302 */
+/* HASH CRC-32:0x722e3cf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1043,10 +1043,10 @@
 #define __NRAN2_pread64f                     bufsize
 #define __NRAN3_pread64f                     offset
 #define __NRAN4_pread64f                     mode
-#define __NRAN0_ksigreturn                   restore_fpu
-#define __NRAN1_ksigreturn                   restore_sigmask
-#define __NRAN2_ksigreturn                   sc_info
-#define __NRAN3_ksigreturn                   restore_cpu
+#define __NRAN0_ksigreturn                   restore_cpu
+#define __NRAN1_ksigreturn                   restore_fpu
+#define __NRAN2_ksigreturn                   restore_sigmask
+#define __NRAN3_ksigreturn                   restart_sc_info
 #define __NRAN0_nanosleep64                  req
 #define __NRAN1_nanosleep64                  rem
 #define __NRAN0_ksysctl                      command
@@ -2713,10 +2713,10 @@
 #define __NRATR3_pread64f                     SC_REPR_UINT64_T                                                     /* offset */ 
 #define __NRATR4_pread64f                     SC_REPR_IOMODE_T                                                     /* mode */ 
 #define __NRRTR_pread64f                      SC_REPR_SSIZE_T                                                      /* return */
-#define __NRATR0_ksigreturn                   SC_REPR_STRUCT_FPUSTATE                                              /* restore_fpu */ 
-#define __NRATR1_ksigreturn                   SC_REPR_STRUCT_SIGSET_WITH_SIZE                                      /* restore_sigmask */ 
-#define __NRATR2_ksigreturn                   SC_REPR_STRUCT_RPC_SYSCALL_INFO                                      /* sc_info */ 
-#define __NRATR3_ksigreturn                   SC_REPR_STRUCT_UCPUSTATE                                             /* restore_cpu */ 
+#define __NRATR0_ksigreturn                   SC_REPR_STRUCT_UCPUSTATE                                             /* restore_cpu */ 
+#define __NRATR1_ksigreturn                   SC_REPR_STRUCT_FPUSTATE                                              /* restore_fpu */ 
+#define __NRATR2_ksigreturn                   SC_REPR_STRUCT_SIGSET_WITH_SIZE                                      /* restore_sigmask */ 
+#define __NRATR3_ksigreturn                   SC_REPR_STRUCT_RPC_SYSCALL_INFO                                      /* restart_sc_info */ 
 #define __NRRTR_ksigreturn                    SC_REPR_SIGNO_T                                                      /* return */
 #define __NRATR0_nanosleep64                  SC_REPR_STRUCT_TIMESPEC64                                            /* req */ 
 #define __NRATR1_nanosleep64                  SC_REPR_POINTER                                                      /* rem */ 
@@ -2763,7 +2763,7 @@
 #define __NRATR0_maplibrary                   SC_REPR_POINTER                                                      /* addr */ 
 #define __NRATR1_maplibrary                   SC_REPR_MMAP_FLAGS                                                   /* flags */ 
 #define __NRATR2_maplibrary                   SC_REPR_FD_T                                                         /* fd */ 
-#define __NRATR3_maplibrary                   SC_REPR_STRUCT_ELF_PHDR_VECTOR                                       /* hdrv */ 
+#define __NRATR3_maplibrary                   SC_REPR_STRUCT_ELF_PHDR32_VECTOR                                     /* hdrv */ 
 #define __NRATL3_maplibrary                   4                                                                    /* hdrv -> hdrc */ 
 #define __NRATR4_maplibrary                   SC_REPR_SIZE_T                                                       /* hdrc */ 
 #define __NRRTR_maplibrary                    SC_REPR_POINTER                                                      /* return */

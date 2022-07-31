@@ -159,7 +159,7 @@ __FORCELOCAL void (__wrdi)(void *__val) { __asm__ __volatile__("movl %k0, %%edi"
 __FORCELOCAL void (__wrsi)(void *__val) { __asm__ __volatile__("movl %k0, %%esi" : : "g" (__val) : "%esi"); }
 __FORCELOCAL void (__wrbx)(__UINTPTR_TYPE__ __val) { __asm__ __volatile__("movl %k0, %%ebx" : : "g" (__val) : "%ebx"); }
 #endif /* !__COMPILER_HAVE_REGISTER_VARS */
-__FORCELOCAL __ATTR_WUNUSED __UINTPTR_TYPE__ (__rdflags)(void) { __UINTPTR_TYPE__ __result; __asm__ __volatile__("pushfl; popl %0" : "=g" (__result)); return __result; }
+__FORCELOCAL __ATTR_WUNUSED __UINTPTR_TYPE__ (__rdflags)(void) { __UINTPTR_TYPE__ __result; __asm__ __volatile__("pushfl\n\tpopl %0" : "=g" (__result)); return __result; }
 __FORCELOCAL void (__wrflags)(__UINTPTR_TYPE__ __fl) { __asm__ __volatile__("pushl %k0\n\tpopfl" : : "g" (__fl) : "cc"); }
 #endif /* !__x86_64__ */
 __FORCELOCAL __ATTR_WUNUSED void *(__rdip)(void) {
@@ -184,6 +184,11 @@ __FORCELOCAL __ATTR_WUNUSED void *(__rdip)(void) {
 	return __result;
 }
 __FORCELOCAL __ATTR_NORETURN void (__wrip)(void *__val) { __asm__ __volatile__("jmp *%0" : : "g" (__val)); __builtin_unreachable(); }
+
+/* Portability aliases */
+#define __rdpc __rdip
+#define __wrpc __wrip
+
 
 /* TODO: Check for `__GCC_ASM_FLAG_OUTPUTS__' */
 __FORCELOCAL __ATTR_WUNUSED __BOOL (__verr)(__UINT16_TYPE__ __seg) { __BOOL __result; __asm__ __volatile__("verr %w1" : "=@ccz" (__result) : "g" (__seg)); return __result; }

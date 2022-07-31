@@ -37,6 +37,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <hybrid/byteorder.h>
 
+#include <kos/kernel/cpu-state.h>
+
 #include <string.h>
 
 DECL_BEGIN

@@ -31,6 +31,7 @@
 
 #include <hybrid/__assert.h>
 
+#include <kos/kernel/cpu-state.h>
 #include <kos/kernel/paging.h> /* KERNEL_DEBUG_STACKSIZE */
 
 #include <stdbool.h>

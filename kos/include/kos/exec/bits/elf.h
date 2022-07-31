@@ -17,29 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_BITS_EXCEPT_H
-#define _KOS_BITS_EXCEPT_H 1
+#ifndef _KOS_EXEC_BITS_ELF_H
+#define _KOS_EXEC_BITS_ELF_H 1
 
-/* Helper macros for portably working with error register state,
- * as  well as specifying how an error register state even looks
- * like. */
+/* ... */
 
-/*
- * #define EXCEPTION_DATA_POINTERS ...
- *
- * #define __EXCEPT_REGISTER_STATE_TYPE ...
- *
- * #ifdef __USE_KOS_KERNEL
- * #define __SIZEOF_EXCEPT_REGISTER_STATE ...
- * #endif
- *
- * #define __EXCEPT_REGISTER_STATE_TYPE_RDPC(x)                       (byte_t const *)...
- * #define __EXCEPT_REGISTER_STATE_TYPE_WRPC(x, value)                ...
- * #define __EXCEPT_REGISTER_STATE_TYPE_RDSP(x)                       (byte_t const *)...
- * #define __EXCEPT_REGISTER_STATE_TYPE_WRSP(x, value)                ...
- * #define __EXCEPT_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)        (byte_t const *)...
- * #define __EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x, value) ...
- *
- */
-
-#endif /* !_KOS_BITS_EXCEPT_H */
+#endif /* !_KOS_EXEC_BITS_ELF_H */

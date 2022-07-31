@@ -19,8 +19,8 @@
  */
 /* (#) Portability: MSVC  (/include/intrin.h) */
 /* (#) Portability: MinGW (/mingw-w64-headers/crt/intrin.h) */
-#ifndef _I386_KOS_INTRIN_H
-#define _I386_KOS_INTRIN_H 1
+#ifndef _INTRIN_H
+#define _INTRIN_H 1
 
 #include <__stdinc.h>
 #include <features.h>
@@ -29,10 +29,12 @@
 #include <hybrid/__rotate.h>
 #include <hybrid/host.h>
 
+#if defined(__i386__) || defined(__x86_64__)
 #include <asm/intrin-arith.h>
 #include <asm/intrin-lock.h>
 #include <asm/intrin-segarith.h>
 #include <asm/intrin.h>
+#endif /* __i386__ || __x86_64__ */
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -634,12 +636,45 @@ __LOCAL __BYTE_TYPE__ (_interlockedbittestandreset64)(__LONG64_TYPE__ *__base, _
 //#endif /* !_InterlockedAddPointer */
 
 
-/* __MACHINE */
-/* __MACHINE: void *_AddressOfReturnAddress(void) */
 #if __has_builtin(__builtin_return_address)
 #define _ReturnAddress() __builtin_return_address(0)
 #endif /* __has_builtin(__builtin_return_address) */
+#ifndef _byteswap_ushort
+#define _byteswap_ushort(x)   __hybrid_bswap16(x)
+#endif /* !_byteswap_ushort */
+#ifndef _byteswap_ulong
+#define _byteswap_ulong(x)    __hybrid_bswap32(x)
+#endif /* !_byteswap_ulong */
+#ifdef __UINT64_TYPE__
+#ifndef _byteswap_uint64
+#define _byteswap_uint64(x)   __hybrid_bswap64(x)
+#endif /* !_byteswap_uint64 */
+#endif /* __UINT64_TYPE__ */
+
+#define _lrotl(val, shift)  __hybrid_rol32(val, shift)
+#define _rotl(val, shift)   __hybrid_rol32(val, shift)
+#define _rotl16(val, shift) __hybrid_rol16(val, shift)
+#define _rotl8(val, shift)  __hybrid_rol8(val, shift)
+#define _lrotr(val, shift)  __hybrid_rol32(val, shift)
+#define _rotr(val, shift)   __hybrid_ror32(val, shift)
+#define _rotr16(val, shift) __hybrid_ror16(val, shift)
+#define _rotr8(val, shift)  __hybrid_ror8(val, shift)
+#ifdef __hybrid_rol64
+#define _rotl64(val, shift) __hybrid_rol64(val, shift)
+#define _rotr64(val, shift) __hybrid_ror64(val, shift)
+#endif /* __hybrid_rol64 */
+
+
+/* __MACHINE: void *_AddressOfReturnAddress(void) */
 /* __MACHINE: void __code_seg(const char *) */
+/* __MACHINE: int __cdecl _setjmp(jmp_buf) */
+
+
+
+/************************************************************************/
+/* X86                                                                  */
+/************************************************************************/
+#if defined(__i386__) || defined(__x86_64__)
 #define __debugbreak() __int3()
 #ifdef __COMPILER_HAVE_GCC_ASM
 #if __has_builtin(__fastfail)
@@ -663,35 +698,8 @@ __FORCELOCAL __ATTR_NORETURN void(__fastfail)(unsigned int __code) {
 #endif /* !__has_builtin(__fastfail) */
 #endif /* __COMPILER_HAVE_GCC_ASM */
 #define __nop() __nop()
-#ifndef _byteswap_ushort
-#define _byteswap_ushort(x)   __hybrid_bswap16(x)
-#endif /* !_byteswap_ushort */
-#ifndef _byteswap_ulong
-#define _byteswap_ulong(x)    __hybrid_bswap32(x)
-#endif /* !_byteswap_ulong */
-#ifdef __UINT64_TYPE__
-#ifndef _byteswap_uint64
-#define _byteswap_uint64(x)   __hybrid_bswap64(x)
-#endif /* !_byteswap_uint64 */
-#endif /* __UINT64_TYPE__ */
 #define _disable()            __cli()
 #define _enable()             __sti()
-#define _lrotl(val, shift)  __hybrid_rol32(val, shift)
-#define _rotl(val, shift)   __hybrid_rol32(val, shift)
-#define _rotl16(val, shift) __hybrid_rol16(val, shift)
-#define _rotl64(val, shift) __hybrid_rol64(val, shift)
-#define _rotl8(val, shift)  __hybrid_rol8(val, shift)
-#define _lrotr(val, shift)  __hybrid_rol32(val, shift)
-#define _rotr(val, shift)   __hybrid_ror32(val, shift)
-#define _rotr16(val, shift) __hybrid_ror16(val, shift)
-#define _rotr64(val, shift) __hybrid_ror64(val, shift)
-#define _rotr8(val, shift)  __hybrid_ror8(val, shift)
-/* __MACHINE: int __cdecl _setjmp(jmp_buf) */
-
-
-
-
-/* __MACHINEX86 / __MACHINEX64 */
 #ifndef __readfsbyte
 #define __readfsbyte(offset)   __rdfsb(offset)
 #endif /* !__readfsbyte */
@@ -778,13 +786,6 @@ __FORCELOCAL void(__writedr)(unsigned int __n, __REGISTER_TYPE__ __val) {
 	}
 }
 
-
-
-
-
-
-
-/* __MACHINEX86 */
 #if defined(__i386__) && !defined(__x86_64__)
 #define __addfsbyte(off, val)  __addfsb(off, val)
 #define __addfsdword(off, val) __addfsl(off, val)
@@ -941,8 +942,6 @@ __FORCELOCAL void (__writefsqword)(__ULONGPTR_TYPE__ __off, __UINT64_TYPE__ __va
 /* __MACHINEX86: void _mm_stream_pi(__m64 *, __m64) */
 /* __MACHINEX86: __m64 _mm_sub_si64(__m64, __m64) */
 #endif /* __i386__ && !__x86_64__ */
-
-
 
 
 /* __MACHINEX64 */
@@ -1502,6 +1501,10 @@ __FORCELOCAL void (__writefsqword)(__ULONGPTR_TYPE__ __off, __UINT64_TYPE__ __va
 /* __MACHINEX86_X64: unsigned char __cdecl _subborrow_u16(unsigned char, unsigned short, unsigned short, unsigned short *) */
 /* __MACHINEX86_X64: unsigned char __cdecl _addcarry_u32(unsigned char, unsigned int, unsigned int, unsigned int *) */
 /* __MACHINEX86_X64: unsigned char __cdecl _subborrow_u32(unsigned char, unsigned int, unsigned int, unsigned int *) */
+#endif /* __i386__ || __x86_64__ */
+/************************************************************************/
+
+
 
 
 #ifdef __USE_DOS
@@ -1530,4 +1533,4 @@ __FORCELOCAL void (__writefsqword)(__ULONGPTR_TYPE__ __off, __UINT64_TYPE__ __va
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_I386_KOS_INTRIN_H */
+#endif /* !_INTRIN_H */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa17c831b */
+/* HASH CRC-32:0xb396059d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3788,7 +3788,7 @@ INTERN_FUNCTION(libc_sys_pread64f)
 END(libc_sys_pread64f)
 DEFINE_PUBLIC_ALIAS(sys_pread64f, libc_sys_pread64f)
 
-/* void ksigreturn(struct fpustate const *restore_fpu, struct sigset_with_size const *restore_sigmask, struct rpc_syscall_info const *sc_info, struct ucpustate const *restore_cpu) */
+/* void ksigreturn(struct ucpustate const *restore_cpu, struct fpustate const *restore_fpu, struct sigset_with_size const *restore_sigmask, struct rpc_syscall_info const *restart_sc_info) */
 INTERN_FUNCTION(libc_sys_ksigreturn)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 4294967123, enableExcept: false) */
 	b .
@@ -3922,7 +3922,7 @@ DEFINE_PUBLIC_ALIAS(sys_setitimer64, libc_sys_setitimer64)
  * @param: hdrv:  Pointer  to  a vector  of `Elf32_Phdr'  or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, ElfW(Phdr) const *hdrv, size_t hdrc) */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr const *hdrv, size_t hdrc) */
 INTERN_FUNCTION(libc_sys_maplibrary)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 4294967210, enableExcept: false) */
 	b .
@@ -8227,7 +8227,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xsetitimer64, libc_sys_Xsetitimer64)
  * @param: hdrv:  Pointer  to  a vector  of `Elf32_Phdr'  or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, ElfW(Phdr) const *hdrv, size_t hdrc) */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr const *hdrv, size_t hdrc) */
 INTERN_FUNCTION(libc_sys_Xmaplibrary)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 4294967210, enableExcept: true) */
 	b .

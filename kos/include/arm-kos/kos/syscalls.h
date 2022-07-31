@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15ef8257 */
+/* HASH CRC-32:0x1ce2b203 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,6 +48,7 @@
 #include <bits/os/tms.h>
 #include <bits/os/utimbuf.h>
 #include <bits/types.h>
+#include <elf.h>
 #include <hybrid/typecore.h>
 #include <kos/bits/coredump.h>
 #include <kos/bits/debugtrap.h>
@@ -129,6 +130,7 @@ struct __utimbuf64;
 struct clone_args;
 struct debugtrap_reason;
 struct dirent;
+struct elf32_phdr;
 struct epoll_event;
 struct file_handle;
 struct fpustate;
@@ -1069,7 +1071,7 @@ __CDECLARE_SC(,__ssize_t,kreaddir,(__fd_t __fd, struct dirent *__buf, __size_t _
 __CDECLARE_SC(,__ssize_t,kreaddirf,(__fd_t __fd, struct dirent *__buf, __size_t __bufsize, __syscall_ulong_t __mode, __iomode_t __iomode),(__fd,__buf,__bufsize,__mode,__iomode))
 #endif /* __CRT_HAVE_SC(kreaddirf) */
 #if __CRT_HAVE_SC(ksigreturn)
-__CDECLARE_VOID_SC(,ksigreturn,(struct fpustate const *__restore_fpu, struct sigset_with_size const *__restore_sigmask, struct rpc_syscall_info const *__sc_info, struct ucpustate const *__restore_cpu),(__restore_fpu,__restore_sigmask,__sc_info,__restore_cpu))
+__CDECLARE_VOID_SC(,ksigreturn,(struct ucpustate const *__restore_cpu, struct fpustate const *__restore_fpu, struct sigset_with_size const *__restore_sigmask, struct rpc_syscall_info const *__restart_sc_info),(__restore_cpu,__restore_fpu,__restore_sigmask,__restart_sc_info))
 #endif /* __CRT_HAVE_SC(ksigreturn) */
 #if __CRT_HAVE_SC(kstat)
 __CDECLARE_SC(,__errno_t,kstat,(char const *__filename, struct __kos_stat *__statbuf),(__filename,__statbuf))
@@ -1196,7 +1198,7 @@ __CDECLARE_SC(,__errno_t,madvise,(void *__addr, __size_t __len, __syscall_ulong_
  * @param: hdrv:  Pointer  to  a vector  of `Elf32_Phdr'  or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-__CDECLARE_SC(,void *,maplibrary,(void *__addr, __syscall_ulong_t __flags, __fd_t __fd, __ElfW(Phdr) const *__hdrv, __size_t __hdrc),(__addr,__flags,__fd,__hdrv,__hdrc))
+__CDECLARE_SC(,void *,maplibrary,(void *__addr, __syscall_ulong_t __flags, __fd_t __fd, struct elf32_phdr const *__hdrv, __size_t __hdrc),(__addr,__flags,__fd,__hdrv,__hdrc))
 #endif /* __CRT_HAVE_SC(maplibrary) */
 #if __CRT_HAVE_SC(mbind)
 __CDECLARE_SC(,__errno_t,mbind,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
@@ -3643,7 +3645,7 @@ __CDECLARE_XSC(,__errno_t,madvise,(void *__addr, __size_t __len, __syscall_ulong
  * @param: hdrv:  Pointer  to  a vector  of `Elf32_Phdr'  or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-__CDECLARE_XSC(,void *,maplibrary,(void *__addr, __syscall_ulong_t __flags, __fd_t __fd, __ElfW(Phdr) const *__hdrv, __size_t __hdrc),(__addr,__flags,__fd,__hdrv,__hdrc))
+__CDECLARE_XSC(,void *,maplibrary,(void *__addr, __syscall_ulong_t __flags, __fd_t __fd, struct elf32_phdr const *__hdrv, __size_t __hdrc),(__addr,__flags,__fd,__hdrv,__hdrc))
 #endif /* __CRT_HAVE_XSC(maplibrary) */
 #if __CRT_HAVE_XSC(mbind)
 __CDECLARE_XSC(,__errno_t,mbind,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))

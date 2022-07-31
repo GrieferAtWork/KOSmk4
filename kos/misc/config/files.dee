@@ -112,6 +112,7 @@ function generateCppPropertiesJson(
 			fp << '	"projectName": "kos",\n';
 		fp << '	"configurations": [{\n';
 		local isFirst = true;
+		local Xslash = forVsCode ? r'/' : r'\\';
 		for (local targetName: listTargetNames().sorted()) {
 			local TARGET = import(f"..targets.{targetName}");
 			for (local configName: listConfigurationNames().sorted()) {
@@ -138,16 +139,16 @@ function generateCppPropertiesJson(
 				}
 				fp << '		"includePath": [\n';
 				if (haveLibstdcxxIncludes) {
-					fp << '			"${workspaceRoot}\\\\include\\\\' << TARGET.XARCH << '-kos\\\\c++\\\\' << LIBSTDCXX_VERSION << '",\n'
-						'			"${workspaceRoot}\\\\include\\\\' << TARGET.XARCH << '-kos\\\\c++\\\\' << LIBSTDCXX_VERSION << '\\\\' << TARGET.CPUNAME << '-kos",\n'
-						'			"${workspaceRoot}\\\\include\\\\' << TARGET.XARCH << '-kos\\\\c++\\\\' << LIBSTDCXX_VERSION << '\\\\backward",\n';
+					fp << '			"${workspaceRoot}' << Xslash << 'include' << Xslash << TARGET.XARCH << '-kos' << Xslash << 'c++' << Xslash << LIBSTDCXX_VERSION << '",\n'
+						'			"${workspaceRoot}' << Xslash << 'include' << Xslash << TARGET.XARCH << '-kos' << Xslash << 'c++' << Xslash << LIBSTDCXX_VERSION << Xslash << TARGET.CPUNAME << '-kos",\n'
+						'			"${workspaceRoot}' << Xslash << 'include' << Xslash << TARGET.XARCH << '-kos' << Xslash << 'c++' << Xslash << LIBSTDCXX_VERSION << Xslash << 'backward",\n';
 				}
 				if (haveKernelIncludes) {
-					fp << '			"${workspaceRoot}\\\\src\\\\kernel\\\\include\\\\' << TARGET.XARCH << '-kos",\n'
-						'			"${workspaceRoot}\\\\src\\\\kernel\\\\include",\n';
+					fp << '			"${workspaceRoot}' << Xslash << 'src' << Xslash << 'kernel' << Xslash << 'include' << Xslash << TARGET.XARCH << '-kos",\n'
+						'			"${workspaceRoot}' << Xslash << 'src' << Xslash << 'kernel' << Xslash << 'include",\n';
 				}
-				fp << '			"${workspaceRoot}\\\\include\\\\' << TARGET.XARCH << '-kos",\n'
-					'			"${workspaceRoot}\\\\include"\n'
+				fp << '			"${workspaceRoot}' << Xslash << 'include' << Xslash << TARGET.XARCH << '-kos",\n'
+					'			"${workspaceRoot}' << Xslash << 'include"\n'
 					'		],\n'
 					'		"defines": [\n';
 				for (local name, value: enumerateTargetAndConfigSpecificMacros(targetName, TARGET, CONFIG).sorted())
@@ -159,7 +160,7 @@ function generateCppPropertiesJson(
 				fp << '			"__cplusplus=201406L",\n'
 					'			"__KOS__"\n'
 					'		],\n'
-					'		"forcedInclude": ["${workspaceRoot}\\\\include\\\\compiler\\\\intellisense-gcc.h"],\n'
+					'		"forcedInclude": ["${workspaceRoot}' << Xslash << 'include' << Xslash << 'compiler' << Xslash << 'intellisense-gcc.h"],\n'
 					'		"intelliSenseMode": ' << repr(TARGET.VS_INTELLISENSE_MODE) << ',\n';
 				if (forVsCode) {
 					fp << '		"compilerPath": "${workspaceFolder}/../' << TARGET.CROSS_PREFIX << 'g++",\n'

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb27e8462 */
+/* HASH CRC-32:0x1a1edfc3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2084,7 +2084,7 @@
 /* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967116) */
 
-/* void ksigreturn(struct fpustate const *restore_fpu, struct sigset_with_size const *restore_sigmask, struct rpc_syscall_info const *sc_info, struct ucpustate const *restore_cpu) */
+/* void ksigreturn(struct ucpustate const *restore_cpu, struct fpustate const *restore_fpu, struct sigset_with_size const *restore_sigmask, struct rpc_syscall_info const *restart_sc_info) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967123) */
 
 /* errno_t nanosleep64(struct timespec64 const *req, struct timespec64 *rem) */
@@ -2174,7 +2174,7 @@
  * @param: hdrv:  Pointer  to  a vector  of `Elf32_Phdr'  or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, ElfW(Phdr) const *hdrv, size_t hdrc) */
+/* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr const *hdrv, size_t hdrc) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 4294967210) */
 
 /* errno_t settimeofday64(struct timeval64 const *tv, struct timezone const *tz) */

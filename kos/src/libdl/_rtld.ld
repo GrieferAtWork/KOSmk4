@@ -17,11 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBDL_ARCH_I386__RTLD_LD
-#define GUARD_LIBDL_ARCH_I386__RTLD_LD 1
+#ifndef GUARD_LIBDL__RTLD_LD
+#define GUARD_LIBDL__RTLD_LD 1
 
 #include <hybrid/compiler.h>
+
+#include <hybrid/host.h>
+
 #include <asm/pagesize.h>
+
+/* clang-format off */
 
 #if 0
 #define PHDR(x)
@@ -39,6 +44,15 @@ PHDRS {
 #undef likely
 #undef unlikely
 
+#if defined(__i386__) || defined(__x86_64__)
+#define OPT_TEXT_X86 .text.__x86.*
+#endif /* __i386__ || __x86_64__ */
+
+
+#ifndef OPT_TEXT_X86
+#define OPT_TEXT_X86 /* nothing */
+#endif /* !OPT_TEXT_X86 */
+
 
 ENTRY(linker_entry)
 SECTIONS {
@@ -50,7 +64,7 @@ SECTIONS {
 		PROVIDE_HIDDEN(__rtld_text_start = .);
 		*(.text.linker_entry)
 		*(.text.hot .text.hot.* .text.likely .text.likely.*)
-		*(.text.__x86.* .text .text.local.*)
+		*(OPT_TEXT_X86 .text .text.local.*)
 		*(.text.cold .text.cold.* .text.unlikely .text.unlikely.*)
 		*(.text.*)
 		PROVIDE_HIDDEN(__rtld_text_end = .);
@@ -147,4 +161,4 @@ SECTIONS {
 	}
 }
 
-#endif /* !GUARD_LIBDL_ARCH_I386__RTLD_LD */
+#endif /* !GUARD_LIBDL__RTLD_LD */

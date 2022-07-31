@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x991b0c27 */
+/* HASH CRC-32:0x1931f372 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2013,10 +2013,10 @@
 #define __NRAT2_pread64f                     (size_t, __size_t)
 #define __NRAT3_pread64f                     (uint64_t, __uint64_t)
 #define __NRAT4_pread64f                     (iomode_t, __iomode_t)
-#define __NRAT0_ksigreturn                   (struct fpustate const *, struct fpustate const *)
-#define __NRAT1_ksigreturn                   (struct sigset_with_size const *, struct sigset_with_size const *)
-#define __NRAT2_ksigreturn                   (struct rpc_syscall_info const *, struct rpc_syscall_info const *)
-#define __NRAT3_ksigreturn                   (struct ucpustate const *, struct ucpustate const *)
+#define __NRAT0_ksigreturn                   (struct ucpustate const *, struct ucpustate const *)
+#define __NRAT1_ksigreturn                   (struct fpustate const *, struct fpustate const *)
+#define __NRAT2_ksigreturn                   (struct sigset_with_size const *, struct sigset_with_size const *)
+#define __NRAT3_ksigreturn                   (struct rpc_syscall_info const *, struct rpc_syscall_info const *)
 #define __NRAT0_nanosleep64                  (struct timespec64 const *, struct __timespec64 const *)
 #define __NRAT1_nanosleep64                  (struct timespec64 *, struct __timespec64 *)
 #define __NRAT0_ksysctl                      (ioctl_t, __ioctl_t)
@@ -2046,7 +2046,7 @@
 #define __NRAT0_maplibrary                   (void *, void *)
 #define __NRAT1_maplibrary                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT2_maplibrary                   (fd_t, __fd_t)
-#define __NRAT3_maplibrary                   (ElfW(Phdr) const *, __ElfW(Phdr) const *)
+#define __NRAT3_maplibrary                   (struct elf32_phdr const *, struct elf32_phdr const *)
 #define __NRAT4_maplibrary                   (size_t, __size_t)
 #define __NRAT0_settimeofday64               (struct timeval64 const *, struct __timeval64 const *)
 #define __NRAT1_settimeofday64               (struct timezone const *, struct timezone const *)
@@ -2557,7 +2557,7 @@
 #define __NRAM_kstat(a, b, c, d, e, f)                        (char const *)a, (struct __kos_stat *)b
 #define __NRAM_pwrite64f(a, b, c, d, e, f)                    (__fd_t)a, (void const *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__iomode_t)f
 #define __NRAM_pread64f(a, b, c, d, e, f)                     (__fd_t)a, (void *)b, (__size_t)c, (__uint64_t)((__uint64_t)d | (__uint64_t)e << 32), (__iomode_t)f
-#define __NRAM_ksigreturn(a, b, c, d, e, f)                   (struct fpustate const *)a, (struct sigset_with_size const *)b, (struct rpc_syscall_info const *)c, (struct ucpustate const *)d
+#define __NRAM_ksigreturn(a, b, c, d, e, f)                   (struct ucpustate const *)a, (struct fpustate const *)b, (struct sigset_with_size const *)c, (struct rpc_syscall_info const *)d
 #define __NRAM_nanosleep64(a, b, c, d, e, f)                  (struct __timespec64 const *)a, (struct __timespec64 *)b
 #define __NRAM_rpc_serve_sysret(a, b, c, d, e, f)             /* nothing */
 #define __NRAM_rpc_serve(a, b, c, d, e, f)                    /* nothing */
@@ -2568,7 +2568,7 @@
 #define __NRAM_wait4_64(a, b, c, d, e, f)                     (__pid_t)a, (__int32_t *)b, (__syscall_ulong_t)c, (struct __rusage64 *)d
 #define __NRAM_getitimer64(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (struct __itimerval64 *)b
 #define __NRAM_setitimer64(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (struct __itimerval64 const *)b, (struct __itimerval64 *)c
-#define __NRAM_maplibrary(a, b, c, d, e, f)                   (void *)a, (__syscall_ulong_t)b, (__fd_t)c, (__ElfW(Phdr) const *)d, (__size_t)e
+#define __NRAM_maplibrary(a, b, c, d, e, f)                   (void *)a, (__syscall_ulong_t)b, (__fd_t)c, (struct elf32_phdr const *)d, (__size_t)e
 #define __NRAM_settimeofday64(a, b, c, d, e, f)               (struct __timeval64 const *)a, (struct timezone const *)b
 #define __NRAM_gettimeofday64(a, b, c, d, e, f)               (struct __timeval64 *)a, (struct timezone *)b
 #define __NRAM_getrusage64(a, b, c, d, e, f)                  (__syscall_slong_t)a, (struct __rusage64 *)b

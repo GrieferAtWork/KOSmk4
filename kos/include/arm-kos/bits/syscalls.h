@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3487abd5 */
+/* HASH CRC-32:0x1eea6d4f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1220,7 +1220,7 @@
 #define SYS_kstat                        __NR_kstat                        /* errno_t kstat(char const *filename, struct __kos_stat *statbuf) */
 #define SYS_pwrite64f                    __NR_pwrite64f                    /* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
 #define SYS_pread64f                     __NR_pread64f                     /* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-#define SYS_ksigreturn                   __NR_ksigreturn                   /* void ksigreturn(struct fpustate const *restore_fpu, struct sigset_with_size const *restore_sigmask, struct rpc_syscall_info const *sc_info, struct ucpustate const *restore_cpu) */
+#define SYS_ksigreturn                   __NR_ksigreturn                   /* void ksigreturn(struct ucpustate const *restore_cpu, struct fpustate const *restore_fpu, struct sigset_with_size const *restore_sigmask, struct rpc_syscall_info const *restart_sc_info) */
 #define SYS_nanosleep64                  __NR_nanosleep64                  /* errno_t nanosleep64(struct timespec64 const *req, struct timespec64 *rem) */
 /* >> rpc_serve_sysret(2)
  * Very similar to `rpc_serve(2)', but with the addition that this one
@@ -1288,7 +1288,7 @@
  * @param: hdrv:  Pointer  to  a vector  of `Elf32_Phdr'  or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-#define SYS_maplibrary                   __NR_maplibrary                   /* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, ElfW(Phdr) const *hdrv, size_t hdrc) */
+#define SYS_maplibrary                   __NR_maplibrary                   /* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr const *hdrv, size_t hdrc) */
 #define SYS_settimeofday64               __NR_settimeofday64               /* errno_t settimeofday64(struct timeval64 const *tv, struct timezone const *tz) */
 #define SYS_gettimeofday64               __NR_gettimeofday64               /* errno_t gettimeofday64(struct timeval64 *tv, struct timezone *tz) */
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */

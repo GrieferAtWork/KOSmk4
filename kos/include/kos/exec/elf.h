@@ -81,6 +81,8 @@
 #ifdef __CC__
 #ifndef __elfexec_info_defined
 #define __elfexec_info_defined
+#include <bits/types.h>
+
 __DECL_BEGIN
 
 struct elfexec_info /*[PREFIX(ei_)]*/ {

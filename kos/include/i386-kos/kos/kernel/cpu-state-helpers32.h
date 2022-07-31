@@ -1707,7 +1707,7 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define lcpustate32_to_kcpustate            lcpustate32_to_kcpustate32
 
 #define kcpustate_getpip                    kcpustate32_geteip
-#define kcpustate_getpc                     (__byte_t *)kcpustate32_geteip
+#define kcpustate_getpc                     (__byte_t const *)kcpustate32_geteip
 #define kcpustate_setpip                    kcpustate32_seteip
 #define kcpustate_setpc(self, pc)           kcpustate32_seteip(self, (__u32)__COMPILER_REQTYPE(void const *, pc))
 #define kcpustate_getpsp                    kcpustate32_getesp

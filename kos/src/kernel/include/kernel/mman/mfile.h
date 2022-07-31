@@ -1161,7 +1161,7 @@ DEFINE_REFCNT_FUNCTIONS(struct mfile, mf_refcnt, mfile_destroy)
 /* Lock accessor helpers for `struct mfile' */
 #ifdef CONFIG_KERNEL_MFILE_TRACES_LOCKPC
 #include <asm/intrin.h>
-#define _mfile_trace_wrlock_setpc(self) (void)((self)->_mf_wrlockpc = __rdip())
+#define _mfile_trace_wrlock_setpc(self) (void)((self)->_mf_wrlockpc = __rdpc())
 #define _mfile_trace_wrlock_clrpc(self) (void)((self)->_mf_wrlockpc = __NULLPTR)
 #define mfile_lock_write(self)          (atomic_rwlock_write(&(self)->mf_lock), _mfile_trace_wrlock_setpc(self))
 #define mfile_lock_write_nx(self)       (atomic_rwlock_write_nx(&(self)->mf_lock) ? (_mfile_trace_wrlock_setpc(self), 1) : 0)

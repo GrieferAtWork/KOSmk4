@@ -25,24 +25,25 @@
 
 #include <hybrid/host.h>
 
+#define __EXCEPT_REGISTER_STATE_TYPE_IS_KCPUSTATE
 #ifdef __USE_KOS_KERNEL
 #include <kos/kernel/cpu-state.h>
 #define __EXCEPT_REGISTER_STATE_TYPE   struct kcpustate
 #define __SIZEOF_EXCEPT_REGISTER_STATE SIZEOF_KCPUSTATE
 #ifdef __x86_64__
-#define __EXCEPT_REGISTER_STATE_TYPE_RDPC(x)                       ((byte_t const *)(x).kcs_rip)
+#define __EXCEPT_REGISTER_STATE_TYPE_RDPC(x)                       ((__BYTE_TYPE__ const *)(x).kcs_rip)
 #define __EXCEPT_REGISTER_STATE_TYPE_WRPC(x, value)                ((x).kcs_rip = (__u64)(value))
-#define __EXCEPT_REGISTER_STATE_TYPE_RDSP(x)                       ((x).kcs_gpregs.gp_rsp)
+#define __EXCEPT_REGISTER_STATE_TYPE_RDSP(x)                       ((__BYTE_TYPE__ const *)(x).kcs_gpregs.gp_rsp)
 #define __EXCEPT_REGISTER_STATE_TYPE_WRSP(x, value)                ((x).kcs_gpregs.gp_rsp = (value))
-#define __EXCEPT_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)        ((x).kcs_gpregs.gp_rax)
+#define __EXCEPT_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)        ((__BYTE_TYPE__ const *)(x).kcs_gpregs.gp_rax)
 #define __EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x, value) ((x).kcs_gpregs.gp_rax = (value))
 #else /* __x86_64__ */
-#define __EXCEPT_REGISTER_STATE_TYPE_RDPC(x)                       ((byte_t const *)(x).kcs_eip)
+#define __EXCEPT_REGISTER_STATE_TYPE_RDPC(x)                       ((__BYTE_TYPE__ const *)(x).kcs_eip)
 #define __EXCEPT_REGISTER_STATE_TYPE_WRPC(x, value)                ((x).kcs_eip = (__u32)(value))
-#define __EXCEPT_REGISTER_STATE_TYPE_RDSP(x)                       ((x).kcs_gpregs.gp_esp)
-#define __EXCEPT_REGISTER_STATE_TYPE_WRSP(x, value)                ((x).kcs_gpregs.gp_esp = (value))
-#define __EXCEPT_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)        ((x).kcs_gpregs.gp_eax)
-#define __EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x, value) ((x).kcs_gpregs.gp_eax = (value))
+#define __EXCEPT_REGISTER_STATE_TYPE_RDSP(x)                       ((__BYTE_TYPE__ const *)(x).kcs_gpregs.gp_esp)
+#define __EXCEPT_REGISTER_STATE_TYPE_WRSP(x, value)                ((x).kcs_gpregs.gp_esp = (__u32)(value))
+#define __EXCEPT_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)        ((__BYTE_TYPE__ const *)(x).kcs_gpregs.gp_eax)
+#define __EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x, value) ((x).kcs_gpregs.gp_eax = (__u32)(value))
 #endif /* !__x86_64__ */
 #else /* __USE_KOS_KERNEL */
 #include <hybrid/typecore.h>
@@ -81,10 +82,10 @@ struct __except_register_state_type_struct {
 __DECL_END
 #define __EXCEPT_REGISTER_STATE_TYPE_RDPC(x)                       ((__BYTE_TYPE__ const *)(x).__ers_pip)
 #define __EXCEPT_REGISTER_STATE_TYPE_WRPC(x, value)                ((x).__ers_pip = (__REGISTER_TYPE__)(value))
-#define __EXCEPT_REGISTER_STATE_TYPE_RDSP(x)                       ((x).__ers_psp)
-#define __EXCEPT_REGISTER_STATE_TYPE_WRSP(x, value)                ((x).__ers_psp = (value))
-#define __EXCEPT_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)        ((x).__ers_pax)
-#define __EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x, value) ((x).__ers_pax = (value))
+#define __EXCEPT_REGISTER_STATE_TYPE_RDSP(x)                       ((__BYTE_TYPE__ const *)(x).__ers_psp)
+#define __EXCEPT_REGISTER_STATE_TYPE_WRSP(x, value)                ((x).__ers_psp = (__REGISTER_TYPE__)(value))
+#define __EXCEPT_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)        ((__BYTE_TYPE__ const *)(x).__ers_pax)
+#define __EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x, value) ((x).__ers_pax = (__REGISTER_TYPE__)(value))
 #endif /* __CC__ */
 #endif /* !__USE_KOS_KERNEL */
 

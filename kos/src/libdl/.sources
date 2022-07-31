@@ -117,7 +117,7 @@ BEGIN
 		options[OPT_ELF_FLATTEN_ALLOWED_HEADERS]        = [0, 1]; /* text + data (don't include rel + dynamic) */
 		options[OPT_ELF_FLATTEN_REQUIRE_NO_RELOCATIONS] = true;
 		STATIC_USELIBGCC()
-		LINKER_SCRIPT(f"arch/{XARCH}/_rtld.ld")
+		LINKER_SCRIPT("_rtld.ld")
 		SET_OUTPUT_LIBDLL("libdl")
 		SOURCE({
 			"./*.c",

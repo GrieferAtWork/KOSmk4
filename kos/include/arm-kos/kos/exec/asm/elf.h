@@ -17,29 +17,31 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_BITS_EXCEPT_H
-#define _KOS_BITS_EXCEPT_H 1
+#ifndef _ARM_KOS_KOS_EXEC_ASM_ELF_H
+#define _ARM_KOS_KOS_EXEC_ASM_ELF_H 1
 
-/* Helper macros for portably working with error register state,
- * as  well as specifying how an error register state even looks
- * like. */
+#include <__stdinc.h>
 
-/*
- * #define EXCEPTION_DATA_POINTERS ...
- *
- * #define __EXCEPT_REGISTER_STATE_TYPE ...
- *
- * #ifdef __USE_KOS_KERNEL
- * #define __SIZEOF_EXCEPT_REGISTER_STATE ...
- * #endif
- *
- * #define __EXCEPT_REGISTER_STATE_TYPE_RDPC(x)                       (byte_t const *)...
- * #define __EXCEPT_REGISTER_STATE_TYPE_WRPC(x, value)                ...
- * #define __EXCEPT_REGISTER_STATE_TYPE_RDSP(x)                       (byte_t const *)...
- * #define __EXCEPT_REGISTER_STATE_TYPE_WRSP(x, value)                ...
- * #define __EXCEPT_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)        (byte_t const *)...
- * #define __EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x, value) ...
- *
- */
+#include <hybrid/byteorder.h>
+#include <hybrid/host.h>
 
-#endif /* !_KOS_BITS_EXCEPT_H */
+#include <elf.h>
+
+#ifdef __arm__
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#define ELF_ARCH_DATA     ELFDATA2MSB
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+#define ELF_ARCH_DATA     ELFDATA2LSB
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#define ELF_ARCH_CLASS    ELF_ARCHARM_CLASS
+#define ELF_ARCH_MACHINE  ELF_ARCHARM_MACHINE
+#define ELF_ARCH_USESRELA ELF_ARCHARM_USESRELA
+#define ELF_ARCH_LAZYINDX ELF_ARCHARM_LAZYINDX
+#endif /* __arm__ */
+
+#define ELF_ARCHARM_CLASS    ELFCLASS32
+#define ELF_ARCHARM_MACHINE  EM_ARM
+#define ELF_ARCHARM_USESRELA 0 /* arm doesn't use addend-relocations */
+#define ELF_ARCHARM_LAZYINDX 0 /* Lazy relocations use offsets, rather than indices */
+
+#endif /* !_ARM_KOS_KOS_EXEC_ASM_ELF_H */

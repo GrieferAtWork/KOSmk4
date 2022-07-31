@@ -17,29 +17,50 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_BITS_EXCEPT_H
-#define _KOS_BITS_EXCEPT_H 1
+#ifndef _KOS_KERNEL_CPU_STATE_H
+#define _KOS_KERNEL_CPU_STATE_H 1
 
-/* Helper macros for portably working with error register state,
- * as  well as specifying how an error register state even looks
- * like. */
+#include <__stdinc.h>
 
-/*
- * #define EXCEPTION_DATA_POINTERS ...
- *
- * #define __EXCEPT_REGISTER_STATE_TYPE ...
- *
- * #ifdef __USE_KOS_KERNEL
- * #define __SIZEOF_EXCEPT_REGISTER_STATE ...
- * #endif
- *
- * #define __EXCEPT_REGISTER_STATE_TYPE_RDPC(x)                       (byte_t const *)...
- * #define __EXCEPT_REGISTER_STATE_TYPE_WRPC(x, value)                ...
- * #define __EXCEPT_REGISTER_STATE_TYPE_RDSP(x)                       (byte_t const *)...
- * #define __EXCEPT_REGISTER_STATE_TYPE_WRSP(x, value)                ...
- * #define __EXCEPT_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)        (byte_t const *)...
- * #define __EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x, value) ...
- *
- */
+#include <bits/types.h>
 
-#endif /* !_KOS_BITS_EXCEPT_H */
+#ifdef __CC__
+__SYSDECL_BEGIN
+
+struct ucpustate { /* u -- User */
+	__uintptr_t __u_pad[128];
+};
+
+struct lcpustate { /* l -- Little */
+	__uintptr_t __l_pad[128];
+};
+
+struct kcpustate {
+	/* A CPU state used to describe a known, valid register state in kernel-space.
+	 * This  kind of state is also used  by exception handling, and the associated
+	 * stack unwinding. */
+	__uintptr_t __k_pad[128];
+};
+
+struct icpustate { /* i -- Interrupts */
+	/* A  CPU state that is used by  hardware interrupts (other than those used
+	 * by scheduling, which generate `scpustate' instead), in order to describe
+	 * the interrupted text location.
+	 * Also the primary CPU state used by RPC handlers. */
+	__uintptr_t __i_pad[128];
+};
+
+
+struct scpustate { /* s -- Scheduling */
+	/* CPU state, as used to store the state of a thread that isn't currently running. */
+	__uintptr_t __s_pad[128];
+};
+
+struct fcpustate { /* f -- Full */
+	__uintptr_t __f_pad[128];
+};
+
+__SYSDECL_END
+#endif /* __CC__ */
+
+#endif /* !_KOS_KERNEL_CPU_STATE_H */

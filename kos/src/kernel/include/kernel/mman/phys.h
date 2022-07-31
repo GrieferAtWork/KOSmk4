@@ -91,12 +91,14 @@ FUNDEF NOBLOCK void NOTHROW(FCALL pokephysq_unaligned)(PHYS physaddr_t addr, u64
 #endif /* __UINT64_TYPE__ */
 
 /* I/O functions with physical buffers. */
+#ifdef __port_t
 FUNDEF NOBLOCK void NOTHROW(KCALL insphysb)(port_t port, PHYS physaddr_t addr, size_t num_bytes);
 FUNDEF NOBLOCK void NOTHROW(KCALL insphysw)(port_t port, /*aligned(2)*/ PHYS physaddr_t addr, size_t num_words);
 FUNDEF NOBLOCK void NOTHROW(KCALL insphysl)(port_t port, /*aligned(4)*/ PHYS physaddr_t addr, size_t num_dwords);
 FUNDEF NOBLOCK void NOTHROW(KCALL outsphysb)(port_t port, PHYS physaddr_t addr, size_t num_bytes);
 FUNDEF NOBLOCK void NOTHROW(KCALL outsphysw)(port_t port, /*aligned(2)*/ PHYS physaddr_t addr, size_t num_words);
 FUNDEF NOBLOCK void NOTHROW(KCALL outsphysl)(port_t port, /*aligned(4)*/ PHYS physaddr_t addr, size_t num_dwords);
+#endif /* __port_t */
 
 /* Copy memory to/from/within the physical address space. */
 #ifdef __OMIT_PHYS_COPY_CONSTANT_P_WRAPPERS

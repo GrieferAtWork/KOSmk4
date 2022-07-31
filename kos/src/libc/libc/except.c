@@ -258,7 +258,7 @@ libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool
 
 	reader     = (byte_t const *)context->uc_fde.f_lsdaaddr;
 	landingpad = (byte_t const *)context->uc_fde.f_pcstart;
-	pc         = (byte_t const *)__EXCEPT_REGISTER_STATE_TYPE_RDPC(*context->uc_state);
+	pc         = __EXCEPT_REGISTER_STATE_TYPE_RDPC(*context->uc_state);
 
 	/* HINT: `reader' points to a `struct gcc_lsda' */
 	temp = *reader++; /* gl_landing_enc */
@@ -284,7 +284,7 @@ libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool
 		startpc = landingpad + start;
 		endpc   = startpc + size;
 
-#if 1 /* Compare  pointers  like  this,  as  `pc'  is  the  _RETURN_  address\
+#if 1 /* Compare  pointers  like  this,  as  `pc'  is  the  _RETURN_  address
        * (i.e. the address after the piece of code that caused the exception) */
 		if (pc > startpc && pc <= endpc)
 #else
@@ -412,13 +412,16 @@ handle_special_exception(except_register_state_t *__restrict state,
 	return NULL;
 }
 
+
+#ifndef __EXCEPT_REGISTER_STATE_TYPE_IS_UCPUSTATE
 #define except_register_state_to_ucpustate kcpustate_to_ucpustate
-#define except_register_state_getpc        kcpustate_getpc
-#define except_register_state_setpc        kcpustate_setpc
+#endif /* !__EXCEPT_REGISTER_STATE_TYPE_IS_UCPUSTATE */
+#define except_register_state_getpc(x)     __EXCEPT_REGISTER_STATE_TYPE_RDPC(*(x))
+#define except_register_state_setpc(x)     __EXCEPT_REGISTER_STATE_TYPE_WRPC(*(x))
 
 PRIVATE SECTION_EXCEPT_TEXT ATTR_NOINLINE void LIBCCALL
-trigger_debugtrap(struct ucpustate *__restrict state,
-                  struct exception_data *__restrict error) {
+trigger_debugtrap(struct ucpustate const *__restrict state,
+                  struct exception_data const *__restrict error) {
 	siginfo_t si;
 	struct debugtrap_reason r;
 	if (!except_as_signal(error, &si))
@@ -429,21 +432,28 @@ trigger_debugtrap(struct ucpustate *__restrict state,
 }
 
 PRIVATE SECTION_EXCEPT_TEXT ATTR_NOINLINE ATTR_NORETURN NONNULL((1, 2)) void LIBCCALL
-trigger_coredump(except_register_state_t *curr_state,
-                 except_register_state_t *orig_state,
-                 struct exception_data *exc,
+trigger_coredump(except_register_state_t const *curr_state,
+                 except_register_state_t const *orig_state,
+                 struct exception_data const *exc,
                  void const **unwind_tracevector,
                  unsigned int unwind_tracelength,
                  unsigned int unwind_error) {
+#ifndef __EXCEPT_REGISTER_STATE_TYPE_IS_UCPUSTATE
 	struct ucpustate curr_ust, orig_ust;
 	except_register_state_to_ucpustate(curr_state, &curr_ust);
 	except_register_state_to_ucpustate(orig_state, &orig_ust);
+#define LOCAL_curr_ust curr_ust
+#define LOCAL_orig_ust orig_ust
+#else /* !__EXCEPT_REGISTER_STATE_TYPE_IS_UCPUSTATE */
+#define LOCAL_curr_ust (*curr_state)
+#define LOCAL_orig_ust (*orig_state)
+#endif /* __EXCEPT_REGISTER_STATE_TYPE_IS_UCPUSTATE */
 
 	/* Try  to trigger a  coredump including all  of the information needed
 	 * to re-construct (up to `EXCEPT_BACKTRACE_SIZE' frames) of the unwind
 	 * path, as well as the remainder of the stack that didn't get unwound. */
-	sys_coredump(&curr_ust,
-	             &orig_ust,
+	sys_coredump(&LOCAL_curr_ust,
+	             &LOCAL_orig_ust,
 	             unwind_tracevector,
 	             unwind_tracelength,
 	             container_of(exc, union coredump_info, ci_except),
@@ -452,23 +462,29 @@ trigger_coredump(except_register_state_t *curr_state,
 
 	/* Shouldn't get here, but if something went wrong,
 	 * also   try  to  trigger  a  legacy  debug  trap. */
+#ifndef __EXCEPT_REGISTER_STATE_TYPE_IS_UCPUSTATE
 	except_register_state_to_ucpustate(curr_state, &curr_ust);
-	trigger_debugtrap(&curr_ust, exc);
+#endif /* !__EXCEPT_REGISTER_STATE_TYPE_IS_UCPUSTATE */
+	trigger_debugtrap(&LOCAL_curr_ust, exc);
 
 	/* As a fallback: just abort execution. */
 	abort();
+#undef LOCAL_curr_ust
+#undef LOCAL_orig_ust
 }
 
 
 PRIVATE SECTION_EXCEPT_TEXT ATTR_NOINLINE NONNULL((1, 2)) void LIBCCALL
-try_raise_signal_from_exception(except_register_state_t *__restrict state,
-                                struct exception_data *__restrict error) {
+try_raise_signal_from_exception(except_register_state_t const *__restrict state,
+                                struct exception_data const *__restrict error) {
 	siginfo_t si;
 	if (except_as_signal(error, &si)) {
 		/* raise a signal `si' at `*state' */
-		struct ucpustate uc;
 		struct rpc_syscall_info sc_info;
+#ifndef __EXCEPT_REGISTER_STATE_TYPE_IS_UCPUSTATE
+		struct ucpustate uc;
 		except_register_state_to_ucpustate(state, &uc);
+#endif /* !__EXCEPT_REGISTER_STATE_TYPE_IS_UCPUSTATE */
 
 		/* Use sigreturn(2) to execute a call to `rt_tgsigqueueinfo(2)' from `uc' */
 		bzero(&sc_info, sizeof(sc_info));
@@ -480,7 +496,11 @@ try_raise_signal_from_exception(except_register_state_t *__restrict state,
 		sc_info.rsi_regs[1] = (syscall_ulong_t)gettid();
 		sc_info.rsi_regs[2] = (syscall_ulong_t)si.si_signo;
 		sc_info.rsi_regs[3] = (syscall_ulong_t)&si;
+#ifndef __EXCEPT_REGISTER_STATE_TYPE_IS_UCPUSTATE
 		libc_sys_sigreturn(&uc, NULL, NULL, &sc_info);
+#else /* !__EXCEPT_REGISTER_STATE_TYPE_IS_UCPUSTATE */
+		libc_sys_sigreturn(state, NULL, NULL, &sc_info);
+#endif /* __EXCEPT_REGISTER_STATE_TYPE_IS_UCPUSTATE */
 		__builtin_unreachable();
 	}
 }
@@ -668,7 +688,7 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_exception_raise_phase_2)(except_register_sta
 	memcpy(state, &newstate, sizeof(newstate));
 	return state;
 err_unwind__URC_FATAL_PHASE2_ERROR:
-	__EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*state, (uintptr_t)_URC_FATAL_PHASE2_ERROR);
+	__EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*state, _URC_FATAL_PHASE2_ERROR);
 	return state;
 }
 
@@ -731,7 +751,7 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_exception_forceunwind_phase_2)(except_regist
 	memcpy(state, &newstate, sizeof(newstate));
 	return state;
 err_unwind__URC_FATAL_PHASE2_ERROR:
-	__EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*state, (uintptr_t)_URC_FATAL_PHASE2_ERROR);
+	__EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*state, _URC_FATAL_PHASE2_ERROR);
 	return state;
 }
 
@@ -790,10 +810,10 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_Unwind_RaiseException_impl)(except_register_
 err_unwind:
 	/* NOTE: This is how we must propagate errors! */
 	if (unwind_error == UNWIND_NO_FRAME) {
-		__EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*state, (uintptr_t)_URC_END_OF_STACK);
+		__EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*state, _URC_END_OF_STACK);
 	} else {
 err_unwind__URC_FATAL_PHASE1_ERROR:
-		__EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*state, (uintptr_t)_URC_FATAL_PHASE1_ERROR);
+		__EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(*state, _URC_FATAL_PHASE1_ERROR);
 	}
 	return state;
 }
@@ -1219,7 +1239,7 @@ install_first_handler:
 	info->ei_flags &= ~recursion_flag;
 
 	/* Pass the placeholder exception object for KOS exceptions. */
-	__EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(first_handler, (uintptr_t)libc_get_kos_unwind_exception());
+	__EXCEPT_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(first_handler, libc_get_kos_unwind_exception());
 	memcpy(state, &first_handler, sizeof(*state));
 	return state;
 handle_mode_3:

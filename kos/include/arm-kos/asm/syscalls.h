@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92e0f832 */
+/* HASH CRC-32:0x9d66022b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1217,7 +1217,7 @@
 #define __NR_kstat                        __UINT32_C(0xffffff3d) /* errno_t kstat(char const *filename, struct __kos_stat *statbuf) */
 #define __NR_pwrite64f                    __UINT32_C(0xffffff4b) /* ssize_t pwrite64f(fd_t fd, void const *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
 #define __NR_pread64f                     __UINT32_C(0xffffff4c) /* ssize_t pread64f(fd_t fd, void *buf, size_t bufsize, uint64_t offset, iomode_t mode) */
-#define __NR_ksigreturn                   __UINT32_C(0xffffff53) /* void ksigreturn(struct fpustate const *restore_fpu, struct sigset_with_size const *restore_sigmask, struct rpc_syscall_info const *sc_info, struct ucpustate const *restore_cpu) */
+#define __NR_ksigreturn                   __UINT32_C(0xffffff53) /* void ksigreturn(struct ucpustate const *restore_cpu, struct fpustate const *restore_fpu, struct sigset_with_size const *restore_sigmask, struct rpc_syscall_info const *restart_sc_info) */
 #define __NR_nanosleep64                  __UINT32_C(0xffffff5e) /* errno_t nanosleep64(struct timespec64 const *req, struct timespec64 *rem) */
 /* >> rpc_serve_sysret(2)
  * Very similar to `rpc_serve(2)', but with the addition that this one
@@ -1285,7 +1285,7 @@
  * @param: hdrv:  Pointer  to  a vector  of `Elf32_Phdr'  or `Elf64_Phdr'
  *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
-#define __NR_maplibrary                   __UINT32_C(0xffffffaa) /* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, ElfW(Phdr) const *hdrv, size_t hdrc) */
+#define __NR_maplibrary                   __UINT32_C(0xffffffaa) /* void *maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, struct elf32_phdr const *hdrv, size_t hdrc) */
 #define __NR_settimeofday64               __UINT32_C(0xffffffb1) /* errno_t settimeofday64(struct timeval64 const *tv, struct timezone const *tz) */
 #define __NR_gettimeofday64               __UINT32_C(0xffffffb2) /* errno_t gettimeofday64(struct timeval64 *tv, struct timezone *tz) */
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */

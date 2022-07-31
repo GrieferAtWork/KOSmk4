@@ -1712,9 +1712,21 @@ vhangup:() -> errno_t; /* UNIMPLEMENTED! */
 [restart(must)][noexcept] rt_sigreturn:(); /* UNIMPLEMENTED! */
 
 %[startgroup]
-[restart(must)][noexcept] ksigreturn:([tostr(STRUCT_FPUSTATE)] struct fpustate const *restore_fpu, [tostr(STRUCT_SIGSET_WITH_SIZE)] struct sigset_with_size const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO)] struct rpc_syscall_info const *sc_info, [tostr(STRUCT_UCPUSTATE)] struct ucpustate const *restore_cpu);
-[restart(must)][noexcept] ksigreturnx32:([tostr(STRUCT_FPUSTATE32)] struct fpustate32 const *restore_fpu, [tostr(STRUCT_SIGSET_WITH_SIZE_X32)] struct __sigset_with_sizex32 const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO32)] struct rpc_syscall_info32 const *sc_info, [tostr(STRUCT_UCPUSTATE32)] struct ucpustate32 const *restore_cpu);
-[restart(must)][noexcept] ksigreturnx64:([tostr(STRUCT_FPUSTATE64)] struct fpustate64 const *restore_fpu, [tostr(STRUCT_SIGSET_WITH_SIZE_X64)] struct __sigset_with_sizex64 const *restore_sigmask, [tostr(STRUCT_RPC_SYSCALL_INFO64)] struct rpc_syscall_info64 const *sc_info, [tostr(STRUCT_UCPUSTATE64)] struct ucpustate64 const *restore_cpu);
+[restart(must)][noexcept]
+ksigreturn:([tostr(STRUCT_UCPUSTATE)] struct ucpustate const *restore_cpu,
+            [tostr(STRUCT_FPUSTATE)] struct fpustate const *restore_fpu,
+            [tostr(STRUCT_SIGSET_WITH_SIZE)] struct sigset_with_size const *restore_sigmask,
+            [tostr(STRUCT_RPC_SYSCALL_INFO)] struct rpc_syscall_info const *restart_sc_info);
+[restart(must)][noexcept]
+ksigreturnx32:([tostr(STRUCT_FPUSTATE32)] struct fpustate32 const *restore_fpu,
+               [tostr(STRUCT_UCPUSTATE32)] struct ucpustate32 const *restore_cpu,
+               [tostr(STRUCT_SIGSET_WITH_SIZE_X32)] struct __sigset_with_sizex32 const *restore_sigmask,
+               [tostr(STRUCT_RPC_SYSCALL_INFO32)] struct rpc_syscall_info32 const *restart_sc_info);
+[restart(must)][noexcept]
+ksigreturnx64:([tostr(STRUCT_FPUSTATE64)] struct fpustate64 const *restore_fpu,
+               [tostr(STRUCT_UCPUSTATE64)] struct ucpustate64 const *restore_cpu,
+               [tostr(STRUCT_SIGSET_WITH_SIZE_X64)] struct __sigset_with_sizex64 const *restore_sigmask,
+               [tostr(STRUCT_RPC_SYSCALL_INFO64)] struct rpc_syscall_info64 const *restart_sc_info);
 %[endgroup]
 
 @@Wait for a child process:

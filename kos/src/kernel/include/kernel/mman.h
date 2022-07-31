@@ -223,7 +223,7 @@ NOTHROW(FCALL _mman_lockops_reap)(struct mman *__restrict self);
 
 #ifdef CONFIG_KERNEL_MMAN_TRACES_LOCKPC
 #include <asm/intrin.h>
-#define _mman_trace_wrlock_setpc(self) (self)->_mm_wrlockpc = __rdip()
+#define _mman_trace_wrlock_setpc(self) (self)->_mm_wrlockpc = __rdpc()
 #define _mman_trace_wrlock_clrpc(self) (self)->_mm_wrlockpc = __NULLPTR
 #endif /* CONFIG_KERNEL_MMAN_TRACES_LOCKPC */
 
