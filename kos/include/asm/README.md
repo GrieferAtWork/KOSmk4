@@ -9,7 +9,8 @@ Normally, `<asm/...>` headers are all internal and not meant to be directly incl
 	- `.macro .word32`
 	- `.macro .word64`
 	- `.macro .wordptr`
-	- `.macro .wordrel`
+	- `.macro .wordrel` (`#ifdef __ARCH_HAVE_wordrel')
+	- `.macro .wordoff` (`#ifdef __ARCH_HAVE_wordoff')
 - `<asm/cacheline.h>`
 	- `#define __ARCH_CACHELINESIZE <Integer>`
 - `<asm/intrin.h>`

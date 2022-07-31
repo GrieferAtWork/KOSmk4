@@ -481,6 +481,55 @@ diff -Naur gcc-12.1.0-orig/libgcc/config/arm/lib1funcs.S gcc-12.1.0/libgcc/confi
  	/* We don't have a speculation barrier directly for this
  	   platform/architecture variant.  But we can use a kernel
  	   clear_cache service routine which will emit such instructions
+diff -Naur gcc-12.1.0-orig/libgcc/config/arm/libunwind.S gcc-12.1.0/libgcc/config/arm/libunwind.S
+--- gcc-12.1.0-orig/libgcc/config/arm/libunwind.S	2022-05-06 09:30:59.000000000 +0200
++++ gcc-12.1.0/libgcc/config/arm/libunwind.S	2022-07-31 15:38:51.922420400 +0200
+@@ -38,6 +38,7 @@
+ #endif /* __ARM_EABI__ */
+ 
+ #ifndef __symbian__
++#ifndef __KOS__
+ 
+ #include "lib1funcs.S"
+ 
+@@ -359,4 +360,5 @@
+ UNWIND_WRAPPER _Unwind_ForcedUnwind 3
+ UNWIND_WRAPPER _Unwind_Backtrace 2
+ 
++#endif /* !__KOS__ */
+ #endif  /* ndef __symbian__ */
+diff -Naur gcc-12.1.0-orig/libgcc/config/arm/pr-support.c gcc-12.1.0/libgcc/config/arm/pr-support.c
+--- gcc-12.1.0-orig/libgcc/config/arm/pr-support.c	2022-05-06 09:30:59.000000000 +0200
++++ gcc-12.1.0/libgcc/config/arm/pr-support.c	2022-07-31 15:39:18.111205100 +0200
+@@ -21,6 +21,7 @@
+    see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+    <http://www.gnu.org/licenses/>.  */
+ 
++#ifndef __KOS__
+ #pragma GCC target ("general-regs-only")
+ #include "unwind.h"
+ 
+@@ -384,3 +385,4 @@
+ {
+   abort ();
+ }
++#endif /* !__KOS__ */
+diff -Naur gcc-12.1.0-orig/libgcc/config/arm/unwind-arm.c gcc-12.1.0/libgcc/config/arm/unwind-arm.c
+--- gcc-12.1.0-orig/libgcc/config/arm/unwind-arm.c	2022-05-06 09:30:59.000000000 +0200
++++ gcc-12.1.0/libgcc/config/arm/unwind-arm.c	2022-07-31 15:38:43.678067200 +0200
+@@ -21,6 +21,7 @@
+    see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+    <http://www.gnu.org/licenses/>.  */
+ 
++#ifndef __KOS__
+ #pragma GCC target ("general-regs-only")
+ #include "unwind.h"
+ 
+@@ -532,3 +533,4 @@
+   _Unwind_SetGR (context, 15, val | (_Unwind_GetGR (context, 15) & 1));
+ }
+ #endif
++#endif /* !__KOS__ */
 diff -Naur gcc-12.1.0-orig/libgcc/config.host gcc-12.1.0/libgcc/config.host
 --- gcc-12.1.0-orig/libgcc/config.host	2022-05-06 09:30:59.000000000 +0200
 +++ gcc-12.1.0/libgcc/config.host	2022-07-23 14:32:21.410176400 +0200

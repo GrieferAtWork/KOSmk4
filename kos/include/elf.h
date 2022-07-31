@@ -3736,9 +3736,9 @@ typedef struct elf_mips_abiflags_v0 {
 #define NT_ARM_PACG_KEYS     0x408      /* ARM pointer authentication generic key. */
 
 /* ARM relocs. */
-#define R_ARM_NONE              0       /* No reloc */
-#define R_ARM_PC24              1       /* PC relative 26 bit branch */
-#define R_ARM_ABS32             2       /* Direct 32 bit  */
+#define R_ARM_NONE              0       /* [RTLD] No reloc */
+#define R_ARM_PC24              1       /* [RTLD] PC relative 26 bit branch */
+#define R_ARM_ABS32             2       /* [RTLD] Direct 32 bit  */
 #define R_ARM_REL32             3       /* PC relative 32 bit */
 #define R_ARM_PC13              4       /* ??? */
 #define R_ARM_ABS16             5       /* Direct 16 bit */
@@ -3750,17 +3750,17 @@ typedef struct elf_mips_abiflags_v0 {
 #define R_ARM_THM_PC8           11      /* PC relative & 0x3FC (Thumb16 LDR, ADD, ADR). */
 #define R_ARM_AMP_VCALL9        12      /* ??? */
 #define R_ARM_SWI24             13      /* Obsolete static relocation. */
-#define R_ARM_TLS_DESC          13      /* Dynamic relocation. */
+#define R_ARM_TLS_DESC          13      /* [RTLD] Dynamic relocation. */
 #define R_ARM_THM_SWI8          14      /* Reserved. */
 #define R_ARM_XPC25             15      /* Reserved. */
 #define R_ARM_THM_XPC22         16      /* Reserved. */
-#define R_ARM_TLS_DTPMOD32      17      /* ID of module containing symbol */
-#define R_ARM_TLS_DTPOFF32      18      /* Offset in TLS block */
-#define R_ARM_TLS_TPOFF32       19      /* Offset in static TLS block */
-#define R_ARM_COPY              20      /* Copy symbol at runtime */
-#define R_ARM_GLOB_DAT          21      /* Create GOT entry */
-#define R_ARM_JUMP_SLOT         22      /* Create PLT entry */
-#define R_ARM_RELATIVE          23      /* Adjust by program base */
+#define R_ARM_TLS_DTPMOD32      17      /* [RTLD] ID of module containing symbol */
+#define R_ARM_TLS_DTPOFF32      18      /* [RTLD] Offset in TLS block */
+#define R_ARM_TLS_TPOFF32       19      /* [RTLD] Offset in static TLS block */
+#define R_ARM_COPY              20      /* [RTLD] Copy symbol at runtime */
+#define R_ARM_GLOB_DAT          21      /* [RTLD] Create GOT entry */
+#define R_ARM_JUMP_SLOT         22      /* [RTLD] Create PLT entry */
+#define R_ARM_RELATIVE          23      /* [RTLD] Adjust by program base */
 #define R_ARM_GOTOFF            24      /* 32 bit offset to GOT */
 #define R_ARM_GOTPC             25      /* 32 bit PC relative offset to GOT */
 #define R_ARM_GOT32             26      /* 32 bit GOT entry */
@@ -3898,7 +3898,7 @@ typedef struct elf_mips_abiflags_v0 {
 /*efine R_ARM_                  157      * ... */
 /*efine R_ARM_                  158      * ... */
 /*efine R_ARM_                  159      * ... */
-#define R_ARM_IRELATIVE         160     /* ??? */
+#define R_ARM_IRELATIVE         160     /* [RTLD] ??? */
 /*efine R_ARM_                  161      * ... */
 /*efine R_ARM_                  ...      * ... */
 /*efine R_ARM_                  248      * ... */

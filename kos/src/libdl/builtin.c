@@ -3185,6 +3185,19 @@ DEFINE_PUBLIC_ALIAS(dlinfo, libdl_dlinfo);
 
 
 
+__ASM_BEGIN
+__ASM_L(.macro .word_noreloc value:req)
+#ifdef __ARCH_HAVE_wordrel
+#define word_noreloc_decode(p_ptr) (void *)(dl_rtld_module.dm_loadaddr + *(p_ptr))
+__ASM_L(	.wordrel __ASM_ARG(\value))
+#elif defined(__ARCH_HAVE_wordoff)
+#define word_noreloc_decode(p_ptr) (void *)((byte_t *)(p_ptr) + *(p_ptr))
+__ASM_L(	.wordoff __ASM_ARG(\value))
+#elif !defined(__DEEMON__)
+#error "No way to encode relative pointers"
+#endif /* ... */
+__ASM_L(.endm)
+__ASM_END
 
 
 /*[[[deemon
@@ -3230,10 +3243,10 @@ function printDb(longestNameLen: int) {
 		if (target !is string) {
 			local targetn, cond = target...;
 			print("#if ", cond);
-			print("__ASM_L(.ascii ", repr adjn, "; .wordrel ", targetn, ")");
+			print("__ASM_L(.ascii ", repr adjn, "; .word_noreloc ", targetn, ")");
 			print("#endif /" "* ... *" "/");
 		} else {
-			print("__ASM_L(.ascii ", repr adjn, "; .wordrel ", target, ")");
+			print("__ASM_L(.ascii ", repr adjn, "; .word_noreloc ", target, ")");
 		}
 	}
 }
@@ -3294,71 +3307,71 @@ __ASM_L(dlsym_builtin_table:)
 #if __SIZEOF_POINTER__ == 4
 #define DLSYM_BUILTIN_NAMELEN 20
 #if defined(__i386__) && !defined(__x86_64__)
-__ASM_L(.ascii "___tls_get_addr\0\0\0\0\0"; .wordrel libdl____tls_get_addr)
+__ASM_L(.ascii "___tls_get_addr\0\0\0\0\0"; .word_noreloc libdl____tls_get_addr)
 #endif /* ... */
-__ASM_L(.ascii "__tls_get_addr\0\0\0\0\0\0"; .wordrel libdl___tls_get_addr)
-__ASM_L(.ascii "dl_iterate_phdr\0\0\0\0\0"; .wordrel libdl_iterate_phdr)
-__ASM_L(.ascii "dladdr\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dladdr)
-__ASM_L(.ascii "dlauxctrl\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlauxctrl)
-__ASM_L(.ascii "dlclearcaches\0\0\0\0\0\0\0"; .wordrel libdl_dlclearcaches)
-__ASM_L(.ascii "dlclose\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlclose)
-__ASM_L(.ascii "dlerror\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlerror)
-__ASM_L(.ascii "dlexceptaware\0\0\0\0\0\0\0"; .wordrel libdl_dlexceptaware)
-__ASM_L(.ascii "dlfopen\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlfopen)
-__ASM_L(.ascii "dlgethandle\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlgethandle)
-__ASM_L(.ascii "dlgetmodule\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlgetmodule)
-__ASM_L(.ascii "dlinflatesection\0\0\0\0"; .wordrel libdl_dlinflatesection)
-__ASM_L(.ascii "dlinfo\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlinfo)
-__ASM_L(.ascii "dllocksection\0\0\0\0\0\0\0"; .wordrel libdl_dllocksection)
-__ASM_L(.ascii "dlmodulebase\0\0\0\0\0\0\0\0"; .wordrel libdl_dlmodulebase)
-__ASM_L(.ascii "dlmodulefd\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlmodulefd)
-__ASM_L(.ascii "dlmodulename\0\0\0\0\0\0\0\0"; .wordrel libdl_dlmodulename)
-__ASM_L(.ascii "dlopen\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlopen)
-__ASM_L(.ascii "dlsectionindex\0\0\0\0\0\0"; .wordrel libdl_dlsectionindex)
-__ASM_L(.ascii "dlsectionmodule\0\0\0\0\0"; .wordrel libdl_dlsectionmodule)
-__ASM_L(.ascii "dlsectionname\0\0\0\0\0\0\0"; .wordrel libdl_dlsectionname)
-__ASM_L(.ascii "dlsym\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlsym)
-__ASM_L(.ascii "dltlsaddr\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsaddr)
-__ASM_L(.ascii "dltlsaddr2\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsaddr2)
-__ASM_L(.ascii "dltlsalloc\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsalloc)
-__ASM_L(.ascii "dltlsallocseg\0\0\0\0\0\0\0"; .wordrel libdl_dltlsallocseg)
-__ASM_L(.ascii "dltlsfree\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsfree)
-__ASM_L(.ascii "dltlsfreeseg\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsfreeseg)
-__ASM_L(.ascii "dlunlocksection\0\0\0\0\0"; .wordrel libdl_dlunlocksection)
+__ASM_L(.ascii "__tls_get_addr\0\0\0\0\0\0"; .word_noreloc libdl___tls_get_addr)
+__ASM_L(.ascii "dl_iterate_phdr\0\0\0\0\0"; .word_noreloc libdl_iterate_phdr)
+__ASM_L(.ascii "dladdr\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dladdr)
+__ASM_L(.ascii "dlauxctrl\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlauxctrl)
+__ASM_L(.ascii "dlclearcaches\0\0\0\0\0\0\0"; .word_noreloc libdl_dlclearcaches)
+__ASM_L(.ascii "dlclose\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlclose)
+__ASM_L(.ascii "dlerror\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlerror)
+__ASM_L(.ascii "dlexceptaware\0\0\0\0\0\0\0"; .word_noreloc libdl_dlexceptaware)
+__ASM_L(.ascii "dlfopen\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlfopen)
+__ASM_L(.ascii "dlgethandle\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlgethandle)
+__ASM_L(.ascii "dlgetmodule\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlgetmodule)
+__ASM_L(.ascii "dlinflatesection\0\0\0\0"; .word_noreloc libdl_dlinflatesection)
+__ASM_L(.ascii "dlinfo\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlinfo)
+__ASM_L(.ascii "dllocksection\0\0\0\0\0\0\0"; .word_noreloc libdl_dllocksection)
+__ASM_L(.ascii "dlmodulebase\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlmodulebase)
+__ASM_L(.ascii "dlmodulefd\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlmodulefd)
+__ASM_L(.ascii "dlmodulename\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlmodulename)
+__ASM_L(.ascii "dlopen\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlopen)
+__ASM_L(.ascii "dlsectionindex\0\0\0\0\0\0"; .word_noreloc libdl_dlsectionindex)
+__ASM_L(.ascii "dlsectionmodule\0\0\0\0\0"; .word_noreloc libdl_dlsectionmodule)
+__ASM_L(.ascii "dlsectionname\0\0\0\0\0\0\0"; .word_noreloc libdl_dlsectionname)
+__ASM_L(.ascii "dlsym\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlsym)
+__ASM_L(.ascii "dltlsaddr\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dltlsaddr)
+__ASM_L(.ascii "dltlsaddr2\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dltlsaddr2)
+__ASM_L(.ascii "dltlsalloc\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dltlsalloc)
+__ASM_L(.ascii "dltlsallocseg\0\0\0\0\0\0\0"; .word_noreloc libdl_dltlsallocseg)
+__ASM_L(.ascii "dltlsfree\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dltlsfree)
+__ASM_L(.ascii "dltlsfreeseg\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dltlsfreeseg)
+__ASM_L(.ascii "dlunlocksection\0\0\0\0\0"; .word_noreloc libdl_dlunlocksection)
 #elif __SIZEOF_POINTER__ == 8
 #define DLSYM_BUILTIN_NAMELEN 24
 #if defined(__i386__) && !defined(__x86_64__)
-__ASM_L(.ascii "___tls_get_addr\0\0\0\0\0\0\0\0\0"; .wordrel libdl____tls_get_addr)
+__ASM_L(.ascii "___tls_get_addr\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl____tls_get_addr)
 #endif /* ... */
-__ASM_L(.ascii "__tls_get_addr\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl___tls_get_addr)
-__ASM_L(.ascii "dl_iterate_phdr\0\0\0\0\0\0\0\0\0"; .wordrel libdl_iterate_phdr)
-__ASM_L(.ascii "dladdr\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dladdr)
-__ASM_L(.ascii "dlauxctrl\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlauxctrl)
-__ASM_L(.ascii "dlclearcaches\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlclearcaches)
-__ASM_L(.ascii "dlclose\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlclose)
-__ASM_L(.ascii "dlerror\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlerror)
-__ASM_L(.ascii "dlexceptaware\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlexceptaware)
-__ASM_L(.ascii "dlfopen\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlfopen)
-__ASM_L(.ascii "dlgethandle\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlgethandle)
-__ASM_L(.ascii "dlgetmodule\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlgetmodule)
-__ASM_L(.ascii "dlinflatesection\0\0\0\0\0\0\0\0"; .wordrel libdl_dlinflatesection)
-__ASM_L(.ascii "dlinfo\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlinfo)
-__ASM_L(.ascii "dllocksection\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dllocksection)
-__ASM_L(.ascii "dlmodulebase\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlmodulebase)
-__ASM_L(.ascii "dlmodulefd\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlmodulefd)
-__ASM_L(.ascii "dlmodulename\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlmodulename)
-__ASM_L(.ascii "dlopen\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlopen)
-__ASM_L(.ascii "dlsectionindex\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlsectionindex)
-__ASM_L(.ascii "dlsectionmodule\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlsectionmodule)
-__ASM_L(.ascii "dlsectionname\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlsectionname)
-__ASM_L(.ascii "dlsym\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlsym)
-__ASM_L(.ascii "dltlsaddr\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsaddr)
-__ASM_L(.ascii "dltlsaddr2\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsaddr2)
-__ASM_L(.ascii "dltlsalloc\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsalloc)
-__ASM_L(.ascii "dltlsallocseg\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsallocseg)
-__ASM_L(.ascii "dltlsfree\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsfree)
-__ASM_L(.ascii "dltlsfreeseg\0\0\0\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dltlsfreeseg)
-__ASM_L(.ascii "dlunlocksection\0\0\0\0\0\0\0\0\0"; .wordrel libdl_dlunlocksection)
+__ASM_L(.ascii "__tls_get_addr\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl___tls_get_addr)
+__ASM_L(.ascii "dl_iterate_phdr\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_iterate_phdr)
+__ASM_L(.ascii "dladdr\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dladdr)
+__ASM_L(.ascii "dlauxctrl\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlauxctrl)
+__ASM_L(.ascii "dlclearcaches\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlclearcaches)
+__ASM_L(.ascii "dlclose\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlclose)
+__ASM_L(.ascii "dlerror\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlerror)
+__ASM_L(.ascii "dlexceptaware\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlexceptaware)
+__ASM_L(.ascii "dlfopen\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlfopen)
+__ASM_L(.ascii "dlgethandle\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlgethandle)
+__ASM_L(.ascii "dlgetmodule\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlgetmodule)
+__ASM_L(.ascii "dlinflatesection\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlinflatesection)
+__ASM_L(.ascii "dlinfo\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlinfo)
+__ASM_L(.ascii "dllocksection\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dllocksection)
+__ASM_L(.ascii "dlmodulebase\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlmodulebase)
+__ASM_L(.ascii "dlmodulefd\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlmodulefd)
+__ASM_L(.ascii "dlmodulename\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlmodulename)
+__ASM_L(.ascii "dlopen\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlopen)
+__ASM_L(.ascii "dlsectionindex\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlsectionindex)
+__ASM_L(.ascii "dlsectionmodule\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlsectionmodule)
+__ASM_L(.ascii "dlsectionname\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlsectionname)
+__ASM_L(.ascii "dlsym\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlsym)
+__ASM_L(.ascii "dltlsaddr\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dltlsaddr)
+__ASM_L(.ascii "dltlsaddr2\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dltlsaddr2)
+__ASM_L(.ascii "dltlsalloc\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dltlsalloc)
+__ASM_L(.ascii "dltlsallocseg\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dltlsallocseg)
+__ASM_L(.ascii "dltlsfree\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dltlsfree)
+__ASM_L(.ascii "dltlsfreeseg\0\0\0\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dltlsfreeseg)
+__ASM_L(.ascii "dlunlocksection\0\0\0\0\0\0\0\0\0"; .word_noreloc libdl_dlunlocksection)
 #elif !defined(__DEEMON__)
 #error "Unsupported __SIZEOF_POINTER__"
 #endif /* ... */
@@ -3369,7 +3382,7 @@ __ASM_END
 
 struct dlsym_builtin_symbol {
 	char      dbs_name[DLSYM_BUILTIN_NAMELEN]; /* Symbol name */
-	uintptr_t dbs_addr;                        /* Symbol address (module relative) */
+	uintptr_t dbs_addr;                        /* Symbol address (either module-, or self-relative) */
 };
 
 INTDEF struct dlsym_builtin_symbol const dlsym_builtin_table[DLSYM_BUILTIN_COUNT];
@@ -3415,8 +3428,7 @@ NOTHROW_NCX(CC dlsym_builtin)(USER char const *name) THROWS(E_SEGFAULT) {
 			lo = index + 1;
 		} else {
 			/* Found it! */
-			return (void *)(dl_rtld_module.dm_loadaddr +
-			                dlsym_builtin_table[index].dbs_addr);
+			return word_noreloc_decode(&dlsym_builtin_table[index].dbs_addr);
 		}
 	}
 

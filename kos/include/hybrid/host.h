@@ -154,6 +154,11 @@
 #define __ckcore__ __CKCORE__
 #endif /* __ckcore__... */
 
+#if (!defined(__aarch64__) && \
+     (defined(__aarch64) || defined(__arm64__) || defined(__arm64)))
+#define __aarch64__ 1
+#endif /* __aarch64__... */
+
 #if (!defined(__arm__) && \
      (defined(_M_ARM) || defined(_M_ARMT) || defined(_M_ARM_NT)))
 #define __arm__ 1

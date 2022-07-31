@@ -17,80 +17,78 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_ASM_ASMWORD_H
-#define _I386_KOS_ASM_ASMWORD_H 1
+#ifndef _ARM_KOS_ASM_ASMWORD_H
+#define _ARM_KOS_ASM_ASMWORD_H 1
 
 #include <__stdinc.h>
+
 #include <hybrid/__asm.h>
 #include <hybrid/host.h>
 
 /* Helper assembler macros for encoding fixed-width data words in
  * text,  as  well as  module-relative  (non-relocated) pointers. */
 
-
 #ifndef __COMPILER_NO_GCC_ASM_MACROS
 __ASM_BEGIN
 
 /* Emit an 8-bit word */
 __ASM_L(.macro .word8 value:req)
-__ASM_L(	.byte __ASM_ARG(\value))
+__ASM_L(	.1byte __ASM_ARG(\value))
 __ASM_L(.endm)
 
 /* Emit a 16-bit word */
 __ASM_L(.macro .word16 value:req)
-__ASM_L(	.word __ASM_ARG(\value))
+__ASM_L(	.2byte __ASM_ARG(\value))
 __ASM_L(.endm)
 
 /* Emit a 32-bit word */
 __ASM_L(.macro .word32 value:req)
-#ifdef __x86_64__
-__ASM_L(	.int __ASM_ARG(\value))
-#else /* __x86_64__ */
-__ASM_L(	.long __ASM_ARG(\value))
-#endif /* !__x86_64__ */
+__ASM_L(	.4byte __ASM_ARG(\value))
 __ASM_L(.endm)
 
 /* Emit a 64-bit word */
 __ASM_L(.macro .word64 value:req)
-__ASM_L(	.quad __ASM_ARG(\value))
+__ASM_L(	.8byte __ASM_ARG(\value))
 __ASM_L(.endm)
 
 /* Emit a pointer-sized word */
 __ASM_L(.macro .wordptr value:req)
-#ifdef __x86_64__
-__ASM_L(	.quad __ASM_ARG(\value))
-#else /* __x86_64__ */
-__ASM_L(	.long __ASM_ARG(\value))
-#endif /* !__x86_64__ */
+#ifdef __aarch64__
+__ASM_L(	.8byte __ASM_ARG(\value))
+#else /* __aarch64__ */
+__ASM_L(	.4byte __ASM_ARG(\value))
+#endif /* !__aarch64__ */
 __ASM_L(.endm)
 
-
+/* Doesn't work because LD sucks: "dangerous relocation: unsupported relocation" */
+#undef __ARCH_HAVE_wordrel
+#if 0
 /* Emit a pointer-sized relocation to `value', offset by `offset',
  * that   will  become  a   module-relative  pointer  at  runtime. */
-#define __ARCH_HAVE_wordrel
 __ASM_L(.macro .wordrel value:req, offset=0)
-#ifdef __x86_64__
+#ifdef __aarch64__
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("R_X86_64_RELATIVE")
+#pragma push_macro("R_AARCH64_RELATIVE")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef R_X86_64_RELATIVE
-__ASM_L(	.reloc .,R_X86_64_RELATIVE, __ASM_ARG(\value) + (__ASM_ARG(\offset)))
-__ASM_L(	.quad 0)
+#undef R_AARCH64_RELATIVE
+__ASM_L(	.reloc .,R_AARCH64_RELATIVE, __ASM_ARG(\value))
+__ASM_L(	.quad __ASM_ARG(\offset))
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("R_X86_64_RELATIVE")
+#pragma pop_macro("R_AARCH64_RELATIVE")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#else /* __x86_64__ */
+#else /* __aarch64__ */
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("R_386_RELATIVE")
+#pragma push_macro("R_ARM_RELATIVE")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef R_386_RELATIVE
-__ASM_L(	.reloc .,R_386_RELATIVE, __ASM_ARG(\value))
+#undef R_ARM_RELATIVE
+__ASM_L(	.reloc .,R_ARM_RELATIVE, __ASM_ARG(\value))
 __ASM_L(	.long __ASM_ARG(\offset))
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("R_386_RELATIVE")
+#pragma pop_macro("R_ARM_RELATIVE")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#endif /* !__x86_64__ */
+#endif /* !__aarch64__ */
 __ASM_L(.endm)
+#endif
 
 
 /* Emit a pointer-sized relocation to `value', offset by `offset',
@@ -111,30 +109,30 @@ __ASM_L(.endm)
  */
 #define __ARCH_HAVE_wordoff
 __ASM_L(.macro .wordoff value:req, offset=0)
-#ifdef __x86_64__
+#ifdef __aarch64__
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("R_X86_64_PC64")
+#pragma push_macro("R_AARCH64_REL64")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef R_X86_64_PC64
-__ASM_L(	.reloc .,R_X86_64_PC64, __ASM_ARG(\value) + (__ASM_ARG(\offset)))
-__ASM_L(	.quad 0)
+#undef R_AARCH64_REL64
+__ASM_L(	.reloc .,R_AARCH64_REL64, __ASM_ARG(\value))
+__ASM_L(	.8byte __ASM_ARG(\offset))
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("R_X86_64_PC64")
+#pragma pop_macro("R_AARCH64_REL64")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#else /* __x86_64__ */
+#else /* __aarch64__ */
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("R_386_PC32")
+#pragma push_macro("R_ARM_REL32")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef R_386_PC32
-__ASM_L(	.reloc .,R_386_PC32, __ASM_ARG(\value))
-__ASM_L(	.long __ASM_ARG(\offset))
+#undef R_ARM_REL32
+__ASM_L(	.reloc .,R_ARM_REL32, __ASM_ARG(\value))
+__ASM_L(	.4byte __ASM_ARG(\offset))
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma pop_macro("R_386_PC32")
+#pragma pop_macro("R_ARM_REL32")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#endif /* !__x86_64__ */
+#endif /* !__aarch64__ */
 __ASM_L(.endm)
 
 __ASM_END
 #endif /* !__COMPILER_NO_GCC_ASM_MACROS */
 
-#endif /* !_I386_KOS_ASM_ASMWORD_H */
+#endif /* !_ARM_KOS_ASM_ASMWORD_H */

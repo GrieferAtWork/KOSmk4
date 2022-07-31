@@ -68,8 +68,31 @@ __ASM_L(.endm)
 
 /* Emit a pointer-sized relocation to `value', offset by `offset',
  * that   will  become  a   module-relative  pointer  at  runtime. */
+#undef __ARCH_HAVE_wordrel
 __ASM_L(.macro .wordrel value:req, offset=0)
 __ASM_L(	.error "Not implemented for this architecture: '.wordrel'")
+__ASM_L(.endm)
+
+
+/* Emit a pointer-sized relocation to `value', offset by `offset',
+ * that   will   become  a   self-relative  pointer   at  runtime:
+ *
+ * >> exterin int bar(void);
+ * >>
+ * >> __asm__(".pushsection .rodata\n\t"
+ * >>         "foo: .wordoff bar\n\t"
+ * >>         ".popsection");
+ * >> extern uintptr_t foo;
+ * >>
+ * >> void test(void) {
+ * >>     void *a = (void *)&bar;
+ * >>     void *b = (byte_t *)&foo + foo;
+ * >>     assert(a == b);
+ * >> }
+ */
+#undef __ARCH_HAVE_wordoff
+__ASM_L(.macro .wordoff value:req, offset=0)
+__ASM_L(	.error "Not implemented for this architecture: '.wordoff'")
 __ASM_L(.endm)
 
 __ASM_END
