@@ -77,7 +77,7 @@
 #ifdef __CC__
 #define DEFINE_PUBLIC_IDATA_G(name, resolve, size)                                           \
 	__asm__(".globl " __PP_PRIVATE_STR(name) "\n"                                            \
-	        ".type  " __PP_PRIVATE_STR(name) ", @kos_indirect_data\n"                        \
+	        ".type  " __PP_PRIVATE_STR(name) ", \"kos_indirect_data\"\n"                     \
 	        ".set   .Lidata_" __PP_PRIVATE_STR(name) ", " __PP_PRIVATE_STR(resolve) " - 1\n" \
 	        ".set   " __PP_PRIVATE_STR(name) ", .Lidata_" __PP_PRIVATE_STR(name) " + 1\n"    \
 	        ".size  " __PP_PRIVATE_STR(name) ", " __PP_PRIVATE_STR(size) "\n")
@@ -85,7 +85,7 @@
 	DEFINE_PUBLIC_IDATA_EX(name, resolve, sizeof((resolve)()))
 #define DEFINE_PUBLIC_IDATA_EX(name, resolve, size)                                       \
 	__asm__(".globl " __PP_PRIVATE_STR(name) "\n"                                         \
-	        ".type  " __PP_PRIVATE_STR(name) ", @kos_indirect_data\n"                     \
+	        ".type  " __PP_PRIVATE_STR(name) ", \"kos_indirect_data\"\n"                  \
 	        ".set   .Lidata_" __PP_PRIVATE_STR(name) ", %p0 - 1\n"                        \
 	        ".set   " __PP_PRIVATE_STR(name) ", .Lidata_" __PP_PRIVATE_STR(name) " + 1\n" \
 	        ".size  " __PP_PRIVATE_STR(name) ", %p1\n"                                    \
@@ -93,7 +93,7 @@
 #elif defined(__ASSEMBLER__)
 #define DEFINE_PUBLIC_IDATA_G(name, resolve, size_) \
 	.globl name;                                    \
-	.type  name, @kos_indirect_data;                \
+	.type  name, "kos_indirect_data";               \
 	.set   .Lidata_##name, (resolve) - 1;           \
 	.set   name, .Lidata_##name + 1;                \
 	.size  name, size_

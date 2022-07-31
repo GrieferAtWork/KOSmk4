@@ -32,7 +32,7 @@ options.setdefault("COMPILE.macros", d.Dict(()))["SYMTAB"] = repr("../../../../.
 #ifdef NO_SYMTAB
 .section .rodata.kernel_symtab
 .global kernel_symbol_table
-.type kernel_symbol_table, @object
+.type kernel_symbol_table, "object"
 kernel_symbol_table:
 	.long 0
 	/* Symbol table */

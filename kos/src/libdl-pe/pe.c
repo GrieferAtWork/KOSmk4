@@ -961,7 +961,7 @@ INTDEF void pe_exit_wrapper_asm(void);
 __asm__(".pushsection .text\n"
         ".global pe_exit_wrapper_asm\n"
         ".hidden pe_exit_wrapper_asm\n"
-        ".type pe_exit_wrapper_asm, @function\n"
+        ".type pe_exit_wrapper_asm, \"function\"\n"
         "pe_exit_wrapper_asm:\n"
 #ifdef __x86_64__
         "	movq   %rax, %rdi\n"

@@ -22,13 +22,13 @@
 
 .section .rodata.compat_execabi_system_rtld
 	.global compat_execabi_system_rtld
-	.type   compat_execabi_system_rtld, @object
+	.type   compat_execabi_system_rtld, "object"
 	.align  4096 /* PAGESIZE */
 compat_execabi_system_rtld:
 	.incbin "bin/x86_64-kos/lib/libdl.rtld-flat.bin"
 	.align  4096 /* PAGESIZE */
 .global compat_execabi_system_rtld_size
-.type   compat_execabi_system_rtld_size, @object
+.type   compat_execabi_system_rtld_size, "object"
 	compat_execabi_system_rtld_size = . - compat_execabi_system_rtld
 .size compat_execabi_system_rtld, . - compat_execabi_system_rtld
 

@@ -249,7 +249,7 @@ BEGIN
 						}
 						fp << ".section .rodata.kernel_symtab\n"
 							".global kernel_symbol_table\n"
-							".type kernel_symbol_table, @object\n"
+							".type kernel_symbol_table, \"object\"\n"
 							"kernel_symbol_table:\n"
 							"\t" << PTR << " " << hash_mask.hex() << "\n"
 							"\t/* Symbol table */\n";

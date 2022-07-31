@@ -29,7 +29,7 @@
 #include <kos/kernel/tss.h>
 
 #define EXPORT_AS_OBJECT(name) \
-	.type name, @object;       \
+	.type name, "object";      \
 	.global name;
 #define EXPORT_AS_OBJECT_EX(name, size_) \
 	EXPORT_AS_OBJECT(name)               \

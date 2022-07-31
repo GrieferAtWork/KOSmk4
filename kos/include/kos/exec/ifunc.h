@@ -24,14 +24,14 @@
 #include <hybrid/typecore.h>
 
 #ifdef __CC__
-#define DEFINE_PUBLIC_IFUNC(name, resolve)                                \
-	__asm__(".globl " __PP_PRIVATE_STR(name) "\n"                         \
-	        ".type  " __PP_PRIVATE_STR(name) ", @gnu_indirect_function\n" \
+#define DEFINE_PUBLIC_IFUNC(name, resolve)                                   \
+	__asm__(".globl " __PP_PRIVATE_STR(name) "\n"                            \
+	        ".type  " __PP_PRIVATE_STR(name) ", \"gnu_indirect_function\"\n" \
 	        ".set   " __PP_PRIVATE_STR(name) ", " __PP_PRIVATE_STR(resolve) "\n")
 #elif defined(__ASSEMBLER__)
 #define DEFINE_PUBLIC_IFUNC(name, resolve) \
 	.globl name;                           \
-	.type  name, @gnu_indirect_function;   \
+	.type  name, "gnu_indirect_function";  \
 	.set   name, resolve
 #endif /* ... */
 

@@ -24,7 +24,7 @@
 
 .section .rodata.execabi_system_rtld
 	.global execabi_system_rtld
-	.type   execabi_system_rtld, @object
+	.type   execabi_system_rtld, "object"
 	.align  4096 /* PAGESIZE */
 execabi_system_rtld:
 #ifdef __x86_64__
@@ -34,7 +34,7 @@ execabi_system_rtld:
 #endif /* !__x86_64__ */
 	.align  4096 /* PAGESIZE */
 .global execabi_system_rtld_size
-.type   execabi_system_rtld_size, @object
+.type   execabi_system_rtld_size, "object"
 	execabi_system_rtld_size = . - execabi_system_rtld
 .size execabi_system_rtld, . - execabi_system_rtld
 

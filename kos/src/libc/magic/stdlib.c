@@ -1719,8 +1719,8 @@ INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") char const libc__i
 #undef libc__itoa_upper_digits
 __asm__(".hidden libc__itoa_lower_digits\n"
         ".hidden libc__itoa_upper_digits\n"
-        ".type   libc__itoa_lower_digits, @object\n"
-        ".type   libc__itoa_upper_digits, @object\n"
+        ".type   libc__itoa_lower_digits, \"object\"\n"
+        ".type   libc__itoa_upper_digits, \"object\"\n"
         ".set    .Ldisp_itoa_lower_digits, libc__itoa_digits - 1\n"       /* Prevent size aliasing */
         ".set    libc__itoa_lower_digits, .Ldisp_itoa_lower_digits + 1\n" /* *ditto* */
         ".set    libc__itoa_upper_digits, libc__itoa_digits + 64\n"

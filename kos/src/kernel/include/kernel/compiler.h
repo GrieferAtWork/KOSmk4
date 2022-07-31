@@ -122,12 +122,12 @@
 
 
 #define __DEFINE_SYMBOL_STR(x) #x
-#define DEFINE_PRIVATE_SYMBOL(name, value, size)      __asm__(".type " __DEFINE_SYMBOL_STR(name) ", @object\n\t.local " __DEFINE_SYMBOL_STR(name) "\n\t.set " __DEFINE_SYMBOL_STR(name) ",%p0\n\t.size " __DEFINE_SYMBOL_STR(name) ",%p1" : : "X" (value), "X" (size))
-#define DEFINE_PUBLIC_SYMBOL(name, value, size)       __asm__(".type " __DEFINE_SYMBOL_STR(name) ", @object\n\t.global " __DEFINE_SYMBOL_STR(name) "\n\t.set " __DEFINE_SYMBOL_STR(name) ",%p0\n\t.size " __DEFINE_SYMBOL_STR(name) ",%p1" : : "X" (value), "X" (size))
-#define DEFINE_INTERN_SYMBOL(name, value, size)       __asm__(".type " __DEFINE_SYMBOL_STR(name) ", @object\n\t.global " __DEFINE_SYMBOL_STR(name) "\n\t.hidden " __DEFINE_SYMBOL_STR(name) "\n\t.set " __DEFINE_SYMBOL_STR(name) ",%p0\n\t.size " __DEFINE_SYMBOL_STR(name) ",%p1" : : "X" (value), "X" (size))
-#define DEFINE_PRIVATE_WEAK_SYMBOL(name, value, size) __asm__(".type " __DEFINE_SYMBOL_STR(name) ", @object\n\t.weak " __DEFINE_SYMBOL_STR(name) "\n\t.local " __DEFINE_SYMBOL_STR(name) "\n\t.set " __DEFINE_SYMBOL_STR(name) ",%p0\n\t.size " __DEFINE_SYMBOL_STR(name) ",%p1" : : "X" (value), "X" (size))
-#define DEFINE_PUBLIC_WEAK_SYMBOL(name, value, size)  __asm__(".type " __DEFINE_SYMBOL_STR(name) ", @object\n\t.weak " __DEFINE_SYMBOL_STR(name) "\n\t.global " __DEFINE_SYMBOL_STR(name) "\n\t.set " __DEFINE_SYMBOL_STR(name) ",%p0\n\t.size " __DEFINE_SYMBOL_STR(name) ",%p1" : : "X" (value), "X" (size))
-#define DEFINE_INTERN_WEAK_SYMBOL(name, value, size)  __asm__(".type " __DEFINE_SYMBOL_STR(name) ", @object\n\t.weak " __DEFINE_SYMBOL_STR(name) "\n\t.global " __DEFINE_SYMBOL_STR(name) "\n\t.hidden " __DEFINE_SYMBOL_STR(name) "\n\t.set " __DEFINE_SYMBOL_STR(name) ",%p0\n\t.size " __DEFINE_SYMBOL_STR(name) ",%p1" : : "X" (value), "X" (size))
+#define DEFINE_PRIVATE_SYMBOL(name, value, size)      __asm__(".type " __DEFINE_SYMBOL_STR(name) ", \"object\"\n\t.local " __DEFINE_SYMBOL_STR(name) "\n\t.set " __DEFINE_SYMBOL_STR(name) ",%p0\n\t.size " __DEFINE_SYMBOL_STR(name) ",%p1" : : "X" (value), "X" (size))
+#define DEFINE_PUBLIC_SYMBOL(name, value, size)       __asm__(".type " __DEFINE_SYMBOL_STR(name) ", \"object\"\n\t.global " __DEFINE_SYMBOL_STR(name) "\n\t.set " __DEFINE_SYMBOL_STR(name) ",%p0\n\t.size " __DEFINE_SYMBOL_STR(name) ",%p1" : : "X" (value), "X" (size))
+#define DEFINE_INTERN_SYMBOL(name, value, size)       __asm__(".type " __DEFINE_SYMBOL_STR(name) ", \"object\"\n\t.global " __DEFINE_SYMBOL_STR(name) "\n\t.hidden " __DEFINE_SYMBOL_STR(name) "\n\t.set " __DEFINE_SYMBOL_STR(name) ",%p0\n\t.size " __DEFINE_SYMBOL_STR(name) ",%p1" : : "X" (value), "X" (size))
+#define DEFINE_PRIVATE_WEAK_SYMBOL(name, value, size) __asm__(".type " __DEFINE_SYMBOL_STR(name) ", \"object\"\n\t.weak " __DEFINE_SYMBOL_STR(name) "\n\t.local " __DEFINE_SYMBOL_STR(name) "\n\t.set " __DEFINE_SYMBOL_STR(name) ",%p0\n\t.size " __DEFINE_SYMBOL_STR(name) ",%p1" : : "X" (value), "X" (size))
+#define DEFINE_PUBLIC_WEAK_SYMBOL(name, value, size)  __asm__(".type " __DEFINE_SYMBOL_STR(name) ", \"object\"\n\t.weak " __DEFINE_SYMBOL_STR(name) "\n\t.global " __DEFINE_SYMBOL_STR(name) "\n\t.set " __DEFINE_SYMBOL_STR(name) ",%p0\n\t.size " __DEFINE_SYMBOL_STR(name) ",%p1" : : "X" (value), "X" (size))
+#define DEFINE_INTERN_WEAK_SYMBOL(name, value, size)  __asm__(".type " __DEFINE_SYMBOL_STR(name) ", \"object\"\n\t.weak " __DEFINE_SYMBOL_STR(name) "\n\t.global " __DEFINE_SYMBOL_STR(name) "\n\t.hidden " __DEFINE_SYMBOL_STR(name) "\n\t.set " __DEFINE_SYMBOL_STR(name) ",%p0\n\t.size " __DEFINE_SYMBOL_STR(name) ",%p1" : : "X" (value), "X" (size))
 
 
 
@@ -194,7 +194,7 @@
  * >>	.globl my_data_symbol
  * >>	.section .bss
  * >>	.align 32
- * >>	.type my_data_symbol, @object
+ * >>	.type my_data_symbol, "object"
  * >>	.size my_data_symbol, 32
  * >>my_data_symbol:
  * >>	.zero 32
@@ -206,7 +206,7 @@
  * >>	.globl my_data_symbol
  * >>	.section .bss
  * >>	.align 8
- * >>	.type my_data_symbol, @object
+ * >>	.type my_data_symbol, "object"
  * >>	.size my_data_symbol, 32
  * >>my_data_symbol:
  * >>	.zero 32 */
