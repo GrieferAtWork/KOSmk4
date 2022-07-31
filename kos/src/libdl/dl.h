@@ -88,9 +88,9 @@ DECL_BEGIN
 	((p) && ((uintptr_t)(p) & (sizeof(void *) - 1)) == 0)
 #endif /* !DL_VERIFY_SECTION_HANDLE */
 
-#define DECLARE_INTERN_OVERRIDE(name)        \
-	__asm__(".type " #name ", @function\n\t" \
-	        ".global " #name "\n\t"          \
+#define DECLARE_INTERN_OVERRIDE(name)           \
+	__asm__(".type " #name ", \"function\"\n\t" \
+	        ".global " #name "\n\t"             \
 	        ".hidden " #name);
 BUILTIN_GLOBALS_ENUMERATE(DECLARE_INTERN_OVERRIDE)
 #undef DECLARE_INTERN_OVERRIDE

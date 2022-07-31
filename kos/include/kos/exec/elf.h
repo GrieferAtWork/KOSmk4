@@ -114,7 +114,7 @@ __DECL_END
 
 /* Return the filename of the primary application */
 #ifndef elfexec_info_getfilename
-#define elfexec_info_getfilename(x) ((char *)&(x)->ei_phdr[(x)->pr_pnum])
+#define elfexec_info_getfilename(x) ((char *)&(x)->ei_phdr[(x)->ei_pnum])
 #endif /* !elfexec_info_getfilename */
 
 /* Return the entry point address of the primary application (as an l-value) */

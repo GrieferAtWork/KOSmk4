@@ -3264,7 +3264,7 @@ if (!plusNConditions) {
 print("__ASM_BEGIN");
 print("__ASM_L(.pushsection .rodata)");
 print("__ASM_L(.align __SIZEOF_POINTER__)");
-print("__ASM_L(.type dlsym_builtin_table, @object)");
+print("__ASM_L(.type dlsym_builtin_table, \"object\")");
 print("__ASM_L(dlsym_builtin_table:)");
 if (aligned4 == aligned8) {
 	printDb(aligned4);
@@ -3289,7 +3289,7 @@ enum { DLSYM_BUILTIN_COUNT = 29
 __ASM_BEGIN
 __ASM_L(.pushsection .rodata)
 __ASM_L(.align __SIZEOF_POINTER__)
-__ASM_L(.type dlsym_builtin_table, @object)
+__ASM_L(.type dlsym_builtin_table, "object")
 __ASM_L(dlsym_builtin_table:)
 #if __SIZEOF_POINTER__ == 4
 #define DLSYM_BUILTIN_NAMELEN 20

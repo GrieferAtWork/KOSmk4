@@ -69,7 +69,7 @@ __ASM_L(.endm)
 /* Emit a pointer-sized relocation to `value', offset by `offset',
  * that   will  become  a   module-relative  pointer  at  runtime. */
 __ASM_L(.macro .wordrel value:req, offset=0)
-__ASM_L(	.error "Not implemented for this architecture")
+__ASM_L(	.error "Not implemented for this architecture: '.wordrel'")
 __ASM_L(.endm)
 
 __ASM_END
