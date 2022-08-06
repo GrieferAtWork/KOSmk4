@@ -22,6 +22,8 @@
 
 #include <__stdinc.h>
 #include <hybrid/compiler.h>
+#include <kernel/arch/compiler.h>
+/**/
 
 #include <kos/anno.h>
 #include <kos/config/config.h> /* Pull in config-specific macro overrides */
@@ -285,6 +287,44 @@ FUNDEF void NOTHROW(KCALL BREAKPOINT)(void);
 #endif /* __GNUC__ < 6 && !__clang__ */
 
 
+
+
+
+
+#include <asm/asmword.h>
+#ifdef __ASSEMBLER__
+#define DEFINE_ABS_CALLBACK(sect, func) .pushsection sect; .wordptr func; .popsection
+#ifdef __ARCH_HAVE_wordrel
+#define DEFINE_REL_CALLBACK(sect, func) .pushsection sect; .wordrel func; .popsection
+#endif /* __ARCH_HAVE_wordrel */
+#ifdef __ARCH_HAVE_wordoff
+#define DEFINE_OFF_CALLBACK(sect, func) .pushsection sect; .wordoff func; .popsection
+#endif /* __ARCH_HAVE_wordoff */
+#else /* __ASSEMBLER__ */
+#define DEFINE_ABS_CALLBACK(sect, func) __asm__(".pushsection " sect "\n\t\t.wordptr " PP_PRIVATE_STR(func) "\n\t.popsection")
+#ifdef __ARCH_HAVE_wordrel
+#define DEFINE_REL_CALLBACK(sect, func) __asm__(".pushsection " sect "\n\t\t.wordrel " PP_PRIVATE_STR(func) "\n\t.popsection")
+#endif /* __ARCH_HAVE_wordrel */
+#ifdef __ARCH_HAVE_wordoff
+#define DEFINE_OFF_CALLBACK(sect, func) __asm__(".pushsection " sect "\n\t\t.wordoff " PP_PRIVATE_STR(func) "\n\t.popsection")
+#endif /* __ARCH_HAVE_wordoff */
+#endif /* !__ASSEMBLER__ */
+
+#ifdef BUILDING_KERNEL_CORE
+#define DEFINE_CALLBACK_IS_ABS
+#define DEFINE_CALLBACK DEFINE_ABS_CALLBACK
+#elif defined(__ARCH_HAVE_wordrel)
+#define DEFINE_CALLBACK_IS_REL
+#define DEFINE_CALLBACK DEFINE_REL_CALLBACK
+#elif defined(__ARCH_HAVE_wordoff)
+#define DEFINE_CALLBACK_IS_OFF
+#define DEFINE_CALLBACK DEFINE_OFF_CALLBACK
+#else /* ... */
+#error "No way to implement `DEFINE_CALLBACK'"
+#endif /* !... */
+
+
+
 extern "C++" {
 __NAMESPACE_INT_BEGIN
 template<class T> class _finally_decref {
@@ -414,7 +454,5 @@ __NAMESPACE_INT_END
 #define DEFINE_REFCNT_FUNCTIONS_P     __DEFINE_REFCNT_FUNCTIONS_P
 #define DEFINE_WEAKREFCNT_FUNCTIONS   __DEFINE_WEAKREFCNT_FUNCTIONS
 #define DEFINE_WEAKREFCNT_FUNCTIONS_P __DEFINE_WEAKREFCNT_FUNCTIONS_P
-
-#include <kernel/arch/compiler.h>
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_COMPILER_H */

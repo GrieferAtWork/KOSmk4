@@ -323,7 +323,7 @@ taskpid_gettask_srch(struct taskpid *__restrict self)
 /* TASK PID NAMESPACE                                                   */
 /************************************************************************/
 INTDEF struct taskpid boottask_pid;
-INTDEF struct taskpid bootidle_pid;
+INTDEF struct taskpid bootcpu_idle_pid;
 INTDEF struct taskpid asyncwork_pid;
 
 /*[[[deemon
@@ -337,7 +337,7 @@ local nodes = {
 local staticPidTree = Cell(none);
 for (local x: nodes)
 	llrbtree.insert(staticPidTree, x);
-function pidof(x) -> x is none ? "NULL" : x.val == "thiscpu_idle" ? "&bootidle_pid" : f"&{x.val}_pid";
+function pidof(x) -> x is none ? "NULL" : x.val == "thiscpu_idle" ? "&bootcpu_idle_pid" : f"&{x.val}_pid";
 for (local x: nodes) {
 	print("INTERN ", (x.val == "thiscpu_idle" ? "ATTR_PERCPU " : ""), "struct taskpid ", x.val, "_pid = {");
 	print("	.tp_refcnt = 2, /" "* +1: ", x.val, "_pid, +1: FORTASK(", x.val, ", this_taskpid) *" "/");
@@ -349,7 +349,7 @@ for (local x: nodes) {
 	print("		._tp_pad    = {}");
 	print("	}},");
 	local prev, next = {
-		"asyncwork"    : ("&boottask_procctl.pc_thrds_list.lh_first", "&bootidle_pid"),
+		"asyncwork"    : ("&boottask_procctl.pc_thrds_list.lh_first", "&bootcpu_idle_pid"),
 		"thiscpu_idle" : ("&asyncwork_pid.tp_parsib.le_next", "NULL"),
 	}.get(x.val, ("NULL", "NULL"))...;
 	print("	.tp_proc   = &boottask_pid,");
@@ -420,7 +420,7 @@ INTERN struct taskpid asyncwork_pid = {
 	}},
 	.tp_proc   = &boottask_pid,
 	.tp_pctl   = &boottask_procctl,
-	.tp_parsib = { .le_next = &bootidle_pid, .le_prev = &boottask_procctl.pc_thrds_list.lh_first },
+	.tp_parsib = { .le_next = &bootcpu_idle_pid, .le_prev = &boottask_procctl.pc_thrds_list.lh_first },
 	.tp_ns     = &pidns_root,
 	.tp_pids   = {
 		[0] = {
@@ -429,7 +429,7 @@ INTERN struct taskpid asyncwork_pid = {
 		}
 	}
 };
-#define STATIC_TASKPID_TREE_ROOT &bootidle_pid
+#define STATIC_TASKPID_TREE_ROOT &bootcpu_idle_pid
 /*[[[end]]]*/
 
 /* `/proc/sys/kernel/pid_max': When `pn_nextpid' >= this
@@ -438,7 +438,7 @@ PUBLIC pid_t pid_recycle_threshold = PID_RECYCLE_THRESHOLD_DEFAULT;
 
 /* The root PID namespace. */
 PUBLIC struct pidns pidns_root = {
-	.pn_refcnt  = 5,    /* +1: pidns_root, +1: boottask_pid, +1: bootidle_pid, +1: asyncwork_pid, +1: boottask_procgrp.pgr_ns */
+	.pn_refcnt  = 5,    /* +1: pidns_root, +1: boottask_pid, +1: bootcpu_idle_pid, +1: asyncwork_pid, +1: boottask_procgrp.pgr_ns */
 	.pn_ind     = 0,    /* Root namespace indirection */
 	.pn_par     = NULL, /* Root namespace doesn't have a parent */
 	.pn_size    = 3,    /* +1: boottask, +1: bootidle, +1: asyncwork */

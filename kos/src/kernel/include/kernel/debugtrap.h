@@ -22,19 +22,16 @@
 
 #include <kernel/compiler.h>
 
-#include <kos/debugtrap.h>
 #include <kernel/types.h>
+
+#include <kos/debugtrap.h>
+#include <kos/kernel/cpu-state.h>
+
 #include <stdbool.h>
 
 DECL_BEGIN
 
 #ifdef __CC__
-struct icpustate;
-struct scpustate;
-struct ucpustate;
-struct kcpustate;
-struct lcpustate;
-struct fcpustate;
 
 struct kernel_debugtraps {
 	/* NOTE: Either all callbacks from this structure are defined, or none of them are. */

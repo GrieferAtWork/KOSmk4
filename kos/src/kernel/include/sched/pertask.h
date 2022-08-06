@@ -22,12 +22,13 @@
 
 #include <kernel/compiler.h>
 
-#include <sched/arch/pertask.h>
-
 #include <hybrid/typecore.h>
 
-#ifdef __CC__
+#ifndef CONFIG_NO_SMP
+#include <sched/arch/pertask.h>
+#endif /* !CONFIG_NO_SMP */
 
+#ifdef __CC__
 #if defined(__INTELLISENSE__) && defined(__cplusplus)
 struct task;
 struct cpu;
@@ -54,7 +55,11 @@ template<class __T> __T const &(FORMMAN)(struct mman const *__restrict self, __T
 #endif /* !__INTELLISENSE__ || !__cplusplus */
 
 
-#ifndef PERTASK
+#ifdef CONFIG_NO_SMP
+DATDEF struct task *bootcpu_sched_current;
+#define THIS_TASK  ((struct task *)bootcpu_sched_current)
+#define PERTASK(x) (*(__typeof__(&(x)))((__BYTE_TYPE__ *)bootcpu_sched_current + (__UINTPTR_TYPE__)(void *)&(x)))
+#elif !defined(PERTASK)
 #error "Arch didn't `#define PERTASK'"
 #endif /* !PERTASK */
 
@@ -93,15 +98,14 @@ extern struct task *THIS_TASK;
 #endif /* !__INTELLISENSE__ */
 
 #ifndef PERCPU
-DECL_BEGIN
 #ifdef CONFIG_NO_SMP
-INTDEF __UINT8_TYPE__ ___bootcpu[] ASMNAME("bootcpu");
-#define PERCPU(x) (*(__typeof__(&(x)))(___bootcpu + (__UINTPTR_TYPE__)&(x)))
+#define PERCPU(x) x
 #else /* CONFIG_NO_SMP */
+DECL_BEGIN
 DATDEF __UINTPTR_TYPE__ ___this_cpu ASMNAME("this_cpu");
+DECL_END
 #define PERCPU(x) (*(__typeof__(&(x)))(PERTASK_GET(___this_cpu) + (__UINTPTR_TYPE__)&(x)))
 #endif /* !CONFIG_NO_SMP */
-DECL_END
 #endif /* !PERCPU */
 
 #ifndef PERTASK_TESTMASK

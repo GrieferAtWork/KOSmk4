@@ -33,7 +33,7 @@ __ASM_BEGIN
 
 /* Emit an 8-bit word */
 __ASM_L(.macro .word8 value:req)
-__ASM_L(	.1byte __ASM_ARG(\value))
+__ASM_L(	.byte __ASM_ARG(\value))
 __ASM_L(.endm)
 
 /* Emit a 16-bit word */

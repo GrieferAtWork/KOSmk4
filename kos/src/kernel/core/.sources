@@ -303,7 +303,7 @@ BEGIN
 			(".debug_loclists", "__kernel_debug_loclists_start", "__kernel_debug_loclists_size"),
 		};
 
-		LINKER_SCRIPT(f"arch/{XARCH}/_kernel.ld")
+		LINKER_SCRIPT("_kernel.ld")
 		SET_OUTPUT("/os/kernel.bin")
 		STATIC_USELIBGCC()
 		SOURCE(KERNEL_ASM_SOURCES)

@@ -41,6 +41,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <hybrid/overflow.h>
 
 #include <compat/config.h>
+#include <kos/except.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 

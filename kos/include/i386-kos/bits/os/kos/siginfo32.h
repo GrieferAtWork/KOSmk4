@@ -70,6 +70,7 @@
 #define __OFFSET_SIGINFO_SYSCALL   __OFFSET_SIGINFOX32_SYSCALL
 #define __OFFSET_SIGINFO_ARCH      __OFFSET_SIGINFOX32_ARCH
 #define __SIZEOF_SIGINFO           __SIZEOF_SIGINFOX32
+#define __ALIGNOF_SIGINFO          __ALIGNOF_SIGINFOX32
 #define __siginfox32_struct        __siginfo_struct
 #endif /* !__x86_64__ && __i386__ */
 
@@ -106,6 +107,7 @@
 #define __OFFSET_SIGINFOX32_SYSCALL   16 /* [FIELD(si_syscall, _sifields._sigsys._syscall)] */
 #define __OFFSET_SIGINFOX32_ARCH      20 /* [FIELD(si_arch, _sifields._sigsys._arch)] */
 #define __SIZEOF_SIGINFOX32           __SIX32_MAX_SIZE
+#define __ALIGNOF_SIGINFOX32          4
 
 
 #ifdef __CC__

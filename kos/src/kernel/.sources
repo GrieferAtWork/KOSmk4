@@ -129,16 +129,18 @@ BEGIN
 		DEFINE_SIMPLE_DRIVER("usb-hid", LIB(":usb")) /* Link against usb driver */
 		DEFINE_SIMPLE_DRIVER("usb-storage", LIB(":usb")) /* Link against usb driver */
 #endif
-		DEFINE_SIMPLE_DRIVER("usb")
 
 		DEFINE_SIMPLE_DRIVER("procfs")
 		DEFINE_SIMPLE_DRIVER("ext2")
 		DEFINE_SIMPLE_DRIVER("iso9660")
-		DEFINE_SIMPLE_DRIVER("ne2k")
-		DEFINE_SIMPLE_DRIVER("ps2")
 		DEFINE_SIMPLE_DRIVER("tar")
+		if (TARGET_ARCH !in ["arm"]) { // TODO: ARM compat
+			DEFINE_SIMPLE_DRIVER("usb")
+			DEFINE_SIMPLE_DRIVER("ne2k")
+			DEFINE_SIMPLE_DRIVER("ps2")
+			DEFINE_SIMPLE_ARCH_DRIVER("gdbserver")
+		}
 
-		DEFINE_SIMPLE_ARCH_DRIVER("gdbserver")
 		DEFINE_SIMPLE_DRIVER("dbx") /* DeBug eXtensions */
 
 		DEFINE_SIMPLE_DRIVER("sctrace",

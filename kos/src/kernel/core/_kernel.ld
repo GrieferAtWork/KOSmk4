@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386__KERNEL_LD
-#define GUARD_KERNEL_CORE_ARCH_I386__KERNEL_LD 1
+#ifndef GUARD_KERNEL_CORE__KERNEL_LD
+#define GUARD_KERNEL_CORE__KERNEL_LD 1
 #define __LINKER__ 1
 #define _KOS_SOURCE 1
 #define _KOS_KERNEL_SOURCE 1
@@ -27,22 +27,25 @@
 
 #include <kernel/paging.h>
 #include <kernel/selftest.h>
+#include <sched/task.h> /* CONFIG_HAVE_KERNEL_STACK_GUARD */
+
+#include <hybrid/align.h>
+#include <hybrid/host.h>
+
+#include <asm/cacheline.h>
+#include <asm/pageid.h>
+
+#if defined(__i386__) || defined(__x86_64__)
 #include <kernel/x86/gdt.h>
 #include <kernel/x86/idt.h>
 #include <kernel/x86/multiboot.h>
 #include <kernel/x86/syscall-tables.h>
-#include <sched/task.h> /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 #include <sched/x86/tss.h>
-
-#include <hybrid/align.h>
-
-#include <asm/cacheline.h>
-#include <asm/pageid.h>
 #include <kos/kernel/gdt.h>
 #include <kos/kernel/segment.h>
 
-/**/
-#include "boot/start.h" /* CONFIG_NO_KERNEL_X86_BOOT0 */
+#include "arch/i386/boot/start.h" /* CONFIG_NO_KERNEL_X86_BOOT0 */
+#endif /* __i386__ || __x86_64__ */
 
 #undef likely
 #undef unlikely
@@ -65,13 +68,25 @@
 	PEROBJECT_SECTION_EX(section_name, name, 0, sections)
 
 
+#ifdef CONFIG_NO_SMP
+#define BOOTCPU_SYMBOL(thiscpu_name) thiscpu_name
+#else /* CONFIG_NO_SMP */
+#define BOOTCPU_SYMBOL(thiscpu_name) bootcpu + thiscpu_name
+#endif /* !CONFIG_NO_SMP */
+
+
 ENTRY(_start)
 SECTIONS {
 
+#if defined(__i386__) || defined(__x86_64__)
 	. = KERNEL_CORE_BASE + 0x100000;
+#else /* __i386__ || __x86_64__ */
+	. = KERNEL_CORE_BASE;
+#endif /* !__i386__ && !__x86_64__ */
 
 	PROVIDE_HIDDEN(__kernel_start = ABSOLUTE(.));
 
+#if defined(__i386__) || defined(__x86_64__)
 #ifndef CONFIG_NO_KERNEL_X86_BOOT0
 	SECTION(.x86.boot0) {
 		KEEP(*(.x86.boot0))
@@ -96,6 +111,7 @@ SECTIONS {
 		PROVIDE_HIDDEN(__386_kernel_mb2_chksum = ABSOLUTE(0 - (MB2_HEADER_MAGIC + MB2_ARCHITECTURE_I386 + __386_kernel_mb2_size)));
 #endif /* !__x86_64__ */
 	}
+#endif /* __i386__ || __x86_64__ */
 
 	IP_ALIGN(PAGESIZE);
 	PROVIDE_HIDDEN(__kernel_sect_text_start = ABSOLUTE(.));
@@ -107,6 +123,7 @@ SECTIONS {
 		*(.text.crt.*)
 		*(.text.kernel.*)
 		*(.text.unlikely*)     /* Should be necessary, but prevents problems... */
+#if defined(__i386__) || defined(__x86_64__)
 		*(.text.x86.syscall.*) /* C-level implementations of system calls. */
 #ifdef __x86_64__
 		*(.text.x86.syscall32.*) /* C-level implementations of system calls (for compatibility mode). */
@@ -126,6 +143,7 @@ SECTIONS {
 		*(.text.x86.asm32_syscall_sysrun32.*)
 #endif /* __x86_64__ */
 		*(.text.x86.*)
+#endif /* __i386__ || __x86_64__ */
 //		*(.text.local.*)
 		*(.text.cold .text.unlikely .text.cold.*)
 	}
@@ -141,7 +159,9 @@ SECTIONS {
 	PROVIDE_HIDDEN(__kernel_rodata_startpage_p = addr2pageptr_p(ABSOLUTE(.)));
 	SECTION(.rodata) {
 		*(.rodata.hot .rodata.likely .rodata.hot.*)
+#if defined(__i386__) || defined(__x86_64__)
 		*(.rodata.x86.*)
+#endif /* __i386__ || __x86_64__ */
 		KEEP(*(.rodata.execabi_system_rtld))
 		PROVIDE_HIDDEN(execabi_system_rtld_startpage_p = addr2pageptr_p(ABSOLUTE(execabi_system_rtld)));
 		PROVIDE_HIDDEN(execabi_system_rtld_numpages    = ABSOLUTE(execabi_system_rtld_size) / PAGESIZE);
@@ -216,13 +236,15 @@ SECTIONS {
 		KEEP(*(.data.percpu.head))
 		KEEP(*(.data.percpu))
 		PROVIDE(thiscpu_idle = ABSOLUTE(ALIGN(__ARCH_CACHELINESIZE)));
+		PROVIDE_HIDDEN(__kernel_percpu_full_bytes = CEIL_ALIGN(ABSOLUTE(thiscpu_x86_iob) + 8192 + 1, PAGESIZE));
+#if defined(__i386__) || defined(__x86_64__)
 		PROVIDE(thiscpu_x86_tss = CEIL_ALIGN(ABSOLUTE(thiscpu_idle + __kernel_pertask_size), PAGESIZE));
 		PROVIDE(thiscpu_x86_iob = ABSOLUTE(thiscpu_x86_tss) + PAGESIZE);
-		PROVIDE_HIDDEN(__kernel_percpu_full_bytes = CEIL_ALIGN(ABSOLUTE(thiscpu_x86_iob) + 8192 + 1, PAGESIZE));
 		PROVIDE_HIDDEN(__x86_cpu_part1_bytes = ABSOLUTE(thiscpu_x86_iob));
 		PROVIDE_HIDDEN(__x86_cpu_part1_pages = ABSOLUTE(thiscpu_x86_iob) / PAGESIZE);
 /*		PROVIDE_HIDDEN(__x86_cpu_part2_pages = ABSOLUTE(2)); */
 /*		PROVIDE_HIDDEN(__x86_cpu_part3_pages = ABSOLUTE(1)); */
+#endif /* __i386__ || __x86_64__ */
 	})
 #endif /* !CONFIG_NO_SMP */
 
@@ -285,6 +307,7 @@ SECTIONS {
 		PROVIDE(thiscpu_idle = ABSOLUTE(.));
 		. += __kernel_pertask_size;
 		IP_ALIGN(PAGESIZE);
+#if defined(__i386__) || defined(__x86_64__)
 		PROVIDE(thiscpu_x86_tss = ABSOLUTE(.));
 		KEEP(*(.data.percpu.tss))
 		STATIC_ASSERT((ABSOLUTE(.) - ABSOLUTE(__kernel_percpu_tss)) == SIZEOF_TSS);
@@ -296,6 +319,7 @@ SECTIONS {
 		PROVIDE_HIDDEN(__x86_kernel_data_before_iob_pages = ABSOLUTE(__x86_kernel_data_before_iob_size) / PAGESIZE);
 		. += 8192; /* Make space for the IOBM table. */
 		. += 1;    /* Trailing FFh-byte */
+#endif /* __i386__ || __x86_64__ */
 #endif /* CONFIG_NO_SMP */
 
 #ifndef CONFIG_NO_KERNEL_BRANCH_PROFILING
@@ -317,10 +341,12 @@ SECTIONS {
 		PROVIDE_HIDDEN(__kernel_data_end = ABSOLUTE(.));
 		PROVIDE_HIDDEN(__kernel_data_size = ABSOLUTE(ABSOLUTE(__kernel_data_end) - ABSOLUTE(__kernel_data_start)));
 		PROVIDE_HIDDEN(__kernel_data_numpages = ABSOLUTE(__kernel_data_size) / PAGESIZE);
+#if defined(__i386__) || defined(__x86_64__)
 #ifdef CONFIG_NO_SMP
 		PROVIDE_HIDDEN(__x86_kernel_data_after_iob_size = ABSOLUTE(__kernel_bss_end - __x86_iob_empty_base));
 		PROVIDE_HIDDEN(__x86_kernel_data_after_iob_pages = ABSOLUTE(__x86_kernel_data_after_iob_size) / PAGESIZE);
 #endif /* CONFIG_NO_SMP */
+#endif /* __i386__ || __x86_64__ */
 
 		PROVIDE_HIDDEN(__kernel_xdata_start = ABSOLUTE(.));
 		PROVIDE_HIDDEN(__kernel_xdata_startpage_p = addr2pageptr_p(ABSOLUTE(.)));
@@ -343,11 +369,13 @@ SECTIONS {
 		*(.text.xdata .xdata)
 		*(.text.xdata.cold .xdata.cold .text.xdata.unlikely .xdata.unlikely)
 
+#if defined(__i386__) || defined(__x86_64__)
 		PROVIDE_HIDDEN(bootcpu_x86_df_stack = ABSOLUTE(.));
 		PROVIDE_HIDDEN(bootcpu_x86_df_stackpage_p = addr2pageptr_p(ABSOLUTE(bootcpu_x86_df_stack)));
 		KEEP(*(.text.xdata.x86.free_unloader))
 		/* Allocate the remainder for the boot cpu's #DF stack. */
 		. += (KERNEL_DF_STACKSIZE - (ABSOLUTE(.) - ABSOLUTE(bootcpu_x86_df_stack)));
+#endif /* __i386__ || __x86_64__ */
 	}
 	PROVIDE_HIDDEN(__kernel_sect_data_size = ABSOLUTE(ABSOLUTE(.) - ABSOLUTE(__kernel_sect_data_start)));
 
@@ -375,6 +403,7 @@ SECTIONS {
 		PROVIDE(bootidle = ABSOLUTE(.));
 		. += __kernel_pertask_size;
 		STATIC_ASSERT((bootcpu & PAGEMASK) == 0);
+#if defined(__i386__) || defined(__x86_64__)
 		STATIC_ASSERT((thiscpu_x86_tss & PAGEMASK) == 0);
 		STATIC_ASSERT((thiscpu_x86_iob & PAGEMASK) == 0);
 		. = ABSOLUTE(bootcpu + thiscpu_x86_tss);
@@ -390,10 +419,13 @@ SECTIONS {
 		STATIC_ASSERT((ABSOLUTE(.) & PAGEMASK) == 0);
 		. += 8192; /* Make space for the IOBM table. */
 		. += 1;    /* Trailing FFh-byte */
+#endif /* __i386__ || __x86_64__ */
 #endif /* !CONFIG_NO_SMP */
 
+#if defined(__i386__) || defined(__x86_64__)
 		/* The value stored in `thiscpu_x86_iob.t_iomap' */
 		PROVIDE_HIDDEN(__x86_cputss_iob_offset = ABSOLUTE(thiscpu_x86_iob - thiscpu_x86_tss));
+#endif /* __i386__ || __x86_64__ */
 
 		IP_ALIGN(__ARCH_CACHELINESIZE);
 		PROVIDE(boottask = ABSOLUTE(.));
@@ -452,8 +484,10 @@ SECTIONS {
 		IP_ALIGN(PAGESIZE);
 		*(.bss.mall.untracked)
 
+#if defined(__i386__) || defined(__x86_64__)
 		IP_ALIGN(PAGESIZE);
 		KEEP(*(.bss.x86.pagedir_kernel_share))
+#endif /* __i386__ || __x86_64__ */
 	}
 	PROVIDE_HIDDEN(__kernel_sect_bss_size = ABSOLUTE(ABSOLUTE(.) - ABSOLUTE(__kernel_sect_bss_start)));
 
@@ -461,10 +495,12 @@ SECTIONS {
 	PROVIDE_HIDDEN(__kernel_bss_end = ABSOLUTE(.));
 	PROVIDE_HIDDEN(__kernel_bss_size = ABSOLUTE(ABSOLUTE(__kernel_bss_end) - ABSOLUTE(__kernel_bss_start)));
 	PROVIDE_HIDDEN(__kernel_bss_numpages = ABSOLUTE(__kernel_bss_size) / PAGESIZE);
+#if defined(__i386__) || defined(__x86_64__)
 #ifndef CONFIG_NO_SMP
 	PROVIDE_HIDDEN(__x86_kernel_bss_after_iob_size = ABSOLUTE(__kernel_bss_end - __x86_iob_empty_base));
 	PROVIDE_HIDDEN(__x86_kernel_bss_after_iob_pages = ABSOLUTE(__x86_kernel_bss_after_iob_size) / PAGESIZE);
 #endif /* !CONFIG_NO_SMP */
+#endif /* __i386__ || __x86_64__ */
 
 
 	PROVIDE_HIDDEN(__kernel_free_start = ABSOLUTE(.));
@@ -502,6 +538,7 @@ SECTIONS {
 		KEEP(*(.rodata.free.commandline_options.late))
 		PROVIDE_HIDDEN(__kernel_commandline_late_end = ABSOLUTE(.));
 
+#if defined(__i386__) || defined(__x86_64__)
 #ifdef __x86_64__
 		PROVIDE_HIDDEN(__x86_fixup_fsgsbase_start = ABSOLUTE(.));
 		KEEP(*(.rodata.free.x86.fixup_fsgsbase))
@@ -517,6 +554,7 @@ SECTIONS {
 		PROVIDE_HIDDEN(__x86_alternatives_start = ABSOLUTE(.));
 		KEEP(*(.alternatives))
 		PROVIDE_HIDDEN(__x86_alternatives_end = ABSOLUTE(.));
+#endif /* __i386__ || __x86_64__ */
 
 #ifdef CONFIG_HAVE_KERNEL_SELFTEST
 		PROVIDE_HIDDEN(__kernel_selftest_start = ABSOLUTE(.));
@@ -541,26 +579,26 @@ SECTIONS {
 		PROVIDE_HIDDEN(__kernel_free_numpages = ABSOLUTE(__kernel_free_size) / PAGESIZE);
 	}
 
-	PROVIDE_HIDDEN(__templatecpu_x86_gdt = ABSOLUTE(__kernel_percpu_start + thiscpu_x86_gdt));
-	PROVIDE_HIDDEN(bootcpu_x86_dfstack_node = ABSOLUTE(bootcpu + thiscpu_x86_dfstacknode));
-	PROVIDE_HIDDEN(bootcpu_x86_dfstack_part = ABSOLUTE(bootcpu + thiscpu_x86_dfstackpart));
-	PROVIDE(bootcpu_x86_cpufeatures = ABSOLUTE(bootcpu + thiscpu_x86_cpufeatures));
-	PROVIDE(bootcpu_x86_cpuid = ABSOLUTE(bootcpu + thiscpu_x86_cpuid));
-	PROVIDE(bootcpu_x86_gdt = ABSOLUTE(bootcpu + thiscpu_x86_gdt));
 
+	PROVIDE(thiscpu_idle_sstate = ABSOLUTE(ABSOLUTE(thiscpu_idle) + ABSOLUTE(this_sstate)));
+	PROVIDE_HIDDEN(bootcpu_idle_pid = ABSOLUTE(BOOTCPU_SYMBOL(thiscpu_idle_pid)));
+	PROVIDE_HIDDEN(bootcpu_sched_current = ABSOLUTE(BOOTCPU_SYMBOL(thiscpu_sched_current)));
+
+#if defined(__i386__) || defined(__x86_64__)
 #ifndef CONFIG_NO_KERNEL_X86_BOOT0
 	PROVIDE_HIDDEN(__kernel_sector_count = ABSOLUTE((__kernel_size + 511) / 512));
 #endif /* !CONFIG_NO_KERNEL_X86_BOOT0 */
 
-#ifdef CONFIG_NO_SMP
-#define TSS_BASE    thiscpu_x86_tss
-#define TSS_DF_BASE thiscpu_x86_tssdf
-#define LDT_BASE    thiscpu_x86_ldt
-#else /* CONFIG_NO_SMP */
-#define TSS_BASE    bootcpu + thiscpu_x86_tss
-#define TSS_DF_BASE bootcpu + thiscpu_x86_tssdf
-#define LDT_BASE    bootcpu + thiscpu_x86_ldt
-#endif /* !CONFIG_NO_SMP */
+	PROVIDE_HIDDEN(__templatecpu_x86_gdt = ABSOLUTE(__kernel_percpu_start + thiscpu_x86_gdt));
+	PROVIDE_HIDDEN(bootcpu_x86_dfstack_node = ABSOLUTE(BOOTCPU_SYMBOL(thiscpu_x86_dfstacknode)));
+	PROVIDE_HIDDEN(bootcpu_x86_dfstack_part = ABSOLUTE(BOOTCPU_SYMBOL(thiscpu_x86_dfstackpart)));
+	PROVIDE(bootcpu_x86_cpufeatures = ABSOLUTE(BOOTCPU_SYMBOL(thiscpu_x86_cpufeatures)));
+	PROVIDE(bootcpu_x86_cpuid = ABSOLUTE(BOOTCPU_SYMBOL(thiscpu_x86_cpuid)));
+	PROVIDE(bootcpu_x86_gdt = ABSOLUTE(BOOTCPU_SYMBOL(thiscpu_x86_gdt)));
+
+#define TSS_BASE    BOOTCPU_SYMBOL(thiscpu_x86_tss)
+#define TSS_DF_BASE BOOTCPU_SYMBOL(thiscpu_x86_tssdf)
+#define LDT_BASE    BOOTCPU_SYMBOL(thiscpu_x86_ldt)
 
 	/* The size of the `struct tss' plus the associated IOB vector addend. */
 #define SIZEOF_TSS_PLUS_IOB_VECTOR \
@@ -590,7 +628,6 @@ SECTIONS {
 #undef GDT_DB
 #undef GDT_L
 
-	PROVIDE(thiscpu_idle_sstate = ABSOLUTE(ABSOLUTE(thiscpu_idle) + ABSOLUTE(this_sstate)));
 	PROVIDE(thiscpu_idle_x86_kernel_psp0 = ABSOLUTE(ABSOLUTE(thiscpu_idle) + ABSOLUTE(this_x86_kernel_psp0)));
 
 	PROVIDE_HIDDEN(x86_dbg_cpu_temporary_b0 = (ABSOLUTE(dbg_cpu_temporary) & 0x000000ff) >> 0);
@@ -616,9 +653,8 @@ SECTIONS {
 #endif /* __x86_64__ */
 
 #ifndef __x86_64__
-	PROVIDE_HIDDEN(bootcpu_thiscpu_x86_tss = ABSOLUTE(bootcpu + thiscpu_x86_tss));
+	PROVIDE_HIDDEN(bootcpu_x86_tss = ABSOLUTE(BOOTCPU_SYMBOL(thiscpu_x86_tss)));
 #endif /* !__x86_64__ */
-	PROVIDE_HIDDEN(bootidle_pid = ABSOLUTE(bootcpu + thiscpu_idle_pid));
 
 #ifndef __x86_64__
 #ifndef CONFIG_NO_KERNEL_X86_PAGING_P32
@@ -629,20 +665,21 @@ SECTIONS {
 #endif /* !__x86_64__ */
 
 	/* The main IDT used during normal operations */
-#include "idt/idt.ld"
+#include "arch/i386/idt/idt.ld"
 
 #ifndef CONFIG_NO_KERNEL_DEBUGGER
 
 	/* The IDT active for `dbg_cpu' while the debugger is in use */
 #define PREFIX x86_dbg
-#include "idt/idt.ld"
+#include "arch/i386/idt/idt.ld"
 
 #ifndef CONFIG_NO_SMP
 	/* The IDT active for all CPUs other than `dbg_cpu' while the debugger is in use */
 #define PREFIX x86_dbgaltcore
-#include "idt/idt.ld"
+#include "arch/i386/idt/idt.ld"
 #endif /* !CONFIG_NO_SMP */
 #endif /* !CONFIG_NO_KERNEL_DEBUGGER */
+#endif /* __i386__ || __x86_64__ */
 
 	/* Allocate debug sections alongside each other. */
 	.debug_line 0 : { *(.debug_line) }
@@ -666,4 +703,4 @@ SECTIONS {
 	}
 }
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386__KERNEL_LD */
+#endif /* !GUARD_KERNEL_CORE__KERNEL_LD */

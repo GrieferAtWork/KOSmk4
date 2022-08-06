@@ -127,7 +127,7 @@ PUBLIC ATTR_PERCPU struct mnode thiscpu_x86_dfstacknode_ = {
 
 #ifndef __x86_64__
 INTDEF void ASMCALL x86_idt_double_fault(void);
-INTDEF byte_t bootcpu_thiscpu_x86_tss[];
+INTDEF byte_t bootcpu_x86_tss[];
 
 PUBLIC ATTR_PERCPU struct tss thiscpu_x86_tssdf = {
 	.t_link       = 0,
@@ -149,7 +149,7 @@ PUBLIC ATTR_PERCPU struct tss thiscpu_x86_tssdf = {
 	.t_edx        = 0,
 	.t_ebx        = (u32)&bootcpu,                 /* Used by the implementation. */
 	.t_esp        = (uintptr_t)COMPILER_ENDOF(bootcpu_x86_df_stack),
-	.t_ebp        = (u32)&bootcpu_thiscpu_x86_tss, /* Used by the implementation. */
+	.t_ebp        = (u32)&bootcpu_x86_tss, /* Used by the implementation. */
 	.t_esi        = 0,
 	.t_edi        = 0,
 	.t_es         = SEGMENT_USER_DATA_RPL,

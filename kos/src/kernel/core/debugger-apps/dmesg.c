@@ -39,6 +39,7 @@
 
 #include <hybrid/align.h>
 
+#include <kos/except.h>
 #include <kos/keyboard.h>
 
 #include <alloca.h>

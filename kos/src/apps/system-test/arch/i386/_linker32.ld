@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_APPS_SYSTEM_TEST_ARC_I386__LINKER32_LD
-#define GUARD_APPS_SYSTEM_TEST_ARC_I386__LINKER32_LD 1
+#ifndef GUARD_APPS_SYSTEM_TEST_ARCH_I386__LINKER32_LD
+#define GUARD_APPS_SYSTEM_TEST_ARCH_I386__LINKER32_LD 1
 
 #include <hybrid/typecore.h>
 
@@ -203,4 +203,4 @@ SECTIONS {
 	}
 }
 
-#endif /* !GUARD_APPS_SYSTEM_TEST_ARC_I386__LINKER32_LD */
+#endif /* !GUARD_APPS_SYSTEM_TEST_ARCH_I386__LINKER32_LD */

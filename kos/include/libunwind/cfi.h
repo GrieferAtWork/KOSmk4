@@ -531,11 +531,11 @@
  *    As  such, using capsules to alter the value of the stack-pointer while a non-zero value
  *    for `DW_CFA_GNU_args_size' is in effect results in weak undefined behavior (that is: it
  *    is undefined in which order capsule/DW_CFA_GNU_args_size adjustments are performed)
- *  - CFI capsules may not to used inside of initialization text (f_inittext), but can only
+ *  - CFI capsules may not be used inside of initialization text (f_inittext), but can only
  *    appear inside of eval-text (f_evaltext)
  *
  * A patch to (among other things) enable  support for this extension by binutils  can
- * be found as part of the KOS source tree under /kos/misc/patches/binutils-2.32.patch
+ * be found as part of the KOS source tree under /kos/misc/patches/binutils-2.38.patch
  */
 
 

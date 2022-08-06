@@ -46,6 +46,18 @@ __DECL_BEGIN
 /************************************************************************/
 /* `struct gpregs32'                                                    */
 /************************************************************************/
+#define gpregs32_foreach_elem(self) \
+	((__UINT64_TYPE__ const *)__COMPILER_REQTYPE(struct gpregs32 const *, self))
+#define gpregs32_foreach_size(self) 8
+#define gpregs32_foreach(self, cb)                                 \
+	do {                                                           \
+		unsigned int __gpregs32_foreach_i;                         \
+		for (__gpregs32_foreach_i = 0;                             \
+		     __gpregs32_foreach_i < gpregs32_foreach_size(self);   \
+		     ++__gpregs32_foreach_i) {                             \
+			cb(gpregs32_foreach_elem(self)[__gpregs32_foreach_i]); \
+		}                                                          \
+	}	__WHILE0
 #define gpregs32_getedi(self)        ((__u32)(self)->gp_edi)
 #define gpregs32_setedi(self, value) ((self)->gp_edi = (value))
 #define gpregs32_getesi(self)        ((__u32)(self)->gp_esi)
@@ -198,6 +210,18 @@ __DECL_BEGIN
 /************************************************************************/
 /* `struct lcpustate32'                                                 */
 /************************************************************************/
+#define lcpustate32_foreach_gpregs_elem(self) \
+	((__UINT64_TYPE__ const *)__COMPILER_REQTYPE(struct lcpustate32 const *, self))
+#define lcpustate32_foreach_gpregs_size(self) 6
+#define lcpustate32_foreach_gpregs(self, cb)                                    \
+	do {                                                                        \
+		unsigned int __lcpustate32_foreach_i;                                   \
+		for (__lcpustate32_foreach_i = 0;                                       \
+		     __lcpustate32_foreach_i < lcpustate32_foreach_gpregs_size(self);   \
+		     ++__lcpustate32_foreach_i) {                                       \
+			cb(lcpustate32_foreach_gpregs_elem(self)[__lcpustate32_foreach_i]); \
+		}                                                                       \
+	}	__WHILE0
 #define lcpustate32_geteip(self)        ((__u32)(self)->lcs_eip)
 #define lcpustate32_seteip(self, value) ((self)->lcs_eip = (value))
 #define lcpustate32_getesp(self)        ((__u32)(self)->lcs_esp)
@@ -299,12 +323,15 @@ __NOTHROW_NCX(lcpustate32_to_kcpustate32)(struct lcpustate32 const *__restrict _
 /************************************************************************/
 /* `struct kcpustate32'                                                 */
 /************************************************************************/
-#define kcpustate32_geteip(self)           ((__u32)(self)->kcs_eip)
-#define kcpustate32_seteip(self, value)    ((self)->kcs_eip = (value))
-#define kcpustate32_getesp(self)           ((__u32)(self)->kcs_gpregs.gp_esp)
-#define kcpustate32_setesp(self, value)    ((self)->kcs_gpregs.gp_esp = (value))
-#define kcpustate32_geteflags(self)        ((__u32)(self)->kcs_eflags)
-#define kcpustate32_seteflags(self, value) ((self)->kcs_eflags = (value))
+#define kcpustate32_foreach_gpregs_elem(self)   gpregs32_foreach_elem(&(self)->kcs_gpregs)
+#define kcpustate32_foreach_gpregs_size(self)   gpregs32_foreach_size(&(self)->kcs_gpregs)
+#define kcpustate32_foreach_gpregs(self, cb)    gpregs32_foreach(&(self)->kcs_gpregs, cb)
+#define kcpustate32_geteip(self)                ((__u32)(self)->kcs_eip)
+#define kcpustate32_seteip(self, value)         ((self)->kcs_eip = (value))
+#define kcpustate32_getesp(self)                ((__u32)(self)->kcs_gpregs.gp_esp)
+#define kcpustate32_setesp(self, value)         ((self)->kcs_gpregs.gp_esp = (value))
+#define kcpustate32_geteflags(self)             ((__u32)(self)->kcs_eflags)
+#define kcpustate32_seteflags(self, value)      ((self)->kcs_eflags = (value))
 #define kcpustate32_mskeflags(self, mask, flag) ((self)->kcs_eflags = ((self)->kcs_eflags & (mask)) | (flag))
 #define kcpustate32_to_kcpustate32(self, result)                        \
 	__libc_memcpy(__COMPILER_REQTYPE(struct kcpustate32 *, result),     \
@@ -492,6 +519,13 @@ __NOTHROW_NCX(kcpustate32_to_icpustate32_p)(struct kcpustate32 const *__restrict
 /************************************************************************/
 /* `struct icpustate32'                                                 */
 /************************************************************************/
+#define icpustate32_foreach_gpregs(self, cb)       \
+	do {                                           \
+		gpregs32_foreach(&(self)->ics_gpregs, cb); \
+		if (icpustate32_isuser(self)) {            \
+			cb(icpustate32_getuseresp(self));      \
+		}                                          \
+	}	__WHILE0
 #define icpustate32_isvm86(self)                 irregs32_isvm86(&(self)->ics_irregs)
 #define icpustate32_isuser_novm86(self)          irregs32_isuser_novm86(&(self)->ics_irregs)
 #define icpustate32_isuser(self)                 irregs32_isuser(&(self)->ics_irregs)
@@ -858,6 +892,13 @@ __NOTHROW_NCX(icpustate32_user_to_icpustate32_p)(struct icpustate32 const *__res
 /************************************************************************/
 /* `struct scpustate32'                                                 */
 /************************************************************************/
+#define scpustate32_foreach_gpregs(self, cb)       \
+	do {                                           \
+		gpregs32_foreach(&(self)->scs_gpregs, cb); \
+		if (scpustate32_isuser(self)) {            \
+			cb(scpustate32_getuseresp(self));      \
+		}                                          \
+	}	__WHILE0
 #ifdef __I386_NO_VM86
 #define scpustate32_isvm86(self)                 0
 #define scpustate32_isuser_novm86(self)          ((self)->scs_irregs.ir_cs16 & 3)
@@ -1142,6 +1183,9 @@ __NOTHROW_NCX(scpustate32_user_to_scpustate32_p)(struct scpustate32 const *__res
 /************************************************************************/
 /* `struct ucpustate32'                                                 */
 /************************************************************************/
+#define ucpustate32_foreach_gpregs_elem(self) gpregs32_foreach_elem(&(self)->ucs_gpregs)
+#define ucpustate32_foreach_gpregs_size(self) gpregs32_foreach_size(&(self)->ucs_gpregs)
+#define ucpustate32_foreach_gpregs(self, cb)  gpregs32_foreach(&(self)->ucs_gpregs, cb)
 #ifdef __I386_NO_VM86
 #define ucpustate32_isvm86(self)           0
 #define ucpustate32_isuser_novm86(self)    ((self)->ucs_cs16 & 3)
@@ -1322,6 +1366,12 @@ __NOTHROW_NCX(ucpustate32_to_scpustate32_p)(struct ucpustate32 const *__restrict
 /************************************************************************/
 /* `struct fcpustate32'                                                 */
 /************************************************************************/
+#define fcpustate32_foreach_gpregs(self, cb)       \
+	do {                                           \
+		gpregs32_foreach(&(self)->fcs_gpregs, cb); \
+		cb((self)->fcs_gdt.dt_base);               \
+		cb((self)->fcs_idt.dt_base);               \
+	}	__WHILE0
 #ifdef __I386_NO_VM86
 #define fcpustate32_isvm86(self)           0
 #define fcpustate32_isuser_novm86(self)    ((self)->fcs_sgregs.sg_cs16 & 3)
@@ -1582,6 +1632,9 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 
 
 #ifndef __x86_64__
+#define gpregs_foreach_elem                 gpregs32_foreach_elem
+#define gpregs_foreach_size                 gpregs32_foreach_size
+#define gpregs_foreach                      gpregs32_foreach
 #define gpregs_getpdi                       gpregs32_getedi
 #define gpregs_setpdi                       gpregs32_setedi
 #define gpregs_getpsi                       gpregs32_getesi
@@ -1674,6 +1727,9 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define irregs_getgs                        irregs32_getgs
 #define irregs_trysetgs                     irregs32_trysetgs
 
+#define lcpustate_foreach_gpregs_elem       lcpustate32_foreach_gpregs_elem
+#define lcpustate_foreach_gpregs_size       lcpustate32_foreach_gpregs_size
+#define lcpustate_foreach_gpregs            lcpustate32_foreach_gpregs
 #define lcpustate_getpip                    lcpustate32_geteip
 #define lcpustate_getpc                     (__byte_t const *)lcpustate32_geteip
 #define lcpustate_setpip                    lcpustate32_seteip
@@ -1705,6 +1761,9 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define lcpustate_to_kcpustate32            lcpustate32_to_kcpustate32
 #define lcpustate32_to_kcpustate            lcpustate32_to_kcpustate32
 
+#define kcpustate_foreach_gpregs_elem       kcpustate32_foreach_gpregs_elem
+#define kcpustate_foreach_gpregs_size       kcpustate32_foreach_gpregs_size
+#define kcpustate_foreach_gpregs            kcpustate32_foreach_gpregs
 #define kcpustate_getpip                    kcpustate32_geteip
 #define kcpustate_getpc                     (__byte_t const *)kcpustate32_geteip
 #define kcpustate_setpip                    kcpustate32_seteip
@@ -1749,6 +1808,7 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define kcpustate_setreturn32(self, v)      gpregs_setreturn32(&(self)->kcs_gpregs, v)
 #define kcpustate_setreturn64(self, v)      gpregs_setreturn64(&(self)->kcs_gpregs, v)
 
+#define icpustate_foreach_gpregs            icpustate32_foreach_gpregs
 #define icpustate_getpip                    icpustate32_geteip
 #define icpustate_getpc                     (__byte_t const *)icpustate32_geteip
 #define icpustate_setpip                    icpustate32_seteip
@@ -1850,6 +1910,7 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define icpustate_setreturn32(self, v)      gpregs_setreturn32(&(self)->ics_gpregs, v)
 #define icpustate_setreturn64(self, v)      gpregs_setreturn64(&(self)->ics_gpregs, v)
 
+#define scpustate_foreach_gpregs            scpustate32_foreach_gpregs
 #define scpustate_getpip                    scpustate32_geteip
 #define scpustate_getpc                     (__byte_t const *)scpustate32_geteip
 #define scpustate_setpip                    scpustate32_seteip
@@ -1937,6 +1998,9 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define scpustate_setreturn32(self, v)      gpregs_setreturn32(&(self)->scs_gpregs, v)
 #define scpustate_setreturn64(self, v)      gpregs_setreturn64(&(self)->scs_gpregs, v)
 
+#define ucpustate_foreach_gpregs_elem       ucpustate32_foreach_gpregs_elem
+#define ucpustate_foreach_gpregs_size       ucpustate32_foreach_gpregs_size
+#define ucpustate_foreach_gpregs            ucpustate32_foreach_gpregs
 #define ucpustate_isvm86                    ucpustate32_isvm86
 #define ucpustate_isuser_novm86             ucpustate32_isuser_novm86
 #define ucpustate_isuser                    ucpustate32_isuser
@@ -1991,6 +2055,7 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define ucpustate_setreturn32(self, v)      gpregs_setreturn32(&(self)->ucs_gpregs, v)
 #define ucpustate_setreturn64(self, v)      gpregs_setreturn64(&(self)->ucs_gpregs, v)
 
+#define fcpustate_foreach_gpregs            fcpustate32_foreach_gpregs
 #define fcpustate_isvm86                    fcpustate32_isvm86
 #define fcpustate_isuser_novm86             fcpustate32_isuser_novm86
 #define fcpustate_isuser                    fcpustate32_isuser

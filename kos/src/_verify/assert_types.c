@@ -742,16 +742,19 @@ static_assert(sizeof(struct __timespec32) == __SIZEOF_TIMESPEC32);
 static_assert(offsetof(struct timeval, tv_sec) == __OFFSET_TIMEVAL_SEC);
 static_assert(offsetof(struct timeval, tv_usec) == __OFFSET_TIMEVAL_USEC);
 static_assert(sizeof(struct timeval) == __SIZEOF_TIMEVAL);
+static_assert(alignof(struct timeval) == __ALIGNOF_TIMEVAL);
 
 /* struct __timeval64 */
 static_assert(offsetof(struct __timeval64, tv_sec) == __OFFSET_TIMEVAL64_SEC);
 static_assert(offsetof(struct __timeval64, tv_usec) == __OFFSET_TIMEVAL64_USEC);
 static_assert(sizeof(struct __timeval64) == __SIZEOF_TIMEVAL64);
+static_assert(alignof(struct __timeval64) == __ALIGNOF_TIMEVAL64);
 
 /* struct __timeval32 */
 static_assert(offsetof(struct __timeval32, tv_sec) == __OFFSET_TIMEVAL32_SEC);
 static_assert(offsetof(struct __timeval32, tv_usec) == __OFFSET_TIMEVAL32_USEC);
 static_assert(sizeof(struct __timeval32) == __SIZEOF_TIMEVAL32);
+static_assert(alignof(struct __timeval32) == __ALIGNOF_TIMEVAL32);
 
 
 
@@ -1009,6 +1012,7 @@ static_assert(offsetof(struct __siginfo_struct, si_upper) == __OFFSET_SIGINFO_UP
 static_assert(offsetof(struct __siginfo_struct, si_utime) == __OFFSET_SIGINFO_UTIME);
 static_assert(offsetof(struct __siginfo_struct, si_value) == __OFFSET_SIGINFO_VALUE);
 static_assert(sizeof(struct __siginfo_struct) == __SIZEOF_SIGINFO);
+static_assert(alignof(struct __siginfo_struct) == __ALIGNOF_SIGINFO);
 
 
 

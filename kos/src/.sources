@@ -107,6 +107,7 @@ BEGIN
 	DEFINE_SIMPLE_LIBRARY("libphys", LD_FLAGS({ "-fini=libphys_fini" }))
 
 
+
 	DEFINE_SIMPLE_LIBRARY("libiconv", LD_FLAGS({ "-fini=libiconv_fini" }))
 
 	/* Stateful codecs have databases too large to excuse fitting them in the main library. */
@@ -125,7 +126,9 @@ BEGIN
 	DEFINE_SIMPLE_ARCH_LIBRARY("libregdump", USELIB("libdl"))
 	DEFINE_SIMPLE_ARCH_LIBRARY("libcpustate")
 	DEFINE_SIMPLE_ARCH_LIBRARY("libviocore", USELIB("libvio") USELIB("libinstrlen"))
-	DEFINE_SIMPLE_ARCH_LIBRARY("libservice")
+	if (TARGET_ARCH !in ["arm"]) { // TODO: ARM compat
+		DEFINE_SIMPLE_ARCH_LIBRARY("libservice")
+	}
 
 	if (TARGET_ARCH in ["i386", "x86_64"]) {
 		DEFINE_SIMPLE_LIBRARY("libvm86")

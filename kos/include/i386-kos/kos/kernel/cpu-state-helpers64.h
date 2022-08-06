@@ -53,6 +53,18 @@ __DECL_BEGIN
 /************************************************************************/
 /* `struct gpregsnsp64'                                                 */
 /************************************************************************/
+#define gpregsnsp64_foreach_elem(self) \
+	((__UINT64_TYPE__ const *)__COMPILER_REQTYPE(struct gpregsnsp64 const *, self))
+#define gpregsnsp64_foreach_size(self) 15
+#define gpregsnsp64_foreach(self, cb)                                    \
+	do {                                                                 \
+		unsigned int __gpregsnsp64_foreach_i;                            \
+		for (__gpregsnsp64_foreach_i = 0;                                \
+		     __gpregsnsp64_foreach_i < gpregsnsp64_foreach_size(self);   \
+		     ++__gpregsnsp64_foreach_i) {                                \
+			cb(gpregsnsp64_foreach_elem(self)[__gpregsnsp64_foreach_i]); \
+		}                                                                \
+	}	__WHILE0
 #define gpregsnsp64_to_gpregsnsp64(self, result)                        \
 	__libc_memcpy(__COMPILER_REQTYPE(struct gpregsnsp64 *, result),     \
 	              __COMPILER_REQTYPE(struct gpregsnsp64 const *, self), \
@@ -86,6 +98,18 @@ __NOTHROW_NCX(gpregsnsp64_to_gpregs64)(struct gpregsnsp64 const *__restrict __se
 /************************************************************************/
 /* `struct gpregs64'                                                    */
 /************************************************************************/
+#define gpregs64_foreach_elem(self) \
+	((__UINT64_TYPE__ const *)__COMPILER_REQTYPE(struct gpregs64 const *, self))
+#define gpregs64_foreach_size(self) 16
+#define gpregs64_foreach(self, cb)                                 \
+	do {                                                           \
+		unsigned int __gpregs64_foreach_i;                         \
+		for (__gpregs64_foreach_i = 0;                             \
+		     __gpregs64_foreach_i < gpregs64_foreach_size(self);   \
+		     ++__gpregs64_foreach_i) {                             \
+			cb(gpregs64_foreach_elem(self)[__gpregs64_foreach_i]); \
+		}                                                          \
+	}	__WHILE0
 #define gpregs64_getr15(self)        ((__u64)(self)->gp_r15)
 #define gpregs64_setr15(self, value) ((self)->gp_r15 = (value))
 #define gpregs64_getr14(self)        ((__u64)(self)->gp_r14)
@@ -202,6 +226,20 @@ __NOTHROW_NCX(gpregs64_to_gpregsnsp64)(struct gpregs64 const *__restrict __self,
 /************************************************************************/
 /* `struct lcpustate64'                                                 */
 /************************************************************************/
+
+/* NOTE: We don't enumerate `%rip'! */
+#define lcpustate64_foreach_gpregs_elem(self) \
+	((__UINT64_TYPE__ const *)__COMPILER_REQTYPE(struct lcpustate64 const *, self))
+#define lcpustate64_foreach_gpregs_size(self) 7
+#define lcpustate64_foreach_gpregs(self, cb)                             \
+	do {                                                                 \
+		unsigned int __lcpustate64_foreach_i;                            \
+		for (__lcpustate64_foreach_i = 0;                                \
+		     __lcpustate64_foreach_i < lcpustate64_foreach_size(self);   \
+		     ++__lcpustate64_foreach_i) {                                \
+			cb(lcpustate64_foreach_elem(self)[__lcpustate64_foreach_i]); \
+		}                                                                \
+	}	__WHILE0
 #define lcpustate64_getrip(self)        ((__u64)(self)->lcs_rip)
 #define lcpustate64_setrip(self, value) ((self)->lcs_rip = (value))
 #define lcpustate64_getrsp(self)        ((__u64)(self)->lcs_rsp)
@@ -323,12 +361,15 @@ __NOTHROW_NCX(lcpustate64_to_kcpustate64)(struct lcpustate64 const *__restrict _
 /************************************************************************/
 /* `struct kcpustate64'                                                 */
 /************************************************************************/
-#define kcpustate64_getrip(self)           ((__u64)(self)->kcs_rip)
-#define kcpustate64_setrip(self, value)    ((self)->kcs_rip = (value))
-#define kcpustate64_getrsp(self)           ((__u64)(self)->kcs_gpregs.gp_rsp)
-#define kcpustate64_setrsp(self, value)    ((self)->kcs_gpregs.gp_rsp = (value))
-#define kcpustate64_getrflags(self)        ((__u64)(self)->kcs_rflags)
-#define kcpustate64_setrflags(self, value) ((self)->kcs_rflags = (value))
+#define kcpustate64_foreach_gpregs_elem(self)   gpregs64_foreach_elem(&(self)->kcs_gpregs)
+#define kcpustate64_foreach_gpregs_size(self)   gpregs64_foreach_size(&(self)->kcs_gpregs)
+#define kcpustate64_foreach_gpregs(self, cb)    gpregs64_foreach(&(self)->kcs_gpregs, cb)
+#define kcpustate64_getrip(self)                ((__u64)(self)->kcs_rip)
+#define kcpustate64_setrip(self, value)         ((self)->kcs_rip = (value))
+#define kcpustate64_getrsp(self)                ((__u64)(self)->kcs_gpregs.gp_rsp)
+#define kcpustate64_setrsp(self, value)         ((self)->kcs_gpregs.gp_rsp = (value))
+#define kcpustate64_getrflags(self)             ((__u64)(self)->kcs_rflags)
+#define kcpustate64_setrflags(self, value)      ((self)->kcs_rflags = (value))
 #define kcpustate64_mskrflags(self, mask, flag) ((self)->kcs_rflags = ((self)->kcs_rflags & (mask)) | (flag))
 #define kcpustate64_to_kcpustate64(self, result)                        \
 	__libc_memcpy(__COMPILER_REQTYPE(struct kcpustate64 *, result),     \
@@ -451,6 +492,11 @@ __NOTHROW_NCX(kcpustate64_to_icpustate64_p)(struct kcpustate64 const *__restrict
 /************************************************************************/
 /* `struct icpustate64'                                                 */
 /************************************************************************/
+#define icpustate64_foreach_gpregs(self, cb)          \
+	do {                                              \
+		gpregsnsp64_foreach(&(self)->ics_gpregs, cb); \
+		cb((self)->ics_irregs.ir_rsp);                \
+	}	__WHILE0
 #define icpustate64_isuser(self)                 irregs64_isuser(&(self)->ics_irregs)
 #define icpustate64_iskernel(self)               irregs64_iskernel(&(self)->ics_irregs)
 #define icpustate64_is32bit(self)                irregs64_is32bit(&(self)->ics_irregs)
@@ -598,6 +644,13 @@ __NOTHROW_NCX(icpustate64_to_scpustate64_p)(struct icpustate64 const *__restrict
 /************************************************************************/
 /* `struct scpustate64'                                                 */
 /************************************************************************/
+#define scpustate64_foreach_gpregs(self, cb)          \
+	do {                                              \
+		cb((self)->scs_sgbase.sg_gsbase);             \
+		cb((self)->scs_sgbase.sg_fsbase);             \
+		gpregsnsp64_foreach(&(self)->scs_gpregs, cb); \
+		cb((self)->scs_irregs.ir_rsp);                \
+	}	__WHILE0
 #define scpustate64_isuser(self)                 ((self)->scs_irregs.ir_cs16 & 3)
 #define scpustate64_iskernel(self)               (!((self)->scs_irregs.ir_cs16 & 3))
 #define scpustate64_is32bit(self)                __KOS64_IS_CS32BIT(scpustate64_getcs(self))
@@ -700,6 +753,12 @@ __NOTHROW_NCX(scpustate64_to_scpustate64_p)(struct scpustate64 const *__restrict
 /************************************************************************/
 /* `struct ucpustate64'                                                 */
 /************************************************************************/
+#define ucpustate64_foreach_gpregs(self, cb)       \
+	do {                                           \
+		cb((self)->ucs_sgbase.sg_gsbase);          \
+		cb((self)->ucs_sgbase.sg_fsbase);          \
+		gpregs64_foreach(&(self)->ucs_gpregs, cb); \
+	}	__WHILE0
 #define ucpustate64_isuser(self)           ((self)->ucs_cs16 & 3)
 #define ucpustate64_iskernel(self)         (!((self)->ucs_cs16 & 3))
 #define ucpustate64_is32bit(self)          __KOS64_IS_CS32BIT((self)->ucs_cs16)
@@ -817,6 +876,14 @@ __NOTHROW_NCX(ucpustate64_to_scpustate64_p)(struct ucpustate64 const *__restrict
 /************************************************************************/
 /* `struct fcpustate64'                                                 */
 /************************************************************************/
+#define fcpustate64_foreach_gpregs(self, cb)       \
+	do {                                           \
+		gpregs64_foreach(&(self)->fcs_gpregs, cb); \
+		cb((self)->fcs_sgbase.sg_gsbase);          \
+		cb((self)->fcs_sgbase.sg_fsbase);          \
+		cb((self)->fcs_gdt.dt_base);               \
+		cb((self)->fcs_idt.dt_base);               \
+	}	__WHILE0
 #define fcpustate64_isuser(self)           ((self)->fcs_sgregs.sg_cs16 & 3)
 #define fcpustate64_iskernel(self)         (!((self)->fcs_sgregs.sg_cs16 & 3))
 #define fcpustate64_is32bit(self)          __KOS64_IS_CS32BIT((self)->fcs_sgregs.sg_cs16)
@@ -997,6 +1064,9 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 
 
 #ifdef __x86_64__
+#define gpregsnsp_foreach_elem              gpregsnsp64_foreach_elem
+#define gpregsnsp_foreach_size              gpregsnsp64_foreach_size
+#define gpregsnsp_foreach                   gpregsnsp64_foreach
 #define gpregsnsp_to_gpregsnsp              gpregsnsp64_to_gpregsnsp64
 #define gpregsnsp_to_gpregsnsp64            gpregsnsp64_to_gpregsnsp64
 #define gpregsnsp64_to_gpregsnsp            gpregsnsp64_to_gpregsnsp64
@@ -1004,6 +1074,9 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define gpregsnsp_to_gpregs64               gpregsnsp64_to_gpregs64
 #define gpregsnsp64_to_gpregs               gpregsnsp64_to_gpregs64
 
+#define gpregs_foreach_elem                 gpregs64_foreach_elem
+#define gpregs_foreach_size                 gpregs64_foreach_size
+#define gpregs_foreach                      gpregs64_foreach
 #define gpregs_getp15                       gpregs64_getr15
 #define gpregs_setp15                       gpregs64_setr15
 #define gpregs_getp14                       gpregs64_getr14
@@ -1087,6 +1160,9 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define irregs_trysetsp(self, sp)           irregs64_trysetrsp(self, (__u64)__COMPILER_REQTYPE(void const *, sp))
 #define irregs_sizeof                       irregs64_sizeof
 
+#define lcpustate_foreach_gpregs_elem       lcpustate64_foreach_gpregs_elem
+#define lcpustate_foreach_gpregs_size       lcpustate64_foreach_gpregs_size
+#define lcpustate_foreach_gpregs            lcpustate64_foreach_gpregs
 #define lcpustate_getpip                    lcpustate64_getrip
 #define lcpustate_getpc                     (__byte_t const *)lcpustate64_getrip
 #define lcpustate_setpip                    lcpustate64_setrip
@@ -1118,6 +1194,9 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define lcpustate_to_kcpustate64            lcpustate64_to_kcpustate64
 #define lcpustate64_to_kcpustate            lcpustate64_to_kcpustate64
 
+#define kcpustate_foreach_gpregs_elem       kcpustate64_foreach_gpregs_elem
+#define kcpustate_foreach_gpregs_size       kcpustate64_foreach_gpregs_size
+#define kcpustate_foreach_gpregs            kcpustate64_foreach_gpregs
 #define kcpustate_getpip                    kcpustate64_getrip
 #define kcpustate_getpc                     (__byte_t const *)kcpustate64_getrip
 #define kcpustate_setpip                    kcpustate64_setrip
@@ -1162,6 +1241,7 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define kcpustate_setreturn32(self, v)      gpregs_setreturn32(&(self)->kcs_gpregs, v)
 #define kcpustate_setreturn64(self, v)      gpregs_setreturn64(&(self)->kcs_gpregs, v)
 
+#define icpustate_foreach_gpregs            icpustate64_foreach_gpregs
 #define icpustate_isvm86(self)              0
 #define icpustate_isuser_novm86             icpustate64_isuser
 #define icpustate_isuser                    icpustate64_isuser
@@ -1262,6 +1342,7 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define icpustate_setreturn32(self, v)      gpregs_setreturn32(&(self)->ics_gpregs, v)
 #define icpustate_setreturn64(self, v)      gpregs_setreturn64(&(self)->ics_gpregs, v)
 
+#define scpustate_foreach_gpregs            scpustate64_foreach_gpregs
 #define scpustate_isvm86(self)              0
 #define scpustate_isuser_novm86             scpustate64_isuser
 #define scpustate_isuser                    scpustate64_isuser
@@ -1351,6 +1432,7 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define scpustate_setreturn32(self, v)      gpregs_setreturn32(&(self)->scs_gpregs, v)
 #define scpustate_setreturn64(self, v)      gpregs_setreturn64(&(self)->scs_gpregs, v)
 
+#define ucpustate_foreach_gpregs            ucpustate64_foreach_gpregs
 #define ucpustate_isvm86(self)              0
 #define ucpustate_isuser_novm86             ucpustate64_isuser
 #define ucpustate_isuser                    ucpustate64_isuser
@@ -1404,6 +1486,7 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define ucpustate_setreturn32(self, v)      gpregs_setreturn32(&(self)->ucs_gpregs, v)
 #define ucpustate_setreturn64(self, v)      gpregs_setreturn64(&(self)->ucs_gpregs, v)
 
+#define fcpustate_foreach_gpregs            fcpustate64_foreach_gpregs
 #define fcpustate_isvm86(self)              0
 #define fcpustate_isuser_novm86             fcpustate64_isuser
 #define fcpustate_isuser                    fcpustate64_isuser

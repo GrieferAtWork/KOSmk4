@@ -1170,13 +1170,12 @@ NOTHROW(KCALL gc_reachable_thread_scpustate)(struct task *__restrict thread,
 	if (scpustate_isuser(context)) {
 		/* Thread is currently in user-space (meaning its kernel stack is unused) */
 	} else {
-		unsigned int i;
 		void *sp, *stack_min, *stack_end;
 
 		/* Search general-purpose registers. */
-		for (i = 0; i < (sizeof(struct gpregs) / sizeof(void *)); ++i)
-			result += gc_reachable_pointer(((void **)&context->scs_gpregs)[i]);
-
+#define CONSUME_GP_REGISTER(val) result += gc_reachable_pointer((void *)(val))
+		scpustate_foreach_gpregs(context, CONSUME_GP_REGISTER);
+#undef CONSUME_GP_REGISTER
 		stack_min = mnode_getminaddr(&FORTASK(thread, this_kernel_stacknode));
 		stack_end = mnode_getendaddr(&FORTASK(thread, this_kernel_stacknode));
 #ifdef scpustate_getkernelsp

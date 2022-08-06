@@ -17,15 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_APPS_SYSTEM_TEST_ARCH_I386__LINKER64_LD
-#define GUARD_APPS_SYSTEM_TEST_ARCH_I386__LINKER64_LD 1
+#ifndef GUARD_APPS_SYSTEM_TEST_ARCH_ARM__LINKER_LD
+#define GUARD_APPS_SYSTEM_TEST_ARCH_ARM__LINKER_LD 1
 
 #include <hybrid/typecore.h>
 
 ENTRY(_start)
+
 SECTIONS {
-	PROVIDE(__executable_start = SEGMENT_START("text-segment", 0x400000));
-	. = SEGMENT_START("text-segment", 0x400000) + SIZEOF_HEADERS;
+	PROVIDE(__executable_start = SEGMENT_START("text-segment", 0x08048000));
+	. = SEGMENT_START("text-segment", 0x08048000) + SIZEOF_HEADERS;
 	.interp : { *(.interp) }
 	.note.gnu.build-id : { *(.note.gnu.build-id) }
 	.hash : { *(.hash) }
@@ -35,35 +36,33 @@ SECTIONS {
 	.gnu.version : { *(.gnu.version) }
 	.gnu.version_d : { *(.gnu.version_d) }
 	.gnu.version_r : { *(.gnu.version_r) }
-	.rela.dyn : {
-		*(.rela.init)
-		*(.rela.text .rela.text.* .rela.gnu.linkonce.t.*)
-		*(.rela.fini)
-		*(.rela.rodata .rela.rodata.* .rela.gnu.linkonce.r.*)
-		*(.rela.data .rela.data.* .rela.gnu.linkonce.d.*)
-		*(.rela.tdata .rela.tdata.* .rela.gnu.linkonce.td.*)
-		*(.rela.tbss .rela.tbss.* .rela.gnu.linkonce.tb.*)
-		*(.rela.ctors)
-		*(.rela.dtors)
-		*(.rela.got)
-		*(.rela.bss .rela.bss.* .rela.gnu.linkonce.b.*)
-		*(.rela.ldata .rela.ldata.* .rela.gnu.linkonce.l.*)
-		*(.rela.lbss .rela.lbss.* .rela.gnu.linkonce.lb.*)
-		*(.rela.lrodata .rela.lrodata.* .rela.gnu.linkonce.lr.*)
-		*(.rela.ifunc)
+	.rel.dyn : {
+		*(.rel.init)
+		*(.rel.text .rel.text.* .rel.gnu.linkonce.t.*)
+		*(.rel.fini)
+		*(.rel.rodata .rel.rodata.* .rel.gnu.linkonce.r.*)
+		*(.rel.data.rel.ro .rel.data.rel.ro.* .rel.gnu.linkonce.d.rel.ro.*)
+		*(.rel.data .rel.data.* .rel.gnu.linkonce.d.*)
+		*(.rel.tdata .rel.tdata.* .rel.gnu.linkonce.td.*)
+		*(.rel.tbss .rel.tbss.* .rel.gnu.linkonce.tb.*)
+		*(.rel.ctors)
+		*(.rel.dtors)
+		*(.rel.got)
+		*(.rel.bss .rel.bss.* .rel.gnu.linkonce.b.*)
+		*(.rel.ifunc)
 	}
-	.rela.plt : {
-		*(.rela.plt)
-		PROVIDE_HIDDEN(__rela_iplt_start = .);
-		*(.rela.iplt)
-		PROVIDE_HIDDEN(__rela_iplt_end = .);
+	.rel.plt : {
+		*(.rel.plt)
+		PROVIDE_HIDDEN(__rel_iplt_start = .);
+		*(.rel.iplt)
+		PROVIDE_HIDDEN(__rel_iplt_end = .);
 	}
 	.init : {
 		KEEP(*(SORT_NONE(.init)))
 	}
 	.plt : { *(.plt) *(.iplt) }
-	lt.got : { *(.plt.got) }
-	lt.sec : { *(.plt.sec) }
+	.plt.got : { *(.plt.got) }
+	.plt.sec : { *(.plt.sec) }
 	.text : {
 		*(.text.unlikely .text.*_unlikely .text.unlikely.*)
 		*(.text.exit .text.exit.*)
@@ -134,10 +133,13 @@ SECTIONS {
 		KEEP(*(.dtors))
 	}
 	.jcr : { KEEP(*(.jcr)) }
-	.data.rel.ro : { *(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*) *(.data.rel.ro .data.rel.ro.* .gnu.linkonce.d.rel.ro.*) }
+	.data.rel.ro : {
+		*(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*)
+		*(.data.rel.ro .data.rel.ro.* .gnu.linkonce.d.rel.ro.*)
+	}
 	.dynamic : { *(.dynamic) }
 	.got : { *(.got) *(.igot) }
-	. = DATA_SEGMENT_RELRO_END(SIZEOF(.got.plt) >= 24 ? 24 : 0, .);
+	. = DATA_SEGMENT_RELRO_END(SIZEOF(.got.plt) >= 12 ? 12 : 0, .);
 	.got.plt : { *(.got.plt) *(.igot.plt) }
 	.data : {
 		. = ALIGN(__SIZEOF_POINTER__);
@@ -156,28 +158,13 @@ SECTIONS {
 		*(.dynbss)
 		*(.bss .bss.* .gnu.linkonce.b.*)
 		*(COMMON)
-		. = ALIGN(. != 0 ? 64 / 8 : 1);
+		. = ALIGN(. != 0 ? 32 / 8 : 1);
 	}
-	.lbss : {
-		*(.dynlbss)
-		*(.lbss .lbss.* .gnu.linkonce.lb.*)
-		*(LARGE_COMMON)
-	}
-	. = ALIGN(64 / 8);
+	. = ALIGN(32 / 8);
 	. = SEGMENT_START("ldata-segment", .);
-	.lrodata   ALIGN(CONSTANT(MAXPAGESIZE)) +(. &(CONSTANT(MAXPAGESIZE) - 1)) :
-	{
-	  *(.lrodata .lrodata.* .gnu.linkonce.lr.*)
-	}
-	.ldata   ALIGN(CONSTANT(MAXPAGESIZE)) +(. &(CONSTANT(MAXPAGESIZE) - 1)) :
-	{
-	  *(.ldata .ldata.* .gnu.linkonce.l.*)
-	  . = ALIGN(. != 0 ? 64 / 8 : 1);
-	}
-	. = ALIGN(64 / 8);
+	. = ALIGN(32 / 8);
 	_end = .; PROVIDE(end = .);
 	. = DATA_SEGMENT_END(.);
-	/* Stabs debugging sections.  */
 	.stab          0 : { *(.stab) }
 	.stabstr       0 : { *(.stabstr) }
 	.stab.excl     0 : { *(.stab.excl) }
@@ -209,7 +196,11 @@ SECTIONS {
 	.debug_macro    0 : { *(.debug_macro) }
 	.debug_addr     0 : { *(.debug_addr) }
 	.gnu.attributes 0 : { KEEP(*(.gnu.attributes)) }
-	/DISCARD/ : { *(.note.GNU-stack) *(.gnu_debuglink) *(.gnu.lto_*) }
+	/DISCARD/ : {
+		*(.note.GNU-stack)
+		*(.gnu_debuglink)
+		*(.gnu.lto_*)
+	}
 }
 
-#endif /* !GUARD_APPS_SYSTEM_TEST_ARCH_I386__LINKER64_LD */
+#endif /* !GUARD_APPS_SYSTEM_TEST_ARCH_ARM__LINKER_LD */

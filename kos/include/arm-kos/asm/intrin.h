@@ -60,7 +60,6 @@ __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdr11)(void) { __register_var(__U
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdr12)(void) { __register_var(__UINT32_TYPE__, __r12, "r12"); return __r12; }
 __FORCELOCAL __ATTR_WUNUSED void *(__rdsp)(void) { __register_var(void *, __sp, "sp"); return __sp; }
 __FORCELOCAL __ATTR_WUNUSED void *(__rdlr)(void) { __register_var(void *, __lr, "lr"); return __lr; }
-__FORCELOCAL __ATTR_WUNUSED void *(__rdpc)(void) { __register_var(void *, __pc, "pc"); return __pc; }
 __FORCELOCAL void (__wrr0)(__UINT32_TYPE__ __val) { __register_var(__UINT32_TYPE__, __r0, "r0"); __r0 = __val; }
 __FORCELOCAL void (__wrr1)(__UINT32_TYPE__ __val) { __register_var(__UINT32_TYPE__, __r1, "r1"); __r1 = __val; }
 __FORCELOCAL void (__wrr2)(__UINT32_TYPE__ __val) { __register_var(__UINT32_TYPE__, __r2, "r2"); __r2 = __val; }
@@ -76,7 +75,6 @@ __FORCELOCAL void (__wrr11)(__UINT32_TYPE__ __val) { __register_var(__UINT32_TYP
 __FORCELOCAL void (__wrr12)(__UINT32_TYPE__ __val) { __register_var(__UINT32_TYPE__, __r12, "r12"); __r12 = __val; }
 __FORCELOCAL void (__wrsp)(void *__val) { __register_var(void *, __sp, "sp"); __sp = __val; }
 __FORCELOCAL void (__wrlr)(void *__val) { __register_var(void *, __lr, "lr"); __lr = __val; }
-__FORCELOCAL __ATTR_NORETURN void (__wrpc)(void *__val) { __register_var(void *, __pc, "pc"); __pc = __val; }
 #else /* __COMPILER_HAVE_REGISTER_VARS */
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdr0)(void) { __UINT32_TYPE__ __res; __asm__ __volatile__("mov %0, r0" : "=r" (__res)); return __res; }
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdr1)(void) { __UINT32_TYPE__ __res; __asm__ __volatile__("mov %0, r1" : "=r" (__res)); return __res; }
@@ -93,7 +91,6 @@ __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdr11)(void) { __UINT32_TYPE__ __
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdr12)(void) { __UINT32_TYPE__ __res; __asm__ __volatile__("mov %0, r12" : "=r" (__res)); return __res; }
 __FORCELOCAL __ATTR_WUNUSED void *(__rdsp)(void) { void *__res; __asm__ __volatile__("mov %0, sp" : "=r" (__res)); return __res; }
 __FORCELOCAL __ATTR_WUNUSED void *(__rdlr)(void) { void *__res; __asm__ __volatile__("mov %0, lr" : "=r" (__res)); return __res; }
-__FORCELOCAL __ATTR_WUNUSED void *(__rdpc)(void) { void *__res; __asm__ __volatile__("mov %0, pc" : "=r" (__res)); return __res; }
 __FORCELOCAL void (__wrr0)(__UINT32_TYPE__ __val) { __asm__ __volatile__("mov r0, %0" : : "r" (__val) : "r0"); }
 __FORCELOCAL void (__wrr1)(__UINT32_TYPE__ __val) { __asm__ __volatile__("mov r1, %0" : : "r" (__val) : "r1"); }
 __FORCELOCAL void (__wrr2)(__UINT32_TYPE__ __val) { __asm__ __volatile__("mov r2, %0" : : "r" (__val) : "r2"); }
@@ -109,8 +106,10 @@ __FORCELOCAL void (__wrr11)(__UINT32_TYPE__ __val) { __asm__ __volatile__("mov r
 __FORCELOCAL void (__wrr12)(__UINT32_TYPE__ __val) { __asm__ __volatile__("mov r12, %0" : : "r" (__val) : "r12"); }
 __FORCELOCAL void (__wrsp)(void *__val) { __asm__ __volatile__("mov sp, %0" : : "r" (__val) : "sp"); }
 __FORCELOCAL void (__wrlr)(void *__val) { __asm__ __volatile__("mov lr, %0" : : "r" (__val) : "lr"); }
-__FORCELOCAL __ATTR_NORETURN void (__wrpc)(void *__val) { __asm__ __volatile__("mov pc, %0" : : "r" (__val) : "pc"); }
 #endif /* !__COMPILER_HAVE_REGISTER_VARS */
+
+__FORCELOCAL __ATTR_WUNUSED void *(__rdpc)(void) { void *__res; __asm__ __volatile__("mov %0, pc" : "=r" (__res)); return __res; }
+__FORCELOCAL __ATTR_NORETURN void (__wrpc)(void *__val) { __asm__ __volatile__("mov pc, %0" : : "r" (__val)); __builtin_unreachable(); }
 
 
 /* Bank-independent, explicit register access */

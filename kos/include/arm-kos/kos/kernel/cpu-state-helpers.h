@@ -235,11 +235,39 @@ __NOTHROW_NCX(_fcpustate_p_banked)(struct fcpustate const *__restrict __self) {
 #define fcpustate_isuser(self) fcpustate_isusr(self)
 #define fcpustate_iskern(self) (!fcpustate_isusr(self))
 
+#define fcpustate_foreach_gpregs(self, cb)                                                                               \
+	do {                                                                                                                 \
+		unsigned int __fcpustate_foreach_i;                                                                              \
+		ucpustate_foreach_gpregs(&(self)->fcs_usr, cb);                                                                  \
+		for (__fcpustate_foreach_i = 0; __fcpustate_foreach_i < 7; ++__fcpustate_foreach_i) {                            \
+			cb(((__UINT32_TYPE__ const *)&(self)->fcs_R8_fiq)[__fcpustate_foreach_i]);                                   \
+		}                                                                                                                \
+		for (__fcpustate_foreach_i = 0; __fcpustate_foreach_i < 4; ++__fcpustate_foreach_i) {                            \
+			unsigned int __fcpustate_foreach_j;                                                                          \
+			for (__fcpustate_foreach_j = 0; __fcpustate_foreach_j < 2; ++__fcpustate_foreach_j) {                        \
+				cb(((__UINT32_TYPE__ const *)&(self)->fcs_SP_irq)[(__fcpustate_foreach_i * 3) + __fcpustate_foreach_j]); \
+			}                                                                                                            \
+		}                                                                                                                \
+	}	__WHILE0
+
 
 
 /************************************************************************/
 /* UCPUSTATE                                                            */
 /************************************************************************/
+/* NOTE: We don't enumerate `pc'! */
+#define ucpustate_foreach_gpregs_elem(self) \
+	((__UINT64_TYPE__ const *)__COMPILER_REQTYPE(struct ucpustate const *, self))
+#define ucpustate_foreach_gpregs_size(self) 15
+#define ucpustate_foreach_gpregs(self, cb)                                         \
+	do {                                                                           \
+		unsigned int __ucpustate_foreach_gpregs_i;                                 \
+		for (__ucpustate_foreach_gpregs_i = 0;                                     \
+		     __ucpustate_foreach_gpregs_i < ucpustate_foreach_gpregs_size(self);   \
+		     ++__ucpustate_foreach_gpregs_i) {                                     \
+			cb(ucpustate_foreach_gpregs_elem(self)[__ucpustate_foreach_gpregs_i]); \
+		}                                                                          \
+	}	__WHILE0
 #define ucpustate_getr0(self)         (self)->ucs_r0
 #define ucpustate_setr0(self, r0)     (void)((self)->ucs_r0 = (r0))
 #define ucpustate_getr1(self)         (self)->ucs_r1
@@ -288,124 +316,133 @@ __NOTHROW_NCX(_fcpustate_p_banked)(struct fcpustate const *__restrict __self) {
 #define ucpustate_iskern(self) (!ucpustate_isusr(self))
 
 /* Aliases for UCPUSTATE */
-#define kcpustate_getr0   ucpustate_getr0
-#define kcpustate_setr0   ucpustate_setr0
-#define kcpustate_getr1   ucpustate_getr1
-#define kcpustate_setr1   ucpustate_setr1
-#define kcpustate_getr2   ucpustate_getr2
-#define kcpustate_setr2   ucpustate_setr2
-#define kcpustate_getr3   ucpustate_getr3
-#define kcpustate_setr3   ucpustate_setr3
-#define kcpustate_getr4   ucpustate_getr4
-#define kcpustate_setr4   ucpustate_setr4
-#define kcpustate_getr5   ucpustate_getr5
-#define kcpustate_setr5   ucpustate_setr5
-#define kcpustate_getr6   ucpustate_getr6
-#define kcpustate_setr6   ucpustate_setr6
-#define kcpustate_getr7   ucpustate_getr7
-#define kcpustate_setr7   ucpustate_setr7
-#define kcpustate_getr8   ucpustate_getr8
-#define kcpustate_setr8   ucpustate_setr8
-#define kcpustate_getr9   ucpustate_getr9
-#define kcpustate_setr9   ucpustate_setr9
-#define kcpustate_getr10  ucpustate_getr10
-#define kcpustate_setr10  ucpustate_setr10
-#define kcpustate_getr11  ucpustate_getr11
-#define kcpustate_setr11  ucpustate_setr11
-#define kcpustate_getr12  ucpustate_getr12
-#define kcpustate_setr12  ucpustate_setr12
-#define kcpustate_getsp   ucpustate_getsp
-#define kcpustate_setsp   ucpustate_setsp
-#define kcpustate_getlr   ucpustate_getlr
-#define kcpustate_setlr   ucpustate_setlr
-#define kcpustate_getpc   ucpustate_getpc
-#define kcpustate_setpc   ucpustate_setpc
-#define kcpustate_getcpsr ucpustate_getcpsr
-#define kcpustate_setcpsr ucpustate_setcpsr
-#define icpustate_getr0   ucpustate_getr0
-#define icpustate_setr0   ucpustate_setr0
-#define icpustate_getr1   ucpustate_getr1
-#define icpustate_setr1   ucpustate_setr1
-#define icpustate_getr2   ucpustate_getr2
-#define icpustate_setr2   ucpustate_setr2
-#define icpustate_getr3   ucpustate_getr3
-#define icpustate_setr3   ucpustate_setr3
-#define icpustate_getr4   ucpustate_getr4
-#define icpustate_setr4   ucpustate_setr4
-#define icpustate_getr5   ucpustate_getr5
-#define icpustate_setr5   ucpustate_setr5
-#define icpustate_getr6   ucpustate_getr6
-#define icpustate_setr6   ucpustate_setr6
-#define icpustate_getr7   ucpustate_getr7
-#define icpustate_setr7   ucpustate_setr7
-#define icpustate_getr8   ucpustate_getr8
-#define icpustate_setr8   ucpustate_setr8
-#define icpustate_getr9   ucpustate_getr9
-#define icpustate_setr9   ucpustate_setr9
-#define icpustate_getr10  ucpustate_getr10
-#define icpustate_setr10  ucpustate_setr10
-#define icpustate_getr11  ucpustate_getr11
-#define icpustate_setr11  ucpustate_setr11
-#define icpustate_getr12  ucpustate_getr12
-#define icpustate_setr12  ucpustate_setr12
-#define icpustate_getsp   ucpustate_getsp
-#define icpustate_setsp   ucpustate_setsp
-#define icpustate_getlr   ucpustate_getlr
-#define icpustate_setlr   ucpustate_setlr
-#define icpustate_getpc   ucpustate_getpc
-#define icpustate_setpc   ucpustate_setpc
-#define icpustate_getcpsr ucpustate_getcpsr
-#define icpustate_setcpsr ucpustate_setcpsr
-#define icpustate_isusr   ucpustate_isusr
-#define icpustate_isfiq   ucpustate_isfiq
-#define icpustate_isirq   ucpustate_isirq
-#define icpustate_issvc   ucpustate_issvc
-#define icpustate_isabt   ucpustate_isabt
-#define icpustate_isund   ucpustate_isund
-#define icpustate_isuser  ucpustate_isuser
-#define icpustate_iskern  ucpustate_iskern
-#define scpustate_getr0   ucpustate_getr0
-#define scpustate_setr0   ucpustate_setr0
-#define scpustate_getr1   ucpustate_getr1
-#define scpustate_setr1   ucpustate_setr1
-#define scpustate_getr2   ucpustate_getr2
-#define scpustate_setr2   ucpustate_setr2
-#define scpustate_getr3   ucpustate_getr3
-#define scpustate_setr3   ucpustate_setr3
-#define scpustate_getr4   ucpustate_getr4
-#define scpustate_setr4   ucpustate_setr4
-#define scpustate_getr5   ucpustate_getr5
-#define scpustate_setr5   ucpustate_setr5
-#define scpustate_getr6   ucpustate_getr6
-#define scpustate_setr6   ucpustate_setr6
-#define scpustate_getr7   ucpustate_getr7
-#define scpustate_setr7   ucpustate_setr7
-#define scpustate_getr8   ucpustate_getr8
-#define scpustate_setr8   ucpustate_setr8
-#define scpustate_getr9   ucpustate_getr9
-#define scpustate_setr9   ucpustate_setr9
-#define scpustate_getr10  ucpustate_getr10
-#define scpustate_setr10  ucpustate_setr10
-#define scpustate_getr11  ucpustate_getr11
-#define scpustate_setr11  ucpustate_setr11
-#define scpustate_getr12  ucpustate_getr12
-#define scpustate_setr12  ucpustate_setr12
-#define scpustate_getsp   ucpustate_getsp
-#define scpustate_setsp   ucpustate_setsp
-#define scpustate_getlr   ucpustate_getlr
-#define scpustate_setlr   ucpustate_setlr
-#define scpustate_getpc   ucpustate_getpc
-#define scpustate_setpc   ucpustate_setpc
-#define scpustate_getcpsr ucpustate_getcpsr
-#define scpustate_setcpsr ucpustate_setcpsr
-#define scpustate_isusr   ucpustate_isusr
-#define scpustate_isfiq   ucpustate_isfiq
-#define scpustate_isirq   ucpustate_isirq
-#define scpustate_issvc   ucpustate_issvc
-#define scpustate_isabt   ucpustate_isabt
-#define scpustate_isund   ucpustate_isund
-#define scpustate_isuser  ucpustate_isuser
-#define scpustate_iskern  ucpustate_iskern
+#define kcpustate_foreach_gpregs_elem ucpustate_foreach_gpregs_elem
+#define kcpustate_foreach_gpregs_size ucpustate_foreach_gpregs_size
+#define kcpustate_foreach_gpregs      ucpustate_foreach_gpregs
+#define kcpustate_getr0               ucpustate_getr0
+#define kcpustate_setr0               ucpustate_setr0
+#define kcpustate_getr1               ucpustate_getr1
+#define kcpustate_setr1               ucpustate_setr1
+#define kcpustate_getr2               ucpustate_getr2
+#define kcpustate_setr2               ucpustate_setr2
+#define kcpustate_getr3               ucpustate_getr3
+#define kcpustate_setr3               ucpustate_setr3
+#define kcpustate_getr4               ucpustate_getr4
+#define kcpustate_setr4               ucpustate_setr4
+#define kcpustate_getr5               ucpustate_getr5
+#define kcpustate_setr5               ucpustate_setr5
+#define kcpustate_getr6               ucpustate_getr6
+#define kcpustate_setr6               ucpustate_setr6
+#define kcpustate_getr7               ucpustate_getr7
+#define kcpustate_setr7               ucpustate_setr7
+#define kcpustate_getr8               ucpustate_getr8
+#define kcpustate_setr8               ucpustate_setr8
+#define kcpustate_getr9               ucpustate_getr9
+#define kcpustate_setr9               ucpustate_setr9
+#define kcpustate_getr10              ucpustate_getr10
+#define kcpustate_setr10              ucpustate_setr10
+#define kcpustate_getr11              ucpustate_getr11
+#define kcpustate_setr11              ucpustate_setr11
+#define kcpustate_getr12              ucpustate_getr12
+#define kcpustate_setr12              ucpustate_setr12
+#define kcpustate_getsp               ucpustate_getsp
+#define kcpustate_setsp               ucpustate_setsp
+#define kcpustate_getlr               ucpustate_getlr
+#define kcpustate_setlr               ucpustate_setlr
+#define kcpustate_getpc               ucpustate_getpc
+#define kcpustate_setpc               ucpustate_setpc
+#define kcpustate_getcpsr             ucpustate_getcpsr
+#define kcpustate_setcpsr             ucpustate_setcpsr
+#define icpustate_foreach_gpregs_elem ucpustate_foreach_gpregs_elem
+#define icpustate_foreach_gpregs_size ucpustate_foreach_gpregs_size
+#define icpustate_foreach_gpregs      ucpustate_foreach_gpregs
+#define icpustate_getr0               ucpustate_getr0
+#define icpustate_setr0               ucpustate_setr0
+#define icpustate_getr1               ucpustate_getr1
+#define icpustate_setr1               ucpustate_setr1
+#define icpustate_getr2               ucpustate_getr2
+#define icpustate_setr2               ucpustate_setr2
+#define icpustate_getr3               ucpustate_getr3
+#define icpustate_setr3               ucpustate_setr3
+#define icpustate_getr4               ucpustate_getr4
+#define icpustate_setr4               ucpustate_setr4
+#define icpustate_getr5               ucpustate_getr5
+#define icpustate_setr5               ucpustate_setr5
+#define icpustate_getr6               ucpustate_getr6
+#define icpustate_setr6               ucpustate_setr6
+#define icpustate_getr7               ucpustate_getr7
+#define icpustate_setr7               ucpustate_setr7
+#define icpustate_getr8               ucpustate_getr8
+#define icpustate_setr8               ucpustate_setr8
+#define icpustate_getr9               ucpustate_getr9
+#define icpustate_setr9               ucpustate_setr9
+#define icpustate_getr10              ucpustate_getr10
+#define icpustate_setr10              ucpustate_setr10
+#define icpustate_getr11              ucpustate_getr11
+#define icpustate_setr11              ucpustate_setr11
+#define icpustate_getr12              ucpustate_getr12
+#define icpustate_setr12              ucpustate_setr12
+#define icpustate_getsp               ucpustate_getsp
+#define icpustate_setsp               ucpustate_setsp
+#define icpustate_getlr               ucpustate_getlr
+#define icpustate_setlr               ucpustate_setlr
+#define icpustate_getpc               ucpustate_getpc
+#define icpustate_setpc               ucpustate_setpc
+#define icpustate_getcpsr             ucpustate_getcpsr
+#define icpustate_setcpsr             ucpustate_setcpsr
+#define icpustate_isusr               ucpustate_isusr
+#define icpustate_isfiq               ucpustate_isfiq
+#define icpustate_isirq               ucpustate_isirq
+#define icpustate_issvc               ucpustate_issvc
+#define icpustate_isabt               ucpustate_isabt
+#define icpustate_isund               ucpustate_isund
+#define icpustate_isuser              ucpustate_isuser
+#define icpustate_iskern              ucpustate_iskern
+#define scpustate_foreach_gpregs_elem ucpustate_foreach_gpregs_elem
+#define scpustate_foreach_gpregs_size ucpustate_foreach_gpregs_size
+#define scpustate_foreach_gpregs      ucpustate_foreach_gpregs
+#define scpustate_getr0               ucpustate_getr0
+#define scpustate_setr0               ucpustate_setr0
+#define scpustate_getr1               ucpustate_getr1
+#define scpustate_setr1               ucpustate_setr1
+#define scpustate_getr2               ucpustate_getr2
+#define scpustate_setr2               ucpustate_setr2
+#define scpustate_getr3               ucpustate_getr3
+#define scpustate_setr3               ucpustate_setr3
+#define scpustate_getr4               ucpustate_getr4
+#define scpustate_setr4               ucpustate_setr4
+#define scpustate_getr5               ucpustate_getr5
+#define scpustate_setr5               ucpustate_setr5
+#define scpustate_getr6               ucpustate_getr6
+#define scpustate_setr6               ucpustate_setr6
+#define scpustate_getr7               ucpustate_getr7
+#define scpustate_setr7               ucpustate_setr7
+#define scpustate_getr8               ucpustate_getr8
+#define scpustate_setr8               ucpustate_setr8
+#define scpustate_getr9               ucpustate_getr9
+#define scpustate_setr9               ucpustate_setr9
+#define scpustate_getr10              ucpustate_getr10
+#define scpustate_setr10              ucpustate_setr10
+#define scpustate_getr11              ucpustate_getr11
+#define scpustate_setr11              ucpustate_setr11
+#define scpustate_getr12              ucpustate_getr12
+#define scpustate_setr12              ucpustate_setr12
+#define scpustate_getsp               ucpustate_getsp
+#define scpustate_setsp               ucpustate_setsp
+#define scpustate_getlr               ucpustate_getlr
+#define scpustate_setlr               ucpustate_setlr
+#define scpustate_getpc               ucpustate_getpc
+#define scpustate_setpc               ucpustate_setpc
+#define scpustate_getcpsr             ucpustate_getcpsr
+#define scpustate_setcpsr             ucpustate_setcpsr
+#define scpustate_isusr               ucpustate_isusr
+#define scpustate_isfiq               ucpustate_isfiq
+#define scpustate_isirq               ucpustate_isirq
+#define scpustate_issvc               ucpustate_issvc
+#define scpustate_isabt               ucpustate_isabt
+#define scpustate_isund               ucpustate_isund
+#define scpustate_isuser              ucpustate_isuser
+#define scpustate_iskern              ucpustate_iskern
 
 
 
@@ -413,6 +450,19 @@ __NOTHROW_NCX(_fcpustate_p_banked)(struct fcpustate const *__restrict __self) {
 /************************************************************************/
 /* LCPUSTATE                                                            */
 /************************************************************************/
+/* NOTE: We don't enumerate `pc'! */
+#define lcpustate_foreach_gpregs_elem(self) \
+	((__UINT64_TYPE__ const *)__COMPILER_REQTYPE(struct lcpustate const *, self))
+#define lcpustate_foreach_gpregs_size(self) 10
+#define lcpustate_foreach_gpregs(self, cb)                                         \
+	do {                                                                           \
+		unsigned int __lcpustate_foreach_gpregs_i;                                 \
+		for (__lcpustate_foreach_gpregs_i = 0;                                     \
+		     __lcpustate_foreach_gpregs_i < lcpustate_foreach_gpregs_size(self);   \
+		     ++__lcpustate_foreach_gpregs_i) {                                     \
+			cb(lcpustate_foreach_gpregs_elem(self)[__lcpustate_foreach_gpregs_i]); \
+		}                                                                          \
+	}	__WHILE0
 #define lcpustate_getr4(self)       (self)->lcs_r4
 #define lcpustate_setr4(self, r4)   (void)((self)->lcs_r4 = (r4))
 #define lcpustate_getr5(self)       (self)->lcs_r5
@@ -487,6 +537,80 @@ __NOTHROW_NCX(lcpustate_current)(struct lcpustate *__restrict __result) {
 	                     : "=m" /*0*/ (*__result)
 	                     : "r" /*1*/ (__result));
 }
+
+
+
+/* Helpful (and portability) aliases */
+#define fcpustate_getreturnbool(self)    (fcpustate_getr0(self) != 0)
+#define fcpustate_getreturn(self)        fcpustate_getr0(self)
+#define fcpustate_getreturn32(self)      fcpustate_getr0(self)
+#define fcpustate_getreturn64(self)      ((__UINT64_TYPE__)fcpustate_getr0(self) | ((__UINT64_TYPE__)fcpustate_getr1(self) << 32))
+#define fcpustate_setreturnbool(self, v) fcpustate_setr0(self, (v) ? 1 : 0)
+#define fcpustate_setreturn(self, v)     fcpustate_setr0(self, v)
+#define fcpustate_setreturn32(self, v)   fcpustate_setr0(self, v)
+#define fcpustate_setreturn64(self, v)   (fcpustate_setr0(self, (__UINT32_TYPE__)(v)), fcpustate_setr1(self, (__UINT32_TYPE__)((__UINT64_TYPE__)(v) >> 32)))
+
+#define ucpustate_getreturnbool(self)    (ucpustate_getr0(self) != 0)
+#define ucpustate_getreturn(self)        ucpustate_getr0(self)
+#define ucpustate_getreturn32(self)      ucpustate_getr0(self)
+#define ucpustate_getreturn64(self)      ((__UINT64_TYPE__)ucpustate_getr0(self) | ((__UINT64_TYPE__)ucpustate_getr1(self) << 32))
+#define ucpustate_setreturnbool(self, v) ucpustate_setr0(self, (v) ? 1 : 0)
+#define ucpustate_setreturn(self, v)     ucpustate_setr0(self, v)
+#define ucpustate_setreturn32(self, v)   ucpustate_setr0(self, v)
+#define ucpustate_setreturn64(self, v)   (ucpustate_setr0(self, (__UINT32_TYPE__)(v)), ucpustate_setr1(self, (__UINT32_TYPE__)((__UINT64_TYPE__)(v) >> 32)))
+
+#define kcpustate_getreturnbool ucpustate_getreturnbool
+#define kcpustate_getreturn     ucpustate_getreturn
+#define kcpustate_getreturn32   ucpustate_getreturn32
+#define kcpustate_getreturn64   ucpustate_getreturn64
+#define kcpustate_setreturnbool ucpustate_setreturnbool
+#define kcpustate_setreturn     ucpustate_setreturn
+#define kcpustate_setreturn32   ucpustate_setreturn32
+#define kcpustate_setreturn64   ucpustate_setreturn64
+
+#define icpustate_getreturnbool ucpustate_getreturnbool
+#define icpustate_getreturn     ucpustate_getreturn
+#define icpustate_getreturn32   ucpustate_getreturn32
+#define icpustate_getreturn64   ucpustate_getreturn64
+#define icpustate_setreturnbool ucpustate_setreturnbool
+#define icpustate_setreturn     ucpustate_setreturn
+#define icpustate_setreturn32   ucpustate_setreturn32
+#define icpustate_setreturn64   ucpustate_setreturn64
+
+#define scpustate_getreturnbool ucpustate_getreturnbool
+#define scpustate_getreturn     ucpustate_getreturn
+#define scpustate_getreturn32   ucpustate_getreturn32
+#define scpustate_getreturn64   ucpustate_getreturn64
+#define scpustate_setreturnbool ucpustate_setreturnbool
+#define scpustate_setreturn     ucpustate_setreturn
+#define scpustate_setreturn32   ucpustate_setreturn32
+#define scpustate_setreturn64   ucpustate_setreturn64
+
+
+/* CPU state converter functions.
+ * NOTE: We DON'T define converter functions between aliasing types. Consumers that
+ *       use converter functions need to check for `?CPUSTATE_IS_?CPUSTATE' macros!
+ * e.g.: we don't define `ucpustate_to_kcpustate' because of `KCPUSTATE_IS_UCPUSTATE' */
+#define lcpustate_to_ucpustate(src, dst) TODO
+#define lcpustate_to_fcpustate(src, dst) TODO
+#define ucpustate_to_lcpustate(src, dst) TODO
+#define ucpustate_to_fcpustate(src, dst) TODO
+#define fcpustate_to_ucpustate(src, dst) TODO
+#define fcpustate_to_lcpustate(src, dst) TODO
+
+/* Aliases that we do have to define (because they're not no-ops) */
+#define lcpustate_to_kcpustate lcpustate_to_ucpustate
+#define lcpustate_to_icpustate lcpustate_to_ucpustate
+#define lcpustate_to_scpustate lcpustate_to_ucpustate
+#define fcpustate_to_kcpustate fcpustate_to_ucpustate
+#define fcpustate_to_icpustate fcpustate_to_ucpustate
+#define fcpustate_to_scpustate fcpustate_to_ucpustate
+#define kcpustate_to_lcpustate ucpustate_to_lcpustate
+#define icpustate_to_lcpustate ucpustate_to_lcpustate
+#define scpustate_to_lcpustate ucpustate_to_lcpustate
+#define kcpustate_to_fcpustate ucpustate_to_fcpustate
+#define icpustate_to_fcpustate ucpustate_to_fcpustate
+#define scpustate_to_fcpustate ucpustate_to_fcpustate
 
 __DECL_END
 #endif /* __CC__ */

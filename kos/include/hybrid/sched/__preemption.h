@@ -197,6 +197,14 @@ __hybrid_preemption_tryyield_f(__hybrid_preemption_flag_t *__restrict __p_flag);
 __NOPREEMPT void __hybrid_preemption_tryyield_nopr(void);
 #define __hybrid_preemption_tryyield_nopr __hybrid_preemption_tryyield_nopr
 
+#if defined(__KOS__) && defined(__KERNEL__)
+#include <kernel/compiler.h> /* CONFIG_NO_SMP */
+#undef __HYBRID_PREEMPTION_NO_SMP
+#ifdef CONFIG_NO_SMP
+#define __HYBRID_PREEMPTION_NO_SMP
+#endif /* CONFIG_NO_SMP */
+#endif /* __KOS__ && __KERNEL__ */
+
 __DECL_END
 #elif defined(__KOS__) && defined(__KERNEL__)
 /* KOS Kernel version */

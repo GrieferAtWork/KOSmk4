@@ -208,8 +208,6 @@ struct fcpustate { /* f -- Full */
 	__uint32_t       fcs_SPSR_und; /* SPSR for UND-mode (old CPSR upon mode-entry) */
 };
 
-
-
 __SYSDECL_END
 #endif /* __CC__ */
 

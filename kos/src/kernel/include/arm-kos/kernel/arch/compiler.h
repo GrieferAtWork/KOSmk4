@@ -17,9 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_KERNEL_ARCH_COMPILER_H
-#define GUARD_KERNEL_INCLUDE_KERNEL_ARCH_COMPILER_H 1
+#ifndef GUARD_KERNEL_INCLUDE_ARM_KOS_KERNEL_ARCH_COMPILER_H
+#define GUARD_KERNEL_INCLUDE_ARM_KOS_KERNEL_ARCH_COMPILER_H 1
 
-/* ... */
+#include <__stdinc.h>
 
-#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_ARCH_COMPILER_H */
+/* Disable SMP (not yet supported on arm) */
+#define CONFIG_NO_SMP
+
+#endif /* !GUARD_KERNEL_INCLUDE_ARM_KOS_KERNEL_ARCH_COMPILER_H */

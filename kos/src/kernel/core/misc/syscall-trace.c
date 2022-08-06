@@ -33,8 +33,10 @@
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/sched/preemption.h>
 
 #include <kos/aref.h>
+#include <kos/except.h>
 
 #include <assert.h>
 #include <format-printer.h>

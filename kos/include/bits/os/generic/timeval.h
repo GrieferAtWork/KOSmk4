@@ -29,16 +29,17 @@
 #include <parts/timeval-cxx-support.h>
 
 #define __OFFSET_TIMEVAL_SEC     0
-#if __TM_SIZEOF(TIME) <= 4 && __SIZEOF_SUSECONDS_T__ > 4
-#define __OFFSET_TIMEVAL_USEC    (__TM_SIZEOF(TIME) + 4)
-#else /* __TM_SIZEOF(TIME) <= 4 && __SIZEOF_SUSECONDS_T__ > 4 */
-#define __OFFSET_TIMEVAL_USEC    __TM_SIZEOF(TIME)
-#endif /* __TM_SIZEOF(TIME) > 4 || __SIZEOF_SUSECONDS_T__ <= 4 */
-#if __TM_SIZEOF(TIME) > 4 && __SIZEOF_SUSECONDS_T__ <= 4
+#if __SIZEOF_TIME_T__ <= 4 && __SIZEOF_SUSECONDS_T__ > 4
+#define __OFFSET_TIMEVAL_USEC    (__SIZEOF_TIME_T__ + 4)
+#else /* __SIZEOF_TIME_T__ <= 4 && __SIZEOF_SUSECONDS_T__ > 4 */
+#define __OFFSET_TIMEVAL_USEC    __SIZEOF_TIME_T__
+#endif /* __SIZEOF_TIME_T__ > 4 || __SIZEOF_SUSECONDS_T__ <= 4 */
+#if __SIZEOF_TIME_T__ > 4 && __SIZEOF_SUSECONDS_T__ <= 4
 #define __SIZEOF_TIMEVAL         (__OFFSET_TIMEVAL_USEC + __SIZEOF_SUSECONDS_T__ + 4)
-#else /* __TM_SIZEOF(TIME) > 4 && __SIZEOF_SUSECONDS_T__ <= 4 */
+#else /* __SIZEOF_TIME_T__ > 4 && __SIZEOF_SUSECONDS_T__ <= 4 */
 #define __SIZEOF_TIMEVAL         (__OFFSET_TIMEVAL_USEC + __SIZEOF_SUSECONDS_T__)
-#endif /* __TM_SIZEOF(TIME) <= 4 || __SIZEOF_SUSECONDS_T__ > 4 */
+#endif /* __SIZEOF_TIME_T__ <= 4 || __SIZEOF_SUSECONDS_T__ > 4 */
+#define __ALIGNOF_TIMEVAL __ALIGNOF_TIME_T__
 
 #define __OFFSET_TIMEVAL32_SEC     0
 #if __SIZEOF_TIME32_T__ <= 4 && __SIZEOF_SUSECONDS_T__ > 4
@@ -51,6 +52,7 @@
 #else /* __SIZEOF_TIME32_T__ > 4 && __SIZEOF_SUSECONDS_T__ <= 4 */
 #define __SIZEOF_TIMEVAL32         (__OFFSET_TIMEVAL32_USEC + __SIZEOF_SUSECONDS_T__)
 #endif /* __SIZEOF_TIME32_T__ <= 4 || __SIZEOF_SUSECONDS_T__ > 4 */
+#define __ALIGNOF_TIMEVAL32 __ALIGNOF_TIME32_T__
 
 #define __OFFSET_TIMEVAL64_SEC     0
 #if __SIZEOF_TIME64_T__ <= 4 && __SIZEOF_SUSECONDS_T__ > 4
@@ -63,6 +65,7 @@
 #else /* __SIZEOF_TIME64_T__ > 4 && __SIZEOF_SUSECONDS_T__ <= 4 */
 #define __SIZEOF_TIMEVAL64         (__OFFSET_TIMEVAL64_USEC + __SIZEOF_SUSECONDS_T__)
 #endif /* __SIZEOF_TIME64_T__ <= 4 || __SIZEOF_SUSECONDS_T__ > 4 */
+#define __ALIGNOF_TIMEVAL64 __ALIGNOF_TIME64_T__
 
 
 #ifdef __CC__
@@ -82,17 +85,17 @@ __TIMEVAL_CXX_DECL_BEGIN
 #define _STRUCT_TIMEVAL 1
 struct timeval /*[PREFIX(tv_)]*/ {
 	__TM_TYPE(time)   tv_sec;   /* Seconds */
-#if __TM_SIZEOF(TIME) <= 4 && __SIZEOF_SUSECONDS_T__ > 4
+#if __SIZEOF_TIME_T__ <= 4 && __SIZEOF_SUSECONDS_T__ > 4
 	__UINT32_TYPE__ __tv_pad; /* ... */
-#endif /* __TM_SIZEOF(TIME) <= 4 && __SIZEOF_SUSECONDS_T__ > 4 */
+#endif /* __SIZEOF_TIME_T__ <= 4 && __SIZEOF_SUSECONDS_T__ > 4 */
 #ifdef __USE_KOS_ALTERATIONS
 	__CRT_PRIVATE_ULNG(__SIZEOF_SUSECONDS_T__) tv_usec;  /* Micro seconds (< 1000000 == 1_000_000) */
 #else /* __USE_KOS_ALTERATIONS */
 	__suseconds_t     tv_usec;  /* Micro seconds (< 1000000 == 1_000_000) */
 #endif /* !__USE_KOS_ALTERATIONS */
-#if __TM_SIZEOF(TIME) > 4 && __SIZEOF_SUSECONDS_T__ <= 4
+#if __SIZEOF_TIME_T__ > 4 && __SIZEOF_SUSECONDS_T__ <= 4
 	__UINT32_TYPE__ __tv_pad; /* ... */
-#endif /* __TM_SIZEOF(TIME) > 4 && __SIZEOF_SUSECONDS_T__ <= 4 */
+#endif /* __SIZEOF_TIME_T__ > 4 && __SIZEOF_SUSECONDS_T__ <= 4 */
 	__TIMEVAL_CXX_SUPPORT(struct timeval, __TM_TYPE(time), __CRT_PRIVATE_ULNG(__SIZEOF_SUSECONDS_T__))
 };
 __TIMEVAL_CXX_SUPPORT2(struct timeval, __TM_TYPE(time), __CRT_PRIVATE_ULNG(__SIZEOF_SUSECONDS_T__))

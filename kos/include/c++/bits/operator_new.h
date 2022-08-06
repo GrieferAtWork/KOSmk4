@@ -38,6 +38,11 @@
 __CXXDECL_BEGIN
 __NAMESPACE_STD_BEGIN
 
+#ifndef __std_size_t_defined
+#define __std_size_t_defined
+typedef __SIZE_TYPE__ size_t;
+#endif /* !__std_size_t_defined */
+
 #ifndef __std_nothrow_t_defined
 #define __std_nothrow_t_defined
 struct nothrow_t {};

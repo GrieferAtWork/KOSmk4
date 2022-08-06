@@ -203,7 +203,7 @@ INTDEF byte_t __kernel_bootidle_stack_guard[];
 #endif /* CONFIG_HAVE_KERNEL_STACK_GUARD */
 
 INTDEF struct taskpid boottask_pid;
-INTDEF struct taskpid bootidle_pid;
+INTDEF struct taskpid bootcpu_idle_pid;
 INTDEF struct taskpid asyncwork_pid;
 
 
@@ -277,7 +277,7 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 
 	/* Fill in task PID pointers. */
 	FORTASK(&boottask, this_taskpid)  = &boottask_pid;
-	FORTASK(&bootidle, this_taskpid)  = &bootidle_pid;
+	FORTASK(&bootidle, this_taskpid)  = &bootcpu_idle_pid;
 	FORTASK(&asyncwork, this_taskpid) = &asyncwork_pid;
 
 	/* Assign task command names. */
