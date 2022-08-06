@@ -47,7 +47,7 @@ __DECL_BEGIN
 /* `struct gpregs32'                                                    */
 /************************************************************************/
 #define gpregs32_foreach_elem(self) \
-	((__UINT64_TYPE__ const *)__COMPILER_REQTYPE(struct gpregs32 const *, self))
+	((__UINT32_TYPE__ const *)__COMPILER_REQTYPE(struct gpregs32 const *, self))
 #define gpregs32_foreach_size(self) 8
 #define gpregs32_foreach(self, cb)                                 \
 	do {                                                           \
@@ -211,7 +211,7 @@ __DECL_BEGIN
 /* `struct lcpustate32'                                                 */
 /************************************************************************/
 #define lcpustate32_foreach_gpregs_elem(self) \
-	((__UINT64_TYPE__ const *)__COMPILER_REQTYPE(struct lcpustate32 const *, self))
+	((__UINT32_TYPE__ const *)__COMPILER_REQTYPE(struct lcpustate32 const *, self))
 #define lcpustate32_foreach_gpregs_size(self) 6
 #define lcpustate32_foreach_gpregs(self, cb)                                    \
 	do {                                                                        \
