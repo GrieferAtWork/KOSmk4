@@ -255,7 +255,15 @@ build_mtools() {
 		fi
 		echo "	Now installing $MTOOLS_VERSION (to '$KOS_BINUTILS/misc/')"
 		cmd cd "$KOS_BINUTILS/misc/opt/$MTOOLS_VERSION"
-		cmd make -j $MAKE_PARALLEL_COUNT install
+		# The install command for mtools doesn't like it if its bin dir already exists?
+		# Anyways: if may `make' here fails, we check if it did in fact install the exe
+		#          already, and if so: we just act like everything worked ;)
+		if ! make -j $MAKE_PARALLEL_COUNT install; then
+			if ! [ -f "$KOS_BINUTILS/misc/bin/mtools" ] && \
+			   ! [ -f "$KOS_BINUTILS/misc/bin/mtools.exe" ]; then
+				cmd make -j $MAKE_PARALLEL_COUNT install
+			fi
+		fi
 		cmd cd "$KOS_BINUTILS"
 	else
 		echo "	$MTOOLS_VERSION has already been installed"
