@@ -495,11 +495,11 @@ again_notif:
 
 
 INTERN_CONST struct kernel_debugtraps const GDBServer_DebugTraps = {
+	.dt_trap_ucpustate = &GDBServer_TrapUCpuState,
+	.dt_trap_lcpustate = &GDBServer_TrapLCpuState,
+	.dt_trap_kcpustate = &GDBServer_TrapKCpuState,
 	.dt_trap_icpustate = &GDBServer_TrapICpuState,
 	.dt_trap_scpustate = &GDBServer_TrapSCpuState,
-	.dt_trap_ucpustate = &GDBServer_TrapUCpuState,
-	.dt_trap_kcpustate = &GDBServer_TrapKCpuState,
-	.dt_trap_lcpustate = &GDBServer_TrapLCpuState,
 	.dt_trap_fcpustate = &GDBServer_TrapFCpuState,
 };
 

@@ -29,18 +29,27 @@
 
 #include <stdbool.h>
 
-DECL_BEGIN
-
 #ifdef __CC__
+DECL_BEGIN
 
 struct kernel_debugtraps {
 	/* NOTE: Either all callbacks from this structure are defined, or none of them are. */
-	ATTR_RETNONNULL_T NONNULL_T((1, 2)) struct icpustate *(FCALL *dt_trap_icpustate)(struct icpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
-	ATTR_RETNONNULL_T NONNULL_T((1, 2)) struct scpustate *(FCALL *dt_trap_scpustate)(struct scpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
 	ATTR_RETNONNULL_T NONNULL_T((1, 2)) struct ucpustate *(FCALL *dt_trap_ucpustate)(struct ucpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
-	ATTR_RETNONNULL_T NONNULL_T((1, 2)) struct kcpustate *(FCALL *dt_trap_kcpustate)(struct kcpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
+#ifndef LCPUSTATE_ALIAS
 	ATTR_RETNONNULL_T NONNULL_T((1, 2)) struct lcpustate *(FCALL *dt_trap_lcpustate)(struct lcpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
+#endif /* !LCPUSTATE_ALIAS */
+#ifndef KCPUSTATE_ALIAS
+	ATTR_RETNONNULL_T NONNULL_T((1, 2)) struct kcpustate *(FCALL *dt_trap_kcpustate)(struct kcpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
+#endif /* !KCPUSTATE_ALIAS */
+#ifndef ICPUSTATE_ALIAS
+	ATTR_RETNONNULL_T NONNULL_T((1, 2)) struct icpustate *(FCALL *dt_trap_icpustate)(struct icpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
+#endif /* !ICPUSTATE_ALIAS */
+#ifndef SCPUSTATE_ALIAS
+	ATTR_RETNONNULL_T NONNULL_T((1, 2)) struct scpustate *(FCALL *dt_trap_scpustate)(struct scpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
+#endif /* !SCPUSTATE_ALIAS */
+#ifndef FCPUSTATE_ALIAS
 	ATTR_RETNONNULL_T NONNULL_T((1, 2)) struct fcpustate *(FCALL *dt_trap_fcpustate)(struct fcpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
+#endif /* !FCPUSTATE_ALIAS */
 };
 
 
@@ -92,51 +101,85 @@ FUNDEF void FCALL kernel_debugtrap(struct debugtrap_reason const *__restrict rea
 /* Debug trap invocation.
  * NOTE: `trap_regs' is written as `NAME:VALUE;NAME:VALUE;...'
  * @param: trapno: Signal number (One of `SIG*') */
-FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap_icpustate(struct icpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
-FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap_scpustate(struct scpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
 FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap_ucpustate(struct ucpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
-FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap_kcpustate(struct kcpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
-FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap_lcpustate(struct lcpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
-FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap_fcpustate(struct fcpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
-FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL kernel_debugtrap_r_icpustate(struct icpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
-FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct scpustate *FCALL kernel_debugtrap_r_scpustate(struct scpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
 FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct ucpustate *FCALL kernel_debugtrap_r_ucpustate(struct ucpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
-FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct kcpustate *FCALL kernel_debugtrap_r_kcpustate(struct kcpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
+#ifdef LCPUSTATE_ALIAS
+FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap_lcpustate(struct lcpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_" LCPUSTATE_ALIAS_STR);
+FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct lcpustate *FCALL kernel_debugtrap_r_lcpustate(struct lcpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_r_" LCPUSTATE_ALIAS_STR);
+#else /* LCPUSTATE_ALIAS */
+FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap_lcpustate(struct lcpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
 FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct lcpustate *FCALL kernel_debugtrap_r_lcpustate(struct lcpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
+#endif /* !LCPUSTATE_ALIAS */
+#ifdef KCPUSTATE_ALIAS
+FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap_kcpustate(struct kcpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_" KCPUSTATE_ALIAS_STR);
+FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct kcpustate *FCALL kernel_debugtrap_r_kcpustate(struct kcpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_r_" KCPUSTATE_ALIAS_STR);
+#else /* KCPUSTATE_ALIAS */
+FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap_kcpustate(struct kcpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
+FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct kcpustate *FCALL kernel_debugtrap_r_kcpustate(struct kcpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
+#endif /* !KCPUSTATE_ALIAS */
+#ifdef ICPUSTATE_ALIAS
+FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap_icpustate(struct icpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_" ICPUSTATE_ALIAS_STR);
+FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL kernel_debugtrap_r_icpustate(struct icpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_r_" ICPUSTATE_ALIAS_STR);
+#else /* ICPUSTATE_ALIAS */
+FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap_icpustate(struct icpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
+FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL kernel_debugtrap_r_icpustate(struct icpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
+#endif /* !ICPUSTATE_ALIAS */
+#ifdef SCPUSTATE_ALIAS
+FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap_scpustate(struct scpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_" SCPUSTATE_ALIAS_STR);
+FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct scpustate *FCALL kernel_debugtrap_r_scpustate(struct scpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_r_" SCPUSTATE_ALIAS_STR);
+#else /* SCPUSTATE_ALIAS */
+FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap_scpustate(struct scpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
+FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct scpustate *FCALL kernel_debugtrap_r_scpustate(struct scpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
+#endif /* !SCPUSTATE_ALIAS */
+#ifdef FCPUSTATE_ALIAS
+FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap_fcpustate(struct fcpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_" FCPUSTATE_ALIAS_STR);
+FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct fcpustate *FCALL kernel_debugtrap_r_fcpustate(struct fcpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_r_" FCPUSTATE_ALIAS_STR);
+#else /* FCPUSTATE_ALIAS */
+FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap_fcpustate(struct fcpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
 FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct fcpustate *FCALL kernel_debugtrap_r_fcpustate(struct fcpustate *__restrict state, struct debugtrap_reason const *__restrict reason);
+#endif /* !FCPUSTATE_ALIAS */
 
 #ifdef __cplusplus
 extern "C++" {
-FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct icpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_icpustate");
-FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct scpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_scpustate");
-FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct ucpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_ucpustate");
-FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct kcpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_kcpustate");
-FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct lcpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_lcpustate");
-FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct fcpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_fcpustate");
-FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL kernel_debugtrap_r(struct icpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_r_icpustate");
-FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct scpustate *FCALL kernel_debugtrap_r(struct scpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_r_scpustate");
-FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct ucpustate *FCALL kernel_debugtrap_r(struct ucpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_r_ucpustate");
-FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct kcpustate *FCALL kernel_debugtrap_r(struct kcpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_r_kcpustate");
-FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct lcpustate *FCALL kernel_debugtrap_r(struct lcpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_r_lcpustate");
-FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct fcpustate *FCALL kernel_debugtrap_r(struct fcpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_r_fcpustate");
 LOCAL void FCALL kernel_debugtrap(syscall_ulong_t signo) { struct debugtrap_reason r; r.dtr_signo = signo; r.dtr_reason = DEBUGTRAP_REASON_NONE; kernel_debugtrap(&r); }
-LOCAL ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct icpustate *__restrict state, syscall_ulong_t signo) { struct debugtrap_reason r; r.dtr_signo = signo; r.dtr_reason = DEBUGTRAP_REASON_NONE; kernel_debugtrap(state, &r); }
-LOCAL ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct scpustate *__restrict state, syscall_ulong_t signo) { struct debugtrap_reason r; r.dtr_signo = signo; r.dtr_reason = DEBUGTRAP_REASON_NONE; kernel_debugtrap(state, &r); }
+FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct ucpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_ucpustate");
+FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct ucpustate *FCALL kernel_debugtrap_r(struct ucpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_r_ucpustate");
 LOCAL ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct ucpustate *__restrict state, syscall_ulong_t signo) { struct debugtrap_reason r; r.dtr_signo = signo; r.dtr_reason = DEBUGTRAP_REASON_NONE; kernel_debugtrap(state, &r); }
-LOCAL ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct kcpustate *__restrict state, syscall_ulong_t signo) { struct debugtrap_reason r; r.dtr_signo = signo; r.dtr_reason = DEBUGTRAP_REASON_NONE; kernel_debugtrap(state, &r); }
-LOCAL ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct lcpustate *__restrict state, syscall_ulong_t signo) { struct debugtrap_reason r; r.dtr_signo = signo; r.dtr_reason = DEBUGTRAP_REASON_NONE; kernel_debugtrap(state, &r); }
-LOCAL ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct fcpustate *__restrict state, syscall_ulong_t signo) { struct debugtrap_reason r; r.dtr_signo = signo; r.dtr_reason = DEBUGTRAP_REASON_NONE; kernel_debugtrap(state, &r); }
-LOCAL ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL kernel_debugtrap_r(struct icpustate *__restrict state, syscall_ulong_t signo) { struct debugtrap_reason r; r.dtr_signo = signo; r.dtr_reason = DEBUGTRAP_REASON_NONE; return kernel_debugtrap_r(state, &r); }
-LOCAL ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct scpustate *FCALL kernel_debugtrap_r(struct scpustate *__restrict state, syscall_ulong_t signo) { struct debugtrap_reason r; r.dtr_signo = signo; r.dtr_reason = DEBUGTRAP_REASON_NONE; return kernel_debugtrap_r(state, &r); }
 LOCAL ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct ucpustate *FCALL kernel_debugtrap_r(struct ucpustate *__restrict state, syscall_ulong_t signo) { struct debugtrap_reason r; r.dtr_signo = signo; r.dtr_reason = DEBUGTRAP_REASON_NONE; return kernel_debugtrap_r(state, &r); }
-LOCAL ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct kcpustate *FCALL kernel_debugtrap_r(struct kcpustate *__restrict state, syscall_ulong_t signo) { struct debugtrap_reason r; r.dtr_signo = signo; r.dtr_reason = DEBUGTRAP_REASON_NONE; return kernel_debugtrap_r(state, &r); }
+#ifndef LCPUSTATE_ALIAS
+FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct lcpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_lcpustate");
+FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct lcpustate *FCALL kernel_debugtrap_r(struct lcpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_r_lcpustate");
+LOCAL ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct lcpustate *__restrict state, syscall_ulong_t signo) { struct debugtrap_reason r; r.dtr_signo = signo; r.dtr_reason = DEBUGTRAP_REASON_NONE; kernel_debugtrap(state, &r); }
 LOCAL ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct lcpustate *FCALL kernel_debugtrap_r(struct lcpustate *__restrict state, syscall_ulong_t signo) { struct debugtrap_reason r; r.dtr_signo = signo; r.dtr_reason = DEBUGTRAP_REASON_NONE; return kernel_debugtrap_r(state, &r); }
+#endif /* !LCPUSTATE_ALIAS */
+#ifndef KCPUSTATE_ALIAS
+FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct kcpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_kcpustate");
+FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct kcpustate *FCALL kernel_debugtrap_r(struct kcpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_r_kcpustate");
+LOCAL ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct kcpustate *__restrict state, syscall_ulong_t signo) { struct debugtrap_reason r; r.dtr_signo = signo; r.dtr_reason = DEBUGTRAP_REASON_NONE; kernel_debugtrap(state, &r); }
+LOCAL ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct kcpustate *FCALL kernel_debugtrap_r(struct kcpustate *__restrict state, syscall_ulong_t signo) { struct debugtrap_reason r; r.dtr_signo = signo; r.dtr_reason = DEBUGTRAP_REASON_NONE; return kernel_debugtrap_r(state, &r); }
+#endif /* !KCPUSTATE_ALIAS */
+#ifndef ICPUSTATE_ALIAS
+FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct icpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_icpustate");
+FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL kernel_debugtrap_r(struct icpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_r_icpustate");
+LOCAL ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct icpustate *__restrict state, syscall_ulong_t signo) { struct debugtrap_reason r; r.dtr_signo = signo; r.dtr_reason = DEBUGTRAP_REASON_NONE; kernel_debugtrap(state, &r); }
+LOCAL ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL kernel_debugtrap_r(struct icpustate *__restrict state, syscall_ulong_t signo) { struct debugtrap_reason r; r.dtr_signo = signo; r.dtr_reason = DEBUGTRAP_REASON_NONE; return kernel_debugtrap_r(state, &r); }
+#endif /* !ICPUSTATE_ALIAS */
+#ifndef SCPUSTATE_ALIAS
+FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct scpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_scpustate");
+FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct scpustate *FCALL kernel_debugtrap_r(struct scpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_r_scpustate");
+LOCAL ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct scpustate *__restrict state, syscall_ulong_t signo) { struct debugtrap_reason r; r.dtr_signo = signo; r.dtr_reason = DEBUGTRAP_REASON_NONE; kernel_debugtrap(state, &r); }
+LOCAL ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct scpustate *FCALL kernel_debugtrap_r(struct scpustate *__restrict state, syscall_ulong_t signo) { struct debugtrap_reason r; r.dtr_signo = signo; r.dtr_reason = DEBUGTRAP_REASON_NONE; return kernel_debugtrap_r(state, &r); }
+#endif /* !SCPUSTATE_ALIAS */
+#ifndef FCPUSTATE_ALIAS
+FUNDEF ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct fcpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_fcpustate");
+FUNDEF ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct fcpustate *FCALL kernel_debugtrap_r(struct fcpustate *__restrict state, struct debugtrap_reason const *__restrict reason) ASMNAME("kernel_debugtrap_r_fcpustate");
+LOCAL ATTR_NORETURN NONNULL((1)) void FCALL kernel_debugtrap(struct fcpustate *__restrict state, syscall_ulong_t signo) { struct debugtrap_reason r; r.dtr_signo = signo; r.dtr_reason = DEBUGTRAP_REASON_NONE; kernel_debugtrap(state, &r); }
 LOCAL ABNORMAL_RETURN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct fcpustate *FCALL kernel_debugtrap_r(struct fcpustate *__restrict state, syscall_ulong_t signo) { struct debugtrap_reason r; r.dtr_signo = signo; r.dtr_reason = DEBUGTRAP_REASON_NONE; return kernel_debugtrap_r(state, &r); }
+#endif /* !FCPUSTATE_ALIAS */
 }
 #endif /* __cplusplus */
 
-#endif /* __CC__ */
-
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_DEBUGTRAP_H */

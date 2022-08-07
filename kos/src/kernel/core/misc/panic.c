@@ -484,9 +484,13 @@ handle_retry_or_ignore:
 		x86_dbg_setregbyidp(DBG_REGLEVEL_TRAP,
 		                    X86_REGISTER_GENERAL_PURPOSE_EAX,
 		                    acheck_result);
-#else
-#error Unsupported arch
-#endif
+#elif defined(__arm__)
+		arm_dbg_setregbyidp(DBG_REGLEVEL_TRAP,
+		                    ARM_REGISTER_GENERAL_PURPOSE_R0,
+		                    acheck_result);
+#else /* ... */
+#error "Unsupported arch"
+#endif /* !... */
 		return;
 	}
 	/* Enter debugger mode. */
@@ -506,9 +510,11 @@ NOTHROW(FCALL libc_assertion_check_core)(struct assert_args *__restrict args) {
 		args->aa_state.kcs_gpregs.gp_rax = 0;
 #elif defined(__i386__)
 		args->aa_state.kcs_gpregs.gp_eax = 0;
-#else
-#error Unsupported arch
-#endif
+#elif defined(__arm__)
+		args->aa_state.ucs_r0 = 0;
+#else /* ... */
+#error "Unsupported arch"
+#endif /* !... */
 		return &args->aa_state;
 	}
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
@@ -748,7 +754,7 @@ NOTHROW(VCALL kernel_panic_ucpustate_n)(unsigned int n_skip,
 /************************************************************************/
 /* LCPUSTATE                                                            */
 /************************************************************************/
-#ifndef LCPUSTATE_IS_UCPUSTATE
+#ifndef LCPUSTATE_ALIAS
 PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((2)) void
 NOTHROW(FCALL kernel_vpanic_lcpustate_n)(unsigned int n_skip,
                                          struct lcpustate *__restrict state,
@@ -780,7 +786,7 @@ NOTHROW(VCALL kernel_panic_lcpustate_n)(unsigned int n_skip,
 	va_start(args, format);
 	kernel_vpanic_lcpustate_n(n_skip, state, format, args);
 }
-#endif /* !LCPUSTATE_IS_UCPUSTATE */
+#endif /* !LCPUSTATE_ALIAS */
 
 
 
@@ -788,7 +794,7 @@ NOTHROW(VCALL kernel_panic_lcpustate_n)(unsigned int n_skip,
 /************************************************************************/
 /* KCPUSTATE                                                            */
 /************************************************************************/
-#if !defined(KCPUSTATE_IS_UCPUSTATE) && !defined(KCPUSTATE_IS_LCPUSTATE)
+#ifndef KCPUSTATE_ALIAS
 PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((2)) void
 NOTHROW(FCALL kernel_vpanic_kcpustate_n)(unsigned int n_skip,
                                          struct kcpustate *__restrict state,
@@ -820,7 +826,7 @@ NOTHROW(VCALL kernel_panic_kcpustate_n)(unsigned int n_skip,
 	va_start(args, format);
 	kernel_vpanic_kcpustate_n(n_skip, state, format, args);
 }
-#endif /* !KCPUSTATE_IS_UCPUSTATE && !KCPUSTATE_IS_LCPUSTATE */
+#endif /* !KCPUSTATE_ALIAS */
 
 
 
@@ -828,7 +834,7 @@ NOTHROW(VCALL kernel_panic_kcpustate_n)(unsigned int n_skip,
 /************************************************************************/
 /* ICPUSTATE                                                            */
 /************************************************************************/
-#if !defined(ICPUSTATE_IS_UCPUSTATE) && !defined(ICPUSTATE_IS_LCPUSTATE) && !defined(ICPUSTATE_IS_KCPUSTATE)
+#ifndef ICPUSTATE_ALIAS
 PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((2)) void
 NOTHROW(FCALL kernel_vpanic_icpustate_n)(unsigned int n_skip,
                                          struct icpustate *__restrict state,
@@ -860,7 +866,7 @@ NOTHROW(VCALL kernel_panic_icpustate_n)(unsigned int n_skip,
 	va_start(args, format);
 	kernel_vpanic_icpustate_n(n_skip, state, format, args);
 }
-#endif /* !ICPUSTATE_IS_UCPUSTATE && !ICPUSTATE_IS_LCPUSTATE && !ICPUSTATE_IS_KCPUSTATE */
+#endif /* !ICPUSTATE_ALIAS */
 
 
 
@@ -868,7 +874,7 @@ NOTHROW(VCALL kernel_panic_icpustate_n)(unsigned int n_skip,
 /************************************************************************/
 /* SCPUSTATE                                                            */
 /************************************************************************/
-#if !defined(SCPUSTATE_IS_UCPUSTATE) && !defined(SCPUSTATE_IS_LCPUSTATE) && !defined(SCPUSTATE_IS_KCPUSTATE) && !defined(SCPUSTATE_IS_ICPUSTATE)
+#ifndef SCPUSTATE_ALIAS
 PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((2)) void
 NOTHROW(FCALL kernel_vpanic_scpustate_n)(unsigned int n_skip,
                                          struct scpustate *__restrict state,
@@ -900,7 +906,7 @@ NOTHROW(VCALL kernel_panic_scpustate_n)(unsigned int n_skip,
 	va_start(args, format);
 	kernel_vpanic_scpustate_n(n_skip, state, format, args);
 }
-#endif /* !SCPUSTATE_IS_UCPUSTATE && !SCPUSTATE_IS_LCPUSTATE && !SCPUSTATE_IS_KCPUSTATE && !SCPUSTATE_IS_ICPUSTATE */
+#endif /* !SCPUSTATE_ALIAS */
 
 
 
@@ -909,7 +915,7 @@ NOTHROW(VCALL kernel_panic_scpustate_n)(unsigned int n_skip,
 /************************************************************************/
 /* FCPUSTATE                                                            */
 /************************************************************************/
-#if !defined(FCPUSTATE_IS_UCPUSTATE) && !defined(FCPUSTATE_IS_LCPUSTATE) && !defined(FCPUSTATE_IS_KCPUSTATE) && !defined(FCPUSTATE_IS_ICPUSTATE) && !defined(FCPUSTATE_IS_SCPUSTATE)
+#ifndef FCPUSTATE_ALIAS
 PUBLIC ABNORMAL_RETURN ATTR_COLD ATTR_COLDTEXT ATTR_NORETURN NONNULL((2)) void
 NOTHROW(FCALL kernel_vpanic_fcpustate_n)(unsigned int n_skip,
                                          struct fcpustate *__restrict state,
@@ -942,7 +948,7 @@ NOTHROW(VCALL kernel_panic_fcpustate_n)(unsigned int n_skip,
 	va_start(args, format);
 	kernel_vpanic_fcpustate_n(n_skip, state, format, args);
 }
-#endif /* !FCPUSTATE_IS_UCPUSTATE && !FCPUSTATE_IS_LCPUSTATE && !FCPUSTATE_IS_KCPUSTATE && !FCPUSTATE_IS_ICPUSTATE && !FCPUSTATE_IS_SCPUSTATE */
+#endif /* !FCPUSTATE_ALIAS */
 
 
 DECL_END

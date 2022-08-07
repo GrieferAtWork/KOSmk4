@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _ARM_KOS_KOS_KERNEL_CPU_STATE_H
-#define _ARM_KOS_KOS_KERNEL_CPU_STATE_H 1
+#ifndef _ARM_KOS_KOS_KERNEL_BITS_CPU_STATE_H
+#define _ARM_KOS_KOS_KERNEL_BITS_CPU_STATE_H 1
 
 #include <__stdinc.h>
 
@@ -211,4 +211,4 @@ struct fcpustate { /* f -- Full */
 __SYSDECL_END
 #endif /* __CC__ */
 
-#endif /* !_ARM_KOS_KOS_KERNEL_CPU_STATE_H */
+#endif /* !_ARM_KOS_KOS_KERNEL_BITS_CPU_STATE_H */
