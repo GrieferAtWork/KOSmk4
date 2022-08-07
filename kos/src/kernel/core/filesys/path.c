@@ -43,6 +43,7 @@
 #include <sched/tsc.h>
 
 #include <hybrid/atomic.h>
+#include <hybrid/sched/preemption.h>
 
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
@@ -123,7 +124,7 @@ NOTHROW(FCALL _path_getvfs)(struct path *__restrict self) {
 		preemption_flag_t was;
 		preemption_pushoff(&was);
 		do {
-			self = path_parent(self);
+			self = self->p_parent;
 		} while (!path_isroot(self));
 		preemption_pop(&was);
 #else /* CONFIG_NO_SMP */

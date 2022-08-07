@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27af002 */
+/* HASH CRC-32:0x15c7ebc7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -429,10 +429,8 @@ __CDECLARE_OPT(__ATTR_OUTS(2, 3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,epoll_pwait
 #define __prpc_exec_callback_t_defined
 #ifndef PRPC_EXEC_CALLBACK_CC
 #ifdef __KERNEL__
-typedef struct icpustate rpc_cpustate_t;
 #define PRPC_EXEC_CALLBACK_CC __FCALL
 #else /* __KERNEL__ */
-typedef struct ucpustate rpc_cpustate_t;
 #define PRPC_EXEC_CALLBACK_CC __LIBKCALL
 #endif /* !__KERNEL__ */
 #endif /* !PRPC_EXEC_CALLBACK_CC */

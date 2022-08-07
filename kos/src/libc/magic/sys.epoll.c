@@ -460,10 +460,8 @@ __STDC_INT_AS_SSIZE_T epoll_pwait($fd_t epfd, [[out(return <= maxevents)]] struc
 #define __prpc_exec_callback_t_defined
 #ifndef PRPC_EXEC_CALLBACK_CC
 #ifdef __KERNEL__
-typedef struct icpustate rpc_cpustate_t;
 #define PRPC_EXEC_CALLBACK_CC __FCALL
 #else /* __KERNEL__ */
-typedef struct ucpustate rpc_cpustate_t;
 #define PRPC_EXEC_CALLBACK_CC __LIBKCALL
 #endif /* !__KERNEL__ */
 #endif /* !PRPC_EXEC_CALLBACK_CC */

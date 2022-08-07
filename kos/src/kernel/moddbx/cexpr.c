@@ -278,6 +278,10 @@ NOTHROW(FCALL get_user_tls_base_register)(void) {
 	if (!x86_dbg_getregbyid(DBG_REGLEVEL_VIEW, X86_REGISTER_MISC_GSBASEL,
 	                        &result, sizeof(result)))
 		result = FORTASK(dbg_current, this_x86_user_gsbase);
+#elif defined(__arm__)
+	if (!arm_dbg_getregbyid(DBG_REGLEVEL_VIEW, ARM_REGISTER_TLSBASE,
+	                        &result, sizeof(result)))
+		result = FORTASK(dbg_current, this_arm_user_tlsbase);
 #else /* ... */
 #error "Unsupported architecture"
 #endif /* !... */

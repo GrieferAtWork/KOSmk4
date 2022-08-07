@@ -17,9 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _ASM_INTRIN_H
-#define _ASM_INTRIN_H 1
+#ifndef _ASM_INTRIN_FPU_H
+#define _ASM_INTRIN_FPU_H 1
 
 /* Placeholder... */
 
-#endif /* !_ASM_INTRIN_H */
+#endif /* !_ASM_INTRIN_FPU_H */

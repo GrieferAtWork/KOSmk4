@@ -17,9 +17,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _ASM_INTRIN_H
-#define _ASM_INTRIN_H 1
+#ifndef _ARM_KOS_LIBSERVICE_BITS_COM_H
+#define _ARM_KOS_LIBSERVICE_BITS_COM_H 1
 
-/* Placeholder... */
+#include <__stdinc.h>
 
-#endif /* !_ASM_INTRIN_H */
+#include <hybrid/typecore.h>
+
+#ifdef __CC__
+__DECL_BEGIN
+
+union service_com_retval {
+	__UINT64_TYPE__ scr_64b; /* 64-bit return value */
+	struct {
+		__UINT32_TYPE__ scr_r0; /* Value for `r0' */
+		__UINT32_TYPE__ scr_r1; /* Value for `r1' */
+	};
+};
+
+#define SERVICE_COM_RETVAL_INIT(value) { (__UINT64_TYPE__)(value) }
+
+__DECL_END
+#endif /* __CC__ */
+
+
+#endif /* !_ARM_KOS_LIBSERVICE_BITS_COM_H */

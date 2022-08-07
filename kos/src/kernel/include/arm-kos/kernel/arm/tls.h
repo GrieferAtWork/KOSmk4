@@ -17,9 +17,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _ASM_INTRIN_H
-#define _ASM_INTRIN_H 1
+#ifndef GUARD_KERNEL_INCLUDE_ARM_KOS_KERNEL_ARM_TLS_H
+#define GUARD_KERNEL_INCLUDE_ARM_KOS_KERNEL_ARM_TLS_H 1
 
-/* Placeholder... */
+#include <__stdinc.h>
 
-#endif /* !_ASM_INTRIN_H */
+#ifdef __CC__
+DECL_BEGIN
+
+/* Get/set the current user-space TLS pointer */
+FUNDEF WUNUSED USER void *NOTHROW(KCALL arm_get_user_tlsbase)(void);
+FUNDEF void NOTHROW(KCALL arm_set_user_tlsbase)(USER void *newtls);
+
+DECL_END
+#endif /* __CC__ */
+
+#endif /* !GUARD_KERNEL_INCLUDE_ARM_KOS_KERNEL_ARM_TLS_H */

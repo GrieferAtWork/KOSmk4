@@ -54,6 +54,7 @@
 #include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state-verify.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/nopf.h>
 #include <kos/rpc.h>
@@ -73,13 +74,15 @@
 
 #if defined(__i386__) || defined(__x86_64__)
 #include <sched/x86/eflags-mask.h>
-
-#include <kos/kernel/cpu-state-verify.h>
 #endif /* __i386__ || __x86_64__ */
 
 #if defined(__i386__) && !defined(__x86_64__)
 #include <kernel/x86/gdt.h> /* x86_set_user_fsbase(), x86_set_user_gsbase() */
 #endif /* __i386__ && !__x86_64__ */
+
+#ifdef __arm__
+#include <kernel/arm/tls.h> /* x86_set_user_fsbase(), x86_set_user_gsbase() */
+#endif /* __arm__ */
 
 #ifdef CONFIG_HAVE_FPU
 #include <kos/kernel/fpu-state.h>
@@ -582,16 +585,18 @@ rpc_mem_fill(struct rpc_mem *__restrict self,
 
 
 /* Flags for `struct rpc_vm::rv_flags' */
-#define RPC_VM_NORMAL      0x0000 /* Normal flags. */
-#define RPC_VM_HAVESIGMASK 0x0001 /* `rv_sigmask' must be or'd with the calling thread's signal mask. */
+#define RPC_VM_NORMAL           0x0000 /* Normal flags. */
+#define RPC_VM_HAVESIGMASK      0x0001 /* `rv_sigmask' must be or'd with the calling thread's signal mask. */
 #ifdef CONFIG_HAVE_FPU
 #define RPC_VM_HAVEFPU          0x0002 /* FPU state loaded */
 #define RPC_VM_HAVEFPU_MODIFIED 0x0004 /* FPU state was modified */
 #endif /* CONFIG_HAVE_FPU */
 #if defined(__i386__) && !defined(__x86_64__)
-#define RPC_VM_HAVE_FSBASE 0x4000 /* `rv_386_fsbase' must be set during exit. */
-#define RPC_VM_HAVE_GSBASE 0x8000 /* `rv_386_gsbase' must be set during exit. */
-#endif /* __i386__ && !__x86_64__ */
+#define RPC_VM_HAVE_FSBASE      0x4000 /* `rv_386_fsbase' must be set during exit. */
+#define RPC_VM_HAVE_GSBASE      0x8000 /* `rv_386_gsbase' must be set during exit. */
+#elif defined(__arm__)
+#define RPC_VM_HAVE_TLSBASE     0x8000 /* `rv_arm_tlsbase' must be set during exit. */
+#endif /* ... */
 
 struct rpc_vm {
 	struct rpc_mem                 rv_mem;                       /* Memory access controller. */
@@ -615,6 +620,8 @@ struct rpc_vm {
 #if defined(__i386__) && !defined(__x86_64__)
 	uintptr_t                      rv_386_fsbase;                /* [valid_if(RPC_VM_HAVE_FSBASE)] Value for %fs.base (to-be loaded during exit) */
 	uintptr_t                      rv_386_gsbase;                /* [valid_if(RPC_VM_HAVE_GSBASE)] Value for %gs.base (to-be loaded during exit) */
+#elif defined(__arm__)
+	uintptr_t                      rv_arm_tlsbase;               /* [valid_if(RPC_VM_HAVE_TLSBASE)] Value for user-space TLS base (to-be loaded during exit) */
 #endif /* __i386__ && !__x86_64__ */
 #ifdef __ARCH_HAVE_COMPAT
 	unwind_getreg_t                rv_unwind_getreg;             /* [1..1][const] Unwind get register function. */
@@ -1849,9 +1856,27 @@ follow_jmp:
 		self->rv_flags |= RPC_VM_HAVE_GSBASE;
 		self->rv_386_gsbase = POP();
 		break;
+#elif defined(__arm__)
+	CASE(RPC_OP_arm_pushreg_tlsbase)
+		if unlikely(!CANPUSH(1))
+			goto err_stack_overflow;
+		PUSH(self->rv_flags & RPC_VM_HAVE_TLSBASE ? self->rv_arm_tlsbase
+		                                          : (uintptr_t)arm_get_user_tlsbase());
+		break;
+
+	CASE(RPC_OP_arm_popreg_tlsbase)
+		if unlikely(!CANPOP(1))
+			goto err_stack_underflow;
+		self->rv_flags |= RPC_VM_HAVE_TLSBASE;
+		self->rv_arm_tlsbase = POP();
+		break;
 #else /* ... */
 	/* No arch-specific instructions for this platform... */
 #endif /* !... */
+
+
+
+
 
 	default:
 		/* Unknown instruction. */
@@ -1931,7 +1956,11 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 
 	/* Initialize the RPC program VM */
 	rpc_mem_init(&vm.rv_mem);
+#ifdef ICPUSTATE_IS_UCPUSTATE
+	vm.rv_cpu = *state;
+#else /* ICPUSTATE_IS_UCPUSTATE */
 	icpustate_to_ucpustate(state, &vm.rv_cpu);
+#endif /* !ICPUSTATE_IS_UCPUSTATE */
 	vm.rv_rpc       = rpc;
 	vm.rv_reason    = reason;
 	vm.rv_sc_info   = sc_info;
@@ -2086,9 +2115,60 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 		icpustate_setpflags(state, ucpustate_getpflags(&vm.rv_cpu));
 		icpustate_setpip(state, ucpustate_getpip(&vm.rv_cpu));
 		icpustate_setuserpsp(state, ucpustate_getpsp(&vm.rv_cpu));
-#else /* __i386__ || __x86_64__ */
+#elif defined(__arm__)
+		cpustate_verify_apsr(icpustate_getcpsr(state),
+		                     ucpustate_getcpsr(&vm.rv_cpu));
+
+		/* NOTE: Even though some of the stuff  below is still able to  throw
+		 *       exceptions, this _has_ to be the point of no return in terms
+		 *       of cancelability, since from this point forth, we have to do
+		 *       stuff that cannot be undone. */
+
+		/* Indicate that the RPC was successfully executed. */
+		if (!ATOMIC_CMPXCH(rpc->pr_user.pur_status,
+		                   PENDING_USER_RPC_STATUS_PENDING,
+		                   PENDING_USER_RPC_STATUS_COMPLETE)) {
+			assert(rpc->pr_user.pur_status == PENDING_USER_RPC_STATUS_CANCELED);
+			state = NULL;
+			goto done;
+		}
+
+		/* Signal anyone waiting for the RPC to complete to wake up. */
+		sig_broadcast(&rpc->pr_user.pur_stchng);
+
+		/* Write-back memory modifications. */
+		rpc_mem_writeback(&vm.rv_mem);
+
+		/* Check for special restore options. */
+		if (vm.rv_flags & (RPC_VM_HAVESIGMASK |
+		                   RPC_VM_HAVE_TLSBASE |
+#ifdef CONFIG_HAVE_FPU
+		                   RPC_VM_HAVEFPU_MODIFIED |
+#endif /* CONFIG_HAVE_FPU */
+		                   0)) {
+
+			/* Mask additional signals */
+			if (vm.rv_flags & RPC_VM_HAVESIGMASK) {
+				assert(!sigismember(&vm.rv_sigmask, SIGKILL));
+				assert(!sigismember(&vm.rv_sigmask, SIGSTOP));
+				sigmask_blockmask(&vm.rv_sigmask);
+			}
+
+#ifdef CONFIG_HAVE_FPU
+			/* Write-back FPU register modifications and masked signals. */
+			if (vm.rv_flags & RPC_VM_HAVEFPU_MODIFIED)
+				fpustate_loadfrom(&vm.rv_fpu);
+#endif /* CONFIG_HAVE_FPU */
+
+			if (vm.rv_flags & RPC_VM_HAVE_TLSBASE)
+				arm_set_user_tlsbase((void *)vm.rv_arm_tlsbase);
+		}
+
+		/* Write-back register modifications. */
+		*state = vm.rv_cpu;
+#else /* ... */
 #error "Unsupported arch"
-#endif /* !__i386__ && !__x86_64__ */
+#endif /* !... */
 
 	} EXCEPT {
 		struct exception_info *tls = except_info();

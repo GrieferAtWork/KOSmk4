@@ -17,9 +17,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _ASM_INTRIN_H
-#define _ASM_INTRIN_H 1
+#ifndef _KOS_BITS_RPC_H
+#define _KOS_BITS_RPC_H 1
 
-/* Placeholder... */
+#include <__stdinc.h>
 
-#endif /* !_ASM_INTRIN_H */
+#ifdef __CC__
+#include <kos/kernel/cpu-state.h>
+
+#ifdef __KERNEL__
+#define __rpc_cpustate_t struct icpustate
+#else /* __KERNEL__ */
+#define __rpc_cpustate_t struct ucpustate
+#endif /* !__KERNEL__ */
+#endif /* __CC__ */
+
+#endif /* !_KOS_BITS_RPC_H */

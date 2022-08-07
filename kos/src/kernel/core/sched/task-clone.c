@@ -595,13 +595,22 @@ again_release_kernel_and_cc:
 				FORTASK(result, this_handman) = incref(&handman_kernel);
 				sigfillset(&FORTASK(result, this_kernel_sigmask));
 				assert(FORTASK(result, this_sighand_ptr) == NULL);
+#if defined(__i386__) || defined(__x86_64__)
 				assert(FORTASK(result, this_x86_ioperm_bitmap) == NULL);
+#endif /* __i386__ || __x86_64__ */
 				result->t_flags |= TASK_FKERNTHREAD;
 				goto do_clone_pid;
 			}
 
 			/* Construct the initial scheduler CPU state from the caller-given `init_state' */
-#ifdef __x86_64__
+#ifdef SCPUSTATE_IS_TRANSITIVE_ICPUSTATE
+#ifdef __ARCH_STACK_GROWS_DOWNWARDS
+			child_state = (struct scpustate *)(kernel_stack - sizeof(struct scpustate));
+#else /* __ARCH_STACK_GROWS_DOWNWARDS */
+			child_state = (struct scpustate *)kernel_stack;
+#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
+			*child_state = *init_state;
+#elif defined(__x86_64__)
 			child_state = icpustate_to_scpustate_p_ex(init_state,
 			                                          kernel_stack,
 			                                          args->tca_arch.atca_x86_gsbase,
@@ -615,11 +624,11 @@ again_release_kernel_and_cc:
 #endif /* !__x86_64__ */
 
 			/* Assign the given stack pointer for the new thread. */
-#ifdef scpustate_setuserpsp
-			scpustate_setuserpsp(child_state, (uintptr_t)args->tca_stack);
-#else /* scpustate_setuserpsp */
-			scpustate_setpsp(child_state, (uintptr_t)args->tca_stack);
-#endif /* !scpustate_setuserpsp */
+#ifdef scpustate_setusersp
+			scpustate_setusersp(child_state, (void *)args->tca_stack);
+#else /* scpustate_setusersp */
+			scpustate_setsp(child_state, (void *)args->tca_stack);
+#endif /* !scpustate_setusersp */
 
 			/* Do additional, arch-specific initialization */
 #if defined(__i386__) || defined(__x86_64__)
@@ -997,11 +1006,11 @@ sys_clone3_impl(struct icpustate const *__restrict state,
 #endif /* __ARCH_STACK_GROWS_DOWNWARDS */
 			cargs.tca_stack = stackbase;
 		} else {
-#ifdef icpustate_getuserpsp
-			cargs.tca_stack = (USER UNCHECKED void *)icpustate_getuserpsp(state);
-#else /* icpustate_getuserpsp */
-			cargs.tca_stack = (USER UNCHECKED void *)icpustate_getpsp(state);
-#endif /* !icpustate_getuserpsp */
+#ifdef icpustate_getusersp
+			cargs.tca_stack = (USER UNCHECKED void *)icpustate_getusersp(state);
+#else /* icpustate_getusersp */
+			cargs.tca_stack = (USER UNCHECKED void *)icpustate_getsp(state);
+#endif /* !icpustate_getusersp */
 		}
 
 		/* Initialize arch-specific TLS data. */
@@ -1075,8 +1084,14 @@ sys_fork_impl(struct icpustate const *__restrict state) {
 	/* Set-up clone args. */
 	bzero(&cargs, sizeof(cargs));
 	cargs.tca_exit_signal = SIGCHLD;
-	cargs.tca_stack       = (USER UNCHECKED void *)icpustate_getusersp(state);
+#ifdef icpustate_getusersp
+	cargs.tca_stack = icpustate_getusersp(state);
+#else /* icpustate_getusersp */
+	cargs.tca_stack = icpustate_getsp(state);
+#endif /* !icpustate_getusersp */
+#ifdef ARCH_HAVE_ARCH_TASK_CLONE_ARGS
 	arch_task_clone_args_initfork(&cargs.tca_arch);
+#endif /* ARCH_HAVE_ARCH_TASK_CLONE_ARGS */
 
 	/* Do the clone. */
 	child_tsk = task_clone(state, &cargs);
@@ -1122,8 +1137,14 @@ sys_vfork_impl(struct icpustate const *__restrict state) {
 	bzero(&cargs, sizeof(cargs));
 	cargs.tca_flags       = CLONE_VM | CLONE_VFORK;
 	cargs.tca_exit_signal = SIGCHLD;
-	cargs.tca_stack       = (USER UNCHECKED void *)icpustate_getusersp(state);
+#ifdef icpustate_getusersp
+	cargs.tca_stack = icpustate_getusersp(state);
+#else /* icpustate_getusersp */
+	cargs.tca_stack = icpustate_getsp(state);
+#endif /* !icpustate_getusersp */
+#ifdef ARCH_HAVE_ARCH_TASK_CLONE_ARGS
 	arch_task_clone_args_initvfork(&cargs.tca_arch);
+#endif /* ARCH_HAVE_ARCH_TASK_CLONE_ARGS */
 
 	/* Do the clone. */
 	child_tsk = task_clone(state, &cargs);

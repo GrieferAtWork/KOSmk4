@@ -29,6 +29,8 @@
 #include <hybrid/sequence/list.h>
 #include <hybrid/typecore.h>
 
+#include <kos/kernel/cpu-state.h>
+
 #ifdef __cplusplus
 #include <asm/os/wait.h>  /* `__W_EXITCODE()' */
 #include <bits/os/wait.h> /* `union wait' */

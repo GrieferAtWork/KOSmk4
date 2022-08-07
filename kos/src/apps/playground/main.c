@@ -225,6 +225,8 @@ int main_color(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
+#if defined(__i386__) || defined(__x86_64__)
+#define HAVE_MAIN_FPU
 int main_fpu(int argc, char *argv[], char *envp[]) {
 	(void)argc, (void)argv, (void)envp;
 	printf("mxcsr=%#.8I32x\n", __stmxcsr());
@@ -241,6 +243,7 @@ int main_fpu(int argc, char *argv[], char *envp[]) {
 	printf("fsw=%#.4I16x\n", __fnstsw());
 	return 0;
 }
+#endif /* __i386__ || __x86_64__ */
 /************************************************************************/
 
 
@@ -717,6 +720,8 @@ int main_vio(int argc, char *argv[], char *envp[]) {
 
 
 /************************************************************************/
+#ifdef RTM_STARTED
+#define HAVE_MAIN_RTM
 int main_rtm(int argc, char *argv[], char *envp[]) {
 	static volatile int a, b, c;
 	rtm_status_t status;
@@ -743,6 +748,7 @@ int main_rtm(int argc, char *argv[], char *envp[]) {
 	}
 	return 0;
 }
+#endif /* RTM_STARTED */
 /************************************************************************/
 
 
@@ -1199,7 +1205,9 @@ PRIVATE DEF defs[] = {
 	{ "prognam", &main_prognam },
 	{ "rawterm", &main_rawterm },
 	{ "color", &main_color },
+#ifdef HAVE_MAIN_FPU
 	{ "fpu", &main_fpu },
+#endif /* HAVE_MAIN_FPU */
 	{ "fork", &main_fork },
 	{ "forkbomb", &main_forkbomb },
 	{ "logtime", &main_logtime },
@@ -1219,7 +1227,9 @@ PRIVATE DEF defs[] = {
 #endif /* HAVE_MAIN_INT3 */
 	{ "yield", &main_yield },
 	{ "vio", &main_vio },
+#ifdef HAVE_MAIN_RTM
 	{ "rtm", &main_rtm },
+#endif /* HAVE_MAIN_RTM */
 	{ "fault", &main_fault },
 	{ "leak", &main_leak },
 	{ "vfork", &main_vfork },

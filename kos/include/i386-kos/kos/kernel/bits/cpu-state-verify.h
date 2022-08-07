@@ -32,9 +32,6 @@
 #include "../x86/gdt.h"
 #endif /* !__INTELLISENSE__ */
 
-#include "cpu-state.h"
-
-
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -126,9 +123,7 @@ __LOCAL void (cpustate_verify_userds)(__u16 __v_ds)
 #endif /* !__INTELLISENSE__ */
 }
 
-
 __DECL_END
 #endif /* __CC__ */
-
 
 #endif /* !_I386_KOS_KOS_KERNEL_BITS_CPU_STATE_VERIFY_H */

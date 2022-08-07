@@ -20,8 +20,6 @@
 
 /* These macros are needed to get all of the opcodes */
 #define __SIZEOF_POINTER__ 8
-#define __x86_64__
-#define __i386__
 #include "../../../include/kos/asm/rpc.h" /* For opcode constants */
 
 
@@ -283,6 +281,10 @@ global final ARCHSPECIFIC_NOARG_INSTRUCTION: {string: {string: int}} = {
 	"x86_64" : {
 		"x86_push_is32bit" : RPC_OP_x86_push_is32bit,
 	},
+	"arm" : {
+		"arm_pushreg_tlsbase" : RPC_OP_arm_pushreg_tlsbase,
+		"arm_popreg_tlsbase" : RPC_OP_arm_popreg_tlsbase,
+	},
 };
 
 @@Instructions with variants that don't take any arguments
@@ -540,6 +542,8 @@ again:
 					yield RPC_OP_386_pushreg_fsbase;
 				} else if (arg == "%gs.base" && arch.name == "i386") {
 					yield RPC_OP_386_pushreg_gsbase;
+				} else if (arg == "%tlsbase" && arch.name == "arm") {
+					yield RPC_OP_arm_pushreg_tlsbase;
 				} else {
 					local registerId = arch.getRegisterByName(arg[1:]);
 					if (registerId <= 31) {
@@ -651,6 +655,8 @@ again:
 				yield RPC_OP_386_popreg_fsbase;
 			} else if (arg == "%gs.base" && arch.name == "i386") {
 				yield RPC_OP_386_popreg_gsbase;
+			} else if (arg == "%tlsbase" && arch.name == "arm") {
+				yield RPC_OP_arm_popreg_tlsbase;
 			} else {
 				local registerId = arch.getRegisterByName(arg[1:]);
 				if (registerId <= 31) {

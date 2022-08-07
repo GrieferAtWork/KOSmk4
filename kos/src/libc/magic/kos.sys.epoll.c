@@ -76,10 +76,8 @@ __STDC_UINT_AS_SIZE_T EPollPWait($fd_t epfd, [[inout(maxevents)]] struct epoll_e
 #define __prpc_exec_callback_t_defined
 #ifndef PRPC_EXEC_CALLBACK_CC
 #ifdef __KERNEL__
-typedef struct icpustate rpc_cpustate_t;
 #define PRPC_EXEC_CALLBACK_CC __FCALL
 #else /* __KERNEL__ */
-typedef struct ucpustate rpc_cpustate_t;
 #define PRPC_EXEC_CALLBACK_CC __LIBKCALL
 #endif /* !__KERNEL__ */
 #endif /* !PRPC_EXEC_CALLBACK_CC */

@@ -17,9 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _ASM_INTRIN_H
-#define _ASM_INTRIN_H 1
+#ifndef _ARM_KOS_LIBSERVICE_ASM_TYPES_H
+#define _ARM_KOS_LIBSERVICE_ASM_TYPES_H 1
 
-/* Placeholder... */
+#define SERVICE_TYPE_ARM_R32 (_SERVICE_TYPE_ARCH_MIN + 0) /* register */
+#define SERVICE_TYPE_ARM_R64 (_SERVICE_TYPE_ARCH_MIN + 1) /* register pair */
 
-#endif /* !_ASM_INTRIN_H */
+/* Return the internal type used to represent a signed/unsigned integer of the given size. */
+#define SERVICE_TYPE_INTn(sizeof)  ((sizeof) >= 8 ? SERVICE_TYPE_ARM_R64 : SERVICE_TYPE_ARM_R32)
+#define SERVICE_TYPE_UINTn(sizeof) ((sizeof) >= 8 ? SERVICE_TYPE_ARM_R64 : SERVICE_TYPE_ARM_R32)
+
+#endif /* !_ARM_KOS_LIBSERVICE_ASM_TYPES_H */

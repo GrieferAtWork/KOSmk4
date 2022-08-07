@@ -715,6 +715,8 @@ NOTHROW_NCX(LIBUNWIND_CC evaluate_call_site_expression)(struct cfientry *__restr
 	byte_t const *expr_end;
 	unwind_ste_t top;
 	unsigned int error;
+	(void)dw_regno;
+
 	/* Select the proper expression. */
 	expr = debuginfo_location_select(location,
 	                                 self->cr_cu.cu_ranges.r_startpc,

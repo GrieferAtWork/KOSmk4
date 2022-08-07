@@ -301,20 +301,23 @@
 /************************************************************************/
 /* Arch-specific opcodes                                                */
 /************************************************************************/
-#if defined(__x86_64__) || defined(__i386__)
-#define RPC_OP_x86_push_is32bit   0xe0 /* [+0] i386/x86_64: push  `1' if target  thread is 32-bit;  push `0' if 64-bit.
-                                        * Since register numbers (and the  operand of `RPC_OP_sppush_const') is  always
-                                        * dependent on the architecture of the _target_ thread (not the sender thread),
-                                        * this instruction can be used to write  portable RPC programs that can be  run
-                                        * both in the context of a 32-bit and 64-bit target thread. */
-/*      RPC_OP_                   0xe1  */
-/*      RPC_OP_                   0xe2  */
-/*      RPC_OP_                   0xe3  */
-#define RPC_OP_386_pushreg_fsbase 0xe4 /* [+0] i386: Push the value of %fs.base */
-#define RPC_OP_386_pushreg_gsbase 0xe5 /* [+0] i386: Push the value of %gs.base */
-#define RPC_OP_386_popreg_fsbase  0xe6 /* [+0] i386: Pop stack-top into %fs.base */
-#define RPC_OP_386_popreg_gsbase  0xe7 /* [+0] i386: Pop stack-top into %gs.base */
-#endif /* __x86_64__ || __i386__ */
+/* X86 */
+#define RPC_OP_x86_push_is32bit    0xe0 /* [+0] i386/x86_64: push  `1' if target  thread is 32-bit;  push `0' if 64-bit.
+                                         * Since register numbers (and the  operand of `RPC_OP_sppush_const') is  always
+                                         * dependent on the architecture of the _target_ thread (not the sender thread),
+                                         * this instruction can be used to write  portable RPC programs that can be  run
+                                         * both in the context of a 32-bit and 64-bit target thread. */
+/*      RPC_OP_                    0xe1  */
+/*      RPC_OP_                    0xe2  */
+/*      RPC_OP_                    0xe3  */
+#define RPC_OP_386_pushreg_fsbase  0xe4 /* [+0] i386: Push the value of %fs.base */
+#define RPC_OP_386_pushreg_gsbase  0xe5 /* [+0] i386: Push the value of %gs.base */
+#define RPC_OP_386_popreg_fsbase   0xe6 /* [+0] i386: Pop stack-top into %fs.base */
+#define RPC_OP_386_popreg_gsbase   0xe7 /* [+0] i386: Pop stack-top into %gs.base */
+
+/* ARM */
+#define RPC_OP_arm_pushreg_tlsbase 0xe0 /* [+0] arm: Push value of user-space tls-base address */
+#define RPC_OP_arm_popreg_tlsbase  0xe1 /* [+0] arm: Pop stack-top into user-space tls-base address */
 /*========================================*/
 
 

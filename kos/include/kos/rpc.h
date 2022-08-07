@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ebf7371 */
+/* HASH CRC-32:0x53f0d2de */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,18 +31,19 @@
 #include <bits/types.h>
 #include <kos/anno.h>
 #include <kos/asm/rpc.h>
+#include <kos/bits/rpc.h>
 #include <kos/asm/rpc-method.h>    /* `RPC_SYSCALL_INFO_METHOD_*' */
 #include <kos/bits/syscall-info.h> /* `struct rpc_syscall_info' */
 
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+typedef __rpc_cpustate_t rpc_cpustate_t;
+
 #ifndef PRPC_EXEC_CALLBACK_CC
 #ifdef __KERNEL__
-typedef struct icpustate rpc_cpustate_t;
 #define PRPC_EXEC_CALLBACK_CC __FCALL
 #else /* __KERNEL__ */
-typedef struct ucpustate rpc_cpustate_t;
 #define PRPC_EXEC_CALLBACK_CC __LIBKCALL
 #endif /* !__KERNEL__ */
 #endif /* !PRPC_EXEC_CALLBACK_CC */

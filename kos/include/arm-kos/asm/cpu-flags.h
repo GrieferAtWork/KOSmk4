@@ -54,5 +54,8 @@
 #define CPSR_Z     __UINT32_C(0x40000000) /* [bit(30)]    Zero cc-flag */
 #define CPSR_N     __UINT32_C(0x80000000) /* [bit(31)]    Negative cc-flag */
 
+/* Mask of CPSR bits also accessible as APSR */
+#define CPSR_APSRMASK __UINT32_C(0xff0ffc00)
+
 
 #endif /* !_ARM_KOS_ASM_CPU_FLAGS_H */

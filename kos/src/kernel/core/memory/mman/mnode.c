@@ -261,7 +261,11 @@ NOTHROW(FCALL mnode_clear_write_locked_p)(struct mnode *__restrict self,
 		return MNODE_CLEAR_WRITE_BADALLOC;
 
 	/* Delete write permissions. */
+#ifdef ARCH_PAGEDIR_HAVE_DENYWRITE
 	pagedir_denywrite_p(pdir, addr, size);
+#else /* ARCH_PAGEDIR_HAVE_DENYWRITE */
+	pagedir_unmap_p(pdir, addr, size); /* Mapping will be re-created lazily! */
+#endif /* !ARCH_PAGEDIR_HAVE_DENYWRITE */
 
 	/* Unprepare the page directory. */
 	pagedir_unprepare_p(pdir, addr, size);
@@ -296,7 +300,11 @@ NOTHROW(FCALL mnode_clear_write_locked)(struct mnode *__restrict self) {
 		return MNODE_CLEAR_WRITE_BADALLOC;
 
 	/* Delete write permissions. */
+#ifdef ARCH_PAGEDIR_HAVE_DENYWRITE
 	pagedir_denywrite(addr, size);
+#else /* ARCH_PAGEDIR_HAVE_DENYWRITE */
+	pagedir_unmap(addr, size); /* Mapping will be re-created lazily! */
+#endif /* !ARCH_PAGEDIR_HAVE_DENYWRITE */
 
 	/* Unprepare the page directory. */
 	pagedir_unprepare(addr, size);

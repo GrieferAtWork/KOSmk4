@@ -1148,7 +1148,7 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define irregs_getuserpsp                   irregs64_getuserrsp
 #define irregs_getusersp                    (__byte_t *)irregs64_getuserrsp
 #define irregs_setuserpsp                   irregs64_setuserrsp
-#define irregs_setusersp(self, sp)          irregs64_setuserrsp(self, (__u64)__COMPILER_REQTYPE(void const *, sp))
+#define irregs_setusersp(self, sp)          irregs64_setuserrsp(self, (__u64)__COMPILER_REQTYPE(void *, sp))
 #define irregs_getuserss                    irregs64_getuserss
 #define irregs_setuserss                    irregs64_setuserss
 #define irregs_getkernelpsp                 irregs64_getkernelrsp
@@ -1157,7 +1157,7 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define irregs_getss                        irregs64_getss
 #define irregs_trysetss                     irregs64_trysetss
 #define irregs_trysetpsp                    irregs64_trysetrsp
-#define irregs_trysetsp(self, sp)           irregs64_trysetrsp(self, (__u64)__COMPILER_REQTYPE(void const *, sp))
+#define irregs_trysetsp(self, sp)           irregs64_trysetrsp(self, (__u64)__COMPILER_REQTYPE(void *, sp))
 #define irregs_sizeof                       irregs64_sizeof
 
 #define lcpustate_foreach_gpregs_elem       lcpustate64_foreach_gpregs_elem
@@ -1170,7 +1170,7 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define lcpustate_getpsp                    lcpustate64_getrsp
 #define lcpustate_getsp                     (__byte_t *)lcpustate64_getrsp
 #define lcpustate_setpsp                    lcpustate64_setrsp
-#define lcpustate_setsp(self, sp)           lcpustate64_setrsp(self, (__u64)__COMPILER_REQTYPE(void const *, sp))
+#define lcpustate_setsp(self, sp)           lcpustate64_setrsp(self, (__u64)__COMPILER_REQTYPE(void *, sp))
 #define lcpustate_current                   lcpustate64_current
 #define lcpustate_to_lcpustate              lcpustate64_to_lcpustate64
 #define lcpustate_to_lcpustate64            lcpustate64_to_lcpustate64
@@ -1204,7 +1204,7 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define kcpustate_getpsp                    kcpustate64_getrsp
 #define kcpustate_getsp                     (__byte_t *)kcpustate64_getrsp
 #define kcpustate_setpsp                    kcpustate64_setrsp
-#define kcpustate_setsp(self, sp)           kcpustate64_setrsp(self, (__u64)__COMPILER_REQTYPE(void const *, sp))
+#define kcpustate_setsp(self, sp)           kcpustate64_setrsp(self, (__u64)__COMPILER_REQTYPE(void *, sp))
 #define kcpustate_getpflags                 kcpustate64_getrflags
 #define kcpustate_setpflags                 kcpustate64_setrflags
 #define kcpustate_mskpflags                 kcpustate64_mskrflags
@@ -1259,14 +1259,14 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define icpustate_getpsp                    icpustate64_getrsp
 #define icpustate_getsp                     (__byte_t *)icpustate64_getrsp
 #define icpustate_setpsp                    icpustate64_setrsp
-#define icpustate_setsp(self, sp)           icpustate64_setrsp(self, (__u64)__COMPILER_REQTYPE(void const *, sp))
+#define icpustate_setsp(self, sp)           icpustate64_setrsp(self, (__u64)__COMPILER_REQTYPE(void *, sp))
 #define icpustate_trysetsp                  icpustate64_trysetrsp
 #define icpustate_setpsp_p                  icpustate64_setrsp_p
-#define icpustate_setsp_p(self, sp)         icpustate64_setrsp_p(self, (__u64)__COMPILER_REQTYPE(void const *, sp))
+#define icpustate_setsp_p(self, sp)         icpustate64_setrsp_p(self, (__u64)__COMPILER_REQTYPE(void *, sp))
 #define icpustate_getuserpsp                icpustate64_getuserrsp
 #define icpustate_getusersp                 (__byte_t *)icpustate64_getuserrsp
 #define icpustate_setuserpsp                icpustate64_setuserrsp
-#define icpustate_setusersp(self, sp)       icpustate64_setuserrsp(self, (__u64)__COMPILER_REQTYPE(void const *, sp))
+#define icpustate_setusersp(self, sp)       icpustate64_setuserrsp(self, (__u64)__COMPILER_REQTYPE(void *, sp))
 #define icpustate_getuserss                 icpustate64_getuserss
 #define icpustate_setuserss                 icpustate64_setuserss
 #define icpustate_getkernelss               icpustate64_getkernelss
@@ -1360,15 +1360,15 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define scpustate_getpsp                    scpustate64_getrsp
 #define scpustate_getsp                     (__byte_t *)scpustate64_getrsp
 #define scpustate_setpsp                    scpustate64_setrsp
-#define scpustate_setsp(self, sp)           scpustate64_setrsp(self, (__u64)__COMPILER_REQTYPE(void const *, sp))
+#define scpustate_setsp(self, sp)           scpustate64_setrsp(self, (__u64)__COMPILER_REQTYPE(void *, sp))
 #define scpustate_trysetpsp                 scpustate64_trysetrsp
-#define scpustate_trysetsp(self, sp)        scpustate64_trysetrsp(self, (__u64)__COMPILER_REQTYPE(void const *, sp))
+#define scpustate_trysetsp(self, sp)        scpustate64_trysetrsp(self, (__u64)__COMPILER_REQTYPE(void *, sp))
 #define scpustate_setpsp_p                  scpustate64_setrsp_p
-#define scpustate_setsp_p(self, sp)         scpustate64_setrsp_p(self, (__u64)__COMPILER_REQTYPE(void const *, sp))
+#define scpustate_setsp_p(self, sp)         scpustate64_setrsp_p(self, (__u64)__COMPILER_REQTYPE(void *, sp))
 #define scpustate_getuserpsp                scpustate64_getuserrsp
 #define scpustate_getusersp                 (__byte_t *)scpustate64_getuserrsp
 #define scpustate_setuserpsp                scpustate64_setuserrsp
-#define scpustate_setusersp(self, sp)       scpustate64_setuserrsp(self, (__u64)__COMPILER_REQTYPE(void const *, sp))
+#define scpustate_setusersp(self, sp)       scpustate64_setuserrsp(self, (__u64)__COMPILER_REQTYPE(void *, sp))
 #define scpustate_getuserss                 scpustate64_getuserss
 #define scpustate_setuserss                 scpustate64_setuserss
 #define scpustate_getkernelss               scpustate64_getkernelss
@@ -1448,7 +1448,7 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define ucpustate_getpsp                    ucpustate64_getrsp
 #define ucpustate_getsp                     (__byte_t *)ucpustate64_getrsp
 #define ucpustate_setpsp                    ucpustate64_setrsp
-#define ucpustate_setsp(self, sp)           ucpustate64_setrsp(self, (__u64)__COMPILER_REQTYPE(void const *, sp))
+#define ucpustate_setsp(self, sp)           ucpustate64_setrsp(self, (__u64)__COMPILER_REQTYPE(void *, sp))
 #define ucpustate_getpflags                 ucpustate64_getrflags
 #define ucpustate_setpflags                 ucpustate64_setrflags
 #define ucpustate_mskpflags                 ucpustate64_mskrflags
@@ -1502,7 +1502,7 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define fcpustate_getpsp                    fcpustate64_getrsp
 #define fcpustate_getsp                     (__byte_t *)fcpustate64_getrsp
 #define fcpustate_setpsp                    fcpustate64_setrsp
-#define fcpustate_setsp(self, sp)           fcpustate64_setrsp(self, (__u64)__COMPILER_REQTYPE(void const *, sp))
+#define fcpustate_setsp(self, sp)           fcpustate64_setrsp(self, (__u64)__COMPILER_REQTYPE(void *, sp))
 #define fcpustate_getpflags                 fcpustate64_getrflags
 #define fcpustate_setpflags                 fcpustate64_setrflags
 #define fcpustate_mskpflags                 fcpustate64_mskrflags

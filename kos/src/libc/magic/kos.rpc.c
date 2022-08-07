@@ -26,6 +26,8 @@
 )]%[insert:prefix(
 #include <kos/asm/rpc.h>
 )]%[insert:prefix(
+#include <kos/bits/rpc.h>
+)]%[insert:prefix(
 #include <kos/asm/rpc-method.h>    /* `RPC_SYSCALL_INFO_METHOD_*' */
 )]%[insert:prefix(
 #include <kos/bits/syscall-info.h> /* `struct rpc_syscall_info' */
@@ -34,12 +36,12 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+typedef __rpc_cpustate_t rpc_cpustate_t;
+
 #ifndef PRPC_EXEC_CALLBACK_CC
 #ifdef __KERNEL__
-typedef struct icpustate rpc_cpustate_t;
 #define PRPC_EXEC_CALLBACK_CC __FCALL
 #else /* __KERNEL__ */
-typedef struct ucpustate rpc_cpustate_t;
 #define PRPC_EXEC_CALLBACK_CC __LIBKCALL
 #endif /* !__KERNEL__ */
 #endif /* !PRPC_EXEC_CALLBACK_CC */
