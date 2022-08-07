@@ -22,8 +22,10 @@
 
 #include <kernel/compiler.h>
 
+#ifndef __INTELLISENSE__
 #include <kernel/except.h>
 #include <kernel/paging.h>
+#endif /* !__INTELLISENSE__ */
 #include <kernel/syscall-properties.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
@@ -155,6 +157,7 @@ NOTHROW(FCALL rpc_syscall_info_get32_sysenter_ucpustate_nx)(struct rpc_syscall_i
 	regcount = kernel_syscall32_regcnt(self->rsi_sysno);
 	if (regcount >= 5) {
 		u32 *ebp = (u32 *)(uintptr_t)(u32)gpregs_getpbp(&state->ucs_gpregs);
+#ifndef __INTELLISENSE__
 		if (ADDR_ISUSER(ebp)) {
 			NESTED_TRY {
 				self->rsi_regs[4] = __hybrid_atomic_load(ebp[0], __ATOMIC_ACQUIRE);
@@ -169,6 +172,7 @@ NOTHROW(FCALL rpc_syscall_info_get32_sysenter_ucpustate_nx)(struct rpc_syscall_i
 					RETHROW();
 			}
 		}
+#endif /* !__INTELLISENSE__ */
 	}
 }
 
@@ -224,6 +228,7 @@ NOTHROW(FCALL rpc_syscall_info_get32_lcall7_ucpustate_nx)(struct rpc_syscall_inf
 	if (argc != 0) {
 		USER UNCHECKED u32 const *sp;
 		sp = (USER UNCHECKED u32 const *)gpregs_getpsp(&state->ucs_gpregs);
+#ifndef __INTELLISENSE__
 		if (ADDR_ISUSER(sp)) {
 			NESTED_TRY {
 				unsigned int i;
@@ -237,6 +242,7 @@ NOTHROW(FCALL rpc_syscall_info_get32_lcall7_ucpustate_nx)(struct rpc_syscall_inf
 					RETHROW();
 			}
 		}
+#endif /* !__INTELLISENSE__ */
 	}
 }
 

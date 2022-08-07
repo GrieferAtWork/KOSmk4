@@ -41,6 +41,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <hybrid/align.h>
 
+#include <kos/except.h>
 #include <kos/nopf.h>
 
 #include <alloca.h>

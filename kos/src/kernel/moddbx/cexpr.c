@@ -46,6 +46,7 @@ for (local o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3",
 #include <hybrid/unaligned.h>
 
 #include <compat/config.h>
+#include <kos/except.h>
 #include <kos/exec/rtld.h>
 
 #include <alloca.h>

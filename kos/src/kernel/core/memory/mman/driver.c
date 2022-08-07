@@ -36,6 +36,7 @@
 #include <debugger/rt.h>
 #include <kernel/arch/driver.h>
 #include <kernel/debugtrap.h>
+#include <kernel/except.h>
 #include <kernel/fs/dirent.h>
 #include <kernel/fs/fs.h>
 #include <kernel/fs/node.h>
@@ -70,9 +71,9 @@
 #include <hybrid/byteorder.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sched/atomic-lock.h>
 #include <hybrid/sequence/bsearch.h>
 #include <hybrid/sequence/rbtree.h>
-#include <hybrid/sched/atomic-lock.h>
 #include <hybrid/typecore.h>
 
 #include <kos/except.h>

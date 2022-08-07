@@ -25,7 +25,6 @@
 #include <debugger/config.h>
 
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER
-#include <kernel/except.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/mman/mpart.h>
 #include <kernel/types.h>
@@ -38,10 +37,11 @@
 #include <asm/intrin.h>
 #include <asm/registers-compat.h>
 #include <asm/registers.h>
+#include <kos/bits/exception_info.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/types.h>
 #include <kos/kernel/x86/gdt.h>
 #include <kos/kernel/x86/segment.h>
-#include <kos/kernel/types.h>
 
 DECL_BEGIN
 

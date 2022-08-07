@@ -165,5 +165,4 @@
 #define FCPUSTATE_IS_TRANSITIVE_SCPUSTATE
 #endif /* ... */
 
-
 #endif /* !_KOS_KERNEL_CPU_STATE_H */

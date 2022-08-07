@@ -35,6 +35,7 @@
 #include <kernel/panic.h>
 
 #include <compat/config.h>
+#include <kos/except.h>
 
 #include <assert.h>
 #include <format-printer.h>

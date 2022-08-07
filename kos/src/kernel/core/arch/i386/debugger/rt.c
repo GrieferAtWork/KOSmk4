@@ -36,6 +36,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/entry.h>
 #include <debugger/hook.h>
 #include <debugger/rt.h>
+#include <kernel/except.h>
 #include <kernel/mman.h>
 #include <kernel/mman/phys.h>
 #include <kernel/panic.h>
@@ -58,6 +59,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <asm/farptr.h>
 #include <asm/intrin.h>
+#include <kos/except.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/x86/tss-compat.h>

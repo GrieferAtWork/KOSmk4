@@ -35,6 +35,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <debugger/io.h>
 #include <debugger/rt.h>
 #include <debugger/util.h>
+#include <kernel/except.h>
 #include <kernel/mman.h>
 #include <kernel/mman/mnode.h>
 #include <kernel/paging.h>
@@ -43,6 +44,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <hybrid/align.h>
 
+#include <kos/except.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/keyboard.h>
 #include <sys/io.h>

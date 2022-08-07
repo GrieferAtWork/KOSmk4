@@ -60,7 +60,7 @@ __DECL_BEGIN
  * thus prevents the use of lazy relocations...
  *
  * The alternative would be to manually load the GOT into %ebx (and
- * mark  %ebx as a clobber register), though that might __result in
+ * mark  %ebx as a  clobber register), though  that might result in
  * duplicate work in case GCC already  loaded the GOT into %ebx  or
  * some other reg. */
 #define __X86_NOPF_CALLASM(name, argno) "call %A" #argno

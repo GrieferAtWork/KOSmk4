@@ -99,8 +99,6 @@
 #include <hybrid/byteorder.h>
 #include <hybrid/sched/atomic-rwlock.h>
 
-#include <kos/except.h>
-
 #include <libvio/userviofd.h>
 #include <libvio/vio.h>
 

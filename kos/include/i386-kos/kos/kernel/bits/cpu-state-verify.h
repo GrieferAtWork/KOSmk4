@@ -22,15 +22,16 @@
 
 /* Helper functions for verification of CPU state values. */
 
-#include <hybrid/__assert.h>
-
-#include <asm/registers.h>
 #include <bits/types.h>
 #include <kos/anno.h>
+
+#ifndef __INTELLISENSE__
+#include <asm/registers.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
-
 #include "../x86/gdt.h"
+#endif /* !__INTELLISENSE__ */
+
 #include "cpu-state.h"
 
 
@@ -42,6 +43,7 @@ __LOCAL void (cpustate_verify_userpflags)(__uintptr_t __old_pflags,
                                           __uintptr_t __new_pflags,
                                           __uintptr_t __modifyable_mask)
 		__THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
+#ifndef __INTELLISENSE__
 	if __unlikely((__old_pflags & ~__modifyable_mask) !=
 	              (__new_pflags & ~__modifyable_mask)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
@@ -49,66 +51,79 @@ __LOCAL void (cpustate_verify_userpflags)(__uintptr_t __old_pflags,
 		      X86_REGISTER_MISC_EFLAGS,
 		      __new_pflags);
 	}
+#endif /* !__INTELLISENSE__ */
 }
 
 /* Verify that `V_CS' is a valid user-space segment register. */
 __LOCAL void (cpustate_verify_usercs)(__u16 __v_cs)
 		__THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
+#ifndef __INTELLISENSE__
 	if __unlikely(!SEGMENT_IS_VALID_USERCODE(__v_cs)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
 		      X86_REGISTER_SEGMENT_CS, __v_cs);
 	}
+#endif /* !__INTELLISENSE__ */
 }
 
 /* Verify that `V_SS' is a valid user-space segment register. */
 __LOCAL void (cpustate_verify_userss)(__u16 __v_ss)
 		__THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
+#ifndef __INTELLISENSE__
 	if __unlikely(!SEGMENT_IS_VALID_USERDATA(__v_ss)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
 		      X86_REGISTER_SEGMENT_SS, __v_ss);
 	}
+#endif /* !__INTELLISENSE__ */
 }
 
 /* Verify that `V_GS' is a valid user-space segment register. */
 __LOCAL void (cpustate_verify_usergs)(__u16 __v_gs)
 		__THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
+#ifndef __INTELLISENSE__
 	if __unlikely(!SEGMENT_IS_VALID_USERDATA(__v_gs)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
 		      X86_REGISTER_SEGMENT_GS, __v_gs);
 	}
+#endif /* !__INTELLISENSE__ */
 }
 
 /* Verify that `V_FS' is a valid user-space segment register. */
 __LOCAL void (cpustate_verify_userfs)(__u16 __v_fs)
 		__THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
+#ifndef __INTELLISENSE__
 	if __unlikely(!SEGMENT_IS_VALID_USERDATA(__v_fs)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
 		      X86_REGISTER_SEGMENT_FS, __v_fs);
 	}
+#endif /* !__INTELLISENSE__ */
 }
 
 /* Verify that `V_ES' is a valid user-space segment register. */
 __LOCAL void (cpustate_verify_useres)(__u16 __v_es)
 		__THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
+#ifndef __INTELLISENSE__
 	if __unlikely(!SEGMENT_IS_VALID_USERDATA(__v_es)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
 		      X86_REGISTER_SEGMENT_ES, __v_es);
 	}
+#endif /* !__INTELLISENSE__ */
 }
 
 /* Verify that `V_DS' is a valid user-space segment register. */
 __LOCAL void (cpustate_verify_userds)(__u16 __v_ds)
 		__THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
+#ifndef __INTELLISENSE__
 	if __unlikely(!SEGMENT_IS_VALID_USERDATA(__v_ds)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
 		      X86_REGISTER_SEGMENT_DS, __v_ds);
 	}
+#endif /* !__INTELLISENSE__ */
 }
 
 
