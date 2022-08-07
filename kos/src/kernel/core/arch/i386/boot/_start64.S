@@ -35,11 +35,11 @@
 #include <asm/instr/interrupt.h>
 #include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/cpu-state32.h>
-#include <kos/kernel/cpu-state64.h>
-#include <kos/kernel/gdt.h>
-#include <kos/kernel/segment.h>
-#include <kos/kernel/tss.h>
+#include <kos/kernel/bits/cpu-state32.h>
+#include <kos/kernel/bits/cpu-state64.h>
+#include <kos/kernel/x86/gdt.h>
+#include <kos/kernel/x86/segment.h>
+#include <kos/kernel/x86/tss.h>
 
 /**/
 #include "_objects.S"

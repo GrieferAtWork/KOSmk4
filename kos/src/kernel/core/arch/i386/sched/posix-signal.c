@@ -54,8 +54,8 @@
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state-verify.h>
-#include <kos/kernel/cpu-state32.h>
-#include <kos/kernel/fpu-state32.h>
+#include <kos/kernel/bits/cpu-state32.h>
+#include <kos/kernel/bits/fpu-state32.h>
 #include <kos/rpc.h>
 
 #include <assert.h>
@@ -68,8 +68,8 @@
 #include <bits/os/kos/mcontext64.h>
 #include <bits/os/kos/ucontext64.h>
 #include <kos/bits/syscall-info64.h>
-#include <kos/kernel/cpu-state64.h>
-#include <kos/kernel/fpu-state64.h>
+#include <kos/kernel/bits/cpu-state64.h>
+#include <kos/kernel/bits/fpu-state64.h>
 #endif /* __x86_64__ */
 
 #ifndef __INTELLISENSE__

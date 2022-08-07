@@ -25,8 +25,8 @@
 #include <kernel/paging.h>
 #include <kernel/x86/cpuid.h>
 
-#include <kos/kernel/gdt.h>
-#include <kos/kernel/tss.h>
+#include <kos/kernel/x86/gdt.h>
+#include <kos/kernel/x86/tss.h>
 
 #define EXPORT_AS_OBJECT(name) \
 	.type name, "object";      \

@@ -27,9 +27,9 @@
 #include <hybrid/typecore.h>
 
 #include <bits/types.h>
-#include <kos/kernel/cpu-state32.h>
-#include <kos/kernel/fpu-sstate.h>
-#include <kos/kernel/fpu-state32.h>
+#include <kos/kernel/bits/cpu-state32.h>
+#include <kos/kernel/bits/fpu-sstate.h>
+#include <kos/kernel/bits/fpu-state32.h>
 
 __DECL_BEGIN
 

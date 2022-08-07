@@ -44,10 +44,10 @@
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/gdt.h>
-#include <kos/kernel/segment.h>
-#include <kos/kernel/tss-compat.h>
-#include <kos/kernel/tss.h>
+#include <kos/kernel/x86/gdt.h>
+#include <kos/kernel/x86/segment.h>
+#include <kos/kernel/x86/tss-compat.h>
+#include <kos/kernel/x86/tss.h>
 
 #include <stddef.h>
 #include <stdint.h>

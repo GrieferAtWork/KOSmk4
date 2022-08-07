@@ -46,7 +46,7 @@
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/fpu-state-helpers.h>
 #include <kos/kernel/fpu-state.h>
-#include <kos/kernel/fpu-state32.h>
+#include <kos/kernel/bits/fpu-state32.h>
 
 #include <assert.h>
 #include <inttypes.h>

@@ -20,18 +20,6 @@
 #ifndef _KOS_KERNEL_FPU_STATE_H
 #define _KOS_KERNEL_FPU_STATE_H 1
 
-#include <__stdinc.h>
-
-#include <bits/types.h>
-
-#ifdef __CC__
-__SYSDECL_BEGIN
-
-struct fpustate {
-	__uintptr_t __f_pad[128];
-};
-
-__SYSDECL_END
-#endif /* __CC__ */
+#include <kos/kernel/bits/fpu-state.h>
 
 #endif /* !_KOS_KERNEL_FPU_STATE_H */

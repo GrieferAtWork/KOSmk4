@@ -25,26 +25,12 @@
 #include <hybrid/typecore.h>
 
 #include <asm/os/mman.h>
+#include <kos/kernel/asm/paging.h>
 
-
-#undef KERNELSPACE_BASE
-#undef KERNEL_CORE_BASE
-
-#undef KERNELSPACE_END
-#undef KERNELSPACE_LOWMEM
-#define KERNELSPACE_HIGHMEM 1
-
-#if __SIZEOF_POINTER__ >= 8
-#define USERSPACE_END    __UINT64_C(0x0000800000000000) /* Upper address space limit for user-space (first invalid address) */
-#define KERNELSPACE_BASE __UINT64_C(0xffff800000000000) /* Lower address space limit for kernel-space */
-#define KERNEL_CORE_BASE __UINT64_C(0xffffffff80000000) /* Load address of the kernel core. (-2GB) */
-#else /* __SIZEOF_POINTER__ >= 8 */
-#define USERSPACE_END    __UINT32_C(0xc0000000) /* Upper address space limit for user-space */
-#define KERNELSPACE_BASE __UINT32_C(0xc0000000) /* lower address space limit for kernel-space */
-#define KERNEL_CORE_BASE __UINT32_C(0xc0000000) /* Load address of the kernel core. */
-#endif /* __SIZEOF_POINTER__ < 8 */
+#ifndef ADDR_IS_NONCANON
 #define ADDR_IS_NONCANON(addr) 0
 #define ADDR_IS_CANON(addr)    1
+#endif /* !ADDR_IS_NONCANON */
 
 /* MMan hints for where to map different, dynamic kernel/user-space components. */
 #if __SIZEOF_POINTER__ >= 8
@@ -54,28 +40,72 @@
 #endif /* __SIZEOF_POINTER__ < 8 */
 
 /* TODO: Adjust these hints to work better in a 64-bit address space */
+#ifndef KERNEL_MHINT_HEAP
 #define KERNEL_MHINT_HEAP         __KERNEL_MHINT(0xe1000000, 0xffffffffe1000000, __MAP_GROWSUP)   /* Hint for the regular kernel heap. */
+#endif /* !KERNEL_MHINT_HEAP */
+#ifndef KERNEL_MHINT_LHEAP
 #define KERNEL_MHINT_LHEAP        __KERNEL_MHINT(0xe2000000, 0xffffffffe2000000, __MAP_GROWSUP)   /* Hint for the locked kernel heap. */
+#endif /* !KERNEL_MHINT_LHEAP */
+#ifndef KERNEL_MHINT_MMAN
 #define KERNEL_MHINT_MMAN         __KERNEL_MHINT(0xe8100000, 0xffffffffe8100000, __MAP_GROWSUP)   /* Hint for memory managers. */
+#endif /* !KERNEL_MHINT_MMAN */
+#ifndef KERNEL_MHINT_SLAB
 #define KERNEL_MHINT_SLAB         __KERNEL_MHINT(0xe8000000, 0xffffffffe8000000, __MAP_GROWSDOWN) /* Hint for the slab allocator. */
+#endif /* !KERNEL_MHINT_SLAB */
+#ifndef KERNEL_MHINT_DHEAP
 #define KERNEL_MHINT_DHEAP        __KERNEL_MHINT(0xe0000000, 0xffffffffe0000000, __MAP_GROWSDOWN) /* Hint for the kernel heap used for allocating debug controllers. */
+#endif /* !KERNEL_MHINT_DHEAP */
+#ifndef KERNEL_MHINT_COREPAGE
 #define KERNEL_MHINT_COREPAGE     __KERNEL_MHINT(0xf0000000, 0xfffffffff0000000, __MAP_GROWSDOWN) /* Hint for core-base pointers. */
+#endif /* !KERNEL_MHINT_COREPAGE */
+#ifndef KERNEL_MHINT_PHYSINFO
 #define KERNEL_MHINT_PHYSINFO     __KERNEL_MHINT(0xf0000000, 0xfffffffff0000000, __MAP_GROWSDOWN) /* Hint for physical memory information/controller data. */
+#endif /* !KERNEL_MHINT_PHYSINFO */
+#ifndef KERNEL_MHINT_LAPIC
 #define KERNEL_MHINT_LAPIC        __KERNEL_MHINT(0xf0000000, 0xfffffffff0000000, __MAP_GROWSDOWN) /* Hint for the LAPIC (if present). */
+#endif /* !KERNEL_MHINT_LAPIC */
+#ifndef KERNEL_MHINT_TRAMPOLINE
 #define KERNEL_MHINT_TRAMPOLINE   __KERNEL_MHINT(0xeffe0000, 0xffffffffeffe0000, __MAP_GROWSDOWN) /* Hint for per-task trampoline pages. */
+#endif /* !KERNEL_MHINT_TRAMPOLINE */
+#ifndef KERNEL_MHINT_KERNSTACK
 #define KERNEL_MHINT_KERNSTACK    __KERNEL_MHINT(0xeb000000, 0xffffffffeb000000, __MAP_GROWSDOWN) /* Hint for kernel stacks. */
+#endif /* !KERNEL_MHINT_KERNSTACK */
+#ifndef KERNEL_MHINT_ALTCORE
 #define KERNEL_MHINT_ALTCORE      __KERNEL_MHINT(0xeeeee000, 0xffffffffeeeee000, __MAP_GROWSUP)   /* Hint for secondary CPU control structures. */
+#endif /* !KERNEL_MHINT_ALTCORE */
+#ifndef KERNEL_MHINT_IDLESTACK
 #define KERNEL_MHINT_IDLESTACK    __KERNEL_MHINT(0xf0000000, 0xfffffffff0000000, __MAP_GROWSDOWN) /* Hint for per-cpu IDLE stacks. */
+#endif /* !KERNEL_MHINT_IDLESTACK */
+#ifndef KERNEL_MHINT_DFSTACK
 #define KERNEL_MHINT_DFSTACK      __KERNEL_MHINT(0xf0000000, 0xfffffffff0000000, __MAP_GROWSDOWN) /* Hint for per-cpu #DF stacks. */
+#endif /* !KERNEL_MHINT_DFSTACK */
+#ifndef KERNEL_MHINT_DRIVER
 #define KERNEL_MHINT_DRIVER       __KERNEL_MHINT(0xd0000000, 0xffffffffd0000000, __MAP_GROWSUP)   /* Hint for the custom kernel-space drivers. */
+#endif /* !KERNEL_MHINT_DRIVER */
+#ifndef KERNEL_MHINT_DEVICE
 #define KERNEL_MHINT_DEVICE       __KERNEL_MHINT(0xf0000000, 0xfffffffff0000000, __MAP_GROWSDOWN) /* Hint for device memory mappings. */
+#endif /* !KERNEL_MHINT_DEVICE */
+#ifndef KERNEL_MHINT_TEMPORARY
 #define KERNEL_MHINT_TEMPORARY    __KERNEL_MHINT(0xf0000000, 0xfffffffff0000000, __MAP_GROWSUP)   /* Hint for temporary memory mappings. */
+#endif /* !KERNEL_MHINT_TEMPORARY */
+#ifndef KERNEL_MHINT_USER_MINADDR
 #define KERNEL_MHINT_USER_MINADDR __KERNEL_MHINT(0x00010000, 0x0000000000010000, 0)               /* Default value for `mman_getunmapped_user_minaddr'. */
+#endif /* !KERNEL_MHINT_USER_MINADDR */
+#ifndef KERNEL_MHINT_USER_HEAP
 #define KERNEL_MHINT_USER_HEAP    __KERNEL_MHINT(0x10000000, 0x0000000010000000, __MAP_GROWSUP)   /* Hint for user-space heap memory. */
+#endif /* !KERNEL_MHINT_USER_HEAP */
+#ifndef KERNEL_MHINT_USER_STACK
 #define KERNEL_MHINT_USER_STACK   __KERNEL_MHINT(0x80000000, 0x0000000080000000, __MAP_GROWSDOWN) /* Hint for user-space stack memory. */
+#endif /* !KERNEL_MHINT_USER_STACK */
+#ifndef KERNEL_MHINT_USER_LIBRARY
 #define KERNEL_MHINT_USER_LIBRARY __KERNEL_MHINT(0x0e000000, 0x000000000e000000, __MAP_GROWSDOWN) /* Hint for user-space dynamic libraries. */
+#endif /* !KERNEL_MHINT_USER_LIBRARY */
+#ifndef KERNEL_MHINT_USER_DYNLINK
 #define KERNEL_MHINT_USER_DYNLINK __KERNEL_MHINT(0xbf100000, 0x00000000bf100000, __MAP_GROWSUP)   /* Hint for user-space dynamic linkers. */
+#endif /* !KERNEL_MHINT_USER_DYNLINK */
+#ifndef KERNEL_MHINT_USER_PEB
 #define KERNEL_MHINT_USER_PEB     __KERNEL_MHINT(0xc0000000, 0x00000000c0000000, __MAP_GROWSDOWN) /* Hint for user-space process environment blocks. */
+#endif /* !KERNEL_MHINT_USER_PEB */
 
 
 #ifndef KERNEL_STACKSIZE
@@ -102,5 +132,6 @@
 #ifndef KERNEL_DEBUG_STACKSIZE
 #define KERNEL_DEBUG_STACKSIZE (KERNEL_STACKSIZE * 2)
 #endif /* !KERNEL_DEBUG_STACKSIZE */
+
 
 #endif /* !_KOS_KERNEL_PAGING_H */

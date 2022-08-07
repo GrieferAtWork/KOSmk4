@@ -27,8 +27,8 @@
 
 #include <hybrid/__assert.h>
 
-#include <kos/kernel/gdt.h>
-#include <kos/kernel/segment.h>
+#include <kos/kernel/x86/gdt.h>
+#include <kos/kernel/x86/segment.h>
 
 #ifdef __x86_64__
 #include <asm/cpu-flags.h>

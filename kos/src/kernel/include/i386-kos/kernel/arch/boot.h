@@ -30,7 +30,7 @@
 #endif /* BUILDING_KERNEL_CORE */
 
 #include <asm/pagesize.h>
-#include <kos/kernel/cpu-state32.h> /* fcpustate32 */
+#include <kos/kernel/bits/cpu-state32.h> /* fcpustate32 */
 
 DECL_BEGIN
 

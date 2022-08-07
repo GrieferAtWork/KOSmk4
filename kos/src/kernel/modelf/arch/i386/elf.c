@@ -38,7 +38,7 @@
 #include <kos/exec/bits/elf32.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/gdt.h>
+#include <kos/kernel/x86/gdt.h>
 
 #include <elf.h>
 #include <stddef.h>

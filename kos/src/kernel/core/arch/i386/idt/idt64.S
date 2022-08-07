@@ -33,8 +33,8 @@
 #include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/gdt.h>
-#include <kos/kernel/tss.h>
+#include <kos/kernel/x86/gdt.h>
+#include <kos/kernel/x86/tss.h>
 
 #include <libunwind/cfi.h>
 

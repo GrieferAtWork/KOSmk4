@@ -24,7 +24,7 @@
 #include <kernel/compiler.h>
 
 #include <asm/asmword.h>
-#include <kos/kernel/gdt.h>
+#include <kos/kernel/x86/gdt.h>
 #include <kos/kernel/paging.h>
 
 .section .data.percpu.tss

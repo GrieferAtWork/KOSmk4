@@ -31,7 +31,7 @@
 #ifdef __ASSEMBLER__
 #include <asm/cpu-flags.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/gdt.h>
+#include <kos/kernel/x86/gdt.h>
 #endif /* __ASSEMBLER__ */
 
 #ifdef BUILDING_KERNEL_CORE

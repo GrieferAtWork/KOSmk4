@@ -61,7 +61,7 @@
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/segment.h>
+#include <kos/kernel/x86/segment.h>
 #include <kos/nopf.h>
 
 #include <assert.h>

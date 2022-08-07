@@ -41,8 +41,8 @@
 #include <kernel/x86/multiboot.h>
 #include <kernel/x86/syscall-tables.h>
 #include <sched/x86/tss.h>
-#include <kos/kernel/gdt.h>
-#include <kos/kernel/segment.h>
+#include <kos/kernel/x86/gdt.h>
+#include <kos/kernel/x86/segment.h>
 
 #include "arch/i386/boot/start.h" /* CONFIG_NO_KERNEL_X86_BOOT0 */
 #endif /* __i386__ || __x86_64__ */

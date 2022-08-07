@@ -28,8 +28,8 @@
 
 #include <hybrid/host.h>
 
-#include <kos/kernel/gdt.h>
-#include <kos/kernel/segment.h>
+#include <kos/kernel/x86/gdt.h>
+#include <kos/kernel/x86/segment.h>
 
 
 #ifndef PREFIX

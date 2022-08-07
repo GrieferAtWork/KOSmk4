@@ -40,7 +40,7 @@
 #include <asm/instr/movzxq.h>
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/gdt.h>
+#include <kos/kernel/x86/gdt.h>
 
 .section .text.x86.asmirq.x86_dbgaltcoreidt
 

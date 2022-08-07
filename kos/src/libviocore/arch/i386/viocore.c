@@ -61,7 +61,7 @@ opt.append("-Os");
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/paging.h>
-#include <kos/kernel/segment.h>
+#include <kos/kernel/x86/segment.h>
 #include <kos/kernel/types.h>
 #include <kos/types.h>
 #include <sys/syslog.h>

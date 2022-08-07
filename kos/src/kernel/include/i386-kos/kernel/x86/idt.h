@@ -25,7 +25,7 @@
 #include <debugger/config.h>
 #include <kernel/types.h>
 
-#include <kos/kernel/segment.h>
+#include <kos/kernel/x86/segment.h>
 
 DECL_BEGIN
 
@@ -75,7 +75,7 @@ DECL_BEGIN
 
 #ifdef __CC__
 
-struct idt_segment; /* From <kos/kernel/segment.h> */
+struct idt_segment; /* From <kos/kernel/x86/segment.h> */
 struct desctab;     /* From <kos/kernel/cpu-state.h> */
 
 DATDEF struct idt_segment x86_idt[256];

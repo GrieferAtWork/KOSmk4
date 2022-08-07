@@ -24,7 +24,7 @@
 #include <kernel/compiler.h>
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
-#include <kos/kernel/gdt.h>
+#include <kos/kernel/x86/gdt.h>
 
 
 .section .xdata

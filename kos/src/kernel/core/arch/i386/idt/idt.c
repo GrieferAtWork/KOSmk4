@@ -39,7 +39,7 @@
 
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/segment.h>
+#include <kos/kernel/x86/segment.h>
 #include <kos/sched/shared-lock.h>
 
 #include <assert.h>

@@ -28,7 +28,7 @@
 #include <sched/pertask.h> /* PERTASK_GET() */
 #include <sched/task.h>    /* this_kernel_stacknode */
 
-#include <kos/kernel/cpu-state-helpers64.h> /* irregs_iscompat() */
+#include <kos/kernel/bits/cpu-state-helpers64.h> /* irregs_iscompat() */
 
 DECL_BEGIN
 

@@ -21,10 +21,10 @@
 #include "register-impl.c.inl"
 #endif /* __INTELLISENSE__ */
 
-#include <kos/kernel/cpu-state-helpers64.h>
-#include <kos/kernel/cpu-state64.h>
-#include <kos/kernel/fpu-state64.h>
-#include <kos/kernel/gdb-cpu-state64.h>
+#include <kos/kernel/bits/cpu-state-helpers64.h>
+#include <kos/kernel/bits/cpu-state64.h>
+#include <kos/kernel/bits/fpu-state64.h>
+#include <kos/kernel/bits/gdb-cpu-state64.h>
 
 #include <inttypes.h>
 #include <stddef.h>

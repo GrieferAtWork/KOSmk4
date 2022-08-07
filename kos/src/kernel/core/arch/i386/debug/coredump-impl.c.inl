@@ -63,11 +63,11 @@
 #ifdef DEFINE_sys32_coredump
 #include <kos/bits/coredump32.h>
 #include <kos/bits/exception_data32.h>
-#include <kos/kernel/cpu-state32.h>
+#include <kos/kernel/bits/cpu-state32.h>
 #else /* DEFINE_sys32_coredump */
 #include <kos/bits/coredump64.h>
 #include <kos/bits/exception_data64.h>
-#include <kos/kernel/cpu-state64.h>
+#include <kos/kernel/bits/cpu-state64.h>
 #endif /* !DEFINE_sys32_coredump */
 
 

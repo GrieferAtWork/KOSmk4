@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97df9c06 */
+/* HASH CRC-32:0x6603ce32 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,8 +64,8 @@
 #include <kos/compat/linux-olddirent.h>
 #include <kos/compat/linux-oldselect.h>
 #include <kos/compat/linux-stat.h>
-#include <kos/kernel/cpu-state32.h>
-#include <kos/kernel/fpu-state32.h>
+#include <kos/kernel/bits/cpu-state32.h>
+#include <kos/kernel/bits/fpu-state32.h>
 #include <kos/rtm.h>
 
 

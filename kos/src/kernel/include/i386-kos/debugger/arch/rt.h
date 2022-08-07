@@ -39,8 +39,8 @@
 #include <asm/registers-compat.h>
 #include <asm/registers.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/gdt.h>
-#include <kos/kernel/segment.h>
+#include <kos/kernel/x86/gdt.h>
+#include <kos/kernel/x86/segment.h>
 #include <kos/kernel/types.h>
 
 DECL_BEGIN

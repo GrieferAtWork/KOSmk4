@@ -33,7 +33,7 @@
 #include <kos/except.h>
 #include <kos/exec/module.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/gdt.h>
+#include <kos/kernel/x86/gdt.h>
 #include <kos/types.h>
 
 #include <format-printer.h>

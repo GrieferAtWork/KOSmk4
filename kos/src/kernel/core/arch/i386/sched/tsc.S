@@ -44,9 +44,9 @@
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/gdt.h>
-#include <kos/kernel/tss-compat.h>
-#include <kos/kernel/tss.h>
+#include <kos/kernel/x86/gdt.h>
+#include <kos/kernel/x86/tss-compat.h>
+#include <kos/kernel/x86/tss.h>
 
 #ifdef __x86_64__
 #define x86_load_thread_Pax_cpu_Pbx x86_load_thread_rax_cpu_rbx

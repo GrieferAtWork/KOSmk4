@@ -26,7 +26,7 @@
 
 #include <asm/cpu-flags.h>
 #include <asm/instr/jccN.h>
-#include <kos/kernel/segment.h>
+#include <kos/kernel/x86/segment.h>
 
 .macro jmp16 sym:req
 	.byte  0xe9

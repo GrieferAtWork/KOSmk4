@@ -20,68 +20,34 @@
 #ifndef _KOS_KERNEL_CPU_STATE_H
 #define _KOS_KERNEL_CPU_STATE_H 1
 
-#include <__stdinc.h>
+#include <kos/kernel/bits/cpu-state.h>
 
-#include <bits/types.h>
+/* Define helper macros to test for aliases between different cpu states */
+#ifdef LCPUSTATE_IS_UCPUSTATE
+#define LCPUSTATE_ISALIAS
+#endif /* LCPUSTATE_IS_?CPUSTATE */
+#if (defined(KCPUSTATE_IS_UCPUSTATE) || \
+     defined(KCPUSTATE_IS_LCPUSTATE))
+#define KCPUSTATE_ISALIAS
+#endif /* KCPUSTATE_IS_?CPUSTATE */
+#if (defined(ICPUSTATE_IS_UCPUSTATE) || \
+     defined(ICPUSTATE_IS_LCPUSTATE) || \
+     defined(ICPUSTATE_IS_KCPUSTATE))
+#define ICPUSTATE_ISALIAS
+#endif /* ICPUSTATE_IS_?CPUSTATE */
+#if (defined(SCPUSTATE_IS_UCPUSTATE) || \
+     defined(SCPUSTATE_IS_LCPUSTATE) || \
+     defined(SCPUSTATE_IS_KCPUSTATE) || \
+     defined(SCPUSTATE_IS_ICPUSTATE))
+#define SCPUSTATE_ISALIAS
+#endif /* SCPUSTATE_IS_?CPUSTATE */
+#if (defined(FCPUSTATE_IS_UCPUSTATE) || \
+     defined(FCPUSTATE_IS_LCPUSTATE) || \
+     defined(FCPUSTATE_IS_KCPUSTATE) || \
+     defined(FCPUSTATE_IS_ICPUSTATE) || \
+     defined(FCPUSTATE_IS_SCPUSTATE))
+#define FCPUSTATE_ISALIAS
+#endif /* FCPUSTATE_IS_?CPUSTATE */
 
-/* The following macros may be defined to indicate aliases.
- * NOTE: Don't define macros to transitive aliases; iow: at most 1
- *       `XCPUSTATE_IS_*' should be defined for every `XCPUSTATE'! */
-#if 0
-#define LCPUSTATE_IS_UCPUSTATE
-#define KCPUSTATE_IS_UCPUSTATE
-#define KCPUSTATE_IS_LCPUSTATE
-#define ICPUSTATE_IS_UCPUSTATE
-#define ICPUSTATE_IS_LCPUSTATE
-#define ICPUSTATE_IS_KCPUSTATE
-#define SCPUSTATE_IS_UCPUSTATE
-#define SCPUSTATE_IS_LCPUSTATE
-#define SCPUSTATE_IS_KCPUSTATE
-#define SCPUSTATE_IS_ICPUSTATE
-#define FCPUSTATE_IS_UCPUSTATE
-#define FCPUSTATE_IS_LCPUSTATE
-#define FCPUSTATE_IS_KCPUSTATE
-#define FCPUSTATE_IS_ICPUSTATE
-#define FCPUSTATE_IS_SCPUSTATE
-#endif
-
-#ifdef __CC__
-__SYSDECL_BEGIN
-
-struct ucpustate { /* u -- User */
-	__uintptr_t __u_pad[128];
-};
-
-struct lcpustate { /* l -- Little */
-	__uintptr_t __l_pad[128];
-};
-
-struct kcpustate {
-	/* A CPU state used to describe a known, valid register state in kernel-space.
-	 * This  kind of state is also used  by exception handling, and the associated
-	 * stack unwinding. */
-	__uintptr_t __k_pad[128];
-};
-
-struct icpustate { /* i -- Interrupts */
-	/* A  CPU state that is used by  hardware interrupts (other than those used
-	 * by scheduling, which generate `scpustate' instead), in order to describe
-	 * the interrupted text location.
-	 * Also the primary CPU state used by RPC handlers. */
-	__uintptr_t __i_pad[128];
-};
-
-
-struct scpustate { /* s -- Scheduling */
-	/* CPU state, as used to store the state of a thread that isn't currently running. */
-	__uintptr_t __s_pad[128];
-};
-
-struct fcpustate { /* f -- Full */
-	__uintptr_t __f_pad[128];
-};
-
-__SYSDECL_END
-#endif /* __CC__ */
 
 #endif /* !_KOS_KERNEL_CPU_STATE_H */

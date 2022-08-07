@@ -60,8 +60,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <asm/intrin.h>
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/tss-compat.h>
-#include <kos/kernel/tss.h>
+#include <kos/kernel/x86/tss-compat.h>
+#include <kos/kernel/x86/tss.h>
 #include <sys/io.h>
 
 #include <alloca.h>

@@ -33,12 +33,12 @@
 #include <asm/instr/compat.h>
 #include <asm/instr/jccN.h>
 #include <asm/instr/movzxq.h>
-#include <kos/kernel/fpu-sstate.h>
-#include <kos/kernel/fpu-state32.h>
+#include <kos/kernel/bits/fpu-sstate.h>
+#include <kos/kernel/bits/fpu-state32.h>
 
 #ifdef __x86_64__
 #include <asm/instr/movzxq.h>
-#include <kos/kernel/fpu-state64.h>
+#include <kos/kernel/bits/fpu-state64.h>
 #endif /* __x86_64__ */
 
 

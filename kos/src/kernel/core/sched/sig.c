@@ -51,7 +51,7 @@
 
 #if defined(__i386__) || defined(__x86_64__)
 #include <asm/intrin.h>
-#include <kos/kernel/segment.h>
+#include <kos/kernel/x86/segment.h>
 #include <kos/nopf.h>
 #endif /* __i386__ || __x86_64__ */
 

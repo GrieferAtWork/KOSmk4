@@ -26,7 +26,7 @@
 
 #include <hybrid/host.h>
 
-#include <kos/kernel/tss.h>
+#include <kos/kernel/x86/tss.h>
 
 DECL_BEGIN
 

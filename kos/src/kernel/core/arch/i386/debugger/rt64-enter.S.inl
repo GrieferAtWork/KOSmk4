@@ -30,8 +30,8 @@
 #include <asm/cpu-flags.h>
 #include <asm/instr/movzxq.h>
 #include <asm/instr/ttest.h>
-#include <kos/kernel/cpu-state-asm64.h>
-#include <kos/kernel/cpu-state64.h>
+#include <kos/kernel/bits/cpu-state-asm64.h>
+#include <kos/kernel/bits/cpu-state64.h>
 
 #if defined(DEFINE_DBG_ENTER_FCPUSTATE)
 #define L(x)                         x##_dbg_enter_fcpustate

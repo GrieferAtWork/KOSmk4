@@ -125,14 +125,14 @@ local files = {
 	"../../../../include/i386-kos/kos/exec/asm/elf64.h",
 	"../../../../include/i386-kos/kos/exec/bits/peb32.h",
 	"../../../../include/i386-kos/kos/exec/bits/peb64.h",
-	"../../../../include/i386-kos/kos/kernel/cpu-state32.h",
-	"../../../../include/i386-kos/kos/kernel/cpu-state64.h",
-	"../../../../include/i386-kos/kos/kernel/fpu-sstate.h",
-	"../../../../include/i386-kos/kos/kernel/fpu-state32.h",
-	"../../../../include/i386-kos/kos/kernel/fpu-state64.h",
-	"../../../../include/i386-kos/kos/kernel/tss16.h",
-	"../../../../include/i386-kos/kos/kernel/tss32.h",
-	"../../../../include/i386-kos/kos/kernel/tss64.h",
+	"../../../../include/i386-kos/kos/kernel/bits/cpu-state32.h",
+	"../../../../include/i386-kos/kos/kernel/bits/cpu-state64.h",
+	"../../../../include/i386-kos/kos/kernel/bits/fpu-sstate.h",
+	"../../../../include/i386-kos/kos/kernel/bits/fpu-state32.h",
+	"../../../../include/i386-kos/kos/kernel/bits/fpu-state64.h",
+	"../../../../include/i386-kos/kos/kernel/x86/tss16.h",
+	"../../../../include/i386-kos/kos/kernel/x86/tss32.h",
+	"../../../../include/i386-kos/kos/kernel/x86/tss64.h",
 };
 
 local include_prefixes = {
@@ -1678,7 +1678,7 @@ static_assert(offsetof(struct process_peb64, pp_envp) == OFFSET_PROCESS_PEB64_EN
 
 
 
-#include <kos/kernel/cpu-state32.h>
+#include <kos/kernel/bits/cpu-state32.h>
 
 /* struct gpregs32 */
 static_assert(offsetof(struct gpregs32, gp_eax) == OFFSET_GPREGS32_EAX);
@@ -1803,7 +1803,7 @@ static_assert(sizeof(struct fcpustate32) == SIZEOF_FCPUSTATE32);
 
 
 
-#include <kos/kernel/cpu-state64.h>
+#include <kos/kernel/bits/cpu-state64.h>
 
 /* struct gpregs64 */
 static_assert(offsetof(struct gpregs64, gp_r10) == OFFSET_GPREGS64_R10);
@@ -1945,7 +1945,7 @@ static_assert(sizeof(struct fcpustate64) == SIZEOF_FCPUSTATE64);
 
 
 
-#include <kos/kernel/fpu-sstate.h>
+#include <kos/kernel/bits/fpu-sstate.h>
 
 /* struct sfpuenv */
 static_assert(offsetof(struct sfpuenv, fe_fcs) == OFFSET_SFPUENV_FCS);
@@ -1992,7 +1992,7 @@ static_assert(alignof(struct sfpustate) == ALIGNOF_SFPUSTATE);
 
 
 
-#include <kos/kernel/fpu-state32.h>
+#include <kos/kernel/bits/fpu-state32.h>
 
 /* struct xfpustate32 */
 static_assert(offsetof(struct xfpustate32, fx_fcs) == OFFSET_XFPUSTATE32_FCS);
@@ -2040,7 +2040,7 @@ static_assert(alignof(struct fpustate32) == ALIGNOF_FPUSTATE32);
 
 
 
-#include <kos/kernel/fpu-state64.h>
+#include <kos/kernel/bits/fpu-state64.h>
 
 /* struct xfpustate64 */
 static_assert(offsetof(struct xfpustate64, fx_fcw) == OFFSET_XFPUSTATE64_FCW);
@@ -2094,7 +2094,7 @@ static_assert(alignof(struct fpustate64) == ALIGNOF_FPUSTATE64);
 
 
 
-#include <kos/kernel/tss16.h>
+#include <kos/kernel/x86/tss16.h>
 
 /* struct tss16 */
 static_assert(offsetof(struct tss16, t_ax) == OFFSET_TSS16_AX);
@@ -2126,7 +2126,7 @@ static_assert(alignof(struct tss16) == ALIGNOF_TSS16);
 
 
 
-#include <kos/kernel/tss32.h>
+#include <kos/kernel/x86/tss32.h>
 
 /* struct tss32 */
 static_assert(offsetof(struct tss32, t_cr3) == OFFSET_TSS32_CR3);
@@ -2163,7 +2163,7 @@ static_assert(alignof(struct tss32) == ALIGNOF_TSS32);
 
 
 
-#include <kos/kernel/tss64.h>
+#include <kos/kernel/x86/tss64.h>
 
 /* struct tss64 */
 static_assert(offsetof(struct tss64, t_iomap) == OFFSET_TSS64_IOMAP);
@@ -2323,7 +2323,7 @@ static_assert(sizeof(__sem_t) == __SIZEOF_SEM_T);
 static_assert(alignof(__sem_t) >= alignof(void *));
 
 
-#include <kos/kernel/segment.h>
+#include <kos/kernel/x86/segment.h>
 static_assert(sizeof(struct segment) == SIZEOF_SEGMENT_DESCRIPTOR);
 static_assert(SIZEOF_SEGMENT_DESCRIPTOR == 8);
 static_assert(offsetof(struct segment, s_descriptor.d_limit0) == OFFSET_SEGMENT_DESCRIPTOR_LIMIT0);
@@ -2335,7 +2335,7 @@ static_assert(offsetof(struct segment, s_descriptor.d_base2) == OFFSET_SEGMENT_D
 static_assert(sizeof(struct idt_segment) == SIZEOF_IDT_SEGMENT);
 
 
-#include <kos/kernel/gdt.h>
+#include <kos/kernel/x86/gdt.h>
 
 static_assert(SEGMENT_IS_VALID_KERNCODE(SEGMENT_KERNEL_CODE));
 static_assert(!SEGMENT_IS_VALID_KERNCODE(SEGMENT_USER_CODE));

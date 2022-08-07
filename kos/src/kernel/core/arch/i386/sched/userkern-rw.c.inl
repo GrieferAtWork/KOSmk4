@@ -51,13 +51,13 @@
 
 #ifndef USERKERN_STRUCT
 #if USERKERN_WIDTH == 4
-#include <kos/kernel/cpu-state32.h>
-#include <kos/kernel/cpu-state-helpers32.h>
+#include <kos/kernel/bits/cpu-state32.h>
+#include <kos/kernel/bits/cpu-state-helpers32.h>
 #include <kos/bits/ukern-struct32.h>
 #define USERKERN_STRUCT struct userkern32
 #else /* USERKERN_WIDTH == 4 */
-#include <kos/kernel/cpu-state64.h>
-#include <kos/kernel/cpu-state-helpers64.h>
+#include <kos/kernel/bits/cpu-state64.h>
+#include <kos/kernel/bits/cpu-state-helpers64.h>
 #include <kos/bits/ukern-struct64.h>
 #define USERKERN_STRUCT struct userkern64
 #endif /* USERKERN_WIDTH != 4 */

@@ -30,7 +30,7 @@
 #include <asm/intrin-cpuid.h>
 #include <asm/intrin-fpu.h>
 #include <bits/crt/fenv.h>
-#include <kos/kernel/fpu-sstate.h>
+#include <kos/kernel/bits/fpu-sstate.h>
 
 #ifdef __CC__
 __SYSDECL_BEGIN

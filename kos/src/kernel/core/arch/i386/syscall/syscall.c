@@ -59,10 +59,10 @@
 #include <kos/kernel/cpu-state-compat.h>
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/cpu-state32.h>
-#include <kos/kernel/gdt.h>
-#include <kos/kernel/tss-compat.h>
-#include <kos/kernel/tss.h>
+#include <kos/kernel/bits/cpu-state32.h>
+#include <kos/kernel/x86/gdt.h>
+#include <kos/kernel/x86/tss-compat.h>
+#include <kos/kernel/x86/tss.h>
 #include <kos/sched/shared-lock.h>
 #include <sys/wait.h>
 

@@ -33,7 +33,7 @@
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/fpu-state.h>
-#include <kos/kernel/gdt.h>
+#include <kos/kernel/x86/gdt.h>
 #include <kos/kernel/paging.h>
 #include <kos/kernel/types.h>
 #include <kos/types.h>

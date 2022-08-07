@@ -46,7 +46,7 @@
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state-verify.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/cpu-state32.h>
+#include <kos/kernel/bits/cpu-state32.h>
 
 #include <assert.h>
 #include <errno.h>

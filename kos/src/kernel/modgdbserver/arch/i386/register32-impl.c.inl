@@ -24,10 +24,10 @@
 
 #include <kernel/x86/gdt.h>
 
-#include <kos/kernel/cpu-state-helpers32.h>
-#include <kos/kernel/cpu-state32.h>
-#include <kos/kernel/fpu-state32.h>
-#include <kos/kernel/gdb-cpu-state32.h>
+#include <kos/kernel/bits/cpu-state-helpers32.h>
+#include <kos/kernel/bits/cpu-state32.h>
+#include <kos/kernel/bits/fpu-state32.h>
+#include <kos/kernel/bits/gdb-cpu-state32.h>
 
 #include <inttypes.h>
 

@@ -62,8 +62,8 @@
 #include <asm/intrin.h>
 #include <kos/except.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/tss-compat.h>
-#include <kos/kernel/tss.h>
+#include <kos/kernel/x86/tss-compat.h>
+#include <kos/kernel/x86/tss.h>
 
 #include <assert.h>
 #include <inttypes.h>

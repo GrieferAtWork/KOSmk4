@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61e2dff */
+/* HASH CRC-32:0x85537a4f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #include <kernel/compiler.h>
 
 #include <asm/cfi.h>
-#include <kos/kernel/gdt.h>
+#include <kos/kernel/x86/gdt.h>
 #include <kos/kernel/paging.h>
 #include <kernel/arch/syscall.h>
 

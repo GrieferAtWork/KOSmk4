@@ -33,10 +33,10 @@
 #include <asm/cpu-flags.h>
 #include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/cpu-state32.h>
-#include <kos/kernel/gdt.h>
-#include <kos/kernel/segment.h>
-#include <kos/kernel/tss.h>
+#include <kos/kernel/bits/cpu-state32.h>
+#include <kos/kernel/x86/gdt.h>
+#include <kos/kernel/x86/segment.h>
+#include <kos/kernel/x86/tss.h>
 
 #ifndef CONFIG_NO_KERNEL_X86_PAGING_P32
 #include <kernel/arch/paging32-p32.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd06f995 */
+/* HASH CRC-32:0x5ddb054a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,7 @@
 #include <kos/compat/linux-dirent.h>
 #include <kos/compat/linux-dirent64.h>
 #include <kos/compat/linux-stat.h>
-#include <kos/kernel/cpu-state64.h>
+#include <kos/kernel/bits/cpu-state64.h>
 #include <kos/rtm.h>
 
 

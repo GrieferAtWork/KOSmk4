@@ -31,7 +31,7 @@
 #include <kos/kernel/cpu-state.h>
 
 #ifdef __x86_64__
-#include <kos/kernel/gdt.h>
+#include <kos/kernel/x86/gdt.h>
 #include <kernel/paging.h>
 #endif /* __x86_64__ */
 

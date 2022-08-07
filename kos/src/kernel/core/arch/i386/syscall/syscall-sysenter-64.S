@@ -33,7 +33,7 @@
 #include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/gdt.h>
+#include <kos/kernel/x86/gdt.h>
 #include <kos/kernel/paging.h>
 #include <kos/rpc.h>
 

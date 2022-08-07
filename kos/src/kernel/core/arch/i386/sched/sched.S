@@ -38,7 +38,7 @@
 #include <kos/except.h>
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state.h>
-#include <kos/kernel/gdt.h>
+#include <kos/kernel/x86/gdt.h>
 
 #ifndef SIZEOF_POINTER
 #define SIZEOF_POINTER __SIZEOF_POINTER__

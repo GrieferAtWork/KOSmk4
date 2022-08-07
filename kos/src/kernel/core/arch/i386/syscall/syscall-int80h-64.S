@@ -32,7 +32,7 @@
 #include <asm/instr/movzxq.h>
 #include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state-asm.h>
-#include <kos/kernel/gdt.h>
+#include <kos/kernel/x86/gdt.h>
 #include <kos/rpc.h>
 
 #include <errno.h>

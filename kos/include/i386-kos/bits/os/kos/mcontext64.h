@@ -46,8 +46,8 @@
 #include <bits/types.h>
 
 #ifdef __USE_KOS_KERNEL
-#include <kos/kernel/cpu-state64.h>
-#include <kos/kernel/fpu-state64.h>
+#include <kos/kernel/bits/cpu-state64.h>
+#include <kos/kernel/bits/fpu-state64.h>
 #endif /* __USE_KOS_KERNEL */
 
 
