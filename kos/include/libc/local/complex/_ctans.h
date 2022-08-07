@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d3792e5 */
+/* HASH CRC-32:0xa9da3f39 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,9 +76,18 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_fabsl,
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_fabsl,(__LONGDOUBLE __x),__fabsl,(__x))
 #else /* ... */
 __NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE_fabs) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_fabsl,(__LONGDOUBLE __x),fabs,(__x))
+#elif defined(__CRT_HAVE___fabs) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_fabsl,(__LONGDOUBLE __x),__fabs,(__x))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <libc/local/math/fabsl.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_fabsl __LIBC_LOCAL_NAME(fabsl)
+#endif /* !... */
 #endif /* !... */
 #endif /* !__local___localdep_fabsl_defined */
 __LOCAL_LIBC(_ctans) __ATTR_CONST __ATTR_WUNUSED double

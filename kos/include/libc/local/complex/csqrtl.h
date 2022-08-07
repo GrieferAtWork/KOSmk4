@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0989fd8 */
+/* HASH CRC-32:0x8f7dc3c7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_csqrtl_defined
 #define __local_csqrtl_defined
 #include <__crt.h>
+#include <hybrid/typecore.h>
 #include <ieee754.h>
 #if defined(__CRT_HAVE_csqrt) || ((defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)) && (defined(__CRT_HAVE_cabs) || defined(__CRT_HAVE__cabs) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))
 __NAMESPACE_LOCAL_BEGIN
@@ -30,6 +31,10 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___signbitl,(__LONGDOUBLE __x),__signbitl,(__x))
 #elif defined(__CRT_HAVE__ldsign)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___signbitl,(__LONGDOUBLE __x),_ldsign,(__x))
+#elif defined(__CRT_HAVE___signbit) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___signbitl,(__LONGDOUBLE __x),__signbit,(__x))
+#elif defined(__CRT_HAVE__dsign) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___signbitl,(__LONGDOUBLE __x),_dsign,(__x))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/__signbitl.h>
@@ -41,6 +46,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_cabsl_defined
 #ifdef __CRT_HAVE_cabsl
 __CREDIRECT(,__LONGDOUBLE,__NOTHROW_NCX,__localdep_cabsl,(long double _Complex __z),cabsl,(__z))
+#elif defined(__CRT_HAVE_cabs) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(,__LONGDOUBLE,__NOTHROW_NCX,__localdep_cabsl,(long double _Complex __z),cabs,(__z))
 #elif defined(__CRT_HAVE_cabs) || defined(__CRT_HAVE__cabs) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/cabsl.h>
@@ -54,12 +61,14 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_cimagl_defined
 #ifdef __CRT_HAVE_cimagl
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_cimagl,(long double _Complex __z),cimagl,(__z))
-#else /* __CRT_HAVE_cimagl */
+#elif defined(__CRT_HAVE_cimag) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_cimagl,(long double _Complex __z),cimag,(__z))
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/cimagl.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_cimagl __LIBC_LOCAL_NAME(cimagl)
-#endif /* !__CRT_HAVE_cimagl */
+#endif /* !... */
 #endif /* !__local___localdep_cimagl_defined */
 #ifndef __local___localdep_copysignl_defined
 #define __local___localdep_copysignl_defined
@@ -69,6 +78,10 @@ __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_copy
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_copysignl,(__LONGDOUBLE __num, __LONGDOUBLE __sign),copysignl,(__num,__sign))
 #elif defined(__CRT_HAVE___copysignl)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_copysignl,(__LONGDOUBLE __num, __LONGDOUBLE __sign),__copysignl,(__num,__sign))
+#elif defined(__CRT_HAVE_copysign) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_copysignl,(__LONGDOUBLE __num, __LONGDOUBLE __sign),copysign,(__num,__sign))
+#elif defined(__CRT_HAVE___copysign) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_copysignl,(__LONGDOUBLE __num, __LONGDOUBLE __sign),__copysign,(__num,__sign))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/copysignl.h>
@@ -80,12 +93,14 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_creall_defined
 #ifdef __CRT_HAVE_creall
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_creall,(long double _Complex __z),creall,(__z))
-#else /* __CRT_HAVE_creall */
+#elif defined(__CRT_HAVE_creal) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_creall,(long double _Complex __z),creal,(__z))
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/creall.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_creall __LIBC_LOCAL_NAME(creall)
-#endif /* !__CRT_HAVE_creall */
+#endif /* !... */
 #endif /* !__local___localdep_creall_defined */
 #ifndef __local___localdep_csqrt_defined
 #define __local___localdep_csqrt_defined
@@ -108,6 +123,10 @@ __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_fabs
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_fabsl,(__LONGDOUBLE __x),fabsl,(__x))
 #elif defined(__CRT_HAVE___fabsl)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_fabsl,(__LONGDOUBLE __x),__fabsl,(__x))
+#elif defined(__CRT_HAVE_fabs) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_fabsl,(__LONGDOUBLE __x),fabs,(__x))
+#elif defined(__CRT_HAVE___fabs) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_fabsl,(__LONGDOUBLE __x),__fabs,(__x))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/fabsl.h>
@@ -123,6 +142,10 @@ __CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_hypotl,(__LONGDOU
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_hypotl,(__LONGDOUBLE __x, __LONGDOUBLE __y),hypotl,(__x,__y))
 #elif defined(__CRT_HAVE___hypotl)
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_hypotl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__hypotl,(__x,__y))
+#elif defined(__CRT_HAVE_hypot) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_hypotl,(__LONGDOUBLE __x, __LONGDOUBLE __y),hypot,(__x,__y))
+#elif defined(__CRT_HAVE___hypot) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_hypotl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__hypot,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/hypotl.h>
@@ -140,6 +163,10 @@ __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinfl,(__LON
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinfl,(__LONGDOUBLE __x),isinfl,(__x))
 #elif defined(__CRT_HAVE___isinfl)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinfl,(__LONGDOUBLE __x),__isinfl,(__x))
+#elif defined(__CRT_HAVE_isinf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinfl,(__LONGDOUBLE __x),isinf,(__x))
+#elif defined(__CRT_HAVE___isinf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinfl,(__LONGDOUBLE __x),__isinf,(__x))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <bits/math-constants.h>
@@ -162,6 +189,10 @@ __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(__LON
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(__LONGDOUBLE __x),isnanl,(__x))
 #elif defined(__CRT_HAVE___isnanl)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(__LONGDOUBLE __x),__isnanl,(__x))
+#elif defined(__CRT_HAVE_isnan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(__LONGDOUBLE __x),isnan,(__x))
+#elif defined(__CRT_HAVE___isnan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(__LONGDOUBLE __x),__isnan,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_isnan) || defined(__CRT_HAVE__isnan) || defined(__CRT_HAVE___isnan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/isnanl.h>
@@ -179,6 +210,10 @@ __CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_sqrtl,(__LONGDOUB
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_sqrtl,(__LONGDOUBLE __x),sqrtl,(__x))
 #elif defined(__CRT_HAVE___sqrtl)
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_sqrtl,(__LONGDOUBLE __x),__sqrtl,(__x))
+#elif defined(__CRT_HAVE_sqrt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_sqrtl,(__LONGDOUBLE __x),sqrt,(__x))
+#elif defined(__CRT_HAVE___sqrt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_sqrtl,(__LONGDOUBLE __x),__sqrt,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/sqrtl.h>

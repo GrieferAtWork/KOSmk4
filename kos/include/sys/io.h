@@ -29,14 +29,11 @@
 
 #include <hybrid/typecore.h>
 
-#include <bits/typesizes.h> /* Optional override for `__SIZEOF_PORT_T__' */
+#include <bits/typesizes.h> /* For `__SIZEOF_PORT_T__' */
 #include <sys/perm.h>
 
-#ifndef __SIZEOF_PORT_T__
-#define __SIZEOF_PORT_T__ 2
-#endif /* !__SIZEOF_PORT_T__ */
-
 #ifndef __port_t
+#ifdef __SIZEOF_PORT_T__
 #if __SIZEOF_PORT_T__ == 2
 #define __port_t __UINT16_TYPE__
 #elif __SIZEOF_PORT_T__ == 4
@@ -48,11 +45,14 @@
 #else /* __SIZEOF_PORT_T__ == ... */
 #error "Unsupported `__SIZEOF_PORT_T__'"
 #endif /* __SIZEOF_PORT_T__ != ... */
+#endif /* __SIZEOF_PORT_T__ */
 #endif /* !__port_t */
 
+#ifdef __port_t
 #ifndef __IOPORT
 #define __IOPORT(x) (__CCAST(__port_t) x)
 #endif /* !__IOPORT */
+#endif /* __port_t */
 
 #ifndef __NOTHROW_KRN
 #ifdef __KERNEL__
@@ -75,6 +75,7 @@ __SYSDECL_BEGIN
  * The prototypes in this header are mainly meant to describe the signatures that
  * architecture-specific implementations will mirror. */
 
+#ifdef __port_t
 __CDECLARE(,__UINT8_TYPE__,__NOTHROW_KRN,inb,(__port_t __port),(__port))
 __CDECLARE(,__UINT16_TYPE__,__NOTHROW_KRN,inw,(__port_t __port),(__port))
 __CDECLARE(,__UINT32_TYPE__,__NOTHROW_KRN,inl,(__port_t __port),(__port))
@@ -109,6 +110,7 @@ __CDECLARE_VOID(,__NOTHROW_KRN,outb_p,(__UINT8_TYPE__ __val, __port_t __port),(_
 __CDECLARE_VOID(,__NOTHROW_KRN,outw_p,(__UINT16_TYPE__ __val, __port_t __port),(__val,__port))
 __CDECLARE_VOID(,__NOTHROW_KRN,outl_p,(__UINT32_TYPE__ __val, __port_t __port),(__val,__port))
 #endif /* !__USE_KOS_ALTERATIONS */
+#endif /* __port_t */
 
 #ifdef __USE_KOS_KERNEL
 __CDECLARE_VOID(,__NOTHROW_KRN,io_delay,(void),())

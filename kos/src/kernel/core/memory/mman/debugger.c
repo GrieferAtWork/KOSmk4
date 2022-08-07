@@ -45,6 +45,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kernel/mman/enum.h>
 #include <kernel/mman/map.h>
 #include <kernel/mman/mfile.h>
+#include <kernel/mman/mnode.h>
 #include <kernel/mman/ramfile.h>
 #include <kernel/mman/unmapped.h>
 #include <kernel/printk.h>

@@ -39,6 +39,8 @@
 #ifdef __CC__
 __DECL_BEGIN
 
+#define __ARM_CPSR_PREEMPTION 0x80 /* [bit(7)] IRQ enabled */
+
 /************************************************************************/
 /* FCPUSTATE                                                            */
 /************************************************************************/
@@ -231,6 +233,10 @@ __NOTHROW_NCX(_fcpustate_p_banked)(struct fcpustate const *__restrict __self) {
 #define fcpustate_getspsr(self)               (*_fcpustate_p_spsr(self))
 #define fcpustate_setspsr(self, spsr)         (void)(*_fcpustate_p_spsr(self) = (spsr))
 
+/* Preemption control */
+#define fcpustate_getpreemption(self)          ((fcpustate_getcpsr(self) & __ARM_CPSR_PREEMPTION) != 0)
+#define fcpustate_setpreemption(self, turn_on) fcpustate_setcpsr(self, (fcpustate_getcpsr(self) & ~__ARM_CPSR_PREEMPTION) | ((turn_on) ? __ARM_CPSR_PREEMPTION : 0))
+
 /* Check for user-space vs. kernel-space */
 #define fcpustate_isuser(self) fcpustate_isusr(self)
 #define fcpustate_iskern(self) (!fcpustate_isusr(self))
@@ -301,6 +307,10 @@ __NOTHROW_NCX(_fcpustate_p_banked)(struct fcpustate const *__restrict __self) {
 #define ucpustate_issvc(self) ((ucpustate_getcpsr(self) & CPSR_M) == CPSR_M_SVC)
 #define ucpustate_isabt(self) ((ucpustate_getcpsr(self) & CPSR_M) == CPSR_M_ABT)
 #define ucpustate_isund(self) ((ucpustate_getcpsr(self) & CPSR_M) == CPSR_M_UND)
+
+/* Preemption control */
+#define ucpustate_getpreemption(self)          ((ucpustate_getcpsr(self) & __ARM_CPSR_PREEMPTION) != 0)
+#define ucpustate_setpreemption(self, turn_on) ucpustate_setcpsr(self, (ucpustate_getcpsr(self) & ~__ARM_CPSR_PREEMPTION) | ((turn_on) ? __ARM_CPSR_PREEMPTION : 0))
 
 /* Check for user-space vs. kernel-space */
 #define ucpustate_isuser(self) ucpustate_isusr(self)

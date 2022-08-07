@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8356fc26 */
+/* HASH CRC-32:0x6c1f5606 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,9 +32,16 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__redupil_defined
 #define __local___localdep__redupil_defined
 __NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE__redupi) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep__redupil,(__LONGDOUBLE __x),_redupi,(__x))
+#else /* __CRT_HAVE__redupi && __ARCH_LONG_DOUBLE_IS_DOUBLE */
+__NAMESPACE_LOCAL_END
 #include <libc/local/complex/_redupil.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep__redupil __LIBC_LOCAL_NAME(_redupil)
+#endif /* !__CRT_HAVE__redupi || !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #endif /* !__local___localdep__redupil_defined */
 #ifndef __local___localdep_cimagl_defined
 #define __local___localdep_cimagl_defined
@@ -42,9 +49,16 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_cimagl,(long double _Complex __z),cimagl,(__z))
 #else /* __CRT_HAVE_cimagl */
 __NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE_cimag) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_cimagl,(long double _Complex __z),cimag,(__z))
+#else /* __CRT_HAVE_cimag && __ARCH_LONG_DOUBLE_IS_DOUBLE */
+__NAMESPACE_LOCAL_END
 #include <libc/local/complex/cimagl.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_cimagl __LIBC_LOCAL_NAME(cimagl)
+#endif /* !__CRT_HAVE_cimag || !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #endif /* !__CRT_HAVE_cimagl */
 #endif /* !__local___localdep_cimagl_defined */
 #ifndef __local___localdep_creall_defined
@@ -53,9 +67,16 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_creall,(long double _Complex __z),creall,(__z))
 #else /* __CRT_HAVE_creall */
 __NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE_creal) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_creall,(long double _Complex __z),creal,(__z))
+#else /* __CRT_HAVE_creal && __ARCH_LONG_DOUBLE_IS_DOUBLE */
+__NAMESPACE_LOCAL_END
 #include <libc/local/complex/creall.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_creall __LIBC_LOCAL_NAME(creall)
+#endif /* !__CRT_HAVE_creal || !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #endif /* !__CRT_HAVE_creall */
 #endif /* !__local___localdep_creall_defined */
 #ifndef __local___localdep_fabsl_defined
@@ -68,9 +89,18 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_fabsl,
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_fabsl,(__LONGDOUBLE __x),__fabsl,(__x))
 #else /* ... */
 __NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE_fabs) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_fabsl,(__LONGDOUBLE __x),fabs,(__x))
+#elif defined(__CRT_HAVE___fabs) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_fabsl,(__LONGDOUBLE __x),__fabs,(__x))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <libc/local/math/fabsl.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_fabsl __LIBC_LOCAL_NAME(fabsl)
+#endif /* !... */
 #endif /* !... */
 #endif /* !__local___localdep_fabsl_defined */
 __LOCAL_LIBC(_ctansl) __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE

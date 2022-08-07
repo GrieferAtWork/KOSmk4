@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe451ca5c */
+/* HASH CRC-32:0xb7abae6e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,8 +46,8 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libm/j1.h>
 #include <libm/fcomp.h>
-#include <libm/matherr.h>
 #include <libm/fabs.h>
+#include <libm/matherr.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(j1l) __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(j1l))(__LONGDOUBLE __x) {

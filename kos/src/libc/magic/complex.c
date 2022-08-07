@@ -128,6 +128,7 @@ __SYSDECL_BEGIN
 
 
 [[static]] _cchshf(*) %{generate(double2float("_cchsh"))}
+[[ldouble_variant_of("_cchsh", ...)]]
 [[static]] _cchshl(*) %{generate(double2ldouble("_cchsh"))}
 
 @@calculate cosh and sinh
@@ -148,6 +149,7 @@ void _cchsh(double x, [[out]] double *c, [[out]] double *s) {
 }
 
 [[static]] _redupif(*) %{generate(double2float("_redupi"))}
+[[ldouble_variant_of("_redupi", ...)]]
 [[static]] _redupil(*) %{generate(double2ldouble("_redupi"))}
 
 [[static, const, wunused]]
@@ -191,6 +193,7 @@ double _redupi(double x) {
 
 
 [[static]] _ctansf(*) %{generate(double2float("_ctans"))}
+[[ldouble_variant_of("_ctans", ...)]]
 [[static]] _ctansl(*) %{generate(double2ldouble("_ctans"))}
 
 @@Taylor series expansion for cosh(2y) - cos(2x)
@@ -694,28 +697,28 @@ double _Complex cproj(double _Complex z) {
 }
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-cabsl(*) %{generate(double2ldouble("cabs"))}
-cexpl(*) %{generate(double2ldouble("cexp"))}
-clogl(*) %{generate(double2ldouble("clog"))}
-cpowl(*) %{generate(double2ldouble("cpow"))}
-csqrtl(*) %{generate(double2ldouble("csqrt"))}
-csinl(*) %{generate(double2ldouble("csin"))}
-ccosl(*) %{generate(double2ldouble("ccos"))}
-ctanl(*) %{generate(double2ldouble("ctan"))}
-casinl(*) %{generate(double2ldouble("casin"))}
-cacosl(*) %{generate(double2ldouble("cacos"))}
-catanl(*) %{generate(double2ldouble("catan"))}
-csinhl(*) %{generate(double2ldouble("csinh"))}
-ccoshl(*) %{generate(double2ldouble("ccosh"))}
-ctanhl(*) %{generate(double2ldouble("ctanh"))}
-casinhl(*) %{generate(double2ldouble("casinh"))}
-cacoshl(*) %{generate(double2ldouble("cacosh"))}
-catanhl(*) %{generate(double2ldouble("catanh"))}
-cargl(*) %{generate(double2ldouble("carg"))}
-conjl(*) %{generate(double2ldouble("conj"))}
-creall(*) %{generate(double2ldouble("creal"))}
-cimagl(*) %{generate(double2ldouble("cimag"))}
-cprojl(*) %{generate(double2ldouble("cproj"))}
+[[ldouble_variant_of("cabs", ...)]]   cabsl(*)   %{generate(double2ldouble("cabs"))}
+[[ldouble_variant_of("cexp", ...)]]   cexpl(*)   %{generate(double2ldouble("cexp"))}
+[[ldouble_variant_of("clog", ...)]]   clogl(*)   %{generate(double2ldouble("clog"))}
+[[ldouble_variant_of("cpow", ...)]]   cpowl(*)   %{generate(double2ldouble("cpow"))}
+[[ldouble_variant_of("csqrt", ...)]]  csqrtl(*)  %{generate(double2ldouble("csqrt"))}
+[[ldouble_variant_of("csin", ...)]]   csinl(*)   %{generate(double2ldouble("csin"))}
+[[ldouble_variant_of("ccos", ...)]]   ccosl(*)   %{generate(double2ldouble("ccos"))}
+[[ldouble_variant_of("ctan", ...)]]   ctanl(*)   %{generate(double2ldouble("ctan"))}
+[[ldouble_variant_of("casin", ...)]]  casinl(*)  %{generate(double2ldouble("casin"))}
+[[ldouble_variant_of("cacos", ...)]]  cacosl(*)  %{generate(double2ldouble("cacos"))}
+[[ldouble_variant_of("catan", ...)]]  catanl(*)  %{generate(double2ldouble("catan"))}
+[[ldouble_variant_of("csinh", ...)]]  csinhl(*)  %{generate(double2ldouble("csinh"))}
+[[ldouble_variant_of("ccosh", ...)]]  ccoshl(*)  %{generate(double2ldouble("ccosh"))}
+[[ldouble_variant_of("ctanh", ...)]]  ctanhl(*)  %{generate(double2ldouble("ctanh"))}
+[[ldouble_variant_of("casinh", ...)]] casinhl(*) %{generate(double2ldouble("casinh"))}
+[[ldouble_variant_of("cacosh", ...)]] cacoshl(*) %{generate(double2ldouble("cacosh"))}
+[[ldouble_variant_of("catanh", ...)]] catanhl(*) %{generate(double2ldouble("catanh"))}
+[[ldouble_variant_of("carg", ...)]]   cargl(*)   %{generate(double2ldouble("carg"))}
+[[ldouble_variant_of("conj", ...)]]   conjl(*)   %{generate(double2ldouble("conj"))}
+[[ldouble_variant_of("creal", ...)]]  creall(*)  %{generate(double2ldouble("creal"))}
+[[ldouble_variant_of("cimag", ...)]]  cimagl(*)  %{generate(double2ldouble("cimag"))}
+[[ldouble_variant_of("cproj", ...)]]  cprojl(*)  %{generate(double2ldouble("cproj"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 %#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_COMPLEX_H_PROTO)

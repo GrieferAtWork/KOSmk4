@@ -193,6 +193,9 @@ __FORCELOCAL __ATTR_WUNUSED void (__wrSPSR_fiq)(__UINT32_TYPE__ __val) { __asm__
 
 #endif /* __COMPILER_HAVE_GCC_ASM */
 
+/* Flush the instruction cache by executing a fencing instruction. */
+#define __flush_instruction_cache() (void)0 /* TODO */
+
 __DECL_END
 #endif /* __CC__ */
 

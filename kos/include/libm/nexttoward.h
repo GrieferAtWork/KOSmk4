@@ -62,7 +62,7 @@ __LIBM_LOCAL_FUNC(nexttowardf) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE_
 	__uint32_t __hy, __ly, __esy;
 	__LIBM_GET_FLOAT_WORD(__hx, __x);
 	__LIBM_GET_LDOUBLE_WORDS(__esy, __hy, __ly, __y);
-	__ix = __hx & __INT32_C(0x7fffffff);              /* |x| */
+	__ix = __hx & __INT32_C(0x7fffffff);       /* |x| */
 	__iy = __esy & IEEE854_LONG_DOUBLE_MAXEXP; /* |y| */
 	/* Intel's extended format has the normally implicit 1 explicit present. Sigh! */
 	if ((__ix > __INT32_C(0x7f800000)) ||                                                        /* x is nan */

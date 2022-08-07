@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7615d071 */
+/* HASH CRC-32:0x98e1c09c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_nexttowardf_defined
 #include <__crt.h>
 #include <ieee754.h>
+#include <hybrid/typecore.h>
 #if ((defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__) || defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)) && defined(__IEEE854_LONG_DOUBLE_TYPE__)) || defined(__CRT_HAVE_nextafterl) || defined(__CRT_HAVE_nexttowardl) || defined(__CRT_HAVE___nextafterl) || defined(__CRT_HAVE___nexttowardl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter) || defined(__CRT_HAVE___nexttoward) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_nextafterl_defined
@@ -38,6 +39,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_nextaf
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nextafterl,(__x,__y))
 #elif defined(__CRT_HAVE___nexttowardl)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttowardl,(__x,__y))
+#elif defined(__CRT_HAVE_nextafter) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),nextafter,(__x,__y))
+#elif defined(__CRT_HAVE_nexttoward) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),nexttoward,(__x,__y))
+#elif defined(__CRT_HAVE___nextafter) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nextafter,(__x,__y))
+#elif defined(__CRT_HAVE___nexttoward) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttoward,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter) || defined(__CRT_HAVE___nexttoward) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/nextafterl.h>

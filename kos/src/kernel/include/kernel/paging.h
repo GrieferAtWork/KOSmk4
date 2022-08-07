@@ -354,7 +354,7 @@ NOTHROW(FCALL pagedir_prepare)(PAGEDIR_PAGEALIGNED VIRT void *addr,
                                PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
-			return true;
+			return 1;
 		if (num_bytes <= PAGESIZE)
 			return pagedir_prepareone(addr);
 	}
@@ -695,7 +695,7 @@ NOTHROW(KCALL pagedir_prepare_p)(pagedir_phys_t self,
                                  PAGEDIR_PAGEALIGNED size_t num_bytes) {
 	if (__builtin_constant_p(num_bytes)) {
 		if (num_bytes == 0)
-			return true;
+			return 1;
 		if (num_bytes <= PAGESIZE)
 			return pagedir_prepareone_p(self, addr);
 	}

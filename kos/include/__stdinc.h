@@ -323,7 +323,7 @@
 #endif /* !... */
 
 #ifndef __DEFINE_PUBLIC_ALIAS
-#ifdef __INTELLISENSE_GCC__
+#if defined(__INTELLISENSE_GCC__) && 0
 #define __DEFINE_PRIVATE_ALIAS(new, old)      static __typeof__(old) new __attribute__((__alias__(#old)))
 #define __DEFINE_PUBLIC_ALIAS(new, old)       __typeof__(old) new __attribute__((__alias__(#old)))
 #define __DEFINE_INTERN_ALIAS(new, old)       __typeof__(old) new __attribute__((__alias__(#old)))

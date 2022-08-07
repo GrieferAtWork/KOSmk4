@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee2d1abd */
+/* HASH CRC-32:0xe1ecf372 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -200,28 +200,117 @@ DFUN(".text.crt.dos.math.complex", libd_conj, libc_conj, TCFD, 1, TCFD)
 DFUN(".text.crt.dos.math.complex", libd_creal, libc_creal, TFD, 1, TCFD)
 DFUN(".text.crt.dos.math.complex", libd_cimag, libc_cimag, TFD, 1, TCFD)
 DFUN(".text.crt.dos.math.complex", libd_cproj, libc_cproj, TCFD, 1, TCFD)
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_cabsl, libd_cabs);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_cabsl, libc_cabsl, TFL, 1, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_cexpl, libd_cexp);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_cexpl, libc_cexpl, TCFL, 1, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_clogl, libd_clog);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_clogl, libc_clogl, TCFL, 1, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_cpowl, libd_cpow);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_cpowl, libc_cpowl, TCFL, 2, TCFL, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_csqrtl, libd_csqrt);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_csqrtl, libc_csqrtl, TCFL, 1, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_csinl, libd_csin);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_csinl, libc_csinl, TCFL, 1, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_ccosl, libd_ccos);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_ccosl, libc_ccosl, TCFL, 1, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_ctanl, libd_ctan);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_ctanl, libc_ctanl, TCFL, 1, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_casinl, libd_casin);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_casinl, libc_casinl, TCFL, 1, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_cacosl, libd_cacos);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_cacosl, libc_cacosl, TCFL, 1, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_catanl, libd_catan);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_catanl, libc_catanl, TCFL, 1, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_csinhl, libd_csinh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_csinhl, libc_csinhl, TCFL, 1, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_ccoshl, libd_ccosh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_ccoshl, libc_ccoshl, TCFL, 1, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_ctanhl, libd_ctanh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_ctanhl, libc_ctanhl, TCFL, 1, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_casinhl, libd_casinh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_casinhl, libc_casinhl, TCFL, 1, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_cacoshl, libd_cacosh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_cacoshl, libc_cacoshl, TCFL, 1, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_catanhl, libd_catanh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_catanhl, libc_catanhl, TCFL, 1, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_cargl, libd_carg);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_cargl, libc_cargl, TFL, 1, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_conjl, libd_conj);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_conjl, libc_conjl, TCFL, 1, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_creall, libd_creal);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_creall, libc_creall, TFL, 1, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_cimagl, libd_cimag);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_cimagl, libc_cimagl, TFL, 1, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_cprojl, libd_cproj);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.complex", libd_cprojl, libc_cprojl, TCFL, 1, TCFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 
 /* conio */
 DFUN(".text.crt.dos.conio", libd__putch, libc__putch, TD, 1, TD)
@@ -549,7 +638,6 @@ DFUN(".text.crt.dos.unsorted", libd_getifaddrs, libc_getifaddrs, TD, 1, TP)
 DFUN(".text.crt.dos.unsorted", libd_freeifaddrs, libc_freeifaddrs, TV, 1, TP)
 
 /* inttypes */
-#include <hybrid/typecore.h>
 #if __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8
 DFUN(".text.crt.dos.math.utility", libd_imaxabs, libc_imaxabs, TIn(__SIZEOF_INTMAX_T__), 1, TIn(__SIZEOF_INTMAX_T__))
 #endif /* __SIZEOF_INTMAX_T__ != __SIZEOF_INT__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 8 */
@@ -718,31 +806,83 @@ DFUN(".text.crt.dos.math.math", libd_atan2f, libc_atan2f, TF, 2, TF, TF)
 DFUN(".text.crt.dos.math.math", libd_cosf, libc_cosf, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_sinf, libc_sinf, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_tanf, libc_tanf, TF, 1, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_acosl, libd_acos);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_acosl, libc_acosl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_asinl, libd_asin);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_asinl, libc_asinl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_atanl, libd_atan);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_atanl, libc_atanl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_atan2l, libd_atan2);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_atan2l, libc_atan2l, TFL, 2, TFL, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_cosl, libd_cos);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_cosl, libc_cosl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_sinl, libd_sin);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_sinl, libc_sinl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_tanl, libd_tan);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_tanl, libc_tanl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_cosh, libc_cosh, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_sinh, libc_sinh, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_tanh, libc_tanh, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_coshf, libc_coshf, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_sinhf, libc_sinhf, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_tanhf, libc_tanhf, TF, 1, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_coshl, libd_cosh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_coshl, libc_coshl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_sinhl, libd_sinh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_sinhl, libc_sinhl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_tanhl, libd_tanh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_tanhl, libc_tanhl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_acosh, libc_acosh, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_asinh, libc_asinh, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_atanh, libc_atanh, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_acoshf, libc_acoshf, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_asinhf, libc_asinhf, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_atanhf, libc_atanhf, TF, 1, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_acoshl, libd_acosh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_acoshl, libc_acoshl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_asinhl, libd_asinh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_asinhl, libc_asinhl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_atanhl, libd_atanh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_atanhl, libc_atanhl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_exp, libc_exp, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_frexp, libc_frexp, TFD, 2, TFD, TP)
 DFUN(".text.crt.dos.math.math", libd_ldexp, libc_ldexp, TFD, 2, TFD, TD)
@@ -755,39 +895,99 @@ DFUN(".text.crt.dos.math.math", libd_ldexpf, libc_ldexpf, TF, 2, TF, TD)
 DFUN(".text.crt.dos.math.math", libd_logf, libc_logf, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_log10f, libc_log10f, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_modff, libc_modff, TF, 2, TF, TP)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_expl, libd_exp);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_expl, libc_expl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_frexpl, libd_frexp);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_frexpl, libc_frexpl, TFL, 2, TFL, TP)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_ldexpl, libd_ldexp);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_ldexpl, libc_ldexpl, TFL, 2, TFL, TD)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_logl, libd_log);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_logl, libc_logl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_log10l, libd_log10);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_log10l, libc_log10l, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_modfl, libd_modf);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_modfl, libc_modfl, TFL, 2, TFL, TP)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_expm1, libc_expm1, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_log1p, libc_log1p, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_logb, libc_logb, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_expm1f, libc_expm1f, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_log1pf, libc_log1pf, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_logbf, libc_logbf, TF, 1, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_expm1l, libd_expm1);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_expm1l, libc_expm1l, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_log1pl, libd_log1p);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_log1pl, libc_log1pl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_logbl, libd_logb);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_logbl, libc_logbl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_exp2, libc_exp2, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_log2, libc_log2, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_exp2f, libc_exp2f, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_log2f, libc_log2f, TF, 1, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_exp2l, libd_exp2);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_exp2l, libc_exp2l, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_log2l, libd_log2);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_log2l, libc_log2l, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_pow, libc_pow, TFD, 2, TFD, TFD)
 DFUN(".text.crt.dos.math.math", libd_sqrt, libc_sqrt, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_powf, libc_powf, TF, 2, TF, TF)
 DFUN(".text.crt.dos.math.math", libd_sqrtf, libc_sqrtf, TF, 1, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_powl, libd_pow);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_powl, libc_powl, TFL, 2, TFL, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_sqrtl, libd_sqrt);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_sqrtl, libc_sqrtl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_hypot, libc_hypot, TFD, 2, TFD, TFD)
 DFUN(".text.crt.dos.math.math", libd_hypotf, libc_hypotf, TF, 2, TF, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_hypotl, libd_hypot);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_hypotl, libc_hypotl, TFL, 2, TFL, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_cbrt, libc_cbrt, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_cbrtf, libc_cbrtf, TF, 1, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_cbrtl, libd_cbrt);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_cbrtl, libc_cbrtl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_ceil, libc_ceil, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_fabs, libc_fabs, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_floor, libc_floor, TFD, 1, TFD)
@@ -796,28 +996,64 @@ DFUN(".text.crt.dos.math.math", libd_ceilf, libc_ceilf, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_fabsf, libc_fabsf, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_floorf, libc_floorf, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_fmodf, libc_fmodf, TF, 2, TF, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_ceill, libd_ceil);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_ceill, libc_ceill, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_fabsl, libd_fabs);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_fabsl, libc_fabsl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_floorl, libd_floor);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_floorl, libc_floorl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_fmodl, libd_fmod);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_fmodl, libc_fmodl, TFL, 2, TFL, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_copysign, libc_copysign, TFD, 2, TFD, TFD)
 DFUN(".text.crt.dos.math.math", libd_nan, libc_nan, TFD, 1, TP)
 DFUN(".text.crt.dos.math.math", libd_copysignf, libc_copysignf, TF, 2, TF, TF)
 DFUN(".text.crt.dos.math.math", libd_nanf, libc_nanf, TF, 1, TP)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_copysignl, libd_copysign);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_copysignl, libc_copysignl, TFL, 2, TFL, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_nanl, libd_nan);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_nanl, libc_nanl, TFL, 1, TP)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_erf, libc_erf, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_erfc, libc_erfc, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_lgamma, libc_lgamma, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_erff, libc_erff, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_erfcf, libc_erfcf, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_lgammaf, libc_lgammaf, TF, 1, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_erfl, libd_erf);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_erfl, libc_erfl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_erfcl, libd_erfc);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_erfcl, libc_erfcl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_lgammal, libc_lgammal, TFL, 1, TFL)
 DFUN(".text.crt.dos.math.math", libd_tgamma, libc_tgamma, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_tgammaf, libc_tgammaf, TF, 1, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_tgammal, libd_tgamma);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_tgammal, libc_tgammal, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_rint, libc_rint, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_nextafter, libc_nextafter, TFD, 2, TFD, TFD)
 DFUN(".text.crt.dos.math.math", libd_remainder, libc_remainder, TFD, 2, TFD, TFD)
@@ -826,10 +1062,26 @@ DFUN(".text.crt.dos.math.math", libd_rintf, libc_rintf, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_nextafterf, libc_nextafterf, TF, 2, TF, TF)
 DFUN(".text.crt.dos.math.math", libd_remainderf, libc_remainderf, TF, 2, TF, TF)
 DFUN(".text.crt.dos.math.math", libd_ilogbf, libc_ilogbf, TD, 1, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_rintl, libd_rint);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_rintl, libc_rintl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_nextafterl, libd_nextafter);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_nextafterl, libc_nextafterl, TFL, 2, TFL, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_remainderl, libd_remainder);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_remainderl, libc_remainderl, TFL, 2, TFL, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_ilogbl, libd_ilogb);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_ilogbl, libc_ilogbl, TD, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_nexttoward, libc_nexttoward, TFD, 2, TFD, TFL)
 DFUN(".text.crt.dos.math.math", libd_scalbn, libc_scalbn, TFD, 2, TFD, TD)
 DFUN(".text.crt.dos.math.math", libd_scalbln, libc_scalbln, TFD, 2, TFD, TL)
@@ -858,19 +1110,67 @@ DFUN(".text.crt.dos.math.math", libd_fminf, libc_fminf, TF, 2, TF, TF)
 DFUN(".text.crt.dos.math.math", libd_fmaf, libc_fmaf, TF, 3, TF, TF, TF)
 DFUN(".text.crt.dos.math.math", libd_llrintf, libc_llrintf, TLL, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_llroundf, libc_llroundf, TLL, 1, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_scalbnl, libd_scalbn);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_scalbnl, libc_scalbnl, TFL, 2, TFL, TD)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_scalblnl, libd_scalbln);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_scalblnl, libc_scalblnl, TFL, 2, TFL, TL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_roundl, libd_round);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_roundl, libc_roundl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_truncl, libd_trunc);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_truncl, libc_truncl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_remquol, libd_remquo);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_remquol, libc_remquol, TFL, 3, TFL, TFL, TP)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_lrintl, libd_remquo);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_lrintl, libc_lrintl, TL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_lroundl, libc_lroundl, TL, 1, TFL)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_fdiml, libd_fdim);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_fdiml, libc_fdiml, TFL, 2, TFL, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_fmaxl, libd_fmax);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_fmaxl, libc_fmaxl, TFL, 2, TFL, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_fminl, libd_fmin);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_fminl, libc_fminl, TFL, 2, TFL, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_fmal, libd_fma);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_fmal, libc_fmal, TFL, 3, TFL, TFL, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_llrintl, libd_llrint);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_llrintl, libc_llrintl, TLL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_llroundl, libd_llround);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_llroundl, libc_llroundl, TLL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_sincos, libc_sincos, TV, 3, TFD, TP, TP)
 DFUN(".text.crt.dos.math.math", libd_exp10, libc_exp10, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_pow10, libc_pow10, TFD, 1, TFD)
@@ -879,19 +1179,39 @@ DFUN(".text.crt.dos.math.math", libd_exp10f, libc_exp10f, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_pow10f, libc_pow10f, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_sincosl, libc_sincosl, TV, 3, TFL, TP, TP)
 DFUN(".text.crt.dos.math.math", libd_exp10l, libc_exp10l, TFL, 1, TFL)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_pow10l, libd_pow10);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_pow10l, libc_pow10l, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_isinf, libc_isinf, TD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_isinff, libc_isinff, TD, 1, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_isinfl, libd_isinf);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_isinfl, libc_isinfl, TD, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_finite, libc_finite, TD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_significand, libc_significand, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_finitef, libc_finitef, TD, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_significandf, libc_significandf, TF, 1, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_finitel, libd_finite);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_finitel, libc_finitel, TD, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_significandl, libd_significand);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_significandl, libc_significandl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_isnan, libc_isnan, TD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_isnanf, libc_isnanf, TD, 1, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_isnanl, libd_isnan);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_isnanl, libc_isnanl, TD, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_j0, libc_j0, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_j1, libc_j1, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_jn, libc_jn, TFD, 2, TD, TFD)
@@ -904,31 +1224,79 @@ DFUN(".text.crt.dos.math.math", libd_jnf, libc_jnf, TF, 2, TD, TF)
 DFUN(".text.crt.dos.math.math", libd_y0f, libc_y0f, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_y1f, libc_y1f, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_ynf, libc_ynf, TF, 2, TD, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_j0l, libd_j0);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_j0l, libc_j0l, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_j1l, libd_j1);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_j1l, libc_j1l, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_jnl, libd_jn);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_jnl, libc_jnl, TFL, 2, TD, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_y0l, libd_y0);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_y0l, libc_y0l, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_y1l, libd_y1);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_y1l, libc_y1l, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_ynl, libd_yn);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_ynl, libc_ynl, TFL, 2, TD, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_lgamma_r, libc_lgamma_r, TFD, 2, TFD, TP)
 DFUN(".text.crt.dos.math.math", libd_lgammaf_r, libc_lgammaf_r, TF, 2, TF, TP)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_lgammal_r, libd_lgamma_r);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_lgammal_r, libc_lgammal_r, TFL, 2, TFL, TP)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_scalb, libc_scalb, TFD, 2, TFD, TFD)
 DFUN(".text.crt.dos.math.math", libd_scalbf, libc_scalbf, TF, 2, TF, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_scalbl, libd_scalb);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_scalbl, libc_scalbl, TFL, 2, TFL, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd___signbit, libc___signbit, TD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd___signbitf, libc___signbitf, TD, 1, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd___signbitl, libd___signbit);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd___signbitl, libc___signbitl, TD, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd___issignaling, libc___issignaling, TD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd___issignalingf, libc___issignalingf, TD, 1, TF)
 DFUN(".text.crt.dos.math.math", libd___iscanonicall, libc___iscanonicall, TD, 1, TFL)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd___issignalingl, libd___issignaling);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd___issignalingl, libc___issignalingl, TD, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_nextdown, libc_nextdown, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_nextup, libc_nextup, TFD, 1, TFD)
 DFUN(".text.crt.dos.math.math", libd_nextdownf, libc_nextdownf, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd_nextupf, libc_nextupf, TF, 1, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_nextdownl, libd_nextdown);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_nextdownl, libc_nextdownl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_nextupl, libd_nextup);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_nextupl, libc_nextupl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #if __SIZEOF_INT__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libd_llogb, libd_ilogb);
 #else /* __SIZEOF_INT__ == __SIZEOF_LONG__ */
@@ -955,22 +1323,62 @@ DFUN(".text.crt.dos.math.math", libd_ufromfpxf, libc_ufromfpxf, TIn(__SIZEOF_INT
 DFUN(".text.crt.dos.math.math", libd_fmaxmagf, libc_fmaxmagf, TF, 2, TF, TF)
 DFUN(".text.crt.dos.math.math", libd_fminmagf, libc_fminmagf, TF, 2, TF, TF)
 DFUN(".text.crt.dos.math.math", libd_canonicalizef, libc_canonicalizef, TD, 2, TP, TP)
-#if __SIZEOF_INT__ == __SIZEOF_LONG__
+#if __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+DEFINE_INTERN_ALIAS(libd_llogbl, libd_ilogb);
+#elif __SIZEOF_INT__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libd_llogbl, libd_ilogbl);
-#else /* __SIZEOF_INT__ == __SIZEOF_LONG__ */
+#elif defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+DEFINE_INTERN_ALIAS(libd_llogbl, libd_llogbl);
+#else /* ... */
 DFUN(".text.crt.dos.math.math", libd_llogbl, libc_llogbl, TL, 1, TFL)
-#endif /* __SIZEOF_INT__ != __SIZEOF_LONG__ */
+#endif /* !... */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_roundevenl, libd_roundeven);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_roundevenl, libc_roundevenl, TFL, 1, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_fromfpl, libd_fromfp);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_fromfpl, libc_fromfpl, TIn(__SIZEOF_INTMAX_T__), 3, TFL, TD, TD)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_ufromfpl, libd_ufromfp);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_ufromfpl, libc_ufromfpl, TIn(__SIZEOF_INTMAX_T__), 3, TFL, TD, TD)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_fromfpxl, libd_fromfpx);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_fromfpxl, libc_fromfpxl, TIn(__SIZEOF_INTMAX_T__), 3, TFL, TD, TD)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_ufromfpxl, libd_ufromfpx);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_ufromfpxl, libc_ufromfpxl, TIn(__SIZEOF_INTMAX_T__), 3, TFL, TD, TD)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_fmaxmagl, libd_fmaxmag);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_fmaxmagl, libc_fmaxmagl, TFL, 2, TFL, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_fminmagl, libd_fminmag);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_fminmagl, libc_fminmagl, TFL, 2, TFL, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_canonicalizel, libd_canonicalize);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_canonicalizel, libc_canonicalizel, TD, 2, TP, TP)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd__dpcomp, libc__dpcomp, TD, 2, TFD, TFD)
 DFUN(".text.crt.dos.math.math", libd__fdpcomp, libc__fdpcomp, TD, 2, TF, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd__ldpcomp, libd__dpcomp);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd__ldpcomp, libc__ldpcomp, TD, 2, TFL, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd__chgsignf, libc__chgsignf, TF, 1, TF)
 DFUN(".text.crt.dos.math.math", libd__chgsign, libc__chgsign, TFD, 1, TFD)
 

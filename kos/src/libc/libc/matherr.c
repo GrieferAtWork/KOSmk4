@@ -1096,6 +1096,9 @@ libc___kernel_standard_f(float arg1, float arg2,
 }
 
 #ifdef __COMPILER_HAVE_LONGDOUBLE
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc___kernel_standard_l, libc___kernel_standard);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 PRIVATE ATTR_CONST ATTR_SECTION(".text.crt.math.math") double
 NOTHROW(LIBCCALL safe_ldouble_to_double)(__LONGDOUBLE arg1) {
 	double result;
@@ -1176,6 +1179,7 @@ libc___kernel_standard_l(__LONGDOUBLE arg1, __LONGDOUBLE arg2,
 
 	return libc_handle_matherr(pc, dx, dy, dretval, type);
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6581ed0 */
+/* HASH CRC-32:0x2b43fad8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_pow10l_defined
 #define __local_pow10l_defined
 #include <__crt.h>
+#include <hybrid/typecore.h>
 #include <ieee754.h>
 #if defined(__CRT_HAVE_powl) || defined(__CRT_HAVE___powl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
@@ -58,6 +59,16 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,__localdep_powl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__powl,(__x,__y))
+#elif defined(__CRT_HAVE_pow) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/math-vector.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,__localdep_powl,(__LONGDOUBLE __x, __LONGDOUBLE __y),pow,(__x,__y))
+#elif defined(__CRT_HAVE___pow) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/math-vector.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,__localdep_powl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__pow,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/powl.h>

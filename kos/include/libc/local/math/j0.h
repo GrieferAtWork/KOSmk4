@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x832613b0 */
+/* HASH CRC-32:0x146673a4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,8 +25,8 @@
 #if defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libm/j0.h>
 #include <libm/fcomp.h>
-#include <libm/matherr.h>
 #include <libm/fabs.h>
+#include <libm/matherr.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(j0) __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(j0))(double __x) {

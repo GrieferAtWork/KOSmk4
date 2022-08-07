@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2cf3adbe */
+/* HASH CRC-32:0x910efb10 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_lgammal_defined
 #include <__crt.h>
 #include <libc/template/signgam.h>
+#include <hybrid/typecore.h>
 #include <ieee754.h>
 #if defined(__LOCAL_signgam) && (defined(__CRT_HAVE_lgammal_r) || defined(__CRT_HAVE___lgammal_r) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))
 __NAMESPACE_LOCAL_BEGIN
@@ -33,6 +34,10 @@ __CEIREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,__localdep
 __CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,__localdep_lgammal_r,(__LONGDOUBLE __x, int *__signgamp),lgammal_r,(__x,__signgamp))
 #elif defined(__CRT_HAVE___lgammal_r)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,__localdep_lgammal_r,(__LONGDOUBLE __x, int *__signgamp),__lgammal_r,(__x,__signgamp))
+#elif defined(__CRT_HAVE_lgamma_r) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,__localdep_lgammal_r,(__LONGDOUBLE __x, int *__signgamp),lgamma_r,(__x,__signgamp))
+#elif defined(__CRT_HAVE___lgamma_r) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,__localdep_lgammal_r,(__LONGDOUBLE __x, int *__signgamp),__lgamma_r,(__x,__signgamp))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/lgammal_r.h>

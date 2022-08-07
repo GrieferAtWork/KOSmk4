@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4722696d */
+/* HASH CRC-32:0xf05a7ea */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -287,6 +287,10 @@ NOTHROW(LIBCCALL libc_tanf)(float x) {
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_acosl, libc_acos);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
 #include <libm/matherr.h>
@@ -311,6 +315,11 @@ NOTHROW(LIBCCALL libc_acosl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_asinl, libc_asin);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
 #include <libm/matherr.h>
@@ -335,6 +344,11 @@ NOTHROW(LIBCCALL libc_asinl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_atanl, libc_atan);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
 #include <libm/matherr.h>
@@ -359,6 +373,11 @@ NOTHROW(LIBCCALL libc_atanl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_atan2l, libc_atan2);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/math-constants.h>
 #include <libm/matherr.h>
 #include <libm/atan2.h>
@@ -377,6 +396,11 @@ NOTHROW(LIBCCALL libc_atan2l)(__LONGDOUBLE y,
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_cosl, libc_cos);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/isnan.h>
 #include <libm/cos.h>
 #include <libm/matherr.h>
@@ -395,6 +419,11 @@ NOTHROW(LIBCCALL libc_cosl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_sinl, libc_sin);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/isnan.h>
 #include <libm/sin.h>
 #include <libm/matherr.h>
@@ -413,6 +442,11 @@ NOTHROW(LIBCCALL libc_sinl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_tanl, libc_tan);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/isnan.h>
 #include <libm/isinf.h>
 #include <libm/tan.h>
@@ -432,6 +466,7 @@ NOTHROW(LIBCCALL libc_tanl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/finite.h>
 #include <libm/cosh.h>
 #include <libm/matherr.h>
@@ -516,6 +551,10 @@ NOTHROW(LIBCCALL libc_tanhf)(float x) {
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_coshl, libc_cosh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/finite.h>
 #include <libm/cosh.h>
 #include <libm/matherr.h>
@@ -535,6 +574,11 @@ NOTHROW(LIBCCALL libc_coshl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_sinhl, libc_sinh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/finite.h>
 #include <libm/sinh.h>
 #include <libm/matherr.h>
@@ -554,6 +598,11 @@ NOTHROW(LIBCCALL libc_sinhl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_tanhl, libc_tanh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/tanh.h>
 /* >> tanhf(3), tanh(3), tanhl(3)
  * Hyperbolic   tangent   of  `x' */
@@ -567,6 +616,7 @@ NOTHROW(LIBCCALL libc_tanhl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <libm/matherr.h>
 #include <libm/nan.h>
@@ -659,6 +709,10 @@ NOTHROW(LIBCCALL libc_atanhf)(float x) {
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_acoshl, libc_acosh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <libm/matherr.h>
 #include <libm/nan.h>
@@ -678,6 +732,11 @@ NOTHROW(LIBCCALL libc_acoshl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_asinhl, libc_asinh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/asinh.h>
 /* >> asinhf(3), asinh(3), asinhl(3)
  * Hyperbolic  arc   sine   of   `x' */
@@ -691,6 +750,11 @@ NOTHROW(LIBCCALL libc_asinhl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_atanhl, libc_atanh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <libm/fabs.h>
 #include <bits/math-constants.h>
@@ -714,6 +778,7 @@ NOTHROW(LIBCCALL libc_atanhl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/signbit.h>
 #include <libm/finite.h>
 #include <libm/matherr.h>
@@ -940,6 +1005,10 @@ NOTHROW_NCX(LIBCCALL libc_modff)(float x,
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_expl, libc_exp);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/signbit.h>
 #include <libm/finite.h>
 #include <libm/matherr.h>
@@ -966,6 +1035,11 @@ NOTHROW(LIBCCALL libc_expl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_frexpl, libc_frexp);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/frexp.h>
 /* >> frexpf(3), frexp(3), frexpl(3)
  * Break `value' into a normalized fraction and an integral power of 2 */
@@ -980,6 +1054,11 @@ NOTHROW_NCX(LIBCCALL libc_frexpl)(__LONGDOUBLE x,
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_ldexpl, libc_ldexp);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libc/errno.h>
 #include <libm/finite.h>
 #include <libm/ldexp.h>
@@ -1002,6 +1081,11 @@ NOTHROW(LIBCCALL libc_ldexpl)(__LONGDOUBLE x,
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_logl, libc_log);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/fenv.h>
 #include <bits/math-constants.h>
 #include <libm/nan.h>
@@ -1030,6 +1114,11 @@ NOTHROW(LIBCCALL libc_logl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_log10l, libc_log10);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/fenv.h>
 #include <bits/math-constants.h>
 #include <libm/nan.h>
@@ -1058,6 +1147,11 @@ NOTHROW(LIBCCALL libc_log10l)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_modfl, libc_modf);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/modf.h>
 /* >> modff(3), modf(3), modfl(3)
  * Break `value' into integral and fractional parts */
@@ -1072,6 +1166,7 @@ NOTHROW_NCX(LIBCCALL libc_modfl)(__LONGDOUBLE x,
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/matherr.h>
 #include <libm/signbit.h>
 #include <libm/finite.h>
@@ -1185,6 +1280,10 @@ NOTHROW(LIBCCALL libc_logbf)(float x) {
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_expm1l, libc_expm1);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/matherr.h>
 #include <libm/signbit.h>
 #include <libm/finite.h>
@@ -1210,6 +1309,11 @@ NOTHROW(LIBCCALL libc_expm1l)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_log1pl, libc_log1p);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/fenv.h>
 #include <bits/math-constants.h>
 #include <libm/nan.h>
@@ -1238,6 +1342,11 @@ NOTHROW(LIBCCALL libc_log1pl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_logbl, libc_logb);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/logb.h>
 /* >> logbf(3), logb(3), logbl(3)
  * Return the base 2 signed integral exponent of `x' */
@@ -1251,6 +1360,7 @@ NOTHROW(LIBCCALL libc_logbl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/exp2.h>
 #include <libm/matherr.h>
 #include <libm/finite.h>
@@ -1345,6 +1455,10 @@ NOTHROW(LIBCCALL libc_log2f)(float x) {
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_exp2l, libc_exp2);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/exp2.h>
 #include <libm/matherr.h>
 #include <libm/finite.h>
@@ -1369,6 +1483,11 @@ NOTHROW(LIBCCALL libc_exp2l)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_log2l, libc_log2);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/fenv.h>
 #include <bits/math-constants.h>
 #include <libm/nan.h>
@@ -1399,6 +1518,7 @@ NOTHROW(LIBCCALL libc_log2l)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/finite.h>
 #include <libm/isnan.h>
 #include <libm/matherr.h>
@@ -1553,6 +1673,10 @@ NOTHROW(LIBCCALL libc_sqrtf)(float x) {
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_powl, libc_pow);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/finite.h>
 #include <libm/isnan.h>
 #include <libm/matherr.h>
@@ -1618,6 +1742,11 @@ NOTHROW(LIBCCALL libc_powl)(__LONGDOUBLE x,
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_sqrtl, libc_sqrt);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <libm/nan.h>
 #include <libm/matherr.h>
@@ -1636,6 +1765,7 @@ NOTHROW(LIBCCALL libc_sqrtl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/finite.h>
 #include <libm/matherr.h>
 #include <libm/hypot.h>
@@ -1670,6 +1800,10 @@ NOTHROW(LIBCCALL libc_hypotf)(float x,
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_hypotl, libc_hypot);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/finite.h>
 #include <libm/matherr.h>
 #include <libm/hypot.h>
@@ -1690,6 +1824,7 @@ NOTHROW(LIBCCALL libc_hypotl)(__LONGDOUBLE x,
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/cbrt.h>
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
  * Return  the  cube root  of `x' */
@@ -1710,6 +1845,10 @@ NOTHROW(LIBCCALL libc_cbrtf)(float x) {
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_cbrtl, libc_cbrt);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/cbrt.h>
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
  * Return  the  cube root  of `x' */
@@ -1723,6 +1862,7 @@ NOTHROW(LIBCCALL libc_cbrtl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #include <libm/ceil.h>
 /* >> ceilf(3), ceil(3), ceill(3)
@@ -1846,6 +1986,9 @@ NOTHROW(LIBCCALL libc_fmodf)(float x,
 
 }
 #include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_ceill, libc_ceil);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/ceil.h>
 /* >> ceilf(3), ceil(3), ceill(3)
  * Smallest integral value not less than `x' */
@@ -1861,6 +2004,11 @@ NOTHROW(LIBCCALL libc_ceill)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_fabsl, libc_fabs);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fabs.h>
 /* >> fabsf(3), fabs(3), fabsl(3)
  * Absolute value of `x' */
@@ -1872,7 +2020,11 @@ NOTHROW(LIBCCALL libc_fabsl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_floorl, libc_floor);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/floor.h>
 /* >> floorf(3), floor(3), floorl(3)
  * Largest integer not greater than `x' */
@@ -1888,6 +2040,11 @@ NOTHROW(LIBCCALL libc_floorl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_fmodl, libc_fmod);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/isinf.h>
 #include <libm/fcomp.h>
 #include <libm/matherr.h>
@@ -1909,6 +2066,7 @@ NOTHROW(LIBCCALL libc_fmodl)(__LONGDOUBLE x,
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/copysign.h>
 /* >> copysignf(3), copysign(3), copysignl(3)
  * Return `x' with its signed changed to `y's */
@@ -1957,6 +2115,10 @@ NOTHROW(LIBCCALL libc_nanf)(char const *tagb) {
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_copysignl, libc_copysign);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/copysign.h>
 /* >> copysignf(3), copysign(3), copysignl(3)
  * Return `x' with its signed changed to `y's */
@@ -1971,6 +2133,11 @@ NOTHROW(LIBCCALL libc_copysignl)(__LONGDOUBLE num,
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_nanl, libc_nan);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/nan.h>
 /* >> nanf(3), nan(3), nanl(3)
  * Return representation of qNaN for double type */
@@ -1984,6 +2151,7 @@ NOTHROW(LIBCCALL libc_nanl)(char const *tagb) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/erf.h>
 /* >> erff(3), erf(3), erfl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
@@ -2030,6 +2198,10 @@ INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_lgammaf)(float x) {
 	return libc_lgammaf_r(x, &__LOCAL_signgam);
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_erfl, libc_erf);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/erf.h>
 /* >> erff(3), erf(3), erfl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
@@ -2042,6 +2214,11 @@ NOTHROW(LIBCCALL libc_erfl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_erfcl, libc_erfc);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/erfc.h>
 /* >> erfcf(3), erfc(3), erfcl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
@@ -2054,6 +2231,7 @@ NOTHROW(LIBCCALL libc_erfcl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* >> lgammaf(3), lgamma(3), lgammal(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_lgammal)(__LONGDOUBLE x) {
@@ -2113,6 +2291,10 @@ NOTHROW(LIBCCALL libc_tgammaf)(float x) {
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_tgammal, libc_tgamma);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <libm/isinf.h>
 #include <libm/finite.h>
@@ -2143,6 +2325,7 @@ NOTHROW(LIBCCALL libc_tgammal)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/rint.h>
 /* >> rintf(3), rint(3), rintl(3)
  * Return the integer nearest `x' in the direction of the prevailing rounding mode */
@@ -2253,6 +2436,10 @@ NOTHROW(LIBCCALL libc_ilogbf)(float x) {
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_rintl, libc_rint);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/rint.h>
 /* >> rintf(3), rint(3), rintl(3)
  * Return the integer nearest `x' in the direction of the prevailing rounding mode */
@@ -2266,6 +2453,11 @@ NOTHROW(LIBCCALL libc_rintl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_nextafterl, libc_nextafter);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/nextafter.h>
 /* >> nextafterf(3), nextafter(3), nextafterl(3)
  * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
@@ -2280,6 +2472,11 @@ NOTHROW(LIBCCALL libc_nextafterl)(__LONGDOUBLE x,
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_remainderl, libc_remainder);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/matherr.h>
 #include <libm/isnan.h>
 #include <libm/isinf.h>
@@ -2301,6 +2498,11 @@ NOTHROW(LIBCCALL libc_remainderl)(__LONGDOUBLE x,
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_ilogbl, libc_ilogb);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/ilogb.h>
 #include <libm/matherr.h>
 #include <bits/crt/mathdef.h>
@@ -2320,6 +2522,7 @@ NOTHROW(LIBCCALL libc_ilogbl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/nexttoward.h>
 /* >> nexttowardf(3), nexttoward(3), nexttowardl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
@@ -2724,6 +2927,10 @@ NOTHROW(LIBCCALL libc_llroundf)(float x) {
 
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_LONG_LONG__ */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_scalbnl, libc_scalbn);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/scalbn.h>
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
@@ -2738,9 +2945,16 @@ NOTHROW(LIBCCALL libc_scalbnl)(__LONGDOUBLE x,
 
 
 }
-#if __SIZEOF_INT__ == __SIZEOF_LONG__
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#if __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+DEFINE_INTERN_ALIAS(libc_scalblnl, libc_scalbn);
+#elif __SIZEOF_INT__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libc_scalblnl, libc_scalbnl);
-#else /* __SIZEOF_INT__ == __SIZEOF_LONG__ */
+#else /* ... */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_scalblnl, libc_scalbln);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/scalbn.h>
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
@@ -2755,8 +2969,12 @@ NOTHROW(LIBCCALL libc_scalblnl)(__LONGDOUBLE x,
 
 
 }
-#endif /* __SIZEOF_INT__ != __SIZEOF_LONG__ */
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#endif /* !... */
 #include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_roundl, libc_round);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/round.h>
 /* >> roundf(3), round(3), roundl(3)
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
@@ -2779,7 +2997,11 @@ NOTHROW(LIBCCALL libc_roundl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_truncl, libc_trunc);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/trunc.h>
 /* >> truncf(3), trunc(3), truncl(3)
  * Round `x' to the integral value in floating-point
@@ -2792,6 +3014,11 @@ NOTHROW(LIBCCALL libc_truncl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_remquol, libc_remquo);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/remquo.h>
 /* >> remquof(3), remquo(3), remquol(3)
  * Compute remainder of `x' and `p' and put in `*pquo' a value with
@@ -2809,7 +3036,11 @@ NOTHROW(LIBCCALL libc_remquol)(__LONGDOUBLE x,
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_lrintl, libc_remquo);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/lrint.h>
 /* >> lrintf(3), lrint(3), lrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
@@ -2821,6 +3052,7 @@ NOTHROW(LIBCCALL libc_lrintl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #include <libm/lround.h>
 /* >> lroundf(3), lround(3), lroundl(3)
@@ -2833,6 +3065,10 @@ NOTHROW(LIBCCALL libc_lroundl)(__LONGDOUBLE x) {
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_fdiml, libc_fdim);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* >> fdimf(3), fdim(3), fdiml(3)
  * Return positive difference between `x' and `y' */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
@@ -2841,6 +3077,11 @@ NOTHROW(LIBCCALL libc_fdiml)(__LONGDOUBLE x,
 	/* TODO: ieee754-specific function */
 	return libc_fabsl(y - x);
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_fmaxl, libc_fmax);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <ieee754.h>
 #include <libm/fcomp.h>
 #include <libm/isnan.h>
@@ -2860,6 +3101,11 @@ NOTHROW(LIBCCALL libc_fmaxl)(__LONGDOUBLE x,
 
 	return y;
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_fminl, libc_fmin);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <ieee754.h>
 #include <libm/fcomp.h>
 #include <libm/isnan.h>
@@ -2879,6 +3125,11 @@ NOTHROW(LIBCCALL libc_fminl)(__LONGDOUBLE x,
 
 	return y;
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_fmal, libc_fma);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* >> fmaf(3), fma(3), fmal(3)
  * Multiply-add function computed as a ternary operation */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
@@ -2888,10 +3139,16 @@ NOTHROW(LIBCCALL libc_fmal)(__LONGDOUBLE x,
 	/* TODO: ieee754-specific function */
 	return (x * y) + z;
 }
-#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+DEFINE_INTERN_ALIAS(libc_llrintl, libc_lrint);
+#elif __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 DEFINE_INTERN_ALIAS(libc_llrintl, libc_lrintl);
-#else /* __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ */
+#else /* ... */
 #include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_llrintl, libc_llrint);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/lrint.h>
 /* >> llrintf(3), llrint(3), llrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
@@ -2903,11 +3160,17 @@ NOTHROW(LIBCCALL libc_llrintl)(__LONGDOUBLE x) {
 
 
 }
-#endif /* __SIZEOF_LONG__ != __SIZEOF_LONG_LONG__ */
-#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#endif /* !... */
+#if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+DEFINE_INTERN_ALIAS(libc_llroundl, libc_lround);
+#elif __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 DEFINE_INTERN_ALIAS(libc_llroundl, libc_lroundl);
-#else /* __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ */
+#else /* ... */
 #include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_llroundl, libc_llround);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/lround.h>
 /* >> llroundf(3), llround(3), llroundl(3)
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
@@ -2919,7 +3182,8 @@ NOTHROW(LIBCCALL libc_llroundl)(__LONGDOUBLE x) {
 
 
 }
-#endif /* __SIZEOF_LONG__ != __SIZEOF_LONG_LONG__ */
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#endif /* !... */
 #include <libm/sincos.h>
 /* >> sincosf(3), sincos(3), sincosl(3)
  * Calculate both sine (*psinx) and cosine (*pcosx) of `x' */
@@ -3047,6 +3311,10 @@ NOTHROW(LIBCCALL libc_exp10l)(__LONGDOUBLE x) {
 	}
 	return result;
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_pow10l, libc_pow10);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* >> pow10f(3), pow10(3), pow10l(3)
  * Another  name  occasionally  used */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
@@ -3057,6 +3325,7 @@ NOTHROW(LIBCCALL libc_pow10l)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/isinf.h>
 /* >> isinff(3), isinf(3), isinfl(3)
  * Return 0 if `value' is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
@@ -3090,6 +3359,10 @@ NOTHROW(LIBCCALL libc_isinff)(float x) {
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_isinfl, libc_isinf);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/isinf.h>
 /* >> isinff(3), isinf(3), isinfl(3)
  * Return 0 if `value' is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
@@ -3110,6 +3383,7 @@ NOTHROW(LIBCCALL libc_isinfl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/finite.h>
 /* >> finitef(3), finite(3), finitel(3)
  * Return nonzero if `value' is finite and not NaN */
@@ -3159,6 +3433,10 @@ NOTHROW(LIBCCALL libc_significandf)(float x) {
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_finitel, libc_finite);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/finite.h>
 /* >> finitef(3), finite(3), finitel(3)
  * Return nonzero if `value' is finite and not NaN */
@@ -3177,6 +3455,11 @@ NOTHROW(LIBCCALL libc_finitel)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_significandl, libc_significand);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/significand.h>
 /* >> significandf(3), significand(3), significandl(3)
  * Return the fractional part of `x' after dividing out `ilogb(x)' */
@@ -3190,6 +3473,7 @@ NOTHROW(LIBCCALL libc_significandl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/isnan.h>
 /* >> isnanf(3), isnan(3), isnanl(3)
  * Return nonzero if `value' is not a number */
@@ -3210,6 +3494,10 @@ NOTHROW(LIBCCALL libc_isnanf)(float x) {
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_isnanl, libc_isnan);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/isnan.h>
 /* >> isnanf(3), isnan(3), isnanl(3)
  * Return nonzero if `value' is not a number */
@@ -3223,10 +3511,11 @@ NOTHROW(LIBCCALL libc_isnanl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/j0.h>
 #include <libm/fcomp.h>
-#include <libm/matherr.h>
 #include <libm/fabs.h>
+#include <libm/matherr.h>
 /* >> j0f(3), j0(3), j0l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_j0)(double x) {
@@ -3237,8 +3526,8 @@ NOTHROW(LIBCCALL libc_j0)(double x) {
 }
 #include <libm/j1.h>
 #include <libm/fcomp.h>
-#include <libm/matherr.h>
 #include <libm/fabs.h>
+#include <libm/matherr.h>
 /* >> j1f(3), j1(3), j1l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_j1)(double x) {
@@ -3249,8 +3538,8 @@ NOTHROW(LIBCCALL libc_j1)(double x) {
 }
 #include <libm/jn.h>
 #include <libm/fcomp.h>
-#include <libm/matherr.h>
 #include <libm/fabs.h>
+#include <libm/matherr.h>
 /* >> jnf(3), jn(3), jnl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED double
 NOTHROW(LIBCCALL libc_jn)(int n,
@@ -3329,8 +3618,8 @@ NOTHROW(LIBCCALL libc_yn)(int n,
 }
 #include <libm/j0.h>
 #include <libm/fcomp.h>
-#include <libm/matherr.h>
 #include <libm/fabs.h>
+#include <libm/matherr.h>
 /* >> j0f(3), j0(3), j0l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_j0f)(float x) {
@@ -3347,8 +3636,8 @@ NOTHROW(LIBCCALL libc_j0f)(float x) {
 }
 #include <libm/j1.h>
 #include <libm/fcomp.h>
-#include <libm/matherr.h>
 #include <libm/fabs.h>
+#include <libm/matherr.h>
 /* >> j1f(3), j1(3), j1l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_j1f)(float x) {
@@ -3365,8 +3654,8 @@ NOTHROW(LIBCCALL libc_j1f)(float x) {
 }
 #include <libm/jn.h>
 #include <libm/fcomp.h>
-#include <libm/matherr.h>
 #include <libm/fabs.h>
+#include <libm/matherr.h>
 /* >> jnf(3), jn(3), jnl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED float
 NOTHROW(LIBCCALL libc_jnf)(int n,
@@ -3470,10 +3759,14 @@ NOTHROW(LIBCCALL libc_ynf)(int n,
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_j0l, libc_j0);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/j0.h>
 #include <libm/fcomp.h>
-#include <libm/matherr.h>
 #include <libm/fabs.h>
+#include <libm/matherr.h>
 /* >> j0f(3), j0(3), j0l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_j0l)(__LONGDOUBLE x) {
@@ -3488,10 +3781,15 @@ NOTHROW(LIBCCALL libc_j0l)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_j1l, libc_j1);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/j1.h>
 #include <libm/fcomp.h>
-#include <libm/matherr.h>
 #include <libm/fabs.h>
+#include <libm/matherr.h>
 /* >> j1f(3), j1(3), j1l(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_j1l)(__LONGDOUBLE x) {
@@ -3506,10 +3804,15 @@ NOTHROW(LIBCCALL libc_j1l)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_jnl, libc_jn);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/jn.h>
 #include <libm/fcomp.h>
-#include <libm/matherr.h>
 #include <libm/fabs.h>
+#include <libm/matherr.h>
 /* >> jnf(3), jn(3), jnl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_jnl)(int n,
@@ -3525,6 +3828,11 @@ NOTHROW(LIBCCALL libc_jnl)(int n,
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_y0l, libc_y0);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <bits/math-constants.h>
 #include <libm/matherr.h>
@@ -3554,6 +3862,11 @@ NOTHROW(LIBCCALL libc_y0l)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_y1l, libc_y1);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <bits/math-constants.h>
 #include <libm/matherr.h>
@@ -3583,6 +3896,11 @@ NOTHROW(LIBCCALL libc_y1l)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_ynl, libc_yn);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 #include <bits/math-constants.h>
 #include <libm/matherr.h>
@@ -3613,6 +3931,7 @@ NOTHROW(LIBCCALL libc_ynl)(int n,
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/lgamma.h>
 #include <libm/matherr.h>
 #include <libm/finite.h>
@@ -3657,6 +3976,10 @@ NOTHROW_NCX(LIBCCALL libc_lgammaf_r)(float x,
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_lgammal_r, libc_lgamma_r);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/lgamma.h>
 #include <libm/matherr.h>
 #include <libm/finite.h>
@@ -3682,6 +4005,7 @@ NOTHROW_NCX(LIBCCALL libc_lgammal_r)(__LONGDOUBLE x,
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/isnan.h>
 #include <libm/finite.h>
 #include <libm/isinf.h>
@@ -3792,6 +4116,10 @@ NOTHROW(LIBCCALL libc_scalbf)(float x,
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_scalbl, libc_scalb);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/isnan.h>
 #include <libm/finite.h>
 #include <libm/isinf.h>
@@ -3850,6 +4178,7 @@ NOTHROW(LIBCCALL libc_scalbl)(__LONGDOUBLE x,
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd___fpclassify)(double x) { return fptype_kos2dos(libc___fpclassify(x)); }
@@ -3894,9 +4223,18 @@ NOTHROW(LIBCCALL libc___signbitf)(float x) {
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd___fpclassifyl, libd___fpclassify);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
 NOTHROW(LIBDCALL libd___fpclassifyl)(__LONGDOUBLE x) { return fptype_kos2dos(libc___fpclassifyl(x)); }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc___fpclassifyl, libc___fpclassify);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fpclassify.h>
 /* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
@@ -3909,6 +4247,11 @@ NOTHROW(LIBCCALL libc___fpclassifyl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc___signbitl, libc___signbit);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/signbit.h>
 /* >> signbit(3), __signbitf(3), __signbit(3), __signbitl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
@@ -3919,6 +4262,7 @@ NOTHROW(LIBCCALL libc___signbitl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/issignaling.h>
 /* >> issignaling(3), __issignalingf(3), __issignaling(3), __issignalingl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
@@ -3947,6 +4291,10 @@ NOTHROW(LIBCCALL libc___iscanonicall)(__LONGDOUBLE x) {
 	return 1;
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc___issignalingl, libc___issignaling);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/issignaling.h>
 /* >> issignaling(3), __issignalingf(3), __issignaling(3), __issignalingl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED int
@@ -3959,6 +4307,7 @@ NOTHROW(LIBCCALL libc___issignalingl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* >> nextdownf(3), nextdown(3), nextdownl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_nextdown)(double x) {
@@ -3991,6 +4340,10 @@ NOTHROW(LIBCCALL libc_nextupf)(float x) {
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_nextdownl, libc_nextdown);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* >> nextdownf(3), nextdown(3), nextdownl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_nextdownl)(__LONGDOUBLE x) {
@@ -4000,6 +4353,11 @@ NOTHROW(LIBCCALL libc_nextdownl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_nextupl, libc_nextup);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/nextup.h>
 /* >> nextupf(3), nextup(3), nextupl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
@@ -4012,6 +4370,7 @@ NOTHROW(LIBCCALL libc_nextupl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libc_llogb, libc_ilogb);
@@ -4125,9 +4484,13 @@ NOTHROW_NCX(LIBCCALL libc_canonicalizef)(float *cx,
 	return 0;
 }
 #include <hybrid/typecore.h>
-#if __SIZEOF_INT__ == __SIZEOF_LONG__
+#if __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+DEFINE_INTERN_ALIAS(libc_llogbl, libc_ilogb);
+#elif __SIZEOF_INT__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libc_llogbl, libc_ilogbl);
-#else /* __SIZEOF_INT__ == __SIZEOF_LONG__ */
+#elif defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+DEFINE_INTERN_ALIAS(libc_llogbl, libc_llogbl);
+#else /* ... */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED long int
 NOTHROW(LIBCCALL libc_llogbl)(__LONGDOUBLE x) {
 
@@ -4136,7 +4499,11 @@ NOTHROW(LIBCCALL libc_llogbl)(__LONGDOUBLE x) {
 
 
 }
-#endif /* __SIZEOF_INT__ != __SIZEOF_LONG__ */
+#endif /* !... */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_roundevenl, libc_roundeven);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/roundeven.h>
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW(LIBCCALL libc_roundevenl)(__LONGDOUBLE x) {
@@ -4148,40 +4515,75 @@ NOTHROW(LIBCCALL libc_roundevenl)(__LONGDOUBLE x) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_fromfpl, libc_fromfp);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED intmax_t
 NOTHROW_NCX(LIBCCALL libc_fromfpl)(__LONGDOUBLE x,
                                    int roundl,
                                    unsigned int width) {
 	return libc_fromfp((double)x, roundl, width);
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_ufromfpl, libc_ufromfp);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED uintmax_t
 NOTHROW_NCX(LIBCCALL libc_ufromfpl)(__LONGDOUBLE x,
                                     int roundl,
                                     unsigned int width) {
 	return libc_ufromfp((double)x, roundl, width);
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_fromfpxl, libc_fromfpx);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED intmax_t
 NOTHROW_NCX(LIBCCALL libc_fromfpxl)(__LONGDOUBLE x,
                                     int roundl,
                                     unsigned int width) {
 	return libc_fromfpx((double)x, roundl, width);
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_ufromfpxl, libc_ufromfpx);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.math") WUNUSED uintmax_t
 NOTHROW_NCX(LIBCCALL libc_ufromfpxl)(__LONGDOUBLE x,
                                      int roundl,
                                      unsigned int width) {
 	return libc_ufromfpx((double)x, roundl, width);
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_fmaxmagl, libc_fmaxmag);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_fmaxmagl)(__LONGDOUBLE x,
                                     __LONGDOUBLE y) {
 	return (__LONGDOUBLE)libc_fmaxmag((double)x, (double)y);
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_fminmagl, libc_fminmag);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_fminmagl)(__LONGDOUBLE x,
                                     __LONGDOUBLE y) {
 	return (__LONGDOUBLE)libc_fminmag((double)x, (double)y);
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_canonicalizel, libc_canonicalize);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
  * @param: x:  Pointer to the value to canonicalize.
  * @param: cx: Store the canonicalized value of `*x' here.
@@ -4202,6 +4604,7 @@ NOTHROW_NCX(LIBCCALL libc_canonicalizel)(__LONGDOUBLE *cx,
 	}
 	return 0;
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 /* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
 INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
@@ -4248,6 +4651,10 @@ NOTHROW_NCX(LIBCCALL libc__fdpcomp)(float x,
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc__ldpcomp, libc__dpcomp);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/fcomp.h>
 /* >> _fdpcomp(3), _dpcomp(3), _ldpcomp(3) */
 INTERN ATTR_SECTION(".text.crt.dos.math.math") ATTR_CONST WUNUSED int
@@ -4274,6 +4681,7 @@ NOTHROW_NCX(LIBCCALL libc__ldpcomp)(__LONGDOUBLE x,
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 #undef signgam

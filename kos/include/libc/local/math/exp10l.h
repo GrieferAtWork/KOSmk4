@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb51e9df */
+/* HASH CRC-32:0xb5d412e5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_exp10l_defined
 #define __local_exp10l_defined
 #include <__crt.h>
+#include <hybrid/typecore.h>
 #include <ieee754.h>
 #if defined(__CRT_HAVE_expl) || defined(__CRT_HAVE___expl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_BEGIN
@@ -30,6 +31,10 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___signbitl,(__LONGDOUBLE __x),__signbitl,(__x))
 #elif defined(__CRT_HAVE__ldsign)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___signbitl,(__LONGDOUBLE __x),_ldsign,(__x))
+#elif defined(__CRT_HAVE___signbit) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___signbitl,(__LONGDOUBLE __x),__signbit,(__x))
+#elif defined(__CRT_HAVE__dsign) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___signbitl,(__LONGDOUBLE __x),_dsign,(__x))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/__signbitl.h>
@@ -54,6 +59,16 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_expl,__LONGDOUBLE,__NOTHROW,__localdep_expl,(__LONGDOUBLE __x),__expl,(__x))
+#elif defined(__CRT_HAVE_exp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/math-vector.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_expl,__LONGDOUBLE,__NOTHROW,__localdep_expl,(__LONGDOUBLE __x),exp,(__x))
+#elif defined(__CRT_HAVE___exp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/math-vector.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_expl,__LONGDOUBLE,__NOTHROW,__localdep_expl,(__LONGDOUBLE __x),__exp,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/expl.h>
@@ -85,6 +100,10 @@ __CEIREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_finitel,(__LO
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_finitel,(__LONGDOUBLE __x),finitel,(__x))
 #elif defined(__CRT_HAVE___finitel)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_finitel,(__LONGDOUBLE __x),__finitel,(__x))
+#elif defined(__CRT_HAVE_finite) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_finitel,(__LONGDOUBLE __x),finite,(__x))
+#elif defined(__CRT_HAVE___finite) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_finitel,(__LONGDOUBLE __x),__finite,(__x))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <bits/math-constants.h>

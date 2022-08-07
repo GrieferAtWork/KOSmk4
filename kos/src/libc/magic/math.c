@@ -478,13 +478,13 @@ double tan(double x) {
 [[std, crtbuiltin, export_alias("__tanf")]] tanf(*) %{generate(double2float("tan"))}
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[std, crtbuiltin, export_alias("__acosl")]] acosl(*) %{generate(double2ldouble("acos"))}
-[[std, crtbuiltin, export_alias("__asinl")]] asinl(*) %{generate(double2ldouble("asin"))}
-[[std, crtbuiltin, export_alias("__atanl")]] atanl(*) %{generate(double2ldouble("atan"))}
-[[std, crtbuiltin, export_alias("__atan2l")]] atan2l(*) %{generate(double2ldouble("atan2"))}
-[[std, crtbuiltin, export_alias("__cosl")]] cosl(*) %{generate(double2ldouble("cos"))}
-[[std, crtbuiltin, export_alias("__sinl")]] sinl(*) %{generate(double2ldouble("sin"))}
-[[std, crtbuiltin, export_alias("__tanl")]] tanl(*) %{generate(double2ldouble("tan"))}
+[[std, crtbuiltin, export_alias("__acosl"), ldouble_variant_of("acos", ...)]] acosl(*) %{generate(double2ldouble("acos"))}
+[[std, crtbuiltin, export_alias("__asinl"), ldouble_variant_of("asin", ...)]] asinl(*) %{generate(double2ldouble("asin"))}
+[[std, crtbuiltin, export_alias("__atanl"), ldouble_variant_of("atan", ...)]] atanl(*) %{generate(double2ldouble("atan"))}
+[[std, crtbuiltin, export_alias("__atan2l"), ldouble_variant_of("atan2", ...)]] atan2l(*) %{generate(double2ldouble("atan2"))}
+[[std, crtbuiltin, export_alias("__cosl"), ldouble_variant_of("cos", ...)]] cosl(*) %{generate(double2ldouble("cos"))}
+[[std, crtbuiltin, export_alias("__sinl"), ldouble_variant_of("sin", ...)]] sinl(*) %{generate(double2ldouble("sin"))}
+[[std, crtbuiltin, export_alias("__tanl"), ldouble_variant_of("tan", ...)]] tanl(*) %{generate(double2ldouble("tan"))}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 %(std, c)
@@ -538,9 +538,9 @@ double tanh(double x) {
 [[std, crtbuiltin, export_alias("__sinhf")]] sinhf(*) %{generate(double2float("sinh"))}
 [[std, crtbuiltin, export_alias("__tanhf")]] tanhf(*) %{generate(double2float("tanh"))}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[std, crtbuiltin, export_alias("__coshl")]] coshl(*) %{generate(double2ldouble("cosh"))}
-[[std, crtbuiltin, export_alias("__sinhl")]] sinhl(*) %{generate(double2ldouble("sinh"))}
-[[std, crtbuiltin, export_alias("__tanhl")]] tanhl(*) %{generate(double2ldouble("tanh"))}
+[[std, crtbuiltin, export_alias("__coshl"), ldouble_variant_of("cosh", ...)]] coshl(*) %{generate(double2ldouble("cosh"))}
+[[std, crtbuiltin, export_alias("__sinhl"), ldouble_variant_of("sinh", ...)]] sinhl(*) %{generate(double2ldouble("sinh"))}
+[[std, crtbuiltin, export_alias("__tanhl"), ldouble_variant_of("tanh", ...)]] tanhl(*) %{generate(double2ldouble("tanh"))}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 %(std, c)
@@ -598,9 +598,9 @@ double atanh(double x) {
 [[std, crtbuiltin, export_alias("__atanhf")]] atanhf(*) %{generate(double2float("atanh"))}
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[std, crtbuiltin, export_alias("__acoshl")]] acoshl(*) %{generate(double2ldouble("acosh"))}
-[[std, crtbuiltin, export_alias("__asinhl")]] asinhl(*) %{generate(double2ldouble("asinh"))}
-[[std, crtbuiltin, export_alias("__atanhl")]] atanhl(*) %{generate(double2ldouble("atanh"))}
+[[std, crtbuiltin, export_alias("__acoshl"), ldouble_variant_of("acosh", ...)]] acoshl(*) %{generate(double2ldouble("acosh"))}
+[[std, crtbuiltin, export_alias("__asinhl"), ldouble_variant_of("asinh", ...)]] asinhl(*) %{generate(double2ldouble("asinh"))}
+[[std, crtbuiltin, export_alias("__atanhl"), ldouble_variant_of("atanh", ...)]] atanhl(*) %{generate(double2ldouble("atanh"))}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
@@ -729,12 +729,12 @@ double modf(double x, [[out]] double *iptr) {
 [[std, crtbuiltin, export_alias("__modff")]]  modff(*)  %{generate(double2float("modf"))}
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[std, crtbuiltin, export_alias("__expl")]]   expl(*)   %{generate(double2ldouble("exp"))}
-[[std, crtbuiltin, export_alias("__frexpl")]] frexpl(*) %{generate(double2ldouble("frexp"))}
-[[std, crtbuiltin, export_alias("__ldexpl")]] ldexpl(*) %{generate(double2ldouble("ldexp"))}
-[[std, crtbuiltin, export_alias("__logl")]]   logl(*)   %{generate(double2ldouble("log"))}
-[[std, crtbuiltin, export_alias("__log10l")]] log10l(*) %{generate(double2ldouble("log10"))}
-[[std, crtbuiltin, export_alias("__modfl")]]  modfl(*)  %{generate(double2ldouble("modf"))}
+[[std, crtbuiltin, export_alias("__expl"), ldouble_variant_of("exp", ...)]]   expl(*)   %{generate(double2ldouble("exp"))}
+[[std, crtbuiltin, export_alias("__frexpl"), ldouble_variant_of("frexp", ...)]] frexpl(*) %{generate(double2ldouble("frexp"))}
+[[std, crtbuiltin, export_alias("__ldexpl"), ldouble_variant_of("ldexp", ...)]] ldexpl(*) %{generate(double2ldouble("ldexp"))}
+[[std, crtbuiltin, export_alias("__logl"), ldouble_variant_of("log", ...)]]   logl(*)   %{generate(double2ldouble("log"))}
+[[std, crtbuiltin, export_alias("__log10l"), ldouble_variant_of("log10", ...)]] log10l(*) %{generate(double2ldouble("log10"))}
+[[std, crtbuiltin, export_alias("__modfl"), ldouble_variant_of("modf", ...)]]  modfl(*)  %{generate(double2ldouble("modf"))}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 %(std, c)
@@ -805,9 +805,9 @@ double logb(double x) {
 [[if(defined(__x86_64__)), dos_only_export_as("_logbf")]]
 logbf(*) %{generate(double2float("logb"))}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[std, crtbuiltin, export_alias("__expm1l")]] expm1l(*) %{generate(double2ldouble("expm1"))}
-[[std, crtbuiltin, export_alias("__log1pl")]] log1pl(*) %{generate(double2ldouble("log1p"))}
-[[std, crtbuiltin, export_alias("__logbl")]]  logbl(*)  %{generate(double2ldouble("logb"))}
+[[std, crtbuiltin, export_alias("__expm1l"), ldouble_variant_of("expm1", ...)]] expm1l(*) %{generate(double2ldouble("expm1"))}
+[[std, crtbuiltin, export_alias("__log1pl"), ldouble_variant_of("log1p", ...)]] log1pl(*) %{generate(double2ldouble("log1p"))}
+[[std, crtbuiltin, export_alias("__logbl"), ldouble_variant_of("logb", ...)]]  logbl(*)  %{generate(double2ldouble("logb"))}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
@@ -865,8 +865,8 @@ double log2(double x) {
 [[std, crtbuiltin, export_alias("__exp2f")]] exp2f(*) %{generate(double2float("exp2"))}
 [[std, crtbuiltin, export_alias("__log2f")]] log2f(*) %{generate(double2float("log2"))}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[std, crtbuiltin, export_alias("__exp2l")]] exp2l(*) %{generate(double2ldouble("exp2"))}
-[[std, crtbuiltin, export_alias("__log2l")]] log2l(*) %{generate(double2ldouble("log2"))}
+[[std, crtbuiltin, export_alias("__exp2l"), ldouble_variant_of("exp2", ...)]] exp2l(*) %{generate(double2ldouble("exp2"))}
+[[std, crtbuiltin, export_alias("__log2l"), ldouble_variant_of("log2", ...)]] log2l(*) %{generate(double2ldouble("log2"))}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_ISOC99 */
 
@@ -953,8 +953,8 @@ double sqrt(double x) {
 [[std, crtbuiltin, export_alias("__powf")]]  powf(*)  %{generate(double2float("pow"))}
 [[std, crtbuiltin, export_alias("__sqrtf")]] sqrtf(*) %{generate(double2float("sqrt"))}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[std, crtbuiltin, export_alias("__powl")]]  powl(*)  %{generate(double2ldouble("pow"))}
-[[std, crtbuiltin, export_alias("__sqrtl")]] sqrtl(*) %{generate(double2ldouble("sqrt"))}
+[[std, crtbuiltin, export_alias("__powl"), ldouble_variant_of("pow", ...)]]  powl(*)  %{generate(double2ldouble("pow"))}
+[[std, crtbuiltin, export_alias("__sqrtl"), ldouble_variant_of("sqrt", ...)]] sqrtl(*) %{generate(double2ldouble("sqrt"))}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 %(std, c)
@@ -981,7 +981,7 @@ double hypot(double x, double y) {
 [[std, crtbuiltin, dos_only_export_alias("_hypotf"), export_alias("__hypotf")]]
 hypotf(*) %{generate(double2float("hypot"))}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[std, crtbuiltin, export_alias("__hypotl")]] hypotl(*) %{generate(double2ldouble("hypot"))}
+[[std, crtbuiltin, export_alias("__hypotl"), ldouble_variant_of("hypot", ...)]] hypotl(*) %{generate(double2ldouble("hypot"))}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_XOPEN || __USE_ISOC99 */
 
@@ -1002,7 +1002,7 @@ double cbrt(double x) {
 
 [[std, crtbuiltin, export_alias("__cbrtf")]] cbrtf(*) %{generate(double2float("cbrt"))}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[std, crtbuiltin, export_alias("__cbrtl")]] cbrtl(*) %{generate(double2ldouble("cbrt"))}
+[[std, crtbuiltin, export_alias("__cbrtl"), ldouble_variant_of("cbrt", ...)]] cbrtl(*) %{generate(double2ldouble("cbrt"))}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
@@ -1076,10 +1076,10 @@ double fmod(double x, double y) {
 [[std, crtbuiltin, export_alias("__fmodf")]]  fmodf(*)  %{generate(double2float("fmod"))}
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[std, crtbuiltin, export_alias("__ceill")]]  ceill(*)  %{generate(double2ldouble("ceil"))}
-[[std, crtbuiltin, export_alias("__fabsl")]]  fabsl(*)  %{generate(double2ldouble("fabs"))}
-[[std, crtbuiltin, export_alias("__floorl")]] floorl(*) %{generate(double2ldouble("floor"))}
-[[std, crtbuiltin, export_alias("__fmodl")]]  fmodl(*)  %{generate(double2ldouble("fmod"))}
+[[std, crtbuiltin, export_alias("__ceill"), ldouble_variant_of("ceil", ...)]]  ceill(*)  %{generate(double2ldouble("ceil"))}
+[[std, crtbuiltin, export_alias("__fabsl"), ldouble_variant_of("fabs", ...)]]  fabsl(*)  %{generate(double2ldouble("fabs"))}
+[[std, crtbuiltin, export_alias("__floorl"), ldouble_variant_of("floor", ...)]] floorl(*) %{generate(double2ldouble("floor"))}
+[[std, crtbuiltin, export_alias("__fmodl"), ldouble_variant_of("fmod", ...)]]  fmodl(*)  %{generate(double2ldouble("fmod"))}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 
@@ -1114,8 +1114,8 @@ double nan(char const *tagb) {
 [[std, crtbuiltin, export_alias("__copysignf")]] copysignf(*) %{generate(double2float("copysign"))}
 [[std, crtbuiltin, export_alias("__nanf")]]      nanf(*)      %{generate(double2float("nan"))}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[std, crtbuiltin, export_alias("__copysignl")]] copysignl(*) %{generate(double2ldouble("copysign"))}
-[[std, crtbuiltin, export_alias("__nanl")]]      nanl(*)      %{generate(double2ldouble("nan"))}
+[[std, crtbuiltin, export_alias("__copysignl"), ldouble_variant_of("copysign", ...)]] copysignl(*) %{generate(double2ldouble("copysign"))}
+[[std, crtbuiltin, export_alias("__nanl"), ldouble_variant_of("nan", ...)]]      nanl(*)      %{generate(double2ldouble("nan"))}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_ISOC99 */
 
@@ -1170,8 +1170,8 @@ float lgammaf(float x) {
 
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[std, crtbuiltin, export_alias("__erfl")]]  erfl(*)  %{generate(double2ldouble("erf"))}
-[[std, crtbuiltin, export_alias("__erfcl")]] erfcl(*) %{generate(double2ldouble("erfc"))}
+[[std, crtbuiltin, export_alias("__erfl"), ldouble_variant_of("erf", ...)]]  erfl(*)  %{generate(double2ldouble("erf"))}
+[[std, crtbuiltin, export_alias("__erfcl"), ldouble_variant_of("erfc", ...)]] erfcl(*) %{generate(double2ldouble("erfc"))}
 
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("gammal", "__lgammal", "__gammal")]]
 [[if(__has_builtin(__builtin_gammal) && defined(__LIBC_BIND_CRTBUILTINS)),
@@ -1212,7 +1212,7 @@ double tgamma(double x) {
 
 [[std, crtbuiltin, export_alias("__tgammaf")]] tgammaf(*) %{generate(double2float("tgamma"))}
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[std, crtbuiltin, export_alias("__tgammal")]] tgammal(*) %{generate(double2ldouble("tgamma"))}
+[[std, crtbuiltin, export_alias("__tgammal"), ldouble_variant_of("tgamma", ...)]] tgammal(*) %{generate(double2ldouble("tgamma"))}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_ISOC99 */
 
@@ -1312,20 +1312,25 @@ int ilogbf(float x) %{generate(double2float("ilogb"))}
 [[std, const, wunused, nothrow, crtbuiltin, export_alias("nearbyintl", "__rintl", "__nearbyintl")]]
 [[if(__has_builtin(__builtin_nearbyintl) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("nearbyintl", { return __builtin_nearbyintl(x); })]]
+[[ldouble_variant_of("rint", ...)]]
 __LONGDOUBLE rintl(__LONGDOUBLE x) %{generate(double2ldouble("rint"))}
 
 [[std, const, wunused, nothrow, crtbuiltin, export_alias("nexttowardl", "__nextafterl", "__nexttowardl")]]
 [[if(__has_builtin(__builtin_nexttowardl) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("nexttowardl", { return __builtin_nexttowardl(x); })]]
+[[ldouble_variant_of("nextafter", ...)]]
 __LONGDOUBLE nextafterl(__LONGDOUBLE x, __LONGDOUBLE y) %{generate(double2ldouble("nextafter"))}
 
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("dreml", "__remainderl", "__dreml")]]
 [[if(__has_builtin(__builtin_dreml) && defined(__LIBC_BIND_CRTBUILTINS)),
   preferred_extern_inline("dreml", { return __builtin_dreml(x, p); })]]
+[[ldouble_variant_of("remainder", ...)]]
 __LONGDOUBLE remainderl(__LONGDOUBLE x, __LONGDOUBLE p) %{generate(double2ldouble("remainder"))}
 
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias("llogb")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("llogbl")]]
 [[std, wunused, ATTR_MCONST, nothrow, crtbuiltin, export_alias("__ilogbl")]]
+[[ldouble_variant_of("ilogb", ...)]]
 int ilogbl(__LONGDOUBLE x) %{generate(double2ldouble("ilogb"))}
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %(std, c, ccompat)#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
@@ -1617,12 +1622,17 @@ __LONGLONG llroundf(float x) %{generate(double2float("llround"))}
 [[std]] nexttowardl(*) = nextafterl;
 
 [[std, const, wunused, nothrow, crtbuiltin, export_alias("__scalbnl")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias("scalbln", "__scalbln")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("scalblnl", "__scalblnl")]]
+[[ldouble_variant_of("scalbn", ...)]]
 __LONGDOUBLE scalbnl(__LONGDOUBLE x, int n) %{generate(double2ldouble("scalbn"))}
 
 [[std, const, wunused, nothrow, crtbuiltin, export_alias("__scalblnl")]]
+[[alt_variant_of(__SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE), scalbn)]]
 [[alt_variant_of(__SIZEOF_INT__ == __SIZEOF_LONG__, scalbnl)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias("__scalbn")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("__scalbnl")]]
+[[ldouble_variant_of("scalbln", ...)]]
 __LONGDOUBLE scalblnl(__LONGDOUBLE x, long int n) %{generate(double2ldouble("scalbln"))}
 
 [[std, const, wunused, nothrow, doc_alias("nearbyint")]]
@@ -1635,32 +1645,40 @@ __LONGDOUBLE scalblnl(__LONGDOUBLE x, long int n) %{generate(double2ldouble("sca
   bind_local_function(rintl)]]
 __LONGDOUBLE nearbyintl(__LONGDOUBLE x);
 
-[[std, crtbuiltin, export_alias("__roundl")]]  roundl(*)  %{generate(double2ldouble("round"))}
-[[std, crtbuiltin, export_alias("__truncl")]]  truncl(*)  %{generate(double2ldouble("trunc"))}
-[[std, crtbuiltin, export_alias("__remquol")]] remquol(*) %{generate(double2ldouble("remquo"))}
+[[std, crtbuiltin, export_alias("__roundl"), ldouble_variant_of("round", ...)]]   roundl(*)  %{generate(double2ldouble("round"))}
+[[std, crtbuiltin, export_alias("__truncl"), ldouble_variant_of("trunc", ...)]]   truncl(*)  %{generate(double2ldouble("trunc"))}
+[[std, crtbuiltin, export_alias("__remquol"), ldouble_variant_of("remquo", ...)]] remquol(*) %{generate(double2ldouble("remquo"))}
 
 [[std, const, wunused, nothrow, crtbuiltin, export_alias("__lrintl")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias("llrint", "__llrint")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llrintl", "__llrintl")]]
+[[ldouble_variant_of("remquo", ...)]]
 long int lrintl(__LONGDOUBLE x) %{generate(double2ldouble("lrint"))}
 
 [[std, const, wunused, nothrow, crtbuiltin, export_alias("__lroundl")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("llroundl", "__llroundl")]]
 long int lroundl(__LONGDOUBLE x) %{generate(double2ldouble("lround"))}
 
-[[std, crtbuiltin, export_alias("__fdiml")]] fdiml(*) %{generate(double2ldouble("fdim"))}
-[[std, crtbuiltin, export_alias("__fmaxl")]] fmaxl(*) %{generate(double2ldouble("fmax"))}
-[[std, crtbuiltin, export_alias("__fminl")]] fminl(*) %{generate(double2ldouble("fmin"))}
-[[std, crtbuiltin, export_alias("__fmal")]]  fmal(*)  %{generate(double2ldouble("fma"))}
+[[std, crtbuiltin, export_alias("__fdiml"), ldouble_variant_of("fdim", ...)]] fdiml(*) %{generate(double2ldouble("fdim"))}
+[[std, crtbuiltin, export_alias("__fmaxl"), ldouble_variant_of("fmax", ...)]] fmaxl(*) %{generate(double2ldouble("fmax"))}
+[[std, crtbuiltin, export_alias("__fminl"), ldouble_variant_of("fmin", ...)]] fminl(*) %{generate(double2ldouble("fmin"))}
+[[std, crtbuiltin, export_alias("__fmal"), ldouble_variant_of("fma", ...)]]  fmal(*)  %{generate(double2ldouble("fma"))}
 
 %(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
 [[std, const, wunused, nothrow, crtbuiltin, export_alias("__llrintl")]]
+[[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE), lrint)]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lrintl)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias("__lrint")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("__lrintl")]]
+[[ldouble_variant_of("llrint", ...)]]
 __LONGLONG llrintl(__LONGDOUBLE x) %{generate(double2ldouble("llrint"))}
 
 [[std, const, wunused, nothrow, crtbuiltin, export_alias("__llroundl")]]
+[[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE), lround)]]
 [[alt_variant_of(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__, lroundl)]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias("__lround")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias("__lroundl")]]
+[[ldouble_variant_of("llround", ...)]]
 __LONGLONG llroundl(__LONGDOUBLE x) %{generate(double2ldouble("llround"))}
 
 %(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGLONG */
@@ -1948,7 +1966,9 @@ __LONGDOUBLE exp10l(__LONGDOUBLE x) {
 	return result;
 }
 
-[[crtbuiltin, export_alias("__pow10l")]] pow10l(*) %{generate(double2ldouble("pow10"))}
+[[crtbuiltin, export_alias("__pow10l")]]
+[[ldouble_variant_of("pow10", ...)]]
+pow10l(*) %{generate(double2ldouble("pow10"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_GNU */
 
@@ -1977,9 +1997,12 @@ int isinf(double x) {
 }
 %#endif /* !__cplusplus || !__CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
 
-[[crtbuiltin, export_alias("__isinff")]] isinff(*) %{generate(double2float("isinf"))}
+[[crtbuiltin, export_alias("__isinff")]]
+isinff(*) %{generate(double2float("isinf"))}
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[crtbuiltin, export_alias("__isinfl")]] isinfl(*) %{generate(double2ldouble("isinf"))}
+[[crtbuiltin, export_alias("__isinfl")]]
+[[ldouble_variant_of("isinf", ...)]]
+isinfl(*) %{generate(double2ldouble("isinf"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 @@>> finitef(3), finite(3), finitel(3)
@@ -2023,11 +2046,13 @@ significandf(*) %{generate(double2float("significand"))}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[crtbuiltin, export_alias("__finitel")]]
+[[ldouble_variant_of("finite", ...)]]
 finitel(*) %{generate(double2ldouble("finite"))}
 
 dreml(*) = remainderl;
 
 [[crtbuiltin, export_alias("__significandl")]]
+[[ldouble_variant_of("significand", ...)]]
 significandl(*) %{generate(double2ldouble("significand"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC */
@@ -2055,6 +2080,7 @@ isnanf(*) %{generate(double2float("isnan"))}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[crtbuiltin, export_alias("__isnanl")]]
+[[ldouble_variant_of("isnan", ...)]]
 isnanl(*) %{generate(double2ldouble("isnan"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
@@ -2065,7 +2091,7 @@ isnanl(*) %{generate(double2ldouble("isnan"))}
 %#if defined(__USE_MISC) || (defined(__USE_XOPEN) && __MATH_DECLARING_DOUBLE)
 @@>> j0f(3), j0(3), j0l(3)
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, dos_only_export_alias("_j0"), export_alias("__j0")]]
-[[impl_include("<libm/j0.h>", "<libm/fcomp.h>", "<libm/matherr.h>", "<libm/fabs.h>")]]
+[[impl_include("<libm/j0.h>", "<libm/fcomp.h>", "<libm/fabs.h>", "<libm/matherr.h>")]]
 [[requires_include("<ieee754.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -2079,7 +2105,7 @@ double j0(double x) {
 
 @@>> j1f(3), j1(3), j1l(3)
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, dos_only_export_alias("_j1"), export_alias("__j1")]]
-[[impl_include("<libm/j1.h>", "<libm/fcomp.h>", "<libm/matherr.h>", "<libm/fabs.h>")]]
+[[impl_include("<libm/j1.h>", "<libm/fcomp.h>", "<libm/fabs.h>", "<libm/matherr.h>")]]
 [[requires_include("<ieee754.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -2093,7 +2119,7 @@ double j1(double x) {
 
 @@>> jnf(3), jn(3), jnl(3)
 [[wunused, ATTR_MCONST, nothrow, crtbuiltin, dos_only_export_alias("_jn"), export_alias("__jn")]]
-[[impl_include("<libm/jn.h>", "<libm/fcomp.h>", "<libm/matherr.h>", "<libm/fabs.h>")]]
+[[impl_include("<libm/jn.h>", "<libm/fcomp.h>", "<libm/fabs.h>", "<libm/matherr.h>")]]
 [[requires_include("<ieee754.h>")]]
 [[requires(defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) ||
            defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) ||
@@ -2188,12 +2214,12 @@ double yn(int n, double x) {
 [[crtbuiltin, export_alias("__ynf")]] ynf(*) %{generate(double2float("yn"))}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[crtbuiltin, export_alias("__j0l")]] j0l(*) %{generate(double2ldouble("j0"))}
-[[crtbuiltin, export_alias("__j1l")]] j1l(*) %{generate(double2ldouble("j1"))}
-[[crtbuiltin, export_alias("__jnl")]] jnl(*) %{generate(double2ldouble("jn"))}
-[[crtbuiltin, export_alias("__y0l")]] y0l(*) %{generate(double2ldouble("y0"))}
-[[crtbuiltin, export_alias("__y1l")]] y1l(*) %{generate(double2ldouble("y1"))}
-[[crtbuiltin, export_alias("__ynl")]] ynl(*) %{generate(double2ldouble("yn"))}
+[[crtbuiltin, export_alias("__j0l"), ldouble_variant_of("j0", ...)]] j0l(*) %{generate(double2ldouble("j0"))}
+[[crtbuiltin, export_alias("__j1l"), ldouble_variant_of("j1", ...)]] j1l(*) %{generate(double2ldouble("j1"))}
+[[crtbuiltin, export_alias("__jnl"), ldouble_variant_of("jn", ...)]] jnl(*) %{generate(double2ldouble("jn"))}
+[[crtbuiltin, export_alias("__y0l"), ldouble_variant_of("y0", ...)]] y0l(*) %{generate(double2ldouble("y0"))}
+[[crtbuiltin, export_alias("__y1l"), ldouble_variant_of("y1", ...)]] y1l(*) %{generate(double2ldouble("y1"))}
+[[crtbuiltin, export_alias("__ynl"), ldouble_variant_of("yn", ...)]] ynl(*) %{generate(double2ldouble("yn"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC || (__USE_XOPEN && __MATH_DECLARING_DOUBLE) */
 
@@ -2234,9 +2260,12 @@ double lgamma_r(double x, [[out]] int *signgamp) {
 }
 
 
-[[crtbuiltin, export_alias("__lgammaf_r")]] lgammaf_r(*) %{generate(double2float("lgamma_r"))};
+[[crtbuiltin, export_alias("__lgammaf_r")]]
+lgammaf_r(*) %{generate(double2float("lgamma_r"))};
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[crtbuiltin, export_alias("__lgammal_r")]] lgammal_r(*) %{generate(double2ldouble("lgamma_r"))};
+[[crtbuiltin, export_alias("__lgammal_r")]]
+[[ldouble_variant_of("lgamma_r", ["__lgamma_r"])]]
+lgammal_r(*) %{generate(double2ldouble("lgamma_r"))};
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC */
 
@@ -2298,9 +2327,12 @@ double scalb(double x, double fn) {
 
 %#ifdef __USE_MISC
 [[dos_only_export_alias("_scalbf")]]
-[[crtbuiltin, export_alias("__scalbf")]] scalbf(*) %{generate(double2float("scalb"))}
+[[crtbuiltin, export_alias("__scalbf")]]
+scalbf(*) %{generate(double2float("scalb"))}
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[[crtbuiltin, export_alias("__scalbl")]] scalbl(*) %{generate(double2ldouble("scalb"))}
+[[crtbuiltin, export_alias("__scalbl")]]
+[[ldouble_variant_of("scalb", ...)]]
+scalbl(*) %{generate(double2ldouble("scalb"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_MISC */
 
@@ -2706,9 +2738,11 @@ __signbitf(*) %{generate(double2float("__signbit"))}
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[const, wunused, nothrow, export_alias("fpclassifyl"), dos_only_export_alias("_ldclass")]]
 [[crt_dos_variant({ impl:{ return fptype_kos2dos(libc___fpclassifyl(x)); }})]]
+[[ldouble_variant_of("__fpclassify", ["fpclassify", "_dclass"])]]
 int __fpclassifyl(__LONGDOUBLE x) %{generate(double2ldouble("__fpclassify"))}
 
 [[dos_only_export_alias("_ldsign")]]
+[[ldouble_variant_of("__signbit", ["_dsign"])]]
 __signbitl(*) %{generate(double2ldouble("__signbit"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_ISOC99 */
@@ -2745,6 +2779,7 @@ int __iscanonicall(__LONGDOUBLE x) {
 }
 
 [[preferred_export_alias("issignalingl")]]
+[[ldouble_variant_of("__issignaling", ...)]]
 __issignalingl(*) %{generate(double2ldouble("__issignaling"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
@@ -2769,8 +2804,8 @@ double nextup(double x) {
 nextdownf(*) %{generate(double2float("nextdown"))}
 nextupf(*) %{generate(double2float("nextup"))}
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-nextdownl(*) %{generate(double2ldouble("nextdown"))}
-nextupl(*) %{generate(double2ldouble("nextup"))}
+[[ldouble_variant_of("nextdown", ...)]] nextdownl(*) %{generate(double2ldouble("nextdown"))}
+[[ldouble_variant_of("nextup", ...)]]   nextupl(*) %{generate(double2ldouble("nextup"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
@@ -2844,18 +2879,21 @@ fminmagf(*) %{generate(double2float("fminmag"))}
 canonicalizef(*) %{generate(double2float("canonicalize"))}
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias("ilogb")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), crt_intern_alias("ilogb")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("ilogbl")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), crt_intern_alias("ilogbl")]]
+[[ldouble_variant_of("llogbl", ...)]]
 llogbl(*) %{generate(double2ldouble("llogb"))}
 
-roundevenl(*) %{generate(double2ldouble("roundeven"))}
-fromfpl(*) %{generate(double2ldouble("fromfp"))}
-ufromfpl(*) %{generate(double2ldouble("ufromfp"))}
-fromfpxl(*) %{generate(double2ldouble("fromfpx"))}
-ufromfpxl(*) %{generate(double2ldouble("ufromfpx"))}
-fmaxmagl(*) %{generate(double2ldouble("fmaxmag"))}
-fminmagl(*) %{generate(double2ldouble("fminmag"))}
-canonicalizel(*) %{generate(double2ldouble("canonicalize"))}
+[[ldouble_variant_of("roundeven", ...)]]    roundevenl(*)    %{generate(double2ldouble("roundeven"))}
+[[ldouble_variant_of("fromfp", ...)]]       fromfpl(*)       %{generate(double2ldouble("fromfp"))}
+[[ldouble_variant_of("ufromfp", ...)]]      ufromfpl(*)      %{generate(double2ldouble("ufromfp"))}
+[[ldouble_variant_of("fromfpx", ...)]]      fromfpxl(*)      %{generate(double2ldouble("fromfpx"))}
+[[ldouble_variant_of("ufromfpx", ...)]]     ufromfpxl(*)     %{generate(double2ldouble("ufromfpx"))}
+[[ldouble_variant_of("fmaxmag", ...)]]      fmaxmagl(*)      %{generate(double2ldouble("fmaxmag"))}
+[[ldouble_variant_of("fminmag", ...)]]      fminmagl(*)      %{generate(double2ldouble("fminmag"))}
+[[ldouble_variant_of("canonicalize", ...)]] canonicalizel(*) %{generate(double2ldouble("canonicalize"))}
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 
@@ -2889,6 +2927,7 @@ int _dpcomp(double x, double y) {
 [[section(".text.crt.dos.math.math")]]
 [[ignore]] _fdpcomp(*) %{generate(double2float("_dpcomp"))}
 [[section(".text.crt.dos.math.math")]]
+[[ldouble_variant_of("_dpcomp", ...)]]
 [[ignore]] _ldpcomp(*) %{generate(double2ldouble("_dpcomp"))}
 
 %(auto_source){

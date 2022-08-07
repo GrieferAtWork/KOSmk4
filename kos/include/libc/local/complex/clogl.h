@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea877eb4 */
+/* HASH CRC-32:0xe13fb251 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 #ifndef __local_clogl_defined
 #define __local_clogl_defined
 #include <__crt.h>
+#include <hybrid/typecore.h>
 #include <ieee754.h>
 #if ((defined(__CRT_HAVE_cabsl) || defined(__CRT_HAVE_cabs) || defined(__CRT_HAVE__cabs) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)) && (defined(__CRT_HAVE_logl) || defined(__CRT_HAVE___logl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)) && (defined(__CRT_HAVE_atan2l) || defined(__CRT_HAVE___atan2l) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__))) || defined(__CRT_HAVE_clog) || ((defined(__CRT_HAVE_cabs) || defined(__CRT_HAVE__cabs) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)) && (defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)) && (defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)))
 __NAMESPACE_LOCAL_BEGIN
@@ -32,6 +33,10 @@ __CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_atan2l,(__LONGDOU
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_atan2l,(__LONGDOUBLE __y, __LONGDOUBLE __x),atan2l,(__y,__x))
 #elif defined(__CRT_HAVE___atan2l)
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_atan2l,(__LONGDOUBLE __y, __LONGDOUBLE __x),__atan2l,(__y,__x))
+#elif defined(__CRT_HAVE_atan2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_atan2l,(__LONGDOUBLE __y, __LONGDOUBLE __x),atan2,(__y,__x))
+#elif defined(__CRT_HAVE___atan2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_atan2l,(__LONGDOUBLE __y, __LONGDOUBLE __x),__atan2,(__y,__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/atan2l.h>
@@ -45,6 +50,8 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_cabsl_defined
 #ifdef __CRT_HAVE_cabsl
 __CREDIRECT(,__LONGDOUBLE,__NOTHROW_NCX,__localdep_cabsl,(long double _Complex __z),cabsl,(__z))
+#elif defined(__CRT_HAVE_cabs) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(,__LONGDOUBLE,__NOTHROW_NCX,__localdep_cabsl,(long double _Complex __z),cabs,(__z))
 #elif defined(__CRT_HAVE_cabs) || defined(__CRT_HAVE__cabs) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/cabsl.h>
@@ -58,12 +65,14 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_cimagl_defined
 #ifdef __CRT_HAVE_cimagl
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_cimagl,(long double _Complex __z),cimagl,(__z))
-#else /* __CRT_HAVE_cimagl */
+#elif defined(__CRT_HAVE_cimag) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_cimagl,(long double _Complex __z),cimag,(__z))
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/cimagl.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_cimagl __LIBC_LOCAL_NAME(cimagl)
-#endif /* !__CRT_HAVE_cimagl */
+#endif /* !... */
 #endif /* !__local___localdep_cimagl_defined */
 #ifndef __local___localdep_clog_defined
 #define __local___localdep_clog_defined
@@ -82,12 +91,14 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_creall_defined
 #ifdef __CRT_HAVE_creall
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_creall,(long double _Complex __z),creall,(__z))
-#else /* __CRT_HAVE_creall */
+#elif defined(__CRT_HAVE_creal) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_creall,(long double _Complex __z),creal,(__z))
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/creall.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_creall __LIBC_LOCAL_NAME(creall)
-#endif /* !__CRT_HAVE_creall */
+#endif /* !... */
 #endif /* !__local___localdep_creall_defined */
 #ifndef __local___localdep_logl_defined
 #define __local___localdep_logl_defined
@@ -106,6 +117,16 @@ __NAMESPACE_LOCAL_END
 #include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,__localdep_logl,(__LONGDOUBLE __x),__logl,(__x))
+#elif defined(__CRT_HAVE_log) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/math-vector.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,__localdep_logl,(__LONGDOUBLE __x),log,(__x))
+#elif defined(__CRT_HAVE___log) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__NAMESPACE_LOCAL_END
+#include <bits/crt/math-vector.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,__localdep_logl,(__LONGDOUBLE __x),__log,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/logl.h>

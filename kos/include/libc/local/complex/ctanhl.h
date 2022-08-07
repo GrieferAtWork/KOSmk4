@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5edabfc */
+/* HASH CRC-32:0x27e27c23 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,12 +29,14 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_cimagl_defined
 #ifdef __CRT_HAVE_cimagl
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_cimagl,(long double _Complex __z),cimagl,(__z))
-#else /* __CRT_HAVE_cimagl */
+#elif defined(__CRT_HAVE_cimag) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_cimagl,(long double _Complex __z),cimag,(__z))
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/cimagl.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_cimagl __LIBC_LOCAL_NAME(cimagl)
-#endif /* !__CRT_HAVE_cimagl */
+#endif /* !... */
 #endif /* !__local___localdep_cimagl_defined */
 #ifndef __local___localdep_coshl_defined
 #define __local___localdep_coshl_defined
@@ -44,6 +46,10 @@ __CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_coshl,(__LONGDOUB
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_coshl,(__LONGDOUBLE __x),coshl,(__x))
 #elif defined(__CRT_HAVE___coshl)
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_coshl,(__LONGDOUBLE __x),__coshl,(__x))
+#elif defined(__CRT_HAVE_cosh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_coshl,(__LONGDOUBLE __x),cosh,(__x))
+#elif defined(__CRT_HAVE___cosh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_coshl,(__LONGDOUBLE __x),__cosh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/coshl.h>
@@ -57,12 +63,14 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_creall_defined
 #ifdef __CRT_HAVE_creall
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_creall,(long double _Complex __z),creall,(__z))
-#else /* __CRT_HAVE_creall */
+#elif defined(__CRT_HAVE_creal) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,__localdep_creall,(long double _Complex __z),creal,(__z))
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/complex/creall.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_creall __LIBC_LOCAL_NAME(creall)
-#endif /* !__CRT_HAVE_creall */
+#endif /* !... */
 #endif /* !__local___localdep_creall_defined */
 #ifndef __local___localdep_ctanh_defined
 #define __local___localdep_ctanh_defined
@@ -121,6 +129,10 @@ __CEIREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_sinhl,(__LONGDOUB
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_sinhl,(__LONGDOUBLE __x),sinhl,(__x))
 #elif defined(__CRT_HAVE___sinhl)
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_sinhl,(__LONGDOUBLE __x),__sinhl,(__x))
+#elif defined(__CRT_HAVE_sinh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_sinhl,(__LONGDOUBLE __x),sinh,(__x))
+#elif defined(__CRT_HAVE___sinh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_sinhl,(__LONGDOUBLE __x),__sinh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/sinhl.h>

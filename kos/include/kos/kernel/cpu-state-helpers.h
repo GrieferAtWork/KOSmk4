@@ -44,6 +44,8 @@ local STANDARD_FUNCTIONS: {string...} = {
 	"setsp",
 };
 local OPTIONAL_FUNCTIONS: {string...} = {
+	"getpreemption",
+	"setpreemption",
 	"foreach_gpregs",
 	"foreach_gpregs_elem",
 	"foreach_gpregs_size",
@@ -222,6 +224,12 @@ for (local xcs: XCPUSTATE) {
 #ifndef lcpustate_setsp
 #define lcpustate_setsp ucpustate_setsp
 #endif /* !lcpustate_setsp */
+#if !defined(lcpustate_getpreemption) && defined(ucpustate_getpreemption)
+#define lcpustate_getpreemption ucpustate_getpreemption
+#endif /* !lcpustate_getpreemption && ucpustate_getpreemption */
+#if !defined(lcpustate_setpreemption) && defined(ucpustate_setpreemption)
+#define lcpustate_setpreemption ucpustate_setpreemption
+#endif /* !lcpustate_setpreemption && ucpustate_setpreemption */
 #if !defined(lcpustate_foreach_gpregs) && defined(ucpustate_foreach_gpregs)
 #define lcpustate_foreach_gpregs ucpustate_foreach_gpregs
 #endif /* !lcpustate_foreach_gpregs && ucpustate_foreach_gpregs */
@@ -303,6 +311,12 @@ for (local xcs: XCPUSTATE) {
 #ifndef kcpustate_setsp
 #define kcpustate_setsp ucpustate_setsp
 #endif /* !kcpustate_setsp */
+#if !defined(kcpustate_getpreemption) && defined(ucpustate_getpreemption)
+#define kcpustate_getpreemption ucpustate_getpreemption
+#endif /* !kcpustate_getpreemption && ucpustate_getpreemption */
+#if !defined(kcpustate_setpreemption) && defined(ucpustate_setpreemption)
+#define kcpustate_setpreemption ucpustate_setpreemption
+#endif /* !kcpustate_setpreemption && ucpustate_setpreemption */
 #if !defined(kcpustate_foreach_gpregs) && defined(ucpustate_foreach_gpregs)
 #define kcpustate_foreach_gpregs ucpustate_foreach_gpregs
 #endif /* !kcpustate_foreach_gpregs && ucpustate_foreach_gpregs */
@@ -346,6 +360,12 @@ for (local xcs: XCPUSTATE) {
 #ifndef kcpustate_setsp
 #define kcpustate_setsp lcpustate_setsp
 #endif /* !kcpustate_setsp */
+#if !defined(kcpustate_getpreemption) && defined(lcpustate_getpreemption)
+#define kcpustate_getpreemption lcpustate_getpreemption
+#endif /* !kcpustate_getpreemption && lcpustate_getpreemption */
+#if !defined(kcpustate_setpreemption) && defined(lcpustate_setpreemption)
+#define kcpustate_setpreemption lcpustate_setpreemption
+#endif /* !kcpustate_setpreemption && lcpustate_setpreemption */
 #if !defined(kcpustate_foreach_gpregs) && defined(lcpustate_foreach_gpregs)
 #define kcpustate_foreach_gpregs lcpustate_foreach_gpregs
 #endif /* !kcpustate_foreach_gpregs && lcpustate_foreach_gpregs */
@@ -427,6 +447,12 @@ for (local xcs: XCPUSTATE) {
 #ifndef icpustate_setsp
 #define icpustate_setsp ucpustate_setsp
 #endif /* !icpustate_setsp */
+#if !defined(icpustate_getpreemption) && defined(ucpustate_getpreemption)
+#define icpustate_getpreemption ucpustate_getpreemption
+#endif /* !icpustate_getpreemption && ucpustate_getpreemption */
+#if !defined(icpustate_setpreemption) && defined(ucpustate_setpreemption)
+#define icpustate_setpreemption ucpustate_setpreemption
+#endif /* !icpustate_setpreemption && ucpustate_setpreemption */
 #if !defined(icpustate_foreach_gpregs) && defined(ucpustate_foreach_gpregs)
 #define icpustate_foreach_gpregs ucpustate_foreach_gpregs
 #endif /* !icpustate_foreach_gpregs && ucpustate_foreach_gpregs */
@@ -470,6 +496,12 @@ for (local xcs: XCPUSTATE) {
 #ifndef icpustate_setsp
 #define icpustate_setsp lcpustate_setsp
 #endif /* !icpustate_setsp */
+#if !defined(icpustate_getpreemption) && defined(lcpustate_getpreemption)
+#define icpustate_getpreemption lcpustate_getpreemption
+#endif /* !icpustate_getpreemption && lcpustate_getpreemption */
+#if !defined(icpustate_setpreemption) && defined(lcpustate_setpreemption)
+#define icpustate_setpreemption lcpustate_setpreemption
+#endif /* !icpustate_setpreemption && lcpustate_setpreemption */
 #if !defined(icpustate_foreach_gpregs) && defined(lcpustate_foreach_gpregs)
 #define icpustate_foreach_gpregs lcpustate_foreach_gpregs
 #endif /* !icpustate_foreach_gpregs && lcpustate_foreach_gpregs */
@@ -513,6 +545,12 @@ for (local xcs: XCPUSTATE) {
 #ifndef icpustate_setsp
 #define icpustate_setsp kcpustate_setsp
 #endif /* !icpustate_setsp */
+#if !defined(icpustate_getpreemption) && defined(kcpustate_getpreemption)
+#define icpustate_getpreemption kcpustate_getpreemption
+#endif /* !icpustate_getpreemption && kcpustate_getpreemption */
+#if !defined(icpustate_setpreemption) && defined(kcpustate_setpreemption)
+#define icpustate_setpreemption kcpustate_setpreemption
+#endif /* !icpustate_setpreemption && kcpustate_setpreemption */
 #if !defined(icpustate_foreach_gpregs) && defined(kcpustate_foreach_gpregs)
 #define icpustate_foreach_gpregs kcpustate_foreach_gpregs
 #endif /* !icpustate_foreach_gpregs && kcpustate_foreach_gpregs */
@@ -594,6 +632,12 @@ for (local xcs: XCPUSTATE) {
 #ifndef scpustate_setsp
 #define scpustate_setsp ucpustate_setsp
 #endif /* !scpustate_setsp */
+#if !defined(scpustate_getpreemption) && defined(ucpustate_getpreemption)
+#define scpustate_getpreemption ucpustate_getpreemption
+#endif /* !scpustate_getpreemption && ucpustate_getpreemption */
+#if !defined(scpustate_setpreemption) && defined(ucpustate_setpreemption)
+#define scpustate_setpreemption ucpustate_setpreemption
+#endif /* !scpustate_setpreemption && ucpustate_setpreemption */
 #if !defined(scpustate_foreach_gpregs) && defined(ucpustate_foreach_gpregs)
 #define scpustate_foreach_gpregs ucpustate_foreach_gpregs
 #endif /* !scpustate_foreach_gpregs && ucpustate_foreach_gpregs */
@@ -637,6 +681,12 @@ for (local xcs: XCPUSTATE) {
 #ifndef scpustate_setsp
 #define scpustate_setsp lcpustate_setsp
 #endif /* !scpustate_setsp */
+#if !defined(scpustate_getpreemption) && defined(lcpustate_getpreemption)
+#define scpustate_getpreemption lcpustate_getpreemption
+#endif /* !scpustate_getpreemption && lcpustate_getpreemption */
+#if !defined(scpustate_setpreemption) && defined(lcpustate_setpreemption)
+#define scpustate_setpreemption lcpustate_setpreemption
+#endif /* !scpustate_setpreemption && lcpustate_setpreemption */
 #if !defined(scpustate_foreach_gpregs) && defined(lcpustate_foreach_gpregs)
 #define scpustate_foreach_gpregs lcpustate_foreach_gpregs
 #endif /* !scpustate_foreach_gpregs && lcpustate_foreach_gpregs */
@@ -680,6 +730,12 @@ for (local xcs: XCPUSTATE) {
 #ifndef scpustate_setsp
 #define scpustate_setsp kcpustate_setsp
 #endif /* !scpustate_setsp */
+#if !defined(scpustate_getpreemption) && defined(kcpustate_getpreemption)
+#define scpustate_getpreemption kcpustate_getpreemption
+#endif /* !scpustate_getpreemption && kcpustate_getpreemption */
+#if !defined(scpustate_setpreemption) && defined(kcpustate_setpreemption)
+#define scpustate_setpreemption kcpustate_setpreemption
+#endif /* !scpustate_setpreemption && kcpustate_setpreemption */
 #if !defined(scpustate_foreach_gpregs) && defined(kcpustate_foreach_gpregs)
 #define scpustate_foreach_gpregs kcpustate_foreach_gpregs
 #endif /* !scpustate_foreach_gpregs && kcpustate_foreach_gpregs */
@@ -723,6 +779,12 @@ for (local xcs: XCPUSTATE) {
 #ifndef scpustate_setsp
 #define scpustate_setsp icpustate_setsp
 #endif /* !scpustate_setsp */
+#if !defined(scpustate_getpreemption) && defined(icpustate_getpreemption)
+#define scpustate_getpreemption icpustate_getpreemption
+#endif /* !scpustate_getpreemption && icpustate_getpreemption */
+#if !defined(scpustate_setpreemption) && defined(icpustate_setpreemption)
+#define scpustate_setpreemption icpustate_setpreemption
+#endif /* !scpustate_setpreemption && icpustate_setpreemption */
 #if !defined(scpustate_foreach_gpregs) && defined(icpustate_foreach_gpregs)
 #define scpustate_foreach_gpregs icpustate_foreach_gpregs
 #endif /* !scpustate_foreach_gpregs && icpustate_foreach_gpregs */
@@ -804,6 +866,12 @@ for (local xcs: XCPUSTATE) {
 #ifndef fcpustate_setsp
 #define fcpustate_setsp ucpustate_setsp
 #endif /* !fcpustate_setsp */
+#if !defined(fcpustate_getpreemption) && defined(ucpustate_getpreemption)
+#define fcpustate_getpreemption ucpustate_getpreemption
+#endif /* !fcpustate_getpreemption && ucpustate_getpreemption */
+#if !defined(fcpustate_setpreemption) && defined(ucpustate_setpreemption)
+#define fcpustate_setpreemption ucpustate_setpreemption
+#endif /* !fcpustate_setpreemption && ucpustate_setpreemption */
 #if !defined(fcpustate_foreach_gpregs) && defined(ucpustate_foreach_gpregs)
 #define fcpustate_foreach_gpregs ucpustate_foreach_gpregs
 #endif /* !fcpustate_foreach_gpregs && ucpustate_foreach_gpregs */
@@ -847,6 +915,12 @@ for (local xcs: XCPUSTATE) {
 #ifndef fcpustate_setsp
 #define fcpustate_setsp lcpustate_setsp
 #endif /* !fcpustate_setsp */
+#if !defined(fcpustate_getpreemption) && defined(lcpustate_getpreemption)
+#define fcpustate_getpreemption lcpustate_getpreemption
+#endif /* !fcpustate_getpreemption && lcpustate_getpreemption */
+#if !defined(fcpustate_setpreemption) && defined(lcpustate_setpreemption)
+#define fcpustate_setpreemption lcpustate_setpreemption
+#endif /* !fcpustate_setpreemption && lcpustate_setpreemption */
 #if !defined(fcpustate_foreach_gpregs) && defined(lcpustate_foreach_gpregs)
 #define fcpustate_foreach_gpregs lcpustate_foreach_gpregs
 #endif /* !fcpustate_foreach_gpregs && lcpustate_foreach_gpregs */
@@ -890,6 +964,12 @@ for (local xcs: XCPUSTATE) {
 #ifndef fcpustate_setsp
 #define fcpustate_setsp kcpustate_setsp
 #endif /* !fcpustate_setsp */
+#if !defined(fcpustate_getpreemption) && defined(kcpustate_getpreemption)
+#define fcpustate_getpreemption kcpustate_getpreemption
+#endif /* !fcpustate_getpreemption && kcpustate_getpreemption */
+#if !defined(fcpustate_setpreemption) && defined(kcpustate_setpreemption)
+#define fcpustate_setpreemption kcpustate_setpreemption
+#endif /* !fcpustate_setpreemption && kcpustate_setpreemption */
 #if !defined(fcpustate_foreach_gpregs) && defined(kcpustate_foreach_gpregs)
 #define fcpustate_foreach_gpregs kcpustate_foreach_gpregs
 #endif /* !fcpustate_foreach_gpregs && kcpustate_foreach_gpregs */
@@ -933,6 +1013,12 @@ for (local xcs: XCPUSTATE) {
 #ifndef fcpustate_setsp
 #define fcpustate_setsp icpustate_setsp
 #endif /* !fcpustate_setsp */
+#if !defined(fcpustate_getpreemption) && defined(icpustate_getpreemption)
+#define fcpustate_getpreemption icpustate_getpreemption
+#endif /* !fcpustate_getpreemption && icpustate_getpreemption */
+#if !defined(fcpustate_setpreemption) && defined(icpustate_setpreemption)
+#define fcpustate_setpreemption icpustate_setpreemption
+#endif /* !fcpustate_setpreemption && icpustate_setpreemption */
 #if !defined(fcpustate_foreach_gpregs) && defined(icpustate_foreach_gpregs)
 #define fcpustate_foreach_gpregs icpustate_foreach_gpregs
 #endif /* !fcpustate_foreach_gpregs && icpustate_foreach_gpregs */
@@ -976,6 +1062,12 @@ for (local xcs: XCPUSTATE) {
 #ifndef fcpustate_setsp
 #define fcpustate_setsp scpustate_setsp
 #endif /* !fcpustate_setsp */
+#if !defined(fcpustate_getpreemption) && defined(scpustate_getpreemption)
+#define fcpustate_getpreemption scpustate_getpreemption
+#endif /* !fcpustate_getpreemption && scpustate_getpreemption */
+#if !defined(fcpustate_setpreemption) && defined(scpustate_setpreemption)
+#define fcpustate_setpreemption scpustate_setpreemption
+#endif /* !fcpustate_setpreemption && scpustate_setpreemption */
 #if !defined(fcpustate_foreach_gpregs) && defined(scpustate_foreach_gpregs)
 #define fcpustate_foreach_gpregs scpustate_foreach_gpregs
 #endif /* !fcpustate_foreach_gpregs && scpustate_foreach_gpregs */

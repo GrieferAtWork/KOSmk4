@@ -873,6 +873,7 @@ NOTHROW(FCALL mpart_changed)(struct mpart *__restrict self,
 }
 
 
+#ifndef CONFIG_NO_SMP
 PRIVATE NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL mpart_atomic_cmpxch_blockstate)(struct mpart *__restrict self,
                                               size_t partrel_block_index,
@@ -903,6 +904,7 @@ NOTHROW(FCALL mpart_atomic_cmpxch_blockstate)(struct mpart *__restrict self,
 	} while (!ATOMIC_CMPXCH_WEAK(*pword, oldword, newword));
 	return true;
 }
+#endif /* !CONFIG_NO_SMP */
 
 /* For use with `MNODE_F_MHINT':
  *  - Ensure that the pages (== block) at the given `offset'

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f1484a */
+/* HASH CRC-32:0x4b0f00f3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_sincosl_defined
 #include <__crt.h>
 #include <ieee754.h>
+#include <hybrid/typecore.h>
 #if defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos) || ((defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)) && (defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos))) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || ((defined(__CRT_HAVE_sinl) || defined(__CRT_HAVE___sinl) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)) && (defined(__CRT_HAVE_cosl) || defined(__CRT_HAVE___cosl) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos))) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__)
 #include <bits/crt/math-vector.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -33,6 +34,10 @@ __CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,__localdep_
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,__localdep_cosl,(__LONGDOUBLE __x),cosl,(__x))
 #elif defined(__CRT_HAVE___cosl)
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,__localdep_cosl,(__LONGDOUBLE __x),__cosl,(__x))
+#elif defined(__CRT_HAVE_cos) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,__localdep_cosl,(__LONGDOUBLE __x),cos,(__x))
+#elif defined(__CRT_HAVE___cos) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,__localdep_cosl,(__LONGDOUBLE __x),__cos,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/cosl.h>
@@ -67,6 +72,10 @@ __CEIREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,__localdep_
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,__localdep_sinl,(__LONGDOUBLE __x),sinl,(__x))
 #elif defined(__CRT_HAVE___sinl)
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,__localdep_sinl,(__LONGDOUBLE __x),__sinl,(__x))
+#elif defined(__CRT_HAVE_sin) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,__localdep_sinl,(__LONGDOUBLE __x),sin,(__x))
+#elif defined(__CRT_HAVE___sin) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,__localdep_sinl,(__LONGDOUBLE __x),__sin,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/sinl.h>

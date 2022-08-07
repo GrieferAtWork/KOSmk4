@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x127d862d */
+/* HASH CRC-32:0x9b521723 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,9 +32,18 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_roundl
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_roundl,(__LONGDOUBLE __x),__roundl,(__x))
 #else /* ... */
 __NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__CRT_HAVE_round) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_roundl,(__LONGDOUBLE __x),round,(__x))
+#elif defined(__CRT_HAVE___round) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__localdep_roundl,(__LONGDOUBLE __x),__round,(__x))
+#else /* ... */
+__NAMESPACE_LOCAL_END
 #include <libc/local/math/roundl.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_roundl __LIBC_LOCAL_NAME(roundl)
+#endif /* !... */
 #endif /* !... */
 #endif /* !__local___localdep_roundl_defined */
 __NAMESPACE_LOCAL_END

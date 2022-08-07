@@ -4753,6 +4753,79 @@ again_parse_annotations:
 					self.skip(")");
 				}	break;
 
+				case "ldouble_variant_of":
+				case "raw_ldouble_variant_of":
+				case "preferred_ldouble_variant_of":
+				case "preferred_raw_ldouble_variant_of": {
+					local command = tok;
+					/* >> [[ldouble_variant_of("sin", ["_sin", "__sin"])]]
+					 * Same as:
+					 * >> [[if($extended_include_prefix("<hybrid/typecore.h>")defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias("sin", "_sin", "__sin")]]
+					 * >> [[if($extended_include_prefix("<hybrid/typecore.h>")defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), crt_intern_alias("sin")]]
+					 */
+					self.next();
+					self.skip("(");
+					local primary = str(self.parseCStringOrKeyword());
+					local secondary: {string...} = [];
+					if (self.tok == ",") {
+						self.next();
+						if (self.tok == "...") {
+							for (local key: currentKosLibraryFunction.exportSymbolNames) {
+								key = key.last;
+								if (!key.endswith("l"))
+									self.err(f"Unsupported `[[export_as({repr key})]]' used with `[[ldouble_variant_of]]'");
+								secondary.append(key[:-1]);
+							}
+							self.next();
+						} else {
+							self.skip("[");
+							while (self.tok !in ["", "]"]) {
+								secondary.extend(context.parseAliasNameOrList());
+								if (self.tok != ",")
+									break;
+								self.next();
+							}
+							self.skip("]");
+						}
+					}
+					function wrapCondition(cond: string | none): string {
+						if (cond is none || cond == "1") {
+							return '$extended_include_prefix("<hybrid/typecore.h>")defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)';
+						} else {
+							return f'$extended_include_prefix("<hybrid/typecore.h>")({cond})&&defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)';
+						}
+					}
+					for (local assemblyName: {primary, secondary...}) {
+						local ppCond = currentConditions;
+						if ("raw_" !in command)
+							ppCond = constructAliasConditions(ppCond, assemblyName);
+						ppCond = wrapCondition(ppCond);
+						local binding = FunctionBinding(
+							ppCond:     ppCond,
+							prototypes: currentPrototypes,
+							binding:    assemblyName);
+						if (command.startswith("preferred_")) {
+							current.bindings.insert(numPreferredBindings, binding);
+							++numPreferredBindings;
+						} else {
+							current.bindings.append(binding);
+						}
+					}
+					if (currentKosLibraryFunction is none)
+						currentKosLibraryFunction = LibraryFunction();
+					if (currentDosLibraryFunction is none)
+						currentDosLibraryFunction = LibraryFunction();
+					local primaryCond = wrapCondition(currentConditions);
+					currentKosLibraryFunction.bindings.append(LibraryFunctionBinding(
+						ppCond:  primaryCond,
+						binding: "libc_" + primary));
+					currentDosLibraryFunction.bindings.append(LibraryFunctionBinding(
+						ppCond:  primaryCond,
+						binding: "libd_" + primary));
+					self.skip(")");
+				}	break;
+
+
 				{
 					local wholeCond;
 					local assemblyName;
@@ -5475,7 +5548,7 @@ got_chkExpr:
 					 * >> wcslen(*) %{generate(str2wcs)}
 					 * >> wcslen(*) %{generate(str2wcs(*))}
 					 * >> wcslen(*) %{generate(str2wcs(%auto))}
-					 * >> wcslen(*) %{generate(str2wcs(strlen))} */
+					 * >> wcslen(*) %{generate(str2wcs("strlen"))} */
 					currentFeatures.assertAllGeneratedFunctionBody(self, currentName);
 					self.next();
 					tok = self.skip("(");

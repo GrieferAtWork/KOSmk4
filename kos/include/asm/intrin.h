@@ -20,6 +20,12 @@
 #ifndef _ASM_INTRIN_H
 #define _ASM_INTRIN_H 1
 
-/* Placeholder... */
+#include <__stdinc.h>
+
+#ifdef __CC__
+/* Flush the instruction cache by executing a fencing instruction. */
+#define __flush_instruction_cache() (void)0
+#endif /* __CC__ */
+
 
 #endif /* !_ASM_INTRIN_H */

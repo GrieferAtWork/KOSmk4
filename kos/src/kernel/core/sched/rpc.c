@@ -266,11 +266,17 @@ NOTHROW(FCALL task_asyncrpc_destroy_list_for_shutdown)(struct pending_rpc *first
 
 PRIVATE ABNORMAL_RETURN ATTR_NORETURN NONNULL((1)) void
 NOTHROW(FCALL unwind_current_exception_at_icpustate)(struct icpustate *__restrict state) {
+#ifdef ICPUSTATE_IS_TRANSITIVE_KCPUSTATE
+	struct kcpustate *newstate;
+	newstate = except_unwind(state);
+	cpu_apply_kcpustate(newstate);
+#else /* ICPUSTATE_IS_TRANSITIVE_KCPUSTATE */
 	struct kcpustate kst;
 	struct kcpustate *newstate;
 	icpustate_to_kcpustate(state, &kst);
 	newstate = except_unwind(&kst);
 	cpu_apply_kcpustate(newstate);
+#endif /* !ICPUSTATE_IS_TRANSITIVE_KCPUSTATE */
 }
 
 

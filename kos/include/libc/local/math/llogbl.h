@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2789848 */
+/* HASH CRC-32:0x8f3f553 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,16 @@ __NAMESPACE_LOCAL_BEGIN
 __CEIREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__localdep_ilogbl,(__LONGDOUBLE __x),ilogbl,{ return __builtin_ilogbl(__x); })
 #elif defined(__CRT_HAVE_ilogbl)
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__localdep_ilogbl,(__LONGDOUBLE __x),ilogbl,(__x))
+#elif defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__localdep_ilogbl,(__LONGDOUBLE __x),llogb,(__x))
 #elif defined(__CRT_HAVE_llogbl) && __SIZEOF_INT__ == __SIZEOF_LONG__
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__localdep_ilogbl,(__LONGDOUBLE __x),llogbl,(__x))
 #elif defined(__CRT_HAVE___ilogbl)
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__localdep_ilogbl,(__LONGDOUBLE __x),__ilogbl,(__x))
+#elif defined(__CRT_HAVE_ilogb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__localdep_ilogbl,(__LONGDOUBLE __x),ilogb,(__x))
+#elif defined(__CRT_HAVE___ilogb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__localdep_ilogbl,(__LONGDOUBLE __x),__ilogb,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_ilogb) || (defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 __NAMESPACE_LOCAL_END
 #include <libc/local/math/ilogbl.h>

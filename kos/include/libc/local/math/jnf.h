@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf667d0f3 */
+/* HASH CRC-32:0xd78b4f16 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,8 +46,8 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <libm/jn.h>
 #include <libm/fcomp.h>
-#include <libm/matherr.h>
 #include <libm/fabs.h>
+#include <libm/matherr.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(jnf) __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(jnf))(int __n, float __x) {

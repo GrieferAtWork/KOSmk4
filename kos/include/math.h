@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x410ad166 */
+/* HASH CRC-32:0x4532624b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,6 +90,7 @@ __NAMESPACE_STD_USING(sinf)
 __NAMESPACE_STD_USING(tanf)
 #endif /* __CRT_HAVE_tanf || __CRT_HAVE___tanf || __IEEE754_DOUBLE_TYPE_IS_FLOAT__ || __IEEE754_FLOAT_TYPE_IS_FLOAT__ || __IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__ || __CRT_HAVE_tan || __CRT_HAVE___tan || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
+#include <hybrid/typecore.h>
 #if defined(__CRT_HAVE_acosl) || defined(__CRT_HAVE___acosl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(acosl)
 #endif /* __CRT_HAVE_acosl || __CRT_HAVE___acosl || __IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__ || __CRT_HAVE_acos || __CRT_HAVE___acos || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
@@ -418,7 +419,6 @@ __NAMESPACE_STD_USING(nextafter)
 #if defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE___drem) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(remainder)
 #endif /* __CRT_HAVE_remainder || __CRT_HAVE_drem || __CRT_HAVE___remainder || __CRT_HAVE___drem || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ */
-#include <hybrid/typecore.h>
 #if defined(__CRT_HAVE_ilogb) || (defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_USING(ilogb)
 #endif /* __CRT_HAVE_ilogb || (__CRT_HAVE_llogb && __SIZEOF_INT__ == __SIZEOF_LONG__) || __CRT_HAVE___ilogb || __IEEE754_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__ || __IEEE754_FLOAT_TYPE_IS_DOUBLE__ */
@@ -1017,6 +1017,14 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acosl,(__LONGDOUBLE __x),(__x))
 /* >> acosf(3), acos(3), acosl(3)
  * Arc cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acosl,(__LONGDOUBLE __x),__acosl,(__x))
+#elif defined(__CRT_HAVE_acos) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> acosf(3), acos(3), acosl(3)
+ * Arc cosine of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acosl,(__LONGDOUBLE __x),acos,(__x))
+#elif defined(__CRT_HAVE___acos) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> acosf(3), acos(3), acosl(3)
+ * Arc cosine of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acosl,(__LONGDOUBLE __x),__acos,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/acosl.h>
@@ -1037,6 +1045,14 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinl,(__LONGDOUBLE __x),(__x))
 /* >> asinf(3), asin(3), asinl(3)
  * Arc sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinl,(__LONGDOUBLE __x),__asinl,(__x))
+#elif defined(__CRT_HAVE_asin) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> asinf(3), asin(3), asinl(3)
+ * Arc sine of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinl,(__LONGDOUBLE __x),asin,(__x))
+#elif defined(__CRT_HAVE___asin) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> asinf(3), asin(3), asinl(3)
+ * Arc sine of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinl,(__LONGDOUBLE __x),__asin,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/asinl.h>
@@ -1057,6 +1073,14 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanl,(__LONGDOUBLE __x),(__x))
 /* >> atanf(3), atan(3), atanl(3)
  * Arc tangent of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanl,(__LONGDOUBLE __x),__atanl,(__x))
+#elif defined(__CRT_HAVE_atan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> atanf(3), atan(3), atanl(3)
+ * Arc tangent of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanl,(__LONGDOUBLE __x),atan,(__x))
+#elif defined(__CRT_HAVE___atan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> atanf(3), atan(3), atanl(3)
+ * Arc tangent of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanl,(__LONGDOUBLE __x),__atan,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/atanl.h>
@@ -1077,6 +1101,14 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan2l,(__LONGDOUBLE __y, __LON
 /* >> atan2f(3), atan2(3), atan2l(3)
  * Arc tangent of `y / x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan2l,(__LONGDOUBLE __y, __LONGDOUBLE __x),__atan2l,(__y,__x))
+#elif defined(__CRT_HAVE_atan2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> atan2f(3), atan2(3), atan2l(3)
+ * Arc tangent of `y / x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan2l,(__LONGDOUBLE __y, __LONGDOUBLE __x),atan2,(__y,__x))
+#elif defined(__CRT_HAVE___atan2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> atan2f(3), atan2(3), atan2l(3)
+ * Arc tangent of `y / x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan2l,(__LONGDOUBLE __y, __LONGDOUBLE __x),__atan2,(__y,__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/atan2l.h>
@@ -1097,6 +1129,14 @@ __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,cosl,(__LONGDO
 /* >> cosf(3), cos(3), cosl(3)
  * Cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,cosl,(__LONGDOUBLE __x),__cosl,(__x))
+#elif defined(__CRT_HAVE_cos) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> cosf(3), cos(3), cosl(3)
+ * Cosine of `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,cosl,(__LONGDOUBLE __x),cos,(__x))
+#elif defined(__CRT_HAVE___cos) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> cosf(3), cos(3), cosl(3)
+ * Cosine of `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,cosl,(__LONGDOUBLE __x),__cos,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/cosl.h>
@@ -1117,6 +1157,14 @@ __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,sinl,(__LONGDO
 /* >> sinf(3), sin(3), sinl(3)
  * Sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,sinl,(__LONGDOUBLE __x),__sinl,(__x))
+#elif defined(__CRT_HAVE_sin) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> sinf(3), sin(3), sinl(3)
+ * Sine of `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,sinl,(__LONGDOUBLE __x),sin,(__x))
+#elif defined(__CRT_HAVE___sin) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> sinf(3), sin(3), sinl(3)
+ * Sine of `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,sinl,(__LONGDOUBLE __x),__sin,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/sinl.h>
@@ -1137,6 +1185,14 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanl,(__LONGDOUBLE __x),(__x))
 /* >> tanf(3), tan(3), tanl(3)
  * Tangent of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanl,(__LONGDOUBLE __x),__tanl,(__x))
+#elif defined(__CRT_HAVE_tan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> tanf(3), tan(3), tanl(3)
+ * Tangent of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanl,(__LONGDOUBLE __x),tan,(__x))
+#elif defined(__CRT_HAVE___tan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> tanf(3), tan(3), tanl(3)
+ * Tangent of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanl,(__LONGDOUBLE __x),__tan,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/tanl.h>
@@ -1281,6 +1337,14 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,coshl,(__LONGDOUBLE __x),(__x))
 /* >> coshf(3), cosh(3), coshl(3)
  * Hyperbolic   cosine   of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,coshl,(__LONGDOUBLE __x),__coshl,(__x))
+#elif defined(__CRT_HAVE_cosh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> coshf(3), cosh(3), coshl(3)
+ * Hyperbolic   cosine   of   `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,coshl,(__LONGDOUBLE __x),cosh,(__x))
+#elif defined(__CRT_HAVE___cosh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> coshf(3), cosh(3), coshl(3)
+ * Hyperbolic   cosine   of   `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,coshl,(__LONGDOUBLE __x),__cosh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/coshl.h>
@@ -1301,6 +1365,14 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sinhl,(__LONGDOUBLE __x),(__x))
 /* >> sinhf(3), sinh(3), sinhl(3)
  * Hyperbolic sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sinhl,(__LONGDOUBLE __x),__sinhl,(__x))
+#elif defined(__CRT_HAVE_sinh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> sinhf(3), sinh(3), sinhl(3)
+ * Hyperbolic sine of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sinhl,(__LONGDOUBLE __x),sinh,(__x))
+#elif defined(__CRT_HAVE___sinh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> sinhf(3), sinh(3), sinhl(3)
+ * Hyperbolic sine of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sinhl,(__LONGDOUBLE __x),__sinh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/sinhl.h>
@@ -1321,6 +1393,14 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanhl,(__LONGDOUBL
 /* >> tanhf(3), tanh(3), tanhl(3)
  * Hyperbolic   tangent   of  `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanhl,(__LONGDOUBLE __x),__tanhl,(__x))
+#elif defined(__CRT_HAVE_tanh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> tanhf(3), tanh(3), tanhl(3)
+ * Hyperbolic   tangent   of  `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanhl,(__LONGDOUBLE __x),tanh,(__x))
+#elif defined(__CRT_HAVE___tanh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> tanhf(3), tanh(3), tanhl(3)
+ * Hyperbolic   tangent   of  `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanhl,(__LONGDOUBLE __x),__tanh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/tanhl.h>
@@ -1465,6 +1545,14 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acoshl,(__LONGDOUBLE __x),(__x)
 /* >> acoshf(3), acosh(3), acoshl(3)
  * Hyperbolic  arc  cosine  of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acoshl,(__LONGDOUBLE __x),__acoshl,(__x))
+#elif defined(__CRT_HAVE_acosh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> acoshf(3), acosh(3), acoshl(3)
+ * Hyperbolic  arc  cosine  of   `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acoshl,(__LONGDOUBLE __x),acosh,(__x))
+#elif defined(__CRT_HAVE___acosh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> acoshf(3), acosh(3), acoshl(3)
+ * Hyperbolic  arc  cosine  of   `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acoshl,(__LONGDOUBLE __x),__acosh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/acoshl.h>
@@ -1485,6 +1573,14 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinhl,(__LONGDOUB
 /* >> asinhf(3), asinh(3), asinhl(3)
  * Hyperbolic  arc   sine   of   `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinhl,(__LONGDOUBLE __x),__asinhl,(__x))
+#elif defined(__CRT_HAVE_asinh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> asinhf(3), asinh(3), asinhl(3)
+ * Hyperbolic  arc   sine   of   `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinhl,(__LONGDOUBLE __x),asinh,(__x))
+#elif defined(__CRT_HAVE___asinh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> asinhf(3), asinh(3), asinhl(3)
+ * Hyperbolic  arc   sine   of   `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinhl,(__LONGDOUBLE __x),__asinh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/asinhl.h>
@@ -1505,6 +1601,14 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanhl,(__LONGDOUBLE __x),(__x)
 /* >> atanhf(3), atanh(3), atanhl(3)
  * Hyperbolic  arc  tangent  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanhl,(__LONGDOUBLE __x),__atanhl,(__x))
+#elif defined(__CRT_HAVE_atanh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> atanhf(3), atanh(3), atanhl(3)
+ * Hyperbolic  arc  tangent  of  `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanhl,(__LONGDOUBLE __x),atanh,(__x))
+#elif defined(__CRT_HAVE___atanh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> atanhf(3), atanh(3), atanhl(3)
+ * Hyperbolic  arc  tangent  of  `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanhl,(__LONGDOUBLE __x),__atanh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/atanhl.h>
@@ -1770,6 +1874,14 @@ __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_expl,__LONGDOUBLE,__NOTHROW,expl,(__LONGDO
 /* >> expf(3), exp(3), expl(3)
  * Exponential function of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_expl,__LONGDOUBLE,__NOTHROW,expl,(__LONGDOUBLE __x),__expl,(__x))
+#elif defined(__CRT_HAVE_exp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> expf(3), exp(3), expl(3)
+ * Exponential function of `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_expl,__LONGDOUBLE,__NOTHROW,expl,(__LONGDOUBLE __x),exp,(__x))
+#elif defined(__CRT_HAVE___exp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> expf(3), exp(3), expl(3)
+ * Exponential function of `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_expl,__LONGDOUBLE,__NOTHROW,expl,(__LONGDOUBLE __x),__exp,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/expl.h>
@@ -1790,6 +1902,14 @@ __CDECLARE(__ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,frexpl,(__LONGDOUBLE __x, in
 /* >> frexpf(3), frexp(3), frexpl(3)
  * Break `value' into a normalized fraction and an integral power of 2 */
 __CREDIRECT(__ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,frexpl,(__LONGDOUBLE __x, int *__pexponent),__frexpl,(__x,__pexponent))
+#elif defined(__CRT_HAVE_frexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> frexpf(3), frexp(3), frexpl(3)
+ * Break `value' into a normalized fraction and an integral power of 2 */
+__CREDIRECT(__ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,frexpl,(__LONGDOUBLE __x, int *__pexponent),frexp,(__x,__pexponent))
+#elif defined(__CRT_HAVE___frexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> frexpf(3), frexp(3), frexpl(3)
+ * Break `value' into a normalized fraction and an integral power of 2 */
+__CREDIRECT(__ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,frexpl,(__LONGDOUBLE __x, int *__pexponent),__frexp,(__x,__pexponent))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/frexpl.h>
@@ -1810,6 +1930,14 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ldexpl,(__LONGDOUBLE __x, int _
 /* >> ldexpf(3), ldexp(3), ldexpl(3)
  * `x' times (two to the `exponent' power) */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ldexpl,(__LONGDOUBLE __x, int __exponent),__ldexpl,(__x,__exponent))
+#elif defined(__CRT_HAVE_ldexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ldexpf(3), ldexp(3), ldexpl(3)
+ * `x' times (two to the `exponent' power) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ldexpl,(__LONGDOUBLE __x, int __exponent),ldexp,(__x,__exponent))
+#elif defined(__CRT_HAVE___ldexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ldexpf(3), ldexp(3), ldexpl(3)
+ * `x' times (two to the `exponent' power) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ldexpl,(__LONGDOUBLE __x, int __exponent),__ldexp,(__x,__exponent))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/ldexpl.h>
@@ -1830,6 +1958,14 @@ __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,logl,(__LONGDO
 /* >> logf(3), log(3), logl(3)
  * Natural  logarithm  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,logl,(__LONGDOUBLE __x),__logl,(__x))
+#elif defined(__CRT_HAVE_log) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> logf(3), log(3), logl(3)
+ * Natural  logarithm  of  `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,logl,(__LONGDOUBLE __x),log,(__x))
+#elif defined(__CRT_HAVE___log) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> logf(3), log(3), logl(3)
+ * Natural  logarithm  of  `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,logl,(__LONGDOUBLE __x),__log,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/logl.h>
@@ -1850,6 +1986,14 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log10l,(__LONGDOUBLE __x),(__x)
 /* >> log10f(3), log10(3), log10l(3)
  * Base-ten    logarithm    of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log10l,(__LONGDOUBLE __x),__log10l,(__x))
+#elif defined(__CRT_HAVE_log10) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> log10f(3), log10(3), log10l(3)
+ * Base-ten    logarithm    of   `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log10l,(__LONGDOUBLE __x),log10,(__x))
+#elif defined(__CRT_HAVE___log10) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> log10f(3), log10(3), log10l(3)
+ * Base-ten    logarithm    of   `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log10l,(__LONGDOUBLE __x),__log10,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/log10l.h>
@@ -1870,6 +2014,14 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,modfl,(__LONG
 /* >> modff(3), modf(3), modfl(3)
  * Break `value' into integral and fractional parts */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,modfl,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),__modfl,(__x,__iptr))
+#elif defined(__CRT_HAVE_modf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> modff(3), modf(3), modfl(3)
+ * Break `value' into integral and fractional parts */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,modfl,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),modf,(__x,__iptr))
+#elif defined(__CRT_HAVE___modf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> modff(3), modf(3), modfl(3)
+ * Break `value' into integral and fractional parts */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,modfl,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),__modf,(__x,__iptr))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/modfl.h>
@@ -2022,6 +2174,14 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expm1l,(__LONGDOUBLE __x),(__x)
 /* >> expm1f(3), expm1(3), expm1l(3)
  * Return `exp(x) - 1' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expm1l,(__LONGDOUBLE __x),__expm1l,(__x))
+#elif defined(__CRT_HAVE_expm1) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> expm1f(3), expm1(3), expm1l(3)
+ * Return `exp(x) - 1' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expm1l,(__LONGDOUBLE __x),expm1,(__x))
+#elif defined(__CRT_HAVE___expm1) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> expm1f(3), expm1(3), expm1l(3)
+ * Return `exp(x) - 1' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expm1l,(__LONGDOUBLE __x),__expm1,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/expm1l.h>
@@ -2042,6 +2202,14 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log1pl,(__LONGDOUBLE __x),(__x)
 /* >> log1pf(3), log1p(3), log1pl(3)
  * Return `log(1 + x)' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log1pl,(__LONGDOUBLE __x),__log1pl,(__x))
+#elif defined(__CRT_HAVE_log1p) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> log1pf(3), log1p(3), log1pl(3)
+ * Return `log(1 + x)' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log1pl,(__LONGDOUBLE __x),log1p,(__x))
+#elif defined(__CRT_HAVE___log1p) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> log1pf(3), log1p(3), log1pl(3)
+ * Return `log(1 + x)' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log1pl,(__LONGDOUBLE __x),__log1p,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/log1pl.h>
@@ -2062,6 +2230,14 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,logbl,(__LONGDOUBL
 /* >> logbf(3), logb(3), logbl(3)
  * Return the base 2 signed integral exponent of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,logbl,(__LONGDOUBLE __x),__logbl,(__x))
+#elif defined(__CRT_HAVE_logb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> logbf(3), logb(3), logbl(3)
+ * Return the base 2 signed integral exponent of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,logbl,(__LONGDOUBLE __x),logb,(__x))
+#elif defined(__CRT_HAVE___logb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> logbf(3), logb(3), logbl(3)
+ * Return the base 2 signed integral exponent of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,logbl,(__LONGDOUBLE __x),__logb,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/logbl.h>
@@ -2167,6 +2343,14 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp2l,(__LONGDOUBLE __x),(__x))
 /* >> exp2f(3), exp2(3), exp2l(3)
  * Compute base-2 exponential of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp2l,(__LONGDOUBLE __x),__exp2l,(__x))
+#elif defined(__CRT_HAVE_exp2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> exp2f(3), exp2(3), exp2l(3)
+ * Compute base-2 exponential of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp2l,(__LONGDOUBLE __x),exp2,(__x))
+#elif defined(__CRT_HAVE___exp2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> exp2f(3), exp2(3), exp2l(3)
+ * Compute base-2 exponential of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp2l,(__LONGDOUBLE __x),__exp2,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/exp2l.h>
@@ -2187,6 +2371,14 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log2l,(__LONGDOUBLE __x),(__x))
 /* >> log2f(3), log2(3), log2l(3)
  * Compute base-2 logarithm of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log2l,(__LONGDOUBLE __x),__log2l,(__x))
+#elif defined(__CRT_HAVE_log2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> log2f(3), log2(3), log2l(3)
+ * Compute base-2 logarithm of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log2l,(__LONGDOUBLE __x),log2,(__x))
+#elif defined(__CRT_HAVE___log2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> log2f(3), log2(3), log2l(3)
+ * Compute base-2 logarithm of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log2l,(__LONGDOUBLE __x),__log2,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/log2l.h>
@@ -2292,6 +2484,14 @@ __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,powl,(__LONGDO
 /* >> powf(3), pow(3), powl(3)
  * Return `x' to the `y' power */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,powl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__powl,(__x,__y))
+#elif defined(__CRT_HAVE_pow) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> powf(3), pow(3), powl(3)
+ * Return `x' to the `y' power */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,powl,(__LONGDOUBLE __x, __LONGDOUBLE __y),pow,(__x,__y))
+#elif defined(__CRT_HAVE___pow) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> powf(3), pow(3), powl(3)
+ * Return `x' to the `y' power */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,powl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__pow,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/powl.h>
@@ -2312,6 +2512,14 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sqrtl,(__LONGDOUBLE __x),(__x))
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
  * Return the square root of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sqrtl,(__LONGDOUBLE __x),__sqrtl,(__x))
+#elif defined(__CRT_HAVE_sqrt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> sqrtf(3), sqrt(3), sqrtl(3)
+ * Return the square root of  `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sqrtl,(__LONGDOUBLE __x),sqrt,(__x))
+#elif defined(__CRT_HAVE___sqrt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> sqrtf(3), sqrt(3), sqrtl(3)
+ * Return the square root of  `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sqrtl,(__LONGDOUBLE __x),__sqrt,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/sqrtl.h>
@@ -2384,6 +2592,14 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,hypotl,(__LONGDOUBLE __x, __LON
 /* >> hypotf(3), hypot(3), hypotl(3)
  * Return `sqrt(x*x + y*y)' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,hypotl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__hypotl,(__x,__y))
+#elif defined(__CRT_HAVE_hypot) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> hypotf(3), hypot(3), hypotl(3)
+ * Return `sqrt(x*x + y*y)' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,hypotl,(__LONGDOUBLE __x, __LONGDOUBLE __y),hypot,(__x,__y))
+#elif defined(__CRT_HAVE___hypot) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> hypotf(3), hypot(3), hypotl(3)
+ * Return `sqrt(x*x + y*y)' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,hypotl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__hypot,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/hypotl.h>
@@ -2449,6 +2665,14 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrtl,(__LONGDOUBL
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
  * Return  the  cube root  of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrtl,(__LONGDOUBLE __x),__cbrtl,(__x))
+#elif defined(__CRT_HAVE_cbrt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> cbrtf(3), cbrt(3), cbrtl(3)
+ * Return  the  cube root  of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrtl,(__LONGDOUBLE __x),cbrt,(__x))
+#elif defined(__CRT_HAVE___cbrt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> cbrtf(3), cbrt(3), cbrtl(3)
+ * Return  the  cube root  of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrtl,(__LONGDOUBLE __x),__cbrt,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/cbrtl.h>
@@ -2634,6 +2858,14 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ceill,(__LONGDOUBL
 /* >> ceilf(3), ceil(3), ceill(3)
  * Smallest integral value not less than `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ceill,(__LONGDOUBLE __x),__ceill,(__x))
+#elif defined(__CRT_HAVE_ceil) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ceilf(3), ceil(3), ceill(3)
+ * Smallest integral value not less than `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ceill,(__LONGDOUBLE __x),ceil,(__x))
+#elif defined(__CRT_HAVE___ceil) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ceilf(3), ceil(3), ceill(3)
+ * Smallest integral value not less than `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ceill,(__LONGDOUBLE __x),__ceil,(__x))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/math/ceill.h>
@@ -2654,6 +2886,14 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fabsl,(__LONGDOUBL
 /* >> fabsf(3), fabs(3), fabsl(3)
  * Absolute value of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fabsl,(__LONGDOUBLE __x),__fabsl,(__x))
+#elif defined(__CRT_HAVE_fabs) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fabsl,(__LONGDOUBLE __x),fabs,(__x))
+#elif defined(__CRT_HAVE___fabs) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fabsl,(__LONGDOUBLE __x),__fabs,(__x))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/math/fabsl.h>
@@ -2674,6 +2914,14 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,floorl,(__LONGDOUB
 /* >> floorf(3), floor(3), floorl(3)
  * Largest integer not greater than `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,floorl,(__LONGDOUBLE __x),__floorl,(__x))
+#elif defined(__CRT_HAVE_floor) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> floorf(3), floor(3), floorl(3)
+ * Largest integer not greater than `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,floorl,(__LONGDOUBLE __x),floor,(__x))
+#elif defined(__CRT_HAVE___floor) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> floorf(3), floor(3), floorl(3)
+ * Largest integer not greater than `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,floorl,(__LONGDOUBLE __x),__floor,(__x))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/math/floorl.h>
@@ -2694,6 +2942,14 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmodl,(__LONGDOUBLE __x, __LONG
 /* >> fmodf(3), fmod(3), fmodl(3)
  * Floating-point modulo remainder of `x / y' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmodl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmodl,(__x,__y))
+#elif defined(__CRT_HAVE_fmod) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fmodf(3), fmod(3), fmodl(3)
+ * Floating-point modulo remainder of `x / y' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmodl,(__LONGDOUBLE __x, __LONGDOUBLE __y),fmod,(__x,__y))
+#elif defined(__CRT_HAVE___fmod) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fmodf(3), fmod(3), fmodl(3)
+ * Floating-point modulo remainder of `x / y' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmodl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmod,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/fmodl.h>
@@ -2806,6 +3062,14 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,copysignl,(__LONGD
 /* >> copysignf(3), copysign(3), copysignl(3)
  * Return `x' with its signed changed to `y's */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,copysignl,(__LONGDOUBLE __num, __LONGDOUBLE __sign),__copysignl,(__num,__sign))
+#elif defined(__CRT_HAVE_copysign) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> copysignf(3), copysign(3), copysignl(3)
+ * Return `x' with its signed changed to `y's */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,copysignl,(__LONGDOUBLE __num, __LONGDOUBLE __sign),copysign,(__num,__sign))
+#elif defined(__CRT_HAVE___copysign) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> copysignf(3), copysign(3), copysignl(3)
+ * Return `x' with its signed changed to `y's */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,copysignl,(__LONGDOUBLE __num, __LONGDOUBLE __sign),__copysign,(__num,__sign))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/math/copysignl.h>
@@ -2826,6 +3090,14 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nanl,(char const *
 /* >> nanf(3), nan(3), nanl(3)
  * Return representation of qNaN for double type */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nanl,(char const *__tagb),__nanl,(__tagb))
+#elif defined(__CRT_HAVE_nan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nanf(3), nan(3), nanl(3)
+ * Return representation of qNaN for double type */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nanl,(char const *__tagb),nan,(__tagb))
+#elif defined(__CRT_HAVE___nan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nanf(3), nan(3), nanl(3)
+ * Return representation of qNaN for double type */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nanl,(char const *__tagb),__nan,(__tagb))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nan) || defined(__CRT_HAVE___nan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/nanl.h>
@@ -2973,6 +3245,12 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erfl,(__LONGDOUBLE
 #elif defined(__CRT_HAVE___erfl)
 /* >> erff(3), erf(3), erfl(3) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erfl,(__LONGDOUBLE __x),__erfl,(__x))
+#elif defined(__CRT_HAVE_erf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> erff(3), erf(3), erfl(3) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erfl,(__LONGDOUBLE __x),erf,(__x))
+#elif defined(__CRT_HAVE___erf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> erff(3), erf(3), erfl(3) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erfl,(__LONGDOUBLE __x),__erf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/erfl.h>
@@ -2989,6 +3267,12 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erfcl,(__LONGDOUBL
 #elif defined(__CRT_HAVE___erfcl)
 /* >> erfcf(3), erfc(3), erfcl(3) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erfcl,(__LONGDOUBLE __x),__erfcl,(__x))
+#elif defined(__CRT_HAVE_erfc) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> erfcf(3), erfc(3), erfcl(3) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erfcl,(__LONGDOUBLE __x),erfc,(__x))
+#elif defined(__CRT_HAVE___erfc) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> erfcf(3), erfc(3), erfcl(3) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erfcl,(__LONGDOUBLE __x),__erfc,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/erfcl.h>
@@ -3082,6 +3366,14 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tgammal,(__LONGDOUBLE __x),(__x
 /* >> tgammaf(3), tgamma(3), tgammal(3)
  * True gamma function */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tgammal,(__LONGDOUBLE __x),__tgammal,(__x))
+#elif defined(__CRT_HAVE_tgamma) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> tgammaf(3), tgamma(3), tgammal(3)
+ * True gamma function */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tgammal,(__LONGDOUBLE __x),tgamma,(__x))
+#elif defined(__CRT_HAVE___tgamma) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> tgammaf(3), tgamma(3), tgammal(3)
+ * True gamma function */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tgammal,(__LONGDOUBLE __x),__tgamma,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/tgammal.h>
@@ -3367,6 +3659,22 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rintl,(__LONGDOUB
 /* >> rintf(3), rint(3), rintl(3)
  * Return the integer nearest `x' in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rintl,(__LONGDOUBLE __x),__nearbyintl,(__x))
+#elif defined(__CRT_HAVE_rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> rintf(3), rint(3), rintl(3)
+ * Return the integer nearest `x' in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rintl,(__LONGDOUBLE __x),rint,(__x))
+#elif defined(__CRT_HAVE_nearbyint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> rintf(3), rint(3), rintl(3)
+ * Return the integer nearest `x' in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rintl,(__LONGDOUBLE __x),nearbyint,(__x))
+#elif defined(__CRT_HAVE___rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> rintf(3), rint(3), rintl(3)
+ * Return the integer nearest `x' in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rintl,(__LONGDOUBLE __x),__rint,(__x))
+#elif defined(__CRT_HAVE___nearbyint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> rintf(3), rint(3), rintl(3)
+ * Return the integer nearest `x' in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rintl,(__LONGDOUBLE __x),__nearbyint,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___rint) || defined(__CRT_HAVE___nearbyint) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/rintl.h>
@@ -3399,6 +3707,22 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafterl,(__LON
 /* >> nextafterf(3), nextafter(3), nextafterl(3)
  * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttowardl,(__x,__y))
+#elif defined(__CRT_HAVE_nextafter) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),nextafter,(__x,__y))
+#elif defined(__CRT_HAVE_nexttoward) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),nexttoward,(__x,__y))
+#elif defined(__CRT_HAVE___nextafter) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nextafter,(__x,__y))
+#elif defined(__CRT_HAVE___nexttoward) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttoward,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter) || defined(__CRT_HAVE___nexttoward) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/nextafterl.h>
@@ -3431,6 +3755,22 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainderl,(__LONGDOUBLE __x, 
 /* >> remainderf(3), remainder(3), remainderl(3)
  * Return the remainder of integer division `x / p' with infinite precision */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __p),__dreml,(__x,__p))
+#elif defined(__CRT_HAVE_remainder) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remainderf(3), remainder(3), remainderl(3)
+ * Return the remainder of integer division `x / p' with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __p),remainder,(__x,__p))
+#elif defined(__CRT_HAVE_drem) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remainderf(3), remainder(3), remainderl(3)
+ * Return the remainder of integer division `x / p' with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __p),drem,(__x,__p))
+#elif defined(__CRT_HAVE___remainder) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remainderf(3), remainder(3), remainderl(3)
+ * Return the remainder of integer division `x / p' with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __p),__remainder,(__x,__p))
+#elif defined(__CRT_HAVE___drem) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remainderf(3), remainder(3), remainderl(3)
+ * Return the remainder of integer division `x / p' with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __p),__drem,(__x,__p))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE___drem) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/remainderl.h>
@@ -3447,6 +3787,10 @@ __CEIDECLARE(__ATTR_WUNUSED,int,__NOTHROW,ilogbl,(__LONGDOUBLE __x),{ return __b
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW,ilogbl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ilogbf(3), ilogb(3), ilogbl(3)
+ * Return the binary exponent of `x', which must be nonzero */
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogbl,(__LONGDOUBLE __x),llogb,(__x))
 #elif defined(__CRT_HAVE_llogbl) && __SIZEOF_INT__ == __SIZEOF_LONG__
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
@@ -3455,6 +3799,14 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogbl,(__LONGDOUBLE __x),llogbl,(__x))
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogbl,(__LONGDOUBLE __x),__ilogbl,(__x))
+#elif defined(__CRT_HAVE_ilogb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ilogbf(3), ilogb(3), ilogbl(3)
+ * Return the binary exponent of `x', which must be nonzero */
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogbl,(__LONGDOUBLE __x),ilogb,(__x))
+#elif defined(__CRT_HAVE___ilogb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ilogbf(3), ilogb(3), ilogbl(3)
+ * Return the binary exponent of `x', which must be nonzero */
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogbl,(__LONGDOUBLE __x),__ilogb,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_ilogb) || (defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/ilogbl.h>
@@ -4220,6 +4572,22 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttowardl,(__LO
 /* >> nextafterf(3), nextafter(3), nextafterl(3)
  * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttowardl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttowardl,(__x,__y))
+#elif defined(__CRT_HAVE_nextafter) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttowardl,(__LONGDOUBLE __x, __LONGDOUBLE __y),nextafter,(__x,__y))
+#elif defined(__CRT_HAVE_nexttoward) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttowardl,(__LONGDOUBLE __x, __LONGDOUBLE __y),nexttoward,(__x,__y))
+#elif defined(__CRT_HAVE___nextafter) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttowardl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nextafter,(__x,__y))
+#elif defined(__CRT_HAVE___nexttoward) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttowardl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttoward,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter) || defined(__CRT_HAVE___nexttoward) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/nextafterl.h>
@@ -4240,6 +4608,14 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbnl,(__LONGDOU
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbnl,(__LONGDOUBLE __x, int __n),__scalbnl,(__x,__n))
+#elif defined(__CRT_HAVE_scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbnl,(__LONGDOUBLE __x, int __n),scalbln,(__x,__n))
+#elif defined(__CRT_HAVE___scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbnl,(__LONGDOUBLE __x, int __n),__scalbln,(__x,__n))
 #elif defined(__CRT_HAVE_scalblnl) && __SIZEOF_INT__ == __SIZEOF_LONG__
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
@@ -4248,6 +4624,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbnl,(__LONGDO
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbnl,(__LONGDOUBLE __x, int __n),__scalblnl,(__x,__n))
+#elif defined(__CRT_HAVE_scalbn) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbnl,(__LONGDOUBLE __x, int __n),scalbn,(__x,__n))
+#elif defined(__CRT_HAVE___scalbn) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbnl,(__LONGDOUBLE __x, int __n),__scalbn,(__x,__n))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn) || (defined(__CRT_HAVE_scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE___scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/scalbnl.h>
@@ -4268,14 +4652,30 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalblnl,(__LONGDO
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalblnl,(__LONGDOUBLE __x, long int __n),__scalblnl,(__x,__n))
+#elif defined(__CRT_HAVE_scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalblnl,(__LONGDOUBLE __x, long int __n),scalbn,(__x,__n))
 #elif defined(__CRT_HAVE_scalbnl) && __SIZEOF_INT__ == __SIZEOF_LONG__
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalblnl,(__LONGDOUBLE __x, long int __n),scalbnl,(__x,__n))
+#elif defined(__CRT_HAVE___scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalblnl,(__LONGDOUBLE __x, long int __n),__scalbn,(__x,__n))
 #elif defined(__CRT_HAVE___scalbnl) && __SIZEOF_INT__ == __SIZEOF_LONG__
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalblnl,(__LONGDOUBLE __x, long int __n),__scalbnl,(__x,__n))
+#elif defined(__CRT_HAVE_scalbln) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalblnl,(__LONGDOUBLE __x, long int __n),scalbln,(__x,__n))
+#elif defined(__CRT_HAVE___scalbln) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalblnl,(__LONGDOUBLE __x, long int __n),__scalbln,(__x,__n))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln) || (defined(__CRT_HAVE_scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE___scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/scalblnl.h>
@@ -4330,6 +4730,14 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,roundl,(__LONGDOUB
 /* >> roundf(3), round(3), roundl(3)
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,roundl,(__LONGDOUBLE __x),__roundl,(__x))
+#elif defined(__CRT_HAVE_round) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> roundf(3), round(3), roundl(3)
+ * Round `x' to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,roundl,(__LONGDOUBLE __x),round,(__x))
+#elif defined(__CRT_HAVE___round) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> roundf(3), round(3), roundl(3)
+ * Round `x' to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,roundl,(__LONGDOUBLE __x),__round,(__x))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/math/roundl.h>
@@ -4353,6 +4761,16 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,truncl,(__LONGDOUB
  * Round `x' to the integral value in floating-point
  * format   nearest  but  not  larger  in  magnitude */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,truncl,(__LONGDOUBLE __x),__truncl,(__x))
+#elif defined(__CRT_HAVE_trunc) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> truncf(3), trunc(3), truncl(3)
+ * Round `x' to the integral value in floating-point
+ * format   nearest  but  not  larger  in  magnitude */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,truncl,(__LONGDOUBLE __x),trunc,(__x))
+#elif defined(__CRT_HAVE___trunc) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> truncf(3), trunc(3), truncl(3)
+ * Round `x' to the integral value in floating-point
+ * format   nearest  but  not  larger  in  magnitude */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,truncl,(__LONGDOUBLE __x),__trunc,(__x))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/math/truncl.h>
@@ -4380,6 +4798,18 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_OUT(3),__LONGDOUBLE,__NOTHROW,remquol,(__LONGDO
  * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
  * of the integral quotient x/p, with n >= 3 */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(3),__LONGDOUBLE,__NOTHROW,remquol,(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo),__remquol,(__x,__p,__pquo))
+#elif defined(__CRT_HAVE_remquo) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remquof(3), remquo(3), remquol(3)
+ * Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(3),__LONGDOUBLE,__NOTHROW,remquol,(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo),remquo,(__x,__p,__pquo))
+#elif defined(__CRT_HAVE___remquo) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remquof(3), remquo(3), remquol(3)
+ * Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(3),__LONGDOUBLE,__NOTHROW,remquol,(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo),__remquo,(__x,__p,__pquo))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 __NAMESPACE_STD_END
 #include <libc/local/math/remquol.h>
@@ -4402,6 +4832,14 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrintl,(__LONGDOUBLE _
 /* >> lrintf(3), lrint(3), lrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrintl,(__LONGDOUBLE __x),__lrintl,(__x))
+#elif defined(__CRT_HAVE_llrint) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> lrintf(3), lrint(3), lrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrintl,(__LONGDOUBLE __x),llrint,(__x))
+#elif defined(__CRT_HAVE___llrint) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> lrintf(3), lrint(3), lrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrintl,(__LONGDOUBLE __x),__llrint,(__x))
 #elif defined(__CRT_HAVE_llrintl) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 /* >> lrintf(3), lrint(3), lrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
@@ -4410,6 +4848,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrintl,(__LONGDOUBLE 
 /* >> lrintf(3), lrint(3), lrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrintl,(__LONGDOUBLE __x),__llrintl,(__x))
+#elif defined(__CRT_HAVE_remquo) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> lrintf(3), lrint(3), lrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrintl,(__LONGDOUBLE __x),remquo,(__x))
+#elif defined(__CRT_HAVE___lrint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> lrintf(3), lrint(3), lrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrintl,(__LONGDOUBLE __x),__lrint,(__x))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/math/lrintl.h>
@@ -4458,6 +4904,14 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fdiml,(__LONGDOUBL
 /* >> fdimf(3), fdim(3), fdiml(3)
  * Return positive difference between `x' and `y' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fdiml,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fdiml,(__x,__y))
+#elif defined(__CRT_HAVE_fdim) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fdimf(3), fdim(3), fdiml(3)
+ * Return positive difference between `x' and `y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fdiml,(__LONGDOUBLE __x, __LONGDOUBLE __y),fdim,(__x,__y))
+#elif defined(__CRT_HAVE___fdim) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fdimf(3), fdim(3), fdiml(3)
+ * Return positive difference between `x' and `y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fdiml,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fdim,(__x,__y))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/math/fdiml.h>
@@ -4478,6 +4932,14 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmaxl,(__LONGDOUBL
 /* >> fmaxf(3), fmax(3), fmaxl(3)
  * Return maximum numeric value from `x' and `y' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmaxl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmaxl,(__x,__y))
+#elif defined(__CRT_HAVE_fmax) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fmaxf(3), fmax(3), fmaxl(3)
+ * Return maximum numeric value from `x' and `y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmaxl,(__LONGDOUBLE __x, __LONGDOUBLE __y),fmax,(__x,__y))
+#elif defined(__CRT_HAVE___fmax) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fmaxf(3), fmax(3), fmaxl(3)
+ * Return maximum numeric value from `x' and `y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmaxl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmax,(__x,__y))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/math/fmaxl.h>
@@ -4498,6 +4960,14 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fminl,(__LONGDOUBL
 /* >> fminf(3), fmin(3), fminl(3)
  * Return minimum numeric value from `x' and `y' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fminl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fminl,(__x,__y))
+#elif defined(__CRT_HAVE_fmin) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fminf(3), fmin(3), fminl(3)
+ * Return minimum numeric value from `x' and `y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fminl,(__LONGDOUBLE __x, __LONGDOUBLE __y),fmin,(__x,__y))
+#elif defined(__CRT_HAVE___fmin) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fminf(3), fmin(3), fminl(3)
+ * Return minimum numeric value from `x' and `y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fminl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmin,(__x,__y))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/math/fminl.h>
@@ -4518,6 +4988,14 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmal,(__LONGDOUBLE
 /* >> fmaf(3), fma(3), fmal(3)
  * Multiply-add function computed as a ternary operation */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmal,(__LONGDOUBLE __x, __LONGDOUBLE __y, __LONGDOUBLE __z),__fmal,(__x,__y,__z))
+#elif defined(__CRT_HAVE_fma) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fmaf(3), fma(3), fmal(3)
+ * Multiply-add function computed as a ternary operation */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmal,(__LONGDOUBLE __x, __LONGDOUBLE __y, __LONGDOUBLE __z),fma,(__x,__y,__z))
+#elif defined(__CRT_HAVE___fma) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fmaf(3), fma(3), fmal(3)
+ * Multiply-add function computed as a ternary operation */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmal,(__LONGDOUBLE __x, __LONGDOUBLE __y, __LONGDOUBLE __z),__fma,(__x,__y,__z))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/math/fmal.h>
@@ -4539,14 +5017,30 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrintl,(__LONGDOUBL
 /* >> llrintf(3), llrint(3), llrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrintl,(__LONGDOUBLE __x),__llrintl,(__x))
+#elif defined(__CRT_HAVE_lrint) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llrintf(3), llrint(3), llrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrintl,(__LONGDOUBLE __x),lrint,(__x))
 #elif defined(__CRT_HAVE_lrintl) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 /* >> llrintf(3), llrint(3), llrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrintl,(__LONGDOUBLE __x),lrintl,(__x))
+#elif defined(__CRT_HAVE___lrint) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llrintf(3), llrint(3), llrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrintl,(__LONGDOUBLE __x),__lrint,(__x))
 #elif defined(__CRT_HAVE___lrintl) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 /* >> llrintf(3), llrint(3), llrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrintl,(__LONGDOUBLE __x),__lrintl,(__x))
+#elif defined(__CRT_HAVE_llrint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llrintf(3), llrint(3), llrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrintl,(__LONGDOUBLE __x),llrint,(__x))
+#elif defined(__CRT_HAVE___llrint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llrintf(3), llrint(3), llrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrintl,(__LONGDOUBLE __x),__llrint,(__x))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/math/llrintl.h>
@@ -4567,14 +5061,30 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llroundl,(__LONGDOUB
 /* >> llroundf(3), llround(3), llroundl(3)
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llroundl,(__LONGDOUBLE __x),__llroundl,(__x))
+#elif defined(__CRT_HAVE_lround) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llroundf(3), llround(3), llroundl(3)
+ * Round `x' to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llroundl,(__LONGDOUBLE __x),lround,(__x))
 #elif defined(__CRT_HAVE_lroundl) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 /* >> llroundf(3), llround(3), llroundl(3)
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llroundl,(__LONGDOUBLE __x),lroundl,(__x))
+#elif defined(__CRT_HAVE___lround) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llroundf(3), llround(3), llroundl(3)
+ * Round `x' to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llroundl,(__LONGDOUBLE __x),__lround,(__x))
 #elif defined(__CRT_HAVE___lroundl) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 /* >> llroundf(3), llround(3), llroundl(3)
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llroundl,(__LONGDOUBLE __x),__lroundl,(__x))
+#elif defined(__CRT_HAVE_llround) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llroundf(3), llround(3), llroundl(3)
+ * Round `x' to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llroundl,(__LONGDOUBLE __x),llround,(__x))
+#elif defined(__CRT_HAVE___llround) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llroundf(3), llround(3), llroundl(3)
+ * Round `x' to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llroundl,(__LONGDOUBLE __x),__llround,(__x))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/math/llroundl.h>
@@ -5087,6 +5597,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acos,(__LONGDOUBLE __x),acosl,
 /* >> acosf(3), acos(3), acosl(3)
  * Arc cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acos,(__LONGDOUBLE __x),__acosl,(__x))
+#elif defined(__CRT_HAVE_acos) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> acosf(3), acos(3), acosl(3)
+ * Arc cosine of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acos,(__LONGDOUBLE __x),acos,(__x))
+#elif defined(__CRT_HAVE___acos) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> acosf(3), acos(3), acosl(3)
+ * Arc cosine of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acos,(__LONGDOUBLE __x),__acos,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5109,6 +5627,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asin,(__LONGDOUBLE __x),asinl,
 /* >> asinf(3), asin(3), asinl(3)
  * Arc sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asin,(__LONGDOUBLE __x),__asinl,(__x))
+#elif defined(__CRT_HAVE_asin) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> asinf(3), asin(3), asinl(3)
+ * Arc sine of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asin,(__LONGDOUBLE __x),asin,(__x))
+#elif defined(__CRT_HAVE___asin) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> asinf(3), asin(3), asinl(3)
+ * Arc sine of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asin,(__LONGDOUBLE __x),__asin,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5131,6 +5657,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan,(__LONGDOUBLE __x),atanl,
 /* >> atanf(3), atan(3), atanl(3)
  * Arc tangent of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan,(__LONGDOUBLE __x),__atanl,(__x))
+#elif defined(__CRT_HAVE_atan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> atanf(3), atan(3), atanl(3)
+ * Arc tangent of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan,(__LONGDOUBLE __x),atan,(__x))
+#elif defined(__CRT_HAVE___atan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> atanf(3), atan(3), atanl(3)
+ * Arc tangent of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan,(__LONGDOUBLE __x),__atan,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5153,6 +5687,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan2,(__LONGDOUBLE __y, __LON
 /* >> atan2f(3), atan2(3), atan2l(3)
  * Arc tangent of `y / x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan2,(__LONGDOUBLE __y, __LONGDOUBLE __x),__atan2l,(__y,__x))
+#elif defined(__CRT_HAVE_atan2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> atan2f(3), atan2(3), atan2l(3)
+ * Arc tangent of `y / x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan2,(__LONGDOUBLE __y, __LONGDOUBLE __x),atan2,(__y,__x))
+#elif defined(__CRT_HAVE___atan2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> atan2f(3), atan2(3), atan2l(3)
+ * Arc tangent of `y / x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atan2,(__LONGDOUBLE __y, __LONGDOUBLE __x),__atan2,(__y,__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5175,6 +5717,14 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,cos,(__LONGDO
 /* >> cosf(3), cos(3), cosl(3)
  * Cosine of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,cos,(__LONGDOUBLE __x),__cosl,(__x))
+#elif defined(__CRT_HAVE_cos) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> cosf(3), cos(3), cosl(3)
+ * Cosine of `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,cos,(__LONGDOUBLE __x),cos,(__x))
+#elif defined(__CRT_HAVE___cos) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> cosf(3), cos(3), cosl(3)
+ * Cosine of `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,cos,(__LONGDOUBLE __x),__cos,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5197,6 +5747,14 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,sin,(__LONGDO
 /* >> sinf(3), sin(3), sinl(3)
  * Sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,sin,(__LONGDOUBLE __x),__sinl,(__x))
+#elif defined(__CRT_HAVE_sin) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> sinf(3), sin(3), sinl(3)
+ * Sine of `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,sin,(__LONGDOUBLE __x),sin,(__x))
+#elif defined(__CRT_HAVE___sin) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> sinf(3), sin(3), sinl(3)
+ * Sine of `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,sin,(__LONGDOUBLE __x),__sin,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5219,6 +5777,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tan,(__LONGDOUBLE __x),tanl,(_
 /* >> tanf(3), tan(3), tanl(3)
  * Tangent of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tan,(__LONGDOUBLE __x),__tanl,(__x))
+#elif defined(__CRT_HAVE_tan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> tanf(3), tan(3), tanl(3)
+ * Tangent of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tan,(__LONGDOUBLE __x),tan,(__x))
+#elif defined(__CRT_HAVE___tan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> tanf(3), tan(3), tanl(3)
+ * Tangent of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tan,(__LONGDOUBLE __x),__tan,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5241,6 +5807,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cosh,(__LONGDOUBLE __x),coshl,
 /* >> coshf(3), cosh(3), coshl(3)
  * Hyperbolic   cosine   of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cosh,(__LONGDOUBLE __x),__coshl,(__x))
+#elif defined(__CRT_HAVE_cosh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> coshf(3), cosh(3), coshl(3)
+ * Hyperbolic   cosine   of   `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cosh,(__LONGDOUBLE __x),cosh,(__x))
+#elif defined(__CRT_HAVE___cosh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> coshf(3), cosh(3), coshl(3)
+ * Hyperbolic   cosine   of   `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cosh,(__LONGDOUBLE __x),__cosh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5263,6 +5837,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sinh,(__LONGDOUBLE __x),sinhl,
 /* >> sinhf(3), sinh(3), sinhl(3)
  * Hyperbolic sine of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sinh,(__LONGDOUBLE __x),__sinhl,(__x))
+#elif defined(__CRT_HAVE_sinh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> sinhf(3), sinh(3), sinhl(3)
+ * Hyperbolic sine of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sinh,(__LONGDOUBLE __x),sinh,(__x))
+#elif defined(__CRT_HAVE___sinh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> sinhf(3), sinh(3), sinhl(3)
+ * Hyperbolic sine of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sinh,(__LONGDOUBLE __x),__sinh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5285,6 +5867,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanh,(__LONGDOUBL
 /* >> tanhf(3), tanh(3), tanhl(3)
  * Hyperbolic   tangent   of  `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanh,(__LONGDOUBLE __x),__tanhl,(__x))
+#elif defined(__CRT_HAVE_tanh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> tanhf(3), tanh(3), tanhl(3)
+ * Hyperbolic   tangent   of  `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanh,(__LONGDOUBLE __x),tanh,(__x))
+#elif defined(__CRT_HAVE___tanh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> tanhf(3), tanh(3), tanhl(3)
+ * Hyperbolic   tangent   of  `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tanh,(__LONGDOUBLE __x),__tanh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5307,6 +5897,14 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_expl,__LONGDOUBLE,__NOTHROW,exp,(__LONGDO
 /* >> expf(3), exp(3), expl(3)
  * Exponential function of `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_expl,__LONGDOUBLE,__NOTHROW,exp,(__LONGDOUBLE __x),__expl,(__x))
+#elif defined(__CRT_HAVE_exp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> expf(3), exp(3), expl(3)
+ * Exponential function of `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_expl,__LONGDOUBLE,__NOTHROW,exp,(__LONGDOUBLE __x),exp,(__x))
+#elif defined(__CRT_HAVE___exp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> expf(3), exp(3), expl(3)
+ * Exponential function of `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_expl,__LONGDOUBLE,__NOTHROW,exp,(__LONGDOUBLE __x),__exp,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5329,6 +5927,14 @@ __CREDIRECT(__ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,frexp,(__LONGDOUBLE __x, in
 /* >> frexpf(3), frexp(3), frexpl(3)
  * Break `value' into a normalized fraction and an integral power of 2 */
 __CREDIRECT(__ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,frexp,(__LONGDOUBLE __x, int *__pexponent),__frexpl,(__x,__pexponent))
+#elif defined(__CRT_HAVE_frexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> frexpf(3), frexp(3), frexpl(3)
+ * Break `value' into a normalized fraction and an integral power of 2 */
+__CREDIRECT(__ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,frexp,(__LONGDOUBLE __x, int *__pexponent),frexp,(__x,__pexponent))
+#elif defined(__CRT_HAVE___frexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> frexpf(3), frexp(3), frexpl(3)
+ * Break `value' into a normalized fraction and an integral power of 2 */
+__CREDIRECT(__ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,frexp,(__LONGDOUBLE __x, int *__pexponent),__frexp,(__x,__pexponent))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5351,6 +5957,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ldexp,(__LONGDOUBLE __x, int _
 /* >> ldexpf(3), ldexp(3), ldexpl(3)
  * `x' times (two to the `exponent' power) */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ldexp,(__LONGDOUBLE __x, int __exponent),__ldexpl,(__x,__exponent))
+#elif defined(__CRT_HAVE_ldexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ldexpf(3), ldexp(3), ldexpl(3)
+ * `x' times (two to the `exponent' power) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ldexp,(__LONGDOUBLE __x, int __exponent),ldexp,(__x,__exponent))
+#elif defined(__CRT_HAVE___ldexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ldexpf(3), ldexp(3), ldexpl(3)
+ * `x' times (two to the `exponent' power) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ldexp,(__LONGDOUBLE __x, int __exponent),__ldexp,(__x,__exponent))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5373,6 +5987,14 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,log,(__LONGDO
 /* >> logf(3), log(3), logl(3)
  * Natural  logarithm  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,log,(__LONGDOUBLE __x),__logl,(__x))
+#elif defined(__CRT_HAVE_log) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> logf(3), log(3), logl(3)
+ * Natural  logarithm  of  `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,log,(__LONGDOUBLE __x),log,(__x))
+#elif defined(__CRT_HAVE___log) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> logf(3), log(3), logl(3)
+ * Natural  logarithm  of  `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,log,(__LONGDOUBLE __x),__log,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5395,6 +6017,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log10,(__LONGDOUBLE __x),log10
 /* >> log10f(3), log10(3), log10l(3)
  * Base-ten    logarithm    of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log10,(__LONGDOUBLE __x),__log10l,(__x))
+#elif defined(__CRT_HAVE_log10) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> log10f(3), log10(3), log10l(3)
+ * Base-ten    logarithm    of   `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log10,(__LONGDOUBLE __x),log10,(__x))
+#elif defined(__CRT_HAVE___log10) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> log10f(3), log10(3), log10l(3)
+ * Base-ten    logarithm    of   `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log10,(__LONGDOUBLE __x),__log10,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5417,6 +6047,14 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,modf,(__LONG
 /* >> modff(3), modf(3), modfl(3)
  * Break `value' into integral and fractional parts */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,modf,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),__modfl,(__x,__iptr))
+#elif defined(__CRT_HAVE_modf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> modff(3), modf(3), modfl(3)
+ * Break `value' into integral and fractional parts */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,modf,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),modf,(__x,__iptr))
+#elif defined(__CRT_HAVE___modf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> modff(3), modf(3), modfl(3)
+ * Break `value' into integral and fractional parts */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,modf,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),__modf,(__x,__iptr))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5439,6 +6077,14 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,pow,(__LONGDO
 /* >> powf(3), pow(3), powl(3)
  * Return `x' to the `y' power */
 __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,pow,(__LONGDOUBLE __x, __LONGDOUBLE __y),__powl,(__x,__y))
+#elif defined(__CRT_HAVE_pow) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> powf(3), pow(3), powl(3)
+ * Return `x' to the `y' power */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,pow,(__LONGDOUBLE __x, __LONGDOUBLE __y),pow,(__x,__y))
+#elif defined(__CRT_HAVE___pow) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> powf(3), pow(3), powl(3)
+ * Return `x' to the `y' power */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,pow,(__LONGDOUBLE __x, __LONGDOUBLE __y),__pow,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5461,6 +6107,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sqrt,(__LONGDOUBLE __x),sqrtl,
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
  * Return the square root of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sqrt,(__LONGDOUBLE __x),__sqrtl,(__x))
+#elif defined(__CRT_HAVE_sqrt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> sqrtf(3), sqrt(3), sqrtl(3)
+ * Return the square root of  `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sqrt,(__LONGDOUBLE __x),sqrt,(__x))
+#elif defined(__CRT_HAVE___sqrt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> sqrtf(3), sqrt(3), sqrtl(3)
+ * Return the square root of  `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,sqrt,(__LONGDOUBLE __x),__sqrt,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5483,6 +6137,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ceil,(__LONGDOUBL
 /* >> ceilf(3), ceil(3), ceill(3)
  * Smallest integral value not less than `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ceil,(__LONGDOUBLE __x),__ceill,(__x))
+#elif defined(__CRT_HAVE_ceil) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ceilf(3), ceil(3), ceill(3)
+ * Smallest integral value not less than `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ceil,(__LONGDOUBLE __x),ceil,(__x))
+#elif defined(__CRT_HAVE___ceil) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ceilf(3), ceil(3), ceill(3)
+ * Smallest integral value not less than `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ceil,(__LONGDOUBLE __x),__ceil,(__x))
 #else /* ... */
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5505,6 +6167,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fabs,(__LONGDOUBL
 /* >> fabsf(3), fabs(3), fabsl(3)
  * Absolute value of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fabs,(__LONGDOUBLE __x),__fabsl,(__x))
+#elif defined(__CRT_HAVE_fabs) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fabs,(__LONGDOUBLE __x),fabs,(__x))
+#elif defined(__CRT_HAVE___fabs) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fabs,(__LONGDOUBLE __x),__fabs,(__x))
 #else /* ... */
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5527,6 +6197,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,floor,(__LONGDOUB
 /* >> floorf(3), floor(3), floorl(3)
  * Largest integer not greater than `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,floor,(__LONGDOUBLE __x),__floorl,(__x))
+#elif defined(__CRT_HAVE_floor) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> floorf(3), floor(3), floorl(3)
+ * Largest integer not greater than `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,floor,(__LONGDOUBLE __x),floor,(__x))
+#elif defined(__CRT_HAVE___floor) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> floorf(3), floor(3), floorl(3)
+ * Largest integer not greater than `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,floor,(__LONGDOUBLE __x),__floor,(__x))
 #else /* ... */
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5549,6 +6227,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmod,(__LONGDOUBLE __x, __LONG
 /* >> fmodf(3), fmod(3), fmodl(3)
  * Floating-point modulo remainder of `x / y' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmod,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmodl,(__x,__y))
+#elif defined(__CRT_HAVE_fmod) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fmodf(3), fmod(3), fmodl(3)
+ * Floating-point modulo remainder of `x / y' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmod,(__LONGDOUBLE __x, __LONGDOUBLE __y),fmod,(__x,__y))
+#elif defined(__CRT_HAVE___fmod) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fmodf(3), fmod(3), fmodl(3)
+ * Floating-point modulo remainder of `x / y' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmod,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmod,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5868,6 +6554,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acosh,(__LONGDOUBLE __x),acosh
 /* >> acoshf(3), acosh(3), acoshl(3)
  * Hyperbolic  arc  cosine  of   `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acosh,(__LONGDOUBLE __x),__acoshl,(__x))
+#elif defined(__CRT_HAVE_acosh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> acoshf(3), acosh(3), acoshl(3)
+ * Hyperbolic  arc  cosine  of   `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acosh,(__LONGDOUBLE __x),acosh,(__x))
+#elif defined(__CRT_HAVE___acosh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> acoshf(3), acosh(3), acoshl(3)
+ * Hyperbolic  arc  cosine  of   `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,acosh,(__LONGDOUBLE __x),__acosh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5890,6 +6584,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinh,(__LONGDOUB
 /* >> asinhf(3), asinh(3), asinhl(3)
  * Hyperbolic  arc   sine   of   `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinh,(__LONGDOUBLE __x),__asinhl,(__x))
+#elif defined(__CRT_HAVE_asinh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> asinhf(3), asinh(3), asinhl(3)
+ * Hyperbolic  arc   sine   of   `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinh,(__LONGDOUBLE __x),asinh,(__x))
+#elif defined(__CRT_HAVE___asinh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> asinhf(3), asinh(3), asinhl(3)
+ * Hyperbolic  arc   sine   of   `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,asinh,(__LONGDOUBLE __x),__asinh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5912,6 +6614,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanh,(__LONGDOUBLE __x),atanh
 /* >> atanhf(3), atanh(3), atanhl(3)
  * Hyperbolic  arc  tangent  of  `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanh,(__LONGDOUBLE __x),__atanhl,(__x))
+#elif defined(__CRT_HAVE_atanh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> atanhf(3), atanh(3), atanhl(3)
+ * Hyperbolic  arc  tangent  of  `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanh,(__LONGDOUBLE __x),atanh,(__x))
+#elif defined(__CRT_HAVE___atanh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> atanhf(3), atanh(3), atanhl(3)
+ * Hyperbolic  arc  tangent  of  `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,atanh,(__LONGDOUBLE __x),__atanh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5934,6 +6644,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expm1,(__LONGDOUBLE __x),expm1
 /* >> expm1f(3), expm1(3), expm1l(3)
  * Return `exp(x) - 1' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expm1,(__LONGDOUBLE __x),__expm1l,(__x))
+#elif defined(__CRT_HAVE_expm1) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> expm1f(3), expm1(3), expm1l(3)
+ * Return `exp(x) - 1' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expm1,(__LONGDOUBLE __x),expm1,(__x))
+#elif defined(__CRT_HAVE___expm1) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> expm1f(3), expm1(3), expm1l(3)
+ * Return `exp(x) - 1' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,expm1,(__LONGDOUBLE __x),__expm1,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5956,6 +6674,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log1p,(__LONGDOUBLE __x),log1p
 /* >> log1pf(3), log1p(3), log1pl(3)
  * Return `log(1 + x)' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log1p,(__LONGDOUBLE __x),__log1pl,(__x))
+#elif defined(__CRT_HAVE_log1p) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> log1pf(3), log1p(3), log1pl(3)
+ * Return `log(1 + x)' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log1p,(__LONGDOUBLE __x),log1p,(__x))
+#elif defined(__CRT_HAVE___log1p) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> log1pf(3), log1p(3), log1pl(3)
+ * Return `log(1 + x)' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log1p,(__LONGDOUBLE __x),__log1p,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -5978,6 +6704,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,logb,(__LONGDOUBL
 /* >> logbf(3), logb(3), logbl(3)
  * Return the base 2 signed integral exponent of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,logb,(__LONGDOUBLE __x),__logbl,(__x))
+#elif defined(__CRT_HAVE_logb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> logbf(3), logb(3), logbl(3)
+ * Return the base 2 signed integral exponent of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,logb,(__LONGDOUBLE __x),logb,(__x))
+#elif defined(__CRT_HAVE___logb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> logbf(3), logb(3), logbl(3)
+ * Return the base 2 signed integral exponent of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,logb,(__LONGDOUBLE __x),__logb,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -6000,6 +6734,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrt,(__LONGDOUBL
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
  * Return  the  cube root  of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrt,(__LONGDOUBLE __x),__cbrtl,(__x))
+#elif defined(__CRT_HAVE_cbrt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> cbrtf(3), cbrt(3), cbrtl(3)
+ * Return  the  cube root  of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrt,(__LONGDOUBLE __x),cbrt,(__x))
+#elif defined(__CRT_HAVE___cbrt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> cbrtf(3), cbrt(3), cbrtl(3)
+ * Return  the  cube root  of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,cbrt,(__LONGDOUBLE __x),__cbrt,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -6034,6 +6776,22 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rint,(__LONGDOUBL
 /* >> rintf(3), rint(3), rintl(3)
  * Return the integer nearest `x' in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rint,(__LONGDOUBLE __x),__nearbyintl,(__x))
+#elif defined(__CRT_HAVE_rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> rintf(3), rint(3), rintl(3)
+ * Return the integer nearest `x' in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rint,(__LONGDOUBLE __x),rint,(__x))
+#elif defined(__CRT_HAVE_nearbyint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> rintf(3), rint(3), rintl(3)
+ * Return the integer nearest `x' in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rint,(__LONGDOUBLE __x),nearbyint,(__x))
+#elif defined(__CRT_HAVE___rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> rintf(3), rint(3), rintl(3)
+ * Return the integer nearest `x' in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rint,(__LONGDOUBLE __x),__rint,(__x))
+#elif defined(__CRT_HAVE___nearbyint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> rintf(3), rint(3), rintl(3)
+ * Return the integer nearest `x' in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,rint,(__LONGDOUBLE __x),__nearbyint,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___rint) || defined(__CRT_HAVE___nearbyint) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -6068,6 +6826,22 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafter,(__LONG
 /* >> nextafterf(3), nextafter(3), nextafterl(3)
  * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafter,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttowardl,(__x,__y))
+#elif defined(__CRT_HAVE_nextafter) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafter,(__LONGDOUBLE __x, __LONGDOUBLE __y),nextafter,(__x,__y))
+#elif defined(__CRT_HAVE_nexttoward) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafter,(__LONGDOUBLE __x, __LONGDOUBLE __y),nexttoward,(__x,__y))
+#elif defined(__CRT_HAVE___nextafter) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafter,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nextafter,(__x,__y))
+#elif defined(__CRT_HAVE___nexttoward) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextafter,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttoward,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter) || defined(__CRT_HAVE___nexttoward) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -6102,6 +6876,22 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainder,(__LONGDOUBLE __x, _
 /* >> remainderf(3), remainder(3), remainderl(3)
  * Return the remainder of integer division `x / p' with infinite precision */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainder,(__LONGDOUBLE __x, __LONGDOUBLE __p),__dreml,(__x,__p))
+#elif defined(__CRT_HAVE_remainder) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remainderf(3), remainder(3), remainderl(3)
+ * Return the remainder of integer division `x / p' with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainder,(__LONGDOUBLE __x, __LONGDOUBLE __p),remainder,(__x,__p))
+#elif defined(__CRT_HAVE_drem) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remainderf(3), remainder(3), remainderl(3)
+ * Return the remainder of integer division `x / p' with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainder,(__LONGDOUBLE __x, __LONGDOUBLE __p),drem,(__x,__p))
+#elif defined(__CRT_HAVE___remainder) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remainderf(3), remainder(3), remainderl(3)
+ * Return the remainder of integer division `x / p' with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainder,(__LONGDOUBLE __x, __LONGDOUBLE __p),__remainder,(__x,__p))
+#elif defined(__CRT_HAVE___drem) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remainderf(3), remainder(3), remainderl(3)
+ * Return the remainder of integer division `x / p' with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,remainder,(__LONGDOUBLE __x, __LONGDOUBLE __p),__drem,(__x,__p))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE___drem) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -6120,6 +6910,10 @@ __CEIREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(__LONGDOUBLE __x),ilogbl,{ ret
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(__LONGDOUBLE __x),ilogbl,(__x))
+#elif defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ilogbf(3), ilogb(3), ilogbl(3)
+ * Return the binary exponent of `x', which must be nonzero */
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(__LONGDOUBLE __x),llogb,(__x))
 #elif defined(__CRT_HAVE_llogbl) && __SIZEOF_INT__ == __SIZEOF_LONG__
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
@@ -6128,6 +6922,14 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(__LONGDOUBLE __x),llogbl,(__x))
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(__LONGDOUBLE __x),__ilogbl,(__x))
+#elif defined(__CRT_HAVE_ilogb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ilogbf(3), ilogb(3), ilogbl(3)
+ * Return the binary exponent of `x', which must be nonzero */
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(__LONGDOUBLE __x),ilogb,(__x))
+#elif defined(__CRT_HAVE___ilogb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ilogbf(3), ilogb(3), ilogbl(3)
+ * Return the binary exponent of `x', which must be nonzero */
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(__LONGDOUBLE __x),__ilogb,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_ilogb) || (defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -6652,6 +7454,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp2,(__LONGDOUBLE __x),exp2l,
 /* >> exp2f(3), exp2(3), exp2l(3)
  * Compute base-2 exponential of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp2,(__LONGDOUBLE __x),__exp2l,(__x))
+#elif defined(__CRT_HAVE_exp2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> exp2f(3), exp2(3), exp2l(3)
+ * Compute base-2 exponential of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp2,(__LONGDOUBLE __x),exp2,(__x))
+#elif defined(__CRT_HAVE___exp2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> exp2f(3), exp2(3), exp2l(3)
+ * Compute base-2 exponential of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,exp2,(__LONGDOUBLE __x),__exp2,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -6674,6 +7484,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log2,(__LONGDOUBLE __x),log2l,
 /* >> log2f(3), log2(3), log2l(3)
  * Compute base-2 logarithm of `x' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log2,(__LONGDOUBLE __x),__log2l,(__x))
+#elif defined(__CRT_HAVE_log2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> log2f(3), log2(3), log2l(3)
+ * Compute base-2 logarithm of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log2,(__LONGDOUBLE __x),log2,(__x))
+#elif defined(__CRT_HAVE___log2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> log2f(3), log2(3), log2l(3)
+ * Compute base-2 logarithm of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,log2,(__LONGDOUBLE __x),__log2,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -6696,6 +7514,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,copysign,(__LONGD
 /* >> copysignf(3), copysign(3), copysignl(3)
  * Return `x' with its signed changed to `y's */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,copysign,(__LONGDOUBLE __num, __LONGDOUBLE __sign),__copysignl,(__num,__sign))
+#elif defined(__CRT_HAVE_copysign) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> copysignf(3), copysign(3), copysignl(3)
+ * Return `x' with its signed changed to `y's */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,copysign,(__LONGDOUBLE __num, __LONGDOUBLE __sign),copysign,(__num,__sign))
+#elif defined(__CRT_HAVE___copysign) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> copysignf(3), copysign(3), copysignl(3)
+ * Return `x' with its signed changed to `y's */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,copysign,(__LONGDOUBLE __num, __LONGDOUBLE __sign),__copysign,(__num,__sign))
 #else /* ... */
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -6718,6 +7544,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tgamma,(__LONGDOUBLE __x),tgam
 /* >> tgammaf(3), tgamma(3), tgammal(3)
  * True gamma function */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tgamma,(__LONGDOUBLE __x),__tgammal,(__x))
+#elif defined(__CRT_HAVE_tgamma) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> tgammaf(3), tgamma(3), tgammal(3)
+ * True gamma function */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tgamma,(__LONGDOUBLE __x),tgamma,(__x))
+#elif defined(__CRT_HAVE___tgamma) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> tgammaf(3), tgamma(3), tgammal(3)
+ * True gamma function */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,tgamma,(__LONGDOUBLE __x),__tgamma,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -6752,6 +7586,22 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttoward,(__LON
 /* >> nextafterf(3), nextafter(3), nextafterl(3)
  * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttoward,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttowardl,(__x,__y))
+#elif defined(__CRT_HAVE_nextafter) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttoward,(__LONGDOUBLE __x, __LONGDOUBLE __y),nextafter,(__x,__y))
+#elif defined(__CRT_HAVE_nexttoward) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttoward,(__LONGDOUBLE __x, __LONGDOUBLE __y),nexttoward,(__x,__y))
+#elif defined(__CRT_HAVE___nextafter) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttoward,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nextafter,(__x,__y))
+#elif defined(__CRT_HAVE___nexttoward) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nexttoward,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttoward,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter) || defined(__CRT_HAVE___nexttoward) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -6774,6 +7624,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbn,(__LONGDOU
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbn,(__LONGDOUBLE __x, int __n),__scalbnl,(__x,__n))
+#elif defined(__CRT_HAVE_scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbn,(__LONGDOUBLE __x, int __n),scalbln,(__x,__n))
+#elif defined(__CRT_HAVE___scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbn,(__LONGDOUBLE __x, int __n),__scalbln,(__x,__n))
 #elif defined(__CRT_HAVE_scalblnl) && __SIZEOF_INT__ == __SIZEOF_LONG__
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
@@ -6782,6 +7640,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbn,(__LONGDOU
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbn,(__LONGDOUBLE __x, int __n),__scalblnl,(__x,__n))
+#elif defined(__CRT_HAVE_scalbn) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbn,(__LONGDOUBLE __x, int __n),scalbn,(__x,__n))
+#elif defined(__CRT_HAVE___scalbn) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbn,(__LONGDOUBLE __x, int __n),__scalbn,(__x,__n))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn) || (defined(__CRT_HAVE_scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE___scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -6804,14 +7670,30 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbln,(__LONGDO
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbln,(__LONGDOUBLE __x, long int __n),__scalblnl,(__x,__n))
+#elif defined(__CRT_HAVE_scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbln,(__LONGDOUBLE __x, long int __n),scalbn,(__x,__n))
 #elif defined(__CRT_HAVE_scalbnl) && __SIZEOF_INT__ == __SIZEOF_LONG__
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbln,(__LONGDOUBLE __x, long int __n),scalbnl,(__x,__n))
+#elif defined(__CRT_HAVE___scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbln,(__LONGDOUBLE __x, long int __n),__scalbn,(__x,__n))
 #elif defined(__CRT_HAVE___scalbnl) && __SIZEOF_INT__ == __SIZEOF_LONG__
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbln,(__LONGDOUBLE __x, long int __n),__scalbnl,(__x,__n))
+#elif defined(__CRT_HAVE_scalbln) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbln,(__LONGDOUBLE __x, long int __n),scalbln,(__x,__n))
+#elif defined(__CRT_HAVE___scalbln) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbln,(__LONGDOUBLE __x, long int __n),__scalbln,(__x,__n))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln) || (defined(__CRT_HAVE_scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE___scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -6846,6 +7728,22 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nearbyint,(__LONG
 /* >> rintf(3), rint(3), rintl(3)
  * Return the integer nearest `x' in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nearbyint,(__LONGDOUBLE __x),__nearbyintl,(__x))
+#elif defined(__CRT_HAVE_rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> rintf(3), rint(3), rintl(3)
+ * Return the integer nearest `x' in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nearbyint,(__LONGDOUBLE __x),rint,(__x))
+#elif defined(__CRT_HAVE_nearbyint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> rintf(3), rint(3), rintl(3)
+ * Return the integer nearest `x' in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nearbyint,(__LONGDOUBLE __x),nearbyint,(__x))
+#elif defined(__CRT_HAVE___rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> rintf(3), rint(3), rintl(3)
+ * Return the integer nearest `x' in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nearbyint,(__LONGDOUBLE __x),__rint,(__x))
+#elif defined(__CRT_HAVE___nearbyint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> rintf(3), rint(3), rintl(3)
+ * Return the integer nearest `x' in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nearbyint,(__LONGDOUBLE __x),__nearbyint,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___rint) || defined(__CRT_HAVE___nearbyint) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -6868,6 +7766,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,round,(__LONGDOUB
 /* >> roundf(3), round(3), roundl(3)
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,round,(__LONGDOUBLE __x),__roundl,(__x))
+#elif defined(__CRT_HAVE_round) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> roundf(3), round(3), roundl(3)
+ * Round `x' to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,round,(__LONGDOUBLE __x),round,(__x))
+#elif defined(__CRT_HAVE___round) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> roundf(3), round(3), roundl(3)
+ * Round `x' to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,round,(__LONGDOUBLE __x),__round,(__x))
 #else /* ... */
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -6893,6 +7799,16 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,trunc,(__LONGDOUB
  * Round `x' to the integral value in floating-point
  * format   nearest  but  not  larger  in  magnitude */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,trunc,(__LONGDOUBLE __x),__truncl,(__x))
+#elif defined(__CRT_HAVE_trunc) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> truncf(3), trunc(3), truncl(3)
+ * Round `x' to the integral value in floating-point
+ * format   nearest  but  not  larger  in  magnitude */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,trunc,(__LONGDOUBLE __x),trunc,(__x))
+#elif defined(__CRT_HAVE___trunc) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> truncf(3), trunc(3), truncl(3)
+ * Round `x' to the integral value in floating-point
+ * format   nearest  but  not  larger  in  magnitude */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,trunc,(__LONGDOUBLE __x),__trunc,(__x))
 #else /* ... */
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -6922,6 +7838,18 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(3),__LONGDOUBLE,__NOTHROW,remquo,(__LONGDO
  * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
  * of the integral quotient x/p, with n >= 3 */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(3),__LONGDOUBLE,__NOTHROW,remquo,(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo),__remquol,(__x,__p,__pquo))
+#elif defined(__CRT_HAVE_remquo) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remquof(3), remquo(3), remquol(3)
+ * Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(3),__LONGDOUBLE,__NOTHROW,remquo,(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo),remquo,(__x,__p,__pquo))
+#elif defined(__CRT_HAVE___remquo) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remquof(3), remquo(3), remquol(3)
+ * Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(3),__LONGDOUBLE,__NOTHROW,remquo,(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo),__remquo,(__x,__p,__pquo))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -6946,6 +7874,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrint,(__LONGDOUBLE _
 /* >> lrintf(3), lrint(3), lrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrint,(__LONGDOUBLE __x),__lrintl,(__x))
+#elif defined(__CRT_HAVE_llrint) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> lrintf(3), lrint(3), lrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrint,(__LONGDOUBLE __x),llrint,(__x))
+#elif defined(__CRT_HAVE___llrint) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> lrintf(3), lrint(3), lrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrint,(__LONGDOUBLE __x),__llrint,(__x))
 #elif defined(__CRT_HAVE_llrintl) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 /* >> lrintf(3), lrint(3), lrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
@@ -6954,6 +7890,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrint,(__LONGDOUBLE _
 /* >> lrintf(3), lrint(3), lrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrint,(__LONGDOUBLE __x),__llrintl,(__x))
+#elif defined(__CRT_HAVE_remquo) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> lrintf(3), lrint(3), lrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrint,(__LONGDOUBLE __x),remquo,(__x))
+#elif defined(__CRT_HAVE___lrint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> lrintf(3), lrint(3), lrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lrint,(__LONGDOUBLE __x),__lrint,(__x))
 #else /* ... */
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -7006,6 +7950,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fdim,(__LONGDOUBL
 /* >> fdimf(3), fdim(3), fdiml(3)
  * Return positive difference between `x' and `y' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fdim,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fdiml,(__x,__y))
+#elif defined(__CRT_HAVE_fdim) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fdimf(3), fdim(3), fdiml(3)
+ * Return positive difference between `x' and `y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fdim,(__LONGDOUBLE __x, __LONGDOUBLE __y),fdim,(__x,__y))
+#elif defined(__CRT_HAVE___fdim) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fdimf(3), fdim(3), fdiml(3)
+ * Return positive difference between `x' and `y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fdim,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fdim,(__x,__y))
 #else /* ... */
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -7028,6 +7980,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmax,(__LONGDOUBL
 /* >> fmaxf(3), fmax(3), fmaxl(3)
  * Return maximum numeric value from `x' and `y' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmax,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmaxl,(__x,__y))
+#elif defined(__CRT_HAVE_fmax) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fmaxf(3), fmax(3), fmaxl(3)
+ * Return maximum numeric value from `x' and `y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmax,(__LONGDOUBLE __x, __LONGDOUBLE __y),fmax,(__x,__y))
+#elif defined(__CRT_HAVE___fmax) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fmaxf(3), fmax(3), fmaxl(3)
+ * Return maximum numeric value from `x' and `y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmax,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmax,(__x,__y))
 #else /* ... */
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -7050,6 +8010,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmin,(__LONGDOUBL
 /* >> fminf(3), fmin(3), fminl(3)
  * Return minimum numeric value from `x' and `y' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmin,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fminl,(__x,__y))
+#elif defined(__CRT_HAVE_fmin) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fminf(3), fmin(3), fminl(3)
+ * Return minimum numeric value from `x' and `y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmin,(__LONGDOUBLE __x, __LONGDOUBLE __y),fmin,(__x,__y))
+#elif defined(__CRT_HAVE___fmin) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fminf(3), fmin(3), fminl(3)
+ * Return minimum numeric value from `x' and `y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fmin,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmin,(__x,__y))
 #else /* ... */
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -7072,6 +8040,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fma,(__LONGDOUBLE
 /* >> fmaf(3), fma(3), fmal(3)
  * Multiply-add function computed as a ternary operation */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fma,(__LONGDOUBLE __x, __LONGDOUBLE __y, __LONGDOUBLE __z),__fmal,(__x,__y,__z))
+#elif defined(__CRT_HAVE_fma) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fmaf(3), fma(3), fmal(3)
+ * Multiply-add function computed as a ternary operation */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fma,(__LONGDOUBLE __x, __LONGDOUBLE __y, __LONGDOUBLE __z),fma,(__x,__y,__z))
+#elif defined(__CRT_HAVE___fma) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fmaf(3), fma(3), fmal(3)
+ * Multiply-add function computed as a ternary operation */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,fma,(__LONGDOUBLE __x, __LONGDOUBLE __y, __LONGDOUBLE __z),__fma,(__x,__y,__z))
 #else /* ... */
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -7097,14 +8073,30 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrint,(__LONGDOUBL
 /* >> llrintf(3), llrint(3), llrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrint,(__LONGDOUBLE __x),__llrintl,(__x))
+#elif defined(__CRT_HAVE_lrint) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llrintf(3), llrint(3), llrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrint,(__LONGDOUBLE __x),lrint,(__x))
 #elif defined(__CRT_HAVE_lrintl) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 /* >> llrintf(3), llrint(3), llrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrint,(__LONGDOUBLE __x),lrintl,(__x))
+#elif defined(__CRT_HAVE___lrint) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llrintf(3), llrint(3), llrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrint,(__LONGDOUBLE __x),__lrint,(__x))
 #elif defined(__CRT_HAVE___lrintl) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 /* >> llrintf(3), llrint(3), llrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrint,(__LONGDOUBLE __x),__lrintl,(__x))
+#elif defined(__CRT_HAVE_llrint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llrintf(3), llrint(3), llrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrint,(__LONGDOUBLE __x),llrint,(__x))
+#elif defined(__CRT_HAVE___llrint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llrintf(3), llrint(3), llrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrint,(__LONGDOUBLE __x),__llrint,(__x))
 #else /* ... */
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -7127,14 +8119,30 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llround,(__LONGDOUB
 /* >> llroundf(3), llround(3), llroundl(3)
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llround,(__LONGDOUBLE __x),__llroundl,(__x))
+#elif defined(__CRT_HAVE_lround) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llroundf(3), llround(3), llroundl(3)
+ * Round `x' to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llround,(__LONGDOUBLE __x),lround,(__x))
 #elif defined(__CRT_HAVE_lroundl) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 /* >> llroundf(3), llround(3), llroundl(3)
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llround,(__LONGDOUBLE __x),lroundl,(__x))
+#elif defined(__CRT_HAVE___lround) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llroundf(3), llround(3), llroundl(3)
+ * Round `x' to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llround,(__LONGDOUBLE __x),__lround,(__x))
 #elif defined(__CRT_HAVE___lroundl) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 /* >> llroundf(3), llround(3), llroundl(3)
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llround,(__LONGDOUBLE __x),__lroundl,(__x))
+#elif defined(__CRT_HAVE_llround) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llroundf(3), llround(3), llroundl(3)
+ * Round `x' to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llround,(__LONGDOUBLE __x),llround,(__x))
+#elif defined(__CRT_HAVE___llround) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llroundf(3), llround(3), llroundl(3)
+ * Round `x' to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,llround,(__LONGDOUBLE __x),__llround,(__x))
 #else /* ... */
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -7262,6 +8270,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,hypot,(__LONGDOUBLE __x, __LON
 /* >> hypotf(3), hypot(3), hypotl(3)
  * Return `sqrt(x*x + y*y)' */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,hypot,(__LONGDOUBLE __x, __LONGDOUBLE __y),__hypotl,(__x,__y))
+#elif defined(__CRT_HAVE_hypot) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> hypotf(3), hypot(3), hypotl(3)
+ * Return `sqrt(x*x + y*y)' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,hypot,(__LONGDOUBLE __x, __LONGDOUBLE __y),hypot,(__x,__y))
+#elif defined(__CRT_HAVE___hypot) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> hypotf(3), hypot(3), hypotl(3)
+ * Return `sqrt(x*x + y*y)' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,hypot,(__LONGDOUBLE __x, __LONGDOUBLE __y),__hypot,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -7281,6 +8297,12 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erf,(__LONGDOUBLE
 #elif defined(__CRT_HAVE___erfl)
 /* >> erff(3), erf(3), erfl(3) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erf,(__LONGDOUBLE __x),__erfl,(__x))
+#elif defined(__CRT_HAVE_erf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> erff(3), erf(3), erfl(3) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erf,(__LONGDOUBLE __x),erf,(__x))
+#elif defined(__CRT_HAVE___erf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> erff(3), erf(3), erfl(3) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erf,(__LONGDOUBLE __x),__erf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -7299,6 +8321,12 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erfc,(__LONGDOUBL
 #elif defined(__CRT_HAVE___erfcl)
 /* >> erfcf(3), erfc(3), erfcl(3) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erfc,(__LONGDOUBLE __x),__erfcl,(__x))
+#elif defined(__CRT_HAVE_erfc) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> erfcf(3), erfc(3), erfcl(3) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erfc,(__LONGDOUBLE __x),erfc,(__x))
+#elif defined(__CRT_HAVE___erfc) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> erfcf(3), erfc(3), erfcl(3) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,erfc,(__LONGDOUBLE __x),__erfc,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 } /* extern "C++" */
 __NAMESPACE_STD_END
@@ -8086,6 +9114,14 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,pow10l,(__LONGDOUBLE __x),(__x)
 /* >> pow10f(3), pow10(3), pow10l(3)
  * Another  name  occasionally  used */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,pow10l,(__LONGDOUBLE __x),__pow10l,(__x))
+#elif defined(__CRT_HAVE_pow10) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> pow10f(3), pow10(3), pow10l(3)
+ * Another  name  occasionally  used */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,pow10l,(__LONGDOUBLE __x),pow10,(__x))
+#elif defined(__CRT_HAVE___pow10) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> pow10f(3), pow10(3), pow10l(3)
+ * Another  name  occasionally  used */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,pow10l,(__LONGDOUBLE __x),__pow10,(__x))
 #elif defined(__CRT_HAVE_powl) || defined(__CRT_HAVE___powl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/pow10l.h>
 /* >> pow10f(3), pow10(3), pow10l(3)
@@ -8147,6 +9183,14 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinfl,(__LONGDOUBLE __x),(
 /* >> isinff(3), isinf(3), isinfl(3)
  * Return 0 if `value' is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinfl,(__LONGDOUBLE __x),__isinfl,(__x))
+#elif defined(__CRT_HAVE_isinf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> isinff(3), isinf(3), isinfl(3)
+ * Return 0 if `value' is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinfl,(__LONGDOUBLE __x),isinf,(__x))
+#elif defined(__CRT_HAVE___isinf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> isinff(3), isinf(3), isinfl(3)
+ * Return 0 if `value' is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinfl,(__LONGDOUBLE __x),__isinf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__INFINITYL) || defined(__HUGE_VALL) || defined(__CRT_HAVE_isinf) || defined(__CRT_HAVE___isinf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__INFINITY) || defined(__HUGE_VAL)
 #include <libc/local/math/isinfl.h>
 /* >> isinff(3), isinf(3), isinfl(3)
@@ -8307,6 +9351,14 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitel,(__LONGDOUBLE __x),
 /* >> finitef(3), finite(3), finitel(3)
  * Return nonzero if `value' is finite and not NaN */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitel,(__LONGDOUBLE __x),__finitel,(__x))
+#elif defined(__CRT_HAVE_finite) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> finitef(3), finite(3), finitel(3)
+ * Return nonzero if `value' is finite and not NaN */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitel,(__LONGDOUBLE __x),finite,(__x))
+#elif defined(__CRT_HAVE___finite) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> finitef(3), finite(3), finitel(3)
+ * Return nonzero if `value' is finite and not NaN */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitel,(__LONGDOUBLE __x),__finite,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || ((defined(__CRT_HAVE_isinfl) || defined(__CRT_HAVE___isinfl) || defined(__INFINITYL) || defined(__HUGE_VALL) || defined(__CRT_HAVE_isinf) || defined(__CRT_HAVE___isinf) || defined(__INFINITY) || defined(__HUGE_VAL)) && (defined(__CRT_HAVE_isnanl) || defined(__CRT_HAVE___isnanl) || defined(__CRT_HAVE_isnan) || defined(__CRT_HAVE__isnan) || defined(__CRT_HAVE___isnan))) || defined(__CRT_HAVE_finite) || defined(__CRT_HAVE___finite) || defined(__CRT_HAVE__finite) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || ((defined(__CRT_HAVE_isinf) || defined(__CRT_HAVE___isinf) || defined(__INFINITY) || defined(__HUGE_VAL)) && (defined(__CRT_HAVE_isnan) || defined(__CRT_HAVE__isnan) || defined(__CRT_HAVE___isnan)))
 #include <libc/local/math/finitel.h>
 /* >> finitef(3), finite(3), finitel(3)
@@ -8337,6 +9389,22 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,dreml,(__LONGDOUBLE __x, __LON
 /* >> remainderf(3), remainder(3), remainderl(3)
  * Return the remainder of integer division `x / p' with infinite precision */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,dreml,(__LONGDOUBLE __x, __LONGDOUBLE __p),__dreml,(__x,__p))
+#elif defined(__CRT_HAVE_remainder) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remainderf(3), remainder(3), remainderl(3)
+ * Return the remainder of integer division `x / p' with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,dreml,(__LONGDOUBLE __x, __LONGDOUBLE __p),remainder,(__x,__p))
+#elif defined(__CRT_HAVE_drem) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remainderf(3), remainder(3), remainderl(3)
+ * Return the remainder of integer division `x / p' with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,dreml,(__LONGDOUBLE __x, __LONGDOUBLE __p),drem,(__x,__p))
+#elif defined(__CRT_HAVE___remainder) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remainderf(3), remainder(3), remainderl(3)
+ * Return the remainder of integer division `x / p' with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,dreml,(__LONGDOUBLE __x, __LONGDOUBLE __p),__remainder,(__x,__p))
+#elif defined(__CRT_HAVE___drem) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remainderf(3), remainder(3), remainderl(3)
+ * Return the remainder of integer division `x / p' with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,dreml,(__LONGDOUBLE __x, __LONGDOUBLE __p),__drem,(__x,__p))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE___drem) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/remainderl.h>
 /* >> remainderf(3), remainder(3), remainderl(3)
@@ -8355,6 +9423,14 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,significandl,(__LO
 /* >> significandf(3), significand(3), significandl(3)
  * Return the fractional part of `x' after dividing out `ilogb(x)' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,significandl,(__LONGDOUBLE __x),__significandl,(__x))
+#elif defined(__CRT_HAVE_significand) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> significandf(3), significand(3), significandl(3)
+ * Return the fractional part of `x' after dividing out `ilogb(x)' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,significandl,(__LONGDOUBLE __x),significand,(__x))
+#elif defined(__CRT_HAVE___significand) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> significandf(3), significand(3), significandl(3)
+ * Return the fractional part of `x' after dividing out `ilogb(x)' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,significandl,(__LONGDOUBLE __x),__significand,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/significandl.h>
 /* >> significandf(3), significand(3), significandl(3)
@@ -8424,6 +9500,14 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanl,(__LONGDOUBLE __x),(
 /* >> isnanf(3), isnan(3), isnanl(3)
  * Return nonzero if `value' is not a number */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanl,(__LONGDOUBLE __x),__isnanl,(__x))
+#elif defined(__CRT_HAVE_isnan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> isnanf(3), isnan(3), isnanl(3)
+ * Return nonzero if `value' is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanl,(__LONGDOUBLE __x),isnan,(__x))
+#elif defined(__CRT_HAVE___isnan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> isnanf(3), isnan(3), isnanl(3)
+ * Return nonzero if `value' is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanl,(__LONGDOUBLE __x),__isnan,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_isnan) || defined(__CRT_HAVE__isnan) || defined(__CRT_HAVE___isnan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/isnanl.h>
 /* >> isnanf(3), isnan(3), isnanl(3)
@@ -8631,6 +9715,12 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,j0l,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___j0l)
 /* >> j0f(3), j0(3), j0l(3) */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,j0l,(__LONGDOUBLE __x),__j0l,(__x))
+#elif defined(__CRT_HAVE_j0) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> j0f(3), j0(3), j0l(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,j0l,(__LONGDOUBLE __x),j0,(__x))
+#elif defined(__CRT_HAVE___j0) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> j0f(3), j0(3), j0l(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,j0l,(__LONGDOUBLE __x),__j0,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_j0) || defined(__CRT_HAVE__j0) || defined(__CRT_HAVE___j0) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/j0l.h>
 /* >> j0f(3), j0(3), j0l(3) */
@@ -8645,6 +9735,12 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,j1l,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___j1l)
 /* >> j1f(3), j1(3), j1l(3) */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,j1l,(__LONGDOUBLE __x),__j1l,(__x))
+#elif defined(__CRT_HAVE_j1) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> j1f(3), j1(3), j1l(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,j1l,(__LONGDOUBLE __x),j1,(__x))
+#elif defined(__CRT_HAVE___j1) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> j1f(3), j1(3), j1l(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,j1l,(__LONGDOUBLE __x),__j1,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_j1) || defined(__CRT_HAVE__j1) || defined(__CRT_HAVE___j1) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/j1l.h>
 /* >> j1f(3), j1(3), j1l(3) */
@@ -8659,6 +9755,12 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,jnl,(int __n, __LONGDOUBLE __x)
 #elif defined(__CRT_HAVE___jnl)
 /* >> jnf(3), jn(3), jnl(3) */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,jnl,(int __n, __LONGDOUBLE __x),__jnl,(__n,__x))
+#elif defined(__CRT_HAVE_jn) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> jnf(3), jn(3), jnl(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,jnl,(int __n, __LONGDOUBLE __x),jn,(__n,__x))
+#elif defined(__CRT_HAVE___jn) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> jnf(3), jn(3), jnl(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,jnl,(int __n, __LONGDOUBLE __x),__jn,(__n,__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_jn) || defined(__CRT_HAVE__jn) || defined(__CRT_HAVE___jn) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/jnl.h>
 /* >> jnf(3), jn(3), jnl(3) */
@@ -8673,6 +9775,12 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,y0l,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___y0l)
 /* >> y0f(3), y0(3), y0l(3) */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,y0l,(__LONGDOUBLE __x),__y0l,(__x))
+#elif defined(__CRT_HAVE_y0) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> y0f(3), y0(3), y0l(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,y0l,(__LONGDOUBLE __x),y0,(__x))
+#elif defined(__CRT_HAVE___y0) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> y0f(3), y0(3), y0l(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,y0l,(__LONGDOUBLE __x),__y0,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_y0) || defined(__CRT_HAVE__y0) || defined(__CRT_HAVE___y0) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/y0l.h>
 /* >> y0f(3), y0(3), y0l(3) */
@@ -8687,6 +9795,12 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,y1l,(__LONGDOUBLE __x),(__x))
 #elif defined(__CRT_HAVE___y1l)
 /* >> y1f(3), y1(3), y1l(3) */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,y1l,(__LONGDOUBLE __x),__y1l,(__x))
+#elif defined(__CRT_HAVE_y1) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> y1f(3), y1(3), y1l(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,y1l,(__LONGDOUBLE __x),y1,(__x))
+#elif defined(__CRT_HAVE___y1) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> y1f(3), y1(3), y1l(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,y1l,(__LONGDOUBLE __x),__y1,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_y1) || defined(__CRT_HAVE__y1) || defined(__CRT_HAVE___y1) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/y1l.h>
 /* >> y1f(3), y1(3), y1l(3) */
@@ -8701,6 +9815,12 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ynl,(int __n, __LONGDOUBLE __x)
 #elif defined(__CRT_HAVE___ynl)
 /* >> ynf(3), yn(3), ynl(3) */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ynl,(int __n, __LONGDOUBLE __x),__ynl,(__n,__x))
+#elif defined(__CRT_HAVE_yn) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ynf(3), yn(3), ynl(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ynl,(int __n, __LONGDOUBLE __x),yn,(__n,__x))
+#elif defined(__CRT_HAVE___yn) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ynf(3), yn(3), ynl(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,ynl,(int __n, __LONGDOUBLE __x),__yn,(__n,__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_yn) || defined(__CRT_HAVE__yn) || defined(__CRT_HAVE___yn) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/ynl.h>
 /* >> ynf(3), yn(3), ynl(3) */
@@ -8832,6 +9952,14 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,lgammal_r,(__
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant    version    of     `lgamma(3)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,lgammal_r,(__LONGDOUBLE __x, int *__signgamp),__lgammal_r,(__x,__signgamp))
+#elif defined(__CRT_HAVE_lgamma_r) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
+ * Reentrant    version    of     `lgamma(3)' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,lgammal_r,(__LONGDOUBLE __x, int *__signgamp),lgamma_r,(__x,__signgamp))
+#elif defined(__CRT_HAVE___lgamma_r) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
+ * Reentrant    version    of     `lgamma(3)' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,lgammal_r,(__LONGDOUBLE __x, int *__signgamp),__lgamma_r,(__x,__signgamp))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/lgammal_r.h>
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
@@ -8901,6 +10029,14 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbl,(__LONGDOUBLE __x, __LON
 /* >> scalbf(3), scalb(3), scalbl(3)
  * Return `x' times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbl,(__LONGDOUBLE __x, __LONGDOUBLE __fn),__scalbl,(__x,__fn))
+#elif defined(__CRT_HAVE_scalb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbf(3), scalb(3), scalbl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbl,(__LONGDOUBLE __x, __LONGDOUBLE __fn),scalb,(__x,__fn))
+#elif defined(__CRT_HAVE___scalb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbf(3), scalb(3), scalbl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,scalbl,(__LONGDOUBLE __x, __LONGDOUBLE __fn),__scalb,(__x,__fn))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE__scalb) || defined(__CRT_HAVE___scalb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/scalbl.h>
 /* >> scalbf(3), scalb(3), scalbl(3)
@@ -9286,6 +10422,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__acosl,(__LONGDOUBLE __x),aco
 /* >> acosf(3), acos(3), acosl(3)
  * Arc cosine of `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__acosl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_acos) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> acosf(3), acos(3), acosl(3)
+ * Arc cosine of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__acosl,(__LONGDOUBLE __x),acos,(__x))
+#elif defined(__CRT_HAVE___acos) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> acosf(3), acos(3), acosl(3)
+ * Arc cosine of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__acosl,(__LONGDOUBLE __x),__acos,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/acosl.h>
 /* >> acosf(3), acos(3), acosl(3)
@@ -9304,6 +10448,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__asinl,(__LONGDOUBLE __x),asi
 /* >> asinf(3), asin(3), asinl(3)
  * Arc sine of `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__asinl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_asin) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> asinf(3), asin(3), asinl(3)
+ * Arc sine of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__asinl,(__LONGDOUBLE __x),asin,(__x))
+#elif defined(__CRT_HAVE___asin) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> asinf(3), asin(3), asinl(3)
+ * Arc sine of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__asinl,(__LONGDOUBLE __x),__asin,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/asinl.h>
 /* >> asinf(3), asin(3), asinl(3)
@@ -9322,6 +10474,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atanl,(__LONGDOUBLE __x),ata
 /* >> atanf(3), atan(3), atanl(3)
  * Arc tangent of `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atanl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_atan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> atanf(3), atan(3), atanl(3)
+ * Arc tangent of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atanl,(__LONGDOUBLE __x),atan,(__x))
+#elif defined(__CRT_HAVE___atan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> atanf(3), atan(3), atanl(3)
+ * Arc tangent of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atanl,(__LONGDOUBLE __x),__atan,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/atanl.h>
 /* >> atanf(3), atan(3), atanl(3)
@@ -9340,6 +10500,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atan2l,(__LONGDOUBLE __y, __
 /* >> atan2f(3), atan2(3), atan2l(3)
  * Arc tangent of `y / x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atan2l,(__LONGDOUBLE __y, __LONGDOUBLE __x),(__y,__x))
+#elif defined(__CRT_HAVE_atan2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> atan2f(3), atan2(3), atan2l(3)
+ * Arc tangent of `y / x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atan2l,(__LONGDOUBLE __y, __LONGDOUBLE __x),atan2,(__y,__x))
+#elif defined(__CRT_HAVE___atan2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> atan2f(3), atan2(3), atan2l(3)
+ * Arc tangent of `y / x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atan2l,(__LONGDOUBLE __y, __LONGDOUBLE __x),__atan2,(__y,__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/atan2l.h>
 /* >> atan2f(3), atan2(3), atan2l(3)
@@ -9358,6 +10526,14 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,__cosl,(__LON
 /* >> cosf(3), cos(3), cosl(3)
  * Cosine of `x' */
 __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,__cosl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_cos) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> cosf(3), cos(3), cosl(3)
+ * Cosine of `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,__cosl,(__LONGDOUBLE __x),cos,(__x))
+#elif defined(__CRT_HAVE___cos) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> cosf(3), cos(3), cosl(3)
+ * Cosine of `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_cosl,__LONGDOUBLE,__NOTHROW,__cosl,(__LONGDOUBLE __x),__cos,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/cosl.h>
 /* >> cosf(3), cos(3), cosl(3)
@@ -9376,6 +10552,14 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,__sinl,(__LON
 /* >> sinf(3), sin(3), sinl(3)
  * Sine of `x' */
 __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,__sinl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_sin) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> sinf(3), sin(3), sinl(3)
+ * Sine of `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,__sinl,(__LONGDOUBLE __x),sin,(__x))
+#elif defined(__CRT_HAVE___sin) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> sinf(3), sin(3), sinl(3)
+ * Sine of `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_sinl,__LONGDOUBLE,__NOTHROW,__sinl,(__LONGDOUBLE __x),__sin,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/sinl.h>
 /* >> sinf(3), sin(3), sinl(3)
@@ -9394,6 +10578,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tanl,(__LONGDOUBLE __x),tanl
 /* >> tanf(3), tan(3), tanl(3)
  * Tangent of `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tanl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_tan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> tanf(3), tan(3), tanl(3)
+ * Tangent of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tanl,(__LONGDOUBLE __x),tan,(__x))
+#elif defined(__CRT_HAVE___tan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> tanf(3), tan(3), tanl(3)
+ * Tangent of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tanl,(__LONGDOUBLE __x),__tan,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/tanl.h>
 /* >> tanf(3), tan(3), tanl(3)
@@ -9412,6 +10604,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__coshl,(__LONGDOUBLE __x),cos
 /* >> coshf(3), cosh(3), coshl(3)
  * Hyperbolic   cosine   of   `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__coshl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_cosh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> coshf(3), cosh(3), coshl(3)
+ * Hyperbolic   cosine   of   `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__coshl,(__LONGDOUBLE __x),cosh,(__x))
+#elif defined(__CRT_HAVE___cosh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> coshf(3), cosh(3), coshl(3)
+ * Hyperbolic   cosine   of   `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__coshl,(__LONGDOUBLE __x),__cosh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/coshl.h>
 /* >> coshf(3), cosh(3), coshl(3)
@@ -9430,6 +10630,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__sinhl,(__LONGDOUBLE __x),sin
 /* >> sinhf(3), sinh(3), sinhl(3)
  * Hyperbolic sine of `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__sinhl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_sinh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> sinhf(3), sinh(3), sinhl(3)
+ * Hyperbolic sine of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__sinhl,(__LONGDOUBLE __x),sinh,(__x))
+#elif defined(__CRT_HAVE___sinh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> sinhf(3), sinh(3), sinhl(3)
+ * Hyperbolic sine of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__sinhl,(__LONGDOUBLE __x),__sinh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/sinhl.h>
 /* >> sinhf(3), sinh(3), sinhl(3)
@@ -9448,6 +10656,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tanhl,(__LONGDO
 /* >> tanhf(3), tanh(3), tanhl(3)
  * Hyperbolic   tangent   of  `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tanhl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_tanh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> tanhf(3), tanh(3), tanhl(3)
+ * Hyperbolic   tangent   of  `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tanhl,(__LONGDOUBLE __x),tanh,(__x))
+#elif defined(__CRT_HAVE___tanh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> tanhf(3), tanh(3), tanhl(3)
+ * Hyperbolic   tangent   of  `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tanhl,(__LONGDOUBLE __x),__tanh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/tanhl.h>
 /* >> tanhf(3), tanh(3), tanhl(3)
@@ -9643,6 +10859,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__acoshl,(__LONGDOUBLE __x),ac
 /* >> acoshf(3), acosh(3), acoshl(3)
  * Hyperbolic  arc  cosine  of   `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__acoshl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_acosh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> acoshf(3), acosh(3), acoshl(3)
+ * Hyperbolic  arc  cosine  of   `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__acoshl,(__LONGDOUBLE __x),acosh,(__x))
+#elif defined(__CRT_HAVE___acosh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> acoshf(3), acosh(3), acoshl(3)
+ * Hyperbolic  arc  cosine  of   `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__acoshl,(__LONGDOUBLE __x),__acosh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/acoshl.h>
 /* >> acoshf(3), acosh(3), acoshl(3)
@@ -9661,6 +10885,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__asinhl,(__LONGD
 /* >> asinhf(3), asinh(3), asinhl(3)
  * Hyperbolic  arc   sine   of   `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__asinhl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_asinh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> asinhf(3), asinh(3), asinhl(3)
+ * Hyperbolic  arc   sine   of   `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__asinhl,(__LONGDOUBLE __x),asinh,(__x))
+#elif defined(__CRT_HAVE___asinh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> asinhf(3), asinh(3), asinhl(3)
+ * Hyperbolic  arc   sine   of   `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__asinhl,(__LONGDOUBLE __x),__asinh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/asinhl.h>
 /* >> asinhf(3), asinh(3), asinhl(3)
@@ -9679,6 +10911,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atanhl,(__LONGDOUBLE __x),at
 /* >> atanhf(3), atanh(3), atanhl(3)
  * Hyperbolic  arc  tangent  of  `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atanhl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_atanh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> atanhf(3), atanh(3), atanhl(3)
+ * Hyperbolic  arc  tangent  of  `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atanhl,(__LONGDOUBLE __x),atanh,(__x))
+#elif defined(__CRT_HAVE___atanh) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> atanhf(3), atanh(3), atanhl(3)
+ * Hyperbolic  arc  tangent  of  `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__atanhl,(__LONGDOUBLE __x),__atanh,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/atanhl.h>
 /* >> atanhf(3), atanh(3), atanhl(3)
@@ -9916,6 +11156,14 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_expl,__LONGDOUBLE,__NOTHROW,__expl,(__LON
 /* >> expf(3), exp(3), expl(3)
  * Exponential function of `x' */
 __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_expl,__LONGDOUBLE,__NOTHROW,__expl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_exp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> expf(3), exp(3), expl(3)
+ * Exponential function of `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_expl,__LONGDOUBLE,__NOTHROW,__expl,(__LONGDOUBLE __x),exp,(__x))
+#elif defined(__CRT_HAVE___exp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> expf(3), exp(3), expl(3)
+ * Exponential function of `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_expl,__LONGDOUBLE,__NOTHROW,__expl,(__LONGDOUBLE __x),__exp,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/expl.h>
 /* >> expf(3), exp(3), expl(3)
@@ -9934,6 +11182,14 @@ __CREDIRECT(__ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,__frexpl,(__LONGDOUBLE __x,
 /* >> frexpf(3), frexp(3), frexpl(3)
  * Break `value' into a normalized fraction and an integral power of 2 */
 __CDECLARE(__ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,__frexpl,(__LONGDOUBLE __x, int *__pexponent),(__x,__pexponent))
+#elif defined(__CRT_HAVE_frexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> frexpf(3), frexp(3), frexpl(3)
+ * Break `value' into a normalized fraction and an integral power of 2 */
+__CREDIRECT(__ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,__frexpl,(__LONGDOUBLE __x, int *__pexponent),frexp,(__x,__pexponent))
+#elif defined(__CRT_HAVE___frexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> frexpf(3), frexp(3), frexpl(3)
+ * Break `value' into a normalized fraction and an integral power of 2 */
+__CREDIRECT(__ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,__frexpl,(__LONGDOUBLE __x, int *__pexponent),__frexp,(__x,__pexponent))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/frexpl.h>
 /* >> frexpf(3), frexp(3), frexpl(3)
@@ -9952,6 +11208,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__ldexpl,(__LONGDOUBLE __x, in
 /* >> ldexpf(3), ldexp(3), ldexpl(3)
  * `x' times (two to the `exponent' power) */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__ldexpl,(__LONGDOUBLE __x, int __exponent),(__x,__exponent))
+#elif defined(__CRT_HAVE_ldexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ldexpf(3), ldexp(3), ldexpl(3)
+ * `x' times (two to the `exponent' power) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__ldexpl,(__LONGDOUBLE __x, int __exponent),ldexp,(__x,__exponent))
+#elif defined(__CRT_HAVE___ldexp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ldexpf(3), ldexp(3), ldexpl(3)
+ * `x' times (two to the `exponent' power) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__ldexpl,(__LONGDOUBLE __x, int __exponent),__ldexp,(__x,__exponent))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/ldexpl.h>
 /* >> ldexpf(3), ldexp(3), ldexpl(3)
@@ -9970,6 +11234,14 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,__logl,(__LON
 /* >> logf(3), log(3), logl(3)
  * Natural  logarithm  of  `x' */
 __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,__logl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_log) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> logf(3), log(3), logl(3)
+ * Natural  logarithm  of  `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,__logl,(__LONGDOUBLE __x),log,(__x))
+#elif defined(__CRT_HAVE___log) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> logf(3), log(3), logl(3)
+ * Natural  logarithm  of  `x' */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_logl,__LONGDOUBLE,__NOTHROW,__logl,(__LONGDOUBLE __x),__log,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/logl.h>
 /* >> logf(3), log(3), logl(3)
@@ -9988,6 +11260,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__log10l,(__LONGDOUBLE __x),lo
 /* >> log10f(3), log10(3), log10l(3)
  * Base-ten    logarithm    of   `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__log10l,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_log10) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> log10f(3), log10(3), log10l(3)
+ * Base-ten    logarithm    of   `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__log10l,(__LONGDOUBLE __x),log10,(__x))
+#elif defined(__CRT_HAVE___log10) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> log10f(3), log10(3), log10l(3)
+ * Base-ten    logarithm    of   `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__log10l,(__LONGDOUBLE __x),__log10,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/log10l.h>
 /* >> log10f(3), log10(3), log10l(3)
@@ -10006,6 +11286,14 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,__modfl,(__L
 /* >> modff(3), modf(3), modfl(3)
  * Break `value' into integral and fractional parts */
 __CDECLARE(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,__modfl,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),(__x,__iptr))
+#elif defined(__CRT_HAVE_modf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> modff(3), modf(3), modfl(3)
+ * Break `value' into integral and fractional parts */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,__modfl,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),modf,(__x,__iptr))
+#elif defined(__CRT_HAVE___modf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> modff(3), modf(3), modfl(3)
+ * Break `value' into integral and fractional parts */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,__modfl,(__LONGDOUBLE __x, __LONGDOUBLE *__iptr),__modf,(__x,__iptr))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/modfl.h>
 /* >> modff(3), modf(3), modfl(3)
@@ -10118,6 +11406,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__pow10l,(__LONGDOUBLE __x),po
 /* >> pow10f(3), pow10(3), pow10l(3)
  * Another  name  occasionally  used */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__pow10l,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_pow10) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> pow10f(3), pow10(3), pow10l(3)
+ * Another  name  occasionally  used */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__pow10l,(__LONGDOUBLE __x),pow10,(__x))
+#elif defined(__CRT_HAVE___pow10) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> pow10f(3), pow10(3), pow10l(3)
+ * Another  name  occasionally  used */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__pow10l,(__LONGDOUBLE __x),__pow10,(__x))
 #elif defined(__CRT_HAVE_powl) || defined(__CRT_HAVE___powl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/pow10l.h>
 /* >> pow10f(3), pow10(3), pow10l(3)
@@ -10257,6 +11553,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__expm1l,(__LONGDOUBLE __x),ex
 /* >> expm1f(3), expm1(3), expm1l(3)
  * Return `exp(x) - 1' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__expm1l,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_expm1) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> expm1f(3), expm1(3), expm1l(3)
+ * Return `exp(x) - 1' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__expm1l,(__LONGDOUBLE __x),expm1,(__x))
+#elif defined(__CRT_HAVE___expm1) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> expm1f(3), expm1(3), expm1l(3)
+ * Return `exp(x) - 1' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__expm1l,(__LONGDOUBLE __x),__expm1,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/expm1l.h>
 /* >> expm1f(3), expm1(3), expm1l(3)
@@ -10275,6 +11579,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__log1pl,(__LONGDOUBLE __x),lo
 /* >> log1pf(3), log1p(3), log1pl(3)
  * Return `log(1 + x)' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__log1pl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_log1p) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> log1pf(3), log1p(3), log1pl(3)
+ * Return `log(1 + x)' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__log1pl,(__LONGDOUBLE __x),log1p,(__x))
+#elif defined(__CRT_HAVE___log1p) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> log1pf(3), log1p(3), log1pl(3)
+ * Return `log(1 + x)' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__log1pl,(__LONGDOUBLE __x),__log1p,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/log1pl.h>
 /* >> log1pf(3), log1p(3), log1pl(3)
@@ -10293,6 +11605,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__logbl,(__LONGDO
 /* >> logbf(3), logb(3), logbl(3)
  * Return the base 2 signed integral exponent of `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__logbl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_logb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> logbf(3), logb(3), logbl(3)
+ * Return the base 2 signed integral exponent of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__logbl,(__LONGDOUBLE __x),logb,(__x))
+#elif defined(__CRT_HAVE___logb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> logbf(3), logb(3), logbl(3)
+ * Return the base 2 signed integral exponent of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__logbl,(__LONGDOUBLE __x),__logb,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/logbl.h>
 /* >> logbf(3), logb(3), logbl(3)
@@ -10388,6 +11708,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__exp2l,(__LONGDOUBLE __x),exp
 /* >> exp2f(3), exp2(3), exp2l(3)
  * Compute base-2 exponential of `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__exp2l,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_exp2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> exp2f(3), exp2(3), exp2l(3)
+ * Compute base-2 exponential of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__exp2l,(__LONGDOUBLE __x),exp2,(__x))
+#elif defined(__CRT_HAVE___exp2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> exp2f(3), exp2(3), exp2l(3)
+ * Compute base-2 exponential of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__exp2l,(__LONGDOUBLE __x),__exp2,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/exp2l.h>
 /* >> exp2f(3), exp2(3), exp2l(3)
@@ -10406,6 +11734,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__log2l,(__LONGDOUBLE __x),log
 /* >> log2f(3), log2(3), log2l(3)
  * Compute base-2 logarithm of `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__log2l,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_log2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> log2f(3), log2(3), log2l(3)
+ * Compute base-2 logarithm of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__log2l,(__LONGDOUBLE __x),log2,(__x))
+#elif defined(__CRT_HAVE___log2) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> log2f(3), log2(3), log2l(3)
+ * Compute base-2 logarithm of `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__log2l,(__LONGDOUBLE __x),__log2,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/log2l.h>
 /* >> log2f(3), log2(3), log2l(3)
@@ -10499,6 +11835,14 @@ __CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,__powl,(__LON
 /* >> powf(3), pow(3), powl(3)
  * Return `x' to the `y' power */
 __CDECLARE(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,__powl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
+#elif defined(__CRT_HAVE_pow) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> powf(3), pow(3), powl(3)
+ * Return `x' to the `y' power */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,__powl,(__LONGDOUBLE __x, __LONGDOUBLE __y),pow,(__x,__y))
+#elif defined(__CRT_HAVE___pow) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> powf(3), pow(3), powl(3)
+ * Return `x' to the `y' power */
+__CREDIRECT(__ATTR_WUNUSED __DECL_SIMD_powl,__LONGDOUBLE,__NOTHROW,__powl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__pow,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/powl.h>
 /* >> powf(3), pow(3), powl(3)
@@ -10517,6 +11861,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__sqrtl,(__LONGDOUBLE __x),sqr
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
  * Return the square root of  `x' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__sqrtl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_sqrt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> sqrtf(3), sqrt(3), sqrtl(3)
+ * Return the square root of  `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__sqrtl,(__LONGDOUBLE __x),sqrt,(__x))
+#elif defined(__CRT_HAVE___sqrt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> sqrtf(3), sqrt(3), sqrtl(3)
+ * Return the square root of  `x' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__sqrtl,(__LONGDOUBLE __x),__sqrt,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/sqrtl.h>
 /* >> sqrtf(3), sqrt(3), sqrtl(3)
@@ -10583,6 +11935,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__hypotl,(__LONGDOUBLE __x, __
 /* >> hypotf(3), hypot(3), hypotl(3)
  * Return `sqrt(x*x + y*y)' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__hypotl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
+#elif defined(__CRT_HAVE_hypot) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> hypotf(3), hypot(3), hypotl(3)
+ * Return `sqrt(x*x + y*y)' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__hypotl,(__LONGDOUBLE __x, __LONGDOUBLE __y),hypot,(__x,__y))
+#elif defined(__CRT_HAVE___hypot) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> hypotf(3), hypot(3), hypotl(3)
+ * Return `sqrt(x*x + y*y)' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__hypotl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__hypot,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE__hypot) || defined(__CRT_HAVE___hypot) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/hypotl.h>
 /* >> hypotf(3), hypot(3), hypotl(3)
@@ -10642,6 +12002,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__cbrtl,(__LONGDO
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
  * Return  the  cube root  of `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__cbrtl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_cbrt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> cbrtf(3), cbrt(3), cbrtl(3)
+ * Return  the  cube root  of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__cbrtl,(__LONGDOUBLE __x),cbrt,(__x))
+#elif defined(__CRT_HAVE___cbrt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> cbrtf(3), cbrt(3), cbrtl(3)
+ * Return  the  cube root  of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__cbrtl,(__LONGDOUBLE __x),__cbrt,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/cbrtl.h>
 /* >> cbrtf(3), cbrt(3), cbrtl(3)
@@ -10887,6 +12255,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__ceill,(__LONGDO
 /* >> ceilf(3), ceil(3), ceill(3)
  * Smallest integral value not less than `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__ceill,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_ceil) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ceilf(3), ceil(3), ceill(3)
+ * Smallest integral value not less than `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__ceill,(__LONGDOUBLE __x),ceil,(__x))
+#elif defined(__CRT_HAVE___ceil) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ceilf(3), ceil(3), ceill(3)
+ * Smallest integral value not less than `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__ceill,(__LONGDOUBLE __x),__ceil,(__x))
 #else /* ... */
 #include <libc/local/math/ceill.h>
 /* >> ceilf(3), ceil(3), ceill(3)
@@ -10905,6 +12281,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fabsl,(__LONGDO
 /* >> fabsf(3), fabs(3), fabsl(3)
  * Absolute value of `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fabsl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_fabs) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fabsl,(__LONGDOUBLE __x),fabs,(__x))
+#elif defined(__CRT_HAVE___fabs) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fabsl,(__LONGDOUBLE __x),__fabs,(__x))
 #else /* ... */
 #include <libc/local/math/fabsl.h>
 /* >> fabsf(3), fabs(3), fabsl(3)
@@ -10923,6 +12307,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__floorl,(__LONGD
 /* >> floorf(3), floor(3), floorl(3)
  * Largest integer not greater than `x' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__floorl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_floor) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> floorf(3), floor(3), floorl(3)
+ * Largest integer not greater than `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__floorl,(__LONGDOUBLE __x),floor,(__x))
+#elif defined(__CRT_HAVE___floor) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> floorf(3), floor(3), floorl(3)
+ * Largest integer not greater than `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__floorl,(__LONGDOUBLE __x),__floor,(__x))
 #else /* ... */
 #include <libc/local/math/floorl.h>
 /* >> floorf(3), floor(3), floorl(3)
@@ -10941,6 +12333,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fmodl,(__LONGDOUBLE __x, __L
 /* >> fmodf(3), fmod(3), fmodl(3)
  * Floating-point modulo remainder of `x / y' */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fmodl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
+#elif defined(__CRT_HAVE_fmod) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fmodf(3), fmod(3), fmodl(3)
+ * Floating-point modulo remainder of `x / y' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fmodl,(__LONGDOUBLE __x, __LONGDOUBLE __y),fmod,(__x,__y))
+#elif defined(__CRT_HAVE___fmod) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fmodf(3), fmod(3), fmodl(3)
+ * Floating-point modulo remainder of `x / y' */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fmodl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmod,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/fmodl.h>
 /* >> fmodf(3), fmod(3), fmodl(3)
@@ -10959,6 +12359,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinfl,(__LONGDOUBLE __x
 /* >> isinff(3), isinf(3), isinfl(3)
  * Return 0 if `value' is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinfl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_isinf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> isinff(3), isinf(3), isinfl(3)
+ * Return 0 if `value' is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinfl,(__LONGDOUBLE __x),isinf,(__x))
+#elif defined(__CRT_HAVE___isinf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> isinff(3), isinf(3), isinfl(3)
+ * Return 0 if `value' is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinfl,(__LONGDOUBLE __x),__isinf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__INFINITYL) || defined(__HUGE_VALL) || defined(__CRT_HAVE_isinf) || defined(__CRT_HAVE___isinf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__INFINITY) || defined(__HUGE_VAL)
 #include <libc/local/math/isinfl.h>
 /* >> isinff(3), isinf(3), isinfl(3)
@@ -10977,6 +12385,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitel,(__LONGDOUBLE __
 /* >> finitef(3), finite(3), finitel(3)
  * Return nonzero if `value' is finite and not NaN */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitel,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_finite) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> finitef(3), finite(3), finitel(3)
+ * Return nonzero if `value' is finite and not NaN */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitel,(__LONGDOUBLE __x),finite,(__x))
+#elif defined(__CRT_HAVE___finite) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> finitef(3), finite(3), finitel(3)
+ * Return nonzero if `value' is finite and not NaN */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitel,(__LONGDOUBLE __x),__finite,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || ((defined(__CRT_HAVE_isinfl) || defined(__CRT_HAVE___isinfl) || defined(__INFINITYL) || defined(__HUGE_VALL) || defined(__CRT_HAVE_isinf) || defined(__CRT_HAVE___isinf) || defined(__INFINITY) || defined(__HUGE_VAL)) && (defined(__CRT_HAVE_isnanl) || defined(__CRT_HAVE___isnanl) || defined(__CRT_HAVE_isnan) || defined(__CRT_HAVE__isnan) || defined(__CRT_HAVE___isnan))) || defined(__CRT_HAVE_finite) || defined(__CRT_HAVE___finite) || defined(__CRT_HAVE__finite) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || ((defined(__CRT_HAVE_isinf) || defined(__CRT_HAVE___isinf) || defined(__INFINITY) || defined(__HUGE_VAL)) && (defined(__CRT_HAVE_isnan) || defined(__CRT_HAVE__isnan) || defined(__CRT_HAVE___isnan)))
 #include <libc/local/math/finitel.h>
 /* >> finitef(3), finite(3), finitel(3)
@@ -11106,6 +12522,22 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__dreml,(__LONGDOUBLE __x, __L
 /* >> remainderf(3), remainder(3), remainderl(3)
  * Return the remainder of integer division `x / p' with infinite precision */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__dreml,(__LONGDOUBLE __x, __LONGDOUBLE __p),(__x,__p))
+#elif defined(__CRT_HAVE_remainder) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remainderf(3), remainder(3), remainderl(3)
+ * Return the remainder of integer division `x / p' with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__dreml,(__LONGDOUBLE __x, __LONGDOUBLE __p),remainder,(__x,__p))
+#elif defined(__CRT_HAVE_drem) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remainderf(3), remainder(3), remainderl(3)
+ * Return the remainder of integer division `x / p' with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__dreml,(__LONGDOUBLE __x, __LONGDOUBLE __p),drem,(__x,__p))
+#elif defined(__CRT_HAVE___remainder) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remainderf(3), remainder(3), remainderl(3)
+ * Return the remainder of integer division `x / p' with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__dreml,(__LONGDOUBLE __x, __LONGDOUBLE __p),__remainder,(__x,__p))
+#elif defined(__CRT_HAVE___drem) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remainderf(3), remainder(3), remainderl(3)
+ * Return the remainder of integer division `x / p' with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__dreml,(__LONGDOUBLE __x, __LONGDOUBLE __p),__drem,(__x,__p))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE___drem) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/remainderl.h>
 /* >> remainderf(3), remainder(3), remainderl(3)
@@ -11124,6 +12556,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__significandl,(_
 /* >> significandf(3), significand(3), significandl(3)
  * Return the fractional part of `x' after dividing out `ilogb(x)' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__significandl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_significand) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> significandf(3), significand(3), significandl(3)
+ * Return the fractional part of `x' after dividing out `ilogb(x)' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__significandl,(__LONGDOUBLE __x),significand,(__x))
+#elif defined(__CRT_HAVE___significand) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> significandf(3), significand(3), significandl(3)
+ * Return the fractional part of `x' after dividing out `ilogb(x)' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__significandl,(__LONGDOUBLE __x),__significand,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/significandl.h>
 /* >> significandf(3), significand(3), significandl(3)
@@ -11227,6 +12667,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__copysignl,(__LO
 /* >> copysignf(3), copysign(3), copysignl(3)
  * Return `x' with its signed changed to `y's */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__copysignl,(__LONGDOUBLE __num, __LONGDOUBLE __sign),(__num,__sign))
+#elif defined(__CRT_HAVE_copysign) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> copysignf(3), copysign(3), copysignl(3)
+ * Return `x' with its signed changed to `y's */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__copysignl,(__LONGDOUBLE __num, __LONGDOUBLE __sign),copysign,(__num,__sign))
+#elif defined(__CRT_HAVE___copysign) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> copysignf(3), copysign(3), copysignl(3)
+ * Return `x' with its signed changed to `y's */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__copysignl,(__LONGDOUBLE __num, __LONGDOUBLE __sign),__copysign,(__num,__sign))
 #else /* ... */
 #include <libc/local/math/copysignl.h>
 /* >> copysignf(3), copysign(3), copysignl(3)
@@ -11245,6 +12693,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nanl,(char cons
 /* >> nanf(3), nan(3), nanl(3)
  * Return representation of qNaN for double type */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nanl,(char const *__tagb),(__tagb))
+#elif defined(__CRT_HAVE_nan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nanf(3), nan(3), nanl(3)
+ * Return representation of qNaN for double type */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nanl,(char const *__tagb),nan,(__tagb))
+#elif defined(__CRT_HAVE___nan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nanf(3), nan(3), nanl(3)
+ * Return representation of qNaN for double type */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nanl,(char const *__tagb),__nan,(__tagb))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nan) || defined(__CRT_HAVE___nan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/nanl.h>
 /* >> nanf(3), nan(3), nanl(3)
@@ -11311,6 +12767,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanl,(__LONGDOUBLE __x
 /* >> isnanf(3), isnan(3), isnanl(3)
  * Return nonzero if `value' is not a number */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_isnan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> isnanf(3), isnan(3), isnanl(3)
+ * Return nonzero if `value' is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanl,(__LONGDOUBLE __x),isnan,(__x))
+#elif defined(__CRT_HAVE___isnan) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> isnanf(3), isnan(3), isnanl(3)
+ * Return nonzero if `value' is not a number */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanl,(__LONGDOUBLE __x),__isnan,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_isnan) || defined(__CRT_HAVE__isnan) || defined(__CRT_HAVE___isnan) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/isnanl.h>
 /* >> isnanf(3), isnan(3), isnanl(3)
@@ -11519,6 +12983,12 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__j0l,(__LONGDOUBLE __x),j0l,(
 #elif defined(__CRT_HAVE___j0l)
 /* >> j0f(3), j0(3), j0l(3) */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__j0l,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_j0) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> j0f(3), j0(3), j0l(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__j0l,(__LONGDOUBLE __x),j0,(__x))
+#elif defined(__CRT_HAVE___j0) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> j0f(3), j0(3), j0l(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__j0l,(__LONGDOUBLE __x),__j0,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_j0) || defined(__CRT_HAVE__j0) || defined(__CRT_HAVE___j0) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/j0l.h>
 /* >> j0f(3), j0(3), j0l(3) */
@@ -11533,6 +13003,12 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__j1l,(__LONGDOUBLE __x),j1l,(
 #elif defined(__CRT_HAVE___j1l)
 /* >> j1f(3), j1(3), j1l(3) */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__j1l,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_j1) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> j1f(3), j1(3), j1l(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__j1l,(__LONGDOUBLE __x),j1,(__x))
+#elif defined(__CRT_HAVE___j1) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> j1f(3), j1(3), j1l(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__j1l,(__LONGDOUBLE __x),__j1,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_j1) || defined(__CRT_HAVE__j1) || defined(__CRT_HAVE___j1) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/j1l.h>
 /* >> j1f(3), j1(3), j1l(3) */
@@ -11547,6 +13023,12 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__jnl,(int __n, __LONGDOUBLE _
 #elif defined(__CRT_HAVE___jnl)
 /* >> jnf(3), jn(3), jnl(3) */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__jnl,(int __n, __LONGDOUBLE __x),(__n,__x))
+#elif defined(__CRT_HAVE_jn) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> jnf(3), jn(3), jnl(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__jnl,(int __n, __LONGDOUBLE __x),jn,(__n,__x))
+#elif defined(__CRT_HAVE___jn) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> jnf(3), jn(3), jnl(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__jnl,(int __n, __LONGDOUBLE __x),__jn,(__n,__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_jn) || defined(__CRT_HAVE__jn) || defined(__CRT_HAVE___jn) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/jnl.h>
 /* >> jnf(3), jn(3), jnl(3) */
@@ -11561,6 +13043,12 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__y0l,(__LONGDOUBLE __x),y0l,(
 #elif defined(__CRT_HAVE___y0l)
 /* >> y0f(3), y0(3), y0l(3) */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__y0l,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_y0) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> y0f(3), y0(3), y0l(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__y0l,(__LONGDOUBLE __x),y0,(__x))
+#elif defined(__CRT_HAVE___y0) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> y0f(3), y0(3), y0l(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__y0l,(__LONGDOUBLE __x),__y0,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_y0) || defined(__CRT_HAVE__y0) || defined(__CRT_HAVE___y0) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/y0l.h>
 /* >> y0f(3), y0(3), y0l(3) */
@@ -11575,6 +13063,12 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__y1l,(__LONGDOUBLE __x),y1l,(
 #elif defined(__CRT_HAVE___y1l)
 /* >> y1f(3), y1(3), y1l(3) */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__y1l,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_y1) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> y1f(3), y1(3), y1l(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__y1l,(__LONGDOUBLE __x),y1,(__x))
+#elif defined(__CRT_HAVE___y1) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> y1f(3), y1(3), y1l(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__y1l,(__LONGDOUBLE __x),__y1,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_y1) || defined(__CRT_HAVE__y1) || defined(__CRT_HAVE___y1) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/y1l.h>
 /* >> y1f(3), y1(3), y1l(3) */
@@ -11589,6 +13083,12 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__ynl,(int __n, __LONGDOUBLE _
 #elif defined(__CRT_HAVE___ynl)
 /* >> ynf(3), yn(3), ynl(3) */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__ynl,(int __n, __LONGDOUBLE __x),(__n,__x))
+#elif defined(__CRT_HAVE_yn) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ynf(3), yn(3), ynl(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__ynl,(int __n, __LONGDOUBLE __x),yn,(__n,__x))
+#elif defined(__CRT_HAVE___yn) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ynf(3), yn(3), ynl(3) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__ynl,(int __n, __LONGDOUBLE __x),__yn,(__n,__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_yn) || defined(__CRT_HAVE__yn) || defined(__CRT_HAVE___yn) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/ynl.h>
 /* >> ynf(3), yn(3), ynl(3) */
@@ -11710,6 +13210,12 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__erfl,(__LONGDOU
 #elif defined(__CRT_HAVE___erfl)
 /* >> erff(3), erf(3), erfl(3) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__erfl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_erf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> erff(3), erf(3), erfl(3) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__erfl,(__LONGDOUBLE __x),erf,(__x))
+#elif defined(__CRT_HAVE___erf) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> erff(3), erf(3), erfl(3) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__erfl,(__LONGDOUBLE __x),__erf,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/erfl.h>
 /* >> erff(3), erf(3), erfl(3) */
@@ -11724,6 +13230,12 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__erfcl,(__LONGDO
 #elif defined(__CRT_HAVE___erfcl)
 /* >> erfcf(3), erfc(3), erfcl(3) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__erfcl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_erfc) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> erfcf(3), erfc(3), erfcl(3) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__erfcl,(__LONGDOUBLE __x),erfc,(__x))
+#elif defined(__CRT_HAVE___erfc) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> erfcf(3), erfc(3), erfcl(3) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__erfcl,(__LONGDOUBLE __x),__erfc,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/erfcl.h>
 /* >> erfcf(3), erfc(3), erfcl(3) */
@@ -11805,6 +13317,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tgammal,(__LONGDOUBLE __x),t
 /* >> tgammaf(3), tgamma(3), tgammal(3)
  * True gamma function */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tgammal,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_tgamma) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> tgammaf(3), tgamma(3), tgammal(3)
+ * True gamma function */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tgammal,(__LONGDOUBLE __x),tgamma,(__x))
+#elif defined(__CRT_HAVE___tgamma) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> tgammaf(3), tgamma(3), tgammal(3)
+ * True gamma function */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__tgammal,(__LONGDOUBLE __x),__tgamma,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/tgammal.h>
 /* >> tgammaf(3), tgamma(3), tgammal(3)
@@ -11937,6 +13457,14 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,__lgammal_r,
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
  * Reentrant    version    of     `lgamma(3)' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,__lgammal_r,(__LONGDOUBLE __x, int *__signgamp),(__x,__signgamp))
+#elif defined(__CRT_HAVE_lgamma_r) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
+ * Reentrant    version    of     `lgamma(3)' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,__lgammal_r,(__LONGDOUBLE __x, int *__signgamp),lgamma_r,(__x,__signgamp))
+#elif defined(__CRT_HAVE___lgamma_r) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
+ * Reentrant    version    of     `lgamma(3)' */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(2),__LONGDOUBLE,__NOTHROW_NCX,__lgammal_r,(__LONGDOUBLE __x, int *__signgamp),__lgamma_r,(__x,__signgamp))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/lgammal_r.h>
 /* >> lgammaf_r(3), lgamma_r(3), lgammal_r(3)
@@ -12204,6 +13732,22 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__rintl,(__LONGDOU
 /* >> rintf(3), rint(3), rintl(3)
  * Return the integer nearest `x' in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__rintl,(__LONGDOUBLE __x),__nearbyintl,(__x))
+#elif defined(__CRT_HAVE_rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> rintf(3), rint(3), rintl(3)
+ * Return the integer nearest `x' in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__rintl,(__LONGDOUBLE __x),rint,(__x))
+#elif defined(__CRT_HAVE_nearbyint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> rintf(3), rint(3), rintl(3)
+ * Return the integer nearest `x' in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__rintl,(__LONGDOUBLE __x),nearbyint,(__x))
+#elif defined(__CRT_HAVE___rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> rintf(3), rint(3), rintl(3)
+ * Return the integer nearest `x' in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__rintl,(__LONGDOUBLE __x),__rint,(__x))
+#elif defined(__CRT_HAVE___nearbyint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> rintf(3), rint(3), rintl(3)
+ * Return the integer nearest `x' in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__rintl,(__LONGDOUBLE __x),__nearbyint,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___rint) || defined(__CRT_HAVE___nearbyint) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/rintl.h>
 /* >> rintf(3), rint(3), rintl(3)
@@ -12234,6 +13778,22 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nextafterl,(__LO
 /* >> nextafterf(3), nextafter(3), nextafterl(3)
  * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttowardl,(__x,__y))
+#elif defined(__CRT_HAVE_nextafter) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),nextafter,(__x,__y))
+#elif defined(__CRT_HAVE_nexttoward) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),nexttoward,(__x,__y))
+#elif defined(__CRT_HAVE___nextafter) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nextafter,(__x,__y))
+#elif defined(__CRT_HAVE___nexttoward) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nextafterl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttoward,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter) || defined(__CRT_HAVE___nexttoward) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/nextafterl.h>
 /* >> nextafterf(3), nextafter(3), nextafterl(3)
@@ -12264,6 +13824,22 @@ __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__remainderl,(__LONGDOUBLE __x,
 /* >> remainderf(3), remainder(3), remainderl(3)
  * Return the remainder of integer division `x / p' with infinite precision */
 __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __p),__dreml,(__x,__p))
+#elif defined(__CRT_HAVE_remainder) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remainderf(3), remainder(3), remainderl(3)
+ * Return the remainder of integer division `x / p' with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __p),remainder,(__x,__p))
+#elif defined(__CRT_HAVE_drem) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remainderf(3), remainder(3), remainderl(3)
+ * Return the remainder of integer division `x / p' with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __p),drem,(__x,__p))
+#elif defined(__CRT_HAVE___remainder) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remainderf(3), remainder(3), remainderl(3)
+ * Return the remainder of integer division `x / p' with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __p),__remainder,(__x,__p))
+#elif defined(__CRT_HAVE___drem) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remainderf(3), remainder(3), remainderl(3)
+ * Return the remainder of integer division `x / p' with infinite precision */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__remainderl,(__LONGDOUBLE __x, __LONGDOUBLE __p),__drem,(__x,__p))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___remainder) || defined(__CRT_HAVE___drem) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/remainderl.h>
 /* >> remainderf(3), remainder(3), remainderl(3)
@@ -12278,6 +13854,10 @@ __CEIREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__ilogbl,(__LONGDOUBLE __x),ilogbl,{ 
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__ilogbl,(__LONGDOUBLE __x),ilogbl,(__x))
+#elif defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ilogbf(3), ilogb(3), ilogbl(3)
+ * Return the binary exponent of `x', which must be nonzero */
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__ilogbl,(__LONGDOUBLE __x),llogb,(__x))
 #elif defined(__CRT_HAVE_llogbl) && __SIZEOF_INT__ == __SIZEOF_LONG__
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
@@ -12286,6 +13866,14 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__ilogbl,(__LONGDOUBLE __x),llogbl,(__x
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
  * Return the binary exponent of `x', which must be nonzero */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW,__ilogbl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_ilogb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ilogbf(3), ilogb(3), ilogbl(3)
+ * Return the binary exponent of `x', which must be nonzero */
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__ilogbl,(__LONGDOUBLE __x),ilogb,(__x))
+#elif defined(__CRT_HAVE___ilogb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> ilogbf(3), ilogb(3), ilogbl(3)
+ * Return the binary exponent of `x', which must be nonzero */
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__ilogbl,(__LONGDOUBLE __x),__ilogb,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_ilogb) || (defined(__CRT_HAVE_llogb) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
 #include <libc/local/math/ilogbl.h>
 /* >> ilogbf(3), ilogb(3), ilogbl(3)
@@ -12983,6 +14571,22 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nexttowardl,(__
 /* >> nextafterf(3), nextafter(3), nextafterl(3)
  * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nexttowardl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
+#elif defined(__CRT_HAVE_nextafter) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nexttowardl,(__LONGDOUBLE __x, __LONGDOUBLE __y),nextafter,(__x,__y))
+#elif defined(__CRT_HAVE_nexttoward) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nexttowardl,(__LONGDOUBLE __x, __LONGDOUBLE __y),nexttoward,(__x,__y))
+#elif defined(__CRT_HAVE___nextafter) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nexttowardl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nextafter,(__x,__y))
+#elif defined(__CRT_HAVE___nexttoward) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextafterf(3), nextafter(3), nextafterl(3)
+ * Return `x + epsilon' if `x < y', and `x - epsilon' if `x > y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nexttowardl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__nexttoward,(__x,__y))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter) || defined(__CRT_HAVE___nexttoward) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/nextafterl.h>
 /* >> nextafterf(3), nextafter(3), nextafterl(3)
@@ -13001,6 +14605,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbnl,(__LONG
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbnl,(__LONGDOUBLE __x, int __n),(__x,__n))
+#elif defined(__CRT_HAVE_scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbnl,(__LONGDOUBLE __x, int __n),scalbln,(__x,__n))
+#elif defined(__CRT_HAVE___scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbnl,(__LONGDOUBLE __x, int __n),__scalbln,(__x,__n))
 #elif defined(__CRT_HAVE_scalblnl) && __SIZEOF_INT__ == __SIZEOF_LONG__
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
@@ -13009,6 +14621,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbnl,(__LONG
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbnl,(__LONGDOUBLE __x, int __n),__scalblnl,(__x,__n))
+#elif defined(__CRT_HAVE_scalbn) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbnl,(__LONGDOUBLE __x, int __n),scalbn,(__x,__n))
+#elif defined(__CRT_HAVE___scalbn) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbnl,(__LONGDOUBLE __x, int __n),__scalbn,(__x,__n))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn) || (defined(__CRT_HAVE_scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE___scalbln) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/scalbnl.h>
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
@@ -13027,14 +14647,30 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalblnl,(__LON
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalblnl,(__LONGDOUBLE __x, long int __n),(__x,__n))
+#elif defined(__CRT_HAVE_scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalblnl,(__LONGDOUBLE __x, long int __n),scalbn,(__x,__n))
 #elif defined(__CRT_HAVE_scalbnl) && __SIZEOF_INT__ == __SIZEOF_LONG__
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalblnl,(__LONGDOUBLE __x, long int __n),scalbnl,(__x,__n))
+#elif defined(__CRT_HAVE___scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalblnl,(__LONGDOUBLE __x, long int __n),__scalbn,(__x,__n))
 #elif defined(__CRT_HAVE___scalbnl) && __SIZEOF_INT__ == __SIZEOF_LONG__
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalblnl,(__LONGDOUBLE __x, long int __n),__scalbnl,(__x,__n))
+#elif defined(__CRT_HAVE_scalbln) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalblnl,(__LONGDOUBLE __x, long int __n),scalbln,(__x,__n))
+#elif defined(__CRT_HAVE___scalbln) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalblnl,(__LONGDOUBLE __x, long int __n),__scalbln,(__x,__n))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln) || (defined(__CRT_HAVE_scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE___scalbn) && __SIZEOF_INT__ == __SIZEOF_LONG__) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/scalblnl.h>
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
@@ -13065,6 +14701,22 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nearbyintl,(__L
 /* >> rintf(3), rint(3), rintl(3)
  * Return the integer nearest `x' in the direction of the prevailing rounding mode */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nearbyintl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> rintf(3), rint(3), rintl(3)
+ * Return the integer nearest `x' in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nearbyintl,(__LONGDOUBLE __x),rint,(__x))
+#elif defined(__CRT_HAVE_nearbyint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> rintf(3), rint(3), rintl(3)
+ * Return the integer nearest `x' in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nearbyintl,(__LONGDOUBLE __x),nearbyint,(__x))
+#elif defined(__CRT_HAVE___rint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> rintf(3), rint(3), rintl(3)
+ * Return the integer nearest `x' in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nearbyintl,(__LONGDOUBLE __x),__rint,(__x))
+#elif defined(__CRT_HAVE___nearbyint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> rintf(3), rint(3), rintl(3)
+ * Return the integer nearest `x' in the direction of the prevailing rounding mode */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__nearbyintl,(__LONGDOUBLE __x),__nearbyint,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___rint) || defined(__CRT_HAVE___nearbyint) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/rintl.h>
 /* >> rintf(3), rint(3), rintl(3)
@@ -13083,6 +14735,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__roundl,(__LONGD
 /* >> roundf(3), round(3), roundl(3)
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__roundl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_round) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> roundf(3), round(3), roundl(3)
+ * Round `x' to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__roundl,(__LONGDOUBLE __x),round,(__x))
+#elif defined(__CRT_HAVE___round) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> roundf(3), round(3), roundl(3)
+ * Round `x' to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__roundl,(__LONGDOUBLE __x),__round,(__x))
 #else /* ... */
 #include <libc/local/math/roundl.h>
 /* >> roundf(3), round(3), roundl(3)
@@ -13104,6 +14764,16 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__truncl,(__LONGD
  * Round `x' to the integral value in floating-point
  * format   nearest  but  not  larger  in  magnitude */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__truncl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_trunc) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> truncf(3), trunc(3), truncl(3)
+ * Round `x' to the integral value in floating-point
+ * format   nearest  but  not  larger  in  magnitude */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__truncl,(__LONGDOUBLE __x),trunc,(__x))
+#elif defined(__CRT_HAVE___trunc) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> truncf(3), trunc(3), truncl(3)
+ * Round `x' to the integral value in floating-point
+ * format   nearest  but  not  larger  in  magnitude */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__truncl,(__LONGDOUBLE __x),__trunc,(__x))
 #else /* ... */
 #include <libc/local/math/truncl.h>
 /* >> truncf(3), trunc(3), truncl(3)
@@ -13129,6 +14799,18 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(3),__LONGDOUBLE,__NOTHROW,__remquol,(__LON
  * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
  * of the integral quotient x/p, with n >= 3 */
 __CDECLARE(__ATTR_WUNUSED __ATTR_OUT(3),__LONGDOUBLE,__NOTHROW,__remquol,(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo),(__x,__p,__pquo))
+#elif defined(__CRT_HAVE_remquo) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remquof(3), remquo(3), remquol(3)
+ * Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(3),__LONGDOUBLE,__NOTHROW,__remquol,(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo),remquo,(__x,__p,__pquo))
+#elif defined(__CRT_HAVE___remquo) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> remquof(3), remquo(3), remquol(3)
+ * Compute remainder of `x' and `p' and put in `*pquo' a value with
+ * sign of x/p and magnitude  congruent `mod 2^n' to the  magnitude
+ * of the integral quotient x/p, with n >= 3 */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(3),__LONGDOUBLE,__NOTHROW,__remquol,(__LONGDOUBLE __x, __LONGDOUBLE __p, int *__pquo),__remquo,(__x,__p,__pquo))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/remquol.h>
 /* >> remquof(3), remquo(3), remquol(3)
@@ -13149,6 +14831,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lrintl,(__LONGDOUBL
 /* >> lrintf(3), lrint(3), lrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lrintl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_llrint) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> lrintf(3), lrint(3), lrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lrintl,(__LONGDOUBLE __x),llrint,(__x))
+#elif defined(__CRT_HAVE___llrint) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> lrintf(3), lrint(3), lrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lrintl,(__LONGDOUBLE __x),__llrint,(__x))
 #elif defined(__CRT_HAVE_llrintl) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 /* >> lrintf(3), lrint(3), lrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
@@ -13157,6 +14847,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lrintl,(__LONGDOUBL
 /* >> lrintf(3), lrint(3), lrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lrintl,(__LONGDOUBLE __x),__llrintl,(__x))
+#elif defined(__CRT_HAVE_remquo) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> lrintf(3), lrint(3), lrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lrintl,(__LONGDOUBLE __x),remquo,(__x))
+#elif defined(__CRT_HAVE___lrint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> lrintf(3), lrint(3), lrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lrintl,(__LONGDOUBLE __x),__lrint,(__x))
 #else /* ... */
 #include <libc/local/math/lrintl.h>
 /* >> lrintf(3), lrint(3), lrintl(3)
@@ -13201,6 +14899,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fdiml,(__LONGDO
 /* >> fdimf(3), fdim(3), fdiml(3)
  * Return positive difference between `x' and `y' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fdiml,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
+#elif defined(__CRT_HAVE_fdim) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fdimf(3), fdim(3), fdiml(3)
+ * Return positive difference between `x' and `y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fdiml,(__LONGDOUBLE __x, __LONGDOUBLE __y),fdim,(__x,__y))
+#elif defined(__CRT_HAVE___fdim) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fdimf(3), fdim(3), fdiml(3)
+ * Return positive difference between `x' and `y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fdiml,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fdim,(__x,__y))
 #else /* ... */
 #include <libc/local/math/fdiml.h>
 /* >> fdimf(3), fdim(3), fdiml(3)
@@ -13219,6 +14925,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fmaxl,(__LONGDO
 /* >> fmaxf(3), fmax(3), fmaxl(3)
  * Return maximum numeric value from `x' and `y' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fmaxl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
+#elif defined(__CRT_HAVE_fmax) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fmaxf(3), fmax(3), fmaxl(3)
+ * Return maximum numeric value from `x' and `y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fmaxl,(__LONGDOUBLE __x, __LONGDOUBLE __y),fmax,(__x,__y))
+#elif defined(__CRT_HAVE___fmax) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fmaxf(3), fmax(3), fmaxl(3)
+ * Return maximum numeric value from `x' and `y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fmaxl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmax,(__x,__y))
 #else /* ... */
 #include <libc/local/math/fmaxl.h>
 /* >> fmaxf(3), fmax(3), fmaxl(3)
@@ -13237,6 +14951,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fminl,(__LONGDO
 /* >> fminf(3), fmin(3), fminl(3)
  * Return minimum numeric value from `x' and `y' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fminl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
+#elif defined(__CRT_HAVE_fmin) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fminf(3), fmin(3), fminl(3)
+ * Return minimum numeric value from `x' and `y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fminl,(__LONGDOUBLE __x, __LONGDOUBLE __y),fmin,(__x,__y))
+#elif defined(__CRT_HAVE___fmin) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fminf(3), fmin(3), fminl(3)
+ * Return minimum numeric value from `x' and `y' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fminl,(__LONGDOUBLE __x, __LONGDOUBLE __y),__fmin,(__x,__y))
 #else /* ... */
 #include <libc/local/math/fminl.h>
 /* >> fminf(3), fmin(3), fminl(3)
@@ -13255,6 +14977,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fmal,(__LONGDOU
 /* >> fmaf(3), fma(3), fmal(3)
  * Multiply-add function computed as a ternary operation */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fmal,(__LONGDOUBLE __x, __LONGDOUBLE __y, __LONGDOUBLE __z),(__x,__y,__z))
+#elif defined(__CRT_HAVE_fma) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fmaf(3), fma(3), fmal(3)
+ * Multiply-add function computed as a ternary operation */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fmal,(__LONGDOUBLE __x, __LONGDOUBLE __y, __LONGDOUBLE __z),fma,(__x,__y,__z))
+#elif defined(__CRT_HAVE___fma) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fmaf(3), fma(3), fmal(3)
+ * Multiply-add function computed as a ternary operation */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__fmal,(__LONGDOUBLE __x, __LONGDOUBLE __y, __LONGDOUBLE __z),__fma,(__x,__y,__z))
 #else /* ... */
 #include <libc/local/math/fmal.h>
 /* >> fmaf(3), fma(3), fmal(3)
@@ -13274,14 +15004,30 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llrintl,(__LONGDO
 /* >> llrintf(3), llrint(3), llrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llrintl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_lrint) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llrintf(3), llrint(3), llrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llrintl,(__LONGDOUBLE __x),lrint,(__x))
 #elif defined(__CRT_HAVE_lrintl) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 /* >> llrintf(3), llrint(3), llrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llrintl,(__LONGDOUBLE __x),lrintl,(__x))
+#elif defined(__CRT_HAVE___lrint) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llrintf(3), llrint(3), llrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llrintl,(__LONGDOUBLE __x),__lrint,(__x))
 #elif defined(__CRT_HAVE___lrintl) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 /* >> llrintf(3), llrint(3), llrintl(3)
  * Round `x' to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llrintl,(__LONGDOUBLE __x),__lrintl,(__x))
+#elif defined(__CRT_HAVE_llrint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llrintf(3), llrint(3), llrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llrintl,(__LONGDOUBLE __x),llrint,(__x))
+#elif defined(__CRT_HAVE___llrint) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llrintf(3), llrint(3), llrintl(3)
+ * Round `x' to nearest integral value according to current rounding direction */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llrintl,(__LONGDOUBLE __x),__llrint,(__x))
 #else /* ... */
 #include <libc/local/math/llrintl.h>
 /* >> llrintf(3), llrint(3), llrintl(3)
@@ -13300,14 +15046,30 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llroundl,(__LONGD
 /* >> llroundf(3), llround(3), llroundl(3)
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llroundl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_lround) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llroundf(3), llround(3), llroundl(3)
+ * Round `x' to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llroundl,(__LONGDOUBLE __x),lround,(__x))
 #elif defined(__CRT_HAVE_lroundl) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 /* >> llroundf(3), llround(3), llroundl(3)
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llroundl,(__LONGDOUBLE __x),lroundl,(__x))
+#elif defined(__CRT_HAVE___lround) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llroundf(3), llround(3), llroundl(3)
+ * Round `x' to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llroundl,(__LONGDOUBLE __x),__lround,(__x))
 #elif defined(__CRT_HAVE___lroundl) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
 /* >> llroundf(3), llround(3), llroundl(3)
  * Round `x' to nearest integral value, rounding halfway cases away from zero */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llroundl,(__LONGDOUBLE __x),__lroundl,(__x))
+#elif defined(__CRT_HAVE_llround) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llroundf(3), llround(3), llroundl(3)
+ * Round `x' to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llroundl,(__LONGDOUBLE __x),llround,(__x))
+#elif defined(__CRT_HAVE___llround) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> llroundf(3), llround(3), llroundl(3)
+ * Round `x' to nearest integral value, rounding halfway cases away from zero */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llroundl,(__LONGDOUBLE __x),__llround,(__x))
 #else /* ... */
 #include <libc/local/math/llroundl.h>
 /* >> llroundf(3), llround(3), llroundl(3)
@@ -13378,6 +15140,14 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbl,(__LONGDOUBLE __x, __
 /* >> scalbf(3), scalb(3), scalbl(3)
  * Return `x' times (2 to the Nth power) */
 __CDECLARE(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbl,(__LONGDOUBLE __x, __LONGDOUBLE __fn),(__x,__fn))
+#elif defined(__CRT_HAVE_scalb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbf(3), scalb(3), scalbl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbl,(__LONGDOUBLE __x, __LONGDOUBLE __fn),scalb,(__x,__fn))
+#elif defined(__CRT_HAVE___scalb) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> scalbf(3), scalb(3), scalbl(3)
+ * Return `x' times (2 to the Nth power) */
+__CREDIRECT(__ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__scalbl,(__LONGDOUBLE __x, __LONGDOUBLE __fn),__scalb,(__x,__fn))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE__scalb) || defined(__CRT_HAVE___scalb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/scalbl.h>
 /* >> scalbf(3), scalb(3), scalbl(3)
@@ -13451,6 +15221,15 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(__LONGDOUBL
 #elif defined(__CRT_HAVE__ldclass)
 /* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(__LONGDOUBLE __x),_ldclass,(__x))
+#elif defined(__CRT_HAVE___fpclassify) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(__LONGDOUBLE __x),__fpclassify,(__x))
+#elif defined(__CRT_HAVE_fpclassify) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(__LONGDOUBLE __x),fpclassify,(__x))
+#elif defined(__CRT_HAVE__dclass) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(__LONGDOUBLE __x),_dclass,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE___fpclassify) || defined(__CRT_HAVE_fpclassify) || defined(__CRT_HAVE__dclass) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/__fpclassifyl.h>
 /* >> fpclassify(3), __fpclassifyf(3), __fpclassify(3), __fpclassifyl(3) */
@@ -13462,6 +15241,12 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitl,(__LONGDOUBLE __
 #elif defined(__CRT_HAVE__ldsign)
 /* >> signbit(3), __signbitf(3), __signbit(3), __signbitl(3) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitl,(__LONGDOUBLE __x),_ldsign,(__x))
+#elif defined(__CRT_HAVE___signbit) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> signbit(3), __signbitf(3), __signbit(3), __signbitl(3) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitl,(__LONGDOUBLE __x),__signbit,(__x))
+#elif defined(__CRT_HAVE__dsign) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> signbit(3), __signbitf(3), __signbit(3), __signbitl(3) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitl,(__LONGDOUBLE __x),_dsign,(__x))
 #else /* ... */
 #include <libc/local/math/__signbitl.h>
 /* >> signbit(3), __signbitf(3), __signbit(3), __signbitl(3) */
@@ -13508,6 +15293,12 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignalingl,(__LONGDOUB
 #elif defined(__CRT_HAVE___issignalingl)
 /* >> issignaling(3), __issignalingf(3), __issignaling(3), __issignalingl(3) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignalingl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE___issignaling) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> issignaling(3), __issignalingf(3), __issignaling(3), __issignalingl(3) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignalingl,(__LONGDOUBLE __x),__issignaling,(__x))
+#elif defined(__CRT_HAVE_issignaling) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> issignaling(3), __issignalingf(3), __issignaling(3), __issignalingl(3) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignalingl,(__LONGDOUBLE __x),issignaling,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_issignaling) || defined(__CRT_HAVE___issignaling) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/__issignalingl.h>
 /* >> issignaling(3), __issignalingf(3), __issignaling(3), __issignalingl(3) */
@@ -13552,6 +15343,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(nextupf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_C
 #ifdef __CRT_HAVE_nextdownl
 /* >> nextdownf(3), nextdown(3), nextdownl(3) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextdownl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_nextdown) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextdownf(3), nextdown(3), nextdownl(3) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextdownl,(__LONGDOUBLE __x),nextdown,(__x))
 #elif defined(__CRT_HAVE_nextupl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nextdown) || defined(__CRT_HAVE_nextup) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/nextdownl.h>
 /* >> nextdownf(3), nextdown(3), nextdownl(3) */
@@ -13560,6 +15354,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(nextdownl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #ifdef __CRT_HAVE_nextupl
 /* >> nextupf(3), nextup(3), nextupl(3) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextupl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_nextup) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> nextupf(3), nextup(3), nextupl(3) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,nextupl,(__LONGDOUBLE __x),nextup,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_nextup) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/nextupl.h>
 /* >> nextupf(3), nextup(3), nextupl(3) */
@@ -13672,6 +15469,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(canonicalizef, __FORCELOCAL __ATTR_ARTIFICIAL in
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifdef __CRT_HAVE_llogbl
 __CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW,llogbl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_ilogb) && __SIZEOF_INT__ == __SIZEOF_LONG__ && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,llogbl,(__LONGDOUBLE __x),ilogb,(__x))
 #elif defined(__CRT_HAVE_ilogbl) && __SIZEOF_INT__ == __SIZEOF_LONG__
 __CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,llogbl,(__LONGDOUBLE __x),ilogbl,(__x))
 #elif defined(__CRT_HAVE_ilogbl) || defined(__CRT_HAVE___ilogbl) || defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_llogb) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)
@@ -13680,42 +15479,56 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(llogbl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #endif /* ... */
 #ifdef __CRT_HAVE_roundevenl
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,roundevenl,(__LONGDOUBLE __x),(__x))
+#elif defined(__CRT_HAVE_roundeven) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,roundevenl,(__LONGDOUBLE __x),roundeven,(__x))
 #elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_LONG_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__) || defined(__CRT_HAVE_roundeven) || defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__) || defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__) || defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
 #include <libc/local/math/roundevenl.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(roundevenl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL roundevenl)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundevenl))(__x); })
 #endif /* ... */
 #ifdef __CRT_HAVE_fromfpl
 __CDECLARE(__ATTR_WUNUSED,__INTMAX_TYPE__,__NOTHROW_NCX,fromfpl,(__LONGDOUBLE __x, int __roundl, unsigned int __width),(__x,__roundl,__width))
+#elif defined(__CRT_HAVE_fromfp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED,__INTMAX_TYPE__,__NOTHROW_NCX,fromfpl,(__LONGDOUBLE __x, int __roundl, unsigned int __width),fromfp,(__x,__roundl,__width))
 #elif defined(__CRT_HAVE_fromfp)
 #include <libc/local/math/fromfpl.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(fromfpl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL fromfpl)(__LONGDOUBLE __x, int __roundl, unsigned int __width) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fromfpl))(__x, __roundl, __width); })
 #endif /* ... */
 #ifdef __CRT_HAVE_ufromfpl
 __CDECLARE(__ATTR_WUNUSED,__UINTMAX_TYPE__,__NOTHROW_NCX,ufromfpl,(__LONGDOUBLE __x, int __roundl, unsigned int __width),(__x,__roundl,__width))
+#elif defined(__CRT_HAVE_ufromfp) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED,__UINTMAX_TYPE__,__NOTHROW_NCX,ufromfpl,(__LONGDOUBLE __x, int __roundl, unsigned int __width),ufromfp,(__x,__roundl,__width))
 #elif defined(__CRT_HAVE_ufromfp)
 #include <libc/local/math/ufromfpl.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(ufromfpl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL ufromfpl)(__LONGDOUBLE __x, int __roundl, unsigned int __width) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ufromfpl))(__x, __roundl, __width); })
 #endif /* ... */
 #ifdef __CRT_HAVE_fromfpxl
 __CDECLARE(__ATTR_WUNUSED,__INTMAX_TYPE__,__NOTHROW_NCX,fromfpxl,(__LONGDOUBLE __x, int __roundl, unsigned int __width),(__x,__roundl,__width))
+#elif defined(__CRT_HAVE_fromfpx) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED,__INTMAX_TYPE__,__NOTHROW_NCX,fromfpxl,(__LONGDOUBLE __x, int __roundl, unsigned int __width),fromfpx,(__x,__roundl,__width))
 #elif defined(__CRT_HAVE_fromfpx)
 #include <libc/local/math/fromfpxl.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(fromfpxl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __INTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL fromfpxl)(__LONGDOUBLE __x, int __roundl, unsigned int __width) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fromfpxl))(__x, __roundl, __width); })
 #endif /* ... */
 #ifdef __CRT_HAVE_ufromfpxl
 __CDECLARE(__ATTR_WUNUSED,__UINTMAX_TYPE__,__NOTHROW_NCX,ufromfpxl,(__LONGDOUBLE __x, int __roundl, unsigned int __width),(__x,__roundl,__width))
+#elif defined(__CRT_HAVE_ufromfpx) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_WUNUSED,__UINTMAX_TYPE__,__NOTHROW_NCX,ufromfpxl,(__LONGDOUBLE __x, int __roundl, unsigned int __width),ufromfpx,(__x,__roundl,__width))
 #elif defined(__CRT_HAVE_ufromfpx)
 #include <libc/local/math/ufromfpxl.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(ufromfpxl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __UINTMAX_TYPE__ __NOTHROW_NCX(__LIBCCALL ufromfpxl)(__LONGDOUBLE __x, int __roundl, unsigned int __width) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ufromfpxl))(__x, __roundl, __width); })
 #endif /* ... */
 #ifdef __CRT_HAVE_fmaxmagl
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,fmaxmagl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
+#elif defined(__CRT_HAVE_fmaxmag) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,fmaxmagl,(__LONGDOUBLE __x, __LONGDOUBLE __y),fmaxmag,(__x,__y))
 #elif defined(__CRT_HAVE_fmaxmag)
 #include <libc/local/math/fmaxmagl.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(fmaxmagl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL fmaxmagl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaxmagl))(__x, __y); })
 #endif /* ... */
 #ifdef __CRT_HAVE_fminmagl
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,fminmagl,(__LONGDOUBLE __x, __LONGDOUBLE __y),(__x,__y))
+#elif defined(__CRT_HAVE_fminmag) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW_NCX,fminmagl,(__LONGDOUBLE __x, __LONGDOUBLE __y),fminmag,(__x,__y))
 #elif defined(__CRT_HAVE_fminmag)
 #include <libc/local/math/fminmagl.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(fminmagl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW_NCX(__LIBCCALL fminmagl)(__LONGDOUBLE __x, __LONGDOUBLE __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminmagl))(__x, __y); })
@@ -13727,7 +15540,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fminmagl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
  * @return: 0: Success
  * @return: 1: Error (`!iscanonical(*x)') */
 __CDECLARE(,int,__NOTHROW_NCX,canonicalizel,(__LONGDOUBLE *__cx, __LONGDOUBLE const *__x),(__cx,__x))
-#else /* __CRT_HAVE_canonicalizel */
+#elif defined(__CRT_HAVE_canonicalize) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
+ * @param: x:  Pointer to the value to canonicalize.
+ * @param: cx: Store the canonicalized value of `*x' here.
+ * @return: 0: Success
+ * @return: 1: Error (`!iscanonical(*x)') */
+__CREDIRECT(,int,__NOTHROW_NCX,canonicalizel,(__LONGDOUBLE *__cx, __LONGDOUBLE const *__x),canonicalize,(__cx,__x))
+#else /* ... */
 #include <libc/local/math/canonicalizel.h>
 /* >> canonicalizef(3), canonicalize(3), canonicalizel(3)
  * @param: x:  Pointer to the value to canonicalize.
@@ -13735,7 +15555,7 @@ __CDECLARE(,int,__NOTHROW_NCX,canonicalizel,(__LONGDOUBLE *__cx, __LONGDOUBLE co
  * @return: 0: Success
  * @return: 1: Error (`!iscanonical(*x)') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(canonicalizel, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL canonicalizel)(__LONGDOUBLE *__cx, __LONGDOUBLE const *__x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(canonicalizel))(__cx, __x); })
-#endif /* !__CRT_HAVE_canonicalizel */
+#endif /* !... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_GNU || __STDC_WANT_IEC_60559_BFP_EXT__ */
 

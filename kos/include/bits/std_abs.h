@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x383ecc35 */
+/* HASH CRC-32:0xaed3c221 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -163,12 +163,27 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,abs,(__LONGDOUBLE
 #else /* ... */
 } /* extern "C++" */
 __NAMESPACE_STD_END
+#include <hybrid/typecore.h>
+__NAMESPACE_STD_BEGIN
+extern "C++" {
+#if defined(__CRT_HAVE_fabs) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,abs,(__LONGDOUBLE __x),fabs,(__x))
+#elif defined(__CRT_HAVE___fabs) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,abs,(__LONGDOUBLE __x),__fabs,(__x))
+#else /* ... */
+} /* extern "C++" */
+__NAMESPACE_STD_END
 #include <libc/local/math/fabsl.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* >> fabsf(3), fabs(3), fabsl(3)
  * Absolute value of `x' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE __NOTHROW(__LIBCCALL abs)(__LONGDOUBLE __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsl))(__x); }
+#endif /* !... */
 #endif /* !... */
 } /* extern "C++" */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */

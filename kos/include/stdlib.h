@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82aaf5d7 */
+/* HASH CRC-32:0x27c14d57 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -638,6 +638,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,abs,(__LONGDOUBLE
 /* >> fabsf(3), fabs(3), fabsl(3)
  * Absolute value of `x' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,abs,(__LONGDOUBLE __x),__fabsl,(__x))
+#elif defined(__CRT_HAVE_fabs) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,abs,(__LONGDOUBLE __x),fabs,(__x))
+#elif defined(__CRT_HAVE___fabs) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> fabsf(3), fabs(3), fabsl(3)
+ * Absolute value of `x' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,abs,(__LONGDOUBLE __x),__fabs,(__x))
 #else /* ... */
 } /* extern "C++" */
 __NAMESPACE_STD_END

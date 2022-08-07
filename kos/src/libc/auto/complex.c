@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x601319a0 */
+/* HASH CRC-32:0x32bcb6a5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,6 +80,10 @@ NOTHROW_NCX(LIBCCALL libc__cchshf)(float x,
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc__cchshl, libc__cchsh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* calculate cosh and sinh */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_OUT(2) ATTR_OUT(3) void
 NOTHROW_NCX(LIBCCALL libc__cchshl)(__LONGDOUBLE x,
@@ -130,6 +134,7 @@ NOTHROW_NCX(LIBCCALL libc__cchshl)(__LONGDOUBLE x,
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* calculate cosh and sinh */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_OUT(2) ATTR_OUT(3) void
 NOTHROW_NCX(LIBCCALL libc__cchsh)(double x,
@@ -242,6 +247,10 @@ NOTHROW_NCX(LIBCCALL libc__redupif)(float x) {
 
 	return t;
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc__redupil, libc__redupi);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc__redupil)(__LONGDOUBLE x) {
 	/* Implementation derived from NetBSD. -- See the following copyright notice. */
@@ -308,6 +317,7 @@ NOTHROW_NCX(LIBCCALL libc__redupil)(__LONGDOUBLE x) {
 
 	return t;
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED double
 NOTHROW_NCX(LIBCCALL libc__redupi)(double x) {
 	/* Implementation derived from NetBSD. -- See the following copyright notice. */
@@ -454,6 +464,10 @@ NOTHROW_NCX(LIBCCALL libc__ctansf)(float _Complex z) {
 
 
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc__ctansl, libc__ctans);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* Taylor series expansion for cosh(2y) - cos(2x) */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc__ctansl)(long double _Complex z) {
@@ -534,6 +548,7 @@ NOTHROW_NCX(LIBCCALL libc__ctansl)(long double _Complex z) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* Taylor series expansion for cosh(2y) - cos(2x) */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED double
 NOTHROW_NCX(LIBCCALL libc__ctans)(double _Complex z) {
@@ -2446,6 +2461,10 @@ NOTHROW_NCX(LIBCCALL libc_cproj)(double _Complex z) {
 	}
 	return v.x;
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_cabsl, libc_cabs);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_cabsl)(long double _Complex z) {
 
@@ -2483,6 +2502,11 @@ NOTHROW_NCX(LIBCCALL libc_cabsl)(long double _Complex z) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_cexpl, libc_cexp);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
 NOTHROW_NCX(LIBCCALL libc_cexpl)(long double _Complex z) {
@@ -2529,6 +2553,11 @@ NOTHROW_NCX(LIBCCALL libc_cexpl)(long double _Complex z) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_clogl, libc_clog);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
 NOTHROW_NCX(LIBCCALL libc_clogl)(long double _Complex z) {
@@ -2573,6 +2602,11 @@ NOTHROW_NCX(LIBCCALL libc_clogl)(long double _Complex z) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_cpowl, libc_cpow);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
 NOTHROW_NCX(LIBCCALL libc_cpowl)(long double _Complex a,
@@ -2629,6 +2663,11 @@ NOTHROW_NCX(LIBCCALL libc_cpowl)(long double _Complex a,
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_csqrtl, libc_csqrt);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/floatcore.h>
 #include <bits/math-constants.h>
 #include <bits/crt/complex.h>
@@ -2793,6 +2832,11 @@ NOTHROW_NCX(LIBCCALL libc_csqrtl)(long double _Complex z) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_csinl, libc_csin);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
 NOTHROW_NCX(LIBCCALL libc_csinl)(long double _Complex z) {
@@ -2837,6 +2881,11 @@ NOTHROW_NCX(LIBCCALL libc_csinl)(long double _Complex z) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_ccosl, libc_ccos);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
 NOTHROW_NCX(LIBCCALL libc_ccosl)(long double _Complex z) {
@@ -2881,6 +2930,11 @@ NOTHROW_NCX(LIBCCALL libc_ccosl)(long double _Complex z) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_ctanl, libc_ctan);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 #include <hybrid/floatcore.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
@@ -2933,6 +2987,11 @@ NOTHROW_NCX(LIBCCALL libc_ctanl)(long double _Complex z) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_casinl, libc_casin);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
 NOTHROW_NCX(LIBCCALL libc_casinl)(long double _Complex z) {
@@ -2988,6 +3047,11 @@ NOTHROW_NCX(LIBCCALL libc_casinl)(long double _Complex z) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_cacosl, libc_cacos);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
 NOTHROW_NCX(LIBCCALL libc_cacosl)(long double _Complex z) {
@@ -3033,6 +3097,11 @@ NOTHROW_NCX(LIBCCALL libc_cacosl)(long double _Complex z) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_catanl, libc_catan);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 #include <hybrid/floatcore.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
@@ -3095,6 +3164,11 @@ ovrf:
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_csinhl, libc_csinh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
 NOTHROW_NCX(LIBCCALL libc_csinhl)(long double _Complex z) {
@@ -3140,6 +3214,11 @@ NOTHROW_NCX(LIBCCALL libc_csinhl)(long double _Complex z) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_ccoshl, libc_ccosh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
 NOTHROW_NCX(LIBCCALL libc_ccoshl)(long double _Complex z) {
@@ -3185,6 +3264,11 @@ NOTHROW_NCX(LIBCCALL libc_ccoshl)(long double _Complex z) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_ctanhl, libc_ctanh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/crt/complex.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
 NOTHROW_NCX(LIBCCALL libc_ctanhl)(long double _Complex z) {
@@ -3231,6 +3315,11 @@ NOTHROW_NCX(LIBCCALL libc_ctanhl)(long double _Complex z) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_casinhl, libc_casinh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
 NOTHROW_NCX(LIBCCALL libc_casinhl)(long double _Complex z) {
 
@@ -3270,6 +3359,11 @@ NOTHROW_NCX(LIBCCALL libc_casinhl)(long double _Complex z) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_cacoshl, libc_cacosh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
 NOTHROW_NCX(LIBCCALL libc_cacoshl)(long double _Complex z) {
 
@@ -3309,6 +3403,11 @@ NOTHROW_NCX(LIBCCALL libc_cacoshl)(long double _Complex z) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_catanhl, libc_catanh);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED long double _Complex
 NOTHROW_NCX(LIBCCALL libc_catanhl)(long double _Complex z) {
 
@@ -3348,6 +3447,11 @@ NOTHROW_NCX(LIBCCALL libc_catanhl)(long double _Complex z) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_cargl, libc_carg);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") WUNUSED __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_cargl)(long double _Complex z) {
 
@@ -3356,6 +3460,11 @@ NOTHROW_NCX(LIBCCALL libc_cargl)(long double _Complex z) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_conjl, libc_conj);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED long double _Complex
 NOTHROW_NCX(LIBCCALL libc_conjl)(long double _Complex z) {
 	union {
@@ -3366,6 +3475,11 @@ NOTHROW_NCX(LIBCCALL libc_conjl)(long double _Complex z) {
 	v.parts[1] = -v.parts[1];
 	return v.x;
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_creall, libc_creal);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_creall)(long double _Complex z) {
 	union {
@@ -3375,6 +3489,11 @@ NOTHROW_NCX(LIBCCALL libc_creall)(long double _Complex z) {
 	v.x = z;
 	return v.parts[0];
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_cimagl, libc_cimag);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_cimagl)(long double _Complex z) {
 	union {
@@ -3384,6 +3503,11 @@ NOTHROW_NCX(LIBCCALL libc_cimagl)(long double _Complex z) {
 	v.x = z;
 	return v.parts[1];
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_cprojl, libc_cproj);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <bits/math-constants.h>
 INTERN ATTR_SECTION(".text.crt.math.complex") ATTR_CONST WUNUSED long double _Complex
 NOTHROW_NCX(LIBCCALL libc_cprojl)(long double _Complex z) {
@@ -3402,6 +3526,7 @@ NOTHROW_NCX(LIBCCALL libc_cprojl)(long double _Complex z) {
 
 
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #endif /* !__KERNEL__ */
 
 DECL_END
