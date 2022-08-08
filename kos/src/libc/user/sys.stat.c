@@ -528,10 +528,10 @@ NOTHROW(LIBCCALL stat_conv)(int vers, struct stat const *__restrict st, void *__
 			__uid_t st_uid;
 			__gid_t st_gid;
 			__dev_t st_rdev;
-			__off_t st_size;
-			__time_t st_atime;
-			__time_t st_mtime;
-			__time_t st_ctime;
+			__off64_t st_size;
+			__time32_t st_atime;
+			__time32_t st_mtime;
+			__time32_t st_ctime;
 			__blkcnt64_t st_blocks;
 			__blksize_t st_blksize;
 			unsigned int st_flags;

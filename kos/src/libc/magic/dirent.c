@@ -39,8 +39,8 @@
 }
 
 %[define_replacement(fd_t       = __fd_t)]
-%[define_replacement(off_t      = "__FS_TYPE(off)")]
-%[define_replacement(pos_t      = "__FS_TYPE(pos)")]
+%[define_replacement(off_t      = "__off_t")]
+%[define_replacement(pos_t      = "__pos_t")]
 %[define_replacement(off32_t    = __off32_t)]
 %[define_replacement(off64_t    = __off64_t)]
 %[define_replacement(pos32_t    = __pos32_t)]
@@ -211,7 +211,7 @@ __SYSDECL_BEGIN
 #ifdef __USE_XOPEN
 #ifndef __ino_t_defined
 #define __ino_t_defined
-typedef __FS_TYPE(ino) ino_t; /* INode number */
+typedef __ino_t ino_t; /* INode number */
 #endif /* !__ino_t_defined */
 #ifdef __USE_LARGEFILE64
 #ifndef __ino64_t_defined

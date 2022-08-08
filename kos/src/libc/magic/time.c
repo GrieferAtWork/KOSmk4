@@ -50,7 +50,7 @@
 %[define_decl_include("<bits/os/sigevent.h>": ["struct sigevent"])]
 %[define_decl_include("<bits/os/timex.h>": ["struct timex", "struct timex64"])]
 
-%[define_replacement(time_t    = "__TM_TYPE(time)")]
+%[define_replacement(time_t    = "__time_t")]
 %[define_replacement(time32_t  = __time32_t)]
 %[define_replacement(time64_t  = __time64_t)]
 %[define_replacement(clock_t   = __clock_t)]
@@ -359,7 +359,7 @@ typedef __clock_t clock_t;
 #endif /* !__std_clock_t_defined */
 #ifndef __std_time_t_defined
 #define __std_time_t_defined
-typedef __TM_TYPE(time) time_t;
+typedef __time_t time_t;
 #endif /* !__std_time_t_defined */
 __NAMESPACE_STD_END
 
@@ -1171,7 +1171,7 @@ $time_t timegm([[inout]] struct $tm *tp) {
 @@pp_endif@@
 
 	/* EOVERFLOW if result gets truncated */
-@@pp_if @__TM_SIZEOF(TIME)@ < __SIZEOF_TIME64_T__@@
+@@pp_if __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__@@
 	if ((time64_t)(time_t)result != result) {
 @@pp_ifdef EOVERFLOW@@
 		return (time_t)__libc_seterrno(EOVERFLOW);
@@ -2410,7 +2410,7 @@ double _difftime32($time32_t time1, $time32_t time0);
 
 [[nocrt, wunused, alias("localtime", "_localtime32")]]
 [[decl_include("<bits/types.h>", "<bits/crt/tm.h>"), doc_alias("localtime")]]
-[[if($extended_include_prefix("<bits/types.h>")__TM_SIZEOF(@TIME@) == __SIZEOF_TIME32_T__), bind_local_function(localtime)]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME_T__ == __SIZEOF_TIME32_T__), bind_local_function(localtime)]]
 [[requires_function(localtime)]]
 [[nonnull]] struct $tm *_localtime32([[in]] $time32_t const *timer) {
 	time_t timer2 = (time_t)*timer;
@@ -2421,7 +2421,7 @@ double _difftime32($time32_t time1, $time32_t time0);
 
 [[nocrt, alias("time", "__time", "__libc_time", "_time32")]]
 [[decl_include("<bits/types.h>"), doc_alias("time")]]
-[[if($extended_include_prefix("<bits/types.h>")__TM_SIZEOF(@TIME@) == __SIZEOF_TIME32_T__ && ($has_function(crt_time32) || $has_function(time64))), bind_local_function(time)]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME_T__ == __SIZEOF_TIME32_T__ && ($has_function(crt_time32) || $has_function(time64))), bind_local_function(time)]]
 [[requires_function(time)]]
 $time32_t _time32([[nullable]] $time32_t *timer) {
 	time32_t result = (time32_t)time(NULL);

@@ -126,8 +126,8 @@ int vlimit(int resource, int value) {
 @@pp_endif@@
 	result = getrlimit((__rlimit_resource_t)rlimit_resource, &rlim);
 	if likely(result == 0) {
-		rlim.@rlim_cur@ = (__FS_TYPE(@rlim@))                       /* Cast to correct type. */
-		                  (__CRT_PRIVATE_SINT(__FS_SIZEOF(@RLIM@))) /* Sign expansion... */
+		rlim.@rlim_cur@ = (__rlim_t)                     /* Cast to correct type. */
+		                  (__CRT_PRIVATE_SINT(__SIZEOF_RLIM_T__)) /* Sign expansion... */
 		                  (int)value;
 		result = setrlimit((__rlimit_resource_t)rlimit_resource, &rlim);
 	}

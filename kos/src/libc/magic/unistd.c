@@ -41,8 +41,8 @@
 }
 
 %[define_replacement(fd_t       = __fd_t)]
-%[define_replacement(off_t      = "__FS_TYPE(off)")]
-%[define_replacement(pos_t      = "__FS_TYPE(pos)")]
+%[define_replacement(off_t      = "__off_t")]
+%[define_replacement(pos_t      = "__pos_t")]
 %[define_replacement(uid_t      = __uid_t)]
 %[define_replacement(gid_t      = __gid_t)]
 %[define_replacement(pid_t      = __pid_t)]
@@ -265,7 +265,7 @@ typedef __uid_t uid_t;
 #endif /* !__uid_t_defined */
 #ifndef __off_t_defined
 #define __off_t_defined
-typedef __FS_TYPE(off) off_t;
+typedef __off_t off_t;
 #endif /* !__off_t_defined */
 #ifndef __useconds_t_defined
 #define __useconds_t_defined
@@ -1508,10 +1508,10 @@ $off64_t lseek64($fd_t fd, $off64_t offset, __STDC_INT_AS_UINT_T whence) {
 %[define(DEFINE_PIO_OFFSET =
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(@pos@)
+#define __PIO_OFFSET   __pos_t
 #define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(@off@)
+#define __PIO_OFFSET   __off_t
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
@@ -1539,9 +1539,9 @@ ssize_t pread($fd_t fd, [[out(return <= bufsize)]] void *buf,
 	off_t oldpos;
 	ssize_t result;
 	oldpos = lseek(fd, 0, __SEEK_CUR);
-	if __unlikely(oldpos < 0)
+	if unlikely(oldpos < 0)
 		return -1;
-	if __unlikely(lseek(fd, (__FS_TYPE(@off@))offset, __SEEK_SET) < 0)
+	if unlikely(lseek(fd, (off_t)offset, __SEEK_SET) < 0)
 		return -1;
 	result = read(fd, buf, bufsize);
 	lseek(fd, oldpos, __SEEK_SET);
@@ -1569,9 +1569,9 @@ ssize_t pwrite($fd_t fd, [[in(return <= bufsize)]] void const *buf,
 	off_t oldpos;
 	ssize_t result;
 	oldpos = lseek(fd, 0, __SEEK_CUR);
-	if __unlikely(oldpos < 0)
+	if unlikely(oldpos < 0)
 		return -1;
-	if __unlikely(lseek(fd, (off_t)offset, __SEEK_SET) < 0)
+	if unlikely(lseek(fd, (off_t)offset, __SEEK_SET) < 0)
 		return -1;
 	result = write(fd, buf, bufsize);
 	lseek(fd, oldpos, __SEEK_SET);
@@ -1676,9 +1676,9 @@ ssize_t pread64($fd_t fd, [[out(return <= bufsize)]] void *buf,
 	off64_t oldpos;
 	ssize_t result;
 	oldpos = lseek64(fd, 0, __SEEK_CUR);
-	if __unlikely(oldpos < 0)
+	if unlikely(oldpos < 0)
 		return -1;
-	if __unlikely(lseek64(fd, (off64_t)offset, __SEEK_SET) < 0)
+	if unlikely(lseek64(fd, (off64_t)offset, __SEEK_SET) < 0)
 		return -1;
 	result = read(fd, buf, bufsize);
 	lseek64(fd, oldpos, __SEEK_SET);
@@ -1688,9 +1688,9 @@ ssize_t pread64($fd_t fd, [[out(return <= bufsize)]] void *buf,
 	off32_t oldpos;
 	ssize_t result;
 	oldpos = crt_lseek32(fd, 0, __SEEK_CUR);
-	if __unlikely(oldpos < 0)
+	if unlikely(oldpos < 0)
 		return -1;
-	if __unlikely(crt_lseek32(fd, (off32_t)offset, __SEEK_SET) < 0)
+	if unlikely(crt_lseek32(fd, (off32_t)offset, __SEEK_SET) < 0)
 		return -1;
 	result = read(fd, buf, bufsize);
 	crt_lseek32(fd, oldpos, __SEEK_SET);
@@ -1714,9 +1714,9 @@ ssize_t pwrite64($fd_t fd, [[in(return <= bufsize)]] void const *buf,
 	off64_t oldpos;
 	ssize_t result;
 	oldpos = lseek64(fd, 0, SEEK_CUR);
-	if __unlikely(oldpos < 0)
+	if unlikely(oldpos < 0)
 		return -1;
-	if __unlikely(lseek64(fd, (off64_t)offset, SEEK_SET) < 0)
+	if unlikely(lseek64(fd, (off64_t)offset, SEEK_SET) < 0)
 		return -1;
 	result = write(fd, buf, bufsize);
 	lseek64(fd, oldpos, SEEK_SET);
@@ -1726,9 +1726,9 @@ ssize_t pwrite64($fd_t fd, [[in(return <= bufsize)]] void const *buf,
 	off32_t oldpos;
 	ssize_t result;
 	oldpos = crt_lseek32(fd, 0, SEEK_CUR);
-	if __unlikely(oldpos < 0)
+	if unlikely(oldpos < 0)
 		return -1;
-	if __unlikely(crt_lseek32(fd, (off32_t)offset, SEEK_SET) < 0)
+	if unlikely(crt_lseek32(fd, (off32_t)offset, SEEK_SET) < 0)
 		return -1;
 	result = write(fd, buf, bufsize);
 	crt_lseek32(fd, oldpos, SEEK_SET);
@@ -2150,10 +2150,10 @@ int lchown([[in]] char const *file, $uid_t owner, $gid_t group) {
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET   __pos_t
 #define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET   __off_t
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
@@ -2183,7 +2183,7 @@ int truncate([[in]] char const *file, __PIO_OFFSET length) {
 	int result;
 	fd_t fd;
 	fd = open(file, O_WRONLY | __PRIVATE_O_CLOEXEC | __PRIVATE_O_CLOFORK);
-	if __unlikely(fd < 0)
+	if unlikely(fd < 0)
 		return -1;
 	result = ftruncate(fd, length);
 @@pp_if $has_function(close)@@
@@ -2209,7 +2209,7 @@ int truncate64([[in]] char const *file, __PIO_OFFSET64 length) {
 	int result;
 	$fd_t fd;
 	fd = open64(file, 1); /* O_WRONLY */
-	if __unlikely(fd < 0)
+	if unlikely(fd < 0)
 		return -1;
 	result = ftruncate64(fd, length);
 @@pp_if $has_function(close)@@

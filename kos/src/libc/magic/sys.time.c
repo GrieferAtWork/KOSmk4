@@ -39,7 +39,7 @@
 }
 
 %[define_replacement(fd_t = __fd_t)]
-%[define_replacement(time_t   = "__TM_TYPE(time)")]
+%[define_replacement(time_t   = "__time_t")]
 %[define_replacement(time32_t = __time32_t)]
 %[define_replacement(time64_t = __time64_t)]
 %[define_replacement(timespec32 = __timespec32)]
@@ -109,7 +109,7 @@ typedef enum __itimer_which {
 
 #ifndef __time_t_defined
 #define __time_t_defined
-typedef __TM_TYPE(time) time_t;
+typedef __time_t time_t;
 #endif /* !__time_t_defined */
 
 #ifndef __suseconds_t_defined

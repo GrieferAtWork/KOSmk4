@@ -38,22 +38,22 @@ typedef __syscall_ulong_t msglen_t;
 #ifdef __CC__
 struct msqid_ds {
 	struct ipc_perm msg_perm;   /* ??? */
-	__TM_TYPE(time) msg_stime;  /* ??? */
-#if __TM_SIZEOF(TIME) > __SIZEOF_SYSCALL_LONG_T__
-#if __TM_SIZEOF(TIME) != __SIZEOF_SYSCALL_LONG_T__*2
+	__time_t        msg_stime;  /* ??? */
+#if __SIZEOF_TIME_T__ > __SIZEOF_SYSCALL_LONG_T__
+#if __SIZEOF_TIME_T__ != __SIZEOF_SYSCALL_LONG_T__ * 2
 #error "Unsupported configuration"
-#endif /* __TM_SIZEOF(TIME) != __SIZEOF_SYSCALL_LONG_T__*2 */
-#else /* __TM_SIZEOF(TIME) > __SIZEOF_SYSCALL_LONG_T__ */
+#endif /* __SIZEOF_TIME_T__ != __SIZEOF_SYSCALL_LONG_T__ * 2 */
+#else /* __SIZEOF_TIME_T__ > __SIZEOF_SYSCALL_LONG_T__ */
 	__syscall_ulong_t __glibc_reserved1;
-#endif /* __TM_SIZEOF(TIME) <= __SIZEOF_SYSCALL_LONG_T__ */
-	__TM_TYPE(time) msg_rtime;  /* ??? */
-#if __TM_SIZEOF(TIME) <= __SIZEOF_SYSCALL_LONG_T__
+#endif /* __SIZEOF_TIME_T__ <= __SIZEOF_SYSCALL_LONG_T__ */
+	__time_t        msg_rtime;  /* ??? */
+#if __SIZEOF_TIME_T__ <= __SIZEOF_SYSCALL_LONG_T__
 	__syscall_ulong_t __glibc_reserved2;
-#endif /* __TM_SIZEOF(TIME) <= __SIZEOF_SYSCALL_LONG_T__ */
-	__TM_TYPE(time) msg_ctime;  /* ??? */
-#if __TM_SIZEOF(TIME) <= __SIZEOF_SYSCALL_LONG_T__
+#endif /* __SIZEOF_TIME_T__ <= __SIZEOF_SYSCALL_LONG_T__ */
+	__time_t        msg_ctime;  /* ??? */
+#if __SIZEOF_TIME_T__ <= __SIZEOF_SYSCALL_LONG_T__
 	__syscall_ulong_t __glibc_reserved3;
-#endif /* __TM_SIZEOF(TIME) <= __SIZEOF_SYSCALL_LONG_T__ */
+#endif /* __SIZEOF_TIME_T__ <= __SIZEOF_SYSCALL_LONG_T__ */
 #ifdef __USE_MISC
 #ifdef __COMPILER_HAVE_TRANSPARENT_UNION
 	union {

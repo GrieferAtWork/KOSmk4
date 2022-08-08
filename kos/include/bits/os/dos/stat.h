@@ -106,9 +106,9 @@ struct __dos_bstat {
 	union { __time32_t st_ctime; __time32_t st_ctime32; };
 #endif /* !__USE_TIME_BITS64 */
 #else /* __USE_KOS */
-	__TM_TYPE(time) st_atime;
-	__TM_TYPE(time) st_mtime;
-	__TM_TYPE(time) st_ctime;
+	__time_t st_atime;
+	__time_t st_mtime;
+	__time_t st_ctime;
 #endif /* !__USE_KOS */
 };
 
@@ -137,13 +137,13 @@ struct __dos_bstat64 {
 	__INT64_TYPE__ st_size;
 #endif /* !... */
 #ifdef __USE_KOS
-	union { __TM_TYPE(time) st_atime; __time32_t st_atime32; };
-	union { __TM_TYPE(time) st_mtime; __time32_t st_mtime32; };
-	union { __TM_TYPE(time) st_ctime; __time32_t st_ctime32; };
+	union { __time_t st_atime; __time32_t st_atime32; };
+	union { __time_t st_mtime; __time32_t st_mtime32; };
+	union { __time_t st_ctime; __time32_t st_ctime32; };
 #else /* __USE_KOS */
-	__TM_TYPE(time) st_atime;
-	__TM_TYPE(time) st_mtime;
-	__TM_TYPE(time) st_ctime;
+	__time_t st_atime;
+	__time_t st_mtime;
+	__time_t st_ctime;
 #endif /* !__USE_KOS */
 };
 

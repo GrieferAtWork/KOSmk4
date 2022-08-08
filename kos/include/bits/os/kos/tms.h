@@ -29,7 +29,7 @@
 #define __OFFSET_TMS_CUTIME (__SIZEOF_CLOCK_T__ * 2)
 #define __OFFSET_TMS_CSTIME (__SIZEOF_CLOCK_T__ * 3)
 #define __SIZEOF_TMS        (__SIZEOF_CLOCK_T__ * 4)
-#define __ALIGNOF_TMS       __ALIGNOF_INTN(__SIZEOF_CLOCK_T__)
+#define __ALIGNOF_TMS       __ALIGNOF_CLOCK_T__
 
 #ifdef __CC__
 __DECL_BEGIN

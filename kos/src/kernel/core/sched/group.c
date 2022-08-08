@@ -1232,9 +1232,9 @@ DEFINE_SYSCALL5(pid_t, waitid,
 		      which);
 	validate_writable_opt(infop, sizeof(*infop));
 	validate_writable_opt(ru, sizeof(*ru));
-#if __SIZEOF_TIME32_T__ == __TM_SIZEOF(TIME)
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME_T__
 	result = waitfor_children((idtype_t)which, upid, options, NULL, infop, ru);
-#else /* __SIZEOF_TIME32_T__ == __TM_SIZEOF(TIME) */
+#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME_T__ */
 	if (ru) {
 		struct rusage kru;
 		result = waitfor_children((idtype_t)which, upid, options, NULL, infop, &kru);
@@ -1243,7 +1243,7 @@ DEFINE_SYSCALL5(pid_t, waitid,
 	} else {
 		result = waitfor_children((idtype_t)which, upid, options, NULL, infop, NULL);
 	}
-#endif /* __SIZEOF_TIME32_T__ != __TM_SIZEOF(TIME) */
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME_T__ */
 	return result;
 }
 #endif /* __ARCH_WANT_SYSCALL_WAITID */
@@ -1270,9 +1270,9 @@ DEFINE_SYSCALL5(pid_t, waitid64,
 		      which);
 	validate_writable_opt(infop, sizeof(*infop));
 	validate_writable_opt(ru, sizeof(*ru));
-#if __SIZEOF_TIME64_T__ == __TM_SIZEOF(TIME)
+#if __SIZEOF_TIME64_T__ == __SIZEOF_TIME_T__
 	result = waitfor_children((idtype_t)which, options, upid, NULL, infop, ru);
-#else /* __SIZEOF_TIME64_T__ == __TM_SIZEOF(TIME) */
+#else /* __SIZEOF_TIME64_T__ == __SIZEOF_TIME_T__ */
 	if (ru) {
 		struct rusage kru;
 		result = waitfor_children((idtype_t)which, upid, options, NULL, infop, &kru);
@@ -1281,7 +1281,7 @@ DEFINE_SYSCALL5(pid_t, waitid64,
 	} else {
 		result = waitfor_children((idtype_t)which, upid, options, NULL, infop, NULL);
 	}
-#endif /* __SIZEOF_TIME64_T__ != __TM_SIZEOF(TIME) */
+#endif /* __SIZEOF_TIME64_T__ != __SIZEOF_TIME_T__ */
 	return result;
 }
 #endif /* __ARCH_WANT_SYSCALL_WAITID64 */
@@ -1407,9 +1407,9 @@ DEFINE_SYSCALL4(pid_t, wait4, pid_t, upid,
 		/* wait for the child whose process ID is equal to the value of pid. */
 		which = (idtype_t)P_PID;
 	}
-#if __SIZEOF_TIME32_T__ == __TM_SIZEOF(TIME)
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME_T__
 	result = waitfor_children(which, upid, options, wstatus, NULL, ru);
-#else /* __SIZEOF_TIME32_T__ == __TM_SIZEOF(TIME) */
+#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME_T__ */
 	if (ru) {
 		struct rusage kru;
 		result = waitfor_children(which, upid, options, wstatus, NULL, &kru);
@@ -1418,7 +1418,7 @@ DEFINE_SYSCALL4(pid_t, wait4, pid_t, upid,
 	} else {
 		result = waitfor_children(which, upid, options, wstatus, NULL, NULL);
 	}
-#endif /* __SIZEOF_TIME32_T__ != __TM_SIZEOF(TIME) */
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME_T__ */
 	return result;
 }
 #endif /* __ARCH_WANT_SYSCALL_WAIT4 */
@@ -1450,9 +1450,9 @@ DEFINE_SYSCALL4(pid_t, wait4_64, pid_t, upid,
 		/* wait for the child whose process ID is equal to the value of pid. */
 		which = (idtype_t)P_PID;
 	}
-#if __SIZEOF_TIME64_T__ == __TM_SIZEOF(TIME)
+#if __SIZEOF_TIME64_T__ == __SIZEOF_TIME_T__
 	result = waitfor_children(which, upid, options, wstatus, NULL, ru);
-#else /* __SIZEOF_TIME64_T__ == __TM_SIZEOF(TIME) */
+#else /* __SIZEOF_TIME64_T__ == __SIZEOF_TIME_T__ */
 	if (ru) {
 		struct rusage kru;
 		result = waitfor_children(which, upid, options, wstatus, NULL, &kru);
@@ -1461,7 +1461,7 @@ DEFINE_SYSCALL4(pid_t, wait4_64, pid_t, upid,
 	} else {
 		result = waitfor_children(which, upid, options, wstatus, NULL, NULL);
 	}
-#endif /* __SIZEOF_TIME64_T__ != __TM_SIZEOF(TIME) */
+#endif /* __SIZEOF_TIME64_T__ != __SIZEOF_TIME_T__ */
 	return result;
 }
 #endif /* __ARCH_WANT_SYSCALL_WAIT4_64 */

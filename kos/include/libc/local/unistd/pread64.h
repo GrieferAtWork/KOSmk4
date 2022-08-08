@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbdb02232 */
+/* HASH CRC-32:0x6ad39755 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,10 +27,10 @@
 #if defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && defined(__SEEK_CUR) && defined(__SEEK_SET))
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET   __pos_t
 #define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET   __off_t
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */

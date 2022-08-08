@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28145c0d */
+/* HASH CRC-32:0xbb510f4d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,12 +32,12 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),char *,__NOTHROW_NCX,__localdep_ctime_r,(__TM_TYPE(time) const *__restrict __timer, char __buf[26]),ctime_r,(__timer,__buf))
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),char *,__NOTHROW_NCX,__localdep_ctime_r,(__time_t const *__restrict __timer, char __buf[26]),ctime_r,(__timer,__buf))
 #elif defined(__CRT_HAVE_ctime64_r) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __NAMESPACE_LOCAL_END
 #include <bits/crt/tm.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),char *,__NOTHROW_NCX,__localdep_ctime_r,(__TM_TYPE(time) const *__restrict __timer, char __buf[26]),ctime64_r,(__timer,__buf))
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),char *,__NOTHROW_NCX,__localdep_ctime_r,(__time_t const *__restrict __timer, char __buf[26]),ctime64_r,(__timer,__buf))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/ctime_r.h>
@@ -61,7 +61,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ctime32_s))(char __buf[26], __SIZE_T
 
 #else /* !__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 	{
-		__TM_TYPE(time) __timer2 = (__TM_TYPE(time))*__timer;
+		__time_t __timer2 = (__time_t)*__timer;
 
 
 

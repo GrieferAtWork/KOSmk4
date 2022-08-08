@@ -34,7 +34,7 @@ opt.removeif([](e) -> e.startswith("-fstack-protector"));
 
 void _start(void) {
 	if (sys_Xksysctl(KSYSCTL_SYSTEM_MEMORY_DUMP_LEAKS, NULL) != 0)
-		__breakpoint();
+		__debugbreak();
 	sys_Xexit(EXIT_SUCCESS);
 }
 

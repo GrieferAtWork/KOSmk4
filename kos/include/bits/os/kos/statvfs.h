@@ -35,12 +35,12 @@ __DECL_BEGIN
 struct statvfs {
 	__ULONGPTR_TYPE__   f_bsize;    /* ??? */
 	__ULONGPTR_TYPE__   f_frsize;   /* ??? */
-	__FS_TYPE(fsblkcnt) f_blocks;   /* ??? */
-	__FS_TYPE(fsblkcnt) f_bfree;    /* ??? */
-	__FS_TYPE(fsblkcnt) f_bavail;   /* ??? */
-	__FS_TYPE(fsfilcnt) f_files;    /* ??? */
-	__FS_TYPE(fsfilcnt) f_ffree;    /* ??? */
-	__FS_TYPE(fsfilcnt) f_favail;   /* ??? */
+	__fsblkcnt_t        f_blocks;   /* ??? */
+	__fsblkcnt_t        f_bfree;    /* ??? */
+	__fsblkcnt_t        f_bavail;   /* ??? */
+	__fsfilcnt_t        f_files;    /* ??? */
+	__fsfilcnt_t        f_ffree;    /* ??? */
+	__fsfilcnt_t        f_favail;   /* ??? */
 	__ULONGPTR_TYPE__   f_fsid;     /* ??? */
 #ifdef _STATVFSBUF_F_UNUSED
 	__ULONGPTR_TYPE__ __f_unused;   /* ... */

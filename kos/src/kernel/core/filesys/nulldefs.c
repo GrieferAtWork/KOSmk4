@@ -155,7 +155,7 @@ print("#define __CCAST(T) (uint64_t)");
 // Assert that our generated INO numbers are correct
 for (local name, st_mode, st_rdev: DEVICES) {
 	print("static_assert(devfs_devnode_makeino(", STMODE_MAP[st_mode & ~07777],
-		", MKDEV(", MAJOR(st_rdev), ", ", MINOR(st_rdev), ")) == (__FS_TYPE(ino))_SELECT_INO(",
+		", MKDEV(", MAJOR(st_rdev), ", ", MINOR(st_rdev), ")) == (__ino_t)_SELECT_INO(",
 		", ".join(for (local c, fun: MAKEINO_FUNCTIONS) f"{c}({fun(st_mode, st_rdev).hex()})"),
 	"));");
 }
@@ -270,16 +270,16 @@ static_assert(offsetof(struct ramfs_dirnode, rdn_dir.dn_node) == 0);
 static_assert(offsetof(struct device, dv_devnode.dn_node) == 0);
 #undef __CCAST
 #define __CCAST(T) (uint64_t)
-static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 1)) == (__FS_TYPE(ino))_SELECT_INO(UINT32_C(0x80000f), UINT64_C(0x80000f)));
-static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 2)) == (__FS_TYPE(ino))_SELECT_INO(UINT32_C(0x800017), UINT64_C(0x800017)));
-static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 3)) == (__FS_TYPE(ino))_SELECT_INO(UINT32_C(0x80001f), UINT64_C(0x80001f)));
-static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 4)) == (__FS_TYPE(ino))_SELECT_INO(UINT32_C(0x800027), UINT64_C(0x800027)));
-static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 5)) == (__FS_TYPE(ino))_SELECT_INO(UINT32_C(0x80002f), UINT64_C(0x80002f)));
-static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 7)) == (__FS_TYPE(ino))_SELECT_INO(UINT32_C(0x80003f), UINT64_C(0x80003f)));
-static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 8)) == (__FS_TYPE(ino))_SELECT_INO(UINT32_C(0x800047), UINT64_C(0x800047)));
-static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 9)) == (__FS_TYPE(ino))_SELECT_INO(UINT32_C(0x80004f), UINT64_C(0x80004f)));
-static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 11)) == (__FS_TYPE(ino))_SELECT_INO(UINT32_C(0x80005f), UINT64_C(0x80005f)));
-static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(5, 0)) == (__FS_TYPE(ino))_SELECT_INO(UINT32_C(0x2800007), UINT64_C(0x2800007)));
+static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 1)) == (__ino_t)_SELECT_INO(UINT32_C(0x80000f), UINT64_C(0x80000f)));
+static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 2)) == (__ino_t)_SELECT_INO(UINT32_C(0x800017), UINT64_C(0x800017)));
+static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 3)) == (__ino_t)_SELECT_INO(UINT32_C(0x80001f), UINT64_C(0x80001f)));
+static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 4)) == (__ino_t)_SELECT_INO(UINT32_C(0x800027), UINT64_C(0x800027)));
+static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 5)) == (__ino_t)_SELECT_INO(UINT32_C(0x80002f), UINT64_C(0x80002f)));
+static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 7)) == (__ino_t)_SELECT_INO(UINT32_C(0x80003f), UINT64_C(0x80003f)));
+static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 8)) == (__ino_t)_SELECT_INO(UINT32_C(0x800047), UINT64_C(0x800047)));
+static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 9)) == (__ino_t)_SELECT_INO(UINT32_C(0x80004f), UINT64_C(0x80004f)));
+static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 11)) == (__ino_t)_SELECT_INO(UINT32_C(0x80005f), UINT64_C(0x80005f)));
+static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(5, 0)) == (__ino_t)_SELECT_INO(UINT32_C(0x2800007), UINT64_C(0x2800007)));
 #undef __CCAST
 #define __CCAST
 PRIVATE struct devdirent dirent_dev_mem = {

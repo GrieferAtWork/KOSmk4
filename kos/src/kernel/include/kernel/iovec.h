@@ -32,13 +32,6 @@
 #include <libc/string.h>
 #endif /* !__INTELLISENSE__ */
 
-
-
-#ifndef __ALIGNOF_PHYSADDR_T__
-#define __ALIGNOF_PHYSADDR_T__ __ALIGNOF_INTN(__SIZEOF_PHYSADDR_T__)
-#endif /* !__ALIGNOF_PHYSADDR_T__ */
-
-
 #define OFFSET_IOV_ENTRY_BASE 0
 #define OFFSET_IOV_ENTRY_SIZE __SIZEOF_POINTER__
 #define SIZEOF_IOV_ENTRY      (__SIZEOF_POINTER__ + __SIZEOF_SIZE_T__)

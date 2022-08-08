@@ -504,7 +504,7 @@ char *copylist([[in]] char const *filename,
 	char *result = copylist64(filename, &filesize64);
 	*p_filesize = (__PIO_OFFSET)filesize64;
 	return result;
-@@pp_elif __FS_SIZEOF(@OFF@) == __SIZEOF_SIZE_T__@@
+@@pp_elif __SIZEOF_OFF_T__ == __SIZEOF_SIZE_T__@@
 	return copylist_sz(filename, (size_t *)p_filesize);
 @@pp_else@@
 	char *result;

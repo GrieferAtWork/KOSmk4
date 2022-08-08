@@ -1884,19 +1884,6 @@ __NAMESPACE_INT_END
 
 
 
-#define __ALIGNOF_INTN_1 __ALIGNOF_INT8__
-#define __ALIGNOF_INTN_2 __ALIGNOF_INT16__
-#define __ALIGNOF_INTN_4 __ALIGNOF_INT32__
-#ifdef __ALIGNOF_INT64__
-#define __ALIGNOF_INTN_8 __ALIGNOF_INT64__
-#endif /* __ALIGNOF_INT64__ */
-#ifdef __ALIGNOF_INT128__
-#define __ALIGNOF_INTN_16 __ALIGNOF_INT128__
-#endif /* __ALIGNOF_INT128__ */
-#define __ALIGNOF_INTN2(sizeof) __ALIGNOF_INTN_##sizeof
-#define __ALIGNOF_INTN(sizeof) __ALIGNOF_INTN2(sizeof)
-
-
 #if (defined(_NATIVE_CHAR16_T_DEFINED) ||                                                                               \
      (defined(__cpp_unicode_characters) && __cpp_unicode_characters + 0 >= 200704) ||                                   \
      (defined(_HAS_CHAR16_T_LANGUAGE_SUPPORT) && _HAS_CHAR16_T_LANGUAGE_SUPPORT + 0) ||                                 \
@@ -2559,10 +2546,15 @@ __NAMESPACE_INT_END
 #endif /* !__INTMAX_WIDTH__ */
 
 /* Helpers to query the alignment of an integer type, given its size */
-#define __HYBRID_PRIVATE_ALIGNOF1        __ALIGNOF_INT8__
-#define __HYBRID_PRIVATE_ALIGNOF2        __ALIGNOF_INT16__
-#define __HYBRID_PRIVATE_ALIGNOF4        __ALIGNOF_INT32__
-#define __HYBRID_PRIVATE_ALIGNOF8        __ALIGNOF_INT64__
+#define __HYBRID_PRIVATE_ALIGNOF1 __ALIGNOF_INT8__
+#define __HYBRID_PRIVATE_ALIGNOF2 __ALIGNOF_INT16__
+#define __HYBRID_PRIVATE_ALIGNOF4 __ALIGNOF_INT32__
+#ifdef __ALIGNOF_INT64__
+#define __HYBRID_PRIVATE_ALIGNOF8 __ALIGNOF_INT64__
+#endif /* __ALIGNOF_INT64__ */
+#ifdef __ALIGNOF_INT128__
+#define __HYBRID_PRIVATE_ALIGNOF16 __ALIGNOF_INT64__
+#endif /* __ALIGNOF_INT128__ */
 #define __HYBRID_PRIVATE_ALIGNOF(sizeof) __HYBRID_PRIVATE_ALIGNOF##sizeof
 #define __HYBRID_ALIGNOF(sizeof)         __HYBRID_PRIVATE_ALIGNOF(sizeof)
 

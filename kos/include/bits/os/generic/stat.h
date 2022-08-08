@@ -52,15 +52,15 @@ __DECL_BEGIN
 struct __gen_stat {
 #ifdef __CRT_HAVE_stat64
 	__dev_t           st_dev;     /* ID of device containing file */
-	__FS_TYPE(ino)    st_ino;     /* inode number */
+	__ino_t           st_ino;     /* inode number */
 	__mode_t          st_mode;    /* protection */
 	__nlink_t         st_nlink;   /* number of hard links */
 	__uid_t           st_uid;     /* user ID of owner */
 	__gid_t           st_gid;     /* group ID of owner */
 	__dev_t           st_rdev;    /* device ID (if special file) */
-	__FS_TYPE(off)    st_size;    /* total size, in bytes */
+	__off_t           st_size;    /* total size, in bytes */
 	__blksize_t       st_blksize; /* blocksize for file system I/O */
-	__FS_TYPE(blkcnt) st_blocks;  /* number of 512B blocks allocated */
+	__blkcnt_t        st_blocks;  /* number of 512B blocks allocated */
 	__time32_t        st_atime;   /* time of last access */
 	__time32_t        st_mtime;   /* time of last modification */
 	__time32_t        st_ctime;   /* time of last status change */

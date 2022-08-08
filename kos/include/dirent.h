@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40d74b98 */
+/* HASH CRC-32:0x62edf27f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -195,7 +195,7 @@ __SYSDECL_BEGIN
 #ifdef __USE_XOPEN
 #ifndef __ino_t_defined
 #define __ino_t_defined
-typedef __FS_TYPE(ino) ino_t; /* INode number */
+typedef __ino_t ino_t; /* INode number */
 #endif /* !__ino_t_defined */
 #ifdef __USE_LARGEFILE64
 #ifndef __ino64_t_defined
@@ -610,19 +610,19 @@ __CDECLARE(__ATTR_IN(2) __ATTR_OUT(3),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,scandi
 #if defined(__CRT_HAVE_getdirentries) && (!defined(__USE_FILE_OFFSET64) || (defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__))
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
-__CDECLARE(__ATTR_INOUT(4) __ATTR_OUTS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __FS_TYPE(off) *__restrict __basep),(__fd,__buf,__nbytes,__basep))
+__CDECLARE(__ATTR_INOUT(4) __ATTR_OUTS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __off_t *__restrict __basep),(__fd,__buf,__nbytes,__basep))
 #elif defined(__CRT_HAVE___getdirentries) && (!defined(__USE_FILE_OFFSET64) || (defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__))
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
-__CREDIRECT(__ATTR_INOUT(4) __ATTR_OUTS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __FS_TYPE(off) *__restrict __basep),__getdirentries,(__fd,__buf,__nbytes,__basep))
+__CREDIRECT(__ATTR_INOUT(4) __ATTR_OUTS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __off_t *__restrict __basep),__getdirentries,(__fd,__buf,__nbytes,__basep))
 #elif defined(__CRT_HAVE___libc_getdirentries) && (!defined(__USE_FILE_OFFSET64) || (defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__))
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
-__CREDIRECT(__ATTR_INOUT(4) __ATTR_OUTS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __FS_TYPE(off) *__restrict __basep),__libc_getdirentries,(__fd,__buf,__nbytes,__basep))
+__CREDIRECT(__ATTR_INOUT(4) __ATTR_OUTS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __off_t *__restrict __basep),__libc_getdirentries,(__fd,__buf,__nbytes,__basep))
 #elif defined(__CRT_HAVE_getdirentries64) && (defined(__USE_FILE_OFFSET64) || (defined(_DIRENT_MATCHES_DIRENT64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__))
 /* >> getdirentries(2), getdirentries64(2)
  * Linux's underlying system call for reading the entries of a directory */
-__CREDIRECT(__ATTR_INOUT(4) __ATTR_OUTS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __FS_TYPE(off) *__restrict __basep),getdirentries64,(__fd,__buf,__nbytes,__basep))
+__CREDIRECT(__ATTR_INOUT(4) __ATTR_OUTS(2, 3),__SSIZE_TYPE__,__NOTHROW_RPC,getdirentries,(__fd_t __fd, char *__restrict __buf, size_t __nbytes, __off_t *__restrict __basep),getdirentries64,(__fd,__buf,__nbytes,__basep))
 #endif /* ... */
 #ifdef __USE_LARGEFILE64
 #if defined(__CRT_HAVE_getdirentries) && defined(__DIRENT32_MATCHES_DIRENT64)

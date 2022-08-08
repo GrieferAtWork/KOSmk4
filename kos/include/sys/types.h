@@ -108,7 +108,7 @@ typedef __loff_t loff_t; /* Large file/device offset */
 
 #ifndef __ino_t_defined
 #define __ino_t_defined
-typedef __FS_TYPE(ino) ino_t;  /* INode number */
+typedef __ino_t ino_t;  /* INode number */
 #endif /* !__ino_t_defined */
 
 #ifdef __USE_LARGEFILE64
@@ -150,7 +150,7 @@ typedef __uid_t uid_t;
 
 #ifndef __off_t_defined
 #define __off_t_defined
-typedef __FS_TYPE(off) off_t;
+typedef __off_t off_t;
 #endif /* !__off_t_defined */
 
 #ifndef __pid_t_defined
@@ -184,7 +184,7 @@ typedef __key_t key_t;
 
 #ifndef __time_t_defined
 #define __time_t_defined
-typedef __TM_TYPE(time) time_t;
+typedef __time_t time_t;
 #endif /* !__time_t_defined */
 
 #ifndef __clockid_t_defined
@@ -279,17 +279,17 @@ typedef __blksize_t blksize_t;
 
 #ifndef __blkcnt_t_defined
 #define __blkcnt_t_defined
-typedef __FS_TYPE(blkcnt) blkcnt_t;
+typedef __blkcnt_t blkcnt_t;
 #endif /* !__blkcnt_t_defined */
 
 #ifndef __fsblkcnt_t_defined
 #define __fsblkcnt_t_defined
-typedef __FS_TYPE(fsblkcnt) fsblkcnt_t;
+typedef __fsblkcnt_t fsblkcnt_t;
 #endif /* !__fsblkcnt_t_defined */
 
 #ifndef __fsfilcnt_t_defined
 #define __fsfilcnt_t_defined
-typedef __FS_TYPE(fsfilcnt) fsfilcnt_t;
+typedef __fsfilcnt_t fsfilcnt_t;
 #endif /* !__fsfilcnt_t_defined */
 
 #ifdef __USE_LARGEFILE64
@@ -313,7 +313,7 @@ typedef __fsfilcnt64_t fsfilcnt64_t;
 /* Define ~~"aliases"~~ used by DOS. */
 #ifndef _INO_T_DEFINED
 #define _INO_T_DEFINED 1
-typedef __FS_TYPE(ino) _ino_t;
+typedef __ino_t _ino_t;
 #endif /* !_INO_T_DEFINED */
 
 #ifndef _DEV_T_DEFINED
@@ -323,7 +323,7 @@ typedef __dev_t _dev_t;
 
 #ifndef _OFF_T_DEFINED
 #define _OFF_T_DEFINED 1
-typedef __FS_TYPE(off) _off_t;
+typedef __off_t _off_t;
 #endif /* !_OFF_T_DEFINED */
 #endif /* __USE_DOS */
 

@@ -17,16 +17,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef ____fpos_t_defined
-#include <__stdinc.h>
-#include <features.h>
-#include <bits/types.h>
-#ifndef ____fpos_t_defined
-#define ____fpos_t_defined
-#ifdef __CC__
-__SYSDECL_BEGIN
-typedef __FS_TYPE(pos) __fpos_t;
-__SYSDECL_END
-#endif /* __CC__ */
-#endif /* !____fpos_t_defined */
-#endif /* !____fpos_t_defined */
+#ifndef __fpos_t
+#include <bits/crt/stdio.h>
+#endif /* !__fpos_t */

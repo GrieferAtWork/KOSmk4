@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x528e5a27 */
+/* HASH CRC-32:0x95c4de46 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,10 +26,10 @@
 #include <features.h>
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET   __pos_t
 #define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET   __off_t
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */

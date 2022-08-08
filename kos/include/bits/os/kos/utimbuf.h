@@ -30,15 +30,15 @@
 #define __OFFSET_UTIMBUF_ACTIME    0
 #define __OFFSET_UTIMBUF_MODTIME   __SIZEOF_TIME_T__
 #define __SIZEOF_UTIMBUF           (__SIZEOF_TIME_T__ * 2)
-#define __ALIGNOF_UTIMBUF          __ALIGNOF_INTN(__SIZEOF_TIME_T__)
+#define __ALIGNOF_UTIMBUF          __ALIGNOF_TIME_T__
 #define __OFFSET_UTIMBUF32_ACTIME  0
 #define __OFFSET_UTIMBUF32_MODTIME __SIZEOF_TIME32_T__
 #define __SIZEOF_UTIMBUF32         (__SIZEOF_TIME32_T__ * 2)
-#define __ALIGNOF_UTIMBUF32        __ALIGNOF_INTN(__SIZEOF_TIME32_T__)
+#define __ALIGNOF_UTIMBUF32        __ALIGNOF_TIME32_T__
 #define __OFFSET_UTIMBUF64_ACTIME  0
 #define __OFFSET_UTIMBUF64_MODTIME __SIZEOF_TIME64_T__
 #define __SIZEOF_UTIMBUF64         (__SIZEOF_TIME64_T__ * 2)
-#define __ALIGNOF_UTIMBUF64        __ALIGNOF_INTN(__SIZEOF_TIME64_T__)
+#define __ALIGNOF_UTIMBUF64        __ALIGNOF_TIME64_T__
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -51,8 +51,8 @@ __DECL_BEGIN
 #undef modtime
 
 struct utimbuf /*[PREFIX()]*/ {
-	__TM_TYPE(time) actime;  /* Access time. */
-	__TM_TYPE(time) modtime; /* Modification time. */
+	__time_t actime;  /* Access time. */
+	__time_t modtime; /* Modification time. */
 };
 
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__

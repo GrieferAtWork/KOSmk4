@@ -27,7 +27,7 @@
 #define __SOCKADDR_COMMON(sa_prefix) \
 	__sa_family_t sa_prefix##family
 #define __SOCKADDR_COMMON_SIZE    __SIZEOF_SA_FAMILY_T__
-#define __SOCKADDR_COMMON_ALIGN   __ALIGNOF_INTN(__SIZEOF_SA_FAMILY_T__)
+#define __SOCKADDR_COMMON_ALIGN   __ALIGNOF_SA_FAMILY_T__
 #define __SIZEOF_SOCKADDR_STORAGE 128
 
 #endif /* !_BITS_OS_GENERIC_SOCKADDR_COMMON_H */

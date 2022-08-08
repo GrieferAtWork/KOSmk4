@@ -30,11 +30,12 @@
 #include <hybrid/__rotate.h>
 #include <hybrid/host.h>
 
+#include <asm/intrin.h>
+
 #if defined(__i386__) || defined(__x86_64__)
 #include <asm/intrin-arith.h>
 #include <asm/intrin-lock.h>
 #include <asm/intrin-segarith.h>
-#include <asm/intrin.h>
 #endif /* __i386__ || __x86_64__ */
 
 #ifdef __CC__
@@ -1502,7 +1503,10 @@ __FORCELOCAL void (__writefsqword)(__ULONGPTR_TYPE__ __off, __UINT64_TYPE__ __va
 /* __MACHINEX86_X64: unsigned char __cdecl _subborrow_u16(unsigned char, unsigned short, unsigned short, unsigned short *) */
 /* __MACHINEX86_X64: unsigned char __cdecl _addcarry_u32(unsigned char, unsigned int, unsigned int, unsigned int *) */
 /* __MACHINEX86_X64: unsigned char __cdecl _subborrow_u32(unsigned char, unsigned int, unsigned int, unsigned int *) */
-#endif /* __i386__ || __x86_64__ */
+#elif defined(__arm__)
+#define __debugbreak() __bkpt(0)
+#define _mm_pause()    __yield()
+#endif /* ... */
 /************************************************************************/
 
 

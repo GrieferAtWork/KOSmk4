@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd859d1c */
+/* HASH CRC-32:0xd4fa40f7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ __SYSDECL_BEGIN
 #if (defined(__USE_XOPEN) || defined(__USE_XOPEN2K) || defined(__USE_DOS))
 #ifndef __time_t_defined
 #define __time_t_defined
-typedef __TM_TYPE(time) time_t;
+typedef __time_t time_t;
 #endif /* !__time_t_defined */
 #endif /* __USE_XOPEN || __USE_XOPEN2K || __USE_DOS */
 

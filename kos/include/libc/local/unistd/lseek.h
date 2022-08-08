@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x261c763a */
+/* HASH CRC-32:0xf380125 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,8 +66,8 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_lseek64_defined
 #endif /* !... */
 #endif /* !__local___localdep_lseek64_defined */
-__LOCAL_LIBC(lseek) __FS_TYPE(off)
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lseek))(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence) {
+__LOCAL_LIBC(lseek) __off_t
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lseek))(__fd_t __fd, __off_t __offset, __STDC_INT_AS_UINT_T __whence) {
 #if defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_lseek32)(__fd, (__off32_t)__offset, __whence);
 #else /* __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE___libc_lseek */

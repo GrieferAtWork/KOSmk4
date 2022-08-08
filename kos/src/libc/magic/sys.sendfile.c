@@ -26,7 +26,7 @@
 }
 
 %[define_replacement(fd_t = __fd_t)]
-%[define_replacement(off_t = "__FS_TYPE(off)")]
+%[define_replacement(off_t = "__off_t")]
 %[define_replacement(off32_t = __off32_t)]
 %[define_replacement(off64_t = __off64_t)]
 %[default:section(".text.crt{|.dos}.fs.statfs.statfs")]

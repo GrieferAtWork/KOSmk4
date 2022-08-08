@@ -34,7 +34,7 @@
 #define _BSD_PTRDIFF_T_   __PTRDIFF_TYPE__
 #define _BSD_SSIZE_T_     __SSIZE_TYPE__
 #define _BSD_SIZE_T_      __SIZE_TYPE__
-#define _BSD_TIME_T_      __TM_TYPE(time)
+#define _BSD_TIME_T_      __time_t
 #define _BSD_CLOCKID_T_   __clockid_t
 #define _BSD_TIMER_T_     __timer_t
 #define _BSD_SUSECONDS_T_ __suseconds_t

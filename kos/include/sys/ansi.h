@@ -41,11 +41,9 @@ typedef __u_net32_t __in_addr_t;
 typedef __u_net16_t __in_port_t;
 #ifndef __machine_fsblkcnt_t_defined
 #define __machine_fsblkcnt_t_defined
-#define __fsblkcnt_t __FS_TYPE(fsblkcnt)
 #endif /* !__machine_fsblkcnt_t_defined */
 #ifndef __machine_fsfilcnt_t_defined
 #define __machine_fsfilcnt_t_defined
-#define __fsfilcnt_t __FS_TYPE(fsfilcnt)
 #endif /* !__machine_fsfilcnt_t_defined */
 #ifndef ____mbstate_t_defined
 #define ____mbstate_t_defined

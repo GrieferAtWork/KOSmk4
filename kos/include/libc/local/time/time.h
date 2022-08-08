@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x255222e7 */
+/* HASH CRC-32:0x5cc537c3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,18 +59,18 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_time64_defined
 #endif /* !... */
 #endif /* !__local___localdep_time64_defined */
-__LOCAL_LIBC(time) __ATTR_OUT_OPT(1) __TM_TYPE(time)
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(time))(__TM_TYPE(time) *__timer) {
+__LOCAL_LIBC(time) __ATTR_OUT_OPT(1) __time_t
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(time))(__time_t *__timer) {
 #if defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 	__time32_t __tm32 = (__NAMESPACE_LOCAL_SYM __localdep_crt_time32)(__NULLPTR);
 	if (__timer)
-		*__timer = (__TM_TYPE(time))__tm32;
-	return (__TM_TYPE(time))__tm32;
+		*__timer = (__time_t)__tm32;
+	return (__time_t)__tm32;
 #else /* __CRT_HAVE_time || __CRT_HAVE___time || __CRT_HAVE___libc_time || __CRT_HAVE__time32 */
 	__time64_t __tm64 = (__NAMESPACE_LOCAL_SYM __localdep_time64)(__NULLPTR);
 	if (__timer)
-		*__timer = (__TM_TYPE(time))__tm64;
-	return (__TM_TYPE(time))__tm64;
+		*__timer = (__time_t)__tm64;
+	return (__time_t)__tm64;
 #endif /* !__CRT_HAVE_time && !__CRT_HAVE___time && !__CRT_HAVE___libc_time && !__CRT_HAVE__time32 */
 }
 __NAMESPACE_LOCAL_END

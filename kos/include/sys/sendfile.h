@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb45e8a48 */
+/* HASH CRC-32:0x46983e34 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,12 +55,12 @@ typedef __SIZE_TYPE__ size_t;
 #endif /* !__size_t_defined */
 
 #if defined(__CRT_HAVE_sendfile) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
-__CDECLARE(__ATTR_INOUT_OPT(3),ssize_t,__NOTHROW_NCX,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __FS_TYPE(off) *__offset, size_t __count),(__out_fd,__in_fd,__offset,__count))
+__CDECLARE(__ATTR_INOUT_OPT(3),ssize_t,__NOTHROW_NCX,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __off_t *__offset, size_t __count),(__out_fd,__in_fd,__offset,__count))
 #elif defined(__CRT_HAVE_sendfile64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
-__CREDIRECT(__ATTR_INOUT_OPT(3),ssize_t,__NOTHROW_NCX,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __FS_TYPE(off) *__offset, size_t __count),sendfile64,(__out_fd,__in_fd,__offset,__count))
+__CREDIRECT(__ATTR_INOUT_OPT(3),ssize_t,__NOTHROW_NCX,sendfile,(__fd_t __out_fd, __fd_t __in_fd, __off_t *__offset, size_t __count),sendfile64,(__out_fd,__in_fd,__offset,__count))
 #elif defined(__CRT_HAVE_sendfile64) || defined(__CRT_HAVE_sendfile)
 #include <libc/local/sys.sendfile/sendfile.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(sendfile, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT_OPT(3) ssize_t __NOTHROW_NCX(__LIBCCALL sendfile)(__fd_t __out_fd, __fd_t __in_fd, __FS_TYPE(off) *__offset, size_t __count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sendfile))(__out_fd, __in_fd, __offset, __count); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(sendfile, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT_OPT(3) ssize_t __NOTHROW_NCX(__LIBCCALL sendfile)(__fd_t __out_fd, __fd_t __in_fd, __off_t *__offset, size_t __count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sendfile))(__out_fd, __in_fd, __offset, __count); })
 #endif /* ... */
 #ifdef __USE_LARGEFILE64
 #if defined(__CRT_HAVE_sendfile) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__

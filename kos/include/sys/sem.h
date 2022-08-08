@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd767212d */
+/* HASH CRC-32:0x242448ae */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -112,7 +112,7 @@ typedef __pid_t pid_t;
 
 #ifndef __time_t_defined
 #define __time_t_defined
-typedef __TM_TYPE(time) time_t;
+typedef __time_t time_t;
 #endif /* !__time_t_defined */
 
 #ifdef __CRT_HAVE_semctl

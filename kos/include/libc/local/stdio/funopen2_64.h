@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60bd30ae */
+/* HASH CRC-32:0xf33457bc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,7 +77,7 @@ struct __funopen_holder {
 	void            *__fh_cookie;                                                 /* [?..?] funopen cookie */
 	int   (__LIBKCALL *__fh_readfn)(void *__cookie, char *__buf, int __num_bytes);        /* [0..1] funopen readfn */
 	int   (__LIBKCALL *__fh_writefn)(void *__cookie, char const *__buf, int __num_bytes); /* [0..1] funopen writefn */
-	__FS_TYPE(off) (__LIBKCALL *__fh_seekfn)(void *__cookie, __FS_TYPE(off) __off, int __whence);           /* [0..1] funopen seekfn */
+	__off_t (__LIBKCALL *__fh_seekfn)(void *__cookie, __off_t __off, int __whence);           /* [0..1] funopen seekfn */
 	int   (__LIBKCALL *__fh_closefn)(void *__cookie);                                 /* [0..1] funopen closefn */
 };
 __NAMESPACE_LOCAL_END
@@ -88,7 +88,7 @@ struct __funopen2_holder {
 	void              *__f2h_cookie;                                                    /* [0..1] funopen2 readfn */
 	__SSIZE_TYPE__ (__LIBKCALL *__f2h_readfn)(void *__cookie, void *__buf, __SIZE_TYPE__ __num_bytes);        /* [0..1] funopen2 readfn */
 	__SSIZE_TYPE__ (__LIBKCALL *__f2h_writefn)(void *__cookie, void const *__buf, __SIZE_TYPE__ __num_bytes); /* [0..1] funopen2 writefn */
-	__FS_TYPE(off)   (__LIBKCALL *__f2h_seekfn)(void *__cookie, __FS_TYPE(off) __off, int __whence);              /* [0..1] funopen2 seekfn */
+	__off_t   (__LIBKCALL *__f2h_seekfn)(void *__cookie, __off_t __off, int __whence);              /* [0..1] funopen2 seekfn */
 	int     (__LIBKCALL *__f2h_closefn)(void *__cookie);                                    /* [0..1] funopen2 closefn */
 	int     (__LIBKCALL *__f2h_flushfn)(void *__cookie);                                    /* [0..1] funopen2 flushfn */
 };

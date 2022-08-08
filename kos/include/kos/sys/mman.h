@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdac29830 */
+/* HASH CRC-32:0x9cbf45b1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __SYSDECL_BEGIN
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__THROWING,MMap,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __FS_TYPE(pos) __offset),(__addr,__len,__prot,__flags,__fd,__offset))
+__CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__THROWING,MMap,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos_t __offset),(__addr,__len,__prot,__flags,__fd,__offset))
 #elif defined(__CRT_HAVE_MMap64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> mmap(2), mmap64(2)
  * @param prot:  Either `PROT_NONE', or set of `PROT_EXEC | PROT_WRITE | PROT_READ | PROT_SEM | PROT_SHARED'
@@ -51,7 +51,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__THROWING,MMap,(void *__
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__THROWING,MMap,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __FS_TYPE(pos) __offset),MMap64,(__addr,__len,__prot,__flags,__fd,__offset))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__THROWING,MMap,(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos_t __offset),MMap64,(__addr,__len,__prot,__flags,__fd,__offset))
 #elif defined(__CRT_HAVE_MMap64) || defined(__CRT_HAVE_MMap)
 #include <libc/local/kos.sys.mman/MMap.h>
 /* >> mmap(2), mmap64(2)
@@ -60,7 +60,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__THROWING,MMap,(void *_
  *               with a set of `MAP_ANONYMOUS | MAP_FIXED | MAP_GROWSDOWN | MAP_LOCKED|
  *               MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
  *               MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(MMap, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_NONE(1) void *(__LIBCCALL MMap)(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __FS_TYPE(pos) __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(MMap))(__addr, __len, __prot, __flags, __fd, __offset); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(MMap, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_ACCESS_NONE(1) void *(__LIBCCALL MMap)(void *__addr, size_t __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos_t __offset) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(MMap))(__addr, __len, __prot, __flags, __fd, __offset); })
 #endif /* ... */
 /* >> munmap(2)
  * Unmap memory from `addr...+=len' */

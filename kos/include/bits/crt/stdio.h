@@ -27,15 +27,10 @@
 
 #define __SIZEOF_FPOS32_T__ __SIZEOF_OFF32_T__
 #define __SIZEOF_FPOS64_T__ __SIZEOF_OFF64_T__
-#define __SIZEOF_FPOS_T__   __FS_SIZEOF(FPOS)
+#define __SIZEOF_FPOS_T__   __SIZEOF_OFF_T__
 
-#ifdef __CC__
-__DECL_BEGIN
-
-typedef __pos32_t __fpos32_t;
-typedef __pos64_t __fpos64_t;
-
-__DECL_END
-#endif /* __CC__ */
+#define __fpos_t   __pos_t
+#define __fpos32_t __pos32_t
+#define __fpos64_t __pos64_t
 
 #endif /* !_BITS_CRT_STDIO_H */

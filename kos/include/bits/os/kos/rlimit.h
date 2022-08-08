@@ -29,8 +29,8 @@
 __DECL_BEGIN
 
 struct rlimit {
-	__FS_TYPE(rlim) rlim_cur; /* The current (soft) limit. */
-	__FS_TYPE(rlim) rlim_max; /* The hard limit. */
+	__rlim_t rlim_cur; /* The current (soft) limit. */
+	__rlim_t rlim_max; /* The hard limit. */
 };
 
 #ifdef __USE_LARGEFILE64

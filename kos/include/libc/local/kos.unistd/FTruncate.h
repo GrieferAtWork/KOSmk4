@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83d6ba1f */
+/* HASH CRC-32:0x3b78589d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(,int,__THROWING,__localdep_crt_FTruncate32,(__fd_t __fd, __pos32_t __length),FTruncate,(__fd,__length))
 #endif /* !__local___localdep_crt_FTruncate32_defined && __CRT_HAVE_FTruncate */
 __LOCAL_LIBC(FTruncate) void
-(__LIBCCALL __LIBC_LOCAL_NAME(FTruncate))(__fd_t __fd, __FS_TYPE(pos) __length) __THROWS(...) {
+(__LIBCCALL __LIBC_LOCAL_NAME(FTruncate))(__fd_t __fd, __pos_t __length) __THROWS(...) {
 #ifdef __CRT_HAVE_FTruncate
 	(__NAMESPACE_LOCAL_SYM __localdep_crt_FTruncate32)(__fd, (__pos32_t)__length);
 #else /* __CRT_HAVE_FTruncate */

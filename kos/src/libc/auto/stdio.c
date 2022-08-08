@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1abb859b */
+/* HASH CRC-32:0x803985d8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1208,9 +1208,9 @@ __NAMESPACE_LOCAL_END
 #ifndef __fopencookie_to_funopen_seekfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen_seekfn_defined
-__LOCAL_LIBC(fopencookie_to_funopen_seekfn) __FS_TYPE(off)
-(__LIBKCALL fopencookie_to_funopen_seekfn)(void *cookie, __FS_TYPE(off) off, int whence) {
-#if __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+__LOCAL_LIBC(fopencookie_to_funopen_seekfn) __off_t
+(__LIBKCALL fopencookie_to_funopen_seekfn)(void *cookie, __off_t off, int whence) {
+#if __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 	struct __fopencookie_holder *holder;
 	holder = (struct __fopencookie_holder *)cookie;
 #ifdef __USE_KOS_ALTERATIONS
@@ -1221,7 +1221,7 @@ __LOCAL_LIBC(fopencookie_to_funopen_seekfn) __FS_TYPE(off)
 		return -1;
 #endif /* !__USE_KOS_ALTERATIONS */
 	return off;
-#else /* __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__ */
+#else /* __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__ */
 #ifdef __USE_KOS_ALTERATIONS
 	pos64_t newpos = (pos64_t)off;
 #else /* __USE_KOS_ALTERATIONS */
@@ -1231,8 +1231,8 @@ __LOCAL_LIBC(fopencookie_to_funopen_seekfn) __FS_TYPE(off)
 	holder = (struct __fopencookie_holder *)cookie;
 	if ((*holder->foch_funcs.seek)(holder->foch_cookie, &newpos, whence) != 0)
 		return -1;
-	return (__FS_TYPE(off))newpos;
-#endif /* __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__ */
+	return (__off_t)newpos;
+#endif /* __SIZEOF_OFF_T__ != __SIZEOF_OFF64_T__ */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__fopencookie_to_funopen_seekfn_defined */
@@ -1281,7 +1281,7 @@ __LOCAL_LIBC(fopencookie_to_funopen64_seekfn) off64_t
 __NAMESPACE_LOCAL_END
 #endif /* !__fopencookie_to_funopen64_seekfn_defined */
 
-#elif defined(__CRT_HAVE_funopen2) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
+#elif defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__
 #ifndef __fopencookie_to_funopen2_readfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen2_readfn_defined
@@ -1309,9 +1309,9 @@ __NAMESPACE_LOCAL_END
 #ifndef __fopencookie_to_funopen_seekfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen_seekfn_defined
-__LOCAL_LIBC(fopencookie_to_funopen_seekfn) __FS_TYPE(off)
-(__LIBKCALL fopencookie_to_funopen_seekfn)(void *cookie, __FS_TYPE(off) off, int whence) {
-#if __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+__LOCAL_LIBC(fopencookie_to_funopen_seekfn) __off_t
+(__LIBKCALL fopencookie_to_funopen_seekfn)(void *cookie, __off_t off, int whence) {
+#if __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 	struct __fopencookie_holder *holder;
 	holder = (struct __fopencookie_holder *)cookie;
 #ifdef __USE_KOS_ALTERATIONS
@@ -1322,7 +1322,7 @@ __LOCAL_LIBC(fopencookie_to_funopen_seekfn) __FS_TYPE(off)
 		return -1;
 #endif /* !__USE_KOS_ALTERATIONS */
 	return off;
-#else /* __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__ */
+#else /* __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__ */
 #ifdef __USE_KOS_ALTERATIONS
 	pos64_t newpos = (pos64_t)off;
 #else /* __USE_KOS_ALTERATIONS */
@@ -1332,8 +1332,8 @@ __LOCAL_LIBC(fopencookie_to_funopen_seekfn) __FS_TYPE(off)
 	holder = (struct __fopencookie_holder *)cookie;
 	if ((*holder->foch_funcs.seek)(holder->foch_cookie, &newpos, whence) != 0)
 		return -1;
-	return (__FS_TYPE(off))newpos;
-#endif /* __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__ */
+	return (__off_t)newpos;
+#endif /* __SIZEOF_OFF_T__ != __SIZEOF_OFF64_T__ */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__fopencookie_to_funopen_seekfn_defined */
@@ -1410,9 +1410,9 @@ __NAMESPACE_LOCAL_END
 #ifndef __fopencookie_to_funopen_seekfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __fopencookie_to_funopen_seekfn_defined
-__LOCAL_LIBC(fopencookie_to_funopen_seekfn) __FS_TYPE(off)
-(__LIBKCALL fopencookie_to_funopen_seekfn)(void *cookie, __FS_TYPE(off) off, int whence) {
-#if __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+__LOCAL_LIBC(fopencookie_to_funopen_seekfn) __off_t
+(__LIBKCALL fopencookie_to_funopen_seekfn)(void *cookie, __off_t off, int whence) {
+#if __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 	struct __fopencookie_holder *holder;
 	holder = (struct __fopencookie_holder *)cookie;
 #ifdef __USE_KOS_ALTERATIONS
@@ -1423,7 +1423,7 @@ __LOCAL_LIBC(fopencookie_to_funopen_seekfn) __FS_TYPE(off)
 		return -1;
 #endif /* !__USE_KOS_ALTERATIONS */
 	return off;
-#else /* __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__ */
+#else /* __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__ */
 #ifdef __USE_KOS_ALTERATIONS
 	pos64_t newpos = (pos64_t)off;
 #else /* __USE_KOS_ALTERATIONS */
@@ -1433,8 +1433,8 @@ __LOCAL_LIBC(fopencookie_to_funopen_seekfn) __FS_TYPE(off)
 	holder = (struct __fopencookie_holder *)cookie;
 	if ((*holder->foch_funcs.seek)(holder->foch_cookie, &newpos, whence) != 0)
 		return -1;
-	return (__FS_TYPE(off))newpos;
-#endif /* __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__ */
+	return (__off_t)newpos;
+#endif /* __SIZEOF_OFF_T__ != __SIZEOF_OFF64_T__ */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__fopencookie_to_funopen_seekfn_defined */
@@ -1921,7 +1921,7 @@ NOTHROW_NCX(LIBCCALL libc_fmtcheck)(char const *user_format,
 	(void)good_format;
 	return user_format;
 }
-#if __SIZEOF_INT__ != __SIZEOF_SIZE_T__ || ((!defined(__CRT_HAVE_funopen2) || __FS_SIZEOF(OFF) != __SIZEOF_OFF32_T__) && (!defined(__CRT_HAVE_funopen2_64) || __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__) && ((!defined(__CRT_HAVE_malloc) && !defined(__CRT_HAVE___libc_malloc) && !defined(__CRT_HAVE_calloc) && !defined(__CRT_HAVE___libc_calloc) && !defined(__CRT_HAVE_realloc) && !defined(__CRT_HAVE___libc_realloc) && !defined(__CRT_HAVE_memalign) && !defined(__CRT_HAVE_aligned_alloc) && !defined(__CRT_HAVE___libc_memalign) && !defined(__CRT_HAVE_posix_memalign)) || (!defined(__CRT_HAVE_funopen2_64) && !defined(__CRT_HAVE_funopen2))))
+#if __SIZEOF_INT__ != __SIZEOF_SIZE_T__ || ((!defined(__CRT_HAVE_funopen2) || __SIZEOF_OFF_T__ != __SIZEOF_OFF32_T__) && (!defined(__CRT_HAVE_funopen2_64) || __SIZEOF_OFF_T__ != __SIZEOF_OFF64_T__) && ((!defined(__CRT_HAVE_malloc) && !defined(__CRT_HAVE___libc_malloc) && !defined(__CRT_HAVE_calloc) && !defined(__CRT_HAVE___libc_calloc) && !defined(__CRT_HAVE_realloc) && !defined(__CRT_HAVE___libc_realloc) && !defined(__CRT_HAVE_memalign) && !defined(__CRT_HAVE_aligned_alloc) && !defined(__CRT_HAVE___libc_memalign) && !defined(__CRT_HAVE_posix_memalign)) || (!defined(__CRT_HAVE_funopen2_64) && !defined(__CRT_HAVE_funopen2))))
 #ifndef ____funopen_holder_defined
 __NAMESPACE_LOCAL_BEGIN
 #define ____funopen_holder_defined
@@ -1953,7 +1953,7 @@ __LOCAL_LIBC(funopen_to_funopen2_closefn) int
 __NAMESPACE_LOCAL_END
 #endif /* !__funopen_to_funopen2_closefn_defined */
 
-#if (defined(__CRT_HAVE_funopen2) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__) || (defined(__CRT_HAVE_funopen2_64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && ((defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_funopen2_64) || defined(__CRT_HAVE_funopen2)))
+#if (defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__) || (defined(__CRT_HAVE_funopen2_64) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && ((defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_funopen2_64) || defined(__CRT_HAVE_funopen2)))
 #ifndef __funopen_to_funopen2_readfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_funopen2_readfn_defined
@@ -1983,8 +1983,8 @@ __NAMESPACE_LOCAL_END
 #ifndef __funopen_to_funopen2_seekfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_funopen2_seekfn_defined
-__LOCAL_LIBC(funopen_to_funopen2_seekfn) __FS_TYPE(off)
-(__LIBKCALL funopen_to_funopen2_seekfn)(void *cookie, __FS_TYPE(off) off, int whence) {
+__LOCAL_LIBC(funopen_to_funopen2_seekfn) __off_t
+(__LIBKCALL funopen_to_funopen2_seekfn)(void *cookie, __off_t off, int whence) {
 	struct __funopen_holder *holder;
 	holder = (struct __funopen_holder *)cookie;
 	return (*holder->fh_seekfn)(holder->fh_cookie, off, whence);
@@ -2030,10 +2030,10 @@ __LOCAL_LIBC(funopen_to_fopencookie_seekfn) NONNULL((2)) int
 (__LIBKCALL funopen_to_fopencookie_seekfn)(void *cookie, off64_t *pos, int whence)
 #endif /* !__USE_KOS_ALTERATIONS */
 {
-	__FS_TYPE(off) newpos;
+	__off_t newpos;
 	struct __funopen_holder *holder;
 	holder = (struct __funopen_holder *)cookie;
-	newpos = (*holder->fh_seekfn)(holder->fh_cookie, (__FS_TYPE(off))*pos, whence);
+	newpos = (*holder->fh_seekfn)(holder->fh_cookie, (__off_t)*pos, whence);
 	if unlikely(newpos == -1)
 		return -1;
 #ifdef __USE_KOS_ALTERATIONS
@@ -2108,13 +2108,13 @@ __LOCAL_LIBC(funopen_to_funopen64_seekfn) off64_t
 (__LIBKCALL funopen_to_funopen64_seekfn)(void *cookie, off64_t off, int whence) {
 	struct __funopen_holder *holder;
 	holder = (struct __funopen_holder *)cookie;
-	return (*holder->fh_seekfn)(holder->fh_cookie, (__FS_TYPE(off))off, whence);
+	return (*holder->fh_seekfn)(holder->fh_cookie, (__off_t)off, whence);
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__funopen_to_funopen64_seekfn_defined */
 
 #endif /* !... */
-#endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ || ((!__CRT_HAVE_funopen2 || __FS_SIZEOF(OFF) != __SIZEOF_OFF32_T__) && (!__CRT_HAVE_funopen2_64 || __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__) && ((!__CRT_HAVE_malloc && !__CRT_HAVE___libc_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE___libc_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE___libc_memalign && !__CRT_HAVE_posix_memalign) || (!__CRT_HAVE_funopen2_64 && !__CRT_HAVE_funopen2))) */
+#endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ || ((!__CRT_HAVE_funopen2 || __SIZEOF_OFF_T__ != __SIZEOF_OFF32_T__) && (!__CRT_HAVE_funopen2_64 || __SIZEOF_OFF_T__ != __SIZEOF_OFF64_T__) && ((!__CRT_HAVE_malloc && !__CRT_HAVE___libc_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE___libc_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE___libc_memalign && !__CRT_HAVE_posix_memalign) || (!__CRT_HAVE_funopen2_64 && !__CRT_HAVE_funopen2))) */
 /* >> funopen(3), funopen64(3) */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.utility") WUNUSED FILE *
 NOTHROW_NCX(LIBCCALL libc_funopen)(void const *cookie,
@@ -2256,12 +2256,12 @@ __LOCAL_LIBC(funopen_to_funopen2_writefn) ssize_t
 __NAMESPACE_LOCAL_END
 #endif /* !__funopen_to_funopen2_writefn_defined */
 
-#if __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+#if __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 #ifndef __funopen_to_funopen2_seekfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_funopen2_seekfn_defined
-__LOCAL_LIBC(funopen_to_funopen2_seekfn) __FS_TYPE(off)
-(__LIBKCALL funopen_to_funopen2_seekfn)(void *cookie, __FS_TYPE(off) off, int whence) {
+__LOCAL_LIBC(funopen_to_funopen2_seekfn) __off_t
+(__LIBKCALL funopen_to_funopen2_seekfn)(void *cookie, __off_t off, int whence) {
 	struct __funopen_holder *holder;
 	holder = (struct __funopen_holder *)cookie;
 	return (*holder->fh_seekfn)(holder->fh_cookie, off, whence);
@@ -2269,7 +2269,7 @@ __LOCAL_LIBC(funopen_to_funopen2_seekfn) __FS_TYPE(off)
 __NAMESPACE_LOCAL_END
 #endif /* !__funopen_to_funopen2_seekfn_defined */
 
-#else /* __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__ */
+#else /* __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__ */
 #ifndef __funopen64_to_funopen2_64_seekfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __funopen64_to_funopen2_64_seekfn_defined
@@ -2282,7 +2282,7 @@ __LOCAL_LIBC(funopen64_to_funopen2_64_seekfn) off64_t
 __NAMESPACE_LOCAL_END
 #endif /* !__funopen64_to_funopen2_64_seekfn_defined */
 
-#endif /* __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__ */
+#endif /* __SIZEOF_OFF_T__ != __SIZEOF_OFF64_T__ */
 #elif defined(__CRT_HAVE_fopencookie)
 #ifndef __funopen_to_funopen2_readfn_defined
 __NAMESPACE_LOCAL_BEGIN
@@ -2310,7 +2310,7 @@ __LOCAL_LIBC(funopen_to_funopen2_writefn) ssize_t
 __NAMESPACE_LOCAL_END
 #endif /* !__funopen_to_funopen2_writefn_defined */
 
-#if __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+#if __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 #ifndef __funopen_to_fopencookie_seekfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_fopencookie_seekfn_defined
@@ -2322,10 +2322,10 @@ __LOCAL_LIBC(funopen_to_fopencookie_seekfn) NONNULL((2)) int
 (__LIBKCALL funopen_to_fopencookie_seekfn)(void *cookie, off64_t *pos, int whence)
 #endif /* !__USE_KOS_ALTERATIONS */
 {
-	__FS_TYPE(off) newpos;
+	__off_t newpos;
 	struct __funopen_holder *holder;
 	holder = (struct __funopen_holder *)cookie;
-	newpos = (*holder->fh_seekfn)(holder->fh_cookie, (__FS_TYPE(off))*pos, whence);
+	newpos = (*holder->fh_seekfn)(holder->fh_cookie, (__off_t)*pos, whence);
 	if unlikely(newpos == -1)
 		return -1;
 #ifdef __USE_KOS_ALTERATIONS
@@ -2338,7 +2338,7 @@ __LOCAL_LIBC(funopen_to_fopencookie_seekfn) NONNULL((2)) int
 __NAMESPACE_LOCAL_END
 #endif /* !__funopen_to_fopencookie_seekfn_defined */
 
-#else /* __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__ */
+#else /* __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__ */
 #ifndef __funopen64_to_fopencookie_seekfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __funopen64_to_fopencookie_seekfn_defined
@@ -2366,7 +2366,7 @@ __LOCAL_LIBC(funopen64_to_fopencookie_seekfn) int
 __NAMESPACE_LOCAL_END
 #endif /* !__funopen64_to_fopencookie_seekfn_defined */
 
-#endif /* __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__ */
+#endif /* __SIZEOF_OFF_T__ != __SIZEOF_OFF64_T__ */
 #include <libio.h>
 #else /* ... */
 #if __SIZEOF_INT__ == __SIZEOF_SIZE_T__
@@ -2422,7 +2422,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__funopen_to_funopen64_writefn_defined */
 
 #endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
-#if __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+#if __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 #ifndef __funopen_to_funopen64_seekfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __funopen_to_funopen64_seekfn_defined
@@ -2430,12 +2430,12 @@ __LOCAL_LIBC(funopen_to_funopen64_seekfn) off64_t
 (__LIBKCALL funopen_to_funopen64_seekfn)(void *cookie, off64_t off, int whence) {
 	struct __funopen_holder *holder;
 	holder = (struct __funopen_holder *)cookie;
-	return (*holder->fh_seekfn)(holder->fh_cookie, (__FS_TYPE(off))off, whence);
+	return (*holder->fh_seekfn)(holder->fh_cookie, (__off_t)off, whence);
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__funopen_to_funopen64_seekfn_defined */
 
-#else /* __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__ */
+#else /* __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__ */
 #ifndef __funopen64_to_funopen_seekfn_defined
 __NAMESPACE_LOCAL_BEGIN
 #define __funopen64_to_funopen_seekfn_defined
@@ -2448,7 +2448,7 @@ __LOCAL_LIBC(funopen64_to_funopen_seekfn) off_t
 __NAMESPACE_LOCAL_END
 #endif /* !__funopen64_to_funopen_seekfn_defined */
 
-#endif /* __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__ */
+#endif /* __SIZEOF_OFF_T__ != __SIZEOF_OFF64_T__ */
 #endif /* !... */
 #endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ || ((!__CRT_HAVE_funopen2 || __SIZEOF_OFF64_T__ != __SIZEOF_OFF32_T__) && !__CRT_HAVE_funopen2_64 && ((!__CRT_HAVE_malloc && !__CRT_HAVE___libc_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE___libc_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE___libc_memalign && !__CRT_HAVE_posix_memalign) || !__CRT_HAVE_funopen2)) */
 /* >> funopen(3), funopen64(3) */
@@ -2481,21 +2481,21 @@ NOTHROW_NCX(LIBCCALL libc_funopen64)(void const *cookie,
 	holder->fh64_seekfn  = seekfn;
 	holder->fh64_closefn = closefn;
 
-#if __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+#if __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 	result = libc_funopen2_64(/* cookie:  */ holder,
 	                     /* readfn:  */ readfn  ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_readfn  : NULL,
 	                     /* writefn: */ writefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_writefn : NULL,
 	                     /* seekfn:  */ seekfn  ? (off64_t (LIBKCALL *)(void *, off64_t, int))&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_seekfn  : NULL,
 	                     /* flushfn: */ NULL,
 	                     /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
-#else /* __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__ */
+#else /* __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__ */
 	result = libc_funopen2_64(/* cookie:  */ holder,
 	                     /* readfn:  */ readfn  ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_readfn  : NULL,
 	                     /* writefn: */ writefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_writefn : NULL,
 	                     /* seekfn:  */ seekfn  ? &__NAMESPACE_LOCAL_SYM funopen64_to_funopen2_64_seekfn  : NULL,
 	                     /* flushfn: */ NULL,
 	                     /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
-#endif /* __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__ */
+#endif /* __SIZEOF_OFF_T__ != __SIZEOF_OFF64_T__ */
 
 
 
@@ -2568,7 +2568,7 @@ INTERN ATTR_SECTION(".text.crt.dos.FILE.utility") WUNUSED int
 NOTHROW_NCX(LIBCCALL libc__getmaxstdio)(void) {
 	struct rlimit rlim;
 	if unlikely(libc_getrlimit((__rlimit_resource_t)__RLIMIT_NOFILE, &rlim) != 0)
-		rlim.rlim_cur = (__FS_TYPE(rlim))-1;
+		rlim.rlim_cur = (__rlim_t)-1;
 	return (int)rlim.rlim_cur;
 }
 #include <asm/os/resource.h>
@@ -2578,10 +2578,10 @@ NOTHROW_NCX(LIBCCALL libc__setmaxstdio)(int newmaxval) {
 	struct rlimit rlim;
 	if unlikely(libc_getrlimit((__rlimit_resource_t)__RLIMIT_NOFILE, &rlim) != 0)
 		goto err;
-	rlim.rlim_cur = (__FS_TYPE(rlim))newmaxval;
+	rlim.rlim_cur = (__rlim_t)newmaxval;
 	if unlikely(libc_setrlimit((__rlimit_resource_t)__RLIMIT_NOFILE, &rlim) != 0) {
 err:
-		rlim.rlim_cur = (__FS_TYPE(rlim))-1;
+		rlim.rlim_cur = (__rlim_t)-1;
 	}
 	return (int)rlim.rlim_cur;
 }

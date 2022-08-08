@@ -27,7 +27,7 @@
 #endif /* ... */
 
 #ifndef __RLIM_INFINITY
-#define __RLIM_INFINITY   (__CCAST(__FS_TYPE(rlim))-1) /* Unlimited */
+#define __RLIM_INFINITY   (__CCAST(__rlim_t)-1) /* Unlimited */
 #endif /* !__RLIM_INFINITY */
 #ifndef __RLIM64_INFINITY
 #define __RLIM64_INFINITY (__CCAST(__rlim64_t)-1)      /* Unlimited */

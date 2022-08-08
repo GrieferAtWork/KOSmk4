@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20c40431 */
+/* HASH CRC-32:0x67fc9201 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -432,7 +432,7 @@ NOTHROW_NCX(LIBCCALL libc_timegm)(struct tm *tp) {
 #endif /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 
 	/* EOVERFLOW if result gets truncated */
-#if __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__
+#if __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__
 	if ((time64_t)(time_t)result != result) {
 
 		return (time_t)__libc_seterrno(EOVERFLOW);
@@ -440,7 +440,7 @@ NOTHROW_NCX(LIBCCALL libc_timegm)(struct tm *tp) {
 
 
 	}
-#endif /* __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__ */
+#endif /* __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__ */
 
 	return (time_t)result;
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22a71476 */
+/* HASH CRC-32:0x18992a1a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __SYSDECL_BEGIN
 
 #ifndef __time_t_defined
 #define __time_t_defined
-typedef __TM_TYPE(time) time_t;
+typedef __time_t time_t;
 #endif /* !__time_t_defined */
 
 #ifdef __CRT_HAVE_acct

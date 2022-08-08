@@ -50,7 +50,7 @@ typedef __SIZE_TYPE__ wint_t;
 
 #ifndef __machine_blkcnt_t_defined
 #define __machine_blkcnt_t_defined
-typedef __FS_TYPE(blkcnt) __blkcnt_t;
+typedef __blkcnt_t __blkcnt_t;
 #endif /* !__machine_blkcnt_t_defined */
 
 #ifndef __machine_blksize_t_defined
@@ -59,17 +59,17 @@ typedef __FS_TYPE(blkcnt) __blkcnt_t;
 
 #ifndef __machine_fsblkcnt_t_defined
 #define __machine_fsblkcnt_t_defined
-typedef __FS_TYPE(fsblkcnt) __fsblkcnt_t;
+typedef __fsblkcnt_t __fsblkcnt_t;
 #endif /* !__machine_fsblkcnt_t_defined */
 
 #ifndef __machine_fsfilcnt_t_defined
 #define __machine_fsfilcnt_t_defined
-typedef __FS_TYPE(fsfilcnt) __fsfilcnt_t;
+typedef __fsfilcnt_t __fsfilcnt_t;
 #endif /* !__machine_fsfilcnt_t_defined */
 
 #ifndef __machine_off_t_defined
 #define __machine_off_t_defined
-typedef __FS_TYPE(off) _off_t;
+typedef __off_t _off_t;
 #endif /* !__machine_off_t_defined */
 
 #ifndef __machine_dev_t_defined
@@ -147,8 +147,8 @@ typedef void *_iconv_t;
 #define _CLOCK_T_ __clock_t
 #endif /* !__machine_clock_t_defined */
 
-#define _TIME_T_ __TM_TYPE(time)
-typedef __TM_TYPE(time) __time_t;
+#define _TIME_T_ __time_t
+typedef __time_t __time_t;
 
 #ifndef __machine_clockid_t_defined
 #define __machine_clockid_t_defined
@@ -174,7 +174,7 @@ typedef __builtin_va_list __va_list;
 typedef __uint32_t __fflags_t;
 #ifndef __machine_ino_t_defined
 #define __machine_ino_t_defined
-typedef __FS_TYPE(ino) __ino_t;
+typedef __ino_t __ino_t;
 #endif /* !__machine_ino_t_defined */
 typedef __pid_t __lwpid_t;
 typedef int __accmode_t;

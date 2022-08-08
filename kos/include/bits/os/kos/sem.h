@@ -32,18 +32,18 @@ __DECL_BEGIN
 #ifdef __CC__
 struct semid_ds {
 	struct ipc_perm     sem_perm;        /* ??? */
-	__TM_TYPE(time)     sem_otime;       /* ??? */
-#if __TM_SIZEOF(TIME) > __SIZEOF_SYSCALL_LONG_T__
-#if __TM_SIZEOF(TIME) != __SIZEOF_SYSCALL_LONG_T__ * 2
+	__time_t            sem_otime;       /* ??? */
+#if __SIZEOF_TIME_T__ > __SIZEOF_SYSCALL_LONG_T__
+#if __SIZEOF_TIME_T__ != __SIZEOF_SYSCALL_LONG_T__ * 2
 #error "Unsupported configuration"
-#endif /* __TM_SIZEOF(TIME) != __SIZEOF_SYSCALL_LONG_T__ * 2 */
-#else /* __TM_SIZEOF(TIME) > __SIZEOF_SYSCALL_LONG_T__ */
+#endif /* __SIZEOF_TIME_T__ != __SIZEOF_SYSCALL_LONG_T__ * 2 */
+#else /* __SIZEOF_TIME_T__ > __SIZEOF_SYSCALL_LONG_T__ */
 	__syscall_ulong_t __glibc_reserved1;
-#endif /* __TM_SIZEOF(TIME) <= __SIZEOF_SYSCALL_LONG_T__ */
-	__TM_TYPE(time)     sem_ctime;       /* ??? */
-#if __TM_SIZEOF(TIME) <= __SIZEOF_SYSCALL_LONG_T__
+#endif /* __SIZEOF_TIME_T__ <= __SIZEOF_SYSCALL_LONG_T__ */
+	__time_t            sem_ctime;       /* ??? */
+#if __SIZEOF_TIME_T__ <= __SIZEOF_SYSCALL_LONG_T__
 	__syscall_ulong_t __glibc_reserved2;
-#endif /* __TM_SIZEOF(TIME) <= __SIZEOF_SYSCALL_LONG_T__ */
+#endif /* __SIZEOF_TIME_T__ <= __SIZEOF_SYSCALL_LONG_T__ */
 	__syscall_ulong_t   sem_nsems;       /* ??? */
 	__syscall_ulong_t __glibc_reserved3;
 	__syscall_ulong_t __glibc_reserved4;

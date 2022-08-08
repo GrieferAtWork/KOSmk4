@@ -54,9 +54,9 @@ final function isUnrelatedGCCFlag(flag: string): bool {
 
 #ifdef __WINDOWS__
 final global EXE_FORMAT = "{}{}.exe";
-#else
+#else /* __WINDOWS__ */
 final global EXE_FORMAT = "{}{}";
-#endif
+#endif /* !__WINDOWS__ */
 
 @@Join sub-process arguments for gcc or g++
 function joinGccArguments(args: {string...}, Wx: string, Xxxx: string): {string...} {
@@ -191,8 +191,8 @@ function normalizeFilenameForLog(filename: string) {
 	if (!fs.isabs(filename))
 		filename = fs.abspath(filename, ROOTDIR);
 #ifdef __WINDOWS__
-	filename = filename.replace("\\", "/");
-#endif
+	filename = filename.replace("/", "\\");
+#endif /* __WINDOWS__ */
 	return filename;
 }
 

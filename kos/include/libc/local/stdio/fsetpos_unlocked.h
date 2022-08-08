@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7169908f */
+/* HASH CRC-32:0xd83ce5c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,21 +30,21 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_fsetpos_defined
 #define __local___localdep_fsetpos_defined
 #if defined(__CRT_HAVE_fsetpos_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__
-__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,__localdep_fsetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) const *__restrict __pos),fsetpos_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,__localdep_fsetpos,(__FILE *__restrict __stream, __fpos_t const *__restrict __pos),fsetpos_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__
-__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,__localdep_fsetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) const *__restrict __pos),fsetpos64_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,__localdep_fsetpos,(__FILE *__restrict __stream, __fpos_t const *__restrict __pos),fsetpos64_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__
-__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,__localdep_fsetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) const *__restrict __pos),fsetpos,(__stream,__pos))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,__localdep_fsetpos,(__FILE *__restrict __stream, __fpos_t const *__restrict __pos),fsetpos,(__stream,__pos))
 #elif defined(__CRT_HAVE__IO_fsetpos) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__
-__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,__localdep_fsetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) const *__restrict __pos),_IO_fsetpos,(__stream,__pos))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,__localdep_fsetpos,(__FILE *__restrict __stream, __fpos_t const *__restrict __pos),_IO_fsetpos,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos64) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__
-__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,__localdep_fsetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) const *__restrict __pos),fsetpos64,(__stream,__pos))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,__localdep_fsetpos,(__FILE *__restrict __stream, __fpos_t const *__restrict __pos),fsetpos64,(__stream,__pos))
 #elif defined(__CRT_HAVE__IO_fsetpos64) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__
-__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,__localdep_fsetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) const *__restrict __pos),_IO_fsetpos64,(__stream,__pos))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,__localdep_fsetpos,(__FILE *__restrict __stream, __fpos_t const *__restrict __pos),_IO_fsetpos64,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos_unlocked) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__
-__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,__localdep_fsetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) const *__restrict __pos),fsetpos_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,__localdep_fsetpos,(__FILE *__restrict __stream, __fpos_t const *__restrict __pos),fsetpos_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos64_unlocked) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__
-__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,__localdep_fsetpos,(__FILE *__restrict __stream, __FS_TYPE(fpos) const *__restrict __pos),fsetpos64_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,__localdep_fsetpos,(__FILE *__restrict __stream, __fpos_t const *__restrict __pos),fsetpos64_unlocked,(__stream,__pos))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/fsetpos.h>
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_fsetpos_defined */
 __LOCAL_LIBC(fsetpos_unlocked) __ATTR_IN(2) __ATTR_INOUT(1) int
-(__LIBCCALL __LIBC_LOCAL_NAME(fsetpos_unlocked))(__FILE *__restrict __stream, __FS_TYPE(fpos) const *__restrict __pos) __THROWS(...) {
+(__LIBCCALL __LIBC_LOCAL_NAME(fsetpos_unlocked))(__FILE *__restrict __stream, __fpos_t const *__restrict __pos) __THROWS(...) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_fsetpos)(__stream, __pos);
 }
 __NAMESPACE_LOCAL_END

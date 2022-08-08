@@ -34,11 +34,11 @@ struct flock /*[PREFIX(l_)]*/ {
 	__INT16_TYPE__ l_type;
 	__INT16_TYPE__ l_whence;
 #ifdef __USE_KOS_ALTERATIONS
-	__FS_TYPE(pos) l_start;
-	__FS_TYPE(pos) l_len;
+	__pos_t        l_start;
+	__pos_t        l_len;
 #else /* __USE_KOS_ALTERATIONS */
-	__FS_TYPE(off) l_start;
-	__FS_TYPE(off) l_len;
+	__off_t        l_start;
+	__off_t        l_len;
 #endif /* !__USE_KOS_ALTERATIONS */
 	__pid_t        l_pid;
 };

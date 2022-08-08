@@ -47,7 +47,7 @@
 %[define_replacement(dev_t      = __dev_t)]
 %[define_replacement(timespec32 = __timespec32)]
 %[define_replacement(timespec64 = __timespec64)]
-%[define_replacement(time_t     = "__TM_TYPE(time)")]
+%[define_replacement(time_t     = "__time_t")]
 %[define_replacement(time32_t   = __time32_t)]
 %[define_replacement(time64_t   = __time64_t)]
 %[define_replacement(stat64     = __stat64)]
@@ -186,7 +186,7 @@ typedef __gid_t gid_t;
 
 #ifndef __ino_t_defined
 #define __ino_t_defined
-typedef __FS_TYPE(ino) ino_t;  /* INode number */
+typedef __ino_t ino_t;  /* INode number */
 #endif /* __ino_t_defined */
 
 #ifndef __mode_t_defined
@@ -201,7 +201,7 @@ typedef __nlink_t nlink_t;
 
 #ifndef __off_t_defined
 #define __off_t_defined
-typedef __FS_TYPE(off) off_t;
+typedef __off_t off_t;
 #endif /* __off_t_defined */
 
 #ifndef __uid_t_defined
@@ -213,7 +213,7 @@ typedef __uid_t uid_t;
 #ifdef __USE_UNIX98
 #ifndef __blkcnt_t_defined
 #define __blkcnt_t_defined
-typedef __FS_TYPE(blkcnt)   blkcnt_t;
+typedef __blkcnt_t   blkcnt_t;
 #endif /* __blkcnt_t_defined */
 
 #ifndef __blksize_t_defined

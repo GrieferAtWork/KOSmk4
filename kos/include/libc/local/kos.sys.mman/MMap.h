@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6b46152 */
+/* HASH CRC-32:0xb8316084 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_MMap64_defined */
 __LOCAL_LIBC(MMap) __ATTR_WUNUSED __ATTR_ACCESS_NONE(1) void *
-(__LIBCCALL __LIBC_LOCAL_NAME(MMap))(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __FS_TYPE(pos) __offset) __THROWS(...) {
+(__LIBCCALL __LIBC_LOCAL_NAME(MMap))(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __pos_t __offset) __THROWS(...) {
 
 	return (__NAMESPACE_LOCAL_SYM __localdep_MMap64)(__addr, __len, __prot, __flags, __fd, (__pos64_t)__offset);
 

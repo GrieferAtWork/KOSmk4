@@ -385,7 +385,7 @@ enum __rusage_who {
 
 #ifndef __rlim_t_defined
 #define __rlim_t_defined
-typedef __FS_TYPE(rlim) rlim_t; /* Resource limit quantity */
+typedef __rlim_t rlim_t; /* Resource limit quantity */
 #endif /* !__rlim_t_defined */
 
 #ifdef __USE_LARGEFILE64

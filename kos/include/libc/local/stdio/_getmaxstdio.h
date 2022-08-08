@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68f80a57 */
+/* HASH CRC-32:0xd485c81f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __LOCAL_LIBC(_getmaxstdio) __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_getmaxstdio))(void) {
 	struct rlimit __rlim;
 	if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_getrlimit)((int)__RLIMIT_NOFILE, &__rlim) != 0)
-		__rlim.rlim_cur = (__FS_TYPE(rlim))-1;
+		__rlim.rlim_cur = (__rlim_t)-1;
 	return (int)__rlim.rlim_cur;
 }
 __NAMESPACE_LOCAL_END

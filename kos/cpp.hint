@@ -1180,14 +1180,18 @@
 #define RAII_FINALLY
 #define __RAII_FINALLY
 
-#define __FS_TYPE(x)      x##_t
-#define __FS_ALTTYPE(x)   x##_t
-#define __FS_SIZEOF(x)    __SIZEOF_##x##_T__
-#define __FS_ALTSIZEOF(x) __SIZEOF_##x##_T__
-#define __TM_TYPE(x)      x##_t
-#define __TM_ALTTYPE(x)   x##_t
-#define __TM_SIZEOF(x)    __SIZEOF_##x##_T__
-#define __TM_ALTSIZEOF(x) __SIZEOF_##x##_T__
+#define __FS_TYPE(x)       x##_t
+#define __FS_ALTTYPE(x)    x##_t
+#define __FS_SIZEOF(x)     __SIZEOF_##x##_T__
+#define __FS_ALTSIZEOF(x)  __SIZEOF_##x##_T__
+#define __FS_ALIGNOF(x)    __ALIGNOF_##x##_T__
+#define __FS_ALTALIGNOF(x) __ALIGNOF_##x##_T__
+#define __TM_TYPE(x)       x##_t
+#define __TM_ALTTYPE(x)    x##_t
+#define __TM_SIZEOF(x)     __SIZEOF_##x##_T__
+#define __TM_ALTSIZEOF(x)  __SIZEOF_##x##_T__
+#define __TM_ALIGNOF(x)    __ALIGNOF_##x##_T__
+#define __TM_ALTALIGNOF(x) __ALIGNOF_##x##_T__
 
 
 #define DEFINE_CMDLINE_FLAG_VAR(flagname,parname) bool flagname;

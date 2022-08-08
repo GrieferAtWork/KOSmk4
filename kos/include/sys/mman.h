@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99ad72d0 */
+/* HASH CRC-32:0x4e6cd76d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -565,7 +565,7 @@ __SYSDECL_BEGIN
 
 #ifndef __off_t_defined
 #define __off_t_defined
-typedef __FS_TYPE(off) off_t;
+typedef __off_t off_t;
 #endif /* !__off_t_defined */
 
 #ifndef __size_t_defined
@@ -580,10 +580,10 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET   __pos_t
 #define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET   __off_t
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */

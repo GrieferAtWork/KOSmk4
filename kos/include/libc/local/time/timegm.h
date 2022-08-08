@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71595973 */
+/* HASH CRC-32:0x7a784b88 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__yearstodays */
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(timegm) __ATTR_PURE __ATTR_WUNUSED __ATTR_INOUT(1) __TM_TYPE(time)
+__LOCAL_LIBC(timegm) __ATTR_PURE __ATTR_WUNUSED __ATTR_INOUT(1) __time_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timegm))(struct __NAMESPACE_STD_SYM tm *__tp) {
 	__time64_t __result;
 
@@ -70,17 +70,17 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timegm))(struct __NAMESPACE_STD_SYM t
 
 
 	/* EOVERFLOW if result gets truncated */
-#if __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__
-	if ((__time64_t)(__TM_TYPE(time))__result != __result) {
+#if __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__
+	if ((__time64_t)(__time_t)__result != __result) {
 #ifdef __EOVERFLOW
-		return (__TM_TYPE(time))__libc_seterrno(__EOVERFLOW);
+		return (__time_t)__libc_seterrno(__EOVERFLOW);
 #else /* __EOVERFLOW */
-		return (__TM_TYPE(time))__libc_seterrno(1);
+		return (__time_t)__libc_seterrno(1);
 #endif /* !__EOVERFLOW */
 	}
-#endif /* __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__ */
+#endif /* __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__ */
 
-	return (__TM_TYPE(time))__result;
+	return (__time_t)__result;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_timegm_defined

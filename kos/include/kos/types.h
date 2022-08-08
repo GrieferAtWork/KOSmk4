@@ -116,7 +116,7 @@ typedef __SHIFT_TYPE__ shift_t;
 
 #ifndef __time_t_defined
 #define __time_t_defined
-typedef __TM_TYPE(time) time_t; /* UNIX time in seconds since 01.01.1970 */
+typedef __time_t time_t; /* UNIX time in seconds since 01.01.1970 */
 #endif /* !__time_t_defined */
 
 #ifndef __time32_t_defined
@@ -153,7 +153,7 @@ typedef __major_t major_t;
 #ifdef __KERNEL__
 __HYBRID_ALTINT_TYPEDEF(__off64_t, off_t, false); /* File/device offset */
 #else /* __KERNEL__ */
-typedef __FS_TYPE(off) off_t; /* File/device offset */
+typedef __off_t off_t; /* File/device offset */
 #endif /* !__KERNEL__ */
 #endif /* !__off_t_defined */
 
@@ -162,7 +162,7 @@ typedef __FS_TYPE(off) off_t; /* File/device offset */
 #ifdef __KERNEL__
 __HYBRID_ALTINT_TYPEDEF(__pos64_t, pos_t, false); /* File/device position */
 #else /* __KERNEL__ */
-typedef __FS_TYPE(pos) pos_t; /* File/device position */
+typedef __pos_t pos_t; /* File/device position */
 #endif /* !__KERNEL__ */
 #endif /* !__pos_t_defined */
 
@@ -171,18 +171,18 @@ typedef __FS_TYPE(pos) pos_t; /* File/device position */
 #ifdef __KERNEL__
 __HYBRID_ALTINT_TYPEDEF(__ino64_t, ino_t, false); /* INode number */
 #else /* __KERNEL__ */
-typedef __FS_TYPE(ino) ino_t; /* INode number */
+typedef __ino_t ino_t; /* INode number */
 #endif /* !__KERNEL__ */
 #endif /* !__ino_t_defined */
 
 #ifndef __off32_t_defined
 #define __off32_t_defined
 #ifdef __KERNEL__
-#if __FS_SIZEOF(OFF) == 4
+#if __SIZEOF_OFF_T__ == 4
 typedef off_t off32_t; /* File/device offset */
-#else /* __FS_SIZEOF(OFF) == 4 */
+#else /* __SIZEOF_OFF_T__ == 4 */
 __HYBRID_ALTINT_TYPEDEF(__off32_t, off32_t, false); /* File/device offset */
-#endif /* __FS_SIZEOF(OFF) != 4 */
+#endif /* __SIZEOF_OFF_T__ != 4 */
 #else /* __KERNEL__ */
 typedef __off32_t off32_t; /* File/device offset */
 #endif /* !__KERNEL__ */
@@ -191,11 +191,11 @@ typedef __off32_t off32_t; /* File/device offset */
 #ifndef __off64_t_defined
 #define __off64_t_defined
 #ifdef __KERNEL__
-#if __FS_SIZEOF(OFF) == 8
+#if __SIZEOF_OFF_T__ == 8
 typedef off_t off64_t; /* File/device offset */
-#else /* __FS_SIZEOF(OFF) == 8 */
+#else /* __SIZEOF_OFF_T__ == 8 */
 __HYBRID_ALTINT_TYPEDEF(__off64_t, off64_t, false); /* File/device offset */
-#endif /* __FS_SIZEOF(OFF) != 8 */
+#endif /* __SIZEOF_OFF_T__ != 8 */
 #else /* __KERNEL__ */
 typedef __off64_t off64_t; /* File/device offset */
 #endif /* !__KERNEL__ */
@@ -204,11 +204,11 @@ typedef __off64_t off64_t; /* File/device offset */
 #ifndef __pos32_t_defined
 #define __pos32_t_defined
 #ifdef __KERNEL__
-#if __FS_SIZEOF(OFF) == 4
+#if __SIZEOF_OFF_T__ == 4
 typedef pos_t pos32_t; /* File/device position */
-#else /* __FS_SIZEOF(OFF) == 4 */
+#else /* __SIZEOF_OFF_T__ == 4 */
 __HYBRID_ALTINT_TYPEDEF(__pos32_t, pos32_t, false); /* File/device position */
-#endif /* __FS_SIZEOF(OFF) != 4 */
+#endif /* __SIZEOF_OFF_T__ != 4 */
 #else /* __KERNEL__ */
 typedef __pos32_t pos32_t; /* File/device position */
 #endif /* !__KERNEL__ */
@@ -217,11 +217,11 @@ typedef __pos32_t pos32_t; /* File/device position */
 #ifndef __pos64_t_defined
 #define __pos64_t_defined
 #ifdef __KERNEL__
-#if __FS_SIZEOF(OFF) == 8
+#if __SIZEOF_OFF_T__ == 8
 typedef pos_t pos64_t; /* File/device position */
-#else /* __FS_SIZEOF(OFF) == 8 */
+#else /* __SIZEOF_OFF_T__ == 8 */
 __HYBRID_ALTINT_TYPEDEF(__pos64_t, pos64_t, false); /* File/device position */
-#endif /* __FS_SIZEOF(OFF) != 8 */
+#endif /* __SIZEOF_OFF_T__ != 8 */
 #else /* __KERNEL__ */
 typedef __pos64_t pos64_t; /* File/device position */
 #endif /* !__KERNEL__ */
@@ -230,11 +230,11 @@ typedef __pos64_t pos64_t; /* File/device position */
 #ifndef __ino32_t_defined
 #define __ino32_t_defined
 #ifdef __KERNEL__
-#if __FS_SIZEOF(INO) == 4
+#if __SIZEOF_INO_T__ == 4
 typedef ino_t ino32_t; /* INode number */
-#else /* __FS_SIZEOF(INO) == 4 */
+#else /* __SIZEOF_INO_T__ == 4 */
 __HYBRID_ALTINT_TYPEDEF(__ino32_t, ino32_t, false); /* INode number */
-#endif /* __FS_SIZEOF(INO) != 4 */
+#endif /* __SIZEOF_INO_T__ != 4 */
 #else /* __KERNEL__ */
 typedef __ino32_t ino32_t; /* INode number */
 #endif /* !__KERNEL__ */
@@ -243,11 +243,11 @@ typedef __ino32_t ino32_t; /* INode number */
 #ifndef __ino64_t_defined
 #define __ino64_t_defined
 #ifdef __KERNEL__
-#if __FS_SIZEOF(INO) == 8
+#if __SIZEOF_INO_T__ == 8
 typedef ino_t ino64_t; /* INode number */
-#else /* __FS_SIZEOF(INO) == 8 */
+#else /* __SIZEOF_INO_T__ == 8 */
 __HYBRID_ALTINT_TYPEDEF(__ino64_t, ino64_t, false); /* INode number */
-#endif /* __FS_SIZEOF(INO) != 8 */
+#endif /* __SIZEOF_INO_T__ != 8 */
 #else /* __KERNEL__ */
 typedef __ino64_t ino64_t; /* INode number */
 #endif /* !__KERNEL__ */
@@ -384,7 +384,7 @@ typedef __clock_t clock_t;
 
 #ifndef __blkcnt_t_defined
 #define __blkcnt_t_defined
-typedef __FS_TYPE(blkcnt) blkcnt_t;
+typedef __blkcnt_t blkcnt_t;
 #endif /* !__blkcnt_t_defined */
 #ifndef __blkcnt32_t_defined
 #define __blkcnt32_t_defined

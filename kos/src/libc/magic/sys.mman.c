@@ -34,8 +34,8 @@
 }
 
 %[define_replacement(fd_t = __fd_t)]
-%[define_replacement(off_t = "__FS_TYPE(off)")]
-%[define_replacement(pos_t = "__FS_TYPE(pos)")]
+%[define_replacement(off_t = "__off_t")]
+%[define_replacement(pos_t = "__pos_t")]
 %[define_replacement(off32_t = __off32_t)]
 %[define_replacement(off64_t = __off64_t)]
 %[define_replacement(pos32_t = __pos32_t)]
@@ -572,7 +572,7 @@ __SYSDECL_BEGIN
 
 #ifndef __off_t_defined
 #define __off_t_defined
-typedef __FS_TYPE(off) off_t;
+typedef __off_t off_t;
 #endif /* !__off_t_defined */
 
 #ifndef __size_t_defined
@@ -590,10 +590,10 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 %[define(DEFINE_PIO_OFFSET =
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(@pos@)
+#define __PIO_OFFSET   __pos_t
 #define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(@off@)
+#define __PIO_OFFSET   __off_t
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */

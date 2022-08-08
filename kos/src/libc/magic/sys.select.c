@@ -37,7 +37,7 @@
 %[define_decl_include("<bits/os/sigset.h>": ["struct __sigset_struct"])]
 %[define_replacement(sigset_t = "struct __sigset_struct")]
 
-%[define_replacement(time_t     = "__TM_TYPE(time)")]
+%[define_replacement(time_t     = "__time_t")]
 %[define_replacement(timespec32 = __timespec32)]
 %[define_replacement(timespec64 = __timespec64)]
 %[define_replacement(timeval32  = __timeval32)]
@@ -87,7 +87,7 @@ __SYSDECL_BEGIN
 
 #ifndef __time_t_defined
 #define __time_t_defined
-typedef __TM_TYPE(time) time_t;
+typedef __time_t time_t;
 #endif /* !__time_t_defined */
 
 #ifndef __sigset_t_defined

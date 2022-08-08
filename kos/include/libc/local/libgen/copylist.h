@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x590d8506 */
+/* HASH CRC-32:0x711e05fc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,10 +28,10 @@
 #if (defined(__CRT_HAVE_copylist64) && __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) || ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) || defined(__CRT_HAVE___libc_read)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)))
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET   __pos_t
 #define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET   __off_t
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
@@ -65,7 +65,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(copylist))(char const *__filename, __
 	char *__result = (__NAMESPACE_LOCAL_SYM __localdep_copylist64)(__filename, &__filesize64);
 	*__p_filesize = (__PIO_OFFSET)__filesize64;
 	return __result;
-#elif __FS_SIZEOF(OFF) == __SIZEOF_SIZE_T__
+#elif __SIZEOF_OFF_T__ == __SIZEOF_SIZE_T__
 	return (__NAMESPACE_LOCAL_SYM __localdep_copylist_sz)(__filename, (__SIZE_TYPE__ *)__p_filesize);
 #else /* ... */
 	char *__result;

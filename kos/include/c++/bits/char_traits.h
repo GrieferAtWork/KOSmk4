@@ -36,8 +36,8 @@ template<typename __CharT>
 struct char_traits {
 	typedef __CharT char_type;
 	typedef unsigned long int_type;
-	typedef __FS_TYPE(pos) pos_type;
-	typedef __FS_TYPE(off) off_type;
+	typedef __pos_t pos_type;
+	typedef __off_t off_type;
 	typedef std::mbstate_t state_type;
 
 	static __CXX_CLASSMEMBER __CXX14_CONSTEXPR void

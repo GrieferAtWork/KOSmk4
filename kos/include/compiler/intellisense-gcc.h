@@ -121,6 +121,12 @@
 #undef __SSE2__
 #undef __SSE_MATH__
 #undef __SSE__
+#elif defined(__aarch64__)
+#define __INTELLISENSE_SIZE_TYPE__  unsigned long long int
+#define __INTELLISENSE_SSIZE_TYPE__ signed long long int
+#elif defined(__arm__)
+#define __INTELLISENSE_SIZE_TYPE__  unsigned int
+#define __INTELLISENSE_SSIZE_TYPE__ signed int
 #endif /* Arch... */
 
 #ifndef __INTELLISENSE_SIZE_TYPE__

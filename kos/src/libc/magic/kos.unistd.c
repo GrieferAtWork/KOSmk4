@@ -42,7 +42,7 @@ __SYSDECL_BEGIN
 
 #ifndef __pos_t_defined
 #define __pos_t_defined
-typedef __FS_TYPE(pos) pos_t; /* File/device position */
+typedef __pos_t pos_t; /* File/device position */
 #endif /* !__pos_t_defined */
 
 #ifdef __USE_LARGEFILE64

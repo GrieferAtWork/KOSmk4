@@ -84,7 +84,7 @@ __TIMEVAL_CXX_DECL_BEGIN
 
 #define _STRUCT_TIMEVAL 1
 struct timeval /*[PREFIX(tv_)]*/ {
-	__TM_TYPE(time)   tv_sec;   /* Seconds */
+	__time_t          tv_sec;   /* Seconds */
 #if __SIZEOF_TIME_T__ <= 4 && __SIZEOF_SUSECONDS_T__ > 4
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __SIZEOF_TIME_T__ <= 4 && __SIZEOF_SUSECONDS_T__ > 4 */
@@ -96,9 +96,9 @@ struct timeval /*[PREFIX(tv_)]*/ {
 #if __SIZEOF_TIME_T__ > 4 && __SIZEOF_SUSECONDS_T__ <= 4
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __SIZEOF_TIME_T__ > 4 && __SIZEOF_SUSECONDS_T__ <= 4 */
-	__TIMEVAL_CXX_SUPPORT(struct timeval, __TM_TYPE(time), __CRT_PRIVATE_ULNG(__SIZEOF_SUSECONDS_T__))
+	__TIMEVAL_CXX_SUPPORT(struct timeval, __time_t, __CRT_PRIVATE_ULNG(__SIZEOF_SUSECONDS_T__))
 };
-__TIMEVAL_CXX_SUPPORT2(struct timeval, __TM_TYPE(time), __CRT_PRIVATE_ULNG(__SIZEOF_SUSECONDS_T__))
+__TIMEVAL_CXX_SUPPORT2(struct timeval, __time_t, __CRT_PRIVATE_ULNG(__SIZEOF_SUSECONDS_T__))
 
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 #define _TIMEVAL_MATCHES_TIMEVAL64 1

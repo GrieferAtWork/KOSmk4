@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfa8c3681 */
+/* HASH CRC-32:0x64d18491 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,13 +44,13 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_sendfile64_defined */
 __LOCAL_LIBC(sendfile) __ATTR_INOUT_OPT(3) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sendfile))(__fd_t __out_fd, __fd_t __in_fd, __FS_TYPE(off) *__offset, __SIZE_TYPE__ __count) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sendfile))(__fd_t __out_fd, __fd_t __in_fd, __off_t *__offset, __SIZE_TYPE__ __count) {
 
 	__SSIZE_TYPE__ __result;
 	if (__offset) {
 		__off64_t __temp = *__offset;
 		__result = (__NAMESPACE_LOCAL_SYM __localdep_sendfile64)(__out_fd, __in_fd, &__temp, __count);
-		*__offset = (__FS_TYPE(off))__temp;
+		*__offset = (__off_t)__temp;
 	} else {
 		__result = (__NAMESPACE_LOCAL_SYM __localdep_sendfile64)(__out_fd, __in_fd, __NULLPTR, __count);
 	}

@@ -197,26 +197,26 @@
 #ifdef __CC__
 __DECL_BEGIN
 
-#if __TM_SIZEOF(TIME) != __SIZEOF_TIME64_T__
+#if __SIZEOF_TIME_T__ != __SIZEOF_TIME64_T__
 struct __stat_timespec32 /*[PREFIX(tv_)][NAME(stat_timespec32)]*/ {
-	__TM_TYPE(time)   tv_sec;  /* seconds since 01.01.1970 */
-	__byte_t        __tv_pad_sec[__SIZEOF_TIME64_T__ - __TM_SIZEOF(TIME)];
+	__time_t          tv_sec;  /* seconds since 01.01.1970 */
+	__byte_t        __tv_pad_sec[__SIZEOF_TIME64_T__ - __SIZEOF_TIME_T__];
 	__syscall_ulong_t tv_nsec; /* nanoseconds */
 #ifdef __cplusplus
 	__CXX_CLASSMEMBER operator timespec(void) const __CXX_NOEXCEPT {
 		struct timespec __res;
-		__res.tv_sec  = (__TM_TYPE(time))this->tv_sec;
+		__res.tv_sec  = (__time_t)this->tv_sec;
 		__res.tv_nsec = this->tv_nsec;
 		return __res;
 	}
 	__CXX_CLASSMEMBER __stat_timespec32 &operator = (struct timespec const &__val) __CXX_NOEXCEPT {
-		this->tv_sec  = (__TM_TYPE(time))__val.tv_sec;
+		this->tv_sec  = (__time_t)__val.tv_sec;
 		this->tv_nsec = __val.tv_nsec;
 		return *this;
 	}
 #endif /* __cplusplus */
 };
-#endif /* __TM_SIZEOF(TIME) != __SIZEOF_TIME64_T__ */
+#endif /* __SIZEOF_TIME_T__ != __SIZEOF_TIME64_T__ */
 
 
 /*[[[deemon
@@ -273,12 +273,18 @@ function Tfield(T: string, name: string, sizeofT: string, wantedSize: string | i
 		if (sizeofT.startswith("__FS_SIZEOF(") && sizeofT.endswith(")"))
 			sizeofT = f"__SIZEOF_{sizeofT[12:-1]}64_T__";
 	}
+	if ((T.startswith("__FS_TYPE(") || T.startswith("__TM_TYPE(")) && T.endswith(")"))
+		T = f"__{T[10:-1]}_t";
+	if ((sizeofT.startswith("__FS_SIZEOF(") || sizeofT.startswith("__TM_SIZEOF(")) && sizeofT.endswith(")"))
+		sizeofT = f"__SIZEOF_{sizeofT[12:-1]}_T__";
 	_printTypedNameWithCommentAndPad(T, name, comment, sizeofT, wantedSize);
 }
 function Tfsfield(Tname: string, name: string, comment: string) {
 	local SIZEOF_NAME = { "pos" : "off" }.get(Tname, Tname).upper();
 	local TX         = f"__FS_TYPE({Tname})";
+	local TXS        = f"__{Tname}_t";
 	local TX_SIZEOF  = f"__FS_SIZEOF({SIZEOF_NAME})";
+	local TXS_SIZEOF = f"__SIZEOF_{SIZEOF_NAME}_T__";
 	local T32        = f"__{Tname}32_t";
 	local T64        = f"__{Tname}64_t";
 	local T32_SIZEOF = f"__SIZEOF_{SIZEOF_NAME}32_TYPE__";
@@ -302,7 +308,7 @@ function Tfsfield(Tname: string, name: string, comment: string) {
 	}
 	print("#ifdef __USE_KOS");
 	print("	union {");
-	print("		", TX. ljust(TYPE_WIDTH - TABSIZE)),;
+	print("		", TXS.ljust(TYPE_WIDTH - TABSIZE)),;
 	_printNameWithComment(name, comment);
 	print("		", T32.ljust(TYPE_WIDTH - TABSIZE)),;
 	_printNameWithComment(name + "32", comment);
@@ -310,17 +316,17 @@ function Tfsfield(Tname: string, name: string, comment: string) {
 	_printNameWithComment(name + "64", comment);
 	print("	};");
 	print("#else /" "* __USE_KOS *" "/");
-	_printTypedNameWithCommentAndPad(TX, name, comment, TX_SIZEOF, T64_SIZEOF);
+	_printTypedNameWithCommentAndPad(TXS, name, comment, TXS_SIZEOF, T64_SIZEOF);
 	print("#endif /" "* !__USE_KOS *" "/");
 }
 
-// >> struct timespec     st_atim;        #if defined(__USE_XOPEN2K8) && __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__
-// >> struct timespec     st_atimespec;   #if __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__
+// >> struct timespec     st_atim;        #if defined(__USE_XOPEN2K8) && __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__
+// >> struct timespec     st_atimespec;   #if __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__
 // >> struct __timespec32 st_atim32;      #if defined(__USE_KOS) && defined(__USE_XOPEN2K8) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 // >> struct __timespec32 st_atimespec32; #if defined(__USE_KOS) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 // >> struct __timespec64 st_atim64;      #if defined(__USE_TIME64) && defined(__USE_XOPEN2K8)
 // >> struct __timespec64 st_atimespec64; #ifdef __USE_TIME64
-// >> __TM_TYPE(time)     st_atime;
+// >> __time_t            st_atime;
 // >> __syscall_ulong_t   st_atimensec;
 // >> __time32_t          st_atime32;     #ifdef __USE_KOS
 // >> __time64_t          st_atime64;     #ifdef __USE_TIME64
@@ -328,21 +334,21 @@ function TtimespecField(name: string, comment: string, doUnionHead: bool = true,
 	if (doUnionHead)
 		print("union {");
 
-	print("#if __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__");
+	print("#if __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__");
 	print("	", "struct timespec".ljust(TYPE_WIDTH)),;
 	_printNameWithComment("st_" + name + "timespec",       comment);
 	print("#ifdef __USE_XOPEN2K8");
 	print("	", "struct timespec".ljust(TYPE_WIDTH)),;
 	_printNameWithComment("st_" + name + "tim",            comment);
 	print("#endif /" "* __USE_XOPEN2K8 *" "/");
-	print("#else /" "* __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__ *" "/");
+	print("#else /" "* __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__ *" "/");
 	print("	", "struct __stat_timespec32".ljust(TYPE_WIDTH)),;
 	_printNameWithComment("st_" + name + "timespec",       comment + " (`struct __timespec64')");
 	print("#ifdef __USE_XOPEN2K8");
 	print("	", "struct __stat_timespec32".ljust(TYPE_WIDTH)),;
 	_printNameWithComment("st_" + name + "tim",            comment + " (`struct __timespec64')");
 	print("#endif /" "* __USE_XOPEN2K8 *" "/");
-	print("#endif /" "* __TM_SIZEOF(TIME) != __SIZEOF_TIME64_T__ *" "/");
+	print("#endif /" "* __SIZEOF_TIME_T__ != __SIZEOF_TIME64_T__ *" "/");
 
 	print("#ifdef __USE_KOS");
 	print("	", "__time32_t".ljust(TYPE_WIDTH)),;
@@ -369,7 +375,7 @@ function TtimespecField(name: string, comment: string, doUnionHead: bool = true,
 	print("#endif /" "* __USE_TIME64 *" "/");
 
 	print("struct {");
-	_printTypedNameWithCommentAndPad("__TM_TYPE(time)", "st_" + name + "time",     comment + " (seconds since 01.01.1970)", "__TM_SIZEOF(TIME)", "__SIZEOF_TIME64_T__");
+	_printTypedNameWithCommentAndPad("__time_t", "st_" + name + "time",     comment + " (seconds since 01.01.1970)", "__SIZEOF_TIME_T__", "__SIZEOF_TIME64_T__");
 	_printTypedNameWithCommentAndPad("__syscall_ulong_t", "st_" + name + "timensec", comment + " (nanoseconds)", "__SIZEOF_SYSCALL_LONG_T__", "8");
 	if (doUnionTail) {
 		print("};};");
@@ -430,15 +436,15 @@ struct __kos_stat /*[PREFIX(st_)][NAME(kos_stat)]*/ {
 #endif /* __SIZEOF_DEV_T__ < 8 */
 #ifdef __USE_KOS
 	union {
-		__FS_TYPE(ino)       st_ino;           /* INode number */
+		__ino_t              st_ino;           /* INode number */
 		__ino32_t            st_ino32;         /* INode number */
 		__ino64_t            st_ino64;         /* INode number */
 	};
 #else /* __USE_KOS */
-	__FS_TYPE(ino)           st_ino;           /* INode number */
-#if __FS_SIZEOF(INO) < 8
-	__byte_t               __st_pad_ino[8 - __FS_SIZEOF(INO)];
-#endif /* __FS_SIZEOF(INO) < 8 */
+	__ino_t                  st_ino;           /* INode number */
+#if __SIZEOF_INO_T__ < 8
+	__byte_t               __st_pad_ino[8 - __SIZEOF_INO_T__];
+#endif /* __SIZEOF_INO_T__ < 8 */
 #endif /* !__USE_KOS */
 	__mode_t                 st_mode;          /* File access permissions & type */
 #if __SIZEOF_MODE_T__ < 4
@@ -463,28 +469,28 @@ struct __kos_stat /*[PREFIX(st_)][NAME(kos_stat)]*/ {
 #ifdef __USE_KOS_ALTERATIONS
 #ifdef __USE_KOS
 	union {
-		__FS_TYPE(pos)       st_size;          /* File size (in bytes) */
+		__pos_t              st_size;          /* File size (in bytes) */
 		__pos32_t            st_size32;        /* File size (in bytes) */
 		__pos64_t            st_size64;        /* File size (in bytes) */
 	};
 #else /* __USE_KOS */
-	__FS_TYPE(pos)           st_size;          /* File size (in bytes) */
-#if __FS_SIZEOF(OFF) < 8
-	__byte_t               __st_pad_size[8 - __FS_SIZEOF(OFF)];
-#endif /* __FS_SIZEOF(OFF) < 8 */
+	__pos_t                  st_size;          /* File size (in bytes) */
+#if __SIZEOF_OFF_T__ < 8
+	__byte_t               __st_pad_size[8 - __SIZEOF_OFF_T__];
+#endif /* __SIZEOF_OFF_T__ < 8 */
 #endif /* !__USE_KOS */
 #else /* __USE_KOS_ALTERATIONS */
 #ifdef __USE_KOS
 	union {
-		__FS_TYPE(off)       st_size;          /* File size (in bytes) */
+		__off_t              st_size;          /* File size (in bytes) */
 		__off32_t            st_size32;        /* File size (in bytes) */
 		__off64_t            st_size64;        /* File size (in bytes) */
 	};
 #else /* __USE_KOS */
-	__FS_TYPE(off)           st_size;          /* File size (in bytes) */
-#if __FS_SIZEOF(OFF) < 8
-	__byte_t               __st_pad_size[8 - __FS_SIZEOF(OFF)];
-#endif /* __FS_SIZEOF(OFF) < 8 */
+	__off_t                  st_size;          /* File size (in bytes) */
+#if __SIZEOF_OFF_T__ < 8
+	__byte_t               __st_pad_size[8 - __SIZEOF_OFF_T__];
+#endif /* __SIZEOF_OFF_T__ < 8 */
 #endif /* !__USE_KOS */
 #endif /* !__USE_KOS_ALTERATIONS */
 	__blksize_t              st_blksize;       /* File block size (in bytes) */
@@ -493,29 +499,29 @@ struct __kos_stat /*[PREFIX(st_)][NAME(kos_stat)]*/ {
 #endif /* __SIZEOF_BLKSIZE_T__ < 8 */
 #ifdef __USE_KOS
 	union {
-		__FS_TYPE(blkcnt)    st_blocks;        /* File block count */
+		__blkcnt_t           st_blocks;        /* File block count */
 		__blkcnt32_t         st_blocks32;      /* File block count */
 		__blkcnt64_t         st_blocks64;      /* File block count */
 	};
 #else /* __USE_KOS */
-	__FS_TYPE(blkcnt)        st_blocks;        /* File block count */
-#if __FS_SIZEOF(BLKCNT) < 8
-	__byte_t               __st_pad_blocks[8 - __FS_SIZEOF(BLKCNT)];
-#endif /* __FS_SIZEOF(BLKCNT) < 8 */
+	__blkcnt_t               st_blocks;        /* File block count */
+#if __SIZEOF_BLKCNT_T__ < 8
+	__byte_t               __st_pad_blocks[8 - __SIZEOF_BLKCNT_T__];
+#endif /* __SIZEOF_BLKCNT_T__ < 8 */
 #endif /* !__USE_KOS */
 	__byte_t               __st_reserved1[64]; /* Reserved for future use */
 union {
-#if __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__
+#if __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__
 	struct timespec          st_atimespec;     /* Last-accessed time */
 #ifdef __USE_XOPEN2K8
 	struct timespec          st_atim;          /* Last-accessed time */
 #endif /* __USE_XOPEN2K8 */
-#else /* __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__ */
+#else /* __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__ */
 	struct __stat_timespec32 st_atimespec;     /* Last-accessed time (`struct __timespec64') */
 #ifdef __USE_XOPEN2K8
 	struct __stat_timespec32 st_atim;          /* Last-accessed time (`struct __timespec64') */
 #endif /* __USE_XOPEN2K8 */
-#endif /* __TM_SIZEOF(TIME) != __SIZEOF_TIME64_T__ */
+#endif /* __SIZEOF_TIME_T__ != __SIZEOF_TIME64_T__ */
 #ifdef __USE_KOS
 	__time32_t               st_atime32;       /* Last-accessed time (seconds since 01.01.1970) */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -533,27 +539,27 @@ union {
 	__time64_t               st_atime64;       /* Last-accessed time (seconds since 01.01.1970) */
 #endif /* __USE_TIME64 */
 struct {
-	__TM_TYPE(time)          st_atime;         /* Last-accessed time (seconds since 01.01.1970) */
-#if __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__
-	__byte_t               __st_pad_atime[__SIZEOF_TIME64_T__ - __TM_SIZEOF(TIME)];
-#endif /* __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__ */
+	__time_t                 st_atime;         /* Last-accessed time (seconds since 01.01.1970) */
+#if __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__
+	__byte_t               __st_pad_atime[__SIZEOF_TIME64_T__ - __SIZEOF_TIME_T__];
+#endif /* __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__ */
 	__syscall_ulong_t        st_atimensec;     /* Last-accessed time (nanoseconds) */
 #if __SIZEOF_SYSCALL_LONG_T__ < 8
 	__byte_t               __st_pad_atimensec[8 - __SIZEOF_SYSCALL_LONG_T__];
 #endif /* __SIZEOF_SYSCALL_LONG_T__ < 8 */
 };};
 union {
-#if __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__
+#if __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__
 	struct timespec          st_mtimespec;     /* Last-modified time */
 #ifdef __USE_XOPEN2K8
 	struct timespec          st_mtim;          /* Last-modified time */
 #endif /* __USE_XOPEN2K8 */
-#else /* __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__ */
+#else /* __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__ */
 	struct __stat_timespec32 st_mtimespec;     /* Last-modified time (`struct __timespec64') */
 #ifdef __USE_XOPEN2K8
 	struct __stat_timespec32 st_mtim;          /* Last-modified time (`struct __timespec64') */
 #endif /* __USE_XOPEN2K8 */
-#endif /* __TM_SIZEOF(TIME) != __SIZEOF_TIME64_T__ */
+#endif /* __SIZEOF_TIME_T__ != __SIZEOF_TIME64_T__ */
 #ifdef __USE_KOS
 	__time32_t               st_mtime32;       /* Last-modified time (seconds since 01.01.1970) */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -571,27 +577,27 @@ union {
 	__time64_t               st_mtime64;       /* Last-modified time (seconds since 01.01.1970) */
 #endif /* __USE_TIME64 */
 struct {
-	__TM_TYPE(time)          st_mtime;         /* Last-modified time (seconds since 01.01.1970) */
-#if __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__
-	__byte_t               __st_pad_mtime[__SIZEOF_TIME64_T__ - __TM_SIZEOF(TIME)];
-#endif /* __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__ */
+	__time_t                 st_mtime;         /* Last-modified time (seconds since 01.01.1970) */
+#if __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__
+	__byte_t               __st_pad_mtime[__SIZEOF_TIME64_T__ - __SIZEOF_TIME_T__];
+#endif /* __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__ */
 	__syscall_ulong_t        st_mtimensec;     /* Last-modified time (nanoseconds) */
 #if __SIZEOF_SYSCALL_LONG_T__ < 8
 	__byte_t               __st_pad_mtimensec[8 - __SIZEOF_SYSCALL_LONG_T__];
 #endif /* __SIZEOF_SYSCALL_LONG_T__ < 8 */
 };};
 union {
-#if __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__
+#if __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__
 	struct timespec          st_ctimespec;     /* Last-changed time */
 #ifdef __USE_XOPEN2K8
 	struct timespec          st_ctim;          /* Last-changed time */
 #endif /* __USE_XOPEN2K8 */
-#else /* __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__ */
+#else /* __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__ */
 	struct __stat_timespec32 st_ctimespec;     /* Last-changed time (`struct __timespec64') */
 #ifdef __USE_XOPEN2K8
 	struct __stat_timespec32 st_ctim;          /* Last-changed time (`struct __timespec64') */
 #endif /* __USE_XOPEN2K8 */
-#endif /* __TM_SIZEOF(TIME) != __SIZEOF_TIME64_T__ */
+#endif /* __SIZEOF_TIME_T__ != __SIZEOF_TIME64_T__ */
 #ifdef __USE_KOS
 	__time32_t               st_ctime32;       /* Last-changed time (seconds since 01.01.1970) */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -609,27 +615,27 @@ union {
 	__time64_t               st_ctime64;       /* Last-changed time (seconds since 01.01.1970) */
 #endif /* __USE_TIME64 */
 struct {
-	__TM_TYPE(time)          st_ctime;         /* Last-changed time (seconds since 01.01.1970) */
-#if __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__
-	__byte_t               __st_pad_ctime[__SIZEOF_TIME64_T__ - __TM_SIZEOF(TIME)];
-#endif /* __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__ */
+	__time_t                 st_ctime;         /* Last-changed time (seconds since 01.01.1970) */
+#if __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__
+	__byte_t               __st_pad_ctime[__SIZEOF_TIME64_T__ - __SIZEOF_TIME_T__];
+#endif /* __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__ */
 	__syscall_ulong_t        st_ctimensec;     /* Last-changed time (nanoseconds) */
 #if __SIZEOF_SYSCALL_LONG_T__ < 8
 	__byte_t               __st_pad_ctimensec[8 - __SIZEOF_SYSCALL_LONG_T__];
 #endif /* __SIZEOF_SYSCALL_LONG_T__ < 8 */
 };};
 union {
-#if __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__
+#if __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__
 	struct timespec          st_btimespec;     /* Birth/creation time */
 #ifdef __USE_XOPEN2K8
 	struct timespec          st_btim;          /* Birth/creation time */
 #endif /* __USE_XOPEN2K8 */
-#else /* __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__ */
+#else /* __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__ */
 	struct __stat_timespec32 st_btimespec;     /* Birth/creation time (`struct __timespec64') */
 #ifdef __USE_XOPEN2K8
 	struct __stat_timespec32 st_btim;          /* Birth/creation time (`struct __timespec64') */
 #endif /* __USE_XOPEN2K8 */
-#endif /* __TM_SIZEOF(TIME) != __SIZEOF_TIME64_T__ */
+#endif /* __SIZEOF_TIME_T__ != __SIZEOF_TIME64_T__ */
 #ifdef __USE_KOS
 	__time32_t               st_btime32;       /* Birth/creation time (seconds since 01.01.1970) */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -647,27 +653,27 @@ union {
 	__time64_t               st_btime64;       /* Birth/creation time (seconds since 01.01.1970) */
 #endif /* __USE_TIME64 */
 struct {
-	__TM_TYPE(time)          st_btime;         /* Birth/creation time (seconds since 01.01.1970) */
-#if __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__
-	__byte_t               __st_pad_btime[__SIZEOF_TIME64_T__ - __TM_SIZEOF(TIME)];
-#endif /* __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__ */
+	__time_t                 st_btime;         /* Birth/creation time (seconds since 01.01.1970) */
+#if __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__
+	__byte_t               __st_pad_btime[__SIZEOF_TIME64_T__ - __SIZEOF_TIME_T__];
+#endif /* __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__ */
 	__syscall_ulong_t        st_btimensec;     /* Birth/creation time (nanoseconds) */
 #if __SIZEOF_SYSCALL_LONG_T__ < 8
 	__byte_t               __st_pad_btimensec[8 - __SIZEOF_SYSCALL_LONG_T__];
 #endif /* __SIZEOF_SYSCALL_LONG_T__ < 8 */
 };
 #ifndef __USE_KOS_PURE
-#if __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__
+#if __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__
 	struct timespec          st_birthtimespec; /* Birth/creation time */
 #ifdef __USE_XOPEN2K8
 	struct timespec          st_birthtim;      /* Birth/creation time */
 #endif /* __USE_XOPEN2K8 */
-#else /* __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__ */
+#else /* __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__ */
 	struct __stat_timespec32 st_birthtimespec; /* Birth/creation time (`struct __timespec64') */
 #ifdef __USE_XOPEN2K8
 	struct __stat_timespec32 st_birthtim;      /* Birth/creation time (`struct __timespec64') */
 #endif /* __USE_XOPEN2K8 */
-#endif /* __TM_SIZEOF(TIME) != __SIZEOF_TIME64_T__ */
+#endif /* __SIZEOF_TIME_T__ != __SIZEOF_TIME64_T__ */
 #ifdef __USE_KOS
 	__time32_t               st_birthtime32;   /* Birth/creation time (seconds since 01.01.1970) */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -685,10 +691,10 @@ struct {
 	__time64_t               st_birthtime64;   /* Birth/creation time (seconds since 01.01.1970) */
 #endif /* __USE_TIME64 */
 struct {
-	__TM_TYPE(time)          st_birthtime;     /* Birth/creation time (seconds since 01.01.1970) */
-#if __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__
-	__byte_t               __st_pad_birthtime[__SIZEOF_TIME64_T__ - __TM_SIZEOF(TIME)];
-#endif /* __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__ */
+	__time_t                 st_birthtime;     /* Birth/creation time (seconds since 01.01.1970) */
+#if __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__
+	__byte_t               __st_pad_birthtime[__SIZEOF_TIME64_T__ - __SIZEOF_TIME_T__];
+#endif /* __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__ */
 	__syscall_ulong_t        st_birthtimensec; /* Birth/creation time (nanoseconds) */
 #if __SIZEOF_SYSCALL_LONG_T__ < 8
 	__byte_t               __st_pad_birthtimensec[8 - __SIZEOF_SYSCALL_LONG_T__];
@@ -770,17 +776,17 @@ struct __kos_stat_alias64 /*[PREFIX(st_)][NAME(kos_stat64)]*/ {
 #endif /* !__USE_KOS */
 	__byte_t               __st_reserved1[64]; /* Reserved for future use */
 union {
-#if __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__
+#if __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__
 	struct timespec          st_atimespec;     /* Last-accessed time */
 #ifdef __USE_XOPEN2K8
 	struct timespec          st_atim;          /* Last-accessed time */
 #endif /* __USE_XOPEN2K8 */
-#else /* __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__ */
+#else /* __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__ */
 	struct __stat_timespec32 st_atimespec;     /* Last-accessed time (`struct __timespec64') */
 #ifdef __USE_XOPEN2K8
 	struct __stat_timespec32 st_atim;          /* Last-accessed time (`struct __timespec64') */
 #endif /* __USE_XOPEN2K8 */
-#endif /* __TM_SIZEOF(TIME) != __SIZEOF_TIME64_T__ */
+#endif /* __SIZEOF_TIME_T__ != __SIZEOF_TIME64_T__ */
 #ifdef __USE_KOS
 	__time32_t               st_atime32;       /* Last-accessed time (seconds since 01.01.1970) */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -798,27 +804,27 @@ union {
 	__time64_t               st_atime64;       /* Last-accessed time (seconds since 01.01.1970) */
 #endif /* __USE_TIME64 */
 struct {
-	__TM_TYPE(time)          st_atime;         /* Last-accessed time (seconds since 01.01.1970) */
-#if __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__
-	__byte_t               __st_pad_atime[__SIZEOF_TIME64_T__ - __TM_SIZEOF(TIME)];
-#endif /* __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__ */
+	__time_t                 st_atime;         /* Last-accessed time (seconds since 01.01.1970) */
+#if __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__
+	__byte_t               __st_pad_atime[__SIZEOF_TIME64_T__ - __SIZEOF_TIME_T__];
+#endif /* __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__ */
 	__syscall_ulong_t        st_atimensec;     /* Last-accessed time (nanoseconds) */
 #if __SIZEOF_SYSCALL_LONG_T__ < 8
 	__byte_t               __st_pad_atimensec[8 - __SIZEOF_SYSCALL_LONG_T__];
 #endif /* __SIZEOF_SYSCALL_LONG_T__ < 8 */
 };};
 union {
-#if __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__
+#if __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__
 	struct timespec          st_mtimespec;     /* Last-modified time */
 #ifdef __USE_XOPEN2K8
 	struct timespec          st_mtim;          /* Last-modified time */
 #endif /* __USE_XOPEN2K8 */
-#else /* __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__ */
+#else /* __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__ */
 	struct __stat_timespec32 st_mtimespec;     /* Last-modified time (`struct __timespec64') */
 #ifdef __USE_XOPEN2K8
 	struct __stat_timespec32 st_mtim;          /* Last-modified time (`struct __timespec64') */
 #endif /* __USE_XOPEN2K8 */
-#endif /* __TM_SIZEOF(TIME) != __SIZEOF_TIME64_T__ */
+#endif /* __SIZEOF_TIME_T__ != __SIZEOF_TIME64_T__ */
 #ifdef __USE_KOS
 	__time32_t               st_mtime32;       /* Last-modified time (seconds since 01.01.1970) */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -836,27 +842,27 @@ union {
 	__time64_t               st_mtime64;       /* Last-modified time (seconds since 01.01.1970) */
 #endif /* __USE_TIME64 */
 struct {
-	__TM_TYPE(time)          st_mtime;         /* Last-modified time (seconds since 01.01.1970) */
-#if __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__
-	__byte_t               __st_pad_mtime[__SIZEOF_TIME64_T__ - __TM_SIZEOF(TIME)];
-#endif /* __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__ */
+	__time_t                 st_mtime;         /* Last-modified time (seconds since 01.01.1970) */
+#if __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__
+	__byte_t               __st_pad_mtime[__SIZEOF_TIME64_T__ - __SIZEOF_TIME_T__];
+#endif /* __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__ */
 	__syscall_ulong_t        st_mtimensec;     /* Last-modified time (nanoseconds) */
 #if __SIZEOF_SYSCALL_LONG_T__ < 8
 	__byte_t               __st_pad_mtimensec[8 - __SIZEOF_SYSCALL_LONG_T__];
 #endif /* __SIZEOF_SYSCALL_LONG_T__ < 8 */
 };};
 union {
-#if __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__
+#if __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__
 	struct timespec          st_ctimespec;     /* Last-changed time */
 #ifdef __USE_XOPEN2K8
 	struct timespec          st_ctim;          /* Last-changed time */
 #endif /* __USE_XOPEN2K8 */
-#else /* __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__ */
+#else /* __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__ */
 	struct __stat_timespec32 st_ctimespec;     /* Last-changed time (`struct __timespec64') */
 #ifdef __USE_XOPEN2K8
 	struct __stat_timespec32 st_ctim;          /* Last-changed time (`struct __timespec64') */
 #endif /* __USE_XOPEN2K8 */
-#endif /* __TM_SIZEOF(TIME) != __SIZEOF_TIME64_T__ */
+#endif /* __SIZEOF_TIME_T__ != __SIZEOF_TIME64_T__ */
 #ifdef __USE_KOS
 	__time32_t               st_ctime32;       /* Last-changed time (seconds since 01.01.1970) */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -874,27 +880,27 @@ union {
 	__time64_t               st_ctime64;       /* Last-changed time (seconds since 01.01.1970) */
 #endif /* __USE_TIME64 */
 struct {
-	__TM_TYPE(time)          st_ctime;         /* Last-changed time (seconds since 01.01.1970) */
-#if __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__
-	__byte_t               __st_pad_ctime[__SIZEOF_TIME64_T__ - __TM_SIZEOF(TIME)];
-#endif /* __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__ */
+	__time_t                 st_ctime;         /* Last-changed time (seconds since 01.01.1970) */
+#if __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__
+	__byte_t               __st_pad_ctime[__SIZEOF_TIME64_T__ - __SIZEOF_TIME_T__];
+#endif /* __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__ */
 	__syscall_ulong_t        st_ctimensec;     /* Last-changed time (nanoseconds) */
 #if __SIZEOF_SYSCALL_LONG_T__ < 8
 	__byte_t               __st_pad_ctimensec[8 - __SIZEOF_SYSCALL_LONG_T__];
 #endif /* __SIZEOF_SYSCALL_LONG_T__ < 8 */
 };};
 union {
-#if __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__
+#if __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__
 	struct timespec          st_btimespec;     /* Birth/creation time */
 #ifdef __USE_XOPEN2K8
 	struct timespec          st_btim;          /* Birth/creation time */
 #endif /* __USE_XOPEN2K8 */
-#else /* __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__ */
+#else /* __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__ */
 	struct __stat_timespec32 st_btimespec;     /* Birth/creation time (`struct __timespec64') */
 #ifdef __USE_XOPEN2K8
 	struct __stat_timespec32 st_btim;          /* Birth/creation time (`struct __timespec64') */
 #endif /* __USE_XOPEN2K8 */
-#endif /* __TM_SIZEOF(TIME) != __SIZEOF_TIME64_T__ */
+#endif /* __SIZEOF_TIME_T__ != __SIZEOF_TIME64_T__ */
 #ifdef __USE_KOS
 	__time32_t               st_btime32;       /* Birth/creation time (seconds since 01.01.1970) */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -912,27 +918,27 @@ union {
 	__time64_t               st_btime64;       /* Birth/creation time (seconds since 01.01.1970) */
 #endif /* __USE_TIME64 */
 struct {
-	__TM_TYPE(time)          st_btime;         /* Birth/creation time (seconds since 01.01.1970) */
-#if __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__
-	__byte_t               __st_pad_btime[__SIZEOF_TIME64_T__ - __TM_SIZEOF(TIME)];
-#endif /* __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__ */
+	__time_t                 st_btime;         /* Birth/creation time (seconds since 01.01.1970) */
+#if __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__
+	__byte_t               __st_pad_btime[__SIZEOF_TIME64_T__ - __SIZEOF_TIME_T__];
+#endif /* __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__ */
 	__syscall_ulong_t        st_btimensec;     /* Birth/creation time (nanoseconds) */
 #if __SIZEOF_SYSCALL_LONG_T__ < 8
 	__byte_t               __st_pad_btimensec[8 - __SIZEOF_SYSCALL_LONG_T__];
 #endif /* __SIZEOF_SYSCALL_LONG_T__ < 8 */
 };
 #ifndef __USE_KOS_PURE
-#if __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__
+#if __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__
 	struct timespec          st_birthtimespec; /* Birth/creation time */
 #ifdef __USE_XOPEN2K8
 	struct timespec          st_birthtim;      /* Birth/creation time */
 #endif /* __USE_XOPEN2K8 */
-#else /* __TM_SIZEOF(TIME) == __SIZEOF_TIME64_T__ */
+#else /* __SIZEOF_TIME_T__ == __SIZEOF_TIME64_T__ */
 	struct __stat_timespec32 st_birthtimespec; /* Birth/creation time (`struct __timespec64') */
 #ifdef __USE_XOPEN2K8
 	struct __stat_timespec32 st_birthtim;      /* Birth/creation time (`struct __timespec64') */
 #endif /* __USE_XOPEN2K8 */
-#endif /* __TM_SIZEOF(TIME) != __SIZEOF_TIME64_T__ */
+#endif /* __SIZEOF_TIME_T__ != __SIZEOF_TIME64_T__ */
 #ifdef __USE_KOS
 	__time32_t               st_birthtime32;   /* Birth/creation time (seconds since 01.01.1970) */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -950,10 +956,10 @@ struct {
 	__time64_t               st_birthtime64;   /* Birth/creation time (seconds since 01.01.1970) */
 #endif /* __USE_TIME64 */
 struct {
-	__TM_TYPE(time)          st_birthtime;     /* Birth/creation time (seconds since 01.01.1970) */
-#if __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__
-	__byte_t               __st_pad_birthtime[__SIZEOF_TIME64_T__ - __TM_SIZEOF(TIME)];
-#endif /* __TM_SIZEOF(TIME) < __SIZEOF_TIME64_T__ */
+	__time_t                 st_birthtime;     /* Birth/creation time (seconds since 01.01.1970) */
+#if __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__
+	__byte_t               __st_pad_birthtime[__SIZEOF_TIME64_T__ - __SIZEOF_TIME_T__];
+#endif /* __SIZEOF_TIME_T__ < __SIZEOF_TIME64_T__ */
 	__syscall_ulong_t        st_birthtimensec; /* Birth/creation time (nanoseconds) */
 #if __SIZEOF_SYSCALL_LONG_T__ < 8
 	__byte_t               __st_pad_birthtimensec[8 - __SIZEOF_SYSCALL_LONG_T__];

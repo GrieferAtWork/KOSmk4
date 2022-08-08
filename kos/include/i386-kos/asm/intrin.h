@@ -239,7 +239,6 @@ __FORCELOCAL void (__clac)(void) { __asm__ __volatile__("pushfl\n\tandl $~0x4000
 __FORCELOCAL void (__hlt)(void) { __asm__ __volatile__("hlt" : : : "memory"); }
 __FORCELOCAL void (__into)(void) { __asm__ __volatile__("into"); }
 __FORCELOCAL void (__int3)(void) { __asm__ __volatile__("int {$}3" : ); }
-#define __breakpoint() __int3()
 #ifdef __INTELLISENSE__
 void (__int)(__UINT8_TYPE__ __intno);
 #elif !defined(__NO_XBLOCK)

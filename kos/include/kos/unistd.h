@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84442db5 */
+/* HASH CRC-32:0xe307df35 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __SYSDECL_BEGIN
 
 #ifndef __pos_t_defined
 #define __pos_t_defined
-typedef __FS_TYPE(pos) pos_t; /* File/device position */
+typedef __pos_t pos_t; /* File/device position */
 #endif /* !__pos_t_defined */
 
 #ifdef __USE_LARGEFILE64
@@ -261,16 +261,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ReadAll, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_O
 #if defined(__CRT_HAVE_LSeek) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CDECLARE(,__FS_TYPE(pos),__THROWING,LSeek,(__fd_t __fd, __FS_TYPE(off) __offset, int __whence),(__fd,__offset,__whence))
+__CDECLARE(,__pos_t,__THROWING,LSeek,(__fd_t __fd, __off_t __offset, int __whence),(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_LSeek64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CREDIRECT(,__FS_TYPE(pos),__THROWING,LSeek,(__fd_t __fd, __FS_TYPE(off) __offset, int __whence),LSeek64,(__fd,__offset,__whence))
+__CREDIRECT(,__pos_t,__THROWING,LSeek,(__fd_t __fd, __off_t __offset, int __whence),LSeek64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_LSeek64) || defined(__CRT_HAVE_LSeek)
 #include <libc/local/kos.unistd/LSeek.h>
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(LSeek, __FORCELOCAL __ATTR_ARTIFICIAL __FS_TYPE(pos) (__LIBCCALL LSeek)(__fd_t __fd, __FS_TYPE(off) __offset, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LSeek))(__fd, __offset, __whence); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(LSeek, __FORCELOCAL __ATTR_ARTIFICIAL __pos_t (__LIBCCALL LSeek)(__fd_t __fd, __off_t __offset, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(LSeek))(__fd, __offset, __whence); })
 #endif /* ... */
 /* >> dup2(2)
  * @return: newfd: Returns the new handle upon success.

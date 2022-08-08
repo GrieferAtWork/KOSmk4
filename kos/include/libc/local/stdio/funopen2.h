@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xacd4d32a */
+/* HASH CRC-32:0x7e5e932e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,7 +89,7 @@ struct __funopen_holder {
 	void            *__fh_cookie;                                                 /* [?..?] funopen cookie */
 	int   (__LIBKCALL *__fh_readfn)(void *__cookie, char *__buf, int __num_bytes);        /* [0..1] funopen readfn */
 	int   (__LIBKCALL *__fh_writefn)(void *__cookie, char const *__buf, int __num_bytes); /* [0..1] funopen writefn */
-	__FS_TYPE(off) (__LIBKCALL *__fh_seekfn)(void *__cookie, __FS_TYPE(off) __off, int __whence);           /* [0..1] funopen seekfn */
+	__off_t (__LIBKCALL *__fh_seekfn)(void *__cookie, __off_t __off, int __whence);           /* [0..1] funopen seekfn */
 	int   (__LIBKCALL *__fh_closefn)(void *__cookie);                                 /* [0..1] funopen closefn */
 };
 __NAMESPACE_LOCAL_END
@@ -100,7 +100,7 @@ struct __funopen2_holder {
 	void              *__f2h_cookie;                                                    /* [0..1] funopen2 readfn */
 	__SSIZE_TYPE__ (__LIBKCALL *__f2h_readfn)(void *__cookie, void *__buf, __SIZE_TYPE__ __num_bytes);        /* [0..1] funopen2 readfn */
 	__SSIZE_TYPE__ (__LIBKCALL *__f2h_writefn)(void *__cookie, void const *__buf, __SIZE_TYPE__ __num_bytes); /* [0..1] funopen2 writefn */
-	__FS_TYPE(off)   (__LIBKCALL *__f2h_seekfn)(void *__cookie, __FS_TYPE(off) __off, int __whence);              /* [0..1] funopen2 seekfn */
+	__off_t   (__LIBKCALL *__f2h_seekfn)(void *__cookie, __off_t __off, int __whence);              /* [0..1] funopen2 seekfn */
 	int     (__LIBKCALL *__f2h_closefn)(void *__cookie);                                    /* [0..1] funopen2 closefn */
 	int     (__LIBKCALL *__f2h_flushfn)(void *__cookie);                                    /* [0..1] funopen2 flushfn */
 };
@@ -112,7 +112,7 @@ __LOCAL_LIBC(__funopen_to_funopen64_seekfn) __off64_t
 (__LIBKCALL __funopen_to_funopen64_seekfn)(void *__cookie, __off64_t __off, int __whence) {
 	struct __funopen_holder *__holder;
 	__holder = (struct __funopen_holder *)__cookie;
-	return (*__holder->__fh_seekfn)(__holder->__fh_cookie, (__FS_TYPE(off))__off, __whence);
+	return (*__holder->__fh_seekfn)(__holder->__fh_cookie, (__off_t)__off, __whence);
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__funopen_to_funopen64_seekfn_defined */
@@ -199,7 +199,7 @@ __NAMESPACE_LOCAL_END
 #endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(funopen2) __ATTR_WUNUSED __FILE *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(funopen2))(void const *__cookie, __SSIZE_TYPE__ (__LIBKCALL *__readfn)(void *__cookie, void *__buf, __SIZE_TYPE__ __num_bytes), __SSIZE_TYPE__ (__LIBKCALL *__writefn)(void *__cookie, void const *__buf, __SIZE_TYPE__ __num_bytes), __FS_TYPE(off) (__LIBKCALL *__seekfn)(void *__cookie, __FS_TYPE(off) __off, int __whence), int (__LIBKCALL *__flushfn)(void *__cookie), int (__LIBKCALL *__closefn)(void *__cookie)) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(funopen2))(void const *__cookie, __SSIZE_TYPE__ (__LIBKCALL *__readfn)(void *__cookie, void *__buf, __SIZE_TYPE__ __num_bytes), __SSIZE_TYPE__ (__LIBKCALL *__writefn)(void *__cookie, void const *__buf, __SIZE_TYPE__ __num_bytes), __off_t (__LIBKCALL *__seekfn)(void *__cookie, __off_t __off, int __whence), int (__LIBKCALL *__flushfn)(void *__cookie), int (__LIBKCALL *__closefn)(void *__cookie)) {
 	__FILE *__result;
 	struct __NAMESPACE_LOCAL_SYM __funopen2_holder *__holder;
 	if (!__seekfn)

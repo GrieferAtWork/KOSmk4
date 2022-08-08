@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd66c94c4 */
+/* HASH CRC-32:0x547d8f40 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,9 +66,9 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 #if defined(__CRT_HAVE_localtime_r) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime_r,(__TM_TYPE(time) const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),localtime_r,(__timer,__tp))
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime_r,(__time_t const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),localtime_r,(__timer,__tp))
 #elif defined(__CRT_HAVE_localtime64_r) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime_r,(__TM_TYPE(time) const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),localtime64_r,(__timer,__tp))
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),struct __NAMESPACE_STD_SYM tm *,__NOTHROW_NCX,__localdep_localtime_r,(__time_t const *__restrict __timer, struct __NAMESPACE_STD_SYM tm *__restrict __tp),localtime64_r,(__timer,__tp))
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/time/localtime_r.h>
@@ -77,7 +77,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_localtime_r_defined */
 __LOCAL_LIBC(ctime_r) __ATTR_IN(1) __ATTR_OUT(2) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ctime_r))(__TM_TYPE(time) const *__restrict __timer, char __buf[26]) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ctime_r))(__time_t const *__restrict __timer, char __buf[26]) {
 #if defined(__CRT_HAVE__ctime32_s) && !defined(__USE_TIME_BITS64)
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_ctime32_s)(__buf, 26, __timer) ? __NULLPTR : __buf;
 #elif defined(__CRT_HAVE__ctime64_s) && defined(__USE_TIME_BITS64)

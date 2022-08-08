@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea91d9e */
+/* HASH CRC-32:0x9cc6a42b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,7 +99,7 @@ typedef enum __itimer_which {
 
 #ifndef __time_t_defined
 #define __time_t_defined
-typedef __TM_TYPE(time) time_t;
+typedef __time_t time_t;
 #endif /* !__time_t_defined */
 
 #ifndef __suseconds_t_defined

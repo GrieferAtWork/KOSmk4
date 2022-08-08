@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6563c251 */
+/* HASH CRC-32:0x6510a1ca */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -389,10 +389,10 @@ NOTHROW_NCX(LIBCCALL libc_copylist_sz)(char const *filename,
 }
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET   __pos_t
 #define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET   __off_t
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
@@ -441,7 +441,7 @@ NOTHROW_RPC(LIBDCALL libd_copylist)(char const *filename,
 	char *result = libd_copylist64(filename, &filesize64);
 	*p_filesize = (__PIO_OFFSET)filesize64;
 	return result;
-#elif __FS_SIZEOF(OFF) == __SIZEOF_SIZE_T__
+#elif __SIZEOF_OFF_T__ == __SIZEOF_SIZE_T__
 	return libd_copylist_sz(filename, (size_t *)p_filesize);
 #else /* ... */
 	char *result;
@@ -457,10 +457,10 @@ DEFINE_INTERN_ALIAS(libc_copylist, libc_copylist_sz);
 #else /* __SIZEOF_OFF32_T__ == __SIZEOF_SIZE_T__ */
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET   __pos_t
 #define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET   __off_t
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
@@ -508,7 +508,7 @@ NOTHROW_RPC(LIBCCALL libc_copylist)(char const *filename,
 	char *result = libc_copylist64(filename, &filesize64);
 	*p_filesize = (__PIO_OFFSET)filesize64;
 	return result;
-#elif __FS_SIZEOF(OFF) == __SIZEOF_SIZE_T__
+#elif __SIZEOF_OFF_T__ == __SIZEOF_SIZE_T__
 	return libc_copylist_sz(filename, (size_t *)p_filesize);
 #else /* ... */
 	char *result;
@@ -525,10 +525,10 @@ DEFINE_INTERN_ALIAS(libd_copylist64, libd_copylist);
 #else /* __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__ */
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET   __pos_t
 #define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET   __off_t
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
@@ -592,10 +592,10 @@ DEFINE_INTERN_ALIAS(libc_copylist64, libc_copylist_sz);
 #else /* ... */
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET   __pos_t
 #define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET   __off_t
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */

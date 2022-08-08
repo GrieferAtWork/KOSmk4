@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6aae33a3 */
+/* HASH CRC-32:0x59e618d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -132,8 +132,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vlimit))(int __resource, int ___value
 #endif /* !__LIM_TO_RLIMIT */
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_getrlimit)((int)__rlimit_resource, &__rlim);
 	if __likely(__result == 0) {
-		__rlim.rlim_cur = (__FS_TYPE(rlim))                       /* Cast to correct type. */
-		                  (__CRT_PRIVATE_SINT(__FS_SIZEOF(RLIM))) /* Sign expansion... */
+		__rlim.rlim_cur = (__rlim_t)                     /* Cast to correct type. */
+		                  (__CRT_PRIVATE_SINT(__SIZEOF_RLIM_T__)) /* Sign expansion... */
 		                  (int)___value;
 		__result = (__NAMESPACE_LOCAL_SYM __localdep_setrlimit)((int)__rlimit_resource, &__rlim);
 	}

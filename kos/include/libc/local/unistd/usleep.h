@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19745140 */
+/* HASH CRC-32:0x1b8926 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,7 +79,7 @@ __LOCAL_LIBC(usleep) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(usleep))(__useconds_t __useconds) {
 #if defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
 	struct timespec __ts;
-	__ts.tv_sec  = (__TM_TYPE(time))(__useconds / __UINT32_C(1000000));
+	__ts.tv_sec  = (__time_t)(__useconds / __UINT32_C(1000000));
 	__ts.tv_nsec = (__syscall_ulong_t)(__useconds % __UINT32_C(1000000)) * __UINT16_C(1000);
 	return (__NAMESPACE_LOCAL_SYM __localdep_nanosleep)(&__ts, __NULLPTR);
 #else /* __CRT_HAVE_nanosleep64 || __CRT_HAVE_nanosleep || __CRT_HAVE___nanosleep || __CRT_HAVE___libc_nanosleep */

@@ -61,13 +61,19 @@
 
 %[define_ccompat_header("cstdio")]
 
+%[define_decl_include("<bits/crt/stdio.h>": [
+	"__fpos_t",
+	"__fpos32_t",
+	"__fpos64_t",
+])]
+
 %[define_replacement(FILE     = __FILE)]
 %[define_replacement(fd_t     = __fd_t)]
 %[define_replacement(atflag_t = __atflag_t)]
-%[define_replacement(off_t    = "__FS_TYPE(off)")]
+%[define_replacement(off_t    = "__off_t")]
 %[define_replacement(off32_t  = __off32_t)]
 %[define_replacement(off64_t  = __off64_t)]
-%[define_replacement(fpos_t   = "__FS_TYPE(fpos)")]
+%[define_replacement(fpos_t   = __fpos_t)]
 %[define_replacement(fpos32_t = __fpos32_t)]
 %[define_replacement(fpos64_t = __fpos64_t)]
 %[define_replacement(pos32_t  = __pos32_t)]
@@ -126,7 +132,7 @@
 )]%[insert:prefix(
 #include <asm/os/stdio.h>
 )]%[insert:prefix(
-#include <bits/crt/stdio.h> /* __fpos32_t, __fpos64_t */
+#include <bits/crt/stdio.h> /* __fpos_t, __fpos64_t */
 )]%[insert:prefix(
 #include <bits/types.h>
 )]%[insert:prefix(
@@ -296,7 +302,7 @@ __NAMESPACE_STD_USING(size_t)
 #ifdef __USE_XOPEN2K8
 #ifndef __off_t_defined
 #define __off_t_defined
-typedef __FS_TYPE(off) off_t;
+typedef __off_t off_t;
 #endif /* !__off_t_defined */
 
 #ifndef __ssize_t_defined
@@ -315,7 +321,7 @@ typedef __off64_t off64_t;
 #ifndef __std_fpos_t_defined
 #define __std_fpos_t_defined
 __NAMESPACE_STD_BEGIN
-typedef __FS_TYPE(fpos) fpos_t;
+typedef __fpos_t fpos_t;
 __NAMESPACE_STD_END
 #endif /* !__std_fpos_t_defined */
 #ifndef __CXX_SYSTEM_HEADER
@@ -1338,7 +1344,7 @@ int fgetpos([[inout]] FILE *__restrict stream, [[out]] fpos_t *__restrict pos) {
 [[section(".text.crt{|.dos}.FILE.locked.seek.pos")]]
 int fsetpos([[inout]] FILE *__restrict stream,
             [[in]] fpos_t const *__restrict pos) {
-@@pp_if __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__ && $has_function(crt_fseeko64)@@
+@@pp_if __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__ && $has_function(crt_fseeko64)@@
 	return crt_fseeko64(stream, (off64_t)*pos, SEEK_SET);
 @@pp_elif $has_function(crt_fsetpos)@@
 	pos32_t pos32 = (pos32_t)*pos;
@@ -2575,9 +2581,9 @@ __LOCAL_LIBC(fopencookie_to_funopen2_writefn) ssize_t
 @@pp_ifndef __fopencookie_to_funopen_seekfn_defined@@
 @@push_namespace(local)@@
 #define __fopencookie_to_funopen_seekfn_defined
-__LOCAL_LIBC(fopencookie_to_funopen_seekfn) __FS_TYPE(@off@)
-(__LIBKCALL fopencookie_to_funopen_seekfn)(void *cookie, __FS_TYPE(@off@) off, int whence) {
-@@pp_if __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__@@
+__LOCAL_LIBC(fopencookie_to_funopen_seekfn) __off_t
+(__LIBKCALL fopencookie_to_funopen_seekfn)(void *cookie, __off_t off, int whence) {
+@@pp_if __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__@@
 	struct __fopencookie_holder *holder;
 	holder = (struct __fopencookie_holder *)cookie;
 @@pp_ifdef __USE_KOS_ALTERATIONS@@
@@ -2598,7 +2604,7 @@ __LOCAL_LIBC(fopencookie_to_funopen_seekfn) __FS_TYPE(@off@)
 	holder = (struct __fopencookie_holder *)cookie;
 	if ((*holder->foch_funcs.@seek@)(holder->foch_cookie, &newpos, whence) != 0)
 		return -1;
-	return (__FS_TYPE(@off@))newpos;
+	return (__off_t)newpos;
 @@pp_endif@@
 }
 @@pop_namespace@@
@@ -2823,16 +2829,16 @@ __STDC_INT_AS_SIZE_T obstack_printf([[inout]] struct obstack *__restrict self,
 @@Change the current in-file position of `stream'
 [[decl_include("<bits/types.h>")]]
 [[stdio_throws, no_crt_self_import, no_crt_self_export, export_as(CNL_fseeko...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(@OFF@) == __SIZEOF_LONG__   ), alias(CNL_fseek_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias(CNL_fseeko64_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_LONG__   ), alias(CNL_fseek...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_fseeko...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias(CNL_fseeko64...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_LONG__   ), alias(CNL_fseek_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias(CNL_fseeko64_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_LONG__), crt_intern_alias("fseek")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_LONG__   ), alias(CNL_fseek_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__), alias(CNL_fseeko64_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __SIZEOF_OFF_T__ == __SIZEOF_LONG__   ), alias(CNL_fseek...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__), alias(CNL_fseeko64...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __SIZEOF_OFF_T__ == __SIZEOF_LONG__   ), alias(CNL_fseek_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__), alias(CNL_fseeko64_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_LONG__), crt_intern_alias("fseek")]]
 [[userimpl, requires($has_function(crt_fseeko64) || $has_function(crt_fseeko) || $has_function(crt_fseek))]]
 int fseeko([[inout]] $FILE *__restrict stream, $off_t off, int whence) {
 @@pp_if $has_function(crt_fseeko64)@@
@@ -2848,16 +2854,16 @@ int fseeko([[inout]] $FILE *__restrict stream, $off_t off, int whence) {
 @@Return the current in-file position of `stream'
 [[decl_include("<bits/types.h>")]]
 [[stdio_throws, wunused, no_crt_self_import, no_crt_self_export, export_as(CNL_ftello...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(@OFF@) == __SIZEOF_LONG__   ), alias(CNL_ftell_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias(CNL_ftello64_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_LONG__   ), alias(CNL_ftell...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_ftello...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias(CNL_ftello64...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_LONG__   ), alias(CNL_ftell_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias(CNL_ftello64_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_LONG__), crt_intern_alias("ftell")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_LONG__   ), alias(CNL_ftell_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__), alias(CNL_ftello64_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __SIZEOF_OFF_T__ == __SIZEOF_LONG__   ), alias(CNL_ftell...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__), alias(CNL_ftello...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__), alias(CNL_ftello64...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __SIZEOF_OFF_T__ == __SIZEOF_LONG__   ), alias(CNL_ftell_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__), alias(CNL_ftello64_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_LONG__), crt_intern_alias("ftell")]]
 [[userimpl, requires($has_function(crt_fgetpos64) || $has_function(crt_fgetpos) ||
                      $has_function(crt_ftello64) || $has_function(crt_ftello) ||
                      $has_function(crt_ftell))]]
@@ -3192,13 +3198,13 @@ long int ftell_unlocked([[inout]] $FILE *__restrict stream) {
 
 [[stdio_throws, decl_include("<bits/types.h>")]]
 [[no_crt_self_import, no_crt_self_export, export_as(CNL_fseeko_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_LONG__   ), alias(CNL_fseek_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias(CNL_fseeko64_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_LONG__   ), alias(CNL_fseek...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_fseeko...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias(CNL_fseeko64...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_LONG__   ), crt_intern_alias("fseek_unlocked")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_LONG__   ), alias(CNL_fseek_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__), alias(CNL_fseeko64_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_LONG__   ), alias(CNL_fseek...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__), alias(CNL_fseeko...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__), alias(CNL_fseeko64...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_LONG__   ), crt_intern_alias("fseek_unlocked")]]
 [[userimpl, requires_function(fseeko)]]
 int fseeko_unlocked([[inout]] $FILE *__restrict stream, $off_t off, int whence) {
 	return fseeko(stream, off, whence);
@@ -3206,13 +3212,13 @@ int fseeko_unlocked([[inout]] $FILE *__restrict stream, $off_t off, int whence) 
 
 [[stdio_throws, wunused, decl_include("<bits/types.h>")]]
 [[no_crt_self_import, no_crt_self_export, export_as(CNL_ftello_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_LONG__   ), alias(CNL_ftell_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias(CNL_ftello64_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_LONG__   ), alias(CNL_ftell...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_ftello...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias(CNL_ftello64...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_LONG__   ), crt_intern_alias("ftell_unlocked")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_LONG__   ), alias(CNL_ftell_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__), alias(CNL_ftello_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__), alias(CNL_ftello64_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_LONG__   ), alias(CNL_ftell...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__), alias(CNL_ftello...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__), alias(CNL_ftello64...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_LONG__   ), crt_intern_alias("ftell_unlocked")]]
 [[userimpl, requires_function(ftello)]]
 $off_t ftello_unlocked([[inout]] $FILE *__restrict stream) {
 	return ftello(stream);
@@ -3374,10 +3380,10 @@ int fisatty([[inout]] $FILE *__restrict stream) {
 %{
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET   __pos_t
 #define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET   __off_t
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
@@ -3386,10 +3392,10 @@ int fisatty([[inout]] $FILE *__restrict stream) {
 %[define(DEFINE_PIO_OFFSET =
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(@pos@)
+#define __PIO_OFFSET   __pos_t
 #define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(@off@)
+#define __PIO_OFFSET   __off_t
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
@@ -3401,12 +3407,12 @@ int fisatty([[inout]] $FILE *__restrict stream) {
 @@Truncate the given file `stream' to a length of `length'
 [[cp_stdio, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
 [[no_crt_self_import, no_crt_self_export, export_as(CNL_fftruncate...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_fftruncate_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias(CNL_fftruncate64_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_fftruncate...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias(CNL_fftruncate64...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_fftruncate_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias(CNL_fftruncate64_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__), alias(CNL_fftruncate_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__), alias(CNL_fftruncate64_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__), alias(CNL_fftruncate...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__), alias(CNL_fftruncate64...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__), alias(CNL_fftruncate_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")                                 __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__), alias(CNL_fftruncate64_unlocked...)]]
 [[userimpl, requires_function(ftruncate, fileno)]]
 [[section(".text.crt{|.dos}.FILE.locked.utility")]]
 int fftruncate([[inout]] $FILE *__restrict stream, __PIO_OFFSET length) {
@@ -3421,10 +3427,10 @@ int fftruncate([[inout]] $FILE *__restrict stream, __PIO_OFFSET length) {
 @@Same as `fftruncate()', but don't acquire a lock to the file
 [[cp_stdio, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET)]]
 [[no_crt_self_import, no_crt_self_export, export_as(CNL_fftruncate_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_fftruncate_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias(CNL_fftruncate64_unlocked...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias(CNL_fftruncate...)]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias(CNL_fftruncate64...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__), alias(CNL_fftruncate_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__), alias(CNL_fftruncate64_unlocked...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__), alias(CNL_fftruncate...)]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__), alias(CNL_fftruncate64...)]]
 [[userimpl, requires_function(ftruncate, fileno_unlocked)]]
 [[section(".text.crt{|.dos}.FILE.unlocked.utility")]]
 int fftruncate_unlocked([[inout]] $FILE *__restrict stream, __PIO_OFFSET length) {
@@ -3748,7 +3754,7 @@ char *fgetln([[inout]] $FILE *__restrict stream,
 %{
 #ifndef __off_t_defined
 #define __off_t_defined
-typedef __FS_TYPE(off) off_t;
+typedef __off_t off_t;
 #endif /* !__off_t_defined */
 }
 
@@ -3824,8 +3830,8 @@ __LOCAL_LIBC(funopen_to_funopen2_writefn) ssize_t
 @@pp_ifndef __funopen_to_funopen2_seekfn_defined@@
 @@push_namespace(local)@@
 #define __funopen_to_funopen2_seekfn_defined
-__LOCAL_LIBC(funopen_to_funopen2_seekfn) __FS_TYPE(@off@)
-(__LIBKCALL funopen_to_funopen2_seekfn)(void *cookie, __FS_TYPE(@off@) off, int whence) {
+__LOCAL_LIBC(funopen_to_funopen2_seekfn) __off_t
+(__LIBKCALL funopen_to_funopen2_seekfn)(void *cookie, __off_t off, int whence) {
 	struct __funopen_holder *holder;
 	holder = (struct __funopen_holder *)cookie;
 	return (*holder->fh_seekfn)(holder->fh_cookie, off, whence);
@@ -3875,10 +3881,10 @@ __LOCAL_LIBC(funopen_to_fopencookie_seekfn) NONNULL((2)) int
 (__LIBKCALL funopen_to_fopencookie_seekfn)(void *cookie, off64_t *pos, int whence)
 @@pp_endif@@
 {
-	__FS_TYPE(@off@) newpos;
+	__off_t newpos;
 	struct __funopen_holder *holder;
 	holder = (struct __funopen_holder *)cookie;
-	newpos = (*holder->fh_seekfn)(holder->fh_cookie, (__FS_TYPE(@off@))*pos, whence);
+	newpos = (*holder->fh_seekfn)(holder->fh_cookie, (__off_t)*pos, whence);
 	if unlikely(newpos == -1)
 		return -1;
 @@pp_ifdef __USE_KOS_ALTERATIONS@@
@@ -3938,7 +3944,7 @@ __LOCAL_LIBC(funopen_to_funopen64_seekfn) off64_t
 (__LIBKCALL funopen_to_funopen64_seekfn)(void *cookie, off64_t off, int whence) {
 	struct __funopen_holder *holder;
 	holder = (struct __funopen_holder *)cookie;
-	return (*holder->fh_seekfn)(holder->fh_cookie, (__FS_TYPE(@off@))off, whence);
+	return (*holder->fh_seekfn)(holder->fh_cookie, (__off_t)off, whence);
 }
 @@pop_namespace@@
 @@pp_endif@@
@@ -3950,8 +3956,8 @@ __LOCAL_LIBC(funopen_to_funopen64_seekfn) off64_t
 
 @@>> funopen(3), funopen64(3)
 [[guard, wunused, decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias("funopen")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias("funopen64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__), alias("funopen")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__), alias("funopen64")]]
 [[requires_include("<hybrid/typecore.h>")]]
 [[requires((__SIZEOF_INT__ == __SIZEOF_SIZE_T__ && $has_function(funopen2)) ||
            ($has_function(malloc) && ($has_function(funopen2) ||
@@ -4120,8 +4126,8 @@ __LOCAL_LIBC(funopen2_to_funopen2_64_flushfn) int
 
 @@>> funopen2(3), funopen2_64(3)
 [[guard, wunused, decl_include("<features.h>", "<bits/types.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF32_T__), alias("funopen2")]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__), alias("funopen2_64")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__), alias("funopen2")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")__SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__), alias("funopen2_64")]]
 [[userimpl, requires_function(malloc, funopen2_64)]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(DEFINE_FUNOPEN_HOLDER)]]
@@ -4282,7 +4288,7 @@ DEFINE_FUNOPEN_TO_FUNOPEN2_CLOSEFN
 @@pp_if $has_function(funopen2_64)@@
 DEFINE_FUNOPEN_TO_FUNOPEN2_READFN
 DEFINE_FUNOPEN_TO_FUNOPEN2_WRITEFN
-@@pp_if __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__@@
+@@pp_if __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__@@
 DEFINE_FUNOPEN_TO_FUNOPEN2_SEEKFN
 @@pp_else@@
 DEFINE_FUNOPEN64_TO_FUNOPEN2_64_SEEKFN
@@ -4290,7 +4296,7 @@ DEFINE_FUNOPEN64_TO_FUNOPEN2_64_SEEKFN
 @@pp_elif $has_function(crt_fopencookie)@@
 DEFINE_FUNOPEN_TO_FUNOPEN2_READFN
 DEFINE_FUNOPEN_TO_FUNOPEN2_WRITEFN
-@@pp_if __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__@@
+@@pp_if __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__@@
 DEFINE_FUNOPEN_TO_FOPENCOOKIE_SEEKFN
 @@pp_else@@
 DEFINE_FUNOPEN64_TO_FOPENCOOKIE_SEEKFN
@@ -4304,7 +4310,7 @@ DEFINE_FUNOPEN_TO_FUNOPEN2_WRITEFN
 DEFINE_FUNOPEN_TO_FUNOPEN64_READFN
 DEFINE_FUNOPEN_TO_FUNOPEN64_WRITEFN
 @@pp_endif@@
-@@pp_if __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__@@
+@@pp_if __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__@@
 DEFINE_FUNOPEN_TO_FUNOPEN64_SEEKFN
 @@pp_else@@
 DEFINE_FUNOPEN64_TO_FUNOPEN_SEEKFN
@@ -4341,7 +4347,7 @@ $FILE *funopen64(void const *cookie,
 	holder->fh64_seekfn  = seekfn;
 	holder->fh64_closefn = closefn;
 @@pp_if $has_function(funopen2_64)@@
-@@pp_if __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__@@
+@@pp_if __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__@@
 	result = funopen2_64(/* cookie:  */ holder,
 	                     /* readfn:  */ readfn  ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_readfn  : NULL,
 	                     /* writefn: */ writefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_writefn : NULL,
@@ -4361,7 +4367,7 @@ $FILE *funopen64(void const *cookie,
 		_IO_cookie_io_functions_t ioc_functions;
 		ioc_functions.@read@  = readfn ? (__io_read_fn *)&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_readfn : NULL;
 		ioc_functions.@write@ = writefn ? (__io_write_fn *)&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_writefn : NULL;
-@@pp_if __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__@@
+@@pp_if __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__@@
 		ioc_functions.@seek@  = seekfn ? &__NAMESPACE_LOCAL_SYM funopen_to_fopencookie_seekfn : NULL;
 @@pp_else@@
 		ioc_functions.@seek@  = seekfn ? &__NAMESPACE_LOCAL_SYM funopen64_to_fopencookie_seekfn : NULL;
@@ -4370,8 +4376,8 @@ $FILE *funopen64(void const *cookie,
 		result = crt_fopencookie(holder, readfn && writefn ? "r+" : readfn ? "r" : "w", ioc_functions);
 	}
 @@pp_else@@
-@@pp_if   __SIZEOF_INT__   ==  __SIZEOF_SIZE_T__@@
-@@pp_if __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__@@
+@@pp_if  __SIZEOF_INT__  ==  __SIZEOF_SIZE_T__@@
+@@pp_if __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__@@
 	result = crt_funopen32(/* cookie:  */ holder,
 	                       /* readfn:  */ readfn  ? (int (LIBKCALL *)(void *, char *, int))&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_readfn  : NULL,
 	                       /* writefn: */ writefn ? (int (LIBKCALL *)(void *, char const *, int))&__NAMESPACE_LOCAL_SYM funopen_to_funopen2_writefn : NULL,
@@ -4385,7 +4391,7 @@ $FILE *funopen64(void const *cookie,
 	                       /* closefn: */ &__NAMESPACE_LOCAL_SYM funopen_to_funopen2_closefn);
 @@pp_endif@@
 @@pp_else@@
-@@pp_if __FS_SIZEOF(@OFF@) == __SIZEOF_OFF64_T__@@
+@@pp_if __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__@@
 	result = crt_funopen32(/* cookie:  */ holder,
 	                       /* readfn:  */ readfn  ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen64_readfn  : NULL,
 	                       /* writefn: */ writefn ? &__NAMESPACE_LOCAL_SYM funopen_to_funopen64_writefn : NULL,
@@ -4681,7 +4687,7 @@ int _flsbuf(int ch, [[inout]] $FILE *__restrict stream);
 int _getmaxstdio() {
 	struct rlimit rlim;
 	if unlikely(getrlimit((__rlimit_resource_t)__RLIMIT_NOFILE, &rlim) != 0)
-		rlim.@rlim_cur@ = (__FS_TYPE(@rlim@))-1;
+		rlim.@rlim_cur@ = (__rlim_t)-1;
 	return (int)rlim.@rlim_cur@;
 }
 
@@ -4694,10 +4700,10 @@ int _setmaxstdio(int newmaxval) {
 	struct rlimit rlim;
 	if unlikely(getrlimit((__rlimit_resource_t)__RLIMIT_NOFILE, &rlim) != 0)
 		goto err;
-	rlim.@rlim_cur@ = (__FS_TYPE(@rlim@))newmaxval;
+	rlim.@rlim_cur@ = (__rlim_t)newmaxval;
 	if unlikely(setrlimit((__rlimit_resource_t)__RLIMIT_NOFILE, &rlim) != 0) {
 err:
-		rlim.@rlim_cur@ = (__FS_TYPE(@rlim@))-1;
+		rlim.@rlim_cur@ = (__rlim_t)-1;
 	}
 	return (int)rlim.@rlim_cur@;
 }

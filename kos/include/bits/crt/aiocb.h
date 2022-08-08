@@ -59,9 +59,9 @@ struct aiocb /*[PREFIX(aio_)]*/ {
 #endif /* __SIZEOF_SIZE_T__ > 4 */
 	__ssize_t         __return_value;
 #ifdef __USE_KOS_ALTERATIONS
-	__FS_TYPE(pos)      aio_offset;     /* File offset for `aio_write(3)' and `aio_read(3)' */
+	__pos_t             aio_offset;     /* File offset for `aio_write(3)' and `aio_read(3)' */
 #else /* __USE_KOS_ALTERATIONS */
-	__FS_TYPE(off)      aio_offset;     /* File offset for `aio_write(3)' and `aio_read(3)' */
+	__off_t             aio_offset;     /* File offset for `aio_write(3)' and `aio_read(3)' */
 #endif /* !__USE_KOS_ALTERATIONS */
 	char              __glibc_reserved[32];
 };

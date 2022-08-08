@@ -28,10 +28,10 @@
 #include <bits/types.h>
 
 #define __OFFSET_TIMEB_TIME       0
-#define __OFFSET_TIMEB_MILLITM    __TM_SIZEOF(TIME)
-#define __OFFSET_TIMEB_TIMEZONE   (__TM_SIZEOF(TIME) + 2)
-#define __OFFSET_TIMEB_DSTFLAG    (__TM_SIZEOF(TIME) + 4)
-#define __SIZEOF_TIMEB            (__TM_SIZEOF(TIME) + 8)
+#define __OFFSET_TIMEB_MILLITM    __SIZEOF_TIME_T__
+#define __OFFSET_TIMEB_TIMEZONE   (__SIZEOF_TIME_T__ + 2)
+#define __OFFSET_TIMEB_DSTFLAG    (__SIZEOF_TIME_T__ + 4)
+#define __SIZEOF_TIMEB            (__SIZEOF_TIME_T__ + 8)
 #define __OFFSET_TIMEB32_TIME     0
 #define __OFFSET_TIMEB32_MILLITM  __SIZEOF_TIME32_T__
 #define __OFFSET_TIMEB32_TIMEZONE (__SIZEOF_TIME32_T__ + 2)
@@ -60,7 +60,7 @@ __DECL_BEGIN
 #undef dstflag
 
 struct timeb /*[PREFIX()]*/ {
-	__TM_TYPE(time) time;     /* Seconds since epoch, as from `time'. */
+	__time_t        time;     /* Seconds since epoch, as from `time'. */
 	__UINT16_TYPE__ millitm;  /* Additional milliseconds. */
 	__INT16_TYPE__  timezone; /* Minutes west of GMT. */
 	__INT16_TYPE__  dstflag;  /* Nonzero if Daylight Savings Time used. */

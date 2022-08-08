@@ -60,7 +60,7 @@ typedef __clock_t clock_t;
 
 #ifndef __time_t_defined
 #define __time_t_defined
-typedef __TM_TYPE(time) time_t; /* UNIX time in seconds since 01.01.1970 */
+typedef __time_t time_t; /* UNIX time in seconds since 01.01.1970 */
 #endif /* !__time_t_defined */
 
 #ifndef __size_t_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x440c70bf */
+/* HASH CRC-32:0xf0abb1aa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -248,7 +248,7 @@ __NAMESPACE_STD_USING(snprintf)
 #include <asm/os/limits.h> /* __IOV_MAX */
 #include <asm/os/oflags.h>
 #include <asm/os/stdio.h>
-#include <bits/crt/stdio.h> /* __fpos32_t, __fpos64_t */
+#include <bits/crt/stdio.h> /* __fpos_t, __fpos64_t */
 #include <bits/types.h>
 #include <kos/anno.h>
 
@@ -411,7 +411,7 @@ __NAMESPACE_STD_USING(size_t)
 #ifdef __USE_XOPEN2K8
 #ifndef __off_t_defined
 #define __off_t_defined
-typedef __FS_TYPE(off) off_t;
+typedef __off_t off_t;
 #endif /* !__off_t_defined */
 
 #ifndef __ssize_t_defined
@@ -430,7 +430,7 @@ typedef __off64_t off64_t;
 #ifndef __std_fpos_t_defined
 #define __std_fpos_t_defined
 __NAMESPACE_STD_BEGIN
-typedef __FS_TYPE(fpos) fpos_t;
+typedef __fpos_t fpos_t;
 __NAMESPACE_STD_END
 #endif /* !__std_fpos_t_defined */
 #ifndef __CXX_SYSTEM_HEADER
@@ -3387,157 +3387,157 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(obstack_printf, __FORCELOCAL __ATTR_ARTIFICIAL _
 #endif /* !__CRT_HAVE_obstack_printf */
 #endif /* __USE_GNU */
 #if defined(__USE_LARGEFILE) || defined(__USE_XOPEN2K)
-#if defined(__CRT_HAVE_fseek_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+#if defined(__CRT_HAVE_fseek_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_LONG__
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE__fseek_nolock) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __off_t __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE__fseek_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_LONG__
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),_fseek_nolock,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseeko_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __off_t __off, int __whence),_fseek_nolock,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseeko_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseeko64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __off_t __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseeko64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseek64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __off_t __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseek64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseek64_unlocked,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE__fseeki64_nolock) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __off_t __off, int __whence),fseek64_unlocked,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE__fseeki64_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseek) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __off_t __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseek) && __SIZEOF_OFF_T__ == __SIZEOF_LONG__
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseek,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseeko) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __off_t __off, int __whence),fseek,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseeko) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
-__CDECLARE(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseeko64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+__CDECLARE(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __off_t __off, int __whence),(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseeko64) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseeko64,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseek64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __off_t __off, int __whence),fseeko64,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseek64) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseek64,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE__fseeki64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __off_t __off, int __whence),fseek64,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE__fseeki64) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),_fseeki64,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseek_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __off_t __off, int __whence),_fseeki64,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseek_unlocked) && __SIZEOF_OFF_T__ == __SIZEOF_LONG__
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE__fseek_nolock) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __off_t __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE__fseek_nolock) && __SIZEOF_OFF_T__ == __SIZEOF_LONG__
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),_fseek_nolock,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseeko_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __off_t __off, int __whence),_fseek_nolock,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseeko_unlocked) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseeko64_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __off_t __off, int __whence),fseeko_unlocked,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseeko64_unlocked) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseek64_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __off_t __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseek64_unlocked) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseek64_unlocked,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE__fseeki64_nolock) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __off_t __off, int __whence),fseek64_unlocked,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE__fseeki64_nolock) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko,(__FILE *__restrict __stream, __off_t __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
 #include <libc/local/stdio/fseeko.h>
 /* >> fseeko(3), fseeko64(3)
  * Change the current in-file position of `stream' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fseeko, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) int (__LIBCCALL fseeko)(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fseeko))(__stream, __off, __whence); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fseeko, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) int (__LIBCCALL fseeko)(__FILE *__restrict __stream, __off_t __off, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fseeko))(__stream, __off, __whence); })
 #endif /* ... */
-#if defined(__CRT_HAVE_ftell_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+#if defined(__CRT_HAVE_ftell_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_LONG__
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello,(__FILE *__restrict __stream),ftell_unlocked,(__stream))
-#elif defined(__CRT_HAVE__ftell_nolock) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello,(__FILE *__restrict __stream),ftell_unlocked,(__stream))
+#elif defined(__CRT_HAVE__ftell_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_LONG__
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello,(__FILE *__restrict __stream),_ftell_nolock,(__stream))
-#elif defined(__CRT_HAVE_ftello_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello,(__FILE *__restrict __stream),_ftell_nolock,(__stream))
+#elif defined(__CRT_HAVE_ftello_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello,(__FILE *__restrict __stream),ftello_unlocked,(__stream))
-#elif defined(__CRT_HAVE_ftello64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello,(__FILE *__restrict __stream),ftello_unlocked,(__stream))
+#elif defined(__CRT_HAVE_ftello64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello,(__FILE *__restrict __stream),ftello64_unlocked,(__stream))
-#elif defined(__CRT_HAVE_ftell64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello,(__FILE *__restrict __stream),ftello64_unlocked,(__stream))
+#elif defined(__CRT_HAVE_ftell64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello,(__FILE *__restrict __stream),ftell64_unlocked,(__stream))
-#elif defined(__CRT_HAVE__ftelli64_nolock) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello,(__FILE *__restrict __stream),ftell64_unlocked,(__stream))
+#elif defined(__CRT_HAVE__ftelli64_nolock) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream))
-#elif defined(__CRT_HAVE_ftell) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream))
+#elif defined(__CRT_HAVE_ftell) && __SIZEOF_OFF_T__ == __SIZEOF_LONG__
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello,(__FILE *__restrict __stream),ftell,(__stream))
-#elif defined(__CRT_HAVE__IO_ftell) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello,(__FILE *__restrict __stream),ftell,(__stream))
+#elif defined(__CRT_HAVE__IO_ftell) && __SIZEOF_OFF_T__ == __SIZEOF_LONG__
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello,(__FILE *__restrict __stream),_IO_ftell,(__stream))
-#elif defined(__CRT_HAVE_ftello) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello,(__FILE *__restrict __stream),_IO_ftell,(__stream))
+#elif defined(__CRT_HAVE_ftello) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
-__CDECLARE(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello,(__FILE *__restrict __stream),(__stream))
-#elif defined(__CRT_HAVE_ftello64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+__CDECLARE(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello,(__FILE *__restrict __stream),(__stream))
+#elif defined(__CRT_HAVE_ftello64) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello,(__FILE *__restrict __stream),ftello64,(__stream))
-#elif defined(__CRT_HAVE_ftell64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello,(__FILE *__restrict __stream),ftello64,(__stream))
+#elif defined(__CRT_HAVE_ftell64) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello,(__FILE *__restrict __stream),ftell64,(__stream))
-#elif defined(__CRT_HAVE__ftelli64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello,(__FILE *__restrict __stream),ftell64,(__stream))
+#elif defined(__CRT_HAVE__ftelli64) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello,(__FILE *__restrict __stream),_ftelli64,(__stream))
-#elif defined(__CRT_HAVE_ftell_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello,(__FILE *__restrict __stream),_ftelli64,(__stream))
+#elif defined(__CRT_HAVE_ftell_unlocked) && __SIZEOF_OFF_T__ == __SIZEOF_LONG__
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello,(__FILE *__restrict __stream),ftell_unlocked,(__stream))
-#elif defined(__CRT_HAVE__ftell_nolock) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello,(__FILE *__restrict __stream),ftell_unlocked,(__stream))
+#elif defined(__CRT_HAVE__ftell_nolock) && __SIZEOF_OFF_T__ == __SIZEOF_LONG__
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello,(__FILE *__restrict __stream),_ftell_nolock,(__stream))
-#elif defined(__CRT_HAVE_ftello_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello,(__FILE *__restrict __stream),_ftell_nolock,(__stream))
+#elif defined(__CRT_HAVE_ftello_unlocked) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello,(__FILE *__restrict __stream),ftello_unlocked,(__stream))
-#elif defined(__CRT_HAVE_ftello64_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello,(__FILE *__restrict __stream),ftello_unlocked,(__stream))
+#elif defined(__CRT_HAVE_ftello64_unlocked) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello,(__FILE *__restrict __stream),ftello64_unlocked,(__stream))
-#elif defined(__CRT_HAVE_ftell64_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello,(__FILE *__restrict __stream),ftello64_unlocked,(__stream))
+#elif defined(__CRT_HAVE_ftell64_unlocked) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello,(__FILE *__restrict __stream),ftell64_unlocked,(__stream))
-#elif defined(__CRT_HAVE__ftelli64_nolock) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello,(__FILE *__restrict __stream),ftell64_unlocked,(__stream))
+#elif defined(__CRT_HAVE__ftelli64_nolock) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream))
 #elif defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE_ftell64) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE_ftell64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE__IO_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock)
 #include <libc/local/stdio/ftello.h>
 /* >> ftello(3), ftello64(3)
  * Return the current in-file position of `stream' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(ftello, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INOUT(1) __FS_TYPE(off) (__LIBCCALL ftello)(__FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftello))(__stream); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ftello, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INOUT(1) __off_t (__LIBCCALL ftello)(__FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftello))(__stream); })
 #endif /* ... */
 #endif /* __USE_LARGEFILE || __USE_XOPEN2K */
 
@@ -4029,59 +4029,59 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),long int,__THROWING,ftell_unlocked,(_
 #include <libc/local/stdio/ftell_unlocked.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(ftell_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INOUT(1) long int (__LIBCCALL ftell_unlocked)(__FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftell_unlocked))(__stream); })
 #endif /* ... */
-#if defined(__CRT_HAVE_fseek_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE__fseek_nolock) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),_fseek_nolock,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseeko_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
-__CDECLARE(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseeko64_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseek64_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseek64_unlocked,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE__fseeki64_nolock) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseek) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseek,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseeko) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseeko,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseeko64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseeko64,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE_fseek64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),fseek64,(__stream,__off,__whence))
-#elif defined(__CRT_HAVE__fseeki64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence),_fseeki64,(__stream,__off,__whence))
+#if defined(__CRT_HAVE_fseek_unlocked) && __SIZEOF_OFF_T__ == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __off_t __off, int __whence),fseek_unlocked,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE__fseek_nolock) && __SIZEOF_OFF_T__ == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __off_t __off, int __whence),_fseek_nolock,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseeko_unlocked) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__
+__CDECLARE(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __off_t __off, int __whence),(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseeko64_unlocked) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __off_t __off, int __whence),fseeko64_unlocked,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseek64_unlocked) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __off_t __off, int __whence),fseek64_unlocked,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE__fseeki64_nolock) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __off_t __off, int __whence),_fseeki64_nolock,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseek) && __SIZEOF_OFF_T__ == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __off_t __off, int __whence),fseek,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseeko) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __off_t __off, int __whence),fseeko,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseeko64) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __off_t __off, int __whence),fseeko64,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE_fseek64) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __off_t __off, int __whence),fseek64,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE__fseeki64) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fseeko_unlocked,(__FILE *__restrict __stream, __off_t __off, int __whence),_fseeki64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
 #include <libc/local/stdio/fseeko_unlocked.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(fseeko_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) int (__LIBCCALL fseeko_unlocked)(__FILE *__restrict __stream, __FS_TYPE(off) __off, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fseeko_unlocked))(__stream, __off, __whence); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fseeko_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) int (__LIBCCALL fseeko_unlocked)(__FILE *__restrict __stream, __off_t __off, int __whence) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fseeko_unlocked))(__stream, __off, __whence); })
 #endif /* ... */
-#if defined(__CRT_HAVE_ftell_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello_unlocked,(__FILE *__restrict __stream),ftell_unlocked,(__stream))
-#elif defined(__CRT_HAVE__ftell_nolock) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello_unlocked,(__FILE *__restrict __stream),_ftell_nolock,(__stream))
-#elif defined(__CRT_HAVE_ftello_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
-__CDECLARE(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello_unlocked,(__FILE *__restrict __stream),(__stream))
-#elif defined(__CRT_HAVE_ftello64_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello_unlocked,(__FILE *__restrict __stream),ftello64_unlocked,(__stream))
-#elif defined(__CRT_HAVE_ftell64_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello_unlocked,(__FILE *__restrict __stream),ftell64_unlocked,(__stream))
-#elif defined(__CRT_HAVE__ftelli64_nolock) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello_unlocked,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream))
-#elif defined(__CRT_HAVE_ftell) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello_unlocked,(__FILE *__restrict __stream),ftell,(__stream))
-#elif defined(__CRT_HAVE__IO_ftell) && __FS_SIZEOF(OFF) == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello_unlocked,(__FILE *__restrict __stream),_IO_ftell,(__stream))
-#elif defined(__CRT_HAVE_ftello) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello_unlocked,(__FILE *__restrict __stream),ftello,(__stream))
-#elif defined(__CRT_HAVE_ftello64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello_unlocked,(__FILE *__restrict __stream),ftello64,(__stream))
-#elif defined(__CRT_HAVE_ftell64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello_unlocked,(__FILE *__restrict __stream),ftell64,(__stream))
-#elif defined(__CRT_HAVE__ftelli64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__FS_TYPE(off),__THROWING,ftello_unlocked,(__FILE *__restrict __stream),_ftelli64,(__stream))
+#if defined(__CRT_HAVE_ftell_unlocked) && __SIZEOF_OFF_T__ == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello_unlocked,(__FILE *__restrict __stream),ftell_unlocked,(__stream))
+#elif defined(__CRT_HAVE__ftell_nolock) && __SIZEOF_OFF_T__ == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello_unlocked,(__FILE *__restrict __stream),_ftell_nolock,(__stream))
+#elif defined(__CRT_HAVE_ftello_unlocked) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__
+__CDECLARE(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello_unlocked,(__FILE *__restrict __stream),(__stream))
+#elif defined(__CRT_HAVE_ftello64_unlocked) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello_unlocked,(__FILE *__restrict __stream),ftello64_unlocked,(__stream))
+#elif defined(__CRT_HAVE_ftell64_unlocked) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello_unlocked,(__FILE *__restrict __stream),ftell64_unlocked,(__stream))
+#elif defined(__CRT_HAVE__ftelli64_nolock) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello_unlocked,(__FILE *__restrict __stream),_ftelli64_nolock,(__stream))
+#elif defined(__CRT_HAVE_ftell) && __SIZEOF_OFF_T__ == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello_unlocked,(__FILE *__restrict __stream),ftell,(__stream))
+#elif defined(__CRT_HAVE__IO_ftell) && __SIZEOF_OFF_T__ == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello_unlocked,(__FILE *__restrict __stream),_IO_ftell,(__stream))
+#elif defined(__CRT_HAVE_ftello) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello_unlocked,(__FILE *__restrict __stream),ftello,(__stream))
+#elif defined(__CRT_HAVE_ftello64) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello_unlocked,(__FILE *__restrict __stream),ftello64,(__stream))
+#elif defined(__CRT_HAVE_ftell64) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello_unlocked,(__FILE *__restrict __stream),ftell64,(__stream))
+#elif defined(__CRT_HAVE__ftelli64) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__off_t,__THROWING,ftello_unlocked,(__FILE *__restrict __stream),_ftelli64,(__stream))
 #elif defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE_ftell64) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE_ftell64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE__IO_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock)
 #include <libc/local/stdio/ftello_unlocked.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(ftello_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INOUT(1) __FS_TYPE(off) (__LIBCCALL ftello_unlocked)(__FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftello_unlocked))(__stream); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ftello_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INOUT(1) __off_t (__LIBCCALL ftello_unlocked)(__FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftello_unlocked))(__stream); })
 #endif /* ... */
 #ifdef __CRT_HAVE_flushall_unlocked
 __CDECLARE(,int,__THROWING,flushall_unlocked,(void),())
@@ -4094,36 +4094,36 @@ __CREDIRECT(,int,__THROWING,flushall_unlocked,(void),_IO_flush_all,())
 __NAMESPACE_LOCAL_USING_OR_IMPL(flushall_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL int (__LIBCCALL flushall_unlocked)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(flushall_unlocked))(); })
 #endif /* !... */
 #if defined(__CRT_HAVE_fgetpos_unlocked) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__
-__CDECLARE(__ATTR_INOUT(1) __ATTR_OUT(2),int,__THROWING,fgetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),(__stream,__pos))
+__CDECLARE(__ATTR_INOUT(1) __ATTR_OUT(2),int,__THROWING,fgetpos_unlocked,(__FILE *__restrict __stream, __fpos_t *__restrict __pos),(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos64_unlocked) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__
-__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__THROWING,fgetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),fgetpos64_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__THROWING,fgetpos_unlocked,(__FILE *__restrict __stream, __fpos_t *__restrict __pos),fgetpos64_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__
-__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__THROWING,fgetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),fgetpos,(__stream,__pos))
+__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__THROWING,fgetpos_unlocked,(__FILE *__restrict __stream, __fpos_t *__restrict __pos),fgetpos,(__stream,__pos))
 #elif defined(__CRT_HAVE__IO_fgetpos) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__
-__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__THROWING,fgetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),_IO_fgetpos,(__stream,__pos))
+__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__THROWING,fgetpos_unlocked,(__FILE *__restrict __stream, __fpos_t *__restrict __pos),_IO_fgetpos,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos64) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__
-__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__THROWING,fgetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),fgetpos64,(__stream,__pos))
+__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__THROWING,fgetpos_unlocked,(__FILE *__restrict __stream, __fpos_t *__restrict __pos),fgetpos64,(__stream,__pos))
 #elif defined(__CRT_HAVE__IO_fgetpos64) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__
-__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__THROWING,fgetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos),_IO_fgetpos64,(__stream,__pos))
+__CREDIRECT(__ATTR_INOUT(1) __ATTR_OUT(2),int,__THROWING,fgetpos_unlocked,(__FILE *__restrict __stream, __fpos_t *__restrict __pos),_IO_fgetpos64,(__stream,__pos))
 #elif defined(__CRT_HAVE_fgetpos) || defined(__CRT_HAVE__IO_fgetpos) || defined(__CRT_HAVE_fgetpos_unlocked) || defined(__CRT_HAVE_fgetpos64) || defined(__CRT_HAVE__IO_fgetpos64) || defined(__CRT_HAVE_fgetpos64_unlocked) || defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE_ftell64) || defined(__CRT_HAVE__ftelli64) || defined(__CRT_HAVE_ftello64_unlocked) || defined(__CRT_HAVE_ftell64_unlocked) || defined(__CRT_HAVE__ftelli64_nolock) || defined(__CRT_HAVE_ftello) || defined(__CRT_HAVE_ftello_unlocked) || defined(__CRT_HAVE_ftell) || defined(__CRT_HAVE__IO_ftell) || defined(__CRT_HAVE_ftell_unlocked) || defined(__CRT_HAVE__ftell_nolock)
 #include <libc/local/stdio/fgetpos_unlocked.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(fgetpos_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_OUT(2) int (__LIBCCALL fgetpos_unlocked)(__FILE *__restrict __stream, __FS_TYPE(fpos) *__restrict __pos) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetpos_unlocked))(__stream, __pos); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fgetpos_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __ATTR_OUT(2) int (__LIBCCALL fgetpos_unlocked)(__FILE *__restrict __stream, __fpos_t *__restrict __pos) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetpos_unlocked))(__stream, __pos); })
 #endif /* ... */
 #if defined(__CRT_HAVE_fsetpos_unlocked) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__
-__CDECLARE(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(fpos) const *__restrict __pos),(__stream,__pos))
+__CDECLARE(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,fsetpos_unlocked,(__FILE *__restrict __stream, __fpos_t const *__restrict __pos),(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos64_unlocked) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__
-__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(fpos) const *__restrict __pos),fsetpos64_unlocked,(__stream,__pos))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,fsetpos_unlocked,(__FILE *__restrict __stream, __fpos_t const *__restrict __pos),fsetpos64_unlocked,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__
-__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(fpos) const *__restrict __pos),fsetpos,(__stream,__pos))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,fsetpos_unlocked,(__FILE *__restrict __stream, __fpos_t const *__restrict __pos),fsetpos,(__stream,__pos))
 #elif defined(__CRT_HAVE__IO_fsetpos) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS32_T__
-__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(fpos) const *__restrict __pos),_IO_fsetpos,(__stream,__pos))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,fsetpos_unlocked,(__FILE *__restrict __stream, __fpos_t const *__restrict __pos),_IO_fsetpos,(__stream,__pos))
 #elif defined(__CRT_HAVE_fsetpos64) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__
-__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(fpos) const *__restrict __pos),fsetpos64,(__stream,__pos))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,fsetpos_unlocked,(__FILE *__restrict __stream, __fpos_t const *__restrict __pos),fsetpos64,(__stream,__pos))
 #elif defined(__CRT_HAVE__IO_fsetpos64) && __SIZEOF_FPOS_T__ == __SIZEOF_FPOS64_T__
-__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,fsetpos_unlocked,(__FILE *__restrict __stream, __FS_TYPE(fpos) const *__restrict __pos),_IO_fsetpos64,(__stream,__pos))
+__CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,fsetpos_unlocked,(__FILE *__restrict __stream, __fpos_t const *__restrict __pos),_IO_fsetpos64,(__stream,__pos))
 #elif defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked) || defined(__CRT_HAVE_fsetpos64) || defined(__CRT_HAVE__IO_fsetpos64) || defined(__CRT_HAVE_fsetpos64_unlocked) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)
 #include <libc/local/stdio/fsetpos_unlocked.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(fsetpos_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_INOUT(1) int (__LIBCCALL fsetpos_unlocked)(__FILE *__restrict __stream, __FS_TYPE(fpos) const *__restrict __pos) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fsetpos_unlocked))(__stream, __pos); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fsetpos_unlocked, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_INOUT(1) int (__LIBCCALL fsetpos_unlocked)(__FILE *__restrict __stream, __fpos_t const *__restrict __pos) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fsetpos_unlocked))(__stream, __pos); })
 #endif /* ... */
 #ifdef __CRT_HAVE_getw_unlocked
 __CDECLARE(__ATTR_INOUT(1),int,__THROWING,getw_unlocked,(__FILE *__restrict __stream),(__stream))
@@ -4209,34 +4209,34 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fisatty, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 #endif /* !__CRT_HAVE_fisatty */
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET   __pos_t
 #define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET   __off_t
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
-#if defined(__CRT_HAVE_fftruncate_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
+#if defined(__CRT_HAVE_fftruncate_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__
 /* >> fftruncate(3)
  * Truncate the given file `stream' to a length of `length' */
 __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fftruncate,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate_unlocked,(__stream,__length))
-#elif defined(__CRT_HAVE_fftruncate64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE_fftruncate64_unlocked) && defined(__USE_STDIO_UNLOCKED) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> fftruncate(3)
  * Truncate the given file `stream' to a length of `length' */
 __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fftruncate,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate64_unlocked,(__stream,__length))
-#elif defined(__CRT_HAVE_fftruncate) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
+#elif defined(__CRT_HAVE_fftruncate) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__
 /* >> fftruncate(3)
  * Truncate the given file `stream' to a length of `length' */
 __CDECLARE(__ATTR_INOUT(1),int,__THROWING,fftruncate,(__FILE *__restrict __stream, __PIO_OFFSET __length),(__stream,__length))
-#elif defined(__CRT_HAVE_fftruncate64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE_fftruncate64) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> fftruncate(3)
  * Truncate the given file `stream' to a length of `length' */
 __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fftruncate,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate64,(__stream,__length))
-#elif defined(__CRT_HAVE_fftruncate_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
+#elif defined(__CRT_HAVE_fftruncate_unlocked) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__
 /* >> fftruncate(3)
  * Truncate the given file `stream' to a length of `length' */
 __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fftruncate,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate_unlocked,(__stream,__length))
-#elif defined(__CRT_HAVE_fftruncate64_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE_fftruncate64_unlocked) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> fftruncate(3)
  * Truncate the given file `stream' to a length of `length' */
 __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fftruncate,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate64_unlocked,(__stream,__length))
@@ -4246,19 +4246,19 @@ __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fftruncate,(__FILE *__restrict __stre
  * Truncate the given file `stream' to a length of `length' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fftruncate, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) int (__LIBCCALL fftruncate)(__FILE *__restrict __stream, __PIO_OFFSET __length) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fftruncate))(__stream, __length); })
 #endif /* ... */
-#if defined(__CRT_HAVE_fftruncate_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
+#if defined(__CRT_HAVE_fftruncate_unlocked) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__
 /* >> fftruncate_unlocked(3)
  * Same as `fftruncate()', but don't acquire a lock to the file */
 __CDECLARE(__ATTR_INOUT(1),int,__THROWING,fftruncate_unlocked,(__FILE *__restrict __stream, __PIO_OFFSET __length),(__stream,__length))
-#elif defined(__CRT_HAVE_fftruncate64_unlocked) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE_fftruncate64_unlocked) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> fftruncate_unlocked(3)
  * Same as `fftruncate()', but don't acquire a lock to the file */
 __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fftruncate_unlocked,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate64_unlocked,(__stream,__length))
-#elif defined(__CRT_HAVE_fftruncate) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
+#elif defined(__CRT_HAVE_fftruncate) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__
 /* >> fftruncate_unlocked(3)
  * Same as `fftruncate()', but don't acquire a lock to the file */
 __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fftruncate_unlocked,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate,(__stream,__length))
-#elif defined(__CRT_HAVE_fftruncate64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE_fftruncate64) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> fftruncate_unlocked(3)
  * Same as `fftruncate()', but don't acquire a lock to the file */
 __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,fftruncate_unlocked,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate64,(__stream,__length))
@@ -4834,33 +4834,33 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_OUT_OPT(2),char *,__NOTHROW_NCX
 #if defined(__USE_BSD) || defined(__USE_KOS)
 #ifndef __off_t_defined
 #define __off_t_defined
-typedef __FS_TYPE(off) off_t;
+typedef __off_t off_t;
 #endif /* !__off_t_defined */
 #ifndef __funopen_defined
 #define __funopen_defined
-#if defined(__CRT_HAVE_funopen) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
+#if defined(__CRT_HAVE_funopen) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__
 /* >> funopen(3), funopen64(3) */
 __CDECLARE(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,funopen,(void const *__cookie, int (__LIBKCALL *__readfn)(void *__cookie, char *__buf, int __num_bytes), int (__LIBKCALL *__writefn)(void *__cookie, char const *__buf, int __num_bytes), off_t (__LIBKCALL *__seekfn)(void *__cookie, off_t __off, int __whence), int (__LIBKCALL *__closefn)(void *__cookie)),(__cookie,__readfn,__writefn,__seekfn,__closefn))
-#elif defined(__CRT_HAVE_funopen64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE_funopen64) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> funopen(3), funopen64(3) */
 __CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,funopen,(void const *__cookie, int (__LIBKCALL *__readfn)(void *__cookie, char *__buf, int __num_bytes), int (__LIBKCALL *__writefn)(void *__cookie, char const *__buf, int __num_bytes), off_t (__LIBKCALL *__seekfn)(void *__cookie, off_t __off, int __whence), int (__LIBKCALL *__closefn)(void *__cookie)),funopen64,(__cookie,__readfn,__writefn,__seekfn,__closefn))
 #else /* ... */
 #include <hybrid/typecore.h>
-#if (__SIZEOF_INT__ == __SIZEOF_SIZE_T__ && ((defined(__CRT_HAVE_funopen2) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__) || (defined(__CRT_HAVE_funopen2_64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && ((defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_funopen2_64) || defined(__CRT_HAVE_funopen2))))) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_funopen2_64) || defined(__CRT_HAVE_funopen2) || defined(__CRT_HAVE_fopencookie) || defined(__CRT_HAVE_funopen64) || defined(__CRT_HAVE_funopen)))
+#if (__SIZEOF_INT__ == __SIZEOF_SIZE_T__ && ((defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__) || (defined(__CRT_HAVE_funopen2_64) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && ((defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_funopen2_64) || defined(__CRT_HAVE_funopen2))))) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_funopen2_64) || defined(__CRT_HAVE_funopen2) || defined(__CRT_HAVE_fopencookie) || defined(__CRT_HAVE_funopen64) || defined(__CRT_HAVE_funopen)))
 #include <libc/local/stdio/funopen.h>
 /* >> funopen(3), funopen64(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(funopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __FILE *__NOTHROW_NCX(__LIBCCALL funopen)(void const *__cookie, int (__LIBKCALL *__readfn)(void *__cookie, char *__buf, int __num_bytes), int (__LIBKCALL *__writefn)(void *__cookie, char const *__buf, int __num_bytes), off_t (__LIBKCALL *__seekfn)(void *__cookie, off_t __off, int __whence), int (__LIBKCALL *__closefn)(void *__cookie)) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(funopen))(__cookie, __readfn, __writefn, __seekfn, __closefn); })
-#else /* (__SIZEOF_INT__ == __SIZEOF_SIZE_T__ && ((__CRT_HAVE_funopen2 && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__) || (__CRT_HAVE_funopen2_64 && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__) || ((__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && ((__CRT_HAVE_funopen2 && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || __CRT_HAVE_funopen2_64 || __CRT_HAVE_funopen2)))) || ((__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && (__CRT_HAVE_funopen2_64 || __CRT_HAVE_funopen2 || __CRT_HAVE_fopencookie || __CRT_HAVE_funopen64 || __CRT_HAVE_funopen)) */
+#else /* (__SIZEOF_INT__ == __SIZEOF_SIZE_T__ && ((__CRT_HAVE_funopen2 && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__) || (__CRT_HAVE_funopen2_64 && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__) || ((__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && ((__CRT_HAVE_funopen2 && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || __CRT_HAVE_funopen2_64 || __CRT_HAVE_funopen2)))) || ((__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && (__CRT_HAVE_funopen2_64 || __CRT_HAVE_funopen2 || __CRT_HAVE_fopencookie || __CRT_HAVE_funopen64 || __CRT_HAVE_funopen)) */
 #undef __funopen_defined
-#endif /* (__SIZEOF_INT__ != __SIZEOF_SIZE_T__ || ((!__CRT_HAVE_funopen2 || __FS_SIZEOF(OFF) != __SIZEOF_OFF32_T__) && (!__CRT_HAVE_funopen2_64 || __FS_SIZEOF(OFF) != __SIZEOF_OFF64_T__) && ((!__CRT_HAVE_malloc && !__CRT_HAVE___libc_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE___libc_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE___libc_memalign && !__CRT_HAVE_posix_memalign) || (!__CRT_HAVE_funopen2_64 && !__CRT_HAVE_funopen2)))) && ((!__CRT_HAVE_malloc && !__CRT_HAVE___libc_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE___libc_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE___libc_memalign && !__CRT_HAVE_posix_memalign) || (!__CRT_HAVE_funopen2_64 && !__CRT_HAVE_funopen2 && !__CRT_HAVE_fopencookie && !__CRT_HAVE_funopen64 && !__CRT_HAVE_funopen)) */
+#endif /* (__SIZEOF_INT__ != __SIZEOF_SIZE_T__ || ((!__CRT_HAVE_funopen2 || __SIZEOF_OFF_T__ != __SIZEOF_OFF32_T__) && (!__CRT_HAVE_funopen2_64 || __SIZEOF_OFF_T__ != __SIZEOF_OFF64_T__) && ((!__CRT_HAVE_malloc && !__CRT_HAVE___libc_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE___libc_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE___libc_memalign && !__CRT_HAVE_posix_memalign) || (!__CRT_HAVE_funopen2_64 && !__CRT_HAVE_funopen2)))) && ((!__CRT_HAVE_malloc && !__CRT_HAVE___libc_malloc && !__CRT_HAVE_calloc && !__CRT_HAVE___libc_calloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc && !__CRT_HAVE_memalign && !__CRT_HAVE_aligned_alloc && !__CRT_HAVE___libc_memalign && !__CRT_HAVE_posix_memalign) || (!__CRT_HAVE_funopen2_64 && !__CRT_HAVE_funopen2 && !__CRT_HAVE_fopencookie && !__CRT_HAVE_funopen64 && !__CRT_HAVE_funopen)) */
 #endif /* !... */
 #endif /* !__funopen_defined */
 #ifndef __funopen2_defined
 #define __funopen2_defined
-#if defined(__CRT_HAVE_funopen2) && __FS_SIZEOF(OFF) == __SIZEOF_OFF32_T__
+#if defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__
 /* >> funopen2(3), funopen2_64(3) */
 __CDECLARE(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,funopen2,(void const *__cookie, ssize_t (__LIBKCALL *__readfn)(void *__cookie, void *__buf, size_t __num_bytes), ssize_t (__LIBKCALL *__writefn)(void *__cookie, void const *__buf, size_t __num_bytes), off_t (__LIBKCALL *__seekfn)(void *__cookie, off_t __off, int __whence), int (__LIBKCALL *__flushfn)(void *__cookie), int (__LIBKCALL *__closefn)(void *__cookie)),(__cookie,__readfn,__writefn,__seekfn,__flushfn,__closefn))
-#elif defined(__CRT_HAVE_funopen2_64) && __FS_SIZEOF(OFF) == __SIZEOF_OFF64_T__
+#elif defined(__CRT_HAVE_funopen2_64) && __SIZEOF_OFF_T__ == __SIZEOF_OFF64_T__
 /* >> funopen2(3), funopen2_64(3) */
 __CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_NCX,funopen2,(void const *__cookie, ssize_t (__LIBKCALL *__readfn)(void *__cookie, void *__buf, size_t __num_bytes), ssize_t (__LIBKCALL *__writefn)(void *__cookie, void const *__buf, size_t __num_bytes), off_t (__LIBKCALL *__seekfn)(void *__cookie, off_t __off, int __whence), int (__LIBKCALL *__flushfn)(void *__cookie), int (__LIBKCALL *__closefn)(void *__cookie)),funopen2_64,(__cookie,__readfn,__writefn,__seekfn,__flushfn,__closefn))
 #elif (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && ((defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_funopen2_64) || defined(__CRT_HAVE_funopen2))

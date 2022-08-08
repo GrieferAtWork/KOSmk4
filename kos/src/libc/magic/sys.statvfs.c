@@ -96,11 +96,11 @@ __SYSDECL_BEGIN
 
 #ifndef __fsblkcnt_t_defined
 #define __fsblkcnt_t_defined
-typedef __FS_TYPE(fsblkcnt) fsblkcnt_t; /* Type to count file system blocks.  */
+typedef __fsblkcnt_t fsblkcnt_t; /* Type to count file system blocks.  */
 #endif /* !__fsblkcnt_t_defined */
 #ifndef __fsfilcnt_t_defined
 #define __fsfilcnt_t_defined
-typedef __FS_TYPE(fsfilcnt) fsfilcnt_t; /* Type to count file system inodes.  */
+typedef __fsfilcnt_t fsfilcnt_t; /* Type to count file system inodes.  */
 #endif /* !__fsfilcnt_t_defined */
 
 }

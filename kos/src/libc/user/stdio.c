@@ -2174,8 +2174,8 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") WUNUSED ATTR_INOUT(1) l
 }
 /*[[[end:libc_ftell_unlocked]]]*/
 
-/*[[[head:libc_ftello,hash:CRC-32=0xecec0d54]]]*/
-#if __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+/*[[[head:libc_ftello,hash:CRC-32=0xbdd7dcbd]]]*/
+#if __SIZEOF_OFF_T__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libc_ftello, libc_ftell);
 #else /* MAGIC:alias */
 /* >> ftello(3), ftello64(3)
@@ -2202,8 +2202,8 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") WUNUSED ATTR_INOUT(1) off
 #endif /* MAGIC:alias */
 /*[[[end:libc_ftello]]]*/
 
-/*[[[head:libc_ftello_unlocked,hash:CRC-32=0xdc239206]]]*/
-#if __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+/*[[[head:libc_ftello_unlocked,hash:CRC-32=0x3a02df12]]]*/
+#if __SIZEOF_OFF_T__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libc_ftello_unlocked, libc_ftell_unlocked);
 #else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") WUNUSED ATTR_INOUT(1) off_t
@@ -2320,8 +2320,8 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") ATTR_INOUT(1) int
 }
 /*[[[end:libc_fseek_unlocked]]]*/
 
-/*[[[head:libc_fseeko,hash:CRC-32=0x266688d1]]]*/
-#if __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+/*[[[head:libc_fseeko,hash:CRC-32=0x885a541e]]]*/
+#if __SIZEOF_OFF_T__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libc_fseeko, libc_fseek);
 #else /* MAGIC:alias */
 /* >> fseeko(3), fseeko64(3)
@@ -2350,8 +2350,8 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.seek.seek") ATTR_INOUT(1) int
 #endif /* MAGIC:alias */
 /*[[[end:libc_fseeko]]]*/
 
-/*[[[head:libc_fseeko_unlocked,hash:CRC-32=0x1973af57]]]*/
-#if __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+/*[[[head:libc_fseeko_unlocked,hash:CRC-32=0x87e7e130]]]*/
+#if __SIZEOF_OFF_T__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libc_fseeko_unlocked, libc_fseek_unlocked);
 #else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek") ATTR_INOUT(1) int

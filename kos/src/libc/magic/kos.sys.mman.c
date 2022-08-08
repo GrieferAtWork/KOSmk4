@@ -24,7 +24,7 @@
 %[define_replacement(dev_t = __dev_t)]
 %[define_replacement(timespec32 = __timespec32)]
 %[define_replacement(timespec64 = __timespec64)]
-%[define_replacement(time_t = "__TM_TYPE(time)")]
+%[define_replacement(time_t = "__time_t")]
 %[define_replacement(time32_t = __time32_t)]
 %[define_replacement(time64_t = __time64_t)]
 %[default:nodos]

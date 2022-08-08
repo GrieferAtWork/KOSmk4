@@ -70,6 +70,7 @@
 #include <err.h>
 #include <errno.h>
 #include <format-printer.h>
+#include <intrin.h>
 #include <inttypes.h>
 #include <malloc.h>
 #include <math.h>
@@ -274,9 +275,9 @@ int main_fork(int argc, char *argv[], char *envp[]) {
 			lock = open(lockfile, O_WRONLY | O_CREAT | O_EXCL, 0644); /* NOLINT */
 			if (lock >= 0) {
 				kill(-mygroup, SIGKILL);
-#ifdef __breakpoint
-				__breakpoint();
-#endif /* __breakpoint */
+#ifdef __debugbreak
+				__debugbreak();
+#endif /* __debugbreak */
 				abort();
 			}
 		}

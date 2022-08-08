@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe280ee17 */
+/* HASH CRC-32:0x7980452c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,10 +86,10 @@ struct _finddata64i32_t;
 
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET   __pos_t
 #define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET   __off_t
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
@@ -482,40 +482,40 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(isatty, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 #if defined(__CRT_HAVE_lseek) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CDECLARE(,__FS_TYPE(off),__NOTHROW_NCX,lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),(__fd,__offset,__whence))
+__CDECLARE(,__off_t,__NOTHROW_NCX,lseek,(__fd_t __fd, __off_t __offset, __STDC_INT_AS_UINT_T __whence),(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseek) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),_lseek,(__fd,__offset,__whence))
+__CREDIRECT(,__off_t,__NOTHROW_NCX,lseek,(__fd_t __fd, __off_t __offset, __STDC_INT_AS_UINT_T __whence),_lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE___lseek) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),__lseek,(__fd,__offset,__whence))
+__CREDIRECT(,__off_t,__NOTHROW_NCX,lseek,(__fd_t __fd, __off_t __offset, __STDC_INT_AS_UINT_T __whence),__lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE___libc_lseek) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),__libc_lseek,(__fd,__offset,__whence))
+__CREDIRECT(,__off_t,__NOTHROW_NCX,lseek,(__fd_t __fd, __off_t __offset, __STDC_INT_AS_UINT_T __whence),__libc_lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),lseek64,(__fd,__offset,__whence))
+__CREDIRECT(,__off_t,__NOTHROW_NCX,lseek,(__fd_t __fd, __off_t __offset, __STDC_INT_AS_UINT_T __whence),lseek64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_llseek) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),llseek,(__fd,__offset,__whence))
+__CREDIRECT(,__off_t,__NOTHROW_NCX,lseek,(__fd_t __fd, __off_t __offset, __STDC_INT_AS_UINT_T __whence),llseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE___llseek) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),__llseek,(__fd,__offset,__whence))
+__CREDIRECT(,__off_t,__NOTHROW_NCX,lseek,(__fd_t __fd, __off_t __offset, __STDC_INT_AS_UINT_T __whence),__llseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseeki64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),_lseeki64,(__fd,__offset,__whence))
+__CREDIRECT(,__off_t,__NOTHROW_NCX,lseek,(__fd_t __fd, __off_t __offset, __STDC_INT_AS_UINT_T __whence),_lseeki64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)
 #include <libc/local/unistd/lseek.h>
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(lseek, __FORCELOCAL __ATTR_ARTIFICIAL __FS_TYPE(off) __NOTHROW_NCX(__LIBCCALL lseek)(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lseek))(__fd, __offset, __whence); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lseek, __FORCELOCAL __ATTR_ARTIFICIAL __off_t __NOTHROW_NCX(__LIBCCALL lseek)(__fd_t __fd, __off_t __offset, __STDC_INT_AS_UINT_T __whence) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lseek))(__fd, __offset, __whence); })
 #else /* ... */
 #undef __lseek_defined
 #endif /* !... */
@@ -860,40 +860,40 @@ __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_RPC(__LIBCCALL _commit)(__fd_t __fd
 #if defined(__CRT_HAVE_lseek) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
+__CREDIRECT(,__off_t,__NOTHROW_NCX,_lseek,(__fd_t __fd, __off_t __offset, __STDC_INT_AS_UINT_T __whence),lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseek) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CDECLARE(,__FS_TYPE(off),__NOTHROW_NCX,_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),(__fd,__offset,__whence))
+__CDECLARE(,__off_t,__NOTHROW_NCX,_lseek,(__fd_t __fd, __off_t __offset, __STDC_INT_AS_UINT_T __whence),(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE___lseek) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),__lseek,(__fd,__offset,__whence))
+__CREDIRECT(,__off_t,__NOTHROW_NCX,_lseek,(__fd_t __fd, __off_t __offset, __STDC_INT_AS_UINT_T __whence),__lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE___libc_lseek) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),__libc_lseek,(__fd,__offset,__whence))
+__CREDIRECT(,__off_t,__NOTHROW_NCX,_lseek,(__fd_t __fd, __off_t __offset, __STDC_INT_AS_UINT_T __whence),__libc_lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),lseek64,(__fd,__offset,__whence))
+__CREDIRECT(,__off_t,__NOTHROW_NCX,_lseek,(__fd_t __fd, __off_t __offset, __STDC_INT_AS_UINT_T __whence),lseek64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_llseek) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),llseek,(__fd,__offset,__whence))
+__CREDIRECT(,__off_t,__NOTHROW_NCX,_lseek,(__fd_t __fd, __off_t __offset, __STDC_INT_AS_UINT_T __whence),llseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE___llseek) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),__llseek,(__fd,__offset,__whence))
+__CREDIRECT(,__off_t,__NOTHROW_NCX,_lseek,(__fd_t __fd, __off_t __offset, __STDC_INT_AS_UINT_T __whence),__llseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE__lseeki64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__CREDIRECT(,__FS_TYPE(off),__NOTHROW_NCX,_lseek,(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence),_lseeki64,(__fd,__offset,__whence))
+__CREDIRECT(,__off_t,__NOTHROW_NCX,_lseek,(__fd_t __fd, __off_t __offset, __STDC_INT_AS_UINT_T __whence),_lseeki64,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)
 #include <libc/local/unistd/lseek.h>
 /* >> lseek(2), lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `fd' */
-__FORCELOCAL __ATTR_ARTIFICIAL __FS_TYPE(off) __NOTHROW_NCX(__LIBCCALL _lseek)(__fd_t __fd, __FS_TYPE(off) __offset, __STDC_INT_AS_UINT_T __whence) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lseek))(__fd, __offset, __whence); }
+__FORCELOCAL __ATTR_ARTIFICIAL __off_t __NOTHROW_NCX(__LIBCCALL _lseek)(__fd_t __fd, __off_t __offset, __STDC_INT_AS_UINT_T __whence) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lseek))(__fd, __offset, __whence); }
 #endif /* ... */
 #if defined(__CRT_HAVE_lseek) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 /* >> lseek(2), lseek64(2)
@@ -1425,26 +1425,26 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __LONG32_TYPE__ __NOTHROW_NCX(__LI
 #if defined(__CRT_HAVE_tell) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-__CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,_tell,(__fd_t __fd),tell,(__fd))
+__CREDIRECT(__ATTR_WUNUSED,__off_t,__NOTHROW_NCX,_tell,(__fd_t __fd),tell,(__fd))
 #elif defined(__CRT_HAVE__tell) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-__CDECLARE(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,_tell,(__fd_t __fd),(__fd))
+__CDECLARE(__ATTR_WUNUSED,__off_t,__NOTHROW_NCX,_tell,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE_tell64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-__CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,_tell,(__fd_t __fd),tell64,(__fd))
+__CREDIRECT(__ATTR_WUNUSED,__off_t,__NOTHROW_NCX,_tell,(__fd_t __fd),tell64,(__fd))
 #elif defined(__CRT_HAVE__telli64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-__CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,_tell,(__fd_t __fd),_telli64,(__fd))
+__CREDIRECT(__ATTR_WUNUSED,__off_t,__NOTHROW_NCX,_tell,(__fd_t __fd),_telli64,(__fd))
 #else /* ... */
 #include <asm/os/stdio.h>
 #if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)) && defined(__SEEK_CUR)
 #include <libc/local/unistd/tell.h>
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __FS_TYPE(off) __NOTHROW_NCX(__LIBCCALL _tell)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell))(__fd); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __off_t __NOTHROW_NCX(__LIBCCALL _tell)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell))(__fd); }
 #endif /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_llseek || __CRT_HAVE___llseek || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE___libc_lseek) && __SEEK_CUR */
 #endif /* !... */
 #if defined(__CRT_HAVE_tell) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
@@ -1591,26 +1591,26 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(filelength, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 #if defined(__CRT_HAVE_tell) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-__CDECLARE(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),(__fd))
+__CDECLARE(__ATTR_WUNUSED,__off_t,__NOTHROW_NCX,tell,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE__tell) && (!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-__CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),_tell,(__fd))
+__CREDIRECT(__ATTR_WUNUSED,__off_t,__NOTHROW_NCX,tell,(__fd_t __fd),_tell,(__fd))
 #elif defined(__CRT_HAVE_tell64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-__CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),tell64,(__fd))
+__CREDIRECT(__ATTR_WUNUSED,__off_t,__NOTHROW_NCX,tell,(__fd_t __fd),tell64,(__fd))
 #elif defined(__CRT_HAVE__telli64) && (defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-__CREDIRECT(__ATTR_WUNUSED,__FS_TYPE(off),__NOTHROW_NCX,tell,(__fd_t __fd),_telli64,(__fd))
+__CREDIRECT(__ATTR_WUNUSED,__off_t,__NOTHROW_NCX,tell,(__fd_t __fd),_telli64,(__fd))
 #else /* ... */
 #include <asm/os/stdio.h>
 #if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek)) && defined(__SEEK_CUR)
 #include <libc/local/unistd/tell.h>
 /* >> tell(3), tell64(3)
  * Return the current file position (alias for `lseek(fd, 0, SEEK_CUR)') */
-__NAMESPACE_LOCAL_USING_OR_IMPL(tell, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __FS_TYPE(off) __NOTHROW_NCX(__LIBCCALL tell)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell))(__fd); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(tell, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __off_t __NOTHROW_NCX(__LIBCCALL tell)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell))(__fd); })
 #else /* (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_llseek || __CRT_HAVE___llseek || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE___libc_lseek) && __SEEK_CUR */
 #undef __tell_defined
 #endif /* (!__CRT_HAVE_lseek64 && !__CRT_HAVE__lseeki64 && !__CRT_HAVE_llseek && !__CRT_HAVE___llseek && !__CRT_HAVE_lseek && !__CRT_HAVE__lseek && !__CRT_HAVE___lseek && !__CRT_HAVE___libc_lseek) || !__SEEK_CUR */

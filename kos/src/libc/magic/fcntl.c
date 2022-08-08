@@ -40,8 +40,8 @@
 %[default:section(".text.crt{|.dos}.io.utility")]
 
 %[define_replacement(fd_t    = __fd_t)]
-%[define_replacement(off_t   = "__FS_TYPE(off)")]
-%[define_replacement(pos_t   = "__FS_TYPE(pos)")]
+%[define_replacement(off_t   = "__off_t")]
+%[define_replacement(pos_t   = "__pos_t")]
 %[define_replacement(off32_t = __off32_t)]
 %[define_replacement(off64_t = __off64_t)]
 %[define_replacement(pos32_t = __pos32_t)]
@@ -1576,30 +1576,21 @@ typedef struct flock64 flock64_t;
 
 
 
-%#ifdef __USE_GNU
-%{
-#ifndef __PIO_OFFSET
-#ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(pos)
-#define __PIO_OFFSET64 __pos64_t
-#else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(off)
-#define __PIO_OFFSET64 __off64_t
-#endif /* !__USE_KOS_ALTERATIONS */
-#endif /* !__PIO_OFFSET */
-}
 
 %[define(DEFINE_PIO_OFFSET =
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(@pos@)
+#define __PIO_OFFSET   __pos_t
 #define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(@off@)
+#define __PIO_OFFSET   __off_t
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */
 )]
+
+%#ifdef __USE_GNU
+%[insert:prefix(DEFINE_PIO_OFFSET)]
 
 
 
@@ -1820,10 +1811,10 @@ $fd_t openat64($fd_t dirfd, [[in]] char const *filename, $oflag_t oflags, ...) {
 %{
 #ifndef __PIO_OFFSET
 #ifdef __USE_KOS_ALTERATIONS
-#define __PIO_OFFSET   __FS_TYPE(pos)
+#define __PIO_OFFSET   __pos_t
 #define __PIO_OFFSET64 __pos64_t
 #else /* __USE_KOS_ALTERATIONS */
-#define __PIO_OFFSET   __FS_TYPE(off)
+#define __PIO_OFFSET   __off_t
 #define __PIO_OFFSET64 __off64_t
 #endif /* !__USE_KOS_ALTERATIONS */
 #endif /* !__PIO_OFFSET */

@@ -30,8 +30,8 @@
 
 
 #define __OFFSET_TIMEX_MODES     0
-#if __ALIGNOF_INTN(__SIZEOF_TIME_T__) > 4
-#define __OFFSET_TIMEX_OFFSET    __ALIGNOF_INTN(__SIZEOF_TIME_T__)
+#if __ALIGNOF_TIME_T__ > 4
+#define __OFFSET_TIMEX_OFFSET    __ALIGNOF_TIME_T__
 #else /* __SIZEOF_TIME_T__ > 4 */
 #define __OFFSET_TIMEX_OFFSET    4
 #endif /* __SIZEOF_TIME_T__ <= 4 */
@@ -39,7 +39,7 @@
 #define __OFFSET_TIMEX_MAXERROR  (__OFFSET_TIMEX_OFFSET + __SIZEOF_TIME_T__ * 2)
 #define __OFFSET_TIMEX_ESTERROR  (__OFFSET_TIMEX_OFFSET + __SIZEOF_TIME_T__ * 3)
 #define __OFFSET_TIMEX_STATUS    (__OFFSET_TIMEX_OFFSET + __SIZEOF_TIME_T__ * 4)
-#if __ALIGNOF_INTN(__SIZEOF_TIME_T__) > 4
+#if __ALIGNOF_TIME_T__ > 4
 #define __OFFSET_TIMEX_CONSTANT  (__OFFSET_TIMEX_OFFSET + __SIZEOF_TIME_T__ * 5)
 #else /* __SIZEOF_TIME_T__ > 4 */
 #define __OFFSET_TIMEX_CONSTANT  (__OFFSET_TIMEX_OFFSET + __SIZEOF_TIME_T__ * 4 + 4)
@@ -62,8 +62,8 @@
 #define __ALIGNOF_TIMEX          __ALIGNOF_TIMEVAL
 
 #define __OFFSET_TIMEX32_MODES     0
-#if __ALIGNOF_INTN(__SIZEOF_TIME32_T__) > 4
-#define __OFFSET_TIMEX32_OFFSET    __ALIGNOF_INTN(__SIZEOF_TIME32_T__)
+#if __ALIGNOF_TIME32_T__ > 4
+#define __OFFSET_TIMEX32_OFFSET    __ALIGNOF_TIME32_T__
 #else /* __SIZEOF_TIME32_T__ > 4 */
 #define __OFFSET_TIMEX32_OFFSET    4
 #endif /* __SIZEOF_TIME32_T__ <= 4 */
@@ -71,7 +71,7 @@
 #define __OFFSET_TIMEX32_MAXERROR  (__OFFSET_TIMEX32_OFFSET + __SIZEOF_TIME32_T__ * 2)
 #define __OFFSET_TIMEX32_ESTERROR  (__OFFSET_TIMEX32_OFFSET + __SIZEOF_TIME32_T__ * 3)
 #define __OFFSET_TIMEX32_STATUS    (__OFFSET_TIMEX32_OFFSET + __SIZEOF_TIME32_T__ * 4)
-#if __ALIGNOF_INTN(__SIZEOF_TIME32_T__) > 4
+#if __ALIGNOF_TIME32_T__ > 4
 #define __OFFSET_TIMEX32_CONSTANT  (__OFFSET_TIMEX32_OFFSET + __SIZEOF_TIME32_T__ * 5)
 #else /* __SIZEOF_TIME32_T__ > 4 */
 #define __OFFSET_TIMEX32_CONSTANT  (__OFFSET_TIMEX32_OFFSET + __SIZEOF_TIME32_T__ * 4 + 4)
@@ -94,8 +94,8 @@
 #define __ALIGNOF_TIMEX32          __ALIGNOF_TIMEVAL32
 
 #define __OFFSET_TIMEX64_MODES     0
-#if __ALIGNOF_INTN(__SIZEOF_TIME64_T__) > 4
-#define __OFFSET_TIMEX64_OFFSET    __ALIGNOF_INTN(__SIZEOF_TIME64_T__)
+#if __ALIGNOF_TIME64_T__ > 4
+#define __OFFSET_TIMEX64_OFFSET    __ALIGNOF_TIME64_T__
 #else /* __SIZEOF_TIME64_T__ > 4 */
 #define __OFFSET_TIMEX64_OFFSET    4
 #endif /* __SIZEOF_TIME64_T__ <= 4 */
@@ -103,7 +103,7 @@
 #define __OFFSET_TIMEX64_MAXERROR  (__OFFSET_TIMEX64_OFFSET + __SIZEOF_TIME64_T__ * 2)
 #define __OFFSET_TIMEX64_ESTERROR  (__OFFSET_TIMEX64_OFFSET + __SIZEOF_TIME64_T__ * 3)
 #define __OFFSET_TIMEX64_STATUS    (__OFFSET_TIMEX64_OFFSET + __SIZEOF_TIME64_T__ * 4)
-#if __ALIGNOF_INTN(__SIZEOF_TIME64_T__) > 4
+#if __ALIGNOF_TIME64_T__ > 4
 #define __OFFSET_TIMEX64_CONSTANT  (__OFFSET_TIMEX64_OFFSET + __SIZEOF_TIME64_T__ * 5)
 #else /* __SIZEOF_TIME64_T__ > 4 */
 #define __OFFSET_TIMEX64_CONSTANT  (__OFFSET_TIMEX64_OFFSET + __SIZEOF_TIME64_T__ * 4 + 4)
@@ -174,25 +174,25 @@ __DECL_BEGIN
 
 struct timex /*[PREFIX()]*/ {
 	__UINT32_TYPE__      modes;     /* ??? */
-	__TM_TYPE(time)      offset;    /* ??? */
-	__TM_TYPE(time)      freq;      /* ??? */
-	__TM_TYPE(time)      maxerror;  /* ??? */
-	__TM_TYPE(time)      esterror;  /* ??? */
+	__time_t             offset;    /* ??? */
+	__time_t             freq;      /* ??? */
+	__time_t             maxerror;  /* ??? */
+	__time_t             esterror;  /* ??? */
 	__INT32_TYPE__       status;    /* ??? */
-	__TM_TYPE(time)      constant;  /* ??? */
-	__TM_TYPE(time)      precision; /* ??? */
-	__TM_TYPE(time)      tolerance; /* ??? */
+	__time_t             constant;  /* ??? */
+	__time_t             precision; /* ??? */
+	__time_t             tolerance; /* ??? */
 	struct timeval       time;      /* ??? */
-	__TM_TYPE(time)      tick;      /* ??? */
-	__TM_TYPE(time)      ppsfreq;   /* ??? */
-	__TM_TYPE(time)      jitter;    /* ??? */
-	__TM_TYPE(time)      shift;     /* ??? */
-	__TM_TYPE(time)      stabil;    /* ??? */
-	__TM_TYPE(time)      jitcnt;    /* ??? */
-	__TM_TYPE(time)      calcnt;    /* ??? */
-	__TM_TYPE(time)      errcnt;    /* ??? */
-	__TM_TYPE(time)      stbcnt;    /* ??? */
-	__TM_TYPE(time)      tai;       /* ??? */
+	__time_t             tick;      /* ??? */
+	__time_t             ppsfreq;   /* ??? */
+	__time_t             jitter;    /* ??? */
+	__time_t             shift;     /* ??? */
+	__time_t             stabil;    /* ??? */
+	__time_t             jitcnt;    /* ??? */
+	__time_t             calcnt;    /* ??? */
+	__time_t             errcnt;    /* ??? */
+	__time_t             stbcnt;    /* ??? */
+	__time_t             tai;       /* ??? */
 	__UINT32_TYPE__    __pad[11];   /* ... */
 };
 

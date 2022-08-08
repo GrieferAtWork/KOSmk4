@@ -617,14 +617,26 @@ typedef struct { __INT8_TYPE__  __val[__SIZEOF_FSID_T__]; } __fsid_t;
 
 __DECL_END
 
+/* Feature-specific types */
+#define __ino_t      __FS_TYPE(ino)
+#define __off_t      __FS_TYPE(off)
+#define __pos_t      __FS_TYPE(pos)
+#define __rlim_t     __FS_TYPE(rlim)
+#define __blkcnt_t   __FS_TYPE(blkcnt)
+#define __fsblkcnt_t __FS_TYPE(fsblkcnt)
+#define __fsfilcnt_t __FS_TYPE(fsfilcnt)
+#define __time_t     __TM_TYPE(time)
 
+/* Feature-specific type sizes / alignment */
 #define __SIZEOF_INO_T__   __FS_SIZEOF(INO)   /* == sizeof(ino_t) */
 #define __SIZEOF_OFF_T__   __FS_SIZEOF(OFF)   /* == sizeof(off_t) */
 #define __SIZEOF_POS_T__   __FS_SIZEOF(OFF)   /* == sizeof(pos_t) */
+#define __SIZEOF_RLIM_T__  __FS_SIZEOF(RLIM)  /* == sizeof(rlim_t) */
 #define __SIZEOF_TIME_T__  __TM_SIZEOF(TIME)  /* == sizeof(time_t) */
 #define __ALIGNOF_INO_T__  __FS_ALIGNOF(INO)  /* == alignof(ino_t) */
 #define __ALIGNOF_OFF_T__  __FS_ALIGNOF(OFF)  /* == alignof(off_t) */
 #define __ALIGNOF_POS_T__  __FS_ALIGNOF(OFF)  /* == alignof(pos_t) */
+#define __ALIGNOF_RLIM_T__ __FS_ALIGNOF(RLIM) /* == alignof(rlim_t) */
 #define __ALIGNOF_TIME_T__ __TM_ALIGNOF(TIME) /* == alignof(time_t) */
 
 

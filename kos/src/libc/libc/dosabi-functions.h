@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe1ecf372 */
+/* HASH CRC-32:0xf7e6de14 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -136,8 +136,8 @@ DFUN(".text.crt.dos.net.nameser", libd_ns_name_uncompress, libc_ns_name_uncompre
 DFUN(".text.crt.dos.net.nameser", libd_ns_name_compress, libc_ns_name_compress, TD, 5, TP, TP, TI, TP, TP)
 DFUN(".text.crt.dos.net.nameser", libd_ns_name_skip, libc_ns_name_skip, TD, 2, TP, TP)
 DFUN(".text.crt.dos.net.nameser", libd_ns_name_rollback, libc_ns_name_rollback, TV, 3, TP, TP, TP)
-DFUN(".text.crt.dos.net.nameser", libd_ns_sign, libc_ns_sign, TD, 10, TP, TP, TD, TD, TP, TP, TD, TP, TP, TIn(__SIZEOF_TIME32_T__))
-DFUN(".text.crt.dos.net.nameser", libd_ns_sign2, libc_ns_sign2, TD, 12, TP, TP, TD, TD, TP, TP, TD, TP, TP, TIn(__SIZEOF_TIME32_T__), TP, TP)
+DFUN(".text.crt.dos.net.nameser", libd_ns_sign, libc_ns_sign, TD, 10, TP, TP, TD, TD, TP, TP, TD, TP, TP, TIn(__SIZEOF_TIME_T__))
+DFUN(".text.crt.dos.net.nameser", libd_ns_sign2, libc_ns_sign2, TD, 12, TP, TP, TD, TD, TP, TP, TD, TP, TP, TIn(__SIZEOF_TIME_T__), TP, TP)
 DFUN(".text.crt.dos.net.nameser", libd_ns_sign_tcp, libc_ns_sign_tcp, TD, 6, TP, TP, TD, TD, TP, TD)
 DFUN(".text.crt.dos.net.nameser", libd_ns_sign_tcp2, libc_ns_sign_tcp2, TD, 8, TP, TP, TD, TD, TP, TD, TP, TP)
 DFUN(".text.crt.dos.net.nameser", libd_ns_sign_tcp_init, libc_ns_sign_tcp_init, TD, 4, TP, TP, TD, TP)
@@ -2213,16 +2213,16 @@ DFUN(".text.crt.dos.FILE.unlocked.write.write", libd_fputs_unlocked, libc_fputs_
 DFUN(".text.crt.dos.heap.obstack", libd_obstack_vprintf, libc_obstack_vprintf, TD, 3, TP, TP, TP)
 #include <features.h>
 #include <bits/types.h>
-#if __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+#if __SIZEOF_OFF_T__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libd_fseeko, libd_fseek);
-#else /* __FS_SIZEOF(OFF) == __SIZEOF_LONG__ */
-DFUN(".text.crt.dos.FILE.locked.seek.seek", libd_fseeko, libc_fseeko, TD, 3, TP, TIn(__SIZEOF_OFF32_T__), TD)
-#endif /* __FS_SIZEOF(OFF) != __SIZEOF_LONG__ */
-#if __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+#else /* __SIZEOF_OFF_T__ == __SIZEOF_LONG__ */
+DFUN(".text.crt.dos.FILE.locked.seek.seek", libd_fseeko, libc_fseeko, TD, 3, TP, TIn(__SIZEOF_OFF_T__), TD)
+#endif /* __SIZEOF_OFF_T__ != __SIZEOF_LONG__ */
+#if __SIZEOF_OFF_T__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libd_ftello, libd_ftell);
-#else /* __FS_SIZEOF(OFF) == __SIZEOF_LONG__ */
-DFUN(".text.crt.dos.FILE.locked.seek.seek", libd_ftello, libc_ftello, TIn(__SIZEOF_OFF32_T__), 1, TP)
-#endif /* __FS_SIZEOF(OFF) != __SIZEOF_LONG__ */
+#else /* __SIZEOF_OFF_T__ == __SIZEOF_LONG__ */
+DFUN(".text.crt.dos.FILE.locked.seek.seek", libd_ftello, libc_ftello, TIn(__SIZEOF_OFF_T__), 1, TP)
+#endif /* __SIZEOF_OFF_T__ != __SIZEOF_LONG__ */
 DFUN(".text.crt.dos.FILE.locked.seek.seek", libd_fseeko64, libc_fseeko64, TD, 3, TP, TIn(__SIZEOF_OFF64_T__), TD)
 DFUN(".text.crt.dos.FILE.locked.seek.seek", libd_ftello64, libc_ftello64, TIn(__SIZEOF_OFF64_T__), 1, TP)
 DFUN(".text.crt.dos.FILE.locked.seek.pos", libd_fgetpos64, libc_fgetpos64, TD, 2, TP, TP)
@@ -2232,16 +2232,16 @@ DFUN(".text.crt.dos.FILE.locked.access", libd_fdreopen, libc_fdreopen, TP, 3, TI
 DFUN(".text.crt.dos.FILE.unlocked.access", libd_fdreopen_unlocked, libc_fdreopen_unlocked, TP, 3, TIn(__SIZEOF_FD_T__), TP, TP)
 DFUN(".text.crt.dos.FILE.unlocked.seek.seek", libd_fseek_unlocked, libc_fseek_unlocked, TD, 3, TP, TL, TD)
 DFUN(".text.crt.dos.FILE.unlocked.seek.seek", libd_ftell_unlocked, libc_ftell_unlocked, TL, 1, TP)
-#if __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+#if __SIZEOF_OFF_T__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libd_fseeko_unlocked, libd_fseek_unlocked);
-#else /* __FS_SIZEOF(OFF) == __SIZEOF_LONG__ */
-DFUN(".text.crt.dos.FILE.unlocked.seek.seek", libd_fseeko_unlocked, libc_fseeko_unlocked, TD, 3, TP, TIn(__SIZEOF_OFF32_T__), TD)
-#endif /* __FS_SIZEOF(OFF) != __SIZEOF_LONG__ */
-#if __FS_SIZEOF(OFF) == __SIZEOF_LONG__
+#else /* __SIZEOF_OFF_T__ == __SIZEOF_LONG__ */
+DFUN(".text.crt.dos.FILE.unlocked.seek.seek", libd_fseeko_unlocked, libc_fseeko_unlocked, TD, 3, TP, TIn(__SIZEOF_OFF_T__), TD)
+#endif /* __SIZEOF_OFF_T__ != __SIZEOF_LONG__ */
+#if __SIZEOF_OFF_T__ == __SIZEOF_LONG__
 DEFINE_INTERN_ALIAS(libd_ftello_unlocked, libd_ftell_unlocked);
-#else /* __FS_SIZEOF(OFF) == __SIZEOF_LONG__ */
-DFUN(".text.crt.dos.FILE.unlocked.seek.seek", libd_ftello_unlocked, libc_ftello_unlocked, TIn(__SIZEOF_OFF32_T__), 1, TP)
-#endif /* __FS_SIZEOF(OFF) != __SIZEOF_LONG__ */
+#else /* __SIZEOF_OFF_T__ == __SIZEOF_LONG__ */
+DFUN(".text.crt.dos.FILE.unlocked.seek.seek", libd_ftello_unlocked, libc_ftello_unlocked, TIn(__SIZEOF_OFF_T__), 1, TP)
+#endif /* __SIZEOF_OFF_T__ != __SIZEOF_LONG__ */
 DFUN(".text.crt.dos.FILE.unlocked.seek.pos", libd_fgetpos_unlocked, libc_fgetpos_unlocked, TD, 2, TP, TP)
 DFUN(".text.crt.dos.FILE.unlocked.seek.pos", libd_fsetpos_unlocked, libc_fsetpos_unlocked, TD, 2, TP, TP)
 DFUN(".text.crt.dos.FILE.unlocked.read.getc", libd_getw_unlocked, libc_getw_unlocked, TD, 1, TP)
@@ -3093,8 +3093,8 @@ DFUN(".text.crt.dos.unsorted", libd_process_vm_readv, libc_process_vm_readv, TI,
 DFUN(".text.crt.dos.unsorted", libd_process_vm_writev, libc_process_vm_writev, TI, 6, TIn(__SIZEOF_PID_T__), TP, TP, TP, TP, TP)
 DFUN(".text.crt.dos.unsorted", libd_readv, libc_readv, TI, 3, TIn(__SIZEOF_FD_T__), TP, TD)
 DFUN(".text.crt.dos.unsorted", libd_writev, libc_writev, TI, 3, TIn(__SIZEOF_FD_T__), TP, TD)
-DFUN(".text.crt.dos.unsorted", libd_preadv, libc_preadv, TI, 4, TIn(__SIZEOF_FD_T__), TP, TD, TIn(__SIZEOF_OFF32_T__))
-DFUN(".text.crt.dos.unsorted", libd_pwritev, libc_pwritev, TI, 4, TIn(__SIZEOF_FD_T__), TP, TD, TIn(__SIZEOF_OFF32_T__))
+DFUN(".text.crt.dos.unsorted", libd_preadv, libc_preadv, TI, 4, TIn(__SIZEOF_FD_T__), TP, TD, TIn(__SIZEOF_OFF_T__))
+DFUN(".text.crt.dos.unsorted", libd_pwritev, libc_pwritev, TI, 4, TIn(__SIZEOF_FD_T__), TP, TD, TIn(__SIZEOF_OFF_T__))
 DFUN(".text.crt.dos.unsorted", libd_preadv64, libc_preadv64, TI, 4, TIn(__SIZEOF_FD_T__), TP, TD, TIn(__SIZEOF_OFF64_T__))
 DFUN(".text.crt.dos.unsorted", libd_pwritev64, libc_pwritev64, TI, 4, TIn(__SIZEOF_FD_T__), TP, TD, TIn(__SIZEOF_OFF64_T__))
 
@@ -3181,9 +3181,9 @@ DFUN(".text.crt.dos.sched.threads", libd_tss_create, libc_tss_create, TD, 2, TP,
 DFUN(".text.crt.dos.sched.threads", libd_tss_set, libc_tss_set, TD, 2, TIn(__SIZEOF_PTHREAD_KEY_T), TP)
 
 /* time */
-DFUN(".text.crt.dos.time", libd_time, libc_time, TIn(__SIZEOF_TIME32_T__), 1, TP)
-DFUN(".text.crt.dos.time", libd_difftime, libc_difftime, TFD, 2, TIn(__SIZEOF_TIME32_T__), TIn(__SIZEOF_TIME32_T__))
-DFUN(".text.crt.dos.time", libd_mktime, libc_mktime, TIn(__SIZEOF_TIME32_T__), 1, TP)
+DFUN(".text.crt.dos.time", libd_time, libc_time, TIn(__SIZEOF_TIME_T__), 1, TP)
+DFUN(".text.crt.dos.time", libd_difftime, libc_difftime, TFD, 2, TIn(__SIZEOF_TIME_T__), TIn(__SIZEOF_TIME_T__))
+DFUN(".text.crt.dos.time", libd_mktime, libc_mktime, TIn(__SIZEOF_TIME_T__), 1, TP)
 DFUN(".text.crt.dos.time", libd_ctime, libc_ctime, TP, 1, TP)
 DFUN(".text.crt.dos.time", libd_gmtime, libc_gmtime, TP, 1, TP)
 DFUN(".text.crt.dos.time", libd_localtime, libc_localtime, TP, 1, TP)
@@ -3197,7 +3197,7 @@ DFUN(".text.crt.dos.time", libd_ctime64, libc_ctime64, TP, 1, TP)
 DFUN(".text.crt.dos.time", libd_gmtime64, libc_gmtime64, TP, 1, TP)
 DFUN(".text.crt.dos.time", libd_localtime64, libc_localtime64, TP, 1, TP)
 DFUN(".text.crt.dos.time", libd_stime, libc_stime, TD, 1, TP)
-DFUN(".text.crt.dos.time", libd_timegm, libc_timegm, TIn(__SIZEOF_TIME32_T__), 1, TP)
+DFUN(".text.crt.dos.time", libd_timegm, libc_timegm, TIn(__SIZEOF_TIME_T__), 1, TP)
 DFUN(".text.crt.dos.time", libd_dysize, libc_dysize, TD, 1, TD)
 DFUN(".text.crt.dos.time", libd_stime64, libc_stime64, TD, 1, TP)
 DFUN(".text.crt.dos.time", libd_timegm64, libc_timegm64, TIn(__SIZEOF_TIME64_T__), 1, TP)
@@ -3338,7 +3338,7 @@ DFUN(".text.crt.dos.io.read", libd_read, libc_read, TI, 3, TIn(__SIZEOF_FD_T__),
 DFUN(".text.crt.dos.io.write", libd_write, libc_write, TI, 3, TIn(__SIZEOF_FD_T__), TP, TI)
 DFUN(".text.crt.dos.io.read", libd_readall, libc_readall, TI, 3, TIn(__SIZEOF_FD_T__), TP, TI)
 DFUN(".text.crt.dos.io.write", libd_writeall, libc_writeall, TI, 3, TIn(__SIZEOF_FD_T__), TP, TI)
-DFUN(".text.crt.dos.io.seek", libd_lseek, libc_lseek, TIn(__SIZEOF_OFF32_T__), 3, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_OFF32_T__), TD)
+DFUN(".text.crt.dos.io.seek", libd_lseek, libc_lseek, TIn(__SIZEOF_OFF_T__), 3, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_OFF_T__), TD)
 DFUN(".text.crt.dos.io.tty", libd_isatty, libc_isatty, TD, 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.io.access", libd_dup, libc_dup, TIn(__SIZEOF_FD_T__), 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.io.access", libd_close, libc_close, TD, 1, TIn(__SIZEOF_FD_T__))
@@ -3403,7 +3403,7 @@ DFUN(".text.crt.dos.io.tty", libd_ctermid_r, libc_ctermid_r, TP, 1, TP)
 DFUN(".text.crt.dos.system.configuration", libd_sysconf, libc_sysconf, TP, 1, TD)
 DFUN(".text.crt.dos.bsd.io.access", libd_closefrom, libc_closefrom, TV, 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.bsd.io.access", libd_close_range, libc_close_range, TD, 3, TD, TD, TD)
-DFUN(".text.crt.dos.solaris", libd_tell, libc_tell, TIn(__SIZEOF_OFF32_T__), 1, TIn(__SIZEOF_FD_T__))
+DFUN(".text.crt.dos.solaris", libd_tell, libc_tell, TIn(__SIZEOF_OFF_T__), 1, TIn(__SIZEOF_FD_T__))
 DFUN(".text.crt.dos.solaris", libd_tell64, libc_tell64, TIn(__SIZEOF_OFF64_T__), 1, TIn(__SIZEOF_FD_T__))
 
 /* util */
