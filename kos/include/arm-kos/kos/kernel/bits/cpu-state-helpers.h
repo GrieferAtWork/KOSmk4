@@ -26,8 +26,8 @@
 #include <kos/kernel/cpu-state.h>
 #include <asm/cpu-flags.h>
 
-#ifndef __INTELLISENSE__
 #include <asm/intrin.h>
+#ifndef __INTELLISENSE__
 #endif /* !__INTELLISENSE__ */
 
  /* These are the cpu-state helpers that may be used portably across all architectures:
@@ -524,30 +524,249 @@ __NOTHROW_NCX(lcpustate_current)(struct lcpustate *__restrict __result) {
  * NOTE: We DON'T define converter functions between aliasing types. Consumers that
  *       use converter functions need to check for `?CPUSTATE_IS_?CPUSTATE' macros!
  * e.g.: we don't define `ucpustate_to_kcpustate' because of `KCPUSTATE_IS_UCPUSTATE' */
-#define lcpustate_to_ucpustate(src, dst) TODO
-#define lcpustate_to_fcpustate(src, dst) TODO
-#define ucpustate_to_lcpustate(src, dst) TODO
-#define ucpustate_to_fcpustate(src, dst) TODO
-#define fcpustate_to_ucpustate(src, dst) TODO
-#define fcpustate_to_lcpustate(src, dst) TODO
+__FORCELOCAL __ATTR_NONNULL((1, 2)) void
+__NOTHROW_NCX(lcpustate_to_ucpustate_ex)(struct lcpustate const *__restrict __src,
+                                         struct ucpustate *__restrict __dst,
+                                         __uint32_t __r0, __uint32_t __r1, __uint32_t __r2,
+                                         __uint32_t __r3, __uint32_t __r12, __uint32_t __cpsr) {
+	ucpustate_setr0(__dst, __r0);
+	ucpustate_setr1(__dst, __r1);
+	ucpustate_setr2(__dst, __r2);
+	ucpustate_setr3(__dst, __r3);
+	ucpustate_setr4(__dst, lcpustate_getr4(__src));
+	ucpustate_setr5(__dst, lcpustate_getr5(__src));
+	ucpustate_setr6(__dst, lcpustate_getr6(__src));
+	ucpustate_setr7(__dst, lcpustate_getr7(__src));
+	ucpustate_setr8(__dst, lcpustate_getr8(__src));
+	ucpustate_setr9(__dst, lcpustate_getr9(__src));
+	ucpustate_setr10(__dst, lcpustate_getr10(__src));
+	ucpustate_setr11(__dst, lcpustate_getr11(__src));
+	ucpustate_setr12(__dst, __r12);
+	ucpustate_setsp(__dst, lcpustate_getsp(__src));
+	ucpustate_setlr(__dst, lcpustate_getlr(__src));
+	ucpustate_setpc(__dst, lcpustate_getpc(__src));
+	ucpustate_setcpsr(__dst, __cpsr);
+}
 
-/* Aliases that we do have to define (because they're not no-ops) */
-#define kcpustate_to_lcpustate ucpustate_to_lcpustate
-#define icpustate_to_lcpustate ucpustate_to_lcpustate
-#define scpustate_to_lcpustate ucpustate_to_lcpustate
+__FORCELOCAL __ATTR_NONNULL((1, 2)) void
+__NOTHROW_NCX(lcpustate_to_fcpustate_ex)(struct lcpustate const *__restrict __src,
+                                         struct fcpustate *__restrict __dst,
+                                         __uint32_t __r0, __uint32_t __r1, __uint32_t __r2,
+                                         __uint32_t __r3, __uint32_t __r12, __uint32_t __cpsr,
+                                         __uint32_t __R8_fiq, __uint32_t __R9_fiq, __uint32_t __R10_fiq,
+                                         __uint32_t __R11_fiq, __uint32_t __R12_fiq, void *__SP_fiq,
+                                         void const *__LR_fiq, __uint32_t __SPSR_fiq, void *__SP_irq,
+                                         void const *__LR_irq, __uint32_t __SPSR_irq, void *__SP_svc,
+                                         void const *__LR_svc, __uint32_t __SPSR_svc, void *__SP_abt,
+                                         void const *__LR_abt, __uint32_t __SPSR_abt, void *__SP_und,
+                                         void const *__LR_und, __uint32_t __SPSR_und) {
+	lcpustate_to_ucpustate_ex(__src, &__dst->fcs_usr, __r0, __r1, __r2, __r3, __r12, __cpsr);
+	fcpustate_setr8_fiq(__dst, __R8_fiq);
+	fcpustate_setr9_fiq(__dst, __R9_fiq);
+	fcpustate_setr10_fiq(__dst, __R10_fiq);
+	fcpustate_setr11_fiq(__dst, __R11_fiq);
+	fcpustate_setr12_fiq(__dst, __R12_fiq);
+	fcpustate_setsp_fiq(__dst, __SP_fiq);
+	fcpustate_setlr_fiq(__dst, __LR_fiq);
+	fcpustate_setspsr_fiq(__dst, __SPSR_fiq);
+	fcpustate_setsp_irq(__dst, __SP_irq);
+	fcpustate_setlr_irq(__dst, __LR_irq);
+	fcpustate_setspsr_irq(__dst, __SPSR_irq);
+	fcpustate_setsp_svc(__dst, __SP_svc);
+	fcpustate_setlr_svc(__dst, __LR_svc);
+	fcpustate_setspsr_svc(__dst, __SPSR_svc);
+	fcpustate_setsp_abt(__dst, __SP_abt);
+	fcpustate_setlr_abt(__dst, __LR_abt);
+	fcpustate_setspsr_abt(__dst, __SPSR_abt);
+	fcpustate_setsp_und(__dst, __SP_und);
+	fcpustate_setlr_und(__dst, __LR_und);
+	fcpustate_setspsr_und(__dst, __SPSR_und);
+}
 
-#define lcpustate_to_kcpustate lcpustate_to_ucpustate
-#define fcpustate_to_kcpustate fcpustate_to_ucpustate
+#ifdef __INTELLISENSE__
+__ATTR_NONNULL((1, 2)) void
+__NOTHROW_NCX(lcpustate_to_ucpustate)(struct lcpustate const *__restrict __src,
+                                      struct ucpustate *__restrict __dst);
+__ATTR_NONNULL((1, 2)) void
+__NOTHROW_NCX(lcpustate_to_fcpustate)(struct lcpustate const *__restrict __src,
+                                      struct fcpustate *__restrict __dst);
+#else /* __INTELLISENSE__ */
+#define lcpustate_to_ucpustate(src, dst) \
+	lcpustate_to_ucpustate_ex(src, dst, 0, 0, 0, 0, 0, __rdcpsr())
+#define lcpustate_to_fcpustate(src, dst)                                                 \
+	lcpustate_to_fcpustate_ex(src, dst, 0, 0, 0, 0, 0, __rdcpsr(),                       \
+	                          __rdR8_fiq(), __rdR9_fiq(), __rdR10_fiq(), __rdR11_fiq(),  \
+	                          __rdR12_fiq(), __rdSP_fiq(), __rdLR_fiq(), __rdSPSR_fiq(), \
+	                          __rdSP_irq(), __rdLR_irq(), __rdSPSR_irq(), __rdSP_svc(),  \
+	                          __rdLR_svc(), __rdSPSR_svc(), __rdSP_abt(), __rdLR_abt(),  \
+	                          __rdSPSR_abt(), __rdSP_und(), __rdLR_und(), __rdSPSR_und())
+#endif /* !__INTELLISENSE__ */
 
-#define lcpustate_to_icpustate lcpustate_to_ucpustate
-#define fcpustate_to_icpustate fcpustate_to_ucpustate
+__FORCELOCAL __ATTR_NONNULL((1, 2)) void
+__NOTHROW_NCX(ucpustate_to_lcpustate)(struct ucpustate const *__restrict __src,
+                                      struct lcpustate *__restrict __dst) {
+	lcpustate_setr4(__dst, ucpustate_getr4(__src));
+	lcpustate_setr5(__dst, ucpustate_getr5(__src));
+	lcpustate_setr6(__dst, ucpustate_getr6(__src));
+	lcpustate_setr7(__dst, ucpustate_getr7(__src));
+	lcpustate_setr8(__dst, ucpustate_getr8(__src));
+	lcpustate_setr9(__dst, ucpustate_getr9(__src));
+	lcpustate_setr10(__dst, ucpustate_getr10(__src));
+	lcpustate_setr11(__dst, ucpustate_getr11(__src));
+	lcpustate_setsp(__dst, ucpustate_getsp(__src));
+	lcpustate_setlr(__dst, ucpustate_getlr(__src));
+	lcpustate_setpc(__dst, ucpustate_getpc(__src));
+}
 
-#define lcpustate_to_scpustate lcpustate_to_ucpustate
-#define fcpustate_to_scpustate fcpustate_to_ucpustate
+__FORCELOCAL __ATTR_NONNULL((1)) void
+__NOTHROW_NCX(__Xcpustate_to_fcpustate)(struct fcpustate *__restrict __dst,
+                                        __uint32_t __r0, __uint32_t __r1, __uint32_t __r2,
+                                        __uint32_t __r3, __uint32_t __r4, __uint32_t __r5,
+                                        __uint32_t __r6, __uint32_t __r7, __uint32_t __r8,
+                                        __uint32_t __r9, __uint32_t __r10, __uint32_t __r11,
+                                        __uint32_t __r12, void *__sp, void const *__lr,
+                                        void const *__pc, __uint32_t __cpsr) {
+	__BOOL __rdusr_splr = 0;
+	__dst->fcs_usr.ucs_r0   = __r0;
+	__dst->fcs_usr.ucs_r1   = __r1;
+	__dst->fcs_usr.ucs_r2   = __r2;
+	__dst->fcs_usr.ucs_r3   = __r3;
+	__dst->fcs_usr.ucs_r4   = __r4;
+	__dst->fcs_usr.ucs_r5   = __r5;
+	__dst->fcs_usr.ucs_r6   = __r6;
+	__dst->fcs_usr.ucs_r7   = __r7;
+	__dst->fcs_usr.ucs_cpsr = __cpsr;
+	__dst->fcs_usr.ucs_pc   = (__uint32_t)__pc;
+	if ((__cpsr & CPSR_M) == CPSR_M_FIQ) {
+		__dst->fcs_R8_fiq      = __r8;
+		__dst->fcs_R9_fiq      = __r9;
+		__dst->fcs_R10_fiq     = __r10;
+		__dst->fcs_R11_fiq     = __r11;
+		__dst->fcs_R12_fiq     = __r12;
+		__dst->fcs_SP_fiq      = (__uint32_t)__sp;
+		__dst->fcs_LR_fiq      = (__uint32_t)__lr;
+		__dst->fcs_usr.ucs_r8  = __rdR8_usr();
+		__dst->fcs_usr.ucs_r9  = __rdR9_usr();
+		__dst->fcs_usr.ucs_r10 = __rdR10_usr();
+		__dst->fcs_usr.ucs_r11 = __rdR11_usr();
+		__dst->fcs_usr.ucs_r12 = __rdR12_usr();
+		__rdusr_splr           = 1;
+	} else {
+		__dst->fcs_usr.ucs_r8  = __r8;
+		__dst->fcs_usr.ucs_r9  = __r9;
+		__dst->fcs_usr.ucs_r10 = __r10;
+		__dst->fcs_usr.ucs_r11 = __r11;
+		__dst->fcs_usr.ucs_r12 = __r12;
+		__dst->fcs_usr.ucs_sp  = (__uint32_t)__sp;
+		__dst->fcs_usr.ucs_lr  = (__uint32_t)__lr;
+		__dst->fcs_R8_fiq      = __rdR8_fiq();
+		__dst->fcs_R9_fiq      = __rdR9_fiq();
+		__dst->fcs_R10_fiq     = __rdR10_fiq();
+		__dst->fcs_R11_fiq     = __rdR11_fiq();
+		__dst->fcs_R12_fiq     = __rdR12_fiq();
+		__dst->fcs_SP_fiq      = (__uint32_t)__rdSP_fiq();
+		__dst->fcs_LR_fiq      = (__uint32_t)__rdLR_fiq();
+	}
 
-#define kcpustate_to_fcpustate ucpustate_to_fcpustate
-#define icpustate_to_fcpustate ucpustate_to_fcpustate
-#define scpustate_to_fcpustate ucpustate_to_fcpustate
+	if ((__cpsr & CPSR_M) == CPSR_M_IRQ) {
+		__dst->fcs_SP_irq = (__uint32_t)__sp;
+		__dst->fcs_LR_irq = (__uint32_t)__lr;
+		__rdusr_splr = 1;
+	} else {
+		__dst->fcs_SP_irq = (__uint32_t)__rdSP_irq();
+		__dst->fcs_LR_irq = (__uint32_t)__rdLR_irq();
+	}
+
+	if ((__cpsr & CPSR_M) == CPSR_M_SVC) {
+		__dst->fcs_SP_svc = (__uint32_t)__sp;
+		__dst->fcs_LR_svc = (__uint32_t)__lr;
+		__rdusr_splr = 1;
+	} else {
+		__dst->fcs_SP_svc = (__uint32_t)__rdSP_svc();
+		__dst->fcs_LR_svc = (__uint32_t)__rdLR_svc();
+	}
+
+	if ((__cpsr & CPSR_M) == CPSR_M_ABT) {
+		__dst->fcs_SP_abt = (__uint32_t)__sp;
+		__dst->fcs_LR_abt = (__uint32_t)__lr;
+		__rdusr_splr = 1;
+	} else {
+		__dst->fcs_SP_abt = (__uint32_t)__rdSP_abt();
+		__dst->fcs_LR_abt = (__uint32_t)__rdLR_abt();
+	}
+
+	if ((__cpsr & CPSR_M) == CPSR_M_UND) {
+		__dst->fcs_SP_und = (__uint32_t)__sp;
+		__dst->fcs_LR_und = (__uint32_t)__lr;
+		__rdusr_splr = 1;
+	} else {
+		__dst->fcs_SP_und = (__uint32_t)__rdSP_und();
+		__dst->fcs_LR_und = (__uint32_t)__rdLR_und();
+	}
+
+	if (__rdusr_splr) {
+		__dst->fcs_usr.ucs_sp = (__uint32_t)__rdSP_usr();
+		__dst->fcs_usr.ucs_lr = (__uint32_t)__rdLR_usr();
+	}
+	__dst->fcs_SPSR_fiq = __rdSPSR_fiq();
+	__dst->fcs_SPSR_irq = __rdSPSR_irq();
+	__dst->fcs_SPSR_svc = __rdSPSR_svc();
+	__dst->fcs_SPSR_abt = __rdSPSR_abt();
+	__dst->fcs_SPSR_und = __rdSPSR_und();
+}
+
+#define ucpustate_to_fcpustate(src, dst)                                                         \
+	__Xcpustate_to_fcpustate(dst, ucpustate_getr0(src), ucpustate_getr1(src),                    \
+	                         ucpustate_getr2(src), ucpustate_getr3(src), ucpustate_getr4(src),   \
+	                         ucpustate_getr5(src), ucpustate_getr6(src), ucpustate_getr7(src),   \
+	                         ucpustate_getr8(src), ucpustate_getr9(src), ucpustate_getr10(src),  \
+	                         ucpustate_getr11(src), ucpustate_getr12(src), ucpustate_getsp(src), \
+	                         ucpustate_getlr(src), ucpustate_getpc(src), ucpustate_getcpsr(src))
+#define lcpustate_to_fcpustate(src, dst)                                                        \
+	__Xcpustate_to_fcpustate(dst, 0, 0,                                                         \
+	                         0, 0, lcpustate_getr4(src),                                        \
+	                         lcpustate_getr5(src), lcpustate_getr6(src), lcpustate_getr7(src),  \
+	                         lcpustate_getr8(src), lcpustate_getr9(src), lcpustate_getr10(src), \
+	                         lcpustate_getr11(src), 0, lcpustate_getsp(src),                    \
+	                         lcpustate_getlr(src), lcpustate_getpc(src), __rdcpsr())
+
+__FORCELOCAL __ATTR_NONNULL((1, 2)) void
+__NOTHROW_NCX(fcpustate_to_ucpustate)(struct fcpustate const *__restrict __src,
+                                      struct ucpustate *__restrict __dst) {
+	ucpustate_setr0(__dst, fcpustate_getr0(__src));
+	ucpustate_setr1(__dst, fcpustate_getr1(__src));
+	ucpustate_setr2(__dst, fcpustate_getr2(__src));
+	ucpustate_setr3(__dst, fcpustate_getr3(__src));
+	ucpustate_setr4(__dst, fcpustate_getr4(__src));
+	ucpustate_setr5(__dst, fcpustate_getr5(__src));
+	ucpustate_setr6(__dst, fcpustate_getr6(__src));
+	ucpustate_setr7(__dst, fcpustate_getr7(__src));
+	ucpustate_setr8(__dst, fcpustate_getr8(__src));
+	ucpustate_setr9(__dst, fcpustate_getr9(__src));
+	ucpustate_setr10(__dst, fcpustate_getr10(__src));
+	ucpustate_setr11(__dst, fcpustate_getr11(__src));
+	ucpustate_setr12(__dst, fcpustate_getr12(__src));
+	ucpustate_setsp(__dst, fcpustate_getsp(__src));
+	ucpustate_setlr(__dst, fcpustate_getlr(__src));
+	ucpustate_setpc(__dst, fcpustate_getpc(__src));
+	ucpustate_setcpsr(__dst, fcpustate_getcpsr(__src));
+}
+
+__FORCELOCAL __ATTR_NONNULL((1, 2)) void
+__NOTHROW_NCX(fcpustate_to_lcpustate)(struct fcpustate const *__restrict __src,
+                                      struct lcpustate *__restrict __dst) {
+	lcpustate_setr4(__dst, fcpustate_getr4(__src));
+	lcpustate_setr5(__dst, fcpustate_getr5(__src));
+	lcpustate_setr6(__dst, fcpustate_getr6(__src));
+	lcpustate_setr7(__dst, fcpustate_getr7(__src));
+	lcpustate_setr8(__dst, fcpustate_getr8(__src));
+	lcpustate_setr9(__dst, fcpustate_getr9(__src));
+	lcpustate_setr10(__dst, fcpustate_getr10(__src));
+	lcpustate_setr11(__dst, fcpustate_getr11(__src));
+	lcpustate_setsp(__dst, fcpustate_getsp(__src));
+	lcpustate_setlr(__dst, fcpustate_getlr(__src));
+	lcpustate_setpc(__dst, fcpustate_getpc(__src));
+}
 
 __DECL_END
 #endif /* __CC__ */

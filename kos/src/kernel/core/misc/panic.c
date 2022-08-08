@@ -505,16 +505,12 @@ NOTHROW(FCALL libc_assertion_check_core)(struct assert_args *__restrict args) {
 	/* Check if assertion failures at the caller's PC should always be ignored. */
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 	if (is_pc_always_ignored(kcpustate_getpc(&args->aa_state))) {
-		/* TODO: Make this part arch-independent */
-#ifdef __x86_64__
-		args->aa_state.kcs_gpregs.gp_rax = 0;
-#elif defined(__i386__)
-		args->aa_state.kcs_gpregs.gp_eax = 0;
-#elif defined(__arm__)
-		args->aa_state.ucs_r0 = 0;
-#else /* ... */
-#error "Unsupported arch"
-#endif /* !... */
+		/* Have `__acheck()' return `false' to break out of loop in:
+		 * >> do if (expr) break; while (__acheck(expr_str));
+		 * (as is part of `assert(3)' when assertion checks are supported)
+		 * NOTE: If we returned `true', the to-be asserted expression
+		 *       would be checked a second time (retry). */
+		kcpustate_setreturnbool(&args->aa_state, false);
 		return &args->aa_state;
 	}
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */

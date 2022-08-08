@@ -59,7 +59,7 @@ __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdr10)(void) { __register_var(__U
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdr11)(void) { __register_var(__UINT32_TYPE__, __r11, "r11"); return __r11; }
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdr12)(void) { __register_var(__UINT32_TYPE__, __r12, "r12"); return __r12; }
 __FORCELOCAL __ATTR_WUNUSED void *(__rdsp)(void) { __register_var(void *, __sp, "sp"); return __sp; }
-__FORCELOCAL __ATTR_WUNUSED void *(__rdlr)(void) { __register_var(void *, __lr, "lr"); return __lr; }
+__FORCELOCAL __ATTR_WUNUSED void const *(__rdlr)(void) { __register_var(void const *, __lr, "lr"); return __lr; }
 __FORCELOCAL void (__wrr0)(__UINT32_TYPE__ __val) { __register_var(__UINT32_TYPE__, __r0, "r0"); __r0 = __val; }
 __FORCELOCAL void (__wrr1)(__UINT32_TYPE__ __val) { __register_var(__UINT32_TYPE__, __r1, "r1"); __r1 = __val; }
 __FORCELOCAL void (__wrr2)(__UINT32_TYPE__ __val) { __register_var(__UINT32_TYPE__, __r2, "r2"); __r2 = __val; }
@@ -74,7 +74,7 @@ __FORCELOCAL void (__wrr10)(__UINT32_TYPE__ __val) { __register_var(__UINT32_TYP
 __FORCELOCAL void (__wrr11)(__UINT32_TYPE__ __val) { __register_var(__UINT32_TYPE__, __r11, "r11"); __r11 = __val; }
 __FORCELOCAL void (__wrr12)(__UINT32_TYPE__ __val) { __register_var(__UINT32_TYPE__, __r12, "r12"); __r12 = __val; }
 __FORCELOCAL void (__wrsp)(void *__val) { __register_var(void *, __sp, "sp"); __sp = __val; }
-__FORCELOCAL void (__wrlr)(void *__val) { __register_var(void *, __lr, "lr"); __lr = __val; }
+__FORCELOCAL void (__wrlr)(void const *__val) { __register_var(void const *, __lr, "lr"); __lr = __val; }
 #else /* __COMPILER_HAVE_REGISTER_VARS */
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdr0)(void) { __UINT32_TYPE__ __res; __asm__ __volatile__("mov %0, r0" : "=r" (__res)); return __res; }
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdr1)(void) { __UINT32_TYPE__ __res; __asm__ __volatile__("mov %0, r1" : "=r" (__res)); return __res; }
@@ -90,7 +90,7 @@ __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdr10)(void) { __UINT32_TYPE__ __
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdr11)(void) { __UINT32_TYPE__ __res; __asm__ __volatile__("mov %0, r11" : "=r" (__res)); return __res; }
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdr12)(void) { __UINT32_TYPE__ __res; __asm__ __volatile__("mov %0, r12" : "=r" (__res)); return __res; }
 __FORCELOCAL __ATTR_WUNUSED void *(__rdsp)(void) { void *__res; __asm__ __volatile__("mov %0, sp" : "=r" (__res)); return __res; }
-__FORCELOCAL __ATTR_WUNUSED void *(__rdlr)(void) { void *__res; __asm__ __volatile__("mov %0, lr" : "=r" (__res)); return __res; }
+__FORCELOCAL __ATTR_WUNUSED void const *(__rdlr)(void) { void const *__res; __asm__ __volatile__("mov %0, lr" : "=r" (__res)); return __res; }
 __FORCELOCAL void (__wrr0)(__UINT32_TYPE__ __val) { __asm__ __volatile__("mov r0, %0" : : "r" (__val) : "r0"); }
 __FORCELOCAL void (__wrr1)(__UINT32_TYPE__ __val) { __asm__ __volatile__("mov r1, %0" : : "r" (__val) : "r1"); }
 __FORCELOCAL void (__wrr2)(__UINT32_TYPE__ __val) { __asm__ __volatile__("mov r2, %0" : : "r" (__val) : "r2"); }
@@ -105,11 +105,11 @@ __FORCELOCAL void (__wrr10)(__UINT32_TYPE__ __val) { __asm__ __volatile__("mov r
 __FORCELOCAL void (__wrr11)(__UINT32_TYPE__ __val) { __asm__ __volatile__("mov r11, %0" : : "r" (__val) : "r11"); }
 __FORCELOCAL void (__wrr12)(__UINT32_TYPE__ __val) { __asm__ __volatile__("mov r12, %0" : : "r" (__val) : "r12"); }
 __FORCELOCAL void (__wrsp)(void *__val) { __asm__ __volatile__("mov sp, %0" : : "r" (__val) : "sp"); }
-__FORCELOCAL void (__wrlr)(void *__val) { __asm__ __volatile__("mov lr, %0" : : "r" (__val) : "lr"); }
+__FORCELOCAL void (__wrlr)(void const *__val) { __asm__ __volatile__("mov lr, %0" : : "r" (__val) : "lr"); }
 #endif /* !__COMPILER_HAVE_REGISTER_VARS */
 
-__FORCELOCAL __ATTR_WUNUSED void *(__rdpc)(void) { void *__res; __asm__ __volatile__("mov %0, pc" : "=r" (__res)); return __res; }
-__FORCELOCAL __ATTR_NORETURN void (__wrpc)(void *__val) { __asm__ __volatile__("mov pc, %0" : : "r" (__val)); __builtin_unreachable(); }
+__FORCELOCAL __ATTR_WUNUSED void const *(__rdpc)(void) { void const *__res; __asm__ __volatile__("mov %0, pc" : "=r" (__res)); return __res; }
+__FORCELOCAL __ATTR_NORETURN void (__wrpc)(void const *__val) { __asm__ __volatile__("mov pc, %0" : : "r" (__val)); __builtin_unreachable(); }
 
 
 /* Bank-independent, explicit register access */
@@ -126,8 +126,8 @@ __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdR12_usr)(void) { __UINT32_TYPE_
 __FORCELOCAL __ATTR_WUNUSED void (__wrR12_usr)(__UINT32_TYPE__ __val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
 __FORCELOCAL __ATTR_WUNUSED void *(__rdSP_usr)(void) { void *__result; __asm__ __volatile__("@ TODO" : "=r" (__result)); return __result; }
 __FORCELOCAL __ATTR_WUNUSED void (__wrSP_usr)(void *__val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
-__FORCELOCAL __ATTR_WUNUSED void *(__rdLR_usr)(void) { void *__result; __asm__ __volatile__("@ TODO" : "=r" (__result)); return __result; }
-__FORCELOCAL __ATTR_WUNUSED void (__wrLR_usr)(void *__val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
+__FORCELOCAL __ATTR_WUNUSED void const *(__rdLR_usr)(void) { void const *__result; __asm__ __volatile__("@ TODO" : "=r" (__result)); return __result; }
+__FORCELOCAL __ATTR_WUNUSED void (__wrLR_usr)(void const *__val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
 #else /* __KERNEL__ */
 /* Outside of kernel-space, *_usr-registers are always the ones that are active! */
 #define __rdR8_usr  __rdr8
@@ -148,29 +148,29 @@ __FORCELOCAL __ATTR_WUNUSED void (__wrLR_usr)(void *__val) { __asm__ __volatile_
 
 __FORCELOCAL __ATTR_WUNUSED void *(__rdSP_svc)(void) { void *__result; __asm__ __volatile__("@ TODO" : "=r" (__result)); return __result; }
 __FORCELOCAL __ATTR_WUNUSED void (__wrSP_svc)(void *__val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
-__FORCELOCAL __ATTR_WUNUSED void *(__rdLR_svc)(void) { void *__result; __asm__ __volatile__("@ TODO" : "=r" (__result)); return __result; }
-__FORCELOCAL __ATTR_WUNUSED void (__wrLR_svc)(void *__val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
+__FORCELOCAL __ATTR_WUNUSED void const *(__rdLR_svc)(void) { void const *__result; __asm__ __volatile__("@ TODO" : "=r" (__result)); return __result; }
+__FORCELOCAL __ATTR_WUNUSED void (__wrLR_svc)(void const *__val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdSPSR_svc)(void) { __UINT32_TYPE__ __spsr; __asm__ __volatile__("@ TODO" : "=r" (__spsr)); return __spsr; }
 __FORCELOCAL __ATTR_WUNUSED void (__wrSPSR_svc)(__UINT32_TYPE__ __val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
 
 __FORCELOCAL __ATTR_WUNUSED void *(__rdSP_abt)(void) { void *__result; __asm__ __volatile__("@ TODO" : "=r" (__result)); return __result; }
 __FORCELOCAL __ATTR_WUNUSED void (__wrSP_abt)(void *__val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
-__FORCELOCAL __ATTR_WUNUSED void *(__rdLR_abt)(void) { void *__result; __asm__ __volatile__("@ TODO" : "=r" (__result)); return __result; }
-__FORCELOCAL __ATTR_WUNUSED void (__wrLR_abt)(void *__val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
+__FORCELOCAL __ATTR_WUNUSED void const *(__rdLR_abt)(void) { void const *__result; __asm__ __volatile__("@ TODO" : "=r" (__result)); return __result; }
+__FORCELOCAL __ATTR_WUNUSED void (__wrLR_abt)(void const *__val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdSPSR_abt)(void) { __UINT32_TYPE__ __spsr; __asm__ __volatile__("@ TODO" : "=r" (__spsr)); return __spsr; }
 __FORCELOCAL __ATTR_WUNUSED void (__wrSPSR_abt)(__UINT32_TYPE__ __val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
 
 __FORCELOCAL __ATTR_WUNUSED void *(__rdSP_und)(void) { void *__result; __asm__ __volatile__("@ TODO" : "=r" (__result)); return __result; }
 __FORCELOCAL __ATTR_WUNUSED void (__wrSP_und)(void *__val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
-__FORCELOCAL __ATTR_WUNUSED void *(__rdLR_und)(void) { void *__result; __asm__ __volatile__("@ TODO" : "=r" (__result)); return __result; }
-__FORCELOCAL __ATTR_WUNUSED void (__wrLR_und)(void *__val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
+__FORCELOCAL __ATTR_WUNUSED void const *(__rdLR_und)(void) { void const *__result; __asm__ __volatile__("@ TODO" : "=r" (__result)); return __result; }
+__FORCELOCAL __ATTR_WUNUSED void (__wrLR_und)(void const *__val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdSPSR_und)(void) { __UINT32_TYPE__ __spsr; __asm__ __volatile__("@ TODO" : "=r" (__spsr)); return __spsr; }
 __FORCELOCAL __ATTR_WUNUSED void (__wrSPSR_und)(__UINT32_TYPE__ __val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
 
 __FORCELOCAL __ATTR_WUNUSED void *(__rdSP_irq)(void) { void *__result; __asm__ __volatile__("@ TODO" : "=r" (__result)); return __result; }
 __FORCELOCAL __ATTR_WUNUSED void (__wrSP_irq)(void *__val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
-__FORCELOCAL __ATTR_WUNUSED void *(__rdLR_irq)(void) { void *__result; __asm__ __volatile__("@ TODO" : "=r" (__result)); return __result; }
-__FORCELOCAL __ATTR_WUNUSED void (__wrLR_irq)(void *__val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
+__FORCELOCAL __ATTR_WUNUSED void const *(__rdLR_irq)(void) { void const *__result; __asm__ __volatile__("@ TODO" : "=r" (__result)); return __result; }
+__FORCELOCAL __ATTR_WUNUSED void (__wrLR_irq)(void const *__val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdSPSR_irq)(void) { __UINT32_TYPE__ __spsr; __asm__ __volatile__("@ TODO" : "=r" (__spsr)); return __spsr; }
 __FORCELOCAL __ATTR_WUNUSED void (__wrSPSR_irq)(__UINT32_TYPE__ __val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
 
@@ -186,8 +186,8 @@ __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdR12_fiq)(void) { __UINT32_TYPE_
 __FORCELOCAL __ATTR_WUNUSED void (__wrR12_fiq)(__UINT32_TYPE__ __val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
 __FORCELOCAL __ATTR_WUNUSED void *(__rdSP_fiq)(void) { void *__result; __asm__ __volatile__("@ TODO" : "=r" (__result)); return __result; }
 __FORCELOCAL __ATTR_WUNUSED void (__wrSP_fiq)(void *__val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
-__FORCELOCAL __ATTR_WUNUSED void *(__rdLR_fiq)(void) { void *__result; __asm__ __volatile__("@ TODO" : "=r" (__result)); return __result; }
-__FORCELOCAL __ATTR_WUNUSED void (__wrLR_fiq)(void *__val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
+__FORCELOCAL __ATTR_WUNUSED void const *(__rdLR_fiq)(void) { void const *__result; __asm__ __volatile__("@ TODO" : "=r" (__result)); return __result; }
+__FORCELOCAL __ATTR_WUNUSED void (__wrLR_fiq)(void const *__val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdSPSR_fiq)(void) { __UINT32_TYPE__ __spsr; __asm__ __volatile__("@ TODO" : "=r" (__spsr)); return __spsr; }
 __FORCELOCAL __ATTR_WUNUSED void (__wrSPSR_fiq)(__UINT32_TYPE__ __val) { __asm__ __volatile__("@ TODO" : : "r" (__val)); }
 
