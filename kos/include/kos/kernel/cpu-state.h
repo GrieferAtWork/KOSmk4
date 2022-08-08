@@ -84,12 +84,12 @@
 /************************************************************************/
 #if (((defined(KCPUSTATE_IS_LCPUSTATE) || defined(ICPUSTATE_IS_LCPUSTATE) ||  \
        defined(SCPUSTATE_IS_LCPUSTATE) || defined(FCPUSTATE_IS_LCPUSTATE)) && \
-      defined(LCPUSTATE_ALIAS)) ||                                          \
+      defined(LCPUSTATE_ALIAS)) ||                                            \
      ((defined(ICPUSTATE_IS_KCPUSTATE) || defined(SCPUSTATE_IS_KCPUSTATE) ||  \
        defined(FCPUSTATE_IS_KCPUSTATE)) &&                                    \
-      defined(KCPUSTATE_ALIAS)) ||                                          \
+      defined(KCPUSTATE_ALIAS)) ||                                            \
      ((defined(SCPUSTATE_IS_ICPUSTATE) || defined(FCPUSTATE_IS_ICPUSTATE)) && \
-      defined(ICPUSTATE_ALIAS)) ||                                          \
+      defined(ICPUSTATE_ALIAS)) ||                                            \
      (defined(FCPUSTATE_IS_SCPUSTATE) && defined(SCPUSTATE_ALIAS)))
 #error "Don't define transitive cpu-state aliasing macros (always-, and only reference the lowest-most alias)"
 #endif /* ... */

@@ -167,7 +167,6 @@ function injectPath(): string {
 
 createVsFile("kos.sln", (fp: File) -> {
 	fp <<
-"\n"
 "Microsoft Visual Studio Solution File, Format Version 12.00\n"
 "# Visual Studio 15\n"
 "VisualStudioVersion = 15.0.28307.1321\n"

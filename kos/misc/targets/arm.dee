@@ -71,7 +71,7 @@ global final GDBARCH = "TODO";
 global final VS_INTELLISENSE_MODE = "linux-gcc-arm";
 
 @@Fake target name for visual studio
-global final VS_PROJECT_TARGET = "Arm";
+global final VS_PROJECT_TARGET = "ARM";
 
 @@Provide a cache for the toolchain.
 function provideToolchainCache(toolchain/*: Toolchain*/, TARGET_NAME: string) {

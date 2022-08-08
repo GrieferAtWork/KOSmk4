@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix label placement in `system.c`"
-DEEMON_VERSION="9f7a3a6413d6bd6c14643b547e92d12359e405c1"
+#     v -- "Fix a bug with `Dict.Frozen'"
+DEEMON_VERSION="18a619c437f72a1321d86680b063db67b4b70c72"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
