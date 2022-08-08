@@ -723,8 +723,7 @@ __NOTHROW_NCX(__Xcpustate_to_fcpustate)(struct fcpustate *__restrict __dst,
 	                         ucpustate_getr11(src), ucpustate_getr12(src), ucpustate_getsp(src), \
 	                         ucpustate_getlr(src), ucpustate_getpc(src), ucpustate_getcpsr(src))
 #define lcpustate_to_fcpustate(src, dst)                                                        \
-	__Xcpustate_to_fcpustate(dst, 0, 0,                                                         \
-	                         0, 0, lcpustate_getr4(src),                                        \
+	__Xcpustate_to_fcpustate(dst, 0, 0, 0, 0, lcpustate_getr4(src),                             \
 	                         lcpustate_getr5(src), lcpustate_getr6(src), lcpustate_getr7(src),  \
 	                         lcpustate_getr8(src), lcpustate_getr9(src), lcpustate_getr10(src), \
 	                         lcpustate_getr11(src), 0, lcpustate_getsp(src),                    \

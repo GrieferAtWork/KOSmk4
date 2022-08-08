@@ -474,9 +474,17 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_kreaddir_mode
 #endif /* HAVE_SC_REPR_KREADDIR_MODE */
 
+#ifdef HAVE_SC_REPR_STRUCT_SIGACTION
+#define NEED_print_sigaction
+#endif /* HAVE_SC_REPR_STRUCT_SIGACTION */
+
 #ifdef HAVE_SC_REPR_STRUCT_SIGACTIONX32
 #define NEED_print_sigaction
 #endif /* HAVE_SC_REPR_STRUCT_SIGACTIONX32 */
+
+#ifdef HAVE_SC_REPR_STRUCT_SIGACTIONX64
+#define NEED_print_sigaction
+#endif /* HAVE_SC_REPR_STRUCT_SIGACTIONX64 */
 
 #ifdef HAVE_SC_REPR_EPOLL_CREATE1_FLAGS
 #define NEED_print_epoll_create1_flags
@@ -3825,7 +3833,7 @@ print_sigaction(pformatprinter printer, void *arg,
 	DO(print_sigset(printer, arg, sa_mask, sigsetsize));
 	PRINT("," SYNSPACE SYNFIELD("sa_flags"));
 	DO(print_sigaction_flags(printer, arg, sa_flags));
-	if (sa_restorer)
+	if (sa_flags & SA_RESTORER)
 		PRINTF("," SYNSPACE SYNFIELD("sa_restorer") "%#" PRIxPTR, sa_restorer);
 	PRINT(SYNSPACE "}");
 done:

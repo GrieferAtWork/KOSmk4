@@ -24,10 +24,83 @@
 
 #include <hybrid/typecore.h>
 
+#include <kos/anno.h>
+
 #ifdef __CC__
 __DECL_BEGIN
 
 #ifdef __COMPILER_HAVE_GCC_ASM
+
+/* Software-triggered breakpoint */
+#define __bkpt(/*thumb:uint8_t,!thumb:uint16_t*/ imm) __asm__ __volatile__("bkpt %0" : : "n" (imm))
+/* TODO: CHKA */
+/* TODO: CPS */
+#define __dbg(/*0-15*/imm4) __asm__ __volatile__("dbg %0" : : "n" (imm4))
+__FORCELOCAL void (__dmb)(void) { __asm__ __volatile__("dmb"); }
+__FORCELOCAL void (__dsb)(void) { __asm__ __volatile__("dsb"); }
+/* TODO: ENTERX */
+/* TODO: LEAVEX */
+__FORCELOCAL void (__isb)(void) { __asm__ __volatile__("isb"); }
+/* TODO: LDC */
+/* TODO: LDC2 */
+/* TODO: LDREX */
+/* TODO: LDREXB */
+/* TODO: LDREXD */
+/* TODO: LDREXH */
+__FORCELOCAL __UINT32_TYPE__ (__ldrbt)(__USER __UNCHECKED __UINT8_TYPE__ const *__addr) { __UINT32_TYPE__ __res; __asm__ __volatile__("ldrbt %0, %1" : "=r" (__res) : "m" (*__addr)); return __res; }
+__FORCELOCAL __UINT32_TYPE__ (__ldrsbt)(__USER __UNCHECKED __INT8_TYPE__ const *__addr) { __UINT32_TYPE__ __res; __asm__ __volatile__("ldrsbt %0, %1" : "=r" (__res) : "m" (*__addr)); return __res; }
+__FORCELOCAL __UINT32_TYPE__ (__ldrht)(__USER __UNCHECKED __UINT16_TYPE__ const *__addr) { __UINT32_TYPE__ __res; __asm__ __volatile__("ldrht %0, %1" : "=r" (__res) : "m" (*__addr)); return __res; }
+__FORCELOCAL __UINT32_TYPE__ (__ldrsht)(__USER __UNCHECKED __INT16_TYPE__ const *__addr) { __UINT32_TYPE__ __res; __asm__ __volatile__("ldrsht %0, %1" : "=r" (__res) : "m" (*__addr)); return __res; }
+__FORCELOCAL __UINT32_TYPE__ (__ldrt)(__USER __UNCHECKED __UINT32_TYPE__ const *__addr) { __UINT32_TYPE__ __res; __asm__ __volatile__("ldrt %0, %1" : "=r" (__res) : "m" (*__addr)); return __res; }
+
+/* TODO: MCR */
+/* TODO: MCR2 */
+/* TODO: MCRR */
+/* TODO: MCRR2 */
+/* TODO: MRC */
+/* TODO: MRC2 */
+/* TODO: MRRC */
+/* TODO: MRRC2 */
+
+/* TODO: MRS */
+/* TODO: MSR */
+__FORCELOCAL void (__nop)(void) { __asm__ __volatile__("nop"); }
+__FORCELOCAL void (__pld)(void const *__addr) { __asm__ __volatile__("pld %0" : : "m" (*(__UINT8_TYPE__ const *)__addr)); }
+__FORCELOCAL void (__pldw)(void *__addr) { __asm__ __volatile__("pldw %0" : : "m" (*(__UINT8_TYPE__ *)__addr)); }
+__FORCELOCAL void (__pli)(void *__addr) { __asm__ __volatile__("pli %0" : : "m" (*(__UINT8_TYPE__ *)__addr)); }
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __UINT32_TYPE__ (__rbit)(__UINT32_TYPE__ __val) { __UINT32_TYPE__ __res; __asm__ __volatile__("rbit %0, %1" : "=r" (__res) : "r" (__val)); return __res; }
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __UINT32_TYPE__ (__rev)(__UINT32_TYPE__ __val) { __UINT32_TYPE__ __res; __asm__ __volatile__("rev %0, %1" : "=r" (__res) : "r" (__val)); return __res; }
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __UINT32_TYPE__ (__rev16)(__UINT32_TYPE__ __val) { __UINT32_TYPE__ __res; __asm__ __volatile__("rev16 %0, %1" : "=r" (__res) : "r" (__val)); return __res; }
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __INT32_TYPE__ (__revsh)(__INT16_TYPE__ __val) { __INT32_TYPE__ __res; __asm__ __volatile__("revsh %0, %1" : "=r" (__res) : "r" (__val)); return __res; }
+__FORCELOCAL __ATTR_NORETURN void (__rfe)(void) { __asm__ __volatile__("rfe"); __builtin_unreachable(); }
+__FORCELOCAL void (__setend_LE)(void) { __asm__ __volatile__("setend LE"); }
+__FORCELOCAL void (__setend_BE)(void) { __asm__ __volatile__("setend BE"); }
+__FORCELOCAL void (__sev)(void) { __asm__ __volatile__("sev"); }
+#define __smc(/*0-15*/imm4) __asm__ __volatile__("smc %0" : : "n" (imm4))
+/* TODO: SRS */
+/* TODO: STC */
+/* TODO: STC2 */
+/* TODO: STREX */
+/* TODO: STREXB */
+/* TODO: STREXD */
+/* TODO: STREXH */
+__FORCELOCAL void (__strbt)(__USER __UNCHECKED __UINT8_TYPE__ *__addr, __UINT8_TYPE__ __val) { __asm__ __volatile__("strbt %0, %1" : : "r" (__val), "m" (*__addr)); }
+__FORCELOCAL void (__strht)(__USER __UNCHECKED __UINT16_TYPE__ *__addr, __UINT16_TYPE__ __val) { __asm__ __volatile__("strht %0, %1" : : "r" (__val), "m" (*__addr)); }
+__FORCELOCAL void (__strt)(__USER __UNCHECKED __UINT32_TYPE__ *__addr, __UINT32_TYPE__ __val) { __asm__ __volatile__("strt %0, %1" : : "r" (__val), "m" (*__addr)); }
+#define __svc(/*thumb:uint8_t,!thumb:uint24_t*/ imm) __asm__ __volatile__("svc %0" : : "n" (imm))
+/* TODO: SWP */
+/* TODO: SWPB */
+/* TODO: VMRS */
+/* TODO: VMSR */
+__FORCELOCAL void (__wfe)(void) { __asm__ __volatile__("wfe"); }
+__FORCELOCAL void (__wfi)(void) { __asm__ __volatile__("wfi"); }
+__FORCELOCAL void (__yield)(void) { __asm__ __volatile__("yield"); }
+
+
+/* Flush the instruction cache by executing a fencing instruction. */
+#define __flush_instruction_cache() __isb()
+
+
 
 /* Get/set ApplicationProgramStatusRegister (only status flags are writable) */
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__rdapsr)(void) { __UINT32_TYPE__ __apsr; __asm__ __volatile__("mrs %0, APSR" : "=r" (__apsr)); return __apsr; }
@@ -193,8 +266,6 @@ __FORCELOCAL __ATTR_WUNUSED void (__wrSPSR_fiq)(__UINT32_TYPE__ __val) { __asm__
 
 #endif /* __COMPILER_HAVE_GCC_ASM */
 
-/* Flush the instruction cache by executing a fencing instruction. */
-#define __flush_instruction_cache() (void)0 /* TODO */
 
 __DECL_END
 #endif /* __CC__ */
