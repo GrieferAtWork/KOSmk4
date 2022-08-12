@@ -140,8 +140,11 @@ NOTHROW(CC libbios86_fini)(struct bios86 *__restrict self) {
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((1)) void *LIBVM86_TRANSLATE_CC
 bios86_vm_translate(vm86_state_t *__restrict self, void *ptr) {
-	struct bios86_emulator *me = container_of(self, struct bios86_emulator, b86e_vm);
-	return me->b86e_bios.b86_biosbase + (uintptr_t)ptr;
+	struct bios86_emulator *me;
+	void *result;
+	me     = container_of(self, struct bios86_emulator, b86e_vm);
+	result = me->b86e_bios.b86_biosbase + (uintptr_t)ptr;
+	return result;
 }
 
 PRIVATE NONNULL((1)) int LIBVM86_CC

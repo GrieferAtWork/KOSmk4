@@ -2747,6 +2747,15 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_modrm_mem
 	}
 	if (modrm->mi_index != 0xff)
 		result += EMU86_GETREGP(modrm->mi_index, op_flags) << modrm->mi_shift;
+
+	/* Mask to 16 bits _BEFORE_ segmentation.
+	 * -> Realmode is limited to 1MiB with segmentation and 64KiB without */
+#if __SIZEOF_POINTER__ > 2 && LIBEMU86_CONFIG_WANT_16BIT
+	if (EMU86_F_IS16(op_flags))
+		result &= UINT16_C(0xffff);
+#endif /* __SIZEOF_POINTER__ > 2 && LIBEMU86_CONFIG_WANT_16BIT */
+
+	/* Form full (segmented) memory address */
 #ifndef EMU86_GETSEGBASE_IS_NOOP_ALL
 	{
 		u8 reg = EMU86_F_SEGREG(op_flags);
@@ -2766,14 +2775,14 @@ EMU86_EMULATE_NOTHROW(EMU86_EMULATE_CC EMU86_EMULATE_HELPER_NAME(emu86_modrm_mem
 		}
 	}
 #endif /* !EMU86_GETSEGBASE_IS_NOOP_ALL */
+
+	/* Mask to 32 bits _AFTER_ segmentation.
+	 * -> 32-bit protected mode can never access more than 4GiB, even when using segmentation! */
 #if __SIZEOF_POINTER__ > 4 && LIBEMU86_CONFIG_WANT_32BIT
 	if (EMU86_F_IS32(op_flags))
 		result &= UINT32_C(0xffffffff);
 #endif /* __SIZEOF_POINTER__ > 4 && LIBEMU86_CONFIG_WANT_32BIT */
-#if __SIZEOF_POINTER__ > 2 && LIBEMU86_CONFIG_WANT_16BIT
-	if (EMU86_F_IS16(op_flags))
-		result &= UINT16_C(0xffff);
-#endif /* __SIZEOF_POINTER__ > 2 && LIBEMU86_CONFIG_WANT_16BIT */
+
 	return (byte_t *)result;
 }
 #endif /* !EMU86_MODRM_MEMADDR */

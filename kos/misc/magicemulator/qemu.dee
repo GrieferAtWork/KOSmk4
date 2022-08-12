@@ -29,9 +29,9 @@ import ._common as common;
 
 function enumerateQEmuInstallationLocations(): {string...} {
 #ifdef __WINDOWS__
-	yield "D:\\qemu";
-	yield "D:\\apps\\qemu";
-#endif
+	yield r"D:\qemu";
+	yield r"D:\apps\qemu";
+#endif /* __WINDOWS__ */
 	yield fs.environ["PATH"].split(fs.DELIM)...;
 }
 
@@ -91,13 +91,6 @@ function start(
 		options: {string: string},
 		magic: Module) {
 	local qemu = options.get("qemu.exe");
-	if (qemu is none) {
-		qemu = common.findExecutableInPaths(
-			enumerateQEmuInstallationLocations(),
-			"qemu-system-" + TARGET_ARCH);
-		if (qemu is none)
-			throw Error("Cannot locate qemu binary");
-	}
 	local qemuArgs = [];
 	qemuArgs.extend({ "-serial", "stdio" });
 	if (opt.getBool(options, opt.HOSTED, true)) {
@@ -184,6 +177,13 @@ did_update_x86_64_kernel:
 		l = l.decode("utf-8");
 		local cmd, none, arg = l.partition("=")...;
 		switch (cmd) {
+		case "qemu":
+			if (qemu.startswith('"') && qemu.endswith('"'))
+				arg = arg[1:-1].decode("c-escape");
+			qemu = arg;
+			if (fs.stat.isdir(qemu))
+				qemu = fs.joinpath(qemu, f"qemu-system-{TARGET_ARCH}");
+			break;
 		case "accel":
 			/* "-accel hax" breaks qemu's builtin GDB stub. :(
 			 * -> For now, ignore accel options if GDB is on. */
@@ -239,6 +239,13 @@ did_update_x86_64_kernel:
 		qemuArgs.append(cmdline);
 	}
 	print "qemu:", repr qemuArgs;
+	if (qemu is none) {
+		qemu = common.findExecutableInPaths(
+			enumerateQEmuInstallationLocations(),
+			f"qemu-system-{TARGET_ARCH}");
+		if (qemu is none)
+			throw Error("Cannot locate qemu binary");
+	}
 	local proc = ipc.Process(qemu, qemuArgs);
 	local r, w = ipc.Pipe.new()...;
 	proc.stdout = w;
