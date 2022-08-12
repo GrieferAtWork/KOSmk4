@@ -208,6 +208,7 @@
 	.fs.* .fs                         # All other filesystem functions
 	.sched.resource                   # Resource limit functions
 	.sched.msg                        # <sys/msg.h>
+	.string.nopf                      # No page-fault functions
 	.string.encrypt                   # String encryption
 	.string.match                     # String matching functions
 	.string.argz   .string.envz       # <argz.h> and <envz.h>
@@ -234,6 +235,7 @@
 ]]]*/
 #define CRT_SECTIONS_LINKORDER(CB, PREFIX) \
 	CB(PREFIX.math.math) \
+	CB(PREFIX.string.nopf) \
 	CB(PREFIX.crt.application.init) \
 	CB(PREFIX.crt.errno_access.core) \
 	CB(PREFIX.crt.errno_access) \
@@ -345,6 +347,7 @@
 	CB(PREFIX.crt.fs.environ.heap PREFIX.crt.fs.exec.posix_spawn PREFIX.crt.fs.exec.spawn PREFIX.crt.fs.exec.system PREFIX.crt.fs.fts PREFIX.crt.fs.ftw PREFIX.crt.fs.statfs.statfs PREFIX.crt.fs.statfs.statvfs) \
 	CB(PREFIX.crt.sched.resource) \
 	CB(PREFIX.crt.sched.msg) \
+	CB(PREFIX.crt.string.nopf) \
 	CB(PREFIX.crt.string.encrypt) \
 	CB(PREFIX.crt.string.match) \
 	CB(PREFIX.crt.string.argz PREFIX.crt.string.envz) \

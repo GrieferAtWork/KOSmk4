@@ -191,6 +191,7 @@ do_service_directly:
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL cpu_private_function_do_finibuf_ex)(void *used_buf) {
 #ifdef CONFIG_NO_SMP
+	(void)used_buf;
 	kernel_panic("Should not get here without SMP");
 #else /* CONFIG_NO_SMP */
 	struct cpf_rtdata *rt;

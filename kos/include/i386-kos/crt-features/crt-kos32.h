@@ -4320,6 +4320,7 @@
 #define __CRT_HAVE_readlink
 #define __CRT_HAVE_readlinkat
 #define __CRT_HAVE_readpassphrase
+#define __CRT_HAVE_readq_nopf
 #define __CRT_HAVE_readv
 #define __CRT_HAVE_realloc
 #define __CRT_HAVE_realloc_in_place
@@ -6362,6 +6363,7 @@
 #define __CRT_HAVE_write_printer
 #define __CRT_HAVE_writeall
 #define __CRT_HAVE_writeargv
+#define __CRT_HAVE_writeq_nopf
 #define __CRT_HAVE_writev
 #define __CRT_HAVE_wrmdir
 #define __CRT_HAVE_wscanf

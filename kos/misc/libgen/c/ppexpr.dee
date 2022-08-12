@@ -345,6 +345,11 @@ again:
 
 class PPBranch {
 	this = default;
+//	this(typ: int, data: Object) {
+//		this.typ = typ;
+//		this.data = data;
+//		assert data !is bool;
+//	}
 
 	@@Branch type (one of `BRT_*`)
 	public member typ: int;
@@ -822,10 +827,10 @@ have_non_boolean_in_brt_all:
 				if (e.typ == BRT_CONST) {
 					/* Merge constant addends */
 					local opfun = typ == BRT_PROD
-						? operator *
-						: typ == BRT_BITAND
-						? operator &
-						: (a, b) -> a && b;
+							? operator *
+							: typ == BRT_BITAND
+									? operator &
+									: (a, b) -> (a && b) ? 1 : 0;
 					local nonConstants: {PPBranch...} = [];
 					local constantsProd: int = 1;
 					for (local e: data) {
@@ -835,7 +840,6 @@ have_non_boolean_in_brt_all:
 							nonConstants.append(e);
 						}
 					}
-					constantsProd = int(constantsProd);
 					if (!nonConstants)
 						return PPBranch(BRT_CONST, constantsProd);
 					if (constantsProd == 0)
@@ -938,10 +942,10 @@ have_non_boolean_in_brt_any:
 				if (e.typ == BRT_CONST) {
 					/* Merge constant addends */
 					local opfun = typ == BRT_SUM
-						? operator +
-						: typ == BRT_BITOR
-						? operator |
-						: (a, b) -> a || b;
+							? operator +
+							: typ == BRT_BITOR
+									? operator |
+									: (a, b) -> (a || b) ? 1 : 0;
 					local nonConstants: {PPBranch...} = [];
 					local constantsSum: int = 0;
 					for (local e: data) {
@@ -951,7 +955,6 @@ have_non_boolean_in_brt_any:
 							nonConstants.append(e);
 						}
 					}
-					constantsSum = int(constantsSum);
 					if (!nonConstants)
 						return PPBranch(BRT_CONST, constantsSum);
 					if (constantsSum == 0) {

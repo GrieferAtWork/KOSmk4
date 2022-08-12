@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_HYBRID_ARCH_I386_MEMCPY_NOPF_H
-#define GUARD_LIBC_HYBRID_ARCH_I386_MEMCPY_NOPF_H 1
+#ifndef GUARD_LIBC_HYBRID_ARCH_I386_NOPF_H
+#define GUARD_LIBC_HYBRID_ARCH_I386_NOPF_H 1
 
 #include <hybrid/compiler.h>
 
@@ -52,4 +52,4 @@ DECL_END
 #endif /* __CC__ */
 
 
-#endif /* !GUARD_LIBC_HYBRID_ARCH_I386_MEMCPY_NOPF_H */
+#endif /* !GUARD_LIBC_HYBRID_ARCH_I386_NOPF_H */

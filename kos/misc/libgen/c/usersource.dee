@@ -424,12 +424,21 @@ again_find_nextPresentFunction:
 			}
 			local isFirst = true;
 			/* Deal with intern-alias bindings (*ugh* UGLY!!) */
+			local extraNotCond = none;
 			for (local b: bindings[:-1]) {
-				assert b.functionBinding !is FunctionImplementation;
-				local ppCond = ppexpr.ppParse(
-					escapeText(b.ppCond, ESCAPE_MODE_NONE))
-						.optimize(asBool: true, assume: ppAssume)
-						.tostr();
+				local bindingItem = b.functionBinding;
+				assert bindingItem !is FunctionImplementation;
+				if (bindingItem is MacroBinding) {
+					extraNotCond = b.ppCond;
+					continue;
+				}
+				local ppCond = ppexpr.ppParse(escapeText(
+						extraNotCond is none
+								? b.ppCond
+								: f"(!({extraNotCond}))&&({b.ppCond})",
+						ESCAPE_MODE_NONE
+				)).optimize(asBool: true, assume: ppAssume).tostr();
+				extraNotCond = none;
 				if (isFirst) {
 					if (ppCond.startswith("defined(") && ppCond.endswith(")") &&
 					    ppCond.findmatch("(", ")", 8) == #ppCond - 1) {
@@ -444,7 +453,7 @@ again_find_nextPresentFunction:
 					headFp << "#elif " << ppCond;
 				}
 				headFp << "\nDEFINE_INTERN_ALIAS(" << func.name << ", "
-					<< str(b.functionBinding) << ");\n";
+					<< str(bindingItem) << ");\n";
 				isFirst = false;
 			}
 			if (!isFirst)

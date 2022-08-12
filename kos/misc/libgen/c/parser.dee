@@ -69,7 +69,7 @@ class UserString {
 	}
 
 	public operator repr(): string {
-		return repr text;
+		return f"UserString({repr text})";
 	}
 
 	public operator contains(other: string): bool {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf7e6de14 */
+/* HASH CRC-32:0x45ea5d8c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -677,6 +677,42 @@ DFUN(".text.crt.dos.io.access", libd_dosfs_setenabled, libc_dosfs_setenabled, TD
 
 /* kos.guid */
 DFUN(".text.crt.dos.sched.rpc", libd_guid_fromstr, libc_guid_fromstr, TP, 2, TP, TP)
+
+/* kos.nopf */
+#include <kos/bits/nopf.h>
+#ifndef __arch_readb_nopf
+DFUN(".text.crt.string.nopf", libd_readb_nopf, libc_readb_nopf, TD, 2, TP, TP)
+#endif /* !__arch_readb_nopf */
+#ifndef __arch_readw_nopf
+DFUN(".text.crt.string.nopf", libd_readw_nopf, libc_readw_nopf, TD, 2, TP, TP)
+#endif /* !__arch_readw_nopf */
+#ifndef __arch_readl_nopf
+DFUN(".text.crt.string.nopf", libd_readl_nopf, libc_readl_nopf, TD, 2, TP, TP)
+#endif /* !__arch_readl_nopf */
+#ifndef __arch_readq_nopf
+DFUN(".text.crt.string.nopf", libd_readq_nopf, libc_readq_nopf, TD, 2, TP, TP)
+#endif /* !__arch_readq_nopf */
+#ifndef __arch_writeb_nopf
+DFUN(".text.crt.string.nopf", libd_writeb_nopf, libc_writeb_nopf, TD, 2, TP, TI8)
+#endif /* !__arch_writeb_nopf */
+#ifndef __arch_writew_nopf
+DFUN(".text.crt.string.nopf", libd_writew_nopf, libc_writew_nopf, TD, 2, TP, TI16)
+#endif /* !__arch_writew_nopf */
+#ifndef __arch_writel_nopf
+DFUN(".text.crt.string.nopf", libd_writel_nopf, libc_writel_nopf, TD, 2, TP, TI32)
+#endif /* !__arch_writel_nopf */
+#ifndef __arch_writeq_nopf
+DFUN(".text.crt.string.nopf", libd_writeq_nopf, libc_writeq_nopf, TD, 2, TP, TI64)
+#endif /* !__arch_writeq_nopf */
+#ifndef __arch_memcpy_nopf
+DFUN(".text.crt.string.nopf", libd_memcpy_nopf, libc_memcpy_nopf, TI, 3, TP, TP, TI)
+#endif /* !__arch_memcpy_nopf */
+#ifndef __arch_memset_nopf
+DFUN(".text.crt.string.nopf", libd_memset_nopf, libc_memset_nopf, TI, 3, TP, TD, TI)
+#endif /* !__arch_memset_nopf */
+#ifndef __arch_nopf_memeq
+DFUN(".text.crt.string.nopf", libd_memeq_nopf, libc_memeq_nopf, TI, 3, TP, TP, TI)
+#endif /* !__arch_nopf_memeq */
 
 /* kos.rpc */
 DFUN(".text.crt.dos.sched.rpc", libd_rpc_schedule, libc_rpc_schedule, TD, 5, TIn(__SIZEOF_PID_T__), TD, TP, TP, TI)

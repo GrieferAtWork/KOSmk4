@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_HYBRID_ARCH_I386_MEMCPY_NOPF_S
-#define GUARD_LIBC_HYBRID_ARCH_I386_MEMCPY_NOPF_S 1
+#ifndef GUARD_LIBC_HYBRID_ARCH_I386_NOPF_S
+#define GUARD_LIBC_HYBRID_ARCH_I386_NOPF_S 1
 #define __ASSEMBLER__ 1
 
 #include <hybrid/compiler.h>
@@ -32,7 +32,7 @@
 #define KERNEL_cld /* nothing */
 #endif /* !__KERNEL__ */
 
-.section .text
+.section .text.string.nopf
 .cfi_startproc
 INTERN_LABEL(libc_x86_nopf_begin):
 
@@ -512,4 +512,4 @@ DEFINE_PUBLIC_ALIAS(x86_nopf_lock_xorq_rax_Pcx, libc_x86_nopf_lock_xorq_rax_Pcx)
 #endif /* __x86_64__ */
 
 
-#endif /* !GUARD_LIBC_HYBRID_ARCH_I386_MEMCPY_NOPF_S */
+#endif /* !GUARD_LIBC_HYBRID_ARCH_I386_NOPF_S */

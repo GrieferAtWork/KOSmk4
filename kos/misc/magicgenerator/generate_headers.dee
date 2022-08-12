@@ -580,7 +580,7 @@ function doPrint_src_libc_crtFeatures(fp: File) {
 				} else {
 					continue; /* Shouldn't happen... */
 				}
-				local newCond = part.ppCond;
+				local newCond = part.isImplementedPpCond;
 				if (newCond == "0")
 					continue; /* Shouldn't happen... */
 				if (!crtFeatureConditions.setnew(effectiveAsmName, newCond)) {
@@ -632,7 +632,7 @@ function doPrint_include_crtFeatures_crtKosKernel(fp: File) {
 		for (local part: header.order_libcAutoHeader) {
 			if (part !is LibraryFunction)
 				continue;
-			local partPpCond = str(part.ppCond);
+			local partPpCond = str(part.isImplementedPpCond);
 			if (NOT_DEFINED_KERNEL in partPpCond)
 				continue;
 			if (partPpCond == "0")
@@ -966,6 +966,8 @@ function doPrint_src_libc_libc_dosabiFunctions(fp: File) {
 							cWriter << typ.requireTypeClass;
 						}
 						cWriter << ")\n";
+					} else if (bind is MacroBinding) {
+						/* Not bound here! */
 					} else {
 						cWriter << "DEFINE_INTERN_ALIAS("
 							<< part.name << ", "
@@ -1241,25 +1243,14 @@ try {
 	}
 
 //	waitTasks();
-//	local f = allFunctionsByName["format_8to16"];
-//	local fp =  CWriter(File.stdout, ppAssume:  ppAssumeHeaderFiles);
-//	f.cprintHeaderDeclaration(fp, ESCAPE_MODE_PART, printDoc: false);
+//	local    f    =   allLibraryFunctionsByName["libc_memeq_nopf"];
+//	local fp = CWriter(File.stdout, ppAssume: ppAssumeHeaderFiles);
+//	for (local b: f.bindings)
+//		print repr b;
+//	print repr f.implementationPpCond;
 //	fp << "\n\n";
-//	for (local bind: f.functionBindings) {
-//		fp << "BIND: ppCond: " << repr bind.ppCond << "\n";
-//	}
-//	fp.flush();
-//	fp << "\n\n";
-//	local f = allFunctionsByName["format_8to32"];
-//	local fp =  CWriter(File.stdout, ppAssume:  ppAssumeHeaderFiles);
-//	f.cprintHeaderDeclaration(fp, ESCAPE_MODE_PART, printDoc: false);
-//	fp << "\n\n";
-//	for (local bind: f.functionBindings) {
-//		fp << "BIND: ppCond: " << repr bind.ppCond << "\n";
-//	}
 //	fp.flush();
 //	return;
-
 
 	/* Scan libc source files for additional section names. */
 	startTask(scanFileForSectionNames, ("src/libc/api.h",));

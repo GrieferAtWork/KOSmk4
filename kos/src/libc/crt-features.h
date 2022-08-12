@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1ffb3d6 */
+/* HASH CRC-32:0xa6e0ba15 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2281,6 +2281,12 @@
 #define __CRT_HAVE_DOS$memcmpq
 #define __CRT_HAVE_DOS$memcmpw
 #define __CRT_HAVE_DOS$memcpy
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#include <kos/bits/nopf.h>
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && !defined(__arch_memcpy_nopf)
+#define __CRT_HAVE_DOS$memcpy_nopf
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && !__arch_memcpy_nopf */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$memcpy_s
 #define __CRT_HAVE_DOS$memcpyc
 #define __CRT_HAVE_DOS$memcpyl
@@ -2291,6 +2297,11 @@
 #define __CRT_HAVE_DOS$memendl
 #define __CRT_HAVE_DOS$memendq
 #define __CRT_HAVE_DOS$memendw
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && !defined(__arch_nopf_memeq)
+#define __CRT_HAVE_DOS$memeq_nopf
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && !__arch_nopf_memeq */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$memfd_create
 #define __CRT_HAVE_DOS$memfrob
 #define __CRT_HAVE_DOS$memlen
@@ -2371,6 +2382,11 @@
 #define __CRT_HAVE_DOS$memrxlenq
 #define __CRT_HAVE_DOS$memrxlenw
 #define __CRT_HAVE_DOS$memset
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && !defined(__arch_memset_nopf)
+#define __CRT_HAVE_DOS$memset_nopf
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && !__arch_memset_nopf */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$memsetl
 #define __CRT_HAVE_DOS$memsetq
 #define __CRT_HAVE_DOS$memsetw
@@ -2907,18 +2923,36 @@
 #define __CRT_HAVE_DOS$read
 #define __CRT_HAVE_DOS$readahead
 #define __CRT_HAVE_DOS$readall
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && !defined(__arch_readb_nopf)
+#define __CRT_HAVE_DOS$readb_nopf
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && !__arch_readb_nopf */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$readdirk
 #define __CRT_HAVE_DOS$readdirk64
 #define __CRT_HAVE_DOS$readdirk64_r
 #define __CRT_HAVE_DOS$readdirk_r
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && !defined(__arch_readl_nopf)
+#define __CRT_HAVE_DOS$readl_nopf
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && !__arch_readl_nopf */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$readlink
 #define __CRT_HAVE_DOS$readlinkat
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$readpassphrase
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && !defined(__arch_readq_nopf)
+#define __CRT_HAVE_DOS$readq_nopf
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && !__arch_readq_nopf */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$readv
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && !defined(__arch_readw_nopf)
+#define __CRT_HAVE_DOS$readw_nopf
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && !__arch_readw_nopf */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$realloc
 #define __CRT_HAVE_DOS$realloc_in_place
 #define __CRT_HAVE_DOS$reallocarray
@@ -3973,8 +4007,22 @@
 #define __CRT_HAVE_DOS$write
 #define __CRT_HAVE_DOS$writeall
 #define __CRT_HAVE_DOS$writeargv
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && !defined(__arch_writeb_nopf)
+#define __CRT_HAVE_DOS$writeb_nopf
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && !__arch_writeb_nopf */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && !defined(__arch_writel_nopf)
+#define __CRT_HAVE_DOS$writel_nopf
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && !__arch_writel_nopf */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && !defined(__arch_writeq_nopf)
+#define __CRT_HAVE_DOS$writeq_nopf
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && !__arch_writeq_nopf */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$writev
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && !defined(__arch_writew_nopf)
+#define __CRT_HAVE_DOS$writew_nopf
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && !__arch_writew_nopf */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$wrmdir
 #define __CRT_HAVE_DOS$wscanf
@@ -6526,6 +6574,9 @@
 #define __CRT_HAVE_memcmpq
 #define __CRT_HAVE_memcmpw
 #define __CRT_HAVE_memcpy
+#ifndef __arch_memcpy_nopf
+#define __CRT_HAVE_memcpy_nopf
+#endif /* !__arch_memcpy_nopf */
 #ifndef __KERNEL__
 #define __CRT_HAVE_memcpy_s
 #define __CRT_HAVE_memcpyc
@@ -6540,6 +6591,9 @@
 #define __CRT_HAVE_memendl
 #define __CRT_HAVE_memendq
 #define __CRT_HAVE_memendw
+#ifndef __arch_nopf_memeq
+#define __CRT_HAVE_memeq_nopf
+#endif /* !__arch_nopf_memeq */
 #ifndef __KERNEL__
 #define __CRT_HAVE_memfd_create
 #define __CRT_HAVE_memfrob
@@ -6642,6 +6696,9 @@
 #define __CRT_HAVE_memrxlenw
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_memset
+#ifndef __arch_memset_nopf
+#define __CRT_HAVE_memset_nopf
+#endif /* !__arch_memset_nopf */
 #define __CRT_HAVE_memsetl
 #define __CRT_HAVE_memsetq
 #define __CRT_HAVE_memsetw
@@ -7166,14 +7223,34 @@
 #define __CRT_HAVE_read
 #define __CRT_HAVE_readahead
 #define __CRT_HAVE_readall
+#endif /* !__KERNEL__ */
+#ifndef __arch_readb_nopf
+#define __CRT_HAVE_readb_nopf
+#endif /* !__arch_readb_nopf */
+#ifndef __KERNEL__
 #define __CRT_HAVE_readdirk
 #define __CRT_HAVE_readdirk64
 #define __CRT_HAVE_readdirk64_r
 #define __CRT_HAVE_readdirk_r
+#endif /* !__KERNEL__ */
+#ifndef __arch_readl_nopf
+#define __CRT_HAVE_readl_nopf
+#endif /* !__arch_readl_nopf */
+#ifndef __KERNEL__
 #define __CRT_HAVE_readlink
 #define __CRT_HAVE_readlinkat
 #define __CRT_HAVE_readpassphrase
+#endif /* !__KERNEL__ */
+#ifndef __arch_readq_nopf
+#define __CRT_HAVE_readq_nopf
+#endif /* !__arch_readq_nopf */
+#ifndef __KERNEL__
 #define __CRT_HAVE_readv
+#endif /* !__KERNEL__ */
+#ifndef __arch_readw_nopf
+#define __CRT_HAVE_readw_nopf
+#endif /* !__arch_readw_nopf */
+#ifndef __KERNEL__
 #define __CRT_HAVE_realloc
 #define __CRT_HAVE_realloc_in_place
 #define __CRT_HAVE_reallocarray
@@ -8327,7 +8404,23 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE_writeall
 #define __CRT_HAVE_writeargv
+#endif /* !__KERNEL__ */
+#ifndef __arch_writeb_nopf
+#define __CRT_HAVE_writeb_nopf
+#endif /* !__arch_writeb_nopf */
+#ifndef __arch_writel_nopf
+#define __CRT_HAVE_writel_nopf
+#endif /* !__arch_writel_nopf */
+#ifndef __arch_writeq_nopf
+#define __CRT_HAVE_writeq_nopf
+#endif /* !__arch_writeq_nopf */
+#ifndef __KERNEL__
 #define __CRT_HAVE_writev
+#endif /* !__KERNEL__ */
+#ifndef __arch_writew_nopf
+#define __CRT_HAVE_writew_nopf
+#endif /* !__arch_writew_nopf */
+#ifndef __KERNEL__
 #define __CRT_HAVE_wrmdir
 #define __CRT_HAVE_wscanf
 #define __CRT_HAVE_wscanf_s

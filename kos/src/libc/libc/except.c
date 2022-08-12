@@ -62,7 +62,7 @@
 #if defined(__i386__) || defined(__x86_64__)
 #include <kos/bits/thread.h>
 
-#include "../hybrid/arch/i386/memcpy_nopf.h"
+#include "../hybrid/arch/i386/nopf.h"
 #endif /* __i386__ || __x86_64__ */
 
 DECL_BEGIN

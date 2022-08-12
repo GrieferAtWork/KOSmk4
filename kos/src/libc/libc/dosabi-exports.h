@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f3a9c3d */
+/* HASH CRC-32:0x8d0397f5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -558,6 +558,42 @@ DEFINE_PUBLIC_ALIAS(DOS$dosfs_setenabled, libd_dosfs_setenabled);
 
 /* kos.guid */
 DEFINE_PUBLIC_ALIAS(DOS$guid_fromstr, libd_guid_fromstr);
+
+/* kos.nopf */
+#include <kos/bits/nopf.h>
+#ifndef __arch_readb_nopf
+DEFINE_PUBLIC_ALIAS(DOS$readb_nopf, libd_readb_nopf);
+#endif /* !__arch_readb_nopf */
+#ifndef __arch_readw_nopf
+DEFINE_PUBLIC_ALIAS(DOS$readw_nopf, libd_readw_nopf);
+#endif /* !__arch_readw_nopf */
+#ifndef __arch_readl_nopf
+DEFINE_PUBLIC_ALIAS(DOS$readl_nopf, libd_readl_nopf);
+#endif /* !__arch_readl_nopf */
+#ifndef __arch_readq_nopf
+DEFINE_PUBLIC_ALIAS(DOS$readq_nopf, libd_readq_nopf);
+#endif /* !__arch_readq_nopf */
+#ifndef __arch_writeb_nopf
+DEFINE_PUBLIC_ALIAS(DOS$writeb_nopf, libd_writeb_nopf);
+#endif /* !__arch_writeb_nopf */
+#ifndef __arch_writew_nopf
+DEFINE_PUBLIC_ALIAS(DOS$writew_nopf, libd_writew_nopf);
+#endif /* !__arch_writew_nopf */
+#ifndef __arch_writel_nopf
+DEFINE_PUBLIC_ALIAS(DOS$writel_nopf, libd_writel_nopf);
+#endif /* !__arch_writel_nopf */
+#ifndef __arch_writeq_nopf
+DEFINE_PUBLIC_ALIAS(DOS$writeq_nopf, libd_writeq_nopf);
+#endif /* !__arch_writeq_nopf */
+#ifndef __arch_memcpy_nopf
+DEFINE_PUBLIC_ALIAS(DOS$memcpy_nopf, libd_memcpy_nopf);
+#endif /* !__arch_memcpy_nopf */
+#ifndef __arch_memset_nopf
+DEFINE_PUBLIC_ALIAS(DOS$memset_nopf, libd_memset_nopf);
+#endif /* !__arch_memset_nopf */
+#ifndef __arch_nopf_memeq
+DEFINE_PUBLIC_ALIAS(DOS$memeq_nopf, libd_memeq_nopf);
+#endif /* !__arch_nopf_memeq */
 
 /* kos.rpc */
 DEFINE_PUBLIC_ALIAS(DOS$rpc_schedule, libd_rpc_schedule);

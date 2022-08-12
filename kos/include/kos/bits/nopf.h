@@ -20,8 +20,6 @@
 #ifndef _KOS_BITS_NOPF_H
 #define _KOS_BITS_NOPF_H 1
 
-#include <__stdinc.h>
-
 /* To-be  overwritten by architectures to define arch-specific
  * handling of *_nopf memory accesses. For an example of this,
  * see <i386-kos/kos/bits/nopf.h> */

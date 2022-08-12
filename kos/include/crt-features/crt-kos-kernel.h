@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd16f423d */
+/* HASH CRC-32:0x73928d0e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -94,6 +94,10 @@
 #define __CRT_HAVE_memcmpq
 #define __CRT_HAVE_memcmpw
 #define __CRT_HAVE_memcpy
+#include <kos/bits/nopf.h>
+#ifndef __arch_memcpy_nopf
+#define __CRT_HAVE_memcpy_nopf
+#endif /* !__arch_memcpy_nopf */
 #define __CRT_HAVE_memcpyl
 #define __CRT_HAVE_memcpyq
 #define __CRT_HAVE_memcpyw
@@ -101,6 +105,9 @@
 #define __CRT_HAVE_memendl
 #define __CRT_HAVE_memendq
 #define __CRT_HAVE_memendw
+#ifndef __arch_nopf_memeq
+#define __CRT_HAVE_memeq_nopf
+#endif /* !__arch_nopf_memeq */
 #define __CRT_HAVE_memlen
 #define __CRT_HAVE_memlenl
 #define __CRT_HAVE_memlenq
@@ -153,6 +160,9 @@
 #define __CRT_HAVE_memrlenq
 #define __CRT_HAVE_memrlenw
 #define __CRT_HAVE_memset
+#ifndef __arch_memset_nopf
+#define __CRT_HAVE_memset_nopf
+#endif /* !__arch_memset_nopf */
 #define __CRT_HAVE_memsetl
 #define __CRT_HAVE_memsetq
 #define __CRT_HAVE_memsetw
@@ -179,6 +189,18 @@
 #define __CRT_HAVE_rawmemrlenl
 #define __CRT_HAVE_rawmemrlenq
 #define __CRT_HAVE_rawmemrlenw
+#ifndef __arch_readb_nopf
+#define __CRT_HAVE_readb_nopf
+#endif /* !__arch_readb_nopf */
+#ifndef __arch_readl_nopf
+#define __CRT_HAVE_readl_nopf
+#endif /* !__arch_readl_nopf */
+#ifndef __arch_readq_nopf
+#define __CRT_HAVE_readq_nopf
+#endif /* !__arch_readq_nopf */
+#ifndef __arch_readw_nopf
+#define __CRT_HAVE_readw_nopf
+#endif /* !__arch_readw_nopf */
 #define __CRT_HAVE_shared_lock_acquire
 #define __CRT_HAVE_shared_lock_acquire_nx
 #define __CRT_HAVE_shared_lock_acquire_with_timeout
@@ -285,3 +307,15 @@
 #define __CRT_HAVE_vsnprintf
 #define __CRT_HAVE_vsprintf
 #define __CRT_HAVE_vsscanf
+#ifndef __arch_writeb_nopf
+#define __CRT_HAVE_writeb_nopf
+#endif /* !__arch_writeb_nopf */
+#ifndef __arch_writel_nopf
+#define __CRT_HAVE_writel_nopf
+#endif /* !__arch_writel_nopf */
+#ifndef __arch_writeq_nopf
+#define __CRT_HAVE_writeq_nopf
+#endif /* !__arch_writeq_nopf */
+#ifndef __arch_writew_nopf
+#define __CRT_HAVE_writew_nopf
+#endif /* !__arch_writew_nopf */

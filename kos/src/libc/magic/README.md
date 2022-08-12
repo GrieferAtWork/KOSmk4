@@ -340,6 +340,8 @@ Note on bindings:
 | `[preferred_alias(ASMNAME)]`                     | Same as: `[if(defined(__CRT_HAVE_{ASMNAME})), preferred_raw_alias(ASMNAME)]` |
 | `[raw_alias(ASMNAME)]`                           | Link against `ASMNAME` in headers (tertiary binding) |
 | `[preferred_raw_alias(ASMNAME)]`                 | Link against `ASMNAME` in headers (primary binding) |
+| `[bind_macro(BODY)]`                             | Define as a macro with body `BODY` in headers (tertiary binding) |
+| `[preferred_bind_macro(BODY)]`                   | Define as a macro with body `BODY` in headers (primary binding) |
 | `[bind_local_function(NAME)]`                    | Link against the local implementation of function `NAME` (tertiary binding) |
 | `[preferred_bind_local_function(NAME)]`          | Link against the local implementation of function `NAME` (primary binding) |
 | `[fastbind]`                                     | Same as `[fastbind(<functionName>)]` |
