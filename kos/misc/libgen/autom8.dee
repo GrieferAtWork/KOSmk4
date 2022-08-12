@@ -55,8 +55,12 @@ global Autom8Parser;
 @@thus causing text to flow to the left.
 global OPT_UNDO_REFLOW = false;
 
-function builtinReflowOff(parser: Autom8Parser, none) { parser.commentReflowEnabled = false; }
-function builtinReflowOn(parser: Autom8Parser, none) { parser.commentReflowEnabled = true; }
+function builtinReflowOff(parser: Autom8Parser, none) {
+	parser.commentReflowEnabled = false;
+}
+function builtinReflowOn(parser: Autom8Parser, none) {
+	parser.commentReflowEnabled = true;
+}
 function builtinSkip2End(parser: Autom8Parser, none) {
 	local endTag = parser.text.find("/*[[[end]]]*/", parser.commentEnd);
 	local endTag2 = parser.text.find("//[[[end]]]\n", parser.commentEnd);
@@ -1079,6 +1083,7 @@ function autom8File(filename: string, beforeWriteHook: Callable = none, quiet: b
 	return false;
 }
 
+@@File extensions that should get hashed by autom8
 global final SHOULD_FORMAT_FILE_EXTENSIONS: {string...} = HashSet.Frozen({
 	"h", "hh", "c", "inl", "dee", "sh", "S", "def", "ld", "sources"
 });

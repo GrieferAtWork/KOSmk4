@@ -79,6 +79,7 @@ DECL_BEGIN
 #define DBG_HOOKFLAG_RELATIVE 0x01 /* Pointers to other components defined in this hook are
                                     * relative to the base-address (i.e. `drv_loadaddr') of
                                     * the module containing the hook. */
+#define DBG_HOOKFLAG_OFFSET   0x02 /* Pointers to other components defined in this hook are self-relative. */
 #define DBG_HOOKFLAG_SPECIFIC 0xf0 /* Mask  of  flags who's  meaning depends  on `dh_type'
                                     * If not specified otherwise, undefined bits masked by
                                     * this must be set to 0 */
@@ -116,13 +117,21 @@ DECL_BEGIN
 #endif /* __SIZEOF_POINTER__ > 4 */
 
 #ifdef BUILDING_KERNEL_CORE
-#define _DBG_HOOK_ASMWORD_RELPTR .wordptr
+#define _DBG_HOOK_ASMWORD_RELPTR                .wordptr
 #define _DBG_HOOK_ASMWORD_RELPTRO(base, offset) .wordptr base + offset
-#define _DBG_HOOK_ASMWORD_FLAGS  0
+#define _DBG_HOOK_ASMWORD_FLAGS                 0
 #else /* BUILDING_KERNEL_CORE */
-#define _DBG_HOOK_ASMWORD_RELPTR .wordrel
+#ifdef __ARCH_HAVE_wordrel
+#define _DBG_HOOK_ASMWORD_RELPTR                .wordrel
 #define _DBG_HOOK_ASMWORD_RELPTRO(base, offset) .wordrel base, offset
-#define _DBG_HOOK_ASMWORD_FLAGS  DBG_HOOKFLAG_RELATIVE
+#define _DBG_HOOK_ASMWORD_FLAGS                 DBG_HOOKFLAG_RELATIVE
+#elif defined(__ARCH_HAVE_wordoff)
+#define _DBG_HOOK_ASMWORD_RELPTR                .wordoff
+#define _DBG_HOOK_ASMWORD_RELPTRO(base, offset) .wordoff base, offset
+#define _DBG_HOOK_ASMWORD_FLAGS                 DBG_HOOKFLAG_OFFSET
+#else /* ... */
+#error "No way to implement `_DBG_HOOK_ASMWORD_RELPTR'"
+#endif /* !... */
 #endif /* !BUILDING_KERNEL_CORE */
 
 

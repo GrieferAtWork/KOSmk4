@@ -19,7 +19,7 @@
  */
 import * from deemon;
 
-@@Deemon re-implementation of the KOS @fdirent_hash() function
+@@Deemon re-implementation of the KOS `fdirent_hash()' function
 class fdirent_hash {
 	this = default;
 	public member text: string;

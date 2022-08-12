@@ -21,7 +21,7 @@ import fs;
 import util;
 import * from deemon;
 
-final global USE_SWITCH_THRESHOLD = 6;
+global final USE_SWITCH_THRESHOLD = 6;
 
 function normalizeData(
 		data: string | (string,) | (string, string | none)): (string,string) {

@@ -313,6 +313,7 @@ NOTHROW_NCX(LIBCCALL wxparser_insert_command)(struct wxparser *__restrict self,
 		shexec_fixedlength(cmdline, cmdline_len);
 		_Exit(127);
 	}
+
 	/* In parent */
 	close(pipes[1]);
 	keep_characters = self->wxp_wordlen;

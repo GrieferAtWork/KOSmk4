@@ -34,7 +34,6 @@
 #include <sched/sig.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
-#include <sched/x86/smp.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/sched/preemption.h>
@@ -312,6 +311,5 @@ DECL_END
 #define DEFINE_task_wake_as
 #include "ipi-task-wake.c.inl"
 #endif /* !__INTELLISENSE__ */
-
 
 #endif /* !GUARD_KERNEL_SRC_SCHED_IPI_C */

@@ -87,10 +87,10 @@ class RbNode: WeakRefAble {
 #define RBTREE_XISRED(node) RBTREE_ISRED(node)
 #define RBTREE_REPPAR(self, oldv, newv) RBTREE_SETPAR(self, newv)
 
-#define RBTREE(name) name
-#define RBTREE_T     RbNode
-#define RBTREE_Tkey  Object
-#define RBTREE_NULL  none
+#define RBTREE(name)                          name
+#define RBTREE_T                              RbNode
+#define RBTREE_Tkey                           Object
+#define RBTREE_NULL                           none
 #define RBTREE_ASSERT(expr)                   assert(expr)
 #define _RBTREE_ASSERTF2(expr, message)       assert(expr, message)
 #define _RBTREE_ASSERTF3(expr, message, a)    assert(expr, (message) % (a,))
@@ -110,10 +110,10 @@ class RbNode: WeakRefAble {
 #define RBTREE_TRUE  true
 #define RBTREE_FALSE false
 
-#define RBTREE_NODE_EQ(a, b)      ((a) === (b))
-#define RBTREE_NODE_NE(a, b)      ((a) !== (b))
-#define RBTREE_NODE_ISNULL(x)     ((x) is none)
-#define RBTREE_NODE_NOT_ISNULL(x) ((x) !is none)
+#define RBTREE_NODE_EQ(a, b)       ((a) === (b))
+#define RBTREE_NODE_NE(a, b)       ((a) !== (b))
+#define RBTREE_NODE_ISNULL(x)      ((x) is none)
+#define RBTREE_NODE_NOT_ISNULL(x)  ((x) !is none)
 #define RBTREE_LOCVAR(T, name)     local name
 #define RBTREE_PROOT_GET(proot)    ((proot).value)
 #define RBTREE_PROOT_SET(proot, v) ((proot).value = (v))

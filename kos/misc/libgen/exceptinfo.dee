@@ -131,8 +131,8 @@ class ExceptClass: WeakRefAble {
 					local baseName = baseClass.name;
 					local commonTextLength = 0;
 					while (commonTextLength < #baseName &&
-						   commonTextLength < #usedName &&
-						   baseName[commonTextLength] == usedName[commonTextLength])
+					       commonTextLength < #usedName &&
+					       baseName[commonTextLength] == usedName[commonTextLength])
 						++commonTextLength;
 					usedName = usedName[commonTextLength:];
 				}
@@ -157,7 +157,7 @@ class ExceptClass: WeakRefAble {
 			if (_exceptionDataStructName !is bound) {
 				_exceptionDataStructName = baseClass !is none
 					? baseClass.exceptionDataStructName
-					: f"exception_{name.lower().lsstrip('e_')}_data";
+					: f"exception_{name.lower().lsstrip("e_")}_data";
 			}
 			return _exceptionDataStructName;
 		}
@@ -247,8 +247,7 @@ yes:
 	@@Print  the  errno  expression.   The  given  @cbField  is   called
 	@@to print $fieldName references, where the argument is @"fieldName"
 	public function printErrnoExpr(
-			fp: File, cbField: Callable with string = none)
-			: File {
+			fp: File, cbField: Callable with string = none): File {
 		if (cbField is none) {
 			cbField = (name: string): string -> {
 				fp << "except_data()->e_args." << findFieldByName(name)[0];
@@ -1073,6 +1072,7 @@ function getExceptionCodeMappings(
 		}
 		errorSubClassToName[errorSubClass] = cls;
 	}
+
 	/* Step #1: Load a codes for which arch-specific overrides exist */
 	for (local name, ppCondToCls: classes) {
 		for (local classPpCond, cls: ppCondToCls) {
@@ -1086,6 +1086,7 @@ function getExceptionCodeMappings(
 			}
 		}
 	}
+
 	/* Step #2: Fill in default codes whereever arch-specific
 	 *          overrides   didn't   define   them    already */
 	for (local name, ppCondToCls: classes) {
@@ -1105,6 +1106,7 @@ function getExceptionCodeMappings(
 			}
 		}
 	}
+
 	/* Step #3: Automatically complete missing codes from the `#if 1'-namespace. */
 	local universalMappings: {int: {int: string}} = nameMappings.get("1");
 	if (universalMappings !is none) {
@@ -1117,6 +1119,7 @@ function getExceptionCodeMappings(
 			}
 		}
 	}
+
 	/* Merge duplicate ppCond->xxx mappings */
 again_merge_dups:
 	for (local ppCond, mappings: nameMappings) {
@@ -1136,6 +1139,7 @@ again_merge_dups:
 			nameMappings[ppCond] = mappings;
 		}
 	}
+
 	/* Check  if we can get rid of nameMappings["1"]
 	 * We can do this if the ||-sum of all the other
 	 * mappings also equals "1" */
@@ -1154,6 +1158,7 @@ again_merge_dups:
 			del nameMappings["1"];
 		}
 	}
+
 	return nameMappings;
 }
 

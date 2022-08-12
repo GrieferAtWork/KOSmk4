@@ -118,7 +118,7 @@ dbg_overwrite(struct dbg_hookhdr const *__restrict self,
 
 PRIVATE ATTR_DBGTEXT ATTR_NOINLINE bool FCALL
 dbg_relocate_hookpointers(struct dbg_hookhdr const *__restrict self,
-                          uintptr_t loadaddr) {
+                          uintptr_t loadaddr, bool selfrel) {
 	bool result;
 	switch (self->dh_type) {
 
@@ -130,20 +130,28 @@ dbg_relocate_hookpointers(struct dbg_hookhdr const *__restrict self,
 		            me->dc_size > offsetafter(struct dbg_commandhook, dc_auto))
 			goto err;
 		newme.dc_type = DBG_HOOK_COMMAND;
-		newme.dc_flag = me->dc_flag & ~DBG_HOOKFLAG_RELATIVE;
+		newme.dc_flag = me->dc_flag & ~(DBG_HOOKFLAG_RELATIVE | DBG_HOOKFLAG_OFFSET);
 		newme.dc_size = me->dc_size;
 		newme.dc_name = (char *)((byte_t *)me->dc_name + loadaddr);
+		if (selfrel)
+			newme.dc_name = (char *)((uintptr_t)&me->dc_name + (uintptr_t)newme.dc_name);
 		if unlikely(!ADDR_ISKERN(newme.dc_name))
 			goto err; /* Shouldn't happen */
-		*(void **)&newme.dc_main = (char *)((byte_t *)(*(void **)&me->dc_main) + loadaddr);
+		*(void **)&newme.dc_main = (void *)((byte_t *)(*(void **)&me->dc_main) + loadaddr);
+		if (selfrel)
+			*(void **)&newme.dc_main = (void *)((uintptr_t)(*(void **)&newme.dc_main) + (uintptr_t)&me->dc_main);
 		if unlikely(!ADDR_ISKERN(*(void **)&newme.dc_main))
 			goto err; /* Shouldn't happen */
 		if (newme.dc_size >= offsetafter(struct dbg_commandhook, dc_help)) {
 			newme.dc_help = (char *)((byte_t *)me->dc_help + loadaddr);
+			if (selfrel)
+				newme.dc_help = (char *)((uintptr_t)newme.dc_help + (uintptr_t)&me->dc_help);
 			if unlikely(newme.dc_help && !ADDR_ISKERN(newme.dc_help))
 				goto err; /* Shouldn't happen */
 			if (newme.dc_size >= offsetafter(struct dbg_commandhook, dc_auto)) {
 				*(void **)&newme.dc_auto = (char *)((byte_t *)(*(void **)&me->dc_auto) + loadaddr);
+				if (selfrel)
+					*(void **)&newme.dc_auto = (void *)((uintptr_t)(*(void **)&newme.dc_auto) + (uintptr_t)&me->dc_auto);
 				if unlikely(newme.dc_auto && !ADDR_ISKERN(*(void **)&newme.dc_auto))
 					goto err; /* Shouldn't happen */
 			}
@@ -161,9 +169,11 @@ dbg_relocate_hookpointers(struct dbg_hookhdr const *__restrict self,
 		if unlikely(me->di_size != sizeof(newme))
 			goto err;
 		newme.di_type = me->di_type;
-		newme.di_flag = me->di_flag & ~DBG_HOOKFLAG_RELATIVE;
+		newme.di_flag = me->di_flag & ~(DBG_HOOKFLAG_RELATIVE | DBG_HOOKFLAG_OFFSET);
 		newme.di_size = sizeof(newme);
 		*(void **)&newme.di_func = (char *)((byte_t *)(*(void **)&me->di_func) + loadaddr);
+		if (selfrel)
+			*(void **)&newme.di_func = (char *)((byte_t *)(*(void **)&newme.di_func) + (uintptr_t)&me->di_func);
 		if unlikely(!ADDR_ISKERN(*(void **)&newme.di_func))
 			goto err; /* Shouldn't happen */
 		result = dbg_overwrite((struct dbg_hookhdr *)me,
@@ -182,9 +192,11 @@ dbg_relocate_hookpointers(struct dbg_hookhdr const *__restrict self,
 		if unlikely(me->dc_size < offsetafter(struct dbg_clearhook, dc_cobj))
 			goto err;
 		newme.dc_type = DBG_HOOK_CLEAR;
-		newme.dc_flag = me->dc_flag & ~DBG_HOOKFLAG_RELATIVE;
+		newme.dc_flag = me->dc_flag & ~(DBG_HOOKFLAG_RELATIVE | DBG_HOOKFLAG_OFFSET);
 		newme.dc_size = me->dc_size;
 		newme.dc_cobj = (void *)((byte_t *)me->dc_cobj + loadaddr);
+		if (selfrel)
+			newme.dc_cobj = (void *)((uintptr_t)newme.dc_cobj + (uintptr_t)&me->dc_cobj);
 		if unlikely(!ADDR_ISKERN(newme.dc_cobj))
 			goto err; /* Shouldn't happen */
 		result = dbg_overwrite_bytes(me, &newme, sizeof(newme));
@@ -269,8 +281,11 @@ end_of_everything:
 			if unlikely(self->dhi_sectprev != NULL)
 				goto again; /* Already iterating a MORE-hook (don't allow for recursion!) */
 			inner = morehook->dm_more;
-			if (morehook->dm_flag & DBG_HOOKFLAG_RELATIVE)
+			if (morehook->dm_flag & DBG_HOOKFLAG_RELATIVE) {
 				inner = (struct dbg_hookhdr *)((uintptr_t)inner + dbg_hookiterator_current_driver_loadaddr(self));
+			} else if (morehook->dm_flag & DBG_HOOKFLAG_OFFSET) {
+				inner = (struct dbg_hookhdr *)((uintptr_t)&morehook->dm_more + (uintptr_t)inner);
+			}
 			if unlikely(!ADDR_ISKERN(inner))
 				goto again; /* Shouldn't happen. */
 			if unlikely(morehook->dm_limt < offsetof(struct dbg_hookhdr, dh_data))
@@ -280,18 +295,19 @@ end_of_everything:
 			self->dhi_sectend  = (struct dbg_hookhdr *)((byte_t *)inner + morehook->dm_limt);
 			goto again;
 		}
-		if unlikely(result->dh_flag & DBG_HOOKFLAG_RELATIVE) {
+		if unlikely(result->dh_flag & (DBG_HOOKFLAG_RELATIVE | DBG_HOOKFLAG_OFFSET)) {
 			/* Lazily relocate module-relative hook pointers on first access. */
 			uintptr_t loadaddr;
 			loadaddr = dbg_hookiterator_current_driver_loadaddr(self);
-			if unlikely(loadaddr == 0) {
+			if unlikely(loadaddr == 0 && !(result->dh_flag & DBG_HOOKFLAG_OFFSET)) {
 				/* Nothing to do! (try to delete the RELATIVE flag, but ignore failure to do so) */
 				dbg_hook_flag_t new_flags;
-				new_flags = result->dh_flag & ~DBG_HOOKFLAG_RELATIVE;
+				new_flags = result->dh_flag & ~(DBG_HOOKFLAG_RELATIVE | DBG_HOOKFLAG_OFFSET);
 				dbg_overwrite_bytes(&result->dh_flag, &new_flags,
 				                    sizeof(dbg_hook_flag_t));
 			} else {
-				if (!dbg_relocate_hookpointers(result, loadaddr))
+				if (!dbg_relocate_hookpointers(result, loadaddr,
+				                               (result->dh_flag & DBG_HOOKFLAG_OFFSET) != 0))
 					goto again;
 			}
 		}

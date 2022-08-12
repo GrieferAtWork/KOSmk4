@@ -628,15 +628,28 @@ __DECL_END
 #define __time_t     __TM_TYPE(time)
 
 /* Feature-specific type sizes / alignment */
-#define __SIZEOF_INO_T__   __FS_SIZEOF(INO)   /* == sizeof(ino_t) */
-#define __SIZEOF_OFF_T__   __FS_SIZEOF(OFF)   /* == sizeof(off_t) */
-#define __SIZEOF_POS_T__   __FS_SIZEOF(OFF)   /* == sizeof(pos_t) */
+#define __SIZEOF_INO_T__  __FS_SIZEOF(INO)  /* == sizeof(ino_t) */
+#define __ALIGNOF_INO_T__ __FS_ALIGNOF(INO) /* == alignof(ino_t) */
+
+#define __SIZEOF_OFF_T__  __FS_SIZEOF(OFF)  /* == sizeof(off_t) */
+#define __ALIGNOF_OFF_T__ __FS_ALIGNOF(OFF) /* == alignof(off_t) */
+
+#define __SIZEOF_POS_T__  __FS_SIZEOF(OFF)  /* == sizeof(pos_t) */
+#define __ALIGNOF_POS_T__ __FS_ALIGNOF(OFF) /* == alignof(pos_t) */
+
 #define __SIZEOF_RLIM_T__  __FS_SIZEOF(RLIM)  /* == sizeof(rlim_t) */
-#define __SIZEOF_TIME_T__  __TM_SIZEOF(TIME)  /* == sizeof(time_t) */
-#define __ALIGNOF_INO_T__  __FS_ALIGNOF(INO)  /* == alignof(ino_t) */
-#define __ALIGNOF_OFF_T__  __FS_ALIGNOF(OFF)  /* == alignof(off_t) */
-#define __ALIGNOF_POS_T__  __FS_ALIGNOF(OFF)  /* == alignof(pos_t) */
 #define __ALIGNOF_RLIM_T__ __FS_ALIGNOF(RLIM) /* == alignof(rlim_t) */
+
+#define __SIZEOF_BLKCNT_T__  __FS_SIZEOF(BLKCNT)  /* == sizeof(blkcnt_t) */
+#define __ALIGNOF_BLKCNT_T__ __FS_ALIGNOF(BLKCNT) /* == alignof(blkcnt_t) */
+
+#define __SIZEOF_FSBLKCNT_T__  __FS_SIZEOF(FSBLKCNT)  /* == sizeof(fsblkcnt_t) */
+#define __ALIGNOF_FSBLKCNT_T__ __FS_ALIGNOF(FSBLKCNT) /* == alignof(fsblkcnt_t) */
+
+#define __SIZEOF_FSFILCNT_T__  __FS_SIZEOF(FSFILCNT)  /* == sizeof(fsfilcnt_t) */
+#define __ALIGNOF_FSFILCNT_T__ __FS_ALIGNOF(FSFILCNT) /* == alignof(fsfilcnt_t) */
+
+#define __SIZEOF_TIME_T__  __TM_SIZEOF(TIME)  /* == sizeof(time_t) */
 #define __ALIGNOF_TIME_T__ __TM_ALIGNOF(TIME) /* == alignof(time_t) */
 
 

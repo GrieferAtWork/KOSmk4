@@ -47,11 +47,11 @@ DECL_BEGIN
 
 /* The System state on x86 while inside of the builtin debugger:
  *
- *  - %pax, %pcx, %pdx, %pbx, %pbp, %pdi, %psi, [%r8-15], %pflags:
+ *  - %Pax, %Pcx, %Pdx, %Pbx, %Pbp, %Pdi, %Psi, [%r8-15], %Pflags:
  *                All general purpose registers can be used just like usual
- *  - %psp:       Points somewhere into `dbg_stack'.
+ *  - %Psp:       Points somewhere into `dbg_stack'.
  *                If this stack should ever overflow, the debugger will reset itself.
- *  - %pflags.IF: Normally enabled. (but can be disabled temporarily)
+ *  - %Pflags.IF: Normally enabled. (but can be disabled temporarily)
  *  - %idtr:      Always points to `x86_dbgidt', where `x86_dbgidt' is pretty much
  *                a carbon copy of `x86_idt', though with a couple of changes made
  *                to allow the handling of HID-related interrupts.

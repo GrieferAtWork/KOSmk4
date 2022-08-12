@@ -212,8 +212,8 @@ PRIVATE void *uvio_service_thread(void *cookie) {
 					      8,
 					      libvio_readl(&args, req.uq_addr + 4 * LSW),
 					      libvio_readl(&args, req.uq_addr + 4 * MSW),
-					      req.uq_ldata[2 + LSW],
-					      req.uq_ldata[2 + MSW]);
+					      req.uq_args[0].ura_q_as_l[LSW],
+					      req.uq_args[0].ura_q_as_l[MSW]);
 				}
 				resp.rq.ur_lresult[0] = libvio_xchl(&args, req.uq_addr + 0, req.uq_args[0].ura_q_as_l[0], false);
 				resp.rq.ur_lresult[1] = libvio_xchl(&args, req.uq_addr + 4, req.uq_args[0].ura_q_as_l[1], false);

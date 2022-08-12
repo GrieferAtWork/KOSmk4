@@ -425,6 +425,17 @@ NOTHROW(FCALL module_scan_reloc_for_DlModule)(struct module *__restrict self,
 	}	break;
 #endif /* __x86_64__ || __i386__ */
 
+#ifdef __arm__
+	case R_ARM_TLS_DTPMOD32: {
+		USER uint32_t *uaddr;
+		uaddr = (USER uint32_t *)(self->md_loadaddr + r_offset);
+		if (!ADDR_ISUSER(uaddr))
+			break;
+		/* Try to read the pointer from this location. */
+		return module_getpointer(self, uaddr, (void **)presult);
+	}	break;
+#endif /* __arm__ */
+
 	default:
 		break;
 	}

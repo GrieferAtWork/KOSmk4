@@ -49,7 +49,7 @@ DECL_BEGIN
 #define SECTION_DEBUG_BSS    ".bss.crt.debug"
 #define SECTION_DEBUG_STRING ".rodata.crt.debug"
 
-INTDEF void *pdyn_libunwind; /* From `../libc/except.c' */
+INTDEF void *pdyn_libunwind;                     /* From `../libc/except.c' */
 INTDEF void LIBCCALL initialize_libunwind(void); /* From `../libc/except.c' */
 
 PRIVATE ATTR_SECTION(SECTION_DEBUG_BSS) PUNWIND_GETREG_LCPUSTATE pdyn_unwind_getreg_lcpustate = NULL;
