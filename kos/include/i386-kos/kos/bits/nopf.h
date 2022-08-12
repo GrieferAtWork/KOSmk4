@@ -218,7 +218,7 @@ __DECL_BEGIN
 #define __X86_NOPF_CALLCLB_ :
 #endif /* !__X86_NOPF_CALLCLB */
 #ifndef __X86_NOPF_DEFFUN
-#define __X86_NOPF_DEFFUN(decl) /* nothing */
+#define __X86_NOPF_DEFFUN(name) /* nothing */
 #endif /* !__X86_NOPF_DEFFUN */
 
 
