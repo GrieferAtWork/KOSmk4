@@ -136,7 +136,8 @@ __DECL_BEGIN
 /* Don't  necessarily include  basic instructions  that _only_  ever result in
  * an  unsupported  instruction  case in  the  only-check-error configuration.
  * This means that no additional code is generated for (e.g.) `add $imm8, %al'
- * when       configured       for      `EMU86_EMULATE_CONFIG_ONLY_CHECKERROR'
+ * when configured for `EMU86_EMULATE_CONFIG_ONLY_CHECKERROR'
+ *
  * This option  is  ignored  when  `EMU86_EMULATE_CONFIG_ONLY_CHECKERROR == 0' */
 #ifndef EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC
 #define EMU86_EMULATE_CONFIG_ONLY_CHECKERROR_NO_BASIC 0
@@ -151,13 +152,14 @@ __DECL_BEGIN
 #endif /* !EMU86_EMULATE_CONFIG_CHECKLOCK */
 
 
-/* Ignore  the `lock'  prefix in individual  instructions, which will  instead always operate
- * identical to how they would when no `lock'-prefix would have been given. Note however that
- * this  option  does not  affect  `EMU86_EMULATE_CONFIG_CHECKLOCK', meaning  that  when that
- * option is  enabled, the  emulator will  still  ensure that  only certain  instruction  are
- * allowed to make use of `lock' prefixes.
- * Note however that this does _NOT_ affect instructions that use the `lock' prefix to
- * alter   their   actual  behavior   in  some   way   other  than   becoming  atomic. */
+/* Ignore the `lock' prefix in individual instructions, which will instead always operate
+ * identical  to how they would when no `lock'-prefix would have been given. Note however
+ * that this option does not  affect `EMU86_EMULATE_CONFIG_CHECKLOCK', meaning that  when
+ * that  option is enabled, the emulator will  still ensure that only certain instruction
+ * are allowed to make use of `lock' prefixes.
+ *
+ * Note  however that  this does _NOT_  affect instructions that  use the `lock'
+ * prefix to alter their actual behavior in some way other than becoming atomic. */
 #ifndef EMU86_EMULATE_CONFIG_IGNORE_LOCK
 #define EMU86_EMULATE_CONFIG_IGNORE_LOCK 0
 #endif /* !EMU86_EMULATE_CONFIG_IGNORE_LOCK */
@@ -1988,7 +1990,7 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
  * segment offsets, but simply set the raw %(e|r)ip register. */
 #ifndef EMU86_GETIPREG
 #define EMU86_GETIPREG()  (EMU86_UREG_TYPE)(uintptr_t)EMU86_GETPCPTR()
-#define EMU86_SETIPREG(v) EMU86_SETPCPTR(v)
+#define EMU86_SETIPREG(v) EMU86_SETPCPTR((void *)(uintptr_t)(EMU86_UREG_TYPE)(v))
 #endif /* !EMU86_GETIPREG */
 
 /* Get/Set the SP/ESP/RSP register (including SS.BASE)
@@ -2005,7 +2007,7 @@ void EMU86_EMULATE_LDMXCSR(u32 mxcsr);                      /* EMU86_EMULATE_CON
 /* Same as `EMU86_GETIPREG()' is for `EMU86_GETPCPTR()', but for `EMU86_GETSTACKPTR()' */
 #ifndef EMU86_GETSPREG
 #define EMU86_GETSPREG()  (EMU86_UREG_TYPE)(uintptr_t)EMU86_GETSTACKPTR()
-#define EMU86_SETSPREG(v) EMU86_SETSTACKPTR(v)
+#define EMU86_SETSPREG(v) EMU86_SETSTACKPTR((void *)(uintptr_t)(EMU86_UREG_TYPE)(v))
 #endif /* !EMU86_GETSPREG */
 
 /* Return the base address address for a given segment */
@@ -4801,7 +4803,7 @@ notsup_popwl:
 #endif /* EMU86_EMULATE_EXCEPT */
 done:
 	/* Set the new instruction pointer. */
-	EMU86_SETPCPTR(REAL_IP());
+	EMU86_SETPCPTR((void *)REAL_IP());
 #ifdef NEED_done_dont_set_pc
 #undef NEED_done_dont_set_pc
 done_dont_set_pc:

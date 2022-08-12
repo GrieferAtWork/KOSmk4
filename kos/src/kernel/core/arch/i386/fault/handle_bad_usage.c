@@ -1202,9 +1202,9 @@ assert_canonical_address(struct icpustate *__restrict state,
 #define EMU86_SETSPREG(v)           (void)(_state = icpustate_setpsp_p(_state, v))
 #endif /* !__x86_64__ */
 #define EMU86_GETPCPTR()            (byte_t *)EMU86_GETIPREG()
-#define EMU86_SETPCPTR(v)           EMU86_SETIPREG(v)
+#define EMU86_SETPCPTR(v)           EMU86_SETIPREG((uintptr_t)(v))
 #define EMU86_GETSTACKPTR()         (byte_t *)EMU86_GETSPREG()
-#define EMU86_SETSTACKPTR(v)        EMU86_SETSPREG(v)
+#define EMU86_SETSTACKPTR(v)        EMU86_SETSPREG((uintptr_t)(v))
 
 
 #ifdef __x86_64__
