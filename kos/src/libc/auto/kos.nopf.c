@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2488d2 */
+/* HASH CRC-32:0xae5e37ba */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -239,7 +239,6 @@ NOTHROW(LIBCCALL libc_memset_nopf)(void *dst,
                                    int byte,
                                    size_t num_bytes) {
 	while (num_bytes) {
-		byte_t b;
 		if unlikely(!libc_writeb_nopf(dst, (byte_t)(unsigned int)byte))
 			break;
 		--num_bytes;

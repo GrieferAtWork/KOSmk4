@@ -112,8 +112,8 @@ __DECL_BEGIN
  *  #3 Return to the caller (i.e. `bx lr')
  *  #4 If a "Data Abort" (#PF) is triggered during any of this, the function will
  *     return  to the caller with all registers  unaltered from the point in time
- *     when  the "Data Abort" (#PF) happened, except that `APSR.Q' will have also
- *     been set (iow: `msr APSR_nzcvq, #CPSR_Q').
+ *     when  the "Data Abort" (#PF) happened, except that `APSR.Z' will have also
+ *     been set (iow: `msr APSR_nzcvq, #CPSR_Z').
  */
 
 

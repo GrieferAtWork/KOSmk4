@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x127ffb9f */
+/* HASH CRC-32:0xed79c9cb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,6 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(memset_nopf) __ATTR_WUNUSED __NOBLOCK __ATTR_OUTS(1, 3) __SIZE_TYPE__
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(memset_nopf))(void *__dst, int __byte, __SIZE_TYPE__ __num_bytes) {
 	while (__num_bytes) {
-		__BYTE_TYPE__ __b;
 		if __unlikely(!(__NAMESPACE_LOCAL_SYM __localdep_writeb_nopf)(__dst, (__BYTE_TYPE__)(unsigned int)__byte))
 			break;
 		--__num_bytes;

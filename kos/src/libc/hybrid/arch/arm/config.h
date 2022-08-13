@@ -20,8 +20,6 @@
 #ifndef GUARD_LIBC_HYBRID_ARCH_ARM_CONFIG_H
 #define GUARD_LIBC_HYBRID_ARCH_ARM_CONFIG_H 1
 
-#include <hybrid/host.h>
-
 /* Libc functions implemented  by arch-specific, optimized  functions.
  * Defining these macros causes libc's auto/user-system to not provide
  * the associated functions. */

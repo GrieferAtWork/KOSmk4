@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_HYBRID_ARCH_I386_NOPF_H
-#define GUARD_LIBC_HYBRID_ARCH_I386_NOPF_H 1
+#ifndef GUARD_LIBC_HYBRID_ARCH_ARM_NOPF_H
+#define GUARD_LIBC_HYBRID_ARCH_ARM_NOPF_H 1
 
 #include <hybrid/compiler.h>
 
@@ -31,25 +31,19 @@ DECL_BEGIN
 /* Must declare these symbols as ELF.HIDDEN (INTDEF) in order to prevent
  * a relocation being generated during linking as the result of except.c
  * otherwise not knowing that these symbols are defined by libc itself. */
-INTDEF __BYTE_TYPE__ const libc_x86_nopf_begin[];   /* Start address for NOPF memory access PC values */
-INTDEF __BYTE_TYPE__ const libc_x86_nopf_end_clc[]; /* End of NOPF handlers that should return to `libc_x86_nopf_ret_stc' */
-INTDEF __BYTE_TYPE__ const libc_x86_nopf_end[];     /* End address for NOPF memory access PC values */
-INTDEF __BYTE_TYPE__ const libc_x86_nopf_ret_stc[]; /* Set the carry bit and return to the caller */
-INTDEF __BYTE_TYPE__ const libc_x86_nopf_ret[];     /* Return PC for #PF with `libc_nopf_checkpc(pc) == true' */
+INTDEF __BYTE_TYPE__ const libc_arm_nopf_begin[]; /* Start address for NOPF memory access PC values */
+INTDEF __BYTE_TYPE__ const libc_arm_nopf_end[];   /* End address for NOPF memory access PC values */
+INTDEF __BYTE_TYPE__ const libc_arm_nopf_ret[];   /* Return PC for #PF with `libc_nopf_checkpc(pc) == true' */
 
 /* Return the #PF-execution-resume address for a #PF that happened at `pc', where pc is
- * apart of a libc_x86_nopf_* function, as indicated by `libc_nopf_checkpc(pc) == true' */
-#define libc_nopf_retof(pc)                              \
-	((__BYTE_TYPE__ const *)(pc) < libc_x86_nopf_end_clc \
-	 ? (__BYTE_TYPE__ const *)libc_x86_nopf_ret_stc      \
-	 : (__BYTE_TYPE__ const *)libc_x86_nopf_ret)
-
+ * apart of a libc_arm_nopf_* function, as indicated by `libc_nopf_checkpc(pc) == true' */
+#define libc_nopf_retof(pc) libc_arm_nopf_ret
 #define libc_nopf_checkpc(pc)                              \
-	((__BYTE_TYPE__ const *)(pc) >= libc_x86_nopf_begin && \
-	 (__BYTE_TYPE__ const *)(pc) < libc_x86_nopf_end)
+	((__BYTE_TYPE__ const *)(pc) >= libc_arm_nopf_begin && \
+	 (__BYTE_TYPE__ const *)(pc) < libc_arm_nopf_end)
 
 DECL_END
 #endif /* __CC__ */
 
 
-#endif /* !GUARD_LIBC_HYBRID_ARCH_I386_NOPF_H */
+#endif /* !GUARD_LIBC_HYBRID_ARCH_ARM_NOPF_H */

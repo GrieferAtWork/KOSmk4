@@ -286,7 +286,6 @@ $size_t memcpy_nopf([[user, checked, out_opt(num_bytes)]] void *dst,
 $size_t memset_nopf([[user, checked, out_opt(num_bytes)]] void *dst,
                     int byte, $size_t num_bytes) {
 	while (num_bytes) {
-		byte_t b;
 		if unlikely(!writeb_nopf(dst, (byte_t)(unsigned int)byte))
 			break;
 		--num_bytes;

@@ -63,6 +63,8 @@
 #include <kos/bits/thread.h>
 
 #include "../hybrid/arch/i386/nopf.h"
+#elif defined(__arm__)
+#include "../hybrid/arch/arm/nopf.h"
 #endif /* __i386__ || __x86_64__ */
 
 DECL_BEGIN
@@ -999,22 +1001,31 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_GetIPInfo)(struct _Unwind_Context const *__rest
 	return (uintptr_t)__EXCEPT_REGISTER_STATE_TYPE_RDPC(*context->uc_state);
 }
 
+/* Support for NOPF via exception handling. */
+#if defined(libc_nopf_checkpc) && defined(libc_nopf_retof)
+#define EXCEPT_HANDLER_ON_ENTRY_CHECK_NOPF(state, error)   \
+	do {                                                   \
+		/* nopf support */                                 \
+		void *pc = (void *)kcpustate_getpc(state);         \
+		if (libc_nopf_checkpc(pc)) {                       \
+			/* TODO: Must send RPC to calling thread that  \
+			 * re-throws exception if it's RT-priority. */ \
+			kcpustate_setpc(state, libc_nopf_retof(pc));   \
+			return state;                                  \
+		}                                                  \
+		COMPILER_BARRIER();                                \
+	}	__WHILE0
+
+#endif /* libc_nopf_checkpc && libc_nopf_retof */
+
 
 #if defined(__i386__) || defined(__x86_64__)
-#define EXCEPT_HANDLER_ON_ENTRY(state, error)                \
-	do {                                                     \
-		/* nopf support */                                   \
-		void *pc = (void *)kcpustate_getpc(state);           \
-		if (libc_x86_nopf_check(pc)) {                       \
-			/* TODO: Must send RPC to calling thread that    \
-			 * re-throws exception if it's RT-priority. */   \
-			kcpustate_setpc(state, libc_x86_nopf_retof(pc)); \
-			return state;                                    \
-		}                                                    \
-		/* Verify TLS segment */                             \
-		x86_verify_tls(state, error);                        \
-		/* Barrier to prevent premature TLS use */           \
-		COMPILER_BARRIER();                                  \
+#define EXCEPT_HANDLER_ON_ENTRY_VERIFY_TLS(state, error) \
+	do {                                                 \
+		/* Verify TLS segment */                         \
+		x86_verify_tls(state, error);                    \
+		/* Barrier to prevent premature TLS use */       \
+		COMPILER_BARRIER();                              \
 	}	__WHILE0
 
 PRIVATE SECTION_EXCEPT_TEXT NONNULL((1, 2)) void CC
@@ -1048,14 +1059,30 @@ x86_verify_tls(except_register_state_t *__restrict state,
 }
 #endif /* __i386__ || __x86_64__ */
 
+/* Select used except-handle-on-entry features. */
+#define EXCEPT_HANDLER_ON_ENTRY_IS_NOOP
+#ifdef EXCEPT_HANDLER_ON_ENTRY_CHECK_NOPF
+#undef EXCEPT_HANDLER_ON_ENTRY_IS_NOOP
+#define OPT_EXCEPT_HANDLER_ON_ENTRY_CHECK_NOPF EXCEPT_HANDLER_ON_ENTRY_CHECK_NOPF
+#else /* EXCEPT_HANDLER_ON_ENTRY_CHECK_NOPF */
+#define OPT_EXCEPT_HANDLER_ON_ENTRY_CHECK_NOPF(...) (void)0
+#endif /* EXCEPT_HANDLER_ON_ENTRY_CHECK_NOPF */
+
+#ifdef EXCEPT_HANDLER_ON_ENTRY_VERIFY_TLS
+#undef EXCEPT_HANDLER_ON_ENTRY_IS_NOOP
+#define OPT_EXCEPT_HANDLER_ON_ENTRY_VERIFY_TLS EXCEPT_HANDLER_ON_ENTRY_VERIFY_TLS
+#else /* EXCEPT_HANDLER_ON_ENTRY_VERIFY_TLS */
+#define OPT_EXCEPT_HANDLER_ON_ENTRY_VERIFY_TLS(...) (void)0
+#endif /* EXCEPT_HANDLER_ON_ENTRY_VERIFY_TLS */
 
 /* Common on-entry callback for exception handlers. Used to deal with
  * architecture-specific checks/features, as  well as (if  supported)
  * to verify TLS and fail with `UNWIND_USER_BADTLS' on error. */
-#ifndef EXCEPT_HANDLER_ON_ENTRY
-#define EXCEPT_HANDLER_ON_ENTRY_IS_NOOP
-#define EXCEPT_HANDLER_ON_ENTRY(state, error) (void)0
-#endif /* !EXCEPT_HANDLER_ON_ENTRY */
+#define EXCEPT_HANDLER_ON_ENTRY(state, error)                 \
+	do {                                                      \
+		OPT_EXCEPT_HANDLER_ON_ENTRY_CHECK_NOPF(state, error); \
+		OPT_EXCEPT_HANDLER_ON_ENTRY_VERIFY_TLS(state, error); \
+	}	__WHILE0
 
 
 #ifdef EXCEPT_HANDLER_ON_ENTRY_IS_NOOP

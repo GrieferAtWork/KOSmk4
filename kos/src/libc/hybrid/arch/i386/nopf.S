@@ -40,156 +40,156 @@ INTERN_FUNCTION(libc_x86_nopf_movb_Pax_al)
 	clc
 	movb   (%Pax), %al
 	ret
-END(x86_nopf_movb_Pax_al)
+END(libc_x86_nopf_movb_Pax_al)
 
 INTERN_FUNCTION(libc_x86_nopf_movw_Pax_ax)
 	clc
 	movw   (%Pax), %ax
 	ret
-END(x86_nopf_movw_Pax_ax)
+END(libc_x86_nopf_movw_Pax_ax)
 
 INTERN_FUNCTION(libc_x86_nopf_movl_Pax_eax)
 	clc
 	movl   (%Pax), %eax
 	ret
-END(x86_nopf_movl_Pax_eax)
+END(libc_x86_nopf_movl_Pax_eax)
 
 #ifdef __x86_64__
 INTERN_FUNCTION(libc_x86_nopf_movq_Pax_rax)
 	clc
 	movq   (%Pax), %rax
 	ret
-END(x86_nopf_movq_Pax_rax)
+END(libc_x86_nopf_movq_Pax_rax)
 #endif /* __x86_64__ */
 
 INTERN_FUNCTION(libc_x86_nopf_movb_al_Pcx)
 	clc
 	movb   %al, (%Pcx)
 	ret
-END(x86_nopf_movb_al_Pcx)
+END(libc_x86_nopf_movb_al_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_movw_ax_Pcx)
 	clc
 	movw   %ax, (%Pcx)
 	ret
-END(x86_nopf_movw_ax_Pcx)
+END(libc_x86_nopf_movw_ax_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_movl_eax_Pcx)
 	clc
 	movl   %eax, (%Pcx)
 	ret
-END(x86_nopf_movl_eax_Pcx)
+END(libc_x86_nopf_movl_eax_Pcx)
 
 #ifdef __x86_64__
 INTERN_FUNCTION(libc_x86_nopf_movq_rax_Pcx)
 	clc
 	movq   %rax, (%Pcx)
 	ret
-END(x86_nopf_movq_rax_Pcx)
+END(libc_x86_nopf_movq_rax_Pcx)
 #endif /* __x86_64__ */
 
 INTERN_FUNCTION(libc_x86_nopf_movb_fsPax_al)
 	clc
 	movb   %fs:(%Pax), %al
 	ret
-END(x86_nopf_movb_Pax_al)
+END(libc_x86_nopf_movb_Pax_al)
 
 INTERN_FUNCTION(libc_x86_nopf_movw_fsPax_ax)
 	clc
 	movw   %fs:(%Pax), %ax
 	ret
-END(x86_nopf_movw_Pax_ax)
+END(libc_x86_nopf_movw_Pax_ax)
 
 INTERN_FUNCTION(libc_x86_nopf_movl_fsPax_eax)
 	clc
 	movl   %fs:(%Pax), %eax
 	ret
-END(x86_nopf_movl_Pax_eax)
+END(libc_x86_nopf_movl_Pax_eax)
 
 #ifdef __x86_64__
 INTERN_FUNCTION(libc_x86_nopf_movq_fsPax_rax)
 	clc
 	movq   %fs:(%Pax), %rax
 	ret
-END(x86_nopf_movq_Pax_rax)
+END(libc_x86_nopf_movq_Pax_rax)
 #endif /* __x86_64__ */
 
 INTERN_FUNCTION(libc_x86_nopf_movb_al_fsPcx)
 	clc
 	movb   %al, %fs:(%Pcx)
 	ret
-END(x86_nopf_movb_al_Pcx)
+END(libc_x86_nopf_movb_al_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_movw_ax_fsPcx)
 	clc
 	movw   %ax, %fs:(%Pcx)
 	ret
-END(x86_nopf_movw_ax_Pcx)
+END(libc_x86_nopf_movw_ax_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_movl_eax_fsPcx)
 	clc
 	movl   %eax, %fs:(%Pcx)
 	ret
-END(x86_nopf_movl_eax_Pcx)
+END(libc_x86_nopf_movl_eax_Pcx)
 
 #ifdef __x86_64__
 INTERN_FUNCTION(libc_x86_nopf_movq_rax_fsPcx)
 	clc
 	movq   %rax, %fs:(%Pcx)
 	ret
-END(x86_nopf_movq_rax_Pcx)
+END(libc_x86_nopf_movq_rax_Pcx)
 #endif /* __x86_64__ */
 
 INTERN_FUNCTION(libc_x86_nopf_movb_gsPax_al)
 	clc
 	movb   %gs:(%Pax), %al
 	ret
-END(x86_nopf_movb_Pax_al)
+END(libc_x86_nopf_movb_Pax_al)
 
 INTERN_FUNCTION(libc_x86_nopf_movw_gsPax_ax)
 	clc
 	movw   %gs:(%Pax), %ax
 	ret
-END(x86_nopf_movw_Pax_ax)
+END(libc_x86_nopf_movw_Pax_ax)
 
 INTERN_FUNCTION(libc_x86_nopf_movl_gsPax_eax)
 	clc
 	movl   %gs:(%Pax), %eax
 	ret
-END(x86_nopf_movl_Pax_eax)
+END(libc_x86_nopf_movl_Pax_eax)
 
 #ifdef __x86_64__
 INTERN_FUNCTION(libc_x86_nopf_movq_gsPax_rax)
 	clc
 	movq   %gs:(%Pax), %rax
 	ret
-END(x86_nopf_movq_Pax_rax)
+END(libc_x86_nopf_movq_Pax_rax)
 #endif /* __x86_64__ */
 
 INTERN_FUNCTION(libc_x86_nopf_movb_al_gsPcx)
 	clc
 	movb   %al, %gs:(%Pcx)
 	ret
-END(x86_nopf_movb_al_Pcx)
+END(libc_x86_nopf_movb_al_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_movw_ax_gsPcx)
 	clc
 	movw   %ax, %gs:(%Pcx)
 	ret
-END(x86_nopf_movw_ax_Pcx)
+END(libc_x86_nopf_movw_ax_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_movl_eax_gsPcx)
 	clc
 	movl   %eax, %gs:(%Pcx)
 	ret
-END(x86_nopf_movl_eax_Pcx)
+END(libc_x86_nopf_movl_eax_Pcx)
 
 #ifdef __x86_64__
 INTERN_FUNCTION(libc_x86_nopf_movq_rax_gsPcx)
 	clc
 	movq   %rax, %gs:(%Pcx)
 	ret
-END(x86_nopf_movq_rax_Pcx)
+END(libc_x86_nopf_movq_rax_Pcx)
 #endif /* __x86_64__ */
 
 
@@ -199,147 +199,147 @@ INTERN_FUNCTION(libc_x86_nopf_lock_xchgb_al_Pcx)
 	clc
 	/*lock*/ xchgb    %al, (%Pcx)
 	ret
-END(x86_nopf_lock_xchgb_al_Pcx)
+END(libc_x86_nopf_lock_xchgb_al_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_lock_xchgw_ax_Pcx)
 	clc
 	/*lock*/ xchgw    %ax, (%Pcx)
 	ret
-END(x86_nopf_lock_xchgw_ax_Pcx)
+END(libc_x86_nopf_lock_xchgw_ax_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_lock_xchgl_eax_Pcx)
 	clc
 	/*lock*/ xchgl    %eax, (%Pcx)
 	ret
-END(x86_nopf_lock_xchgl_eax_Pcx)
+END(libc_x86_nopf_lock_xchgl_eax_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_lock_xaddb_al_Pcx)
 	lock xaddb    %al, (%Pcx)
 	clc
 	ret
-END(x86_nopf_lock_xaddb_al_Pcx)
+END(libc_x86_nopf_lock_xaddb_al_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_lock_xaddw_ax_Pcx)
 	lock xaddw    %ax, (%Pcx)
 	clc
 	ret
-END(x86_nopf_lock_xaddw_ax_Pcx)
+END(libc_x86_nopf_lock_xaddw_ax_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_lock_xaddl_eax_Pcx)
 	lock xaddl    %eax, (%Pcx)
 	clc
 	ret
-END(x86_nopf_lock_xaddl_eax_Pcx)
+END(libc_x86_nopf_lock_xaddl_eax_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_lock_cmpxchgb_dl_Pcx)
 	lock cmpxchgb %dl, (%Pcx)
 	clc
 	ret
-END(x86_nopf_lock_cmpxchgb_dl_Pcx)
+END(libc_x86_nopf_lock_cmpxchgb_dl_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_lock_cmpxchgw_dx_Pcx)
 	lock cmpxchgw %dx, (%Pcx)
 	clc
 	ret
-END(x86_nopf_lock_cmpxchgw_dx_Pcx)
+END(libc_x86_nopf_lock_cmpxchgw_dx_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_lock_cmpxchgl_edx_Pcx)
 	lock cmpxchgl %edx, (%Pcx)
 	clc
 	ret
-END(x86_nopf_lock_cmpxchgl_edx_Pcx)
+END(libc_x86_nopf_lock_cmpxchgl_edx_Pcx)
 
 
 INTERN_FUNCTION(libc_x86_nopf_lock_andb_al_Pcx)
 	lock andb     %al, (%Pcx)
 	clc
 	ret
-END(x86_nopf_lock_andb_al_Pcx)
+END(libc_x86_nopf_lock_andb_al_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_lock_andw_ax_Pcx)
 	lock andw     %ax, (%Pcx)
 	clc
 	ret
-END(x86_nopf_lock_andw_ax_Pcx)
+END(libc_x86_nopf_lock_andw_ax_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_lock_andl_eax_Pcx)
 	lock andl     %eax, (%Pcx)
 	clc
 	ret
-END(x86_nopf_lock_andl_eax_Pcx)
+END(libc_x86_nopf_lock_andl_eax_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_lock_orb_al_Pcx)
 	lock orb      %al, (%Pcx)
 	clc
 	ret
-END(x86_nopf_lock_orb_al_Pcx)
+END(libc_x86_nopf_lock_orb_al_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_lock_orw_ax_Pcx)
 	lock orw      %ax, (%Pcx)
 	clc
 	ret
-END(x86_nopf_lock_orw_ax_Pcx)
+END(libc_x86_nopf_lock_orw_ax_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_lock_orl_eax_Pcx)
 	lock orl      %eax, (%Pcx)
 	clc
 	ret
-END(x86_nopf_lock_orl_eax_Pcx)
+END(libc_x86_nopf_lock_orl_eax_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_lock_xorb_al_Pcx)
 	lock xorb     %al, (%Pcx)
 	clc
 	ret
-END(x86_nopf_lock_xorb_al_Pcx)
+END(libc_x86_nopf_lock_xorb_al_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_lock_xorw_ax_Pcx)
 	lock xorw     %ax, (%Pcx)
 	clc
 	ret
-END(x86_nopf_lock_xorw_ax_Pcx)
+END(libc_x86_nopf_lock_xorw_ax_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_lock_xorl_eax_Pcx)
 	lock xorl     %eax, (%Pcx)
 	clc
 	ret
-END(x86_nopf_lock_xorl_eax_Pcx)
+END(libc_x86_nopf_lock_xorl_eax_Pcx)
 
 #ifdef __x86_64__
 INTERN_FUNCTION(libc_x86_nopf_lock_xchgq_rax_Pcx)
 	clc
 	/*lock*/ xchgq    %rax, (%Pcx)
 	ret
-END(x86_nopf_lock_xchgq_rax_Pcx)
+END(libc_x86_nopf_lock_xchgq_rax_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_lock_xaddq_rax_Pcx)
 	lock xaddq    %rax, (%Pcx)
 	clc
 	ret
-END(x86_nopf_lock_xaddq_rax_Pcx)
+END(libc_x86_nopf_lock_xaddq_rax_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_lock_cmpxchgq_rdx_Pcx)
 	lock cmpxchgq %rdx, (%Pcx)
 	clc
 	ret
-END(x86_nopf_lock_cmpxchgq_rdx_Pcx)
+END(libc_x86_nopf_lock_cmpxchgq_rdx_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_lock_andq_rax_Pcx)
 	lock andq     %rax, (%Pcx)
 	clc
 	ret
-END(x86_nopf_lock_andq_rax_Pcx)
+END(libc_x86_nopf_lock_andq_rax_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_lock_orq_rax_Pcx)
 	lock orq      %rax, (%Pcx)
 	clc
 	ret
-END(x86_nopf_lock_orq_rax_Pcx)
+END(libc_x86_nopf_lock_orq_rax_Pcx)
 
 INTERN_FUNCTION(libc_x86_nopf_lock_xorq_rax_Pcx)
 	lock xorq     %rax, (%Pcx)
 	clc
 	ret
-END(x86_nopf_lock_xorq_rax_Pcx)
+END(libc_x86_nopf_lock_xorq_rax_Pcx)
 #endif /* __x86_64__ */
 
 
@@ -354,50 +354,50 @@ INTERN_FUNCTION(libc_x86_nopf_rep_insb)
 	KERNEL_cld
 	rep    insb
 	ret
-END(x86_nopf_rep_insb)
+END(libc_x86_nopf_rep_insb)
 
 INTERN_FUNCTION(libc_x86_nopf_rep_insw)
 	KERNEL_cld
 	rep    insw
 	ret
-END(x86_nopf_rep_insw)
+END(libc_x86_nopf_rep_insw)
 
 INTERN_FUNCTION(libc_x86_nopf_rep_insl)
 	KERNEL_cld
 	rep    insl
 	ret
-END(x86_nopf_rep_insl)
+END(libc_x86_nopf_rep_insl)
 
 INTERN_FUNCTION(libc_x86_nopf_rep_outsb)
 	KERNEL_cld
 	rep    outsb
 	ret
-END(x86_nopf_rep_outsb)
+END(libc_x86_nopf_rep_outsb)
 
 INTERN_FUNCTION(libc_x86_nopf_rep_outsw)
 	KERNEL_cld
 	rep    outsw
 	ret
-END(x86_nopf_rep_outsw)
+END(libc_x86_nopf_rep_outsw)
 
 INTERN_FUNCTION(libc_x86_nopf_rep_outsl)
 	KERNEL_cld
 	rep    outsl
 	ret
-END(x86_nopf_rep_outsl)
+END(libc_x86_nopf_rep_outsl)
 
 
 INTERN_FUNCTION(libc_x86_nopf_repe_cmpsb)
 	KERNEL_cld
 	repe   cmpsb
 	ret
-END(x86_nopf_repe_cmpsb)
+END(libc_x86_nopf_repe_cmpsb)
 
 INTERN_FUNCTION(libc_x86_nopf_rep_stosb)
 	KERNEL_cld
 	rep    stosb
 	ret
-END(x86_nopf_rep_stosb)
+END(libc_x86_nopf_rep_stosb)
 
 /* Assembly function:
  * >> INTERN_FUNCTION(libc_x86_nopf_rep_movsb)
@@ -435,13 +435,13 @@ INTERN_FUNCTION(libc_x86_nopf_rep_movsb)
 INTERN_LABEL(libc_x86_nopf_end):
 INTERN_FUNCTION(libc_x86_nopf_ret)
 	ret
-END(x86_nopf_rep_movsb)
-END(x86_nopf_ret)
+END(libc_x86_nopf_rep_movsb)
+END(libc_x86_nopf_ret)
 
 INTERN_FUNCTION(libc_x86_nopf_ret_stc)
 	stc
 	ret
-END(x86_nopf_ret_stc)
+END(libc_x86_nopf_ret_stc)
 .cfi_endproc
 
 
