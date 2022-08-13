@@ -67,6 +67,7 @@ local badFiles = List({
 	"bits/os/",
 	"compat/asm/os/",
 	"compat/bits/os/",
+	"arm-kos",
 	"i386-kos",
 	"libc/local",
 	"libc/template",
@@ -141,6 +142,7 @@ incdir("");
 #include <asm/__stdinc.h>
 #include <asm/asmword.h>
 #include <asm/cacheline.h>
+#include <asm/cfi.h>
 #include <asm/crt/aio.h>
 #include <asm/crt/confname.h>
 #include <asm/crt/float.h>
@@ -169,6 +171,7 @@ incdir("");
 #include <asm/crt/ucontext.h>
 #include <asm/crt/util.h>
 #include <asm/intrin-arith.h>
+#include <asm/intrin-fpu.h>
 #include <asm/intrin.h>
 #include <asm/ioctl.h>
 #include <asm/ls-syscalls.h>
@@ -254,6 +257,8 @@ incdir("");
 #include <bits/crt/db/utmp.h>
 #include <bits/crt/db/utmpx.h>
 #include <bits/crt/div.h>
+#include <bits/crt/dos/_CrtMemState.h>
+#include <bits/crt/dos/corecrt_startup.h>
 #include <bits/crt/dyn-string.h>
 #include <bits/crt/environments.h>
 #include <bits/crt/fenv-inline.h>
@@ -432,6 +437,7 @@ incdir("");
 #include <bstring.h>
 #include <bytesex.h>
 #include <byteswap.h>
+#include <cfi.h>
 #include <compat/bits/os/cmsghdr.h>
 #include <compat/bits/os/flock.h>
 #include <compat/bits/os/iovec.h>
@@ -582,6 +588,7 @@ incdir("");
 #include <hybrid/__assert.h>
 #include <hybrid/__atomic.h>
 #include <hybrid/__bit.h>
+#include <hybrid/__bitfield.h>
 #include <hybrid/__byteswap.h>
 #include <hybrid/__debug-alignment.h>
 #include <hybrid/__minmax.h>
@@ -637,6 +644,7 @@ incdir("");
 #include <ieeefp.h>
 #include <ifaddrs.h>
 #include <int128.h>
+#include <intrin.h>
 #include <inttypes.h>
 #include <io.h>
 #include <iso646.h>
@@ -644,6 +652,8 @@ incdir("");
 #include <kos/anno.h>
 #include <kos/aref.h>
 #include <kos/asm/futex.h>
+#include <kos/asm/lockop.h>
+#include <kos/asm/rpc-method.h>
 #include <kos/asm/rpc.h>
 #include <kos/asm/rtm.h>
 #include <kos/asm/syscall.h>
@@ -656,8 +666,10 @@ incdir("");
 #include <kos/bits/exception_nest.h>
 #include <kos/bits/fastexcept.h>
 #include <kos/bits/futex-expr.h>
+#include <kos/bits/guid.h>
 #include <kos/bits/lockop.h>
 #include <kos/bits/nopf.h>
+#include <kos/bits/rpc.h>
 #include <kos/bits/rtm.h>
 #include <kos/bits/shared-lock.h>
 #include <kos/bits/shared-recursive-lock.h>
@@ -673,7 +685,14 @@ incdir("");
 #include <kos/compat/linux-dirent64.h>
 #include <kos/compat/linux-olddirent.h>
 #include <kos/compat/linux-oldselect.h>
+#include <kos/compat/linux-stat-convert.h>
 #include <kos/compat/linux-stat.h>
+#include <kos/config/config.h>
+#include <kos/config/configurations/OD.h>
+#include <kos/config/configurations/OnD.h>
+#include <kos/config/configurations/nOD.h>
+#include <kos/config/configurations/nOnD.h>
+#include <kos/config/toolchain.h>
 #include <kos/coredump.h>
 #include <kos/debugtrap.h>
 #include <kos/dev.h>
@@ -688,8 +707,11 @@ incdir("");
 #include <kos/except/reason/noexec.h>
 #include <kos/except-handler.h>
 #include <kos/except.h>
+#include <kos/exec/asm/elf-rel.h>
 #include <kos/exec/asm/elf.h>
+#include <kos/exec/asm/lazybind.h>
 #include <kos/exec/asm/rtld.h>
+#include <kos/exec/bits/elf.h>
 #include <kos/exec/bits/peb.h>
 #include <kos/exec/elf-rel.h>
 #include <kos/exec/elf.h>
@@ -719,8 +741,30 @@ incdir("");
 #include <kos/ioctl/svga.h>
 #include <kos/ioctl/tty.h>
 #include <kos/ioctl/video.h>
+#include <kos/kernel/asm/paging.h>
+#include <kos/kernel/bits/cpu-state-asm.h>
+#include <kos/kernel/bits/cpu-state-compat.h>
+#include <kos/kernel/bits/cpu-state-helpers.h>
+#include <kos/kernel/bits/cpu-state-helperscc.h>
+#include <kos/kernel/bits/cpu-state-verify.h>
+#include <kos/kernel/bits/cpu-state.h>
+#include <kos/kernel/bits/fpu-state-helpers.h>
+#include <kos/kernel/bits/fpu-state-helperscc.h>
+#include <kos/kernel/bits/fpu-state.h>
+#include <kos/kernel/bits/gdb-cpu-state.h>
+#include <kos/kernel/cpu-state-asm.h>
+#include <kos/kernel/cpu-state-compat.h>
+#include <kos/kernel/cpu-state-helpers.h>
+#include <kos/kernel/cpu-state-helperscc.h>
+#include <kos/kernel/cpu-state-verify.h>
+#include <kos/kernel/cpu-state.h>
+#include <kos/kernel/fpu-state-helpers.h>
+#include <kos/kernel/fpu-state-helperscc.h>
+#include <kos/kernel/fpu-state.h>
+#include <kos/kernel/gdb-cpu-state.h>
 #include <kos/kernel/handle.h>
 #include <kos/kernel/memory.h>
+#include <kos/kernel/paging.h>
 #include <kos/kernel/printk.h>
 #include <kos/kernel/syscalls.h>
 #include <kos/kernel/types.h>
@@ -767,6 +811,7 @@ incdir("");
 #include <libc/core/errno.h>
 #include <libc/core/error.h>
 #include <libc/core/fenv.h>
+#include <libc/core/format-printer.h>
 #include <libc/core/kos.malloc.h>
 #include <libc/core/malloc.h>
 #include <libc/core/parts.uchar.string.h>
@@ -782,6 +827,7 @@ incdir("");
 #include <libc/errno.h>
 #include <libc/error.h>
 #include <libc/fenv.h>
+#include <libc/format-printer.h>
 #include <libc/kos.malloc.h>
 #include <libc/malloc.h>
 #include <libc/parts.uchar.string.h>
@@ -797,6 +843,8 @@ incdir("");
 #include <libcmdline/decode.h>
 #include <libcmdline/encode.h>
 #include <libcpustate/api.h>
+#include <libcpustate/apply.h>
+#include <libcpustate/asm/features.h>
 #include <libdebuginfo/addr2line.h>
 #include <libdebuginfo/api.h>
 #include <libdebuginfo/cfi_entry.h>
@@ -980,6 +1028,7 @@ incdir("");
 #include <libterm/termio.h>
 #include <libunwind/api.h>
 #include <libunwind/arch-register.h>
+#include <libunwind/cfi/arm.h>
 #include <libunwind/cfi/i386.h>
 #include <libunwind/cfi/x86_64.h>
 #include <libunwind/cfi.h>

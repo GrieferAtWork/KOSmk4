@@ -101,10 +101,10 @@ typedef __off_t _off_t;
 typedef __off64_t _off64_t;
 #endif /* !__machine_off64_t_defined */
 
-#ifndef __off_t
-#define __off_t __off_t
-typedef _off64_t __off_t;
-#endif /* !__off_t */
+//#ifndef __off_t
+//#define  __off_t  __off_t
+//typedef _off64_t __off_t;
+//#endif /* !__off_t */
 
 #ifndef __machine_key_t_defined
 #define __machine_key_t_defined
@@ -148,7 +148,7 @@ typedef void *_iconv_t;
 #endif /* !__machine_clock_t_defined */
 
 #define _TIME_T_ __time_t
-typedef __time_t __time_t;
+/*typedef __time_t __time_t;*/
 
 #ifndef __machine_clockid_t_defined
 #define __machine_clockid_t_defined
@@ -178,7 +178,7 @@ typedef __ino_t __ino_t;
 #endif /* !__machine_ino_t_defined */
 typedef __pid_t __lwpid_t;
 typedef int __accmode_t;
-typedef __int64_t __rlim_t;
+/*typedef __int64_t __rlim_t;*/
 typedef __fd_t __mqd_t; /* mqd_t */
 typedef int __cpuwhich_t;
 typedef int __cpulevel_t;

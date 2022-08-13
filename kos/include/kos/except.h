@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25e1c31 */
+/* HASH CRC-32:0x1d8647b6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -352,12 +352,12 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(except_code_t __code);
 #define __PRIVATE_THROW_PACKAGE_CODE(args...) __PRIVATE_THROW_PACKAGE_CODEN(__HYBRID_PP_VA_NARGS(args))(args)
 #endif /* ... */
 
+#ifdef __except_thrown_defined
 #ifdef __except_throw_defined
 #define __PRIVATE_THROW1(code) except_throw(__PRIVATE_THROW_PACKAGE_CODE code)
-#elif defined(__except_thrown_defined)
+#else /* __except_throw_defined */
 #define __PRIVATE_THROW1(code) except_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 0)
-#endif /* ... */
-#ifdef __except_thrown_defined
+#endif /* !__except_throw_defined */
 #define __PRIVATE_THROW2(code, a)                      except_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 1, (__UINTPTR_TYPE__)(a))
 #define __PRIVATE_THROW3(code, a, b)                   except_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 2, (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b))
 #define __PRIVATE_THROW4(code, a, b, c)                except_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 3, (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b), (__UINTPTR_TYPE__)(c))
@@ -366,7 +366,6 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(except_code_t __code);
 #define __PRIVATE_THROW7(code, a, b, c, d, e, f)       except_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 6, (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b), (__UINTPTR_TYPE__)(c), (__UINTPTR_TYPE__)(d), (__UINTPTR_TYPE__)(e), (__UINTPTR_TYPE__)(f))
 #define __PRIVATE_THROW8(code, a, b, c, d, e, f, g)    except_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 7, (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b), (__UINTPTR_TYPE__)(c), (__UINTPTR_TYPE__)(d), (__UINTPTR_TYPE__)(e), (__UINTPTR_TYPE__)(f), (__UINTPTR_TYPE__)(g))
 #define __PRIVATE_THROW9(code, a, b, c, d, e, f, g, h) except_thrown(__PRIVATE_THROW_PACKAGE_CODE code, 8, (__UINTPTR_TYPE__)(a), (__UINTPTR_TYPE__)(b), (__UINTPTR_TYPE__)(c), (__UINTPTR_TYPE__)(d), (__UINTPTR_TYPE__)(e), (__UINTPTR_TYPE__)(f), (__UINTPTR_TYPE__)(g), (__UINTPTR_TYPE__)(h))
-#endif /* __except_thrown_defined */
 #define __PRIVATE_THROW_N2(n) __PRIVATE_THROW##n
 #define __PRIVATE_THROW_N(n)  __PRIVATE_THROW_N2(n)
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
@@ -374,6 +373,7 @@ __ATTR_WUNUSED __BOOL __NOTHROW(was_thrown)(except_code_t __code);
 #elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
 #define THROW(args...)        __PRIVATE_THROW_N(__HYBRID_PP_VA_NARGS(args))(args)
 #endif /* ... */
+#endif /* __except_thrown_defined */
 #endif /* __HYBRID_PP_VA_NARGS */
 #endif /* !THROW */
 

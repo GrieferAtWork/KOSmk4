@@ -33,6 +33,7 @@
 #endif /* !__INTELLISENSE__ */
 
 #ifdef __CC__
+#if defined(THROW) || defined(__INTELLISENSE__)
 __DECL_BEGIN
 
 /* Verify that only bits maskable by `MODIFYABLE_MASK' have changed. */
@@ -124,6 +125,7 @@ __LOCAL void (cpustate_verify_userds)(__u16 __v_ds)
 }
 
 __DECL_END
+#endif /* THROW || __INTELLISENSE__ */
 #endif /* __CC__ */
 
 #endif /* !_I386_KOS_KOS_KERNEL_BITS_CPU_STATE_VERIFY_H */
