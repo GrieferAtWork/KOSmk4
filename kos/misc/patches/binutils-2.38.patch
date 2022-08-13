@@ -260,6 +260,184 @@ diff -Naur binutils-2.38-orig/config.sub binutils-2.38/config.sub
  		;;
  	# This one is extra strict with allowed versions
  	sco3.2v2 | sco3.2v[4-9]* | sco5v6*)
+diff -Naur binutils-2.38-orig/gas/cond.c binutils-2.38/gas/cond.c
+--- binutils-2.38-orig/gas/cond.c	2022-01-22 13:14:08.000000000 +0100
++++ binutils-2.38/gas/cond.c	2022-08-13 19:04:29.304247200 +0200
+@@ -244,6 +244,22 @@
+ 	}
+       SKIP_WHITESPACE ();
+     }
++  else if (*input_line_pointer == '\"')
++    {
++      ++s;
++      ++input_line_pointer;
++      while (! is_end_of_line[(unsigned char) *input_line_pointer])
++	{
++	  *s++ = *input_line_pointer++;
++	  if (s[-1] == '\"')
++	    {
++	      if (*input_line_pointer != '\"')
++		break;
++	      ++input_line_pointer;
++	    }
++	}
++      SKIP_WHITESPACE ();
++    }
+   else
+     {
+       while (*input_line_pointer != terminator
+@@ -260,6 +276,74 @@
+ 
+ /* The MRI IFC and IFNC pseudo-ops.  */
+ 
++
++
++#include <ctype.h>
++static int my_memcasecmp(void const *lhs, void const *rhs, size_t num_bytes) {
++	unsigned char const *p1 = (unsigned char const *)lhs;
++	unsigned char const *p2 = (unsigned char const *)rhs;
++	unsigned char v1, v2;
++	v1 = v2 = 0;
++	while (num_bytes--) {
++		v1 = *p1++;
++		v2 = *p2++;
++		if (v1 != v2) {
++			v1 = (unsigned char)tolower(v1);
++			v2 = (unsigned char)tolower(v2);
++			if (v1 != v2)
++				break;
++		}
++	}
++	return (int)v1 - (int)v2;
++}
++
++static void *my_memcasemem(void const *haystack, size_t haystacklen,
++                           void const *needle, size_t needlelen) {
++	unsigned char *candidate, marker;
++	unsigned char *hayend;
++	if (!needlelen)
++		return (unsigned char *)haystack + haystacklen;
++	if (needlelen > haystacklen)
++		return NULL;
++	haystacklen -= (needlelen - 1);
++	marker       = (unsigned char)tolower(*(unsigned char *)needle);
++	hayend       = (unsigned char *)haystack + haystacklen;
++	for (;;) {
++		for (candidate = (unsigned char *)haystack; candidate < hayend; ++candidate) {
++			unsigned char b = *candidate;
++			if (b == marker || (unsigned char)tolower(b) == marker)
++				goto got_candidate;
++		}
++		break;
++got_candidate:
++		if (my_memcasecmp(candidate, needle, needlelen) == 0)
++			return (void *)candidate;
++		++candidate;
++		haystacklen = ((unsigned char *)haystack + haystacklen) - candidate;
++		haystack    = (void const *)candidate;
++	}
++	return NULL;
++}
++static void *my_memmem(void const *haystack, size_t haystacklen,
++                       void const *needle, size_t needlelen) {
++	unsigned char *candidate, marker;
++	if (!needlelen)
++		return (void *)haystack;
++	if (needlelen > haystacklen)
++		return NULL;
++	haystacklen -= (needlelen - 1);
++	marker       = *(unsigned char *)needle;
++	while ((candidate = (unsigned char *)memchr(haystack, marker, haystacklen)) != NULL) {
++		if (memcmp(candidate, needle, needlelen) == 0)
++			return (void *)candidate;
++		++candidate;
++		haystacklen = ((unsigned char *)haystack + haystacklen) - candidate;
++		haystack    = (void const *)candidate;
++	}
++	return NULL;
++}
++
++
+ void
+ s_ifc (int arg)
+ {
+@@ -267,7 +351,7 @@
+   char stopc = 0;
+   char *s1, *s2;
+   int len1, len2;
+-  int res;
++  int res, nocase;
+   struct conditional_frame cframe;
+ 
+   if (flag_mri)
+@@ -282,10 +366,65 @@
+ 
+   s2 = get_mri_string (';', &len2);
+ 
+-  res = len1 == len2 && strncmp (s1, s2, len1) == 0;
++	/* Check if strings are equal */
++	nocase = (arg & 0x8000) != 0;
++//	fprintf(stderr, ".ifc:{arg=%#x,s1='%.*s',s2='%.*s'}\n",
++//		(unsigned int)arg,
++//		(int)len1, s1,
++//		(int)len2, s2);
++	switch ((arg >> 1) & 0xff) {
++
++	case 1: /* ifc_startswith */
++		res = len1 >= len2 &&
++		      ((nocase ? my_memcasecmp(s1, s2, len2)
++		               : memcmp(s1, s2, len2)) == 0);
++		break;
++
++	case 2: /* ifc_endswith */
++		res = len1 >= len2 &&
++		      ((nocase ? my_memcasecmp(s1 + len1 - len2, s2, len2)
++		               : memcmp(s1 + len1 - len2, s2, len2)) == 0);
++		break;
++
++	case 3: /* ifc_contains */
++		res = ((nocase ? my_memmem(s1, len1, s2, len2)
++		               : my_memcasemem(s1, len1, s2, len2)) != NULL);
++		break;
++
++	case 4: /* ifc_ignorespace */
++		for (;;) {
++			char c1, c2;
++			while (len1 && isspace((unsigned char)*s1))
++				--len1, ++s1;
++			while (len2 && isspace((unsigned char)*s2))
++				--len2, ++s2;
++			if (!len1 || !len2)
++				break;
++			c1 = *s1++, --len1;
++			c2 = *s2++, --len2;
++			if (c1 != c2) {
++				if (nocase) {
++					c1 = (char)tolower((unsigned char)c1);
++					c2 = (char)tolower((unsigned char)c2);
++				}
++				if (c1 != c2)
++					break;
++			}
++		}
++		res = len1 == 0 && len2 == 0;
++		break;
++
++	default:
++		res = len1 == len2 &&
++		      ((nocase ? my_memcasecmp(s1, s2, len1)
++		               : memcmp(s1, s2, len1)) == 0);
++		break;
++	}
++	if (arg & 1)
++		res = !res;
+ 
+   initialize_cframe (&cframe);
+-  cframe.ignoring = cframe.dead_tree || ! (res ^ arg);
++  cframe.ignoring = cframe.dead_tree || !res;
+   current_cframe =
+     (struct conditional_frame *) obstack_alloc (&cond_obstack, sizeof cframe);
+   memcpy (current_cframe, &cframe, sizeof cframe);
 diff -Naur binutils-2.38-orig/gas/config/obj-elf.c binutils-2.38/gas/config/obj-elf.c
 --- binutils-2.38-orig/gas/config/obj-elf.c	2022-01-22 13:14:08.000000000 +0100
 +++ binutils-2.38/gas/config/obj-elf.c	2022-05-15 17:36:27.794542900 +0200
@@ -288,6 +466,45 @@ diff -Naur binutils-2.38-orig/gas/configure.tgt binutils-2.38/gas/configure.tgt
    aarch64*-*-elf*)			fmt=elf;;
    aarch64*-*-fuchsia*)			fmt=elf;;
    aarch64*-*-haiku*)			fmt=elf em=haiku ;;
+diff -Naur binutils-2.38-orig/gas/read.c binutils-2.38/gas/read.c
+--- binutils-2.38-orig/gas/read.c	2022-01-22 13:14:08.000000000 +0100
++++ binutils-2.38/gas/read.c	2022-08-13 18:45:28.291555300 +0200
+@@ -425,7 +425,16 @@
+   {"hword", cons, 2},
+   {"if", s_if, (int) O_ne},
+   {"ifb", s_ifb, 1},
+-  {"ifc", s_ifc, 0},
++  {"ifc",              s_ifc, (0 << 1)},
++  {"ifc_startswith",   s_ifc, (1 << 1)},
++  {"ifc_endswith",     s_ifc, (2 << 1)},
++  {"ifc_contains",     s_ifc, (3 << 1)},
++  {"ifc_skipspace",    s_ifc, (4 << 1)},
++  {"ifc_i",            s_ifc, (0 << 1) | 0x8000},
++  {"ifc_istartswith",  s_ifc, (1 << 1) | 0x8000},
++  {"ifc_iendswith",    s_ifc, (2 << 1) | 0x8000},
++  {"ifc_icontains",    s_ifc, (3 << 1) | 0x8000},
++  {"ifc_iskipspace",   s_ifc, (4 << 1) | 0x8000},
+   {"ifdef", s_ifdef, 0},
+   {"ifeq", s_if, (int) O_eq},
+   {"ifeqs", s_ifeqs, 0},
+@@ -434,7 +443,16 @@
+   {"ifle", s_if, (int) O_le},
+   {"iflt", s_if, (int) O_lt},
+   {"ifnb", s_ifb, 0},
+-  {"ifnc", s_ifc, 1},
++  {"ifnc",              s_ifc, (0 << 1) | 1},
++  {"ifnc_startswith",   s_ifc, (1 << 1) | 1},
++  {"ifnc_endswith",     s_ifc, (2 << 1) | 1},
++  {"ifnc_contains",     s_ifc, (3 << 1) | 1},
++  {"ifnc_skipspace",    s_ifc, (4 << 1) | 1},
++  {"ifnc_i",            s_ifc, (0 << 1) | 1 | 0x8000},
++  {"ifnc_istartswith",  s_ifc, (1 << 1) | 1 | 0x8000},
++  {"ifnc_iendswith",    s_ifc, (2 << 1) | 1 | 0x8000},
++  {"ifnc_icontains",    s_ifc, (3 << 1) | 1 | 0x8000},
++  {"ifnc_iskipspace",   s_ifc, (4 << 1) | 1 | 0x8000},
+   {"ifndef", s_ifdef, 1},
+   {"ifne", s_if, (int) O_ne},
+   {"ifnes", s_ifeqs, 1},
 diff -Naur binutils-2.38-orig/include/dwarf2.def binutils-2.38/include/dwarf2.def
 --- binutils-2.38-orig/include/dwarf2.def	2022-01-22 13:14:09.000000000 +0100
 +++ binutils-2.38/include/dwarf2.def	2022-05-15 17:37:09.120791400 +0200

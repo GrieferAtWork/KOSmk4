@@ -318,10 +318,18 @@ __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_syscall6_dw)(__sysca
 __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_Xsyscall6_dw)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __uint64_t __res; __kos_syscall6_ebp = __arg5; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_XSYSCALL_ASSEMBLY) : "=A" (__res) : "a" (__sysno), "b" (__arg0), "c" (__arg1), "d" (__arg2), "S" (__arg3), "D" (__arg4) : "memory", "cc"); return __res; }
 #endif /* !__X86_SYSCALL_MAY_CLOBBER_ECX_EDX */
 #else /* 0 */
-/* FIXME: `__X86_SYSCALL_TEST_EBP' is incomplete,  and could  never be  complete.
- *        Add an extension to binutils `.ifccont' that behaves similar to `.ifc',
- *        but checks for contains, rather than equals */
+
+#undef __GAS_HAVE_IFC_ENDSWITH
+/* Custom KOS extension to gas: `.ifc_endswith' */
+#ifdef __KOS__
+#define __GAS_HAVE_IFC_ENDSWITH
+#endif /* __KOS__ */
+
+#ifndef __GAS_HAVE_IFC_ENDSWITH
+/* CAUTION: `__X86_SYSCALL_TEST_EBP' is incomplete, and could never be complete.
+ *          > This is what the `.ifc_endswith' extension was created for! */
 #include "syscall-test-ebp.h"
+#endif /* !__GAS_HAVE_IFC_ENDSWITH */
 
 #define __X86_DEFINE_SYSCALL6_WRAPPER                                             \
 	".ifndef __x86.syscall6\n"                                                    \
@@ -361,6 +369,19 @@ __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_Xsyscall6_dw)(__sysc
 	".endif\n"
 
 #ifdef __X86_SYSCALL_MAY_CLOBBER_ECX_EDX
+#ifdef __GAS_HAVE_IFC_ENDSWITH
+#define __X86_SYSCALL_WITH_EBP(c, w, cw) \
+	".ifc %10,%%ebp\n\t" c "\n\t"        \
+	".else\n\t"                          \
+	".ifc_endswith %1,(%%ebp)\n\t" w     \
+	"pushl %10\n\t" cw "\n\t"            \
+	".else\n\t"                          \
+	"movl %%ebp, %1\n\t"                 \
+	"movl %10, %%ebp\n\t" c "\n\t"       \
+	"movl %1, %%ebp\n\t"                 \
+	".endif\n\t"                         \
+	".endif\n\t"
+#else /* __GAS_HAVE_IFC_ENDSWITH */
 #define __X86_SYSCALL_WITH_EBP(c, w, cw) \
 	".ifc %10,%%ebp\n\t" c "\n\t"        \
 	".else\n\t"                          \
@@ -373,11 +394,25 @@ __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_Xsyscall6_dw)(__sysc
 	"movl %1, %%ebp\n\t"                 \
 	".endif\n\t"                         \
 	".endif\n\t"
+#endif /* !__GAS_HAVE_IFC_ENDSWITH */
 __FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall6)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __syscall_ulong_t __ecx; __register __syscall_ulong_t __edx; __register __syscall_ulong_t __res; __syscall_ulong_t __temp; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_SYSCALL_ASSEMBLY, __X86_DEFINE_SYSCALL6_WRAPPER, "call __x86.syscall6") : "=a" (__res), "=&m" (__temp), "=&c" (__ecx), "=&d" (__edx) : "0" (__sysno), "b" (__arg0), "2" (__arg1), "3" (__arg2), "S" (__arg3), "D" (__arg4), "g" (__arg5) : "memory", "cc"); return __res; }
 __FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall6)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __syscall_ulong_t __ecx; __register __syscall_ulong_t __edx; __register __syscall_ulong_t __res; __syscall_ulong_t __temp; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_XSYSCALL_ASSEMBLY, __X86_DEFINE_XSYSCALL6_WRAPPER, "call __x86.Xsyscall6") : "=a" (__res), "=&m" (__temp), "=&c" (__ecx), "=&d" (__edx) : "0" (__sysno), "b" (__arg0), "2" (__arg1), "3" (__arg2), "S" (__arg3), "D" (__arg4), "g" (__arg5) : "memory", "cc"); return __res; }
 __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_syscall6_dw)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __syscall_ulong_t __ecx; __register __syscall_ulong_t __edx; __register __uint64_t __res; __syscall_ulong_t __temp; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_SYSCALL_ASSEMBLY, __X86_DEFINE_SYSCALL6_WRAPPER, "call __x86.syscall6") : "=A" (__res), "=&m" (__temp), "=&c" (__ecx), "=&d" (__edx) : "a" (__sysno), "b" (__arg0), "2" (__arg1), "3" (__arg2), "S" (__arg3), "D" (__arg4), "g" (__arg5) : "memory", "cc"); return __res; }
 __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_Xsyscall6_dw)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __syscall_ulong_t __ecx; __register __syscall_ulong_t __edx; __register __uint64_t __res; __syscall_ulong_t __temp; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_XSYSCALL_ASSEMBLY, __X86_DEFINE_XSYSCALL6_WRAPPER, "call __x86.Xsyscall6") : "=A" (__res), "=&m" (__temp), "=&c" (__ecx), "=&d" (__edx) : "a" (__sysno), "b" (__arg0), "2" (__arg1), "3" (__arg2), "S" (__arg3), "D" (__arg4), "g" (__arg5) : "memory", "cc"); return __res; }
 #else /* __X86_SYSCALL_MAY_CLOBBER_ECX_EDX */
+#ifdef __GAS_HAVE_IFC_ENDSWITH
+#define __X86_SYSCALL_WITH_EBP(c, w, cw) \
+	".ifc %8,%%ebp\n\t" c "\n\t"         \
+	".else\n\t"                          \
+	".ifc_endswith %1,(%%ebp)\n\t" w     \
+	"pushl %8\n\t" cw "\n\t"             \
+	".else\n\t"                          \
+	"movl %%ebp, %1\n\t"                 \
+	"movl %8, %%ebp\n\t" c "\n\t"        \
+	"movl %1, %%ebp\n\t"                 \
+	".endif\n\t"                         \
+	".endif\n\t"
+#else /* __GAS_HAVE_IFC_ENDSWITH */
 #define __X86_SYSCALL_WITH_EBP(c, w, cw) \
 	".ifc %8,%%ebp\n\t" c "\n\t"         \
 	".else\n\t"                          \
@@ -390,6 +425,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_Xsyscall6_dw)(__sysc
 	"movl %1, %%ebp\n\t"                 \
 	".endif\n\t"                         \
 	".endif\n\t"
+#endif /* !__GAS_HAVE_IFC_ENDSWITH */
 __FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_syscall6)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __syscall_ulong_t __res; __syscall_ulong_t __temp; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_SYSCALL_ASSEMBLY, __X86_DEFINE_SYSCALL6_WRAPPER, "call __x86.syscall6") : "=a" (__res), "=&m" (__temp) : "0" (__sysno), "b" (__arg0), "c" (__arg1), "d" (__arg2), "S" (__arg3), "D" (__arg4), "g" (__arg5) : "memory", "cc"); return __res; }
 __FORCELOCAL __ATTR_ARTIFICIAL __syscall_ulong_t (__LIBKCALL __x86_Xsyscall6)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __syscall_ulong_t __res; __syscall_ulong_t __temp; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_XSYSCALL_ASSEMBLY, __X86_DEFINE_XSYSCALL6_WRAPPER, "call __x86.Xsyscall6") : "=a" (__res), "=&m" (__temp) : "0" (__sysno), "b" (__arg0), "c" (__arg1), "d" (__arg2), "S" (__arg3), "D" (__arg4), "g" (__arg5) : "memory", "cc"); return __res; }
 __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_syscall6_dw)(__syscall_ulong_t __sysno, __syscall_ulong_t __arg0, __syscall_ulong_t __arg1, __syscall_ulong_t __arg2, __syscall_ulong_t __arg3, __syscall_ulong_t __arg4, __syscall_ulong_t __arg5) { __register __uint64_t __res; __syscall_ulong_t __temp; __asm__ __volatile__(__X86_SYSCALL_WITH_EBP(__X86_SYSCALL_ASSEMBLY, __X86_DEFINE_SYSCALL6_WRAPPER, "call __x86.syscall6") : "=A" (__res), "=&m" (__temp) : "a" (__sysno), "b" (__arg0), "c" (__arg1), "d" (__arg2), "S" (__arg3), "D" (__arg4), "g" (__arg5) : "memory", "cc"); return __res; }
