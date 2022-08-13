@@ -231,6 +231,7 @@ print_traceback_ucpustate(pformatprinter printer, void *arg,
 	                               n_skip);
 }
 
+#ifndef LCPUSTATE_ALIAS
 PUBLIC ATTR_COLDTEXT NONNULL((1, 3)) ssize_t FCALL
 print_traceback_lcpustate(pformatprinter printer, void *arg,
                           struct lcpustate const *__restrict state,
@@ -239,7 +240,9 @@ print_traceback_lcpustate(pformatprinter printer, void *arg,
 	lcpustate_to_kcpustate(state, &kst);
 	return print_traceback_kcpustate(printer, arg, &kst, n_skip);
 }
+#endif /* !LCPUSTATE_ALIAS */
 
+#ifndef KCPUSTATE_ALIAS
 PUBLIC ATTR_COLDTEXT NONNULL((1, 3)) ssize_t FCALL
 print_traceback_kcpustate(pformatprinter printer, void *arg,
                           struct kcpustate const *__restrict state,
@@ -249,7 +252,9 @@ print_traceback_kcpustate(pformatprinter printer, void *arg,
 	                               &unwind_setreg_kcpustate,
 	                               n_skip);
 }
+#endif /* !KCPUSTATE_ALIAS */
 
+#ifndef ICPUSTATE_ALIAS
 PUBLIC ATTR_COLDTEXT NONNULL((1, 3)) ssize_t FCALL
 print_traceback_icpustate(pformatprinter printer, void *arg,
                           struct icpustate const *__restrict state,
@@ -258,7 +263,9 @@ print_traceback_icpustate(pformatprinter printer, void *arg,
 	icpustate_to_ucpustate(state, &ust);
 	return print_traceback_ucpustate(printer, arg, &ust, n_skip);
 }
+#endif /* !ICPUSTATE_ALIAS */
 
+#ifndef SCPUSTATE_ALIAS
 PUBLIC ATTR_COLDTEXT NONNULL((1, 3)) ssize_t FCALL
 print_traceback_scpustate(pformatprinter printer, void *arg,
                           struct scpustate const *__restrict state,
@@ -267,7 +274,9 @@ print_traceback_scpustate(pformatprinter printer, void *arg,
 	scpustate_to_ucpustate(state, &ust);
 	return print_traceback_ucpustate(printer, arg, &ust, n_skip);
 }
+#endif /* !SCPUSTATE_ALIAS */
 
+#ifndef FCPUSTATE_ALIAS
 PUBLIC ATTR_COLDTEXT NONNULL((1, 3)) ssize_t FCALL
 print_traceback_fcpustate(pformatprinter printer, void *arg,
                           struct fcpustate const *__restrict state,
@@ -277,6 +286,7 @@ print_traceback_fcpustate(pformatprinter printer, void *arg,
 	                               &unwind_setreg_fcpustate,
 	                               n_skip);
 }
+#endif /* !FCPUSTATE_ALIAS */
 
 /* Print a traceback to the system log, using `KERN_RAW' */
 PUBLIC ATTR_NOINLINE ATTR_WEAK ATTR_SECTION(".text.kernel.tbn")
