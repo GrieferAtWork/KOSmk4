@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x189e5852 */
+/* HASH CRC-32:0xfbadef19 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atomic_xchb_nopf))(void *__addr, __UINT8_
 	do {
 		__nopf = __likely((__NAMESPACE_LOCAL_SYM __localdep_readb_nopf)(__addr, &__expected_oldval)) &&
 		       __likely((__NAMESPACE_LOCAL_SYM __localdep_atomic_cmpxchb_nopf)(__addr, __expected_oldval, __newval, __poldval));
-	} while (__likely(__nopf) && *__poldval == __expected_oldval);
+	} while (__likely(__nopf) && __unlikely(*__poldval != __expected_oldval));
 	return __nopf;
 }
 __NAMESPACE_LOCAL_END

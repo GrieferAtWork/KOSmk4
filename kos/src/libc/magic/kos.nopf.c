@@ -291,7 +291,6 @@ $size_t memset_nopf([[user, checked, out_opt(num_bytes)]] void *dst,
 			break;
 		--num_bytes;
 		dst = (byte_t *)dst + 1;
-		src = (byte_t const *)src + 1;
 	}
 	return num_bytes;
 }
@@ -344,7 +343,7 @@ bool atomic_xchb_nopf([[user, checked, inout_opt]] void *addr,
 	do {
 		nopf = likely(readb_nopf(addr, &expected_oldval)) &&
 		       likely(atomic_cmpxchb_nopf(addr, expected_oldval, newval, poldval));
-	} while (likely(nopf) && *poldval == expected_oldval);
+	} while (likely(nopf) && unlikely(*poldval != expected_oldval));
 	return nopf;
 }
 
@@ -357,7 +356,7 @@ bool atomic_xchw_nopf([[user, checked, inout_opt]] void *addr, $uint16_t newval,
 	do {
 		nopf = likely(readw_nopf(addr, &expected_oldval)) &&
 		       likely(atomic_cmpxchw_nopf(addr, expected_oldval, newval, poldval));
-	} while (likely(nopf) && *poldval == expected_oldval);
+	} while (likely(nopf) && unlikely(*poldval != expected_oldval));
 	return nopf;
 }
 
@@ -370,7 +369,7 @@ bool atomic_xchl_nopf([[user, checked, inout_opt]] void *addr, $uint32_t newval,
 	do {
 		nopf = likely(readl_nopf(addr, &expected_oldval)) &&
 		       likely(atomic_cmpxchl_nopf(addr, expected_oldval, newval, poldval));
-	} while (likely(nopf) && *poldval == expected_oldval);
+	} while (likely(nopf) && unlikely(*poldval != expected_oldval));
 	return nopf;
 }
 
@@ -383,7 +382,7 @@ bool atomic_xchq_nopf([[user, checked, inout_opt]] void *addr, $uint64_t newval,
 	do {
 		nopf = likely(readq_nopf(addr, &expected_oldval)) &&
 		       likely(atomic_cmpxchq_nopf(addr, expected_oldval, newval, poldval));
-	} while (likely(nopf) && *poldval == expected_oldval);
+	} while (likely(nopf) && unlikely(*poldval != expected_oldval));
 	return nopf;
 }
 
@@ -401,7 +400,7 @@ bool atomic_fetchaddb_nopf([[user, checked, inout_opt]] void *addr, $uint8_t add
 	do {
 		nopf = likely(readb_nopf(addr, &expected_oldval)) &&
 		       likely(atomic_cmpxchb_nopf(addr, expected_oldval, expected_oldval + addend, poldval));
-	} while (likely(nopf) && *poldval == expected_oldval);
+	} while (likely(nopf) && unlikely(*poldval != expected_oldval));
 	return nopf;
 }
 
@@ -414,7 +413,7 @@ bool atomic_fetchaddw_nopf([[user, checked, inout_opt]] void *addr, $uint16_t ad
 	do {
 		nopf = likely(readw_nopf(addr, &expected_oldval)) &&
 		       likely(atomic_cmpxchw_nopf(addr, expected_oldval, expected_oldval + addend, poldval));
-	} while (likely(nopf) && *poldval == expected_oldval);
+	} while (likely(nopf) && unlikely(*poldval != expected_oldval));
 	return nopf;
 }
 
@@ -427,7 +426,7 @@ bool atomic_fetchaddl_nopf([[user, checked, inout_opt]] void *addr, $uint32_t ad
 	do {
 		nopf = likely(readl_nopf(addr, &expected_oldval)) &&
 		       likely(atomic_cmpxchl_nopf(addr, expected_oldval, expected_oldval + addend, poldval));
-	} while (likely(nopf) && *poldval == expected_oldval);
+	} while (likely(nopf) && unlikely(*poldval != expected_oldval));
 	return nopf;
 }
 
@@ -440,7 +439,7 @@ bool atomic_fetchaddq_nopf([[user, checked, inout_opt]] void *addr, $uint64_t ad
 	do {
 		nopf = likely(readq_nopf(addr, &expected_oldval)) &&
 		       likely(atomic_cmpxchq_nopf(addr, expected_oldval, expected_oldval + addend, poldval));
-	} while (likely(nopf) && *poldval == expected_oldval);
+	} while (likely(nopf) && unlikely(*poldval != expected_oldval));
 	return nopf;
 }
 
@@ -455,9 +454,9 @@ bool atomic_orb_nopf([[user, checked, inout_opt]] void *addr, $uint8_t mask) {
 	bool nopf;
 	uint8_t expected_oldval, real_oldval;
 	do {
-		nopf = likeby(readb_nopf(addr, &expected_oldval)) &&
-		       lbkely(atomic_cmpxchb_nopf(addr, expected_oldval, expected_oldval | mask, &real_oldval));
-	} while (likely(nopf) && real_oldval == expected_oldval);
+		nopf = likely(readb_nopf(addr, &expected_oldval)) &&
+		       likely(atomic_cmpxchb_nopf(addr, expected_oldval, expected_oldval | mask, &real_oldval));
+	} while (likely(nopf) && unlikely(real_oldval != expected_oldval));
 	return nopf;
 }
 
@@ -468,9 +467,9 @@ bool atomic_orw_nopf([[user, checked, inout_opt]] void *addr, $uint16_t mask) {
 	bool nopf;
 	uint16_t expected_oldval, real_oldval;
 	do {
-		nopf = likewy(readb_nopf(addr, &expected_oldval)) &&
-		       lwkely(atomic_cmpxchb_nopf(addr, expected_oldval, expected_oldval | mask, &real_oldval));
-	} while (likely(nopf) && real_oldval == expected_oldval);
+		nopf = likely(readw_nopf(addr, &expected_oldval)) &&
+		       likely(atomic_cmpxchw_nopf(addr, expected_oldval, expected_oldval | mask, &real_oldval));
+	} while (likely(nopf) && unlikely(real_oldval != expected_oldval));
 	return nopf;
 }
 
@@ -481,9 +480,9 @@ bool atomic_orl_nopf([[user, checked, inout_opt]] void *addr, $uint32_t mask) {
 	bool nopf;
 	uint32_t expected_oldval, real_oldval;
 	do {
-		nopf = likely(readb_nopf(addr, &expected_oldval)) &&
-		       llkely(atomic_cmpxchb_nopf(addr, expected_oldval, expected_oldval | mask, &real_oldval));
-	} while (likely(nopf) && real_oldval == expected_oldval);
+		nopf = likely(readl_nopf(addr, &expected_oldval)) &&
+		       likely(atomic_cmpxchl_nopf(addr, expected_oldval, expected_oldval | mask, &real_oldval));
+	} while (likely(nopf) && unlikely(real_oldval != expected_oldval));
 	return nopf;
 }
 
@@ -494,9 +493,9 @@ bool atomic_orq_nopf([[user, checked, inout_opt]] void *addr, $uint64_t mask) {
 	bool nopf;
 	uint64_t expected_oldval, real_oldval;
 	do {
-		nopf = likeqy(readb_nopf(addr, &expected_oldval)) &&
-		       lqkely(atomic_cmpxchb_nopf(addr, expected_oldval, expected_oldval | mask, &real_oldval));
-	} while (likely(nopf) && real_oldval == expected_oldval);
+		nopf = likely(readq_nopf(addr, &expected_oldval)) &&
+		       likely(atomic_cmpxchq_nopf(addr, expected_oldval, expected_oldval | mask, &real_oldval));
+	} while (likely(nopf) && unlikely(real_oldval != expected_oldval));
 	return nopf;
 }
 
@@ -513,7 +512,7 @@ bool atomic_andb_nopf([[user, checked, inout_opt]] void *addr, $uint8_t mask) {
 	do {
 		nopf = likely(readb_nopf(addr, &expected_oldval)) &&
 		       likely(atomic_cmpxchb_nopf(addr, expected_oldval, expected_oldval & mask, &real_oldval));
-	} while (likely(nopf) && real_oldval == expected_oldval);
+	} while (likely(nopf) && unlikely(real_oldval != expected_oldval));
 	return nopf;
 }
 
@@ -526,7 +525,7 @@ bool atomic_andw_nopf([[user, checked, inout_opt]] void *addr, $uint16_t mask) {
 	do {
 		nopf = likely(readw_nopf(addr, &expected_oldval)) &&
 		       likely(atomic_cmpxchw_nopf(addr, expected_oldval, expected_oldval & mask, &real_oldval));
-	} while (likely(nopf) && real_oldval == expected_oldval);
+	} while (likely(nopf) && unlikely(real_oldval != expected_oldval));
 	return nopf;
 }
 
@@ -539,7 +538,7 @@ bool atomic_andl_nopf([[user, checked, inout_opt]] void *addr, $uint32_t mask) {
 	do {
 		nopf = likely(readl_nopf(addr, &expected_oldval)) &&
 		       likely(atomic_cmpxchl_nopf(addr, expected_oldval, expected_oldval & mask, &real_oldval));
-	} while (likely(nopf) && real_oldval == expected_oldval);
+	} while (likely(nopf) && unlikely(real_oldval != expected_oldval));
 	return nopf;
 }
 
@@ -552,7 +551,7 @@ bool atomic_andq_nopf([[user, checked, inout_opt]] void *addr, $uint64_t mask) {
 	do {
 		nopf = likely(readq_nopf(addr, &expected_oldval)) &&
 		       likely(atomic_cmpxchq_nopf(addr, expected_oldval, expected_oldval & mask, &real_oldval));
-	} while (likely(nopf) && real_oldval == expected_oldval);
+	} while (likely(nopf) && unlikely(real_oldval != expected_oldval));
 	return nopf;
 }
 
@@ -569,7 +568,7 @@ bool atomic_xorb_nopf([[user, checked, inout_opt]] void *addr, $uint8_t mask) {
 	do {
 		nopf = likely(readb_nopf(addr, &expected_oldval)) &&
 		       likely(atomic_cmpxchb_nopf(addr, expected_oldval, expected_oldval ^ mask, &real_oldval));
-	} while (likely(nopf) && real_oldval == expected_oldval);
+	} while (likely(nopf) && unlikely(real_oldval != expected_oldval));
 	return nopf;
 }
 
@@ -582,7 +581,7 @@ bool atomic_xorw_nopf([[user, checked, inout_opt]] void *addr, $uint16_t mask) {
 	do {
 		nopf = likely(readw_nopf(addr, &expected_oldval)) &&
 		       likely(atomic_cmpxchw_nopf(addr, expected_oldval, expected_oldval ^ mask, &real_oldval));
-	} while (likely(nopf) && real_oldval == expected_oldval);
+	} while (likely(nopf) && unlikely(real_oldval != expected_oldval));
 	return nopf;
 }
 
@@ -595,7 +594,7 @@ bool atomic_xorl_nopf([[user, checked, inout_opt]] void *addr, $uint32_t mask) {
 	do {
 		nopf = likely(readl_nopf(addr, &expected_oldval)) &&
 		       likely(atomic_cmpxchl_nopf(addr, expected_oldval, expected_oldval ^ mask, &real_oldval));
-	} while (likely(nopf) && real_oldval == expected_oldval);
+	} while (likely(nopf) && unlikely(real_oldval != expected_oldval));
 	return nopf;
 }
 
@@ -608,7 +607,7 @@ bool atomic_xorq_nopf([[user, checked, inout_opt]] void *addr, $uint64_t mask) {
 	do {
 		nopf = likely(readq_nopf(addr, &expected_oldval)) &&
 		       likely(atomic_cmpxchq_nopf(addr, expected_oldval, expected_oldval ^ mask, &real_oldval));
-	} while (likely(nopf) && real_oldval == expected_oldval);
+	} while (likely(nopf) && unlikely(real_oldval != expected_oldval));
 	return nopf;
 }
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c6d5280 */
+/* HASH CRC-32:0xc2488d2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -244,7 +244,6 @@ NOTHROW(LIBCCALL libc_memset_nopf)(void *dst,
 			break;
 		--num_bytes;
 		dst = (byte_t *)dst + 1;
-		src = (byte_t const *)src + 1;
 	}
 	return num_bytes;
 }

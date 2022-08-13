@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8c8eb19 */
+/* HASH CRC-32:0x127ffb9f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,6 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(memset_nopf))(void *__dst, int __byte, __
 			break;
 		--__num_bytes;
 		__dst = (__BYTE_TYPE__ *)__dst + 1;
-		__src = (__BYTE_TYPE__ const *)__src + 1;
 	}
 	return __num_bytes;
 }
