@@ -4186,6 +4186,12 @@ int memcmpb([[in(n_bytes * 1), aligned(1)]] void const *s1,
             [[in(n_bytes * 1), aligned(1)]] void const *s2,
             $size_t n_bytes) = memcmp;
 
+%(auto_source){
+#if !defined(LIBC_ARCH_HAVE_MEMCMPW) && !defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL) && __SIZEOF_INT__ <= 2
+DEFINE_INTERN_ALIAS(libd_wmemcmp, libc_memcmpw);
+#endif /* !LIBC_ARCH_HAVE_MEMCMPW && !__KERNEL__ && __LIBCCALL_IS_LIBDCALL && __SIZEOF_INT__ <= 2 */
+}
+
 @@Compare memory buffers and return the difference of the first non-matching word
 [[libc, kernel, pure, wunused, decl_include("<hybrid/typecore.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INT__ >= 2), alias("wmemcmp")]]
@@ -4206,6 +4212,12 @@ $int16_t memcmpw([[in(n_words * 2), aligned(2)]] void const *s1,
 	while (n_words-- && ((v1 = *p1++) == (v2 = *p2++)))
 		;
 	return v1 - v2;
+}
+
+%(auto_source){
+#if !defined(LIBC_ARCH_HAVE_MEMCMPL) && !defined(__KERNEL__) && __SIZEOF_INT__ <= 4
+DEFINE_INTERN_ALIAS(libc_wmemcmp, libc_memcmpl);
+#endif /* !LIBC_ARCH_HAVE_MEMCMPL && !__KERNEL__ && __SIZEOF_INT__ <= 4 */
 }
 
 @@Compare memory buffers and return the difference of the first non-matching dword

@@ -62,6 +62,15 @@ __ASM_L(	mcr    p15, 0, r0, c7, c10, 5) /* dmb    ish */
 __ASM_L(.endm)
 #endif /* __ARM_ARCH < 7 */
 
+/* Helper for always generating the correct code sequence to load a 32-bit constant `value' into a register `reg' */
+__ASM_L(.macro ldreg reg:req, value:req)
+__ASM_L(.if __ASM_ARG(\value) >= 0 && __ASM_ARG(\value) < 65535)
+__ASM_L(	mov    __ASM_ARG(\reg), #__ASM_ARG(\value))
+__ASM_L(.else)
+__ASM_L(	ldr    __ASM_ARG(\reg), =__ASM_ARG(\value))
+__ASM_L(.endif)
+__ASM_L(.endm)
+
 __ASM_END
 #endif /* !__COMPILER_NO_GCC_ASM_MACROS */
 

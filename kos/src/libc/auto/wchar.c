@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc38b862c */
+/* HASH CRC-32:0x53aff696 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,9 +25,9 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/wchar.h"
-#if !defined(LIBC_ARCH_HAVE_C16MEMCMP) && __SIZEOF_INT__ > 2
+#if !defined(LIBC_ARCH_HAVE_C16MEMCMP) && (!defined(__LIBCCALL_IS_LIBDCALL) || __SIZEOF_INT__ > 2)
 #include "string.h"
-#endif /* !LIBC_ARCH_HAVE_C16MEMCMP && __SIZEOF_INT__ > 2 */
+#endif /* !LIBC_ARCH_HAVE_C16MEMCMP && (!__LIBCCALL_IS_LIBDCALL || __SIZEOF_INT__ > 2) */
 #if !defined(LIBC_ARCH_HAVE_C32MEMCMP) && __SIZEOF_INT__ > 4
 #include "string.h"
 #endif /* !LIBC_ARCH_HAVE_C32MEMCMP && __SIZEOF_INT__ > 4 */
@@ -433,7 +433,7 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED ATTR
 NOTHROW_NCX(LIBCCALL libc_mbsinit)(mbstate_t const *mbs) {
 	return !mbs || mbstate_isempty(mbs);
 }
-#if !defined(LIBC_ARCH_HAVE_C16MEMCMP) && __SIZEOF_INT__ > 2
+#if !defined(LIBC_ARCH_HAVE_C16MEMCMP) && (!defined(__LIBCCALL_IS_LIBDCALL) || __SIZEOF_INT__ > 2)
 /* >> wmemcmp(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wmemcmp)(char16_t const *s1,
@@ -447,7 +447,7 @@ NOTHROW_NCX(LIBDCALL libd_wmemcmp)(char16_t const *s1,
 
 
 }
-#endif /* !LIBC_ARCH_HAVE_C16MEMCMP && __SIZEOF_INT__ > 2 */
+#endif /* !LIBC_ARCH_HAVE_C16MEMCMP && (!__LIBCCALL_IS_LIBDCALL || __SIZEOF_INT__ > 2) */
 #if !defined(LIBC_ARCH_HAVE_C32MEMCMP) && __SIZEOF_INT__ > 4
 /* >> wmemcmp(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
@@ -6505,9 +6505,9 @@ DEFINE_PUBLIC_ALIAS(wcstoumax, libc_wcstoul);
 #endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__ */
 DEFINE_PUBLIC_ALIAS(mbsinit, libc_mbsinit);
 #endif /* !__KERNEL__ */
-#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C16MEMCMP) && __SIZEOF_INT__ > 2
+#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C16MEMCMP) && (!defined(__LIBCCALL_IS_LIBDCALL) || __SIZEOF_INT__ > 2)
 DEFINE_PUBLIC_ALIAS(DOS$wmemcmp, libd_wmemcmp);
-#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_C16MEMCMP && __SIZEOF_INT__ > 2 */
+#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_C16MEMCMP && (!__LIBCCALL_IS_LIBDCALL || __SIZEOF_INT__ > 2) */
 #if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C32MEMCMP) && __SIZEOF_INT__ > 4
 DEFINE_PUBLIC_ALIAS(wmemcmp, libc_wmemcmp);
 #endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_C32MEMCMP && __SIZEOF_INT__ > 4 */

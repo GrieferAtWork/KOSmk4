@@ -69,6 +69,29 @@ Cheat sheet for someone that know a lot about x86 assembly, but is pretty much t
 	- It doesn't make a difference which order you write them in `push`
 
 
+### Condition code suffixes
+
+| Code          | Mnemonic   | Meaning                           | Operation           | Check (in `APSR`)
+|---------------|------------|-----------------------------------|---------------------|-------------------
+| `0b0000[0x0]` | `EQ`       | Equal                             | `x == y`, `x == 0`  | `Z == 1`
+| `0b0001[0x1]` | `NE`       | NotEqual                          | `x != y`, `x != 0`  | `Z == 0`
+| `0b0010[0x2]` | `CS`, `HS` | CarrySet, unsigned_Higher_or_Same | `(unsigned)x >= y`  | `C == 1`
+| `0b0011[0x3]` | `CC`, `LO` | CarryClear, unsigned_LOwer        | `(unsigned)x < y`   | `C == 0`
+| `0b0100[0x4]` | `MI`       | Minus                             | `(signed)x < 0`     | `N == 1`
+| `0b0101[0x5]` | `PL`       | Plus                              | `(signed)x >= 0`    | `N == 0`
+| `0b0110[0x6]` | `VS`       | ValueStripped                     | *Overflow*          | `V == 1`
+| `0b0111[0x7]` | `VC`       | ValueCorrect                      | *No overflow*       | `V == 0`
+| `0b1000[0x8]` | `HI`       | unsigned_HIgher                   | `(unsigned)x > y`   | `C == 1 && Z == 0`
+| `0b1001[0x9]` | `LS`       | unsigned_Lower_or_Same            | `(unsigned)x <= y`  | `C == 0 || Z == 1`
+| `0b1010[0xa]` | `GE`       | signed_Greater_than_or_Equal      | `(signed)x >= y`    | `N == V`
+| `0b1011[0xb]` | `LT`       | signed_LessThan                   | `(signed)x < y`     | `N != V`
+| `0b1100[0xc]` | `GT`       | signed_GreaterThan                | `(signed)x > y`     | `Z == 0 and N == V`
+| `0b1101[0xd]` | `LE`       | signed_Less_than_or_Equal         | `(signed)x <= y`    | `Z == 1 or N != V`
+| `0b1110[0xe]` | `AL`       | ALways                            | -                   | `true`
+
+
+**\[From\]**: Table A8-1 Condition codes
+
 ### Operand size suffix
 
 | Width | canonical name   | arm                    | x86

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda90298 */
+/* HASH CRC-32:0xc56ef90b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3209,6 +3209,9 @@ NOTHROW_NCX(LIBCCALL libc_mempsetl)(void *__restrict dst,
 	return (u32 *)libc_memsetl(dst, dword, n_dwords) + n_dwords;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMPSETL */
+#if !defined(LIBC_ARCH_HAVE_MEMCMPW) && !defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL) && __SIZEOF_INT__ <= 2
+DEFINE_INTERN_ALIAS(libd_wmemcmp, libc_memcmpw);
+#endif /* !LIBC_ARCH_HAVE_MEMCMPW && !__KERNEL__ && __LIBCCALL_IS_LIBDCALL && __SIZEOF_INT__ <= 2 */
 #ifndef LIBC_ARCH_HAVE_MEMCMPW
 /* Compare memory buffers and return the difference of the first non-matching word */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int16_t
@@ -3224,6 +3227,9 @@ NOTHROW_NCX(LIBCCALL libc_memcmpw)(void const *s1,
 	return v1 - v2;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCMPW */
+#if !defined(LIBC_ARCH_HAVE_MEMCMPL) && !defined(__KERNEL__) && __SIZEOF_INT__ <= 4
+DEFINE_INTERN_ALIAS(libc_wmemcmp, libc_memcmpl);
+#endif /* !LIBC_ARCH_HAVE_MEMCMPL && !__KERNEL__ && __SIZEOF_INT__ <= 4 */
 #ifndef LIBC_ARCH_HAVE_MEMCMPL
 /* Compare memory buffers and return the difference of the first non-matching dword */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int32_t

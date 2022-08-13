@@ -1253,11 +1253,17 @@ try {
 
 	/* Scan libc source files for additional section names. */
 	startTask(scanFileForSectionNames, ("src/libc/api.h",));
+	startScanSectionJobs("src/libc/hybrid/arch/arm/*.h");
+	startScanSectionJobs("src/libc/hybrid/arch/arm/*.c");
+	startScanSectionJobs("src/libc/hybrid/arch/arm/*.S");
 	startScanSectionJobs("src/libc/hybrid/arch/i386/*.h");
 	startScanSectionJobs("src/libc/hybrid/arch/i386/*.c");
 	startScanSectionJobs("src/libc/hybrid/arch/i386/*.S");
 	startScanSectionJobs("src/libc/hybrid/*.c");
 	startScanSectionJobs("src/libc/hybrid/*.h");
+	startScanSectionJobs("src/libc/libc/arch/arm/*.h");
+	startScanSectionJobs("src/libc/libc/arch/arm/*.c");
+	startScanSectionJobs("src/libc/libc/arch/arm/*.S");
 	startScanSectionJobs("src/libc/libc/arch/i386/*.h");
 	startScanSectionJobs("src/libc/libc/arch/i386/*.c");
 	startScanSectionJobs("src/libc/libc/arch/i386/*.S");

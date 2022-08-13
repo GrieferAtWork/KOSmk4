@@ -17,50 +17,32 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_LIBC_ARCH_ARM_PTHREAD_S
-#define GUARD_LIBC_LIBC_ARCH_ARM_PTHREAD_S 1
-#define __ASSEMBLER__ 1
+#ifndef GUARD_LIBC_LIBC_ARCH_ARM_UCONTEXT_C
+#define GUARD_LIBC_LIBC_ARCH_ARM_UCONTEXT_C 1
 
 #include "../../../api.h"
 /**/
 
-#include <hybrid/compiler.h>
+#include <kos/types.h>
 
-#include <asm/arm.h>
-#include <sys/syscall.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ucontext.h>
+/**/
 
-#include <cfi.h>
+DECL_BEGIN
 
+INTERN ATTR_SECTION(".text.crt.cpu.ucontext") NONNULL((1, 2)) void
+NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
+                                        void (LIBKCALL *func)(void),
+                                        __STDC_INT_AS_SIZE_T argc,
+                                        ...) {
+	CRT_UNIMPLEMENTEDF("[arm]::makecontext(%p, %p, %Iu)", ucp, func, argc);
+}
 
-/* Assembly-side for the process of cloning a thread. */
-/* >> INTERN NONNULL((1, 2)) pid_t
- * >> NOTHROW(__FCALL libc_pthread_clone)(struct pthread_clone_args *__restrict args,
- * >>                                     struct pthread *__restrict thread); */
-.section .text.crt.sched.pthread
-INTERN_FUNCTION(libc_pthread_clone)
-	.cfi_startproc
-	b      . /* TODO */
-	.cfi_endproc
-END(libc_pthread_clone)
+DEFINE_PUBLIC_ALIAS(makecontext, libc_makecontext);
 
+DECL_END
 
-/* >> INTDEF ATTR_NORETURN void FCALL
- * >> libc_pthread_unmap_stack_and_exit(void  *stackaddr,
- * >>                                   size_t stacksize,
- * >>                                   int    exitcode); */
-.section .text.crt.sched.pthread
-INTERN_FUNCTION(libc_pthread_unmap_stack_and_exit)
-	mov    r7, #SYS_munmap
-	swi    #0                    /* unmap our own stack. */
-
-	/* WARNING: No more accessing stack memory from here on! */
-
-	mov    r0, r2                /* int exitcode */
-	mov    r7, #SYS_exit
-	swi    #0
-
-	/* -unreachable- */
-	b      .
-END(libc_pthread_unmap_stack_and_exit)
-
-#endif /* !GUARD_LIBC_LIBC_ARCH_ARM_PTHREAD_S */
+#endif /* GUARD_LIBC_LIBC_ARCH_ARM_UCONTEXT_C */

@@ -490,7 +490,7 @@ int mbsinit([[in_opt]] mbstate_t const *mbs) {
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INT__ <= 2), bind_local_function(memcmpw)]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INT__ <= 4), bind_local_function(memcmpl)]]
 /* When sizeof(int) <= 2: export int wmemcmp(...) = int16_t memcmpw(...); */
-[[crt_dos_impl_requires(!defined(LIBC_ARCH_HAVE_C16MEMCMP) && __SIZEOF_INT__ > 2)]]
+[[crt_dos_impl_requires(!defined(LIBC_ARCH_HAVE_C16MEMCMP) && (!defined(__LIBCCALL_IS_LIBDCALL) || __SIZEOF_INT__ > 2))]]
 /* When sizeof(int) <= 4: export int wmemcmp(...) = int32_t memcmpl(...); */
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_C32MEMCMP) && __SIZEOF_INT__ > 4)]]
 int wmemcmp([[in(num_chars)]] wchar_t const *s1,

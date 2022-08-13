@@ -17,50 +17,57 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_LIBC_ARCH_ARM_PTHREAD_S
-#define GUARD_LIBC_LIBC_ARCH_ARM_PTHREAD_S 1
+#ifndef GUARD_LIBC_LIBC_ARCH_ARM_VFORK_S
+#define GUARD_LIBC_LIBC_ARCH_ARM_VFORK_S 1
 #define __ASSEMBLER__ 1
-
-#include "../../../api.h"
-/**/
+#define _KOS_KERNEL_SOURCE 1
 
 #include <hybrid/compiler.h>
 
 #include <asm/arm.h>
+#include <kos/asm/syscall.h>
 #include <sys/syscall.h>
 
 #include <cfi.h>
+#include <errno.h> /* ELIMIT */
 
 
-/* Assembly-side for the process of cloning a thread. */
-/* >> INTERN NONNULL((1, 2)) pid_t
- * >> NOTHROW(__FCALL libc_pthread_clone)(struct pthread_clone_args *__restrict args,
- * >>                                     struct pthread *__restrict thread); */
-.section .text.crt.sched.pthread
-INTERN_FUNCTION(libc_pthread_clone)
+.section ".text.crt.sched.access"
+INTERN_FUNCTION(libc_vfork)
 	.cfi_startproc
-	b      . /* TODO */
-	.cfi_endproc
-END(libc_pthread_clone)
-
-
-/* >> INTDEF ATTR_NORETURN void FCALL
- * >> libc_pthread_unmap_stack_and_exit(void  *stackaddr,
- * >>                                   size_t stacksize,
- * >>                                   int    exitcode); */
-.section .text.crt.sched.pthread
-INTERN_FUNCTION(libc_pthread_unmap_stack_and_exit)
-	mov    r7, #SYS_munmap
-	swi    #0                    /* unmap our own stack. */
-
-	/* WARNING: No more accessing stack memory from here on! */
-
-	mov    r0, r2                /* int exitcode */
-	mov    r7, #SYS_exit
+	/* Invoke the vfork() system call. */
+	mov    r7, #SYS_vfork
 	swi    #0
 
-	/* -unreachable- */
-	b      .
-END(libc_pthread_unmap_stack_and_exit)
+	/* Check for errors. */
+	cmp    r0, #-ELIMIT
+	bxlo   lr /* if ((unsigned)r0 < -ELIMIT) return r0; */
 
-#endif /* !GUARD_LIBC_LIBC_ARCH_ARM_PTHREAD_S */
+	/* Vfork error (within the parent)
+	 * Note that we only get here when the vfork() _itself_ fails.
+	 * We  _dont_ get here if something within the child after the
+	 * vfork() fails. */
+	push_cfi_r {lr}
+	EXTERN(libc_seterrno_neg)
+	bl     libc_seterrno_neg /* Returns -1 unconditionally in r0 */
+	pop_cfi_r {pc}
+	.cfi_endproc
+END(libc_vfork)
+
+DEFINE_PUBLIC_ALIAS(vfork, libc_vfork)
+DEFINE_PUBLIC_ALIAS(__vfork, libc_vfork)
+DEFINE_PUBLIC_ALIAS(__libc_vfork, libc_vfork)
+
+
+.section ".text.crt.except.sched.access"
+INTERN_FUNCTION(libc_VFork)
+	.cfi_startproc
+	ldreg  r7, ARM_XSYSCALL(SYS_vfork)
+	swi    #0
+	bx     lr
+	.cfi_endproc
+END(libc_VFork)
+DEFINE_PUBLIC_ALIAS(VFork, libc_VFork)
+
+
+#endif /* !GUARD_LIBC_LIBC_ARCH_ARM_VFORK_S */

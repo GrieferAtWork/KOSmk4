@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_LIBC_ARCH_ARM_PTHREAD_S
-#define GUARD_LIBC_LIBC_ARCH_ARM_PTHREAD_S 1
+#ifndef GUARD_LIBC_LIBC_ARCH_ARM_UCONTEXT_S
+#define GUARD_LIBC_LIBC_ARCH_ARM_UCONTEXT_S 1
 #define __ASSEMBLER__ 1
 
 #include "../../../api.h"
@@ -27,40 +27,49 @@
 #include <hybrid/compiler.h>
 
 #include <asm/arm.h>
-#include <sys/syscall.h>
-
 #include <cfi.h>
+/**/
 
 
-/* Assembly-side for the process of cloning a thread. */
-/* >> INTERN NONNULL((1, 2)) pid_t
- * >> NOTHROW(__FCALL libc_pthread_clone)(struct pthread_clone_args *__restrict args,
- * >>                                     struct pthread *__restrict thread); */
-.section .text.crt.sched.pthread
-INTERN_FUNCTION(libc_pthread_clone)
+/* INTERN NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_getcontext)(ucontext_t *__restrict ucp); */
+.section ".text.crt.cpu.ucontext"
+INTERN_FUNCTION(libc_getcontext)
 	.cfi_startproc
 	b      . /* TODO */
 	.cfi_endproc
-END(libc_pthread_clone)
+END(libc_getcontext)
+DEFINE_PUBLIC_ALIAS(getcontext, libc_getcontext)
 
 
-/* >> INTDEF ATTR_NORETURN void FCALL
- * >> libc_pthread_unmap_stack_and_exit(void  *stackaddr,
- * >>                                   size_t stacksize,
- * >>                                   int    exitcode); */
-.section .text.crt.sched.pthread
-INTERN_FUNCTION(libc_pthread_unmap_stack_and_exit)
-	mov    r7, #SYS_munmap
-	swi    #0                    /* unmap our own stack. */
 
-	/* WARNING: No more accessing stack memory from here on! */
+.section ".text.crt.cpu.ucontext"
+INTERN_FUNCTION(libc_swapcontext)
+	.cfi_startproc simple
+	b      . /* TODO */
+	.cfi_endproc
+END(libc_swapcontext)
+DEFINE_PUBLIC_ALIAS(swapcontext, libc_swapcontext)
 
-	mov    r0, r2                /* int exitcode */
-	mov    r7, #SYS_exit
-	swi    #0
 
-	/* -unreachable- */
-	b      .
-END(libc_pthread_unmap_stack_and_exit)
+/* INTERN NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_setcontext)(ucontext_t const *__restrict ucp); */
+.section ".text.crt.cpu.ucontext"
+INTERN_FUNCTION(libc_setcontext)
+	.cfi_startproc simple
+	b      . /* TODO */
+	.cfi_endproc
+END(libc_setcontext)
+DEFINE_PUBLIC_ALIAS(setcontext, libc_setcontext)
 
-#endif /* !GUARD_LIBC_LIBC_ARCH_ARM_PTHREAD_S */
+
+
+
+.section ".text.crt.cpu.ucontext"
+	nop /* For unwinding... */
+INTERN_FUNCTION(libc_makecontext_exit_thread)
+	/* No CFI annotation, because we don't return! */
+	b      . /* TODO */
+END(libc_makecontext_exit_thread)
+
+
+
+#endif /* GUARD_LIBC_LIBC_ARCH_ARM_UCONTEXT_S */

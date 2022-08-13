@@ -96,6 +96,11 @@ DEFINE_PUBLIC_ALIAS(__crt_unreachable, libc_abort)
 
 
 
+/* >> PUBLIC ATTR_NORETURN void VLIBCCALL
+ * >> __afail(char const *expr,
+ * >>         char const *file,
+ * >>         unsigned int line,
+ * >>         char const *func); */
 .section ASSERTION_SECTION
 INTERN_FUNCTION(libc___afail)
 	.cfi_startproc
@@ -141,6 +146,13 @@ DEFINE_PUBLIC_ALIAS(__afail, libc___afail)
 
 
 
+/* >> PUBLIC ATTR_NORETURN void VLIBCCALL
+ * >> __afailf(char const *expr,
+ * >>          char const *file,
+ * >>          unsigned int line,
+ * >>          char const *func,
+ * >>          char const *format,
+ * >>          ...); */
 .section ASSERTION_SECTION
 INTERN_FUNCTION(libc___afailf)
 	.cfi_startproc
@@ -184,7 +196,7 @@ INTERN_FUNCTION(libc___afailf)
 	INTERN(libc_assertion_failure_core)
 	call   libc_assertion_failure_core
 #else /* __x86_64__ */
-	/* char const *expr, char const *file, unsigned int line, char const *func, char const *format */
+	/* char const *expr, char const *file, unsigned int line, char const *func, char const *format, ... */
 
 	/* Generate a full `struct kcpustate' */
 	ASM_PUSH_KCPUSTATE_AFTER_PIP_CFI_R
@@ -205,6 +217,11 @@ DEFINE_PUBLIC_ALIAS(__afailf, libc___afailf)
 #if defined(__KERNEL__) || defined(__INTELLISENSE__)
 /* Support for __acheck[f]() */
 
+/* >> PUBLIC bool VLIBCCALL
+ * >> __acheck(char const *expr,
+ * >>          char const *file,
+ * >>          unsigned int line,
+ * >>          char const *func); */
 .section ASSERTION_SECTION
 INTERN_FUNCTION(libc___acheck)
 	.cfi_startproc
@@ -293,6 +310,13 @@ END(libc___acheck)
 DEFINE_PUBLIC_ALIAS(__acheck, libc___acheck)
 
 
+/* >> PUBLIC bool VLIBCCALL
+ * >> __acheckf(char const *expr,
+ * >>           char const *file,
+ * >>           unsigned int line,
+ * >>           char const *func,
+ * >>           char const *format,
+ * >>           ...); */
 .section ASSERTION_SECTION
 INTERN_FUNCTION(libc___acheckf)
 	.cfi_startproc
@@ -335,7 +359,7 @@ INTERN_FUNCTION(libc___acheckf)
 #endif /* !__NO_FPU */
 	movl   $(SIZEOF_X86_64_VA_LIST_REG_SAVE_AREA), OFFSET_X86_64_VA_LIST_STRUCT_FP_OFFSET(%R_fcall0P)
 #else /* __x86_64__ */
-	/* char const *expr, char const *file, unsigned int line, char const *func, char const *format */
+	/* char const *expr, char const *file, unsigned int line, char const *func, char const *format, ... */
 	ASM_PUSH_KCPUSTATE_AFTER_PIP_CFI_R
 	leaP   (SIZEOF_KCPUSTATE + Pn(5))(%Psp), %Pax
 	pushP_cfi %Pax           /* aa_args */
@@ -358,6 +382,11 @@ DEFINE_PUBLIC_ALIAS(__acheckf, libc___acheckf)
 DEFINE_INTERN_ALIAS(libc___assert_fail, libc___afail)
 DEFINE_PUBLIC_ALIAS(__assert_fail, libc___assert_fail)
 
+/* >> PUBLIC ATTR_NORETURN void VLIBCCALL
+ * >> __assert_func(char const *file,
+ * >>               unsigned int line,
+ * >>               char const *func,
+ * >>               char const *expr); */
 .section ASSERTION_SECTION
 INTERN_FUNCTION(libc___assert_func)
 	.cfi_startproc
@@ -395,6 +424,12 @@ END(libc___assert_func)
 DEFINE_PUBLIC_ALIAS(__assert_func, libc___assert_func)
 
 
+/* >> PUBLIC ATTR_NORETURN void VLIBCCALL
+ * >> __assertfail(char const *expr,
+ * >>              char const *file,
+ * >>              unsigned int line,
+ * >>              char const *func,
+ * >>              size_t charsize); */
 #ifdef __x86_64__
 DEFINE_INTERN_ALIAS(libc___assertfail, libc___afail)
 #else /* __x86_64__ */
@@ -415,6 +450,10 @@ DEFINE_PUBLIC_ALIAS(__assertfail, libc___assertfail)
 
 
 
+/* >> PUBLIC ATTR_NORETURN void VLIBCCALL
+ * >> __assert(char const *file,
+ * >>          unsigned int line,
+ * >>          char const *expr); */
 .section ASSERTION_SECTION
 INTERN_FUNCTION(libc___assert)
 	.cfi_startproc
@@ -459,6 +498,10 @@ DEFINE_PUBLIC_ALIAS(__assert, libc___assert)
 
 
 
+/* >> PUBLIC ATTR_NORETURN void VLIBCCALL
+ * >> _assert(char const *expr,
+ * >>         char const *file,
+ * >>         unsigned int line); */
 .section ASSERTION_SECTION
 INTERN_FUNCTION(libc__assert)
 	.cfi_startproc
@@ -502,6 +545,10 @@ END(libc__assert)
 DEFINE_PUBLIC_ALIAS(_assert, libc__assert)
 
 
+/* >> PUBLIC ATTR_NORETURN void VLIBCCALL
+ * >> _wassert(char32_t const *expr,
+ * >>          char32_t const *file,
+ * >>          unsigned int line); */
 .section ".text.crt.dos.assert"
 INTERN_FUNCTION(libc__wassert)
 	.cfi_startproc
@@ -545,6 +592,10 @@ END(libc__wassert)
 DEFINE_PUBLIC_ALIAS(_wassert, libc__wassert)
 
 
+/* >> PUBLIC ATTR_NORETURN void VLIBCCALL
+ * >> DOS$_wassert(char16_t const *expr,
+ * >>              char16_t const *file,
+ * >>              unsigned int line); */
 .section ".text.crt.dos.assert"
 INTERN_FUNCTION(libd__wassert)
 	.cfi_startproc
@@ -591,10 +642,13 @@ DEFINE_PUBLIC_ALIAS(DOS$_wassert, libd__wassert)
 
 
 
+/* >> PUBLIC ATTR_NORETURN void VLIBCCALL
+ * >> __assert_perror_fail(int errnum,
+ * >>                      char const *file,
+ * >>                      unsigned int line,
+ * >>                      char const *func) */
 .section ".text.crt.glibc.assert"
 INTERN_FUNCTION(libc___assert_perror_fail)
-	/* >> void __assert_perror_fail(int errnum, char const *file,
-	 * >>                           unsigned int line, char const *func) */
 	.cfi_startproc
 #ifdef __x86_64__
 	/* %R_sysvabi0P: int errnum

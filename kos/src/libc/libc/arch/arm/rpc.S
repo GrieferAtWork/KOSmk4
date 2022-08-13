@@ -17,50 +17,27 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_LIBC_ARCH_ARM_PTHREAD_S
-#define GUARD_LIBC_LIBC_ARCH_ARM_PTHREAD_S 1
+#ifndef GUARD_LIBC_LIBC_ARCH_ARM_RPC_S
+#define GUARD_LIBC_LIBC_ARCH_ARM_RPC_S 1
 #define __ASSEMBLER__ 1
-
-#include "../../../api.h"
-/**/
 
 #include <hybrid/compiler.h>
 
 #include <asm/arm.h>
-#include <sys/syscall.h>
 
 #include <cfi.h>
 
 
-/* Assembly-side for the process of cloning a thread. */
-/* >> INTERN NONNULL((1, 2)) pid_t
- * >> NOTHROW(__FCALL libc_pthread_clone)(struct pthread_clone_args *__restrict args,
- * >>                                     struct pthread *__restrict thread); */
-.section .text.crt.sched.pthread
-INTERN_FUNCTION(libc_pthread_clone)
-	.cfi_startproc
+.section .text.crt.sched.rpc
+	.cfi_startproc simple
+	nop /* For unwinding... */
+INTERN_FUNCTION(libc_arm_rpc_restorer)
 	b      . /* TODO */
 	.cfi_endproc
-END(libc_pthread_clone)
+END(libc_arm_rpc_restorer)
 
 
-/* >> INTDEF ATTR_NORETURN void FCALL
- * >> libc_pthread_unmap_stack_and_exit(void  *stackaddr,
- * >>                                   size_t stacksize,
- * >>                                   int    exitcode); */
-.section .text.crt.sched.pthread
-INTERN_FUNCTION(libc_pthread_unmap_stack_and_exit)
-	mov    r7, #SYS_munmap
-	swi    #0                    /* unmap our own stack. */
 
-	/* WARNING: No more accessing stack memory from here on! */
 
-	mov    r0, r2                /* int exitcode */
-	mov    r7, #SYS_exit
-	swi    #0
 
-	/* -unreachable- */
-	b      .
-END(libc_pthread_unmap_stack_and_exit)
-
-#endif /* !GUARD_LIBC_LIBC_ARCH_ARM_PTHREAD_S */
+#endif /* !GUARD_LIBC_LIBC_ARCH_ARM_RPC_S */

@@ -26,6 +26,9 @@
  * Defining these macros causes libc's auto/user-system to not provide
  * the associated functions. */
 
+/* abort() */
+#define LIBC_ARCH_HAVE_ABORT 1
+
 
 #ifndef __KERNEL__
 /* void ASMCALL libc_sig_restore(void); */

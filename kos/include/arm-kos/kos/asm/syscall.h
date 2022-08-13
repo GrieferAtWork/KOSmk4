@@ -21,6 +21,16 @@
 #define _ARM_KOS_KOS_ASM_SYSCALL_H 1
 
 #include <__stdinc.h>
+#include <features.h> /* __USE_KOS_KERNEL */
+
+/* Flag for system call numbers to indicate execution in an exception-enabled context */
+#define __ARM_XSYSCALL_FLAG 0x800000 /* Or'd with `sysno' */
+#define __ARM_XSYSCALL(x) ((x) | __ARM_XSYSCALL_FLAG)
+#ifdef __USE_KOS_KERNEL
+#define ARM_XSYSCALL_FLAG __ARM_XSYSCALL_FLAG
+#define ARM_XSYSCALL      __ARM_XSYSCALL
+#endif /* __USE_KOS_KERNEL */
+
 #ifndef __LCLINT__
 #include <__crt.h>
 
@@ -311,10 +321,6 @@ __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __arm_syscall7_dw)(__sysca
 }
 
 
-/* Flag for system call numbers to indicate execution in an exception-enabled context */
-#define __ARM_XSYSCALL_FLAG 0x800000 /* Or'd with `sysno' */
-
-
 #define __ARM_SYSCALL_ARG_PLACEHOLDER_1  ,
 #define __ARM_SYSCALL_TAKE_SECOND_ARG_IMPL(x, val, ...) val
 #define __ARM_SYSCALL_TAKE_SECOND_ARG(x) __ARM_SYSCALL_TAKE_SECOND_ARG_IMPL x
@@ -341,13 +347,13 @@ __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __arm_syscall7_dw)(__sysca
 #define __CDECLARE_XSC(attr, Treturn, name, param, args)                                                     \
 	__FORCELOCAL __ATTR_ARTIFICIAL attr Treturn (__LIBKCALL sys_X##name) param {                             \
 		return (Treturn)__ARM_SYSCALL_SELECT(__NRRC_##name,__ARM_SYSCALL_IS_DEFINED(__NRDW_##name))          \
-		                                    (__NR_##name | __ARM_XSYSCALL_FLAG                               \
+		                                    (__ARM_XSYSCALL(__NR_##name)                                     \
 		                                     __ARM_SYSCALL_COMMA_IF_ARGC(__NRRC_##name) __NRAP_##name args); \
 	}
 #define __CDECLARE_VOID_XSC(attr, name, param, args)                                           \
 	__FORCELOCAL __ATTR_ARTIFICIAL attr void (__LIBKCALL sys_X##name) param {                  \
 		__ARM_SYSCALL_SELECT0(__NRRC_##name)                                                   \
-		                      (__NR_##name | __ARM_XSYSCALL_FLAG                               \
+		                      (__ARM_XSYSCALL(__NR_##name)                                     \
 		                       __ARM_SYSCALL_COMMA_IF_ARGC(__NRRC_##name) __NRAP_##name args); \
 		__ARM_SYSCALL_NORETURN_UNREACHABLE(__ARM_SYSCALL_IS_DEFINED(__NRNT_##name));           \
 	}
