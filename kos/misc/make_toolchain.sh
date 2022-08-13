@@ -312,7 +312,6 @@ elif [[ "$1" == arm-kos ]]; then
 	NAME="arm-kos"
 	INCLUDE_NAME="arm-kos"
 	BINLIBDIRNAME="lib"
-	SYSHEADER_BUILD_CONFIG_SUFFIX="32"
 	export TARGET="arm-kos"
 	CONFIGURE_OPTIONS_GCC+=("--with-arch=armv6")
 	CONFIGURE_OPTIONS_GCC+=("--with-fpu=vfp")
@@ -707,24 +706,34 @@ if ! [ -f "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" ] || \
 		# the framework surrounding those headers only gets created by said
 		# make command!
 		# Even more importantly, libstdc++ needs `__USE_BROKEN_CCOMPAT' (s.a. <features.h>)
+		LIBSTDCXX_INCLUDE_PATHS=("$PREFIX/gcc/$TARGET/libstdc++-v3/include")
+		if [[ "$TARGET_NAME" == "arm" ]]; then
+			LIBSTDCXX_INCLUDE_PATHS+=("$PREFIX/gcc/$TARGET/arm/autofp/v5te/fpu/libstdc++-v3/include")
+			LIBSTDCXX_INCLUDE_PATHS+=("$PREFIX/gcc/$TARGET/thumb/libstdc++-v3/include")
+			LIBSTDCXX_INCLUDE_PATHS+=("$PREFIX/gcc/$TARGET/thumb/autofp/v7/fpu/libstdc++-v3/include")
+		fi
 
 		# $1: header name (e.g. `stdlib')
 		use_real_header() {
-			echo "	Link real header for '$PREFIX/gcc/$TARGET/libstdc++-v3/include/c$1'"
-			unlink "$PREFIX/gcc/$TARGET/libstdc++-v3/include/c$1" > /dev/null 2>&1
-			cmd ln -s "$KOS_ROOT/kos/include/c$1" "$PREFIX/gcc/$TARGET/libstdc++-v3/include/c$1"
-			echo "	Link real header for '$PREFIX/gcc/$TARGET/libstdc++-v3/include/$1.h'"
-			unlink "$PREFIX/gcc/$TARGET/libstdc++-v3/include/$1.h" > /dev/null 2>&1
-			cmd ln -s "$KOS_ROOT/kos/include/$1.h" "$PREFIX/gcc/$TARGET/libstdc++-v3/include/$1.h"
+			for LIBSTDCXX_INCLUDE_PATH in "${LIBSTDCXX_INCLUDE_PATHS[@]}"; do
+				echo "	Link real header for '${LIBSTDCXX_INCLUDE_PATH}/c$1'"
+				unlink "${LIBSTDCXX_INCLUDE_PATH}/c$1" > /dev/null 2>&1
+				cmd ln -s "$KOS_ROOT/kos/include/c$1" "${LIBSTDCXX_INCLUDE_PATH}/c$1"
+				echo "	Link real header for '${LIBSTDCXX_INCLUDE_PATH}/$1.h'"
+				unlink "${LIBSTDCXX_INCLUDE_PATH}/$1.h" > /dev/null 2>&1
+				cmd ln -s "$KOS_ROOT/kos/include/$1.h" "${LIBSTDCXX_INCLUDE_PATH}/$1.h"
+			done
 		}
 		echo "Fixup libstdc++ build-time headers"
 		for HEADER_NAME in "${CXX_COMPAT_HEADER_NAMES[@]}"; do
 			use_real_header "$HEADER_NAME"
 		done
 		for HEADER_NAME in "${CXX_COMPAT_HEADER_FILES[@]}"; do
-			echo "	Link real header for '$PREFIX/gcc/$TARGET/libstdc++-v3/include/$HEADER_NAME'"
-			unlink "$PREFIX/gcc/$TARGET/libstdc++-v3/include/$HEADER_NAME" > /dev/null 2>&1
-			cmd ln -s "$KOS_ROOT/kos/include/$HEADER_NAME" "$PREFIX/gcc/$TARGET/libstdc++-v3/include/$HEADER_NAME"
+			for LIBSTDCXX_INCLUDE_PATH in "${LIBSTDCXX_INCLUDE_PATHS[@]}"; do
+				echo "	Link real header for '${LIBSTDCXX_INCLUDE_PATH}/$HEADER_NAME'"
+				unlink "${LIBSTDCXX_INCLUDE_PATH}/$HEADER_NAME" > /dev/null 2>&1
+				cmd ln -s "$KOS_ROOT/kos/include/$HEADER_NAME" "${LIBSTDCXX_INCLUDE_PATH}/$HEADER_NAME"
+			done
 		done
 		cmd make -j "$MAKE_PARALLEL_COUNT" "all-target-libstdc++-v3"
 	fi
@@ -756,11 +765,15 @@ install_libstdcxx() {
 	fi
 	echo "Check if $GCC_VERSION:libgcc_s was installed into $1"
 	if ! [ -f "$1/libgcc_s.so.$LIBGCC_VERSION" ]; then
-		echo "	Copying $GCC_VERSION:libgcc_s into $1"
-		cmd mkdir -p "$1"
-		cmd cp \
-			"$PREFIX/$TARGET/lib/libgcc_s.so.$LIBGCC_VERSION_FULL" \
-			"$1/libgcc_s.so.$LIBGCC_VERSION"
+		if [ -f "$PREFIX/$TARGET/lib/libgcc_s.so.$LIBGCC_VERSION_FULL" ]; then
+			echo "	Copying $GCC_VERSION:libgcc_s into $1"
+			cmd mkdir -p "$1"
+			cmd cp \
+				"$PREFIX/$TARGET/lib/libgcc_s.so.$LIBGCC_VERSION_FULL" \
+				"$1/libgcc_s.so.$LIBGCC_VERSION"
+		else
+			echo "	$GCC_VERSION:libgcc_s wasn't built for this architecture"
+		fi
 	else
 		echo "	$GCC_VERSION:libgcc_s has already been installed to $1"
 	fi
@@ -779,11 +792,15 @@ install_libstdcxx_symlinks() {
 	fi
 	echo "Check if $GCC_VERSION:libgcc_s was installed into $1"
 	if ! [ -f "$1/libgcc_s.so.$LIBGCC_VERSION" ]; then
-		echo "	Installing $GCC_VERSION:libgcc_s into $1"
-		cmd mkdir -p "$1"
-		cmd ln -s \
-			"../../${NAME}-common/$BINLIBDIRNAME/libgcc_s.so.$LIBGCC_VERSION_FULL" \
-			"$1/libgcc_s.so.$LIBGCC_VERSION_FULL"
+		if [ -f "$PREFIX/$TARGET/lib/libgcc_s.so.$LIBGCC_VERSION_FULL" ]; then
+			echo "	Installing $GCC_VERSION:libgcc_s into $1"
+			cmd mkdir -p "$1"
+			cmd ln -s \
+				"../../${NAME}-common/$BINLIBDIRNAME/libgcc_s.so.$LIBGCC_VERSION_FULL" \
+				"$1/libgcc_s.so.$LIBGCC_VERSION_FULL"
+		else
+			echo "	$GCC_VERSION:libgcc_s wasn't built for this architecture"
+		fi
 	else
 		echo "	$GCC_VERSION:libgcc_s has already been installed to $1"
 	fi
@@ -944,6 +961,10 @@ for name in *.h; do
 	libiconv_mirror_include "$name"
 done
 
+if test -z "$SYSHEADER_BUILD_CONFIG_SUFFIX"; then
+	SYSHEADER_BUILD_CONFIG_SUFFIX=""
+fi
+cmd mkdir -p "$KOS_ROOT/kos/include/$INCLUDE_NAME/kos/config"
 BUILD_CONFIG_HEADER="$KOS_ROOT/kos/include/$INCLUDE_NAME/kos/config/_toolchain${SYSHEADER_BUILD_CONFIG_SUFFIX}.h"
 echo "Updating build configuration: $BUILD_CONFIG_HEADER"
 DI=($(date -u +"%-s %0Y %0m %0d %0H %0M %0S %0N"))

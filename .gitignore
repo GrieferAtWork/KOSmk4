@@ -21,6 +21,7 @@
 /asm.S
 /kos/include/i386-kos/c++
 /kos/include/i386-kos/c++-backup-*
+/kos/include/arm-kos/c++
 /kos/ammend.sources
 __ice__
 *.dec
