@@ -205,15 +205,92 @@ END(libc_arm_nopf_ret)
 
 /* Implement alignment wrapers */
 #ifdef __ARM_ATOMIC_8_ALIGN_TO_32
+/* @in  uint8_t *r0_addr
+ * @in  uint8_t  r1_oldval
+ * @in  uint8_t  r2_newval
+ * @out uint8_t  r3_real_oldval
+ *
+ * >> r4_saved_oldval = r1_oldval;
+ * >> r5_saved_newval = r2_newval;
+ * >> switch (r0_addr & 3) {
+ * >> case N:
+ * >> again_caseN:
+ * >>     r12_addr       = r0_addr;
+ * >>     r0_addr        = r0_addr - N;
+ * >>     r0_oldval32    = libc_arm_nopf_ldr_r0_Br0B(r0_addr);
+ * >>     r3_real_oldval = (r0_oldval32 >> (N * 8)) & 0xff;
+ * >>     if (r3_real_oldval != r4_saved_oldval) {
+ * >>         r0_addr = r12_addr;
+ * >>         break;
+ * >>     }
+ * >>     r1_oldval       = r0_oldval32 & ~(0x000000ff << (N * 8));
+ * >>     r2_newval       = r1_oldval | (r5_saved_newval << (N * 8));
+ * >>     r1_oldval       = r1_oldval | (r4_saved_oldval << (N * 8));
+ * >>     r0_addr         = r12_addr;
+ * >>     r3_real_oldval  = libc_arm_nopf_cmpxch(r0_addr, r1_oldval, r2_newval);
+ * >>     if (APSR.Z) {
+ * >>         r1_oldval = r4_saved_oldval;
+ * >>         r2_newval = r5_saved_newval;
+ * >>         return;
+ * >>     }
+ * >>     if (r3_real_oldval != r1_oldval) {
+ * >>         goto again_caseN;
+ * >>     }
+ * >>     r3_real_oldval = (r3_real_oldval >> (N * 8)) & 0xff;
+ * >>     break;
+ * >> }
+ * >> r1_oldval = r4_saved_oldval;
+ * >> r2_newval = r5_saved_newval;
+ * >> SET_APSR_Z;
+ * >> return;
+ */
 INTERN_FUNCTION(libc_arm_nopf_cmpxchb)
-	push_cfi_r {r0, r1, r2, lr}
+	push_cfi_r {r4, r5, lr}
 	b      . /* TODO */
-	bl     libc_arm_nopf_cmpxch
-	pop_cfi_r {r0, r1, r2, pc}
+	pop_cfi_r {r4, r5, pc}
 END(libc_arm_nopf_cmpxchb)
 #endif /* __ARM_ATOMIC_8_ALIGN_TO_32 */
 
 #ifdef __ARM_ATOMIC_16_ALIGN_TO_32
+/* @in  uint16_t *r0_addr
+ * @in  uint16_t  r1_oldval
+ * @in  uint16_t  r2_newval
+ * @out uint16_t  r3_real_oldval
+ *
+ * >> r4_saved_oldval = r1_oldval;
+ * >> r5_saved_newval = r2_newval;
+ * >> switch (r0_addr & 2) {
+ * >> case N:
+ * >> again_caseN:
+ * >>     r12_addr       = r0_addr;
+ * >>     r0_addr        = r0_addr - N;
+ * >>     r0_oldval32    = libc_arm_nopf_ldr_r0_Br0B(r0_addr);
+ * >>     r3_real_oldval = (r0_oldval32 >> (N * 8)) & 0xffff;
+ * >>     if (r3_real_oldval != r4_saved_oldval) {
+ * >>         r0_addr = r12_addr;
+ * >>         break;
+ * >>     }
+ * >>     r1_oldval       = r0_oldval32 & ~(0x0000ffff << (N * 8));
+ * >>     r2_newval       = r1_oldval | (r5_saved_newval << (N * 8));
+ * >>     r1_oldval       = r1_oldval | (r4_saved_oldval << (N * 8));
+ * >>     r0_addr         = r12_addr;
+ * >>     r3_real_oldval  = libc_arm_nopf_cmpxch(r0_addr, r1_oldval, r2_newval);
+ * >>     if (APSR.Z) {
+ * >>         r1_oldval = r4_saved_oldval;
+ * >>         r2_newval = r5_saved_newval;
+ * >>         return;
+ * >>     }
+ * >>     if (r3_real_oldval != r1_oldval) {
+ * >>         goto again_caseN;
+ * >>     }
+ * >>     r3_real_oldval = (r3_real_oldval >> (N * 8)) & 0xffff;
+ * >>     break;
+ * >> }
+ * >> r1_oldval = r4_saved_oldval;
+ * >> r2_newval = r5_saved_newval;
+ * >> SET_APSR_Z;
+ * >> return;
+ */
 INTERN_FUNCTION(libc_arm_nopf_cmpxchh)
 	push_cfi_r {r0, r1, r2, lr}
 	b      . /* TODO */
