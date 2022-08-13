@@ -22,17 +22,27 @@
 
 #include <kernel/compiler.h>
 
+#ifdef BUILDING_KERNEL_CORE
+#ifdef __CC__
+#include <hybrid/typecore.h>
+#include <asm/asmword.h>
+#define DEFINE_KERNEL_COMMANDLINE_OPTION_IMPL(section, addr, type, name) \
+	__asm__(".pushsection " section "\n\t"                               \
+	        ".wordptr " PP_PRIVATE_STR(addr) "\n\t"                      \
+	        ".byte " PP_STR(type) "\n\t"                                 \
+	        ".asciz " PP_PRIVATE_STR(name) "\n\t"                        \
+	        ".align " PP_STR(__ALIGNOF_POINTER__) "\n\t"                 \
+	        ".popsection")
 #define DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(addr, type, name) \
-	NOT_IMPLEMENTED
-
+	DEFINE_KERNEL_COMMANDLINE_OPTION_IMPL(".rodata.free.commandline_options.very_early", addr, type, name)
 #define DEFINE_EARLY_KERNEL_COMMANDLINE_OPTION(addr, type, name) \
-	NOT_IMPLEMENTED
-
+	DEFINE_KERNEL_COMMANDLINE_OPTION_IMPL(".rodata.free.commandline_options.early", addr, type, name)
 #define DEFINE_KERNEL_COMMANDLINE_OPTION(addr, type, name) \
-	NOT_IMPLEMENTED
-
+	DEFINE_KERNEL_COMMANDLINE_OPTION_IMPL(".rodata.free.commandline_options.stable", addr, type, name)
 #define DEFINE_LATE_KERNEL_COMMANDLINE_OPTION(addr, type, name) \
-	NOT_IMPLEMENTED
+	DEFINE_KERNEL_COMMANDLINE_OPTION_IMPL(".rodata.free.commandline_options.late", addr, type, name)
+#endif /* __CC__ */
+#endif /* BUILDING_KERNEL_CORE */
 
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_ARCH_DRIVER_PARAM_H */

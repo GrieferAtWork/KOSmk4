@@ -23,13 +23,13 @@
 #include <kernel/compiler.h>
 
 #ifdef BUILDING_KERNEL_CORE
-#include <hybrid/host.h>
 #ifdef __CC__
+#include <hybrid/host.h>
 #ifdef __x86_64__
 #define DEFINE_KERNEL_COMMANDLINE_OPTION_IMPL(section, addr, type, name) \
 	__asm__(".pushsection " section "\n\t"                               \
 	        ".quad " PP_PRIVATE_STR(addr) "\n\t"                         \
-	        "991: .byte " PP_STR(type) "\n\t"                            \
+	        ".byte " PP_STR(type) "\n\t"                                 \
 	        ".asciz " PP_PRIVATE_STR(name) "\n\t"                        \
 	        ".align 8\n\t"                                               \
 	        ".popsection")
@@ -37,13 +37,11 @@
 #define DEFINE_KERNEL_COMMANDLINE_OPTION_IMPL(section, addr, type, name) \
 	__asm__(".pushsection " section "\n\t"                               \
 	        ".long " PP_PRIVATE_STR(addr) "\n\t"                         \
-	        "991: .byte " PP_STR(type) "\n\t"                            \
+	        ".byte " PP_STR(type) "\n\t"                                 \
 	        ".asciz " PP_PRIVATE_STR(name) "\n\t"                        \
 	        ".align 4\n\t"                                               \
 	        ".popsection")
 #endif /* !__x86_64__ */
-#endif /* __CC__ */
-
 #define DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(addr, type, name) \
 	DEFINE_KERNEL_COMMANDLINE_OPTION_IMPL(".rodata.free.commandline_options.very_early", addr, type, name)
 #define DEFINE_EARLY_KERNEL_COMMANDLINE_OPTION(addr, type, name) \
@@ -52,7 +50,7 @@
 	DEFINE_KERNEL_COMMANDLINE_OPTION_IMPL(".rodata.free.commandline_options.stable", addr, type, name)
 #define DEFINE_LATE_KERNEL_COMMANDLINE_OPTION(addr, type, name) \
 	DEFINE_KERNEL_COMMANDLINE_OPTION_IMPL(".rodata.free.commandline_options.late", addr, type, name)
-
+#endif /* __CC__ */
 #endif /* BUILDING_KERNEL_CORE */
 
 #endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_KERNEL_ARCH_DRIVER_PARAM_H */
