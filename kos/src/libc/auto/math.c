@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf05a7ea */
+/* HASH CRC-32:0xea0f198e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2523,21 +2523,26 @@ NOTHROW(LIBCCALL libc_ilogbl)(__LONGDOUBLE x) {
 
 }
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_nexttoward, libc_nextafter);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/nexttoward.h>
 /* >> nexttowardf(3), nexttoward(3), nexttowardl(3) */
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED double
 NOTHROW(LIBCCALL libc_nexttoward)(double x,
                                   __LONGDOUBLE y) {
-
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
 
 	return (double)__ieee754_nexttoward((__IEEE754_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
 
 
 
-
-
-
+#else /* __IEEE854_LONG_DOUBLE_TYPE__ */
+	return (double)libc_nextafterl((__LONGDOUBLE)x, y);
+#endif /* !__IEEE854_LONG_DOUBLE_TYPE__ */
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libm/scalbn.h>
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)
  * Return `x' times (2 to the Nth power) */
@@ -2721,15 +2726,17 @@ NOTHROW(LIBCCALL libc_llround)(double x) {
 INTERN ATTR_SECTION(".text.crt.math.math") ATTR_CONST WUNUSED float
 NOTHROW(LIBCCALL libc_nexttowardf)(float x,
                                    __LONGDOUBLE y) {
-
+#ifdef __IEEE854_LONG_DOUBLE_TYPE__
 
 	return (float)__ieee754_nexttowardf((__IEEE754_FLOAT_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
 
 
 
+#else /* __IEEE854_LONG_DOUBLE_TYPE__ */
+	return (float)__ieee754_nexttowardf_d((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
 
 
-
+#endif /* !__IEEE854_LONG_DOUBLE_TYPE__ */
 }
 #include <libm/scalbn.h>
 /* >> scalbnf(3), scalbn(3), scalbnl(3), scalblnf(3), scalbln(3), scalblnl(3)

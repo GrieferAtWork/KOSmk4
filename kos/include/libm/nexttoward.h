@@ -42,6 +42,78 @@
 #ifdef __CC__
 __DECL_BEGIN
 
+#ifdef __IEEE754_DOUBLE_TYPE__
+#ifdef __IEEE754_FLOAT_TYPE__
+/*
+ * ====================================================
+ * Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
+ *
+ * Developed at SunPro, a Sun Microsystems, Inc. business.
+ * Permission to use, copy, modify, and distribute this
+ * software is freely granted, provided that this notice
+ * is preserved.
+ * ====================================================
+ */
+__LIBM_LOCAL_FUNC(nexttowardf_d) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYPE__
+(__LIBCCALL __ieee754_nexttowardf_d)(__IEEE754_FLOAT_TYPE__ __x,
+                                     __IEEE754_DOUBLE_TYPE__ __y) {
+	__int32_t __hx, __hy, __ix, __iy;
+	__uint32_t __ly;
+	__LIBM_GET_FLOAT_WORD(__hx, __x);
+	__LIBM_EXTRACT_WORDS(__hy, __ly, __y);
+	__ix = __hx & __UINT32_C(0x7fffffff); /* |x| */
+	__iy = __hy & __UINT32_C(0x7fffffff); /* |y| */
+
+	if ((__ix > __UINT32_C(0x7f800000)) ||   /* x is nan */
+	    ((__iy >= __UINT32_C(0x7ff00000)) && /* y is nan */
+	     ((__iy - __UINT32_C(0x7ff00000)) | __ly) != 0)) {
+		return __x + __y;
+	}
+
+	if ((__IEEE754_DOUBLE_TYPE__)__x == __y) {
+		/* x=y, return y */
+		return __y;
+	}
+
+	if (__ix == 0) { /* x == 0 */
+		__IEEE754_FLOAT_TYPE__ __u;
+		__LIBM_SET_FLOAT_WORD(__x, (uint32_t)(__hy & __UINT32_C(0x80000000)) | 1); /* return +-minsub*/
+		__libm_math_opt_barrier(__x, __u);
+		__u = __u * __u;
+		__libm_math_force_eval(__u); /* raise underflow flag */
+		return __x;
+	}
+
+	if (__hx >= 0) {     /* x > 0 */
+		if (__x > __y) { /* x -= ulp */
+			__hx -= 1;
+		} else { /* x < y, x += ulp */
+			__hx += 1;
+		}
+	} else {             /* x < 0 */
+		if (__x < __y) { /* x -= ulp */
+			__hx -= 1;
+		} else { /* x > y, x += ulp */
+			__hx += 1;
+		}
+	}
+	__hy = __hx & __UINT32_C(0x7f800000);
+	if (__hy >= __UINT32_C(0x7f800000)) {
+		__IEEE754_FLOAT_TYPE__ u = __x + __x; /* overflow  */
+		__libm_math_force_eval(u);
+		/*__libc_seterrno(ERANGE);*/
+	}
+	if (__hy < __UINT32_C(0x00800000)) {
+		__IEEE754_FLOAT_TYPE__ u = __x * __x; /* underflow */
+		__libm_math_force_eval(u);            /* raise underflow flag */
+		/*__libc_seterrno(ERANGE);*/
+	}
+	__LIBM_SET_FLOAT_WORD(__x, __hx);
+	return __x;
+}
+#endif /* __IEEE754_FLOAT_TYPE__ */
+#endif /* __IEEE754_DOUBLE_TYPE__ */
+
 #ifdef __IEEE854_LONG_DOUBLE_TYPE__
 #ifdef __IEEE754_FLOAT_TYPE__
 /*

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45ea5d8c */
+/* HASH CRC-32:0x6d2ea498 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1118,7 +1118,11 @@ DEFINE_INTERN_ALIAS(libd_ilogbl, libd_ilogb);
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_ilogbl, libc_ilogbl, TD, 1, TFL)
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_nexttoward, libd_nextafter);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_nexttoward, libc_nexttoward, TFD, 2, TFD, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.math.math", libd_scalbn, libc_scalbn, TFD, 2, TFD, TD)
 DFUN(".text.crt.dos.math.math", libd_scalbln, libc_scalbln, TFD, 2, TFD, TL)
 DFUN(".text.crt.dos.math.math", libd_round, libc_round, TFD, 1, TFD)

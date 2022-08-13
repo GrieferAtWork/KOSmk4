@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98e1c09c */
+/* HASH CRC-32:0xbca624b2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,9 +67,11 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nexttowardf))(float __x, __LONGDOUBLE __y
 #else /* __IEEE754_FLOAT_TYPE_IS_FLOAT__ */
 	return (float)__ieee754_nexttoward((__IEEE754_DOUBLE_TYPE__)__x, (__IEEE854_LONG_DOUBLE_TYPE__)__y);
 #endif /* !__IEEE754_FLOAT_TYPE_IS_FLOAT__ */
-#else /* __IEEE854_LONG_DOUBLE_TYPE__ */
+#elif defined(__IEEE754_DOUBLE_TYPE__) && defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)
+	return (float)__ieee754_nexttowardf_d((__IEEE754_FLOAT_TYPE__)__x, (__IEEE754_DOUBLE_TYPE__)__y);
+#else /* ... */
 	return (float)(__NAMESPACE_LOCAL_SYM __localdep_nextafterl)((__LONGDOUBLE)__x, __y);
-#endif /* !__IEEE854_LONG_DOUBLE_TYPE__ */
+#endif /* !... */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_nexttowardf_defined

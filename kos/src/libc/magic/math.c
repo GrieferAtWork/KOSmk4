@@ -176,7 +176,7 @@
 %[assume_defined_in_kos(__LIBM_MATHFUNL, __LIBM_MATHFUNIL, __LIBM_MATHFUN2L, __LIBM_MATHFUNI2L, __LIBM_MATHFUN1IL, __LIBM_MATHFUN2IL, __LIBM_MATHFUN3IL, __LIBM_MATHFUNIML, __LIBM_MATHFUN0L, __LIBM_MATHFUNXL)]
 %[assume_defined_in_kos(__IEEE754_FLOAT_TYPE__)]
 %[assume_defined_in_kos(__IEEE754_DOUBLE_TYPE__)]
-%[assume_defined_in_kos(__IEEE854_LONG_DOUBLE_TYPE__)]
+//%[assume_defined_in_kos(__IEEE854_LONG_DOUBLE_TYPE__)] /* Not the case on ARM! (where `long double' is an alias for `double') */
 /**/
 
 %(auto_source){
@@ -1347,6 +1347,7 @@ int ilogbl(__LONGDOUBLE x) %{generate(double2ldouble("ilogb"))}
              defined(__IEEE754_FLOAT_TYPE_IS_DOUBLE__)) &&
             defined(__IEEE854_LONG_DOUBLE_TYPE__)) ||
             $has_function(nextafterl))]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), crt_intern_alias("nextafter")]]
 double nexttoward(double x, __LONGDOUBLE y) {
 @@pp_ifdef      __IEEE854_LONG_DOUBLE_TYPE__@@
 @@pp_ifdef __IEEE754_DOUBLE_TYPE_IS_DOUBLE__@@
@@ -1563,6 +1564,8 @@ float nexttowardf(float x, __LONGDOUBLE y) {
 @@pp_else@@
 	return (float)__ieee754_nexttoward((__IEEE754_DOUBLE_TYPE__)x, (__IEEE854_LONG_DOUBLE_TYPE__)y);
 @@pp_endif@@
+@@pp_elif defined(__IEEE754_DOUBLE_TYPE__) && defined(__IEEE754_FLOAT_TYPE_IS_FLOAT__)@@
+	return (float)__ieee754_nexttowardf_d((__IEEE754_FLOAT_TYPE__)x, (__IEEE754_DOUBLE_TYPE__)y);
 @@pp_else@@
 	return (float)nextafterl((__LONGDOUBLE)x, y);
 @@pp_endif@@
