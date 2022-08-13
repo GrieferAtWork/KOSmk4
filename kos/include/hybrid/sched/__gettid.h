@@ -65,6 +65,16 @@
 #define __HYBRID_GETTID_INVALID_IS_ZERO
 #define __HYBRID_GETTID_INVALID 0
 
+#elif __KOS_VERSION__ >= 400 && defined(__arm__)
+#include <hybrid/typecore.h>
+#include <kos/asm/kuser.h>
+#define __hybrid_tid_t                void *
+#define __hybrid_gettid()             __kuser_get_tls()
+#define __HYBRID_SIZEOF_TID__         __SIZEOF_POINTER__
+#define __HYBRID_GETTID_INVALID       __NULLPTR
+#define __HYBRID_GETTID_PRINTF_FMT    "%p"
+#define __HYBRID_GETTID_PRINTF_ARG(x) (void *)(x)
+#define __HYBRID_GETTID_INVALID_IS_ZERO
 #else /* Mk4 + X86 */
 #include <__crt.h>
 
@@ -80,12 +90,23 @@
 #define __hybrid_gettid __hybrid_gettid
 #ifdef __CC__
 #define __hybrid_tid_t __pid_t
+#if !defined(__gettid_defined) && !defined(gettid)
+#define __gettid_defined
 __DECL_BEGIN
 __CREDIRECT(__ATTR_CONST,__pid_t,__NOTHROW,__hybrid_gettid,(void),gettid,())
 __DECL_END
+#endif /* !__gettid_defined && !gettid */
 #endif /* __CC__ */
 #endif /* ... */
 #endif /* !__KERNEL__ */
+#elif defined(__arm__) && (defined(__KOS__) || defined(__linux__))
+#define __hybrid_tid_t                void *
+#define __hybrid_gettid()             ((*(__ATTR_PURE_T __ATTR_WUNUSED_T void *(*)(void))0xffff0fe0)())
+#define __HYBRID_SIZEOF_TID__         4
+#define __HYBRID_GETTID_INVALID       __NULLPTR
+#define __HYBRID_GETTID_PRINTF_FMT    "%p"
+#define __HYBRID_GETTID_PRINTF_ARG(x) (void *)(x)
+#define __HYBRID_GETTID_INVALID_IS_ZERO
 #elif defined(__WINNT__)
 #define __HYBRID_SIZEOF_TID__ 4
 #define __HYBRID_GETTID_INVALID_IS_ZERO

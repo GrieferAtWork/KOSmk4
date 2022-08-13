@@ -18,6 +18,13 @@ Cheat sheet for someone that know a lot about x86 assembly, but is pretty much t
 | CPSR                | Super-set of APSR, w/ access to execute-mode bits (kernel vs. user-space)
 
 
+### Thumb vs. ARM
+
+- [Really interesting & insightful explaination](https://stackoverflow.com/a/9370417/3296587)
+- Important: in assembly, enter thumb-mode with `.thumb`
+- Important: in thumb-mode assembly, thumb functions labels must be pre-fixed by `.thumb_func`
+
+
 ### Calling convention
 
 | Category | Registers
@@ -120,3 +127,77 @@ Anyways: here's what you need to know:
 | `.fnend`            | `.cfi_endproc`
 | `.save {fp, lr}`    | `.cfi_rel_offset fp, 0; .cfi_rel_offset lr, 4;`
 | `.pad #64`          | `.cfi_adjust_cfa_offset 64`
+
+
+
+### Interrupts/exceptions
+
+The interrupt vector is (conventionally) located at `(VIRT void *)0` and consists of `8` 32-bit instructions (that get branched to when interrupts/exceptions are triggered, and usually are themselves instructions that branch once again to the actual interrupt handler)
+
+- Interrupt: Triggered by hardware (can happen at any moment interrupts aren't disabled; also includes preemptive interrupts)
+- Exception: Triggered explicitly as the result of actions taken by software
+
+| Address\[index\]    | Name  | Interrupt/exception   | Description
+|---------------------|-------|-----------------------|-----------------------
+| `0x00000000[0]`     | `RES` | Exception             | Reset
+| `0x00000004[1]`     | `UND` | Exception             | Undefined instruction
+| `0x00000008[2]`     | `SWI` | Exception             | Software interrupt (`swi`)
+| `0x0000000C[3]`     | `PAB` | Exception             | Prefetch abort
+| `0x00000010[4]`     | `DAB` | Exception             | Data abort (#PF)
+| `0x00000014[5]`     | -     | -                     | -
+| `0x00000018[6]`     | `IRQ` | Interrupt             | Interrupt
+| `0x0000001C[7]`     | `FIQ` | Interrupt             | Fast interrupt
+
+**\[From\]**: Table B1-3 Offsets from exception base addresses
+
+
+
+
+### Atomic operations how-to
+
+| ARMv?               | Bit-width             | Howto
+|---------------------|-----------------------|-----------------------
+| `armv4`, `armv5`    | 8, 16, 32, 64         | **\[1\]** Kernel support
+| `armv6`             | 8, 16                 | **\[2\]** Align(32)
+| `armv6`             | 32                    | **\[3\]** `ldrex` + `strex`
+| `armv6`             | 64                    | **\[1\]** Kernel support
+| `armv7`             | 8, 16, 32, 64         | **\[3\]** `ldrex` + `strex`
+| `armv8+`            | 8, 16, 32, 64         | **\[4\]** `ldaex` + `staex`
+
+
+**\[1\]** Kernel support:
+> Implement `ATOMIC_CMPXCH_WEAK` (64-bit):
+> ```asm
+> .Lcritical_begin:
+>     ldmia  @BASE@, {@REAL_OLDVAL_LO32@, @REAL_OLDVAL_HI32@}
+>     cmp    @REAL_OLDVAL_LO32@, @OLDVAL_LO32@
+>     cmpeq  @REAL_OLDVAL_HI32@, @OLDVAL_HI32@
+> .Lcritical_end:
+>     stmiaeq @BASE@, {@NEWVAL_LO32@, @NEWVAL_HI32@}
+> ```
+> All handlers for interrupts that can happened witin `.Lcritical_begin ... .Lcritical_end` (iow: PAB, DAB, IRQ, FIQ) must check if this was the case, and if so: reset the return-pc to `.Lcritical_begin`. \
+> 8-, 16- and 32-bit atomics can be implemented using the same trick, or by aligning addresses and calling the 64-bit variant above. \
+> IMPORTANT: Architectures that use this trick can't (and don't) support SMP. \
+> NOTE: Linux-compatible kernel support is exposed in `<arm-kos/kos/asm/kuser.h>`
+
+**\[2\]** Align(N):
+> Align address to N bits and perform an N-bit-wide atomic operation
+
+**\[3\]** `ldrex` + `strex`:
+> Implement `ATOMIC_CMPXCH_WEAK` (8-, 16- or 32-bit):
+> ```asm
+>     dmb    ish                  /* on armv6: `mcr p15, 0, r0, c7, c10, 5` */
+> 1:  ldrex* @REAL_OLDVAL@, [@BASE@]
+>     cmp    @REAL_OLDVAL@, @OLDVAL@
+>     bne    2f
+>     strex* @TEMP_REGISTER@, @NEWVAL@, [@BASE_REGISTER@]
+>     cmp    @TEMP_REGISTER@, #0  /* Check status */
+>     bne    1b                   /* Repeat if STATUS != 0 */
+> 2:  dmb    ish                  /* on armv6: `mcr p15, 0, r0, c7, c10, 5` */
+> ```
+> Where `*` is either `""` (nothing) for 32-bit, or `b` / `h` for 8/16-bit. \
+> Note that 8/16/64-bit are only supported starting with `armv7`! \
+> The 64-bit variant or this uses suffix `d` and requires register-pairs.
+
+**\[4\]** `ldaex` + `staex`:
+> Same as **\[3\]**, except that `dmb ish` can be omitted, and `ldaex` + `staex` are used instead of `ldrex` + `strex`.

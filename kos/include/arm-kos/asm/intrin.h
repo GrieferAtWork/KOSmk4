@@ -24,6 +24,7 @@
 
 #include <hybrid/typecore.h>
 
+#include <asm/arm.h>
 #include <kos/anno.h>
 
 #ifdef __CC__
@@ -36,7 +37,7 @@ __DECL_BEGIN
 /* TODO: CHKA */
 /* TODO: CPS */
 #define __dbg(/*0-15*/imm4) __asm__ __volatile__("dbg %0" : : "n" (imm4))
-__FORCELOCAL void (__dmb)(void) { __asm__ __volatile__("dmb"); }
+__FORCELOCAL void (__dmb_ish)(void) { __asm__ __volatile__("dmb ish"); }
 __FORCELOCAL void (__dsb)(void) { __asm__ __volatile__("dsb"); }
 /* TODO: ENTERX */
 /* TODO: LEAVEX */

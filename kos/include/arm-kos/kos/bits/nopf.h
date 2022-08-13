@@ -122,10 +122,10 @@ __DECL_BEGIN
  * - arm_nopf_ldrh_r0_Br0B      # ldrh   r0, [r0]
  * - arm_nopf_ldr_r0_Br0B       # ldr    r0, [r0]
  * - arm_nopf_ldrd_r0_r1_Br0B   # ldrd   r0, r1, [r0]
- * - arm_nopf_strb_r1_Br0B      # strb   r1, [r0]
- * - arm_nopf_strh_r1_Br0B      # strh   r1, [r0]
- * - arm_nopf_str_r1_Br0B       # str    r1, [r0]
- * - arm_nopf_strd_r1_r2_Br0B   # strd   r1, r2, [r0]
+ * - arm_nopf_strb_r0_Br1B      # strb   r0, [r1]
+ * - arm_nopf_strh_r0_Br1B      # strh   r0, [r1]
+ * - arm_nopf_str_r0_Br1B       # str    r0, [r1]
+ * - arm_nopf_strd_r0_r1_Br2B   # strd   r0, r1, [r2]
  */
 
 
@@ -216,60 +216,60 @@ __NOTHROW(__arch_readq_nopf)(__USER __CHECKED void const *__addr, __uint64_t *__
 
 
 #ifdef __arch_writeb_nopf
-__ARM_NOPF_DEFFUN(arm_nopf_strb_r1_Br0B) /* strb r0, [r0] # write byte */
+__ARM_NOPF_DEFFUN(arm_nopf_strb_r0_Br1B) /* strb r0, [r1] # write byte */
 /* Try to write `val' into a possibly faulty `addr'
  * Return  `true'  on  success,  `false'  on  error */
 #define __arch_writeb_nopf __arch_writeb_nopf
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
 __NOTHROW(__arch_writeb_nopf)(__USER __CHECKED void const *__addr, __uint8_t __val) {
 	__BOOL __error;
-	__register_var(__uint32_t, __r0, "r0") = (__uint32_t)__addr;
-	__register_var(__uint32_t, __r1, "r1") = (__uint32_t)__val;
-	__asm__ __volatile__(__ARM_NOPF_CALLASM(arm_nopf_strb_r1_Br0B)
+	__register_var(__uint32_t, __r0, "r0") = (__uint32_t)__val;
+	__register_var(__uint32_t, __r1, "r1") = (__uint32_t)__addr;
+	__asm__ __volatile__(__ARM_NOPF_CALLASM(arm_nopf_strb_r0_Br1B)
 	                     : "=@cceq" (__error)
 	                     : "r" (__r0)
 	                     , "r" (__r1)
-	                     __ARM_NOPF_CALLARG(arm_nopf_strb_r1_Br0B)
+	                     __ARM_NOPF_CALLARG(arm_nopf_strb_r0_Br1B)
 	                     __ARM_NOPF_CALLCLB);
 	return !__error;
 }
 #endif /* __arch_writeb_nopf */
 
 #ifdef __arch_writew_nopf
-__ARM_NOPF_DEFFUN(arm_nopf_strh_r1_Br0B) /* strh r0, [r0] # write word */
+__ARM_NOPF_DEFFUN(arm_nopf_strh_r0_Br1B) /* strh r0, [r1] # write word */
 /* Try to write `val' into a possibly faulty `addr'
  * Return  `true'  on  success,  `false'  on  error */
 #define __arch_writew_nopf __arch_writew_nopf
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
 __NOTHROW(__arch_writew_nopf)(__USER __CHECKED void const *__addr, __uint16_t __val) {
 	__BOOL __error;
-	__register_var(__uint32_t, __r0, "r0") = (__uint32_t)__addr;
-	__register_var(__uint32_t, __r1, "r1") = (__uint32_t)__val;
-	__asm__ __volatile__(__ARM_NOPF_CALLASM(arm_nopf_strh_r1_Br0B)
+	__register_var(__uint32_t, __r0, "r0") = (__uint32_t)__val;
+	__register_var(__uint32_t, __r1, "r1") = (__uint32_t)__addr;
+	__asm__ __volatile__(__ARM_NOPF_CALLASM(arm_nopf_strh_r0_Br1B)
 	                     : "=@cceq" (__error)
 	                     : "r" (__r0)
 	                     , "r" (__r1)
-	                     __ARM_NOPF_CALLARG(arm_nopf_strh_r1_Br0B)
+	                     __ARM_NOPF_CALLARG(arm_nopf_strh_r0_Br1B)
 	                     __ARM_NOPF_CALLCLB);
 	return !__error;
 }
 #endif /* __arch_writew_nopf */
 
 #ifdef __arch_writel_nopf
-__ARM_NOPF_DEFFUN(arm_nopf_str_r1_Br0B) /* str r0, [r0] # write dword */
+__ARM_NOPF_DEFFUN(arm_nopf_str_r0_Br1B) /* str r0, [r1] # write dword */
 /* Try to write `val' into a possibly faulty `addr'
  * Return  `true'  on  success,  `false'  on  error */
 #define __arch_writel_nopf __arch_writel_nopf
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
 __NOTHROW(__arch_writel_nopf)(__USER __CHECKED void const *__addr, __uint32_t __val) {
 	__BOOL __error;
-	__register_var(__uint32_t, __r0, "r0") = (__uint32_t)__addr;
-	__register_var(__uint32_t, __r1, "r1") = (__uint32_t)__val;
-	__asm__ __volatile__(__ARM_NOPF_CALLASM(arm_nopf_str_r1_Br0B)
+	__register_var(__uint32_t, __r0, "r0") = (__uint32_t)__val;
+	__register_var(__uint32_t, __r1, "r1") = (__uint32_t)__addr;
+	__asm__ __volatile__(__ARM_NOPF_CALLASM(arm_nopf_str_r0_Br1B)
 	                     : "=@cceq" (__error)
 	                     : "r" (__r0)
 	                     , "r" (__r1)
-	                     __ARM_NOPF_CALLARG(arm_nopf_str_r1_Br0B)
+	                     __ARM_NOPF_CALLARG(arm_nopf_str_r0_Br1B)
 	                     __ARM_NOPF_CALLCLB);
 	return !__error;
 }
@@ -277,7 +277,7 @@ __NOTHROW(__arch_writel_nopf)(__USER __CHECKED void const *__addr, __uint32_t __
 
 
 #ifdef __arch_writeq_nopf
-__ARM_NOPF_DEFFUN(arm_nopf_strd_r1_r2_Br0B) /* strd r0, r1, [r0] # write qword */
+__ARM_NOPF_DEFFUN(arm_nopf_strd_r0_r1_Br2B) /* strd r0, r1, [r2] # write qword */
 
 /* Try to write `val' into a possibly faulty `addr'
  * Return  `true'  on  success,  `false'  on  error */
@@ -285,15 +285,15 @@ __ARM_NOPF_DEFFUN(arm_nopf_strd_r1_r2_Br0B) /* strd r0, r1, [r0] # write qword *
 __FORCELOCAL __NOBLOCK __ATTR_ARTIFICIAL __ATTR_WUNUSED __BOOL
 __NOTHROW(__arch_writeq_nopf)(__USER __CHECKED void const *__addr, __uint64_t __val) {
 	__BOOL __error;
-	__register_var(__uint32_t, __r0, "r0") = (__uint32_t)__addr;
-	__register_var(__uint32_t, __r1, "r1") = (__uint32_t)__val;
-	__register_var(__uint32_t, __r2, "r2") = (__uint32_t)(__val >> 32);
-	__asm__ __volatile__(__ARM_NOPF_CALLASM(arm_nopf_strd_r1_r2_Br0B)
+	__register_var(__uint32_t, __r0, "r0") = (__uint32_t)__val;
+	__register_var(__uint32_t, __r1, "r1") = (__uint32_t)(__val >> 32);
+	__register_var(__uint32_t, __r2, "r2") = (__uint32_t)__addr;
+	__asm__ __volatile__(__ARM_NOPF_CALLASM(arm_nopf_strd_r0_r1_Br2B)
 	                     : "=@cceq" (__error)
 	                     : "r" (__r0)
 	                     , "r" (__r1)
 	                     , "r" (__r2)
-	                     __ARM_NOPF_CALLARG(arm_nopf_strd_r1_r2_Br0B)
+	                     __ARM_NOPF_CALLARG(arm_nopf_strd_r0_r1_Br2B)
 	                     __ARM_NOPF_CALLCLB);
 	return !__error;
 }

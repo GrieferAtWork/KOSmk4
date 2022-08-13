@@ -36,7 +36,7 @@ __SYSDECL_BEGIN
  * @return: * : The calling thread's TLS pointer.
  * @requires: __kuser_helper_version >= 1 */
 #define __kuser_get_tls (*(__kuser_get_tls_t *)0xffff0fe0)
-typedef void *(__kuser_get_tls_t)(void);
+typedef __ATTR_PURE_T __ATTR_WUNUSED_T void *(__kuser_get_tls_t)(void);
 
 
 /* Do a 32-bit atomic-compare-exchange

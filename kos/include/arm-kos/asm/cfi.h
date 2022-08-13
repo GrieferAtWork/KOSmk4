@@ -92,6 +92,26 @@ __ASM_L(	.endif;.endif)
 #undef __REGISTER_CASE
 __ASM_L(.endm)
 
+
+__ASM_L(.macro .cfi_pushregs args:vararg)
+__ASM_L(	/* TODO: CFI */)
+__ASM_L(.endm)
+
+__ASM_L(.macro .cfi_popregs args:vararg)
+__ASM_L(	/* TODO: CFI */)
+__ASM_L(.endm)
+
+__ASM_L(.macro push_cfi_r args:vararg)
+__ASM_L(	push __ASM_ARG(\args))
+__ASM_L(	.cfi_pushregs __ASM_ARG(\args))
+__ASM_L(.endm)
+
+__ASM_L(.macro pop_cfi_r args:vararg)
+__ASM_L(	pop __ASM_ARG(\args))
+__ASM_L(	.cfi_popregs __ASM_ARG(\args))
+__ASM_L(.endm)
+
+
 __ASM_END
 #endif /* !__COMPILER_NO_GCC_ASM_MACROS */
 
