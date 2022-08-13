@@ -47,10 +47,8 @@ INTERN_FUNCTION(libc_vfork)
 	 * Note that we only get here when the vfork() _itself_ fails.
 	 * We  _dont_ get here if something within the child after the
 	 * vfork() fails. */
-	push_cfi_r {lr}
 	EXTERN(libc_seterrno_neg)
-	bl     libc_seterrno_neg /* Returns -1 unconditionally in r0 */
-	pop_cfi_r {pc}
+	b      libc_seterrno_neg /* Returns -1 unconditionally in r0 */
 	.cfi_endproc
 END(libc_vfork)
 

@@ -262,7 +262,7 @@ diff -Naur binutils-2.38-orig/config.sub binutils-2.38/config.sub
  	sco3.2v2 | sco3.2v[4-9]* | sco5v6*)
 diff -Naur binutils-2.38-orig/gas/cond.c binutils-2.38/gas/cond.c
 --- binutils-2.38-orig/gas/cond.c	2022-01-22 13:14:08.000000000 +0100
-+++ binutils-2.38/gas/cond.c	2022-08-13 19:04:29.304247200 +0200
++++ binutils-2.38/gas/cond.c	2022-08-13 22:28:42.534709900 +0200
 @@ -244,6 +244,22 @@
  	}
        SKIP_WHITESPACE ();
@@ -370,17 +370,23 @@ diff -Naur binutils-2.38-orig/gas/cond.c binutils-2.38/gas/cond.c
    struct conditional_frame cframe;
  
    if (flag_mri)
-@@ -282,10 +366,65 @@
+@@ -282,10 +366,94 @@
  
    s2 = get_mri_string (';', &len2);
  
 -  res = len1 == len2 && strncmp (s1, s2, len1) == 0;
-+	/* Check if strings are equal */
-+	nocase = (arg & 0x8000) != 0;
++	/* Strip surrounding quotation marks. */
++	if (len1 >= 2 && s1[0] == '\"' && s1[len1 - 1] == '\"')
++		++s1, len1 -= 2;
++	if (len2 >= 2 && s2[0] == '\"' && s2[len2 - 1] == '\"')
++		++s2, len2 -= 2;
++
 +//	fprintf(stderr, ".ifc:{arg=%#x,s1='%.*s',s2='%.*s'}\n",
 +//		(unsigned int)arg,
 +//		(int)len1, s1,
 +//		(int)len2, s2);
++
++	nocase = (arg & 0x8000) != 0;
 +	switch ((arg >> 1) & 0xff) {
 +
 +	case 1: /* ifc_startswith */
@@ -422,6 +428,29 @@ diff -Naur binutils-2.38-orig/gas/cond.c binutils-2.38/gas/cond.c
 +		}
 +		res = len1 == 0 && len2 == 0;
 +		break;
++
++	case 5: { /* ifc_bcontains */
++		char *pos;
++		res = 0;
++		/* bcontains: regex-style contains for "\b{needle}\b" */
++again_find_bcontains_needle:
++		pos = nocase ? my_memmem(s1, len1, s2, len2)
++		             : my_memcasemem(s1, len1, s2, len2);
++		if (pos && len2) {
++			res = 1;
++			if (pos > s1 && isalnum((unsigned char)pos[-1]))
++				res = 0;
++			pos += len2;
++			if (pos < (s1 + len1) && isalnum((unsigned char)pos[0]))
++				res = 0;
++			if (!res) {
++				/* Repeat the search */
++				len1 = (s1 + len1) - pos;
++				s1   = pos;
++				goto again_find_bcontains_needle;
++			}
++		}
++	}	break;
 +
 +	default:
 +		res = len1 == len2 &&
@@ -468,8 +497,8 @@ diff -Naur binutils-2.38-orig/gas/configure.tgt binutils-2.38/gas/configure.tgt
    aarch64*-*-haiku*)			fmt=elf em=haiku ;;
 diff -Naur binutils-2.38-orig/gas/read.c binutils-2.38/gas/read.c
 --- binutils-2.38-orig/gas/read.c	2022-01-22 13:14:08.000000000 +0100
-+++ binutils-2.38/gas/read.c	2022-08-13 18:45:28.291555300 +0200
-@@ -425,7 +425,16 @@
++++ binutils-2.38/gas/read.c	2022-08-13 21:57:21.642834400 +0200
+@@ -425,7 +425,18 @@
    {"hword", cons, 2},
    {"if", s_if, (int) O_ne},
    {"ifb", s_ifb, 1},
@@ -479,15 +508,17 @@ diff -Naur binutils-2.38-orig/gas/read.c binutils-2.38/gas/read.c
 +  {"ifc_endswith",     s_ifc, (2 << 1)},
 +  {"ifc_contains",     s_ifc, (3 << 1)},
 +  {"ifc_skipspace",    s_ifc, (4 << 1)},
++  {"ifc_bcontains",    s_ifc, (5 << 1)},
 +  {"ifc_i",            s_ifc, (0 << 1) | 0x8000},
 +  {"ifc_istartswith",  s_ifc, (1 << 1) | 0x8000},
 +  {"ifc_iendswith",    s_ifc, (2 << 1) | 0x8000},
 +  {"ifc_icontains",    s_ifc, (3 << 1) | 0x8000},
 +  {"ifc_iskipspace",   s_ifc, (4 << 1) | 0x8000},
++  {"ifc_ibcontains",   s_ifc, (5 << 1) | 0x8000},
    {"ifdef", s_ifdef, 0},
    {"ifeq", s_if, (int) O_eq},
    {"ifeqs", s_ifeqs, 0},
-@@ -434,7 +443,16 @@
+@@ -434,7 +445,18 @@
    {"ifle", s_if, (int) O_le},
    {"iflt", s_if, (int) O_lt},
    {"ifnb", s_ifb, 0},
@@ -497,11 +528,13 @@ diff -Naur binutils-2.38-orig/gas/read.c binutils-2.38/gas/read.c
 +  {"ifnc_endswith",     s_ifc, (2 << 1) | 1},
 +  {"ifnc_contains",     s_ifc, (3 << 1) | 1},
 +  {"ifnc_skipspace",    s_ifc, (4 << 1) | 1},
++  {"ifnc_bcontains",    s_ifc, (5 << 1) | 1},
 +  {"ifnc_i",            s_ifc, (0 << 1) | 1 | 0x8000},
 +  {"ifnc_istartswith",  s_ifc, (1 << 1) | 1 | 0x8000},
 +  {"ifnc_iendswith",    s_ifc, (2 << 1) | 1 | 0x8000},
 +  {"ifnc_icontains",    s_ifc, (3 << 1) | 1 | 0x8000},
 +  {"ifnc_iskipspace",   s_ifc, (4 << 1) | 1 | 0x8000},
++  {"ifnc_ibcontains",   s_ifc, (5 << 1) | 1 | 0x8000},
    {"ifndef", s_ifdef, 1},
    {"ifne", s_if, (int) O_ne},
    {"ifnes", s_ifeqs, 1},

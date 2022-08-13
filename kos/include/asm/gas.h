@@ -22,18 +22,28 @@
 
 #include <__stdinc.h>
 
-/* Implemented as of 2022-08-13T19:16 */
+/* Implemented as of 2022-08-13T19:16
+ *
+ * >> .ifc_startswith "foobar", "foo"           -- String starts-with
+ * >> .ifc_endswith   "foobar", "bar"           -- String ends-with
+ * >> .ifc_contains   "foobar", "oob"           -- String contains
+ * >> .ifc_skipspace  "[ a ,b ,c ]", "[a,b,c]"  -- Compare, but skip over space characters
+ * >> .ifc_bcontains  "r1,r10,r101", "r1"       -- word-Boundary contains-check
+ * >> .ifc_i          "FOO", "foo"              -- Case-insensitive
+ */
 #if defined(__KOS__) && defined(__GCC_VERSION_NUM) && (__GCC_VERSION_NUM >= 120100)
 #define __GAS_HAVE_IFC_ACCEPTS_STRINGS /* `.ifc "a,b", "c,d"' */
 #define __GAS_HAVE_IFC_STARTSWITH      /* `.ifc_startswith', `.ifnc_startswith' */
 #define __GAS_HAVE_IFC_ENDSWITH        /* `.ifc_endswith', `.ifnc_endswith' */
 #define __GAS_HAVE_IFC_CONTAINS        /* `.ifc_contains', `.ifnc_contains' */
 #define __GAS_HAVE_IFC_SKIPSPACE       /* `.ifc_skipspace', `.ifnc_skipspace' */
+#define __GAS_HAVE_IFC_BCONTAINS       /* `.ifc_bcontains', `.ifnc_bcontains' */
 #define __GAS_HAVE_IFC_I               /* `.ifc_i', `.ifnc_i' */
 #define __GAS_HAVE_IFC_ISTARTSWITH     /* `.ifc_istartswith', `.ifnc_istartswith' */
 #define __GAS_HAVE_IFC_IENDSWITH       /* `.ifc_iendswith', `.ifnc_iendswith' */
 #define __GAS_HAVE_IFC_ICONTAINS       /* `.ifc_icontains', `.ifnc_icontains' */
 #define __GAS_HAVE_IFC_ISKIPSPACE      /* `.ifc_iskipspace', `.ifnc_iskipspace' */
+#define __GAS_HAVE_IFC_IBCONTAINS      /* `.ifc_ibcontains', `.ifnc_ibcontains' */
 #endif /* __KOS__ && GCC >= 12.1.0 */
 
 #endif /* !_ASM_GAS_H */

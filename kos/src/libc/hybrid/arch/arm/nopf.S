@@ -245,9 +245,11 @@ END(libc_arm_nopf_ret)
  * >> return;
  */
 INTERN_FUNCTION(libc_arm_nopf_cmpxchb)
+	.cfi_remember_state
 	push_cfi_r {r4, r5, lr}
 	b      . /* TODO */
-	pop_cfi_r {r4, r5, pc}
+	pop    {r4, r5, pc}
+	.cfi_restore_state
 END(libc_arm_nopf_cmpxchb)
 #endif /* __ARM_ATOMIC_8_ALIGN_TO_32 */
 
@@ -292,10 +294,12 @@ END(libc_arm_nopf_cmpxchb)
  * >> return;
  */
 INTERN_FUNCTION(libc_arm_nopf_cmpxchh)
+	/*.cfi_remember_state*/
 	push_cfi_r {r0, r1, r2, lr}
 	b      . /* TODO */
 	bl     libc_arm_nopf_cmpxch
-	pop_cfi_r {r0, r1, r2, pc}
+	pop    {r0, r1, r2, pc}
+	/*.cfi_restore_state*/
 END(libc_arm_nopf_cmpxchh)
 #endif /* __ARM_ATOMIC_16_ALIGN_TO_32 */
 

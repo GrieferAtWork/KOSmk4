@@ -39,6 +39,7 @@ __ice__
 # These headers are installed by `make_toolchain.sh`
 /kos/include/i386-kos/kos/config/_toolchain32.h
 /kos/include/i386-kos/kos/config/_toolchain64.h
+/kos/include/arm-kos/kos/config/_toolchain.h
 
 # These headers are installed by `make_utility.sh ... ncurses`
 /kos/include/bsd/curses.h
