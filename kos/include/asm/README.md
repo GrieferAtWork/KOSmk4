@@ -3,6 +3,9 @@
 
 Normally, `<asm/...>` headers are all internal and not meant to be directly included by programs. However, a small hand full of headers fall out of this norm and are actually intended for direct inclusion. To prevent any confusion, the following are all of the official *public* asm-headers:
 
+- `<asm/gas.h>`
+	- `#define __GAS_HAVE_*`
+	- Feature test macros to check for custom GAS (GNU AS) extensions
 - `<asm/asmword.h>`
 	- `.macro .word8`
 	- `.macro .word16`

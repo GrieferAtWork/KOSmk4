@@ -319,11 +319,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __uint64_t (__LIBKCALL __x86_Xsyscall6_dw)(__sysc
 #endif /* !__X86_SYSCALL_MAY_CLOBBER_ECX_EDX */
 #else /* 0 */
 
-#undef __GAS_HAVE_IFC_ENDSWITH
-/* Custom KOS extension to gas: `.ifc_endswith' */
-#ifdef __KOS__
-#define __GAS_HAVE_IFC_ENDSWITH
-#endif /* __KOS__ */
+#include <asm/gas.h> /* __GAS_HAVE_IFC_ENDSWITH */
 
 #ifndef __GAS_HAVE_IFC_ENDSWITH
 /* CAUTION: `__X86_SYSCALL_TEST_EBP' is incomplete, and could never be complete.
