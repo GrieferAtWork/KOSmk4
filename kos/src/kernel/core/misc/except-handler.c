@@ -1256,7 +1256,11 @@ search_fde:
 	if (error == UNWIND_INVALID_REGISTER) {
 		struct ucpustate ustate;
 		unwind_cfa_sigframe_state_t sigframe_cfa;
+#ifdef KCPUSTATE_IS_TRANSITIVE_UCPUSTATE
+		ustate = old_state;
+#else /* KCPUSTATE_IS_TRANSITIVE_UCPUSTATE */
 		kcpustate_to_ucpustate(&old_state, &ustate);
+#endif /* !KCPUSTATE_IS_TRANSITIVE_UCPUSTATE */
 
 		/* Assume that we're unwinding a signal frame when returning to user-space. */
 		error = unwind_fde_sigframe_exec(&fde, &sigframe_cfa, pc);
@@ -1360,7 +1364,11 @@ search_fde:
 		}
 #endif /* __i386__ || __x86_64__ */
 
+#ifdef KCPUSTATE_IS_TRANSITIVE_UCPUSTATE
+		*state = ustate;
+#else /* KCPUSTATE_IS_TRANSITIVE_UCPUSTATE */
 		ucpustate_to_kcpustate(&ustate, state);
+#endif /* !KCPUSTATE_IS_TRANSITIVE_UCPUSTATE */
 	} else {
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err_old_state;
@@ -1411,7 +1419,11 @@ NOTHROW(FCALL except_throw_current_at_icpustate)(struct icpustate *__restrict st
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 
 	/* Fill in the exception register state. */
+#ifdef ICPUSTATE_IS_TRANSITIVE_KCPUSTATE
+	info->ei_state = *state;
+#else /* ICPUSTATE_IS_TRANSITIVE_KCPUSTATE */
 	icpustate_to_kcpustate(state, &info->ei_state);
+#endif /* !ICPUSTATE_IS_TRANSITIVE_KCPUSTATE */
 
 	/* Figure out how we want to unwind this exception. */
 	if (icpustate_isuser(state)) {
