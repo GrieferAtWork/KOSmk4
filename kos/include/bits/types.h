@@ -24,7 +24,6 @@
 
 /* NOTE: This file must _always_ be kept for GLibc compatibility! */
 
-#include <__crt.h>
 #include <__stdinc.h>
 #include <features.h>
 
@@ -654,6 +653,10 @@ __DECL_END
 
 
 
+#if !defined(__KOS__) && !defined(__KERNEL__)
+#ifndef ___CRT_H
+#include <__crt.h>
+#endif /* !___CRT_H */
 #ifdef __CRT_DOS_PRIMARY
 /* DOS filesystem headers contain different types for these... */
 #undef __dev_t
@@ -687,5 +690,6 @@ __DECL_END
 #define __SIZEOF_OFF64_T__ 4
 #define __SIZEOF_CLOCK_T__ 4
 #endif /* __CRT_DOS_PRIMARY */
+#endif /* !__KOS__ && !__KERNEL__ */
 
 #endif /* !_BITS_TYPES_H */

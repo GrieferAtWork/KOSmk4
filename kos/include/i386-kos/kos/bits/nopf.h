@@ -20,7 +20,6 @@
 #ifndef _I386_KOS_KOS_BITS_NOPF_H
 #define _I386_KOS_KOS_BITS_NOPF_H 1
 
-#include <__crt.h>
 #include <__stdinc.h>
 
 #include <hybrid/host.h>
@@ -31,9 +30,11 @@
 /* Figure out how we should call nofp functions. */
 #if defined(__KOS__) && defined(__KERNEL__)
 #define __X86_NOPF_AVAILABLE
-#elif defined(__CRT_KOS) && defined(__BUILDING_LIBC)
+#elif defined(__KOS__) && defined(__BUILDING_LIBC)
 #define __X86_NOPF_AVAILABLE
-#endif /* ... */
+#else /* ... */
+#include <__crt.h>
+#endif /* !... */
 
 
 #if defined(__CRT_HAVE_x86_nopf_rep_movsb) || defined(__X86_NOPF_AVAILABLE)
