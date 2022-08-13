@@ -17,15 +17,6 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef ____fpos64_t_defined
-#include <__stdinc.h>
-#include <bits/types.h>
-#ifndef ____fpos64_t_defined
-#define ____fpos64_t_defined
-#ifdef __CC__
-__DECL_BEGIN
-typedef __pos64_t __fpos64_t;
-__DECL_END
-#endif /* __CC__ */
-#endif /* !____fpos64_t_defined */
-#endif /* !____fpos64_t_defined */
+#ifndef __fpos64_t
+#include <bits/crt/stdio.h>
+#endif /* !__fpos64_t */
