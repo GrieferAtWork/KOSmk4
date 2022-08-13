@@ -258,7 +258,10 @@ NOTHROW_NCX(LIBCCALL libc_strfromf)(char *__restrict buf,
 }
 /*[[[end:libc_strfromf]]]*/
 
-/*[[[head:libc_strfroml,hash:CRC-32=0x3247ea16]]]*/
+/*[[[head:libc_strfroml,hash:CRC-32=0x37aba810]]]*/
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_strfroml, libc_strfromd);
+#else /* MAGIC:alias */
 INTERN ATTR_SECTION(".text.crt.unsorted") ATTR_IN(3) ATTR_OUTS(1, 2) __STDC_INT32_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_strfroml)(char *__restrict buf,
                                     size_t buflen,
@@ -273,6 +276,7 @@ NOTHROW_NCX(LIBCCALL libc_strfroml)(char *__restrict buf,
 	CRT_UNIMPLEMENTEDF("strfroml(%q, %Ix, %q, %lf)", buf, buflen, format, fp); /* TODO */
 	return (__STDC_INT32_AS_SIZE_T)libc_seterrno(ENOSYS);
 }
+#endif /* MAGIC:alias */
 /*[[[end:libc_strfroml]]]*/
 
 /*[[[head:libc_rand_r,hash:CRC-32=0x41a1acf2]]]*/

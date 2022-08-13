@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8a638c5 */
+/* HASH CRC-32:0xffc5d1b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -236,6 +236,9 @@ __NOTHROW(__LIBCCALL __libc_unicode_getnumericdbl)(__CHAR32_TYPE__ __ch) {
  * Return  the numerical  variable for which  `ch' is representative  (s.a. `unicode_isnumeric(3)'). When
  * `ch' doesn't represent  a numerical character,  return `0'.  Note that this  function also  recognizes
  * 'a'-'f' and 'A'-'F' as numeric characters (representing their hex values) */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+#define __libc_unicode_getnumericldbl(ch) ((__LONGDOUBLE)__libc_unicode_getnumericdbl(ch))
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 __LOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __libc_unicode_getnumericldbl)(__CHAR32_TYPE__ __ch) {
 	struct __unitraits const *__traits = __libc___unicode_descriptor(__ch);
@@ -251,6 +254,7 @@ __NOTHROW(__LIBCCALL __libc_unicode_getnumericldbl)(__CHAR32_TYPE__ __ch) {
 	return 0.0L;
 #endif /* !... */
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU */
 __DECL_END

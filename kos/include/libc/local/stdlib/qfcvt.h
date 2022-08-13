@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a9f101f */
+/* HASH CRC-32:0xc56d61e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,12 +29,17 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_OUT(3) __ATTR_OUT(4) __ATTR_OUTS(5, 6),int,__NOTHROW_NCX,__localdep_qfcvt_r,(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len),qfcvt_r,(__val,__ndigit,__decptr,__sign,__buf,__len))
-#else /* __CRT_HAVE_qfcvt_r */
+#elif defined(__CRT_HAVE_fcvt_r) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_OUT(3) __ATTR_OUT(4) __ATTR_OUTS(5, 6),int,__NOTHROW_NCX,__localdep_qfcvt_r,(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len),fcvt_r,(__val,__ndigit,__decptr,__sign,__buf,__len))
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/qfcvt_r.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_qfcvt_r __LIBC_LOCAL_NAME(qfcvt_r)
-#endif /* !__CRT_HAVE_qfcvt_r */
+#endif /* !... */
 #endif /* !__local___localdep_qfcvt_r_defined */
 __LOCAL_LIBC(qfcvt) __ATTR_WUNUSED __ATTR_OUT(3) __ATTR_OUT(4) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qfcvt))(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign) {

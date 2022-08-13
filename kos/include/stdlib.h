@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27c14d57 */
+/* HASH CRC-32:0x58b3ec17 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1121,7 +1121,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(atof, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF
 #endif /* !__CRT_HAVE_atof */
 #ifdef __CRT_HAVE_strtod
 __CDECLARE(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),double,__NOTHROW_NCX,strtod,(char const *__restrict __nptr, char **__endptr),(__nptr,__endptr))
-#elif defined(__CRT_HAVE_strtold) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#elif defined(__CRT_HAVE_strtold) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),double,__NOTHROW_NCX,strtod,(char const *__restrict __nptr, char **__endptr),strtold,(__nptr,__endptr))
 #else /* ... */
 __NAMESPACE_STD_END
@@ -1154,8 +1154,10 @@ __NAMESPACE_GLB_USING_OR_IMPL(strtold, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEA
 __CDECLARE(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,strtold,(char const *__restrict __nptr, char **__endptr),(__nptr,__endptr))
 #elif defined(__CRT_HAVE___strtold)
 __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,strtold,(char const *__restrict __nptr, char **__endptr),__strtold,(__nptr,__endptr))
-#elif defined(__CRT_HAVE_strtod) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#elif defined(__CRT_HAVE_strtod) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,strtold,(char const *__restrict __nptr, char **__endptr),strtod,(__nptr,__endptr))
+#elif defined(__CRT_HAVE___strtod) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,strtold,(char const *__restrict __nptr, char **__endptr),__strtod,(__nptr,__endptr))
 #else /* ... */
 __NAMESPACE_STD_END
 #include <libc/local/stdlib/strtold.h>
@@ -1316,7 +1318,11 @@ __NAMESPACE_STD_USING(strtold)
 __CDECLARE_OPT(__ATTR_IN(3) __ATTR_OUTS(1, 2),__STDC_INT32_AS_SIZE_T,__NOTHROW_NCX,strfromd,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, double __fp),(__buf,__buflen,__format,__fp))
 __CDECLARE_OPT(__ATTR_IN(3) __ATTR_OUTS(1, 2),__STDC_INT32_AS_SIZE_T,__NOTHROW_NCX,strfromf,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, float __fp),(__buf,__buflen,__format,__fp))
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-__CDECLARE_OPT(__ATTR_IN(3) __ATTR_OUTS(1, 2),__STDC_INT32_AS_SIZE_T,__NOTHROW_NCX,strfroml,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, __LONGDOUBLE __fp),(__buf,__buflen,__format,__fp))
+#ifdef __CRT_HAVE_strfroml
+__CDECLARE(__ATTR_IN(3) __ATTR_OUTS(1, 2),__STDC_INT32_AS_SIZE_T,__NOTHROW_NCX,strfroml,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, __LONGDOUBLE __fp),(__buf,__buflen,__format,__fp))
+#elif defined(__CRT_HAVE_strfromd) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_IN(3) __ATTR_OUTS(1, 2),__STDC_INT32_AS_SIZE_T,__NOTHROW_NCX,strfroml,(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, __LONGDOUBLE __fp),strfromd,(__buf,__buflen,__format,__fp))
+#endif /* ... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU  && (__USE_GNU || __STDC_WANT_IEC_60559_BFP_EXT__)*/
 
@@ -2417,9 +2423,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fcvt_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OU
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifdef __CRT_HAVE_qgcvt
 __CDECLARE(__ATTR_OUT(3),char *,__NOTHROW_NCX,qgcvt,(__LONGDOUBLE __val, int __ndigit, char *__buf),(__val,__ndigit,__buf))
-#elif defined(__CRT_HAVE_gcvt) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#elif defined(__CRT_HAVE_gcvt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_OUT(3),char *,__NOTHROW_NCX,qgcvt,(__LONGDOUBLE __val, int __ndigit, char *__buf),gcvt,(__val,__ndigit,__buf))
-#elif defined(__CRT_HAVE__gcvt) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#elif defined(__CRT_HAVE__gcvt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_OUT(3),char *,__NOTHROW_NCX,qgcvt,(__LONGDOUBLE __val, int __ndigit, char *__buf),_gcvt,(__val,__ndigit,__buf))
 #else /* ... */
 #include <libc/local/stdlib/qgcvt.h>
@@ -2427,21 +2433,25 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(qgcvt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT
 #endif /* !... */
 #ifdef __CRT_HAVE_qecvt_r
 __CDECLARE(__ATTR_OUT(3) __ATTR_OUT(4) __ATTR_OUTS(5, 6),int,__NOTHROW_NCX,qecvt_r,(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len),(__val,__ndigit,__decptr,__sign,__buf,__len))
-#else /* __CRT_HAVE_qecvt_r */
+#elif defined(__CRT_HAVE_ecvt_r) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_OUT(3) __ATTR_OUT(4) __ATTR_OUTS(5, 6),int,__NOTHROW_NCX,qecvt_r,(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len),ecvt_r,(__val,__ndigit,__decptr,__sign,__buf,__len))
+#else /* ... */
 #include <libc/local/stdlib/qecvt_r.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(qecvt_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(3) __ATTR_OUT(4) __ATTR_OUTS(5, 6) int __NOTHROW_NCX(__LIBCCALL qecvt_r)(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qecvt_r))(__val, __ndigit, __decptr, __sign, __buf, __len); })
-#endif /* !__CRT_HAVE_qecvt_r */
+#endif /* !... */
 #ifdef __CRT_HAVE_qfcvt_r
 __CDECLARE(__ATTR_OUT(3) __ATTR_OUT(4) __ATTR_OUTS(5, 6),int,__NOTHROW_NCX,qfcvt_r,(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len),(__val,__ndigit,__decptr,__sign,__buf,__len))
-#else /* __CRT_HAVE_qfcvt_r */
+#elif defined(__CRT_HAVE_fcvt_r) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+__CREDIRECT(__ATTR_OUT(3) __ATTR_OUT(4) __ATTR_OUTS(5, 6),int,__NOTHROW_NCX,qfcvt_r,(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len),fcvt_r,(__val,__ndigit,__decptr,__sign,__buf,__len))
+#else /* ... */
 #include <libc/local/stdlib/qfcvt_r.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(qfcvt_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(3) __ATTR_OUT(4) __ATTR_OUTS(5, 6) int __NOTHROW_NCX(__LIBCCALL qfcvt_r)(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(qfcvt_r))(__val, __ndigit, __decptr, __sign, __buf, __len); })
-#endif /* !__CRT_HAVE_qfcvt_r */
+#endif /* !... */
 #ifdef __CRT_HAVE_qecvt
 __CDECLARE(__ATTR_WUNUSED __ATTR_OUT(3) __ATTR_OUT(4),char *,__NOTHROW_NCX,qecvt,(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),(__val,__ndigit,__decptr,__sign))
-#elif defined(__CRT_HAVE_ecvt) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#elif defined(__CRT_HAVE_ecvt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(3) __ATTR_OUT(4),char *,__NOTHROW_NCX,qecvt,(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),ecvt,(__val,__ndigit,__decptr,__sign))
-#elif defined(__CRT_HAVE__ecvt) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#elif defined(__CRT_HAVE__ecvt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(3) __ATTR_OUT(4),char *,__NOTHROW_NCX,qecvt,(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),_ecvt,(__val,__ndigit,__decptr,__sign))
 #else /* ... */
 #include <libc/local/stdlib/qecvt.h>
@@ -2449,9 +2459,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(qecvt, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUN
 #endif /* !... */
 #ifdef __CRT_HAVE_qfcvt
 __CDECLARE(__ATTR_WUNUSED __ATTR_OUT(3) __ATTR_OUT(4),char *,__NOTHROW_NCX,qfcvt,(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),(__val,__ndigit,__decptr,__sign))
-#elif defined(__CRT_HAVE_fcvt) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#elif defined(__CRT_HAVE_fcvt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(3) __ATTR_OUT(4),char *,__NOTHROW_NCX,qfcvt,(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),fcvt,(__val,__ndigit,__decptr,__sign))
-#elif defined(__CRT_HAVE__fcvt) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#elif defined(__CRT_HAVE__fcvt) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_OUT(3) __ATTR_OUT(4),char *,__NOTHROW_NCX,qfcvt,(__LONGDOUBLE __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),_fcvt,(__val,__ndigit,__decptr,__sign))
 #else /* ... */
 #include <libc/local/stdlib/qfcvt.h>
@@ -3213,11 +3223,11 @@ __CDECLARE(__ATTR_IN(1) __ATTR_OUT_OPT(2),double,__NOTHROW_NCX,strtod_l,(char co
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),double,__NOTHROW_NCX,strtod_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),_strtod_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE___strtod_l)
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),double,__NOTHROW_NCX,strtod_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtod_l,(__nptr,__endptr,__locale))
-#elif defined(__CRT_HAVE_strtold_l) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#elif defined(__CRT_HAVE_strtold_l) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),double,__NOTHROW_NCX,strtod_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),strtold_l,(__nptr,__endptr,__locale))
-#elif defined(__CRT_HAVE__strtold_l) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#elif defined(__CRT_HAVE__strtold_l) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),double,__NOTHROW_NCX,strtod_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),_strtold_l,(__nptr,__endptr,__locale))
-#elif defined(__CRT_HAVE___strtold_l) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#elif defined(__CRT_HAVE___strtold_l) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),double,__NOTHROW_NCX,strtod_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtold_l,(__nptr,__endptr,__locale))
 #else /* ... */
 #include <libc/local/stdlib/strtod_l.h>
@@ -3240,11 +3250,11 @@ __CDECLARE(__ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,strtold_l,(
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,strtold_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),_strtold_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE___strtold_l)
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,strtold_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtold_l,(__nptr,__endptr,__locale))
-#elif defined(__CRT_HAVE_strtod_l) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#elif defined(__CRT_HAVE_strtod_l) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,strtold_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),strtod_l,(__nptr,__endptr,__locale))
-#elif defined(__CRT_HAVE__strtod_l) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#elif defined(__CRT_HAVE__strtod_l) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,strtold_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),_strtod_l,(__nptr,__endptr,__locale))
-#elif defined(__CRT_HAVE___strtod_l) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#elif defined(__CRT_HAVE___strtod_l) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,strtold_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtod_l,(__nptr,__endptr,__locale))
 #else /* ... */
 #include <libc/local/stdlib/strtold_l.h>
@@ -5506,11 +5516,11 @@ __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),double,__NOTHROW_NCX,_strtod_l,(char 
 __CDECLARE(__ATTR_IN(1) __ATTR_OUT_OPT(2),double,__NOTHROW_NCX,_strtod_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE___strtod_l)
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),double,__NOTHROW_NCX,_strtod_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtod_l,(__nptr,__endptr,__locale))
-#elif defined(__CRT_HAVE_strtold_l) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#elif defined(__CRT_HAVE_strtold_l) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),double,__NOTHROW_NCX,_strtod_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),strtold_l,(__nptr,__endptr,__locale))
-#elif defined(__CRT_HAVE__strtold_l) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#elif defined(__CRT_HAVE__strtold_l) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),double,__NOTHROW_NCX,_strtod_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),_strtold_l,(__nptr,__endptr,__locale))
-#elif defined(__CRT_HAVE___strtold_l) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#elif defined(__CRT_HAVE___strtold_l) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),double,__NOTHROW_NCX,_strtod_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtold_l,(__nptr,__endptr,__locale))
 #else /* ... */
 #include <libc/local/stdlib/strtod_l.h>
@@ -5533,11 +5543,11 @@ __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,_strtold_l
 __CDECLARE(__ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,_strtold_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE___strtold_l)
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,_strtold_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtold_l,(__nptr,__endptr,__locale))
-#elif defined(__CRT_HAVE_strtod_l) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#elif defined(__CRT_HAVE_strtod_l) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,_strtold_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),strtod_l,(__nptr,__endptr,__locale))
-#elif defined(__CRT_HAVE__strtod_l) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#elif defined(__CRT_HAVE__strtod_l) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,_strtold_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),_strtod_l,(__nptr,__endptr,__locale))
-#elif defined(__CRT_HAVE___strtod_l) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#elif defined(__CRT_HAVE___strtod_l) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGDOUBLE,__NOTHROW_NCX,_strtold_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtod_l,(__nptr,__endptr,__locale))
 #else /* ... */
 #include <libc/local/stdlib/strtold_l.h>
@@ -5661,24 +5671,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_atoflt_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* !__CRT_HAVE__atoflt_l */
 #ifdef __CRT_HAVE__atodbl
 __CDECLARE(__ATTR_IN(2) __ATTR_OUT(1),int,__NOTHROW_NCX,_atodbl,(double *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr),(__result,__nptr))
-#elif defined(__CRT_HAVE__atoldbl) && __SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__
-__CREDIRECT(__ATTR_IN(2) __ATTR_OUT(1),int,__NOTHROW_NCX,_atodbl,(double *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr),_atoldbl,(__result,__nptr))
-#else /* ... */
+#else /* __CRT_HAVE__atodbl */
 #include <libc/local/stdlib/_atodbl.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_atodbl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL _atodbl)(double *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atodbl))(__result, __nptr); })
-#endif /* !... */
+#endif /* !__CRT_HAVE__atodbl */
 #ifdef __CRT_HAVE__atodbl_l
 __CDECLARE(__ATTR_IN(2) __ATTR_OUT(1),int,__NOTHROW_NCX,_atodbl_l,(double *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr, __locale_t __locale),(__result,__nptr,__locale))
-#elif defined(__CRT_HAVE__atoldbl_l) && __SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__
-__CREDIRECT(__ATTR_IN(2) __ATTR_OUT(1),int,__NOTHROW_NCX,_atodbl_l,(double *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr, __locale_t __locale),_atoldbl_l,(__result,__nptr,__locale))
-#else /* ... */
+#else /* __CRT_HAVE__atodbl_l */
 #include <libc/local/stdlib/_atodbl_l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_atodbl_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL _atodbl_l)(double *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_atodbl_l))(__result, __nptr, __locale); })
-#endif /* !... */
+#endif /* !__CRT_HAVE__atodbl_l */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #ifdef __CRT_HAVE__atoldbl
 __CDECLARE(__ATTR_IN(2) __ATTR_OUT(1),int,__NOTHROW_NCX,_atoldbl,(__LONGDOUBLE *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr),(__result,__nptr))
-#elif defined(__CRT_HAVE__atodbl) && __SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__
+#elif defined(__CRT_HAVE__atodbl) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_IN(2) __ATTR_OUT(1),int,__NOTHROW_NCX,_atoldbl,(__LONGDOUBLE *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr),_atodbl,(__result,__nptr))
 #else /* ... */
 #include <libc/local/stdlib/_atoldbl.h>
@@ -5686,7 +5692,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_atoldbl, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !... */
 #ifdef __CRT_HAVE__atoldbl_l
 __CDECLARE(__ATTR_IN(2) __ATTR_OUT(1),int,__NOTHROW_NCX,_atoldbl_l,(__LONGDOUBLE *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr, __locale_t __locale),(__result,__nptr,__locale))
-#elif defined(__CRT_HAVE__atodbl_l) && __SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__
+#elif defined(__CRT_HAVE__atodbl_l) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
 __CREDIRECT(__ATTR_IN(2) __ATTR_OUT(1),int,__NOTHROW_NCX,_atoldbl_l,(__LONGDOUBLE *__restrict __result, char __KOS_FIXED_CONST *__restrict __nptr, __locale_t __locale),_atodbl_l,(__result,__nptr,__locale))
 #else /* ... */
 #include <libc/local/stdlib/_atoldbl_l.h>

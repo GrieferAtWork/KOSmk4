@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d2ea498 */
+/* HASH CRC-32:0x246ca5c7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2412,10 +2412,18 @@ DFUN(".text.crt.dos.unicode.static.convert", libd_strtoull, libc_strtoull, TLL, 
 DFUN(".text.crt.dos.unicode.static.convert", libd_atof, libc_atof, TFD, 1, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtod, libc_strtod, TFD, 2, TP, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtof, libc_strtof, TF, 2, TP, TP)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_strtold, libd_strtod);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtold, libc_strtold, TFL, 2, TP, TP)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.unsorted", libd_strfromd, libc_strfromd, TI32, 4, TP, TI, TP, TFD)
 DFUN(".text.crt.dos.unsorted", libd_strfromf, libc_strfromf, TI32, 4, TP, TI, TP, TF)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_strfroml, libd_strfromd);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.unsorted", libd_strfroml, libc_strfroml, TI32, 4, TP, TI, TP, TFL)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtou32_r, libc_strtou32_r, TI32, 4, TP, TP, TD, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_strto32_r, libc_strto32_r, TI32, 4, TP, TP, TD, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtou64_r, libc_strtou64_r, TI64, 4, TP, TP, TD, TP)
@@ -2432,11 +2440,31 @@ DFUN(".text.crt.dos.unicode.static.convert", libd_gcvt, libc_gcvt, TP, 3, TFD, T
 DFUN(".text.crt.dos.random", libd_rand_r, libc_rand_r, TD, 1, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_ecvt_r, libc_ecvt_r, TD, 6, TFD, TD, TP, TP, TP, TI)
 DFUN(".text.crt.dos.unicode.static.convert", libd_fcvt_r, libc_fcvt_r, TD, 6, TFD, TD, TP, TP, TP, TI)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_qgcvt, libd_gcvt);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.unicode.static.convert", libd_qgcvt, libc_qgcvt, TP, 3, TFL, TD, TP)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_qecvt_r, libd_ecvt_r);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.unicode.static.convert", libd_qecvt_r, libc_qecvt_r, TD, 6, TFL, TD, TP, TP, TP, TI)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_qfcvt_r, libd_fcvt_r);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.unicode.static.convert", libd_qfcvt_r, libc_qfcvt_r, TD, 6, TFL, TD, TP, TP, TP, TI)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_qecvt, libd_ecvt);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.unicode.static.convert", libd_qecvt, libc_qecvt, TP, 4, TFL, TD, TP, TP)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_qfcvt, libd_fcvt);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.unicode.static.convert", libd_qfcvt, libc_qfcvt, TP, 4, TFL, TD, TP, TP)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.system.utility", libd_getloadavg, libc_getloadavg, TD, 2, TP, TD)
 DFUN(".text.crt.dos.random", libd_drand48_r, libc_drand48_r, TD, 2, TP, TP)
 DFUN(".text.crt.dos.random", libd_erand48_r, libc_erand48_r, TD, 3, TP, TP, TP)
@@ -2481,7 +2509,11 @@ DFUN(".text.crt.dos.unicode.static.convert", libd_strtoll_l, libc_strtoll_l, TLL
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtoull_l, libc_strtoull_l, TLL, 4, TP, TP, TD, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtod_l, libc_strtod_l, TFD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtof_l, libc_strtof_l, TF, 3, TP, TP, TP)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd_strtold_l, libd_strtod_l);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.unicode.static.convert", libd_strtold_l, libc_strtold_l, TFL, 3, TP, TP, TP)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.fs.exec.system", libd_shexec, libc_shexec, TD, 1, TP)
 DFUN(".text.crt.dos.solaris", libd_lltostr, libc_lltostr, TP, 2, TLL, TP)
 DFUN(".text.crt.dos.solaris", libd_ulltostr, libc_ulltostr, TP, 2, TLL, TP)
@@ -2536,8 +2568,16 @@ DFUN(".text.crt.dos.unicode.static.convert", libd__atoflt, libc__atoflt, TD, 2, 
 DFUN(".text.crt.dos.unicode.static.convert", libd__atoflt_l, libc__atoflt_l, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd__atodbl, libc__atodbl, TD, 2, TP, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd__atodbl_l, libc__atodbl_l, TD, 3, TP, TP, TP)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd__atoldbl, libd__atodbl);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.unicode.static.convert", libd__atoldbl, libc__atoldbl, TD, 2, TP, TP)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd__atoldbl_l, libd__atodbl_l);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.unicode.static.convert", libd__atoldbl_l, libc__atoldbl_l, TD, 3, TP, TP, TP)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #if __SIZEOF_INT__ == 8
 DEFINE_INTERN_ALIAS(libd__rotl, libd__rotl64);
 #else /* __SIZEOF_INT__ == 8 */
@@ -3357,7 +3397,11 @@ DFUN(".text.crt.dos.unicode.UTF", libd___unicode_descriptor, libc___unicode_desc
 DFUN(".text.crt.dos.unicode.UTF", libd___unicode_descriptor_digit, libc___unicode_descriptor_digit, TI8, 1, TI8)
 DFUN(".text.crt.dos.unicode.UTF", libd___unicode_descriptor_digit64, libc___unicode_descriptor_digit64, TI64, 1, TI8)
 DFUN(".text.crt.dos.unicode.UTF", libd___unicode_descriptor_digitd, libc___unicode_descriptor_digitd, TFD, 1, TI8)
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libd___unicode_descriptor_digitld, libd___unicode_descriptor_digitd);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.unicode.UTF", libd___unicode_descriptor_digitld, libc___unicode_descriptor_digitld, TFL, 1, TI8)
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 DFUN(".text.crt.dos.unicode.UTF", libd_unicode_fold, libc_unicode_fold, TP, 2, TI32, TP)
 
 /* unistd */

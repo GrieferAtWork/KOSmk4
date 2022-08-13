@@ -2233,6 +2233,7 @@ double __unicode_descriptor_digitd($uint8_t digit_idx);
 [[guard, libc, const, wunused, nothrow]]
 [[doc_alias("__unicode_descriptor_digitd")]]
 [[decl_include("<hybrid/typecore.h>")]]
+[[ldouble_variant_of("__unicode_descriptor_digitd", [])]]
 __LONGDOUBLE __unicode_descriptor_digitld($uint8_t digit_idx);
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* !__NO_FPU */
@@ -2389,6 +2390,9 @@ __NOTHROW(__LIBCCALL unicode_getnumericdbl)(char32_t __ch) {
  * Return  the numerical  variable for which  `ch' is representative  (s.a. `unicode_isnumeric(3)'). When
  * `ch' doesn't represent  a numerical character,  return `0'.  Note that this  function also  recognizes
  * 'a'-'f' and 'A'-'F' as numeric characters (representing their hex values) */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+#define unicode_getnumericldbl(ch) ((__LONGDOUBLE)unicode_getnumericdbl(ch))
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 __LOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL unicode_getnumericldbl)(char32_t __ch) {
 	struct __unitraits const *__traits = __unicode_descriptor(__ch);
@@ -2404,6 +2408,7 @@ __NOTHROW(__LIBCCALL unicode_getnumericldbl)(char32_t __ch) {
 	return 0.0L;
 #endif /* !... */
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU */
 
@@ -2689,6 +2694,9 @@ __NOTHROW(__LIBCCALL __libc_unicode_getnumericdbl)(__CHAR32_TYPE__ __ch) {
  * Return  the numerical  variable for which  `ch' is representative  (s.a. `unicode_isnumeric(3)'). When
  * `ch' doesn't represent  a numerical character,  return `0'.  Note that this  function also  recognizes
  * 'a'-'f' and 'A'-'F' as numeric characters (representing their hex values) */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+#define __libc_unicode_getnumericldbl(ch) ((__LONGDOUBLE)__libc_unicode_getnumericdbl(ch))
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 __LOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL __libc_unicode_getnumericldbl)(__CHAR32_TYPE__ __ch) {
 	struct __unitraits const *__traits = __libc___unicode_descriptor(__ch);
@@ -2704,6 +2712,7 @@ __NOTHROW(__LIBCCALL __libc_unicode_getnumericldbl)(__CHAR32_TYPE__ __ch) {
 	return 0.0L;
 #endif /* !... */
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU */
 __DECL_END

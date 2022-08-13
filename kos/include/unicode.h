@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x847c3874 */
+/* HASH CRC-32:0x769f264 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1393,14 +1393,24 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__UINT64_TYPE__,__NOTHROW,__unicode_descr
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__unicode_descriptor_digitd,(__UINT8_TYPE__ __digit_idx),(__digit_idx))
 #endif /* !____unicode_descriptor_digitd_defined && __CRT_HAVE___unicode_descriptor_digitd */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-#if !defined(____unicode_descriptor_digitld_defined) && defined(__CRT_HAVE___unicode_descriptor_digitld)
+#ifndef ____unicode_descriptor_digitld_defined
 #define ____unicode_descriptor_digitld_defined
+#ifdef __CRT_HAVE___unicode_descriptor_digitld
 /* >> __unicode_descriptor_digitd(3), __unicode_descriptor_digitld(3)
  * Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__unicode_descriptor_digitld,(__UINT8_TYPE__ __digit_idx),(__digit_idx))
-#endif /* !____unicode_descriptor_digitld_defined && __CRT_HAVE___unicode_descriptor_digitld */
+#elif defined(__CRT_HAVE___unicode_descriptor_digitd) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+/* >> __unicode_descriptor_digitd(3), __unicode_descriptor_digitld(3)
+ * Return the floating-point constant associated with a given digit index
+ * Returns `0.0' if the given index is invalid
+ * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__unicode_descriptor_digitld,(__UINT8_TYPE__ __digit_idx),__unicode_descriptor_digitd,(__digit_idx))
+#else /* ... */
+#undef ____unicode_descriptor_digitld_defined
+#endif /* !... */
+#endif /* !____unicode_descriptor_digitld_defined */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU */
 
@@ -1548,6 +1558,9 @@ __NOTHROW(__LIBCCALL unicode_getnumericdbl)(char32_t __ch) {
  * Return  the numerical  variable for which  `ch' is representative  (s.a. `unicode_isnumeric(3)'). When
  * `ch' doesn't represent  a numerical character,  return `0'.  Note that this  function also  recognizes
  * 'a'-'f' and 'A'-'F' as numeric characters (representing their hex values) */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+#define unicode_getnumericldbl(ch) ((__LONGDOUBLE)unicode_getnumericdbl(ch))
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 __LOCAL __ATTR_CONST __ATTR_WUNUSED __LONGDOUBLE
 __NOTHROW(__LIBCCALL unicode_getnumericldbl)(char32_t __ch) {
 	struct __unitraits const *__traits = __unicode_descriptor(__ch);
@@ -1563,6 +1576,7 @@ __NOTHROW(__LIBCCALL unicode_getnumericldbl)(char32_t __ch) {
 	return 0.0L;
 #endif /* !... */
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* !__NO_FPU */
 

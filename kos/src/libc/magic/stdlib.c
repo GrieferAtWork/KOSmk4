@@ -986,8 +986,7 @@ double atof([[in]] char const *__restrict nptr) {
 }
 
 [[std, leaf]]
-[[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__, strtod)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias("strtold")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias("strtold")]]
 [[dependency(unicode_readutf8, unicode_readutf8_rev)]]
 [[impl_include("<asm/crt/stdio.h>")]]
 [[impl_prefix(
@@ -1066,7 +1065,6 @@ float strtof([[in]] char const *__restrict nptr,
 
 %(std)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[guard, std, leaf, export_alias("__strtold")]]
-[[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__, strtod)]]
 [[dependency(unicode_readutf8, unicode_readutf8_rev)]]
 [[impl_include("<asm/crt/stdio.h>")]]
 [[impl_prefix(
@@ -1079,6 +1077,7 @@ DEFINE_VSC32SCANF_HELPERS
 @@pp_endif@@
 )]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
+[[ldouble_variant_of("strtod", ["__strtod"])]]
 __LONGDOUBLE strtold([[in]] char const *__restrict nptr,
                      [[out_opt]] char **endptr) {
 	__LONGDOUBLE result;
@@ -1124,6 +1123,7 @@ __STDC_INT32_AS_SIZE_T strfromf([[out(return <= buflen)]] char *__restrict buf, 
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[ldouble_variant_of("strfromd", [])]]
 __STDC_INT32_AS_SIZE_T strfroml([[out(return <= buflen)]] char *__restrict buf, $size_t buflen,
                                 [[in]] char const *__restrict format, __LONGDOUBLE fp);
 /* TODO: Implement as inline */
@@ -1917,8 +1917,8 @@ int fcvt_r(double val, int ndigit,
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[impl_include("<hybrid/floatcore.h>")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias("gcvt", "_gcvt")]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
+[[ldouble_variant_of("gcvt", ["_gcvt"])]]
 char *qgcvt(__LONGDOUBLE val, int ndigit, [[out]] char *buf) {
 @@pp_ifndef     LDBG_NDIGIT_MAX@@
 @@pp_if __LDBL_MANT_DIG__ == 53@@
@@ -1940,6 +1940,7 @@ char *qgcvt(__LONGDOUBLE val, int ndigit, [[out]] char *buf) {
 
 [[decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
+[[ldouble_variant_of("ecvt_r", [])]]
 int qecvt_r(__LONGDOUBLE val, int ndigit,
             [[out]] int *__restrict decptr,
             [[out]] int *__restrict sign,
@@ -1961,6 +1962,7 @@ int qecvt_r(__LONGDOUBLE val, int ndigit,
 
 [[decl_include("<hybrid/typecore.h>")]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
+[[ldouble_variant_of("fcvt_r", [])]]
 int qfcvt_r(__LONGDOUBLE val, int ndigit,
             [[out]] int *__restrict decptr,
             [[out]] int *__restrict sign,
@@ -1988,8 +1990,8 @@ static char qcvt_buffer[32];
 
 
 [[wunused]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias("ecvt", "_ecvt")]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
+[[ldouble_variant_of("ecvt", ["_ecvt"])]]
 char *qecvt(__LONGDOUBLE val, int ndigit,
             [[out]] int *__restrict decptr,
             [[out]] int *__restrict sign) {
@@ -2002,8 +2004,8 @@ char *qecvt(__LONGDOUBLE val, int ndigit,
 }
 
 [[wunused]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias("fcvt", "_fcvt")]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
+[[ldouble_variant_of("fcvt", ["_fcvt"])]]
 char *qfcvt(__LONGDOUBLE val, int ndigit,
             [[out]] int *__restrict decptr,
             [[out]] int *__restrict sign) {
@@ -2726,7 +2728,7 @@ __ULONGLONG strtoull_l([[in]] char const *__restrict nptr,
 
 %#ifndef __NO_FPU
 [[dos_only_export_alias("_strtod_l"), export_alias("__strtod_l")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias("strtold_l", "_strtold_l", "__strtold_l")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)), alias("strtold_l", "_strtold_l", "__strtold_l")]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 double strtod_l([[in]] char const *__restrict nptr,
                 [[out_opt]] char **endptr, $locale_t locale) {
@@ -2744,9 +2746,8 @@ float strtof_l([[in]] char const *__restrict nptr,
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[dos_only_export_alias("_strtold_l"), export_alias("__strtold_l")]]
-[[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__, strtod_l)]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias("_strtod_l", "__strtod_l")]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
+[[ldouble_variant_of("strtod_l", ["_strtod_l", "__strtod_l"])]]
 __LONGDOUBLE strtold_l([[in]] char const *__restrict nptr,
                        [[out_opt]] char **endptr, $locale_t locale) {
 	(void)locale;
@@ -5120,7 +5121,6 @@ int _atoflt_l([[out]] float *__restrict result,
 %[define_c_language_keyword(__KOS_FIXED_CONST)]
 
 [[decl_include("<features.h>")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__), alias("_atoldbl")]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 int _atodbl([[out]] double *__restrict result,
             [[in]] char __KOS_FIXED_CONST *__restrict nptr) {
@@ -5129,7 +5129,6 @@ int _atodbl([[out]] double *__restrict result,
 }
 
 [[decl_include("<features.h>")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__), alias("_atoldbl_l")]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
 int _atodbl_l([[out]] double *__restrict result,
               [[in]] char __KOS_FIXED_CONST *__restrict nptr, $locale_t locale) {
@@ -5139,8 +5138,8 @@ int _atodbl_l([[out]] double *__restrict result,
 
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
 [[decl_include("<features.h>")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__), alias("_atodbl")]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
+[[ldouble_variant_of("_atodbl", [])]]
 int _atoldbl([[out]] __LONGDOUBLE *__restrict result,
              [[in]] char __KOS_FIXED_CONST *__restrict nptr) {
 	*result = strtold(nptr, NULL);
@@ -5148,8 +5147,8 @@ int _atoldbl([[out]] __LONGDOUBLE *__restrict result,
 }
 
 [[decl_include("<features.h>")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_DOUBLE__ == __SIZEOF_LONG_DOUBLE__), alias("_atodbl_l")]]
 [[section(".text.crt{|.dos}.unicode.static.convert")]]
+[[ldouble_variant_of("_atodbl_l", [])]]
 int _atoldbl_l([[out]] __LONGDOUBLE *__restrict result,
                [[in]] char __KOS_FIXED_CONST *__restrict nptr,
                $locale_t locale) {

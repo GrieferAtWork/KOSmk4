@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbdad73cb */
+/* HASH CRC-32:0x2660232a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -191,15 +191,26 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__UINT64_TYPE__,__NOTHROW,__libc_core___
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__libc_core___unicode_descriptor_digitd,(__UINT8_TYPE__ __digit_idx),__unicode_descriptor_digitd,(__digit_idx))
 #endif /* !____libc_core___unicode_descriptor_digitd_defined && __CRT_HAVE___unicode_descriptor_digitd */
-#if !defined(____libc_core___unicode_descriptor_digitld_defined) && defined(__CRT_HAVE___unicode_descriptor_digitld)
+#ifndef ____libc_core___unicode_descriptor_digitld_defined
 #define ____libc_core___unicode_descriptor_digitld_defined
+#ifdef __CRT_HAVE___unicode_descriptor_digitld
 #include <hybrid/typecore.h>
 /* >> __unicode_descriptor_digitd(3), __unicode_descriptor_digitld(3)
  * Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__libc_core___unicode_descriptor_digitld,(__UINT8_TYPE__ __digit_idx),__unicode_descriptor_digitld,(__digit_idx))
-#endif /* !____libc_core___unicode_descriptor_digitld_defined && __CRT_HAVE___unicode_descriptor_digitld */
+#elif defined(__CRT_HAVE___unicode_descriptor_digitd) && defined(__ARCH_LONG_DOUBLE_IS_DOUBLE)
+#include <hybrid/typecore.h>
+/* >> __unicode_descriptor_digitd(3), __unicode_descriptor_digitld(3)
+ * Return the floating-point constant associated with a given digit index
+ * Returns `0.0' if the given index is invalid
+ * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__libc_core___unicode_descriptor_digitld,(__UINT8_TYPE__ __digit_idx),__unicode_descriptor_digitd,(__digit_idx))
+#else /* ... */
+#undef ____libc_core___unicode_descriptor_digitld_defined
+#endif /* !... */
+#endif /* !____libc_core___unicode_descriptor_digitld_defined */
 #ifdef __CRT_HAVE_unicode_fold
 #include <hybrid/typecore.h>
 /* >> unicode_fold(3)

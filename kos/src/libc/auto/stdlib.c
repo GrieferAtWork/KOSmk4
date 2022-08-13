@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb02e5669 */
+/* HASH CRC-32:0xb3d12fdd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -471,10 +471,6 @@ INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_LEAF WUNUSED ATTR_I
 NOTHROW_NCX(LIBCCALL libc_atof)(char const *__restrict nptr) {
 	return libc_strtod(nptr, NULL);
 }
-#include <hybrid/typecore.h>
-#if __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
-DEFINE_INTERN_ALIAS(libc_strtod, libc_strtod);
-#else /* __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__ */
 #include <asm/crt/stdio.h>
 #if __SIZEOF_CHAR__ == 1
 #ifndef ____vsscanf_getc_defined
@@ -565,7 +561,6 @@ NOTHROW_NCX(LIBCCALL libc_strtod)(char const *__restrict nptr,
 		*endptr = (char *)text_pointer;
 	return result;
 }
-#endif /* __SIZEOF_LONG_DOUBLE__ != __SIZEOF_DOUBLE__ */
 #include <asm/crt/stdio.h>
 #if __SIZEOF_CHAR__ == 1
 #ifndef ____vsscanf_getc_defined
@@ -657,9 +652,9 @@ NOTHROW_NCX(LIBCCALL libc_strtof)(char const *__restrict nptr,
 	return result;
 }
 #include <hybrid/typecore.h>
-#if __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
 DEFINE_INTERN_ALIAS(libc_strtold, libc_strtod);
-#else /* __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__ */
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <asm/crt/stdio.h>
 #if __SIZEOF_CHAR__ == 1
 #ifndef ____vsscanf_getc_defined
@@ -750,7 +745,7 @@ NOTHROW_NCX(LIBCCALL libc_strtold)(char const *__restrict nptr,
 		*endptr = (char *)text_pointer;
 	return result;
 }
-#endif /* __SIZEOF_LONG_DOUBLE__ != __SIZEOF_DOUBLE__ */
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #endif /* !__KERNEL__ */
 #include <asm/os/errno.h>
 #include <hybrid/__overflow.h>
@@ -1897,6 +1892,10 @@ NOTHROW_NCX(LIBCCALL libc_fcvt_r)(double val,
 	return 0;
 #endif
 }
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_qgcvt, libc_gcvt);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <hybrid/floatcore.h>
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_OUT(3) char *
 NOTHROW_NCX(LIBCCALL libc_qgcvt)(__LONGDOUBLE val,
@@ -1919,6 +1918,11 @@ NOTHROW_NCX(LIBCCALL libc_qgcvt)(__LONGDOUBLE val,
 	libc_sprintf(buf, "%.*Lg", ndigit, val);
 	return buf;
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_qecvt_r, libc_ecvt_r);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_OUT(3) ATTR_OUT(4) ATTR_OUTS(5, 6) int
 NOTHROW_NCX(LIBCCALL libc_qecvt_r)(__LONGDOUBLE val,
                                    int ndigit,
@@ -1940,6 +1944,11 @@ NOTHROW_NCX(LIBCCALL libc_qecvt_r)(__LONGDOUBLE val,
 	return 0;
 #endif
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_qfcvt_r, libc_fcvt_r);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_OUT(3) ATTR_OUT(4) ATTR_OUTS(5, 6) int
 NOTHROW_NCX(LIBCCALL libc_qfcvt_r)(__LONGDOUBLE val,
                                    int ndigit,
@@ -1961,11 +1970,16 @@ NOTHROW_NCX(LIBCCALL libc_qfcvt_r)(__LONGDOUBLE val,
 	return 0;
 #endif
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 static char qcvt_buffer[32];
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_qecvt, libc_ecvt);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED ATTR_OUT(3) ATTR_OUT(4) char *
 NOTHROW_NCX(LIBCCALL libc_qecvt)(__LONGDOUBLE val,
                                  int ndigit,
@@ -1978,6 +1992,11 @@ NOTHROW_NCX(LIBCCALL libc_qecvt)(__LONGDOUBLE val,
 		return NULL;
 	return qcvt_buffer;
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#include <hybrid/typecore.h>
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc_qfcvt, libc_fcvt);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") WUNUSED ATTR_OUT(3) ATTR_OUT(4) char *
 NOTHROW_NCX(LIBCCALL libc_qfcvt)(__LONGDOUBLE val,
                                  int ndigit,
@@ -1990,6 +2009,7 @@ NOTHROW_NCX(LIBCCALL libc_qfcvt)(__LONGDOUBLE val,
 		return NULL;
 	return qcvt_buffer;
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 /* >> mkstemps(3), mkstemps64(3)
  * Replace the last 6 characters of `template_' (which are followed by exactly
  * `suffixlen' more characters that are left alone), which must be filled with
@@ -2352,9 +2372,9 @@ NOTHROW_NCX(LIBCCALL libc_strtof_l)(char const *__restrict nptr,
 	return libc_strtof(nptr, endptr);
 }
 #include <hybrid/typecore.h>
-#if __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
 DEFINE_INTERN_ALIAS(libc_strtold_l, libc_strtod_l);
-#else /* __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__ */
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_IN(1) ATTR_OUT_OPT(2) __LONGDOUBLE
 NOTHROW_NCX(LIBCCALL libc_strtold_l)(char const *__restrict nptr,
                                      char **endptr,
@@ -2362,7 +2382,7 @@ NOTHROW_NCX(LIBCCALL libc_strtold_l)(char const *__restrict nptr,
 	(void)locale;
 	return libc_strtold(nptr, endptr);
 }
-#endif /* __SIZEOF_LONG_DOUBLE__ != __SIZEOF_DOUBLE__ */
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #include <libc/template/__libc_enable_secure.h>
 /* >> secure_getenv(3)
  * Same as `getenv(3)', but always  return `NULL' if the  caller
@@ -4219,12 +4239,19 @@ NOTHROW_NCX(LIBCCALL libc__atodbl_l)(double *__restrict result,
 	*result = libc_strtod_l(nptr, NULL, locale);
 	return 0;
 }
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc__atoldbl, libc__atodbl);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_IN(2) ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc__atoldbl)(__LONGDOUBLE *__restrict result,
                                     char __KOS_FIXED_CONST *__restrict nptr) {
 	*result = libc_strtold(nptr, NULL);
 	return 0;
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc__atoldbl_l, libc__atodbl_l);
+#else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
 INTERN ATTR_SECTION(".text.crt.unicode.static.convert") ATTR_IN(2) ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc__atoldbl_l)(__LONGDOUBLE *__restrict result,
                                       char __KOS_FIXED_CONST *__restrict nptr,
@@ -4232,6 +4259,7 @@ NOTHROW_NCX(LIBCCALL libc__atoldbl_l)(__LONGDOUBLE *__restrict result,
 	*result = libc_strtold_l(nptr, NULL, locale);
 	return 0;
 }
+#endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
 #if __SIZEOF_INT__ == 8
 DEFINE_INTERN_ALIAS(libc__rotl, libc__rotl64);
 #else /* __SIZEOF_INT__ == 8 */

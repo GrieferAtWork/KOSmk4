@@ -160,7 +160,10 @@ NOTHROW(LIBCCALL libc___unicode_descriptor_digitd)(uint8_t digit_idx)
 }
 /*[[[end:libc___unicode_descriptor_digitd]]]*/
 
-/*[[[head:libc___unicode_descriptor_digitld,hash:CRC-32=0x22dd8786]]]*/
+/*[[[head:libc___unicode_descriptor_digitld,hash:CRC-32=0x4b7e81fc]]]*/
+#ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
+DEFINE_INTERN_ALIAS(libc___unicode_descriptor_digitld, libc___unicode_descriptor_digitd);
+#else /* MAGIC:alias */
 /* >> __unicode_descriptor_digitd(3), __unicode_descriptor_digitld(3)
  * Return the floating-point constant associated with a given digit index
  * Returns `0.0' if the given index is invalid
@@ -178,6 +181,7 @@ NOTHROW(LIBCCALL libc___unicode_descriptor_digitld)(uint8_t digit_idx)
 	return (__LONGDOUBLE)unidigit_getfrac_numerator(digit) /
 	       (__LONGDOUBLE)unidigit_getfrac_denominator(digit);
 }
+#endif /* MAGIC:alias */
 /*[[[end:libc___unicode_descriptor_digitld]]]*/
 
 /*[[[head:libc_unicode_fold,hash:CRC-32=0x33fdf49d]]]*/
