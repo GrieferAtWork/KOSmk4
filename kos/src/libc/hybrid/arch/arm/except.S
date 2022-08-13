@@ -171,4 +171,31 @@ INTERN_FUNCTION(libc__except_badusage_no_nesting)
 END(libc__except_badusage_no_nesting)
 
 
+
+/* ARM-specific exception-related functions */
+.section SECTION_EXCEPT_TEXT
+DEFINE_PUBLIC_ALIAS(__aeabi_unwind_cpp_pr0, libc___aeabi_unwind_cpp_pr0)
+INTERN_FUNCTION(libc___aeabi_unwind_cpp_pr0)
+	.cfi_startproc
+	b      . /* TODO */
+	.cfi_endproc
+END(libc___aeabi_unwind_cpp_pr0)
+
+.section SECTION_EXCEPT_TEXT
+DEFINE_PUBLIC_ALIAS(__aeabi_unwind_cpp_pr1, libc___aeabi_unwind_cpp_pr1)
+INTERN_FUNCTION(libc___aeabi_unwind_cpp_pr1)
+	.cfi_startproc
+	b      . /* TODO */
+	.cfi_endproc
+END(libc___aeabi_unwind_cpp_pr1)
+
+.section SECTION_EXCEPT_TEXT
+DEFINE_PUBLIC_ALIAS(__cxa_end_cleanup, libc___cxa_end_cleanup)
+INTERN_FUNCTION(libc___cxa_end_cleanup)
+	.cfi_startproc
+	b      . /* TODO */
+	.cfi_endproc
+END(libc___cxa_end_cleanup)
+
+
 #endif /* !GUARD_LIBC_HYBRID_ARCH_ARM_EXCEPT32_S */
