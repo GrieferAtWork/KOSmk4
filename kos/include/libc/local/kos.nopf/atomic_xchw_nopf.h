@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc175fb8f */
+/* HASH CRC-32:0xe22fc059 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_readw_nopf_defined */
 __LOCAL_LIBC(atomic_xchw_nopf) __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3) __BOOL
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atomic_xchw_nopf))(void const *__addr, __UINT16_TYPE__ __newval, __UINT16_TYPE__ *__poldval) {
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(atomic_xchw_nopf))(void *__addr, __UINT16_TYPE__ __newval, __UINT16_TYPE__ *__poldval) {
 	__BOOL __nopf;
 	__UINT16_TYPE__  __expected_oldval;
 	do {

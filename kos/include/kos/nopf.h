@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbefe39eb */
+/* HASH CRC-32:0x3ad4fef4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -275,14 +275,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(memeq_nopf, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
  * Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
  * old value in `*poldval', and loading a new value from `newval'
  * Return `true' on success, `false' on fault */
-__CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3),__BOOL,__NOTHROW,atomic_xchb_nopf,(void const *__addr, __UINT8_TYPE__ __newval, __UINT8_TYPE__ *__poldval),(__addr,__newval,__poldval))
+__CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3),__BOOL,__NOTHROW,atomic_xchb_nopf,(void *__addr, __UINT8_TYPE__ __newval, __UINT8_TYPE__ *__poldval),(__addr,__newval,__poldval))
 #elif (defined(__arch_readb_nopf) || defined(__CRT_HAVE_readb_nopf) || defined(__arch_memcpy_nopf) || defined(__CRT_HAVE_memcpy_nopf) || defined(__arch_readw_nopf) || defined(__CRT_HAVE_readw_nopf) || defined(__arch_readl_nopf) || defined(__CRT_HAVE_readl_nopf) || defined(__arch_readq_nopf) || defined(__CRT_HAVE_readq_nopf)) && (defined(__arch_atomic_cmpxchb_nopf) || defined(__CRT_HAVE_atomic_cmpxchb_nopf))
 #include <libc/local/kos.nopf/atomic_xchb_nopf.h>
 /* >> atomic_xch[bwlq]_nopf(3)
  * Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
  * old value in `*poldval', and loading a new value from `newval'
  * Return `true' on success, `false' on fault */
-__NAMESPACE_LOCAL_USING_OR_IMPL(atomic_xchb_nopf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3) __BOOL __NOTHROW(__LIBCCALL atomic_xchb_nopf)(void const *__addr, __UINT8_TYPE__ __newval, __UINT8_TYPE__ *__poldval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atomic_xchb_nopf))(__addr, __newval, __poldval); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(atomic_xchb_nopf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3) __BOOL __NOTHROW(__LIBCCALL atomic_xchb_nopf)(void *__addr, __UINT8_TYPE__ __newval, __UINT8_TYPE__ *__poldval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atomic_xchb_nopf))(__addr, __newval, __poldval); })
 #else /* ... */
 #undef __atomic_xchb_nopf_defined
 #endif /* !... */
@@ -300,14 +300,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(atomic_xchb_nopf, __FORCELOCAL __ATTR_ARTIFICIAL
  * Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
  * old value in `*poldval', and loading a new value from `newval'
  * Return `true' on success, `false' on fault */
-__CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3),__BOOL,__NOTHROW,atomic_xchw_nopf,(void const *__addr, __UINT16_TYPE__ __newval, __UINT16_TYPE__ *__poldval),(__addr,__newval,__poldval))
+__CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3),__BOOL,__NOTHROW,atomic_xchw_nopf,(void *__addr, __UINT16_TYPE__ __newval, __UINT16_TYPE__ *__poldval),(__addr,__newval,__poldval))
 #elif (defined(__arch_readb_nopf) || defined(__CRT_HAVE_readb_nopf) || defined(__arch_readw_nopf) || defined(__CRT_HAVE_readw_nopf) || defined(__arch_readl_nopf) || defined(__CRT_HAVE_readl_nopf) || defined(__arch_readq_nopf) || defined(__CRT_HAVE_readq_nopf) || defined(__arch_memcpy_nopf) || defined(__CRT_HAVE_memcpy_nopf)) && (defined(__arch_atomic_cmpxchw_nopf) || defined(__CRT_HAVE_atomic_cmpxchw_nopf))
 #include <libc/local/kos.nopf/atomic_xchw_nopf.h>
 /* >> atomic_xch[bwlq]_nopf(3)
  * Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
  * old value in `*poldval', and loading a new value from `newval'
  * Return `true' on success, `false' on fault */
-__NAMESPACE_LOCAL_USING_OR_IMPL(atomic_xchw_nopf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3) __BOOL __NOTHROW(__LIBCCALL atomic_xchw_nopf)(void const *__addr, __UINT16_TYPE__ __newval, __UINT16_TYPE__ *__poldval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atomic_xchw_nopf))(__addr, __newval, __poldval); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(atomic_xchw_nopf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3) __BOOL __NOTHROW(__LIBCCALL atomic_xchw_nopf)(void *__addr, __UINT16_TYPE__ __newval, __UINT16_TYPE__ *__poldval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atomic_xchw_nopf))(__addr, __newval, __poldval); })
 #else /* ... */
 #undef __atomic_xchw_nopf_defined
 #endif /* !... */
@@ -325,14 +325,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(atomic_xchw_nopf, __FORCELOCAL __ATTR_ARTIFICIAL
  * Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
  * old value in `*poldval', and loading a new value from `newval'
  * Return `true' on success, `false' on fault */
-__CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3),__BOOL,__NOTHROW,atomic_xchl_nopf,(void const *__addr, __UINT32_TYPE__ __newval, __UINT32_TYPE__ *__poldval),(__addr,__newval,__poldval))
+__CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3),__BOOL,__NOTHROW,atomic_xchl_nopf,(void *__addr, __UINT32_TYPE__ __newval, __UINT32_TYPE__ *__poldval),(__addr,__newval,__poldval))
 #elif (defined(__arch_readb_nopf) || defined(__CRT_HAVE_readb_nopf) || defined(__arch_readw_nopf) || defined(__CRT_HAVE_readw_nopf) || defined(__arch_readl_nopf) || defined(__CRT_HAVE_readl_nopf) || defined(__arch_readq_nopf) || defined(__CRT_HAVE_readq_nopf) || defined(__arch_memcpy_nopf) || defined(__CRT_HAVE_memcpy_nopf)) && (defined(__arch_atomic_cmpxchl_nopf) || defined(__CRT_HAVE_atomic_cmpxchl_nopf))
 #include <libc/local/kos.nopf/atomic_xchl_nopf.h>
 /* >> atomic_xch[bwlq]_nopf(3)
  * Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
  * old value in `*poldval', and loading a new value from `newval'
  * Return `true' on success, `false' on fault */
-__NAMESPACE_LOCAL_USING_OR_IMPL(atomic_xchl_nopf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3) __BOOL __NOTHROW(__LIBCCALL atomic_xchl_nopf)(void const *__addr, __UINT32_TYPE__ __newval, __UINT32_TYPE__ *__poldval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atomic_xchl_nopf))(__addr, __newval, __poldval); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(atomic_xchl_nopf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3) __BOOL __NOTHROW(__LIBCCALL atomic_xchl_nopf)(void *__addr, __UINT32_TYPE__ __newval, __UINT32_TYPE__ *__poldval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atomic_xchl_nopf))(__addr, __newval, __poldval); })
 #else /* ... */
 #undef __atomic_xchl_nopf_defined
 #endif /* !... */
@@ -350,14 +350,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(atomic_xchl_nopf, __FORCELOCAL __ATTR_ARTIFICIAL
  * Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
  * old value in `*poldval', and loading a new value from `newval'
  * Return `true' on success, `false' on fault */
-__CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3),__BOOL,__NOTHROW,atomic_xchq_nopf,(void const *__addr, __UINT64_TYPE__ __newval, __UINT64_TYPE__ *__poldval),(__addr,__newval,__poldval))
+__CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3),__BOOL,__NOTHROW,atomic_xchq_nopf,(void *__addr, __UINT64_TYPE__ __newval, __UINT64_TYPE__ *__poldval),(__addr,__newval,__poldval))
 #elif (defined(__arch_readb_nopf) || defined(__CRT_HAVE_readb_nopf) || defined(__arch_readw_nopf) || defined(__CRT_HAVE_readw_nopf) || defined(__arch_readl_nopf) || defined(__CRT_HAVE_readl_nopf) || defined(__arch_readq_nopf) || defined(__CRT_HAVE_readq_nopf) || defined(__arch_memcpy_nopf) || defined(__CRT_HAVE_memcpy_nopf)) && (defined(__arch_atomic_cmpxchq_nopf) || defined(__CRT_HAVE_atomic_cmpxchq_nopf))
 #include <libc/local/kos.nopf/atomic_xchq_nopf.h>
 /* >> atomic_xch[bwlq]_nopf(3)
  * Try  to ATOMIC_XCH  at a  possibly faulty  `addr', storing the
  * old value in `*poldval', and loading a new value from `newval'
  * Return `true' on success, `false' on fault */
-__NAMESPACE_LOCAL_USING_OR_IMPL(atomic_xchq_nopf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3) __BOOL __NOTHROW(__LIBCCALL atomic_xchq_nopf)(void const *__addr, __UINT64_TYPE__ __newval, __UINT64_TYPE__ *__poldval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atomic_xchq_nopf))(__addr, __newval, __poldval); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(atomic_xchq_nopf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3) __BOOL __NOTHROW(__LIBCCALL atomic_xchq_nopf)(void *__addr, __UINT64_TYPE__ __newval, __UINT64_TYPE__ *__poldval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atomic_xchq_nopf))(__addr, __newval, __poldval); })
 #else /* ... */
 #undef __atomic_xchq_nopf_defined
 #endif /* !... */
@@ -375,14 +375,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(atomic_xchq_nopf, __FORCELOCAL __ATTR_ARTIFICIAL
  * Try to ATOMIC_FETCHADD at a possibly faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored val
  * Return `true' on success, `false' on fault */
-__CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3),__BOOL,__NOTHROW,atomic_fetchaddb_nopf,(void const *__addr, __UINT8_TYPE__ __addend, __UINT8_TYPE__ *__poldval),(__addr,__addend,__poldval))
+__CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3),__BOOL,__NOTHROW,atomic_fetchaddb_nopf,(void *__addr, __UINT8_TYPE__ __addend, __UINT8_TYPE__ *__poldval),(__addr,__addend,__poldval))
 #elif (defined(__arch_readb_nopf) || defined(__CRT_HAVE_readb_nopf) || defined(__arch_memcpy_nopf) || defined(__CRT_HAVE_memcpy_nopf) || defined(__arch_readw_nopf) || defined(__CRT_HAVE_readw_nopf) || defined(__arch_readl_nopf) || defined(__CRT_HAVE_readl_nopf) || defined(__arch_readq_nopf) || defined(__CRT_HAVE_readq_nopf)) && (defined(__arch_atomic_cmpxchb_nopf) || defined(__CRT_HAVE_atomic_cmpxchb_nopf))
 #include <libc/local/kos.nopf/atomic_fetchaddb_nopf.h>
 /* >> atomic_fetchadd[bwlq]_nopf(3)
  * Try to ATOMIC_FETCHADD at a possibly faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored val
  * Return `true' on success, `false' on fault */
-__NAMESPACE_LOCAL_USING_OR_IMPL(atomic_fetchaddb_nopf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3) __BOOL __NOTHROW(__LIBCCALL atomic_fetchaddb_nopf)(void const *__addr, __UINT8_TYPE__ __addend, __UINT8_TYPE__ *__poldval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atomic_fetchaddb_nopf))(__addr, __addend, __poldval); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(atomic_fetchaddb_nopf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3) __BOOL __NOTHROW(__LIBCCALL atomic_fetchaddb_nopf)(void *__addr, __UINT8_TYPE__ __addend, __UINT8_TYPE__ *__poldval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atomic_fetchaddb_nopf))(__addr, __addend, __poldval); })
 #else /* ... */
 #undef __atomic_fetchaddb_nopf_defined
 #endif /* !... */
@@ -400,14 +400,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(atomic_fetchaddb_nopf, __FORCELOCAL __ATTR_ARTIF
  * Try to ATOMIC_FETCHADD at a possibly faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored val
  * Return `true' on success, `false' on fault */
-__CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3),__BOOL,__NOTHROW,atomic_fetchaddw_nopf,(void const *__addr, __UINT16_TYPE__ __addend, __UINT16_TYPE__ *__poldval),(__addr,__addend,__poldval))
+__CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3),__BOOL,__NOTHROW,atomic_fetchaddw_nopf,(void *__addr, __UINT16_TYPE__ __addend, __UINT16_TYPE__ *__poldval),(__addr,__addend,__poldval))
 #elif (defined(__arch_readb_nopf) || defined(__CRT_HAVE_readb_nopf) || defined(__arch_readw_nopf) || defined(__CRT_HAVE_readw_nopf) || defined(__arch_readl_nopf) || defined(__CRT_HAVE_readl_nopf) || defined(__arch_readq_nopf) || defined(__CRT_HAVE_readq_nopf) || defined(__arch_memcpy_nopf) || defined(__CRT_HAVE_memcpy_nopf)) && (defined(__arch_atomic_cmpxchw_nopf) || defined(__CRT_HAVE_atomic_cmpxchw_nopf))
 #include <libc/local/kos.nopf/atomic_fetchaddw_nopf.h>
 /* >> atomic_fetchadd[bwlq]_nopf(3)
  * Try to ATOMIC_FETCHADD at a possibly faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored val
  * Return `true' on success, `false' on fault */
-__NAMESPACE_LOCAL_USING_OR_IMPL(atomic_fetchaddw_nopf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3) __BOOL __NOTHROW(__LIBCCALL atomic_fetchaddw_nopf)(void const *__addr, __UINT16_TYPE__ __addend, __UINT16_TYPE__ *__poldval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atomic_fetchaddw_nopf))(__addr, __addend, __poldval); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(atomic_fetchaddw_nopf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3) __BOOL __NOTHROW(__LIBCCALL atomic_fetchaddw_nopf)(void *__addr, __UINT16_TYPE__ __addend, __UINT16_TYPE__ *__poldval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atomic_fetchaddw_nopf))(__addr, __addend, __poldval); })
 #else /* ... */
 #undef __atomic_fetchaddw_nopf_defined
 #endif /* !... */
@@ -425,14 +425,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(atomic_fetchaddw_nopf, __FORCELOCAL __ATTR_ARTIF
  * Try to ATOMIC_FETCHADD at a possibly faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored val
  * Return `true' on success, `false' on fault */
-__CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3),__BOOL,__NOTHROW,atomic_fetchaddl_nopf,(void const *__addr, __UINT32_TYPE__ __addend, __UINT32_TYPE__ *__poldval),(__addr,__addend,__poldval))
+__CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3),__BOOL,__NOTHROW,atomic_fetchaddl_nopf,(void *__addr, __UINT32_TYPE__ __addend, __UINT32_TYPE__ *__poldval),(__addr,__addend,__poldval))
 #elif (defined(__arch_readb_nopf) || defined(__CRT_HAVE_readb_nopf) || defined(__arch_readw_nopf) || defined(__CRT_HAVE_readw_nopf) || defined(__arch_readl_nopf) || defined(__CRT_HAVE_readl_nopf) || defined(__arch_readq_nopf) || defined(__CRT_HAVE_readq_nopf) || defined(__arch_memcpy_nopf) || defined(__CRT_HAVE_memcpy_nopf)) && (defined(__arch_atomic_cmpxchl_nopf) || defined(__CRT_HAVE_atomic_cmpxchl_nopf))
 #include <libc/local/kos.nopf/atomic_fetchaddl_nopf.h>
 /* >> atomic_fetchadd[bwlq]_nopf(3)
  * Try to ATOMIC_FETCHADD at a possibly faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored val
  * Return `true' on success, `false' on fault */
-__NAMESPACE_LOCAL_USING_OR_IMPL(atomic_fetchaddl_nopf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3) __BOOL __NOTHROW(__LIBCCALL atomic_fetchaddl_nopf)(void const *__addr, __UINT32_TYPE__ __addend, __UINT32_TYPE__ *__poldval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atomic_fetchaddl_nopf))(__addr, __addend, __poldval); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(atomic_fetchaddl_nopf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3) __BOOL __NOTHROW(__LIBCCALL atomic_fetchaddl_nopf)(void *__addr, __UINT32_TYPE__ __addend, __UINT32_TYPE__ *__poldval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atomic_fetchaddl_nopf))(__addr, __addend, __poldval); })
 #else /* ... */
 #undef __atomic_fetchaddl_nopf_defined
 #endif /* !... */
@@ -450,14 +450,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(atomic_fetchaddl_nopf, __FORCELOCAL __ATTR_ARTIF
  * Try to ATOMIC_FETCHADD at a possibly faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored val
  * Return `true' on success, `false' on fault */
-__CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3),__BOOL,__NOTHROW,atomic_fetchaddq_nopf,(void const *__addr, __UINT64_TYPE__ __addend, __UINT64_TYPE__ *__poldval),(__addr,__addend,__poldval))
+__CDECLARE(__ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3),__BOOL,__NOTHROW,atomic_fetchaddq_nopf,(void *__addr, __UINT64_TYPE__ __addend, __UINT64_TYPE__ *__poldval),(__addr,__addend,__poldval))
 #elif (defined(__arch_readb_nopf) || defined(__CRT_HAVE_readb_nopf) || defined(__arch_readw_nopf) || defined(__CRT_HAVE_readw_nopf) || defined(__arch_readl_nopf) || defined(__CRT_HAVE_readl_nopf) || defined(__arch_readq_nopf) || defined(__CRT_HAVE_readq_nopf) || defined(__arch_memcpy_nopf) || defined(__CRT_HAVE_memcpy_nopf)) && (defined(__arch_atomic_cmpxchq_nopf) || defined(__CRT_HAVE_atomic_cmpxchq_nopf))
 #include <libc/local/kos.nopf/atomic_fetchaddq_nopf.h>
 /* >> atomic_fetchadd[bwlq]_nopf(3)
  * Try to ATOMIC_FETCHADD at a possibly faulty `addr', storing  the
  * old value in `*poldval', and adding `newval' onto the stored val
  * Return `true' on success, `false' on fault */
-__NAMESPACE_LOCAL_USING_OR_IMPL(atomic_fetchaddq_nopf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3) __BOOL __NOTHROW(__LIBCCALL atomic_fetchaddq_nopf)(void const *__addr, __UINT64_TYPE__ __addend, __UINT64_TYPE__ *__poldval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atomic_fetchaddq_nopf))(__addr, __addend, __poldval); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(atomic_fetchaddq_nopf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __NOBLOCK __ATTR_INOUT_OPT(1) __ATTR_OUT(3) __BOOL __NOTHROW(__LIBCCALL atomic_fetchaddq_nopf)(void *__addr, __UINT64_TYPE__ __addend, __UINT64_TYPE__ *__poldval) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atomic_fetchaddq_nopf))(__addr, __addend, __poldval); })
 #else /* ... */
 #undef __atomic_fetchaddq_nopf_defined
 #endif /* !... */

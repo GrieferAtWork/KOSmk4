@@ -23,6 +23,7 @@
 #include "../api.h"
 /**/
 
+#include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
 /* Sources:

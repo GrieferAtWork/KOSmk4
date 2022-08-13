@@ -337,21 +337,21 @@ $ssize_t memeq_nopf([[user, checked, in_opt(num_bytes)]] void const *lhs,
 [[guard, kernel, noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]]
 [[preferred_bind_arch_macro_replacement("<kos/bits/nopf.h>", __arch_atomic_xchb_nopf)]]
 [[requires_function(readb_nopf, atomic_cmpxchb_nopf)]]
-bool atomic_xchb_nopf([[user, checked, inout_opt]] void const *addr,
+bool atomic_xchb_nopf([[user, checked, inout_opt]] void *addr,
                       $uint8_t newval, [[out]] $uint8_t *poldval) {
 	bool nopf;
 	uint8_t expected_oldval;
 	do {
 		nopf = likely(readb_nopf(addr, &expected_oldval)) &&
 		       likely(atomic_cmpxchb_nopf(addr, expected_oldval, newval, poldval));
-	} while (likely(nopf) && *poldval == expected_oldval)
+	} while (likely(nopf) && *poldval == expected_oldval);
 	return nopf;
 }
 
 [[guard, kernel, noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_xchb_nopf")]]
 [[preferred_bind_arch_macro_replacement("<kos/bits/nopf.h>", __arch_atomic_xchw_nopf)]]
 [[requires_function(readw_nopf, atomic_cmpxchw_nopf)]]
-bool atomic_xchw_nopf([[user, checked, inout_opt]] void const *addr, $uint16_t newval, [[out]] $uint16_t *poldval) {
+bool atomic_xchw_nopf([[user, checked, inout_opt]] void *addr, $uint16_t newval, [[out]] $uint16_t *poldval) {
 	bool nopf;
 	uint16_t  expected_oldval;
 	do {
@@ -364,7 +364,7 @@ bool atomic_xchw_nopf([[user, checked, inout_opt]] void const *addr, $uint16_t n
 [[guard, kernel, noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_xchb_nopf")]]
 [[preferred_bind_arch_macro_replacement("<kos/bits/nopf.h>", __arch_atomic_xchl_nopf)]]
 [[requires_function(readl_nopf, atomic_cmpxchl_nopf)]]
-bool atomic_xchl_nopf([[user, checked, inout_opt]] void const *addr, $uint32_t newval, [[out]] $uint32_t *poldval) {
+bool atomic_xchl_nopf([[user, checked, inout_opt]] void *addr, $uint32_t newval, [[out]] $uint32_t *poldval) {
 	bool nopf;
 	uint32_t  expected_oldval;
 	do {
@@ -377,7 +377,7 @@ bool atomic_xchl_nopf([[user, checked, inout_opt]] void const *addr, $uint32_t n
 [[guard, kernel, noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_xchb_nopf")]]
 [[preferred_bind_arch_macro_replacement("<kos/bits/nopf.h>", __arch_atomic_xchq_nopf)]]
 [[requires_function(readq_nopf, atomic_cmpxchq_nopf)]]
-bool atomic_xchq_nopf([[user, checked, inout_opt]] void const *addr, $uint64_t newval, [[out]] $uint64_t *poldval) {
+bool atomic_xchq_nopf([[user, checked, inout_opt]] void *addr, $uint64_t newval, [[out]] $uint64_t *poldval) {
 	bool nopf;
 	uint64_t  expected_oldval;
 	do {
@@ -395,12 +395,12 @@ bool atomic_xchq_nopf([[user, checked, inout_opt]] void const *addr, $uint64_t n
 [[guard, kernel, noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>")]]
 [[preferred_bind_arch_macro_replacement("<kos/bits/nopf.h>", __arch_atomic_fetchaddb_nopf)]]
 [[requires_function(readb_nopf, atomic_cmpxchb_nopf)]]
-bool atomic_fetchaddb_nopf([[user, checked, inout_opt]] void const *addr, $uint8_t addend, [[out]] $uint8_t *poldval) {
+bool atomic_fetchaddb_nopf([[user, checked, inout_opt]] void *addr, $uint8_t addend, [[out]] $uint8_t *poldval) {
 	bool nopf;
 	uint8_t  expected_oldval;
 	do {
 		nopf = likely(readb_nopf(addr, &expected_oldval)) &&
-		       likely(atomic_cmpxchb_nopf(addr, expected_oldval, expected_oldval + mask, poldval));
+		       likely(atomic_cmpxchb_nopf(addr, expected_oldval, expected_oldval + addend, poldval));
 	} while (likely(nopf) && *poldval == expected_oldval);
 	return nopf;
 }
@@ -408,12 +408,12 @@ bool atomic_fetchaddb_nopf([[user, checked, inout_opt]] void const *addr, $uint8
 [[guard, kernel, noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_fetchaddb_nopf")]]
 [[preferred_bind_arch_macro_replacement("<kos/bits/nopf.h>", __arch_atomic_fetchaddw_nopf)]]
 [[requires_function(readw_nopf, atomic_cmpxchw_nopf)]]
-bool atomic_fetchaddw_nopf([[user, checked, inout_opt]] void const *addr, $uint16_t addend, [[out]] $uint16_t *poldval) {
+bool atomic_fetchaddw_nopf([[user, checked, inout_opt]] void *addr, $uint16_t addend, [[out]] $uint16_t *poldval) {
 	bool nopf;
 	uint16_t  expected_oldval;
 	do {
 		nopf = likely(readw_nopf(addr, &expected_oldval)) &&
-		       likely(atomic_cmpxchw_nopf(addr, expected_oldval, expected_oldval + mask, poldval));
+		       likely(atomic_cmpxchw_nopf(addr, expected_oldval, expected_oldval + addend, poldval));
 	} while (likely(nopf) && *poldval == expected_oldval);
 	return nopf;
 }
@@ -421,12 +421,12 @@ bool atomic_fetchaddw_nopf([[user, checked, inout_opt]] void const *addr, $uint1
 [[guard, kernel, noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_fetchaddb_nopf")]]
 [[preferred_bind_arch_macro_replacement("<kos/bits/nopf.h>", __arch_atomic_fetchaddl_nopf)]]
 [[requires_function(readl_nopf, atomic_cmpxchl_nopf)]]
-bool atomic_fetchaddl_nopf([[user, checked, inout_opt]] void const *addr, $uint32_t addend, [[out]] $uint32_t *poldval) {
+bool atomic_fetchaddl_nopf([[user, checked, inout_opt]] void *addr, $uint32_t addend, [[out]] $uint32_t *poldval) {
 	bool nopf;
 	uint32_t  expected_oldval;
 	do {
 		nopf = likely(readl_nopf(addr, &expected_oldval)) &&
-		       likely(atomic_cmpxchl_nopf(addr, expected_oldval, expected_oldval + mask, poldval));
+		       likely(atomic_cmpxchl_nopf(addr, expected_oldval, expected_oldval + addend, poldval));
 	} while (likely(nopf) && *poldval == expected_oldval);
 	return nopf;
 }
@@ -434,12 +434,12 @@ bool atomic_fetchaddl_nopf([[user, checked, inout_opt]] void const *addr, $uint3
 [[guard, kernel, noblock, wunused, nothrow, decl_include("<hybrid/typecore.h>"), doc_alias("atomic_fetchaddb_nopf")]]
 [[preferred_bind_arch_macro_replacement("<kos/bits/nopf.h>", __arch_atomic_fetchaddq_nopf)]]
 [[requires_function(readq_nopf, atomic_cmpxchq_nopf)]]
-bool atomic_fetchaddq_nopf([[user, checked, inout_opt]] void const *addr, $uint64_t addend, [[out]] $uint64_t *poldval) {
+bool atomic_fetchaddq_nopf([[user, checked, inout_opt]] void *addr, $uint64_t addend, [[out]] $uint64_t *poldval) {
 	bool nopf;
 	uint64_t  expected_oldval;
 	do {
 		nopf = likely(readq_nopf(addr, &expected_oldval)) &&
-		       likely(atomic_cmpxchq_nopf(addr, expected_oldval, expected_oldval + mask, poldval));
+		       likely(atomic_cmpxchq_nopf(addr, expected_oldval, expected_oldval + addend, poldval));
 	} while (likely(nopf) && *poldval == expected_oldval);
 	return nopf;
 }
