@@ -70,8 +70,10 @@ DECL_BEGIN
 #define interruptible_copytophys(dst, src, num_bytes)   (copytophys(dst, src, num_bytes), num_bytes)
 #define interruptible_bzero(dst, num_bytes)             (bzero(dst, num_bytes), num_bytes)
 #define interruptible_memcpy(dst, src, num_bytes)       (memcpy(dst, src, num_bytes), num_bytes)
+#ifdef __port_t
 #define interruptible_insb(port, buf, num_bytes)        (insb(port, buf, num_bytes), num_bytes)
 #define interruptible_outsb(port, buf, num_bytes)       (outsb(port, buf, num_bytes), num_bytes)
+#endif /* __port_t */
 
 
 /************************************************************************/
@@ -573,6 +575,7 @@ PRIVATE struct vio_ops const devkmem_vio_ops = {
 /************************************************************************/
 /* Full, unfiltered, system port access (/dev/port)                     */
 /************************************************************************/
+#ifdef __port_t
 PRIVATE WUNUSED NONNULL((1)) size_t KCALL
 devport_v_pread(struct mfile *__restrict UNUSED(self), USER CHECKED void *dst,
                 size_t num_bytes, pos_t addr, iomode_t UNUSED(mode)) THROWS(...) {
@@ -669,6 +672,7 @@ PRIVATE struct vio_ops const devport_vio_ops = {
 	VIO_CALLBACK_INIT_WRITE(&devport_v_wrb, &devport_v_wrw, &devport_v_wrl, NULL),
 };
 #endif /* LIBVIO_CONFIG_ENABLED */
+#endif /* __port_t */
 
 
 
@@ -1187,12 +1191,14 @@ INTERN_CONST struct device_ops const dev_tty_ops = {{{
 INTERN_CONST struct chrdev_ops const dev_mem_ops     = DEVICE_OPS_INIT(&devmem_v_newpart, NULL, &devmem_stream_ops, NULL);
 INTERN_CONST struct chrdev_ops const dev_kmem_ops    = DEVICE_OPS_INIT(NULL, NULL, &devkmem_stream_ops, &devkmem_vio_ops);
 INTERN_CONST struct chrdev_ops const dev_null_ops    = DEVICE_OPS_INIT(NULL, &devnull_v_loadpages, &devnull_stream_ops, NULL);
-INTERN_CONST struct chrdev_ops const dev_port_ops    = DEVICE_OPS_INIT(NULL, NULL, &devport_stream_ops, &devport_vio_ops);
 INTERN_CONST struct chrdev_ops const dev_zero_ops    = DEVICE_OPS_INIT(NULL, &devzero_v_loadpages, &devzero_stream_ops, NULL);
 INTERN_CONST struct chrdev_ops const dev_full_ops    = DEVICE_OPS_INIT(NULL, &devfull_v_loadpages, &devfull_stream_ops, NULL);
 INTERN_CONST struct chrdev_ops const dev_random_ops  = DEVICE_OPS_INIT(NULL, NULL, &devrandom_stream_ops, &devrandom_vio_ops);
 INTERN_CONST struct chrdev_ops const dev_urandom_ops = DEVICE_OPS_INIT(NULL, NULL, &devurandom_stream_ops, &devurandom_vio_ops);
 INTERN_CONST struct chrdev_ops const dev_kmsg_ops    = DEVICE_OPS_INIT(NULL, NULL, &devkmsg_stream_ops, NULL);
+#ifdef __port_t
+INTERN_CONST struct chrdev_ops const dev_port_ops = DEVICE_OPS_INIT(NULL, NULL, &devport_stream_ops, &devport_vio_ops);
+#endif /* __port_t */
 #undef DEVICE_OPS_INIT
 #undef IF_VIO_ENABLED
 
