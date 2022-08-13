@@ -588,7 +588,7 @@ remove_bad_fixinclude() {
 remove_bad_fixinclude
 
 echo "Check if $GCC_VERSION:libgcc needs to be built"
-if ! [ -f "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" ] || \
+if ! [ -f "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" ] && \
    ! [ -f "$PREFIX/$TARGET/lib/libgcc_s.so.1" ]; then
 	cmd cd "$KOS_ROOT"
 
