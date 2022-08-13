@@ -86,7 +86,8 @@
 #ifndef __BUILDING_LIBC
 #ifdef __CRT_KOS_KERNEL
 #include <crt-features/crt-kos-kernel.h>
-#if defined(CONFIG_NO_ASSERT_RESTARTABLE) || defined(CONFIG_NO_KERNEL_DEBUGGER)
+#if (defined(CONFIG_NO_ASSERT_RESTARTABLE) || defined(CONFIG_NO_KERNEL_DEBUGGER) || \
+     (defined(CONFIG_HAVE_KERNEL_DEBUGGER) && (-CONFIG_HAVE_KERNEL_DEBUGGER - 1) == -1))
 #undef __CRT_HAVE___acheck
 #undef __CRT_HAVE___acheckf
 #endif /* CONFIG_NO_ASSERT_RESTARTABLE || CONFIG_NO_KERNEL_DEBUGGER */
