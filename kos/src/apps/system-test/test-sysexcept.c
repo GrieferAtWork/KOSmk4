@@ -39,7 +39,7 @@
 #include <syslog.h>
 
 #if defined(__i386__) || defined(__x86_64__)
-#include <asm/cfi.h>
+#include <cfi.h>
 #endif /* __i386__ || __x86_64__ */
 
 DECL_BEGIN

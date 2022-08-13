@@ -24,7 +24,7 @@
 
 #include <hybrid/compiler.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/cpu-flags.h>
 #include <asm/instr/compat.h>
 #include <bits/va_list-struct.h>

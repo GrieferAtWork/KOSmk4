@@ -24,7 +24,7 @@
 
 #include <hybrid/compiler.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/instr/compat.h>
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state.h>

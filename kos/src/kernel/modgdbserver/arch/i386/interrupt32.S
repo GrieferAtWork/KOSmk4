@@ -25,7 +25,7 @@
 
 #include <kernel/x86/gdt.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <kos/kernel/cpu-state.h>
 
 .section .text

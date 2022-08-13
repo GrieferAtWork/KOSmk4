@@ -26,7 +26,7 @@
 #include <sched/cpu.h>
 
 #include <asm/cacheline.h>
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/cpu-flags.h>
 #include <asm/instr/ttest.h>
 

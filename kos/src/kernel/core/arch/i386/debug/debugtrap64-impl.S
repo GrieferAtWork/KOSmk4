@@ -19,7 +19,7 @@
  */
 #include <kernel/compiler.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/cpu-flags.h>
 
 

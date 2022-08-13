@@ -24,7 +24,7 @@
 #include <kernel/compiler.h>
 #include <kernel/panic.h>
 #include <kos/kernel/cpu-state.h>
-#include <asm/cfi.h>
+#include <cfi.h>
 
 /* ATTR_NORETURN void FCALL kernel_panic_here(void) */
 .section .text.cold

@@ -23,7 +23,7 @@
 
 #include <kernel/compiler.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <kos/kernel/x86/gdt.h>
 #include <kos/kernel/paging.h>
 #include <kernel/arch/syscall.h>

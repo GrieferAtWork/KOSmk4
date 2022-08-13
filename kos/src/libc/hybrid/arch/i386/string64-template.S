@@ -26,7 +26,7 @@
 
 #include <hybrid/compiler.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/instr/movzxq.h>
 
 #include <inttypes.h>

@@ -642,9 +642,8 @@ function doPrint_include_crtFeatures_crtKosKernel(fp: File) {
 				exportAsmname = str(exportAsmname);
 				if (NOT_DEFINED_KERNEL in exportPpCond)
 					continue;
-				if (partPpCond != "1") {
+				if (partPpCond != "1")
 					exportPpCond = f"({partPpCond})&&({exportPpCond})";
-				}
 				if (exportPpCond == "0")
 					continue;
 				if (!crtFeatureConditions.setnew(exportAsmname, exportPpCond)) {

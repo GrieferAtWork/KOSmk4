@@ -26,7 +26,7 @@
 #include <kernel/except.h>
 #include <kernel/syscall.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/cpu-flags.h>
 #include <asm/instr/compat.h>
 #include <asm/instr/ttest.h>

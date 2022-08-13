@@ -25,7 +25,7 @@
 
 #include <hybrid/compiler.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 
 #include <setjmp.h>
 #include <signal.h>

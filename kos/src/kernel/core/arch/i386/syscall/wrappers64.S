@@ -23,7 +23,7 @@
 
 #include <kernel/compiler.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/instr/movzxq.h>
 #include <asm/instr/interrupt.h>
 #include <kos/kernel/paging.h>

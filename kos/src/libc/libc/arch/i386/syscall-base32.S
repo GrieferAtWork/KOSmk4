@@ -26,7 +26,7 @@
 
 #include <hybrid/wordbits.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/cpu-cpuid.h>
 #include <asm/instr/ttest.h>
 #include <sys/syscall.h>

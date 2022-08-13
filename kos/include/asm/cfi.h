@@ -17,56 +17,32 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODGDBSERVER_ARCH_I386_INTERRUPT64_S
-#define GUARD_MODGDBSERVER_ARCH_I386_INTERRUPT64_S 1
-#define __ASSEMBLER__ 1
+#ifndef _ASM_CFI_H
+#define _ASM_CFI_H 1
 
-#include <kernel/compiler.h>
+#include <__stdinc.h>
 
-#include <kernel/x86/gdt.h>
+#include <hybrid/__asm.h>
 
-#include <cfi.h>
-#include <asm/instr/interrupt.h>
-#include <kos/kernel/cpu-state-asm.h>
-#include <kos/kernel/cpu-state.h>
+#ifndef __COMPILER_NO_GCC_ASM_MACROS
+__ASM_BEGIN
 
-.section .text
-INTERN_FUNCTION(GDBX86Interrupt_AsmInt1Handler)
-	/* INTERN void ASMCALL GDBX86Interrupt_AsmInt1Handler(void); */
-	.cfi_startproc simple
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	intr_enter TRAP
-	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
+/* Decode register names and invoke `func' with the effective CFI register ID. */
+__ASM_L(.macro __cfi_decode_register func:req, reg:req)
+#if 0
+#define __REGISTER_CASE(name,id) __ASM_L(.ifc __ASM_ARG(\reg),name; __ASM_ARG(\func) id; .else)
+	__REGISTER_CASE(register_zero,0)
+	__REGISTER_CASE(register_one,1)
+	/* ... */
+__ASM_L(	__ASM_ARG(\func) __ASM_ARG(\reg))
+__ASM_L(	.endif;.endif)
+#undef __REGISTER_CASE
+#else
+__ASM_L(	__ASM_ARG(\func) __ASM_ARG(\reg))
+#endif
+__ASM_L(.endm)
 
-	movq   %rsp, %rdi
-	EXTERN(GDBX86Interrupt_Int1Handler)
-	call   GDBX86Interrupt_Int1Handler
-	movq   %rax, %rsp
+__ASM_END
+#endif /* !__COMPILER_NO_GCC_ASM_MACROS */
 
-	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
-	intr_exit
-	.cfi_endproc
-END(GDBX86Interrupt_AsmInt1Handler)
-
-
-.section .text
-INTERN_FUNCTION(GDBX86Interrupt_AsmInt3Handler)
-	/* INTERN void ASMCALL GDBX86Interrupt_AsmInt3Handler(void); */
-	.cfi_startproc simple
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %rsp, 0
-	intr_enter TRAP
-	ASM_PUSH_ICPUSTATE_AFTER_IRET_CFI_R
-
-	movq   %rsp, %rdi
-	EXTERN(GDBX86Interrupt_Int3Handler)
-	call   GDBX86Interrupt_Int3Handler
-	movq   %rax, %rsp
-
-	ASM_POP_ICPUSTATE_BEFORE_IRET_CFI_R
-	intr_exit
-	.cfi_endproc
-END(GDBX86Interrupt_AsmInt3Handler)
-
-#endif /* !GUARD_MODGDBSERVER_ARCH_I386_INTERRUPT64_S */
+#endif /* !_ASM_CFI_H */

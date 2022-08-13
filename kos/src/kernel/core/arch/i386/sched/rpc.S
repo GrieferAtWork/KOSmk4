@@ -29,7 +29,7 @@
 
 #include <hybrid/host.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/cpu-flags.h>
 #include <asm/instr/compat.h>
 #include <asm/instr/ttest.h>

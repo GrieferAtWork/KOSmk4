@@ -26,7 +26,7 @@
 /**/
 
 #include <hybrid/compiler.h>
-#include <asm/cfi.h>
+#include <cfi.h>
 
 .section .text.crt.dos.utility
 INTERN_FUNCTION(libc__CrtDbgBreak)

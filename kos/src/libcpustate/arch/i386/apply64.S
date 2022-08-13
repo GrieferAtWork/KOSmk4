@@ -25,7 +25,7 @@
 
 #include <hybrid/compiler.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/cpu-flags.h>
 #include <asm/instr/fsgsbase.h>
 #include <asm/instr/interrupt.h>

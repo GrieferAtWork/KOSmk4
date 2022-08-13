@@ -23,7 +23,7 @@
 
 #include <hybrid/compiler.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/instr/compat.h>
 #include <kos/bits/exception_info.h>
 #include <kos/except.h>

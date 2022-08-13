@@ -27,7 +27,7 @@
 #include <kernel/x86/idt.h>
 #include <kernel/x86/pic.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/cpu-flags.h>
 #include <asm/instr/interrupt.h>
 #include <asm/instr/ttest.h>

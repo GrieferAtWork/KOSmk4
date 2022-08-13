@@ -27,7 +27,7 @@
 #include <__crt.h>
 #include <hybrid/compiler.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 
 #include <inttypes.h>
 

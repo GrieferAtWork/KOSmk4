@@ -24,7 +24,7 @@
 #include <hybrid/compiler.h>
 
 .section .text.crt.syscalls
-#include <asm/cfi.h>
+#include <cfi.h>
 
 EXTERN(libc_x86_sysenter_common)
 EXTERN(libc_x86_syscall_check_sysenter)

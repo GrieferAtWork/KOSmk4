@@ -47,50 +47,6 @@
 #ifndef __COMPILER_NO_GCC_ASM_MACROS
 __ASM_BEGIN
 
-#if defined(__GNUC__) && defined(__KOS__)
-#ifndef __GCC_HAVE_DWARF2_CFI_ASM
-#define __GCC_HAVE_DWARF2_CFI_ASM
-#endif /* !__GCC_HAVE_DWARF2_CFI_ASM */
-#elif !defined(__GCC_HAVE_DWARF2_CFI_ASM)
-__ASM_L(.macro .cfi_sections args:vararg; .endm)
-__ASM_L(.macro .cfi_startproc args:vararg; .endm)
-__ASM_L(.macro .cfi_endproc args:vararg; .endm)
-__ASM_L(.macro .cfi_personality args:vararg; .endm)
-__ASM_L(.macro .cfi_personality_id args:vararg; .endm)
-__ASM_L(.macro .cfi_fde_data args:vararg; .endm)
-__ASM_L(.macro .cfi_lsda args:vararg; .endm)
-__ASM_L(.macro .cfi_inline_lsda args:vararg; .endm)
-__ASM_L(.macro .cfi_def_cfa args:vararg; .endm)
-__ASM_L(.macro .cfi_def_cfa_register args:vararg; .endm)
-__ASM_L(.macro .cfi_def_cfa_offset args:vararg; .endm)
-__ASM_L(.macro .cfi_adjust_cfa_offset args:vararg; .endm)
-__ASM_L(.macro .cfi_offset args:vararg; .endm)
-__ASM_L(.macro .cfi_val_offset args:vararg; .endm)
-__ASM_L(.macro .cfi_rel_offset args:vararg; .endm)
-__ASM_L(.macro .cfi_register args:vararg; .endm)
-__ASM_L(.macro .cfi_restore args:vararg; .endm)
-__ASM_L(.macro .cfi_undefined args:vararg; .endm)
-__ASM_L(.macro .cfi_same_value args:vararg; .endm)
-__ASM_L(.macro .cfi_remember_state args:vararg; .endm)
-__ASM_L(.macro .cfi_restore_state args:vararg; .endm)
-__ASM_L(.macro .cfi_return_column args:vararg; .endm)
-__ASM_L(.macro .cfi_signal_frame args:vararg; .endm)
-__ASM_L(.macro .cfi_window_save args:vararg; .endm)
-__ASM_L(.macro .cfi_escape args:vararg; .endm)
-__ASM_L(.macro .cfi_val_encoded_addr args:vararg; .endm)
-#endif /* __GCC_HAVE_DWARF2_CFI_ASM */
-
-/* NOTE: CFI capsules are currently restricted to KOS+!KERNEL.
- *       s.a.          `LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES' */
-#if defined(__KOS__) && !defined(__KERNEL__)
-__ASM_L(.macro .cfi_startcapsule)
-__ASM_L(	.cfi_escape 0x38)
-__ASM_L(.endm)
-__ASM_L(.macro .cfi_endcapsule)
-__ASM_L(	.cfi_escape 0x39)
-__ASM_L(.endm)
-#endif /* __KOS__ && !__KERNEL__ */
-
 #ifdef __x86_64__
 __ASM_L(.macro subq_imm_cfi offset:req, reg:req)
 __ASM_L(	subq $(__ASM_ARG(\offset)), __ASM_ARG(\reg))
@@ -100,18 +56,7 @@ __ASM_L(.macro addq_imm_cfi offset:req, reg:req)
 __ASM_L(	addq $(__ASM_ARG(\offset)), __ASM_ARG(\reg))
 __ASM_L(	.cfi_adjust_cfa_offset -__ASM_ARG(\offset))
 __ASM_L(.endm)
-#else /* __x86_64__ */
-__ASM_L(.macro subl_imm_cfi offset:req, reg:req)
-__ASM_L(	subl $(__ASM_ARG(\offset)), __ASM_ARG(\reg))
-__ASM_L(	.cfi_adjust_cfa_offset __ASM_ARG(\offset))
-__ASM_L(.endm)
-__ASM_L(.macro addl_imm_cfi offset:req, reg:req)
-__ASM_L(	addl $(__ASM_ARG(\offset)), __ASM_ARG(\reg))
-__ASM_L(	.cfi_adjust_cfa_offset -__ASM_ARG(\offset))
-__ASM_L(.endm)
-#endif /* !__x86_64__ */
 
-#ifdef __x86_64__
 __ASM_L(.macro pushq_cfi reg:req; pushq __ASM_ARG(\reg); .cfi_adjust_cfa_offset 8; .endm)
 __ASM_L(.macro popq_cfi reg:req; popq __ASM_ARG(\reg); .cfi_adjust_cfa_offset -8; .endm)
 __ASM_L(.macro pushq_cfi_r reg:req; pushq __ASM_ARG(\reg); .cfi_adjust_cfa_offset 8; .cfi_rel_offset __ASM_ARG(\reg), 0; .endm)
@@ -121,9 +66,9 @@ __ASM_L(.macro popfq_cfi; popfq; .cfi_adjust_cfa_offset -8; .endm)
 __ASM_L(.macro pushfq_cfi_r; pushfq; .cfi_adjust_cfa_offset 8; .cfi_rel_offset %eflags, 0; .endm)
 __ASM_L(.macro popfq_cfi_r; popfq; .cfi_adjust_cfa_offset -8; .cfi_restore %eflags; .endm)
 
-/* Because x86_64 doesn't allow `pushq %ss/%cs/%ds/%es/%fs.base/%gs.base', add a
- * convenience   wrapper   that   uses   an   intermediate   register  `clobber'
- * The  same  also  goes  for  popq,  which  also  gets  a  convenience  wrapper */
+/* Because x86_64 doesn't allow `pushq %ss/%cs/%ds/%es/%fs.base/%gs.base',
+ * add a convenience wrapper that uses an intermediate register  `clobber'
+ * The same also goes for popq, which also gets a convenience wrapper */
 __ASM_L(.macro pushq_cfi_seg_r reg:req, clobber:req)
 __ASM_L(.ifc __ASM_ARG(\reg),%fs.base)
 __ASM_L(	safe_rdfsbase __ASM_ARG(\clobber))
@@ -174,6 +119,15 @@ __ASM_L(	.cfi_same_value __ASM_ARG(\reg))
 __ASM_L(.endif;.endif)
 __ASM_L(.endm)
 #else /* __x86_64__ */
+__ASM_L(.macro subl_imm_cfi offset:req, reg:req)
+__ASM_L(	subl $(__ASM_ARG(\offset)), __ASM_ARG(\reg))
+__ASM_L(	.cfi_adjust_cfa_offset __ASM_ARG(\offset))
+__ASM_L(.endm)
+__ASM_L(.macro addl_imm_cfi offset:req, reg:req)
+__ASM_L(	addl $(__ASM_ARG(\offset)), __ASM_ARG(\reg))
+__ASM_L(	.cfi_adjust_cfa_offset -__ASM_ARG(\offset))
+__ASM_L(.endm)
+
 __ASM_L(.macro pushw_cfi reg:req; pushw __ASM_ARG(\reg); .cfi_adjust_cfa_offset 2; .endm)
 __ASM_L(.macro popw_cfi reg:req; popw __ASM_ARG(\reg); .cfi_adjust_cfa_offset -2; .endm)
 __ASM_L(.macro pushl_cfi reg:req; pushl __ASM_ARG(\reg); .cfi_adjust_cfa_offset 4; .endm)
@@ -398,87 +352,6 @@ __ASM_L(	.endif;.endif;.endif;.endif;.endif)
 #endif /* !__x86_64__ */
 #undef __REGISTER_CASE
 __ASM_L(.endm)
-
-__ASM_L(.macro .cfi_escape_uleb128 value:req)
-__ASM_L(	.if (__ASM_ARG(\value)) <= 0x7f)
-__ASM_L(		.cfi_escape __ASM_ARG(\value))
-__ASM_L(	.else)
-__ASM_L(		.cfi_escape ((__ASM_ARG(\value)) & 0x7f) | 0x80)
-__ASM_L(		.cfi_escape_uleb128 (__ASM_ARG(\value)) >> 7)
-__ASM_L(	.endif)
-__ASM_L(.endm)
-
-__ASM_L(.macro .cfi_escape_sleb128 value:req)
-__ASM_L(	.Lbyte = (__ASM_ARG(\value)) & 0x7f)
-__ASM_L(	.if (__ASM_ARG(\value)) >= 0)
-__ASM_L(		.Lvalue = (__ASM_ARG(\value)) / 128)
-__ASM_L(	.else)
-__ASM_L(		.Lvalue = ~(~(__ASM_ARG(\value)) / 128))
-__ASM_L(	.endif)
-__ASM_L(	.if ((.Lvalue == 0) && ((.Lbyte & 0x40) == 0)) || ((.Lvalue == -1) && ((.Lbyte & 0x40) != 0)))
-__ASM_L(		.cfi_escape .Lbyte)
-__ASM_L(	.else)
-__ASM_L(		.cfi_escape .Lbyte | 0x80)
-__ASM_L(		.cfi_escape_sleb128 .Lvalue)
-__ASM_L(	.endif)
-__ASM_L(.endm)
-
-__ASM_L(.macro __cfi_escape_breg regno:req)
-__ASM_L(	.cfi_escape 0x70 + __ASM_ARG(\regno))
-__ASM_L(.endm)
-
-
-/* Encode a CFI register restore: `%dst = *(offset + %src)' */
-__ASM_L(.macro .cfi_reg_offset dst:req, offset:req, src:req)
-__ASM_L(.ifc __ASM_ARG(\src),%cfa)
-__ASM_L(	.cfi_rel_offset __ASM_ARG(\dst), __ASM_ARG(\offset))
-__ASM_L(.else)
-__ASM_L(	.cfi_escape 0x10) /* DW_CFA_expression */
-__ASM_L(	__cfi_decode_register .cfi_escape_uleb128, __ASM_ARG(\dst))
-__ASM_L(	.pushsection .discard)
-__ASM_L(	.Lcfi_reg_offset_text_start = .)
-__ASM_L(		.sleb128 __ASM_ARG(\offset))
-__ASM_L(	.Lcfi_reg_offset_text_size = 1 + (. - .Lcfi_reg_offset_text_start))
-__ASM_L(	.popsection)
-__ASM_L(	.cfi_escape_uleb128 .Lcfi_reg_offset_text_size)
-__ASM_L(	__cfi_decode_register __cfi_escape_breg, __ASM_ARG(\src)) /* DW_OP_breg0 + offset */
-__ASM_L(	.cfi_escape_sleb128 __ASM_ARG(\offset))
-__ASM_L(.endif)
-__ASM_L(.endm)
-
-/* Encode a CFI register restore: `%dst = offset + %src' */
-__ASM_L(.macro .cfi_reg_value dst:req, offset:req, src:req)
-__ASM_L(.ifc __ASM_ARG(\src),%cfa)
-__ASM_L(	.cfi_rel_offset __ASM_ARG(\dst), __ASM_ARG(\offset))
-__ASM_L(.else)
-__ASM_L(	.cfi_escape 0x16) /* DW_CFA_val_expression */
-__ASM_L(	__cfi_decode_register .cfi_escape_uleb128, __ASM_ARG(\dst))
-__ASM_L(	.pushsection .discard)
-__ASM_L(	.Lcfi_reg_offset_text_start = .)
-__ASM_L(		.sleb128 __ASM_ARG(\offset))
-__ASM_L(	.Lcfi_reg_offset_text_size = 1 + (. - .Lcfi_reg_offset_text_start))
-__ASM_L(	.popsection)
-__ASM_L(	.cfi_escape_uleb128 .Lcfi_reg_offset_text_size)
-__ASM_L(	__cfi_decode_register __cfi_escape_breg, __ASM_ARG(\src)) /* DW_OP_breg0 + offset */
-__ASM_L(	.cfi_escape_sleb128 __ASM_ARG(\offset))
-__ASM_L(.endif)
-__ASM_L(.endm)
-
-
-/* Encode a CFI register restore: `%dst = value' */
-__ASM_L(.macro .cfi_reg_const dst:req, value:req)
-__ASM_L(	.cfi_escape 0x16) /* DW_CFA_val_expression */
-__ASM_L(	__cfi_decode_register .cfi_escape_uleb128, __ASM_ARG(\dst))
-__ASM_L(	.pushsection .discard)
-__ASM_L(	.Lcfi_reg_offset_text_start = .)
-__ASM_L(		.uleb128 __ASM_ARG(\value))
-__ASM_L(	.Lcfi_reg_offset_text_size = 1 + (. - .Lcfi_reg_offset_text_start))
-__ASM_L(	.popsection)
-__ASM_L(	.cfi_escape_uleb128 .Lcfi_reg_offset_text_size)
-__ASM_L(	.cfi_escape 0x10) /* DW_OP_constu */
-__ASM_L(	.cfi_escape_uleb128 __ASM_ARG(\value))
-__ASM_L(.endm)
-
 
 #ifdef __x86_64__
 

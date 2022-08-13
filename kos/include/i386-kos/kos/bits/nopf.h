@@ -256,18 +256,18 @@ __DECL_BEGIN
  *    advance the  instruction pointer  to the  `ret' instruction,  causing
  *    the `rep' to be aborted.
  * IN:
- *   - USER CHECKED void       *%edi:  Destination pointer
- *   - USER CHECKED void const *%esi:  Source pointer
- *   - size_t                   %ecx:  Copy size
+ *   - USER CHECKED void       *%Pdi:  Destination pointer
+ *   - USER CHECKED void const *%Psi:  Source pointer
+ *   - size_t                   %Pcx:  Copy size
  * OUT:
- *   - %edi:  == IN(%edi) + (IN(%ecx) - OUT(%ecx))
- *   - %esi:  == IN(%esi) + (IN(%ecx) - OUT(%ecx))
- *   - %ecx:  Number of bytes that were not copied.
- *   - %cr2:  if (OUT(%ecx) == 0)
+ *   - %Pdi:  == IN(%Pdi) + (IN(%Pcx) - OUT(%Pcx))
+ *   - %Psi:  == IN(%Psi) + (IN(%Pcx) - OUT(%Pcx))
+ *   - %Pcx:  Number of bytes that were not copied.
+ *   - %cr2:  if (OUT(%Pcx) == 0)
  *                <UNCHANGED>
- *            else if (OUT(%cr2) == OUT(%edi))
+ *            else if (OUT(%cr2) == OUT(%Pdi))
  *                <#PF in `dst'>
- *            else if (OUT(%cr2) == OUT(%esi))
+ *            else if (OUT(%cr2) == OUT(%Psi))
  *                <#PF in `src'>
  */
 __X86_NOPF_DEFFUN(x86_nopf_rep_movsb)

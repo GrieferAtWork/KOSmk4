@@ -24,7 +24,7 @@
 
 #include <hybrid/compiler.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <sys/syscall.h>
 
 #include <errno.h> /* ELIMIT */

@@ -22,7 +22,7 @@
 #define __ASSEMBLER__ 1
 
 #include <kernel/compiler.h>
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/cpu-flags.h>
 #include <kos/kernel/x86/gdt.h>
 

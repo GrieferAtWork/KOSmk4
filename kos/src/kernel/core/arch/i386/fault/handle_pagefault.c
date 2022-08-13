@@ -74,7 +74,7 @@
 #include <libvio/access.h>
 #include <libviocore/viocore.h>
 #ifndef __x86_64__
-#include <asm/cfi.h>
+#include <cfi.h>
 #endif /* !__x86_64__ */
 
 

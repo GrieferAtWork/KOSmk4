@@ -26,7 +26,7 @@
 #include <debugger/rt.h>
 #include <kernel/x86/apic.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/cpu-flags.h>
 #include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state-asm.h>

@@ -27,7 +27,7 @@
 #if defined(__i386__) && !defined(__x86_64__)
 #include <hybrid/__asm.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 
 /* RESTORE: ...\%esp = *(struct gpregs32 const *)(CFA + offset) */
 #define ASM_CFI_OFFSET_RESTORE_GPREGSNSP(offset)                \

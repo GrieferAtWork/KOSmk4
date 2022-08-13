@@ -61,7 +61,7 @@ __FORCELOCAL void (__fstenv)(struct sfpuenv *__restrict __dst) { __asm__ __volat
 __FORCELOCAL void (__fnstenv)(struct sfpuenv *__restrict __dst) { __asm__ __volatile__("fnstenv %0" : "=m" (__COMPILER_ASM_BUFFER(__BYTE_TYPE__, 28, __dst))); }
 __FORCELOCAL void (__fldenv)(struct sfpuenv const *__restrict __src) { __asm__ __volatile__("fldenv %0" : : "m" (__COMPILER_ASM_BUFFER(__BYTE_TYPE__, 28, __src))); }
 
-/* fsave / fnsave: Save and re-initialize FPU state (re-init happens identital to `finit' / `fninit') */
+/* fsave / fnsave: Save and re-initialize FPU state (re-init happens identical to `finit' / `fninit') */
 __FORCELOCAL void (__fsave)(struct sfpustate *__restrict __dst) { __asm__ __volatile__("fsave %0" : "=m" (__COMPILER_ASM_BUFFER(__BYTE_TYPE__, 108, __dst))); }
 __FORCELOCAL void (__fnsave)(struct sfpustate *__restrict __dst) { __asm__ __volatile__("fnsave %0" : "=m" (__COMPILER_ASM_BUFFER(__BYTE_TYPE__, 108, __dst))); }
 __FORCELOCAL void (__frstor)(struct sfpustate const *__restrict __src) { __asm__ __volatile__("frstor %0" : : "m" (__COMPILER_ASM_BUFFER(__BYTE_TYPE__, 108, __src))); }
@@ -78,7 +78,7 @@ __FORCELOCAL void (__fninit)(void) { __asm__ __volatile__("fninit"); }
 
 /* Load/Store the extended FPU state
  * WARNING: When working in kernel-space, be aware that these instruction may not
- *          necessarily be supported by the CPU, that that emulating them may  be
+ *          necessarily be supported by the CPU,  and that emulating them may  be
  *          expensive, or even impossible in certain situations.
  *          For this purpose, kernel-space should instead make use of the functions
  *          exported from <kernel/arch/fpu.h>:
@@ -115,7 +115,7 @@ __FORCELOCAL void (__ldmxcsr)(__UINT32_TYPE__ __val) {
 	                     : "a" (__val));
 #endif /* !__x86_64__ */
 #else /* __TINYC__ */
-	__asm__ __volatile__("ldmxcsr %0" : : "m"(__val));
+	__asm__ __volatile__("ldmxcsr %0" : : "m" (__val));
 #endif /* !__TINYC__ */
 }
 __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__stmxcsr)(void) {
@@ -133,7 +133,7 @@ __FORCELOCAL __ATTR_WUNUSED __UINT32_TYPE__ (__stmxcsr)(void) {
 	                     : "=a" (__result));
 #endif /* !__x86_64__ */
 #else /* __TINYC__ */
-	__asm__ __volatile__("stmxcsr %0" : "=m"(__result));
+	__asm__ __volatile__("stmxcsr %0" : "=m" (__result));
 #endif /* !__TINYC__ */
 	return __result;
 }

@@ -33,7 +33,7 @@
 #include <hybrid/typecore.h>
 
 #include <asm/asmword.h>
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/cpu-cpuid.h>
 #include <asm/instr/compat.h>
 #include <asm/instr/fsgsbase.h>

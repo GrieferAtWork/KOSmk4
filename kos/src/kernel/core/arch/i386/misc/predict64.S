@@ -22,7 +22,7 @@
 
 #include <kernel/compiler.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 
 #ifdef CONFIG_NO_KERNEL_BRANCH_PROFILING
 

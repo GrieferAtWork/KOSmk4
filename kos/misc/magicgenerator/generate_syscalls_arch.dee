@@ -162,7 +162,7 @@ function i386_printLibcSyscall386CdeclInvocation(
 }
 
 function i386_printLibcSyscallWrapperPrefix(fp: File) {
-	fp << "#include <asm/cfi.h>\n";
+	fp << "#include <cfi.h>\n";
 	fp << "\n";
 	fp << "EXTERN(libc_x86_sysenter_common)\n";
 	fp << "EXTERN(libc_x86_syscall_check_sysenter)\n";
@@ -206,7 +206,7 @@ function i386_printLibcSyscallWrapper(fp: File, f: Function, sysno: int, enableE
 }
 
 function i386_printKernelSyscallWrapperCommon(fp: File) {
-	fp << "#include <asm/cfi.h>\n";
+	fp << "#include <cfi.h>\n";
 	fp << "#include <kos/kernel/x86/gdt.h>\n";
 	fp << "#include <kos/kernel/paging.h>\n";
 	fp << "#include <kernel/arch/syscall.h>\n";
@@ -489,7 +489,7 @@ function x86_64_printLibcSyscallWrapper(fp: File, f: Function, sysno: int, enabl
 }
 
 function x86_64_printKernelSyscallWrapperCommon(fp: File) {
-	fp << "#include <asm/cfi.h>\n";
+	fp << "#include <cfi.h>\n";
 	fp << "#include <asm/instr/movzxq.h>\n";
 	fp << "#include <asm/instr/interrupt.h>\n";
 	fp << "#include <kos/kernel/paging.h>\n";

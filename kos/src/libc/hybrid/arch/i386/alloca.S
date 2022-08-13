@@ -23,7 +23,7 @@
 
 #include <hybrid/compiler.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/instr/compat.h>
 
 #ifndef SIZEOF_POINTER

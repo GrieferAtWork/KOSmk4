@@ -27,7 +27,7 @@
 
 #include <hybrid/typecore.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/instr/movzxq.h>
 #include <bits/types.h>
 #include <sys/syscall.h>

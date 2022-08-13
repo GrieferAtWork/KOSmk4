@@ -29,7 +29,7 @@
 #include <hybrid/host.h>
 #include <hybrid/wordbits.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/instr/movzxq.h>
 #include <asm/instr/ttest.h>
 #include <asm/rtm.h>

@@ -26,7 +26,7 @@
 #include <kernel/except.h>
 #include <kernel/syscall.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/instr/interrupt.h>
 #include <asm/instr/movzxq.h>
 #include <asm/instr/ttest.h>

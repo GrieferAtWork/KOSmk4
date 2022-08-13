@@ -27,7 +27,7 @@
 
 #include <hybrid/host.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/instr/movzxq.h>
 #include <kos/rpc.h>
 

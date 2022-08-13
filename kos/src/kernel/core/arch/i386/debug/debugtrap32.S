@@ -21,7 +21,7 @@
 #define GUARD_KERNEL_CORE_ARCH_I386_DEBUG_DEBUGTRAP32_S 1
 
 #include <kernel/compiler.h>
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/cpu-flags.h>
 
 .section .xdata

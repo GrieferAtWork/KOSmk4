@@ -27,7 +27,7 @@
 #ifdef __x86_64__
 #include <hybrid/__asm.h>
 
-#include <asm/cfi.h>
+#include <cfi.h>
 #include <asm/instr/kgsbase.h>
 
 /* Helper macros for restoring registers from cpu-state structures */

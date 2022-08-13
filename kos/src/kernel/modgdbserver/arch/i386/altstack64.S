@@ -22,7 +22,7 @@
 
 #include <kernel/paging.h> /* KERNEL_DEBUG_STACKSIZE */
 
-#include <asm/cfi.h>
+#include <cfi.h>
 
 .section .bss
 	.align 8
