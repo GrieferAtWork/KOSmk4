@@ -22,11 +22,60 @@
 
 #include <kernel/compiler.h>
 
-DECL_BEGIN
+/************************************************************************/
+/* Default kernel driver name, and on-disk file location                */
+/************************************************************************/
+#ifndef KERNEL_DRIVER_NAME
+#define KERNEL_DRIVER_NAME "kernel"
+#endif /* !KERNEL_DRIVER_NAME */
+#ifndef KERNEL_DRIVER_FILENAME
+#define KERNEL_DRIVER_FILENAME "/boot/kernel.bin"
+#endif /* !KERNEL_DRIVER_FILENAME */
 
-#define KERNEL_DRIVER_NAME        "kernel"
-#define KERNEL_DRIVER_FILENAME    "/boot/kernel.bin"
 
-DECL_END
+/************************************************************************/
+/* Set default values to be identical to user-space programs            */
+/************************************************************************/
+#ifndef KERNEL_DRIVER_REQUIRED_CLASS
+#include <kos/exec/elf.h>
+#define KERNEL_DRIVER_REQUIRED_CLASS ELF_ARCH_CLASS
+#endif /* !KERNEL_DRIVER_REQUIRED_CLASS */
+#ifndef KERNEL_DRIVER_REQUIRED_MACHINE
+#include <kos/exec/elf.h>
+#define KERNEL_DRIVER_REQUIRED_MACHINE ELF_ARCH_MACHINE
+#endif /* !KERNEL_DRIVER_REQUIRED_MACHINE */
+#ifndef KERNEL_DRIVER_REQUIRED_DATA
+#include <kos/exec/elf.h>
+#define KERNEL_DRIVER_REQUIRED_DATA ELF_ARCH_DATA
+#endif /* !KERNEL_DRIVER_REQUIRED_DATA */
+
+
+/************************************************************************/
+/* Substitute missing string representations                            */
+/************************************************************************/
+#ifndef KERNEL_DRIVER_REQUIRED_CLASS_S
+#include <elf.h>
+#define KERNEL_DRIVER_REQUIRED_CLASS_S \
+	__ELF_CLASSNAME(KERNEL_DRIVER_REQUIRED_CLASS)
+#endif /* !KERNEL_DRIVER_REQUIRED_CLASS_S */
+#ifndef KERNEL_DRIVER_REQUIRED_MACHINE_S
+#include <elf.h>
+#define KERNEL_DRIVER_REQUIRED_MACHINE_S \
+	__ELF_EMNAME(KERNEL_DRIVER_REQUIRED_MACHINE)
+#endif /* !KERNEL_DRIVER_REQUIRED_MACHINE_S */
+#ifndef KERNEL_DRIVER_REQUIRED_DATA_S
+#include <elf.h>
+#define KERNEL_DRIVER_REQUIRED_DATA_S \
+	__ELF_DATANAME(KERNEL_DRIVER_REQUIRED_DATA)
+#endif /* !KERNEL_DRIVER_REQUIRED_DATA_S */
+
+
+/************************************************************************/
+/* Default limit for program headers defined by drivers                 */
+/************************************************************************/
+#ifndef KERNEL_DRIVER_MAXPROGRAMHEADERCOUNT
+#define KERNEL_DRIVER_MAXPROGRAMHEADERCOUNT 64
+#endif /* !KERNEL_DRIVER_MAXPROGRAMHEADERCOUNT */
+
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_ARCH_DRIVER_H */
