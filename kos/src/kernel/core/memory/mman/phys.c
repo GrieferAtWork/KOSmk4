@@ -38,6 +38,7 @@
 #include <hybrid/align.h>
 #include <hybrid/unaligned.h>
 
+#include <asm/defsym.h>
 #include <kos/except.h>
 #include <kos/nopf.h>
 #include <sys/io.h>

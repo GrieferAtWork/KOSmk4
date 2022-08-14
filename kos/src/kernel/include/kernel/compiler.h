@@ -122,17 +122,6 @@
 
 #define BITSOF(x) (sizeof(x)*8)
 
-
-#define __DEFINE_SYMBOL_STR(x) #x
-#define DEFINE_PRIVATE_SYMBOL(name, value, size)      __asm__(".type " __DEFINE_SYMBOL_STR(name) ", \"object\"\n\t.local " __DEFINE_SYMBOL_STR(name) "\n\t.set " __DEFINE_SYMBOL_STR(name) ",%p0\n\t.size " __DEFINE_SYMBOL_STR(name) ",%p1" : : "X" (value), "X" (size))
-#define DEFINE_PUBLIC_SYMBOL(name, value, size)       __asm__(".type " __DEFINE_SYMBOL_STR(name) ", \"object\"\n\t.global " __DEFINE_SYMBOL_STR(name) "\n\t.set " __DEFINE_SYMBOL_STR(name) ",%p0\n\t.size " __DEFINE_SYMBOL_STR(name) ",%p1" : : "X" (value), "X" (size))
-#define DEFINE_INTERN_SYMBOL(name, value, size)       __asm__(".type " __DEFINE_SYMBOL_STR(name) ", \"object\"\n\t.global " __DEFINE_SYMBOL_STR(name) "\n\t.hidden " __DEFINE_SYMBOL_STR(name) "\n\t.set " __DEFINE_SYMBOL_STR(name) ",%p0\n\t.size " __DEFINE_SYMBOL_STR(name) ",%p1" : : "X" (value), "X" (size))
-#define DEFINE_PRIVATE_WEAK_SYMBOL(name, value, size) __asm__(".type " __DEFINE_SYMBOL_STR(name) ", \"object\"\n\t.weak " __DEFINE_SYMBOL_STR(name) "\n\t.local " __DEFINE_SYMBOL_STR(name) "\n\t.set " __DEFINE_SYMBOL_STR(name) ",%p0\n\t.size " __DEFINE_SYMBOL_STR(name) ",%p1" : : "X" (value), "X" (size))
-#define DEFINE_PUBLIC_WEAK_SYMBOL(name, value, size)  __asm__(".type " __DEFINE_SYMBOL_STR(name) ", \"object\"\n\t.weak " __DEFINE_SYMBOL_STR(name) "\n\t.global " __DEFINE_SYMBOL_STR(name) "\n\t.set " __DEFINE_SYMBOL_STR(name) ",%p0\n\t.size " __DEFINE_SYMBOL_STR(name) ",%p1" : : "X" (value), "X" (size))
-#define DEFINE_INTERN_WEAK_SYMBOL(name, value, size)  __asm__(".type " __DEFINE_SYMBOL_STR(name) ", \"object\"\n\t.weak " __DEFINE_SYMBOL_STR(name) "\n\t.global " __DEFINE_SYMBOL_STR(name) "\n\t.hidden " __DEFINE_SYMBOL_STR(name) "\n\t.set " __DEFINE_SYMBOL_STR(name) ",%p0\n\t.size " __DEFINE_SYMBOL_STR(name) ",%p1" : : "X" (value), "X" (size))
-
-
-
 #define ATTR_FREETEXT        FREE ATTR_SECTION(".text.free")
 #define ATTR_FREERODATA      FREE ATTR_SECTION(".rodata.free")
 #define ATTR_FREEDATA        FREE ATTR_SECTION(".data.free")

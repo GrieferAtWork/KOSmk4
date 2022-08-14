@@ -13,6 +13,14 @@ Normally, `<asm/...>` headers are all internal and not meant to be directly incl
 	- `.macro .wordoff` (`#ifdef __ARCH_HAVE_wordoff')
 - `<asm/cacheline.h>`
 	- `#define __ARCH_CACHELINESIZE <Integer>`
+- `<asm/defsym.h>`
+	- `#define DEFINE_PRIVATE_SYMBOL(name, value, size)      __asm__("..." : : "X" (value), "X" (size))
+	- `#define DEFINE_PUBLIC_SYMBOL(name, value, size)       __asm__("..." : : "X" (value), "X" (size))
+	- `#define DEFINE_INTERN_SYMBOL(name, value, size)       __asm__("..." : : "X" (value), "X" (size))
+	- `#define DEFINE_PRIVATE_WEAK_SYMBOL(name, value, size) __asm__("..." : : "X" (value), "X" (size))
+	- `#define DEFINE_PUBLIC_WEAK_SYMBOL(name, value, size)  __asm__("..." : : "X" (value), "X" (size))
+	- `#define DEFINE_INTERN_WEAK_SYMBOL(name, value, size)  __asm__("..." : : "X" (value), "X" (size))
+	- Helper macros to define linker symbols from C expressions.
 - `<asm/intrin.h>`
 	- Arch-specific intrinsic functions
 - `<asm/intrin-arith.h>`

@@ -46,6 +46,8 @@
 #include <hybrid/overflow.h>
 #include <hybrid/sequence/list.h>
 
+#include <asm/defsym.h>
+
 #include <assert.h>
 #include <inttypes.h>
 #include <stdbool.h>

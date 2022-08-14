@@ -56,6 +56,7 @@
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 
+#include <asm/defsym.h>
 #include <asm/farptr.h>
 #include <sys/wait.h>
 
