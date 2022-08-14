@@ -1,28 +1,30 @@
 
 ## Cheat sheet
 
-Cheat sheet for someone that know a lot about x86 assembly, but is pretty much totally new to arm. -- like me ;)
+Cheat sheet for someone that knows a lot about x86 assembly, but is pretty much a total noob when it comes to arm. -- Like me ;)
 
 ### Registers
 
 | Group               | Registers
 |---------------------|----------------------------------------------
-| General purpose     | `r0`, `r1`, `r2`, ..., `r15`
-| SP                  | `sp`, `r13`
-| LR                  | `lr`, `r14` (return address for leaf functions)
-| PC                  | `pc`, `r15`
+| GeneralPurpose      | `r0`, `r1`, `r2`, ..., `r15`
+| StackPointer        | `sp = r13`
+| LinkRegister        | `lr = r14` (return address for leaf functions)
+| ProgramCounter      | `pc = r15`
 
 | Name                | Description
 |---------------------|----------------------------------------------
 | APSR                | x86's `%eflags` (contains condition)
-| CPSR                | Super-set of APSR, w/ access to execute-mode bits (kernel vs. user-space)
+| CPSR                | Super-set of APSR, w/ access to execute-mode bits (e.g. kernel- vs. user-space)
 
 
 ### Thumb vs. ARM
 
 - [Really interesting & insightful explaination](https://stackoverflow.com/a/9370417/3296587)
+	- TLDR: The `bx @ADDR@` essentially `@ADDR@ & 1` into `APSR.T`
 - Important: in assembly, enter thumb-mode with `.thumb`
-- Important: in thumb-mode assembly, thumb functions labels must be pre-fixed by `.thumb_func`
+- Important: in thumb-mode assembly, thumb function labels must be preceded by `.thumb_func`
+	- This causes the function's address label to be or'd with `1`, and its use by `bx` to force-enable thumb-mode
 
 
 ### Calling convention
@@ -32,7 +34,7 @@ Cheat sheet for someone that know a lot about x86 assembly, but is pretty much t
 | args     | `r0, r1, r2, r3, [stack...]`
 | return   | `r0, r1`
 | clobber  | `r0, r1, r2, r3, r12`
-| preserve | `r4, r5, r6, r7, r8, r9, r10, r11, r13=sp, r14=lr`
+| preserve | `r4, r5, r6, r7, r8, r9, r10, r11, sp=r13, lr=r14`
 
 
 ### Syscall call calling convention
@@ -42,7 +44,9 @@ Cheat sheet for someone that know a lot about x86 assembly, but is pretty much t
 | args     | `r0, r1, r2, r3, r4, r5, r6` (yes: 7 argument registers)
 | return   | `r0, r1`
 | sysno    | `r7` (EABI), `swi #NR` (OABI)
-| except   | `(r7 & 0x800000) != 0`
+| except   | `(r7 & 0x800000) != 0` \[*\]
+
+\[*\]: KOS-specific (s.a. `ARM_XSYSCALL_FLAG` from `<arm-kos/kos/asm/syscall.h>`)
 
 
 
@@ -51,10 +55,10 @@ Cheat sheet for someone that know a lot about x86 assembly, but is pretty much t
 - `push   {r0, r1, r2, r3}`
 	- same as:
 	  ```asm
-	  push   {r0}
-	  push   {r1}
-	  push   {r2}
 	  push   {r3}
+	  push   {r2}
+	  push   {r1}
+	  push   {r0}
 	  ```
 	- Creates on-stach:
 	  ```c
@@ -97,7 +101,7 @@ Cheat sheet for someone that know a lot about x86 assembly, but is pretty much t
 | Width | canonical name   | arm                    | x86
 |-------|------------------|------------------------|-------------------
 | `1`   | `b`, byte        | `ldrb   r0,     [r2]`  | `movb (%r2), %r0`
-| `1`   | `b`, byte        | `strb   r0,     [r2]`  | `movl %r0, (%r2)`
+| `1`   | `b`, byte        | `strb   r0,     [r2]`  | `movb %r0, (%r2)`
 | `2`   | `w`, word        | `ldrh   r0,     [r2]`  | `movw (%r2), %r0`
 | `4`   | `l`, dword       | `ldr    r0,     [r2]`  | `movl (%r2), %r0`
 | `8`   | `q`, qword       | `ldrd   r0, r1, [r2]`  | `movl 0(%r2), %r0; movl 4(%r2), %r1`
@@ -185,11 +189,11 @@ The interrupt vector is (conventionally) located at `(VIRT void *)0` and consist
 | `armv6`             | 32                    | **\[3\]** `ldrex` + `strex`
 | `armv6`             | 64                    | **\[1\]** Kernel support
 | `armv7`             | 8, 16, 32, 64         | **\[3\]** `ldrex` + `strex`
-| `armv8+`            | 8, 16, 32, 64         | **\[4\]** `ldaex` + `staex`
+| `armv8+`            | 8, 16, 32, 64         | **\[4\]** `ldaex` + `stlex`
 
 
 **\[1\]** Kernel support:
-> Implement `ATOMIC_CMPXCH_WEAK` (64-bit):
+> Implement `ATOMIC_CMPXCH` (64-bit):
 > ```asm
 > .Lcritical_begin:
 >     ldmia  @BASE@, {@REAL_OLDVAL_LO32@, @REAL_OLDVAL_HI32@}
@@ -207,7 +211,7 @@ The interrupt vector is (conventionally) located at `(VIRT void *)0` and consist
 > Align address to N bits and perform an N-bit-wide atomic operation
 
 **\[3\]** `ldrex` + `strex`:
-> Implement `ATOMIC_CMPXCH_WEAK` (8-, 16- or 32-bit):
+> Implement `ATOMIC_CMPXCH_WEAK`:
 > ```asm
 >     dmb    ish                  /* on armv6: `mcr p15, 0, r0, c7, c10, 5` */
 > 1:  ldrex* @REAL_OLDVAL@, [@BASE@]
@@ -222,5 +226,5 @@ The interrupt vector is (conventionally) located at `(VIRT void *)0` and consist
 > Note that 8/16/64-bit are only supported starting with `armv7`! \
 > The 64-bit variant or this uses suffix `d` and requires register-pairs.
 
-**\[4\]** `ldaex` + `staex`:
-> Same as **\[3\]**, except that `dmb ish` can be omitted, and `ldaex` + `staex` are used instead of `ldrex` + `strex`.
+**\[4\]** `ldaex` + `stlex`:
+> Same as **\[3\]**, except that `dmb ish` can be omitted, and `ldaex` + `stlex` are used instead of `ldrex` + `strex`.
