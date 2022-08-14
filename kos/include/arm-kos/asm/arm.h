@@ -24,6 +24,15 @@
 
 #include <hybrid/__asm.h>
 
+/************************************************************************/
+/* ARM UNIFIED ASSEMBLY CONFIGURATION HEADERS                           */
+/************************************************************************/
+/* This header should be included by all ARM assembly source files, as it
+ * provides various helper macros, and configure the assembler to  output
+ * bytecode for the intended target. */
+
+
+
 /* Fill in missing compiler macros */
 #ifndef __ARM_ARCH
 #define __ARM_ARCH 6
@@ -46,10 +55,47 @@
 #endif /* !__ARM_FEATURE_LDREX */
 
 
+/* Required stack alignment */
+#define __ARM_STACK_ALIGNMENT 8
+
+/* Return the number of required alignment bytes after `num_pushed_bytes' */
+#define __ARM_STACK_ALIGN_OFFSET(num_pushed_bytes) \
+	((__ARM_STACK_ALIGNMENT - ((num_pushed_bytes) % __ARM_STACK_ALIGNMENT)) % __ARM_STACK_ALIGNMENT)
+
+/* Helper macro to force canonical stack alignment after `num_pushed_bytes'. */
+#define __ARM_STACK_ALIGN_AFTER(num_pushed_bytes)                                                                                   \
+	__ASM_L(.if ((num_pushed_bytes) % __ARM_STACK_ALIGNMENT) != 0)                                                                  \
+	__ASM_L(	sub sp, sp, __PRIVATE_ARM_STACK_ALIGN_POUND (__ARM_STACK_ALIGNMENT - ((num_pushed_bytes) % __ARM_STACK_ALIGNMENT))) \
+	__ASM_L(	.cfi_adjust_cfa_offset (__ARM_STACK_ALIGNMENT - ((num_pushed_bytes) % __ARM_STACK_ALIGNMENT)))                      \
+	__ASM_L(.endif)
+#define __ARM_STACK_UNALIGN_AFTER(num_pushed_bytes)                                                                                 \
+	__ASM_L(.if ((num_pushed_bytes) % __ARM_STACK_ALIGNMENT) != 0)                                                                  \
+	__ASM_L(	add sp, sp, __PRIVATE_ARM_STACK_ALIGN_POUND (__ARM_STACK_ALIGNMENT - ((num_pushed_bytes) % __ARM_STACK_ALIGNMENT))) \
+	__ASM_L(	.cfi_adjust_cfa_offset -(__ARM_STACK_ALIGNMENT - ((num_pushed_bytes) % __ARM_STACK_ALIGNMENT)))                     \
+	__ASM_L(.endif)
+#define __ARM_STACK_GET_BEFORE_ALIGN(dst_reg, num_pushed_bytes)                                                                          \
+	__ASM_L(.if ((num_pushed_bytes) % __ARM_STACK_ALIGNMENT) != 0)                                                                       \
+	__ASM_L(	add dst_reg, sp, __PRIVATE_ARM_STACK_ALIGN_POUND (__ARM_STACK_ALIGNMENT - ((num_pushed_bytes) % __ARM_STACK_ALIGNMENT))) \
+	__ASM_L(.else)                                                                                                                       \
+	__ASM_L(	mov dst_reg, sp)                                                                                                         \
+	__ASM_L(.endif)
+#define __PRIVATE_ARM_STACK_ALIGN_POUND #
+
+
 #ifdef __ASSEMBLER__
+
+/* Stack alignment helpers. */
+#define STACK_ALIGNMENT            __ARM_STACK_ALIGNMENT
+#define STACK_ALIGN_OFFSET         __ARM_STACK_ALIGN_OFFSET
+#define ASM_STACK_ALIGN_AFTER      __ARM_STACK_ALIGN_AFTER
+#define ASM_STACK_UNALIGN_AFTER    __ARM_STACK_UNALIGN_AFTER
+#define ASM_STACK_GET_BEFORE_ALIGN __ARM_STACK_GET_BEFORE_ALIGN
+
+#ifndef __INTELLISENSE__
 .arch __ARM_ARCH_NAME
 .syntax unified
 .arm
+#endif /* !__INTELLISENSE__ */
 #endif /* __ASSEMBLER__ */
 
 #ifndef __COMPILER_NO_GCC_ASM_MACROS

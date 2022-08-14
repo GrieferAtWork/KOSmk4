@@ -538,10 +538,10 @@ IU(	movq   %rcx, FIELD_ERROR_REGISTERS(OFFSET_KCPUSTATE_GPREGS + OFFSET_GPREGS_R
 #if EXCEPT_BACKTRACE_SIZE != 0
 .Ldo_fill_trace:
 	.Lindex = 0
-	.rept EXCEPT_BACKTRACE_SIZE-1
+.rept EXCEPT_BACKTRACE_SIZE
 	movq   $(0), FIELD_ERROR_TRACE(.Lindex)
 	.Lindex = .Lindex + 8
-	.endr
+.endr
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	goto_Ldo_unwind_rsp
 #ifndef NDEBUG

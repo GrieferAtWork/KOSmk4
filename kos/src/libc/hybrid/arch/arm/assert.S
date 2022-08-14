@@ -46,7 +46,7 @@
 #define aa_line            (12 + SIZEOF_KCPUSTATE)
 #define aa_func            (16 + SIZEOF_KCPUSTATE)
 #define aa_format          (20 + SIZEOF_KCPUSTATE)
-#define sizeof_assert_args (24 + SIZEOF_KCPUSTATE)
+#define SIZEOF_ASSERT_ARGS (24 + SIZEOF_KCPUSTATE)
 
 
 /* >> PUBLIC ATTR_NORETURN void LIBCCALL __stack_chk_fail(void);
@@ -55,12 +55,10 @@
 INTERN_FUNCTION(libc_stack_chk_fail)
 	.cfi_startproc
 	ASM_PUSH_KCPUSTATE_ON_ENTRY_CFI_R
-	mov    r0, sp
-#if (SIZEOF_KCPUSTATE % 8) != 0
-	sub    sp, sp, #4 /* ensure 8-byte alignment */
-#endif /* (SIZEOF_KCPUSTATE % 8) != 0 */
 
 	/* Call the high-level handler */
+	mov    r0, sp
+	ASM_STACK_ALIGN_AFTER(SIZEOF_KCPUSTATE)
 	EXTERN(libc_stack_failure_core)
 	bl     libc_stack_failure_core
 	.cfi_endproc
@@ -74,12 +72,10 @@ DEFINE_PUBLIC_ALIAS(__stack_chk_fail_local, libc_stack_chk_fail)
 INTERN_FUNCTION(libc_abort)
 	.cfi_startproc
 	ASM_PUSH_KCPUSTATE_ON_ENTRY_CFI_R
-	mov    r0, sp
-#if (SIZEOF_KCPUSTATE % 8) != 0
-	sub    sp, sp, #4 /* ensure 8-byte alignment */
-#endif /* (SIZEOF_KCPUSTATE % 8) != 0 */
 
 	/* Call the high-level handler */
+	mov    r0, sp
+	ASM_STACK_ALIGN_AFTER(SIZEOF_KCPUSTATE)
 	EXTERN(libc_abort_failure_core)
 	bl     libc_abort_failure_core
 	.cfi_endproc
@@ -112,12 +108,10 @@ INTERN_FUNCTION(libc___afail)
 	mov    r12, #0
 	push_cfi {r12}                     /* `aa_args' */
 	str    r12, [sp, #aa_format]       /* override `aa_format' with NULL */
-#if (sizeof_assert_args % 8) != 0
-	sub    sp, sp, #4 /* ensure 8-byte alignment */
-#endif /* (sizeof_assert_args % 8) != 0 */
 
 	/* Call the high-level handler */
 	mov    r0, sp
+	ASM_STACK_ALIGN_AFTER(SIZEOF_ASSERT_ARGS)
 	INTERN(libc_assertion_failure_core)
 	bl     libc_assertion_failure_core
 	.cfi_endproc
@@ -141,16 +135,14 @@ INTERN_FUNCTION(libc___afailf)
 	/* Push `struct assert_args' */
 	push_cfi {r0,r1,r2,r3,r12}         /* `aa_expr', `aa_file', `aa_line', `aa_func', [r12: placeholder for `aa_format'] */
 	ASM_PUSH_KCPUSTATE_ON_ENTRY_CFI_R  /* `aa_state' */
-	ldr    r12, [sp, #(sizeof_assert_args - 4)]
+	ldr    r12, [sp, #(SIZEOF_ASSERT_ARGS - 4)]
 	str    r12, [sp, #(aa_format - 4)] /* Copy `format' argument into `aa_format' */
-	add    r12, sp, #(sizeof_assert_args - 4 + 4) /* Pointer to varargs */
+	add    r12, sp, #(SIZEOF_ASSERT_ARGS - 4 + 4) /* Pointer to varargs */
 	push_cfi {r12}                     /* `aa_args' */
-#if (sizeof_assert_args % 8) != 0
-	sub    sp, sp, #4 /* ensure 8-byte alignment */
-#endif /* (sizeof_assert_args % 8) != 0 */
 
 	/* Call the high-level handler */
 	mov    r0, sp
+	ASM_STACK_ALIGN_AFTER(SIZEOF_ASSERT_ARGS)
 	INTERN(libc_assertion_failure_core)
 	bl     libc_assertion_failure_core
 	.cfi_endproc
@@ -176,51 +168,16 @@ INTERN_FUNCTION(libc___acheck)
 	mov    r12, #0
 	push_cfi {r12}                     /* `aa_args' */
 	str    r12, [sp, #aa_format]       /* override `aa_format' with NULL */
-#if (sizeof_assert_args % 8) != 0
-	sub    sp, sp, #4 /* ensure 8-byte alignment */
-#endif /* (sizeof_assert_args % 8) != 0 */
 
 	/* Call the high-level handler */
 	mov    r0, sp
+	ASM_STACK_ALIGN_AFTER(SIZEOF_ASSERT_ARGS)
 	INTERN(libc_assertion_check_core)
 	bl     libc_assertion_check_core
-	nop    /* For tracebacks */
 
-.Lload_kcpustate_r0:
-	.cfi_def_cfa r0, 0
-	ASM_CFI_OFFSET_RESTORE_KCPUSTATE(0)
-	ldr    lr, [r0, #OFFSET_KCPUSTATE_PC]
-	ldr    r1, [r0, #OFFSET_KCPUSTATE_CPSR]
-	tst    r1, #CPSR_T
-	orrne  lr, #1         /* Set THUMB bit */
-	add    r0, r0, #OFFSET_KCPUSTATE_R1
-	.cfi_adjust_cfa_offset -OFFSET_KCPUSTATE_R1
-	msr    APSR_nzcvq, r1 /* Load APSR flags (ignoring flags from CPSR) */
-/*[[[cfi{arch='arm', register='%cpsr'}
-	# Encode how the THUMB bit should be restored
-	push   %cpsr     # [%cpsr]
-	push   %lr       # [%cpsr, %lr]
-	and    $1        # [%cpsr, %lr & 1]
-	jf     pop, 1f   # [%cpsr]
-	or     $CPSR_T   # [%cpsr | CPSR_T]
-1:]]]*/
-	.cfi_escape 22,128,1,15,146,128,1,0,126,0,49,26,32,40,3,0
-	.cfi_escape 9,32,33
-/*[[[end]]]*/
-/*[[[cfi{arch='arm', register='%pc'}
-	# Encode how to restore 'pc'
-	push   %lr       # [%lr]
-	and    ~$1       # [%lr & ~1]
-1:]]]*/
-	.cfi_escape 22,15,5,126,0,9,254,26
-/*[[[end]]]*/
-	ldm    r0, {r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12} /* Restore GP registers */
-	.cfi_restore r1; .cfi_restore r2; .cfi_restore r3; .cfi_restore r4;  .cfi_restore r5;  .cfi_restore r6
-	.cfi_restore r7; .cfi_restore r8; .cfi_restore r9; .cfi_restore r10; .cfi_restore r11; .cfi_restore r12
-	ldr    sp, [r0, #(OFFSET_KCPUSTATE_SP - OFFSET_KCPUSTATE_R1)] /* Restore stack */
-	.cfi_restore sp
-	ldr    r0, [r0, #(OFFSET_KCPUSTATE_R0 - OFFSET_KCPUSTATE_R1)] /* Restore r0 */
-	bx     lr             /* Resume execution */
+	/* Load the returned CPU state */
+	INTERN(libc___arm_cpu_apply_kcpustate)
+	b      libc___arm_cpu_apply_kcpustate /* from "except.S" */
 	.cfi_endproc
 END(libc___acheck)
 DEFINE_PUBLIC_ALIAS(__acheck, libc___acheck)
@@ -239,21 +196,20 @@ INTERN_FUNCTION(libc___acheckf)
 	/* Push `struct assert_args' */
 	push_cfi {r0,r1,r2,r3,r12}         /* `aa_expr', `aa_file', `aa_line', `aa_func', [r12: placeholder for `aa_format'] */
 	ASM_PUSH_KCPUSTATE_ON_ENTRY_CFI_R  /* `aa_state' */
-	ldr    r12, [sp, #(sizeof_assert_args - 4)]
+	ldr    r12, [sp, #(SIZEOF_ASSERT_ARGS - 4)]
 	str    r12, [sp, #(aa_format - 4)] /* Copy `format' argument into `aa_format' */
-	add    r12, sp, #(sizeof_assert_args - 4 + 4) /* Pointer to varargs */
+	add    r12, sp, #(SIZEOF_ASSERT_ARGS - 4 + 4) /* Pointer to varargs */
 	push_cfi {r12}                     /* `aa_args' */
-#if (sizeof_assert_args % 8) != 0
-	sub    sp, sp, #4 /* ensure 8-byte alignment */
-#endif /* (sizeof_assert_args % 8) != 0 */
 
 	/* Call the high-level handler */
 	mov    r0, sp
+	ASM_STACK_ALIGN_AFTER(SIZEOF_ASSERT_ARGS)
 	INTERN(libc_assertion_check_core)
 	bl     libc_assertion_check_core
 
 	/* Load the returned CPU state */
-	b      .Lload_kcpustate_r0
+	INTERN(libc___arm_cpu_apply_kcpustate)
+	b      libc___arm_cpu_apply_kcpustate /* from "except.S" */
 	.cfi_endproc
 END(libc___acheckf)
 DEFINE_PUBLIC_ALIAS(__acheckf, libc___acheckf)
@@ -281,12 +237,10 @@ INTERN_FUNCTION(libc___assert_func)
 	mov    r12, #0
 	push_cfi {r12}                     /* `aa_args' */
 	str    r12, [sp, #aa_format]       /* override `aa_format' with NULL */
-#if (sizeof_assert_args % 8) != 0
-	sub    sp, sp, #4 /* ensure 8-byte alignment */
-#endif /* (sizeof_assert_args % 8) != 0 */
 
 	/* Call the high-level handler */
 	mov    r0, sp
+	ASM_STACK_ALIGN_AFTER(SIZEOF_ASSERT_ARGS)
 	INTERN(libc_assertion_failure_core)
 	bl     libc_assertion_failure_core
 	.cfi_endproc
@@ -319,12 +273,10 @@ INTERN_FUNCTION(libc___assert)
 	push_cfi {r12}                     /* `aa_args' */
 	str    r12, [sp, #aa_func]         /* override `aa_func' with NULL */
 	str    r12, [sp, #aa_format]       /* override `aa_format' with NULL */
-#if (sizeof_assert_args % 8) != 0
-	sub    sp, sp, #4 /* ensure 8-byte alignment */
-#endif /* (sizeof_assert_args % 8) != 0 */
 
 	/* Call the high-level handler */
 	mov    r0, sp
+	ASM_STACK_ALIGN_AFTER(SIZEOF_ASSERT_ARGS)
 	INTERN(libc_assertion_failure_core)
 	bl     libc_assertion_failure_core
 	.cfi_endproc
@@ -347,12 +299,10 @@ INTERN_FUNCTION(libc__assert)
 	push_cfi {r12}                     /* `aa_args' */
 	str    r12, [sp, #aa_func]         /* override `aa_func' with NULL */
 	str    r12, [sp, #aa_format]       /* override `aa_format' with NULL */
-#if (sizeof_assert_args % 8) != 0
-	sub    sp, sp, #4 /* ensure 8-byte alignment */
-#endif /* (sizeof_assert_args % 8) != 0 */
 
 	/* Call the high-level handler */
 	mov    r0, sp
+	ASM_STACK_ALIGN_AFTER(SIZEOF_ASSERT_ARGS)
 	INTERN(libc_assertion_failure_core)
 	bl     libc_assertion_failure_core
 	.cfi_endproc
@@ -374,12 +324,10 @@ INTERN_FUNCTION(libc__wassert)
 	push_cfi {r12}                     /* `aa_args' */
 	str    r12, [sp, #aa_func]         /* override `aa_func' with NULL */
 	str    r12, [sp, #aa_format]       /* override `aa_format' with NULL */
-#if (sizeof_assert_args % 8) != 0
-	sub    sp, sp, #4 /* ensure 8-byte alignment */
-#endif /* (sizeof_assert_args % 8) != 0 */
 
 	/* Call the high-level handler */
 	mov    r0, sp
+	ASM_STACK_ALIGN_AFTER(SIZEOF_ASSERT_ARGS)
 	INTERN(libc_assertion_failure_core_c32)
 	bl     libc_assertion_failure_core_c32
 	.cfi_endproc
@@ -401,12 +349,10 @@ INTERN_FUNCTION(libd__wassert)
 	push_cfi {r12}                     /* `aa_args' */
 	str    r12, [sp, #aa_func]         /* override `aa_func' with NULL */
 	str    r12, [sp, #aa_format]       /* override `aa_format' with NULL */
-#if (sizeof_assert_args % 8) != 0
-	sub    sp, sp, #4 /* ensure 8-byte alignment */
-#endif /* (sizeof_assert_args % 8) != 0 */
 
 	/* Call the high-level handler */
 	mov    r0, sp
+	ASM_STACK_ALIGN_AFTER(SIZEOF_ASSERT_ARGS)
 	INTERN(libc_assertion_failure_core_c16)
 	bl     libc_assertion_failure_core_c16
 	.cfi_endproc
@@ -429,12 +375,10 @@ INTERN_FUNCTION(libc___assert_perror_fail)
 	mov    r12, #0
 	push_cfi {r12}                     /* `aa_args' */
 	str    r12, [sp, #aa_format]       /* override `aa_format' with NULL */
-#if (sizeof_assert_args % 8) != 0
-	sub    sp, sp, #4 /* ensure 8-byte alignment */
-#endif /* (sizeof_assert_args % 8) != 0 */
 
 	/* Call the high-level handler */
 	mov    r0, sp
+	ASM_STACK_ALIGN_AFTER(SIZEOF_ASSERT_ARGS)
 	INTERN(libc_assertion_failure_perror)
 	bl     libc_assertion_failure_perror
 	.cfi_endproc

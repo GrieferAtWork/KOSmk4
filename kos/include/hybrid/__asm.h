@@ -23,7 +23,12 @@
 #include "../__stdinc.h"
 
 
-#ifdef __ASSEMBLER__
+#ifdef __INTELLISENSE__
+#define __ASM_BEGIN      /* nothing */
+#define __ASM_END        /* nothing */
+#define __ASM_ARG(x)     /* nothing */
+#define __ASM_L(...)     /* nothing */
+#elif defined(__ASSEMBLER__)
 #define __ASM_BEGIN      /* nothing */
 #define __ASM_END        /* nothing */
 #define __ASM_ARG(x)     x
@@ -34,7 +39,7 @@
 #else /* __PREPROCESSOR_HAVE_VA_ARGS */
 #define __ASM_L(line)    line ;
 #endif /* !__PREPROCESSOR_HAVE_VA_ARGS */
-#elif !defined(__CC__) || defined(__INTELLISENSE__)
+#elif !defined(__CC__)
 #define __ASM_BEGIN      /* nothing */
 #define __ASM_END        /* nothing */
 #define __ASM_ARG(x)     /* nothing */

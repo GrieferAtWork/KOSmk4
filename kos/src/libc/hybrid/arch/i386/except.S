@@ -79,6 +79,7 @@ INTERN_FUNCTION(libc__except_badusage_no_nesting)
 	movP   %Psp, %R_fcall0P
 	EXTERN(libc_except_badusage_no_nesting)
 	call   libc_except_badusage_no_nesting
+	nop    /* For unwinding... */
 END(libc__except_badusage_no_nesting)
 	.cfi_endproc
 END(libc__except_check_no_nesting)

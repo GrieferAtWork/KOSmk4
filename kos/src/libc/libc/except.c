@@ -519,7 +519,7 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_except_unwind)(except_register_state_t *__re
 	void const *pc;
 #if EXCEPT_BACKTRACE_SIZE != 0
 	unsigned int orig_tracecount;
-	for (orig_tracecount = 0; orig_tracecount < EXCEPT_BACKTRACE_SIZE - 1; ++orig_tracecount) {
+	for (orig_tracecount = 0; orig_tracecount < EXCEPT_BACKTRACE_SIZE; ++orig_tracecount) {
 		if (!current.pt_except.ei_trace[orig_tracecount])
 			break;
 	}

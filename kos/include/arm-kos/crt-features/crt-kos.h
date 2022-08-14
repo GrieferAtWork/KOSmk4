@@ -326,6 +326,7 @@
 #define __CRT_HAVE___argz_next
 #define __CRT_HAVE___argz_replace
 #define __CRT_HAVE___argz_stringify
+#define __CRT_HAVE___arm_cpu_apply_kcpustate
 #define __CRT_HAVE___asin
 #define __CRT_HAVE___asinf
 #define __CRT_HAVE___asinh
