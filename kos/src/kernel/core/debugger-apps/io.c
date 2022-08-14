@@ -102,8 +102,8 @@ DBG_COMMAND(undo,
 }
 
 
-#define LOG_STACK_REMAINDER 1
 
+#ifdef __port_t
 DBG_COMMAND(inb,
             "inb PORT\n"
             "\tRead from PORT and display the read value on-screen\n",
@@ -196,6 +196,8 @@ DBG_COMMAND(outl,
 	outl((port_t)port, (u32)val);
 	return val;
 }
+#endif /* __port_t */
+
 
 
 DBG_COMMAND(m,
@@ -376,6 +378,7 @@ DBG_COMMAND(trace,
             "\tFile: Last component of the associated source's filename\n"
             "\tLine: Line number within File of the associated source code\n"
             "\tInfo: Additional information\n") {
+#define LOG_STACK_REMAINDER 1
 	struct fcpustate state;
 	unsigned int error;
 #ifdef LOG_STACK_REMAINDER
