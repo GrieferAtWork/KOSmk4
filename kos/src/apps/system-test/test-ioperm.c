@@ -23,10 +23,11 @@
 #undef NDEBUG
 
 #include <hybrid/compiler.h>
+#include <sys/io.h>
 
+#ifdef __port_t
 #include <kos/except.h>
 #include <kos/types.h>
-#include <sys/io.h>
 #include <sys/perm.h>
 #include <system-test/ctest.h>
 
@@ -147,5 +148,6 @@ DEFINE_TEST(ioperm_works_correctly) {
 
 
 DECL_END
+#endif /* __port_t */
 
 #endif /* !GUARD_APPS_SYSTEM_TEST_TEST_IOPERM_C */

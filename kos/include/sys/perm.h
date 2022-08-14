@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x894bc48e */
+/* HASH CRC-32:0x7a6bdf2d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,23 +36,29 @@
 __SYSDECL_BEGIN
 
 #ifdef __CRT_HAVE_ioperm
-/* Change I/O port permissions for a specific I/O port range */
+/* >> ioperm(2)
+ * Change I/O port permissions for a specific I/O port range */
 __CDECLARE(,int,__NOTHROW_NCX,ioperm,(__ULONGPTR_TYPE__ __from, __ULONGPTR_TYPE__ __num, __STDC_INT_AS_UINT_T __turn_on),(__from,__num,__turn_on))
 #elif defined(__CRT_HAVE___ioperm)
-/* Change I/O port permissions for a specific I/O port range */
+/* >> ioperm(2)
+ * Change I/O port permissions for a specific I/O port range */
 __CREDIRECT(,int,__NOTHROW_NCX,ioperm,(__ULONGPTR_TYPE__ __from, __ULONGPTR_TYPE__ __num, __STDC_INT_AS_UINT_T __turn_on),__ioperm,(__from,__num,__turn_on))
 #elif defined(__CRT_HAVE___libc_ioperm)
-/* Change I/O port permissions for a specific I/O port range */
+/* >> ioperm(2)
+ * Change I/O port permissions for a specific I/O port range */
 __CREDIRECT(,int,__NOTHROW_NCX,ioperm,(__ULONGPTR_TYPE__ __from, __ULONGPTR_TYPE__ __num, __STDC_INT_AS_UINT_T __turn_on),__libc_ioperm,(__from,__num,__turn_on))
 #endif /* ... */
 #ifdef __CRT_HAVE_iopl
-/* Change I/O port permissions for all I/O ports */
+/* >> iopl(2)
+ * Change I/O port permissions for all I/O ports */
 __CDECLARE(,int,__NOTHROW_NCX,iopl,(__STDC_INT_AS_UINT_T __level),(__level))
 #elif defined(__CRT_HAVE___iopl)
-/* Change I/O port permissions for all I/O ports */
+/* >> iopl(2)
+ * Change I/O port permissions for all I/O ports */
 __CREDIRECT(,int,__NOTHROW_NCX,iopl,(__STDC_INT_AS_UINT_T __level),__iopl,(__level))
 #elif defined(__CRT_HAVE___libc_iopl)
-/* Change I/O port permissions for all I/O ports */
+/* >> iopl(2)
+ * Change I/O port permissions for all I/O ports */
 __CREDIRECT(,int,__NOTHROW_NCX,iopl,(__STDC_INT_AS_UINT_T __level),__libc_iopl,(__level))
 #endif /* ... */
 

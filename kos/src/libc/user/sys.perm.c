@@ -23,15 +23,17 @@
 #include "../api.h"
 /**/
 
-#include <syscall.h>
-#include <kos/syscalls.h>
+#include <bits/types.h>
 
+#include "../libc/syscalls.h"
 #include "sys.perm.h"
 
 DECL_BEGIN
 
-/*[[[head:libc_ioperm,hash:CRC-32=0x3342be26]]]*/
-/* Change I/O port permissions for a specific I/O port range */
+/*[[[head:libc_ioperm,hash:CRC-32=0xb708a59b]]]*/
+#ifdef __port_t
+/* >> ioperm(2)
+ * Change I/O port permissions for a specific I/O port range */
 INTERN ATTR_SECTION(".text.crt.system.ioperm") int
 NOTHROW_NCX(LIBCCALL libc_ioperm)(ulongptr_t from,
                                   ulongptr_t num,
@@ -48,14 +50,16 @@ NOTHROW_NCX(LIBCCALL libc_ioperm)(ulongptr_t from,
 	(void)from;
 	(void)num;
 	(void)turn_on;
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_seterrno(ENOSYS);
 #endif /* !SYS_ioperm */
 }
+#endif /* MAGIC:impl_if */
 /*[[[end:libc_ioperm]]]*/
 
-/*[[[head:libc_iopl,hash:CRC-32=0x4bd4f2b]]]*/
-/* Change I/O port permissions for all I/O ports */
+/*[[[head:libc_iopl,hash:CRC-32=0xa8ec3420]]]*/
+#ifdef __port_t
+/* >> iopl(2)
+ * Change I/O port permissions for all I/O ports */
 INTERN ATTR_SECTION(".text.crt.system.ioperm") int
 NOTHROW_NCX(LIBCCALL libc_iopl)(__STDC_INT_AS_UINT_T level)
 /*[[[body:libc_iopl]]]*/
@@ -66,20 +70,23 @@ NOTHROW_NCX(LIBCCALL libc_iopl)(__STDC_INT_AS_UINT_T level)
 	return libc_seterrno_syserr(error);
 #else /* SYS_iopl */
 	(void)level;
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_seterrno(ENOSYS);
 #endif /* !SYS_iopl */
 }
+#endif /* MAGIC:impl_if */
 /*[[[end:libc_iopl]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0x8c944090]]]*/
+/*[[[start:exports,hash:CRC-32=0xe1ef953c]]]*/
+#include <bits/types.h>
+#ifdef __port_t
 DEFINE_PUBLIC_ALIAS(__ioperm, libc_ioperm);
 DEFINE_PUBLIC_ALIAS(__libc_ioperm, libc_ioperm);
 DEFINE_PUBLIC_ALIAS(ioperm, libc_ioperm);
 DEFINE_PUBLIC_ALIAS(__iopl, libc_iopl);
 DEFINE_PUBLIC_ALIAS(__libc_iopl, libc_iopl);
 DEFINE_PUBLIC_ALIAS(iopl, libc_iopl);
+#endif /* __port_t */
 /*[[[end:exports]]]*/
 
 DECL_END
