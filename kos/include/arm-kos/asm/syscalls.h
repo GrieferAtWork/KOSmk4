@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46e2505d */
+/* HASH CRC-32:0xac5cab */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -156,9 +156,9 @@
 #define __NR_sigpending                   0x49                 /* errno_t sigpending(struct __old_sigset_struct *set) */
 #define __NR_sethostname                  0x4a                 /* errno_t sethostname(char const *name, size_t len) */
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-#define __NR_setrlimit                    0x4b                 /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
+#define __NR_setrlimit                    0x4b                 /* errno_t setrlimit(syscall_ulong_t resource, struct rlimit32 const *rlimits) */
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-#define __NR_getrlimit                    0x4c                 /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
+#define __NR_getrlimit                    0x4c                 /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit32 *rlimits) */
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 #define __NR_getrusage                    0x4d                 /* errno_t getrusage(syscall_slong_t who, struct rusage *usage) */
 #define __NR_gettimeofday                 0x4e                 /* errno_t gettimeofday(struct timeval *tv, struct timezone *tz) */

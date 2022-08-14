@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfdce885a */
+/* HASH CRC-32:0xf4f82ebd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1099,9 +1099,9 @@
 #define __NRAT0_sethostname                  (char const *, char const *)
 #define __NRAT1_sethostname                  (size_t, __size_t)
 #define __NRAT0_setrlimit                    (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT1_setrlimit                    (struct rlimit const *, struct rlimit const *)
+#define __NRAT1_setrlimit                    (struct rlimit32 const *, struct __rlimit32 const *)
 #define __NRAT0_getrlimit                    (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT1_getrlimit                    (struct rlimit *, struct rlimit *)
+#define __NRAT1_getrlimit                    (struct rlimit32 *, struct __rlimit32 *)
 #define __NRAT0_getrusage                    (syscall_slong_t, __syscall_slong_t)
 #define __NRAT1_getrusage                    (struct rusage *, struct rusage *)
 #define __NRAT0_gettimeofday                 (struct timeval *, struct timeval *)
@@ -2208,8 +2208,8 @@
 #define __NRAM_sigsuspend(a, b, c, d, e, f, g)                   (struct __old_sigset_struct const *)a
 #define __NRAM_sigpending(a, b, c, d, e, f, g)                   (struct __old_sigset_struct *)a
 #define __NRAM_sethostname(a, b, c, d, e, f, g)                  (char const *)a, (__size_t)b
-#define __NRAM_setrlimit(a, b, c, d, e, f, g)                    (__syscall_ulong_t)a, (struct rlimit const *)b
-#define __NRAM_getrlimit(a, b, c, d, e, f, g)                    (__syscall_ulong_t)a, (struct rlimit *)b
+#define __NRAM_setrlimit(a, b, c, d, e, f, g)                    (__syscall_ulong_t)a, (struct __rlimit32 const *)b
+#define __NRAM_getrlimit(a, b, c, d, e, f, g)                    (__syscall_ulong_t)a, (struct __rlimit32 *)b
 #define __NRAM_getrusage(a, b, c, d, e, f, g)                    (__syscall_slong_t)a, (struct rusage *)b
 #define __NRAM_gettimeofday(a, b, c, d, e, f, g)                 (struct timeval *)a, (struct timezone *)b
 #define __NRAM_settimeofday(a, b, c, d, e, f, g)                 (struct timeval const *)a, (struct timezone const *)b

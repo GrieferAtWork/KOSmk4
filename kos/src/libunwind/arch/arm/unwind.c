@@ -122,9 +122,9 @@ NOTHROW_NCX(CC libuw_unwind_setreg_implicit)(unwind_regno_t dw_regno,
 
 /* Only for register numbers CFI_ARM_UNWIND_REGISTER_R0...CFI_ARM_UNWIND_REGISTER_PC: */
 #define DWREGNO_TO_UCPUSTATE_OFFSET(dw_regno)                                           \
-	((dw_regno) >= CFI_ARM_UNWIND_REGISTER_SP                                           \
+	((uintptr_t)(dw_regno) >= (uintptr_t)CFI_ARM_UNWIND_REGISTER_SP                     \
 	 ? (uintptr_t)(((uintptr_t)CFI_ARM_UNWIND_REGISTER_PC - (uintptr_t)(dw_regno)) * 4) \
-	 : (uintptr_t)OFFSET_UCPUSTATE_R0 + (uintptr_t)(4 * (dw_regno)))
+	 : (uintptr_t)OFFSET_UCPUSTATE_R0 + (uintptr_t)((uintptr_t)(dw_regno) * 4))
 
 
 /* Register state accessor base functions */

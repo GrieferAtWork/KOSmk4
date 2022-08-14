@@ -28,21 +28,33 @@
 #ifdef __CC__
 __DECL_BEGIN
 
+#ifdef __USE_LARGEFILE64
+#define __rlimit64 rlimit64
+#endif /* __USE_LARGEFILE64 */
+#ifdef __USE_KOS_KERNEL
+#define rlimit32 __rlimit32
+#endif /* __USE_KOS_KERNEL */
+
 struct rlimit {
 	__rlim_t rlim_cur; /* The current (soft) limit. */
 	__rlim_t rlim_max; /* The hard limit. */
 };
 
-#ifdef __USE_LARGEFILE64
-#define __rlimit64 rlimit64
-struct rlimit64
-#else /* __USE_LARGEFILE64 */
-struct __rlimit64
-#endif /* !__USE_LARGEFILE64 */
-{
+struct __rlimit64 {
 	__rlim64_t rlim_cur; /* The current (soft) limit. */
 	__rlim64_t rlim_max; /* The hard limit. */
 };
+
+#if __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM_T__
+#define __rlimit32 rlimit
+#else /* __SIZEOF_RLIM32_T__ == __SIZEOF_RLIM_T__ */
+struct __rlimit32 {
+	__rlim32_t rlim_cur; /* The current (soft) limit. */
+	__rlim32_t rlim_max; /* The hard limit. */
+};
+#endif /* __SIZEOF_RLIM32_T__ != __SIZEOF_RLIM_T__ */
+
+
 __DECL_END
 #endif /* __CC__ */
 

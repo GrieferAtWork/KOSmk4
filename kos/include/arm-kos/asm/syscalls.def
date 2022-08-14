@@ -102,8 +102,9 @@ semtimedop_time64 = semtimedop64;
 rt_sigtimedwait_time64 = rt_sigtimedwait64;
 futex_time64 = futex64;
 sched_rr_get_interval_time64 = sched_rr_get_interval64;
-
 maplibrary = maplibraryx32;
+getrlimit = getrlimit32;
+setrlimit = setrlimit32;
 
 /* Deal with the whole new-vs-old select issue. */
 _newselect = select32;

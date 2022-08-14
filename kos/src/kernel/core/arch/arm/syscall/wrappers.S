@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6381c15c */
+/* HASH CRC-32:0x62c0f744 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -287,11 +287,11 @@
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 74) */
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
+/* errno_t setrlimit(syscall_ulong_t resource, struct rlimit32 const *rlimits) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 75) */
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
+/* errno_t getrlimit(syscall_ulong_t resource, struct rlimit32 *rlimits) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 76) */
 
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */

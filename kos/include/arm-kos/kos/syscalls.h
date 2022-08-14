@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c72e6cb */
+/* HASH CRC-32:0xa1425441 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -115,6 +115,7 @@ struct __kernel_sigaction;
 struct __kos_stat;
 struct __old_kernel_sigaction;
 struct __old_sigset_struct;
+struct __rlimit32;
 struct __rlimit64;
 struct __rusage64;
 struct __siginfo_struct;
@@ -147,7 +148,6 @@ struct mq_attr;
 struct msghdr;
 struct old_linux_dirent;
 struct pollfd;
-struct rlimit;
 struct rpc_syscall_info;
 struct rusage;
 struct sched_param;
@@ -896,7 +896,7 @@ __CDECLARE_SC(,__errno_t,getresuid32,(__uint32_t *__ruid, __uint32_t *__euid, __
 #endif /* __CRT_HAVE_SC(getresuid32) */
 #if __CRT_HAVE_SC(getrlimit)
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-__CDECLARE_SC(,__errno_t,getrlimit,(__syscall_ulong_t __resource, struct rlimit *__rlimits),(__resource,__rlimits))
+__CDECLARE_SC(,__errno_t,getrlimit,(__syscall_ulong_t __resource, struct __rlimit32 *__rlimits),(__resource,__rlimits))
 #endif /* __CRT_HAVE_SC(getrlimit) */
 #if __CRT_HAVE_SC(getrusage)
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
@@ -2202,7 +2202,7 @@ __CDECLARE_SC(,__errno_t,setreuid32,(__uint32_t __ruid, __uint32_t __euid),(__ru
 #endif /* __CRT_HAVE_SC(setreuid32) */
 #if __CRT_HAVE_SC(setrlimit)
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-__CDECLARE_SC(,__errno_t,setrlimit,(__syscall_ulong_t __resource, struct rlimit const *__rlimits),(__resource,__rlimits))
+__CDECLARE_SC(,__errno_t,setrlimit,(__syscall_ulong_t __resource, struct __rlimit32 const *__rlimits),(__resource,__rlimits))
 #endif /* __CRT_HAVE_SC(setrlimit) */
 #if __CRT_HAVE_SC(setsid)
 __CDECLARE_SC(,__pid_t,setsid,(void),())
@@ -3370,7 +3370,7 @@ __CDECLARE_XSC(,__errno_t,getresuid32,(__uint32_t *__ruid, __uint32_t *__euid, _
 #endif /* __CRT_HAVE_XSC(getresuid32) */
 #if __CRT_HAVE_XSC(getrlimit)
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-__CDECLARE_XSC(,__errno_t,getrlimit,(__syscall_ulong_t __resource, struct rlimit *__rlimits),(__resource,__rlimits))
+__CDECLARE_XSC(,__errno_t,getrlimit,(__syscall_ulong_t __resource, struct __rlimit32 *__rlimits),(__resource,__rlimits))
 #endif /* __CRT_HAVE_XSC(getrlimit) */
 #if __CRT_HAVE_XSC(getrusage)
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
@@ -4670,7 +4670,7 @@ __CDECLARE_XSC(,__errno_t,setreuid32,(__uint32_t __ruid, __uint32_t __euid),(__r
 #endif /* __CRT_HAVE_XSC(setreuid32) */
 #if __CRT_HAVE_XSC(setrlimit)
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-__CDECLARE_XSC(,__errno_t,setrlimit,(__syscall_ulong_t __resource, struct rlimit const *__rlimits),(__resource,__rlimits))
+__CDECLARE_XSC(,__errno_t,setrlimit,(__syscall_ulong_t __resource, struct __rlimit32 const *__rlimits),(__resource,__rlimits))
 #endif /* __CRT_HAVE_XSC(setrlimit) */
 #if __CRT_HAVE_XSC(setsid)
 __CDECLARE_XSC(,__pid_t,setsid,(void),())

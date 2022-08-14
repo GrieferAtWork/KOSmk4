@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x685f0e17 */
+/* HASH CRC-32:0x18bb957a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -519,7 +519,7 @@ END(libc_sys_sethostname)
 DEFINE_PUBLIC_ALIAS(sys_sethostname, libc_sys_sethostname)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
+/* errno_t setrlimit(syscall_ulong_t resource, struct rlimit32 const *rlimits) */
 INTERN_FUNCTION(libc_sys_setrlimit)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 75, enableExcept: false) */
 	b .
@@ -527,7 +527,7 @@ END(libc_sys_setrlimit)
 DEFINE_PUBLIC_ALIAS(sys_setrlimit, libc_sys_setrlimit)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
+/* errno_t getrlimit(syscall_ulong_t resource, struct rlimit32 *rlimits) */
 INTERN_FUNCTION(libc_sys_getrlimit)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 76, enableExcept: false) */
 	b .
@@ -4893,7 +4893,7 @@ END(libc_sys_Xsethostname)
 DEFINE_PUBLIC_ALIAS(sys_Xsethostname, libc_sys_Xsethostname)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits) */
+/* errno_t setrlimit(syscall_ulong_t resource, struct rlimit32 const *rlimits) */
 INTERN_FUNCTION(libc_sys_Xsetrlimit)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 75, enableExcept: true) */
 	b .
@@ -4901,7 +4901,7 @@ END(libc_sys_Xsetrlimit)
 DEFINE_PUBLIC_ALIAS(sys_Xsetrlimit, libc_sys_Xsetrlimit)
 
 /* @param: resource: One of `RLIMIT_*' from <sys/resource.h> */
-/* errno_t getrlimit(syscall_ulong_t resource, struct rlimit *rlimits) */
+/* errno_t getrlimit(syscall_ulong_t resource, struct rlimit32 *rlimits) */
 INTERN_FUNCTION(libc_sys_Xgetrlimit)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 76, enableExcept: true) */
 	b .
