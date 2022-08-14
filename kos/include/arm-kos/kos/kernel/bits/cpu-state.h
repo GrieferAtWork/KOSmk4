@@ -25,40 +25,43 @@
 #include <bits/types.h>
 
 
-#define OFFSET_UCPUSTATE_R0   0  /* r0 */
-#define OFFSET_UCPUSTATE_R1   4  /* r1 */
-#define OFFSET_UCPUSTATE_R2   8  /* r2 */
-#define OFFSET_UCPUSTATE_R3   12 /* r3 */
-#define OFFSET_UCPUSTATE_R4   16 /* r4 */
-#define OFFSET_UCPUSTATE_R5   20 /* r5 */
-#define OFFSET_UCPUSTATE_R6   24 /* r6 */
-#define OFFSET_UCPUSTATE_R7   28 /* r7 */
-#define OFFSET_UCPUSTATE_R8   32 /* r8 */
-#define OFFSET_UCPUSTATE_R9   36 /* r9 */
-#define OFFSET_UCPUSTATE_R10  40 /* r10 */
-#define OFFSET_UCPUSTATE_R11  44 /* r11 */
-#define OFFSET_UCPUSTATE_R12  48 /* r12 */
-#define OFFSET_UCPUSTATE_SP   52 /* r13 */
-#define OFFSET_UCPUSTATE_LR   56 /* r14 */
-#define OFFSET_UCPUSTATE_PC   60 /* r15 */
-#define OFFSET_UCPUSTATE_CPSR 64 /* CurrentProgramStatusRegister */
+#define OFFSET_UCPUSTATE_PC   0  /* r15 */
+#define OFFSET_UCPUSTATE_LR   4  /* r14 */
+#define OFFSET_UCPUSTATE_SP   8  /* r13 */
+#define OFFSET_UCPUSTATE_CPSR 12 /* CurrentProgramStatusRegister */
+#define OFFSET_UCPUSTATE_R0   16 /* r0 */
+#define OFFSET_UCPUSTATE_R1   20 /* r1 */
+#define OFFSET_UCPUSTATE_R2   24 /* r2 */
+#define OFFSET_UCPUSTATE_R3   28 /* r3 */
+#define OFFSET_UCPUSTATE_R4   32 /* r4 */
+#define OFFSET_UCPUSTATE_R5   36 /* r5 */
+#define OFFSET_UCPUSTATE_R6   40 /* r6 */
+#define OFFSET_UCPUSTATE_R7   44 /* r7 */
+#define OFFSET_UCPUSTATE_R8   48 /* r8 */
+#define OFFSET_UCPUSTATE_R9   52 /* r9 */
+#define OFFSET_UCPUSTATE_R10  56 /* r10 */
+#define OFFSET_UCPUSTATE_R11  60 /* r11 */
+#define OFFSET_UCPUSTATE_R12  64 /* r12 */
 #define SIZEOF_UCPUSTATE      68
 #define ALIGNOF_UCPUSTATE     4
 
-#define OFFSET_LCPUSTATE_R4  0  /* r4 */
-#define OFFSET_LCPUSTATE_R5  4  /* r5 */
-#define OFFSET_LCPUSTATE_R6  8  /* r6 */
-#define OFFSET_LCPUSTATE_R7  12 /* r7 */
-#define OFFSET_LCPUSTATE_R8  16 /* r8 */
-#define OFFSET_LCPUSTATE_R9  20 /* r9 */
-#define OFFSET_LCPUSTATE_R10 24 /* r10 */
-#define OFFSET_LCPUSTATE_R11 28 /* r11 */
-#define OFFSET_LCPUSTATE_SP  32 /* r13 */
-#define OFFSET_LCPUSTATE_LR  36 /* r14 */
-#define OFFSET_LCPUSTATE_PC  40 /* r15 */
-#define SIZEOF_LCPUSTATE     44
+#define OFFSET_LCPUSTATE_PC  0  /* r15 */
+#define OFFSET_LCPUSTATE_SP  4  /* r13 */
+#define OFFSET_LCPUSTATE_R4  8  /* r4 */
+#define OFFSET_LCPUSTATE_R5  12 /* r5 */
+#define OFFSET_LCPUSTATE_R6  16 /* r6 */
+#define OFFSET_LCPUSTATE_R7  20 /* r7 */
+#define OFFSET_LCPUSTATE_R8  24 /* r8 */
+#define OFFSET_LCPUSTATE_R9  28 /* r9 */
+#define OFFSET_LCPUSTATE_R10 32 /* r10 */
+#define OFFSET_LCPUSTATE_R11 36 /* r11 */
+#define SIZEOF_LCPUSTATE     40
 #define ALIGNOF_LCPUSTATE    4
 
+#define OFFSET_KCPUSTATE_PC   OFFSET_UCPUSTATE_PC   /* r15 */
+#define OFFSET_KCPUSTATE_LR   OFFSET_UCPUSTATE_LR   /* r14 */
+#define OFFSET_KCPUSTATE_SP   OFFSET_UCPUSTATE_SP   /* r13 */
+#define OFFSET_KCPUSTATE_CPSR OFFSET_UCPUSTATE_CPSR /* CurrentProgramStatusRegister */
 #define OFFSET_KCPUSTATE_R0   OFFSET_UCPUSTATE_R0   /* r0 */
 #define OFFSET_KCPUSTATE_R1   OFFSET_UCPUSTATE_R1   /* r1 */
 #define OFFSET_KCPUSTATE_R2   OFFSET_UCPUSTATE_R2   /* r2 */
@@ -72,13 +75,13 @@
 #define OFFSET_KCPUSTATE_R10  OFFSET_UCPUSTATE_R10  /* r10 */
 #define OFFSET_KCPUSTATE_R11  OFFSET_UCPUSTATE_R11  /* r11 */
 #define OFFSET_KCPUSTATE_R12  OFFSET_UCPUSTATE_R12  /* r12 */
-#define OFFSET_KCPUSTATE_SP   OFFSET_UCPUSTATE_SP   /* r13 */
-#define OFFSET_KCPUSTATE_LR   OFFSET_UCPUSTATE_LR   /* r14 */
-#define OFFSET_KCPUSTATE_PC   OFFSET_UCPUSTATE_PC   /* r15 */
-#define OFFSET_KCPUSTATE_CPSR OFFSET_UCPUSTATE_CPSR /* CurrentProgramStatusRegister */
 #define SIZEOF_KCPUSTATE      SIZEOF_UCPUSTATE
 #define ALIGNOF_KCPUSTATE     ALIGNOF_UCPUSTATE
 
+#define OFFSET_ICPUSTATE_PC   OFFSET_UCPUSTATE_PC   /* r15 */
+#define OFFSET_ICPUSTATE_LR   OFFSET_UCPUSTATE_LR   /* r14 */
+#define OFFSET_ICPUSTATE_SP   OFFSET_UCPUSTATE_SP   /* r13 */
+#define OFFSET_ICPUSTATE_CPSR OFFSET_UCPUSTATE_CPSR /* CurrentProgramStatusRegister */
 #define OFFSET_ICPUSTATE_R0   OFFSET_UCPUSTATE_R0   /* r0 */
 #define OFFSET_ICPUSTATE_R1   OFFSET_UCPUSTATE_R1   /* r1 */
 #define OFFSET_ICPUSTATE_R2   OFFSET_UCPUSTATE_R2   /* r2 */
@@ -92,13 +95,13 @@
 #define OFFSET_ICPUSTATE_R10  OFFSET_UCPUSTATE_R10  /* r10 */
 #define OFFSET_ICPUSTATE_R11  OFFSET_UCPUSTATE_R11  /* r11 */
 #define OFFSET_ICPUSTATE_R12  OFFSET_UCPUSTATE_R12  /* r12 */
-#define OFFSET_ICPUSTATE_SP   OFFSET_UCPUSTATE_SP   /* r13 */
-#define OFFSET_ICPUSTATE_LR   OFFSET_UCPUSTATE_LR   /* r14 */
-#define OFFSET_ICPUSTATE_PC   OFFSET_UCPUSTATE_PC   /* r15 */
-#define OFFSET_ICPUSTATE_CPSR OFFSET_UCPUSTATE_CPSR /* CurrentProgramStatusRegister */
 #define SIZEOF_ICPUSTATE      SIZEOF_UCPUSTATE
 #define ALIGNOF_ICPUSTATE     ALIGNOF_UCPUSTATE
 
+#define OFFSET_SCPUSTATE_PC   OFFSET_UCPUSTATE_PC   /* r15 */
+#define OFFSET_SCPUSTATE_LR   OFFSET_UCPUSTATE_LR   /* r14 */
+#define OFFSET_SCPUSTATE_SP   OFFSET_UCPUSTATE_SP   /* r13 */
+#define OFFSET_SCPUSTATE_CPSR OFFSET_UCPUSTATE_CPSR /* CurrentProgramStatusRegister */
 #define OFFSET_SCPUSTATE_R0   OFFSET_UCPUSTATE_R0   /* r0 */
 #define OFFSET_SCPUSTATE_R1   OFFSET_UCPUSTATE_R1   /* r1 */
 #define OFFSET_SCPUSTATE_R2   OFFSET_UCPUSTATE_R2   /* r2 */
@@ -112,10 +115,6 @@
 #define OFFSET_SCPUSTATE_R10  OFFSET_UCPUSTATE_R10  /* r10 */
 #define OFFSET_SCPUSTATE_R11  OFFSET_UCPUSTATE_R11  /* r11 */
 #define OFFSET_SCPUSTATE_R12  OFFSET_UCPUSTATE_R12  /* r12 */
-#define OFFSET_SCPUSTATE_SP   OFFSET_UCPUSTATE_SP   /* r13 */
-#define OFFSET_SCPUSTATE_LR   OFFSET_UCPUSTATE_LR   /* r14 */
-#define OFFSET_SCPUSTATE_PC   OFFSET_UCPUSTATE_PC   /* r15 */
-#define OFFSET_SCPUSTATE_CPSR OFFSET_UCPUSTATE_CPSR /* CurrentProgramStatusRegister */
 #define SIZEOF_SCPUSTATE      SIZEOF_UCPUSTATE
 #define ALIGNOF_SCPUSTATE     ALIGNOF_UCPUSTATE
 
@@ -128,6 +127,10 @@
 __SYSDECL_BEGIN
 
 struct ucpustate { /* u -- User */
+	__uint32_t ucs_pc;   /* r15 */
+	__uint32_t ucs_lr;   /* r14 */
+	__uint32_t ucs_sp;   /* r13 */
+	__uint32_t ucs_cpsr; /* CurrentProgramStatusRegister */
 	__uint32_t ucs_r0;   /* r0 */
 	__uint32_t ucs_r1;   /* r1 */
 	__uint32_t ucs_r2;   /* r2 */
@@ -141,13 +144,11 @@ struct ucpustate { /* u -- User */
 	__uint32_t ucs_r10;  /* r10 */
 	__uint32_t ucs_r11;  /* r11 */
 	__uint32_t ucs_r12;  /* r12 */
-	__uint32_t ucs_sp;   /* r13 */
-	__uint32_t ucs_lr;   /* r14 */
-	__uint32_t ucs_pc;   /* r15 */
-	__uint32_t ucs_cpsr; /* CurrentProgramStatusRegister */
 };
 
 struct lcpustate { /* l -- Little */
+	__uint32_t lcs_pc;  /* r15 (!!!includes THUMB bit!!!) */
+	__uint32_t lcs_sp;  /* r13 */
 	__uint32_t lcs_r4;  /* r4 */
 	__uint32_t lcs_r5;  /* r5 */
 	__uint32_t lcs_r6;  /* r6 */
@@ -156,11 +157,10 @@ struct lcpustate { /* l -- Little */
 	__uint32_t lcs_r9;  /* r9 */
 	__uint32_t lcs_r10; /* r10 */
 	__uint32_t lcs_r11; /* r11 */
-	__uint32_t lcs_sp;  /* r13 */
-	__uint32_t lcs_lr;  /* r14 */
-	__uint32_t lcs_pc;  /* r15 */
 };
 
+/* NOTE: Places that only work with `kcpustate' may or may not ignore non-APSR bits from
+ *       CPSR  As such, when working with `kcpustate',  make sure to preserve CPSR bits! */
 #define kcpustate ucpustate /* k -- kernel */
 #define icpustate ucpustate /* i -- Interrupts */
 #define scpustate ucpustate /* s -- Scheduling */

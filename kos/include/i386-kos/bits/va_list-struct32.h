@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_BITS_VA_LIST_H
-#define _I386_KOS_BITS_VA_LIST_H 1
+#ifndef _I386_KOS_BITS_VA_LIST_STRUCT32_H
+#define _I386_KOS_BITS_VA_LIST_STRUCT32_H 1
 
 #include <__stdinc.h>
 #include <hybrid/host.h>
@@ -42,4 +42,4 @@ struct i386_va_list_struct {
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_I386_KOS_BITS_VA_LIST_H */
+#endif /* !_I386_KOS_BITS_VA_LIST_STRUCT32_H */

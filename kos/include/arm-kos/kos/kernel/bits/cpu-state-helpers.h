@@ -430,28 +430,29 @@ __NOTHROW_NCX(_fcpustate_p_banked)(struct fcpustate const *__restrict __self) {
 #define lcpustate_foreach_gpregs_elem(self) \
 	((__UINT32_TYPE__ const *)__COMPILER_REQTYPE(struct lcpustate const *, self))
 #define lcpustate_foreach_gpregs_size(self) 10
-#define lcpustate_getr4(self)       (self)->lcs_r4
-#define lcpustate_setr4(self, r4)   (void)((self)->lcs_r4 = (r4))
-#define lcpustate_getr5(self)       (self)->lcs_r5
-#define lcpustate_setr5(self, r5)   (void)((self)->lcs_r5 = (r5))
-#define lcpustate_getr6(self)       (self)->lcs_r6
-#define lcpustate_setr6(self, r6)   (void)((self)->lcs_r6 = (r6))
-#define lcpustate_getr7(self)       (self)->lcs_r7
-#define lcpustate_setr7(self, r7)   (void)((self)->lcs_r7 = (r7))
-#define lcpustate_getr8(self)       (self)->lcs_r8
-#define lcpustate_setr8(self, r8)   (void)((self)->lcs_r8 = (r8))
-#define lcpustate_getr9(self)       (self)->lcs_r9
-#define lcpustate_setr9(self, r9)   (void)((self)->lcs_r9 = (r9))
-#define lcpustate_getr10(self)      (self)->lcs_r10
-#define lcpustate_setr10(self, r10) (void)((self)->lcs_r10 = (r10))
-#define lcpustate_getr11(self)      (self)->lcs_r11
-#define lcpustate_setr11(self, r11) (void)((self)->lcs_r11 = (r11))
-#define lcpustate_getsp(self)       (__byte_t *)(self)->lcs_sp
-#define lcpustate_setsp(self, sp)   (void)((self)->lcs_sp = (__uintptr_t)__COMPILER_REQTYPE(void *, sp))
-#define lcpustate_getlr(self)       (__byte_t const *)(self)->lcs_lr
-#define lcpustate_setlr(self, lr)   (void)((self)->lcs_lr = (__uintptr_t)__COMPILER_REQTYPE(void const *, lr))
-#define lcpustate_getpc(self)       (__byte_t const *)(self)->lcs_pc
-#define lcpustate_setpc(self, pc)   (void)((self)->lcs_pc = (__uintptr_t)__COMPILER_REQTYPE(void const *, pc))
+#define lcpustate_getr4(self)         (self)->lcs_r4
+#define lcpustate_setr4(self, r4)     (void)((self)->lcs_r4 = (r4))
+#define lcpustate_getr5(self)         (self)->lcs_r5
+#define lcpustate_setr5(self, r5)     (void)((self)->lcs_r5 = (r5))
+#define lcpustate_getr6(self)         (self)->lcs_r6
+#define lcpustate_setr6(self, r6)     (void)((self)->lcs_r6 = (r6))
+#define lcpustate_getr7(self)         (self)->lcs_r7
+#define lcpustate_setr7(self, r7)     (void)((self)->lcs_r7 = (r7))
+#define lcpustate_getr8(self)         (self)->lcs_r8
+#define lcpustate_setr8(self, r8)     (void)((self)->lcs_r8 = (r8))
+#define lcpustate_getr9(self)         (self)->lcs_r9
+#define lcpustate_setr9(self, r9)     (void)((self)->lcs_r9 = (r9))
+#define lcpustate_getr10(self)        (self)->lcs_r10
+#define lcpustate_setr10(self, r10)   (void)((self)->lcs_r10 = (r10))
+#define lcpustate_getr11(self)        (self)->lcs_r11
+#define lcpustate_setr11(self, r11)   (void)((self)->lcs_r11 = (r11))
+#define lcpustate_getsp(self)         (__byte_t *)(self)->lcs_sp
+#define lcpustate_setsp(self, sp)     (void)((self)->lcs_sp = (__uintptr_t)__COMPILER_REQTYPE(void *, sp))
+/* NOTE: pc_arm: includes thumb bit masked as `0x1' */
+#define lcpustate_getpc_arm(self)      (self)->lcs_pc
+#define lcpustate_setpc_arm(self, apc) (void)((self)->lcs_pc = (apc))
+#define lcpustate_getpc(self)          (__byte_t const *)((self)->lcs_pc & ~1)
+#define lcpustate_isthumb(self)        ((self)->lcs_pc & 1)
 
 
 
@@ -528,7 +529,8 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(lcpustate_to_ucpustate_ex)(struct lcpustate const *__restrict __src,
                                          struct ucpustate *__restrict __dst,
                                          __uint32_t __r0, __uint32_t __r1, __uint32_t __r2,
-                                         __uint32_t __r3, __uint32_t __r12, __uint32_t __cpsr) {
+                                         __uint32_t __r3, __uint32_t __r12, void const *__lr,
+                                         __uint32_t __cpsr) {
 	ucpustate_setr0(__dst, __r0);
 	ucpustate_setr1(__dst, __r1);
 	ucpustate_setr2(__dst, __r2);
@@ -543,7 +545,7 @@ __NOTHROW_NCX(lcpustate_to_ucpustate_ex)(struct lcpustate const *__restrict __sr
 	ucpustate_setr11(__dst, lcpustate_getr11(__src));
 	ucpustate_setr12(__dst, __r12);
 	ucpustate_setsp(__dst, lcpustate_getsp(__src));
-	ucpustate_setlr(__dst, lcpustate_getlr(__src));
+	ucpustate_setlr(__dst, __lr);
 	ucpustate_setpc(__dst, lcpustate_getpc(__src));
 	ucpustate_setcpsr(__dst, __cpsr);
 }
@@ -552,7 +554,7 @@ __FORCELOCAL __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(lcpustate_to_fcpustate_ex)(struct lcpustate const *__restrict __src,
                                          struct fcpustate *__restrict __dst,
                                          __uint32_t __r0, __uint32_t __r1, __uint32_t __r2,
-                                         __uint32_t __r3, __uint32_t __r12, __uint32_t __cpsr,
+                                         __uint32_t __r3, __uint32_t __r12, void const *__lr, __uint32_t __cpsr,
                                          __uint32_t __R8_fiq, __uint32_t __R9_fiq, __uint32_t __R10_fiq,
                                          __uint32_t __R11_fiq, __uint32_t __R12_fiq, void *__SP_fiq,
                                          void const *__LR_fiq, __uint32_t __SPSR_fiq, void *__SP_irq,
@@ -560,7 +562,7 @@ __NOTHROW_NCX(lcpustate_to_fcpustate_ex)(struct lcpustate const *__restrict __sr
                                          void const *__LR_svc, __uint32_t __SPSR_svc, void *__SP_abt,
                                          void const *__LR_abt, __uint32_t __SPSR_abt, void *__SP_und,
                                          void const *__LR_und, __uint32_t __SPSR_und) {
-	lcpustate_to_ucpustate_ex(__src, &__dst->fcs_usr, __r0, __r1, __r2, __r3, __r12, __cpsr);
+	lcpustate_to_ucpustate_ex(__src, &__dst->fcs_usr, __r0, __r1, __r2, __r3, __r12, __lr, __cpsr);
 	fcpustate_setr8_fiq(__dst, __R8_fiq);
 	fcpustate_setr9_fiq(__dst, __R9_fiq);
 	fcpustate_setr10_fiq(__dst, __R10_fiq);
@@ -591,15 +593,29 @@ __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(lcpustate_to_fcpustate)(struct lcpustate const *__restrict __src,
                                       struct fcpustate *__restrict __dst);
 #else /* __INTELLISENSE__ */
+#ifdef NDEBUG
 #define lcpustate_to_ucpustate(src, dst) \
-	lcpustate_to_ucpustate_ex(src, dst, 0, 0, 0, 0, 0, __rdcpsr())
+	lcpustate_to_ucpustate_ex(src, dst, 0, 0, 0, 0, 0, 0, __rdcpsr())
 #define lcpustate_to_fcpustate(src, dst)                                                 \
-	lcpustate_to_fcpustate_ex(src, dst, 0, 0, 0, 0, 0, __rdcpsr(),                       \
+	lcpustate_to_fcpustate_ex(src, dst, 0, 0, 0, 0, 0, 0, __rdcpsr(),                    \
 	                          __rdR8_fiq(), __rdR9_fiq(), __rdR10_fiq(), __rdR11_fiq(),  \
 	                          __rdR12_fiq(), __rdSP_fiq(), __rdLR_fiq(), __rdSPSR_fiq(), \
 	                          __rdSP_irq(), __rdLR_irq(), __rdSPSR_irq(), __rdSP_svc(),  \
 	                          __rdLR_svc(), __rdSPSR_svc(), __rdSP_abt(), __rdLR_abt(),  \
 	                          __rdSPSR_abt(), __rdSP_und(), __rdLR_und(), __rdSPSR_und())
+#else /* NDEBUG */
+#define lcpustate_to_ucpustate(src, dst)                                                \
+	lcpustate_to_ucpustate_ex(src, dst, 0xCCCCCCCC, 0xCCCCCCCC, 0xCCCCCCCC, 0xCCCCCCCC, \
+	                          0xCCCCCCCC, (void const *)0xCCCCCCCC, __rdcpsr())
+#define lcpustate_to_fcpustate(src, dst)                                                 \
+	lcpustate_to_fcpustate_ex(src, dst, 0xCCCCCCCC, 0xCCCCCCCC, 0xCCCCCCCC, 0xCCCCCCCC,  \
+	                          0xCCCCCCCC, (void const *)0xCCCCCCCC, __rdcpsr(),          \
+	                          __rdR8_fiq(), __rdR9_fiq(), __rdR10_fiq(), __rdR11_fiq(),  \
+	                          __rdR12_fiq(), __rdSP_fiq(), __rdLR_fiq(), __rdSPSR_fiq(), \
+	                          __rdSP_irq(), __rdLR_irq(), __rdSPSR_irq(), __rdSP_svc(),  \
+	                          __rdLR_svc(), __rdSPSR_svc(), __rdSP_abt(), __rdLR_abt(),  \
+	                          __rdSPSR_abt(), __rdSP_und(), __rdLR_und(), __rdSPSR_und())
+#endif /* !NDEBUG */
 #endif /* !__INTELLISENSE__ */
 
 __FORCELOCAL __ATTR_NONNULL((1, 2)) void
@@ -614,8 +630,7 @@ __NOTHROW_NCX(ucpustate_to_lcpustate)(struct ucpustate const *__restrict __src,
 	lcpustate_setr10(__dst, ucpustate_getr10(__src));
 	lcpustate_setr11(__dst, ucpustate_getr11(__src));
 	lcpustate_setsp(__dst, ucpustate_getsp(__src));
-	lcpustate_setlr(__dst, ucpustate_getlr(__src));
-	lcpustate_setpc(__dst, ucpustate_getpc(__src));
+	lcpustate_setpc_arm(__dst, __src->ucs_pc | ((__src->ucs_cpsr & 0x20) >> 5));
 }
 
 __FORCELOCAL __ATTR_NONNULL((1)) void
@@ -722,12 +737,12 @@ __NOTHROW_NCX(__Xcpustate_to_fcpustate)(struct fcpustate *__restrict __dst,
 	                         ucpustate_getr8(src), ucpustate_getr9(src), ucpustate_getr10(src),  \
 	                         ucpustate_getr11(src), ucpustate_getr12(src), ucpustate_getsp(src), \
 	                         ucpustate_getlr(src), ucpustate_getpc(src), ucpustate_getcpsr(src))
-#define lcpustate_to_fcpustate(src, dst)                                                        \
-	__Xcpustate_to_fcpustate(dst, 0, 0, 0, 0, lcpustate_getr4(src),                             \
-	                         lcpustate_getr5(src), lcpustate_getr6(src), lcpustate_getr7(src),  \
-	                         lcpustate_getr8(src), lcpustate_getr9(src), lcpustate_getr10(src), \
-	                         lcpustate_getr11(src), 0, lcpustate_getsp(src),                    \
-	                         lcpustate_getlr(src), lcpustate_getpc(src), __rdcpsr())
+#define lcpustate_to_fcpustate(src, dst)                                                              \
+	__Xcpustate_to_fcpustate(dst, 0, 0, 0, 0, lcpustate_getr4(src),                                   \
+	                         lcpustate_getr5(src), lcpustate_getr6(src), lcpustate_getr7(src),        \
+	                         lcpustate_getr8(src), lcpustate_getr9(src), lcpustate_getr10(src),       \
+	                         lcpustate_getr11(src), 0, lcpustate_getsp(src), 0, lcpustate_getpc(src), \
+	                         (__rdcpsr() & ~0x20) | (lcpustate_isthumb(src) ? 0x20 : 0))
 
 __FORCELOCAL __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(fcpustate_to_ucpustate)(struct fcpustate const *__restrict __src,
@@ -763,8 +778,7 @@ __NOTHROW_NCX(fcpustate_to_lcpustate)(struct fcpustate const *__restrict __src,
 	lcpustate_setr10(__dst, fcpustate_getr10(__src));
 	lcpustate_setr11(__dst, fcpustate_getr11(__src));
 	lcpustate_setsp(__dst, fcpustate_getsp(__src));
-	lcpustate_setlr(__dst, fcpustate_getlr(__src));
-	lcpustate_setpc(__dst, fcpustate_getpc(__src));
+	lcpustate_setpc_arm(__dst, __src->fcs_usr.ucs_pc | ((__src->fcs_usr.ucs_cpsr & 0x20) >> 5));
 }
 
 __DECL_END

@@ -259,6 +259,7 @@ INTERN_FUNCTION(libc___acheck)
 	movP   %Psp, %R_fcall0P
 	INTERN(libc_assertion_check_core)
 	call   libc_assertion_check_core
+	nop    /* For tracebacks */
 
 .Lload_kcpustate_Pax:
 	.cfi_def_cfa %Pax, 0

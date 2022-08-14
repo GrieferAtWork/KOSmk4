@@ -98,8 +98,8 @@ __ASM_L(.endm)
  * Only canonical register name may be used (though those are
  * allowed to be case-insensitive) */
 __ASM_L(.macro .cfi_pushregs args:vararg)
-__ASM_L(	.ifnc_startswith "\args","{";.error ".cfi_pushregs: register list '\args' doesn't start '{'";.endif)
-__ASM_L(	.ifnc_endswith "\args","}";.error ".cfi_pushregs: register list '\args' doesn't end '}'";.endif)
+__ASM_L(	.ifnc_startswith "\args","{";.error ".cfi_pushregs: register list '\args' doesn't start with '{'";.endif)
+__ASM_L(	.ifnc_endswith "\args","}";.error ".cfi_pushregs: register list '\args' doesn't end with '}'";.endif)
 __ASM_L(	.ifc_contains "\args","-";.error ".cfi_pushregs: register list '\args' must not contain '-'";.endif)
 __ASM_L(	.Lcfi_pushregs_offset = 0)
 /*[[[deemon
@@ -192,8 +192,8 @@ __ASM_L(.endm)
  * Only canonical register name may be used (though those are allowed
  * to be case-insensitive) */
 __ASM_L(.macro .cfi_popregs args:vararg)
-__ASM_L(	.ifnc_startswith "\args","{";.error ".cfi_popregs: register list '\args' doesn't start '{'";.endif)
-__ASM_L(	.ifnc_endswith "\args","}";.error ".cfi_popregs: register list '\args' doesn't end '}'";.endif)
+__ASM_L(	.ifnc_startswith "\args","{";.error ".cfi_popregs: register list '\args' doesn't start with '{'";.endif)
+__ASM_L(	.ifnc_endswith "\args","}";.error ".cfi_popregs: register list '\args' doesn't end with '}'";.endif)
 __ASM_L(	.ifc_contains "\args","-";.error ".cfi_popregs: register list '\args' must not contain '-'";.endif)
 __ASM_L(	.Lcfi_popregs_offset = 0)
 /*[[[deemon
@@ -280,6 +280,89 @@ __ASM_L(		.cfi_adjust_cfa_offset .Lcfi_popregs_offset)
 __ASM_L(	.endif)
 __ASM_L(.endm)
 
+
+/* >> .cfi_pushregs_nosave {r0, r1, r2, ...} */
+__ASM_L(.macro .cfi_pushregs_nosave args:vararg)
+__ASM_L(	.ifnc_startswith "\args","{";.error ".cfi_pushregs_nosave: register list '\args' doesn't start with '{'";.endif)
+__ASM_L(	.ifnc_endswith "\args","}";.error ".cfi_pushregs_nosave: register list '\args' doesn't end with '}'";.endif)
+__ASM_L(	.ifc_contains "\args","-";.error ".cfi_pushregs_nosave: register list '\args' must not contain '-'";.endif)
+__ASM_L(	.Lcfi_pushregs_offset = 0)
+/*[[[deemon
+local REGS = {
+	("r0", 0), ("r1", 1), ("r2", 2), ("r3", 3),
+	("r4", 4), ("r5", 5), ("r6", 6), ("r7", 7),
+	("r8", 8), ("r9", 9), ("r10", 10), ("r11", 11),
+	("r12", 12), ("sp", 13), ("lr", 14), ("pc", 15)
+};
+for (local name, id: REGS) {
+	print('__ASM_L(	.ifc_ibcontains "\\args",', name, ';'),;
+	print('.Lcfi_pushregs_offset = .Lcfi_pushregs_offset + 4;.endif)');
+}
+]]]*/
+__ASM_L(	.ifc_ibcontains "\args",r0;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset + 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r1;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset + 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r2;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset + 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r3;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset + 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r4;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset + 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r5;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset + 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r6;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset + 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r7;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset + 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r8;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset + 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r9;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset + 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r10;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset + 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r11;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset + 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r12;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset + 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",sp;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset + 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",lr;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset + 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",pc;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset + 4;.endif)
+/*[[[end]]]*/
+__ASM_L(	.if .Lcfi_pushregs_offset != 0)
+__ASM_L(		.cfi_adjust_cfa_offset .Lcfi_pushregs_offset)
+__ASM_L(	.endif)
+__ASM_L(.endm)
+
+/* >> .cfi_popregs_noload {r0, r1, r2, ...} */
+__ASM_L(.macro .cfi_popregs_noload args:vararg)
+__ASM_L(	.ifnc_startswith "\args","{";.error ".cfi_popregs_noload: register list '\args' doesn't start with '{'";.endif)
+__ASM_L(	.ifnc_endswith "\args","}";.error ".cfi_popregs_noload: register list '\args' doesn't end with '}'";.endif)
+__ASM_L(	.ifc_contains "\args","-";.error ".cfi_popregs_noload: register list '\args' must not contain '-'";.endif)
+__ASM_L(	.Lcfi_popregs_offset = 0)
+/*[[[deemon
+local REGS = {
+	("r0", 0), ("r1", 1), ("r2", 2), ("r3", 3),
+	("r4", 4), ("r5", 5), ("r6", 6), ("r7", 7),
+	("r8", 8), ("r9", 9), ("r10", 10), ("r11", 11),
+	("r12", 12), ("sp", 13), ("lr", 14), ("pc", 15)
+};
+for (local name, id: REGS) {
+	print('__ASM_L(	.ifc_ibcontains "\\args",', name, ';'),;
+	print('.Lcfi_pushregs_offset = .Lcfi_pushregs_offset - 4;.endif)');
+}
+]]]*/
+__ASM_L(	.ifc_ibcontains "\args",r0;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset - 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r1;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset - 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r2;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset - 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r3;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset - 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r4;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset - 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r5;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset - 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r6;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset - 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r7;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset - 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r8;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset - 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r9;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset - 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r10;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset - 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r11;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset - 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",r12;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset - 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",sp;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset - 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",lr;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset - 4;.endif)
+__ASM_L(	.ifc_ibcontains "\args",pc;.Lcfi_pushregs_offset = .Lcfi_pushregs_offset - 4;.endif)
+/*[[[end]]]*/
+__ASM_L(	.if .Lcfi_popregs_offset != 0)
+__ASM_L(		.cfi_adjust_cfa_offset .Lcfi_popregs_offset)
+__ASM_L(	.endif)
+__ASM_L(.endm)
+
+
+
 /* >> push_cfi_r {r0, r1, r2, ...}
  * Combination of `push' + `.cfi_pushregs' */
 __ASM_L(.macro push_cfi_r args:vararg)
@@ -292,6 +375,20 @@ __ASM_L(.endm)
 __ASM_L(.macro pop_cfi_r args:vararg)
 __ASM_L(	pop __ASM_ARG(\args))
 __ASM_L(	.cfi_popregs __ASM_ARG(\args))
+__ASM_L(.endm)
+
+/* >> push_cfi {r0, r1, r2, ...}
+ * Combination of `push' + `.cfi_pushregs_nosave' */
+__ASM_L(.macro push_cfi args:vararg)
+__ASM_L(	push __ASM_ARG(\args))
+__ASM_L(	.cfi_pushregs_nosave __ASM_ARG(\args))
+__ASM_L(.endm)
+
+/* >> pop_cfi {r0, r1, r2, ...}
+ * Combination of `pop' + `.cfi_popregs_noload' */
+__ASM_L(.macro pop_cfi args:vararg)
+__ASM_L(	pop __ASM_ARG(\args))
+__ASM_L(	.cfi_popregs_noload __ASM_ARG(\args))
 __ASM_L(.endm)
 
 

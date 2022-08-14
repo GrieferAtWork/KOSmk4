@@ -17,66 +17,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef _ARM_KOS_BITS_VA_LIST_STRUCT_H
+#define _ARM_KOS_BITS_VA_LIST_STRUCT_H 1
 
-import Architecture from ..comp;
+#include <__stdinc.h>
+#include <hybrid/host.h>
+#include <hybrid/typecore.h>
 
-global final ARCH = Architecture(
-	name:" arm",
-	registers: {
-		/* GP Registers */
-		"r0"       : 0,
-		"r1"       : 1,
-		"r2"       : 2,
-		"r3"       : 3,
-		"r4"       : 4,
-		"r5"       : 5,
-		"r6"       : 6,
-		"r7"       : 7,
-		"r8"       : 8,
-		"r9"       : 9,
-		"r10"      : 10,
-		"r11"      : 11,
-		"r12"      : 12,
-		"r13"      : 13, "sp" : 13,
-		"r14"      : 14, "lr" : 14,
-		"r15"      : 15, "pc" : 15,
-		"cpsr"     : 128, "apsr" : 128,
-		"spsr_fiq" : 129,
-		"spsr_irq" : 130,
-		"spsr_abt" : 131,
-		"spsr_und" : 132,
-		"spsr_svc" : 133,
-		"r8_usr"   : 144,
-		"r9_usr"   : 145,
-		"r10_usr"  : 146,
-		"r11_usr"  : 147,
-		"r12_usr"  : 148,
-		"r13_usr"  : 149,
-		"r14_usr"  : 150,
-		"r8_fiq"   : 151,
-		"r9_fiq"   : 152,
-		"r10_fiq"  : 153,
-		"r11_fiq"  : 154,
-		"r12_fiq"  : 155,
-		"r13_fiq"  : 156,
-		"r14_fiq"  : 157,
-		"r13_irq"  : 158,
-		"r14_irq"  : 159,
-		"r13_abt"  : 160,
-		"r14_abt"  : 161,
-		"r13_und"  : 162,
-		"r14_und"  : 163,
-		"r13_svc"  : 164,
-		"r14_svc"  : 165,
-	},
-	sysmacroFiles: {
-		"kos/include/arm-kos/asm/cpu-flags.h",
-		"kos/include/arm-kos/kos/kernel/bits/cpu-state.h",
-		"kos/include/arm-kos/asm/pagesize.h",
-		"kos/include/arm-kos/asm/syscalls.h",
-		"kos/include/asm/os/sigset.h",
-	},
-	addrsize: 4,
-	bigEndian: false, /* TODO: depends on CPSR_E */
-	caseInsensitiveRegisterNames: true,
-);
+/* typedef struct va_list_struct *va_list; */
+#ifdef __arm__
+#define arm_va_list_struct va_list_struct
+#endif /* !__arm__ */
+
+#ifdef __CC__
+__DECL_BEGIN
+
+struct arm_va_list_struct {
+	/* Inline array of  4-byte-aligned arguments.  - va_arg() modifies  the value  of the  given
+	 * va_list object itself (which is a pointer) to point to the next argument before returning
+	 * the previous one. - The size of  any given argument `T' is always  `(sizeof(T) + 3) & ~3' */
+	__UINT32_TYPE__ vl_args[1024];
+};
+
+__DECL_END
+#endif /* __CC__ */
+
+#endif /* !_ARM_KOS_BITS_VA_LIST_STRUCT_H */
