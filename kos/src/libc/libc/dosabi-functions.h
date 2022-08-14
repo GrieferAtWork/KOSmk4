@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83ba2136 */
+/* HASH CRC-32:0xad5359d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2997,10 +2997,11 @@ DFUN(".text.crt.dos.sched.msg", libd_msgrcv, libc_msgrcv, TI, 5, TD, TP, TI, TP,
 DFUN(".text.crt.dos.sched.msg", libd_msgsnd, libc_msgsnd, TD, 4, TD, TP, TI, TD)
 
 /* sys.perm */
-#ifdef __port_t
+#include <bits/typesizes.h>
+#ifdef __SIZEOF_PORT_T__
 DFUN(".text.crt.dos.system.ioperm", libd_ioperm, libc_ioperm, TD, 3, TP, TP, TD)
 DFUN(".text.crt.dos.system.ioperm", libd_iopl, libc_iopl, TD, 1, TD)
-#endif /* __port_t */
+#endif /* __SIZEOF_PORT_T__ */
 
 /* sys.poll */
 DFUN(".text.crt.dos.io.poll", libd_poll, libc_poll, TD, 3, TP, TP, TD)

@@ -40,14 +40,14 @@ __SYSDECL_BEGIN
 @@Change I/O port permissions for a specific I/O port range
 [[decl_include("<features.h>", "<hybrid/typecore.h>")]]
 [[export_alias("__ioperm", "__libc_ioperm")]]
-[[crt_impl_if($extended_include_prefix("<bits/types.h>")!defined(__KERNEL__) && defined(__port_t))]]
+[[crt_impl_if($extended_include_prefix("<bits/typesizes.h>")!defined(__KERNEL__) && defined(__SIZEOF_PORT_T__))]]
 int ioperm($ulongptr_t from, $ulongptr_t num, __STDC_INT_AS_UINT_T turn_on);
 
 @@>> iopl(2)
 @@Change I/O port permissions for all I/O ports
 [[decl_include("<features.h>")]]
 [[export_alias("__iopl", "__libc_iopl")]]
-[[crt_impl_if($extended_include_prefix("<bits/types.h>")!defined(__KERNEL__) && defined(__port_t))]]
+[[crt_impl_if($extended_include_prefix("<bits/typesizes.h>")!defined(__KERNEL__) && defined(__SIZEOF_PORT_T__))]]
 int iopl(__STDC_INT_AS_UINT_T level);
 
 %{

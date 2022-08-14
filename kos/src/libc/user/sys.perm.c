@@ -23,15 +23,15 @@
 #include "../api.h"
 /**/
 
-#include <bits/types.h>
+#include <bits/typesizes.h>
 
 #include "../libc/syscalls.h"
 #include "sys.perm.h"
 
 DECL_BEGIN
 
-/*[[[head:libc_ioperm,hash:CRC-32=0xb708a59b]]]*/
-#ifdef __port_t
+/*[[[head:libc_ioperm,hash:CRC-32=0x1025f9d0]]]*/
+#ifdef __SIZEOF_PORT_T__
 /* >> ioperm(2)
  * Change I/O port permissions for a specific I/O port range */
 INTERN ATTR_SECTION(".text.crt.system.ioperm") int
@@ -56,8 +56,8 @@ NOTHROW_NCX(LIBCCALL libc_ioperm)(ulongptr_t from,
 #endif /* MAGIC:impl_if */
 /*[[[end:libc_ioperm]]]*/
 
-/*[[[head:libc_iopl,hash:CRC-32=0xa8ec3420]]]*/
-#ifdef __port_t
+/*[[[head:libc_iopl,hash:CRC-32=0x19b2b074]]]*/
+#ifdef __SIZEOF_PORT_T__
 /* >> iopl(2)
  * Change I/O port permissions for all I/O ports */
 INTERN ATTR_SECTION(".text.crt.system.ioperm") int
@@ -77,16 +77,16 @@ NOTHROW_NCX(LIBCCALL libc_iopl)(__STDC_INT_AS_UINT_T level)
 /*[[[end:libc_iopl]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0xe1ef953c]]]*/
-#include <bits/types.h>
-#ifdef __port_t
+/*[[[start:exports,hash:CRC-32=0x49144702]]]*/
+#include <bits/typesizes.h>
+#ifdef __SIZEOF_PORT_T__
 DEFINE_PUBLIC_ALIAS(__ioperm, libc_ioperm);
 DEFINE_PUBLIC_ALIAS(__libc_ioperm, libc_ioperm);
 DEFINE_PUBLIC_ALIAS(ioperm, libc_ioperm);
 DEFINE_PUBLIC_ALIAS(__iopl, libc_iopl);
 DEFINE_PUBLIC_ALIAS(__libc_iopl, libc_iopl);
 DEFINE_PUBLIC_ALIAS(iopl, libc_iopl);
-#endif /* __port_t */
+#endif /* __SIZEOF_PORT_T__ */
 /*[[[end:exports]]]*/
 
 DECL_END

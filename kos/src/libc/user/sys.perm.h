@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb46bca76 */
+/* HASH CRC-32:0x31c4d7a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,15 +30,15 @@
 
 DECL_BEGIN
 
-#include <bits/types.h>
-#if !defined(__KERNEL__) && defined(__port_t)
+#include <bits/typesizes.h>
+#if !defined(__KERNEL__) && defined(__SIZEOF_PORT_T__)
 /* >> ioperm(2)
  * Change I/O port permissions for a specific I/O port range */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_ioperm)(ulongptr_t from, ulongptr_t num, __STDC_INT_AS_UINT_T turn_on);
 /* >> iopl(2)
  * Change I/O port permissions for all I/O ports */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_iopl)(__STDC_INT_AS_UINT_T level);
-#endif /* !__KERNEL__ && __port_t */
+#endif /* !__KERNEL__ && __SIZEOF_PORT_T__ */
 
 DECL_END
 

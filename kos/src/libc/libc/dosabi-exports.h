@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x665656f9 */
+/* HASH CRC-32:0x3f3b3780 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3183,15 +3183,15 @@ DEFINE_PUBLIC_ALIAS(DOS$__libc_msgsnd, libd_msgsnd);
 DEFINE_PUBLIC_ALIAS(DOS$msgsnd, libd_msgsnd);
 
 /* sys.perm */
-#include <bits/types.h>
-#ifdef __port_t
+#include <bits/typesizes.h>
+#ifdef __SIZEOF_PORT_T__
 DEFINE_PUBLIC_ALIAS(DOS$__ioperm, libd_ioperm);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_ioperm, libd_ioperm);
 DEFINE_PUBLIC_ALIAS(DOS$ioperm, libd_ioperm);
 DEFINE_PUBLIC_ALIAS(DOS$__iopl, libd_iopl);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_iopl, libd_iopl);
 DEFINE_PUBLIC_ALIAS(DOS$iopl, libd_iopl);
-#endif /* __port_t */
+#endif /* __SIZEOF_PORT_T__ */
 
 /* sys.poll */
 DEFINE_PUBLIC_ALIAS(DOS$__poll, libd_poll);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1bae576 */
+/* HASH CRC-32:0x56b4844b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2046,11 +2046,11 @@
 #define __CRT_HAVE_DOS$insque
 #define __CRT_HAVE_DOS$ioctl
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#include <bits/types.h>
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && defined(__port_t)
+#include <bits/typesizes.h>
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__) && defined(__SIZEOF_PORT_T__)
 #define __CRT_HAVE_DOS$ioperm
 #define __CRT_HAVE_DOS$iopl
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __port_t */
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __SIZEOF_PORT_T__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$iruserok
 #define __CRT_HAVE_DOS$iruserok_af
@@ -6343,10 +6343,10 @@
 #define __CRT_HAVE_insque
 #define __CRT_HAVE_ioctl
 #endif /* !__KERNEL__ */
-#if !defined(__KERNEL__) && defined(__port_t)
+#if !defined(__KERNEL__) && defined(__SIZEOF_PORT_T__)
 #define __CRT_HAVE_ioperm
 #define __CRT_HAVE_iopl
-#endif /* !__KERNEL__ && __port_t */
+#endif /* !__KERNEL__ && __SIZEOF_PORT_T__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_iruserok
 #define __CRT_HAVE_iruserok_af
