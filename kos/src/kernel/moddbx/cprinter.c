@@ -36,6 +36,7 @@
 #include <kernel/mman.h>
 #include <kernel/mman/mfile.h>
 #include <kernel/mman/mnode.h>
+#include <kernel/mman/mpart.h>
 #include <kernel/types.h>
 #include <sched/task.h>
 

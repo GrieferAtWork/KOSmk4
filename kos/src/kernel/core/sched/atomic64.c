@@ -75,11 +75,11 @@ NOTHROW(FCALL lockfor)(atomic64_t const *__restrict self) {
 
 
 #ifdef CONFIG_NO_SMP
-#define _LOCK_EX(...) \
-	do {              \
+#define _LOCK_EX(...)           \
+	do {                        \
 		preemption_flag_t _was; \
 		preemption_pushoff(&_was)
-#define _UNLOCK_EX(...)       \
+#define _UNLOCK_EX(...)        \
 		preemption_pop(&_was); \
 	}	__WHILE0
 #else /* CONFIG_NO_SMP */
@@ -94,8 +94,8 @@ NOTHROW(FCALL lockfor)(atomic64_t const *__restrict self) {
 			preemption_pop(&_was);                   \
 			task_tryyield_or_pause();                \
 		}
-#define _UNLOCK_EX(release)   \
-		release(_lock);       \
+#define _UNLOCK_EX(release)    \
+		release(_lock);        \
 		preemption_pop(&_was); \
 	}	__WHILE0
 #endif /* !CONFIG_NO_SMP */

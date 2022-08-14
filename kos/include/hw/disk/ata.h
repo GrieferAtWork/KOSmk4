@@ -123,6 +123,7 @@ __DECL_BEGIN
 
 
 #ifdef __CC__
+#ifdef __port_t
 struct ata_ports {
 	__port_t a_bus;  /* I/O port for the ATA bus. */
 	__port_t a_ctrl; /* Device control register/Alternate status ports. */
@@ -140,6 +141,7 @@ struct ide_ports {
 	__port_t i_dma_ctrl;       /* DMA controller port (or (port_t)-1 if DMA isn't supported)
 	                            * NOTE: Documentation calls th(is|ese) the `Bus Master Register(s)' */
 };
+#endif /* __port_t */
 #endif /* __CC__ */
 
 

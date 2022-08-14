@@ -27,6 +27,7 @@
 #include <kos/anno.h>
 #include <sys/io.h>
 
+#ifdef __port_t
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -191,5 +192,6 @@ __FORCELOCAL void vga_wattr_res(__port_t __is1_rX, __uint8_t __reg,
 
 __DECL_END
 #endif /* __CC__ */
+#endif /* __port_t */
 
 #endif /* !_LIBSVGADRV_UTIL_VGAIO_H */

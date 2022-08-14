@@ -203,11 +203,11 @@ NOTHROW(KCALL untraced_kmalloc_trace_nx)(void *base, size_t UNUSED(num_bytes),
 	return base;
 }
 
-INTERN NOBLOCK ATTR_CONST void
+INTERN NOBLOCK void
 NOTHROW(KCALL untraced_kmalloc_untrace)(void *UNUSED(ptr)) {
 }
 
-INTERN NOBLOCK ATTR_CONST void
+INTERN NOBLOCK void
 NOTHROW(KCALL untraced_kmalloc_untrace_n)(void *UNUSED(ptr),
                                           size_t UNUSED(num_bytes)) {
 }

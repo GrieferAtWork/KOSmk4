@@ -106,6 +106,7 @@
 
 
 /* Get/Set BGA (BochsGraphicsAdapter) registers. */
+#ifdef __port_t
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -128,6 +129,7 @@ __FORCELOCAL void dispi_wrreg(__uint16_t __index, __uint16_t __val) {
 
 __DECL_END
 #endif /* __CC__ */
+#endif /* __port_t */
 
 
 
