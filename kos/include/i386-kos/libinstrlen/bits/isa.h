@@ -125,15 +125,15 @@ __DECL_BEGIN
 
 /* Return the ISA type, given a CPU state structure. */
 #ifdef __x86_64__
-#define instrlen_isa_from_icpustate(s) (likely(icpustate_is64bit(s)) ? INSTRLEN_ISA_X86_64 : INSTRLEN_ISA_I386)
-#define instrlen_isa_from_scpustate(s) (likely(scpustate_is64bit(s)) ? INSTRLEN_ISA_X86_64 : INSTRLEN_ISA_I386)
-#define instrlen_isa_from_ucpustate(s) (likely(ucpustate_is64bit(s)) ? INSTRLEN_ISA_X86_64 : INSTRLEN_ISA_I386)
+#define instrlen_isa_from_icpustate(s) (__likely(icpustate_is64bit(s)) ? INSTRLEN_ISA_X86_64 : INSTRLEN_ISA_I386)
+#define instrlen_isa_from_scpustate(s) (__likely(scpustate_is64bit(s)) ? INSTRLEN_ISA_X86_64 : INSTRLEN_ISA_I386)
+#define instrlen_isa_from_ucpustate(s) (__likely(ucpustate_is64bit(s)) ? INSTRLEN_ISA_X86_64 : INSTRLEN_ISA_I386)
 #define instrlen_isa_from_kcpustate(s) INSTRLEN_ISA_X86_64
 #define instrlen_isa_from_lcpustate(s) INSTRLEN_ISA_X86_64
-#define instrlen_isa_from_fcpustate(s) (likely(fcpustate_is64bit(s)) ? INSTRLEN_ISA_X86_64 : INSTRLEN_ISA_I386)
-#define instrlen_isa_from_unwind_getreg(reg_getter, state)                                 \
-	(likely(__KOS64_IS_CS64BIT(_instrlen_isa_getcs_from_unwind_getreg(reg_getter, state))) \
-	 ? INSTRLEN_ISA_X86_64                                                                 \
+#define instrlen_isa_from_fcpustate(s) (__likely(fcpustate_is64bit(s)) ? INSTRLEN_ISA_X86_64 : INSTRLEN_ISA_I386)
+#define instrlen_isa_from_unwind_getreg(reg_getter, state)                                   \
+	(__likely(__KOS64_IS_CS64BIT(_instrlen_isa_getcs_from_unwind_getreg(reg_getter, state))) \
+	 ? INSTRLEN_ISA_X86_64                                                                   \
 	 : INSTRLEN_ISA_I386)
 __LOCAL __uintptr_t
 _instrlen_isa_getcs_from_unwind_getreg(unsigned int (LIBUNWIND_CC *__reg_getter)(void const *__arg,
@@ -153,13 +153,13 @@ _instrlen_isa_getcs_from_unwind_getreg(unsigned int (LIBUNWIND_CC *__reg_getter)
 #define instrlen_isa_from_fcpustate(s)                     INSTRLEN_ISA_I386
 #define instrlen_isa_from_unwind_getreg(reg_getter, state) INSTRLEN_ISA_I386
 #else /* __I386_NO_VM86 */
-#define instrlen_isa_from_icpustate(s) (likely(!icpustate_isvm86(s)) ? INSTRLEN_ISA_I386 : INSTRLEN_ISA_8086)
-#define instrlen_isa_from_scpustate(s) (likely(!scpustate_isvm86(s)) ? INSTRLEN_ISA_I386 : INSTRLEN_ISA_8086)
-#define instrlen_isa_from_ucpustate(s) (likely(!ucpustate_isvm86(s)) ? INSTRLEN_ISA_I386 : INSTRLEN_ISA_8086)
-#define instrlen_isa_from_fcpustate(s) (likely(!fcpustate_isvm86(s)) ? INSTRLEN_ISA_I386 : INSTRLEN_ISA_8086)
-#define instrlen_isa_from_unwind_getreg(reg_getter, state)                                                             \
-	(likely(!(_instrlen_isa_geteflags_from_unwind_getreg(reg_getter, state) & __UINT32_C(0x00020000) /* EFLAGS_VM */)) \
-	 ? INSTRLEN_ISA_I386                                                                                               \
+#define instrlen_isa_from_icpustate(s) (__likely(!icpustate_isvm86(s)) ? INSTRLEN_ISA_I386 : INSTRLEN_ISA_8086)
+#define instrlen_isa_from_scpustate(s) (__likely(!scpustate_isvm86(s)) ? INSTRLEN_ISA_I386 : INSTRLEN_ISA_8086)
+#define instrlen_isa_from_ucpustate(s) (__likely(!ucpustate_isvm86(s)) ? INSTRLEN_ISA_I386 : INSTRLEN_ISA_8086)
+#define instrlen_isa_from_fcpustate(s) (__likely(!fcpustate_isvm86(s)) ? INSTRLEN_ISA_I386 : INSTRLEN_ISA_8086)
+#define instrlen_isa_from_unwind_getreg(reg_getter, state)                                                               \
+	(__likely(!(_instrlen_isa_geteflags_from_unwind_getreg(reg_getter, state) & __UINT32_C(0x00020000) /* EFLAGS_VM */)) \
+	 ? INSTRLEN_ISA_I386                                                                                                 \
 	 : INSTRLEN_ISA_8086)
 #endif /* !__I386_NO_VM86 */
 #define instrlen_isa_from_kcpustate(s) INSTRLEN_ISA_I386

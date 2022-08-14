@@ -17,30 +17,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBINSTRLEN_ISA_H
-#define _LIBINSTRLEN_ISA_H 1
+#ifndef _LIBINSTRLEN_BITS_INSTRLEN_H
+#define _LIBINSTRLEN_BITS_INSTRLEN_H 1
 
-#include <__stdinc.h>
+#undef LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH
+#if 0
+#define LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH(isa) \
+	(IS_ISA_ONE(isa) ? 4 : (IS_ISA_TWO(isa) ? 16 : 32))
+#endif
 
-/* Default ISA type. */
-#define INSTRLEN_ISA_DEFAULT 0
-
-/* Return the ISA type, given a CPU state structure. */
-#define instrlen_isa_from_icpustate(s) INSTRLEN_ISA_DEFAULT
-#define instrlen_isa_from_scpustate(s) INSTRLEN_ISA_DEFAULT
-#define instrlen_isa_from_ucpustate(s) INSTRLEN_ISA_DEFAULT
-#define instrlen_isa_from_kcpustate(s) INSTRLEN_ISA_DEFAULT
-#define instrlen_isa_from_lcpustate(s) INSTRLEN_ISA_DEFAULT
-#define instrlen_isa_from_fcpustate(s) INSTRLEN_ISA_DEFAULT
-#define instrlen_isa_from_unwind_getreg(/*unwind_getreg_t*/ reg_getter, /*void **/ state) \
-	INSTRLEN_ISA_DEFAULT
-
-#ifdef __CC__
-__DECL_BEGIN
-
-typedef unsigned int instrlen_isa_t;
-
-__DECL_END
-#endif /* __CC__ */
-
-#endif /* !_LIBINSTRLEN_ISA_H */
+#endif /* !_LIBINSTRLEN_BITS_INSTRLEN_H */

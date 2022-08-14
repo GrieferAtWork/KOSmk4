@@ -27,12 +27,8 @@
 
 #include <bits/types.h>
 
-#include <libinstrlen/bits/isa.h>
-
-#undef LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH
-#if defined(__arm__)
-#define LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH(isa) 4
-#endif /* ... */
+#include <libinstrlen/bits/instrlen.h> /* LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH */
+#include <libinstrlen/bits/isa.h>      /* ISA definitions */
 
 #ifdef __CC__
 __DECL_BEGIN

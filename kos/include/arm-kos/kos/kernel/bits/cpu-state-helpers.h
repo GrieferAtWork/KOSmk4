@@ -50,12 +50,13 @@ __DECL_BEGIN
 #define fcpustate_setcpsr(self, cpsr) (void)(*_fcpustate_p_cpsr(self) = (cpsr))
 
 /* Test for current execution mode */
-#define fcpustate_isusr(self) ((fcpustate_getcpsr(self) & CPSR_M) == CPSR_M_USR)
-#define fcpustate_isfiq(self) ((fcpustate_getcpsr(self) & CPSR_M) == CPSR_M_FIQ)
-#define fcpustate_isirq(self) ((fcpustate_getcpsr(self) & CPSR_M) == CPSR_M_IRQ)
-#define fcpustate_issvc(self) ((fcpustate_getcpsr(self) & CPSR_M) == CPSR_M_SVC)
-#define fcpustate_isabt(self) ((fcpustate_getcpsr(self) & CPSR_M) == CPSR_M_ABT)
-#define fcpustate_isund(self) ((fcpustate_getcpsr(self) & CPSR_M) == CPSR_M_UND)
+#define fcpustate_isusr(self)   ((fcpustate_getcpsr(self) & CPSR_M) == CPSR_M_USR)
+#define fcpustate_isfiq(self)   ((fcpustate_getcpsr(self) & CPSR_M) == CPSR_M_FIQ)
+#define fcpustate_isirq(self)   ((fcpustate_getcpsr(self) & CPSR_M) == CPSR_M_IRQ)
+#define fcpustate_issvc(self)   ((fcpustate_getcpsr(self) & CPSR_M) == CPSR_M_SVC)
+#define fcpustate_isabt(self)   ((fcpustate_getcpsr(self) & CPSR_M) == CPSR_M_ABT)
+#define fcpustate_isund(self)   ((fcpustate_getcpsr(self) & CPSR_M) == CPSR_M_UND)
+#define fcpustate_isthumb(self) (fcpustate_getcpsr(self) & CPSR_T)
 
 /* Pointer-to-register */
 #define _fcpustate_p_r0(self)       (&(self)->fcs_usr.ucs_r0)
@@ -301,12 +302,13 @@ __NOTHROW_NCX(_fcpustate_p_banked)(struct fcpustate const *__restrict __self) {
 #define ucpustate_setcpsr(self, cpsr) (void)((self)->ucs_cpsr = (cpsr))
 
 /* Test for current execution mode */
-#define ucpustate_isusr(self) ((ucpustate_getcpsr(self) & CPSR_M) == CPSR_M_USR)
-#define ucpustate_isfiq(self) ((ucpustate_getcpsr(self) & CPSR_M) == CPSR_M_FIQ)
-#define ucpustate_isirq(self) ((ucpustate_getcpsr(self) & CPSR_M) == CPSR_M_IRQ)
-#define ucpustate_issvc(self) ((ucpustate_getcpsr(self) & CPSR_M) == CPSR_M_SVC)
-#define ucpustate_isabt(self) ((ucpustate_getcpsr(self) & CPSR_M) == CPSR_M_ABT)
-#define ucpustate_isund(self) ((ucpustate_getcpsr(self) & CPSR_M) == CPSR_M_UND)
+#define ucpustate_isusr(self)   ((ucpustate_getcpsr(self) & CPSR_M) == CPSR_M_USR)
+#define ucpustate_isfiq(self)   ((ucpustate_getcpsr(self) & CPSR_M) == CPSR_M_FIQ)
+#define ucpustate_isirq(self)   ((ucpustate_getcpsr(self) & CPSR_M) == CPSR_M_IRQ)
+#define ucpustate_issvc(self)   ((ucpustate_getcpsr(self) & CPSR_M) == CPSR_M_SVC)
+#define ucpustate_isabt(self)   ((ucpustate_getcpsr(self) & CPSR_M) == CPSR_M_ABT)
+#define ucpustate_isund(self)   ((ucpustate_getcpsr(self) & CPSR_M) == CPSR_M_UND)
+#define ucpustate_isthumb(self) (ucpustate_getcpsr(self) & CPSR_T)
 
 /* Preemption control */
 #define ucpustate_getpreemption(self)          ((ucpustate_getcpsr(self) & __ARM_CPSR_PREEMPTION) != 0)
@@ -347,6 +349,7 @@ __NOTHROW_NCX(_fcpustate_p_banked)(struct fcpustate const *__restrict __self) {
 #define kcpustate_setlr               ucpustate_setlr
 #define kcpustate_getcpsr             ucpustate_getcpsr
 #define kcpustate_setcpsr             ucpustate_setcpsr
+#define kcpustate_isthumb             ucpustate_isthumb
 #define icpustate_getr0               ucpustate_getr0
 #define icpustate_setr0               ucpustate_setr0
 #define icpustate_getr1               ucpustate_getr1
@@ -383,6 +386,7 @@ __NOTHROW_NCX(_fcpustate_p_banked)(struct fcpustate const *__restrict __self) {
 #define icpustate_issvc               ucpustate_issvc
 #define icpustate_isabt               ucpustate_isabt
 #define icpustate_isund               ucpustate_isund
+#define icpustate_isthumb             ucpustate_isthumb
 #define scpustate_getr0               ucpustate_getr0
 #define scpustate_setr0               ucpustate_setr0
 #define scpustate_getr1               ucpustate_getr1
@@ -419,6 +423,7 @@ __NOTHROW_NCX(_fcpustate_p_banked)(struct fcpustate const *__restrict __self) {
 #define scpustate_issvc               ucpustate_issvc
 #define scpustate_isabt               ucpustate_isabt
 #define scpustate_isund               ucpustate_isund
+#define scpustate_isthumb             ucpustate_isthumb
 
 
 
