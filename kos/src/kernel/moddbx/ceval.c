@@ -72,14 +72,27 @@ for (local o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3",
 #include "include/malloc.h"
 
 #ifdef __IEEE854_LONG_DOUBLE_TYPE_IS_LONG_DOUBLE__
-#define strto854l strtold
+#define DBX_FLOAT_T __IEEE854_LONG_DOUBLE_TYPE__
+#define strto854l   strtold
 #elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_DOUBLE__)
-#define strto854l strtod
+#define DBX_FLOAT_T __IEEE854_LONG_DOUBLE_TYPE__
+#define strto854l   strtod
 #elif defined(__IEEE854_LONG_DOUBLE_TYPE_IS_FLOAT__)
-#define strto854l strtof
-#else /* ... */
-#define strto854l (__IEEE854_LONG_DOUBLE_TYPE__)strtold
-#endif /* !... */
+#define DBX_FLOAT_T __IEEE854_LONG_DOUBLE_TYPE__
+#define strto854l   strtof
+#elif defined(__IEEE854_LONG_DOUBLE_TYPE__)
+#define DBX_FLOAT_T __IEEE854_LONG_DOUBLE_TYPE__
+#define strto854l   (__IEEE854_LONG_DOUBLE_TYPE__)strtold
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_LONG_DOUBLE__)
+#define DBX_FLOAT_T __IEEE754_DOUBLE_TYPE__
+#define strto854l   strtold
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_DOUBLE__)
+#define DBX_FLOAT_T __IEEE754_DOUBLE_TYPE__
+#define strto854l   strtod
+#elif defined(__IEEE754_DOUBLE_TYPE_IS_FLOAT__)
+#define DBX_FLOAT_T __IEEE754_DOUBLE_TYPE__
+#define strto854l   strtof
+#endif /* ... */
 
 
 DECL_BEGIN
@@ -695,7 +708,7 @@ doparen_expr:
 	case CTOKEN_TOK_FLOAT: {
 		struct ctype *used_type;
 		char *endp;
-		__IEEE854_LONG_DOUBLE_TYPE__ value;
+		DBX_FLOAT_T value;
 		value     = strto854l(self->c_tokstart, &endp);
 		used_type = &ctype_ieee754_double;
 		if (endp != self->c_tokend) {
@@ -715,16 +728,21 @@ doparen_expr:
 				goto syn;
 			}
 		}
-		if (used_type == &ctype_ieee754_double) {
-			__IEEE754_DOUBLE_TYPE__ used_value;
-			used_value = (__IEEE754_DOUBLE_TYPE__)value;
+#ifdef CTYPE_KIND_IEEE854_LONG_DOUBLE
+		if (used_type == &ctype_ieee854_long_double) {
+			__IEEE854_LONG_DOUBLE_TYPE__ used_value;
+			used_value = (__IEEE854_LONG_DOUBLE_TYPE__)value;
 			result     = cexpr_pushdata_simple(used_type, &used_value);
-		} else if (used_type == &ctype_ieee754_float) {
+		} else
+#endif /* CTYPE_KIND_IEEE854_LONG_DOUBLE */
+		if (used_type == &ctype_ieee754_float) {
 			__IEEE754_FLOAT_TYPE__ used_value;
 			used_value = (__IEEE754_FLOAT_TYPE__)value;
 			result     = cexpr_pushdata_simple(used_type, &used_value);
 		} else {
-			result = cexpr_pushdata_simple(used_type, &value);
+			__IEEE754_DOUBLE_TYPE__ used_value;
+			used_value = (__IEEE754_DOUBLE_TYPE__)value;
+			result     = cexpr_pushdata_simple(used_type, &used_value);
 		}
 		yield();
 	}	break;
