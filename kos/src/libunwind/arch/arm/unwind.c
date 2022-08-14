@@ -46,8 +46,6 @@
 
 #include "../../unwind.h"
 
-/* TODO: Fix stuff in here!!! */
-
 DECL_BEGIN
 
 /* Functions we want to define: */
@@ -122,6 +120,13 @@ NOTHROW_NCX(CC libuw_unwind_setreg_implicit)(unwind_regno_t dw_regno,
 }
 
 
+/* Only for register numbers CFI_ARM_UNWIND_REGISTER_R0...CFI_ARM_UNWIND_REGISTER_PC: */
+#define DWREGNO_TO_UCPUSTATE_OFFSET(dw_regno)                                           \
+	((dw_regno) >= CFI_ARM_UNWIND_REGISTER_SP                                           \
+	 ? (uintptr_t)(((uintptr_t)CFI_ARM_UNWIND_REGISTER_PC - (uintptr_t)(dw_regno)) * 4) \
+	 : (uintptr_t)OFFSET_UCPUSTATE_R0 + (uintptr_t)(4 * (dw_regno)))
+
+
 /* Register state accessor base functions */
 LOCAL WUNUSED NONNULL((1)) uint32_t *
 NOTHROW_NCX(CC ucpustate_regptr)(struct ucpustate const *self,
@@ -130,23 +135,23 @@ NOTHROW_NCX(CC ucpustate_regptr)(struct ucpustate const *self,
 	switch (dw_regno) {
 
 	case CFI_ARM_UNWIND_REGISTER_R0 ... CFI_ARM_UNWIND_REGISTER_PC: {
-		static_assert(offsetof(struct ucpustate, ucs_r0) == CFI_ARM_UNWIND_REGISTER_R0 * 4);
-		static_assert(offsetof(struct ucpustate, ucs_r1) == CFI_ARM_UNWIND_REGISTER_R1 * 4);
-		static_assert(offsetof(struct ucpustate, ucs_r2) == CFI_ARM_UNWIND_REGISTER_R2 * 4);
-		static_assert(offsetof(struct ucpustate, ucs_r3) == CFI_ARM_UNWIND_REGISTER_R3 * 4);
-		static_assert(offsetof(struct ucpustate, ucs_r4) == CFI_ARM_UNWIND_REGISTER_R4 * 4);
-		static_assert(offsetof(struct ucpustate, ucs_r5) == CFI_ARM_UNWIND_REGISTER_R5 * 4);
-		static_assert(offsetof(struct ucpustate, ucs_r6) == CFI_ARM_UNWIND_REGISTER_R6 * 4);
-		static_assert(offsetof(struct ucpustate, ucs_r7) == CFI_ARM_UNWIND_REGISTER_R7 * 4);
-		static_assert(offsetof(struct ucpustate, ucs_r8) == CFI_ARM_UNWIND_REGISTER_R8 * 4);
-		static_assert(offsetof(struct ucpustate, ucs_r9) == CFI_ARM_UNWIND_REGISTER_R9 * 4);
-		static_assert(offsetof(struct ucpustate, ucs_r10) == CFI_ARM_UNWIND_REGISTER_R10 * 4);
-		static_assert(offsetof(struct ucpustate, ucs_r11) == CFI_ARM_UNWIND_REGISTER_R11 * 4);
-		static_assert(offsetof(struct ucpustate, ucs_r12) == CFI_ARM_UNWIND_REGISTER_R12 * 4);
-		static_assert(offsetof(struct ucpustate, ucs_sp) == CFI_ARM_UNWIND_REGISTER_SP * 4);
-		static_assert(offsetof(struct ucpustate, ucs_lr) == CFI_ARM_UNWIND_REGISTER_LR * 4);
-		static_assert(offsetof(struct ucpustate, ucs_pc) == CFI_ARM_UNWIND_REGISTER_PC * 4);
-		result = (uint32_t *)((byte_t *)self + (dw_regno * 4));
+		static_assert(offsetof(struct ucpustate, ucs_r0) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R0));
+		static_assert(offsetof(struct ucpustate, ucs_r1) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R1));
+		static_assert(offsetof(struct ucpustate, ucs_r2) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R2));
+		static_assert(offsetof(struct ucpustate, ucs_r3) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R3));
+		static_assert(offsetof(struct ucpustate, ucs_r4) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R4));
+		static_assert(offsetof(struct ucpustate, ucs_r5) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R5));
+		static_assert(offsetof(struct ucpustate, ucs_r6) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R6));
+		static_assert(offsetof(struct ucpustate, ucs_r7) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R7));
+		static_assert(offsetof(struct ucpustate, ucs_r8) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R8));
+		static_assert(offsetof(struct ucpustate, ucs_r9) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R9));
+		static_assert(offsetof(struct ucpustate, ucs_r10) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R10));
+		static_assert(offsetof(struct ucpustate, ucs_r11) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R11));
+		static_assert(offsetof(struct ucpustate, ucs_r12) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R12));
+		static_assert(offsetof(struct ucpustate, ucs_sp) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_SP));
+		static_assert(offsetof(struct ucpustate, ucs_lr) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_LR));
+		static_assert(offsetof(struct ucpustate, ucs_pc) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_PC));
+		result = (uint32_t *)((byte_t *)self + DWREGNO_TO_UCPUSTATE_OFFSET(dw_regno));
 	}	break;
 
 	case CFI_ARM_UNWIND_REGISTER_CPSR:
@@ -184,29 +189,29 @@ NOTHROW_NCX(CC ucpustate_regptr)(struct ucpustate const *self,
 		break;
 
 	case CFI_ARM_UNWIND_REGISTER_R8_USR ... CFI_ARM_UNWIND_REGISTER_LR_USR: {
-		static_assert(offsetof(struct ucpustate, ucs_r8) == (CFI_ARM_UNWIND_REGISTER_R8_USR - 136) * 4);
-		static_assert(offsetof(struct ucpustate, ucs_r9) == (CFI_ARM_UNWIND_REGISTER_R9_USR - 136) * 4);
-		static_assert(offsetof(struct ucpustate, ucs_r10) == (CFI_ARM_UNWIND_REGISTER_R10_USR - 136) * 4);
-		static_assert(offsetof(struct ucpustate, ucs_r11) == (CFI_ARM_UNWIND_REGISTER_R11_USR - 136) * 4);
-		static_assert(offsetof(struct ucpustate, ucs_r12) == (CFI_ARM_UNWIND_REGISTER_R12_USR - 136) * 4);
-		static_assert(offsetof(struct ucpustate, ucs_sp) == (CFI_ARM_UNWIND_REGISTER_SP_USR - 136) * 4);
-		static_assert(offsetof(struct ucpustate, ucs_lr) == (CFI_ARM_UNWIND_REGISTER_LR_USR - 136) * 4);
+		static_assert(offsetof(struct ucpustate, ucs_r8) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R8_USR - 136));
+		static_assert(offsetof(struct ucpustate, ucs_r9) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R9_USR - 136));
+		static_assert(offsetof(struct ucpustate, ucs_r10) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R10_USR - 136));
+		static_assert(offsetof(struct ucpustate, ucs_r11) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R11_USR - 136));
+		static_assert(offsetof(struct ucpustate, ucs_r12) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R12_USR - 136));
+		static_assert(offsetof(struct ucpustate, ucs_sp) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_SP_USR - 136));
+		static_assert(offsetof(struct ucpustate, ucs_lr) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_LR_USR - 136));
 		if (!ucpustate_isusr(self))
 			goto badreg;
-		result = (uint32_t *)((byte_t *)self + ((dw_regno - 136) * 4));
+		result = (uint32_t *)((byte_t *)self + DWREGNO_TO_UCPUSTATE_OFFSET(dw_regno - 136));
 	}	break;
 
 	case CFI_ARM_UNWIND_REGISTER_R8_FIQ ... CFI_ARM_UNWIND_REGISTER_LR_FIQ: {
-		static_assert(offsetof(struct ucpustate, ucs_r8) == (CFI_ARM_UNWIND_REGISTER_R8_FIQ - 143) * 4);
-		static_assert(offsetof(struct ucpustate, ucs_r9) == (CFI_ARM_UNWIND_REGISTER_R9_FIQ - 143) * 4);
-		static_assert(offsetof(struct ucpustate, ucs_r10) == (CFI_ARM_UNWIND_REGISTER_R10_FIQ - 143) * 4);
-		static_assert(offsetof(struct ucpustate, ucs_r11) == (CFI_ARM_UNWIND_REGISTER_R11_FIQ - 143) * 4);
-		static_assert(offsetof(struct ucpustate, ucs_r12) == (CFI_ARM_UNWIND_REGISTER_R12_FIQ - 143) * 4);
-		static_assert(offsetof(struct ucpustate, ucs_sp) == (CFI_ARM_UNWIND_REGISTER_SP_FIQ - 143) * 4);
-		static_assert(offsetof(struct ucpustate, ucs_lr) == (CFI_ARM_UNWIND_REGISTER_LR_FIQ - 143) * 4);
+		static_assert(offsetof(struct ucpustate, ucs_r8) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R8_FIQ - 143));
+		static_assert(offsetof(struct ucpustate, ucs_r9) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R9_FIQ - 143));
+		static_assert(offsetof(struct ucpustate, ucs_r10) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R10_FIQ - 143));
+		static_assert(offsetof(struct ucpustate, ucs_r11) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R11_FIQ - 143));
+		static_assert(offsetof(struct ucpustate, ucs_r12) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R12_FIQ - 143));
+		static_assert(offsetof(struct ucpustate, ucs_sp) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_SP_FIQ - 143));
+		static_assert(offsetof(struct ucpustate, ucs_lr) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_LR_FIQ - 143));
 		if (!ucpustate_isfiq(self))
 			goto badreg;
-		result = (uint32_t *)((byte_t *)self + ((dw_regno - 143) * 4));
+		result = (uint32_t *)((byte_t *)self + DWREGNO_TO_UCPUSTATE_OFFSET(dw_regno - 143));
 	}	break;
 
 	case CFI_ARM_UNWIND_REGISTER_SP_IRQ:
@@ -281,7 +286,7 @@ PRIVATE uintptr_t const lcpustate_register_offsets[16] = {
 	/* r11 */ offsetof(struct lcpustate, lcs_r11),
 	/* r12 */ (uintptr_t)-1,
 	/* sp  */ offsetof(struct lcpustate, lcs_sp),
-	/* lr  */ offsetof(struct lcpustate, lcs_lr),
+	/* lr  */ (uintptr_t)-1,
 	/* pc  */ offsetof(struct lcpustate, lcs_pc),
 };
 
@@ -398,7 +403,22 @@ INTERN NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_getreg_lcpustate_exclusive)(struct lcpustate const *self,
                                                         unwind_regno_t dw_regno,
                                                         void *__restrict dst) {
-	uint32_t *regptr = lcpustate_regptr(self, dw_regno);
+	uint32_t *regptr;
+	switch (dw_regno) {
+
+	case CFI_ARM_UNWIND_REGISTER_CPSR:
+		wr32(dst, (CPSR_MYMODE | CPSR_F | CPSR_I) |
+		          (lcpustate_isthumb(self) ? CPSR_T : 0));
+		return UNWIND_SUCCESS;
+
+	case CFI_ARM_UNWIND_REGISTER_PC:
+		wr32(dst, (uint32_t)lcpustate_getpc(self));
+		return UNWIND_SUCCESS;
+
+	default:
+		break;
+	}
+	regptr = lcpustate_regptr(self, dw_regno);
 	if unlikely(!regptr)
 		return UNWIND_INVALID_REGISTER;
 	wr32(dst, *regptr);
@@ -409,7 +429,24 @@ INTERN NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_setreg_lcpustate_exclusive)(struct lcpustate *self,
                                                         unwind_regno_t dw_regno,
                                                         void const *__restrict src) {
-	uint32_t *regptr = lcpustate_regptr(self, dw_regno);
+	uint32_t *regptr;
+	switch (dw_regno) {
+
+	case CFI_ARM_UNWIND_REGISTER_CPSR:
+		self->lcs_pc &= ~1;
+		if (rd32(src) & CPSR_T)
+			self->lcs_pc |= 1;
+		return UNWIND_SUCCESS;
+
+	case CFI_ARM_UNWIND_REGISTER_PC:
+		self->lcs_pc &= 1;
+		self->lcs_pc |= rd32(src) & ~1;
+		return UNWIND_SUCCESS;
+
+	default:
+		break;
+	}
+	regptr = lcpustate_regptr(self, dw_regno);
 	if unlikely(!regptr)
 		return UNWIND_INVALID_REGISTER;
 	*regptr = rd32(src);
@@ -420,24 +457,22 @@ INTERN NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_getreg_lcpustate)(struct lcpustate const *self,
                                               unwind_regno_t dw_regno,
                                               void *__restrict dst) {
-	uint32_t *regptr = lcpustate_regptr(self, dw_regno);
-	if likely(regptr) {
-		wr32(dst, *regptr);
-		return UNWIND_SUCCESS;
-	}
-	return libuw_unwind_getreg_implicit(dw_regno, dst);
+	unsigned int result;
+	result = libuw_unwind_getreg_lcpustate_exclusive(self, dw_regno, dst);
+	if (result == UNWIND_INVALID_REGISTER)
+		result = libuw_unwind_getreg_implicit(dw_regno, dst);
+	return result;
 }
 
 INTERN NONNULL((1, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_setreg_lcpustate)(struct lcpustate *self,
                                               unwind_regno_t dw_regno,
                                               void const *__restrict src) {
-	uint32_t *regptr = lcpustate_regptr(self, dw_regno);
-	if likely(regptr) {
-		*regptr = rd32(src);
-		return UNWIND_SUCCESS;
-	}
-	return libuw_unwind_setreg_implicit(dw_regno, src);
+	unsigned int result;
+	result = libuw_unwind_setreg_lcpustate_exclusive(self, dw_regno, src);
+	if (result == UNWIND_INVALID_REGISTER)
+		result = libuw_unwind_setreg_implicit(dw_regno, src);
+	return result;
 }
 
 
@@ -453,16 +488,16 @@ NOTHROW_NCX(CC fcpustate_regptr)(struct fcpustate const *self,
 
 	case CFI_ARM_UNWIND_REGISTER_R0 ... CFI_ARM_UNWIND_REGISTER_R7:
 	case CFI_ARM_UNWIND_REGISTER_PC: {
-		static_assert(offsetof(struct fcpustate, fcs_usr.ucs_r0) == CFI_ARM_UNWIND_REGISTER_R0 * 4);
-		static_assert(offsetof(struct fcpustate, fcs_usr.ucs_r1) == CFI_ARM_UNWIND_REGISTER_R1 * 4);
-		static_assert(offsetof(struct fcpustate, fcs_usr.ucs_r2) == CFI_ARM_UNWIND_REGISTER_R2 * 4);
-		static_assert(offsetof(struct fcpustate, fcs_usr.ucs_r3) == CFI_ARM_UNWIND_REGISTER_R3 * 4);
-		static_assert(offsetof(struct fcpustate, fcs_usr.ucs_r4) == CFI_ARM_UNWIND_REGISTER_R4 * 4);
-		static_assert(offsetof(struct fcpustate, fcs_usr.ucs_r5) == CFI_ARM_UNWIND_REGISTER_R5 * 4);
-		static_assert(offsetof(struct fcpustate, fcs_usr.ucs_r6) == CFI_ARM_UNWIND_REGISTER_R6 * 4);
-		static_assert(offsetof(struct fcpustate, fcs_usr.ucs_r7) == CFI_ARM_UNWIND_REGISTER_R7 * 4);
-		static_assert(offsetof(struct fcpustate, fcs_usr.ucs_pc) == CFI_ARM_UNWIND_REGISTER_PC * 4);
-		result = (uint32_t *)((byte_t *)self + (dw_regno * 4));
+		static_assert(offsetof(struct fcpustate, fcs_usr.ucs_r0) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R0));
+		static_assert(offsetof(struct fcpustate, fcs_usr.ucs_r1) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R1));
+		static_assert(offsetof(struct fcpustate, fcs_usr.ucs_r2) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R2));
+		static_assert(offsetof(struct fcpustate, fcs_usr.ucs_r3) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R3));
+		static_assert(offsetof(struct fcpustate, fcs_usr.ucs_r4) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R4));
+		static_assert(offsetof(struct fcpustate, fcs_usr.ucs_r5) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R5));
+		static_assert(offsetof(struct fcpustate, fcs_usr.ucs_r6) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R6));
+		static_assert(offsetof(struct fcpustate, fcs_usr.ucs_r7) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_R7));
+		static_assert(offsetof(struct fcpustate, fcs_usr.ucs_pc) == DWREGNO_TO_UCPUSTATE_OFFSET(CFI_ARM_UNWIND_REGISTER_PC));
+		result = (uint32_t *)((byte_t *)self + DWREGNO_TO_UCPUSTATE_OFFSET(dw_regno));
 	}	break;
 
 	case CFI_ARM_UNWIND_REGISTER_R8:       result = _fcpustate_p_r8(self); break;
@@ -529,9 +564,6 @@ NOTHROW_NCX(CC libuw_unwind_setreg_fcpustate)(struct fcpustate *self,
 	*regptr = rd32(src);
 	return UNWIND_SUCCESS;
 }
-
-
-
 
 
 /* Exports */

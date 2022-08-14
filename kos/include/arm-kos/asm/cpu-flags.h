@@ -57,5 +57,11 @@
 /* Mask of CPSR bits also accessible as APSR */
 #define CPSR_APSRMASK __UINT32_C(0xff0ffc00)
 
+#ifdef __KERNEL__
+#define CPSR_MYMODE CPSR_M_SVC /* Probably... */
+#else /* __KERNEL__ */
+#define CPSR_MYMODE CPSR_M_USR
+#endif /* !__KERNEL__ */
+
 
 #endif /* !_ARM_KOS_ASM_CPU_FLAGS_H */
