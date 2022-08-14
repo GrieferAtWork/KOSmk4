@@ -371,6 +371,7 @@ NOTHROW(FCALL pokephysq_unaligned)(PHYS physaddr_t addr, u64 value) {
 
 
 /* I/O functions with physical buffers. */
+#ifdef __port_t
 PUBLIC NOBLOCK void
 NOTHROW(KCALL insphysb)(port_t port, PHYS physaddr_t addr, size_t num_bytes) {
 	u8 *buf;
@@ -424,6 +425,7 @@ NOTHROW(KCALL outsphysl)(port_t port, /*aligned(4)*/ PHYS physaddr_t addr, size_
 		outsl(port, buf, buflen);
 	});
 }
+#endif /* __port_t */
 
 
 /* Copy memory to/from the physical address space. */
