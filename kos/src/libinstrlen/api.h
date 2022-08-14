@@ -41,6 +41,8 @@
 
 #if defined(__i386__) || defined(__x86_64__)
 #include "arch/i386/config.h"
-#endif /* __i386__ || __x86_64__ */
+#elif defined(__arm__)
+#include "arch/arm/config.h"
+#endif /* ... */
 
 #endif /* !GUARD_LIBINSTRLEN_API_H */

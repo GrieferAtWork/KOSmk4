@@ -17,14 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _ARM_KOS_LIBINSTRLEN_BITS_INSTRLEN_H
-#define _ARM_KOS_LIBINSTRLEN_BITS_INSTRLEN_H 1
+#ifndef GUARD_LIBINSTRLEN_ARCH_ARM_CONFIG_H
+#define GUARD_LIBINSTRLEN_ARCH_ARM_CONFIG_H 1
 
-#include <libinstrlen/bits/isa.h>
+/* Define source files */
+#define ARCH_INSTRLEN_SOURCE_FILE "arch/arm/instrlen.c"
 
-/* FIXME: Not all thumb instructions are 2-byte (some are 4-byte!!!) */
-#undef LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH
-#define LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH(isa) \
-	((isa) == INSTRLEN_ISA_THUMB ? 2 : 4)
+/* Define features defined in source files */
+#define ARCH_HAVE_INSTRUCTION_LENGTH  1 /* Defined in arch/arm/instrlen.c */
+#define ARCH_HAVE_INSTRUCTION_PRED    1 /* Defined in arch/arm/instrlen.c */
+#define ARCH_HAVE_INSTRUCTION_TRYSUCC 1 /* Defined in arch/arm/instrlen.c */
+#define ARCH_HAVE_INSTRUCTION_TRYPRED 1 /* Defined in arch/arm/instrlen.c */
+#define ARCH_INSTRUCTION_MAXLENGTH    4 /* ARM has 4-byte instructions, and thumb has varying 2/4-byte */
 
-#endif /* !_ARM_KOS_LIBINSTRLEN_BITS_INSTRLEN_H */
+#endif /* !GUARD_LIBINSTRLEN_ARCH_ARM_CONFIG_H */
