@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1425441 */
+/* HASH CRC-32:0x7cdee6e6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -117,9 +117,11 @@ struct __old_kernel_sigaction;
 struct __old_sigset_struct;
 struct __rlimit32;
 struct __rlimit64;
+struct __rusage32;
 struct __rusage64;
 struct __siginfo_struct;
 struct __sigset_struct;
+struct __statfs32;
 struct __statfs64;
 struct __timeb64;
 struct __timespec32;
@@ -157,10 +159,8 @@ struct sigaltstack;
 struct sigevent;
 struct sigset_with_size;
 struct sockaddr;
-struct statfs;
 struct sysinfo;
 struct termios;
-struct timeval;
 struct timex32;
 struct timezone;
 struct tms;
@@ -702,7 +702,7 @@ __CDECLARE_SC(,__errno_t,fstat64,(__fd_t __fd, struct linux_stat64 *__statbuf),(
 __CDECLARE_SC(,__errno_t,fstatat64,(__fd_t __dirfd, char const *__filename, struct linux_stat64 *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
 #endif /* __CRT_HAVE_SC(fstatat64) */
 #if __CRT_HAVE_SC(fstatfs)
-__CDECLARE_SC(,__errno_t,fstatfs,(__fd_t __file, struct statfs *__buf),(__file,__buf))
+__CDECLARE_SC(,__errno_t,fstatfs,(__fd_t __file, struct __statfs32 *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_SC(fstatfs) */
 #if __CRT_HAVE_SC(fstatfs64)
 __CDECLARE_SC(,__errno_t,fstatfs64,(__fd_t __file, struct __statfs64 *__buf),(__file,__buf))
@@ -940,7 +940,7 @@ __CDECLARE_SC(,__errno_t,getsockopt,(__fd_t __sockfd, __syscall_ulong_t __level,
 __CDECLARE_SC(,__pid_t,gettid,(void),())
 #endif /* __CRT_HAVE_SC(gettid) */
 #if __CRT_HAVE_SC(gettimeofday)
-__CDECLARE_SC(,__errno_t,gettimeofday,(struct timeval *__tv, struct timezone *__tz),(__tv,__tz))
+__CDECLARE_SC(,__errno_t,gettimeofday,(struct __timeval32 *__tv, struct timezone *__tz),(__tv,__tz))
 #endif /* __CRT_HAVE_SC(gettimeofday) */
 #if __CRT_HAVE_SC(gettimeofday64)
 __CDECLARE_SC(,__errno_t,gettimeofday64,(struct __timeval64 *__tv, struct timezone *__tz),(__tv,__tz))
@@ -2219,7 +2219,7 @@ __CDECLARE_SC(,__pid_t,setsid,(void),())
 __CDECLARE_SC(,__errno_t,setsockopt,(__fd_t __sockfd, __syscall_ulong_t __level, __syscall_ulong_t __optname, void const *__optval, __socklen_t __optlen),(__sockfd,__level,__optname,__optval,__optlen))
 #endif /* __CRT_HAVE_SC(setsockopt) */
 #if __CRT_HAVE_SC(settimeofday)
-__CDECLARE_SC(,__errno_t,settimeofday,(struct timeval const *__tv, struct timezone const *__tz),(__tv,__tz))
+__CDECLARE_SC(,__errno_t,settimeofday,(struct __timeval32 const *__tv, struct timezone const *__tz),(__tv,__tz))
 #endif /* __CRT_HAVE_SC(settimeofday) */
 #if __CRT_HAVE_SC(settimeofday64)
 __CDECLARE_SC(,__errno_t,settimeofday64,(struct __timeval64 const *__tv, struct timezone const *__tz),(__tv,__tz))
@@ -2339,7 +2339,7 @@ __CDECLARE_SC(,__errno_t,stat,(char const *__filename, struct linux_stat *__stat
 __CDECLARE_SC(,__errno_t,stat64,(char const *__filename, struct linux_stat64 *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_SC(stat64) */
 #if __CRT_HAVE_SC(statfs)
-__CDECLARE_SC(,__errno_t,statfs,(char const *__file, struct statfs *__buf),(__file,__buf))
+__CDECLARE_SC(,__errno_t,statfs,(char const *__file, struct __statfs32 *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_SC(statfs) */
 #if __CRT_HAVE_SC(statfs64)
 __CDECLARE_SC(,__errno_t,statfs64,(char const *__file, struct __statfs64 *__buf),(__file,__buf))
@@ -2599,7 +2599,7 @@ __CDECLARE_SC(,__pid_t,wait4_64,(__pid_t __pid, __int32_t *__stat_loc, __syscall
 #if __CRT_HAVE_SC(waitid)
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-__CDECLARE_SC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfo_struct *__infop, __syscall_ulong_t __options, struct rusage *__ru),(__idtype,__id,__infop,__options,__ru))
+__CDECLARE_SC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfo_struct *__infop, __syscall_ulong_t __options, struct __rusage32 *__ru),(__idtype,__id,__infop,__options,__ru))
 #endif /* __CRT_HAVE_SC(waitid) */
 #if __CRT_HAVE_SC(waitid64)
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
@@ -3176,7 +3176,7 @@ __CDECLARE_XSC(,__errno_t,fstat64,(__fd_t __fd, struct linux_stat64 *__statbuf),
 __CDECLARE_XSC(,__errno_t,fstatat64,(__fd_t __dirfd, char const *__filename, struct linux_stat64 *__statbuf, __atflag_t __flags),(__dirfd,__filename,__statbuf,__flags))
 #endif /* __CRT_HAVE_XSC(fstatat64) */
 #if __CRT_HAVE_XSC(fstatfs)
-__CDECLARE_XSC(,__errno_t,fstatfs,(__fd_t __file, struct statfs *__buf),(__file,__buf))
+__CDECLARE_XSC(,__errno_t,fstatfs,(__fd_t __file, struct __statfs32 *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_XSC(fstatfs) */
 #if __CRT_HAVE_XSC(fstatfs64)
 __CDECLARE_XSC(,__errno_t,fstatfs64,(__fd_t __file, struct __statfs64 *__buf),(__file,__buf))
@@ -3414,7 +3414,7 @@ __CDECLARE_XSC(,__errno_t,getsockopt,(__fd_t __sockfd, __syscall_ulong_t __level
 __CDECLARE_XSC(,__pid_t,gettid,(void),())
 #endif /* __CRT_HAVE_XSC(gettid) */
 #if __CRT_HAVE_XSC(gettimeofday)
-__CDECLARE_XSC(,__errno_t,gettimeofday,(struct timeval *__tv, struct timezone *__tz),(__tv,__tz))
+__CDECLARE_XSC(,__errno_t,gettimeofday,(struct __timeval32 *__tv, struct timezone *__tz),(__tv,__tz))
 #endif /* __CRT_HAVE_XSC(gettimeofday) */
 #if __CRT_HAVE_XSC(gettimeofday64)
 __CDECLARE_XSC(,__errno_t,gettimeofday64,(struct __timeval64 *__tv, struct timezone *__tz),(__tv,__tz))
@@ -4687,7 +4687,7 @@ __CDECLARE_XSC(,__pid_t,setsid,(void),())
 __CDECLARE_XSC(,__errno_t,setsockopt,(__fd_t __sockfd, __syscall_ulong_t __level, __syscall_ulong_t __optname, void const *__optval, __socklen_t __optlen),(__sockfd,__level,__optname,__optval,__optlen))
 #endif /* __CRT_HAVE_XSC(setsockopt) */
 #if __CRT_HAVE_XSC(settimeofday)
-__CDECLARE_XSC(,__errno_t,settimeofday,(struct timeval const *__tv, struct timezone const *__tz),(__tv,__tz))
+__CDECLARE_XSC(,__errno_t,settimeofday,(struct __timeval32 const *__tv, struct timezone const *__tz),(__tv,__tz))
 #endif /* __CRT_HAVE_XSC(settimeofday) */
 #if __CRT_HAVE_XSC(settimeofday64)
 __CDECLARE_XSC(,__errno_t,settimeofday64,(struct __timeval64 const *__tv, struct timezone const *__tz),(__tv,__tz))
@@ -4804,7 +4804,7 @@ __CDECLARE_XSC(,__errno_t,stat,(char const *__filename, struct linux_stat *__sta
 __CDECLARE_XSC(,__errno_t,stat64,(char const *__filename, struct linux_stat64 *__statbuf),(__filename,__statbuf))
 #endif /* __CRT_HAVE_XSC(stat64) */
 #if __CRT_HAVE_XSC(statfs)
-__CDECLARE_XSC(,__errno_t,statfs,(char const *__file, struct statfs *__buf),(__file,__buf))
+__CDECLARE_XSC(,__errno_t,statfs,(char const *__file, struct __statfs32 *__buf),(__file,__buf))
 #endif /* __CRT_HAVE_XSC(statfs) */
 #if __CRT_HAVE_XSC(statfs64)
 __CDECLARE_XSC(,__errno_t,statfs64,(char const *__file, struct __statfs64 *__buf),(__file,__buf))
@@ -5064,7 +5064,7 @@ __CDECLARE_XSC(,__pid_t,wait4_64,(__pid_t __pid, __int32_t *__stat_loc, __syscal
 #if __CRT_HAVE_XSC(waitid)
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-__CDECLARE_XSC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfo_struct *__infop, __syscall_ulong_t __options, struct rusage *__ru),(__idtype,__id,__infop,__options,__ru))
+__CDECLARE_XSC(,__errno_t,waitid,(__syscall_ulong_t __idtype, __id_t __id, struct __siginfo_struct *__infop, __syscall_ulong_t __options, struct __rusage32 *__ru),(__idtype,__id,__infop,__options,__ru))
 #endif /* __CRT_HAVE_XSC(waitid) */
 #if __CRT_HAVE_XSC(waitid64)
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'

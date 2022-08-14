@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10f3e408 */
+/* HASH CRC-32:0x2f768d1a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -481,8 +481,8 @@
 #define __NR_uselib                   0x86                           /* errno_t uselib(char const *library) */
 #define __NR_personality              0x87                           /* errno_t personality(int TODO_PROTOTYPE) */
 #define __NR_ustat                    0x88                           /* errno_t ustat(dev_t dev, struct ustat *ubuf) */
-#define __NR_statfs                   0x89                           /* errno_t statfs(char const *file, struct __statfsx64 *buf) */
-#define __NR_fstatfs                  0x8a                           /* errno_t fstatfs(fd_t file, struct __statfsx64 *buf) */
+#define __NR_statfs                   0x89                           /* errno_t statfs(char const *file, struct statfsx64 *buf) */
+#define __NR_fstatfs                  0x8a                           /* errno_t fstatfs(fd_t file, struct statfsx64 *buf) */
 #define __NR_sysfs                    0x8b                           /* errno_t sysfs(int TODO_PROTOTYPE) */
 /* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 #define __NR_getpriority              0x8c                           /* syscall_slong_t getpriority(syscall_ulong_t which, id_t who) */

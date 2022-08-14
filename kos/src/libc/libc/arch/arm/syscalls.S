@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18bb957a */
+/* HASH CRC-32:0x29e98ad4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -542,14 +542,14 @@ INTERN_FUNCTION(libc_sys_getrusage)
 END(libc_sys_getrusage)
 DEFINE_PUBLIC_ALIAS(sys_getrusage, libc_sys_getrusage)
 
-/* errno_t gettimeofday(struct timeval *tv, struct timezone *tz) */
+/* errno_t gettimeofday(struct timeval32 *tv, struct timezone *tz) */
 INTERN_FUNCTION(libc_sys_gettimeofday)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 78, enableExcept: false) */
 	b .
 END(libc_sys_gettimeofday)
 DEFINE_PUBLIC_ALIAS(sys_gettimeofday, libc_sys_gettimeofday)
 
-/* errno_t settimeofday(struct timeval const *tv, struct timezone const *tz) */
+/* errno_t settimeofday(struct timeval32 const *tv, struct timezone const *tz) */
 INTERN_FUNCTION(libc_sys_settimeofday)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 79, enableExcept: false) */
 	b .
@@ -693,14 +693,14 @@ INTERN_FUNCTION(libc_sys_setpriority)
 END(libc_sys_setpriority)
 DEFINE_PUBLIC_ALIAS(sys_setpriority, libc_sys_setpriority)
 
-/* errno_t statfs(char const *file, struct statfs *buf) */
+/* errno_t statfs(char const *file, struct statfs32 *buf) */
 INTERN_FUNCTION(libc_sys_statfs)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 99, enableExcept: false) */
 	b .
 END(libc_sys_statfs)
 DEFINE_PUBLIC_ALIAS(sys_statfs, libc_sys_statfs)
 
-/* errno_t fstatfs(fd_t file, struct statfs *buf) */
+/* errno_t fstatfs(fd_t file, struct statfs32 *buf) */
 INTERN_FUNCTION(libc_sys_fstatfs)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 100, enableExcept: false) */
 	b .
@@ -1986,14 +1986,14 @@ INTERN_FUNCTION(libc_sys_clock_nanosleep)
 END(libc_sys_clock_nanosleep)
 DEFINE_PUBLIC_ALIAS(sys_clock_nanosleep, libc_sys_clock_nanosleep)
 
-/* errno_t statfs64(char const *file, struct __statfs64 *buf) */
+/* errno_t statfs64(char const *file, struct statfs64 *buf) */
 INTERN_FUNCTION(libc_sys_statfs64)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 266, enableExcept: false) */
 	b .
 END(libc_sys_statfs64)
 DEFINE_PUBLIC_ALIAS(sys_statfs64, libc_sys_statfs64)
 
-/* errno_t fstatfs64(fd_t file, struct __statfs64 *buf) */
+/* errno_t fstatfs64(fd_t file, struct statfs64 *buf) */
 INTERN_FUNCTION(libc_sys_fstatfs64)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 267, enableExcept: false) */
 	b .
@@ -2089,7 +2089,7 @@ DEFINE_PUBLIC_ALIAS(sys_mq_getsetattr, libc_sys_mq_getsetattr)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, syscall_ulong_t options, struct rusage *ru) */
+/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, syscall_ulong_t options, struct rusage32 *ru) */
 INTERN_FUNCTION(libc_sys_waitid)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 280, enableExcept: false) */
 	b .
@@ -4916,14 +4916,14 @@ INTERN_FUNCTION(libc_sys_Xgetrusage)
 END(libc_sys_Xgetrusage)
 DEFINE_PUBLIC_ALIAS(sys_Xgetrusage, libc_sys_Xgetrusage)
 
-/* errno_t gettimeofday(struct timeval *tv, struct timezone *tz) */
+/* errno_t gettimeofday(struct timeval32 *tv, struct timezone *tz) */
 INTERN_FUNCTION(libc_sys_Xgettimeofday)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 78, enableExcept: true) */
 	b .
 END(libc_sys_Xgettimeofday)
 DEFINE_PUBLIC_ALIAS(sys_Xgettimeofday, libc_sys_Xgettimeofday)
 
-/* errno_t settimeofday(struct timeval const *tv, struct timezone const *tz) */
+/* errno_t settimeofday(struct timeval32 const *tv, struct timezone const *tz) */
 INTERN_FUNCTION(libc_sys_Xsettimeofday)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 79, enableExcept: true) */
 	b .
@@ -5067,14 +5067,14 @@ INTERN_FUNCTION(libc_sys_Xsetpriority)
 END(libc_sys_Xsetpriority)
 DEFINE_PUBLIC_ALIAS(sys_Xsetpriority, libc_sys_Xsetpriority)
 
-/* errno_t statfs(char const *file, struct statfs *buf) */
+/* errno_t statfs(char const *file, struct statfs32 *buf) */
 INTERN_FUNCTION(libc_sys_Xstatfs)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 99, enableExcept: true) */
 	b .
 END(libc_sys_Xstatfs)
 DEFINE_PUBLIC_ALIAS(sys_Xstatfs, libc_sys_Xstatfs)
 
-/* errno_t fstatfs(fd_t file, struct statfs *buf) */
+/* errno_t fstatfs(fd_t file, struct statfs32 *buf) */
 INTERN_FUNCTION(libc_sys_Xfstatfs)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 100, enableExcept: true) */
 	b .
@@ -6346,14 +6346,14 @@ INTERN_FUNCTION(libc_sys_Xclock_nanosleep)
 END(libc_sys_Xclock_nanosleep)
 DEFINE_PUBLIC_ALIAS(sys_Xclock_nanosleep, libc_sys_Xclock_nanosleep)
 
-/* errno_t statfs64(char const *file, struct __statfs64 *buf) */
+/* errno_t statfs64(char const *file, struct statfs64 *buf) */
 INTERN_FUNCTION(libc_sys_Xstatfs64)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 266, enableExcept: true) */
 	b .
 END(libc_sys_Xstatfs64)
 DEFINE_PUBLIC_ALIAS(sys_Xstatfs64, libc_sys_Xstatfs64)
 
-/* errno_t fstatfs64(fd_t file, struct __statfs64 *buf) */
+/* errno_t fstatfs64(fd_t file, struct statfs64 *buf) */
 INTERN_FUNCTION(libc_sys_Xfstatfs64)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 267, enableExcept: true) */
 	b .
@@ -6449,7 +6449,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xmq_getsetattr, libc_sys_Xmq_getsetattr)
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, syscall_ulong_t options, struct rusage *ru) */
+/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, syscall_ulong_t options, struct rusage32 *ru) */
 INTERN_FUNCTION(libc_sys_Xwaitid)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 280, enableExcept: true) */
 	b .

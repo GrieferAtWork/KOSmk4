@@ -228,3 +228,13 @@ The interrupt vector is (conventionally) located at `(VIRT void *)0` and consist
 
 **\[4\]** `ldaex` + `stlex`:
 > Same as **\[3\]**, except that `dmb ish` can be omitted, and `ldaex` + `stlex` are used instead of `ldrex` + `strex`.
+
+
+
+
+### Cache control
+
+TODO: This seems to be on the level of atomics when it comes to complexity
+
+Figure this out and document here (for reference: `linux:/arch/arm/mm/cache-*`)
+

@@ -33,6 +33,7 @@
 #endif /* !__INTELLISENSE__ */
 
 #ifdef __CC__
+#if defined(THROW) || defined(__INTELLISENSE__)
 __DECL_BEGIN
 
 /* Verify that only bits masked by APSR differ between `old_cpsr' and `new_cpsr'. */
@@ -50,6 +51,7 @@ __LOCAL void (cpustate_verify_apsr)(__uintptr_t __old_cpsr,
 }
 
 __DECL_END
+#endif /* THROW || __INTELLISENSE__ */
 #endif /* __CC__ */
 
 

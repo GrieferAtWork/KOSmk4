@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4f82ebd */
+/* HASH CRC-32:0xa1da7903 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1104,9 +1104,9 @@
 #define __NRAT1_getrlimit                    (struct rlimit32 *, struct __rlimit32 *)
 #define __NRAT0_getrusage                    (syscall_slong_t, __syscall_slong_t)
 #define __NRAT1_getrusage                    (struct rusage *, struct rusage *)
-#define __NRAT0_gettimeofday                 (struct timeval *, struct timeval *)
+#define __NRAT0_gettimeofday                 (struct timeval32 *, struct __timeval32 *)
 #define __NRAT1_gettimeofday                 (struct timezone *, struct timezone *)
-#define __NRAT0_settimeofday                 (struct timeval const *, struct timeval const *)
+#define __NRAT0_settimeofday                 (struct timeval32 const *, struct __timeval32 const *)
 #define __NRAT1_settimeofday                 (struct timezone const *, struct timezone const *)
 #define __NRAT0_getgroups                    (size_t, __size_t)
 #define __NRAT1_getgroups                    (uint16_t *, __uint16_t *)
@@ -1147,9 +1147,9 @@
 #define __NRAT1_setpriority                  (id_t, __id_t)
 #define __NRAT2_setpriority                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_statfs                       (char const *, char const *)
-#define __NRAT1_statfs                       (struct statfs *, struct statfs *)
+#define __NRAT1_statfs                       (struct statfs32 *, struct __statfs32 *)
 #define __NRAT0_fstatfs                      (fd_t, __fd_t)
-#define __NRAT1_fstatfs                      (struct statfs *, struct statfs *)
+#define __NRAT1_fstatfs                      (struct statfs32 *, struct __statfs32 *)
 #define __NRAT0_socketcall                   (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_socketcall                   (syscall_ulong_t *, __syscall_ulong_t *)
 #define __NRAT0_syslog                       (syscall_ulong_t, __syscall_ulong_t)
@@ -1484,9 +1484,9 @@
 #define __NRAT2_clock_nanosleep              (struct timespec32 const *, struct __timespec32 const *)
 #define __NRAT3_clock_nanosleep              (struct timespec32 *, struct __timespec32 *)
 #define __NRAT0_statfs64                     (char const *, char const *)
-#define __NRAT1_statfs64                     (struct __statfs64 *, struct __statfs64 *)
+#define __NRAT1_statfs64                     (struct statfs64 *, struct __statfs64 *)
 #define __NRAT0_fstatfs64                    (fd_t, __fd_t)
-#define __NRAT1_fstatfs64                    (struct __statfs64 *, struct __statfs64 *)
+#define __NRAT1_fstatfs64                    (struct statfs64 *, struct __statfs64 *)
 #define __NRAT0_tgkill                       (pid_t, __pid_t)
 #define __NRAT1_tgkill                       (pid_t, __pid_t)
 #define __NRAT2_tgkill                       (signo_t, __signo_t)
@@ -1519,7 +1519,7 @@
 #define __NRAT1_waitid                       (id_t, __id_t)
 #define __NRAT2_waitid                       (struct __siginfo_struct *, struct __siginfo_struct *)
 #define __NRAT3_waitid                       (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT4_waitid                       (struct rusage *, struct rusage *)
+#define __NRAT4_waitid                       (struct rusage32 *, struct __rusage32 *)
 #define __NRAT0_socket                       (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_socket                       (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT2_socket                       (syscall_ulong_t, __syscall_ulong_t)
@@ -2211,8 +2211,8 @@
 #define __NRAM_setrlimit(a, b, c, d, e, f, g)                    (__syscall_ulong_t)a, (struct __rlimit32 const *)b
 #define __NRAM_getrlimit(a, b, c, d, e, f, g)                    (__syscall_ulong_t)a, (struct __rlimit32 *)b
 #define __NRAM_getrusage(a, b, c, d, e, f, g)                    (__syscall_slong_t)a, (struct rusage *)b
-#define __NRAM_gettimeofday(a, b, c, d, e, f, g)                 (struct timeval *)a, (struct timezone *)b
-#define __NRAM_settimeofday(a, b, c, d, e, f, g)                 (struct timeval const *)a, (struct timezone const *)b
+#define __NRAM_gettimeofday(a, b, c, d, e, f, g)                 (struct __timeval32 *)a, (struct timezone *)b
+#define __NRAM_settimeofday(a, b, c, d, e, f, g)                 (struct __timeval32 const *)a, (struct timezone const *)b
 #define __NRAM_getgroups(a, b, c, d, e, f, g)                    (__size_t)a, (__uint16_t *)b
 #define __NRAM_setgroups(a, b, c, d, e, f, g)                    (__size_t)a, (__uint16_t const *)b
 #define __NRAM_select(a, b, c, d, e, f, g)                       (struct sel_arg_struct const *)a
@@ -2230,8 +2230,8 @@
 #define __NRAM_fchown(a, b, c, d, e, f, g)                       (__fd_t)a, (__uint16_t)b, (__uint16_t)c
 #define __NRAM_getpriority(a, b, c, d, e, f, g)                  (__syscall_ulong_t)a, (__id_t)b
 #define __NRAM_setpriority(a, b, c, d, e, f, g)                  (__syscall_ulong_t)a, (__id_t)b, (__syscall_ulong_t)c
-#define __NRAM_statfs(a, b, c, d, e, f, g)                       (char const *)a, (struct statfs *)b
-#define __NRAM_fstatfs(a, b, c, d, e, f, g)                      (__fd_t)a, (struct statfs *)b
+#define __NRAM_statfs(a, b, c, d, e, f, g)                       (char const *)a, (struct __statfs32 *)b
+#define __NRAM_fstatfs(a, b, c, d, e, f, g)                      (__fd_t)a, (struct __statfs32 *)b
 #define __NRAM_socketcall(a, b, c, d, e, f, g)                   (__syscall_ulong_t)a, (__syscall_ulong_t *)b
 #define __NRAM_syslog(a, b, c, d, e, f, g)                       (__syscall_ulong_t)a, (char const *)b, (__size_t)c
 #define __NRAM_setitimer(a, b, c, d, e, f, g)                    (__syscall_ulong_t)a, (struct itimerval const *)b, (struct itimerval *)c
@@ -2395,7 +2395,7 @@
 #define __NRAM_mq_timedreceive(a, b, c, d, e, f, g)              (__fd_t)a, (char *)b, (__size_t)c, (__uint32_t *)d, (struct __timespec32 const *)e
 #define __NRAM_mq_notify(a, b, c, d, e, f, g)                    (__fd_t)a, (struct sigevent const *)b
 #define __NRAM_mq_getsetattr(a, b, c, d, e, f, g)                (__fd_t)a, (struct mq_attr const *)b, (struct mq_attr *)c
-#define __NRAM_waitid(a, b, c, d, e, f, g)                       (__syscall_ulong_t)a, (__id_t)b, (struct __siginfo_struct *)c, (__syscall_ulong_t)d, (struct rusage *)e
+#define __NRAM_waitid(a, b, c, d, e, f, g)                       (__syscall_ulong_t)a, (__id_t)b, (struct __siginfo_struct *)c, (__syscall_ulong_t)d, (struct __rusage32 *)e
 #define __NRAM_socket(a, b, c, d, e, f, g)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAM_bind(a, b, c, d, e, f, g)                         (__fd_t)a, (struct sockaddr const *)b, (__socklen_t)c
 #define __NRAM_connect(a, b, c, d, e, f, g)                      (__fd_t)a, (struct sockaddr const *)b, (__socklen_t)c

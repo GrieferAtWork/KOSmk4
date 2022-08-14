@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x826f4717 */
+/* HASH CRC-32:0x8a355a42 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -999,14 +999,14 @@ INTERN_FUNCTION(libc_sys_profil)
 END(libc_sys_profil)
 DEFINE_PUBLIC_ALIAS(sys_profil, libc_sys_profil)
 
-/* errno_t statfs(char const *file, struct __statfsx32 *buf) */
+/* errno_t statfs(char const *file, struct statfsx32 *buf) */
 INTERN_FUNCTION(libc_sys_statfs)
 	movl   $(0x63), %eax
 	jmp    libc_x86_exec_syscall2
 END(libc_sys_statfs)
 DEFINE_PUBLIC_ALIAS(sys_statfs, libc_sys_statfs)
 
-/* errno_t fstatfs(fd_t file, struct __statfsx32 *buf) */
+/* errno_t fstatfs(fd_t file, struct statfsx32 *buf) */
 INTERN_FUNCTION(libc_sys_fstatfs)
 	movl   $(0x64), %eax
 	jmp    libc_x86_exec_syscall2
@@ -2396,14 +2396,14 @@ INTERN_FUNCTION(libc_sys_clock_nanosleep)
 END(libc_sys_clock_nanosleep)
 DEFINE_PUBLIC_ALIAS(sys_clock_nanosleep, libc_sys_clock_nanosleep)
 
-/* errno_t statfs64(char const *file, struct __statfsx32_64 *buf) */
+/* errno_t statfs64(char const *file, struct statfsx32_64 *buf) */
 INTERN_FUNCTION(libc_sys_statfs64)
 	movl   $(0x10c), %eax
 	jmp    libc_x86_exec_syscall2
 END(libc_sys_statfs64)
 DEFINE_PUBLIC_ALIAS(sys_statfs64, libc_sys_statfs64)
 
-/* errno_t fstatfs64(fd_t file, struct __statfsx32_64 *buf) */
+/* errno_t fstatfs64(fd_t file, struct statfsx32_64 *buf) */
 INTERN_FUNCTION(libc_sys_fstatfs64)
 	movl   $(0x10d), %eax
 	jmp    libc_x86_exec_syscall2
@@ -5480,14 +5480,14 @@ INTERN_FUNCTION(libc_sys_Xprofil)
 END(libc_sys_Xprofil)
 DEFINE_PUBLIC_ALIAS(sys_Xprofil, libc_sys_Xprofil)
 
-/* errno_t statfs(char const *file, struct __statfsx32 *buf) */
+/* errno_t statfs(char const *file, struct statfsx32 *buf) */
 INTERN_FUNCTION(libc_sys_Xstatfs)
 	movl   $(0x63), %eax
 	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xstatfs)
 DEFINE_PUBLIC_ALIAS(sys_Xstatfs, libc_sys_Xstatfs)
 
-/* errno_t fstatfs(fd_t file, struct __statfsx32 *buf) */
+/* errno_t fstatfs(fd_t file, struct statfsx32 *buf) */
 INTERN_FUNCTION(libc_sys_Xfstatfs)
 	movl   $(0x64), %eax
 	jmp    libc_x86_exec_Xsyscall2
@@ -6863,14 +6863,14 @@ INTERN_FUNCTION(libc_sys_Xclock_nanosleep)
 END(libc_sys_Xclock_nanosleep)
 DEFINE_PUBLIC_ALIAS(sys_Xclock_nanosleep, libc_sys_Xclock_nanosleep)
 
-/* errno_t statfs64(char const *file, struct __statfsx32_64 *buf) */
+/* errno_t statfs64(char const *file, struct statfsx32_64 *buf) */
 INTERN_FUNCTION(libc_sys_Xstatfs64)
 	movl   $(0x10c), %eax
 	jmp    libc_x86_exec_Xsyscall2
 END(libc_sys_Xstatfs64)
 DEFINE_PUBLIC_ALIAS(sys_Xstatfs64, libc_sys_Xstatfs64)
 
-/* errno_t fstatfs64(fd_t file, struct __statfsx32_64 *buf) */
+/* errno_t fstatfs64(fd_t file, struct statfsx32_64 *buf) */
 INTERN_FUNCTION(libc_sys_Xfstatfs64)
 	movl   $(0x10d), %eax
 	jmp    libc_x86_exec_Xsyscall2

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa02be5f */
+/* HASH CRC-32:0x2ec9a471 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4486,7 +4486,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_ustat)
 	.cfi_endproc
 END(__x86_asm64_syscall_ustat)
 
-/* errno_t statfs(char const *file, struct __statfsx64 *buf) */
+/* errno_t statfs(char const *file, struct statfsx64 *buf) */
 .section .text.x86.asm64_syscall.statfs
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_statfs)
 	.cfi_startproc simple
@@ -4516,7 +4516,7 @@ INTERN_WEAK_FUNCTION(__x86_asm64_syscall_statfs)
 	.cfi_endproc
 END(__x86_asm64_syscall_statfs)
 
-/* errno_t fstatfs(fd_t file, struct __statfsx64 *buf) */
+/* errno_t fstatfs(fd_t file, struct statfsx64 *buf) */
 .section .text.x86.asm64_syscall.fstatfs
 INTERN_WEAK_FUNCTION(__x86_asm64_syscall_fstatfs)
 	.cfi_startproc simple
@@ -15456,7 +15456,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_profil)
 	.cfi_endproc
 END(__x86_asm32_int80_profil)
 
-/* errno_t statfs(char const *file, struct __statfsx32 *buf) */
+/* errno_t statfs(char const *file, struct statfsx32 *buf) */
 .section .text.x86.asm32_syscall_int80.statfs
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_statfs)
 	.cfi_startproc simple
@@ -15480,7 +15480,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_statfs)
 	.cfi_endproc
 END(__x86_asm32_int80_statfs)
 
-/* errno_t fstatfs(fd_t file, struct __statfsx32 *buf) */
+/* errno_t fstatfs(fd_t file, struct statfsx32 *buf) */
 .section .text.x86.asm32_syscall_int80.fstatfs
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstatfs)
 	.cfi_startproc simple
@@ -19737,7 +19737,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_clock_nanosleep)
 	.cfi_endproc
 END(__x86_asm32_int80_clock_nanosleep)
 
-/* errno_t statfs64(char const *file, struct __statfsx32_64 *buf) */
+/* errno_t statfs64(char const *file, struct statfsx32_64 *buf) */
 .section .text.x86.asm32_syscall_int80.statfs64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_statfs64)
 	.cfi_startproc simple
@@ -19761,7 +19761,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_int80_statfs64)
 	.cfi_endproc
 END(__x86_asm32_int80_statfs64)
 
-/* errno_t fstatfs64(fd_t file, struct __statfsx32_64 *buf) */
+/* errno_t fstatfs64(fd_t file, struct statfsx32_64 *buf) */
 .section .text.x86.asm32_syscall_int80.fstatfs64
 INTERN_WEAK_FUNCTION(__x86_asm32_int80_fstatfs64)
 	.cfi_startproc simple
@@ -26673,10 +26673,10 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_setpriority, __x86_asm32_int80_set
 /* errno_t profil(void) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_profil, __x86_asm32_int80_profil)
 
-/* errno_t statfs(char const *file, struct __statfsx32 *buf) */
+/* errno_t statfs(char const *file, struct statfsx32 *buf) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_statfs, __x86_asm32_int80_statfs)
 
-/* errno_t fstatfs(fd_t file, struct __statfsx32 *buf) */
+/* errno_t fstatfs(fd_t file, struct statfsx32 *buf) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fstatfs, __x86_asm32_int80_fstatfs)
 
 /* errno_t ioperm(syscall_ulong_t from, syscall_ulong_t num, syscall_ulong_t turn_on) */
@@ -27843,10 +27843,10 @@ DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_getres, __x86_asm32_int80_cl
 /* errno_t clock_nanosleep(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32 const *requested_time, struct timespecx32 *remaining) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_clock_nanosleep, __x86_asm32_int80_clock_nanosleep)
 
-/* errno_t statfs64(char const *file, struct __statfsx32_64 *buf) */
+/* errno_t statfs64(char const *file, struct statfsx32_64 *buf) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_statfs64, __x86_asm32_int80_statfs64)
 
-/* errno_t fstatfs64(fd_t file, struct __statfsx32_64 *buf) */
+/* errno_t fstatfs64(fd_t file, struct statfsx32_64 *buf) */
 DEFINE_INTERN_WEAK_ALIAS(__x86_asm32_sysenter_fstatfs64, __x86_asm32_int80_fstatfs64)
 
 /* errno_t tgkill(pid_t pid, pid_t tid, signo_t signo) */
@@ -31873,7 +31873,7 @@ END(__x86_asm32_sysrun32_setpriority)
 /* errno_t profil(void) */
 /* DEFINE_INTERN_ALIAS(__x86_asm32_sysrun32_profil, sys32_profil); */
 
-/* errno_t statfs(char const *file, struct __statfsx32 *buf) */
+/* errno_t statfs(char const *file, struct statfsx32 *buf) */
 .section .text.x86.asm32_syscall_sysrun32.statfs
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_statfs)
 	.cfi_startproc
@@ -31884,7 +31884,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_statfs)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_statfs)
 
-/* errno_t fstatfs(fd_t file, struct __statfsx32 *buf) */
+/* errno_t fstatfs(fd_t file, struct statfsx32 *buf) */
 .section .text.x86.asm32_syscall_sysrun32.fstatfs
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fstatfs)
 	.cfi_startproc
@@ -33861,7 +33861,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_clock_nanosleep)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_clock_nanosleep)
 
-/* errno_t statfs64(char const *file, struct __statfsx32_64 *buf) */
+/* errno_t statfs64(char const *file, struct statfsx32_64 *buf) */
 .section .text.x86.asm32_syscall_sysrun32.statfs64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_statfs64)
 	.cfi_startproc
@@ -33872,7 +33872,7 @@ INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_statfs64)
 	.cfi_endproc
 END(__x86_asm32_sysrun32_statfs64)
 
-/* errno_t fstatfs64(fd_t file, struct __statfsx32_64 *buf) */
+/* errno_t fstatfs64(fd_t file, struct statfsx32_64 *buf) */
 .section .text.x86.asm32_syscall_sysrun32.fstatfs64
 INTERN_WEAK_FUNCTION(__x86_asm32_sysrun32_fstatfs64)
 	.cfi_startproc

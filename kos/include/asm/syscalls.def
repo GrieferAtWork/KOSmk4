@@ -1175,20 +1175,20 @@ ustat:([tostr(DEV_BLK)] dev_t dev, [tostr(out:STRUCT_USTAT)] struct ustat *ubuf)
 
 %[startgroup]
 statfs:([tostr(FILENAME)] char const *file, [tostr(out:STRUCT_STATFS)] struct statfs *buf) -> errno_t;
-statfs32:([tostr(FILENAME)] char const *file, [tostr(out:STRUCT_STATFS32)] struct __statfs32 *buf) -> errno_t;
-statfs64:([tostr(FILENAME)] char const *file, [tostr(out:STRUCT_STATFS64)] struct __statfs64 *buf) -> errno_t;
-statfsx32:([tostr(FILENAME)] char const *file, [tostr(out:STRUCT_STATFSX32)] struct __statfsx32 *buf) -> errno_t;
-statfsx32_64:([tostr(FILENAME)] char const *file, [tostr(out:STRUCT_STATFSX32_64)] struct __statfsx32_64 *buf) -> errno_t;
-statfsx64:([tostr(FILENAME)] char const *file, [tostr(out:STRUCT_STATFSX64)] struct __statfsx64 *buf) -> errno_t;
+statfs32:([tostr(FILENAME)] char const *file, [tostr(out:STRUCT_STATFS32)] struct statfs32 *buf) -> errno_t;
+statfs64:([tostr(FILENAME)] char const *file, [tostr(out:STRUCT_STATFS64)] struct statfs64 *buf) -> errno_t;
+statfsx32:([tostr(FILENAME)] char const *file, [tostr(out:STRUCT_STATFSX32)] struct statfsx32 *buf) -> errno_t;
+statfsx32_64:([tostr(FILENAME)] char const *file, [tostr(out:STRUCT_STATFSX32_64)] struct statfsx32_64 *buf) -> errno_t;
+statfsx64:([tostr(FILENAME)] char const *file, [tostr(out:STRUCT_STATFSX64)] struct statfsx64 *buf) -> errno_t;
 %[endgroup]
 
 %[startgroup]
 fstatfs:(fd_t file, [tostr(out:STRUCT_STATFS)] struct statfs *buf) -> errno_t;
-fstatfs32:(fd_t file, [tostr(out:STRUCT_STATFS32)] struct __statfs32 *buf) -> errno_t;
-fstatfs64:(fd_t file, [tostr(out:STRUCT_STATFS64)] struct __statfs64 *buf) -> errno_t;
-fstatfsx32:(fd_t file, [tostr(out:STRUCT_STATFSX32)] struct __statfsx32 *buf) -> errno_t;
-fstatfsx32_64:(fd_t file, [tostr(out:STRUCT_STATFSX32_64)] struct __statfsx32_64 *buf) -> errno_t;
-fstatfsx64:(fd_t file, [tostr(out:STRUCT_STATFSX64)] struct __statfsx64 *buf) -> errno_t;
+fstatfs32:(fd_t file, [tostr(out:STRUCT_STATFS32)] struct statfs32 *buf) -> errno_t;
+fstatfs64:(fd_t file, [tostr(out:STRUCT_STATFS64)] struct statfs64 *buf) -> errno_t;
+fstatfsx32:(fd_t file, [tostr(out:STRUCT_STATFSX32)] struct statfsx32 *buf) -> errno_t;
+fstatfsx32_64:(fd_t file, [tostr(out:STRUCT_STATFSX32_64)] struct statfsx32_64 *buf) -> errno_t;
+fstatfsx64:(fd_t file, [tostr(out:STRUCT_STATFSX64)] struct statfsx64 *buf) -> errno_t;
 %[endgroup]
 
 [cp] oldfstatat:(fd_t dirfd, [tostr(FILENAME:dirfd)] char const *filename,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc583ac43 */
+/* HASH CRC-32:0x603d43a6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -164,8 +164,8 @@
 #define SYS_getrlimit                    __NR_getrlimit                    /* errno_t getrlimit(syscall_ulong_t resource, struct rlimit32 *rlimits) */
 /* @param: who: One of `RUSAGE_SELF', `RUSAGE_CHILDREN' or `RUSAGE_THREAD' */
 #define SYS_getrusage                    __NR_getrusage                    /* errno_t getrusage(syscall_slong_t who, struct rusage *usage) */
-#define SYS_gettimeofday                 __NR_gettimeofday                 /* errno_t gettimeofday(struct timeval *tv, struct timezone *tz) */
-#define SYS_settimeofday                 __NR_settimeofday                 /* errno_t settimeofday(struct timeval const *tv, struct timezone const *tz) */
+#define SYS_gettimeofday                 __NR_gettimeofday                 /* errno_t gettimeofday(struct timeval32 *tv, struct timezone *tz) */
+#define SYS_settimeofday                 __NR_settimeofday                 /* errno_t settimeofday(struct timeval32 const *tv, struct timezone const *tz) */
 /* @return: * :     [count == 0] The required number of groups
  * @return: * :     [count != 0] The number of groups that were actually returned
  * @throw: -EINVAL: [count != 0] There are more than `count' groups (NOTE: No exception is thrown for this case!) */
@@ -201,8 +201,8 @@
 #define SYS_getpriority                  __NR_getpriority                  /* syscall_slong_t getpriority(syscall_ulong_t which, id_t who) */
 /* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 #define SYS_setpriority                  __NR_setpriority                  /* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
-#define SYS_statfs                       __NR_statfs                       /* errno_t statfs(char const *file, struct statfs *buf) */
-#define SYS_fstatfs                      __NR_fstatfs                      /* errno_t fstatfs(fd_t file, struct statfs *buf) */
+#define SYS_statfs                       __NR_statfs                       /* errno_t statfs(char const *file, struct statfs32 *buf) */
+#define SYS_fstatfs                      __NR_fstatfs                      /* errno_t fstatfs(fd_t file, struct statfs32 *buf) */
 #define SYS_socketcall                   __NR_socketcall                   /* syscall_slong_t socketcall(syscall_ulong_t call, syscall_ulong_t *args) */
 #define SYS_syslog                       __NR_syslog                       /* ssize_t syslog(syscall_ulong_t level, char const *str, size_t len) */
 /* @param: which: One of `ITIMER_REAL', `ITIMER_VIRTUAL' or `ITIMER_PROF' */
@@ -588,8 +588,8 @@
 #define SYS_clock_gettime                __NR_clock_gettime                /* errno_t clock_gettime(clockid_t clock_id, struct timespec32 *tp) */
 #define SYS_clock_getres                 __NR_clock_getres                 /* errno_t clock_getres(clockid_t clock_id, struct timespec32 *res) */
 #define SYS_clock_nanosleep              __NR_clock_nanosleep              /* errno_t clock_nanosleep(clockid_t clock_id, syscall_ulong_t flags, struct timespec32 const *requested_time, struct timespec32 *remaining) */
-#define SYS_statfs64                     __NR_statfs64                     /* errno_t statfs64(char const *file, struct __statfs64 *buf) */
-#define SYS_fstatfs64                    __NR_fstatfs64                    /* errno_t fstatfs64(fd_t file, struct __statfs64 *buf) */
+#define SYS_statfs64                     __NR_statfs64                     /* errno_t statfs64(char const *file, struct statfs64 *buf) */
+#define SYS_fstatfs64                    __NR_fstatfs64                    /* errno_t fstatfs64(fd_t file, struct statfs64 *buf) */
 #define SYS_tgkill                       __NR_tgkill                       /* errno_t tgkill(pid_t pid, pid_t tid, signo_t signo) */
 /* @param: times:    When NULL, set the current time
  * @param: times[0]: New access time
@@ -607,7 +607,7 @@
 #define SYS_mq_getsetattr                __NR_mq_getsetattr                /* errno_t mq_getsetattr(fd_t mqdes, struct mq_attr const *newattr, struct mq_attr *oldattr) */
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-#define SYS_waitid                       __NR_waitid                       /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, syscall_ulong_t options, struct rusage *ru) */
+#define SYS_waitid                       __NR_waitid                       /* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, syscall_ulong_t options, struct rusage32 *ru) */
 /* Create a new socket for the given domain/type/protocol triple.
  * @param: domain:   Socket address domain/family (one of `AF_*' from `<sys/socket.h>')
  * @param: type:     Socket type (one of `SOCK_*' from `<sys/socket.h>')

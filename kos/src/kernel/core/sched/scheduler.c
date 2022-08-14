@@ -1447,7 +1447,9 @@ NOTHROW(FCALL cpuset_wake)(cpuset_t cpus) {
 PUBLIC void NOTHROW(KCALL cpu_deepsleep)(void) {
 	struct task *caller = THIS_TASK;
 	struct cpu *me = FORTASK(caller, this_cpu);
+#ifndef CONFIG_NO_SMP
 again:
+#endif /* !CONFIG_NO_SMP */
 	assertf(caller == &sched_idle,
 	        "cpu_deepsleep() may only be called form a cpu's IDLE thread!");
 	assertf(FORCPU(me, thiscpu_sched_current) == caller,

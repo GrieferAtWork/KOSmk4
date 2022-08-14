@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9f0f661 */
+/* HASH CRC-32:0xb9885c40 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1150,9 +1150,9 @@
 #define __NR64AT0_ustat                    (dev_t, __dev_t)
 #define __NR64AT1_ustat                    (struct ustat *, struct ustat *)
 #define __NR64AT0_statfs                   (char const *, char const *)
-#define __NR64AT1_statfs                   (struct __statfsx64 *, struct __statfsx64 *)
+#define __NR64AT1_statfs                   (struct statfsx64 *, struct __statfsx64 *)
 #define __NR64AT0_fstatfs                  (fd_t, __fd_t)
-#define __NR64AT1_fstatfs                  (struct __statfsx64 *, struct __statfsx64 *)
+#define __NR64AT1_fstatfs                  (struct statfsx64 *, struct __statfsx64 *)
 #define __NR64AT0_sysfs                    (int, int)
 #define __NR64AT0_getpriority              (syscall_ulong_t, __syscall_ulong_t)
 #define __NR64AT1_getpriority              (id_t, __id_t)

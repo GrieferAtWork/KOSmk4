@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1331aae4 */
+/* HASH CRC-32:0xc9e886d6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1461,7 +1461,7 @@ INTERN_FUNCTION(libc_sys_ustat)
 END(libc_sys_ustat)
 DEFINE_PUBLIC_ALIAS(sys_ustat, libc_sys_ustat)
 
-/* errno_t statfs(char const *file, struct __statfsx64 *buf) */
+/* errno_t statfs(char const *file, struct statfsx64 *buf) */
 INTERN_FUNCTION(libc_sys_statfs)
 	movq   $(0x89), %rax
 	syscall
@@ -1469,7 +1469,7 @@ INTERN_FUNCTION(libc_sys_statfs)
 END(libc_sys_statfs)
 DEFINE_PUBLIC_ALIAS(sys_statfs, libc_sys_statfs)
 
-/* errno_t fstatfs(fd_t file, struct __statfsx64 *buf) */
+/* errno_t fstatfs(fd_t file, struct statfsx64 *buf) */
 INTERN_FUNCTION(libc_sys_fstatfs)
 	movq   $(0x8a), %rax
 	syscall
@@ -5968,7 +5968,7 @@ INTERN_FUNCTION(libc_sys_Xustat)
 END(libc_sys_Xustat)
 DEFINE_PUBLIC_ALIAS(sys_Xustat, libc_sys_Xustat)
 
-/* errno_t statfs(char const *file, struct __statfsx64 *buf) */
+/* errno_t statfs(char const *file, struct statfsx64 *buf) */
 INTERN_FUNCTION(libc_sys_Xstatfs)
 	movq   $(0x89), %rax
 	std /* Enable exceptions */
@@ -5978,7 +5978,7 @@ INTERN_FUNCTION(libc_sys_Xstatfs)
 END(libc_sys_Xstatfs)
 DEFINE_PUBLIC_ALIAS(sys_Xstatfs, libc_sys_Xstatfs)
 
-/* errno_t fstatfs(fd_t file, struct __statfsx64 *buf) */
+/* errno_t fstatfs(fd_t file, struct statfsx64 *buf) */
 INTERN_FUNCTION(libc_sys_Xfstatfs)
 	movq   $(0x8a), %rax
 	std /* Enable exceptions */

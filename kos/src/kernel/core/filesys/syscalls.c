@@ -2675,14 +2675,9 @@ DEFINE_SYSCALL0(syscall_slong_t, getdrives) {
 /************************************************************************/
 /* fstatfs(), fstatfs64(), statfs(), statfs64()                         */
 /************************************************************************/
-typedef struct statfs32 struct_statfs32;
-typedef struct statfs64 struct_statfs64;
-#undef statfs32
-#undef statfs64
-
 #ifdef __ARCH_WANT_SYSCALL_FSTATFS
 DEFINE_SYSCALL2(errno_t, fstatfs, fd_t, fd,
-                USER UNCHECKED struct_statfs32 *, result) {
+                USER UNCHECKED struct __statfs32 *, result) {
 	REF struct fsuper *super;
 #ifndef _STATFS_MATCHES_STATFS64
 	struct statfs data;
@@ -2724,7 +2719,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, fstatfs, fd_t, fd,
 
 #ifdef __ARCH_WANT_SYSCALL_FSTATFS64
 DEFINE_SYSCALL2(errno_t, fstatfs64, fd_t, fd,
-                USER UNCHECKED struct_statfs64 *, result) {
+                USER UNCHECKED struct __statfs64 *, result) {
 	REF struct fsuper *super;
 	validate_writable(result, sizeof(*result));
 	super = handles_lookupfsuper_relaxed(fd);
@@ -2775,7 +2770,7 @@ get_super_from_path(USER CHECKED char const *filename) {
 #ifdef __ARCH_WANT_SYSCALL_STATFS
 DEFINE_SYSCALL2(errno_t, statfs,
                 USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct_statfs32 *, result) {
+                USER UNCHECKED struct __statfs32 *, result) {
 	REF struct fsuper *super;
 #ifndef _STATFS_MATCHES_STATFS64
 	struct statfs data;
@@ -2821,7 +2816,7 @@ DEFINE_COMPAT_SYSCALL2(errno_t, statfs,
 #ifdef __ARCH_WANT_SYSCALL_STATFS64
 DEFINE_SYSCALL2(errno_t, statfs64,
                 USER UNCHECKED char const *, filename,
-                USER UNCHECKED struct_statfs64 *, result) {
+                USER UNCHECKED struct __statfs64 *, result) {
 	REF struct fsuper *super;
 	validate_readable(filename, 1);
 	validate_writable(result, sizeof(*result));

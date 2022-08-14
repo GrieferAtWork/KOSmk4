@@ -99,7 +99,7 @@ __FORCELOCAL void (__yield)(void) { __asm__ __volatile__("yield"); }
 
 
 /* Flush the instruction cache by executing a fencing instruction. */
-#define __flush_instruction_cache() __isb()
+#define __flush_instruction_cache() (void)0 /* TODO */
 
 
 

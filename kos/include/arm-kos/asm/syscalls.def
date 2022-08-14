@@ -105,6 +105,11 @@ sched_rr_get_interval_time64 = sched_rr_get_interval64;
 maplibrary = maplibraryx32;
 getrlimit = getrlimit32;
 setrlimit = setrlimit32;
+waitid = waitid32;
+statfs = statfs32;
+fstatfs = fstatfs32;
+gettimeofday = gettimeofday32;
+settimeofday = settimeofday32;
 
 /* Deal with the whole new-vs-old select issue. */
 _newselect = select32;

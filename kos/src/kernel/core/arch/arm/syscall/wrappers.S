@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62c0f744 */
+/* HASH CRC-32:0x52ecfbc5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -298,10 +298,10 @@
 /* errno_t getrusage(syscall_slong_t who, struct rusage *usage) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 77) */
 
-/* errno_t gettimeofday(struct timeval *tv, struct timezone *tz) */
+/* errno_t gettimeofday(struct timeval32 *tv, struct timezone *tz) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 78) */
 
-/* errno_t settimeofday(struct timeval const *tv, struct timezone const *tz) */
+/* errno_t settimeofday(struct timeval32 const *tv, struct timezone const *tz) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 79) */
 
 /* @return: * :     [count == 0] The required number of groups
@@ -373,10 +373,10 @@
 /* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 97) */
 
-/* errno_t statfs(char const *file, struct statfs *buf) */
+/* errno_t statfs(char const *file, struct statfs32 *buf) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 99) */
 
-/* errno_t fstatfs(fd_t file, struct statfs *buf) */
+/* errno_t fstatfs(fd_t file, struct statfs32 *buf) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 100) */
 
 /* syscall_slong_t socketcall(syscall_ulong_t call, syscall_ulong_t *args) */
@@ -1062,10 +1062,10 @@
 /* errno_t clock_nanosleep(clockid_t clock_id, syscall_ulong_t flags, struct timespec32 const *requested_time, struct timespec32 *remaining) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 265) */
 
-/* errno_t statfs64(char const *file, struct __statfs64 *buf) */
+/* errno_t statfs64(char const *file, struct statfs64 *buf) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 266) */
 
-/* errno_t fstatfs64(fd_t file, struct __statfs64 *buf) */
+/* errno_t fstatfs64(fd_t file, struct statfs64 *buf) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 267) */
 
 /* errno_t tgkill(pid_t pid, pid_t tid, signo_t signo) */
@@ -1109,7 +1109,7 @@
 
 /* @param: idtype:  One of `P_ALL', `P_PID', `P_PGID'
  * @param: options: At least one of `WEXITED', `WSTOPPED', `WCONTINUED', optionally or'd with `WNOHANG | WNOWAIT' */
-/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, syscall_ulong_t options, struct rusage *ru) */
+/* errno_t waitid(syscall_ulong_t idtype, id_t id, struct __siginfo_struct *infop, syscall_ulong_t options, struct rusage32 *ru) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 280) */
 
 /* Create a new socket for the given domain/type/protocol triple.

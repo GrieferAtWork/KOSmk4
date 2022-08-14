@@ -1215,7 +1215,7 @@ DEFINE_SYSCALL5(pid_t, waitid,
                 syscall_ulong_t, which, id_t, upid,
                 USER UNCHECKED siginfo_t *, infop,
                 syscall_ulong_t, options,
-                USER UNCHECKED struct rusage32 *, ru) {
+                USER UNCHECKED struct __rusage32 *, ru) {
 	pid_t result;
 	VALIDATE_FLAGSET(options,
 	                 WNOHANG | WNOREAP | WEXITED | WSTOPPED | WCONTINUED,
@@ -1384,7 +1384,7 @@ DEFINE_COMPAT_SYSCALL3(pid_t, waitpid,
 DEFINE_SYSCALL4(pid_t, wait4, pid_t, upid,
                 USER UNCHECKED int32_t *, wstatus,
                 syscall_ulong_t, options,
-                USER UNCHECKED struct rusage32 *, ru) {
+                USER UNCHECKED struct __rusage32 *, ru) {
 	idtype_t which;
 	pid_t result;
 	VALIDATE_FLAGSET(options,

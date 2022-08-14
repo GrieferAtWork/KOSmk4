@@ -109,7 +109,7 @@ coredump_create(struct ucpustate const *curr_ustate,
 
 /* Create a coredump because of the given signal `si' */
 FUNDEF NONNULL((1, 2)) void FCALL
-coredump_create_for_signal(struct icpustate *__restrict state,
+coredump_create_for_signal(struct icpustate const *__restrict state,
                            struct __siginfo_struct const *__restrict si);
 
 /* Create a coredump because of the currently thrown exception
@@ -121,7 +121,7 @@ coredump_create_for_signal(struct icpustate *__restrict state,
  *                                      if  the  exception being  handled was  caused by
  *                                      user-space, such as an E_SEGFAULT */
 FUNDEF NONNULL((1, 2)) void FCALL
-coredump_create_for_exception(struct icpustate *__restrict state,
+coredump_create_for_exception(struct icpustate const *__restrict state,
                               struct exception_info const *__restrict info,
                               bool originates_from_kernelspace);
 

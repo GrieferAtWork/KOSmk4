@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf33b753f */
+/* HASH CRC-32:0x131cd779 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -224,8 +224,8 @@
 /* @param: which: One of `PRIO_PROCESS', `PRIO_PGRP' or `PRIO_USER' */
 #define SYS_setpriority                  __NR_setpriority                  /* errno_t setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value) */
 #define SYS_profil                       __NR_profil                       /* errno_t profil(void) */
-#define SYS_statfs                       __NR_statfs                       /* errno_t statfs(char const *file, struct __statfsx32 *buf) */
-#define SYS_fstatfs                      __NR_fstatfs                      /* errno_t fstatfs(fd_t file, struct __statfsx32 *buf) */
+#define SYS_statfs                       __NR_statfs                       /* errno_t statfs(char const *file, struct statfsx32 *buf) */
+#define SYS_fstatfs                      __NR_fstatfs                      /* errno_t fstatfs(fd_t file, struct statfsx32 *buf) */
 #define SYS_ioperm                       __NR_ioperm                       /* errno_t ioperm(syscall_ulong_t from, syscall_ulong_t num, syscall_ulong_t turn_on) */
 #define SYS_socketcall                   __NR_socketcall                   /* __LONG32_TYPE__ socketcall(__ULONG32_TYPE__ call, __ULONG32_TYPE__ *args) */
 #define SYS_syslog                       __NR_syslog                       /* ssize_t syslog(syscall_ulong_t level, char const *str, size_t len) */
@@ -625,8 +625,8 @@
 #define SYS_clock_gettime                __NR_clock_gettime                /* errno_t clock_gettime(clockid_t clock_id, struct timespecx32 *tp) */
 #define SYS_clock_getres                 __NR_clock_getres                 /* errno_t clock_getres(clockid_t clock_id, struct timespecx32 *res) */
 #define SYS_clock_nanosleep              __NR_clock_nanosleep              /* errno_t clock_nanosleep(clockid_t clock_id, syscall_ulong_t flags, struct timespecx32 const *requested_time, struct timespecx32 *remaining) */
-#define SYS_statfs64                     __NR_statfs64                     /* errno_t statfs64(char const *file, struct __statfsx32_64 *buf) */
-#define SYS_fstatfs64                    __NR_fstatfs64                    /* errno_t fstatfs64(fd_t file, struct __statfsx32_64 *buf) */
+#define SYS_statfs64                     __NR_statfs64                     /* errno_t statfs64(char const *file, struct statfsx32_64 *buf) */
+#define SYS_fstatfs64                    __NR_fstatfs64                    /* errno_t fstatfs64(fd_t file, struct statfsx32_64 *buf) */
 #define SYS_tgkill                       __NR_tgkill                       /* errno_t tgkill(pid_t pid, pid_t tid, signo_t signo) */
 /* @param: times:    When NULL, set the current time
  * @param: times[0]: New access time

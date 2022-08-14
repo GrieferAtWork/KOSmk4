@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5eb2842d */
+/* HASH CRC-32:0x5b994e47 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1195,9 +1195,9 @@
 #define __NRAT1_setpriority                  (id_t, __id_t)
 #define __NRAT2_setpriority                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT0_statfs                       (char const *, char const *)
-#define __NRAT1_statfs                       (struct __statfsx32 *, struct __statfsx32 *)
+#define __NRAT1_statfs                       (struct statfsx32 *, struct __statfsx32 *)
 #define __NRAT0_fstatfs                      (fd_t, __fd_t)
-#define __NRAT1_fstatfs                      (struct __statfsx32 *, struct __statfsx32 *)
+#define __NRAT1_fstatfs                      (struct statfsx32 *, struct __statfsx32 *)
 #define __NRAT0_ioperm                       (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_ioperm                       (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT2_ioperm                       (syscall_ulong_t, __syscall_ulong_t)
@@ -1544,9 +1544,9 @@
 #define __NRAT2_clock_nanosleep              (struct timespecx32 const *, struct __timespecx32 const *)
 #define __NRAT3_clock_nanosleep              (struct timespecx32 *, struct __timespecx32 *)
 #define __NRAT0_statfs64                     (char const *, char const *)
-#define __NRAT1_statfs64                     (struct __statfsx32_64 *, struct __statfsx32_64 *)
+#define __NRAT1_statfs64                     (struct statfsx32_64 *, struct __statfsx32_64 *)
 #define __NRAT0_fstatfs64                    (fd_t, __fd_t)
-#define __NRAT1_fstatfs64                    (struct __statfsx32_64 *, struct __statfsx32_64 *)
+#define __NRAT1_fstatfs64                    (struct statfsx32_64 *, struct __statfsx32_64 *)
 #define __NRAT0_tgkill                       (pid_t, __pid_t)
 #define __NRAT1_tgkill                       (pid_t, __pid_t)
 #define __NRAT2_tgkill                       (signo_t, __signo_t)

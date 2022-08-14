@@ -41,6 +41,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <hybrid/overflow.h>
 
+#include <asm/intrin.h> /* __flush_instruction_cache */
+
 #include <stddef.h>
 #include <string.h>
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc40c5c84 */
+/* HASH CRC-32:0x30b45eb8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1150,9 +1150,9 @@
 #define __NRAT0_ustat                    (dev_t, __dev_t)
 #define __NRAT1_ustat                    (struct ustat *, struct ustat *)
 #define __NRAT0_statfs                   (char const *, char const *)
-#define __NRAT1_statfs                   (struct __statfsx64 *, struct __statfsx64 *)
+#define __NRAT1_statfs                   (struct statfsx64 *, struct __statfsx64 *)
 #define __NRAT0_fstatfs                  (fd_t, __fd_t)
-#define __NRAT1_fstatfs                  (struct __statfsx64 *, struct __statfsx64 *)
+#define __NRAT1_fstatfs                  (struct statfsx64 *, struct __statfsx64 *)
 #define __NRAT0_sysfs                    (int, int)
 #define __NRAT0_getpriority              (syscall_ulong_t, __syscall_ulong_t)
 #define __NRAT1_getpriority              (id_t, __id_t)

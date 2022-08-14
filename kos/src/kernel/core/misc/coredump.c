@@ -426,11 +426,16 @@ coredump_create(struct ucpustate const *curr_ustate,
 
 /* Create a coredump because of the currently thrown exception */
 PUBLIC ATTR_NOINLINE NONNULL((1, 2)) void FCALL
-coredump_create_for_exception(struct icpustate *__restrict state,
+coredump_create_for_exception(struct icpustate const *__restrict state,
                               struct exception_info const *__restrict info,
                               bool originates_from_kernelspace) {
+#ifdef ICPUSTATE_IS_TRANSITIVE_UCPUSTATE
+#define LOCAL_p_ust state
+#else /* ICPUSTATE_IS_TRANSITIVE_UCPUSTATE */
+#define LOCAL_p_ust (&ust)
 	struct ucpustate ust;
-	icpustate_user_to_ucpustate(state, &ust);
+	icpustate_user_to_ucpustate(state, LOCAL_p_ust);
+#endif /* !ICPUSTATE_IS_TRANSITIVE_UCPUSTATE */
 	if (!originates_from_kernelspace) {
 		/* If the exception doesn't originate from kernel-space, such as
 		 * an E_SEGFAULT propagated  by `userexcept_handler()', then  we
@@ -439,7 +444,7 @@ coredump_create_for_exception(struct icpustate *__restrict state,
 		 * still  refer to  the previous  thrown exception,  and not the
 		 * current one)
 		 * Also: The current exception doesn't actually have a kernel side. */
-		coredump_create(&ust, NULL, 0, &ust, NULL, 0, NULL,
+		coredump_create(LOCAL_p_ust, NULL, 0, LOCAL_p_ust, NULL, 0, NULL,
 		                container_of(&info->ei_data, union coredump_info, ci_except),
 		                UNWIND_USER_DISABLED);
 	} else {
@@ -450,27 +455,34 @@ coredump_create_for_exception(struct icpustate *__restrict state,
 				if (info->ei_trace[i] == NULL)
 					break;
 			}
-			coredump_create(&ust, NULL, 0, &ust, i ? info->ei_trace : NULL, i, &info->ei_state,
+			coredump_create(LOCAL_p_ust, NULL, 0, LOCAL_p_ust, i ? info->ei_trace : NULL, i, &info->ei_state,
 			                container_of(&info->ei_data, union coredump_info, ci_except),
 			                UNWIND_USER_DISABLED);
 		}
 #else /* EXCEPT_BACKTRACE_SIZE != 0 */
-		coredump_create(&ust, NULL, 0, &ust, NULL, 0, &info->ei_state,
+		coredump_create(LOCAL_p_ust, NULL, 0, LOCAL_p_ust, NULL, 0, &info->ei_state,
 		                container_of(&info->ei_data, union coredump_info, ci_except),
 		                UNWIND_USER_DISABLED);
 #endif /* EXCEPT_BACKTRACE_SIZE == 0 */
 	}
+#undef LOCAL_p_ust
 }
 
 /* Create a coredump because of the given signal `si' */
 PUBLIC ATTR_NOINLINE NONNULL((1, 2)) void FCALL
-coredump_create_for_signal(struct icpustate *__restrict state,
+coredump_create_for_signal(struct icpustate const *__restrict state,
                            siginfo_t const *__restrict si) {
+#ifdef ICPUSTATE_IS_TRANSITIVE_UCPUSTATE
+#define LOCAL_p_ust state
+#else /* ICPUSTATE_IS_TRANSITIVE_UCPUSTATE */
+#define LOCAL_p_ust (&ust)
 	struct ucpustate ust;
-	icpustate_user_to_ucpustate(state, &ust);
-	coredump_create(&ust, NULL, 0, &ust, NULL, 0, NULL,
+	icpustate_user_to_ucpustate(state, LOCAL_p_ust);
+#endif /* !ICPUSTATE_IS_TRANSITIVE_UCPUSTATE */
+	coredump_create(LOCAL_p_ust, NULL, 0, LOCAL_p_ust, NULL, 0, NULL,
 	                container_of(si, union coredump_info, ci_signal),
 	                UNWIND_SUCCESS);
+#undef LOCAL_p_ust
 }
 
 

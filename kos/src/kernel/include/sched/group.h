@@ -437,11 +437,11 @@ struct procctl {
 #define procctl_thrds_acquired(self)        atomic_lock_acquired(&(self)->pc_thrds_lock)
 #define procctl_thrds_available(self)       atomic_lock_available(&(self)->pc_thrds_lock)
 #else /* !CONFIG_NO_SMP */
-#define procctl_thrds_tryacquire_nopr(self) 1
-#define procctl_thrds_acquire_nopr(self)    (void)0
-#define procctl_thrds_release_nopr(self)    (void)0
-#define procctl_thrds_acquired(self)        (!__hybrid_preemption_ison())
-#define procctl_thrds_available(self)       1
+#define procctl_thrds_tryacquire_nopr(self) ((void)(self), 1)
+#define procctl_thrds_acquire_nopr(self)    (void)(self)
+#define procctl_thrds_release_nopr(self)    (void)(self)
+#define procctl_thrds_acquired(self)        ((void)(self), !__hybrid_preemption_ison())
+#define procctl_thrds_available(self)       ((void)(self), 1)
 #endif /* CONFIG_NO_SMP */
 #define procctl_thrds_acquire(self)   atomic_lock_acquire_smp(&(self)->pc_thrds_lock)
 #define procctl_thrds_release(self)   atomic_lock_release_smp(&(self)->pc_thrds_lock)

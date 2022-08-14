@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc03af6fd */
+/* HASH CRC-32:0x611aa544 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1195,9 +1195,9 @@
 #define __NR32AT1_setpriority                  (id_t, __id_t)
 #define __NR32AT2_setpriority                  (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT0_statfs                       (char const *, char const *)
-#define __NR32AT1_statfs                       (struct __statfsx32 *, struct __statfsx32 *)
+#define __NR32AT1_statfs                       (struct statfsx32 *, struct __statfsx32 *)
 #define __NR32AT0_fstatfs                      (fd_t, __fd_t)
-#define __NR32AT1_fstatfs                      (struct __statfsx32 *, struct __statfsx32 *)
+#define __NR32AT1_fstatfs                      (struct statfsx32 *, struct __statfsx32 *)
 #define __NR32AT0_ioperm                       (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT1_ioperm                       (syscall_ulong_t, __syscall_ulong_t)
 #define __NR32AT2_ioperm                       (syscall_ulong_t, __syscall_ulong_t)
@@ -1544,9 +1544,9 @@
 #define __NR32AT2_clock_nanosleep              (struct timespecx32 const *, struct __timespecx32 const *)
 #define __NR32AT3_clock_nanosleep              (struct timespecx32 *, struct __timespecx32 *)
 #define __NR32AT0_statfs64                     (char const *, char const *)
-#define __NR32AT1_statfs64                     (struct __statfsx32_64 *, struct __statfsx32_64 *)
+#define __NR32AT1_statfs64                     (struct statfsx32_64 *, struct __statfsx32_64 *)
 #define __NR32AT0_fstatfs64                    (fd_t, __fd_t)
-#define __NR32AT1_fstatfs64                    (struct __statfsx32_64 *, struct __statfsx32_64 *)
+#define __NR32AT1_fstatfs64                    (struct statfsx32_64 *, struct __statfsx32_64 *)
 #define __NR32AT0_tgkill                       (pid_t, __pid_t)
 #define __NR32AT1_tgkill                       (pid_t, __pid_t)
 #define __NR32AT2_tgkill                       (signo_t, __signo_t)

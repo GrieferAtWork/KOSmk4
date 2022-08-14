@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d1afae7 */
+/* HASH CRC-32:0x2802c71b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1337,7 +1337,7 @@
 #define __NRATR0_gettimeofday                 SC_REPR_POINTER                                                      /* tv */ 
 #define __NRATR1_gettimeofday                 SC_REPR_POINTER                                                      /* tz */ 
 #define __NRRTR_gettimeofday                  SC_REPR_ERRNO_T                                                      /* return */
-#define __NRATR0_settimeofday                 SC_REPR_STRUCT_TIMEVAL                                               /* tv */ 
+#define __NRATR0_settimeofday                 SC_REPR_STRUCT_TIMEVAL32                                             /* tv */ 
 #define __NRATR1_settimeofday                 SC_REPR_STRUCT_TIMEZONE                                              /* tz */ 
 #define __NRRTR_settimeofday                  SC_REPR_ERRNO_T                                                      /* return */
 #define __NRATR0_getgroups                    SC_REPR_SIZE_T                                                       /* count */ 
