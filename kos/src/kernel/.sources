@@ -147,12 +147,12 @@ BEGIN
 			SOURCE({ "../libsctrace/*.c" }) /* Include libsctrace source files */
 		)
 
-		DEFINE_SIMPLE_DRIVER("svga",
-			SOURCE({ "../libsvgadrv/*.c" }) /* Video driver library */
-		)
-
 		/* X86-specific drivers */
 		if (TARGET_ARCH in ["i386", "x86_64"]) {
+			DEFINE_SIMPLE_DRIVER("svga",
+				SOURCE({ "../libsvgadrv/*.c" }) /* Video driver library */
+			)
+
 			DEFINE_SIMPLE_ARCH_DRIVER("rtm")
 
 			/* PE executable driver */

@@ -97,9 +97,6 @@ BEGIN
 		/* Required for: executing #!-files. */
 		"../modshebang/*.c",
 
-		/* Required for: disk I/O */
-		"../modide/*.c",
-
 		/* Required for: disk file access */
 		"../modfat/*.c",
 
@@ -118,6 +115,14 @@ BEGIN
 		/* Do arch-specific files last */
 		f"arch/{XARCH}/*.c",
 	];
+
+	/* Required for: disk I/O */
+	if (TARGET_ARCH !in ["arm"]) { /* TODOB */
+		KERNEL_C_SOURCES.append("../modide/*.c");
+	}
+
+
+
 	for (local x: fs.dir("kos/src/kernel/core/arch/" + XARCH)) {
 		if ("." in x || x.startswith("__"))
 			continue; /* Not a directory */
