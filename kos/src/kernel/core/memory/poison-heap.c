@@ -545,7 +545,7 @@ INTDEF ATTR_CONST size_t KCALL ph_kmalloc_traceback(void *ptr, /*out*/ void **tb
 #endif /* POISON_HEAP_CONFIG_NEED_ZERO_FUNCTIONS */
 #ifdef POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS
 INTDEF void NOTHROW(KCALL ph_kmalloc_validate)(void);
-INTDEF void NOTHROW(KCALL ph_kmalloc_leaks_release)(kmalloc_leaks_t leaks);
+INTDEF void NOTHROW(KCALL ph_kmalloc_leaks_release)(kmalloc_leaks_t leaks, unsigned int how);
 INTDEF void NOTHROW(KCALL ph_kmalloc_untrace)(void *ptr);
 INTDEF void NOTHROW(KCALL ph_kmalloc_untrace_n)(void *ptr, size_t num_bytes);
 #endif /* POISON_HEAP_CONFIG_NEED_VOID_FUNCTIONS */
