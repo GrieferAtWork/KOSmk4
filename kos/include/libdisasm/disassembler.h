@@ -33,45 +33,66 @@
 #include "format.h"
 
 /* Known disassembler target IDs. */
-/*[[[enum]]]*/
-#ifdef __CC__
-enum {
-	DISASSEMBLER_TARGET_UNKNOWN = 0x0000, /* Unknown target */
-	DISASSEMBLER_TARGET_8086    = 0x8086, /* Disassemble for 8086 (16-bit mode) (in AT&T syntax) */
-	DISASSEMBLER_TARGET_I386    = 0x0386, /* Disassemble for i386+ (32-bit mode) (in AT&T syntax) */
-	DISASSEMBLER_TARGET_X86_64  = 0x8664, /* Disassemble for x86_64 (64-bit mode) (in AT&T syntax) */
-};
-#endif /* __CC__ */
-/*[[[AUTO]]]*/
-#ifdef __COMPILER_PREFERR_ENUMS
-#define DISASSEMBLER_TARGET_UNKNOWN DISASSEMBLER_TARGET_UNKNOWN /* Unknown target */
-#define DISASSEMBLER_TARGET_8086    DISASSEMBLER_TARGET_8086    /* Disassemble for 8086 (16-bit mode) (in AT&T syntax) */
-#define DISASSEMBLER_TARGET_I386    DISASSEMBLER_TARGET_I386    /* Disassemble for i386+ (32-bit mode) (in AT&T syntax) */
-#define DISASSEMBLER_TARGET_X86_64  DISASSEMBLER_TARGET_X86_64  /* Disassemble for x86_64 (64-bit mode) (in AT&T syntax) */
-#else /* __COMPILER_PREFERR_ENUMS */
-#define DISASSEMBLER_TARGET_UNKNOWN 0     /* Unknown target */
-#define DISASSEMBLER_TARGET_8086    32902 /* Disassemble for 8086 (16-bit mode) (in AT&T syntax) */
-#define DISASSEMBLER_TARGET_I386    902   /* Disassemble for i386+ (32-bit mode) (in AT&T syntax) */
-#define DISASSEMBLER_TARGET_X86_64  34404 /* Disassemble for x86_64 (64-bit mode) (in AT&T syntax) */
-#endif /* !__COMPILER_PREFERR_ENUMS */
-/*[[[end]]]*/
+#define DISASSEMBLER_TARGET_UNKNOWN 0x0000 /* Unknown target */
+#define DISASSEMBLER_TARGET_8086    0x0001 /* Disassemble for 8086 (16-bit mode) (in AT&T syntax) */
+#define DISASSEMBLER_TARGET_I386    0x0002 /* Disassemble for i386+ (32-bit mode) (in AT&T syntax) */
+#define DISASSEMBLER_TARGET_X86_64  0x0003 /* Disassemble for x86_64 (64-bit mode) (in AT&T syntax) */
+#define DISASSEMBLER_TARGET_ARM_A32 0x0004 /* Disassemble for ARM (32-bit arm) */
+#define DISASSEMBLER_TARGET_ARM_T32 0x0005 /* Disassemble for ARM (32-bit thumb) */
+#define DISASSEMBLER_TARGET_COUNT   0x0006 /* Greatest supported target +1 */
 
+/* Determine the target to disassemble from a given register state */
 #if defined(__i386__) || defined(__x86_64__)
 #define disassembler_target_from_icpustate(state) (icpustate_isvm86(state) ? DISASSEMBLER_TARGET_8086 : icpustate_is32bit(state) ? DISASSEMBLER_TARGET_I386 : DISASSEMBLER_TARGET_X86_64)
 #define disassembler_target_from_scpustate(state) (scpustate_isvm86(state) ? DISASSEMBLER_TARGET_8086 : scpustate_is32bit(state) ? DISASSEMBLER_TARGET_I386 : DISASSEMBLER_TARGET_X86_64)
 #define disassembler_target_from_ucpustate(state) (ucpustate_isvm86(state) ? DISASSEMBLER_TARGET_8086 : ucpustate_is32bit(state) ? DISASSEMBLER_TARGET_I386 : DISASSEMBLER_TARGET_X86_64)
 #define disassembler_target_from_fcpustate(state) (fcpustate_isvm86(state) ? DISASSEMBLER_TARGET_8086 : fcpustate_is32bit(state) ? DISASSEMBLER_TARGET_I386 : DISASSEMBLER_TARGET_X86_64)
-#endif /* __i386__ || __x86_64__ */
+#elif defined(__arm__)
+#define disassembler_target_from_icpustate(state) (icpustate_isthumb(state) ? DISASSEMBLER_TARGET_ARM_T32 : DISASSEMBLER_TARGET_ARM_A32)
+#define disassembler_target_from_scpustate(state) (scpustate_isthumb(state) ? DISASSEMBLER_TARGET_ARM_T32 : DISASSEMBLER_TARGET_ARM_A32)
+#define disassembler_target_from_ucpustate(state) (ucpustate_isthumb(state) ? DISASSEMBLER_TARGET_ARM_T32 : DISASSEMBLER_TARGET_ARM_A32)
+#define disassembler_target_from_fcpustate(state) (fcpustate_isthumb(state) ? DISASSEMBLER_TARGET_ARM_T32 : DISASSEMBLER_TARGET_ARM_A32)
+#else /* ... */
+#define disassembler_target_from_icpustate(state) DISASSEMBLER_TARGET_UNKNOWN
+#define disassembler_target_from_scpustate(state) DISASSEMBLER_TARGET_UNKNOWN
+#define disassembler_target_from_ucpustate(state) DISASSEMBLER_TARGET_UNKNOWN
+#define disassembler_target_from_fcpustate(state) DISASSEMBLER_TARGET_UNKNOWN
+#endif /* !... */
 
-
-/* The target ID for the hosting machine. */
-#ifdef __x86_64__
+/* Check if a given disassembler target can be run by the host */
+#if defined(__x86_64__)
 #define DISASSEMBLER_TARGET_CURRENT DISASSEMBLER_TARGET_X86_64
+#define DISASSEMBLER_TARGET_ISHOST(target)   \
+	((target) == DISASSEMBLER_TARGET_8086 || \
+	 (target) == DISASSEMBLER_TARGET_I386 || \
+	 (target) == DISASSEMBLER_TARGET_X86_64)
 #elif defined(__i386__)
 #define DISASSEMBLER_TARGET_CURRENT DISASSEMBLER_TARGET_I386
+#define DISASSEMBLER_TARGET_ISHOST(target)   \
+	((target) == DISASSEMBLER_TARGET_8086 || \
+	 (target) == DISASSEMBLER_TARGET_I386)
+#elif defined(__arm__)
+#ifdef __thumb__
+#define DISASSEMBLER_TARGET_CURRENT DISASSEMBLER_TARGET_ARM_T32
+#else /* __thumb__ */
+#define DISASSEMBLER_TARGET_CURRENT DISASSEMBLER_TARGET_ARM_A32
+#endif /* !__thumb__ */
+#define DISASSEMBLER_TARGET_ISHOST(target)      \
+	((target) == DISASSEMBLER_TARGET_ARM_A32 || \
+	 (target) == DISASSEMBLER_TARGET_ARM_T32)
 #else /* ... */
 #define DISASSEMBLER_TARGET_CURRENT DISASSEMBLER_TARGET_UNKNOWN
+#define DISASSEMBLER_TARGET_ISHOST(target) ((target) == DISASSEMBLER_TARGET_UNKNOWN)
 #endif /* !... */
+
+/* Determine if a given target is supported by the implementation. */
+#if defined(__KOS__) && defined(__KERNEL__)
+#define DISASSEMBLER_TARGET_SUPPORTED(target) \
+	DISASSEMBLER_TARGET_ISHOST(target) /* The kernel-space implementation only supports host targets. */
+#else /* __KOS__ && __KERNEL__ */
+#define DISASSEMBLER_TARGET_SUPPORTED(target) \
+	((target) < DISASSEMBLER_TARGET_COUNT)
+#endif /* !__KOS__ || !__KERNEL__ */
 
 /* Disassembler flags. */
 #define DISASSEMBLER_FNORMAL  0x0000 /* Normal flags. */

@@ -34,6 +34,13 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define LIBEMU86_WANT_PROTOTYPES   1
 #define __LIBEMU86_STATIC          1
 
+#include <libdisasm/disassembler.h>
+/**/
+
+/* Only compile this file if X86 should be supported as a target */
+#if (DISASSEMBLER_TARGET_SUPPORTED(DISASSEMBLER_TARGET_8086) || \
+     DISASSEMBLER_TARGET_SUPPORTED(DISASSEMBLER_TARGET_I386) || \
+     DISASSEMBLER_TARGET_SUPPORTED(DISASSEMBLER_TARGET_X86_64))
 #include "x86.h"
 /**/
 
@@ -1690,5 +1697,6 @@ print_byte:
 
 
 DECL_END
+#endif /* DISASSEMBLER_TARGET_SUPPORTED(x86...) */
 
 #endif /* !GUARD_LIBDISASM_X86_C */
