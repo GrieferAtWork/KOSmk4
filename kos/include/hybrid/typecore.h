@@ -453,9 +453,10 @@
      defined(__sparc64__) || defined(__sparc_v9__) || \
      defined(__s390x__) ||  defined(__powerpc64__) || \
      defined(__arch64__) || defined(_WIN64) ||        \
-     defined(__mips64))
+     defined(__mips64) || defined(__ARM_64BIT_STATE))
 #define __SIZEOF_POINTER__ 8
-#elif defined(__i386__) || defined(__arm__) || defined(__CYGWIN32__)
+#elif (defined(__i386__) || defined(__arm__) || \
+       defined(__CYGWIN32__) || defined(__ARM_32BIT_STATE))
 #define __SIZEOF_POINTER__ 4
 #elif defined(__SIZEOF_SIZE_T__)
 #define __SIZEOF_POINTER__ __SIZEOF_SIZE_T__
@@ -1002,6 +1003,11 @@
 #endif /* __SIZEOF_WINT_T__ */
 
 
+#ifndef __SIZEOF_WCHAR_T__
+#ifdef __ARM_SIZEOF_WCHAR_T
+#define __SIZEOF_WCHAR_T__ __ARM_SIZEOF_WCHAR_T
+#endif /* __ARM_SIZEOF_WCHAR_T */
+#endif /* __SIZEOF_WCHAR_T__ */
 #ifndef __SIZEOF_WCHAR_T__
 #ifdef __WCHAR_MIN__
 #undef __WCHAR_UNSIGNED__
@@ -1619,7 +1625,7 @@
  * s.a. `https://gcc.gnu.org/onlinedocs/gcc/x86-Options.html#index-malign-double' */
 #define __ALIGNOF_INT64__ 4
 #endif /* __i386__ && !__x86_64__ */
-#endif /* __GNUC__ && !__INTELLISENSE__ */
+#endif /* !_MSC_VER && !__INTELLISENSE__ */
 #ifndef __ALIGNOF_INT64__
 #define __ALIGNOF_INT64__ 8
 #endif /* !__ALIGNOF_INT64__ */
@@ -1904,7 +1910,8 @@ __NAMESPACE_INT_END
 
 
 #ifdef __INTELLISENSE__
-/* Don't  #define   builtin   keywords   with   Intellisense.
+/* Don't #define builtin keywords under Intellisense.
+ *
  * Sometimes, Intellisense doesn't  notice when those  macros
  * get undef'd  and will  continue chugging  along as  though
  * they were still defined (leading to sporadic syntax errors
@@ -1950,6 +1957,8 @@ __NAMESPACE_INT_END
 #pragma push_macro("long")
 #pragma push_macro("signed")
 #pragma push_macro("unsigned")
+#pragma push_macro("__longlong_t")
+#pragma push_macro("__ulonglong_t")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #undef char
 #undef short
@@ -2349,6 +2358,8 @@ __NAMESPACE_INT_END
 #undef __longlong_t
 #undef __ulonglong_t
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("__ulonglong_t")
+#pragma pop_macro("__longlong_t")
 #pragma pop_macro("unsigned")
 #pragma pop_macro("signed")
 #pragma pop_macro("long")

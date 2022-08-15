@@ -258,7 +258,7 @@ template<class __T> class __PRIVATE_REFCNT_NAME(weakrefcnt_methods);
 #ifndef __PRIVATE_REFCNT_IMPL_DESTROY
 #if defined(NDEBUG) || defined(NDEBUG_REFCNT)
 #define __PRIVATE_REFCNT_IMPL_DESTROY(T, function, destroy_, refcnt_t, refcnt_field) \
-	destroy_(self);
+	destroy_(__self);
 #else /* NDEBUG || NDEBUG_REFCNT */
 #define __PRIVATE_REFCNT_IMPL_DESTROY(T, function, destroy_, refcnt_t, refcnt_field) \
 	/* Satisfy refcnt assertions within `destroy_()' */                              \

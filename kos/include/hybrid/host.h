@@ -321,12 +321,18 @@
 #define __powerpc64__ 1
 #endif /* __powerpc64__... */
 
+
+/************************************************************************/
+/* PORTABLE ARCH FEATURES                                               */
+/************************************************************************/
 #undef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #ifdef _ALIGNMENT_REQUIRED
 #if (_ALIGNMENT_REQUIRED + 0) == 0
 #define __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS 1
 #endif /* _ALIGNMENT_REQUIRED */
 #elif defined(__i386__) || defined(__x86_64__)
+#define __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS 1
+#elif defined(__arm__) && defined(__ARM_FEATURE_UNALIGNED)
 #define __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS 1
 #elif !defined(__KOS_SYSTEM_HEADERS__) && __has_include(<sys/isa_defs.h>)
 #include <sys/isa_defs.h>
