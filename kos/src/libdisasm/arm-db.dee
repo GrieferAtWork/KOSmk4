@@ -1,0 +1,542 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import fs;
+
+function indexOfMostSignificantZeroBit(v: int): int {
+	local result = -1;
+	local index = 0;
+	while (v) {
+		if (!(v & 1))
+			result = index;
+		++index;
+		v >>= 1;
+	}
+	return result;
+}
+
+class Instruction {
+	this = default;
+
+	@@Additional instruction flags
+	public member flags: {string...};
+
+	@@Unique id and order (in input file) of this instruction
+	public member order: int;
+
+	@@Mask of bits that must be @0
+	public member zeroBits: int;
+
+	@@Mask of bits that must be @1
+	public member oneBits: int;
+
+	@@Meaning of each bit
+	public member bits: {string...};
+
+	@@Instruction mnemonic + representation
+	public member display: string;
+
+	@@Instruction mnemonic
+	public property mnemonic: string = {
+		get(): string {
+			local i = 0, len = #display;
+			while (i < len && display.isalnum(i))
+				++i;
+			return display[:i];
+		}
+	};
+
+	@@Build a bit-match string for @name
+	function buildBitMatchString(name: string): string {
+		local firstMatchGroup = none;
+		local firstMatchGroupEnded = none;
+		local bitIndex = #bits - 1;
+		for (local bit: bits) {
+			if (bit == name) {
+				if (firstMatchGroupEnded !is none)
+					goto do_multi_match;
+				if (firstMatchGroup is none)
+					firstMatchGroup = bitIndex;
+			} else {
+				if (firstMatchGroup !is none && firstMatchGroupEnded is none)
+					firstMatchGroupEnded = bitIndex;
+			}
+			--bitIndex;
+		}
+		if (firstMatchGroupEnded is none)
+			firstMatchGroupEnded = -1;
+		local count = firstMatchGroup - firstMatchGroupEnded;
+		/* S: SHIFT; N: COUNT
+		 * -> Operand is encoded as: "(opcode >> SHIFT) & ((1 << COUNT) - 1)"
+		 */
+		return f"S{firstMatchGroupEnded+1}N{count}";
+do_multi_match:
+		File.Writer result;
+		for (local bit: bits)
+			result << (bit == name ? "X" : "_");
+		return result.string.lstrip("_");
+	}
+
+
+	@@Check if @this @Instruction is more restrictive (in terms of pattern matching) than @other
+	public operator < (other: Instruction): bool {
+		local lhsDef = this.zeroBits | this.oneBits;
+		local rhsDef = other.zeroBits | other.oneBits;
+
+		/* TODO: Look deeper into actual order:
+		 * - ["RnRnRnRn", "_1_1_1_1"]
+		 *   ["_1_1_1_1", "RnRnRnRn"]
+		 *   must always be  ordered:
+		 *   ["_1_1_1_1", "RnRnRnRn"]
+		 */
+
+		/* Order by position of most significant varying bit. */
+		local lastUndefBitLhs = indexOfMostSignificantZeroBit(lhsDef);
+		local lastUndefBitRhs = indexOfMostSignificantZeroBit(rhsDef);
+		if (lastUndefBitLhs < lastUndefBitRhs)
+			return true;
+		if (lastUndefBitLhs > lastUndefBitRhs)
+			return false;
+
+		/* Order by # of varying bits */
+		local lhsPop = lhsDef.popcount;
+		local rhsPop = rhsDef.popcount;
+		if (lhsPop > rhsPop)
+			return true;
+		if (lhsPop < rhsPop)
+			return false;
+
+		/* Fallback ordering (rely on user) */
+		return this.order < other.order;
+	}
+
+	@@Check if @zeroBits and @oneBits of @this instruction overlap with @other
+	public function conflictsWith(other: Instruction): bool {
+		/* We must return true if there exists an `opcode' such that:
+		 * >> (opcode & ~this.zeroBits) | this.oneBits ==
+		 * >> (opcode & ~other.zeroBits) | other.oneBits; */
+		if ((other.zeroBits & this.oneBits) != 0)
+			return false; /* Is there any bit for which `other' expects `0', but we expect `1' */
+		if ((other.oneBits & this.zeroBits) != 0)
+			return false; /* Is there any bit for which `other' expects `1', but we expect `0' */
+		if ((this.zeroBits & other.oneBits) != 0)
+			return false; /* Is there any bit for which we expect `0', but `other' expects `1' */
+		if ((this.oneBits & other.zeroBits) != 0)
+			return false; /* Is there any bit for which we expect `1', but `other' expects `0' */
+		/* There exists an `opcode' for which both instruction would match... */
+		return true;
+	}
+
+}
+
+global final varying T16: {Instruction...} = List();
+global final varying T32: {Instruction...} = List();
+global final varying A32: {Instruction...} = List();
+
+function parseArmDb() {
+	local fp = File.open(fs.joinpath(fs.headof(__FILE__), "arm-db"));
+	local order = 0;
+	for (local line: fp.read().splitlines(false)) {
+		local com = line.find("~");
+		if (com >= 0)
+			line = line[:com];
+		line = line.strip();
+		if (!line)
+			continue;
+
+		/* Parse instruction:
+		 *         ENCODING : PATTERN : MNEMONIC OPERANDS ~ [ARM-VERSIONS]
+		 * FLAGS : ENCODING : PATTERN : MNEMONIC OPERANDS ~ [ARM-VERSIONS] */
+		local flags = "";
+		local enc, pattern, display;
+		enc, none, line = line.partition(":")...;
+		enc = enc.strip();
+		pattern, none, line = line.partition(":")...;
+		pattern = pattern.strip();
+		display = line.strip();
+		if (":" in display) {
+			flags = enc;
+			enc = pattern;
+			pattern, none, display = display.partition(":")...;
+			pattern = pattern.strip();
+			display = display.strip();
+		}
+
+		/* Decode parts */
+		flags   = Tuple(flags.split(",").each.strip().decode("utf-8"));
+		enc     = Tuple(enc.split("/").each.strip().decode("utf-8"));
+		pattern = Tuple(pattern.decode("utf-8").segments(2));
+		display = display.decode("utf-8");
+
+		local zeroBits = 0;
+		local oneBits  = 0;
+		local mask = 1 << (#pattern - 1);
+		for (local bit: pattern) {
+			if (bit == "_0")
+				zeroBits |= mask;
+			if (bit == "_1")
+				oneBits |= mask;
+			mask >>= 1;
+		}
+
+		local instr = Instruction(
+				flags:    flags,
+				order:    order++,
+				zeroBits: zeroBits,
+				oneBits:  oneBits,
+				bits:     pattern,
+				display:  display);
+		for (local e: enc) {
+			switch (e) {
+
+			case "T1":
+			case "T2":
+			case "T3":
+			case "T4":
+				if (#pattern == 16) {
+					T16.append(instr);
+				} else if (#pattern == 32) {
+					T32.append(instr);
+				} else {
+					throw Error(
+							f"Expected 16/32-bit opcode for thumb instruction "
+							f"{repr display}, but is {#pattern} bits long");
+				}
+				break;
+
+			case "A1":
+			case "A2":
+				if (#pattern == 32) {
+					A32.append(instr);
+				} else {
+					throw Error(
+							f"Expected 32-bit opcode for ARM instruction "
+							f"{repr display}, but is {#pattern} bits long");
+				}
+				break;
+
+			default:
+				throw Error(f"Unknown encoding: {repr e}");
+			}
+		}
+	}
+}
+
+class InstructionGroup {
+	this = default;
+
+	@@Mask of bits that must be @0
+	public member zeroBits: int;
+
+	@@Mask of bits that must be @1
+	public member oneBits: int;
+
+	@@Instructions in this group
+	public member instructions: {Instruction...};
+}
+
+
+function groupByConflicts(instructions: {Instruction...}): {InstructionGroup...} {
+	instructions = Tuple(instructions);
+	local enumerated: HashSet with Instruction = HashSet();
+	for (local first: instructions) {
+		if (!enumerated.insert(first))
+			continue;
+		local currentBlock = [first];
+again_search_secondary:
+		for (local secondary: instructions) {
+			if (secondary in enumerated)
+				continue;
+			if ((currentBlock.each.conflictsWith(secondary)) || ...) {
+				enumerated.insert(secondary);
+				currentBlock.append(secondary);
+				goto again_search_secondary;
+			}
+		}
+		currentBlock.sort();
+		currentBlock = Tuple(currentBlock);
+		yield InstructionGroup(
+				zeroBits: (currentBlock.each.zeroBits as Sequence).reduce(operator &),
+				oneBits:  (currentBlock.each.oneBits as Sequence).reduce(operator &),
+				instructions: currentBlock);
+	}
+}
+
+
+
+parseArmDb();
+
+
+@@Representation of an instruction, as it will be output to the database
+class DBInstruction {
+	this = default;
+	public member ai_mask: int;
+	public member ai_bits: int;
+	public member ai_repr: {string...};
+
+	@@Underlying instruction
+	public member instr: Instruction;
+
+	operator == (other: DBInstruction): bool {
+		return ai_mask == other.ai_mask &&
+		       ai_bits == other.ai_bits &&
+		       ai_repr == other.ai_repr;
+	}
+
+	public property sizeof: int = {
+		get(): int {
+			return 8 + #ai_repr;
+		}
+	}
+	public property aligned_sizeof: int = {
+		get(): int {
+			return (sizeof + 3) & -3;
+		}
+	}
+}
+
+
+global usedFlagNames: {string...} = [];
+global usedSuffixNames: {string...} = [];
+global usedOperandNames: {string...} = [];
+
+function compileDBInstruction(instr: Instruction): DBInstruction {
+	local iRepr: {string...} = [];
+	local display: string = instr.display;
+	local len = #display;
+	local i = 0;
+	while (i < len && display.isalnum(i))
+		++i;
+	for (local flag: instr.flags) {
+		flag = f"F_{flag}";
+		if (flag !in usedFlagNames)
+			usedFlagNames.append(flag);
+		iRepr.append(flag);
+	}
+	for (local ch: display[:i].lower())
+		iRepr.append(f"'{ch}'");
+	while (i < len && display[i] in "<{") {
+		local suffixEnd = display.indexmatch(display[i], {
+			"<" : ">",
+			"{" : "}",
+		}[display[i]], i + 1);
+		local suffix = f"S_{display[i+1:suffixEnd]}";
+		if (suffix !in usedSuffixNames)
+			usedSuffixNames.append(suffix);
+		iRepr.append(suffix);
+		i = suffixEnd + 1;
+	}
+
+	while (i < len && display.isspace(i))
+		++i;
+	if (i < len)
+		iRepr.append(r"'\t'");
+	while (i < len) {
+		local ch = display[i];
+		if (ch == "<") {
+			local operandEnd = display.index(">", i);
+			local operand = display[i+1:operandEnd];
+			if (operand in ["Ra", "Rd", "Rm", "Rn", "Rs", "RdLo", "RdHi"]) {
+				operand = {
+					"RdLo": "Rl",
+					"RdHi": "Rh",
+				}.get(operand, operand);
+				operand = f"O_R_{instr.buildBitMatchString(operand)}";
+			} else {
+				operand = f"O_TODO({repr operand})";
+			}
+			iRepr.append(operand);
+			if (operand !in usedOperandNames)
+				usedOperandNames.append(operand);
+			i = operandEnd + 1;
+		} else if (ch in ",{}" || ch.isspace()) {
+			/* Ignore */
+			++i;
+		} else {
+			iRepr.append(f"'{ch}'");
+			++i;
+		}
+	}
+	iRepr.append("0");
+	return DBInstruction(
+			ai_mask: instr.zeroBits | instr.oneBits,
+			ai_bits: instr.oneBits,
+			ai_repr: iRepr,
+			instr:   instr);
+}
+
+function hexN(v: int, n: int = 8): string {
+	return "0x" + v.hex()[2:].zfill(n);
+}
+
+function findSubList(seq: {Object...}, findme: {Object...}): int | none {
+	local first = findme.first;
+	local start = 0;
+	for (;;) {
+		start = seq.find(first, start);
+		if (start < 0)
+			break;
+		for (local i = 1; i < #findme; ++i) {
+			local seq_i = start + i;
+			if (seq_i > #seq)
+				return none;
+			if (seq[seq_i] != findme[i])
+				goto next;
+		}
+		return start;
+next:
+		++start;
+	}
+	return none;
+}
+
+function printInstructionDatabase() {
+	local numDbGroups: Cell with int = Cell(0);
+	local dbInstructionsOffset: Cell with int = Cell(0);
+	local dbInstructions: {DBInstruction...} = [];
+	function printInstructionGroups(name: string, groups: {InstructionGroup...}) {
+//		groups = List(groups);
+//		groups.sort(key: x -> (x.zeroBits | x.oneBits, x.oneBits));
+
+		print("PRIVATE struct arm_instruction_group const ", name, "[", #groups, "] = {");
+		for (local group: groups) {
+			local dbGroup = [];
+			local dbGroupSize = 0;
+			for (local instr: group.instructions) {
+				local dbInst: DBInstruction = compileDBInstruction(instr);
+				dbGroupSize += dbInst.aligned_sizeof;
+				dbGroup.append(dbInst);
+			}
+			/* Check if this group has already been compiled */
+			local groupOffset = dbInstructionsOffset.value;
+			local existing = findSubList(dbInstructions, dbGroup);
+			if (existing is none) {
+				dbInstructions.extend(dbGroup);
+				dbInstructionsOffset.value += dbGroupSize;
+			} else {
+				groupOffset = 0;
+				for (local dbInst: dbInstructions[:existing])
+					groupOffset += dbInst.aligned_sizeof;
+			}
+			print("\t{ U32(", hexN(group.zeroBits | group.oneBits), "), "
+			          "U32(", hexN(group.oneBits), "), "
+			          "U16(", #group.instructions, "), "
+			          "U16(", hexN(groupOffset, 4), ") },");
+		}
+		print("}; /* ", name, " */");
+		numDbGroups.value += #groups;
+		print;
+	}
+	printInstructionGroups("t16_instruction_groups", groupByConflicts(T16));
+	printInstructionGroups("t32_instruction_groups", groupByConflicts(T32));
+	printInstructionGroups("a32_instruction_groups", groupByConflicts(A32));
+
+	/* Print flag macros */
+	if (usedFlagNames) {
+		local flagId = 1;
+		print("/* Instruction matching flags */");
+		for (local flagName: usedFlagNames) {
+			if (flagId == "\t".ord())
+				++flagId;
+			print("#define ", flagName, " ", flagId);
+			++flagId;
+		}
+		print("#define ISFLAG(b) ((b) < ", flagId, ")");
+		print;
+	}
+
+	/* Print suffix macros */
+	if (usedSuffixNames) {
+		local suffixId = 1;
+		print("/* Instruction suffix flags */");
+		for (local suffixName: usedSuffixNames) {
+			if (suffixId == "\t".ord())
+				++suffixId;
+			print("#define ", suffixName, " ", suffixId);
+			++suffixId;
+		}
+		print;
+	}
+
+	/* Print operand macros */
+	if (usedSuffixNames) {
+		local operandId = 1;
+		print("/* Instruction operand encodings */");
+		local printedOperandNames = HashSet();
+		for (local operandName: usedOperandNames) {
+			if ("(" in operandName) {
+				operandName = operandName.partition("(")[0];
+				if (printedOperandNames.insert(operandName)) {
+					print("#define ", operandName, "(...) ", operandId);
+					++operandId;
+				}
+			} else if (printedOperandNames.insert(operandName)) {
+				print("#define ", operandName, " ", operandId);
+				++operandId;
+			}
+		}
+		print;
+	}
+
+	print("PRIVATE byte_t const arm_instruction_db[", dbInstructionsOffset.value, "] = {");
+	local longestMnemonicLen = dbInstructions.each.instr.mnemonic.length > ...;
+	for (local dbInst: dbInstructions) {
+		local padding = dbInst.aligned_sizeof - dbInst.sizeof;
+		print("\t/* ", dbInst.instr.mnemonic.lower().ljust(longestMnemonicLen), " */ "
+		      "P32(", hexN(dbInst.ai_mask), "), ",
+		      "P32(", hexN(dbInst.ai_bits), "), ",
+		      ", ".join(dbInst.ai_repr),
+		      ", 0" * padding, ",");
+	}
+	print("};");
+
+	print("/* Database size:");
+	print(" * groups: ", numDbGroups.value * 12, " = ", numDbGroups.value, " * 12");
+	print(" * blob:   ", dbInstructionsOffset.value);
+	local total = (numDbGroups.value * 12) + dbInstructionsOffset.value;
+	print(" * total:  ", total, " (", total / 1024, ".",
+	      str(((total * 100) / 1024) % 100).zfill(2),
+	      "KiB) */");
+}
+
+
+#ifdef __MAIN__
+function printGroup(group: InstructionGroup) {
+	print("\t{group:", #group.instructions,
+			", 0:",      group.zeroBits.hex(),
+			", 1:", group.oneBits.hex(), "}");
+	for (local instr: group.instructions) {
+		print("\t\t", "".join(instr.bits), ":", instr.display);
+	}
+}
+function printGroups(name: string, groups: {InstructionGroup...}) {
+	print(name, ":");
+	for (local group: groups)
+		printGroup(group);
+	print;
+	print;
+}
+
+
+printGroups("T16", groupByConflicts(T16));
+printGroups("T32", groupByConflicts(T32));
+printGroups("A32", groupByConflicts(A32));
+#endif /* __MAIN__ */

@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix a bug with `Dict.Frozen'"
-DEEMON_VERSION="18a619c437f72a1321d86680b063db67b4b70c72"
+#     v -- "Add some more integer helpers for bit inspection"
+DEEMON_VERSION="501496ccbeae929213328f7ef0905b7ba2c57be7"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
