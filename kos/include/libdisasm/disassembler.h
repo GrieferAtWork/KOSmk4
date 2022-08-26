@@ -33,13 +33,13 @@
 #include "format.h"
 
 /* Known disassembler target IDs. */
-#define DISASSEMBLER_TARGET_UNKNOWN 0x0000 /* Unknown target */
-#define DISASSEMBLER_TARGET_8086    0x0001 /* Disassemble for 8086 (16-bit mode) (in AT&T syntax) */
-#define DISASSEMBLER_TARGET_I386    0x0002 /* Disassemble for i386+ (32-bit mode) (in AT&T syntax) */
-#define DISASSEMBLER_TARGET_X86_64  0x0003 /* Disassemble for x86_64 (64-bit mode) (in AT&T syntax) */
-#define DISASSEMBLER_TARGET_ARM_A32 0x0004 /* Disassemble for ARM (32-bit arm) */
-#define DISASSEMBLER_TARGET_ARM_T32 0x0005 /* Disassemble for ARM (32-bit thumb) */
-#define DISASSEMBLER_TARGET_COUNT   0x0006 /* Greatest supported target +1 */
+#define DISASSEMBLER_TARGET_UNKNOWN   0x0000 /* Unknown target */
+#define DISASSEMBLER_TARGET_8086      0x0001 /* Disassemble for 8086 (16-bit mode) (in AT&T syntax) */
+#define DISASSEMBLER_TARGET_I386      0x0002 /* Disassemble for i386+ (32-bit mode) (in AT&T syntax) */
+#define DISASSEMBLER_TARGET_X86_64    0x0003 /* Disassemble for x86_64 (64-bit mode) (in AT&T syntax) */
+#define DISASSEMBLER_TARGET_ARM_ARM   0x0004 /* Disassemble for ARM (32-bit arm) */
+#define DISASSEMBLER_TARGET_ARM_THUMB 0x0005 /* Disassemble for ARM (32-bit thumb) */
+#define DISASSEMBLER_TARGET_COUNT     0x0006 /* Greatest supported target +1 */
 
 /* Determine the target to disassemble from a given register state */
 #if defined(__i386__) || defined(__x86_64__)
@@ -48,10 +48,10 @@
 #define disassembler_target_from_ucpustate(state) (ucpustate_isvm86(state) ? DISASSEMBLER_TARGET_8086 : ucpustate_is32bit(state) ? DISASSEMBLER_TARGET_I386 : DISASSEMBLER_TARGET_X86_64)
 #define disassembler_target_from_fcpustate(state) (fcpustate_isvm86(state) ? DISASSEMBLER_TARGET_8086 : fcpustate_is32bit(state) ? DISASSEMBLER_TARGET_I386 : DISASSEMBLER_TARGET_X86_64)
 #elif defined(__arm__)
-#define disassembler_target_from_icpustate(state) (icpustate_isthumb(state) ? DISASSEMBLER_TARGET_ARM_T32 : DISASSEMBLER_TARGET_ARM_A32)
-#define disassembler_target_from_scpustate(state) (scpustate_isthumb(state) ? DISASSEMBLER_TARGET_ARM_T32 : DISASSEMBLER_TARGET_ARM_A32)
-#define disassembler_target_from_ucpustate(state) (ucpustate_isthumb(state) ? DISASSEMBLER_TARGET_ARM_T32 : DISASSEMBLER_TARGET_ARM_A32)
-#define disassembler_target_from_fcpustate(state) (fcpustate_isthumb(state) ? DISASSEMBLER_TARGET_ARM_T32 : DISASSEMBLER_TARGET_ARM_A32)
+#define disassembler_target_from_icpustate(state) (icpustate_isthumb(state) ? DISASSEMBLER_TARGET_ARM_THUMB : DISASSEMBLER_TARGET_ARM_ARM)
+#define disassembler_target_from_scpustate(state) (scpustate_isthumb(state) ? DISASSEMBLER_TARGET_ARM_THUMB : DISASSEMBLER_TARGET_ARM_ARM)
+#define disassembler_target_from_ucpustate(state) (ucpustate_isthumb(state) ? DISASSEMBLER_TARGET_ARM_THUMB : DISASSEMBLER_TARGET_ARM_ARM)
+#define disassembler_target_from_fcpustate(state) (fcpustate_isthumb(state) ? DISASSEMBLER_TARGET_ARM_THUMB : DISASSEMBLER_TARGET_ARM_ARM)
 #else /* ... */
 #define disassembler_target_from_icpustate(state) DISASSEMBLER_TARGET_UNKNOWN
 #define disassembler_target_from_scpustate(state) DISASSEMBLER_TARGET_UNKNOWN
@@ -73,13 +73,13 @@
 	 (target) == DISASSEMBLER_TARGET_I386)
 #elif defined(__arm__)
 #ifdef __thumb__
-#define DISASSEMBLER_TARGET_CURRENT DISASSEMBLER_TARGET_ARM_T32
+#define DISASSEMBLER_TARGET_CURRENT DISASSEMBLER_TARGET_ARM_THUMB
 #else /* __thumb__ */
-#define DISASSEMBLER_TARGET_CURRENT DISASSEMBLER_TARGET_ARM_A32
+#define DISASSEMBLER_TARGET_CURRENT DISASSEMBLER_TARGET_ARM_ARM
 #endif /* !__thumb__ */
 #define DISASSEMBLER_TARGET_ISHOST(target)      \
-	((target) == DISASSEMBLER_TARGET_ARM_A32 || \
-	 (target) == DISASSEMBLER_TARGET_ARM_T32)
+	((target) == DISASSEMBLER_TARGET_ARM_ARM || \
+	 (target) == DISASSEMBLER_TARGET_ARM_THUMB)
 #else /* ... */
 #define DISASSEMBLER_TARGET_CURRENT DISASSEMBLER_TARGET_UNKNOWN
 #define DISASSEMBLER_TARGET_ISHOST(target) ((target) == DISASSEMBLER_TARGET_UNKNOWN)

@@ -39,7 +39,7 @@
 #define __BYTE_ORDER__ __BYTE_ORDER
 #elif defined(__BYTEORDER)
 #define __BYTE_ORDER__ __BYTEORDER
-#elif defined(__ENDIAN__)
+#elif defined(__ENDIAN__) && ((__ENDIAN__ + 0) >= 1234 && (__ENDIAN__ + 0) <= 4321)
 #define __BYTE_ORDER__ __ENDIAN__
 #elif defined(__LITTLE_ENDIAN__) && !defined(__BIG_ENDIAN__)
 #define __BYTE_ORDER__ 1234

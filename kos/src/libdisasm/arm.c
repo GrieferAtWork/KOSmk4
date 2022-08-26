@@ -52,7 +52,7 @@ INTERN NONNULL((1)) void CC
 libda_single_arm(struct disassembler *__restrict self) {
 	/* TODO: Properly disassemble instructions */
 
-	if (DAARM_ISA32(self)) {
+	if (DAARM_ISARM(self)) {
 		uint32_t opcode;
 print_32bit:
 		opcode = UNALIGNED_GET32((uint32_t const *)self->d_pc);

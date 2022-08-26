@@ -1631,10 +1631,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthread_t target_thread,
 /*[[[body:libc_pthread_setname_np]]]*/
 {
 	pid_t tid;
-	fd_t commfd;
-	size_t namelen;
 	ssize_t result;
-	char pathname[COMPILER_LENOF("/proc/" PRIMAXu "/comm")];
 	tid = ATOMIC_READ(target_thread->pt_tid);
 	if unlikely(tid == 0)
 		return ESRCH;
@@ -1652,7 +1649,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthread_t target_thread,
 		 * Because of this (and because we mustn't modify the thread's actual
 		 * name in case the caller-given name is too long), we have to  check
 		 * the length of `name' before even passing it along to the kernel! */
-		namelen = strlen(name);
+		fd_t commfd;
+		char pathname[COMPILER_LENOF("/proc/" PRIMAXu "/comm")];
+		size_t namelen = strlen(name);
 #ifdef TASK_COMM_LEN
 		if unlikely(namelen > (TASK_COMM_LEN - 1))
 			return ERANGE;
@@ -2756,7 +2755,7 @@ again:
 
 /* With a 64-bit timeout, wait  while a 32-bit control word  matches
  * the given value. Note that this function may access up to 8 bytes
- * starting at the base of the futex control word, through only  the
+ * starting at the base of the  futex control word, though only  the
  * first 4 bytes are actually inspected.
  * HINT: Waiting for 32-bit control words on 64-bit platforms is
  *       done  by  making  use  of   `LFUTEX_WAIT_WHILE_BITMASK' */
@@ -3255,7 +3254,7 @@ NOTHROW_NCX(LIBCCALL pthread_rwlock_delreading)(pthread_rwlock_t *__restrict rwl
 	struct readlock_tls_data *data;
 	data = readlock_tls_getdata();
 	if unlikely(!data)
-		return ENOMEM;
+		return EPERM; /* No data -> can't possibly be reading */
 	result = readlock_tls_data_dodel(data, rwlock);
 	if (result == EOK)
 		readlock_tls_data_rehash_after_remove(data);
@@ -4196,6 +4195,8 @@ PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") pthread_destr_function_t *tls_dto
 /* Max allocated TLS key, plus 1. This describes the length of `tls_dtors' */
 PRIVATE ATTR_SECTION(".bss.crt.sched.pthread") size_t tls_count = 0;
 
+/* Check that a  given TLS-key  has been  allocated; the  caller must  be
+ * holding at least a read-lock to `tls_lock' when calling this function. */
 #define tls_keyok(key) ((size_t)(key) < tls_count && tls_dtors[(size_t)(key)] != NULL)
 
 

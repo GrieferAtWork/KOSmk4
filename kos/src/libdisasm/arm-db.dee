@@ -81,6 +81,8 @@ class Instruction {
 			}
 			--bitIndex;
 		}
+		if (firstMatchGroup is none)
+			return "";
 		if (firstMatchGroupEnded is none)
 			firstMatchGroupEnded = -1;
 		local count = firstMatchGroup - firstMatchGroupEnded;
@@ -354,14 +356,114 @@ function compileDBInstruction(instr: Instruction): DBInstruction {
 		if (ch == "<") {
 			local operandEnd = display.index(">", i);
 			local operand = display[i+1:operandEnd];
-			if (operand in ["Ra", "Rd", "Rm", "Rn", "Rs", "RdLo", "RdHi"]) {
+			switch (operand) {
+
+			case "registers": {
+				local Lp = instr.buildBitMatchString("Lp");
+				local Ll = instr.buildBitMatchString("Ll");
+				local Lr = instr.buildBitMatchString("Lr");
+				if (Lp) {
+					operand = f"O_RLIST_P_{Lr}";
+				} else if (Ll) {
+					operand = f"O_RLIST_L_{Lr}";
+				} else {
+					operand = f"O_RLIST_{Lr}";
+				}
+			}	break;
+
+			case "imm":
+				/* ZeroExtend(imm*, 32); */
+				operand = f"O_IMM_{instr.buildBitMatchString("Ii")}";
+				break;
+
+			case "imm0":
+				/* ZeroExtend(imm*:0, 32); */
+				operand = f"O_IMM0_{instr.buildBitMatchString("Ii")}";
+				break;
+
+			case "imm00":
+				/* ZeroExtend(imm*:00, 32); */
+				operand = f"O_IMM00_{instr.buildBitMatchString("Ii")}";
+				break;
+
+			case "imm0_rel":
+				/* ZeroExtend(imm*:0, 32); */
+				operand = f"O_IMM0_REL_{instr.buildBitMatchString("Ii")}";
+				break;
+
+			case "imm00_rel":
+				/* ZeroExtend(imm*:00, 32); */
+				operand = f"O_IMM00_REL_{instr.buildBitMatchString("Ii")}";
+				break;
+
+			case "Simm0_rel":
+				/* SignExtend(imm*:0, 32); */
+				operand = f"O_SIMM0_REL_{instr.buildBitMatchString("Ii")}";
+				break;
+
+			case "Simm0_sj2j1_rel":
+				/* SignExtend(S:J2:J1:imm6:imm11:0, 32); */
+				operand = f"O_SIMM0_SJ2J1_REL_{instr.buildBitMatchString("Ii")}";
+				break;
+
+			case "Simm00_sj2j1_rel":
+				/* SignExtend(S:J1:J2:imm10H:imm10L:00, 32); */
+				operand = f"O_SIMM00_SJ2J1_REL_{instr.buildBitMatchString("Ii")}";
+				break;
+
+			case "Simm0_h_rel":
+				/* SignExtend(imm24:H:0, 32); */
+				operand = f"O_SIMM0_H_REL_{instr.buildBitMatchString("Ii")}";
+				break;
+
+			case "Simm00_rel":
+				/* SignExtend(imm*:00, 32); */
+				operand = f"O_SIMM00_REL_{instr.buildBitMatchString("Ii")}";
+				break;
+
+			case "dis10_imm":
+				/* DecodeImmShift(10, imm*); */
+				operand = f"O_DIS10_{instr.buildBitMatchString("Ii")}";
+				break;
+
+			case "ARMExpandImm(imm)":
+				operand = f"O_ARMEI_{instr.buildBitMatchString("Ii")}";
+				break;
+
+			case "ARMExpandImm_C(imm)":
+				operand = f"O_ARMEI_C_{instr.buildBitMatchString("Ii")}";
+				break;
+
+			case "ThumbExpandImm_C(imm)":
+				operand = f"O_THUMBEI_C_{instr.buildBitMatchString("Ii")}";
+				break;
+
+			case "ARMExpandImm_rel(imm)":
+				operand = f"O_ARMEI_REL_{instr.buildBitMatchString("Ii")}";
+				break;
+
+			case "shift":
+				operand = f"O_SHIFT_{instr.buildBitMatchString("St")}";
+				break;
+
+			case "Ra":
+			case "Rd":
+			case "Rm":
+			case "Rn":
+			case "Rs":
+			case "Rt":
+			case "RdLo":
+			case "RdHi":
 				operand = {
 					"RdLo": "Rl",
 					"RdHi": "Rh",
 				}.get(operand, operand);
 				operand = f"O_R_{instr.buildBitMatchString(operand)}";
-			} else {
+				break;
+
+			default:
 				operand = f"O_TODO({repr operand})";
+				break;
 			}
 			iRepr.append(operand);
 			if (operand !in usedOperandNames)
@@ -453,7 +555,7 @@ function printInstructionDatabase() {
 	if (usedFlagNames) {
 		local flagId = 1;
 		print("/* Instruction matching flags */");
-		for (local flagName: usedFlagNames) {
+		for (local flagName: usedFlagNames.sorted()) {
 			if (flagId == "\t".ord())
 				++flagId;
 			print("#define ", flagName, " ", flagId);
@@ -467,7 +569,7 @@ function printInstructionDatabase() {
 	if (usedSuffixNames) {
 		local suffixId = 1;
 		print("/* Instruction suffix flags */");
-		for (local suffixName: usedSuffixNames) {
+		for (local suffixName: usedSuffixNames.sorted()) {
 			if (suffixId == "\t".ord())
 				++suffixId;
 			print("#define ", suffixName, " ", suffixId);
@@ -477,11 +579,13 @@ function printInstructionDatabase() {
 	}
 
 	/* Print operand macros */
-	if (usedSuffixNames) {
+	if (usedOperandNames) {
 		local operandId = 1;
 		print("/* Instruction operand encodings */");
 		local printedOperandNames = HashSet();
-		for (local operandName: usedOperandNames) {
+		for (local operandName: usedOperandNames.sorted()) {
+			if (operandId == 33) /* "!" */
+				operandId = 127; /* ESC */
 			if ("(" in operandName) {
 				operandName = operandName.partition("(")[0];
 				if (printedOperandNames.insert(operandName)) {
@@ -540,3 +644,33 @@ printGroups("T16", groupByConflicts(T16));
 printGroups("T32", groupByConflicts(T32));
 printGroups("A32", groupByConflicts(A32));
 #endif /* __MAIN__ */
+
+/*
+??? = 000, 001, 010, 011, 100, 101, 110, 111
+??0 = 000, 010, 100, 110
+??1 = 001, 011, 101, 111
+?0? = 000, 001, 100, 101
+?00 = 000, 100
+?01 = 001, 101
+?1? = 010, 011, 110, 111
+?10 = 010, 110
+?11 = 011, 111
+0?? = 000, 001, 010, 011
+0?0 = 000, 010
+0?1 = 001, 011
+00? = 000, 001
+000 = 000
+001 = 001
+01? = 010, 011
+010 = 010
+011 = 011
+1?? = 100, 101, 110, 111
+1?0 = 100, 110
+1?1 = 101, 111
+10? = 100, 101
+100 = 100
+101 = 101
+11? = 110, 111
+110 = 110
+111 = 111
+*/

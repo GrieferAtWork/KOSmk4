@@ -31,8 +31,8 @@
 
 DECL_BEGIN
 
-#define DAARM_ISA32(self) ((self)->d_target == DISASSEMBLER_TARGET_ARM_A32)
-#define DAARM_IST32(self) ((self)->d_target == DISASSEMBLER_TARGET_ARM_T32)
+#define DAARM_ISARM(self)   ((self)->d_target == DISASSEMBLER_TARGET_ARM_ARM)
+#define DAARM_ISTHUMB(self) ((self)->d_target == DISASSEMBLER_TARGET_ARM_THUMB)
 
 INTDEF void CC libda_single_arm(struct disassembler *__restrict self);
 

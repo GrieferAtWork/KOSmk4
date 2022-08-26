@@ -205,7 +205,7 @@
 /* Automatic namespacing for header-local implementations of functions. */
 #ifdef __cplusplus
 #ifdef __INTELLISENSE__
-#define __LIBC_LOCAL_NAME(x)                  x
+#define __LIBC_LOCAL_NAME(x) x
 #define __LIBC_LOCAL_NAME_IS_IDENTITY
 #elif defined(_MSC_VER)
 #define __LIBC_LOCAL_NAME(x) x
@@ -235,7 +235,7 @@
  * >> Error: symbol `my_function' is already defined
  * >> Error: .size expression for my_function does not evaluate to a constant
  */
-#define __LIBC_LOCAL_NAME(x)                  __l_##x
+#define __LIBC_LOCAL_NAME(x) __l_##x
 #endif /* !__INTELLISENSE__ */
 extern "C++" {namespace __local_imp {
 #if (__has_feature(cxx_alias_templates) ||                                  \
