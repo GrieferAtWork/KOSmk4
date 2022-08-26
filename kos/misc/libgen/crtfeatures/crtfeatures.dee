@@ -29,15 +29,15 @@ import * from ..libgen.optiexpr;
 #define LOG_INCLUDE(...) print File.stderr:(__VA_ARGS__)
 #endif
 
-final global WARN_BAD_INCLUDE           = 0;
-final global WARN_MACRO_REDEFINED       = 1;
-final global WARN_MISSING_HEADER        = 2;
-final global WARN_TRAILING_DATA         = 3;
-final global WARN_UNDEF_BUILTIN_MACRO   = 4;
-final global WARN_UNDEF_MISSING_KEYWORD = 5;
-final global WARN_UNKNOWN_DIRECTIVE     = 6;
-final global WARN_COUNT = 7;
-final global DISABLED_WARNINGS: {string...} = HashSet();
+global final WARN_BAD_INCLUDE           = 0;
+global final WARN_MACRO_REDEFINED       = 1;
+global final WARN_MISSING_HEADER        = 2;
+global final WARN_TRAILING_DATA         = 3;
+global final WARN_UNDEF_BUILTIN_MACRO   = 4;
+global final WARN_UNDEF_MISSING_KEYWORD = 5;
+global final WARN_UNKNOWN_DIRECTIVE     = 6;
+global final WARN_COUNT = 7;
+global final DISABLED_WARNINGS: {string...} = HashSet();
 
 
 function replaceMacroInvocationKeywords(

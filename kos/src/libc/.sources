@@ -82,13 +82,13 @@ BEGIN
 		})
 	END
 
-	final local LIBC_FEATURES_HEADER = f"/kos/include/{XARCH}-kos/crt-features/crt-kos{SUFFIX}.h";
+	local final LIBC_FEATURES_HEADER = f"/kos/include/{XARCH}-kos/crt-features/crt-kos{SUFFIX}.h";
 	BEGIN GROUP("libs.libc") { LINK, ARCHIVE, MCOPY,
 			enumerateSymbolsStep(
 				elfBinary: f"{TARGET_BINPATH}{DISK_LIBPATH}libc.so",
 				callback: [](self: BoundStep, symbols: {(string, string, string, string, string)...}) {
 					local symbols_set: {string...} = HashSet();
-					final local CRT_DLSUBST_GLOBALS = {
+					local final CRT_DLSUBST_GLOBALS = {
 						"__peb", "environ", "_environ", "__environ",
 						"__argc", "__argv", "_pgmptr",
 						"program_invocation_name", "__progname_full",
@@ -99,7 +99,7 @@ BEGIN
 							continue;
 						if (symbolBind != "GLOBAL" && symbolBind != "WEAK")
 							continue;
-						final local LIBDL_SYMBOLS = {
+						local final LIBDL_SYMBOLS = {
 							"dlopen", "dlfopen", "dlclose", "dlsym", "dlerror", "dlgethandle",
 							"dlgetmodule", "dladdr", "dlmodulefd", "dlmodulename", "dlexceptaware",
 							"dlmodulebase", "dllocksection", "dlunlocksection", "dlsectionname",

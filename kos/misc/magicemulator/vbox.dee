@@ -108,7 +108,7 @@ function createVmdkDescriptor(diskFile: string): string {
 }
 
 function getUUIDOfVmdkDescriptor(vmdkFilename: string): string {
-	final local PREFIX = "ddb.uuid.image=";
+	local final PREFIX = "ddb.uuid.image=";
 	with (local fp = File.open(vmdkFilename, "r")) {
 		for (local l: fp) {
 			if (l.startswith(PREFIX))

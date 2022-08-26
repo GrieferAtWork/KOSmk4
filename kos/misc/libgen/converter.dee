@@ -90,7 +90,7 @@ function generateArrayMapping(
 }
 
 function printArrayDefineMacro(macroName: string, array: {int | none...}) {
-	final local MAX_VALUES_PER_LINE = 16;
+	local final MAX_VALUES_PER_LINE = 16;
 	local items = List(array);
 	local maxValue = max(for (local x: items) if (x !is none) x);
 	local elemType = maxValue > 0xffff

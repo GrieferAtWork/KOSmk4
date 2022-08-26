@@ -28,8 +28,8 @@ import ipc;
 import ._common as common;
 import ._shadow as shadow;
 
-final global BOCHS_BIOS    = "BIOS-bochs-latest";
-final global BOCHS_VGABIOS = "VGABIOS-lgpl-latest";
+global final BOCHS_BIOS    = "BIOS-bochs-latest";
+global final BOCHS_VGABIOS = "VGABIOS-lgpl-latest";
 
 function enumerateBochsInstallationLocations(): {string...} {
 	/* Check the bochs version created by `bash kos/misc/make_tool.sh bochs` */

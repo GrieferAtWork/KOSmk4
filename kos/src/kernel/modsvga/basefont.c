@@ -202,7 +202,7 @@ for (local i: [:256]) {
 }
 
 // Unicode -> vga w/ transliteration aliases
-final local UNI_EQ_PAIRS: {(int, int)...} = {
+local final UNI_EQ_PAIRS: {(int, int)...} = {
 
 	// Space characters
 	(0x00A0, 0x0020), // 𝘕𝘉𝘚𝘗 → ␠

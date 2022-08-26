@@ -5481,8 +5481,8 @@ function calculateOpcodeOffsets(start: string, end: string): ({int...}, int) {
 }
 
 function generateOffsetTable(name: string) {
-	final local START_MARKER_PATTERN = "/" "*[[[start:{}]]]*" "/";
-	final local END_MARKER_PATTERN = "/" "*[[[end:{}]]]*" "/";
+	local final START_MARKER_PATTERN = "/" "*[[[start:{}]]]*" "/";
+	local final END_MARKER_PATTERN = "/" "*[[[end:{}]]]*" "/";
 	local offsets, count = calculateOpcodeOffsets(
 		START_MARKER_PATTERN.format({ name }),
 		END_MARKER_PATTERN.format({ name }))...;

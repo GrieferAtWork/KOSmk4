@@ -37,8 +37,8 @@ with (local fp = File.open("../../../include/asm/os/" + contextName + "/errno.h"
 	local inside = false;
 	for (local l: fp) {
 		l = l.strip();
-		final local PREFIX = "/" "*[[[begin:";
-		final local SUFFIX = "]]]*" "/";
+		local final PREFIX = "/" "*[[[begin:";
+		local final SUFFIX = "]]]*" "/";
 		if (l == "/" "*[[[begin]]]*" "/")
 			inside = true;
 		if (l == "/" "*[[[end]]]*" "/")

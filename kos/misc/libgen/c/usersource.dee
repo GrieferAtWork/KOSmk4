@@ -117,8 +117,8 @@ function updateUserImplementationSourceFile(
 			if (tagEnd < 0)
 				errAt(tagStart, "Tag never terminated");
 			local tagBody = origText[tagStart+5:tagEnd];
-			final local EXPORTS_TABLE_TAG = "start:exports,hash:";
-			final local EXPORTS_TABLE_END = "\n/*[[[end:exports]]]*/\n";
+			local final EXPORTS_TABLE_TAG = "start:exports,hash:";
+			local final EXPORTS_TABLE_END = "\n/*[[[end:exports]]]*/\n";
 			if (tagBody.startswith("head:")) {
 				/* Actual function declaration */
 				local functionName: string;

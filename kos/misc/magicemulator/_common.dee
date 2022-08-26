@@ -422,7 +422,7 @@ function processKosDebugOutput(
 		writeStdout(text);
 	}
 #else /* !CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT */
-	final local MAX_COMMAND_LENGTH = 512;
+	local final MAX_COMMAND_LENGTH = 512;
 	local running_addr2line: {string: Addr2line} = Dict();
 	local stored_data = Cell();
 	function writeData(data: Bytes) {

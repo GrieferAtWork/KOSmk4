@@ -144,7 +144,7 @@ function scanFolderForFiles(path: string) {
 
 scanFolderForFiles(".");
 
-final global SORTED_FILE_NAMES = FILES.keys.sorted();
+global final SORTED_FILE_NAMES = FILES.keys.sorted();
 
 function createVsFile(filename: string, cb: Callable) {
 	print("Creating file: ", repr filename);

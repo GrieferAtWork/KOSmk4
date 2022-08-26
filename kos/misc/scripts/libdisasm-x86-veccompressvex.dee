@@ -80,7 +80,7 @@ for (local l: File.stdin) {
 				for (local j: ids) {
 					currentGroup.erase(j);
 				}
-				final local xmm_vex_start_prefix = "OP_VEX_B0(";
+				local final xmm_vex_start_prefix = "OP_VEX_B0(";
 				local xmm_vex_start = xmm.index(xmm_vex_start_prefix) + #xmm_vex_start_prefix;
 				local xmm_vex_end = xmm.indexmatch("(", ")", xmm_vex_start);
 				local xmm_vex_comma = xmm.rindex(",", xmm_vex_start, xmm_vex_end);

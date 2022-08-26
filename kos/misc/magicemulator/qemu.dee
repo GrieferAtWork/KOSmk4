@@ -51,7 +51,7 @@ function qemuMonitorBackend(addr: string, monitorPipe: File) {
 	}
 	Thread(() -> {
 		local isFirst = true;
-		final local prefix = "monitor>: ";
+		local final prefix = "monitor>: ";
 		for (;;) {
 			local text = s.recv();
 			if (isFirst) {
@@ -64,7 +64,7 @@ function qemuMonitorBackend(addr: string, monitorPipe: File) {
 		}
 	}).start();
 	local isFirst = true;
-	final local prefix = "monitor<: ";
+	local final prefix = "monitor<: ";
 	for (;;) {
 		local text = monitorPipe.read();
 		s.send(text);
@@ -156,7 +156,7 @@ did_update_x86_64_kernel:
 		));
 	}
 	try {
-		final local traceFilename = "qemu.events";
+		local final traceFilename = "qemu.events";
 		for (local l: File.open(traceFilename, "r")) {
 			l = l.strip();
 			if (l.startswith("#") || !l)
@@ -227,7 +227,7 @@ did_update_x86_64_kernel:
 	local enableMonitorCommands = false;
 	local monitorCommandPipe = none;
 	if (enableMonitorCommands) {
-		final local port = "1235";
+		local final port = "1235";
 		qemuArgs.extend({ "-monitor", "tcp::" + port + ",server" });
 		local r;
 		r, monitorCommandPipe = ipc.Pipe.new()...;

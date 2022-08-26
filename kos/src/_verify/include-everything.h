@@ -99,7 +99,7 @@ for (local l: File.open("../../../.gitignore", "r")) {
 }
 
 
-final global INCLUDE_PATH = "../../include/";
+global final INCLUDE_PATH = "../../include/";
 function incdir(path) {
 	for (local x: fs.dir(INCLUDE_PATH + path).sorted()) {
 		if (x in ["__ice__"])

@@ -80,7 +80,7 @@ PRIVATE ATTR_SECTION(".rodata.crt.unicode.static.ctype")
 uint16_t const libc___ctype_b_loc_matrix[384] = {
 /*[[[deemon
 
-final local known_flags = {
+local final known_flags = {
 	("CTB_LOC_ISUPPER",  [](ch) -> ASCII_ISUPPER(ch)),
 	("CTB_LOC_ISLOWER",  [](ch) -> ASCII_ISLOWER(ch)),
 	("CTB_LOC_ISALPHA",  [](ch) -> ASCII_ISALPHA(ch)),

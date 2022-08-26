@@ -300,7 +300,7 @@ $errno_t except_as_errno([[in]] struct exception_data const *__restrict self) {
 @@pp_endif@@
 	switch (self->@e_class@) {
 /*[[[deemon
-final local DEFAULT_ERRNO = "EPERM";
+local final DEFAULT_ERRNO = "EPERM";
 import * from deemon;
 import * from ....misc.libgen.exceptinfo;
 function isCustomErrnoExpr(s) -> s !is none && s != "DEFAULT_ERRNO";

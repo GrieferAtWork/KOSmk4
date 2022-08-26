@@ -38,7 +38,7 @@ File.stderr.setbuf("line");
 
 fs.chdir(fs.headof(__FILE__) + "/../../");
 
-final global HASH_FUNCTION = "CRC-32";
+global final HASH_FUNCTION = "CRC-32";
 
 @@Names of all of the functions unconditionally defined
 @@via `__CRT_HAVE_*` in "/kos/src/libc/crt-features.h".
@@ -108,13 +108,13 @@ function createAutoFilePPAssume(macros: {string: (int | bool)} = none): PPAssume
 
 @@Macro   definition  assumptions  that  may  be  made
 @@in headers and <libc/local/...> implementation files
-final global ppAssumeHeaderFiles: PPAssume = createPPAssume({
+global final ppAssumeHeaderFiles: PPAssume = createPPAssume({
 	"__BUILDING_LIBC" : false, /* not defined */
 	"__SIZEOF_CHAR__" : 1,
 });
 
 @@Macro definition assumptions that may be made inside of libc
-final global ppAssumeSourceFiles: PPAssume = createAutoFilePPAssume({
+global final ppAssumeSourceFiles: PPAssume = createAutoFilePPAssume({
 	"__BUILDING_LIBC" : 1,
 	"__SIZEOF_CHAR__" : 1,
 	"__KOS__"         : 1,
@@ -122,7 +122,7 @@ final global ppAssumeSourceFiles: PPAssume = createAutoFilePPAssume({
 });
 
 @@Macro definition assumptions that may be made inside of libc
-final global ppAssumeUserSourceFiles: PPAssume = createPPAssume({
+global final ppAssumeUserSourceFiles: PPAssume = createPPAssume({
 	"__KERNEL__"      : false, /* not defined */
 	"__BUILDING_LIBC" : 1,
 	"__SIZEOF_CHAR__" : 1,
@@ -131,7 +131,7 @@ final global ppAssumeUserSourceFiles: PPAssume = createPPAssume({
 });
 
 @@Macro definition assumptions that may be made in DOSABI source files
-final global ppAssumeDosAbiSourceFiles: PPAssume = createPPAssume({
+global final ppAssumeDosAbiSourceFiles: PPAssume = createPPAssume({
 	"__LIBCCALL_IS_LIBDCALL" : false, /* not defined */
 	"__LIBDCALL_IS_LIBKCALL" : false, /* not defined */
 	"__KERNEL__"             : false, /* not defined */
@@ -142,7 +142,7 @@ final global ppAssumeDosAbiSourceFiles: PPAssume = createPPAssume({
 });
 
 @@Macro definition assumptions that may be made in crt-kos-kernel.h
-final global ppAssumeCrtKosKernelFeatures: PPAssume = createPPAssume({
+global final ppAssumeCrtKosKernelFeatures: PPAssume = createPPAssume({
 	"__LIBCCALL_IS_LIBDCALL" : false, /* not defined */
 	"__LIBDCALL_IS_LIBKCALL" : false, /* not defined */
 	"__KERNEL__"             : true,  /* is defined */
@@ -154,7 +154,7 @@ final global ppAssumeCrtKosKernelFeatures: PPAssume = createPPAssume({
 
 
 @@The max # of tasks that may be run in parallel
-final global MAX_RUNNING_TASKS = (cpu_count from posix)() * 2;
+global final MAX_RUNNING_TASKS = (cpu_count from posix)() * 2;
 
 class CriticalSection {
 
@@ -627,7 +627,7 @@ function doPrint_include_crtFeatures_crtKosKernel(fp: File) {
 	 * Also note that we can skip scanning of user-level source files,
 	 * as  those don't even  get included as part  of the kernel build
 	 * tree */
-	final local NOT_DEFINED_KERNEL = "!defined(__KERNEL__)";
+	local final NOT_DEFINED_KERNEL = "!defined(__KERNEL__)";
 	for (local none, header: allSystemHeaders) {
 		for (local part: header.order_libcAutoHeader) {
 			if (part !is LibraryFunction)
@@ -691,7 +691,7 @@ function resolveLine(line: {string | WildcardRule...}): {string...} {
 
 @@Update the file "/src/libc/crt-order.h"
 function doPrint_src_libc_crtOrder() {
-	final local ORDER_FILENAME = "src/libc/crt-order.h";
+	local final ORDER_FILENAME = "src/libc/crt-order.h";
 	printMessage(f"Parsing crt-order: {repr ORDER_FILENAME} (begin)");
 	local usedSectionNames: HashSet with string = copy knownLibcSections;
 	for (local header: allSystemHeaders.values) {
@@ -898,7 +898,7 @@ function doPrint_src_libc_libc_dosabiFunctions(fp: File) {
 		"#ifndef DFUN\n"
 		"#define DFUN(section, libd_name, libc_name, returnType, argc, /*argvTypes*/...)\n"
 		"#endif /* !DFUN */\n\n";
-	final local DEFAULT_TIn_TYPES: {(string, string)...} = {
+	local final DEFAULT_TIn_TYPES: {(string, string)...} = {
 		("TP", "__SIZEOF_POINTER__"),
 		("THH", "__SIZEOF_CHAR__"),
 		("TH", "__SIZEOF_SHORT__"),

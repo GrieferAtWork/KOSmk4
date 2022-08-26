@@ -361,9 +361,9 @@ class CType {
 	}
 }
 
-final global FUNCTION_RESTART_MODE_AUTO = 0;
-final global FUNCTION_RESTART_MODE_DONT = 1;
-final global FUNCTION_RESTART_MODE_MUST = 2;
+global final FUNCTION_RESTART_MODE_AUTO = 0;
+global final FUNCTION_RESTART_MODE_DONT = 1;
+global final FUNCTION_RESTART_MODE_MUST = 2;
 
 class Function {
 	this = default;
@@ -543,7 +543,7 @@ global xArchTypeSizes: {string: {string: int}} = Dict();
 global possiblyCompatibleFunctionGroups: {string: HashSet with string} = Dict();
 
 
-final local BOOL_MAP = {
+local final BOOL_MAP = {
 	""      : true,
 	"1"     : true,
 	"true"  : true,
@@ -1539,7 +1539,7 @@ function parseSyscallDefs(
 				}	break;
 
 				case "restart": {
-					final local MODE_NAMES = {
+					local final MODE_NAMES = {
 						"auto" : FUNCTION_RESTART_MODE_AUTO,
 						"dont" : FUNCTION_RESTART_MODE_DONT,
 						"must" : FUNCTION_RESTART_MODE_MUST,

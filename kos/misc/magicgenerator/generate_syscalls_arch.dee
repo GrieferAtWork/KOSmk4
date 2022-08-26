@@ -128,17 +128,17 @@ class SyscallArch {
 
 /* CFI code to inject in order to clear EFLAGS.DF upon return */
 /*[[[deemon
-print("final global i386CfiClearDF = ", repr(",".join(
+print("global final i386CfiClearDF = ", repr(",".join(
 (assemble from ..libgen.cfi.comp)('i386', '%eflags', r'
 	push %eflags
 	and  ~$EFLAGS_DF
 '))), ";");
 ]]]*/
-final global i386CfiClearDF = "22,9,6,121,0,11,255,251,26";
+global final i386CfiClearDF = "22,9,6,121,0,11,255,251,26";
 /*[[[end]]]*/
 #define I386_SETDF_BEGIN(fp, enableExcept) if (enableExcept) fp << "\tstd /* Enable exceptions */\n";
 #define I386_SETDF_END(fp, enableExcept)   if (enableExcept) fp << "\tcld /* Disable exceptions */\n";
-final global i386SyscallArgumentRegisters = { "%ebx", "%ecx", "%edx", "%esi", "%edi", "%ebp" };
+global final i386SyscallArgumentRegisters = { "%ebx", "%ecx", "%edx", "%esi", "%edi", "%ebp" };
 function i386_printLibcSyscall386CdeclInvocation(
 		fp: File, registerCount: int, enableExcept: bool) {
 	local conditionalX = enableExcept ? "X" : "";
@@ -444,23 +444,23 @@ function i386_printKernelSyscallWrapper_sysenter(fp: File, f: Function, sysno: i
 /************************************************************************/
 /* CFI code to inject in order to clear EFLAGS.DF upon return */
 /*[[[deemon
-print("final global x86_64CfiClearDF = ", repr(",".join(
+print("global final x86_64CfiClearDF = ", repr(",".join(
 (assemble from ..libgen.cfi.comp)('x86_64', '%rflags', r'
 	push %rflags
 	and  ~$EFLAGS_DF
 '))), ";");
 ]]]*/
-final global x86_64CfiClearDF = "22,49,7,146,49,0,11,255,251,26";
+global final x86_64CfiClearDF = "22,49,7,146,49,0,11,255,251,26";
 /*[[[end]]]*/
-final global x86_64SyscallArgumentRegisters = { "%rdi", "%rsi", "%rdx", "%r10", "%r8", "%r9" };
-final global x86_64SysvABIRegisters = { "%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9" };
-final global x86_64Reg8NamesOfReg32 = {
+global final x86_64SyscallArgumentRegisters = { "%rdi", "%rsi", "%rdx", "%r10", "%r8", "%r9" };
+global final x86_64SysvABIRegisters = { "%rdi", "%rsi", "%rdx", "%rcx", "%r8", "%r9" };
+global final x86_64Reg8NamesOfReg32 = {
 	"%eax" : "%al", "%ecx" : "%cl",
 	"%edx" : "%dl", "%ebx" : "%bl",
 	"%esp" : "%spl", "%ebp" : "%bpl",
 	"%esi" : "%sil", "%edi" : "%dil",
 };
-final global x86_64Reg16NamesOfReg32 = {
+global final x86_64Reg16NamesOfReg32 = {
 	"%eax" : "%ax", "%ecx" : "%cx",
 	"%edx" : "%dx", "%ebx" : "%bx",
 	"%esp" : "%sp", "%ebp" : "%bp",
@@ -575,7 +575,7 @@ function x86_64_getRegisterName64(reg: string): string {
 function x86_64_formDoubleWideArgument64Ex(
 		fp: File, dst64: string, losrc32: string,
 		hisrc32: string, clobber: string) {
-	final local TEXTALIGN = 17;
+	local final TEXTALIGN = 17;
 	fp << "	movzlq " << hisrc32 << ", " << dst64
 		<< (" " * (TEXTALIGN - (#hisrc32 + #dst64)))
 		<< " /* "

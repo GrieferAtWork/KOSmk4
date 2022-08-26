@@ -21,7 +21,7 @@ import fs;
 import * from deemon;
 
 
-final local SIZEOF_MACRO_PATTERNS = {
+local final SIZEOF_MACRO_PATTERNS = {
 	"SIZEOF_{typ}",
 	"__SIZEOF_{typ}",
 	"{typ}_SIZE",
@@ -30,7 +30,7 @@ final local SIZEOF_MACRO_PATTERNS = {
 	"__SIZEOF_{typ}_T__",
 };
 
-final local ALIGNOF_MACRO_PATTERNS = {
+local final ALIGNOF_MACRO_PATTERNS = {
 	"ALIGNOF_{typ}",
 	"__ALIGNOF_{typ}",
 	"{typ}_ALIGN",
@@ -39,7 +39,7 @@ final local ALIGNOF_MACRO_PATTERNS = {
 	"__ALIGNOF_{typ}_T__",
 };
 
-final local OFFSET_MACRO_PATTERNS = {
+local final OFFSET_MACRO_PATTERNS = {
 	"OFFSET_{typ}_",
 	"__OFFSET_{typ}_",
 	"OFFSETOF_{typ}_",

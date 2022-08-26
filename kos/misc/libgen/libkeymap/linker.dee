@@ -25,11 +25,11 @@
 import * from deemon;
 
 
-final global KMP_MAG0            = 'K'.ord();
-final global KMP_MAG1            = 'm'.ord();
-final global KMP_MAG2            = 'p'.ord();
-final global KMP_MAG3            = 0x35;
-final global KMP_VERSION_CURRENT = 1;
+global final KMP_MAG0            = 'K'.ord();
+global final KMP_MAG1            = 'm'.ord();
+global final KMP_MAG2            = 'p'.ord();
+global final KMP_MAG3            = 0x35;
+global final KMP_VERSION_CURRENT = 1;
 
 //typedef struct __ATTR_PACKED {
 //	__uint8_t   h_magic[4]; /* Header magic. */
@@ -39,33 +39,33 @@ final global KMP_VERSION_CURRENT = 1;
 
 
 @@All characters are encoded as 7-bit ascii characters with the 8th bit ZERO
-final global KMP_ENCODING_ASCII   = 0x00;
+global final KMP_ENCODING_ASCII   = 0x00;
 
 @@All characters are encoded as 8-bit integers (single-byte LATIN-1 characters)
-final global KMP_ENCODING_LATIN1  = 0x00;
+global final KMP_ENCODING_LATIN1  = 0x00;
 
 @@All characters are encoded as UTF-8 sequences.
-final global KMP_ENCODING_UTF8    = 0x01;
+global final KMP_ENCODING_UTF8    = 0x01;
 
 @@All  characters are  encoded as UTF-16  sequences (Little endian)  with a length
 @@of a single character each (max. 2 UTF-16 characters; 1 if it isn't a surrogate)
-final global KMP_ENCODING_UTF16LE = 0x02;
+global final KMP_ENCODING_UTF16LE = 0x02;
 
 @@Same as `KMP_ENCODING_UTF16LE', but big endian.
-final global KMP_ENCODING_UTF16BE = 0x03;
+global final KMP_ENCODING_UTF16BE = 0x03;
 
 @@Characters are encoded as UTF32, little-endian (max 1 character)
-final global KMP_ENCODING_UTF32LE = 0x04;
+global final KMP_ENCODING_UTF32LE = 0x04;
 
 @@Characters are encoded as UTF32, big-endian
-final global KMP_ENCODING_UTF32BE = 0x05;
+global final KMP_ENCODING_UTF32BE = 0x05;
 
 @@Multi-character-string (each character is encoded as UTF-8,
 @@and   the  sequence  is   terminated  by  a  NUL-character)
-final global KMP_ENCODING_MCS     = 0x06;
+global final KMP_ENCODING_MCS     = 0x06;
 
 @@Max recognized encoding.
-final global KMP_ENCODING_MAX     = 0x06;
+global final KMP_ENCODING_MAX     = 0x06;
 
 //typedef struct __ATTR_PACKED {
 //	__uint8_t   d_encoding; /* KMP default encoding (One of `KMP_ENCODING_*'). */
@@ -82,56 +82,56 @@ final global KMP_ENCODING_MAX     = 0x06;
  *   - CURRENT_KEYMOD Set of keyboard modifiers currently active.
  */
 @@OPCODE: Stop execution
-final global KMP_OP_STOP       = 0x00;
+global final KMP_OP_STOP       = 0x00;
 
 @@OPCODE: %key += KEY(0, 1);
-final global KMP_OP_INCCOL     = 0x01;
+global final KMP_OP_INCCOL     = 0x01;
 
 @@OPCODE: %key -= KEY(0, 1);
-final global KMP_OP_DECCOL     = 0x02;
+global final KMP_OP_DECCOL     = 0x02;
 
 @@OPCODE: %enc  = *%pc; %pc += 1;
-final global KMP_OP_SETENC     = 0x03;
+global final KMP_OP_SETENC     = 0x03;
 
 @@OPCODE: %key  = *%pc; %pc += 1;
-final global KMP_OP_SETKEY     = 0x04;
+global final KMP_OP_SETKEY     = 0x04;
 
 @@OPCODE: %enc  = DEFAULT_ENCODING; (DEFAULT_ENCODING == `d_encoding')
-final global KMP_OP_DEFENC     = 0x05;
+global final KMP_OP_DEFENC     = 0x05;
 
 @@OPCODE: %key  = *(u16 const *)*%pc; %pc += 2;
-final global KMP_OP_SETKEY2    = 0x06;
+global final KMP_OP_SETKEY2    = 0x06;
 
 @@OPCODE: mask = *(u16 const *)%pc; %pc += 2;
 @@        kchr  =  READ_CHARACTER(%pc, %enc);
 @@        if (CURRENT_KEYMOD == mask)
 @@            return kchr;
-final global KMP_OP_SETKEYMOD2 = 0x1a;
+global final KMP_OP_SETKEYMOD2 = 0x1a;
 
 @@OPCODE: mask = *(u8 const *)%pc; %pc += 1;
 @@        kchr = READ_CHARACTER(%pc,  %enc);
 @@        if (CURRENT_KEYMOD == mask)
 @@            return kchr;
-final global KMP_OP_SETKEYMOD  = 0x1b;
+global final KMP_OP_SETKEYMOD  = 0x1b;
 
 @@OPCODE: kchr = READ_CHARACTER(%pc, %enc);
 @@         if (CURRENT_KEY == %key && KEYMOD_ISNORMAL(CURRENT_KEYMOD))
 @@             return kchr;
 @@         %key += KEY(0,1);
-final global KMP_OP_SETPRESS   = 0x1c;
+global final KMP_OP_SETPRESS   = 0x1c;
 
 @@OPCODE: kchr = READ_CHARACTER(%pc, %enc);
 @@         if (CURRENT_KEY == %key && KEYMOD_ISSHIFT(CURRENT_KEYMOD))
 @@             return kchr;
-final global KMP_OP_SETSHIFT   = 0x1d;
+global final KMP_OP_SETSHIFT   = 0x1d;
 
 @@OPCODE: kchr = READ_CHARACTER(%pc, %enc);
 @@         if (CURRENT_KEY == %key && KEYMOD_ISALTGR(CURRENT_KEYMOD))
 @@             return kchr;
-final global KMP_OP_SETALTGR   = 0x1e;
+global final KMP_OP_SETALTGR   = 0x1e;
 
 @@OPCODE: // no-op
-final global KMP_OP_NOP        = 0x1f;
+global final KMP_OP_NOP        = 0x1f;
 
 
 /* Special opcodes that encode their operand as part of the instruction. */
@@ -141,38 +141,38 @@ final global KMP_OP_NOP        = 0x1f;
 @@ if ((op & KMP_OP_MEXTENDED) == KMP_OP_FDEFDIGIT) ...;
 @@ if ((op &  KMP_OP_MEXTENDED) == KMP_OP_FSETROW)  ...;
 @@ if ((op & KMP_OP_MEXTENDED) == KMP_OP_FSETCOL) ...;
-final global KMP_OP_MEXTENDED = 0xe0;
+global final KMP_OP_MEXTENDED = 0xe0;
 
 @@ press[%key] = 'a' + (op & 0x1f);
 @@ shift[%key] = 'A' + (op & 0x1f);
 @@ %key += KEY(0,1);
-final global KMP_OP_FDEFLATIN = 0x20;
+global final KMP_OP_FDEFLATIN = 0x20;
 
 @@ press[%key] = '1' + (op & 0x1f);
 @@ shift[%key] = '!' + (op & 0x1f);
 @@ %key += KEY(0,1);
-final global KMP_OP_FDEFDIGIT = 0x40;
+global final KMP_OP_FDEFDIGIT = 0x40;
 
 @@`%key = KEY(op & 0x1f, 0);'
-final global KMP_OP_FSETROW   = 0xc0;
+global final KMP_OP_FSETROW   = 0xc0;
 
 @@`%key = KEY(KEY_GETROW(%key), op & 0x1f);'
-final global KMP_OP_FSETCOL   = 0xe0;
+global final KMP_OP_FSETCOL   = 0xe0;
 
 
-final global KEYBOARD_COL_BITS = 5;
-final global KEYBOARD_ROW_BITS = 3;
+global final KEYBOARD_COL_BITS = 5;
+global final KEYBOARD_ROW_BITS = 3;
 
 
-final global KEYMOD_LCTRL      = 0x0001; /* KEY_LCTRL */
-final global KEYMOD_RCTRL      = 0x0002; /* KEY_RCTRL */
-final global KEYMOD_LSHIFT     = 0x0004; /* KEY_LSHIFT */
-final global KEYMOD_RSHIFT     = 0x0008; /* KEY_RSHIFT */
-final global KEYMOD_LGUI       = 0x0010; /* KEY_LGUI */
-final global KEYMOD_RGUI       = 0x0020; /* KEY_RGUI */
-final global KEYMOD_LALT       = 0x0040; /* KEY_LALT */
-final global KEYMOD_RALT       = 0x0080; /* KEY_RALT */
-final global KEYMOD_CAPSLOCK   = 0x0100; /* KEY_CAPSLOCK */
+global final KEYMOD_LCTRL      = 0x0001; /* KEY_LCTRL */
+global final KEYMOD_RCTRL      = 0x0002; /* KEY_RCTRL */
+global final KEYMOD_LSHIFT     = 0x0004; /* KEY_LSHIFT */
+global final KEYMOD_RSHIFT     = 0x0008; /* KEY_RSHIFT */
+global final KEYMOD_LGUI       = 0x0010; /* KEY_LGUI */
+global final KEYMOD_RGUI       = 0x0020; /* KEY_RGUI */
+global final KEYMOD_LALT       = 0x0040; /* KEY_LALT */
+global final KEYMOD_RALT       = 0x0080; /* KEY_RALT */
+global final KEYMOD_CAPSLOCK   = 0x0100; /* KEY_CAPSLOCK */
 
 
 #define KEY_GETROW(key) ((key) >> KEYBOARD_COL_BITS)
@@ -317,7 +317,7 @@ function linkKeymap(fp: File, defs: {int: {int : string}}) {
 		commonPress = mappings.get(0);
 		commonShift = mappings.get(KEYMOD_LSHIFT);
 		if (commonShift !is none) {
-			final local alts = {
+			local final alts = {
 				KEYMOD_RSHIFT,
 				KEYMOD_LSHIFT | KEYMOD_RSHIFT,
 				KEYMOD_CAPSLOCK
@@ -332,7 +332,7 @@ function linkKeymap(fp: File, defs: {int: {int : string}}) {
 		}
 		commonAltGr = mappings.get(KEYMOD_RALT);
 		if (commonAltGr !is none) {
-			final local alts = {
+			local final alts = {
 				KEYMOD_LCTRL | KEYMOD_LALT,
 				KEYMOD_LCTRL | KEYMOD_RALT,
 				KEYMOD_RCTRL | KEYMOD_LALT,

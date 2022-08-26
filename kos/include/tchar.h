@@ -195,7 +195,7 @@ __DECL_END
 
 
 /*[[[deemon
-final global MAPPINGS = {
+global final MAPPINGS = {
 //  _TCHAR________________WCHAR________________CHAR_________________MBCS_
 	("_TEOF",             "WEOF",              "EOF"),
 	("__T",               "(x) L##x",          "(x) x"),

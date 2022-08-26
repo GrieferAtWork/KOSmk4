@@ -71,8 +71,8 @@ function runProc(exe: string, args: {string...}, callback: Callable with {string
 	return result;
 }
 
-final global READELF = "binutils/x86_64-kos/bin/x86_64-kos-readelf" EXE;
-final global OBJDUMP = "binutils/x86_64-kos/bin/x86_64-kos-objdump" EXE;
+global final READELF = "binutils/x86_64-kos/bin/x86_64-kos-readelf" EXE;
+global final OBJDUMP = "binutils/x86_64-kos/bin/x86_64-kos-objdump" EXE;
 
 function dumpTables(filename: string, tableNames: {string...}) {
 	@@List of (start, end, name)

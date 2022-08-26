@@ -49,7 +49,7 @@ global final OPT_MCOPY_OUTPUT = "MCOPY.output";
 global final OPT_MCOPY_INPUT = "MCOPY.input";
 
 
-final local function mtoolsInvoke(
+local final function mtoolsInvoke(
 		self: BoundStep, cmd: string, args: {string...}): Waitable {
 	local toolchainOptions = self.toolchain.options;
 	local proc = ipc.Process(
@@ -61,11 +61,11 @@ final local function mtoolsInvoke(
 	return WaitableJoin(proc);
 }
 
-final local function MTOOLS_getModifiedOutputFiles(self: BoundStep): {string...} {
+local final function MTOOLS_getModifiedOutputFiles(self: BoundStep): {string...} {
 	yield self.toolchain.options[TOOLCHAIN_MTOOLS_DISK];
 }
 
-final local function MFORMAT_run(self: BoundStep): {Waitable...} {
+local final function MFORMAT_run(self: BoundStep): {Waitable...} {
 	local options = self.group.options;
 	local disk = self.toolchain.options[TOOLCHAIN_MTOOLS_DISK];
 	local num_sectors = options[OPT_MFORMAT_TOTAL_SECTORS];
@@ -86,12 +86,12 @@ final local function MFORMAT_run(self: BoundStep): {Waitable...} {
 	yield mtoolsInvoke(self, "mformat", args);
 }
 
-final local function MFORMAT_tostr(self: BoundStep): string {
+local final function MFORMAT_tostr(self: BoundStep): string {
 	return f"Mformat {repr self.toolchain.options[TOOLCHAIN_MTOOLS_DISK]}";
 }
 
 
-final local function MMD(self: BoundStep, cache: HashSet with string, path: string) {
+local final function MMD(self: BoundStep, cache: HashSet with string, path: string) {
 	path = path.replace("\\", "/").strip("/").strip();
 	local head, none, tail = path.rpartition("/")...;
 	if (tail)
@@ -105,7 +105,7 @@ final local function MMD(self: BoundStep, cache: HashSet with string, path: stri
 	}
 }
 
-final local function MCOPY_split(self: BoundStep): {BoundStep...} {
+local final function MCOPY_split(self: BoundStep): {BoundStep...} {
 	local group = self.group;
 	local options = group.options;
 	local input = options.get(OPT_MCOPY_INPUT);
@@ -115,7 +115,7 @@ final local function MCOPY_split(self: BoundStep): {BoundStep...} {
 		yield self.createChildStep(f);
 }
 
-final local function MCOPY_getOutputFilename(
+local final function MCOPY_getOutputFilename(
 		options: {string: Object}, input: string): string {
 	local result = options[OPT_MCOPY_OUTPUT].replace("\\", "/").lstrip("/");
 	if (result.endswith("/"))
@@ -123,12 +123,12 @@ final local function MCOPY_getOutputFilename(
 	return result;
 }
 
-final local function MCOPY_run(self: BoundStep): {Waitable...} {
+local final function MCOPY_run(self: BoundStep): {Waitable...} {
 	local th = Thread((self: BoundStep) -> {
 		local group: Group = self.group;
 		local options: {string: Object} = group.options;
 		local input: string = self.userData;
-		final local DISK_MMD_CACHE: string = "MTOOLS.disk_mmd_cache";
+		local final DISK_MMD_CACHE: string = "MTOOLS.disk_mmd_cache";
 		local toolchainOptions: {string: Object} = self.toolchain.options;
 		local mmdCache: {string: {string...}} = toolchainOptions.get(DISK_MMD_CACHE);
 		if (mmdCache is none)
@@ -150,11 +150,11 @@ final local function MCOPY_run(self: BoundStep): {Waitable...} {
 	yield WaitableJoin(th);
 }
 
-final local function MCOPY_getRequiredFiles(self: BoundStep): {string...} {
+local final function MCOPY_getRequiredFiles(self: BoundStep): {string...} {
 	yield self.userData;
 }
 
-final local function MCOPY_tostr(self: BoundStep): string {
+local final function MCOPY_tostr(self: BoundStep): string {
 	local group = self.group;
 	local options = group.options;
 	return f"Mcopy {self.toolchain.options[TOOLCHAIN_MTOOLS_DISK]}:{group.options[OPT_MCOPY_OUTPUT]}";

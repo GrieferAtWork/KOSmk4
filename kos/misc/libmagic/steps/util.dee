@@ -31,7 +31,7 @@ global final OPT_COPYFILE_SRC = "COPYFILE.src";
 @@Copy target filename
 global final OPT_COPYFILE_DST = "COPYFILE.dst";
 
-final local function COPYFILE_run(self: BoundStep): {Waitable...} {
+local final function COPYFILE_run(self: BoundStep): {Waitable...} {
 	local th = Thread((self: BoundStep) -> {
 		local group = self.group;
 		local dst = group.fixFilename(group.options[OPT_COPYFILE_DST]);
@@ -41,7 +41,7 @@ final local function COPYFILE_run(self: BoundStep): {Waitable...} {
 	th.start();
 	yield WaitableJoin(th);
 }
-final local function COPYFILE_tostr(self: BoundStep): string {
+local final function COPYFILE_tostr(self: BoundStep): string {
 	local group = self.group;
 	return f"Copy {
 		repr group.fixFilename(group.options[OPT_COPYFILE_SRC])
@@ -49,11 +49,11 @@ final local function COPYFILE_tostr(self: BoundStep): string {
 		repr group.fixFilename(group.options[OPT_COPYFILE_DST])
 	}";
 }
-final local function COPYFILE_getRequiredFiles(self: BoundStep): {string...} {
+local final function COPYFILE_getRequiredFiles(self: BoundStep): {string...} {
 	local group = self.group;
 	yield group.fixFilename(group.options[OPT_COPYFILE_SRC]);
 }
-final local function COPYFILE_getProducedFiles(self: BoundStep): {string...} {
+local final function COPYFILE_getProducedFiles(self: BoundStep): {string...} {
 	local group = self.group;
 	yield group.fixFilename(group.options[OPT_COPYFILE_DST]);
 }

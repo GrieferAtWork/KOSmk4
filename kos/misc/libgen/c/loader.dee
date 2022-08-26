@@ -121,7 +121,7 @@ global final SIMPLE_NOTHROW_ANNOTATIONS: {string: string} = {
 	"rpc_pure"           : "NOTHROW_RPC_PURE",
 };
 
-final global KNOWN_STRING_TAGS: {string...} = {
+global final KNOWN_STRING_TAGS: {string...} = {
 	"c_prefix",     /* Guard-prefix in <string.h> */
 	"c",            /* C-part in <string.h> */
 	"std",          /* std:: -part in <string.h> */
@@ -237,7 +237,7 @@ continue_typename_expression:
 		} else if (tok in "([") {
 			/* Inner  variable  name:   "int (*foo)(int x)"
 			 * Must split into: "int (*", "foo", ")(int x)" */
-			final local PAREN_TABLE = {
+			local final PAREN_TABLE = {
 				"(" : ")",
 				"[" : "]",
 				"{" : "}",
@@ -598,7 +598,7 @@ again_parse_arg_annotations:
 						self.skip(")");
 					} else {
 						local functionName = currentFunction.name;
-						final local METHOD_MARKERS: {string...} = {
+						local final METHOD_MARKERS: {string...} = {
 							"printf_p", "printf", "scanf" };
 						method = none;
 						for (local marker: METHOD_MARKERS) {
@@ -1236,7 +1236,7 @@ class FunctionFeatures {
 		local tok = self.tok;
 		@@Simple annotations that only entail setting the value of some field.
 		@@This  is  a mapping  of: @(tagName:  (fieldName, toBeAssignedValue))
-		final local SIMPLE_SETFIELD_ANNOTATIONS: {string: (string, Object)} = {
+		local final SIMPLE_SETFIELD_ANNOTATIONS: {string: (string, Object)} = {
 			"nodecl"                       : ("decl", "__LIBC" /*DEFAULT_DECL*/),
 			"no_decl"                      : ("decl", "__LIBC" /*DEFAULT_DECL*/),
 			"ignore"                       : ("namespaces", ()),
@@ -2159,7 +2159,7 @@ class LoaderContext {
 	public function parseDirective_push_macro() {
 		local self = this.self;
 		local tok = self.tok;
-		final local DEFAULT_LOCATION_LIST = ("c", );
+		local final DEFAULT_LOCATION_LIST = ("c", );
 		local macroList;
 		local locationList = DEFAULT_LOCATION_LIST;
 		local locationListContainsProperComma = true;
@@ -3231,7 +3231,7 @@ class WrapperCookieStruct {
 }
 
 function updateCTypeForCookie(ctype: CType, cookie: WrapperCookie | WrapperCookieStruct) {
-	final local COOKIE_MARKER = "$cook";
+	local final COOKIE_MARKER = "$cook";
 	if (ctype.beforeName == COOKIE_MARKER && ctype.afterName == "") {
 		ctype.beforeName = cookie.cookieTypePrefix;
 		ctype.afterName  = cookie.cookieTypeSuffix;

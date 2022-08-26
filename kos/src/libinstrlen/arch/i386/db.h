@@ -78,7 +78,7 @@ PRIVATE uint8_t const optypes[] = {
 	 */
 /*[[[deemon
 import * from deemon;
-final local OPCODE_NAME_WIDTH = 6;
+local final OPCODE_NAME_WIDTH = 6;
 
 local opcodes: {int: string | HashSet with string} = Dict();
 {
@@ -101,8 +101,8 @@ local opcodes: {int: string | HashSet with string} = Dict();
 	}
 	local opbase = none;
 	for (local l: File.open("../../../libdisasm/x86-db.h")) {
-		final local PREFIX = "/" "*[[[";
-		final local SUFFIX = "]]]*" "/";
+		local final PREFIX = "/" "*[[[";
+		local final SUFFIX = "]]]*" "/";
 		l = l.strip();
 		if (l.startswith(PREFIX) && l.endswith(SUFFIX)) {
 			l = l[#PREFIX:-#SUFFIX].strip();
@@ -112,7 +112,7 @@ local opcodes: {int: string | HashSet with string} = Dict();
 				l = l[6:];
 				opbase = markers.get(l);
 			} else {
-				final local PREFIX_VIRTUAL = "virtual:";
+				local final PREFIX_VIRTUAL = "virtual:";
 				if (l.startswith(PREFIX_VIRTUAL)) {
 					l = l[#PREFIX_VIRTUAL:].lstrip();
 					goto got_line;
@@ -204,9 +204,9 @@ got_line:
 	}
 }
 
-final local UNDEF = -1;
-final local NO    = 0;
-final local YES   = 1;
+local final UNDEF = -1;
+local final NO    = 0;
+local final YES   = 1;
 
 function isOpcodeTail1632(decls: HashSet with string, if_66: string = "IF_66"): bool {
 	for (local d: decls) {

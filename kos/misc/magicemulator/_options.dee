@@ -30,27 +30,27 @@ import * from deemon;
 @@vbox:  -                       -
 @@In all cases, GDB should connect to `localhost:<GDB_PORT>`,
 @@where `<GDB_PORT>` defaults to `1234`
-final global GDB = "gdb"; /* "emulator" or "server" */
+global final GDB = "gdb"; /* "emulator" or "server" */
 
 @@The port under which the GDB stub should listen
-final global GDB_PORT = "gdb.port"; /* "1234" */
+global final GDB_PORT = "gdb.port"; /* "1234" */
 
 @@Prevent reboot on tripple fault (instead, pause the emulation)
 @@qemu:  -no-reboot -no-shutdown
 @@bochs: cpu: ... reset_on_triple_fault=0
 @@vbox:  <TripleFaultReset enabled="false"/>
-final global HOSTED = "hosted"; /* "true" */
+global final HOSTED = "hosted"; /* "true" */
 
 @@Kernel command line (passed with multiboot)
-final global CMDLINE = "cmdline"; /* "" */
+global final CMDLINE = "cmdline"; /* "" */
 
 @@How many cores to emulate in an SMP system
-final global SMP = "smp"; /* SMP_DEFAULT */
+global final SMP = "smp"; /* SMP_DEFAULT */
 
 @@The default value of @SMP
 @@NOTE: In situations where this value is never accepted, @SMP
 @@      will   instead   default  to   some   accepted  value.
-final global SMP_DEFAULT = "2";
+global final SMP_DEFAULT = "2";
 
 
 function getBool(options: {string: string}, name: string, defl: bool): bool {

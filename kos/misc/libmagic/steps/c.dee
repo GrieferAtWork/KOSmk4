@@ -27,7 +27,7 @@ import * from ..libmagic;
 @@Option: string | {string...}
 @@List of wildcard-enabled filenames, relative to
 @@@ROOTDIR, or to the associated @Group.defPath
-final global OPT_COMPILE_SOURCES: string = "COMPILE.sources";
+global final OPT_COMPILE_SOURCES: string = "COMPILE.sources";
 @@Option: bool
 @@Set  to  @true  to   enable  in-source  compiler  flag   overrides
 @@When a COMPILE.sources file has changed and has to be re-compiled,
@@ -46,76 +46,76 @@ final global OPT_COMPILE_SOURCES: string = "COMPILE.sources";
 @@     to hold compiler options. - Any changed  made to this dict will apply  only
 @@     to the annotated file, and will be applied to the commandline of that file.
 @@  - @(step: Step), which is the associated build step
-final global OPT_COMPILE_INLINE_SOURCE_FLAGS: string = "COMPILE.inline_source_flags";
+global final OPT_COMPILE_INLINE_SOURCE_FLAGS: string = "COMPILE.inline_source_flags";
 @@Option: {string...}
 @@List of additional flags passed to the C compiler
-final global OPT_COMPILE_CCFLAGS: string = "COMPILE.cflags";
+global final OPT_COMPILE_CCFLAGS: string = "COMPILE.cflags";
 @@Option: {string...}
 @@List of additional flags passed to the preprocessor
-final global OPT_COMPILE_PPFLAGS: string = "COMPILE.pflags";
+global final OPT_COMPILE_PPFLAGS: string = "COMPILE.pflags";
 @@Option: {string...}
 @@List of additional flags passed to the assembler
-final global OPT_COMPILE_ASFLAGS: string = "COMPILE.aflags";
+global final OPT_COMPILE_ASFLAGS: string = "COMPILE.aflags";
 @@Option: {string...}
 @@List of additional include paths passed to the preprocessor
-final global OPT_COMPILE_INCPATH: string = "COMPILE.incpath";
+global final OPT_COMPILE_INCPATH: string = "COMPILE.incpath";
 @@Option: {string: string | none}
 @@Mapping of additional, predefined macros
-final global OPT_COMPILE_MACROS: string = "COMPILE.macros";
+global final OPT_COMPILE_MACROS: string = "COMPILE.macros";
 @@Option: {string...}
 @@Additional arguments to pass to clang-tidy
-final global OPT_COMPILE_CLANG_TIDY_ARGS: string = "COMPILE.clang-tidy.args";
+global final OPT_COMPILE_CLANG_TIDY_ARGS: string = "COMPILE.clang-tidy.args";
 @@Option: {string...}
 @@Additional arguments to pass as compiler arguments to clang-tidy
-final global OPT_COMPILE_CLANG_TIDY_CC_ARGS: string = "COMPILE.clang-tidy.args.cc";
+global final OPT_COMPILE_CLANG_TIDY_CC_ARGS: string = "COMPILE.clang-tidy.args.cc";
 @@Option: {string...}
 @@Additional arguments to pass to lint
-final global OPT_COMPILE_LINT_ARGS: string = "COMPILE.lint.args";
+global final OPT_COMPILE_LINT_ARGS: string = "COMPILE.lint.args";
 @@Option: string
 @@Override for the output location of the object file
 @@NOTE: When set, only a single object file may be created by COMPILE
 @@      Otherwise,   you   will  get   a   multiple-producers  error.
-final global OPT_COMPILE_OBJFILE: string = "COMPILE.objfile";
+global final OPT_COMPILE_OBJFILE: string = "COMPILE.objfile";
 @@Option: {string...}
 @@List of @["E", "S", "clang-tidy=..."]
 @@   - @"E":              PREPROCESS
 @@   - @"S":              ASSEMBLE
 @@   - @"clang-tidy=...": Run clang-tidy executable "..."
 @@additional actions to perform with COMPILE
-final global OPT_COMPILE_SECONDARY: string = "COMPILE.secondary";
+global final OPT_COMPILE_SECONDARY: string = "COMPILE.secondary";
 @@Option: string
 @@Language name to-be build:
 @@    All toolchains must accept "c"
 @@    Any toolchains providing a c++ compiler must accept "c++"
 @@Other values are  toolchain-specific
-final global OPT_COMPILE_LANGUAGE: string = "COMPILE.language";
+global final OPT_COMPILE_LANGUAGE: string = "COMPILE.language";
 @@Option: string
 @@Name of the executable to-be produced by the linker
-final global OPT_LINK_OUTPUT: string = "LINK.output";
+global final OPT_LINK_OUTPUT: string = "LINK.output";
 @@Option: {string...}
 @@List of additional object files to input in a link
-final global OPT_LINK_OBJECTS: string = "LINK.objects";
+global final OPT_LINK_OBJECTS: string = "LINK.objects";
 @@Option: {string...}
 @@List of additional flags to pass to a linker  (-Wl...)
-final global OPT_LINK_LDFLAGS: string = "LINK.ldflags";
+global final OPT_LINK_LDFLAGS: string = "LINK.ldflags";
 @@Option: string
 @@Filename of an LD linker script (gets put through the C preprocessor)  (-Wl, -T, ...)
-final global OPT_LINK_SCRIPT: string = "LINK.script";
+global final OPT_LINK_SCRIPT: string = "LINK.script";
 @@Option: {string...}
 @@List of additional library paths  (-L ...)
-final global OPT_LINK_LIBPATH: string = "LINK.libpath";
+global final OPT_LINK_LIBPATH: string = "LINK.libpath";
 @@Option: {string...}
 @@List of additional libraries to link against  (-l...)
-final global OPT_LINK_LIBRARIES: string = "LINK.libraries";
+global final OPT_LINK_LIBRARIES: string = "LINK.libraries";
 @@Option: bool
 @@Disable standard library inclusion  (-nostdlib)
-final global OPT_LINK_NOSTDLIB: string = "LINK.nostdlib";
+global final OPT_LINK_NOSTDLIB: string = "LINK.nostdlib";
 @@Option: string
 @@Output filename of the static library archiver
-final global OPT_ARCHIVE_OUTPUT: string = "ARCHIVE.output";
+global final OPT_ARCHIVE_OUTPUT: string = "ARCHIVE.output";
 
 
-final local function readFileUntil(fp: File, end_pattern: string): string | none {
+local final function readFileUntil(fp: File, end_pattern: string): string | none {
 	File.Writer result;
 	for (;;) {
 		local temp = fp.read(512);
@@ -135,7 +135,7 @@ final local function readFileUntil(fp: File, end_pattern: string): string | none
 	return result.string;
 }
 
-final local function getCompileOptions(self: BoundStep, srcFile: string): {string: Object} {
+local final function getCompileOptions(self: BoundStep, srcFile: string): {string: Object} {
 	local result = self.group.options;
 	local extra = self.toolchain.config.CONFIG.getExtraCCompileOptions(self, srcFile);
 	if (extra !is none)
@@ -212,7 +212,7 @@ err_bad_magic_tag:
 }
 
 
-final local function PREPROCESS_run(self: BoundStep): {Waitable...} {
+local final function PREPROCESS_run(self: BoundStep): {Waitable...} {
 	local toolchain = self.toolchain;
 	local config = toolchain.config;
 	local group = self.group;
@@ -231,7 +231,7 @@ final local function PREPROCESS_run(self: BoundStep): {Waitable...} {
 	);
 }
 
-final local function PREPROCESS_getProducedFiles(self: BoundStep): {string...} {
+local final function PREPROCESS_getProducedFiles(self: BoundStep): {string...} {
 	local config = self.toolchain.config;
 	local group = self.group;
 	local srcFile = group.fixFilename(self.userData);
@@ -239,17 +239,17 @@ final local function PREPROCESS_getProducedFiles(self: BoundStep): {string...} {
 	yield config.getPreprocessedFilename(group, srcFile);
 }
 
-final local function PREPROCESS_getProducedOutputFiles(self: BoundStep): {string...} {
+local final function PREPROCESS_getProducedOutputFiles(self: BoundStep): {string...} {
 	local group = self.group;
 	local srcFile = group.fixFilename(self.userData);
 	yield self.toolchain.config.getPreprocessedFilename(group, srcFile);
 }
 
-final local function PREPROCESS_tostr(self: BoundStep): string {
+local final function PREPROCESS_tostr(self: BoundStep): string {
 	return f"Preprocess {repr self.group.fixFilename(self.userData)}";
 }
 
-final local function ASSEMBLE_run(self: BoundStep): {Waitable...} {
+local final function ASSEMBLE_run(self: BoundStep): {Waitable...} {
 	local toolchain = self.toolchain;
 	local config = toolchain.config;
 	local group = self.group;
@@ -269,7 +269,7 @@ final local function ASSEMBLE_run(self: BoundStep): {Waitable...} {
 	);
 }
 
-final local function ASSEMBLE_getProducedFiles(self: BoundStep): {string...} {
+local final function ASSEMBLE_getProducedFiles(self: BoundStep): {string...} {
 	local config = self.toolchain.config;
 	local group = self.group;
 	local srcFile = group.fixFilename(self.userData);
@@ -277,18 +277,18 @@ final local function ASSEMBLE_getProducedFiles(self: BoundStep): {string...} {
 	yield config.getAssembledFilename(group, srcFile);
 }
 
-final local function ASSEMBLE_getProducedOutputFiles(self: BoundStep): {string...} {
+local final function ASSEMBLE_getProducedOutputFiles(self: BoundStep): {string...} {
 	local group = self.group;
 	local srcFile = group.fixFilename(self.userData);
 	yield self.toolchain.config.getAssembledFilename(group, srcFile);
 }
 
-final local function ASSEMBLE_tostr(self: BoundStep): string {
+local final function ASSEMBLE_tostr(self: BoundStep): string {
 	return f"Assemble {repr self.group.fixFilename(self.userData)}";
 }
 
 
-final local function COMPILE_split(self: BoundStep): {BoundStep...} {
+local final function COMPILE_split(self: BoundStep): {BoundStep...} {
 	local group = self.group;
 	for (local f: group.enumerateWildcardFiles(group.options.get(OPT_COMPILE_SOURCES)))
 		yield self.createChildStep(f);
@@ -296,7 +296,7 @@ final local function COMPILE_split(self: BoundStep): {BoundStep...} {
 
 global _saved_clang_tidy_module;
 global _saved_lint_module;
-final local function COMPILE_run(self: BoundStep): {Waitable...} {
+local final function COMPILE_run(self: BoundStep): {Waitable...} {
 	local toolchain = self.toolchain;
 	local config = toolchain.config;
 	local group = self.group;
@@ -393,7 +393,7 @@ final local function COMPILE_run(self: BoundStep): {Waitable...} {
 	}
 }
 
-final local function COMPILE_getRequiredFiles(self: BoundStep): {string...} {
+local final function COMPILE_getRequiredFiles(self: BoundStep): {string...} {
 	local srcFile = self.userData;
 	local toolchain = self.toolchain;
 	local dep = toolchain.config.getDependencyFilename(self.group, srcFile);
@@ -405,7 +405,7 @@ final local function COMPILE_getRequiredFiles(self: BoundStep): {string...} {
 	}
 	yield srcFile;
 }
-final local function COMPILE_WRAP_getRequiredFiles(self: BoundStep): {string...} {
+local final function COMPILE_WRAP_getRequiredFiles(self: BoundStep): {string...} {
 	local group = self.group;
 	local toolchain = self.toolchain;
 	local srcFile = group.fixFilename(self.userData);
@@ -418,7 +418,7 @@ final local function COMPILE_WRAP_getRequiredFiles(self: BoundStep): {string...}
 	}
 	yield srcFile;
 }
-final local function COMPILE_getProducedOutputFiles(self: BoundStep): {string...} {
+local final function COMPILE_getProducedOutputFiles(self: BoundStep): {string...} {
 	local group = self.group;
 	local config = self.toolchain.config;
 	local srcFile = self.userData;
@@ -449,18 +449,18 @@ final local function COMPILE_getProducedOutputFiles(self: BoundStep): {string...
 		}
 	}
 }
-final local function COMPILE_getProducedFiles(self: BoundStep): {string...} {
+local final function COMPILE_getProducedFiles(self: BoundStep): {string...} {
 	yield self.toolchain.config.getDependencyFilename(self.group, self.userData);
 	yield COMPILE_getProducedOutputFiles(self)...;
 }
-final local function COMPILE_tostr(self: BoundStep): string {
+local final function COMPILE_tostr(self: BoundStep): string {
 	return f"Compile {repr self.userData}";
 }
 
 
 
 global PREPROCESS;
-final global function LINK_split(self: BoundStep): {BoundStep...} {
+global final function LINK_split(self: BoundStep): {BoundStep...} {
 	local script = self.group.options.get(OPT_LINK_SCRIPT);
 	if (script !is none) {
 		/* Generate the linker script in its own step */
@@ -477,7 +477,7 @@ final global function LINK_split(self: BoundStep): {BoundStep...} {
 	}
 	yield self;
 }
-final global function LINK_enumerate_objects(self: BoundStep): {string...} {
+global final function LINK_enumerate_objects(self: BoundStep): {string...} {
 	local config = self.toolchain.config;
 	local group = self.group;
 	local options = group.options;
@@ -485,7 +485,7 @@ final global function LINK_enumerate_objects(self: BoundStep): {string...} {
 		yield config.getObjectFilename(group, f);
 	yield group.fixFilenames(options.get(OPT_LINK_OBJECTS))...;
 }
-final global function LINK_run(self: BoundStep): string {
+global final function LINK_run(self: BoundStep): string {
 	local toolchain = self.toolchain;
 	local config = toolchain.config;
 	local group = self.group;
@@ -509,7 +509,7 @@ final global function LINK_run(self: BoundStep): string {
 		noStdLib: options.get(OPT_LINK_NOSTDLIB, false),
 	);
 }
-final global function LINK_getRequiredFiles(self: BoundStep): string {
+global final function LINK_getRequiredFiles(self: BoundStep): string {
 	local toolchain = self.toolchain;
 	local config = toolchain.config;
 	local group = self.group;
@@ -529,11 +529,11 @@ final global function LINK_getRequiredFiles(self: BoundStep): string {
 		noStdLib:  options.get(OPT_LINK_NOSTDLIB, false),
 	)...;
 }
-final global function LINK_getProducedFiles(self: BoundStep): string {
+global final function LINK_getProducedFiles(self: BoundStep): string {
 	local group = self.group;
 	yield group.fixFilename(group.options[OPT_LINK_OUTPUT]);
 }
-final local function LINK_tostr(self: BoundStep): string {
+local final function LINK_tostr(self: BoundStep): string {
 	local group = self.group;
 	return f"Link {repr group.fixFilename(group.options[OPT_LINK_OUTPUT])}";
 }
@@ -541,7 +541,7 @@ final local function LINK_tostr(self: BoundStep): string {
 
 
 
-final local function ARCHIVE_run(self: BoundStep): string {
+local final function ARCHIVE_run(self: BoundStep): string {
 	local toolchain = self.toolchain;
 	local config = toolchain.config;
 	local group = self.group;
@@ -559,7 +559,7 @@ final local function ARCHIVE_run(self: BoundStep): string {
 		),
 	);
 }
-final local function ARCHIVE_getRequiredFiles(self: BoundStep): string {
+local final function ARCHIVE_getRequiredFiles(self: BoundStep): string {
 	local config = self.toolchain.config;
 	local group = self.group;
 	local options = group.options;
@@ -568,11 +568,11 @@ final local function ARCHIVE_getRequiredFiles(self: BoundStep): string {
 	for (local f: options.get(OPT_LINK_OBJECTS))
 		yield group.fixFilename(f);
 }
-final local function ARCHIVE_getProducedFiles(self: BoundStep): string {
+local final function ARCHIVE_getProducedFiles(self: BoundStep): string {
 	local group = self.group;
 	yield group.fixFilename(group.options[OPT_ARCHIVE_OUTPUT]);
 }
-final local function ARCHIVE_tostr(self: BoundStep): string {
+local final function ARCHIVE_tostr(self: BoundStep): string {
 	local group = self.group;
 	return f"Archive {repr group.fixFilename(group.options[OPT_ARCHIVE_OUTPUT])}";
 }
@@ -582,7 +582,7 @@ final local function ARCHIVE_tostr(self: BoundStep): string {
 
 
 
-final local function COMPILE_WITH_ASM_FILTER_run(
+local final function COMPILE_WITH_ASM_FILTER_run(
 		self: BoundStep, filter: Callable with (File, File)): {Waitable...} {
 	local options = getCompileOptions(self, self.userData);
 	local secondary = options.get(OPT_COMPILE_SECONDARY);
@@ -642,7 +642,7 @@ final local function COMPILE_WITH_ASM_FILTER_run(
 	}
 }
 
-final local function COMPILE_WITH_ASM_FILTER_getProducedOutputFiles(self: BoundStep): {string...} {
+local final function COMPILE_WITH_ASM_FILTER_getProducedOutputFiles(self: BoundStep): {string...} {
 	local group = self.group;
 	local options = group.options;
 	local secondary = options.get(OPT_COMPILE_SECONDARY);
@@ -660,11 +660,11 @@ final local function COMPILE_WITH_ASM_FILTER_getProducedOutputFiles(self: BoundS
 		yield COMPILE_getProducedOutputFiles(self)...;
 	}
 }
-final local function COMPILE_WITH_ASM_FILTER_getProducedFiles(self: BoundStep): {string...} {
+local final function COMPILE_WITH_ASM_FILTER_getProducedFiles(self: BoundStep): {string...} {
 	yield self.toolchain.config.getDependencyFilename(self.group, self.userData);
 	yield COMPILE_WITH_ASM_FILTER_getProducedOutputFiles(self)...;
 }
-final local function COMPILE_WITH_ASM_FILTER_tostr(self: BoundStep): string {
+local final function COMPILE_WITH_ASM_FILTER_tostr(self: BoundStep): string {
 	return f"Compile with asm filter {repr self.userData}";
 }
 

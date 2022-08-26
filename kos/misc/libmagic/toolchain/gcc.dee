@@ -25,10 +25,10 @@ import * from deemon;
 import * from errors;
 
 @@Special set of options that is always passed when gcc or g++ is invoked
-final global OPT_GCC_OPTIONS: string = "GCC.options";
+global final OPT_GCC_OPTIONS: string = "GCC.options";
 
 @@Flags that are unrelated to implicitly linked libraries
-final local GCC_SYSTEM_LIBRARY_UNRELATED_FLAGS = {
+local final GCC_SYSTEM_LIBRARY_UNRELATED_FLAGS = {
 	"-fPIC", "-fpic", "-fPIE", "-fpie", "-fplt",
 	"-shared", "-static", "-shared-libgcc",
 	"-static-libgcc", "-frtti", "-ffreestanding",
@@ -53,9 +53,9 @@ final function isUnrelatedGCCFlag(flag: string): bool {
 
 
 #ifdef __WINDOWS__
-final global EXE_FORMAT = "{}{}.exe";
+global final EXE_FORMAT = "{}{}.exe";
 #else /* __WINDOWS__ */
-final global EXE_FORMAT = "{}{}";
+global final EXE_FORMAT = "{}{}";
 #endif /* !__WINDOWS__ */
 
 @@Join sub-process arguments for gcc or g++
@@ -258,7 +258,7 @@ global class GCCToolchain: Toolchain {
 								}
 								/* Capture: <LD_PATH>: <OBJECT_FILE>: in function `<FUNCTION_NAME>': */
 								local tail = l[col2:];
-								final local IN_FUNCTION_PREFIX = ": in function `";
+								local final IN_FUNCTION_PREFIX = ": in function `";
 								if (tail.startswith(IN_FUNCTION_PREFIX)) {
 									local end = tail.find("\'", #IN_FUNCTION_PREFIX);
 									if (end >= 0) {

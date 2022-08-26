@@ -29,7 +29,7 @@ import fs;
 function getConfigDocString(declFilename: string, configName: string): string {
 	with (local fp = File.open(fs.joinpath(getKosRootDir(), declFilename), "r")) {
 		local data = fp.read().unifylines();
-		final local PREFIX = "/*" "[[[config";
+		local final PREFIX = "/*" "[[[config";
 		for (local configStart: data.findall(PREFIX)) {
 			configStart += #PREFIX;
 			while (configStart < #data && data.isspace(configStart))
@@ -53,7 +53,7 @@ function getConfigDocString(declFilename: string, configName: string): string {
 			if (configLine == configName) {
 				@@Characters  removed from the start of @docText, so-
 				@@long as all of its lines start with that character.
-				final local LSTRIP_COMMON_CHARS = "\t *".bytes();
+				local final LSTRIP_COMMON_CHARS = "\t *".bytes();
 				for (;;) {
 					docText = docText.rstrip("\n");
 					local commonPrefix = none;

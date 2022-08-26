@@ -221,9 +221,9 @@ struct __stat_timespec32 /*[PREFIX(tv_)][NAME(stat_timespec32)]*/ {
 
 /*[[[deemon
 import * from deemon;
-final global TYPE_WIDTH = 25;
-final global NAME_WIDTH = 16;
-final global TABSIZE    = 4;
+global final TYPE_WIDTH = 25;
+global final NAME_WIDTH = 16;
+global final TABSIZE    = 4;
 global doStat64 = false;
 function _printNameWithComment(name: string, comment: string) {
 	print(name, ";"),;

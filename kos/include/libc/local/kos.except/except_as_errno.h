@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd38b3da1 */
+/* HASH CRC-32:0xc7bd7694 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(except_as_errno))(struct exception_da
 #endif /* !__EPERM */
 	switch (__self->e_class) {
 /*[[[deemon
-final local DEFAULT_ERRNO = "EPERM";
+local final DEFAULT_ERRNO = "EPERM";
 import * from deemon;
 import * from ....misc.libgen.exceptinfo;
 function isCustomErrnoExpr(s) -> s !is none && s != "DEFAULT_ERRNO";

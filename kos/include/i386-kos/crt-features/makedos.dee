@@ -58,7 +58,7 @@ function loadSymbolsFromFile(filename: string | {string...}): {string...} {
 	if (ecode != 0)
 		throw Error("dumpbin failed with " + ecode);
 	local symbols = HashSet();
-	final local START_MARKER = "ordinal hint RVA      name";
+	local final START_MARKER = "ordinal hint RVA      name";
 	local start = text.index(START_MARKER) + #START_MARKER;
 	for (local line: text[start:].splitlines(false)) {
 		local name;

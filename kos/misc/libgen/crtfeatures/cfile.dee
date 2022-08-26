@@ -23,25 +23,25 @@ import * from errors;
 import util;
 
 @@[repr: @none] EOF
-final global TOK_EOF = none;
+global final TOK_EOF = none;
 
 @@[repr: @string] Misc. tokens (usually 1-character)
-final global TOK_MISC = 1;
+global final TOK_MISC = 1;
 
 @@[repr: @string] C-String (the token repr is the un-escaped string text)
-final global TOK_STRING = 2;
+global final TOK_STRING = 2;
 
 @@[repr: @int] Integer constant (the token repr is the keyword)
-final global TOK_NUMBER = 4;
+global final TOK_NUMBER = 4;
 
 @@[repr: @string] Keyword constant (the token repr is the keyword)
-final global TOK_KEYWORD = 5;
+global final TOK_KEYWORD = 5;
 
 @@[repr: (@string, @string)] Preprocessor directive
 @@The repr is the (directive_cmd,  directive_args).
 @@e.g.: @((TOK_DIRECTIVE, ("define", "foo 42")))
 @@for:  @"#define foo 42"
-final global TOK_DIRECTIVE = 6;
+global final TOK_DIRECTIVE = 6;
 
 @@Replace all occurrence of @findStr with @replaceStr in @text
 function replaceAll(text: string, findStr: string, replaceStr: string): string {

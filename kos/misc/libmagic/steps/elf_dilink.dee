@@ -53,7 +53,7 @@ function findProgramHeaderIndexWithPhysAddressEqualToSymbolPlusOffset(
 	throw Error("TODO");
 }
 
-final local function DILINK_run(self: BoundStep): string {
+local final function DILINK_run(self: BoundStep): string {
 	local toolchain = self.toolchain;
 	local config = toolchain.config;
 	local group = self.group;
@@ -322,7 +322,7 @@ link_again_with_new_guesses:
 }
 
 
-final local function DILINK_tostr(self: BoundStep): string {
+local final function DILINK_tostr(self: BoundStep): string {
 	local group = self.group;
 	return f"di-Link {repr group.fixFilename(group.options[OPT_LINK_OUTPUT])}";
 }

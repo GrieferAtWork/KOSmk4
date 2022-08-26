@@ -48,8 +48,8 @@ again:
 
 function printPreprocessorExpressionEndif(fp: File, cond: string): File {
 	for (;;) {
-		final local PREFIX = "defined(";
-		final local SUFFIX = ")";
+		local final PREFIX = "defined(";
+		local final SUFFIX = ")";
 		local i = cond.find(PREFIX);
 		if (i < 0)
 			break;
@@ -524,8 +524,8 @@ function parseExceptionClasses(
 	@@Stack of expressions that must hold true
 	local ppExpressionStack = [];
 	for (;;) {
-		final local BEGIN = "/*[[[begin]]]*/";
-		final local END   = "/*[[[end]]]*/";
+		local final BEGIN = "/*[[[begin]]]*/";
+		local final END   = "/*[[[end]]]*/";
 		i = text.find(BEGIN, i);
 		if (i < 0)
 			break;

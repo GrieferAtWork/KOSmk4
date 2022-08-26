@@ -57,7 +57,7 @@ import * from deemon;
 
 @@Parse `ProjectSettings.json' and return a tuple (target, config)
 function parseCurrentVsConfiguration(filename: string): (string,string) {
-	final local OPTION_PREFIX = r'"CurrentProjectSetting"';
+	local final OPTION_PREFIX = r'"CurrentProjectSetting"';
 	for (local l: File.open(filename)) {
 		local name;
 		try {

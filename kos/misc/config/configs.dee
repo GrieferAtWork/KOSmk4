@@ -75,7 +75,7 @@ final class CustomConfiguration: Configuration {
 		get(): Bytes | none {
 			if (m_magic !is bound) {
 				local bytes = configFileData;
-				final local PREFIX = "/*" "[[[magic";
+				local final PREFIX = "/*" "[[[magic";
 				local magicOffset = bytes.find(PREFIX);
 				if (magicOffset < 0) {
 					m_magic = none;

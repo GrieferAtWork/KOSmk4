@@ -23,8 +23,8 @@ import ipc;
 import * from deemon;
 import * from errors;
 
-final global ROOT = fs.headof(__FILE__);
-final global GCC = "E:\\home\\src\\git-gcc\\gcc";
+global final ROOT = fs.headof(__FILE__);
+global final GCC = "E:\\home\\src\\git-gcc\\gcc";
 
 
 class GCCBuiltin {
@@ -148,7 +148,7 @@ function getGCCBuiltins(version: (int,int,int)): {string...} {
 	local i = 0;
 	local len = #data;
 	while (i < len) {
-		final local DEF = "DEF_BUILTIN";
+		local final DEF = "DEF_BUILTIN";
 		i = data.find(DEF, i);
 		if (i < 0)
 			break;
@@ -191,7 +191,7 @@ function getGCCBuiltins(version: (int,int,int)): {string...} {
 			if (name.isanylower() || !name.startswith("BUILT_IN_"))
 				throw Error("Unexpected old-style builtin definition: " + repr(name));
 			name = "__builtin_" + name[#"BUILT_IN_":].lower();
-			final local knownNonLibcFunctions = {
+			local final knownNonLibcFunctions = {
 				"__builtin_alloca",
 				"__builtin_apply",
 				"__builtin_getexp",
