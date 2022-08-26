@@ -35,7 +35,7 @@ NOTHROW_NCX(LIBDCALL libd__wtempnam)(char16_t const *directory,
 /*AUTO*/{
 	(void)directory;
 	(void)file_prefix;
-	CRT_UNIMPLEMENTEDF("DOS$_wtempnam(%p, %p)", directory, file_prefix); /* TODO */
+	CRT_UNIMPLEMENTEDF("DOS$_wtempnam(directory: %p, file_prefix: %p)", directory, file_prefix); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -49,7 +49,7 @@ NOTHROW_NCX(LIBKCALL libc__wtempnam)(char32_t const *directory,
 /*AUTO*/{
 	(void)directory;
 	(void)file_prefix;
-	CRT_UNIMPLEMENTEDF("_wtempnam(%p, %p)", directory, file_prefix); /* TODO */
+	CRT_UNIMPLEMENTEDF("_wtempnam(directory: %p, file_prefix: %p)", directory, file_prefix); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -63,7 +63,7 @@ NOTHROW_NCX(LIBDCALL libd__wtmpnam_s)(char16_t *dst,
 /*AUTO*/{
 	(void)dst;
 	(void)wchar_count;
-	CRT_UNIMPLEMENTEDF("DOS$_wtmpnam_s(%p, %Ix)", dst, wchar_count); /* TODO */
+	CRT_UNIMPLEMENTEDF("DOS$_wtmpnam_s(dst: %p, wchar_count: %Ix)", dst, wchar_count); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libd__wtmpnam_s]]]*/
@@ -76,7 +76,7 @@ NOTHROW_NCX(LIBKCALL libc__wtmpnam_s)(char32_t *dst,
 /*AUTO*/{
 	(void)dst;
 	(void)wchar_count;
-	CRT_UNIMPLEMENTEDF("_wtmpnam_s(%p, %Ix)", dst, wchar_count); /* TODO */
+	CRT_UNIMPLEMENTEDF("_wtmpnam_s(dst: %p, wchar_count: %Ix)", dst, wchar_count); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libc__wtmpnam_s]]]*/
@@ -87,7 +87,7 @@ NOTHROW_NCX(LIBDCALL libd__wtmpnam)(char16_t *buf)
 /*[[[body:libd__wtmpnam]]]*/
 /*AUTO*/{
 	(void)buf;
-	CRT_UNIMPLEMENTEDF("DOS$_wtmpnam(%p)", buf); /* TODO */
+	CRT_UNIMPLEMENTEDF("DOS$_wtmpnam(buf: %p)", buf); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -99,7 +99,7 @@ NOTHROW_NCX(LIBKCALL libc__wtmpnam)(char32_t *buf)
 /*[[[body:libc__wtmpnam]]]*/
 /*AUTO*/{
 	(void)buf;
-	CRT_UNIMPLEMENTEDF("_wtmpnam(%p)", buf); /* TODO */
+	CRT_UNIMPLEMENTEDF("_wtmpnam(buf: %p)", buf); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }

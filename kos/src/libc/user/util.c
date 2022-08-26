@@ -39,7 +39,7 @@ NOTHROW_RPC(LIBCCALL libc_opendev)(char const *path,
 	(void)oflags;
 	(void)dflags;
 	(void)realpath;
-	CRT_UNIMPLEMENTEDF("opendev(%q, %" PRIxN(__SIZEOF_OFLAG_T__) ", %x, %p)", path, oflags, dflags, realpath); /* TODO */
+	CRT_UNIMPLEMENTEDF("opendev(path: %q, oflags: %" PRIxN(__SIZEOF_OFLAG_T__) ", dflags: %x, realpath: %p)", path, oflags, dflags, realpath); /* TODO */
 	return (fd_t)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_opendev]]]*/

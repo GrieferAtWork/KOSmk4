@@ -262,7 +262,7 @@ NOTHROW_NCX(LIBCCALL libc_sigreturn)(struct sigcontext const *scp)
 /*[[[body:libc_sigreturn]]]*/
 /*AUTO*/{
 	(void)scp;
-	CRT_UNIMPLEMENTEDF("sigreturn(%p)", scp); /* TODO */
+	CRT_UNIMPLEMENTEDF("sigreturn(scp: %p)", scp); /* TODO */
 	assert_failed("Not implemented");
 }
 /*[[[end:libc_sigreturn]]]*/

@@ -62,7 +62,7 @@ NOTHROW_RPC(LIBCCALL libc_getspnam)(char const *__restrict name)
 /*[[[body:libc_getspnam]]]*/
 /*AUTO*/{
 	(void)name;
-	CRT_UNIMPLEMENTEDF("getspnam(%q)", name); /* TODO */
+	CRT_UNIMPLEMENTEDF("getspnam(name: %q)", name); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -74,7 +74,7 @@ NOTHROW_RPC(LIBCCALL libc_sgetspent)(char const *__restrict string)
 /*[[[body:libc_sgetspent]]]*/
 /*AUTO*/{
 	(void)string;
-	CRT_UNIMPLEMENTEDF("sgetspent(%q)", string); /* TODO */
+	CRT_UNIMPLEMENTEDF("sgetspent(string: %q)", string); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -86,7 +86,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetspent)(FILE *__restrict stream)
 /*[[[body:libc_fgetspent]]]*/
 /*AUTO*/{
 	(void)stream;
-	CRT_UNIMPLEMENTEDF("fgetspent(%p)", stream); /* TODO */
+	CRT_UNIMPLEMENTEDF("fgetspent(stream: %p)", stream); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -100,7 +100,7 @@ NOTHROW_RPC(LIBCCALL libc_putspent)(struct spwd const *__restrict p,
 /*AUTO*/{
 	(void)p;
 	(void)stream;
-	CRT_UNIMPLEMENTEDF("putspent(%p, %p)", p, stream); /* TODO */
+	CRT_UNIMPLEMENTEDF("putspent(p: %p, stream: %p)", p, stream); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_putspent]]]*/
@@ -117,7 +117,7 @@ NOTHROW_RPC(LIBCCALL libc_getspent_r)(struct spwd *__restrict result_buf,
 	(void)buffer;
 	(void)buflen;
 	(void)result;
-	CRT_UNIMPLEMENTEDF("getspent_r(%p, %q, %Ix, %p)", result_buf, buffer, buflen, result); /* TODO */
+	CRT_UNIMPLEMENTEDF("getspent_r(result_buf: %p, buffer: %q, buflen: %Ix, result: %p)", result_buf, buffer, buflen, result); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getspent_r]]]*/
@@ -136,7 +136,7 @@ NOTHROW_RPC(LIBCCALL libc_getspnam_r)(char const *__restrict name,
 	(void)buffer;
 	(void)buflen;
 	(void)result;
-	CRT_UNIMPLEMENTEDF("getspnam_r(%q, %p, %q, %Ix, %p)", name, result_buf, buffer, buflen, result); /* TODO */
+	CRT_UNIMPLEMENTEDF("getspnam_r(name: %q, result_buf: %p, buffer: %q, buflen: %Ix, result: %p)", name, result_buf, buffer, buflen, result); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getspnam_r]]]*/
@@ -155,7 +155,7 @@ NOTHROW_RPC(LIBCCALL libc_sgetspent_r)(char const *__restrict string,
 	(void)buffer;
 	(void)buflen;
 	(void)result;
-	CRT_UNIMPLEMENTEDF("sgetspent_r(%q, %p, %q, %Ix, %p)", string, result_buf, buffer, buflen, result); /* TODO */
+	CRT_UNIMPLEMENTEDF("sgetspent_r(string: %q, result_buf: %p, buffer: %q, buflen: %Ix, result: %p)", string, result_buf, buffer, buflen, result); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_sgetspent_r]]]*/
@@ -174,7 +174,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetspent_r)(FILE *__restrict stream,
 	(void)buffer;
 	(void)buflen;
 	(void)result;
-	CRT_UNIMPLEMENTEDF("fgetspent_r(%p, %p, %q, %Ix, %p)", stream, result_buf, buffer, buflen, result); /* TODO */
+	CRT_UNIMPLEMENTEDF("fgetspent_r(stream: %p, result_buf: %p, buffer: %q, buflen: %Ix, result: %p)", stream, result_buf, buffer, buflen, result); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_fgetspent_r]]]*/

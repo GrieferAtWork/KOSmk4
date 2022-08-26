@@ -33,7 +33,7 @@ NOTHROW_NCX(LIBCCALL libc_fesetexcept)(int excepts)
 /*[[[body:libc_fesetexcept]]]*/
 /*AUTO*/{
 	(void)excepts;
-	CRT_UNIMPLEMENTEDF("fesetexcept(%x)", excepts); /* TODO */
+	CRT_UNIMPLEMENTEDF("fesetexcept(excepts: %x)", excepts); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_fesetexcept]]]*/
@@ -46,7 +46,7 @@ NOTHROW_NCX(LIBCCALL libc_fetestexceptflag)(fexcept_t const *flagp,
 /*AUTO*/{
 	(void)flagp;
 	(void)excepts;
-	CRT_UNIMPLEMENTEDF("fetestexceptflag(%p, %x)", flagp, excepts); /* TODO */
+	CRT_UNIMPLEMENTEDF("fetestexceptflag(flagp: %p, excepts: %x)", flagp, excepts); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_fetestexceptflag]]]*/
@@ -57,7 +57,7 @@ NOTHROW_NCX(LIBCCALL libc_fegetmode)(femode_t *modep)
 /*[[[body:libc_fegetmode]]]*/
 /*AUTO*/{
 	(void)modep;
-	CRT_UNIMPLEMENTEDF("fegetmode(%p)", modep); /* TODO */
+	CRT_UNIMPLEMENTEDF("fegetmode(modep: %p)", modep); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_fegetmode]]]*/
@@ -68,7 +68,7 @@ NOTHROW_NCX(LIBCCALL libc_fesetmode)(femode_t const *modep)
 /*[[[body:libc_fesetmode]]]*/
 /*AUTO*/{
 	(void)modep;
-	CRT_UNIMPLEMENTEDF("fesetmode(%p)", modep); /* TODO */
+	CRT_UNIMPLEMENTEDF("fesetmode(modep: %p)", modep); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_fesetmode]]]*/

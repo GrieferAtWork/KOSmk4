@@ -128,7 +128,7 @@ NOTHROW_NCX(LIBCCALL libc_newlocale)(int category_mask,
 	(void)category_mask;
 	(void)locale;
 	(void)base;
-	CRT_UNIMPLEMENTEDF("newlocale(%x, %q, %p)", category_mask, locale, base); /* TODO */
+	CRT_UNIMPLEMENTEDF("newlocale(category_mask: %x, locale: %q, base: %p)", category_mask, locale, base); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -142,7 +142,7 @@ NOTHROW_NCX(LIBCCALL libc_duplocale)(locale_t dataset)
 /*[[[body:libc_duplocale]]]*/
 /*AUTO*/{
 	(void)dataset;
-	CRT_UNIMPLEMENTEDF("duplocale(%p)", dataset); /* TODO */
+	CRT_UNIMPLEMENTEDF("duplocale(dataset: %p)", dataset); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -155,7 +155,7 @@ NOTHROW_NCX(LIBCCALL libc_freelocale)(locale_t dataset)
 /*[[[body:libc_freelocale]]]*/
 /*AUTO*/{
 	(void)dataset;
-	CRT_UNIMPLEMENTEDF("freelocale(%p)", dataset); /* TODO */
+	CRT_UNIMPLEMENTEDF("freelocale(dataset: %p)", dataset); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_freelocale]]]*/
@@ -174,7 +174,7 @@ NOTHROW_NCX(LIBCCALL libc_uselocale)(locale_t dataset)
 /*[[[body:libc_uselocale]]]*/
 /*AUTO*/{
 	(void)dataset;
-	CRT_UNIMPLEMENTEDF("uselocale(%p)", dataset); /* TODO */
+	CRT_UNIMPLEMENTEDF("uselocale(dataset: %p)", dataset); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -206,7 +206,7 @@ NOTHROW_NCX(LIBCCALL libc__configthreadlocale)(int flag)
 /*[[[body:libc__configthreadlocale]]]*/
 /*AUTO*/{
 	(void)flag;
-	CRT_UNIMPLEMENTEDF("_configthreadlocale(%x)", flag); /* TODO */
+	CRT_UNIMPLEMENTEDF("_configthreadlocale(flag: %x)", flag); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__configthreadlocale]]]*/
@@ -230,7 +230,7 @@ NOTHROW_NCX(LIBCCALL libc__create_locale)(int category,
 /*AUTO*/{
 	(void)category;
 	(void)locale;
-	CRT_UNIMPLEMENTEDF("_create_locale(%x, %q)", category, locale); /* TODO */
+	CRT_UNIMPLEMENTEDF("_create_locale(category: %x, locale: %q)", category, locale); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -242,7 +242,7 @@ NOTHROW_NCX(LIBCCALL libc__free_locale)(locale_t locale)
 /*[[[body:libc__free_locale]]]*/
 /*AUTO*/{
 	(void)locale;
-	CRT_UNIMPLEMENTEDF("_free_locale(%p)", locale); /* TODO */
+	CRT_UNIMPLEMENTEDF("_free_locale(locale: %p)", locale); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__free_locale]]]*/
@@ -255,7 +255,7 @@ NOTHROW_NCX(LIBDCALL libd__wsetlocale)(int category,
 /*AUTO*/{
 	(void)category;
 	(void)locale;
-	CRT_UNIMPLEMENTEDF("DOS$_wsetlocale(%x, %p)", category, locale); /* TODO */
+	CRT_UNIMPLEMENTEDF("DOS$_wsetlocale(category: %x, locale: %p)", category, locale); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -269,7 +269,7 @@ NOTHROW_NCX(LIBKCALL libc__wsetlocale)(int category,
 /*AUTO*/{
 	(void)category;
 	(void)locale;
-	CRT_UNIMPLEMENTEDF("_wsetlocale(%x, %p)", category, locale); /* TODO */
+	CRT_UNIMPLEMENTEDF("_wsetlocale(category: %x, locale: %p)", category, locale); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -283,7 +283,7 @@ NOTHROW_NCX(LIBDCALL libd__wcreate_locale)(int category,
 /*AUTO*/{
 	(void)category;
 	(void)locale;
-	CRT_UNIMPLEMENTEDF("DOS$_wcreate_locale(%x, %p)", category, locale); /* TODO */
+	CRT_UNIMPLEMENTEDF("DOS$_wcreate_locale(category: %x, locale: %p)", category, locale); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -297,7 +297,7 @@ NOTHROW_NCX(LIBKCALL libc__wcreate_locale)(int category,
 /*AUTO*/{
 	(void)category;
 	(void)locale;
-	CRT_UNIMPLEMENTEDF("_wcreate_locale(%x, %p)", category, locale); /* TODO */
+	CRT_UNIMPLEMENTEDF("_wcreate_locale(category: %x, locale: %p)", category, locale); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -391,7 +391,7 @@ NOTHROW_NCX(LIBCCALL libc__Strftime)(char *buf,
 	(void)format;
 	(void)tms;
 	(void)lc_time_arg;
-	CRT_UNIMPLEMENTEDF("_Strftime(%q, %Ix, %q, %p, %p)", buf, bufsize, format, tms, lc_time_arg); /* TODO */
+	CRT_UNIMPLEMENTEDF("_Strftime(buf: %q, bufsize: %Ix, format: %q, tms: %p, lc_time_arg: %p)", buf, bufsize, format, tms, lc_time_arg); /* TODO */
 	return (size_t)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__Strftime]]]*/
@@ -410,7 +410,7 @@ NOTHROW_NCX(LIBDCALL libd__Wcsftime)(char16_t *buf,
 	(void)format;
 	(void)tms;
 	(void)lc_time_arg;
-	CRT_UNIMPLEMENTEDF("DOS$_Wcsftime(%p, %Ix, %p, %p, %p)", buf, bufsize, format, tms, lc_time_arg); /* TODO */
+	CRT_UNIMPLEMENTEDF("DOS$_Wcsftime(buf: %p, bufsize: %Ix, format: %p, tms: %p, lc_time_arg: %p)", buf, bufsize, format, tms, lc_time_arg); /* TODO */
 	return (size_t)libc_seterrno(ENOSYS);
 }
 /*[[[end:libd__Wcsftime]]]*/
@@ -429,7 +429,7 @@ NOTHROW_NCX(LIBKCALL libc__Wcsftime)(char32_t *buf,
 	(void)format;
 	(void)tms;
 	(void)lc_time_arg;
-	CRT_UNIMPLEMENTEDF("_Wcsftime(%p, %Ix, %p, %p, %p)", buf, bufsize, format, tms, lc_time_arg); /* TODO */
+	CRT_UNIMPLEMENTEDF("_Wcsftime(buf: %p, bufsize: %Ix, format: %p, tms: %p, lc_time_arg: %p)", buf, bufsize, format, tms, lc_time_arg); /* TODO */
 	return (size_t)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__Wcsftime]]]*/

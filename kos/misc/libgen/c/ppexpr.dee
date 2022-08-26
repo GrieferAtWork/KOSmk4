@@ -827,10 +827,10 @@ have_non_boolean_in_brt_all:
 				if (e.typ == BRT_CONST) {
 					/* Merge constant addends */
 					local opfun = typ == BRT_PROD
-							? operator *
-							: typ == BRT_BITAND
-									? operator &
-									: (a, b) -> (a && b) ? 1 : 0;
+						? operator *
+						: typ == BRT_BITAND
+							? operator &
+							: (a, b) -> (a && b) ? 1 : 0;
 					local nonConstants: {PPBranch...} = [];
 					local constantsProd: int = 1;
 					for (local e: data) {
@@ -942,10 +942,10 @@ have_non_boolean_in_brt_any:
 				if (e.typ == BRT_CONST) {
 					/* Merge constant addends */
 					local opfun = typ == BRT_SUM
-							? operator +
-							: typ == BRT_BITOR
-									? operator |
-									: (a, b) -> (a || b) ? 1 : 0;
+						? operator +
+						: typ == BRT_BITOR
+							? operator |
+							: (a, b) -> (a || b) ? 1 : 0;
 					local nonConstants: {PPBranch...} = [];
 					local constantsSum: int = 0;
 					for (local e: data) {

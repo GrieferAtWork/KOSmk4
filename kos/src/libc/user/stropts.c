@@ -31,7 +31,7 @@ NOTHROW(LIBCCALL libc_isastream)(fd_t fd)
 /*[[[body:libc_isastream]]]*/
 /*AUTO*/{
 	(void)fd;
-	CRT_UNIMPLEMENTEDF("isastream(%" PRIxN(__SIZEOF_FD_T__) ")", fd); /* TODO */
+	CRT_UNIMPLEMENTEDF("isastream(fd: %" PRIxN(__SIZEOF_FD_T__) ")", fd); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_isastream]]]*/
@@ -51,7 +51,7 @@ NOTHROW_RPC(LIBCCALL libc_getmsg)(fd_t fd,
 	(void)ctlptr;
 	(void)dataptr;
 	(void)pflags;
-	CRT_UNIMPLEMENTEDF("getmsg(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %p)", fd, ctlptr, dataptr, pflags); /* TODO */
+	CRT_UNIMPLEMENTEDF("getmsg(fd: %" PRIxN(__SIZEOF_FD_T__) ", ctlptr: %p, dataptr: %p, pflags: %p)", fd, ctlptr, dataptr, pflags); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getmsg]]]*/
@@ -73,7 +73,7 @@ NOTHROW_RPC(LIBCCALL libc_getpmsg)(fd_t fd,
 	(void)dataptr;
 	(void)bandp;
 	(void)pflags;
-	CRT_UNIMPLEMENTEDF("getpmsg(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %p, %p)", fd, ctlptr, dataptr, bandp, pflags); /* TODO */
+	CRT_UNIMPLEMENTEDF("getpmsg(fd: %" PRIxN(__SIZEOF_FD_T__) ", ctlptr: %p, dataptr: %p, bandp: %p, pflags: %p)", fd, ctlptr, dataptr, bandp, pflags); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getpmsg]]]*/
@@ -91,7 +91,7 @@ NOTHROW_RPC(LIBCCALL libc_putmsg)(fd_t fd,
 	(void)ctlptr;
 	(void)dataptr;
 	(void)flags;
-	CRT_UNIMPLEMENTEDF("putmsg(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %x)", fd, ctlptr, dataptr, flags); /* TODO */
+	CRT_UNIMPLEMENTEDF("putmsg(fd: %" PRIxN(__SIZEOF_FD_T__) ", ctlptr: %p, dataptr: %p, flags: %x)", fd, ctlptr, dataptr, flags); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_putmsg]]]*/
@@ -111,7 +111,7 @@ NOTHROW_RPC(LIBCCALL libc_putpmsg)(fd_t fd,
 	(void)dataptr;
 	(void)band;
 	(void)flags;
-	CRT_UNIMPLEMENTEDF("putpmsg(%" PRIxN(__SIZEOF_FD_T__) ", %p, %p, %x, %x)", fd, ctlptr, dataptr, band, flags); /* TODO */
+	CRT_UNIMPLEMENTEDF("putpmsg(fd: %" PRIxN(__SIZEOF_FD_T__) ", ctlptr: %p, dataptr: %p, band: %x, flags: %x)", fd, ctlptr, dataptr, band, flags); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_putpmsg]]]*/
@@ -124,7 +124,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_fattach)(fd_t fd,
 /*AUTO*/{
 	(void)fd;
 	(void)path;
-	CRT_UNIMPLEMENTEDF("fattach(%" PRIxN(__SIZEOF_FD_T__) ", %q)", fd, path); /* TODO */
+	CRT_UNIMPLEMENTEDF("fattach(fd: %" PRIxN(__SIZEOF_FD_T__) ", path: %q)", fd, path); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_fattach]]]*/
@@ -135,7 +135,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_fdetach)(char const *__restrict path)
 /*[[[body:libc_fdetach]]]*/
 /*AUTO*/{
 	(void)path;
-	CRT_UNIMPLEMENTEDF("fdetach(%q)", path); /* TODO */
+	CRT_UNIMPLEMENTEDF("fdetach(path: %q)", path); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_fdetach]]]*/

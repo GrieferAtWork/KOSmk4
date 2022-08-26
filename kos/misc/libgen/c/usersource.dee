@@ -256,7 +256,8 @@ discard_function_during_scan:
 		/* Generate the initial file layout */
 		local fp = File.Writer();
 		local guardName = f"GUARD_LIBC_USER_{
-			header.name.replace(".", "_").replace("/", "_").upper()}_C";
+			header.name.replace(".", "_").replace("/", "_").upper()
+		}_C";
 		fp << COPYRIGHT << "\n"
 			"#ifndef " << guardName << "\n"
 			"#define " << guardName << " 1\n"
@@ -275,9 +276,9 @@ discard_function_during_scan:
 		}
 		local fp = File.Writer();
 		fp << "\n"
-			"DECL_END\n"
-			"\n"
-			"#endif /* !" << guardName << " */\n";
+		      "DECL_END\n"
+		      "\n"
+		      "#endif /* !" << guardName << " */\n";
 		userSourceLayout.append(UserSourceExportTable);
 		userSourceLayout.append(fp.string);
 		missingSourceFunctionsByName = none;
@@ -395,8 +396,8 @@ again_find_nextPresentFunction:
 				expTab += "\n";
 			local expTabHash = hash(HASH_FUNCTION, expTab);
 			fp << "/*[[[start:exports,hash:" << HASH_FUNCTION << "=" << expTabHash.hex() << "]]]*/\n"
-				<< expTab
-				<< "/*[[[end:exports]]]*/\n";
+			   << expTab
+			   << "/*[[[end:exports]]]*/\n";
 			continue;
 		}
 		if (part is UserSourceFunction) {
@@ -433,10 +434,10 @@ again_find_nextPresentFunction:
 					continue;
 				}
 				local ppCond = ppexpr.ppParse(escapeText(
-						extraNotCond is none
-								? b.ppCond
-								: f"(!({extraNotCond}))&&({b.ppCond})",
-						ESCAPE_MODE_NONE
+					extraNotCond is none
+						? b.ppCond
+						: f"(!({extraNotCond}))&&({b.ppCond})",
+					ESCAPE_MODE_NONE
 				)).optimize(asBool: true, assume: ppAssume).tostr();
 				extraNotCond = none;
 				if (isFirst) {
@@ -453,7 +454,7 @@ again_find_nextPresentFunction:
 					headFp << "#elif " << ppCond;
 				}
 				headFp << "\nDEFINE_INTERN_ALIAS(" << func.name << ", "
-					<< str(bindingItem) << ");\n";
+				       << str(bindingItem) << ");\n";
 				isFirst = false;
 			}
 			if (!isFirst)
@@ -492,11 +493,11 @@ again_find_nextPresentFunction:
 			/* Print the actual function */
 			headFp = headFp.string.lstrip("\n").rstrip() + "\n";
 			fp << "/*[[[head:" << func.name << ",hash:"
-				<< HASH_FUNCTION << "="
-				<< hash(HASH_FUNCTION, headFp).hex() << "]]]*/\n"
-				<< headFp
-				<< "/*[[[body:" << func.name << "]]]*/"
-				<< usedBody;
+			   << HASH_FUNCTION << "="
+			   << hash(HASH_FUNCTION, headFp).hex() << "]]]*/\n"
+			   << headFp
+			   << "/*[[[body:" << func.name << "]]]*/"
+			   << usedBody;
 			if (!usedBody.endswith("\n"))
 				fp << "\n";
 			if (!isFirst)

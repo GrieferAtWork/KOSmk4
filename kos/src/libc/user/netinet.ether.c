@@ -36,7 +36,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_ether_ntohost)(char *hostname,
 /*AUTO*/{
 	(void)hostname;
 	(void)addr;
-	CRT_UNIMPLEMENTEDF("ether_ntohost(%q, %p)", hostname, addr); /* TODO */
+	CRT_UNIMPLEMENTEDF("ether_ntohost(hostname: %q, addr: %p)", hostname, addr); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ether_ntohost]]]*/
@@ -52,7 +52,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_ether_hostton)(char const *hostname,
 /*AUTO*/{
 	(void)hostname;
 	(void)addr;
-	CRT_UNIMPLEMENTEDF("ether_hostton(%q, %p)", hostname, addr); /* TODO */
+	CRT_UNIMPLEMENTEDF("ether_hostton(hostname: %q, addr: %p)", hostname, addr); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ether_hostton]]]*/

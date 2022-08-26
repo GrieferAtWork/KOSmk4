@@ -32,7 +32,7 @@ NOTHROW_NCX(LIBCCALL libc_getifaddrs)(struct ifaddrs **ifap)
 /*[[[body:libc_getifaddrs]]]*/
 /*AUTO*/{
 	(void)ifap;
-	CRT_UNIMPLEMENTEDF("getifaddrs(%p)", ifap); /* TODO */
+	CRT_UNIMPLEMENTEDF("getifaddrs(ifap: %p)", ifap); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getifaddrs]]]*/
@@ -44,7 +44,7 @@ NOTHROW_NCX(LIBCCALL libc_freeifaddrs)(struct ifaddrs *ifa)
 /*[[[body:libc_freeifaddrs]]]*/
 /*AUTO*/{
 	(void)ifa;
-	CRT_UNIMPLEMENTEDF("freeifaddrs(%p)", ifa); /* TODO */
+	CRT_UNIMPLEMENTEDF("freeifaddrs(ifa: %p)", ifa); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_freeifaddrs]]]*/

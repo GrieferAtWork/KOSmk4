@@ -1811,7 +1811,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setcancelstate)(int state,
 /*AUTO*/{
 	(void)state;
 	(void)oldstate;
-	CRT_UNIMPLEMENTEDF("pthread_setcancelstate(%x, %p)", state, oldstate); /* TODO */
+	CRT_UNIMPLEMENTEDF("pthread_setcancelstate(state: %x, oldstate: %p)", state, oldstate); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libc_pthread_setcancelstate]]]*/
@@ -1829,7 +1829,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setcanceltype)(int type,
 /*AUTO*/{
 	(void)type;
 	(void)oldtype;
-	CRT_UNIMPLEMENTEDF("pthread_setcanceltype(%x, %p)", type, oldtype); /* TODO */
+	CRT_UNIMPLEMENTEDF("pthread_setcanceltype(type: %x, oldtype: %p)", type, oldtype); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libc_pthread_setcanceltype]]]*/
@@ -1906,7 +1906,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getcpuclockid)(pthread_t pthread,
 /*AUTO*/{
 	(void)pthread;
 	(void)clock_id;
-	CRT_UNIMPLEMENTEDF("pthread_getcpuclockid(%" PRIxN(__SIZEOF_PTHREAD_T) ", %p)", pthread, clock_id); /* TODO */
+	CRT_UNIMPLEMENTEDF("pthread_getcpuclockid(pthread: %" PRIxN(__SIZEOF_PTHREAD_T) ", clock_id: %p)", pthread, clock_id); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libc_pthread_getcpuclockid]]]*/
@@ -1984,7 +1984,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_atfork)(void (LIBCCALL *prepare)(void),
 	(void)prepare;
 	(void)parent;
 	(void)child;
-	CRT_UNIMPLEMENTEDF("pthread_atfork(%p, %p, %p)", prepare, parent, child); /* TODO */
+	CRT_UNIMPLEMENTEDF("pthread_atfork(prepare: %p, parent: %p, child: %p)", prepare, parent, child); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libc_pthread_atfork]]]*/
@@ -1995,7 +1995,7 @@ NOTHROW_NCX(LIBCCALL libc___pthread_register_cancel)(__pthread_unwind_buf_t *buf
 /*[[[body:libc___pthread_register_cancel]]]*/
 /*AUTO*/{
 	(void)buf;
-	CRT_UNIMPLEMENTEDF("__pthread_register_cancel(%p)", buf); /* TODO */
+	CRT_UNIMPLEMENTEDF("__pthread_register_cancel(buf: %p)", buf); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc___pthread_register_cancel]]]*/
@@ -2006,7 +2006,7 @@ NOTHROW_NCX(LIBCCALL libc___pthread_unregister_cancel)(__pthread_unwind_buf_t *b
 /*[[[body:libc___pthread_unregister_cancel]]]*/
 /*AUTO*/{
 	(void)buf;
-	CRT_UNIMPLEMENTEDF("__pthread_unregister_cancel(%p)", buf); /* TODO */
+	CRT_UNIMPLEMENTEDF("__pthread_unregister_cancel(buf: %p)", buf); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc___pthread_unregister_cancel]]]*/
@@ -2017,7 +2017,7 @@ NOTHROW_NCX(LIBCCALL libc___pthread_register_cancel_defer)(__pthread_unwind_buf_
 /*[[[body:libc___pthread_register_cancel_defer]]]*/
 /*AUTO*/{
 	(void)buf;
-	CRT_UNIMPLEMENTEDF("__pthread_register_cancel_defer(%p)", buf); /* TODO */
+	CRT_UNIMPLEMENTEDF("__pthread_register_cancel_defer(buf: %p)", buf); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc___pthread_register_cancel_defer]]]*/
@@ -2028,7 +2028,7 @@ NOTHROW_NCX(LIBCCALL libc___pthread_unregister_cancel_restore)(__pthread_unwind_
 /*[[[body:libc___pthread_unregister_cancel_restore]]]*/
 /*AUTO*/{
 	(void)buf;
-	CRT_UNIMPLEMENTEDF("__pthread_unregister_cancel_restore(%p)", buf); /* TODO */
+	CRT_UNIMPLEMENTEDF("__pthread_unregister_cancel_restore(buf: %p)", buf); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc___pthread_unregister_cancel_restore]]]*/
@@ -2040,7 +2040,7 @@ NOTHROW_NCX(LIBCCALL libc___pthread_unwind_next)(__pthread_unwind_buf_t *buf)
 /*[[[body:libc___pthread_unwind_next]]]*/
 /*AUTO*/{
 	(void)buf;
-	CRT_UNIMPLEMENTEDF("__pthread_unwind_next(%p)", buf); /* TODO */
+	CRT_UNIMPLEMENTEDF("__pthread_unwind_next(buf: %p)", buf); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc___pthread_unwind_next]]]*/
@@ -2920,7 +2920,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_getprioceiling)(pthread_mutex_t const *_
 /*AUTO*/{
 	(void)mutex;
 	(void)prioceiling;
-	CRT_UNIMPLEMENTEDF("pthread_mutex_getprioceiling(%p, %p)", mutex, prioceiling); /* TODO */
+	CRT_UNIMPLEMENTEDF("pthread_mutex_getprioceiling(mutex: %p, prioceiling: %p)", mutex, prioceiling); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libc_pthread_mutex_getprioceiling]]]*/
@@ -2940,7 +2940,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_setprioceiling)(pthread_mutex_t *__restr
 	(void)mutex;
 	(void)prioceiling;
 	(void)old_ceiling;
-	CRT_UNIMPLEMENTEDF("pthread_mutex_setprioceiling(%p, %x, %p)", mutex, prioceiling, old_ceiling); /* TODO */
+	CRT_UNIMPLEMENTEDF("pthread_mutex_setprioceiling(mutex: %p, prioceiling: %x, old_ceiling: %p)", mutex, prioceiling, old_ceiling); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libc_pthread_mutex_setprioceiling]]]*/
@@ -2956,7 +2956,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_consistent)(pthread_mutex_t *mutex)
 /*[[[body:libc_pthread_mutex_consistent]]]*/
 /*AUTO*/{
 	(void)mutex;
-	CRT_UNIMPLEMENTEDF("pthread_mutex_consistent(%p)", mutex); /* TODO */
+	CRT_UNIMPLEMENTEDF("pthread_mutex_consistent(mutex: %p)", mutex); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libc_pthread_mutex_consistent]]]*/
@@ -4135,7 +4135,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_barrier_init)(pthread_barrier_t *__restrict ba
 	(void)barrier;
 	(void)attr;
 	(void)count;
-	CRT_UNIMPLEMENTEDF("pthread_barrier_init(%p, %p, %x)", barrier, attr, count); /* TODO */
+	CRT_UNIMPLEMENTEDF("pthread_barrier_init(barrier: %p, attr: %p, count: %x)", barrier, attr, count); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libc_pthread_barrier_init]]]*/
@@ -4149,7 +4149,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_barrier_destroy)(pthread_barrier_t *barrier)
 /*[[[body:libc_pthread_barrier_destroy]]]*/
 /*AUTO*/{
 	(void)barrier;
-	CRT_UNIMPLEMENTEDF("pthread_barrier_destroy(%p)", barrier); /* TODO */
+	CRT_UNIMPLEMENTEDF("pthread_barrier_destroy(barrier: %p)", barrier); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libc_pthread_barrier_destroy]]]*/
@@ -4163,7 +4163,7 @@ NOTHROW_RPC(LIBCCALL libc_pthread_barrier_wait)(pthread_barrier_t *barrier)
 /*[[[body:libc_pthread_barrier_wait]]]*/
 /*AUTO*/{
 	(void)barrier;
-	CRT_UNIMPLEMENTEDF("pthread_barrier_wait(%p)", barrier); /* TODO */
+	CRT_UNIMPLEMENTEDF("pthread_barrier_wait(barrier: %p)", barrier); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libc_pthread_barrier_wait]]]*/

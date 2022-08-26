@@ -38,7 +38,7 @@ NOTHROW_NCX(VLIBDCALL libd_semctl)(int semid,
 	(void)semid;
 	(void)semnum;
 	(void)cmd;
-	CRT_UNIMPLEMENTEDF("semctl(%x, %x, %x, ...)", semid, semnum, cmd); /* TODO */
+	CRT_UNIMPLEMENTEDF("semctl(semid: %x, semnum: %x, cmd: %x, ...)", semid, semnum, cmd); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 #endif /* MAGIC:impl_if */
@@ -56,7 +56,7 @@ NOTHROW_NCX(VLIBCCALL libc_semctl)(int semid,
 	(void)semid;
 	(void)semnum;
 	(void)cmd;
-	CRT_UNIMPLEMENTEDF("semctl(%x, %x, %x, ...)", semid, semnum, cmd); /* TODO */
+	CRT_UNIMPLEMENTEDF("semctl(semid: %x, semnum: %x, cmd: %x, ...)", semid, semnum, cmd); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_semctl]]]*/
@@ -72,7 +72,7 @@ NOTHROW_NCX(LIBCCALL libc_semget)(key_t key,
 	(void)key;
 	(void)nsems;
 	(void)semflg;
-	CRT_UNIMPLEMENTEDF("semget(%" PRIxN(__SIZEOF_KEY_T__) ", %x, %x)", key, nsems, semflg); /* TODO */
+	CRT_UNIMPLEMENTEDF("semget(key: %" PRIxN(__SIZEOF_KEY_T__) ", nsems: %x, semflg: %x)", key, nsems, semflg); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_semget]]]*/
@@ -88,7 +88,7 @@ NOTHROW_NCX(LIBCCALL libc_semop)(int semid,
 	(void)semid;
 	(void)sops;
 	(void)nsops;
-	CRT_UNIMPLEMENTEDF("semop(%x, %p, %Ix)", semid, sops, nsops); /* TODO */
+	CRT_UNIMPLEMENTEDF("semop(semid: %x, sops: %p, nsops: %Ix)", semid, sops, nsops); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_semop]]]*/
@@ -106,7 +106,7 @@ NOTHROW_NCX(LIBCCALL libc_semtimedop)(int semid,
 	(void)sops;
 	(void)nsops;
 	(void)timeout;
-	CRT_UNIMPLEMENTEDF("semtimedop(%x, %p, %Ix, %p)", semid, sops, nsops, timeout); /* TODO */
+	CRT_UNIMPLEMENTEDF("semtimedop(semid: %x, sops: %p, nsops: %Ix, timeout: %p)", semid, sops, nsops, timeout); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_semtimedop]]]*/

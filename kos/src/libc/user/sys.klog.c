@@ -35,7 +35,7 @@ NOTHROW_NCX(LIBCCALL libc_klogctl)(__STDC_INT_AS_UINT_T type,
 	(void)type;
 	(void)bufp;
 	(void)len;
-	CRT_UNIMPLEMENTEDF("klogctl(%x, %q, %x)", type, bufp, len); /* TODO */
+	CRT_UNIMPLEMENTEDF("klogctl(type: %x, bufp: %q, len: %x)", type, bufp, len); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_klogctl]]]*/

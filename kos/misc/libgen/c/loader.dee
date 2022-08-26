@@ -1793,13 +1793,6 @@ function defineFunctionInMapping(
 }
 
 
-#define DELAY_printDefaultLibraryImplementationForPrototype
-#ifdef DELAY_printDefaultLibraryImplementationForPrototype
-#define DELAY_cb () ->
-#else /* DELAY_printDefaultLibraryImplementationForPrototype */
-#define DELAY_cb /* nothing */
-#endif /* !DELAY_printDefaultLibraryImplementationForPrototype */
-
 @@Print a default, stub-library-implementation for a given @prototype
 function printDefaultLibraryImplementationForPrototype(
 		fp: File, prototype: FunctionPrototype,
@@ -1809,12 +1802,11 @@ function printDefaultLibraryImplementationForPrototype(
 		if (a.name)
 			fp << "\t(void)" << a.name << ";\n";
 	}
-#ifdef DELAY_printDefaultLibraryImplementationForPrototype
 	if (!prototype.argv) {
 generic_unimplemented:
-#endif /* DELAY_printDefaultLibraryImplementationForPrototype */
-		fp << "\tCRT_UNIMPLEMENTED(" << repr(functionName) << "); /* TO" "DO */\n";
-#ifdef DELAY_printDefaultLibraryImplementationForPrototype
+		fp << "\tCRT_UNIMPLEMENTED("
+			<< repr(functionName)
+			<< "); /* TO" "DO */\n";
 	} else {
 		local priArgs = [];
 		for (local a: prototype.argv) {
@@ -1830,7 +1822,8 @@ generic_unimplemented:
 			if (ct.afterName)
 				effectiveBeforeName += " *";
 			effectiveBeforeName = effectiveBeforeName
-				.replace("$", "").replace("\t", " ");
+				.replace("$", "")
+				.replace("\t", " ");
 			for (;;) {
 				local newEffectiveBeforeName = effectiveBeforeName
 					.replace("  ", " ")
@@ -1902,11 +1895,16 @@ generic_unimplemented:
 			<< functionName.encode("c-escape")
 			<< "(";
 		local isFirst = true;
-		for (local p: priArgs) {
+		local i = 0;
+		for (local fmt: priArgs) {
 			if (!isFirst)
 				fp << ", ";
+			if (fmt.startswith("%")) {
+				fp << prototype.argv[i].name << ": ";
+				++i;
+			}
 			isFirst = false;
-			fp << p;
+			fp << fmt;
 		}
 		fp << ")\"";
 		local i = 0;
@@ -1918,13 +1916,12 @@ generic_unimplemented:
 		}
 		fp << "); /* TO" "DO */\n";
 	}
-#endif /* DELAY_printDefaultLibraryImplementationForPrototype */
 	if (prototype.isNoreturn) {
 		fp << "\tassert_failed(\"Not implemented\");\n";
 	} else {
 		local returnType = prototype.returnType;
-		if (!returnType.afterName && returnType.beforeName in
-				["error_t", "errno_t", "$error_t", "$errno_t", "__errno_t"]) {
+		if (!returnType.afterName && returnType.beforeName in {
+				"error_t", "errno_t", "$error_t", "$errno_t", "__errno_t" }) {
 			fp << "\treturn ENOSYS;\n";
 		} else {
 			if (returnType.isVoid) {
@@ -4148,9 +4145,9 @@ again_parse_annotations:
 								if (ppCond is none)
 									ppCond = "1";
 								local binding = FunctionBinding(
-										ppCond:     ppCond,
-										prototypes: currentPrototypes,
-										binding:    name);
+									ppCond:     ppCond,
+									prototypes: currentPrototypes,
+									binding:    name);
 								if (mode.startswith("preferred_")) {
 									current.bindings.insert(numPreferredBindings, binding);
 									++numPreferredBindings;
@@ -4159,15 +4156,15 @@ again_parse_annotations:
 								}
 							}
 							currentDosLibraryFunction.exportSymbolNames.append((
-									currentConditions is none
-											? "1"
-											: currentConditions,
-									"DOS$" + name));
+								currentConditions is none
+									? "1"
+									: currentConditions,
+								"DOS$" + name));
 							currentKosLibraryFunction.exportSymbolNames.append((
-									currentConditions is none
-											? f"defined(__LIBCCALL_IS_LIBDCALL)"
-											: f"defined(__LIBCCALL_IS_LIBDCALL) && ({currentConditions})",
-									name));
+								currentConditions is none
+									? f"defined(__LIBCCALL_IS_LIBDCALL)"
+									: f"defined(__LIBCCALL_IS_LIBDCALL) && ({currentConditions})",
+								name));
 						}
 						if (self.tok != ",")
 							break;
@@ -4215,9 +4212,9 @@ again_parse_annotations:
 							if (ppCond is none)
 								ppCond = "1";
 							local binding = FunctionBinding(
-									ppCond:     ppCond,
-									prototypes: currentPrototypes,
-									binding:    name);
+								ppCond:     ppCond,
+								prototypes: currentPrototypes,
+								binding:    name);
 							if (mode.startswith("preferred_")) {
 								current.bindings.insert(numPreferredBindings, binding);
 								++numPreferredBindings;
@@ -4229,10 +4226,10 @@ again_parse_annotations:
 								if (lf === currentDosLibraryFunction)
 									usedAsmname = "DOS$" + name;
 								lf.exportSymbolNames.append((
-										currentConditions is none
-												? "1"
-												: currentConditions,
-										usedAsmname));
+									currentConditions is none
+										? "1"
+										: currentConditions,
+									usedAsmname));
 							}
 						}
 						if (self.tok != ",")
@@ -4254,10 +4251,10 @@ again_parse_annotations:
 								if (currentKosLibraryFunction is none)
 									currentKosLibraryFunction = LibraryFunction();
 								currentKosLibraryFunction.exportSymbolNames.append((
-										currentConditions !is none
-												? currentConditions
-												: "1",
-										name));
+									currentConditions !is none
+										? currentConditions
+										: "1",
+									name));
 							}
 							if (mode != "kos_export_as") {
 								if (mode == "export_as")
@@ -4265,10 +4262,10 @@ again_parse_annotations:
 								if (currentDosLibraryFunction is none)
 									currentDosLibraryFunction = LibraryFunction();
 								currentDosLibraryFunction.exportSymbolNames.append((
-										currentConditions !is none
-												? currentConditions
-												: "1",
-										name));
+									currentConditions !is none
+										? currentConditions
+										: "1",
+									name));
 							}
 						}
 						if (self.tok != ",")
@@ -4290,9 +4287,9 @@ again_parse_annotations:
 							if (!tok.endswith("raw_alias"))
 								ppCond = constructAliasConditions(ppCond, assemblyName);
 							local binding = FunctionBinding(
-									ppCond:     ppCond,
-									prototypes: currentPrototypes,
-									binding:    assemblyName);
+								ppCond:     ppCond,
+								prototypes: currentPrototypes,
+								binding:    assemblyName);
 							if (tok.startswith("preferred_")) {
 								current.bindings.insert(numPreferredBindings, binding);
 								++numPreferredBindings;
@@ -4314,9 +4311,9 @@ again_parse_annotations:
 					while (self.tok !in ["", ")"]) {
 						local functionName = self.parseCStringOrFunctionLikeExpression();
 						local binding = FunctionBinding(
-								ppCond:     currentConditions is none ? "1" : currentConditions,
-								prototypes: currentPrototypes,
-								binding:    () -> findLocalFunctionByName(functionName));
+							ppCond:     currentConditions is none ? "1" : currentConditions,
+							prototypes: currentPrototypes,
+							binding:    () -> findLocalFunctionByName(functionName));
 						if (tok.startswith("preferred_")) {
 							current.bindings.insert(numPreferredBindings, binding);
 							++numPreferredBindings;
@@ -4361,9 +4358,9 @@ again_parse_annotations:
 						bindingCond = f"({bindingCond})&&({extraCondition})";
 					}
 					local binding = FunctionBinding(
-							ppCond:     bindingCond,
-							prototypes: currentPrototypes,
-							binding:    macroBinding);
+						ppCond:     bindingCond,
+						prototypes: currentPrototypes,
+						binding:    macroBinding);
 					if (tok.startswith("preferred_")) {
 						current.bindings.insert(numPreferredBindings, binding);
 						++numPreferredBindings;
@@ -4374,9 +4371,9 @@ again_parse_annotations:
 					if (tok.endswith("_replacement")) {
 						/* Prevent implementation of KOS/DOS libc functions when a macro-implementation gets used */
 						currentFeatures.crt_kosImplRequires =
-								f"({currentFeatures.crt_kosImplRequires})&&!({bindingCond})";
+							f"({currentFeatures.crt_kosImplRequires})&&!({bindingCond})";
 						currentFeatures.crt_dosImplRequires =
-								f"({currentFeatures.crt_dosImplRequires})&&!({bindingCond})";
+							f"({currentFeatures.crt_dosImplRequires})&&!({bindingCond})";
 
 						/* Register the macro-binding as available for in-library declarations. */
 						if (currentKosLibraryFunction is none)
@@ -4384,13 +4381,13 @@ again_parse_annotations:
 						if (currentDosLibraryFunction is none)
 							currentDosLibraryFunction = LibraryFunction();
 						currentKosLibraryFunction.bindings.append(
-								LibraryFunctionBinding(
-										ppCond:  bindingCond,
-										binding: macroBinding));
+							LibraryFunctionBinding(
+								ppCond:  bindingCond,
+								binding: macroBinding));
 						currentDosLibraryFunction.bindings.append(
-								LibraryFunctionBinding(
-										ppCond:  bindingCond,
-										binding: macroBinding));
+							LibraryFunctionBinding(
+								ppCond:  bindingCond,
+								binding: macroBinding));
 					}
 				}	break;
 
@@ -4422,9 +4419,9 @@ again_parse_annotations:
 					local macroBinding = MacroBinding(body: macroBody);
 					local bindingCond = currentConditions is none ? "1" : currentConditions;
 					local binding = FunctionBinding(
-							ppCond:     bindingCond,
-							prototypes: currentPrototypes,
-							binding:    macroBinding);
+						ppCond:     bindingCond,
+						prototypes: currentPrototypes,
+						binding:    macroBinding);
 					if (tok.startswith("preferred_")) {
 						current.bindings.insert(numPreferredBindings, binding);
 						++numPreferredBindings;
@@ -4435,9 +4432,9 @@ again_parse_annotations:
 					if (tok.endswith("_replacement")) {
 						/* Prevent implementation of KOS/DOS libc functions when a macro-implementation gets used */
 						currentFeatures.crt_kosImplRequires =
-								f"({currentFeatures.crt_kosImplRequires})&&!({bindingCond})";
+							f"({currentFeatures.crt_kosImplRequires})&&!({bindingCond})";
 						currentFeatures.crt_dosImplRequires =
-								f"({currentFeatures.crt_dosImplRequires})&&!({bindingCond})";
+							f"({currentFeatures.crt_dosImplRequires})&&!({bindingCond})";
 
 						/* Register the macro-binding as available for in-library declarations. */
 						if (currentKosLibraryFunction is none)
@@ -4445,13 +4442,13 @@ again_parse_annotations:
 						if (currentDosLibraryFunction is none)
 							currentDosLibraryFunction = LibraryFunction();
 						currentKosLibraryFunction.bindings.append(
-								LibraryFunctionBinding(
-										ppCond:  bindingCond,
-										binding: macroBinding));
+							LibraryFunctionBinding(
+								ppCond:  bindingCond,
+								binding: macroBinding));
 						currentDosLibraryFunction.bindings.append(
-								LibraryFunctionBinding(
-										ppCond:  bindingCond,
-										binding: macroBinding));
+							LibraryFunctionBinding(
+								ppCond:  bindingCond,
+								binding: macroBinding));
 					}
 				}	break;
 
@@ -6721,7 +6718,7 @@ again_lookup_wcsCurrent:
 							local kosProto = currentKosLibraryFunction.prototype;
 							kosLibImpl = kosProto is Callable
 								? () -> getDefaultLibraryImplementationForPrototype(kosProto(), crtName)
-								: DELAY_cb getDefaultLibraryImplementationForPrototype(kosProto, crtName);
+								: () -> getDefaultLibraryImplementationForPrototype(kosProto, crtName);
 						}
 						if (currentFeatures.crt_dosVariant !is bool) {
 							/* Custom override for the dos implementation */
@@ -6742,7 +6739,7 @@ again_lookup_wcsCurrent:
 							local dosProto = currentDosLibraryFunction.prototype;
 							dosLibImpl = dosProto is Callable
 								? () -> getDefaultLibraryImplementationForPrototype(dosProto(), crtName)
-								: DELAY_cb getDefaultLibraryImplementationForPrototype(dosProto, crtName);
+								: () -> getDefaultLibraryImplementationForPrototype(dosProto, crtName);
 						}
 						currentDosLibraryFunction.bindings.append(LibraryFunctionBinding(
 							ppCond:          currentFeatures.crt_dosImplRequires,
@@ -6776,7 +6773,7 @@ again_lookup_wcsCurrent:
 						/* Create a default implementation for user-sources */
 						libImpl = kosProto is Callable
 							? () -> getDefaultLibraryImplementationForPrototype(kosProto(), crtName)
-							: DELAY_cb getDefaultLibraryImplementationForPrototype(kosProto, crtName);
+							: () -> getDefaultLibraryImplementationForPrototype(kosProto, crtName);
 					}
 					currentKosLibraryFunction.bindings.append(LibraryFunctionBinding(
 						ppCond:          currentFeatures.crt_kosImplRequires,

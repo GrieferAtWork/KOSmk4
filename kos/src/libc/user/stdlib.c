@@ -236,7 +236,7 @@ NOTHROW_NCX(LIBCCALL libc_strfromd)(char *__restrict buf,
 	(void)buflen;
 	(void)format;
 	(void)fp;
-	CRT_UNIMPLEMENTEDF("strfromd(%q, %Ix, %q, %f)", buf, buflen, format, fp); /* TODO */
+	CRT_UNIMPLEMENTEDF("strfromd(buf: %q, buflen: %Ix, format: %q, fp: %f)", buf, buflen, format, fp); /* TODO */
 	return (__STDC_INT32_AS_SIZE_T)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_strfromd]]]*/
@@ -253,7 +253,7 @@ NOTHROW_NCX(LIBCCALL libc_strfromf)(char *__restrict buf,
 	(void)buflen;
 	(void)format;
 	(void)fp;
-	CRT_UNIMPLEMENTEDF("strfromf(%q, %Ix, %q, %f)", buf, buflen, format, fp); /* TODO */
+	CRT_UNIMPLEMENTEDF("strfromf(buf: %q, buflen: %Ix, format: %q, fp: %f)", buf, buflen, format, fp); /* TODO */
 	return (__STDC_INT32_AS_SIZE_T)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_strfromf]]]*/
@@ -273,7 +273,7 @@ NOTHROW_NCX(LIBCCALL libc_strfroml)(char *__restrict buf,
 	(void)buflen;
 	(void)format;
 	(void)fp;
-	CRT_UNIMPLEMENTEDF("strfroml(%q, %Ix, %q, %lf)", buf, buflen, format, fp); /* TODO */
+	CRT_UNIMPLEMENTEDF("strfroml(buf: %q, buflen: %Ix, format: %q, fp: %lf)", buf, buflen, format, fp); /* TODO */
 	return (__STDC_INT32_AS_SIZE_T)libc_seterrno(ENOSYS);
 }
 #endif /* MAGIC:alias */
@@ -1653,7 +1653,7 @@ NOTHROW_RPC(LIBCCALL libc__searchenv_s)(char const *file,
 	(void)envvar;
 	(void)resultpath;
 	(void)resultpath_len;
-	CRT_UNIMPLEMENTEDF("_searchenv_s(%q, %q, %q, %Ix)", file, envvar, resultpath, resultpath_len); /* TODO */
+	CRT_UNIMPLEMENTEDF("_searchenv_s(file: %q, envvar: %q, resultpath: %q, resultpath_len: %Ix)", file, envvar, resultpath, resultpath_len); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libc__searchenv_s]]]*/
@@ -1909,7 +1909,7 @@ NOTHROW_NCX(LIBCCALL libc_drand48_r)(struct drand48_data *__restrict buffer,
 /*AUTO*/{
 	(void)buffer;
 	(void)result;
-	CRT_UNIMPLEMENTEDF("drand48_r(%p, %p)", buffer, result); /* TODO */
+	CRT_UNIMPLEMENTEDF("drand48_r(buffer: %p, result: %p)", buffer, result); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_drand48_r]]]*/
@@ -1924,7 +1924,7 @@ NOTHROW_NCX(LIBCCALL libc_erand48_r)(unsigned short xsubi[3],
 	(void)xsubi;
 	(void)buffer;
 	(void)result;
-	CRT_UNIMPLEMENTEDF("erand48_r(%p, %p, %p)", xsubi, buffer, result); /* TODO */
+	CRT_UNIMPLEMENTEDF("erand48_r(xsubi: %p, buffer: %p, result: %p)", xsubi, buffer, result); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_erand48_r]]]*/
@@ -1937,7 +1937,7 @@ NOTHROW_NCX(LIBCCALL libc_lrand48_r)(struct drand48_data *__restrict buffer,
 /*AUTO*/{
 	(void)buffer;
 	(void)result;
-	CRT_UNIMPLEMENTEDF("lrand48_r(%p, %p)", buffer, result); /* TODO */
+	CRT_UNIMPLEMENTEDF("lrand48_r(buffer: %p, result: %p)", buffer, result); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_lrand48_r]]]*/
@@ -1952,7 +1952,7 @@ NOTHROW_NCX(LIBCCALL libc_nrand48_r)(unsigned short xsubi[3],
 	(void)xsubi;
 	(void)buffer;
 	(void)result;
-	CRT_UNIMPLEMENTEDF("nrand48_r(%p, %p, %p)", xsubi, buffer, result); /* TODO */
+	CRT_UNIMPLEMENTEDF("nrand48_r(xsubi: %p, buffer: %p, result: %p)", xsubi, buffer, result); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_nrand48_r]]]*/
@@ -1965,7 +1965,7 @@ NOTHROW_NCX(LIBCCALL libc_mrand48_r)(struct drand48_data *__restrict buffer,
 /*AUTO*/{
 	(void)buffer;
 	(void)result;
-	CRT_UNIMPLEMENTEDF("mrand48_r(%p, %p)", buffer, result); /* TODO */
+	CRT_UNIMPLEMENTEDF("mrand48_r(buffer: %p, result: %p)", buffer, result); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_mrand48_r]]]*/
@@ -1980,7 +1980,7 @@ NOTHROW_NCX(LIBCCALL libc_jrand48_r)(unsigned short xsubi[3],
 	(void)xsubi;
 	(void)buffer;
 	(void)result;
-	CRT_UNIMPLEMENTEDF("jrand48_r(%p, %p, %p)", xsubi, buffer, result); /* TODO */
+	CRT_UNIMPLEMENTEDF("jrand48_r(xsubi: %p, buffer: %p, result: %p)", xsubi, buffer, result); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_jrand48_r]]]*/
@@ -1993,7 +1993,7 @@ NOTHROW_NCX(LIBCCALL libc_srand48_r)(long seedval,
 /*AUTO*/{
 	(void)seedval;
 	(void)buffer;
-	CRT_UNIMPLEMENTEDF("srand48_r(%lx, %p)", seedval, buffer); /* TODO */
+	CRT_UNIMPLEMENTEDF("srand48_r(seedval: %lx, buffer: %p)", seedval, buffer); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_srand48_r]]]*/
@@ -2006,7 +2006,7 @@ NOTHROW_NCX(LIBCCALL libc_seed48_r)(unsigned short seed16v[3],
 /*AUTO*/{
 	(void)seed16v;
 	(void)buffer;
-	CRT_UNIMPLEMENTEDF("seed48_r(%p, %p)", seed16v, buffer); /* TODO */
+	CRT_UNIMPLEMENTEDF("seed48_r(seed16v: %p, buffer: %p)", seed16v, buffer); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_seed48_r]]]*/
@@ -2019,7 +2019,7 @@ NOTHROW_NCX(LIBCCALL libc_lcong48_r)(unsigned short param[7],
 /*AUTO*/{
 	(void)param;
 	(void)buffer;
-	CRT_UNIMPLEMENTEDF("lcong48_r(%p, %p)", param, buffer); /* TODO */
+	CRT_UNIMPLEMENTEDF("lcong48_r(param: %p, buffer: %p)", param, buffer); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_lcong48_r]]]*/
@@ -2032,7 +2032,7 @@ NOTHROW_NCX(LIBCCALL libc_random_r)(struct random_data *__restrict buf,
 /*AUTO*/{
 	(void)buf;
 	(void)result;
-	CRT_UNIMPLEMENTEDF("random_r(%p, %p)", buf, result); /* TODO */
+	CRT_UNIMPLEMENTEDF("random_r(buf: %p, result: %p)", buf, result); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_random_r]]]*/
@@ -2045,7 +2045,7 @@ NOTHROW_NCX(LIBCCALL libc_srandom_r)(unsigned int seed,
 /*AUTO*/{
 	(void)seed;
 	(void)buf;
-	CRT_UNIMPLEMENTEDF("srandom_r(%x, %p)", seed, buf); /* TODO */
+	CRT_UNIMPLEMENTEDF("srandom_r(seed: %x, buf: %p)", seed, buf); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_srandom_r]]]*/
@@ -2062,7 +2062,7 @@ NOTHROW_NCX(LIBCCALL libc_initstate_r)(unsigned int seed,
 	(void)statebuf;
 	(void)statelen;
 	(void)buf;
-	CRT_UNIMPLEMENTEDF("initstate_r(%x, %q, %Ix, %p)", seed, statebuf, statelen, buf); /* TODO */
+	CRT_UNIMPLEMENTEDF("initstate_r(seed: %x, statebuf: %q, statelen: %Ix, buf: %p)", seed, statebuf, statelen, buf); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_initstate_r]]]*/
@@ -2075,7 +2075,7 @@ NOTHROW_NCX(LIBCCALL libc_setstate_r)(char *__restrict statebuf,
 /*AUTO*/{
 	(void)statebuf;
 	(void)buf;
-	CRT_UNIMPLEMENTEDF("setstate_r(%q, %p)", statebuf, buf); /* TODO */
+	CRT_UNIMPLEMENTEDF("setstate_r(statebuf: %q, buf: %p)", statebuf, buf); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_setstate_r]]]*/
@@ -2091,7 +2091,7 @@ NOTHROW_RPC(LIBCCALL libc_getloadavg)(double loadavg[],
 /*AUTO*/{
 	(void)loadavg;
 	(void)nelem;
-	CRT_UNIMPLEMENTEDF("getloadavg(%p, %x)", loadavg, nelem); /* TODO */
+	CRT_UNIMPLEMENTEDF("getloadavg(loadavg: %p, nelem: %x)", loadavg, nelem); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getloadavg]]]*/
@@ -2132,7 +2132,7 @@ NOTHROW_NCX(LIBCCALL libc_erand48)(unsigned short xsubi[3])
 /*[[[body:libc_erand48]]]*/
 /*AUTO*/{
 	(void)xsubi;
-	CRT_UNIMPLEMENTEDF("erand48(%p)", xsubi); /* TODO */
+	CRT_UNIMPLEMENTEDF("erand48(xsubi: %p)", xsubi); /* TODO */
 	return (double)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_erand48]]]*/
@@ -2143,7 +2143,7 @@ NOTHROW_NCX(LIBCCALL libc_nrand48)(unsigned short xsubi[3])
 /*[[[body:libc_nrand48]]]*/
 /*AUTO*/{
 	(void)xsubi;
-	CRT_UNIMPLEMENTEDF("nrand48(%p)", xsubi); /* TODO */
+	CRT_UNIMPLEMENTEDF("nrand48(xsubi: %p)", xsubi); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_nrand48]]]*/
@@ -2154,7 +2154,7 @@ NOTHROW_NCX(LIBCCALL libc_jrand48)(unsigned short xsubi[3])
 /*[[[body:libc_jrand48]]]*/
 /*AUTO*/{
 	(void)xsubi;
-	CRT_UNIMPLEMENTEDF("jrand48(%p)", xsubi); /* TODO */
+	CRT_UNIMPLEMENTEDF("jrand48(xsubi: %p)", xsubi); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_jrand48]]]*/
@@ -2165,7 +2165,7 @@ NOTHROW_NCX(LIBCCALL libc_srand48)(long seedval)
 /*[[[body:libc_srand48]]]*/
 /*AUTO*/{
 	(void)seedval;
-	CRT_UNIMPLEMENTEDF("srand48(%lx)", seedval); /* TODO */
+	CRT_UNIMPLEMENTEDF("srand48(seedval: %lx)", seedval); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_srand48]]]*/
@@ -2176,7 +2176,7 @@ NOTHROW_NCX(LIBCCALL libc_seed48)(unsigned short seed16v[3])
 /*[[[body:libc_seed48]]]*/
 /*AUTO*/{
 	(void)seed16v;
-	CRT_UNIMPLEMENTEDF("seed48(%p)", seed16v); /* TODO */
+	CRT_UNIMPLEMENTEDF("seed48(seed16v: %p)", seed16v); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -2188,7 +2188,7 @@ NOTHROW_NCX(LIBCCALL libc_lcong48)(unsigned short param[7])
 /*[[[body:libc_lcong48]]]*/
 /*AUTO*/{
 	(void)param;
-	CRT_UNIMPLEMENTEDF("lcong48(%p)", param); /* TODO */
+	CRT_UNIMPLEMENTEDF("lcong48(param: %p)", param); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_lcong48]]]*/
@@ -2203,7 +2203,7 @@ NOTHROW_NCX(LIBCCALL libc_initstate)(unsigned int seed,
 	(void)seed;
 	(void)statebuf;
 	(void)statelen;
-	CRT_UNIMPLEMENTEDF("initstate(%x, %q, %Ix)", seed, statebuf, statelen); /* TODO */
+	CRT_UNIMPLEMENTEDF("initstate(seed: %x, statebuf: %q, statelen: %Ix)", seed, statebuf, statelen); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -2215,7 +2215,7 @@ NOTHROW_NCX(LIBCCALL libc_setstate)(char *statebuf)
 /*[[[body:libc_setstate]]]*/
 /*AUTO*/{
 	(void)statebuf;
-	CRT_UNIMPLEMENTEDF("setstate(%q)", statebuf); /* TODO */
+	CRT_UNIMPLEMENTEDF("setstate(statebuf: %q)", statebuf); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -2447,7 +2447,7 @@ NOTHROW_NCX(LIBCCALL libc_grantpt)(fd_t fd)
 /*[[[body:libc_grantpt]]]*/
 /*AUTO*/{
 	(void)fd;
-	CRT_UNIMPLEMENTEDF("grantpt(%" PRIxN(__SIZEOF_FD_T__) ")", fd); /* TODO */
+	CRT_UNIMPLEMENTEDF("grantpt(fd: %" PRIxN(__SIZEOF_FD_T__) ")", fd); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_grantpt]]]*/
@@ -2460,7 +2460,7 @@ NOTHROW_RPC(LIBCCALL libc_posix_openpt)(oflag_t oflags)
 /*[[[body:libc_posix_openpt]]]*/
 /*AUTO*/{
 	(void)oflags;
-	CRT_UNIMPLEMENTEDF("posix_openpt(%" PRIxN(__SIZEOF_OFLAG_T__) ")", oflags); /* TODO */
+	CRT_UNIMPLEMENTEDF("posix_openpt(oflags: %" PRIxN(__SIZEOF_OFLAG_T__) ")", oflags); /* TODO */
 	return (fd_t)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_posix_openpt]]]*/
@@ -2477,7 +2477,7 @@ NOTHROW_NCX(LIBDCALL libd_ptsname_r)(fd_t fd,
 	(void)fd;
 	(void)buf;
 	(void)buflen;
-	CRT_UNIMPLEMENTEDF("ptsname_r(%" PRIxN(__SIZEOF_FD_T__) ", %q, %Ix)", fd, buf, buflen); /* TODO */
+	CRT_UNIMPLEMENTEDF("ptsname_r(fd: %" PRIxN(__SIZEOF_FD_T__) ", buf: %q, buflen: %Ix)", fd, buf, buflen); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libd_ptsname_r]]]*/
@@ -2494,7 +2494,7 @@ NOTHROW_NCX(LIBCCALL libc_ptsname_r)(fd_t fd,
 	(void)fd;
 	(void)buf;
 	(void)buflen;
-	CRT_UNIMPLEMENTEDF("ptsname_r(%" PRIxN(__SIZEOF_FD_T__) ", %q, %Ix)", fd, buf, buflen); /* TODO */
+	CRT_UNIMPLEMENTEDF("ptsname_r(fd: %" PRIxN(__SIZEOF_FD_T__) ", buf: %q, buflen: %Ix)", fd, buf, buflen); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ptsname_r]]]*/
@@ -2832,7 +2832,7 @@ NOTHROW_NCX(LIBCCALL libc__seterrormode)(int mode)
 /*[[[body:libc__seterrormode]]]*/
 /*AUTO*/{
 	(void)mode;
-	CRT_UNIMPLEMENTEDF("_seterrormode(%x)", mode); /* TODO */
+	CRT_UNIMPLEMENTEDF("_seterrormode(mode: %x)", mode); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__seterrormode]]]*/
@@ -2843,7 +2843,7 @@ NOTHROW_NCX(LIBCCALL libc__set_error_mode)(int mode)
 /*[[[body:libc__set_error_mode]]]*/
 /*AUTO*/{
 	(void)mode;
-	CRT_UNIMPLEMENTEDF("_set_error_mode(%x)", mode); /* TODO */
+	CRT_UNIMPLEMENTEDF("_set_error_mode(mode: %x)", mode); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__set_error_mode]]]*/
@@ -2856,7 +2856,7 @@ NOTHROW_NCX(LIBCCALL libc__beep)(unsigned int freq,
 /*AUTO*/{
 	(void)freq;
 	(void)duration;
-	CRT_UNIMPLEMENTEDF("_beep(%x, %x)", freq, duration); /* TODO */
+	CRT_UNIMPLEMENTEDF("_beep(freq: %x, duration: %x)", freq, duration); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__beep]]]*/
@@ -2867,7 +2867,7 @@ NOTHROW_NCX(LIBCCALL libc__set_purecall_handler)(_purecall_handler __handler)
 /*[[[body:libc__set_purecall_handler]]]*/
 /*AUTO*/{
 	(void)__handler;
-	CRT_UNIMPLEMENTEDF("_set_purecall_handler(%p)", __handler); /* TODO */
+	CRT_UNIMPLEMENTEDF("_set_purecall_handler(__handler: %p)", __handler); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -2926,7 +2926,7 @@ NOTHROW_NCX(LIBCCALL libc__set_abort_behavior)(unsigned int flags,
 /*AUTO*/{
 	(void)flags;
 	(void)mask;
-	CRT_UNIMPLEMENTEDF("_set_abort_behavior(%x, %x)", flags, mask); /* TODO */
+	CRT_UNIMPLEMENTEDF("_set_abort_behavior(flags: %x, mask: %x)", flags, mask); /* TODO */
 	return (unsigned int)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__set_abort_behavior]]]*/
@@ -2946,7 +2946,7 @@ NOTHROW_RPC(LIBDCALL libd__wsearchenv_s)(char16_t const *file,
 	(void)envvar;
 	(void)resultpath;
 	(void)resultpath_len;
-	CRT_UNIMPLEMENTEDF("DOS$_wsearchenv_s(%p, %p, %p, %Ix)", file, envvar, resultpath, resultpath_len); /* TODO */
+	CRT_UNIMPLEMENTEDF("DOS$_wsearchenv_s(file: %p, envvar: %p, resultpath: %p, resultpath_len: %Ix)", file, envvar, resultpath, resultpath_len); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libd__wsearchenv_s]]]*/
@@ -2963,7 +2963,7 @@ NOTHROW_RPC(LIBKCALL libc__wsearchenv_s)(char32_t const *file,
 	(void)envvar;
 	(void)resultpath;
 	(void)resultpath_len;
-	CRT_UNIMPLEMENTEDF("_wsearchenv_s(%p, %p, %p, %Ix)", file, envvar, resultpath, resultpath_len); /* TODO */
+	CRT_UNIMPLEMENTEDF("_wsearchenv_s(file: %p, envvar: %p, resultpath: %p, resultpath_len: %Ix)", file, envvar, resultpath, resultpath_len); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libc__wsearchenv_s]]]*/
@@ -2984,7 +2984,7 @@ NOTHROW_NCX(LIBCCALL libc_radixsort)(unsigned char const **base,
 	(void)item_count;
 	(void)table;
 	(void)endbyte;
-	CRT_UNIMPLEMENTEDF("radixsort(%p, %x, %p, %x)", base, item_count, table, endbyte); /* TODO */
+	CRT_UNIMPLEMENTEDF("radixsort(base: %p, item_count: %x, table: %p, endbyte: %x)", base, item_count, table, endbyte); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_radixsort]]]*/
@@ -3001,7 +3001,7 @@ NOTHROW_NCX(LIBCCALL libc_sradixsort)(unsigned char const **base,
 	(void)item_count;
 	(void)table;
 	(void)endbyte;
-	CRT_UNIMPLEMENTEDF("sradixsort(%p, %x, %p, %x)", base, item_count, table, endbyte); /* TODO */
+	CRT_UNIMPLEMENTEDF("sradixsort(base: %p, item_count: %x, table: %p, endbyte: %x)", base, item_count, table, endbyte); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_sradixsort]]]*/
@@ -3014,7 +3014,7 @@ NOTHROW_NCX(LIBCCALL libc_getbsize)(int *headerlenp,
 /*AUTO*/{
 	(void)headerlenp;
 	(void)blocksizep;
-	CRT_UNIMPLEMENTEDF("getbsize(%p, %p)", headerlenp, blocksizep); /* TODO */
+	CRT_UNIMPLEMENTEDF("getbsize(headerlenp: %p, blocksizep: %p)", headerlenp, blocksizep); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -3033,7 +3033,7 @@ NOTHROW_NCX(LIBCCALL libc_devname_r)(dev_t dev,
 	(void)type;
 	(void)buf;
 	(void)len;
-	CRT_UNIMPLEMENTEDF("devname_r(%" PRIxN(__SIZEOF_DEV_T__) ", %" PRIxN(__SIZEOF_MODE_T__) ", %q, %Ix)", dev, type, buf, len); /* TODO */
+	CRT_UNIMPLEMENTEDF("devname_r(dev: %" PRIxN(__SIZEOF_DEV_T__) ", type: %" PRIxN(__SIZEOF_MODE_T__) ", buf: %q, len: %Ix)", dev, type, buf, len); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_devname_r]]]*/
@@ -3057,7 +3057,7 @@ NOTHROW_NCX(LIBCCALL libc_humanize_number)(char *buf,
 	(void)suffix;
 	(void)scale;
 	(void)flags;
-	CRT_UNIMPLEMENTEDF("humanize_number(%q, %Ix, %" PRIx64 ", %q, %x, %x)", buf, len, bytes, suffix, scale, flags); /* TODO */
+	CRT_UNIMPLEMENTEDF("humanize_number(buf: %q, len: %Ix, bytes: %" PRIx64 ", suffix: %q, scale: %x, flags: %x)", buf, len, bytes, suffix, scale, flags); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_humanize_number]]]*/
@@ -3073,7 +3073,7 @@ NOTHROW_NCX(LIBCCALL libc_dehumanize_number)(char const *str,
 /*AUTO*/{
 	(void)str;
 	(void)size;
-	CRT_UNIMPLEMENTEDF("dehumanize_number(%q, %p)", str, size); /* TODO */
+	CRT_UNIMPLEMENTEDF("dehumanize_number(str: %q, size: %p)", str, size); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_dehumanize_number]]]*/

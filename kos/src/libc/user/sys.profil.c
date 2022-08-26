@@ -39,7 +39,7 @@ NOTHROW_NCX(LIBCCALL libc_sprofil)(struct prof *profp,
 	(void)profcnt;
 	(void)tvp;
 	(void)flags;
-	CRT_UNIMPLEMENTEDF("sprofil(%p, %x, %p, %x)", profp, profcnt, tvp, flags); /* TODO */
+	CRT_UNIMPLEMENTEDF("sprofil(profp: %p, profcnt: %x, tvp: %p, flags: %x)", profp, profcnt, tvp, flags); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_sprofil]]]*/

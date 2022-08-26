@@ -31,7 +31,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_setrpcent)(int stayopen)
 /*[[[body:libc_setrpcent]]]*/
 /*AUTO*/{
 	(void)stayopen;
-	CRT_UNIMPLEMENTEDF("setrpcent(%x)", stayopen); /* TODO */
+	CRT_UNIMPLEMENTEDF("setrpcent(stayopen: %x)", stayopen); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_setrpcent]]]*/
@@ -52,7 +52,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getrpcbyname)(char const *name)
 /*[[[body:libc_getrpcbyname]]]*/
 /*AUTO*/{
 	(void)name;
-	CRT_UNIMPLEMENTEDF("getrpcbyname(%q)", name); /* TODO */
+	CRT_UNIMPLEMENTEDF("getrpcbyname(name: %q)", name); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -64,7 +64,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getrpcbynumber)(int number)
 /*[[[body:libc_getrpcbynumber]]]*/
 /*AUTO*/{
 	(void)number;
-	CRT_UNIMPLEMENTEDF("getrpcbynumber(%x)", number); /* TODO */
+	CRT_UNIMPLEMENTEDF("getrpcbynumber(number: %x)", number); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -95,7 +95,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getrpcbyname_r)(char const *name,
 	(void)buffer;
 	(void)buflen;
 	(void)result;
-	CRT_UNIMPLEMENTEDF("getrpcbyname_r(%q, %p, %q, %Ix, %p)", name, result_buf, buffer, buflen, result); /* TODO */
+	CRT_UNIMPLEMENTEDF("getrpcbyname_r(name: %q, result_buf: %p, buffer: %q, buflen: %Ix, result: %p)", name, result_buf, buffer, buflen, result); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getrpcbyname_r]]]*/
@@ -114,7 +114,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getrpcbynumber_r)(int number,
 	(void)buffer;
 	(void)buflen;
 	(void)result;
-	CRT_UNIMPLEMENTEDF("getrpcbynumber_r(%x, %p, %q, %Ix, %p)", number, result_buf, buffer, buflen, result); /* TODO */
+	CRT_UNIMPLEMENTEDF("getrpcbynumber_r(number: %x, result_buf: %p, buffer: %q, buflen: %Ix, result: %p)", number, result_buf, buffer, buflen, result); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getrpcbynumber_r]]]*/
@@ -131,7 +131,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getrpcent_r)(struct rpcent *result_buf,
 	(void)buffer;
 	(void)buflen;
 	(void)result;
-	CRT_UNIMPLEMENTEDF("getrpcent_r(%p, %q, %Ix, %p)", result_buf, buffer, buflen, result); /* TODO */
+	CRT_UNIMPLEMENTEDF("getrpcent_r(result_buf: %p, buffer: %q, buflen: %Ix, result: %p)", result_buf, buffer, buflen, result); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getrpcent_r]]]*/

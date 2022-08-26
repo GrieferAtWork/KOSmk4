@@ -1347,7 +1347,7 @@ NOTHROW_NCX(LIBCCALL libc___locale_ctype_ptr_l)(locale_t locale)
 /*[[[body:libc___locale_ctype_ptr_l]]]*/
 /*AUTO*/{
 	(void)locale;
-	CRT_UNIMPLEMENTEDF("__locale_ctype_ptr_l(%p)", locale); /* TODO */
+	CRT_UNIMPLEMENTEDF("__locale_ctype_ptr_l(locale: %p)", locale); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }

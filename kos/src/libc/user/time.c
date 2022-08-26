@@ -136,7 +136,7 @@ NOTHROW_NCX(LIBCCALL libc_clock_adjtime)(clockid_t clock_id,
 /*AUTO*/{
 	(void)clock_id;
 	(void)utx;
-	CRT_UNIMPLEMENTEDF("clock_adjtime(%" PRIxN(__SIZEOF_CLOCKID_T__) ", %p)", clock_id, utx); /* TODO */
+	CRT_UNIMPLEMENTEDF("clock_adjtime(clock_id: %" PRIxN(__SIZEOF_CLOCKID_T__) ", utx: %p)", clock_id, utx); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_clock_adjtime]]]*/
@@ -153,7 +153,7 @@ NOTHROW_NCX(LIBCCALL libc_clock_adjtime64)(clockid_t clock_id,
 /*AUTO*/{
 	(void)clock_id;
 	(void)utx;
-	CRT_UNIMPLEMENTEDF("clock_adjtime64(%" PRIxN(__SIZEOF_CLOCKID_T__) ", %p)", clock_id, utx); /* TODO */
+	CRT_UNIMPLEMENTEDF("clock_adjtime64(clock_id: %" PRIxN(__SIZEOF_CLOCKID_T__) ", utx: %p)", clock_id, utx); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 #endif /* MAGIC:alias */
@@ -328,7 +328,7 @@ NOTHROW_NCX(LIBCCALL libc_clock_getcpuclockid)(pid_t pid,
 /*AUTO*/{
 	(void)pid;
 	(void)clock_id;
-	CRT_UNIMPLEMENTEDF("clock_getcpuclockid(%" PRIxN(__SIZEOF_PID_T__) ", %p)", pid, clock_id); /* TODO */
+	CRT_UNIMPLEMENTEDF("clock_getcpuclockid(pid: %" PRIxN(__SIZEOF_PID_T__) ", clock_id: %p)", pid, clock_id); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_clock_getcpuclockid]]]*/

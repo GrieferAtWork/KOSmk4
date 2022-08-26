@@ -3683,7 +3683,7 @@ NOTHROW_NCX(LIBCCALL libc_tmpnam)(char *buf)
 /*[[[body:libc_tmpnam]]]*/
 /*AUTO*/{
 	(void)buf;
-	CRT_UNIMPLEMENTEDF("tmpnam(%q)", buf); /* TODO */
+	CRT_UNIMPLEMENTEDF("tmpnam(buf: %q)", buf); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -3696,7 +3696,7 @@ NOTHROW_NCX(LIBDCALL libd_tmpnam)(char *buf)
 /*[[[body:libd_tmpnam]]]*/
 /*AUTO*/{
 	(void)buf;
-	CRT_UNIMPLEMENTEDF("tmpnam(%q)", buf); /* TODO */
+	CRT_UNIMPLEMENTEDF("tmpnam(buf: %q)", buf); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -3711,7 +3711,7 @@ NOTHROW_NCX(LIBCCALL libc_tempnam)(char const *dir,
 /*AUTO*/{
 	(void)dir;
 	(void)pfx;
-	CRT_UNIMPLEMENTEDF("tempnam(%q, %q)", dir, pfx); /* TODO */
+	CRT_UNIMPLEMENTEDF("tempnam(dir: %q, pfx: %q)", dir, pfx); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -3759,7 +3759,7 @@ NOTHROW_NCX(LIBCCALL libc__set_output_format)(uint32_t format)
 /*[[[body:libc__set_output_format]]]*/
 /*AUTO*/{
 	(void)format;
-	CRT_UNIMPLEMENTEDF("_set_output_format(%" PRIx32 ")", format); /* TODO */
+	CRT_UNIMPLEMENTEDF("_set_output_format(format: %" PRIx32 ")", format); /* TODO */
 	return (uint32_t)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__set_output_format]]]*/

@@ -389,7 +389,7 @@ NOTHROW_NCX(LIBCCALL libc_setlogin)(char const *name)
 /*[[[body:libc_setlogin]]]*/
 /*AUTO*/{
 	(void)name;
-	CRT_UNIMPLEMENTEDF("setlogin(%q)", name); /* TODO */
+	CRT_UNIMPLEMENTEDF("setlogin(name: %q)", name); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_setlogin]]]*/
@@ -1726,7 +1726,7 @@ NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file)
 /*[[[body:libc_revoke]]]*/
 /*AUTO*/{
 	(void)file;
-	CRT_UNIMPLEMENTEDF("revoke(%q)", file); /* TODO */
+	CRT_UNIMPLEMENTEDF("revoke(file: %q)", file); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_revoke]]]*/
@@ -3372,7 +3372,7 @@ NOTHROW_NCX(LIBCCALL libc_setmode)(char const *mode_str)
 /*[[[body:libc_setmode]]]*/
 /*AUTO*/{
 	(void)mode_str;
-	CRT_UNIMPLEMENTEDF("setmode(%q)", mode_str); /* TODO */
+	CRT_UNIMPLEMENTEDF("setmode(mode_str: %q)", mode_str); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -3387,7 +3387,7 @@ NOTHROW_NCX(LIBCCALL libc_getmode)(void const *bbox,
 /*AUTO*/{
 	(void)bbox;
 	(void)mode;
-	CRT_UNIMPLEMENTEDF("getmode(%p, %" PRIxN(__SIZEOF_MODE_T__) ")", bbox, mode); /* TODO */
+	CRT_UNIMPLEMENTEDF("getmode(bbox: %p, mode: %" PRIxN(__SIZEOF_MODE_T__) ")", bbox, mode); /* TODO */
 	return (mode_t)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getmode]]]*/

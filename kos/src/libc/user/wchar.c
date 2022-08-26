@@ -412,7 +412,7 @@ NOTHROW_NCX(LIBKCALL libc_open_wmemstream)(char32_t **bufloc,
 /*AUTO*/{
 	(void)bufloc;
 	(void)sizeloc;
-	CRT_UNIMPLEMENTEDF("open_wmemstream(%p, %p)", bufloc, sizeloc); /* TODO */
+	CRT_UNIMPLEMENTEDF("open_wmemstream(bufloc: %p, sizeloc: %p)", bufloc, sizeloc); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -427,7 +427,7 @@ NOTHROW_NCX(LIBDCALL libd_open_wmemstream)(char16_t **bufloc,
 /*AUTO*/{
 	(void)bufloc;
 	(void)sizeloc;
-	CRT_UNIMPLEMENTEDF("DOS$open_wmemstream(%p, %p)", bufloc, sizeloc); /* TODO */
+	CRT_UNIMPLEMENTEDF("DOS$open_wmemstream(bufloc: %p, sizeloc: %p)", bufloc, sizeloc); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -453,7 +453,7 @@ NOTHROW_NCX(LIBDCALL libd_fgetwln)(FILE *__restrict fp,
 /*AUTO*/{
 	(void)fp;
 	(void)lenp;
-	CRT_UNIMPLEMENTEDF("DOS$fgetwln(%p, %p)", fp, lenp); /* TODO */
+	CRT_UNIMPLEMENTEDF("DOS$fgetwln(fp: %p, lenp: %p)", fp, lenp); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -468,7 +468,7 @@ NOTHROW_NCX(LIBKCALL libc_fgetwln)(FILE *__restrict fp,
 /*AUTO*/{
 	(void)fp;
 	(void)lenp;
-	CRT_UNIMPLEMENTEDF("fgetwln(%p, %p)", fp, lenp); /* TODO */
+	CRT_UNIMPLEMENTEDF("fgetwln(fp: %p, lenp: %p)", fp, lenp); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }

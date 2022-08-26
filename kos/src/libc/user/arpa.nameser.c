@@ -41,7 +41,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_initparse)(u_char const *a,
 	(void)a;
 	(void)b;
 	(void)c;
-	CRT_UNIMPLEMENTEDF("ns_initparse(%p, %x, %p)", a, b, c); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_initparse(a: %p, b: %x, c: %p)", a, b, c); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_initparse]]]*/
@@ -58,7 +58,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_skiprr)(u_char const *a,
 	(void)b;
 	(void)c;
 	(void)d;
-	CRT_UNIMPLEMENTEDF("ns_skiprr(%p, %p, %x, %x)", a, b, c, d); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_skiprr(a: %p, b: %p, c: %x, d: %x)", a, b, c, d); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_skiprr]]]*/
@@ -75,7 +75,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_parserr)(ns_msg *a,
 	(void)b;
 	(void)c;
 	(void)d;
-	CRT_UNIMPLEMENTEDF("ns_parserr(%p, %x, %x, %p)", a, b, c, d); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_parserr(a: %p, b: %x, c: %x, d: %p)", a, b, c, d); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_parserr]]]*/
@@ -96,7 +96,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_sprintrr)(ns_msg const *a,
 	(void)d;
 	(void)e;
 	(void)f;
-	CRT_UNIMPLEMENTEDF("ns_sprintrr(%p, %p, %q, %q, %q, %Ix)", a, b, c, d, e, f); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_sprintrr(a: %p, b: %p, c: %q, d: %q, e: %q, f: %Ix)", a, b, c, d, e, f); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_sprintrr]]]*/
@@ -143,7 +143,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_format_ttl)(u_long a,
 	(void)a;
 	(void)b;
 	(void)c;
-	CRT_UNIMPLEMENTEDF("ns_format_ttl(%lx, %q, %Ix)", a, b, c); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_format_ttl(a: %lx, b: %q, c: %Ix)", a, b, c); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_format_ttl]]]*/
@@ -156,7 +156,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_parse_ttl)(char const *a,
 /*AUTO*/{
 	(void)a;
 	(void)b;
-	CRT_UNIMPLEMENTEDF("ns_parse_ttl(%q, %p)", a, b); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_parse_ttl(a: %q, b: %p)", a, b); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_parse_ttl]]]*/
@@ -169,7 +169,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_datetosecs)(char const *a,
 /*AUTO*/{
 	(void)a;
 	(void)b;
-	CRT_UNIMPLEMENTEDF("ns_datetosecs(%q, %p)", a, b); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_datetosecs(a: %q, b: %p)", a, b); /* TODO */
 	return (u_int32_t)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_datetosecs]]]*/
@@ -184,7 +184,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_name_ntol)(u_char const *a,
 	(void)a;
 	(void)b;
 	(void)c;
-	CRT_UNIMPLEMENTEDF("ns_name_ntol(%p, %p, %Ix)", a, b, c); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_name_ntol(a: %p, b: %p, c: %Ix)", a, b, c); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_name_ntol]]]*/
@@ -199,7 +199,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_name_ntop)(u_char const *a,
 	(void)a;
 	(void)b;
 	(void)c;
-	CRT_UNIMPLEMENTEDF("ns_name_ntop(%p, %q, %Ix)", a, b, c); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_name_ntop(a: %p, b: %q, c: %Ix)", a, b, c); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_name_ntop]]]*/
@@ -214,7 +214,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_name_pton)(char const *a,
 	(void)a;
 	(void)b;
 	(void)c;
-	CRT_UNIMPLEMENTEDF("ns_name_pton(%q, %p, %Ix)", a, b, c); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_name_pton(a: %q, b: %p, c: %Ix)", a, b, c); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_name_pton]]]*/
@@ -233,7 +233,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_name_unpack)(u_char const *a,
 	(void)c;
 	(void)d;
 	(void)e;
-	CRT_UNIMPLEMENTEDF("ns_name_unpack(%p, %p, %p, %p, %Ix)", a, b, c, d, e); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_name_unpack(a: %p, b: %p, c: %p, d: %p, e: %Ix)", a, b, c, d, e); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_name_unpack]]]*/
@@ -252,7 +252,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_name_pack)(u_char const *a,
 	(void)c;
 	(void)d;
 	(void)e;
-	CRT_UNIMPLEMENTEDF("ns_name_pack(%p, %p, %x, %p, %p)", a, b, c, d, e); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_name_pack(a: %p, b: %p, c: %x, d: %p, e: %p)", a, b, c, d, e); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_name_pack]]]*/
@@ -271,7 +271,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_name_uncompress)(u_char const *a,
 	(void)c;
 	(void)d;
 	(void)e;
-	CRT_UNIMPLEMENTEDF("ns_name_uncompress(%p, %p, %p, %q, %Ix)", a, b, c, d, e); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_name_uncompress(a: %p, b: %p, c: %p, d: %q, e: %Ix)", a, b, c, d, e); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_name_uncompress]]]*/
@@ -285,7 +285,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_name_skip)(u_char const **p_msg_ptr,
 /*AUTO*/{
 	(void)p_msg_ptr;
 	(void)msg_end;
-	CRT_UNIMPLEMENTEDF("ns_name_skip(%p, %p)", p_msg_ptr, msg_end); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_name_skip(p_msg_ptr: %p, msg_end: %p)", p_msg_ptr, msg_end); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_name_skip]]]*/
@@ -300,7 +300,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_name_rollback)(u_char const *a,
 	(void)a;
 	(void)b;
 	(void)c;
-	CRT_UNIMPLEMENTEDF("ns_name_rollback(%p, %p, %p)", a, b, c); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_name_rollback(a: %p, b: %p, c: %p)", a, b, c); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_name_rollback]]]*/
@@ -329,7 +329,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_sign)(u_char *a,
 	(void)h;
 	(void)i;
 	(void)j;
-	CRT_UNIMPLEMENTEDF("ns_sign(%p, %p, %x, %x, %p, %p, %x, %p, %p, %" PRIxN(__SIZEOF_TIME_T__) ")", a, b, c, d, e, f, g, h, i, j); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_sign(a: %p, b: %p, c: %x, d: %x, e: %p, f: %p, g: %x, h: %p, i: %p, j: %" PRIxN(__SIZEOF_TIME_T__) ")", a, b, c, d, e, f, g, h, i, j); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_sign]]]*/
@@ -362,7 +362,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_sign2)(u_char *a,
 	(void)j;
 	(void)k;
 	(void)l;
-	CRT_UNIMPLEMENTEDF("ns_sign2(%p, %p, %x, %x, %p, %p, %x, %p, %p, %" PRIxN(__SIZEOF_TIME_T__) ", %p, %p)", a, b, c, d, e, f, g, h, i, j, k, l); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_sign2(a: %p, b: %p, c: %x, d: %x, e: %p, f: %p, g: %x, h: %p, i: %p, j: %" PRIxN(__SIZEOF_TIME_T__) ", k: %p, l: %p)", a, b, c, d, e, f, g, h, i, j, k, l); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_sign2]]]*/
@@ -383,7 +383,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_sign_tcp)(u_char *a,
 	(void)d;
 	(void)e;
 	(void)f;
-	CRT_UNIMPLEMENTEDF("ns_sign_tcp(%p, %p, %x, %x, %p, %x)", a, b, c, d, e, f); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_sign_tcp(a: %p, b: %p, c: %x, d: %x, e: %p, f: %x)", a, b, c, d, e, f); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_sign_tcp]]]*/
@@ -408,7 +408,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_sign_tcp2)(u_char *a,
 	(void)f;
 	(void)g;
 	(void)h;
-	CRT_UNIMPLEMENTEDF("ns_sign_tcp2(%p, %p, %x, %x, %p, %x, %p, %p)", a, b, c, d, e, f, g, h); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_sign_tcp2(a: %p, b: %p, c: %x, d: %x, e: %p, f: %x, g: %p, h: %p)", a, b, c, d, e, f, g, h); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_sign_tcp2]]]*/
@@ -425,7 +425,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_sign_tcp_init)(void *a,
 	(void)b;
 	(void)c;
 	(void)d;
-	CRT_UNIMPLEMENTEDF("ns_sign_tcp_init(%p, %p, %x, %p)", a, b, c, d); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_sign_tcp_init(a: %p, b: %p, c: %x, d: %p)", a, b, c, d); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_sign_tcp_init]]]*/
@@ -438,7 +438,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_find_tsig)(u_char *a,
 /*AUTO*/{
 	(void)a;
 	(void)b;
-	CRT_UNIMPLEMENTEDF("ns_find_tsig(%p, %p)", a, b); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_find_tsig(a: %p, b: %p)", a, b); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -466,7 +466,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_verify)(u_char *a,
 	(void)g;
 	(void)h;
 	(void)i;
-	CRT_UNIMPLEMENTEDF("ns_verify(%p, %p, %p, %p, %x, %p, %p, %p, %x)", a, b, c, d, e, f, g, h, i); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_verify(a: %p, b: %p, c: %p, d: %p, e: %x, f: %p, g: %p, h: %p, i: %x)", a, b, c, d, e, f, g, h, i); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_verify]]]*/
@@ -483,7 +483,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_verify_tcp)(u_char *a,
 	(void)b;
 	(void)c;
 	(void)d;
-	CRT_UNIMPLEMENTEDF("ns_verify_tcp(%p, %p, %p, %x)", a, b, c, d); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_verify_tcp(a: %p, b: %p, c: %p, d: %x)", a, b, c, d); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_verify_tcp]]]*/
@@ -500,7 +500,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_verify_tcp_init)(void *a,
 	(void)b;
 	(void)c;
 	(void)d;
-	CRT_UNIMPLEMENTEDF("ns_verify_tcp_init(%p, %p, %x, %p)", a, b, c, d); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_verify_tcp_init(a: %p, b: %p, c: %x, d: %p)", a, b, c, d); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_verify_tcp_init]]]*/
@@ -513,7 +513,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_samedomain)(char const *a,
 /*AUTO*/{
 	(void)a;
 	(void)b;
-	CRT_UNIMPLEMENTEDF("ns_samedomain(%q, %q)", a, b); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_samedomain(a: %q, b: %q)", a, b); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_samedomain]]]*/
@@ -526,7 +526,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_subdomain)(char const *a,
 /*AUTO*/{
 	(void)a;
 	(void)b;
-	CRT_UNIMPLEMENTEDF("ns_subdomain(%q, %q)", a, b); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_subdomain(a: %q, b: %q)", a, b); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_subdomain]]]*/
@@ -541,7 +541,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_makecanon)(char const *a,
 	(void)a;
 	(void)b;
 	(void)c;
-	CRT_UNIMPLEMENTEDF("ns_makecanon(%q, %q, %Ix)", a, b, c); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_makecanon(a: %q, b: %q, c: %Ix)", a, b, c); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_makecanon]]]*/
@@ -554,7 +554,7 @@ NOTHROW_NCX(LIBCCALL libc_ns_samename)(char const *a,
 /*AUTO*/{
 	(void)a;
 	(void)b;
-	CRT_UNIMPLEMENTEDF("ns_samename(%q, %q)", a, b); /* TODO */
+	CRT_UNIMPLEMENTEDF("ns_samename(a: %q, b: %q)", a, b); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_ns_samename]]]*/

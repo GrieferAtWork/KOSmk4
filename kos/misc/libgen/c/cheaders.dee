@@ -3468,8 +3468,8 @@ class LibraryFunction {
 						++numExtraEndIfs;
 				}
 				binding.cprintMacroBinding(
-						fp, escapeMode, exposedName: this.name,
-						prototype: this.functionPrototype, doc: doc);
+					fp, escapeMode, exposedName: this.name,
+					prototype: this.functionPrototype, doc: doc);
 			}
 		}
 
@@ -3478,7 +3478,7 @@ class LibraryFunction {
 		if (doc)
 			fp.printComment(doc);
 		this.functionPrototype.cprintDeclarationWithoutTerminator(
-				fp, escapeMode, decl: decl, exposedName: this.name);
+			fp, escapeMode, decl: decl, exposedName: this.name);
 		fp << ";\n";
 		while (numExtraEndIfs) {
 			fp.ppEndif();

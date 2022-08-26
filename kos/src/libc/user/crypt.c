@@ -36,7 +36,7 @@ NOTHROW_NCX(LIBCCALL libc_crypt)(char const *key,
 /*AUTO*/{
 	(void)key;
 	(void)salt;
-	CRT_UNIMPLEMENTEDF("crypt(%q, %q)", key, salt); /* TODO */
+	CRT_UNIMPLEMENTEDF("crypt(key: %q, salt: %q)", key, salt); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -49,7 +49,7 @@ NOTHROW_NCX(LIBCCALL libc_setkey)(char const *key)
 /*[[[body:libc_setkey]]]*/
 /*AUTO*/{
 	(void)key;
-	CRT_UNIMPLEMENTEDF("setkey(%q)", key); /* TODO */
+	CRT_UNIMPLEMENTEDF("setkey(key: %q)", key); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_setkey]]]*/
@@ -63,7 +63,7 @@ NOTHROW_NCX(LIBCCALL libc_encrypt)(char *glibc_block,
 /*AUTO*/{
 	(void)glibc_block;
 	(void)edflag;
-	CRT_UNIMPLEMENTEDF("encrypt(%q, %x)", glibc_block, edflag); /* TODO */
+	CRT_UNIMPLEMENTEDF("encrypt(glibc_block: %q, edflag: %x)", glibc_block, edflag); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_encrypt]]]*/
@@ -79,7 +79,7 @@ NOTHROW_NCX(LIBCCALL libc_crypt_r)(char const *key,
 	(void)key;
 	(void)salt;
 	(void)data;
-	CRT_UNIMPLEMENTEDF("crypt_r(%q, %q, %p)", key, salt, data); /* TODO */
+	CRT_UNIMPLEMENTEDF("crypt_r(key: %q, salt: %q, data: %p)", key, salt, data); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -94,7 +94,7 @@ NOTHROW_NCX(LIBCCALL libc_setkey_r)(char const *key,
 /*AUTO*/{
 	(void)key;
 	(void)data;
-	CRT_UNIMPLEMENTEDF("setkey_r(%q, %p)", key, data); /* TODO */
+	CRT_UNIMPLEMENTEDF("setkey_r(key: %q, data: %p)", key, data); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_setkey_r]]]*/
@@ -110,7 +110,7 @@ NOTHROW_NCX(LIBCCALL libc_encrypt_r)(char *glibc_block,
 	(void)glibc_block;
 	(void)edflag;
 	(void)data;
-	CRT_UNIMPLEMENTEDF("encrypt_r(%q, %x, %p)", glibc_block, edflag, data); /* TODO */
+	CRT_UNIMPLEMENTEDF("encrypt_r(glibc_block: %q, edflag: %x, data: %p)", glibc_block, edflag, data); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_encrypt_r]]]*/

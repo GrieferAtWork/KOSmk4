@@ -44,7 +44,7 @@ NOTHROW_NCX(LIBDCALL libc__set_new_handler)(_PNH newhandler)
 /*[[[body:libc__set_new_handler]]]*/
 /*AUTO*/{
 	(void)newhandler;
-	CRT_UNIMPLEMENTEDF("_set_new_handler(%p)", newhandler); /* TODO */
+	CRT_UNIMPLEMENTEDF("_set_new_handler(newhandler: %p)", newhandler); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -66,7 +66,7 @@ NOTHROW_NCX(LIBDCALL libc__set_new_mode)(int newmode)
 /*[[[body:libc__set_new_mode]]]*/
 /*AUTO*/{
 	(void)newmode;
-	CRT_UNIMPLEMENTEDF("_set_new_mode(%x)", newmode); /* TODO */
+	CRT_UNIMPLEMENTEDF("_set_new_mode(newmode: %x)", newmode); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__set_new_mode]]]*/

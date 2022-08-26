@@ -66,7 +66,7 @@ NOTHROW_RPC(LIBCCALL libc_getutxid)(struct utmpx const *id)
 /*[[[body:libc_getutxid]]]*/
 /*AUTO*/{
 	(void)id;
-	CRT_UNIMPLEMENTEDF("getutxid(%p)", id); /* TODO */
+	CRT_UNIMPLEMENTEDF("getutxid(id: %p)", id); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -79,7 +79,7 @@ NOTHROW_RPC(LIBCCALL libc_getutxline)(struct utmpx const *line)
 /*[[[body:libc_getutxline]]]*/
 /*AUTO*/{
 	(void)line;
-	CRT_UNIMPLEMENTEDF("getutxline(%p)", line); /* TODO */
+	CRT_UNIMPLEMENTEDF("getutxline(line: %p)", line); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -92,7 +92,7 @@ NOTHROW_RPC(LIBCCALL libc_pututxline)(struct utmpx const *utmpx)
 /*[[[body:libc_pututxline]]]*/
 /*AUTO*/{
 	(void)utmpx;
-	CRT_UNIMPLEMENTEDF("pututxline(%p)", utmpx); /* TODO */
+	CRT_UNIMPLEMENTEDF("pututxline(utmpx: %p)", utmpx); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -105,7 +105,7 @@ NOTHROW_RPC(LIBCCALL libc_utmpxname)(char const *file)
 /*[[[body:libc_utmpxname]]]*/
 /*AUTO*/{
 	(void)file;
-	CRT_UNIMPLEMENTEDF("utmpxname(%q)", file); /* TODO */
+	CRT_UNIMPLEMENTEDF("utmpxname(file: %q)", file); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_utmpxname]]]*/
@@ -119,7 +119,7 @@ NOTHROW_RPC(LIBCCALL libc_updwtmpx)(char const *wtmpx_file,
 /*AUTO*/{
 	(void)wtmpx_file;
 	(void)utmpx;
-	CRT_UNIMPLEMENTEDF("updwtmpx(%q, %p)", wtmpx_file, utmpx); /* TODO */
+	CRT_UNIMPLEMENTEDF("updwtmpx(wtmpx_file: %q, utmpx: %p)", wtmpx_file, utmpx); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_updwtmpx]]]*/
@@ -133,7 +133,7 @@ NOTHROW_RPC(LIBCCALL libc_getutmp)(struct utmpx const *utmpx,
 /*AUTO*/{
 	(void)utmpx;
 	(void)utmp;
-	CRT_UNIMPLEMENTEDF("getutmp(%p, %p)", utmpx, utmp); /* TODO */
+	CRT_UNIMPLEMENTEDF("getutmp(utmpx: %p, utmp: %p)", utmpx, utmp); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getutmp]]]*/
@@ -147,7 +147,7 @@ NOTHROW_RPC(LIBCCALL libc_getutmpx)(struct utmp const *utmp,
 /*AUTO*/{
 	(void)utmp;
 	(void)utmpx;
-	CRT_UNIMPLEMENTEDF("getutmpx(%p, %p)", utmp, utmpx); /* TODO */
+	CRT_UNIMPLEMENTEDF("getutmpx(utmp: %p, utmpx: %p)", utmp, utmpx); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_getutmpx]]]*/

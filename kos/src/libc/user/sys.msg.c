@@ -35,7 +35,7 @@ NOTHROW_NCX(LIBCCALL libc_msgctl)(int msqid,
 	(void)msqid;
 	(void)cmd;
 	(void)buf;
-	CRT_UNIMPLEMENTEDF("msgctl(%x, %x, %p)", msqid, cmd, buf); /* TODO */
+	CRT_UNIMPLEMENTEDF("msgctl(msqid: %x, cmd: %x, buf: %p)", msqid, cmd, buf); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_msgctl]]]*/
@@ -48,7 +48,7 @@ NOTHROW_NCX(LIBCCALL libc_msgget)(key_t key,
 /*AUTO*/{
 	(void)key;
 	(void)msgflg;
-	CRT_UNIMPLEMENTEDF("msgget(%" PRIxN(__SIZEOF_KEY_T__) ", %x)", key, msgflg); /* TODO */
+	CRT_UNIMPLEMENTEDF("msgget(key: %" PRIxN(__SIZEOF_KEY_T__) ", msgflg: %x)", key, msgflg); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_msgget]]]*/
@@ -67,7 +67,7 @@ NOTHROW_RPC(LIBCCALL libc_msgrcv)(int msqid,
 	(void)msgsz;
 	(void)msgtyp;
 	(void)msgflg;
-	CRT_UNIMPLEMENTEDF("msgrcv(%x, %p, %Ix, %p, %x)", msqid, msgp, msgsz, msgtyp, msgflg); /* TODO */
+	CRT_UNIMPLEMENTEDF("msgrcv(msqid: %x, msgp: %p, msgsz: %Ix, msgtyp: %p, msgflg: %x)", msqid, msgp, msgsz, msgtyp, msgflg); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_msgrcv]]]*/
@@ -84,7 +84,7 @@ NOTHROW_RPC(LIBCCALL libc_msgsnd)(int msqid,
 	(void)msgp;
 	(void)msgsz;
 	(void)msgflg;
-	CRT_UNIMPLEMENTEDF("msgsnd(%x, %p, %Ix, %x)", msqid, msgp, msgsz, msgflg); /* TODO */
+	CRT_UNIMPLEMENTEDF("msgsnd(msqid: %x, msgp: %p, msgsz: %Ix, msgflg: %x)", msqid, msgp, msgsz, msgflg); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_msgsnd]]]*/

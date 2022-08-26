@@ -49,7 +49,7 @@ NOTHROW_NCX(LIBDCALL libc__seh_filter_dll)(__ULONG32_TYPE__ xno,
 /*AUTO*/{
 	(void)xno;
 	(void)infp_ptrs;
-	CRT_UNIMPLEMENTEDF("_seh_filter_dll(%" PRIx32 ", %p)", xno, infp_ptrs); /* TODO */
+	CRT_UNIMPLEMENTEDF("_seh_filter_dll(xno: %" PRIx32 ", infp_ptrs: %p)", xno, infp_ptrs); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__seh_filter_dll]]]*/
@@ -62,7 +62,7 @@ NOTHROW_NCX(LIBDCALL libc__seh_filter_exe)(__ULONG32_TYPE__ xno,
 /*AUTO*/{
 	(void)xno;
 	(void)infp_ptrs;
-	CRT_UNIMPLEMENTEDF("_seh_filter_exe(%" PRIx32 ", %p)", xno, infp_ptrs); /* TODO */
+	CRT_UNIMPLEMENTEDF("_seh_filter_exe(xno: %" PRIx32 ", infp_ptrs: %p)", xno, infp_ptrs); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__seh_filter_exe]]]*/
@@ -73,7 +73,7 @@ NOTHROW_NCX(LIBDCALL libc__set_app_type)(_crt_app_type type)
 /*[[[body:libc__set_app_type]]]*/
 /*AUTO*/{
 	(void)type;
-	CRT_UNIMPLEMENTEDF("_set_app_type(%x)", type); /* TODO */
+	CRT_UNIMPLEMENTEDF("_set_app_type(type: %x)", type); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__set_app_type]]]*/

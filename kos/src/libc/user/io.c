@@ -358,7 +358,7 @@ NOTHROW_NCX(LIBCCALL libc__mktemp_s)(char *template_,
 /*AUTO*/{
 	(void)template_;
 	(void)size;
-	CRT_UNIMPLEMENTEDF("_mktemp_s(%q, %Ix)", template_, size); /* TODO */
+	CRT_UNIMPLEMENTEDF("_mktemp_s(template_: %q, size: %Ix)", template_, size); /* TODO */
 	return ENOSYS;
 }
 /*[[[end:libc__mktemp_s]]]*/

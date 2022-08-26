@@ -41,7 +41,7 @@ NOTHROW_NCX(LIBCCALL libc_xmalloc_set_program_name)(char const *progname)
 /*[[[body:libc_xmalloc_set_program_name]]]*/
 /*AUTO*/{
 	(void)progname;
-	CRT_UNIMPLEMENTEDF("xmalloc_set_program_name(%q)", progname); /* TODO */
+	CRT_UNIMPLEMENTEDF("xmalloc_set_program_name(progname: %q)", progname); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_xmalloc_set_program_name]]]*/
@@ -52,7 +52,7 @@ INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_NORETURN void
 /*[[[body:libc_xmalloc_failed]]]*/
 /*AUTO*/{
 	(void)num_bytes;
-	CRT_UNIMPLEMENTEDF("xmalloc_failed(%Ix)", num_bytes); /* TODO */
+	CRT_UNIMPLEMENTEDF("xmalloc_failed(num_bytes: %Ix)", num_bytes); /* TODO */
 	assert_failed("Not implemented");
 }
 /*[[[end:libc_xmalloc_failed]]]*/
@@ -98,7 +98,7 @@ NOTHROW_NCX(LIBCCALL libc_make_relative_prefix)(char const *a,
 	(void)a;
 	(void)b;
 	(void)c;
-	CRT_UNIMPLEMENTEDF("make_relative_prefix(%q, %q, %q)", a, b, c); /* TODO */
+	CRT_UNIMPLEMENTEDF("make_relative_prefix(a: %q, b: %q, c: %q)", a, b, c); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -114,7 +114,7 @@ NOTHROW_NCX(LIBCCALL libc_make_relative_prefix_ignore_links)(char const *a,
 	(void)a;
 	(void)b;
 	(void)c;
-	CRT_UNIMPLEMENTEDF("make_relative_prefix_ignore_links(%q, %q, %q)", a, b, c); /* TODO */
+	CRT_UNIMPLEMENTEDF("make_relative_prefix_ignore_links(a: %q, b: %q, c: %q)", a, b, c); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -147,7 +147,7 @@ NOTHROW_NCX(LIBCCALL libc_pex_run)(struct pex_obj *obj,
 	(void)outname;
 	(void)errname;
 	(void)err;
-	CRT_UNIMPLEMENTEDF("pex_run(%p, %x, %q, %p, %q, %q, %p)", obj, flags, executable, argv, outname, errname, err); /* TODO */
+	CRT_UNIMPLEMENTEDF("pex_run(obj: %p, flags: %x, executable: %q, argv: %p, outname: %q, errname: %q, err: %p)", obj, flags, executable, argv, outname, errname, err); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -173,7 +173,7 @@ NOTHROW_NCX(LIBCCALL libc_pex_run_in_environment)(struct pex_obj *obj,
 	(void)outname;
 	(void)errname;
 	(void)err;
-	CRT_UNIMPLEMENTEDF("pex_run_in_environment(%p, %x, %q, %p, %p, %q, %q, %p)", obj, flags, executable, argv, env, outname, errname, err); /* TODO */
+	CRT_UNIMPLEMENTEDF("pex_run_in_environment(obj: %p, flags: %x, executable: %q, argv: %p, env: %p, outname: %q, errname: %q, err: %p)", obj, flags, executable, argv, env, outname, errname, err); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -189,7 +189,7 @@ NOTHROW_NCX(LIBCCALL libc_pex_input_file)(struct pex_obj *obj,
 	(void)obj;
 	(void)flags;
 	(void)in_name;
-	CRT_UNIMPLEMENTEDF("pex_input_file(%p, %x, %q)", obj, flags, in_name); /* TODO */
+	CRT_UNIMPLEMENTEDF("pex_input_file(obj: %p, flags: %x, in_name: %q)", obj, flags, in_name); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -203,7 +203,7 @@ NOTHROW_NCX(LIBCCALL libc_pex_input_pipe)(struct pex_obj *obj,
 /*AUTO*/{
 	(void)obj;
 	(void)binary;
-	CRT_UNIMPLEMENTEDF("pex_input_pipe(%p, %x)", obj, binary); /* TODO */
+	CRT_UNIMPLEMENTEDF("pex_input_pipe(obj: %p, binary: %x)", obj, binary); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -217,7 +217,7 @@ NOTHROW_NCX(LIBCCALL libc_pex_read_output)(struct pex_obj *obj,
 /*AUTO*/{
 	(void)obj;
 	(void)binary;
-	CRT_UNIMPLEMENTEDF("pex_read_output(%p, %x)", obj, binary); /* TODO */
+	CRT_UNIMPLEMENTEDF("pex_read_output(obj: %p, binary: %x)", obj, binary); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -231,7 +231,7 @@ NOTHROW_NCX(LIBCCALL libc_pex_read_err)(struct pex_obj *obj,
 /*AUTO*/{
 	(void)obj;
 	(void)binary;
-	CRT_UNIMPLEMENTEDF("pex_read_err(%p, %x)", obj, binary); /* TODO */
+	CRT_UNIMPLEMENTEDF("pex_read_err(obj: %p, binary: %x)", obj, binary); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -247,7 +247,7 @@ NOTHROW_NCX(LIBCCALL libc_pex_get_status)(struct pex_obj *obj,
 	(void)obj;
 	(void)count;
 	(void)vector;
-	CRT_UNIMPLEMENTEDF("pex_get_status(%p, %x, %p)", obj, count, vector); /* TODO */
+	CRT_UNIMPLEMENTEDF("pex_get_status(obj: %p, count: %x, vector: %p)", obj, count, vector); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_pex_get_status]]]*/
@@ -262,7 +262,7 @@ NOTHROW_NCX(LIBCCALL libc_pex_init)(int flags,
 	(void)flags;
 	(void)pname;
 	(void)tempbase;
-	CRT_UNIMPLEMENTEDF("pex_init(%x, %q, %q)", flags, pname, tempbase); /* TODO */
+	CRT_UNIMPLEMENTEDF("pex_init(flags: %x, pname: %q, tempbase: %q)", flags, pname, tempbase); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -278,7 +278,7 @@ NOTHROW_NCX(LIBCCALL libc_pex_get_times)(struct pex_obj *obj,
 	(void)obj;
 	(void)count;
 	(void)vector;
-	CRT_UNIMPLEMENTEDF("pex_get_times(%p, %x, %p)", obj, count, vector); /* TODO */
+	CRT_UNIMPLEMENTEDF("pex_get_times(obj: %p, count: %x, vector: %p)", obj, count, vector); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_pex_get_times]]]*/
@@ -289,7 +289,7 @@ NOTHROW_NCX(LIBCCALL libc_pex_free)(struct pex_obj *obj)
 /*[[[body:libc_pex_free]]]*/
 /*AUTO*/{
 	(void)obj;
-	CRT_UNIMPLEMENTEDF("pex_free(%p)", obj); /* TODO */
+	CRT_UNIMPLEMENTEDF("pex_free(obj: %p)", obj); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_pex_free]]]*/
@@ -314,7 +314,7 @@ NOTHROW_NCX(LIBCCALL libc_pex_one)(int flags,
 	(void)errname;
 	(void)status;
 	(void)err;
-	CRT_UNIMPLEMENTEDF("pex_one(%x, %q, %p, %q, %q, %q, %p, %p)", flags, executable, argv, pname, outname, errname, status, err); /* TODO */
+	CRT_UNIMPLEMENTEDF("pex_one(flags: %x, executable: %q, argv: %p, pname: %q, outname: %q, errname: %q, status: %p, err: %p)", flags, executable, argv, pname, outname, errname, status, err); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -338,7 +338,7 @@ NOTHROW_NCX(LIBCCALL libc_pexecute)(char const *a,
 	(void)e;
 	(void)f;
 	(void)g;
-	CRT_UNIMPLEMENTEDF("pexecute(%q, %p, %q, %q, %p, %p, %x)", a, b, c, d, e, f, g); /* TODO */
+	CRT_UNIMPLEMENTEDF("pexecute(a: %q, b: %p, c: %q, d: %q, e: %p, f: %p, g: %x)", a, b, c, d, e, f, g); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_pexecute]]]*/
@@ -353,7 +353,7 @@ NOTHROW_NCX(LIBCCALL libc_pwait)(int a,
 	(void)a;
 	(void)b;
 	(void)c;
-	CRT_UNIMPLEMENTEDF("pwait(%x, %p, %x)", a, b, c); /* TODO */
+	CRT_UNIMPLEMENTEDF("pwait(a: %x, b: %p, c: %x)", a, b, c); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_pwait]]]*/

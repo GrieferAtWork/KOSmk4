@@ -267,7 +267,7 @@ NOTHROW_NCX(LIBCCALL libc_re_match_2)(struct re_pattern_buffer *buffer,
 	(void)start;
 	(void)regs;
 	(void)stop;
-	CRT_UNIMPLEMENTEDF("re_match_2(%p, %q, %x, %q, %x, %x, %p, %x)", buffer, string1, length1, string2, length2, start, regs, stop); /* TODO */
+	CRT_UNIMPLEMENTEDF("re_match_2(buffer: %p, string1: %q, length1: %x, string2: %q, length2: %x, start: %x, regs: %p, stop: %x)", buffer, string1, length1, string2, length2, start, regs, stop); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_re_match_2]]]*/
@@ -293,7 +293,7 @@ NOTHROW_NCX(LIBCCALL libc_re_set_registers)(struct re_pattern_buffer *buffer,
 	(void)num_regs;
 	(void)starts;
 	(void)ends;
-	CRT_UNIMPLEMENTEDF("re_set_registers(%p, %p, %x, %p, %p)", buffer, regs, num_regs, starts, ends); /* TODO */
+	CRT_UNIMPLEMENTEDF("re_set_registers(buffer: %p, regs: %p, num_regs: %x, starts: %p, ends: %p)", buffer, regs, num_regs, starts, ends); /* TODO */
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_re_set_registers]]]*/

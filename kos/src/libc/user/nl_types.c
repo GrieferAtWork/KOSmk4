@@ -35,7 +35,7 @@ NOTHROW_RPC(LIBCCALL libc_catopen)(char const *cat_name,
 /*AUTO*/{
 	(void)cat_name;
 	(void)flag;
-	CRT_UNIMPLEMENTEDF("catopen(%q, %x)", cat_name, flag); /* TODO */
+	CRT_UNIMPLEMENTEDF("catopen(cat_name: %q, flag: %x)", cat_name, flag); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -53,7 +53,7 @@ NOTHROW_NCX(LIBCCALL libc_catgets)(nl_catd catalog,
 	(void)set;
 	(void)number;
 	(void)string;
-	CRT_UNIMPLEMENTEDF("catgets(%p, %x, %x, %q)", catalog, set, number, string); /* TODO */
+	CRT_UNIMPLEMENTEDF("catgets(catalog: %p, set: %x, number: %x, string: %q)", catalog, set, number, string); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -65,7 +65,7 @@ NOTHROW_NCX(LIBCCALL libc_catclose)(nl_catd catalog)
 /*[[[body:libc_catclose]]]*/
 /*AUTO*/{
 	(void)catalog;
-	CRT_UNIMPLEMENTEDF("catclose(%p)", catalog); /* TODO */
+	CRT_UNIMPLEMENTEDF("catclose(catalog: %p)", catalog); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_catclose]]]*/

@@ -161,7 +161,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetReportMode)(int report_type,
 /*AUTO*/{
 	(void)report_type;
 	(void)report_mode;
-	CRT_UNIMPLEMENTEDF("_CrtSetReportMode(%x, %x)", report_type, report_mode); /* TODO */
+	CRT_UNIMPLEMENTEDF("_CrtSetReportMode(report_type: %x, report_mode: %x)", report_type, report_mode); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__CrtSetReportMode]]]*/
@@ -174,7 +174,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetReportFile)(int report_type,
 /*AUTO*/{
 	(void)report_type;
 	(void)report_file;
-	CRT_UNIMPLEMENTEDF("_CrtSetReportFile(%x, %p)", report_type, report_file); /* TODO */
+	CRT_UNIMPLEMENTEDF("_CrtSetReportFile(report_type: %x, report_file: %p)", report_type, report_file); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -195,7 +195,7 @@ NOTHROW_NCX(VLIBDCALL libc__CrtDbgReport)(int report_type,
 	(void)line;
 	(void)module_name;
 	(void)format;
-	CRT_UNIMPLEMENTEDF("_CrtDbgReport(%x, %q, %x, %q, %q, ...)", report_type, filename, line, module_name, format); /* TODO */
+	CRT_UNIMPLEMENTEDF("_CrtDbgReport(report_type: %x, filename: %q, line: %x, module_name: %q, format: %q, ...)", report_type, filename, line, module_name, format); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__CrtDbgReport]]]*/
@@ -207,7 +207,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetDebugFillThreshold)(size_t new_debug_fill_thres
 /*[[[body:libc__CrtSetDebugFillThreshold]]]*/
 /*AUTO*/{
 	(void)new_debug_fill_threshold;
-	CRT_UNIMPLEMENTEDF("_CrtSetDebugFillThreshold(%Ix)", new_debug_fill_threshold); /* TODO */
+	CRT_UNIMPLEMENTEDF("_CrtSetDebugFillThreshold(new_debug_fill_threshold: %Ix)", new_debug_fill_threshold); /* TODO */
 	return (size_t)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__CrtSetDebugFillThreshold]]]*/
@@ -228,7 +228,7 @@ NOTHROW_NCX(VLIBDCALL libc__CrtDbgReportW)(int report_type,
 	(void)line;
 	(void)module_name;
 	(void)format;
-	CRT_UNIMPLEMENTEDF("_CrtDbgReportW(%x, %p, %x, %p, %p, ...)", report_type, filename, line, module_name, format); /* TODO */
+	CRT_UNIMPLEMENTEDF("_CrtDbgReportW(report_type: %x, filename: %p, line: %x, module_name: %p, format: %p, ...)", report_type, filename, line, module_name, format); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__CrtDbgReportW]]]*/
@@ -252,7 +252,7 @@ NOTHROW_NCX(LIBDCALL libc__CrtSetBreakAlloc)(__LONG32_TYPE__ break_alloc)
 /*[[[body:libc__CrtSetBreakAlloc]]]*/
 /*AUTO*/{
 	(void)break_alloc;
-	CRT_UNIMPLEMENTEDF("_CrtSetBreakAlloc(%" PRIx32 ")", break_alloc); /* TODO */
+	CRT_UNIMPLEMENTEDF("_CrtSetBreakAlloc(break_alloc: %" PRIx32 ")", break_alloc); /* TODO */
 	return (__LONG32_TYPE__)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc__CrtSetBreakAlloc]]]*/

@@ -37,7 +37,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_pton)(int af,
 	(void)af;
 	(void)cp;
 	(void)buf;
-	CRT_UNIMPLEMENTEDF("inet_pton(%x, %q, %p)", af, cp, buf); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet_pton(af: %x, cp: %q, buf: %p)", af, cp, buf); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_inet_pton]]]*/
@@ -56,7 +56,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_ntop)(int af,
 	(void)cp;
 	(void)buf;
 	(void)len;
-	CRT_UNIMPLEMENTEDF("inet_ntop(%x, %p, %q, %" PRIxN(__SIZEOF_SOCKLEN_T__) ")", af, cp, buf, len); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet_ntop(af: %x, cp: %p, buf: %q, len: %" PRIxN(__SIZEOF_SOCKLEN_T__) ")", af, cp, buf, len); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -80,7 +80,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_net_ntop)(int af,
 	(void)bits;
 	(void)buf;
 	(void)len;
-	CRT_UNIMPLEMENTEDF("inet_net_ntop(%x, %p, %x, %q, %Ix)", af, cp, bits, buf, len); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet_net_ntop(af: %x, cp: %p, bits: %x, buf: %q, len: %Ix)", af, cp, bits, buf, len); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
@@ -100,7 +100,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_net_pton)(int af,
 	(void)cp;
 	(void)buf;
 	(void)len;
-	CRT_UNIMPLEMENTEDF("inet_net_pton(%x, %q, %p, %Ix)", af, cp, buf, len); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet_net_pton(af: %x, cp: %q, buf: %p, len: %Ix)", af, cp, buf, len); /* TODO */
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_inet_net_pton]]]*/
@@ -117,7 +117,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_nsap_addr)(char const *cp,
 	(void)cp;
 	(void)buf;
 	(void)len;
-	CRT_UNIMPLEMENTEDF("inet_nsap_addr(%q, %p, %x)", cp, buf, len); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet_nsap_addr(cp: %q, buf: %p, len: %x)", cp, buf, len); /* TODO */
 	return (unsigned int)libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_inet_nsap_addr]]]*/
@@ -138,7 +138,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_nsap_ntoa)(int len,
 	(void)len;
 	(void)cp;
 	(void)buf;
-	CRT_UNIMPLEMENTEDF("inet_nsap_ntoa(%x, %p, %q)", len, cp, buf); /* TODO */
+	CRT_UNIMPLEMENTEDF("inet_nsap_ntoa(len: %x, cp: %p, buf: %q)", len, cp, buf); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
 }
