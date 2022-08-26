@@ -42,6 +42,8 @@ DECL_BEGIN
 /*[[[skip:libc_malloc_usable_size]]]*/
 /*[[[skip:libc_malloc_trim]]]*/
 /*[[[skip:libc_mallopt]]]*/
+/*[[[skip:libc_mallinfo]]]*/
+/*[[[skip:libc_mallinfo2]]]*/
 
 
 /*[[[head:libc_memcdup,hash:CRC-32=0xe2f0ddeb]]]*/

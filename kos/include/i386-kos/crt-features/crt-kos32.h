@@ -3634,6 +3634,7 @@
 #define __CRT_HAVE_make_temp_file_with_prefix
 #define __CRT_HAVE_makecontext
 #define __CRT_HAVE_mallinfo
+#define __CRT_HAVE_mallinfo2
 #define __CRT_HAVE_malloc
 #define __CRT_HAVE_malloc_footprint
 #define __CRT_HAVE_malloc_footprint_limit

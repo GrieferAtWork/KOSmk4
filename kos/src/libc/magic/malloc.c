@@ -39,6 +39,11 @@
 
 %[default:section(".text.crt{|.dos}.heap.malloc")]
 
+%[define_decl_include("<bits/crt/mallinfo.h>": [
+	"struct mallinfo",
+	"struct mallinfo2"
+])]
+
 %(libc_fast,libc_core){
 #include "stdlib.h"
 }
@@ -49,6 +54,8 @@
 
 }%[insert:prefix(
 #include <asm/crt/malloc.h>
+)]%[insert:prefix(
+#include <bits/crt/mallinfo.h>
 )]%[insert:prefix(
 #include <bits/types.h>
 )]%{
@@ -363,6 +370,58 @@ void *__NOTHROW_NCX(__LIBCCALL calloc)(size_t __num_bytes) { return (calloc)(1, 
 %#endif /* !__MALLOC_OVERLOADS_DEFINED */
 %#endif /* __USE_STRING_OVERLOADS */
 %#endif /* __USE_KOS */
+
+
+
+[[decl_include("<bits/crt/mallinfo.h>")]]
+[[ignore, nocrt, alias("mallinfo")]]
+struct mallinfo crt_mallinfo(void);
+
+[[decl_include("<bits/crt/mallinfo.h>")]]
+[[ignore, nocrt, alias("mallinfo2")]]
+struct mallinfo2 crt_mallinfo2(void);
+
+
+[[decl_include("<bits/crt/mallinfo.h>")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_SIZE_T__), alias("mallinfo2")]]
+[[userimpl, requires_function(crt_mallinfo2)]]
+struct mallinfo mallinfo(void) {
+	struct mallinfo result;
+	struct mallinfo2 info = crt_mallinfo2();
+	result.@arena@    = (int)(unsigned int)info.@arena@;
+	result.@ordblks@  = (int)(unsigned int)info.@ordblks@;
+	result.@smblks@   = (int)(unsigned int)info.@smblks@;
+	result.@hblks@    = (int)(unsigned int)info.@hblks@;
+	result.@hblkhd@   = (int)(unsigned int)info.@hblkhd@;
+	result.@usmblks@  = (int)(unsigned int)info.@usmblks@;
+	result.@fsmblks@  = (int)(unsigned int)info.@fsmblks@;
+	result.@uordblks@ = (int)(unsigned int)info.@uordblks@;
+	result.@fordblks@ = (int)(unsigned int)info.@fordblks@;
+	result.@keepcost@ = (int)(unsigned int)info.@keepcost@;
+	return result;
+}
+
+[[decl_include("<bits/crt/mallinfo.h>")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_SIZE_T__), preferred_alias("mallinfo")]]
+[[userimpl, requires_function(crt_mallinfo)]]
+struct mallinfo2 mallinfo2(void) {
+	struct mallinfo2 result;
+	struct mallinfo info = crt_mallinfo();
+	result.@arena@    = (size_t)(unsigned int)info.@arena@;
+	result.@ordblks@  = (size_t)(unsigned int)info.@ordblks@;
+	result.@smblks@   = (size_t)(unsigned int)info.@smblks@;
+	result.@hblks@    = (size_t)(unsigned int)info.@hblks@;
+	result.@hblkhd@   = (size_t)(unsigned int)info.@hblkhd@;
+	result.@usmblks@  = (size_t)(unsigned int)info.@usmblks@;
+	result.@fsmblks@  = (size_t)(unsigned int)info.@fsmblks@;
+	result.@uordblks@ = (size_t)(unsigned int)info.@uordblks@;
+	result.@fordblks@ = (size_t)(unsigned int)info.@fordblks@;
+	result.@keepcost@ = (size_t)(unsigned int)info.@keepcost@;
+	return result;
+}
+
+
+
 
 
 %(user){

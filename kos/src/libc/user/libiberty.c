@@ -28,12 +28,19 @@
 #include <sys/stat.h>
 
 #include <assert.h>
+#include <malloc.h>
+#include <stdio.h>
 #include <syscall.h>
 #include <unistd.h>
 
+#include "../libc/dl.h"
+#include "../libc/globals.h"
 #include "libiberty.h"
 
 DECL_BEGIN
+
+PRIVATE ATTR_SECTION(".bss.crt.libiberty")
+char const *libc_xmalloc_program_name = NULL;
 
 /*[[[head:libc_xmalloc_set_program_name,hash:CRC-32=0x72744191]]]*/
 INTERN ATTR_SECTION(".text.crt.libiberty") void
@@ -46,16 +53,51 @@ NOTHROW_NCX(LIBCCALL libc_xmalloc_set_program_name)(char const *progname)
 }
 /*[[[end:libc_xmalloc_set_program_name]]]*/
 
-/*[[[head:libc_xmalloc_failed,hash:CRC-32=0xc75654bd]]]*/
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_NORETURN void
-(LIBCCALL libc_xmalloc_failed)(size_t num_bytes) THROWS(...)
-/*[[[body:libc_xmalloc_failed]]]*/
-/*AUTO*/{
-	(void)num_bytes;
-	CRT_UNIMPLEMENTEDF("xmalloc_failed(num_bytes: %Ix)", num_bytes); /* TODO */
-	assert_failed("Not implemented");
+
+DEFINE_PUBLIC_ALIAS(xmalloc_failed, libc_xmalloc_failed_fallback);
+INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.libiberty") void
+(LIBCCALL libc_xmalloc_failed_fallback)(size_t num_bytes) THROWS(...) {
+	struct mallinfo2 info = mallinfo2();
+	char const *program_name = libc_xmalloc_program_name;
+	/* KOS extension: if you never called `xmalloc_set_program_name(3)',
+	 *                we just use the `program_invocation_short_name' as
+	 *                exposed in <errno.h> and defined by libdl.so */
+	if (program_name == NULL)
+		program_name = program_invocation_short_name;
+	if (program_name == NULL)
+		program_name = "";
+	fprintf(stderr,
+	        "\n%s%sout of memory allocating %" PRIuSIZ " bytes after a total of %" PRIuSIZ " bytes\n",
+	        program_name, *program_name ? ": " : "", num_bytes, info.uordblks);
+	xexit(1);
 }
-/*[[[end:libc_xmalloc_failed]]]*/
+
+/*[[[skip:libc_xmalloc_failed]]]*/
+INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_NORETURN void
+(LIBCCALL libc_xmalloc_failed)(size_t num_bytes) THROWS(...) {
+	void (LIBCCALL *pdyn_xmalloc_failed)(size_t num_bytes);
+	/* Allow the hosting program to define its own `xmalloc_failed()'
+	 * function  which  it could  then (theoretically)  implement by:
+	 *
+	 * Throwing an exception:
+	 * >> THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes);
+	 *
+	 * longjmp-ing  up  the stack:
+	 * >> longjmp(oom_handler, 1);
+	 *
+	 * Or doing something else entirely.
+	 */
+	*(void **)&pdyn_xmalloc_failed = dlsym(RTLD_DEFAULT, "xmalloc_failed");
+	if unlikely(!pdyn_xmalloc_failed)
+		pdyn_xmalloc_failed = &libc_xmalloc_failed_fallback; /* Shouldn't happen. */
+	(*pdyn_xmalloc_failed)(num_bytes);
+
+	/* Shouldn't get here, but if the user's override doesn't behave
+	 * like it should, we just fallthru to the default  oom-handler. */
+	libc_xmalloc_failed_fallback(num_bytes);
+}
+
+
 
 /*[[[head:libc_fdmatch,hash:CRC-32=0xd02e5611]]]*/
 INTERN ATTR_SECTION(".text.crt.libiberty") WUNUSED int
@@ -358,9 +400,8 @@ NOTHROW_NCX(LIBCCALL libc_pwait)(int a,
 }
 /*[[[end:libc_pwait]]]*/
 
-/*[[[start:exports,hash:CRC-32=0x696f1e20]]]*/
+/*[[[start:exports,hash:CRC-32=0x2924a674]]]*/
 DEFINE_PUBLIC_ALIAS(xmalloc_set_program_name, libc_xmalloc_set_program_name);
-DEFINE_PUBLIC_ALIAS(xmalloc_failed, libc_xmalloc_failed);
 DEFINE_PUBLIC_ALIAS(fdmatch, libc_fdmatch);
 DEFINE_PUBLIC_ALIAS(make_relative_prefix, libc_make_relative_prefix);
 DEFINE_PUBLIC_ALIAS(make_relative_prefix_ignore_links, libc_make_relative_prefix_ignore_links);

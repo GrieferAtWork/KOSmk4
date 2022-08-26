@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56b4844b */
+/* HASH CRC-32:0xcc795c1c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -6549,6 +6549,8 @@
 #define __CRT_HAVE_make_temp_file
 #define __CRT_HAVE_make_temp_file_with_prefix
 #define __CRT_HAVE_makecontext
+#define __CRT_HAVE_mallinfo
+#define __CRT_HAVE_mallinfo2
 #define __CRT_HAVE_malloc
 #define __CRT_HAVE_malloc_trim
 #define __CRT_HAVE_malloc_usable_size

@@ -595,8 +595,6 @@
 #define __CRT_HAVE___initstate
 #define __CRT_HAVE___iob_func
 #define __CRT_HAVE___ioctl
-#define __CRT_HAVE___ioperm
-#define __CRT_HAVE___iopl
 #define __CRT_HAVE___isalnum_l
 #define __CRT_HAVE___isalpha_l
 #define __CRT_HAVE___isascii
@@ -712,8 +710,6 @@
 #define __CRT_HAVE___libc_gettimeofday
 #define __CRT_HAVE___libc_getuid
 #define __CRT_HAVE___libc_ioctl
-#define __CRT_HAVE___libc_ioperm
-#define __CRT_HAVE___libc_iopl
 #define __CRT_HAVE___libc_kill
 #define __CRT_HAVE___libc_link
 #define __CRT_HAVE___libc_longjmp
@@ -3416,8 +3412,6 @@
 #define __CRT_HAVE_insline
 #define __CRT_HAVE_insque
 #define __CRT_HAVE_ioctl
-#define __CRT_HAVE_ioperm
-#define __CRT_HAVE_iopl
 #define __CRT_HAVE_iruserok
 #define __CRT_HAVE_iruserok_af
 #define __CRT_HAVE_is_wctype
@@ -3626,6 +3620,7 @@
 #define __CRT_HAVE_make_temp_file_with_prefix
 #define __CRT_HAVE_makecontext
 #define __CRT_HAVE_mallinfo
+#define __CRT_HAVE_mallinfo2
 #define __CRT_HAVE_malloc
 #define __CRT_HAVE_malloc_footprint
 #define __CRT_HAVE_malloc_footprint_limit

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6818d6e0 */
+/* HASH CRC-32:0xcde505f0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1040,7 +1040,7 @@ __CDECLARE(__ATTR_WUNUSED,char const *,__NOTHROW_NCX,spaces,(__STDC_INT_AS_SIZE_
 #include <libc/local/libiberty/spaces.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(spaces, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL spaces)(__STDC_INT_AS_SIZE_T __count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(spaces))(__count); })
 #endif /* ... */
-__CDECLARE_VOID_OPT(,__NOTHROW_NCX,xmalloc_set_program_name,(char const *__progname),(__progname))
+__CDECLARE_VOID_OPT(,__NOTHROW_NCX,xmalloc_set_program_name,(char const *___progname),(___progname))
 __CDECLARE_VOID_OPT(__ATTR_NORETURN,__THROWING,xmalloc_failed,(size_t __num_bytes),(__num_bytes))
 #ifdef __CRT_HAVE_xmalloc
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,xmalloc,(size_t __num_bytes),(__num_bytes))

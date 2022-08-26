@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5985d96 */
+/* HASH CRC-32:0xf238bd41 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,6 +48,7 @@
 #include <features.h>
 
 #include <asm/crt/malloc.h>
+#include <bits/crt/mallinfo.h>
 #include <bits/types.h>
 #if defined(__USE_KOS) && defined(__USE_STRING_OVERLOADS)
 #include <hybrid/__overflow.h>
@@ -442,6 +443,26 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR
 #endif /* !__MALLOC_OVERLOADS_DEFINED */
 #endif /* __USE_STRING_OVERLOADS */
 #endif /* __USE_KOS */
+#ifdef __CRT_HAVE_mallinfo
+__CDECLARE(,struct mallinfo,__NOTHROW_NCX,mallinfo,(void),())
+#else /* __CRT_HAVE_mallinfo */
+#include <hybrid/typecore.h>
+#if defined(__CRT_HAVE_mallinfo2) && __SIZEOF_INT__ == __SIZEOF_SIZE_T__
+__CREDIRECT(,struct mallinfo,__NOTHROW_NCX,mallinfo,(void),mallinfo2,())
+#elif defined(__CRT_HAVE_mallinfo2)
+#include <libc/local/malloc/mallinfo.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(mallinfo, __FORCELOCAL __ATTR_ARTIFICIAL struct mallinfo __NOTHROW_NCX(__LIBCCALL mallinfo)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mallinfo))(); })
+#endif /* ... */
+#endif /* !__CRT_HAVE_mallinfo */
+#include <hybrid/typecore.h>
+#if defined(__CRT_HAVE_mallinfo) && __SIZEOF_INT__ == __SIZEOF_SIZE_T__
+__CREDIRECT(,struct mallinfo2,__NOTHROW_NCX,mallinfo2,(void),mallinfo,())
+#elif defined(__CRT_HAVE_mallinfo2)
+__CDECLARE(,struct mallinfo2,__NOTHROW_NCX,mallinfo2,(void),())
+#elif defined(__CRT_HAVE_mallinfo)
+#include <libc/local/malloc/mallinfo2.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(mallinfo2, __FORCELOCAL __ATTR_ARTIFICIAL struct mallinfo2 __NOTHROW_NCX(__LIBCCALL mallinfo2)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mallinfo2))(); })
+#endif /* ... */
 #ifdef __clang_tidy__
 #ifdef __memalign_defined
 #undef memalign

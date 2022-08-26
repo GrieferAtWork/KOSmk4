@@ -131,6 +131,7 @@
 #include <hybrid/typecore.h>
 
 #include <asm/pagesize.h>
+#include <bits/crt/mallinfo.h>
 #include <kos/config/config.h> /* Pull in config-specific macro overrides */
 
 #include <assert.h>
@@ -181,7 +182,7 @@ DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") size_t dlmalloc_footprint(
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") size_t dlmalloc_max_footprint(void);
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") size_t dlmalloc_footprint_limit(void);
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") size_t dlmalloc_set_footprint_limit(size_t bytes);
-DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") struct mallinfo dlmallinfo(void);
+DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") struct mallinfo2 dlmallinfo(void);
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") void **dlindependent_calloc(size_t n_elements, size_t elem_size, void *chunks[]);
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") void **dlindependent_comalloc(size_t n_elements, size_t sizes[], void *chunks[]);
 DLMALLOC_EXPORT ATTR_SECTION(".text.crt.heap.malloc") size_t dlbulk_free(void *array[], size_t nelem);
@@ -234,8 +235,16 @@ DEFINE_DL_EXPORT_ALIAS(malloc_footprint, dlmalloc_footprint);
 DEFINE_DL_EXPORT_ALIAS(malloc_max_footprint, dlmalloc_max_footprint);
 DEFINE_DL_EXPORT_ALIAS(malloc_footprint_limit, dlmalloc_footprint_limit);
 DEFINE_DL_EXPORT_ALIAS(malloc_set_footprint_limit, dlmalloc_set_footprint_limit);
+#ifdef __BUILDING_LIBC
+#if __SIZEOF_INT__ == __SIZEOF_SIZE_T__
 DEFINE_DL_EXPORT_ALIAS(__libc_mallinfo, dlmallinfo);
 DEFINE_DL_EXPORT_ALIAS(mallinfo, dlmallinfo);
+#else /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
+DEFINE_DL_EXPORT_ALIAS(__libc_mallinfo, libc_mallinfo_int);
+DEFINE_DL_EXPORT_ALIAS(mallinfo, libc_mallinfo_int);
+#endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
+#endif /* __BUILDING_LIBC */
+DEFINE_DL_EXPORT_ALIAS(mallinfo2, dlmallinfo);
 DEFINE_DL_EXPORT_ALIAS(independent_calloc, dlindependent_calloc);
 DEFINE_DL_EXPORT_ALIAS(independent_comalloc, dlindependent_comalloc);
 DEFINE_DL_EXPORT_ALIAS(bulk_free, dlbulk_free);
@@ -265,13 +274,48 @@ DEFINE_INTERN_ALIAS(libc_malloc_footprint, dlmalloc_footprint);
 DEFINE_INTERN_ALIAS(libc_malloc_max_footprint, dlmalloc_max_footprint);
 DEFINE_INTERN_ALIAS(libc_malloc_footprint_limit, dlmalloc_footprint_limit);
 DEFINE_INTERN_ALIAS(libc_malloc_set_footprint_limit, dlmalloc_set_footprint_limit);
+#ifdef __BUILDING_LIBC
+#if __SIZEOF_INT__ == __SIZEOF_SIZE_T__
 DEFINE_INTERN_ALIAS(libc_mallinfo, dlmallinfo);
+#else /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
+DEFINE_INTERN_ALIAS(libc_mallinfo, libc_mallinfo_int);
+#endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
+#endif /* __BUILDING_LIBC */
+DEFINE_INTERN_ALIAS(libc_mallinfo2, dlmallinfo);
 DEFINE_INTERN_ALIAS(libc_independent_calloc, dlindependent_calloc);
 DEFINE_INTERN_ALIAS(libc_independent_comalloc, dlindependent_comalloc);
 DEFINE_INTERN_ALIAS(libc_bulk_free, dlbulk_free);
 DEFINE_INTERN_ALIAS(libc_pvalloc, dlpvalloc);
 DEFINE_INTERN_ALIAS(libc_malloc_trim, dlmalloc_trim);
 DEFINE_INTERN_ALIAS(libc_malloc_usable_size, dlmalloc_usable_size);
+
+#if __SIZEOF_INT__ != __SIZEOF_SIZE_T__
+INTERN ATTR_SECTION(".text.crt.heap.malloc")
+struct mallinfo libc_mallinfo_int(void) {
+	struct mallinfo2 info = dlmallinfo();
+	struct mallinfo result;
+	result.arena    = (int)(unsigned int)info.arena;
+	result.ordblks  = (int)(unsigned int)info.ordblks;
+	result.smblks   = (int)(unsigned int)info.smblks;
+	result.hblks    = (int)(unsigned int)info.hblks;
+	result.hblkhd   = (int)(unsigned int)info.hblkhd;
+	result.usmblks  = (int)(unsigned int)info.usmblks;
+	result.fsmblks  = (int)(unsigned int)info.fsmblks;
+	result.uordblks = (int)(unsigned int)info.uordblks;
+	result.fordblks = (int)(unsigned int)info.fordblks;
+	result.keepcost = (int)(unsigned int)info.keepcost;
+	return result;
+}
+#endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
+#ifdef __BUILDING_LIBC
+#endif /* __BUILDING_LIBC */
+
+
+/* Have dlmalloc implement `mallinfo2(3)' */
+#undef mallinfo
+#define mallinfo mallinfo2
+#define STRUCT_MALLINFO_DECLARED
+#define MALLINFO_FIELD_TYPE size_t
 
 DECL_END
 

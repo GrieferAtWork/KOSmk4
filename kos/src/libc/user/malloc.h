@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x254f273c */
+/* HASH CRC-32:0xd2b3f2a5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,6 +50,8 @@ INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_I
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2, 3)) void *NOTHROW_NCX(LIBCCALL libc_reallocarray)(void *ptr, size_t elem_count, size_t elem_size);
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_recalloc)(void *mallptr, size_t num_bytes);
 INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2, 3)) void *NOTHROW_NCX(LIBCCALL libc_recallocv)(void *mallptr, size_t elem_count, size_t elem_size);
+INTDEF struct mallinfo NOTHROW_NCX(LIBCCALL libc_mallinfo)(void);
+INTDEF struct mallinfo2 NOTHROW_NCX(LIBCCALL libc_mallinfo2)(void);
 #endif /* !__KERNEL__ */
 #ifdef __clang_tidy__
 #define libc_realloc_in_place(mallptr, n_bytes)        __builtin_realloc_in_place(mallptr, n_bytes)

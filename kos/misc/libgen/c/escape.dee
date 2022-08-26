@@ -728,25 +728,27 @@ global final keywordMacros: {string: string | Callable with (CParser, File | CWr
 
 @@Keywords that may look escaped, but must be escaped again
 global final special_escapes: {string...} = {
-	"__used",        /* Macro in <sys/cdefs.h> */
-	"__unused",      /* Macro in <sys/cdefs.h> */
-	"__packed",      /* Macro in <sys/cdefs.h> */
-	"__value",       /* Compiler keyword in MSVC */
-	"__event",       /* Compiler keyword in MSVC */
-	"__in",          /* SAL macro */
-	"__in_z",        /* SAL macro */
-	"__in_opt",      /* SAL macro */
-	"__in_z_opt",    /* SAL macro */
-	"__out",         /* SAL macro */
-	"__out_z",       /* SAL macro */
-	"__out_opt",     /* SAL macro */
-	"__inout",       /* SAL macro */
-	"__inout_z",     /* SAL macro */
-	"__inout_opt",   /* SAL macro */
-	"__inout_z_opt", /* SAL macro */
-	"__argv",        /* Macro from <stdlib.h> */
-	"__envp",        /* Macro from <stdlib.h> */
-	"__environ",     /* Macro from <stdlib.h> */
+	"__used",          /* Macro in <sys/cdefs.h> */
+	"__unused",        /* Macro in <sys/cdefs.h> */
+	"__packed",        /* Macro in <sys/cdefs.h> */
+	"__value",         /* Compiler keyword in MSVC */
+	"__event",         /* Compiler keyword in MSVC */
+	"__in",            /* SAL macro */
+	"__in_z",          /* SAL macro */
+	"__in_opt",        /* SAL macro */
+	"__in_z_opt",      /* SAL macro */
+	"__out",           /* SAL macro */
+	"__out_z",         /* SAL macro */
+	"__out_opt",       /* SAL macro */
+	"__inout",         /* SAL macro */
+	"__inout_z",       /* SAL macro */
+	"__inout_opt",     /* SAL macro */
+	"__inout_z_opt",   /* SAL macro */
+	"__argv",          /* Macro from <stdlib.h> */
+	"__envp",          /* Macro from <stdlib.h> */
+	"__environ",       /* Macro from <stdlib.h> */
+	"__progname",      /* Macro from <stdlib.h> */
+	"__progname_full", /* Macro from <stdlib.h> */
 };
 
 
