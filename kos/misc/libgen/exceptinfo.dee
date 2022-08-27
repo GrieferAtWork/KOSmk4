@@ -322,7 +322,8 @@ yes:
 			fp << "\tunion {\n";
 			local classNames = List(
 				for (local c: subClassesWithFields)
-					c.getClassMemberName());
+					c.getClassMemberName()
+			);
 			for (local name: classNames)
 				fp << "#undef " << name << "\n";
 			local hasUnconditionalSubClass = false;
@@ -336,7 +337,7 @@ yes:
 				fp << "\t\tstruct {\n";
 				c.printExceptionDataStructFields(fp, escapeTypename, "\t\t\t");
 				fp << "\t\t} " << c.getClassMemberName()
-					<< "; /* " << c.name << " */\n";
+				   << "; /* " << c.name << " */\n";
 				if (c.ppCond != "1" && c.ppCond != ppCond)
 					printPreprocessorExpressionEndif(fp, c.ppCond);
 			}
@@ -345,17 +346,17 @@ yes:
 				fp << "int _" << prefix << "placeholder;\n";
 			}
 			fp << "\n"
-				"\t}\n"
-				"#ifndef __COMPILER_HAVE_TRANSPARENT_UNION\n";
+			      "\t}\n"
+			      "#ifndef __COMPILER_HAVE_TRANSPARENT_UNION\n";
 			local subClassUnionName = "_" + prefix + "classes";
 			fp << "\t" << subClassUnionName << "\n";
 			local longestClassName = classNames.each.length > ...;
 			for (local name: classNames) {
 				fp << "#define " << name << (" " * (longestClassName - #name))
-					<< " " << subClassUnionName << "." << name << "\n";
+				   << " " << subClassUnionName << "." << name << "\n";
 			}
 			fp << "#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */\n"
-				"\t;\n";
+			      "\t;\n";
 		}
 		fp << "};\n";
 		if (ppCond != "1")
@@ -378,18 +379,19 @@ yes:
 		local longestFieldType = effectiveFields.each[1].length > ...;
 		for (local name, typ, doc: effectiveFields) {
 			fp << linePrefix << typ
-				<< (" " * (longestFieldType - #typ))
-				<< " " << name << ";";
+			   << (" " * (longestFieldType - #typ))
+			   << " " << name << ";";
 			doc = doc.rstrip();
 			if (doc) {
 				fp << (" " * (longestFieldName - #name))
-					<< " /* ";
+				   << " /* ";
 				local docPrefix = f"\n{linePrefix}{
-					' ' * (longestFieldType + longestFieldName)
+					" " * (longestFieldType + longestFieldName)
 				}    * ";
 				fp << docPrefix.join(
 					for (local l: doc.splitlines(false))
-						l.rstrip());
+						l.rstrip()
+				);
 
 				fp << " */";
 			}
@@ -514,7 +516,8 @@ function parseExceptionClasses(
 		local lineStart = text.rfind("\n", 0, index) + 1;
 		return (
 			1 + text.count("\n", 0, lineStart),
-			1 + (index - lineStart));
+			1 + (index - lineStart)
+		);
 	}
 	function errAt(index: int, message: string) {
 		local line, col = lcAt(index)...;
@@ -889,16 +892,16 @@ function printExceptionDataStructs(
 	if (longestDataStructName < #exceptionDataPointerType)
 		longestDataStructName = #exceptionDataPointerType;
 	fp << "\t" << exceptionDataPointerType
-		<< (" " * (longestDataStructName - #exceptionDataPointerType))
-		<< " e_pointers[" << exceptionDataPointerCount << "];\n";
+	   << (" " * (longestDataStructName - #exceptionDataPointerType))
+	   << " e_pointers[" << exceptionDataPointerCount << "];\n";
 	for (local ppCond, name, e_name: exceptionDataStructNames) {
 		if (ppCond != "1")
 			printPreprocessorExpressionIf(fp, ppCond);
 		fp << "\t" << name
-			<< (" " * (longestDataStructName - #name))
-			<< " " << e_name.lower() << ";"
-			<< (" " * (longestErrorClassName - #e_name))
-			<< " /* " << e_name << " */\n";
+		   << (" " * (longestDataStructName - #name))
+		   << " " << e_name.lower() << ";"
+		   << (" " * (longestErrorClassName - #e_name))
+		   << " /* " << e_name << " */\n";
 		if (ppCond != "1")
 			printPreprocessorExpressionEndif(fp, ppCond);
 	}
@@ -1079,7 +1082,7 @@ function getExceptionCodeMappings(
 			for (local codePpCond, code: cls.allCodes) {
 				if (codePpCond == "1")
 					continue;
-				local fullPpCond = ppexpr.optimize(f"({classPpCond}) && ({codePpCond})");
+				local fullPpCond = ppexpr.optimize(f"({classPpCond})&&({codePpCond})");
 				if (fullPpCond == "0")
 					continue;
 				addClass(fullPpCond, cls, code);
@@ -1238,8 +1241,8 @@ function printExceptNameFunctionBodyForMappings(
 			text << exceptClassEndMarker;
 		}
 		fp << linePrefix << "static char const e_linear_"
-			<< hex4(min) << "h_" << hex4(max) << "h[] =\n"
-			<< linePrefix;
+		   << hex4(min) << "h_" << hex4(max) << "h[] =\n"
+		   << linePrefix;
 		local isFirst = true;
 		for (local l: text.string.segments(64)) {
 			if (!isFirst)
@@ -1252,10 +1255,10 @@ function printExceptNameFunctionBodyForMappings(
 		fp << ";\n";
 	}
 	/* Generate code to select the correct range from `classParitions' */
-	fp	<< linePrefix << "char const *result;\n"
-		<< linePrefix << "except_class_t class_offset;\n"
-		<< linePrefix << "except_subclass_t subclass_offset;\n"
-		<< linePrefix;
+	fp << linePrefix << "char const *result;\n"
+	   << linePrefix << "except_class_t class_offset;\n"
+	   << linePrefix << "except_subclass_t subclass_offset;\n"
+	   << linePrefix;
 	local isFirst = true;
 	for (local min, max: classParitions) {
 		isFirst = false;
@@ -1263,43 +1266,44 @@ function printExceptNameFunctionBodyForMappings(
 		if (min != 0)
 			fp << classVariableName << " >= 0x" << hex4(min) << " && ";
 		fp << classVariableName << " <= 0x" << hex4(max) << ") {\n"
-			<< linePrefix << "	result = e_linear_" << hex4(min) << "h_" << hex4(max) << "h;\n"
-			<< linePrefix << "	class_offset = " << classVariableName;
+		   << linePrefix << "	result = e_linear_" << hex4(min) << "h_" << hex4(max) << "h;\n"
+		   << linePrefix << "	class_offset = " << classVariableName;
 		if (min != 0)
 			fp << " - 0x" << hex4(min);
 		fp << ";\n"
 			<< linePrefix << "} else ";
 	}
 	if (!isFirst) {
-		fp	<< "{\n"
-			<< linePrefix << "	goto non_linear_prefix;\n"
-			<< linePrefix << "}\n"
-			<< linePrefix << "while (class_offset) {\n"
-			<< linePrefix << "	--class_offset;\n"
-			<< linePrefix << "	result = (char *)";
+		fp << "{\n"
+		   << linePrefix << "	goto non_linear_prefix;\n"
+		   << linePrefix << "}\n"
+		   << linePrefix << "while (class_offset) {\n"
+		   << linePrefix << "	--class_offset;\n"
+		   << linePrefix << "	result = (char *)";
 		printStrendExpr(fp, "result", exceptClassEndMarker);
-		fp	<< " + 1;\n"
-			<< linePrefix << "}\n"
-			<< linePrefix << "subclass_offset = " << subClassVariableName << ";\n"
-			<< linePrefix << "for (;;) {\n"
-			<< linePrefix << "	if (*result == '\\1')\n"
-			<< linePrefix << "		break; /* End-of-class */\n"
-			<< linePrefix << "	if (!subclass_offset) {\n"
-			<< linePrefix << "		if (!*result)\n"
-			<< linePrefix << "			result = NULL;\n"
-			<< linePrefix << "		return result;\n"
-			<< linePrefix << "	}\n"
-			<< linePrefix << "	--subclass_offset;\n"
-			<< linePrefix << "	result = ";
+		fp << " + 1;\n"
+		   << linePrefix << "}\n"
+		   << linePrefix << "subclass_offset = " << subClassVariableName << ";\n"
+		   << linePrefix << "for (;;) {\n"
+		   << linePrefix << "	if (*result == '\\1')\n"
+		   << linePrefix << "		break; /* End-of-class */\n"
+		   << linePrefix << "	if (!subclass_offset) {\n"
+		   << linePrefix << "		if (!*result)\n"
+		   << linePrefix << "			result = NULL;\n"
+		   << linePrefix << "		return result;\n"
+		   << linePrefix << "	}\n"
+		   << linePrefix << "	--subclass_offset;\n"
+		   << linePrefix << "	result = ";
 		printStrendExpr(fp, "result", exceptSubClassEndMarker);
-		fp	<< " + 1;\n"
-			<< linePrefix << "}\n"
-			<< "non_linear_prefix:\n";
+		fp << " + 1;\n"
+		   << linePrefix << "}\n"
+		   << "non_linear_prefix:\n";
 	}
 	if (nonLinearMappings) {
 		fp << linePrefix << "switch(" << classVariableName << ") {\n";
 		for (local classId: nonLinearMappings.keys.sorted()) {
-			fp << "\n" << linePrefix << "case 0x" << hex4(classId) << ": {\n";
+			fp << "\n"
+			   << linePrefix << "case 0x" << hex4(classId) << ": {\n";
 			/* Deal with `nonLinearMappings' by generating a conventional STREND^N table. */
 			local mySubClassPartitions = subClassPartitions[classId];
 			assert #mySubClassPartitions >= 2 || mySubClassPartitions.first.first != 0;
@@ -1320,8 +1324,8 @@ function printExceptNameFunctionBodyForMappings(
 				if (exceptSubClassEndMarker != "\0" && !isFirst)
 					text << exceptSubClassEndMarker;
 				fp << linePrefix << "\tstatic char const e_" << hex4(classId) << "h_linear_"
-					<< hex4(min) << "h_" << hex4(max) << "h[] =\n"
-					<< linePrefix << "\t";
+				   << hex4(min) << "h_" << hex4(max) << "h[] =\n"
+				   << linePrefix << "\t";
 				local isFirst = true;
 				for (local l: text.string.segments(64)) {
 					if (!isFirst)
@@ -1342,36 +1346,35 @@ function printExceptNameFunctionBodyForMappings(
 				if (min != 0)
 					fp << subClassVariableName << " >= 0x" << hex4(min) << " && ";
 				fp << subClassVariableName << " <= 0x" << hex4(max) << ") {\n"
-					<< linePrefix << "		result = e_" << hex4(classId)
-						<< "h_linear_" << hex4(min) << "h_" << hex4(max) << "h;\n"
-					<< linePrefix << "		subclass_offset = "
-						<< subClassVariableName;
+				   << linePrefix << "		result = e_" << hex4(classId)
+				   << "h_linear_" << hex4(min) << "h_" << hex4(max) << "h;\n"
+				   << linePrefix << "		subclass_offset = "
+				   << subClassVariableName;
 				if (min != 0)
 					fp << " - 0x" << hex4(min);
-				fp	<< ";\n"
-					<< linePrefix << "	} else ";
+				fp << ";\n"
+				   << linePrefix << "	} else ";
 			}
 			if (!isFirst) {
 				fp << "{\n"
-					<< linePrefix << "		return NULL;\n"
-					<< linePrefix << "	}\n";
+				   << linePrefix << "		return NULL;\n"
+				   << linePrefix << "	}\n";
 			}
 			fp << linePrefix << "}	break;\n";
 		}
-		fp	<< "\n" << linePrefix << "default:\n"
-			<< linePrefix << "	return NULL;\n"
-			<< linePrefix << "}\n";
+		fp << "\n" << linePrefix << "default:\n"
+		   << linePrefix << "	return NULL;\n"
+		   << linePrefix << "}\n";
 	}
-	fp	<< linePrefix << "while (subclass_offset) {\n"
-		<< linePrefix << "	--subclass_offset;\n"
-		<< linePrefix << "	result = ";
+	fp << linePrefix << "while (subclass_offset) {\n"
+	   << linePrefix << "	--subclass_offset;\n"
+	   << linePrefix << "	result = ";
 	printStrendExpr(fp, "result", exceptSubClassEndMarker);
-	fp	<< " + 1;\n"
-		<< linePrefix << "}\n"
-		<< linePrefix << "if (!*result)\n"
-		<< linePrefix << "	result = NULL;\n"
-		<< linePrefix << "return result;\n"
-	;
+	fp << " + 1;\n"
+	   << linePrefix << "}\n"
+	   << linePrefix << "if (!*result)\n"
+	   << linePrefix << "	result = NULL;\n"
+	   << linePrefix << "return result;\n";
 }
 
 

@@ -41,7 +41,8 @@ function _listGitIgnoreInPath(absPath: string): {string...} {
 		lines = lines.read().decode("utf-8").splitlines(false);
 		lines = List(for (local l: lines.each.strip().strip("/"))
 			if (l && !l.startswith("#"))
-				l);
+				l
+		);
 	} else {
 		lines = {};
 	}

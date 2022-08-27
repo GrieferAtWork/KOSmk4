@@ -50,16 +50,14 @@ function getRequirementsForCases(
 		return none;
 	if (#commonConditions == 1)
 		return commonConditions.first;
-	return f"({
-		') || ('.join(commonConditions.sorted())
-	})";
+	return f"({") || (".join(commonConditions.sorted())})";
 }
 
 function fixExpression(expr: string, indent: string): string {
 	return expr
 		.unifylines()
 		.strip()
-		.replace("\n","\n" + indent);
+		.replace("\n", f"\n{indent}");
 }
 
 
@@ -92,62 +90,50 @@ handle_single_case:
 		if (cond && (parentCommonCC !is none && cond == parentCommonCC))
 			cond = none;
 		if (cond)
-			print "#if",cond;
+			print("#if ", cond);
 		if (name) {
-			print indent,;
-			print "if (",;
+			print(indent, "if ("),;
 			for (local i, ch: util.enumerate(name)) {
 				if (i) {
-					print " &&",;
+					print(" &&"),;
 					if ((i % 3) == 0) {
 						print;
-						print indent,;
-						print "    ",;
+						print(indent, "    "),;
 					} else {
-						print " ",;
+						print(" "),;
 					}
 				}
-				print strExpr,;
-				print "[",;
-				print strOffset + i,;
-				print "] == '",;
-				print ch.encode("c-escape"),;
-				print "'",;
+				print(strExpr, "[", strOffset + i, "] == '", ch.encode("c-escape"), "'"),;
 			}
-			print ") {";
+			print(") {");
 			indent = indent + "\t";
 		}
-		print indent,;
-		print "/* case",repr((prefix + name).rstrip("\0")) + ": ... */";
-		print indent,;
-		print fixExpression(expr, indent);
+		print(indent, "/* case",
+		      repr((prefix + name).rstrip("\0")), ": ... */",
+		      indent, fixExpression(expr, indent));
 		if (name) {
 			indent = indent[:-1];
 			print indent,;
 			if (defaultCase !is none) {
 				if (cond) {
-					print "} else";
-					print "#endif /*",cond,"*/";
-					print indent,;
-					print "{";
+					print("} else");
+					print("#endif /* ", cond, " */");
+					print(indent, "{");
 				} else {
-					print "} else {";
+					print("} else {");
 				}
 				indent = indent + "\t";
-				print indent,;
-				print "/* default: ... */";
-				print indent,;
-				print fixExpression(defaultCase, indent);
+				print(indent, "/* default: ... */");
+				print(indent, fixExpression(defaultCase, indent));
 				indent = indent[:-1];
-				print indent,;
-				print "}";
+				print(indent, "}");
 				return;
 			} else {
-				print "}";
+				print("}");
 			}
 		}
 		if (cond)
-			print "#endif /*",cond,"*/";
+			print("#endif /* ", cond, " */");
 		return;
 	}
 	local firstChars: {string: Dict} = Dict();
@@ -170,27 +156,19 @@ handle_single_case:
 		parentCommonCC = getRequirementsForCases(cases);
 		if (parentCommonCC) {
 			isPrimaryCommonCC = true;
-			print "#if",parentCommonCC;
+			print("#if ", parentCommonCC);
 		}
 	}
 	if (#firstCharsSorted >= USE_SWITCH_THRESHOLD) {
-		print indent,;
-		print "switch (",;
-		print strExpr,;
-		print "[",;
-		print strOffset + 0,;
-		print "]) {";
+		print(indent, "switch (", strExpr, "[", strOffset + 0, "]) {");
 		for (local ch: firstCharsSorted) {
 			local ch_cases = firstChars[ch];
 			assert ch_cases;
 			print;
 			local commonCC = getRequirementsForCases(ch_cases);
 			if (commonCC)
-				print "#if",commonCC;
-			print indent,;
-			print "case '",;
-			print ch.encode("c-escape"),;
-			print "':";
+				print("#if ", commonCC);
+			print(indent, "case '", ch.encode("c-escape"), "':");
 			stringSwitch(
 				strExpr:        strExpr,
 				cases:          ch_cases,
@@ -199,28 +177,21 @@ handle_single_case:
 				prefix:         prefix + ch,
 				strOffset:      strOffset + 1,
 				parentCommonCC: commonCC ? commonCC : parentCommonCC);
-			print indent,;
-			print "\tbreak;";
+			print(indent, "\tbreak;");
 			if (commonCC)
-				print "#endif /*",commonCC,"*/";
+				print("#endif /* ", commonCC, " */");
 		}
 		if (defaultCase !is none) {
-			print indent,;
-			print "default:";
+			print(indent, "default:");
 			indent = indent + "\t";
-			print indent,;
-			print "/* default: ... */";
-			print indent,;
-			print fixExpression(defaultCase, indent);
-			print indent,;
-			print "break;";
+			print(indent, "/* default: ... */");
+			print(indent, fixExpression(defaultCase, indent));
+			print(indent, "break;");
 			indent = indent[:-1];
 		} else {
-			print indent,;
-			print "default: break;";
+			print(indent, "default: break;");
 		}
-		print indent,;
-		print "}";
+		print(indent, "}");
 	} else {
 		local next_needs_indent = true;
 		for (local i, ch: util.enumerate(firstCharsSorted)) {
@@ -229,20 +200,15 @@ handle_single_case:
 			assert ch_cases;
 			local commonCC = getRequirementsForCases(ch_cases);
 			if (commonCC)
-				print "#if",commonCC;
+				print("#if ", commonCC);
 			if (next_needs_indent) {
-				print indent,;
+				print(indent),;
 				next_needs_indent = false;
 			} else {
-				print " ",;
+				print(" "),;
 			}
-			print "if (",;
-			print strExpr,;
-			print "[",;
-			print strOffset + 0,;
-			print "] == '",;
-			print ch.encode("c-escape"),;
-			print "') {";
+			print("if (", strExpr, "[", strOffset + 0, "] == '",
+			      ch.encode("c-escape"), "') {");
 			stringSwitch(
 				strExpr:        strExpr,
 				cases:          ch_cases,
@@ -251,38 +217,34 @@ handle_single_case:
 				prefix:         prefix + ch,
 				strOffset:      strOffset + 1,
 				parentCommonCC: commonCC ? commonCC : parentCommonCC);
-			print indent,;
-			print "}",;
+			print(indent, "}"),;
 			if (!is_last) {
-				print " else",;
+				print(" else"),;
 			} else if (defaultCase !is none) {
 				if (commonCC) {
-					print " else";
-					print "#endif /*",commonCC,"*/";
+					print(" else");
+					print("#endif /* ", commonCC, " */");
 					commonCC = none;
-					print indent,;
-					print "{";
+					print(indent, "{");
 				} else {
-					print " else {";
+					print(" else {");
 				}
 				indent = indent + "\t";
-				print indent,;
-				print "/* default: ... */";
-				print fixExpression(defaultCase, indent);
+				print(indent, "/* default: ... */");
+				print(fixExpression(defaultCase, indent));
 				indent = indent[:-1];
-				print indent,;
-				print "}";
+				print(indent, "}");
 			} else {
 				print;
 			}
 			if (commonCC) {
 				if (!is_last)
 					print;
-				print "#endif /*",commonCC,"*/";
+				print("#endif /* ", commonCC, " */");
 				next_needs_indent = true;
 			}
 		}
 	}
 	if (isPrimaryCommonCC)
-		print "#endif /*",parentCommonCC,"*/";
+		print("#endif /* ", parentCommonCC, " */");
 }

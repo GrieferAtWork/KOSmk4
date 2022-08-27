@@ -39,10 +39,10 @@ function processX86AssemblyBodyLines(body: string, is386: bool): {string...} {
 		local strippedLine = line.strip();
 		if (strippedLine.startswith("#if")) {
 			local isX64 = {
-				"#ifdef __x86_64__" : true,
+				"#ifdef __x86_64__"  : true,
 				"#ifndef __x86_64__" : false,
-				"#ifdef __i386__" : false,
-				"#ifndef __i386__" : true,
+				"#ifdef __i386__"    : false,
+				"#ifndef __i386__"   : true,
 			}.get(strippedLine);
 			if (context != CONTEXT_NORMAL)
 				throw Error("#if.. directive in invalid context: " + repr strippedLine);
@@ -85,14 +85,14 @@ function processX86AssemblyBody(body: string, is386: bool): string {
 function main(parser: Autom8Parser, body: string) {
 	body = body.lstrip();
 	if (!body.startswith("{"))
-		throw Error("Expected '{' after '[[[cfi', but got " + repr body);
+		throw Error(f"Expected '\{' after '[[[cfi', but got {repr body}");
 	local i = 1;
 	local arch = none;
 	local register = none;
 	local mode = none;
 	for (;;) {
 		if (i >= #body)
-			throw Error("Unmatched '{' after '[[[cfi{' in " + repr body);
+			throw Error(f"Unmatched '\{' after '[[[cfi\{' in {repr body}");
 		if (body[i] == "}") {
 			++i;
 			break;
@@ -102,7 +102,7 @@ function main(parser: Autom8Parser, body: string) {
 			continue;
 		}
 		if (!body.issymstrt(i))
-			throw Error("Expected keyword after [[[cfi{, but got " + repr body[i]);
+			throw Error(f"Expected keyword after [[[cfi\{, but got {repr body[i]}");
 		local kwdStart = i;
 		do {
 			++i;
@@ -111,20 +111,20 @@ function main(parser: Autom8Parser, body: string) {
 		while (i < #body && body.isspace(i))
 			++i;
 		if (i >= #body || body[i] !in ":=")
-			throw Error("Expected ':' or '=' after [[[cfi{" + kwd);
+			throw Error(f"Expected ':' or '=' after [[[cfi\{{kwd}");
 		do {
 			++i;
 		} while (i < #body && body.isspace(i));
 		if (i >= #body || body[i] !in "\"\'")
-			throw Error("Expected '\\\'' or '\"' after [[[cfi{" + kwd + "=");
+			throw Error(f"Expected '\\\'' or '\"' after [[[cfi\{{kwd}=");
 		local endCh = body[i];
 		++i;
 		local valueStart = i;
 		for (;;) {
 			if (i >= #body)
-				throw Error("Unmatched " + repr endCh + " in " + repr body);
+				throw Error(f"Unmatched {repr endCh} in {repr body}");
 			local ch = body[i];
-			if (ch == "\\") {
+			if (ch == r"\") {
 				i += 2;
 				continue;
 			} else if (ch == endCh) {
@@ -135,11 +135,11 @@ function main(parser: Autom8Parser, body: string) {
 		}
 		local value = body[valueStart:i].decode("c-escape");
 		switch (kwd) {
-		case "arch": arch = value; break;
+		case "arch":     arch = value; break;
 		case "register": register = value; break;
-		case "mode": mode = value; break;
+		case "mode":     mode = value; break;
 		default:
-			throw Error("Unknown attribute: " + repr kwd);
+			throw Error(f"Unknown attribute: {repr kwd}");
 		}
 		do {
 			++i;
@@ -169,16 +169,16 @@ function main(parser: Autom8Parser, body: string) {
 				 *       must be the arch our caller is referring to. */
 			}
 			if (arch is none)
-				throw Error("Attribute 'arch' not set by " + repr body[:i]);
+				throw Error(f"Attribute 'arch' not set by {repr body[:i]}");
 		}
 	}
 	if (register is none)
-		throw Error("Attribute 'register' not set by " + repr body[:i]);
+		throw Error(f"Attribute 'register' not set by {repr body[:i]}");
 	body = body[i:];
 	local autoEnd = parser.text.find("/*[[[end]]]*/", parser.commentEnd);
 	if (autoEnd < 0)
 		parser.errAt(parser.commentStart, "Missing /*[[[end]]]*/ tag");
-	parser.newText << parser.text[parser.flushStart:parser.commentEnd+2] << "\n";
+	parser.newText << parser.text[parser.flushStart:parser.commentEnd + 2] << "\n";
 	parser.flushStart = autoEnd + 13;
 
 	/* Generate CFI instrumentation */

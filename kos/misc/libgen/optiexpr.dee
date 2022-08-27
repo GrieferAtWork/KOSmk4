@@ -67,9 +67,9 @@ done:
 function equalPPBranches(a: Object, b: Object): bool {
 	if (type(a) !== type(b))
 		return false;
-	if (type(a) == PPBranchNot)
+	if (type(a) === PPBranchNot)
 		return equalPPBranches(a.branch, b.branch);
-	if (type(a) == PPBranchOr || type(a) == PPBranchAnd) {
+	if (type(a) === PPBranchOr || type(a) === PPBranchAnd) {
 		local ca = a.conditions;
 		local cb = b.conditions;
 		if (#ca != #cb)
@@ -284,9 +284,11 @@ function removeDuplicatePPBranches(b: {Object...}): {Object...} {
 
 
 class PPBranchNot: PPBranch {
-	member branch: Object;
 	this = default;
-	operator str() {
+
+	public member branch: Object;
+
+	public operator str() {
 		if (branch is PPBranchAnd || branch is PPBranchOr)
 			return f"!({branch})";
 		return "!" + branch;
@@ -294,14 +296,17 @@ class PPBranchNot: PPBranch {
 }
 
 class PPBranchAnd: PPBranch {
-	member conditions: {Object...};
 	this(branches: {Object...}) {
 		conditions = List(branches);
 	}
-	operator repr() {
+
+	public member conditions: {Object...};
+
+	public operator repr() {
 		return f"PPBranchAnd({repr conditions})";
 	}
-	operator str() {
+
+	public operator str() {
 		File.Writer fp;
 		local isFirst = true;
 		for (local x: conditions) {
@@ -316,7 +321,8 @@ class PPBranchAnd: PPBranch {
 		}
 		return fp.string;
 	}
-	optimize() {
+
+	public function optimize() {
 		/* Optimize inner branches. */
 		for (local i = 0; i < #conditions; ++i) {
 			conditions[i] = optimizePPBranch(conditions[i]);
@@ -365,14 +371,17 @@ again_conditions_i:
 }
 
 class PPBranchOr: PPBranch {
-	member conditions: {Object...};
 	this(branches: {Object...}) {
 		conditions = List(branches);
 	}
-	operator repr() {
+
+	public member conditions: {Object...};
+
+	public operator repr() {
 		return f"PPBranchOr({repr conditions})";
 	}
-	operator str() {
+
+	public operator str() {
 		File.Writer fp;
 		local isFirst = true;
 		for (local x: conditions) {
@@ -387,7 +396,8 @@ class PPBranchOr: PPBranch {
 		}
 		return fp.string;
 	}
-	optimize() {
+
+	public function optimize() {
 		/* Optimize branches. */
 		for (local i = 0; i < #conditions; ++i) {
 			conditions[i] = optimizePPBranch(conditions[i]);
@@ -435,17 +445,19 @@ again_conditions_i:
 }
 
 class PPBranchParser {
-	member expr: string;
-	member tok: string;
-	member pos: int;
-	member end: int;
 	this(expr: string) {
 		this.expr = expr;
 		this.pos = 0;
 		this.end = #expr;
 		this.tok = "";
 	}
-	next(): string {
+
+	public member expr: string;
+	public member tok: string;
+	public member pos: int;
+	public member end: int;
+
+	public function next(): string {
 		while (pos < end && expr.isspace(pos))
 			++pos;
 		if (pos >= end) {
@@ -657,7 +669,7 @@ function wrapProcessorExpressionForIf(expr: string): string {
 		if (temp.startswith("defined")) {
 			temp = temp[7:].lstrip();
 			if (temp.startswith("(") && temp.endswith(")") &&
-				temp.findmatch("(", ")", 1) == #temp - 1)
+			    temp.findmatch("(", ")", 1) == #temp - 1)
 				return "#ifndef " + temp[1:-1].strip();
 		}
 	}
@@ -666,8 +678,7 @@ function wrapProcessorExpressionForIf(expr: string): string {
 
 function optimizeAndWrapProcessorExpressionForIf(expr: string): string {
 	return wrapProcessorExpressionForIf(
-		optimizePreprocessorExpression(
-			expr));
+		optimizePreprocessorExpression(expr));
 }
 
 assert optimizePreprocessorExpression("!a && (a || a)") == "0";

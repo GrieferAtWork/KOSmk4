@@ -101,7 +101,7 @@ global final ARCH = Architecture(
 		"kos/include/i386-kos/kos/kernel/bits/fpu-state32.h",
 		"kos/include/i386-kos/kos/kernel/bits/gdb-cpu-state32.h",
 		"kos/include/i386-kos/kos/kernel/x86/gdt.h",
-		"kos/include/i386-kos/kos/kernel/paging.h",
+		"kos/include/i386-kos/kos/kernel/asm/paging.h",
 		"kos/include/i386-kos/kos/kernel/x86/segment.h",
 		"kos/include/i386-kos/kos/kernel/x86/tss32.h",
 		"kos/include/asm/os/sigset.h",

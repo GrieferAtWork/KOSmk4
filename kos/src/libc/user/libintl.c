@@ -76,8 +76,6 @@ DECL_BEGIN
 
 
 /*[[[deemon
-local offset = 0;
-
 // Supported categories
 local CATEGORIES = {
 	"LC_CTYPE",
@@ -91,6 +89,7 @@ local CATEGORIES = {
 
 local longest_catname_len = CATEGORIES.each.length > ...;
 print("PRIVATE ATTR_SECTION(\".rodata.crt.i18n\") char const category_names[] =");
+local offset = 0;
 for (local name: CATEGORIES) {
 	if (offset) {
 		print(repr("\0" + name));

@@ -131,8 +131,7 @@ function joinpath(paths...: string): string {
 #ifdef __WINDOWS__
 		.replace("\\", "/")
 #endif /* __WINDOWS__ */
-		.lsstrip("./")
-	;
+		.lsstrip("./");
 }
 
 @@Returns the .latest-name of `filename':

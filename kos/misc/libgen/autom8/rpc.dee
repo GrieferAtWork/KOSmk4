@@ -126,11 +126,13 @@ function main(parser: Autom8Parser, body: string) {
 		if (mode == "default" || mode == "bytes") {
 			parser.newText << "\t" << ",\n\t".join(
 				for (local line: bytes.segments(16))
-					",".join(line)) << "\n";
+					",".join(line)
+			) << "\n";
 		} else if (mode == "asm") {
 			parser.newText << "\t.byte " << ",\n\t".join(
 				for (local line: bytes.segments(16))
-					",".join(line)) << "\n";
+					",".join(line)
+			) << "\n";
 		} else if (mode.startswith("macro:")) {
 			local macroName = mode[6:];
 			if (!macroName.issymbol())
@@ -138,7 +140,8 @@ function main(parser: Autom8Parser, body: string) {
 			parser.newText << "#define " << macroName << " \\\n";
 			parser.newText << "\t" << ",\\\n\t".join(
 				for (local line: bytes.segments(16))
-					",".join(line)) << "\n";
+					",".join(line)
+			) << "\n";
 		} else {
 			throw Error("Unsupported RPC mode: " + repr mode);
 		}

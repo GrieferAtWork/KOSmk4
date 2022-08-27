@@ -53,7 +53,7 @@ class fdirent_hash {
 		for (local x: values) {
 			if (common != x) {
 				return f"FDIRENT_HASH_INIT({
-					', '.join(values.each.hex())
+					", ".join(values.each.hex())
 				})";
 			}
 		}

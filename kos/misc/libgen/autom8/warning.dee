@@ -50,9 +50,9 @@ function operator_push_ignored(fp: File, arg: string) {
 	WARNINGS_STACK.append(warningName);
 	local expr = getPpCondForCompilerWarningSupport(warningName);
 	fp << optimizeForIfdef(expr)
-		<< "#pragma GCC diagnostic push\n"
-		<< "#pragma GCC diagnostic ignored " << repr(warningName) << "\n"
-		<< optimizeForEndif(expr);
+	   << "#pragma GCC diagnostic push\n"
+	   << "#pragma GCC diagnostic ignored " << repr(warningName) << "\n"
+	   << optimizeForEndif(expr);
 }
 
 function operator_pop(fp: File, arg: string) {
@@ -63,8 +63,8 @@ function operator_pop(fp: File, arg: string) {
 	local warningName = WARNINGS_STACK.popback();
 	local expr = getPpCondForCompilerWarningSupport(warningName);
 	fp << optimizeForIfdef(expr)
-		<< "#pragma GCC diagnostic pop\n"
-		<< optimizeForEndif(expr);
+	   << "#pragma GCC diagnostic pop\n"
+	   << optimizeForEndif(expr);
 }
 
 function operator_warn(fp: File, body: string, error: bool = false) {
@@ -80,15 +80,15 @@ function operator_warn(fp: File, body: string, error: bool = false) {
 	if ("\n" in body)
 		body = "\\\n" + body;
 	body = f'"{body}"';
-	fp << "#ifndef __NO_WARNINGS\n";
-	fp << "#ifdef __PREPROCESSOR_HAVE_WARNING\n";
-	fp << "#warning " << body << "\n";
-	fp << "#elif defined(__PREPROCESSOR_HAVE_PRAGMA_WARNING)\n";
-	fp << "#pragma warning(" << body << ")\n";
+	fp << "#ifndef __NO_WARNINGS\n"
+	      "#ifdef __PREPROCESSOR_HAVE_WARNING\n"
+	      "#warning " << body << "\n"
+	      "#elif defined(__PREPROCESSOR_HAVE_PRAGMA_WARNING)\n"
+	      "#pragma warning(" << body << ")\n";
 	if (error) {
-		fp << "#else /* ... */\n";
-		fp << "#error " << body << "\n";
-		fp << "#endif /* !... */\n";
+		fp << "#else /* ... */\n"
+		      "#error " << body << "\n"
+		      "#endif /* !... */\n";
 	} else {
 		fp << "#endif /* ... */\n";
 	}
