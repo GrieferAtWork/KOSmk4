@@ -23,16 +23,60 @@
 #include <__stdinc.h>
 #include <__crt.h>
 
-#if defined(__CRT_KOS) || defined(__CRT_GLC)
+#if defined(__CRT_CYG) || defined(__CRT_NEWLIB)
+#define __M_TRIM_THRESHOLD (-1)
+#define __M_TOP_PAD        (-2)
+#define __M_MMAP_THRESHOLD (-3)
+#define __M_MMAP_MAX       (-4)
+#elif defined(__CRT_LIBC6)
+#define __M_TRIM_THRESHOLD (-1)
+#define __M_TOP_PAD        (-2)
+#define __M_MMAP_THRESHOLD (-3)
+#define __M_MMAP_MAX       (-4)
+#define __M_CHECK_ACTION   (-5)
+#define __M_PERTURB        (-6)
+#define __M_ARENA_TEST     (-7)
+#define __M_ARENA_MAX      (-8)
+#elif defined(__CRT_uCLIBC)
+#define __M_MXFAST         1
+#define __M_NLBLKS         2
+#define __M_GRAIN          3
+#define __M_KEEP           4
+#define __M_TRIM_THRESHOLD (-1)
+#define __M_TOP_PAD        (-2)
+#define __M_MMAP_THRESHOLD (-3)
+#define __M_MMAP_MAX       (-4)
+#define __M_CHECK_ACTION   (-5)
+#define __M_PERTURB        (-6)
+#elif defined(__CRT_KOS) || defined(__CRT_GLC) || defined(__KOS__)
 /* malloc behavior attributes. */
 #ifndef __clang_tidy__
 #define __MALLOC_ZERO_IS_NONNULL  1
 #define __REALLOC_ZERO_IS_NONNULL 1
 #endif /* !__clang_tidy__ */
 
-#define __M_TRIM_THRESHOLD     (-1)
-#define __M_GRANULARITY        (-2)
-#define __M_MMAP_THRESHOLD     (-3)
-#endif /* __CRT_KOS || __CRT_GLC */
+/* Options for `mallopt(3)' */
+#define __M_MXFAST         1 /* XXX: Not implemented on KOS */
+#define __M_NLBLKS         2 /* XXX: Not implemented on KOS */
+#define __M_GRAIN          3 /* XXX: Not implemented on KOS */
+#define __M_KEEP           4 /* XXX: Not implemented on KOS */
+#define __M_TRIM_THRESHOLD (-1)
+#define __M_TOP_PAD        (-2) /* XXX: Not implemented on KOS */
+#define __M_MMAP_THRESHOLD (-3)
+#define __M_MMAP_MAX       (-4) /* XXX: Not implemented on KOS */
+#define __M_CHECK_ACTION   (-5) /* XXX: Not implemented on KOS */
+#define __M_PERTURB        (-6) /* XXX: Not implemented on KOS */
+#define __M_ARENA_TEST     (-7) /* XXX: Not implemented on KOS */
+#define __M_ARENA_MAX      (-8) /* XXX: Not implemented on KOS */
+#if defined(__CRT_KOS) || defined(__KOS__)
+#define __M_GRANULARITY (-101)
+#endif /* __CRT_KOS || __KOS__ */
+#elif defined(__solaris__)
+#define __M_MXFAST 1
+#define __M_NLBLKS 2
+#define __M_GRAIN  3
+#define __M_KEEP   4
+#endif /* ... */
+
 
 #endif /* !_ASM_CRT_MALLOC_H */

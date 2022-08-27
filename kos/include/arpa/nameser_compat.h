@@ -17,6 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/arpa/nameser_compat.h) */
+/* (#) Portability: FreeBSD       (/include/arpa/nameser_compat.h) */
+/* (#) Portability: GNU C Library (/resolv/arpa/nameser_compat.h) */
+/* (#) Portability: NetBSD        (/include/arpa/nameser_compat.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/arpa/nameser_compat.h) */
+/* (#) Portability: libc6         (/include/arpa/nameser_compat.h) */
+/* (#) Portability: musl libc     (/include/arpa/nameser_compat.h) */
+/* (#) Portability: uClibc        (/include/arpa/nameser_compat.h) */
 #ifndef _ARPA_NAMESER_COMPAT_H
 #define _ARPA_NAMESER_COMPAT_H 1
 

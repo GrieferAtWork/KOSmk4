@@ -17,6 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/arpa/ftp.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/arpa/ftp.h) */
+/* (#) Portability: FreeBSD       (/include/arpa/ftp.h) */
+/* (#) Portability: GNU C Library (/inet/arpa/ftp.h) */
+/* (#) Portability: NetBSD        (/include/arpa/ftp.h) */
+/* (#) Portability: OpenBSD       (/include/arpa/ftp.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/arpa/ftp.h) */
+/* (#) Portability: libc4/5       (/include/arpa/ftp.h) */
+/* (#) Portability: libc6         (/include/arpa/ftp.h) */
+/* (#) Portability: mintlib       (/include/arpa/ftp.h) */
+/* (#) Portability: musl libc     (/include/arpa/ftp.h) */
+/* (#) Portability: uClibc        (/include/arpa/ftp.h) */
 #ifndef _ARPA_FTP_H
 #define _ARPA_FTP_H 1
 

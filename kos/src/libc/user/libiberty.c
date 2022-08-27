@@ -73,7 +73,7 @@ INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.libiberty") void
 }
 
 /*[[[skip:libc_xmalloc_failed]]]*/
-INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_NORETURN void
+INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.libiberty") void
 (LIBCCALL libc_xmalloc_failed)(size_t num_bytes) THROWS(...) {
 	void (LIBCCALL *pdyn_xmalloc_failed)(size_t num_bytes);
 	/* Allow the hosting program to define its own `xmalloc_failed()'

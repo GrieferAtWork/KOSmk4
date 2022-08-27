@@ -130,6 +130,7 @@
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
+#include <asm/crt/malloc.h>
 #include <asm/pagesize.h>
 #include <bits/crt/mallinfo.h>
 #include <kos/config/config.h> /* Pull in config-specific macro overrides */
@@ -316,6 +317,11 @@ struct mallinfo libc_mallinfo_int(void) {
 #define mallinfo mallinfo2
 #define STRUCT_MALLINFO_DECLARED
 #define MALLINFO_FIELD_TYPE size_t
+
+/* Override the command IDs used by `mallopt(3)' */
+#define M_TRIM_THRESHOLD __M_TRIM_THRESHOLD
+#define M_GRANULARITY    __M_GRANULARITY
+#define M_MMAP_THRESHOLD __M_MMAP_THRESHOLD
 
 DECL_END
 

@@ -17,6 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Cygwin        (/winsup/cygwin/include/arpa/telnet.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/arpa/telnet.h) */
+/* (#) Portability: FreeBSD       (/include/arpa/telnet.h) */
+/* (#) Portability: GNU C Library (/inet/arpa/telnet.h) */
+/* (#) Portability: NetBSD        (/include/arpa/telnet.h) */
+/* (#) Portability: OpenBSD       (/include/arpa/telnet.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/arpa/telnet.h) */
+/* (#) Portability: libc4/5       (/include/arpa/telnet.h) */
+/* (#) Portability: libc6         (/include/arpa/telnet.h) */
+/* (#) Portability: mintlib       (/include/arpa/telnet.h) */
+/* (#) Portability: musl libc     (/include/arpa/telnet.h) */
+/* (#) Portability: uClibc        (/include/arpa/telnet.h) */
 #ifndef _ARPA_TELNET_H
 #define _ARPA_TELNET_H 1
 

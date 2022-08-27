@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf238bd41 */
+/* HASH CRC-32:0x48d68b8d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,16 +57,46 @@
 #endif /* !__cplusplus */
 #endif /* __USE_KOS && __USE_STRING_OVERLOADS */
 
-
-#ifdef __M_TRIM_THRESHOLD
+/* Options for `mallopt(3)' */
+#if !defined(M_MXFAST) && defined(__M_MXFAST)
+#define M_MXFAST __M_MXFAST
+#endif /* !M_MXFAST && __M_MXFAST */
+#if !defined(M_NLBLKS) && defined(__M_NLBLKS)
+#define M_NLBLKS __M_NLBLKS
+#endif /* !M_NLBLKS && __M_NLBLKS */
+#if !defined(M_GRAIN) && defined(__M_GRAIN)
+#define M_GRAIN __M_GRAIN
+#endif /* !M_GRAIN && __M_GRAIN */
+#if !defined(M_KEEP) && defined(__M_KEEP)
+#define M_KEEP __M_KEEP
+#endif /* !M_KEEP && __M_KEEP */
+#if !defined(M_TRIM_THRESHOLD) && defined(__M_TRIM_THRESHOLD)
 #define M_TRIM_THRESHOLD __M_TRIM_THRESHOLD
-#endif /* __M_TRIM_THRESHOLD */
-#ifdef __M_GRANULARITY
+#endif /* !M_TRIM_THRESHOLD && __M_TRIM_THRESHOLD */
+#if !defined(M_GRANULARITY) && defined(__M_GRANULARITY)
 #define M_GRANULARITY __M_GRANULARITY
-#endif /* __M_GRANULARITY */
-#ifdef __M_MMAP_THRESHOLD
+#endif /* !M_GRANULARITY && __M_GRANULARITY */
+#if !defined(M_MMAP_THRESHOLD) && defined(__M_MMAP_THRESHOLD)
 #define M_MMAP_THRESHOLD __M_MMAP_THRESHOLD
-#endif /* __M_MMAP_THRESHOLD */
+#endif /* !M_MMAP_THRESHOLD && __M_MMAP_THRESHOLD */
+#if !defined(M_TOP_PAD) && defined(__M_TOP_PAD)
+#define M_TOP_PAD __M_TOP_PAD
+#endif /* !M_TOP_PAD && __M_TOP_PAD */
+#if !defined(M_MMAP_MAX) && defined(__M_MMAP_MAX)
+#define M_MMAP_MAX __M_MMAP_MAX
+#endif /* !M_MMAP_MAX && __M_MMAP_MAX */
+#if !defined(M_CHECK_ACTION) && defined(__M_CHECK_ACTION)
+#define M_CHECK_ACTION __M_CHECK_ACTION
+#endif /* !M_CHECK_ACTION && __M_CHECK_ACTION */
+#if !defined(M_PERTURB) && defined(__M_PERTURB)
+#define M_PERTURB __M_PERTURB
+#endif /* !M_PERTURB && __M_PERTURB */
+#if !defined(M_ARENA_TEST) && defined(__M_ARENA_TEST)
+#define M_ARENA_TEST __M_ARENA_TEST
+#endif /* !M_ARENA_TEST && __M_ARENA_TEST */
+#if !defined(M_ARENA_MAX) && defined(__M_ARENA_MAX)
+#define M_ARENA_MAX __M_ARENA_MAX
+#endif /* !M_ARENA_MAX && __M_ARENA_MAX */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

@@ -31,6 +31,11 @@
  *   - __CRT_GLC          (linux / glibc.so)
  *   - __CRT_KOS          (kos / libc.so)
  *   - __CRT_KOS_KERNEL   (kos / kernel.bin)
+ * XXX: Sometimes referenced, but not fully implemented:
+ *   - __CRT_NEWLIB
+ *   - __CRT_LIBC45
+ *   - __CRT_LIBC6
+ *   - __CRT_uCLIBC
  */
 #if (!defined(__CRT_DOS) && !defined(__CRT_GLC) &&            \
      !defined(__CRT_KOS) && !defined(__CRT_CYG) &&            \

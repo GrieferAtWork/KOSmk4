@@ -17,6 +17,18 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: EMX kLIBC     (/libc/include/arpa/tftp.h) */
+/* (#) Portability: FreeBSD       (/include/arpa/tftp.h) */
+/* (#) Portability: GNU C Library (/inet/arpa/tftp.h) */
+/* (#) Portability: NetBSD        (/include/arpa/tftp.h) */
+/* (#) Portability: OpenBSD       (/include/arpa/tftp.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/arpa/tftp.h) */
+/* (#) Portability: diet libc     (/include/arpa/tftp.h) */
+/* (#) Portability: libc4/5       (/include/arpa/tftp.h) */
+/* (#) Portability: libc6         (/include/arpa/tftp.h) */
+/* (#) Portability: mintlib       (/include/arpa/tftp.h) */
+/* (#) Portability: musl libc     (/include/arpa/tftp.h) */
+/* (#) Portability: uClibc        (/include/arpa/tftp.h) */
 #ifndef _ARPA_TFTP_H
 #define _ARPA_TFTP_H 1
 
