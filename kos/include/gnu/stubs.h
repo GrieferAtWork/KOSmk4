@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35df3dfb */
+/* HASH CRC-32:0x84435401 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -114,7 +114,6 @@
 #define __stub_catclose
 #define __stub_catgets
 #define __stub_catopen
-#define __stub_clock
 #define __stub_clock_adjtime
 #define __stub_clock_adjtime64
 #define __stub___clock_getcpuclockid

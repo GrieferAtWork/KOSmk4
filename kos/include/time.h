@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6203ff */
+/* HASH CRC-32:0xe82ad8a7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,11 +65,12 @@ __NAMESPACE_STD_USING(time_t)
 #define __tm_defined
 __NAMESPACE_STD_USING(tm)
 #endif /* !__tm_defined */
-#ifdef __CRT_HAVE_clock
-__NAMESPACE_STD_USING(clock)
-#endif /* __CRT_HAVE_clock */
-#include <features.h>
+#include <asm/os/clock.h>
 #include <bits/types.h>
+#if defined(__CRT_HAVE_clock) || (defined(__CLOCK_PROCESS_CPUTIME_ID) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))) || defined(__CRT_HAVE_times) || defined(__CRT_HAVE___times) || defined(__CRT_HAVE___libc_times)
+__NAMESPACE_STD_USING(clock)
+#endif /* __CRT_HAVE_clock || (__CLOCK_PROCESS_CPUTIME_ID && (__CRT_HAVE_clock_gettime64 || __CRT_HAVE_clock_gettime || __CRT_HAVE___clock_gettime)) || __CRT_HAVE_times || __CRT_HAVE___times || __CRT_HAVE___libc_times */
+#include <features.h>
 #if defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 __NAMESPACE_STD_USING(time)
 #endif /* __CRT_HAVE_time64 || __CRT_HAVE__time64 || __CRT_HAVE_time || __CRT_HAVE___time || __CRT_HAVE___libc_time || __CRT_HAVE__time32 */
@@ -462,10 +463,20 @@ struct sigevent;
 #endif /* __USE_POSIX199309 */
 
 __NAMESPACE_STD_BEGIN
+#ifdef __CRT_HAVE_clock
 /* >> clock(3)
  * Time used by the program so  far (user time + system  time)
  * The `result / CLOCKS_PER_SECOND' is program time in seconds */
-__CDECLARE_OPT(__ATTR_WUNUSED,clock_t,__NOTHROW_NCX,clock,(void),())
+__CDECLARE(__ATTR_WUNUSED,clock_t,__NOTHROW_NCX,clock,(void),())
+#elif (defined(__CLOCK_PROCESS_CPUTIME_ID) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))) || defined(__CRT_HAVE_times) || defined(__CRT_HAVE___times) || defined(__CRT_HAVE___libc_times)
+__NAMESPACE_STD_END
+#include <libc/local/time/clock.h>
+__NAMESPACE_STD_BEGIN
+/* >> clock(3)
+ * Time used by the program so  far (user time + system  time)
+ * The `result / CLOCKS_PER_SECOND' is program time in seconds */
+__NAMESPACE_LOCAL_USING_OR_IMPL(clock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED clock_t __NOTHROW_NCX(__LIBCCALL clock)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clock))(); })
+#endif /* ... */
 #if defined(__CRT_HAVE_time) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> time(2), time64(2)
  * Return the current time and put it in `*timer' if `timer' is not `NULL' */
@@ -737,9 +748,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(timespec_get, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* __USE_ISOCXX17 */
 __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
-#ifdef __CRT_HAVE_clock
+#if defined(__CRT_HAVE_clock) || (defined(__CLOCK_PROCESS_CPUTIME_ID) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))) || defined(__CRT_HAVE_times) || defined(__CRT_HAVE___times) || defined(__CRT_HAVE___libc_times)
 __NAMESPACE_STD_USING(clock)
-#endif /* __CRT_HAVE_clock */
+#endif /* __CRT_HAVE_clock || (__CLOCK_PROCESS_CPUTIME_ID && (__CRT_HAVE_clock_gettime64 || __CRT_HAVE_clock_gettime || __CRT_HAVE___clock_gettime)) || __CRT_HAVE_times || __CRT_HAVE___times || __CRT_HAVE___libc_times */
 #if defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE___time) || defined(__CRT_HAVE___libc_time) || defined(__CRT_HAVE__time32)
 __NAMESPACE_STD_USING(time)
 #endif /* __CRT_HAVE_time64 || __CRT_HAVE__time64 || __CRT_HAVE_time || __CRT_HAVE___time || __CRT_HAVE___libc_time || __CRT_HAVE__time32 */

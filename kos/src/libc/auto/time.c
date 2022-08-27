@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67fc9201 */
+/* HASH CRC-32:0xa030056c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@
 #include "../user/stdio.h"
 #include "string.h"
 #include "../user/sys.time.h"
+#include "../user/sys.times.h"
 
 DECL_BEGIN
 
@@ -172,6 +173,29 @@ NOTHROW_NCX(LIBCCALL libc_normalize_struct_tm)(struct tm *__restrict tp) {
 		}
 	}
 	return tp;
+}
+#include <bits/os/timespec.h>
+#include <bits/os/tms.h>
+/* >> clock(3)
+ * Time used by the program so  far (user time + system  time)
+ * The `result / CLOCKS_PER_SECOND' is program time in seconds */
+INTERN ATTR_SECTION(".text.crt.time") WUNUSED clock_t
+NOTHROW_NCX(LIBCCALL libc_clock)(void) {
+	clock_t result;
+#ifdef __CLOCK_PROCESS_CPUTIME_ID
+	struct timespec64 ts;
+	if unlikely(libc_clock_gettime64(__CLOCK_PROCESS_CPUTIME_ID, &ts))
+		return -1;
+	result  = ts.tv_sec * __CLOCKS_PER_SEC;
+	result += ts.tv_nsec / (1000000000 / __CLOCKS_PER_SEC);
+#else /* __CLOCK_PROCESS_CPUTIME_ID */
+	struct tms ts;
+	if unlikely(libc_times(&ts))
+		return -1;
+	result  = ts.tms_utime;
+	result += ts.tms_stime;
+#endif /* !__CLOCK_PROCESS_CPUTIME_ID */
+	return result;
 }
 /* >> difftime(3), difftime64(3)
  * Return the difference between `time1' and `time0' */
@@ -1182,6 +1206,7 @@ NOTHROW_NCX(LIBCCALL libc__setsystime)(struct tm *tp,
 DECL_END
 
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(clock, libc_clock);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_difftime32, libc_difftime);
 #endif /* __LIBCCALL_IS_LIBDCALL */

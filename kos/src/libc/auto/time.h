@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98bec8d2 */
+/* HASH CRC-32:0x16d3397d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,10 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 INTDEF ATTR_RETNONNULL ATTR_INOUT(1) struct tm *NOTHROW_NCX(LIBCCALL libc_normalize_struct_tm)(struct tm *__restrict tp);
+/* >> clock(3)
+ * Time used by the program so  far (user time + system  time)
+ * The `result / CLOCKS_PER_SECOND' is program time in seconds */
+INTDEF WUNUSED clock_t NOTHROW_NCX(LIBCCALL libc_clock)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> time(2), time64(2)

@@ -114,18 +114,6 @@ NOTHROW_NCX(LIBCCALL libc_tzset)(void)
 /*[[[end:libc_tzset]]]*/
 
 
-/*[[[head:libc_clock,hash:CRC-32=0x4139ade9]]]*/
-/* >> clock(3)
- * Time used by the program so  far (user time + system  time)
- * The `result / CLOCKS_PER_SECOND' is program time in seconds */
-INTERN ATTR_SECTION(".text.crt.time") WUNUSED clock_t
-NOTHROW_NCX(LIBCCALL libc_clock)(void)
-/*[[[body:libc_clock]]]*/
-/*AUTO*/{
-	CRT_UNIMPLEMENTED("clock"); /* TODO */
-	return (clock_t)libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_clock]]]*/
 
 /*[[[head:libc_clock_adjtime,hash:CRC-32=0x1182d872]]]*/
 /* >> clock_adjtime(2), clock_adjtime64(2) */
@@ -560,8 +548,7 @@ NOTHROW_NCX(LIBCCALL libc_timer_settime64)(timer_t timerid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xafaf24ca]]]*/
-DEFINE_PUBLIC_ALIAS(clock, libc_clock);
+/*[[[start:exports,hash:CRC-32=0xd0579041]]]*/
 DEFINE_PUBLIC_ALIAS(__time, libc_time);
 DEFINE_PUBLIC_ALIAS(__libc_time, libc_time);
 #ifdef __LIBCCALL_IS_LIBDCALL

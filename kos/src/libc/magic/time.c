@@ -650,7 +650,28 @@ struct $tm *normalize_struct_tm([[inout]] struct $tm *__restrict tp) {
 @@>> clock(3)
 @@Time used by the program so  far (user time + system  time)
 @@The `result / CLOCKS_PER_SECOND' is program time in seconds
-[[std, wunused, decl_include("<bits/types.h>")]] clock_t clock();
+[[std, wunused, decl_include("<bits/types.h>")]]
+[[requires_include("<asm/os/clock.h>")]]
+[[requires((defined(__CLOCK_PROCESS_CPUTIME_ID) && $has_function(clock_gettime64)) ||
+           $has_function(times))]]
+[[impl_include("<bits/os/timespec.h>", "<bits/os/tms.h>")]]
+clock_t clock() {
+	clock_t result;
+@@pp_if defined(__CLOCK_PROCESS_CPUTIME_ID) && $has_function(clock_gettime64)@@
+	struct timespec64 ts;
+	if unlikely(clock_gettime64(__CLOCK_PROCESS_CPUTIME_ID, &ts))
+		return -1;
+	result  = ts.@tv_sec@ * __CLOCKS_PER_SEC;
+	result += ts.@tv_nsec@ / (1000000000 / __CLOCKS_PER_SEC);
+@@pp_else@@
+	struct tms ts;
+	if unlikely(times(&ts))
+		return -1;
+	result  = ts.@tms_utime@;
+	result += ts.@tms_stime@;
+@@pp_endif@@
+	return result;
+}
 
 @@>> time(2), time64(2)
 @@Return the current time and put it in `*timer' if `timer' is not `NULL'

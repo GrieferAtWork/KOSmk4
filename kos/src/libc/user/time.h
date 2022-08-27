@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f6070b1 */
+/* HASH CRC-32:0xde0c2f25 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,6 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* >> clock(3)
- * Time used by the program so  far (user time + system  time)
- * The `result / CLOCKS_PER_SECOND' is program time in seconds */
-INTDEF WUNUSED clock_t NOTHROW_NCX(LIBCCALL libc_clock)(void);
 /* >> time(2), time64(2)
  * Return the current time and put it in `*timer' if `timer' is not `NULL' */
 INTDEF ATTR_OUT_OPT(1) time_t NOTHROW_NCX(LIBCCALL libc_time)(time_t *timer);
