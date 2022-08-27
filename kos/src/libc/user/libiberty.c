@@ -46,10 +46,8 @@ char const *libc_xmalloc_program_name = NULL;
 INTERN ATTR_SECTION(".text.crt.libiberty") void
 NOTHROW_NCX(LIBCCALL libc_xmalloc_set_program_name)(char const *progname)
 /*[[[body:libc_xmalloc_set_program_name]]]*/
-/*AUTO*/{
-	(void)progname;
-	CRT_UNIMPLEMENTEDF("xmalloc_set_program_name(progname: %q)", progname); /* TODO */
-	libc_seterrno(ENOSYS);
+{
+	libc_xmalloc_program_name = progname;
 }
 /*[[[end:libc_xmalloc_set_program_name]]]*/
 

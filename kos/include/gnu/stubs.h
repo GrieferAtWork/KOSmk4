@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab15368e */
+/* HASH CRC-32:0x35df3dfb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -563,7 +563,6 @@
 #define __stub_uselocale
 #define __stub_utmpname
 #define __stub_utmpxname
-#define __stub_xmalloc_set_program_name
 #ifndef __COMPILER_NO_DOLLAR_IN_SYMBOL
 #define __stub_DOS$_W_Gettnames
 #define __stub_DOS$_Wcsftime
