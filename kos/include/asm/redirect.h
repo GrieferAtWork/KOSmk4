@@ -40,6 +40,10 @@
  * The caller must ensure that memory at `from_pc' is writable. */
 #define __arch_redirect(from_pc, to_pc) (void)0
 
+/* The actual number of bytes that will be overwritten  at
+ * `from_pc' in order to facilitate the injected redirect. */
+#define __arch_redirect_size(from_pc, to_pc) 0
+
 /* Check if redirection is possible; when not defined, redirection is always possible. */
 #define __arch_redirect_possible(from_pc, to_pc) 0
 

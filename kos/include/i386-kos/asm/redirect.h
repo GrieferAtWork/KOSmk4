@@ -23,7 +23,6 @@
 #include <__stdinc.h>
 
 #include <hybrid/__unaligned.h>
-#include <hybrid/limitcore.h>
 #include <hybrid/typecore.h>
 
 /* Max # of bytes which may be modified by `__arch_redirect()'
@@ -47,6 +46,7 @@
 	 __hybrid_unaligned_set32((__UINT32_TYPE__ *)((__BYTE_TYPE__ *)(from_pc) + 1), \
 	                          (__UINT32_TYPE__)(__INT32_TYPE__)(__INTPTR_TYPE__)   \
 	                          ((__BYTE_TYPE__ *)(to_pc) - ((__BYTE_TYPE__ *)(from_pc) + 5))))
+#define __arch_redirect_size(from_pc, to_pc) 5
 
 
 #ifdef __x86_64__
