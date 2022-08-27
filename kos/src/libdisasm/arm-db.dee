@@ -346,6 +346,12 @@ function compileDBInstruction(instr: Instruction): DBInstruction {
 		iRepr.append(suffix);
 		i = suffixEnd + 1;
 	}
+	if (display.startswith(".W", i)) {
+		iRepr.append("S_dW");
+		if ("S_dW" !in usedSuffixNames)
+			usedSuffixNames.append("S_dW");
+		i += 2;
+	}
 
 	while (i < len && display.isspace(i))
 		++i;
@@ -371,9 +377,16 @@ function compileDBInstruction(instr: Instruction): DBInstruction {
 				}
 			}	break;
 
+			case "mb_option":
+				operand = f"O_MB_OPTION_{instr.buildBitMatchString("Ii")}";
+				break;
+
 			case "imm":
 				/* ZeroExtend(imm*, 32); */
 				operand = f"O_IMM_{instr.buildBitMatchString("Ii")}";
+				if (operand == "O_IMM_") {
+					operand = f"O_IMMP1_{instr.buildBitMatchString("I+")}";
+				}
 				break;
 
 			case "imm0":
@@ -426,24 +439,24 @@ function compileDBInstruction(instr: Instruction): DBInstruction {
 				operand = f"O_DIS10_{instr.buildBitMatchString("Ii")}";
 				break;
 
-			case "ARMExpandImm(imm)":
+			case "ArmExpandImm(imm)":
 				operand = f"O_ARMEI_{instr.buildBitMatchString("Ii")}";
 				break;
 
-			case "ARMExpandImm_C(imm)":
+			case "ArmExpandImm_C(imm)":
 				operand = f"O_ARMEI_C_{instr.buildBitMatchString("Ii")}";
+				break;
+
+			case "ThumbExpandImm(imm)":
+				operand = f"O_THUMBEI_{instr.buildBitMatchString("Ii")}";
 				break;
 
 			case "ThumbExpandImm_C(imm)":
 				operand = f"O_THUMBEI_C_{instr.buildBitMatchString("Ii")}";
 				break;
 
-			case "ARMExpandImm_rel(imm)":
+			case "ArmExpandImm_rel(imm)":
 				operand = f"O_ARMEI_REL_{instr.buildBitMatchString("Ii")}";
-				break;
-
-			case "shift":
-				operand = f"O_SHIFT_{instr.buildBitMatchString("St")}";
 				break;
 
 			case "Ra":
@@ -452,27 +465,88 @@ function compileDBInstruction(instr: Instruction): DBInstruction {
 			case "Rn":
 			case "Rs":
 			case "Rt":
+			case "Rt2":
 			case "RdLo":
 			case "RdHi":
 				operand = {
-					"RdLo": "Rl",
-					"RdHi": "Rh",
+					"RdLo" : "Rl",
+					"RdHi" : "Rh",
+					"Rt2"  : "RT",
 				}.get(operand, operand);
 				operand = f"O_R_{instr.buildBitMatchString(operand)}";
 				break;
 
+			case "RtP1":
+				operand = f"O_RP1_{instr.buildBitMatchString("Rt")}";
+				break;
+
 			default:
-				operand = f"O_TODO({repr operand})";
+				operand = f"O_TO" f"DO({repr operand})";
 				break;
 			}
 			iRepr.append(operand);
 			if (operand !in usedOperandNames)
 				usedOperandNames.append(operand);
 			i = operandEnd + 1;
-		} else if (ch in ",{}" || ch.isspace()) {
-			/* Ignore */
-			++i;
 		} else {
+			switch (ch) {
+
+			case '+':
+				if (display.startswith("+/-", i)) {
+					i += 3;
+					local operand = f"O_PLUSMINUS_{instr.buildBitMatchString("Xu")}";
+					iRepr.append(operand);
+					if (operand !in usedOperandNames)
+						usedOperandNames.append(operand);
+					continue;
+				}
+				break;
+
+			case '{':
+				if (display.startswith("{!}", i)) {
+					i += 3;
+					iRepr.append("O_OPT_IA"); /* OPTional_IncrementAfter */
+					if ("O_OPT_IA" !in usedOperandNames)
+						usedOperandNames.append("O_OPT_IA");
+					continue;
+				}
+				if (display.startswith("{,<shift>}", i)) {
+					i += 10;
+					local operand = f"O_OPT_SHIFT_{instr.buildBitMatchString("St")}";
+					iRepr.append(operand);
+					if (operand !in usedOperandNames)
+						usedOperandNames.append(operand);
+					continue;
+				}
+				if (display.startswith("{,<rotation>}", i)) {
+					i += 13;
+					local operand = f"O_OPT_ROTATION_{instr.buildBitMatchString("Xr")}";
+					iRepr.append(operand);
+					if (operand !in usedOperandNames)
+						usedOperandNames.append(operand);
+					continue;
+				}
+				break;
+
+			case '#':
+				if (display.startswith("#+/-", i) ||
+				    display.startswith("#<imm", i) ||
+				    display.startswith("#<Simm", i) ||
+				    display.startswith("#<ThumbExpandImm", i) ||
+				    display.startswith("#<ArmExpandImm", i)) {
+					++i; /* Skip if '#' is followed by an imm-operand */
+					continue;
+				}
+				break;
+
+			default:
+				if (ch.isspace()) {
+			case ',':
+					++i;
+					continue;
+				}
+				break;
+			}
 			iRepr.append(f"'{ch}'");
 			++i;
 		}
