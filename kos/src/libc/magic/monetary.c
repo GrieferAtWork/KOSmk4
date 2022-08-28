@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/monetary.h) */
+/* (#) Portability: DragonFly BSD (/include/monetary.h) */
 /* (#) Portability: FreeBSD       (/include/monetary.h) */
 /* (#) Portability: GNU C Library (/stdlib/monetary.h) */
 /* (#) Portability: NetBSD        (/include/monetary.h) */

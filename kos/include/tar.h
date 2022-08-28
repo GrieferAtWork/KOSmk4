@@ -19,6 +19,7 @@
  */
 /* (>) Standard: POSIX.1c (Issue 3, IEEE Std 1003.1c-1995) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/tar.h) */
+/* (#) Portability: DragonFly BSD (/include/tar.h) */
 /* (#) Portability: FreeBSD       (/include/tar.h) */
 /* (#) Portability: GNU C Library (/posix/tar.h) */
 /* (#) Portability: NetBSD        (/include/tar.h) */

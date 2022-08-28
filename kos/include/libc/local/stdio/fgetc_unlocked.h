@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x973487b */
+/* HASH CRC-32:0xcb9e33b7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #ifndef __local_fgetc_unlocked_defined
 #define __local_fgetc_unlocked_defined
 #include <__crt.h>
-#if (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
+#if (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow) || defined(__CRT_HAVE___srget))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep__filbuf_defined
@@ -32,6 +32,8 @@ __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep__filbuf,(__FILE *__restric
 __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep__filbuf,(__FILE *__restrict __stream),__uflow,(__stream))
 #elif defined(__CRT_HAVE___underflow)
 __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep__filbuf,(__FILE *__restrict __stream),__underflow,(__stream))
+#elif defined(__CRT_HAVE___srget)
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep__filbuf,(__FILE *__restrict __stream),__srget,(__stream))
 #else /* ... */
 #undef __local___localdep__filbuf_defined
 #endif /* !... */
@@ -68,21 +70,21 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fgetc_unlocked) __ATTR_INOUT(1) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fgetc_unlocked))(__FILE *__restrict __stream) __THROWS(...) {
-#if defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow))
+#if defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow) || defined(__CRT_HAVE___srget))
 	return --__stream->__f_cnt >= 0 ? (int)((__UINT8_TYPE__)*__stream->__f_ptr++) : (__NAMESPACE_LOCAL_SYM __localdep__filbuf)(__stream);
-#else /* __CRT_DOS && (__CRT_HAVE__filbuf || __CRT_HAVE___uflow || __CRT_HAVE___underflow) */
+#else /* __CRT_DOS && (__CRT_HAVE__filbuf || __CRT_HAVE___uflow || __CRT_HAVE___underflow || __CRT_HAVE___srget) */
 	char __ch;
 	if (!(__NAMESPACE_LOCAL_SYM __localdep_crt_fread_unlocked)(&__ch, sizeof(char), 1, __stream))
 		return __EOF;
 	return (int)__ch;
-#endif /* !__CRT_DOS || (!__CRT_HAVE__filbuf && !__CRT_HAVE___uflow && !__CRT_HAVE___underflow) */
+#endif /* !__CRT_DOS || (!__CRT_HAVE__filbuf && !__CRT_HAVE___uflow && !__CRT_HAVE___underflow && !__CRT_HAVE___srget) */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_fgetc_unlocked_defined
 #define __local___localdep_fgetc_unlocked_defined
 #define __localdep_fgetc_unlocked __LIBC_LOCAL_NAME(fgetc_unlocked)
 #endif /* !__local___localdep_fgetc_unlocked_defined */
-#else /* (__CRT_DOS && (__CRT_HAVE__filbuf || __CRT_HAVE___uflow || __CRT_HAVE___underflow)) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock */
+#else /* (__CRT_DOS && (__CRT_HAVE__filbuf || __CRT_HAVE___uflow || __CRT_HAVE___underflow || __CRT_HAVE___srget)) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock */
 #undef __local_fgetc_unlocked_defined
-#endif /* (!__CRT_DOS || (!__CRT_HAVE__filbuf && !__CRT_HAVE___uflow && !__CRT_HAVE___underflow)) && !__CRT_HAVE_fread && !__CRT_HAVE__IO_fread && !__CRT_HAVE_fread_unlocked && !__CRT_HAVE__fread_nolock */
+#endif /* (!__CRT_DOS || (!__CRT_HAVE__filbuf && !__CRT_HAVE___uflow && !__CRT_HAVE___underflow && !__CRT_HAVE___srget)) && !__CRT_HAVE_fread && !__CRT_HAVE__IO_fread && !__CRT_HAVE_fread_unlocked && !__CRT_HAVE__fread_nolock */
 #endif /* !__local_fgetc_unlocked_defined */

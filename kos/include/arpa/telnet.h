@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/arpa/telnet.h) */
+/* (#) Portability: DragonFly BSD (/include/arpa/telnet.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/arpa/telnet.h) */
 /* (#) Portability: FreeBSD       (/include/arpa/telnet.h) */
 /* (#) Portability: GNU C Library (/inet/arpa/telnet.h) */

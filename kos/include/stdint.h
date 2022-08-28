@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/stdint.h) */
 /* (#) Portability: DJGPP         (/include/stdint.h) */
+/* (#) Portability: DragonFly BSD (/include/stdint.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/stdint.h) */
 /* (#) Portability: GNU C Library (/stdlib/stdint.h) */
 /* (#) Portability: MSVC          (/include/stdint.h) */

@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/arpa/ftp.h) */
+/* (#) Portability: DragonFly BSD (/include/arpa/ftp.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/arpa/ftp.h) */
 /* (#) Portability: FreeBSD       (/include/arpa/ftp.h) */
 /* (#) Portability: GNU C Library (/inet/arpa/ftp.h) */

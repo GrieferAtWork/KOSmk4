@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/inttypes.h) */
 /* (#) Portability: DJGPP         (/include/inttypes.h) */
+/* (#) Portability: DragonFly BSD (/include/inttypes.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/inttypes.h) */
 /* (#) Portability: FreeBSD       (/include/inttypes.h) */
 /* (#) Portability: GNU C Library (/stdlib/inttypes.h) */

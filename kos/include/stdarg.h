@@ -19,17 +19,18 @@
  */
 /* (>) Standard: ISO C89 (ANSI X3.159-1989) */
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
-/* (#) Portability: DJGPP       (/include/stdarg.h) */
-/* (#) Portability: EMX kLIBC   (/libc/include/stdarg.h) */
-/* (#) Portability: FreeBSD     (/sys/[...]/include/stdarg.h) */
-/* (#) Portability: MSVC        (/include/stdarg.h) */
-/* (#) Portability: MinGW       (/mingw-w64-headers/crt/stdarg.h) */
-/* (#) Portability: NetBSD      (/sys/arch/[...]/include/stdarg.h) */
-/* (#) Portability: OpenSolaris (/usr/src/head/stdarg.h) */
-/* (#) Portability: PDCLib      (/include/stdarg.h) */
-/* (#) Portability: diet libc   (/include/stdarg.h) */
-/* (#) Portability: libcmini    (/include/stdarg.h) */
-/* (#) Portability: musl libc   (/include/stdarg.h) */
+/* (#) Portability: DJGPP         (/include/stdarg.h) */
+/* (#) Portability: DragonFly BSD (/include/stdarg.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/stdarg.h) */
+/* (#) Portability: FreeBSD       (/sys/[...]/include/stdarg.h) */
+/* (#) Portability: MSVC          (/include/stdarg.h) */
+/* (#) Portability: MinGW         (/mingw-w64-headers/crt/stdarg.h) */
+/* (#) Portability: NetBSD        (/sys/arch/[...]/include/stdarg.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/stdarg.h) */
+/* (#) Portability: PDCLib        (/include/stdarg.h) */
+/* (#) Portability: diet libc     (/include/stdarg.h) */
+/* (#) Portability: libcmini      (/include/stdarg.h) */
+/* (#) Portability: musl libc     (/include/stdarg.h) */
 #ifndef _STDARG_H
 #define _STDARG_H 1
 

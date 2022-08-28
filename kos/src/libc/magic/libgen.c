@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/libgen.h) */
+/* (#) Portability: DragonFly BSD (/include/libgen.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/libgen.h) */
 /* (#) Portability: FreeBSD       (/include/libgen.h) */
 /* (#) Portability: GNU C Library (/misc/libgen.h) */

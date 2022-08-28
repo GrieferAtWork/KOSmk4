@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d887d8f */
+/* HASH CRC-32:0x604916f7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,10 +18,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: EMX kLIBC (/libc/include/stringlist.h) */
-/* (#) Portability: FreeBSD   (/include/stringlist.h) */
-/* (#) Portability: NetBSD    (/include/stringlist.h) */
-/* (#) Portability: libbsd    (/include/bsd/stringlist.h) */
+/* (#) Portability: DragonFly BSD (/include/stringlist.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/stringlist.h) */
+/* (#) Portability: FreeBSD       (/include/stringlist.h) */
+/* (#) Portability: NetBSD        (/include/stringlist.h) */
+/* (#) Portability: libbsd        (/include/bsd/stringlist.h) */
 #ifndef _STRINGLIST_H
 #define _STRINGLIST_H 1
 

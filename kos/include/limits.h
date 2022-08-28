@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/limits.h) */
 /* (#) Portability: DJGPP         (/include/limits.h) */
+/* (#) Portability: DragonFly BSD (/include/limits.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/limits.h) */
 /* (#) Portability: FreeBSD       (/include/limits.h) */
 /* (#) Portability: GNU C Library (/include/limits.h) */

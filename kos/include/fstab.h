@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3790f92 */
+/* HASH CRC-32:0x2ee562d7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: DragonFly BSD (/include/fstab.h) */
 /* (#) Portability: FreeBSD       (/include/fstab.h) */
 /* (#) Portability: GNU C Library (/misc/fstab.h) */
 /* (#) Portability: NetBSD        (/include/fstab.h) */

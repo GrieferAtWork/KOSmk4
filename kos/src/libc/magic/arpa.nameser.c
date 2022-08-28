@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/arpa/nameser.h) */
+/* (#) Portability: DragonFly BSD (/include/arpa/nameser.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/arpa/nameser.h) */
 /* (#) Portability: FreeBSD       (/include/arpa/nameser.h) */
 /* (#) Portability: GNU C Library (/resolv/arpa/nameser.h) */

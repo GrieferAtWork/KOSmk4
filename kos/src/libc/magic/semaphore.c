@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/semaphore.h) */
+/* (#) Portability: DragonFly BSD (/include/semaphore.h) */
 /* (#) Portability: FreeBSD       (/include/semaphore.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/semaphore.h) */
 /* (#) Portability: MinGW         (/mingw-w64-libraries/winpthreads/include/semaphore.h) */

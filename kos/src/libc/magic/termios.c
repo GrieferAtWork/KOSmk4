@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1c (Issue 3, IEEE Std 1003.1c-1995) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/termios.h) */
 /* (#) Portability: DJGPP         (/include/termios.h) */
+/* (#) Portability: DragonFly BSD (/include/termios.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/termios.h) */
 /* (#) Portability: FreeBSD       (/include/termios.h) */
 /* (#) Portability: GNU C Library (/termios/termios.h) */

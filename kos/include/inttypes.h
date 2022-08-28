@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5dfa829f */
+/* HASH CRC-32:0xe8d624ad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/inttypes.h) */
 /* (#) Portability: DJGPP         (/include/inttypes.h) */
+/* (#) Portability: DragonFly BSD (/include/inttypes.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/inttypes.h) */
 /* (#) Portability: FreeBSD       (/include/inttypes.h) */
 /* (#) Portability: GNU C Library (/stdlib/inttypes.h) */

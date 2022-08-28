@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/pwd.h) */
 /* (#) Portability: DJGPP         (/include/pwd.h) */
+/* (#) Portability: DragonFly BSD (/include/pwd.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/pwd.h) */
 /* (#) Portability: FreeBSD       (/include/pwd.h) */
 /* (#) Portability: GNU C Library (/pwd/pwd.h) */

@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/stdio.h) */
 /* (#) Portability: DJGPP         (/include/stdio.h) */
+/* (#) Portability: DragonFly BSD (/include/stdio.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/stdio.h) */
 /* (#) Portability: FreeBSD       (/include/stdio.h) */
 /* (#) Portability: GNU C Library (/libio/stdio.h) */
@@ -397,6 +398,12 @@ __CSDECLARE(,__FILE *,stdin)
 #define stdin (__CYG_REENT->__cyg_stdin)
 #elif defined(____iob_func_defined)
 #define stdin (__iob_func() + 0)
+#elif defined(__CRT_HAVE___stdinp)
+#ifndef __stdinp
+__CSDECLARE(,__FILE *,__stdinp)
+#define __stdinp __stdinp
+#endif /* !__stdinp */
+#define stdin __stdinp
 #elif defined(__CRT_HAVE__IO_stdin_)
 #ifndef _IO_stdin_
 __CSDECLARE(,__FILE,_IO_stdin_)
@@ -424,6 +431,12 @@ __CSDECLARE(,__FILE *,stdout)
 #define stdout (__CYG_REENT->__cyg_stdout)
 #elif defined(____iob_func_defined)
 #define stdout (__iob_func() + 1)
+#elif defined(__CRT_HAVE___stdoutp)
+#ifndef __stdoutp
+__CSDECLARE(,__FILE *,__stdoutp)
+#define __stdoutp __stdoutp
+#endif /* !__stdoutp */
+#define stdout __stdoutp
 #elif defined(__CRT_HAVE__IO_stdout_)
 #ifndef _IO_stdout_
 __CSDECLARE(,__FILE,_IO_stdout_)
@@ -451,6 +464,12 @@ __CSDECLARE(,__FILE *,stderr)
 #define stderr (__CYG_REENT->__cyg_stderr)
 #elif defined(____iob_func_defined)
 #define stderr (__iob_func() + 2)
+#elif defined(__CRT_HAVE___stderrp)
+#ifndef __stderrp
+__CSDECLARE(,__FILE *,__stderrp)
+#define __stderrp __stderrp
+#endif /* !__stderrp */
+#define stderr __stderrp
 #elif defined(__CRT_HAVE__IO_stderr_)
 #ifndef _IO_stderr_
 __CSDECLARE(,__FILE,_IO_stderr_)
@@ -4667,12 +4686,12 @@ int _flushall() {
 
 %
 [[cp_stdio]]
-[[export_alias("__uflow", "__underflow")]]
+[[export_alias("__uflow", "__underflow", "__srget")]] /* __srget() is the dragonfly name */
 [[section(".text.crt.dos.FILE.locked.read.read")]]
 int _filbuf([[inout]] $FILE *__restrict stream);
 
 [[cp_stdio]]
-[[export_alias("__swbuf")]] /* __swbuf() is the cygwin name for this function */
+[[export_alias("__swbuf")]] /* __swbuf() is the cygwin/dragonfly name */
 [[section(".text.crt.dos.FILE.locked.write.write")]]
 int _flsbuf(int ch, [[inout]] $FILE *__restrict stream);
 

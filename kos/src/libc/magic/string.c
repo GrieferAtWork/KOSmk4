@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/string.h) */
 /* (#) Portability: DJGPP         (/include/string.h) */
+/* (#) Portability: DragonFly BSD (/include/string.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/string.h) */
 /* (#) Portability: FreeBSD       (/include/string.h) */
 /* (#) Portability: GNU C Library (/string/string.h) */

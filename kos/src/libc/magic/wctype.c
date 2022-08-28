@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/wctype.h) */
 /* (#) Portability: DJGPP         (/include/wctype.h) */
+/* (#) Portability: DragonFly BSD (/include/wctype.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/wctype.h) */
 /* (#) Portability: FreeBSD       (/include/wctype.h) */
 /* (#) Portability: GNU C Library (/wctype/wctype.h) */

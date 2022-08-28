@@ -54,6 +54,7 @@ No affiliation exists between KOS and the following projects. This is merely the
 
 - [`Cygwin`](https://cygwin.com/git/gitweb.cgi?p=newlib-cygwin.git)
 - [`DJGPP`](http://www.delorie.com/djgpp/getting.html)
+- [`DragonFly BSD`](https://gitweb.dragonflybsd.org/dragonfly.git)
 - [`EMX kLIBC`](https://trac.netlabs.org/libc/wiki)
 - [`FreeBSD`](https://github.com/freebsd/freebsd-src)
 - [`GNU C Library`](https://www.gnu.org/software/libc/sources.html)
@@ -69,7 +70,7 @@ No affiliation exists between KOS and the following projects. This is merely the
 - [`avr-libc`](http://download.savannah.gnu.org/releases/avr-libc/)
 - [`diet libc`](http://www.fefe.de/dietlibc/)
 - [`libbsd`](https://github.com/freedesktop/libbsd)
-- [`libc4/5`](http://archive.debian.org/debian/dists/Debian-0.93R6/source/devel/libc-4.6.27-6.tar.gz) (Seems mostly wiped off of the Internet at this point, but it you look long enough, you'll can still find it)
+- [`libc4/5`](http://archive.debian.org/debian/dists/Debian-0.93R6/source/devel/libc-4.6.27-6.tar.gz) (Seems mostly wiped off of the Internet at this point, but it you look long enough, you can still find it)
 - [`libc6`](https://pkgs.org/download/libc6)
 - [`libcmini`](https://github.com/freemint/libcmini/)
 - `libiberty` (As shipped with [gcc](https://ftp.gnu.org/gnu/gcc/))

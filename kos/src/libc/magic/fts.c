@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/fts.h) */
+/* (#) Portability: DragonFly BSD (/include/fts.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/fts.h) */
 /* (#) Portability: FreeBSD       (/include/fts.h) */
 /* (#) Portability: GNU C Library (/io/fts.h) */

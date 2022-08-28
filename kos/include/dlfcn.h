@@ -20,6 +20,7 @@
 /* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/dlfcn.h) */
 /* (#) Portability: DJGPP         (/include/dlfcn.h) */
+/* (#) Portability: DragonFly BSD (/include/dlfcn.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/dlfcn.h) */
 /* (#) Portability: FreeBSD       (/include/dlfcn.h) */
 /* (#) Portability: GNU C Library (/dlfcn/dlfcn.h) */

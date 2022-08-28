@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4fa40f7 */
+/* HASH CRC-32:0x83d6fb8a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1c (Issue 3, IEEE Std 1003.1c-1995) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/utime.h) */
 /* (#) Portability: DJGPP         (/include/utime.h) */
+/* (#) Portability: DragonFly BSD (/include/utime.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/utime.h) */
 /* (#) Portability: FreeBSD       (/include/utime.h) */
 /* (#) Portability: GNU C Library (/io/utime.h) */

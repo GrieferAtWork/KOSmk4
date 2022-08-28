@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/err.h) */
+/* (#) Portability: DragonFly BSD (/include/err.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/err.h) */
 /* (#) Portability: FreeBSD       (/include/err.h) */
 /* (#) Portability: GNU C Library (/misc/err.h) */

@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/assert.h) */
 /* (#) Portability: DJGPP         (/include/assert.h) */
+/* (#) Portability: DragonFly BSD (/include/assert.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/assert.h) */
 /* (#) Portability: FreeBSD       (/include/assert.h) */
 /* (#) Portability: GNU C Library (/assert/assert.h) */

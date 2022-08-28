@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/wchar.h) */
 /* (#) Portability: DJGPP         (/include/wchar.h) */
+/* (#) Portability: DragonFly BSD (/include/wchar.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/wchar.h) */
 /* (#) Portability: FreeBSD       (/include/wchar.h) */
 /* (#) Portability: GNU C Library (/wcsmbs/wchar.h) */

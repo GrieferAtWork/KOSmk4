@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0ddc5e0 */
+/* HASH CRC-32:0x193a2ca7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (>) Standard: ISO C11 (ISO/IEC 9899:2011) */
+/* (#) Portability: DragonFly BSD (/include/uchar.h) */
 /* (#) Portability: FreeBSD       (/include/uchar.h) */
 /* (#) Portability: GNU C Library (/wcsmbs/uchar.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/uchar.h) */

@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/glob.h) */
 /* (#) Portability: DJGPP         (/include/glob.h) */
+/* (#) Portability: DragonFly BSD (/include/glob.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/glob.h) */
 /* (#) Portability: FreeBSD       (/include/glob.h) */
 /* (#) Portability: GNU C Library (/posix/glob.h) */

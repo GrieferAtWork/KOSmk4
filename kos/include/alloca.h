@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/alloca.h) */
+/* (#) Portability: DragonFly BSD (/include/alloca.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/alloca.h) */
 /* (#) Portability: GNU C Library (/stdlib/alloca.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/alloca.h) */

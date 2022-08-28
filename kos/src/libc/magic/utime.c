@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1c (Issue 3, IEEE Std 1003.1c-1995) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/utime.h) */
 /* (#) Portability: DJGPP         (/include/utime.h) */
+/* (#) Portability: DragonFly BSD (/include/utime.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/utime.h) */
 /* (#) Portability: FreeBSD       (/include/utime.h) */
 /* (#) Portability: GNU C Library (/io/utime.h) */

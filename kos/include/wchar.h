@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x764631a7 */
+/* HASH CRC-32:0xc7b6b38c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/wchar.h) */
 /* (#) Portability: DJGPP         (/include/wchar.h) */
+/* (#) Portability: DragonFly BSD (/include/wchar.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/wchar.h) */
 /* (#) Portability: FreeBSD       (/include/wchar.h) */
 /* (#) Portability: GNU C Library (/wcsmbs/wchar.h) */

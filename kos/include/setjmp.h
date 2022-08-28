@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/setjmp.h) */
 /* (#) Portability: DJGPP         (/include/setjmp.h) */
+/* (#) Portability: DragonFly BSD (/include/setjmp.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/setjmp.h) */
 /* (#) Portability: FreeBSD       (/include/setjmp.h) */
 /* (#) Portability: GNU C Library (/setjmp/setjmp.h) */

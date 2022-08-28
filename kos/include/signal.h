@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44a7e563 */
+/* HASH CRC-32:0x7c1c4b44 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/signal.h) */
 /* (#) Portability: DJGPP         (/include/signal.h) */
+/* (#) Portability: DragonFly BSD (/include/signal.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/signal.h) */
 /* (#) Portability: FreeBSD       (/include/signal.h) */
 /* (#) Portability: GNU C Library (/signal/signal.h) */

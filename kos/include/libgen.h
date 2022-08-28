@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x399e74ec */
+/* HASH CRC-32:0xf7c61225 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/libgen.h) */
+/* (#) Portability: DragonFly BSD (/include/libgen.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/libgen.h) */
 /* (#) Portability: FreeBSD       (/include/libgen.h) */
 /* (#) Portability: GNU C Library (/misc/libgen.h) */
@@ -223,7 +224,7 @@ typedef __FILE FILE;
  *                There is no true error  case; read errors are  treated
  *                the same way as end-of-file. */
 __CDECLARE(__ATTR_INOUT(3) __ATTR_IN_OPT(4) __ATTR_OUT(1),char *,__NOTHROW_NCX,bgets,(char *__buf, size_t __buflen_minus_one, FILE *__fp, char __KOS_FIXED_CONST *__stop_chars),(__buf,__buflen_minus_one,__fp,__stop_chars))
-#elif defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
+#elif defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE__IO_getc) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE__getc_nolock) || defined(__CRT_HAVE__fgetc_nolock) || (defined(__CRT_DOS) && (defined(__CRT_HAVE__filbuf) || defined(__CRT_HAVE___uflow) || defined(__CRT_HAVE___underflow) || defined(__CRT_HAVE___srget))) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE__IO_fread) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)
 #include <libc/local/libgen/bgets.h>
 /* >> bgets(3)
  * Read at most `buflen_minus_one' characters from `fp' and into `buf'

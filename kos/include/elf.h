@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/elf.h) */
+/* (#) Portability: DragonFly BSD (/include/elf.h) */
 /* (#) Portability: FreeBSD       (/include/elf.h) */
 /* (#) Portability: GNU C Library (/elf/elf.h) */
 /* (#) Portability: NetBSD        (/sys/arch/[...]/include/elf.h) */

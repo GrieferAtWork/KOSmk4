@@ -19,6 +19,7 @@
  */
 /* (>) Standard: POSIX.1c (Issue 3, IEEE Std 1003.1c-1995) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/cpio.h) */
+/* (#) Portability: DragonFly BSD (/include/cpio.h) */
 /* (#) Portability: FreeBSD       (/include/cpio.h) */
 /* (#) Portability: GNU C Library (/posix/cpio.h) */
 /* (#) Portability: NetBSD        (/include/cpio.h) */

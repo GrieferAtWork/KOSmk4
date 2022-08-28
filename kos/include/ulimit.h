@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78f3cbf4 */
+/* HASH CRC-32:0xec18955b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: DragonFly BSD (/include/ulimit.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/ulimit.h) */
 /* (#) Portability: FreeBSD       (/include/ulimit.h) */
 /* (#) Portability: GNU C Library (/resource/ulimit.h) */

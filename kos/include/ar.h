@@ -19,6 +19,7 @@
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/ar.h) */
 /* (#) Portability: DJGPP         (/include/ar.h) */
+/* (#) Portability: DragonFly BSD (/include/ar.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/ar.h) */
 /* (#) Portability: FreeBSD       (/include/ar.h) */
 /* (#) Portability: GNU C Library (/misc/ar.h) */

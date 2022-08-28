@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/unistd.h) */
 /* (#) Portability: DJGPP         (/include/unistd.h) */
+/* (#) Portability: DragonFly BSD (/include/unistd.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/unistd.h) */
 /* (#) Portability: FreeBSD       (/include/unistd.h) */
 /* (#) Portability: GNU C Library (/posix/unistd.h) */

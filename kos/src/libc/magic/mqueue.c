@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/mqueue.h) */
+/* (#) Portability: DragonFly BSD (/include/mqueue.h) */
 /* (#) Portability: FreeBSD       (/include/mqueue.h) */
 /* (#) Portability: GNU C Library (/rt/mqueue.h) */
 /* (#) Portability: NetBSD        (/include/mqueue.h) */

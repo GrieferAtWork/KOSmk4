@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x422f819 */
+/* HASH CRC-32:0xf7bc0eb6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/ctype.h) */
 /* (#) Portability: DJGPP         (/include/ctype.h) */
+/* (#) Portability: DragonFly BSD (/include/ctype.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/ctype.h) */
 /* (#) Portability: FreeBSD       (/include/ctype.h) */
 /* (#) Portability: GNU C Library (/ctype/ctype.h) */

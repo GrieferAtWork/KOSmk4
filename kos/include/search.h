@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff64387d */
+/* HASH CRC-32:0x25ea8911 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/search.h) */
 /* (#) Portability: DJGPP         (/include/search.h) */
+/* (#) Portability: DragonFly BSD (/include/search.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/search.h) */
 /* (#) Portability: FreeBSD       (/include/search.h) */
 /* (#) Portability: GNU C Library (/misc/search.h) */

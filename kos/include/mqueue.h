@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x44192e1 */
+/* HASH CRC-32:0x35ea2ca0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/mqueue.h) */
+/* (#) Portability: DragonFly BSD (/include/mqueue.h) */
 /* (#) Portability: FreeBSD       (/include/mqueue.h) */
 /* (#) Portability: GNU C Library (/rt/mqueue.h) */
 /* (#) Portability: NetBSD        (/include/mqueue.h) */

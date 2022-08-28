@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6df670e0 */
+/* HASH CRC-32:0x5f4b1b99 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/wctype.h) */
 /* (#) Portability: DJGPP         (/include/wctype.h) */
+/* (#) Portability: DragonFly BSD (/include/wctype.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/wctype.h) */
 /* (#) Portability: FreeBSD       (/include/wctype.h) */
 /* (#) Portability: GNU C Library (/wctype/wctype.h) */

@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/endian.h) */
+/* (#) Portability: DragonFly BSD (/include/endian.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/endian.h) */
 /* (#) Portability: FreeBSD       (/sys/[...]/include/endian.h) */
 /* (#) Portability: GNU C Library (/string/endian.h) */

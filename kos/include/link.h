@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: DragonFly BSD (/include/link.h) */
 /* (#) Portability: FreeBSD       (/include/link.h) */
 /* (#) Portability: GNU C Library (/elf/link.h) */
 /* (#) Portability: NetBSD        (/include/link.h) */

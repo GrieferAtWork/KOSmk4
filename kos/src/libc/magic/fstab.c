@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
+/* (#) Portability: DragonFly BSD (/include/fstab.h) */
 /* (#) Portability: FreeBSD       (/include/fstab.h) */
 /* (#) Portability: GNU C Library (/misc/fstab.h) */
 /* (#) Portability: NetBSD        (/include/fstab.h) */

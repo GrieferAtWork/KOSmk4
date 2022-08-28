@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6c8c711b */
+/* HASH CRC-32:0x73a7281a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/err.h) */
+/* (#) Portability: DragonFly BSD (/include/err.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/err.h) */
 /* (#) Portability: FreeBSD       (/include/err.h) */
 /* (#) Portability: GNU C Library (/misc/err.h) */

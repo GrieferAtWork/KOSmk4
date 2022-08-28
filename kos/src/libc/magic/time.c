@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/time.h) */
 /* (#) Portability: DJGPP         (/include/time.h) */
+/* (#) Portability: DragonFly BSD (/include/time.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/time.h) */
 /* (#) Portability: FreeBSD       (/include/time.h) */
 /* (#) Portability: GNU C Library (/time/time.h) */

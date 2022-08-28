@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/ifaddrs.h) */
+/* (#) Portability: DragonFly BSD (/include/ifaddrs.h) */
 /* (#) Portability: FreeBSD       (/include/ifaddrs.h) */
 /* (#) Portability: GNU C Library (/inet/ifaddrs.h) */
 /* (#) Portability: NetBSD        (/include/ifaddrs.h) */

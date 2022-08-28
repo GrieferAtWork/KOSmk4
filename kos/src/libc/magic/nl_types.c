@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/nl_types.h) */
+/* (#) Portability: DragonFly BSD (/include/nl_types.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/nl_types.h) */
 /* (#) Portability: FreeBSD       (/include/nl_types.h) */
 /* (#) Portability: GNU C Library (/catgets/nl_types.h) */

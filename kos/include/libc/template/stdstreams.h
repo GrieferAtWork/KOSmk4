@@ -65,6 +65,12 @@ __CSDECLARE(,__FILE *,stdin)
 #define __LOCAL_stdin (__CYG_REENT->__cyg_stdin)
 #elif defined(____iob_func_defined)
 #define __LOCAL_stdin (__iob_func() + 0)
+#elif defined(__CRT_HAVE___stdinp)
+#ifndef __stdinp
+__CSDECLARE(,__FILE *,__stdinp)
+#define __stdinp __stdinp
+#endif /* !__stdinp */
+#define __LOCAL_stdin __stdinp
 #elif defined(__CRT_HAVE__IO_stdin_)
 #ifndef _IO_stdin_
 __CSDECLARE(,__FILE,_IO_stdin_)
@@ -93,6 +99,12 @@ __CSDECLARE(,__FILE *,stdout)
 #define __LOCAL_stdout (__CYG_REENT->__cyg_stdout)
 #elif defined(____iob_func_defined)
 #define __LOCAL_stdout (__iob_func() + 1)
+#elif defined(__CRT_HAVE___stdoutp)
+#ifndef __stdoutp
+__CSDECLARE(,__FILE *,__stdoutp)
+#define __stdoutp __stdoutp
+#endif /* !__stdoutp */
+#define __LOCAL_stdout __stdoutp
 #elif defined(__CRT_HAVE__IO_stdout_)
 #ifndef _IO_stdout_
 __CSDECLARE(,__FILE,_IO_stdout_)
@@ -121,6 +133,12 @@ __CSDECLARE(,__FILE *,stderr)
 #define __LOCAL_stderr (__CYG_REENT->__cyg_stderr)
 #elif defined(____iob_func_defined)
 #define __LOCAL_stderr (__iob_func() + 2)
+#elif defined(__CRT_HAVE___stderrp)
+#ifndef __stderrp
+__CSDECLARE(,__FILE *,__stderrp)
+#define __stderrp __stderrp
+#endif /* !__stderrp */
+#define __LOCAL_stderr __stderrp
 #elif defined(__CRT_HAVE__IO_stderr_)
 #ifndef _IO_stderr_
 __CSDECLARE(,__FILE,_IO_stderr_)

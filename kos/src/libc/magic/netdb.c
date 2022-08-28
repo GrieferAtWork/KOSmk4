@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/netdb.h) */
+/* (#) Portability: DragonFly BSD (/include/netdb.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/netdb.h) */
 /* (#) Portability: FreeBSD       (/include/netdb.h) */
 /* (#) Portability: GNU C Library (/resolv/netdb.h) */

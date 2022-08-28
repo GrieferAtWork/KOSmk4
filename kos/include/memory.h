@@ -19,6 +19,7 @@
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/memory.h) */
 /* (#) Portability: DJGPP         (/include/memory.h) */
+/* (#) Portability: DragonFly BSD (/include/memory.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/memory.h) */
 /* (#) Portability: FreeBSD       (/include/memory.h) */
 /* (#) Portability: GNU C Library (/string/memory.h) */

@@ -1159,6 +1159,7 @@
 #define __CRT_HAVE___sqrtf
 #define __CRT_HAVE___sqrtl
 #define __CRT_HAVE___srandom
+#define __CRT_HAVE___srget
 #define __CRT_HAVE___stack_chk_fail
 #define __CRT_HAVE___stack_chk_fail_local
 #define __CRT_HAVE___stack_chk_guard

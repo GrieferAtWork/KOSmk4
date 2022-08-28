@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: DragonFly BSD (/include/re_comp.h) */
 /* (#) Portability: GNU C Library (/posix/re_comp.h) */
 /* (#) Portability: NetBSD        (/include/re_comp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/re_comp.h) */

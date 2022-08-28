@@ -22,6 +22,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/ctype.h) */
 /* (#) Portability: DJGPP         (/include/ctype.h) */
+/* (#) Portability: DragonFly BSD (/include/ctype.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/ctype.h) */
 /* (#) Portability: FreeBSD       (/include/ctype.h) */
 /* (#) Portability: GNU C Library (/ctype/ctype.h) */

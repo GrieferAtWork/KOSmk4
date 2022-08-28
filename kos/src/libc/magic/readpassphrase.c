@@ -18,9 +18,10 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
-/* (#) Portability: FreeBSD (/include/readpassphrase.h) */
-/* (#) Portability: OpenBSD (/include/readpassphrase.h) */
-/* (#) Portability: libbsd  (/include/bsd/readpassphrase.h) */
+/* (#) Portability: DragonFly BSD (/include/readpassphrase.h) */
+/* (#) Portability: FreeBSD       (/include/readpassphrase.h) */
+/* (#) Portability: OpenBSD       (/include/readpassphrase.h) */
+/* (#) Portability: libbsd        (/include/bsd/readpassphrase.h) */
 }
 
 %[define_replacement(fd_t = __fd_t)]

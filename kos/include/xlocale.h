@@ -17,8 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: FreeBSD (/include/xlocale.h) */
-/* (#) Portability: uClibc  (/include/xlocale.h) */
+/* (#) Portability: DragonFly BSD (/include/xlocale.h) */
+/* (#) Portability: FreeBSD       (/include/xlocale.h) */
+/* (#) Portability: uClibc        (/include/xlocale.h) */
 #ifndef _XLOCALE_H
 #define _XLOCALE_H 1
 

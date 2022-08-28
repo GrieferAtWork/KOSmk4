@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: DragonFly BSD (/include/arpa/tftp.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/arpa/tftp.h) */
 /* (#) Portability: FreeBSD       (/include/arpa/tftp.h) */
 /* (#) Portability: GNU C Library (/inet/arpa/tftp.h) */

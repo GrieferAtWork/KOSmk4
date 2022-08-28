@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/resolv.h) */
+/* (#) Portability: DragonFly BSD (/include/resolv.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/resolv.h) */
 /* (#) Portability: FreeBSD       (/include/resolv.h) */
 /* (#) Portability: GNU C Library (/resolv/resolv.h) */

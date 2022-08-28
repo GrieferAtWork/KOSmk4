@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/newlib/libc/include/wordexp.h) */
+/* (#) Portability: DragonFly BSD (/include/wordexp.h) */
 /* (#) Portability: FreeBSD       (/include/wordexp.h) */
 /* (#) Portability: GNU C Library (/posix/wordexp.h) */
 /* (#) Portability: NetBSD        (/include/wordexp.h) */

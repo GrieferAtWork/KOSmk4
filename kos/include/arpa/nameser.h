@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10b91f94 */
+/* HASH CRC-32:0x4be9ad6b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/arpa/nameser.h) */
+/* (#) Portability: DragonFly BSD (/include/arpa/nameser.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/arpa/nameser.h) */
 /* (#) Portability: FreeBSD       (/include/arpa/nameser.h) */
 /* (#) Portability: GNU C Library (/resolv/arpa/nameser.h) */

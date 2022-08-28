@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/newlib/libc/include/getopt.h) */
+/* (#) Portability: DragonFly BSD (/include/getopt.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/getopt.h) */
 /* (#) Portability: FreeBSD       (/include/getopt.h) */
 /* (#) Portability: GNU C Library (/posix/getopt.h) */

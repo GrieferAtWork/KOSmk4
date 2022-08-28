@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/arpa/nameser_compat.h) */
+/* (#) Portability: DragonFly BSD (/include/arpa/nameser_compat.h) */
 /* (#) Portability: FreeBSD       (/include/arpa/nameser_compat.h) */
 /* (#) Portability: GNU C Library (/resolv/arpa/nameser_compat.h) */
 /* (#) Portability: NetBSD        (/include/arpa/nameser_compat.h) */

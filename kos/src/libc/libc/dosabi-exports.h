@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f3b3780 */
+/* HASH CRC-32:0x89b89ec5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2318,6 +2318,7 @@ DEFINE_PUBLIC_ALIAS(DOS$funopen64, libd_funopen64);
 DEFINE_PUBLIC_ALIAS(DOS$funopen2_64, libd_funopen2_64);
 DEFINE_PUBLIC_ALIAS(DOS$__uflow, libd__filbuf);
 DEFINE_PUBLIC_ALIAS(DOS$__underflow, libd__filbuf);
+DEFINE_PUBLIC_ALIAS(DOS$__srget, libd__filbuf);
 DEFINE_PUBLIC_ALIAS(DOS$_filbuf, libd__filbuf);
 DEFINE_PUBLIC_ALIAS(DOS$__swbuf, libd__flsbuf);
 DEFINE_PUBLIC_ALIAS(DOS$_flsbuf, libd__flsbuf);

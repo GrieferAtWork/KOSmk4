@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (>) Standard: ISO C11 (ISO/IEC 9899:2011) */
+/* (#) Portability: DragonFly BSD (/include/uchar.h) */
 /* (#) Portability: FreeBSD       (/include/uchar.h) */
 /* (#) Portability: GNU C Library (/wcsmbs/uchar.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/uchar.h) */

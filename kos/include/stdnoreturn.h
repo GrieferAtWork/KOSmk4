@@ -18,10 +18,11 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (>) Standard: ISO C11 (ISO/IEC 9899:2011) */
-/* (#) Portability: FreeBSD   (/include/stdnoreturn.h) */
-/* (#) Portability: NetBSD    (/include/stdnoreturn.h) */
-/* (#) Portability: PDCLib    (/include/stdnoreturn.h) */
-/* (#) Portability: musl libc (/include/stdnoreturn.h) */
+/* (#) Portability: DragonFly BSD (/include/stdnoreturn.h) */
+/* (#) Portability: FreeBSD       (/include/stdnoreturn.h) */
+/* (#) Portability: NetBSD        (/include/stdnoreturn.h) */
+/* (#) Portability: PDCLib        (/include/stdnoreturn.h) */
+/* (#) Portability: musl libc     (/include/stdnoreturn.h) */
 #ifndef _STDNORETURN_H
 #define _STDNORETURN_H 1
 

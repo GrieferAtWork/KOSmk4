@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/paths.h) */
+/* (#) Portability: DragonFly BSD (/include/paths.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/paths.h) */
 /* (#) Portability: FreeBSD       (/include/paths.h) */
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/paths.h) */

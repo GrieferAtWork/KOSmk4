@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
+/* (#) Portability: DragonFly BSD (/include/ttyent.h) */
 /* (#) Portability: FreeBSD       (/include/ttyent.h) */
 /* (#) Portability: GNU C Library (/misc/ttyent.h) */
 /* (#) Portability: NetBSD        (/include/ttyent.h) */

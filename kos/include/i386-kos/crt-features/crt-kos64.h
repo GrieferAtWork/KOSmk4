@@ -1154,6 +1154,7 @@
 #define __CRT_HAVE___sqrtf
 #define __CRT_HAVE___sqrtl
 #define __CRT_HAVE___srandom
+#define __CRT_HAVE___srget
 #define __CRT_HAVE___stack_chk_fail
 #define __CRT_HAVE___stack_chk_fail_local
 #define __CRT_HAVE___stack_chk_guard
@@ -7182,6 +7183,7 @@
 #define __CRT_HAVE_KOS$__sqrtf
 #define __CRT_HAVE_KOS$__sqrtl
 #define __CRT_HAVE_KOS$__srandom
+#define __CRT_HAVE_KOS$__srget
 #define __CRT_HAVE_KOS$__statfs
 #define __CRT_HAVE_KOS$__stdio_common_vfprintf
 #define __CRT_HAVE_KOS$__stdio_common_vfprintf_p
@@ -11479,6 +11481,7 @@
 #define __CRT_HAVE_DOS$__sqrtf
 #define __CRT_HAVE_DOS$__sqrtl
 #define __CRT_HAVE_DOS$__srandom
+#define __CRT_HAVE_DOS$__srget
 #define __CRT_HAVE_DOS$__statfs
 #define __CRT_HAVE_DOS$__stdio_common_vfprintf
 #define __CRT_HAVE_DOS$__stdio_common_vfprintf_p

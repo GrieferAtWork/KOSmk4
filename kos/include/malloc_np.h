@@ -17,7 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: FreeBSD (/include/malloc_np.h) */
+/* (#) Portability: DragonFly BSD (/include/malloc_np.h) */
+/* (#) Portability: FreeBSD       (/include/malloc_np.h) */
 #ifndef _MALLOC_NP_H
 #define _MALLOC_NP_H 1
 

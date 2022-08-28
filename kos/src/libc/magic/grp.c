@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/grp.h) */
 /* (#) Portability: DJGPP         (/include/grp.h) */
+/* (#) Portability: DragonFly BSD (/include/grp.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/grp.h) */
 /* (#) Portability: FreeBSD       (/include/grp.h) */
 /* (#) Portability: GNU C Library (/grp/grp.h) */

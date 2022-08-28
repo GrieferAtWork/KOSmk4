@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
+/* (#) Portability: DragonFly BSD (/include/ulimit.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/ulimit.h) */
 /* (#) Portability: FreeBSD       (/include/ulimit.h) */
 /* (#) Portability: GNU C Library (/resource/ulimit.h) */

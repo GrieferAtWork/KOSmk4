@@ -21,6 +21,7 @@
 /* (>) Standard: ISO C89 (ANSI X3.159-1989) */
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: DJGPP         (/include/float.h) */
+/* (#) Portability: DragonFly BSD (/include/float.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/float.h) */
 /* (#) Portability: FreeBSD       (/sys/[...]/include/float.h) */
 /* (#) Portability: GNU C Library (/include/float.h) */
