@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x225e92b5 */
+/* HASH CRC-32:0x63ed51c7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -122,12 +122,44 @@ __CDECLARE_VOID(,__NOTHROW_NCX,__fpurge,(__FILE *__stream),(__stream))
  * start off from a blank state. */
 __CREDIRECT_VOID(,__NOTHROW_NCX,__fpurge,(__FILE *__stream),fpurge,(__stream))
 #endif /* ... */
-/* >> __fpending(3)
+#include <features.h>
+#if defined(__CRT_HAVE___fpending_unlocked) && defined(__USE_STDIO_UNLOCKED)
+/* >> __fpending(3), __fpending_unlocked(3)
  * Returns the number of pending, but not-yet-written bytes of modified
  * file  data (s.a. `__fwriting(3)'). A call to `fflush(3)' can be used
  * to write all modified data to the system, and following such a call,
  * this function will return `0' until new unwritten data appears. */
-__CDECLARE_OPT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),size_t,__NOTHROW_NCX,__fpending,(__FILE __KOS_FIXED_CONST *__stream),(__stream))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),size_t,__NOTHROW_NCX,__fpending,(__FILE __KOS_FIXED_CONST *__stream),__fpending_unlocked,(__stream))
+#elif defined(__CRT_HAVE___fpending)
+/* >> __fpending(3), __fpending_unlocked(3)
+ * Returns the number of pending, but not-yet-written bytes of modified
+ * file  data (s.a. `__fwriting(3)'). A call to `fflush(3)' can be used
+ * to write all modified data to the system, and following such a call,
+ * this function will return `0' until new unwritten data appears. */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),size_t,__NOTHROW_NCX,__fpending,(__FILE __KOS_FIXED_CONST *__stream),(__stream))
+#elif defined(__CRT_HAVE___fpending_unlocked)
+/* >> __fpending(3), __fpending_unlocked(3)
+ * Returns the number of pending, but not-yet-written bytes of modified
+ * file  data (s.a. `__fwriting(3)'). A call to `fflush(3)' can be used
+ * to write all modified data to the system, and following such a call,
+ * this function will return `0' until new unwritten data appears. */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),size_t,__NOTHROW_NCX,__fpending,(__FILE __KOS_FIXED_CONST *__stream),__fpending_unlocked,(__stream))
+#endif /* ... */
+#ifdef __CRT_HAVE___fpending_unlocked
+/* >> __fpending(3), __fpending_unlocked(3)
+ * Returns the number of pending, but not-yet-written bytes of modified
+ * file  data (s.a. `__fwriting(3)'). A call to `fflush(3)' can be used
+ * to write all modified data to the system, and following such a call,
+ * this function will return `0' until new unwritten data appears. */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),size_t,__NOTHROW_NCX,__fpending_unlocked,(__FILE __KOS_FIXED_CONST *__stream),(__stream))
+#elif defined(__CRT_HAVE___fpending)
+/* >> __fpending(3), __fpending_unlocked(3)
+ * Returns the number of pending, but not-yet-written bytes of modified
+ * file  data (s.a. `__fwriting(3)'). A call to `fflush(3)' can be used
+ * to write all modified data to the system, and following such a call,
+ * this function will return `0' until new unwritten data appears. */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),size_t,__NOTHROW_NCX,__fpending_unlocked,(__FILE __KOS_FIXED_CONST *__stream),__fpending,(__stream))
+#endif /* ... */
 #ifdef __CRT_HAVE__flushlbf
 /* >> _flushlbf(3)
  * Perform  a call  `fflush(stream)' for  every open  line-buffered stdio file.
@@ -154,6 +186,53 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,__fsetlocking,(__FILE *__stream, int __type),(
  * that `ferror(stream) != 0', and `clearerr(stream)' must be used if one wishes
  * to clear the error once again. */
 __CDECLARE_VOID_OPT(,__NOTHROW_NCX,__fseterr,(__FILE *__stream),(__stream))
+#if defined(__CRT_HAVE___freadahead_unlocked) && defined(__USE_STDIO_UNLOCKED)
+/* >> __freadahead(3), __freadahead_unlocked(3)
+ * Returns  the # of bytes pending to-be read from the given `stream's internal buffer.
+ * Once this many bytes have been read (or `__fpurge(3)' is called), the next read will
+ * query the stream's underlying read function (usually `read(2)') for more data.
+ * NOTE: The function `__fpending(3)' can be used to query the # of modified bytes that
+ *       are pending for write-back.
+ * @return: * : The # of pending, unread bytes in the `stream's read-buffer. */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),size_t,__NOTHROW_NCX,__freadahead,(__FILE __KOS_FIXED_CONST *__stream),__freadahead_unlocked,(__stream))
+#elif defined(__CRT_HAVE___freadahead)
+/* >> __freadahead(3), __freadahead_unlocked(3)
+ * Returns  the # of bytes pending to-be read from the given `stream's internal buffer.
+ * Once this many bytes have been read (or `__fpurge(3)' is called), the next read will
+ * query the stream's underlying read function (usually `read(2)') for more data.
+ * NOTE: The function `__fpending(3)' can be used to query the # of modified bytes that
+ *       are pending for write-back.
+ * @return: * : The # of pending, unread bytes in the `stream's read-buffer. */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),size_t,__NOTHROW_NCX,__freadahead,(__FILE __KOS_FIXED_CONST *__stream),(__stream))
+#elif defined(__CRT_HAVE___freadahead_unlocked)
+/* >> __freadahead(3), __freadahead_unlocked(3)
+ * Returns  the # of bytes pending to-be read from the given `stream's internal buffer.
+ * Once this many bytes have been read (or `__fpurge(3)' is called), the next read will
+ * query the stream's underlying read function (usually `read(2)') for more data.
+ * NOTE: The function `__fpending(3)' can be used to query the # of modified bytes that
+ *       are pending for write-back.
+ * @return: * : The # of pending, unread bytes in the `stream's read-buffer. */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),size_t,__NOTHROW_NCX,__freadahead,(__FILE __KOS_FIXED_CONST *__stream),__freadahead_unlocked,(__stream))
+#endif /* ... */
+#ifdef __CRT_HAVE___freadahead_unlocked
+/* >> __freadahead(3), __freadahead_unlocked(3)
+ * Returns  the # of bytes pending to-be read from the given `stream's internal buffer.
+ * Once this many bytes have been read (or `__fpurge(3)' is called), the next read will
+ * query the stream's underlying read function (usually `read(2)') for more data.
+ * NOTE: The function `__fpending(3)' can be used to query the # of modified bytes that
+ *       are pending for write-back.
+ * @return: * : The # of pending, unread bytes in the `stream's read-buffer. */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),size_t,__NOTHROW_NCX,__freadahead_unlocked,(__FILE __KOS_FIXED_CONST *__stream),(__stream))
+#elif defined(__CRT_HAVE___freadahead)
+/* >> __freadahead(3), __freadahead_unlocked(3)
+ * Returns  the # of bytes pending to-be read from the given `stream's internal buffer.
+ * Once this many bytes have been read (or `__fpurge(3)' is called), the next read will
+ * query the stream's underlying read function (usually `read(2)') for more data.
+ * NOTE: The function `__fpending(3)' can be used to query the # of modified bytes that
+ *       are pending for write-back.
+ * @return: * : The # of pending, unread bytes in the `stream's read-buffer. */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),size_t,__NOTHROW_NCX,__freadahead_unlocked,(__FILE __KOS_FIXED_CONST *__stream),__freadahead,(__stream))
+#endif /* ... */
 
 __SYSDECL_END
 #endif /* __CC__ */

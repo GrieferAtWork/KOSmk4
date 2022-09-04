@@ -167,8 +167,8 @@ NOTHROW_NCX(LIBCCALL libc___fpurge)(FILE *stream)
 }
 /*[[[end:libc___fpurge]]]*/
 
-/*[[[head:libc___fpending,hash:CRC-32=0x9efce4f2]]]*/
-/* >> __fpending(3)
+/*[[[head:libc___fpending,hash:CRC-32=0x9d8387b4]]]*/
+/* >> __fpending(3), __fpending_unlocked(3)
  * Returns the number of pending, but not-yet-written bytes of modified
  * file  data (s.a. `__fwriting(3)'). A call to `fflush(3)' can be used
  * to write all modified data to the system, and following such a call,
@@ -185,6 +185,9 @@ NOTHROW_NCX(LIBCCALL libc___fpending)(FILE __KOS_FIXED_CONST *stream)
 	return result;
 }
 /*[[[end:libc___fpending]]]*/
+
+/*[[[impl:libc___fpending_unlocked]]]*/
+DEFINE_INTERN_ALIAS(libc___fpending_unlocked, libc___fpending);
 
 /*[[[head:libc__flushlbf,hash:CRC-32=0x3d029d6f]]]*/
 /* >> _flushlbf(3)
@@ -244,11 +247,33 @@ NOTHROW_NCX(LIBCCALL libc___fseterr)(FILE *stream)
 }
 /*[[[end:libc___fseterr]]]*/
 
+/*[[[head:libc___freadahead,hash:CRC-32=0x376ecb98]]]*/
+/* >> __freadahead(3), __freadahead_unlocked(3)
+ * Returns  the # of bytes pending to-be read from the given `stream's internal buffer.
+ * Once this many bytes have been read (or `__fpurge(3)' is called), the next read will
+ * query the stream's underlying read function (usually `read(2)') for more data.
+ * NOTE: The function `__fpending(3)' can be used to query the # of modified bytes that
+ *       are pending for write-back.
+ * @return: * : The # of pending, unread bytes in the `stream's read-buffer. */
+INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_PURE WUNUSED ATTR_IN(1) size_t
+NOTHROW_NCX(LIBCCALL libc___freadahead)(FILE __KOS_FIXED_CONST *stream)
+/*[[[body:libc___freadahead]]]*/
+{
+	size_t result;
+	stream = file_fromuser(stream);
+	result = ATOMIC_READ(stream->if_cnt);
+	return result;
+}
+/*[[[end:libc___freadahead]]]*/
+
+/*[[[impl:libc___freadahead_unlocked]]]*/
+DEFINE_INTERN_ALIAS(libc___freadahead_unlocked, libc___freadahead);
 
 
 
 
-/*[[[start:exports,hash:CRC-32=0xe6a2f628]]]*/
+
+/*[[[start:exports,hash:CRC-32=0xa5bde049]]]*/
 DEFINE_PUBLIC_ALIAS(__fbufsize, libc___fbufsize);
 DEFINE_PUBLIC_ALIAS(__freading, libc___freading);
 DEFINE_PUBLIC_ALIAS(__fwriting, libc___fwriting);
@@ -258,10 +283,13 @@ DEFINE_PUBLIC_ALIAS(__flbf, libc___flbf);
 DEFINE_PUBLIC_ALIAS(fpurge, libc___fpurge);
 DEFINE_PUBLIC_ALIAS(__fpurge, libc___fpurge);
 DEFINE_PUBLIC_ALIAS(__fpending, libc___fpending);
+DEFINE_PUBLIC_ALIAS(__fpending_unlocked, libc___fpending_unlocked);
 DEFINE_PUBLIC_ALIAS(_IO_flush_all_linebuffered, libc__flushlbf);
 DEFINE_PUBLIC_ALIAS(_flushlbf, libc__flushlbf);
 DEFINE_PUBLIC_ALIAS(__fsetlocking, libc___fsetlocking);
 DEFINE_PUBLIC_ALIAS(__fseterr, libc___fseterr);
+DEFINE_PUBLIC_ALIAS(__freadahead, libc___freadahead);
+DEFINE_PUBLIC_ALIAS(__freadahead_unlocked, libc___freadahead_unlocked);
 /*[[[end:exports]]]*/
 
 DECL_END

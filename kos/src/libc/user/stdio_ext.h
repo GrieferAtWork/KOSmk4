@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45fa6993 */
+/* HASH CRC-32:0x72ec48cd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,12 +72,18 @@ INTDEF ATTR_PURE WUNUSED ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc___flbf)(FIL
  * a call to this function, the next `fread(3)' or `fwrite(3)' will
  * start off from a blank state. */
 INTDEF void NOTHROW_NCX(LIBCCALL libc___fpurge)(FILE *stream);
-/* >> __fpending(3)
+/* >> __fpending(3), __fpending_unlocked(3)
  * Returns the number of pending, but not-yet-written bytes of modified
  * file  data (s.a. `__fwriting(3)'). A call to `fflush(3)' can be used
  * to write all modified data to the system, and following such a call,
  * this function will return `0' until new unwritten data appears. */
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) size_t NOTHROW_NCX(LIBCCALL libc___fpending)(FILE __KOS_FIXED_CONST *stream);
+/* >> __fpending(3), __fpending_unlocked(3)
+ * Returns the number of pending, but not-yet-written bytes of modified
+ * file  data (s.a. `__fwriting(3)'). A call to `fflush(3)' can be used
+ * to write all modified data to the system, and following such a call,
+ * this function will return `0' until new unwritten data appears. */
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) size_t NOTHROW_NCX(LIBCCALL libc___fpending_unlocked)(FILE __KOS_FIXED_CONST *stream);
 /* >> _flushlbf(3)
  * Perform  a call  `fflush(stream)' for  every open  line-buffered stdio file.
  * Note that usually call this function isn't necessary, since the same already
@@ -95,6 +101,22 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc___fsetlocking)(FILE *stream, int type);
  * that `ferror(stream) != 0', and `clearerr(stream)' must be used if one wishes
  * to clear the error once again. */
 INTDEF void NOTHROW_NCX(LIBCCALL libc___fseterr)(FILE *stream);
+/* >> __freadahead(3), __freadahead_unlocked(3)
+ * Returns  the # of bytes pending to-be read from the given `stream's internal buffer.
+ * Once this many bytes have been read (or `__fpurge(3)' is called), the next read will
+ * query the stream's underlying read function (usually `read(2)') for more data.
+ * NOTE: The function `__fpending(3)' can be used to query the # of modified bytes that
+ *       are pending for write-back.
+ * @return: * : The # of pending, unread bytes in the `stream's read-buffer. */
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) size_t NOTHROW_NCX(LIBCCALL libc___freadahead)(FILE __KOS_FIXED_CONST *stream);
+/* >> __freadahead(3), __freadahead_unlocked(3)
+ * Returns  the # of bytes pending to-be read from the given `stream's internal buffer.
+ * Once this many bytes have been read (or `__fpurge(3)' is called), the next read will
+ * query the stream's underlying read function (usually `read(2)') for more data.
+ * NOTE: The function `__fpending(3)' can be used to query the # of modified bytes that
+ *       are pending for write-back.
+ * @return: * : The # of pending, unread bytes in the `stream's read-buffer. */
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) size_t NOTHROW_NCX(LIBCCALL libc___freadahead_unlocked)(FILE __KOS_FIXED_CONST *stream);
 #endif /* !__KERNEL__ */
 
 DECL_END

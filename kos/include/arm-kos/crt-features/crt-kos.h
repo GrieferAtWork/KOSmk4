@@ -519,9 +519,12 @@
 #define __CRT_HAVE___fpe_flt_rounds
 #define __CRT_HAVE___fpecode
 #define __CRT_HAVE___fpending
+#define __CRT_HAVE___fpending_unlocked
 #define __CRT_HAVE___fpu_control
 #define __CRT_HAVE___fpurge
 #define __CRT_HAVE___freadable
+#define __CRT_HAVE___freadahead
+#define __CRT_HAVE___freadahead_unlocked
 #define __CRT_HAVE___freading
 #define __CRT_HAVE___free_locale
 #define __CRT_HAVE___freelocale

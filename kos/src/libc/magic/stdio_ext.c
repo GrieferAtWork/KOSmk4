@@ -130,13 +130,19 @@ int __flbf([[inout]] $FILE *stream);
 [[export_alias("fpurge")]]
 void __fpurge([[inout]] $FILE *stream);
 
-@@>> __fpending(3)
+@@>> __fpending(3), __fpending_unlocked(3)
 @@Returns the number of pending, but not-yet-written bytes of modified
 @@file  data (s.a. `__fwriting(3)'). A call to `fflush(3)' can be used
 @@to write all modified data to the system, and following such a call,
 @@this function will return `0' until new unwritten data appears.
 [[pure, wunused, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("__fpending_unlocked")]]
+[[alias("__fpending_unlocked")]]
 size_t __fpending([[in]] $FILE __KOS_FIXED_CONST *stream);
+
+[[doc_alias("__fpending"), alias("__fpending")]]
+[[pure, wunused, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+size_t __fpending_unlocked([[in]] $FILE __KOS_FIXED_CONST *stream);
 
 @@>> _flushlbf(3)
 @@Perform  a call  `fflush(stream)' for  every open  line-buffered stdio file.
@@ -158,6 +164,24 @@ int __fsetlocking([[inout]] $FILE *stream, int type);
 @@that `ferror(stream) != 0', and `clearerr(stream)' must be used if one wishes
 @@to clear the error once again.
 void __fseterr([[inout]] $FILE *stream);
+
+
+@@>> __freadahead(3), __freadahead_unlocked(3)
+@@Returns  the # of bytes pending to-be read from the given `stream's internal buffer.
+@@Once this many bytes have been read (or `__fpurge(3)' is called), the next read will
+@@query the stream's underlying read function (usually `read(2)') for more data.
+@@NOTE: The function `__fpending(3)' can be used to query the # of modified bytes that
+@@      are pending for write-back.
+@@@return: * : The # of pending, unread bytes in the `stream's read-buffer.
+[[pure, wunused, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("__freadahead_unlocked")]]
+[[alias("__freadahead_unlocked")]]
+size_t __freadahead([[in]] $FILE __KOS_FIXED_CONST *stream);
+
+[[doc_alias("__freadahead"), alias("__freadahead")]]
+[[pure, wunused, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+size_t __freadahead_unlocked([[in]] $FILE __KOS_FIXED_CONST *stream);
+
 
 %{
 
