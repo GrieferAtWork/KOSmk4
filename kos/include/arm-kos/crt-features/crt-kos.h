@@ -1145,6 +1145,7 @@
 #define __CRT_HAVE___sqrtf
 #define __CRT_HAVE___sqrtl
 #define __CRT_HAVE___srandom
+#define __CRT_HAVE___srget
 #define __CRT_HAVE___stack_chk_fail
 #define __CRT_HAVE___stack_chk_fail_local
 #define __CRT_HAVE___stack_chk_guard
@@ -1686,6 +1687,7 @@
 #define __CRT_HAVE__ldtest
 #define __CRT_HAVE__lfind
 #define __CRT_HAVE__lfind_s
+#define __CRT_HAVE__libc_intl_domainname
 #define __CRT_HAVE__loaddll
 #define __CRT_HAVE__localtime32
 #define __CRT_HAVE__localtime32_s

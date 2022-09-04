@@ -1706,6 +1706,7 @@
 #define __CRT_HAVE__ldtest
 #define __CRT_HAVE__lfind
 #define __CRT_HAVE__lfind_s
+#define __CRT_HAVE__libc_intl_domainname
 #define __CRT_HAVE__loaddll
 #define __CRT_HAVE__localtime32
 #define __CRT_HAVE__localtime32_s

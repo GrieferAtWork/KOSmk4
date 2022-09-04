@@ -1504,9 +1504,9 @@ NOTHROW_NCX(LIBCCALL libc_bind_textdomain_codeset)(char const *domainname,
 /*[[[end:libc_bind_textdomain_codeset]]]*/
 
 
-/* This  is a special variable also visible to loaded programs, that
- * gets incremented every time anything  happens that may result  in
- * `gettext()' returning a different value from a given string, than
+/* This is a special variable also visible to loaded programs, that
+ * gets incremented every time anything happens that may result  in
+ * `gettext()' returning a different value for a given string, than
  * what it may have returned during a preceding invocation.
  *
  * This may be used by programs to cache translated strings for  as
@@ -1538,6 +1538,13 @@ DEFINE_PUBLIC_ALIAS(_nl_default_dirname, default_domain_dir);
 #undef _nl_domain_bindings
 INTERN ATTR_SECTION(".bss.crt.i18n") int *libc__nl_domain_bindings = NULL;
 DEFINE_PUBLIC_ALIAS(_nl_domain_bindings, libc__nl_domain_bindings);
+
+/* This one is (probably accidentally) exported by glibc. Supposedly,
+ * it is used to  facilitate translations of libc-internal  messages,
+ * though we don't use it any only provide it for compat. */
+INTERN ATTR_SECTION(".rodata.crt.i18n")
+char const libc__libc_intl_domainname[] = "libc";
+DEFINE_PUBLIC_ALIAS(_libc_intl_domainname, libc__libc_intl_domainname);
 
 
 
