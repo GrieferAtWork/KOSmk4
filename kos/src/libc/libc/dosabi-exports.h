@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98e2ec24 */
+/* HASH CRC-32:0x7749d847 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2220,6 +2220,7 @@ DEFINE_PUBLIC_ALIAS(DOS$putc_unlocked, libd_fputc_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$fputc_unlocked, libd_fputc_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$_putc_nolock, libd_fputc_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$_fputc_nolock, libd_fputc_unlocked);
+DEFINE_PUBLIC_ALIAS(DOS$vasnprintf, libd_vasnprintf);
 DEFINE_PUBLIC_ALIAS(DOS$_tempnam, libd_tempnam);
 DEFINE_PUBLIC_ALIAS(DOS$tempnam, libd_tempnam);
 DEFINE_PUBLIC_ALIAS(DOS$_fdopen, libd_fdopen);

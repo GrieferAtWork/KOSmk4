@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b6c7873 */
+/* HASH CRC-32:0x57bdcdb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -410,6 +410,70 @@ INTDEF ATTR_INOUT(1) int (LIBDCALL libd_fgetc_unlocked)(FILE *__restrict stream)
 /* >> fputc_unlocked(3)
  * Same as `fputc()', but performs I/O without acquiring a lock to `stream' */
 INTDEF ATTR_INOUT(2) int (LIBDCALL libd_fputc_unlocked)(int ch, FILE *__restrict stream) THROWS(...);
+/* >> asnprintf(3), vasnprintf(3)
+ * Given a malloc'd `heapbuf...+=*p_buflen' (where `*p_buflen' is the number of BYTES), write
+ * a  given `format'-string to said buffer. If the  buffer is too small, it will be realloc'd
+ * (or a new buffer  is alloc'd, and the  given `heapbuf' is free'd  upon success, so- as  to
+ * prevent any problem relating to printing failing after a preceding, moving realloc)
+ *
+ * @param: p_buflen: [in]  The total allocated size (in bytes) of buffer
+ *                   [out] The number of bytes written to `*heapbuf' (EXCLUDING the trailing NUL char)
+ *                   [out] Unchanged when `NULL' is returned
+ * @return: * :   A malloc'd buffer derived from `heapbuf' and populated as specified by `format'->
+ * @return: NULL: Failed  to allocated sufficient  heap memory. In  this case, the caller-given
+ *                `heapbuf' will still be allocated (iow: must be free'd by the caller), though
+ *                its contents are left undefined. */
+INTDEF WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) ATTR_LIBC_PRINTF(3, 0) char *NOTHROW_NCX(LIBDCALL libd_vasnprintf)(char *heapbuf, size_t *p_buflen, char const *format, va_list args);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> asnprintf(3), vasnprintf(3)
+ * Given a malloc'd `heapbuf...+=*p_buflen' (where `*p_buflen' is the number of BYTES), write
+ * a  given `format'-string to said buffer. If the  buffer is too small, it will be realloc'd
+ * (or a new buffer  is alloc'd, and the  given `heapbuf' is free'd  upon success, so- as  to
+ * prevent any problem relating to printing failing after a preceding, moving realloc)
+ *
+ * @param: p_buflen: [in]  The total allocated size (in bytes) of buffer
+ *                   [out] The number of bytes written to `*heapbuf' (EXCLUDING the trailing NUL char)
+ *                   [out] Unchanged when `NULL' is returned
+ * @return: * :   A malloc'd buffer derived from `heapbuf' and populated as specified by `format'->
+ * @return: NULL: Failed  to allocated sufficient  heap memory. In  this case, the caller-given
+ *                `heapbuf' will still be allocated (iow: must be free'd by the caller), though
+ *                its contents are left undefined. */
+INTDEF WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) ATTR_LIBC_PRINTF(3, 0) char *NOTHROW_NCX(LIBCCALL libc_vasnprintf)(char *heapbuf, size_t *p_buflen, char const *format, va_list args);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> asnprintf(3), vasnprintf(3)
+ * Given a malloc'd `heapbuf...+=*p_buflen' (where `*p_buflen' is the number of BYTES), write
+ * a  given `format'-string to said buffer. If the  buffer is too small, it will be realloc'd
+ * (or a new buffer  is alloc'd, and the  given `heapbuf' is free'd  upon success, so- as  to
+ * prevent any problem relating to printing failing after a preceding, moving realloc)
+ *
+ * @param: p_buflen: [in]  The total allocated size (in bytes) of buffer
+ *                   [out] The number of bytes written to `*heapbuf' (EXCLUDING the trailing NUL char)
+ *                   [out] Unchanged when `NULL' is returned
+ * @return: * :   A malloc'd buffer derived from `heapbuf' and populated as specified by `format'->
+ * @return: NULL: Failed  to allocated sufficient  heap memory. In  this case, the caller-given
+ *                `heapbuf' will still be allocated (iow: must be free'd by the caller), though
+ *                its contents are left undefined. */
+INTDEF WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) ATTR_LIBC_PRINTF(3, 4) char *NOTHROW_NCX(VLIBDCALL libd_asnprintf)(char *__restrict heapbuf, size_t *__restrict p_buflen, char const *__restrict format, ...);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> asnprintf(3), vasnprintf(3)
+ * Given a malloc'd `heapbuf...+=*p_buflen' (where `*p_buflen' is the number of BYTES), write
+ * a  given `format'-string to said buffer. If the  buffer is too small, it will be realloc'd
+ * (or a new buffer  is alloc'd, and the  given `heapbuf' is free'd  upon success, so- as  to
+ * prevent any problem relating to printing failing after a preceding, moving realloc)
+ *
+ * @param: p_buflen: [in]  The total allocated size (in bytes) of buffer
+ *                   [out] The number of bytes written to `*heapbuf' (EXCLUDING the trailing NUL char)
+ *                   [out] Unchanged when `NULL' is returned
+ * @return: * :   A malloc'd buffer derived from `heapbuf' and populated as specified by `format'->
+ * @return: NULL: Failed  to allocated sufficient  heap memory. In  this case, the caller-given
+ *                `heapbuf' will still be allocated (iow: must be free'd by the caller), though
+ *                its contents are left undefined. */
+INTDEF WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) ATTR_LIBC_PRINTF(3, 4) char *NOTHROW_NCX(VLIBCCALL libc_asnprintf)(char *__restrict heapbuf, size_t *__restrict p_buflen, char const *__restrict format, ...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> tempnam(3) */
 INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_NCX(LIBDCALL libd_tempnam)(char const *dir, char const *pfx);
 /* >> fdopen(3)

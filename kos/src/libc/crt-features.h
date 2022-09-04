@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fac1618 */
+/* HASH CRC-32:0xc0155b38 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1074,6 +1074,7 @@
 #define __CRT_HAVE_DOS$asinhf
 #define __CRT_HAVE_DOS$asinhl
 #define __CRT_HAVE_DOS$asinl
+#define __CRT_HAVE_DOS$asnprintf
 #define __CRT_HAVE_DOS$asprintf
 #define __CRT_HAVE_DOS$at_quick_exit
 #define __CRT_HAVE_DOS$atan
@@ -3725,6 +3726,7 @@
 #define __CRT_HAVE_DOS$uucopy
 #define __CRT_HAVE_DOS$uucopystr
 #define __CRT_HAVE_DOS$valloc
+#define __CRT_HAVE_DOS$vasnprintf
 #define __CRT_HAVE_DOS$vasprintf
 #define __CRT_HAVE_DOS$vdprintf
 #define __CRT_HAVE_DOS$verr
@@ -5307,6 +5309,7 @@
 #define __CRT_HAVE_asinhf
 #define __CRT_HAVE_asinhl
 #define __CRT_HAVE_asinl
+#define __CRT_HAVE_asnprintf
 #define __CRT_HAVE_asprintf
 #define __CRT_HAVE_at_quick_exit
 #define __CRT_HAVE_atan
@@ -8145,6 +8148,7 @@
 #define __CRT_HAVE_uucopy
 #define __CRT_HAVE_uucopystr
 #define __CRT_HAVE_valloc
+#define __CRT_HAVE_vasnprintf
 #define __CRT_HAVE_vasprintf
 #define __CRT_HAVE_vconcat
 #define __CRT_HAVE_vdprintf

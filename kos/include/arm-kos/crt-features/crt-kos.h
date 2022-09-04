@@ -2371,6 +2371,7 @@
 #define __CRT_HAVE_asinhf
 #define __CRT_HAVE_asinhl
 #define __CRT_HAVE_asinl
+#define __CRT_HAVE_asnprintf
 #define __CRT_HAVE_asprintf
 #define __CRT_HAVE_at_quick_exit
 #define __CRT_HAVE_atan
@@ -6047,6 +6048,7 @@
 #define __CRT_HAVE_uucopy
 #define __CRT_HAVE_uucopystr
 #define __CRT_HAVE_valloc
+#define __CRT_HAVE_vasnprintf
 #define __CRT_HAVE_vasprintf
 #define __CRT_HAVE_vdprintf
 #define __CRT_HAVE_verr

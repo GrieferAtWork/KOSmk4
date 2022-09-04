@@ -271,14 +271,14 @@ DEFINE_INTERN_ALIAS(libc___freadahead_unlocked, libc___freadahead);
 
 
 
-/*[[[head:libc___freadptr,hash:CRC-32=0x17c79e99]]]*/
+/*[[[head:libc___freadptr,hash:CRC-32=0xe0d67a58]]]*/
 /* >> __freadptr(3)
  * Returns a pointer to the internal read-buffer of `stream', and set `*p_num_bytes'
- * to  the number of bytes which may be  read starting at the returned pointed. Note
+ * to  the number of bytes which may be  read starting at the returned pointer. Note
  * that this function isn't thread-safe  unless the caller calls `flockfile(3)'  and
  * `funlockfile(3)' themselves.
  * Once the caller is done reading from `return', they should use `__freadptrinc(3)'
- * in order to advance  the file's read-pointer and  marked processed data as  read.
+ * in order to advance the  file's read-pointer and to  mark consumed data as  read.
  * @param: p_num_bytes: Set to `__freadahead(stream)' when non-`NULL' is returned.
  * @return: * :   Pointer to a readable buffer of at least `*p_num_bytes' bytes
  * @return: NULL: The internal buffer of  `stream' is currently empty.  In
@@ -298,9 +298,9 @@ NOTHROW_NCX(LIBCCALL libc___freadptr)(FILE __KOS_FIXED_CONST *stream,
 }
 /*[[[end:libc___freadptr]]]*/
 
-/*[[[head:libc___freadptrinc,hash:CRC-32=0x27fa8402]]]*/
+/*[[[head:libc___freadptrinc,hash:CRC-32=0x349b39a0]]]*/
 /* >> __freadptrinc(3)
- * Consume `num_bytes' bytes from `stream's internal read-buffer. The caller must
+ * Consume `num_bytes' bytes from `stream's internal read-buffer. The caller  must
  * ensure that `num_bytes <= __freadahead(stream)'. Failure in doing so results in
  * undefined behavior. */
 INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_INOUT(1) void

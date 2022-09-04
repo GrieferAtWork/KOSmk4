@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x572c991 */
+/* HASH CRC-32:0x2e08fd13 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2230,6 +2230,7 @@ DFUN(".text.crt.dos.FILE.unlocked.read.read", libd_fread_unlocked, libc_fread_un
 DFUN(".text.crt.dos.FILE.unlocked.write.write", libd_fwrite_unlocked, libc_fwrite_unlocked, TI, 4, TP, TI, TI, TP)
 DFUN(".text.crt.dos.FILE.unlocked.read.getc", libd_fgetc_unlocked, libc_fgetc_unlocked, TD, 1, TP)
 DFUN(".text.crt.dos.FILE.unlocked.write.putc", libd_fputc_unlocked, libc_fputc_unlocked, TD, 2, TD, TP)
+DFUN(".text.crt.dos.FILE.unlocked.write.putc", libd_vasnprintf, libc_vasnprintf, TP, 4, TP, TP, TP, TP)
 DFUN(".text.crt.dos.fs.utility", libd_tempnam, libc_tempnam, TP, 2, TP, TP)
 DFUN(".text.crt.dos.FILE.locked.utility", libd_fdopen, libc_fdopen, TP, 2, TIn(__SIZEOF_FD_T__), TP)
 DFUN(".text.crt.dos.FILE.locked.utility", libd_fileno, libc_fileno, TIn(__SIZEOF_FD_T__), 1, TP)

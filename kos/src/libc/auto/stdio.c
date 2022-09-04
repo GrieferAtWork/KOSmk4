@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x803985d8 */
+/* HASH CRC-32:0xcad7f40a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -719,6 +719,232 @@ NOTHROW_NCX(LIBCCALL libc_setbuffer)(FILE *__restrict stream,
 INTERN ATTR_SECTION(".text.crt.FILE.locked.read.utility") ATTR_INOUT(1) void
 NOTHROW_NCX(LIBCCALL libc_setlinebuf)(FILE *__restrict stream) {
 	libc_setvbuf(stream, NULL, ___IOLBF, 0);
+}
+__NAMESPACE_LOCAL_BEGIN
+struct __vasnprintf_data {
+	char  *vapd_obf; /* [0..1][MAYBE(owned)] Original output buffer. */
+	char  *vapd_buf; /* [0..1][MAYBE(owned)] Output buffer base pointer. */
+	char  *vapd_ptr; /* [0..vapd_cnt] Pointer into `vapd_buf' for where to continue writing */
+	size_t vapd_cnt; /* # of remaining, available bytes in `vapd_ptr' (excluding space for trailing NUL) */
+};
+__LOCAL_LIBC(vasnprintf_printer) ssize_t FORMATPRINTER_CC
+vasnprintf_printer(void *arg, char const *__restrict data, size_t datalen) {
+	struct __vasnprintf_data *cookie;
+	cookie = (struct __vasnprintf_data *)arg;
+
+	/* Check for sufficient space. */
+	if (datalen > cookie->vapd_cnt) {
+		char *newbuf;
+		size_t reqlen;
+		reqlen = (cookie->vapd_ptr - cookie->vapd_buf) * sizeof(char);
+		reqlen += datalen * sizeof(char);
+		reqlen += sizeof(char); /* For trailing NUL */
+		if (cookie->vapd_buf == cookie->vapd_obf) {
+			size_t offset;
+#if defined(__CRT_HAVE_realloc_in_place) || defined(__CRT_HAVE__expand)
+			newbuf = (char *)libc_realloc_in_place(cookie->vapd_obf, reqlen);
+			if (newbuf) {
+				cookie->vapd_cnt = datalen;
+				goto dowrite;
+			}
+#endif /* __CRT_HAVE_realloc_in_place || __CRT_HAVE__expand */
+
+			/* Allocate the initial version of our own heap-buffer */
+			reqlen += 512 * sizeof(char);
+			newbuf = (char *)libc_malloc(reqlen);
+			if unlikely(!newbuf) {
+				reqlen -= 512 * sizeof(char);
+				newbuf = (char *)libc_malloc(reqlen);
+				if unlikely(!newbuf)
+					goto err;
+			}
+#if defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)
+			reqlen = malloc_usable_size(newbuf) - sizeof(char);
+#endif /* __CRT_HAVE_malloc_usable_size || __CRT_HAVE__msize */
+			offset = (size_t)(cookie->vapd_ptr - cookie->vapd_buf);
+			/* Copy already-printed data off of the initial buffer */
+			newbuf = (char *)libc_memcpy(newbuf, cookie->vapd_buf,
+			                        offset * sizeof(char));
+			cookie->vapd_buf = newbuf;
+			cookie->vapd_ptr = newbuf + offset;
+			cookie->vapd_cnt = (reqlen / sizeof(char)) - offset;
+		} else {
+			size_t offset;
+
+#if defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
+			/* Already on secondary buffer -> try to realloc to a larger size */
+			reqlen += 512 * sizeof(char);
+			newbuf = (char *)libc_realloc(cookie->vapd_buf, reqlen);
+			if unlikely(!newbuf) {
+				reqlen -= 512 * sizeof(char);
+				newbuf = (char *)libc_realloc(cookie->vapd_buf, reqlen);
+				if unlikely(!newbuf)
+					goto err;
+			}
+#if defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)
+			reqlen = malloc_usable_size(newbuf) - sizeof(char);
+#endif /* __CRT_HAVE_malloc_usable_size || __CRT_HAVE__msize */
+			offset = (size_t)(cookie->vapd_ptr - cookie->vapd_buf);
+			cookie->vapd_buf = newbuf;
+			cookie->vapd_ptr = newbuf + offset;
+			cookie->vapd_cnt = (reqlen / sizeof(char)) - offset;
+#else /* __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc */
+			/* No realloc(3) function -> can only use malloc */
+			reqlen += 512 * sizeof(char);
+			newbuf = (char *)libc_malloc(reqlen);
+			if unlikely(!newbuf) {
+				reqlen -= 512 * sizeof(char);
+				newbuf = (char *)libc_malloc(reqlen);
+				if unlikely(!newbuf)
+					goto err;
+			}
+#if defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)
+			reqlen = malloc_usable_size(newbuf) - sizeof(char);
+#endif /* __CRT_HAVE_malloc_usable_size || __CRT_HAVE__msize */
+			offset = (size_t)(cookie->vapd_ptr - cookie->vapd_buf);
+			newbuf = (char *)libc_memcpy(newbuf, cookie->vapd_buf, offset * sizeof(char));
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+			libc_free(cookie->vapd_buf);
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+			cookie->vapd_buf = newbuf;
+			cookie->vapd_ptr = newbuf + offset;
+			cookie->vapd_cnt = (reqlen / sizeof(char)) - offset;
+#endif /* !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc */
+		}
+	}
+
+	/* Do the write! */
+dowrite:
+	cookie->vapd_ptr = (char *)libc_mempcpy(cookie->vapd_ptr, data, datalen * sizeof(char));
+	cookie->vapd_cnt -= datalen;
+	return (ssize_t)datalen;
+err:
+	return -1; /* Stop printing! */
+}
+__NAMESPACE_LOCAL_END
+/* >> asnprintf(3), vasnprintf(3)
+ * Given a malloc'd `heapbuf...+=*p_buflen' (where `*p_buflen' is the number of BYTES), write
+ * a  given `format'-string to said buffer. If the  buffer is too small, it will be realloc'd
+ * (or a new buffer  is alloc'd, and the  given `heapbuf' is free'd  upon success, so- as  to
+ * prevent any problem relating to printing failing after a preceding, moving realloc)
+ *
+ * @param: p_buflen: [in]  The total allocated size (in bytes) of buffer
+ *                   [out] The number of bytes written to `*heapbuf' (EXCLUDING the trailing NUL char)
+ *                   [out] Unchanged when `NULL' is returned
+ * @return: * :   A malloc'd buffer derived from `heapbuf' and populated as specified by `format'->
+ * @return: NULL: Failed  to allocated sufficient  heap memory. In  this case, the caller-given
+ *                `heapbuf' will still be allocated (iow: must be free'd by the caller), though
+ *                its contents are left undefined. */
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) ATTR_LIBC_PRINTF(3, 0) char *
+NOTHROW_NCX(LIBCCALL libc_vasnprintf)(char *heapbuf,
+                                      size_t *p_buflen,
+                                      char const *format,
+                                      va_list args) {
+	size_t result_buflen;
+	struct __NAMESPACE_LOCAL_SYM __vasnprintf_data cookie;
+	cookie.vapd_obf = heapbuf;
+	cookie.vapd_buf = heapbuf;
+	cookie.vapd_cnt = *p_buflen;
+
+	/* Allocate an initial buffer if none was provided by the caller. */
+	if (!cookie.vapd_buf || !cookie.vapd_cnt) {
+		cookie.vapd_obf = NULL;
+		cookie.vapd_cnt = 512;
+		cookie.vapd_buf = (char *)libc_malloc(512 * sizeof(char));
+		if unlikely(!cookie.vapd_buf) {
+			cookie.vapd_cnt = 1;
+			cookie.vapd_buf = (char *)libc_malloc(sizeof(char));
+			if unlikely(!cookie.vapd_buf)
+				return NULL;
+		}
+	}
+
+	/* Do the print. */
+	cookie.vapd_ptr = cookie.vapd_buf;
+	if unlikely(libc_format_vprintf(&__NAMESPACE_LOCAL_SYM vasnprintf_printer,
+	                           &cookie, format, args) < 0)
+		goto err;
+
+	/* Realloc to shrink result buffer to its minimal size. */
+	result_buflen = (size_t)(cookie.vapd_ptr - cookie.vapd_buf);
+	if (cookie.vapd_buf == cookie.vapd_obf) {
+
+		/* Still using caller-given buffer -> must use realloc_in_place! */
+		libc_realloc_in_place(cookie.vapd_obf, (result_buflen + 1) * sizeof(char));
+
+	} else {
+
+		char *result;
+		result = (char *)libc_realloc(cookie.vapd_buf, (result_buflen + 1) * sizeof(char));
+		if likely(result != NULL)
+			cookie.vapd_buf = result;
+
+	}
+
+	/* Ensure NUL-termination */
+	cookie.vapd_buf[result_buflen] = '\0';
+	*p_buflen = result_buflen;
+	return cookie.vapd_buf;
+err:
+
+	if (cookie.vapd_buf != cookie.vapd_obf)
+		libc_free(cookie.vapd_buf);
+
+	return NULL;
+}
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> asnprintf(3), vasnprintf(3)
+ * Given a malloc'd `heapbuf...+=*p_buflen' (where `*p_buflen' is the number of BYTES), write
+ * a  given `format'-string to said buffer. If the  buffer is too small, it will be realloc'd
+ * (or a new buffer  is alloc'd, and the  given `heapbuf' is free'd  upon success, so- as  to
+ * prevent any problem relating to printing failing after a preceding, moving realloc)
+ *
+ * @param: p_buflen: [in]  The total allocated size (in bytes) of buffer
+ *                   [out] The number of bytes written to `*heapbuf' (EXCLUDING the trailing NUL char)
+ *                   [out] Unchanged when `NULL' is returned
+ * @return: * :   A malloc'd buffer derived from `heapbuf' and populated as specified by `format'->
+ * @return: NULL: Failed  to allocated sufficient  heap memory. In  this case, the caller-given
+ *                `heapbuf' will still be allocated (iow: must be free'd by the caller), though
+ *                its contents are left undefined. */
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.unlocked.write.putc") WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) ATTR_LIBC_PRINTF(3, 4) char *
+NOTHROW_NCX(VLIBDCALL libd_asnprintf)(char *__restrict heapbuf,
+                                      size_t *__restrict p_buflen,
+                                      char const *__restrict format,
+                                      ...) {
+	char * result;
+	va_list args;
+	va_start(args, format);
+	result = libc_vasnprintf(heapbuf, p_buflen, format, args);
+	va_end(args);
+	return result;
+}
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> asnprintf(3), vasnprintf(3)
+ * Given a malloc'd `heapbuf...+=*p_buflen' (where `*p_buflen' is the number of BYTES), write
+ * a  given `format'-string to said buffer. If the  buffer is too small, it will be realloc'd
+ * (or a new buffer  is alloc'd, and the  given `heapbuf' is free'd  upon success, so- as  to
+ * prevent any problem relating to printing failing after a preceding, moving realloc)
+ *
+ * @param: p_buflen: [in]  The total allocated size (in bytes) of buffer
+ *                   [out] The number of bytes written to `*heapbuf' (EXCLUDING the trailing NUL char)
+ *                   [out] Unchanged when `NULL' is returned
+ * @return: * :   A malloc'd buffer derived from `heapbuf' and populated as specified by `format'->
+ * @return: NULL: Failed  to allocated sufficient  heap memory. In  this case, the caller-given
+ *                `heapbuf' will still be allocated (iow: must be free'd by the caller), though
+ *                its contents are left undefined. */
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") WUNUSED ATTR_IN(3) ATTR_INOUT(1) ATTR_INOUT(2) ATTR_LIBC_PRINTF(3, 4) char *
+NOTHROW_NCX(VLIBCCALL libc_asnprintf)(char *__restrict heapbuf,
+                                      size_t *__restrict p_buflen,
+                                      char const *__restrict format,
+                                      ...) {
+	char * result;
+	va_list args;
+	va_start(args, format);
+	result = libc_vasnprintf(heapbuf, p_buflen, format, args);
+	va_end(args);
+	return result;
 }
 #include <libc/errno.h>
 #include <asm/os/stdio.h>
@@ -4091,6 +4317,13 @@ DEFINE_PUBLIC_ALIAS(tmpnam_r, libc_tmpnam_r);
 DEFINE_PUBLIC_ALIAS(_IO_setbuffer, libc_setbuffer);
 DEFINE_PUBLIC_ALIAS(setbuffer, libc_setbuffer);
 DEFINE_PUBLIC_ALIAS(setlinebuf, libc_setlinebuf);
+DEFINE_PUBLIC_ALIAS(vasnprintf, libc_vasnprintf);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$asnprintf, libd_asnprintf);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(asnprintf, libc_asnprintf);
 DEFINE_PUBLIC_ALIAS(fmemopen, libc_fmemopen);
 DEFINE_PUBLIC_ALIAS(open_memstream, libc_open_memstream);
 DEFINE_PUBLIC_ALIAS(__getdelim, libc_getdelim);

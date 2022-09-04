@@ -1915,6 +1915,226 @@ int fputc_unlocked(int ch, [[inout]] $FILE *__restrict stream) {
 	return ch;
 @@pp_endif@@
 }
+
+
+/************************************************************************/
+/* From newlib                                                          */
+/************************************************************************/
+
+[[wunused, doc_alias("asnprintf")]]
+[[requires_function("malloc")]]
+[[decl_include("<hybrid/typecore.h>")]]
+[[impl_include("<hybrid/typecore.h>")]]
+[[impl_include("<bits/crt/format-printer.h>")]]
+[[dependency("memcpy", "mempcpy")]]
+[[impl_prefix(
+@@push_namespace(local)@@
+struct __vasnprintf_data {
+	char  *vapd_obf; /* [0..1][MAYBE(owned)] Original output buffer. */
+	char  *vapd_buf; /* [0..1][MAYBE(owned)] Output buffer base pointer. */
+	char  *vapd_ptr; /* [0..vapd_cnt] Pointer into `vapd_buf' for where to continue writing */
+	size_t vapd_cnt; /* # of remaining, available bytes in `vapd_ptr' (excluding space for trailing NUL) */
+};
+__LOCAL_LIBC(@vasnprintf_printer@) ssize_t FORMATPRINTER_CC
+vasnprintf_printer(void *arg, char const *__restrict data, size_t datalen) {
+	struct __vasnprintf_data *cookie;
+	cookie = (struct __vasnprintf_data *)arg;
+
+	/* Check for sufficient space. */
+	if (datalen > cookie->vapd_cnt) {
+		char *newbuf;
+		size_t reqlen;
+		reqlen = (cookie->vapd_ptr - cookie->vapd_buf) * sizeof(char);
+		reqlen += datalen * sizeof(char);
+		reqlen += sizeof(char); /* For trailing NUL */
+		if (cookie->vapd_buf == cookie->vapd_obf) {
+			size_t offset;
+@@pp_if $has_function(realloc_in_place)@@
+			newbuf = (char *)realloc_in_place(cookie->vapd_obf, reqlen);
+			if (newbuf) {
+				cookie->vapd_cnt = datalen;
+				goto dowrite;
+			}
+@@pp_endif@@
+
+			/* Allocate the initial version of our own heap-buffer */
+			reqlen += 512 * sizeof(char);
+			newbuf = (char *)malloc(reqlen);
+			if unlikely(!newbuf) {
+				reqlen -= 512 * sizeof(char);
+				newbuf = (char *)malloc(reqlen);
+				if unlikely(!newbuf)
+					goto err;
+			}
+@@pp_if $has_function(malloc_usable_size)@@
+			reqlen = malloc_usable_size(newbuf) - sizeof(char);
+@@pp_endif@@
+			offset = (size_t)(cookie->vapd_ptr - cookie->vapd_buf);
+			/* Copy already-printed data off of the initial buffer */
+			newbuf = (char *)memcpy(newbuf, cookie->vapd_buf,
+			                        offset * sizeof(char));
+			cookie->vapd_buf = newbuf;
+			cookie->vapd_ptr = newbuf + offset;
+			cookie->vapd_cnt = (reqlen / sizeof(char)) - offset;
+		} else {
+			size_t offset;
+
+@@pp_if $has_function(realloc)@@
+			/* Already on secondary buffer -> try to realloc to a larger size */
+			reqlen += 512 * sizeof(char);
+			newbuf = (char *)realloc(cookie->vapd_buf, reqlen);
+			if unlikely(!newbuf) {
+				reqlen -= 512 * sizeof(char);
+				newbuf = (char *)realloc(cookie->vapd_buf, reqlen);
+				if unlikely(!newbuf)
+					goto err;
+			}
+@@pp_if $has_function(malloc_usable_size)@@
+			reqlen = malloc_usable_size(newbuf) - sizeof(char);
+@@pp_endif@@
+			offset = (size_t)(cookie->vapd_ptr - cookie->vapd_buf);
+			cookie->vapd_buf = newbuf;
+			cookie->vapd_ptr = newbuf + offset;
+			cookie->vapd_cnt = (reqlen / sizeof(char)) - offset;
+@@pp_else@@
+			/* No realloc(3) function -> can only use malloc */
+			reqlen += 512 * sizeof(char);
+			newbuf = (char *)malloc(reqlen);
+			if unlikely(!newbuf) {
+				reqlen -= 512 * sizeof(char);
+				newbuf = (char *)malloc(reqlen);
+				if unlikely(!newbuf)
+					goto err;
+			}
+@@pp_if $has_function(malloc_usable_size)@@
+			reqlen = malloc_usable_size(newbuf) - sizeof(char);
+@@pp_endif@@
+			offset = (size_t)(cookie->vapd_ptr - cookie->vapd_buf);
+			newbuf = (char *)memcpy(newbuf, cookie->vapd_buf, offset * sizeof(char));
+@@pp_if $has_function(free)@@
+			free(cookie->vapd_buf);
+@@pp_endif@@
+			cookie->vapd_buf = newbuf;
+			cookie->vapd_ptr = newbuf + offset;
+			cookie->vapd_cnt = (reqlen / sizeof(char)) - offset;
+@@pp_endif@@
+		}
+	}
+
+	/* Do the write! */
+dowrite:
+	cookie->vapd_ptr = (char *)mempcpy(cookie->vapd_ptr, data, datalen * sizeof(char));
+	cookie->vapd_cnt -= datalen;
+	return (ssize_t)datalen;
+err:
+	return -1; /* Stop printing! */
+}
+@@pop_namespace@@
+)]]
+char *vasnprintf([[inout]] char *heapbuf,
+                 [[inout]] size_t *p_buflen,
+                 [[in, format]] char const *format,
+                 $va_list args) {
+	size_t result_buflen;
+	struct __NAMESPACE_LOCAL_SYM __vasnprintf_data cookie;
+	cookie.vapd_obf = heapbuf;
+	cookie.vapd_buf = heapbuf;
+	cookie.vapd_cnt = *p_buflen;
+
+	/* Allocate an initial buffer if none was provided by the caller. */
+	if (!cookie.vapd_buf || !cookie.vapd_cnt) {
+		cookie.vapd_obf = NULL;
+		cookie.vapd_cnt = 512;
+		cookie.vapd_buf = (char *)malloc(512 * sizeof(char));
+		if unlikely(!cookie.vapd_buf) {
+			cookie.vapd_cnt = 1;
+			cookie.vapd_buf = (char *)malloc(sizeof(char));
+			if unlikely(!cookie.vapd_buf)
+				return NULL;
+		}
+	}
+
+	/* Do the print. */
+	cookie.vapd_ptr = cookie.vapd_buf;
+	if unlikely(format_vprintf(&__NAMESPACE_LOCAL_SYM vasnprintf_printer,
+	                           &cookie, format, args) < 0)
+		goto err;
+
+	/* Realloc to shrink result buffer to its minimal size. */
+	result_buflen = (size_t)(cookie.vapd_ptr - cookie.vapd_buf);
+	if (cookie.vapd_buf == cookie.vapd_obf) {
+@@pp_if $has_function(realloc_in_place)@@
+		/* Still using caller-given buffer -> must use realloc_in_place! */
+		realloc_in_place(cookie.vapd_obf, (result_buflen + 1) * sizeof(char));
+@@pp_endif@@
+	} else {
+@@pp_if $has_function(realloc)@@
+		char *result;
+		result = (char *)realloc(cookie.vapd_buf, (result_buflen + 1) * sizeof(char));
+		if likely(result != NULL)
+			cookie.vapd_buf = result;
+@@pp_endif@@
+	}
+
+	/* Ensure NUL-termination */
+	cookie.vapd_buf[result_buflen] = '\0';
+	*p_buflen = result_buflen;
+	return cookie.vapd_buf;
+err:
+@@pp_if $has_function(free)@@
+	if (cookie.vapd_buf != cookie.vapd_obf)
+		free(cookie.vapd_buf);
+@@pp_endif@@
+	return NULL;
+}
+
+
+@@>> asnprintf(3), vasnprintf(3)
+@@Given a malloc'd `heapbuf...+=*p_buflen' (where `*p_buflen' is the number of BYTES), write
+@@a  given `format'-string to said buffer. If the  buffer is too small, it will be realloc'd
+@@(or a new buffer  is alloc'd, and the  given `heapbuf' is free'd  upon success, so- as  to
+@@prevent any problem relating to printing failing after a preceding, moving realloc)
+@@
+@@@param: p_buflen: [in]  The total allocated size (in bytes) of buffer
+@@                  [out] The number of bytes written to `*heapbuf' (EXCLUDING the trailing NUL char)
+@@                  [out] Unchanged when `NULL' is returned
+@@@return: * :   A malloc'd buffer derived from `heapbuf' and populated as specified by `format'->
+@@@return: NULL: Failed  to allocated sufficient  heap memory. In  this case, the caller-given
+@@               `heapbuf' will still be allocated (iow: must be free'd by the caller), though
+@@               its contents are left undefined.
+[[wunused, decl_include("<hybrid/typecore.h>")]]
+char *asnprintf([[inout]] char *__restrict heapbuf,
+                [[inout]] size_t *__restrict p_buflen,
+                [[in, format]] char const *__restrict format, ...)
+	%{printf("vasnprintf")}
+
+//TODO: Within libc, all of the following can just be implemented as aliases for the normal
+//      variants. They're documented as being  tiny (integer-only) variants of the  regular
+//      printf  functions. Because of  this, their local  implementations must reflect this
+//      requirement, such that they're implemented as reduced-functionality-variants of the
+//      regular printf family (s.a. `format_iprintf(3)')
+
+//TODO: int vasiprintf([[out]] char **pstr, [[in, format]] char const *format, $va_list args);
+//TODO: [[wunused]] char *vasniprintf([[inout]] char *heapbuf, [[inout]] size_t *p_buflen, [[in, format]] char const *format, $va_list args);
+//TODO: int vdiprintf($fd_t fd, [[in, format]] char const *format, $va_list args);
+//TODO: int vfiprintf([[inout]] $FILE *, [[in, format]] char const *format, $va_list args);
+//TODO: int vfiscanf([[inout]] $FILE *, [[in, format]] char const *format, $va_list args);
+//TODO: int viprintf([[in, format]] char const *format, $va_list args);
+//TODO: int viscanf([[in, format]] char const *format, $va_list args);
+//TODO: int vsiprintf([[out]] char *buf, [[in, format]] char const *format, $va_list args);
+//TODO: int vsiscanf([[in]] char const *input, [[in, format]] char const *format, $va_list args);
+//TODO: int vsniprintf([[out(? <= buflen)]] char *buf, size_t buflen, [[in, format]] char const *format, $va_list args);
+
+//TODO: int asiprintf([[out]] char **pstr, [[in, format]] char const *format, ...);
+//TODO: [[wunused]] char *asniprintf([[inout]] char *heapbuf, [[inout]] size_t *p_buflen, [[in, format]] char const *format, ...);
+//TODO: [[guard("diprintf")]] int diprintf($fd_t fd, [[in, format]] char const *format, ...);
+//TODO: int fiprintf([[inout]] $FILE *stream, [[in, format]] char const *format, ...);
+//TODO: int fiscanf([[inout]] $FILE *stream, [[in, format]] char const *format, ...);
+//TODO: int iprintf([[in, format]] char const *format, ...);
+//TODO: int iscanf([[in, format]] char const *format, ...);
+//TODO: int siprintf([[out]] char *buf, [[in, format]] char const *format, ...);
+//TODO: int siscanf([[in]] char const *input, [[in, format]] char const *format, ...);
+//TODO: int sniprintf([[out(? <= buflen)]] char *buf, size_t buflen, [[in, format]] char const *format, ...);
 %#endif /* __USE_MISC */
 
 
