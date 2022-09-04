@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcad7f40a */
+/* HASH CRC-32:0x8399a1d3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -844,6 +844,7 @@ NOTHROW_NCX(LIBCCALL libc_vasnprintf)(char *heapbuf,
 	struct __NAMESPACE_LOCAL_SYM __vasnprintf_data cookie;
 	cookie.vapd_obf = heapbuf;
 	cookie.vapd_buf = heapbuf;
+	cookie.vapd_ptr = heapbuf;
 	cookie.vapd_cnt = *p_buflen;
 
 	/* Allocate an initial buffer if none was provided by the caller. */
@@ -857,10 +858,10 @@ NOTHROW_NCX(LIBCCALL libc_vasnprintf)(char *heapbuf,
 			if unlikely(!cookie.vapd_buf)
 				return NULL;
 		}
+		cookie.vapd_ptr = cookie.vapd_buf;
 	}
 
 	/* Do the print. */
-	cookie.vapd_ptr = cookie.vapd_buf;
 	if unlikely(libc_format_vprintf(&__NAMESPACE_LOCAL_SYM vasnprintf_printer,
 	                           &cookie, format, args) < 0)
 		goto err;
@@ -912,7 +913,7 @@ NOTHROW_NCX(VLIBDCALL libd_asnprintf)(char *__restrict heapbuf,
                                       size_t *__restrict p_buflen,
                                       char const *__restrict format,
                                       ...) {
-	char * result;
+	char *result;
 	va_list args;
 	va_start(args, format);
 	result = libc_vasnprintf(heapbuf, p_buflen, format, args);
@@ -939,7 +940,7 @@ NOTHROW_NCX(VLIBCCALL libc_asnprintf)(char *__restrict heapbuf,
                                       size_t *__restrict p_buflen,
                                       char const *__restrict format,
                                       ...) {
-	char * result;
+	char *result;
 	va_list args;
 	va_start(args, format);
 	result = libc_vasnprintf(heapbuf, p_buflen, format, args);

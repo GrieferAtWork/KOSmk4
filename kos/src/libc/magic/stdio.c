@@ -2039,6 +2039,7 @@ char *vasnprintf([[inout]] char *heapbuf,
 	struct __NAMESPACE_LOCAL_SYM __vasnprintf_data cookie;
 	cookie.vapd_obf = heapbuf;
 	cookie.vapd_buf = heapbuf;
+	cookie.vapd_ptr = heapbuf;
 	cookie.vapd_cnt = *p_buflen;
 
 	/* Allocate an initial buffer if none was provided by the caller. */
@@ -2052,10 +2053,10 @@ char *vasnprintf([[inout]] char *heapbuf,
 			if unlikely(!cookie.vapd_buf)
 				return NULL;
 		}
+		cookie.vapd_ptr = cookie.vapd_buf;
 	}
 
 	/* Do the print. */
-	cookie.vapd_ptr = cookie.vapd_buf;
 	if unlikely(format_vprintf(&__NAMESPACE_LOCAL_SYM vasnprintf_printer,
 	                           &cookie, format, args) < 0)
 		goto err;

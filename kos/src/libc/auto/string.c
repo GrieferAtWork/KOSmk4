@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x245f2108 */
+/* HASH CRC-32:0xfbf4e993 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5110,7 +5110,7 @@ NOTHROW_NCX(LIBCCALL libc_vstrdupf)(char const *__restrict format,
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2) char *
 NOTHROW_NCX(VLIBDCALL libd_strdupf)(char const *__restrict format,
                                     ...) {
-	char * result;
+	char *result;
 	va_list args;
 	va_start(args, format);
 	result = libc_vstrdupf(format, args);
@@ -5124,7 +5124,7 @@ NOTHROW_NCX(VLIBDCALL libd_strdupf)(char const *__restrict format,
 INTERN ATTR_SECTION(".text.crt.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2) char *
 NOTHROW_NCX(VLIBCCALL libc_strdupf)(char const *__restrict format,
                                     ...) {
-	char * result;
+	char *result;
 	va_list args;
 	va_start(args, format);
 	result = libc_vstrdupf(format, args);

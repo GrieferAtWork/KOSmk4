@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0e2e171 */
+/* HASH CRC-32:0x69730b71 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -227,6 +227,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vasnprintf))(char *__heapbuf, __SIZE_
 	struct __NAMESPACE_LOCAL_SYM __vasnprintf_data __cookie;
 	__cookie.__vapd_obf = __heapbuf;
 	__cookie.__vapd_buf = __heapbuf;
+	__cookie.__vapd_ptr = __heapbuf;
 	__cookie.__vapd_cnt = *__p_buflen;
 
 	/* Allocate an initial buffer if none was provided by the caller. */
@@ -240,10 +241,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vasnprintf))(char *__heapbuf, __SIZE_
 			if __unlikely(!__cookie.__vapd_buf)
 				return __NULLPTR;
 		}
+		__cookie.__vapd_ptr = __cookie.__vapd_buf;
 	}
 
 	/* Do the print. */
-	__cookie.__vapd_ptr = __cookie.__vapd_buf;
 	if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_format_vprintf)(&__NAMESPACE_LOCAL_SYM __vasnprintf_printer,
 	                           &__cookie, __format, __args) < 0)
 		goto __err;

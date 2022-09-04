@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f772942 */
+/* HASH CRC-32:0xd9bb3d7e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_vasnprintf_defined */
 __LOCAL_LIBC(asnprintf) __ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_LIBC_PRINTF(3, 4) char *
 __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(asnprintf))(char *__restrict __heapbuf, __SIZE_TYPE__ *__restrict __p_buflen, char const *__restrict __format, ...) {
-	char * __result;
+	char *__result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_vasnprintf)(__heapbuf, __p_buflen, __format, __args);

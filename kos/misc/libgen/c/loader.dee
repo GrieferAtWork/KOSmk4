@@ -5577,7 +5577,7 @@ got_chkExpr:
 							myPrototype = myPrototype();
 						local bodyPattern: string =
 						"{{\n"
-						"	{returnType0} result{returnType1};\n"
+						"	{returnTypeResult};\n"
 						"	va_list args;\n"
 						"	va_start(args, {lastArg});\n"
 						"	result = {vprintf}({positionalArgs}, args);\n"
@@ -5604,11 +5604,10 @@ got_chkExpr:
 						return LoaderFunctionImplementation(
 							impl: FunctionImplementation(
 								body: bodyPattern.format({
-									"returnType0"    : myPrototype.returnType.beforeName,
-									"returnType1"    : myPrototype.returnType.afterName,
-									"lastArg"        : myPrototype.argv[#myPrototype.argv-2].name,
-									"positionalArgs" : ", ".join(myPrototype.argv[:-1].each.name),
-									"vprintf"        : vprintfFunctionName,
+									"returnTypeResult" : myPrototype.returnType.cprintToString("result"),
+									"lastArg"          : myPrototype.argv[#myPrototype.argv-2].name,
+									"positionalArgs"   : ", ".join(myPrototype.argv[:-1].each.name),
+									"vprintf"          : vprintfFunctionName,
 								}),
 								name: currentName,
 								dependencies: { vprintfFunctionName : vprintfFunctionName }),

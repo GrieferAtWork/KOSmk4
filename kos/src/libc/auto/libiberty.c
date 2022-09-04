@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3476580c */
+/* HASH CRC-32:0xfff4ab7a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -358,7 +358,7 @@ NOTHROW_NCX(LIBCCALL libc_xvasprintf)(char const *format,
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2) char *
 NOTHROW_NCX(VLIBDCALL libd_xasprintf)(char const *__restrict format,
                                       ...) {
-	char * result;
+	char *result;
 	va_list args;
 	va_start(args, format);
 	result = libc_xvasprintf(format, args);
@@ -370,7 +370,7 @@ NOTHROW_NCX(VLIBDCALL libd_xasprintf)(char const *__restrict format,
 INTERN ATTR_SECTION(".text.crt.libiberty") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2) char *
 NOTHROW_NCX(VLIBCCALL libc_xasprintf)(char const *__restrict format,
                                       ...) {
-	char * result;
+	char *result;
 	va_list args;
 	va_start(args, format);
 	result = libc_xvasprintf(format, args);

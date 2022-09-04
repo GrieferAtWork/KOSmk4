@@ -381,6 +381,14 @@ again_compare_typenames:
 		fp << "0";
 	}
 
+	public function cprintToString(name: string | UserString = ""): string {
+		local tempFp = File.Writer();
+		local tempWriter = CWriter(tempFp);
+		this.cprint(tempWriter, ESCAPE_MODE_NONE, name);
+		tempWriter.flush();
+		return tempFp.string;
+	}
+
 	@@Output @this @CType to a @CWriter
 	@@Returns @true if the type string must be followed by whitespace if
 	@@immediately  succeeded  by  a keyword.  Returns  @false otherwise.
