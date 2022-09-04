@@ -251,6 +251,14 @@
 #else /* _TIME_T_BITS == 32 */
 #error "Must #define _TIME_T_BITS as either 32 or 64"
 #endif /* _TIME_T_BITS != 32 */
+#elif defined(_TIME_BITS)
+#if (_TIME_BITS + 0) == 64
+#define __USE_TIME_BITS64 1
+#elif (_TIME_BITS + 0) == 32
+#undef __USE_TIME_BITS64
+#else /* _TIME_BITS == 32 */
+#error "Must #define _TIME_BITS as either 32 or 64"
+#endif /* _TIME_T_BITS != 32 */
 #elif defined(_USE_32BIT_TIME_T)
 #undef __USE_TIME_BITS64
 #elif defined(_USE_64BIT_TIME_T)
