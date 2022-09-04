@@ -183,6 +183,32 @@ size_t __freadahead([[in]] $FILE __KOS_FIXED_CONST *stream);
 size_t __freadahead_unlocked([[in]] $FILE __KOS_FIXED_CONST *stream);
 
 
+
+
+
+@@>> __freadptr(3)
+@@Returns a pointer to the internal read-buffer of `stream', and set `*p_num_bytes'
+@@to  the number of bytes which may be  read starting at the returned pointer. Note
+@@that this function isn't thread-safe  unless the caller calls `flockfile(3)'  and
+@@`funlockfile(3)' themselves.
+@@Once the caller is done reading from `return', they should use `__freadptrinc(3)'
+@@in order to advance the  file's read-pointer and to  mark consumed data as  read.
+@@@param: p_num_bytes: Set to `__freadahead(stream)' when non-`NULL' is returned.
+@@@return: * :   Pointer to a readable buffer of at least `*p_num_bytes' bytes
+@@@return: NULL: The internal buffer of  `stream' is currently empty.  In
+@@               this case, `*p_num_bytes' is left in an undefined state.
+[[wunused, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+char const *__freadptr([[in]] $FILE __KOS_FIXED_CONST *stream, size_t *p_num_bytes);
+
+@@>> __freadptrinc(3)
+@@Consume `num_bytes' bytes from `stream's internal read-buffer. The caller  must
+@@ensure that `num_bytes <= __freadahead(stream)'. Failure in doing so results in
+@@undefined behavior.
+[[decl_include("<hybrid/typecore.h>")]]
+void __freadptrinc([[inout]] $FILE *stream, size_t num_bytes);
+
+
+
 %{
 
 __SYSDECL_END

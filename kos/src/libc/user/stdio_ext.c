@@ -271,9 +271,61 @@ DEFINE_INTERN_ALIAS(libc___freadahead_unlocked, libc___freadahead);
 
 
 
+/*[[[head:libc___freadptr,hash:CRC-32=0x17c79e99]]]*/
+/* >> __freadptr(3)
+ * Returns a pointer to the internal read-buffer of `stream', and set `*p_num_bytes'
+ * to  the number of bytes which may be  read starting at the returned pointed. Note
+ * that this function isn't thread-safe  unless the caller calls `flockfile(3)'  and
+ * `funlockfile(3)' themselves.
+ * Once the caller is done reading from `return', they should use `__freadptrinc(3)'
+ * in order to advance  the file's read-pointer and  marked processed data as  read.
+ * @param: p_num_bytes: Set to `__freadahead(stream)' when non-`NULL' is returned.
+ * @return: * :   Pointer to a readable buffer of at least `*p_num_bytes' bytes
+ * @return: NULL: The internal buffer of  `stream' is currently empty.  In
+ *                this case, `*p_num_bytes' is left in an undefined state. */
+INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") WUNUSED ATTR_IN(1) char const *
+NOTHROW_NCX(LIBCCALL libc___freadptr)(FILE __KOS_FIXED_CONST *stream,
+                                      size_t *p_num_bytes)
+/*[[[body:libc___freadptr]]]*/
+{
+	byte_t *result;
+	stream       = file_fromuser(stream);
+	*p_num_bytes = stream->if_cnt;
+	result       = stream->if_ptr;
+	if unlikely(!stream->if_cnt)
+		result = NULL; /* Mandated by specs... */
+	return (char const *)result;
+}
+/*[[[end:libc___freadptr]]]*/
+
+/*[[[head:libc___freadptrinc,hash:CRC-32=0x27fa8402]]]*/
+/* >> __freadptrinc(3)
+ * Consume `num_bytes' bytes from `stream's internal read-buffer. The caller must
+ * ensure that `num_bytes <= __freadahead(stream)'. Failure in doing so results in
+ * undefined behavior. */
+INTERN ATTR_SECTION(".text.crt.FILE.utility.ext") ATTR_INOUT(1) void
+NOTHROW_NCX(LIBCCALL libc___freadptrinc)(FILE *stream,
+                                         size_t num_bytes)
+/*[[[body:libc___freadptrinc]]]*/
+{
+	stream = file_fromuser(stream);
+	assertf(num_bytes <= stream->if_cnt,
+	        "Cannot skip that many bytes (buffer too small)\n"
+	        "num_bytes      = %" PRIuSIZ "\n"
+	        "stream->if_cnt = %" PRIuSIZ "\n",
+	        num_bytes, stream->if_cnt);
+
+	/* Advance stream pointer, and shrink buffer size */
+	stream->if_ptr += num_bytes;
+	stream->if_cnt -= num_bytes;
+}
+/*[[[end:libc___freadptrinc]]]*/
 
 
-/*[[[start:exports,hash:CRC-32=0xa5bde049]]]*/
+
+
+
+/*[[[start:exports,hash:CRC-32=0x7568027e]]]*/
 DEFINE_PUBLIC_ALIAS(__fbufsize, libc___fbufsize);
 DEFINE_PUBLIC_ALIAS(__freading, libc___freading);
 DEFINE_PUBLIC_ALIAS(__fwriting, libc___fwriting);
@@ -290,6 +342,8 @@ DEFINE_PUBLIC_ALIAS(__fsetlocking, libc___fsetlocking);
 DEFINE_PUBLIC_ALIAS(__fseterr, libc___fseterr);
 DEFINE_PUBLIC_ALIAS(__freadahead, libc___freadahead);
 DEFINE_PUBLIC_ALIAS(__freadahead_unlocked, libc___freadahead_unlocked);
+DEFINE_PUBLIC_ALIAS(__freadptr, libc___freadptr);
+DEFINE_PUBLIC_ALIAS(__freadptrinc, libc___freadptrinc);
 /*[[[end:exports]]]*/
 
 DECL_END

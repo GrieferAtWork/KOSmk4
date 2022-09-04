@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72ec48cd */
+/* HASH CRC-32:0x8bb0df21 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -117,6 +117,23 @@ INTDEF ATTR_PURE WUNUSED ATTR_IN(1) size_t NOTHROW_NCX(LIBCCALL libc___freadahea
  *       are pending for write-back.
  * @return: * : The # of pending, unread bytes in the `stream's read-buffer. */
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) size_t NOTHROW_NCX(LIBCCALL libc___freadahead_unlocked)(FILE __KOS_FIXED_CONST *stream);
+/* >> __freadptr(3)
+ * Returns a pointer to the internal read-buffer of `stream', and set `*p_num_bytes'
+ * to  the number of bytes which may be  read starting at the returned pointer. Note
+ * that this function isn't thread-safe  unless the caller calls `flockfile(3)'  and
+ * `funlockfile(3)' themselves.
+ * Once the caller is done reading from `return', they should use `__freadptrinc(3)'
+ * in order to advance the  file's read-pointer and to  mark consumed data as  read.
+ * @param: p_num_bytes: Set to `__freadahead(stream)' when non-`NULL' is returned.
+ * @return: * :   Pointer to a readable buffer of at least `*p_num_bytes' bytes
+ * @return: NULL: The internal buffer of  `stream' is currently empty.  In
+ *                this case, `*p_num_bytes' is left in an undefined state. */
+INTDEF WUNUSED ATTR_IN(1) char const *NOTHROW_NCX(LIBCCALL libc___freadptr)(FILE __KOS_FIXED_CONST *stream, size_t *p_num_bytes);
+/* >> __freadptrinc(3)
+ * Consume `num_bytes' bytes from `stream's internal read-buffer. The caller  must
+ * ensure that `num_bytes <= __freadahead(stream)'. Failure in doing so results in
+ * undefined behavior. */
+INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc___freadptrinc)(FILE *stream, size_t num_bytes);
 #endif /* !__KERNEL__ */
 
 DECL_END

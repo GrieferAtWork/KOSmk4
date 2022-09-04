@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7592288c */
+/* HASH CRC-32:0x98e2ec24 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2395,6 +2395,8 @@ DEFINE_PUBLIC_ALIAS(DOS$__fsetlocking, libd___fsetlocking);
 DEFINE_PUBLIC_ALIAS(DOS$__fseterr, libd___fseterr);
 DEFINE_PUBLIC_ALIAS(DOS$__freadahead, libd___freadahead);
 DEFINE_PUBLIC_ALIAS(DOS$__freadahead_unlocked, libd___freadahead_unlocked);
+DEFINE_PUBLIC_ALIAS(DOS$__freadptr, libd___freadptr);
+DEFINE_PUBLIC_ALIAS(DOS$__freadptrinc, libd___freadptrinc);
 
 /* stdlib */
 #if __SIZEOF_INTMAX_T__ == __SIZEOF_INT__

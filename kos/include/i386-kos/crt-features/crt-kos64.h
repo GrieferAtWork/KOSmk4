@@ -531,6 +531,8 @@
 #define __CRT_HAVE___freadahead
 #define __CRT_HAVE___freadahead_unlocked
 #define __CRT_HAVE___freading
+#define __CRT_HAVE___freadptr
+#define __CRT_HAVE___freadptrinc
 #define __CRT_HAVE___free_locale
 #define __CRT_HAVE___freelocale
 #define __CRT_HAVE___frexp
@@ -6696,6 +6698,8 @@
 #define __CRT_HAVE_KOS$__freadahead
 #define __CRT_HAVE_KOS$__freadahead_unlocked
 #define __CRT_HAVE_KOS$__freading
+#define __CRT_HAVE_KOS$__freadptr
+#define __CRT_HAVE_KOS$__freadptrinc
 #define __CRT_HAVE_KOS$__free_locale
 #define __CRT_HAVE_KOS$__freelocale
 #define __CRT_HAVE_KOS$__frexp
@@ -10991,6 +10995,8 @@
 #define __CRT_HAVE_DOS$__freadahead
 #define __CRT_HAVE_DOS$__freadahead_unlocked
 #define __CRT_HAVE_DOS$__freading
+#define __CRT_HAVE_DOS$__freadptr
+#define __CRT_HAVE_DOS$__freadptrinc
 #define __CRT_HAVE_DOS$__free_locale
 #define __CRT_HAVE_DOS$__freelocale
 #define __CRT_HAVE_DOS$__frexp

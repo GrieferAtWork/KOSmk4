@@ -531,6 +531,8 @@
 #define __CRT_HAVE___freadahead
 #define __CRT_HAVE___freadahead_unlocked
 #define __CRT_HAVE___freading
+#define __CRT_HAVE___freadptr
+#define __CRT_HAVE___freadptrinc
 #define __CRT_HAVE___free_locale
 #define __CRT_HAVE___freelocale
 #define __CRT_HAVE___frexp

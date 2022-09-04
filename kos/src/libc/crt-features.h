@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1669a6a */
+/* HASH CRC-32:0x3fac1618 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,6 +81,8 @@
 #define __CRT_HAVE_DOS$__freadahead
 #define __CRT_HAVE_DOS$__freadahead_unlocked
 #define __CRT_HAVE_DOS$__freading
+#define __CRT_HAVE_DOS$__freadptr
+#define __CRT_HAVE_DOS$__freadptrinc
 #define __CRT_HAVE_DOS$__fseterr
 #define __CRT_HAVE_DOS$__fsetlocking
 #define __CRT_HAVE_DOS$__fwritable
@@ -4351,6 +4353,8 @@
 #define __CRT_HAVE___freadahead
 #define __CRT_HAVE___freadahead_unlocked
 #define __CRT_HAVE___freading
+#define __CRT_HAVE___freadptr
+#define __CRT_HAVE___freadptrinc
 #define __CRT_HAVE___fseterr
 #define __CRT_HAVE___fsetlocking
 #define __CRT_HAVE___fwritable
