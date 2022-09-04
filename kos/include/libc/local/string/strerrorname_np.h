@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x416b8beb */
+/* HASH CRC-32:0x58b44dde */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,7 +74,8 @@ for (local i: [:emax + 1]) {
 	if (name is none)
 		continue;
 	name += "\0";
-	comment += "\0";
+	if (i != emax)
+		comment += "\0";
 	print("\t", repr(name + comment));
 	strtab_offsets[i] = currentOffset;
 	currentOffset += #name;
@@ -91,7 +92,7 @@ if (sizeofStrTab > 0xffff)
 	usedOffsetType = "uint32_t";
 else if (sizeofStrTab > 0xff)
 	usedOffsetType = "uint16_t";
-print("	static ", usedOffsetType, " errno_offsets[", (emax + 1), "] = {");
+print("	static ", usedOffsetType, " const errno_offsets[", (emax + 1), "] = {");
 for (local i: [:emax + 1].segments(16))
 	print("\t\t", ", ".join(for (local x: i) strtab_offsets[x]), ",");
 print("	};");
@@ -329,13 +330,13 @@ print("	};");
 	"EOWNERDEAD\0Owner died\0"
 	"ENOTRECOVERABLE\0State not recoverable\0"
 	"ERFKILL\0Operation not possible due to RF-kill\0"
-	"EHWPOISON\0Memory page has hardware error\0"
+	"EHWPOISON\0Memory page has hardware error"
 	"";
-	static __UINT16_TYPE__ __errno_offsets[134] = {
+	static __UINT16_TYPE__ const __errno_offsets[134] = {
 		0, 12, 42, 75, 97, 127, 141, 173, 202, 228, 250, 276, 293, 314, 339, 358,
 		388, 418, 437, 461, 483, 507, 529, 553, 580, 607, 631, 654, 675, 706, 726, 754,
-		776, 794, 835, 872, 910, 942, 975, 1007, 1037, 4167, 1079, 1113, 1138, 1173, 1207, 1229,
-		1250, 1282, 1319, 1353, 1375, 1398, 1431, 1452, 1468, 1497, 4167, 1518, 1546, 1573, 1599, 1619,
+		776, 794, 835, 872, 910, 942, 975, 1007, 1037, 4166, 1079, 1113, 1138, 1173, 1207, 1229,
+		1250, 1282, 1319, 1353, 1375, 1398, 1431, 1452, 1468, 1497, 4166, 1518, 1546, 1573, 1599, 1619,
 		1650, 1687, 1716, 1741, 1771, 1792, 1813, 1847, 1869, 1898, 1925, 1952, 2000, 2036, 2072, 2103,
 		2150, 2195, 2235, 2291, 2338, 2367, 2420, 2448, 2470, 2510, 2552, 2578, 2620, 2655, 2694, 2736,
 		2793, 2836, 2890, 2924, 2970, 2995, 3030, 3084, 3130, 3166, 3200, 3248, 3293, 3349, 3397, 3428,
