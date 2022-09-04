@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34b8177 */
+/* HASH CRC-32:0x245f2108 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2221,7 +2221,8 @@ for (local i: [:sigmax + 1]) {
 	if (name is none)
 		continue;
 	name += "\0";
-	comment += "\0";
+	if (i != sigmax)
+		comment += "\0";
 	print("\t", repr(name + comment));
 	strtab_offsets[i] = currentOffset;
 	currentOffset += #name;
@@ -2238,7 +2239,7 @@ if (sizeofStrTab > 0xffff)
 	usedOffsetType = "uint32_t";
 else if (sizeofStrTab > 0xff)
 	usedOffsetType = "uint16_t";
-print("	static ", usedOffsetType, " signo_offsets[", (sigmax + 1), "] = {");
+print("	static ", usedOffsetType, " const signo_offsets[", (sigmax + 1), "] = {");
 for (local i: [:sigmax + 1].segments(16))
 	print("\t\t", ", ".join(for (local x: i) strtab_offsets[x]), ",");
 print("	};");
@@ -2336,10 +2337,10 @@ print("	};");
 	"RTMIN+29\0rtmin+29\0"
 	"RTMIN+30\0rtmin+30\0"
 	"RTMIN+31\0rtmin+31\0"
-	"RTMAX\0rtmax\0"
+	"RTMAX\0rtmax"
 	"";
-	static uint16_t signo_offsets[65] = {
-		1205, 0, 11, 25, 35, 59, 86, 99, 113, 142, 154, 181, 209, 236, 253, 270,
+	static uint16_t const signo_offsets[65] = {
+		1204, 0, 11, 25, 35, 59, 86, 99, 113, 142, 154, 181, 209, 236, 253, 270,
 		286, 305, 323, 338, 360, 373, 398, 424, 449, 478, 508, 537, 566, 587, 603, 621,
 		641, 653, 669, 685, 701, 717, 733, 749, 765, 781, 797, 815, 833, 851, 869, 887,
 		905, 923, 941, 959, 977, 995, 1013, 1031, 1049, 1067, 1085, 1103, 1121, 1139, 1157, 1175,
