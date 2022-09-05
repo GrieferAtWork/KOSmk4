@@ -5923,6 +5923,8 @@
 #define __CRT_HAVE_times
 #define __CRT_HAVE_timespec_get
 #define __CRT_HAVE_timespec_get64
+#define __CRT_HAVE_timespec_getres
+#define __CRT_HAVE_timespec_getres64
 #define __CRT_HAVE_timeval_add
 #define __CRT_HAVE_timeval_add64
 #define __CRT_HAVE_timeval_sub

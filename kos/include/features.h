@@ -369,11 +369,17 @@
 #define _DEFAULT_SOURCE 1
 #endif /* ... */
 
-#if (defined(_ISOC17_SOURCE) || \
-     (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L))
+#if (defined(_ISOC23_SOURCE) /* || \
+     (defined(__STDC_VERSION__) && __STDC_VERSION__ >= TBA)*/)
+#define __ISO_C_VISIBLE 2023 /* API alias (don't use in headers!) */
+#define __USE_ISOC23 1
+#endif /* _ISOC23_SOURCE || __STDC_VERSION__ >= 201112L */
+
+#if (defined(_ISOC17_SOURCE) || defined(__USE_ISOC23) || \
+     (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201710L))
 #define __ISO_C_VISIBLE 2017 /* API alias (don't use in headers!) */
 #define __USE_ISOC17 1
-#endif /* _ISOC17_SOURCE || __STDC_VERSION__ >= 201112L */
+#endif /* _ISOC17_SOURCE || __STDC_VERSION__ >= 201710L */
 
 #if (defined(_ISOC11_SOURCE) || defined(__USE_ISOC17) || \
      (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L))

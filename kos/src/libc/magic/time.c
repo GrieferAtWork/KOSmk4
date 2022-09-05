@@ -449,36 +449,38 @@ struct sigevent;
 
 
 
-[[ignore, nocrt, doc_alias("ctime"),          alias("ctime",       "_ctime32"),       decl_include("<bits/types.h>"), wunused, nonnull]] char *crt_ctime32([[in]] $time32_t const *timer);
-[[ignore, nocrt, doc_alias("ctime64"),        alias("ctime64",     "_ctime64"),       decl_include("<bits/types.h>"), wunused, nonnull]] char *crt_ctime64([[in]] $time64_t const *timer);
-[[ignore, nocrt, doc_alias("gmtime"),         alias("gmtime",      "_gmtime32"),      decl_include("<bits/types.h>", "<bits/crt/tm.h>"), wunused, nonnull]] struct $tm *crt_gmtime32([[in]] $time32_t const *timer);
-[[ignore, nocrt, doc_alias("gmtime64"),       alias("gmtime64",    "_gmtime64"),      decl_include("<bits/types.h>", "<bits/crt/tm.h>"), wunused, nonnull]] struct $tm *crt_gmtime64([[in]] $time64_t const *timer);
-[[ignore, nocrt, doc_alias("gmtime_r"),       alias("gmtime_r"),                      decl_include("<bits/types.h>", "<bits/crt/tm.h>")]] $errno_t crt_gmtime32_r([[in]] $time32_t const *__restrict timer, [[out]] struct $tm *__restrict tp);
-[[ignore, nocrt, doc_alias("gmtime64_r"),     alias("gmtime64_r"),                    decl_include("<bits/types.h>", "<bits/crt/tm.h>")]] $errno_t crt_gmtime64_r([[in]] $time64_t const *__restrict timer, [[out]] struct $tm *__restrict tp);
-[[ignore, nocrt, doc_alias("gmtime_r"),       alias(               "_gmtime32_s"),    decl_include("<bits/types.h>", "<bits/crt/tm.h>")]] $errno_t crt_gmtime32_s([[out]] struct $tm *__restrict tp, [[in]] $time32_t const *__restrict timer);
-[[ignore, nocrt, doc_alias("gmtime64_r"),     alias(               "_gmtime64_s"),    decl_include("<bits/types.h>", "<bits/crt/tm.h>")]] $errno_t crt_gmtime64_s([[out]] struct $tm *__restrict tp, [[in]] $time64_t const *__restrict timer);
-[[ignore, nocrt, doc_alias("localtime"),      alias("localtime",   "_localtime32"),   decl_include("<bits/types.h>", "<bits/crt/tm.h>"), wunused, nonnull]] struct $tm *crt_localtime32([[in]] $time32_t const *timer);
-[[ignore, nocrt, doc_alias("localtime64"),    alias("localtime64", "_localtime64"),   decl_include("<bits/types.h>", "<bits/crt/tm.h>"), wunused, nonnull]] struct $tm *crt_localtime64([[in]] $time64_t const *timer);
-[[ignore, nocrt, doc_alias("localtime_r"),    alias("localtime_r"),                   decl_include("<bits/types.h>", "<bits/crt/tm.h>")]] $errno_t crt_localtime32_r([[in]] $time32_t const *__restrict timer, [[out]] struct $tm *__restrict tp);
-[[ignore, nocrt, doc_alias("localtime64_r"),  alias("localtime64_r"),                 decl_include("<bits/types.h>", "<bits/crt/tm.h>")]] $errno_t crt_localtime64_r([[in]] $time64_t const *__restrict timer, [[out]] struct $tm *__restrict tp);
-[[ignore, nocrt, doc_alias("localtime_r"),    alias(               "_localtime32_s"), decl_include("<bits/types.h>", "<bits/crt/tm.h>")]] $errno_t crt_localtime32_s([[out]] struct $tm *__restrict tp, [[in]] $time32_t const *__restrict timer);
-[[ignore, nocrt, doc_alias("localtime64_r"),  alias(               "_localtime64_s"), decl_include("<bits/types.h>", "<bits/crt/tm.h>")]] $errno_t crt_localtime64_s([[out]] struct $tm *__restrict tp, [[in]] $time64_t const *__restrict timer);
-[[ignore, nocrt, doc_alias("ctime_r"),        alias("ctime_r"),                       decl_include("<bits/types.h>")]] $errno_t crt_ctime32_r([[in]] $time32_t const *__restrict timer, [[out]] char buf[26]);
-[[ignore, nocrt, doc_alias("ctime64_r"),      alias("ctime64_r"),                     decl_include("<bits/types.h>")]] $errno_t crt_ctime64_r([[in]] $time64_t const *__restrict timer, [[out]] char buf[26]);
-[[ignore, nocrt, doc_alias("ctime_r"),        alias(               "_ctime32_s"),     decl_include("<bits/types.h>")]] $errno_t crt_ctime32_s([[out(? <= bufsize)]] char buf[26], $size_t bufsize, [[in]] $time32_t const *__restrict timer);
-[[ignore, nocrt, doc_alias("ctime64_r"),      alias(               "_ctime64_s"),     decl_include("<bits/types.h>")]] $errno_t crt_ctime64_s([[out(? <= bufsize)]] char buf[26], $size_t bufsize, [[in]] $time64_t const *__restrict timer);
-[[ignore, nocrt, doc_alias("difftime"),       alias("difftime",    "_difftime32"),    decl_include("<bits/types.h>"), const, wunused, nothrow]] double crt_difftime32($time32_t time1, $time32_t time0);
-[[ignore, nocrt, doc_alias("difftime64"),     alias("difftime64",  "_difftime64"),    decl_include("<bits/types.h>"), const, wunused, nothrow]] double crt_difftime64($time64_t time1, $time64_t time0);
-[[ignore, nocrt, doc_alias("time"),           alias("time", "__time", "__libc_time", "_time32"), decl_include("<bits/types.h>")]] $time32_t crt_time32([[out_opt]] $time32_t *timer);
-[[ignore, nocrt, doc_alias("time64"),         alias("time64",      "_time64"),        decl_include("<bits/types.h>")]] $time64_t crt_time64([[out_opt]] $time64_t *timer);
-[[ignore, nocrt, doc_alias("mktime"),         alias("mktime", "timelocal", "_mktime32"), decl_include("<bits/types.h>", "<features.h>", "<bits/crt/tm.h>"), pure, wunused]] $time32_t crt_mktime32([[inout]] struct $tm *tp);
-[[ignore, nocrt, doc_alias("mktime64"),       alias("mktime64", "timelocal64", "_mktime64"), decl_include("<bits/types.h>", "<features.h>", "<bits/crt/tm.h>"), pure, wunused]] $time64_t crt_mktime64([[inout]] struct $tm *tp);
-[[ignore, nocrt, doc_alias("timegm"),         alias("timegm",      "_mkgmtime", "_mkgmtime32"), decl_include("<bits/types.h>", "<features.h>", "<bits/crt/tm.h>"), pure, wunused]] $time32_t crt_timegm32([[inout]] struct $tm *tp);
-[[ignore, nocrt, doc_alias("mktime64"),       alias("timegm64",    "_mkgmtime64"),    decl_include("<bits/types.h>", "<features.h>", "<bits/crt/tm.h>"), pure, wunused]] $time64_t crt_timegm64([[inout]] struct $tm *tp);
-[[ignore, nocrt, doc_alias("timespec_get"),   alias("timespec_get", "_timespec32_get"), pure, wunused, decl_include("<features.h>", "<bits/os/timespec.h>")]] int crt_timespec32_get([[out]] struct __timespec32 *ts, __STDC_INT_AS_UINT_T base);
-[[ignore, nocrt, doc_alias("timespec_get64"), alias("timespec_get64", "_timespec64_get"), pure, wunused, decl_include("<features.h>", "<bits/os/timespec.h>")]] int crt_timespec64_get([[out]] struct __timespec64 *ts, __STDC_INT_AS_UINT_T base);
-[[ignore, nocrt, doc_alias("stime"),          alias("stime", "__stime", "__libc_stime"), decl_include("<bits/types.h>")]] int crt_stime32([[in]] $time32_t const *when);
-[[ignore, nocrt, doc_alias("stime64"),        alias("stime64"),                       decl_include("<bits/types.h>")]] int crt_stime64([[in]] $time64_t const *when);
+[[ignore, nocrt, doc_alias("ctime"),             alias("ctime",       "_ctime32"),       decl_include("<bits/types.h>"), wunused, nonnull]] char *crt_ctime32([[in]] $time32_t const *timer);
+[[ignore, nocrt, doc_alias("ctime64"),           alias("ctime64",     "_ctime64"),       decl_include("<bits/types.h>"), wunused, nonnull]] char *crt_ctime64([[in]] $time64_t const *timer);
+[[ignore, nocrt, doc_alias("gmtime"),            alias("gmtime",      "_gmtime32"),      decl_include("<bits/types.h>", "<bits/crt/tm.h>"), wunused, nonnull]] struct $tm *crt_gmtime32([[in]] $time32_t const *timer);
+[[ignore, nocrt, doc_alias("gmtime64"),          alias("gmtime64",    "_gmtime64"),      decl_include("<bits/types.h>", "<bits/crt/tm.h>"), wunused, nonnull]] struct $tm *crt_gmtime64([[in]] $time64_t const *timer);
+[[ignore, nocrt, doc_alias("gmtime_r"),          alias("gmtime_r"),                      decl_include("<bits/types.h>", "<bits/crt/tm.h>")]] $errno_t crt_gmtime32_r([[in]] $time32_t const *__restrict timer, [[out]] struct $tm *__restrict tp);
+[[ignore, nocrt, doc_alias("gmtime64_r"),        alias("gmtime64_r"),                    decl_include("<bits/types.h>", "<bits/crt/tm.h>")]] $errno_t crt_gmtime64_r([[in]] $time64_t const *__restrict timer, [[out]] struct $tm *__restrict tp);
+[[ignore, nocrt, doc_alias("gmtime_r"),          alias(               "_gmtime32_s"),    decl_include("<bits/types.h>", "<bits/crt/tm.h>")]] $errno_t crt_gmtime32_s([[out]] struct $tm *__restrict tp, [[in]] $time32_t const *__restrict timer);
+[[ignore, nocrt, doc_alias("gmtime64_r"),        alias(               "_gmtime64_s"),    decl_include("<bits/types.h>", "<bits/crt/tm.h>")]] $errno_t crt_gmtime64_s([[out]] struct $tm *__restrict tp, [[in]] $time64_t const *__restrict timer);
+[[ignore, nocrt, doc_alias("localtime"),         alias("localtime",   "_localtime32"),   decl_include("<bits/types.h>", "<bits/crt/tm.h>"), wunused, nonnull]] struct $tm *crt_localtime32([[in]] $time32_t const *timer);
+[[ignore, nocrt, doc_alias("localtime64"),       alias("localtime64", "_localtime64"),   decl_include("<bits/types.h>", "<bits/crt/tm.h>"), wunused, nonnull]] struct $tm *crt_localtime64([[in]] $time64_t const *timer);
+[[ignore, nocrt, doc_alias("localtime_r"),       alias("localtime_r"),                   decl_include("<bits/types.h>", "<bits/crt/tm.h>")]] $errno_t crt_localtime32_r([[in]] $time32_t const *__restrict timer, [[out]] struct $tm *__restrict tp);
+[[ignore, nocrt, doc_alias("localtime64_r"),     alias("localtime64_r"),                 decl_include("<bits/types.h>", "<bits/crt/tm.h>")]] $errno_t crt_localtime64_r([[in]] $time64_t const *__restrict timer, [[out]] struct $tm *__restrict tp);
+[[ignore, nocrt, doc_alias("localtime_r"),       alias(               "_localtime32_s"), decl_include("<bits/types.h>", "<bits/crt/tm.h>")]] $errno_t crt_localtime32_s([[out]] struct $tm *__restrict tp, [[in]] $time32_t const *__restrict timer);
+[[ignore, nocrt, doc_alias("localtime64_r"),     alias(               "_localtime64_s"), decl_include("<bits/types.h>", "<bits/crt/tm.h>")]] $errno_t crt_localtime64_s([[out]] struct $tm *__restrict tp, [[in]] $time64_t const *__restrict timer);
+[[ignore, nocrt, doc_alias("ctime_r"),           alias("ctime_r"),                       decl_include("<bits/types.h>")]] $errno_t crt_ctime32_r([[in]] $time32_t const *__restrict timer, [[out]] char buf[26]);
+[[ignore, nocrt, doc_alias("ctime64_r"),         alias("ctime64_r"),                     decl_include("<bits/types.h>")]] $errno_t crt_ctime64_r([[in]] $time64_t const *__restrict timer, [[out]] char buf[26]);
+[[ignore, nocrt, doc_alias("ctime_r"),           alias(               "_ctime32_s"),     decl_include("<bits/types.h>")]] $errno_t crt_ctime32_s([[out(? <= bufsize)]] char buf[26], $size_t bufsize, [[in]] $time32_t const *__restrict timer);
+[[ignore, nocrt, doc_alias("ctime64_r"),         alias(               "_ctime64_s"),     decl_include("<bits/types.h>")]] $errno_t crt_ctime64_s([[out(? <= bufsize)]] char buf[26], $size_t bufsize, [[in]] $time64_t const *__restrict timer);
+[[ignore, nocrt, doc_alias("difftime"),          alias("difftime",    "_difftime32"),    decl_include("<bits/types.h>"), const, wunused, nothrow]] double crt_difftime32($time32_t time1, $time32_t time0);
+[[ignore, nocrt, doc_alias("difftime64"),        alias("difftime64",  "_difftime64"),    decl_include("<bits/types.h>"), const, wunused, nothrow]] double crt_difftime64($time64_t time1, $time64_t time0);
+[[ignore, nocrt, doc_alias("time"),              alias("time", "__time", "__libc_time", "_time32"), decl_include("<bits/types.h>")]] $time32_t crt_time32([[out_opt]] $time32_t *timer);
+[[ignore, nocrt, doc_alias("time64"),            alias("time64",      "_time64"),        decl_include("<bits/types.h>")]] $time64_t crt_time64([[out_opt]] $time64_t *timer);
+[[ignore, nocrt, doc_alias("mktime"),            alias("mktime", "timelocal", "_mktime32"), decl_include("<bits/types.h>", "<features.h>", "<bits/crt/tm.h>"), pure, wunused]] $time32_t crt_mktime32([[inout]] struct $tm *tp);
+[[ignore, nocrt, doc_alias("mktime64"),          alias("mktime64", "timelocal64", "_mktime64"), decl_include("<bits/types.h>", "<features.h>", "<bits/crt/tm.h>"), pure, wunused]] $time64_t crt_mktime64([[inout]] struct $tm *tp);
+[[ignore, nocrt, doc_alias("timegm"),            alias("timegm",      "_mkgmtime", "_mkgmtime32"), decl_include("<bits/types.h>", "<features.h>", "<bits/crt/tm.h>"), pure, wunused]] $time32_t crt_timegm32([[inout]] struct $tm *tp);
+[[ignore, nocrt, doc_alias("mktime64"),          alias("timegm64",    "_mkgmtime64"),    decl_include("<bits/types.h>", "<features.h>", "<bits/crt/tm.h>"), pure, wunused]] $time64_t crt_timegm64([[inout]] struct $tm *tp);
+[[ignore, nocrt, doc_alias("timespec_get"),      alias("timespec_get", "_timespec32_get"), wunused, decl_include("<features.h>", "<bits/os/timespec.h>")]] int crt_timespec32_get([[out]] struct __timespec32 *ts, int base);
+[[ignore, nocrt, doc_alias("timespec_get64"),    alias("timespec_get64", "_timespec64_get"), wunused, decl_include("<features.h>", "<bits/os/timespec.h>")]] int crt_timespec64_get([[out]] struct __timespec64 *ts, int base);
+[[ignore, nocrt, doc_alias("timespec_getres"),   alias("timespec_getres", "_timespec32_getres"), pure, wunused, decl_include("<features.h>", "<bits/os/timespec.h>")]] int crt_timespec32_getres([[out]] struct __timespec32 *ts, int base);
+[[ignore, nocrt, doc_alias("timespec_getres64"), alias("timespec_getres64", "_timespec64_getres"), pure, wunused, decl_include("<features.h>", "<bits/os/timespec.h>")]] int crt_timespec64_getres([[out]] struct __timespec64 *ts, int base);
+[[ignore, nocrt, doc_alias("stime"),             alias("stime", "__stime", "__libc_stime"), decl_include("<bits/types.h>")]] int crt_stime32([[in]] $time32_t const *when);
+[[ignore, nocrt, doc_alias("stime64"),           alias("stime64"),                       decl_include("<bits/types.h>")]] int crt_stime64([[in]] $time64_t const *when);
 
 
 
@@ -1699,16 +1701,16 @@ int clock_nanosleep64(clockid_t clock_id, __STDC_INT_AS_UINT_T flags,
 
 
 %
-%(c,std)#ifdef __USE_ISOCXX17
+%/* timespec_get() is defined by both c11 and c++17 */
+%(c,std)#if defined(__USE_ISOCXX17) || defined(__USE_ISOC11)
 @@>> timespec_get(3), timespec_get64(3)
 @@Set `ts' to calendar time based in time base `base'
-[[std, guard, decl_include("<features.h>", "<bits/os/timespec.h>"), no_crt_self_import, dos_only_export_as("_timespec32_get")]]
+[[std, decl_include("<bits/os/timespec.h>"), no_crt_self_import, dos_only_export_as("_timespec32_get")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timespec_get", "_timespec32_get")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timespec_get64", "_timespec64_get")]]
 [[requires_include("<asm/os/clock.h>", "<asm/crt/time.h>")]]
 [[requires(defined(__CLOCK_REALTIME) && defined(__TIME_UTC) && $has_function(clock_gettime))]]
-int timespec_get([[out]] struct timespec *ts,
-                 __STDC_INT_AS_UINT_T base) {
+int timespec_get([[out]] struct timespec *ts, int base) {
 	if (base == __TIME_UTC) {
 		if (clock_gettime(__CLOCK_REALTIME, ts) == 0)
 			return __TIME_UTC;
@@ -1718,12 +1720,11 @@ int timespec_get([[out]] struct timespec *ts,
 }
 
 %#ifdef __USE_TIME64
-[[decl_include("<features.h>", "<bits/os/timespec.h>"), dos_only_export_alias("_timespec64_get")]]
+[[decl_include("<bits/os/timespec.h>"), dos_only_export_alias("_timespec64_get")]]
 [[preferred_time64_variant_of(timespec_get), doc_alias("timespec_get")]]
 [[requires_include("<asm/os/clock.h>", "<asm/crt/time.h>")]]
 [[requires(defined(__CLOCK_REALTIME) && defined(__TIME_UTC) && $has_function(clock_gettime64))]]
-int timespec_get64([[out]] struct timespec64 *ts,
-                   __STDC_INT_AS_UINT_T base) {
+int timespec_get64([[out]] struct timespec64 *ts, int base) {
 	if (base == __TIME_UTC) {
 		if (clock_gettime64(__CLOCK_REALTIME, ts) == 0)
 			return __TIME_UTC;
@@ -1733,13 +1734,42 @@ int timespec_get64([[out]] struct timespec64 *ts,
 }
 %#endif /* __USE_TIME64 */
 
-%(c,std)#endif /* __USE_ISOCXX17 */
+%(c,std)#endif /* __USE_ISOCXX17 || __USE_ISOC11 */
 
 %
-%/* timespec_get() is defined by both c11 and c++17 */
-%#ifdef __USE_ISOC11
-%[insert:extern(timespec_get)]
-%#endif /* __USE_ISOC11 */
+%(c,std)#if defined(__USE_ISOC23)
+@@>> timespec_getres(3), timespec_getres64(3)
+@@Set `ts' to calendar time based in time base `base'
+[[std, decl_include("<bits/os/timespec.h>"), no_crt_self_import, dos_only_export_as("_timespec32_get")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timespec_getres", "_timespec32_get")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timespec_getres64", "_timespec64_get")]]
+[[requires_include("<asm/os/clock.h>", "<asm/crt/time.h>")]]
+[[requires(defined(__CLOCK_REALTIME) && defined(__TIME_UTC) && $has_function(clock_getres))]]
+int timespec_getres([[out]] struct timespec *ts, int base) {
+	if (base == __TIME_UTC) {
+		if (clock_getres(__CLOCK_REALTIME, ts) == 0)
+			return __TIME_UTC;
+	}
+	/* Unsupported base... */
+	return 0;
+}
+
+%#ifdef __USE_TIME64
+[[decl_include("<bits/os/timespec.h>"), dos_only_export_alias("_timespec64_get")]]
+[[preferred_time64_variant_of(timespec_getres), doc_alias("timespec_getres")]]
+[[requires_include("<asm/os/clock.h>", "<asm/crt/time.h>")]]
+[[requires(defined(__CLOCK_REALTIME) && defined(__TIME_UTC) && $has_function(clock_getres64))]]
+int timespec_getres64([[out]] struct timespec64 *ts, int base) {
+	if (base == __TIME_UTC) {
+		if (clock_getres64(__CLOCK_REALTIME, ts) == 0)
+			return __TIME_UTC;
+	}
+	/* Unsupported base... */
+	return 0;
+}
+%#endif /* __USE_TIME64 */
+
+%(c,std)#endif /* __USE_ISOC23 */
 
 
 

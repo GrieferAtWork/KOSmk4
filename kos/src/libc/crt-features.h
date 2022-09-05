@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0155b38 */
+/* HASH CRC-32:0x4780652f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3573,6 +3573,8 @@
 #define __CRT_HAVE_DOS$times
 #define __CRT_HAVE_DOS$timespec_get
 #define __CRT_HAVE_DOS$timespec_get64
+#define __CRT_HAVE_DOS$timespec_getres
+#define __CRT_HAVE_DOS$timespec_getres64
 #define __CRT_HAVE_DOS$timeval_add
 #define __CRT_HAVE_DOS$timeval_add64
 #define __CRT_HAVE_DOS$timeval_sub
@@ -8008,6 +8010,8 @@
 #define __CRT_HAVE_times
 #define __CRT_HAVE_timespec_get
 #define __CRT_HAVE_timespec_get64
+#define __CRT_HAVE_timespec_getres
+#define __CRT_HAVE_timespec_getres64
 #define __CRT_HAVE_timeval_add
 #define __CRT_HAVE_timeval_add64
 #define __CRT_HAVE_timeval_sub

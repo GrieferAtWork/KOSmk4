@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa030056c */
+/* HASH CRC-32:0x1119c82f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -509,7 +509,7 @@ NOTHROW_NCX(LIBCCALL libc_timegm64)(struct tm *tp) {
  * Set `ts' to calendar time based in time base `base' */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc_timespec_get)(struct timespec *ts,
-                                        __STDC_INT_AS_UINT_T base) {
+                                        int base) {
 	if (base == __TIME_UTC) {
 		if (libc_clock_gettime(__CLOCK_REALTIME, ts) == 0)
 			return __TIME_UTC;
@@ -525,9 +525,38 @@ DEFINE_INTERN_ALIAS(libc_timespec_get64, libc_timespec_get);
  * Set `ts' to calendar time based in time base `base' */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_OUT(1) int
 NOTHROW_NCX(LIBCCALL libc_timespec_get64)(struct timespec64 *ts,
-                                          __STDC_INT_AS_UINT_T base) {
+                                          int base) {
 	if (base == __TIME_UTC) {
 		if (libc_clock_gettime64(__CLOCK_REALTIME, ts) == 0)
+			return __TIME_UTC;
+	}
+	/* Unsupported base... */
+	return 0;
+}
+#endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
+/* >> timespec_getres(3), timespec_getres64(3)
+ * Set `ts' to calendar time based in time base `base' */
+INTERN ATTR_SECTION(".text.crt.time") ATTR_OUT(1) int
+NOTHROW_NCX(LIBCCALL libc_timespec_getres)(struct timespec *ts,
+                                           int base) {
+	if (base == __TIME_UTC) {
+		if (libc_clock_getres(__CLOCK_REALTIME, ts) == 0)
+			return __TIME_UTC;
+	}
+	/* Unsupported base... */
+	return 0;
+}
+#include <bits/types.h>
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_timespec_getres64, libc_timespec_getres);
+#else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
+/* >> timespec_getres(3), timespec_getres64(3)
+ * Set `ts' to calendar time based in time base `base' */
+INTERN ATTR_SECTION(".text.crt.time") ATTR_OUT(1) int
+NOTHROW_NCX(LIBCCALL libc_timespec_getres64)(struct timespec64 *ts,
+                                             int base) {
+	if (base == __TIME_UTC) {
+		if (libc_clock_getres64(__CLOCK_REALTIME, ts) == 0)
 			return __TIME_UTC;
 	}
 	/* Unsupported base... */
@@ -1271,6 +1300,14 @@ DEFINE_PUBLIC_ALIAS(timespec_get, libc_timespec_get);
 DEFINE_PUBLIC_ALIAS(_timespec64_get, libc_timespec_get64);
 #endif /* __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(timespec_get64, libc_timespec_get64);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_timespec32_get, libc_timespec_getres);
+#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(timespec_getres, libc_timespec_getres);
+#ifdef __LIBCCALL_IS_LIBDCALL
+DEFINE_PUBLIC_ALIAS(_timespec64_get, libc_timespec_getres64);
+#endif /* __LIBCCALL_IS_LIBDCALL */
+DEFINE_PUBLIC_ALIAS(timespec_getres64, libc_timespec_getres64);
 DEFINE_PUBLIC_ALIAS(getdate, libc_getdate);
 #ifdef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(_strftime_l, libc_strftime_l);

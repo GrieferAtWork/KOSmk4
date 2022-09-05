@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb29486bd */
+/* HASH CRC-32:0xd08c50b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_clock_gettime_defined */
 __LOCAL_LIBC(timespec_get) __ATTR_OUT(1) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timespec_get))(struct timespec *__ts, __STDC_INT_AS_UINT_T __base) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timespec_get))(struct timespec *__ts, int __base) {
 	if (__base == __TIME_UTC) {
 		if ((__NAMESPACE_LOCAL_SYM __localdep_clock_gettime)(__CLOCK_REALTIME, __ts) == 0)
 			return __TIME_UTC;

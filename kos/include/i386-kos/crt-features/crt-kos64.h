@@ -5632,6 +5632,8 @@
 #define __CRT_HAVE_times
 #define __CRT_HAVE_timespec_get
 #define __CRT_HAVE_timespec_get64
+#define __CRT_HAVE_timespec_getres
+#define __CRT_HAVE_timespec_getres64
 #define __CRT_HAVE_timeval_add
 #define __CRT_HAVE_timeval_add64
 #define __CRT_HAVE_timeval_sub
@@ -10322,6 +10324,8 @@
 #define __CRT_HAVE_KOS$times
 #define __CRT_HAVE_KOS$timespec_get
 #define __CRT_HAVE_KOS$timespec_get64
+#define __CRT_HAVE_KOS$timespec_getres
+#define __CRT_HAVE_KOS$timespec_getres64
 #define __CRT_HAVE_KOS$timeval_add
 #define __CRT_HAVE_KOS$timeval_add64
 #define __CRT_HAVE_KOS$timeval_sub
@@ -14924,6 +14928,8 @@
 #define __CRT_HAVE_DOS$times
 #define __CRT_HAVE_DOS$timespec_get
 #define __CRT_HAVE_DOS$timespec_get64
+#define __CRT_HAVE_DOS$timespec_getres
+#define __CRT_HAVE_DOS$timespec_getres64
 #define __CRT_HAVE_DOS$timeval_add
 #define __CRT_HAVE_DOS$timeval_add64
 #define __CRT_HAVE_DOS$timeval_sub

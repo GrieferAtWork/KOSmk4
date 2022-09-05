@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63e9c0b9 */
+/* HASH CRC-32:0x560e350d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,10 +89,13 @@ __NAMESPACE_STD_USING(asctime)
 #define __asctime_s_defined
 __NAMESPACE_STD_USING(asctime_s)
 #endif /* !__asctime_s_defined && __std_asctime_s_defined */
-#if !defined(__timespec_get_defined) && defined(__std_timespec_get_defined)
-#define __timespec_get_defined
+#include <asm/crt/time.h>
+#if (defined(__CRT_HAVE_timespec_get) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE__timespec32_get) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_timespec_get64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE__timespec64_get) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CLOCK_REALTIME) && defined(__TIME_UTC) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime)))
 __NAMESPACE_STD_USING(timespec_get)
-#endif /* !__timespec_get_defined && __std_timespec_get_defined */
+#endif /* (__CRT_HAVE_timespec_get && (!__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE__timespec32_get && (!__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE_timespec_get64 && (__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE__timespec64_get && (__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CLOCK_REALTIME && __TIME_UTC && (__CRT_HAVE_clock_gettime64 || __CRT_HAVE_clock_gettime || __CRT_HAVE___clock_gettime)) */
+#if (defined(__CRT_HAVE_timespec_getres) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE__timespec32_get) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_timespec_getres64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE__timespec64_get) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CLOCK_REALTIME) && defined(__TIME_UTC) && (defined(__CRT_HAVE_clock_getres64) || defined(__CRT_HAVE_clock_getres) || defined(__CRT_HAVE___clock_getres)))
+__NAMESPACE_STD_USING(timespec_getres)
+#endif /* (__CRT_HAVE_timespec_getres && (!__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE__timespec32_get && (!__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE_timespec_getres64 && (__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE__timespec64_get && (__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CLOCK_REALTIME && __TIME_UTC && (__CRT_HAVE_clock_getres64 || __CRT_HAVE_clock_getres || __CRT_HAVE___clock_getres)) */
 #undef _CXX_STDONLY_CTIME
 #endif /* !__CXX_SYSTEM_HEADER */
 #else /* _CXX_STDONLY_CTIME */
@@ -712,41 +715,58 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(asctime_s, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* !... */
 #endif /* !__std_asctime_s_defined */
 #endif /* __USE_ISOC11 */
-#ifdef __USE_ISOCXX17
-#ifndef __std_timespec_get_defined
-#define __std_timespec_get_defined
-#ifdef __timespec_get_defined
+#if defined(__USE_ISOCXX17) || defined(__USE_ISOC11)
+#if defined(__CRT_HAVE_timespec_get) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
-__NAMESPACE_GLB_USING_OR_IMPL(timespec_get, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL timespec_get)(struct timespec *__ts, __STDC_INT_AS_UINT_T __base) { return :: timespec_get(__ts, __base); })
-#elif defined(__CRT_HAVE_timespec_get) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* >> timespec_get(3), timespec_get64(3)
- * Set `ts' to calendar time based in time base `base' */
-__CDECLARE(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_get,(struct timespec *__ts, __STDC_INT_AS_UINT_T __base),(__ts,__base))
+__CDECLARE(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_get,(struct timespec *__ts, int __base),(__ts,__base))
 #elif defined(__CRT_HAVE__timespec32_get) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
-__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_get,(struct timespec *__ts, __STDC_INT_AS_UINT_T __base),_timespec32_get,(__ts,__base))
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_get,(struct timespec *__ts, int __base),_timespec32_get,(__ts,__base))
 #elif defined(__CRT_HAVE_timespec_get64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
-__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_get,(struct timespec *__ts, __STDC_INT_AS_UINT_T __base),timespec_get64,(__ts,__base))
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_get,(struct timespec *__ts, int __base),timespec_get64,(__ts,__base))
 #elif defined(__CRT_HAVE__timespec64_get) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
-__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_get,(struct timespec *__ts, __STDC_INT_AS_UINT_T __base),_timespec64_get,(__ts,__base))
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_get,(struct timespec *__ts, int __base),_timespec64_get,(__ts,__base))
 #elif defined(__CLOCK_REALTIME) && defined(__TIME_UTC) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))
 __NAMESPACE_STD_END
 #include <libc/local/time/timespec_get.h>
 __NAMESPACE_STD_BEGIN
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(timespec_get, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL timespec_get)(struct timespec *__ts, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timespec_get))(__ts, __base); })
-#else /* ... */
-#undef __std_timespec_get_defined
-#endif /* !... */
-#endif /* !__std_timespec_get_defined */
-#endif /* __USE_ISOCXX17 */
+__NAMESPACE_LOCAL_USING_OR_IMPL(timespec_get, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL timespec_get)(struct timespec *__ts, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timespec_get))(__ts, __base); })
+#endif /* ... */
+#endif /* __USE_ISOCXX17 || __USE_ISOC11 */
+#if defined(__USE_ISOC23)
+#if defined(__CRT_HAVE_timespec_getres) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> timespec_getres(3), timespec_getres64(3)
+ * Set `ts' to calendar time based in time base `base' */
+__CDECLARE(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_getres,(struct timespec *__ts, int __base),(__ts,__base))
+#elif defined(__CRT_HAVE__timespec32_get) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> timespec_getres(3), timespec_getres64(3)
+ * Set `ts' to calendar time based in time base `base' */
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_getres,(struct timespec *__ts, int __base),_timespec32_get,(__ts,__base))
+#elif defined(__CRT_HAVE_timespec_getres64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> timespec_getres(3), timespec_getres64(3)
+ * Set `ts' to calendar time based in time base `base' */
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_getres,(struct timespec *__ts, int __base),timespec_getres64,(__ts,__base))
+#elif defined(__CRT_HAVE__timespec64_get) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* >> timespec_getres(3), timespec_getres64(3)
+ * Set `ts' to calendar time based in time base `base' */
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_getres,(struct timespec *__ts, int __base),_timespec64_get,(__ts,__base))
+#elif defined(__CLOCK_REALTIME) && defined(__TIME_UTC) && (defined(__CRT_HAVE_clock_getres64) || defined(__CRT_HAVE_clock_getres) || defined(__CRT_HAVE___clock_getres))
+__NAMESPACE_STD_END
+#include <libc/local/time/timespec_getres.h>
+__NAMESPACE_STD_BEGIN
+/* >> timespec_getres(3), timespec_getres64(3)
+ * Set `ts' to calendar time based in time base `base' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(timespec_getres, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL timespec_getres)(struct timespec *__ts, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timespec_getres))(__ts, __base); })
+#endif /* ... */
+#endif /* __USE_ISOC23 */
 __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 #if defined(__CRT_HAVE_clock) || (defined(__CLOCK_PROCESS_CPUTIME_ID) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))) || defined(__CRT_HAVE_times) || defined(__CRT_HAVE___times) || defined(__CRT_HAVE___libc_times)
@@ -1544,69 +1564,62 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(clock_nanosleep64, __FORCELOCAL __ATTR_ARTIFICIA
 #endif /* __USE_TIME64 */
 #endif /* __USE_POSIX199309 */
 
-#ifdef __USE_ISOCXX17
+/* timespec_get() is defined by both c11 and c++17 */
+#if defined(__USE_ISOCXX17) || defined(__USE_ISOC11)
 #ifndef __CXX_SYSTEM_HEADER
-#if !defined(__timespec_get_defined) && defined(__std_timespec_get_defined)
-#define __timespec_get_defined
+#if (defined(__CRT_HAVE_timespec_get) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE__timespec32_get) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_timespec_get64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE__timespec64_get) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CLOCK_REALTIME) && defined(__TIME_UTC) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime)))
 __NAMESPACE_STD_USING(timespec_get)
-#endif /* !__timespec_get_defined && __std_timespec_get_defined */
+#endif /* (__CRT_HAVE_timespec_get && (!__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE__timespec32_get && (!__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE_timespec_get64 && (__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE__timespec64_get && (__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CLOCK_REALTIME && __TIME_UTC && (__CRT_HAVE_clock_gettime64 || __CRT_HAVE_clock_gettime || __CRT_HAVE___clock_gettime)) */
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_timespec_get) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
-__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_get64,(struct timespec64 *__ts, __STDC_INT_AS_UINT_T __base),timespec_get,(__ts,__base))
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_get64,(struct timespec64 *__ts, int __base),timespec_get,(__ts,__base))
 #elif defined(__CRT_HAVE_timespec_get64)
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
-__CDECLARE(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_get64,(struct timespec64 *__ts, __STDC_INT_AS_UINT_T __base),(__ts,__base))
+__CDECLARE(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_get64,(struct timespec64 *__ts, int __base),(__ts,__base))
 #elif defined(__CRT_HAVE__timespec64_get)
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
-__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_get64,(struct timespec64 *__ts, __STDC_INT_AS_UINT_T __base),_timespec64_get,(__ts,__base))
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_get64,(struct timespec64 *__ts, int __base),_timespec64_get,(__ts,__base))
 #elif defined(__CLOCK_REALTIME) && defined(__TIME_UTC) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))
 #include <libc/local/time/timespec_get64.h>
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(timespec_get64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL timespec_get64)(struct timespec64 *__ts, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timespec_get64))(__ts, __base); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(timespec_get64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL timespec_get64)(struct timespec64 *__ts, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timespec_get64))(__ts, __base); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
-#endif /* __USE_ISOCXX17 */
+#endif /* __USE_ISOCXX17 || __USE_ISOC11 */
 
-/* timespec_get() is defined by both c11 and c++17 */
-#ifdef __USE_ISOC11
-#ifndef __timespec_get_defined
-#define __timespec_get_defined
-#ifdef __std_timespec_get_defined
-/* >> timespec_get(3), timespec_get64(3)
+#if defined(__USE_ISOC23)
+#ifndef __CXX_SYSTEM_HEADER
+#if (defined(__CRT_HAVE_timespec_getres) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE__timespec32_get) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE_timespec_getres64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CRT_HAVE__timespec64_get) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (defined(__CLOCK_REALTIME) && defined(__TIME_UTC) && (defined(__CRT_HAVE_clock_getres64) || defined(__CRT_HAVE_clock_getres) || defined(__CRT_HAVE___clock_getres)))
+__NAMESPACE_STD_USING(timespec_getres)
+#endif /* (__CRT_HAVE_timespec_getres && (!__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE__timespec32_get && (!__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE_timespec_getres64 && (__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CRT_HAVE__timespec64_get && (__USE_TIME_BITS64 || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)) || (__CLOCK_REALTIME && __TIME_UTC && (__CRT_HAVE_clock_getres64 || __CRT_HAVE_clock_getres || __CRT_HAVE___clock_getres)) */
+#endif /* !__CXX_SYSTEM_HEADER */
+#ifdef __USE_TIME64
+#if defined(__CRT_HAVE_timespec_getres) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+/* >> timespec_getres(3), timespec_getres64(3)
  * Set `ts' to calendar time based in time base `base' */
-__NAMESPACE_STD_USING(timespec_get)
-#elif defined(__CRT_HAVE_timespec_get) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* >> timespec_get(3), timespec_get64(3)
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_getres64,(struct timespec64 *__ts, int __base),timespec_getres,(__ts,__base))
+#elif defined(__CRT_HAVE_timespec_getres64)
+/* >> timespec_getres(3), timespec_getres64(3)
  * Set `ts' to calendar time based in time base `base' */
-__CDECLARE(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_get,(struct timespec *__ts, __STDC_INT_AS_UINT_T __base),(__ts,__base))
-#elif defined(__CRT_HAVE__timespec32_get) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* >> timespec_get(3), timespec_get64(3)
+__CDECLARE(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_getres64,(struct timespec64 *__ts, int __base),(__ts,__base))
+#elif defined(__CRT_HAVE__timespec64_get)
+/* >> timespec_getres(3), timespec_getres64(3)
  * Set `ts' to calendar time based in time base `base' */
-__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_get,(struct timespec *__ts, __STDC_INT_AS_UINT_T __base),_timespec32_get,(__ts,__base))
-#elif defined(__CRT_HAVE_timespec_get64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* >> timespec_get(3), timespec_get64(3)
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_getres64,(struct timespec64 *__ts, int __base),_timespec64_get,(__ts,__base))
+#elif defined(__CLOCK_REALTIME) && defined(__TIME_UTC) && (defined(__CRT_HAVE_clock_getres64) || defined(__CRT_HAVE_clock_getres) || defined(__CRT_HAVE___clock_getres))
+#include <libc/local/time/timespec_getres64.h>
+/* >> timespec_getres(3), timespec_getres64(3)
  * Set `ts' to calendar time based in time base `base' */
-__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_get,(struct timespec *__ts, __STDC_INT_AS_UINT_T __base),timespec_get64,(__ts,__base))
-#elif defined(__CRT_HAVE__timespec64_get) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* >> timespec_get(3), timespec_get64(3)
- * Set `ts' to calendar time based in time base `base' */
-__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,timespec_get,(struct timespec *__ts, __STDC_INT_AS_UINT_T __base),_timespec64_get,(__ts,__base))
-#elif defined(__CLOCK_REALTIME) && defined(__TIME_UTC) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))
-#include <libc/local/time/timespec_get.h>
-/* >> timespec_get(3), timespec_get64(3)
- * Set `ts' to calendar time based in time base `base' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(timespec_get, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL timespec_get)(struct timespec *__ts, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timespec_get))(__ts, __base); })
-#else /* ... */
-#undef __timespec_get_defined
-#endif /* !... */
-#endif /* !__timespec_get_defined */
-#endif /* __USE_ISOC11 */
+__NAMESPACE_LOCAL_USING_OR_IMPL(timespec_getres64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL timespec_getres64)(struct timespec64 *__ts, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timespec_getres64))(__ts, __base); })
+#endif /* ... */
+#endif /* __USE_TIME64 */
+#endif /* __USE_ISOC23 */
 
 #ifdef __USE_XOPEN_EXTENDED
 /* Set to one of the following values to indicate an error.
@@ -2313,20 +2326,20 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_OUT(1),int,__NOTHROW_NCX,_timespec3
 #if defined(__CRT_HAVE_timespec_get) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
-__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,_timespec64_get,(struct timespec64 *__ts, __STDC_INT_AS_UINT_T __base),timespec_get,(__ts,__base))
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,_timespec64_get,(struct timespec64 *__ts, int __base),timespec_get,(__ts,__base))
 #elif defined(__CRT_HAVE_timespec_get64)
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
-__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,_timespec64_get,(struct timespec64 *__ts, __STDC_INT_AS_UINT_T __base),timespec_get64,(__ts,__base))
+__CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,_timespec64_get,(struct timespec64 *__ts, int __base),timespec_get64,(__ts,__base))
 #elif defined(__CRT_HAVE__timespec64_get)
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
-__CDECLARE(__ATTR_OUT(1),int,__NOTHROW_NCX,_timespec64_get,(struct timespec64 *__ts, __STDC_INT_AS_UINT_T __base),(__ts,__base))
+__CDECLARE(__ATTR_OUT(1),int,__NOTHROW_NCX,_timespec64_get,(struct timespec64 *__ts, int __base),(__ts,__base))
 #elif defined(__CLOCK_REALTIME) && defined(__TIME_UTC) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))
 #include <libc/local/time/timespec_get64.h>
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL _timespec64_get)(struct timespec64 *__ts, __STDC_INT_AS_UINT_T __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timespec_get64))(__ts, __base); }
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) int __NOTHROW_NCX(__LIBCCALL _timespec64_get)(struct timespec64 *__ts, int __base) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timespec_get64))(__ts, __base); }
 #endif /* ... */
 #ifdef __CRT_HAVE_tzset
 /* >> tzset(3)

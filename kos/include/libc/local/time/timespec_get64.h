@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x880e2c1f */
+/* HASH CRC-32:0x2a316281 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,6 @@
 #include <asm/crt/time.h>
 #include <bits/types.h>
 #if defined(__CLOCK_REALTIME) && defined(__TIME_UTC) && (defined(__CRT_HAVE_clock_gettime64) || defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime))
-#include <features.h>
 #include <bits/os/timespec.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_clock_gettime64_defined
@@ -46,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_clock_gettime64_defined */
 __LOCAL_LIBC(timespec_get64) __ATTR_OUT(1) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timespec_get64))(struct __timespec64 *__ts, __STDC_INT_AS_UINT_T __base) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timespec_get64))(struct __timespec64 *__ts, int __base) {
 	if (__base == __TIME_UTC) {
 		if ((__NAMESPACE_LOCAL_SYM __localdep_clock_gettime64)(__CLOCK_REALTIME, __ts) == 0)
 			return __TIME_UTC;

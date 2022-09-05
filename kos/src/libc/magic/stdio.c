@@ -2115,27 +2115,27 @@ char *asnprintf([[inout]] char *__restrict heapbuf,
 //      requirement, such that they're implemented as reduced-functionality-variants of the
 //      regular printf family (s.a. `format_iprintf(3)')
 
-//TODO: int vasiprintf([[out]] char **pstr, [[in, format]] char const *format, $va_list args);
+//TODO: __STDC_INT_AS_SSIZE_T vasiprintf([[out]] char **pstr, [[in, format]] char const *format, $va_list args);
 //TODO: [[wunused]] char *vasniprintf([[inout]] char *heapbuf, [[inout]] size_t *p_buflen, [[in, format]] char const *format, $va_list args);
-//TODO: int vdiprintf($fd_t fd, [[in, format]] char const *format, $va_list args);
-//TODO: int vfiprintf([[inout]] $FILE *, [[in, format]] char const *format, $va_list args);
-//TODO: int vfiscanf([[inout]] $FILE *, [[in, format]] char const *format, $va_list args);
-//TODO: int viprintf([[in, format]] char const *format, $va_list args);
-//TODO: int viscanf([[in, format]] char const *format, $va_list args);
-//TODO: int vsiprintf([[out]] char *buf, [[in, format]] char const *format, $va_list args);
-//TODO: int vsiscanf([[in]] char const *input, [[in, format]] char const *format, $va_list args);
-//TODO: int vsniprintf([[out(? <= buflen)]] char *buf, size_t buflen, [[in, format]] char const *format, $va_list args);
+//TODO: __STDC_INT_AS_SIZE_T vdiprintf($fd_t fd, [[in, format]] char const *format, $va_list args);
+//TODO: __STDC_INT_AS_SIZE_T vfiprintf([[inout]] $FILE *, [[in, format]] char const *format, $va_list args);
+//TODO: __STDC_INT_AS_SIZE_T vfiscanf([[inout]] $FILE *, [[in, format]] char const *format, $va_list args);
+//TODO: __STDC_INT_AS_SIZE_T viprintf([[in, format]] char const *format, $va_list args);
+//TODO: __STDC_INT_AS_SIZE_T viscanf([[in, format]] char const *format, $va_list args);
+//TODO: __STDC_INT_AS_SIZE_T vsiprintf([[out]] char *buf, [[in, format]] char const *format, $va_list args);
+//TODO: __STDC_INT_AS_SIZE_T vsiscanf([[in]] char const *input, [[in, format]] char const *format, $va_list args);
+//TODO: __STDC_INT_AS_SIZE_T vsniprintf([[out(? <= buflen)]] char *buf, size_t buflen, [[in, format]] char const *format, $va_list args);
 
-//TODO: int asiprintf([[out]] char **pstr, [[in, format]] char const *format, ...);
+//TODO: __STDC_INT_AS_SSIZE_T asiprintf([[out]] char **pstr, [[in, format]] char const *format, ...);
 //TODO: [[wunused]] char *asniprintf([[inout]] char *heapbuf, [[inout]] size_t *p_buflen, [[in, format]] char const *format, ...);
-//TODO: [[guard("diprintf")]] int diprintf($fd_t fd, [[in, format]] char const *format, ...);
-//TODO: int fiprintf([[inout]] $FILE *stream, [[in, format]] char const *format, ...);
-//TODO: int fiscanf([[inout]] $FILE *stream, [[in, format]] char const *format, ...);
-//TODO: int iprintf([[in, format]] char const *format, ...);
-//TODO: int iscanf([[in, format]] char const *format, ...);
-//TODO: int siprintf([[out]] char *buf, [[in, format]] char const *format, ...);
-//TODO: int siscanf([[in]] char const *input, [[in, format]] char const *format, ...);
-//TODO: int sniprintf([[out(? <= buflen)]] char *buf, size_t buflen, [[in, format]] char const *format, ...);
+//TODO: [[guard("diprintf")]] __STDC_INT_AS_SIZE_T diprintf($fd_t fd, [[in, format]] char const *format, ...);
+//TODO: __STDC_INT_AS_SIZE_T fiprintf([[inout]] $FILE *stream, [[in, format]] char const *format, ...);
+//TODO: __STDC_INT_AS_SIZE_T fiscanf([[inout]] $FILE *stream, [[in, format]] char const *format, ...);
+//TODO: __STDC_INT_AS_SIZE_T iprintf([[in, format]] char const *format, ...);
+//TODO: __STDC_INT_AS_SIZE_T iscanf([[in, format]] char const *format, ...);
+//TODO: __STDC_INT_AS_SIZE_T siprintf([[out]] char *buf, [[in, format]] char const *format, ...);
+//TODO: __STDC_INT_AS_SIZE_T siscanf([[in]] char const *input, [[in, format]] char const *format, ...);
+//TODO: __STDC_INT_AS_SIZE_T sniprintf([[out(? <= buflen)]] char *buf, size_t buflen, [[in, format]] char const *format, ...);
 %#endif /* __USE_MISC */
 
 

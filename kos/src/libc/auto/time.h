@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16d3397d */
+/* HASH CRC-32:0x262b02d9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -279,22 +279,42 @@ INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_timer_gettime64)(timer_t timeri
 INTDEF ATTR_IN(3) ATTR_OUT_OPT(4) int NOTHROW_RPC(LIBDCALL libd_clock_nanosleep64)(clockid_t clock_id, __STDC_INT_AS_UINT_T flags, struct timespec64 const *requested_time, struct timespec64 *remaining);
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
-INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_timespec_get)(struct timespec *ts, __STDC_INT_AS_UINT_T base);
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_timespec_get)(struct timespec *ts, int base);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
-INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_timespec_get)(struct timespec *ts, __STDC_INT_AS_UINT_T base);
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_timespec_get)(struct timespec *ts, int base);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
-INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_timespec_get64)(struct timespec64 *ts, __STDC_INT_AS_UINT_T base);
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_timespec_get64)(struct timespec64 *ts, int base);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> timespec_get(3), timespec_get64(3)
  * Set `ts' to calendar time based in time base `base' */
-INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_timespec_get64)(struct timespec64 *ts, __STDC_INT_AS_UINT_T base);
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_timespec_get64)(struct timespec64 *ts, int base);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> timespec_getres(3), timespec_getres64(3)
+ * Set `ts' to calendar time based in time base `base' */
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_timespec_getres)(struct timespec *ts, int base);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> timespec_getres(3), timespec_getres64(3)
+ * Set `ts' to calendar time based in time base `base' */
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_timespec_getres)(struct timespec *ts, int base);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> timespec_getres(3), timespec_getres64(3)
+ * Set `ts' to calendar time based in time base `base' */
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_timespec_getres64)(struct timespec64 *ts, int base);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> timespec_getres(3), timespec_getres64(3)
+ * Set `ts' to calendar time based in time base `base' */
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_timespec_getres64)(struct timespec64 *ts, int base);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> getdate(3)
