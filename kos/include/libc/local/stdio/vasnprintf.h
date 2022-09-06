@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69730b71 */
+/* HASH CRC-32:0x193fe341 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,6 +70,16 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_malloc_defined
 #endif /* !... */
 #endif /* !__local___localdep_malloc_defined */
+#ifndef __local___localdep_malloc_usable_size_defined
+#define __local___localdep_malloc_usable_size_defined
+#ifdef __CRT_HAVE_malloc_usable_size
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_malloc_usable_size,(void *__restrict __mallptr),malloc_usable_size,(__mallptr))
+#elif defined(__CRT_HAVE__msize)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep_malloc_usable_size,(void *__restrict __mallptr),_msize,(__mallptr))
+#else /* ... */
+#undef __local___localdep_malloc_usable_size_defined
+#endif /* !... */
+#endif /* !__local___localdep_malloc_usable_size_defined */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined
 #ifdef __CRT_HAVE_memcpy
@@ -157,7 +167,7 @@ __vasnprintf_printer(void *__arg, char const *__restrict __data, __SIZE_TYPE__ _
 					goto __err;
 			}
 #if defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)
-			__reqlen = __malloc_usable_size(__newbuf) - sizeof(char);
+			__reqlen = (__NAMESPACE_LOCAL_SYM __localdep_malloc_usable_size)(__newbuf) - sizeof(char);
 #endif /* __CRT_HAVE_malloc_usable_size || __CRT_HAVE__msize */
 			__offset = (__SIZE_TYPE__)(__cookie->__vapd_ptr - __cookie->__vapd_buf);
 			/* Copy already-printed data off of the initial buffer */
@@ -180,7 +190,7 @@ __vasnprintf_printer(void *__arg, char const *__restrict __data, __SIZE_TYPE__ _
 					goto __err;
 			}
 #if defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)
-			__reqlen = __malloc_usable_size(__newbuf) - sizeof(char);
+			__reqlen = (__NAMESPACE_LOCAL_SYM __localdep_malloc_usable_size)(__newbuf) - sizeof(char);
 #endif /* __CRT_HAVE_malloc_usable_size || __CRT_HAVE__msize */
 			__offset = (__SIZE_TYPE__)(__cookie->__vapd_ptr - __cookie->__vapd_buf);
 			__cookie->__vapd_buf = __newbuf;
@@ -197,7 +207,7 @@ __vasnprintf_printer(void *__arg, char const *__restrict __data, __SIZE_TYPE__ _
 					goto __err;
 			}
 #if defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)
-			__reqlen = __malloc_usable_size(__newbuf) - sizeof(char);
+			__reqlen = (__NAMESPACE_LOCAL_SYM __localdep_malloc_usable_size)(__newbuf) - sizeof(char);
 #endif /* __CRT_HAVE_malloc_usable_size || __CRT_HAVE__msize */
 			__offset = (__SIZE_TYPE__)(__cookie->__vapd_ptr - __cookie->__vapd_buf);
 			__newbuf = (char *)(__NAMESPACE_LOCAL_SYM __localdep_memcpy)(__newbuf, __cookie->__vapd_buf, __offset * sizeof(char));

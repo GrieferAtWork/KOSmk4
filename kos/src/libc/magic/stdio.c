@@ -1926,7 +1926,8 @@ int fputc_unlocked(int ch, [[inout]] $FILE *__restrict stream) {
 [[decl_include("<hybrid/typecore.h>")]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[impl_include("<bits/crt/format-printer.h>")]]
-[[dependency("memcpy", "mempcpy")]]
+[[dependency("memcpy", "mempcpy", "malloc_usable_size",
+             "malloc", "realloc", "free", "realloc_in_place")]]
 [[impl_prefix(
 @@push_namespace(local)@@
 struct __vasnprintf_data {

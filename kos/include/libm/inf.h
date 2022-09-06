@@ -67,7 +67,7 @@ __LIBM_LOCAL_FUNC(infl) __ATTR_WUNUSED __ATTR_CONST __IEEE854_LONG_DOUBLE_TYPE__
 	__LIBM_SET_LDOUBLE_WORDS(__res,
 	                         __UINT16_C(0x7fff),
 	                         __UINT32_C(0x80000000),
-	                         __UINT32_C(0));
+	                         __UINT32_C(0x00000000));
 	return __res;
 }
 #endif /* !__ieee854_infl */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8399a1d3 */
+/* HASH CRC-32:0x36d961d7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -759,7 +759,7 @@ vasnprintf_printer(void *arg, char const *__restrict data, size_t datalen) {
 					goto err;
 			}
 #if defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)
-			reqlen = malloc_usable_size(newbuf) - sizeof(char);
+			reqlen = libc_malloc_usable_size(newbuf) - sizeof(char);
 #endif /* __CRT_HAVE_malloc_usable_size || __CRT_HAVE__msize */
 			offset = (size_t)(cookie->vapd_ptr - cookie->vapd_buf);
 			/* Copy already-printed data off of the initial buffer */
@@ -782,7 +782,7 @@ vasnprintf_printer(void *arg, char const *__restrict data, size_t datalen) {
 					goto err;
 			}
 #if defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)
-			reqlen = malloc_usable_size(newbuf) - sizeof(char);
+			reqlen = libc_malloc_usable_size(newbuf) - sizeof(char);
 #endif /* __CRT_HAVE_malloc_usable_size || __CRT_HAVE__msize */
 			offset = (size_t)(cookie->vapd_ptr - cookie->vapd_buf);
 			cookie->vapd_buf = newbuf;
@@ -799,7 +799,7 @@ vasnprintf_printer(void *arg, char const *__restrict data, size_t datalen) {
 					goto err;
 			}
 #if defined(__CRT_HAVE_malloc_usable_size) || defined(__CRT_HAVE__msize)
-			reqlen = malloc_usable_size(newbuf) - sizeof(char);
+			reqlen = libc_malloc_usable_size(newbuf) - sizeof(char);
 #endif /* __CRT_HAVE_malloc_usable_size || __CRT_HAVE__msize */
 			offset = (size_t)(cookie->vapd_ptr - cookie->vapd_buf);
 			newbuf = (char *)libc_memcpy(newbuf, cookie->vapd_buf, offset * sizeof(char));

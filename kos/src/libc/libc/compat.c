@@ -939,7 +939,7 @@ INTERN ATTR_SECTION(".data.crt.math.float") fpu_control_t libc___fpu_control = _
 DEFINE_PUBLIC_ALIAS(__fpu_control, libc___fpu_control);
 
 DEFINE_PUBLIC_ALIAS(__getfpucw, libc___getfpucw);
-INTERN ATTR_CONST ATTR_SECTION(".text.crt.math.float") fpu_control_t
+INTERN ATTR_PURE ATTR_SECTION(".text.crt.math.float") fpu_control_t
 NOTHROW_NCX(LIBCCALL libc___getfpucw)(void) {
 	fpu_control_t word;
 	_FPU_GETCW(word);
@@ -972,7 +972,7 @@ DEFINE_PUBLIC_ALIAS(__huge_val, libc___huge_val);
 DEFINE_PUBLIC_ALIAS(_HUGE, libc___huge_val); /* DOS alias for the same constant */
 INTERN_CONST ATTR_SECTION(".rodata.crt.math.float")
 uint32_t const libc___huge_val[2] = {
-	UINT32_C(0x7FF00000),
+	UINT32_C(0x7ff00000),
 	UINT32_C(0x00000000)
 };
 
