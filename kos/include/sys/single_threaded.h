@@ -17,24 +17,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Cygwin        (/newlib/libc/include/sys/fcntl.h) */
-/* (#) Portability: DJGPP         (/include/sys/fcntl.h) */
-/* (#) Portability: DragonFly BSD (/sys/sys/fcntl.h) */
-/* (#) Portability: EMX kLIBC     (/libc/include/sys/fcntl.h) */
-/* (#) Portability: FreeBSD       (/sys/sys/fcntl.h) */
-/* (#) Portability: GNU C Library (/io/sys/fcntl.h) */
-/* (#) Portability: MinGW         (/mingw-w64-headers/crt/sys/fcntl.h) */
-/* (#) Portability: NetBSD        (/sys/sys/fcntl.h) */
-/* (#) Portability: Newlib        (/newlib/libc/include/sys/fcntl.h) */
-/* (#) Portability: OpenBSD       (/sys/sys/fcntl.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/fcntl.h) */
-/* (#) Portability: libc4/5       (/include/sys/fcntl.h) */
-/* (#) Portability: mintlib       (/include/sys/fcntl.h) */
-/* (#) Portability: musl libc     (/include/sys/fcntl.h) */
-/* (#) Portability: uClibc        (/include/sys/fcntl.h) */
-#ifndef _SYS_FCNTL_H
-#define _SYS_FCNTL_H 1
+/* (#) Portability: DragonFly BSD (/sys/sys/single_threaded.h) */
+/* (#) Portability: GNU C Library (/misc/sys/single_threaded.h) */
+#ifndef _SYS_SINGLE_THREADED_H
+#define _SYS_SINGLE_THREADED_H 1
 
-#include <fcntl.h>
+#include <__crt.h>
+#include <__stdinc.h>
+#include <features.h>
 
-#endif /* !_SYS_FCNTL_H */
+#ifdef __CC__
+__DECL_BEGIN
+
+/* >> __libc_single_threaded(3)
+ * When zero, the calling process might be multi-threaded. */
+#ifndef __libc_single_threaded
+#ifdef __CRT_HAVE___libc_single_threaded
+__CSDECLARE(,char __KOS_FIXED_CONST,__libc_single_threaded)
+#else /* __CRT_HAVE___libc_single_threaded */
+#define __libc_single_threaded ((char)0)
+#endif /* !__CRT_HAVE___libc_single_threaded */
+#endif /* !__libc_single_threaded */
+
+__DECL_END
+#endif /* __CC__ */
+
+#endif /* !_SYS_SINGLE_THREADED_H */

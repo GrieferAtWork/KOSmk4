@@ -19,6 +19,7 @@
  */
 /* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/netinet/tcp.h) */
+/* (#) Portability: DragonFly BSD (/sys/netinet/tcp.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/netinet/tcp.h) */
 /* (#) Portability: FreeBSD       (/sys/netinet/tcp.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/netinet/tcp.h) */

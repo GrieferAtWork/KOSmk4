@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/stat.h) */
 /* (#) Portability: DJGPP         (/include/sys/stat.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/stat.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/stat.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/stat.h) */
 /* (#) Portability: GNU C Library (/io/sys/stat.h) */

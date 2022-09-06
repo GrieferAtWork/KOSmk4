@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/select.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/select.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/select.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/select.h) */
 /* (#) Portability: GNU C Library (/misc/sys/select.h) */

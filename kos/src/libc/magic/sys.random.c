@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/random.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/random.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/random.h) */
 /* (#) Portability: GNU C Library (/stdlib/sys/random.h) */
 /* (#) Portability: NetBSD        (/sys/sys/random.h) */

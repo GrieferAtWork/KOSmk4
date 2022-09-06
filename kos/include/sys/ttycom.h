@@ -17,10 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: FreeBSD     (/sys/sys/ttycom.h) */
-/* (#) Portability: NetBSD      (/sys/sys/ttycom.h) */
-/* (#) Portability: OpenBSD     (/sys/sys/ttycom.h) */
-/* (#) Portability: OpenSolaris (/usr/src/lib/libbc/inc/include/sys/ttycom.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/ttycom.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/ttycom.h) */
+/* (#) Portability: NetBSD        (/sys/sys/ttycom.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/ttycom.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/lib/libbc/inc/include/sys/ttycom.h) */
 #ifndef _SYS_TTYCOM_H
 #define _SYS_TTYCOM_H 1
 

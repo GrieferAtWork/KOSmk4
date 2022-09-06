@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf261422 */
+/* HASH CRC-32:0xb8aa6c9a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/times.h) */
 /* (#) Portability: DJGPP         (/include/sys/times.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/times.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/times.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/times.h) */
 /* (#) Portability: GNU C Library (/posix/sys/times.h) */

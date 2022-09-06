@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
+/* (#) Portability: DragonFly BSD (/sys/sys/acct.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/acct.h) */
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/acct.h) */
 /* (#) Portability: NetBSD        (/sys/sys/acct.h) */

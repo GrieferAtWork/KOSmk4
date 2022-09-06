@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/mount.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/mount.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/mount.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/mount.h) */
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/mount.h) */

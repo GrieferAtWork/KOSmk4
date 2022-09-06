@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (>) Standard: POSIX.1b (Issue 2, IEEE Std 1003.1b-1993) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/shm.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/shm.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/shm.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/shm.h) */
 /* (#) Portability: GNU C Library (/sysvipc/sys/shm.h) */

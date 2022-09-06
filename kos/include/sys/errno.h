@@ -19,6 +19,7 @@
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/errno.h) */
 /* (#) Portability: DJGPP         (/include/sys/errno.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/errno.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/errno.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/errno.h) */
 /* (#) Portability: GNU C Library (/stdlib/sys/errno.h) */

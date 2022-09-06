@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/netinet/in_systm.h) */
+/* (#) Portability: DragonFly BSD (/sys/netinet/in_systm.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/netinet/in_systm.h) */
 /* (#) Portability: FreeBSD       (/sys/netinet/in_systm.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/netinet/in_systm.h) */

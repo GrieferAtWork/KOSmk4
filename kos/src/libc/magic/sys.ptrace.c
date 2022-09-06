@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
+/* (#) Portability: DragonFly BSD (/sys/sys/ptrace.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/ptrace.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/ptrace.h) */
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/ptrace.h) */

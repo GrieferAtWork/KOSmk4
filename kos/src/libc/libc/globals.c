@@ -142,6 +142,11 @@ DEFINE_NOREL_GLOBAL_META(int, obstack_exit_failure, ".crt.heap.obstack");
 DEFINE_NOREL_GLOBAL_META(char *, libiberty_concat_ptr, ".crt.libiberty");
 
 
+/* <sys/single_threaded.h> */
+#undef __libc_single_threaded
+DEFINE_NOREL_GLOBAL_META(char, __libc_single_threaded, ".crt.sched.pthread");
+
+
 /* Misc... */
 #undef __libc_enable_secure
 DEFINE_NOREL_GLOBAL_META(int, __libc_enable_secure, ".crt.compat.glibc");

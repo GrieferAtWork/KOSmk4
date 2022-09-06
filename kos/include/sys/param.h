@@ -19,6 +19,7 @@
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/param.h) */
 /* (#) Portability: DJGPP         (/include/sys/param.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/param.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/param.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/param.h) */
 /* (#) Portability: GNU C Library (/misc/sys/param.h) */

@@ -17,16 +17,17 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Cygwin      (/newlib/libc/include/sys/dirent.h) */
-/* (#) Portability: EMX kLIBC   (/libc/include/sys/dirent.h) */
-/* (#) Portability: FreeBSD     (/sys/sys/dirent.h) */
-/* (#) Portability: NetBSD      (/sys/sys/dirent.h) */
-/* (#) Portability: Newlib      (/newlib/libc/include/sys/dirent.h) */
-/* (#) Portability: OpenBSD     (/sys/sys/dirent.h) */
-/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/dirent.h) */
-/* (#) Portability: libc4/5     (/include/sys/dirent.h) */
-/* (#) Portability: libcmini    (/include/sys/dirent.h) */
-/* (#) Portability: mintlib     (/include/sys/dirent.h) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/sys/dirent.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/dirent.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/dirent.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/dirent.h) */
+/* (#) Portability: NetBSD        (/sys/sys/dirent.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/sys/dirent.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/dirent.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/dirent.h) */
+/* (#) Portability: libc4/5       (/include/sys/dirent.h) */
+/* (#) Portability: libcmini      (/include/sys/dirent.h) */
+/* (#) Portability: mintlib       (/include/sys/dirent.h) */
 #ifndef _SYS_DIRENT_H
 #define _SYS_DIRENT_H 1
 

@@ -20,6 +20,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/types.h) */
 /* (#) Portability: DJGPP         (/include/sys/types.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/types.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/types.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/types.h) */
 /* (#) Portability: GNU C Library (/posix/sys/types.h) */

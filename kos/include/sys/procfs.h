@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/procfs.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/procfs.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/procfs.h) */
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/procfs.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/procfs.h) */

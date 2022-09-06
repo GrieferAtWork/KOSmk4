@@ -289,6 +289,12 @@ DECLARE_NOREL_GLOBAL_META(char *, libiberty_concat_ptr);
 #define __LOCAL_libiberty_concat_ptr GET_NOREL_GLOBAL(libiberty_concat_ptr)
 
 
+/* <sys/single_threaded.h> */
+#undef __libc_single_threaded
+DECLARE_NOREL_GLOBAL_META(char, __libc_single_threaded);
+#define __libc_single_threaded GET_NOREL_GLOBAL(__libc_single_threaded)
+
+
 /* Misc... */
 #undef __libc_enable_secure
 #undef __LOCAL___libc_enable_secure

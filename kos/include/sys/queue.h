@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/queue.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/queue.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/queue.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/queue.h) */
 /* (#) Portability: GNU C Library (/misc/sys/queue.h) */

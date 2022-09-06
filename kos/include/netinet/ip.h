@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/netinet/ip.h) */
+/* (#) Portability: DragonFly BSD (/sys/netinet/ip.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/netinet/ip.h) */
 /* (#) Portability: FreeBSD       (/sys/netinet/ip.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/netinet/ip.h) */

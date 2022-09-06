@@ -19,6 +19,7 @@
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/cdefs.h) */
 /* (#) Portability: DJGPP         (/include/sys/cdefs.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/cdefs.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/cdefs.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/cdefs.h) */
 /* (#) Portability: GNU C Library (/misc/sys/cdefs.h) */

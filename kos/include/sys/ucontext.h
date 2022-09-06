@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/ucontext.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/ucontext.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/ucontext.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/sys/ucontext.h) */
 /* (#) Portability: NetBSD        (/sys/sys/ucontext.h) */

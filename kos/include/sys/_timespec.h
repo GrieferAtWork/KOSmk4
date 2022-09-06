@@ -17,10 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Cygwin    (/newlib/libc/include/sys/_timespec.h) */
-/* (#) Portability: EMX kLIBC (/libc/include/sys/_timespec.h) */
-/* (#) Portability: FreeBSD   (/sys/sys/_timespec.h) */
-/* (#) Portability: Newlib    (/newlib/libc/include/sys/_timespec.h) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/sys/_timespec.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/_timespec.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/_timespec.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/_timespec.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/sys/_timespec.h) */
 #ifndef _SYS__TIMESPEC_H
 #define _SYS__TIMESPEC_H 1
 

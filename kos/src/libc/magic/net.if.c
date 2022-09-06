@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/net/if.h) */
+/* (#) Portability: DragonFly BSD (/sys/net/if.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/net/if.h) */
 /* (#) Portability: FreeBSD       (/sys/net/if.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/net/if.h) */

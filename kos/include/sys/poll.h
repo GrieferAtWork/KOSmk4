@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a1832ae */
+/* HASH CRC-32:0x37537abb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/poll.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/poll.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/poll.h) */
 /* (#) Portability: GNU C Library (/io/sys/poll.h) */
 /* (#) Portability: NetBSD        (/sys/sys/poll.h) */

@@ -17,11 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Cygwin  (/newlib/libc/include/sys/sched.h) */
-/* (#) Portability: FreeBSD (/sys/sys/sched.h) */
-/* (#) Portability: NetBSD  (/sys/sys/sched.h) */
-/* (#) Portability: Newlib  (/newlib/libc/include/sys/sched.h) */
-/* (#) Portability: OpenBSD (/sys/sys/sched.h) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/sys/sched.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/sched.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/sched.h) */
+/* (#) Portability: NetBSD        (/sys/sys/sched.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/sys/sched.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/sched.h) */
 #ifndef _SYS_SCHED_H
 #define _SYS_SCHED_H 1
 

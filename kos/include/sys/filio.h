@@ -17,11 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: EMX kLIBC   (/libc/include/sys/filio.h) */
-/* (#) Portability: FreeBSD     (/sys/sys/filio.h) */
-/* (#) Portability: NetBSD      (/sys/sys/filio.h) */
-/* (#) Portability: OpenBSD     (/sys/sys/filio.h) */
-/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/filio.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/filio.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/filio.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/filio.h) */
+/* (#) Portability: NetBSD        (/sys/sys/filio.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/filio.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/filio.h) */
 #ifndef _SYS_FILIO_H
 #define _SYS_FILIO_H 1
 

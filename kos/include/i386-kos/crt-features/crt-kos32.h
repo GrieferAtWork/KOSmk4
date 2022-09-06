@@ -798,6 +798,7 @@
 #define __CRT_HAVE___libc_siglongjmp
 #define __CRT_HAVE___libc_sigpending
 #define __CRT_HAVE___libc_sigprocmask
+#define __CRT_HAVE___libc_single_threaded
 #define __CRT_HAVE___libc_socketcall
 #define __CRT_HAVE___libc_stack_end
 #define __CRT_HAVE___libc_start_main

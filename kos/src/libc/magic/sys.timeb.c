@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/timeb.h) */
 /* (#) Portability: DJGPP         (/include/sys/timeb.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/timeb.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/timeb.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/timeb.h) */
 /* (#) Portability: GNU C Library (/time/sys/timeb.h) */

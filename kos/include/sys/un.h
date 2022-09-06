@@ -19,6 +19,7 @@
  */
 /* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/un.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/un.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/un.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/un.h) */
 /* (#) Portability: GNU C Library (/socket/sys/un.h) */

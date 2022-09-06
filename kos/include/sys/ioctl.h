@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f0a93d6 */
+/* HASH CRC-32:0x2c50e5f7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/ioctl.h) */
 /* (#) Portability: DJGPP         (/include/sys/ioctl.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/ioctl.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/ioctl.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/ioctl.h) */
 /* (#) Portability: GNU C Library (/misc/sys/ioctl.h) */

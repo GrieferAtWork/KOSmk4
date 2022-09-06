@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa797f471 */
+/* HASH CRC-32:0xa0683714 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/stat.h) */
 /* (#) Portability: DJGPP         (/include/sys/stat.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/stat.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/stat.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/stat.h) */
 /* (#) Portability: GNU C Library (/io/sys/stat.h) */

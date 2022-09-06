@@ -59,6 +59,7 @@
 #include <unistd.h>
 
 #include "../libc/dl.h"
+#include "../libc/globals.h"
 #include "../libc/tls.h"
 #include "pthread.h"
 #include "sched.h"
@@ -161,6 +162,14 @@ static_assert(offsetof(pthread_barrier_t, b_current_round) == __OFFSET_PTHREAD_B
 static_assert(offsetof(pthread_barrier_t, b_count) == __OFFSET_PTHREAD_BARRIER_COUNT);
 static_assert(offsetof(pthread_barrier_t, b_shared) == __OFFSET_PTHREAD_BARRIER_SHARED);
 static_assert(offsetof(pthread_barrier_t, b_out) == __OFFSET_PTHREAD_BARRIER_OUT);
+
+
+/* Global variable  to indicate  that  a process  is  single-threaded.
+ * Exposed as `__libc_single_threaded(3)' in `<sys/single_threaded.h>' */
+#undef __libc_single_threaded
+DEFINE_PUBLIC_ALIAS(__libc_single_threaded, libc___libc_single_threaded);
+INTERN ATTR_SECTION(".data.crt.sched.pthread") char libc___libc_single_threaded = (char)1;
+#define __libc_single_threaded GET_NOREL_GLOBAL(__libc_single_threaded)
 
 
 /* Destroy a given `pthread' `self' */
@@ -439,6 +448,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 		dltlsfreeseg(tls);
 		return (errno_t)-cpid;
 	}
+
+	/* Indicate that the process is no longer single-threaded */
+	__libc_single_threaded = 0;
+
 	/* Create as detached; iow: detach after creation... */
 	if (attr->pa_flags & PTHREAD_ATTR_FLAG_DETACHSTATE)
 		libc_pthread_detach(pt);

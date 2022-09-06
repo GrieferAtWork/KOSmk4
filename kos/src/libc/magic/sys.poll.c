@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/poll.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/poll.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/poll.h) */
 /* (#) Portability: GNU C Library (/io/sys/poll.h) */
 /* (#) Portability: NetBSD        (/sys/sys/poll.h) */

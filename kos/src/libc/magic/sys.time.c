@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/time.h) */
 /* (#) Portability: DJGPP         (/include/sys/time.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/time.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/time.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/time.h) */
 /* (#) Portability: GNU C Library (/time/sys/time.h) */

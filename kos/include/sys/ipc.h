@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x586ac28c */
+/* HASH CRC-32:0x8ae0cac8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (>) Standard: POSIX.1b (Issue 2, IEEE Std 1003.1b-1993) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/ipc.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/ipc.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/ipc.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/ipc.h) */
 /* (#) Portability: GNU C Library (/sysvipc/sys/ipc.h) */

@@ -17,8 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: NetBSD  (/sys/sys/stdarg.h) */
-/* (#) Portability: OpenBSD (/sys/sys/stdarg.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/stdarg.h) */
+/* (#) Portability: NetBSD        (/sys/sys/stdarg.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/stdarg.h) */
 #ifndef _SYS_STDARG_H
 #define _SYS_STDARG_H 1
 

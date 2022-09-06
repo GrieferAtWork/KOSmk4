@@ -17,8 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: FreeBSD (/sys/sys/bitstring.h) */
-/* (#) Portability: libbsd  (/include/bsd/sys/bitstring.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/bitstring.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/bitstring.h) */
+/* (#) Portability: libbsd        (/include/bsd/sys/bitstring.h) */
 #ifndef _SYS_BITSTRING_H
 #define _SYS_BITSTRING_H 1
 

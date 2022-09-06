@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/file.h) */
 /* (#) Portability: DJGPP         (/include/sys/file.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/file.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/file.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/file.h) */
 /* (#) Portability: GNU C Library (/misc/sys/file.h) */

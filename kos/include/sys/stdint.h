@@ -17,11 +17,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: EMX kLIBC   (/libc/include/sys/stdint.h) */
-/* (#) Portability: FreeBSD     (/sys/sys/stdint.h) */
-/* (#) Portability: NetBSD      (/sys/sys/stdint.h) */
-/* (#) Portability: OpenBSD     (/sys/sys/stdint.h) */
-/* (#) Portability: OpenSolaris (/usr/src/uts/common/sys/stdint.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/stdint.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/stdint.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/stdint.h) */
+/* (#) Portability: NetBSD        (/sys/sys/stdint.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/stdint.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/stdint.h) */
 #ifndef _SYS_STDINT_H
 #define _SYS_STDINT_H 1
 

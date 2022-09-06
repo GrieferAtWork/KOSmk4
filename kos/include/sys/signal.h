@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/signal.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/signal.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/signal.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/signal.h) */
 /* (#) Portability: GNU C Library (/signal/sys/signal.h) */

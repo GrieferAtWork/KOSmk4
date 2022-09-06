@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x954cb34a */
+/* HASH CRC-32:0x29abb65a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: DragonFly BSD (/sys/sys/ptrace.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/ptrace.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/ptrace.h) */
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/sys/ptrace.h) */

@@ -17,10 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Cygwin    (/newlib/libc/include/sys/_timeval.h) */
-/* (#) Portability: EMX kLIBC (/libc/include/sys/_timeval.h) */
-/* (#) Portability: FreeBSD   (/sys/sys/_timeval.h) */
-/* (#) Portability: Newlib    (/newlib/libc/include/sys/_timeval.h) */
+/* (#) Portability: Cygwin        (/newlib/libc/include/sys/_timeval.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/_timeval.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/_timeval.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/_timeval.h) */
+/* (#) Portability: Newlib        (/newlib/libc/include/sys/_timeval.h) */
 #ifndef _SYS__TIMEVAL_H
 #define _SYS__TIMEVAL_H 1
 

@@ -17,7 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: FreeBSD (/sys/sys/_iovec.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/_iovec.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/_iovec.h) */
 #ifndef _SYS__IOVEC_H
 #define _SYS__IOVEC_H 1
 

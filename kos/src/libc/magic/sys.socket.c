@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/socket.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/socket.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/socket.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/socket.h) */
 /* (#) Portability: GNU C Library (/socket/sys/socket.h) */

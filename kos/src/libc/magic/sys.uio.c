@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/uio.h) */
 /* (#) Portability: DJGPP         (/include/sys/uio.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/uio.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/uio.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/uio.h) */
 /* (#) Portability: GNU C Library (/misc/sys/uio.h) */

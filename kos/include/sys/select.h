@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x328fd08e */
+/* HASH CRC-32:0xd10fde50 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (>) Standard: POSIX.1-2004 (Issue 6, IEEE Std 1003.1-2004) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/select.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/select.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/select.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/select.h) */
 /* (#) Portability: GNU C Library (/misc/sys/select.h) */

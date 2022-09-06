@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1 (Issue 1, IEEE Std 1003.1-1988) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/utsname.h) */
 /* (#) Portability: DJGPP         (/include/sys/utsname.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/utsname.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/utsname.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/utsname.h) */
 /* (#) Portability: GNU C Library (/posix/sys/utsname.h) */

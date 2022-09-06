@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/ioctl.h) */
 /* (#) Portability: DJGPP         (/include/sys/ioctl.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/ioctl.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/ioctl.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/ioctl.h) */
 /* (#) Portability: GNU C Library (/misc/sys/ioctl.h) */

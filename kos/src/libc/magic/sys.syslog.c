@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/syslog.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/syslog.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/syslog.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/syslog.h) */
 /* (#) Portability: GNU C Library (/misc/sys/syslog.h) */

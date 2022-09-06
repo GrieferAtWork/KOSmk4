@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e7d5969 */
+/* HASH CRC-32:0xeea3c494 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1c (Issue 3, IEEE Std 1003.1c-1995) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/wait.h) */
 /* (#) Portability: DJGPP         (/include/sys/wait.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/wait.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/wait.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/wait.h) */
 /* (#) Portability: GNU C Library (/posix/sys/wait.h) */

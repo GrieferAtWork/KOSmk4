@@ -17,9 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: EMX kLIBC (/libc/include/sys/_null.h) */
-/* (#) Portability: FreeBSD   (/sys/sys/_null.h) */
-/* (#) Portability: OpenBSD   (/sys/sys/_null.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/_null.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/sys/_null.h) */
+/* (#) Portability: FreeBSD       (/sys/sys/_null.h) */
+/* (#) Portability: OpenBSD       (/sys/sys/_null.h) */
 #ifndef NULL
 #include <__stdinc.h>
 #ifndef NULL

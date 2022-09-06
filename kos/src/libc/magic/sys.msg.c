@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (>) Standard: POSIX.1b (Issue 2, IEEE Std 1003.1b-1993) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/msg.h) */
+/* (#) Portability: DragonFly BSD (/sys/sys/msg.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/msg.h) */
 /* (#) Portability: FreeBSD       (/sys/sys/msg.h) */
 /* (#) Portability: GNU C Library (/sysvipc/sys/msg.h) */
