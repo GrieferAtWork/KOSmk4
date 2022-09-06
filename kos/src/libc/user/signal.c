@@ -501,13 +501,13 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 do_legacy_sigprocmask:
 		me->pt_pmask.lpm_pmask.pm_sigmask = NULL;
 		error = sys_sigprocmask((syscall_ulong_t)(unsigned int)how,
-		                         set, oset);
+		                        set, oset);
 		return libc_seterrno_syserr(error);
 	}
 #else /* __LIBC_CONFIG_HAVE_USERPROCMASK */
 	errno_t error;
 	error = sys_sigprocmask((syscall_ulong_t)(unsigned int)how,
-	                         set, oset);
+	                        set, oset);
 	return libc_seterrno_syserr(error);
 #endif /* !__LIBC_CONFIG_HAVE_USERPROCMASK */
 }

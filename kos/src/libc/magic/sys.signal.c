@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x73bfb706 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+%(c_prefix){
 /* (#) Portability: Cygwin        (/newlib/libc/include/sys/signal.h) */
 /* (#) Portability: DragonFly BSD (/sys/sys/signal.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/sys/signal.h) */
@@ -32,23 +32,24 @@
 /* (#) Portability: mintlib       (/include/sys/signal.h) */
 /* (#) Portability: musl libc     (/include/sys/signal.h) */
 /* (#) Portability: uClibc        (/include/sys/signal.h) */
-#ifndef _SYS_SIGNAL_H
-#define _SYS_SIGNAL_H 1
+}
 
-#include <__stdinc.h>
-#include <__crt.h>
+%[default:section(".text.crt{|.dos}.bsd.sched.signal")]
 
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <signal.h>
+)]%{
 
 #ifdef __CC__
 __SYSDECL_BEGIN
 
+}
 
+
+%
+%{
 /* From DragonFly BSD: functions to quickly mask/unmask all  signals
  * Note that on KOS, these are implemented in terms of userprocmask,
  * and the `setsigmaskptr(3)' function.
@@ -56,23 +57,30 @@ __SYSDECL_BEGIN
  * or  unpredictable behavior (though  that shouldn't really matter
  * since this one originates from DragonFly, and `setsigmaskptr(3)'
  * is a kos-specific invention) */
-#ifdef __USE_BSD
-/* >> sigblockall(3)
- * Block all signals (s.a. `setsigmaskfullptr(3)')
- * @return: >1: Signals were already blocked (recursion counter)
- * @return: 1 : Signals were just blocked
- * @return: -1: Error (on KOS, `errno' was modified in this case, but on DragonFly, it isn't) */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,sigblockall,(void),())
-/* >> sigunblockall(3)
- * Unblock all signals, undoing the effects of `sigblockall(3)'
- * @return: & 0x80000000: Signals were marked as pending while they were being blocked
- * @return: & 0x7fffffff != 0: Signals are still blocked (recursion counter)
- * @return: & 0x7fffffff == 0: Signals were just unblocked
- * @return: -1: Error (on KOS, `errno' was modified in this case, but on DragonFly, it isn't) */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,sigunblockall,(void),())
-#endif /* __USE_BSD */
+}
+%#ifdef __USE_BSD
+
+@@>> sigblockall(3)
+@@Block all signals (s.a. `setsigmaskfullptr(3)')
+@@@return: >1: Signals were already blocked (recursion counter)
+@@@return: 1 : Signals were just blocked
+@@@return: -1: Error (on KOS, `errno' was modified in this case, but on DragonFly, it isn't)
+int sigblockall(void);
+
+@@>> sigunblockall(3)
+@@Unblock all signals, undoing the effects of `sigblockall(3)'
+@@@return: & 0x80000000: Signals were marked as pending while they were being blocked
+@@@return: & 0x7fffffff != 0: Signals are still blocked (recursion counter)
+@@@return: & 0x7fffffff == 0: Signals were just unblocked
+@@@return: -1: Error (on KOS, `errno' was modified in this case, but on DragonFly, it isn't)
+int sigunblockall(void);
+
+%#endif /* __USE_BSD */
+
+
+%{
 
 __SYSDECL_END
 #endif /* __CC__ */
 
-#endif /* !_SYS_SIGNAL_H */
+}

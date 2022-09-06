@@ -4623,6 +4623,7 @@
 #define __CRT_HAVE_sigaltstack
 #define __CRT_HAVE_sigandset
 #define __CRT_HAVE_sigblock
+#define __CRT_HAVE_sigblockall
 #define __CRT_HAVE_sigcodedesc_np
 #define __CRT_HAVE_sigcodename_np
 #define __CRT_HAVE_sigdelset
@@ -4664,6 +4665,7 @@
 #define __CRT_HAVE_sigsuspend
 #define __CRT_HAVE_sigtimedwait
 #define __CRT_HAVE_sigtimedwait64
+#define __CRT_HAVE_sigunblockall
 #define __CRT_HAVE_sigvec
 #define __CRT_HAVE_sigwait
 #define __CRT_HAVE_sigwaitinfo

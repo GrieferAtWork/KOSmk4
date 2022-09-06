@@ -358,7 +358,7 @@
 	CB(PREFIX.crt.wordexp) \
 	CB(PREFIX.crt.glibc.application.init PREFIX.crt.glibc.assert PREFIX.crt.glibc.fs.stat) \
 	CB(PREFIX.crt.bsd.stringlist) \
-	CB(PREFIX.crt.bsd.io.access PREFIX.crt.bsd.strstat PREFIX.crt.bsd.user PREFIX.crt.bsd) \
+	CB(PREFIX.crt.bsd.io.access PREFIX.crt.bsd.sched.signal PREFIX.crt.bsd.strstat PREFIX.crt.bsd.user PREFIX.crt.bsd) \
 	CB(PREFIX.crt.solaris) \
 	CB(PREFIX.crt.capability) \
 	CB(PREFIX.crt.libiberty) \
