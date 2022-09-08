@@ -25,9 +25,6 @@
 /* NOTE: References  used  during the  implementation of  this ansitty
  *       processor can be found in `/kos/include/libansitty/ansitty.h' */
 
-/* TODO: The unicode C1 area contains characters that act as aliases
- *       for  \e[  and  other  sequences.  --  Support  them   here! */
-
 #include "api.h"
 /**/
 
@@ -222,9 +219,52 @@ DECL_BEGIN
 #define STATE_ESC_Y2          22 /* After "\eY<ORD>" */
 #define STATE_LPAREN_PERCENT  23 /* After "\e(%" */
 #define STATE_TEXT            24 /* Non-utf8 character set */
+#define STATE_OSC_C2          25 /* STATE_OSC followed by a C2-byte (in UTF-8 locale) */
+#define STATE_DCS_C2          26 /* STATE_DCS followed by a C2-byte (in UTF-8 locale) */
+#define STATE_SOS_C2          27 /* STATE_SOS followed by a C2-byte (in UTF-8 locale) */
+#define STATE_PM_C2           28 /* STATE_PM followed by a C2-byte (in UTF-8 locale) */
+#define STATE_APC_C2          29 /* STATE_APC followed by a C2-byte (in UTF-8 locale) */
+#define STATE_OSC_ISC2(x)    ((x) >= STATE_OSC_C2)
+#define STATE_STRCMD_ADD_ESC(x) ((x) + (STATE_OSC_ESC - STATE_OSC))
+#define STATE_STRCMD_DEL_ESC(x) ((x) - (STATE_OSC_ESC - STATE_OSC))
+#define STATE_STRCMD_ADD_C2(x)  ((x) + (STATE_OSC_C2 - STATE_OSC))
+#define STATE_STRCMD_DEL_C2(x)  ((x) - (STATE_OSC_C2 - STATE_OSC))
 
-#define STATE_OSC_ADD_ESC(x) ((x) + 5)
-#define STATE_OSC_DEL_ESC(x) ((x) - 5)
+static_assert(STATE_STRCMD_ADD_ESC(STATE_OSC) == STATE_OSC_ESC);
+static_assert(STATE_STRCMD_ADD_ESC(STATE_DCS) == STATE_DCS_ESC);
+static_assert(STATE_STRCMD_ADD_ESC(STATE_SOS) == STATE_SOS_ESC);
+static_assert(STATE_STRCMD_ADD_ESC(STATE_PM) == STATE_PM_ESC);
+static_assert(STATE_STRCMD_ADD_ESC(STATE_APC) == STATE_APC_ESC);
+static_assert(STATE_STRCMD_DEL_ESC(STATE_OSC_ESC) == STATE_OSC);
+static_assert(STATE_STRCMD_DEL_ESC(STATE_DCS_ESC) == STATE_DCS);
+static_assert(STATE_STRCMD_DEL_ESC(STATE_SOS_ESC) == STATE_SOS);
+static_assert(STATE_STRCMD_DEL_ESC(STATE_PM_ESC) == STATE_PM);
+static_assert(STATE_STRCMD_DEL_ESC(STATE_APC_ESC) == STATE_APC);
+static_assert(STATE_STRCMD_ADD_C2(STATE_OSC) == STATE_OSC_C2);
+static_assert(STATE_STRCMD_ADD_C2(STATE_DCS) == STATE_DCS_C2);
+static_assert(STATE_STRCMD_ADD_C2(STATE_SOS) == STATE_SOS_C2);
+static_assert(STATE_STRCMD_ADD_C2(STATE_PM) == STATE_PM_C2);
+static_assert(STATE_STRCMD_ADD_C2(STATE_APC) == STATE_APC_C2);
+static_assert(STATE_STRCMD_DEL_C2(STATE_OSC_C2) == STATE_OSC);
+static_assert(STATE_STRCMD_DEL_C2(STATE_DCS_C2) == STATE_DCS);
+static_assert(STATE_STRCMD_DEL_C2(STATE_SOS_C2) == STATE_SOS);
+static_assert(STATE_STRCMD_DEL_C2(STATE_PM_C2) == STATE_PM);
+static_assert(STATE_STRCMD_DEL_C2(STATE_APC_C2) == STATE_APC);
+static_assert(!STATE_OSC_ISC2(STATE_OSC));
+static_assert(!STATE_OSC_ISC2(STATE_DCS));
+static_assert(!STATE_OSC_ISC2(STATE_SOS));
+static_assert(!STATE_OSC_ISC2(STATE_PM));
+static_assert(!STATE_OSC_ISC2(STATE_APC));
+static_assert(!STATE_OSC_ISC2(STATE_OSC_ESC));
+static_assert(!STATE_OSC_ISC2(STATE_DCS_ESC));
+static_assert(!STATE_OSC_ISC2(STATE_SOS_ESC));
+static_assert(!STATE_OSC_ISC2(STATE_PM_ESC));
+static_assert(!STATE_OSC_ISC2(STATE_APC_ESC));
+static_assert(STATE_OSC_ISC2(STATE_OSC_C2));
+static_assert(STATE_OSC_ISC2(STATE_DCS_C2));
+static_assert(STATE_OSC_ISC2(STATE_SOS_C2));
+static_assert(STATE_OSC_ISC2(STATE_PM_C2));
+static_assert(STATE_OSC_ISC2(STATE_APC_C2));
 
 
 /* Code page codes. */
@@ -756,9 +796,19 @@ resetterminal(struct ansitty *__restrict self,
 
 PRIVATE NONNULL((1)) void CC
 ansitty_setstate_text(struct ansitty *__restrict self) {
-	self->at_state = (self->at_ttyflag & ANSITTY_FLAG_INSERT)
-	                 ? (self->at_codepage == CP_UTF8 ? STATE_INSERT_UTF8 : STATE_INSERT)
-	                 : (self->at_codepage == CP_UTF8 ? STATE_TEXT_UTF8 : STATE_TEXT);
+	if (self->at_ttyflag & ANSITTY_FLAG_INSERT) {
+		if (self->at_codepage == CP_UTF8) {
+			self->at_state = STATE_INSERT_UTF8;
+		} else {
+			self->at_state = STATE_INSERT;
+		}
+	} else {
+		if (self->at_codepage == CP_UTF8) {
+			self->at_state = STATE_TEXT_UTF8;
+		} else {
+			self->at_state = STATE_TEXT;
+		}
+	}
 }
 
 PRIVATE ATTR_PURE WUNUSED NONNULL((2)) char32_t FCALL
@@ -906,6 +956,9 @@ handle_control_character(struct ansitty *__restrict self, char32_t ch) {
 			PUTUNILAST(0x2421);
 		break;
 
+	case 0x00a0: /* NO-BREAK SPACE  (treat like regular space) */
+		ch = ' ';
+		ATTR_FALLTHROUGH
 	case CC_SPC:
 		if (self->at_ttyflag & ANSITTY_FLAG_CRM) {
 			PUTUNILAST(0x2420);
@@ -913,10 +966,112 @@ handle_control_character(struct ansitty *__restrict self, char32_t ch) {
 		}
 		break;
 
+	/* Unicode control characters from C1 area.
+	 * >> https://en.wikipedia.org/wiki/C0_and_C1_control_codes#C1_control_codes_for_general_use
+	 * Most of these we simply implement as no-ops (though we do print them as blanks in CRM-mode) */
+	case 0x0080: /* PAD: PADDING CHARACTER */
+	case 0x0081: /* HOP: HIGH OCTET PRESET */
+	case 0x0082: /* BPH: BREAK PERMITTED HERE */
+	case 0x0083: /* NBH: NO BREAK HERE */
+	case 0x0086: /* SSA: Start of Selected Area */
+	case 0x0087: /* ESA: End of Selected Area */
+	case 0x0088: /* HTS: Horizontal Tabulation Set  (TODO: case 'I': Horizontal tab emulation) */
+	case 0x0089: /* HTJ: Horizontal Tabulation With Justification */
+	case 0x008a: /* VTS: Vertical Tabulation Set */
+	case 0x008e: /* SS2: Single-Shift 2 */
+	case 0x008f: /* SS3: Single-Shift 3 */
+	case 0x0091: /* PU1: Private Use 1 */
+	case 0x0092: /* PU2: Private Use 2 */
+	case 0x0093: /* STS: Set Transmit State */
+	case 0x0095: /* MW: Message Waiting */
+	case 0x0096: /* SPA: Start of Protected Area */
+	case 0x0097: /* EPA: End of Protected Area */
+	case 0x0099: /* SGCI: Single Graphic Character Introducer */
+	case 0x009a: /* SCI: Single Character Introducer */
+	case 0x009c: /* ST: String Terminator */
+		if (self->at_ttyflag & ANSITTY_FLAG_CRM) {
+do_print_blank:
+			PUTUNILAST(0x2423); /* ␣ */
+		}
+		goto done;
+
+	case 0x0084: {
+		/* IND: INDEX (move to next line, but keep horizontal position) */
+		ansitty_coord_t xy[2];
+		ansitty_coord_t sxy[2];
+		if (self->at_ttyflag & ANSITTY_FLAG_CRM)
+			PUTUNILAST(0x2423); /* ␣ */
+		GETCURSOR(xy);
+		GETSIZE(sxy);
+		if (xy[1] >= sxy[1] - 1) {
+			SCROLL(1);
+		} else {
+			SETCURSOR(xy[0], xy[1] + 1, true);
+		}
+	}	goto done;
+
+	case 0x0085:
+		/* NEL: NEXT LINE (alias for "\r\n") */
+		if (self->at_ttyflag & ANSITTY_FLAG_CRM)
+			goto do_print_blank;
+		PUTUNI(CC_CR);
+		PUTUNI(CC_LF);
+		goto done;
+
+	case 0x008b: /* PLD: Partial Line Down */
+		setattrib(self, ((self->at_attrib & ~ANSITTY_ATTRIB_PLU)) |
+		                ((self->at_attrib & ANSITTY_ATTRIB_PLU) ? 0 : ANSITTY_ATTRIB_PLD));
+		goto done;
+
+	case 0x008c: /* PLU: Partial Line Up */
+		setattrib(self, ((self->at_attrib & ~ANSITTY_ATTRIB_PLD)) |
+		                ((self->at_attrib & ANSITTY_ATTRIB_PLD) ? 0 : ANSITTY_ATTRIB_PLU));
+		goto done;
+
+	case 0x008d: {
+		/* RI: Reverse Index */
+		ansitty_coord_t xy[2];
+		if (self->at_ttyflag & ANSITTY_FLAG_CRM)
+			PUTUNILAST(0x2423); /* ␣ */
+		GETCURSOR(xy);
+		if (xy[1] > 0)
+			SETCURSOR(xy[0], xy[1] - 1, true);
+	}	goto done;
+
+	case 0x0094: /* CCH: Cancel character   (erasing BS) */
+		if (self->at_ttyflag & ANSITTY_FLAG_CRM)
+			PUTUNILAST(0x2423); /* ␣ */
+		PUTUNI(CC_BS);
+		PUTUNI(CC_SPC);
+		PUTUNI(CC_BS);
+		goto done;
+
+	case 0x0090: /* DCS: Device Control String */
+	case 0x0098: /* SOS: Start of String */
+	case 0x009b: /* CSI: Control Sequence Introducer (alias for "\e[") */
+	case 0x009d: /* OSC: Operating System Command */
+	case 0x009e: /* PM: Privacy Message */
+	case 0x009f: /* APC: Application Program Command */
+		if (self->at_ttyflag & ANSITTY_FLAG_CRM)
+			PUTUNILAST(0x2423); /* ␣ */
+		switch (ch) {
+		case 0x0090: self->at_state = STATE_DCS; break;
+		case 0x0098: self->at_state = STATE_SOS; break;
+		case 0x009b: self->at_state = STATE_CSI; break;
+		case 0x009d: self->at_state = STATE_OSC; break;
+		case 0x009e: self->at_state = STATE_PM; break;
+		case 0x009f: self->at_state = STATE_APC; break;
+		default: __builtin_unreachable();
+		}
+		self->at_esclen = 0;
+		goto done;
+
 	default:
 		return false;
 	}
 	PUTUNI(ch);
+/*done_ch:*/
+	self->at_lastch = ch;
 done:
 	return true;
 }
@@ -2643,26 +2798,31 @@ ansitty_invoke_string_command(struct ansitty *__restrict self,
 
 	case STATE_OSC:
 	case STATE_OSC_ESC:
+	case STATE_OSC_C2:
 		result = ansi_OSC(self, (char *)self->at_escape, len);
 		break;
 
 	case STATE_DCS:
 	case STATE_DCS_ESC:
+	case STATE_DCS_C2:
 		result = ansi_DCS(self, (char *)self->at_escape, len);
 		break;
 
 	case STATE_SOS:
 	case STATE_SOS_ESC:
+	case STATE_SOS_C2:
 		result = ansi_SOS(self, (char *)self->at_escape, len);
 		break;
 
 	case STATE_PM:
 	case STATE_PM_ESC:
+	case STATE_PM_C2:
 		result = ansi_PM(self, (char *)self->at_escape, len);
 		break;
 
 	case STATE_APC:
 	case STATE_APC_ESC:
+	case STATE_APC_C2:
 		result = ansi_APC(self, (char *)self->at_escape, len);
 		break;
 
@@ -2679,26 +2839,31 @@ NOTHROW(CC get_string_command_start_character)(uintptr_t state) {
 
 	case STATE_OSC:
 	case STATE_OSC_ESC:
+	case STATE_OSC_C2:
 		result = ']';
 		break;
 
 	case STATE_DCS:
 	case STATE_DCS_ESC:
+	case STATE_DCS_C2:
 		result = 'P';
 		break;
 
 	case STATE_SOS:
 	case STATE_SOS_ESC:
+	case STATE_SOS_C2:
 		result = 'X';
 		break;
 
 	case STATE_PM:
 	case STATE_PM_ESC:
+	case STATE_PM_C2:
 		result = '^';
 		break;
 
 	case STATE_APC:
 	case STATE_APC_ESC:
+	case STATE_APC_C2:
 		result = '_';
 		break;
 
@@ -3237,12 +3402,22 @@ do_process_csi:
 	case STATE_DCS_ESC:
 	case STATE_SOS_ESC:
 	case STATE_PM_ESC:
-	case STATE_APC_ESC: {
+	case STATE_APC_ESC:
+	case STATE_OSC_C2:
+	case STATE_DCS_C2:
+	case STATE_SOS_C2:
+	case STATE_PM_C2:
+	case STATE_APC_C2: {
 		size_t len;
 		len = self->at_esclen;
 		if unlikely(len >= COMPILER_LENOF(self->at_escape))
 			RACE(set_text_and_done);
-		if ((byte_t)ch == '\\') {
+		if (((byte_t)ch == (STATE_OSC_ISC2(self->at_state)
+		                    ? 0x9c      /* 0xc2 0x9c -> U+009C (ST: String Terminator) */
+		                    : '\\')) || /* \e\\      -> ANSI string terminator */
+		    ((byte_t)ch == CC_BEL)) {   /* BEL       -> old-style string terminator */
+			if ((byte_t)ch == CC_BEL) /* Append preceding half-character to text */
+				self->at_escape[len++] = STATE_OSC_ISC2(self->at_state) ? 0xc2 : CC_ESC;
 			if (!ansitty_invoke_string_command(self, state, len)) {
 				WARN_UNKNOWN_SEQUENCE4(get_string_command_start_character(state),
 				                       len, self->at_escape, CC_ESC, ch);
@@ -3261,7 +3436,7 @@ do_process_csi:
 		self->at_esclen = len;
 		if unlikely(len >= COMPILER_LENOF(self->at_escape))
 			goto do_process_string_command;
-		self->at_state = STATE_OSC_DEL_ESC(state);
+		self->at_state = STATE_STRCMD_DEL_ESC(state);
 		break;
 
 	case STATE_OSC:
@@ -3279,8 +3454,15 @@ do_process_string_command:
 				                       len, self->at_escape, CC_BEL);
 			}
 			goto set_text_and_done;
+		} else if ((byte_t)ch == 0xc2 && self->at_codepage == CP_UTF8) {
+			/* Switch into string-command termination-check sub-mode
+			 * for terminator sequence: 0xc2 0x9c -> U+009C (ST: String Terminator) */
+			self->at_state = STATE_STRCMD_ADD_C2(state);
+			break;
 		} else if ((byte_t)ch == CC_ESC) {
-			self->at_state = STATE_OSC_ADD_ESC(state);
+			/* Switch into string-command termination-check sub-mode
+			 * for terminator sequence: \e\\ */
+			self->at_state = STATE_STRCMD_ADD_ESC(state);
 			break;
 		} else if (ch == CC_CAN) { /* Cancel */
 			goto set_text_and_done;

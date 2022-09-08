@@ -169,7 +169,7 @@ struct procsession {
 		_pgiagct_ctty;                                  \
 	})
 
-/* Return a [0..1]-reference to the calling/given components controlling terminal. */
+/* Return a [0..1]-reference to the calling/given component's controlling terminal. */
 #define procsession_getctty(self) axref_get(&(self)->ps_ctty)
 #define procgrp_getctty(self)     procsession_getctty(procgrp_getsession(self))
 #define task_getctty()            _procgrp_inherit_and_getctty(task_getprocgrp())

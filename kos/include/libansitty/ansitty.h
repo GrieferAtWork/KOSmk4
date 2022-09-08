@@ -191,6 +191,8 @@
 #define ANSITTY_ATTRIB_LET_DHTP      0x0200 /* Letter mode: Single-Width, Double-Height (top-half) */
 #define ANSITTY_ATTRIB_LET_DHBP      0x0300 /* Letter mode: Single-Width, Double-Height (bottom-half) */
 #define ANSITTY_ATTRIB_LET_MASK      0x0300 /* Mask for letter mode. */
+#define ANSITTY_ATTRIB_PLD           0x0400 /* Partial-line-down is active (subscripts; s.a. U+008B) */
+#define ANSITTY_ATTRIB_PLU           0x0800 /* Partial-line-up is active (superscripts; s.a. U+008C) */
 #define ANSITTY_ATTRIB_FONTMASK      0xf000 /* MASK: Alternate font selection */
 #define ANSITTY_ATTRIB_FONTSHFT          12 /* SHFT: Alternate font selection */
 
