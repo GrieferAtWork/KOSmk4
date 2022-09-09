@@ -21,6 +21,7 @@
 #define GUARD_LIBANSITTY_ANSITTY_C 1
 #define LIBANSITTY_EXPOSE_INTERNALS 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 /* NOTE: References  used  during the  implementation of  this ansitty
  *       processor can be found in `/kos/include/libansitty/ansitty.h' */
@@ -151,8 +152,8 @@ DECL_BEGIN
 #define NOTIFY_SETTTYMODE()         (TRACE_OPERATION("setttymode(%#x)\n", self->at_ttymode), self->at_ops.ato_setttymode ? (*self->at_ops.ato_setttymode)(self) : (void)0)
 #define NOTIFY_SETATTRIB()          (TRACE_OPERATION("setattrib(%#x)\n", self->at_attrib), self->at_ops.ato_setattrib ? (*self->at_ops.ato_setattrib)(self) : (void)0)
 #define SETTITLE(title)             (TRACE_OPERATION("settitle(%q)\n", title), (self->at_ops.ato_settitle ? (*self->at_ops.ato_settitle)(self, title) : (void)0))
-#define DOOUTPUT(text, len)         (TRACE_OPERATION("output(%$q)\n", len, text), (*self->at_ops.ato_output)(self, text, len))
-#define OUTPUT(text)                (TRACE_OPERATION("output(%q)\n", text), self->at_ops.ato_output ? (*self->at_ops.ato_output)(self, text, COMPILER_STRLEN(text)) : (void)0)
+#define OUTPUT(text, len)           (TRACE_OPERATION("output(%$q)\n", len, text), (*self->at_ops.ato_output)(self, text, len))
+#define OUTPUT_CONSTSTR(text)       (TRACE_OPERATION("output(%q)\n", text), self->at_ops.ato_output ? (*self->at_ops.ato_output)(self, text, COMPILER_STRLEN(text)) : (void)0)
 #define SCROLL(offset)              (TRACE_OPERATION("scroll(%d)\n", (int)(offset)), (*self->at_ops.ato_scroll)(self, offset))
 #define COPYCELL(dst_offset, count) (TRACE_OPERATION("copycell(%d,%u)\n", (int)(dst_offset), (unsigned int)(count)), (*self->at_ops.ato_copycell)(self, dst_offset, count))
 #define FILLCELL(ch, count)         (TRACE_OPERATION("fillcell(%I32Q,%u)\n", (uint32_t)(ch), (unsigned int)(count)), (*self->at_ops.ato_fillcell)(self, ch, count))
@@ -1226,8 +1227,8 @@ do_handle_unich:
 /* ==================================================================================== */
 
 
-/* "\e]{arg[arglen]:%s}\e[" */
-PRIVATE NONNULL((1, 2)) bool CC
+/* "\e]{arg[arglen]:%s}\e\\" */
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) bool CC
 ansi_OSC(struct ansitty *__restrict self,
          char *__restrict arg, size_t arglen) {
 	char *pos;
@@ -1250,10 +1251,272 @@ ansi_OSC(struct ansitty *__restrict self,
 	return false;
 }
 
-/* "\eP{arg[arglen]:%s}\e[" */
-PRIVATE NONNULL((1, 2)) bool CC
+/* "\eP{arg[arglen]:%s}\e\\" */
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) bool CC
 ansi_DCS(struct ansitty *__restrict self,
          char *__restrict arg, size_t arglen) {
+
+	if (arglen >= 3 && arg[0] == '$' && arg[1] == 'q') {
+		/* Support for `DECRQSS' https://invisible-island.net/xterm/ctlseqs/ctlseqs.html#h3-Device-Control-functions */
+		char response[256];
+		char *ptr;
+		arg += 2;
+		arglen -= 2;
+		ptr = stpcpy(response, CC_SESC "P1$r");
+		switch (arg[arglen - 1]) {
+
+		case 'm':
+			if unlikely(arglen != 1)
+				goto err_DECRQSS_unknown;
+
+			/* Get current graphic rendition settings */
+			*ptr++ = '0'; /* Reset settings */
+			if (self->at_attrib & ANSITTY_ATTRIB_ITALIC) {
+				*ptr++ = ';';
+				*ptr++ = '3';
+			}
+			if (self->at_attrib & ANSITTY_ATTRIB_UNDERLINE) {
+				*ptr++ = ';';
+				*ptr++ = '4';
+			}
+			if (self->at_attrib & ANSITTY_ATTRIB_BLINK) {
+				*ptr++ = ';';
+				*ptr++ = '5';
+			}
+			if (self->at_attrib & ANSITTY_FLAG_CONCEIL) {
+				*ptr++ = ';';
+				*ptr++ = '8';
+			}
+			if (self->at_attrib & ANSITTY_ATTRIB_STRIKETHROUGH) {
+				*ptr++ = ';';
+				*ptr++ = '9';
+			}
+			if (self->at_attrib & ANSITTY_ATTRIB_OVERLINE) {
+				*ptr++ = ';';
+				*ptr++ = '5';
+				*ptr++ = '3';
+			}
+			if (self->at_attrib & ANSITTY_ATTRIB_CIRCLED) {
+				*ptr++ = ';';
+				*ptr++ = '5';
+				*ptr++ = '2';
+			} else if (self->at_attrib & ANSITTY_ATTRIB_FRAMED) {
+				*ptr++ = ';';
+				*ptr++ = '5';
+				*ptr++ = '1';
+			}
+			if (self->at_attrib & ANSITTY_ATTRIB_FONTMASK)
+				ptr += sprintf(ptr, ";%u", 10 + ((self->at_attrib & ANSITTY_ATTRIB_FONTMASK) >> ANSITTY_ATTRIB_FONTSHFT));
+			if (ANSITTY_PALETTE_INDEX_FG(self->at_color) != ANSITTY_PALETTE_INDEX_FG(self->at_defcolor)) {
+				ptr += sprintf(ptr, ";%u",
+				               (ANSITTY_ISSTRONG(ANSITTY_PALETTE_INDEX_FG(self->at_color)) ? 90 : 30) +
+				               ANSITTY_PALETTE_INDEX_FG(self->at_color));
+			}
+			if (ANSITTY_PALETTE_INDEX_BG(self->at_color) != ANSITTY_PALETTE_INDEX_BG(self->at_defcolor)) {
+				ptr += sprintf(ptr, ";%u",
+				               (ANSITTY_ISSTRONG(ANSITTY_PALETTE_INDEX_BG(self->at_color)) ? 100 : 40) +
+				               ANSITTY_PALETTE_INDEX_BG(self->at_color));
+			}
+			break;
+
+		case 'H':   /* ANSI/VT100: CUP */
+		case 'f': { /* ANSI/VT100: HVP */
+			ansitty_coord_t xy[2];
+			if unlikely(arglen != 1)
+				goto err_DECRQSS_unknown;
+			GETCURSOR(xy);
+			if (xy[1] != 0)
+				ptr += sprintf(ptr, "%u", xy[1] + 1);
+			if (xy[0] != 0 || xy[1] != 0)
+				*ptr++ = ';';
+			if (xy[0] != 0)
+				ptr += sprintf(ptr, "%u", xy[0] + 1);
+		}	break;
+
+		case 'Q': /* SEM Set Editing extent Mode (limits ICH & DCH) */
+			if unlikely(arglen != 1)
+				goto err_DECRQSS_unknown;
+			if (!(self->at_ttyflag & ANSITTY_FLAG_INSDEL_SCRN))
+				*ptr++ = '1'; /* \e[1Q   ICH/DCH affect the current line only */
+			break;
+
+		case 'h':
+		case 'l':
+			if unlikely(arglen != 1)
+				goto err_DECRQSS_unknown;
+#define _PUT_HL(h_if, ...)                   \
+			if (!!(h_if) == (*arg == 'h')) { \
+				__VA_ARGS__;                 \
+				*ptr++ = ';';                \
+			}
+#define PUT_HL_1(h_if, a)             _PUT_HL(h_if, *ptr++ = a)
+#define PUT_HL_2(h_if, a, b)          _PUT_HL(h_if, *ptr++ = a, *ptr++ = b)
+#define PUT_HL_3(h_if, a, b, c)       _PUT_HL(h_if, *ptr++ = a, *ptr++ = b, *ptr++ = c)
+
+			/* \e[?1h    DECCKM   Cursor Keys Mode, send ESC O A for cursor up */
+			/* \e[?1l             Cursor keys send ANSI cursor position commands DECCKM */
+			PUT_HL_2(self->at_ttyflag & ANSITTY_FLAG_ENABLE_APP_CURSOR, '?', '1');
+
+			/* \e[?2h    DECANM   ANSI Mode, use ESC < to switch VT52 to ANSI */
+			/* \e[?2l             Use VT52 emulation instead of ANSI mode DECANM */
+			PUT_HL_2(!(self->at_ttyflag & ANSITTY_FLAG_VT52), '?', '2');
+
+			/* \e[?7h    DECAWM   AutoWrap Mode, start newline after column 80 */
+			/* \e[?7l             Cursor remains at end of line after column 80 DECAWM */
+			PUT_HL_2(!(self->at_ttyflag & ANSITTY_MODE_NOLINEWRAP), '?', '7');
+
+			if (self->at_ops.ato_termios) {
+				struct termios ios;
+				(*self->at_ops.ato_termios)(self, &ios, NULL);
+
+				/* \e[?24h   AH1   Autohardcopy before erasing or rolling GIGI screen */
+				/* \e[?24l   AH0   No auto-hardcopy when GIGI screen erased AH0 */
+				PUT_HL_3(ios.c_lflag & ECHOPRT, '?', '2', '4');
+
+				/* \e[2h   KAM   Keyboard Action Mode, disable keyboard input */
+				/* \e[2l         Enable input from keyboard KAM */
+				PUT_HL_1(!(ios.c_iflag & __IIOFF), '2');
+
+				/* \e[12h   SRM  Send Receive Mode, transmit without local echo */
+				/* \e[12l        Local echo - input from keyboard sent to screen SRM */
+				PUT_HL_2(!(ios.c_iflag & ECHO), '1', '2');
+
+				/* \e[20h   LNM  Linefeed newline mode (sets the `ONLCR' bit, and clear `ONLRET') */
+				/* \e[20l        Linefeed normal mode (clear the `ONLCR' bit) */
+				if ((ios.c_oflag & (ONLCR | ONLRET)) == ONLCR) {
+					if (*arg == 'h') {
+						*ptr++ = '2';
+						*ptr++ = '0';
+						*ptr++ = ';';
+					}
+				} else if (!(ios.c_oflag & ONLCR)) {
+					if (*arg == 'l') {
+						*ptr++ = '2';
+						*ptr++ = '0';
+						*ptr++ = ';';
+					}
+				}
+			}
+
+			/* \e[?25h   show cursor */
+			/* \e[?25l   hide cursor */
+			PUT_HL_3(!(self->at_ttymode & ANSITTY_MODE_HIDECURSOR), '?', '2', '5');
+
+			/* \e[?66h   Application keypad (DECNKM), VT320. */
+			/* \e[?66l   Numeric keypad (DECNKM), VT320. */
+			PUT_HL_3(self->at_ttyflag & ANSITTY_FLAG_ENABLE_APP_KEYPAD, '?', '6', '6');
+
+			/* \e[?67h   Backarrow key sends backspace (DECBKM), VT340, VT420. */
+			/* \e[?67l   Backarrow key sends delete (DECBKM), VT340, VT420 */
+			PUT_HL_3(self->at_ttyflag & ANSITTY_FLAG_BACKSPACE_REVERSE, '?', '6', '7');
+
+			/* \e[?69h   Enable left and right margin mode (DECLRMM), VT420 and up. */
+			/* \e[?69l   Disable left and right margin mode (DECLRMM), VT420 and up. */
+			PUT_HL_3(!(self->at_scroll_ec & HORIZONTAL_MARGIN_DISABLE_BIT), '?', '6', '9');
+
+			if ((self->at_ttymode & ANSITTY_MODE_MOUSEON_MASK) == ANSITTY_MODE_MOUSEON_WITHMOTION) {
+				if (*arg == 'h')
+					*ptr++ = '?', *ptr++ = '1', *ptr++ = '0', *ptr++ = '0', *ptr++ = '2', *ptr++ = ';';
+			} else if ((self->at_ttymode & ANSITTY_MODE_MOUSEON_MASK) == ANSITTY_MODE_MOUSEON_YES) {
+				if (*arg == 'h')
+					*ptr++ = '?', *ptr++ = '1', *ptr++ = '0', *ptr++ = '0', *ptr++ = '0', *ptr++ = ';';
+			} else {
+				if (*arg == 'l')
+					*ptr++ = '?', *ptr++ = '1', *ptr++ = '0', *ptr++ = '0', *ptr++ = '0', *ptr++ = ';';
+			}
+
+			/* \e[3h   CRM   Control Representation Mode, show all control chars */
+			/* \e[3l         Control characters are not displayable characters CRM */
+			PUT_HL_1(self->at_ttyflag & ANSITTY_FLAG_CRM, '3');
+
+			/* \e[4h   IRM   Insertion/Replacement Mode, set insert mode (VT102) */
+			/* \e[4l         Reset to replacement mode (VT102) IRM */
+			PUT_HL_1(self->at_ttyflag & ANSITTY_FLAG_INSERT, '4');
+
+			/* \e[10h   HEM  Horizontal Editing mode, ICH/DCH/IRM go backwards */
+			/* \e[10l        ICH and IRM shove characters forward, DCH pulls HEM */
+			PUT_HL_2(self->at_ttyflag & ANSITTY_FLAG_HEDIT, '1', '0');
+
+			/* \e[11h   PUM  Positioning Unit Mode, use decipoints for HVP/etc */
+			/* \e[11l        Use character positions for HPA/HPR/VPA/VPR/HVP PUM */
+			if (*arg == 'l') {
+				*ptr++ = '1';
+				*ptr++ = '1';
+				*ptr++ = ';';
+			}
+			if (ptr[-1] != 'r')
+				--ptr; /* Skip trailing ';' */
+#undef PUT_HL_3
+#undef PUT_HL_2
+#undef PUT_HL_1
+#undef _PUT_HL
+			break;
+
+		//case 'q': /* TODO: GETLED */
+
+		case 's':
+			if unlikely(arglen != 1)
+				goto err_DECRQSS_unknown;
+
+			/* DECSLRM */
+			if (self->at_scroll_ec & HORIZONTAL_MARGIN_DISABLE_BIT)
+				goto err_DECRQSS_unknown;
+			/* Set left and right columns of the scroll region */
+			if (self->at_scroll_sc != 0)
+				ptr += sprintf(ptr, "%u;", self->at_scroll_sc + 1);
+			if (self->at_scroll_ec != (MAXCOORD & ~HORIZONTAL_MARGIN_DISABLE_BIT)) {
+				ansitty_coord_t sxy[2];
+				GETSIZE(sxy);
+				if (self->at_scroll_ec < sxy[1]) {
+					if (self->at_scroll_sc == 0)
+						*ptr++ = ';';
+					ptr += sprintf(ptr, "%u", self->at_scroll_ec + 1);
+				}
+			}
+			break;
+
+		case 'r':
+			if unlikely(arglen != 1)
+				goto err_DECRQSS_unknown;
+
+			/* VT100: setwin DECSTBM */
+			/* Set top and bottom (inclusive) line's of a window */
+			if (self->at_scroll_sl != 0)
+				ptr += sprintf(ptr, "%u;", self->at_scroll_sl + 1);
+			if (self->at_scroll_el != MAXCOORD) {
+				ansitty_coord_t sxy[2];
+				GETSIZE(sxy);
+				if (self->at_scroll_el < sxy[1]) {
+					if (self->at_scroll_sl == 0)
+						*ptr++ = ';';
+					ptr += sprintf(ptr, "%u", self->at_scroll_el + 1);
+				}
+			}
+			break;
+
+		default:
+err_DECRQSS_unknown:
+			ptr = stpcpy(response, CC_SESC "P0$r");
+			break;
+		}
+
+		/* Append the request control sequence */
+		{
+			size_t avail = (size_t)(COMPILER_ENDOF(response) - ptr);
+			if (avail > arglen + 2)
+				avail = arglen + 2;
+			ptr = (char *)mempcpy(ptr, arg, avail, sizeof(char));
+		}
+
+		/* Append a string terminator */
+		*ptr++ = CC_ESC; /* ST */
+		*ptr++ = '\\';   /* ST */
+		OUTPUT(response, (size_t)(ptr - response));
+		return true;
+	}
+
+	/* TODO: Support for `DECTABSR' https://vt100.net/docs/vt510-rm/DECTABSR.html */
+
 	/* ??? */
 	(void)self;
 	(void)arg;
@@ -1261,8 +1524,8 @@ ansi_DCS(struct ansitty *__restrict self,
 	return false;
 }
 
-/* "\eX{arg[arglen]:%s}\e[" */
-PRIVATE NONNULL((1, 2)) bool CC
+/* "\eX{arg[arglen]:%s}\e\\" */
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) bool CC
 ansi_SOS(struct ansitty *__restrict self,
          char *__restrict arg, size_t arglen) {
 	/* ??? */
@@ -1272,8 +1535,8 @@ ansi_SOS(struct ansitty *__restrict self,
 	return false;
 }
 
-/* "\e^{arg[arglen]:%s}\e[" */
-PRIVATE NONNULL((1, 2)) bool CC
+/* "\e^{arg[arglen]:%s}\e\\" */
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) bool CC
 ansi_PM(struct ansitty *__restrict self,
         char *__restrict arg, size_t arglen) {
 	/* ??? */
@@ -1283,8 +1546,8 @@ ansi_PM(struct ansitty *__restrict self,
 	return false;
 }
 
-/* "\e_{arg[arglen]:%s}\e[" */
-PRIVATE NONNULL((1, 2)) bool CC
+/* "\e_{arg[arglen]:%s}\e\\" */
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) bool CC
 ansi_APC(struct ansitty *__restrict self,
          char *__restrict arg, size_t arglen) {
 	/* ??? */
@@ -1296,14 +1559,57 @@ ansi_APC(struct ansitty *__restrict self,
 
 
 
-PRIVATE NONNULL((1)) void CC
+PRIVATE ATTR_NOINLINE NONNULL((1)) void CC
 do_ident_DA(struct ansitty *__restrict self) {
 	/* Do what linux does: Report `\e[?6c` */
-	OUTPUT(CC_SESC "[?6c"); /* VT102 */
+	OUTPUT_CONSTSTR(CC_SESC "[?6c"); /* VT102 */
 }
 
 
-#define ARGUMENT_CODE_SWITCH_BEGIN()                            \
+
+/* DECRQPSR: \e[{what}$w */
+PRIVATE ATTR_NOINLINE NONNULL((1)) bool CC
+ansi_request_presentation_state_report(struct ansitty *__restrict self, unsigned int what) {
+	char response[COMPILER_LENOF(CC_SESC "P1$u"
+	                             PRIMAXu ";" PRIMAXu ";1;"
+	                             "X;\x40;\x40;0;0;\x40;"
+	                             "B0BB"
+	                             CC_SESC "\\")];
+	switch (what) {
+
+	case 1: {
+		/* cursor information report (DECCIR).
+		 * Responds with:
+		 * >> "\eP1$u{Pr};{Pc};{Pp};{Srend};{Satt};{Sflag};{Pgl};{Pgr};{Scss};{Sdesig}\e\\"
+		 */
+		ansitty_coord_t xy[2];
+		GETCURSOR(xy);
+		sprintf(response,
+		        CC_SESC "P1$u"
+		        "%u;%u;1;"               /* {Pr};{Pc};{Pp}; */
+		        "%c;\x40;\x40;0;0;\x40;" /* {Srend};{Satt};{Sflag};{Pgl};{Pgr};{Scss}; */
+		        "B0BB"                   /* {Sdesig} */
+		        CC_SESC "\\",
+		        xy[1] + 1,
+		        xy[0] + 1,
+		        0x40 | ((ANSITTY_ISSTRONG(self->at_color & 0xf) ? 0x01 : 0x00) |
+		                (self->at_attrib & ANSITTY_ATTRIB_UNDERLINE ? 0x02 : 0x00) |
+		                (self->at_attrib & ANSITTY_ATTRIB_BLINK ? 0x04 : 0x00)));
+	}	break;
+
+//TODO:	case 2:
+//TODO:		/* tab stop report (DECTABSR). */
+//TODO:		break;
+
+	default:
+		return false;
+	}
+	OUTPUT(response, strlen(response));
+	return true;
+}
+
+
+#define ARGUMENT_CODE_FOREACH_BEGIN(code)                       \
 	{                                                           \
 		unsigned int code;                                      \
 		char *_args_iter, *_args_end;                           \
@@ -1311,16 +1617,21 @@ do_ident_DA(struct ansitty *__restrict self) {
 		for (;;) {                                              \
 			code = strtoui(_args_iter, &_args_end, 10);         \
 			if (*_args_end != ';' && _args_end != arg + arglen) \
-				goto nope;                                      \
-			switch (code) {
-#define ARGUMENT_CODE_SWITCH_END()         \
-			default: goto nope;            \
-			}                              \
+				goto nope;
+#define ARGUMENT_CODE_FOREACH_END()        \
 			if (_args_end == arg + arglen) \
 				break;                     \
 			_args_iter = _args_end + 1;    \
 		}                                  \
 	}
+
+#define ARGUMENT_CODE_SWITCH_BEGIN()  \
+	ARGUMENT_CODE_FOREACH_BEGIN(code) \
+	switch (code) {
+#define ARGUMENT_CODE_SWITCH_END() \
+	default: goto nope;            \
+	}                              \
+	ARGUMENT_CODE_FOREACH_END()
 
 #define ARGUMENT_CODE_QSWITCH_BEGIN()                               \
 	{                                                               \
@@ -2478,7 +2789,7 @@ done_insert_ansitty_flag_hedit:
 				 *     \e[?10n = OK,
 				 *     \e[?11n = not OK,
 				 *     \e[?13n = no printer. */
-				OUTPUT(CC_SESC "[?13n"); /* no printer */
+				OUTPUT_CONSTSTR(CC_SESC "[?13n"); /* no printer */
 				break;
 
 			} ARGUMENT_CODE_QSWITCH_ELSE() {
@@ -2490,7 +2801,7 @@ done_insert_ansitty_flag_hedit:
 				 *     \e[2n = Terminal is busy, it will send DSR when ready
 				 *     \e[3n = Malfunction, please try again
 				 *     \e[4n = Malfunction, terminal will send DSR when ready */
-				OUTPUT(CC_SESC "[0n"); /* We are always ready! */
+				OUTPUT_CONSTSTR(CC_SESC "[0n"); /* We are always ready! */
 				break;
 
 			case 6:
@@ -2503,7 +2814,7 @@ done_insert_ansitty_flag_hedit:
 					len = sprintf(buf, CC_SESC "[%u;%uR",
 					              (unsigned int)(xy[1] + 1),
 					              (unsigned int)(xy[0] + 1));
-					DOOUTPUT(buf, len);
+					OUTPUT(buf, len);
 				}
 				break;
 
@@ -2599,7 +2910,7 @@ done_insert_ansitty_flag_hedit:
 				{
 					char buf[COMPILER_LENOF(CC_SESC "[" PRIMAXu ";" PRIMAXu "$y")];
 					size_t len = sprintf(buf, CC_SESC "[%u;%u$y", name, result);
-					DOOUTPUT(buf, len);
+					OUTPUT(buf, len);
 				}
 			}
 		}
@@ -2712,7 +3023,7 @@ done_insert_ansitty_flag_hedit:
 
 
 	case 'r': { /* VT100: setwin DECSTBM */
-		/* Set top and bottom (inclusive) line#s of a window */
+		/* Set top and bottom (inclusive) line's of a window */
 		ansitty_coord_t startline;
 		ansitty_coord_t endline;
 		if (!arglen) {
@@ -2773,6 +3084,17 @@ done_insert_ansitty_flag_hedit:
 			count = maxerase;
 		FILLCELL(' ', count);
 	}	break;
+
+	case 'w':
+		if (arglen >= 1 && arg[arglen - 1] == '$') {
+			/* CSI Ps $ w  -- Request presentation state report (DECRQPSR), VT320 and up. */
+			--arglen;
+			ARGUMENT_CODE_FOREACH_BEGIN(code)
+			if (!ansi_request_presentation_state_report(self, code))
+				goto nope;
+			ARGUMENT_CODE_FOREACH_END()
+		}
+		break;
 
 	default:
 		goto nope;
@@ -3412,17 +3734,26 @@ do_process_csi:
 		len = self->at_esclen;
 		if unlikely(len >= COMPILER_LENOF(self->at_escape))
 			RACE(set_text_and_done);
-		if (((byte_t)ch == (STATE_OSC_ISC2(self->at_state)
+		if (((byte_t)ch == (STATE_OSC_ISC2(state)
 		                    ? 0x9c      /* 0xc2 0x9c -> U+009C (ST: String Terminator) */
 		                    : '\\')) || /* \e\\      -> ANSI string terminator */
 		    ((byte_t)ch == CC_BEL)) {   /* BEL       -> old-style string terminator */
 			if ((byte_t)ch == CC_BEL) /* Append preceding half-character to text */
-				self->at_escape[len++] = STATE_OSC_ISC2(self->at_state) ? 0xc2 : CC_ESC;
+				self->at_escape[len++] = STATE_OSC_ISC2(state) ? 0xc2 : CC_ESC;
 			if (!ansitty_invoke_string_command(self, state, len)) {
 				WARN_UNKNOWN_SEQUENCE4(get_string_command_start_character(state),
 				                       len, self->at_escape, CC_ESC, ch);
 			}
 			goto set_text_and_done;
+		} else if ((byte_t)ch == 0xc2 && self->at_codepage == CP_UTF8) {
+			/* Switch into string-command termination-check sub-mode
+			 * for terminator sequence: 0xc2 0x9c -> U+009C (ST: String Terminator) */
+			if (!STATE_OSC_ISC2(state)) {
+				state = STATE_STRCMD_DEL_ESC(state);
+				state = STATE_STRCMD_ADD_C2(state);
+				self->at_state = state;
+			}
+			break;
 		} else if (ch == CC_CAN) { /* Cancel */
 			goto set_text_and_done;
 		} else if (ch == CC_NUL) { /* Ignored */
@@ -3481,7 +3812,7 @@ do_process_string_command:
 		if (ch == 'n') {
 			/* VT100: devstat DSR */
 			/* termok DSR  --- Response: terminal is OK */
-			OUTPUT(CC_SESC "0n");
+			OUTPUT_CONSTSTR(CC_SESC "0n");
 			goto set_text_and_done;
 		} else if (ch == CC_CAN) {
 			goto set_text_and_done;
@@ -3502,7 +3833,7 @@ do_process_string_command:
 			len = sprintf(buf, CC_SESC "%u;%uR",
 			              (unsigned int)(xy[1] + 1),
 			              (unsigned int)(xy[0] + 1));
-			DOOUTPUT(buf, len);
+			OUTPUT(buf, len);
 			goto set_text_and_done;
 		} else if (ch == CC_CAN) {
 			goto set_text_and_done;
