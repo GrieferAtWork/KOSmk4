@@ -572,6 +572,26 @@ mfile_utailwrite(struct mfile *__restrict self,
 	      E_FILESYSTEM_OPERATION_WRITE);
 }
 
+/* Check if a bad-usage O_DIRECT exception should get handled */
+PRIVATE WUNUSED bool
+NOTHROW(FCALL shoud_handle_direct_io_bad_usage)(iomode_t mode) {
+	syscall_ulong_t context;
+
+	/* Only handle bad-usage O_DIRECT when direct I/O is optional */
+	if (!(mode & IO_OPTDIRECT))
+		return false;
+
+	/* Check that the current exception indicates bad API usage for direct-I/O */
+	if (!was_thrown(E_INVALID_ARGUMENT_BAD_ALIGNMENT))
+		return false;
+	context = PERTASK_GET(this_exception_args.e_invalid_argument.ia_context);
+	if (context == E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BADPOS ||
+	    context == E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BADSIZ ||
+	    context == E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BADBUF)
+		return true;
+	return false;
+}
+
 INTERN BLOCKING WUNUSED NONNULL((1)) size_t KCALL
 handle_mfile_pread(struct mfile *__restrict self,
                    USER CHECKED void *dst, size_t num_bytes,
@@ -589,8 +609,15 @@ handle_mfile_pread(struct mfile *__restrict self,
 		}
 	}
 	if likely(!(self->mf_flags & MFILE_F_NOUSRIO)) {
-		if unlikely(mode & IO_DIRECT)
-			return mfile_direct_read(self, dst, num_bytes, addr);
+		if unlikely(mode & IO_DIRECT) {
+			TRY {
+				return mfile_direct_read(self, dst, num_bytes, addr);
+			} EXCEPT {
+				if (!shoud_handle_direct_io_bad_usage(mode))
+					RETHROW();
+				/* Fallthru to doing normal (non-direct) file I/O */
+			}
+		}
 		return mfile_read(self, dst, num_bytes, addr);
 	}
 	if (stream != NULL && addr == 0) {
@@ -623,8 +650,15 @@ handle_mfile_pwrite(struct mfile *__restrict self,
 		}
 	}
 	if likely(!(self->mf_flags & MFILE_F_NOUSRIO)) {
-		if unlikely(mode & IO_DIRECT)
-			return mfile_direct_write(self, src, num_bytes, addr);
+		if unlikely(mode & IO_DIRECT) {
+			TRY {
+				return mfile_direct_write(self, src, num_bytes, addr);
+			} EXCEPT {
+				if (!shoud_handle_direct_io_bad_usage(mode))
+					RETHROW();
+				/* Fallthru to doing normal (non-direct) file I/O */
+			}
+		}
 		return mfile_write(self, src, num_bytes, addr);
 	}
 	if (stream != NULL && addr == 0) {
@@ -808,8 +842,15 @@ done_pread:
 		}
 	}
 	if likely(!(self->mf_flags & MFILE_F_NOUSRIO)) {
-		if unlikely(mode & IO_DIRECT)
-			return mfile_direct_readv(self, dst, 0, num_bytes, addr);
+		if unlikely(mode & IO_DIRECT) {
+			TRY {
+				return mfile_direct_readv(self, dst, 0, num_bytes, addr);
+			} EXCEPT {
+				if (!shoud_handle_direct_io_bad_usage(mode))
+					RETHROW();
+				/* Fallthru to doing normal (non-direct) file I/O */
+			}
+		}
 		return mfile_readv(self, dst, 0, num_bytes, addr);
 	}
 	if (stream != NULL && addr == 0) {
@@ -886,8 +927,15 @@ done_pwrite:
 		}
 	}
 	if likely(!(self->mf_flags & MFILE_F_NOUSRIO)) {
-		if unlikely(mode & IO_DIRECT)
-			return mfile_direct_writev(self, src, 0, num_bytes, addr);
+		if unlikely(mode & IO_DIRECT) {
+			TRY {
+				return mfile_direct_writev(self, src, 0, num_bytes, addr);
+			} EXCEPT {
+				if (!shoud_handle_direct_io_bad_usage(mode))
+					RETHROW();
+				/* Fallthru to doing normal (non-direct) file I/O */
+			}
+		}
 		return mfile_writev(self, src, 0, num_bytes, addr);
 	}
 	if (stream != NULL && addr == 0) {

@@ -37,4 +37,22 @@
 
 #include <fcntl.h>
 
+#include <features.h>
+
+#ifdef __USE_SOLARIS
+#include <asm/os/file-ioctls.h>
+
+/* Arguments for `_FIODIRECTIO' from <sys/filio.h> */
+#if !defined(DIRECTIO_OFF) && defined(__DIRECTIO_OFF)
+#define DIRECTIO_OFF __DIRECTIO_OFF /* Disable optional direct I/O (clear O_DIRECT and IO_OPTDIRECT) */
+#endif /* !DIRECTIO_OFF && __DIRECTIO_OFF */
+#if !defined(DIRECTIO_ON) && defined(__DIRECTIO_ON)
+#define DIRECTIO_ON __DIRECTIO_ON /* Enable optional direct I/O  (set O_DIRECT and IO_OPTDIRECT) */
+#endif /* !DIRECTIO_ON && __DIRECTIO_ON */
+#if !defined(DIRECTIO_MAND) && defined(__DIRECTIO_MAND)
+#define DIRECTIO_MAND __DIRECTIO_MAND /* Enable mandatory direct I/O (only set O_DIRECT; KOS-specific) */
+#endif /* !DIRECTIO_MAND && __DIRECTIO_MAND */
+
+#endif /* __USE_SOLARIS */
+
 #endif /* !_SYS_FCNTL_H */

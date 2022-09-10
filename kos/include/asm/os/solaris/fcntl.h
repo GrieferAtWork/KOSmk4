@@ -59,8 +59,6 @@
 #define __F_UNLKSYS             4
 #define __O_ACCMODE             3
 #define __FD_CLOEXEC            1
-#define __DIRECTIO_OFF          (0)
-#define __DIRECTIO_ON           (1)
 #define __F_RDACC               0x1
 #define __F_WRACC               0x2
 #define __F_RWACC               0x3

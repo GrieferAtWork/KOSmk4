@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b30de7c */
+/* HASH CRC-32:0xcd815fdf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -427,6 +427,7 @@ DEFINE_PUBLIC_ALIAS(DOS$posix_fallocate64, libd_posix_fallocate64);
 DEFINE_PUBLIC_ALIAS(DOS$_locking, libd_lockf);
 DEFINE_PUBLIC_ALIAS(DOS$lockf, libd_lockf);
 DEFINE_PUBLIC_ALIAS(DOS$lockf64, libd_lockf64);
+DEFINE_PUBLIC_ALIAS(DOS$directio, libd_directio);
 
 /* fenv */
 DEFINE_PUBLIC_ALIAS(DOS$feclearexcept, libd_feclearexcept);

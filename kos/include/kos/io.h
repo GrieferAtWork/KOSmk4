@@ -481,6 +481,7 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #define IO_CLOFORK    0x0080 /* Close during fork() (or rather: `unshare(CLONE_FILES)') */
 /*efine IO_           0x0100  * -- O_NOCTTY */
 /*efine IO_           0x0200  * -- O_TRUNC */
+#define IO_OPTDIRECT  0x0200 /* [O_TRUNC] When combined with `IO_DIRECT', handle `E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BAD*' by doing non-direct I/O. */
 #define IO_APPEND     0x0400 /* Append newly written data at the end (== O_APPEND) */
 #define IO_NONBLOCK   0x0800 /* Don't block in I/O (== O_NONBLOCK) */
 #define IO_DSYNC      0x1000 /* Ensure that all modified caches are flushed during write() (== O_DSYNC) */

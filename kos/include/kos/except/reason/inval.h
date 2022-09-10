@@ -286,6 +286,7 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND = 0x1800, /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown ioctl() command */
 	E_INVALID_ARGUMENT_CONTEXT_OPENFD_FLAGS,           /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `of_flags' field of a `struct openfd' contained flags other than `IO_CLOEXEC | IO_CLOFORK'. */
 	E_INVALID_ARGUMENT_CONTEXT_OPENFD_MODE,            /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `of_mode' field of a `struct openfd' wasn't one of `OPENFD_MODE_*'. */
+	E_INVALID_ARGUMENT_CONTEXT_DIRECTIO_MODE,          /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `arg' given to `FD_IOC_DIRECTIO' isn't one of `FD_IOC_DIRECTIO_*'. */
 
 	/* === BEGIN: BUILDING DEVICE IOCTLS === */
 
@@ -561,6 +562,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND                    E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND                    /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown ioctl() command */
 #define E_INVALID_ARGUMENT_CONTEXT_OPENFD_FLAGS                     E_INVALID_ARGUMENT_CONTEXT_OPENFD_FLAGS                     /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `of_flags' field of a `struct openfd' contained flags other than `IO_CLOEXEC | IO_CLOFORK'. */
 #define E_INVALID_ARGUMENT_CONTEXT_OPENFD_MODE                      E_INVALID_ARGUMENT_CONTEXT_OPENFD_MODE                      /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `of_mode' field of a `struct openfd' wasn't one of `OPENFD_MODE_*'. */
+#define E_INVALID_ARGUMENT_CONTEXT_DIRECTIO_MODE                    E_INVALID_ARGUMENT_CONTEXT_DIRECTIO_MODE                    /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `arg' given to `FD_IOC_DIRECTIO' isn't one of `FD_IOC_DIRECTIO_*'. */
 /* === BEGIN: BUILDING DEVICE IOCTLS === */
 
 	/* ioctl() (tty) */
@@ -825,6 +827,7 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND                    6144 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown ioctl() command */
 #define E_INVALID_ARGUMENT_CONTEXT_OPENFD_FLAGS                     6145 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `of_flags' field of a `struct openfd' contained flags other than `IO_CLOEXEC | IO_CLOFORK'. */
 #define E_INVALID_ARGUMENT_CONTEXT_OPENFD_MODE                      6146 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `of_mode' field of a `struct openfd' wasn't one of `OPENFD_MODE_*'. */
+#define E_INVALID_ARGUMENT_CONTEXT_DIRECTIO_MODE                    6147 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The `arg' given to `FD_IOC_DIRECTIO' isn't one of `FD_IOC_DIRECTIO_*'. */
 /* === BEGIN: BUILDING DEVICE IOCTLS === */
 
 	/* ioctl() (tty) */

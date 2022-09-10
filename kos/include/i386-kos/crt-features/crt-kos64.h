@@ -2465,6 +2465,7 @@
 #define __CRT_HAVE_dgettext
 #define __CRT_HAVE_difftime
 #define __CRT_HAVE_difftime64
+#define __CRT_HAVE_directio
 #define __CRT_HAVE_dirfd
 #define __CRT_HAVE_dirname
 #define __CRT_HAVE_div
@@ -8331,6 +8332,7 @@
 #define __CRT_HAVE_KOS$dgettext
 #define __CRT_HAVE_KOS$difftime
 #define __CRT_HAVE_KOS$difftime64
+#define __CRT_HAVE_KOS$directio
 #define __CRT_HAVE_KOS$dirfd
 #define __CRT_HAVE_KOS$dirname
 #define __CRT_HAVE_KOS$div
@@ -12935,6 +12937,7 @@
 #define __CRT_HAVE_DOS$dgettext
 #define __CRT_HAVE_DOS$difftime
 #define __CRT_HAVE_DOS$difftime64
+#define __CRT_HAVE_DOS$directio
 #define __CRT_HAVE_DOS$dirfd
 #define __CRT_HAVE_DOS$dirname
 #define __CRT_HAVE_DOS$div

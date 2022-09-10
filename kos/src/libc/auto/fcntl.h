@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6543b71 */
+/* HASH CRC-32:0x86b4dd62 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,49 @@ INTDEF int NOTHROW_NCX(LIBDCALL libd_posix_fadvise64)(fd_t fd, __PIO_OFFSET64 of
 INTDEF int NOTHROW_NCX(LIBDCALL libd_posix_fallocate64)(fd_t fd, __PIO_OFFSET64 offset, __PIO_OFFSET64 length);
 INTDEF int NOTHROW_RPC(LIBDCALL libd_lockf)(fd_t fd, __STDC_INT_AS_UINT_T cmd, __PIO_OFFSET length);
 INTDEF int NOTHROW_RPC(LIBDCALL libd_lockf64)(fd_t fd, __STDC_INT_AS_UINT_T cmd, __PIO_OFFSET64 length);
+/* >> directio(3)
+ * Enable or disable optional direct-I/O for  `fd'. Optional direct I/O behaves  the
+ * same as mandatory direct I/O (s.a. `O_DIRECT'), but those cases where the  buffer
+ * or file position/length provided in a call to `read(2)' or `write(2)' don't match
+ * the requirements imposed by the  backing hardware (s.a. `FILE_IOC_BLKSHIFT')  are
+ * handled  not by throwing an `E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BAD*' exception,
+ * but by falling back to doing non-direct I/O (as if `O_DIRECT') hasn't been set.
+ *
+ * Note that when optional direct-I/O is enabled, the O_DIRECT bit will also be set
+ * for  the  given  `fd'  (in   addition  to  the  internal  `IO_OPTDIRECT'   bit).
+ *
+ * PORTABILITY WARNING: On OpenSolaris, this optional direct  I/O isn't used for file  ranges
+ *                      of the given `fd' that have been mmap'd. This is NOT the case on KOS,
+ *                      where direct I/O is always use if possible.
+ *
+ * @param: fd:   The file for which direct-I/O should be enabled/disabled
+ * @param: mode: One of `DIRECTIO_*' from `<sys/fcntl.h>'
+ * @return:  0: Success
+ * @return: -1: Error (s.a. `errno') */
+INTDEF int NOTHROW_NCX(LIBDCALL libd_directio)(fd_t fd, int mode);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> directio(3)
+ * Enable or disable optional direct-I/O for  `fd'. Optional direct I/O behaves  the
+ * same as mandatory direct I/O (s.a. `O_DIRECT'), but those cases where the  buffer
+ * or file position/length provided in a call to `read(2)' or `write(2)' don't match
+ * the requirements imposed by the  backing hardware (s.a. `FILE_IOC_BLKSHIFT')  are
+ * handled  not by throwing an `E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BAD*' exception,
+ * but by falling back to doing non-direct I/O (as if `O_DIRECT') hasn't been set.
+ *
+ * Note that when optional direct-I/O is enabled, the O_DIRECT bit will also be set
+ * for  the  given  `fd'  (in   addition  to  the  internal  `IO_OPTDIRECT'   bit).
+ *
+ * PORTABILITY WARNING: On OpenSolaris, this optional direct  I/O isn't used for file  ranges
+ *                      of the given `fd' that have been mmap'd. This is NOT the case on KOS,
+ *                      where direct I/O is always use if possible.
+ *
+ * @param: fd:   The file for which direct-I/O should be enabled/disabled
+ * @param: mode: One of `DIRECTIO_*' from `<sys/fcntl.h>'
+ * @return:  0: Success
+ * @return: -1: Error (s.a. `errno') */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_directio)(fd_t fd, int mode);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

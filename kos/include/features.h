@@ -51,11 +51,7 @@
 
 
 
-#if (defined(__cplusplus) && !defined(__INTELLISENSE__) &&   \
-     !defined(_NO_IMPLICIT_GNU_SOURCE) &&                    \
-     !defined(__USE_ISOC_PURE) && !defined(_EVERY_SOURCE) && \
-     (defined(__GNUC__) || __has_include(<bits/vector.tcc>)))
-/* Hacky  work-around  to satisfy  header requirements  for libstdc++
+/* Hacky work-around to  satisfy header  requirements for  libstdc++.
  * And  before you say that this is a  bad way of doing it, know that
  * on  linux,  g++  will _always_  pre-define  `_GNU_SOURCE' straight
  * from  within the compiler  itself, in order to  get access to some
@@ -72,8 +68,11 @@
  * must be  handled explicitly  so-as to  already expose  the  required
  * symbols  during the libstdc++  configure phase), or  when one of the
  * headers specific to  libstdc++ are apart  of the include-path  (thus
- * also supporting compilers other than g++).
- */
+ * also supporting compilers other than g++). */
+#if (defined(__cplusplus) && !defined(__INTELLISENSE__) &&   \
+     !defined(_NO_IMPLICIT_GNU_SOURCE) &&                    \
+     !defined(__USE_ISOC_PURE) && !defined(_EVERY_SOURCE) && \
+     (defined(__GNUC__) || __has_include(<bits/vector.tcc>)))
 #undef _GNU_SOURCE
 #define _GNU_SOURCE 1
 #endif /* ... */
@@ -89,8 +88,7 @@
  * up and made this
  *
  * When  this feature is enabled, <cstddef> will just behave the same
- * as <stddef.h>, meaning all symbols are declared in `::' and `std'!
- */
+ * as <stddef.h>, meaning all symbols are declared in `std' AND `::'! */
 #if defined(_BROKEN_CCOMPAT_SOURCE) || defined(_GLIBCXX_SHARED)
 #undef __USE_BROKEN_CCOMPAT
 #define __USE_BROKEN_CCOMPAT 1
@@ -103,8 +101,7 @@
  * #undef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE  (gLibc-compatible)
  *    -> memmem() or memrmem() called with `needlelen' set to ZERO(0), return:
  *       memmem():  `haystack'
- *       memrmem(): `haystack + haystacklen'
- */
+ *       memrmem(): `haystack + haystacklen' */
 #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
 #undef __USE_MEMMEM_EMPTY_NEEDLE_NULL
 #define __USE_MEMMEM_EMPTY_NEEDLE_NULL 1
@@ -158,14 +155,15 @@
  * for kernel-space (when `_KOS_KERNEL_SOURCE' is also implied), but  must
  * be enabled explicitly for user-space.
  * Alterations include:
- *    - int sprintf() ->  size_t sprintf()
- *    - int printf()  -> ssize_t printf()
- *    - ...
- *    - feof(FILE *)  -> feof(FILE const *)
- *    - ...
- *    - Changing `int flags'-like arguments to `unsigned int flags'
- *    - Reversing the argument order of `outb()', `outw()', `outl()'
- *      and their `*_p'  versions, such that  the port comes  first. */
+ *  - int sprintf() ->  size_t sprintf()
+ *  - int printf()  -> ssize_t printf()
+ *  - ...
+ *  - feof(FILE *)  -> feof(FILE const *)
+ *  - ...
+ *  - Changing `int flags'-like arguments to `unsigned int flags'
+ *  - Reversing the argument order of `outb()', `outw()', `outl()'
+ *    and their `*_p'  versions, such that  the port comes  first.
+ *  - ... */
 #if (defined(_KOS_ALTERATIONS_SOURCE) || \
      (defined(__KOS__) && defined(__KERNEL__) && !defined(__USE_ISOC_PURE)))
 #define __USE_KOS_ALTERATIONS 1
@@ -189,10 +187,10 @@
 /* DOS (NT) extensions and symbol visibility.
  * This is the stuff you'd also find in `msvcrt.dll' and its headers. */
 #ifdef _DOS_SOURCE
-#if (_DOS_SOURCE + 0) != 0
+#if (-_DOS_SOURCE - 1) != -1
 #define __USE_DOS 1
 #define __USE_DOS_SLIB 1
-#endif /* (_DOS_SOURCE + 0) != 0 */
+#endif /* (-_DOS_SOURCE - 1) != -1 */
 #elif defined(_MSC_VER) && !defined(__USE_ISOC_PURE)
 #define __USE_DOS 1
 #ifndef __STDC_WANT_SECURE_LIB__
@@ -296,7 +294,7 @@
 #endif /* _XOPEN_SOURCE < 200809L */
 #endif /* _NETBSD_SOURCE */
 
-/* Make available some BSD-specific extensions such as `cfmakesane()' */
+/* Make available some BSD-specific extensions, such as `cfmakesane(3)' */
 #ifdef _BSD_SOURCE
 #undef _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE 1
@@ -307,7 +305,7 @@
 #define __BSD_VISIBLE 1 /* API alias (don't use in headers!) */
 #endif /* _BSD_SOURCE */
 
-/* Make available some Cygwin-specific extensions */
+/* Make available some Cygwin-specific extensions, such as `strtosigno(3)' */
 #ifdef _CYG_SOURCE
 #define __USE_CYGWIN 1
 #endif /* _CYG_SOURCE */
@@ -317,8 +315,8 @@
 #define __USE_NEWLIB 1
 #endif /* _NEWLIB_SOURCE */
 
-/* Enable  additional  extensions  present  on
- * Solaris (or more specifically: OpenSolaris) */
+/* Enable additional extensions present on Solaris (or more specifically: OpenSolaris,
+ * since Solaris is closed-source and I couldn't  get my hands on its system  headers) */
 #ifdef __EXTENSIONS__
 #define __USE_SOLARIS 1
 #undef _DEFAULT_SOURCE
@@ -377,7 +375,9 @@
 
 #if (defined(_ISOC17_SOURCE) || defined(__USE_ISOC23) || \
      (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201710L))
+#ifndef __ISO_C_VISIBLE
 #define __ISO_C_VISIBLE 2017 /* API alias (don't use in headers!) */
+#endif /* !__ISO_C_VISIBLE */
 #define __USE_ISOC17 1
 #endif /* _ISOC17_SOURCE || __STDC_VERSION__ >= 201710L */
 
@@ -405,10 +405,10 @@
 #define __USE_ISOC95 1
 #endif /* _ISOC95_SOURCE || __USE_ISOC99 || __STDC_VERSION__ >= 199409L */
 
-#if (defined(_ISOCXX2A_SOURCE) || \
-     (defined(__cplusplus) && __cplusplus > 201703L))
+#if (defined(_ISOCXX2A_SOURCE) || defined(_ISOCXX20_SOURCE) || \
+     (defined(__cplusplus) && __cplusplus > 202002L))
 #define __USE_ISOCXX2A 1
-#endif /* _ISOCXX2A_SOURCE || __cplusplus > 201703L */
+#endif /* _ISOCXX2A_SOURCE || _ISOCXX20_SOURCE || __cplusplus > 202002L */
 
 #if (defined(_ISOCXX17_SOURCE) || defined(__USE_ISOCXX2A) || \
      (defined(__cplusplus) && __cplusplus >= 201703L))

@@ -2617,6 +2617,7 @@
 #define __CRT_HAVE_dgettext
 #define __CRT_HAVE_difftime
 #define __CRT_HAVE_difftime64
+#define __CRT_HAVE_directio
 #define __CRT_HAVE_dirfd
 #define __CRT_HAVE_dirname
 #define __CRT_HAVE_div

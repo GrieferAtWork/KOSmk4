@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14b25cd0 */
+/* HASH CRC-32:0x8d033914 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -555,6 +555,7 @@ DFUN(".text.crt.dos.io.large.utility", libd_posix_fadvise64, libc_posix_fadvise6
 DFUN(".text.crt.dos.io.large.utility", libd_posix_fallocate64, libc_posix_fallocate64, TD, 3, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_OFF64_T__), TIn(__SIZEOF_OFF64_T__))
 DFUN(".text.crt.dos.io.lock", libd_lockf, libc_lockf, TD, 3, TIn(__SIZEOF_FD_T__), TD, TIn(__SIZEOF_OFF32_T__))
 DFUN(".text.crt.dos.io.large.lock", libd_lockf64, libc_lockf64, TD, 3, TIn(__SIZEOF_FD_T__), TD, TIn(__SIZEOF_OFF64_T__))
+DFUN(".text.crt.dos.solaris.io", libd_directio, libc_directio, TD, 2, TIn(__SIZEOF_FD_T__), TD)
 
 /* fenv */
 DFUN(".text.crt.dos.math.fenv", libd_feclearexcept, libc_feclearexcept, TD, 1, TD)

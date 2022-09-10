@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_SRC_FD_IOCTL_C
 #define GUARD_KERNEL_SRC_FD_IOCTL_C 1
 #define _KOS_SOURCE 1
+#define __EXTENSIONS__ 1
 
 #include <kernel/compiler.h>
 
@@ -38,6 +39,8 @@
 #include <kos/io.h>
 #include <kos/ioctl/fd.h>
 #include <linux/fs.h>
+#include <sys/fcntl.h>
+#include <sys/filio.h>
 #include <sys/ioctl.h>
 #include <sys/types.h> /* loff_t */
 
@@ -64,6 +67,26 @@ NOTHROW(KCALL ioctl_complete_exception_info)(fd_t fd) {
 	default: break;
 	}
 }
+
+static_assert(FD_IOC_DIRECTIO == _FIODIRECTIO);
+static_assert(FD_IOC_DIRECTIO_OFF == DIRECTIO_OFF);
+static_assert(FD_IOC_DIRECTIO_ON == DIRECTIO_ON);
+static_assert(FD_IOC_DIRECTIO_MAND == DIRECTIO_MAND);
+static iomode_t const directio_modes[] = {
+	[FD_IOC_DIRECTIO_OFF]  = 0,
+	[FD_IOC_DIRECTIO_ON]   = IO_DIRECT | IO_OPTDIRECT,
+	[FD_IOC_DIRECTIO_MAND] = IO_DIRECT,
+};
+
+PRIVATE WUNUSED iomode_t FCALL get_directio_mode(uintptr_t cmd) {
+	if (cmd >= COMPILER_LENOF(directio_modes)) {
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_DIRECTIO_MODE,
+		      cmd);
+	}
+	return directio_modes[cmd];
+}
+
 
 PRIVATE WUNUSED NONNULL((3, 5)) bool KCALL
 ioctl_generic(ioctl_t cmd, fd_t fd,
@@ -157,7 +180,6 @@ err_bad_handle_type:
 		goto done;
 	}	break;
 
-
 #if !defined(NDEBUG) && !defined(NDEBUG_HANDLE_REFCNT)
 		/* Debug commands for direct reference control.
 		 *
@@ -183,6 +205,14 @@ err_bad_handle_type:
 		handle_decref(*hand);
 		break;
 #endif /* !NDEBUG && !NDEBUG_HANDLE_REFCNT */
+
+	case FD_IOC_DIRECTIO: {
+		/* Adjust handle flags */
+		iomode_t iomode = get_directio_mode((uintptr_t)arg);
+		handman_sethandflags(THIS_HANDMAN, fd,
+		                     ~(IO_DIRECT | IO_OPTDIRECT),
+		                     iomode);
+	}	break;
 
 	default:
 		/* Commands for which we accept any size value. */
@@ -221,7 +251,6 @@ err_bad_handle_type:
 			goto done;
 		}	break;
 
-
 		case _IO_WITHSIZE(FD_IOC_GETTYPE, 0):
 			*result = ioctl_intarg_setu32(cmd, arg, hand->h_type);
 			goto done;
@@ -253,6 +282,26 @@ err_bad_handle_type:
 			what    = handle_polltest(*hand, what);
 			*result = ioctl_intarg_setu32(cmd, arg, (uint32_t)what);
 			goto done;
+		}	break;
+
+		case _IO_WITHSIZE(FD_IOC_GETDIRECTIO, 0): {
+			unsigned int mode = FD_IOC_DIRECTIO_OFF;
+			if (hand->h_mode & IO_DIRECT) {
+				mode = FD_IOC_DIRECTIO_MAND;
+				if (hand->h_mode & IO_OPTDIRECT)
+					mode = FD_IOC_DIRECTIO_ON;
+			}
+			*result = ioctl_intarg_setuint(cmd, arg, mode);
+			goto done;
+		}	break;
+
+		case _IO_WITHSIZE(FD_IOC_SETDIRECTIO, 0): {
+			/* Adjust handle flags */
+			unsigned int umode = ioctl_intarg_getuint(cmd, arg);
+			iomode_t iomode    = get_directio_mode(umode);
+			handman_sethandflags(THIS_HANDMAN, fd,
+			                     ~(IO_DIRECT | IO_OPTDIRECT),
+			                     iomode);
 		}	break;
 
 		default:

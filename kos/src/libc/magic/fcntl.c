@@ -1955,6 +1955,39 @@ int lockf64($fd_t fd, __STDC_INT_AS_UINT_T cmd, __PIO_OFFSET64 length) {
 %#endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_POSIX) */
 
 
+
+%
+%#ifdef __USE_SOLARIS
+@@>> directio(3)
+@@Enable or disable optional direct-I/O for  `fd'. Optional direct I/O behaves  the
+@@same as mandatory direct I/O (s.a. `O_DIRECT'), but those cases where the  buffer
+@@or file position/length provided in a call to `read(2)' or `write(2)' don't match
+@@the requirements imposed by the  backing hardware (s.a. `FILE_IOC_BLKSHIFT')  are
+@@handled  not by throwing an `E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BAD*' exception,
+@@but by falling back to doing non-direct I/O (as if `O_DIRECT') hasn't been set.
+@@
+@@Note that when optional direct-I/O is enabled, the O_DIRECT bit will also be set
+@@for  the  given  `fd'  (in   addition  to  the  internal  `IO_OPTDIRECT'   bit).
+@@
+@@PORTABILITY WARNING: On OpenSolaris, this optional direct  I/O isn't used for file  ranges
+@@                     of the given `fd' that have been mmap'd. This is NOT the case on KOS,
+@@                     where direct I/O is always use if possible.
+@@
+@@@param: fd:   The file for which direct-I/O should be enabled/disabled
+@@@param: mode: One of `DIRECTIO_*' from `<sys/fcntl.h>'
+@@@return:  0: Success
+@@@return: -1: Error (s.a. `errno')
+[[decl_include("<bits/types.h>")]]
+[[requires_include("<asm/os/file-ioctls.h>")]]
+[[requires($has_function(ioctl) && defined(__FIODIRECTIO))]]
+[[section(".text.crt{|.dos}.solaris.io")]]
+[[impl_include("<asm/os/file-ioctls.h>")]]
+int directio($fd_t fd, int mode) {
+	return ioctl(fd, __FIODIRECTIO, mode);
+}
+%#endif /* __USE_SOLARIS */
+
+
 %{
 
 #endif /* __CC__ */

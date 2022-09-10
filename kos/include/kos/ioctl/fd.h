@@ -41,19 +41,25 @@
 #define FD_IOC_GETBSZ __FIGETBSZ /* [int *arg] Return `struct stat::st_blksize' */
 
 /* KOS-specific ioctls. */
-#define FD_IOC_NOOP        _IO_KOS('f', 0x00)                /* Does nothing; ioctl(2) returns `0' */
-#define FD_IOC_POLLTEST  _IOWR_KOS('f', 0x01, unsigned int)  /* do `*(poll_mode_t *)arg = handle_polltest(fd, *(poll_mode_t *)arg);' */
-#define FD_IOC_DUPFD     _IOWR_KOS('f', 0x10, struct openfd) /* Duplicate the handle for this file. (ioctl(2) returns `arg->fo_hint') */
-#define FD_IOC_CAST      _IOWR_KOS('f', 0x11, struct fdcast) /* Cast handle into a different type. - Usually, casting is done implicitly, but this does it explicitly. */
-#define FD_IOC_DESC      _IOWR_KOS('f', 0x12, struct fddesc) /* Get description string, as also appears in `readlink("/proc/self/fd/[fdno]")' (Not NUL-terminated!) */
-#define FD_IOC_GETTYPE    _IOR_KOS('f', 0x80, __uint32_t)    /* Get handle type (one of `HANDLE_TYPE_*' from <kos/kernel/handle.h>) */
-#define FD_IOC_GETKIND    _IOR_KOS('f', 0x81, __uint32_t)    /* Get handle kind (one of `HANDLE_TYPEKIND_*' from <kos/kernel/handle.h>) */
-#define FD_IOC_GETMODE    _IOR_KOS('f', 0x82, __uint32_t)    /* Get handle mode (set of `IO_*' from <kos/io.h>) */
-#define FD_IOC_GETADDR    _IOR_KOS('f', 0x83, __uint64_t)    /* Get handle address (skewed, but guarantied unqiue) */
-#define FD_IOC_GETRADDR   _IOR_KOS('f', 0x84, __uint64_t)    /* Get handle address (non-skewed; requires `CAP_SYS_MODULE') */
-#define FD_IOC_GETREFCNT  _IOR_KOS('f', 0x85, __uint64_t)    /* Get reference counter of handle (close(2) decrements; dup(2) increments; never returns `0') */
-#define _FD_IOC_INCREF     _IO_KOS('f', 0xc0)                /* increment reference counter and set `_KERNEL_POISON_NO_WARRANTY'; requires `CAP_SYS_MODULE'; not available in NDEBUG kernels. */
-#define _FD_IOC_DECREF     _IO_KOS('f', 0xc1)                /* decrement reference counter and set `_KERNEL_POISON_NO_WARRANTY'; requires `CAP_SYS_MODULE'; not available in NDEBUG kernels. */
+#define FD_IOC_NOOP          _IO_KOS('f', 0x00)                /* Does nothing; ioctl(2) returns `0' */
+#define FD_IOC_POLLTEST    _IOWR_KOS('f', 0x01, unsigned int)  /* do `*(poll_mode_t *)arg = handle_polltest(fd, *(poll_mode_t *)arg);' */
+#define FD_IOC_DUPFD       _IOWR_KOS('f', 0x10, struct openfd) /* Duplicate the handle for this file. (ioctl(2) returns `arg->fo_hint') */
+#define FD_IOC_CAST        _IOWR_KOS('f', 0x11, struct fdcast) /* Cast handle into a different type. - Usually, casting is done implicitly, but this does it explicitly. */
+#define FD_IOC_DESC        _IOWR_KOS('f', 0x12, struct fddesc) /* Get description string, as also appears in `readlink("/proc/self/fd/[fdno]")' (Not NUL-terminated!) */
+#define FD_IOC_DIRECTIO      _IO_KOS('f', 0x4c)                /* s.a. `_FIODIRECTIO' from `<sys/filio.h>' (NOTE: `arg' _is_ one of `FD_IOC_DIRECTIO_*'; it ISN'T a pointer to one of them!) */
+#   define FD_IOC_DIRECTIO_OFF  0                              /* Disable optional direct I/O (clear O_DIRECT and IO_OPTDIRECT) */
+#   define FD_IOC_DIRECTIO_ON   1                              /* Enable optional direct I/O  (set O_DIRECT and IO_OPTDIRECT) */
+#   define FD_IOC_DIRECTIO_MAND 2                              /* Enable mandatory direct I/O (only set O_DIRECT; KOS-specific) */
+#define FD_IOC_GETDIRECTIO _IOR_KOS('f', 0x4c, unsigned int)   /* Get current direct-IO mode (arg is a pointer) */
+#define FD_IOC_SETDIRECTIO _IOW_KOS('f', 0x4c, unsigned int)   /* Set current direct-IO mode (arg is a pointer) */
+#define FD_IOC_GETTYPE     _IOR_KOS('f', 0x80, __uint32_t)     /* Get handle type (one of `HANDLE_TYPE_*' from <kos/kernel/handle.h>) */
+#define FD_IOC_GETKIND     _IOR_KOS('f', 0x81, __uint32_t)     /* Get handle kind (one of `HANDLE_TYPEKIND_*' from <kos/kernel/handle.h>) */
+#define FD_IOC_GETMODE     _IOR_KOS('f', 0x82, __uint32_t)     /* Get handle mode (set of `IO_*' from <kos/io.h>) */
+#define FD_IOC_GETADDR     _IOR_KOS('f', 0x83, __uint64_t)     /* Get handle address (skewed, but guarantied unqiue) */
+#define FD_IOC_GETRADDR    _IOR_KOS('f', 0x84, __uint64_t)     /* Get handle address (non-skewed; requires `CAP_SYS_MODULE') */
+#define FD_IOC_GETREFCNT   _IOR_KOS('f', 0x85, __uint64_t)     /* Get reference counter of handle (close(2) decrements; dup(2) increments; never returns `0') */
+#define _FD_IOC_INCREF      _IO_KOS('f', 0xc0)                 /* increment reference counter and set `_KERNEL_POISON_NO_WARRANTY'; requires `CAP_SYS_MODULE'; not available in NDEBUG kernels. */
+#define _FD_IOC_DECREF      _IO_KOS('f', 0xc1)                 /* decrement reference counter and set `_KERNEL_POISON_NO_WARRANTY'; requires `CAP_SYS_MODULE'; not available in NDEBUG kernels. */
 
 
 #ifdef __CC__

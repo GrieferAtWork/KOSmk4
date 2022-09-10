@@ -59,7 +59,6 @@
 #define FILE_IOC_MKUALIGN _IOWR_KOS('F', 0x10, struct file_mkualign) /* Create an unaligned wrapper for this file (see below) */
 #define FILE_IOC_TAILREAD _IOWR_KOS('F', 0x20, struct file_tailread) /* Tail read (see below) */
 
-
 /* Return `_PC_*' for the superblock associated with the given file.
  * - This ioctl is only support for `fnode'-derived files */
 #define FILE_IOC_GETFSLINKMAX _IOR_KOS('F', 0x80, __nlink_t)      /* _PC_LINK_MAX:           `struct fsuper::fs_feat::sf_link_max' */

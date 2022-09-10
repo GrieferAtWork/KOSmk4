@@ -584,6 +584,31 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						addconfx "--disable-doxygen-pdf"
 						;;
 
+					*--disable-year2038* | *--enable-year2038*)
+						addconfx "--enable-year2038"
+						;;
+
+					*--enable-cross-guesses=*)
+						addconf "--enable-cross-guesses=" "risky"
+						;;
+
+					*--disable-acl* | *--enable-acl*)
+						# KOS doesn't have ACLs (and I don't plan on adding support for them anytime soon)
+						addconfx "--disable-acl"
+						;;
+
+					*--disable-xattr* | *--enable-xattr*)
+						addconfx "--enable-xattr"
+						;;
+
+					*--with-packager-bug-reports*)
+						addconf "--with-packager-bug-reports=" "https://github.com/GrieferAtWork/KOSmk4"
+						;;
+
+					*--with-packager*)
+						addconf "--with-packager=" "Griefer@Work"
+						;;
+
 					*) ;;
 					esac
 				done < "$SRCPATH/._configure_help"
@@ -1370,6 +1395,14 @@ $1=$2"
 						_config_site_option "gl_cv_func_iswcntrl_works" "yes"; ;;
 					*gl_cv_func_wcwidth_works*)
 						_config_site_option "gl_cv_func_wcwidth_works" "yes"; ;;
+					*gl_cv_have_unlimited_file_name_length*)
+						_config_site_option "gl_cv_have_unlimited_file_name_length" "yes"; ;;
+					*gl_cv_func_free_preserves_errno*)
+						_config_site_option "gl_cv_func_free_preserves_errno" "yes"; ;;
+					*gl_cv_double_slash_root*) # It's complicated (s.a. `\\unix\...')
+						_config_site_option "gl_cv_double_slash_root" "yes"; ;;
+					*gl_cv_have_proc_uptime*)
+						_config_site_option "gl_cv_have_proc_uptime" "yes"; ;;
 
 					*gl_cv_func_mbrtoc32_C_locale_sans_EILSEQ* | \
 					*gl_cv_func_mbrtowc_C_locale_sans_EILSEQ* | \

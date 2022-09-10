@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e211e2b */
+/* HASH CRC-32:0x63938783 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1981,6 +1981,56 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lockf64, __FORCELOCAL __ATTR_ARTIFICIAL int __NO
 #endif /* !__lockf64_defined */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_MISC || (__USE_XOPEN_EXTENDED && !__USE_POSIX) */
+
+#ifdef __USE_SOLARIS
+#ifdef __CRT_HAVE_directio
+/* >> directio(3)
+ * Enable or disable optional direct-I/O for  `fd'. Optional direct I/O behaves  the
+ * same as mandatory direct I/O (s.a. `O_DIRECT'), but those cases where the  buffer
+ * or file position/length provided in a call to `read(2)' or `write(2)' don't match
+ * the requirements imposed by the  backing hardware (s.a. `FILE_IOC_BLKSHIFT')  are
+ * handled  not by throwing an `E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BAD*' exception,
+ * but by falling back to doing non-direct I/O (as if `O_DIRECT') hasn't been set.
+ *
+ * Note that when optional direct-I/O is enabled, the O_DIRECT bit will also be set
+ * for  the  given  `fd'  (in   addition  to  the  internal  `IO_OPTDIRECT'   bit).
+ *
+ * PORTABILITY WARNING: On OpenSolaris, this optional direct  I/O isn't used for file  ranges
+ *                      of the given `fd' that have been mmap'd. This is NOT the case on KOS,
+ *                      where direct I/O is always use if possible.
+ *
+ * @param: fd:   The file for which direct-I/O should be enabled/disabled
+ * @param: mode: One of `DIRECTIO_*' from `<sys/fcntl.h>'
+ * @return:  0: Success
+ * @return: -1: Error (s.a. `errno') */
+__CDECLARE(,int,__NOTHROW_NCX,directio,(__fd_t __fd, int __mode),(__fd,__mode))
+#else /* __CRT_HAVE_directio */
+#include <asm/os/file-ioctls.h>
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__FIODIRECTIO)
+#include <libc/local/fcntl/directio.h>
+/* >> directio(3)
+ * Enable or disable optional direct-I/O for  `fd'. Optional direct I/O behaves  the
+ * same as mandatory direct I/O (s.a. `O_DIRECT'), but those cases where the  buffer
+ * or file position/length provided in a call to `read(2)' or `write(2)' don't match
+ * the requirements imposed by the  backing hardware (s.a. `FILE_IOC_BLKSHIFT')  are
+ * handled  not by throwing an `E_INVALID_ARGUMENT_CONTEXT_O_DIRECT_BAD*' exception,
+ * but by falling back to doing non-direct I/O (as if `O_DIRECT') hasn't been set.
+ *
+ * Note that when optional direct-I/O is enabled, the O_DIRECT bit will also be set
+ * for  the  given  `fd'  (in   addition  to  the  internal  `IO_OPTDIRECT'   bit).
+ *
+ * PORTABILITY WARNING: On OpenSolaris, this optional direct  I/O isn't used for file  ranges
+ *                      of the given `fd' that have been mmap'd. This is NOT the case on KOS,
+ *                      where direct I/O is always use if possible.
+ *
+ * @param: fd:   The file for which direct-I/O should be enabled/disabled
+ * @param: mode: One of `DIRECTIO_*' from `<sys/fcntl.h>'
+ * @return:  0: Success
+ * @return: -1: Error (s.a. `errno') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(directio, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL directio)(__fd_t __fd, int __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(directio))(__fd, __mode); })
+#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __FIODIRECTIO */
+#endif /* !__CRT_HAVE_directio */
+#endif /* __USE_SOLARIS */
 
 #endif /* __CC__ */
 
