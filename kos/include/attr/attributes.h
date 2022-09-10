@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24499923 */
+/* HASH CRC-32:0x5bb7b96f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,7 +88,7 @@ typedef struct attrlist_cursor attrlist_cursor_t;
 typedef struct attr_multiop attr_multiop_t;
 
 #define ATTR_ENTRY(buf, i) \
-	((struct attrlist_ent *)((__BYTE_TYPE__ *)(buf) + ((struct attrlist const *)(buffer))->al_offset[i]))
+	((struct attrlist_ent *)((__BYTE_TYPE__ *)(buf) + ((struct attrlist const *)(buf))->al_offset[i]))
 
 /* >> attr_get(3), attr_getf(3)
  * @param: flags: Set of `0 | ATTR_DONTFOLLOW | ATTR_SECURE | ATTR_ROOT'

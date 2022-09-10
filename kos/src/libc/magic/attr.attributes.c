@@ -97,7 +97,7 @@ typedef struct attrlist_cursor attrlist_cursor_t;
 typedef struct attr_multiop attr_multiop_t;
 
 #define ATTR_ENTRY(buf, i) \
-	((struct attrlist_ent *)((__BYTE_TYPE__ *)(buf) + ((struct attrlist const *)(buffer))->al_offset[i]))
+	((struct attrlist_ent *)((__BYTE_TYPE__ *)(buf) + ((struct attrlist const *)(buf))->al_offset[i]))
 
 }
 
