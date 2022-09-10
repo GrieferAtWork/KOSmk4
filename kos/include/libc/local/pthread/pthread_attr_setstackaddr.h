@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc436163e */
+/* HASH CRC-32:0x29548a8b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 #undef __local___localdep_pthread_attr_getstack_defined
 #endif /* !... */
 #endif /* !__local___localdep_pthread_attr_getstack_defined */
-__LOCAL_LIBC(pthread_attr_setstackaddr) __ATTR_DEPRECATED("Use pthread_attr_setstack()") __ATTR_INOUT(1) __errno_t
+__LOCAL_LIBC(pthread_attr_setstackaddr) __ATTR_INOUT(1) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_attr_setstackaddr))(__pthread_attr_t *__attr, void *__stackaddr) {
 	__errno_t __result;
 	__SIZE_TYPE__ __stacksize;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36d961d7 */
+/* HASH CRC-32:0x42bb930e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -404,7 +404,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.read.scanf") WUNUSED ATTR_IN(1) ATTR_
 }
 #include <libc/template/stdstreams.h>
 #include <hybrid/typecore.h>
-INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_DEPRECATED("No buffer size checks (use `fgets\' instead)") ATTR_OUT(1) char *
+INTERN ATTR_SECTION(".text.crt.FILE.locked.read.read") WUNUSED ATTR_OUT(1) char *
 (LIBCCALL libc_gets)(char *__restrict buf) THROWS(...) {
 	return libc_fgets(buf, INT_MAX, stdin);
 }

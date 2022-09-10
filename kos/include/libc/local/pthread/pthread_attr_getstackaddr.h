@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac028a61 */
+/* HASH CRC-32:0x4970d3b7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_crt_pthread_attr_getstack_defined
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2) __ATTR_OUT(3),__errno_t,__NOTHROW_NCX,__localdep_crt_pthread_attr_getstack,(__pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr, __SIZE_TYPE__ *__restrict __stacksize),pthread_attr_getstack,(__attr,__stackaddr,__stacksize))
 #endif /* !__local___localdep_crt_pthread_attr_getstack_defined */
-__LOCAL_LIBC(pthread_attr_getstackaddr) __ATTR_DEPRECATED("Use pthread_attr_getstack()") __ATTR_IN(1) __ATTR_OUT(2) __errno_t
+__LOCAL_LIBC(pthread_attr_getstackaddr) __ATTR_IN(1) __ATTR_OUT(2) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_attr_getstackaddr))(__pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr) {
 	__SIZE_TYPE__ __stacksize;
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_attr_getstack)(__attr, __stackaddr, &__stacksize);

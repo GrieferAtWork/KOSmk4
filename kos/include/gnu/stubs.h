@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c0123db */
+/* HASH CRC-32:0xe5ec0bde */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -107,8 +107,6 @@
 #define __stub_attr_getf
 #define __stub_attr_list
 #define __stub_attr_listf
-#define __stub_attr_multi
-#define __stub_attr_multif
 #define __stub_attr_remove
 #define __stub_attr_removef
 #define __stub_attr_set

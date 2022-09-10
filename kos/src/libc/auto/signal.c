@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5fe13748 */
+/* HASH CRC-32:0x45fe50a4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ DECL_BEGIN
  * Deprecated  method  of  SIG_BLOCK-ing  a  given  set  of
  * signals. Modern code should use `sigprocmask()' instead.
  * @return: * : First 32 bits of previous signal mask (or however many fit in `int') */
-INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_DEPRECATED("Using `sigprocmask(SIG_BLOCK)\' instead") int
+INTERN ATTR_SECTION(".text.crt.sched.signal") int
 NOTHROW_NCX(LIBCCALL libc_sigblock)(int mask) {
 	sigset_t sigset, osigset;
 	libc_sigfillset(&sigset);
@@ -59,7 +59,7 @@ NOTHROW_NCX(LIBCCALL libc_sigblock)(int mask) {
  * Deprecated method of SIG_SETMASK-ing a given set of signals.
  * Modern code should  use `sigprocmask(SIG_SETMASK)'  instead.
  * @return: * : First 32 bits of previous signal mask (or however many fit in `int') */
-INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_DEPRECATED("Using `sigprocmask()\' instead") int
+INTERN ATTR_SECTION(".text.crt.sched.signal") int
 NOTHROW_NCX(LIBCCALL libc_sigsetmask)(int mask) {
 	sigset_t sigset, osigset;
 	libc_sigfillset(&sigset);
@@ -78,7 +78,7 @@ NOTHROW_NCX(LIBCCALL libc_sigsetmask)(int mask) {
  * Deprecated method of  retrieving the masking-state  of
  * the lowest-numberred `sizeof(int) * NBBY - 1' signals.
  * @return: * : First 32 bits of signal mask (or however many fit in `int') */
-INTERN ATTR_SECTION(".text.crt.sched.signal") ATTR_DEPRECATED("Using `sigprocmask()\' instead") int
+INTERN ATTR_SECTION(".text.crt.sched.signal") int
 NOTHROW_NCX(LIBCCALL libc_siggetmask)(void) {
 	sigset_t sigset;
 

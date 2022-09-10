@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53a71d30 */
+/* HASH CRC-32:0xd22cff16 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -163,7 +163,7 @@ INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_attr_setscope)(pt
 /* >> pthread_attr_getstackaddr(3)
  * Return the previously set address for the stack
  * @return: EOK: Success */
-INTDEF ATTR_DEPRECATED("Use pthread_attr_getstack()") ATTR_IN(1) ATTR_OUT(2) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstackaddr)(pthread_attr_t const *__restrict attr, void **__restrict stackaddr);
+INTDEF ATTR_IN(1) ATTR_OUT(2) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstackaddr)(pthread_attr_t const *__restrict attr, void **__restrict stackaddr);
 /* >> pthread_attr_setstackaddr(3)
  * Set the starting address  of the stack of  the thread to be  created.
  * Depending on whether the stack grows up or down the value must either
@@ -171,7 +171,7 @@ INTDEF ATTR_DEPRECATED("Use pthread_attr_getstack()") ATTR_IN(1) ATTR_OUT(2) err
  * minimal size of the block must be `PTHREAD_STACK_MIN'
  * @return: EOK:    Success
  * @return: EINVAL: The stack isn't suitably aligned */
-INTDEF ATTR_DEPRECATED("Use pthread_attr_setstack()") ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstackaddr)(pthread_attr_t *attr, void *stackaddr);
+INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstackaddr)(pthread_attr_t *attr, void *stackaddr);
 /* >> pthread_attr_getstacksize(3)
  * Return the currently used minimal stack size
  * @return: EOK: Success */

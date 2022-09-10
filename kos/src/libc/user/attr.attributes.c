@@ -171,41 +171,9 @@ NOTHROW_NCX(LIBCCALL libc_attr_listf)(fd_t fd,
 }
 /*[[[end:libc_attr_listf]]]*/
 
-/*[[[head:libc_attr_multi,hash:CRC-32=0x6c87f882]]]*/
-INTERN ATTR_SECTION(".text.crt.libattr") ATTR_DEPRECATED("Use getxattr(2), setxattr(2), removexattr(2) and listxattr(2) instead") int
-NOTHROW_NCX(LIBCCALL libc_attr_multi)(char const *path,
-                                      struct attr_multiop *oplist,
-                                      int count,
-                                      int flags)
-/*[[[body:libc_attr_multi]]]*/
-/*AUTO*/{
-	(void)path;
-	(void)oplist;
-	(void)count;
-	(void)flags;
-	CRT_UNIMPLEMENTEDF("attr_multi(path: %q, oplist: %p, count: %x, flags: %x)", path, oplist, count, flags); /* TODO */
-	return libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_attr_multi]]]*/
 
-/*[[[head:libc_attr_multif,hash:CRC-32=0x39035608]]]*/
-INTERN ATTR_SECTION(".text.crt.libattr") ATTR_DEPRECATED("Use getxattr(2), setxattr(2), removexattr(2) and listxattr(2) instead") int
-NOTHROW_NCX(LIBCCALL libc_attr_multif)(fd_t fd,
-                                       struct attr_multiop *oplist,
-                                       int count,
-                                       int flags)
-/*[[[body:libc_attr_multif]]]*/
-/*AUTO*/{
-	(void)fd;
-	(void)oplist;
-	(void)count;
-	(void)flags;
-	CRT_UNIMPLEMENTEDF("attr_multif(fd: %" PRIxN(__SIZEOF_FD_T__) ", oplist: %p, count: %x, flags: %x)", fd, oplist, count, flags); /* TODO */
-	return libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_attr_multif]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xbd489e13]]]*/
+/*[[[start:exports,hash:CRC-32=0x1bac3ddb]]]*/
 DEFINE_PUBLIC_ALIAS(attr_get, libc_attr_get);
 DEFINE_PUBLIC_ALIAS(attr_getf, libc_attr_getf);
 DEFINE_PUBLIC_ALIAS(attr_set, libc_attr_set);
@@ -214,8 +182,6 @@ DEFINE_PUBLIC_ALIAS(attr_remove, libc_attr_remove);
 DEFINE_PUBLIC_ALIAS(attr_removef, libc_attr_removef);
 DEFINE_PUBLIC_ALIAS(attr_list, libc_attr_list);
 DEFINE_PUBLIC_ALIAS(attr_listf, libc_attr_listf);
-DEFINE_PUBLIC_ALIAS(attr_multi, libc_attr_multi);
-DEFINE_PUBLIC_ALIAS(attr_multif, libc_attr_multif);
 /*[[[end:exports]]]*/
 
 DECL_END

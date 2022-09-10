@@ -738,9 +738,13 @@ class FunctionPrototype {
 	@@Print the attribute list (returns @false if
 	@@nothing was printed,  and @true  otherwise)
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
-	public function cprintAttributeList(fp: CWriter, escapeMode: int): bool {
+	public function cprintAttributeList(
+			fp: CWriter, escapeMode: int,
+			hideDeprecationAttributes: bool = false): bool {
 		local isFirst = true;
 		for (local attr: prototypeAttributes) {
+			if (hideDeprecationAttributes && "ATTR_DEPRECATED" in attr)
+				continue;
 			if (!isFirst)
 				fp << " ";
 			escapeTextIntoFile(fp, attr, escapeMode);
@@ -787,7 +791,7 @@ class FunctionPrototype {
 	public function cprintDeclarationWithOptionalAsmname(
 			fp: CWriter, escapeMode: int, decl: string,
 			exposedName: string, assemblyName: string,
-			isSameAsname: bool) {
+			isSameAsname: bool, hideDeprecationAttributes: bool = false) {
 		local hasGccNCX = decl in LIBC_LINKAGE_DECLS && fp.externLinkage in ["", "C"] &&
 		                  exposedName in GCC_NCX && isNothrowGCCNCX;
 		if (hasGccNCX) {
@@ -796,7 +800,8 @@ class FunctionPrototype {
 			fp << "#endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */\n";
 		}
 		/* Same symbol name -> declare normally (or with `__ASMNAME()' suffix) */
-		cprintDeclarationWithoutTerminator(fp, escapeMode, decl, exposedName);
+		cprintDeclarationWithoutTerminator(fp, escapeMode, decl, exposedName,
+			hideDeprecationAttributes: hideDeprecationAttributes);
 		if (decl in LIBC_LINKAGE_DECLS) {
 			/* Always use __CASMNAME for anything declared in the context of libc.
 			 * This is  required to  ensure proper  assembly linkage,  as well  as
@@ -831,7 +836,8 @@ class FunctionPrototype {
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintCDECLARE(
 			fp: CWriter, escapeMode: int, decl: string,
-			exposedName: string, optSuffix: bool = false) {
+			exposedName: string, optSuffix: bool = false,
+			hideDeprecationAttributes: bool = false) {
 		/* Special case: Make use of __CDECLARE */
 		local isVoidReturn = this.returnType.isVoid;
 		fp << "__CDECLARE";
@@ -843,7 +849,7 @@ class FunctionPrototype {
 			fp << "_OPT";
 		fp << "(";
 		/* Attributes */
-		cprintAttributeList(fp, escapeMode);
+		cprintAttributeList(fp, escapeMode, hideDeprecationAttributes);
 		fp << ",";
 		/* Return type */
 		if (!isVoidReturn) {
@@ -870,7 +876,8 @@ class FunctionPrototype {
 			fp: CWriter, escapeMode: int, decl: string, exposedName: string,
 			injectedAttributes: {string...} = none,
 			breakAfterReturnType: bool = false,
-			oneArgumentPerLine: bool = false) {
+			oneArgumentPerLine: bool = false,
+			hideDeprecationAttributes: bool = false) {
 		/* Same symbol name -> declare normally */
 		escapeTextIntoFile(fp, decl, escapeMode);
 		if (decl)
@@ -886,7 +893,7 @@ class FunctionPrototype {
 			if (!isFirst)
 				fp << " ";
 		}
-		if (cprintAttributeList(fp, escapeMode))
+		if (cprintAttributeList(fp, escapeMode, hideDeprecationAttributes))
 			fp << " ";
 		if (returnType.cprint(fp, escapeMode) && !breakAfterReturnType)
 			fp << " ";
@@ -919,7 +926,7 @@ class FunctionPrototype {
 						if (!isFirst)
 							tempWriter << " ";
 					}
-					if (cprintAttributeList(tempWriter, escapeMode))
+					if (cprintAttributeList(tempWriter, escapeMode, hideDeprecationAttributes))
 						tempWriter << " ";
 					if (returnType.cprint(tempWriter, escapeMode))
 						tempWriter << " ";
@@ -1098,11 +1105,13 @@ class FunctionPrototype {
 	public function cprintCallToFunction(
 			fp: CWriter, escapeMode: int, decl: string, exposedName: string,
 			callToName: string, callToPrototype: FunctionPrototype,
-			explicitCastAllTypes: bool = false, callToEscapeMode: int = none) {
+			explicitCastAllTypes: bool = false, callToEscapeMode: int = none,
+			hideDeprecationAttributes: bool = false) {
 		if (callToEscapeMode is none)
 			callToEscapeMode = escapeMode;
 		cprintDeclarationWithoutTerminator(fp, escapeMode, decl, exposedName,
-			injectedAttributes: INJECTED_WRAPPER_FUNCTION_ATTRIBUTES);
+			injectedAttributes: INJECTED_WRAPPER_FUNCTION_ATTRIBUTES,
+			hideDeprecationAttributes: hideDeprecationAttributes);
 		fp << " { ";
 		if (!returnType.isVoid)
 			fp << "return ";
@@ -1141,7 +1150,7 @@ class FunctionPrototype {
 	public function cprintREDIRECT(
 			fp: CWriter, escapeMode: int, decl: string,
 			exposedName: string, assemblyName: string,
-			isLcl: bool) {
+			isLcl: bool, hideDeprecationAttributes: bool = false) {
 		fp << (isLcl ? "__CREDIRECT" : "__COMPILER_CREDIRECT");
 		local isVoidReturn = returnType.isVoid;
 		if (isVoidReturn)
@@ -1162,7 +1171,7 @@ class FunctionPrototype {
 		if (!isLcl)
 			fp << decl << ",";
 		/* Attributes */
-		cprintAttributeList(fp, escapeMode);
+		cprintAttributeList(fp, escapeMode, hideDeprecationAttributes);
 		/* Return type */
 		fp << ",";
 		if (!isVoidReturn) {
@@ -1199,7 +1208,7 @@ class FunctionPrototype {
 	public function cprintVREDIRECT(
 			fp: CWriter, escapeMode: int, decl: string,
 			exposedName: string, assemblyName: string,
-			isLcl: bool) {
+			isLcl: bool, hideDeprecationAttributes: bool = false) {
 		fp << (isLcl ? "__CVREDIRECT" : "__COMPILER_CVREDIRECT");
 		local isVoidReturn = returnType.isVoid;
 		if (isVoidReturn)
@@ -1220,7 +1229,7 @@ class FunctionPrototype {
 		if (!isLcl)
 			fp << decl << ",";
 		/* Attributes */
-		cprintAttributeList(fp, escapeMode);
+		cprintAttributeList(fp, escapeMode, hideDeprecationAttributes);
 		/* Return type */
 		fp << ",";
 		if (!isVoidReturn) {
@@ -1295,7 +1304,8 @@ class FunctionPrototype {
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintRedirectionBinding(
 			fp: CWriter, escapeMode: int, decl: string,
-			exposedName: string, assemblyName: string) {
+			exposedName: string, assemblyName: string,
+			hideDeprecationAttributes: bool = false) {
 		local hasEllipsis = this.hasEllipsis;
 		local isLcl = isLibcLinkage(decl, cc, assemblyName, hasEllipsis);
 		local isSameAsname = exposedName == assemblyName && fp.externLinkage in ["", "C"];
@@ -1303,7 +1313,8 @@ class FunctionPrototype {
 			if (!isSameAsname) {
 				if (ellipsisArgumentTypes !is none) {
 					return cprintVREDIRECT(
-						fp, escapeMode, decl, exposedName, assemblyName, isLcl);
+						fp, escapeMode, decl, exposedName,
+						assemblyName, isLcl, hideDeprecationAttributes);
 				}
 				/* XXX: This is the one corner-case, where there's no real way
 				 *      of implementing redirections  portably... So for  now,
@@ -1312,20 +1323,22 @@ class FunctionPrototype {
 			}
 			return cprintDeclarationWithOptionalAsmname(
 				fp, escapeMode, decl, exposedName,
-				assemblyName, isSameAsname);
+				assemblyName, isSameAsname, hideDeprecationAttributes);
 		}
 		if (isLcl) {
-			if (!isSameAsname)
-				return cprintREDIRECT(fp, escapeMode, decl, exposedName, assemblyName, isLcl);
-			return cprintCDECLARE(fp, escapeMode, decl, exposedName);
+			if (!isSameAsname) {
+				return cprintREDIRECT(fp, escapeMode, decl, exposedName,
+				                      assemblyName, isLcl, hideDeprecationAttributes);
+			}
+			return cprintCDECLARE(fp, escapeMode, decl, exposedName, hideDeprecationAttributes);
 		}
 		if (!isSameAsname) {
-			return cprintREDIRECT(
-				fp, escapeMode, decl, exposedName, assemblyName, isLcl);
+			return cprintREDIRECT(fp, escapeMode, decl, exposedName,
+			                      assemblyName, isLcl, hideDeprecationAttributes);
 		}
 		return cprintDeclarationWithOptionalAsmname(
 			fp, escapeMode, decl, exposedName,
-			assemblyName, isSameAsname);
+			assemblyName, isSameAsname, hideDeprecationAttributes);
 	}
 
 	@@Print the start of an EXTERN-INLINE redirection- or declaration-binding,
@@ -1336,7 +1349,8 @@ class FunctionPrototype {
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintExternInlineBindingStart(
 			fp: CWriter, escapeMode: int, decl: string,
-			exposedName: string, assemblyName: string) {
+			exposedName: string, assemblyName: string,
+			hideDeprecationAttributes: bool = false) {
 		local hasEllipsis = this.hasEllipsis;
 		local isLcl = isLibcLinkage(decl, cc, assemblyName, hasEllipsis);
 		local isSameAsname = exposedName == assemblyName && fp.externLinkage in ["", "C"];
@@ -1358,7 +1372,7 @@ class FunctionPrototype {
 //		if (!isLcl)
 //			fp << decl << ","; /* Declaration linkage */
 		/* Attribute list */
-		cprintAttributeList(fp, escapeMode);
+		cprintAttributeList(fp, escapeMode, hideDeprecationAttributes);
 		fp << ",";
 		/* Return type */
 		returnType.cprint(fp, escapeMode);
@@ -1522,7 +1536,8 @@ class FunctionImplementation {
 				 *     bindings, and <optimized/...> wrappers.
 				 */
 				ignoreFastBindings:        true,
-				printDoc: __TPP_EVAL(defined(CONFIG_DOC_STRINGS_IN_LIBC_LOCAL))
+				printDoc: __TPP_EVAL(defined(CONFIG_DOC_STRINGS_IN_LIBC_LOCAL)),
+				hideDeprecationAttributes: true
 				);
 		}
 		if (implPrefix) {
@@ -1548,7 +1563,7 @@ class FunctionImplementation {
 			fp.printComment(doc);
 #endif /* CONFIG_DOC_STRINGS_IN_LIBC_LOCAL */
 		fp << "__LOCAL_LIBC(" << name << ") ";
-		if (prototype.cprintAttributeList(fp, escapeMode))
+		if (prototype.cprintAttributeList(fp, escapeMode, hideDeprecationAttributes: true))
 			fp << " ";
 		prototype.returnType.cprint(fp, escapeMode);
 		fp << "\n";
@@ -1785,7 +1800,8 @@ class LocalFunction {
 	@@@param: escapeMode: One of @ESCAPE_MODE_NONE, @ESCAPE_MODE_PART, @ESCAPE_MODE_FULL
 	public function cprintFunctionBinding(
 			fp: CWriter, escapeMode: int, decl: string, exposedName: string,
-			prototypes: {FunctionPrototype...}, doc: string, preferBindingMacros: bool) {
+			prototypes: {FunctionPrototype...}, doc: string, preferBindingMacros: bool,
+			hideDeprecationAttributes: bool = false) {
 		local usedPrototype = functionPrototype;
 		local oldExternLinkage = fp.externLinkage;
 		if (oldExternLinkage !in ["", "C"])
@@ -1838,7 +1854,8 @@ class LocalFunction {
 					prototypes.first.cprintCallToFunction(
 						fp, escapeMode, NAMESPACE_IMPORT_DECL,
 						exposedName, callToLocalName, usedPrototype,
-						callToEscapeMode: callToEscapeMode);
+						callToEscapeMode: callToEscapeMode,
+						hideDeprecationAttributes: hideDeprecationAttributes);
 				});
 			}
 			if (fp.namespace != GLOBAL_NAMESPACE || exposedName in everImportedFromGlobalNamespace) {
@@ -1879,13 +1896,15 @@ class LocalFunction {
 					ptype.cprintCallToFunction(
 						fp, escapeMode, NAMESPACE_IMPORT_DECL,
 						exposedName, callToLocalName, usedPrototype,
-						callToEscapeMode: callToEscapeMode);
+						callToEscapeMode: callToEscapeMode,
+						hideDeprecationAttributes: hideDeprecationAttributes);
 				});
 			} else {
 				ptype.cprintCallToFunction(
 					fp, escapeMode, NAMESPACE_IMPORT_DECL,
 					exposedName, callToLocalName, usedPrototype,
-					callToEscapeMode: callToEscapeMode);
+					callToEscapeMode: callToEscapeMode,
+					hideDeprecationAttributes: hideDeprecationAttributes);
 				fp << "\n";
 			}
 		}
@@ -1938,7 +1957,8 @@ class InlineFunction {
 			fp: CWriter, escapeMode: int, decl: string, exposedName: string,
 			prototypes: {FunctionPrototype...}, doc: string,
 			preferBindingMacros: bool, keyDependency: Callable with string = none,
-			dependenciesNamespace: Namespace = none, dependencyDecl: string = "__LIBC") {
+			dependenciesNamespace: Namespace = none, dependencyDecl: string = "__LIBC",
+			hideDeprecationAttributes: bool = false) {
 		local impl: FunctionImplementation = functionImpl;
 		local implName = impl.name;
 		/* Bind dependent functions. */
@@ -1969,10 +1989,11 @@ class InlineFunction {
 				local depFun = deps[depName];
 				depName = keyDependency(depName);
 				depFun.cprintHeaderDeclaration(fp, escapeMode, dependencyDecl,
-					exposedName:              depName,
-					guardName:                dependenciesNamespace.keyDefaultGuard(depName),
-					preferBindingMacros:      true,
-					printDeclarationPrefixes: true);
+					exposedName:               depName,
+					guardName:                 dependenciesNamespace.keyDefaultGuard(depName),
+					preferBindingMacros:       true,
+					printDeclarationPrefixes:  true,
+					hideDeprecationAttributes: hideDeprecationAttributes);
 			}
 			fp.namespace = oldNs;
 			fp.externLinkage = oldExternLinkage;
@@ -2011,8 +2032,8 @@ class InlineFunction {
 				fp.printComment(doc);
 			if (mode == "__EXTERN_INLINE") {
 				prototype.cprintExternInlineBindingStart(
-					fp, escapeMode, decl, exposedName,
-					str externInlineAsmname);
+					fp, escapeMode, decl, exposedName, str externInlineAsmname,
+					hideDeprecationAttributes: hideDeprecationAttributes);
 				/* Inline implementation */
 				escapeTextIntoFile(
 					fp, impl.body, escapeMode,
@@ -2022,7 +2043,8 @@ class InlineFunction {
 			} else {
 				/* Generic inlining (use the inlining mode as declaration prefix) */
 				prototype.cprintDeclarationWithoutTerminator(
-					fp, escapeMode, this.mode, exposedName);
+					fp, escapeMode, this.mode, exposedName,
+					hideDeprecationAttributes: hideDeprecationAttributes);
 				fp << " ";
 				escapeTextIntoFile(
 					fp, impl.body, escapeMode,
@@ -2119,7 +2141,8 @@ class NamespaceBinding {
 	public function cprintNamespaceImportBinding(
 			fp: CWriter, escapeMode: int, exposedName: string,
 			conditionalPrototypes: {(string | UserString, {FunctionPrototype...})...},
-			doc: string, preferBindingMacros/*unused*/: bool) {
+			doc: string, preferBindingMacros/*unused*/: bool,
+			hideDeprecationAttributes: bool = false) {
 		assert namespace !== fp.namespace;
 		assert importName == exposedName;
 		if (doc)
@@ -2187,7 +2210,8 @@ class NamespaceBinding {
 						prototypes.first.cprintCallToFunction(
 							fp, escapeMode, NAMESPACE_IMPORT_DECL,
 							exposedName, cSymbolName, callToPrototype,
-							callToEscapeMode: callToEscapeMode);
+							callToEscapeMode: callToEscapeMode,
+							hideDeprecationAttributes: hideDeprecationAttributes);
 					} else {
 						fp.forceStartOfLine();
 						local oldExternLinkage = fp.externLinkage;
@@ -2199,7 +2223,8 @@ class NamespaceBinding {
 							p.cprintCallToFunction(
 								fp, escapeMode, NAMESPACE_IMPORT_DECL,
 								exposedName, cSymbolName, callToPrototype,
-								callToEscapeMode: callToEscapeMode);
+								callToEscapeMode: callToEscapeMode,
+								hideDeprecationAttributes: hideDeprecationAttributes);
 							fp.forceStartOfLine();
 						}
 						fp.externLinkage = oldExternLinkage;
@@ -2241,7 +2266,8 @@ class NamespaceBinding {
 						prototypes.first.cprintCallToFunction(
 							fp, escapeMode, NAMESPACE_IMPORT_DECL,
 							exposedName, cSymbolName, callToPrototype,
-							callToEscapeMode: callToEscapeMode);
+							callToEscapeMode: callToEscapeMode,
+							hideDeprecationAttributes: hideDeprecationAttributes);
 					} else {
 						fp.forceStartOfLine();
 						local oldExternLinkage = fp.externLinkage;
@@ -2253,7 +2279,8 @@ class NamespaceBinding {
 							p.cprintCallToFunction(
 								fp, escapeMode, NAMESPACE_IMPORT_DECL,
 								exposedName, cSymbolName, callToPrototype,
-								callToEscapeMode: callToEscapeMode);
+								callToEscapeMode: callToEscapeMode,
+								hideDeprecationAttributes: hideDeprecationAttributes);
 							fp.forceStartOfLine();
 						}
 						fp.externLinkage = oldExternLinkage;
@@ -2295,7 +2322,8 @@ class NamespaceBinding {
 					usedPrototype.cprintCallToFunction(
 						fp, escapeMode, NAMESPACE_IMPORT_DECL,
 						exposedName, cSymbolName, usedCallToPrototype,
-						callToEscapeMode: callToEscapeMode);
+						callToEscapeMode: callToEscapeMode,
+						hideDeprecationAttributes: hideDeprecationAttributes);
 				});
 				if (doUsingPpCond != "1") {
 					fp.ppElse();
@@ -2327,7 +2355,8 @@ class NamespaceBinding {
 					proto.cprintCallToFunction(
 						fp, escapeMode, NAMESPACE_IMPORT_DECL,
 						exposedName, cSymbolName, callToPrototype,
-						callToEscapeMode: callToEscapeMode);
+						callToEscapeMode: callToEscapeMode,
+						hideDeprecationAttributes: hideDeprecationAttributes);
 					fp << "\n";
 				}
 				fp.ppEndif();
@@ -2400,11 +2429,13 @@ class MacroBinding {
 	@@Print the macro binding a normal function (needed when printing outside the global namespace)
 	public function cprintMacroBindingAsFunction(
 			fp: CWriter, escapeMode: int, exposedName: string,
-			prototype: FunctionPrototype, doc: string) {
+			prototype: FunctionPrototype, doc: string,
+			hideDeprecationAttributes: bool = false) {
 		if (doc)
 			fp.printComment(doc);
 		prototype.cprintDeclarationWithoutTerminator(
-			fp, escapeMode, "__FORCELOCAL", exposedName);
+			fp, escapeMode, "__FORCELOCAL", exposedName,
+			hideDeprecationAttributes: hideDeprecationAttributes);
 		if (body is Callable)
 			body = body();
 		fp << " { return ";
@@ -2607,7 +2638,8 @@ do_universal_binding:
 			guardName: string | none = none, doc: string = "",
 			preferBindingMacros: bool = false,
 			printDeclarationPrefixes: bool = false,
-			onlyPrintPrimaryPrototype: bool = false) {
+			onlyPrintPrimaryPrototype: bool = false,
+			hideDeprecationAttributes: bool = false) {
 		local usedBinding = functionBinding;
 		local usedPrototypes = functionPrototypes;
 		if (usedBinding is NamespaceBinding) {
@@ -2616,7 +2648,8 @@ do_universal_binding:
 			assert usedBinding.importName == exposedName, "The caller must check this!";
 			usedBinding.cprintNamespaceImportBinding(
 				fp, escapeMode, exposedName,
-				usedPrototypes, doc, preferBindingMacros);
+				usedPrototypes, doc, preferBindingMacros,
+				hideDeprecationAttributes: hideDeprecationAttributes);
 			return;
 		}
 		if (usedBinding is MacroBinding) {
@@ -2626,7 +2659,9 @@ do_universal_binding:
 			if (fp.namespace === GLOBAL_NAMESPACE) {
 				usedBinding.cprintMacroBinding(fp, escapeMode, exposedName, prim, doc);
 			} else {
-				usedBinding.cprintMacroBindingAsFunction(fp, escapeMode, exposedName, prim, doc);
+				usedBinding.cprintMacroBindingAsFunction(
+					fp, escapeMode, exposedName, prim, doc,
+					hideDeprecationAttributes: hideDeprecationAttributes);
 			}
 			return;
 		}
@@ -2710,12 +2745,14 @@ do_universal_binding:
 						fp.printComment(doc);
 					ptype.cprintRedirectionBinding(
 						fp, escapeMode, decl,
-						exposedName, usedBinding);
+						exposedName, usedBinding,
+						hideDeprecationAttributes);
 				}
 			} else {
 				usedBinding.cprintFunctionBinding(
-					fp, escapeMode, decl, exposedName, associatedPrototypes,
-					doc, preferBindingMacros);
+					fp, escapeMode, decl, exposedName,
+					associatedPrototypes, doc, preferBindingMacros,
+					hideDeprecationAttributes: hideDeprecationAttributes);
 			}
 			fp.externLinkage = oldExternLinkage;
 		}
@@ -2983,7 +3020,8 @@ no_usable_bindings:
 			onlyPrintPrimaryPrototype: bool = false,
 			ignoreNamespaceBindings: bool = false,
 			ignoreFastBindings: bool = false,
-			printDoc: bool = true) {
+			printDoc: bool = true,
+			hideDeprecationAttributes: bool = false) {
 		try {
 			local usedBindings = [];
 			if (exposedName is none)
@@ -3064,7 +3102,8 @@ again_check_extendedPrefixes:
 						fp, escapeMode, decl, exposedName, guardName,
 						doc, preferBindingMacros,
 						printDeclarationPrefixes,
-						onlyPrintPrimaryPrototype);
+						onlyPrintPrimaryPrototype,
+						hideDeprecationAttributes: hideDeprecationAttributes);
 					fp.ppEndif();
 					return;
 				}
@@ -3093,8 +3132,8 @@ normal_guardName_binding:
 										if (doc)
 											fp.printComment(doc);
 										ptype.cprintCDECLARE(
-											fp, escapeMode, decl, exposedName,
-											optSuffix: true);
+											fp, escapeMode, decl, exposedName, optSuffix: true,
+											hideDeprecationAttributes: hideDeprecationAttributes);
 										return;
 									}
 								}
@@ -3157,7 +3196,8 @@ handle_extendedPrefixes:
 					fp, escapeMode, decl, exposedName, guardName,
 					doc, preferBindingMacros,
 					printDeclarationPrefixes,
-					onlyPrintPrimaryPrototype);
+					onlyPrintPrimaryPrototype,
+					hideDeprecationAttributes: hideDeprecationAttributes);
 				isFirst = false;
 			}
 			while (numNeededEndif) {
@@ -3486,7 +3526,8 @@ class LibraryFunction {
 		if (doc)
 			fp.printComment(doc);
 		this.functionPrototype.cprintDeclarationWithoutTerminator(
-			fp, escapeMode, decl: decl, exposedName: this.name);
+			fp, escapeMode, decl: decl, exposedName: this.name,
+			hideDeprecationAttributes: true);
 		fp << ";\n";
 		while (numExtraEndIfs) {
 			fp.ppEndif();
@@ -3554,7 +3595,8 @@ class LibraryFunction {
 						exposedName:          this.name,
 						injectedAttributes:   extraAttributes,
 						breakAfterReturnType: true,
-						oneArgumentPerLine:   true);
+						oneArgumentPerLine:   true,
+						hideDeprecationAttributes: true);
 					fp << " ";
 					escapeTextIntoFile(
 						fp, impl.body, escapeMode,
@@ -3809,7 +3851,8 @@ class SystemHeader {
 				printDeclarationPrefixes:  true,
 				onlyPrintPrimaryPrototype: true,
 				ignoreNamespaceBindings:   true,
-				ignoreFastBindings:        true);
+				ignoreFastBindings:        true,
+				hideDeprecationAttributes: true);
 		}
 		fp << "\n"
 			"__SYSDECL_END\n"

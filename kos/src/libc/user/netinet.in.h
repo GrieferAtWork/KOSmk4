@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfdd38e24 */
+/* HASH CRC-32:0xd6d90cce */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,12 +33,12 @@ DECL_BEGIN
 #ifndef __KERNEL__
 INTDEF int NOTHROW_RPC(LIBCCALL libc_bindresvport)(fd_t sockfd, struct sockaddr_in *sock_in);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_bindresvport6)(fd_t sockfd, struct sockaddr_in6 *sock_in);
-INTDEF ATTR_DEPRECATED_ int NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_space)(int nbytes);
-INTDEF ATTR_DEPRECATED_ int NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_init)(void *bp, struct cmsghdr **cmsgp, int type);
-INTDEF ATTR_DEPRECATED_ int NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_append)(struct cmsghdr *cmsg, uint8_t const *typep, int multx, int plusy);
-INTDEF ATTR_DEPRECATED_ uint8_t *NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_alloc)(struct cmsghdr *cmsg, int datalen, int multx, int plusy);
-INTDEF ATTR_DEPRECATED_ int NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_next)(struct cmsghdr const *cmsg, uint8_t **tptrp);
-INTDEF ATTR_DEPRECATED_ int NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_find)(struct cmsghdr const *cmsg, uint8_t **tptrp, int type);
+INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_space)(int nbytes);
+INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_init)(void *bp, struct cmsghdr **cmsgp, int type);
+INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_append)(struct cmsghdr *cmsg, uint8_t const *typep, int multx, int plusy);
+INTDEF uint8_t *NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_alloc)(struct cmsghdr *cmsg, int datalen, int multx, int plusy);
+INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_next)(struct cmsghdr const *cmsg, uint8_t **tptrp);
+INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_find)(struct cmsghdr const *cmsg, uint8_t **tptrp, int type);
 INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_init)(void *extbuf, socklen_t extlen);
 INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_append)(void *extbuf, socklen_t extlen, int offset, uint8_t type, socklen_t len, uint8_t align, void **databufp);
 INTDEF int NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_finish)(void *extbuf, socklen_t extlen, int offset);

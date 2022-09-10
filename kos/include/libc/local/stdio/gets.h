@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bd2a57a */
+/* HASH CRC-32:0xc6685cd9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(gets) __ATTR_WUNUSED __ATTR_DEPRECATED("No buffer size checks (use `fgets\' instead)") __ATTR_OUT(1) char *
+__LOCAL_LIBC(gets) __ATTR_WUNUSED __ATTR_OUT(1) char *
 (__LIBCCALL __LIBC_LOCAL_NAME(gets))(char *__restrict __buf) __THROWS(...) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_fgets)(__buf, __INT_MAX__, __LOCAL_stdin);
 }

@@ -101,6 +101,19 @@ typedef struct attr_multiop attr_multiop_t;
 
 }
 
+%[define_replacement(ATTR_MAX_VALUELEN = __ATTR_MAX_VALUELEN)]
+%[define_replacement(ATTR_DONTFOLLOW = __ATTR_DONTFOLLOW)]
+%[define_replacement(ATTR_ROOT = __ATTR_ROOT)]
+%[define_replacement(ATTR_TRUST = __ATTR_TRUST)]
+%[define_replacement(ATTR_SECURE = __ATTR_SECURE)]
+%[define_replacement(ATTR_CREATE = __ATTR_CREATE)]
+%[define_replacement(ATTR_REPLACE = __ATTR_REPLACE)]
+%[define_replacement(ATTR_MAX_MULTIOPS = __ATTR_MAX_MULTIOPS)]
+%[define_replacement(ATTR_OP_GET = __ATTR_OP_GET)]
+%[define_replacement(ATTR_OP_SET = __ATTR_OP_SET)]
+%[define_replacement(ATTR_OP_REMOVE = __ATTR_OP_REMOVE)]
+
+
 [[deprecated("Use getxattr(2) or lgetxattr(2) instead")]]
 int attr_get(char const *path, char const *attrname,
              char *attrvalue, int *valuelength, int flags);
@@ -138,13 +151,118 @@ int attr_list(char const *path, char *buffer, int buffersize,
 int attr_listf($fd_t fd, char *buffer, int buffersize,
                int flags, struct attrlist_cursor *cursor);
 
-[[deprecated("Use getxattr(2), setxattr(2), removexattr(2) and listxattr(2) instead")]]
+[[deprecated("Use `getxattr(2)', `setxattr(2)' and `removexattr(2)' instead")]]
 [[decl_include("<attr/bits/attributes.h>")]]
-int attr_multi(char const *path, struct attr_multiop *oplist, int count, int flags);
+[[impl_include("<attr/bits/attributes.h>")]]
+[[impl_include("<libc/errno.h>", "<attr/asm/attributes.h>")]]
+[[requires_include("<attr/asm/attributes.h>")]]
+[[requires(defined(__ATTR_DONTFOLLOW) && defined(__ATTR_OP_GET) &&
+           defined(__ATTR_OP_SET) && defined(__ATTR_OP_REMOVE) &&
+           $has_function(attr_get, attr_set, attr_remove))]]
+int attr_multi(char const *path, struct attr_multiop *oplist, int count, int flags) {
+	int i, result = 0;
+	if unlikely(flags & ~ATTR_DONTFOLLOW) {
+@@pp_ifdef EINVAL@@
+		return __libc_seterrno(EINVAL);
+@@pp_else@@
+		return __libc_seterrno(1);
+@@pp_endif@@
+	}
+	for (i = 0; i < count; ++i) {
+		struct attr_multiop *ent = &oplist[i];
+		int ent_flags = ent->@am_flags@ | flags;
+		switch (ent->@am_opcode@) {
 
-[[deprecated("Use getxattr(2), setxattr(2), removexattr(2) and listxattr(2) instead")]]
+		case ATTR_OP_GET:
+			result |= attr_get(path,
+			                   ent->@am_attrname@,
+			                   ent->@am_attrvalue@,
+			                   &ent->@am_length@,
+			                   ent_flags);
+			break;
+
+		case ATTR_OP_SET:
+			result |= attr_set(path,
+			                   ent->@am_attrname@,
+			                   ent->@am_attrvalue@,
+			                   ent->@am_length@,
+			                   ent_flags);
+			break;
+
+		case ATTR_OP_REMOVE:
+			result |= attr_remove(path,
+			                      ent->@am_attrname@,
+			                      ent_flags);
+			break;
+
+		default:
+@@pp_ifdef EINVAL@@
+			result = __libc_seterrno(EINVAL);
+@@pp_else@@
+			result = __libc_seterrno(1);
+@@pp_endif@@
+			break;
+		}
+	}
+	return result;
+}
+
+
+[[deprecated("Use `fgetxattr(2)', `fsetxattr(2)' and `fremovexattr(2)' instead")]]
 [[decl_include("<bits/types.h>", "<attr/bits/attributes.h>")]]
-int attr_multif($fd_t fd, struct attr_multiop *oplist, int count, int flags);
+[[impl_include("<attr/bits/attributes.h>")]]
+[[impl_include("<libc/errno.h>", "<attr/asm/attributes.h>")]]
+[[requires_include("<attr/asm/attributes.h>")]]
+[[requires(defined(__ATTR_DONTFOLLOW) && defined(__ATTR_OP_GET) &&
+           defined(__ATTR_OP_SET) && defined(__ATTR_OP_REMOVE) &&
+           $has_function(attr_getf, attr_setf, attr_removef))]]
+int attr_multif($fd_t fd, struct attr_multiop *oplist, int count, int flags) {
+	int i, result = 0;
+	if unlikely(flags & ~ATTR_DONTFOLLOW) {
+@@pp_ifdef EINVAL@@
+		return __libc_seterrno(EINVAL);
+@@pp_else@@
+		return __libc_seterrno(1);
+@@pp_endif@@
+	}
+	for (i = 0; i < count; ++i) {
+		struct attr_multiop *ent = &oplist[i];
+		int ent_flags = ent->@am_flags@ | flags;
+		switch (ent->@am_opcode@) {
+
+		case ATTR_OP_GET:
+			result |= attr_getf(fd,
+			                    ent->@am_attrname@,
+			                    ent->@am_attrvalue@,
+			                    &ent->@am_length@,
+			                    ent_flags);
+			break;
+
+		case ATTR_OP_SET:
+			result |= attr_setf(fd,
+			                    ent->@am_attrname@,
+			                    ent->@am_attrvalue@,
+			                    ent->@am_length@,
+			                    ent_flags);
+			break;
+
+		case ATTR_OP_REMOVE:
+			result |= attr_removef(fd,
+			                       ent->@am_attrname@,
+			                       ent_flags);
+			break;
+
+		default:
+@@pp_ifdef EINVAL@@
+			result = __libc_seterrno(EINVAL);
+@@pp_else@@
+			result = __libc_seterrno(1);
+@@pp_endif@@
+			break;
+		}
+	}
+	return result;
+}
 
 
 %{

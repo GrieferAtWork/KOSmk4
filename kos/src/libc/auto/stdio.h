@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57bdcdb */
+/* HASH CRC-32:0x1fbce779 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -275,10 +275,10 @@ INTDEF WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (VLIBDCALL 
 INTDEF WUNUSED ATTR_IN(1) ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_scanf)(char const *__restrict format, ...) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF WUNUSED ATTR_DEPRECATED("No buffer size checks (use `fgets\' instead)") ATTR_OUT(1) char *(LIBDCALL libd_gets)(char *__restrict buf) THROWS(...);
+INTDEF WUNUSED ATTR_OUT(1) char *(LIBDCALL libd_gets)(char *__restrict buf) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_DEPRECATED("No buffer size checks (use `fgets\' instead)") ATTR_OUT(1) char *(LIBCCALL libc_gets)(char *__restrict buf) THROWS(...);
+INTDEF WUNUSED ATTR_OUT(1) char *(LIBCCALL libc_gets)(char *__restrict buf) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sscanf(3), vsscanf(3)

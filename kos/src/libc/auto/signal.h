@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11f53b43 */
+/* HASH CRC-32:0xb9a88a6b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,33 +35,33 @@ DECL_BEGIN
  * Deprecated  method  of  SIG_BLOCK-ing  a  given  set  of
  * signals. Modern code should use `sigprocmask()' instead.
  * @return: * : First 32 bits of previous signal mask (or however many fit in `int') */
-INTDEF ATTR_DEPRECATED("Using `sigprocmask(SIG_BLOCK)\' instead") int NOTHROW_NCX(LIBDCALL libd_sigblock)(int mask);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_sigblock)(int mask);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sigblock(3)
  * Deprecated  method  of  SIG_BLOCK-ing  a  given  set  of
  * signals. Modern code should use `sigprocmask()' instead.
  * @return: * : First 32 bits of previous signal mask (or however many fit in `int') */
-INTDEF ATTR_DEPRECATED("Using `sigprocmask(SIG_BLOCK)\' instead") int NOTHROW_NCX(LIBCCALL libc_sigblock)(int mask);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_sigblock)(int mask);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sigsetmask(3)
  * Deprecated method of SIG_SETMASK-ing a given set of signals.
  * Modern code should  use `sigprocmask(SIG_SETMASK)'  instead.
  * @return: * : First 32 bits of previous signal mask (or however many fit in `int') */
-INTDEF ATTR_DEPRECATED("Using `sigprocmask()\' instead") int NOTHROW_NCX(LIBDCALL libd_sigsetmask)(int mask);
+INTDEF int NOTHROW_NCX(LIBDCALL libd_sigsetmask)(int mask);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> sigsetmask(3)
  * Deprecated method of SIG_SETMASK-ing a given set of signals.
  * Modern code should  use `sigprocmask(SIG_SETMASK)'  instead.
  * @return: * : First 32 bits of previous signal mask (or however many fit in `int') */
-INTDEF ATTR_DEPRECATED("Using `sigprocmask()\' instead") int NOTHROW_NCX(LIBCCALL libc_sigsetmask)(int mask);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_sigsetmask)(int mask);
 /* >> sigsetmask(3)
  * Deprecated method of  retrieving the masking-state  of
  * the lowest-numberred `sizeof(int) * NBBY - 1' signals.
  * @return: * : First 32 bits of signal mask (or however many fit in `int') */
-INTDEF ATTR_DEPRECATED("Using `sigprocmask()\' instead") int NOTHROW_NCX(LIBCCALL libc_siggetmask)(void);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_siggetmask)(void);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> __old_sigpause(3)

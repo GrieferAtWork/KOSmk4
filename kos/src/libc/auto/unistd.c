@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d2432bb */
+/* HASH CRC-32:0x4bed6c5f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -826,7 +826,7 @@ NOTHROW_RPC(LIBCCALL libc_usleep)(useconds_t useconds) {
  * should be obvious why you shouldn't use this one.
  * And  if it isn't, take a look at the arguments of
  * this function, compared to `getcwd()' */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.basic_property") ATTR_DEPRECATED("Use getcwd()") ATTR_OUT(1) char *
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.basic_property") ATTR_OUT(1) char *
 NOTHROW_RPC(LIBDCALL libd_getwd)(char *buf) {
 	return libd_getcwd(buf, (size_t)-1);
 }
@@ -835,7 +835,7 @@ NOTHROW_RPC(LIBDCALL libd_getwd)(char *buf) {
  * should be obvious why you shouldn't use this one.
  * And  if it isn't, take a look at the arguments of
  * this function, compared to `getcwd()' */
-INTERN ATTR_SECTION(".text.crt.fs.basic_property") ATTR_DEPRECATED("Use getcwd()") ATTR_OUT(1) char *
+INTERN ATTR_SECTION(".text.crt.fs.basic_property") ATTR_OUT(1) char *
 NOTHROW_RPC(LIBCCALL libc_getwd)(char *buf) {
 	return libc_getcwd(buf, (size_t)-1);
 }
