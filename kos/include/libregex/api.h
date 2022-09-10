@@ -39,7 +39,7 @@
 #define LIBREGEX_DECL __IMPDEF
 #endif /* !... */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBREGEX_LIBRARY_NAME "libregex.so"
 
 #endif /* !_LIBREGEX_API_H */

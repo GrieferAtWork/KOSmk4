@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b0e0bb1 */
+/* HASH CRC-32:0x9a5c476a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -261,7 +261,7 @@
 
 
 /************************************************************************/
-/* Error return value for `mmap()'                                      */
+/* Error return value for `mmap(2)'                                     */
 /************************************************************************/
 #if !defined(MAP_FAILED) && defined(__MAP_FAILED)
 #define MAP_FAILED __MAP_FAILED

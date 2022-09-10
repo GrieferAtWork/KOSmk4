@@ -127,8 +127,8 @@ static_assert(_UNDERFLOW == __MATH_EXCEPT_UNDERFLOW);
 static_assert(_TLOSS == __MATH_EXCEPT_TLOSS);
 static_assert(_PLOSS == __MATH_EXCEPT_PLOSS);
 
-/* If non-NULL, the currently used `matherr(3)' handler in  "libc/matherr.c"
- * When `NULL', lazily load the matherr handler via `dlsym()', and fall back
+/* If non-NULL, the  currently used `matherr(3)'  handler in  "libc/matherr.c"
+ * When `NULL', lazily load the matherr handler via `dlsym(3D)', and fall back
  * to a no-op handler when no override was defined.
  *
  * To facilitate DOS's `__setusermatherr(3)', we simply re-assign this pointer

@@ -43,7 +43,7 @@
 #define LIBVM86_DECL __IMPDEF
 #endif /* !... */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBVM86_LIBRARY_NAME "libvm86.so"
 
 #endif /* !_LIBVM86_API_H */

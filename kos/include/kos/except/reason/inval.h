@@ -68,8 +68,8 @@ enum {
 
 	/* System calls: fs syscalls for file creation. */
 	E_INVALID_ARGUMENT_CONTEXT_OPEN_OFLAG = 0x0100, /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: [mask == O_ACCMODE]: The given `oflags' used `__O_ACCMODE_INVALID' as access mode
-	                                                 * E_INVALID_ARGUMENT_UNKNOWN_FLAG:         Unknown `O_*' flag passed to `open()' */
-	E_INVALID_ARGUMENT_CONTEXT_OPEN_MODE,           /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The mode argument passed to `open()' cannot be masked by `07777'. */
+	                                                 * E_INVALID_ARGUMENT_UNKNOWN_FLAG:         Unknown `O_*' flag passed to `open(2)' */
+	E_INVALID_ARGUMENT_CONTEXT_OPEN_MODE,           /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The mode argument passed to `open(2)' cannot be masked by `07777'. */
 	E_INVALID_ARGUMENT_CONTEXT_MKNOD_MODE,          /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The mode argument passed in `mknod()' cannot be masked by `07777 | S_IFMT'.
 	                                                 * E_INVALID_ARGUMENT_BAD_FLAG_MASK: When masked by `S_IFMT', the mode argument passed to `mknod()' doesn't evaluate to one of `S_IFREG', `S_IFCHR' or `S_IFBLK' */
 	E_INVALID_ARGUMENT_CONTEXT_FMKNODAT_FLAGS,      /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fmknodat()' isn't a set of `0|AT_DOSPATH' */
@@ -368,8 +368,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_PKEY_GET_PKEY                    E_INVALID_ARGUMENT_CONTEXT_PKEY_GET_PKEY                    /* E_INVALID_ARGUMENT_BAD_VALUE: The `pkey' argument passed to `PKeyGet(3)' is invalid. */
 /* System calls: fs syscalls for file creation. */
 #define E_INVALID_ARGUMENT_CONTEXT_OPEN_OFLAG                       E_INVALID_ARGUMENT_CONTEXT_OPEN_OFLAG                       /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: [mask == O_ACCMODE]: The given `oflags' used `__O_ACCMODE_INVALID' as access mode
-                                                                                                                                 * E_INVALID_ARGUMENT_UNKNOWN_FLAG:         Unknown `O_*' flag passed to `open()' */
-#define E_INVALID_ARGUMENT_CONTEXT_OPEN_MODE                        E_INVALID_ARGUMENT_CONTEXT_OPEN_MODE                        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The mode argument passed to `open()' cannot be masked by `07777'. */
+                                                                                                                                 * E_INVALID_ARGUMENT_UNKNOWN_FLAG:         Unknown `O_*' flag passed to `open(2)' */
+#define E_INVALID_ARGUMENT_CONTEXT_OPEN_MODE                        E_INVALID_ARGUMENT_CONTEXT_OPEN_MODE                        /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The mode argument passed to `open(2)' cannot be masked by `07777'. */
 #define E_INVALID_ARGUMENT_CONTEXT_MKNOD_MODE                       E_INVALID_ARGUMENT_CONTEXT_MKNOD_MODE                       /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The mode argument passed in `mknod()' cannot be masked by `07777 | S_IFMT'.
                                                                                                                                  * E_INVALID_ARGUMENT_BAD_FLAG_MASK: When masked by `S_IFMT', the mode argument passed to `mknod()' doesn't evaluate to one of `S_IFREG', `S_IFCHR' or `S_IFBLK' */
 #define E_INVALID_ARGUMENT_CONTEXT_FMKNODAT_FLAGS                   E_INVALID_ARGUMENT_CONTEXT_FMKNODAT_FLAGS                   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fmknodat()' isn't a set of `0|AT_DOSPATH' */
@@ -633,8 +633,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_PKEY_GET_PKEY                    138  /* E_INVALID_ARGUMENT_BAD_VALUE: The `pkey' argument passed to `PKeyGet(3)' is invalid. */
 /* System calls: fs syscalls for file creation. */
 #define E_INVALID_ARGUMENT_CONTEXT_OPEN_OFLAG                       256  /* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: [mask == O_ACCMODE]: The given `oflags' used `__O_ACCMODE_INVALID' as access mode
-                                                                          * E_INVALID_ARGUMENT_UNKNOWN_FLAG:         Unknown `O_*' flag passed to `open()' */
-#define E_INVALID_ARGUMENT_CONTEXT_OPEN_MODE                        257  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The mode argument passed to `open()' cannot be masked by `07777'. */
+                                                                          * E_INVALID_ARGUMENT_UNKNOWN_FLAG:         Unknown `O_*' flag passed to `open(2)' */
+#define E_INVALID_ARGUMENT_CONTEXT_OPEN_MODE                        257  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The mode argument passed to `open(2)' cannot be masked by `07777'. */
 #define E_INVALID_ARGUMENT_CONTEXT_MKNOD_MODE                       258  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The mode argument passed in `mknod()' cannot be masked by `07777 | S_IFMT'.
                                                                           * E_INVALID_ARGUMENT_BAD_FLAG_MASK: When masked by `S_IFMT', the mode argument passed to `mknod()' doesn't evaluate to one of `S_IFREG', `S_IFCHR' or `S_IFBLK' */
 #define E_INVALID_ARGUMENT_CONTEXT_FMKNODAT_FLAGS                   259  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `fmknodat()' isn't a set of `0|AT_DOSPATH' */

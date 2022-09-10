@@ -400,14 +400,14 @@ again:
 }
 
 
-/* Close a  previously  opened  dynamic module  handle,  as  returned  by
- * `dlopen()',  and  some  of the  other  functions found  in  this file.
- * Note that  this call  is implemented  as a  decref() operation,  since
- * multiple calls to `dlopen()' for the  same library will try to  ensure
- * that only a  single instance  of some  unique library  is ever  loaded
- * at  the same time. However, every call to `dlopen()' should eventually
- * be followed by a call to `dlclose()' with that same handle, such  that
- * once some specific handle is closed for the last time, the library can
+/* Close  a  previously  opened  dynamic  module  handle,  as  returned by
+ * `dlopen(3D)',  and  some of  the other  functions  found in  this file.
+ * Note  that  this call  is implemented  as  a decref()  operation, since
+ * multiple calls to `dlopen(3D)' for the same library will try to  ensure
+ * that  only  a single  instance of  some unique  library is  ever loaded
+ * at the same time. However, every call to `dlopen(3D)' should eventually
+ * be followed by a call to `dlclose(3D)' with that same handle, such that
+ * once some specific handle is closed for the last time, the library  can
  * be unloaded.
  * Note  also that  if this function  does actually unload  a library, user-
  * defined callbacks may be invoked, including `__attribute__((destructor))'
@@ -895,7 +895,7 @@ INTERN WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE) && (flags & DLGETHANDL
 NOTHROW(DLFCN_CC libdl_dlgethandle)(void const *static_pointer, unsigned int flags) {
 	DlModule *result;
 	if unlikely(flags & ~(DLGETHANDLE_FINCREF)) {
-		dl_seterrorf("Invalid flags %#x passed to `dlgethandle()'", flags);
+		dl_seterrorf("Invalid flags %#x passed to `dlgethandle(3D)'", flags);
 		goto err;
 	}
 	dlglobals_all_read(&dl_globals);
@@ -962,7 +962,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dlgetmodule)(USER char const *name, unsigned int flag
 		return result;
 	}
 	if unlikely(flags & ~(DLGETHANDLE_FINCREF | DLGETHANDLE_FNOCASE)) {
-		dl_seterrorf("Invalid flags %#x passed to `dlgetmodule()'", flags);
+		dl_seterrorf("Invalid flags %#x passed to `dlgetmodule(3D)'", flags);
 		goto err;
 	}
 	dlglobals_all_read(&dl_globals);
@@ -1239,7 +1239,7 @@ err_bad_module:
 
 /* Return the internally used file descriptor for the given module `handle'
  * Note  however that this  descriptor is usually  only opened for reading!
- * @param: handle: A handle returned by `dlopen()'.
+ * @param: handle: A handle returned by `dlopen(3D)'.
  * @return: * : An open file descriptor for the given module `handle'
  *              WARNING: Attempting  to  close()  this  handle  may  cause  future
  *                       operations  performed with the associated module to fail!
@@ -1260,7 +1260,7 @@ err_bad_module:
 
 /* Return the internally  used filename for  the given module  `handle'
  * Note that this path is an absolute, canonical (realpath()) filename.
- * @param: handle: A handle returned by `dlopen()'.
+ * @param: handle: A handle returned by `dlopen(3D)'.
  * @return: * :    The absolute, unambiguous filename for the given module `handle'
  * @return: NULL:  Error (s.a. `dlerror()') */
 INTERN WUNUSED NONNULL((1)) char const *
@@ -1275,14 +1275,14 @@ err_bad_module:
 }
 
 /* Return the base address offset chosen by ASLR, which is added to addresses of the given module `handle'.
- * WARNING: This function usually returns `NULL' for the root executable, in which case  dlerror()
- *          is  not modified, meaning  that in order to  safely use this  function, you must first
- *          call `dlerror()' in  order to clear  any existing errors,  then invoke this  function,
- *          and call `dlerror()' again when NULL is returned to check if an error really occurred.
- *          Or alternatively, you  can simply  make sure that  `handle' isn't  invalid, since  the
- *          only  case when this  function can ever fail  is when `handle'  was already closed, is
- *          `NULL',  or isn't a pointer returned by `dlopen()', `dlgetmodule()' or `dlgethandle()'
- * @param: handle: A handle returned by `dlopen()'.
+ * WARNING: This function  usually returns  `NULL' for  the root  executable, in  which case  dlerror()
+ *          is not  modified, meaning  that  in order  to  safely use  this  function, you  must  first
+ *          call `dlerror()'  in  order  to clear  any  existing  errors, then  invoke  this  function,
+ *          and call `dlerror()'  again when NULL  is returned to  check if an  error really  occurred.
+ *          Or alternatively,  you  can  simply  make  sure that  `handle'  isn't  invalid,  since  the
+ *          only case  when this  function  can ever  fail  is when  `handle'  was already  closed,  is
+ *          `NULL', or isn't a pointer returned by `dlopen(3D)', `dlgetmodule(3D)' or `dlgethandle(3D)'
+ * @param: handle: A handle returned by `dlopen(3D)'.
  * @return: * : The load address / module base for the given `handle'.
  * @return: 0 : Error (s.a. `dlerror()'), or load-address of ZERO */
 INTERN WUNUSED NONNULL((1)) uintptr_t
@@ -2169,13 +2169,13 @@ err_bad_module:
 	dl_seterror_badmodule(self);
 	goto err;
 err_bad_flags:
-	dl_seterrorf("Invalid flags %#x passed to `dllocksection()'", flags);
+	dl_seterrorf("Invalid flags %#x passed to `dllocksection(3D)'", flags);
 	goto err;
 }
 
 
-/* Unlock a locked section, as previously returned by `dllocksection()'
- * HINT: Think of this function as a decref(), where `dllocksection()'
+/* Unlock a locked section, as previously returned by `dllocksection(3D)'
+ * HINT: Think of this function as a decref(), where `dllocksection(3D)'
  *       returns a reference you inherit as the caller
  * @return: 0 : Successfully unlocked the given section `sect'
  * @return: * : Error (s.a. `dlerror()') */
@@ -2229,7 +2229,7 @@ err_bad_section:
  *          Because the names  of sections  are stored  alongside the  module, if  you
  *          can't guaranty that  the module  associated with the  section doesn't  get
  *          unloaded while you're accessing the section's name, you must first acquire
- *          your own  reference to  that module  through use  of  `dlsectionmodule()':
+ *          your own reference  to that module  through use of  `dlsectionmodule(3D)':
  *          >> void *mod = dlsectionmodule(my_sect, DLGETHANDLE_FINCREF);
  *          >> char const *name = dlsectionname(my_sect);
  *          >> // Make use of `name' (also check if `name' is NULL; if it is, `mod'
@@ -2318,7 +2318,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dlsectionmodule)(USER DlSection *sect, unsigned int f
 	if unlikely(!DL_VERIFY_SECTION_HANDLE(sect))
 		goto err_bad_section;
 	if unlikely(flags & ~(DLGETHANDLE_FINCREF)) {
-		dl_seterrorf("Invalid flags %#x passed to `dlsectionmodule()'", flags);
+		dl_seterrorf("Invalid flags %#x passed to `dlsectionmodule(3D)'", flags);
 		goto err;
 	}
 	DlSection_ModuleRead(sect);
@@ -2473,8 +2473,8 @@ err:
  *       fail for any reason, this function will also fail, and `dlerror()'
  *       will reflect what went wrong when trying to load said library.
  * NOTE: The backing memory for the deflated data blob is allocated lazily and
- *       will not be freed before  `sect' is `dlunlocksection()'ed the same  #
- *       of times that it was `dllocksection()'ed.
+ *       will not be freed before `sect' is `dlunlocksection(3D)'ed the same #
+ *       of times that it was `dllocksection(3D)'ed.
  * @param: psize: When non-NULL, store the size of the inflated (decompressed)
  *                data blob that is returned.
  * @return: * :   A pointer to the inflated data that is backing `sect'. When
@@ -2560,10 +2560,10 @@ done:
 }
 
 
-/* Clear internal caches used by loaded modules in order to free up
- * available memory. This function is automatically called by  libc
- * when `mmap()' fails due to lack of available virtual or physical
- * memory. For more information, see `DL_REGISTER_CACHE()'
+/* Clear internal caches used by loaded modules in order to free  up
+ * available memory. This function  is automatically called by  libc
+ * when `mmap(2)' fails due to lack of available virtual or physical
+ * memory. For more information, see `DL_REGISTER_CACHE(3D)'
  * @return: 0: No optional memory could be released.
  * @return: 1: Some optional memory was released. */
 INTERN int DLFCN_CC libdl_dlclearcaches(void) THROWS(...) {
@@ -3408,7 +3408,7 @@ NOTHROW_NCX(FCALL dlget_p_program_invocation_short_name)(void) THROWS(E_SEGFAULT
 
 
 
-/* Return the address of a builtin function (e.g. `dlopen()') */
+/* Return the address of a builtin function (e.g. `dlopen(3D)') */
 INTERN ATTR_PURE WUNUSED NONNULL((1)) void *
 NOTHROW_NCX(CC dlsym_builtin)(USER char const *name) THROWS(E_SEGFAULT) {
 	size_t lo, hi;

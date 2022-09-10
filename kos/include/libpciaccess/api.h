@@ -41,7 +41,7 @@
 #define LIBPCIACCESS_DECL __IMPDEF
 #endif /* !... */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBPCIACCESS_LIBRARY_NAME "libpciaccess.so"
 #endif /* LIBPCIACCESS_SUPPORTED */
 

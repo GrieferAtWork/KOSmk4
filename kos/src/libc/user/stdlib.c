@@ -161,7 +161,7 @@ NOTHROW_NCX(LIBCCALL libc___cxa_atexit)(void (LIBCCALL *func)(void *arg),
 	} else {
 		/* `dso_handle' is actually a pointer somewhere inside of the static memory segment
 		 * of  some module  (either dynamically allocated,  or part of  the primary module)
-		 * As such, we can make use of  `dlgethandle()' in order to look-up the  associated
+		 * As such, we can make use of `dlgethandle(3D)' in order to look-up the associated
 		 * shared object, which which we can then register the given callback. */
 		dl_handle = dlgethandle(dso_handle, DLGETHANDLE_FINCREF);
 		if unlikely(!dl_handle)

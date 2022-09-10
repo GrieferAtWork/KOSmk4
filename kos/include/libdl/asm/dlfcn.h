@@ -50,10 +50,10 @@ __DECL_BEGIN
 #if __KOS_VERSION__ >= 400
 #define __RTLD_NOINIT 0x80000000 /* KOS Extension: Don't run module initializers, and consequently
                                   *                skip running finalizers as well.
-                                  * When set, `dlopen()' will immeditaly return to the caller upon success,
-                                  * rather than  running  initializers  of all  affected  libraries  first.
-                                  * HINT: You may  run initializers  (and finalizers  during exit())  at  a
-                                  *       later time by calling `dlopen()' again without passing this flag.
+                                  * When set, `dlopen(3D)' will immediately return to the caller upon success,
+                                  * rather  than  running  initializers  of  all  affected  libraries   first.
+                                  * HINT: You may  run  initializers  (and finalizers  during  exit())  at  a
+                                  *       later time by calling `dlopen(3D)' again without passing this flag.
                                   * WARNING: Initializers of newly loaded dependencies will not be executed
                                   *          either! */
 
@@ -84,7 +84,7 @@ __DECL_BEGIN
 #endif /* __i386__ && !__x86_64__ */
 
 #else /* __KOS_VERSION__ >= 400 */
-#define __CRT_HAVE_fdlopen /* WARNING: In KOS v300, `fdlopen()' didn't inherit the given `FD' on success! */
+#define __CRT_HAVE_fdlopen /* WARNING: In KOS v300, `fdlopen(3D)' didn't inherit the given `FD' on success! */
 #endif /* __KOS_VERSION__ < 400 */
 #endif /* __KOS__ || __CRT_KOS || (__KOS__ && __BUILDING_LIBDL) */
 

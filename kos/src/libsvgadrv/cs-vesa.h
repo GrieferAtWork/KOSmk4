@@ -49,7 +49,7 @@ struct vesa_chipset: svga_chipset {
 	shift_t                vc_wingranshift; /* [lock(EXTERNAL)] ilog2 of current mode window granularity */
 #ifndef __KERNEL__
 	/* libbios86 library bindings. */
-	void                 *_vc_bios86;       /* [1..1][const] dlopen(3) library binding */
+	void                 *_vc_bios86;       /* [1..1][const] dlopen(3D) library binding */
 	PBIOS86_EMULATOR_INT  _vc_bios86_int;   /* [1..1][const] Library function */
 	PBIOS86_EMULATOR_FINI _vc_bios86_fini;  /* [1..1][const] Library function */
 #endif /* !__KERNEL__ */

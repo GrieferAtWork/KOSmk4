@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3d2f060 */
+/* HASH CRC-32:0xa1e718d5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -791,7 +791,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_alloc)(posix_spawn_file_actio
 }
 /* >> posix_spawn_file_actions_addopen(3)
  * Enqueue a call `dup2(open(path, oflags, mode), fd)' to be performed by the child process
- * Note though  that the  intermediate file  returned  by `open()'  will not  remain  open!
+ * Note though  that the  intermediate file  returned by  `open(2)' will  not remain  open!
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
 INTERN ATTR_SECTION(".text.crt.fs.exec.posix_spawn") ATTR_IN(3) ATTR_INOUT(1) errno_t

@@ -39,7 +39,7 @@
 #define LIBSVGADRV_DECL __IMPDEF
 #endif /* !__LIBSVGADRV_STATIC */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBSVGADRV_LIBRARY_NAME "libsvgadrv.so"
 
 #ifndef __NOTHROW_KERNEL

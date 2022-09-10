@@ -67,7 +67,7 @@ struct bochs_chipset: svga_chipset {
 	physaddr_t         bc_lfbaddr;      /* [const] Linear frame buffer address. */
 	struct pci_device *bc_pci;          /* [0..1][const] Associated PCI device. */
 #ifndef __KERNEL__
-	void              *bc_libpciaccess; /* [0..1][const] dlopen(3) handle for libpciaccess. */
+	void              *bc_libpciaccess; /* [0..1][const] dlopen(3D) handle for libpciaccess. */
 #endif /* !__KERNEL__ */
 };
 

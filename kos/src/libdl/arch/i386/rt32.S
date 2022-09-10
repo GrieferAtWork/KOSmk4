@@ -125,8 +125,8 @@ INTERN_FUNCTION(dl_load_lazy_relocation)
 	 *  - *(u32 *)((byte_t *)MODULE->dm_elf.de_pltgot + 0xc) == 0x25b26 (Pointer to the `push   $0x20')
 	 *
 	 * Lazy linkage procedure:
-	 *  - User-code calls `dlsym()', which is compiled as `call dlsym@plt'
-	 *    Additionally,  user-code will have set up `%ebx' to point to the
+	 *  - User-code calls `dlsym(3D)', which is compiled as `call dlsym@plt'
+	 *    Additionally,  user-code will have  set up `%ebx'  to point to the
 	 *    associated module's PLT/GOT.
 	 *  - Within `dlsym@plt', read a pointer from `GOT + 0x1c' and jump
 	 *    to the address contained within.

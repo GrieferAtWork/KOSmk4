@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdaeaf719 */
+/* HASH CRC-32:0x36cf5e34 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -382,7 +382,7 @@ INTDEF WUNUSED ATTR_INOUT(1) struct __spawn_action *NOTHROW_NCX(LIBCCALL libc_po
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> posix_spawn_file_actions_addopen(3)
  * Enqueue a call `dup2(open(path, oflags, mode), fd)' to be performed by the child process
- * Note though  that the  intermediate file  returned  by `open()'  will not  remain  open!
+ * Note though  that the  intermediate file  returned by  `open(2)' will  not remain  open!
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
 INTDEF ATTR_IN(3) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_file_actions_addopen)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd, char const *__restrict path, oflag_t oflags, mode_t mode);
@@ -390,7 +390,7 @@ INTDEF ATTR_IN(3) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_posix_spawn_fi
 #ifndef __KERNEL__
 /* >> posix_spawn_file_actions_addopen(3)
  * Enqueue a call `dup2(open(path, oflags, mode), fd)' to be performed by the child process
- * Note though  that the  intermediate file  returned  by `open()'  will not  remain  open!
+ * Note though  that the  intermediate file  returned by  `open(2)' will  not remain  open!
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
 INTDEF ATTR_IN(3) ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addopen)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd, char const *__restrict path, oflag_t oflags, mode_t mode);

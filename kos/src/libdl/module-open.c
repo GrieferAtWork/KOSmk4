@@ -403,7 +403,7 @@ err:
 
 
 
-/* Open a library, given a file descriptor previously acquired by `open()'
+/* Open a library, given a file descriptor previously acquired by `open(2)'
  * NOTE: This function will inherit the given `fd' on success.
  * @param: fd:   The file descriptor to use & inherit for the shared library
  * @param: mode: Exactly  one  of  [RTLD_LAZY, RTLD_NOW],  or'd  with
@@ -672,7 +672,7 @@ NOTHROW_NCX(CC DlModule_FindFilenameInPathListFromAll)(USER char const *filename
 }
 
 /*[[[config CONFIG_LIBDL_DLOPEN_TRYHARD_NO_VERSION_SUFFIX = true
- * Upon failure, dlopen(3) will try to open shared libraries with
+ * Upon failure, dlopen(3D) will try to open shared libraries with
  * version extensions a second time, but with the version extension
  * stripped. This is needed for compatibility in some cases.
  * ]]]*/

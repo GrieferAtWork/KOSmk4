@@ -55,7 +55,7 @@
 #define LIBSCTRACE_DECL __IMPDEF
 #endif /* !... */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBSCTRACE_LIBRARY_NAME "libsctrace.so"
 
 #endif /* !_LIBSCTRACE_API_H */

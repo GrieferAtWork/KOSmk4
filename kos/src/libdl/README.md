@@ -17,7 +17,7 @@
 			- Same as...
 				- ... `DT_BIND_NOW` appears in the `.dynamic` section of a module
 				- ... `DF_BIND_NOW` is set in `DT_FLAGS` in `.dynamic`
-				- ... `RTLD_NOW` is passed to `dlopen(3)` (as opposed to `RTLD_LAZY`)
+				- ... `RTLD_NOW` is passed to `dlopen(3D)` (as opposed to `RTLD_LAZY`)
 	- Unsupported LD environment variables (with no intention of support being added)
 		- `LD_SHOW_AUXV`
 		- `LD_TRACE_LOADED_OBJECTS`
@@ -79,7 +79,7 @@
 	- `R_386_16`, `R_X86_64_16` (unsigned 16-bit integer)
 	- `R_386_PC16`, `R_X86_64_PC16` (signed, relocation-relative 16-bit integer)
 	- Whether or not the RLTD link driver considers it a fatal error for these relocations to over- or under-flow following zero-/sign-extension is undefined.
-- The value written by relocations `R_386_TLS_DTPMOD32` and `R_X86_64_DTPMOD64` is equal to the value stored in `GOT[1]` (as used by lazy relocation). Additionally, such a value may be used as a `handle`-value normally returned by `dlopen(3)`, and accepted by a number of functions such as `dlsym(3)` or `dlmodulename(3)` (a KOS-specific `<dlfcn.h>` extension)
+- The value written by relocations `R_386_TLS_DTPMOD32` and `R_X86_64_DTPMOD64` is equal to the value stored in `GOT[1]` (as used by lazy relocation). Additionally, such a value may be used as a `handle`-value normally returned by `dlopen(3D)`, and accepted by a number of functions such as `dlsym(3)` or `dlmodulename(3)` (a KOS-specific `<dlfcn.h>` extension)
 - i386 only:
 	- ...
 - x86_64 only:

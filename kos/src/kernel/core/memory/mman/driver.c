@@ -2416,9 +2416,9 @@ NOTHROW(FCALL driver_dladdr_elf)(struct driver *__restrict self,
 	return result;
 }
 
-/* Do the reverse of the `dlsym()' functions above, and resolve
- * a  driver-relative `driver_reladdr' to try to determine info
- * about the symbol that contains that address.
+/* Do the reverse of the `driver_dlsym()' functions above, and resolve
+ * a driver-relative `driver_reladdr' to  try to determine info  about
+ * the symbol that contains that address.
  * @return: true:  Success.
  * @return: false: Failure. */
 PUBLIC NOBLOCK WUNUSED NONNULL((1, 3)) bool

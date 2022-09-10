@@ -46,7 +46,7 @@
 #define LIBDL_DECL __IMPDEF
 #endif /* !... */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBDL_LIBRARY_NAME "libdl.so"
 
 #endif /* !_LIBDL_API_H */

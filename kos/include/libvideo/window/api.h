@@ -43,7 +43,7 @@
 #define LIBVIDEO_WINDOW_DECL __IMPDEF
 #endif /* !... */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBVIDEO_WINDOW_LIBRARY_NAME "libvideo-window.so"
 
 #endif /* !_LIBVIDEO_WINDOW_API_H */

@@ -43,7 +43,7 @@
 #define LIBBIOS86_DECL __IMPDEF
 #endif /* !... */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBBIOS86_LIBRARY_NAME "libbios86.so"
 
 #endif /* !_LIBBIOS86_API_H */

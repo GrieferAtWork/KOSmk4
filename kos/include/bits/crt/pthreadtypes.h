@@ -113,8 +113,8 @@ struct pthread {
 	                                          * When this hits ZERO, you must call `dltlsfreeseg(pt_tls)',
 	                                          * which will also delete our structure, since we're embedded
 	                                          * within the associated thread's TLS segment. */
-	void                    *pt_retval;      /* [lock(WRITE_ONCE)] Thread return value (as passed to `pthread_exit()') (also used as argument for `pt_start') */
-	void                    *pt_tls;         /* [const] TLS segment base address (allocated by `dltlsallocseg()', freed in `pthread_exit()')
+	void                    *pt_retval;      /* [lock(WRITE_ONCE)] Thread return value (as passed to `pthread_exit(3)') (also used as argument for `pt_start') */
+	void                    *pt_tls;         /* [const] TLS segment base address (allocated by `dltlsallocseg(3D)', freed in `pthread_exit(3)')
 	                                          *         (or NULL if not lazily initialized within the main() thread). */
 	void                    *pt_stackaddr;   /* [const] Thread stack address (or NULL if not lazily initialized within the main() thread) */
 	__size_t                 pt_stacksize;   /* [const] Thread stack size (or 0 if not lazily initialized within the main() thread) */

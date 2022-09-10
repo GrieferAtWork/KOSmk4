@@ -43,7 +43,7 @@
 #define LIBICONV_DECL __IMPDEF
 #endif /* !... */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBICONV_LIBRARY_NAME "libiconv.so"
 
 #endif /* !_LIBICONV_API_H */

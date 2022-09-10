@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2ea51b0 */
+/* HASH CRC-32:0x668f6e5e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,14 +28,10 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_crt_mallinfo_defined
 __CREDIRECT(,struct mallinfo,__NOTHROW_NCX,__localdep_crt_mallinfo,(void),mallinfo,())
 #endif /* !__local___localdep_crt_mallinfo_defined */
-#ifndef __local___localdep_mallinfo_defined
-#define __local___localdep_mallinfo_defined
-__CREDIRECT(,struct mallinfo,__NOTHROW_NCX,__localdep_mallinfo,(void),mallinfo,())
-#endif /* !__local___localdep_mallinfo_defined */
 __LOCAL_LIBC(mallinfo2) struct mallinfo2
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mallinfo2))(void) {
-	struct (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mallinfo2)) __result;
-	struct (__NAMESPACE_LOCAL_SYM __localdep_mallinfo) __info = (__NAMESPACE_LOCAL_SYM __localdep_crt_mallinfo)();
+	struct mallinfo2 __result;
+	struct mallinfo __info = (__NAMESPACE_LOCAL_SYM __localdep_crt_mallinfo)();
 	__result.arena    = (__SIZE_TYPE__)(unsigned int)__info.arena;
 	__result.ordblks  = (__SIZE_TYPE__)(unsigned int)__info.ordblks;
 	__result.smblks   = (__SIZE_TYPE__)(unsigned int)__info.smblks;

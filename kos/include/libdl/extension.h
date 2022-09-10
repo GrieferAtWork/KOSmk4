@@ -57,7 +57,7 @@
  * >>                   sizeof(struct dlmodule_format),
  * >>                   sizeof(struct dlcore_ops))) {
  * >>         // At this point, `my_module_format.df_core' has been initialized,
- * >>         // and any future library loaded by `dlopen()' will be check
+ * >>         // and any future library loaded by `dlopen(3D)' will be check
  * >>         // for a magic header equal to `MY_MAGIC', and be processed
  * >>         // by `my_module_format.df_open' should that be the case.
  * >>     }
@@ -114,7 +114,7 @@ struct dlglobals;
  * extensions to call back into the libdl core.
  * Essentially, this is a reverse V-Table to expose internal libdl functions
  * to loader extensions (and loader extensions only), without clobbering the
- * actual export namespace (i.e. functions such as `dlopen()') */
+ * actual export namespace (i.e. functions such as `dlopen(3D)') */
 struct dlcore_ops {
 #define DL_COREOP(attr, return, nothrow, cc, name, args) attr return nothrow(cc *name) args;
 #define DL_COREFIELD(type, name)                         type *name;

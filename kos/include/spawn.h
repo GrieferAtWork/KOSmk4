@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x99069343 */
+/* HASH CRC-32:0x3268bbaf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -483,7 +483,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_destroy, __FORCELOCAL _
 #ifdef __CRT_HAVE_posix_spawn_file_actions_addopen
 /* >> posix_spawn_file_actions_addopen(3)
  * Enqueue a call `dup2(open(path, oflags, mode), fd)' to be performed by the child process
- * Note though  that the  intermediate file  returned  by `open()'  will not  remain  open!
+ * Note though  that the  intermediate file  returned by  `open(2)' will  not remain  open!
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
 __CDECLARE(__ATTR_IN(3) __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,posix_spawn_file_actions_addopen,(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __fd, char const *__restrict __path, __oflag_t __oflags, mode_t __mode),(__file_actions,__fd,__path,__oflags,__mode))
@@ -491,7 +491,7 @@ __CDECLARE(__ATTR_IN(3) __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,posix_spawn_file
 #include <libc/local/spawn/posix_spawn_file_actions_addopen.h>
 /* >> posix_spawn_file_actions_addopen(3)
  * Enqueue a call `dup2(open(path, oflags, mode), fd)' to be performed by the child process
- * Note though  that the  intermediate file  returned  by `open()'  will not  remain  open!
+ * Note though  that the  intermediate file  returned by  `open(2)' will  not remain  open!
  * @return: 0     : Success
  * @return: ENOMEM: Insufficient memory to enqueue the action */
 __NAMESPACE_LOCAL_USING_OR_IMPL(posix_spawn_file_actions_addopen, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL posix_spawn_file_actions_addopen)(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __fd, char const *__restrict __path, __oflag_t __oflags, mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_spawn_file_actions_addopen))(__file_actions, __fd, __path, __oflags, __mode); })

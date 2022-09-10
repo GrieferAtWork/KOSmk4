@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfccc3845 */
+/* HASH CRC-32:0xd224e0ca */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,21 +28,10 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_crt_mallinfo2_defined
 __CREDIRECT(,struct mallinfo2,__NOTHROW_NCX,__localdep_crt_mallinfo2,(void),mallinfo2,())
 #endif /* !__local___localdep_crt_mallinfo2_defined */
-#ifndef __local___localdep_mallinfo2_defined
-#define __local___localdep_mallinfo2_defined
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-#if defined(__CRT_HAVE_mallinfo) && __SIZEOF_INT__ == __SIZEOF_SIZE_T__
-__CREDIRECT(,struct mallinfo2,__NOTHROW_NCX,__localdep_mallinfo2,(void),mallinfo,())
-#else /* __CRT_HAVE_mallinfo && __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
-__CREDIRECT(,struct mallinfo2,__NOTHROW_NCX,__localdep_mallinfo2,(void),mallinfo2,())
-#endif /* !__CRT_HAVE_mallinfo || __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
-#endif /* !__local___localdep_mallinfo2_defined */
 __LOCAL_LIBC(mallinfo) struct mallinfo
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mallinfo))(void) {
-	struct (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mallinfo)) __result;
-	struct (__NAMESPACE_LOCAL_SYM __localdep_mallinfo2) __info = (__NAMESPACE_LOCAL_SYM __localdep_crt_mallinfo2)();
+	struct mallinfo __result;
+	struct mallinfo2 __info = (__NAMESPACE_LOCAL_SYM __localdep_crt_mallinfo2)();
 	__result.arena    = (int)(unsigned int)__info.arena;
 	__result.ordblks  = (int)(unsigned int)__info.ordblks;
 	__result.smblks   = (int)(unsigned int)__info.smblks;

@@ -183,7 +183,7 @@ If libc contains relocations not rationalized by this document, their presence m
 	  #else
 	  PUBLIC int mysymbol = 42;
 	  /* NOTE: This is essentially how every access must go, however you are allowed to
-	   * cache the return value of `dlsym()'. -- s.a. `/kos/src/libc/libc/globals.h' */
+	   * cache the return value of `dlsym(3D)'. -- s.a. `/kos/src/libc/libc/globals.h' */
 	  #define libc_mysymbol  (*(int **)dlsym(RTLD_DEFAULT, "mysymbol"))
 	  #endif
 	  ```

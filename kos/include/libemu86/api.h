@@ -36,7 +36,7 @@
 #define LIBEMU86_WANT_PROTOTYPES
 #endif /* ... */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBEMU86_LIBRARY_NAME "libemu86.so"
 
 

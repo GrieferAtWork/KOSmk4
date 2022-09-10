@@ -42,7 +42,7 @@
 #define LIBVIOCORE_DECL __IMPDEF
 #endif /* !__LIBVIOCORE_STATIC */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBVIOCORE_LIBRARY_NAME "libviocore.so"
 
 #endif /* !_LIBVIOCORE_API_H */

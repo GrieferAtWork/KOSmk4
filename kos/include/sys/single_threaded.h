@@ -34,6 +34,7 @@ __DECL_BEGIN
 #ifndef __libc_single_threaded
 #ifdef __CRT_HAVE___libc_single_threaded
 __CSDECLARE(,char __KOS_FIXED_CONST,__libc_single_threaded)
+#define __libc_single_threaded __libc_single_threaded
 #else /* __CRT_HAVE___libc_single_threaded */
 #define __libc_single_threaded ((char)0)
 #endif /* !__CRT_HAVE___libc_single_threaded */

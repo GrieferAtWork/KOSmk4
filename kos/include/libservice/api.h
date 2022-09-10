@@ -43,7 +43,7 @@
 #define LIBSERVICE_DECL __IMPDEF
 #endif /* !__LIBSERVICE_STATIC */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBSERVICE_LIBRARY_NAME "libservice.so"
 
 #endif /* !_LIBSERVICE_API_H */

@@ -170,6 +170,9 @@ incdir("");
 #include <asm/crt/ttyent.h>
 #include <asm/crt/ucontext.h>
 #include <asm/crt/util.h>
+#include <asm/defsym.h>
+#include <asm/farptr.h>
+#include <asm/gas.h>
 #include <asm/intrin-arith.h>
 #include <asm/intrin-fpu.h>
 #include <asm/intrin.h>
@@ -184,6 +187,7 @@ incdir("");
 #include <asm/os/fcntl.h>
 #include <asm/os/fd_set.h>
 #include <asm/os/features.h>
+#include <asm/os/file-ioctls.h>
 #include <asm/os/ipc.h>
 #include <asm/os/itimer.h>
 #include <asm/os/limits.h>
@@ -238,6 +242,12 @@ incdir("");
 #include <asm/syscalls.h>
 #include <asm/unistd.h>
 #include <assert.h>
+#include <attr/asm/attributes.h>
+#include <attr/asm/libattr.h>
+#include <attr/attributes.h>
+#include <attr/bits/attributes.h>
+#include <attr/error_context.h>
+#include <attr/libattr.h>
 #include <attr/xattr.h>
 #include <bits/crt/_diskfree_t.h>
 #include <bits/crt/aiocb.h>
@@ -272,6 +282,7 @@ incdir("");
 #include <bits/crt/io-file.h>
 #include <bits/crt/lconv.h>
 #include <bits/crt/locale.h>
+#include <bits/crt/mallinfo.h>
 #include <bits/crt/mapfile.h>
 #include <bits/crt/math-vector.h>
 #include <bits/crt/mathdef.h>
@@ -891,6 +902,7 @@ incdir("");
 #include <libiconv/stdiconv.h>
 #include <libiconv/transliterate.h>
 #include <libinstrlen/api.h>
+#include <libinstrlen/bits/instrlen.h>
 #include <libinstrlen/bits/isa.h>
 #include <libinstrlen/instrlen.h>
 #include <libintl.h>
@@ -1114,6 +1126,7 @@ incdir("");
 #include <machine/time.h>
 #include <machine/types.h>
 #include <malloc.h>
+#include <malloc_np.h>
 #include <malloca.h>
 #include <math.h>
 #include <mbctype.h>
@@ -1360,6 +1373,7 @@ incdir("");
 #include <sys/shm.h>
 #include <sys/signal.h>
 #include <sys/signalfd.h>
+#include <sys/single_threaded.h>
 #include <sys/socket.h>
 #include <sys/socketvar.h>
 #include <sys/sockio.h>

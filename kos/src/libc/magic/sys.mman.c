@@ -268,7 +268,7 @@
 
 
 /************************************************************************/
-/* Error return value for `mmap()'                                      */
+/* Error return value for `mmap(2)'                                     */
 /************************************************************************/
 #if !defined(MAP_FAILED) && defined(__MAP_FAILED)
 #define MAP_FAILED __MAP_FAILED

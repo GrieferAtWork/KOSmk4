@@ -92,8 +92,8 @@ int LIBKCALL libc_matherr(STRUCT_EXCEPTION *exc) {
 }
 
 
-/* If non-NULL, the currently used `matherr(3)' handler in  "libc/matherr.c"
- * When `NULL', lazily load the matherr handler via `dlsym()', and fall back
+/* If non-NULL, the  currently used `matherr(3)'  handler in  "libc/matherr.c"
+ * When `NULL', lazily load the matherr handler via `dlsym(3D)', and fall back
  * to a no-op handler when no override was defined. */
 typedef int (LIBKCALL *LPMATHERR)(STRUCT_EXCEPTION *exc);
 INTERN ATTR_SECTION(".bss.crt.math.math") LPMATHERR libc_pdyn_matherr = NULL;

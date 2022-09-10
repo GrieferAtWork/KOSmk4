@@ -43,7 +43,7 @@
 #define LIBBUFFER_DECL __IMPDEF
 #endif /* !... */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBBUFFER_LIBRARY_NAME "libbuffer.so"
 
 #endif /* !_LIBBUFFER_API_H */

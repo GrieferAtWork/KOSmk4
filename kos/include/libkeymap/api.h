@@ -41,7 +41,7 @@
 #define LIBKEYMAP_DECL __IMPDEF
 #endif /* !... */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBKEYMAP_LIBRARY_NAME "libkeymap.so"
 
 #endif /* !_LIBKEYMAP_API_H */

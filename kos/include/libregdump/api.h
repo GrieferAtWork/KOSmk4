@@ -43,7 +43,7 @@
 #define LIBREGDUMP_DECL __IMPDEF
 #endif /* !... */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBREGDUMP_LIBRARY_NAME "libregdump.so"
 
 #endif /* !_LIBREGDUMP_API_H */

@@ -148,7 +148,7 @@ DEFINE_TEST(open_anon_inode) {
 		/* Test what had already been mentioned above:
 		 * Use files from `/proc/self/fd/[...]/' to implement the
 		 * equivalent  of an `openat()' system call, whilst still
-		 * using the regular `open()'. */
+		 * using the regular `open(2)'. */
 		dfd = open("/proc/self", O_RDONLY | O_DIRECTORY); /* NOLINT */
 		ASSERT_ERROR_OK(dfd != -1);
 

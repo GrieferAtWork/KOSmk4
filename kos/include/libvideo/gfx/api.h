@@ -43,7 +43,7 @@
 #define LIBVIDEO_GFX_DECL __IMPDEF
 #endif /* !... */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBVIDEO_GFX_LIBRARY_NAME "libvideo-gfx.so"
 
 #endif /* !_LIBVIDEO_GFX_API_H */

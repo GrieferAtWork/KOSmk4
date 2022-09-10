@@ -54,7 +54,7 @@ struct dltls_extension {
 
 /* This is the actual structure that the TLS register (e.g. `%fs.base' /
  * `%gs.base'  on i386 and  x86_64) points to. It  is also the structure
- * returned by `dltlsallocseg()'! */
+ * returned by `dltlsallocseg(3D)'! */
 struct dltls_segment {
 	/* Static TLS data goes here (aka. at negative offsets from `ts_self') */
 	struct dltls_segment          *ts_self;    /* [1..1][const][== self] Self-pointer

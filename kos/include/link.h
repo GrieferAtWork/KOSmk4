@@ -55,7 +55,7 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-/* Module handles (as returned by `dlopen()') can be cast to this structure. */
+/* Module handles (as returned by `dlopen(3D)') can be cast to this structure. */
 struct link_map {
 	/* A mirror of the first couple of fields of the `DlModule' structure.
 	 * NOTE: This structure  is also  defined by  GLibC and  must

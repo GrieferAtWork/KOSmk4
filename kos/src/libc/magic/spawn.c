@@ -1003,7 +1003,7 @@ struct __spawn_action *posix_spawn_file_actions_alloc([[inout]] posix_spawn_file
 
 @@>> posix_spawn_file_actions_addopen(3)
 @@Enqueue a call `dup2(open(path, oflags, mode), fd)' to be performed by the child process
-@@Note though  that the  intermediate file  returned  by `open()'  will not  remain  open!
+@@Note though  that the  intermediate file  returned by  `open(2)' will  not remain  open!
 @@@return: 0     : Success
 @@@return: ENOMEM: Insufficient memory to enqueue the action
 [[decl_include("<bits/crt/posix_spawn.h>", "<bits/types.h>", "<libc/errno.h>")]]

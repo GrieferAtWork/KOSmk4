@@ -43,7 +43,7 @@
 #define LIBTERM_DECL __IMPDEF
 #endif /* !... */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBTERM_LIBRARY_NAME "libterm.so"
 
 #endif /* !_LIBTERM_API_H */

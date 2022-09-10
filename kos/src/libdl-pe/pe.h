@@ -114,7 +114,7 @@ libpe_linker_main(struct peexec_info *__restrict info,
                   struct process_peb *__restrict peb);
 
 
-/* Wrapper for `dlsym()' that does all of the "DOS$" / "KOS$" prefix handling. */
+/* Wrapper for `dlsym(3D)' that does all of the "DOS$" / "KOS$" prefix handling. */
 INTDEF void *WINAPI
 libpe_GetProcAddress(DlModule *self, char const *symbol_name);
 

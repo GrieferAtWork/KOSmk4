@@ -316,6 +316,7 @@ INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread") void
 NOTHROW(LIBC_PTHREAD_MAIN_CC libc_pthread_main)(LIBC_PTHREAD_MAIN_ARGS) {
 	/* NOTE: At this point, me == &current */
 	int exitcode = 0;
+
 	/* Apply the initial affinity mask (if given) */
 	if (me->pt_cpuset) {
 		size_t cpuset_size;
@@ -351,6 +352,7 @@ NOTHROW(LIBC_PTHREAD_MAIN_CC libc_pthread_main)(LIBC_PTHREAD_MAIN_ARGS) {
 		exitcode = (int)except_data()->e_args.e_exit_thread.et_exit_code;
 		me->pt_retval = PTHREAD_CANCELED;
 	}
+
 	/* Perform cleanup & terminate the current thread. */
 	pthread_exit_thread(me, exitcode);
 }
@@ -380,12 +382,14 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 	tls = dltlsallocseg();
 	if unlikely(!tls)
 		goto err_nomem;
-	pt = current_from_tls(tls);
+
 	/* This should only be able to fail when libc isn't part of the static TLS
 	 * segment, which can only happen when libc was loaded by dlopen(), rather
 	 * having been pre-loaded by one of the initial application's DT_NEEDED-s. */
+	pt = current_from_tls(tls);
 	if unlikely(!pt)
 		goto err_nomem_tls;
+
 #ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
 	/* Initialize the new thread's initial userprocmask structure,
 	 * such  that it will  lazily initialize it  the first time it
@@ -403,6 +407,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 	pt->pt_stacksize = attr->pa_stacksize;
 	pt->pt_cpuset    = NULL;
 	pt->pt_tls       = tls;
+
 	/* Copy affinity cpuset information. */
 	if (attr->pa_cpuset) {
 		pt->pt_cpusetsize = attr->pa_cpusetsize;
@@ -415,6 +420,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 			memcpy(pt->pt_cpuset, attr->pa_cpuset, pt->pt_cpusetsize);
 		}
 	}
+
 	if (!(attr->pa_flags & PTHREAD_ATTR_FLAG_STACKADDR)) {
 		/* Automatically allocate a stack. */
 		if (!pt->pt_stacksize)
@@ -721,11 +727,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_detach)(pthread_t pthread)
 		refcnt = ATOMIC_READ(pthread->pt_refcnt);
 		assert(refcnt >= 1);
 		if (refcnt == 1) {
-			/* Special  handling   requiring   for   when  this   is   the   last   reference!
+			/* Special handling requiring for when this is the last reference!
+			 *
 			 * In  this case,  the thread  will have  already invoked `libc_pthread_onexit()',
 			 * however did not destroy() its own structure, or deleted its kernel tid-address.
 			 * There is a  chance that the  thread is still  running, and that  the kernel  is
 			 * still going to write 0 to the TID address.
+			 *
 			 * In  this case, we must wait for it to do so, since we mustn't destroy()
 			 * the pthread structure before then, else the kernel might possibly write
 			 * to free'd memory. */
@@ -733,6 +741,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_detach)(pthread_t pthread)
 				sys_sched_yield();
 				continue;
 			}
+
 			/* The TID field was already set to ZERO. -> Set the  reference
 			 * counter to zero and destroy() the pthread structure ourself. */
 			if (!ATOMIC_CMPXCH_WEAK(pthread->pt_refcnt, 1, 0))
@@ -798,12 +807,15 @@ NOTHROW(LIBCCALL libc_pthread_mainthread_np)(void)
 	if (main->pt_tid == 0) {
 		/* Initially, the TID field of the main  thread's `current' will be set to  `0'.
 		 * However, this setting would cause practically all other pthread APIs to think
-		 * that  said thread has already terminated when in fact that has yet to happen.
+		 * that said thread has already terminated when  in fact that has yet to  happen
+		 * (and in this case  won't ever happen, since  your main thread terminating  on
+		 * KOS  will automatically cause  the kernel to terminate  all other threads and
+		 * consequently the entire process).
 		 *
-		 * However, not to worry. -  On KOS, the main thread's  TID is equal to  getpid(),
+		 * However:  not to worry. - On KOS, the main thread's TID is equal to `getpid()',
 		 * so  we can simply fill in that field lazily (no data race here; so-long as this
-		 * function isn't called from a vfork'd child process, the PID given by the kernel
-		 * at this point will always be correct) */
+		 * function isn't called from a vfork'd child process, the PID the kernel gives us
+		 * here will always be correct) */
 		main->pt_tid = getpid();
 	}
 	return main;
@@ -4249,7 +4261,7 @@ struct atomic_rwlock tls_lock = ATOMIC_RWLOCK_INIT;
 #define tls_waitwrite()  atomic_rwlock_waitwrite(&tls_lock)
 
 
-/* [0..1][lock(WRITE_ONCE)] TLS  segment  (from  libdl's  `dltlsalloc()')  that
+/* [0..1][lock(WRITE_ONCE)] TLS  segment (from  libdl's `dltlsalloc(3D)')  that
  * is  used  for representing  and storing  TLS values  on a  per-thread basis.
  * Technically,  we could get  rid of this right  here, and put  all of the TLS
  * stuff into `current', but since KOS already supports static TLS declaration,
@@ -4268,7 +4280,7 @@ struct pthread_tls_segment {
 	void   *pts_static[32]; /* Initial (static) vector for holding the first N keys.
 	                         * This vector gets  allocated by libdl  and is here  so
 	                         * we don't waste  too much memory  (since TLS  segments
-	                         * allocated  by  `dltlsalloc()'  have  quite  a  lot of
+	                         * allocated  by  `dltlsalloc(3D)' have  quite a  lot of
 	                         * overhead) */
 };
 

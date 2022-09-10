@@ -64,7 +64,7 @@
 #define LIBPHYS_DECL __IMPDEF
 #endif /* !... */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBPHYS_LIBRARY_NAME "libphys.so"
 
 #endif /* !_LIBPHYS_API_H */

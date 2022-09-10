@@ -58,10 +58,10 @@
 #define _LARGEFILE_SOURCE       1
 #define __EXTENSIONS__          1
 
-/* Must load headers  in 32-bit time/file-offset  mode, so-as to  prevent
- * any symbol re-directions from  happening, which might otherwise  screw
- * up libc linkage. - Instead, libc itself must always explicitly specify
- * the *64 variants of functions (e.g. `mmap64()'; `mmap()' is always the
+/* Must load  headers in  32-bit time/file-offset  mode, so-as  to  prevent
+ * any symbol  re-directions from  happening, which  might otherwise  screw
+ * up libc linkage. - Instead,  libc itself must always explicitly  specify
+ * the *64 variants of functions (e.g. `mmap64(2)'; `mmap(2)' is always the
  * 32-bit variant) */
 #undef _LARGEFILE64_SOURCE
 #define _LARGEFILE64_SOURCE 1

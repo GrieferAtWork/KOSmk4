@@ -819,8 +819,8 @@ INTERN_CONST STRINGSECTION char const secname_dynstr[]         = ".dynstr";
 
 
 /* Load debug sections, given a handle to a module, as returned by dlopen()
- * >> These functions are simply light-weight wrappers around `dllocksection()',
- *    taking  the job of  locking debug information sections  into memory off of
+ * >> These functions are simply light-weight wrappers around `dllocksection(3D)',
+ *    taking the job  of locking  debug information  sections into  memory off  of
  *    the user.
  * @return: DEBUG_INFO_ERROR_SUCCESS: Successfully loaded debug sections.
  * @return: DEBUG_INFO_ERROR_NOFRAME: Either `dl_handle' is invalid, or the specified library

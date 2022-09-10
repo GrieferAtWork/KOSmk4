@@ -55,7 +55,7 @@ DECL_BEGIN
 /* In order to minimize relocations within the final libc binary, we
  * use a custom, lazily initialized function table against functions
  * from libdl (though excluding the function we need to fill in that
- * table, which is `dlsym()')
+ * table, which is `dlsym(3D)')
  *
  * The  reason we do  this because on  most architectures, each jump
  * relocation will require  some form of  initialization to be  done
@@ -69,8 +69,8 @@ DECL_BEGIN
  * So any lazy relocation against  functions from libdl is  replaced
  * by a lazily initialized indirection call that truly doesn't cause
  * any additional relocations.
- * Using  this, all relocations to libdl symbols can (and are) removed
- * this way (except for `dlsym()', as that one is actually required to
+ * Using  this, all relocations  to libdl symbols  can (and are) removed
+ * this way (except for `dlsym(3D)', as that one is actually required to
  * do the symbol lookups themself, meaning we'd had to do
  * `dlsym(RTLD_DEFAULT, "dlsym")' to get dlsym itself, which obviously
  * wouldn't work)

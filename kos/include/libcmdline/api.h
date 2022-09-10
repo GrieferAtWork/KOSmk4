@@ -43,7 +43,7 @@
 #define LIBCMDLINE_DECL __IMPDEF
 #endif /* !... */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBCMDLINE_LIBRARY_NAME "libcmdline.so"
 
 #endif /* !_LIBCMDLINE_API_H */

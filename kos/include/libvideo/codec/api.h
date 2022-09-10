@@ -43,7 +43,7 @@
 #define LIBVIDEO_CODEC_DECL __IMPDEF
 #endif /* !... */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBVIDEO_CODEC_LIBRARY_NAME "libvideo-codec.so"
 
 #endif /* !_LIBVIDEO_CODEC_API_H */

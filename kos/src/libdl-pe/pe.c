@@ -120,7 +120,7 @@ err_buffer_result_errno:
 
 
 
-/* Wrapper for `dlsym()' that does all of the "DOS$" / "KOS$" prefix handling. */
+/* Wrapper for `dlsym(3D)' that does all of the "DOS$" / "KOS$" prefix handling. */
 DEFINE_PUBLIC_ALIAS(GetProcAddress, libpe_GetProcAddress);
 INTERN void *WINAPI
 libpe_GetProcAddress(DlModule *self, char const *symbol_name) {
@@ -153,7 +153,7 @@ libpe_GetProcAddress(DlModule *self, char const *symbol_name) {
 	/* Try again with the non-prefixed name. */
 	result = dlsym(self, symbol_name);
 	if (result) {
-		/* Clear the error message set by the initial failed `dlsym()' */
+		/* Clear the error message set by the initial failed `dlsym(3D)' */
 		dl_globals.dg_errmsg = NULL;
 	}
 	return result;
@@ -232,7 +232,7 @@ libpe_LoadLibraryInPath(char const *__restrict path, size_t pathlen,
 		 * However, that's a lot of overhead, and doesn't work well with
 		 * the established dlopen()  function (which  doesn't feature  a
 		 * dlopenat() variant; though I guess we could do the open here,
-		 * and  then  use  `fdlopen()'...). Anyways:  to  ensure uniform
+		 * and then use  `fdlopen(3D)'...). Anyways:  to ensure  uniform
 		 * filenames, we just convert everything to lowercase (for now).
 		 *
 		 * Sadly, this means that any dll you put on the system, you  have
@@ -562,10 +562,10 @@ PRIVATE NONNULL((1, 2)) void CC
 DlModule_PeTlsExec(DlModule *__restrict self, void *base, DWORD reason) {
 	void **pmodtls, *oldbase;
 
-	/* Technically,  PE TLS should be initialized in the context of the
-	 * thread it is meant to be used for. -- This isn't something  that
-	 * is guarantied for KOS-style dlfcn tls initializers (which we are
-	 * basing our's on, so that `dltlsaddr()' will work for PE modules)
+	/* Technically,  PE TLS should  be initialized in  the context of the
+	 * thread it is meant  to be used for.  -- This isn't something  that
+	 * is guarantied for KOS-style dlfcn  tls initializers (which we  are
+	 * basing our's on, so that `dltlsaddr(3D)' will work for PE modules)
 	 *
 	 * As such, we hijack the calling thread's TLS base pointer for  the
 	 * relevant module and temporarily override it. If it already didn't
@@ -1118,7 +1118,7 @@ libpe_linker_main(struct peexec_info *__restrict info,
 	 * This will be overwritten sometime later in `libdl.so:linker_main',
 	 * but until then we need `%segtls:0'  to already resolve to a  valid
 	 * value, since that one's used by `__hybrid_gettid()', which is used
-	 * by  `atomic_owner_rwlock_write()',  which is  used  by `dlopen()',
+	 * by `atomic_owner_rwlock_write()', which  is used by  `dlopen(3D)',
 	 * which we are using to load dependencies of the main PE. */
 	WR_TLS_BASE_REGISTER(&tib->Self);
 

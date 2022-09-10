@@ -223,7 +223,7 @@ struct dlmodule_elf {
 	char const               *de_dynstr;     /* [0..1][const] Dynamic string table. */
 	char const               *de_runpath;    /* [0..1][const] Library path of this module. */
 
-	/* ELF-specific Named data sections of the module (for use with `dllocksection()'). */
+	/* ELF-specific Named data sections of the module (for use with `dllocksection(3D)'). */
 	ElfW(Off)                 de_shoff;      /* File offset to section headers (or `0' if unknown). */
 	ElfW(Half)                de_shstrndx;   /* Index of the section header names section (or `(ElfW(Half))-1' if unknown). */
 	ElfW(Shdr)               *de_shdr;       /* [lock(WRITE_ONCE)][0..de_shnum][owned_if(!= empty_shdr)] Vector of section headers (or `NULL' if not loaded). */
@@ -247,7 +247,7 @@ struct dlmodule_elf {
 
 struct dlmodule_format;
 
-/* The actual data-structure to which a pointer is returned by `dlopen()' */
+/* The actual data-structure to which a pointer is returned by `dlopen(3D)' */
 struct dlmodule {
 	/* Fields from `struct link_map' (for binary compatibility... *ugh*) */
 	uintptr_t                 dm_loadaddr;   /* [const] Load address of the module. */
@@ -281,7 +281,7 @@ struct dlmodule {
 	void         (__DLFCN_CC *dm_tls_fini)(void *arg, void *base, void *tls_segment); /* [valid_if(!dm_tlsstoff)][0..1] Optional callback for a TLS finalizer. */
 	void                     *dm_tls_arg;    /* [?..?][const] Argument passed to `dm_tls_init' / `dm_tls_fini' */
 
-	/* All  of  the  above  was  just  so  that  `dltlsalloc()' doesn't
+	/* All  of  the above  was  just so  that  `dltlsalloc(3D)' doesn't
 	 * have to allocate the full DlModule structure. The rest following
 	 * below is what should be considered the actual module  structure. */
 	__WEAK refcnt_t           dm_refcnt;     /* Reference counter. */
@@ -306,7 +306,7 @@ struct dlmodule {
 	__REF_IF(!(->de_flags & RTLD_NODELETE))
 	    DlModule            **dm_depvec;     /* [1..1][const][0..dm_depcnt][owned][const] Vector of dependencies of this module. */
 
-	/* Named data sections of the module (for use with `dllocksection()'). */
+	/* Named data sections of the module (for use with `dllocksection(3D)'). */
 	struct atomic_rwlock      dm_sections_lock;     /* Lock for `dm_sections' */
 	DlSection               **dm_sections;          /* [0..1][weak][0..dm_shnum][owned][lock(dm_sections_lock)] Vector of locked sections. */
 	__REF DlSection          *dm_sections_dangling; /* [0..1][lock(dm_sections_lock)] Chain of dangling sections. */

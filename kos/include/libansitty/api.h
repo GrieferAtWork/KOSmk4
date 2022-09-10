@@ -43,7 +43,7 @@
 #define LIBANSITTY_DECL __IMPDEF
 #endif /* !... */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBANSITTY_LIBRARY_NAME "libansitty.so"
 
 #endif /* !_LIBANSITTY_API_H */

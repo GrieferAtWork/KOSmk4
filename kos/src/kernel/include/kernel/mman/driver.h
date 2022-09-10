@@ -650,9 +650,9 @@ struct driver_symaddr {
 };
 
 
-/* Do the reverse of the `dlsym()' functions above, and resolve
- * a  driver-relative `driver_reladdr' to try to determine info
- * about the symbol that contains that address.
+/* Do the reverse of the `driver_dlsym()' functions above, and resolve
+ * a driver-relative `driver_reladdr' to  try to determine info  about
+ * the symbol that contains that address.
  * @return: true:  Success.
  * @return: false: Failure. */
 FUNDEF NOBLOCK WUNUSED NONNULL((1, 3)) __BOOL

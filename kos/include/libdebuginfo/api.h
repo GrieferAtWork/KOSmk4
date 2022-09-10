@@ -46,7 +46,7 @@
 #define LIBDEBUGINFO_DECL __IMPDEF
 #endif /* !... */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBDEBUGINFO_LIBRARY_NAME "libdebuginfo.so"
 
 /* Debug info error codes. */

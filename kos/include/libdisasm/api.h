@@ -44,7 +44,7 @@
 #define LIBDISASM_DECL __IMPDEF
 #endif /* !... */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBDISASM_LIBRARY_NAME "libdisasm.so"
 
 #endif /* !_LIBDISASM_API_H */

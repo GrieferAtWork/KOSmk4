@@ -44,7 +44,7 @@
 #define LIBUNWIND_DECL __IMPDEF
 #endif /* !... */
 
-/* Library name for use with `dlopen()' */
+/* Library name for use with `dlopen(3D)' */
 #define LIBUNWIND_LIBRARY_NAME "libunwind.so"
 
 
