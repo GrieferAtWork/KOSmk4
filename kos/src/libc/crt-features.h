@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5730550d */
+/* HASH CRC-32:0x7c9be08c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1091,8 +1091,6 @@
 #define __CRT_HAVE_DOS$atoi
 #define __CRT_HAVE_DOS$atol
 #define __CRT_HAVE_DOS$atoll
-#define __CRT_HAVE_DOS$attr_copy_action
-#define __CRT_HAVE_DOS$attr_copy_check_permissions
 #define __CRT_HAVE_DOS$attr_get
 #define __CRT_HAVE_DOS$attr_getf
 #define __CRT_HAVE_DOS$attr_list
@@ -5345,6 +5343,7 @@
 #define __CRT_HAVE_attr_copy_check_permissions
 #define __CRT_HAVE_attr_copy_fd
 #define __CRT_HAVE_attr_copy_file
+#define __CRT_HAVE_attr_copy_impl
 #define __CRT_HAVE_attr_get
 #define __CRT_HAVE_attr_getf
 #define __CRT_HAVE_attr_list

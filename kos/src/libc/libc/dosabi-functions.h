@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb039b08 */
+/* HASH CRC-32:0x38c745a1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -166,10 +166,6 @@ DFUN(".text.crt.dos.libattr", libd_attr_list, libc_attr_list, TD, 5, TP, TP, TD,
 DFUN(".text.crt.dos.libattr", libd_attr_listf, libc_attr_listf, TD, 5, TIn(__SIZEOF_FD_T__), TP, TD, TD, TP)
 DFUN(".text.crt.dos.libattr", libd_attr_multi, libc_attr_multi, TD, 4, TP, TP, TD, TD)
 DFUN(".text.crt.dos.libattr", libd_attr_multif, libc_attr_multif, TD, 4, TIn(__SIZEOF_FD_T__), TP, TD, TD)
-
-/* attr.libattr */
-DFUN(".text.crt.dos.libattr", libd_attr_copy_check_permissions, libc_attr_copy_check_permissions, TD, 2, TP, TP)
-DFUN(".text.crt.dos.libattr", libd_attr_copy_action, libc_attr_copy_action, TD, 2, TP, TP)
 
 /* complex */
 DFUN(".text.crt.dos.math.complex", libd_cabsf, libc_cabsf, TF, 1, TCF)

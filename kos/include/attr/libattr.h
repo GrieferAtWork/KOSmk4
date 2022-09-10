@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76ac47bf */
+/* HASH CRC-32:0xc4289250 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,13 +47,28 @@ __SYSDECL_BEGIN
 
 struct error_context;
 
+#ifdef __CRT_HAVE_attr_copy_file
 /* >> attr_copy_file(3)
  * Copy attributes from `src_path' to `dst_path'. Only attributes for which `check()'
  * returns  non-zero (if  not given,  `attr_copy_check_permissions' is  used) will be
  * copied.
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno' and `ctx') */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_IN(2) __ATTR_INOUT_OPT(4),int,__NOTHROW_NCX,attr_copy_file,(char const *__src_path, char const *__dst_path, int (__LIBKCALL *__check)(char const *, struct error_context *), struct error_context *__ctx),(__src_path,__dst_path,__check,__ctx))
+__CDECLARE(__ATTR_IN(1) __ATTR_IN(2) __ATTR_INOUT_OPT(4),int,__NOTHROW_NCX,attr_copy_file,(char const *__src_path, char const *__dst_path, int (__LIBKCALL *__check)(char const *__attr_name, struct error_context *__ctx), struct error_context *__ctx),(__src_path,__dst_path,__check,__ctx))
+#else /* __CRT_HAVE_attr_copy_file */
+#include <parts/malloca.h>
+#if !defined(__NO_MALLOCA) && defined(__CRT_HAVE_llistxattr) && defined(__CRT_HAVE_flistxattr) && defined(__CRT_HAVE_lgetxattr) && defined(__CRT_HAVE_fgetxattr) && defined(__CRT_HAVE_lsetxattr) && defined(__CRT_HAVE_fsetxattr) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
+#include <libc/local/attr.libattr/attr_copy_file.h>
+/* >> attr_copy_file(3)
+ * Copy attributes from `src_path' to `dst_path'. Only attributes for which `check()'
+ * returns  non-zero (if  not given,  `attr_copy_check_permissions' is  used) will be
+ * copied.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno' and `ctx') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(attr_copy_file, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_IN(2) __ATTR_INOUT_OPT(4) int __NOTHROW_NCX(__LIBCCALL attr_copy_file)(char const *__src_path, char const *__dst_path, int (__LIBKCALL *__check)(char const *__attr_name, struct error_context *__ctx), struct error_context *__ctx) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(attr_copy_file))(__src_path, __dst_path, __check, __ctx); })
+#endif /* !__NO_MALLOCA && __CRT_HAVE_llistxattr && __CRT_HAVE_flistxattr && __CRT_HAVE_lgetxattr && __CRT_HAVE_fgetxattr && __CRT_HAVE_lsetxattr && __CRT_HAVE_fsetxattr && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) */
+#endif /* !__CRT_HAVE_attr_copy_file */
+#ifdef __CRT_HAVE_attr_copy_fd
 /* >> attr_copy_fd(3)
  * Copy attributes from `src_fd' to `dst_fd'. Only attributes for which `check()'
  * returns non-zero (if not given, `attr_copy_check_permissions' is used) will be
@@ -62,7 +77,22 @@ __CDECLARE_OPT(__ATTR_IN(1) __ATTR_IN(2) __ATTR_INOUT_OPT(4),int,__NOTHROW_NCX,a
  * @param: dst_path: The name of `dst_fd' (only used for error messages)
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno' and `ctx') */
-__CDECLARE_OPT(__ATTR_INOUT_OPT(6) __ATTR_IN_OPT(1) __ATTR_IN_OPT(3),int,__NOTHROW_NCX,attr_copy_fd,(char const *__src_path, __fd_t __src_fd, char const *__dst_path, __fd_t __dst_fd, int (__LIBKCALL *__check)(char const *, struct error_context *), struct error_context *__ctx),(__src_path,__src_fd,__dst_path,__dst_fd,__check,__ctx))
+__CDECLARE(__ATTR_INOUT_OPT(6) __ATTR_IN_OPT(1) __ATTR_IN_OPT(3),int,__NOTHROW_NCX,attr_copy_fd,(char const *__src_path, __fd_t __src_fd, char const *__dst_path, __fd_t __dst_fd, int (__LIBKCALL *__check)(char const *__attr_name, struct error_context *__ctx), struct error_context *__ctx),(__src_path,__src_fd,__dst_path,__dst_fd,__check,__ctx))
+#else /* __CRT_HAVE_attr_copy_fd */
+#include <parts/malloca.h>
+#if !defined(__NO_MALLOCA) && defined(__CRT_HAVE_llistxattr) && defined(__CRT_HAVE_flistxattr) && defined(__CRT_HAVE_lgetxattr) && defined(__CRT_HAVE_fgetxattr) && defined(__CRT_HAVE_lsetxattr) && defined(__CRT_HAVE_fsetxattr) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
+#include <libc/local/attr.libattr/attr_copy_fd.h>
+/* >> attr_copy_fd(3)
+ * Copy attributes from `src_fd' to `dst_fd'. Only attributes for which `check()'
+ * returns non-zero (if not given, `attr_copy_check_permissions' is used) will be
+ * copied.
+ * @param: src_path: The name of `src_fd' (only used for error messages)
+ * @param: dst_path: The name of `dst_fd' (only used for error messages)
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno' and `ctx') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(attr_copy_fd, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT_OPT(6) __ATTR_IN_OPT(1) __ATTR_IN_OPT(3) int __NOTHROW_NCX(__LIBCCALL attr_copy_fd)(char const *__src_path, __fd_t __src_fd, char const *__dst_path, __fd_t __dst_fd, int (__LIBKCALL *__check)(char const *__attr_name, struct error_context *__ctx), struct error_context *__ctx) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(attr_copy_fd))(__src_path, __src_fd, __dst_path, __dst_fd, __check, __ctx); })
+#endif /* !__NO_MALLOCA && __CRT_HAVE_llistxattr && __CRT_HAVE_flistxattr && __CRT_HAVE_lgetxattr && __CRT_HAVE_fgetxattr && __CRT_HAVE_lsetxattr && __CRT_HAVE_fsetxattr && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) */
+#endif /* !__CRT_HAVE_attr_copy_fd */
 #ifdef __CRT_HAVE_attr_copy_check_permissions
 /* >> attr_copy_check_permissions(3)
  * Returns non-zero if `attr_name' should be preserved (default handler

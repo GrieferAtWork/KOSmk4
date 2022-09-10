@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x101307cc */
+/* HASH CRC-32:0x990df76c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -203,8 +203,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(attr_load_actions))(struct error_cont
 			char *__line, *__action;
 			__line = (__NAMESPACE_LOCAL_SYM __localdep_fparseln)(__fp, __NULLPTR, &__lno, __NULLPTR, __FPARSELN_UNESCALL);
 			if __unlikely(!__line) {
+				char const *__config_filename_q = __attr_quote(__ctx, __config_filename);
 				__attr_error(__ctx, "%s:%" __PRIN_PREFIX(__SIZEOF_SIZE_T__) "u: I/O error: %m",
-				             __config_filename, __lno);
+				             __config_filename_q, __lno);
+				__attr_quote_free(__ctx, __config_filename_q);
 				break;
 			}
 
@@ -217,8 +219,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(attr_load_actions))(struct error_cont
 #endif /* __CRT_HAVE_fclose || __CRT_HAVE__fclose_nolock || __CRT_HAVE__IO_fclose */
 				__result = (__NAMESPACE_LOCAL_SYM __localdep_format_aprintf_pack)(&__printer, __NULLPTR);
 				if __unlikely(!__result) {
+					char const *__config_filename_q = __attr_quote(__ctx, __config_filename);
 					__attr_error(__ctx, "%s:%" __PRIN_PREFIX(__SIZEOF_SIZE_T__) "u: print error: %m",
-					             __config_filename, __lno);
+					             __config_filename_q, __lno);
+					__attr_quote_free(__ctx, __config_filename_q);
 					goto __return_fallback;
 				}
 				return __result;
@@ -245,16 +249,24 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(attr_load_actions))(struct error_cont
 				} else
 #endif /* __ATTR_ACTION_PERMISSIONS */
 				{
+					char const *__config_filename_q = __attr_quote(__ctx, __config_filename);
+					char const *__line_q            = __attr_quote(__ctx, __line);
+					char const *__action_q          = __attr_quote(__ctx, __action);
 					__attr_error(__ctx, "%s:%" __PRIN_PREFIX(__SIZEOF_SIZE_T__) "u: "
-					             "rule %q specifies unknown action %q",
-					             __config_filename, __lno, __line, __action);
+					             "rule %s specifies unknown action %s",
+					             __config_filename_q, __lno, __line_q, __action_q);
+					__attr_quote_free(__ctx, __action_q);
+					__attr_quote_free(__ctx, __line_q);
+					__attr_quote_free(__ctx, __config_filename_q);
 					goto __next_line;
 				}
 
 				/* Print the rule into the result buffer. */
 				if __unlikely((__NAMESPACE_LOCAL_SYM __localdep_format_aprintf_printer)(&__printer, __line, (__SIZE_TYPE__)(__action_endp - __line)) < 0) {
+					char const *__config_filename_q = __attr_quote(__ctx, __config_filename);
 					__attr_error(__ctx, "%s:%" __PRIN_PREFIX(__SIZEOF_SIZE_T__) "u: print error: %m",
-					             __config_filename, __lno);
+					             __config_filename_q, __lno);
+					__attr_quote_free(__ctx, __config_filename_q);
 					break;
 				}
 			}
@@ -268,7 +280,9 @@ __next_line:
 		(__NAMESPACE_LOCAL_SYM __localdep_free)(__printer.ap_base);
 #endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
 	} else {
-		__attr_error(__ctx, "%s: cannot open file: %m", __config_filename);
+		char const *__config_filename_q = __attr_quote(__ctx, __config_filename);
+		__attr_error(__ctx, "%s: cannot open file: %m", __config_filename_q);
+		__attr_quote_free(__ctx, __config_filename_q);
 	}
 __return_fallback:
 #endif /* ((__CRT_HAVE_fopen && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || (__CRT_HAVE__IO_fopen && (!__USE_FILE_OFFSET64 || !__O_LARGEFILE || !__O_LARGEFILE)) || __CRT_HAVE_fopen64) && (__CRT_HAVE_fparseln || ((__CRT_HAVE_getc || __CRT_HAVE_fgetc || __CRT_HAVE__IO_getc || __CRT_HAVE_fgetc_unlocked || __CRT_HAVE_getc_unlocked || __CRT_HAVE__getc_nolock || __CRT_HAVE__fgetc_nolock || (__CRT_DOS && (__CRT_HAVE__filbuf || __CRT_HAVE___uflow || __CRT_HAVE___underflow || __CRT_HAVE___srget)) || __CRT_HAVE_fread || __CRT_HAVE__IO_fread || __CRT_HAVE_fread_unlocked || __CRT_HAVE__fread_nolock) && (__CRT_HAVE_ungetc || __CRT_HAVE__IO_ungetc || __CRT_HAVE_ungetc_unlocked || __CRT_HAVE__ungetc_nolock) && (__CRT_HAVE_realloc || __CRT_HAVE___libc_realloc))) && (__CRT_HAVE_format_aprintf_printer || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) && __FPARSELN_UNESCALL */

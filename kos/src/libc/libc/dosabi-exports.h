@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x397387cf */
+/* HASH CRC-32:0x9dc19ed6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -145,10 +145,6 @@ DEFINE_PUBLIC_ALIAS(DOS$attr_list, libd_attr_list);
 DEFINE_PUBLIC_ALIAS(DOS$attr_listf, libd_attr_listf);
 DEFINE_PUBLIC_ALIAS(DOS$attr_multi, libd_attr_multi);
 DEFINE_PUBLIC_ALIAS(DOS$attr_multif, libd_attr_multif);
-
-/* attr.libattr */
-DEFINE_PUBLIC_ALIAS(DOS$attr_copy_check_permissions, libd_attr_copy_check_permissions);
-DEFINE_PUBLIC_ALIAS(DOS$attr_copy_action, libd_attr_copy_action);
 
 /* complex */
 DEFINE_PUBLIC_ALIAS(DOS$cabsf, libd_cabsf);

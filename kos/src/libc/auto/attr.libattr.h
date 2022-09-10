@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf9cb2a1 */
+/* HASH CRC-32:0x9600242 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,16 +29,24 @@
 
 DECL_BEGIN
 
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> attr_copy_check_permissions(3)
- * Returns non-zero if `attr_name' should be preserved (default handler
- * for `check' argument  of `attr_copy_file(3)' and  `attr_copy_fd(3)')
- * Same as `attr_copy_action(attr_name, ctx) == 0'
- * @return: == 0 : `attr_name' should not be copied
- * @return: != 0 : `attr_name' should be copied */
-INTDEF ATTR_IN(1) ATTR_INOUT_OPT(2) int NOTHROW_NCX(LIBDCALL libd_attr_copy_check_permissions)(char const *attr_name, struct error_context *ctx);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+/* >> attr_copy_file(3)
+ * Copy attributes from `src_path' to `dst_path'. Only attributes for which `check()'
+ * returns  non-zero (if  not given,  `attr_copy_check_permissions' is  used) will be
+ * copied.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno' and `ctx') */
+INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_INOUT_OPT(4) int NOTHROW_NCX(LIBCCALL libc_attr_copy_file)(char const *src_path, char const *dst_path, int (LIBKCALL *check)(char const *attr_name, struct error_context *ctx), struct error_context *ctx);
+/* >> attr_copy_fd(3)
+ * Copy attributes from `src_fd' to `dst_fd'. Only attributes for which `check()'
+ * returns non-zero (if not given, `attr_copy_check_permissions' is used) will be
+ * copied.
+ * @param: src_path: The name of `src_fd' (only used for error messages)
+ * @param: dst_path: The name of `dst_fd' (only used for error messages)
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno' and `ctx') */
+INTDEF ATTR_INOUT_OPT(6) ATTR_IN_OPT(1) ATTR_IN_OPT(3) int NOTHROW_NCX(LIBCCALL libc_attr_copy_fd)(char const *src_path, fd_t src_fd, char const *dst_path, fd_t dst_fd, int (LIBKCALL *check)(char const *attr_name, struct error_context *ctx), struct error_context *ctx);
+INTDEF ATTR_INOUT_OPT(6) ATTR_IN_OPT(1) ATTR_IN_OPT(3) int NOTHROW_NCX(LIBCCALL libc_attr_copy_impl)(char const *src_path, fd_t src_fd, char const *dst_path, fd_t dst_fd, int (LIBKCALL *check)(char const *attr_name, struct error_context *ctx), struct error_context *ctx);
 /* >> attr_copy_check_permissions(3)
  * Returns non-zero if `attr_name' should be preserved (default handler
  * for `check' argument  of `attr_copy_file(3)' and  `attr_copy_fd(3)')
@@ -46,15 +54,6 @@ INTDEF ATTR_IN(1) ATTR_INOUT_OPT(2) int NOTHROW_NCX(LIBDCALL libd_attr_copy_chec
  * @return: == 0 : `attr_name' should not be copied
  * @return: != 0 : `attr_name' should be copied */
 INTDEF ATTR_IN(1) ATTR_INOUT_OPT(2) int NOTHROW_NCX(LIBCCALL libc_attr_copy_check_permissions)(char const *attr_name, struct error_context *ctx);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* >> attr_copy_action(3)
- * Return the default action to-be taken for `attr_name'
- * @return: 0 : No special action
- * @return: * : One of `ATTR_ACTION_*' */
-INTDEF ATTR_IN(1) ATTR_INOUT_OPT(2) int NOTHROW_NCX(LIBDCALL libd_attr_copy_action)(char const *attr_name, struct error_context *ctx);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
 /* >> attr_copy_action(3)
  * Return the default action to-be taken for `attr_name'
  * @return: 0 : No special action

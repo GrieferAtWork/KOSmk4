@@ -8139,8 +8139,6 @@
 #define __CRT_HAVE_KOS$atoi
 #define __CRT_HAVE_KOS$atol
 #define __CRT_HAVE_KOS$atoll
-#define __CRT_HAVE_KOS$attr_copy_action
-#define __CRT_HAVE_KOS$attr_copy_check_permissions
 #define __CRT_HAVE_KOS$attr_get
 #define __CRT_HAVE_KOS$attr_getf
 #define __CRT_HAVE_KOS$attr_list
@@ -12756,8 +12754,6 @@
 #define __CRT_HAVE_DOS$atoi
 #define __CRT_HAVE_DOS$atol
 #define __CRT_HAVE_DOS$atoll
-#define __CRT_HAVE_DOS$attr_copy_action
-#define __CRT_HAVE_DOS$attr_copy_check_permissions
 #define __CRT_HAVE_DOS$attr_get
 #define __CRT_HAVE_DOS$attr_getf
 #define __CRT_HAVE_DOS$attr_list
