@@ -115,41 +115,45 @@ typedef struct attr_multiop attr_multiop_t;
 
 
 [[deprecated("Use getxattr(2) or lgetxattr(2) instead")]]
-int attr_get(char const *path, char const *attrname,
-             char *attrvalue, int *valuelength, int flags);
+int attr_get([[in]] char const *path, [[in]] char const *attrname,
+             [[out(*valuelength <= *valuelength)]] char *attrvalue,
+             [[inout]] int *valuelength, int flags);
 
 [[deprecated("Use fgetxattr(2) instead")]]
 [[decl_include("<bits/types.h>")]]
-int attr_getf($fd_t fd, char const *attrname, char *attrvalue,
-              int *valuelength, int flags);
+int attr_getf($fd_t fd, [[in]] char const *attrname,
+              [[out(*valuelength <= *valuelength)]] char *attrvalue,
+              [[inout]] int *valuelength, int flags);
 
 [[deprecated("Use setxattr(2) or lsetxattr(2) instead")]]
-int attr_set(char const *path, char const *attrname,
-             char const *attrvalue, int valuelength,
+int attr_set([[in]] char const *path, [[in]] char const *attrname,
+             [[in(valuelength)]] char const *attrvalue, int valuelength,
              int flags);
 
 [[deprecated("Use fsetxattr(2) instead")]]
 [[decl_include("<bits/types.h>")]]
-int attr_setf($fd_t fd, char const *attrname,
-              char const *attrvalue, int valuelength,
+int attr_setf($fd_t fd, [[in]] char const *attrname,
+              [[in(valuelength)]] char const *attrvalue, int valuelength,
               int flags);
 
 [[deprecated("Use removexattr(2) or lremovexattr(2) instead")]]
-int attr_remove(char const *path, char const *attrname, int flags);
+int attr_remove([[in]] char const *path, [[in]] char const *attrname, int flags);
 
 [[deprecated("Use fremovexattr(2) instead")]]
 [[decl_include("<bits/types.h>")]]
-int attr_removef($fd_t fd, char const *attrname, int flags);
+int attr_removef($fd_t fd, [[in]] char const *attrname, int flags);
 
 [[deprecated("Use listxattr(2) or llistxattr(2) instead")]]
 [[decl_include("<attr/bits/attributes.h>")]]
-int attr_list(char const *path, char *buffer, int buffersize,
-              int flags, struct attrlist_cursor *cursor);
+int attr_list([[in]] char const *path,
+              [[out(? <= buffersize)]] char *buffer, int buffersize,
+              int flags, [[inout]] struct attrlist_cursor *cursor);
 
 [[deprecated("Use flistxattr(2) instead")]]
 [[decl_include("<bits/types.h>", "<attr/bits/attributes.h>")]]
-int attr_listf($fd_t fd, char *buffer, int buffersize,
-               int flags, struct attrlist_cursor *cursor);
+int attr_listf($fd_t fd,
+               [[out(? <= buffersize)]] char *buffer, int buffersize,
+               int flags, [[inout]] struct attrlist_cursor *cursor);
 
 [[deprecated("Use `getxattr(2)', `setxattr(2)' and `removexattr(2)' instead")]]
 [[decl_include("<attr/bits/attributes.h>")]]
@@ -159,7 +163,7 @@ int attr_listf($fd_t fd, char *buffer, int buffersize,
 [[requires(defined(__ATTR_DONTFOLLOW) && defined(__ATTR_OP_GET) &&
            defined(__ATTR_OP_SET) && defined(__ATTR_OP_REMOVE) &&
            $has_function(attr_get, attr_set, attr_remove))]]
-int attr_multi(char const *path, struct attr_multiop *oplist, int count, int flags) {
+int attr_multi([[in]] char const *path, [[inout(count)]] struct attr_multiop *oplist, int count, int flags) {
 	int i, result = 0;
 	if unlikely(flags & ~ATTR_DONTFOLLOW) {
 @@pp_ifdef EINVAL@@
@@ -216,7 +220,7 @@ int attr_multi(char const *path, struct attr_multiop *oplist, int count, int fla
 [[requires(defined(__ATTR_DONTFOLLOW) && defined(__ATTR_OP_GET) &&
            defined(__ATTR_OP_SET) && defined(__ATTR_OP_REMOVE) &&
            $has_function(attr_getf, attr_setf, attr_removef))]]
-int attr_multif($fd_t fd, struct attr_multiop *oplist, int count, int flags) {
+int attr_multif($fd_t fd, [[inout(count)]] struct attr_multiop *oplist, int count, int flags) {
 	int i, result = 0;
 	if unlikely(flags & ~ATTR_DONTFOLLOW) {
 @@pp_ifdef EINVAL@@

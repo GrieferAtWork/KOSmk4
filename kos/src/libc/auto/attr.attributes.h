@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9cbdf882 */
+/* HASH CRC-32:0x956f74c7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,24 +30,24 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF int NOTHROW_NCX(LIBDCALL libd_attr_get)(char const *path, char const *attrname, char *attrvalue, int *valuelength, int flags);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_attr_getf)(fd_t fd, char const *attrname, char *attrvalue, int *valuelength, int flags);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_attr_set)(char const *path, char const *attrname, char const *attrvalue, int valuelength, int flags);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_attr_setf)(fd_t fd, char const *attrname, char const *attrvalue, int valuelength, int flags);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_attr_remove)(char const *path, char const *attrname, int flags);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_attr_removef)(fd_t fd, char const *attrname, int flags);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_attr_list)(char const *path, char *buffer, int buffersize, int flags, struct attrlist_cursor *cursor);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_attr_listf)(fd_t fd, char *buffer, int buffersize, int flags, struct attrlist_cursor *cursor);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_attr_multi)(char const *path, struct attr_multiop *oplist, int count, int flags);
+INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_INOUT(4) int NOTHROW_NCX(LIBDCALL libd_attr_get)(char const *path, char const *attrname, char *attrvalue, int *valuelength, int flags);
+INTDEF ATTR_IN(2) ATTR_INOUT(4) int NOTHROW_NCX(LIBDCALL libd_attr_getf)(fd_t fd, char const *attrname, char *attrvalue, int *valuelength, int flags);
+INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_INS(3, 4) int NOTHROW_NCX(LIBDCALL libd_attr_set)(char const *path, char const *attrname, char const *attrvalue, int valuelength, int flags);
+INTDEF ATTR_IN(2) ATTR_INS(3, 4) int NOTHROW_NCX(LIBDCALL libd_attr_setf)(fd_t fd, char const *attrname, char const *attrvalue, int valuelength, int flags);
+INTDEF ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_attr_remove)(char const *path, char const *attrname, int flags);
+INTDEF ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_attr_removef)(fd_t fd, char const *attrname, int flags);
+INTDEF ATTR_IN(1) ATTR_INOUT(5) ATTR_OUTS(2, 3) int NOTHROW_NCX(LIBDCALL libd_attr_list)(char const *path, char *buffer, int buffersize, int flags, struct attrlist_cursor *cursor);
+INTDEF ATTR_INOUT(5) ATTR_OUTS(2, 3) int NOTHROW_NCX(LIBDCALL libd_attr_listf)(fd_t fd, char *buffer, int buffersize, int flags, struct attrlist_cursor *cursor);
+INTDEF ATTR_IN(1) ATTR_INOUTS(2, 3) int NOTHROW_NCX(LIBDCALL libd_attr_multi)(char const *path, struct attr_multiop *oplist, int count, int flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF int NOTHROW_NCX(LIBCCALL libc_attr_multi)(char const *path, struct attr_multiop *oplist, int count, int flags);
+INTDEF ATTR_IN(1) ATTR_INOUTS(2, 3) int NOTHROW_NCX(LIBCCALL libc_attr_multi)(char const *path, struct attr_multiop *oplist, int count, int flags);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF int NOTHROW_NCX(LIBDCALL libd_attr_multif)(fd_t fd, struct attr_multiop *oplist, int count, int flags);
+INTDEF ATTR_INOUTS(2, 3) int NOTHROW_NCX(LIBDCALL libd_attr_multif)(fd_t fd, struct attr_multiop *oplist, int count, int flags);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF int NOTHROW_NCX(LIBCCALL libc_attr_multif)(fd_t fd, struct attr_multiop *oplist, int count, int flags);
+INTDEF ATTR_INOUTS(2, 3) int NOTHROW_NCX(LIBCCALL libc_attr_multif)(fd_t fd, struct attr_multiop *oplist, int count, int flags);
 #endif /* !__KERNEL__ */
 
 DECL_END

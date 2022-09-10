@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e30c56d */
+/* HASH CRC-32:0x6cba7de3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,25 +90,25 @@ typedef struct attr_multiop attr_multiop_t;
 #define ATTR_ENTRY(buf, i) \
 	((struct attrlist_ent *)((__BYTE_TYPE__ *)(buf) + ((struct attrlist const *)(buffer))->al_offset[i]))
 
-__CDECLARE_OPT(__ATTR_DEPRECATED("Use getxattr(2) or lgetxattr(2) instead"),int,__NOTHROW_NCX,attr_get,(char const *__path, char const *__attrname, char *__attrvalue, int *__valuelength, int __flags),(__path,__attrname,__attrvalue,__valuelength,__flags))
-__CDECLARE_OPT(__ATTR_DEPRECATED("Use fgetxattr(2) instead"),int,__NOTHROW_NCX,attr_getf,(__fd_t __fd, char const *__attrname, char *__attrvalue, int *__valuelength, int __flags),(__fd,__attrname,__attrvalue,__valuelength,__flags))
-__CDECLARE_OPT(__ATTR_DEPRECATED("Use setxattr(2) or lsetxattr(2) instead"),int,__NOTHROW_NCX,attr_set,(char const *__path, char const *__attrname, char const *__attrvalue, int __valuelength, int __flags),(__path,__attrname,__attrvalue,__valuelength,__flags))
-__CDECLARE_OPT(__ATTR_DEPRECATED("Use fsetxattr(2) instead"),int,__NOTHROW_NCX,attr_setf,(__fd_t __fd, char const *__attrname, char const *__attrvalue, int __valuelength, int __flags),(__fd,__attrname,__attrvalue,__valuelength,__flags))
-__CDECLARE_OPT(__ATTR_DEPRECATED("Use removexattr(2) or lremovexattr(2) instead"),int,__NOTHROW_NCX,attr_remove,(char const *__path, char const *__attrname, int __flags),(__path,__attrname,__flags))
-__CDECLARE_OPT(__ATTR_DEPRECATED("Use fremovexattr(2) instead"),int,__NOTHROW_NCX,attr_removef,(__fd_t __fd, char const *__attrname, int __flags),(__fd,__attrname,__flags))
-__CDECLARE_OPT(__ATTR_DEPRECATED("Use listxattr(2) or llistxattr(2) instead"),int,__NOTHROW_NCX,attr_list,(char const *__path, char *__buffer, int __buffersize, int __flags, struct attrlist_cursor *__cursor),(__path,__buffer,__buffersize,__flags,__cursor))
-__CDECLARE_OPT(__ATTR_DEPRECATED("Use flistxattr(2) instead"),int,__NOTHROW_NCX,attr_listf,(__fd_t __fd, char *__buffer, int __buffersize, int __flags, struct attrlist_cursor *__cursor),(__fd,__buffer,__buffersize,__flags,__cursor))
+__CDECLARE_OPT(__ATTR_DEPRECATED("Use getxattr(2) or lgetxattr(2) instead") __ATTR_IN(1) __ATTR_IN(2) __ATTR_INOUT(4),int,__NOTHROW_NCX,attr_get,(char const *__path, char const *__attrname, char *__attrvalue, int *__valuelength, int __flags),(__path,__attrname,__attrvalue,__valuelength,__flags))
+__CDECLARE_OPT(__ATTR_DEPRECATED("Use fgetxattr(2) instead") __ATTR_IN(2) __ATTR_INOUT(4),int,__NOTHROW_NCX,attr_getf,(__fd_t __fd, char const *__attrname, char *__attrvalue, int *__valuelength, int __flags),(__fd,__attrname,__attrvalue,__valuelength,__flags))
+__CDECLARE_OPT(__ATTR_DEPRECATED("Use setxattr(2) or lsetxattr(2) instead") __ATTR_IN(1) __ATTR_IN(2) __ATTR_INS(3, 4),int,__NOTHROW_NCX,attr_set,(char const *__path, char const *__attrname, char const *__attrvalue, int __valuelength, int __flags),(__path,__attrname,__attrvalue,__valuelength,__flags))
+__CDECLARE_OPT(__ATTR_DEPRECATED("Use fsetxattr(2) instead") __ATTR_IN(2) __ATTR_INS(3, 4),int,__NOTHROW_NCX,attr_setf,(__fd_t __fd, char const *__attrname, char const *__attrvalue, int __valuelength, int __flags),(__fd,__attrname,__attrvalue,__valuelength,__flags))
+__CDECLARE_OPT(__ATTR_DEPRECATED("Use removexattr(2) or lremovexattr(2) instead") __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,attr_remove,(char const *__path, char const *__attrname, int __flags),(__path,__attrname,__flags))
+__CDECLARE_OPT(__ATTR_DEPRECATED("Use fremovexattr(2) instead") __ATTR_IN(2),int,__NOTHROW_NCX,attr_removef,(__fd_t __fd, char const *__attrname, int __flags),(__fd,__attrname,__flags))
+__CDECLARE_OPT(__ATTR_DEPRECATED("Use listxattr(2) or llistxattr(2) instead") __ATTR_IN(1) __ATTR_INOUT(5) __ATTR_OUTS(2, 3),int,__NOTHROW_NCX,attr_list,(char const *__path, char *__buffer, int __buffersize, int __flags, struct attrlist_cursor *__cursor),(__path,__buffer,__buffersize,__flags,__cursor))
+__CDECLARE_OPT(__ATTR_DEPRECATED("Use flistxattr(2) instead") __ATTR_INOUT(5) __ATTR_OUTS(2, 3),int,__NOTHROW_NCX,attr_listf,(__fd_t __fd, char *__buffer, int __buffersize, int __flags, struct attrlist_cursor *__cursor),(__fd,__buffer,__buffersize,__flags,__cursor))
 #ifdef __CRT_HAVE_attr_multi
-__CDECLARE(__ATTR_DEPRECATED("Use `getxattr(2)\', `setxattr(2)\' and `removexattr(2)\' instead"),int,__NOTHROW_NCX,attr_multi,(char const *__path, struct attr_multiop *__oplist, int __count, int __flags),(__path,__oplist,__count,__flags))
+__CDECLARE(__ATTR_DEPRECATED("Use `getxattr(2)\', `setxattr(2)\' and `removexattr(2)\' instead") __ATTR_IN(1) __ATTR_INOUTS(2, 3),int,__NOTHROW_NCX,attr_multi,(char const *__path, struct attr_multiop *__oplist, int __count, int __flags),(__path,__oplist,__count,__flags))
 #elif defined(__ATTR_DONTFOLLOW) && defined(__ATTR_OP_GET) && defined(__ATTR_OP_SET) && defined(__ATTR_OP_REMOVE) && defined(__CRT_HAVE_attr_get) && defined(__CRT_HAVE_attr_set) && defined(__CRT_HAVE_attr_remove)
 #include <libc/local/attr.attributes/attr_multi.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(attr_multi, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Use `getxattr(2)\', `setxattr(2)\' and `removexattr(2)\' instead") int __NOTHROW_NCX(__LIBCCALL attr_multi)(char const *__path, struct attr_multiop *__oplist, int __count, int __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(attr_multi))(__path, __oplist, __count, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(attr_multi, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Use `getxattr(2)\', `setxattr(2)\' and `removexattr(2)\' instead") __ATTR_IN(1) __ATTR_INOUTS(2, 3) int __NOTHROW_NCX(__LIBCCALL attr_multi)(char const *__path, struct attr_multiop *__oplist, int __count, int __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(attr_multi))(__path, __oplist, __count, __flags); })
 #endif /* ... */
 #ifdef __CRT_HAVE_attr_multif
-__CDECLARE(__ATTR_DEPRECATED("Use `fgetxattr(2)\', `fsetxattr(2)\' and `fremovexattr(2)\' instead"),int,__NOTHROW_NCX,attr_multif,(__fd_t __fd, struct attr_multiop *__oplist, int __count, int __flags),(__fd,__oplist,__count,__flags))
+__CDECLARE(__ATTR_DEPRECATED("Use `fgetxattr(2)\', `fsetxattr(2)\' and `fremovexattr(2)\' instead") __ATTR_INOUTS(2, 3),int,__NOTHROW_NCX,attr_multif,(__fd_t __fd, struct attr_multiop *__oplist, int __count, int __flags),(__fd,__oplist,__count,__flags))
 #elif defined(__ATTR_DONTFOLLOW) && defined(__ATTR_OP_GET) && defined(__ATTR_OP_SET) && defined(__ATTR_OP_REMOVE) && defined(__CRT_HAVE_attr_getf) && defined(__CRT_HAVE_attr_setf) && defined(__CRT_HAVE_attr_removef)
 #include <libc/local/attr.attributes/attr_multif.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(attr_multif, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Use `fgetxattr(2)\', `fsetxattr(2)\' and `fremovexattr(2)\' instead") int __NOTHROW_NCX(__LIBCCALL attr_multif)(__fd_t __fd, struct attr_multiop *__oplist, int __count, int __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(attr_multif))(__fd, __oplist, __count, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(attr_multif, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Use `fgetxattr(2)\', `fsetxattr(2)\' and `fremovexattr(2)\' instead") __ATTR_INOUTS(2, 3) int __NOTHROW_NCX(__LIBCCALL attr_multif)(__fd_t __fd, struct attr_multiop *__oplist, int __count, int __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(attr_multif))(__fd, __oplist, __count, __flags); })
 #endif /* ... */
 
 __SYSDECL_END

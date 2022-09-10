@@ -690,6 +690,8 @@ again_parse_arg_annotations:
 						 * >> size_t foo([[in(return <= sizearg)]]      void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
 						 * >> void   foo([[in(*p_retsize <= sizearg)]]  void const *p, size_t sizearg,
 						 * >>                                           size_t *p_retsize);               -->   __attribute__((access(read_only, 1, 2)))
+						 * >> void   foo([[in(*p_outsize <= *p_insize)]] void const *p, size_t *p_insize,
+						 * >>                                           size_t *p_outsize);               -->   __attribute__((access(read_only, 1)))
 						 * >> void   foo([[in(sizearg * <N>)]]          void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1)))
 						 * >> void   foo([[in(<N> * sizearg)]]          void const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1)))
 						 * >> void   foo([[in(strlen(.))]]              char const *p, size_t sizearg);   -->   __attribute__((nonnull(1), access(read_only, 1)))
@@ -698,7 +700,7 @@ again_parse_arg_annotations:
 						 * >> void   foo([[in(strnlen(p, sizearg))]]    char const *p, size_t sizearg);   -->   __attribute__((access(read_only, 1, 2)))
 						 */
 						self.next();
-						local sizeArgumentName;
+						local sizeArgumentName = none;
 						switch (self.tok) {
 						case "*":
 							self.next();
@@ -717,6 +719,12 @@ again_parse_arg_annotations:
 							self.next();
 access_annotation_expected_le:
 							self.skip("<=");
+							if (self.tok == "*") {
+								self.next();
+								self.parseCStringOrKeyword();
+								sizeArgumentName = none;
+								break;
+							}
 							/* FALLTHRU */
 						default: {
 							sizeArgumentName = self.parseCStringOrKeywordOrNumber();
@@ -774,11 +782,13 @@ access_annotation_parse_multiply_rhs:
 
 						}
 						self.skip(")");
-						extraAttributes.append(() -> {
-							local sizeArg = result.argsByName[str sizeArgumentName];
-							local sizeIndex = str(result.argv.index(sizeArg) + 1);
-							result.attributes.append(f"{mode}S({argIndex}, {sizeIndex})");
-						});
+						if (sizeArgumentName !is none) {
+							extraAttributes.append(() -> {
+								local sizeArg = result.argsByName[str sizeArgumentName];
+								local sizeIndex = str(result.argv.index(sizeArg) + 1);
+								result.attributes.append(f"{mode}S({argIndex}, {sizeIndex})");
+							});
+						}
 						if (shouldMarkAsNonNull) {
 							if (nonNullArguments is none)
 								nonNullArguments = HashSet();

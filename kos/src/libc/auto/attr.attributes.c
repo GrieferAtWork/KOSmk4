@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32d97f97 */
+/* HASH CRC-32:0x994e901c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ DECL_BEGIN
 #include <attr/bits/attributes.h>
 #include <libc/errno.h>
 #include <attr/asm/attributes.h>
-INTERN ATTR_SECTION(".text.crt.libattr") int
+INTERN ATTR_SECTION(".text.crt.libattr") ATTR_IN(1) ATTR_INOUTS(2, 3) int
 NOTHROW_NCX(LIBCCALL libc_attr_multi)(char const *path,
                                       struct attr_multiop *oplist,
                                       int count,
@@ -86,7 +86,7 @@ NOTHROW_NCX(LIBCCALL libc_attr_multi)(char const *path,
 #include <attr/bits/attributes.h>
 #include <libc/errno.h>
 #include <attr/asm/attributes.h>
-INTERN ATTR_SECTION(".text.crt.libattr") int
+INTERN ATTR_SECTION(".text.crt.libattr") ATTR_INOUTS(2, 3) int
 NOTHROW_NCX(LIBCCALL libc_attr_multif)(fd_t fd,
                                        struct attr_multiop *oplist,
                                        int count,
