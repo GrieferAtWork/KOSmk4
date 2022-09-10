@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4831524 */
+/* HASH CRC-32:0xd30865c4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1091,6 +1091,18 @@
 #define __CRT_HAVE_DOS$atoi
 #define __CRT_HAVE_DOS$atol
 #define __CRT_HAVE_DOS$atoll
+#define __CRT_HAVE_DOS$attr_copy_action
+#define __CRT_HAVE_DOS$attr_copy_check_permissions
+#define __CRT_HAVE_DOS$attr_get
+#define __CRT_HAVE_DOS$attr_getf
+#define __CRT_HAVE_DOS$attr_list
+#define __CRT_HAVE_DOS$attr_listf
+#define __CRT_HAVE_DOS$attr_multi
+#define __CRT_HAVE_DOS$attr_multif
+#define __CRT_HAVE_DOS$attr_remove
+#define __CRT_HAVE_DOS$attr_removef
+#define __CRT_HAVE_DOS$attr_set
+#define __CRT_HAVE_DOS$attr_setf
 #define __CRT_HAVE_DOS$b64_ntop
 #define __CRT_HAVE_DOS$b64_pton
 #define __CRT_HAVE_DOS$backtrace
@@ -5329,6 +5341,20 @@
 #define __CRT_HAVE_atoi
 #define __CRT_HAVE_atol
 #define __CRT_HAVE_atoll
+#define __CRT_HAVE_attr_copy_action
+#define __CRT_HAVE_attr_copy_check_permissions
+#define __CRT_HAVE_attr_copy_fd
+#define __CRT_HAVE_attr_copy_file
+#define __CRT_HAVE_attr_get
+#define __CRT_HAVE_attr_getf
+#define __CRT_HAVE_attr_list
+#define __CRT_HAVE_attr_listf
+#define __CRT_HAVE_attr_multi
+#define __CRT_HAVE_attr_multif
+#define __CRT_HAVE_attr_remove
+#define __CRT_HAVE_attr_removef
+#define __CRT_HAVE_attr_set
+#define __CRT_HAVE_attr_setf
 #define __CRT_HAVE_b64_ntop
 #define __CRT_HAVE_b64_pton
 #define __CRT_HAVE_backtrace

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd815fdf */
+/* HASH CRC-32:0x397387cf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -133,6 +133,22 @@ DEFINE_PUBLIC_ALIAS(DOS$ns_makecanon, libd_ns_makecanon);
 DEFINE_PUBLIC_ALIAS(DOS$ns_samename, libd_ns_samename);
 DEFINE_PUBLIC_ALIAS(DOS$__dn_comp, libd_dn_comp);
 DEFINE_PUBLIC_ALIAS(DOS$dn_comp, libd_dn_comp);
+
+/* attr.attributes */
+DEFINE_PUBLIC_ALIAS(DOS$attr_get, libd_attr_get);
+DEFINE_PUBLIC_ALIAS(DOS$attr_getf, libd_attr_getf);
+DEFINE_PUBLIC_ALIAS(DOS$attr_set, libd_attr_set);
+DEFINE_PUBLIC_ALIAS(DOS$attr_setf, libd_attr_setf);
+DEFINE_PUBLIC_ALIAS(DOS$attr_remove, libd_attr_remove);
+DEFINE_PUBLIC_ALIAS(DOS$attr_removef, libd_attr_removef);
+DEFINE_PUBLIC_ALIAS(DOS$attr_list, libd_attr_list);
+DEFINE_PUBLIC_ALIAS(DOS$attr_listf, libd_attr_listf);
+DEFINE_PUBLIC_ALIAS(DOS$attr_multi, libd_attr_multi);
+DEFINE_PUBLIC_ALIAS(DOS$attr_multif, libd_attr_multif);
+
+/* attr.libattr */
+DEFINE_PUBLIC_ALIAS(DOS$attr_copy_check_permissions, libd_attr_copy_check_permissions);
+DEFINE_PUBLIC_ALIAS(DOS$attr_copy_action, libd_attr_copy_action);
 
 /* complex */
 DEFINE_PUBLIC_ALIAS(DOS$cabsf, libd_cabsf);

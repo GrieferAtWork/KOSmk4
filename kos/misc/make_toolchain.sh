@@ -931,6 +931,19 @@ Cflags:
 Libs: -lpciaccess
 EOF
 
+install_cat_file "$PREFIX/opt/pkg_config/libattr.pc" <<EOF
+prefix=/
+exec_prefix=/
+libdir="$KOS_ROOT/bin/$NAME/$BINLIBDIRNAME"
+includedir="$KOS_ROOT/kos/include"
+
+Name: libattr
+Description: A library for filesystem extended attribute support
+Version: 2.5.1
+Cflags:
+Libs: -lc
+EOF
+
 
 # In order to ensure consistency and make certain that the libiconv
 # git submodule always includes up-to-date versions of its own headers

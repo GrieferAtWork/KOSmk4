@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8d033914 */
+/* HASH CRC-32:0xfb039b08 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -154,6 +154,22 @@ DEFINE_INTERN_ALIAS(libd_dn_comp, libd_ns_name_compress);
 #else /* __SIZEOF_INT__ == __SIZEOF_SIZE_T__ */
 DFUN(".text.crt.dos.net.nameser", libd_dn_comp, libc_dn_comp, TD, 5, TP, TP, TD, TP, TP)
 #endif /* __SIZEOF_INT__ != __SIZEOF_SIZE_T__ */
+
+/* attr.attributes */
+DFUN(".text.crt.dos.libattr", libd_attr_get, libc_attr_get, TD, 5, TP, TP, TP, TP, TD)
+DFUN(".text.crt.dos.libattr", libd_attr_getf, libc_attr_getf, TD, 5, TIn(__SIZEOF_FD_T__), TP, TP, TP, TD)
+DFUN(".text.crt.dos.libattr", libd_attr_set, libc_attr_set, TD, 5, TP, TP, TP, TD, TD)
+DFUN(".text.crt.dos.libattr", libd_attr_setf, libc_attr_setf, TD, 5, TIn(__SIZEOF_FD_T__), TP, TP, TD, TD)
+DFUN(".text.crt.dos.libattr", libd_attr_remove, libc_attr_remove, TD, 3, TP, TP, TD)
+DFUN(".text.crt.dos.libattr", libd_attr_removef, libc_attr_removef, TD, 3, TIn(__SIZEOF_FD_T__), TP, TD)
+DFUN(".text.crt.dos.libattr", libd_attr_list, libc_attr_list, TD, 5, TP, TP, TD, TD, TP)
+DFUN(".text.crt.dos.libattr", libd_attr_listf, libc_attr_listf, TD, 5, TIn(__SIZEOF_FD_T__), TP, TD, TD, TP)
+DFUN(".text.crt.dos.libattr", libd_attr_multi, libc_attr_multi, TD, 4, TP, TP, TD, TD)
+DFUN(".text.crt.dos.libattr", libd_attr_multif, libc_attr_multif, TD, 4, TIn(__SIZEOF_FD_T__), TP, TD, TD)
+
+/* attr.libattr */
+DFUN(".text.crt.dos.libattr", libd_attr_copy_check_permissions, libc_attr_copy_check_permissions, TD, 2, TP, TP)
+DFUN(".text.crt.dos.libattr", libd_attr_copy_action, libc_attr_copy_action, TD, 2, TP, TP)
 
 /* complex */
 DFUN(".text.crt.dos.math.complex", libd_cabsf, libc_cabsf, TF, 1, TCF)
