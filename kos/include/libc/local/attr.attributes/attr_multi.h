@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b368870 */
+/* HASH CRC-32:0x88641921 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,12 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(attr_multi) __ATTR_IN(1) __ATTR_INOUTS(2, 3) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(attr_multi))(char const *__path, struct attr_multiop *__oplist, int __count, int __flags) {
 	int __i, __result = 0;
-	if __unlikely(__flags & ~__ATTR_DONTFOLLOW) {
+	if (__unlikely(__flags & ~__ATTR_DONTFOLLOW) ||
+	    __unlikely(__count < 0)
+#ifdef __ATTR_MAX_MULTIOPS
+	    || __unlikely(__count > __ATTR_MAX_MULTIOPS)
+#endif /* __ATTR_MAX_MULTIOPS */
+	    ) {
 #ifdef __EINVAL
 		return __libc_seterrno(__EINVAL);
 #else /* __EINVAL */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x994e901c */
+/* HASH CRC-32:0xa6339a7a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,13 +32,22 @@ DECL_BEGIN
 #include <attr/bits/attributes.h>
 #include <libc/errno.h>
 #include <attr/asm/attributes.h>
+/* >> attr_multi(3), attr_multif(3)
+ * @param: flags: Set of `0 | ATTR_DONTFOLLOW'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.libattr") ATTR_IN(1) ATTR_INOUTS(2, 3) int
 NOTHROW_NCX(LIBCCALL libc_attr_multi)(char const *path,
                                       struct attr_multiop *oplist,
                                       int count,
                                       int flags) {
 	int i, result = 0;
-	if unlikely(flags & ~ATTR_DONTFOLLOW) {
+	if (unlikely(flags & ~ATTR_DONTFOLLOW) ||
+	    unlikely(count < 0)
+#ifdef ATTR_MAX_MULTIOPS
+	    || unlikely(count > ATTR_MAX_MULTIOPS)
+#endif /* ATTR_MAX_MULTIOPS */
+	    ) {
 
 		return __libc_seterrno(EINVAL);
 
@@ -86,13 +95,22 @@ NOTHROW_NCX(LIBCCALL libc_attr_multi)(char const *path,
 #include <attr/bits/attributes.h>
 #include <libc/errno.h>
 #include <attr/asm/attributes.h>
+/* >> attr_multi(3), attr_multif(3)
+ * @param: flags: Set of `0 | ATTR_DONTFOLLOW'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.libattr") ATTR_INOUTS(2, 3) int
 NOTHROW_NCX(LIBCCALL libc_attr_multif)(fd_t fd,
                                        struct attr_multiop *oplist,
                                        int count,
                                        int flags) {
 	int i, result = 0;
-	if unlikely(flags & ~ATTR_DONTFOLLOW) {
+	if (unlikely(flags & ~ATTR_DONTFOLLOW) ||
+	    unlikely(count < 0)
+#ifdef ATTR_MAX_MULTIOPS
+	    || unlikely(count > ATTR_MAX_MULTIOPS)
+#endif /* ATTR_MAX_MULTIOPS */
+	    ) {
 
 		return __libc_seterrno(EINVAL);
 
@@ -134,6 +152,7 @@ NOTHROW_NCX(LIBCCALL libc_attr_multif)(fd_t fd,
 
 			break;
 		}
+		ent->am_error = __libc_geterrno_or(0);
 	}
 	return result;
 }

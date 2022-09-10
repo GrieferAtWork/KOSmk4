@@ -27,8 +27,12 @@
 
 DECL_BEGIN
 
-/*[[[head:libc_attr_get,hash:CRC-32=0x90fe37a9]]]*/
-INTERN ATTR_SECTION(".text.crt.libattr") ATTR_DEPRECATED("Use getxattr(2) or lgetxattr(2) instead") ATTR_IN(1) ATTR_IN(2) ATTR_INOUT(4) int
+/*[[[head:libc_attr_get,hash:CRC-32=0x8fc8615c]]]*/
+/* >> attr_get(3), attr_getf(3)
+ * @param: flags: Set of `0 | ATTR_DONTFOLLOW | ATTR_SECURE | ATTR_ROOT'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTERN ATTR_SECTION(".text.crt.libattr") ATTR_DEPRECATED("Use `getxattr(2)\' or `lgetxattr(2)\' instead") ATTR_IN(1) ATTR_IN(2) ATTR_INOUT(4) int
 NOTHROW_NCX(LIBCCALL libc_attr_get)(char const *path,
                                     char const *attrname,
                                     char *attrvalue,
@@ -46,8 +50,12 @@ NOTHROW_NCX(LIBCCALL libc_attr_get)(char const *path,
 }
 /*[[[end:libc_attr_get]]]*/
 
-/*[[[head:libc_attr_getf,hash:CRC-32=0x2e08306a]]]*/
-INTERN ATTR_SECTION(".text.crt.libattr") ATTR_DEPRECATED("Use fgetxattr(2) instead") ATTR_IN(2) ATTR_INOUT(4) int
+/*[[[head:libc_attr_getf,hash:CRC-32=0x64563c0d]]]*/
+/* >> attr_get(3), attr_getf(3)
+ * @param: flags: Set of `0 | ATTR_DONTFOLLOW | ATTR_SECURE | ATTR_ROOT'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTERN ATTR_SECTION(".text.crt.libattr") ATTR_DEPRECATED("Use `fgetxattr(2)\' instead") ATTR_IN(2) ATTR_INOUT(4) int
 NOTHROW_NCX(LIBCCALL libc_attr_getf)(fd_t fd,
                                      char const *attrname,
                                      char *attrvalue,
@@ -65,8 +73,12 @@ NOTHROW_NCX(LIBCCALL libc_attr_getf)(fd_t fd,
 }
 /*[[[end:libc_attr_getf]]]*/
 
-/*[[[head:libc_attr_set,hash:CRC-32=0xddd41761]]]*/
-INTERN ATTR_SECTION(".text.crt.libattr") ATTR_DEPRECATED("Use setxattr(2) or lsetxattr(2) instead") ATTR_IN(1) ATTR_IN(2) ATTR_INS(3, 4) int
+/*[[[head:libc_attr_set,hash:CRC-32=0x427f1f66]]]*/
+/* >> attr_set(3), attr_setf(3)
+ * @param: flags: Set of `0 | ATTR_DONTFOLLOW | ATTR_CREATE | ATTR_REPLACE | ATTR_SECURE | ATTR_ROOT'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTERN ATTR_SECTION(".text.crt.libattr") ATTR_DEPRECATED("Use `setxattr(2)\' or `lsetxattr(2)\' instead") ATTR_IN(1) ATTR_IN(2) ATTR_INS(3, 4) int
 NOTHROW_NCX(LIBCCALL libc_attr_set)(char const *path,
                                     char const *attrname,
                                     char const *attrvalue,
@@ -84,8 +96,12 @@ NOTHROW_NCX(LIBCCALL libc_attr_set)(char const *path,
 }
 /*[[[end:libc_attr_set]]]*/
 
-/*[[[head:libc_attr_setf,hash:CRC-32=0xbc54590]]]*/
-INTERN ATTR_SECTION(".text.crt.libattr") ATTR_DEPRECATED("Use fsetxattr(2) instead") ATTR_IN(2) ATTR_INS(3, 4) int
+/*[[[head:libc_attr_setf,hash:CRC-32=0x116b2f2c]]]*/
+/* >> attr_set(3), attr_setf(3)
+ * @param: flags: Set of `0 | ATTR_DONTFOLLOW | ATTR_CREATE | ATTR_REPLACE | ATTR_SECURE | ATTR_ROOT'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTERN ATTR_SECTION(".text.crt.libattr") ATTR_DEPRECATED("Use `fsetxattr(2)\' instead") ATTR_IN(2) ATTR_INS(3, 4) int
 NOTHROW_NCX(LIBCCALL libc_attr_setf)(fd_t fd,
                                      char const *attrname,
                                      char const *attrvalue,
@@ -103,8 +119,12 @@ NOTHROW_NCX(LIBCCALL libc_attr_setf)(fd_t fd,
 }
 /*[[[end:libc_attr_setf]]]*/
 
-/*[[[head:libc_attr_remove,hash:CRC-32=0x3b886ca0]]]*/
-INTERN ATTR_SECTION(".text.crt.libattr") ATTR_DEPRECATED("Use removexattr(2) or lremovexattr(2) instead") ATTR_IN(1) ATTR_IN(2) int
+/*[[[head:libc_attr_remove,hash:CRC-32=0x8d639be0]]]*/
+/* >> attr_remove(3), attr_removef(3)
+ * @param: flags: Set of `0 | ATTR_DONTFOLLOW | ATTR_SECURE | ATTR_ROOT'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTERN ATTR_SECTION(".text.crt.libattr") ATTR_DEPRECATED("Use `removexattr(2)\' or `lremovexattr(2)\' instead") ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc_attr_remove)(char const *path,
                                        char const *attrname,
                                        int flags)
@@ -118,8 +138,12 @@ NOTHROW_NCX(LIBCCALL libc_attr_remove)(char const *path,
 }
 /*[[[end:libc_attr_remove]]]*/
 
-/*[[[head:libc_attr_removef,hash:CRC-32=0x1d52dfc8]]]*/
-INTERN ATTR_SECTION(".text.crt.libattr") ATTR_DEPRECATED("Use fremovexattr(2) instead") ATTR_IN(2) int
+/*[[[head:libc_attr_removef,hash:CRC-32=0xd41972bd]]]*/
+/* >> attr_remove(3), attr_removef(3)
+ * @param: flags: Set of `0 | ATTR_DONTFOLLOW | ATTR_SECURE | ATTR_ROOT'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTERN ATTR_SECTION(".text.crt.libattr") ATTR_DEPRECATED("Use `fremovexattr(2)\' instead") ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc_attr_removef)(fd_t fd,
                                         char const *attrname,
                                         int flags)
@@ -133,8 +157,12 @@ NOTHROW_NCX(LIBCCALL libc_attr_removef)(fd_t fd,
 }
 /*[[[end:libc_attr_removef]]]*/
 
-/*[[[head:libc_attr_list,hash:CRC-32=0xf94ca3d5]]]*/
-INTERN ATTR_SECTION(".text.crt.libattr") ATTR_DEPRECATED("Use listxattr(2) or llistxattr(2) instead") ATTR_IN(1) ATTR_INOUT(5) ATTR_OUTS(2, 3) int
+/*[[[head:libc_attr_list,hash:CRC-32=0xf11a0a1e]]]*/
+/* >> attr_list(3), attr_listf(3)
+ * @param: flags: Set of `0 | ATTR_DONTFOLLOW | ATTR_SECURE | ATTR_ROOT'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTERN ATTR_SECTION(".text.crt.libattr") ATTR_DEPRECATED("Use `listxattr(2)\' or `llistxattr(2)\' instead") ATTR_IN(1) ATTR_INOUT(5) ATTR_OUTS(2, 3) int
 NOTHROW_NCX(LIBCCALL libc_attr_list)(char const *path,
                                      char *buffer,
                                      int buffersize,
@@ -152,8 +180,12 @@ NOTHROW_NCX(LIBCCALL libc_attr_list)(char const *path,
 }
 /*[[[end:libc_attr_list]]]*/
 
-/*[[[head:libc_attr_listf,hash:CRC-32=0x5cde56d]]]*/
-INTERN ATTR_SECTION(".text.crt.libattr") ATTR_DEPRECATED("Use flistxattr(2) instead") ATTR_INOUT(5) ATTR_OUTS(2, 3) int
+/*[[[head:libc_attr_listf,hash:CRC-32=0x9304bf65]]]*/
+/* >> attr_list(3), attr_listf(3)
+ * @param: flags: Set of `0 | ATTR_DONTFOLLOW | ATTR_SECURE | ATTR_ROOT'
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTERN ATTR_SECTION(".text.crt.libattr") ATTR_DEPRECATED("Use `flistxattr(2)\' instead") ATTR_INOUT(5) ATTR_OUTS(2, 3) int
 NOTHROW_NCX(LIBCCALL libc_attr_listf)(fd_t fd,
                                       char *buffer,
                                       int buffersize,

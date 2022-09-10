@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f4cb00b */
+/* HASH CRC-32:0xe3e61fea */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,12 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(attr_multif) __ATTR_INOUTS(2, 3) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(attr_multif))(__fd_t __fd, struct attr_multiop *__oplist, int __count, int __flags) {
 	int __i, __result = 0;
-	if __unlikely(__flags & ~__ATTR_DONTFOLLOW) {
+	if (__unlikely(__flags & ~__ATTR_DONTFOLLOW) ||
+	    __unlikely(__count < 0)
+#ifdef __ATTR_MAX_MULTIOPS
+	    || __unlikely(__count > __ATTR_MAX_MULTIOPS)
+#endif /* __ATTR_MAX_MULTIOPS */
+	    ) {
 #ifdef __EINVAL
 		return __libc_seterrno(__EINVAL);
 #else /* __EINVAL */
@@ -86,6 +91,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(attr_multif))(__fd_t __fd, struct att
 #endif /* !__EINVAL */
 			break;
 		}
+		__ent->am_error = __libc_geterrno_or(0);
 	}
 	return __result;
 }

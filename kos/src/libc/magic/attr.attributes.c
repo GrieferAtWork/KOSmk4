@@ -47,45 +47,45 @@
 #define ENOATTR ENODATA
 #endif /* !ENOATTR && ENODATA */
 
-/* ??? */
+/* Max size for attribute values */
 #if !defined(ATTR_MAX_VALUELEN) && defined(__ATTR_MAX_VALUELEN)
-#define ATTR_MAX_VALUELEN __ATTR_MAX_VALUELEN /* ??? */
+#define ATTR_MAX_VALUELEN __ATTR_MAX_VALUELEN /* Max size for attribute values */
 #endif /* !ATTR_MAX_VALUELEN && __ATTR_MAX_VALUELEN */
 
-/* ??? */
+/* Possible values for the `flags' arguments of functions from `<attr/attributes.h>' */
 #if !defined(ATTR_DONTFOLLOW) && defined(__ATTR_DONTFOLLOW)
-#define ATTR_DONTFOLLOW __ATTR_DONTFOLLOW /* ??? */
+#define ATTR_DONTFOLLOW __ATTR_DONTFOLLOW /* Don't follow symbolic links */
 #endif /* !ATTR_DONTFOLLOW && __ATTR_DONTFOLLOW */
 #if !defined(ATTR_ROOT) && defined(__ATTR_ROOT)
-#define ATTR_ROOT __ATTR_ROOT /* ??? */
+#define ATTR_ROOT __ATTR_ROOT /* Prefix attribute names with "trusted." or "xfsroot." (else: ATTR_SECURE) */
 #endif /* !ATTR_ROOT && __ATTR_ROOT */
 #if !defined(ATTR_TRUST) && defined(__ATTR_TRUST)
-#define ATTR_TRUST __ATTR_TRUST /* ??? */
+#define ATTR_TRUST __ATTR_TRUST /* Ignored... */
 #endif /* !ATTR_TRUST && __ATTR_TRUST */
 #if !defined(ATTR_SECURE) && defined(__ATTR_SECURE)
-#define ATTR_SECURE __ATTR_SECURE /* ??? */
+#define ATTR_SECURE __ATTR_SECURE /* Prefix attribute names with "security." (else: prefix with "user.") */
 #endif /* !ATTR_SECURE && __ATTR_SECURE */
 #if !defined(ATTR_CREATE) && defined(__ATTR_CREATE)
-#define ATTR_CREATE __ATTR_CREATE /* ??? */
+#define ATTR_CREATE __ATTR_CREATE /* Create new attribute, fail if attribute already exists (s.a. `XATTR_CREATE') */
 #endif /* !ATTR_CREATE && __ATTR_CREATE */
 #if !defined(ATTR_REPLACE) && defined(__ATTR_REPLACE)
-#define ATTR_REPLACE __ATTR_REPLACE /* ??? */
+#define ATTR_REPLACE __ATTR_REPLACE /* Replace existing attribute, fail if attribute doesn't already exists (s.a. `XATTR_REPLACE') */
 #endif /* !ATTR_REPLACE && __ATTR_REPLACE */
 
-/* ??? */
+/* Max allowed value for `attr_multi[f]::count' */
 #if !defined(ATTR_MAX_MULTIOPS) && defined(__ATTR_MAX_MULTIOPS)
-#define ATTR_MAX_MULTIOPS __ATTR_MAX_MULTIOPS /* ??? */
+#define ATTR_MAX_MULTIOPS __ATTR_MAX_MULTIOPS /* Max allowed value for `attr_multi[f]::count' */
 #endif /* !ATTR_MAX_MULTIOPS && __ATTR_MAX_MULTIOPS */
 
-/* ??? */
+/* Possible values for `struct attr_multiop::am_opcode' */
 #if !defined(ATTR_OP_GET) && defined(__ATTR_OP_GET)
-#define ATTR_OP_GET __ATTR_OP_GET /* ??? */
+#define ATTR_OP_GET __ATTR_OP_GET /* Perform a call to `attr_get(3)' or `attr_getf(3)' */
 #endif /* !ATTR_OP_GET && __ATTR_OP_GET */
 #if !defined(ATTR_OP_SET) && defined(__ATTR_OP_SET)
-#define ATTR_OP_SET __ATTR_OP_SET /* ??? */
+#define ATTR_OP_SET __ATTR_OP_SET /* Perform a call to `attr_set(3)' or `attr_setf(3)' */
 #endif /* !ATTR_OP_SET && __ATTR_OP_SET */
 #if !defined(ATTR_OP_REMOVE) && defined(__ATTR_OP_REMOVE)
-#define ATTR_OP_REMOVE __ATTR_OP_REMOVE /* ??? */
+#define ATTR_OP_REMOVE __ATTR_OP_REMOVE /* Perform a call to `attr_remove(3)' or `attr_removef(3)' */
 #endif /* !ATTR_OP_REMOVE && __ATTR_OP_REMOVE */
 
 #ifdef __CC__
@@ -101,60 +101,100 @@ typedef struct attr_multiop attr_multiop_t;
 
 }
 
-%[define_replacement(ATTR_MAX_VALUELEN = __ATTR_MAX_VALUELEN)]
-%[define_replacement(ATTR_DONTFOLLOW = __ATTR_DONTFOLLOW)]
-%[define_replacement(ATTR_ROOT = __ATTR_ROOT)]
-%[define_replacement(ATTR_TRUST = __ATTR_TRUST)]
-%[define_replacement(ATTR_SECURE = __ATTR_SECURE)]
-%[define_replacement(ATTR_CREATE = __ATTR_CREATE)]
-%[define_replacement(ATTR_REPLACE = __ATTR_REPLACE)]
-%[define_replacement(ATTR_MAX_MULTIOPS = __ATTR_MAX_MULTIOPS)]
-%[define_replacement(ATTR_OP_GET = __ATTR_OP_GET)]
-%[define_replacement(ATTR_OP_SET = __ATTR_OP_SET)]
-%[define_replacement(ATTR_OP_REMOVE = __ATTR_OP_REMOVE)]
+%[define_replacement(ATTR_MAX_VALUELEN = __ATTR_MAX_VALUELEN)] /* Max size for attribute values */
+%[define_replacement(ATTR_DONTFOLLOW = __ATTR_DONTFOLLOW)]     /* Don't follow symbolic links */
+%[define_replacement(ATTR_ROOT = __ATTR_ROOT)]                 /* Prefix attribute names with "trusted." or "xfsroot." (else: ATTR_SECURE) */
+%[define_replacement(ATTR_TRUST = __ATTR_TRUST)]               /* Ignored... */
+%[define_replacement(ATTR_SECURE = __ATTR_SECURE)]             /* Prefix attribute names with "security." (else: prefix with "user.") */
+%[define_replacement(ATTR_CREATE = __ATTR_CREATE)]             /* Create new attribute, fail if attribute already exists (s.a. `XATTR_CREATE') */
+%[define_replacement(ATTR_REPLACE = __ATTR_REPLACE)]           /* Replace existing attribute, fail if attribute doesn't already exists (s.a. `XATTR_REPLACE') */
+%[define_replacement(ATTR_MAX_MULTIOPS = __ATTR_MAX_MULTIOPS)] /* Max allowed value for `attr_multi[f]::count' */
+%[define_replacement(ATTR_OP_GET = __ATTR_OP_GET)]             /* Perform a call to `attr_get(3)' or `attr_getf(3)' */
+%[define_replacement(ATTR_OP_SET = __ATTR_OP_SET)]             /* Perform a call to `attr_set(3)' or `attr_setf(3)' */
+%[define_replacement(ATTR_OP_REMOVE = __ATTR_OP_REMOVE)]       /* Perform a call to `attr_remove(3)' or `attr_removef(3)' */
 
 
-[[deprecated("Use getxattr(2) or lgetxattr(2) instead")]]
+@@>> attr_get(3), attr_getf(3)
+@@@param: flags: Set of `0 | ATTR_DONTFOLLOW | ATTR_SECURE | ATTR_ROOT'
+@@@return: 0 : Success
+@@@return: -1: Error (s.a. `errno')
+[[deprecated("Use `getxattr(2)' or `lgetxattr(2)' instead")]]
 int attr_get([[in]] char const *path, [[in]] char const *attrname,
              [[out(*valuelength <= *valuelength)]] char *attrvalue,
              [[inout]] int *valuelength, int flags);
 
-[[deprecated("Use fgetxattr(2) instead")]]
+[[doc_alias("attr_get")]]
+[[deprecated("Use `fgetxattr(2)' instead")]]
 [[decl_include("<bits/types.h>")]]
 int attr_getf($fd_t fd, [[in]] char const *attrname,
               [[out(*valuelength <= *valuelength)]] char *attrvalue,
               [[inout]] int *valuelength, int flags);
 
-[[deprecated("Use setxattr(2) or lsetxattr(2) instead")]]
+
+
+
+
+@@>> attr_set(3), attr_setf(3)
+@@@param: flags: Set of `0 | ATTR_DONTFOLLOW | ATTR_CREATE | ATTR_REPLACE | ATTR_SECURE | ATTR_ROOT'
+@@@return: 0 : Success
+@@@return: -1: Error (s.a. `errno')
+[[deprecated("Use `setxattr(2)' or `lsetxattr(2)' instead")]]
 int attr_set([[in]] char const *path, [[in]] char const *attrname,
              [[in(valuelength)]] char const *attrvalue, int valuelength,
              int flags);
 
-[[deprecated("Use fsetxattr(2) instead")]]
+[[doc_alias("attr_set")]]
+[[deprecated("Use `fsetxattr(2)' instead")]]
 [[decl_include("<bits/types.h>")]]
 int attr_setf($fd_t fd, [[in]] char const *attrname,
               [[in(valuelength)]] char const *attrvalue, int valuelength,
               int flags);
 
-[[deprecated("Use removexattr(2) or lremovexattr(2) instead")]]
+
+
+
+
+@@>> attr_remove(3), attr_removef(3)
+@@@param: flags: Set of `0 | ATTR_DONTFOLLOW | ATTR_SECURE | ATTR_ROOT'
+@@@return: 0 : Success
+@@@return: -1: Error (s.a. `errno')
+[[deprecated("Use `removexattr(2)' or `lremovexattr(2)' instead")]]
 int attr_remove([[in]] char const *path, [[in]] char const *attrname, int flags);
 
-[[deprecated("Use fremovexattr(2) instead")]]
+[[doc_alias("attr_remove")]]
+[[deprecated("Use `fremovexattr(2)' instead")]]
 [[decl_include("<bits/types.h>")]]
 int attr_removef($fd_t fd, [[in]] char const *attrname, int flags);
 
-[[deprecated("Use listxattr(2) or llistxattr(2) instead")]]
+
+
+
+
+@@>> attr_list(3), attr_listf(3)
+@@@param: flags: Set of `0 | ATTR_DONTFOLLOW | ATTR_SECURE | ATTR_ROOT'
+@@@return: 0 : Success
+@@@return: -1: Error (s.a. `errno')
+[[deprecated("Use `listxattr(2)' or `llistxattr(2)' instead")]]
 [[decl_include("<attr/bits/attributes.h>")]]
 int attr_list([[in]] char const *path,
               [[out(? <= buffersize)]] char *buffer, int buffersize,
               int flags, [[inout]] struct attrlist_cursor *cursor);
 
-[[deprecated("Use flistxattr(2) instead")]]
+[[doc_alias("attr_list")]]
+[[deprecated("Use `flistxattr(2)' instead")]]
 [[decl_include("<bits/types.h>", "<attr/bits/attributes.h>")]]
 int attr_listf($fd_t fd,
                [[out(? <= buffersize)]] char *buffer, int buffersize,
                int flags, [[inout]] struct attrlist_cursor *cursor);
 
+
+
+
+
+@@>> attr_multi(3), attr_multif(3)
+@@@param: flags: Set of `0 | ATTR_DONTFOLLOW'
+@@@return: 0 : Success
+@@@return: -1: Error (s.a. `errno')
 [[deprecated("Use `getxattr(2)', `setxattr(2)' and `removexattr(2)' instead")]]
 [[decl_include("<attr/bits/attributes.h>")]]
 [[impl_include("<attr/bits/attributes.h>")]]
@@ -165,7 +205,12 @@ int attr_listf($fd_t fd,
            $has_function(attr_get, attr_set, attr_remove))]]
 int attr_multi([[in]] char const *path, [[inout(count)]] struct attr_multiop *oplist, int count, int flags) {
 	int i, result = 0;
-	if unlikely(flags & ~ATTR_DONTFOLLOW) {
+	if (unlikely(flags & ~ATTR_DONTFOLLOW) ||
+	    unlikely(count < 0)
+@@pp_ifdef ATTR_MAX_MULTIOPS@@
+	    || unlikely(count > ATTR_MAX_MULTIOPS)
+@@pp_endif@@
+	    ) {
 @@pp_ifdef EINVAL@@
 		return __libc_seterrno(EINVAL);
 @@pp_else@@
@@ -212,6 +257,7 @@ int attr_multi([[in]] char const *path, [[inout(count)]] struct attr_multiop *op
 }
 
 
+[[doc_alias("attr_multi")]]
 [[deprecated("Use `fgetxattr(2)', `fsetxattr(2)' and `fremovexattr(2)' instead")]]
 [[decl_include("<bits/types.h>", "<attr/bits/attributes.h>")]]
 [[impl_include("<attr/bits/attributes.h>")]]
@@ -222,7 +268,12 @@ int attr_multi([[in]] char const *path, [[inout(count)]] struct attr_multiop *op
            $has_function(attr_getf, attr_setf, attr_removef))]]
 int attr_multif($fd_t fd, [[inout(count)]] struct attr_multiop *oplist, int count, int flags) {
 	int i, result = 0;
-	if unlikely(flags & ~ATTR_DONTFOLLOW) {
+	if (unlikely(flags & ~ATTR_DONTFOLLOW) ||
+	    unlikely(count < 0)
+@@pp_ifdef ATTR_MAX_MULTIOPS@@
+	    || unlikely(count > ATTR_MAX_MULTIOPS)
+@@pp_endif@@
+	    ) {
 @@pp_ifdef EINVAL@@
 		return __libc_seterrno(EINVAL);
 @@pp_else@@
@@ -264,6 +315,7 @@ int attr_multif($fd_t fd, [[inout(count)]] struct attr_multiop *oplist, int coun
 @@pp_endif@@
 			break;
 		}
+		ent->@am_error@ = __libc_geterrno_or(0);
 	}
 	return result;
 }

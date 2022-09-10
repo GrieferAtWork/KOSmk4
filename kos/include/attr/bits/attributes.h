@@ -42,12 +42,12 @@ struct attrlist_cursor {
 };
 
 struct attr_multiop {
-	__INT32_TYPE__ am_opcode;    /* ??? */
-	__INT32_TYPE__ am_error;     /* ??? */
-	char          *am_attrname;  /* ??? */
-	char          *am_attrvalue; /* ??? */
-	__INT32_TYPE__ am_length;    /* ??? */
-	__INT32_TYPE__ am_flags;     /* ??? */
+	__INT32_TYPE__ am_opcode;    /* [in]  One of `ATTR_OP_GET', `ATTR_OP_SET' or `ATTR_OP_REMOVE' */
+	__INT32_TYPE__ am_error;     /* [out] errno after the operation */
+	char          *am_attrname;  /* [1..1][in] Attribute name */
+	char          *am_attrvalue; /* [0..am_length] Attribute value buffer ([out] for ATTR_OP_GET, [in] for ATTR_OP_SET, unused by ATTR_OP_REMOVE) */
+	__INT32_TYPE__ am_length;    /* [inout] Attribute value length (out only for `ATTR_OP_GET') */
+	__INT32_TYPE__ am_flags;     /* Set of `ATTR_*' from <attr/attributes.h> (based on `am_opcode') */
 };
 
 __DECL_END

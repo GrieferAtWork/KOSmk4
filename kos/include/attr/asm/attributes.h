@@ -22,23 +22,23 @@
 
 #include <__stdinc.h>
 
-/* ??? */
-#define __ATTR_MAX_VALUELEN (64 * 1024) /* ??? */
+/* Max size for attribute values */
+#define __ATTR_MAX_VALUELEN (64 * 1024) /* Max size for attribute values */
 
-/* ??? */
-#define __ATTR_DONTFOLLOW 0x0001 /* ??? */
-#define __ATTR_ROOT       0x0002 /* ??? */
-#define __ATTR_TRUST      0x0004 /* ??? */
-#define __ATTR_SECURE     0x0008 /* ??? */
-#define __ATTR_CREATE     0x0010 /* ??? */
-#define __ATTR_REPLACE    0x0020 /* ??? */
+/* Possible values for the `flags' arguments of functions from `<attr/attributes.h>' */
+#define __ATTR_DONTFOLLOW 0x0001 /* Don't follow symbolic links */
+#define __ATTR_ROOT       0x0002 /* Prefix attribute names with "trusted." or "xfsroot." (else: ATTR_SECURE) */
+#define __ATTR_TRUST      0x0004 /* Ignored... */
+#define __ATTR_SECURE     0x0008 /* Prefix attribute names with "security." (else: prefix with "user.") */
+#define __ATTR_CREATE     0x0010 /* Create new attribute, fail if attribute already exists (s.a. `XATTR_CREATE') */
+#define __ATTR_REPLACE    0x0020 /* Replace existing attribute, fail if attribute doesn't already exists (s.a. `XATTR_REPLACE') */
 
-/* ??? */
-#define __ATTR_MAX_MULTIOPS 128
+/* Max allowed value for `attr_multi[f]::count' */
+#define __ATTR_MAX_MULTIOPS 128 /* Max allowed value for `attr_multi[f]::count' */
 
-/* ??? */
-#define __ATTR_OP_GET    1 /* ??? */
-#define __ATTR_OP_SET    2 /* ??? */
-#define __ATTR_OP_REMOVE 3 /* ??? */
+/* Possible values for `struct attr_multiop::am_opcode' */
+#define __ATTR_OP_GET    1 /* Perform a call to `attr_get(3)' or `attr_getf(3)' */
+#define __ATTR_OP_SET    2 /* Perform a call to `attr_set(3)' or `attr_setf(3)' */
+#define __ATTR_OP_REMOVE 3 /* Perform a call to `attr_remove(3)' or `attr_removef(3)' */
 
 #endif /* !_ATTR_ASM_ATTRIBUTES_H */
