@@ -329,7 +329,12 @@ NOTHROW(LIBC_PTHREAD_MAIN_CC libc_pthread_main)(LIBC_PTHREAD_MAIN_ARGS) {
 		if (me->pt_cpuset != (cpu_set_t *)&me->pt_cpusetsize)
 			free(me->pt_cpuset);
 	}
+
+	/* Indicate that the process is no longer single-threaded */
 	COMPILER_BARRIER();
+	__libc_single_threaded = 0;
+	COMPILER_BARRIER();
+
 	TRY {
 		/* Invoke the thread-main function. */
 		me->pt_retval = (*start)(me->pt_retval);
@@ -450,7 +455,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
 	}
 
 	/* Indicate that the process is no longer single-threaded */
+	COMPILER_BARRIER();
 	__libc_single_threaded = 0;
+	COMPILER_BARRIER();
 
 	/* Create as detached; iow: detach after creation... */
 	if (attr->pa_flags & PTHREAD_ATTR_FLAG_DETACHSTATE)
