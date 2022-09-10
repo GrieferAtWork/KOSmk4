@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a4ba60b */
+/* HASH CRC-32:0x1077bacf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,18 +47,6 @@ INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_INOUT_OPT(4) int NOTHROW_NCX(LIBCCALL libc_att
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno' and `ctx') */
 INTDEF ATTR_INOUT_OPT(6) ATTR_IN_OPT(1) ATTR_IN_OPT(3) int NOTHROW_NCX(LIBCCALL libc_attr_copy_fd)(char const *src_path, fd_t src_fd, char const *dst_path, fd_t dst_fd, int (LIBKCALL *check)(char const *, struct error_context *), struct error_context *ctx);
-/* >> attr_copy_check_permissions(3)
- * Returns non-zero if `attr_name' should be preserved (default handler
- * for `check' argument  of `attr_copy_file(3)' and  `attr_copy_fd(3)')
- * Same as `attr_copy_action(attr_name, ctx) == 0'
- * @return: == 0 : `attr_name' should not be copied
- * @return: != 0 : `attr_name' should be copied */
-INTDEF ATTR_IN(1) ATTR_INOUT_OPT(2) int NOTHROW_NCX(LIBCCALL libc_attr_copy_check_permissions)(char const *attr_name, struct error_context *ctx);
-/* >> attr_copy_action(3)
- * Return the default action to-be taken for `attr_name'
- * @return: 0 : No special action
- * @return: * : One of `ATTR_ACTION_*' */
-INTDEF ATTR_IN(1) ATTR_INOUT_OPT(2) int NOTHROW_NCX(LIBCCALL libc_attr_copy_action)(char const *attr_name, struct error_context *ctx);
 #endif /* !__KERNEL__ */
 
 DECL_END

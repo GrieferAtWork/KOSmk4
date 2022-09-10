@@ -79,47 +79,11 @@ NOTHROW_NCX(LIBCCALL libc_attr_copy_fd)(char const *src_path,
 }
 /*[[[end:libc_attr_copy_fd]]]*/
 
-/*[[[head:libc_attr_copy_check_permissions,hash:CRC-32=0x38bd70a5]]]*/
-/* >> attr_copy_check_permissions(3)
- * Returns non-zero if `attr_name' should be preserved (default handler
- * for `check' argument  of `attr_copy_file(3)' and  `attr_copy_fd(3)')
- * Same as `attr_copy_action(attr_name, ctx) == 0'
- * @return: == 0 : `attr_name' should not be copied
- * @return: != 0 : `attr_name' should be copied */
-INTERN ATTR_SECTION(".text.crt.libattr") ATTR_IN(1) ATTR_INOUT_OPT(2) int
-NOTHROW_NCX(LIBCCALL libc_attr_copy_check_permissions)(char const *attr_name,
-                                                       struct error_context *ctx)
-/*[[[body:libc_attr_copy_check_permissions]]]*/
-/*AUTO*/{
-	(void)attr_name;
-	(void)ctx;
-	CRT_UNIMPLEMENTEDF("attr_copy_check_permissions(attr_name: %q, ctx: %p)", attr_name, ctx); /* TODO */
-	return libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_attr_copy_check_permissions]]]*/
 
-/*[[[head:libc_attr_copy_action,hash:CRC-32=0x47df179e]]]*/
-/* >> attr_copy_action(3)
- * Return the default action to-be taken for `attr_name'
- * @return: 0 : No special action
- * @return: * : One of `ATTR_ACTION_*' */
-INTERN ATTR_SECTION(".text.crt.libattr") ATTR_IN(1) ATTR_INOUT_OPT(2) int
-NOTHROW_NCX(LIBCCALL libc_attr_copy_action)(char const *attr_name,
-                                            struct error_context *ctx)
-/*[[[body:libc_attr_copy_action]]]*/
-/*AUTO*/{
-	(void)attr_name;
-	(void)ctx;
-	CRT_UNIMPLEMENTEDF("attr_copy_action(attr_name: %q, ctx: %p)", attr_name, ctx); /* TODO */
-	return libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_attr_copy_action]]]*/
 
-/*[[[start:exports,hash:CRC-32=0xc79bd740]]]*/
+/*[[[start:exports,hash:CRC-32=0x52cbbe8f]]]*/
 DEFINE_PUBLIC_ALIAS(attr_copy_file, libc_attr_copy_file);
 DEFINE_PUBLIC_ALIAS(attr_copy_fd, libc_attr_copy_fd);
-DEFINE_PUBLIC_ALIAS(attr_copy_check_permissions, libc_attr_copy_check_permissions);
-DEFINE_PUBLIC_ALIAS(attr_copy_action, libc_attr_copy_action);
 /*[[[end:exports]]]*/
 
 DECL_END

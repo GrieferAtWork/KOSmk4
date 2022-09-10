@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc24e32ac */
+/* HASH CRC-32:0x53ef6fea */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -103,8 +103,6 @@
 #define __stub_adjtimex
 #define __stub___adjtimex64
 #define __stub_adjtimex64
-#define __stub_attr_copy_action
-#define __stub_attr_copy_check_permissions
 #define __stub_attr_copy_fd
 #define __stub_attr_copy_file
 #define __stub_attr_get

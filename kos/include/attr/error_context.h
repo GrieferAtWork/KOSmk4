@@ -22,17 +22,18 @@
 #define _ATTR_ERROR_CONTEXT_H 1
 
 #include <__stdinc.h>
+#include <__crt.h>
 
 #ifdef __CC__
 __DECL_BEGIN
 
 struct error_context {
 	/* [0..1] Error message handler */
-	void (*error)(struct error_context *__ec, char const *__fmt, ...);
+	void (__LIBKCALL *error)(struct error_context *__ec, char const *__fmt, ...);
 	/* [0..1] Path quoting function */
-	char const *(*quote)(struct error_context *__ec, char const *__path);
+	char const *(__LIBKCALL *quote)(struct error_context *__ec, char const *__path);
 	/* [0..1] Release return value of `quote' */
-	void (*quote_free)(struct error_context *__ec, char const *__quoted_path);
+	void (__LIBKCALL *quote_free)(struct error_context *__ec, char const *__quoted_path);
 };
 
 #define __attr_error(ctx, ...) \

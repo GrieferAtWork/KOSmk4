@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b9f0fb7 */
+/* HASH CRC-32:0x76ac47bf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,18 +63,38 @@ __CDECLARE_OPT(__ATTR_IN(1) __ATTR_IN(2) __ATTR_INOUT_OPT(4),int,__NOTHROW_NCX,a
  * @return: 0 : Success
  * @return: -1: Error (s.a. `errno' and `ctx') */
 __CDECLARE_OPT(__ATTR_INOUT_OPT(6) __ATTR_IN_OPT(1) __ATTR_IN_OPT(3),int,__NOTHROW_NCX,attr_copy_fd,(char const *__src_path, __fd_t __src_fd, char const *__dst_path, __fd_t __dst_fd, int (__LIBKCALL *__check)(char const *, struct error_context *), struct error_context *__ctx),(__src_path,__src_fd,__dst_path,__dst_fd,__check,__ctx))
+#ifdef __CRT_HAVE_attr_copy_check_permissions
 /* >> attr_copy_check_permissions(3)
  * Returns non-zero if `attr_name' should be preserved (default handler
  * for `check' argument  of `attr_copy_file(3)' and  `attr_copy_fd(3)')
  * Same as `attr_copy_action(attr_name, ctx) == 0'
  * @return: == 0 : `attr_name' should not be copied
  * @return: != 0 : `attr_name' should be copied */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_INOUT_OPT(2),int,__NOTHROW_NCX,attr_copy_check_permissions,(char const *__attr_name, struct error_context *__ctx),(__attr_name,__ctx))
+__CDECLARE(__ATTR_IN(1) __ATTR_INOUT_OPT(2),int,__NOTHROW_NCX,attr_copy_check_permissions,(char const *__attr_name, struct error_context *__ctx),(__attr_name,__ctx))
+#else /* __CRT_HAVE_attr_copy_check_permissions */
+#include <libc/local/attr.libattr/attr_copy_check_permissions.h>
+/* >> attr_copy_check_permissions(3)
+ * Returns non-zero if `attr_name' should be preserved (default handler
+ * for `check' argument  of `attr_copy_file(3)' and  `attr_copy_fd(3)')
+ * Same as `attr_copy_action(attr_name, ctx) == 0'
+ * @return: == 0 : `attr_name' should not be copied
+ * @return: != 0 : `attr_name' should be copied */
+__NAMESPACE_LOCAL_USING_OR_IMPL(attr_copy_check_permissions, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_INOUT_OPT(2) int __NOTHROW_NCX(__LIBCCALL attr_copy_check_permissions)(char const *__attr_name, struct error_context *__ctx) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(attr_copy_check_permissions))(__attr_name, __ctx); })
+#endif /* !__CRT_HAVE_attr_copy_check_permissions */
+#ifdef __CRT_HAVE_attr_copy_action
 /* >> attr_copy_action(3)
  * Return the default action to-be taken for `attr_name'
  * @return: 0 : No special action
  * @return: * : One of `ATTR_ACTION_*' */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_INOUT_OPT(2),int,__NOTHROW_NCX,attr_copy_action,(char const *__attr_name, struct error_context *__ctx),(__attr_name,__ctx))
+__CDECLARE(__ATTR_IN(1) __ATTR_INOUT_OPT(2),int,__NOTHROW_NCX,attr_copy_action,(char const *__attr_name, struct error_context *__ctx),(__attr_name,__ctx))
+#else /* __CRT_HAVE_attr_copy_action */
+#include <libc/local/attr.libattr/attr_copy_action.h>
+/* >> attr_copy_action(3)
+ * Return the default action to-be taken for `attr_name'
+ * @return: 0 : No special action
+ * @return: * : One of `ATTR_ACTION_*' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(attr_copy_action, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_INOUT_OPT(2) int __NOTHROW_NCX(__LIBCCALL attr_copy_action)(char const *__attr_name, struct error_context *__ctx) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(attr_copy_action))(__attr_name, __ctx); })
+#endif /* !__CRT_HAVE_attr_copy_action */
 
 __SYSDECL_END
 #endif /* __CC__ */
