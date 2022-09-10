@@ -69,6 +69,7 @@ No affiliation exists between KOS and the following projects. This is merely the
 - [`Windows Kits`](https://docs.microsoft.com/en-us/windows-hardware/get-started/adk-install)
 - [`avr-libc`](http://download.savannah.gnu.org/releases/avr-libc/)
 - [`diet libc`](http://www.fefe.de/dietlibc/)
+- [`libattr`](http://download.savannah.nongnu.org/releases/attr/)
 - [`libbsd`](https://github.com/freedesktop/libbsd)
 - [`libc4/5`](http://archive.debian.org/debian/dists/Debian-0.93R6/source/devel/libc-4.6.27-6.tar.gz) (Seems mostly wiped off of the Internet at this point, but it you look long enough, you can still find it)
 - [`libc6`](https://pkgs.org/download/libc6)
