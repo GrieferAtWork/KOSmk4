@@ -173,6 +173,9 @@ __ice__
 # These headers are installed by `make_utility.sh ... libreadline`
 /kos/include/readline/
 
+# These headers are installed by `make_utility.sh ... bash`
+/kos/include/bash/
+
 # These headers are installed by X11-related programs/libraries
 /kos/include/X11/
 /kos/include/xcb/

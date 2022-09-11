@@ -1678,6 +1678,72 @@ $1=$2"
 					*samba_cv_HAVE_BROKEN_READDIR*)
 						_config_site_option "samba_cv_HAVE_BROKEN_READDIR" "no"; ;;
 
+					# bash
+					*bash_cv_sys_errlist*)
+						# This test is broken because it needlessly tries to `extern char *sys_errlist[];'
+						# (which fails because of how we `#define sys_errlist')
+						_config_site_option "bash_cv_sys_errlist" "yes"; ;;
+					*bash_cv_sys_siglist*)
+						_config_site_option "bash_cv_sys_siglist" "yes"; ;;
+					*bash_cv_under_sys_siglist*)
+						_config_site_option "bash_cv_under_sys_siglist" "yes"; ;;
+					*bash_cv_dup2_broken*)
+						_config_site_option "bash_cv_dup2_broken" "no"; ;;
+					*bash_cv_func_ctype_nonascii*)
+						_config_site_option "bash_cv_func_ctype_nonascii" "yes"; ;;
+					*bash_cv_printf_declared*)
+						_config_site_option "bash_cv_printf_declared" "yes"; ;;
+					*bash_cv_opendir_not_robust*)
+						_config_site_option "bash_cv_opendir_not_robust" "no"; ;;
+					*bash_cv_type_rlimit*)
+						_config_site_option "bash_cv_type_rlimit" "rlim_t"; ;;
+					*bash_cv_getenv_redef*) # Please don't redefine stuff from libc ~_~
+						_config_site_option "bash_cv_getenv_redef" "no"; ;;
+					*bash_cv_ulimit_maxfds*)
+						_config_site_option "bash_cv_ulimit_maxfds" "yes"; ;;
+					*bash_cv_getcwd_malloc*)
+						_config_site_option "bash_cv_getcwd_malloc" "yes"; ;;
+					*bash_cv_fnm_extmatch*)
+						_config_site_option "bash_cv_fnm_extmatch" "yes"; ;;
+					*bash_cv_func_sigsetjmp*)
+						_config_site_option "bash_cv_func_sigsetjmp" "present"; ;;
+					*bash_cv_func_strcoll_broken*)
+						_config_site_option "bash_cv_func_strcoll_broken" "no"; ;;
+					*bash_cv_printf_a_format*)
+						_config_site_option "bash_cv_printf_a_format" "yes"; ;;
+					*bash_cv_pgrp_pipe*)
+						_config_site_option "bash_cv_pgrp_pipe" "no"; ;;
+					*bash_cv_must_reinstall_sighandlers*)
+						_config_site_option "bash_cv_must_reinstall_sighandlers" "no"; ;;
+					*bash_cv_sys_named_pipes*)
+						_config_site_option "bash_cv_sys_named_pipes" "yes"; ;;
+					*bash_cv_unusable_rtsigs*)
+						_config_site_option "bash_cv_unusable_rtsigs" "no"; ;;
+					*bash_cv_wcwidth_broken*)
+						_config_site_option "bash_cv_wcwidth_broken" "no"; ;;
+					*ac_cv_rl_version*)
+						READLINE_VERSION="?"
+						while IFS= read -r readline_config_line; do
+							case "$readline_config_line" in
+							"Version: "*) READLINE_VERSION="${readline_config_line:9}"; ;;
+							"Version:"*)  READLINE_VERSION="${readline_config_line:8}"; ;;
+							*) ;;
+							esac
+						done < "$BINUTILS_SYSROOT/opt/pkg_config/readline.pc"
+						_config_site_option "ac_cv_rl_version" "$READLINE_VERSION"; ;;
+					*bash_cv_wcontinued_broken*)
+						_config_site_option "bash_cv_wcontinued_broken" "no"; ;;
+					*bash_cv_func_snprintf*)
+						_config_site_option "bash_cv_func_snprintf" "yes"; ;;
+					*bash_cv_func_vsnprintf*)
+						_config_site_option "bash_cv_func_vsnprintf" "yes"; ;;
+					*bash_cv_wexitstatus_offset*) # This "8" is the same 8 as in `__WEXITSTATUS` from <asm/os/kos/wait.h>
+						_config_site_option "bash_cv_wexitstatus_offset" "8"; ;;
+					*bash_cv_func_sbrk*)
+						_config_site_option "bash_cv_func_sbrk" "yes"; ;;
+					*bash_cv_fnmatch_equiv_fallback*) # TODO: Add support for this
+						_config_site_option "bash_cv_fnmatch_equiv_fallback" "no"; ;;
+
 					*) ;;
 					esac
 				done < "$SRCPATH/configure"
