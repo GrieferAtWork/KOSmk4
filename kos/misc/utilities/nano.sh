@@ -25,7 +25,7 @@ PACKAGE_URL="https://nano-editor.org/dist/v4/nano-4.4.tar.xz"
 # Additions configure options
 CONFIGURE=(
 	"--enable-largefile"
-	"--disable-threads"
+	"--disable-threads"   # Why? You're a single-threaded, single-user text editor...
 	"--enable-nls"
 	"--enable-browser"
 	"--enable-color"
@@ -70,3 +70,6 @@ PACKAGE_CCFLAGS="-D_TIME_T_BITS=64"
 
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"
+
+#TODO: Improve integration:
+# checking for glob_pattern_p... no
