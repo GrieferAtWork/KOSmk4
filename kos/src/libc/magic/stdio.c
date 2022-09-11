@@ -3956,10 +3956,20 @@ char const *fmtcheck([[in_opt]] char const *user_format,
 
 
 
+/* NOTE: Many systems expose `fpurge(3)' within the global namespace,
+ *       (only DragonFly exposes it  only under _BSD_SOURCE), but  we
+ *       also expose it under _GNU_SOURCE in order to improve compat,
+ *       since most 3rd party tools #define _GNU_SOURCE anyways. */
+%
+%#if defined(__USE_BSD) || defined(__USE_GNU)
+%[insert:guarded_function(fpurge = __fpurge)]
+%#endif /* __USE_BSD || __USE_GNU */
+
+
+
+
 %
 %#ifdef __USE_BSD
-%[insert:guarded_function(fpurge = __fpurge)]
-
 @@>> fgetln(3)
 @@A slightly more convenient (but way less portable) alternative to `fgets(3)'
 @@This function automatically malloc's a  buffer of sufficient length for  the
@@ -3978,7 +3988,6 @@ char const *fmtcheck([[in_opt]] char const *user_format,
 [[guard, wunused, decl_include("<hybrid/typecore.h>")]]
 char *fgetln([[inout]] $FILE *__restrict stream,
              [[out_opt]] $size_t *__restrict lenp);
-
 %#endif /* __USE_BSD */
 
 

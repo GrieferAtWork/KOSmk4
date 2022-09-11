@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5ded199 */
+/* HASH CRC-32:0x364d96bd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4880,7 +4880,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fmtcheck, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !__fmtcheck_defined */
 #endif /* __USE_NETBSD */
 
-#ifdef __USE_BSD
+#if defined(__USE_BSD) || defined(__USE_GNU)
 #ifndef __fpurge_defined
 #define __fpurge_defined
 #ifdef __CRT_HAVE___fpurge
@@ -4901,6 +4901,9 @@ __CDECLARE_VOID(,__NOTHROW_NCX,fpurge,(__FILE *__stream),(__stream))
 #undef __fpurge_defined
 #endif /* !... */
 #endif /* !__fpurge_defined */
+#endif /* __USE_BSD || __USE_GNU */
+
+#ifdef __USE_BSD
 #if !defined(__fgetln_defined) && defined(__CRT_HAVE_fgetln)
 #define __fgetln_defined
 /* >> fgetln(3)
