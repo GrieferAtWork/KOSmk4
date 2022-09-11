@@ -23,11 +23,14 @@
 #include "../__stdinc.h"
 #include "pp/__va_nargs.h"
 
-#define __hybrid_min_c2(a, b) ((a) < (b) ? (a) : (b))
-#define __hybrid_max_c2(a, b) ((b) < (a) ? (a) : (b))
-
-#if (defined(__DCC_VERSION__) || \
-     (__has_builtin(__builtin_min) && __has_builtin(__builtin_max)))
+#if (defined(__GNUC__) && defined(__cplusplus) && \
+     (defined(__INTELLISENSE__) || (__GCC_VERSION_NUM <= 30406 && __GCC_VERSION_NUM >= 29503)))
+/* https://gcc.gnu.org/onlinedocs/gcc-2.95.3/gcc_5.html#SEC107   (no earlier docs available) */
+/* https://gcc.gnu.org/onlinedocs/gcc-3.4.6/gcc/Min-and-Max.html (last version to document this extension) */
+#define __hybrid_min_c2(a, b) ((a) <? (b))
+#define __hybrid_max_c2(a, b) ((a) >? (b))
+#elif (defined(__DCC_VERSION__) || \
+       (__has_builtin(__builtin_min) && __has_builtin(__builtin_max)))
 #define __hybrid_min_r2 __builtin_min
 #define __hybrid_max_r2 __builtin_max
 #define __hybrid_min2   __builtin_min
@@ -47,6 +50,11 @@
 #define __hybrid_min2(a, b)   __XBLOCK({ __typeof__(a) __hmima_a = (a); __typeof__(b) __hmima_b = (b); __XRETURN __hmima_a < __hmima_b ? __hmima_a : __hmima_b; })
 #define __hybrid_max2(a, b)   __XBLOCK({ __typeof__(a) __hmima_a = (a); __typeof__(b) __hmima_b = (b); __XRETURN __hmima_b < __hmima_a ? __hmima_a : __hmima_b; })
 #endif /* ... */
+
+#ifndef __hybrid_min_c2
+#define __hybrid_min_c2(a, b) ((a) < (b) ? (a) : (b))
+#define __hybrid_max_c2(a, b) ((a) < (b) ? (b) : (a))
+#endif /* !NDEBUG */
 
 #ifndef __hybrid_min2
 #ifndef __hybrid_min_r2

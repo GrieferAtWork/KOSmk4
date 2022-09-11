@@ -22,6 +22,10 @@
 
 #include "__minmax.h"
 
+#undef MIN
+#undef MAX
+#undef MIN_C
+#undef MAX_C
 #define MIN   __hybrid_min
 #define MAX   __hybrid_max
 #define MIN_C __hybrid_min_c

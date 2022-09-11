@@ -38,13 +38,13 @@
 #define _SYS_PARAM_H 1
 
 #include <__stdinc.h>
+#include <features.h>
 
-#include <hybrid/minmax.h> /* MIN(), MAX() */
+#include <hybrid/__minmax.h>
 
 #include <asm/os/limits.h>
 #include <asm/pagesize.h>
 
-#include <features.h>
 #include <limits.h>
 
 #ifdef __USE_GLIBC
@@ -53,6 +53,17 @@
 #include <endian.h>
 #include <signal.h>
 #endif /* __USE_GLIBC */
+
+/* NOTE: This  differs from the version defined by <hybrid/minmax.h>,
+ *       in that this one can safely be used in constant expressions,
+ *       with the downside that it (may) evaluate its arguments  more
+ *       than once. */
+#ifndef MIN
+#define MIN(a, b) __hybrid_min_c2(a, b)
+#endif /* !MIN */
+#ifndef MAX
+#define MAX(a, b) __hybrid_max_c2(a, b)
+#endif /* !MAX */
 
 /* System memory page size */
 #if !defined(EXEC_PAGESIZE) && defined(__ARCH_PAGESIZE)
