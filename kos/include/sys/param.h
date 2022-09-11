@@ -177,10 +177,15 @@
 #define CANBSIZ MAX_CANON
 #endif /* !CANBSIZ && MAX_CANON */
 
-/* MAXPATHLEN: Alias for `PATH_MAX' */
-#if !defined(MAXPATHLEN) && defined(PATH_MAX)
+/* MAXPATHLEN: Alias for `PATH_MAX' (that still gets defined, even when `PATH_MAX' isn't).
+ *             If we don't define this one, bsdgames breaks. */
+#ifndef MAXPATHLEN
+#ifdef PATH_MAX
 #define MAXPATHLEN PATH_MAX
-#endif /* !MAXPATHLEN && PATH_MAX */
+#else /* PATH_MAX */
+#define MAXPATHLEN _POSIX_PATH_MAX
+#endif /* !PATH_MAX */
+#endif /* !MAXPATHLEN */
 
 /* NOFILE: Alias for `OPEN_MAX' */
 #if !defined(NOFILE) && defined(OPEN_MAX)
