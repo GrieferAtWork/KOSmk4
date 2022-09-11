@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Add some more integer helpers for bit inspection"
-DEEMON_VERSION="501496ccbeae929213328f7ef0905b7ba2c57be7"
+#     v -- "Fix missing include for `CHAR_BIT` in `int.c`"
+DEEMON_VERSION="03ce4102d577e39896c875ab87e0fba4c69292e3"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
