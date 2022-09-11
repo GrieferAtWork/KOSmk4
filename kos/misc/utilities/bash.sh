@@ -67,6 +67,14 @@ CONFIGURE=(
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"
 
+# Install some helper headers which bash didn't want to
+install_rawfile_stdin "$KOS_ROOT/kos/include/bash/stdc.h" <<EOF
+#include "include/stdc.h"
+EOF
+install_rawfile_stdin "$KOS_ROOT/kos/include/bash/builtins/stdc.h" <<EOF
+#include "../include/stdc.h"
+EOF
+
 
 #TODO: Improve integration:
 # checking for sys/pte.h... no

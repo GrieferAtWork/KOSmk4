@@ -2145,6 +2145,8 @@
 #define MPFR_DEPRECATED
 #define MPFR_RETURNS_NONNULL
 #define __MPC_DECLSPEC
+#define PARAMS(x) x
+#define INLINE
 
 
 

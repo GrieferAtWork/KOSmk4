@@ -1214,7 +1214,7 @@ handman_sethandflags(struct handman *__restrict self,
 		sig_broadcast(&self->hm_changed);
 	return omode;
 err_badfd:
-	handman_unlock_and_throw_invalid_handle(self, fd, false);
+	handman_unlock_and_throw_invalid_handle(self, fd, true);
 }
 PUBLIC NONNULL((1)) iomode_t FCALL
 handman_gethandflags(struct handman *__restrict self, fd_t fd)
