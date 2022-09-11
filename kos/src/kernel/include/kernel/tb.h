@@ -36,27 +36,27 @@ DECL_BEGIN
 FUNDEF NONNULL((1)) ssize_t FCALL print_traceback(__pformatprinter printer, void *arg, unsigned int n_skip DFL(0));
 FUNDEF NONNULL((1, 3)) ssize_t FCALL print_traceback_ucpustate(__pformatprinter printer, void *arg, struct ucpustate const *__restrict state, unsigned int n_skip DFL(0));
 #ifdef LCPUSTATE_ALIAS
-FUNDEF NONNULL((1, 3)) ssize_t FCALL print_traceback_lcpustate(__pformatprinter printer, void *arg, struct lcpustate const *__restrict state, unsigned int n_skip DFL(0)) __ASMNAME(LCPUSTATE_ALIAS_STR);
+FUNDEF NONNULL((1, 3)) ssize_t FCALL print_traceback_lcpustate(__pformatprinter printer, void *arg, struct lcpustate const *__restrict state, unsigned int n_skip DFL(0)) ASMNAME(LCPUSTATE_ALIAS_STR);
 #else /* LCPUSTATE_ALIAS */
 FUNDEF NONNULL((1, 3)) ssize_t FCALL print_traceback_lcpustate(__pformatprinter printer, void *arg, struct lcpustate const *__restrict state, unsigned int n_skip DFL(0));
 #endif /* !LCPUSTATE_ALIAS */
 #ifdef KCPUSTATE_ALIAS
-FUNDEF NONNULL((1, 3)) ssize_t FCALL print_traceback_kcpustate(__pformatprinter printer, void *arg, struct kcpustate const *__restrict state, unsigned int n_skip DFL(0)) __ASMNAME(KCPUSTATE_ALIAS_STR);
+FUNDEF NONNULL((1, 3)) ssize_t FCALL print_traceback_kcpustate(__pformatprinter printer, void *arg, struct kcpustate const *__restrict state, unsigned int n_skip DFL(0)) ASMNAME(KCPUSTATE_ALIAS_STR);
 #else /* KCPUSTATE_ALIAS */
 FUNDEF NONNULL((1, 3)) ssize_t FCALL print_traceback_kcpustate(__pformatprinter printer, void *arg, struct kcpustate const *__restrict state, unsigned int n_skip DFL(0));
 #endif /* !KCPUSTATE_ALIAS */
 #ifdef ICPUSTATE_ALIAS
-FUNDEF NONNULL((1, 3)) ssize_t FCALL print_traceback_icpustate(__pformatprinter printer, void *arg, struct icpustate const *__restrict state, unsigned int n_skip DFL(0)) __ASMNAME(ICPUSTATE_ALIAS_STR);
+FUNDEF NONNULL((1, 3)) ssize_t FCALL print_traceback_icpustate(__pformatprinter printer, void *arg, struct icpustate const *__restrict state, unsigned int n_skip DFL(0)) ASMNAME(ICPUSTATE_ALIAS_STR);
 #else /* ICPUSTATE_ALIAS */
 FUNDEF NONNULL((1, 3)) ssize_t FCALL print_traceback_icpustate(__pformatprinter printer, void *arg, struct icpustate const *__restrict state, unsigned int n_skip DFL(0));
 #endif /* !ICPUSTATE_ALIAS */
 #ifdef SCPUSTATE_ALIAS
-FUNDEF NONNULL((1, 3)) ssize_t FCALL print_traceback_scpustate(__pformatprinter printer, void *arg, struct scpustate const *__restrict state, unsigned int n_skip DFL(0)) __ASMNAME(SCPUSTATE_ALIAS_STR);
+FUNDEF NONNULL((1, 3)) ssize_t FCALL print_traceback_scpustate(__pformatprinter printer, void *arg, struct scpustate const *__restrict state, unsigned int n_skip DFL(0)) ASMNAME(SCPUSTATE_ALIAS_STR);
 #else /* SCPUSTATE_ALIAS */
 FUNDEF NONNULL((1, 3)) ssize_t FCALL print_traceback_scpustate(__pformatprinter printer, void *arg, struct scpustate const *__restrict state, unsigned int n_skip DFL(0));
 #endif /* !SCPUSTATE_ALIAS */
 #ifdef FCPUSTATE_ALIAS
-FUNDEF NONNULL((1, 3)) ssize_t FCALL print_traceback_fcpustate(__pformatprinter printer, void *arg, struct fcpustate const *__restrict state, unsigned int n_skip DFL(0)) __ASMNAME(FCPUSTATE_ALIAS_STR);
+FUNDEF NONNULL((1, 3)) ssize_t FCALL print_traceback_fcpustate(__pformatprinter printer, void *arg, struct fcpustate const *__restrict state, unsigned int n_skip DFL(0)) ASMNAME(FCPUSTATE_ALIAS_STR);
 #else /* FCPUSTATE_ALIAS */
 FUNDEF NONNULL((1, 3)) ssize_t FCALL print_traceback_fcpustate(__pformatprinter printer, void *arg, struct fcpustate const *__restrict state, unsigned int n_skip DFL(0));
 #endif /* !FCPUSTATE_ALIAS */

@@ -52,26 +52,26 @@ __NAMESPACE_INT_BEGIN
 	extern T (__atomic_or_fetch_##n)(T *__mptr, T, int __order);                     \
 	extern T (__atomic_nand_fetch_##n)(T *__mptr, T, int __order);
 #else /* __NO_ASMNAME */
-#define __HYBRID_DEFINE_LIBATOMIC_FUNCTIONS(T, n)                                                                    \
-	extern T (__hybrid_atomic_load_##n)(T *__mptr, int __order) __ASMNAME("__atomic_load_" #n);                      \
-	extern void (__hybrid_atomic_store_##n)(T *__mptr, T __val, int __order) __ASMNAME("__atomic_store_" #n);        \
-	extern T (__hybrid_atomic_exchange_##n)(T *__mptr, T __val, int __order) __ASMNAME("__atomic_exchange_" #n);     \
-	extern __BOOL (__hybrid_atomic_compare_exchange_##n)(T *__mptr, T *__expected,                                   \
-	                                                     T __newval, int __succ, int __fail)                         \
-			__ASMNAME("__atomic_compare_exchange_" #n);                                                              \
-	/*extern __BOOL (__hybrid_atomic_test_and_set_##n)(T *__mptr, int __order) __ASMNAME("__atomic_test_and_set_" #n);*/ \
-	extern T (__hybrid_atomic_fetch_add_##n)(T *__mptr, T, int __order) __ASMNAME("__atomic_fetch_add_" #n);         \
-	extern T (__hybrid_atomic_fetch_sub_##n)(T *__mptr, T, int __order) __ASMNAME("__atomic_fetch_sub_" #n);         \
-	extern T (__hybrid_atomic_fetch_and_##n)(T *__mptr, T, int __order) __ASMNAME("__atomic_fetch_and_" #n);         \
-	extern T (__hybrid_atomic_fetch_xor_##n)(T *__mptr, T, int __order) __ASMNAME("__atomic_fetch_xor_" #n);         \
-	extern T (__hybrid_atomic_fetch_or_##n)(T *__mptr, T, int __order) __ASMNAME("__atomic_fetch_or_" #n);           \
-	extern T (__hybrid_atomic_fetch_nand_##n)(T *__mptr, T, int __order) __ASMNAME("__atomic_fetch_nand_" #n);       \
-	extern T (__hybrid_atomic_add_fetch_##n)(T *__mptr, T, int __order) __ASMNAME("__atomic_add_fetch_" #n);         \
-	extern T (__hybrid_atomic_sub_fetch_##n)(T *__mptr, T, int __order) __ASMNAME("__atomic_sub_fetch_" #n);         \
-	extern T (__hybrid_atomic_and_fetch_##n)(T *__mptr, T, int __order) __ASMNAME("__atomic_and_fetch_" #n);         \
-	extern T (__hybrid_atomic_xor_fetch_##n)(T *__mptr, T, int __order) __ASMNAME("__atomic_xor_fetch_" #n);         \
-	extern T (__hybrid_atomic_or_fetch_##n)(T *__mptr, T, int __order) __ASMNAME("__atomic_or_fetch_" #n);           \
-	extern T (__hybrid_atomic_nand_fetch_##n)(T *__mptr, T, int __order) __ASMNAME("__atomic_nand_fetch_" #n);
+#define __HYBRID_DEFINE_LIBATOMIC_FUNCTIONS(T, n)                                                                                 \
+	extern T (__hybrid_atomic_load_##n)(T *__mptr, int __order) __COMPILER_ASMNAME("__atomic_load_" #n);                          \
+	extern void (__hybrid_atomic_store_##n)(T *__mptr, T __val, int __order) __COMPILER_ASMNAME("__atomic_store_" #n);            \
+	extern T (__hybrid_atomic_exchange_##n)(T *__mptr, T __val, int __order) __COMPILER_ASMNAME("__atomic_exchange_" #n);         \
+	extern __BOOL (__hybrid_atomic_compare_exchange_##n)(T *__mptr, T *__expected,                                                \
+	                                                     T __newval, int __succ, int __fail)                                      \
+			__COMPILER_ASMNAME("__atomic_compare_exchange_" #n);                                                                  \
+	/*extern __BOOL (__hybrid_atomic_test_and_set_##n)(T *__mptr, int __order) __COMPILER_ASMNAME("__atomic_test_and_set_" #n);*/ \
+	extern T (__hybrid_atomic_fetch_add_##n)(T *__mptr, T, int __order) __COMPILER_ASMNAME("__atomic_fetch_add_" #n);             \
+	extern T (__hybrid_atomic_fetch_sub_##n)(T *__mptr, T, int __order) __COMPILER_ASMNAME("__atomic_fetch_sub_" #n);             \
+	extern T (__hybrid_atomic_fetch_and_##n)(T *__mptr, T, int __order) __COMPILER_ASMNAME("__atomic_fetch_and_" #n);             \
+	extern T (__hybrid_atomic_fetch_xor_##n)(T *__mptr, T, int __order) __COMPILER_ASMNAME("__atomic_fetch_xor_" #n);             \
+	extern T (__hybrid_atomic_fetch_or_##n)(T *__mptr, T, int __order) __COMPILER_ASMNAME("__atomic_fetch_or_" #n);               \
+	extern T (__hybrid_atomic_fetch_nand_##n)(T *__mptr, T, int __order) __COMPILER_ASMNAME("__atomic_fetch_nand_" #n);           \
+	extern T (__hybrid_atomic_add_fetch_##n)(T *__mptr, T, int __order) __COMPILER_ASMNAME("__atomic_add_fetch_" #n);             \
+	extern T (__hybrid_atomic_sub_fetch_##n)(T *__mptr, T, int __order) __COMPILER_ASMNAME("__atomic_sub_fetch_" #n);             \
+	extern T (__hybrid_atomic_and_fetch_##n)(T *__mptr, T, int __order) __COMPILER_ASMNAME("__atomic_and_fetch_" #n);             \
+	extern T (__hybrid_atomic_xor_fetch_##n)(T *__mptr, T, int __order) __COMPILER_ASMNAME("__atomic_xor_fetch_" #n);             \
+	extern T (__hybrid_atomic_or_fetch_##n)(T *__mptr, T, int __order) __COMPILER_ASMNAME("__atomic_or_fetch_" #n);               \
+	extern T (__hybrid_atomic_nand_fetch_##n)(T *__mptr, T, int __order) __COMPILER_ASMNAME("__atomic_nand_fetch_" #n);
 #endif /* !__NO_ASMNAME */
 __HYBRID_DEFINE_LIBATOMIC_FUNCTIONS(__UINT8_TYPE__, 1)
 __HYBRID_DEFINE_LIBATOMIC_FUNCTIONS(__UINT16_TYPE__, 2)

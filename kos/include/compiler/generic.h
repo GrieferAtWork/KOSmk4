@@ -215,7 +215,7 @@
  * >>         ...
  * >>     } else {
  * >>         ...
- * >>         patch_storage(s, ad, type);  // <<<< This right here applies our `__ASMNAME',
+ * >>         patch_storage(s, ad, type);  // <<<< This right here applies our `__COMPILER_ASMNAME',
  * >>                                      //      but this only happens if the symbol already
  * >>                                      //      existed previously.
  * >>     }
@@ -223,10 +223,10 @@
  * >> } */
 #define __COMPILER_ASMNAME_ON_SECOND_DECL
 #endif /* __TINYC__ */
-#define __ASMNAME(x) __asm__(x)
+#define __COMPILER_ASMNAME(x) __asm__(x)
 #else /* __DCC_VERSION__ || __TINYC__ */
 #define __NO_ASMNAME
-#define __ASMNAME(x) /* Nothing */
+#define __COMPILER_ASMNAME(x) /* Nothing */
 #endif /* !__DCC_VERSION__ && !__TINYC__ */
 
 #ifndef __DCC_VERSION__

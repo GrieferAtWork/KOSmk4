@@ -883,7 +883,7 @@
 #define __DECL_SIMD_powl
 
 #define ASMNAME(x)
-#define __ASMNAME(x)
+#define __COMPILER_ASMNAME(x)
 #define __CASMNAME(x)
 #define __CASMNAME_SAME(x)
 #define __CASMNAME_KOS(x)

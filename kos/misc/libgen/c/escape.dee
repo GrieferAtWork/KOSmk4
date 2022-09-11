@@ -315,7 +315,7 @@ global partialKeywordEscapes: {string: string} = Dict({
 	"unlikely" : "__unlikely",
 	"DECL_BEGIN" : "__DECL_BEGIN",
 	"DECL_END" : "__DECL_END",
-	"ASMNAME" : "__ASMNAME",
+	"ASMNAME" : "__COMPILER_ASMNAME",
 	"XBLOCK" : "__XBLOCK",
 	"XRETURN" : "__XRETURN",
 	"NOTHROW" : "__NOTHROW",

@@ -147,7 +147,7 @@
 #define __attribute__(x) /* Nothing */
 
 #define __NO_ASMNAME
-#define __ASMNAME(x) /* Nothing */
+#define __COMPILER_ASMNAME(x) /* Nothing */
 
 #define __NO_ATTR_NOINLINE
 #define __ATTR_NOINLINE /* Nothing */

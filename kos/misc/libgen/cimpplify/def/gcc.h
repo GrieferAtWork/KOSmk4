@@ -71,7 +71,7 @@
 #define __COMPILER_HAVE_TRANSPARENT_STRUCT
 #define __COMPILER_HAVE_TRANSPARENT_UNION
 #define __COMPILER_HAVE_VARIABLE_LENGTH_ARRAYS
-#define __ASMNAME __asm__
+#define __COMPILER_ASMNAME __asm__
 
 #define __ATTR_NOINLINE __attribute__((__noinline__))
 #define   ATTR_NOINLINE __attribute__((__noinline__))

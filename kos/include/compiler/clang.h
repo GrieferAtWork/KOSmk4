@@ -131,7 +131,7 @@
 #define __STATIC_ASSERT_MSG(expr, msg) typedef int __PP_CAT2(__static_assert_, __LINE__)[(expr) ? 1 : -1]
 #endif /* !... */
 
-#define __ASMNAME(x) __asm__(x)
+#define __COMPILER_ASMNAME(x) __asm__(x)
 
 #if __has_attribute(__noinline__)
 #define __ATTR_NOINLINE __attribute__((__noinline__))

@@ -799,7 +799,7 @@ class FunctionPrototype {
 			fp << "extern \"C++\" {\n";
 			fp << "#endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */\n";
 		}
-		/* Same symbol name -> declare normally (or with `__ASMNAME()' suffix) */
+		/* Same symbol name -> declare normally (or with `__COMPILER_ASMNAME()' suffix) */
 		cprintDeclarationWithoutTerminator(fp, escapeMode, decl, exposedName,
 			hideDeprecationAttributes: hideDeprecationAttributes);
 		if (decl in LIBC_LINKAGE_DECLS) {
@@ -821,7 +821,7 @@ class FunctionPrototype {
 				fp << "_GCCNCX";
 			fp << suffix << "(" << repr(assemblyName) << ")";
 		} else if (!isSameAsname) {
-			fp << " __ASMNAME(" << repr(assemblyName) << ")";
+			fp << " __COMPILER_ASMNAME(" << repr(assemblyName) << ")";
 		}
 		fp << ";\n";
 		if (hasGccNCX) {

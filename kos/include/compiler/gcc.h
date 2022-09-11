@@ -296,9 +296,9 @@
 #endif /* !... */
 
 #if defined(__INTELLISENSE__) && !defined(__INTELLISENSE_GCC__)
-#define __ASMNAME(x) /* Nothing */
+#define __COMPILER_ASMNAME(x) /* Nothing */
 #else /* ... */
-#define __ASMNAME(x) __asm__(x)
+#define __COMPILER_ASMNAME(x) __asm__(x)
 #endif /* !... */
 
 #if __GCC_VERSION_NUM < 20700

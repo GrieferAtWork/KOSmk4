@@ -157,7 +157,7 @@
 #define DECL_END            __DECL_END
 /*#define SYSDECL_BEGIN     __SYSDECL_BEGIN * Not defined to discourage use in anything but system headers. */
 /*#define SYSDECL_END       __SYSDECL_END*/
-#define ASMNAME             __ASMNAME
+#define ASMNAME             __COMPILER_ASMNAME
 #define XBLOCK              __XBLOCK
 #define XRETURN             __XRETURN
 #define NOTHROW             __NOTHROW

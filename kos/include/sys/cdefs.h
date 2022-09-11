@@ -197,22 +197,22 @@
 #endif /* !__USER_LABEL_PREFIX_IS_EMPTY */
 
 #if !defined(__REDIRECT) && !defined(__NO_ASMNAME)
-#define __REDIRECT(name, proto, alias) name proto __ASMNAME(__ASMNAMESTR(#alias))
+#define __REDIRECT(name, proto, alias) name proto __COMPILER_ASMNAME(__ASMNAMESTR(#alias))
 #endif /* !__REDIRECT && !__NO_ASMNAME */
 
 #if !defined(__REDIRECT_NTH) && !defined(__NO_ASMNAME)
 #ifdef __cplusplus
-#define __REDIRECT_NTH(name, proto, alias) name proto __THROW __ASMNAME(__ASMNAMESTR(#alias))
+#define __REDIRECT_NTH(name, proto, alias) name proto __THROW __COMPILER_ASMNAME(__ASMNAMESTR(#alias))
 #else /* __cplusplus */
-#define __REDIRECT_NTH(name, proto, alias) name proto __ASMNAME(__ASMNAMESTR(#alias)) __THROW
+#define __REDIRECT_NTH(name, proto, alias) name proto __COMPILER_ASMNAME(__ASMNAMESTR(#alias)) __THROW
 #endif /* !__cplusplus */
 #endif /* !__REDIRECT_NTH && !__NO_ASMNAME */
 
 #if !defined(__REDIRECT_NTHNL) && !defined(__NO_ASMNAME)
 #ifdef __cplusplus
-#define __REDIRECT_NTHNL(name, proto, alias) name proto __THROWNL __ASMNAME(__ASMNAMESTR(#alias))
+#define __REDIRECT_NTHNL(name, proto, alias) name proto __THROWNL __COMPILER_ASMNAME(__ASMNAMESTR(#alias))
 #else /* __cplusplus */
-#define __REDIRECT_NTHNL(name, proto, alias) name proto __ASMNAME(__ASMNAMESTR(#alias)) __THROWNL
+#define __REDIRECT_NTHNL(name, proto, alias) name proto __COMPILER_ASMNAME(__ASMNAMESTR(#alias)) __THROWNL
 #endif /* !__cplusplus */
 #endif /* !__REDIRECT_NTHNL && !__NO_ASMNAME */
 
@@ -319,8 +319,8 @@
 #define __LDBL_REDIR(name, proto)               __LDBL_REDIR1(name, proto, __nldbl_##name)
 #define __LDBL_REDIR1_NTH(name, proto, alias)   __REDIRECT_NTH(name, proto, alias)
 #define __LDBL_REDIR_NTH(name, proto)           __LDBL_REDIR1_NTH(name, proto, __nldbl_##name)
-#define __LDBL_REDIR1_DECL(name, alias)         extern __typeof(name) name __asm(__ASMNAME(#alias));
-#define __LDBL_REDIR_DECL(name)                 extern __typeof(name) name __asm(__ASMNAME("__nldbl_" #name));
+#define __LDBL_REDIR1_DECL(name, alias)         extern __typeof(name) name __COMPILER_ASMNAME(__ASMNAMESTR(#alias));
+#define __LDBL_REDIR_DECL(name)                 extern __typeof(name) name __COMPILER_ASMNAME(__ASMNAMESTR("__nldbl_" #name));
 #define __REDIRECT_LDBL(name, proto, alias)     __LDBL_REDIR1(name, proto, __nldbl_##alias)
 #define __REDIRECT_NTH_LDBL(name, proto, alias) __LDBL_REDIR1_NTH(name, proto, __nldbl_##alias)
 #endif /* __REDIRECT */

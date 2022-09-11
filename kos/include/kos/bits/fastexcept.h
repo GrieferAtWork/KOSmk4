@@ -44,12 +44,13 @@ typedef __EXCEPT_REGISTER_STATE_TYPE except_register_state_t;
 #endif /* !__except_register_state_t_defined */
 
 struct exception_info;
-__PUBDEF /*ATTR_PERTASK*/ struct exception_info __arch_this_exception_info __ASMNAME("this_exception_info");
-__PUBDEF /*ATTR_PERTASK*/ struct exception_data __arch_this_exception_data __ASMNAME("this_exception_data");
-__PUBDEF /*ATTR_PERTASK*/ except_register_state_t __arch_this_exception_state __ASMNAME("this_exception_state");
-__PUBDEF /*ATTR_PERTASK*/ __except_code_t __arch_this_exception_code __ASMNAME("this_exception_code");
-__PUBDEF /*ATTR_PERTASK*/ __except_class_t __arch_this_exception_class __ASMNAME("this_exception_class");
-__PUBDEF /*ATTR_PERTASK*/ __except_subclass_t __arch_this_exception_subclass __ASMNAME("this_exception_subclass");
+struct exception_data;
+__COMPILER_SREDIRECT(__PUBDEF,/*ATTR_PERTASK*/,struct exception_info,__arch_this_exception_info,this_exception_info)
+__COMPILER_SREDIRECT(__PUBDEF,/*ATTR_PERTASK*/,struct exception_data,__arch_this_exception_data,this_exception_data)
+__COMPILER_SREDIRECT(__PUBDEF,/*ATTR_PERTASK*/,except_register_state_t,__arch_this_exception_state,this_exception_state)
+__COMPILER_SREDIRECT(__PUBDEF,/*ATTR_PERTASK*/,__except_code_t,__arch_this_exception_code,this_exception_code)
+__COMPILER_SREDIRECT(__PUBDEF,/*ATTR_PERTASK*/,__except_class_t,__arch_this_exception_class,this_exception_class)
+__COMPILER_SREDIRECT(__PUBDEF,/*ATTR_PERTASK*/,__except_subclass_t,__arch_this_exception_subclass,this_exception_subclass)
 
 /* Directly access per-task variables, thus allowing for inline optimizations. */
 #define __arch_except_data()           (&PERTASK(__arch_this_exception_data))

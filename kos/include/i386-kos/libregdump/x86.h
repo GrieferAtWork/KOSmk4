@@ -138,26 +138,11 @@ LIBREGDUMP_DECL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump_idt(struc
 
 #ifdef __cplusplus
 extern "C++" {
-#ifdef __NO_ASMNAME
-#define LIBREGDUMP_DEFINE_DUMPER(type, name)                                      \
-	__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC \
-	regdump(struct regdump_printer *__restrict __self,                            \
-	        type const *__restrict __data) {                                      \
-		return name(self, data);                                                  \
-	}
-#else /* __NO_ASMNAME */
-#define LIBREGDUMP_DEFINE_DUMPER(type, name)                       \
-	LIBREGDUMP_DECL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC \
-	regdump(struct regdump_printer *__restrict __self,             \
-	        type const *__restrict __data) __ASMNAME(#name);
-#endif /* !__NO_ASMNAME */
-LIBREGDUMP_DEFINE_DUMPER(struct gpregs, regdump_gpregs)
-LIBREGDUMP_DEFINE_DUMPER(struct sgregs, regdump_sgregs)
-LIBREGDUMP_DEFINE_DUMPER(struct coregs, regdump_coregs)
-LIBREGDUMP_DEFINE_DUMPER(struct drregs, regdump_drregs)
-#undef LIBREGDUMP_DEFINE_DUMPER
-
-}
+__COMPILER_REDIRECT(LIBREGDUMP_DECL,__ATTR_NONNULL((1, 2)),__ssize_t,LIBREGDUMP_CC,regdump,(struct regdump_printer *__restrict __self, struct gpregs const *__restrict __data),regdump_gpregs,(__self,__data))
+__COMPILER_REDIRECT(LIBREGDUMP_DECL,__ATTR_NONNULL((1, 2)),__ssize_t,LIBREGDUMP_CC,regdump,(struct regdump_printer *__restrict __self, struct sgregs const *__restrict __data),regdump_sgregs,(__self,__data))
+__COMPILER_REDIRECT(LIBREGDUMP_DECL,__ATTR_NONNULL((1, 2)),__ssize_t,LIBREGDUMP_CC,regdump,(struct regdump_printer *__restrict __self, struct coregs const *__restrict __data),regdump_coregs,(__self,__data))
+__COMPILER_REDIRECT(LIBREGDUMP_DECL,__ATTR_NONNULL((1, 2)),__ssize_t,LIBREGDUMP_CC,regdump,(struct regdump_printer *__restrict __self, struct drregs const *__restrict __data),regdump_drregs,(__self,__data))
+} /* extern "C++" */
 #endif /* __cplusplus */
 #endif /* LIBREGDUMP_WANT_PROTOTYPES */
 
