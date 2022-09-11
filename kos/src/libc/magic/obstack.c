@@ -559,7 +559,7 @@ void obstack_chunk_free(void *ptr);
  * When `obj' is `NULL',  simply free everything allocated  by `self', in which  case
  * `self' must be re-initialized (via `_obstack_begin(3)') upon return. */
 #if defined(__NO_XBLOCK) || defined(__OPTIMIZE_SIZE__)
-#define obstack_free(self, obj) (__obstack_free)(self, obj)
+#define obstack_free(self, obj) __obstack_free(self, obj)
 #else /* __NO_XBLOCK || __OPTIMIZE_SIZE__ */
 #define obstack_free(self, obj)                                                         \
 	__XBLOCK({                                                                          \
@@ -567,12 +567,12 @@ void obstack_chunk_free(void *ptr);
 		if (__of_obj > (void *)(self)->chunk && __of_obj < (void *)(self)->chunk_limit) \
 			(self)->next_free = (self)->object_base = (char *)__of_obj;                 \
 		else {                                                                          \
-			(__obstack_free)(self, __of_obj);                                           \
+			__obstack_free(self, __of_obj);                                             \
 		}                                                                               \
 	})
 #endif /* !__NO_XBLOCK && !__OPTIMIZE_SIZE__ */
 #ifndef __obstack_free
-#define __obstack_free obstack_free
+#define __obstack_free (obstack_free)
 #endif /* !__obstack_free */
 
 /* Combination of `obstack_blank()' + `obstack_finish()' */
