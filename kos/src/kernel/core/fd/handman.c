@@ -1222,7 +1222,7 @@ handman_gethandflags(struct handman *__restrict self, fd_t fd)
 	iomode_t result;
 	unsigned int relfd;
 	struct handrange *range;
-	handman_write(self);
+	handman_read(self);
 
 	/* Lookup handle. */
 	range = handman_ranges_locate(self, (unsigned int)fd);
@@ -1232,7 +1232,7 @@ handman_gethandflags(struct handman *__restrict self, fd_t fd)
 	if unlikely(!handrange_slotishand(range, relfd))
 		goto err_badfd;
 	result = range->hr_hand[relfd].mh_hand.h_mode;
-	handman_endwrite(self);
+	handman_endread(self);
 	return result;
 err_badfd:
 	handman_unlock_and_throw_invalid_handle(self, fd, false);
