@@ -79,6 +79,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- [libgmp-6.2.1](https://ftp.gnu.org/gnu/gmp/)
 	- [libmpfr-4.1.0](https://ftp.gnu.org/gnu/mpfr/mpfr/)
 	- [libmpc-1.2.1](https://ftp.gnu.org/gnu/mpc/)
+	- [libreadline-8.1](https://ftp.gnu.org/gnu/readline/)
 - Misc
 	- [X-Server (Experimental)](kos/misc/utilities/README.md#X-server)
 

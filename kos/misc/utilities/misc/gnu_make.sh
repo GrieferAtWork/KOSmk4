@@ -601,6 +601,10 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						addconfx "--enable-xattr"
 						;;
 
+					*--disable-install-examples* | *--enable-install-examples*)
+						addconfx "--disable-install-examples"
+						;;
+
 					*--with-packager-bug-reports*)
 						addconf "--with-packager-bug-reports=" "https://github.com/GrieferAtWork/KOSmk4"
 						;;
