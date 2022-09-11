@@ -65,7 +65,7 @@
 #else /* __SIZEOF_POINTER__ >= 8 */
 #xdefine __SIZEOF_IOMODE_T__         2
 #endif /* __SIZEOF_POINTER__ < 8 */
-#xdefine __SIZEOF_MAJOR_T__          4
+#xdefine __SIZEOF_MAJOR_T__          8
 #xdefine __SIZEOF_MINOR_T__          4
 #xdefine __SIZEOF_DEV_T__            8
 #xdefine __SIZEOF_ID_T__             4

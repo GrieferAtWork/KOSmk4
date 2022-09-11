@@ -46,6 +46,7 @@
 #include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <kos/ioctl/svga.h>
+#include <sys/mkdev.h>
 
 #include <assert.h>
 #include <signal.h>
@@ -805,7 +806,7 @@ svgadev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 		validate_readable(name, 1);
 		/* Create the new TTY */
 		tty = svgadev_newttyf(me, svgadev_findmode(me, &info->smt_mode),
-		                      MKDEV(DEV_MAJOR_AUTO, 0), "%s", name);
+		                      makedev(MKDEV_MAJOR_AUTO, 0), "%s", name);
 		FINALLY_DECREF_UNLIKELY(tty);
 		hand.h_type = HANDLE_TYPE_MFILE;
 		hand.h_mode = IO_RDWR;

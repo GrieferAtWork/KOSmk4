@@ -46,6 +46,7 @@
 
 #include <kos/except/reason/inval.h>
 #include <sys/ioctl.h>
+#include <sys/mkdev.h>
 
 #include <assert.h>
 #include <errno.h>
@@ -401,7 +402,7 @@ mkttydev_new(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 
 	TRY {
 		/* Register the device */
-		device_registerf(result, MKDEV(DEV_MAJOR_AUTO, 0),
+		device_registerf(result, makedev(MKDEV_MAJOR_AUTO, 0),
 		                 "%$s", namelen, name);
 	} EXCEPT {
 		(*handle_type_db.h_decref[ihandle_typ])(ihandle_ptr);

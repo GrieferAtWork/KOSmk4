@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c9be08c */
+/* HASH CRC-32:0x5c32636f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -102,6 +102,8 @@
 #define __CRT_HAVE_DOS$__libc_allocate_rtsig
 #define __CRT_HAVE_DOS$__locale_ctype_ptr_l
 #define __CRT_HAVE_DOS$__lock_fhandle
+#define __CRT_HAVE_DOS$__major
+#define __CRT_HAVE_DOS$__makedev
 #define __CRT_HAVE_DOS$__memcpy_chk
 #define __CRT_HAVE_DOS$__memcpyc_chk
 #define __CRT_HAVE_DOS$__memcpyl_chk
@@ -150,6 +152,7 @@
 #define __CRT_HAVE_DOS$__memsetl_chk
 #define __CRT_HAVE_DOS$__memsetq_chk
 #define __CRT_HAVE_DOS$__memsetw_chk
+#define __CRT_HAVE_DOS$__minor
 #define __CRT_HAVE_DOS$__overflow
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -1967,9 +1970,6 @@
 #define __CRT_HAVE_DOS$gmtime64
 #define __CRT_HAVE_DOS$gmtime64_r
 #define __CRT_HAVE_DOS$gmtime_r
-#define __CRT_HAVE_DOS$gnu_dev_major
-#define __CRT_HAVE_DOS$gnu_dev_makedev
-#define __CRT_HAVE_DOS$gnu_dev_minor
 #define __CRT_HAVE_DOS$gotoxy
 #define __CRT_HAVE_DOS$grantpt
 #define __CRT_HAVE_DOS$group_from_gid
@@ -2257,10 +2257,12 @@
 #define __CRT_HAVE_DOS$lutimes
 #define __CRT_HAVE_DOS$lutimes64
 #define __CRT_HAVE_DOS$madvise
+#define __CRT_HAVE_DOS$major
 #define __CRT_HAVE_DOS$make_relative_prefix
 #define __CRT_HAVE_DOS$make_relative_prefix_ignore_links
 #define __CRT_HAVE_DOS$make_temp_file
 #define __CRT_HAVE_DOS$make_temp_file_with_prefix
+#define __CRT_HAVE_DOS$makedev
 #define __CRT_HAVE_DOS$malloc
 #define __CRT_HAVE_DOS$malloc_trim
 #define __CRT_HAVE_DOS$malloc_usable_size
@@ -2426,6 +2428,7 @@
 #define __CRT_HAVE_DOS$memxlenw
 #define __CRT_HAVE_DOS$mergesort
 #define __CRT_HAVE_DOS$mincore
+#define __CRT_HAVE_DOS$minor
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$mkdir
@@ -4393,6 +4396,8 @@
 #define __CRT_HAVE___locale_ctype_ptr
 #define __CRT_HAVE___locale_ctype_ptr_l
 #define __CRT_HAVE___lock_fhandle
+#define __CRT_HAVE___major
+#define __CRT_HAVE___makedev
 #define __CRT_HAVE___memcpy_chk
 #define __CRT_HAVE___memcpyc_chk
 #define __CRT_HAVE___memcpyl_chk
@@ -4441,6 +4446,7 @@
 #define __CRT_HAVE___memsetl_chk
 #define __CRT_HAVE___memsetq_chk
 #define __CRT_HAVE___memsetw_chk
+#define __CRT_HAVE___minor
 #define __CRT_HAVE___overflow
 #define __CRT_HAVE___p___argc
 #define __CRT_HAVE___p___argv
@@ -6291,9 +6297,6 @@
 #define __CRT_HAVE_gmtime64
 #define __CRT_HAVE_gmtime64_r
 #define __CRT_HAVE_gmtime_r
-#define __CRT_HAVE_gnu_dev_major
-#define __CRT_HAVE_gnu_dev_makedev
-#define __CRT_HAVE_gnu_dev_minor
 #define __CRT_HAVE_gotoxy
 #define __CRT_HAVE_grantpt
 #define __CRT_HAVE_group_from_gid
@@ -6587,11 +6590,13 @@
 #define __CRT_HAVE_lutimes
 #define __CRT_HAVE_lutimes64
 #define __CRT_HAVE_madvise
+#define __CRT_HAVE_major
 #define __CRT_HAVE_make_relative_prefix
 #define __CRT_HAVE_make_relative_prefix_ignore_links
 #define __CRT_HAVE_make_temp_file
 #define __CRT_HAVE_make_temp_file_with_prefix
 #define __CRT_HAVE_makecontext
+#define __CRT_HAVE_makedev
 #define __CRT_HAVE_mallinfo
 #define __CRT_HAVE_mallinfo2
 #define __CRT_HAVE_malloc
@@ -6771,6 +6776,7 @@
 #define __CRT_HAVE_memxlenw
 #define __CRT_HAVE_mergesort
 #define __CRT_HAVE_mincore
+#define __CRT_HAVE_minor
 #define __CRT_HAVE_mkdir
 #define __CRT_HAVE_mkdirat
 #define __CRT_HAVE_mkdtemp

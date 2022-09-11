@@ -70,8 +70,8 @@
 #include <hybrid/unaligned.h>
 
 #include <compat/config.h>
-#include <kos/dev.h>
 #include <kos/exec/rtld.h>
+#include <sys/mkdev.h>
 #include <sys/poll.h>
 
 #include <fcntl.h>
@@ -1008,7 +1008,7 @@ NOTHROW(KCALL note_mfile)(pformatprinter printer, void *arg,
 						devnode = fnode_asdevnode(node);
 						devno   = devnode->dn_devno;
 						PRINTF(":[%" PRIuN(__SIZEOF_MAJOR_T__) ":%" PRIuN(__SIZEOF_MINOR_T__) "]",
-						       MAJOR(devno), MINOR(devno));
+						       major(devno), minor(devno));
 					}
 					if (fnode_islnk(node)) {
 						struct flnknode_ops const *lnkops;

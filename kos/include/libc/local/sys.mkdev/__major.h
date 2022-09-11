@@ -1,3 +1,4 @@
+/* HASH CRC-32:0xcaefd601 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,37 +18,25 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%(c_prefix){
-/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/sysmacros.h) */
-/* (#) Portability: DJGPP         (/include/sys/sysmacros.h) */
-/* (#) Portability: GNU C Library (/misc/sys/sysmacros.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/sysmacros.h) */
-/* (#) Portability: diet libc     (/include/sys/sysmacros.h) */
-/* (#) Portability: libc4/5       (/include/sys/sysmacros.h) */
-/* (#) Portability: mintlib       (/include/sys/sysmacros.h) */
-/* (#) Portability: musl libc     (/include/sys/sysmacros.h) */
-/* (#) Portability: uClibc        (/include/sys/sysmacros.h) */
+#ifndef __local___major_defined
+#define __local___major_defined
+#include <__crt.h>
+#include <asm/os/mkdev.h>
+#ifdef __MKDEV_CURRENT_VERSION
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(__major) __ATTR_CONST __ATTR_WUNUSED __major_t
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__major))(int __version, __dev_t __dev) {
+	(void)__version;
+	return (__major_t)(__dev >> __MKDEV_MAJOR_SHFT(__version)) &
+	       (__major_t)(((__major_t)1 << __MKDEV_MAJOR_BITS(__version)) - 1);
 }
-
-%[insert:prefix(
-#include <sys/mkdev.h>
-)]%{
-
-}
-
-
-%[insert:pp_if($has_function(major))]
-%#define gnu_dev_major(dev)            major(dev)
-%[insert:pp_endif]
-
-%[insert:pp_if($has_function(minor))]
-%#define gnu_dev_minor(dev)            minor(dev)
-%[insert:pp_endif]
-
-%[insert:pp_if($has_function(makedev))]
-%#define gnu_dev_makedev(major, minor) makedev(major, minor)
-%[insert:pp_endif]
-
-%{
-
-}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep___major_defined
+#define __local___localdep___major_defined
+#define __localdep___major __LIBC_LOCAL_NAME(__major)
+#endif /* !__local___localdep___major_defined */
+#else /* __MKDEV_CURRENT_VERSION */
+#undef __local___major_defined
+#endif /* !__MKDEV_CURRENT_VERSION */
+#endif /* !__local___major_defined */

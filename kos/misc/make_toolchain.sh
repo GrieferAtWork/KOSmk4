@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix missing include for `CHAR_BIT` in `int.c`"
-DEEMON_VERSION="03ce4102d577e39896c875ab87e0fba4c69292e3"
+#     v -- "Fix a bug in `TPPLexer_LoadPosition()`"
+DEEMON_VERSION="dea555f02098fd28cc7ab3476cb964cc8779f83f"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 

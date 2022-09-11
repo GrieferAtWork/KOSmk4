@@ -46,10 +46,10 @@
 #include <hybrid/sched/preemption.h>
 
 #include <hw/bus/pci.h>
-#include <kos/dev.h>
 #include <kos/except.h>
 #include <kos/except/reason/io.h>
 #include <linux/hdreg.h>
+#include <sys/mkdev.h>
 
 #include <assert.h>
 #include <inttypes.h>
@@ -1430,13 +1430,13 @@ got_identify_signal:
 		REF struct devdirent *name;
 		bool is_master = drive_id == ATA_DRIVE_MASTER;
 		if (is_default_ide) {
-			devno = MKDEV((is_primary_bus ? 3 : 22),
-			              (is_master /**/ ? 0 : 64));
+			devno = makedev((is_primary_bus ? 3 : 22),
+			                (is_master /**/ ? 0 : 64));
 			name  = devdirent_newf("hd%c",
 			                       (is_primary_bus ? 'a' : 'c') +
 			                       (is_master /**/ ? 0 : 1));
 		} else {
-			devno = MKDEV(DEV_MAJOR_AUTO, 0);
+			devno = makedev(MKDEV_MAJOR_AUTO, 0);
 			name  = devdirent_newf("hdX"
 			                       "%" PRIxN(__SIZEOF_PORT_T__) "."
 			                       "%" PRIxN(__SIZEOF_PORT_T__) "."

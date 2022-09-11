@@ -54,8 +54,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <hybrid/atomic.h>
 
 #include <compat/config.h>
-#include <kos/dev.h>
 #include <kos/exec/rtld.h> /* RTLD_LIBDL */
+#include <sys/mkdev.h>
 
 #include <inttypes.h>
 #include <stdint.h>
@@ -130,7 +130,7 @@ lsmm_enum_callback(void *UNUSED(arg), struct mmapinfo *__restrict info) {
 	           info->mmi_flags & MNODE_F_PEXEC /* */ ? 'x' : '-',
 	           info->mmi_flags & MNODE_F_SHARED /**/ ? 's' : 'p',
 	           info->mmi_offset,
-	           MAJOR(dev), MINOR(dev), ino);
+	           major(dev), minor(dev), ino);
 	dbg_savecolor();
 	if (info->mmi_fspath) {
 		char const *filename;

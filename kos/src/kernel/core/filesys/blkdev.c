@@ -51,11 +51,11 @@
 #include <hw/disk/part/efi.h>
 #include <hw/disk/part/embr.h>
 #include <hw/disk/part/mbr.h>
-#include <kos/dev.h>
 #include <kos/except.h>
 #include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <linux/fs.h>
+#include <sys/mkdev.h>
 
 #include <alloca.h>
 #include <assert.h>
@@ -429,8 +429,8 @@ blkdev_makeparts_loadefi(struct blkdev *__restrict self,
 	printk(KERN_INFO "[blk] EFI partition found at %#" PRIx64 " on "
 	                 "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
 	                 "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q)\n",
-	       efipart_sectormin, MAJOR(self->dn_devno),
-	       MINOR(self->dn_devno), device_getname(self));
+	       efipart_sectormin, major(self->dn_devno),
+	       minor(self->dn_devno), device_getname(self));
 	efi_hdrsize = LETOH32(efi->gpt_hdrsize);
 	if unlikely(efi_hdrsize < offsetafter(struct efi_descriptor, gpt_partition_count))
 		goto fail_hdr_toosmall;
@@ -515,8 +515,8 @@ blkdev_makeparts_loadefi(struct blkdev *__restrict self,
 			                "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
 			                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) "
 			                "ends at %" PRIu64 " before it starts at %" PRIu64 "\n",
-			       efipart_sectormin, MAJOR(self->dn_devno),
-			       MINOR(self->dn_devno), device_getname(self),
+			       efipart_sectormin, major(self->dn_devno),
+			       minor(self->dn_devno), device_getname(self),
 			       lba_max + 1, lba_min);
 			continue;
 		}
@@ -550,29 +550,29 @@ fail_bad_partition_vector:
 	                "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
 	                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) overflows "
 	                "(sector %" PRIu64 " * %" PRIuSIZ " bytes per sector)\n",
-	       efipart_sectormin, MAJOR(self->dn_devno), MINOR(self->dn_devno),
+	       efipart_sectormin, major(self->dn_devno), minor(self->dn_devno),
 	       device_getname(self), efi_entbase, blkdev_getsectorsize(self));
 	return false;
 fail_ent_toosmall:
 	printk(KERN_ERR "[blk] EFI partition entries in %#" PRIx64 " on "
 	                "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
 	                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) are too small (%" PRIu32 " bytes)\n",
-	       efipart_sectormin, MAJOR(self->dn_devno), MINOR(self->dn_devno),
+	       efipart_sectormin, major(self->dn_devno), minor(self->dn_devno),
 	       device_getname(self), efi_entsize);
 	return false;
 fail_hdr_toosmall:
 	printk(KERN_ERR "[blk] EFI header table at %#" PRIx64 " on "
 	                "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
 	                "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q) is too small (%" PRIu32 " bytes)\n",
-	       efipart_sectormin, MAJOR(self->dn_devno),
-	       MINOR(self->dn_devno), device_getname(self), efi_hdrsize);
+	       efipart_sectormin, major(self->dn_devno),
+	       minor(self->dn_devno), device_getname(self), efi_hdrsize);
 	return false;
 fail_badsig:
 	printk(KERN_WARNING "[blk] Invalid EFI signature in EFI partition at %#" PRIx64 " on "
 	                    "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
 	                    "%.2" PRIxN(__SIZEOF_MINOR_T__) " (%q)\n",
-	       efipart_sectormin, MAJOR(self->dn_devno),
-	       MINOR(self->dn_devno), device_getname(self));
+	       efipart_sectormin, major(self->dn_devno),
+	       minor(self->dn_devno), device_getname(self));
 	return false;
 }
 
@@ -965,7 +965,7 @@ blkdev_makeparts(struct blkdev *__restrict self,
 				size_t numlen, namlen;
 
 				part->bd_partinfo.bp_partno = index++;
-				part->dn_devno = self->dn_devno + MKDEV(0, index);
+				part->dn_devno = self->dn_devno + makedev(0, index);
 				part->fn_ino   = devfs_devnode_makeino(S_IFBLK, part->dn_devno);
 
 				/* Allocate and assign `part->dv_dirent' */

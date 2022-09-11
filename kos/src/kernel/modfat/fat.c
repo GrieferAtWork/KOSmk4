@@ -58,7 +58,6 @@
 #include <hybrid/unaligned.h>
 
 #include <compat/config.h>
-#include <kos/dev.h>
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>

@@ -41,11 +41,11 @@
 
 #include <hw/bus/pci.h>
 #include <hw/net/ne2k.h>
-#include <kos/dev.h>
 #include <kos/except/reason/io.h>
 #include <linux/if_ether.h>
 #include <netinet/in.h>
 #include <sys/io.h>
+#include <sys/mkdev.h>
 
 #include <assert.h>
 #include <inttypes.h>
@@ -1367,7 +1367,7 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 
 		/* Register device. */
 		TRY {
-			device_registerf(self, MKDEV(DEV_MAJOR_AUTO, 0),
+			device_registerf(self, makedev(MKDEV_MAJOR_AUTO, 0),
 			                 "ne2k.pci.%" PRIx32,
 			                 dev->pd_addr);
 		} EXCEPT {

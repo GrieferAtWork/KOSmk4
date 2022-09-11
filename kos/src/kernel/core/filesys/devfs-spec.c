@@ -40,9 +40,9 @@
 
 #include <hybrid/overflow.h>
 
-#include <kos/dev.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
+#include <sys/mkdev.h>
 #include <sys/stat.h>
 
 #include <inttypes.h>
@@ -97,7 +97,7 @@ INTERN_CONST struct mfile_stream_ops const devfs_spec_v_stream_ops_with_boottime
 
 
 /* Decode a string such as "4:5" into a devno.
- * When the given `name' can't be decoded as such, return `DEV_UNSET' */
+ * When the given `name' can't be decoded as such, return `MKDEV_BADDEV' */
 PRIVATE ATTR_PURE WUNUSED dev_t KCALL
 decode_devno(USER CHECKED char const *name, u16 namelen)
 		THROWS(E_SEGFAULT) {
@@ -143,13 +143,13 @@ decode_devno(USER CHECKED char const *name, u16 namelen)
 			ch = *name++;
 		}
 	}
-	if (major > MAJORMASK)
+	if (major > MAJOR_MAX)
 		goto err;
-	if (minor > MINORMASK)
+	if (minor > MINOR_MAX)
 		goto err;
-	return MKDEV(major, minor);
+	return makedev(major, minor);
 err:
-	return DEV_UNSET;
+	return MKDEV_BADDEV;
 }
 
 
@@ -324,7 +324,7 @@ devfs_block_v_lookup(struct fdirnode *__restrict UNUSED(self),
                      struct flookup_info *__restrict info)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	dev_t devno = decode_devno(info->flu_name, info->flu_namelen);
-	if (devno != DEV_UNSET) {
+	if (devno != MKDEV_BADDEV) {
 		REF struct blkdev *dev;
 		dev = blkdev_lookup_bydev(devno);
 		if (dev != NULL) {
@@ -335,7 +335,7 @@ devfs_block_v_lookup(struct fdirnode *__restrict UNUSED(self),
 			sprintf(result->dld_ent.fd_name,
 			        "%" PRIuN(__SIZEOF_MAJOR_T__) ":"
 			        "%" PRIuN(__SIZEOF_MINOR_T__),
-			        MAJOR(devno), MINOR(devno));
+			        major(devno), minor(devno));
 			result->dld_ent.fd_hash = fdirent_hash(result->dld_ent.fd_name,
 			                                       result->dld_ent.fd_namelen);
 			return &result->dld_ent;
@@ -373,8 +373,8 @@ again:
 	namelen = (u16)sprintf(namebuf,
 	                       "%" PRIuN(__SIZEOF_MAJOR_T__) ":"
 	                       "%" PRIuN(__SIZEOF_MINOR_T__),
-	                       MAJOR(fnode_asblkdev(mydev)->dn_devno),
-	                       MINOR(fnode_asblkdev(mydev)->dn_devno));
+	                       major(fnode_asblkdev(mydev)->dn_devno),
+	                       minor(fnode_asblkdev(mydev)->dn_devno));
 
 	/* Yield directory entry. */
 	result = fdirenum_feedent_ex(buf, bufsize, readdir_mode,
@@ -421,7 +421,7 @@ devfs_char_v_lookup(struct fdirnode *__restrict UNUSED(self),
                     struct flookup_info *__restrict info)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	dev_t devno = decode_devno(info->flu_name, info->flu_namelen);
-	if (devno != DEV_UNSET) {
+	if (devno != MKDEV_BADDEV) {
 		REF struct chrdev *dev;
 		dev = chrdev_lookup_bydev(devno);
 		if (dev != NULL) {
@@ -432,7 +432,7 @@ devfs_char_v_lookup(struct fdirnode *__restrict UNUSED(self),
 			sprintf(result->dld_ent.fd_name,
 			        "%" PRIuN(__SIZEOF_MAJOR_T__) ":"
 			        "%" PRIuN(__SIZEOF_MINOR_T__),
-			        MAJOR(devno), MINOR(devno));
+			        major(devno), minor(devno));
 			result->dld_ent.fd_hash = fdirent_hash(result->dld_ent.fd_name,
 			                                       result->dld_ent.fd_namelen);
 			return &result->dld_ent;
@@ -470,8 +470,8 @@ again:
 	namelen = (u16)sprintf(namebuf,
 	                       "%" PRIuN(__SIZEOF_MAJOR_T__) ":"
 	                       "%" PRIuN(__SIZEOF_MINOR_T__),
-	                       MAJOR(fnode_aschrdev(mydev)->dn_devno),
-	                       MINOR(fnode_aschrdev(mydev)->dn_devno));
+	                       major(fnode_aschrdev(mydev)->dn_devno),
+	                       minor(fnode_aschrdev(mydev)->dn_devno));
 
 	/* Yield directory entry. */
 	result = fdirenum_feedent_ex(buf, bufsize, readdir_mode,

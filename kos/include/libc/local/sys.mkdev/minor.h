@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x724e2377 */
+/* HASH CRC-32:0xa6f7ad98 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,36 +18,24 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_AUTO_SYS_SYSMACROS_H
-#define GUARD_LIBC_AUTO_SYS_SYSMACROS_H 1
-
-#include "../api.h"
-
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <sys/sysmacros.h>
-
-DECL_BEGIN
-
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED major_t NOTHROW(LIBDCALL libd_gnu_dev_major)(dev_t dev);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED major_t NOTHROW(LIBCCALL libc_gnu_dev_major)(dev_t dev);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED minor_t NOTHROW(LIBDCALL libd_gnu_dev_minor)(dev_t dev);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED minor_t NOTHROW(LIBCCALL libc_gnu_dev_minor)(dev_t dev);
-#endif /* !__KERNEL__ */
-#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-INTDEF ATTR_CONST WUNUSED dev_t NOTHROW(LIBDCALL libd_gnu_dev_makedev)(major_t major, minor_t minor);
-#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#ifndef __KERNEL__
-INTDEF ATTR_CONST WUNUSED dev_t NOTHROW(LIBCCALL libc_gnu_dev_makedev)(major_t major, minor_t minor);
-#endif /* !__KERNEL__ */
-
-DECL_END
-
-#endif /* !GUARD_LIBC_AUTO_SYS_SYSMACROS_H */
+#ifndef __local_minor_defined
+#define __local_minor_defined
+#include <__crt.h>
+#include <asm/os/mkdev.h>
+#ifdef __MKDEV_CURRENT_VERSION
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(minor) __ATTR_CONST __ATTR_WUNUSED __minor_t
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(minor))(__dev_t __dev) {
+	return (__minor_t)(__dev >> __MKDEV_MINOR_SHFT(__MKDEV_CURRENT_VERSION)) &
+	       (__minor_t)(((__minor_t)1 << __MKDEV_MINOR_BITS(__MKDEV_CURRENT_VERSION)) - 1);
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_minor_defined
+#define __local___localdep_minor_defined
+#define __localdep_minor __LIBC_LOCAL_NAME(minor)
+#endif /* !__local___localdep_minor_defined */
+#else /* __MKDEV_CURRENT_VERSION */
+#undef __local_minor_defined
+#endif /* !__MKDEV_CURRENT_VERSION */
+#endif /* !__local_minor_defined */

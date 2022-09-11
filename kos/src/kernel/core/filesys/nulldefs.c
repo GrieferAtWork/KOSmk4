@@ -39,7 +39,6 @@ gcc_opt.remove("-g"); // Disable debug informations for this file!
 #include <kernel/fs/ramfs.h>
 #include <kernel/mman/driver.h>
 
-#include <kos/dev.h>
 #include <sys/io.h>
 
 #include <assert.h>
@@ -78,9 +77,22 @@ import * from deemon;
 import fdirent_hash from .....misc.libgen.fdirent_hash;
 import llrbtree = .....misc.libgen.llrbtree;
 import rbtree = .....misc.libgen.rbtree;
+#undef __CCAST
+#define __KOS__
+#define __KERNEL__
 #define __CCAST(T)
-#include "../../../../include/kos/dev.h"      // For MKDEV
-#include "../../../../include/asm/os/stat.h"  // For __S_IFBLK, __S_IFCHR
+
+// For makedev
+#include "../../../../include/asm/os/kos/mkdev.h"
+#include "../../../../include/asm/os/mkdev.h"
+#include "../../../../include/sys/mkdev.h"
+
+// For __S_IFBLK, __S_IFCHR
+#include "../../../../include/asm/os/stat.h"
+#ifndef __MKDEV_CURRENT_VERSION
+#error WTF?
+#endif
+
 
 local DEVICE_EXTFLAGS = {
 	"mem":     none,
@@ -109,16 +121,16 @@ local DEVICE_SIZES = {
 };
 
 local DEVICES = {
-	("mem",     0640 | __S_IFCHR, MKDEV(1, 1)),
-	("kmem",    0640 | __S_IFCHR, MKDEV(1, 2)),
-	("null",    0666 | __S_IFCHR, MKDEV(1, 3)),
-	("port",    0640 | __S_IFCHR, MKDEV(1, 4)),
-	("zero",    0666 | __S_IFCHR, MKDEV(1, 5)),
-	("full",    0666 | __S_IFCHR, MKDEV(1, 7)),
-	("random",  0666 | __S_IFCHR, MKDEV(1, 8)),
-	("urandom", 0666 | __S_IFCHR, MKDEV(1, 9)),
-	("kmsg",    0644 | __S_IFCHR, MKDEV(1, 11)),
-	("tty",     0666 | __S_IFCHR, MKDEV(5, 0)),
+	("mem",     0640 | __S_IFCHR, makedev(1, 1)),
+	("kmem",    0640 | __S_IFCHR, makedev(1, 2)),
+	("null",    0666 | __S_IFCHR, makedev(1, 3)),
+	("port",    0640 | __S_IFCHR, makedev(1, 4)),
+	("zero",    0666 | __S_IFCHR, makedev(1, 5)),
+	("full",    0666 | __S_IFCHR, makedev(1, 7)),
+	("random",  0666 | __S_IFCHR, makedev(1, 8)),
+	("urandom", 0666 | __S_IFCHR, makedev(1, 9)),
+	("kmsg",    0644 | __S_IFCHR, makedev(1, 11)),
+	("tty",     0666 | __S_IFCHR, makedev(5, 0)),
 };
 local STMODE_MAP = { __S_IFCHR: "S_IFCHR", __S_IFBLK: "S_IFBLK" };
 
@@ -155,7 +167,7 @@ print("#define __CCAST(T) (uint64_t)");
 // Assert that our generated INO numbers are correct
 for (local name, st_mode, st_rdev: DEVICES) {
 	print("static_assert(devfs_devnode_makeino(", STMODE_MAP[st_mode & ~07777],
-		", MKDEV(", MAJOR(st_rdev), ", ", MINOR(st_rdev), ")) == (__ino_t)_SELECT_INO(",
+		", makedev(", major(st_rdev), ", ", minor(st_rdev), ")) == (__ino_t)_SELECT_INO(",
 		", ".join(for (local c, fun: MAKEINO_FUNCTIONS) f"{c}({fun(st_mode, st_rdev).hex()})"),
 	"));");
 }
@@ -253,7 +265,7 @@ for (local name, st_mode, st_rdev: DEVICES) {
 	print("			},");
 	print("			FNODE_INIT_fn_allnodes,");
 	print("		},");
-	print("		.dn_devno = MKDEV(", MAJOR(st_rdev), ", ", MINOR(st_rdev), ")");
+	print("		.dn_devno = makedev(", major(st_rdev), ", ", minor(st_rdev), ")");
 	print("	},");
 	print("	.dv_driver = &drv_self,");
 	print("	.dv_dirent = &dirent_dev_", name, ",");
@@ -270,16 +282,16 @@ static_assert(offsetof(struct ramfs_dirnode, rdn_dir.dn_node) == 0);
 static_assert(offsetof(struct device, dv_devnode.dn_node) == 0);
 #undef __CCAST
 #define __CCAST(T) (uint64_t)
-static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 1)) == (__ino_t)_SELECT_INO(UINT32_C(0x80000f), UINT64_C(0x80000f)));
-static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 2)) == (__ino_t)_SELECT_INO(UINT32_C(0x800017), UINT64_C(0x800017)));
-static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 3)) == (__ino_t)_SELECT_INO(UINT32_C(0x80001f), UINT64_C(0x80001f)));
-static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 4)) == (__ino_t)_SELECT_INO(UINT32_C(0x800027), UINT64_C(0x800027)));
-static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 5)) == (__ino_t)_SELECT_INO(UINT32_C(0x80002f), UINT64_C(0x80002f)));
-static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 7)) == (__ino_t)_SELECT_INO(UINT32_C(0x80003f), UINT64_C(0x80003f)));
-static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 8)) == (__ino_t)_SELECT_INO(UINT32_C(0x800047), UINT64_C(0x800047)));
-static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 9)) == (__ino_t)_SELECT_INO(UINT32_C(0x80004f), UINT64_C(0x80004f)));
-static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(1, 11)) == (__ino_t)_SELECT_INO(UINT32_C(0x80005f), UINT64_C(0x80005f)));
-static_assert(devfs_devnode_makeino(S_IFCHR, MKDEV(5, 0)) == (__ino_t)_SELECT_INO(UINT32_C(0x2800007), UINT64_C(0x2800007)));
+static_assert(devfs_devnode_makeino(S_IFCHR, makedev(1, 1)) == (__ino_t)_SELECT_INO(UINT32_C(0x80000f), UINT64_C(0x80000f)));
+static_assert(devfs_devnode_makeino(S_IFCHR, makedev(1, 2)) == (__ino_t)_SELECT_INO(UINT32_C(0x800017), UINT64_C(0x800017)));
+static_assert(devfs_devnode_makeino(S_IFCHR, makedev(1, 3)) == (__ino_t)_SELECT_INO(UINT32_C(0x80001f), UINT64_C(0x80001f)));
+static_assert(devfs_devnode_makeino(S_IFCHR, makedev(1, 4)) == (__ino_t)_SELECT_INO(UINT32_C(0x800027), UINT64_C(0x800027)));
+static_assert(devfs_devnode_makeino(S_IFCHR, makedev(1, 5)) == (__ino_t)_SELECT_INO(UINT32_C(0x80002f), UINT64_C(0x80002f)));
+static_assert(devfs_devnode_makeino(S_IFCHR, makedev(1, 7)) == (__ino_t)_SELECT_INO(UINT32_C(0x80003f), UINT64_C(0x80003f)));
+static_assert(devfs_devnode_makeino(S_IFCHR, makedev(1, 8)) == (__ino_t)_SELECT_INO(UINT32_C(0x800047), UINT64_C(0x800047)));
+static_assert(devfs_devnode_makeino(S_IFCHR, makedev(1, 9)) == (__ino_t)_SELECT_INO(UINT32_C(0x80004f), UINT64_C(0x80004f)));
+static_assert(devfs_devnode_makeino(S_IFCHR, makedev(1, 11)) == (__ino_t)_SELECT_INO(UINT32_C(0x80005f), UINT64_C(0x80005f)));
+static_assert(devfs_devnode_makeino(S_IFCHR, makedev(5, 0)) == (__ino_t)_SELECT_INO(UINT32_C(0x2800007), UINT64_C(0x2800007)));
 #undef __CCAST
 #define __CCAST
 PRIVATE struct devdirent dirent_dev_mem = {
@@ -457,7 +469,7 @@ PUBLIC struct device dev_mem = {
 			},
 			FNODE_INIT_fn_allnodes,
 		},
-		.dn_devno = MKDEV(1, 1)
+		.dn_devno = makedev(1, 1)
 	},
 	.dv_driver = &drv_self,
 	.dv_dirent = &dirent_dev_mem,
@@ -509,7 +521,7 @@ PUBLIC struct device dev_kmem = {
 			},
 			FNODE_INIT_fn_allnodes,
 		},
-		.dn_devno = MKDEV(1, 2)
+		.dn_devno = makedev(1, 2)
 	},
 	.dv_driver = &drv_self,
 	.dv_dirent = &dirent_dev_kmem,
@@ -561,7 +573,7 @@ PUBLIC struct device dev_null = {
 			},
 			FNODE_INIT_fn_allnodes,
 		},
-		.dn_devno = MKDEV(1, 3)
+		.dn_devno = makedev(1, 3)
 	},
 	.dv_driver = &drv_self,
 	.dv_dirent = &dirent_dev_null,
@@ -613,7 +625,7 @@ PUBLIC struct device dev_port = {
 			},
 			FNODE_INIT_fn_allnodes,
 		},
-		.dn_devno = MKDEV(1, 4)
+		.dn_devno = makedev(1, 4)
 	},
 	.dv_driver = &drv_self,
 	.dv_dirent = &dirent_dev_port,
@@ -664,7 +676,7 @@ PUBLIC struct device dev_zero = {
 			},
 			FNODE_INIT_fn_allnodes,
 		},
-		.dn_devno = MKDEV(1, 5)
+		.dn_devno = makedev(1, 5)
 	},
 	.dv_driver = &drv_self,
 	.dv_dirent = &dirent_dev_zero,
@@ -717,7 +729,7 @@ PUBLIC struct device dev_full = {
 			},
 			FNODE_INIT_fn_allnodes,
 		},
-		.dn_devno = MKDEV(1, 7)
+		.dn_devno = makedev(1, 7)
 	},
 	.dv_driver = &drv_self,
 	.dv_dirent = &dirent_dev_full,
@@ -769,7 +781,7 @@ PUBLIC struct device dev_random = {
 			},
 			FNODE_INIT_fn_allnodes,
 		},
-		.dn_devno = MKDEV(1, 8)
+		.dn_devno = makedev(1, 8)
 	},
 	.dv_driver = &drv_self,
 	.dv_dirent = &dirent_dev_random,
@@ -822,7 +834,7 @@ PUBLIC struct device dev_urandom = {
 			},
 			FNODE_INIT_fn_allnodes,
 		},
-		.dn_devno = MKDEV(1, 9)
+		.dn_devno = makedev(1, 9)
 	},
 	.dv_driver = &drv_self,
 	.dv_dirent = &dirent_dev_urandom,
@@ -875,7 +887,7 @@ PUBLIC struct device dev_kmsg = {
 			},
 			FNODE_INIT_fn_allnodes,
 		},
-		.dn_devno = MKDEV(1, 11)
+		.dn_devno = makedev(1, 11)
 	},
 	.dv_driver = &drv_self,
 	.dv_dirent = &dirent_dev_kmsg,
@@ -928,7 +940,7 @@ PUBLIC struct device dev_tty = {
 			},
 			FNODE_INIT_fn_allnodes,
 		},
-		.dn_devno = MKDEV(5, 0)
+		.dn_devno = makedev(5, 0)
 	},
 	.dv_driver = &drv_self,
 	.dv_dirent = &dirent_dev_tty,

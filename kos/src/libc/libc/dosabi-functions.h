@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38c745a1 */
+/* HASH CRC-32:0x67828b56 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2975,6 +2975,14 @@ DFUN(".text.crt.dos.unsorted", libd_ftok, libc_ftok, TIn(__SIZEOF_KEY_T__), 2, T
 /* sys.klog */
 DFUN(".text.crt.dos.utility.klog", libd_klogctl, libc_klogctl, TD, 3, TD, TP, TD)
 
+/* sys.mkdev */
+DFUN(".text.crt.dos.system.utility", libd_makedev, libc_makedev, TIn(__SIZEOF_DEV_T__), 2, TIn(__SIZEOF_MAJOR_T__), TIn(__SIZEOF_MINOR_T__))
+DFUN(".text.crt.dos.system.utility", libd_major, libc_major, TIn(__SIZEOF_MAJOR_T__), 1, TIn(__SIZEOF_DEV_T__))
+DFUN(".text.crt.dos.system.utility", libd_minor, libc_minor, TIn(__SIZEOF_MINOR_T__), 1, TIn(__SIZEOF_DEV_T__))
+DFUN(".text.crt.dos.system.utility", libd___makedev, libc___makedev, TIn(__SIZEOF_DEV_T__), 3, TD, TIn(__SIZEOF_MAJOR_T__), TIn(__SIZEOF_MINOR_T__))
+DFUN(".text.crt.dos.system.utility", libd___major, libc___major, TIn(__SIZEOF_MAJOR_T__), 2, TD, TIn(__SIZEOF_DEV_T__))
+DFUN(".text.crt.dos.system.utility", libd___minor, libc___minor, TIn(__SIZEOF_MINOR_T__), 2, TD, TIn(__SIZEOF_DEV_T__))
+
 /* sys.mman */
 DFUN(".text.crt.dos.heap.mman", libd_mmap, libc_mmap, TP, 6, TP, TI, TD, TD, TIn(__SIZEOF_FD_T__), TIn(__SIZEOF_OFF32_T__))
 DFUN(".text.crt.dos.heap.mman", libd_munmap, libc_munmap, TD, 2, TP, TI)
@@ -3135,11 +3143,6 @@ DFUN(".text.crt.dos.system.info", libd_sysinfo, libc_sysinfo, TD, 1, TP)
 DFUN(".text.crt.dos.system.syslog", libd_openlog, libc_openlog, TV, 3, TP, TD, TD)
 DFUN(".text.crt.dos.system.syslog", libd_setlogmask, libc_setlogmask, TD, 1, TD)
 DFUN(".text.crt.dos.system.syslog", libd_vsyslog, libc_vsyslog, TV, 3, TD, TP, TP)
-
-/* sys.sysmacros */
-DFUN(".text.crt.dos.system.utility", libd_gnu_dev_major, libc_gnu_dev_major, TIn(__SIZEOF_MAJOR_T__), 1, TIn(__SIZEOF_DEV_T__))
-DFUN(".text.crt.dos.system.utility", libd_gnu_dev_minor, libc_gnu_dev_minor, TIn(__SIZEOF_MINOR_T__), 1, TIn(__SIZEOF_DEV_T__))
-DFUN(".text.crt.dos.system.utility", libd_gnu_dev_makedev, libc_gnu_dev_makedev, TIn(__SIZEOF_DEV_T__), 2, TIn(__SIZEOF_MAJOR_T__), TIn(__SIZEOF_MINOR_T__))
 
 /* sys.systeminfo */
 DFUN(".text.crt.dos.system.info", libd___solaris_sysinfo, libc___solaris_sysinfo, TD, 3, TD, TP, TL)

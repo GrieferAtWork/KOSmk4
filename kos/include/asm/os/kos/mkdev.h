@@ -17,39 +17,38 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_DEV_H
-#define _KOS_DEV_H 1
+#ifndef _ASM_OS_KOS_MKDEV_H
+#define _ASM_OS_KOS_MKDEV_H 1
 
-#ifndef __DEEMON__
 #include <__stdinc.h>
-#include <bits/types.h>
 
-#ifndef __KOS__
-#error "KOS-only system header"
-#endif /* !__KOS__ */
-#endif /* !__DEEMON__ */
+#include <bits/typesizes.h>
 
-#define DEV_UNSET      __CCAST(dev_t)(0) /* Unset device number */
-#define DEV_MAJOR_AUTO 256               /* The first automatically assigned device major-number */
+#ifndef __SIZEOF_DEV_T__
+#define __SIZEOF_DEV_T__ 8
+#endif /* !__SIZEOF_DEV_T__ */
 
-#define MINORBITS 20
-#define MAJORBITS 12
-#define MINORMASK ((1 << MINORBITS) - 1)
-#define MAJORMASK ((1 << MAJORBITS) - 1)
+#define __MKDEV_V0_MAJOR_SHFT 20
+#if __SIZEOF_DEV_T__ == 8
+#define __MKDEV_V0_MAJOR_BITS 44
+#elif __SIZEOF_DEV_T__ == 4
+#define __MKDEV_V0_MAJOR_BITS 12
+#else /* __SIZEOF_DEV_T__ == ... */
+#define __MKDEV_V0_MAJOR_BITS ((__SIZEOF_DEV_T__ * 8) - 20)
+#endif /* __SIZEOF_DEV_T__ != ... */
+#define __MKDEV_V0_MINOR_SHFT 0
+#define __MKDEV_V0_MINOR_BITS 20
 
-#define MAJOR(dev)    (__CCAST(__major_t)(__CCAST(__uintptr_t)(dev) >> MINORBITS))
-#define MINOR(dev)    (__CCAST(__minor_t)(__CCAST(__uintptr_t)(dev) & MINORMASK))
-#define MKDEV(ma, mi) (__CCAST(dev_t)((ma) << MINORBITS | (mi)))
+#define __MKDEV_CURRENT_VERSION 0
+#define __MKDEV_MAJOR_SHFT(v) __MKDEV_V0_MAJOR_SHFT
+#define __MKDEV_MAJOR_BITS(v) __MKDEV_V0_MAJOR_BITS
+#define __MKDEV_MINOR_SHFT(v) __MKDEV_V0_MINOR_SHFT
+#define __MKDEV_MINOR_BITS(v) __MKDEV_V0_MINOR_BITS
 
-#ifdef __CC__
-__DECL_BEGIN
+/* Bad/invalid device number */
+#define __MKDEV_BADDEV 0
 
-#ifndef __dev_t_defined
-#define __dev_t_defined
-typedef __dev_t dev_t;
-#endif /* !__dev_t_defined */
+/* The first automatically assigned device major-number */
+#define __MKDEV_MAJOR_AUTO 256
 
-__DECL_END
-#endif /* __CC__ */
-
-#endif /* !_KOS_DEV_H */
+#endif /* !_ASM_OS_KOS_MKDEV_H */

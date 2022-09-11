@@ -35,6 +35,7 @@
 #include <kos/io.h> /* S_IFCHR, S_IFBLK */
 #include <kos/kernel/paging.h>
 #include <kos/lockop.h>
+#include <sys/mkdev.h>
 
 
 /* The  /dev filesystem contains files of a number of different types.
@@ -165,8 +166,8 @@ DATDEF struct mfile_stream_ops const device_v_stream_ops;
 #define device_getname(self)    ((self)->dv_dirent->dd_dirent.fd_name)
 #define device_getnamelen(self) ((self)->dv_dirent->dd_dirent.fd_namelen)
 #define device_getdevno(self)   ((self)->_device_devnode_ dn_devno)
-#define device_getmajor(self)   MAJOR(device_getdevno(self))
-#define device_getminor(self)   MINOR(device_getdevno(self))
+#define device_getmajor(self)   major(device_getdevno(self))
+#define device_getminor(self)   minor(device_getdevno(self))
 
 /* Helpers for acquiring a non-blocking SMP-lock for `device_getname()' */
 #define device_getname_lock_acquire      mfile_tslock_acquire
@@ -391,7 +392,7 @@ NOTHROW(FCALL device_lookup_byino_nx)(ino_t ino);
 
 /* Lookup a device within devfs, given its device type and device number.
  * @param: st_mode: Either `S_IFCHR' or `S_IFBLK'
- * @param: st_rdev: Real device number (`MKDEV(...)')
+ * @param: st_rdev: Real device number (`makedev(...)')
  * @return: NULL: No such device. */
 #define device_lookup_bydev(st_mode, st_rdev) \
 	device_lookup_byino(devfs_devnode_makeino(st_mode, st_rdev))
@@ -428,7 +429,7 @@ device_lookup_bypartguid(guid_t const *__restrict guid)
  *  #2: Pass `string' to `device_lookup_byname()', and re-return if non-NULL
  *  #3: if `!S_ISCHR(st_mode)' and `string' matches FORMAT_GUID_T, decode a
  *      GUID and make use of `device_lookup_bypartguid'.
- *  #4: if `st_mode != 0', do `sscanf(string, "%u:%u")' for a MAJOR/MINOR
+ *  #4: if `st_mode != 0', do `sscanf(string, "%u:%u")' for a major/minor
  *      pair, construct a dev_t, and pass to `device_lookup_bydev()', and
  *      re-return if non-NULL
  *  #5: If all else failed, return `NULL' */

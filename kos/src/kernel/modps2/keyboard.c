@@ -38,6 +38,7 @@
 #include <hybrid/atomic.h>
 
 #include <kos/ioctl/kbd.h>
+#include <sys/mkdev.h>
 
 #include <assert.h>
 #include <stdio.h>
@@ -489,7 +490,7 @@ ps2_keyboard_create(struct ps2_probe_data *__restrict probe_data,
 		COMPILER_BARRIER();
 		hisr_register_at(PS2_GET_ISR_FOR_PORT(portno), &ps2_keyboard_isr_handler, kbd);
 		TRY {
-			device_registerf(kbd, MKDEV(DEV_MAJOR_AUTO, 0),
+			device_registerf(kbd, makedev(MKDEV_MAJOR_AUTO, 0),
 			                 "ps2kbd%u", portno + 1);
 		} EXCEPT {
 			hisr_unregister_at(PS2_GET_ISR_FOR_PORT(portno), &ps2_keyboard_isr_handler, kbd);

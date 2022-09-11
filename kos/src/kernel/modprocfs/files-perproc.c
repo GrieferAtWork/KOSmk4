@@ -73,13 +73,13 @@ DECL_END
 #include <hybrid/overflow.h>
 
 #include <compat/config.h>
-#include <kos/dev.h>
 #include <kos/except.h>
 #include <kos/except/reason/illop.h>
 #include <kos/except/reason/inval.h>
 #include <kos/except/reason/io.h>
 #include <kos/exec/peb.h>
 #include <kos/exec/rtld.h> /* RTLD_LIBDL */
+#include <sys/mkdev.h>
 #include <sys/param.h>
 #include <sys/stat.h>
 
@@ -1025,7 +1025,7 @@ maps_printer_cb(void *maps_arg, struct mmapinfo *__restrict info) {
 	           info->mmi_flags & MNODE_F_PEXEC /* */ ? 'x' : '-',
 	           info->mmi_flags & MNODE_F_SHARED /**/ ? 's' : 'p',
 	           info->mmi_offset,
-	           MAJOR(dev), MINOR(dev), ino) < 0)
+	           major(dev), minor(dev), ino) < 0)
 		goto err;
 	if (maps_print_name(ctx, info->mmi_file, info->mmi_fspath, info->mmi_fsname) < 0)
 		goto err;
@@ -1395,9 +1395,9 @@ no_exec:
 				decref_unlikely(fg);
 			}
 		}
-		tty_devno_encoded = ((MAJOR(tty_devno) & 0xff) << 8) |
-		                    ((MINOR(tty_devno) & 0xff) |
-		                     (MINOR(tty_devno) & 0xffff00) << 8);
+		tty_devno_encoded = ((major(tty_devno) & 0xff) << 8) |
+		                    ((minor(tty_devno) & 0xff) |
+		                     (minor(tty_devno) & 0xffff00) << 8);
 		if (printf("%" PRIu32 " "
 		           "%" PRIuN(__SIZEOF_PID_T__) " ",
 		           tty_devno_encoded, fgpid) < 0)

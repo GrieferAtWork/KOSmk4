@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf01a6d7 */
+/* HASH CRC-32:0xb429e6ab */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,37 +37,17 @@
 #pragma GCC system_header
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
-#include <features.h>
-#include <bits/types.h>
+#include <sys/mkdev.h>
 
-#ifdef __CC__
-__SYSDECL_BEGIN
-
-#ifdef __CRT_HAVE_gnu_dev_major
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__major_t,__NOTHROW,gnu_dev_major,(__dev_t __dev),(__dev))
-#else /* __CRT_HAVE_gnu_dev_major */
-#include <libc/local/sys.sysmacros/gnu_dev_major.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(gnu_dev_major, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __major_t __NOTHROW(__LIBCCALL gnu_dev_major)(__dev_t __dev) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gnu_dev_major))(__dev); })
-#endif /* !__CRT_HAVE_gnu_dev_major */
-#ifdef __CRT_HAVE_gnu_dev_minor
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__minor_t,__NOTHROW,gnu_dev_minor,(__dev_t __dev),(__dev))
-#else /* __CRT_HAVE_gnu_dev_minor */
-#include <libc/local/sys.sysmacros/gnu_dev_minor.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(gnu_dev_minor, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __minor_t __NOTHROW(__LIBCCALL gnu_dev_minor)(__dev_t __dev) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gnu_dev_minor))(__dev); })
-#endif /* !__CRT_HAVE_gnu_dev_minor */
-#ifdef __CRT_HAVE_gnu_dev_makedev
-__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__dev_t,__NOTHROW,gnu_dev_makedev,(__major_t __major, __minor_t __minor),(__major,__minor))
-#else /* __CRT_HAVE_gnu_dev_makedev */
-#include <libc/local/sys.sysmacros/gnu_dev_makedev.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(gnu_dev_makedev, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_CONST __ATTR_WUNUSED __dev_t __NOTHROW(__LIBCCALL gnu_dev_makedev)(__major_t __major, __minor_t __minor) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gnu_dev_makedev))(__major, __minor); })
-#endif /* !__CRT_HAVE_gnu_dev_makedev */
-
-/* Access the functions with their traditional names.  */
-#define major(dev)        gnu_dev_major(dev)
-#define minor(dev)        gnu_dev_minor(dev)
-#define makedev(maj, min) gnu_dev_makedev(maj, min)
-
-__SYSDECL_END
-#endif /* __CC__ */
+#include <asm/os/mkdev.h>
+#if defined(__CRT_HAVE_major) || defined(__CRT_HAVE_gnu_dev_major) || defined(__MKDEV_CURRENT_VERSION)
+#define gnu_dev_major(dev)            major(dev)
+#endif /* __CRT_HAVE_major || __CRT_HAVE_gnu_dev_major || __MKDEV_CURRENT_VERSION */
+#if defined(__CRT_HAVE_minor) || defined(__CRT_HAVE_gnu_dev_minor) || defined(__MKDEV_CURRENT_VERSION)
+#define gnu_dev_minor(dev)            minor(dev)
+#endif /* __CRT_HAVE_minor || __CRT_HAVE_gnu_dev_minor || __MKDEV_CURRENT_VERSION */
+#if defined(__CRT_HAVE_makedev) || defined(__CRT_HAVE_gnu_dev_makedev) || defined(__MKDEV_CURRENT_VERSION)
+#define gnu_dev_makedev(major, minor) makedev(major, minor)
+#endif /* __CRT_HAVE_makedev || __CRT_HAVE_gnu_dev_makedev || __MKDEV_CURRENT_VERSION */
 
 #endif /* !_SYS_SYSMACROS_H */

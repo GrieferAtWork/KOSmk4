@@ -61,7 +61,7 @@
 #endif /* __SIZEOF_POINTER__ < 8 */
 #endif /* !__SIZEOF_IOMODE_T__ */
 #ifndef __SIZEOF_MAJOR_T__
-#define __SIZEOF_MAJOR_T__ 4
+#define __SIZEOF_MAJOR_T__ 8
 #endif /* !__SIZEOF_MAJOR_T__ */
 #ifndef __SIZEOF_MINOR_T__
 #define __SIZEOF_MINOR_T__ 4

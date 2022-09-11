@@ -36,7 +36,6 @@
 #include <hybrid/sched/atomic-lock.h>
 
 #include <asm/defsym.h>
-#include <kos/dev.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 

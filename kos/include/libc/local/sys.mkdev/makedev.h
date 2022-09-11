@@ -1,3 +1,4 @@
+/* HASH CRC-32:0x8344069e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,37 +18,24 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-%(c_prefix){
-/* (#) Portability: Cygwin        (/winsup/cygwin/include/sys/sysmacros.h) */
-/* (#) Portability: DJGPP         (/include/sys/sysmacros.h) */
-/* (#) Portability: GNU C Library (/misc/sys/sysmacros.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/uts/common/sys/sysmacros.h) */
-/* (#) Portability: diet libc     (/include/sys/sysmacros.h) */
-/* (#) Portability: libc4/5       (/include/sys/sysmacros.h) */
-/* (#) Portability: mintlib       (/include/sys/sysmacros.h) */
-/* (#) Portability: musl libc     (/include/sys/sysmacros.h) */
-/* (#) Portability: uClibc        (/include/sys/sysmacros.h) */
+#ifndef __local_makedev_defined
+#define __local_makedev_defined
+#include <__crt.h>
+#include <asm/os/mkdev.h>
+#ifdef __MKDEV_CURRENT_VERSION
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(makedev) __ATTR_CONST __ATTR_WUNUSED __dev_t
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(makedev))(__major_t __maj, __minor_t __min) {
+	return ((__dev_t)__maj << __MKDEV_MAJOR_SHFT(__MKDEV_CURRENT_VERSION)) |
+	       ((__dev_t)__min << __MKDEV_MINOR_SHFT(__MKDEV_CURRENT_VERSION));
 }
-
-%[insert:prefix(
-#include <sys/mkdev.h>
-)]%{
-
-}
-
-
-%[insert:pp_if($has_function(major))]
-%#define gnu_dev_major(dev)            major(dev)
-%[insert:pp_endif]
-
-%[insert:pp_if($has_function(minor))]
-%#define gnu_dev_minor(dev)            minor(dev)
-%[insert:pp_endif]
-
-%[insert:pp_if($has_function(makedev))]
-%#define gnu_dev_makedev(major, minor) makedev(major, minor)
-%[insert:pp_endif]
-
-%{
-
-}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_makedev_defined
+#define __local___localdep_makedev_defined
+#define __localdep_makedev __LIBC_LOCAL_NAME(makedev)
+#endif /* !__local___localdep_makedev_defined */
+#else /* __MKDEV_CURRENT_VERSION */
+#undef __local_makedev_defined
+#endif /* !__MKDEV_CURRENT_VERSION */
+#endif /* !__local_makedev_defined */

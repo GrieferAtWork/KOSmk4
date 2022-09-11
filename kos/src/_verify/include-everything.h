@@ -191,6 +191,7 @@ incdir("");
 #include <asm/os/ipc.h>
 #include <asm/os/itimer.h>
 #include <asm/os/limits.h>
+#include <asm/os/mkdev.h>
 #include <asm/os/mman.h>
 #include <asm/os/mount.h>
 #include <asm/os/msq.h>
@@ -706,7 +707,6 @@ incdir("");
 #include <kos/config/toolchain.h>
 #include <kos/coredump.h>
 #include <kos/debugtrap.h>
-#include <kos/dev.h>
 #include <kos/dosfs.h>
 #include <kos/except/asm/codes.h>
 #include <kos/except/codes.h>
@@ -1349,6 +1349,7 @@ incdir("");
 #include <sys/klog.h>
 #include <sys/link.h>
 #include <sys/loadavg.h>
+#include <sys/mkdev.h>
 #include <sys/mman.h>
 #include <sys/mmio.h>
 #include <sys/mount.h>

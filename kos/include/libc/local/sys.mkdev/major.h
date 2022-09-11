@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe09e8155 */
+/* HASH CRC-32:0x3b89cb33 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,38 +18,24 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_AUTO_SYS_SYSMACROS_C
-#define GUARD_LIBC_AUTO_SYS_SYSMACROS_C 1
-
-#include "../api.h"
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include "sys.sysmacros.h"
-
-DECL_BEGIN
-
-#ifndef __KERNEL__
-INTERN ATTR_SECTION(".text.crt.system.utility") ATTR_CONST WUNUSED major_t
-NOTHROW(LIBCCALL libc_gnu_dev_major)(dev_t dev) {
-	return (major_t)((uintptr_t)dev >> 20);
+#ifndef __local_major_defined
+#define __local_major_defined
+#include <__crt.h>
+#include <asm/os/mkdev.h>
+#ifdef __MKDEV_CURRENT_VERSION
+#include <bits/types.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(major) __ATTR_CONST __ATTR_WUNUSED __major_t
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(major))(__dev_t __dev) {
+	return (__major_t)(__dev >> __MKDEV_MAJOR_SHFT(__MKDEV_CURRENT_VERSION)) &
+	       (__major_t)(((__major_t)1 << __MKDEV_MAJOR_BITS(__MKDEV_CURRENT_VERSION)) - 1);
 }
-INTERN ATTR_SECTION(".text.crt.system.utility") ATTR_CONST WUNUSED minor_t
-NOTHROW(LIBCCALL libc_gnu_dev_minor)(dev_t dev) {
-	return (minor_t)((uintptr_t)dev & ((1 << 20) - 1));
-}
-INTERN ATTR_SECTION(".text.crt.system.utility") ATTR_CONST WUNUSED dev_t
-NOTHROW(LIBCCALL libc_gnu_dev_makedev)(major_t major,
-                                       minor_t minor) {
-	return (dev_t)major << 20 | (dev_t)minor;
-}
-#endif /* !__KERNEL__ */
-
-DECL_END
-
-#ifndef __KERNEL__
-DEFINE_PUBLIC_ALIAS(gnu_dev_major, libc_gnu_dev_major);
-DEFINE_PUBLIC_ALIAS(gnu_dev_minor, libc_gnu_dev_minor);
-DEFINE_PUBLIC_ALIAS(gnu_dev_makedev, libc_gnu_dev_makedev);
-#endif /* !__KERNEL__ */
-
-#endif /* !GUARD_LIBC_AUTO_SYS_SYSMACROS_C */
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_major_defined
+#define __local___localdep_major_defined
+#define __localdep_major __LIBC_LOCAL_NAME(major)
+#endif /* !__local___localdep_major_defined */
+#else /* __MKDEV_CURRENT_VERSION */
+#undef __local_major_defined
+#endif /* !__MKDEV_CURRENT_VERSION */
+#endif /* !__local_major_defined */

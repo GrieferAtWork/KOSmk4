@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9dc19ed6 */
+/* HASH CRC-32:0x6b916150 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3141,6 +3141,17 @@ DEFINE_PUBLIC_ALIAS(DOS$ftok, libd_ftok);
 /* sys.klog */
 DEFINE_PUBLIC_ALIAS(DOS$klogctl, libd_klogctl);
 
+/* sys.mkdev */
+DEFINE_PUBLIC_ALIAS(DOS$gnu_dev_makedev, libd_makedev);
+DEFINE_PUBLIC_ALIAS(DOS$makedev, libd_makedev);
+DEFINE_PUBLIC_ALIAS(DOS$gnu_dev_major, libd_major);
+DEFINE_PUBLIC_ALIAS(DOS$major, libd_major);
+DEFINE_PUBLIC_ALIAS(DOS$gnu_dev_minor, libd_minor);
+DEFINE_PUBLIC_ALIAS(DOS$minor, libd_minor);
+DEFINE_PUBLIC_ALIAS(DOS$__makedev, libd___makedev);
+DEFINE_PUBLIC_ALIAS(DOS$__major, libd___major);
+DEFINE_PUBLIC_ALIAS(DOS$__minor, libd___minor);
+
 /* sys.mman */
 DEFINE_PUBLIC_ALIAS(DOS$mmap, libd_mmap);
 DEFINE_PUBLIC_ALIAS(DOS$__munmap, libd_munmap);
@@ -3361,11 +3372,6 @@ DEFINE_PUBLIC_ALIAS(DOS$sysinfo, libd_sysinfo);
 DEFINE_PUBLIC_ALIAS(DOS$openlog, libd_openlog);
 DEFINE_PUBLIC_ALIAS(DOS$setlogmask, libd_setlogmask);
 DEFINE_PUBLIC_ALIAS(DOS$vsyslog, libd_vsyslog);
-
-/* sys.sysmacros */
-DEFINE_PUBLIC_ALIAS(DOS$gnu_dev_major, libd_gnu_dev_major);
-DEFINE_PUBLIC_ALIAS(DOS$gnu_dev_minor, libd_gnu_dev_minor);
-DEFINE_PUBLIC_ALIAS(DOS$gnu_dev_makedev, libd_gnu_dev_makedev);
 
 /* sys.systeminfo */
 DEFINE_PUBLIC_ALIAS(DOS$__solaris_sysinfo, libd___solaris_sysinfo);

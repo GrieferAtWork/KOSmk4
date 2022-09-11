@@ -37,7 +37,7 @@
 #include <hw/usb/class.h>
 #include <hw/usb/hub.h>
 #include <hw/usb/usb.h>
-#include <kos/dev.h>
+#include <sys/mkdev.h>
 
 #include <stddef.h>
 #include <stdio.h>
@@ -192,7 +192,7 @@ usbhubdev_probe(struct usb_controller *__restrict self,
 
 	{
 		static int n = 0; /* TODO: better naming */
-		device_registerf(self, MKDEV(DEV_MAJOR_AUTO, 0), "usbhub%c", 'a' + n++);
+		device_registerf(self, makedev(MKDEV_MAJOR_AUTO, 0), "usbhub%c", 'a' + n++);
 	}
 	TRY {
 		usb_register_device(intf->ui_device, result);

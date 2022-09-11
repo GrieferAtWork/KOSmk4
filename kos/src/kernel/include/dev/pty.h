@@ -28,15 +28,15 @@
 #include <bits/os/termio.h>  /* struct winsize */
 #include <bits/os/termios.h> /* struct termios */
 #include <kos/aref.h>
-#include <kos/dev.h>
+#include <sys/mkdev.h>
 
 #include <libbuffer/ringbuffer.h>
 
 /* PTY device numbers. */
 #define PTY_DEVCNT    256
-#define PTY_MASTER(n) MKDEV(2, n)
-#define PTY_SLAVE(n)  MKDEV(3, n)
-#define PTY_EXTCNT    (1 << MINORBITS) /* Total number of unique PTY devices. */
+#define PTY_MASTER(n) makedev(2, n)
+#define PTY_SLAVE(n)  makedev(3, n)
+#define PTY_EXTCNT    MINOR_MAX /* Total number of unique PTY devices. */
 
 
 #ifdef __CC__

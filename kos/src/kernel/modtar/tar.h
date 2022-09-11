@@ -90,7 +90,7 @@ DEFINE_REFCNT_FUNCTIONS(struct tarfile, tf_refcnt, tarfile_destroy)
 
 /* Accessors for hidden fields. */
 #define _tarfile_hidden(self)    (strend((self)->tf_name) + 1)
-#define tarfile_getdevno(self)   ((dev_t)(*(uint32_t const *)CEIL_ALIGN((uintptr_t)_tarfile_hidden(self), 4)))
+#define tarfile_getdevno(self)   (*(dev_t const *)CEIL_ALIGN((uintptr_t)_tarfile_hidden(self), __ALIGNOF_DEV_T__))
 #define tarfile_getlnkstr(self)  ((char const *)_tarfile_hidden(self))
 #define tarfile_gethrdstr(self)  ((char const *)_tarfile_hidden(self))
 #define tarfile_getnexthdr(self) ((self)->tf_pos + CEIL_ALIGN((self)->tf_size, TBLOCKSIZE))

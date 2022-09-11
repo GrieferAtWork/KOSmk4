@@ -1,4 +1,3 @@
-/* HASH CRC-32:0x445aa0c9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,18 +17,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_gnu_dev_minor_defined
-#define __local_gnu_dev_minor_defined
-#include <__crt.h>
-#include <bits/types.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(gnu_dev_minor) __ATTR_CONST __ATTR_WUNUSED __minor_t
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(gnu_dev_minor))(__dev_t __dev) {
-	return (__minor_t)((__UINTPTR_TYPE__)__dev & ((1 << 20) - 1));
-}
-__NAMESPACE_LOCAL_END
-#ifndef __local___localdep_gnu_dev_minor_defined
-#define __local___localdep_gnu_dev_minor_defined
-#define __localdep_gnu_dev_minor __LIBC_LOCAL_NAME(gnu_dev_minor)
-#endif /* !__local___localdep_gnu_dev_minor_defined */
-#endif /* !__local_gnu_dev_minor_defined */
+#ifndef _ASM_OS_MKDEV_H
+#define _ASM_OS_MKDEV_H 1
+
+#include <__stdinc.h>
+
+#if defined(__KOS__) || defined(__linux__)
+#include <asm/os/kos/mkdev.h>
+#elif defined(__solaris__)
+#include <asm/os/solaris/mkdev.h>
+#endif /* ... */
+
+#endif /* !_ASM_OS_MKDEV_H */

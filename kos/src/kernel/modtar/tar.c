@@ -50,10 +50,10 @@
 #include <hybrid/overflow.h>
 #include <hybrid/wordbits.h>
 
-#include <kos/dev.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 #include <linux/magic.h>
+#include <sys/mkdev.h>
 
 #include <alloca.h>
 #include <assert.h>
@@ -1505,20 +1505,20 @@ handle_empty_name:
 
 	case S_IFBLK:
 	case S_IFCHR: {
-		uint32_t major, minor;
+		major_t major;
+		minor_t minor;
 		size_t offsetof_devno;
-		major = (uint32_t)decode_oct(self->th_devmajor, COMPILER_LENOF(self->th_devmajor));
-		minor = (uint32_t)decode_oct(self->th_devminor, COMPILER_LENOF(self->th_devminor));
-		if unlikely(major > (uint32_t)((1 << MAJORBITS) - 1) ||
-		            minor > (uint32_t)((1 << MINORBITS) - 1))
+		major = (major_t)decode_oct(self->th_devmajor, COMPILER_LENOF(self->th_devmajor));
+		minor = (minor_t)decode_oct(self->th_devminor, COMPILER_LENOF(self->th_devminor));
+		if unlikely(major > MAJOR_MAX || minor > MINOR_MAX)
 			return NULL; /* Unsupported device number :( */
-		descsiz        = CEIL_ALIGN(descsiz, 4);
+		descsiz        = CEIL_ALIGN(descsiz, __ALIGNOF_DEV_T__);
 		offsetof_devno = descsiz;
-		descsiz += 4;
+		descsiz += sizeof(dev_t);
 		result = (struct tarfile *)kmalloc(descsiz, GFP_NORMAL);
 
 		/* Fill in device number. */
-		*(uint32_t *)((byte_t *)result + offsetof_devno) = (uint32_t)MKDEV(major, minor);
+		*(dev_t *)((byte_t *)result + offsetof_devno) = makedev(major, minor);
 		goto fill_common_fields;
 	}	break;
 

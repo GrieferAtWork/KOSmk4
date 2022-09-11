@@ -26,7 +26,6 @@
 #include <kernel/types.h>
 #include <sched/group.h>
 
-#include <kos/dev.h>
 
 #include <libterm/termio.h>
 

@@ -54,8 +54,8 @@
 #include <hw/bus/pci.h>
 #include <hw/usb/uhci.h>
 #include <hw/usb/usb.h>
-#include <kos/dev.h>
 #include <kos/except/reason/io.h>
+#include <sys/mkdev.h>
 
 #include <assert.h>
 #include <inttypes.h>
@@ -3156,7 +3156,7 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 	/* Register the device. */
 	{
 		static int n = 0; /* TODO: better naming */
-		device_registerf(result, MKDEV(DEV_MAJOR_AUTO, 0), "uhci%c", 'a' + n++);
+		device_registerf(result, makedev(MKDEV_MAJOR_AUTO, 0), "uhci%c", 'a' + n++);
 	}
 
 	/* Reset & probe for new connections. */

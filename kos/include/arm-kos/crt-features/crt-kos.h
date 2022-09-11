@@ -855,6 +855,8 @@
 #define __CRT_HAVE___lxstat
 #define __CRT_HAVE___lxstat64
 #define __CRT_HAVE___madvise
+#define __CRT_HAVE___major
+#define __CRT_HAVE___makedev
 #define __CRT_HAVE___mb_cur_max
 #define __CRT_HAVE___mbrlen
 #define __CRT_HAVE___mbrtowc
@@ -910,6 +912,7 @@
 #define __CRT_HAVE___memsetl_chk
 #define __CRT_HAVE___memsetq_chk
 #define __CRT_HAVE___memsetw_chk
+#define __CRT_HAVE___minor
 #define __CRT_HAVE___mkdir
 #define __CRT_HAVE___mktemp
 #define __CRT_HAVE___mlock
@@ -3639,11 +3642,13 @@
 #define __CRT_HAVE_lutimes
 #define __CRT_HAVE_lutimes64
 #define __CRT_HAVE_madvise
+#define __CRT_HAVE_major
 #define __CRT_HAVE_make_relative_prefix
 #define __CRT_HAVE_make_relative_prefix_ignore_links
 #define __CRT_HAVE_make_temp_file
 #define __CRT_HAVE_make_temp_file_with_prefix
 #define __CRT_HAVE_makecontext
+#define __CRT_HAVE_makedev
 #define __CRT_HAVE_mallinfo
 #define __CRT_HAVE_mallinfo2
 #define __CRT_HAVE_malloc
@@ -3799,6 +3804,7 @@
 #define __CRT_HAVE_memxlenw
 #define __CRT_HAVE_mergesort
 #define __CRT_HAVE_mincore
+#define __CRT_HAVE_minor
 #define __CRT_HAVE_mkdir
 #define __CRT_HAVE_mkdirat
 #define __CRT_HAVE_mkdtemp

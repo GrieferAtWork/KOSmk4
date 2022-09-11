@@ -54,13 +54,13 @@
 
 #include <hybrid/atomic.h>
 
-#include <kos/dev.h>
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
 #include <kos/guid.h>
 #include <kos/kernel/handle.h>
 #include <kos/sched/shared-rwlock.h>
+#include <sys/mkdev.h>
 
 #include <assert.h>
 #include <format-printer.h>
@@ -1400,7 +1400,7 @@ NOTHROW(FCALL devfs_log_new_device)(struct device *__restrict self) {
 	                  "%#" PRIxN(__SIZEOF_MINOR_T__) ":"
 	                  "%q%s\n",
 	       device_ischr(self) ? "chr" : "blk",
-	       MAJOR(self->dn_devno), MINOR(self->dn_devno),
+	       major(self->dn_devno), minor(self->dn_devno),
 	       self->dv_dirent->dd_dirent.fd_name,
 	       self->dv_byname_node.rb_lhs == DEVICE_BYNAME_DELETED ? " [deleted]" : "");
 }
@@ -2046,7 +2046,7 @@ device_lookup_bypartguid(guid_t const *__restrict guid)
  *  #2: Pass `string' to `device_lookup_byname()', and re-return if non-NULL
  *  #3: if `!S_ISCHR(st_mode)' and `string' matches FORMAT_GUID_T, decode a
  *      GUID and make use of `device_lookup_bypartguid'.
- *  #4: if `st_mode != 0', do `sscanf(string, "%u:%u")' for a MAJOR/MINOR
+ *  #4: if `st_mode != 0', do `sscanf(string, "%u:%u")' for a major/minor
  *      pair, construct a dev_t, and pass to `device_lookup_bydev()', and
  *      re-return if non-NULL
  *  #5: If all else failed, return `NULL' */
@@ -2080,7 +2080,7 @@ device_lookup_bystring(USER CHECKED char const *string,
 		*(char *)mempcpy(text, string, stringlen, sizeof(char)) = '\0';
 		if (sscanf(text, "%u:%u", &major, &minor) == 2) {
 			dev_t devno;
-			devno  = MKDEV(major, minor);
+			devno  = makedev(major, minor);
 			result = device_lookup_bydev(st_mode, devno);
 			if (result != NULL)
 				goto done;
@@ -2120,7 +2120,7 @@ do_dump_blkdev(struct blkdev *__restrict self,
 	                  "%" PRIuSIZ "\n"),
 	           (unsigned int)longest_device_name,
 	           device_getname(self),
-	           MAJOR(self->dn_devno), MINOR(self->dn_devno),
+	           major(self->dn_devno), minor(self->dn_devno),
 	           (unsigned int)longest_driver_name,
 	           self->dv_driver->d_name,
 	           total_bytes_adj, total_bytes_name,
@@ -2268,7 +2268,7 @@ do_dump_chrdev(struct chrdev *__restrict self,
 	                  "%*-s  %-8s  "),
 	           (unsigned int)longest_device_name,
 	           self->dv_dirent->dd_dirent.fd_name,
-	           MAJOR(self->dn_devno), MINOR(self->dn_devno),
+	           major(self->dn_devno), minor(self->dn_devno),
 	           (unsigned int)longest_driver_name,
 	           self->dv_driver->d_name,
 	           kind);

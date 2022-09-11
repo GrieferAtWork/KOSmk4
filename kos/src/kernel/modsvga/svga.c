@@ -33,6 +33,7 @@
 #include <hybrid/align.h>
 
 #include <kos/except.h>
+#include <sys/mkdev.h>
 
 #include <assert.h>
 #include <inttypes.h>
@@ -272,7 +273,9 @@ again_load_mode:
 				{
 					/* Register the device. */
 					TRY {
-						device_registerf(self, MKDEV(DEV_MAJOR_AUTO, 0), "svga");
+						device_registerf(self,
+						                 makedev(MKDEV_MAJOR_AUTO, 0),
+						                 "svga");
 					} EXCEPT {
 						decref_nokill(&drv_self);
 						RETHROW();

@@ -49,7 +49,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <bits/os/timespec.h>
 #include <bits/os/timeval.h>
 #include <kos/anno.h>
-#include <kos/dev.h>
 #include <kos/except-handler.h>
 #include <kos/except.h>
 #include <kos/futex.h>
@@ -66,6 +65,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <sys/eventfd.h>
 #include <sys/filio.h>
 #include <sys/ioctl.h>
+#include <sys/mkdev.h>
 #include <sys/mman.h>
 #include <sys/mount.h>
 #include <sys/param.h>
@@ -993,8 +993,7 @@ print_dev(pformatprinter printer, void *arg, mode_t mode, dev_t devno) {
 	                       ":%" PRIuN(__SIZEOF_MAJOR_T__)
 	                       ":%" PRIuN(__SIZEOF_MINOR_T__),
 	                       S_ISBLK(mode) ? "blk" : "chr",
-	                       MAJOR(devno),
-	                       MINOR(devno));
+	                       major(devno), minor(devno));
 #ifdef __KERNEL__
 	if likely(result >= 0) {
 		REF struct device *dev;
@@ -5878,8 +5877,7 @@ do_struct_timespecx64:
 		                       "?"
 		                       ":%" PRIuN(__SIZEOF_MAJOR_T__)
 		                       ":%" PRIuN(__SIZEOF_MINOR_T__),
-		                       MAJOR(devno),
-		                       MINOR(devno));
+		                       major(devno), minor(devno));
 	}	break;
 #endif /* HAVE_SC_REPR_DEV_T */
 

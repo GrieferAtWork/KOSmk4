@@ -43,7 +43,6 @@
 
 #include <hybrid/atomic.h>
 
-#include <kos/dev.h>
 #include <sys/filio.h>
 #include <sys/io.h>
 #include <sys/param.h> /* NBBY */

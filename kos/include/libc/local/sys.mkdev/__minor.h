@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43e5201a */
+/* HASH CRC-32:0xc4f2aa99 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,18 +18,25 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_gnu_dev_makedev_defined
-#define __local_gnu_dev_makedev_defined
+#ifndef __local___minor_defined
+#define __local___minor_defined
 #include <__crt.h>
+#include <asm/os/mkdev.h>
+#ifdef __MKDEV_CURRENT_VERSION
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(gnu_dev_makedev) __ATTR_CONST __ATTR_WUNUSED __dev_t
-__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(gnu_dev_makedev))(__major_t __major, __minor_t __minor) {
-	return (__dev_t)__major << 20 | (__dev_t)__minor;
+__LOCAL_LIBC(__minor) __ATTR_CONST __ATTR_WUNUSED __minor_t
+__NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__minor))(int __version, __dev_t __dev) {
+	(void)__version;
+	return (__minor_t)(__dev >> __MKDEV_MINOR_SHFT(__version)) &
+	       (__minor_t)(((__minor_t)1 << __MKDEV_MINOR_BITS(__version)) - 1);
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_gnu_dev_makedev_defined
-#define __local___localdep_gnu_dev_makedev_defined
-#define __localdep_gnu_dev_makedev __LIBC_LOCAL_NAME(gnu_dev_makedev)
-#endif /* !__local___localdep_gnu_dev_makedev_defined */
-#endif /* !__local_gnu_dev_makedev_defined */
+#ifndef __local___localdep___minor_defined
+#define __local___localdep___minor_defined
+#define __localdep___minor __LIBC_LOCAL_NAME(__minor)
+#endif /* !__local___localdep___minor_defined */
+#else /* __MKDEV_CURRENT_VERSION */
+#undef __local___minor_defined
+#endif /* !__MKDEV_CURRENT_VERSION */
+#endif /* !__local___minor_defined */
