@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83ab571e */
+/* HASH CRC-32:0x77f277f0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,10 +28,10 @@
 #include "core/strings.h"
 
 /* >> explicit_bzero(3)
- * Same as `bzero(dst, n_bytes)',  however compilers  will not  optimize
- * away uses of this function when they (think) that clearing the memory
- * wouldn't  have  any visible  side-effects (though  those side-effects
- * may be a security-concious application trying to wipe sensitive data) */
+ * Same  as  `bzero(dst, n_bytes)', however  compilers will  not optimize
+ * away uses of this function when they (think) that clearing the  memory
+ * wouldn't  have  any  visible side-effects  (though  those side-effects
+ * may be a security-conscious application trying to wipe sensitive data) */
 #define __libc_explicit_bzero __libc_core_explicit_bzero
 
 #endif /* __CC__ */
