@@ -46,4 +46,8 @@
 #define __GAS_HAVE_IFC_IBCONTAINS      /* `.ifc_ibcontains', `.ifnc_ibcontains' */
 #endif /* __KOS__ && GCC >= 12.1.0 */
 
+/* GAS/LD (though mostly LD)  produce corrupted CFI data  if
+ * you try to use `.cfi_*' directives in comdat text section */
+#define __GAS_HAVE_BROKEN_CFI_IN_COMDAT
+
 #endif /* !_ASM_GAS_H */
