@@ -24,6 +24,11 @@ require_utility libpciaccess "$PKG_CONFIG_PATH/pciaccess.pc"
 #      ever heard of. (So upgrading any further might be a problem...)
 PACKAGE_URL="https://dri.freedesktop.org/libdrm/libdrm-2.4.100.tar.gz"
 
+#Hacks:
+# - "-fcommon":                error "multiple definition of `nouveau_debug';"
+# - "-D_GLIBC_BLOAT_SOURCE=1": relies <pthread.h> including <time.h> (as it does in glibc)
+PACKAGE_CCFLAGS="-fcommon -D_GLIBC_BLOAT_SOURCE=1"
+
 # Automatically build+install using autoconf
 . "$KOS_MISC/utilities/misc/gnu_make.sh"
 
