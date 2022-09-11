@@ -1,4 +1,4 @@
-#TEST: require_utility coreutils "TODO"
+#TEST: require_utility deemon "$TARGET_SYSROOT/bin/join"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -17,6 +17,7 @@
 # 2. Altered source versions must be plainly marked as such, and must not be
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
+require_utility libgmp "$PKG_CONFIG_PATH/gmp.pc"
 
 PACKAGE_URL="https://ftp.gnu.org/gnu/coreutils/coreutils-9.1.tar.xz"
 PACKAGE_NAME="coreutils-9.1"
@@ -24,7 +25,7 @@ PACKAGE_NAME="coreutils-9.1"
 CONFIGURE=(
 	--disable-libsmack
 	--without-linux-crypto
-	--without-libgmp
+	--with-libgmp
 	--without-openssl
 	--enable-threads=posix
 	--with-included-regex  # FIXME: KOS's libc regex is still broken
