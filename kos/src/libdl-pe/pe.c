@@ -24,6 +24,7 @@
 #define _KOS_ALTERATIONS_SOURCE 1
 #define _GNU_SOURCE 1
 #define _DOS_SOURCE 1
+#define _ALL_LIMITS_SOURCE 1
 
 #include "api.h"
 /**/

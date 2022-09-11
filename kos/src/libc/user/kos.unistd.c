@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBC_USER_KOS_UNISTD_C
 #define GUARD_LIBC_USER_KOS_UNISTD_C 1
+#define _ALL_LIMITS_SOURCE 1
 
 #include "../api.h"
 /**/

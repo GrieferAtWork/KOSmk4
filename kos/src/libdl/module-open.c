@@ -21,6 +21,7 @@
 #define GUARD_LIBDL_MODULE_OPEN_C 1
 #define _KOS_SOURCE 1
 #define _GNU_SOURCE 1
+#define _ALL_LIMITS_SOURCE 1
 
 /* Keep this one the first */
 #include "dl.h"

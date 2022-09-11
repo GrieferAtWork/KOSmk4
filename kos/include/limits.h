@@ -300,7 +300,7 @@ local limits = {
 	(0, "MQ_OPEN_MAX",                  "_POSIX_MQ_OPEN_MAX",                  "8",        "Maximum # of message queues open for a process."),
 	(0, "MQ_PRIO_MAX",                  "_POSIX_MQ_PRIO_MAX",                  "32",       "Maximum # of supported message priorities."),
 	(1, "NAME_MAX",                     "_POSIX_NAME_MAX",                     "14",       "Number of bytes in a filename."),
-	(1, "PATH_MAX",                     "_POSIX_PATH_MAX",                     "256",      "Number of bytes in a pathname."),
+	(0, "PATH_MAX",                     "_POSIX_PATH_MAX",                     "256",      "Number of bytes in a pathname. (Not defined by default because some programs\n * think `defined(MAX_PATH)' -> chdir(2) fails for paths longer than this)"),
 	(0, "PIPE_BUF",                     "_POSIX_PIPE_BUF",                     "512",      "Number of bytes than can be written atomically to a pipe."),
 	(1, "RE_DUP_MAX",                   "_POSIX_RE_DUP_MAX",                   "255",      "Max # of repeated occurrences of a BRE permitted by the REGEXEC and REGCOMP functions when using the interval notation."),
 	(1, "RTSIG_MAX",                    "_POSIX_RTSIG_MAX",                    "8",        "Minimal # of realtime signals reserved for the application."),
@@ -408,7 +408,8 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #define _POSIX_NAME_MAX                     14       /* Number of bytes in a filename. */
 #endif /* !_POSIX_NAME_MAX */
 #ifndef _POSIX_PATH_MAX
-#define _POSIX_PATH_MAX                     256      /* Number of bytes in a pathname. */
+#define _POSIX_PATH_MAX                     256      /* Number of bytes in a pathname. (Not defined by default because some programs
+ * think `defined(MAX_PATH)' -> chdir(2) fails for paths longer than this) */
 #endif /* !_POSIX_PATH_MAX */
 #ifndef _POSIX_PIPE_BUF
 #define _POSIX_PIPE_BUF                     512      /* Number of bytes than can be written atomically to a pipe. */
@@ -507,7 +508,8 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #define __NAME_MAX _POSIX_NAME_MAX /* Number of bytes in a filename. */
 #endif /* !__NAME_MAX */
 #ifndef __PATH_MAX
-#define __PATH_MAX _POSIX_PATH_MAX /* Number of bytes in a pathname. */
+#define __PATH_MAX _POSIX_PATH_MAX /* Number of bytes in a pathname. (Not defined by default because some programs
+ * think `defined(MAX_PATH)' -> chdir(2) fails for paths longer than this) */
 #endif /* !__PATH_MAX */
 #ifndef __PIPE_BUF
 #define __PIPE_BUF _POSIX_PIPE_BUF /* Number of bytes than can be written atomically to a pipe. */
@@ -702,13 +704,14 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #endif /* !__NAME_MAX || __NAME_MAX == -1 */
 #endif /* !NAME_MAX */
 
-/* Number of bytes in a pathname. */
+/* Number of bytes in a pathname. (Not defined by default because some programs
+ * think `defined(MAX_PATH)' -> chdir(2) fails for paths longer than this) */
 #ifndef PATH_MAX
 #if defined(__PATH_MAX) && __PATH_MAX != -1
 #define PATH_MAX __PATH_MAX
-#else /* __PATH_MAX && __PATH_MAX != -1 */
+#elif defined(__USE_ALL_LIMITS)
 #define PATH_MAX _POSIX_PATH_MAX
-#endif /* !__PATH_MAX || __PATH_MAX == -1 */
+#endif /* ... */
 #endif /* !PATH_MAX */
 
 /* Number of bytes than can be written atomically to a pipe. */

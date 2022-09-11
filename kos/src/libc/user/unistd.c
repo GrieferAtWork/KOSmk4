@@ -20,6 +20,7 @@
 #ifndef GUARD_LIBC_USER_UNISTD_C
 #define GUARD_LIBC_USER_UNISTD_C 1
 #define _KOS_SOURCE 1
+#define _ALL_LIMITS_SOURCE 1
 
 #include "../api.h"
 /**/
@@ -1933,7 +1934,7 @@ PRIVATE ATTR_SECTION(".rodata.crt.fs.property") longptr_t const pc_constants[] =
 	[_PC_MAX_CANON]          = PATHCONF_VARYING_LIMIT,
 	[_PC_MAX_INPUT]          = PATHCONF_VARYING_LIMIT,
 	[_PC_NAME_MAX]           = PATHCONF_VARYING_LIMIT,
-	[_PC_PATH_MAX]           = PATH_MAX,
+	[_PC_PATH_MAX]           = -1 /*PATH_MAX*/, /* Unlimitedw */
 	[_PC_PIPE_BUF]           = PIPE_BUF,
 	[_PC_CHOWN_RESTRICTED]   = 1, /* All filesystems supported by KOS implement posix ownership rules. */
 	[_PC_NO_TRUNC]           = 1, /* No, filenames are never silently truncated. */

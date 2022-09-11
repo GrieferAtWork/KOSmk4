@@ -20,6 +20,7 @@
 #ifndef GUARD_LIBC_USER_STDLIB_C
 #define GUARD_LIBC_USER_STDLIB_C 1
 #define _UTF_SOURCE 1
+#define _ALL_LIMITS_SOURCE 1
 
 #include "../api.h"
 /**/
