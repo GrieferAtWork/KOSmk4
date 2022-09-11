@@ -207,9 +207,12 @@ diff -Naur gcc-12.1.0-orig/gcc/config/kos.h gcc-12.1.0/gcc/config/kos.h
 +#endif /* !TARGET_KOS64_WITH_MULTIARCH */
 diff -Naur gcc-12.1.0-orig/gcc/config/kos.opt gcc-12.1.0/gcc/config/kos.opt
 --- gcc-12.1.0-orig/gcc/config/kos.opt	1970-01-01 01:00:00.000000000 +0100
-+++ gcc-12.1.0/gcc/config/kos.opt	2022-05-15 17:52:37.986345500 +0200
-@@ -0,0 +1,6 @@
++++ gcc-12.1.0/gcc/config/kos.opt	2022-09-11 16:51:07.082271700 +0200
+@@ -0,0 +1,9 @@
 +; Kos-specific options.
++
++rdynamic
++Driver
 +
 +pthread
 +Driver
