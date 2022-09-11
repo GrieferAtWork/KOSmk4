@@ -241,6 +241,14 @@ __DECL_END
 #define __hybrid_preemption_pop(p_flag)     (void)(__libc_setsigmaskptr(*(p_flag)))
 #define __hybrid_preemption_ison()          (!__libc_sigisemptyset(__libc_getsigmaskptr()))
 #define __hybrid_preemption_wason(p_flag)   (!__libc_sigisemptyset(*(p_flag)))
+#else /* __libc_setsigmaskfullptr && __libc_setsigmaskptr */
+#include <libc/sys.signal.h>
+#if defined(__libc_sigblockall) && defined(__libc_sigunblockall)
+#define __hybrid_preemption_flag_t          int
+#define __hybrid_preemption_pushoff(p_flag) (void)(*(p_flag) = __libc_sigblockall())
+#define __hybrid_preemption_pop(p_flag)     ((void)(p_flag), (void)__libc_sigunblockall())
+#define __hybrid_preemption_ison()          (__libc_sigblockall(), (__libc_sigunblockall() & 0x7fffffff) == 0)
+#define __hybrid_preemption_wason(p_flag)   (*(p_flag) == 1)
 #elif defined(__libc_sigprocmask)
 #include <asm/os/signal.h>
 #define __hybrid_preemption_flag_t struct __sigset_struct
@@ -281,11 +289,28 @@ __DECL_END
 	})
 #endif /* !__NO_XBLOCK */
 #endif /* ... */
+#endif /* !__libc_setsigmaskfullptr || !__libc_setsigmaskptr */
 #endif /* __KOS_SYSTEM_HEADERS__ */
 
 
-/* Fallback implementation for a generic UNIX target */
 #ifndef __hybrid_preemption_flag_t
+/* Optimized implementation for DragonFly's `sigblockall(3)' */
+#if (defined(__DragonFly__) || defined(__KOS__) ||                \
+     (defined(HAVE_SIGBLOCKALL) && defined(HAVE_SIGUNBLOCKALL) && \
+      (defined(HAVE_SYS_SIGNAL_H) || __has_include(<sys/signal.h>))))
+#ifndef _BSD_SOURCE
+#define _BSD_SOURCE 1
+#endif /* !_BSD_SOURCE */
+#include <sys/signal.h>
+#define __hybrid_preemption_flag_t          int
+#define __hybrid_preemption_pushoff(p_flag) (void)(*(p_flag) = sigblockall())
+#define __hybrid_preemption_pop(p_flag)     ((void)(p_flag), (void)sigunblockall())
+#define __hybrid_preemption_ison()          (sigblockall(), (sigunblockall() & 0x7fffffff) == 0)
+#define __hybrid_preemption_wason(p_flag)   (*(p_flag) == 1)
+#endif /* __DragonFly__ || ... */
+
+#ifndef __hybrid_preemption_flag_t
+/* Fallback implementation for a generic UNIX target */
 #include <hybrid/host.h>
 #if defined(__unix__) || defined(HAVE_SIGNAL_H) || __has_include(<signal.h>)
 #include <signal.h>
@@ -365,6 +390,7 @@ __DECL_END
 #define __hybrid_preemption_pop(p_flag)   (void)sigprocmask(SIG_SETMASK, p_flag, __NULLPTR)
 #define __hybrid_preemption_wason(p_flag) (!__hybrid_sigisemptyset(p_flag))
 #endif /* SIG_SETMASK */
+#endif /* !__hybrid_preemption_flag_t */
 #endif /* !__hybrid_preemption_flag_t */
 
 #if 0 /* Technically correct, but only if `-pthread' is used correctly and passes `-D_REENTRANT' */

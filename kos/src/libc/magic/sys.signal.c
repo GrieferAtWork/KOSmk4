@@ -65,6 +65,7 @@ __SYSDECL_BEGIN
 @@@return: >1: Signals were already blocked (recursion counter)
 @@@return: 1 : Signals were just blocked
 @@@return: -1: Error (on KOS, `errno' was modified in this case, but on DragonFly, it isn't)
+[[libc]]
 int sigblockall(void);
 
 @@>> sigunblockall(3)
@@ -73,6 +74,7 @@ int sigblockall(void);
 @@@return: & 0x7fffffff != 0: Signals are still blocked (recursion counter)
 @@@return: & 0x7fffffff == 0: Signals were just unblocked
 @@@return: -1: Error (on KOS, `errno' was modified in this case, but on DragonFly, it isn't)
+[[libc]]
 int sigunblockall(void);
 
 %#endif /* __USE_BSD */

@@ -832,6 +832,7 @@ incdir("");
 #include <libc/core/string.h>
 #include <libc/core/strings.h>
 #include <libc/core/sys.auxv.h>
+#include <libc/core/sys.signal.h>
 #include <libc/core/unicode.h>
 #include <libc/core/unistd.h>
 #include <libc/ctype.h>
@@ -848,6 +849,7 @@ incdir("");
 #include <libc/string.h>
 #include <libc/strings.h>
 #include <libc/sys.auxv.h>
+#include <libc/sys.signal.h>
 #include <libc/unicode.h>
 #include <libc/unistd.h>
 #include <libcmdline/api.h>
