@@ -1,0 +1,11 @@
+diff -Naur libreadline-8.1-orig/support/shobj-conf libreadline-8.1/support/shobj-conf
+--- libreadline-8.1-orig/support/shobj-conf	2019-12-13 15:51:17.000000000 +0100
++++ libreadline-8.1/support/shobj-conf	2022-09-11 17:50:47.318570900 +0200
+@@ -130,6 +130,7 @@
+ 
+ 	SHLIB_XLDFLAGS='-Wl,-rpath,$(libdir) -Wl,-soname,`basename $@ $(SHLIB_MINOR)`'
+ 	SHLIB_LIBVERSION='$(SHLIB_LIBSUFF).$(SHLIB_MAJOR)$(SHLIB_MINOR)'
++	SHLIB_LIBS='-lncursesw'
+ 	;;
+ 
+ # Darwin/MacOS X
