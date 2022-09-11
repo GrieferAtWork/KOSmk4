@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72b04e12 */
+/* HASH CRC-32:0xdc74b65c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,10 +41,10 @@
 #include <hybrid/typecore.h>
 #include <libc/string.h>
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <stddef.h>
 #include <string.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 
 #ifndef __attribute_pure__

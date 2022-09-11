@@ -56,9 +56,9 @@
 #include <bits/os/timespec.h>
 #endif /* __USE_GNU */
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <stddef.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 /* Flags for `semop'. */
 #if !defined(SEM_UNDO) && defined(__SEM_UNDO)

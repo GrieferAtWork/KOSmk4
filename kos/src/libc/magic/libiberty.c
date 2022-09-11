@@ -39,10 +39,10 @@
 #include <hybrid/__alloca.h>
 )]%{
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <stddef.h>
 #include <stdarg.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

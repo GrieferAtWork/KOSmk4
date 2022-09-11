@@ -630,16 +630,16 @@
  * perform  this inclusion, however doing so isn't actually
  * necessary under KOS.
  *
- * When `_GLIBC_SOURCE' is defined, non-portable, implicit
- * includes are emulated more closely to what is also done
- * by gLibc, note  however that this  additional level  of
- * compatibility is not backed by any fixed standard,  but
- * depends solely on what gLibc actually does in  relation
- * to fixed standards (such as POSIX) */
-#ifdef _GLIBC_SOURCE
-#undef __USE_GLIBC
-#define __USE_GLIBC 1
-#endif /* _GLIBC_SOURCE */
+ * When `_GLIBC_BLOAT_SOURCE'  is defined,  non-portable,
+ * implicit includes are emulated more closely to what is
+ * also done by gLibc, note however that this  additional
+ * level of  compatibility is  not  backed by  any  fixed
+ * standard, but depends  solely on  what gLibc  actually
+ * does in relation  to fixed standards  (such as  POSIX) */
+#ifdef _GLIBC_BLOAT_SOURCE
+#undef __USE_GLIBC_BLOAT
+#define __USE_GLIBC_BLOAT 1
+#endif /* _GLIBC_BLOAT_SOURCE */
 
 
 /* Some system headers  may define secondary  variants of  certain

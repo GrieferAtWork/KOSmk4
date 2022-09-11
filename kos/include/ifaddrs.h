@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f0de432 */
+/* HASH CRC-32:0x747549e2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,9 +42,9 @@
 
 #include <bits/crt/ifaddrs.h>
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <sys/socket.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

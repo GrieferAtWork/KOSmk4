@@ -37,10 +37,10 @@
 #include <bits/os/acct.h>
 #include <bits/types.h>
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <sys/types.h>
 #include <endian.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

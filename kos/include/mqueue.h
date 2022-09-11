@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35ea2ca0 */
+/* HASH CRC-32:0x9e9dccd2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,10 +45,10 @@
 #include <bits/os/timespec.h>
 #include <bits/types.h>
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <sys/types.h>
 #include <fcntl.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

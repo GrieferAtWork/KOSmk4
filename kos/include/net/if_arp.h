@@ -42,10 +42,10 @@
 #include <net/bits/types.h>
 
 /* NOTE: None of the things in here are imporant for the kernel! */
-#ifndef __USE_GLIBC
+#ifndef __USE_GLIBC_BLOAT
 #include <sys/socket.h>
 #include <sys/types.h>
-#endif /* !__USE_GLIBC */
+#endif /* !__USE_GLIBC_BLOAT */
 
 __SYSDECL_BEGIN
 

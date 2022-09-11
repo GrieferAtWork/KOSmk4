@@ -261,9 +261,9 @@ INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") __INT8_TYPE__ cons
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 */
 )]%[insert:prefix(
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <endian.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 )]%{
 
 #ifdef __USE_DOS

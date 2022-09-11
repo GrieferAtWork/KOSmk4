@@ -159,9 +159,9 @@
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 || __USE_DOS */
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <endian.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 
 #if !defined(WEOF) && defined(__WEOF)

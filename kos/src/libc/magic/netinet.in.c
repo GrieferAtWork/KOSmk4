@@ -66,12 +66,12 @@
 #include <netinet/ipproto.h>
 )]%{
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <sys/socket.h>
 
 #include <endian.h>
 #include <stdint.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 /* TODO: Constants and structs from this header should
  *       be  moved  into <asm/>  and  <bits/> headers! */

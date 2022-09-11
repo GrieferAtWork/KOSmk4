@@ -53,9 +53,9 @@
 #include <bits/os/timespec.h>
 #endif /* __USE_XOPEN2K */
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <sys/types.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 #if !defined(SEM_FAILED) && defined(__SEM_FAILED)
 #define SEM_FAILED (__CCAST(sem_t *)__SEM_FAILED) /* Returned by `sem_open(3)' upon failure. */

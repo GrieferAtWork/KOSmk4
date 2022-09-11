@@ -38,9 +38,9 @@
 #include <bits/types.h>
 )]%{
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <sys/types.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 #if !defined(XATTR_CREATE) && defined(__XATTR_CREATE)
 #define XATTR_CREATE  __XATTR_CREATE  /* set value, fail if attr already exists. */

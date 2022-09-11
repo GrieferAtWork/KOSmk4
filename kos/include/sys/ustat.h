@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2225bc2 */
+/* HASH CRC-32:0x58e5149f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,9 +35,9 @@
 #include <bits/os/ustat.h> /* struct ustat */
 #include <bits/types.h>    /* __dev_t */
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <sys/types.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

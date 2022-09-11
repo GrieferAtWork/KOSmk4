@@ -36,11 +36,11 @@
 #include <linux/xattr.h>
 )]%{
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <sys/types.h>
 #include <stdint.h>
 #include <linux/types.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

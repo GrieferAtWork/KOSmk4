@@ -33,9 +33,9 @@
 #include <hybrid/host.h>
 #include <hybrid/typecore.h>
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <endian.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 /* For `union ieee754_float' */
 #define IEEE754_FLOAT_MAXEXP 0xff

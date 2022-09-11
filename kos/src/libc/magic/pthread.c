@@ -96,11 +96,11 @@
 #include <kos/anno.h>
 )]%{
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <endian.h>
 #include <sched.h>
 #include <time.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 __SYSDECL_BEGIN
 

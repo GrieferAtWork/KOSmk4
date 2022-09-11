@@ -50,9 +50,9 @@
 #include <bits/types.h>   /* fd_t */
 )]%{
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <fcntl.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 #if !defined(SEEK_SET) && defined(__SEEK_SET)
 #define SEEK_SET __SEEK_SET /* Seek from beginning of file. */

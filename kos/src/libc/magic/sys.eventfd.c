@@ -38,9 +38,9 @@
 #include <bits/types.h>
 )]%{
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <stdint.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 __SYSDECL_BEGIN
 

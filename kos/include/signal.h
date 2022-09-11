@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c1c4b44 */
+/* HASH CRC-32:0x9ae3258e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2615,13 +2615,13 @@ __LOCAL __ATTR_INOUT(1) int __NOTHROW_NCX(__LIBCCALL __sigdelset)(struct __sigse
 /* These appear in glibc under these  names, however these names collide  with
  * some escapes in a couple of places, so only define them when we're supposed
  * to emulate glibc as closely as possible. */
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #undef __sigmask
 #undef __sigword
 /* Return the mask or index for a specific signal `sig' within some sigset. */
 #define __sigmask(sig) __sigset_mask(sig)
 #define __sigword(sig) __sigset_word(sig)
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 #ifdef __USE_NETBSD
 #ifdef __CRT_HAVE_sigabbrev_np

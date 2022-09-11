@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x213fa025 */
+/* HASH CRC-32:0x63b01414 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,9 +40,9 @@
 
 #include <asm/os/random.h>
 #include <bits/types.h>
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <sys/types.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 
 /* Flags accepted by `getrandom(2)' */

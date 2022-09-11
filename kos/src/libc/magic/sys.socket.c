@@ -86,9 +86,9 @@
 #include <compat/config.h>
 #endif /* __KOS__ && __USE_KOS_KERNEL */
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <sys/types.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 #if !defined(FIOSETOWN) && defined(__FIOSETOWN)
 #define FIOSETOWN  __FIOSETOWN  /* ... */

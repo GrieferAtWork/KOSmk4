@@ -42,9 +42,9 @@
 #ifdef __KOS_SYSTEM_HEADERS__
 #include "hybrid/typecore.h"
 #include <bits/elf-types.h>
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <stdint.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 #else /* __KOS_SYSTEM_HEADERS__ */
 #include <stdint.h>
 #endif /* !__KOS_SYSTEM_HEADERS__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc583c79 */
+/* HASH CRC-32:0x961923a4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,10 +42,10 @@
 #include <bits/os/acct.h>
 #include <bits/types.h>
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <sys/types.h>
 #include <endian.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

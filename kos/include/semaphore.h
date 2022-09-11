@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c6d77fd */
+/* HASH CRC-32:0x8cb2a8e1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,9 +49,9 @@
 #include <bits/os/timespec.h>
 #endif /* __USE_XOPEN2K */
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <sys/types.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 #if !defined(SEM_FAILED) && defined(__SEM_FAILED)
 #define SEM_FAILED (__CCAST(sem_t *)__SEM_FAILED) /* Returned by `sem_open(3)' upon failure. */

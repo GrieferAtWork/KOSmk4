@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5890f36 */
+/* HASH CRC-32:0xf6b4d103 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,12 +58,12 @@
 #include <netinet/ipport.h>
 #include <netinet/ipproto.h>
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <sys/socket.h>
 
 #include <endian.h>
 #include <stdint.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 /* TODO: Constants and structs from this header should
  *       be  moved  into <asm/>  and  <bits/> headers! */

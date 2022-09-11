@@ -46,10 +46,10 @@
 
 #include <paths.h>
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <sys/time.h>
 #include <sys/types.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 /* Compatibility names for the strings of the canonical file names. */
 #define UTMP_FILE     _PATH_UTMP

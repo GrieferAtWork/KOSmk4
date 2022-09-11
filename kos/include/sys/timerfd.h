@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x137019fe */
+/* HASH CRC-32:0xe8cdc0c5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,9 +37,9 @@
 #include <asm/os/timerfd.h>
 #include <bits/types.h>
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <time.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 __SYSDECL_BEGIN
 

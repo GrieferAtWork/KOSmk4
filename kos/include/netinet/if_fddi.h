@@ -32,9 +32,9 @@
 #include <bits/types.h>
 #endif /* __USE_MISC && __CC__ && !__USE_KOS_PURE */
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <sys/types.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 /* Copyright (C) 1997-2016 Free Software Foundation, Inc.
    This file is part of the GNU C Library.

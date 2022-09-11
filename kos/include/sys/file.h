@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35af3f3d */
+/* HASH CRC-32:0xacd0d239 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,9 +50,9 @@
 #include <asm/os/stdio.h> /* __SEEK_* */
 #include <bits/types.h>   /* fd_t */
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <fcntl.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 #if !defined(SEEK_SET) && defined(__SEEK_SET)
 #define SEEK_SET __SEEK_SET /* Seek from beginning of file. */

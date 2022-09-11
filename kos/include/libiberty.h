@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4296a14 */
+/* HASH CRC-32:0x61ec0122 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,10 +37,10 @@
 #include <libc/string.h>
 #include <hybrid/__alloca.h>
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <stddef.h>
 #include <stdarg.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

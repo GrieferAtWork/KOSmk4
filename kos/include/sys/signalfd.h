@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f4e5e4 */
+/* HASH CRC-32:0xf7a1fab6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,9 +39,9 @@
 #include <bits/os/sigset.h>           /* struct __sigset_struct */
 #include <bits/types.h>               /* __fd_t */
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <stdint.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 
 

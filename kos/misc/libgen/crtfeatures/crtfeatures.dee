@@ -233,7 +233,7 @@ global final PREDEF_MACROS: {string: CMacro} = Dict({
 	"_REENTRANT": CMacro("1"),
 	"_THREAD_SAFE": CMacro("1"),
 	"_UTF_SOURCE": CMacro("1"),
-	"_GLIBC_SOURCE": CMacro("1"),
+	"_GLIBC_BLOAT_SOURCE": CMacro("1"),
 	"_EVERY_SOURCE": CMacro("1"),
 	"__EXTENSIONS__": CMacro("1"),
 	"__USE_KOS": CMacro("1"),

@@ -47,12 +47,12 @@
 
 #include <limits.h>
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <sys/types.h>
 
 #include <endian.h>
 #include <signal.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 /* NOTE: This  differs from the version defined by <hybrid/minmax.h>,
  *       in that this one can safely be used in constant expressions,

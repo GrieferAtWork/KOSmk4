@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc32bb9e6 */
+/* HASH CRC-32:0x569e9f88 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,9 +53,9 @@
 #include <bits/os/timespec.h>
 #endif /* __USE_GNU */
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <stddef.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 /* Flags for `semop'. */
 #if !defined(SEM_UNDO) && defined(__SEM_UNDO)

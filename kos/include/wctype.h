@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f4b1b99 */
+/* HASH CRC-32:0x74080211 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -110,9 +110,9 @@ __NAMESPACE_STD_USING(iswctype)
 #include <xlocale.h>
 #endif /* __USE_XOPEN2K8 || __USE_DOS */
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <endian.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 
 #if !defined(WEOF) && defined(__WEOF)

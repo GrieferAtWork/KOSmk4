@@ -50,12 +50,12 @@
 #include <__stdinc.h>
 #include <features.h>
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <sys/types.h>
 #ifdef __USE_MISC
 #include <netinet/in.h>
 #endif /* __USE_MISC */
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 #ifdef __USE_MISC
 #include <bits/types.h>

@@ -39,10 +39,10 @@
 
 /* GLibc includes these two headers unconditionally,
  * but as an extension KOS doesn't. */
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include "float.h"
 #include "limits.h"
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 #define _TYPEBITS(type) (sizeof(type) * __CHAR_BIT__)
 #define CHARBITS        __CHAR_BIT__

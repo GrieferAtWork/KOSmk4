@@ -3004,13 +3004,13 @@ DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO
 /* These appear in glibc under these  names, however these names collide  with
  * some escapes in a couple of places, so only define them when we're supposed
  * to emulate glibc as closely as possible. */
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #undef __sigmask
 #undef __sigword
 /* Return the mask or index for a specific signal `sig' within some sigset. */
 #define __sigmask(sig) __sigset_mask(sig)
 #define __sigword(sig) __sigset_word(sig)
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 }
 
 

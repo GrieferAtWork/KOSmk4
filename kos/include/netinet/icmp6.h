@@ -36,12 +36,12 @@
 #include <net/bits/types.h>
 #include <libc/string.h>
 
-#ifdef __USE_GLIBC
+#ifdef __USE_GLIBC_BLOAT
 #include <netinet/in.h>
 #include <sys/types.h>
 #include <inttypes.h>
 #include <string.h>
-#endif /* __USE_GLIBC */
+#endif /* __USE_GLIBC_BLOAT */
 
 /* Copyright (C) 1991-2016 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
