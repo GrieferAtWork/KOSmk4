@@ -3395,7 +3395,7 @@ NOTHROW_NCX(LIBCCALL libc_getmode)(void const *bbox,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x910084b9]]]*/
+/*[[[start:exports,hash:CRC-32=0xa37c1089]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$_execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__execve, libd_execve);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_execve, libd_execve);
@@ -3533,9 +3533,11 @@ DEFINE_PUBLIC_ALIAS(access, libc_access);
 DEFINE_PUBLIC_ALIAS(DOS$_chdir, libd_chdir);
 DEFINE_PUBLIC_ALIAS(DOS$__chdir, libd_chdir);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_chdir, libd_chdir);
+DEFINE_PUBLIC_ALIAS(DOS$chdir_long, libd_chdir);
 DEFINE_PUBLIC_ALIAS(DOS$chdir, libd_chdir);
 DEFINE_PUBLIC_ALIAS(__chdir, libc_chdir);
 DEFINE_PUBLIC_ALIAS(__libc_chdir, libc_chdir);
+DEFINE_PUBLIC_ALIAS(chdir_long, libc_chdir);
 DEFINE_PUBLIC_ALIAS(chdir, libc_chdir);
 DEFINE_PUBLIC_ALIAS(DOS$_getcwd, libd_getcwd);
 DEFINE_PUBLIC_ALIAS(DOS$getcwd, libd_getcwd);

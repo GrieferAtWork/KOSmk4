@@ -1333,6 +1333,32 @@ int access([[in]] char const *file, __STDC_INT_AS_UINT_T type) {
 [[export_alias("__chdir", "__libc_chdir")]]
 [[requires(defined(__AT_FDCWD) && $has_function(fchdirat))]]
 [[userimpl, section(".text.crt{|.dos}.fs.basic_property")]]
+/* Hacky work-around for a bug in gnulib:
+ * - When configuring a gnulib project, we tell it that:
+ *   >> gl_cv_func_getcwd_path_max=yes
+ *   However, normally the check for that one is gnulib assuming that
+ *   systems  which define PATH_MAX  in <limits.h> implement chdir(2)
+ *   such that it refuses to accept paths longer than that.
+ * - We can't NOT define PATH_MAX in <limits.h> because other programs
+ *   will refuse to compile at all (compiler errors) if that macro  is
+ *   missing, so we HAVE to define it.
+ * - And because we don't want stupid bloat in 3rd party programs, we
+ *   configure  them  with  `gl_cv_func_getcwd_path_max=yes',   which
+ *   prevents an unnecessary wrapper around chdir() that would  split
+ *   up long paths into smaller components to work around path length
+ *   limitations
+ * - BUT: Here comes gnulib internal "chdir-long.h" header, which
+ *        essentially does:
+ *        >> #ifdef PATH_MAX
+ *        >> extern int chdir_long(char *dir);
+ *        >> #else
+ *        >> #define chdir_long(dir) chdir(dir)
+ *        >> #endif
+ * - To prevent undefined symbol errors, we just export this "chdir_long"
+ *   function  as well (but also see comment next to `#undef PATH_MAX' in
+ *   our `<limits.h>')
+ */
+[[export_as("chdir_long")]]
 int chdir([[in]] char const *path) {
 	return fchdirat(__AT_FDCWD, path, 0);
 }

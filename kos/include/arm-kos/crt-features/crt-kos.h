@@ -2496,6 +2496,7 @@
 #define __CRT_HAVE_cfsetospeed
 #define __CRT_HAVE_cfsetspeed
 #define __CRT_HAVE_chdir
+#define __CRT_HAVE_chdir_long
 #define __CRT_HAVE_chkuserprocmask
 #define __CRT_HAVE_chmod
 #define __CRT_HAVE_choose_temp_base
@@ -6952,6 +6953,7 @@
 #define __CRT_HAVE_KOS$btowc
 #define __CRT_HAVE_KOS$canonicalize_file_name
 #define __CRT_HAVE_KOS$chdir
+#define __CRT_HAVE_KOS$chdir_long
 #define __CRT_HAVE_KOS$chmod
 #define __CRT_HAVE_KOS$chown
 #define __CRT_HAVE_KOS$chroot
@@ -7990,6 +7992,7 @@
 #define __CRT_HAVE_DOS$btowc
 #define __CRT_HAVE_DOS$canonicalize_file_name
 #define __CRT_HAVE_DOS$chdir
+#define __CRT_HAVE_DOS$chdir_long
 #define __CRT_HAVE_DOS$chmod
 #define __CRT_HAVE_DOS$chown
 #define __CRT_HAVE_DOS$chroot

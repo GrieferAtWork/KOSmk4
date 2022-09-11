@@ -178,14 +178,11 @@
 #endif /* !CANBSIZ && MAX_CANON */
 
 /* MAXPATHLEN: Alias for `PATH_MAX' (that still gets defined, even when `PATH_MAX' isn't).
- *             If we don't define this one, bsdgames breaks. */
-#ifndef MAXPATHLEN
-#ifdef PATH_MAX
+ * WARNING: If this one doesn't get defined, some 3rd party programs break (e.g. bsdgames).
+ * WARNING: If this does get defined, gnulib will try to link against `chdir_long()' */
+#if !defined(MAXPATHLEN) && defined(PATH_MAX)
 #define MAXPATHLEN PATH_MAX
-#else /* PATH_MAX */
-#define MAXPATHLEN _POSIX_PATH_MAX
-#endif /* !PATH_MAX */
-#endif /* !MAXPATHLEN */
+#endif /* !MAXPATHLEN && PATH_MAX */
 
 /* NOFILE: Alias for `OPEN_MAX' */
 #if !defined(NOFILE) && defined(OPEN_MAX)

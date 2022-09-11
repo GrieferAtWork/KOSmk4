@@ -300,7 +300,7 @@ local limits = {
 	(0, "MQ_OPEN_MAX",                  "_POSIX_MQ_OPEN_MAX",                  "8",        "Maximum # of message queues open for a process."),
 	(0, "MQ_PRIO_MAX",                  "_POSIX_MQ_PRIO_MAX",                  "32",       "Maximum # of supported message priorities."),
 	(1, "NAME_MAX",                     "_POSIX_NAME_MAX",                     "14",       "Number of bytes in a filename."),
-	(0, "PATH_MAX",                     "_POSIX_PATH_MAX",                     "256",      "Number of bytes in a pathname. (Not defined by default because some programs\n * think `defined(MAX_PATH)' -> chdir(2) fails for paths longer than this)"),
+	(1, "PATH_MAX",                     "_POSIX_PATH_MAX",                     "256",      "Number of bytes in a pathname. Note that some programs think\n * `defined(MAX_PATH)' -> chdir(2) fails for paths longer than\n * this (e.g. coreutils). But others assume that it is always\n * defined (e.g. fontconfig). As such, we also have to define\n * it always and live with the consequences."),
 	(0, "PIPE_BUF",                     "_POSIX_PIPE_BUF",                     "512",      "Number of bytes than can be written atomically to a pipe."),
 	(1, "RE_DUP_MAX",                   "_POSIX_RE_DUP_MAX",                   "255",      "Max # of repeated occurrences of a BRE permitted by the REGEXEC and REGCOMP functions when using the interval notation."),
 	(1, "RTSIG_MAX",                    "_POSIX_RTSIG_MAX",                    "8",        "Minimal # of realtime signals reserved for the application."),
@@ -408,8 +408,11 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #define _POSIX_NAME_MAX                     14       /* Number of bytes in a filename. */
 #endif /* !_POSIX_NAME_MAX */
 #ifndef _POSIX_PATH_MAX
-#define _POSIX_PATH_MAX                     256      /* Number of bytes in a pathname. (Not defined by default because some programs
- * think `defined(MAX_PATH)' -> chdir(2) fails for paths longer than this) */
+#define _POSIX_PATH_MAX                     256      /* Number of bytes in a pathname. Note that some programs think
+ * `defined(MAX_PATH)' -> chdir(2) fails for paths longer than
+ * this (e.g. coreutils). But others assume that it is always
+ * defined (e.g. fontconfig). As such, we also have to define
+ * it always and live with the consequences. */
 #endif /* !_POSIX_PATH_MAX */
 #ifndef _POSIX_PIPE_BUF
 #define _POSIX_PIPE_BUF                     512      /* Number of bytes than can be written atomically to a pipe. */
@@ -508,8 +511,11 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #define __NAME_MAX _POSIX_NAME_MAX /* Number of bytes in a filename. */
 #endif /* !__NAME_MAX */
 #ifndef __PATH_MAX
-#define __PATH_MAX _POSIX_PATH_MAX /* Number of bytes in a pathname. (Not defined by default because some programs
- * think `defined(MAX_PATH)' -> chdir(2) fails for paths longer than this) */
+#define __PATH_MAX _POSIX_PATH_MAX /* Number of bytes in a pathname. Note that some programs think
+ * `defined(MAX_PATH)' -> chdir(2) fails for paths longer than
+ * this (e.g. coreutils). But others assume that it is always
+ * defined (e.g. fontconfig). As such, we also have to define
+ * it always and live with the consequences. */
 #endif /* !__PATH_MAX */
 #ifndef __PIPE_BUF
 #define __PIPE_BUF _POSIX_PIPE_BUF /* Number of bytes than can be written atomically to a pipe. */
@@ -704,14 +710,17 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #endif /* !__NAME_MAX || __NAME_MAX == -1 */
 #endif /* !NAME_MAX */
 
-/* Number of bytes in a pathname. (Not defined by default because some programs
- * think `defined(MAX_PATH)' -> chdir(2) fails for paths longer than this) */
+/* Number of bytes in a pathname. Note that some programs think
+ * `defined(MAX_PATH)' -> chdir(2) fails for paths longer than
+ * this (e.g. coreutils). But others assume that it is always
+ * defined (e.g. fontconfig). As such, we also have to define
+ * it always and live with the consequences. */
 #ifndef PATH_MAX
 #if defined(__PATH_MAX) && __PATH_MAX != -1
 #define PATH_MAX __PATH_MAX
-#elif defined(__USE_ALL_LIMITS)
+#else /* __PATH_MAX && __PATH_MAX != -1 */
 #define PATH_MAX _POSIX_PATH_MAX
-#endif /* ... */
+#endif /* !__PATH_MAX || __PATH_MAX == -1 */
 #endif /* !PATH_MAX */
 
 /* Number of bytes than can be written atomically to a pipe. */
@@ -849,6 +858,30 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 #endif /* ... */
 #endif /* !THREAD_THREADS_MAX */
 //[[[end]]]
+
+/* Hacky work-around for a bug in gnulib:
+ * - For compatibility with certain programs, we always need to define `PATH_MAX'
+ * - If we define `PATH_MAX' where gnulib would see it, it'll end up trying to
+ *   replace `chdir(2)'  with its  own function  `chdir_long()' (100%  BLOAT).
+ * - In case that ends up happening, we define an alias `chdir_long()' for our
+ *   `chdir(2)' in libc (though we don't want gnulib programs to actually link
+ *   against that one)
+ * - Because  of that, we try to detect  the situation where we're being included
+ *   by gnulib "chdir_long.h" -> "pathmax.h" -> <limits.h>, in which case we will
+ *   not  define PATH_MAX, so-as  to convince it that  our chdir() function works
+ *   for paths of any length (which it does)
+ * - The reason we still have  to export the chdir_long  alias from libc lies  in
+ *   the fact that the `_PATHMAX_H' guard we're using here would only be  defined
+ *   if  the current source  file hasn't included <limits.h>  already prior to it
+ *   being included again (and skipped due to our own include-guard) once  loaded
+ *   by  gnulib's "pathmax.h" header.  If that happens,  the current program will
+ *   end up linking against a function `chdir_long' that it never defined itself,
+ *   and which we provide in libc for exactly this scenario.
+ */
+#if defined(_PATHMAX_H) && !defined(__USE_ALL_LIMITS)
+#undef PATH_MAX
+#endif /* _PATHMAX_H && !__USE_ALL_LIMITS */
+
 
 /* <pthread.h>: Max # of data keys per process. */
 #ifndef PTHREAD_KEYS_MAX
