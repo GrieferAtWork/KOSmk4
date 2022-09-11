@@ -49,6 +49,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- [file-5.39](https://github.com/file/file)
 	- [midnight-commander-4.8.27](http://midnight-commander.org/) (mc)
 	- [tree](https://github.com/rubicks/tree)
+	- [coreutils-9.1](https://ftp.gnu.org/gnu/coreutils)
 - Programming
 	- [tcc-0.9.27](https://bellard.org/tcc/)
 	- [nano-4.4](https://www.nano-editor.org/)
