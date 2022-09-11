@@ -88,7 +88,7 @@
 
 #ifdef __USE_POSIX199309
 #include <bits/os/timespec.h>
-#include <bits/os/itimerval.h>
+#include <bits/os/itimerspec.h>
 #endif /* __USE_POSIX199309 */
 
 #ifdef __USE_XOPEN2K8

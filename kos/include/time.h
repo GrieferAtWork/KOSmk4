@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x560e350d */
+/* HASH CRC-32:0x17484ca4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -115,7 +115,7 @@ __NAMESPACE_STD_USING(timespec_getres)
 
 #ifdef __USE_POSIX199309
 #include <bits/os/timespec.h>
-#include <bits/os/itimerval.h>
+#include <bits/os/itimerspec.h>
 #endif /* __USE_POSIX199309 */
 
 #ifdef __USE_XOPEN2K8
