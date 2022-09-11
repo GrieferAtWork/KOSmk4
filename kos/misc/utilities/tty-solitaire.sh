@@ -41,19 +41,20 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$EXEFILE" ]; then
 	set_archpath
 	TS_OBJECTS=""
 	cmd cd "$SRCPATH/src"
+	CFLAGS="-g -fcommon" # Need -fcommon to prevent link errors
 	for SRCFILE in *.c; do
 		OBJFILE="$OPTPATH/$SRCFILE.o"
 		SRCFILE="$SRCPATH/src/$SRCFILE"
 		TS_OBJECTS="$TS_OBJECTS $OBJFILE"
 		if [ "$MODE_FORCE_MAKE" == yes ] || [ "$OBJFILE" -ot "$SRCFILE" ]; then
 			echo "compile: $CC -g -c -o $OBJFILE $SRCFILE"
-			cmd "$CC" -g -c -o "$OBJFILE" "$SRCFILE" &
+			cmd "$CC" $CFLAGS -c -o "$OBJFILE" "$SRCFILE" &
 		fi
 	done
 	cmd wait
 	# Build and link against ncurses
-	echo "link: $CC -g -o $EXEFILE $TS_OBJECTS -lncursesw"
-	cmd "$CC" -g -o "$EXEFILE" "$TS_OBJECTS" -lncursesw
+	echo "link: $CC $CFLAGS -o $EXEFILE $TS_OBJECTS -lncursesw"
+	cmd "$CC" $CFLAGS -o "$EXEFILE" "$TS_OBJECTS" -lncursesw
 fi
 
 # Install ttysolitaire to disk

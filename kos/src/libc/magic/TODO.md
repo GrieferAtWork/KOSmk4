@@ -17,6 +17,8 @@
 		- `svcudp_create()`
 		- `xdr_u_int()`
 		- `xdrstdio_create()`
+	- `<glob.h>`:
+		- `glob_pattern_p()`
 	- `<ssp/fcntl.h>`:
 		- `__open64_2()`
 		- `__open_2()`
