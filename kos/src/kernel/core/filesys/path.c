@@ -1268,7 +1268,7 @@ again_lookup_dent:
  * @param: atflags: Set of:
  *  - AT_DOSPATH:                 Use DOS path semantics
  *  - AT_NO_AUTOMOUNT:            Currently ignored
- *  - AT_EMPTY_PATH:              `upath'  may be an  empty string, which cases
+ *  - AT_EMPTY_PATH:              `upath'  may be an empty string, which causes
  *                                `cwd ? cwd : THIS_FS->fs_cwd' to be returned.
  *  - AT_IGNORE_TRAILING_SLASHES: Ignore trailing slashes
  *  - Other flags are silently ignored. */

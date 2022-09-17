@@ -448,7 +448,7 @@ DECL_BEGIN
  * @return: * : Always re-returns `base' */
 FUNDEF NOBLOCK_IF(gfp & GFP_ATOMIC) ATTR_RETNONNULL void *KCALL
 kmalloc_trace(void *base, size_t num_bytes, gfp_t gfp, unsigned int tb_skip DFL(0))
-	THROWS(E_BADALLOC, E_WOULDBLOCK);
+		THROWS(E_BADALLOC, E_WOULDBLOCK);
 
 /* Same as `kmalloc_trace()', but don't throw an exception. If the operation
  * fails, rather than re-returning `base', `NULL' will be returned  instead. */
