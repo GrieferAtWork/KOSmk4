@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix a bug in `TPPLexer_LoadPosition()`"
-DEEMON_VERSION="dea555f02098fd28cc7ab3476cb964cc8779f83f"
+#     v -- "Fix a problem with how `DeeStruct_Type` is defined"
+DEEMON_VERSION="4a903386c7404aa626658d8957fe8a4c0a420d07"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
