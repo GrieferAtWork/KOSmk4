@@ -138,10 +138,10 @@ LIBREGDUMP_DECL __ATTR_NONNULL((1, 2)) __ssize_t LIBREGDUMP_CC regdump_idt(struc
 
 #ifdef __cplusplus
 extern "C++" {
-__COMPILER_REDIRECT(LIBREGDUMP_DECL,__ATTR_NONNULL((1, 2)),__ssize_t,LIBREGDUMP_CC,regdump,(struct regdump_printer *__restrict __self, struct gpregs const *__restrict __data),regdump_gpregs,(__self,__data))
-__COMPILER_REDIRECT(LIBREGDUMP_DECL,__ATTR_NONNULL((1, 2)),__ssize_t,LIBREGDUMP_CC,regdump,(struct regdump_printer *__restrict __self, struct sgregs const *__restrict __data),regdump_sgregs,(__self,__data))
-__COMPILER_REDIRECT(LIBREGDUMP_DECL,__ATTR_NONNULL((1, 2)),__ssize_t,LIBREGDUMP_CC,regdump,(struct regdump_printer *__restrict __self, struct coregs const *__restrict __data),regdump_coregs,(__self,__data))
-__COMPILER_REDIRECT(LIBREGDUMP_DECL,__ATTR_NONNULL((1, 2)),__ssize_t,LIBREGDUMP_CC,regdump,(struct regdump_printer *__restrict __self, struct drregs const *__restrict __data),regdump_drregs,(__self,__data))
+__COMPILER_REDIRECT(LIBREGDUMP_DECL,__ATTR_NONNULL((1, 2)),__ssize_t,,LIBREGDUMP_CC,regdump,(struct regdump_printer *__restrict __self, struct gpregs const *__restrict __data),regdump_gpregs,(__self,__data))
+__COMPILER_REDIRECT(LIBREGDUMP_DECL,__ATTR_NONNULL((1, 2)),__ssize_t,,LIBREGDUMP_CC,regdump,(struct regdump_printer *__restrict __self, struct sgregs const *__restrict __data),regdump_sgregs,(__self,__data))
+__COMPILER_REDIRECT(LIBREGDUMP_DECL,__ATTR_NONNULL((1, 2)),__ssize_t,,LIBREGDUMP_CC,regdump,(struct regdump_printer *__restrict __self, struct coregs const *__restrict __data),regdump_coregs,(__self,__data))
+__COMPILER_REDIRECT(LIBREGDUMP_DECL,__ATTR_NONNULL((1, 2)),__ssize_t,,LIBREGDUMP_CC,regdump,(struct regdump_printer *__restrict __self, struct drregs const *__restrict __data),regdump_drregs,(__self,__data))
 } /* extern "C++" */
 #endif /* __cplusplus */
 #endif /* LIBREGDUMP_WANT_PROTOTYPES */
