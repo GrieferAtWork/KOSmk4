@@ -177,9 +177,6 @@
 #define _XOPEN_XPG3        1
 #define _XOPEN_XPG4        1
 #define _XOPEN_UNIX        1
-#define _XOPEN_CRYPT       1
-#define _XOPEN_ENH_I18N    1
-#define _XOPEN_LEGACY      1
 
 
 #ifdef __STDIN_FILENO

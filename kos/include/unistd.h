@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8332e140 */
+/* HASH CRC-32:0xd175ed67 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -137,9 +137,6 @@
 #define _XOPEN_XPG3        1
 #define _XOPEN_XPG4        1
 #define _XOPEN_UNIX        1
-#define _XOPEN_CRYPT       1
-#define _XOPEN_ENH_I18N    1
-#define _XOPEN_LEGACY      1
 
 
 #ifdef __STDIN_FILENO

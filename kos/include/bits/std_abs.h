@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaed3c221 */
+/* HASH CRC-32:0x4a6bde6d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,6 +18,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: libstdc++ (/include/bits/std_abs.h) */
 #ifndef _BITS_STD_ABS_H
 #define _BITS_STD_ABS_H 1
 
