@@ -29,11 +29,14 @@
 #include <fcntl.h>
 #include <syscall.h>
 
-#ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES
+#if (!defined(__NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES) || \
+     !defined(__NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT))
 #undef __WANT_SYSCALL_ARGUMENT_TYPES
 #define __WANT_SYSCALL_ARGUMENT_TYPES
+#undef __WANT_SYSCALL_ARGUMENT_COUNT
+#define __WANT_SYSCALL_ARGUMENT_COUNT
 #include <asm/syscalls-proto.h>
-#endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES */
+#endif /* !... */
 
 #define SYSCALL_ARG_TYPE_OF3(a, b)      b
 #define SYSCALL_ARG_TYPE_OF2(x)         SYSCALL_ARG_TYPE_OF3 x
@@ -261,6 +264,239 @@
 #define SYS_clock_nanosleep_time64 SYS_clock_nanosleep64
 #define sys_clock_nanosleep_time64 sys_clock_nanosleep64
 #endif /* SYS_clock_nanosleep64 && SYS_clock_nanosleep_time64 */
+
+#if defined(SYS_select64) && !defined(SYS_select_time64)
+#define SYS_select_time64 SYS_select64
+#define sys_select_time64 sys_select64
+#endif /* SYS_select64 && SYS_select_time64 */
+
+#if defined(SYS_pselect6_64) && !defined(SYS_pselect6_time64)
+#define SYS_pselect6_time64 SYS_pselect6_64
+#define sys_pselect6_time64 sys_pselect6_64
+#endif /* SYS_pselect6_64 && SYS_pselect6_time64 */
+
+#if !defined(SYS__newselect) && defined(SYS_select)
+#if __NRAC_select == 5
+#define sys__newselect(nfds, readfds, writefds, exceptfds, timeout) \
+	sys_select(nfds, readfds, writefds, exceptfds, timeout)
+#elif __NRAC_select == 1
+#include <kos/compat/linux-oldselect.h>
+#define sys__newselect(nfds, readfds, writefds, exceptfds, timeout) \
+	({                                                              \
+		struct sel_arg_struct _arg;                                 \
+		_arg.n    = (ulongptr_t)(nfds);                             \
+		_arg.inp  = readfds;                                        \
+		_arg.outp = writefds;                                       \
+		_arg.exp  = exceptfds;                                      \
+		_arg.tvp  = timeout;                                        \
+		sys_select(&_arg);                                          \
+	})
+#endif /* __NRAC_select == ... */
+#endif /* !SYS__newselect && SYS_select */
+
+#ifndef SYS_recv
+#ifdef SYS_recvfrom
+#define sys_recv(sockfd, buf, bufsize, msg_flags) \
+	sys_recvfrom(sockfd, buf, bufsize, msg_flags, NULL, 0)
+#elif defined(SYS_recvmsg)
+#define sys_recv(sockfd, buf, bufsize, msg_flags) \
+	({                                            \
+		struct msghdr _msg;                       \
+		struct iovec _iov[1];                     \
+		_msg.msg_name       = NULL;               \
+		_msg.msg_namelen    = 0;                  \
+		_msg.msg_iov        = _iov;               \
+		_msg.msg_iovlen     = 1;                  \
+		_iov[0].iov_base    = buf;                \
+		_iov[0].iov_len     = bufsize;            \
+		_msg.msg_control    = NULL;               \
+		_msg.msg_controllen = 0;                  \
+		sys_recvmsg(sockfd, &_msg, msg_flags);    \
+	})
+#elif defined(SYS_recvmmsg)
+#define sys_recv(sockfd, buf, bufsize, msg_flags)                  \
+	({                                                             \
+		ssize_t _result;                                           \
+		struct mmsghdr _msg;                                       \
+		struct iovec _iov[1];                                      \
+		_msg.msg_hdr.msg_name       = NULL;                        \
+		_msg.msg_hdr.msg_namelen    = 0;                           \
+		_msg.msg_hdr.msg_iov        = _iov;                        \
+		_msg.msg_hdr.msg_iovlen     = 1;                           \
+		_iov[0].iov_base            = buf;                         \
+		_iov[0].iov_len             = bufsize;                     \
+		_msg.msg_hdr.msg_control    = NULL;                        \
+		_msg.msg_hdr.msg_controllen = 0;                           \
+		_result = sys_recvmmsg(sockfd, &_msg, 1, msg_flags, NULL); \
+		if (_result >= 1)                                          \
+			_result = _msg.msg_len;                                \
+		_result;                                                   \
+	})
+#endif /* ... */
+#endif /* !SYS_recv */
+
+#ifndef SYS_recvfrom
+#ifdef SYS_recvmsg
+#define sys_recvfrom(sockfd, buf, bufsize, msg_flags, addr, addr_len) \
+	({                                                                \
+		ssize_t _result;                                              \
+		struct msghdr _msg;                                           \
+		struct iovec _iov[1];                                         \
+		_msg.msg_name       = (struct sockaddr *)(addr);              \
+		_msg.msg_namelen    = (addr_len) ? *(addr_len) : 0;           \
+		_msg.msg_iov        = _iov;                                   \
+		_msg.msg_iovlen     = 1;                                      \
+		_iov[0].iov_base    = buf;                                    \
+		_iov[0].iov_len     = bufsize;                                \
+		_msg.msg_control    = NULL;                                   \
+		_msg.msg_controllen = 0;                                      \
+		_result = sys_recvmsg(sockfd, &_msg, msg_flags);              \
+		if (_result >= 0 && addr_len)                                 \
+			*addr_len = _msg.msg_namelen;                             \
+		_result;                                                      \
+	})
+#elif defined(SYS_recvmmsg)
+#define sys_recvfrom(sockfd, buf, bufsize, msg_flags, addr, addr_len) \
+	({                                                                \
+		ssize_t _result;                                              \
+		struct mmsghdr _msg;                                          \
+		struct iovec _iov[1];                                         \
+		_msg.msg_hdr.msg_name       = (struct sockaddr *)(addr);      \
+		_msg.msg_hdr.msg_namelen    = (addr_len) ? *(addr_len) : 0;   \
+		_msg.msg_hdr.msg_iov        = _iov;                           \
+		_msg.msg_hdr.msg_iovlen     = 1;                              \
+		_iov[0].iov_base            = buf;                            \
+		_iov[0].iov_len             = bufsize;                        \
+		_msg.msg_hdr.msg_control    = NULL;                           \
+		_msg.msg_hdr.msg_controllen = 0;                              \
+		_result = sys_recvmmsg(sockfd, &_msg, 1, msg_flags, NULL);    \
+		if (_result >= 1) {                                           \
+			if (addr_len)                                             \
+				*(addr_len) = _msg.msg_hdr.msg_namelen;               \
+			_result = _msg.msg_len;                                   \
+		}                                                             \
+		_result;                                                      \
+	})
+#endif /* ... */
+#endif /* !SYS_recvfrom */
+
+#if !defined(SYS_recvmsg) && defined(SYS_recvmmsg)
+#define sys_recvfrom(sockfd, message, msg_flags_)                   \
+	({                                                              \
+		ssize_t _result;                                            \
+		struct mmsghdr _msg;                                        \
+		_msg.msg_hdr                = *(message);                   \
+		_msg.msg_hdr.msg_control    = NULL;                         \
+		_msg.msg_hdr.msg_controllen = 0;                            \
+		_result = sys_recvmmsg(sockfd, &_msg, 1, msg_flags_, NULL); \
+		(message)->msg_namelen      = _msg.msg_hdr.msg_namelen;     \
+		(message)->msg_controllen   = _msg.msg_hdr.msg_controllen;  \
+		(message)->msg_flags        = _msg.msg_hdr.msg_flags;       \
+		if (_result >= 1)                                           \
+			_result = _msg.msg_len;                                 \
+		_result;                                                    \
+	})
+#endif /* !SYS_recvmsg && SYS_recvmmsg */
+
+#ifndef SYS_send
+#ifdef SYS_sendto
+#define sys_send(sockfd, buf, bufsize, msg_flags) \
+	sys_sendto(sockfd, buf, bufsize, msg_flags, NULL, 0)
+#elif defined(SYS_sendmsg)
+#define sys_send(sockfd, buf, bufsize, msg_flags) \
+	({                                            \
+		struct msghdr _msg;                       \
+		struct iovec _iov[1];                     \
+		_msg.msg_name       = NULL;               \
+		_msg.msg_namelen    = 0;                  \
+		_msg.msg_iov        = _iov;               \
+		_msg.msg_iovlen     = 1;                  \
+		_iov[0].iov_base    = (void *)buf;        \
+		_iov[0].iov_len     = bufsize;            \
+		_msg.msg_control    = NULL;               \
+		_msg.msg_controllen = 0;                  \
+		sys_sendmsg(sockfd, &_msg, msg_flags);    \
+	})
+#elif defined(SYS_sendmmsg)
+#define sys_send(sockfd, buf, bufsize, msg_flags)            \
+	({                                                       \
+		ssize_t _result;                                     \
+		struct mmsghdr _msg;                                 \
+		struct iovec _iov[1];                                \
+		_msg.msg_hdr.msg_name       = NULL;                  \
+		_msg.msg_hdr.msg_namelen    = 0;                     \
+		_msg.msg_hdr.msg_iov        = _iov;                  \
+		_msg.msg_hdr.msg_iovlen     = 1;                     \
+		_iov[0].iov_base            = (void *)(buf);         \
+		_iov[0].iov_len             = bufsize;               \
+		_msg.msg_hdr.msg_control    = NULL;                  \
+		_msg.msg_hdr.msg_controllen = 0;                     \
+		_result = sys_sendmmsg(sockfd, &_msg, 1, msg_flags); \
+		if (_result >= 1)                                    \
+			_result = _msg.msg_len;                          \
+		_result;                                             \
+	})
+#endif /* ... */
+#endif /* !SYS_send */
+
+#ifndef SYS_sendto
+#ifdef SYS_sendmsg
+#define sys_sendto(sockfd, buf, bufsize, msg_flags, addr, addr_len) \
+	({                                                              \
+		struct msghdr _msg;                                         \
+		struct iovec _iov[1];                                       \
+		_msg.msg_name       = (struct sockaddr *)addr;              \
+		_msg.msg_namelen    = addr_len;                             \
+		_msg.msg_iov        = _iov;                                 \
+		_msg.msg_iovlen     = 1;                                    \
+		_iov[0].iov_base    = (void *)buf;                          \
+		_iov[0].iov_len     = bufsize;                              \
+		_msg.msg_control    = NULL;                                 \
+		_msg.msg_controllen = 0;                                    \
+		sys_sendmsg(sockfd, &_msg, msg_flags);                      \
+	})
+#elif defined(SYS_sendmmsg)
+#define sys_sendto(sockfd, buf, bufsize, msg_flags, addr, addr_len) \
+	({                                                              \
+		ssize_t _result;                                            \
+		struct mmsghdr _msg;                                        \
+		struct iovec _iov[1];                                       \
+		_msg.msg_hdr.msg_name       = (struct sockaddr *)addr;      \
+		_msg.msg_hdr.msg_namelen    = addr_len;                     \
+		_msg.msg_hdr.msg_iov        = _iov;                         \
+		_msg.msg_hdr.msg_iovlen     = 1;                            \
+		_iov[0].iov_base            = (void *)buf;                  \
+		_iov[0].iov_len             = bufsize;                      \
+		_msg.msg_hdr.msg_control    = NULL;                         \
+		_msg.msg_hdr.msg_controllen = 0;                            \
+		_result = sys_sendmmsg(sockfd, &_msg, 1, msg_flags);        \
+		if (_result >= 1)                                           \
+			_result = _msg.msg_len;                                 \
+		_result;                                                    \
+	})
+#endif /* ... */
+#endif /* !SYS_sendto */
+
+#if !defined(SYS_sendmsg) && defined(SYS_sendmmsg)
+#define sys_sendmsg(sockfd, message, msg_flags_)              \
+	({                                                        \
+		ssize_t _result;                                      \
+		struct mmsghdr _msg;                                  \
+		_msg.msg_hdr                = *(message);             \
+		_msg.msg_hdr.msg_control    = NULL;                   \
+		_msg.msg_hdr.msg_controllen = 0;                      \
+		_result = sys_sendmmsg(sockfd, &_msg, 1, msg_flags_); \
+		if (_result >= 1)                                     \
+			_result = _msg.msg_len;                           \
+		_result;                                              \
+	})
+#endif /* !SYS_sendto && SYS_sendmmsg */
+
+#if !defined(SYS_accept) && defined(SYS_accept4)
+#define sys_accept(sockfd, addr, addr_len) \
+	sys_accept4(sockfd, addr, addr_len, 0)
+#endif /* !SYS_accept && SYS_accept4 */
+
 
 #if defined(SYS_sync_file_range2) && !defined(SYS_sync_file_range)
 #define sys_sync_file_range(fd, offset, count, flags) \

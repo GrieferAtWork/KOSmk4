@@ -24,8 +24,8 @@
 /**/
 
 #include <bits/os/rusage-convert.h>
-#include <kos/syscalls.h>
 
+#include "../libc/syscalls.h"
 #include "sys.resource.h"
 
 DECL_BEGIN
@@ -194,7 +194,8 @@ NOTHROW_NCX(LIBCCALL libc_setpriority)(__priority_which_t which,
 /*[[[body:libc_setpriority]]]*/
 {
 	errno_t error;
-	error = sys_setpriority((syscall_ulong_t)which, who, (syscall_ulong_t)(20 - prio));
+	error = sys_setpriority((syscall_ulong_t)which, who,
+	                        (syscall_ulong_t)(20 - prio));
 	return libc_seterrno_syserr(error);
 }
 /*[[[end:libc_setpriority]]]*/

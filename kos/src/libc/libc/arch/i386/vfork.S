@@ -32,6 +32,10 @@
 
 #include <errno.h> /* ELIMIT */
 
+#ifndef __x86_64__
+#define syscall int $(0x80)
+#endif /* !__x86_64__ */
+
 
 .section .text.crt.sched.access
 INTERN_FUNCTION(libc_vfork)
@@ -41,11 +45,7 @@ INTERN_FUNCTION(libc_vfork)
 
 	/* Invoke the vfork() system call. */
 	movP   $(SYS_vfork), %Pax
-#ifdef __x86_64__
 	syscall
-#else /* __x86_64__ */
-	int    $(0x80)
-#endif /* !__x86_64__ */
 
 	/* Push the return address back onto the stack. */
 	pushP_cfi %Pdx
@@ -102,11 +102,7 @@ INTERN_FUNCTION(libc_VFork)
 	/* Invoke the vfork() system call. */
 	movP   $(SYS_vfork), %Pax
 	std /* Enable exceptions */
-#ifdef __x86_64__
 	syscall
-#else /* __x86_64__ */
-	int    $(0x80)
-#endif /* !__x86_64__ */
 	cld /* Disable exceptions */
 
 	/* Return to the caller. */

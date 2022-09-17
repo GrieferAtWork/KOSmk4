@@ -885,7 +885,7 @@ NOTHROW_RPC(LIBDCALL libd_mkdir)(char const *pathname,
                                  mode_t mode)
 /*[[[body:libd_mkdir]]]*/
 {
-	return libc_fmkdirat(AT_FDCWD, pathname, mode, libd_AT_DOSPATH);
+	return libd_fmkdirat(AT_FDCWD, pathname, mode, 0);
 }
 /*[[[end:libd_mkdir]]]*/
 
@@ -909,7 +909,7 @@ NOTHROW_RPC(LIBDCALL libd_chmod)(char const *filename,
                                  mode_t mode)
 /*[[[body:libd_chmod]]]*/
 {
-	return libc_fchmodat(AT_FDCWD, filename, mode, libd_AT_DOSPATH);
+	return libd_fchmodat(AT_FDCWD, filename, mode, 0);
 }
 /*[[[end:libd_chmod]]]*/
 
@@ -933,7 +933,7 @@ NOTHROW_RPC(LIBDCALL libd_lchmod)(char const *filename,
                                   mode_t mode)
 /*[[[body:libd_lchmod]]]*/
 {
-	return libc_fchmodat(AT_FDCWD, filename, mode, libd_AT_DOSPATH | AT_SYMLINK_NOFOLLOW);
+	return libd_fchmodat(AT_FDCWD, filename, mode, AT_SYMLINK_NOFOLLOW);
 }
 /*[[[end:libd_lchmod]]]*/
 
@@ -1076,7 +1076,7 @@ NOTHROW_RPC(LIBDCALL libd_mkdirat)(fd_t dirfd,
                                    mode_t mode)
 /*[[[body:libd_mkdirat]]]*/
 {
-	return libc_fmkdirat(dirfd, pathname, mode, libd_AT_DOSPATH);
+	return libd_fmkdirat(dirfd, pathname, mode, 0);
 }
 /*[[[end:libd_mkdirat]]]*/
 
@@ -1115,7 +1115,7 @@ NOTHROW_RPC(LIBDCALL libd_mknod)(char const *nodename,
                                  dev_t dev)
 /*[[[body:libd_mknod]]]*/
 {
-	return libc_fmknodat(AT_FDCWD, nodename, mode, dev, libd_AT_DOSPATH);
+	return libd_fmknodat(AT_FDCWD, nodename, mode, dev, 0);
 }
 /*[[[end:libd_mknod]]]*/
 
@@ -1146,7 +1146,7 @@ NOTHROW_RPC(LIBDCALL libd_mknodat)(fd_t dirfd,
                                    dev_t dev)
 /*[[[body:libd_mknodat]]]*/
 {
-	return libc_fmknodat(dirfd, nodename, mode, dev, libd_AT_DOSPATH);
+	return libd_fmknodat(dirfd, nodename, mode, dev, 0);
 }
 /*[[[end:libd_mknodat]]]*/
 

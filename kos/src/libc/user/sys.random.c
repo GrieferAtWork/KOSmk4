@@ -23,13 +23,12 @@
 #include "../api.h"
 /**/
 
-#include <kos/syscalls.h>
-
 #include <errno.h>
 #include <fcntl.h>
 #include <syscall.h>
 #include <unistd.h>
 
+#include "../libc/syscalls.h"
 #include "sys.random.h"
 
 DECL_BEGIN

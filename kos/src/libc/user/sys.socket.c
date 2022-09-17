@@ -23,12 +23,12 @@
 #include "../api.h"
 /**/
 
-#include <kos/syscalls.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 
 #include <syscall.h>
 
+#include "../libc/syscalls.h"
 #include "sys.socket.h"
 
 DECL_BEGIN
@@ -209,39 +209,7 @@ NOTHROW_RPC(LIBCCALL libc_recv)(fd_t sockfd,
 /*[[[body:libc_recv]]]*/
 {
 	ssize_t result;
-#ifdef SYS_recv
 	result = sys_recv(sockfd, buf, bufsize, (syscall_ulong_t)msg_flags);
-#elif defined(SYS_recvfrom)
-	result = sys_recvfrom(sockfd, buf, bufsize, (syscall_ulong_t)msg_flags, NULL, 0);
-#elif defined(SYS_recvmsg)
-	struct msghdr msg;
-	struct iovec iov[1];
-	msg.msg_name       = NULL;
-	msg.msg_namelen    = 0;
-	msg.msg_iov        = iov;
-	msg.msg_iovlen     = 1;
-	iov[0].iov_base    = buf;
-	iov[0].iov_len     = bufsize;
-	msg.msg_control    = NULL;
-	msg.msg_controllen = 0;
-	result = sys_recvmsg(sockfd, &msg, msg_flags);
-#elif defined(SYS_recvmmsg)
-	struct mmsghdr msg;
-	struct iovec iov[1];
-	msg.msg_hdr.msg_name       = NULL;
-	msg.msg_hdr.msg_namelen    = 0;
-	msg.msg_hdr.msg_iov        = iov;
-	msg.msg_hdr.msg_iovlen     = 1;
-	iov[0].iov_base            = buf;
-	iov[0].iov_len             = bufsize;
-	msg.msg_hdr.msg_control    = NULL;
-	msg.msg_hdr.msg_controllen = 0;
-	result = sys_recvmmsg(sockfd, &msg, 1, msg_flags);
-	if (result >= 1)
-		result = msg.msg_len;
-#else /* ... */
-#error "No suitable system call to implement `recv(2)'"
-#endif /* !... */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_recv]]]*/
@@ -273,43 +241,8 @@ NOTHROW_RPC(LIBCCALL libc_recvfrom)(fd_t sockfd,
 /*[[[body:libc_recvfrom]]]*/
 {
 	ssize_t result;
-#ifdef SYS_recvfrom
 	result = sys_recvfrom(sockfd, buf, bufsize, (syscall_ulong_t)msg_flags,
 	                      (struct sockaddr *)addr, addr_len);
-#elif defined(SYS_recvmsg)
-	struct msghdr msg;
-	struct iovec iov[1];
-	msg.msg_name       = (struct sockaddr *)addr;
-	msg.msg_namelen    = addr_len ? *addr_len : 0;
-	msg.msg_iov        = iov;
-	msg.msg_iovlen     = 1;
-	iov[0].iov_base    = buf;
-	iov[0].iov_len     = bufsize;
-	msg.msg_control    = NULL;
-	msg.msg_controllen = 0;
-	result = sys_recvmsg(sockfd, &msg, msg_flags);
-	if (result >= 0 && addr_len)
-		*addr_len = msg.msg_namelen;
-#elif defined(SYS_recvmmsg)
-	struct mmsghdr msg;
-	struct iovec iov[1];
-	msg.msg_hdr.msg_name       = (struct sockaddr *)addr;
-	msg.msg_hdr.msg_namelen    = addr_len ? *addr_len : 0;
-	msg.msg_hdr.msg_iov        = iov;
-	msg.msg_hdr.msg_iovlen     = 1;
-	iov[0].iov_base            = buf;
-	iov[0].iov_len             = bufsize;
-	msg.msg_hdr.msg_control    = NULL;
-	msg.msg_hdr.msg_controllen = 0;
-	result = sys_recvmmsg(sockfd, &msg, 1, msg_flags);
-	if (result >= 1) {
-		if (addr_len)
-			*addr_len = msg.msg_hdr.msg_namelen;
-		result = msg.msg_len;
-	}
-#else /* ... */
-#error "No suitable system call to implement `recvfrom(2)'"
-#endif /* !... */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_recvfrom]]]*/
@@ -330,24 +263,7 @@ NOTHROW_RPC(LIBCCALL libc_recvmsg)(fd_t sockfd,
 /*[[[body:libc_recvmsg]]]*/
 {
 	ssize_t result;
-#ifdef SYS_recvmsg
-	result = sys_recvmsg(sockfd,
-	                     message,
-	                     (syscall_ulong_t)msg_flags);
-#elif defined(SYS_recvmmsg)
-	struct mmsghdr msg;
-	msg.msg_hdr                = *message;
-	msg.msg_hdr.msg_control    = NULL;
-	msg.msg_hdr.msg_controllen = 0;
-	result = sys_recvmmsg(sockfd, &msg, 1, msg_flags, NULL);
-	message->msg_namelen    = msg.msg_hdr.msg_namelen;
-	message->msg_controllen = msg.msg_hdr.msg_controllen;
-	message->msg_flags      = msg.msg_hdr.msg_flags;
-	if (result >= 1)
-		result = msg.msg_len;
-#else /* ... */
-#error "No suitable system call to implement `recvmsg(2)'"
-#endif /* !... */
+	result = sys_recvmsg(sockfd, message, (syscall_ulong_t)msg_flags);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_recvmsg]]]*/
@@ -402,15 +318,11 @@ NOTHROW_RPC(LIBCCALL libc_recvmmsg64)(fd_t sockfd,
 /*[[[body:libc_recvmmsg64]]]*/
 {
 	ssize_t error;
-#ifdef SYS_recvmmsg_time64
 	error = sys_recvmmsg_time64(sockfd,
 	                            vmessages,
 	                            (size_t)vlen,
 	                            (syscall_ulong_t)msg_flags,
 	                            tmo);
-#else /* ... */
-#error "No way to implement `recvmmsg64(2)'"
-#endif /* !... */
 	return (int)libc_seterrno_syserr(error);
 }
 #endif /* MAGIC:alias */
@@ -434,39 +346,7 @@ NOTHROW_RPC(LIBCCALL libc_send)(fd_t sockfd,
 /*[[[body:libc_send]]]*/
 {
 	ssize_t result;
-#ifdef SYS_send
 	result = sys_send(sockfd, buf, bufsize, (syscall_ulong_t)msg_flags);
-#elif defined(SYS_sendto)
-	result = sys_sendto(sockfd, buf, bufsize, (syscall_ulong_t)msg_flags, NULL, 0);
-#elif defined(SYS_sendmsg)
-	struct msghdr msg;
-	struct iovec iov[1];
-	msg.msg_name       = NULL;
-	msg.msg_namelen    = 0;
-	msg.msg_iov        = iov;
-	msg.msg_iovlen     = 1;
-	iov[0].iov_base    = (void *)buf;
-	iov[0].iov_len     = bufsize;
-	msg.msg_control    = NULL;
-	msg.msg_controllen = 0;
-	result = sys_sendmsg(sockfd, &msg, msg_flags);
-#elif defined(SYS_sendmmsg)
-	struct mmsghdr msg;
-	struct iovec iov[1];
-	msg.msg_hdr.msg_name       = NULL;
-	msg.msg_hdr.msg_namelen    = 0;
-	msg.msg_hdr.msg_iov        = iov;
-	msg.msg_hdr.msg_iovlen     = 1;
-	iov[0].iov_base            = (void *)buf;
-	iov[0].iov_len             = bufsize;
-	msg.msg_hdr.msg_control    = NULL;
-	msg.msg_hdr.msg_controllen = 0;
-	result = sys_sendmmsg(sockfd, &msg, 1, msg_flags);
-	if (result >= 1)
-		result = msg.msg_len;
-#else /* ... */
-#error "No suitable system call to implement `send(2)'"
-#endif /* !... */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_send]]]*/
@@ -498,38 +378,8 @@ NOTHROW_RPC(LIBCCALL libc_sendto)(fd_t sockfd,
 /*[[[body:libc_sendto]]]*/
 {
 	ssize_t result;
-#ifdef SYS_sendto
 	result = sys_sendto(sockfd, buf, bufsize, (syscall_ulong_t)msg_flags,
 	                    (struct sockaddr const *)addr, addr_len);
-#elif defined(SYS_sendmsg)
-	struct msghdr msg;
-	struct iovec iov[1];
-	msg.msg_name       = (struct sockaddr *)addr;
-	msg.msg_namelen    = addr_len;
-	msg.msg_iov        = iov;
-	msg.msg_iovlen     = 1;
-	iov[0].iov_base    = (void *)buf;
-	iov[0].iov_len     = bufsize;
-	msg.msg_control    = NULL;
-	msg.msg_controllen = 0;
-	result = sys_sendmsg(sockfd, &msg, msg_flags);
-#elif defined(SYS_sendmmsg)
-	struct mmsghdr msg;
-	struct iovec iov[1];
-	msg.msg_hdr.msg_name       = (struct sockaddr *)addr;
-	msg.msg_hdr.msg_namelen    = addr_len;
-	msg.msg_hdr.msg_iov        = iov;
-	msg.msg_hdr.msg_iovlen     = 1;
-	iov[0].iov_base            = (void *)buf;
-	iov[0].iov_len             = bufsize;
-	msg.msg_hdr.msg_control    = NULL;
-	msg.msg_hdr.msg_controllen = 0;
-	result = sys_sendmmsg(sockfd, &msg, 1, msg_flags);
-	if (result >= 1)
-		result = msg.msg_len;
-#else /* ... */
-#error "No suitable system call to implement `sendto(2)'"
-#endif /* !... */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_sendto]]]*/
@@ -549,24 +399,7 @@ NOTHROW_RPC(LIBCCALL libc_sendmsg)(fd_t sockfd,
 /*[[[body:libc_sendmsg]]]*/
 {
 	ssize_t result;
-#ifdef SYS_sendmsg
-	result = sys_sendmsg(sockfd,
-	                     message,
-	                     (syscall_ulong_t)msg_flags);
-#elif defined(SYS_sendmmsg)
-	struct mmsghdr msg;
-	msg.msg_hdr                = *message;
-	msg.msg_hdr.msg_control    = NULL;
-	msg.msg_hdr.msg_controllen = 0;
-	result = sys_sendmmsg(sockfd, &msg, 1, msg_flags);
-	message->msg_namelen    = msg.msg_hdr.msg_namelen;
-	message->msg_controllen = msg.msg_hdr.msg_controllen;
-	message->msg_flags      = msg.msg_hdr.msg_flags;
-	if (result >= 1)
-		result = msg.msg_len;
-#else /* ... */
-#error "No suitable system call to implement `sendmsg(2)'"
-#endif /* !... */
+	result = sys_sendmsg(sockfd, message, (syscall_ulong_t)msg_flags);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_sendmsg]]]*/
@@ -587,9 +420,7 @@ NOTHROW_RPC(LIBCCALL libc_sendmmsg)(fd_t sockfd,
 /*[[[body:libc_sendmmsg]]]*/
 {
 	ssize_t error;
-	error = sys_sendmmsg(sockfd,
-	                     vmessages,
-	                     (size_t)vlen,
+	error = sys_sendmmsg(sockfd, vmessages, (size_t)vlen,
 	                     (syscall_ulong_t)msg_flags);
 	return (int)libc_seterrno_syserr(error);
 }
@@ -697,13 +528,7 @@ NOTHROW_RPC(LIBCCALL libc_accept)(fd_t sockfd,
 /*[[[body:libc_accept]]]*/
 {
 	fd_t result;
-#ifdef SYS_accept
 	result = sys_accept(sockfd, (struct sockaddr *)addr, addr_len);
-#elif defined(SYS_accept4)
-	result = sys_accept4(sockfd, (struct sockaddr *)addr, addr_len, 0);
-#else /* ... */
-#error "No suitable system call to implement `accept(2)'"
-#endif /* !... */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_accept]]]*/

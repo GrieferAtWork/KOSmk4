@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab3d9083 */
+/* HASH CRC-32:0x4cfd0cae */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ DECL_BEGIN
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
- * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * first `nfds'  elements of  the respective  sets are  considered,  thus
  * representing  the  upper limit  on how  much  memory the  kernel might
  * touch in the given sets.
  *
@@ -67,7 +67,7 @@ INTDEF ATTR_INOUT_OPT(2) ATTR_INOUT_OPT(3) ATTR_INOUT_OPT(4) ATTR_INOUT_OPT(5) _
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
- * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * first `nfds'  elements of  the respective  sets are  considered,  thus
  * representing  the  upper limit  on how  much  memory the  kernel might
  * touch in the given sets.
  *
@@ -99,7 +99,7 @@ INTDEF ATTR_INOUT_OPT(2) ATTR_INOUT_OPT(3) ATTR_INOUT_OPT(4) ATTR_IN_OPT(5) ATTR
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
- * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * first `nfds'  elements of  the respective  sets are  considered,  thus
  * representing  the  upper limit  on how  much  memory the  kernel might
  * touch in the given sets.
  *
@@ -131,7 +131,7 @@ INTDEF ATTR_INOUT_OPT(2) ATTR_INOUT_OPT(3) ATTR_INOUT_OPT(4) ATTR_INOUT_OPT(5) _
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
- * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * first `nfds'  elements of  the respective  sets are  considered,  thus
  * representing  the  upper limit  on how  much  memory the  kernel might
  * touch in the given sets.
  *

@@ -21,8 +21,10 @@
 #define GUARD_LIBC_USER_SYS_REBOOT_C 1
 
 #include "../api.h"
+/**/
+
+#include "../libc/syscalls.h"
 #include "sys.reboot.h"
-#include <kos/syscalls.h>
 
 DECL_BEGIN
 

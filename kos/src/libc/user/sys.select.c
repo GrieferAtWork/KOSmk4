@@ -26,26 +26,16 @@
 #include <bits/os/sigset_with_size.h>
 #include <kos/syscalls.h>
 
-#include <syscall.h> /* SYS_* */
-
+#include "../libc/syscalls.h"
 #include "sys.select.h"
-
-#ifndef SYS__newselect
-/* Pull in information to figure out what kind of
- * select() function is  exported by the  kernel. */
-#ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT
-#define __WANT_SYSCALL_ARGUMENT_COUNT 1
-#include <asm/syscalls-proto.h>
-#endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_COUNT */
-#endif /* !SYS__newselect */
 
 DECL_BEGIN
 
-/*[[[head:libc_select,hash:CRC-32=0xb57124a7]]]*/
+/*[[[head:libc_select,hash:CRC-32=0x700edc6]]]*/
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
- * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * first `nfds'  elements of  the respective  sets are  considered,  thus
  * representing  the  upper limit  on how  much  memory the  kernel might
  * touch in the given sets.
  *
@@ -82,32 +72,17 @@ NOTHROW_RPC(LIBCCALL libc_select)(__STDC_INT_AS_SIZE_T nfds,
 /*[[[body:libc_select]]]*/
 {
 	ssize_t result;
-#ifdef SYS__newselect
 	result = sys__newselect(nfds, readfds, writefds, exceptfds, timeout);
-#elif __NRAC_select == 5
-	result = sys_select(nfds, readfds, writefds, exceptfds, timeout);
-#elif __NRAC_select == 1
-	/* Must use `struct sel_arg_struct' */
-	struct sel_arg_struct arg;
-	arg.n    = (ulongptr_t)nfds;
-	arg.inp  = readfds;
-	arg.outp = writefds;
-	arg.exp  = exceptfds;
-	arg.tvp  = timeout;
-	result   = sys_select(&arg);
-#else /* ... */
-#error "Unrecognized sys_select() variant"
-#endif /* !... */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_select]]]*/
 
 
-/*[[[head:libc_pselect,hash:CRC-32=0xdd223bbb]]]*/
+/*[[[head:libc_pselect,hash:CRC-32=0x938597d9]]]*/
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
- * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * first `nfds'  elements of  the respective  sets are  considered,  thus
  * representing  the  upper limit  on how  much  memory the  kernel might
  * touch in the given sets.
  *
@@ -153,14 +128,14 @@ NOTHROW_RPC(LIBCCALL libc_pselect)(__STDC_INT_AS_SIZE_T nfds,
 }
 /*[[[end:libc_pselect]]]*/
 
-/*[[[head:libc_select64,hash:CRC-32=0xc8ac12b1]]]*/
+/*[[[head:libc_select64,hash:CRC-32=0xdea6269e]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_select64, libc_select);
 #else /* MAGIC:alias */
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
- * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * first `nfds'  elements of  the respective  sets are  considered,  thus
  * representing  the  upper limit  on how  much  memory the  kernel might
  * touch in the given sets.
  *
@@ -197,26 +172,20 @@ NOTHROW_RPC(LIBCCALL libc_select64)(__STDC_INT_AS_SIZE_T nfds,
 /*[[[body:libc_select64]]]*/
 {
 	ssize_t result;
-#ifdef SYS_select64
-	result = sys_select64(nfds, readfds, writefds, exceptfds, timeout);
-#elif defined(SYS_select_time64)
 	result = sys_select_time64(nfds, readfds, writefds, exceptfds, timeout);
-#else /* ... */
-#error "No way to implement `select64()'"
-#endif /* !... */
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_select64]]]*/
 
-/*[[[head:libc_pselect64,hash:CRC-32=0x525c0335]]]*/
+/*[[[head:libc_pselect64,hash:CRC-32=0x3e11f0d6]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pselect64, libc_pselect);
 #else /* MAGIC:alias */
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
- * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * first `nfds'  elements of  the respective  sets are  considered,  thus
  * representing  the  upper limit  on how  much  memory the  kernel might
  * touch in the given sets.
  *
@@ -257,13 +226,7 @@ NOTHROW_RPC(LIBCCALL libc_pselect64)(__STDC_INT_AS_SIZE_T nfds,
 	struct sigset_with_size ss;
 	ss.sws_sigset = (sigset_t *)sigmask;
 	ss.sws_sigsiz = sizeof(sigset_t);
-#ifdef SYS_pselect6_64
-	result = sys_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, &ss);
-#elif defined(SYS_pselect6_time64)
 	result = sys_pselect6_time64(nfds, readfds, writefds, exceptfds, timeout, &ss);
-#else /* ... */
-#error "No way to implement `pselect64()'"
-#endif /* !... */
 	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */

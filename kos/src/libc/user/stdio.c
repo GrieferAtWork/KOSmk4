@@ -1795,7 +1795,7 @@ NOTHROW_RPC(LIBDCALL libd_renameat)(fd_t oldfd,
                                     char const *newname_or_path)
 /*[[[body:libd_renameat]]]*/
 {
-	return libc_renameat2(oldfd, oldname, newfd, newname_or_path, libd_AT_DOSPATH);
+	return libd_renameat2(oldfd, oldname, newfd, newname_or_path, 0);
 }
 /*[[[end:libd_renameat]]]*/
 

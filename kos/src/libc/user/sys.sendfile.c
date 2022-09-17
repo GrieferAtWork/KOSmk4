@@ -21,8 +21,10 @@
 #define GUARD_LIBC_USER_SYS_SENDFILE_C 1
 
 #include "../api.h"
+/**/
+
+#include "../libc/syscalls.h"
 #include "sys.sendfile.h"
-#include <kos/syscalls.h>
 
 DECL_BEGIN
 
@@ -57,9 +59,6 @@ NOTHROW_NCX(LIBCCALL libc_sendfile64)(fd_t out_fd,
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_sendfile64]]]*/
-
-
-
 
 
 /*[[[start:exports,hash:CRC-32=0x7772fdfe]]]*/

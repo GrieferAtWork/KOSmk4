@@ -21,9 +21,10 @@
 #define GUARD_LIBC_USER_SYS_SIGNALFD_C 1
 
 #include "../api.h"
-#include "sys.signalfd.h"
+/**/
 
-#include <kos/syscalls.h>
+#include "../libc/syscalls.h"
+#include "sys.signalfd.h"
 
 DECL_BEGIN
 
@@ -49,9 +50,6 @@ NOTHROW_NCX(LIBCCALL libc_signalfd)(fd_t fd,
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:libc_signalfd]]]*/
-
-
-
 
 
 /*[[[start:exports,hash:CRC-32=0xcd6e98ec]]]*/

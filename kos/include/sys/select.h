@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd10fde50 */
+/* HASH CRC-32:0xc802a67c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -142,7 +142,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_WARNING("fd number cannot be used 
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
- * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * first `nfds'  elements of  the respective  sets are  considered,  thus
  * representing  the  upper limit  on how  much  memory the  kernel might
  * touch in the given sets.
  *
@@ -175,7 +175,7 @@ __CDECLARE(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_IN
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
- * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * first `nfds'  elements of  the respective  sets are  considered,  thus
  * representing  the  upper limit  on how  much  memory the  kernel might
  * touch in the given sets.
  *
@@ -208,7 +208,7 @@ __CREDIRECT(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_I
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
- * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * first `nfds'  elements of  the respective  sets are  considered,  thus
  * representing  the  upper limit  on how  much  memory the  kernel might
  * touch in the given sets.
  *
@@ -242,7 +242,7 @@ __CREDIRECT(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_I
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
- * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * first `nfds'  elements of  the respective  sets are  considered,  thus
  * representing  the  upper limit  on how  much  memory the  kernel might
  * touch in the given sets.
  *
@@ -277,7 +277,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(select, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
- * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * first `nfds'  elements of  the respective  sets are  considered,  thus
  * representing  the  upper limit  on how  much  memory the  kernel might
  * touch in the given sets.
  *
@@ -310,7 +310,7 @@ __CDECLARE(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_IN
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
- * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * first `nfds'  elements of  the respective  sets are  considered,  thus
  * representing  the  upper limit  on how  much  memory the  kernel might
  * touch in the given sets.
  *
@@ -344,7 +344,7 @@ __CREDIRECT(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_I
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
- * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * first `nfds'  elements of  the respective  sets are  considered,  thus
  * representing  the  upper limit  on how  much  memory the  kernel might
  * touch in the given sets.
  *
@@ -381,7 +381,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pselect, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_I
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
- * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * first `nfds'  elements of  the respective  sets are  considered,  thus
  * representing  the  upper limit  on how  much  memory the  kernel might
  * touch in the given sets.
  *
@@ -414,7 +414,7 @@ __CREDIRECT(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_I
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
- * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * first `nfds'  elements of  the respective  sets are  considered,  thus
  * representing  the  upper limit  on how  much  memory the  kernel might
  * touch in the given sets.
  *
@@ -448,7 +448,7 @@ __CDECLARE(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_IN
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
- * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * first `nfds'  elements of  the respective  sets are  considered,  thus
  * representing  the  upper limit  on how  much  memory the  kernel might
  * touch in the given sets.
  *
@@ -483,7 +483,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(select64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
- * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * first `nfds'  elements of  the respective  sets are  considered,  thus
  * representing  the  upper limit  on how  much  memory the  kernel might
  * touch in the given sets.
  *
@@ -516,7 +516,7 @@ __CREDIRECT(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_I
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
- * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * first `nfds'  elements of  the respective  sets are  considered,  thus
  * representing  the  upper limit  on how  much  memory the  kernel might
  * touch in the given sets.
  *
@@ -550,7 +550,7 @@ __CDECLARE(__ATTR_INOUT_OPT(2) __ATTR_INOUT_OPT(3) __ATTR_INOUT_OPT(4) __ATTR_IN
 /* >> select(2), select64(2), pselect(2), pselect64(2)
  * Wait for read/write/other events to become possible (without blocking)
  * on the file descriptors within  any given non-NULL `fd_set'. Only  the
- * first  `nfds' elementes  of the  respective sets  are considered, thus
+ * first `nfds'  elements of  the respective  sets are  considered,  thus
  * representing  the  upper limit  on how  much  memory the  kernel might
  * touch in the given sets.
  *

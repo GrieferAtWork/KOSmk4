@@ -21,6 +21,8 @@
 #define GUARD_LIBC_USER_SYS_SHM_C 1
 
 #include "../api.h"
+/**/
+
 #include "sys.shm.h"
 
 DECL_BEGIN
@@ -81,9 +83,6 @@ NOTHROW_NCX(LIBCCALL libc_shmdt)(void const *shmaddr)
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_shmdt]]]*/
-
-
-
 
 
 /*[[[start:exports,hash:CRC-32=0x8b4a25ab]]]*/

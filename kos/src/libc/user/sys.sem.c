@@ -21,6 +21,8 @@
 #define GUARD_LIBC_USER_SYS_SEM_C 1
 
 #include "../api.h"
+/**/
+
 #include "sys.sem.h"
 
 DECL_BEGIN
@@ -110,9 +112,6 @@ NOTHROW_NCX(LIBCCALL libc_semtimedop)(int semid,
 	return libc_seterrno(ENOSYS);
 }
 /*[[[end:libc_semtimedop]]]*/
-
-
-
 
 
 /*[[[start:exports,hash:CRC-32=0x879137b2]]]*/

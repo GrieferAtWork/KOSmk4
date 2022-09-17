@@ -200,7 +200,7 @@ __STDC_INT_AS_SSIZE_T pselect32(__STDC_INT_AS_SIZE_T nfds,
 @@>> select(2), select64(2), pselect(2), pselect64(2)
 @@Wait for read/write/other events to become possible (without blocking)
 @@on the file descriptors within  any given non-NULL `fd_set'. Only  the
-@@first  `nfds' elementes  of the  respective sets  are considered, thus
+@@first `nfds'  elements of  the respective  sets are  considered,  thus
 @@representing  the  upper limit  on how  much  memory the  kernel might
 @@touch in the given sets.
 @@

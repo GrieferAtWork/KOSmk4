@@ -138,10 +138,13 @@ again:
 #ifndef __OPTIMIZE_SIZE__
 	/* 32-bit libc makes use of lcall7-clone to implement its  pthread_create().
 	 * To prevent the need of going the long route of sending an RPC to ourself,
-	 * have a special optimization for this use-case. */
+	 * have a special optimization for this use-case.
+	 *
+	 * n.b.: libc no longer does this; it now uses SYS_clone3 on i386 and x86_64! */
 	if (sc_info.rsi_sysno == __NR32_clone)
 		kernel_restart_interrupt(state, &lcall7_clone32);
 #endif /* !__OPTIMIZE_SIZE__ */
+
 	sc_info.rsi_flags = RPC_SYSCALL_INFO_METHOD_LCALL7_32;
 	if (icpustate_getpflags(state) & EFLAGS_DF)
 		sc_info.rsi_flags |= RPC_SYSCALL_INFO_FEXCEPT;

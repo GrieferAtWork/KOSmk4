@@ -364,7 +364,7 @@ NOTHROW_RPC(LIBDCALL libd_chown)(char const *file,
                                  gid_t group)
 /*[[[body:libd_chown]]]*/
 {
-	return libc_fchownat(AT_FDCWD, file, owner, group, libd_AT_DOSPATH);
+	return libd_fchownat(AT_FDCWD, file, owner, group, 0);
 }
 /*[[[end:libd_chown]]]*/
 
@@ -403,7 +403,7 @@ NOTHROW_RPC(LIBDCALL libd_link)(char const *from,
                                 char const *to)
 /*[[[body:libd_link]]]*/
 {
-	return libc_linkat(AT_FDCWD, from, AT_FDCWD, to, libd_AT_DOSPATH);
+	return libd_linkat(AT_FDCWD, from, AT_FDCWD, to, 0);
 }
 /*[[[end:libd_link]]]*/
 
@@ -575,7 +575,7 @@ NOTHROW_RPC(LIBDCALL libd_access)(char const *file,
                                   __STDC_INT_AS_UINT_T type)
 /*[[[body:libd_access]]]*/
 {
-	return libc_faccessat(AT_FDCWD, file, type, libd_AT_DOSPATH);
+	return libd_faccessat(AT_FDCWD, file, type, 0);
 }
 /*[[[end:libd_access]]]*/
 
@@ -733,7 +733,7 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.modify") ATTR_IN(1) int
 NOTHROW_RPC(LIBDCALL libd_unlink)(char const *file)
 /*[[[body:libd_unlink]]]*/
 {
-	return libc_unlinkat(AT_FDCWD, file, libd_AT_DOSPATH);
+	return libd_unlinkat(AT_FDCWD, file, 0);
 }
 /*[[[end:libd_unlink]]]*/
 
