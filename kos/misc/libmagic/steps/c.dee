@@ -521,8 +521,12 @@ global final function LINK_getRequiredFiles(self: BoundStep): string {
 	local script = options.get(OPT_LINK_SCRIPT);
 	if (script !is none)
 		yield config.getPreprocessedFilename(group, group.fixFilename(script));
+	local extra = config.CONFIG.getExtraCLinkOptions(self);
+	if (extra !is none)
+		options = mergeOptions(options, extra);
 	yield toolchain.enumerateLinkerDependencies(
 		step:      self,
+		options:   options,
 		language:  options.get(OPT_COMPILE_LANGUAGE),
 		libPath:   group.fixFilenames(options.get(OPT_LINK_LIBPATH)),
 		libraries: options.get(OPT_LINK_LIBRARIES),

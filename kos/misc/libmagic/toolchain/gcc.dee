@@ -759,6 +759,7 @@ again_handle_col:
 
 	@@Enumerate all (possible) input dependencies of the linker
 	function enumerateLinkerDependencies(step: BoundStep,
+	                                     options: {string: Object} | none = none,
 	                                     language: string | none = none,
 	                                     libPath: {string...} = none,
 	                                     libraries: {string...} = none,
@@ -766,7 +767,7 @@ again_handle_col:
 		local systemLibraryPaths, systemLibraries, systemObjects;
 		if (language is none)
 			language = getDefaultLinkerLanguage(step);
-		local gccOptions = step.group.options.get(OPT_GCC_OPTIONS);
+		local gccOptions = options.get(OPT_GCC_OPTIONS);
 		systemLibraryPaths, systemLibraries, systemObjects =
 			enumerateSystemLibraryPathsAndStandardLibraries(gccOptions, language)...;
 		if (!noStdLib)
