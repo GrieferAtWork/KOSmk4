@@ -69,7 +69,7 @@ DEFINE_TEST(pty_works_correctly) {
 	/* Read the data that was written by the child process. */
 	if ((error = read(master, buf, sizeof(buf))) != sizeof(pty_child_data))
 		err(1, "Error, or unexpected amount of data read from master (%" PRIdSIZ ")", error);
-	if (memcmp(buf, pty_child_data, sizeof(pty_child_data)) != 0)
+	if (bcmp(buf, pty_child_data, sizeof(pty_child_data)) != 0)
 		err(1, "Wrong data read by master: %$q", sizeof(pty_child_data), buf);
 
 	/* Wait for the child process to exit. - As long as the child is still alive,

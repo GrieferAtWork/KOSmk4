@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62c44d49 */
+/* HASH CRC-32:0x21828980 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,60 +90,6 @@ __CDECLARE_VOID_GCCNCX(__ATTR_INS(1, 3) __ATTR_OUTS(2, 3),__NOTHROW_NCX,bcopy,(v
 __NAMESPACE_LOCAL_USING_OR_IMPL(bcopy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(1, 3) __ATTR_OUTS(2, 3) void __NOTHROW_NCX(__LIBCCALL bcopy)(void const *__src, void *__dst, __SIZE_TYPE__ __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bcopy))(__src, __dst, __num_bytes); })
 #endif /* !... */
 #endif /* !__bcopy_defined */
-#ifndef __bcmp_defined
-#define __bcmp_defined
-#if defined(__fast_bcmp_defined) && defined(__CRT_HAVE_bcmp)
-/* >> bcmp(3)
- * Similar to `memcmp(3)', except that no ordering is done,
- * such  that compare is  only correct for equal/non-equal.
- * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
- * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
-__CEIDECLARE_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,bcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmp))(__s1, __s2, __n_bytes); })
-#elif defined(__fast_bcmp_defined)
-/* >> bcmp(3)
- * Similar to `memcmp(3)', except that no ordering is done,
- * such  that compare is  only correct for equal/non-equal.
- * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
- * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
-__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL bcmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmp))(__s1, __s2, __n_bytes); }
-#elif defined(__fast_memcmp_defined) && defined(__CRT_HAVE_bcmp)
-/* >> bcmp(3)
- * Similar to `memcmp(3)', except that no ordering is done,
- * such  that compare is  only correct for equal/non-equal.
- * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
- * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
-__CEIDECLARE_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,bcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))(__s1, __s2, __n_bytes); })
-#elif defined(__fast_memcmp_defined)
-/* >> bcmp(3)
- * Similar to `memcmp(3)', except that no ordering is done,
- * such  that compare is  only correct for equal/non-equal.
- * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
- * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
-__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL bcmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))(__s1, __s2, __n_bytes); }
-#elif defined(__CRT_HAVE_bcmp)
-/* >> bcmp(3)
- * Similar to `memcmp(3)', except that no ordering is done,
- * such  that compare is  only correct for equal/non-equal.
- * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
- * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
-__CDECLARE_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,bcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),(__s1,__s2,__n_bytes))
-#elif defined(__CRT_HAVE_memcmp)
-/* >> bcmp(3)
- * Similar to `memcmp(3)', except that no ordering is done,
- * such  that compare is  only correct for equal/non-equal.
- * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
- * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
-__CREDIRECT_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,bcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcmp,(__s1,__s2,__n_bytes))
-#else /* ... */
-#include <libc/local/string/memcmp.h>
-/* >> bcmp(3)
- * Similar to `memcmp(3)', except that no ordering is done,
- * such  that compare is  only correct for equal/non-equal.
- * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
- * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL bcmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmp))(__s1, __s2, __n_bytes); }
-#endif /* !... */
-#endif /* !__bcmp_defined */
 #ifndef __index_defined
 #define __index_defined
 #if __has_builtin(__builtin_strchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strchr)
@@ -305,6 +251,83 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) char *__N
 #endif /* !... */
 #endif /* !__rindex_defined */
 
+#ifndef __bcmp_defined
+#define __bcmp_defined
+#if defined(__fast_bcmp_defined) && defined(__CRT_HAVE_bcmp)
+/* >> bcmp(3)
+ * Similar to `memcmp(3)', except that no ordering is done,
+ * such  that compare is  only correct for equal/non-equal.
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
+__CEIDECLARE_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,bcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmp))(__s1, __s2, __n_bytes); })
+#elif defined(__fast_bcmp_defined)
+/* >> bcmp(3)
+ * Similar to `memcmp(3)', except that no ordering is done,
+ * such  that compare is  only correct for equal/non-equal.
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL bcmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmp))(__s1, __s2, __n_bytes); }
+#elif defined(__fast_memcmp_defined) && defined(__CRT_HAVE_bcmp)
+/* >> bcmp(3)
+ * Similar to `memcmp(3)', except that no ordering is done,
+ * such  that compare is  only correct for equal/non-equal.
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
+__CEIDECLARE_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,bcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))(__s1, __s2, __n_bytes); })
+#elif defined(__fast_memcmp_defined)
+/* >> bcmp(3)
+ * Similar to `memcmp(3)', except that no ordering is done,
+ * such  that compare is  only correct for equal/non-equal.
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL bcmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))(__s1, __s2, __n_bytes); }
+#elif defined(__CRT_HAVE_bcmp)
+/* >> bcmp(3)
+ * Similar to `memcmp(3)', except that no ordering is done,
+ * such  that compare is  only correct for equal/non-equal.
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
+__CDECLARE_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,bcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),(__s1,__s2,__n_bytes))
+#elif defined(__CRT_HAVE_memcmp)
+/* >> bcmp(3)
+ * Similar to `memcmp(3)', except that no ordering is done,
+ * such  that compare is  only correct for equal/non-equal.
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
+__CREDIRECT_GCCNCX(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,bcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcmp,(__s1,__s2,__n_bytes))
+#else /* ... */
+#include <libc/local/string/memcmp.h>
+/* >> bcmp(3)
+ * Similar to `memcmp(3)', except that no ordering is done,
+ * such  that compare is  only correct for equal/non-equal.
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL bcmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmp))(__s1, __s2, __n_bytes); }
+#endif /* !... */
+#if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+extern "C++" {
+#if defined(__fast_bcmpc_defined) && defined(__CRT_HAVE_bcmpc)
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),bcmpc,{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpc))(__s1, __s2, __elem_count, __elem_size); })
+#elif defined(__fast_bcmpc_defined)
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL bcmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpc))(__s1, __s2, __elem_count, __elem_size); }
+#elif defined(__fast_memcmpc_defined) && defined(__CRT_HAVE_bcmpc)
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),bcmpc,{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpc))(__s1, __s2, __elem_count, __elem_size); })
+#elif defined(__fast_memcmpc_defined)
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL bcmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpc))(__s1, __s2, __elem_count, __elem_size); }
+#elif defined(__CRT_HAVE_bcmpc)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),bcmpc,(__s1,__s2,__elem_count,__elem_size))
+#elif defined(__CRT_HAVE_memcmpc)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcmpc,(__s1,__s2,__elem_count,__elem_size))
+#else /* ... */
+} /* extern "C++" */
+#include <libc/local/string/memcmp.h>
+extern "C++" {
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL bcmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmp))(__s1, __s2, __elem_count); }
+#endif /* !... */
+} /* extern "C++" */
+#endif /* __cplusplus && __USE_STRING_OVERLOADS */
+#endif /* !__bcmp_defined */
+
 #ifndef __bzero_defined
 #define __bzero_defined
 #if defined(__fast_bzero_defined) && defined(__CRT_HAVE_bzero)
@@ -344,6 +367,127 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_OUT(1) void __NOTHROW_NCX(__LI
 #endif /* !__bzero_defined */
 
 #ifdef __USE_STRING_BWLQ
+#ifndef __bcmpb_defined
+#define __bcmpb_defined
+#if defined(__fast_bcmp_defined) && defined(__CRT_HAVE_bcmp)
+/* >> bcmp(3)
+ * Similar to `memcmp(3)', except that no ordering is done,
+ * such  that compare is  only correct for equal/non-equal.
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,bcmpb,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),bcmp,{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmp))(__s1, __s2, __n_bytes); })
+#elif defined(__fast_bcmp_defined)
+/* >> bcmp(3)
+ * Similar to `memcmp(3)', except that no ordering is done,
+ * such  that compare is  only correct for equal/non-equal.
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL bcmpb)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmp))(__s1, __s2, __n_bytes); }
+#elif defined(__fast_memcmp_defined) && defined(__CRT_HAVE_bcmp)
+/* >> bcmp(3)
+ * Similar to `memcmp(3)', except that no ordering is done,
+ * such  that compare is  only correct for equal/non-equal.
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,bcmpb,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),bcmp,{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))(__s1, __s2, __n_bytes); })
+#elif defined(__fast_memcmp_defined)
+/* >> bcmp(3)
+ * Similar to `memcmp(3)', except that no ordering is done,
+ * such  that compare is  only correct for equal/non-equal.
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL bcmpb)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))(__s1, __s2, __n_bytes); }
+#elif defined(__CRT_HAVE_bcmp)
+/* >> bcmp(3)
+ * Similar to `memcmp(3)', except that no ordering is done,
+ * such  that compare is  only correct for equal/non-equal.
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,bcmpb,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),bcmp,(__s1,__s2,__n_bytes))
+#elif defined(__CRT_HAVE_memcmp)
+/* >> bcmp(3)
+ * Similar to `memcmp(3)', except that no ordering is done,
+ * such  that compare is  only correct for equal/non-equal.
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,bcmpb,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcmp,(__s1,__s2,__n_bytes))
+#else /* ... */
+#include <libc/local/string/memcmp.h>
+/* >> bcmp(3)
+ * Similar to `memcmp(3)', except that no ordering is done,
+ * such  that compare is  only correct for equal/non-equal.
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return: != 0: `s1...+=n_bytes' != `s2...+=n_bytes' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL bcmpb)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmp))(__s1, __s2, __n_bytes); }
+#endif /* !... */
+#endif /* !__bcmpb_defined */
+#ifndef __bcmpw_defined
+#define __bcmpw_defined
+#if defined(__fast_bcmpw_defined) && defined(__CRT_HAVE_bcmpw)
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpw,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_words),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpw))(__s1, __s2, __n_words); })
+#elif defined(__fast_memcmpw_defined) && defined(__CRT_HAVE_bcmpw)
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpw,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_words),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpw))(__s1, __s2, __n_words); })
+#elif defined(__fast_bcmpw_defined) && defined(__CRT_HAVE_memcmpw)
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpw,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_words),memcmpw,{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpw))(__s1, __s2, __n_words); })
+#elif defined(__fast_memcmpw_defined) && defined(__CRT_HAVE_memcmpw)
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpw,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_words),memcmpw,{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpw))(__s1, __s2, __n_words); })
+#elif defined(__fast_bcmpw_defined)
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL bcmpw)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_words) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpw))(__s1, __s2, __n_words); }
+#elif defined(__fast_memcmpw_defined)
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL bcmpw)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_words) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpw))(__s1, __s2, __n_words); }
+#elif defined(__CRT_HAVE_bcmpw)
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpw,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_words),(__s1,__s2,__n_words))
+#elif defined(__CRT_HAVE_memcmpw)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpw,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_words),memcmpw,(__s1,__s2,__n_words))
+#else /* ... */
+#include <libc/local/string/memcmpw.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL bcmpw)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_words) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpw))(__s1, __s2, __n_words); }
+#endif /* !... */
+#endif /* !__bcmpw_defined */
+#ifndef __bcmpl_defined
+#define __bcmpl_defined
+#if defined(__fast_bcmpl_defined) && defined(__CRT_HAVE_bcmpl)
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpl,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_dwords),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpl))(__s1, __s2, __n_dwords); })
+#elif defined(__fast_memcmpl_defined) && defined(__CRT_HAVE_bcmpl)
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpl,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_dwords),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpl))(__s1, __s2, __n_dwords); })
+#elif defined(__fast_bcmpl_defined) && defined(__CRT_HAVE_memcmpl)
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpl,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_dwords),memcmpl,{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpl))(__s1, __s2, __n_dwords); })
+#elif defined(__fast_memcmpl_defined) && defined(__CRT_HAVE_memcmpl)
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpl,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_dwords),memcmpl,{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpl))(__s1, __s2, __n_dwords); })
+#elif defined(__fast_bcmpl_defined)
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL bcmpl)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_dwords) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpl))(__s1, __s2, __n_dwords); }
+#elif defined(__fast_memcmpl_defined)
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL bcmpl)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_dwords) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpl))(__s1, __s2, __n_dwords); }
+#elif defined(__CRT_HAVE_bcmpl)
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpl,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_dwords),(__s1,__s2,__n_dwords))
+#elif defined(__CRT_HAVE_memcmpl)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpl,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_dwords),memcmpl,(__s1,__s2,__n_dwords))
+#else /* ... */
+#include <libc/local/string/memcmpl.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL bcmpl)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_dwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpl))(__s1, __s2, __n_dwords); }
+#endif /* !... */
+#endif /* !__bcmpl_defined */
+#ifndef __bzerob_defined
+#define __bzerob_defined
+#if defined(__fast_bzero_defined) && defined(__CRT_HAVE_bzero)
+__CEIREDIRECT(__ATTR_LEAF __ATTR_OUTS(1, 2) __ATTR_NONNULL((1)),void,__NOTHROW_NCX,bzerob,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),bzero,{ (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzero))(__dst, __num_bytes); })
+#elif defined(__fast_bzero_defined) && defined(__CRT_HAVE___bzero)
+__CEIREDIRECT(__ATTR_LEAF __ATTR_OUTS(1, 2) __ATTR_NONNULL((1)),void,__NOTHROW_NCX,bzerob,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),__bzero,{ (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzero))(__dst, __num_bytes); })
+#elif defined(__fast_bzero_defined) && defined(__CRT_HAVE_explicit_bzero)
+__CEIREDIRECT(__ATTR_LEAF __ATTR_OUTS(1, 2) __ATTR_NONNULL((1)),void,__NOTHROW_NCX,bzerob,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),explicit_bzero,{ (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzero))(__dst, __num_bytes); })
+#elif defined(__fast_bzero_defined)
+__FORCELOCAL __ATTR_LEAF __ATTR_OUTS(1, 2) __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzerob)(void *__restrict __dst, __SIZE_TYPE__ __num_bytes) { (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzero))(__dst, __num_bytes); }
+#elif defined(__CRT_HAVE_bzero)
+__CREDIRECT_VOID(__ATTR_LEAF __ATTR_OUTS(1, 2) __ATTR_NONNULL((1)),__NOTHROW_NCX,bzerob,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),bzero,(__dst,__num_bytes))
+#elif defined(__CRT_HAVE___bzero)
+__CREDIRECT_VOID(__ATTR_LEAF __ATTR_OUTS(1, 2) __ATTR_NONNULL((1)),__NOTHROW_NCX,bzerob,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),__bzero,(__dst,__num_bytes))
+#elif defined(__CRT_HAVE_explicit_bzero)
+__CREDIRECT_VOID(__ATTR_LEAF __ATTR_OUTS(1, 2) __ATTR_NONNULL((1)),__NOTHROW_NCX,bzerob,(void *__restrict __dst, __SIZE_TYPE__ __num_bytes),explicit_bzero,(__dst,__num_bytes))
+#else /* ... */
+#include <libc/local/string/bzero.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_OUTS(1, 2) __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzerob)(void *__restrict __dst, __SIZE_TYPE__ __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzero))(__dst, __num_bytes); }
+#endif /* !... */
+#endif /* !__bzerob_defined */
 #ifndef __bzerow_defined
 #define __bzerow_defined
 #if defined(__fast_bzerow_defined) && defined(__CRT_HAVE_bzerow)
@@ -370,6 +514,30 @@ __CDECLARE_VOID(__ATTR_LEAF __ATTR_OUT(1),__NOTHROW_NCX,bzerol,(void *__restrict
 __NAMESPACE_LOCAL_USING_OR_IMPL(bzerol, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_OUT(1) void __NOTHROW_NCX(__LIBCCALL bzerol)(void *__restrict __dst, __SIZE_TYPE__ __num_dwords) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzerol))(__dst, __num_dwords); })
 #endif /* !... */
 #endif /* !__bzerol_defined */
+#ifdef __UINT64_TYPE__
+#ifndef __bcmpq_defined
+#define __bcmpq_defined
+#if defined(__fast_bcmpq_defined) && defined(__CRT_HAVE_bcmpq)
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpq,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_qwords),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpq))(__s1, __s2, __n_qwords); })
+#elif defined(__fast_memcmpq_defined) && defined(__CRT_HAVE_bcmpq)
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpq,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_qwords),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpq))(__s1, __s2, __n_qwords); })
+#elif defined(__fast_bcmpq_defined) && defined(__CRT_HAVE_memcmpq)
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpq,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_qwords),memcmpq,{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpq))(__s1, __s2, __n_qwords); })
+#elif defined(__fast_memcmpq_defined) && defined(__CRT_HAVE_memcmpq)
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpq,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_qwords),memcmpq,{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpq))(__s1, __s2, __n_qwords); })
+#elif defined(__fast_bcmpq_defined)
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL bcmpq)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_qwords) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpq))(__s1, __s2, __n_qwords); }
+#elif defined(__fast_memcmpq_defined)
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL bcmpq)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_qwords) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpq))(__s1, __s2, __n_qwords); }
+#elif defined(__CRT_HAVE_bcmpq)
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpq,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_qwords),(__s1,__s2,__n_qwords))
+#elif defined(__CRT_HAVE_memcmpq)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpq,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_qwords),memcmpq,(__s1,__s2,__n_qwords))
+#else /* ... */
+#include <libc/local/string/memcmpq.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL bcmpq)(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_qwords) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpq))(__s1, __s2, __n_qwords); }
+#endif /* !... */
+#endif /* !__bcmpq_defined */
 #ifndef __bzeroq_defined
 #define __bzeroq_defined
 #if defined(__fast_bzeroq_defined) && defined(__CRT_HAVE_bzeroq)
@@ -383,9 +551,29 @@ __CDECLARE_VOID(__ATTR_LEAF __ATTR_OUT(1),__NOTHROW_NCX,bzeroq,(void *__restrict
 __NAMESPACE_LOCAL_USING_OR_IMPL(bzeroq, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_OUT(1) void __NOTHROW_NCX(__LIBCCALL bzeroq)(void *__restrict __dst, __SIZE_TYPE__ __num_qwords) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzeroq))(__dst, __num_qwords); })
 #endif /* !... */
 #endif /* !__bzeroq_defined */
+#endif /* __UINT64_TYPE__ */
 #endif /* __USE_STRING_BWLQ */
 
 #ifdef __USE_KOS
+#ifndef __bcmpc_defined
+#define __bcmpc_defined
+#if defined(__fast_bcmpc_defined) && defined(__CRT_HAVE_bcmpc)
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpc,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpc))(__s1, __s2, __elem_count, __elem_size); })
+#elif defined(__fast_bcmpc_defined)
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL bcmpc)(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpc))(__s1, __s2, __elem_count, __elem_size); }
+#elif defined(__fast_memcmpc_defined) && defined(__CRT_HAVE_bcmpc)
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpc,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpc))(__s1, __s2, __elem_count, __elem_size); })
+#elif defined(__fast_memcmpc_defined)
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL bcmpc)(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpc))(__s1, __s2, __elem_count, __elem_size); }
+#elif defined(__CRT_HAVE_bcmpc)
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpc,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),(__s1,__s2,__elem_count,__elem_size))
+#elif defined(__CRT_HAVE_memcmpc)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,bcmpc,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcmpc,(__s1,__s2,__elem_count,__elem_size))
+#else /* ... */
+#include <libc/local/string/memcmp.h>
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL bcmpc)(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmp))(__s1, __s2, __elem_count); }
+#endif /* !... */
+#endif /* !__bcmpc_defined */
 #ifndef __bzeroc_defined
 #define __bzeroc_defined
 #if defined(__fast_bzeroc_defined) && defined(__CRT_HAVE_bzeroc)
@@ -513,21 +701,29 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(explicit_bzero, __FORCELOCAL __ATTR_ARTIFICIAL _
 #if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS) && defined(__HYBRID_PP_VA_OVERLOAD)
 /* In C, we can use argument-count overload macros to implement these overloads! */
 #ifdef __USE_MISC
+#undef __PRIVATE_bcmp_3
+#undef __PRIVATE_bcmp_4
 #undef __PRIVATE_bzero_2
 #undef __PRIVATE_bzero_3
 #ifdef __USE_KOS
-#define __PRIVATE_bzero_3   bzeroc
+#define __PRIVATE_bcmp_4  bcmpc
+#define __PRIVATE_bzero_3 bzeroc
 #else /* __USE_KOS */
 __SYSDECL_END
 #include <libc/string.h>
 __SYSDECL_BEGIN
-#define __PRIVATE_bzero_3   __libc_bzeroc
+#define __PRIVATE_bcmp_4  __libc_bcmpc
+#define __PRIVATE_bzero_3 __libc_bzeroc
 #endif /* !__USE_KOS */
-#define __PRIVATE_bzero_2   (bzero)
+#define __PRIVATE_bcmp_3  (bcmp)
+#define __PRIVATE_bzero_2 (bzero)
+#undef bcmp
 #undef bzero
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define bcmp(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bcmp_, (__VA_ARGS__))(__VA_ARGS__)
 #define bzero(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bzero_, (__VA_ARGS__))(__VA_ARGS__)
 #elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define bcmp(args...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bcmp_, (args))(args)
 #define bzero(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bzero_, (args))(args)
 #endif /* ... */
 #endif /* __USE_MISC */

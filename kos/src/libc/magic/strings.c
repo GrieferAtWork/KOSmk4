@@ -73,9 +73,17 @@ typedef __SIZE_TYPE__ size_t;
 %#if defined(__USE_MISC) || !defined(__USE_XOPEN2K8)
 
 %[insert:extern(bcopy)]
-%[insert:guarded_function(bcmp)]
 %[insert:guarded_function(index = strchr)]
 %[insert:guarded_function(rindex = strrchr)]
+
+%
+%#ifndef __bcmp_defined
+%#define __bcmp_defined
+%[insert:function(bcmp)]
+%#if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+%[insert:function(bcmp = bcmpc, externLinkageOverride: "C++")]
+%#endif /* __cplusplus && __USE_STRING_OVERLOADS */
+%#endif /* !__bcmp_defined */
 
 %
 %#ifndef __bzero_defined
@@ -85,14 +93,23 @@ typedef __SIZE_TYPE__ size_t;
 %[insert:function(bzero = bzeroc, externLinkageOverride: "C++")]
 %#endif /* __cplusplus && __USE_STRING_OVERLOADS */
 %#endif /* !__bzero_defined */
+
 %
 %#ifdef __USE_STRING_BWLQ
+%[insert:extern(bcmpb)]
+%[insert:extern(bcmpw)]
+%[insert:extern(bcmpl)]
+%[insert:extern(bzerob)]
 %[insert:extern(bzerow)]
 %[insert:extern(bzerol)]
+%#ifdef __UINT64_TYPE__
+%[insert:extern(bcmpq)]
 %[insert:extern(bzeroq)]
+%#endif /* __UINT64_TYPE__ */
 %#endif /* __USE_STRING_BWLQ */
 %
 %#ifdef __USE_KOS
+%[insert:extern(bcmpc)]
 %[insert:extern(bzeroc)]
 %#endif /* __USE_KOS */
 %#endif /* __USE_MISC || !__USE_XOPEN2K8 */
@@ -128,21 +145,29 @@ void explicit_bzero([[out(n_bytes)]] void *dst, size_t n_bytes) {
 #if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS) && defined(__HYBRID_PP_VA_OVERLOAD)
 /* In C, we can use argument-count overload macros to implement these overloads! */
 #ifdef __USE_MISC
+#undef __PRIVATE_bcmp_3
+#undef __PRIVATE_bcmp_4
 #undef __PRIVATE_bzero_2
 #undef __PRIVATE_bzero_3
 #ifdef __USE_KOS
-#define __PRIVATE_bzero_3   bzeroc
+#define __PRIVATE_bcmp_4  bcmpc
+#define __PRIVATE_bzero_3 bzeroc
 #else /* __USE_KOS */
 __SYSDECL_END
 #include <libc/string.h>
 __SYSDECL_BEGIN
-#define __PRIVATE_bzero_3   __libc_bzeroc
+#define __PRIVATE_bcmp_4  __libc_bcmpc
+#define __PRIVATE_bzero_3 __libc_bzeroc
 #endif /* !__USE_KOS */
-#define __PRIVATE_bzero_2   (bzero)
+#define __PRIVATE_bcmp_3  (bcmp)
+#define __PRIVATE_bzero_2 (bzero)
+#undef bcmp
 #undef bzero
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define bcmp(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bcmp_, (__VA_ARGS__))(__VA_ARGS__)
 #define bzero(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bzero_, (__VA_ARGS__))(__VA_ARGS__)
 #elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define bcmp(args...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bcmp_, (args))(args)
 #define bzero(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bzero_, (args))(args)
 #endif /* ... */
 #endif /* __USE_MISC */

@@ -68,10 +68,10 @@ DEFINE_TEST(fifo) {
 	EQss(6, write(wr, "foobar", 6));
 
 	EQss(3, read(rd, buf, 3));
-	assertf(memcmp(buf, "foo", 3) == 0, "%$q", 3, buf);
+	assertf(bcmp(buf, "foo", 3) == 0, "%$q", 3, buf);
 
 	EQss(3, read(rd, buf, 3));
-	assertf(memcmp(buf, "bar", 3) == 0, "%$q", 3, buf);
+	assertf(bcmp(buf, "bar", 3) == 0, "%$q", 3, buf);
 
 	/* The fifo should now be empty,  but because `wr' is still  opened,
 	 * attempting to read from it should trigger EWOULDBLOCK (or EAGAIN,
@@ -104,11 +104,11 @@ DEFINE_TEST(fifo) {
 	/* Also verify that readlink("/proc/self/fd") works with named pipes! */
 	sprintf(buf, "/proc/self/fd/%d", wr);
 	EQss(strlen(FIFO_NAME), readlink(buf, buf, sizeof(buf)));
-	assertf(memcmp(buf, FIFO_NAME, strlen(FIFO_NAME) * sizeof(char)) == 0, "%$q", buf);
+	assertf(bcmp(buf, FIFO_NAME, strlen(FIFO_NAME) * sizeof(char)) == 0, "%$q", buf);
 
 	sprintf(buf, "/proc/self/fd/%d", rd);
 	EQss(strlen(FIFO_NAME), readlink(buf, buf, sizeof(buf)));
-	assertf(memcmp(buf, FIFO_NAME, strlen(FIFO_NAME) * sizeof(char)) == 0, "%$q", buf);
+	assertf(bcmp(buf, FIFO_NAME, strlen(FIFO_NAME) * sizeof(char)) == 0, "%$q", buf);
 
 	/* Delete the FIFO */
 	EQd(0, unlink(FIFO_NAME));
@@ -121,7 +121,7 @@ DEFINE_TEST(fifo) {
 	EQss(6, write(wr, "foobar", 6));
 
 	EQss(6, read(rd, buf, 64));
-	assertf(memcmp(buf, "foobar", 6) == 0, "%$q", 6, buf);
+	assertf(bcmp(buf, "foobar", 6) == 0, "%$q", 6, buf);
 
 	/* The fifo should now be empty, but still connected. */
 	EQss(-1, read(rd, buf, 3));

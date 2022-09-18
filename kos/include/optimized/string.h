@@ -3615,7 +3615,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memrchrq))(/*aligned(8)*/ void const *__restrict 
 #ifndef __fast_memcmp_defined
 #define __fast_memcmp_defined
 #include <hybrid/byteorder.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) int
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBC_FAST_NAME(memcmp))(/*aligned(1)*/ void const *__restrict __s1,
                                         /*aligned(1)*/ void const *__restrict __s2,
                                         __SIZE_TYPE__ __n_bytes) {
@@ -3966,7 +3966,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcmp))(/*aligned(1)*/ void const *__restrict __
 #ifndef __fast_memcmpw_defined
 #define __fast_memcmpw_defined
 #include <hybrid/byteorder.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT16_TYPE__
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __INT16_TYPE__
 __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpw))(/*aligned(2)*/ void const *__restrict __s1,
                                          /*aligned(2)*/ void const *__restrict __s2,
                                          __SIZE_TYPE__ __n_words) {
@@ -4181,7 +4181,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpw))(/*aligned(2)*/ void const *__restrict _
 #ifndef __fast_memcmpl_defined
 #define __fast_memcmpl_defined
 #include <hybrid/byteorder.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT32_TYPE__
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __INT32_TYPE__
 __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpl))(/*aligned(4)*/ void const *__restrict __s1,
                                          /*aligned(4)*/ void const *__restrict __s2,
                                          __SIZE_TYPE__ __n_dwords) {
@@ -4330,7 +4330,7 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpl))(/*aligned(4)*/ void const *__restrict _
 #ifndef __fast_memcmpq_defined
 #define __fast_memcmpq_defined
 #include <hybrid/byteorder.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __INT64_TYPE__
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __INT64_TYPE__
 __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpq))(/*aligned(8)*/ void const *__restrict __s1,
                                          /*aligned(8)*/ void const *__restrict __s2,
                                          __SIZE_TYPE__ __n_qwords) {
@@ -4430,6 +4430,581 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpq))(/*aligned(8)*/ void const *__restrict _
 	return __libc_core_memcmpq(__s1, __s2, __n_qwords);
 }
 #endif /* !__fast_memcmpq_defined */
+#endif /* __UINT64_TYPE__ */
+
+#ifndef __fast_bcmp_defined
+#define __fast_bcmp_defined
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
+__NOTHROW_NCX(__LIBC_FAST_NAME(bcmp))(/*aligned(1)*/ void const *__restrict __s1,
+                                      /*aligned(1)*/ void const *__restrict __s2,
+                                      __SIZE_TYPE__ __n_bytes) {
+	if __untraced(__builtin_constant_p(__s1 == __s2) && (__s1 == __s2))
+		return 0;
+	if __untraced(__builtin_constant_p(__n_bytes)) {
+#define __DO_COMPARE(T, off)                                \
+	if __untraced(*((T *)__s1 + off) != *((T *)__s2 + off)) \
+		return 1;
+#define __DO_COMPARE8(off)  __DO_COMPARE(__UINT8_TYPE__, off)
+#define __DO_COMPARE16(off) __DO_COMPARE(__UINT16_TYPE__, off)
+#define __DO_COMPARE32(off) __DO_COMPARE(__UINT32_TYPE__, off)
+#if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
+#define __DO_COMPARE64(off) __DO_COMPARE(__UINT64_TYPE__, off)
+#endif /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
+
+		/* Add constant cases all compares with less than 2 memory lookups. */
+		switch __untraced(__n_bytes) {
+		case 0:
+			return 0;
+		case 1:
+			__DO_COMPARE8(0)
+			return 0;
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+		case 2:
+			__DO_COMPARE8(0)
+			__DO_COMPARE8(1)
+			return 0;
+#ifndef __OPTIMIZE_SIZE__
+		case 3:
+			__DO_COMPARE8(0)
+			__DO_COMPARE8(1)
+			__DO_COMPARE8(2)
+			return 0;
+		case 4:
+			__DO_COMPARE8(0)
+			__DO_COMPARE8(1)
+			__DO_COMPARE8(2)
+			__DO_COMPARE8(3)
+			return 0;
+#endif /* !__OPTIMIZE_SIZE__ */
+#else /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+		case 2:
+			__DO_COMPARE16(0)
+			return 0;
+		case 3:
+			__DO_COMPARE16(0)
+			__DO_COMPARE8(2)
+			return 0;
+		case 4:
+			__DO_COMPARE32(0)
+			return 0;
+		case 5:
+			__DO_COMPARE32(0)
+			__DO_COMPARE8(4)
+			return 0;
+		case 6:
+			__DO_COMPARE32(0)
+			__DO_COMPARE16(2)
+			return 0;
+#if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
+		case 8:
+			__DO_COMPARE64(0)
+			return 0;
+		case 9:
+			__DO_COMPARE64(0)
+			__DO_COMPARE8(8)
+			return 0;
+		case 10:
+			__DO_COMPARE64(0)
+			__DO_COMPARE16(4)
+			return 0;
+		case 12:
+			__DO_COMPARE64(0)
+			__DO_COMPARE32(2)
+			return 0;
+		case 16:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			return 0;
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
+		case 8:
+			__DO_COMPARE32(0)
+			__DO_COMPARE32(1)
+			return 0;
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+			/* More optimizations for small data blocks that require more assignments (though no more than 4). */
+#ifndef __OPTIMIZE_SIZE__
+		case 7:
+			__DO_COMPARE32(0)
+			__DO_COMPARE16(2)
+			__DO_COMPARE8(6)
+			return 0;
+#if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
+		case 11:
+			__DO_COMPARE64(0)
+			__DO_COMPARE16(4)
+			__DO_COMPARE8(10)
+			return 0;
+		case 13:
+			__DO_COMPARE64(0)
+			__DO_COMPARE32(2)
+			__DO_COMPARE8(12)
+			return 0;
+		case 14:
+			__DO_COMPARE64(0)
+			__DO_COMPARE32(2)
+			__DO_COMPARE16(6)
+			return 0;
+		case 15:
+			__DO_COMPARE64(0)
+			__DO_COMPARE32(2)
+			__DO_COMPARE16(6)
+			__DO_COMPARE8(14)
+			return 0;
+		case 17:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE8(16)
+			return 0;
+		case 18:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE16(8)
+			return 0;
+		case 19:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE16(8)
+			__DO_COMPARE8(18)
+			return 0;
+		case 20:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE32(4)
+			return 0;
+		case 21:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE32(4)
+			__DO_COMPARE8(20)
+			return 0;
+		case 22:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE32(4)
+			__DO_COMPARE16(10)
+			return 0;
+		case 24:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE64(2)
+			return 0;
+		case 25:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE64(2)
+			__DO_COMPARE8(24)
+			return 0;
+		case 26:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE64(2)
+			__DO_COMPARE16(12)
+			return 0;
+		case 28:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE64(2)
+			__DO_COMPARE32(6)
+			return 0;
+		case 32:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE64(2)
+			__DO_COMPARE64(3)
+			return 0;
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
+		case 9:
+			__DO_COMPARE32(0)
+			__DO_COMPARE32(1)
+			__DO_COMPARE8(8)
+			return 0;
+		case 10:
+			__DO_COMPARE32(0)
+			__DO_COMPARE32(1)
+			__DO_COMPARE16(4)
+			return 0;
+		case 11:
+			__DO_COMPARE32(0)
+			__DO_COMPARE32(1)
+			__DO_COMPARE16(4)
+			__DO_COMPARE8(10)
+			return 0;
+		case 12:
+			__DO_COMPARE32(0)
+			__DO_COMPARE32(1)
+			__DO_COMPARE32(2)
+			return 0;
+		case 13:
+			__DO_COMPARE32(0)
+			__DO_COMPARE32(1)
+			__DO_COMPARE32(2)
+			__DO_COMPARE8(12)
+			return 0;
+		case 14:
+			__DO_COMPARE32(0)
+			__DO_COMPARE32(1)
+			__DO_COMPARE32(2)
+			__DO_COMPARE16(6)
+			return 0;
+		case 16:
+			__DO_COMPARE32(0)
+			__DO_COMPARE32(1)
+			__DO_COMPARE32(2)
+			__DO_COMPARE32(3)
+			return 0;
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+		default: break;
+		}
+#undef __DO_COMPARE64
+#undef __DO_COMPARE32
+#undef __DO_COMPARE16
+#undef __DO_COMPARE8
+#undef __DO_COMPARE
+	}
+	return __libc_core_bcmp(__s1, __s2, __n_bytes);
+}
+#endif /* !__fast_bcmp_defined */
+
+#ifndef __fast_bcmpw_defined
+#define __fast_bcmpw_defined
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __INT16_TYPE__
+__NOTHROW_NCX(__LIBC_FAST_NAME(bcmpw))(/*aligned(2)*/ void const *__restrict __s1,
+                                       /*aligned(2)*/ void const *__restrict __s2,
+                                       __SIZE_TYPE__ __n_words) {
+	if __untraced(__builtin_constant_p(__s1 == __s2) && (__s1 == __s2))
+		return 0;
+	if __untraced(__builtin_constant_p(__n_words)) {
+#define __DO_COMPARE(T, off)                                \
+	if __untraced(*((T *)__s1 + off) != *((T *)__s2 + off)) \
+		return 1;
+#define __DO_COMPARE16(off) __DO_COMPARE(__UINT16_TYPE__, off)
+#define __DO_COMPARE32(off) __DO_COMPARE(__UINT32_TYPE__, off)
+#if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
+#define __DO_COMPARE64(off) __DO_COMPARE(__UINT64_TYPE__, off)
+#endif /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
+
+		/* Add constant cases all compares with less than 2 memory lookups. */
+		switch __untraced(__n_words) {
+		case 0:
+			return 0;
+		case 1:
+			__DO_COMPARE16(0)
+			return 0;
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+		case 2:
+			__DO_COMPARE16(0)
+			__DO_COMPARE16(1)
+			return 0;
+#ifndef __OPTIMIZE_SIZE__
+		case 3:
+			__DO_COMPARE16(0)
+			__DO_COMPARE16(1)
+			__DO_COMPARE16(2)
+			return 0;
+		case 4:
+			__DO_COMPARE16(0)
+			__DO_COMPARE16(1)
+			__DO_COMPARE16(2)
+			__DO_COMPARE16(3)
+			return 0;
+#endif /* !__OPTIMIZE_SIZE__ */
+#else /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+		case 2:
+			__DO_COMPARE32(0)
+			return 0;
+		case 3:
+			__DO_COMPARE32(0)
+			__DO_COMPARE16(2)
+			return 0;
+#if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
+		case 4:
+			__DO_COMPARE64(0)
+			return 0;
+		case 5:
+			__DO_COMPARE64(0)
+			__DO_COMPARE16(4)
+			return 0;
+		case 6:
+			__DO_COMPARE64(0)
+			__DO_COMPARE32(2)
+			return 0;
+		case 8:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			return 0;
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
+		case 4:
+			__DO_COMPARE32(0)
+			__DO_COMPARE32(1)
+			return 0;
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+			/* More optimizations for small data blocks that require more assignments (though no more than 4). */
+#ifndef __OPTIMIZE_SIZE__
+#if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
+		case 7:
+			__DO_COMPARE64(0)
+			__DO_COMPARE32(2)
+			__DO_COMPARE16(6)
+			return 0;
+		case 9:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE16(8)
+			return 0;
+		case 10:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE32(4)
+			return 0;
+		case 11:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE32(4)
+			__DO_COMPARE16(10)
+			return 0;
+		case 12:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE64(2)
+			return 0;
+		case 13:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE64(2)
+			__DO_COMPARE16(12)
+			return 0;
+		case 14:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE64(2)
+			__DO_COMPARE32(6)
+			return 0;
+		case 16:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE64(2)
+			__DO_COMPARE64(3)
+			return 0;
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
+		case 5:
+			__DO_COMPARE32(0)
+			__DO_COMPARE32(1)
+			__DO_COMPARE16(4)
+			return 0;
+		case 6:
+			__DO_COMPARE32(0)
+			__DO_COMPARE32(1)
+			__DO_COMPARE32(2)
+			return 0;
+		case 7:
+			__DO_COMPARE32(0)
+			__DO_COMPARE32(1)
+			__DO_COMPARE32(2)
+			__DO_COMPARE16(6)
+			return 0;
+		case 8:
+			__DO_COMPARE32(0)
+			__DO_COMPARE32(1)
+			__DO_COMPARE32(2)
+			__DO_COMPARE32(3)
+			return 0;
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+		default: break;
+		}
+#undef __DO_COMPARE64
+#undef __DO_COMPARE32
+#undef __DO_COMPARE16
+#undef __DO_COMPARE
+	}
+	return __libc_core_bcmpw(__s1, __s2, __n_words);
+}
+#endif /* !__fast_bcmpw_defined */
+
+#ifndef __fast_bcmpl_defined
+#define __fast_bcmpl_defined
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __INT32_TYPE__
+__NOTHROW_NCX(__LIBC_FAST_NAME(bcmpl))(/*aligned(4)*/ void const *__restrict __s1,
+                                       /*aligned(4)*/ void const *__restrict __s2,
+                                       __SIZE_TYPE__ __n_dwords) {
+	if __untraced(__builtin_constant_p(__s1 == __s2) && (__s1 == __s2))
+		return 0;
+	if __untraced(__builtin_constant_p(__n_dwords)) {
+#define __DO_COMPARE(T, off)                                \
+	if __untraced(*((T *)__s1 + off) != *((T *)__s2 + off)) \
+		return 1;
+#define __DO_COMPARE32(off) __DO_COMPARE(__UINT32_TYPE__, off)
+#if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
+#define __DO_COMPARE64(off) __DO_COMPARE(__UINT64_TYPE__, off)
+#endif /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
+
+		/* Add constant cases all compares with less than 2 memory lookups. */
+		switch __untraced(__n_dwords) {
+		case 0:
+			return 0;
+		case 1:
+			__DO_COMPARE32(0)
+			return 0;
+#ifndef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+		case 2:
+			__DO_COMPARE32(0)
+			__DO_COMPARE32(1)
+			return 0;
+#ifndef __OPTIMIZE_SIZE__
+		case 3:
+			__DO_COMPARE32(0)
+			__DO_COMPARE32(1)
+			__DO_COMPARE32(2)
+			return 0;
+		case 4:
+			__DO_COMPARE32(0)
+			__DO_COMPARE32(1)
+			__DO_COMPARE32(2)
+			__DO_COMPARE32(3)
+			return 0;
+#endif /* !__OPTIMIZE_SIZE__ */
+#else /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+#if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
+		case 2:
+			__DO_COMPARE64(0)
+			return 0;
+		case 3:
+			__DO_COMPARE64(0)
+			__DO_COMPARE32(2)
+			return 0;
+		case 4:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			return 0;
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
+		case 2:
+			__DO_COMPARE32(0)
+			__DO_COMPARE32(1)
+			return 0;
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+		/* More optimizations for small data blocks that require more assignments (though no more than 4). */
+#ifndef __OPTIMIZE_SIZE__
+#if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
+		case 5:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE32(4)
+			return 0;
+		case 6:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE64(2)
+			return 0;
+		case 7:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE64(2)
+			__DO_COMPARE32(6)
+			return 0;
+		case 8:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE64(2)
+			__DO_COMPARE64(3)
+			return 0;
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
+		case 3:
+			__DO_COMPARE32(0)
+			__DO_COMPARE32(1)
+			__DO_COMPARE32(2)
+			return 0;
+		case 4:
+			__DO_COMPARE32(0)
+			__DO_COMPARE32(1)
+			__DO_COMPARE32(2)
+			__DO_COMPARE32(3)
+			return 0;
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+		default:
+			break;
+		}
+#undef __DO_COMPARE64
+#undef __DO_COMPARE32
+#undef __DO_COMPARE
+	}
+	return __libc_core_bcmpl(__s1, __s2, __n_dwords);
+}
+#endif /* !__fast_bcmpl_defined */
+
+#ifdef __UINT64_TYPE__
+#ifndef __fast_bcmpq_defined
+#define __fast_bcmpq_defined
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __INT64_TYPE__
+__NOTHROW_NCX(__LIBC_FAST_NAME(bcmpq))(/*aligned(8)*/ void const *__restrict __s1,
+                                       /*aligned(8)*/ void const *__restrict __s2,
+                                       __SIZE_TYPE__ __n_qwords) {
+	if __untraced(__builtin_constant_p(__s1 == __s2) && (__s1 == __s2))
+		return 0;
+	if __untraced(__builtin_constant_p(__n_qwords)) {
+#define __DO_COMPARE(T, off)                                \
+	if __untraced(*((T *)__s1 + off) != *((T *)__s2 + off)) \
+		return 1;
+#define __DO_COMPARE32(off) __DO_COMPARE(__UINT32_TYPE__, off)
+#if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
+#define __DO_COMPARE64(off) __DO_COMPARE(__UINT64_TYPE__, off)
+#endif /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
+
+		/* Add constant cases all compares with less than 2 memory lookups. */
+		switch __untraced(__n_qwords) {
+		case 0:
+			return 0;
+#if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
+		case 1:
+			__DO_COMPARE64(0)
+			return 0;
+		case 2:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			return 0;
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
+		case 1:
+			__DO_COMPARE32(0)
+			__DO_COMPARE32(1)
+			return 0;
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+		/* More optimizations for small data blocks that require more assignments (though no more than 4). */
+#ifndef __OPTIMIZE_SIZE__
+#if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
+		case 3:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE64(2)
+			return 0;
+		case 4:
+			__DO_COMPARE64(0)
+			__DO_COMPARE64(1)
+			__DO_COMPARE64(2)
+			__DO_COMPARE64(3)
+			return 0;
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
+		case 2:
+			__DO_COMPARE32(0)
+			__DO_COMPARE32(1)
+			__DO_COMPARE32(2)
+			__DO_COMPARE32(3)
+			return 0;
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
+		default:
+			break;
+		}
+#undef __DO_COMPARE64
+#undef __DO_COMPARE32
+#undef __DO_COMPARE
+	}
+	return __libc_core_bcmpq(__s1, __s2, __n_qwords);
+}
+#endif /* !__fast_bcmpq_defined */
 #endif /* __UINT64_TYPE__ */
 
 #undef __OPTIMIZE_STRING_MEMOVE_DIRECTION
@@ -9587,24 +10162,104 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempatq))(void *__restrict __dst,
 
 
 
+#ifndef __fast_bcmpc_defined
+#define __fast_bcmpc_defined
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
+__NOTHROW_NCX(__LIBC_FAST_NAME(bcmpc))(void const *__s1,
+                                       void const *__s2,
+                                       __SIZE_TYPE__ __elem_count,
+                                       __SIZE_TYPE__ __elem_size) {
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+	if __untraced(__builtin_constant_p(__elem_size)) {
+		switch __untraced(__elem_size) {
+		case 1: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmp))(__s1, __s2, __elem_count);
+		case 2: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpw))(__s1, __s2, __elem_count);
+		case 4: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpl))(__s1, __s2, __elem_count);
+#ifdef __UINT64_TYPE__
+		case 8: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpq))(__s1, __s2, __elem_count);
+#endif /* __UINT64_TYPE__ */
+		default: break;
+		}
+#ifdef __UINT64_TYPE__
+		if __untraced(__elem_size >= 8 && (__elem_size & 7) == 0)
+			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpq))(__s1, __s2, __elem_count * (__elem_size / 8));
+#endif /* __UINT64_TYPE__ */
+		if __untraced(__elem_size >= 4 && (__elem_size & 3) == 0)
+			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpl))(__s1, __s2, __elem_count * (__elem_size / 4));
+		if __untraced(__elem_size >= 2 && (__elem_size & 1) == 0)
+			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpw))(__s1, __s2, __elem_count * (__elem_size / 2));
+	}
+	if __untraced(__builtin_constant_p(__elem_count)) {
+		switch __untraced(__elem_count) {
+		case 1: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmp))(__s1, __s2, __elem_size);
+		case 2: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpw))(__s1, __s2, __elem_size);
+		case 4: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpl))(__s1, __s2, __elem_size);
+#ifdef __UINT64_TYPE__
+		case 8: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpq))(__s1, __s2, __elem_size);
+#endif /* __UINT64_TYPE__ */
+		default: break;
+		}
+#ifdef __UINT64_TYPE__
+		if __untraced(__elem_count >= 8 && (__elem_count & 7) == 0)
+			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpq))(__s1, __s2, __elem_size * (__elem_count / 8));
+#endif /* __UINT64_TYPE__ */
+		if __untraced(__elem_count >= 4 && (__elem_count & 3) == 0)
+			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpl))(__s1, __s2, __elem_size * (__elem_count / 4));
+		if __untraced(__elem_count >= 2 && (__elem_count & 1) == 0)
+			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpw))(__s1, __s2, __elem_size * (__elem_count / 2));
+	}
+	return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmp))(__s1, __s2, __elem_count * __elem_size);
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+#ifdef __OPTIMIZE_SIZE__
+	if __untraced(__builtin_constant_p(__elem_size)) {
+		if __untraced(__elem_size == 0)
+			return 0;
+		if __untraced(__elem_size == 1)
+			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmp))(__s1, __s2, __elem_count);
+		if __untraced(__builtin_constant_p(__elem_count))
+			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmp))(__s1, __s2, __elem_count * __elem_size);
+	}
+	if __untraced(__builtin_constant_p(__elem_count)) {
+		if __untraced(__elem_count == 0)
+			return 0;
+		if __untraced(__elem_count == 1)
+			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmp))(__s1, __s2, __elem_size);
+	}
+	if __untraced(__builtin_constant_p(__s1 == __s2) && (__s1 == __s2))
+		return 0;
+	return __libc_core_bcmpc(__s1, __s2, __elem_count, __elem_size);
+#else /* __OPTIMIZE_SIZE__ */
+	return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmp))(__s1, __s2, __elem_count * __elem_size);
+#endif /* !__OPTIMIZE_SIZE__ */
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+}
+#endif /* !__fast_bcmpc_defined */
+
 #ifndef __fast_memcmpc_defined
 #define __fast_memcmpc_defined
+#include <hybrid/byteorder.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpc))(void const *__s1,
                                          void const *__s2,
                                          __SIZE_TYPE__ __elem_count,
                                          __SIZE_TYPE__ __elem_size) {
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 	if __untraced(__builtin_constant_p(__elem_size)) {
 		switch __untraced(__elem_size) {
+		case 0: return 0;
 		case 1: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))(__s1, __s2, __elem_count);
 		case 2: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpw))(__s1, __s2, __elem_count);
 		case 4: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpl))(__s1, __s2, __elem_count);
+#ifdef __UINT64_TYPE__
 		case 8: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpq))(__s1, __s2, __elem_count);
+#endif /* __UINT64_TYPE__ */
 		default: break;
 		}
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#ifdef __UINT64_TYPE__
 		if __untraced(__elem_size >= 8 && (__elem_size & 7) == 0)
 			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpq))(__s1, __s2, __elem_count * (__elem_size / 8));
+#endif /* __UINT64_TYPE__ */
 		if __untraced(__elem_size >= 4 && (__elem_size & 3) == 0)
 			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpl))(__s1, __s2, __elem_count * (__elem_size / 4));
 		if __untraced(__elem_size >= 2 && (__elem_size & 1) == 0)
@@ -9614,25 +10269,68 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(memcmpc))(void const *__s1,
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 	if __untraced(__builtin_constant_p(__elem_count)) {
 		switch __untraced(__elem_count) {
+		case 0: return 0;
 		case 1: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))(__s1, __s2, __elem_size);
 		case 2: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpw))(__s1, __s2, __elem_size);
 		case 4: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpl))(__s1, __s2, __elem_size);
+#ifdef __UINT64_TYPE__
 		case 8: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpq))(__s1, __s2, __elem_size);
+#endif /* __UINT64_TYPE__ */
 		default: break;
 		}
+#ifdef __UINT64_TYPE__
 		if __untraced(__elem_count >= 8 && (__elem_count & 7) == 0)
 			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpq))(__s1, __s2, __elem_size * (__elem_count / 8));
+#endif /* __UINT64_TYPE__ */
 		if __untraced(__elem_count >= 4 && (__elem_count & 3) == 0)
 			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpl))(__s1, __s2, __elem_size * (__elem_count / 4));
 		if __untraced(__elem_count >= 2 && (__elem_count & 1) == 0)
 			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpw))(__s1, __s2, __elem_size * (__elem_count / 2));
 	}
-#endif /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	if __untraced(__builtin_constant_p(__elem_count) && (__elem_count == 0))
+		return 0;
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 	return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))(__s1, __s2, __elem_count * __elem_size);
 #else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	if __untraced(__builtin_constant_p(__s1 == __s2) && (__s1 == __s2))
+		return 0;
 	return __libc_core_memcmpc(__s1, __s2, __elem_count, __elem_size);
 #endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#else /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+#ifdef __OPTIMIZE_SIZE__
+	if __untraced(__builtin_constant_p(__elem_size)) {
+		if __untraced(__elem_size == 0)
+			return 0;
+		if __untraced(__elem_size == 1)
+			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))(__s1, __s2, __elem_count);
+		if __untraced(__builtin_constant_p(__elem_count))
+			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))(__s1, __s2, __elem_count * __elem_size);
+	}
+	if __untraced(__builtin_constant_p(__elem_count)) {
+		if __untraced(__elem_count == 0)
+			return 0;
+		if __untraced(__elem_count == 1)
+			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))(__s1, __s2, __elem_size);
+	}
+	if __untraced(__builtin_constant_p(__s1 == __s2) && (__s1 == __s2))
+		return 0;
+	return __libc_core_memcmpc(__s1, __s2, __elem_count, __elem_size);
+#else /* __OPTIMIZE_SIZE__ */
+	return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))(__s1, __s2, __elem_count * __elem_size);
+#endif /* !__OPTIMIZE_SIZE__ */
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	if __untraced(__builtin_constant_p(__elem_size) && (__elem_size == 0))
+		return 0;
+	if __untraced(__builtin_constant_p(__elem_count) && (__elem_count == 0))
+		return 0;
+	if __untraced(__builtin_constant_p(__s1 == __s2) && (__s1 == __s2))
+		return 0;
+	return __libc_core_memcmpc(__s1, __s2, __elem_count, __elem_size);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+#endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 }
 #endif /* !__fast_memcmpc_defined */
 

@@ -120,7 +120,7 @@ DEFINE_TEST(system_rtld_ro) {
 		ps = sizeof(buf);
 	if (ps > st.st_size)
 		ps = (size_t)st.st_size;
-	assert(memcmp(map, buf, ps) == 0);
+	EQd(0, bcmp(map, buf, ps));
 	EQd(0, munmap(map, getpagesize()));
 
 	/* Make sure that mprotect() also can't be used to gain write access. */

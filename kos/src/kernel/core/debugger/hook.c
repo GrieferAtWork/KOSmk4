@@ -423,7 +423,7 @@ dbg_lookup_command_startswith(char const *__restrict name_start) {
 		hooknamelen = strlen(current->dc_name);
 		if (hooknamelen < name_start_len)
 			continue;
-		if (memcmp(current->dc_name, name_start, hooknamelen * sizeof(char)) != 0)
+		if (bcmp(current->dc_name, name_start, hooknamelen, sizeof(char)) != 0)
 			continue;
 		if (result)
 			return NULL; /* Ambiguous */

@@ -83,7 +83,7 @@ DEFINE_TEST(cc) {
 
 	LEd(0, (fd = open("/var/testfile.txt", O_RDONLY))); /* NOLINT */
 	EQss(DATSZ, pread(fd, buf, DATSZ, 512));
-	assertf(memcmp(buf, dat, DATSZ) == 0,
+	assertf(bcmp(buf, dat, DATSZ) == 0,
 	        "buf = %$q\n"
 	        "dat = %$q\n",
 	        DATSZ, buf,

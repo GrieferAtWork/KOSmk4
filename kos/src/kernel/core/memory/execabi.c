@@ -132,7 +132,7 @@ again:
 			continue;
 		if (other_abi->ea_magsiz != abi->ea_magsiz)
 			continue;
-		if (memcmp(other_abi->ea_magic, abi->ea_magic, other_abi->ea_magsiz) != 0)
+		if (bcmp(other_abi->ea_magic, abi->ea_magic, other_abi->ea_magsiz) != 0)
 			continue;
 		/* Already defined... */
 		decref_unlikely(old_abis);
@@ -200,8 +200,8 @@ again:
 
 	/* Check for special case: re-use the default set of ABIs. */
 	if (new_abis->eas_count == DEFAULT_EXECABIS_COUNT &&
-	    memcmp(default_execabis.eas_abis, new_abis->eas_abis,
-	           DEFAULT_EXECABIS_COUNT * sizeof(struct execabi)) == 0) {
+	    bcmp(default_execabis.eas_abis, new_abis->eas_abis,
+	         DEFAULT_EXECABIS_COUNT, sizeof(struct execabi)) == 0) {
 		destroy(new_abis);
 		new_abis = incref(&default_execabis);
 	}

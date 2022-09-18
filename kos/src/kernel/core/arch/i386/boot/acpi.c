@@ -331,8 +331,8 @@ NOTHROW(KCALL acpi_lookup)(char const signature[4],
 		       : (physaddr_t)peekphysq_unaligned(addr);
 		copyfromphys(buf, base, sizeof(ACPISDTHeader));
 		hdr = (ACPISDTHeader *)buf;
-		if (memcmp(hdr->rsdp_signature, signature,
-		           sizeof(hdr->rsdp_signature)) != 0)
+		if (bcmp(hdr->rsdp_signature, signature,
+		         sizeof(hdr->rsdp_signature)) != 0)
 			continue;
 		result = hdr->rsdp_length;
 		/* Make sure not to copy more than the given buffer can hold. */

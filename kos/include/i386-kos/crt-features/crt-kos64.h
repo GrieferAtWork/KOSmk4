@@ -2267,6 +2267,7 @@
 #define __CRT_HAVE_backtrace_symbols_fmt
 #define __CRT_HAVE_basename
 #define __CRT_HAVE_bcmp
+#define __CRT_HAVE_bcmpc
 #define __CRT_HAVE_bcmpl
 #define __CRT_HAVE_bcmpq
 #define __CRT_HAVE_bcmpw
@@ -8170,6 +8171,10 @@
 #define __CRT_HAVE_KOS$backtrace_symbols_fmt
 #define __CRT_HAVE_KOS$basename
 #define __CRT_HAVE_KOS$bcmp
+#define __CRT_HAVE_KOS$bcmpc
+#define __CRT_HAVE_KOS$bcmpl
+#define __CRT_HAVE_KOS$bcmpq
+#define __CRT_HAVE_KOS$bcmpw
 #define __CRT_HAVE_KOS$bcopy
 #define __CRT_HAVE_KOS$bgets
 #define __CRT_HAVE_KOS$bind
@@ -12793,6 +12798,10 @@
 #define __CRT_HAVE_DOS$backtrace_symbols_fmt
 #define __CRT_HAVE_DOS$basename
 #define __CRT_HAVE_DOS$bcmp
+#define __CRT_HAVE_DOS$bcmpc
+#define __CRT_HAVE_DOS$bcmpl
+#define __CRT_HAVE_DOS$bcmpq
+#define __CRT_HAVE_DOS$bcmpw
 #define __CRT_HAVE_DOS$bcopy
 #define __CRT_HAVE_DOS$bgets
 #define __CRT_HAVE_DOS$bind

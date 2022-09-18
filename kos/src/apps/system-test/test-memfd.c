@@ -83,19 +83,19 @@ DEFINE_TEST(memfd) {
 
 	/* The changes should be immediately visible to read/write */
 	EQss((ssize_t)sizeof(buf), pread(mfd, buf, sizeof(buf), (uint64_t)0 - ps));
-	assertf(memcmp(buf, "Ping\0\0\0\0\0\0\0\0\0\0\0\0", 16) == 0,
+	assertf(bcmp(buf, "Ping\0\0\0\0\0\0\0\0\0\0\0\0", 16) == 0,
 	        "buf: %$q", sizeof(buf), buf);
 
 	/* I/O works in both ways. */
 	EQss(4, pwrite(mfd, "Pong", 4, (uint64_t)0 - ps));
-	assertf(memcmp(base, "Pong", 5) == 0, "base: %$q", 5, base);
+	assertf(bcmp(base, "Pong", 5) == 0, "base: %$q", 5, base);
 
 	/* If we truncate the file, then the connection to the mapping will be lost. */
 	EQd(0, ftruncate(mfd, 0));
 	EQss(6, pwrite(mfd, "Hello?", 6, (uint64_t)0 - ps));
 	EQd(0, fstat(mfd, &st));
 	EQu64(((uint64_t)0 - ps) + 6, st.st_size);
-	assertf(memcmp(base, "Pong", 5) == 0, "base: %$q", 5, base); /* This still contains what was written earlier. */
+	assertf(bcmp(base, "Pong", 5) == 0, "base: %$q", 5, base); /* This still contains what was written earlier. */
 	EQd(0, munmap(base, ps));
 
 	/* Also make sure that the procfs fd-text is correct. */
@@ -103,7 +103,7 @@ DEFINE_TEST(memfd) {
 	{
 		static char const expected_text[] = "memfd:mymemfd";
 		EQss(13, readlink(buf, buf, sizeof(buf)));
-		assertf(memcmp(buf, expected_text, 13) == 0,
+		assertf(bcmp(buf, expected_text, 13) == 0,
 		        "buf = %$q", (size_t)13, buf);
 	}
 

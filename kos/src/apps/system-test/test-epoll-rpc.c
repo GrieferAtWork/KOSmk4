@@ -88,7 +88,7 @@ DEFINE_TEST(epoll_rpc) {
 	/* Also  make sure that the in-pipe data is correct (though that's
 	 * kind-of a given and not ~really~ related to testing epoll RPCs) */
 	EQss(5, read(pipes[0], data, 5));
-	EQd(0, memcmp(data, "Hello", 5));
+	EQd(0, bcmp(data, "Hello", 5));
 
 	/* Cleanup */
 	EQd(0, close(pipes[0]));

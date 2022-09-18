@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e837bb4 */
+/* HASH CRC-32:0x64859360 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2684,8 +2684,20 @@ DFUN(".text.crt.dos.string.memory", libd_bcopy, libc_bcopy, TV, 3, TP, TP, TI)
 DFUN(".text.crt.dos.string.memory", libd_bzero, libc_bzero, TV, 2, TP, TI)
 DFUN(".text.crt.dos.string.memory", libd_bzerow, libc_bzerow, TV, 2, TP, TI)
 DFUN(".text.crt.dos.string.memory", libd_bzerol, libc_bzerol, TV, 2, TP, TI)
+#ifndef LIBC_ARCH_HAVE_BCMPW
+DEFINE_INTERN_ALIAS(libd_bcmpw, libd_memcmpw);
+#endif /* !LIBC_ARCH_HAVE_BCMPW */
+#ifndef LIBC_ARCH_HAVE_BCMPL
+DEFINE_INTERN_ALIAS(libd_bcmpl, libd_memcmpl);
+#endif /* !LIBC_ARCH_HAVE_BCMPL */
 DFUN(".text.crt.dos.string.memory", libd_bzeroq, libc_bzeroq, TV, 2, TP, TI)
+#ifndef LIBC_ARCH_HAVE_BCMPQ
+DEFINE_INTERN_ALIAS(libd_bcmpq, libd_memcmpq);
+#endif /* !LIBC_ARCH_HAVE_BCMPQ */
 DFUN(".text.crt.dos.string.memory", libd_bzeroc, libc_bzeroc, TV, 3, TP, TI, TI)
+#ifndef LIBC_ARCH_HAVE_BCMPC
+DFUN(".text.crt.dos.string.memory", libd_bcmpc, libc_bcmpc, TD, 4, TP, TP, TI, TI)
+#endif /* !LIBC_ARCH_HAVE_BCMPC */
 #ifndef LIBC_ARCH_HAVE_BCMP
 DEFINE_INTERN_ALIAS(libd_bcmp, libd_memcmp);
 #endif /* !LIBC_ARCH_HAVE_BCMP */

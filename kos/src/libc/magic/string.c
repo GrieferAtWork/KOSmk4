@@ -172,6 +172,7 @@ local funcs = {
 	"memmovec(dst, src, elem_count, elem_size)",
 	"mempcpyc(dst, src, elem_count, elem_size)",
 	"memcpyc(dst, src, elem_count, elem_size)",
+	"bcmpc(s1, s2, elem_count, elem_size)",
 	"memcmpc(s1, s2, elem_count, elem_size)",
 	"mempatq(dst, pattern, n_bytes)",
 	"mempatl(dst, pattern, n_bytes)",
@@ -221,6 +222,9 @@ local funcs = {
 	"mempsetl(dst, dword, n_dwords)",
 	"mempsetq(dst, qword, n_qwords)",
 	"bcmp(s1, s2, n_bytes)",
+	"bcmpw(s1, s2, n_words)",
+	"bcmpl(s1, s2, n_dwords)",
+	"bcmpq(s1, s2, n_qwords)",
 	"bzero(dst, n_bytes)",
 	"bzerow(dst, n_words)",
 	"bzerol(dst, n_dwords)",
@@ -270,6 +274,9 @@ for (local f: funcs) {
 #ifdef __fast_memcpyc_defined
 #define libc_memcpyc(dst, src, elem_count, elem_size) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyc))(dst, src, elem_count, elem_size)
 #endif /* __fast_memcpyc_defined */
+#ifdef __fast_bcmpc_defined
+#define libc_bcmpc(s1, s2, elem_count, elem_size) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpc))(s1, s2, elem_count, elem_size)
+#endif /* __fast_bcmpc_defined */
 #ifdef __fast_memcmpc_defined
 #define libc_memcmpc(s1, s2, elem_count, elem_size) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpc))(s1, s2, elem_count, elem_size)
 #endif /* __fast_memcmpc_defined */
@@ -417,6 +424,15 @@ for (local f: funcs) {
 #ifdef __fast_bcmp_defined
 #define libc_bcmp(s1, s2, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmp))(s1, s2, n_bytes)
 #endif /* __fast_bcmp_defined */
+#ifdef __fast_bcmpw_defined
+#define libc_bcmpw(s1, s2, n_words) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpw))(s1, s2, n_words)
+#endif /* __fast_bcmpw_defined */
+#ifdef __fast_bcmpl_defined
+#define libc_bcmpl(s1, s2, n_dwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpl))(s1, s2, n_dwords)
+#endif /* __fast_bcmpl_defined */
+#ifdef __fast_bcmpq_defined
+#define libc_bcmpq(s1, s2, n_qwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpq))(s1, s2, n_qwords)
+#endif /* __fast_bcmpq_defined */
 #ifdef __fast_bzero_defined
 #define libc_bzero(dst, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzero))(dst, n_bytes)
 #endif /* __fast_bzero_defined */
@@ -3437,7 +3453,7 @@ void bzero([[out(num_bytes)]] void *__restrict dst, $size_t num_bytes) {
 %
 %#ifdef __USE_STRING_BWLQ
 
-[[decl_include("<hybrid/typecore.h>")]]
+[[guard, decl_include("<hybrid/typecore.h>")]]
 [[nocrt, leaf, alias("bzero", "__bzero", "explicit_bzero")]]
 [[preferred_fastbind(bzero, ["bzero", "__bzero", "explicit_bzero"])]]
 [[bind_local_function("bzero")]]
@@ -3458,6 +3474,44 @@ void bzerol([[out(num_dwords * 4)]] void *__restrict dst, $size_t num_dwords) {
 	memsetl(dst, 0, num_dwords);
 }
 
+[[guard, pure, wunused, decl_include("<hybrid/typecore.h>")]]
+int bcmpb([[in(n_bytes * 1), aligned(1)]] void const *s1,
+          [[in(n_bytes * 1), aligned(1)]] void const *s2,
+          $size_t n_bytes) = bcmp;
+
+[[guard, libc, kernel, pure, wunused, decl_include("<hybrid/typecore.h>")]]
+[[if_fast_defined(bcmpw), preferred_fast_extern_inline("bcmpw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@bcmpw@))(s1, s2, n_words); })]]
+[[if_fast_defined(memcmpw), preferred_fast_extern_inline("bcmpw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpw@))(s1, s2, n_words); })]]
+[[if_fast_defined(bcmpw), preferred_fast_extern_inline("memcmpw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@bcmpw@))(s1, s2, n_words); })]]
+[[if_fast_defined(memcmpw), preferred_fast_extern_inline("memcmpw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpw@))(s1, s2, n_words); })]]
+[[if_fast_defined(bcmpw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@bcmpw@))(s1, s2, n_words); })]]
+[[if_fast_defined(memcmpw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpw@))(s1, s2, n_words); })]]
+[[crt_impl_requires(!defined(LIBC_ARCH_HAVE_BCMPW))]]
+[[if(!defined(LIBC_ARCH_HAVE_BCMPW)), crt_intern_alias(memcmpw)]]
+[[alias("memcmpw"), bind_local_function("memcmpw")]]
+int bcmpw([[in(n_words * 2), aligned(2)]] void const *s1,
+          [[in(n_words * 2), aligned(2)]] void const *s2, $size_t n_words) {
+	return memcmpw(s1, s2, n_words);
+}
+
+[[guard, libc, kernel, pure, wunused, decl_include("<hybrid/typecore.h>")]]
+[[if_fast_defined(bcmpl), preferred_fast_extern_inline("bcmpl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@bcmpl@))(s1, s2, n_dwords); })]]
+[[if_fast_defined(memcmpl), preferred_fast_extern_inline("bcmpl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpl@))(s1, s2, n_dwords); })]]
+[[if_fast_defined(bcmpl), preferred_fast_extern_inline("memcmpl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@bcmpl@))(s1, s2, n_dwords); })]]
+[[if_fast_defined(memcmpl), preferred_fast_extern_inline("memcmpl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpl@))(s1, s2, n_dwords); })]]
+[[if_fast_defined(bcmpl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@bcmpl@))(s1, s2, n_dwords); })]]
+[[if_fast_defined(memcmpl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpl@))(s1, s2, n_dwords); })]]
+[[crt_impl_requires(!defined(LIBC_ARCH_HAVE_BCMPL))]]
+[[if(!defined(LIBC_ARCH_HAVE_BCMPL)), crt_intern_alias(memcmpl)]]
+[[alias("memcmpl"), bind_local_function("memcmpl")]]
+int bcmpl([[in(n_dwords * 4), aligned(4)]] void const *s1,
+          [[in(n_dwords * 4), aligned(4)]] void const *s2,
+          $size_t n_dwords) {
+	return memcmpl(s1, s2, n_dwords);
+}
+
+%#ifdef __UINT64_TYPE__
+
 [[decl_include("<hybrid/typecore.h>")]]
 [[preferred_fastbind, guard, libc, kernel, leaf]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_BZEROQ))]]
@@ -3469,6 +3523,23 @@ void bzeroq([[out(num_qwords * 8)]] void *__restrict dst, $size_t num_qwords) {
 @@pp_endif@@
 }
 
+[[guard, libc, kernel, pure, wunused, decl_include("<hybrid/typecore.h>")]]
+[[if_fast_defined(bcmpq), preferred_fast_extern_inline("bcmpq", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@bcmpq@))(s1, s2, n_qwords); })]]
+[[if_fast_defined(memcmpq), preferred_fast_extern_inline("bcmpq", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpq@))(s1, s2, n_qwords); })]]
+[[if_fast_defined(bcmpq), preferred_fast_extern_inline("memcmpq", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@bcmpq@))(s1, s2, n_qwords); })]]
+[[if_fast_defined(memcmpq), preferred_fast_extern_inline("memcmpq", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpq@))(s1, s2, n_qwords); })]]
+[[if_fast_defined(bcmpq), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@bcmpq@))(s1, s2, n_qwords); })]]
+[[if_fast_defined(memcmpq), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpq@))(s1, s2, n_qwords); })]]
+[[crt_impl_requires(!defined(LIBC_ARCH_HAVE_BCMPQ))]]
+[[if(!defined(LIBC_ARCH_HAVE_BCMPQ)), crt_intern_alias(memcmpq)]]
+[[alias("memcmpq"), bind_local_function("memcmpq")]]
+int bcmpq([[in(n_qwords * 8), aligned(8)]] void const *s1,
+          [[in(n_qwords * 8), aligned(8)]] void const *s2,
+          $size_t n_qwords) {
+	return memcmpq(s1, s2, n_qwords);
+}
+
+%#endif /* __UINT64_TYPE__ */
 %#endif /* __USE_STRING_BWLQ */
 
 
@@ -3526,6 +3597,41 @@ void bzeroc([[out(elem_count * elem_size)]] void *__restrict dst,
 @@pp_endif@@
 }
 
+[[guard, decl_include("<hybrid/typecore.h>")]]
+[[libc, kernel, pure, wunused]]
+[[preferred_fastbind(bcmpc(s1, s2, elem_count, elem_size), ["bcmpc"])]]
+[[preferred_fastbind(memcmpc(s1, s2, elem_count, elem_size), ["bcmpc"])]]
+[[preferred_fastbind(bcmpc(s1, s2, elem_count, elem_size), ["memcmpc"])]]
+[[preferred_fastbind(memcmpc(s1, s2, elem_count, elem_size), ["memcmpc"])]]
+[[crt_impl_requires(!defined(LIBC_ARCH_HAVE_BCMPC))]]
+[[alias("memcmpc"), bind_local_function("memcmp")]]
+[[impl_include("<hybrid/host.h>")]]
+int bcmpc([[in(elem_count * elem_size)]] void const *s1,
+          [[in(elem_count * elem_size)]] void const *s2,
+          $size_t elem_count, $size_t elem_size) {
+@@pp_ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS@@
+	switch (elem_size) {
+
+	case 1:
+		return bcmp(s1, s2, elem_count);
+
+	case 2:
+		return bcmpw(s1, s2, elem_count);
+
+	case 4:
+		return bcmpl(s1, s2, elem_count);
+
+@@pp_ifdef __UINT64_TYPE__@@
+	case 8:
+		return bcmpq(s1, s2, elem_count);
+@@pp_endif@@
+
+	default:
+		break;
+	}
+@@pp_endif@@
+	return bcmp(s1, s2, elem_count * elem_size);
+}
 %#endif /* __USE_KOS */
 
 
@@ -3547,6 +3653,11 @@ int bcmp([[in(n_bytes)]] void const *s1,
          [[in(n_bytes)]] void const *s2, $size_t n_bytes) {
 	return memcmp(s1, s2, n_bytes);
 }
+
+%#if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+%[insert:function(bcmp = bcmpc, externLinkageOverride: "C++")]
+%#endif /* __cplusplus && __USE_STRING_OVERLOADS */
+
 
 %[insert:guarded_function(index = strchr)]
 %[insert:guarded_function(rindex = strrchr)]
@@ -4250,6 +4361,7 @@ int memcmpl([[in(n_dwords * 4), aligned(4)]] void const *s1,
 	}
 	return 0;
 }
+
 
 @@Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found.
 [[pure, wunused, nocrt, alias("memchr"), decl_include("<hybrid/typecore.h>")]]
@@ -5585,11 +5697,12 @@ memmovedown:([[out(n_bytes)]] void *dst,
 @@ - return `< 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] < (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]'
 @@ - return `> 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] > (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]'
 [[preferred_fastbind, libc, kernel, pure, wunused]]
-[[impl_include("<hybrid/byteorder.h>"), decl_include("<hybrid/typecore.h>")]]
+[[impl_include("<hybrid/byteorder.h>", "<hybrid/host.h>"), decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCMPC))]]
 int memcmpc([[in(elem_count * elem_size)]] void const *s1,
             [[in(elem_count * elem_size)]] void const *s2,
             $size_t elem_count, $size_t elem_size) {
+@@pp_ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS@@
 	switch (elem_size) {
 
 	case 1:
@@ -5601,14 +5714,13 @@ int memcmpc([[in(elem_count * elem_size)]] void const *s1,
 	case 4:
 		return memcmpl(s1, s2, elem_count);
 
-@@pp_ifdef __UINT64_TYPE__@@
 	case 8:
 		return memcmpq(s1, s2, elem_count);
-@@pp_endif@@
 
 	default:
 		break;
 	}
+@@pp_endif@@
 @@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
 	return memcmp(s1, s2, elem_count * elem_size);
 @@pp_else@@
@@ -8232,24 +8344,34 @@ __SYSDECL_BEGIN
  * >> void *mempmoveup(void *dst, void const *src, size_t elem_count, size_t elem_size);
  * >> void *mempmovedown(void *dst, void const *src, size_t num_bytes);
  * >> void *mempmovedown(void *dst, void const *src, size_t elem_count, size_t elem_size);
+ * >> int bcmp(void const *s1, void const *s2, size_t num_bytes);
+ * >> int bcmp(void const *s1, void const *s2, size_t elem_count, size_t elem_size);
  * >> void bzero(void *dst, size_t num_bytes);
  * >> void bzero(void *dst, size_t elem_count, size_t elem_size); */
 #ifdef __USE_MISC
+#undef __PRIVATE_bcmp_3
+#undef __PRIVATE_bcmp_4
 #undef __PRIVATE_bzero_2
 #undef __PRIVATE_bzero_3
 #ifdef __USE_KOS
-#define __PRIVATE_bzero_3   bzeroc
+#define __PRIVATE_bcmp_4  bcmpc
+#define __PRIVATE_bzero_3 bzeroc
 #else /* __USE_KOS */
 __SYSDECL_END
 #include <libc/string.h>
 __SYSDECL_BEGIN
-#define __PRIVATE_bzero_3   __libc_bzeroc
+#define __PRIVATE_bcmp_4  __libc_bcmpc
+#define __PRIVATE_bzero_3 __libc_bzeroc
 #endif /* !__USE_KOS */
-#define __PRIVATE_bzero_2   (bzero)
+#define __PRIVATE_bcmp_3  (bcmp)
+#define __PRIVATE_bzero_2 (bzero)
+#undef bcmp
 #undef bzero
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define bcmp(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bcmp_, (__VA_ARGS__))(__VA_ARGS__)
 #define bzero(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bzero_, (__VA_ARGS__))(__VA_ARGS__)
 #elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define bcmp(args...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bcmp_, (args))(args)
 #define bzero(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_bzero_, (args))(args)
 #endif /* ... */
 #endif /* __USE_MISC */

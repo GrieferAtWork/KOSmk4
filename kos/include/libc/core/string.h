@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x868a9f98 */
+/* HASH CRC-32:0xcc5a3f1b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -294,6 +294,26 @@ __CREDIRECT_VOID(__ATTR_LEAF __ATTR_OUT(1),__NOTHROW_NCX,__libc_core_bzerol,(voi
 #include <libc/local/string/bzerol.h>
 #define __libc_core_bzerol __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzerol)
 #endif /* !__CRT_HAVE_bzerol */
+#ifdef __CRT_HAVE_bcmpw
+#include <hybrid/typecore.h>
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__libc_core_bcmpw,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_words),bcmpw,(__s1,__s2,__n_words))
+#elif defined(__CRT_HAVE_memcmpw)
+#include <hybrid/typecore.h>
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__libc_core_bcmpw,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_words),memcmpw,(__s1,__s2,__n_words))
+#else /* ... */
+#include <libc/local/string/memcmpw.h>
+#define __libc_core_bcmpw __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpw)
+#endif /* !... */
+#ifdef __CRT_HAVE_bcmpl
+#include <hybrid/typecore.h>
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__libc_core_bcmpl,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_dwords),bcmpl,(__s1,__s2,__n_dwords))
+#elif defined(__CRT_HAVE_memcmpl)
+#include <hybrid/typecore.h>
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__libc_core_bcmpl,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_dwords),memcmpl,(__s1,__s2,__n_dwords))
+#else /* ... */
+#include <libc/local/string/memcmpl.h>
+#define __libc_core_bcmpl __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpl)
+#endif /* !... */
 #ifdef __CRT_HAVE_bzeroq
 #include <hybrid/typecore.h>
 __CREDIRECT_VOID(__ATTR_LEAF __ATTR_OUT(1),__NOTHROW_NCX,__libc_core_bzeroq,(void *__restrict __dst, __SIZE_TYPE__ __num_qwords),bzeroq,(__dst,__num_qwords))
@@ -301,6 +321,16 @@ __CREDIRECT_VOID(__ATTR_LEAF __ATTR_OUT(1),__NOTHROW_NCX,__libc_core_bzeroq,(voi
 #include <libc/local/string/bzeroq.h>
 #define __libc_core_bzeroq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzeroq)
 #endif /* !__CRT_HAVE_bzeroq */
+#ifdef __CRT_HAVE_bcmpq
+#include <hybrid/typecore.h>
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__libc_core_bcmpq,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_qwords),bcmpq,(__s1,__s2,__n_qwords))
+#elif defined(__CRT_HAVE_memcmpq)
+#include <hybrid/typecore.h>
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__libc_core_bcmpq,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_qwords),memcmpq,(__s1,__s2,__n_qwords))
+#else /* ... */
+#include <libc/local/string/memcmpq.h>
+#define __libc_core_bcmpq __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpq)
+#endif /* !... */
 #ifdef __CRT_HAVE_bzeroc
 #include <hybrid/typecore.h>
 __CREDIRECT_VOID(__ATTR_LEAF __ATTR_OUT(1),__NOTHROW_NCX,__libc_core_bzeroc,(void *__restrict __dst, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),bzeroc,(__dst,__elem_count,__elem_size))
@@ -308,6 +338,16 @@ __CREDIRECT_VOID(__ATTR_LEAF __ATTR_OUT(1),__NOTHROW_NCX,__libc_core_bzeroc,(voi
 #include <libc/local/string/bzeroc.h>
 #define __libc_core_bzeroc __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzeroc)
 #endif /* !__CRT_HAVE_bzeroc */
+#ifdef __CRT_HAVE_bcmpc
+#include <hybrid/typecore.h>
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__libc_core_bcmpc,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),bcmpc,(__s1,__s2,__elem_count,__elem_size))
+#elif defined(__CRT_HAVE_memcmpc)
+#include <hybrid/typecore.h>
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__libc_core_bcmpc,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcmpc,(__s1,__s2,__elem_count,__elem_size))
+#else /* ... */
+#include <libc/local/string/memcmp.h>
+#define __libc_core_bcmpc(s1, s2, elem_count, elem_size) __LIBC_LOCAL_NAME(memcmp)(s1, s2, elem_count)
+#endif /* !... */
 #ifdef __CRT_HAVE_bcmp
 #include <hybrid/typecore.h>
 /* >> bcmp(3)

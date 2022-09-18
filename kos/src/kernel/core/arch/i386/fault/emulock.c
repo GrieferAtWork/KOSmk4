@@ -202,7 +202,7 @@ again:
 	error = memcpy_nopf(real_oldval, addr, num_bytes);
 	if unlikely(error != 0)
 		goto handle_vio_or_not_faulted;
-	if (memcmp(real_oldval, poldval, num_bytes) == 0) {
+	if (bcmp(real_oldval, poldval, num_bytes) == 0) {
 		error = memcpy_nopf(addr, pnewval, num_bytes);
 		if unlikely(error != 0)
 			goto handle_vio_or_not_faulted;

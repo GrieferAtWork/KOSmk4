@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2f11084 */
+/* HASH CRC-32:0x8f7f6f89 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -148,16 +148,36 @@
 #else /* __fast_bzerol_defined */
 #define __libc_bzerol __libc_core_bzerol
 #endif /* !__fast_bzerol_defined */
+#ifdef __fast_bcmpw_defined
+#define __libc_bcmpw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpw))
+#else /* __fast_bcmpw_defined */
+#define __libc_bcmpw __libc_core_bcmpw
+#endif /* !__fast_bcmpw_defined */
+#ifdef __fast_bcmpl_defined
+#define __libc_bcmpl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpl))
+#else /* __fast_bcmpl_defined */
+#define __libc_bcmpl __libc_core_bcmpl
+#endif /* !__fast_bcmpl_defined */
 #ifdef __fast_bzeroq_defined
 #define __libc_bzeroq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzeroq))
 #else /* __fast_bzeroq_defined */
 #define __libc_bzeroq __libc_core_bzeroq
 #endif /* !__fast_bzeroq_defined */
+#ifdef __fast_bcmpq_defined
+#define __libc_bcmpq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpq))
+#else /* __fast_bcmpq_defined */
+#define __libc_bcmpq __libc_core_bcmpq
+#endif /* !__fast_bcmpq_defined */
 #ifdef __fast_bzeroc_defined
 #define __libc_bzeroc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzeroc))
 #else /* __fast_bzeroc_defined */
 #define __libc_bzeroc __libc_core_bzeroc
 #endif /* !__fast_bzeroc_defined */
+#ifdef __fast_bcmpc_defined
+#define __libc_bcmpc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpc))
+#else /* __fast_bcmpc_defined */
+#define __libc_bcmpc __libc_core_bcmpc
+#endif /* !__fast_bcmpc_defined */
 #ifdef __fast_bcmp_defined
 /* >> bcmp(3)
  * Similar to `memcmp(3)', except that no ordering is done,

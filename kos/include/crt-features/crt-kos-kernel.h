@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ebdf21c */
+/* HASH CRC-32:0x1190d8c5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,6 +41,10 @@
 #define __CRT_HAVE__itoa_digits
 #define __CRT_HAVE_abort
 #define __CRT_HAVE_bcmp
+#define __CRT_HAVE_bcmpc
+#define __CRT_HAVE_bcmpl
+#define __CRT_HAVE_bcmpq
+#define __CRT_HAVE_bcmpw
 #define __CRT_HAVE_bitcpy
 #define __CRT_HAVE_bzero
 #define __CRT_HAVE_bzeroc

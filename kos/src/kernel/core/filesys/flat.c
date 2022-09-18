@@ -506,8 +506,8 @@ handle_result_after_wrlock:
 		if (result->fde_ent.fd_namelen == info->flu_namelen &&
 		    (!(info->flu_flags & AT_DOSPATH)
 		     ? (result->fde_ent.fd_hash == info->flu_hash &&
-		        memcmp(info->flu_name, result->fde_ent.fd_name,
-		               result->fde_ent.fd_namelen * sizeof(char)) == 0)
+		        bcmp(info->flu_name, result->fde_ent.fd_name,
+		             result->fde_ent.fd_namelen, sizeof(char)) == 0)
 		     : (memcasecmp(info->flu_name, result->fde_ent.fd_name,
 		                   result->fde_ent.fd_namelen * sizeof(char)) == 0)))
 			goto incref_and_return_result;
@@ -2065,8 +2065,8 @@ NOTHROW(FCALL flatdirnode_fileslist_insertent)(struct flatdirnode *__restrict se
 			break; /* Re-use a previously deleted slot. */
 		assertf(!(pth->fde_ent.fd_hash == hash &&
 		          pth->fde_ent.fd_namelen == ent->fde_ent.fd_namelen &&
-		          memcmp(pth->fde_ent.fd_name, ent->fde_ent.fd_name,
-		                 ent->fde_ent.fd_namelen * sizeof(char)) == 0),
+		          bcmp(pth->fde_ent.fd_name, ent->fde_ent.fd_name,
+		               ent->fde_ent.fd_namelen, sizeof(char)) == 0),
 		        "Duplicate entry: %$q",
 		        (size_t)ent->fde_ent.fd_namelen, ent->fde_ent.fd_name);
 	}
@@ -2095,8 +2095,8 @@ NOTHROW(FCALL flatdirnode_fileslist_tryinsertent)(struct flatdirnode *__restrict
 			break; /* Re-use a previously deleted slot. */
 		if (pth->fde_ent.fd_hash == hash &&
 		    pth->fde_ent.fd_namelen == ent->fde_ent.fd_namelen &&
-		    memcmp(pth->fde_ent.fd_name, ent->fde_ent.fd_name,
-		           ent->fde_ent.fd_namelen * sizeof(char)) == 0)
+		    bcmp(pth->fde_ent.fd_name, ent->fde_ent.fd_name,
+		         ent->fde_ent.fd_namelen, sizeof(char)) == 0)
 			return false; /* Duplicate! */
 	}
 	bucket->ffdb_ent = ent;
@@ -2207,8 +2207,8 @@ flatdirnode_fileslist_lookup(struct flatdirnode *__restrict self,
 			continue; /* Wrong hash */
 		if unlikely(result->fde_ent.fd_namelen != info->flu_namelen)
 			continue; /* Wrong name length */
-		if unlikely(memcmp(result->fde_ent.fd_name, info->flu_name,
-		                   info->flu_namelen * sizeof(char)) != 0)
+		if unlikely(bcmp(result->fde_ent.fd_name, info->flu_name,
+		                 info->flu_namelen, sizeof(char)) != 0)
 			continue; /* Wrong name */
 		if unlikely(result == &flatdirnode_deleted_dirent)
 			continue; /* Prevent any chance of *this* happening... */
@@ -2263,8 +2263,8 @@ flatdirnode_fileslist_remove(struct flatdirnode *__restrict self,
 			continue; /* Wrong hash */
 		if unlikely(result->fde_ent.fd_namelen != info->flu_namelen)
 			continue; /* Wrong name length */
-		if unlikely(memcmp(result->fde_ent.fd_name, info->flu_name,
-		                   info->flu_namelen * sizeof(char)) != 0)
+		if unlikely(bcmp(result->fde_ent.fd_name, info->flu_name,
+		                 info->flu_namelen, sizeof(char)) != 0)
 			continue; /* Wrong name */
 		if unlikely(result == &flatdirnode_deleted_dirent)
 			continue; /* Prevent any chance of *this* happening... */

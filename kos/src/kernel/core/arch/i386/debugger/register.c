@@ -1163,9 +1163,9 @@ NOTHROW(KCALL x86_dbg_setregbyidp)(unsigned int level,
 PUBLIC ATTR_DBGTEXT ATTR_PURE WUNUSED bool
 NOTHROW(FCALL dbg_changedview)(void) {
 	loadview();
-	return memcmp(&x86_dbg_origstate,
-	              &x86_dbg_viewstate,
-	              sizeof(struct fcpustate)) != 0;
+	return bcmp(&x86_dbg_origstate,
+	            &x86_dbg_viewstate,
+	            sizeof(struct fcpustate)) != 0;
 }
 
 

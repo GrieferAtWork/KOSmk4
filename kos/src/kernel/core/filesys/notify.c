@@ -1355,7 +1355,7 @@ again:
 	notify_lock_acquire();
 	COMPILER_READ_BARRIER();
 	slot = &self->nf_eventv[self->nf_eventr];
-	if unlikely(self->nf_eventc == 0 || memcmp(&ne, slot, sizeof(ne)) != 0) {
+	if unlikely(self->nf_eventc == 0 || bcmp(&ne, slot, sizeof(ne)) != 0) {
 		/* Race condition: event was already read by another thread. --> try again */
 		notify_lock_release_br();
 		goto again;

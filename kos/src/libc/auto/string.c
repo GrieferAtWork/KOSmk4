@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86e66e55 */
+/* HASH CRC-32:0xeabf6072 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2777,6 +2777,12 @@ NOTHROW_NCX(LIBCCALL libc_bzerol)(void *__restrict dst,
 	libc_memsetl(dst, 0, num_dwords);
 }
 #endif /* !LIBC_ARCH_HAVE_BZEROL */
+#ifndef LIBC_ARCH_HAVE_BCMPW
+DEFINE_INTERN_ALIAS(libc_bcmpw, libc_memcmpw);
+#endif /* !LIBC_ARCH_HAVE_BCMPW */
+#ifndef LIBC_ARCH_HAVE_BCMPL
+DEFINE_INTERN_ALIAS(libc_bcmpl, libc_memcmpl);
+#endif /* !LIBC_ARCH_HAVE_BCMPL */
 #ifndef LIBC_ARCH_HAVE_BZEROQ
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_OUT(1) void
 NOTHROW_NCX(LIBCCALL libc_bzeroq)(void *__restrict dst,
@@ -2788,6 +2794,9 @@ NOTHROW_NCX(LIBCCALL libc_bzeroq)(void *__restrict dst,
 #endif /* !__UINT64_TYPE__ || __SIZEOF_BUSINT__ < 8 */
 }
 #endif /* !LIBC_ARCH_HAVE_BZEROQ */
+#ifndef LIBC_ARCH_HAVE_BCMPQ
+DEFINE_INTERN_ALIAS(libc_bcmpq, libc_memcmpq);
+#endif /* !LIBC_ARCH_HAVE_BCMPQ */
 /* Restore optimized libc string functions */
 #if !defined(LIBC_ARCH_HAVE_BZERO) && defined(__fast_memset_defined)
 #define libc_memset(dst, byte, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memset))(dst, byte, n_bytes)
@@ -2835,6 +2844,36 @@ NOTHROW_NCX(LIBCCALL libc_bzeroc)(void *__restrict dst,
 	libc_bzero(dst, elem_count * elem_size);
 #endif /* !__ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 }
+#ifndef LIBC_ARCH_HAVE_BCMPC
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
+NOTHROW_NCX(LIBCCALL libc_bcmpc)(void const *s1,
+                                 void const *s2,
+                                 size_t elem_count,
+                                 size_t elem_size) {
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
+	switch (elem_size) {
+
+	case 1:
+		return libc_bcmp(s1, s2, elem_count);
+
+	case 2:
+		return libc_bcmpw(s1, s2, elem_count);
+
+	case 4:
+		return libc_bcmpl(s1, s2, elem_count);
+
+#ifdef __UINT64_TYPE__
+	case 8:
+		return libc_bcmpq(s1, s2, elem_count);
+#endif /* __UINT64_TYPE__ */
+
+	default:
+		break;
+	}
+#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
+	return libc_bcmp(s1, s2, elem_count * elem_size);
+}
+#endif /* !LIBC_ARCH_HAVE_BCMPC */
 #ifndef LIBC_ARCH_HAVE_BCMP
 DEFINE_INTERN_ALIAS(libc_bcmp, libc_memcmp);
 #endif /* !LIBC_ARCH_HAVE_BCMP */
@@ -4382,6 +4421,7 @@ NOTHROW_NCX(LIBCCALL libc_memcmpc)(void const *s1,
                                    void const *s2,
                                    size_t elem_count,
                                    size_t elem_size) {
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 	switch (elem_size) {
 
 	case 1:
@@ -4393,14 +4433,13 @@ NOTHROW_NCX(LIBCCALL libc_memcmpc)(void const *s1,
 	case 4:
 		return libc_memcmpl(s1, s2, elem_count);
 
-#ifdef __UINT64_TYPE__
 	case 8:
 		return libc_memcmpq(s1, s2, elem_count);
-#endif /* __UINT64_TYPE__ */
 
 	default:
 		break;
 	}
+#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 	return libc_memcmp(s1, s2, elem_count * elem_size);
 #else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
@@ -7081,10 +7120,22 @@ DEFINE_PUBLIC_ALIAS(bzerow, libc_bzerow);
 #ifndef LIBC_ARCH_HAVE_BZEROL
 DEFINE_PUBLIC_ALIAS(bzerol, libc_bzerol);
 #endif /* !LIBC_ARCH_HAVE_BZEROL */
+#ifndef LIBC_ARCH_HAVE_BCMPW
+DEFINE_PUBLIC_ALIAS(bcmpw, libc_bcmpw);
+#endif /* !LIBC_ARCH_HAVE_BCMPW */
+#ifndef LIBC_ARCH_HAVE_BCMPL
+DEFINE_PUBLIC_ALIAS(bcmpl, libc_bcmpl);
+#endif /* !LIBC_ARCH_HAVE_BCMPL */
 #ifndef LIBC_ARCH_HAVE_BZEROQ
 DEFINE_PUBLIC_ALIAS(bzeroq, libc_bzeroq);
 #endif /* !LIBC_ARCH_HAVE_BZEROQ */
+#ifndef LIBC_ARCH_HAVE_BCMPQ
+DEFINE_PUBLIC_ALIAS(bcmpq, libc_bcmpq);
+#endif /* !LIBC_ARCH_HAVE_BCMPQ */
 DEFINE_PUBLIC_ALIAS(bzeroc, libc_bzeroc);
+#ifndef LIBC_ARCH_HAVE_BCMPC
+DEFINE_PUBLIC_ALIAS(bcmpc, libc_bcmpc);
+#endif /* !LIBC_ARCH_HAVE_BCMPC */
 #ifndef LIBC_ARCH_HAVE_BCMP
 DEFINE_PUBLIC_ALIAS(bcmp, libc_bcmp);
 #endif /* !LIBC_ARCH_HAVE_BCMP */

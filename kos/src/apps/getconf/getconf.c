@@ -418,7 +418,7 @@ again:
 		if (strcmp(confs[i].c_name, name) == 0)
 			return &confs[i];
 	}
-	if (memcmp(name, "_POSIX_", 7 * sizeof(char)) == 0) {
+	if (bcmp(name, "_POSIX_", 7, sizeof(char)) == 0) {
 		name += 7;
 		goto again;
 	}

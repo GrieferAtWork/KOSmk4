@@ -220,7 +220,7 @@ autocomplete_help(size_t argc, char *argv[],
 		current = DBG_HOOKITERATOR_NEXT_FILTERED(&iter, DBG_HOOK_COMMAND);
 		if (!current)
 			break;
-		if (memcmp(current->dc_name, starts_with, starts_with_len * sizeof(char)) != 0)
+		if (bcmp(current->dc_name, starts_with, starts_with_len, sizeof(char)) != 0)
 			continue; /* Skip this one */
 		(*cb)(arg, current->dc_name, strlen(current->dc_name));
 	}
@@ -324,7 +324,7 @@ dbg_autocomplete_countmatches(void *arg,
 	cookie = (struct dbg_autocomplete_cnt_cookie *)arg;
 	if (namelen < cookie->acc_startslen)
 		return; /* Not a match */
-	if (memcmp(name, cookie->acc_starts, cookie->acc_startslen) != 0)
+	if (bcmp(name, cookie->acc_starts, cookie->acc_startslen, sizeof(char)) != 0)
 		return; /* Not a match */
 	name += cookie->acc_startslen;
 	namelen -= cookie->acc_startslen;
@@ -367,7 +367,7 @@ dbg_autocomplete_insertmatch(void *arg,
 		return; /* Already inserted. */
 	if (namelen < cookie->acc_startslen)
 		return; /* Not a match */
-	if (memcmp(name, cookie->acc_starts, cookie->acc_startslen) != 0)
+	if (bcmp(name, cookie->acc_starts, cookie->acc_startslen, sizeof(char)) != 0)
 		return; /* Not a match */
 	cookie->acc_destreq = namelen;
 	if (namelen <= cookie->acc_destavl) {
@@ -391,7 +391,7 @@ dbg_autocomplete_longestmatch(void *arg,
 	cookie = (struct dbg_autocomplete_cnt_cookie *)arg;
 	if (namelen < cookie->acc_startslen)
 		return; /* Not a match */
-	if (memcmp(name, cookie->acc_starts, cookie->acc_startslen) != 0)
+	if (bcmp(name, cookie->acc_starts, cookie->acc_startslen, sizeof(char)) != 0)
 		return; /* Not a match */
 	if (cookie->acc_count < namelen)
 		cookie->acc_count = namelen;
@@ -421,7 +421,7 @@ dbg_autocomplete_matchlist(void *arg,
 	cookie = (struct dbg_autocomplete_prn_cookie *)arg;
 	if (namelen < cookie->acc_startslen)
 		return; /* Not a match */
-	if (memcmp(name, cookie->acc_starts, cookie->acc_startslen) != 0)
+	if (bcmp(name, cookie->acc_starts, cookie->acc_startslen, sizeof(char)) != 0)
 		return; /* Not a match */
 	if (!cookie->acc_match_count)
 		return; /* No space for any more matches. */
@@ -618,8 +618,9 @@ set_starts_empty_string:
 			size_t new_cursor;
 			if unlikely(cursor < cookie.cnt.acc_startslen)
 				goto done; /* shouldn't happen... */
-			if unlikely(memcmp(cmdline + cursor - cookie.cnt.acc_startslen,
-			                   cookie.cnt.acc_starts, cookie.cnt.acc_startslen) != 0)
+			if unlikely(bcmp(cmdline + cursor - cookie.cnt.acc_startslen,
+			                 cookie.cnt.acc_starts, cookie.cnt.acc_startslen,
+			                 sizeof(char)) != 0)
 				goto done; /* Shouldn't happen... */
 			new_cursor = cursor - cookie.cnt.acc_startslen;
 			if unlikely(new_cursor >= (DBG_MAXLINE - 1))
@@ -814,7 +815,7 @@ NOTHROW(KCALL cmdline_backlog_try_appendcurrent)(void) {
 		 * original, then don't re-add it to the backlog once again! */
 		cursel = cmdline_backlog + cmdline_current;
 		if (cmdline_len == strlen(cursel) &&
-		    memcmp(cmdline, cursel, cmdline_len * sizeof(char)) == 0)
+		    bcmp(cmdline, cursel, cmdline_len, sizeof(char)) == 0)
 			return;
 	}
 	if (cmdline_len != 0)

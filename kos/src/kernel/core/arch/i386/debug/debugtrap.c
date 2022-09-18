@@ -188,7 +188,7 @@ kernel_debugtraps_uninstall(struct kernel_debugtraps const *__restrict handlers)
 	kernel_debugtrap_acquire();
 	if (!do_get_traps(&old_traps))
 		goto nope; /* No traps installed. */
-	if (memcmp(&old_traps, handlers, sizeof(struct kernel_debugtraps)) != 0)
+	if (bcmp(&old_traps, handlers, sizeof(struct kernel_debugtraps)) != 0)
 		goto nope; /* Different traps were installed. */
 	/* Uninstall traps. */
 #define DISABLE_TRAP(cpustate)                                                                           \

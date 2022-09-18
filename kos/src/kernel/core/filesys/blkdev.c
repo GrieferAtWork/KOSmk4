@@ -605,7 +605,7 @@ blkdev_makeparts_loadembr(struct blkdev *__restrict self,
 	   mfile_readall(self, embr, 512, embr_pos));
 
 	/* Verify signature. */
-	if (memcmp(embr->embr_signature, "EmbrrbmE", 8) != 0)
+	if (bcmp(embr->embr_signature, "EmbrrbmE", 8) != 0)
 		return false;
 	if (embr->embr_bootsig[0] != 0x55)
 		return false;
@@ -627,9 +627,9 @@ blkdev_makeparts_loadembr(struct blkdev *__restrict self,
 	}
 
 	/* Do some more signature validation */
-	if (memcmp(phdr->eph_sig1, "EMBR", 4) != 0)
+	if (bcmp(phdr->eph_sig1, "EMBR", 4) != 0)
 		return false;
-	if (memcmp(phdr->eph_sig2, "RBME", 4) != 0)
+	if (bcmp(phdr->eph_sig2, "RBME", 4) != 0)
 		return false;
 	num_partitions = LETOH16(phdr->eph_entcnt);
 	if unlikely(!num_partitions)
@@ -659,7 +659,7 @@ blkdev_makeparts_loadembr(struct blkdev *__restrict self,
 		}
 
 		/* Load the partition. */
-		if likely(memcmp(pent->epe_sig, "eMBR", 4) == 0) {
+		if likely(bcmp(pent->epe_sig, "eMBR", 4) == 0) {
 			struct blkdev *dev;
 			uint64_t partbase, partsize, partmax;
 			partbase = embr_sectors_base + LETOH64(pent->epe_lbastart);

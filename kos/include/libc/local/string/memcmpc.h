@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd505904 */
+/* HASH CRC-32:0x3e6a9d54 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,9 +79,11 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_memcmpw_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/byteorder.h>
+#include <hybrid/host.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(memcmpc) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcmpc))(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) {
+#ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 	switch (__elem_size) {
 
 	case 1:
@@ -93,14 +95,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcmpc))(void const *__s1, void cons
 	case 4:
 		return (__NAMESPACE_LOCAL_SYM __localdep_memcmpl)(__s1, __s2, __elem_count);
 
-#ifdef __UINT64_TYPE__
 	case 8:
 		return (__NAMESPACE_LOCAL_SYM __localdep_memcmpq)(__s1, __s2, __elem_count);
-#endif /* __UINT64_TYPE__ */
 
 	default:
 		break;
 	}
+#endif /* __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS */
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 	return (__NAMESPACE_LOCAL_SYM __localdep_memcmp)(__s1, __s2, __elem_count * __elem_size);
 #else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */

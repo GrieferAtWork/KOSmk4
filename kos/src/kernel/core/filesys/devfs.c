@@ -2003,7 +2003,7 @@ again:
 	if (fnode_isblkpart(root)) {
 		struct blkdev *dev;
 		dev = fnode_asblkdev(root);
-		if (memcmp(&dev->bd_partinfo.bp_efi_partguid, guid, sizeof(guid_t)) == 0)
+		if (bcmp(&dev->bd_partinfo.bp_efi_partguid, guid, sizeof(guid_t)) == 0)
 			result = result ? (struct blkdev *)-1 : dev;
 	}
 	if (root->fn_supent.rb_lhs) {
@@ -2057,7 +2057,7 @@ device_lookup_bystring(USER CHECKED char const *string,
 	REF struct device *result;
 	static char const devfs_prefix[] = "/dev/";
 	if (stringlen >= COMPILER_STRLEN(devfs_prefix) &&
-	    memcmp(string, devfs_prefix, COMPILER_STRLEN(devfs_prefix) * sizeof(char)) == 0) {
+	    bcmp(string, devfs_prefix, COMPILER_STRLEN(devfs_prefix), sizeof(char)) == 0) {
 		string += COMPILER_STRLEN(devfs_prefix);
 		stringlen -= COMPILER_STRLEN(devfs_prefix);
 	}

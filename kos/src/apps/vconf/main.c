@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
 	curmodeid   = lsm.svl_count;
 	if (has_curmode) {
 		for (curmodeid = 0; curmodeid < lsm.svl_count; ++curmodeid) {
-			if (memcmp(&lsm.svl_buf[curmodeid], &curmode, sizeof(struct svga_modeinfo)) == 0)
+			if (bcmp(&lsm.svl_buf[curmodeid], &curmode, sizeof(struct svga_modeinfo)) == 0)
 				break;
 		}
 	}

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd906a431 */
+/* HASH CRC-32:0xaa8ad684 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,6 +44,7 @@ local funcs = {
 	"memmovec(dst, src, elem_count, elem_size)",
 	"mempcpyc(dst, src, elem_count, elem_size)",
 	"memcpyc(dst, src, elem_count, elem_size)",
+	"bcmpc(s1, s2, elem_count, elem_size)",
 	"memcmpc(s1, s2, elem_count, elem_size)",
 	"mempatq(dst, pattern, n_bytes)",
 	"mempatl(dst, pattern, n_bytes)",
@@ -93,6 +94,9 @@ local funcs = {
 	"mempsetl(dst, dword, n_dwords)",
 	"mempsetq(dst, qword, n_qwords)",
 	"bcmp(s1, s2, n_bytes)",
+	"bcmpw(s1, s2, n_words)",
+	"bcmpl(s1, s2, n_dwords)",
+	"bcmpq(s1, s2, n_qwords)",
 	"bzero(dst, n_bytes)",
 	"bzerow(dst, n_words)",
 	"bzerol(dst, n_dwords)",
@@ -142,6 +146,9 @@ for (local f: funcs) {
 #ifdef __fast_memcpyc_defined
 #define libc_memcpyc(dst, src, elem_count, elem_size) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyc))(dst, src, elem_count, elem_size)
 #endif /* __fast_memcpyc_defined */
+#ifdef __fast_bcmpc_defined
+#define libc_bcmpc(s1, s2, elem_count, elem_size) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpc))(s1, s2, elem_count, elem_size)
+#endif /* __fast_bcmpc_defined */
 #ifdef __fast_memcmpc_defined
 #define libc_memcmpc(s1, s2, elem_count, elem_size) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpc))(s1, s2, elem_count, elem_size)
 #endif /* __fast_memcmpc_defined */
@@ -289,6 +296,15 @@ for (local f: funcs) {
 #ifdef __fast_bcmp_defined
 #define libc_bcmp(s1, s2, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmp))(s1, s2, n_bytes)
 #endif /* __fast_bcmp_defined */
+#ifdef __fast_bcmpw_defined
+#define libc_bcmpw(s1, s2, n_words) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpw))(s1, s2, n_words)
+#endif /* __fast_bcmpw_defined */
+#ifdef __fast_bcmpl_defined
+#define libc_bcmpl(s1, s2, n_dwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpl))(s1, s2, n_dwords)
+#endif /* __fast_bcmpl_defined */
+#ifdef __fast_bcmpq_defined
+#define libc_bcmpq(s1, s2, n_qwords) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bcmpq))(s1, s2, n_qwords)
+#endif /* __fast_bcmpq_defined */
 #ifdef __fast_bzero_defined
 #define libc_bzero(dst, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzero))(dst, n_bytes)
 #endif /* __fast_bzero_defined */
@@ -857,13 +873,29 @@ INTDEF ATTR_LEAF ATTR_OUT(1) void NOTHROW_NCX(LIBDCALL libd_bzerol)(void *__rest
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 INTDEF ATTR_LEAF ATTR_OUT(1) void NOTHROW_NCX(LIBCCALL libc_bzerol)(void *__restrict dst, size_t num_dwords);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_bcmpw)(void const *s1, void const *s2, size_t n_words);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBCCALL libc_bcmpw)(void const *s1, void const *s2, size_t n_words);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_bcmpl)(void const *s1, void const *s2, size_t n_dwords);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBCCALL libc_bcmpl)(void const *s1, void const *s2, size_t n_dwords);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_LEAF ATTR_OUT(1) void NOTHROW_NCX(LIBDCALL libd_bzeroq)(void *__restrict dst, size_t num_qwords);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 INTDEF ATTR_LEAF ATTR_OUT(1) void NOTHROW_NCX(LIBCCALL libc_bzeroq)(void *__restrict dst, size_t num_qwords);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_bcmpq)(void const *s1, void const *s2, size_t n_qwords);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBCCALL libc_bcmpq)(void const *s1, void const *s2, size_t n_qwords);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 INTDEF ATTR_LEAF ATTR_OUT(1) void NOTHROW_NCX(LIBDCALL libd_bzeroc)(void *__restrict dst, size_t elem_count, size_t elem_size);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 INTDEF ATTR_LEAF ATTR_OUT(1) void NOTHROW_NCX(LIBCCALL libc_bzeroc)(void *__restrict dst, size_t elem_count, size_t elem_size);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_bcmpc)(void const *s1, void const *s2, size_t elem_count, size_t elem_size);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBCCALL libc_bcmpc)(void const *s1, void const *s2, size_t elem_count, size_t elem_size);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> bcmp(3)
  * Similar to `memcmp(3)', except that no ordering is done,

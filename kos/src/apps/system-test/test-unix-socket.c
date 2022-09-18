@@ -114,7 +114,7 @@ DEFINE_TEST(unix_socket) {
 		len = read(client_sock, buf, sizeof(buf));
 		if (len != sizeof(msg1) - sizeof(char))
 			err(1, "read(client_sock) returned: %" PRIdSIZ, len);
-		if (memcmp(buf, msg1, sizeof(msg1) - sizeof(char)) != 0)
+		if (bcmp(buf, msg1, sizeof(msg1) - sizeof(char)) != 0)
 			errc(1, EINVAL, "read(client_sock) returned data %$q", len, buf);
 		len = write(client_sock, msg2, sizeof(msg2) - sizeof(char));
 		if (len != sizeof(msg2) - sizeof(char))
@@ -122,7 +122,7 @@ DEFINE_TEST(unix_socket) {
 		len = read(accept_sock, buf, sizeof(buf));
 		if (len != sizeof(msg2) - sizeof(char))
 			err(1, "read(accept_sock) returned: %" PRIdSIZ, len);
-		if (memcmp(buf, msg2, sizeof(msg2) - sizeof(char)) != 0)
+		if (bcmp(buf, msg2, sizeof(msg2) - sizeof(char)) != 0)
 			errc(1, EINVAL, "read(accept_sock) returned data %$q", len, buf);
 
 		len = write(accept_sock, msg3, sizeof(msg3) - sizeof(char));
@@ -131,7 +131,7 @@ DEFINE_TEST(unix_socket) {
 		len = read(client_sock, buf, sizeof(buf));
 		if (len != sizeof(msg3) - sizeof(char))
 			err(1, "read(client_sock) returned: %" PRIdSIZ, len);
-		if (memcmp(buf, msg3, sizeof(msg3) - sizeof(char)) != 0)
+		if (bcmp(buf, msg3, sizeof(msg3) - sizeof(char)) != 0)
 			errc(1, EINVAL, "read(client_sock) returned data %$q", len, buf);
 	}
 

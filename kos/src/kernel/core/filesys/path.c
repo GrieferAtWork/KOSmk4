@@ -591,7 +591,7 @@ path_lookupchild_withlock(struct path *__restrict self,
 			continue; /* Wrong hash */
 		if unlikely(result->p_name->fd_namelen != namelen)
 			continue; /* Wrong name length */
-		if unlikely(memcmp(result->p_name->fd_name, name, namelen * sizeof(char)) != 0)
+		if unlikely(bcmp(result->p_name->fd_name, name, namelen, sizeof(char)) != 0)
 			continue; /* Wrong name */
 		if unlikely(result == &deleted_path)
 			continue; /* Prevent any chance of *this* happening... */
@@ -1292,7 +1292,7 @@ path_traverse_ex(struct path *cwd, u32 *__restrict premaining_symlinks,
 	/* Check if this is a universal unix pathname. */
 	if unlikely(upath[0] == '\\' && upath[1] == '\\' &&
 	            0 == ((atflags & AT_DOSPATH) ? memcasecmp(upath + 2, "unix", 4 * sizeof(char))
-	                                         : memcmp(upath + 2, "unix", 4 * sizeof(char))) &&
+	                                         : bcmp(upath + 2, "unix", 4, sizeof(char))) &&
 	            upath[6] == '\\') {
 		char ch;
 		upath += COMPILER_STRLEN("\\\\unix\\");

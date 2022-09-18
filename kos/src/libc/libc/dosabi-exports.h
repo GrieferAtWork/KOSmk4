@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x392179d1 */
+/* HASH CRC-32:0x2f5ce9d2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2796,8 +2796,20 @@ DEFINE_PUBLIC_ALIAS(DOS$explicit_bzero, libd_bzero);
 DEFINE_PUBLIC_ALIAS(DOS$bzero, libd_bzero);
 DEFINE_PUBLIC_ALIAS(DOS$bzerow, libd_bzerow);
 DEFINE_PUBLIC_ALIAS(DOS$bzerol, libd_bzerol);
+#ifndef LIBC_ARCH_HAVE_BCMPW
+DEFINE_PUBLIC_ALIAS(DOS$bcmpw, libd_bcmpw);
+#endif /* !LIBC_ARCH_HAVE_BCMPW */
+#ifndef LIBC_ARCH_HAVE_BCMPL
+DEFINE_PUBLIC_ALIAS(DOS$bcmpl, libd_bcmpl);
+#endif /* !LIBC_ARCH_HAVE_BCMPL */
 DEFINE_PUBLIC_ALIAS(DOS$bzeroq, libd_bzeroq);
+#ifndef LIBC_ARCH_HAVE_BCMPQ
+DEFINE_PUBLIC_ALIAS(DOS$bcmpq, libd_bcmpq);
+#endif /* !LIBC_ARCH_HAVE_BCMPQ */
 DEFINE_PUBLIC_ALIAS(DOS$bzeroc, libd_bzeroc);
+#ifndef LIBC_ARCH_HAVE_BCMPC
+DEFINE_PUBLIC_ALIAS(DOS$bcmpc, libd_bcmpc);
+#endif /* !LIBC_ARCH_HAVE_BCMPC */
 #ifndef LIBC_ARCH_HAVE_BCMP
 DEFINE_PUBLIC_ALIAS(DOS$bcmp, libd_bcmp);
 #endif /* !LIBC_ARCH_HAVE_BCMP */

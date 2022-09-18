@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f7b8d34 */
+/* HASH CRC-32:0x4a023f33 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1114,6 +1114,10 @@
 #define __CRT_HAVE_DOS$backtrace_symbols_fmt
 #define __CRT_HAVE_DOS$basename
 #define __CRT_HAVE_DOS$bcmp
+#define __CRT_HAVE_DOS$bcmpc
+#define __CRT_HAVE_DOS$bcmpl
+#define __CRT_HAVE_DOS$bcmpq
+#define __CRT_HAVE_DOS$bcmpw
 #define __CRT_HAVE_DOS$bcopy
 #define __CRT_HAVE_DOS$bgets
 #define __CRT_HAVE_DOS$bind
@@ -5372,6 +5376,10 @@
 #define __CRT_HAVE_basename
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_bcmp
+#define __CRT_HAVE_bcmpc
+#define __CRT_HAVE_bcmpl
+#define __CRT_HAVE_bcmpq
+#define __CRT_HAVE_bcmpw
 #ifndef __KERNEL__
 #define __CRT_HAVE_bcopy
 #define __CRT_HAVE_bgets

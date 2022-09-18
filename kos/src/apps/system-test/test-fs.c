@@ -64,7 +64,7 @@ assertFileText_impl(fd_t dfd, char const *name,
 		        "%" PRIdSIZ " (%m)\n"
 		        "line:%d",
 		        temp, line);
-		assertf(memcmp(buf, text, len) == 0,
+		assertf(bcmp(buf, text, len) == 0,
 		        "%$q != %q\n"
 		        "line:%d",
 		        len, buf, text, line);
@@ -243,7 +243,7 @@ PRIVATE void testPath(char const *path) {
 
 		/* Pre-init the stat structures to account for padding
 		 * fields (that aren't written  by the kernel) in  the
-		 * memcmp() below. */
+		 * bcmp() below. */
 		memset(&st1, 0xcc, sizeof(st1));
 		memset(&st2, 0xcc, sizeof(st2));
 
@@ -251,7 +251,7 @@ PRIVATE void testPath(char const *path) {
 		EQd(0, fstatat(dfd, "test2", &st2, 0));
 
 		/* Should be the same file. */
-		assertf(memcmp(&st1, &st2, sizeof(struct stat)) == 0,
+		assertf(bcmp(&st1, &st2, sizeof(struct stat)) == 0,
 		        "st1:\n%$[hex]\n"
 		        "st2:\n%$[hex]\n",
 		        sizeof(st1), &st1,

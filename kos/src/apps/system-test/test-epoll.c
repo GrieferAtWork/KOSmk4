@@ -162,7 +162,7 @@ DEFINE_TEST(epoll_et) {
 
 	/* Now consume the data */
 	EQss(3, read(pipes[0], buf, sizeof(buf)));
-	assertf(memcmp(buf, "foo", 3) == 0, "buf = %$[hex]", 3, buf);
+	assertf(bcmp(buf, "foo", 3) == 0, "buf = %$[hex]", 3, buf);
 
 	EQss(0, epoll_wait(epfd, events, 8, 0)); /* Reading should still not be possible */
 	EQss(0, epoll_wait(epfd, events, 8, 0)); /* Reading should still not be possible */

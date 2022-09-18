@@ -76,7 +76,7 @@ ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_changedview)(void) {
 	struct fcpustate view, orig;
 	dbg_getallregs(DBG_REGLEVEL_ORIG, &orig);
 	dbg_getallregs(DBG_REGLEVEL_VIEW, &view);
-	return memcmp(&view, &orig, sizeof(struct fcpustate)) != 0;
+	return bcmp(&view, &orig, sizeof(struct fcpustate)) != 0;
 }
 
 PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_getregbynamep") bool

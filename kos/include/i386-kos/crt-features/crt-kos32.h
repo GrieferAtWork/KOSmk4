@@ -2420,7 +2420,9 @@
 #define __CRT_HAVE_backtrace_symbols_fmt
 #define __CRT_HAVE_basename
 #define __CRT_HAVE_bcmp
+#define __CRT_HAVE_bcmpc
 #define __CRT_HAVE_bcmpl
+#define __CRT_HAVE_bcmpq
 #define __CRT_HAVE_bcmpw
 #define __CRT_HAVE_bcopy
 #define __CRT_HAVE_bgets

@@ -155,7 +155,7 @@ LOCAL_sys_coredump_impl(struct icpustate *__restrict return_state,
 		validate_readable(orig_state, sizeof(*orig_state));
 		LOCAL_ucpustate_decode(return_state, curr_state, &curr_ustate);
 		LOCAL_ucpustate_decode(return_state, orig_state, &orig_ustate);
-		if (memcmp(&curr_ustate, &orig_ustate, sizeof(ucpustate)) == 0) {
+		if (bcmp(&curr_ustate, &orig_ustate, sizeof(ucpustate)) == 0) {
 			traceback_vector = NULL;
 			traceback_length = 0;
 		}

@@ -190,7 +190,7 @@ devdisk_partuuid_byname(struct devdiskruledir *__restrict UNUSED(self),
 			FINALLY_DECREF_UNLIKELY(node);
 			if (fnode_isblkpart(node)) {
 				struct blkdev *dev = fnode_asblkdev(node);
-				if (memcmp(&dev->bd_partinfo.bp_efi_partguid, &guid, sizeof(guid)) == 0)
+				if (bcmp(&dev->bd_partinfo.bp_efi_partguid, &guid, sizeof(guid)) == 0)
 					return mfile_asblkdev(incref(dev));
 			}
 			node = fsuper_nodeafter(&devfs, node);
