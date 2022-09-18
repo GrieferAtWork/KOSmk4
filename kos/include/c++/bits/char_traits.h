@@ -57,33 +57,7 @@ struct char_traits {
 
 	static __CXX_CLASSMEMBER __CXX14_CONSTEXPR int
 	compare(__CharT const *__lhs, __CharT const *__rhs, __SIZE_TYPE__ __num_chars) __CXX_NOEXCEPT_NCX {
-		__STATIC_IF(sizeof(__CharT) == 8) {
-			return (int)__libc_memcmpq(__lhs, __rhs, __num_chars);
-		}
-		__STATIC_ELSE(sizeof(__CharT) == 8) {
-			__STATIC_IF(sizeof(__CharT) == 4) {
-				return (int)__libc_memcmpl(__lhs, __rhs, __num_chars);
-			}
-			__STATIC_ELSE(sizeof(__CharT) == 4) {
-				__STATIC_IF(sizeof(__CharT) == 2) {
-					return (int)__libc_memcmpw(__lhs, __rhs, __num_chars);
-				}
-				__STATIC_ELSE(sizeof(__CharT) == 2) {
-					__STATIC_IF(sizeof(__CharT) == 1) {
-						return (int)__libc_memcmp(__lhs, __rhs, __num_chars);
-					}
-					__STATIC_ELSE(sizeof(__CharT) == 1) {
-						for (__SIZE_TYPE__ __i = 0; __i < __num_chars; ++__i) {
-							if (lt(__lhs[__i], __rhs[__i]))
-								return -1;
-							if (lt(__rhs[__i], __lhs[__i]))
-								return 1;
-						}
-						return 0;
-					}
-				}
-			}
-		}
+		return __libc_memcmpc(__lhs, __rhs, __num_chars, sizeof(__CharT));
 	}
 
 	static __CXX_CLASSMEMBER __ATTR_PURE __CXX14_CONSTEXPR __SIZE_TYPE__

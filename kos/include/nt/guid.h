@@ -113,22 +113,22 @@ typedef GUID FMTID, *LPFMTID;
 #ifndef _SYS_GUID_OPERATORS_
 #define _SYS_GUID_OPERATORS_
 #ifdef __cplusplus
-__LOCAL int(InlineIsEqualGUID)(REFGUID rguid1, REFGUID rguid2) {
-	return (((__UINT32_TYPE__ *)&rguid1)[0] == ((__UINT32_TYPE__ *)&rguid2)[0] &&
-	        ((__UINT32_TYPE__ *)&rguid1)[1] == ((__UINT32_TYPE__ *)&rguid2)[1] &&
-	        ((__UINT32_TYPE__ *)&rguid1)[2] == ((__UINT32_TYPE__ *)&rguid2)[2] &&
-	        ((__UINT32_TYPE__ *)&rguid1)[3] == ((__UINT32_TYPE__ *)&rguid2)[3]);
+__LOCAL int (InlineIsEqualGUID)(REFGUID rguid1, REFGUID rguid2) {
+	return (((__UINT32_TYPE__ const *)&rguid1)[0] == ((__UINT32_TYPE__ const *)&rguid2)[0] &&
+	        ((__UINT32_TYPE__ const *)&rguid1)[1] == ((__UINT32_TYPE__ const *)&rguid2)[1] &&
+	        ((__UINT32_TYPE__ const *)&rguid1)[2] == ((__UINT32_TYPE__ const *)&rguid2)[2] &&
+	        ((__UINT32_TYPE__ const *)&rguid1)[3] == ((__UINT32_TYPE__ const *)&rguid2)[3]);
 }
-__LOCAL int(IsEqualGUID)(REFGUID rguid1, REFGUID rguid2) {
-	return __libc_memcmp(&rguid1, &rguid2, sizeof(GUID)) == 0;
+__LOCAL int (IsEqualGUID)(REFGUID rguid1, REFGUID rguid2) {
+	return __libc_bcmp(&rguid1, &rguid2, sizeof(GUID)) == 0;
 }
 #else /* __cplusplus */
-#define InlineIsEqualGUID(rguid1, rguid2)                                    \
-	(((__UINT32_TYPE__ *)(rguid1))[0] == ((__UINT32_TYPE__ *)(rguid2))[0] && \
-	 ((__UINT32_TYPE__ *)(rguid1))[1] == ((__UINT32_TYPE__ *)(rguid2))[1] && \
-	 ((__UINT32_TYPE__ *)(rguid1))[2] == ((__UINT32_TYPE__ *)(rguid2))[2] && \
-	 ((__UINT32_TYPE__ *)(rguid1))[3] == ((__UINT32_TYPE__ *)(rguid2))[3])
-#define IsEqualGUID(rguid1, rguid2) (!__libc_memcmp(rguid1, rguid2, sizeof(GUID)))
+#define InlineIsEqualGUID(rguid1, rguid2)                                                \
+	(((__UINT32_TYPE__ const *)(rguid1))[0] == ((__UINT32_TYPE__ const *)(rguid2))[0] && \
+	 ((__UINT32_TYPE__ const *)(rguid1))[1] == ((__UINT32_TYPE__ const *)(rguid2))[1] && \
+	 ((__UINT32_TYPE__ const *)(rguid1))[2] == ((__UINT32_TYPE__ const *)(rguid2))[2] && \
+	 ((__UINT32_TYPE__ const *)(rguid1))[3] == ((__UINT32_TYPE__ const *)(rguid2))[3])
+#define IsEqualGUID(rguid1, rguid2) (!__libc_bcmp(rguid1, rguid2, sizeof(GUID)))
 #endif /* !__cplusplus */
 
 #ifdef __INLINE_ISEQUAL_GUID

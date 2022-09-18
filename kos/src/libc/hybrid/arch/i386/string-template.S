@@ -180,7 +180,7 @@
 
 
 /********************************************************************************/
-/* Tsigned LIBCCALL memcmp(void const *lhs, void const *rhs, size_t num_Tword); */
+/* int LIBCCALL memcmp(void const *lhs, void const *rhs, size_t num_Tword);     */
 /********************************************************************************/
 BEGIN_MEMFUNC(memcmp)
 	ENTER_Pdi_Psi_Pcx

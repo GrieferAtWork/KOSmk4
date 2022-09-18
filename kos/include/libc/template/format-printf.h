@@ -1083,7 +1083,7 @@ __check_string_error_and_print_tail:
 		(void)__xformat_size;
 		(void)__xformat_arg;
 		(void)__xformat_argsize;
-#define __COMPARE_NAME(x) (__COMPILER_STRLEN(x) == __xformat_size && __libc_memcmp(x, __xformat_start, __COMPILER_STRLEN(x)*sizeof(char)) == 0)
+#define __COMPARE_NAME(x) (__COMPILER_STRLEN(x) == __xformat_size && __libc_bcmpc(x, __xformat_start, __COMPILER_STRLEN(x), sizeof(char)) == 0)
 #ifndef __NO_PRINTF_HEX
 		if (__COMPARE_NAME("hex")) {
 #ifndef __FORMAT_HEXDUMP_FNORMAL

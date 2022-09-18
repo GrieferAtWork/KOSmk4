@@ -161,8 +161,8 @@ struct dlmodule_format {
 	struct dlmodule_format *_df_next; /* [1..1] Next dl module extension format. */
 #endif /* !__BUILDING_LIBDL */
 
-	/* [1..1] Open  a  DL  module,  given   a  header,  filename  and  file   descriptor.
-	 * NOTE: This function is only called when `memcmp(header, df_magic, df_magsz) == 0'! */
+	/* [1..1] Open a DL module, given a header, filename and file descriptor.
+	 * NOTE: This function is only called when `bcmp(header, df_magic, df_magsz) == 0'! */
 	NONNULL((1, 2)) __REF DlModule *(LIBDL_CC *df_open)(byte_t const header[DL_MODULE_MAXMAGIC],
 	                                                    /*inherit(on_success,HEAP)*/ char *__restrict filename,
 	                                                    /*inherit(on_success)*/ fd_t fd);

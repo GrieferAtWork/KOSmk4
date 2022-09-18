@@ -207,7 +207,7 @@ __PRIVATE_DEFINE_CPU_OP_S(__cpu_xor_s_impl, ^)
 #endif /* __NO_XBLOCK */
 
 #define __CPU_EQUAL_S(setsize, cpusetp1, cpusetp2) \
-	(__libc_memcmp(cpusetp1, cpusetp2, setsize) == 0)
+	(__libc_bcmp(cpusetp1, cpusetp2, setsize) == 0)
 #define __CPU_ALLOC_SIZE(count) \
 	((((count) + __NCPUBITS - 1) / __NCPUBITS) * sizeof(__cpu_mask_t))
 #ifdef ____libc_calloc_defined
