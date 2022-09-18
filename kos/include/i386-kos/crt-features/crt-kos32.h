@@ -3701,6 +3701,7 @@
 #define __CRT_HAVE_memchrq
 #define __CRT_HAVE_memchrw
 #define __CRT_HAVE_memcmp
+#define __CRT_HAVE_memcmpc
 #define __CRT_HAVE_memcmpl
 #define __CRT_HAVE_memcmpq
 #define __CRT_HAVE_memcmpw

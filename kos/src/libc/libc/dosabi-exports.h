@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc568b1f5 */
+/* HASH CRC-32:0x392179d1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2934,6 +2934,7 @@ DEFINE_PUBLIC_ALIAS(DOS$rawmemxlenq, libd_rawmemxlenq);
 DEFINE_PUBLIC_ALIAS(DOS$rawmemrxlenq, libd_rawmemrxlenq);
 DEFINE_PUBLIC_ALIAS(DOS$memmoveup, libd_memmoveup);
 DEFINE_PUBLIC_ALIAS(DOS$memmovedown, libd_memmovedown);
+DEFINE_PUBLIC_ALIAS(DOS$memcmpc, libd_memcmpc);
 DEFINE_PUBLIC_ALIAS(DOS$memcpyc, libd_memcpyc);
 DEFINE_PUBLIC_ALIAS(DOS$mempcpyc, libd_mempcpyc);
 DEFINE_PUBLIC_ALIAS(DOS$memmovec, libd_memmovec);

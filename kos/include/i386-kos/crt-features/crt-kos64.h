@@ -3547,6 +3547,7 @@
 #define __CRT_HAVE_memchrq
 #define __CRT_HAVE_memchrw
 #define __CRT_HAVE_memcmp
+#define __CRT_HAVE_memcmpc
 #define __CRT_HAVE_memcmpl
 #define __CRT_HAVE_memcmpq
 #define __CRT_HAVE_memcmpw
@@ -9214,6 +9215,7 @@
 #define __CRT_HAVE_KOS$memchrq
 #define __CRT_HAVE_KOS$memchrw
 #define __CRT_HAVE_KOS$memcmp
+#define __CRT_HAVE_KOS$memcmpc
 #define __CRT_HAVE_KOS$memcmpl
 #define __CRT_HAVE_KOS$memcmpq
 #define __CRT_HAVE_KOS$memcmpw
@@ -13836,6 +13838,7 @@
 #define __CRT_HAVE_DOS$memchrq
 #define __CRT_HAVE_DOS$memchrw
 #define __CRT_HAVE_DOS$memcmp
+#define __CRT_HAVE_DOS$memcmpc
 #define __CRT_HAVE_DOS$memcmpl
 #define __CRT_HAVE_DOS$memcmpq
 #define __CRT_HAVE_DOS$memcmpw

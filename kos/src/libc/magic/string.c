@@ -172,6 +172,7 @@ local funcs = {
 	"memmovec(dst, src, elem_count, elem_size)",
 	"mempcpyc(dst, src, elem_count, elem_size)",
 	"memcpyc(dst, src, elem_count, elem_size)",
+	"memcmpc(s1, s2, elem_count, elem_size)",
 	"mempatq(dst, pattern, n_bytes)",
 	"mempatl(dst, pattern, n_bytes)",
 	"mempatw(dst, pattern, n_bytes)",
@@ -269,6 +270,9 @@ for (local f: funcs) {
 #ifdef __fast_memcpyc_defined
 #define libc_memcpyc(dst, src, elem_count, elem_size) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyc))(dst, src, elem_count, elem_size)
 #endif /* __fast_memcpyc_defined */
+#ifdef __fast_memcmpc_defined
+#define libc_memcmpc(s1, s2, elem_count, elem_size) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpc))(s1, s2, elem_count, elem_size)
+#endif /* __fast_memcmpc_defined */
 #ifdef __fast_mempatq_defined
 #define libc_mempatq(dst, pattern, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempatq))(dst, pattern, n_bytes)
 #endif /* __fast_mempatq_defined */
@@ -703,9 +707,18 @@ int memcmp([[in(n_bytes)]] void const *s1,
 	byte_t *p2 = (byte_t *)s2;
 	byte_t v1, v2;
 	v1 = v2 = 0;
+@@pp_if __SIZEOF_INT__ >= 2@@
 	while (n_bytes-- && ((v1 = *p1++) == (v2 = *p2++)))
 		;
 	return (int)v1 - (int)v2;
+@@pp_else@@
+	while (n_bytes--) {
+		if ((v1 = *p1++) != (v2 = *p2++)) {
+			return v1 < v2 ? -1 : 1;
+		}
+	}
+	return 0;
+@@pp_endif@@
 }
 
 @@>> memchr(3)
@@ -1018,6 +1031,7 @@ size_t strxfrm([[out(buflen)]] char *dst,
 }
 
 %(std)#if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
+%[insert:std_function_nousing(memcmp = memcmpc, externLinkageOverride: "C++")]
 %[insert:std_function_nousing(memcpy = memcpyc, externLinkageOverride: "C++")]
 %[insert:std_function_nousing(memmove = memmovec, externLinkageOverride: "C++")]
 %(std)#endif /* __cplusplus && __USE_STRING_OVERLOADS */
@@ -5565,6 +5579,69 @@ memmovedown:([[out(n_bytes)]] void *dst,
 }
 
 
+@@>> memcmpc(3)
+@@Compare up to `elem_count' `elem_size'-bytes-large unsigned integers
+@@from  the 2 given  buffers. If all are  identical, return `0'. Else:
+@@ - return `< 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] < (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]'
+@@ - return `> 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] > (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]'
+[[preferred_fastbind, libc, kernel, pure, wunused]]
+[[impl_include("<hybrid/byteorder.h>"), decl_include("<hybrid/typecore.h>")]]
+[[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCMPC))]]
+int memcmpc([[in(elem_count * elem_size)]] void const *s1,
+            [[in(elem_count * elem_size)]] void const *s2,
+            $size_t elem_count, $size_t elem_size) {
+	switch (elem_size) {
+
+	case 1:
+		return memcmp(s1, s2, elem_count);
+
+	case 2:
+		return memcmpw(s1, s2, elem_count);
+
+	case 4:
+		return memcmpl(s1, s2, elem_count);
+
+@@pp_ifdef __UINT64_TYPE__@@
+	case 8:
+		return memcmpq(s1, s2, elem_count);
+@@pp_endif@@
+
+	default:
+		break;
+	}
+@@pp_if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__@@
+	return memcmp(s1, s2, elem_count * elem_size);
+@@pp_else@@
+	/* Complicated case: we must compare elem_size-large unsigned integers,
+	 * but because host endian is LITTLE, we can't just compare bytes  from
+	 * lowest address -> highest address (because the most significant byte
+	 * comes last in a LITTLE-ENDIAN data-word) */
+	while (elem_count--) {
+		size_t i;
+		byte_t const *s1_iter, *s2_iter;
+		s1      = (byte_t const *)s1 + elem_size;
+		s2      = (byte_t const *)s2 + elem_size;
+		s1_iter = (byte_t const *)s1;
+		s2_iter = (byte_t const *)s2;
+		i = elem_size;
+		while (i--) {
+			byte_t v1, v2;
+			v1 = *--s1_iter;
+			v2 = *--s2_iter;
+			if (v1 != v2) {
+@@pp_if __SIZEOF_INT__ >= 2@@
+				return (int)(unsigned int)v1 -
+				       (int)(unsigned int)v2;
+@@pp_else@@
+				return v1 < v2 ? -1 : 1;
+@@pp_endif@@
+			}
+		}
+	}
+	return 0;
+@@pp_endif@@
+}
+
 
 
 @@>> memcpyc(3)
@@ -8137,6 +8214,8 @@ __SYSDECL_BEGIN
 
 #if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS) && defined(__HYBRID_PP_VA_OVERLOAD)
 /* In C, we can use argument-count overload macros to implement these overloads:
+ * >> int memcmp(void const *s1, void const *s2, size_t num_bytes);
+ * >> int memcmp(void const *s1, void const *s2, size_t elem_count, size_t elem_size);
  * >> void *memcpy(void *dst, void const *src, size_t num_bytes);
  * >> void *memcpy(void *dst, void const *src, size_t elem_count, size_t elem_size);
  * >> void *memmove(void *dst, void const *src, size_t num_bytes);
@@ -8175,6 +8254,7 @@ __SYSDECL_BEGIN
 #endif /* ... */
 #endif /* __USE_MISC */
 #ifdef __USE_KOS
+#define __PRIVATE_memcmp_4  memcmpc
 #define __PRIVATE_memcpy_4  memcpyc
 #define __PRIVATE_memmove_4 memmovec
 #ifdef __USE_GNU
@@ -8184,20 +8264,25 @@ __SYSDECL_BEGIN
 __SYSDECL_END
 #include <libc/string.h>
 __SYSDECL_BEGIN
+#define __PRIVATE_memcmp_4  __libc_memcmpc
 #define __PRIVATE_memcpy_4  __libc_memcpyc
 #define __PRIVATE_memmove_4 __libc_memmovec
 #ifdef __USE_GNU
 #define __PRIVATE_mempcpy_4 __libc_mempcpyc
 #endif /* __USE_GNU */
 #endif /* !__USE_KOS */
+#define __PRIVATE_memcmp_3  (memcmp)
 #define __PRIVATE_memcpy_3  (memcpy)
 #define __PRIVATE_memmove_3 (memmove)
+#undef memcmp
 #undef memcpy
 #undef memmove
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define memcmp(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memcmp_, (__VA_ARGS__))(__VA_ARGS__)
 #define memcpy(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memcpy_, (__VA_ARGS__))(__VA_ARGS__)
 #define memmove(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmove_, (__VA_ARGS__))(__VA_ARGS__)
 #elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define memcmp(args...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memcmp_, (args))(args)
 #define memcpy(args...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memcpy_, (args))(args)
 #define memmove(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmove_, (args))(args)
 #endif /* ... */

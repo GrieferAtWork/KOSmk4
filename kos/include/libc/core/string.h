@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1be431e8 */
+/* HASH CRC-32:0x868a9f98 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1056,6 +1056,23 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3) __A
  * @return: * : Always re-returns `dst' */
 #define __libc_core_memmovedown __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedown)
 #endif /* !... */
+#ifdef __CRT_HAVE_memcmpc
+#include <hybrid/typecore.h>
+/* >> memcmpc(3)
+ * Compare up to `elem_count' `elem_size'-bytes-large unsigned integers
+ * from  the 2 given  buffers. If all are  identical, return `0'. Else:
+ *  - return `< 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] < (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]'
+ *  - return `> 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] > (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]' */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__libc_core_memcmpc,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcmpc,(__s1,__s2,__elem_count,__elem_size))
+#else /* __CRT_HAVE_memcmpc */
+#include <libc/local/string/memcmpc.h>
+/* >> memcmpc(3)
+ * Compare up to `elem_count' `elem_size'-bytes-large unsigned integers
+ * from  the 2 given  buffers. If all are  identical, return `0'. Else:
+ *  - return `< 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] < (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]'
+ *  - return `> 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] > (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]' */
+#define __libc_core_memcmpc __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpc)
+#endif /* !__CRT_HAVE_memcmpc */
 #ifdef __CRT_HAVE_memcpyc
 #include <hybrid/typecore.h>
 /* >> memcpyc(3)

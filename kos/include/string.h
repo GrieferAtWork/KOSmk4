@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55c275e0 */
+/* HASH CRC-32:0x917c047e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -906,6 +906,40 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strerror, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #endif /* !... */
 #if defined(__cplusplus) && defined(__USE_STRING_OVERLOADS)
 extern "C++" {
+#if defined(__fast_memcmpc_defined) && defined(__CRT_HAVE_memcmpc)
+/* >> memcmpc(3)
+ * Compare up to `elem_count' `elem_size'-bytes-large unsigned integers
+ * from  the 2 given  buffers. If all are  identical, return `0'. Else:
+ *  - return `< 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] < (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]'
+ *  - return `> 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] > (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]' */
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcmpc,{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpc))(__s1, __s2, __elem_count, __elem_size); })
+#elif defined(__fast_memcmpc_defined)
+/* >> memcmpc(3)
+ * Compare up to `elem_count' `elem_size'-bytes-large unsigned integers
+ * from  the 2 given  buffers. If all are  identical, return `0'. Else:
+ *  - return `< 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] < (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]'
+ *  - return `> 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] > (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]' */
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL memcmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpc))(__s1, __s2, __elem_count, __elem_size); }
+#elif defined(__CRT_HAVE_memcmpc)
+/* >> memcmpc(3)
+ * Compare up to `elem_count' `elem_size'-bytes-large unsigned integers
+ * from  the 2 given  buffers. If all are  identical, return `0'. Else:
+ *  - return `< 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] < (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]'
+ *  - return `> 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] > (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]' */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcmpc,(__s1,__s2,__elem_count,__elem_size))
+#else /* ... */
+} /* extern "C++" */
+__NAMESPACE_STD_END
+#include <libc/local/string/memcmpc.h>
+__NAMESPACE_STD_BEGIN
+extern "C++" {
+/* >> memcmpc(3)
+ * Compare up to `elem_count' `elem_size'-bytes-large unsigned integers
+ * from  the 2 given  buffers. If all are  identical, return `0'. Else:
+ *  - return `< 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] < (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]'
+ *  - return `> 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] > (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]' */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL memcmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpc))(__s1, __s2, __elem_count, __elem_size); }
+#endif /* !... */
 #if defined(__fast_memcpyc_defined) && defined(__CRT_HAVE_memcpyc)
 /* >> memcpyc(3)
  * Copy memory between non-overlapping memory blocks.
@@ -5761,6 +5795,36 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3) __A
  * @return: * : Always re-returns `dst' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(memmovedown, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3) __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memmovedown)(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmovedown))(__dst, __src, __n_bytes); })
 #endif /* !... */
+#if defined(__fast_memcmpc_defined) && defined(__CRT_HAVE_memcmpc)
+/* >> memcmpc(3)
+ * Compare up to `elem_count' `elem_size'-bytes-large unsigned integers
+ * from  the 2 given  buffers. If all are  identical, return `0'. Else:
+ *  - return `< 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] < (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]'
+ *  - return `> 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] > (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]' */
+__CEIDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,memcmpc,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),{ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpc))(__s1, __s2, __elem_count, __elem_size); })
+#elif defined(__fast_memcmpc_defined)
+/* >> memcmpc(3)
+ * Compare up to `elem_count' `elem_size'-bytes-large unsigned integers
+ * from  the 2 given  buffers. If all are  identical, return `0'. Else:
+ *  - return `< 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] < (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]'
+ *  - return `> 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] > (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]' */
+__FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL memcmpc)(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpc))(__s1, __s2, __elem_count, __elem_size); }
+#elif defined(__CRT_HAVE_memcmpc)
+/* >> memcmpc(3)
+ * Compare up to `elem_count' `elem_size'-bytes-large unsigned integers
+ * from  the 2 given  buffers. If all are  identical, return `0'. Else:
+ *  - return `< 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] < (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]'
+ *  - return `> 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] > (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]' */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,memcmpc,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),(__s1,__s2,__elem_count,__elem_size))
+#else /* ... */
+#include <libc/local/string/memcmpc.h>
+/* >> memcmpc(3)
+ * Compare up to `elem_count' `elem_size'-bytes-large unsigned integers
+ * from  the 2 given  buffers. If all are  identical, return `0'. Else:
+ *  - return `< 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] < (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]'
+ *  - return `> 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] > (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(memcmpc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL memcmpc)(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpc))(__s1, __s2, __elem_count, __elem_size); })
+#endif /* !... */
 #if defined(__fast_memcpyc_defined) && defined(__CRT_HAVE_memcpyc)
 /* >> memcpyc(3)
  * Copy memory between non-overlapping memory blocks.
@@ -8458,6 +8522,8 @@ __SYSDECL_BEGIN
 
 #if !defined(__cplusplus) && defined(__USE_STRING_OVERLOADS) && defined(__HYBRID_PP_VA_OVERLOAD)
 /* In C, we can use argument-count overload macros to implement these overloads:
+ * >> int memcmp(void const *s1, void const *s2, size_t num_bytes);
+ * >> int memcmp(void const *s1, void const *s2, size_t elem_count, size_t elem_size);
  * >> void *memcpy(void *dst, void const *src, size_t num_bytes);
  * >> void *memcpy(void *dst, void const *src, size_t elem_count, size_t elem_size);
  * >> void *memmove(void *dst, void const *src, size_t num_bytes);
@@ -8496,6 +8562,7 @@ __SYSDECL_BEGIN
 #endif /* ... */
 #endif /* __USE_MISC */
 #ifdef __USE_KOS
+#define __PRIVATE_memcmp_4  memcmpc
 #define __PRIVATE_memcpy_4  memcpyc
 #define __PRIVATE_memmove_4 memmovec
 #ifdef __USE_GNU
@@ -8505,20 +8572,25 @@ __SYSDECL_BEGIN
 __SYSDECL_END
 #include <libc/string.h>
 __SYSDECL_BEGIN
+#define __PRIVATE_memcmp_4  __libc_memcmpc
 #define __PRIVATE_memcpy_4  __libc_memcpyc
 #define __PRIVATE_memmove_4 __libc_memmovec
 #ifdef __USE_GNU
 #define __PRIVATE_mempcpy_4 __libc_mempcpyc
 #endif /* __USE_GNU */
 #endif /* !__USE_KOS */
+#define __PRIVATE_memcmp_3  (memcmp)
 #define __PRIVATE_memcpy_3  (memcpy)
 #define __PRIVATE_memmove_3 (memmove)
+#undef memcmp
 #undef memcpy
 #undef memmove
 #ifdef __PREPROCESSOR_HAVE_VA_ARGS
+#define memcmp(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memcmp_, (__VA_ARGS__))(__VA_ARGS__)
 #define memcpy(...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memcpy_, (__VA_ARGS__))(__VA_ARGS__)
 #define memmove(...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmove_, (__VA_ARGS__))(__VA_ARGS__)
 #elif defined(__PREPROCESSOR_HAVE_NAMED_VA_ARGS)
+#define memcmp(args...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memcmp_, (args))(args)
 #define memcpy(args...)  __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memcpy_, (args))(args)
 #define memmove(args...) __HYBRID_PP_VA_OVERLOAD(__PRIVATE_memmove_, (args))(args)
 #endif /* ... */

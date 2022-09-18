@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5f8d4c1 */
+/* HASH CRC-32:0xd906a431 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,6 +44,7 @@ local funcs = {
 	"memmovec(dst, src, elem_count, elem_size)",
 	"mempcpyc(dst, src, elem_count, elem_size)",
 	"memcpyc(dst, src, elem_count, elem_size)",
+	"memcmpc(s1, s2, elem_count, elem_size)",
 	"mempatq(dst, pattern, n_bytes)",
 	"mempatl(dst, pattern, n_bytes)",
 	"mempatw(dst, pattern, n_bytes)",
@@ -141,6 +142,9 @@ for (local f: funcs) {
 #ifdef __fast_memcpyc_defined
 #define libc_memcpyc(dst, src, elem_count, elem_size) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyc))(dst, src, elem_count, elem_size)
 #endif /* __fast_memcpyc_defined */
+#ifdef __fast_memcmpc_defined
+#define libc_memcmpc(s1, s2, elem_count, elem_size) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpc))(s1, s2, elem_count, elem_size)
+#endif /* __fast_memcmpc_defined */
 #ifdef __fast_mempatq_defined
 #define libc_mempatq(dst, pattern, n_bytes) (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempatq))(dst, pattern, n_bytes)
 #endif /* __fast_mempatq_defined */
@@ -1644,6 +1648,20 @@ INTDEF ATTR_LEAF ATTR_RETNONNULL ATTR_INS(2, 3) ATTR_OUTS(1, 3) NONNULL((1, 2)) 
  * Move memory between potentially overlapping memory blocks (assumes that `dst <= src || !n_bytes')
  * @return: * : Always re-returns `dst' */
 INTDEF ATTR_LEAF ATTR_RETNONNULL ATTR_INS(2, 3) ATTR_OUTS(1, 3) NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_memmovedown)(void *dst, void const *src, size_t n_bytes);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> memcmpc(3)
+ * Compare up to `elem_count' `elem_size'-bytes-large unsigned integers
+ * from  the 2 given  buffers. If all are  identical, return `0'. Else:
+ *  - return `< 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] < (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]'
+ *  - return `> 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] > (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]' */
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_memcmpc)(void const *s1, void const *s2, size_t elem_count, size_t elem_size);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+/* >> memcmpc(3)
+ * Compare up to `elem_count' `elem_size'-bytes-large unsigned integers
+ * from  the 2 given  buffers. If all are  identical, return `0'. Else:
+ *  - return `< 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] < (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]'
+ *  - return `> 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] > (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]' */
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBCCALL libc_memcmpc)(void const *s1, void const *s2, size_t elem_count, size_t elem_size);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> memcpyc(3)
  * Copy memory between non-overlapping memory blocks.

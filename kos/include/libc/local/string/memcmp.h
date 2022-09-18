@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85c0cc1f */
+/* HASH CRC-32:0x651887c9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,9 +29,18 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcmp))(void const *__s1, void const
 	__BYTE_TYPE__ *__p2 = (__BYTE_TYPE__ *)__s2;
 	__BYTE_TYPE__ __v1, __v2;
 	__v1 = __v2 = 0;
+#if __SIZEOF_INT__ >= 2
 	while (__n_bytes-- && ((__v1 = *__p1++) == (__v2 = *__p2++)))
 		;
 	return (int)__v1 - (int)__v2;
+#else /* __SIZEOF_INT__ >= 2 */
+	while (__n_bytes--) {
+		if ((__v1 = *__p1++) != (__v2 = *__p2++)) {
+			return __v1 < __v2 ? -1 : 1;
+		}
+	}
+	return 0;
+#endif /* __SIZEOF_INT__ < 2 */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_memcmp_defined

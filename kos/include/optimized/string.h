@@ -9587,6 +9587,55 @@ __NOTHROW_NCX(__LIBC_FAST_NAME(mempatq))(void *__restrict __dst,
 
 
 
+#ifndef __fast_memcmpc_defined
+#define __fast_memcmpc_defined
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
+__NOTHROW_NCX(__LIBC_FAST_NAME(memcmpc))(void const *__s1,
+                                         void const *__s2,
+                                         __SIZE_TYPE__ __elem_count,
+                                         __SIZE_TYPE__ __elem_size) {
+	if __untraced(__builtin_constant_p(__elem_size)) {
+		switch __untraced(__elem_size) {
+		case 1: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))(__s1, __s2, __elem_count);
+		case 2: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpw))(__s1, __s2, __elem_count);
+		case 4: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpl))(__s1, __s2, __elem_count);
+		case 8: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpq))(__s1, __s2, __elem_count);
+		default: break;
+		}
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+		if __untraced(__elem_size >= 8 && (__elem_size & 7) == 0)
+			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpq))(__s1, __s2, __elem_count * (__elem_size / 8));
+		if __untraced(__elem_size >= 4 && (__elem_size & 3) == 0)
+			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpl))(__s1, __s2, __elem_count * (__elem_size / 4));
+		if __untraced(__elem_size >= 2 && (__elem_size & 1) == 0)
+			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpw))(__s1, __s2, __elem_count * (__elem_size / 2));
+#endif /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	}
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	if __untraced(__builtin_constant_p(__elem_count)) {
+		switch __untraced(__elem_count) {
+		case 1: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))(__s1, __s2, __elem_size);
+		case 2: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpw))(__s1, __s2, __elem_size);
+		case 4: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpl))(__s1, __s2, __elem_size);
+		case 8: return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpq))(__s1, __s2, __elem_size);
+		default: break;
+		}
+		if __untraced(__elem_count >= 8 && (__elem_count & 7) == 0)
+			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpq))(__s1, __s2, __elem_size * (__elem_count / 8));
+		if __untraced(__elem_count >= 4 && (__elem_count & 3) == 0)
+			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpl))(__s1, __s2, __elem_size * (__elem_count / 4));
+		if __untraced(__elem_count >= 2 && (__elem_count & 1) == 0)
+			return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpw))(__s1, __s2, __elem_size * (__elem_count / 2));
+	}
+#endif /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))(__s1, __s2, __elem_count * __elem_size);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	return __libc_core_memcmpc(__s1, __s2, __elem_count, __elem_size);
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+}
+#endif /* !__fast_memcmpc_defined */
+
 #ifdef __ARCH_HAVE_UNALIGNED_MEMORY_ACCESS
 #ifdef __UINT64_TYPE__
 #define __DEFINE_FAST_MEMCPYC_FUNCTION(memcpyc, memcpy, memcpyw, memcpyl, memcpyq, __restrict, noop_return) \

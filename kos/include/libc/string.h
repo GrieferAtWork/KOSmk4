@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1269ef98 */
+/* HASH CRC-32:0xa2f11084 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -542,6 +542,21 @@
  * @return: * : Always re-returns `dst' */
 #define __libc_memmovedown __libc_core_memmovedown
 #endif /* !__fast_memmovedown_defined */
+#ifdef __fast_memcmpc_defined
+/* >> memcmpc(3)
+ * Compare up to `elem_count' `elem_size'-bytes-large unsigned integers
+ * from  the 2 given  buffers. If all are  identical, return `0'. Else:
+ *  - return `< 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] < (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]'
+ *  - return `> 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] > (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]' */
+#define __libc_memcmpc (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpc))
+#else /* __fast_memcmpc_defined */
+/* >> memcmpc(3)
+ * Compare up to `elem_count' `elem_size'-bytes-large unsigned integers
+ * from  the 2 given  buffers. If all are  identical, return `0'. Else:
+ *  - return `< 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] < (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]'
+ *  - return `> 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] > (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]' */
+#define __libc_memcmpc __libc_core_memcmpc
+#endif /* !__fast_memcmpc_defined */
 #ifdef __fast_memcpyc_defined
 /* >> memcpyc(3)
  * Copy memory between non-overlapping memory blocks.

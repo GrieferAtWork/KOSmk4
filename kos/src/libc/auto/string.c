@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x253ae4d4 */
+/* HASH CRC-32:0x86e66e55 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -200,9 +200,18 @@ NOTHROW_NCX(LIBCCALL libc_memcmp)(void const *s1,
 	byte_t *p2 = (byte_t *)s2;
 	byte_t v1, v2;
 	v1 = v2 = 0;
+#if __SIZEOF_INT__ >= 2
 	while (n_bytes-- && ((v1 = *p1++) == (v2 = *p2++)))
 		;
 	return (int)v1 - (int)v2;
+#else /* __SIZEOF_INT__ >= 2 */
+	while (n_bytes--) {
+		if ((v1 = *p1++) != (v2 = *p2++)) {
+			return v1 < v2 ? -1 : 1;
+		}
+	}
+	return 0;
+#endif /* __SIZEOF_INT__ < 2 */
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCMP */
 #ifndef LIBC_ARCH_HAVE_MEMCHR
@@ -4361,6 +4370,70 @@ NOTHROW_NCX(LIBCCALL libc_memmovedown)(void *dst,
 	return dst;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMMOVEDOWN */
+#ifndef LIBC_ARCH_HAVE_MEMCMPC
+#include <hybrid/byteorder.h>
+/* >> memcmpc(3)
+ * Compare up to `elem_count' `elem_size'-bytes-large unsigned integers
+ * from  the 2 given  buffers. If all are  identical, return `0'. Else:
+ *  - return `< 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] < (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]'
+ *  - return `> 0' if `(UNSIGNED NBYTES(elem_size))s1[FIRST_MISSMATCH] > (UNSIGNED NBYTES(elem_size))s2[FIRST_MISSMATCH]' */
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
+NOTHROW_NCX(LIBCCALL libc_memcmpc)(void const *s1,
+                                   void const *s2,
+                                   size_t elem_count,
+                                   size_t elem_size) {
+	switch (elem_size) {
+
+	case 1:
+		return libc_memcmp(s1, s2, elem_count);
+
+	case 2:
+		return libc_memcmpw(s1, s2, elem_count);
+
+	case 4:
+		return libc_memcmpl(s1, s2, elem_count);
+
+#ifdef __UINT64_TYPE__
+	case 8:
+		return libc_memcmpq(s1, s2, elem_count);
+#endif /* __UINT64_TYPE__ */
+
+	default:
+		break;
+	}
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+	return libc_memcmp(s1, s2, elem_count * elem_size);
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+	/* Complicated case: we must compare elem_size-large unsigned integers,
+	 * but because host endian is LITTLE, we can't just compare bytes  from
+	 * lowest address -> highest address (because the most significant byte
+	 * comes last in a LITTLE-ENDIAN data-word) */
+	while (elem_count--) {
+		size_t i;
+		byte_t const *s1_iter, *s2_iter;
+		s1      = (byte_t const *)s1 + elem_size;
+		s2      = (byte_t const *)s2 + elem_size;
+		s1_iter = (byte_t const *)s1;
+		s2_iter = (byte_t const *)s2;
+		i = elem_size;
+		while (i--) {
+			byte_t v1, v2;
+			v1 = *--s1_iter;
+			v2 = *--s2_iter;
+			if (v1 != v2) {
+#if __SIZEOF_INT__ >= 2
+				return (int)(unsigned int)v1 -
+				       (int)(unsigned int)v2;
+#else /* __SIZEOF_INT__ >= 2 */
+				return v1 < v2 ? -1 : 1;
+#endif /* __SIZEOF_INT__ < 2 */
+			}
+		}
+	}
+	return 0;
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
+}
+#endif /* !LIBC_ARCH_HAVE_MEMCMPC */
 #ifndef __KERNEL__
 /* >> memcpyc(3)
  * Copy memory between non-overlapping memory blocks.
@@ -7420,6 +7493,9 @@ DEFINE_PUBLIC_ALIAS(memmoveup, libc_memmoveup);
 #ifndef LIBC_ARCH_HAVE_MEMMOVEDOWN
 DEFINE_PUBLIC_ALIAS(memmovedown, libc_memmovedown);
 #endif /* !LIBC_ARCH_HAVE_MEMMOVEDOWN */
+#ifndef LIBC_ARCH_HAVE_MEMCMPC
+DEFINE_PUBLIC_ALIAS(memcmpc, libc_memcmpc);
+#endif /* !LIBC_ARCH_HAVE_MEMCMPC */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(memcpyc, libc_memcpyc);
 DEFINE_PUBLIC_ALIAS(mempcpyc, libc_mempcpyc);
