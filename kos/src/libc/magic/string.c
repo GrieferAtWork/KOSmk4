@@ -4189,60 +4189,52 @@ int memcmpb([[in(n_bytes * 1), aligned(1)]] void const *s1,
             [[in(n_bytes * 1), aligned(1)]] void const *s2,
             $size_t n_bytes) = memcmp;
 
-%(auto_source){
-#if !defined(LIBC_ARCH_HAVE_MEMCMPW) && !defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL) && __SIZEOF_INT__ <= 2
-DEFINE_INTERN_ALIAS(libd_wmemcmp, libc_memcmpw);
-#endif /* !LIBC_ARCH_HAVE_MEMCMPW && !__KERNEL__ && __LIBCCALL_IS_LIBDCALL && __SIZEOF_INT__ <= 2 */
-}
-
 @@Compare memory buffers and return the difference of the first non-matching word
 [[libc, kernel, pure, wunused, decl_include("<hybrid/typecore.h>")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INT__ >= 2), alias("wmemcmp")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")defined(__LIBCCALL_IS_LIBDCALL) && __SIZEOF_INT__ >= 2), alias("DOS$wmemcmp")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL) && __SIZEOF_INT__ <= 2), kos_export_as("DOS$wmemcmp")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL) && __SIZEOF_INT__ <= 2), dos_export_as("DOS$wmemcmp")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), alias("wmemcmp")]]
+[[if(defined(__LIBCCALL_IS_LIBDCALL)), alias("DOS$wmemcmp")]]
+[[if(!defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)), kos_export_as("DOS$wmemcmp")]]
+[[if(!defined(__KERNEL__) && !defined(__LIBCCALL_IS_LIBDCALL)), dos_export_as("DOS$wmemcmp")]]
 [[if_fast_defined(memcmpw), preferred_fast_extern_inline("memcmpw", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpw@))(s1, s2, n_words); })]]
-[[if_fast_defined(memcmpw), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INT__ >= 2), preferred_fast_extern_inline("wmemcmp", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpw@))(s1, s2, n_words); })]]
-[[if_fast_defined(memcmpw), if($extended_include_prefix("<hybrid/typecore.h>")defined(__LIBCCALL_IS_LIBDCALL) && __SIZEOF_INT__ >= 2), preferred_fast_extern_inline("DOS$wmemcmp", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpw@))(s1, s2, n_words); })]]
+[[if_fast_defined(memcmpw), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 2), preferred_fast_extern_inline("wmemcmp", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpw@))(s1, s2, n_words); })]]
+[[if_fast_defined(memcmpw), if(defined(__LIBCCALL_IS_LIBDCALL)), preferred_fast_extern_inline("DOS$wmemcmp", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpw@))(s1, s2, n_words); })]]
 [[if_fast_defined(memcmpw), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpw@))(s1, s2, n_words); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCMPW))]]
-$int16_t memcmpw([[in(n_words * 2), aligned(2)]] void const *s1,
-                 [[in(n_words * 2), aligned(2)]] void const *s2, $size_t n_words) {
-	s16 const *p1 = (s16 const *)s1;
-	s16 const *p2 = (s16 const *)s2;
-	s16 v1, v2;
-	v1 = v2 = 0;
-	while (n_words-- && ((v1 = *p1++) == (v2 = *p2++)))
-		;
-	return v1 - v2;
-}
-
-%(auto_source){
-#if !defined(LIBC_ARCH_HAVE_MEMCMPL) && !defined(__KERNEL__) && __SIZEOF_INT__ <= 4
-DEFINE_INTERN_ALIAS(libc_wmemcmp, libc_memcmpl);
-#endif /* !LIBC_ARCH_HAVE_MEMCMPL && !__KERNEL__ && __SIZEOF_INT__ <= 4 */
+int memcmpw([[in(n_words * 2), aligned(2)]] void const *s1,
+            [[in(n_words * 2), aligned(2)]] void const *s2, $size_t n_words) {
+	u16 const *p1 = (u16 const *)s1;
+	u16 const *p2 = (u16 const *)s2;
+	while (n_words--) {
+		u16 v1, v2;
+		if ((v1 = *p1++) != (v2 = *p2++)) {
+			return v1 < v2 ? -1 : 1;
+		}
+	}
+	return 0;
 }
 
 @@Compare memory buffers and return the difference of the first non-matching dword
 [[libc, kernel, pure, wunused, decl_include("<hybrid/typecore.h>")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INT__ >= 4), alias("wmemcmp")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")defined(__LIBCCALL_IS_LIBKCALL) && __SIZEOF_INT__ >= 4), alias("KOS$wmemcmp")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")!defined(__KERNEL__) && __SIZEOF_INT__ <= 4), kos_export_as("wmemcmp")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), alias("wmemcmp")]]
+[[if(defined(__LIBCCALL_IS_LIBKCALL)), alias("KOS$wmemcmp")]]
+[[if(!defined(__KERNEL__)), kos_export_as("wmemcmp")]]
 [[if_fast_defined(memcmpl), preferred_fast_extern_inline("memcmpl", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpl@))(s1, s2, n_dwords); })]]
-[[if_fast_defined(memcmpl), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4 && __SIZEOF_INT__ >= 4), preferred_fast_extern_inline("wmemcmp", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpl@))(s1, s2, n_dwords); })]]
-[[if_fast_defined(memcmpl), if($extended_include_prefix("<hybrid/typecore.h>")defined(__LIBCCALL_IS_LIBKCALL) && __SIZEOF_INT__ >= 4), preferred_fast_extern_inline("KOS$wmemcmp", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpl@))(s1, s2, n_dwords); })]]
+[[if_fast_defined(memcmpl), if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_WCHAR_T__ == 4), preferred_fast_extern_inline("wmemcmp", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpl@))(s1, s2, n_dwords); })]]
+[[if_fast_defined(memcmpl), if(defined(__LIBCCALL_IS_LIBKCALL)), preferred_fast_extern_inline("KOS$wmemcmp", { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpl@))(s1, s2, n_dwords); })]]
 [[if_fast_defined(memcmpl), preferred_fast_forceinline({ return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(@memcmpl@))(s1, s2, n_dwords); })]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCMPL))]]
-$int32_t memcmpl([[in(n_dwords * 4), aligned(4)]] void const *s1,
-                 [[in(n_dwords * 4), aligned(4)]] void const *s2,
-                 $size_t n_dwords) {
-	s32 const *p1 = (s32 const *)s1;
-	s32 const *p2 = (s32 const *)s2;
-	s32 v1, v2;
-	v1 = v2 = 0;
-	while (n_dwords-- && ((v1 = *p1++) == (v2 = *p2++)))
-		;
-	return v1 - v2;
+int memcmpl([[in(n_dwords * 4), aligned(4)]] void const *s1,
+            [[in(n_dwords * 4), aligned(4)]] void const *s2,
+            $size_t n_dwords) {
+	u32 const *p1 = (u32 const *)s1;
+	u32 const *p2 = (u32 const *)s2;
+	while (n_dwords--) {
+		u32 v1, v2;
+		if ((v1 = *p1++) != (v2 = *p2++)) {
+			return v1 < v2 ? -1 : 1;
+		}
+	}
+	return 0;
 }
 
 @@Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found.
@@ -4795,14 +4787,17 @@ mempsetq:([[out(n_qwords * 8), aligned(8)]] void *__restrict dst,
 @@Compare memory buffers and return the difference of the first non-matching qword
 [[preferred_fastbind, libc, kernel, pure, wunused, decl_include("<hybrid/typecore.h>")]]
 [[crt_kos_impl_requires(!defined(LIBC_ARCH_HAVE_MEMCMPQ))]]
-$int64_t memcmpq([[in(n_qwords * 8), aligned(8)]] void const *s1,
-                 [[in(n_qwords * 8), aligned(8)]] void const *s2, $size_t n_dwords) {
-	s64 const *p1 = (s64 const *)s1;
-	s64 const *p2 = (s64 const *)s2;
-	s64 v1, v2;
-	v1 = v2 = 0;
-	while (n_dwords-- && ((v1 = *p1++) == (v2 = *p2++)));
-	return v1 - v2;
+int memcmpq([[in(n_qwords * 8), aligned(8)]] void const *s1,
+            [[in(n_qwords * 8), aligned(8)]] void const *s2, $size_t n_dwords) {
+	u64 const *p1 = (u64 const *)s1;
+	u64 const *p2 = (u64 const *)s2;
+	while (n_dwords--) {
+		u64 v1, v2;
+		if ((v1 = *p1++) != (v2 = *p2++)) {
+			return v1 < v2 ? -1 : 1;
+		}
+	}
+	return 0;
 }
 
 @@Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found.

@@ -93,20 +93,6 @@
 #ifdef __x86_64__
 #define LIBC_ARCH_HAVE_MEMCMPQ 1
 #endif /* __x86_64__ */
-#ifndef __KERNEL__
-#ifndef __x86_64__
-#define LIBC_ARCH_HAVE_C16MEMCMP 1 /* Alias for `memcmpw'. Works, because memcmpw returns through %eax,
-                                    * rather than %ax,  meaning that even  though the public  prototype
-                                    * might indicate a 16-bit return value, that is only partly true as
-                                    * the user normally only sees a truncation.
-                                    * But because wmemcmp(3)  (and thus c16memcmp(3))  return `int',  this
-                                    * alias  would  normally  only work  when  `sizeof(int) <= 2', meaning
-                                    * that this isn't something that can normally be done unconditionally. */
-#else /* !__x86_64__ */
-/* `LIBC_ARCH_HAVE_C16MEMCMP' is not implemented because of msabi64! */
-#endif /* __x86_64__ */
-#define LIBC_ARCH_HAVE_C32MEMCMP 1 /* Alias for `memcmpl', because on i386/x86_64 `sizeof(int) <= 4' */
-#endif /* !__KERNEL__ */
 
 /* bcmp() */
 #define LIBC_ARCH_HAVE_BCMP  1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c32636f */
+/* HASH CRC-32:0x5949d79d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3998,7 +3998,6 @@
 #define __CRT_HAVE_DOS$wlchown
 #define __CRT_HAVE_DOS$wlink
 #define __CRT_HAVE_DOS$wlinkat
-#define __CRT_HAVE_DOS$wmemcmp
 #define __CRT_HAVE_DOS$wmemcpy_s
 #define __CRT_HAVE_DOS$wmemmove_s
 #define __CRT_HAVE_DOS$wmkdir
@@ -8432,7 +8431,6 @@
 #define __CRT_HAVE_wlchown
 #define __CRT_HAVE_wlink
 #define __CRT_HAVE_wlinkat
-#define __CRT_HAVE_wmemcmp
 #define __CRT_HAVE_wmemcpy_s
 #define __CRT_HAVE_wmemmove_s
 #define __CRT_HAVE_wmkdir

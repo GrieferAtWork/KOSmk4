@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53aff696 */
+/* HASH CRC-32:0xab423f1d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,12 +25,6 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "../user/wchar.h"
-#if !defined(LIBC_ARCH_HAVE_C16MEMCMP) && (!defined(__LIBCCALL_IS_LIBDCALL) || __SIZEOF_INT__ > 2)
-#include "string.h"
-#endif /* !LIBC_ARCH_HAVE_C16MEMCMP && (!__LIBCCALL_IS_LIBDCALL || __SIZEOF_INT__ > 2) */
-#if !defined(LIBC_ARCH_HAVE_C32MEMCMP) && __SIZEOF_INT__ > 4
-#include "string.h"
-#endif /* !LIBC_ARCH_HAVE_C32MEMCMP && __SIZEOF_INT__ > 4 */
 #include "format-printer.h"
 #include "parts.wchar.format-printer.h"
 #include "../user/stdio.h"
@@ -433,36 +427,6 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED ATTR
 NOTHROW_NCX(LIBCCALL libc_mbsinit)(mbstate_t const *mbs) {
 	return !mbs || mbstate_isempty(mbs);
 }
-#if !defined(LIBC_ARCH_HAVE_C16MEMCMP) && (!defined(__LIBCCALL_IS_LIBDCALL) || __SIZEOF_INT__ > 2)
-/* >> wmemcmp(3) */
-INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
-NOTHROW_NCX(LIBDCALL libd_wmemcmp)(char16_t const *s1,
-                                   char16_t const *s2,
-                                   size_t num_chars) {
-
-	return (int)libc_memcmpw(s1, s2, num_chars);
-
-
-
-
-
-}
-#endif /* !LIBC_ARCH_HAVE_C16MEMCMP && (!__LIBCCALL_IS_LIBDCALL || __SIZEOF_INT__ > 2) */
-#if !defined(LIBC_ARCH_HAVE_C32MEMCMP) && __SIZEOF_INT__ > 4
-/* >> wmemcmp(3) */
-INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.mbs") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
-NOTHROW_NCX(LIBKCALL libc_wmemcmp)(char32_t const *s1,
-                                   char32_t const *s2,
-                                   size_t num_chars) {
-
-
-
-	return (int)libc_memcmpl(s1, s2, num_chars);
-
-
-
-}
-#endif /* !LIBC_ARCH_HAVE_C32MEMCMP && __SIZEOF_INT__ > 4 */
 /* >> wcscpy(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_RETNONNULL ATTR_IN(2) ATTR_OUT(1) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcscpy)(char16_t *__restrict buf,
@@ -6504,14 +6468,6 @@ DEFINE_PUBLIC_ALIAS(wcstoul, libc_wcstoul);
 DEFINE_PUBLIC_ALIAS(wcstoumax, libc_wcstoul);
 #endif /* __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__ */
 DEFINE_PUBLIC_ALIAS(mbsinit, libc_mbsinit);
-#endif /* !__KERNEL__ */
-#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C16MEMCMP) && (!defined(__LIBCCALL_IS_LIBDCALL) || __SIZEOF_INT__ > 2)
-DEFINE_PUBLIC_ALIAS(DOS$wmemcmp, libd_wmemcmp);
-#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_C16MEMCMP && (!__LIBCCALL_IS_LIBDCALL || __SIZEOF_INT__ > 2) */
-#if !defined(__KERNEL__) && !defined(LIBC_ARCH_HAVE_C32MEMCMP) && __SIZEOF_INT__ > 4
-DEFINE_PUBLIC_ALIAS(wmemcmp, libc_wmemcmp);
-#endif /* !__KERNEL__ && !LIBC_ARCH_HAVE_C32MEMCMP && __SIZEOF_INT__ > 4 */
-#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(DOS$wcscpy, libd_wcscpy);
 DEFINE_PUBLIC_ALIAS(wcscpy, libc_wcscpy);
 DEFINE_PUBLIC_ALIAS(DOS$wcscat, libd_wcscat);

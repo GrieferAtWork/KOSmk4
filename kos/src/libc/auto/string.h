@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2fdd10b */
+/* HASH CRC-32:0xa5f8d4c1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1036,16 +1036,16 @@ INTDEF ATTR_LEAF ATTR_OUT(1) uint32_t *NOTHROW_NCX(LIBDCALL libd_mempsetl)(void 
 INTDEF ATTR_LEAF ATTR_OUT(1) uint32_t *NOTHROW_NCX(LIBCCALL libc_mempsetl)(void *__restrict dst, uint32_t dword, size_t n_dwords);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Compare memory buffers and return the difference of the first non-matching word */
-INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int16_t NOTHROW_NCX(LIBDCALL libd_memcmpw)(void const *s1, void const *s2, size_t n_words);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_memcmpw)(void const *s1, void const *s2, size_t n_words);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* Compare memory buffers and return the difference of the first non-matching word */
-INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int16_t NOTHROW_NCX(LIBCCALL libc_memcmpw)(void const *s1, void const *s2, size_t n_words);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBCCALL libc_memcmpw)(void const *s1, void const *s2, size_t n_words);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Compare memory buffers and return the difference of the first non-matching dword */
-INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int32_t NOTHROW_NCX(LIBDCALL libd_memcmpl)(void const *s1, void const *s2, size_t n_dwords);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_memcmpl)(void const *s1, void const *s2, size_t n_dwords);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* Compare memory buffers and return the difference of the first non-matching dword */
-INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int32_t NOTHROW_NCX(LIBCCALL libc_memcmpl)(void const *s1, void const *s2, size_t n_dwords);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBCCALL libc_memcmpl)(void const *s1, void const *s2, size_t n_dwords);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) uint16_t *NOTHROW_NCX(LIBDCALL libd_memchrw)(void const *__restrict haystack, uint16_t needle, size_t n_words);
@@ -1236,10 +1236,10 @@ INTDEF ATTR_LEAF ATTR_OUT(1) uint64_t *NOTHROW_NCX(LIBDCALL libd_mempsetq)(void 
 INTDEF ATTR_LEAF ATTR_OUT(1) uint64_t *NOTHROW_NCX(LIBCCALL libc_mempsetq)(void *__restrict dst, uint64_t qword, size_t n_qwords);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Compare memory buffers and return the difference of the first non-matching qword */
-INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int64_t NOTHROW_NCX(LIBDCALL libd_memcmpq)(void const *s1, void const *s2, size_t n_dwords);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_memcmpq)(void const *s1, void const *s2, size_t n_dwords);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* Compare memory buffers and return the difference of the first non-matching qword */
-INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int64_t NOTHROW_NCX(LIBCCALL libc_memcmpq)(void const *s1, void const *s2, size_t n_dwords);
+INTDEF ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBCCALL libc_memcmpq)(void const *s1, void const *s2, size_t n_dwords);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* Ascendingly search for `needle', starting at `haystack'. - Return `NULL' if `needle' wasn't found. */
 INTDEF ATTR_PURE WUNUSED ATTR_IN(1) uint64_t *NOTHROW_NCX(LIBDCALL libd_memchrq)(void const *__restrict haystack, uint64_t needle, size_t n_qwords);

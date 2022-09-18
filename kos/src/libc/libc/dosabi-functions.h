@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67828b56 */
+/* HASH CRC-32:0x7d3d1782 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2717,8 +2717,8 @@ DFUN(".text.crt.dos.string.memory", libd_memsetw, libc_memsetw, TP, 3, TP, TI16,
 DFUN(".text.crt.dos.string.memory", libd_mempsetw, libc_mempsetw, TP, 3, TP, TI16, TI)
 DFUN(".text.crt.dos.string.memory", libd_memsetl, libc_memsetl, TP, 3, TP, TI32, TI)
 DFUN(".text.crt.dos.string.memory", libd_mempsetl, libc_mempsetl, TP, 3, TP, TI32, TI)
-DFUN(".text.crt.dos.string.memory", libd_memcmpw, libc_memcmpw, TI16, 3, TP, TP, TI)
-DFUN(".text.crt.dos.string.memory", libd_memcmpl, libc_memcmpl, TI32, 3, TP, TP, TI)
+DFUN(".text.crt.dos.string.memory", libd_memcmpw, libc_memcmpw, TD, 3, TP, TP, TI)
+DFUN(".text.crt.dos.string.memory", libd_memcmpl, libc_memcmpl, TD, 3, TP, TP, TI)
 DFUN(".text.crt.dos.string.memory", libd_memchrw, libc_memchrw, TP, 3, TP, TI16, TI)
 DFUN(".text.crt.dos.string.memory", libd_memchrl, libc_memchrl, TP, 3, TP, TI32, TI)
 DFUN(".text.crt.dos.string.memory", libd_memrchrw, libc_memrchrw, TP, 3, TP, TI16, TI)
@@ -2749,7 +2749,7 @@ DFUN(".text.crt.dos.string.memory", libd_mempmoveupq, libc_mempmoveupq, TP, 3, T
 DFUN(".text.crt.dos.string.memory", libd_mempmovedownq, libc_mempmovedownq, TP, 3, TP, TP, TI)
 DFUN(".text.crt.dos.string.memory", libd_memsetq, libc_memsetq, TP, 3, TP, TI64, TI)
 DFUN(".text.crt.dos.string.memory", libd_mempsetq, libc_mempsetq, TP, 3, TP, TI64, TI)
-DFUN(".text.crt.dos.string.memory", libd_memcmpq, libc_memcmpq, TI64, 3, TP, TP, TI)
+DFUN(".text.crt.dos.string.memory", libd_memcmpq, libc_memcmpq, TD, 3, TP, TP, TI)
 DFUN(".text.crt.dos.string.memory", libd_memchrq, libc_memchrq, TP, 3, TP, TI64, TI)
 DFUN(".text.crt.dos.string.memory", libd_memrchrq, libc_memrchrq, TP, 3, TP, TI64, TI)
 DFUN(".text.crt.dos.string.memory", libd_rawmemchrq, libc_rawmemchrq, TP, 2, TP, TI64)

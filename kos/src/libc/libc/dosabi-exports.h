@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b916150 */
+/* HASH CRC-32:0xc568b1f5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2847,9 +2847,7 @@ DEFINE_PUBLIC_ALIAS(DOS$wmempset, libd_mempsetw);
 DEFINE_PUBLIC_ALIAS(DOS$mempsetw, libd_mempsetw);
 DEFINE_PUBLIC_ALIAS(DOS$memsetl, libd_memsetl);
 DEFINE_PUBLIC_ALIAS(DOS$mempsetl, libd_mempsetl);
-#if __SIZEOF_INT__ <= 2
 DEFINE_PUBLIC_ALIAS(DOS$wmemcmp, libd_memcmpw);
-#endif /* __SIZEOF_INT__ <= 2 */
 DEFINE_PUBLIC_ALIAS(DOS$memcmpw, libd_memcmpw);
 DEFINE_PUBLIC_ALIAS(DOS$memcmpl, libd_memcmpl);
 DEFINE_PUBLIC_ALIAS(DOS$wmemchr, libd_memchrw);

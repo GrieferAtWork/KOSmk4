@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfbf4e993 */
+/* HASH CRC-32:0x253ae4d4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3211,40 +3211,38 @@ NOTHROW_NCX(LIBCCALL libc_mempsetl)(void *__restrict dst,
 	return (u32 *)libc_memsetl(dst, dword, n_dwords) + n_dwords;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMPSETL */
-#if !defined(LIBC_ARCH_HAVE_MEMCMPW) && !defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL) && __SIZEOF_INT__ <= 2
-DEFINE_INTERN_ALIAS(libd_wmemcmp, libc_memcmpw);
-#endif /* !LIBC_ARCH_HAVE_MEMCMPW && !__KERNEL__ && __LIBCCALL_IS_LIBDCALL && __SIZEOF_INT__ <= 2 */
 #ifndef LIBC_ARCH_HAVE_MEMCMPW
 /* Compare memory buffers and return the difference of the first non-matching word */
-INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int16_t
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc_memcmpw)(void const *s1,
                                    void const *s2,
                                    size_t n_words) {
-	s16 const *p1 = (s16 const *)s1;
-	s16 const *p2 = (s16 const *)s2;
-	s16 v1, v2;
-	v1 = v2 = 0;
-	while (n_words-- && ((v1 = *p1++) == (v2 = *p2++)))
-		;
-	return v1 - v2;
+	u16 const *p1 = (u16 const *)s1;
+	u16 const *p2 = (u16 const *)s2;
+	while (n_words--) {
+		u16 v1, v2;
+		if ((v1 = *p1++) != (v2 = *p2++)) {
+			return v1 < v2 ? -1 : 1;
+		}
+	}
+	return 0;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCMPW */
-#if !defined(LIBC_ARCH_HAVE_MEMCMPL) && !defined(__KERNEL__) && __SIZEOF_INT__ <= 4
-DEFINE_INTERN_ALIAS(libc_wmemcmp, libc_memcmpl);
-#endif /* !LIBC_ARCH_HAVE_MEMCMPL && !__KERNEL__ && __SIZEOF_INT__ <= 4 */
 #ifndef LIBC_ARCH_HAVE_MEMCMPL
 /* Compare memory buffers and return the difference of the first non-matching dword */
-INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int32_t
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc_memcmpl)(void const *s1,
                                    void const *s2,
                                    size_t n_dwords) {
-	s32 const *p1 = (s32 const *)s1;
-	s32 const *p2 = (s32 const *)s2;
-	s32 v1, v2;
-	v1 = v2 = 0;
-	while (n_dwords-- && ((v1 = *p1++) == (v2 = *p2++)))
-		;
-	return v1 - v2;
+	u32 const *p1 = (u32 const *)s1;
+	u32 const *p2 = (u32 const *)s2;
+	while (n_dwords--) {
+		u32 v1, v2;
+		if ((v1 = *p1++) != (v2 = *p2++)) {
+			return v1 < v2 ? -1 : 1;
+		}
+	}
+	return 0;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCMPL */
 #ifndef LIBC_ARCH_HAVE_MEMCHRW
@@ -3694,16 +3692,19 @@ NOTHROW_NCX(LIBCCALL libc_mempsetq)(void *__restrict dst,
 #endif /* !LIBC_ARCH_HAVE_MEMPSETQ */
 #ifndef LIBC_ARCH_HAVE_MEMCMPQ
 /* Compare memory buffers and return the difference of the first non-matching qword */
-INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int64_t
+INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc_memcmpq)(void const *s1,
                                    void const *s2,
                                    size_t n_dwords) {
-	s64 const *p1 = (s64 const *)s1;
-	s64 const *p2 = (s64 const *)s2;
-	s64 v1, v2;
-	v1 = v2 = 0;
-	while (n_dwords-- && ((v1 = *p1++) == (v2 = *p2++)));
-	return v1 - v2;
+	u64 const *p1 = (u64 const *)s1;
+	u64 const *p2 = (u64 const *)s2;
+	while (n_dwords--) {
+		u64 v1, v2;
+		if ((v1 = *p1++) != (v2 = *p2++)) {
+			return v1 < v2 ? -1 : 1;
+		}
+	}
+	return 0;
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCMPQ */
 #ifndef LIBC_ARCH_HAVE_MEMCHRQ
@@ -7153,15 +7154,15 @@ DEFINE_PUBLIC_ALIAS(wmempset, libc_mempsetl);
 DEFINE_PUBLIC_ALIAS(mempsetl, libc_mempsetl);
 #endif /* !LIBC_ARCH_HAVE_MEMPSETL */
 #ifndef LIBC_ARCH_HAVE_MEMCMPW
-#if !defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL) && __SIZEOF_INT__ <= 2
+#if !defined(__KERNEL__) && defined(__LIBCCALL_IS_LIBDCALL)
 DEFINE_PUBLIC_ALIAS(DOS$wmemcmp, libc_memcmpw);
-#endif /* !__KERNEL__ && __LIBCCALL_IS_LIBDCALL && __SIZEOF_INT__ <= 2 */
+#endif /* !__KERNEL__ && __LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(memcmpw, libc_memcmpw);
 #endif /* !LIBC_ARCH_HAVE_MEMCMPW */
 #ifndef LIBC_ARCH_HAVE_MEMCMPL
-#if !defined(__KERNEL__) && __SIZEOF_INT__ <= 4
+#ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(wmemcmp, libc_memcmpl);
-#endif /* !__KERNEL__ && __SIZEOF_INT__ <= 4 */
+#endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(memcmpl, libc_memcmpl);
 #endif /* !LIBC_ARCH_HAVE_MEMCMPL */
 #ifndef LIBC_ARCH_HAVE_MEMCHRW
