@@ -1556,7 +1556,7 @@ PRIVATE ATTR_SECTION(".text.crt.wordexp") ATTR_PURE WUNUSED NONNULL((1, 2)) size
 NOTHROW_NCX(LIBCCALL envline_startswith)(char const *__restrict line,
                                          char const *__restrict prefix_str,
                                          size_t prefix_len) {
-	if (memcmp(line, prefix_str, prefix_len * sizeof(char)) != 0)
+	if (bcmp(line, prefix_str, prefix_len, sizeof(char)) != 0)
 		return 0;
 	return prefix_len + stroff(line + prefix_len, '=');
 }

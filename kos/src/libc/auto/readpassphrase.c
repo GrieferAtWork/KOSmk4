@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe86a07f2 */
+/* HASH CRC-32:0x8e617fba */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -188,7 +188,7 @@ again:
 		if (term.c_cc[__VSTATUS] != __VDISABLE)
 			term.c_cc[__VSTATUS] = __VDISABLE;
 #endif /* __VSTATUS */
-		if (libc_memcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
+		if (libc_bcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
 #ifdef __TCSASOFT
 			if (libc_tcsetattr(infd, __TCSAFLUSH | __TCSASOFT, &new_ios) != 0)
 				goto err_infd;
@@ -297,7 +297,7 @@ again:
 	/* Restore terminal IOS configuration */
 done_infd_oldsact_oldios:
 
-	if (libc_memcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
+	if (libc_bcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
 #ifdef __TCSASOFT
 		(void)libc_tcsetattr(infd, __TCSAFLUSH | __TCSASOFT, &old_ios);
 #else /* __TCSASOFT */
@@ -377,7 +377,7 @@ err_infd_oldsact_oldios:
 err_infd_oldios:
 	/* Restore terminal IOS configuration */
 
-	if (libc_memcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
+	if (libc_bcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
 #ifdef __TCSASOFT
 		(void)libc_tcsetattr(infd, __TCSAFLUSH | __TCSASOFT, &old_ios);
 #else /* __TCSASOFT */

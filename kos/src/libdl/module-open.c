@@ -532,9 +532,7 @@ DlModule_OpenFilenameInPathWithDollar(char const *__restrict path, size_t pathle
 		symname_len = (size_t)(symname_end - symname_start);
 #define SYMNAME_EQUALS(str)                     \
 		(symname_len == COMPILER_STRLEN(str) && \
-		 memcmp(symname_start, str,             \
-		        COMPILER_STRLEN(str) *          \
-		        sizeof(char)) == 0)
+		 bcmp(symname_start, str, COMPILER_STRLEN(str), sizeof(char)) == 0)
 		if (SYMNAME_EQUALS("ORIGIN")) {
 			size_t origin_len;
 			/* Default to the origin filename of the primary application
@@ -1076,7 +1074,7 @@ DlModule_OpenFilenameAndFd(/*inherit(on_success,HEAP)*/ char *__restrict filenam
 		struct dlmodule_format *ext;
 		ext = ATOMIC_READ(dl_extensions);
 		for (; ext; ext = ext->df_next) {
-			if (memcmp(&ehdr, ext->df_magic, ext->df_magsz) != 0)
+			if (bcmp(&ehdr, ext->df_magic, ext->df_magsz) != 0)
 				continue; /* Non-matching magic. */
 			/* Found the format! */
 			result = (*ext->df_open)((byte_t const *)&ehdr, filename, fd);

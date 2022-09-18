@@ -1178,7 +1178,7 @@ format_compare_string(void *arg,
 	compare_data = (struct format_compare_data *)arg;
 	if (datalen > compare_data->len)
 		return -1; /* Json string is too long */
-	if (memcmp(compare_data->str, data, datalen) != 0)
+	if (bcmp(compare_data->str, data, datalen, sizeof(char)) != 0)
 		return -1; /* Json string isn't equal */
 	/* Consume data that has already been compared. */
 	compare_data->str += datalen;

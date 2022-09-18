@@ -130,7 +130,7 @@ libpe_GetProcAddress(DlModule *self, char const *symbol_name) {
 	size_t symbol_name_len;
 
 	/* Check for special case: don't try to link against DOS symbols */
-	if (memcmp(symbol_name, "KOS$", 4 * sizeof(char)) == 0)
+	if (bcmp(symbol_name, "KOS$", 4, sizeof(char)) == 0)
 		return dlsym(self, symbol_name + 4);
 
 	/* Firstly: try to link against "DOS$"-prefixed symbols. */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55ebc2b7 */
+/* HASH CRC-32:0xed0348b8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,19 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_bcmp_defined
+#define __local___localdep_bcmp_defined
+#ifdef __CRT_HAVE_bcmp
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_bcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),bcmp,(__s1,__s2,__n_bytes))
+#elif defined(__CRT_HAVE_memcmp)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_bcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcmp,(__s1,__s2,__n_bytes))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/memcmp.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_bcmp __LIBC_LOCAL_NAME(memcmp)
+#endif /* !... */
+#endif /* !__local___localdep_bcmp_defined */
 #ifndef __local___localdep_memchr_defined
 #define __local___localdep_memchr_defined
 #ifdef __CRT_HAVE_memchr
@@ -34,19 +47,6 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_memchr __LIBC_LOCAL_NAME(memchr)
 #endif /* !__CRT_HAVE_memchr */
 #endif /* !__local___localdep_memchr_defined */
-#ifndef __local___localdep_memcmp_defined
-#define __local___localdep_memcmp_defined
-#ifdef __CRT_HAVE_memcmp
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcmp,(__s1,__s2,__n_bytes))
-#elif defined(__CRT_HAVE___gcc_bcmp)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),__gcc_bcmp,(__s1,__s2,__n_bytes))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/string/memcmp.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_memcmp __LIBC_LOCAL_NAME(memcmp)
-#endif /* !... */
-#endif /* !__local___localdep_memcmp_defined */
 __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -65,7 +65,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmem))(void const *__haystack, __SI
 	__haystacklen -= (__needlelen - 1);
 	__marker       = *(__BYTE_TYPE__ *)__needle;
 	while ((__candidate = (__BYTE_TYPE__ *)(__NAMESPACE_LOCAL_SYM __localdep_memchr)(__haystack, __marker, __haystacklen)) != __NULLPTR) {
-		if ((__NAMESPACE_LOCAL_SYM __localdep_memcmp)(__candidate, __needle, __needlelen) == 0)
+		if ((__NAMESPACE_LOCAL_SYM __localdep_bcmp)(__candidate, __needle, __needlelen) == 0)
 			return (void *)__candidate;
 		++__candidate;
 		__haystacklen = ((__BYTE_TYPE__ *)__haystack + __haystacklen) - __candidate;

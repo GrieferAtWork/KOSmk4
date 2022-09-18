@@ -58,7 +58,7 @@ NOTHROW(KCALL initialize_cmdline)(struct kernel_commandline_option const *start,
 			/* Check if the option is present. */
 			for (i = 0, arg = kernel_driver.d_cmdline;
 			     i < kernel_driver.d_argc; ++i, arg = strend(arg) + 1) {
-				if (memcmp(arg, start->co_name, namlen * sizeof(char)) != 0)
+				if (bcmp(arg, start->co_name, namlen, sizeof(char)) != 0)
 					continue;
 				if (arg[namlen] != 0)
 					continue;
@@ -89,7 +89,7 @@ NOTHROW(KCALL initialize_cmdline)(struct kernel_commandline_option const *start,
 				optlen = (size_t)(eq - arg);
 				if (optlen != namlen)
 					continue;
-				if (memcmp(arg, start->co_name, optlen * sizeof(char)) != 0)
+				if (bcmp(arg, start->co_name, optlen, sizeof(char)) != 0)
 					continue;
 				arg += optlen + 1;
 				switch (start->co_type) {

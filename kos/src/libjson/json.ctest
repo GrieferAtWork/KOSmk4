@@ -139,7 +139,7 @@ PRIVATE void do_test_codec(byte_t const *codec) {
 		json_writer_init(&writer, &format_sprintf_printer, &ptr, JSON_WRITER_FORMAT_PRETTY);
 		EQd(JSON_ERROR_OK, json_encode(&writer, codec, &foo, NULL));
 		assertf(ptr == foo_generated + COMPILER_STRLEN(foo_pretty_expected) &&
-		        memcmp(foo_generated, foo_pretty_expected, sizeof(foo_pretty_expected) - sizeof(char)) == 0,
+		        bcmp(foo_generated, foo_pretty_expected, COMPILER_STRLEN(foo_pretty_expected), sizeof(char)) == 0,
 		        "Expected: %$q\n"
 		        "Parsed  : %$q\n",
 		        COMPILER_STRLEN(foo_pretty_expected), foo_pretty_expected,
@@ -148,7 +148,7 @@ PRIVATE void do_test_codec(byte_t const *codec) {
 		json_writer_init(&writer, &format_sprintf_printer, &ptr, JSON_WRITER_FORMAT_COMPACT);
 		EQd(JSON_ERROR_OK, json_encode(&writer, codec, &foo, NULL));
 		assertf(ptr == foo_generated + COMPILER_STRLEN(foo_compact_expected) &&
-		        memcmp(foo_generated, foo_compact_expected, sizeof(foo_compact_expected) - sizeof(char)) == 0,
+		        bcmp(foo_generated, foo_compact_expected, COMPILER_STRLEN(foo_compact_expected), sizeof(char)) == 0,
 		        "Expected: %$q\n"
 		        "Parsed  : %$q\n",
 		        COMPILER_STRLEN(foo_compact_expected), foo_compact_expected,

@@ -356,8 +356,8 @@ vga_v_setmode(struct svga_chipset *__restrict self,
 	uint8_t modeid;
 	for (modeid = 0;; ++modeid) {
 		assert(modeid <= COMPILER_LENOF(vga_modelist));
-		if (memcmp(&vga_modelist[modeid].vkm_info, mode,
-		           sizeof(struct svga_modeinfo)) == 0)
+		if (bcmp(&vga_modelist[modeid].vkm_info, mode,
+		         sizeof(struct svga_modeinfo)) == 0)
 			break;
 	}
 
@@ -391,8 +391,8 @@ ega_v_setmode(struct svga_chipset *__restrict self,
 	uint8_t modeid;
 	for (modeid = 0;; ++modeid) {
 		assert(modeid <= COMPILER_LENOF(vga_modelist));
-		if (memcmp(&vga_modelist[modeid].vkm_info, mode,
-		           sizeof(struct svga_modeinfo)) == 0)
+		if (bcmp(&vga_modelist[modeid].vkm_info, mode,
+		         sizeof(struct svga_modeinfo)) == 0)
 			break;
 	}
 

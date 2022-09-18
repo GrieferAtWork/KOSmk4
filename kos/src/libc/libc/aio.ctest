@@ -72,7 +72,7 @@ DEFINE_TEST(aio) {
 	EQss(aio_return(&aio), -1);
 	EQd(errno, EINVAL);
 
-	assertf(memcmp(buf, "test data", 9) == 0, "%$q", 9, buf);
+	assertf(bcmp(buf, "test data", 9) == 0, "%$q", 9, buf);
 }
 
 DECL_END

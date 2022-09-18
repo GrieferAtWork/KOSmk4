@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34093ff */
+/* HASH CRC-32:0x6687a737 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ NOTHROW_NCX(LIBCCALL libc_envz_entry)(char const *__restrict envz,
 	char *envz_end = (char *)(envz + envz_len);
 	namelen = libc_stroff(name, '=');
 	while (envz < envz_end) {
-		if (libc_memcmp(envz, name, namelen) == 0 &&
+		if (libc_bcmpc(envz, name, namelen, sizeof(char)) == 0 &&
 		    (envz[namelen] == '\0' || envz[namelen] == '='))
 			return (char *)envz; /* Found it! */
 		envz = libc_strend(envz) + 1;

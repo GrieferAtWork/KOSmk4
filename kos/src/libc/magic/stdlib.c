@@ -584,7 +584,7 @@ char *getenv([[in]] char const *varname) {
 		size_t namelen = strlen(varname);
 @@pp_ifdef __OPTIMIZE_SIZE__@@
 		for (; (result = *envp) != NULL; ++envp) {
-			if (memcmp(result, varname, namelen * sizeof(char)) != 0)
+			if (bcmpc(result, varname, namelen, sizeof(char)) != 0)
 				continue;
 			if (result[namelen] != '=')
 				continue;
@@ -630,7 +630,7 @@ char *getenv([[in]] char const *varname) {
 				for (; (result = *envp) != NULL; ++envp) {
 					if (__hybrid_unaligned_get16((uint16_t const *)result) != pattern.word)
 						continue; /* First 2 characters don't match. */
-					if (memcmp(result + 2, varname, tail_namelen * sizeof(char)) != 0)
+					if (bcmpc(result + 2, varname, tail_namelen, sizeof(char)) != 0)
 						continue; /* Rest of string didn't match */
 					if (result[namelen] != '=')
 						continue; /* It's not the complete string. */
@@ -2527,7 +2527,7 @@ int getsubopt([[inout]] char **__restrict optionp,
 		size_t toklen = strlen(tokens[i]);
 
 		/* Check if this token is matches the found option */
-		if (memcmp(tokens[i], option, toklen * sizeof(char)) != 0)
+		if (bcmpc(tokens[i], option, toklen, sizeof(char)) != 0)
 			continue;
 
 		/* Deal with a potential option value. */
@@ -2825,7 +2825,7 @@ $fd_t system_mktemp(unsigned int what, [[inout]] char *template_,
 	fd_t result;
 
 	/* Verify the validity of the input template. */
-	if unlikely(xloc < template_ || memcmp(xloc, "XXXXXX", 6 * sizeof(char)) != 0) {
+	if unlikely(xloc < template_ || bcmpc(xloc, "XXXXXX", 6, sizeof(char)) != 0) {
 @@pp_ifdef EINVAL@@
 		return libc_seterrno(EINVAL);
 @@pp_else@@

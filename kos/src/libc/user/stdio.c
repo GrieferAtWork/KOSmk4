@@ -1573,7 +1573,7 @@ file_evalmodes(char const *modes, oflag_t *poflags) {
 				for (i = 0; i < COMPILER_LENOF(open_options); ++i) {
 					if (open_options[i].name[optlen])
 						continue;
-					if (memcmp(open_options[i].name, modes, optlen * sizeof(char)) != 0)
+					if (bcmp(open_options[i].name, modes, optlen, sizeof(char)) != 0)
 						continue;
 					if ((oflags & open_options[i].mask) != 0)
 						goto err_invalid_oflags; /* XXX: Illegal file option */

@@ -126,7 +126,7 @@ NOTHROW_NCX(LIBCCALL libc_memmem0)(void const *haystack, size_t haystacklen,
 	haystacklen -= (needlelen - 1);
 	marker       = *(byte_t *)needle;
 	while ((candidate = (byte_t *)memchr(haystack, marker, haystacklen)) != NULL) {
-		if (memcmp(candidate, needle, needlelen) == 0)
+		if (bcmp(candidate, needle, needlelen) == 0)
 			return (void *)candidate;
 		++candidate;
 		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
@@ -145,7 +145,7 @@ NOTHROW_NCX(LIBCCALL libc_memrmem0)(void const *haystack, size_t haystacklen,
 	haystacklen -= needlelen - 1;
 	marker = *(uint8_t const *)needle;
 	while ((candidate = (byte_t *)memrchr(haystack, marker, haystacklen)) != NULL) {
-		if (memcmp(candidate, needle, needlelen) == 0)
+		if (bcmp(candidate, needle, needlelen) == 0)
 			return (void *)candidate;
 		haystacklen = (size_t)(candidate - (byte_t *)haystack);
 	}
@@ -1271,7 +1271,7 @@ void *memrchr([[in(n_bytes)]] void const *__restrict haystack, int needle, $size
 	haystacklen -= (needlelen - 1);
 	marker       = *(byte_t *)needle;
 	while ((candidate = (byte_t *)memchr(haystack, marker, haystacklen)) != NULL) {
-		if (memcmp(candidate, needle, needlelen) == 0)
+		if (bcmp(candidate, needle, needlelen) == 0)
 			return (void *)candidate;
 		++candidate;
 		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
@@ -3604,7 +3604,7 @@ void bzeroc([[out(elem_count * elem_size)]] void *__restrict dst,
 [[preferred_fastbind(bcmpc(s1, s2, elem_count, elem_size), ["memcmpc"])]]
 [[preferred_fastbind(memcmpc(s1, s2, elem_count, elem_size), ["memcmpc"])]]
 [[crt_impl_requires(!defined(LIBC_ARCH_HAVE_BCMPC))]]
-[[alias("memcmpc"), bind_local_function("memcmp")]]
+[[alias("memcmpc"), bind_local_function("memcmpc")]]
 [[impl_include("<hybrid/host.h>")]]
 int bcmpc([[in(elem_count * elem_size)]] void const *s1,
           [[in(elem_count * elem_size)]] void const *s2,
@@ -6354,7 +6354,7 @@ void *memrmem([[in(haystacklen)]] void const *haystack, $size_t haystacklen, [[i
 	haystacklen -= needlelen - 1;
 	marker = *(uint8_t const *)needle;
 	while ((candidate = (byte_t *)memrchr(haystack, marker, haystacklen)) != NULL) {
-		if (memcmp(candidate, needle, needlelen) == 0)
+		if (bcmp(candidate, needle, needlelen) == 0)
 			return (void *)candidate;
 		haystacklen = (size_t)(candidate - (byte_t *)haystack);
 	}

@@ -495,11 +495,11 @@ int wmemcmp([[in(num_chars)]] wchar_t const *s1,
             [[in(num_chars)]] wchar_t const *s2,
             size_t num_chars) {
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
-	return (int)memcmpw(s1, s2, num_chars);
+	return memcmpw(s1, s2, num_chars);
 @@pp_elif __SIZEOF_WCHAR_T__ == 4@@
-	return (int)memcmpl(s1, s2, num_chars);
+	return memcmpl(s1, s2, num_chars);
 @@pp_else@@
-	return (int)memcmp(s1, s2, num_chars * sizeof(wchar_t));
+	return memcmpc(s1, s2, num_chars, sizeof(wchar_t));
 @@pp_endif@@
 }
 

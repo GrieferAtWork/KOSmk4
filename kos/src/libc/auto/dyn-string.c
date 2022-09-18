@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6fd033f4 */
+/* HASH CRC-32:0x66fa143e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -283,7 +283,7 @@ NOTHROW_NCX(LIBCCALL libc_dyn_string_eq)(struct dyn_string __KOS_FIXED_CONST *lh
                                          struct dyn_string __KOS_FIXED_CONST *rhs) {
 	if (lhs->length != rhs->length)
 		return 0;
-	return libc_memcmp(lhs->s, rhs->s, lhs->length * sizeof(char)) == 0 ? 1 : 0;
+	return libc_bcmpc(lhs->s, rhs->s, lhs->length, sizeof(char)) == 0 ? 1 : 0;
 }
 #endif /* !__KERNEL__ */
 

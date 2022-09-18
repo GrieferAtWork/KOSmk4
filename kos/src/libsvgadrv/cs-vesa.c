@@ -83,7 +83,7 @@ vesa_getbiosinfo(struct vesa_chipset *__restrict self) {
 		return NULL;
 	if (self->vc_emu.b86e_vm.vr_regs.vr_ax != 0x4f)
 		return NULL;
-	if (memcmp(result->vbi_signature, "VESA", 4) != 0)
+	if (bcmp(result->vbi_signature, "VESA", 4) != 0)
 		return NULL;
 	return result;
 }

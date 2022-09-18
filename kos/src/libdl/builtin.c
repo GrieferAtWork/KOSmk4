@@ -988,7 +988,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dlgetmodule)(USER char const *name, unsigned int flag
 		if (!col)
 			continue;
 		namelen = (size_t)(col - sep);
-		if (memcmp(sep, name, namelen * sizeof(char)) == 0 &&
+		if (bcmp(sep, name, namelen, sizeof(char)) == 0 &&
 		    name[namelen] == '\0')
 			goto got_result;
 	}
@@ -1005,7 +1005,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dlgetmodule)(USER char const *name, unsigned int flag
 		if (!col)
 			continue;
 		namelen = (size_t)(col - sep);
-		if (memcmp(sep, name, namelen * sizeof(char)) == 0 &&
+		if (bcmp(sep, name, namelen, sizeof(char)) == 0 &&
 		    name[namelen] == '\0')
 			goto got_result;
 	}
@@ -3475,7 +3475,7 @@ NOTHROW_NCX(CC dlsym_builtin)(USER char const *name) THROWS(E_SEGFAULT) {
 				break;
 
 			case 'p':
-				if (memcmp(name, "rogname", 7 * sizeof(char)) == 0) {
+				if (bcmp(name, "rogname", 7, sizeof(char)) == 0) {
 					name += 7;
 					if (*name == '\0') /* char *__progname */
 						goto return_program_invocation_short_name;
@@ -3503,7 +3503,7 @@ check_environ:
 		break;
 
 	case 'p':
-		if (memcmp(name, "rogram_invocation_", 18 * sizeof(char)) == 0) {
+		if (bcmp(name, "rogram_invocation_", 18, sizeof(char)) == 0) {
 			name += 18;
 			if (strcmp(name, "name") == 0) { /* char *program_invocation_name */
 return_program_invocation_name:
@@ -3564,7 +3564,7 @@ NOTHROW_NCX(CC dlsym_builtin_size)(USER char const *name) THROWS(E_SEGFAULT) {
 				break;
 
 			case 'p':
-				if (memcmp(name, "rogname", 7 * sizeof(char)) == 0) {
+				if (bcmp(name, "rogname", 7, sizeof(char)) == 0) {
 					name += 7;
 					if (*name == '\0') /* char *__progname */
 						goto return_pointer;
@@ -3592,7 +3592,7 @@ check_environ:
 		break;
 
 	case 'p':
-		if (memcmp(name, "rogram_invocation_", 18 * sizeof(char)) == 0) {
+		if (bcmp(name, "rogram_invocation_", 18, sizeof(char)) == 0) {
 			name += 18;
 			if (strcmp(name, "name") == 0) /* char *program_invocation_name */
 				goto return_pointer;

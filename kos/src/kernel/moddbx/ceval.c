@@ -108,7 +108,7 @@ DECL_BEGIN
 
 #define KWD_CHECK(kwd_str, kwd_len, name)  \
 	((kwd_len) == COMPILER_STRLEN(name) && \
-	 memcmp((kwd_str), name, sizeof(name) - sizeof(char)) == 0)
+	 bcmp((kwd_str), name, COMPILER_STRLEN(name), sizeof(char)) == 0)
 
 
 
@@ -597,7 +597,7 @@ NOTHROW(FCALL autocomplete_nontype_symbols)(struct cparser *__restrict self,
 		unsigned int i;
 		for (i = 0; i < COMPILER_LENOF(misc_expr_keywords); ++i) {
 			char const *cname_str = misc_expr_keywords[i];
-			if (memcmp(cname_str, name, namelen) == 0 &&
+			if (bcmp(cname_str, name, namelen, sizeof(char)) == 0 &&
 			    cname_str[namelen] != '\0') {
 				size_t cname_len = strlen(cname_str);
 				cparser_autocomplete(self,
@@ -1083,8 +1083,8 @@ NOTHROW(KCALL autocomplete_struct_fields_callback)(void *arg,
 	member_namelen = strlen(member->m_name);
 	if (member_namelen <= cookie->namelen)
 		return 0;
-	if (memcmp(member->m_name, cookie->name,
-	           cookie->namelen * sizeof(char)) != 0)
+	if (bcmp(member->m_name, cookie->name,
+	         cookie->namelen, sizeof(char)) != 0)
 		return 0;
 	cparser_autocomplete(cookie->self,
 	                     member->m_name + cookie->namelen,
@@ -2390,7 +2390,7 @@ NOTHROW(FCALL autocomplete_types)(struct cparser *__restrict self,
 	unsigned int i;
 	if (namelen < (COMPILER_LENOF(builtin_types[0].bt_name) - 1)) {
 		for (i = 0; i < COMPILER_LENOF(builtin_types); ++i) {
-			if (memcmp(builtin_types[i].bt_name, name, namelen) == 0 &&
+			if (bcmp(builtin_types[i].bt_name, name, namelen, sizeof(char)) == 0 &&
 			    builtin_types[i].bt_name[namelen] != '\0') {
 				char const *cname_str = builtin_types[i].bt_name;
 				size_t cname_len = strlen(cname_str);
@@ -2402,7 +2402,7 @@ NOTHROW(FCALL autocomplete_types)(struct cparser *__restrict self,
 	}
 	if (namelen < (COMPILER_LENOF(misc_type_keywords[0]) - 1)) {
 		for (i = 0; i < COMPILER_LENOF(misc_type_keywords); ++i) {
-			if (memcmp(misc_type_keywords[i], name, namelen) == 0 &&
+			if (bcmp(misc_type_keywords[i], name, namelen, sizeof(char)) == 0 &&
 			    misc_type_keywords[i][namelen] != '\0') {
 				char const *cname_str = misc_type_keywords[i];
 				size_t cname_len = strlen(cname_str);
@@ -2557,7 +2557,8 @@ yield_and_scan_keyword:
 			if (dbg_current_iscompat()) {
 				for (i = 0; i < COMPILER_LENOF(compat_builtin_types); ++i) {
 					if (compat_builtin_types[i].bt_name[kwd_len] == '\0' &&
-						memcmp(compat_builtin_types[i].bt_name, kwd_str, kwd_len) == 0) {
+					    bcmp(compat_builtin_types[i].bt_name, kwd_str,
+					         kwd_len, sizeof(char)) == 0) {
 						/* Found it! */
 						if unlikely(integer_type_flags != 0)
 							goto syn;
@@ -2570,7 +2571,8 @@ yield_and_scan_keyword:
 #endif /* __ARCH_HAVE_COMPAT */
 			for (i = 0; i < COMPILER_LENOF(builtin_types); ++i) {
 				if (builtin_types[i].bt_name[kwd_len] == '\0' &&
-				    memcmp(builtin_types[i].bt_name, kwd_str, kwd_len) == 0) {
+				    bcmp(builtin_types[i].bt_name, kwd_str,
+				         kwd_len, sizeof(char)) == 0) {
 					/* Found it! */
 					if unlikely(integer_type_flags != 0)
 						goto syn;

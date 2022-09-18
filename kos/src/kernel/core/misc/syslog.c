@@ -265,7 +265,7 @@ NOTHROW(KCALL setup_loglevel_from_name)(char const *__restrict name,
 	for (i = 0; i < SYSLOG_LEVEL_COUNT; ++i) {
 		if (strlen(syslog_level_names[i]) != namelen)
 			continue;
-		if (memcmp(name, syslog_level_names[i], namelen * sizeof(char)) == 0)
+		if (bcmp(name, syslog_level_names[i], namelen, sizeof(char)) == 0)
 			return (uintptr_t)1 << i;
 	}
 	kernel_panic(FREESTR("Unknown syslog level: %q"), name);

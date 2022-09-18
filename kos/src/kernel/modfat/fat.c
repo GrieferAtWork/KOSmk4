@@ -1175,7 +1175,7 @@ dos_8dot3:
 						kfree(result);
 						RETHROW();
 					}
-					if (memcmp(hdr, Fat_CygwinSymlinkMagic, sizeof(hdr)) == 0) {
+					if (bcmp(hdr, Fat_CygwinSymlinkMagic, sizeof(hdr)) == 0) {
 						/* Jup! It sure looks like a symlink to me :) */
 						result->fad_ent.fde_ent.fd_type = DT_LNK;
 					}
@@ -1284,9 +1284,9 @@ NOTHROW(FCALL FatDir_Contains83Filename)(FatDirNode const *__restrict self,
 		fatent = flatdirent_asfat(ent);
 		if (fatent == newent)
 			continue; /* Don't collide with our own entry! */
-		if (memcmp(fatent->fad_dos.f_nameext,
-		           newent->fad_dos.f_nameext,
-		           (8 + 3) * sizeof(char)) == 0)
+		if (bcmp(fatent->fad_dos.f_nameext,
+		         newent->fad_dos.f_nameext,
+		         8 + 3, sizeof(char)) == 0)
 			return true;
 	}
 	return false;

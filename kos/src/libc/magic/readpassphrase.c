@@ -220,7 +220,7 @@ again:
 		if (term.c_cc[__VSTATUS] != __VDISABLE)
 			term.c_cc[__VSTATUS] = __VDISABLE;
 @@pp_endif@@
-		if (memcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
+		if (bcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
 @@pp_if defined(__TCSAFLUSH) && defined(__TCSASOFT)@@
 			if (tcsetattr(infd, __TCSAFLUSH | __TCSASOFT, &new_ios) != 0)
 				goto err_infd;
@@ -329,7 +329,7 @@ again:
 	/* Restore terminal IOS configuration */
 done_infd_oldsact_oldios:
 @@pp_if $has_function(tcgetattr) && $has_function(tcsetattr)@@
-	if (memcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
+	if (bcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
 @@pp_if defined(__TCSAFLUSH) && defined(__TCSASOFT)@@
 		(void)tcsetattr(infd, __TCSAFLUSH | __TCSASOFT, &old_ios);
 @@pp_elif defined(__TCSAFLUSH)@@
@@ -409,7 +409,7 @@ err_infd_oldsact_oldios:
 err_infd_oldios:
 	/* Restore terminal IOS configuration */
 @@pp_if $has_function(tcgetattr) && $has_function(tcsetattr)@@
-	if (memcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
+	if (bcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
 @@pp_if defined(__TCSAFLUSH) && defined(__TCSASOFT)@@
 		(void)tcsetattr(infd, __TCSAFLUSH | __TCSASOFT, &old_ios);
 @@pp_elif defined(__TCSAFLUSH)@@

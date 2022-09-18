@@ -55,7 +55,7 @@ char *envz_entry([in(envz_len)] char const *__restrict envz, size_t envz_len, [[
 	char *envz_end = (char *)(envz + envz_len);
 	namelen = stroff(name, '=');
 	while (envz < envz_end) {
-		if (memcmp(envz, name, namelen) == 0 &&
+		if (bcmpc(envz, name, namelen, sizeof(char)) == 0 &&
 		    (envz[namelen] == '\0' || envz[namelen] == '='))
 			return (char *)envz; /* Found it! */
 		envz = strend(envz) + 1;

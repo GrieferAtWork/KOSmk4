@@ -508,8 +508,9 @@ again_get_oldpath:
 			oldpath_string = arref_get(&driver_libpath);
 			oldpath_len = (strlen(oldpath_string->dlp_path) + 1) * sizeof(char);
 			TRY {
-				oldpath_is_correct = memcmp(oldpath_string->dlp_path,
-				                            oldpath, oldpath_len) == 0;
+				oldpath_is_correct = bcmp(oldpath_string->dlp_path,
+				                          oldpath, oldpath_len,
+				                          sizeof(char)) == 0;
 			} EXCEPT {
 				decref_likely(newpath_string);
 				decref_unlikely(oldpath_string);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4b3e016 */
+/* HASH CRC-32:0x6028bb42 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,25 +22,25 @@
 #define __local_getsubopt_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_memcmp_defined
-#define __local___localdep_memcmp_defined
-#ifdef __CRT_HAVE_memcmp
+#ifndef __local___localdep_bcmpc_defined
+#define __local___localdep_bcmpc_defined
+#ifdef __CRT_HAVE_bcmpc
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcmp,(__s1,__s2,__n_bytes))
-#elif defined(__CRT_HAVE___gcc_bcmp)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_bcmpc,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),bcmpc,(__s1,__s2,__elem_count,__elem_size))
+#elif defined(__CRT_HAVE_memcmpc)
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),__gcc_bcmp,(__s1,__s2,__n_bytes))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_bcmpc,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcmpc,(__s1,__s2,__elem_count,__elem_size))
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/string/memcmp.h>
+#include <libc/local/string/memcmpc.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_memcmp __LIBC_LOCAL_NAME(memcmp)
+#define __localdep_bcmpc __LIBC_LOCAL_NAME(memcmpc)
 #endif /* !... */
-#endif /* !__local___localdep_memcmp_defined */
+#endif /* !__local___localdep_bcmpc_defined */
 #ifndef __local___localdep_strchr_defined
 #define __local___localdep_strchr_defined
 #if __has_builtin(__builtin_strchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strchr)
@@ -97,7 +97,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getsubopt))(char **__restrict __optio
 		__SIZE_TYPE__ __toklen = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__tokens[__i]);
 
 		/* Check if this token is matches the found option */
-		if ((__NAMESPACE_LOCAL_SYM __localdep_memcmp)(__tokens[__i], __option, __toklen * sizeof(char)) != 0)
+		if ((__NAMESPACE_LOCAL_SYM __localdep_bcmpc)(__tokens[__i], __option, __toklen, sizeof(char)) != 0)
 			continue;
 
 		/* Deal with a potential option value. */

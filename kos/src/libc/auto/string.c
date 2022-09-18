@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeabf6072 */
+/* HASH CRC-32:0x50fb38cc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -106,7 +106,7 @@ NOTHROW_NCX(LIBCCALL libc_memmem0)(void const *haystack, size_t haystacklen,
 	haystacklen -= (needlelen - 1);
 	marker       = *(byte_t *)needle;
 	while ((candidate = (byte_t *)memchr(haystack, marker, haystacklen)) != NULL) {
-		if (memcmp(candidate, needle, needlelen) == 0)
+		if (bcmp(candidate, needle, needlelen) == 0)
 			return (void *)candidate;
 		++candidate;
 		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
@@ -125,7 +125,7 @@ NOTHROW_NCX(LIBCCALL libc_memrmem0)(void const *haystack, size_t haystacklen,
 	haystacklen -= needlelen - 1;
 	marker = *(uint8_t const *)needle;
 	while ((candidate = (byte_t *)memrchr(haystack, marker, haystacklen)) != NULL) {
-		if (memcmp(candidate, needle, needlelen) == 0)
+		if (bcmp(candidate, needle, needlelen) == 0)
 			return (void *)candidate;
 		haystacklen = (size_t)(candidate - (byte_t *)haystack);
 	}
@@ -659,7 +659,7 @@ NOTHROW_NCX(LIBCCALL libc_memmem)(void const *haystack,
 	haystacklen -= (needlelen - 1);
 	marker       = *(byte_t *)needle;
 	while ((candidate = (byte_t *)libc_memchr(haystack, marker, haystacklen)) != NULL) {
-		if (libc_memcmp(candidate, needle, needlelen) == 0)
+		if (libc_bcmp(candidate, needle, needlelen) == 0)
 			return (void *)candidate;
 		++candidate;
 		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
@@ -5012,7 +5012,7 @@ NOTHROW_NCX(LIBCCALL libc_memrmem)(void const *haystack,
 	haystacklen -= needlelen - 1;
 	marker = *(uint8_t const *)needle;
 	while ((candidate = (byte_t *)libc_memrchr(haystack, marker, haystacklen)) != NULL) {
-		if (libc_memcmp(candidate, needle, needlelen) == 0)
+		if (libc_bcmp(candidate, needle, needlelen) == 0)
 			return (void *)candidate;
 		haystacklen = (size_t)(candidate - (byte_t *)haystack);
 	}

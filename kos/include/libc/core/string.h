@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc5a3f1b */
+/* HASH CRC-32:0xd097e450 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -345,8 +345,8 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_N
 #include <hybrid/typecore.h>
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__libc_core_bcmpc,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcmpc,(__s1,__s2,__elem_count,__elem_size))
 #else /* ... */
-#include <libc/local/string/memcmp.h>
-#define __libc_core_bcmpc(s1, s2, elem_count, elem_size) __LIBC_LOCAL_NAME(memcmp)(s1, s2, elem_count)
+#include <libc/local/string/memcmpc.h>
+#define __libc_core_bcmpc __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmpc)
 #endif /* !... */
 #ifdef __CRT_HAVE_bcmp
 #include <hybrid/typecore.h>

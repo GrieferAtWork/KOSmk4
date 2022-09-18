@@ -329,7 +329,7 @@ coredump_create(struct ucpustate const *curr_ustate,
 	size_t tbi;
 	assert(curr_ustate != NULL);
 	assert(orig_ustate != NULL);
-	assert(memcmp(curr_ustate, orig_ustate, sizeof(ucpustate)) == 0
+	assert(bcmp(curr_ustate, orig_ustate, sizeof(ucpustate)) == 0
 	       ? (traceback_vector == NULL && traceback_length == 0)
 	       : true);
 	assert(orig_kstate == NULL

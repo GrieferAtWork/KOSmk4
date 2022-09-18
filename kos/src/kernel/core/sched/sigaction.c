@@ -401,9 +401,9 @@ sighand_reset_handler(signo_t signo,
 	if unlikely(!THIS_SIGHAND_PTR)
 		return false;
 	hand = sighand_ptr_lockwrite();
-	if (memcmp(current_action,
-	           &hand->sh_actions[signo - 1],
-	           sizeof(struct kernel_sigaction)) != 0) {
+	if (bcmp(current_action,
+	         &hand->sh_actions[signo - 1],
+	         sizeof(struct kernel_sigaction)) != 0) {
 		sighand_endwrite(hand);
 		return false;
 	}

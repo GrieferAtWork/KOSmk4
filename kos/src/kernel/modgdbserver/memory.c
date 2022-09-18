@@ -204,7 +204,7 @@ continue_scanning:
 				avail = (size_t)(end - pos);
 				if (avail >= needle_length) {
 					/* If this _is_ the match, then we've already got all the data we need. */
-					if (memcmp(pos + 1, (byte_t *)needle + 1, needle_length - 1) != 0) {
+					if (bcmp(pos + 1, (byte_t *)needle + 1, needle_length - 1) != 0) {
 						/* Continue searching... */
 						++pos;
 						--avail;
@@ -218,7 +218,7 @@ found_it_at_pos:
 					size_t missing_bytes;
 					/* We may still have a partial match that may
 					 * cross  over into the next block of memory. */
-					if (memcmp(pos + 1, (byte_t *)needle + 1, avail - 1) != 0) {
+					if (bcmp(pos + 1, (byte_t *)needle + 1, avail - 1) != 0) {
 						/* Not this one... */
 						++pos;
 						--avail;
@@ -247,7 +247,7 @@ found_it_at_pos:
 					if unlikely(realcount < missing_bytes)
 						goto advance_to_next_haystack;
 					/* Compare the remaining data. */
-					if (memcmp(buf, (byte_t *)needle + avail, missing_bytes) == 0)
+					if (bcmp(buf, (byte_t *)needle + avail, missing_bytes) == 0)
 						goto found_it_at_pos; /* Found it! (as `haystack + (size_t)(pos - buf)') */
 					pos = buf + missing_bytes;
 					end = buf + realcount;

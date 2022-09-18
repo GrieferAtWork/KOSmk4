@@ -1221,7 +1221,7 @@ NOTHROW(FCALL driver_getargval)(struct driver const *__restrict self,
 	size_t namelen = strlen(name);
 	for (i = 0; i < self->d_argc; ++i) {
 		char *arg = self->d_argv[i];
-		if (memcmp(arg, name, namelen * sizeof(char)) != 0)
+		if (bcmp(arg, name, namelen, sizeof(char)) != 0)
 			continue;
 		if (name[namelen] != '=' && name[namelen] != ':')
 			continue;
@@ -4749,7 +4749,7 @@ got_dynsym_size:
 			continue;
 		if (memcpy_nopf(namebuf, self->d_shstrtab + self->d_shdr[i].sh_name, sizeof(namebuf)) != 0)
 			continue;
-		if (memcmp(namebuf, EH_FRAME_SECTION_NAME, sizeof(EH_FRAME_SECTION_NAME)) != 0)
+		if (bcmp(namebuf, EH_FRAME_SECTION_NAME, sizeof(EH_FRAME_SECTION_NAME)) != 0)
 			continue;
 #undef EH_FRAME_SECTION_NAME
 		/* Found the `.eh_frame' section! */
@@ -5607,8 +5607,8 @@ path_equals_string(struct path *__restrict pth,
 	while (path_get_last_segment(pth_str, &pth_len, &lastseg)) {
 		if (lastseg.ps_size != pth->p_name->fd_namelen)
 			goto nope;
-		if (memcmp(pth->p_name->fd_name, lastseg.ps_base,
-		           lastseg.ps_size * sizeof(char)) != 0)
+		if (bcmp(pth->p_name->fd_name, lastseg.ps_base,
+		         lastseg.ps_size, sizeof(char)) != 0)
 			goto nope;
 		if unlikely((pth = pth->p_parent) == NULL)
 			goto nope;
@@ -5685,8 +5685,8 @@ driver_fromfilename_with_len(USER CHECKED char const *driver_filename,
 		if (result->d_module.md_fspath && result->d_module.md_fsname) {
 			TRY {
 				if (result->d_module.md_fsname->fd_namelen == namelen &&
-				    memcmp(result->d_module.md_fsname->fd_name,
-				           name, namelen * sizeof(char)) == 0 &&
+				    bcmp(result->d_module.md_fsname->fd_name,
+				         name, namelen, sizeof(char)) == 0 &&
 				    path_equals_string(result->d_module.md_fspath,
 				                       driver_filename, pathlen))
 					return result; /* This is the one! */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37a36353 */
+/* HASH CRC-32:0xe8d36b03 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,19 @@
 #include <features.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_bcmp_defined
+#define __local___localdep_bcmp_defined
+#ifdef __CRT_HAVE_bcmp
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_bcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),bcmp,(__s1,__s2,__n_bytes))
+#elif defined(__CRT_HAVE_memcmp)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_bcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcmp,(__s1,__s2,__n_bytes))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/memcmp.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_bcmp __LIBC_LOCAL_NAME(memcmp)
+#endif /* !... */
+#endif /* !__local___localdep_bcmp_defined */
 #ifndef __local___localdep_bzero_defined
 #define __local___localdep_bzero_defined
 #ifdef __CRT_HAVE_bzero
@@ -114,19 +127,6 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_kill,(__pid_t __pid, __signo_t __signo
 #undef __local___localdep_kill_defined
 #endif /* !... */
 #endif /* !__local___localdep_kill_defined */
-#ifndef __local___localdep_memcmp_defined
-#define __local___localdep_memcmp_defined
-#ifdef __CRT_HAVE_memcmp
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcmp,(__s1,__s2,__n_bytes))
-#elif defined(__CRT_HAVE___gcc_bcmp)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),__gcc_bcmp,(__s1,__s2,__n_bytes))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/string/memcmp.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_memcmp __LIBC_LOCAL_NAME(memcmp)
-#endif /* !... */
-#endif /* !__local___localdep_memcmp_defined */
 #ifndef __local___localdep_memcpy_defined
 #define __local___localdep_memcpy_defined
 #ifdef __CRT_HAVE_memcpy
@@ -516,7 +516,7 @@ __again:
 		if (__term.__c_cc[__VSTATUS] != __VDISABLE)
 			__term.__c_cc[__VSTATUS] = __VDISABLE;
 #endif /* __VSTATUS */
-		if ((__NAMESPACE_LOCAL_SYM __localdep_memcmp)(&__old_ios, &__new_ios, sizeof(struct termios)) != 0) {
+		if ((__NAMESPACE_LOCAL_SYM __localdep_bcmp)(&__old_ios, &__new_ios, sizeof(struct termios)) != 0) {
 #if defined(__TCSAFLUSH) && defined(__TCSASOFT)
 			if ((__NAMESPACE_LOCAL_SYM __localdep_tcsetattr)(__infd, __TCSAFLUSH | __TCSASOFT, &__new_ios) != 0)
 				goto __err_infd;
@@ -625,7 +625,7 @@ __again:
 	/* Restore terminal IOS configuration */
 __done_infd_oldsact_oldios:
 #if (defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))
-	if ((__NAMESPACE_LOCAL_SYM __localdep_memcmp)(&__old_ios, &__new_ios, sizeof(struct termios)) != 0) {
+	if ((__NAMESPACE_LOCAL_SYM __localdep_bcmp)(&__old_ios, &__new_ios, sizeof(struct termios)) != 0) {
 #if defined(__TCSAFLUSH) && defined(__TCSASOFT)
 		(void)(__NAMESPACE_LOCAL_SYM __localdep_tcsetattr)(__infd, __TCSAFLUSH | __TCSASOFT, &__old_ios);
 #elif defined(__TCSAFLUSH)
@@ -705,7 +705,7 @@ __err_infd_oldsact_oldios:
 __err_infd_oldios:
 	/* Restore terminal IOS configuration */
 #if (defined(__CRT_HAVE_tcgetattr) || defined(__CRT_HAVE___tcgetattr) || ((defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TCGETA))) && (defined(__CRT_HAVE_tcsetattr) || defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl))
-	if ((__NAMESPACE_LOCAL_SYM __localdep_memcmp)(&__old_ios, &__new_ios, sizeof(struct termios)) != 0) {
+	if ((__NAMESPACE_LOCAL_SYM __localdep_bcmp)(&__old_ios, &__new_ios, sizeof(struct termios)) != 0) {
 #if defined(__TCSAFLUSH) && defined(__TCSASOFT)
 		(void)(__NAMESPACE_LOCAL_SYM __localdep_tcsetattr)(__infd, __TCSAFLUSH | __TCSASOFT, &__old_ios);
 #elif defined(__TCSAFLUSH)

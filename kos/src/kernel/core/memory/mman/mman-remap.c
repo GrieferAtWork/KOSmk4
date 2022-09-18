@@ -732,7 +732,7 @@ again_lock_mman_phase2:
 					struct mappinginfo new_mapinfo;
 					if (!get_mappinginfo_or_unlock(self, &new_mapinfo, (byte_t *)old_address, old_maxaddr))
 						goto again_lock_mman_phase2;
-					if unlikely(memcmp(&new_mapinfo, &mapinfo, sizeof(mapinfo)) != 0) {
+					if unlikely(bcmp(&new_mapinfo, &mapinfo, sizeof(mapinfo)) != 0) {
 						/* Mapping information changed (start over from scratch) */
 						mfile_map_release_or_reserved(&map.mmwu_map);
 						mman_lock_release(self);

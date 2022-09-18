@@ -338,7 +338,7 @@ NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname)
 		size_t namelen = strlen(varname);
 #ifdef __OPTIMIZE_SIZE__
 		for (; (result = *envp) != NULL; ++envp) {
-			if (memcmp(result, varname, namelen * sizeof(char)) != 0)
+			if (bcmp(result, varname, namelen, sizeof(char)) != 0)
 				continue;
 			if (result[namelen] != '=')
 				continue;
@@ -385,7 +385,7 @@ NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname)
 				for (; (result = *envp) != NULL; ++envp) {
 					if (UNALIGNED_GET16((uint16_t const *)result) != pattern.word)
 						continue; /* First 2 characters don't match. */
-					if (memcmp(result + 2, varname, tail_namelen * sizeof(char)) != 0)
+					if (bcmp(result + 2, varname, tail_namelen, sizeof(char)) != 0)
 						continue; /* Rest of string didn't match */
 					if (result[namelen] != '=')
 						continue; /* It's not the complete string. */
@@ -445,7 +445,7 @@ again_searchenv:
 		/* Search for an existing instance of `varname' */
 		for (; (existing_line = *iter) != NULL; ++iter, ++envc) {
 			struct environ_heapstr *existing_heapline;
-			if (memcmp(existing_line, line->ehs_text, (namelen + 1) * sizeof(char)) != 0)
+			if (bcmp(existing_line, line->ehs_text, namelen + 1, sizeof(char)) != 0)
 				continue;
 			free(new_envp);
 			if (!replace) {
@@ -543,7 +543,7 @@ NOTHROW_NCX(LIBCCALL libc_unsetenv)(char const *varname)
 		for (; (existing_line = *envp) != NULL; ++envp) {
 			char **envp_fwd;
 			struct environ_heapstr *existing_heapline;
-			if (memcmp(existing_line, varname, namelen * sizeof(char)) != 0 ||
+			if (bcmp(existing_line, varname, namelen, sizeof(char)) != 0 ||
 			    existing_line[namelen] != '=')
 				continue;
 			/* Remove the line by shifting. */
@@ -635,7 +635,7 @@ again_searchenv:
 		/* Search for an existing instance of `varname' */
 		for (; (existing_line = *iter) != NULL; ++iter, ++envc) {
 			struct environ_heapstr *existing_heapline;
-			if (memcmp(existing_line, string, (namelen + 1) * sizeof(char)) != 0)
+			if (bcmp(existing_line, string, namelen + 1, sizeof(char)) != 0)
 				continue;
 			/* Check if the existing line was allocated on the heap. */
 			existing_heapline = container_of(existing_line,
@@ -941,7 +941,7 @@ NOTHROW_NCX(CC libd_alloc_environ)(char **unix_environ) {
 					goto fallback;
 				if (environ_special[i].es_name[name_length] != '\0')
 					continue;
-				if (memcmp(str, environ_special[i].es_name, name_length * sizeof(char)) != 0)
+				if (bcmp(str, environ_special[i].es_name, name_length, sizeof(char)) != 0)
 					continue;
 				switch (environ_special[i].es_type) {
 				case ENVIRON_SPECIAL_PATH:
@@ -1021,7 +1021,7 @@ NOTHROW_NCX(LIBDCALL libd_getenv)(char const *varname)
 search_dos_environment:
 		len = strlen(varname);
 		for (i = 0; (envstr = dos_environ[i]) != NULL; ++i) {
-			if (memcmp(envstr, varname, len * sizeof(char)) != 0)
+			if (bcmp(envstr, varname, len, sizeof(char)) != 0)
 				continue;
 			if (envstr[len] != '=')
 				continue;
@@ -1262,7 +1262,7 @@ NOTHROW_NCX(LIBDCALL libd_setenv)(char const *varname,
 				return -1;
 			for (j = 0; dos_environ[j]; ++j) {
 				char *str = dos_environ[j];
-				if (memcmp(str, varname, namelen * sizeof(char)) != 0)
+				if (bcmp(str, varname, namelen, sizeof(char)) != 0)
 					continue;
 				if (str[namelen] != '=')
 					continue;
@@ -1337,7 +1337,7 @@ NOTHROW_NCX(LIBDCALL libd_unsetenv)(char const *varname)
 			char *str;
 			size_t i, len = strlen(varname);
 			for (i = 0; (str = tab[i]) != NULL; ++i) {
-				if (memcmp(str, varname, len * sizeof(char)) != 0)
+				if (bcmp(str, varname, len, sizeof(char)) != 0)
 					continue;
 				if (str[len] != '=')
 					continue;

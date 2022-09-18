@@ -1048,7 +1048,7 @@ fix_lo_part_state_affinity:
 				struct mchunk *lomax, *himin;
 				lomax = &lopart->mp_mem_sc.ms_v[lopart->mp_mem_sc.ms_c - 1];
 				himin = &hipart->mp_mem_sc.ms_v[0];
-				assert(memcmp(lomax, himin, sizeof(struct mchunk)) == 0);
+				assert(bcmp(lomax, himin, sizeof(struct mchunk)) == 0);
 				lomax->mc_size = split_offset;
 				himin->mc_start += split_offset;
 				himin->mc_size -= split_offset;

@@ -116,7 +116,7 @@ NOTHROW_NCX(LIBCCALL libc_getfsent)(void)
 		size_t len = strlen(ptr);
 		/* s.a. modprocfs: `print_mounting_point()'
 		 * HINT: On KOS, only "ro" and "rw" are ever generated (based on `MFILE_F_READONLY') */
-		if (memcmp(fstab_ent.fs_mntops, ptr, len * sizeof(char)) == 0 &&
+		if (bcmp(fstab_ent.fs_mntops, ptr, len, sizeof(char)) == 0 &&
 		    (fstab_ent.fs_mntops[len] == ',' || fstab_ent.fs_mntops[len] == '\0')) {
 			fstab_ent.fs_type = ptr;
 			break;

@@ -82,11 +82,11 @@ DEFINE_TEST(keymap_translations) {
 		len = keymap_codesize(mymap.km_ext, &enc, enc);
 		assertf(len > 0, "len = %Id", len);
 	}
-#define ASSERT_TRANSLATION(key, keymod, str)                                   \
-	do {                                                                       \
-		buflen = keymap_translate_buf(&mymap, key, keymod, buf, sizeof(buf));  \
-		assertf(buflen == COMPILER_STRLEN(str), "buflen = %Iu", buflen);       \
-		assertf(memcmp(buf, str, buflen) == 0, "%$q != %q", buflen, buf, str); \
+#define ASSERT_TRANSLATION(key, keymod, str)                                               \
+	do {                                                                                   \
+		buflen = keymap_translate_buf(&mymap, key, keymod, buf, sizeof(buf));              \
+		assertf(buflen == COMPILER_STRLEN(str), "buflen = %Iu", buflen);                   \
+		assertf(bcmp(buf, str, buflen, sizeof(char)) == 0, "%$q != %q", buflen, buf, str); \
 	} __WHILE0
 	ASSERT_TRANSLATION(KEY_Q, 0, "q");
 	ASSERT_TRANSLATION(KEY_Q, KEYMOD_LSHIFT, "Q");

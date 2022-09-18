@@ -1673,7 +1673,7 @@ handle_set_register_error:
 		nameLen = (size_t)(nameEnd - i);
 #define ISNAME(name)                         \
 		(nameLen == COMPILER_STRLEN(name) && \
-		 memcmp(i, name, COMPILER_STRLEN(name) * sizeof(char)) == 0)
+		 bcmp(i, name, COMPILER_STRLEN(name), sizeof(char)) == 0)
 		if (ISNAME("Attach") && *nameEnd == ';') {
 			/* Attach/detach is ignored... */
 			goto send_empty;
@@ -1883,7 +1883,7 @@ send_empty:
 		nameLen = (size_t)(nameEnd - i);
 #define ISNAME(name)                         \
 		(nameLen == COMPILER_STRLEN(name) && \
-		 memcmp(i, name, COMPILER_STRLEN(name) * sizeof(char)) == 0)
+		 bcmp(i, name, COMPILER_STRLEN(name), sizeof(char)) == 0)
 		if (ISNAME("C")) {
 			if (nameEnd != endptr)
 				ERROR(err_syntax);
@@ -1912,9 +1912,9 @@ send_empty:
 			size_t haystack_length, needle_length;
 			if (*nameEnd++ != ':')
 				ERROR(err_syntax);
-			if (memcmp(nameEnd, "memory", COMPILER_STRLEN("memory") * sizeof(char)) != 0)
+			if (bcmp(nameEnd, "memory", 6, sizeof(char)) != 0)
 				ERROR(unknown);
-			i = nameEnd + COMPILER_STRLEN("memory");
+			i = nameEnd + 6;
 			if (*i++ != ':')
 				ERROR(err_syntax);
 			haystack = (VIRT void const *)strtou(i, &i, 16);
@@ -2247,8 +2247,8 @@ do_return_attached_everything:
 			o = STPCAT(o, ";qXfer:osdata:read+");
 			o = STPCAT(o, ";qXfer:features:read+"); /* Allows GDB to handle custom registers */
 			o = STPCAT(o, ";vContSupported+");
-		} else if (nameLen == 1 + COMPILER_STRLEN("ThreadInfo") &&
-		           memcmp(i + 1, "ThreadInfo", COMPILER_STRLEN("ThreadInfo") * sizeof(char)) == 0 &&
+		} else if (nameLen == 1 + 10 &&
+		           bcmp(i + 1, "ThreadInfo", 10, sizeof(char)) == 0 &&
 		           (i[0] == 'f' || i[0] == 's')) {
 			REF struct task *thread;
 			char action = i[0];
@@ -2351,7 +2351,7 @@ do_return_attached_everything:
 		nameLen = (size_t)(nameEnd - i);
 #define ISNAME(name)                         \
 		(nameLen == COMPILER_STRLEN(name) && \
-		 memcmp(i, name, COMPILER_STRLEN(name) * sizeof(char)) == 0)
+		 bcmp(i, name, COMPILER_STRLEN(name), sizeof(char)) == 0)
 		if (ISNAME("DisableRandomization") && *nameEnd == ':') {
 			unsigned long mode;
 			i    = nameEnd + 1;

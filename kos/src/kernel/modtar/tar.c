@@ -205,7 +205,8 @@ again:
 		char const *local_filename;
 		parent_dir_size = dir->tdn_fdat.tfd_nlen;
 		assertf(dir->tdn_fdat.tfd_filp == NULL ||
-		        memcmp(dir->tdn_fdat.tfd_filp->tf_name, tfile->tf_name, parent_dir_size) == 0,
+		        bcmp(dir->tdn_fdat.tfd_filp->tf_name, tfile->tf_name,
+		             parent_dir_size, sizeof(char)) == 0,
 		        "dir->tdn_fdat.tfd_filp->tf_name = %q\n"
 		        "tfile->tf_name                  = %q\n",
 		        dir->tdn_fdat.tfd_filp->tf_name, tfile->tf_name);
@@ -217,7 +218,8 @@ again:
 			assert(parent_dir_size == 0);
 		}
 		local_filename = tfile->tf_name + parent_dir_size;
-		assertf(memcmp(local_filename, me->td_ent.fd_name, me->td_ent.fd_namelen) == 0,
+		assertf(bcmp(local_filename, me->td_ent.fd_name,
+		             me->td_ent.fd_namelen, sizeof(char)) == 0,
 		        "local_filename     = %q\n"
 		        "me->td_ent.fd_name = %q\n",
 		        local_filename, me->td_ent.fd_name);
@@ -359,14 +361,14 @@ tarsuper_find_first_subtree_file(struct tarsuper const *__restrict self,
 	size_t i;
 	for (i = indexof_tf; i--; task_serve()) {
 		struct tarfile *ot = self->ts_filev[i];
-		if (memcmp(ot->tf_name, tf->tf_name, dirlen_plus_one * sizeof(char)) != 0)
+		if (bcmp(ot->tf_name, tf->tf_name, dirlen_plus_one, sizeof(char)) != 0)
 			break;
 		if (result->tf_pos > ot->tf_pos)
 			result = ot;
 	}
 	for (i = indexof_tf + 1; i < self->ts_filec; ++i, task_serve()) {
 		struct tarfile *ot = self->ts_filev[i];
-		if (memcmp(ot->tf_name, tf->tf_name, dirlen_plus_one * sizeof(char)) != 0)
+		if (bcmp(ot->tf_name, tf->tf_name, dirlen_plus_one, sizeof(char)) != 0)
 			break;
 		if (result->tf_pos > ot->tf_pos)
 			result = ot;
@@ -417,7 +419,7 @@ again:
 			i   = (lo + hi) / 2;
 			tf  = super->ts_filev[i];
 			/* Compare based on requested filename prefix. */
-			cmp = memcmp(tf->tf_name, filename, filename_len * sizeof(char));
+			cmp = memcmp(tf->tf_name, filename, filename_len, sizeof(char));
 			if (cmp < 0) {
 				lo = i + 1;
 			} else if (cmp > 0) {
@@ -437,7 +439,7 @@ again:
 						i2  = (lo + hi) / 2;
 						tf2 = super->ts_filev[i2];
 						/* Compare based on requested filename prefix. */
-						cmp = memcmp(tf2->tf_name, filename, (filename_len + 1) * sizeof(char));
+						cmp = memcmp(tf2->tf_name, filename, filename_len + 1, sizeof(char));
 						if (cmp < 0) {
 							lo = i2 + 1;
 						} else if (cmp > 0) {
@@ -471,7 +473,7 @@ again:
 						i2 = (lo2 + hi2) / 2;
 						tf = super->ts_filev[i2];
 						/* Compare based on requested filename prefix. */
-						cmp = memcmp(tf->tf_name, filename, filename_len * sizeof(char));
+						cmp = memcmp(tf->tf_name, filename, filename_len, sizeof(char));
 						if (cmp < 0) {
 							lo2 = i2 + 1;
 						} else if (cmp > 0) {
@@ -505,7 +507,7 @@ again:
 				int cmp;
 				i   = (lo + hi) / 2;
 				tf  = super->ts_filev[i];
-				cmp = memcmp(tf->tf_name, filename, dirlen * sizeof(char));
+				cmp = memcmp(tf->tf_name, filename, dirlen, sizeof(char));
 				if (cmp > 0) {
 					hi = i;
 				} else if (cmp < 0) {
@@ -521,7 +523,7 @@ again:
 				/* Search for the requested file below and above. */
 				for (i = lo;;) {
 					tf = super->ts_filev[i];
-					if (memcmp(tf->tf_name, filename, dirlen * sizeof(char)) != 0)
+					if (bcmp(tf->tf_name, filename, dirlen, sizeof(char)) != 0)
 						break;
 					/* Check trailing name. */
 					if (memcasecmp(tf->tf_name + dirlen, basename, info->flu_namelen * sizeof(char)) == 0) {
@@ -541,7 +543,7 @@ again:
 				}
 				for (i = hi; i < super->ts_filec; ++i) {
 					tf = super->ts_filev[i];
-					if (memcmp(tf->tf_name, filename, dirlen * sizeof(char)) != 0)
+					if (bcmp(tf->tf_name, filename, dirlen, sizeof(char)) != 0)
 						break;
 					/* Check trailing name. */
 					if (memcasecmp(tf->tf_name + dirlen, basename, info->flu_namelen * sizeof(char)) == 0) {
@@ -577,7 +579,7 @@ again_readdir:
 		goto again; /* Lock was lost... */
 
 	/* Check if `tf' is the requested file. (No TRY needed, because `filename' is allocated on the stack) */
-	if (memcmp(tf->tf_name, filename, filename_len * sizeof(char)) == 0 &&
+	if (bcmp(tf->tf_name, filename, filename_len, sizeof(char)) == 0 &&
 	    (tf->tf_name[filename_len] == '\0' || tf->tf_name[filename_len] == '/')) {
 incref_and_return_tf:
 		incref(tf);
@@ -591,7 +593,7 @@ incref_and_return_tf:
 		size_t dirlen;        /* Length of the directory prefix in `filename' */
 		dirlen   = filename_len - info->flu_namelen;
 		basename = filename + dirlen;
-		if (memcmp(tf->tf_name, filename, dirlen * sizeof(char)) == 0 &&
+		if (bcmp(tf->tf_name, filename, dirlen, sizeof(char)) == 0 &&
 		    memcasecmp(tf->tf_name + dirlen, basename, info->flu_namelen * sizeof(char)) == 0 &&
 		    (tf->tf_name[filename_len] == '\0' || tf->tf_name[filename_len] == '/'))
 			goto incref_and_return_tf;
@@ -687,7 +689,8 @@ tardirenum_peekfile_raw(struct tardirenum const *__restrict self, pos_t pos) {
 			int cmp;
 			i   = (lo + hi) / 2;
 			tf  = super->ts_filev[i];
-			cmp = memcmp(tf->tf_name, self->tde_dirname, self->tde_dirsize * sizeof(char));
+			cmp = memcmp(tf->tf_name, self->tde_dirname,
+			             self->tde_dirsize, sizeof(char));
 			if (cmp > 0) {
 				hi = i;
 			} else if (cmp < 0) {
@@ -705,7 +708,7 @@ tardirenum_peekfile_raw(struct tardirenum const *__restrict self, pos_t pos) {
 			for (i = lo;;) {
 				struct tarfile *ntf;
 				ntf = super->ts_filev[i];
-				if (memcmp(ntf->tf_name, self->tde_dirname, self->tde_dirsize * sizeof(char)) != 0)
+				if (bcmp(ntf->tf_name, self->tde_dirname, self->tde_dirsize, sizeof(char)) != 0)
 					break;
 				if ((self->tde_dirsize == 0 ||
 				     ntf->tf_name[self->tde_dirsize] == '/') &&
@@ -723,7 +726,7 @@ tardirenum_peekfile_raw(struct tardirenum const *__restrict self, pos_t pos) {
 			for (i = hi; i < super->ts_filec; ++i) {
 				struct tarfile *ntf;
 				ntf = super->ts_filev[i];
-				if (memcmp(ntf->tf_name, self->tde_dirname, self->tde_dirsize * sizeof(char)) != 0)
+				if (bcmp(ntf->tf_name, self->tde_dirname, self->tde_dirsize, sizeof(char)) != 0)
 					break;
 				if ((self->tde_dirsize == 0 ||
 				     ntf->tf_name[self->tde_dirsize] == '/') &&
@@ -754,7 +757,7 @@ tardirenum_peekfile_raw(struct tardirenum const *__restrict self, pos_t pos) {
 	for (;;) {
 		/* Check if `tf' matches. */
 		assert(tarfile_gethpos(tf) >= pos);
-		if (memcmp(tf->tf_name, self->tde_dirname, self->tde_dirsize * sizeof(char)) == 0 &&
+		if (bcmp(tf->tf_name, self->tde_dirname, self->tde_dirsize, sizeof(char)) == 0 &&
 		    (self->tde_dirsize == 0 || tf->tf_name[self->tde_dirsize] == '/'))
 			break; /* Got one! */
 
@@ -823,7 +826,8 @@ again:
 			int cmp;
 			i   = (lo + hi) / 2;
 			tf  = super->ts_filev[i];
-			cmp = memcmp(tf->tf_name, result->tf_name, prefix_len);
+			cmp = memcmp(tf->tf_name, result->tf_name,
+			             prefix_len, sizeof(char));
 			if (cmp > 0) {
 				hi = i;
 			} else if (cmp < 0) {
@@ -839,7 +843,7 @@ again:
 			/* Search for the requested file below and above. */
 			for (i = lo;;) {
 				tf = super->ts_filev[i];
-				if (memcmp(tf->tf_name, result->tf_name, prefix_len * sizeof(char)) != 0)
+				if (bcmp(tf->tf_name, result->tf_name, prefix_len, sizeof(char)) != 0)
 					break;
 				tarsuper_serve_or_unlock(super);
 				if ((tf->tf_name[prefix_len] == '\0' ||
@@ -855,7 +859,7 @@ skip_already_enumerated_directory:
 						next = TAILQ_NEXT(result, tf_bypos);
 						if (!next)
 							break;
-						if (memcmp(next->tf_name, result->tf_name, prefix_len * sizeof(char)) != 0 ||
+						if (bcmp(next->tf_name, result->tf_name, prefix_len, sizeof(char)) != 0 ||
 						    (next->tf_name[prefix_len] != '\0' && next->tf_name[prefix_len] != '/'))
 							break; /* Part of different sub-tree */
 						tarsuper_serve_or_unlock(super);
@@ -870,7 +874,7 @@ skip_already_enumerated_directory:
 			}
 			for (i = hi; i < super->ts_filec; ++i) {
 				tf = super->ts_filev[i];
-				if (memcmp(tf->tf_name, result->tf_name, prefix_len * sizeof(char)) != 0)
+				if (bcmp(tf->tf_name, result->tf_name, prefix_len, sizeof(char)) != 0)
 					break;
 				tarsuper_serve_or_unlock(super);
 				if ((tf->tf_name[prefix_len] == '\0' ||
@@ -1325,7 +1329,7 @@ tarfile_new(struct tarhdr const *__restrict self,
 	char const *fstr_start, *fstr_end;
 	size_t descsiz;
 	uint32_t fsize;
-	is_ustar   = memcmp(self->th_ustar, TMAGIC, TMAGLEN) == 0;
+	is_ustar   = bcmp(self->th_ustar, TMAGIC, TMAGLEN) == 0;
 	pstr_start = NULL;
 	pstr_end   = NULL;
 	fstr_start = self->th_filename;

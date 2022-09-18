@@ -3680,7 +3680,7 @@ out:
 
 	/* Restore old terminal settings. */
 @@pp_if $has_function(tcgetattr) && $has_function(tcsetattr)@@
-	if (memcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
+	if (bcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
 @@pp_if defined(__TCSAFLUSH) && defined(__TCSASOFT)@@
 		(void)tcsetattr(fds[0], __TCSAFLUSH | __TCSASOFT, &old_ios);
 @@pp_elif defined(__TCSAFLUSH)@@

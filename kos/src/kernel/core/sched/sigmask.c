@@ -802,7 +802,7 @@ NOTHROW(FCALL sigmask_setmask)(sigset_t const *__restrict mask)
 		}
 
 		/* Check if the masks differ. */
-		changed = memcmp(&current_umask, mask, sizeof(sigset_t)) != 0;
+		changed = bcmp(&current_umask, mask, sizeof(sigset_t)) != 0;
 
 		/* If changes are present, write-back the new mask.
 		 * Note that in this case, we don't modify extended
@@ -816,7 +816,7 @@ NOTHROW(FCALL sigmask_setmask)(sigset_t const *__restrict mask)
 	{
 		sigset_t *mymask;
 		mymask  = &THIS_KERNEL_SIGMASK;
-		changed = memcmp(mymask, mask, sizeof(sigset_t)) != 0;
+		changed = bcmp(mymask, mask, sizeof(sigset_t)) != 0;
 		if (changed)
 			memcpy(mymask, mask, sizeof(sigset_t));
 	}
@@ -1154,13 +1154,13 @@ NOTHROW(FCALL sigmask_getmask_and_setmask)(sigset_t *__restrict oldmask,
 			umasksize = sizeof(sigset_t);
 		memset(mempcpy(oldmask, umask, umasksize), 0xff,
 		       sizeof(sigset_t) - umasksize);
-		result = memcmp(newmask, oldmask, sizeof(sigset_t)) != 0;
+		result = bcmp(newmask, oldmask, sizeof(sigset_t)) != 0;
 		if (result) {
 			/* Check if the mask still contains changes (but keep the state of change SIGKILL or SIGSTOP) */
 			sigset_t used_newmask;
 			memcpy(&used_newmask, newmask, sizeof(sigset_t));
 			nmiandorset(&used_newmask, oldmask);
-			result = memcmp(&used_newmask, oldmask, sizeof(sigset_t)) != 0;
+			result = bcmp(&used_newmask, oldmask, sizeof(sigset_t)) != 0;
 			if (result) {
 				/* Write-back modified words into user-space. */
 				memcpy(umask, &used_newmask, umasksize);
@@ -1175,7 +1175,7 @@ NOTHROW(FCALL sigmask_getmask_and_setmask)(sigset_t *__restrict oldmask,
 		sigset_t *mymask = &THIS_KERNEL_SIGMASK;
 		memcpy(oldmask, mymask, sizeof(sigset_t)); /* Get old mask */
 		memcpy(mymask, newmask, sizeof(sigset_t)); /* Set new mask */
-		result = memcmp(oldmask, newmask, sizeof(sigset_t)) != 0;
+		result = bcmp(oldmask, newmask, sizeof(sigset_t)) != 0;
 	}
 	return result;
 }
@@ -1214,7 +1214,7 @@ NOTHROW(FCALL sigmask_getmask_and_blockmask)(sigset_t *__restrict oldmask,
 		memset(mempcpy(oldmask, umask, umasksize), 0xff,
 		       sizeof(sigset_t) - umasksize);
 		sigorset(&newmask, oldmask, these);
-		result = memcmp(&newmask, oldmask, sizeof(sigset_t)) != 0;
+		result = bcmp(&newmask, oldmask, sizeof(sigset_t)) != 0;
 		if (result) {
 			/* Write-back modified words into user-space. */
 			memcpy(umask, &newmask, umasksize);
@@ -1228,7 +1228,7 @@ NOTHROW(FCALL sigmask_getmask_and_blockmask)(sigset_t *__restrict oldmask,
 		sigset_t *mymask = &THIS_KERNEL_SIGMASK;
 		memcpy(oldmask, mymask, sizeof(sigset_t));
 		sigorset(mymask, mymask, these);
-		result = memcmp(oldmask, mymask, sizeof(sigset_t)) != 0;
+		result = bcmp(oldmask, mymask, sizeof(sigset_t)) != 0;
 	}
 	return result;
 }
@@ -1279,7 +1279,7 @@ NOTHROW(FCALL sigmask_getmask_and_unblockmask)(sigset_t *__restrict oldmask,
 		nmiandorset(&newmask, oldmask);
 
 		/* Check if changes have been made */
-		result = memcmp(&newmask, oldmask, sizeof(sigset_t)) != 0;
+		result = bcmp(&newmask, oldmask, sizeof(sigset_t)) != 0;
 		if (result) {
 			/* Write-back modified words into user-space. */
 			memcpy(umask, &newmask, umasksize);
@@ -1293,7 +1293,7 @@ NOTHROW(FCALL sigmask_getmask_and_unblockmask)(sigset_t *__restrict oldmask,
 		sigset_t *mymask = &THIS_KERNEL_SIGMASK;
 		memcpy(oldmask, mymask, sizeof(sigset_t));
 		signandset(mymask, mymask, these);
-		result = memcmp(oldmask, mymask, sizeof(sigset_t)) != 0;
+		result = bcmp(oldmask, mymask, sizeof(sigset_t)) != 0;
 	}
 	return result;
 }

@@ -1312,7 +1312,7 @@ DEFINE_CMPXCH_FUNCTIONS(l, u32)
 DEFINE_CMPXCH_FUNCTIONS(q, u64)
 #undef CMPXCH_OPERANDS_EQ
 #ifdef __x86_64__
-#define CMPXCH_OPERANDS_EQ(a, b) (memcmp(&a, &b, 16) == 0)
+#define CMPXCH_OPERANDS_EQ(a, b) (bcmp(&a, &b, 16) == 0)
 DEFINE_CMPXCH_FUNCTIONS(x, uint128_t)
 #undef CMPXCH_OPERANDS_EQ
 #endif /* __x86_64__ */

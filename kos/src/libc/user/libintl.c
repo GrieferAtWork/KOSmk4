@@ -840,7 +840,7 @@ NOTHROW_NCX(FCALL mo_extract_plural_from_metadata)(char const *__restrict header
 		/* Skip leading spaces. */
 		while (iter < line_end && isspace(*iter))
 			++iter;
-		if (memcmp(iter, "Plural-Forms", 12 * sizeof(char)) == 0) {
+		if (bcmp(iter, "Plural-Forms", 12, sizeof(char)) == 0) {
 			/* NOTE: No need to check for bounds with `line_end', because we
 			 *       know that `line_end' is succeeded by \n or \r,  neither
 			 *       of which are apart of the string "Plural-Forms". */
@@ -857,7 +857,7 @@ NOTHROW_NCX(FCALL mo_extract_plural_from_metadata)(char const *__restrict header
 						++iter;
 					if (iter >= line_end)
 						break;
-					if (memcmp(iter, "plural", 6 * sizeof(char)) == 0) {
+					if (bcmp(iter, "plural", 6, sizeof(char)) == 0) {
 						iter += 6;
 						while (iter < line_end && isspace(*iter))
 							++iter;

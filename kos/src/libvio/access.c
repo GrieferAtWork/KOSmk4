@@ -1318,7 +1318,7 @@ libvio_cmpxchx(struct vioargs *__restrict args,
 #ifdef LIBVIO_CONFIG_HAVE_QWORD
 		result.q[0] = libvio_readq(args, addr + 0);
 		result.q[1] = libvio_readq(args, addr + 8);
-		if (memcmp(&result, &oldvalue, 16) == 0) {
+		if (bcmp(&result, &oldvalue, 16) == 0) {
 			libvio_writeq(args, addr + 0, uint128_vec64(newvalue)[0]);
 			libvio_writeq(args, addr + 8, uint128_vec64(newvalue)[1]);
 		}
@@ -1327,7 +1327,7 @@ libvio_cmpxchx(struct vioargs *__restrict args,
 		result.l[1] = libvio_readl(args, addr + 4);
 		result.l[2] = libvio_readl(args, addr + 8);
 		result.l[3] = libvio_readl(args, addr + 12);
-		if (memcmp(&result, &oldvalue, 16) == 0) {
+		if (bcmp(&result, &oldvalue, 16) == 0) {
 			libvio_writel(args, addr + 0,  uint128_vec32(newvalue)[0]);
 			libvio_writel(args, addr + 4,  uint128_vec32(newvalue)[1]);
 			libvio_writel(args, addr + 8,  uint128_vec32(newvalue)[2]);

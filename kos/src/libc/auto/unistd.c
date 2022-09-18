@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4bed6c5f */
+/* HASH CRC-32:0xaad77dc6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1784,7 +1784,7 @@ out:
 
 	/* Restore old terminal settings. */
 
-	if (libc_memcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
+	if (libc_bcmp(&old_ios, &new_ios, sizeof(struct termios)) != 0) {
 #ifdef __TCSASOFT
 		(void)libc_tcsetattr(fds[0], __TCSAFLUSH | __TCSASOFT, &old_ios);
 #else /* __TCSASOFT */

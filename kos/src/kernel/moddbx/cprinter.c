@@ -1039,7 +1039,7 @@ NOTHROW(KCALL dbg_eqmemory)(void const *a, void const *b, size_t num_bytes) {
 		if (dbg_readmemory(a, a_buf, temp) != 0 ||
 		    dbg_readmemory(b, b_buf, temp) != 0)
 			return false; /* Faulty memory */
-		if (memcmp(a_buf, b_buf, temp) != 0)
+		if (bcmp(a_buf, b_buf, temp) != 0)
 			return false; /* Non-equal memory */
 		a = (byte_t const *)a + temp;
 		b = (byte_t const *)b + temp;

@@ -3058,7 +3058,7 @@ NOTHROW(FCALL cexpr_load_special_libdl_symbol)(char const *__restrict name) {
 		}
 	} else if (strcmp(name, "environ") == 0) {
 		varid = LIBDL_VAR_environ;
-	} else if (memcmp(name, "program_invocation_", 19 * sizeof(char)) == 0) {
+	} else if (bcmp(name, "program_invocation_", 19, sizeof(char)) == 0) {
 		name += 19;
 		if (strcmp(name, "name") == 0) {
 			varid = LIBDL_VAR_program_invocation_name;
@@ -3405,12 +3405,12 @@ got_symbol_type:
 					struct fdirent *dent = expr.v_module->cm_module->md_fsname;
 					if ((dent->fd_hash == _RTLD_LIBDL_HASH &&
 					     dent->fd_namelen == COMPILER_STRLEN(RTLD_LIBDL) &&
-					     memcmp(dent->fd_name, RTLD_LIBDL, sizeof(RTLD_LIBDL)) == 0)
+					     bcmp(dent->fd_name, RTLD_LIBDL, sizeof(RTLD_LIBDL)) == 0)
 #ifdef __ARCH_HAVE_COMPAT
 					    ||
 					    (dent->fd_hash == _COMPAT_RTLD_LIBDL_HASH &&
 					     dent->fd_namelen == COMPILER_STRLEN(COMPAT_RTLD_LIBDL) &&
-					     memcmp(dent->fd_name, COMPAT_RTLD_LIBDL, sizeof(COMPAT_RTLD_LIBDL)) == 0)
+					     bcmp(dent->fd_name, COMPAT_RTLD_LIBDL, sizeof(COMPAT_RTLD_LIBDL)) == 0)
 #endif /* __ARCH_HAVE_COMPAT */
 					    ) {
 						char const *name;
@@ -3438,7 +3438,7 @@ got_symbol_type:
 				    !CTYPE_KIND_ISFUNCTION(symtype.ct_typ->ct_kind)) {
 					uintptr_t addend;
 					char const *name = cmodsyminfo_name(sym);
-					if (name && memcmp(name, "this", 4 * sizeof(char)) == 0) {
+					if (name && bcmp(name, "this", 4, sizeof(char)) == 0) {
 						if (name[4] == '_') {
 							REF struct ctype *symtype_ptr;
 							addend = (uintptr_t)dbg_current;

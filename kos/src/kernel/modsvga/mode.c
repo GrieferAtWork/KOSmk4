@@ -86,7 +86,7 @@ svgadev_findmode(struct svgadev *__restrict self,
 	size_t i;
 	for (i = 0; i < self->svd_supmodec; ++i) {
 		result = svgadev_supmode(self, i);
-		if (memcmp(result, mode, sizeof(struct svga_modeinfo)) == 0)
+		if (bcmp(result, mode, sizeof(struct svga_modeinfo)) == 0)
 			return result;
 	}
 	THROW(E_INVALID_ARGUMENT_BAD_VALUE,
@@ -340,7 +340,7 @@ PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) byte_t
 NOTHROW(FCALL try_ocr_on_gfxcell)(struct svga_gfxcell const *__restrict cell) {
 	unsigned int i;
 	for (i = 0; i < 256; ++i) {
-		if (memcmp(basevga_defaultfont[i], cell->sgc_lines, 16) == 0)
+		if (bcmp(basevga_defaultfont[i], cell->sgc_lines, 16) == 0)
 			break;
 	}
 	return i & 0xff;

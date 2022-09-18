@@ -324,7 +324,7 @@ int dyn_string_eq([[in]] struct dyn_string __KOS_FIXED_CONST *lhs,
                   [[in]] struct dyn_string __KOS_FIXED_CONST *rhs) {
 	if (lhs->@length@ != rhs->@length@)
 		return 0;
-	return memcmp(lhs->@s@, rhs->@s@, lhs->@length@ * sizeof(char)) == 0 ? 1 : 0;
+	return bcmpc(lhs->@s@, rhs->@s@, lhs->@length@, sizeof(char)) == 0 ? 1 : 0;
 }
 
 

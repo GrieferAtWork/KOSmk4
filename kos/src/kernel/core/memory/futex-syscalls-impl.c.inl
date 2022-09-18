@@ -316,8 +316,8 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_BELOW, ATOMIC_READ(*uaddr) < val);
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_BITMASK, (ATOMIC_READ(*uaddr) & val) == val2);
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_UNTIL_BITMASK, (ATOMIC_READ(*uaddr) & val) != val2);
-	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_EX, memcmp(uaddr, (USER CHECKED void const *)(uintptr_t)val, val2) == 0, LOCAL_validate_readable((USER UNCHECKED void const *)(uintptr_t)val, val2));
-	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_UNTIL_EX, memcmp(uaddr, (USER CHECKED void const *)(uintptr_t)val, val2) != 0, LOCAL_validate_readable((USER UNCHECKED void const *)(uintptr_t)val, val2));
+	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_EX, bcmp(uaddr, (USER CHECKED void const *)(uintptr_t)val, val2) == 0, LOCAL_validate_readable((USER UNCHECKED void const *)(uintptr_t)val, val2));
+	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_UNTIL_EX, bcmp(uaddr, (USER CHECKED void const *)(uintptr_t)val, val2) != 0, LOCAL_validate_readable((USER UNCHECKED void const *)(uintptr_t)val, val2));
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_ABOVE_EX, memcmp(uaddr, (USER CHECKED void const *)(uintptr_t)val, val2) > 0, LOCAL_validate_readable((USER UNCHECKED void const *)(uintptr_t)val, val2));
 	DEFINE_WAIT_WHILE_OPERATOR(LFUTEX_WAIT_WHILE_BELOW_EX, memcmp(uaddr, (USER CHECKED void const *)(uintptr_t)val, val2) < 0, LOCAL_validate_readable((USER UNCHECKED void const *)(uintptr_t)val, val2));
 #undef DEFINE_WAIT_WHILE_OPERATOR

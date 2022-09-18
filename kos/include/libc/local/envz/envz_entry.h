@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a21d60a */
+/* HASH CRC-32:0x3ad78622 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,19 +23,19 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_memcmp_defined
-#define __local___localdep_memcmp_defined
-#ifdef __CRT_HAVE_memcmp
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcmp,(__s1,__s2,__n_bytes))
-#elif defined(__CRT_HAVE___gcc_bcmp)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),__gcc_bcmp,(__s1,__s2,__n_bytes))
+#ifndef __local___localdep_bcmpc_defined
+#define __local___localdep_bcmpc_defined
+#ifdef __CRT_HAVE_bcmpc
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_bcmpc,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),bcmpc,(__s1,__s2,__elem_count,__elem_size))
+#elif defined(__CRT_HAVE_memcmpc)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_bcmpc,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcmpc,(__s1,__s2,__elem_count,__elem_size))
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/string/memcmp.h>
+#include <libc/local/string/memcmpc.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_memcmp __LIBC_LOCAL_NAME(memcmp)
+#define __localdep_bcmpc __LIBC_LOCAL_NAME(memcmpc)
 #endif /* !... */
-#endif /* !__local___localdep_memcmp_defined */
+#endif /* !__local___localdep_bcmpc_defined */
 #ifndef __local___localdep_strend_defined
 #define __local___localdep_strend_defined
 #ifdef __CRT_HAVE_strend
@@ -64,7 +64,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(envz_entry))(char const *__restrict _
 	char *__envz_end = (char *)(__envz + __envz_len);
 	__namelen = (__NAMESPACE_LOCAL_SYM __localdep_stroff)(__name, '=');
 	while (__envz < __envz_end) {
-		if ((__NAMESPACE_LOCAL_SYM __localdep_memcmp)(__envz, __name, __namelen) == 0 &&
+		if ((__NAMESPACE_LOCAL_SYM __localdep_bcmpc)(__envz, __name, __namelen, sizeof(char)) == 0 &&
 		    (__envz[__namelen] == '\0' || __envz[__namelen] == '='))
 			return (char *)__envz; /* Found it! */
 		__envz = (__NAMESPACE_LOCAL_SYM __localdep_strend)(__envz) + 1;

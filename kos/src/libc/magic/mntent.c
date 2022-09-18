@@ -223,7 +223,7 @@ char *hasmntopt([[in_opt]] struct mntent const *mnt,
 	if likely(mnt && opt && (str = mnt->@mnt_opts@) != NULL) {
 		size_t optlen = strlen(opt);
 		while (*str) {
-			if (memcmp(str, opt, optlen * sizeof(char)) == 0 &&
+			if (bcmpc(str, opt, optlen, sizeof(char)) == 0 &&
 			    (str[optlen] == ',' || str[optlen] == '\0'))
 				return str;
 			str = strchrnul(str, ',');

@@ -333,18 +333,18 @@ libk32_SetConsoleScreenBufferInfoEx(HANDLE hConsoleOutput,
 	TRACE("SetConsoleScreenBufferInfoEx(%p, %p)", hConsoleOutput, lpConsoleScreenBufferInfoEx);
 	if (!libk32_GetConsoleScreenBufferInfoEx(hConsoleOutput, &oldattr))
 		return FALSE;
-	if (memcmp(&lpConsoleScreenBufferInfoEx->srWindow, &oldattr.srWindow, sizeof(oldattr.srWindow)) != 0)
+	if (bcmp(&lpConsoleScreenBufferInfoEx->srWindow, &oldattr.srWindow, sizeof(oldattr.srWindow)) != 0)
 		goto illegal;
-	if (memcmp(&lpConsoleScreenBufferInfoEx->dwSize, &oldattr.dwSize, sizeof(oldattr.dwSize)) != 0)
+	if (bcmp(&lpConsoleScreenBufferInfoEx->dwSize, &oldattr.dwSize, sizeof(oldattr.dwSize)) != 0)
 		goto illegal;
-	if (memcmp(&lpConsoleScreenBufferInfoEx->dwMaximumWindowSize, &oldattr.dwMaximumWindowSize, sizeof(oldattr.dwMaximumWindowSize)) != 0)
+	if (bcmp(&lpConsoleScreenBufferInfoEx->dwMaximumWindowSize, &oldattr.dwMaximumWindowSize, sizeof(oldattr.dwMaximumWindowSize)) != 0)
 		goto illegal;
 	if (lpConsoleScreenBufferInfoEx->bFullscreenSupported != oldattr.bFullscreenSupported)
 		goto illegal;
-	if (memcmp(lpConsoleScreenBufferInfoEx->ColorTable, oldattr.ColorTable, sizeof(oldattr.ColorTable)) != 0)
+	if (bcmp(lpConsoleScreenBufferInfoEx->ColorTable, oldattr.ColorTable, sizeof(oldattr.ColorTable)) != 0)
 		goto illegal;
-	if (memcmp(&lpConsoleScreenBufferInfoEx->dwCursorPosition,
-	           &oldattr.dwCursorPosition, sizeof(oldattr.dwCursorPosition)) != 0) {
+	if (bcmp(&lpConsoleScreenBufferInfoEx->dwCursorPosition,
+	         &oldattr.dwCursorPosition, sizeof(oldattr.dwCursorPosition)) != 0) {
 		if (!libk32_SetConsoleCursorPosition(hConsoleOutput, lpConsoleScreenBufferInfoEx->dwCursorPosition))
 			return FALSE;
 	}

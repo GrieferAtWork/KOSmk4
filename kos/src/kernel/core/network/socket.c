@@ -1041,7 +1041,7 @@ again_receive:
 		/* Check if the peer addresses match. */
 		if (peer_have_len != peer_want_len)
 			goto again_receive;
-		if (memcmp(peer_have, peer_want, peer_want_len) != 0)
+		if (bcmp(peer_have, peer_want, peer_want_len) != 0)
 			goto again_receive;
 	}
 	return result;

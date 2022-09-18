@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3d12fdd */
+/* HASH CRC-32:0x1991283b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2214,7 +2214,7 @@ NOTHROW_NCX(LIBCCALL libc_getsubopt)(char **__restrict optionp,
 		size_t toklen = libc_strlen(tokens[i]);
 
 		/* Check if this token is matches the found option */
-		if (libc_memcmp(tokens[i], option, toklen * sizeof(char)) != 0)
+		if (libc_bcmpc(tokens[i], option, toklen, sizeof(char)) != 0)
 			continue;
 
 		/* Deal with a potential option value. */
@@ -2443,7 +2443,7 @@ NOTHROW_RPC(LIBCCALL libc_system_mktemp)(unsigned int what,
 	fd_t result;
 
 	/* Verify the validity of the input template. */
-	if unlikely(xloc < template_ || libc_memcmp(xloc, "XXXXXX", 6 * sizeof(char)) != 0) {
+	if unlikely(xloc < template_ || libc_bcmpc(xloc, "XXXXXX", 6, sizeof(char)) != 0) {
 
 		return libc_seterrno(EINVAL);
 

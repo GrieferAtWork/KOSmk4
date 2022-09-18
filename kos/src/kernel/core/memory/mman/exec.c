@@ -88,7 +88,7 @@ again_loadheader:
 		unsigned int status;
 		struct execabi *abi = &abis->eas_abis[i];
 		/* Check if the magic for this ABI matches. */
-		if (memcmp(args->ea_header, abi->ea_magic, abi->ea_magsiz) != 0)
+		if (bcmp(args->ea_header, abi->ea_magic, abi->ea_magsiz) != 0)
 			continue;
 		if (!tryincref(abi->ea_driver))
 			continue;

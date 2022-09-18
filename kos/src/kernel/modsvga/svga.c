@@ -231,7 +231,7 @@ again_load_mode:
 						struct svga_modeinfo *oldmode;
 						oldmode = (struct svga_modeinfo *)((byte_t *)modev +
 						                                   (j * self->svd_chipset.sc_ops.sco_modeinfosize));
-						if (memcmp(mode, oldmode, sizeof(struct svga_modeinfo)) == 0)
+						if (bcmp(mode, oldmode, sizeof(struct svga_modeinfo)) == 0)
 							goto again_load_mode;
 					}
 					++modec; /* Remember that we've got another mode now! */
