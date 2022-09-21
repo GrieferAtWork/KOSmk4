@@ -538,38 +538,41 @@ __NOTHROW_NCX(__hybrid_atomic_store)(__T &__x, __V __v, int __order) {
 	__DO_DECL_INLINE_hybrid_atomic_fetchop_seqcst(name, 16, opfun) \
 	__DO_DECL_INLINE_hybrid_atomic_fetchop_seqcst(name, 32, opfun) \
 	__DO_DECL_INLINE_hybrid_atomic_fetchop_seqcst(name, 64, opfun)
-#define __CALL_hybrid_atomic_fetchop_seqcst(name, opfun, x, v) \
-	__ATOMIC_RECAST(x, sizeof(x) == 1 ? __impl_hybrid_atomic_fetch##name##8_seqcst((void *)&(x), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(v)) : sizeof(x) == 2 ? __impl_hybrid_atomic_fetch##name##16_seqcst((void *)&(x), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(v)) : sizeof(x) == 4 ? __impl_hybrid_atomic_fetch##name##32_seqcst((void *)&(x), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(v)) : __impl_hybrid_atomic_fetch##name##64_seqcst((void *)&(x), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(v)))
+#define __CALL_hybrid_atomic_fetchop_seqcst(name, opfun, x, v)                                                                             \
+	__ATOMIC_RECAST(x, sizeof(x) == 1 ? __impl_hybrid_atomic_##name##8_seqcst((void *)&(x), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(v)) :        \
+	                   sizeof(x) == 2 ? __impl_hybrid_atomic_fetch##name##16_seqcst((void *)&(x), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(v)) : \
+	                   sizeof(x) == 4 ? __impl_hybrid_atomic_fetch##name##32_seqcst((void *)&(x), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(v)) : \
+	                                    __impl_hybrid_atomic_fetch##name##64_seqcst((void *)&(x), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(v)))
 #else /* !__cplusplus */
-#define __INLINE_hybrid_atomic_fetchop_seqcst(name, opfun)                                                                               \
-	__NAMESPACE_INT_BEGIN                                                                                                                \
-	__DO_DECL_INLINE_hybrid_atomic_fetchop_seqcst(name, 8, opfun)                                                                        \
-	__DO_DECL_INLINE_hybrid_atomic_fetchop_seqcst(name, 16, opfun)                                                                       \
-	__DO_DECL_INLINE_hybrid_atomic_fetchop_seqcst(name, 32, opfun)                                                                       \
-	__DO_DECL_INLINE_hybrid_atomic_fetchop_seqcst(name, 64, opfun)                                                                       \
-	__NAMESPACE_INT_END extern "C++" {                                                                                                   \
-		template<class __T, class __V>                                                                                                   \
-		__FORCELOCAL __ATTR_ARTIFICIAL __T __NOTHROW_NCX(__impl_hybrid_atomic_fetch##name##_seqcst)(__T & __x, __V __v) {                \
-			__STATIC_IF(sizeof(__T) == 1) {                                                                                              \
-				return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetch##name##8_seqcst((void *)&__x, (__UINT8_TYPE__)__v);           \
-			}                                                                                                                            \
-			__STATIC_ELSE(sizeof(__T) == 1) {                                                                                            \
-				__STATIC_IF(sizeof(__T) == 2) {                                                                                          \
-					return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetch##name##16_seqcst((void *)&__x, (__UINT16_TYPE__)__v);     \
-				}                                                                                                                        \
-				__STATIC_ELSE(sizeof(__T) == 2) {                                                                                        \
-					__STATIC_IF(sizeof(__T) == 4) {                                                                                      \
-						return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetch##name##32_seqcst((void *)&__x, (__UINT64_TYPE__)__v); \
-					}                                                                                                                    \
-					__STATIC_ELSE(sizeof(__T) == 4) {                                                                                    \
-						return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_fetch##name##64_seqcst((void *)&__x, (__UINT64_TYPE__)__v); \
-					}                                                                                                                    \
-				}                                                                                                                        \
-			}                                                                                                                            \
-		}                                                                                                                                \
+#define __INLINE_hybrid_atomic_fetchop_seqcst(name, opfun)                                                                          \
+	__NAMESPACE_INT_BEGIN                                                                                                           \
+	__DO_DECL_INLINE_hybrid_atomic_fetchop_seqcst(name, 8, opfun)                                                                   \
+	__DO_DECL_INLINE_hybrid_atomic_fetchop_seqcst(name, 16, opfun)                                                                  \
+	__DO_DECL_INLINE_hybrid_atomic_fetchop_seqcst(name, 32, opfun)                                                                  \
+	__DO_DECL_INLINE_hybrid_atomic_fetchop_seqcst(name, 64, opfun)                                                                  \
+	__NAMESPACE_INT_END extern "C++" {                                                                                              \
+		template<class __T, class __V>                                                                                              \
+		__FORCELOCAL __ATTR_ARTIFICIAL __T __NOTHROW_NCX(__impl_hybrid_atomic_##name##_seqcst)(__T & __x, __V __v) {                \
+			__STATIC_IF(sizeof(__T) == 1) {                                                                                         \
+				return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_##name##8_seqcst((void *)&__x, (__UINT8_TYPE__)__v);           \
+			}                                                                                                                       \
+			__STATIC_ELSE(sizeof(__T) == 1) {                                                                                       \
+				__STATIC_IF(sizeof(__T) == 2) {                                                                                     \
+					return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_##name##16_seqcst((void *)&__x, (__UINT16_TYPE__)__v);     \
+				}                                                                                                                   \
+				__STATIC_ELSE(sizeof(__T) == 2) {                                                                                   \
+					__STATIC_IF(sizeof(__T) == 4) {                                                                                 \
+						return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_##name##32_seqcst((void *)&__x, (__UINT64_TYPE__)__v); \
+					}                                                                                                               \
+					__STATIC_ELSE(sizeof(__T) == 4) {                                                                               \
+						return (__T)__NAMESPACE_INT_SYM __impl_hybrid_atomic_##name##64_seqcst((void *)&__x, (__UINT64_TYPE__)__v); \
+					}                                                                                                               \
+				}                                                                                                                   \
+			}                                                                                                                       \
+		}                                                                                                                           \
 	}
 #define __CALL_hybrid_atomic_fetchop_seqcst(name, opfun, x, v) \
-	__impl_hybrid_atomic_fetch##name##_seqcst(x, v)
+	__impl_hybrid_atomic_##name##_seqcst(x, v)
 #endif /* __cplusplus */
 #endif /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
 

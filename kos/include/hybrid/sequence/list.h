@@ -1303,8 +1303,8 @@
 	for ((elem) = (self)->slh_first; (elem); (elem) = X(_, elem).sle_next)
 #define __HYBRID_SLIST_FOREACH_FROM(elem, self, X, _) \
 	for ((elem) ? (void)0 : (void)((elem) = (self)->slh_first); (elem); (elem) = X(_, elem).sle_next)
-#define __HYBRID_SLIST_FOREACH_PREVPTR(elem, p_elem, self, X, _) \
-	for ((p_elem) = &(self); ((elem) = *(p_elem)) != __NULLPTR;  \
+#define __HYBRID_SLIST_FOREACH_PREVPTR(elem, p_elem, self, X, _)           \
+	for ((p_elem) = &(self)->slh_first; ((elem) = *(p_elem)) != __NULLPTR; \
 	     (p_elem) = &X(_, elem).sle_next)
 #define __HYBRID_SLIST_P_FOREACH(p_elem, self, X, _) \
 	for ((p_elem) = &(self)->slh_first; *(p_elem); (p_elem) = &X(_, *(p_elem)).sle_next)
