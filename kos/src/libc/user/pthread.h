@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd22cff16 */
+/* HASH CRC-32:0x5b5a375c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -726,7 +726,7 @@ INTDEF ATTR_ACCESS_NONE(2) errno_t NOTHROW_NCX(LIBCCALL libc_pthread_setspecific
  * @return: NULL: `key' had yet to be allocated for the calling thread,
  *                and an  attempt  to  allocate  it  just  now  failed.
  * @return: NULL: Invalid `key'. */
-INTDEF WUNUSED void **NOTHROW_NCX(LIBCCALL libc_pthread_getspecificptr_np)(pthread_key_t key);
+INTDEF ATTR_CONST WUNUSED void **NOTHROW_NCX(LIBCCALL libc_pthread_getspecificptr_np)(pthread_key_t key);
 /* >> pthread_getcpuclockid(3)
  * Get the ID of CPU-time clock for thread `pthread'
  * @return: EOK: Success */
