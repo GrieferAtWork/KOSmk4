@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67d6fb69 */
+/* HASH CRC-32:0xff3fee9f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,17 +23,19 @@
 #include <__crt.h>
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_memcpy_defined
-#define __local___localdep_memcpy_defined
-#ifdef __CRT_HAVE_memcpy
-__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3) __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
-#else /* __CRT_HAVE_memcpy */
+#ifndef __local___localdep_mempcpy_defined
+#define __local___localdep_mempcpy_defined
+#ifdef __CRT_HAVE_mempcpy
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3) __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
+#elif defined(__CRT_HAVE___mempcpy)
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3) __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
+#else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/string/memcpy.h>
+#include <libc/local/string/mempcpy.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_memcpy __LIBC_LOCAL_NAME(memcpy)
-#endif /* !__CRT_HAVE_memcpy */
-#endif /* !__local___localdep_memcpy_defined */
+#define __localdep_mempcpy __LIBC_LOCAL_NAME(mempcpy)
+#endif /* !... */
+#endif /* !__local___localdep_mempcpy_defined */
 #ifndef __local___localdep_strend_defined
 #define __local___localdep_strend_defined
 #ifdef __CRT_HAVE_strend
@@ -64,8 +66,7 @@ __LOCAL_LIBC(strncat) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_INOUT(1) __ATTR_INS(2
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strncat))(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __max_srclen) {
 	__SIZE_TYPE__ __srclen = (__NAMESPACE_LOCAL_SYM __localdep_strnlen)(__src, __max_srclen);
 	char *__dst = (__NAMESPACE_LOCAL_SYM __localdep_strend)(__buf);
-	(__NAMESPACE_LOCAL_SYM __localdep_memcpy)(__dst, __src, __srclen * sizeof(char));
-	__dst[__srclen] = '\0';
+	*(char *)(__NAMESPACE_LOCAL_SYM __localdep_mempcpy)(__dst, __src, __srclen * sizeof(char)) = '\0';
 	return __buf;
 }
 __NAMESPACE_LOCAL_END

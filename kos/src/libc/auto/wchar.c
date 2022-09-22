@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab423f1d */
+/* HASH CRC-32:0xa04343aa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5616,14 +5616,14 @@ NOTHROW_NCX(LIBDCALL libd_wcsverscmp)(char16_t const *s1,
 				if (c1 < '0' || c1 > '9')
 					break;
 				vala *= 10;
-				vala += c1-'0';
+				vala += c1 - '0';
 			}
 			for (;;) {
 				c2 = *s2++;
 				if (c2 < '0' || c2 > '9')
 					break;
 				valb *= 10;
-				valb += c2-'0';
+				valb += c2 - '0';
 			}
 
 			/* Return difference between digits. */
@@ -5670,14 +5670,14 @@ NOTHROW_NCX(LIBKCALL libc_wcsverscmp)(char32_t const *s1,
 				if (c1 < '0' || c1 > '9')
 					break;
 				vala *= 10;
-				vala += c1-'0';
+				vala += c1 - '0';
 			}
 			for (;;) {
 				c2 = *s2++;
 				if (c2 < '0' || c2 > '9')
 					break;
 				valb *= 10;
-				valb += c2-'0';
+				valb += c2 - '0';
 			}
 
 			/* Return difference between digits. */

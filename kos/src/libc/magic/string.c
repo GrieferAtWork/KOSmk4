@@ -922,8 +922,7 @@ miss:
                           size_t max_srclen) {
 	size_t srclen = strnlen(src, max_srclen);
 	char *dst = strend(buf);
-	memcpy(dst, src, srclen * sizeof(char));
-	dst[srclen] = '\0';
+	*(char *)mempcpy(dst, src, srclen * sizeof(char)) = '\0';
 	return buf;
 }
 
@@ -1430,14 +1429,14 @@ int strverscmp([[in]] char const *s1,
 				if (c1 < '0' || c1 > '9')
 					break;
 				vala *= 10;
-				vala += c1-'0';
+				vala += c1 - '0';
 			}
 			for (;;) {
 				c2 = *s2++;
 				if (c2 < '0' || c2 > '9')
 					break;
 				valb *= 10;
-				valb += c2-'0';
+				valb += c2 - '0';
 			}
 
 			/* Return difference between digits. */

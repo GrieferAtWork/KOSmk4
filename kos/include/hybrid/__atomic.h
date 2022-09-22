@@ -770,11 +770,7 @@ __INLINE_hybrid_atomic_fetchop_seqcst(fetchnand, __hybrid_opfun_nand)
 #endif /* !__GCC_ATOMIC_POINTER_LOCK_FREE */
 
 #ifndef __hybrid_atomic_lockfree
-#ifdef __SIZEOF_POINTER__
-#define __hybrid_atomic_lockfree(x) (sizeof(x) <= __SIZEOF_POINTER__)
-#else /* __SIZEOF_POINTER__ */
-#define __hybrid_atomic_lockfree(x) (sizeof(x) <= sizeof(void *))
-#endif /* !__SIZEOF_POINTER__ */
+#define __hybrid_atomic_lockfree(x) __HYBRID_ATOMIC_LOCKFREE(sizeof(x))
 #endif /* !__hybrid_atomic_lockfree */
 
 #ifndef __hybrid_atomic_signal_fence

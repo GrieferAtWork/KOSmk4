@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50fb38cc */
+/* HASH CRC-32:0x5ea96328 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -377,8 +377,7 @@ NOTHROW_NCX(LIBCCALL libc_strncat)(char *__restrict buf,
                                    size_t max_srclen) {
 	size_t srclen = libc_strnlen(src, max_srclen);
 	char *dst = libc_strend(buf);
-	libc_memcpy(dst, src, srclen * sizeof(char));
-	dst[srclen] = '\0';
+	*(char *)libc_mempcpy(dst, src, srclen * sizeof(char)) = '\0';
 	return buf;
 }
 #endif /* !LIBC_ARCH_HAVE_STRNCAT */
@@ -793,14 +792,14 @@ NOTHROW_NCX(LIBCCALL libc_strverscmp)(char const *s1,
 				if (c1 < '0' || c1 > '9')
 					break;
 				vala *= 10;
-				vala += c1-'0';
+				vala += c1 - '0';
 			}
 			for (;;) {
 				c2 = *s2++;
 				if (c2 < '0' || c2 > '9')
 					break;
 				valb *= 10;
-				valb += c2-'0';
+				valb += c2 - '0';
 			}
 
 			/* Return difference between digits. */
