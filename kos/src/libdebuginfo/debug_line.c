@@ -188,7 +188,7 @@ NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t *__restrict self, /
 		if unlikely(!parser.dsp_cu_info_pos)
 			ERRORF(err_corrupt, "index = %" PRIuSIZ, index);
 	} else {
-		/* Skip entires that we don't care about. */
+		/* Skip entries that we don't care about. */
 		for (; index; --index) {
 			if unlikely(!skip_fileinfo(&parser, self->dlu_filefmt))
 				ERROR(err_corrupt);
@@ -237,7 +237,7 @@ NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t *__restrict self, /
 	/* Modify the parser to decode path- rather than file-names. */
 	parser.dsp_cu_info_pos = self->dlu_pathdata;
 
-	/* Skip entires that we don't care about. */
+	/* Skip entries that we don't care about. */
 	for (; index; --index) {
 		if unlikely(!skip_fileinfo(&parser, self->dlu_pathfmt))
 			ERROR(err_corrupt);
