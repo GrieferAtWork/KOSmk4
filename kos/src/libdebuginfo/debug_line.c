@@ -299,7 +299,7 @@ PRIVATE byte_t const dwarf4_lne_filefmt[] = {
 
 
 
-/* Given a pointer to the start of a  debug_line CU (or a pointer to the start  of
+/* Given a pointer to the start of a .debug_line CU (or a pointer to the start  of
  * the .debug_line section), initialize the given debugline CU structure `result',
  * and advance `*preader' to the start of the next unit:
  * >> #define _KOS_SOURCE 1
@@ -377,7 +377,7 @@ again:
 
 	/* header_length */
 	length = result->dlu_ptrsize == 8 ? (uintptr_t)UNALIGNED_GET64((uint64_t const *)reader)
-	                                  : UNALIGNED_GET32((uint32_t const *)reader);
+	                                  : (uintptr_t)UNALIGNED_GET32((uint32_t const *)reader);
 	reader += result->dlu_ptrsize;
 	if (OVERFLOW_UADD((uintptr_t)reader, length, (uintptr_t *)&cu_text) || cu_text > next_cu) {
 		reader = next_cu;

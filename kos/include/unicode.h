@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x769f264 */
+/* HASH CRC-32:0x27bb45c6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -562,12 +562,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_writeutf8, __FORCELOCAL __ATTR_ARTIFICIA
 #endif /* !__CRT_HAVE_unicode_writeutf8 */
 #ifdef __CRT_HAVE_unicode_writeutf8_n
 /* >> unicode_writeutf8_n(3)
- * Same as `unicode_writeutf8(3)', but don't writ emore than `dst_maxbytes' bytes. */
+ * Same as `unicode_writeutf8(3)', but don't write emore than `dst_maxbytes' bytes. */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_OUTS(1, 3),char *,__NOTHROW_NCX,unicode_writeutf8_n,(char *__restrict __dst, char32_t __ch, __SIZE_TYPE__ __dst_maxbytes),(__dst,__ch,__dst_maxbytes))
 #else /* __CRT_HAVE_unicode_writeutf8_n */
 #include <libc/local/unicode/unicode_writeutf8_n.h>
 /* >> unicode_writeutf8_n(3)
- * Same as `unicode_writeutf8(3)', but don't writ emore than `dst_maxbytes' bytes. */
+ * Same as `unicode_writeutf8(3)', but don't write emore than `dst_maxbytes' bytes. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(unicode_writeutf8_n, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_OUTS(1, 3) char *__NOTHROW_NCX(__LIBCCALL unicode_writeutf8_n)(char *__restrict __dst, char32_t __ch, __SIZE_TYPE__ __dst_maxbytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(unicode_writeutf8_n))(__dst, __ch, __dst_maxbytes); })
 #endif /* !__CRT_HAVE_unicode_writeutf8_n */
 #ifdef __CRT_HAVE_unicode_writeutf16

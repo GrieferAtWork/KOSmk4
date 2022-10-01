@@ -183,7 +183,7 @@ rpc_schedule_in_this_task(struct pending_rpc *__restrict rpc,
 		}
 	} else {
 		/* The per-task RPC list is thread-private, so no-one should
-		 * have been able to remove `rpc' from our's. */
+		 * have been able to remove `rpc' from ours. */
 		struct pending_rpc_slist *list = &PERTASK(this_rpcs);
 		struct pending_rpc_slist pending;
 		pending.slh_first = SLIST_ATOMIC_CLEAR(list);

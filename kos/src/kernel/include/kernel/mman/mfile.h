@@ -1595,7 +1595,7 @@ FUNDEF BLOCKING NONNULL((1, 5)) size_t KCALL mfile_direct_write_async_p(struct m
 FUNDEF BLOCKING NONNULL((1, 2, 6)) size_t KCALL mfile_direct_writev_async(struct mfile *__restrict self, struct iov_buffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset, struct aio_multihandle *__restrict aio) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
 FUNDEF BLOCKING NONNULL((1, 2, 6)) size_t KCALL mfile_direct_writev_async_p(struct mfile *__restrict self, struct iov_physbuffer const *__restrict buf, size_t buf_offset, size_t num_bytes, pos_t dst_offset, struct aio_multihandle *__restrict aio) THROWS(E_WOULDBLOCK, E_BADALLOC, E_INVALID_ARGUMENT_BAD_ALIGNMENT, ...);
 
-/* Helpers for directly reading to/from VIO space. */
+/* Helpers for directly reading/writing to/from VIO space. */
 #ifdef LIBVIO_CONFIG_ENABLED
 FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_vioread(struct mfile *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF BLOCKING NONNULL((1)) void KCALL mfile_viowrite(struct mfile *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);

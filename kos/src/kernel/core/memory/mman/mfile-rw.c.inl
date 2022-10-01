@@ -1050,7 +1050,7 @@ handle_write_impossible_too_big:
 			THROW(E_FSERROR_FILE_TOO_BIG);
 		}
 
-		/* Don't writ more than what can fit within the fs-specific disk limits. */
+		/* Don't write more than what can fit within the fs-specific disk limits. */
 		max_file_size -= offset;
 		assert(max_file_size != 0);
 		if ((pos_t)num_bytes > max_file_size)
@@ -1111,7 +1111,7 @@ handle_write_impossible_too_big:
 		 * when calling `mfile_trunclock_inc()'
 		 * This way, another thread can also acquire a write-lock, and
 		 * wait for `mf_trunclock' to become  zero in order to  ensure
-		 * that a file's size doesn't change for a period of this.
+		 * that  a file's size doesn't change for some period of time.
 		 *
 		 * This kind of functionality is required for O_APPEND support! */
 		if (!mfile_lock_tryupgrade(self)) {
@@ -1668,7 +1668,7 @@ extend_failed:
 					/* No  unaligned part of  the file needs to  be loaded fro disk.
 					 * This can  happen when  doing an  unaligned write  beyond  the
 					 * previously allocated bounds of the  file, and can be  handled
-					 * must simpler since it doesn't require complicated calculation
+					 * much simpler since it doesn't require complicated calculation
 					 * of file blocks. (All unaligned data is just bzero'd)
 					 *
 					 * In this case we can also further optimize which regions we do
@@ -1756,7 +1756,7 @@ extend_failed:
 		 *
 		 * Normally, an increase in file size that overlaps with our new  `part'
 		 * would mean that `mfile_insert_and_merge_part_and_unlock()' would fail
-		 * since there would now be another part which with our's overlaps.  But
+		 * since there would now be another  part which ours overlaps with.  But
 		 * this doesn't happen if said other part has already been unloaded.
 		 *
 		 * As  such, we have to manually check  if the file's size has increased,

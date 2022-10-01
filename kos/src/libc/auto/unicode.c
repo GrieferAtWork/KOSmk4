@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf57ae83a */
+/* HASH CRC-32:0x8c492b82 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -587,7 +587,7 @@ NOTHROW_NCX(LIBCCALL libc_unicode_writeutf8)(char *__restrict dst,
 }
 #ifndef __KERNEL__
 /* >> unicode_writeutf8_n(3)
- * Same as `unicode_writeutf8(3)', but don't writ emore than `dst_maxbytes' bytes. */
+ * Same as `unicode_writeutf8(3)', but don't write emore than `dst_maxbytes' bytes. */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL ATTR_OUTS(1, 3) char *
 NOTHROW_NCX(LIBCCALL libc_unicode_writeutf8_n)(char *__restrict dst,
                                                char32_t ch,

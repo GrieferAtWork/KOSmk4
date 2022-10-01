@@ -63,7 +63,8 @@ DECL_BEGIN
  *   within your directory) are being monitored properly, you have to traverse the
  *   directory at least once (thus forcing the  kernel to load and bind all  files
  *   within  the directory at least once). Else, changes may not be visible as has
- *   been described above!
+ *   been described above (though keep in mind that this only happens if hardlinks
+ *   come into play)!
  *
  * - Because any given  file can  appear in more  than one  directory, and  because
  *   events  generated  by  files  must  be  send  to  containing  directories, any

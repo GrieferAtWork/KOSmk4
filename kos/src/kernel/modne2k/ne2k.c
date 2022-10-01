@@ -1012,10 +1012,10 @@ again_poll_transit:
 			task_tryyield_or_pause();
 			goto again_poll_transit;
 		}
-		/* Check if our packet can be found  within the `transit' chain we've just  stolen.
-		 * If  it's not in there, then `transit' is  a chain of packets that were scheduled
-		 * for sending _after_ the async-worker did  its ATOMIC_XCH() of AIO handles  which
-		 * includes our's, such that we have to wait for it to put our handle back into the
+		/* Check  if our packet can be found within the `transit' chain we've just stolen.
+		 * If  it's not in there, then `transit' is a chain of packets that were scheduled
+		 * for sending _after_ the async-worker did its ATOMIC_XCH() of AIO handles  which
+		 * includes ours, such that we have to wait for it to put our handle back into the
 		 * chain of those that are pending. */
 		piter    = &transit;
 		did_find = false;

@@ -357,7 +357,7 @@ __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((2)) dlfunc_t
 #endif /* ... */
 #endif /* __USE_BSD */
 
-/* BSD also has a function `fdlopen(3D)' that does the same as our's does. */
+/* BSD also has a function `fdlopen(3D)' that does the same as ours does. */
 #if defined(__USE_KOS) || defined(__USE_BSD)
 /* Open a library, given a file descriptor previously acquired by `open(2)'
  * NOTE: This function will inherit the given `fd' on success.

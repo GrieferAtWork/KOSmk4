@@ -585,7 +585,7 @@ NOTHROW(FCALL move_thread_to_back_of_runqueue)(struct cpu *__restrict me,
 				sched_pself(thread)   = &sched_s_running_first;
 				sched_s_running_first = thread;
 			} else {
-				/* Find the thread after which we should insert our's */
+				/* Find the thread after which we should insert ours */
 				do {
 					last_running = sched_prev(last_running);
 				} while (new_stop_time < sched_stoptime(last_running));

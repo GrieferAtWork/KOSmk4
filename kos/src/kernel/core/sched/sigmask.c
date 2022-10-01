@@ -318,8 +318,8 @@ NOTHROW(FCALL sigmask_ismasked_in_userprocmask_nopf)(struct task *__restrict sel
 	 *       know that nothing can change `this_userprocmask_address' */
 	um = FORTASK(self, this_userprocmask_address);
 
-	/* Make sure we're operating  in the context of  `self->t_mman'
-	 * Note that we don't use task_setmman() to change our's, since
+	/* Make sure we're operating in the context of  `self->t_mman'
+	 * Note that we don't use task_setmman() to change ours, since
 	 * that function would be complete overkill for our purposes. */
 	mymm     = THIS_MMAN;
 	threadmm = self->t_mman;

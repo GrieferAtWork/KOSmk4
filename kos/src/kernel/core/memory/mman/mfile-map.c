@@ -353,7 +353,7 @@ again_getpart:
 		return;
 	}
 
-	/* Failed to acquire all required parts. - Unlock our's, and re-lock everything
+	/* Failed to acquire all required parts. - Unlock ours, and re-lock everything
 	 * NOTE: This should never ~really~ happen when `file' is anonymous,  though... */
 	mpart_lock_release(part);
 again_acquire:

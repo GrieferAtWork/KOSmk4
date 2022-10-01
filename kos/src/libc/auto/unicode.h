@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89d18a00 */
+/* HASH CRC-32:0xe323819a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -154,12 +154,12 @@ INTDEF ATTR_RETNONNULL ATTR_OUT(1) char *NOTHROW_NCX(LIBDCALL libd_unicode_write
 INTDEF ATTR_RETNONNULL ATTR_OUT(1) char *NOTHROW_NCX(LIBCCALL libc_unicode_writeutf8)(char *__restrict dst, char32_t ch);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> unicode_writeutf8_n(3)
- * Same as `unicode_writeutf8(3)', but don't writ emore than `dst_maxbytes' bytes. */
+ * Same as `unicode_writeutf8(3)', but don't write emore than `dst_maxbytes' bytes. */
 INTDEF ATTR_RETNONNULL ATTR_OUTS(1, 3) char *NOTHROW_NCX(LIBDCALL libd_unicode_writeutf8_n)(char *__restrict dst, char32_t ch, size_t dst_maxbytes);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> unicode_writeutf8_n(3)
- * Same as `unicode_writeutf8(3)', but don't writ emore than `dst_maxbytes' bytes. */
+ * Same as `unicode_writeutf8(3)', but don't write emore than `dst_maxbytes' bytes. */
 INTDEF ATTR_RETNONNULL ATTR_OUTS(1, 3) char *NOTHROW_NCX(LIBCCALL libc_unicode_writeutf8_n)(char *__restrict dst, char32_t ch, size_t dst_maxbytes);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

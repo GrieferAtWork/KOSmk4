@@ -581,7 +581,9 @@ NOTHROW(FCALL mpart_assert_integrity)(struct mpart *__restrict self);
 /* Fill in `self->mp_filent' such that `self' is marked as an anonymous mem-part.
  * NOTE: `rb_rhs' must be filled in with `NULL' as an indicator for `mpart_trim()'! */
 #ifdef NDEBUG
-#define _mpart_init_asanon(self) (void)((self)->mp_filent.rb_par = (struct mpart *)-1)
+#define _mpart_init_asanon(self)                          \
+	(void)((self)->mp_filent.rb_par = (struct mpart *)-1, \
+	       (self)->mp_filent.rb_rhs = __NULLPTR)
 #elif __SIZEOF_POINTER__ == 4
 #define _mpart_init_asanon(self)                                              \
 	(void)((self)->mp_filent.rb_par = (struct mpart *)-1,                     \

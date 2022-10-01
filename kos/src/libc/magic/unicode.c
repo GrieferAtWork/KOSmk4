@@ -804,7 +804,7 @@ char *unicode_writeutf8([[out]] /*utf-8*/ char *__restrict dst, char32_t ch) {
 }
 
 @@>> unicode_writeutf8_n(3)
-@@Same as `unicode_writeutf8(3)', but don't writ emore than `dst_maxbytes' bytes.
+@@Same as `unicode_writeutf8(3)', but don't write emore than `dst_maxbytes' bytes.
 [[nonnull, decl_include("<hybrid/typecore.h>"), impl_include("<hybrid/typecore.h>")]]
 char *unicode_writeutf8_n([[out(? <= dst_maxbytes)]] /*utf-8*/ char *__restrict dst,
                           char32_t ch, $size_t dst_maxbytes) {

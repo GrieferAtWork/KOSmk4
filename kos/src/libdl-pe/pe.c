@@ -563,10 +563,10 @@ PRIVATE NONNULL((1, 2)) void CC
 DlModule_PeTlsExec(DlModule *__restrict self, void *base, DWORD reason) {
 	void **pmodtls, *oldbase;
 
-	/* Technically,  PE TLS should  be initialized in  the context of the
-	 * thread it is meant  to be used for.  -- This isn't something  that
-	 * is guarantied for KOS-style dlfcn  tls initializers (which we  are
-	 * basing our's on, so that `dltlsaddr(3D)' will work for PE modules)
+	/* Technically, PE TLS should be  initialized in the context of  the
+	 * thread  it is meant to be used  for. -- This isn't something that
+	 * is guarantied for KOS-style dlfcn tls initializers (which we  are
+	 * basing ours on, so that `dltlsaddr(3D)' will work for PE modules)
 	 *
 	 * As such, we hijack the calling thread's TLS base pointer for  the
 	 * relevant module and temporarily override it. If it already didn't
