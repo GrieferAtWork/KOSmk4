@@ -38,7 +38,7 @@
  * >> PRIVATE void *stack[1024];
  * >>
  * >> PRIVATE void do_call(void *arg) {
- * >>     SPCALL_NORETURN(&callee, arg, stack, sizeof(stack));
+ * >>     SPCALL_NORETURN(callee, arg, stack, sizeof(stack));
  * >> }
  *
  * Use the function:
