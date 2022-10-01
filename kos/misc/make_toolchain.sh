@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix a problem with how `DeeStruct_Type` is defined"
-DEEMON_VERSION="4a903386c7404aa626658d8957fe8a4c0a420d07"
+#     v -- "Cleanup & fix stack-jumping when enumerating attributes"
+DEEMON_VERSION="18e9fc33d29784d551dc5babe7860ed563964227"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
