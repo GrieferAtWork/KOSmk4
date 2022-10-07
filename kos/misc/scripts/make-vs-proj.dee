@@ -531,3 +531,97 @@ createVsFile("kos.vcxproj.user", (fp: File) -> {
 	fp <<
 "</Project>";
 });
+
+/* Generate MI engine configuration files.
+ * With these, you can start KOS and attach it to VC's debugger from the CTRL+ALT+A (command) window
+ * >> Debug.MIDebugLaunch /Executable:foo /OptionsFile:E:\c\kls\kos\.vs\MIOptions-i386-kos-nOD.xml
+ * Though you will have to replace `E:\c\kls\kos' with what is correct for your machine
+ *
+ * There sadly isn't a way to trick VS into running that command automatically, or to
+ * have it auto-insert the name of the current configuration (so you don't have to do
+ * so by hand)
+ */
+for (local targetName: listTargetNames()) {
+	local TARGET = import(f"..targets.{targetName}");
+	for (local configName: listConfigurationNames()) {
+		createVsFile(f"MIOptions-{targetName}-kos-{configName}.xml", (fp: File) -> {
+			fp <<
+"<LocalLaunchOptions xmlns=\"http://schemas.microsoft.com/vstudio/MDDDebuggerOptions/2014\"\n"
+"	MiMode=\"gdb\"\n"
+"	TargetArchitecture=\"" << {
+				/* s.a. https://github.com/Microsoft/MIEngine/blob/main/src/MICore/LaunchOptions.xsd#L136 */
+				"arm" : "arm",
+				"arm64" : "arm64",
+				"i386" : "x86",
+				"x86_64" : "amd64",
+				"mips" : "mips",
+			}[targetName] << "\"\n"
+"	MIDebuggerPath=\"gdb.exe\"\n"
+"	MIDebuggerServerAddress=\"localhost:1234\"\n"
+"	DebugServer=\"" << ROOTDIR << "\\binutils\\deemon\\deemon.exe\"\n"
+"	DebugServerArgs=\"&quot;" << ROOTDIR << "\\magic.dee&quot;"
+				" --run-only"
+				" --emulator=qemu"
+				" --gdb=emulator"
+				" --emulator-started-pattern=EMULATOR_STARTED"
+				" --emulator-setopt=redirect.stdout=gdb.exe"
+				" --target=" << targetName <<
+				" --config=" << configName <<
+				"\"\n"
+"	ServerStarted=\"EMULATOR_STARTED\"\n"
+"	FilterStdout=\"true\"\n"
+"	FilterStderr=\"true\"\n"
+"	ServerLaunchTimeout=\"120000\"\n"
+">\n"
+"	<SourceMap>\n"
+"		<SourceMapEntry EditorPath=\"C:\\\" CompileTimePath=\"/cygdrive/c\" UseForBreakpoints=\"true\" />\n"
+"		<SourceMapEntry EditorPath=\"D:\\\" CompileTimePath=\"/cygdrive/d\" UseForBreakpoints=\"true\" />\n"
+"		<SourceMapEntry EditorPath=\"E:\\\" CompileTimePath=\"/cygdrive/e\" UseForBreakpoints=\"true\" />\n"
+"		<SourceMapEntry EditorPath=\"F:\\\" CompileTimePath=\"/cygdrive/f\" UseForBreakpoints=\"true\" />\n"
+"		<SourceMapEntry EditorPath=\"G:\\\" CompileTimePath=\"/cygdrive/g\" UseForBreakpoints=\"true\" />\n"
+"		<SourceMapEntry EditorPath=\"H:\\\" CompileTimePath=\"/cygdrive/h\" UseForBreakpoints=\"true\" />\n"
+"		<SourceMapEntry EditorPath=\"I:\\\" CompileTimePath=\"/cygdrive/i\" UseForBreakpoints=\"true\" />\n"
+"		<SourceMapEntry EditorPath=\"J:\\\" CompileTimePath=\"/cygdrive/j\" UseForBreakpoints=\"true\" />\n"
+"		<SourceMapEntry EditorPath=\"K:\\\" CompileTimePath=\"/cygdrive/k\" UseForBreakpoints=\"true\" />\n"
+"		<SourceMapEntry EditorPath=\"X:\\\" CompileTimePath=\"/cygdrive/x\" UseForBreakpoints=\"true\" />\n"
+"		<SourceMapEntry EditorPath=\"Y:\\\" CompileTimePath=\"/cygdrive/y\" UseForBreakpoints=\"true\" />\n"
+"		<SourceMapEntry EditorPath=\"Z:\\\" CompileTimePath=\"/cygdrive/z\" UseForBreakpoints=\"true\" />\n"
+"	</SourceMap>\n"
+"	<CustomLaunchSetupCommands>\n"
+"		<Command IgnoreFailures=\"false\" Description=\".\">cd " << ROOTDIR << "</Command>\n"
+"		<Command IgnoreFailures=\"false\" Description=\".\">set sysroot bin/" << targetName << "-kos-" << configName << "</Command>\n"
+"		<Command IgnoreFailures=\"false\" Description=\".\">set architecture " << TARGET.GDBARCH << "</Command>\n"
+"		<Command IgnoreFailures=\"false\" Description=\".\">target remote localhost:1234</Command>\n"
+"		<Command IgnoreFailures=\"true\" Description=\".\">file bin/" << targetName << "-kos-" << configName << "/os/kernel.bin</Command>\n"
+"	</CustomLaunchSetupCommands>\n"
+"	<SetupCommands>\n"
+"		<Command IgnoreFailures=\"true\" Description=\".\">-enable-pretty-printing</Command>\n"
+"		<Command IgnoreFailures=\"true\" Description=\".\">set print pretty on</Command>\n"
+"		<Command IgnoreFailures=\"true\" Description=\".\">set print object on</Command>\n"
+"		<Command IgnoreFailures=\"true\" Description=\".\">set print static-members on</Command>\n"
+"		<Command IgnoreFailures=\"true\" Description=\".\">set print vtbl on</Command>\n"
+"		<Command IgnoreFailures=\"true\" Description=\".\">set print demangle on</Command>\n"
+"		<Command IgnoreFailures=\"true\" Description=\".\">set demangle-style gnu-v3</Command>\n"
+"		<Command IgnoreFailures=\"true\" Description=\".\">set print sevenbit-strings off</Command>\n"
+"	</SetupCommands>\n"
+"</LocalLaunchOptions>\n";
+/*<PipeLaunchOptions xmlns="http://schemas.microsoft.com/vstudio/MDDDebuggerOptions/2014"
+	PipePath="D:\cyg\root\bin\bash.exe"
+	PipeCommandArguments="-c"
+	PipeArguments="-c 'gdb - -interpreter=mi'"
+	MiMode="gdb"
+	ExePath="/os/kernel.bin"
+	TargetArchitecture="x86"
+	PipeCwd="E:\c\kls\kos"
+	WorkingDirectory="/"
+>
+	<CustomLaunchSetupCommands>
+		<Command IgnoreFailures="false" Description=".">set sysroot bin/i386-kos-nOD</Command>
+		<Command IgnoreFailures="false" Description=".">set architecture i386:intel</Command>
+		<Command IgnoreFailures="false" Description=".">target remote localhost:1234</Command>
+		<Command IgnoreFailures="true" Description=".">file bin/i386-kos-nOD/os/kernel.bin</Command>
+	</CustomLaunchSetupCommands>
+</PipeLaunchOptions>*/
+		});
+	}
+}
