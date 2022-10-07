@@ -53,7 +53,7 @@ NOTHROW_NCX(LIBCCALL libc___freading)(FILE __KOS_FIXED_CONST *stream)
 /*[[[body:libc___freading]]]*/
 {
 	stream = file_fromuser(stream);
-	return !(stream->if_flag & __IO_FILE_IORW) ||
+	return !(stream->if_flag & IO_RW) ||
 	       (stream->if_exdata->io_chsz == 0);
 }
 /*[[[end:libc___freading]]]*/
@@ -102,7 +102,7 @@ NOTHROW_NCX(LIBCCALL libc___fwritable)(FILE __KOS_FIXED_CONST *stream)
 /*[[[body:libc___fwritable]]]*/
 {
 	stream = file_fromuser(stream);
-	return (stream->if_flag & __IO_FILE_IORW) != 0;
+	return (stream->if_flag & IO_RW) != 0;
 }
 /*[[[end:libc___fwritable]]]*/
 

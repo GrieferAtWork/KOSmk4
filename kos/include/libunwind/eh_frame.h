@@ -225,7 +225,7 @@ typedef struct unwind_fde_struct {
 	__uintptr_t             f_codealign;   /* Code alignment. (Multiplied with the delta argument of an advance location instruction) */
 	__intptr_t              f_dataalign;   /* Data alignment. (Multiplied with the register offset argument of an offset instruction) */
 	void const             *f_persofun;    /* [0..1] Address of a personality handler function. (absolute) */
-	void const             *f_lsdaaddr;    /* [0..1] Address of a language-specific data block. (absolute) */
+	void const             *f_lsdaaddr;    /* [0..1] Address of a language-specific data area. (absolute) */
 	__byte_t const         *f_inittext;    /* [0..1] Pointer to initial EH instructions (usually describing compiler-generated frames) (absolute) */
 	__byte_t const         *f_inittextend; /* [0..1] End address of `f_inittext'. */
 	__byte_t const         *f_evaltext;    /* [0..1] Pointer to FDE-specific EH instructions (This is the meat of it all) (absolute) */

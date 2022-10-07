@@ -258,6 +258,7 @@ libc_gxx_personality_kernexcept(struct _Unwind_Context *__restrict context, bool
 	size_t callsite_size;
 	ENSURE_LIBUNWIND_LOADED();
 
+	/* HINT: `f_lsdaaddr' points into `.gcc_except_table' */
 	reader     = (byte_t const *)context->uc_fde.f_lsdaaddr;
 	landingpad = (byte_t const *)context->uc_fde.f_pcstart;
 	pc         = __EXCEPT_REGISTER_STATE_TYPE_RDPC(*context->uc_state);
