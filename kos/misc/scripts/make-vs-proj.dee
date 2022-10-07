@@ -57,6 +57,10 @@ global final PROJ_TARGETS = Dict.Frozen(() -> {
 			4 : "Win32",
 			8 : "x64",
 		}[TARGET.POINTER_SIZE];
+#ifdef ENABLE_GDB
+		if (targetName == "i386")
+			VS_PROJECT_TARGET = "x86";
+#endif /* ENABLE_GDB */
 		yield (
 			f"{targetName}-kos",
 			(VS_PROJECT_TARGET, {
@@ -148,14 +152,20 @@ global final SORTED_FILE_NAMES = FILES.keys.sorted();
 
 function createVsFile(filename: string, cb: Callable) {
 	print("Creating file: ", repr filename);
-	local fp;
-	try {
-		fp = File.open(".vs/" + filename, "w");
-	} catch (...) {
-		try fs.mkdir(".vs"); catch (...);
-		fp = File.open(".vs/" + filename, "w");
+	local newData = File.Writer();
+	cb(newData);
+	newData = newData.string.encode("utf-8");
+	local oldData = try File.open(".vs/" + filename, "r").read() catch (...) none;
+	if (oldData is none || oldData != newData) {
+		local fp;
+		try {
+			fp = File.open(".vs/" + filename, "w");
+		} catch (...) {
+			try fs.mkdir(".vs"); catch (...);
+			fp = File.open(".vs/" + filename, "w");
+		}
+		with (fp) cb(fp);
 	}
-	with (fp) cb(fp);
 }
 
 function injectPath(): string {
@@ -496,9 +506,9 @@ createVsFile("kos.vcxproj.user", (fp: File) -> {
 			fp <<
 "	<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='" << config << "|" << target_int << "'\">\n"
 #ifdef ENABLE_GDB
-"		<RemoteDebuggingMode>gdbserver</RemoteDebuggingMode>\n"
 "		<DebuggerFlavor>LinuxDebugger</DebuggerFlavor>\n"
-"		<RemoteDebugTarget>-1625936366;localhost (username=, port=1234, authentication=Password)</RemoteDebugTarget>\n"
+"		<RemoteDebuggerCommand>/os/kernel.bin</RemoteDebuggerCommand>\n"
+"		<RemoteDebuggingMode>gdb</RemoteDebuggingMode>\n"
 "		<RemotePortNumber>1234</RemotePortNumber>\n"
 "		<GDBPath>D:\\cyg\\root\\bin\\gdb.exe</GDBPath>\n"
 "		<PreLaunchCommand>"
@@ -513,6 +523,7 @@ createVsFile("kos.vcxproj.user", (fp: File) -> {
 			<< " --config=" << configShortHand
 			<< "</PreLaunchCommand>\n"
 #else /* ENABLE_GDB */
+"		<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>\n"
 "		<LocalDebuggerCommand>" << ROOTDIR << "\\binutils\\deemon\\deemon.exe</LocalDebuggerCommand>\n"
 "		<LocalDebuggerCommandArguments>"
 			<< ROOTDIR << "\\magic.dee"
@@ -523,7 +534,6 @@ createVsFile("kos.vcxproj.user", (fp: File) -> {
 			<< " " << injectPath()
 			<< "</LocalDebuggerCommandArguments>\n"
 "		<LocalDebuggerWorkingDirectory>" << ROOTDIR << "</LocalDebuggerWorkingDirectory>\n"
-"		<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>\n"
 #endif /* !ENABLE_GDB */
 "	</PropertyGroup>\n";
 		}
@@ -540,6 +550,13 @@ createVsFile("kos.vcxproj.user", (fp: File) -> {
  * There sadly isn't a way to trick VS into running that command automatically, or to
  * have it auto-insert the name of the current configuration (so you don't have to do
  * so by hand)
+ *
+ * However, to make  this slightly  better, `./make-vs-proj-update-mioptions.dee'  gets
+ * called by `/magic.dee' whenever you do a build, and it will make sure that the last-
+ * built  configuration is referenced by a file  `/.vs/MIOptions.xml', so in VS you can
+ * then do:
+ * >> alias d Debug.MIDebugLaunch /Executable:foo /OptionsFile:E:\c\kls\kos\.vs\MIOptions.xml
+ * >> d
  */
 for (local targetName: listTargetNames()) {
 	local TARGET = import(f"..targets.{targetName}");

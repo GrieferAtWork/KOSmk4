@@ -755,6 +755,17 @@ Finally, use the `Open Folder` function to open the `/kos` sub-folder.
 
 Make sure that `make_toolchain.sh` has already been executed at least once, as it will generate required configuration files for Visual Studio. Once this has been done, you can use the `Open Folder` function under the file-tab (`CTRL+SHIFT+ALT+O`) to open the `/kos` sub-folder. - DONT OPEN THE ACTUAL ROOT FOLDER (see notes below).
 
+Alternatively (because `Open Folder` tends to be extremely laggy), you can also run `make vs-proj`, and open the `/.vs/kos.sln` file it generated. While this method fixes all of the slow-downs that appear when using `Open Folder`, take note of the following caveats:
+
+- Don't get any idea about tinkering with project settings within VS. The next time you run `make vs-proj`, any changes you made will be overwritten
+- Whenever you add/delete a file to/from the KOS source tree, you have to re-run `make vs-proj` (After doing this, VS will detect this and ask you to re-load its project files. When prompted to, confirm this reload)
+- If you try to start KOS using the regular Run-button (or by pressing `F5`), you will not actually be debugging KOS, but will be debugging `deemon` as it is executing `/magic.dee` (though while it does so, deemon will still launch qemu and KOS as expected). To properly debug KOS, you have to do the following:
+	- Press `CTRL+ALT+A` to open the "Command Window"
+	- (First time only) type `alias d Debug.MIDebugLaunch /Executable:foo /OptionsFile:{{KOS_ROOT_DIRECTORY}}\kos\.vs\MIOptions.xml` and replace `{{KOS_ROOT_DIRECTORY}}` with the absolute path of the KOS source tree
+	- From now on, you can start debugging KOS from the "Command Window" by typing `d`, followed by `ENTER`
+- After changing the target/configuration in VS, make sure you build at least once (`CTRL+SHIFT+B`) before running `d` from the "Command Window". If you fail to do so and run `d` immediately, you will actually launch whatever configuration you had selected previously.
+
+
 #### Rant on Visual Studio
 
 I personally use Visual Studio 2017 Community Edition for this, as it actually has a fairly unknown feature `Open Folder` which allows for a hacky way to get full support for GDB debugging without having to pay an insane sum of up to $340 for [VisualGDB](https://visualgdb.com/buy/) (I'm doing this as a hobby; I don't have that kind of money; Jeez: I could barely scrape together $10 if that was the asking price)
@@ -803,7 +814,7 @@ For this, the KOS system header folder contains crt feature files. These files a
 
 Using this system, KOS system headers will automatically determine the features provided by the linked libc, and fill in the gaps, thus offering a much more complete API experience, regardless of what the underlying libraries actually offer.
 
-Now assuming that some functionality is missing from linked libraries, this manifests itself by the automatic function substitution system kicking in and providing local definitions (aka. static/inline functions) for pretty much everything found in system headers (e.g. memcpy is immediatly implemented as an inline/static function in `/kos/include/libc/local/string/memcpy.h`)
+Now assuming that some functionality is missing from linked libraries, this manifests itself by the automatic function substitution system kicking in and providing local definitions (aka. static/inline functions) for pretty much everything found in system headers (e.g. memcpy is immediately implemented as an inline/static function in `/kos/include/libc/local/string/memcpy.h`)
 
 With these substitutions in place, libraries and the kernel can still be built, however will result in below-optimal code being generated, simple due to the rediculous amount of redundancies.
 

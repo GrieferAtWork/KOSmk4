@@ -397,6 +397,11 @@ _err_unknown_argument:
 	TARGET = import(".kos.misc.targets." + TARGET_ARCH);
 	/* Build everything that was selected. */
 	if (!OPT_DONT_BUILD) {
+		/* Update the vs MIEngine work-around config build */
+		if (fs.stat.isdir(".vs")) {
+			import(".kos.misc.scripts.make-vs-proj-update-mioptions")
+				.selectMiOptions(TARGET_ARCH, config.CONFIG.name);
+		}
 		if (hasattr(TARGET, "build")) {
 			import . as me;
 			TARGET.build(me);
