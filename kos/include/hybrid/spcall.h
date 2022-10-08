@@ -70,11 +70,13 @@
 		__builtin_unreachable();                              \
 	}	__WHILE0
 #elif defined(__COMPILER_HAVE_GCC_ASM)
+#ifndef __USER_LABEL_PREFIX_STR__
 #ifdef __USER_LABEL_PREFIX__
 #define __USER_LABEL_PREFIX_STR__ PP_STR(__USER_LABEL_PREFIX__)
 #else /* __USER_LABEL_PREFIX__ */
 #define __USER_LABEL_PREFIX_STR__ /* nothing */
 #endif /* !__USER_LABEL_PREFIX__ */
+#endif /* !__USER_LABEL_PREFIX_STR__ */
 #if !defined(__NO_ATTR_MSABI) && (defined(__NO_ATTR_SYSVABI) || defined(__WINNT__))
 #define SPCALL_CC __ATTR_MSABI
 #define SPCALL_NORETURN(fun, arg, stackaddr, stacksize)       \
@@ -131,6 +133,13 @@
 		__builtin_unreachable();                              \
 	}	__WHILE0
 #else /* _MSC_VER */
+#ifndef __USER_LABEL_PREFIX_STR__
+#ifdef __USER_LABEL_PREFIX__
+#define __USER_LABEL_PREFIX_STR__ PP_STR(__USER_LABEL_PREFIX__)
+#else /* __USER_LABEL_PREFIX__ */
+#define __USER_LABEL_PREFIX_STR__ /* nothing */
+#endif /* !__USER_LABEL_PREFIX__ */
+#endif /* !__USER_LABEL_PREFIX_STR__ */
 #ifndef __NO_ATTR_FASTCALL
 #define SPCALL_CC __ATTR_FASTCALL
 #define SPCALL_NORETURN(fun, arg, stackaddr, stacksize)       \

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d7b9f32 */
+/* HASH CRC-32:0xaffc9929 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -119,10 +119,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(waccess, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_W
 __CDECLARE(__ATTR_IN(1),int,__NOTHROW_RPC,wchdir,(wchar_t const *__path),(__path))
 #elif defined(__CRT_HAVE__wchdir)
 __CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,wchdir,(wchar_t const *__path),_wchdir,(__path))
-#elif (defined(__CRT_HAVE_chdir) || defined(__CRT_HAVE__chdir) || defined(__CRT_HAVE___chdir) || defined(__CRT_HAVE___libc_chdir) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_fchdirat))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
+#else /* ... */
+#include <asm/os/fcntl.h>
+#if (defined(__CRT_HAVE_chdir) || defined(__CRT_HAVE__chdir) || defined(__CRT_HAVE___chdir) || defined(__CRT_HAVE___libc_chdir) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_fchdirat))) && (defined(__CRT_HAVE_convert_wcstombs) || defined(__CRT_HAVE_convert_wcstombsn) || defined(__CRT_HAVE_format_aprintf_printer) || defined(__CRT_HAVE_format_aprintf_alloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc))
 #include <libc/local/parts.wchar.unistd/wchdir.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(wchdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) int __NOTHROW_RPC(__LIBCCALL wchdir)(wchar_t const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wchdir))(__path); })
-#endif /* ... */
+#endif /* (__CRT_HAVE_chdir || __CRT_HAVE__chdir || __CRT_HAVE___chdir || __CRT_HAVE___libc_chdir || (__AT_FDCWD && __CRT_HAVE_fchdirat)) && (__CRT_HAVE_convert_wcstombs || __CRT_HAVE_convert_wcstombsn || __CRT_HAVE_format_aprintf_printer || __CRT_HAVE_format_aprintf_alloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc) */
+#endif /* !... */
 #ifndef __wgetcwd_defined
 #define __wgetcwd_defined
 #ifdef __CRT_HAVE_wgetcwd

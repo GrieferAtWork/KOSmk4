@@ -1299,8 +1299,8 @@ NOTHROW_RPC(LIBCCALL libc_fchown)(fd_t fd,
 }
 /*[[[end:libc_fchown]]]*/
 
-/*[[[head:libc_fchdir,hash:CRC-32=0x47010fa5]]]*/
-/* >> chdir(2)
+/*[[[head:libc_fchdir,hash:CRC-32=0xa4cc825d]]]*/
+/* >> fchdir(2)
  * Change the current working directory to `path' */
 INTERN ATTR_SECTION(".text.crt.fs.basic_property") int
 NOTHROW_RPC(LIBCCALL libc_fchdir)(fd_t fd)

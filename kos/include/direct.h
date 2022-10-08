@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5c0603d */
+/* HASH CRC-32:0x3de6e684 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,12 +74,15 @@ __CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,_chdir,(char const *__path),__chdir,(
 /* >> chdir(2)
  * Change the current working directory to `path' */
 __CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,_chdir,(char const *__path),__libc_chdir,(__path))
-#elif defined(__AT_FDCWD) && defined(__CRT_HAVE_fchdirat)
+#else /* ... */
+#include <asm/os/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_fchdirat)
 #include <libc/local/unistd/chdir.h>
 /* >> chdir(2)
  * Change the current working directory to `path' */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) int __NOTHROW_RPC(__LIBCCALL _chdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(chdir))(__path); }
-#endif /* ... */
+#endif /* __AT_FDCWD && __CRT_HAVE_fchdirat */
+#endif /* !... */
 #ifdef __CRT_HAVE_rmdir
 /* >> rmdir(2)
  * Remove a directory referred to by `path' */

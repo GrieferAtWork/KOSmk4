@@ -1328,6 +1328,7 @@ int access([[in]] char const *file, __STDC_INT_AS_UINT_T type) {
 [[cp, guard, crt_dos_variant]]
 [[dos_export_alias("_chdir")]]
 [[export_alias("__chdir", "__libc_chdir")]]
+[[requires_include("<asm/os/fcntl.h>")]]
 [[requires(defined(__AT_FDCWD) && $has_function(fchdirat))]]
 [[userimpl, section(".text.crt{|.dos}.fs.basic_property")]]
 /* Hacky work-around for a bug in gnulib:
@@ -2131,7 +2132,7 @@ $pid_t vfork();
 [[section(".text.crt{|.dos}.fs.modify")]]
 int fchown($fd_t fd, $uid_t owner, $gid_t group);
 
-@@>> chdir(2)
+@@>> fchdir(2)
 @@Change the current working directory to `path'
 [[cp, decl_include("<bits/types.h>")]]
 [[export_alias("__fchdir", "__libc_fchdir")]]

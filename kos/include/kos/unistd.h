@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe307df35 */
+/* HASH CRC-32:0x39d35a11 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -543,7 +543,7 @@ __CDECLARE_OPT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__THROWING,VFork,(voi
 /* >> fchown(2)
  * Change the ownership of a given `fd' to `group:owner' */
 __CDECLARE_VOID_OPT(,__THROWING,FChown,(__fd_t __fd, __uid_t __owner, __gid_t __group),(__fd,__owner,__group))
-/* >> chdir(2)
+/* >> fchdir(2)
  * Change the current working directory to `path' */
 __CDECLARE_VOID_OPT(,__THROWING,FChdir,(__fd_t __fd),(__fd))
 /* >> getpgid(2)

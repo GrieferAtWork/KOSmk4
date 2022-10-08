@@ -77,7 +77,7 @@ __LIBM_LOCAL_FUNC(nexttowardf_d) __ATTR_WUNUSED __ATTR_CONST __IEEE754_FLOAT_TYP
 
 	if (__ix == 0) { /* x == 0 */
 		__IEEE754_FLOAT_TYPE__ __u;
-		__LIBM_SET_FLOAT_WORD(__x, (uint32_t)(__hy & __UINT32_C(0x80000000)) | 1); /* return +-minsub*/
+		__LIBM_SET_FLOAT_WORD(__x, (__uint32_t)(__hy & __UINT32_C(0x80000000)) | 1); /* return +-minsub*/
 		__libm_math_opt_barrier(__x, __u);
 		__u = __u * __u;
 		__libm_math_force_eval(__u); /* raise underflow flag */

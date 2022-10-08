@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19b04e66 */
+/* HASH CRC-32:0x21dd166d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -247,7 +247,7 @@ INTDEF ATTR_RETURNS_TWICE WUNUSED pid_t (LIBCCALL libc_VFork)(void) THROWS(...);
 /* >> fchown(2)
  * Change the ownership of a given `fd' to `group:owner' */
 INTDEF void (LIBCCALL libc_FChown)(fd_t fd, uid_t owner, gid_t group) THROWS(...);
-/* >> chdir(2)
+/* >> fchdir(2)
  * Change the current working directory to `path' */
 INTDEF void (LIBCCALL libc_FChdir)(fd_t fd) THROWS(...);
 /* >> getpgid(2)

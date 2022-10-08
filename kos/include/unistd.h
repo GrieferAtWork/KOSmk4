@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd175ed67 */
+/* HASH CRC-32:0xa315489f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1672,13 +1672,16 @@ __CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,chdir,(char const *__path),__chdir,(_
 /* >> chdir(2)
  * Change the current working directory to `path' */
 __CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,chdir,(char const *__path),__libc_chdir,(__path))
-#elif defined(__AT_FDCWD) && defined(__CRT_HAVE_fchdirat)
+#else /* ... */
+#include <asm/os/fcntl.h>
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_fchdirat)
 #include <libc/local/unistd/chdir.h>
 /* >> chdir(2)
  * Change the current working directory to `path' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(chdir, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) int __NOTHROW_RPC(__LIBCCALL chdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(chdir))(__path); })
-#else /* ... */
+#else /* __AT_FDCWD && __CRT_HAVE_fchdirat */
 #undef __chdir_defined
+#endif /* !__AT_FDCWD || !__CRT_HAVE_fchdirat */
 #endif /* !... */
 #endif /* !__chdir_defined */
 #ifndef __getcwd_defined
@@ -2384,15 +2387,15 @@ __CREDIRECT(,int,__NOTHROW_RPC,fchown,(__fd_t __fd, __uid_t __owner, __gid_t __g
 __CREDIRECT(,int,__NOTHROW_RPC,fchown,(__fd_t __fd, __uid_t __owner, __gid_t __group),__libc_fchown,(__fd,__owner,__group))
 #endif /* ... */
 #ifdef __CRT_HAVE_fchdir
-/* >> chdir(2)
+/* >> fchdir(2)
  * Change the current working directory to `path' */
 __CDECLARE(,int,__NOTHROW_RPC,fchdir,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE___fchdir)
-/* >> chdir(2)
+/* >> fchdir(2)
  * Change the current working directory to `path' */
 __CREDIRECT(,int,__NOTHROW_RPC,fchdir,(__fd_t __fd),__fchdir,(__fd))
 #elif defined(__CRT_HAVE___libc_fchdir)
-/* >> chdir(2)
+/* >> fchdir(2)
  * Change the current working directory to `path' */
 __CREDIRECT(,int,__NOTHROW_RPC,fchdir,(__fd_t __fd),__libc_fchdir,(__fd))
 #endif /* ... */
@@ -3026,8 +3029,8 @@ __CDECLARE_VOID_OPT(,__NOTHROW_RPC,setusershell,(void),())
 /* >> daemon(3), daemonfd(3) */
 __CDECLARE(,int,__NOTHROW_RPC,daemon,(int __nochdir, int __noclose),(__nochdir,__noclose))
 #else /* __CRT_HAVE_daemon */
-#include <asm/os/oflags.h>
 #include <asm/os/fcntl.h>
+#include <asm/os/oflags.h>
 #if (defined(__CRT_HAVE_fork) || defined(__CRT_HAVE___fork) || defined(__CRT_HAVE___libc_fork)) && (defined(__CRT_HAVE__Exit) || defined(__CRT_HAVE__exit) || defined(__CRT_HAVE_quick_exit) || defined(__CRT_HAVE_exit)) && (defined(__CRT_HAVE_setsid) || defined(__CRT_HAVE___setsid) || defined(__CRT_HAVE___libc_setsid)) && (defined(__CRT_HAVE_chdir) || defined(__CRT_HAVE__chdir) || defined(__CRT_HAVE___chdir) || defined(__CRT_HAVE___libc_chdir) || (defined(__AT_FDCWD) && defined(__CRT_HAVE_fchdirat))) && (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE___libc_open) || (defined(__AT_FDCWD) && (defined(__CRT_HAVE_openat64) || defined(__CRT_HAVE_openat)))) && (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2) || defined(__CRT_HAVE___libc_dup2))
 #include <libc/local/unistd/daemon.h>
 /* >> daemon(3), daemonfd(3) */

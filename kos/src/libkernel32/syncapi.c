@@ -311,7 +311,8 @@ again:
 		if (pfd[i].revents != 0) {
 			/* TODO: Based on object type, we (may) need to do additional actions!
 			 * e.g.: In case of an eventfd, we must do a non-blocking ticket acquire */
-			return WAIT_OBJECT_0 + i;
+			result = WAIT_OBJECT_0 + i;
+			goto done;
 		}
 	}
 	goto again;

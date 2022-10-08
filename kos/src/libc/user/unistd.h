@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34df2d9f */
+/* HASH CRC-32:0x2c9d4ba3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -403,7 +403,7 @@ INTDEF ATTR_RETURNS_TWICE WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_vfork)(void);
 /* >> fchown(2)
  * Change the ownership of a given `fd' to `group:owner' */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_fchown)(fd_t fd, uid_t owner, gid_t group);
-/* >> chdir(2)
+/* >> fchdir(2)
  * Change the current working directory to `path' */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_fchdir)(fd_t fd);
 /* >> getpgid(2)

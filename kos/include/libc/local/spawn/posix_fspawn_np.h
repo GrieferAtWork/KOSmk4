@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d24b009 */
+/* HASH CRC-32:0x3d2cebd4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,13 +84,18 @@ __CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path)
 __CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),__chdir,(__path))
 #elif defined(__CRT_HAVE___libc_chdir)
 __CREDIRECT(__ATTR_IN(1),int,__NOTHROW_RPC,__localdep_chdir,(char const *__path),__libc_chdir,(__path))
-#elif defined(__AT_FDCWD) && defined(__CRT_HAVE_fchdirat)
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <asm/os/fcntl.h>
+__NAMESPACE_LOCAL_BEGIN
+#if defined(__AT_FDCWD) && defined(__CRT_HAVE_fchdirat)
 __NAMESPACE_LOCAL_END
 #include <libc/local/unistd/chdir.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_chdir __LIBC_LOCAL_NAME(chdir)
-#else /* ... */
+#else /* __AT_FDCWD && __CRT_HAVE_fchdirat */
 #undef __local___localdep_chdir_defined
+#endif /* !__AT_FDCWD || !__CRT_HAVE_fchdirat */
 #endif /* !... */
 #endif /* !__local___localdep_chdir_defined */
 #ifndef __local___localdep_close_defined

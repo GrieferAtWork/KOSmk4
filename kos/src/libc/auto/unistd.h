@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7da37445 */
+/* HASH CRC-32:0x62ba2e8e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -431,7 +431,7 @@ INTDEF useconds_t NOTHROW_NCX(LIBCCALL libc_ualarm)(useconds_t value, useconds_t
 /* >> fchown(2)
  * Change the ownership of a given `fd' to `group:owner' */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_fchown)(fd_t fd, uid_t owner, gid_t group);
-/* >> chdir(2)
+/* >> fchdir(2)
  * Change the current working directory to `path' */
 INTDEF int NOTHROW_RPC(LIBDCALL libd_fchdir)(fd_t fd);
 /* >> getpgid(2)
