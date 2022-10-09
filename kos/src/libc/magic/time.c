@@ -1702,7 +1702,7 @@ int clock_nanosleep64(clockid_t clock_id, __STDC_INT_AS_UINT_T flags,
 
 %
 %/* timespec_get() is defined by both c11 and c++17 */
-%(c,std)#if defined(__USE_ISOCXX17) || defined(__USE_ISOC11)
+%(c,std,ccompat)#if defined(__USE_ISOCXX17) || defined(__USE_ISOC11)
 @@>> timespec_get(3), timespec_get64(3)
 @@Set `ts' to calendar time based in time base `base'
 [[std, decl_include("<bits/os/timespec.h>"), no_crt_self_import, dos_only_export_as("_timespec32_get")]]
@@ -1734,10 +1734,10 @@ int timespec_get64([[out]] struct timespec64 *ts, int base) {
 }
 %#endif /* __USE_TIME64 */
 
-%(c,std)#endif /* __USE_ISOCXX17 || __USE_ISOC11 */
+%(c,std,ccompat)#endif /* __USE_ISOCXX17 || __USE_ISOC11 */
 
 %
-%(c,std)#if defined(__USE_ISOC23)
+%(c,std,ccompat)#if defined(__USE_ISOC23)
 @@>> timespec_getres(3), timespec_getres64(3)
 @@Set `ts' to calendar time based in time base `base'
 [[std, decl_include("<bits/os/timespec.h>"), no_crt_self_import, dos_only_export_as("_timespec32_get")]]
@@ -1769,7 +1769,7 @@ int timespec_getres64([[out]] struct timespec64 *ts, int base) {
 }
 %#endif /* __USE_TIME64 */
 
-%(c,std)#endif /* __USE_ISOC23 */
+%(c,std,ccompat)#endif /* __USE_ISOC23 */
 
 
 

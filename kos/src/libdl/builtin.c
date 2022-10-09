@@ -58,7 +58,7 @@
 DECL_BEGIN
 
 INTERN NONNULL((2)) ssize_t
-NOTHROW_NCX(FORMATPRINTER_CC syslog_printer)(void *arg,
+NOTHROW_RPC(FORMATPRINTER_CC syslog_printer)(void *arg,
                                              USER char const *data,
                                              size_t datalen)
 		THROWS(E_SEGFAULT) {

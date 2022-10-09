@@ -96,6 +96,13 @@ DECL_BEGIN
  *
  * Instead, we just use the same stand-alone heap implementation that's also
  * used by the core libdl (which we are extending) */
+#undef malloc
+#undef free
+#undef calloc
+#undef realloc
+#undef realloc_in_place
+#undef memalign
+#undef strdup
 #define malloc           (*libpe_fmt.df_core->dlmalloc)
 #define free             (*libpe_fmt.df_core->dlfree)
 #define calloc           (*libpe_fmt.df_core->dlcalloc)

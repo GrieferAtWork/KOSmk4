@@ -29,11 +29,12 @@
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/host.h>
+#include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sched/atomic-lock.h>
 #include <hybrid/sched/preemption.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
-#include <hybrid/sched/atomic-lock.h>
 
 #include <asm/pagesize.h>
 #include <kos/except.h>

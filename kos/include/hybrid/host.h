@@ -361,6 +361,20 @@
 #endif /* !__ARCH_STACK_GROWS_DOWNWARDS && !__ARCH_STACK_GROWS_UPWARDS */
 #endif /* !... */
 
+#undef __ARCH_STACK_ALIGNMENT
+#ifdef __x86_64__
+#define __ARCH_STACK_ALIGNMENT 16
+#elif defined(__aarch64__)
+#define __ARCH_STACK_ALIGNMENT 16
+#elif defined(__arm__)
+#define __ARCH_STACK_ALIGNMENT 8
+#elif defined(__i386__) && defined(__KOS__) && defined(__KERNEL__)
+#define __ARCH_STACK_ALIGNMENT 4
+#elif defined(__i386__)
+#define __ARCH_STACK_ALIGNMENT 8
+#endif /* ... */
+
+
 /* The native PAGE size of the hosting arch (if known to be  constant)
  * Note that on some architectures, this value is not fixed, but is  a
  * run- or compile-time option of the hosting kernel and should not be
