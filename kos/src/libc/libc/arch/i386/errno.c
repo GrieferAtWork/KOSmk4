@@ -186,8 +186,8 @@ NOTHROW(LIBCCALL nontls_errno_redirect)(void) {
 }
 
 
-DEFINE_PUBLIC_IDATA_G(errno, nontls_errno_getaddr, __SIZEOF_ERRNO_T__);
-DEFINE_PUBLIC_IDATA_G(_errno, nontls_errno_getaddr, __SIZEOF_ERRNO_T__);
+DEFINE_PUBLIC_IDATA(errno, nontls_errno_getaddr, __SIZEOF_ERRNO_T__);
+DEFINE_PUBLIC_IDATA(_errno, nontls_errno_getaddr, __SIZEOF_ERRNO_T__);
 INTERN ATTR_SECTION(".text.crt.glibc.application.init") errno_t *
 NOTHROW(LIBCCALL nontls_errno_getaddr)(void) {
 	/* The return value here is either the address to-be linked for

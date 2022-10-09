@@ -982,9 +982,9 @@ err:
 #undef DOS$_environ
 #undef DOS$__environ
 DEFINE_PUBLIC_ALIAS(DOS$__p__environ, libd_p_environ);
-DEFINE_PUBLIC_IDATA_G(DOS$environ, libd_p_environ, __SIZEOF_POINTER__);
-DEFINE_PUBLIC_IDATA_G(DOS$_environ, libd_p_environ, __SIZEOF_POINTER__);
-DEFINE_PUBLIC_IDATA_G(DOS$__environ, libd_p_environ, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(DOS$environ, libd_p_environ, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(DOS$_environ, libd_p_environ, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(DOS$__environ, libd_p_environ, __SIZEOF_POINTER__);
 
 /* Don't need to use dlsym("DOS$environ") because PE doesn't have copy relocations */
 #define DOS$environ (*libd_p_environ())
@@ -1372,8 +1372,8 @@ NOTHROW_NCX(LIBDCALL libd_unsetenv)(char const *varname)
 #undef _wenviron
 PRIVATE ATTR_SECTION(".bss.crt.dos.wchar.fs.environ") char16_t **libd_wenviron = NULL;
 PRIVATE ATTR_SECTION(".bss.crt.dos.wchar.fs.environ") char32_t **libc_wenviron = NULL;
-DEFINE_PUBLIC_IDATA_G(DOS$_wenviron, libd___p__wenviron, __SIZEOF_POINTER__);
-DEFINE_PUBLIC_IDATA_G(_wenviron, libc___p__wenviron, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(DOS$_wenviron, libd___p__wenviron, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(_wenviron, libc___p__wenviron, __SIZEOF_POINTER__);
 #define DOS$_wenviron libd_wenviron
 #define _wenviron     GET_NOREL_GLOBAL(_wenviron)
 
@@ -2565,8 +2565,8 @@ PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libd___
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libc___p___wargv_initialized = ATOMIC_ONCE_INIT;
 
 #undef __wargv
-DEFINE_PUBLIC_IDATA_G(__wargv, libc___p___wargv, __SIZEOF_POINTER__);
-DEFINE_PUBLIC_IDATA_G(DOS$__wargv, libd___p___wargv, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(__wargv, libc___p___wargv, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(DOS$__wargv, libd___p___wargv, __SIZEOF_POINTER__);
 
 /*[[[head:libd___p___wargv,hash:CRC-32=0x8148fe7c]]]*/
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***
@@ -2612,8 +2612,8 @@ PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libc___
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libd___p___initenv_initialized = ATOMIC_ONCE_INIT;
 
 #undef __initenv
-DEFINE_PUBLIC_IDATA_G(__initenv, libc___p___initenv, __SIZEOF_POINTER__);
-DEFINE_PUBLIC_IDATA_G(DOS$__initenv, libd___p___initenv, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(__initenv, libc___p___initenv, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(DOS$__initenv, libd___p___initenv, __SIZEOF_POINTER__);
 
 /*[[[head:libc___p___initenv,hash:CRC-32=0x2f3a191d]]]*/
 /* Access to the initial environment block */
@@ -2652,8 +2652,8 @@ PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libd___
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libc___p___winitenv_initialized = ATOMIC_ONCE_INIT;
 
 #undef __winitenv
-DEFINE_PUBLIC_IDATA_G(__winitenv, libc___p___winitenv, __SIZEOF_POINTER__);
-DEFINE_PUBLIC_IDATA_G(DOS$__winitenv, libd___p___winitenv, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(__winitenv, libc___p___winitenv, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(DOS$__winitenv, libd___p___winitenv, __SIZEOF_POINTER__);
 
 /*[[[head:libd___p___winitenv,hash:CRC-32=0x6e247b16]]]*/
 /* Access to the initial environment block */
@@ -2700,7 +2700,7 @@ NOTHROW_NCX(LIBDCALL libd_alloc_pgmptr)(void) {
 	return libd_from_unix_filename(unix_pgmptr, NULL, 0);
 }
 
-DEFINE_PUBLIC_IDATA_G(DOS$_pgmptr, libd___p__pgmptr, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(DOS$_pgmptr, libd___p__pgmptr, __SIZEOF_POINTER__);
 DEFINE_PUBLIC_ALIAS(DOS$__p__pgmptr, libd___p__pgmptr);
 INTERN ATTR_SECTION(".text.crt.dos.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char **
 NOTHROW_NCX(LIBDCALL libd___p__pgmptr)(void) {
@@ -2717,8 +2717,8 @@ PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libd___
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") struct atomic_once libc___p__wpgmptr_initialized = ATOMIC_ONCE_INIT;
 
 #undef _wpgmptr
-DEFINE_PUBLIC_IDATA_G(_wpgmptr, libc___p__wpgmptr, __SIZEOF_POINTER__);
-DEFINE_PUBLIC_IDATA_G(DOS$_wpgmptr, libd___p__wpgmptr, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(_wpgmptr, libc___p__wpgmptr, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(DOS$_wpgmptr, libd___p__wpgmptr, __SIZEOF_POINTER__);
 
 /*[[[head:libd___p__wpgmptr,hash:CRC-32=0x3fd7346b]]]*/
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.application.init") ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t **

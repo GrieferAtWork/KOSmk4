@@ -214,7 +214,7 @@ libc_construct_dos_commandline(void) {
 }
 
 #undef _acmdln
-DEFINE_PUBLIC_IDATA_G(_acmdln, libc___p__acmdln, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(_acmdln, libc___p__acmdln, __SIZEOF_POINTER__);
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char *libc__acmdln = NULL;
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init")
 pthread_once_t libc___p__acmdln_initialized = PTHREAD_ONCE_INIT;
@@ -247,7 +247,7 @@ libd_construct_dos_wcommandline(void) {
 
 #undef _wcmdln
 #undef DOS$_wcmdln
-DEFINE_PUBLIC_IDATA_G(DOS$_wcmdln, libc___p__wcmdln, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(DOS$_wcmdln, libc___p__wcmdln, __SIZEOF_POINTER__);
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init") char16_t *libd__wcmdln = NULL;
 PRIVATE ATTR_SECTION(".bss.crt.dos.application.init")
 pthread_once_t libd___p__wcmdln_initialized = PTHREAD_ONCE_INIT;

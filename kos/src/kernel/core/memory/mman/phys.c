@@ -50,6 +50,10 @@
 #include <stddef.h>
 #include <string.h>
 
+#ifndef SIZEOF_POINTER
+#define SIZEOF_POINTER __SIZEOF_POINTER__
+#endif /* !SIZEOF_POINTER */
+
 DECL_BEGIN
 
 typedef union {
@@ -76,6 +80,16 @@ typedef union {
 #define IS_TRAMPOLINE_POINTER(p) ((p) >= trampoline && (p) < trampoline + PAGESIZE)
 
 
+/* A single page of virtual memory in the kernel mman, that is  always
+ * prepared for being used for whatever purposes a thread has in mind.
+ * NOTE: This page is also used  by PAGEFAULTS, though it  will
+ *       restore a previous mapping, if such a mapping existed.
+ * NOTE: Because this page is unique for each thread, the user is  not
+ *       required to acquire a lock to the kernel mman when wishing to
+ *       map something at this location! */
+DEFINE_PUBLIC_SYMBOL(this_trampoline, this_trampoline_node + OFFSET_MNODE_MINADDR, SIZEOF_POINTER);
+static_assert(sizeof(this_trampoline) == SIZEOF_POINTER);
+
 
 /************************************************************************/
 /* Helper functions for accessing very small segments of physical memory.
@@ -90,14 +104,6 @@ PUBLIC NOBLOCK WUNUSED u8
 NOTHROW(FCALL peekphysb)(PHYS physaddr_t addr) {
 	PHYS_VARS;
 	u8 result;
-	/* A single page of virtual memory in the kernel mman, that is  always
-	 * prepared for being used for whatever purposes a thread has in mind.
-	 * NOTE: This page is also used  by PAGEFAULTS, though it  will
-	 *       restore a previous mapping, if such a mapping existed.
-	 * NOTE: Because this page is unique for each thread, the user is  not
-	 *       required to acquire a lock to the kernel mman when wishing to
-	 *       map something at this location! */
-	DEFINE_PUBLIC_SYMBOL(this_trampoline, &this_trampoline_node.mn_minaddr, sizeof(this_trampoline));
 	IF_PHYS_IDENTITY(addr, 1, {
 		return *(u8 const *)PHYS_TO_IDENTITY(addr);
 	});

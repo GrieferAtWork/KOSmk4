@@ -173,7 +173,7 @@ NOTHROW(LIBCCALL libc_stdtty_initialize)(void) {
 }
 
 #undef stdtty
-DEFINE_PUBLIC_IDATA_G(stdtty, libc_resolve_stdtty, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(stdtty, libc_resolve_stdtty, __SIZEOF_POINTER__);
 INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.dos.conio")
 FILE **NOTHROW(LIBDCALL libc_resolve_stdtty)(void) {
 	pthread_once(&libc_stdtty_initialized, &libc_stdtty_initialize);
@@ -420,12 +420,12 @@ NOTHROW(LIBCCALL linux_stdio_get_stderr)(void) {
 }
 
 /* Export symbols. */
-DEFINE_PUBLIC_IDATA_G(_IO_2_1_stdin_, linux_stdio_get_2_1_stdin, SIZEOF_IO_FILE_84);
-DEFINE_PUBLIC_IDATA_G(_IO_2_1_stdout_, linux_stdio_get_2_1_stdout, SIZEOF_IO_FILE_84);
-DEFINE_PUBLIC_IDATA_G(_IO_2_1_stderr_, linux_stdio_get_2_1_stderr, SIZEOF_IO_FILE_84);
-DEFINE_PUBLIC_IDATA_G(_IO_stdin_, linux_stdio_get_stdin, SIZEOF_IO_FILE_84);
-DEFINE_PUBLIC_IDATA_G(_IO_stdout_, linux_stdio_get_stdout, SIZEOF_IO_FILE_84);
-DEFINE_PUBLIC_IDATA_G(_IO_stderr_, linux_stdio_get_stderr, SIZEOF_IO_FILE_84);
+DEFINE_PUBLIC_IDATA(_IO_2_1_stdin_, linux_stdio_get_2_1_stdin, SIZEOF_IO_FILE_84);
+DEFINE_PUBLIC_IDATA(_IO_2_1_stdout_, linux_stdio_get_2_1_stdout, SIZEOF_IO_FILE_84);
+DEFINE_PUBLIC_IDATA(_IO_2_1_stderr_, linux_stdio_get_2_1_stderr, SIZEOF_IO_FILE_84);
+DEFINE_PUBLIC_IDATA(_IO_stdin_, linux_stdio_get_stdin, SIZEOF_IO_FILE_84);
+DEFINE_PUBLIC_IDATA(_IO_stdout_, linux_stdio_get_stdout, SIZEOF_IO_FILE_84);
+DEFINE_PUBLIC_IDATA(_IO_stderr_, linux_stdio_get_stderr, SIZEOF_IO_FILE_84);
 
 
 
@@ -450,7 +450,7 @@ libc_default_new_handler(void) {
 }
 
 #undef __new_handler
-DEFINE_PUBLIC_IDATA_G(__new_handler, libc___new_handler, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(__new_handler, libc___new_handler, __SIZEOF_POINTER__);
 INTERN ATTR_SECTION(".bss.crt.compat.linux.heap") PNEW_HANDLER libc___new_handler = NULL;
 INTERN ATTR_SECTION(".text.crt.compat.linux.heap") PNEW_HANDLER *LIBCCALL
 libc___new_handler_cb(void) {
@@ -1054,7 +1054,7 @@ NOTHROW_NCX(LIBCCALL libc___libc_stack_end_initialize)(void) {
 	libc___libc_stack_end = end_of_stack;
 }
 
-DEFINE_PUBLIC_IDATA_G(__libc_stack_end, libc_resolve___libc_stack_end, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(__libc_stack_end, libc_resolve___libc_stack_end, __SIZEOF_POINTER__);
 INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.glibc")
 void **NOTHROW_NCX(LIBCCALL libc_resolve___libc_stack_end)(void) {
 	pthread_once(&libc___libc_stack_end_initialized,
@@ -1120,7 +1120,7 @@ libc_linux_C_lib_version_string[] = "@(#) The Linux C library 5.3.12";
 PRIVATE ATTR_SECTION(".bss.crt.compat.linux") char const *
 libc___linux_C_lib_version = NULL;
 
-DEFINE_PUBLIC_IDATA_G(__linux_C_lib_version, libc___p___linux_C_lib_version, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(__linux_C_lib_version, libc___p___linux_C_lib_version, __SIZEOF_POINTER__);
 INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux") char const **
 NOTHROW_NCX(LIBCCALL libc___p___linux_C_lib_version)(void) {
 	if (libc___linux_C_lib_version == NULL)
@@ -1325,7 +1325,7 @@ NOTHROW(LIBDCALL libd__freea)(void *ptr) {
 }
 
 PRIVATE ATTR_SECTION(".bss.crt.dos.compat.dos") struct lconv *libd___lconv = NULL;
-DEFINE_PUBLIC_IDATA_G(__lconv, libd___p___lconv, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(__lconv, libd___p___lconv, __SIZEOF_POINTER__);
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos") struct lconv **
 NOTHROW(LIBDCALL libd___p___lconv)(void) {
 	if (libd___lconv == NULL)
@@ -1358,7 +1358,7 @@ NOTHROW(LIBDCALL libd___initialize_lconv_for_unsigned_char)(void) {
 #endif /* __LIBCCALL_IS_LIBDCALL */
 
 PRIVATE ATTR_SECTION(".bss.crt.dos.compat.dos") void (*LIBDCALL libd__aexit_rtn)(int) = NULL;
-DEFINE_PUBLIC_IDATA_G(DOS$_aexit_rtn, libd___p__aexit_rtn, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(DOS$_aexit_rtn, libd___p__aexit_rtn, __SIZEOF_POINTER__);
 INTERN ATTR_SECTION(".text.crt.dos.compat.dos") void *
 NOTHROW(LIBDCALL libd___p__aexit_rtn)(void) {
 	if (libd__aexit_rtn == NULL)
@@ -1394,7 +1394,7 @@ NOTHROW(LIBDCALL libd___CxxCallUnwindDtor)(void *(LIBDCALL *func)(void)) {
 /* _commode                                                             */
 /************************************************************************/
 INTERN ATTR_SECTION(".bss.crt.dos.application.init") int libd__commode = 0;
-/*DEFINE_PUBLIC_IDATA_G(DOS$_commode, libd___p__commode, __SIZEOF_POINTER__);*/
+/*DEFINE_PUBLIC_IDATA(DOS$_commode, libd___p__commode, __SIZEOF_POINTER__);*/
 DEFINE_PUBLIC_ALIAS(DOS$_commode, libd__commode);
 DEFINE_PUBLIC_ALIAS(DOS$__p__commode, libd___p__commode);
 INTERN ATTR_CONST ATTR_SECTION(".text.crt.dos.application.init") int *LIBDCALL
@@ -1812,7 +1812,7 @@ libc_siginfolist_init(char const **list, unsigned int count, signo_t signo) {
 #endif /* !... */
 #define DEFINE_LIBC_SIGINFO_LIST(name, N, signo)                                         \
 	PRIVATE ATTR_SECTION(".bss.crt.solaris") char const *libc_##name[N] = {};            \
-	DEFINE_PUBLIC_IDATA_G(name, libc_##name##_init, N * __SIZEOF_POINTER__);             \
+	DEFINE_PUBLIC_IDATA(name, libc_##name##_init, N * __SIZEOF_POINTER__);             \
 	INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.solaris")           \
 	char const **LIBCCALL libc_##name##_init(void) {                                     \
 		return libc_siginfolist_init(libc_##name, N, signo);                             \
@@ -1845,7 +1845,7 @@ DEFINE_LIBC_SIGINFO_LIST(_sys_polllist, N_SYS_POLLLIST, SIGPOLL)
 /* Define the per-signal information lookup table. */
 PRIVATE ATTR_SECTION(".bss.crt.solaris") struct siginfolist libc__sys_siginfolist[NSIG - 1] = {};
 PRIVATE ATTR_SECTION(".bss.crt.solaris") struct siginfolist const *libc__sys_siginfolistp   = NULL;
-DEFINE_PUBLIC_IDATA_G(_sys_siginfolistp, libc__sys_siginfolistp_init, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(_sys_siginfolistp, libc__sys_siginfolistp_init, __SIZEOF_POINTER__);
 INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.solaris")
 struct siginfolist const **LIBCCALL libc__sys_siginfolistp_init(void) {
 	if (!libc__sys_siginfolistp) {

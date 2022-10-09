@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29e98ad4 */
+/* HASH CRC-32:0x8a19db2a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -775,7 +775,7 @@ DEFINE_PUBLIC_ALIAS(sys_syscall, libc_sys_syscall)
 
 /* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage *usage) */
+/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage32 *usage) */
 INTERN_FUNCTION(libc_sys_wait4)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 114, enableExcept: false) */
 	b .
@@ -5149,7 +5149,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xsyscall, libc_sys_Xsyscall)
 
 /* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage *usage) */
+/* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage32 *usage) */
 INTERN_FUNCTION(libc_sys_Xwait4)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 114, enableExcept: true) */
 	b .

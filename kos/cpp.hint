@@ -983,9 +983,7 @@
 #define __DEFINE_PRIVATE_WEAK_ALIAS(new,old) int new(){}
 #define __DEFINE_PUBLIC_WEAK_ALIAS(new,old) int new(){}
 #define __DEFINE_INTERN_WEAK_ALIAS(new,old) int new(){}
-#define DEFINE_PUBLIC_IDATA_G(name,resolve, size_) int name(){}
-#define DEFINE_PUBLIC_IDATA(name,resolve) int name(){}
-#define DEFINE_PUBLIC_IDATA_EX(name,resolve,size) int name(){}
+#define DEFINE_PUBLIC_IDATA(name,resolve,size) int name(){}
 
 #define REFCNT_METHODS(T) int
 #define REFCNT_METHODS_P(i) int

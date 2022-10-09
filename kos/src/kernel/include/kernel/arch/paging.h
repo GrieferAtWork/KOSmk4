@@ -43,6 +43,8 @@ DECL_BEGIN
 #define PAGEDIR_MAPHINT_ALIGNMENT  8 /* Guess... */
 #endif /* !PAGEDIR_MAPHINT_ALIGNMENT */
 
+#define PAGEDIR_ALIGN __ARCH_PAGESIZE
+#define PAGEDIR_SIZE  __ARCH_PAGESIZE
 #ifdef __CC__
 typedef struct ATTR_ALIGNED(__ARCH_PAGESIZE) {
 	byte_t __pd_data[__ARCH_PAGESIZE];

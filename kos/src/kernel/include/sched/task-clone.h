@@ -202,9 +202,8 @@ NOTHROW(FCALL task_clone_setup_kthread)(struct task *__restrict thread, void *ks
  * >> *(uintptr_t *)((byte_t *)thread + addr) += (uintptr_t)thread; */
 #define DEFINE_PERTASK_RELOCATION(addr)                    \
 	__asm__(".pushsection .rodata.pertask.relocations\n\t" \
-	        "\t.wordptr %p0\n\t"                           \
-	        ".popsection"                                  \
-	        : : "X" (addr))
+	        "\t.wordptr " __PP_PRIVATE_STR(addr) "\n\t"    \
+	        ".popsection")
 
 /* Initialize task relocations, as defined by `DEFINE_PERTASK_RELOCATION()' */
 INTDEF NOBLOCK NONNULL((1)) void

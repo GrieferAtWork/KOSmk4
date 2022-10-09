@@ -330,7 +330,7 @@ union p64_pdir_e4 {
 #endif /* __CC__ */
 
 #ifdef __CC__
-struct p64_pdir {
+struct ATTR_ALIGNED(P64_PDIR_ALIGN) p64_pdir {
 	/* Page-directory (512-entry/4096-byte vector of `union p64_pdir_e4') */
 	union p64_pdir_e4 p_e4[512];
 };

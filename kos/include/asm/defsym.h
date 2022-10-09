@@ -24,17 +24,11 @@
 
 /* Helper macros to define linker symbols from C expressions. */
 #ifdef __CC__
-#ifndef __PRIVATE_DEFINE_SYMBOL_COMMON
 #define __PRIVATE_DEFINE_SYMBOL_COMMON(name, value, size, ...) \
 	__asm__(".type " #name ", \"object\"\n\t"                  \
 	        __VA_ARGS__                                        \
-	        ".set " #name ",%0\n\t"                            \
-	        ".size " #name ",%1"                               \
-	        :                                                  \
-	        : "X" (value)                                      \
-	        , "X" (size))
-#endif /* !__PRIVATE_DEFINE_SYMBOL_COMMON */
-
+	        ".set " #name "," #value "\n\t"                    \
+	        ".size " #name "," #size)
 #define __PRIVATE_DEFSYM_STR(x) #x
 #define DEFINE_PRIVATE_SYMBOL(name, value, size) \
 	__PRIVATE_DEFINE_SYMBOL_COMMON(name, value, size, ".local " __PRIVATE_DEFSYM_STR(name) "\n\t")
@@ -48,6 +42,24 @@
 	__PRIVATE_DEFINE_SYMBOL_COMMON(name, value, size, ".weak " __PRIVATE_DEFSYM_STR(name) "\n\t.global " __PRIVATE_DEFSYM_STR(name) "\n\t")
 #define DEFINE_INTERN_WEAK_SYMBOL(name, value, size) \
 	__PRIVATE_DEFINE_SYMBOL_COMMON(name, value, size, ".weak " __PRIVATE_DEFSYM_STR(name) "\n\t.global " __PRIVATE_DEFSYM_STR(name) "\n\t.hidden " __PRIVATE_DEFSYM_STR(name) "\n\t")
-#endif /* __CC__ */
+#elif defined(__ASSEMBLER__)
+#define __PRIVATE_DEFINE_SYMBOL_COMMON(name, value, size_, ...) \
+	.type name, "object";                                       \
+	__VA_ARGS__                                                 \
+	.set name, value;                                           \
+	.size name, size_
+#define DEFINE_PRIVATE_SYMBOL(name, value, size) \
+	__PRIVATE_DEFINE_SYMBOL_COMMON(name, value, size, .local name;)
+#define DEFINE_PUBLIC_SYMBOL(name, value, size) \
+	__PRIVATE_DEFINE_SYMBOL_COMMON(name, value, size, .global name;)
+#define DEFINE_INTERN_SYMBOL(name, value, size) \
+	__PRIVATE_DEFINE_SYMBOL_COMMON(name, value, size, .global name; .hidden name;)
+#define DEFINE_PRIVATE_WEAK_SYMBOL(name, value, size) \
+	__PRIVATE_DEFINE_SYMBOL_COMMON(name, value, size, .weak name; .local name;)
+#define DEFINE_PUBLIC_WEAK_SYMBOL(name, value, size) \
+	__PRIVATE_DEFINE_SYMBOL_COMMON(name, value, size, .weak name; .global name;)
+#define DEFINE_INTERN_WEAK_SYMBOL(name, value, size) \
+	__PRIVATE_DEFINE_SYMBOL_COMMON(name, value, size, .weak name; .global name; .hidden name;)
+#endif /* ... */
 
 #endif /* !_ASM_DEFSYM_H */

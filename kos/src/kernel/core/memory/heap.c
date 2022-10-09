@@ -50,6 +50,7 @@
 
 #include <assert.h>
 #include <inttypes.h>
+#include <stdalign.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -88,6 +89,20 @@
 DECL_BEGIN
 
 static_assert(SIZEOF_MFREE == offsetof(struct mfree, mf_data));
+static_assert(offsetof(struct heap, h_lock) == OFFSET_HEAP_LOCK);
+static_assert(offsetof(struct heap, h_addr) == OFFSET_HEAP_ADDR);
+static_assert(offsetof(struct heap, h_size) == OFFSET_HEAP_SIZE);
+static_assert(offsetof(struct heap, h_overalloc) == OFFSET_HEAP_OVERALLOC);
+static_assert(offsetof(struct heap, h_freethresh) == OFFSET_HEAP_FREETHRESH);
+static_assert(offsetof(struct heap, h_hintaddr) == OFFSET_HEAP_HINTADDR);
+static_assert(offsetof(struct heap, h_hintmode) == OFFSET_HEAP_HINTMODE);
+static_assert(offsetof(struct heap, h_pfree) == OFFSET_HEAP_PFREE);
+#ifdef OFFSET_HEAP_DANGLE
+static_assert(offsetof(struct heap, h_dangle) == OFFSET_HEAP_DANGLE);
+#endif /* OFFSET_HEAP_DANGLE */
+static_assert(sizeof(struct heap) == SIZEOF_HEAP);
+static_assert(alignof(struct heap) == ALIGNOF_HEAP);
+
 
 #if defined(NDEBUG) || 0
 #define heap_validate(heap) (void)0
@@ -185,6 +200,11 @@ PUBLIC struct heap kernel_heaps[__GFP_HEAPCOUNT] = {
 	                               MHINT_GETADDR(KERNEL_MHINT_LHEAP),
 	                               MHINT_GETMODE(KERNEL_MHINT_LHEAP)),
 };
+
+/* Alias symbols for kernel heaps */
+DEFINE_PUBLIC_SYMBOL(kernel_default_heap, kernel_heaps + (GFP_NORMAL * SIZEOF_HEAP), SIZEOF_HEAP);
+DEFINE_PUBLIC_SYMBOL(kernel_locked_heap, kernel_heaps + (GFP_LOCKED * SIZEOF_HEAP), SIZEOF_HEAP);
+
 
 
 #ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
@@ -1132,8 +1152,6 @@ PUBLIC NOBLOCK_IF(gfp & GFP_ATOMIC) NONNULL((1)) size_t
 NOTHROW(KCALL heap_trim)(struct heap *__restrict self, size_t threshold, gfp_t flags) {
 	size_t result = 0;
 	struct mfree_list *iter, *end;
-	DEFINE_PUBLIC_SYMBOL(kernel_default_heap, &kernel_heaps[GFP_NORMAL], sizeof(struct heap));
-	DEFINE_PUBLIC_SYMBOL(kernel_locked_heap, &kernel_heaps[GFP_LOCKED], sizeof(struct heap));
 	threshold = CEIL_ALIGN(threshold, PAGESIZE);
 	if (!threshold)
 		threshold = PAGESIZE;

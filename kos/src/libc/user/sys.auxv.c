@@ -185,7 +185,7 @@ NOTHROW(LIBCCALL libc_saved_AT_SECURE_ensure_init)(void) {
 }
 
 #undef __libc_enable_secure
-DEFINE_PUBLIC_IDATA_G(__libc_enable_secure, libc___p___libc_enable_secure, __SIZEOF_INT__);
+DEFINE_PUBLIC_IDATA(__libc_enable_secure, libc___p___libc_enable_secure, __SIZEOF_INT__);
 #define __libc_enable_secure GET_NOREL_GLOBAL(__libc_enable_secure)
 INTERN ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.glibc") int *
 NOTHROW(LIBCCALL libc___p___libc_enable_secure)(void) {

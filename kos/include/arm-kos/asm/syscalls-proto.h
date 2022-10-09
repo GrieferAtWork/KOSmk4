@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1da7903 */
+/* HASH CRC-32:0x201560e5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1170,7 +1170,7 @@
 #define __NRAT0_wait4                        (pid_t, __pid_t)
 #define __NRAT1_wait4                        (int32_t *, __int32_t *)
 #define __NRAT2_wait4                        (syscall_ulong_t, __syscall_ulong_t)
-#define __NRAT3_wait4                        (struct rusage *, struct rusage *)
+#define __NRAT3_wait4                        (struct rusage32 *, struct __rusage32 *)
 #define __NRAT0_swapoff                      (char const *, char const *)
 #define __NRAT0_sysinfo                      (struct sysinfo *, struct sysinfo *)
 #define __NRAT0_ipc                          (int, int)
@@ -2241,7 +2241,7 @@
 #define __NRAM_fstat(a, b, c, d, e, f, g)                        (__fd_t)a, (struct linux_stat *)b
 #define __NRAM_vhangup(a, b, c, d, e, f, g)                      /* nothing */
 #define __NRAM_syscall(a, b, c, d, e, f, g)                      (int)a
-#define __NRAM_wait4(a, b, c, d, e, f, g)                        (__pid_t)a, (__int32_t *)b, (__syscall_ulong_t)c, (struct rusage *)d
+#define __NRAM_wait4(a, b, c, d, e, f, g)                        (__pid_t)a, (__int32_t *)b, (__syscall_ulong_t)c, (struct __rusage32 *)d
 #define __NRAM_swapoff(a, b, c, d, e, f, g)                      (char const *)a
 #define __NRAM_sysinfo(a, b, c, d, e, f, g)                      (struct sysinfo *)a
 #define __NRAM_ipc(a, b, c, d, e, f, g)                          (int)a

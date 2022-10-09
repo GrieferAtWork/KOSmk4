@@ -218,7 +218,7 @@
 DECL_BEGIN
 
 #ifdef __CC__
-typedef union {
+typedef union ATTR_ALIGNED(PAGEDIR_ALIGN) {
 #ifndef CONFIG_NO_KERNEL_X86_PAGING_P32
 	struct p32_pdir pd_p32; /* P32 page directory */
 #endif /* !CONFIG_NO_KERNEL_X86_PAGING_P32 */

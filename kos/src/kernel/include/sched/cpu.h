@@ -65,16 +65,29 @@ DECL_BEGIN
                                          * the internal CPU initialization phase (the i386 variant of which
                                          * is implemented in `arch/i386/sched/smp32.S') */
 
-#ifdef __CC__
+/* `struct cpu' offsets */
+#define OFFSET_CPU_ID    0
+#define OFFSET_CPU_STATE __SIZEOF_INT__
+#if ((__SIZEOF_INT__ + 2) % __SIZEOF_PAGEDIR_PHYS_T__) != 0
+#define OFFSET_CPU__PAD (__SIZEOF_INT__ + 2)
+#ifndef CONFIG_NO_SMP
+#define OFFSET_CPU_PDIR (OFFSET_CPU__PAD + (__SIZEOF_PAGEDIR_PHYS_T__ - ((__SIZEOF_INT__ + 2) % __SIZEOF_PAGEDIR_PHYS_T__)))
+#endif /* !CONFIG_NO_SMP */
+#else /* ((__SIZEOF_INT__ + 2) % __SIZEOF_PAGEDIR_PHYS_T__) != 0 */
+#ifndef CONFIG_NO_SMP
+#define OFFSET_CPU_PDIR (__SIZEOF_INT__ + 2)
+#endif /* !CONFIG_NO_SMP */
+#endif /* ((__SIZEOF_INT__ + 2) % __SIZEOF_PAGEDIR_PHYS_T__) == 0 */
 
+#ifdef __CC__
 struct task;
 
 struct cpu {
 	unsigned int        c_id;       /* The ID of this CPU. */
 	WEAK u16            c_state;    /* CPU State (one of `CPU_STATE_*') */
-#if ((__SIZEOF_INT__ + 2) % __SIZEOF_POINTER__) != 0
-	u16                _c_pad[__SIZEOF_POINTER__ - ((__SIZEOF_INT__ + 2) % __SIZEOF_POINTER__)]; /* ... */
-#endif /* ((__SIZEOF_INT__ + 2) % __SIZEOF_POINTER__) != 0 */
+#if ((__SIZEOF_INT__ + 2) % __SIZEOF_PAGEDIR_PHYS_T__) != 0
+	byte_t             _c_pad[__SIZEOF_PAGEDIR_PHYS_T__ - ((__SIZEOF_INT__ + 2) % __SIZEOF_PAGEDIR_PHYS_T__)]; /* ... */
+#endif /* ((__SIZEOF_INT__ + 2) % __SIZEOF_PAGEDIR_PHYS_T__) != 0 */
 #ifndef CONFIG_NO_SMP
 	WEAK pagedir_phys_t c_pdir; /* [1..1][lock(READ(*), WRITE(THIS_CPU))]
 	                             * The currently used  page directory. When  `mman_sync()' is  called,

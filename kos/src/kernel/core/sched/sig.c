@@ -41,6 +41,8 @@
 #include <hybrid/atomic.h>
 #include <hybrid/sched/preemption.h>
 
+#include <kos/nopf.h>
+
 #include <alloca.h>
 #include <assert.h>
 #include <inttypes.h>
@@ -52,7 +54,6 @@
 #if defined(__i386__) || defined(__x86_64__)
 #include <asm/intrin.h>
 #include <kos/kernel/x86/segment.h>
-#include <kos/nopf.h>
 #endif /* __i386__ || __x86_64__ */
 
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
@@ -66,9 +67,26 @@
 
 DECL_BEGIN
 
+/* Assert offsets */
+static_assert(offsetof(struct task_connection, tc_sig) == OFFSET_TASK_CONNECTION_SIG);
+static_assert(offsetof(struct task_connection, tc_connext) == OFFSET_TASK_CONNECTION_CONNEXT);
+static_assert(offsetof(struct task_connection, tc_signext) == OFFSET_TASK_CONNECTION_SIGNEXT);
+static_assert(offsetof(struct task_connection, tc_cons) == OFFSET_TASK_CONNECTION_CONS);
+static_assert(offsetof(struct task_connection, tc_stat) == OFFSET_TASK_CONNECTION_STAT);
+static_assert(sizeof(struct task_connection) == SIZEOF_TASK_CONNECTION);
+static_assert(alignof(struct task_connection) == ALIGNOF_TASK_CONNECTION);
+static_assert(offsetof(struct task_connections, tcs_prev) == OFFSET_TASK_CONNECTIONS_PREV);
+static_assert(offsetof(struct task_connections, tcs_thread) == OFFSET_TASK_CONNECTIONS_THREAD);
+static_assert(offsetof(struct task_connections, tcs_con) == OFFSET_TASK_CONNECTIONS_CON);
+static_assert(offsetof(struct task_connections, tcs_dlvr) == OFFSET_TASK_CONNECTIONS_DLVR);
+static_assert(offsetof(struct task_connections, tcs_static) == OFFSET_TASK_CONNECTIONS_STATIC);
+static_assert(sizeof(struct task_connections) == SIZEOF_TASK_CONNECTIONS);
+static_assert(alignof(struct task_connections) == ALIGNOF_TASK_CONNECTIONS);
+
+
 /* Root connections set. */
 PUBLIC ATTR_PERTASK ATTR_ALIGN(struct task_connections) this_root_connections = {
-	.tsc_prev   = NULL,
+	.tcs_prev   = NULL,
 	.tcs_thread = NULL,
 	.tcs_con    = NULL,
 	.tcs_dlvr   = NULL,
@@ -80,13 +98,14 @@ PUBLIC ATTR_PERTASK ATTR_ALIGN(struct task_connections) this_root_connections = 
 PUBLIC ATTR_PERTASK ATTR_ALIGN(struct task_connections *)
 this_connections = &this_root_connections;
 
+/* Define relocations */
+DEFINE_PERTASK_RELOCATION(this_root_connections + OFFSET_TASK_CONNECTIONS_THREAD);
+DEFINE_PERTASK_RELOCATION(this_connections);
 
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pertask_fix_task_connections)(struct task *__restrict self) {
 	struct task *active_thread;
 	struct task_connections *self_connections;
-	DEFINE_PERTASK_RELOCATION(&this_root_connections.tcs_thread);
-	DEFINE_PERTASK_RELOCATION(&this_connections);
 	self_connections = FORTASK(self, this_connections);
 	if (!ADDR_ISKERN(self_connections))
 		goto fixit;
@@ -166,7 +185,7 @@ NOTHROW(FCALL task_pushconnections)(struct task_connections *__restrict cons) {
 	assertf(cons != oldcons,
 	        "Connections set %p has already been pushed",
 	        cons);
-	cons->tsc_prev = oldcons;
+	cons->tcs_prev = oldcons;
 
 	/* Disable async notifications for the old set of connections,
 	 * and use the receiver thread for the new set of connections.
@@ -189,7 +208,7 @@ NOTHROW(FCALL task_popconnections)(void) {
 	struct task_connections *oldcons;
 	struct task_connections *cons;
 	cons = THIS_CONNECTIONS;
-	assert((cons->tsc_prev == NULL) == (cons == THIS_ROOT_CONNECTIONS));
+	assert((cons->tcs_prev == NULL) == (cons == THIS_ROOT_CONNECTIONS));
 	assertf(cons != THIS_ROOT_CONNECTIONS,
 	        "Cannot pop connections: Root connection set %p is already active",
 	        cons);
@@ -201,7 +220,7 @@ NOTHROW(FCALL task_popconnections)(void) {
 	        "call `task_disconnectall()' first!");
 
 	/* Set the TLS pointer for the current set of connection to the old set. */
-	oldcons = cons->tsc_prev;
+	oldcons = cons->tcs_prev;
 	PERTASK_SET(this_connections, oldcons);
 
 	/* Re-enable asynchronous notifications as the result of `sig_send()' / `sig_broadcast()' */
@@ -2142,7 +2161,7 @@ again_read_cons:
 						context.ssc_thread = chain->tcs_thread;
 						break;
 					}
-					if (!chain->tsc_prev) {
+					if (!chain->tcs_prev) {
 						/* Assume that `chain' is `this_root_connections' of the
 						 * target  thread, which we  can use to reverse-engineer
 						 * the actual thread */
@@ -2150,7 +2169,7 @@ again_read_cons:
 						                                     (uintptr_t)&this_root_connections);
 						break;
 					}
-					chain = chain->tsc_prev;
+					chain = chain->tcs_prev;
 				}
 			}
 

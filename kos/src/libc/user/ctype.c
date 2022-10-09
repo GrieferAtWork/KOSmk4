@@ -1292,9 +1292,9 @@ PRIVATE ATTR_SECTION(".bss.crt.unicode.static.ctype") uint16_t const *libc___cty
 PRIVATE ATTR_SECTION(".bss.crt.unicode.static.ctype") int32_t const *libc___ctype_tolower_loc_pointer = NULL;
 PRIVATE ATTR_SECTION(".bss.crt.unicode.static.ctype") int32_t const *libc___ctype_toupper_loc_pointer = NULL;
 
-DEFINE_PUBLIC_IDATA_G(__ctype_b, libc___ctype_b_loc, __SIZEOF_POINTER__);             /* >> extern uint16_t const *__ctype_b; */
-DEFINE_PUBLIC_IDATA_G(__ctype_tolower, libc___ctype_tolower_loc, __SIZEOF_POINTER__); /* >> extern int32_t const *__ctype_tolower; */
-DEFINE_PUBLIC_IDATA_G(__ctype_toupper, libc___ctype_toupper_loc, __SIZEOF_POINTER__); /* >> extern int32_t const *__ctype_toupper; */
+DEFINE_PUBLIC_IDATA(__ctype_b, libc___ctype_b_loc, __SIZEOF_POINTER__);             /* >> extern uint16_t const *__ctype_b; */
+DEFINE_PUBLIC_IDATA(__ctype_tolower, libc___ctype_tolower_loc, __SIZEOF_POINTER__); /* >> extern int32_t const *__ctype_tolower; */
+DEFINE_PUBLIC_IDATA(__ctype_toupper, libc___ctype_toupper_loc, __SIZEOF_POINTER__); /* >> extern int32_t const *__ctype_toupper; */
 
 /*[[[head:libc___ctype_b_loc,hash:CRC-32=0xde267e1c]]]*/
 INTERN ATTR_SECTION(".text.crt.unicode.static.ctype") ATTR_PURE WUNUSED uint16_t const **

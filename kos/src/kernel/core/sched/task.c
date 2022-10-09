@@ -64,6 +64,10 @@
 #include <stddef.h>
 #include <string.h>
 
+#ifndef SIZEOF_POINTER
+#define SIZEOF_POINTER __SIZEOF_POINTER__
+#endif /* !SIZEOF_POINTER */
+
 DECL_BEGIN
 
 INTDEF byte_t __kernel_pertask_start[];
@@ -80,6 +84,15 @@ static_assert(offsetof(struct task, t_mman_tasks.le_prev) == OFFSET_TASK_MMAN_TA
 static_assert(offsetof(struct task, t_heapsz) == OFFSET_TASK_HEAPSZ);
 static_assert(offsetof(struct task, t_state) == OFFSET_TASK_STATE);
 static_assert(offsetof(struct task, _t_next) == OFFSET_TASK__NEXT);
+static_assert(sizeof(struct task) == SIZEOF_STRUCT_TASK);
+static_assert(offsetof(struct cpu, c_id) == OFFSET_CPU_ID);
+static_assert(offsetof(struct cpu, c_state) == OFFSET_CPU_STATE);
+#ifdef OFFSET_CPU__PAD
+static_assert(offsetof(struct cpu, _c_pad) == OFFSET_CPU__PAD);
+#endif /* OFFSET_CPU__PAD */
+#ifdef OFFSET_CPU_PDIR
+static_assert(offsetof(struct cpu, c_pdir) == OFFSET_CPU_PDIR);
+#endif /* OFFSET_CPU_PDIR */
 
 
 PRIVATE ATTR_USED ATTR_SECTION(".data.pertask.head")
@@ -191,6 +204,46 @@ NOTHROW(FCALL kernel_initialize_boot_trampolines)(void);
 PUBLIC ATTR_PERTASK ATTR_ALIGN(struct exception_info) this_exception_info = {};
 
 
+/* Define relocations */
+DEFINE_PERTASK_RELOCATION(this_task + OFFSET_TASK_SELF);
+DEFINE_PERTASK_RELOCATION(this_kernel_stacknode + OFFSET_MNODE_PART);
+DEFINE_PERTASK_RELOCATION(this_kernel_stacknode + OFFSET_MNODE_LINK_PREV);
+DEFINE_PERTASK_RELOCATION(this_kernel_stackpart + OFFSET_MPART_SHARE_FIRST);
+
+/* Define PERTASK alias symbols */
+DEFINE_PUBLIC_SYMBOL(this_task, 0, SIZEOF_STRUCT_TASK);
+#define DEFINE_FIELD_SYMBOL(name, BASE, OFFSET, SIZEOF, T, field) \
+	static_assert(offsetof(T, field) == (OFFSET));                \
+	static_assert(sizeoffield(T, field) == (SIZEOF));             \
+	DEFINE_PUBLIC_SYMBOL(name, (BASE) + (OFFSET), SIZEOF)
+
+DEFINE_FIELD_SYMBOL(this_cpu, 0, OFFSET_TASK_CPU, SIZEOF_POINTER, struct task, t_cpu);
+DEFINE_FIELD_SYMBOL(this_mman, 0, OFFSET_TASK_MMAN, SIZEOF_POINTER, struct task, t_mman);
+DEFINE_FIELD_SYMBOL(this_sstate, 0, OFFSET_TASK_STATE, SIZEOF_POINTER, struct task, t_state);
+DEFINE_FIELD_SYMBOL(this_exception_code, this_exception_info, OFFSET_EXCEPTION_INFO_CODE, __SIZEOF_EXCEPT_CODE_T__, struct exception_info, ei_code);
+DEFINE_FIELD_SYMBOL(this_exception_data, this_exception_info, OFFSET_EXCEPTION_INFO_DATA, __SIZEOF_EXCEPTION_DATA, struct exception_info, ei_data);
+DEFINE_FIELD_SYMBOL(this_exception_state, this_exception_info, OFFSET_EXCEPTION_INFO_STATE, __SIZEOF_EXCEPT_REGISTER_STATE, struct exception_info, ei_state);
+DEFINE_FIELD_SYMBOL(this_exception_class, this_exception_info, OFFSET_EXCEPTION_INFO_DATA + __OFFSET_EXCEPTION_DATA_CLASS, __SIZEOF_EXCEPT_CLASS_T__, struct exception_info, ei_class);
+DEFINE_FIELD_SYMBOL(this_exception_subclass, this_exception_info, OFFSET_EXCEPTION_INFO_DATA + __OFFSET_EXCEPTION_DATA_SUBCLASS, __SIZEOF_EXCEPT_SUBCLASS_T__, struct exception_info, ei_subclass);
+DEFINE_FIELD_SYMBOL(this_exception_args, this_exception_info, OFFSET_EXCEPTION_INFO_DATA + __OFFSET_EXCEPTION_DATA_ARGS, EXCEPTION_DATA_POINTERS * SIZEOF_POINTER, struct exception_info, ei_data.e_args);
+DEFINE_FIELD_SYMBOL(this_exception_flags, this_exception_info, OFFSET_EXCEPTION_INFO_FLAGS, 1, struct exception_info, ei_flags);
+DEFINE_FIELD_SYMBOL(this_exception_faultaddr, this_exception_info, OFFSET_EXCEPTION_INFO_DATA + __OFFSET_EXCEPTION_DATA_FAULTADDR, SIZEOF_POINTER, struct exception_info, ei_data.e_faultaddr);
+#ifdef OFFSET_EXCEPTION_INFO_TRACE
+DEFINE_FIELD_SYMBOL(this_exception_trace, this_exception_info, OFFSET_EXCEPTION_INFO_TRACE, EXCEPT_BACKTRACE_SIZE * SIZEOF_POINTER, struct exception_info, ei_trace);
+#else /* OFFSET_EXCEPTION_INFO_TRACE */
+DEFINE_PUBLIC_SYMBOL(this_exception_trace, 0, 0);
+#endif /* !OFFSET_EXCEPTION_INFO_TRACE */
+DEFINE_FIELD_SYMBOL(thiscpu_id, 0, OFFSET_CPU_ID, __SIZEOF_INT__, struct cpu, c_id);
+#ifndef CONFIG_NO_SMP
+DEFINE_FIELD_SYMBOL(thiscpu_pdir, 0, OFFSET_CPU_PDIR, __SIZEOF_PAGEDIR_PHYS_T__, struct cpu, c_pdir);
+#else /* !CONFIG_NO_SMP */
+DEFINE_PUBLIC_SYMBOL(thiscpu_pdir, 0, 0);
+#endif /* CONFIG_NO_SMP */
+DEFINE_FIELD_SYMBOL(thiscpu_state, 0, OFFSET_CPU_STATE, 2, struct cpu, c_state);
+DEFINE_FIELD_SYMBOL(thismman_pagedir_p, 0, OFFSET_MMAN_PAGEDIR_P, __SIZEOF_PAGEDIR_PHYS_T__, struct mman, mm_pagedir_p);
+#undef DEFINE_FIELD_SYMBOL
+
+
 INTDEF byte_t __kernel_boottask_stack[];
 INTDEF byte_t __kernel_boottask_stack_page_p[];
 INTDEF byte_t __kernel_bootidle_stack[];
@@ -241,35 +294,6 @@ extern struct fdirent kernel_driver_fsname;
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	void *boot_trampoline_pages;
-	DEFINE_PERTASK_RELOCATION(&this_task.t_self);
-	DEFINE_PERTASK_RELOCATION(&this_kernel_stacknode_.mn_part);
-	DEFINE_PERTASK_RELOCATION(&this_kernel_stacknode_.mn_link.le_prev);
-	DEFINE_PERTASK_RELOCATION(&this_kernel_stackpart_.mp_share.lh_first);
-	DEFINE_PUBLIC_SYMBOL(this_task, 0, sizeof(struct task));
-	DEFINE_PUBLIC_SYMBOL(this_cpu, offsetof(struct task, t_cpu), sizeof(struct cpu *));
-	DEFINE_PUBLIC_SYMBOL(this_mman, offsetof(struct task, t_mman), sizeof(struct mman *));
-	DEFINE_PUBLIC_SYMBOL(this_sstate, offsetof(struct task, t_state), sizeof(struct scpustate *));
-	DEFINE_PUBLIC_SYMBOL(this_exception_code, &this_exception_info.ei_code, sizeof(this_exception_info.ei_code));
-	DEFINE_PUBLIC_SYMBOL(this_exception_data, &this_exception_info.ei_data, sizeof(this_exception_info.ei_data));
-	DEFINE_PUBLIC_SYMBOL(this_exception_state, &this_exception_info.ei_state, sizeof(this_exception_info.ei_state));
-	DEFINE_PUBLIC_SYMBOL(this_exception_class, &this_exception_info.ei_class, sizeof(this_exception_info.ei_class));
-	DEFINE_PUBLIC_SYMBOL(this_exception_subclass, &this_exception_info.ei_subclass, sizeof(this_exception_info.ei_subclass));
-	DEFINE_PUBLIC_SYMBOL(this_exception_args, &this_exception_info.ei_data.e_args, sizeof(this_exception_info.ei_data.e_args));
-	DEFINE_PUBLIC_SYMBOL(this_exception_flags, &this_exception_info.ei_flags, sizeof(this_exception_info.ei_flags));
-	DEFINE_PUBLIC_SYMBOL(this_exception_faultaddr, &this_exception_info.ei_data.e_faultaddr, sizeof(this_exception_info.ei_data.e_faultaddr));
-#if EXCEPT_BACKTRACE_SIZE != 0
-	DEFINE_PUBLIC_SYMBOL(this_exception_trace, &this_exception_info.ei_trace[0], sizeof(this_exception_info.ei_trace));
-#else /* EXCEPT_BACKTRACE_SIZE != 0 */
-	DEFINE_PUBLIC_SYMBOL(this_exception_trace, 0, 0);
-#endif /* EXCEPT_BACKTRACE_SIZE == 0 */
-	DEFINE_PUBLIC_SYMBOL(thiscpu_id, offsetof(struct cpu, c_id), sizeof(unsigned int));
-#ifndef CONFIG_NO_SMP
-	DEFINE_PUBLIC_SYMBOL(thiscpu_pdir, offsetof(struct cpu, c_pdir), sizeof(pagedir_phys_t));
-#else /* !CONFIG_NO_SMP */
-	DEFINE_PUBLIC_SYMBOL(thiscpu_pdir, 0, 0);
-#endif /* CONFIG_NO_SMP */
-	DEFINE_PUBLIC_SYMBOL(thiscpu_state, offsetof(struct cpu, c_state), sizeof(u16));
-	DEFINE_PUBLIC_SYMBOL(thismman_pagedir_p, offsetof(struct mman, mm_pagedir_p), sizeof(physaddr_t));
 
 	/* Apply relocations to static threads. */
 	_task_init_relocations(&boottask);

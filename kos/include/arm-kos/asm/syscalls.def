@@ -110,6 +110,7 @@ statfs = statfs32;
 fstatfs = fstatfs32;
 gettimeofday = gettimeofday32;
 settimeofday = settimeofday32;
+wait4 = wait4_32;
 
 /* Deal with the whole new-vs-old select issue. */
 _newselect = select32;

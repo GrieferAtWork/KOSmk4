@@ -55,6 +55,26 @@
 
 DECL_BEGIN
 
+static_assert(alignof(pagedir_t) == PAGEDIR_ALIGN);
+static_assert(sizeof(pagedir_t) == PAGEDIR_SIZE);
+static_assert(offsetof(struct mman, mm_pagedir) == OFFSET_MMAN_PAGEDIR);
+static_assert(offsetof(struct mman, mm_refcnt) == OFFSET_MMAN_REFCNT);
+static_assert(offsetof(struct mman, mm_weakrefcnt) == OFFSET_MMAN_WEAKREFCNT);
+static_assert(offsetof(struct mman, mm_lock) == OFFSET_MMAN_LOCK);
+#ifdef OFFSET_MMAN_WRLOCKPC
+static_assert(offsetof(struct mman, _mm_wrlockpc) == OFFSET_MMAN_WRLOCKPC);
+#endif /* OFFSET_MMAN_WRLOCKPC */
+static_assert(offsetof(struct mman, mm_mappings) == OFFSET_MMAN_MAPPINGS);
+static_assert(offsetof(struct mman, mm_pagedir_p) == OFFSET_MMAN_PAGEDIR_P);
+static_assert(offsetof(struct mman, mm_writable) == OFFSET_MMAN_WRITABLE);
+static_assert(offsetof(struct mman, mm_writable.lh_first) == OFFSET_MMAN_WRITABLE_FIRST);
+static_assert(offsetof(struct mman, mm_threads) == OFFSET_MMAN_THREADS);
+static_assert(offsetof(struct mman, mm_threads.lh_first) == OFFSET_MMAN_THREADS_FIRST);
+#ifdef OFFSET_MMAN_THREADSLOCK
+static_assert(offsetof(struct mman, mm_threadslock) == OFFSET_MMAN_THREADSLOCK);
+#endif /* OFFSET_MMAN_THREADSLOCK */
+
+
 #ifdef KERNELSPACE_HIGHMEM
 #define KS_MINADDR ((uintptr_t)KERNELSPACE_BASE)
 #define KS_MAXADDR ((uintptr_t)-1)

@@ -249,6 +249,19 @@ struct devruleenum: fdirenum {
 #define devruleenum_acquire(self) atomic_lock_acquire_smp(&(self)->dre_lock)
 #define devruleenum_release(self) atomic_lock_release_smp(&(self)->dre_lock)
 
+#ifdef CONFIG_NO_SMP
+#define SIZEOF_DEVRULEENUM (SIZEOF_FDIRENUM + (__SIZEOF_POINTER__ * 2))
+#else /* CONFIG_NO_SMP */
+#define SIZEOF_DEVRULEENUM (SIZEOF_FDIRENUM + (__SIZEOF_POINTER__ * 3))
+#endif /* !CONFIG_NO_SMP */
+
+static_assert(sizeof(struct devruleenum) == SIZEOF_DEVRULEENUM);
+
+#undef devdiskruledir_v_enumsz
+DEFINE_PUBLIC_SYMBOL(devdiskruledir_v_enumsz, SIZEOF_DEVRULEENUM, 0);
+#define devdiskruledir_v_enumsz sizeof(struct devruleenum)
+
+
 
 struct devdiskruledir_readdata {
 	/*USER CHECKED*/ char *rd_buf;     /* File name buffer */
@@ -425,9 +438,6 @@ PUBLIC BLOCKING NONNULL((1)) void KCALL
 devdiskruledir_v_enum(struct fdirenum *__restrict result)
 		THROWS(E_IOERROR, ...) {
 	struct devruleenum *me;
-#undef devdiskruledir_v_enumsz
-	DEFINE_PUBLIC_SYMBOL(devdiskruledir_v_enumsz, sizeof(struct devruleenum), 0);
-#define devdiskruledir_v_enumsz sizeof(struct devruleenum)
 	me         = (struct devruleenum *)result;
 	me->de_ops = &devdiskruledir_enum_ops;
 #ifndef CONFIG_NO_SMP
@@ -489,6 +499,12 @@ PUBLIC_CONST REF struct devdiskrule *const devdiskrules_default_list[] = {
 	/* /dev/disk/by-uuid      */ &_devdisk_defrule_byuuid,
 };
 
+#undef devdiskrules_default_size
+#define _devdiskrules_default_size 6
+static_assert(lengthof(devdiskrules_default_list) == _devdiskrules_default_size);
+DEFINE_PUBLIC_SYMBOL(devdiskrules_default_size, _devdiskrules_default_size, 0);
+#define devdiskrules_default_size _devdiskrules_default_size
+
 
 /* [1..1][0..devdiskrules_size][owned_if(!= devdiskrules_default_list)][lock(devdiskrules_lock)]
  * List of device disk rules. Always sorted lexicographically ascendingly, based on rule  names. */
@@ -512,9 +528,6 @@ devfs_disk_v_lookup(struct fdirnode *__restrict UNUSED(self),
                     struct flookup_info *__restrict info)
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	size_t lo, hi;
-#undef devdiskrules_default_size
-	DEFINE_PUBLIC_SYMBOL(devdiskrules_default_size, lengthof(devdiskrules_default_list), 0);
-#define devdiskrules_default_size lengthof(devdiskrules_default_list)
 	devdiskrules_read();
 	RAII_FINALLY { devdiskrules_endread(); };
 	lo = 0;

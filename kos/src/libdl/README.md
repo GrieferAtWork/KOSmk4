@@ -54,7 +54,7 @@
 	      intern_procpid = getpid();
 	  }
 
-	  DEFINE_PUBLIC_IDATA_G(procpid, get_procpid_addr, __SIZEOF_PID_T__);
+	  DEFINE_PUBLIC_IDATA(procpid, get_procpid_addr, __SIZEOF_PID_T__);
 	  PRIVATE ATTR_USED pid_t *get_procpid_addr(void) {
 	      static pthread_once_t didinit = PTHREAD_ONCE_INIT;
 	      pthread_once(&didinit, &init_procpid);

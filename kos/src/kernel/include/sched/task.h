@@ -118,6 +118,7 @@ DECL_BEGIN
 #define OFFSET_TASK_HEAPSZ          (__SIZEOF_POINTER__ * 7)
 #define OFFSET_TASK_STATE           (__SIZEOF_POINTER__ * 8)
 #define OFFSET_TASK__NEXT           (__SIZEOF_POINTER__ * 8)
+#define SIZEOF_STRUCT_TASK          (__SIZEOF_POINTER__ * 9)
 
 #ifdef __CC__
 

@@ -167,6 +167,37 @@ DECL_BEGIN
  */
 
 
+
+/*[[[config CONFIG_TASK_STATIC_CONNECTIONS! = 3
+ * Max number of signal connections guarantied to not invoke `kmalloc()'
+ * and   potentially   throw   exceptions,  or   serve   RPC  functions.
+ * ]]]*/
+#ifndef CONFIG_TASK_STATIC_CONNECTIONS
+#define CONFIG_TASK_STATIC_CONNECTIONS 3
+#endif /* !CONFIG_TASK_STATIC_CONNECTIONS */
+/*[[[end]]]*/
+
+
+
+/* `struct task_connection' offsets */
+#define OFFSET_TASK_CONNECTION_SIG     0
+#define OFFSET_TASK_CONNECTION_CONNEXT __SIZEOF_POINTER__
+#define OFFSET_TASK_CONNECTION_SIGNEXT (__SIZEOF_POINTER__ * 2)
+#define OFFSET_TASK_CONNECTION_CONS    (__SIZEOF_POINTER__ * 3)
+#define OFFSET_TASK_CONNECTION_STAT    (__SIZEOF_POINTER__ * 3)
+#define SIZEOF_TASK_CONNECTION         (__SIZEOF_POINTER__ * 4)
+#define ALIGNOF_TASK_CONNECTION        __ALIGNOF_POINTER__
+
+/* `struct task_connections' offsets */
+#define OFFSET_TASK_CONNECTIONS_PREV   0
+#define OFFSET_TASK_CONNECTIONS_THREAD __SIZEOF_POINTER__
+#define OFFSET_TASK_CONNECTIONS_CON    (__SIZEOF_POINTER__ * 2)
+#define OFFSET_TASK_CONNECTIONS_DLVR   (__SIZEOF_POINTER__ * 3)
+#define OFFSET_TASK_CONNECTIONS_STATIC (__SIZEOF_POINTER__ * 4)
+#define SIZEOF_TASK_CONNECTIONS        ((__SIZEOF_POINTER__ * 4) + (SIZEOF_TASK_CONNECTION * CONFIG_TASK_STATIC_CONNECTIONS))
+#define ALIGNOF_TASK_CONNECTIONS       __ALIGNOF_POINTER__
+
+
 #ifdef __CC__
 
 struct sig;
@@ -453,21 +484,12 @@ struct task_connection {
 };
 
 
-/*[[[config CONFIG_TASK_STATIC_CONNECTIONS! = 3
- * Max number of signal connections guarantied to not invoke `kmalloc()'
- * and   potentially   throw   exceptions,  or   serve   RPC  functions.
- * ]]]*/
-#ifndef CONFIG_TASK_STATIC_CONNECTIONS
-#define CONFIG_TASK_STATIC_CONNECTIONS 3
-#endif /* !CONFIG_TASK_STATIC_CONNECTIONS */
-/*[[[end]]]*/
-
 #if CONFIG_TASK_STATIC_CONNECTIONS < 2
 #error "Need at least 2 statically allocatable connections per task!"
 #endif /* CONFIG_TASK_STATIC_CONNECTIONS < 2 */
 
 struct task_connections {
-	struct task_connections *tsc_prev;   /* [0..1][lock(PRIVATE(THIS_TASK))]
+	struct task_connections *tcs_prev;   /* [0..1][lock(PRIVATE(THIS_TASK))]
 	                                      * [(!= NULL) == (this == &this_root_connections)]
 	                                      * Previous set of active connections. */
 	WEAK struct task        *tcs_thread; /* [0..1][lock(PRIVATE(THIS_TASK))]

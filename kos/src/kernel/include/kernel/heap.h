@@ -32,7 +32,6 @@
 
 #include "malloc-defs.h"
 
-DECL_BEGIN
 
 /* Heap debug initialization DWORDs */
 #ifdef CONFIG_HAVE_KERNEL_DEBUG_HEAP
@@ -45,7 +44,25 @@ DECL_BEGIN
 #endif /* CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 
 
+#define OFFSET_HEAP_LOCK       0
+#define OFFSET_HEAP_ADDR       __SIZEOF_POINTER__
+#define OFFSET_HEAP_SIZE       (__SIZEOF_POINTER__ * 2)
+#define OFFSET_HEAP_OVERALLOC  (__SIZEOF_POINTER__ * (2 + HEAP_BUCKET_COUNT))
+#define OFFSET_HEAP_FREETHRESH (__SIZEOF_POINTER__ * (3 + HEAP_BUCKET_COUNT))
+#define OFFSET_HEAP_HINTADDR   (__SIZEOF_POINTER__ * (4 + HEAP_BUCKET_COUNT))
+#define OFFSET_HEAP_HINTMODE   (__SIZEOF_POINTER__ * (5 + HEAP_BUCKET_COUNT))
+#define OFFSET_HEAP_PFREE      (__SIZEOF_POINTER__ * (6 + HEAP_BUCKET_COUNT))
+#ifdef CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE
+#define OFFSET_HEAP_DANGLE (__SIZEOF_POINTER__ * (7 + HEAP_BUCKET_COUNT))
+#define SIZEOF_HEAP        (__SIZEOF_POINTER__ * (8 + HEAP_BUCKET_COUNT))
+#else /* CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
+#define SIZEOF_HEAP (__SIZEOF_POINTER__ * (7 + HEAP_BUCKET_COUNT))
+#endif /* !CONFIG_HAVE_KERNEL_HEAP_TRACE_DANGLE */
+#define ALIGNOF_HEAP __ALIGNOF_POINTER__
+
+
 #ifdef __CC__
+DECL_BEGIN
 
 struct mfree {
 	LIST_ENTRY(mfree)    mf_lsize;   /* [lock(:h_lock)][sort(ASCENDING(mf_size))] List of free entries ordered by size. */
@@ -659,8 +676,7 @@ FUNDEF NOBLOCK void NOTHROW(KCALL heap_validate_all)(void);
 #define DEFINE_VALIDATABLE_HEAP(x) /* nothing */
 #endif /* !CONFIG_HAVE_KERNEL_DEBUG_HEAP */
 
-#endif /* __CC__ */
-
 DECL_END
+#endif /* __CC__ */
 
 #endif /* !GUARD_KERNEL_INCLUDE_KERNEL_HEAP_H */

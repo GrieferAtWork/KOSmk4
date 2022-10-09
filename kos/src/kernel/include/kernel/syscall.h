@@ -72,67 +72,71 @@ DECL_BEGIN
 #define __PRIVATE_SYSCALL_GET_ESCAPED_TYPE2(a, b) b
 #define __PRIVATE_SYSCALL_GET_ESCAPED_TYPE(t) __PRIVATE_SYSCALL_GET_ESCAPED_TYPE2 t
 #endif /* !__PRIVATE_SYSCALL_GET_ESCAPED_TYPE */
+#define __PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(T1, T2)      \
+	STATIC_ASSERT_MSG(__builtin_types_compatible_p(T1, T2),   \
+	                  "Types `" __PP_PRIVATE_STR(T1) "' and " \
+	                  "`" __PP_PRIVATE_STR(T2) "' are not compatible")
 
-#define DEFINE_SYSCALL0(return_type, name)                                                                       \
-	STATIC_ASSERT(__NRAC_##name == 0);                                                                           \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRRT_##name), return_type)); \
-	__ARCH_DEFINE_SYSCALL_COMMON(_##name)                                                                        \
-	FUNDEF return_type __ARCH_SYSCALLCC impl_sys_##name(void) ASMNAME("sys_" #name);                             \
+#define DEFINE_SYSCALL0(return_type, name)                                                                    \
+	STATIC_ASSERT(__NRAC_##name == 0);                                                                        \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRRT_##name), return_type); \
+	__ARCH_DEFINE_SYSCALL_COMMON(_##name)                                                                     \
+	FUNDEF return_type __ARCH_SYSCALLCC impl_sys_##name(void) ASMNAME("sys_" #name);                          \
 	PUBLIC ATTR_SECTION_SYSCALL(#name) return_type __ARCH_SYSCALLCC impl_sys_##name(void)
-#define DEFINE_SYSCALL1(return_type, name, T0, N0)                                                               \
-	STATIC_ASSERT(__NRAC_##name == 1);                                                                           \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRRT_##name), return_type)); \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT0_##name), T0));         \
-	__ARCH_DEFINE_SYSCALL_COMMON(_##name)                                                                        \
-	FUNDEF return_type __ARCH_SYSCALLCC impl_sys_##name(T0 N0) ASMNAME("sys_" #name);                            \
+#define DEFINE_SYSCALL1(return_type, name, T0, N0)                                                            \
+	STATIC_ASSERT(__NRAC_##name == 1);                                                                        \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRRT_##name), return_type); \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT0_##name), T0);         \
+	__ARCH_DEFINE_SYSCALL_COMMON(_##name)                                                                     \
+	FUNDEF return_type __ARCH_SYSCALLCC impl_sys_##name(T0 N0) ASMNAME("sys_" #name);                         \
 	PUBLIC ATTR_SECTION_SYSCALL(#name) return_type __ARCH_SYSCALLCC impl_sys_##name(T0 N0)
-#define DEFINE_SYSCALL2(return_type, name, T0, N0, T1, N1)                                                       \
-	STATIC_ASSERT(__NRAC_##name == 2);                                                                           \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRRT_##name), return_type)); \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT0_##name), T0));         \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_##name), T1));         \
-	__ARCH_DEFINE_SYSCALL_COMMON(_##name)                                                                        \
-	FUNDEF return_type __ARCH_SYSCALLCC impl_sys_##name(T0 N0, T1 N1) ASMNAME("sys_" #name);                     \
+#define DEFINE_SYSCALL2(return_type, name, T0, N0, T1, N1)                                                    \
+	STATIC_ASSERT(__NRAC_##name == 2);                                                                        \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRRT_##name), return_type); \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT0_##name), T0);         \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_##name), T1);         \
+	__ARCH_DEFINE_SYSCALL_COMMON(_##name)                                                                     \
+	FUNDEF return_type __ARCH_SYSCALLCC impl_sys_##name(T0 N0, T1 N1) ASMNAME("sys_" #name);                  \
 	PUBLIC ATTR_SECTION_SYSCALL(#name) return_type __ARCH_SYSCALLCC impl_sys_##name(T0 N0, T1 N1)
-#define DEFINE_SYSCALL3(return_type, name, T0, N0, T1, N1, T2, N2)                                               \
-	STATIC_ASSERT(__NRAC_##name == 3);                                                                           \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRRT_##name), return_type)); \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT0_##name), T0));         \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_##name), T1));         \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_##name), T2));         \
-	__ARCH_DEFINE_SYSCALL_COMMON(_##name)                                                                        \
-	FUNDEF return_type __ARCH_SYSCALLCC impl_sys_##name(T0 N0, T1 N1, T2 N2) ASMNAME("sys_" #name);              \
+#define DEFINE_SYSCALL3(return_type, name, T0, N0, T1, N1, T2, N2)                                            \
+	STATIC_ASSERT(__NRAC_##name == 3);                                                                        \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRRT_##name), return_type); \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT0_##name), T0);         \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_##name), T1);         \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_##name), T2);         \
+	__ARCH_DEFINE_SYSCALL_COMMON(_##name)                                                                     \
+	FUNDEF return_type __ARCH_SYSCALLCC impl_sys_##name(T0 N0, T1 N1, T2 N2) ASMNAME("sys_" #name);           \
 	PUBLIC ATTR_SECTION_SYSCALL(#name) return_type __ARCH_SYSCALLCC impl_sys_##name(T0 N0, T1 N1, T2 N2)
-#define DEFINE_SYSCALL4(return_type, name, T0, N0, T1, N1, T2, N2, T3, N3)                                       \
-	STATIC_ASSERT(__NRAC_##name == 4);                                                                           \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRRT_##name), return_type)); \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT0_##name), T0));         \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_##name), T1));         \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_##name), T2));         \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT3_##name), T3));         \
-	__ARCH_DEFINE_SYSCALL_COMMON(_##name)                                                                        \
-	FUNDEF return_type __ARCH_SYSCALLCC impl_sys_##name(T0 N0, T1 N1, T2 N2, T3 N3) ASMNAME("sys_" #name);       \
+#define DEFINE_SYSCALL4(return_type, name, T0, N0, T1, N1, T2, N2, T3, N3)                                    \
+	STATIC_ASSERT(__NRAC_##name == 4);                                                                        \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRRT_##name), return_type); \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT0_##name), T0);         \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_##name), T1);         \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_##name), T2);         \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT3_##name), T3);         \
+	__ARCH_DEFINE_SYSCALL_COMMON(_##name)                                                                     \
+	FUNDEF return_type __ARCH_SYSCALLCC impl_sys_##name(T0 N0, T1 N1, T2 N2, T3 N3) ASMNAME("sys_" #name);    \
 	PUBLIC ATTR_SECTION_SYSCALL(#name) return_type __ARCH_SYSCALLCC impl_sys_##name(T0 N0, T1 N1, T2 N2, T3 N3)
 #define DEFINE_SYSCALL5(return_type, name, T0, N0, T1, N1, T2, N2, T3, N3, T4, N4)                                \
 	STATIC_ASSERT(__NRAC_##name == 5);                                                                            \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRRT_##name), return_type));  \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT0_##name), T0));          \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_##name), T1));          \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_##name), T2));          \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT3_##name), T3));          \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT4_##name), T4));          \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRRT_##name), return_type);     \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT0_##name), T0);             \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_##name), T1);             \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_##name), T2);             \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT3_##name), T3);             \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT4_##name), T4);             \
 	__ARCH_DEFINE_SYSCALL_COMMON(_##name)                                                                         \
 	FUNDEF return_type __ARCH_SYSCALLCC impl_sys_##name(T0 N0, T1 N1, T2 N2, T3 N3, T4 N4) ASMNAME("sys_" #name); \
 	PUBLIC ATTR_SECTION_SYSCALL(#name) return_type __ARCH_SYSCALLCC impl_sys_##name(T0 N0, T1 N1, T2 N2, T3 N3, T4 N4)
 #define DEFINE_SYSCALL6(return_type, name, T0, N0, T1, N1, T2, N2, T3, N3, T4, N4, T5, N5)                               \
 	STATIC_ASSERT(__NRAC_##name == 6);                                                                                   \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRRT_##name), return_type));         \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT0_##name), T0));                 \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_##name), T1));                 \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_##name), T2));                 \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT3_##name), T3));                 \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT4_##name), T4));                 \
-	STATIC_ASSERT(__builtin_types_compatible_p(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT5_##name), T5));                 \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRRT_##name), return_type);            \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT0_##name), T0);                    \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT1_##name), T1);                    \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT2_##name), T2);                    \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT3_##name), T3);                    \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT4_##name), T4);                    \
+	__PRIVATE_STATIC_ASSERT_TYPES_COMPATIBLE(__PRIVATE_SYSCALL_GET_ESCAPED_TYPE(__NRAT5_##name), T5);                    \
 	__ARCH_DEFINE_SYSCALL_COMMON(_##name)                                                                                \
 	FUNDEF return_type __ARCH_SYSCALLCC impl_sys_##name(T0 N0, T1 N1, T2 N2, T3 N3, T4 N4, T5 N5) ASMNAME("sys_" #name); \
 	PUBLIC ATTR_SECTION_SYSCALL(#name) return_type __ARCH_SYSCALLCC impl_sys_##name(T0 N0, T1 N1, T2 N2, T3 N3, T4 N4, T5 N5)

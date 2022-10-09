@@ -515,7 +515,7 @@ NOTHROW(KCALL verify_task_connections)(struct task_connections *self) {
 			goto nope;
 		if (self->tcs_thread && !ADDR_ISKERN(self->tcs_thread))
 			goto nope;
-		if (self->tsc_prev && !ADDR_ISKERN(self->tsc_prev))
+		if (self->tcs_prev && !ADDR_ISKERN(self->tcs_prev))
 			goto nope;
 		for (con = self->tcs_con; con; con = con->tc_connext) {
 			if (!ADDR_ISKERN(con))
@@ -920,7 +920,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset_dbg_stack(void) {
 				if unlikely(!verify_task_connections(&x86_dbg_hostbackup.dhs_signals))
 					goto reset_all_connections; /* Something is insanely broken here. */
 				for (iter = chain; iter != &x86_dbg_hostbackup.dhs_signals;
-				     iter = iter->tsc_prev) {
+				     iter = iter->tcs_prev) {
 					if unlikely(!verify_task_connections(iter))
 						goto dont_pop_connections;
 				}
@@ -966,7 +966,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_reset(void) {
 	pertask_fix_task_connections(mythread);
 	if (FORTASK(mythread, this_connections) != &x86_dbg_hostbackup.dhs_signals) {
 		if (initok & INITOK_CONNECTIONS)
-			FORTASK(mythread, this_connections) = x86_dbg_hostbackup.dhs_signals.tsc_prev;
+			FORTASK(mythread, this_connections) = x86_dbg_hostbackup.dhs_signals.tcs_prev;
 		task_pushconnections(&x86_dbg_hostbackup.dhs_signals);
 		initok |= INITOK_CONNECTIONS;
 	}

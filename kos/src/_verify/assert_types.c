@@ -475,6 +475,12 @@ static_assert(__ALIGNOF_MAX_ALIGN_T__ >= __ALIGNOF_INT128__);
 #endif /* __UINT128_TYPE__ */
 
 
+#include <kos/types.h>
+#include <kos/kernel/types.h>
+#include <kos/kernel/memory.h>
+static_assert(sizeof(physaddr_t) == __SIZEOF_PHYSADDR_T__);
+static_assert(sizeof(physpage_t) == __SIZEOF_PHYSPAGE_T__);
+
 #include <pthread.h>
 static_assert(sizeof(pthread_t) == __SIZEOF_PTHREAD_T);
 static_assert(sizeof(pthread_key_t) == __SIZEOF_PTHREAD_KEY_T);
@@ -1952,6 +1958,65 @@ static_assert(sizeof(struct __sigevent_cygwin) == __SIZEOF_SIGEVENT_CYGWIN);
 /* struct __siginfo_cygwin_struct */
 /* ... */
 //[[[end]]]
+
+
+
+#include <kos/except.h>
+#include <kos/bits/exception_data.h>
+static_assert(sizeof(except_code_t) == __SIZEOF_EXCEPT_CODE_T__);
+static_assert(sizeof(except_class_t) == __SIZEOF_EXCEPT_CLASS_T__);
+static_assert(sizeof(except_subclass_t) == __SIZEOF_EXCEPT_SUBCLASS_T__);
+static_assert(offsetof(struct exception_data, e_code) == __OFFSET_EXCEPTION_DATA_CODE);
+static_assert(offsetof(struct exception_data, e_class) == __OFFSET_EXCEPTION_DATA_CLASS);
+static_assert(offsetof(struct exception_data, e_subclass) == __OFFSET_EXCEPTION_DATA_SUBCLASS);
+static_assert(offsetof(struct exception_data, e_args) == __OFFSET_EXCEPTION_DATA_ARGS);
+static_assert(offsetof(struct exception_data, e_args.e_pointers[0]) == __OFFSET_EXCEPTION_DATA_POINTER(0));
+static_assert(offsetof(struct exception_data, e_faultaddr) == __OFFSET_EXCEPTION_DATA_FAULTADDR);
+static_assert(sizeof(struct exception_data) == __SIZEOF_EXCEPTION_DATA);
+
+
+#include <kos/bits/exception_info.h>
+static_assert(offsetof(struct exception_info, ei_state) == OFFSET_EXCEPTION_INFO_STATE);
+static_assert(offsetof(struct exception_info, ei_code) == OFFSET_EXCEPTION_INFO_CODE);
+static_assert(offsetof(struct exception_info, ei_data) == OFFSET_EXCEPTION_INFO_DATA);
+static_assert(offsetof(struct exception_info, ei_data.e_args.e_pointers) == OFFSET_EXCEPTION_INFO_POINTERS);
+static_assert(offsetof(struct exception_info, ei_flags) == OFFSET_EXCEPTION_INFO_FLAGS);
+static_assert(sizeof(__EXCEPT_REGISTER_STATE_TYPE) == __SIZEOF_EXCEPT_REGISTER_STATE);
+static_assert(sizeof(union exception_data_pointers) == EXCEPTION_DATA_POINTERS * __SIZEOF_POINTER__);
+static_assert(sizeoffield(struct exception_info, ei_data.e_args) == EXCEPTION_DATA_POINTERS * __SIZEOF_POINTER__);
+static_assert(sizeoffield(struct exception_info, ei_data.e_args.e_pointers) == EXCEPTION_DATA_POINTERS * __SIZEOF_POINTER__);
+#if EXCEPT_BACKTRACE_SIZE != 0
+static_assert(offsetof(struct exception_info, ei_trace) == OFFSET_EXCEPTION_INFO_TRACE);
+static_assert(sizeoffield(struct exception_info, ei_trace) == EXCEPT_BACKTRACE_SIZE * __SIZEOF_POINTER__);
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
+
+#ifdef __USE_KOS_KERNEL
+#define ASSERT_TYPES_COMPATIBLE_EXCEPT_REGISTER_STATE(T) \
+	static_assert(__builtin_types_compatible_p(__EXCEPT_REGISTER_STATE_TYPE, T))
+#else /* __USE_KOS_KERNEL */
+#define ASSERT_TYPES_COMPATIBLE_EXCEPT_REGISTER_STATE(T)              \
+	static_assert(sizeof(__EXCEPT_REGISTER_STATE_TYPE) == sizeof(T)); \
+	static_assert(alignof(__EXCEPT_REGISTER_STATE_TYPE) == alignof(T))
+#endif /* !__USE_KOS_KERNEL */
+#ifdef __EXCEPT_REGISTER_STATE_TYPE_IS_UCPUSTATE
+ASSERT_TYPES_COMPATIBLE_EXCEPT_REGISTER_STATE(struct ucpustate);
+#endif /* __EXCEPT_REGISTER_STATE_TYPE_IS_UCPUSTATE */
+#ifdef __EXCEPT_REGISTER_STATE_TYPE_IS_LCPUSTATE
+ASSERT_TYPES_COMPATIBLE_EXCEPT_REGISTER_STATE(struct lcpustate);
+#endif /* __EXCEPT_REGISTER_STATE_TYPE_IS_LCPUSTATE */
+#ifdef __EXCEPT_REGISTER_STATE_TYPE_IS_KCPUSTATE
+ASSERT_TYPES_COMPATIBLE_EXCEPT_REGISTER_STATE(struct kcpustate);
+#endif /* __EXCEPT_REGISTER_STATE_TYPE_IS_KCPUSTATE */
+#ifdef __EXCEPT_REGISTER_STATE_TYPE_IS_ICPUSTATE
+ASSERT_TYPES_COMPATIBLE_EXCEPT_REGISTER_STATE(struct icpustate);
+#endif /* __EXCEPT_REGISTER_STATE_TYPE_IS_ICPUSTATE */
+#ifdef __EXCEPT_REGISTER_STATE_TYPE_IS_SCPUSTATE
+ASSERT_TYPES_COMPATIBLE_EXCEPT_REGISTER_STATE(struct scpustate);
+#endif /* __EXCEPT_REGISTER_STATE_TYPE_IS_SCPUSTATE */
+#ifdef __EXCEPT_REGISTER_STATE_TYPE_IS_FCPUSTATE
+ASSERT_TYPES_COMPATIBLE_EXCEPT_REGISTER_STATE(struct fcpustate);
+#endif /* __EXCEPT_REGISTER_STATE_TYPE_IS_FCPUSTATE */
+#undef ASSERT_TYPES_COMPATIBLE_EXCEPT_REGISTER_STATE
 
 
 #include <kos/except.h>

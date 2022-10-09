@@ -1828,8 +1828,8 @@ byte_t *brk_curr = NULL;
 
 
 /* For compatibility with old linux programs: the current program break address. */
-DEFINE_PUBLIC_IDATA_G(___brk_addr, libc_brk_addr_cb, __SIZEOF_POINTER__);
-DEFINE_PUBLIC_IDATA_G(__curbrk, libc_brk_addr_cb, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(___brk_addr, libc_brk_addr_cb, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(__curbrk, libc_brk_addr_cb, __SIZEOF_POINTER__);
 INTERN ATTR_SECTION(".text.crt.compat.linux.heap") byte_t **LIBCCALL
 libc_brk_addr_cb(void) {
 	if (brk_curr == NULL)

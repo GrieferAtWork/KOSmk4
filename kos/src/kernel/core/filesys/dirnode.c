@@ -42,6 +42,7 @@
 #include <assert.h>
 #include <dirent.h>
 #include <fcntl.h>
+#include <stdalign.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -52,6 +53,12 @@ DECL_BEGIN
 #else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
+
+/* Assert `struct fdirenum' offsets */
+static_assert(offsetof(struct fdirenum, de_ops) == OFFSET_FDIRENUM_OPS);
+static_assert(offsetof(struct fdirenum, de_dir) == OFFSET_FDIRENUM_DIR);
+static_assert(sizeof(struct fdirenum) == SIZEOF_FDIRENUM);
+static_assert(alignof(struct fdirenum) == ALIGNOF_FDIRENUM);
 
 
 PRIVATE NOBLOCK NONNULL((1)) void

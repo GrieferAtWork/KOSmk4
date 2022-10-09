@@ -133,6 +133,81 @@
 #define MPART_ST_NOSC(x)    ((x) & ~4) /* Return the non-scatter-variant of the given state. */
 
 
+/* `struct mpart' offsets */
+#define OFFSET_MCHUNK_START        0
+#define OFFSET_MCHUNK_SIZE         __SIZEOF_PHYSPAGE_T__
+#define SIZEOF_MCHUNK              (__SIZEOF_PHYSPAGE_T__ * 2)
+#define ALIGNOF_MCHUNK             __ALIGNOF_PHYSPAGE_T__
+#define OFFSET_MCHUNKVEC_V         0
+#define OFFSET_MCHUNKVEC_C         __SIZEOF_POINTER__
+#define SIZEOF_MCHUNKVEC           (__SIZEOF_POINTER__ + __SIZEOF_SIZE_T__)
+#define ALIGNOF_MCHUNKVEC          __ALIGNOF_POINTER__
+#define OFFSET_MPART_REFCNT        0
+#define OFFSET_MPART_FLAGS         __SIZEOF_POINTER__
+#define OFFSET_MPART_XFLAGS        (__SIZEOF_POINTER__ + (__SIZEOF_POINTER__ / 2))
+#define OFFSET_MPART_STATE         (__SIZEOF_POINTER__ + (__SIZEOF_POINTER__ / 2) + (__SIZEOF_POINTER__ / 4))
+#define OFFSET_MPART__JOBLINK      (__SIZEOF_POINTER__ * 2)
+#define OFFSET_MPART__JOBLINK_NEXT (__SIZEOF_POINTER__ * 2)
+#define OFFSET_MPART_FILE          (__SIZEOF_POINTER__ * 3)
+#define OFFSET_MPART_COPY          (__SIZEOF_POINTER__ * 4)
+#define OFFSET_MPART_COPY_FIRST    (__SIZEOF_POINTER__ * 4)
+#define OFFSET_MPART_SHARE         (__SIZEOF_POINTER__ * 5)
+#define OFFSET_MPART_SHARE_FIRST   (__SIZEOF_POINTER__ * 5)
+#ifdef __WANT_MPART__mp_nodlsts
+#define OFFSET_MPART__NODLSTS (__SIZEOF_POINTER__ * 4)
+#endif /* __WANT_MPART__mp_nodlsts */
+#ifdef __WANT_MPART__mp_dtplop
+#define OFFSET_MPART__DTPLOP (__SIZEOF_POINTER__ * 4)
+#endif /* __WANT_MPART__mp_dtplop */
+#ifdef __WANT_MPART__mp_anXplop
+#define OFFSET_MPART__ANFPLOP (__SIZEOF_POINTER__ * 4)
+#define OFFSET_MPART__ANPPLOP (__SIZEOF_POINTER__ * 4)
+#endif /* __WANT_MPART__mp_anXplop */
+#define OFFSET_MPART_LOCKOPS       (__SIZEOF_POINTER__ * 6)
+#define OFFSET_MPART_ALLPARTS      (__SIZEOF_POINTER__ * 7)
+#define OFFSET_MPART_ALLPARTS_NEXT (__SIZEOF_POINTER__ * 7)
+#define OFFSET_MPART_ALLPARTS_PREV (__SIZEOF_POINTER__ * 8)
+#ifdef __WANT_MPART__mp_lopall
+#define OFFSET_MPART__LOPALL  (__SIZEOF_POINTER__ * 7)
+#define OFFSET_MPART__PLOPALL (__SIZEOF_POINTER__ * 7)
+#endif /* __WANT_MPART__mp_lopall */
+#define OFFSET_MPART_CHANGED      (__SIZEOF_POINTER__ * 9)
+#define OFFSET_MPART_CHANGED_NEXT (__SIZEOF_POINTER__ * 9)
+#ifdef __WANT_MPART__mp_dead
+#define OFFSET_MPART__DEAD      (__SIZEOF_POINTER__ * 9)
+#define OFFSET_MPART__DEAD_NEXT (__SIZEOF_POINTER__ * 9)
+#endif /* __WANT_MPART__mp_dead */
+#define OFFSET_MPART_MINADDR    (__SIZEOF_POINTER__ * 10)
+#define OFFSET_MPART_MAXADDR    (__SIZEOF_POINTER__ * 10 + 8)
+#define OFFSET_MPART_FILENT     (__SIZEOF_POINTER__ * 10 + 16)
+#define OFFSET_MPART_FILENT_PAR (__SIZEOF_POINTER__ * 10 + 16)
+#define OFFSET_MPART_FILENT_LHS (__SIZEOF_POINTER__ * 11 + 16)
+#define OFFSET_MPART_FILENT_RHS (__SIZEOF_POINTER__ * 12 + 16)
+#ifdef __WANT_MPART__mp_trmlop
+#define OFFSET_MPART___TRMLOP_PAD (__SIZEOF_POINTER__ * 10 + 16)
+#define OFFSET_MPART__TRMLOP_MM   (__SIZEOF_POINTER__ * 11 + 16)
+#define OFFSET_MPART__TRMPLOP_MM  (__SIZEOF_POINTER__ * 11 + 16)
+#define OFFSET_MPART__TRMLOP_MP   (__SIZEOF_POINTER__ * 11 + 16)
+#define OFFSET_MPART__TRMPLOP_MP  (__SIZEOF_POINTER__ * 11 + 16)
+#endif /* __WANT_MPART__mp_trmlop */
+#define OFFSET_MPART_BLKST_PTR (__SIZEOF_POINTER__ * 13 + 16)
+#define OFFSET_MPART_BLKST_INL (__SIZEOF_POINTER__ * 13 + 16)
+#define OFFSET_MPART_MEM       (__SIZEOF_POINTER__ * 14 + 16)
+#define OFFSET_MPART_MEM       (__SIZEOF_POINTER__ * 14 + 16)
+#define OFFSET_MPART_MEM_SC    (__SIZEOF_POINTER__ * 14 + 16)
+#define OFFSET_MPART_SWP       (__SIZEOF_POINTER__ * 14 + 16)
+#define OFFSET_MPART_SWP_SC    (__SIZEOF_POINTER__ * 14 + 16)
+#define OFFSET_MPART_META      (__SIZEOF_POINTER__ * 14 + 16 + SIZEOF_MCHUNK)
+#if __ALIGNOF_POS_T__ > __ALIGNOF_POINTER__
+#define OFFSET_MPART___PAD (__SIZEOF_POINTER__ * 15 + 16 + SIZEOF_MCHUNK)
+#define SIZEOF_MPART       (OFFSET_MPART___PAD + (__ALIGNOF_POS_T__ - __ALIGNOF_POINTER__))
+#else /* __ALIGNOF_POS_T__ > __ALIGNOF_POINTER__ */
+#define SIZEOF_MPART (__SIZEOF_POINTER__ * 15 + 16 + SIZEOF_MCHUNK)
+#endif /* __ALIGNOF_POS_T__ <= __ALIGNOF_POINTER__ */
+#define ALIGNOF_MPART __ALIGNOF_POS_T__
+
+
+
 #ifdef __CC__
 DECL_BEGIN
 

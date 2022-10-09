@@ -54,10 +54,10 @@ DEFINE_PUBLIC_ALIAS(_sys_nerr, libc_sys_nerr);
 DEFINE_PUBLIC_ALIAS(DOS$sys_nerr, libd_sys_nerr);
 DEFINE_PUBLIC_ALIAS(DOS$_sys_nerr, libd_sys_nerr);
 
-DEFINE_PUBLIC_IDATA_G(sys_errlist, libc___sys_errlist, ECOUNT * __SIZEOF_POINTER__);
-DEFINE_PUBLIC_IDATA_G(_sys_errlist, libc___sys_errlist, ECOUNT * __SIZEOF_POINTER__);
-DEFINE_PUBLIC_IDATA_G(DOS$sys_errlist, libd___sys_errlist, DOS_ECOUNT * __SIZEOF_POINTER__);
-DEFINE_PUBLIC_IDATA_G(DOS$_sys_errlist, libd___sys_errlist, DOS_ECOUNT * __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(sys_errlist, libc___sys_errlist, ECOUNT * __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(_sys_errlist, libc___sys_errlist, ECOUNT * __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(DOS$sys_errlist, libd___sys_errlist, DOS_ECOUNT * __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(DOS$_sys_errlist, libd___sys_errlist, DOS_ECOUNT * __SIZEOF_POINTER__);
 
 
 /*[[[head:libd___sys_errlist,hash:CRC-32=0xf8951d59]]]*/

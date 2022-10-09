@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82338ad9 */
+/* HASH CRC-32:0x70d6cf1d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ DEFINE_PUBLIC_ALIAS(_obstack, libc__obstack);
 #undef obstack_exit_failure
 #undef obstack_alloc_failed_handler
 DEFINE_PUBLIC_ALIAS(obstack_exit_failure, libc_obstack_exit_failure);
-DEFINE_PUBLIC_IDATA_G(obstack_alloc_failed_handler, libc_obstack_alloc_failed_handler_resolve, __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(obstack_alloc_failed_handler, libc_obstack_alloc_failed_handler_resolve, __SIZEOF_POINTER__);
 #define obstack_exit_failure         GET_NOREL_GLOBAL(obstack_exit_failure)
 #define obstack_alloc_failed_handler GET_NOREL_GLOBAL(obstack_alloc_failed_handler)
 

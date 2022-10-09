@@ -72,9 +72,9 @@ DEFINE_PUBLIC_ALIAS(__daylight, libc_daylight);
 DEFINE_PUBLIC_ALIAS(timezone, libc_timezone);
 DEFINE_PUBLIC_ALIAS(_timezone, libc_timezone);
 DEFINE_PUBLIC_ALIAS(__timezone, libc_timezone);
-DEFINE_PUBLIC_IDATA_G(tzname, libc_resolve_tzname, 2 * __SIZEOF_POINTER__);
-DEFINE_PUBLIC_IDATA_G(_tzname, libc_resolve_tzname, 2 * __SIZEOF_POINTER__);
-DEFINE_PUBLIC_IDATA_G(__tzname, libc_resolve_tzname, 2 * __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(tzname, libc_resolve_tzname, 2 * __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(_tzname, libc_resolve_tzname, 2 * __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(__tzname, libc_resolve_tzname, 2 * __SIZEOF_POINTER__);
 DEFINE_PUBLIC_ALIAS(_dstbias, libc__dstbias);
 
 /* Restore NOREL definitions */

@@ -124,18 +124,24 @@ typedef uintptr_t pagedir_pushval_t;
 #endif /* !ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 
 
-#ifdef __CC__
 
 #ifndef __pagedir_phys_t_defined
 #define __pagedir_phys_t_defined
 #ifdef ARCH_PAGEDIR_GETSET_USES_POINTER
+#define __SIZEOF_PAGEDIR_PHYS_T__ __SIZEOF_POINTER__
+#ifdef __CC__
 typedef PHYS pagedir_t *pagedir_phys_t;
+#endif /* __CC__ */
 #else /* ARCH_PAGEDIR_GETSET_USES_POINTER */
+#define __SIZEOF_PAGEDIR_PHYS_T__ __SIZEOF_PHYSADDR_T__
+#ifdef __CC__
 typedef PHYS physaddr_t pagedir_phys_t;
+#endif /* __CC__ */
 #endif /* !ARCH_PAGEDIR_GETSET_USES_POINTER */
 #endif /* !__pagedir_phys_t_defined */
 
 
+#ifdef __CC__
 /* The physical and virtual address bindings of the kernel's page directory.
  * This  is the initial page directory active when KOS boots, as well as the
  * the directory later used for threads running in kernel-space only. */

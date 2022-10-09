@@ -66,11 +66,11 @@ DECL_BEGIN
 static_assert(NBBY == __CHAR_BIT__);
 
 /* Helper macros for working with bitsets */
-#define _bitset_word(base, i)       ((base)[(i) / NBBY])
-#define _bitset_mask(i)             (1 << ((i) % NBBY))
-#define bitset_contains(base, i)    (_bitset_word(base, i) & _bitset_mask(i))
-#define bitset_insert(base, i)      (void)(_bitset_word(base, i) |= _bitset_mask(i))
-#define bitset_remove(base, i)      (void)(_bitset_word(base, i) &= ~_bitset_mask(i))
+#define _bitset_word(base, i)           ((base)[(i) / NBBY])
+#define _bitset_mask(i)                 (1 << ((i) % NBBY))
+#define bitset_contains(base, i)        (_bitset_word(base, i) & _bitset_mask(i))
+#define bitset_insert(base, i)          (void)(_bitset_word(base, i) |= _bitset_mask(i))
+#define bitset_remove(base, i)          (void)(_bitset_word(base, i) &= ~_bitset_mask(i))
 #define bitset_insert_from(dst, src, i) (void)(_bitset_word(dst, i) |= (_bitset_word(src, i) & _bitset_mask(i)))
 #define bitset_inherit(dst, src, i)     (void)(_bitset_word(dst, i) = (_bitset_word(dst, i) & ~_bitset_mask(i)) | (_bitset_word(src, i) & _bitset_mask(i)))
 

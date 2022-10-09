@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7cdee6e6 */
+/* HASH CRC-32:0x31a44dc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2589,7 +2589,7 @@ __CDECLARE_SC(,__errno_t,vserve,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #if __CRT_HAVE_SC(wait4)
 /* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__CDECLARE_SC(,__pid_t,wait4,(__pid_t __pid, __int32_t *__stat_loc, __syscall_ulong_t __options, struct rusage *__usage),(__pid,__stat_loc,__options,__usage))
+__CDECLARE_SC(,__pid_t,wait4,(__pid_t __pid, __int32_t *__stat_loc, __syscall_ulong_t __options, struct __rusage32 *__usage),(__pid,__stat_loc,__options,__usage))
 #endif /* __CRT_HAVE_SC(wait4) */
 #if __CRT_HAVE_SC(wait4_64)
 /* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
@@ -5054,7 +5054,7 @@ __CDECLARE_XSC(,__errno_t,vserve,(int __TODO_PROTOTYPE),(__TODO_PROTOTYPE))
 #if __CRT_HAVE_XSC(wait4)
 /* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-__CDECLARE_XSC(,__pid_t,wait4,(__pid_t __pid, __int32_t *__stat_loc, __syscall_ulong_t __options, struct rusage *__usage),(__pid,__stat_loc,__options,__usage))
+__CDECLARE_XSC(,__pid_t,wait4,(__pid_t __pid, __int32_t *__stat_loc, __syscall_ulong_t __options, struct __rusage32 *__usage),(__pid,__stat_loc,__options,__usage))
 #endif /* __CRT_HAVE_XSC(wait4) */
 #if __CRT_HAVE_XSC(wait4_64)
 /* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL

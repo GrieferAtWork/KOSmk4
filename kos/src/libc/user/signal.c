@@ -170,8 +170,8 @@ NOTHROW_NCX(LIBCCALL libc_sysv_signal)(signo_t signo,
 PRIVATE ATTR_SECTION(".bss.crt.errno.sys_siglist") char const *
 libc_sys_siglist[NSIG] = { NULL };
 
-DEFINE_PUBLIC_IDATA_G(sys_siglist, libc___p_sys_siglist, NSIG * __SIZEOF_POINTER__);
-DEFINE_PUBLIC_IDATA_G(_sys_siglist, libc___p_sys_siglist, NSIG * __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(sys_siglist, libc___p_sys_siglist, NSIG * __SIZEOF_POINTER__);
+DEFINE_PUBLIC_IDATA(_sys_siglist, libc___p_sys_siglist, NSIG * __SIZEOF_POINTER__);
 
 /*[[[head:libc___p_sys_siglist,hash:CRC-32=0x7263abdb]]]*/
 INTERN ATTR_SECTION(".text.crt.errno.sys_siglist") ATTR_CONST ATTR_RETNONNULL WUNUSED char const *const *
@@ -204,8 +204,8 @@ NOTHROW(LIBCCALL libc___p_sys_siglist)(void)
  * >> printf("%s\n", sys_sigabbrev[SIGINT]); // "INT\n" */
 #undef sys_sigabbrev
 PRIVATE ATTR_SECTION(".bss.crt.errno.sys_siglist") char const *libc_sys_sigabbrev[NSIG] = { NULL };
-DEFINE_PUBLIC_IDATA_G(sys_sigabbrev, libc___p_sys_sigabbrev, NSIG * __SIZEOF_POINTER__); /* GLibc symbol (not defined in headers) */
-DEFINE_PUBLIC_IDATA_G(sys_signame, libc___p_sys_sigabbrev, NSIG * __SIZEOF_POINTER__);   /* FreeBSD symbol */
+DEFINE_PUBLIC_IDATA(sys_sigabbrev, libc___p_sys_sigabbrev, NSIG * __SIZEOF_POINTER__); /* GLibc symbol (not defined in headers) */
+DEFINE_PUBLIC_IDATA(sys_signame, libc___p_sys_sigabbrev, NSIG * __SIZEOF_POINTER__);   /* FreeBSD symbol */
 
 INTERN ATTR_SECTION(".text.crt.errno.sys_siglist")
 ATTR_CONST ATTR_RETNONNULL WUNUSED char const *const *

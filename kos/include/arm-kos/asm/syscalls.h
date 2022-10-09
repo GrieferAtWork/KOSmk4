@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab2960f2 */
+/* HASH CRC-32:0xc789f211 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -214,7 +214,7 @@
 #define __NR_syscall                      0x71                 /* errno_t syscall(int TODO_PROTOTYPE) */
 /* Same as `waitpid(pid, STAT_LOC, OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param: options: Set of `WNOHANG | WUNTRACED | WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
-#define __NR_wait4                        0x72                 /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage *usage) */
+#define __NR_wait4                        0x72                 /* pid_t wait4(pid_t pid, int32_t *stat_loc, syscall_ulong_t options, struct rusage32 *usage) */
 #define __NR_swapoff                      0x73                 /* errno_t swapoff(char const *pathname) */
 #define __NR_sysinfo                      0x74                 /* errno_t sysinfo(struct sysinfo *info) */
 #define __NR_ipc                          0x75                 /* errno_t ipc(int TODO_PROTOTYPE) */

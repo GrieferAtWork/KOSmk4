@@ -20,62 +20,64 @@
 #ifdef __INTELLISENSE__
 #include "eh_frame.c"
 
-#define EH_FRAME_CFA_APPLY 1
-//#define EH_FRAME_CFA_SIGFRAME_APPLY 1
-//#define EH_FRAME_CFA_LANDING_APPLY  1
+#define EH_FRAME_CFA_APPLY
+//#define EH_FRAME_CFA_SIGFRAME_APPLY
+//#define  EH_FRAME_CFA_LANDING_APPLY
 #endif /* __INTELLISENSE__ */
 
-#if (defined(EH_FRAME_CFA_APPLY) + defined(EH_FRAME_CFA_SIGFRAME_APPLY) + defined(EH_FRAME_CFA_LANDING_APPLY)) != 1
-#error "Must #define EH_FRAME_CFA_APPLY or EH_FRAME_CFA_SIGFRAME_APPLY"
-#endif /* (EH_FRAME_CFA_APPLY + EH_FRAME_CFA_SIGFRAME_APPLY) != 1 */
+#if (defined(EH_FRAME_CFA_APPLY) +          \
+     defined(EH_FRAME_CFA_SIGFRAME_APPLY) + \
+     defined(EH_FRAME_CFA_LANDING_APPLY)) != 1
+#error "Must #define exactly one of these macros"
+#endif /* ... */
 
 
 DECL_BEGIN
 
 #ifdef EH_FRAME_CFA_APPLY
 #ifdef CFI_UNWIND_COMMON_REGISTER_SP
-#define CFI_UNWIND_LOCAL_COMMON_REGISTER_SP      CFI_UNWIND_COMMON_REGISTER_SP
+#define LOCAL_CFI_UNWIND_COMMON_REGISTER_SP      CFI_UNWIND_COMMON_REGISTER_SP
 #else /* CFI_UNWIND_COMMON_REGISTER_SP */
-#define CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP    CFI_UNWIND_UNCOMMON_REGISTER_SP
+#define LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_SP    CFI_UNWIND_UNCOMMON_REGISTER_SP
 #endif /* !CFI_UNWIND_COMMON_REGISTER_SP */
-#define CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT   CFI_UNWIND_COMMON_REGISTER_MAXCOUNT
-#define CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT
-#define cfi_unwind_local_register_common2dw      cfi_unwind_register_common2dw
-#define cfi_unwind_local_register_uncommon2dw    cfi_unwind_register_uncommon2dw
-#define libuw_unwind_local_fde_exec_until        libuw_unwind_fde_exec_until
+#define LOCAL_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT   CFI_UNWIND_COMMON_REGISTER_MAXCOUNT
+#define LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT
+#define local_cfi_unwind_register_common2dw      cfi_unwind_register_common2dw
+#define local_cfi_unwind_register_uncommon2dw    cfi_unwind_register_uncommon2dw
+#define local_libuw_unwind_fde_exec_until        libuw_unwind_fde_exec_until
 #elif defined(EH_FRAME_CFA_SIGFRAME_APPLY)
 #ifdef CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP
-#define CFI_UNWIND_LOCAL_COMMON_REGISTER_SP      CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP
+#define LOCAL_CFI_UNWIND_COMMON_REGISTER_SP      CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP
 #else /* CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP */
-#define CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP    CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_SP
+#define LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_SP    CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_SP
 #endif /* !CFI_UNWIND_SIGFRAME_COMMON_REGISTER_SP */
-#define CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT   CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT
-#define CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT
-#define cfi_unwind_local_register_common2dw      cfi_unwind_sigframe_register_common2dw
-#define cfi_unwind_local_register_uncommon2dw    cfi_unwind_sigframe_register_uncommon2dw
-#define libuw_unwind_local_fde_exec_until        libuw_unwind_sigframe_fde_exec_until
+#define LOCAL_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT   CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT
+#define LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT
+#define local_cfi_unwind_register_common2dw      cfi_unwind_sigframe_register_common2dw
+#define local_cfi_unwind_register_uncommon2dw    cfi_unwind_sigframe_register_uncommon2dw
+#define local_libuw_unwind_fde_exec_until        libuw_unwind_sigframe_fde_exec_until
 #elif defined(EH_FRAME_CFA_LANDING_APPLY)
 #ifdef CFI_UNWIND_LANDING_COMMON_REGISTER_SP
-#define CFI_UNWIND_LOCAL_COMMON_REGISTER_SP      CFI_UNWIND_LANDING_COMMON_REGISTER_SP
+#define LOCAL_CFI_UNWIND_COMMON_REGISTER_SP      CFI_UNWIND_LANDING_COMMON_REGISTER_SP
 #else /* CFI_UNWIND_LANDING_COMMON_REGISTER_SP */
-#define CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP    CFI_UNWIND_LANDING_UNCOMMON_REGISTER_SP
+#define LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_SP    CFI_UNWIND_LANDING_UNCOMMON_REGISTER_SP
 #endif /* !CFI_UNWIND_LANDING_COMMON_REGISTER_SP */
-#define CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT   CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT
-#define CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT
-#define cfi_unwind_local_register_common2dw      cfi_unwind_landing_register_common2dw
-#define cfi_unwind_local_register_uncommon2dw    cfi_unwind_landing_register_uncommon2dw
+#define LOCAL_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT   CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT
+#define LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT
+#define local_cfi_unwind_register_common2dw      cfi_unwind_landing_register_common2dw
+#define local_cfi_unwind_register_uncommon2dw    cfi_unwind_landing_register_uncommon2dw
 #endif /* ... */
 
-#if CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT != 0
-#define IF_CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT(...) __VA_ARGS__
-#else /* CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT != 0 */
-#define IF_CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT(...) /* nothing */
-#endif /* CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT == 0 */
-#if CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT != 0
-#define IF_CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT(...) __VA_ARGS__
-#else /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT != 0 */
-#define IF_CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT(...) /* nothing */
-#endif /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT == 0 */
+#if LOCAL_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT != 0
+#define LOCAL_IF_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT(...) __VA_ARGS__
+#else /* LOCAL_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT != 0 */
+#define LOCAL_IF_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT(...) /* nothing */
+#endif /* LOCAL_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT == 0 */
+#if LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT != 0
+#define LOCAL_IF_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT(...) __VA_ARGS__
+#else /* LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT != 0 */
+#define LOCAL_IF_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT(...) /* nothing */
+#endif /* LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT == 0 */
 
 
 
@@ -124,24 +126,24 @@ NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t *__restrict self, /*
 	bzero(result, sizeof(*result));
 
 	/* Execute the init-body */
-	error = libuw_unwind_local_fde_exec_until(self,
-	                                          IF_CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT(NULL,)
-	                                          IF_CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT(NULL,)
+	error = local_libuw_unwind_fde_exec_until(self,
+	                                          LOCAL_IF_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT(NULL,)
+	                                          LOCAL_IF_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT(NULL,)
 	                                          self->f_inittext,
 	                                          self->f_inittextend,
 	                                          result,
 	                                          (void *)-1);
 	if likely(error == UNWIND_SUCCESS) {
-		IF_CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t common_init_regs[CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT];)
-		IF_CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT(byte_t uncommon_init_regs[(CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT + NBBY) / NBBY];)
-		IF_CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT(STATIC_ASSERT(sizeof(common_init_regs) == sizeof(result->cs_regs));)
-		IF_CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT(STATIC_ASSERT(sizeof(uncommon_init_regs) == sizeof(result->cs_uncommon));)
-		IF_CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT(memcpy(common_init_regs, result->cs_regs, sizeof(result->cs_regs));)
-		IF_CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT(memcpy(uncommon_init_regs, result->cs_uncommon, sizeof(result->cs_uncommon));)
+		LOCAL_IF_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t common_init_regs[LOCAL_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT];)
+		LOCAL_IF_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT(byte_t uncommon_init_regs[(LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT + NBBY) / NBBY];)
+		LOCAL_IF_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT(STATIC_ASSERT(sizeof(common_init_regs) == sizeof(result->cs_regs));)
+		LOCAL_IF_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT(STATIC_ASSERT(sizeof(uncommon_init_regs) == sizeof(result->cs_uncommon));)
+		LOCAL_IF_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT(memcpy(common_init_regs, result->cs_regs, sizeof(result->cs_regs));)
+		LOCAL_IF_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT(memcpy(uncommon_init_regs, result->cs_uncommon, sizeof(result->cs_uncommon));)
 		/* Execute the eval-body */
-		error = libuw_unwind_local_fde_exec_until(self,
-		                                          IF_CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT(common_init_regs,)
-		                                          IF_CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT(uncommon_init_regs,)
+		error = local_libuw_unwind_fde_exec_until(self,
+		                                          LOCAL_IF_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT(common_init_regs,)
+		                                          LOCAL_IF_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT(uncommon_init_regs,)
 		                                          self->f_evaltext,
 		                                          self->f_evaltextend,
 		                                          result,
@@ -218,21 +220,21 @@ _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
 {
 	unsigned int i, result;
 	uintptr_t cfa;
-#ifdef CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP
+#ifdef LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_SP
 #ifndef EH_FRAME_CFA_LANDING_APPLY
 	bool has_sp_rule;
 #endif /* !EH_FRAME_CFA_LANDING_APPLY */
-#endif /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP */
+#endif /* LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_SP */
 	union {
 		byte_t bytes[CFI_REGISTER_MAXSIZE];
 		uintptr_t addr;
 	} reg_buf;
 
-#ifdef CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP
+#ifdef LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_SP
 #ifndef EH_FRAME_CFA_LANDING_APPLY
-	has_sp_rule = bitset_contains(self->cs_uncommon, CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP(fde->f_addrsize));
+	has_sp_rule = bitset_contains(self->cs_uncommon, LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_SP(fde->f_addrsize));
 #endif /* !EH_FRAME_CFA_LANDING_APPLY */
-#endif /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP */
+#endif /* LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_SP */
 
 	/* Step #1: Calculate the CFA (CanonicalFrameAddress) */
 	result = libuw_unwind_fde_calculate_cfa(fde,
@@ -245,11 +247,11 @@ _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
 		goto done;
 
 	/* Apply common new register values. */
-#if CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT != 0
-	for (i = 0; i < CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT; ++i) {
+#if LOCAL_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT != 0
+	for (i = 0; i < LOCAL_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT; ++i) {
 		unwind_regno_t dw_regno;
 		unwind_cfa_register_t *rule;
-		dw_regno = cfi_unwind_local_register_common2dw(fde->f_addrsize, i);
+		dw_regno = local_cfi_unwind_register_common2dw(fde->f_addrsize, i);
 		rule     = &self->cs_regs[i];
 		TRACE("UNWIND(reg: %u, rule: %u)\n",
 		      (unsigned int)dw_regno,
@@ -341,16 +343,16 @@ _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
 		default: break;
 		}
 	}
-#endif /* CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT != 0 */
+#endif /* LOCAL_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT != 0 */
 
-#if CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT != 0
-	if (bitset_contains(self->cs_uncommon, CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT)) {
-		for (i = 0; i < CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT; ++i) {
+#if LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT != 0
+	if (bitset_contains(self->cs_uncommon, LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT)) {
+		for (i = 0; i < LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT; ++i) {
 			unwind_regno_t dw_regno;
 			unwind_cfa_register_t rule;
 			if (!bitset_contains(self->cs_uncommon, i))
 				continue; /* Not this one... */
-			dw_regno = cfi_unwind_local_register_uncommon2dw(fde->f_addrsize, i);
+			dw_regno = local_cfi_unwind_register_uncommon2dw(fde->f_addrsize, i);
 			DOTRACE("Uncommon register used: %u (%u)\n", (unsigned int)dw_regno, (unsigned int)i);
 			result = libuw_unwind_fde_rule(fde, &rule, dw_regno, absolute_pc);
 			if unlikely(result != UNWIND_SUCCESS)
@@ -446,7 +448,7 @@ _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
 			}
 		}
 	}
-#endif /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT != 0 */
+#endif /* LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT != 0 */
 
 	assertf(self->cs_cfa.cv_type != UNWIND_CFA_VALUE_UNSET,
 	        "No CFA for %p...%p (GDB doesn't like this)",
@@ -458,10 +460,10 @@ _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
 	    /* Only  apply  if no  other register  rule was  already defined  for SP
 	     * This allows users to  satisfy gdb by providing  a CFA rule but  still
 	     * provide a value for SP by providing an explicit register rule for it. */
-#ifdef CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP
+#ifdef LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_SP
 	    !has_sp_rule
-#elif defined(CFI_UNWIND_LOCAL_COMMON_REGISTER_SP)
-	    (self->cs_regs[CFI_UNWIND_LOCAL_COMMON_REGISTER_SP(fde->f_addrsize)].cr_rule == DW_CFA_register_rule_undefined)
+#elif defined(LOCAL_CFI_UNWIND_COMMON_REGISTER_SP)
+	    (self->cs_regs[LOCAL_CFI_UNWIND_COMMON_REGISTER_SP(fde->f_addrsize)].cr_rule == DW_CFA_register_rule_undefined)
 #endif /* ... */
 	    ) {
 		/* Check if we should apply signal frame transformations.
@@ -513,7 +515,7 @@ _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
 		 * >>     DEFINE_REGISTER_ADDRESS(CFI_386_UNWIND_REGISTER_GS)
 		 * >> #undef DEFINE_REGISTER_ADDRESS
 		 * >>     nop  // So that a return-pc directed at `MyRegisterUnwindFunction'
-		 * >>          // shows up properly in backtraced
+		 * >>          // shows up properly in backtraces
 		 * >> PUBLIC_FUNCTION(MyRegisterUnwindFunction)
 		 * >>     ...
 		 * >>     .cfi_endproc
@@ -533,15 +535,15 @@ err_noaddr_register:
 	return UNWIND_APPLY_NOADDR_REGISTER;
 }
 
-#undef cfi_unwind_local_register_uncommon2dw
-#undef cfi_unwind_local_register_common2dw
-#undef libuw_unwind_local_fde_exec_until
-#undef IF_CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT
-#undef CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_MAXCOUNT
-#undef IF_CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT
-#undef CFI_UNWIND_LOCAL_COMMON_REGISTER_MAXCOUNT
-#undef CFI_UNWIND_LOCAL_COMMON_REGISTER_SP
-#undef CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_SP
+#undef local_cfi_unwind_register_uncommon2dw
+#undef local_cfi_unwind_register_common2dw
+#undef local_libuw_unwind_fde_exec_until
+#undef LOCAL_IF_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT
+#undef LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT
+#undef LOCAL_IF_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT
+#undef LOCAL_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT
+#undef LOCAL_CFI_UNWIND_COMMON_REGISTER_SP
+#undef LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_SP
 
 #undef EH_FRAME_CFA_LANDING_APPLY
 #undef EH_FRAME_CFA_SIGFRAME_APPLY

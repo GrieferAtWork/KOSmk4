@@ -21,6 +21,10 @@
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MPART_C 1
 #define __WANT_MPART__mp_nodlsts
 #define __WANT_MPART__mp_lopall
+#define __WANT_MPART__mp_dtplop  /* Only to assert offsets */
+#define __WANT_MPART__mp_anXplop /* Only to assert offsets */
+#define __WANT_MPART__mp_dead    /* Only to assert offsets */
+#define __WANT_MPART__mp_trmlop  /* Only to assert offsets */
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -45,6 +49,7 @@
 
 #include <assert.h>
 #include <inttypes.h>
+#include <stdalign.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -60,6 +65,67 @@ DECL_BEGIN
 #else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
+
+
+/* Assert `struct mpart' offsets */
+static_assert(offsetof(struct mchunk, mc_start) == OFFSET_MCHUNK_START);
+static_assert(offsetof(struct mchunk, mc_size) == OFFSET_MCHUNK_SIZE);
+static_assert(sizeof(struct mchunk) == SIZEOF_MCHUNK);
+static_assert(alignof(struct mchunk) == ALIGNOF_MCHUNK);
+static_assert(offsetof(struct mchunkvec, ms_v) == OFFSET_MCHUNKVEC_V);
+static_assert(offsetof(struct mchunkvec, ms_c) == OFFSET_MCHUNKVEC_C);
+static_assert(sizeof(struct mchunkvec) == SIZEOF_MCHUNKVEC);
+static_assert(alignof(struct mchunkvec) == ALIGNOF_MCHUNKVEC);
+static_assert(offsetof(struct mpart, mp_refcnt) == OFFSET_MPART_REFCNT);
+static_assert(offsetof(struct mpart, mp_flags) == OFFSET_MPART_FLAGS);
+static_assert(offsetof(struct mpart, mp_xflags) == OFFSET_MPART_XFLAGS);
+static_assert(offsetof(struct mpart, mp_state) == OFFSET_MPART_STATE);
+static_assert(offsetof(struct mpart, _mp_joblink) == OFFSET_MPART__JOBLINK);
+static_assert(offsetof(struct mpart, _mp_joblink.sle_next) == OFFSET_MPART__JOBLINK_NEXT);
+static_assert(offsetof(struct mpart, mp_file) == OFFSET_MPART_FILE);
+static_assert(offsetof(struct mpart, mp_copy) == OFFSET_MPART_COPY);
+static_assert(offsetof(struct mpart, mp_copy.lh_first) == OFFSET_MPART_COPY_FIRST);
+static_assert(offsetof(struct mpart, mp_share) == OFFSET_MPART_SHARE);
+static_assert(offsetof(struct mpart, mp_share.lh_first) == OFFSET_MPART_SHARE_FIRST);
+static_assert(offsetof(struct mpart, _mp_nodlsts) == OFFSET_MPART__NODLSTS);
+static_assert(offsetof(struct mpart, _mp_dtplop) == OFFSET_MPART__DTPLOP);
+static_assert(offsetof(struct mpart, _mp_anfplop) == OFFSET_MPART__ANFPLOP);
+static_assert(offsetof(struct mpart, _mp_anpplop) == OFFSET_MPART__ANPPLOP);
+static_assert(offsetof(struct mpart, mp_lockops) == OFFSET_MPART_LOCKOPS);
+static_assert(offsetof(struct mpart, mp_allparts) == OFFSET_MPART_ALLPARTS);
+static_assert(offsetof(struct mpart, mp_allparts.le_next) == OFFSET_MPART_ALLPARTS_NEXT);
+static_assert(offsetof(struct mpart, mp_allparts.le_prev) == OFFSET_MPART_ALLPARTS_PREV);
+static_assert(offsetof(struct mpart, _mp_lopall) == OFFSET_MPART__LOPALL);
+static_assert(offsetof(struct mpart, _mp_plopall) == OFFSET_MPART__PLOPALL);
+static_assert(offsetof(struct mpart, mp_changed) == OFFSET_MPART_CHANGED);
+static_assert(offsetof(struct mpart, mp_changed.sle_next) == OFFSET_MPART_CHANGED_NEXT);
+static_assert(offsetof(struct mpart, _mp_dead) == OFFSET_MPART__DEAD);
+static_assert(offsetof(struct mpart, _mp_dead.sle_next) == OFFSET_MPART__DEAD_NEXT);
+static_assert(offsetof(struct mpart, mp_minaddr) == OFFSET_MPART_MINADDR);
+static_assert(offsetof(struct mpart, mp_maxaddr) == OFFSET_MPART_MAXADDR);
+static_assert(offsetof(struct mpart, mp_filent) == OFFSET_MPART_FILENT);
+static_assert(offsetof(struct mpart, mp_filent.rb_par) == OFFSET_MPART_FILENT_PAR);
+static_assert(offsetof(struct mpart, mp_filent.rb_lhs) == OFFSET_MPART_FILENT_LHS);
+static_assert(offsetof(struct mpart, mp_filent.rb_rhs) == OFFSET_MPART_FILENT_RHS);
+static_assert(offsetof(struct mpart, __mp_trmlop_pad) == OFFSET_MPART___TRMLOP_PAD);
+static_assert(offsetof(struct mpart, _mp_trmlop_mm) == OFFSET_MPART__TRMLOP_MM);
+static_assert(offsetof(struct mpart, _mp_trmplop_mm) == OFFSET_MPART__TRMPLOP_MM);
+static_assert(offsetof(struct mpart, _mp_trmlop_mp) == OFFSET_MPART__TRMLOP_MP);
+static_assert(offsetof(struct mpart, _mp_trmplop_mp) == OFFSET_MPART__TRMPLOP_MP);
+static_assert(offsetof(struct mpart, mp_blkst_ptr) == OFFSET_MPART_BLKST_PTR);
+static_assert(offsetof(struct mpart, mp_blkst_inl) == OFFSET_MPART_BLKST_INL);
+static_assert(offsetof(struct mpart, mp_mem) == OFFSET_MPART_MEM);
+static_assert(offsetof(struct mpart, mp_mem) == OFFSET_MPART_MEM);
+static_assert(offsetof(struct mpart, mp_mem_sc) == OFFSET_MPART_MEM_SC);
+static_assert(offsetof(struct mpart, mp_swp) == OFFSET_MPART_SWP);
+static_assert(offsetof(struct mpart, mp_swp_sc) == OFFSET_MPART_SWP_SC);
+static_assert(offsetof(struct mpart, mp_meta) == OFFSET_MPART_META);
+#ifdef OFFSET_MPART___PAD
+static_assert(offsetof(struct mpart, __mp_pad) == OFFSET_MPART___PAD);
+#endif /* OFFSET_MPART___PAD */
+static_assert(sizeof(struct mpart) == SIZEOF_MPART);
+static_assert(alignof(struct mpart) == ALIGNOF_MPART);
+
 
 
 #ifndef NDEBUG

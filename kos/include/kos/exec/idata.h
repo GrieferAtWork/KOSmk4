@@ -37,10 +37,10 @@
  * >> #include <sched.h>          // sched_yield
  * >> #include <hybrid/atomic.h>  // ATOMIC_CMPXCH, ATOMIC_WRITE
  * >>
+ * >> // Export a public symbol "program_pid" from this library that
+ * >> // is a data-object and will lazily invoke this function if used
+ * >> DEFINE_PUBLIC_IDATA(program_pid, resolve_program_pid, __SIZEOF_PID_T__);
  * >> PRIVATE ATTR_USED pid_t *resolve_program_pid() {
- * >>     // Export a public symbol "program_pid" from this library that
- * >>     // is a data-object and will lazily invoke this function if used
- * >>     DEFINE_PUBLIC_IDATA(program_pid, resolve_program_pid);
  * >>     static pid_t program_pid  = 0; // The library address of `program_pid'
  * >>     static int program_loaded = 0; // init-once barrier
  * >> again:
@@ -75,27 +75,18 @@
  *       it to be equivalent to the size of the resolver function... */
 
 #ifdef __CC__
-#define DEFINE_PUBLIC_IDATA_G(name, resolve, size)                                           \
+#define DEFINE_PUBLIC_IDATA(name, resolve, size)                                             \
 	__asm__(".globl " __PP_PRIVATE_STR(name) "\n"                                            \
 	        ".type  " __PP_PRIVATE_STR(name) ", \"kos_indirect_data\"\n"                     \
 	        ".set   .Lidata_" __PP_PRIVATE_STR(name) ", " __PP_PRIVATE_STR(resolve) " - 1\n" \
 	        ".set   " __PP_PRIVATE_STR(name) ", .Lidata_" __PP_PRIVATE_STR(name) " + 1\n"    \
 	        ".size  " __PP_PRIVATE_STR(name) ", " __PP_PRIVATE_STR(size) "\n")
-#define DEFINE_PUBLIC_IDATA(name, resolve) \
-	DEFINE_PUBLIC_IDATA_EX(name, resolve, sizeof((resolve)()))
-#define DEFINE_PUBLIC_IDATA_EX(name, resolve, size)                                       \
-	__asm__(".globl " __PP_PRIVATE_STR(name) "\n"                                         \
-	        ".type  " __PP_PRIVATE_STR(name) ", \"kos_indirect_data\"\n"                  \
-	        ".set   .Lidata_" __PP_PRIVATE_STR(name) ", %p0 - 1\n"                        \
-	        ".set   " __PP_PRIVATE_STR(name) ", .Lidata_" __PP_PRIVATE_STR(name) " + 1\n" \
-	        ".size  " __PP_PRIVATE_STR(name) ", %p1\n"                                    \
-	        : : "X" ((void *)(resolve)), "X" (size))
 #elif defined(__ASSEMBLER__)
-#define DEFINE_PUBLIC_IDATA_G(name, resolve, size_) \
-	.globl name;                                    \
-	.type  name, "kos_indirect_data";               \
-	.set   .Lidata_##name, (resolve) - 1;           \
-	.set   name, .Lidata_##name + 1;                \
+#define DEFINE_PUBLIC_IDATA(name, resolve, size_) \
+	.globl name;                                  \
+	.type  name, "kos_indirect_data";             \
+	.set   .Lidata_##name, (resolve) - 1;         \
+	.set   name, .Lidata_##name + 1;              \
 	.size  name, size_
 #endif /* ... */
 

@@ -20,6 +20,9 @@
 #ifndef GUARD_KERNEL_SRC_MEMORY_MMAN_MNODE_C
 #define GUARD_KERNEL_SRC_MEMORY_MMAN_MNODE_C 1
 #define __WANT_MPART__mp_nodlsts
+#define __WANT_MNODE__mn_dead  /* Only to assert offsets */
+#define __WANT_MNODE__mn_alloc /* Only to assert offsets */
+#define __WANT_MNODE__mn_ilink /* Only to assert offsets */
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -58,6 +61,35 @@ DECL_BEGIN
 /* Check if 2 given ranges overlap (that is: share at least 1 common address) */
 #define RANGE_OVERLAPS(a_min, a_max, b_min, b_max) \
 	((a_max) >= (b_min) && (a_min) <= (b_max))
+
+
+/* `struct mnode' offsets */
+static_assert(offsetof(struct mnode, mn_mement) == OFFSET_MNODE_MEMENT);
+static_assert(offsetof(struct mnode, mn_mement.rb_par) == OFFSET_MNODE_MEMENT_PAR);
+static_assert(offsetof(struct mnode, mn_mement.rb_lhs) == OFFSET_MNODE_MEMENT_LHS);
+static_assert(offsetof(struct mnode, mn_mement.rb_rhs) == OFFSET_MNODE_MEMENT_RHS);
+static_assert(offsetof(struct mnode, _mn_dead) == OFFSET_MNODE__DEAD);
+static_assert(offsetof(struct mnode, mn_minaddr) == OFFSET_MNODE_MINADDR);
+static_assert(offsetof(struct mnode, mn_maxaddr) == OFFSET_MNODE_MAXADDR);
+static_assert(offsetof(struct mnode, mn_flags) == OFFSET_MNODE_FLAGS);
+static_assert(offsetof(struct mnode, mn_part) == OFFSET_MNODE_PART);
+static_assert(offsetof(struct mnode, mn_fspath) == OFFSET_MNODE_FSPATH);
+static_assert(offsetof(struct mnode, mn_fsname) == OFFSET_MNODE_FSNAME);
+static_assert(offsetof(struct mnode, mn_mman) == OFFSET_MNODE_MMAN);
+static_assert(offsetof(struct mnode, _mn_alloc) == OFFSET_MNODE__ALLOC);
+static_assert(offsetof(struct mnode, mn_partoff) == OFFSET_MNODE_PARTOFF);
+static_assert(offsetof(struct mnode, mn_link) == OFFSET_MNODE_LINK);
+static_assert(offsetof(struct mnode, mn_link.le_next) == OFFSET_MNODE_LINK_NEXT);
+static_assert(offsetof(struct mnode, mn_link.le_prev) == OFFSET_MNODE_LINK_PREV);
+static_assert(offsetof(struct mnode, mn_writable) == OFFSET_MNODE_WRITABLE);
+static_assert(offsetof(struct mnode, mn_writable.le_next) == OFFSET_MNODE_WRITABLE_NEXT);
+static_assert(offsetof(struct mnode, mn_writable.le_prev) == OFFSET_MNODE_WRITABLE_PREV);
+static_assert(offsetof(struct mnode, _mn_iswritable) == OFFSET_MNODE__ISWRITABLE);
+static_assert(offsetof(struct mnode, _mn_iswritable) == OFFSET_MNODE__ISWRITABLE);
+static_assert(offsetof(struct mnode, _mn_ilink) == OFFSET_MNODE__ILINK);
+static_assert(offsetof(struct mnode, mn_module) == OFFSET_MNODE_MODULE);
+static_assert(sizeof(struct mnode) == SIZEOF_MNODE);
+static_assert(alignof(struct mnode) == ALIGNOF_MNODE);
 
 
 /* Free/destroy a given mem-node */
