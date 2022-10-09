@@ -35,6 +35,7 @@
 #include <system-test/ctest.h>
 
 #include <assert.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <syslog.h>
 
@@ -202,7 +203,7 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 			0x00130000, 0x00130200, 0x00140000, 0x00140200,
 		};
 		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(offsets); ++i) {
+		for (i = 0; i < lengthof(offsets); ++i) {
 			TRY {
 				int *volatile kbase = (int *)(KERNEL_CORE_BASE + offsets[i]);
 				Pipe(kbase);
@@ -342,7 +343,7 @@ DEFINE_TEST(system_exceptions_work_correctly) {
 		assertf(data->e_args.e_pointers[0] == 1, "data->e_args.e_pointers[0] = %p", data->e_args.e_pointers[0]);
 		assertf(data->e_args.e_pointers[1] == 2, "data->e_args.e_pointers[1] = %p", data->e_args.e_pointers[1]);
 		assertf(data->e_args.e_pointers[2] == 3, "data->e_args.e_pointers[2] = %p", data->e_args.e_pointers[2]);
-		for (i = 3; i < COMPILER_LENOF(data->e_args.e_pointers); ++i) {
+		for (i = 3; i < lengthof(data->e_args.e_pointers); ++i) {
 			assertf(data->e_args.e_pointers[i] == 0,
 			        "data->e_args.e_pointers[%u] = %p",
 			        i, data->e_args.e_pointers[i]);

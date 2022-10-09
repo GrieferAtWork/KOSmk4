@@ -46,6 +46,7 @@
 #include <format-printer.h>
 #include <inttypes.h>
 #include <limits.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <time.h>
@@ -304,7 +305,7 @@ again_render_screen:
 	}
 	/* Render the status selection index in the status bar. */
 	{
-		char buf[COMPILER_LENOF(PRIMAXu "/" PRIMAXu)];
+		char buf[lengthof(PRIMAXu "/" PRIMAXu)];
 		size_t len;
 		len = sprintf(buf, DBGSTR("%u/%u"),
 		              data->rd_selected + 1,

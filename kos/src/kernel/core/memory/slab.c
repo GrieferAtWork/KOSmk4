@@ -48,6 +48,7 @@
 
 #include <assert.h>
 #include <inttypes.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -207,7 +208,7 @@ NOTHROW(KCALL system_cc_perslabpool)(struct slab_pool *__restrict self,
 INTERN NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_slab_prealloc)(struct ccinfo *__restrict info) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(slab_freepool); ++i) {
+	for (i = 0; i < lengthof(slab_freepool); ++i) {
 		system_cc_perslabpool(&slab_freepool[i], info);
 		if (ccinfo_isdone(info))
 			break;

@@ -30,6 +30,7 @@
 #include <kos/types.h>
 
 #include <errno.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -414,7 +415,7 @@ PRIVATE ATTR_PURE WUNUSED NONNULL((1)) struct conf const *CC
 findconf(char const *__restrict name) {
 	unsigned int i;
 again:
-	for (i = 0; i < COMPILER_LENOF(confs); ++i) {
+	for (i = 0; i < lengthof(confs); ++i) {
 		if (strcmp(confs[i].c_name, name) == 0)
 			return &confs[i];
 	}
@@ -532,7 +533,7 @@ printconfval_or_error(fd_t stdout_fileno,
 /* Print all conf */
 PRIVATE void CC printall(char const *path) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(confs); ++i) {
+	for (i = 0; i < lengthof(confs); ++i) {
 		if (confs[i].c_type == CONFTYPE_PATHCONF && !path)
 			continue; /* Skip */
 		dprintf(STDOUT_FILENO,

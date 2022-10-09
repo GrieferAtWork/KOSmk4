@@ -23,6 +23,7 @@
 #endif /* __INTELLISENSE__ */
 
 #include <inttypes.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #if N == 0
@@ -84,171 +85,171 @@ PRIVATE void FUNC(do_test_memory)(void) {
 
 	ASSERT_EQ_PTR(FUNC(memchr)(null, 0, 0), NULL);
 	ASSERT_EQ_PTR(FUNC(memchr)(blob, 0, 0), NULL);
-	ASSERT_EQ_PTR(FUNC(memchr)(blob, 0, COMPILER_LENOF(blob)), blob + 0);
-	ASSERT_EQ_PTR(FUNC(memchr)(blob, 1, COMPILER_LENOF(blob)), blob + 1);
-	ASSERT_EQ_PTR(FUNC(memchr)(blob, 2, COMPILER_LENOF(blob)), blob + 2);
-	ASSERT_EQ_PTR(FUNC(memchr)(blob, 3, COMPILER_LENOF(blob)), blob + 3);
-	ASSERT_EQ_PTR(FUNC(memchr)(blob, 4, COMPILER_LENOF(blob)), blob + 4);
-	ASSERT_EQ_PTR(FUNC(memchr)(blob, 5, COMPILER_LENOF(blob)), blob + 5);
-	ASSERT_EQ_PTR(FUNC(memchr)(blob, 6, COMPILER_LENOF(blob)), blob + 6);
-	ASSERT_EQ_PTR(FUNC(memchr)(blob, 7, COMPILER_LENOF(blob)), blob + 7);
-	ASSERT_EQ_PTR(FUNC(memchr)(blob, 8, COMPILER_LENOF(blob)), blob + 8);
-	ASSERT_EQ_PTR(FUNC(memchr)(blob, 9, COMPILER_LENOF(blob)), blob + 9);
-	ASSERT_EQ_PTR(FUNC(memchr)(blob, 10, COMPILER_LENOF(blob)), NULL);
+	ASSERT_EQ_PTR(FUNC(memchr)(blob, 0, lengthof(blob)), blob + 0);
+	ASSERT_EQ_PTR(FUNC(memchr)(blob, 1, lengthof(blob)), blob + 1);
+	ASSERT_EQ_PTR(FUNC(memchr)(blob, 2, lengthof(blob)), blob + 2);
+	ASSERT_EQ_PTR(FUNC(memchr)(blob, 3, lengthof(blob)), blob + 3);
+	ASSERT_EQ_PTR(FUNC(memchr)(blob, 4, lengthof(blob)), blob + 4);
+	ASSERT_EQ_PTR(FUNC(memchr)(blob, 5, lengthof(blob)), blob + 5);
+	ASSERT_EQ_PTR(FUNC(memchr)(blob, 6, lengthof(blob)), blob + 6);
+	ASSERT_EQ_PTR(FUNC(memchr)(blob, 7, lengthof(blob)), blob + 7);
+	ASSERT_EQ_PTR(FUNC(memchr)(blob, 8, lengthof(blob)), blob + 8);
+	ASSERT_EQ_PTR(FUNC(memchr)(blob, 9, lengthof(blob)), blob + 9);
+	ASSERT_EQ_PTR(FUNC(memchr)(blob, 10, lengthof(blob)), NULL);
 
 	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 0, 0), NULL);
-	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 0, COMPILER_LENOF(blob)), blob + 0);
-	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 1, COMPILER_LENOF(blob)), blob + 1);
-	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 2, COMPILER_LENOF(blob)), blob + 2);
-	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 3, COMPILER_LENOF(blob)), blob + 3);
-	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 4, COMPILER_LENOF(blob)), blob + 4);
-	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 5, COMPILER_LENOF(blob)), blob + 5);
-	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 6, COMPILER_LENOF(blob)), blob + 6);
-	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 7, COMPILER_LENOF(blob)), blob + 7);
-	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 8, COMPILER_LENOF(blob)), blob + 8);
-	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 9, COMPILER_LENOF(blob)), blob + 9);
-	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 10, COMPILER_LENOF(blob)), NULL);
+	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 0, lengthof(blob)), blob + 0);
+	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 1, lengthof(blob)), blob + 1);
+	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 2, lengthof(blob)), blob + 2);
+	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 3, lengthof(blob)), blob + 3);
+	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 4, lengthof(blob)), blob + 4);
+	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 5, lengthof(blob)), blob + 5);
+	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 6, lengthof(blob)), blob + 6);
+	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 7, lengthof(blob)), blob + 7);
+	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 8, lengthof(blob)), blob + 8);
+	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 9, lengthof(blob)), blob + 9);
+	ASSERT_EQ_PTR(FUNC(memchr)(vblob, 10, lengthof(blob)), NULL);
 
 	ASSERT_EQ_PTR(FUNC(memrchr)(null, 0, 0), NULL);
 	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 0, 0), NULL);
-	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 0, COMPILER_LENOF(blob)), blob + 18);
-	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 1, COMPILER_LENOF(blob)), blob + 17);
-	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 2, COMPILER_LENOF(blob)), blob + 16);
-	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 3, COMPILER_LENOF(blob)), blob + 15);
-	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 4, COMPILER_LENOF(blob)), blob + 14);
-	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 5, COMPILER_LENOF(blob)), blob + 13);
-	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 6, COMPILER_LENOF(blob)), blob + 12);
-	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 7, COMPILER_LENOF(blob)), blob + 11);
-	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 8, COMPILER_LENOF(blob)), blob + 10);
-	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 9, COMPILER_LENOF(blob)), blob + 9);
-	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 10, COMPILER_LENOF(blob)), NULL);
+	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 0, lengthof(blob)), blob + 18);
+	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 1, lengthof(blob)), blob + 17);
+	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 2, lengthof(blob)), blob + 16);
+	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 3, lengthof(blob)), blob + 15);
+	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 4, lengthof(blob)), blob + 14);
+	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 5, lengthof(blob)), blob + 13);
+	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 6, lengthof(blob)), blob + 12);
+	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 7, lengthof(blob)), blob + 11);
+	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 8, lengthof(blob)), blob + 10);
+	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 9, lengthof(blob)), blob + 9);
+	ASSERT_EQ_PTR(FUNC(memrchr)(blob, 10, lengthof(blob)), NULL);
 
 	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 0, 0), NULL);
-	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 0, COMPILER_LENOF(blob)), blob + 18);
-	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 1, COMPILER_LENOF(blob)), blob + 17);
-	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 2, COMPILER_LENOF(blob)), blob + 16);
-	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 3, COMPILER_LENOF(blob)), blob + 15);
-	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 4, COMPILER_LENOF(blob)), blob + 14);
-	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 5, COMPILER_LENOF(blob)), blob + 13);
-	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 6, COMPILER_LENOF(blob)), blob + 12);
-	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 7, COMPILER_LENOF(blob)), blob + 11);
-	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 8, COMPILER_LENOF(blob)), blob + 10);
-	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 9, COMPILER_LENOF(blob)), blob + 9);
-	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 10, COMPILER_LENOF(blob)), NULL);
+	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 0, lengthof(blob)), blob + 18);
+	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 1, lengthof(blob)), blob + 17);
+	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 2, lengthof(blob)), blob + 16);
+	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 3, lengthof(blob)), blob + 15);
+	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 4, lengthof(blob)), blob + 14);
+	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 5, lengthof(blob)), blob + 13);
+	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 6, lengthof(blob)), blob + 12);
+	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 7, lengthof(blob)), blob + 11);
+	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 8, lengthof(blob)), blob + 10);
+	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 9, lengthof(blob)), blob + 9);
+	ASSERT_EQ_PTR(FUNC(memrchr)(vblob, 10, lengthof(blob)), NULL);
 
 	ASSERT_EQ_PTR(FUNC(memend)(blob, 0, 0), blob + 0);
 	ASSERT_EQ_PTR(FUNC(memend)(blob, 10, 0), blob + 0);
-	ASSERT_EQ_PTR(FUNC(memend)(blob, 0, COMPILER_LENOF(blob)), blob + 0);
-	ASSERT_EQ_PTR(FUNC(memend)(blob, 1, COMPILER_LENOF(blob)), blob + 1);
-	ASSERT_EQ_PTR(FUNC(memend)(blob, 2, COMPILER_LENOF(blob)), blob + 2);
-	ASSERT_EQ_PTR(FUNC(memend)(blob, 3, COMPILER_LENOF(blob)), blob + 3);
-	ASSERT_EQ_PTR(FUNC(memend)(blob, 4, COMPILER_LENOF(blob)), blob + 4);
-	ASSERT_EQ_PTR(FUNC(memend)(blob, 5, COMPILER_LENOF(blob)), blob + 5);
-	ASSERT_EQ_PTR(FUNC(memend)(blob, 6, COMPILER_LENOF(blob)), blob + 6);
-	ASSERT_EQ_PTR(FUNC(memend)(blob, 7, COMPILER_LENOF(blob)), blob + 7);
-	ASSERT_EQ_PTR(FUNC(memend)(blob, 8, COMPILER_LENOF(blob)), blob + 8);
-	ASSERT_EQ_PTR(FUNC(memend)(blob, 9, COMPILER_LENOF(blob)), blob + 9);
-	ASSERT_EQ_PTR(FUNC(memend)(blob, 10, COMPILER_LENOF(blob)), COMPILER_ENDOF(blob));
+	ASSERT_EQ_PTR(FUNC(memend)(blob, 0, lengthof(blob)), blob + 0);
+	ASSERT_EQ_PTR(FUNC(memend)(blob, 1, lengthof(blob)), blob + 1);
+	ASSERT_EQ_PTR(FUNC(memend)(blob, 2, lengthof(blob)), blob + 2);
+	ASSERT_EQ_PTR(FUNC(memend)(blob, 3, lengthof(blob)), blob + 3);
+	ASSERT_EQ_PTR(FUNC(memend)(blob, 4, lengthof(blob)), blob + 4);
+	ASSERT_EQ_PTR(FUNC(memend)(blob, 5, lengthof(blob)), blob + 5);
+	ASSERT_EQ_PTR(FUNC(memend)(blob, 6, lengthof(blob)), blob + 6);
+	ASSERT_EQ_PTR(FUNC(memend)(blob, 7, lengthof(blob)), blob + 7);
+	ASSERT_EQ_PTR(FUNC(memend)(blob, 8, lengthof(blob)), blob + 8);
+	ASSERT_EQ_PTR(FUNC(memend)(blob, 9, lengthof(blob)), blob + 9);
+	ASSERT_EQ_PTR(FUNC(memend)(blob, 10, lengthof(blob)), COMPILER_ENDOF(blob));
 
 	ASSERT_EQ_PTR(FUNC(memrend)(blob, 0, 0), vblob - 1);
 	ASSERT_EQ_PTR(FUNC(memrend)(blob, 10, 0), vblob - 1);
-	ASSERT_EQ_PTR(FUNC(memrend)(blob, 0, COMPILER_LENOF(blob)), blob + 18);
-	ASSERT_EQ_PTR(FUNC(memrend)(blob, 1, COMPILER_LENOF(blob)), blob + 17);
-	ASSERT_EQ_PTR(FUNC(memrend)(blob, 2, COMPILER_LENOF(blob)), blob + 16);
-	ASSERT_EQ_PTR(FUNC(memrend)(blob, 3, COMPILER_LENOF(blob)), blob + 15);
-	ASSERT_EQ_PTR(FUNC(memrend)(blob, 4, COMPILER_LENOF(blob)), blob + 14);
-	ASSERT_EQ_PTR(FUNC(memrend)(blob, 5, COMPILER_LENOF(blob)), blob + 13);
-	ASSERT_EQ_PTR(FUNC(memrend)(blob, 6, COMPILER_LENOF(blob)), blob + 12);
-	ASSERT_EQ_PTR(FUNC(memrend)(blob, 7, COMPILER_LENOF(blob)), blob + 11);
-	ASSERT_EQ_PTR(FUNC(memrend)(blob, 8, COMPILER_LENOF(blob)), blob + 10);
-	ASSERT_EQ_PTR(FUNC(memrend)(blob, 9, COMPILER_LENOF(blob)), blob + 9);
-	ASSERT_EQ_PTR(FUNC(memrend)(blob, 10, COMPILER_LENOF(blob)), vblob - 1);
+	ASSERT_EQ_PTR(FUNC(memrend)(blob, 0, lengthof(blob)), blob + 18);
+	ASSERT_EQ_PTR(FUNC(memrend)(blob, 1, lengthof(blob)), blob + 17);
+	ASSERT_EQ_PTR(FUNC(memrend)(blob, 2, lengthof(blob)), blob + 16);
+	ASSERT_EQ_PTR(FUNC(memrend)(blob, 3, lengthof(blob)), blob + 15);
+	ASSERT_EQ_PTR(FUNC(memrend)(blob, 4, lengthof(blob)), blob + 14);
+	ASSERT_EQ_PTR(FUNC(memrend)(blob, 5, lengthof(blob)), blob + 13);
+	ASSERT_EQ_PTR(FUNC(memrend)(blob, 6, lengthof(blob)), blob + 12);
+	ASSERT_EQ_PTR(FUNC(memrend)(blob, 7, lengthof(blob)), blob + 11);
+	ASSERT_EQ_PTR(FUNC(memrend)(blob, 8, lengthof(blob)), blob + 10);
+	ASSERT_EQ_PTR(FUNC(memrend)(blob, 9, lengthof(blob)), blob + 9);
+	ASSERT_EQ_PTR(FUNC(memrend)(blob, 10, lengthof(blob)), vblob - 1);
 
 	ASSERT_EQ_PTR(FUNC(memend)(vblob, 0, 0), blob + 0);
 	ASSERT_EQ_PTR(FUNC(memend)(vblob, 10, 0), blob + 0);
-	ASSERT_EQ_PTR(FUNC(memend)(vblob, 0, COMPILER_LENOF(blob)), blob + 0);
-	ASSERT_EQ_PTR(FUNC(memend)(vblob, 1, COMPILER_LENOF(blob)), blob + 1);
-	ASSERT_EQ_PTR(FUNC(memend)(vblob, 2, COMPILER_LENOF(blob)), blob + 2);
-	ASSERT_EQ_PTR(FUNC(memend)(vblob, 3, COMPILER_LENOF(blob)), blob + 3);
-	ASSERT_EQ_PTR(FUNC(memend)(vblob, 4, COMPILER_LENOF(blob)), blob + 4);
-	ASSERT_EQ_PTR(FUNC(memend)(vblob, 5, COMPILER_LENOF(blob)), blob + 5);
-	ASSERT_EQ_PTR(FUNC(memend)(vblob, 6, COMPILER_LENOF(blob)), blob + 6);
-	ASSERT_EQ_PTR(FUNC(memend)(vblob, 7, COMPILER_LENOF(blob)), blob + 7);
-	ASSERT_EQ_PTR(FUNC(memend)(vblob, 8, COMPILER_LENOF(blob)), blob + 8);
-	ASSERT_EQ_PTR(FUNC(memend)(vblob, 9, COMPILER_LENOF(blob)), blob + 9);
-	ASSERT_EQ_PTR(FUNC(memend)(vblob, 10, COMPILER_LENOF(blob)), COMPILER_ENDOF(blob));
+	ASSERT_EQ_PTR(FUNC(memend)(vblob, 0, lengthof(blob)), blob + 0);
+	ASSERT_EQ_PTR(FUNC(memend)(vblob, 1, lengthof(blob)), blob + 1);
+	ASSERT_EQ_PTR(FUNC(memend)(vblob, 2, lengthof(blob)), blob + 2);
+	ASSERT_EQ_PTR(FUNC(memend)(vblob, 3, lengthof(blob)), blob + 3);
+	ASSERT_EQ_PTR(FUNC(memend)(vblob, 4, lengthof(blob)), blob + 4);
+	ASSERT_EQ_PTR(FUNC(memend)(vblob, 5, lengthof(blob)), blob + 5);
+	ASSERT_EQ_PTR(FUNC(memend)(vblob, 6, lengthof(blob)), blob + 6);
+	ASSERT_EQ_PTR(FUNC(memend)(vblob, 7, lengthof(blob)), blob + 7);
+	ASSERT_EQ_PTR(FUNC(memend)(vblob, 8, lengthof(blob)), blob + 8);
+	ASSERT_EQ_PTR(FUNC(memend)(vblob, 9, lengthof(blob)), blob + 9);
+	ASSERT_EQ_PTR(FUNC(memend)(vblob, 10, lengthof(blob)), COMPILER_ENDOF(blob));
 
 	ASSERT_EQ_PTR(FUNC(memrend)(blob, 0, 0), vblob - 1);
 	ASSERT_EQ_PTR(FUNC(memrend)(blob, 10, 0), vblob - 1);
-	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 0, COMPILER_LENOF(blob)), blob + 18);
-	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 1, COMPILER_LENOF(blob)), blob + 17);
-	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 2, COMPILER_LENOF(blob)), blob + 16);
-	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 3, COMPILER_LENOF(blob)), blob + 15);
-	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 4, COMPILER_LENOF(blob)), blob + 14);
-	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 5, COMPILER_LENOF(blob)), blob + 13);
-	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 6, COMPILER_LENOF(blob)), blob + 12);
-	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 7, COMPILER_LENOF(blob)), blob + 11);
-	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 8, COMPILER_LENOF(blob)), blob + 10);
-	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 9, COMPILER_LENOF(blob)), blob + 9);
-	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 10, COMPILER_LENOF(blob)), vblob - 1);
+	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 0, lengthof(blob)), blob + 18);
+	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 1, lengthof(blob)), blob + 17);
+	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 2, lengthof(blob)), blob + 16);
+	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 3, lengthof(blob)), blob + 15);
+	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 4, lengthof(blob)), blob + 14);
+	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 5, lengthof(blob)), blob + 13);
+	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 6, lengthof(blob)), blob + 12);
+	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 7, lengthof(blob)), blob + 11);
+	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 8, lengthof(blob)), blob + 10);
+	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 9, lengthof(blob)), blob + 9);
+	ASSERT_EQ_PTR(FUNC(memrend)(vblob, 10, lengthof(blob)), vblob - 1);
 
 	ASSERT_EQ_SIZE_T(FUNC(memlen)(null, 0, 0), 0);
 	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 0, 0), 0);
 	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 10, 0), 0);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 0, COMPILER_LENOF(blob)), 0);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 1, COMPILER_LENOF(blob)), 1);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 2, COMPILER_LENOF(blob)), 2);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 3, COMPILER_LENOF(blob)), 3);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 4, COMPILER_LENOF(blob)), 4);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 5, COMPILER_LENOF(blob)), 5);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 6, COMPILER_LENOF(blob)), 6);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 7, COMPILER_LENOF(blob)), 7);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 8, COMPILER_LENOF(blob)), 8);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 9, COMPILER_LENOF(blob)), 9);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 10, COMPILER_LENOF(blob)), COMPILER_LENOF(blob));
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 0, lengthof(blob)), 0);
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 1, lengthof(blob)), 1);
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 2, lengthof(blob)), 2);
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 3, lengthof(blob)), 3);
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 4, lengthof(blob)), 4);
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 5, lengthof(blob)), 5);
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 6, lengthof(blob)), 6);
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 7, lengthof(blob)), 7);
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 8, lengthof(blob)), 8);
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 9, lengthof(blob)), 9);
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(blob, 10, lengthof(blob)), lengthof(blob));
 
 	ASSERT_EQ_SIZE_T(FUNC(memrlen)(null, 0, 0), (size_t)-1);
 	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 0, 0), (size_t)-1);
 	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 10, 0), (size_t)-1);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 0, COMPILER_LENOF(blob)), 18);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 1, COMPILER_LENOF(blob)), 17);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 2, COMPILER_LENOF(blob)), 16);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 3, COMPILER_LENOF(blob)), 15);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 4, COMPILER_LENOF(blob)), 14);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 5, COMPILER_LENOF(blob)), 13);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 6, COMPILER_LENOF(blob)), 12);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 7, COMPILER_LENOF(blob)), 11);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 8, COMPILER_LENOF(blob)), 10);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 9, COMPILER_LENOF(blob)), 9);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 10, COMPILER_LENOF(blob)), (size_t)-1);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 0, lengthof(blob)), 18);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 1, lengthof(blob)), 17);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 2, lengthof(blob)), 16);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 3, lengthof(blob)), 15);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 4, lengthof(blob)), 14);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 5, lengthof(blob)), 13);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 6, lengthof(blob)), 12);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 7, lengthof(blob)), 11);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 8, lengthof(blob)), 10);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 9, lengthof(blob)), 9);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(blob, 10, lengthof(blob)), (size_t)-1);
 
 	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 0, 0), 0);
 	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 10, 0), 0);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 0, COMPILER_LENOF(blob)), 0);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 1, COMPILER_LENOF(blob)), 1);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 2, COMPILER_LENOF(blob)), 2);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 3, COMPILER_LENOF(blob)), 3);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 4, COMPILER_LENOF(blob)), 4);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 5, COMPILER_LENOF(blob)), 5);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 6, COMPILER_LENOF(blob)), 6);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 7, COMPILER_LENOF(blob)), 7);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 8, COMPILER_LENOF(blob)), 8);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 9, COMPILER_LENOF(blob)), 9);
-	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 10, COMPILER_LENOF(blob)), COMPILER_LENOF(blob));
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 0, lengthof(blob)), 0);
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 1, lengthof(blob)), 1);
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 2, lengthof(blob)), 2);
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 3, lengthof(blob)), 3);
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 4, lengthof(blob)), 4);
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 5, lengthof(blob)), 5);
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 6, lengthof(blob)), 6);
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 7, lengthof(blob)), 7);
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 8, lengthof(blob)), 8);
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 9, lengthof(blob)), 9);
+	ASSERT_EQ_SIZE_T(FUNC(memlen)(vblob, 10, lengthof(blob)), lengthof(blob));
 
 	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 0, 0), (size_t)-1);
 	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 10, 0), (size_t)-1);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 0, COMPILER_LENOF(blob)), 18);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 1, COMPILER_LENOF(blob)), 17);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 2, COMPILER_LENOF(blob)), 16);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 3, COMPILER_LENOF(blob)), 15);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 4, COMPILER_LENOF(blob)), 14);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 5, COMPILER_LENOF(blob)), 13);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 6, COMPILER_LENOF(blob)), 12);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 7, COMPILER_LENOF(blob)), 11);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 8, COMPILER_LENOF(blob)), 10);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 9, COMPILER_LENOF(blob)), 9);
-	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 10, COMPILER_LENOF(blob)), (size_t)-1);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 0, lengthof(blob)), 18);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 1, lengthof(blob)), 17);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 2, lengthof(blob)), 16);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 3, lengthof(blob)), 15);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 4, lengthof(blob)), 14);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 5, lengthof(blob)), 13);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 6, lengthof(blob)), 12);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 7, lengthof(blob)), 11);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 8, lengthof(blob)), 10);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 9, lengthof(blob)), 9);
+	ASSERT_EQ_SIZE_T(FUNC(memrlen)(vblob, 10, lengthof(blob)), (size_t)-1);
 
 	ASSERT_EQ_PTR(FUNC(rawmemchr)(blob, 0), blob + 0);
 	ASSERT_EQ_PTR(FUNC(rawmemchr)(blob, 1), blob + 1);
@@ -283,16 +284,16 @@ PRIVATE void FUNC(do_test_memory)(void) {
 	ASSERT_EQ_PTR(FUNC(rawmemrchr)(COMPILER_ENDOF(blob), 8), blob + 10);
 	ASSERT_EQ_PTR(FUNC(rawmemrchr)(COMPILER_ENDOF(blob), 9), blob + 9);
 
-	ASSERT_EQ_PTR(FUNC(rawmemrchr)(vblob + COMPILER_LENOF(blob), 0), blob + 18);
-	ASSERT_EQ_PTR(FUNC(rawmemrchr)(vblob + COMPILER_LENOF(blob), 1), blob + 17);
-	ASSERT_EQ_PTR(FUNC(rawmemrchr)(vblob + COMPILER_LENOF(blob), 2), blob + 16);
-	ASSERT_EQ_PTR(FUNC(rawmemrchr)(vblob + COMPILER_LENOF(blob), 3), blob + 15);
-	ASSERT_EQ_PTR(FUNC(rawmemrchr)(vblob + COMPILER_LENOF(blob), 4), blob + 14);
-	ASSERT_EQ_PTR(FUNC(rawmemrchr)(vblob + COMPILER_LENOF(blob), 5), blob + 13);
-	ASSERT_EQ_PTR(FUNC(rawmemrchr)(vblob + COMPILER_LENOF(blob), 6), blob + 12);
-	ASSERT_EQ_PTR(FUNC(rawmemrchr)(vblob + COMPILER_LENOF(blob), 7), blob + 11);
-	ASSERT_EQ_PTR(FUNC(rawmemrchr)(vblob + COMPILER_LENOF(blob), 8), blob + 10);
-	ASSERT_EQ_PTR(FUNC(rawmemrchr)(vblob + COMPILER_LENOF(blob), 9), blob + 9);
+	ASSERT_EQ_PTR(FUNC(rawmemrchr)(vblob + lengthof(blob), 0), blob + 18);
+	ASSERT_EQ_PTR(FUNC(rawmemrchr)(vblob + lengthof(blob), 1), blob + 17);
+	ASSERT_EQ_PTR(FUNC(rawmemrchr)(vblob + lengthof(blob), 2), blob + 16);
+	ASSERT_EQ_PTR(FUNC(rawmemrchr)(vblob + lengthof(blob), 3), blob + 15);
+	ASSERT_EQ_PTR(FUNC(rawmemrchr)(vblob + lengthof(blob), 4), blob + 14);
+	ASSERT_EQ_PTR(FUNC(rawmemrchr)(vblob + lengthof(blob), 5), blob + 13);
+	ASSERT_EQ_PTR(FUNC(rawmemrchr)(vblob + lengthof(blob), 6), blob + 12);
+	ASSERT_EQ_PTR(FUNC(rawmemrchr)(vblob + lengthof(blob), 7), blob + 11);
+	ASSERT_EQ_PTR(FUNC(rawmemrchr)(vblob + lengthof(blob), 8), blob + 10);
+	ASSERT_EQ_PTR(FUNC(rawmemrchr)(vblob + lengthof(blob), 9), blob + 9);
 
 	ASSERT_EQ_SIZE_T(FUNC(rawmemlen)(blob, 0), 0);
 	ASSERT_EQ_SIZE_T(FUNC(rawmemlen)(blob, 1), 1);
@@ -327,20 +328,20 @@ PRIVATE void FUNC(do_test_memory)(void) {
 	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(COMPILER_ENDOF(blob), 8), (size_t)-9);
 	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(COMPILER_ENDOF(blob), 9), (size_t)-10);
 
-	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(vblob + COMPILER_LENOF(blob), 0), (size_t)-1);
-	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(vblob + COMPILER_LENOF(blob), 1), (size_t)-2);
-	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(vblob + COMPILER_LENOF(blob), 2), (size_t)-3);
-	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(vblob + COMPILER_LENOF(blob), 3), (size_t)-4);
-	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(vblob + COMPILER_LENOF(blob), 4), (size_t)-5);
-	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(vblob + COMPILER_LENOF(blob), 5), (size_t)-6);
-	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(vblob + COMPILER_LENOF(blob), 6), (size_t)-7);
-	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(vblob + COMPILER_LENOF(blob), 7), (size_t)-8);
-	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(vblob + COMPILER_LENOF(blob), 8), (size_t)-9);
-	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(vblob + COMPILER_LENOF(blob), 9), (size_t)-10);
+	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(vblob + lengthof(blob), 0), (size_t)-1);
+	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(vblob + lengthof(blob), 1), (size_t)-2);
+	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(vblob + lengthof(blob), 2), (size_t)-3);
+	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(vblob + lengthof(blob), 3), (size_t)-4);
+	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(vblob + lengthof(blob), 4), (size_t)-5);
+	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(vblob + lengthof(blob), 5), (size_t)-6);
+	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(vblob + lengthof(blob), 6), (size_t)-7);
+	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(vblob + lengthof(blob), 7), (size_t)-8);
+	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(vblob + lengthof(blob), 8), (size_t)-9);
+	ASSERT_EQ_SIZE_T(FUNC(rawmemrlen)(vblob + lengthof(blob), 9), (size_t)-10);
 
 	/* XCHR functions */
-	ASSERT_EQ_PTR(FUNC(memxchr)(xblob, 5, COMPILER_LENOF(xblob)), xblob + 9);
-	ASSERT_EQ_PTR(FUNC(memxchr)(vxblob, 5, COMPILER_LENOF(xblob)), xblob + 9);
+	ASSERT_EQ_PTR(FUNC(memxchr)(xblob, 5, lengthof(xblob)), xblob + 9);
+	ASSERT_EQ_PTR(FUNC(memxchr)(vxblob, 5, lengthof(xblob)), xblob + 9);
 	ASSERT_EQ_PTR(FUNC(memxchr)(xblob, 5, 9), NULL);
 	ASSERT_EQ_PTR(FUNC(memxchr)(vxblob, 5, 9), NULL);
 	ASSERT_EQ_PTR(FUNC(memxchr)(xblob, 5, 10), xblob + 9);
@@ -350,8 +351,8 @@ PRIVATE void FUNC(do_test_memory)(void) {
 	ASSERT_EQ_PTR(FUNC(memxchr)(xblob + 9, 5, 1), xblob + 9);
 	ASSERT_EQ_PTR(FUNC(memxchr)(vxblob + 9, 5, 1), xblob + 9);
 
-	ASSERT_EQ_PTR(FUNC(memrxchr)(xblob, 5, COMPILER_LENOF(xblob)), xblob + 9);
-	ASSERT_EQ_PTR(FUNC(memrxchr)(vxblob, 5, COMPILER_LENOF(xblob)), xblob + 9);
+	ASSERT_EQ_PTR(FUNC(memrxchr)(xblob, 5, lengthof(xblob)), xblob + 9);
+	ASSERT_EQ_PTR(FUNC(memrxchr)(vxblob, 5, lengthof(xblob)), xblob + 9);
 	ASSERT_EQ_PTR(FUNC(memrxchr)(xblob, 5, 9), NULL);
 	ASSERT_EQ_PTR(FUNC(memrxchr)(vxblob, 5, 9), NULL);
 	ASSERT_EQ_PTR(FUNC(memrxchr)(xblob, 5, 10), xblob + 9);
@@ -363,8 +364,8 @@ PRIVATE void FUNC(do_test_memory)(void) {
 	ASSERT_EQ_PTR(FUNC(memrxchr)(xblob + 9, 5, 2), xblob + 9);
 	ASSERT_EQ_PTR(FUNC(memrxchr)(vxblob + 9, 5, 2), xblob + 9);
 
-	ASSERT_EQ_PTR(FUNC(memxend)(xblob, 5, COMPILER_LENOF(xblob)), xblob + 9);
-	ASSERT_EQ_PTR(FUNC(memxend)(vxblob, 5, COMPILER_LENOF(xblob)), xblob + 9);
+	ASSERT_EQ_PTR(FUNC(memxend)(xblob, 5, lengthof(xblob)), xblob + 9);
+	ASSERT_EQ_PTR(FUNC(memxend)(vxblob, 5, lengthof(xblob)), xblob + 9);
 	ASSERT_EQ_PTR(FUNC(memxend)(xblob, 5, 10), xblob + 9);
 	ASSERT_EQ_PTR(FUNC(memxend)(vxblob, 5, 10), xblob + 9);
 	ASSERT_EQ_PTR(FUNC(memxend)(xblob, 5, 9), xblob + 9);
@@ -380,8 +381,8 @@ PRIVATE void FUNC(do_test_memory)(void) {
 	ASSERT_EQ_PTR(FUNC(memxend)(xblob + 8, 5, 2), xblob + 9);
 	ASSERT_EQ_PTR(FUNC(memxend)(vxblob + 8, 5, 2), xblob + 9);
 
-	ASSERT_EQ_PTR(FUNC(memrxend)(xblob, 5, COMPILER_LENOF(xblob)), xblob + 9);
-	ASSERT_EQ_PTR(FUNC(memrxend)(vxblob, 5, COMPILER_LENOF(xblob)), xblob + 9);
+	ASSERT_EQ_PTR(FUNC(memrxend)(xblob, 5, lengthof(xblob)), xblob + 9);
+	ASSERT_EQ_PTR(FUNC(memrxend)(vxblob, 5, lengthof(xblob)), xblob + 9);
 	ASSERT_EQ_PTR(FUNC(memrxend)(xblob, 5, 9), vxblob - 1);
 	ASSERT_EQ_PTR(FUNC(memrxend)(vxblob, 5, 9), vxblob - 1);
 	ASSERT_EQ_PTR(FUNC(memrxend)(xblob + 9, 5, 1), xblob + 9);
@@ -389,8 +390,8 @@ PRIVATE void FUNC(do_test_memory)(void) {
 	ASSERT_EQ_PTR(FUNC(memrxend)(xblob + 9, 5, 0), xblob + 8);
 	ASSERT_EQ_PTR(FUNC(memrxend)(vxblob + 9, 5, 0), xblob + 8);
 
-	ASSERT_EQ_SIZE_T(FUNC(memxlen)(xblob, 5, COMPILER_LENOF(xblob)), 9);
-	ASSERT_EQ_SIZE_T(FUNC(memxlen)(vxblob, 5, COMPILER_LENOF(xblob)), 9);
+	ASSERT_EQ_SIZE_T(FUNC(memxlen)(xblob, 5, lengthof(xblob)), 9);
+	ASSERT_EQ_SIZE_T(FUNC(memxlen)(vxblob, 5, lengthof(xblob)), 9);
 	ASSERT_EQ_SIZE_T(FUNC(memxlen)(xblob, 5, 9), 9);
 	ASSERT_EQ_SIZE_T(FUNC(memxlen)(vxblob, 5, 9), 9);
 	ASSERT_EQ_SIZE_T(FUNC(memxlen)(xblob, 5, 8), 8);
@@ -404,8 +405,8 @@ PRIVATE void FUNC(do_test_memory)(void) {
 	ASSERT_EQ_SIZE_T(FUNC(memxlen)(xblob + 8, 5, 2), 1);
 	ASSERT_EQ_SIZE_T(FUNC(memxlen)(vxblob + 8, 5, 2), 1);
 
-	ASSERT_EQ_SIZE_T(FUNC(memrxlen)(xblob, 5, COMPILER_LENOF(xblob)), 9);
-	ASSERT_EQ_SIZE_T(FUNC(memrxlen)(vxblob, 5, COMPILER_LENOF(xblob)), 9);
+	ASSERT_EQ_SIZE_T(FUNC(memrxlen)(xblob, 5, lengthof(xblob)), 9);
+	ASSERT_EQ_SIZE_T(FUNC(memrxlen)(vxblob, 5, lengthof(xblob)), 9);
 	ASSERT_EQ_SIZE_T(FUNC(memrxlen)(xblob, 5, 9), (size_t)-1);
 	ASSERT_EQ_SIZE_T(FUNC(memrxlen)(vxblob, 5, 9), (size_t)-1);
 	ASSERT_EQ_SIZE_T(FUNC(memrxlen)(xblob + 9, 5, 1), 0);
@@ -419,7 +420,7 @@ PRIVATE void FUNC(do_test_memory)(void) {
 	ASSERT_EQ_PTR(FUNC(rawmemxchr)(vxblob + 9, 5), xblob + 9);
 
 	ASSERT_EQ_PTR(FUNC(rawmemrxchr)(COMPILER_ENDOF(xblob), 5), xblob + 9);
-	ASSERT_EQ_PTR(FUNC(rawmemrxchr)(vxblob + COMPILER_LENOF(xblob), 5), xblob + 9);
+	ASSERT_EQ_PTR(FUNC(rawmemrxchr)(vxblob + lengthof(xblob), 5), xblob + 9);
 	ASSERT_EQ_PTR(FUNC(rawmemrxchr)(xblob + 10, 5), xblob + 9);
 	ASSERT_EQ_PTR(FUNC(rawmemrxchr)(vxblob + 10, 5), xblob + 9);
 
@@ -429,7 +430,7 @@ PRIVATE void FUNC(do_test_memory)(void) {
 	ASSERT_EQ_SIZE_T(FUNC(rawmemxlen)(vxblob + 9, 5), 0);
 
 	ASSERT_EQ_SIZE_T(FUNC(rawmemrxlen)(COMPILER_ENDOF(xblob), 5), (size_t)-10);
-	ASSERT_EQ_SIZE_T(FUNC(rawmemrxlen)(vxblob + COMPILER_LENOF(xblob), 5), (size_t)-10);
+	ASSERT_EQ_SIZE_T(FUNC(rawmemrxlen)(vxblob + lengthof(xblob), 5), (size_t)-10);
 	ASSERT_EQ_SIZE_T(FUNC(rawmemrxlen)(xblob + 10, 5), (size_t)-1);
 	ASSERT_EQ_SIZE_T(FUNC(rawmemrxlen)(vxblob + 10, 5), (size_t)-1);
 }

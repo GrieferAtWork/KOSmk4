@@ -47,6 +47,7 @@
 #include <pthread.h>
 #include <sched.h>
 #include <signal.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 #include <syslog.h>
@@ -122,7 +123,7 @@ DEFINE_INTERN_ALIAS(libk32_GetExitCodeThread, libk32_GetExitCodeProcess);
 INTERN HANDLE WINAPI
 libk32_OpenThread(DWORD dwDesiredAccess, WINBOOL bInheritHandle, DWORD dwThreadId) {
 	fd_t result;
-	char filename[COMPILER_LENOF("/proc/" PRIMAXdN(__SIZEOF_PID_T__))];
+	char filename[lengthof("/proc/" PRIMAXdN(__SIZEOF_PID_T__))];
 	struct fdcast cast;
 	int status;
 	TRACE("OpenThread(%#x, %u, %#x)", dwDesiredAccess, bInheritHandle, dwThreadId);
@@ -185,7 +186,7 @@ libk32_GetThreadId(HANDLE hThread) {
 INTERN WINBOOL WINAPI
 libk32_GetProcessHandleCount(HANDLE hProcess, PDWORD pdwHandleCount) {
 	/* Count the # of files in "/proc/pid/fd" */
-	char pathname[COMPILER_LENOF("/proc/" PRIMAXd "/fd")];
+	char pathname[lengthof("/proc/" PRIMAXd "/fd")];
 	DWORD pid = libk32_GetProcessId(hProcess);
 	DIR *fddir;
 	size_t count;

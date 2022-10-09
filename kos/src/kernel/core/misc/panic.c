@@ -434,7 +434,7 @@ PRIVATE ATTR_DBGBSS void const *always_ignored_assertions[64] = { 0 };
 PRIVATE NOBLOCK ATTR_COLDTEXT ATTR_PURE bool
 NOTHROW(KCALL is_pc_always_ignored)(void const *pc) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(always_ignored_assertions); ++i) {
+	for (i = 0; i < lengthof(always_ignored_assertions); ++i) {
 		if (pc == always_ignored_assertions[i])
 			return true;
 	}
@@ -460,7 +460,7 @@ panic_assert_chk_dbg_main(void *arg) {
 	                    args);
 	if (option == ASSERTION_OPTION_IGNORE_ALWAYS) {
 		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(always_ignored_assertions); ++i) {
+		for (i = 0; i < lengthof(always_ignored_assertions); ++i) {
 			if (always_ignored_assertions[i])
 				continue;
 			always_ignored_assertions[i] = dbg_getpcreg(DBG_REGLEVEL_TRAP);

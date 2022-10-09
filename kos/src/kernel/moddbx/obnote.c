@@ -1096,7 +1096,7 @@ NOTHROW(KCALL note_mpart)(pformatprinter printer, void *arg,
 			goto badobj;
 		isanon = mpart_isanon(me);
 		/* Check if there's an mnode-mapping that includes fs-name info. */
-		for (i = 0; i < COMPILER_LENOF(me->_mp_nodlsts); ++i) {
+		for (i = 0; i < lengthof(me->_mp_nodlsts); ++i) {
 			struct mnode *node;
 			LIST_FOREACH (node, &me->_mp_nodlsts[i], mn_link) {
 				if (!ADDR_ISKERN(node))
@@ -1250,7 +1250,7 @@ NOTHROW(KCALL note_mfutex)(pformatprinter printer, void *arg,
 			isanon = mpart_isanon(part);
 
 			/* Check if there's an mnode-mapping that includes fs-name info. */
-			for (i = 0; i < COMPILER_LENOF(part->_mp_nodlsts); ++i) {
+			for (i = 0; i < lengthof(part->_mp_nodlsts); ++i) {
 				struct mnode *node;
 				LIST_FOREACH (node, &part->_mp_nodlsts[i], mn_link) {
 					if (!ADDR_ISKERN(node))
@@ -1407,7 +1407,7 @@ NOTHROW(KCALL note_fd_t_value)(pformatprinter printer, void *arg, fd_t fd,
 
 			case (AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN))...(AT_FDDRIVE_CWD(AT_DOS_DRIVEMAX)):
 			case (AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN))...(AT_FDDRIVE_ROOT(AT_DOS_DRIVEMAX)): {
-				char prefixstr[COMPILER_LENOF("AT_FDDRIVE_ROOT('Z')")];
+				char prefixstr[lengthof("AT_FDDRIVE_ROOT('Z')")];
 				struct path *p = curfs->fs_dcwd[(unsigned int)fd - AT_FDDRIVE_CWD(AT_DOS_DRIVEMIN)];
 				if (!p || (fd >= AT_FDDRIVE_ROOT(AT_DOS_DRIVEMIN) &&
 				           fd <= AT_FDDRIVE_ROOT(AT_DOS_DRIVEMAX)))
@@ -1840,7 +1840,7 @@ PRIVATE struct obnote_entry const notes[] = {
 PRIVATE WUNUSED ATTR_PURE NONNULL((1)) struct obnote_entry const *
 NOTHROW(KCALL obnote_entry_byname)(char const *__restrict name) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(notes); ++i) {
+	for (i = 0; i < lengthof(notes); ++i) {
 		if (strcmp(notes[i].one_name, name) == 0)
 			return &notes[i];
 	}

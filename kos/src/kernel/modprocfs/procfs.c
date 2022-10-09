@@ -123,7 +123,7 @@ ProcFS_ParseBool(USER CHECKED void const *buf, size_t bufsize)
 INTERN NONNULL((1)) u32 FCALL
 ProcFS_ParseU32(USER CHECKED void const *buf, size_t bufsize, u32 minval, u32 maxval)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE, E_BUFFER_TOO_SMALL) {
-	char intbuf[COMPILER_LENOF(PRIMAXu32) + 1];
+	char intbuf[lengthof(PRIMAXu32) + 1];
 	USER CHECKED char const *endp;
 	USER CHECKED char *real_endp;
 	u32 result;
@@ -138,7 +138,7 @@ ProcFS_ParseU32(USER CHECKED void const *buf, size_t bufsize, u32 minval, u32 ma
 	bufsize = (size_t)(endp - (USER CHECKED char const *)buf);
 	if unlikely(bufsize < 1)
 		THROW(E_BUFFER_TOO_SMALL, sizeof(char), bufsize * sizeof(char));
-	if unlikely(bufsize >= COMPILER_LENOF(intbuf) - 1)
+	if unlikely(bufsize >= lengthof(intbuf) - 1)
 		THROW(E_BUFFER_TOO_SMALL, sizeof(intbuf) - sizeof(char), bufsize * sizeof(char));
 	COMPILER_READ_BARRIER();
 	memcpy(intbuf, buf, bufsize, sizeof(char));
@@ -158,7 +158,7 @@ ProcFS_ParseU32(USER CHECKED void const *buf, size_t bufsize, u32 minval, u32 ma
 INTERN NONNULL((1)) u64 FCALL
 ProcFS_ParseU64(USER CHECKED void const *buf, size_t bufsize, u64 minval, u64 maxval)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE, E_BUFFER_TOO_SMALL) {
-	char intbuf[COMPILER_LENOF(PRIMAXu64) + 1];
+	char intbuf[lengthof(PRIMAXu64) + 1];
 	USER CHECKED char const *endp;
 	USER CHECKED char *real_endp;
 	u64 result;
@@ -173,7 +173,7 @@ ProcFS_ParseU64(USER CHECKED void const *buf, size_t bufsize, u64 minval, u64 ma
 	bufsize = (size_t)(endp - (USER CHECKED char const *)buf);
 	if unlikely(bufsize < 1)
 		THROW(E_BUFFER_TOO_SMALL, sizeof(char), bufsize * sizeof(char));
-	if unlikely(bufsize >= COMPILER_LENOF(intbuf) - 1)
+	if unlikely(bufsize >= lengthof(intbuf) - 1)
 		THROW(E_BUFFER_TOO_SMALL, sizeof(intbuf) - sizeof(char), bufsize * sizeof(char));
 	COMPILER_READ_BARRIER();
 	memcpy(intbuf, buf, bufsize, sizeof(char));
@@ -193,7 +193,7 @@ ProcFS_ParseU64(USER CHECKED void const *buf, size_t bufsize, u64 minval, u64 ma
 INTERN NONNULL((1)) USER UNCHECKED void *FCALL
 ProcFS_ParsePtr(USER CHECKED void const *buf, size_t bufsize)
 		THROWS(E_SEGFAULT, E_INVALID_ARGUMENT_BAD_VALUE, E_BUFFER_TOO_SMALL) {
-	char intbuf[COMPILER_LENOF(PRIMAXxPTR)];
+	char intbuf[lengthof(PRIMAXxPTR)];
 	USER CHECKED char const *endp;
 	USER CHECKED char *real_endp;
 	USER UNCHECKED void *result;
@@ -228,7 +228,7 @@ skip_leading_zeroes:
 	bufsize = (size_t)(endp - (USER CHECKED char const *)buf);
 	if unlikely(bufsize < 1)
 		THROW(E_BUFFER_TOO_SMALL, sizeof(char), bufsize * sizeof(char));
-	if unlikely(bufsize >= COMPILER_LENOF(intbuf) - 1)
+	if unlikely(bufsize >= lengthof(intbuf) - 1)
 		THROW(E_BUFFER_TOO_SMALL, sizeof(intbuf) - sizeof(char), bufsize * sizeof(char));
 	COMPILER_READ_BARRIER();
 	memcpy(intbuf, buf, bufsize, sizeof(char));
@@ -337,7 +337,7 @@ INTERN_CONST struct printnode_ops const procfs_txtfile_ops = {
 #include "procfs.def"
 
 /* NOTE: Files in this are sorted as lexicographically ascending. */
-#define PROCFS_ROOT_COUNT COMPILER_LENOF(procfs_root_files)
+#define PROCFS_ROOT_COUNT lengthof(procfs_root_files)
 PRIVATE struct fdirent *const procfs_root_files[] = {
 #define ROOTENT(name, type, nodeptr, hash) \
 	constdirent_asent(&PP_CAT2(procfs_root_dirent_, __LINE__)),
@@ -500,7 +500,7 @@ again:
 		struct pidns *ns = THIS_PIDNS;
 		upid_t pid_id;
 		u16 namelen;
-		char namebuf[COMPILER_LENOF(PRIMAXuN(__SIZEOF_PID_T__))];
+		char namebuf[lengthof(PRIMAXuN(__SIZEOF_PID_T__))];
 
 		/* Lookup next taskpid entry. */
 		pid = find_first_taskpid_greater_or_equal(ns, (pid_t)(index - PROCFS_ROOT_COUNT));

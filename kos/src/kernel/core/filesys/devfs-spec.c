@@ -348,8 +348,8 @@ PRIVATE BLOCKING NONNULL((1)) size_t KCALL
 devfs_block_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
                            size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
-	char namebuf[COMPILER_LENOF("" PRIMAXuN(__SIZEOF_MAJOR_T__) ":"
-	                            "" PRIMAXuN(__SIZEOF_MINOR_T__))];
+	char namebuf[lengthof("" PRIMAXuN(__SIZEOF_MAJOR_T__) ":"
+	                      "" PRIMAXuN(__SIZEOF_MINOR_T__))];
 	ssize_t result;
 	u16 namelen;
 	struct devenum *me = (struct devenum *)self;
@@ -445,8 +445,8 @@ PRIVATE BLOCKING NONNULL((1)) size_t KCALL
 devfs_char_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct dirent *buf,
                           size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
-	char namebuf[COMPILER_LENOF("" PRIMAXuN(__SIZEOF_MAJOR_T__) ":"
-	                            "" PRIMAXuN(__SIZEOF_MINOR_T__))];
+	char namebuf[lengthof("" PRIMAXuN(__SIZEOF_MAJOR_T__) ":"
+	                      "" PRIMAXuN(__SIZEOF_MINOR_T__))];
 	ssize_t result;
 	u16 namelen;
 	struct devenum *me = (struct devenum *)self;

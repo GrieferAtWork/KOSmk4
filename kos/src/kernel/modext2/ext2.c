@@ -581,7 +581,7 @@ again:
 	}
 	if (super->es_feat_required & EXT2_FEAT_REQ_FDIRENT_TYPE) {
 		fd_type = DT_UNKNOWN;
-		if likely(entry.d_type < COMPILER_LENOF(ext_ft2dt))
+		if likely(entry.d_type < lengthof(ext_ft2dt))
 			fd_type = ext_ft2dt[entry.d_type];
 		fd_namelen = entry.d_namlen_low;
 	} else {

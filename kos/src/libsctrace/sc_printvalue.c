@@ -1061,7 +1061,7 @@ print_mode_t(pformatprinter printer, void *arg, mode_t mode) {
 			goto done;
 		is_first = false;
 	}
-	for (i = 0; i < COMPILER_LENOF(mode_names); ++i) {
+	for (i = 0; i < lengthof(mode_names); ++i) {
 		char const *name;
 		if (!(mode & mode_names[i].mn_mode))
 			continue;
@@ -1155,7 +1155,7 @@ print_oflag_t_impl(pformatprinter printer, void *arg,
 			goto done;
 		is_first = false;
 	}
-	for (i = 0; i < COMPILER_LENOF(oflag_names); ++i) {
+	for (i = 0; i < lengthof(oflag_names); ++i) {
 		char const *name;
 		if ((oflags & oflag_names[i].on_flag) !=
 		    /*     */ oflag_names[i].on_flag)
@@ -1238,7 +1238,7 @@ print_atflag_t_impl(pformatprinter printer, void *arg,
 	              AT_ALTPATH | AT_DOSPATH);
 	if (nameof_AT_READLINK_REQSIZE)
 		valid_mask |= AT_READLINK_REQSIZE;
-	for (i = 0; i < COMPILER_LENOF(atflag_names); ++i) {
+	for (i = 0; i < lengthof(atflag_names); ++i) {
 		char const *name;
 		if (!(atflags & atflag_names[i].an_flag))
 			continue;
@@ -1336,7 +1336,7 @@ print_iomode_t_impl(pformatprinter printer, void *arg,
 			goto done;
 		is_first = false;
 	}
-	for (i = 0; i < COMPILER_LENOF(iomode_names); ++i) {
+	for (i = 0; i < lengthof(iomode_names); ++i) {
 		char const *name;
 		if (!(iomodes & iomode_names[i].on_flag))
 			continue;
@@ -3218,7 +3218,7 @@ print_msg_flags(pformatprinter printer, void *arg,
 	ssize_t temp, result = 0;
 	unsigned int i;
 	bool is_first = true;
-	for (i = 0; i < COMPILER_LENOF(msg_flag_names); ++i) {
+	for (i = 0; i < lengthof(msg_flag_names); ++i) {
 		if (!(msg_flags & msg_flag_names[i].mf_flag))
 			continue;
 		if (!(valid_flags & msg_flag_names[i].mf_flag))
@@ -3559,7 +3559,7 @@ print_mmap_prot(pformatprinter printer, void *arg,
 	ssize_t temp, result = 0;
 	bool is_first = true;
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(mmap_prot_flags); ++i) {
+	for (i = 0; i < lengthof(mmap_prot_flags); ++i) {
 		if (!(prot & mmap_prot_flags[i].mpf_flag))
 			continue;
 		PRINTF("%sPROT_%s",
@@ -3665,7 +3665,7 @@ print_mmap_flags(pformatprinter printer, void *arg,
 	ssize_t temp, result = 0;
 	bool is_first = true;
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(mmap_flags); ++i) {
+	for (i = 0; i < lengthof(mmap_flags); ++i) {
 		if (!(flags & mmap_flags[i].mf_flag))
 			continue;
 		PRINTF("%sMAP_%s",
@@ -3746,7 +3746,7 @@ print_kreaddir_mode(pformatprinter printer, void *arg,
 	                   : format_printf(printer, arg, "%#x", mode_id);
 	if unlikely(result < 0)
 		goto done;
-	for (i = 0; i < COMPILER_LENOF(readdir_flags); ++i) {
+	for (i = 0; i < lengthof(readdir_flags); ++i) {
 		if (!(mode & readdir_flags[i].rf_flag))
 			continue;
 		PRINTF(PIPESTR_S "READDIR_%s",

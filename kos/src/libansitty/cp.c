@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBANSITTY_CP_C
 #define GUARD_LIBANSITTY_CP_C 1
+#define _KOS_SOURCE 1
 
 #include "api.h"
 /**/
@@ -26,6 +27,8 @@
 #include <hybrid/compiler.h>
 
 #include <kos/types.h>
+
+#include <stddef.h>
 
 #include "cp.h"
 
@@ -83,7 +86,7 @@ NOTHROW(FCALL libansitty_decode_cp_ldm)(uint8_t byte) {
 	/* Translate line-drawing-mode characters. */
 	char32_t result = (char32_t)byte;
 	if (byte >= LDM_CHARS_START &&
-	    byte < (LDM_CHARS_START + COMPILER_LENOF(ldm_chars)))
+	    byte < (LDM_CHARS_START + lengthof(ldm_chars)))
 		result = ldm_chars[byte - LDM_CHARS_START];
 	return result;
 }

@@ -238,7 +238,7 @@ devfs_rootspec_lookup(struct flookup_info const *__restrict info)
 		THROWS(E_SEGFAULT) {
 	unsigned int lo, hi;
 	lo = 0;
-	hi = COMPILER_LENOF(devfs_rootspec);
+	hi = lengthof(devfs_rootspec);
 	while (lo < hi) {
 		struct fdirent *ent;
 		size_t i;
@@ -386,7 +386,7 @@ devfs_root_next(struct fdirent *__restrict self)
 	REF struct fdirent *result = NULL;
 	if (fdirent_isspec(self)) {
 		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(devfs_rootspec) - 1; ++i) {
+		for (i = 0; i < lengthof(devfs_rootspec) - 1; ++i) {
 			if (devfs_rootspec[i] == self)
 				return incref(devfs_rootspec[i + 1]);
 		}

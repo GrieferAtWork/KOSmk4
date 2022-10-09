@@ -394,11 +394,11 @@ tardir_v_lookup(struct fdirnode *__restrict self,
 	prefix_len = me->tdn_fdat.tfd_nlen;
 
 	/* Figure out the absolute on-disk filename that is*/
-	filename_len = snprintf(filename, COMPILER_LENOF(filename), "%$s%s%$s",
+	filename_len = snprintf(filename, lengthof(filename), "%$s%s%$s",
 	                        (size_t)prefix_len, prefix_str,
 	                        me->tdn_fdat.tfd_filp ? "/" : "",
 	                        (size_t)info->flu_namelen, info->flu_name);
-	if unlikely(filename_len >= COMPILER_LENOF(filename))
+	if unlikely(filename_len >= lengthof(filename))
 		return NULL; /* Filename is too long and can't appear in a tar archive. */
 
 	/* Acquire a read-lock to `me->ts_lock' */
@@ -1333,10 +1333,10 @@ tarfile_new(struct tarhdr const *__restrict self,
 	pstr_start = NULL;
 	pstr_end   = NULL;
 	fstr_start = self->th_filename;
-	fstr_end   = strnend(fstr_start, COMPILER_LENOF(self->th_filename));
+	fstr_end   = strnend(fstr_start, lengthof(self->th_filename));
 	if (is_ustar) {
 		pstr_start = self->th_filepfx;
-		pstr_end   = strnend(pstr_start, COMPILER_LENOF(self->th_filepfx));
+		pstr_end   = strnend(pstr_start, lengthof(self->th_filepfx));
 		while (pstr_start < pstr_end) {
 			if (pstr_start[0] == '/') {
 				pstr_start += 1;
@@ -1368,7 +1368,7 @@ tarfile_new(struct tarhdr const *__restrict self,
 	}
 
 	/* Decode file mode. */
-	mode = (uint16_t)decode_oct(self->th_mode, COMPILER_LENOF(self->th_mode));
+	mode = (uint16_t)decode_oct(self->th_mode, lengthof(self->th_mode));
 
 #if 1
 	/* From https://www.gnu.org/software/tar/manual/html_node/Standard.html:
@@ -1383,7 +1383,7 @@ tarfile_new(struct tarhdr const *__restrict self,
 #endif
 
 	/* Figure out the correct file size. */
-	fsize       = (uint32_t)decode_oct(self->th_size, COMPILER_LENOF(self->th_size));
+	fsize       = (uint32_t)decode_oct(self->th_size, lengthof(self->th_size));
 	*p_filesize = fsize;
 
 	/* Figure out the proper file mode. */
@@ -1481,7 +1481,7 @@ handle_empty_name:
 		char const *ref_end;
 		size_t offsetof_lnkname;
 		ref_start = self->th_lnkname;
-		ref_end   = strnend(ref_start, COMPILER_LENOF(self->th_lnkname));
+		ref_end   = strnend(ref_start, lengthof(self->th_lnkname));
 		while (ref_start < ref_end) {
 			if (ref_start[0] == '/') {
 				++ref_start;
@@ -1512,8 +1512,8 @@ handle_empty_name:
 		major_t major;
 		minor_t minor;
 		size_t offsetof_devno;
-		major = (major_t)decode_oct(self->th_devmajor, COMPILER_LENOF(self->th_devmajor));
-		minor = (minor_t)decode_oct(self->th_devminor, COMPILER_LENOF(self->th_devminor));
+		major = (major_t)decode_oct(self->th_devmajor, lengthof(self->th_devmajor));
+		minor = (minor_t)decode_oct(self->th_devminor, lengthof(self->th_devminor));
 		if unlikely(major > MAJOR_MAX || minor > MINOR_MAX)
 			return NULL; /* Unsupported device number :( */
 		descsiz        = CEIL_ALIGN(descsiz, __ALIGNOF_DEV_T__);
@@ -1531,7 +1531,7 @@ handle_empty_name:
 		char const *lnk_end;
 		size_t offsetof_lnkname;
 		lnk_start = self->th_lnkname;
-		lnk_end   = strnend(lnk_start, COMPILER_LENOF(self->th_lnkname));
+		lnk_end   = strnend(lnk_start, lengthof(self->th_lnkname));
 
 		/* Allocate file descriptor. */
 		offsetof_lnkname = descsiz;
@@ -1554,9 +1554,9 @@ handle_empty_name:
 	/* Decode other fields. */
 fill_common_fields:
 	TRY {
-		result->tf_mtim = (int32_t)decode_oct(self->th_mtime, COMPILER_LENOF(self->th_mtime));
-		result->tf_uid  = (uint16_t)decode_oct(self->th_uid, COMPILER_LENOF(self->th_uid));
-		result->tf_gid  = (uint16_t)decode_oct(self->th_gid, COMPILER_LENOF(self->th_gid));
+		result->tf_mtim = (int32_t)decode_oct(self->th_mtime, lengthof(self->th_mtime));
+		result->tf_uid  = (uint16_t)decode_oct(self->th_uid, lengthof(self->th_uid));
+		result->tf_gid  = (uint16_t)decode_oct(self->th_gid, lengthof(self->th_gid));
 	} EXCEPT {
 		kfree(result);
 		RETHROW();

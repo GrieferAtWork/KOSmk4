@@ -490,11 +490,11 @@ PRIVATE struct ctype_triple const builtin_triples[] = {
 
 INTERN void NOTHROW(KCALL reset_builtin_types)(void) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(standalong_ctypes); ++i) {
+	for (i = 0; i < lengthof(standalong_ctypes); ++i) {
 		standalong_ctypes[i]->ct_refcnt   = 0x7fff;
 		standalong_ctypes[i]->ct_children = NULL;
 	}
-	for (i = 0; i < COMPILER_LENOF(builtin_triples); ++i) {
+	for (i = 0; i < lengthof(builtin_triples); ++i) {
 		builtin_triples[i].ct_base->ct_refcnt         = 0x7fff;
 		builtin_triples[i].ct_base->ct_children       = builtin_triples[i].ct_ptr;
 		builtin_triples[i].ct_ptr->ct_refcnt          = 0x7fff;

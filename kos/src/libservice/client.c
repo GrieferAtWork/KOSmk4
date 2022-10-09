@@ -296,7 +296,7 @@ libservice_open(char const *filename) THROWS(E_FSERROR, E_BADALLOC, E_INTERRUPT)
 								iov[0].iov_base    = (void *)LIBSERVICE_COM_HANDSHAKE_MESSAGE;
 								iov[0].iov_len     = sizeof(LIBSERVICE_COM_HANDSHAKE_MESSAGE);
 								msg.msg_iov        = iov;
-								msg.msg_iovlen     = COMPILER_LENOF(iov);
+								msg.msg_iovlen     = lengthof(iov);
 								msg.msg_control    = fd_buf;
 								msg.msg_controllen = sizeof(fd_buf);
 								cmsg               = CMSG_FIRSTHDR(&msg);

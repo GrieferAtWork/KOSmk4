@@ -19,10 +19,13 @@
  */
 #ifndef GUARD_MODSVGA_BASEFONT_C
 #define GUARD_MODSVGA_BASEFONT_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
 #include "svga.h"
+
+#include <stddef.h>
 
 DECL_BEGIN
 
@@ -678,7 +681,7 @@ NOTHROW(FCALL basevga_defaultfont_encode)(char32_t ch) {
 		return (byte_t)ch;
 	/* Binary search through `basevga_encode_db' */
 	lo = 0;
-	hi = COMPILER_LENOF(basevga_encode_db);
+	hi = lengthof(basevga_encode_db);
 	while (lo < hi) {
 		size_t i;
 		i = (lo + hi) / 2;

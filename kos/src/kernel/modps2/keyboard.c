@@ -41,6 +41,7 @@
 #include <sys/mkdev.h>
 
 #include <assert.h>
+#include <stddef.h>
 #include <stdio.h>
 
 #include "keyboard-scansets.h"
@@ -203,7 +204,7 @@ ss1_reset:
 				self->pk_state = PS2_KEYBOARD_STATE_SS2_F0;
 				goto done;
 			}
-			if likely(data < COMPILER_LENOF(ps2_keyboard_ss2)) {
+			if likely(data < lengthof(ps2_keyboard_ss2)) {
 				key = ps2_keyboard_ss2[data];
 			} else {
 				key = KEY_UNKNOWN;
@@ -218,7 +219,7 @@ ss1_reset:
 				self->pk_state = PS2_KEYBOARD_STATE_SS2_E0_F0;
 				goto done;
 			}
-			if likely(data < COMPILER_LENOF(ps2_keyboard_ss2_e0)) {
+			if likely(data < lengthof(ps2_keyboard_ss2_e0)) {
 				key = ps2_keyboard_ss2_e0[data];
 			} else {
 				key = KEY_UNKNOWN;
@@ -248,7 +249,7 @@ ss2_reset:
 				self->pk_state = PS2_KEYBOARD_STATE_SS2_E0_F0_7C;
 				goto done;
 			}
-			if likely(data < COMPILER_LENOF(ps2_keyboard_ss2_e0)) {
+			if likely(data < lengthof(ps2_keyboard_ss2_e0)) {
 				key = KEY_FRELEASED | ps2_keyboard_ss2_e0[data];
 			} else {
 				key = KEY_FRELEASED | KEY_UNKNOWN;
@@ -320,7 +321,7 @@ ss2_reset:
 			break;
 
 		case PS2_KEYBOARD_STATE_SS2_F0:
-			if likely(data < COMPILER_LENOF(ps2_keyboard_ss2)) {
+			if likely(data < lengthof(ps2_keyboard_ss2)) {
 				key = KEY_FRELEASED | ps2_keyboard_ss2[data];
 			} else {
 				key = KEY_FRELEASED | KEY_UNKNOWN;

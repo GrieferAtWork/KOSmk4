@@ -29,6 +29,7 @@
 #include <kos/rpc.h>
 
 #include <assert.h>
+#include <stddef.h>
 
 #include <libunwind/cfi/i386.h>
 #include <libunwind/cfi/x86_64.h>
@@ -144,7 +145,7 @@ rpc_exec_program[] = {
 };
 
 #define _rpc_exec_program_offsetof_restorer \
-	(COMPILER_LENOF(rpc_exec_program) - (1 + sizeof(void *)))
+	(lengthof(rpc_exec_program) - (1 + sizeof(void *)))
 #define _rpc_exec_program_restorer \
 	(*(void **)(rpc_exec_program + _rpc_exec_program_offsetof_restorer))
 
@@ -252,7 +253,7 @@ rpc_interrupt_program[] = {
 };
 
 #define _rpc_interrupt_program_offsetof_restorer \
-	(COMPILER_LENOF(rpc_interrupt_program) - (2 + sizeof(void *)))
+	(lengthof(rpc_interrupt_program) - (2 + sizeof(void *)))
 #define _rpc_interrupt_program_restorer \
 	(*(void **)(rpc_interrupt_program + _rpc_interrupt_program_offsetof_restorer))
 

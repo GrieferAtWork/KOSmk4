@@ -308,7 +308,7 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 	 * being made to `quick_verify_mfree()' */
 	NESTED_EXCEPTION;
 
-	for (i = 0; i < COMPILER_LENOF(self->h_size); ++i) {
+	for (i = 0; i < lengthof(self->h_size); ++i) {
 		struct mfree **piter, *iter;
 		for (piter = LIST_PFIRST(&self->h_size[i]); (iter = *piter) != NULL;
 		     piter = LIST_PNEXT(iter, mf_lsize)) {
@@ -323,14 +323,14 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 			        "Free node at %p is too small (%" PRIuSIZ "=%#" PRIxSIZ " bytes) "
 			        "(size bucket %" PRIuSIZ "/%" PRIuSIZ ")\n",
 			        &iter->mf_size, (uintptr_t)&iter->mf_size + sizeof(size_t) - 1,
-			        iter, iter->mf_size, iter->mf_size, i, COMPILER_LENOF(self->h_size));
+			        iter, iter->mf_size, iter->mf_size, i, lengthof(self->h_size));
 			assertf((uintptr_t)iter + iter->mf_size > (uintptr_t)iter,
 			        "\tPotential USE-AFTER-FREE of <%p...%p>\n"
 			        "Free node at %p is too large (%" PRIuSIZ "=%#" PRIxSIZ " bytes) "
 			        "(size bucket %" PRIuSIZ "/%" PRIuSIZ ")\n"
 			        "PHYS: %I64p",
 			        &iter->mf_size, (uintptr_t)&iter->mf_size + sizeof(size_t) - 1,
-			        iter, iter->mf_size, iter->mf_size, i, COMPILER_LENOF(self->h_size),
+			        iter, iter->mf_size, iter->mf_size, i, lengthof(self->h_size),
 			        (u64)pagedir_translate(&iter->mf_size));
 			assertf(IS_ALIGNED(iter->mf_size, HEAP_ALIGNMENT),
 			        "\tPotential USE-AFTER-FREE of <%p...%p>\n"

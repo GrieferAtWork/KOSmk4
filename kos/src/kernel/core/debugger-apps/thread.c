@@ -56,6 +56,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <assert.h>
 #include <inttypes.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -268,10 +269,10 @@ DBG_AUTOCOMPLETE(thread,
 			return;
 		}
 		if (starts_with[0] == 'p') {
-			char pidtext[MAX_C(COMPILER_LENOF("p0" PRIMAXoN(__SIZEOF_PID_T__)),
-			                   COMPILER_LENOF("p0x" PRIMAXxN(__SIZEOF_PID_T__)),
-			                   COMPILER_LENOF("p0X" PRIMAXXN(__SIZEOF_PID_T__)),
-			                   COMPILER_LENOF("p0b" PRIMAXbN(__SIZEOF_PID_T__)))];
+			char pidtext[MAX_C(lengthof("p0" PRIMAXoN(__SIZEOF_PID_T__)),
+			                   lengthof("p0x" PRIMAXxN(__SIZEOF_PID_T__)),
+			                   lengthof("p0X" PRIMAXXN(__SIZEOF_PID_T__)),
+			                   lengthof("p0b" PRIMAXbN(__SIZEOF_PID_T__)))];
 			char const *format = DBGSTR("p%lu");
 			if (starts_with_len >= 2 && starts_with[1] == '0') {
 				format = DBGSTR("p0%" PRIoN(__SIZEOF_PID_T__));

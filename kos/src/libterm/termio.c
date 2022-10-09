@@ -37,6 +37,7 @@
 #include <errno.h>
 #include <limits.h> /* _POSIX_MAX_INPUT, _POSIX_MAX_CANON */
 #include <signal.h>
+#include <stddef.h>
 #include <string.h>
 #include <termios.h>
 #include <unicode.h>
@@ -192,8 +193,8 @@ libterminal_do_owrite_nostop_nobuf(struct terminal *__restrict self,
 							goto done;
 						flush_start = iter;
 					}
-					temp = libterminal_do_owrite_direct(self, backslash, COMPILER_LENOF(backslash), mode);
-					if unlikely(temp < (ssize_t)COMPILER_LENOF(backslash))
+					temp = libterminal_do_owrite_direct(self, backslash, lengthof(backslash), mode);
+					if unlikely(temp < (ssize_t)lengthof(backslash))
 						goto err_or_done;
 				}
 				break;
@@ -211,8 +212,8 @@ libterminal_do_owrite_nostop_nobuf(struct terminal *__restrict self,
 							goto done;
 					}
 					/* Output NL characters as CRNL */
-					temp = libterminal_do_owrite_direct(self, crlf, COMPILER_LENOF(crlf), mode);
-					if unlikely(temp < (ssize_t)COMPILER_LENOF(crlf))
+					temp = libterminal_do_owrite_direct(self, crlf, lengthof(crlf), mode);
+					if unlikely(temp < (ssize_t)lengthof(crlf))
 						goto err_or_done;
 					++result; /* Account for the control character */
 					flush_start = iter + 1;
@@ -236,13 +237,13 @@ libterminal_do_owrite_nostop_nobuf(struct terminal *__restrict self,
 					} else if (oflag & OCRNL) {
 						if (oflag & ONLCR) {
 							/* Output CR characters as CRNL */
-							temp = libterminal_do_owrite_direct(self, crlf, COMPILER_LENOF(crlf), mode);
-							if unlikely(temp < (ssize_t)COMPILER_LENOF(crlf))
+							temp = libterminal_do_owrite_direct(self, crlf, lengthof(crlf), mode);
+							if unlikely(temp < (ssize_t)lengthof(crlf))
 								goto err_or_done;
 						} else {
 							/* Output CR characters as NL */
-							temp = libterminal_do_owrite_direct(self, lf, COMPILER_LENOF(lf), mode);
-							if unlikely(temp < (ssize_t)COMPILER_LENOF(lf))
+							temp = libterminal_do_owrite_direct(self, lf, lengthof(lf), mode);
+							if unlikely(temp < (ssize_t)lengthof(lf))
 								goto err_or_done;
 						}
 					}
@@ -446,7 +447,7 @@ libterminal_do_iwrite_canon(struct terminal *__restrict self,
 	                               ATOMIC_READ(self->t_canon.lb_limt)))) {
 		ssize_t temp;
 		/* Print a bell-character-sequence to the output */
-		temp = libterminal_do_owrite_nostop_nobuf(self, bell, COMPILER_LENOF(bell), mode,
+		temp = libterminal_do_owrite_nostop_nobuf(self, bell, lengthof(bell), mode,
 		                                          /* Disable `ECHOCTL' to prevent `bell' from being escaped. */
 		                                          lflag & ~ECHOCTL);
 		if unlikely(temp < 0)
@@ -499,8 +500,8 @@ libterminal_do_iwrite_erase(struct terminal *__restrict self,
 	ssize_t temp, result = 0;
 	if (lflag & ECHOPRT) {
 		/* Hardcopy terminal support. */
-		temp = libterminal_do_owrite_echo(self, backslash, COMPILER_LENOF(backslash), mode, lflag);
-		if unlikely(temp < (ssize_t)COMPILER_LENOF(backslash))
+		temp = libterminal_do_owrite_echo(self, backslash, lengthof(backslash), mode, lflag);
+		if unlikely(temp < (ssize_t)lengthof(backslash))
 			goto err_or_done;
 		result += temp;
 		if (iflag & IUTF8) {
@@ -536,8 +537,8 @@ libterminal_do_iwrite_erase(struct terminal *__restrict self,
 				result += temp;
 			}
 		}
-		temp = libterminal_do_owrite_echo(self, slash, COMPILER_LENOF(slash), mode, lflag);
-		if unlikely(temp < (ssize_t)COMPILER_LENOF(slash))
+		temp = libterminal_do_owrite_echo(self, slash, lengthof(slash), mode, lflag);
+		if unlikely(temp < (ssize_t)lengthof(slash))
 			goto err_or_done;
 		result += temp;
 	} else {
@@ -549,11 +550,11 @@ libterminal_do_iwrite_erase(struct terminal *__restrict self,
 			character_count = utf8_character_count((__USER __CHECKED /*utf-8*/ char const *)erased_data, num_bytes);
 		while (character_count) {
 			--character_count;
-			temp = libterminal_do_owrite_echo(self, erase1, COMPILER_LENOF(erase1), mode,
+			temp = libterminal_do_owrite_echo(self, erase1, lengthof(erase1), mode,
 			                                  /* Disable `ECHOCTL', since `erase1' would
 			                                   * otherwise  get   escaped   as   `^H ^H' */
 			                                  lflag & ~ECHOCTL);
-			if unlikely(temp < (ssize_t)COMPILER_LENOF(erase1))
+			if unlikely(temp < (ssize_t)lengthof(erase1))
 				goto err_or_done;
 			result += temp;
 		}
@@ -647,7 +648,7 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 #endif /* !__KERNEL__ */
 					if (iflag & IMAXBEL) {
 						/* Cannot erase character from empty canon */
-						temp = libterminal_do_owrite_echo(self, bell, COMPILER_LENOF(bell), mode,
+						temp = libterminal_do_owrite_echo(self, bell, lengthof(bell), mode,
 						                                  /* Disable `ECHOCTL' to prevent `bell' from being escaped. */
 						                                  lflag & ~ECHOCTL);
 						if unlikely(temp < 0)
@@ -707,7 +708,7 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 					if unlikely(!capture.lc_size) {
 						if (iflag & IMAXBEL) {
 							/* Cannot erase character from empty canon */
-							temp = libterminal_do_owrite_echo(self, bell, COMPILER_LENOF(bell), mode,
+							temp = libterminal_do_owrite_echo(self, bell, lengthof(bell), mode,
 							                                  /* Disable `ECHOCTL' to prevent `bell' from being escaped. */
 							                                  lflag & ~ECHOCTL);
 							if unlikely(temp < 0)

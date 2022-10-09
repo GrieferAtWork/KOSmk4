@@ -80,7 +80,7 @@ NOTHROW(FCALL has_feature)(u32 feature) {
 
 		/* Use the boot-cpu's cpuid  feature table (since that  one
 		 * can be overwritten, unlike the actual cpuid instruction) */
-		for (i = 0; i < COMPILER_LENOF(feature_offsets); ++i) {
+		for (i = 0; i < lengthof(feature_offsets); ++i) {
 			if (feature_offsets[i].fo_feature == (feature & ~X86_FEATURE_BITMASK)) {
 				word = *(u32 const *)((byte_t const *)&bootcpu_x86_cpuid +
 				                      feature_offsets[i].fo_offset);

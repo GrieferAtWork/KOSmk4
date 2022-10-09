@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_MEMORY_DETECT_C
 #define GUARD_KERNEL_CORE_ARCH_I386_MEMORY_DETECT_C 1
+#define _KOS_SOURCE 1
 #define DISABLE_BRANCH_PROFILING /* Don't profile this file */
 
 #include <kernel/compiler.h>
@@ -58,7 +59,7 @@ PRIVATE ATTR_FREERODATA struct pmembank const default_memory_banks[] = {
 
 INTDEF struct pmembank kernel_membanks_initial[];
 PUBLIC ATTR_COLDDATA struct pmeminfo minfo = {
-	 .mb_bankc = COMPILER_LENOF(default_memory_banks) - 1,
+	 .mb_bankc = lengthof(default_memory_banks) - 1,
 	 .mb_banks = kernel_membanks_initial
 };
 
@@ -166,7 +167,7 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_e820)(void) {
 			break; /* Error. */
 		if (state.vr_regs.vr_ecx > 20 && (entry->sm_acpi & 1) == 0)
 			continue; /* Ignored. */
-		if (entry->sm_type >= COMPILER_LENOF(memtype_bios_matrix))
+		if (entry->sm_type >= lengthof(memtype_bios_matrix))
 			entry->sm_type = 0;
 		if (memtype_bios_matrix[entry->sm_type] >= PMEMBANK_TYPE_COUNT)
 			continue;

@@ -421,7 +421,7 @@ sighand_reset_handler(signo_t signo,
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL sighand_has_nondefault_sig_ign)(struct sighand const *__restrict self) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(self->sh_actions); ++i) {
+	for (i = 0; i < lengthof(self->sh_actions); ++i) {
 		/* Check if the handler's action is SIG_IGN */
 		if (self->sh_actions[i].sa_handler != SIG_IGN)
 			continue; /* Something other than SIG_IGN */
@@ -485,7 +485,7 @@ INTERN void KCALL onexec_posix_signals_reset_action(void) {
 		 * or any other handlers for that matter.
 		 * Especially of note is that we also don't copy signal masks,
 		 * since  those wouldn't actually matter for SIG_IGN handlers. */
-		for (i = 0; i < COMPILER_LENOF(hand->sh_actions); ++i) {
+		for (i = 0; i < lengthof(hand->sh_actions); ++i) {
 			if (hand->sh_actions[i].sa_handler == SIG_IGN)
 				newhand->sh_actions[i].sa_handler = SIG_IGN;
 		}

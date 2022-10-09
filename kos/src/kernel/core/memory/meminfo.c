@@ -92,7 +92,7 @@ PRIVATE ATTR_FREERODATA struct pmemzone const *const empty_mzone_vec[] = {
 };
 
 PUBLIC ATTR_SECTION(".data.hot") struct pmem mzones = {
-	.pm_zonec = COMPILER_LENOF(empty_mzone_vec),
+	.pm_zonec = lengthof(empty_mzone_vec),
 	.pm_last  = (struct pmemzone *)&empty_mzone,
 	.pm_zones = (struct pmemzone *const *)&empty_mzone_vec[0]
 };
@@ -857,7 +857,7 @@ kernel_handle_ram_cmdline(char *__restrict arg) {
 		} else {
 			/* Translate the bank type. */
 			for (bank_type = 0;
-			     bank_type < (u16)COMPILER_LENOF(pmembank_type_names); ++bank_type) {
+			     bank_type < (u16)lengthof(pmembank_type_names); ++bank_type) {
 				if (strcmp(ramdef.rd_type, pmembank_type_names[bank_type]) == 0)
 					goto got_bank_type;
 			}

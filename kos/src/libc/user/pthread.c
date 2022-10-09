@@ -1633,7 +1633,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getname_np)(pthread_t target_thread,
 	pid_t tid;
 	fd_t commfd;
 	ssize_t result;
-	char pathname[COMPILER_LENOF("/proc/" PRIMAXu "/comm")];
+	char pathname[lengthof("/proc/" PRIMAXu "/comm")];
 	tid = ATOMIC_READ(target_thread->pt_tid);
 	if unlikely(tid == 0)
 		return ESRCH;
@@ -1682,7 +1682,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthread_t target_thread,
 		 * name in case the caller-given name is too long), we have to  check
 		 * the length of `name' before even passing it along to the kernel! */
 		fd_t commfd;
-		char pathname[COMPILER_LENOF("/proc/" PRIMAXu "/comm")];
+		char pathname[lengthof("/proc/" PRIMAXu "/comm")];
 		size_t namelen = strlen(name);
 #ifdef TASK_COMM_LEN
 		if unlikely(namelen > (TASK_COMM_LEN - 1))
@@ -4290,7 +4290,7 @@ pthread_tls_segment_init(void *UNUSED(arg), void *base,
 	struct pthread_tls_segment *me;
 	me = (struct pthread_tls_segment *)base;
 	me->pts_values = me->pts_static;
-	me->pts_alloc  = COMPILER_LENOF(me->pts_static);
+	me->pts_alloc  = lengthof(me->pts_static);
 }
 
 PRIVATE void __LIBCCALL

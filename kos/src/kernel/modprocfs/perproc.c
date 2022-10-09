@@ -20,7 +20,7 @@
 #ifndef GUARD_MODPROCFS_PERPROC_C
 #define GUARD_MODPROCFS_PERPROC_C 1
 #define __WANT_FS_INIT
-#define _KOS_SOURCE    1
+#define _KOS_SOURCE 1
 #define FNODE_FSDATA_T struct taskpid
 
 #include <kernel/compiler.h>
@@ -579,34 +579,34 @@ procfs_perproc_printnode_v_stat(struct mfile *__restrict self,
                                 USER CHECKED struct stat *result)
 		THROWS(...);
 
-#define MKDIR_BEGIN(ops_symbol_name)                                                   \
-	PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL                          \
-	__##ops_symbol_name##_v_lookup(struct fdirnode *__restrict UNUSED(self),           \
-	                               struct flookup_info *__restrict info) {             \
-		return procfs_perproc_lookup_impl(__##ops_symbol_name##_files,                 \
-		                                  COMPILER_LENOF(__##ops_symbol_name##_files), \
-		                                  info);                                       \
-	}                                                                                  \
-	PRIVATE NONNULL((1)) void KCALL                                                    \
-	__##ops_symbol_name##_v_enum(struct fdirenum *__restrict result) {                 \
-		procfs_perproc_enum_impl(__##ops_symbol_name##_files,                          \
-		                         COMPILER_LENOF(__##ops_symbol_name##_files),          \
-		                         result);                                              \
-	}                                                                                  \
-	INTERN_CONST struct fdirnode_ops const ops_symbol_name = {                         \
-		.dno_node = {                                                                  \
-			.no_file = {                                                               \
-				.mo_destroy = &procfs_perproc_dir_v_destroy,                           \
-				.mo_changed = &procfs_perproc_dir_v_changed,                           \
-				.mo_stream  = &procfs_perproc_dir_v_stream_ops,                        \
-			},                                                                         \
-			.no_free   = &procfs_perproc_dir_v_free,                                   \
-			.no_wrattr = &procfs_perproc_dir_v_wrattr,                                 \
-			.no_perm   = &procfs_perproc_dir_v_perm_ops,                               \
-		},                                                                             \
-		.dno_lookup = &__##ops_symbol_name##_v_lookup,                                 \
-		.dno_enumsz = procfs_perproc_enumsz_impl,                                      \
-		.dno_enum   = &__##ops_symbol_name##_v_enum,                                   \
+#define MKDIR_BEGIN(ops_symbol_name)                                             \
+	PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL                    \
+	__##ops_symbol_name##_v_lookup(struct fdirnode *__restrict UNUSED(self),     \
+	                               struct flookup_info *__restrict info) {       \
+		return procfs_perproc_lookup_impl(__##ops_symbol_name##_files,           \
+		                                  lengthof(__##ops_symbol_name##_files), \
+		                                  info);                                 \
+	}                                                                            \
+	PRIVATE NONNULL((1)) void KCALL                                              \
+	__##ops_symbol_name##_v_enum(struct fdirenum *__restrict result) {           \
+		procfs_perproc_enum_impl(__##ops_symbol_name##_files,                    \
+		                         lengthof(__##ops_symbol_name##_files),          \
+		                         result);                                        \
+	}                                                                            \
+	INTERN_CONST struct fdirnode_ops const ops_symbol_name = {                   \
+		.dno_node = {                                                            \
+			.no_file = {                                                         \
+				.mo_destroy = &procfs_perproc_dir_v_destroy,                     \
+				.mo_changed = &procfs_perproc_dir_v_changed,                     \
+				.mo_stream  = &procfs_perproc_dir_v_stream_ops,                  \
+			},                                                                   \
+			.no_free   = &procfs_perproc_dir_v_free,                             \
+			.no_wrattr = &procfs_perproc_dir_v_wrattr,                           \
+			.no_perm   = &procfs_perproc_dir_v_perm_ops,                         \
+		},                                                                       \
+		.dno_lookup = &__##ops_symbol_name##_v_lookup,                           \
+		.dno_enumsz = procfs_perproc_enumsz_impl,                                \
+		.dno_enum   = &__##ops_symbol_name##_v_enum,                             \
 	};
 #define MKREG_RO(ops_symbol_name, printer)                               \
 	INTDEF NONNULL((1, 2)) void KCALL                                    \
@@ -697,7 +697,7 @@ PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 procfs_perproc_root_v_lookup(struct fdirnode *__restrict UNUSED(self),
                              struct flookup_info *__restrict info) {
 	return procfs_perproc_lookup_impl(procfs_perproc_root_files,
-	                                  COMPILER_LENOF(procfs_perproc_root_files),
+	                                  lengthof(procfs_perproc_root_files),
 	                                  info);
 }
 
@@ -705,7 +705,7 @@ procfs_perproc_root_v_lookup(struct fdirnode *__restrict UNUSED(self),
 PRIVATE NONNULL((1)) void KCALL
 procfs_perproc_root_v_enum(struct fdirenum *__restrict result) {
 	procfs_perproc_enum_impl(procfs_perproc_root_files,
-	                         COMPILER_LENOF(procfs_perproc_root_files),
+	                         lengthof(procfs_perproc_root_files),
 	                         result);
 }
 
@@ -781,7 +781,7 @@ PRIVATE WUNUSED NONNULL((1, 2)) REF struct fdirent *KCALL
 procfs_pertask_root_v_lookup(struct fdirnode *__restrict UNUSED(self),
                              struct flookup_info *__restrict info) {
 	return procfs_perproc_lookup_impl(procfs_pertask_root_files,
-	                                  COMPILER_LENOF(procfs_pertask_root_files),
+	                                  lengthof(procfs_pertask_root_files),
 	                                  info);
 }
 
@@ -789,7 +789,7 @@ procfs_pertask_root_v_lookup(struct fdirnode *__restrict UNUSED(self),
 PRIVATE NONNULL((1)) void KCALL
 procfs_pertask_root_v_enum(struct fdirenum *__restrict result) {
 	procfs_perproc_enum_impl(procfs_pertask_root_files,
-	                         COMPILER_LENOF(procfs_pertask_root_files),
+	                         lengthof(procfs_pertask_root_files),
 	                         result);
 }
 

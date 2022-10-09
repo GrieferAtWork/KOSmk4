@@ -125,13 +125,13 @@ bochs_v_getmode(struct svga_chipset *__restrict self,
 	struct bga_mode const *bm;
 	size_t reqvmem;
 next:
-	if (*p_index >= COMPILER_LENOF(bochs_modes)) {
+	if (*p_index >= lengthof(bochs_modes)) {
 		/* Enumerate standard VGA modes. */
 		bool ok;
 		result->bmi_modeid = (uint8_t)-1;
-		*p_index -= COMPILER_LENOF(bochs_modes);
+		*p_index -= lengthof(bochs_modes);
 		ok = vga_v_getmode(self, result, p_index);
-		*p_index += COMPILER_LENOF(bochs_modes);
+		*p_index += lengthof(bochs_modes);
 		return ok;
 	}
 	result->bmi_modeid = *p_index;
@@ -217,7 +217,7 @@ bochs_v_setmode(struct svga_chipset *__restrict self,
 	dispi_wrreg(VBE_DISPI_INDEX_ENABLE, VBE_DISPI_DISABLED);
 
 	/* Support for standard VGA modes. */
-	if (mode->bmi_modeid >= COMPILER_LENOF(bochs_modes)) {
+	if (mode->bmi_modeid >= lengthof(bochs_modes)) {
 		vga_v_setmode(self, mode);
 		return;
 	}
@@ -314,11 +314,11 @@ bochs_v_strings(struct svga_chipset *__restrict self,
                 svga_chipset_enumstring_t cb, void *arg) {
 	ssize_t temp, result;
 	struct bochs_chipset *me;
-	char valbuf[MAX_C(COMPILER_LENOF(PRIMAXu16),
-	                  COMPILER_LENOF(PRIMAXxN(__SIZEOF_PHYSADDR_T__)),
-	                  COMPILER_LENOF(PRIMAXx32),
-	                  COMPILER_LENOF("0x" PRIMAXx16 ".0x" PRIMAXx16),
-	                  COMPILER_LENOF("0x" PRIMAXx8 ".0x" PRIMAXx8 "."
+	char valbuf[MAX_C(lengthof(PRIMAXu16),
+	                  lengthof(PRIMAXxN(__SIZEOF_PHYSADDR_T__)),
+	                  lengthof(PRIMAXx32),
+	                  lengthof("0x" PRIMAXx16 ".0x" PRIMAXx16),
+	                  lengthof("0x" PRIMAXx8 ".0x" PRIMAXx8 "."
 	                                 "0x" PRIMAXx8 ".0x" PRIMAXx8))];
 	me = (struct bochs_chipset *)self;
 

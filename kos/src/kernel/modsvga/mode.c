@@ -172,7 +172,7 @@ cs_strings_printer_cb(void *arg,
 		--me->csp_req.svs_start;
 		return 0; /* Skip this pair... */
 	}
-	for (i = 0; i < COMPILER_LENOF(strings); ++i) {
+	for (i = 0; i < lengthof(strings); ++i) {
 		char const *str;
 		size_t len;
 		str = strings[i];

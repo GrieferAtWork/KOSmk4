@@ -76,10 +76,10 @@ DECL_BEGIN
 #endif /* NDEBUG || NDEBUG_FINI */
 
 /* Assert that string buffers from `blkdev' are big enough for what they're meant to hold. */
-static_assert(COMPILER_LENOF(((struct blkdev *)0)->bd_rootinfo.br_mbr_diskuid) ==
-              COMPILER_LENOF(((struct mbr_sector *)0)->mbr_diskuid));
-static_assert(COMPILER_LENOF(((struct blkdev *)0)->bd_partinfo.bp_efi_name) >
-              UNICODE_16TO8_MAXBUF(COMPILER_LENOF(((struct efi_partition *)0)->p_name)));
+static_assert(lengthof(((struct blkdev *)0)->bd_rootinfo.br_mbr_diskuid) ==
+              lengthof(((struct mbr_sector *)0)->mbr_diskuid));
+static_assert(lengthof(((struct blkdev *)0)->bd_partinfo.bp_efi_name) >
+              UNICODE_16TO8_MAXBUF(lengthof(((struct efi_partition *)0)->p_name)));
 
 /* Check if 2 given ranges overlap (that is: share at least 1 common address) */
 #define RANGE_OVERLAPS(a_min, a_max, b_min, b_max) \
@@ -314,7 +314,7 @@ NOTHROW(FCALL blkdev_list_overlaps)(struct blkdev_list const *__restrict self,
 
 struct blkdev_makeparts_info {
 	/* New value for `struct blkdev::br_mbr_diskuid' */
-	byte_t br_mbr_diskuid[COMPILER_LENOF(((struct blkdev *)0)->bd_rootinfo.br_mbr_diskuid)];
+	byte_t br_mbr_diskuid[lengthof(((struct blkdev *)0)->bd_rootinfo.br_mbr_diskuid)];
 
 	/* New value for `struct blkdev::br_efi_guid' */
 	guid_t br_efi_guid;
@@ -452,7 +452,7 @@ blkdev_makeparts_loadefi(struct blkdev *__restrict self,
 		struct blkdev *dev;
 		struct efi_partition part;
 		uint64_t lba_min, lba_max, part_flags;
-		char16_t part_name[COMPILER_LENOF(part.p_name)];
+		char16_t part_name[lengthof(part.p_name)];
 		unsigned int i;
 		size_t part_name_len;
 
@@ -491,8 +491,8 @@ blkdev_makeparts_loadefi(struct blkdev *__restrict self,
 		part_name_len = 0;
 		if (efi_entsize > offsetof(struct efi_partition, p_name)) {
 			part_name_len = (efi_entsize - offsetof(struct efi_partition, p_name)) / 2;
-			if (part_name_len > COMPILER_LENOF(part.p_name))
-				part_name_len = COMPILER_LENOF(part.p_name);
+			if (part_name_len > lengthof(part.p_name))
+				part_name_len = lengthof(part.p_name);
 		}
 		for (i = 0; i < part_name_len; ++i)
 			part_name[i] = (char16_t)LETOH16(part.p_name[i]);
@@ -762,7 +762,7 @@ blkdev_makeparts_from_mbr(struct blkdev *__restrict self,
 		memcpy(info->br_mbr_diskuid, mbr->mbr_diskuid, sizeof(mbr->mbr_diskuid));
 
 	/* Load MBR partitions. */
-	for (i = 0; i < COMPILER_LENOF(mbr->mbr_part); ++i) {
+	for (i = 0; i < lengthof(mbr->mbr_part); ++i) {
 		/* NOTE: LBA is ADDR >> blkdev_getsectorshift(self) */
 		uint64_t lba_min, lba_max, lba_cnt;
 		if (mbr->mbr_part[i].pt.pt_sysid == MBR_SYSID_UNUSED)
@@ -961,7 +961,7 @@ blkdev_makeparts(struct blkdev *__restrict self,
 			LIST_FOREACH (part, &result, bd_partinfo.bp_partlink) {
 				REF struct devdirent *devname;
 				char *writer;
-				char numbuf[COMPILER_LENOF(PRIMAXuN(__SIZEOF_MINOR_T__))];
+				char numbuf[lengthof(PRIMAXuN(__SIZEOF_MINOR_T__))];
 				size_t numlen, namlen;
 
 				part->bd_partinfo.bp_partno = index++;

@@ -48,6 +48,7 @@
 #include <limits.h>
 #include <paths.h>
 #include <pwd.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -58,8 +59,8 @@
 
 #include "../libc/dl.h"
 #include "../libc/globals.h"
-#include "../libc/tls.h"
 #include "../libc/syscalls.h"
+#include "../libc/tls.h"
 #include "fcntl.h"
 #include "pthread.h"
 #include "stdlib.h"
@@ -2002,7 +2003,7 @@ NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
 /*[[[body:libc_fpathconf]]]*/
 {
 	longptr_t result;
-	if unlikely(name >= COMPILER_LENOF(pc_constants)) {
+	if unlikely(name >= lengthof(pc_constants)) {
 		result = libc_seterrno(EINVAL);
 	} else if ((result = pc_constants[name]) == PATHCONF_VARYING_LIMIT) {
 		/* Determine the value based on `fd' */
@@ -2092,7 +2093,7 @@ NOTHROW_RPC(LIBDCALL do_pathconf)(char const *path,
                                   oflag_t path_oflags) {
 	longptr_t result;
 	/* Try not to open `path' if `name' is invalid, or has a constant value */
-	if unlikely(name >= COMPILER_LENOF(pc_constants)) {
+	if unlikely(name >= lengthof(pc_constants)) {
 		result = libc_seterrno(EINVAL);
 	} else if ((result = pc_constants[name]) == PATHCONF_VARYING_LIMIT) {
 		fd_t fd;
@@ -3092,7 +3093,7 @@ for (local id: [:idCount]) {
 #endif /* !_POSIX_THREAD_ROBUST_PRIO_PROTECT */
 /*[[[end]]]*/
 };
-static_assert(COMPILER_LENOF(sysconf_table) <= _SC_COUNT);
+static_assert(lengthof(sysconf_table) <= _SC_COUNT);
 
 
 
@@ -3109,7 +3110,7 @@ NOTHROW_RPC(LIBCCALL libc_sysconf)(__STDC_INT_AS_UINT_T name)
 /*[[[body:libc_sysconf]]]*/
 {
 	longptr_t result;
-	if (name < COMPILER_LENOF(sysconf_table)) {
+	if (name < lengthof(sysconf_table)) {
 		result = sysconf_table[name];
 		if (result != SYSCONF_ENTRY_UNDEFINED)
 			return result;

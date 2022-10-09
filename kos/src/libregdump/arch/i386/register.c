@@ -144,7 +144,7 @@ libregdump_register_name(pformatprinter printer, void *arg,
 		char regname_with_percent[GP_REGISTER_NAME_MAXLEN + 2];
 		char const *regname;
 		unsigned int id = regno & X86_REGISTER_IDMASK;
-		if unlikely(id >= COMPILER_LENOF(gpreg_names)) {
+		if unlikely(id >= lengthof(gpreg_names)) {
 #ifdef __x86_64__
 			if (regno >= X86_REGISTER_GENERAL_PURPOSE_SPL &&
 			    regno <= X86_REGISTER_GENERAL_PURPOSE_DIL) {
@@ -178,7 +178,7 @@ libregdump_register_name(pformatprinter printer, void *arg,
 	}	break;
 
 	case X86_REGISTER_SEGMENT:
-		if ((regno & X86_REGISTER_IDMASK) <= COMPILER_LENOF(sgreg_names)) {
+		if ((regno & X86_REGISTER_IDMASK) <= lengthof(sgreg_names)) {
 			result = (*printer)(arg, sgreg_names[regno & X86_REGISTER_IDMASK], 3);
 			break;
 		}

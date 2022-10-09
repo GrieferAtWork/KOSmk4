@@ -233,7 +233,7 @@ NOTHROW_NCX(CC libkeymap_translate)(struct keymap *__restrict self,
 	uint16_t reg_key;
 	char cachable_character;
 	/* Check if the translation for the key can be cached. */
-	if (key < COMPILER_LENOF(self->km_basic) &&
+	if (key < lengthof(self->km_basic) &&
 	    (KEYMOD_ISNORMAL(mod) || KEYMOD_ISSHIFT(mod))) {
 		/* Check if the translation is cached. */
 		basic = &self->km_basic[key];

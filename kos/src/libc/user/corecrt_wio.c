@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBC_USER_CORECRT_WIO_C
 #define GUARD_LIBC_USER_CORECRT_WIO_C 1
+#define _KOS_SOURCE 1
 
 #include "../api.h"
 /**/
@@ -31,6 +32,7 @@
 #include <fcntl.h>
 #include <io.h>
 #include <malloc.h>
+#include <stddef.h>
 #include <string.h>
 #include <uchar.h>
 #include <unicode.h>
@@ -147,7 +149,7 @@ libc_dfind_wread32(struct dfind *__restrict self,
 	finddata->time_access = (typeof(finddata->time_access))st.st_atime32;
 	finddata->time_write  = (typeof(finddata->time_write))st.st_mtime32;
 	finddata->size        = (typeof(finddata->size))st.st_size;
-	fast_encode(finddata->name, COMPILER_LENOF(finddata->name),
+	fast_encode(finddata->name, lengthof(finddata->name),
 	            ent->d_name, ent->d_namlen, utf32);
 	return 0;
 err:
@@ -171,7 +173,7 @@ libc_dfind_wread32i64(struct dfind *__restrict self,
 	finddata->time_access = (typeof(finddata->time_access))st.st_atime32;
 	finddata->time_write  = (typeof(finddata->time_write))st.st_mtime32;
 	finddata->size        = (typeof(finddata->size))st.st_size64;
-	fast_encode(finddata->name, COMPILER_LENOF(finddata->name),
+	fast_encode(finddata->name, lengthof(finddata->name),
 	            ent->d_name, ent->d_namlen, utf32);
 	return 0;
 err:
@@ -195,7 +197,7 @@ libc_dfind_wread64(struct dfind *__restrict self,
 	finddata->time_access = (typeof(finddata->time_access))st.st_atime64;
 	finddata->time_write  = (typeof(finddata->time_write))st.st_mtime64;
 	finddata->size        = (typeof(finddata->size))st.st_size64;
-	fast_encode(finddata->name, COMPILER_LENOF(finddata->name),
+	fast_encode(finddata->name, lengthof(finddata->name),
 	            ent->d_name, ent->d_namlen, utf32);
 	return 0;
 err:

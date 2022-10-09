@@ -1143,14 +1143,14 @@ argcash_eval(struct driver *__restrict self,
 		} intval;
 		if (type == DRIVER_ARGCASH_ENTRY_TYPE_INT) {
 			intval.im = strtoimax_r(value, NULL, 0, &error);
-			if (error == 0 && bufsize < COMPILER_LENOF(argcash_sint_minmax)) {
+			if (error == 0 && bufsize < lengthof(argcash_sint_minmax)) {
 				if (intval.im < argcash_sint_minmax[bufsize][0] ||
 				    intval.im > argcash_sint_minmax[bufsize][1])
 					error = ERANGE;
 			}
 		} else {
 			intval.um = strtoumax_r(value, NULL, 0, &error);
-			if (error == 0 && bufsize < COMPILER_LENOF(argcash_uint_minmax)) {
+			if (error == 0 && bufsize < lengthof(argcash_uint_minmax)) {
 				if (intval.um > argcash_uint_minmax[bufsize])
 					error = ERANGE;
 			}

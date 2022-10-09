@@ -24,6 +24,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_MEMORY_POISON_HEAP_C
 #define GUARD_KERNEL_CORE_ARCH_I386_MEMORY_POISON_HEAP_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -31,14 +32,16 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #ifdef CONFIG_HAVE_KERNEL_POISON_HEAP
 #include <kernel/driver-param.h>
-#include <kernel/types.h>
 #include <kernel/mman/phys.h>
+#include <kernel/types.h>
 
 #include <hybrid/host.h>
 #include <hybrid/unaligned.h>
 
 #include <asm/intrin.h>
 #include <kos/kernel/paging.h>
+
+#include <stddef.h>
 
 DECL_BEGIN
 
@@ -94,7 +97,7 @@ INTERN NOBLOCK ATTR_COLDTEXT void NOTHROW(KCALL ph_install)(void) {
 	unsigned int i;
 	if (boot_no_poison_heap)
 		return;
-	for (i = 0; i < COMPILER_LENOF(ph_install_seq); ++i) {
+	for (i = 0; i < lengthof(ph_install_seq); ++i) {
 		/* Buffer of override instructions. */
 		byte_t buf[8];
 		size_t buflen = 0;

@@ -31,8 +31,8 @@
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
-#include <hybrid/sched/preemption.h>
 #include <hybrid/sched/atomic-lock.h>
+#include <hybrid/sched/preemption.h>
 
 #include <sys/io.h>
 
@@ -40,6 +40,7 @@
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stdarg.h>
+#include <stddef.h>
 #include <stdio.h> /* sprintf() */
 #include <string.h>
 #include <time.h> /* localtime_r() */
@@ -166,14 +167,14 @@ NOTHROW(FCALL x86_syslog_sink_impl)(struct syslog_sink *__restrict UNUSED(self),
                                     unsigned int level) {
 	preemption_flag_t was;
 	/* Write to a debug port. */
-	if (level < COMPILER_LENOF(level_prefix)) {
+	if (level < lengthof(level_prefix)) {
 		/* Note that the max values here may not make perfect sense in
 		 * some cases, but we want to guaranty that there is no chance
 		 * of this ever overflowing. */
-		char buf[COMPILER_LENOF("[" PRIMAXu "-" PRIMAXu "-" PRIMAXu
-		                        "T" PRIMAXu ":" PRIMAXu ":" PRIMAXu
-		                        "." PRIMAXu32 ":notice]["
-		                        "" PRIMAXdN(__SIZEOF_PID_T__) "] ")];
+		char buf[lengthof("[" PRIMAXu "-" PRIMAXu "-" PRIMAXu
+		                  "T" PRIMAXu ":" PRIMAXu ":" PRIMAXu
+		                  "." PRIMAXu32 ":notice]["
+		                  "" PRIMAXdN(__SIZEOF_PID_T__) "] ")];
 		struct tm t;
 		size_t len;
 		localtime_r(&packet->sp_time, &t);

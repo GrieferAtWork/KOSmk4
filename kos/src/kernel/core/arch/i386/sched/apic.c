@@ -128,7 +128,7 @@ INTERN ATTR_FREEBSS volatile u8 cpu_offline_mask[CEILDIV(CONFIG_MAX_CPU_COUNT, 8
 #else /* ... */
 LOCAL bool KCALL all_all_cpus_online(void) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(cpu_offline_mask); ++i)
+	for (i = 0; i < lengthof(cpu_offline_mask); ++i)
 		if (ATOMIC_READ(cpu_offline_mask[i]))
 			return false;
 	return true;

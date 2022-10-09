@@ -1673,7 +1673,7 @@ follow_jmp:
 			struct compat_rpc_syscall_info compat_sc_info;
 			compat_sc_info.rsi_flags = (compat_uintptr_t)info->rsi_flags;
 			compat_sc_info.rsi_sysno = (compat_uintptr_t)info->rsi_sysno;
-			for (i = 0; i < COMPILER_LENOF(compat_sc_info.rsi_regs); ++i)
+			for (i = 0; i < lengthof(compat_sc_info.rsi_regs); ++i)
 				compat_sc_info.rsi_regs[i] = (compat_uintptr_t)info->rsi_regs[i];
 			rpc_vm_push2user(self, &compat_sc_info, sizeof(compat_sc_info));
 		} else

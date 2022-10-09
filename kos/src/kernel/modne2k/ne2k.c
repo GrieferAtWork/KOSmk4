@@ -1302,7 +1302,7 @@ Ne2k_ProbePciDevice(struct pci_device *__restrict dev) THROWS(...) {
 	       dev, iobase, dev->pd_addr);
 	Ne2k_ResetCard(iobase);
 	/* Execute a sequence of startup instructions. */
-	for (i = 0; i < COMPILER_LENOF(Ne2k_StartupSequence); ++i) {
+	for (i = 0; i < lengthof(Ne2k_StartupSequence); ++i) {
 		outb(iobase +
 		     Ne2k_StartupSequence[i].off,
 		     Ne2k_StartupSequence[i].val);

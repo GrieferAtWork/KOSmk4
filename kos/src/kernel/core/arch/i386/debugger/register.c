@@ -24,6 +24,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
  */
 #ifndef GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_REGISTER_C
 #define GUARD_KERNEL_CORE_ARCH_I386_DEBUGGER_REGISTER_C 1
+#define _KOS_SOURCE 1
 #define DISABLE_BRANCH_PROFILING
 
 #include <kernel/compiler.h>
@@ -49,6 +50,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kos/kernel/cpu-state.h>
 
 #include <assert.h>
+#include <stddef.h>
 #include <string.h>
 
 #include <libcpustate/register.h>
@@ -211,7 +213,7 @@ NOTHROW(KCALL get_dbg_current_kernel_gs_base)(u64 *__restrict presult) {
 		struct x86_dbg_cpuammend *ammend;
 		/* The current thread of a different CPU. */
 		cpuid  = dbg_current->t_cpu->c_id;
-		assert(cpuid < COMPILER_LENOF(x86_dbg_hostbackup.dhs_cpus));
+		assert(cpuid < lengthof(x86_dbg_hostbackup.dhs_cpus));
 		if (x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_istate) {
 			ammend = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_iammend;
 			assert(ammend);
@@ -241,7 +243,7 @@ NOTHROW(KCALL set_dbg_current_kernel_gs_base)(u64 value) {
 		struct x86_dbg_cpuammend *ammend;
 		/* The current thread of a different CPU. */
 		cpuid  = dbg_current->t_cpu->c_id;
-		assert(cpuid < COMPILER_LENOF(x86_dbg_hostbackup.dhs_cpus));
+		assert(cpuid < lengthof(x86_dbg_hostbackup.dhs_cpus));
 		if (x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_istate) {
 			ammend = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_iammend;
 			assert(ammend);
@@ -281,7 +283,7 @@ NOTHROW(KCALL saveorig)(void) {
 		struct x86_dbg_cpuammend *ammend;
 		/* The current thread of a different CPU. */
 		cpuid  = dbg_current->t_cpu->c_id;
-		assert(cpuid < COMPILER_LENOF(x86_dbg_hostbackup.dhs_cpus));
+		assert(cpuid < lengthof(x86_dbg_hostbackup.dhs_cpus));
 		ist = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_istate;
 		if (!ist) /* The CPU wasn't suspended, because it wasn't online */
 			goto do_normal_unscheduled_thread;
@@ -336,7 +338,7 @@ do_normal_unscheduled_thread:
 			if unlikely(!dbg_current->t_cpu)
 				goto nocpu;
 			cpuid = dbg_current->t_cpu->c_id;
-			if unlikely(cpuid >= COMPILER_LENOF(x86_dbg_hostbackup.dhs_cpus))
+			if unlikely(cpuid >= lengthof(x86_dbg_hostbackup.dhs_cpus))
 				goto nocpu;
 			if (x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_istate) {
 				struct x86_dbg_cpuammend *ammend;
@@ -399,7 +401,7 @@ NOTHROW(KCALL loadview)(void) {
 			uintptr_t psp;
 			/* The current thread of a different CPU. */
 			cpuid  = dbg_current->t_cpu->c_id;
-			assert(cpuid < COMPILER_LENOF(x86_dbg_hostbackup.dhs_cpus));
+			assert(cpuid < lengthof(x86_dbg_hostbackup.dhs_cpus));
 			ist = x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_istate;
 			if (!ist) /* The CPU wasn't suspended, because it wasn't online */
 				goto do_normal_unscheduled_thread;
@@ -501,7 +503,7 @@ do_normal_unscheduled_thread:
 				if unlikely(!dbg_current->t_cpu)
 					goto nocpu;
 				cpuid = dbg_current->t_cpu->c_id;
-				if unlikely(cpuid >= COMPILER_LENOF(x86_dbg_hostbackup.dhs_cpus))
+				if unlikely(cpuid >= lengthof(x86_dbg_hostbackup.dhs_cpus))
 					goto nocpu;
 				if (x86_dbg_hostbackup.dhs_cpus[cpuid].dcs_istate) {
 					struct x86_dbg_cpuammend *ammend;

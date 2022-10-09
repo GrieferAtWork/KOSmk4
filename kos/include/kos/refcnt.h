@@ -45,6 +45,7 @@
 
 #if defined(__KOS__) && defined(__KERNEL__)
 #ifndef __REFCNT_CC
+#include <__crt.h> /* __KCALL */
 #define __REFCNT_CC __KCALL
 #endif /* !__REFCNT_CC */
 #ifndef __REFCNT_NOTHROW

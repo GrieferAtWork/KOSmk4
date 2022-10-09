@@ -593,9 +593,9 @@ PRIVATE NONNULL((1)) void
 NOTHROW(FCALL autocomplete_nontype_symbols)(struct cparser *__restrict self,
                                             char const *__restrict name,
                                             size_t namelen) {
-	if (namelen < (COMPILER_LENOF(misc_expr_keywords[0]) - 1)) {
+	if (namelen < (lengthof(misc_expr_keywords[0]) - 1)) {
 		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(misc_expr_keywords); ++i) {
+		for (i = 0; i < lengthof(misc_expr_keywords); ++i) {
 			char const *cname_str = misc_expr_keywords[i];
 			if (bcmp(cname_str, name, namelen, sizeof(char)) == 0 &&
 			    cname_str[namelen] != '\0') {
@@ -2388,8 +2388,8 @@ NOTHROW(FCALL autocomplete_types)(struct cparser *__restrict self,
                                   char const *__restrict name,
                                   size_t namelen, uintptr_t ns) {
 	unsigned int i;
-	if (namelen < (COMPILER_LENOF(builtin_types[0].bt_name) - 1)) {
-		for (i = 0; i < COMPILER_LENOF(builtin_types); ++i) {
+	if (namelen < (lengthof(builtin_types[0].bt_name) - 1)) {
+		for (i = 0; i < lengthof(builtin_types); ++i) {
 			if (bcmp(builtin_types[i].bt_name, name, namelen, sizeof(char)) == 0 &&
 			    builtin_types[i].bt_name[namelen] != '\0') {
 				char const *cname_str = builtin_types[i].bt_name;
@@ -2400,8 +2400,8 @@ NOTHROW(FCALL autocomplete_types)(struct cparser *__restrict self,
 			}
 		}
 	}
-	if (namelen < (COMPILER_LENOF(misc_type_keywords[0]) - 1)) {
-		for (i = 0; i < COMPILER_LENOF(misc_type_keywords); ++i) {
+	if (namelen < (lengthof(misc_type_keywords[0]) - 1)) {
+		for (i = 0; i < lengthof(misc_type_keywords); ++i) {
 			if (bcmp(misc_type_keywords[i], name, namelen, sizeof(char)) == 0 &&
 			    misc_type_keywords[i][namelen] != '\0') {
 				char const *cname_str = misc_type_keywords[i];
@@ -2551,11 +2551,11 @@ yield_and_scan_keyword:
 		incref(presult->ct_typ);
 	} else {
 		/* Check for builtin types. */
-		if (kwd_len < COMPILER_LENOF(builtin_types->bt_name)) {
+		if (kwd_len < lengthof(builtin_types->bt_name)) {
 			unsigned int i;
 #ifdef __ARCH_HAVE_COMPAT
 			if (dbg_current_iscompat()) {
-				for (i = 0; i < COMPILER_LENOF(compat_builtin_types); ++i) {
+				for (i = 0; i < lengthof(compat_builtin_types); ++i) {
 					if (compat_builtin_types[i].bt_name[kwd_len] == '\0' &&
 					    bcmp(compat_builtin_types[i].bt_name, kwd_str,
 					         kwd_len, sizeof(char)) == 0) {
@@ -2569,7 +2569,7 @@ yield_and_scan_keyword:
 				}
 			}
 #endif /* __ARCH_HAVE_COMPAT */
-			for (i = 0; i < COMPILER_LENOF(builtin_types); ++i) {
+			for (i = 0; i < lengthof(builtin_types); ++i) {
 				if (builtin_types[i].bt_name[kwd_len] == '\0' &&
 				    bcmp(builtin_types[i].bt_name, kwd_str,
 				         kwd_len, sizeof(char)) == 0) {

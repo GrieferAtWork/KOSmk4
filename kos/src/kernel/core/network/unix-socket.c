@@ -131,7 +131,7 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL unix_client_destroy)(struct unix_client *__restrict self) {
 	unsigned int i;
 	/* Finalize data buffers. */
-	for (i = 0; i < COMPILER_LENOF(self->uc_bufs); ++i) {
+	for (i = 0; i < lengthof(self->uc_bufs); ++i) {
 		pb_buffer_fini_ex(&self->uc_bufs[i],
 		                  unix_ancillary_data_fini);
 	}

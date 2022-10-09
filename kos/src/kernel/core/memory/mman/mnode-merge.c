@@ -1000,7 +1000,7 @@ PRIVATE NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct mpart *
 NOTHROW(FCALL mpart_trymerge_nodes)(REF struct mpart *__restrict self) {
 	unsigned int i;
 again:
-	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		struct mnode *node;
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
 			if (mnode_trymerge_with_partlock(node, (REF struct mpart **)&self))
@@ -1042,7 +1042,7 @@ PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) bool
 NOTHROW(FCALL mpart_mappedby_mman)(struct mpart const *__restrict self,
                                    struct mman const *__restrict mm) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		struct mnode *node;
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
 			if (node->mn_mman == mm)
@@ -1060,7 +1060,7 @@ NOTHROW(FCALL mpart_mappedby_mman_before)(struct mpart const *__restrict self,
                                           struct mnode const *stop,
                                           struct mman const *__restrict mm) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		struct mnode *node;
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
 			if (node == stop)
@@ -1076,7 +1076,7 @@ NOTHROW(FCALL mpart_mappedby_mman_before)(struct mpart const *__restrict self,
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) void
 NOTHROW(FCALL mpart_incref_all_mmans)(struct mpart const *__restrict self) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		struct mnode *node;
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link)
 			COMPILER_UNUSED(tryincref(node->mn_mman));
@@ -1087,7 +1087,7 @@ NOTHROW(FCALL mpart_incref_all_mmans)(struct mpart const *__restrict self) {
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) void
 NOTHROW(FCALL mpart_decref_all_mmans)(struct mpart const *__restrict self) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		struct mnode *node;
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
 			if likely(!wasdestroyed(node->mn_mman))
@@ -1107,7 +1107,7 @@ NOTHROW(FCALL mpart_unlock_all_mmans)(struct mpart const *__restrict self,
                                       struct mman *locked_mman DFL(NULL)) {
 	struct mnode *node;
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
 			if (node == stop)
 				return; /* Stop on this node! */
@@ -1131,7 +1131,7 @@ NOTHROW(FCALL mpart_unlock_all_mmans_after)(struct mpart const *__restrict self,
                                             struct mman *locked_mman DFL(NULL)) {
 	struct mnode *node;
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
 			if (node == stop)
 				return; /* Stop on this node! */
@@ -1156,7 +1156,7 @@ NOTHROW(FCALL mpart_lock_all_mmans)(struct mpart const *__restrict self,
                                     struct mman *locked_mman DFL(NULL)) {
 	struct mnode *node;
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
 			if (node->mn_mman == locked_mman)
 				continue; /* Already locked by the caller... */
@@ -1182,7 +1182,7 @@ NOTHROW(FCALL mpart_lock_all_mmans_after)(struct mpart const *__restrict self,
                                           struct mman *locked_mman DFL(NULL)) {
 	struct mnode *node;
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
 			if (node->mn_mman == locked_mman)
 				continue; /* Already locked by the caller... */
@@ -1649,7 +1649,7 @@ NOTHROW(FCALL mpart_domerge_with_all_locks)(/*inherit(on_success)*/ REF struct m
 	/* Update mem-nodes from `hipart' to reference `lopart' at the proper offsets. */
 	{
 		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(hipart->_mp_nodlsts); ++i) {
+		for (i = 0; i < lengthof(hipart->_mp_nodlsts); ++i) {
 			struct mnode *node, *next;
 			struct mnode_list *list;
 			list = &hipart->_mp_nodlsts[i];

@@ -127,7 +127,7 @@ NOTHROW(FCALL mpart_assert_integrity)(struct mpart *__restrict self) {
 	/* Assert that mem-node access ranges are all in-bounds. */
 	{
 		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+		for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 			struct mnode *node;
 			LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
 				byte_t *minaddr, *maxaddr;
@@ -856,7 +856,7 @@ NOTHROW(FCALL _mpart_iscopywritable)(struct mpart const *__restrict self,
 	unsigned int i;
 	/* Check  for _any_ nodes that overlap with the
 	 * given address range, that aren't just `node' */
-	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		struct mnode *iter;
 		LIST_FOREACH (iter, &self->_mp_nodlsts[i], mn_link) {
 			if (!RANGE_OVERLAPS(addr, addr + num_bytes,

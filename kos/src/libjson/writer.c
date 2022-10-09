@@ -29,6 +29,7 @@
 #include <format-printer.h>
 #include <inttypes.h>
 #include <stdarg.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -103,21 +104,21 @@ json_linefeed_and_indent(struct json_writer *__restrict self) {
 	if (self->jw_format == JSON_WRITER_FORMAT_PRETTY) {
 		char buf[16];
 		buf[0] = '\n';
-		if likely(self->jw_depth <= COMPILER_LENOF(buf) - 1) {
+		if likely(self->jw_depth <= lengthof(buf) - 1) {
 			memset(buf + 1, '\t', self->jw_depth, sizeof(char));
 			if unlikely(json_print(self, buf, self->jw_depth + 1))
 				goto err;
 		} else {
 			unsigned int missing;
-			memset(buf + 1, '\t', COMPILER_LENOF(buf) - 1, sizeof(char));
-			if unlikely(json_print(self, buf, COMPILER_LENOF(buf)))
+			memset(buf + 1, '\t', lengthof(buf) - 1, sizeof(char));
+			if unlikely(json_print(self, buf, lengthof(buf)))
 				goto err;
-			missing = self->jw_depth - (COMPILER_LENOF(buf) - 1);
+			missing = self->jw_depth - (lengthof(buf) - 1);
 			buf[0] = '\t';
 			while (missing) {
 				unsigned int count = missing;
-				if (count > COMPILER_LENOF(buf))
-					count = COMPILER_LENOF(buf);
+				if (count > lengthof(buf))
+					count = lengthof(buf);
 				if unlikely(json_print(self, buf, count))
 					goto err;
 				missing -= count;

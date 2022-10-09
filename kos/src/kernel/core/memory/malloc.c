@@ -36,6 +36,7 @@
 #include <hybrid/overflow.h>
 
 #include <assert.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -357,7 +358,7 @@ kernel_disable_trace_malloc(void) {
 	unsigned int i;
 
 	/* Redirect malloc functions to their untraced counterparts. */
-	for (i = 0; i < COMPILER_LENOF(trace_malloc_overrides); ++i) {
+	for (i = 0; i < lengthof(trace_malloc_overrides); ++i) {
 		void *from = trace_malloc_overrides[i][0];
 		void *to   = trace_malloc_overrides[i][1];
 		if (from != to)

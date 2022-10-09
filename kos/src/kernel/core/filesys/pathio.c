@@ -1488,7 +1488,7 @@ NOTHROW(FCALL path_umount_subtree)(struct path *__restrict self,
 		struct vfs *pathvfs = _path_getvfs(self);
 		assert(!wasdestroyed(pathvfs));
 		assert(vfs_driveslock_writing(pathvfs));
-		for (i = 0; i < COMPILER_LENOF(pathvfs->vf_drives); ++i) {
+		for (i = 0; i < lengthof(pathvfs->vf_drives); ++i) {
 			if (pathvfs->vf_drives[i] != self)
 				continue; /* Some other path */
 			pathvfs->vf_drives[i] = NULL;
@@ -2006,12 +2006,12 @@ path_print(struct path *__restrict self, pformatprinter printer,
 		unsigned int i;
 		struct vfs *path_vfs = _path_getvfs(self);
 		vfs_driveslock_read(path_vfs);
-		for (i = 0; i < COMPILER_LENOF(path_vfs->vf_drives); ++i) {
+		for (i = 0; i < lengthof(path_vfs->vf_drives); ++i) {
 			if (path_vfs->vf_drives[i] == self)
 				break;
 		}
 		vfs_driveslock_endread(path_vfs);
-		if (i < COMPILER_LENOF(path_vfs->vf_drives)) {
+		if (i < lengthof(path_vfs->vf_drives)) {
 			char buf[3];
 			buf[0] = 'A' + i;
 			buf[1] = ':';

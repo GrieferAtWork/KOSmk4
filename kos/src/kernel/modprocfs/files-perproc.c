@@ -170,7 +170,7 @@ print_sigset(pformatprinter printer, void *arg,
 	ssize_t temp, result = 0;
 	bool got_nonzero = false;
 	unsigned int i;
-	i = COMPILER_LENOF(ss->__val) - 1;
+	i = lengthof(ss->__val) - 1;
 	for (;;) {
 		ulongptr_t val;
 		val = ATOMIC_READ(ss->__val[i]);
@@ -604,8 +604,8 @@ ProcFS_PrintUserSpaceStringArray(struct mman *__restrict mm, pformatprinter prin
 	while (strc) {
 		USER UNCHECKED char const *strings[32];
 		size_t count = strc;
-		if (count > COMPILER_LENOF(strings))
-			count = COMPILER_LENOF(strings);
+		if (count > lengthof(strings))
+			count = lengthof(strings);
 		mman_read(mm, strv, strings, count * sizeof(USER UNCHECKED char const *));
 		for (i = 0; i < count; ++i) {
 			USER UNCHECKED char const *str = strings[i];
@@ -635,8 +635,8 @@ ProcFS_PrintCompatUserSpaceStringArray(struct mman *__restrict mm, pformatprinte
 	while (strc) {
 		USER UNCHECKED compat_uintptr_t strings[32];
 		size_t count = strc;
-		if (count > COMPILER_LENOF(strings))
-			count = COMPILER_LENOF(strings);
+		if (count > lengthof(strings))
+			count = lengthof(strings);
 		mman_read(mm, strv, strings, count * sizeof(USER UNCHECKED compat_uintptr_t));
 		for (i = 0; i < count; ++i) {
 			USER UNCHECKED compat_uintptr_t str = strings[i];
@@ -2251,7 +2251,7 @@ procfs_fd_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct d
 	struct procfs_fd_enum *me;
 	u16 namelen;
 	void *hdata;
-	char namebuf[COMPILER_LENOF(PRIMAXu)];
+	char namebuf[lengthof(PRIMAXu)];
 	me = (struct procfs_fd_enum *)self;
 
 again:
@@ -2723,7 +2723,7 @@ procfs_fdinfo_enum_v_readdir(struct fdirenum *__restrict self, USER CHECKED stru
 	struct procfs_fd_enum *me;
 	u16 namelen;
 	void *hdata;
-	char namebuf[COMPILER_LENOF(PRIMAXu)];
+	char namebuf[lengthof(PRIMAXu)];
 	me = (struct procfs_fd_enum *)self;
 
 again:
@@ -3056,7 +3056,7 @@ perproc_mapfile_direnum_v_readdir(struct fdirenum *__restrict self, USER CHECKED
 	ssize_t result;
 	bool should_enum;
 	struct mmapinfo mminfo;
-	char rangename[COMPILER_LENOF(PRIMAXxPTR "-" PRIMAXxPTR)];
+	char rangename[lengthof(PRIMAXxPTR "-" PRIMAXxPTR)];
 	u16 namelen;
 	struct perproc_mapfile_direnum *me = (struct perproc_mapfile_direnum *)self;
 	UNCHECKED void *oldaddr, *newaddr;
@@ -3356,7 +3356,7 @@ again:
 	pid_id   = _taskpid_slot_getpidno(pid->tp_pids[myind]);
 	newindex = pid_id + 1; /* Next time around, yield a process with a greater PID */
 	{
-		char namebuf[COMPILER_LENOF(PRIMAXuN(__SIZEOF_PID_T__))];
+		char namebuf[lengthof(PRIMAXuN(__SIZEOF_PID_T__))];
 gotpid:
 		FINALLY_DECREF_UNLIKELY(pid);
 		namelen = (u16)sprintf(namebuf, "%" PRIuN(__SIZEOF_PID_T__), pid_id);

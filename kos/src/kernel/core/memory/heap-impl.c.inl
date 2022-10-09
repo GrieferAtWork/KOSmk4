@@ -133,7 +133,7 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_alloc_untraced)(struct heap *__restrict self,
 	             iter < COMPILER_ENDOF(self->h_size),
 	             "HEAP_BUCKET_OF(%" PRIuSIZ ") = %" PRIuSIZ "/%" PRIuSIZ,
 	             result_siz, HEAP_BUCKET_OF(result_siz),
-	             COMPILER_LENOF(self->h_size));
+	             lengthof(self->h_size));
 search_heap:
 	if (!LOCAL_heap_acquirelock(self, flags))
 		LOCAL_IF_NX_ELSE(goto err, THROW(E_WOULDBLOCK_PREEMPTED));
@@ -614,7 +614,7 @@ LOCAL_NOTHROW(KCALL LOCAL_heap_align_untraced)(struct heap *__restrict self,
 		             iter < COMPILER_ENDOF(self->h_size),
 		             "HEAP_BUCKET_OF(%" PRIuSIZ ") = %" PRIuSIZ "/%" PRIuSIZ,
 		             alloc_bytes, HEAP_BUCKET_OF(alloc_bytes),
-		             COMPILER_LENOF(self->h_size));
+		             lengthof(self->h_size));
 		if (!LOCAL_heap_acquirelock(self, flags))
 			LOCAL_IF_NX_ELSE(goto err, THROW(E_WOULDBLOCK_PREEMPTED));
 		/* Search for  existing  free  data  that

@@ -868,7 +868,7 @@ NOTHROW(KCALL gc_slab_reset_reach_desc)(struct slab_descriptor const *__restrict
 PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL gc_slab_reset_reach)(void) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(gc_slab_descs); ++i) {
+	for (i = 0; i < lengthof(gc_slab_descs); ++i) {
 		gc_slab_reset_reach_desc(gc_slab_descs[i]);
 	}
 }
@@ -963,7 +963,7 @@ NOTHROW(KCALL gc_reachable_slab_pointer)(void *ptr) {
 PRIVATE NOBLOCK ATTR_COLDTEXT void
 NOTHROW(KCALL gc_coreheap_reset_reach)(void) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(mcoreheap_lists); ++i) {
+	for (i = 0; i < lengthof(mcoreheap_lists); ++i) {
 		struct mcorepage *iter;
 		SLIST_FOREACH (iter, &mcoreheap_lists[i], mcp_link)
 			bzero(iter->_mcp_reach, sizeof(iter->_mcp_reach));
@@ -1058,7 +1058,7 @@ NOTHROW(KCALL gc_reachable_pointer)(void *ptr) {
 		cp    = (struct mcorepage *)FLOOR_ALIGN((uintptr_t)ptr, PAGESIZE);
 		index = (uintptr_t)((byte_t *)ptr - (byte_t *)cp->mcp_part);
 		index /= sizeof(union mcorepart);
-		if (index >= COMPILER_LENOF(cp->mcp_part))
+		if (index >= lengthof(cp->mcp_part))
 			goto check_reachable_mnode; /* Invalid index. (including the underflow case) */
 		if (!pagedir_iswritable((void *)cp))
 			return 0; /* Page isn't writable. -> This can't be one of them! */
@@ -1068,7 +1068,7 @@ NOTHROW(KCALL gc_reachable_pointer)(void *ptr) {
 			goto check_reachable_mnode; /* Already reached. */
 
 		/* Check that `cp' really is one of the coreheap pages. */
-		for (i = 0; i < COMPILER_LENOF(mcoreheap_lists); ++i) {
+		for (i = 0; i < lengthof(mcoreheap_lists); ++i) {
 			SLIST_FOREACH (iter, &mcoreheap_lists[i], mcp_link) {
 				if (iter == cp) {
 					/* Yes: this really is a reachable coreheap object! */
@@ -1833,7 +1833,7 @@ gc_gather_unreachable_slab_descriptor(struct trace_node **__restrict pleaks,
 PRIVATE ATTR_COLDTEXT NONNULL((1)) void KCALL
 gc_gather_unreachable_slabs(struct trace_node **__restrict pleaks) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(gc_slab_descs); ++i) {
+	for (i = 0; i < lengthof(gc_slab_descs); ++i) {
 		gc_gather_unreachable_slab_descriptor(pleaks, gc_slab_descs[i]);
 	}
 }
@@ -1844,11 +1844,11 @@ PRIVATE ATTR_COLDTEXT NONNULL((1)) void KCALL
 gc_gather_unreachable_coreheap(struct trace_node **__restrict pleaks) {
 	/* Search for allocated, but not reachable parts. */
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(mcoreheap_lists); ++i) {
+	for (i = 0; i < lengthof(mcoreheap_lists); ++i) {
 		struct mcorepage *iter;
 		SLIST_FOREACH (iter, &mcoreheap_lists[i], mcp_link) {
 			unsigned int partno;
-			for (partno = 0; partno < COMPILER_LENOF(iter->mcp_part); ++partno) {
+			for (partno = 0; partno < lengthof(iter->mcp_part); ++partno) {
 				if (!INUSE_BITSET_GET(iter->mcp_used, partno))
 					continue; /* This one's not allocated */
 				if (INUSE_BITSET_GET(iter->_mcp_reach, partno))

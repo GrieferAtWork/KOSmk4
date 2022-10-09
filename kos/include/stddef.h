@@ -165,6 +165,7 @@ typedef __WCHAR_TYPE__ wchar_t;
 
 #define offsetafter(s, m)               __COMPILER_OFFSETAFTER(s, m)
 #define container_of(ptr, type, member) __COMPILER_CONTAINER_OF(ptr, type, member)
+#define lengthof(arr)                   __COMPILER_LENOF(arr)
 
 #define sizeoffield(s, m) sizeof(((s *)0)->m)
 #ifdef __COMPILER_HAVE_TYPEOF

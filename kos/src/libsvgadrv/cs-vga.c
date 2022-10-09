@@ -20,6 +20,7 @@
 #ifndef GUARD_LIBSVGADRV_CS_VGA_C
 #define GUARD_LIBSVGADRV_CS_VGA_C 1
 #define _KOS_ALTERATIONS_SOURCE 1 /* Want sensical parameter order for outb/outw/outl */
+#define _KOS_SOURCE 1
 
 #include "api.h"
 /**/
@@ -316,7 +317,7 @@ vga_v_getmode(struct svga_chipset *__restrict UNUSED(self),
               struct svga_modeinfo *__restrict result,
               uintptr_t *__restrict p_index)
 		THROWS(E_IOERROR) {
-	if (*p_index >= COMPILER_LENOF(vga_modelist))
+	if (*p_index >= lengthof(vga_modelist))
 		return false; /* No more modes... */
 	/* Copy mode information. */
 	memcpy(result, &vga_modelist[*p_index].vkm_info,
@@ -330,7 +331,7 @@ ega_v_getmode(struct svga_chipset *__restrict UNUSED(self),
               struct svga_modeinfo *__restrict result,
               uintptr_t *__restrict p_index)
 		THROWS(E_IOERROR) {
-	if (*p_index >= COMPILER_LENOF(ega_modelist))
+	if (*p_index >= lengthof(ega_modelist))
 		return false; /* No more modes... */
 	/* Copy mode information. */
 	memcpy(result, &ega_modelist[*p_index].vkm_info,
@@ -355,7 +356,7 @@ vga_v_setmode(struct svga_chipset *__restrict self,
 	struct vga_chipset *me = (struct vga_chipset *)self;
 	uint8_t modeid;
 	for (modeid = 0;; ++modeid) {
-		assert(modeid <= COMPILER_LENOF(vga_modelist));
+		assert(modeid <= lengthof(vga_modelist));
 		if (bcmp(&vga_modelist[modeid].vkm_info, mode,
 		         sizeof(struct svga_modeinfo)) == 0)
 			break;
@@ -390,7 +391,7 @@ ega_v_setmode(struct svga_chipset *__restrict self,
 	struct vga_chipset *me = (struct vga_chipset *)self;
 	uint8_t modeid;
 	for (modeid = 0;; ++modeid) {
-		assert(modeid <= COMPILER_LENOF(vga_modelist));
+		assert(modeid <= lengthof(vga_modelist));
 		if (bcmp(&vga_modelist[modeid].vkm_info, mode,
 		         sizeof(struct svga_modeinfo)) == 0)
 			break;

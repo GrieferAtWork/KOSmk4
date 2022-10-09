@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_KERNEL_SRC_MISC_RAND_C
 #define GUARD_KERNEL_SRC_MISC_RAND_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -27,6 +28,8 @@
 #include <kernel/types.h>
 
 #include <hybrid/atomic.h>
+
+#include <stddef.h>
 
 DECL_BEGIN
 
@@ -49,7 +52,7 @@ NOTHROW(KCALL krand32)(void) {
 	do {
 		new_seed = old_seed = ATOMIC_READ(krand_seed);
 		new_seed = (((new_seed + 7) << 1) / 3);
-		new_seed ^= rand_map[(new_seed >> (new_seed & 7)) % COMPILER_LENOF(rand_map)];
+		new_seed ^= rand_map[(new_seed >> (new_seed & 7)) % lengthof(rand_map)];
 	} while (!ATOMIC_CMPXCH_WEAK(krand_seed, old_seed, new_seed));
 	return old_seed;
 }
@@ -65,7 +68,7 @@ NOTHROW(KCALL krand32_r)(u32 *__restrict pseed) {
 	u32 old_seed, new_seed;
 	new_seed = old_seed = *pseed;
 	new_seed = (((new_seed + 7) << 1) / 3);
-	new_seed ^= rand_map[(new_seed >> (new_seed & 7)) % COMPILER_LENOF(rand_map)];
+	new_seed ^= rand_map[(new_seed >> (new_seed & 7)) % lengthof(rand_map)];
 	*pseed = new_seed;
 	return old_seed;
 }

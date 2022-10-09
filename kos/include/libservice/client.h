@@ -82,7 +82,7 @@
  * >>
  * >> static struct service_specs const specs = {
  * >>     .ss_exportv      = functions,
- * >>     .ss_exportc      = COMPILER_LENOF(functions),
+ * >>     .ss_exportc      = lengthof(functions),
  * >>     .ss_context_init = &on_attach,
  * >>     .ss_context_fini = &on_detach,
  * >> };

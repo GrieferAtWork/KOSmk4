@@ -131,7 +131,7 @@ DEFINE_TEST(libdl_builtins) {
 	unsigned int i;
 	void *libdl = dlgetmodule("dl", DLGETHANDLE_FNORMAL);
 	assertf(libdl, "%s", dlerror());
-	for (i = 0; i < COMPILER_LENOF(libdl_symbols); ++i) {
+	for (i = 0; i < lengthof(libdl_symbols); ++i) {
 		void *sym = dlsym(libdl, libdl_symbols[i]);
 		assertf(sym, "%s:%s", libdl_symbols[i], dlerror());
 	}

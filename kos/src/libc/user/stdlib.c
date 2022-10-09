@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBC_USER_STDLIB_C
 #define GUARD_LIBC_USER_STDLIB_C 1
+#define _KOS_SOURCE 1
 #define _UTF_SOURCE 1
 #define _ALL_LIMITS_SOURCE 1
 
@@ -46,6 +47,7 @@
 #include <malloc.h>
 #include <malloca.h>
 #include <sched.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
@@ -196,7 +198,7 @@ NOTHROW(LIBCCALL libc_do_random)(unsigned int *pseed) {
 	do {
 		new_seed = old_seed = ATOMIC_READ(*pseed);
 		new_seed = (((new_seed + 7) << 1) / 3);
-		new_seed ^= rand_map[(new_seed >> (new_seed & 7)) % COMPILER_LENOF(rand_map)];
+		new_seed ^= rand_map[(new_seed >> (new_seed & 7)) % lengthof(rand_map)];
 	} while (!ATOMIC_CMPXCH_WEAK(*pseed, old_seed, new_seed));
 	return old_seed;
 }
@@ -937,7 +939,7 @@ NOTHROW_NCX(CC libd_alloc_environ)(char **unix_environ) {
 				goto fallback;
 			/* Check for special variable names. */
 			for (i = 0;; ++i) {
-				if (i >= COMPILER_LENOF(environ_special))
+				if (i >= lengthof(environ_special))
 					goto fallback;
 				if (environ_special[i].es_name[name_length] != '\0')
 					continue;
@@ -1035,7 +1037,7 @@ search_dos_environment:
 	 * for said variable. */
 	{
 		size_t i;
-		for (i = 0; i < COMPILER_LENOF(environ_special); ++i) {
+		for (i = 0; i < lengthof(environ_special); ++i) {
 			if (strcmp(environ_special[i].es_name, varname) != 0)
 				continue;
 			/* Yup: it's one of the special variables! */
@@ -1060,7 +1062,7 @@ struct libd_to_unix_cache {
 PRIVATE ATTR_SECTION(".text.crt.dos.fs.environ") NONNULL((1)) void
 NOTHROW(CC libd_to_unix_cache_fini)(struct libd_to_unix_cache *__restrict self) {
 	size_t i;
-	for (i = 0; i < COMPILER_LENOF(self->d2uc_drives); ++i)
+	for (i = 0; i < lengthof(self->d2uc_drives); ++i)
 		free(self->d2uc_drives[i]);
 }
 
@@ -1285,7 +1287,7 @@ NOTHROW_NCX(LIBDCALL libd_setenv)(char const *varname,
 did_update_dos_environ:
 
 	/* Check for special variables. */
-	for (i = 0; i < COMPILER_LENOF(environ_special); ++i) {
+	for (i = 0; i < lengthof(environ_special); ++i) {
 		int result;
 		char *unixval;
 		if (strcmp(environ_special[i].es_name, varname) != 0)

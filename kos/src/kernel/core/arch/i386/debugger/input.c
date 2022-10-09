@@ -48,6 +48,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <ctype.h>
 #include <inttypes.h>
+#include <stddef.h>
 #include <string.h>
 #include <unicode.h>
 
@@ -439,7 +440,7 @@ PRIVATE ATTR_DBGBSS u8 dbg_getkey_pending_cnt = 0;
  * When ungetting multiple keys, the key last unget'ed will be returned last. */
 PUBLIC NOBLOCK ATTR_DBGTEXT bool
 NOTHROW(FCALL dbg_ungetkey)(u16 key) {
-	if (dbg_getkey_pending_cnt >= COMPILER_LENOF(dbg_getkey_pending))
+	if (dbg_getkey_pending_cnt >= lengthof(dbg_getkey_pending))
 		return false;
 	dbg_getkey_pending[dbg_getkey_pending_cnt] = key;
 	++dbg_getkey_pending_cnt;
@@ -1018,7 +1019,7 @@ NOTHROW(FCALL dbg_getuni_setstring)(char const *__restrict text) {
 
 PUBLIC NOBLOCK ATTR_DBGTEXT bool
 NOTHROW(FCALL dbg_ungetuni)(/*utf-32*/ char32_t ch) {
-	if (dbg_getuni_pending_cnt >= COMPILER_LENOF(dbg_getuni_pending))
+	if (dbg_getuni_pending_cnt >= lengthof(dbg_getuni_pending))
 		return false;
 	dbg_getuni_pending[dbg_getuni_pending_cnt] = ch;
 	++dbg_getuni_pending_cnt;

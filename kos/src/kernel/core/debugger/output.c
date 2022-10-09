@@ -32,9 +32,9 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <debugger/config.h>
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER
-#include <debugger/output.h>
 #include <debugger/hook.h>
 #include <debugger/io.h>
+#include <debugger/output.h>
 #include <dev/video.h>
 
 #include <hybrid/host.h>
@@ -45,6 +45,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 #include <unicode.h>
@@ -264,7 +265,7 @@ NOTHROW(FCALL dbgtty_showscrollpos)(void) {
 	size_t textlen;
 	uintptr_t i, txtaddr;
 	uint8_t saved_color;
-	char text[COMPILER_LENOF(PRIMAXu16 "/" PRIMAXu16)];
+	char text[lengthof(PRIMAXu16 "/" PRIMAXu16)];
 	textlen = sprintf(text, "%" PRIu16 "/%" PRIu16,
 	                  dbgtty_scrolllen - dbgtty_scrollpos,
 	                  dbgtty_scrolllen);
@@ -1181,7 +1182,7 @@ NOTHROW(FCALL dbg_pprinter_putc)(dbg_pprinter_arg_t *__restrict printer,
 		} else {
 			unsigned int i;
 			for (i = 0;; ++i) {
-				if unlikely(i >= COMPILER_LENOF(printer->p_utf8)) {
+				if unlikely(i >= lengthof(printer->p_utf8)) {
 					dbg_pprinter_putuni(printer, dbg_pprinter_pending_ch32(printer));
 					printer->p_utf8[0] = 0;
 					goto normal_ch;

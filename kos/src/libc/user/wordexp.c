@@ -39,6 +39,7 @@
 #include <paths.h>
 #include <pwd.h>
 #include <signal.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -201,7 +202,7 @@ PRIVATE ATTR_NOINLINE ATTR_SECTION(".text.crt.wordexp") int
 NOTHROW_NCX(FCALL setenv_intval)(char const *varname_str,
                                  size_t varname_len,
                                  intmax_t val, int replace) {
-	char valbuf[COMPILER_LENOF(PRIMAXdMAX)];
+	char valbuf[lengthof(PRIMAXdMAX)];
 	sprintf(valbuf, "%" PRIdMAX, val);
 	return setenv_fixedlength(varname_str, varname_len, valbuf, replace);
 }
@@ -1339,7 +1340,7 @@ NOTHROW_NCX(LIBCCALL wxparser_parse_expr)(struct wxparser *__restrict self,
 	/* Simplified arithmetic parser (e.g. "(10+20)*2" --> "60") */
 	int result;
 	struct wxpr_parser wxpr;
-	char buf[COMPILER_LENOF(PRIMAXdMAX)];
+	char buf[lengthof(PRIMAXdMAX)];
 	size_t len;
 	WX_DEBUG("wxparser_parse_expr(%$q)\n", expr_len, expr);
 
@@ -1571,7 +1572,7 @@ PRIVATE ATTR_SECTION(".text.crt.wordexp") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL wxparser_parse_dollar_param)(struct wxparser *__restrict self,
                                                   bool quoted, bool curlyd) {
 	int result;
-	char _local_buf[COMPILER_LENOF(PRIMAXdMAX)];
+	char _local_buf[lengthof(PRIMAXdMAX)];
 	char const *env_start = self->wxp_input;
 	char ch;
 	char const *value_str;

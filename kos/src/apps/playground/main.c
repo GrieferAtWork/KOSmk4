@@ -193,7 +193,7 @@ int main_color(int argc, char *argv[], char *envp[]) {
 	printf(SESC "[m");
 	printf("\\e[f;bm:\n"
 	       "b f");
-	for (f = 0; f < COMPILER_LENOF(f_codes); ++f) {
+	for (f = 0; f < lengthof(f_codes); ++f) {
 		printf("%" PRIc32 "%2u",
 		       f == 0 ? 0x2551 : 0x2502,
 		       f_codes[f]);
@@ -201,14 +201,14 @@ int main_color(int argc, char *argv[], char *envp[]) {
 	printf("\n"
 	       "%" PRIc32 "%" PRIc32 "%" PRIc32,
 	       0x2550, 0x2550, 0x2550);
-	for (f = 0; f < COMPILER_LENOF(f_codes); ++f) {
+	for (f = 0; f < lengthof(f_codes); ++f) {
 		printf("%" PRIc32 "%" PRIc32 "%" PRIc32,
 		       f == 0 ? 0x256c : 0x256a,
 		       0x2550, 0x2550);
 	}
-	for (b = 0; b < COMPILER_LENOF(b_codes); ++b) {
+	for (b = 0; b < lengthof(b_codes); ++b) {
 		printf("\n%3u", b_codes[b]);
-		for (f = 0; f < COMPILER_LENOF(f_codes); ++f) {
+		for (f = 0; f < lengthof(f_codes); ++f) {
 			printf("%" PRIc32 "",
 			       f == 0 ? 0x2551 : 0x2502);
 			printf(SESC "[%u;%um%" PRIc32 "%" PRIc32 SESC "[m",

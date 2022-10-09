@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_CORE_FILESYS_ROOTFS_C
 #define GUARD_KERNEL_CORE_FILESYS_ROOTFS_C 1
 #define _GNU_SOURCE 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -328,7 +329,7 @@ again:
 			0,
 		};
 		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(flags); ++i) {
+		for (i = 0; i < lengthof(flags); ++i) {
 			result = kernel_open_rootfs_bydev(pnewly_created, flags[i]);
 			if (result) {
 				printk(FREESTR(KERN_NOTICE "[boot] Boot partition found the hard way. "

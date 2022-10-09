@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBC_USER_STDIO_C
 #define GUARD_LIBC_USER_STDIO_C 1
+#define _KOS_SOURCE 1
 
 #include "../api.h"
 /**/
@@ -27,9 +28,9 @@
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
-#include <hybrid/sequence/list.h>
 #include <hybrid/sched/atomic-lock.h>
 #include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/sequence/list.h>
 
 #include <bits/crt/io-file.h>
 #include <kos/syscalls.h>
@@ -41,6 +42,7 @@
 #include <limits.h>
 #include <malloc.h>
 #include <pwd.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1569,8 +1571,8 @@ file_evalmodes(char const *modes, oflag_t *poflags) {
 			char const *next;
 			next   = strchrnul(modes, ',');
 			optlen = (size_t)(next - modes);
-			if (optlen < COMPILER_LENOF(open_options[0].name)) {
-				for (i = 0; i < COMPILER_LENOF(open_options); ++i) {
+			if (optlen < lengthof(open_options[0].name)) {
+				for (i = 0; i < lengthof(open_options); ++i) {
 					if (open_options[i].name[optlen])
 						continue;
 					if (bcmp(open_options[i].name, modes, optlen, sizeof(char)) != 0)

@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_APPS_SYSTEM_TEST_TEST_RBTREE_C
 #define GUARD_APPS_SYSTEM_TEST_TEST_RBTREE_C 1
+#define _KOS_SOURCE 1
 #undef NDEBUG
 
 #include <hybrid/compiler.h>
@@ -29,6 +30,7 @@
 
 #include <assert.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 DECL_BEGIN
 
@@ -77,25 +79,25 @@ PRIVATE void create_node(unsigned int id, int key) {
 
 PRIVATE void create_nodes(unsigned int const order[10]) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(nodes); ++i) {
+	for (i = 0; i < lengthof(nodes); ++i) {
 		unsigned int id = order[i];
 		create_node(id, node_values[id]);
 	}
-	for (i = 0; i < COMPILER_LENOF(nodes); ++i)
+	for (i = 0; i < lengthof(nodes); ++i)
 		EQp(rb_locate(tree, node_values[i]), &nodes[i]);
 #ifndef TESTING_LEFT_LEANING
-	for (i = 1; i < COMPILER_LENOF(nodes) - 1; ++i) {
+	for (i = 1; i < lengthof(nodes) - 1; ++i) {
 		EQp(rb_prevnode(&nodes[i]), &nodes[i - 1]);
 		EQp(rb_nextnode(&nodes[i]), &nodes[i + 1]);
 	}
 	EQp(rb_prevnode(&nodes[0]), NULL);
-	EQp(rb_nextnode(&nodes[COMPILER_LENOF(nodes) - 1]), NULL);
+	EQp(rb_nextnode(&nodes[lengthof(nodes) - 1]), NULL);
 #endif /* !TESTING_LEFT_LEANING */
 }
 
 PRIVATE void pop_nodes(unsigned int const order[10]) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(nodes); ++i) {
+	for (i = 0; i < lengthof(nodes); ++i) {
 		unsigned int id = order[i];
 		EQp(rb_remove(&tree, node_values[id]), &nodes[id]);
 	}

@@ -34,6 +34,7 @@
 
 #include <assert.h>
 #include <inttypes.h>
+#include <stddef.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -44,7 +45,7 @@ PRIVATE ATTR_RETNONNULL NONNULL((1, 2)) struct nic_packet *KCALL
 nic_packetlist_append_inherit(struct nic_packetlist *__restrict self,
                               /*inherit(always)*/ REF struct nic_packet *__restrict packet)
 		THROWS(E_BADALLOC) {
-	size_t alloc = COMPILER_LENOF(self->npl_sta);
+	size_t alloc = lengthof(self->npl_sta);
 	if (self->npl_vec != self->npl_sta)
 		alloc = kmalloc_usable_size(self->npl_vec) / sizeof(REF struct nic_packet *);
 	assert(self->npl_cnt <= alloc);
@@ -99,7 +100,7 @@ NOTHROW(KCALL nic_packetlist_truncate)(struct nic_packetlist *__restrict self,
 	/* Set the new vector size. */
 	self->npl_cnt = new_count;
 	if (self->npl_vec != self->npl_sta) {
-		if (new_count <= COMPILER_LENOF(self->npl_sta)) {
+		if (new_count <= lengthof(self->npl_sta)) {
 			/* Switch over to the static vector. */
 			memcpy(self->npl_sta, self->npl_vec,
 			       new_count, sizeof(REF struct nic_packet *));
@@ -123,7 +124,7 @@ nic_packetlist_reserve(struct nic_packetlist *__restrict self,
 		THROWS(E_BADALLOC) {
 	size_t alloc;
 	REF struct nic_packet **new_vector;
-	if (total_count <= COMPILER_LENOF(self->npl_sta))
+	if (total_count <= lengthof(self->npl_sta))
 		return;
 	if (self->npl_vec == self->npl_sta) {
 		new_vector = (REF struct nic_packet **)kmalloc(total_count * sizeof(REF struct nic_packet *), GFP_NORMAL);

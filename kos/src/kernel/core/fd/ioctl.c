@@ -46,6 +46,7 @@
 
 #include <errno.h>
 #include <format-printer.h>
+#include <stddef.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -79,7 +80,7 @@ static iomode_t const directio_modes[] = {
 };
 
 PRIVATE WUNUSED iomode_t FCALL get_directio_mode(uintptr_t cmd) {
-	if (cmd >= COMPILER_LENOF(directio_modes)) {
+	if (cmd >= lengthof(directio_modes)) {
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_DIRECTIO_MODE,
 		      cmd);

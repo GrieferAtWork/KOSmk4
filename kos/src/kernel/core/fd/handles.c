@@ -80,7 +80,7 @@ handles_close_symbolic(fd_t fd, /*out*/ REF struct handle *__restrict ohand) {
 			/* Check if `oldpath' is still a drive root. */
 			bool isdrive = false;
 			unsigned int id;
-			for (id = 0; id < COMPILER_LENOF(myvfs->vf_drives); ++id) {
+			for (id = 0; id < lengthof(myvfs->vf_drives); ++id) {
 				if (myvfs->vf_drives[id] == oldpath) {
 					isdrive = true;
 					break;
@@ -400,7 +400,7 @@ handles_install_symbolic(fd_t fd, struct handle const *__restrict nhand,
 					/* Check if `oldpath' is still a drive root. */
 					bool isdrive = false;
 					unsigned int id;
-					for (id = 0; id < COMPILER_LENOF(myvfs->vf_drives); ++id) {
+					for (id = 0; id < lengthof(myvfs->vf_drives); ++id) {
 						if (myvfs->vf_drives[id] == oldpath) {
 							isdrive = true;
 							break;

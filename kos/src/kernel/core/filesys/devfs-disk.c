@@ -513,8 +513,8 @@ devfs_disk_v_lookup(struct fdirnode *__restrict UNUSED(self),
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	size_t lo, hi;
 #undef devdiskrules_default_size
-	DEFINE_PUBLIC_SYMBOL(devdiskrules_default_size, COMPILER_LENOF(devdiskrules_default_list), 0);
-#define devdiskrules_default_size COMPILER_LENOF(devdiskrules_default_list)
+	DEFINE_PUBLIC_SYMBOL(devdiskrules_default_size, lengthof(devdiskrules_default_list), 0);
+#define devdiskrules_default_size lengthof(devdiskrules_default_list)
 	devdiskrules_read();
 	RAII_FINALLY { devdiskrules_endread(); };
 	lo = 0;

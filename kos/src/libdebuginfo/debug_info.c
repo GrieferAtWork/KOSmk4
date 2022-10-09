@@ -43,6 +43,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <elf.h>
 #include <int128.h>
 #include <inttypes.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
@@ -52,9 +53,9 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <libdebuginfo/dwarf.h>
 #include <libunwind/dwarf.h>
 
-#include "dwarf.h"
 #include "debug_aranges.h"
 #include "debug_info.h"
+#include "dwarf.h"
 
 #ifdef __KERNEL__
 #include <debugger/config.h>
@@ -384,12 +385,12 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_lookup)(di_debuginfo_cu_abbrev_t *__res
 		if (!cache_pointer)
 			return false;
 		abbrev_loadcache(cache_pointer, result);
-		if (self->dua_cache_next >= COMPILER_LENOF(self->dua_stcache)) {
-			if (self->dua_cache_size >= COMPILER_LENOF(self->dua_stcache)) {
+		if (self->dua_cache_next >= lengthof(self->dua_stcache)) {
+			if (self->dua_cache_size >= lengthof(self->dua_stcache)) {
 				if (list != (di_debuginfo_cu_abbrev_cache_entry_t *)-1) {
 					/* Try to move into the territory of dynamically allocated caches. */
 					size_t initial_cache_size;
-					initial_cache_size = MIN_C(COMPILER_LENOF(self->dua_stcache) * 2,
+					initial_cache_size = MIN_C(lengthof(self->dua_stcache) * 2,
 					                           CONFIG_LIBDEBUGINFO_ABBREV_CACHE_MAXSIZE);
 					list = (di_debuginfo_cu_abbrev_cache_entry_t *)CACHE_CALLOC(initial_cache_size,
 					                                                            sizeof(di_debuginfo_cu_abbrev_cache_entry_t));
@@ -397,7 +398,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_lookup)(di_debuginfo_cu_abbrev_t *__res
 						memcpy(list, self->dua_stcache, sizeof(self->dua_stcache));
 						self->dua_cache_list = list;
 						self->dua_cache_size = initial_cache_size;
-						self->dua_cache_next = COMPILER_LENOF(self->dua_stcache);
+						self->dua_cache_next = lengthof(self->dua_stcache);
 						self->dua_stcache[0].ace_code = 0; /* Allow further re-sizing */
 						goto do_fill_dynamic_cache;
 					}

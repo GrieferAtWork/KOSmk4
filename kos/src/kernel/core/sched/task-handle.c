@@ -194,7 +194,7 @@ DEFINE_SYSCALL2(fd_t, pidfd_open,
 
 	/* Only allow pidfd_open() for process leaders
 	 * NOTE: Programs that don't want to rely on `KP_PIDFD_OPEN_THREAD' can do:
-	 *    >> char buf[COMPILER_LENOF("/proc/" PRIMAXd)];
+	 *    >> char buf[lengthof("/proc/" PRIMAXd)];
 	 *    >> sprintf(buf, "/proc/%d", tid);
 	 *    >> temp = open(buf, O_RDONLY);
 	 *    >> struct fdcast cast;

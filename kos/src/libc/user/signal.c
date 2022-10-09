@@ -468,7 +468,7 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(__STDC_INT_AS_UINT_T how,
 		if (how == SIG_BLOCK)
 			return 0;
 
-		for (i = 0; i < COMPILER_LENOF(me->pt_pmask.lpm_pmask.pm_pending.__val); ++i) {
+		for (i = 0; i < lengthof(me->pt_pmask.lpm_pmask.pm_pending.__val); ++i) {
 			ulongptr_t pending_word;
 			ulongptr_t newmask_word;
 			pending_word = ATOMIC_READ(me->pt_pmask.lpm_pmask.pm_pending.__val[i]);
@@ -604,7 +604,7 @@ NOTHROW_NCX(LIBCCALL libc_setsigmaskptr)(sigset_t *sigmaskptr)
 	/* Check previously pending signals became available */
 	if (me->pt_pmask.lpm_pmask.pm_flags & USERPROCMASK_FLAG_HASPENDING) {
 		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(me->pt_pmask.lpm_pmask.pm_pending.__val); ++i) {
+		for (i = 0; i < lengthof(me->pt_pmask.lpm_pmask.pm_pending.__val); ++i) {
 			ulongptr_t pending_word;
 			ulongptr_t newmask_word;
 			pending_word = ATOMIC_READ(me->pt_pmask.lpm_pmask.pm_pending.__val[i]);
@@ -729,7 +729,7 @@ NOTHROW(LIBCCALL libc_chkuserprocmask)(void)
 		sigset_t *sigmaskptr;
 		unsigned int i;
 		sigmaskptr = me->pt_pmask.lpm_pmask.pm_sigmask;
-		for (i = 0; i < COMPILER_LENOF(me->pt_pmask.lpm_pmask.pm_pending.__val); ++i) {
+		for (i = 0; i < lengthof(me->pt_pmask.lpm_pmask.pm_pending.__val); ++i) {
 			ulongptr_t pending_word;
 			ulongptr_t newmask_word;
 			pending_word = ATOMIC_READ(me->pt_pmask.lpm_pmask.pm_pending.__val[i]);

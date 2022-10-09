@@ -38,6 +38,7 @@
 #include <assert.h>
 #include <inttypes.h>
 #include <malloc.h>
+#include <stddef.h>
 #include <string.h>
 
 #include <libunwind/cfi.h>
@@ -149,7 +150,7 @@ for (local name: [
 #endif /* CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS */
 
 #define _convert_with_array(arr, index, error) \
-	((index) >= COMPILER_LENOF(arr) ? (error) : arr[index])
+	((index) >= lengthof(arr) ? (error) : arr[index])
 
 /* Load register index convert arrays. */
 

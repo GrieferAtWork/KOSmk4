@@ -1655,7 +1655,7 @@ NOTHROW(FCALL sig_multicompletion_disconnectall)(struct sig_multicompletion *__r
 	set = &self->sm_set;
 	do {
 		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(set->sms_routes); ++i) {
+		for (i = 0; i < lengthof(set->sms_routes); ++i) {
 #ifndef __OPTIMIZE_SIZE__
 			if (set->sms_routes[i].tc_stat != TASK_CONNECTION_STAT_BROADCAST)
 #endif /* !__OPTIMIZE_SIZE__ */
@@ -1673,7 +1673,7 @@ NOTHROW(FCALL sig_multicompletion_wasconnected)(struct sig_multicompletion const
 	set = &self->sm_set;
 	do {
 		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(set->sms_routes); ++i) {
+		for (i = 0; i < lengthof(set->sms_routes); ++i) {
 			if (sig_completion_wasconnected(&set->sms_routes[i]))
 				return true;
 		}
@@ -1703,7 +1703,7 @@ sig_multicompletion_alloc(struct sig_multicompletion *__restrict self,
 	unsigned int i;
 	set = &self->sm_set;
 	do {
-		for (i = 0; i < COMPILER_LENOF(set->sms_routes); ++i) {
+		for (i = 0; i < lengthof(set->sms_routes); ++i) {
 			result = &set->sms_routes[i];
 			if (result->tc_stat == TASK_CONNECTION_STAT_BROADCAST)
 				goto done; /* Unused completion entry. */
@@ -1715,7 +1715,7 @@ sig_multicompletion_alloc(struct sig_multicompletion *__restrict self,
 	 *       use of  by code  that may  be running  with preemption  disabled. */
 	set = (struct _sig_multicompletion_set *)kmalloc(sizeof(struct _sig_multicompletion_set),
 	                                                 GFP_LOCKED | GFP_PREFLT);
-	for (i = 0; i < COMPILER_LENOF(self->sm_set.sms_routes); ++i)
+	for (i = 0; i < lengthof(self->sm_set.sms_routes); ++i)
 		set->sms_routes[i].tc_stat = TASK_CONNECTION_STAT_BROADCAST;
 
 	/* Insert the set into the list of known sets. */
@@ -1738,7 +1738,7 @@ NOTHROW(FCALL sig_multicompletion_alloc_nx)(struct sig_multicompletion *__restri
 	unsigned int i;
 	set = &self->sm_set;
 	do {
-		for (i = 0; i < COMPILER_LENOF(set->sms_routes); ++i) {
+		for (i = 0; i < lengthof(set->sms_routes); ++i) {
 			result = &set->sms_routes[i];
 			if (result->tc_stat == TASK_CONNECTION_STAT_BROADCAST)
 				goto done; /* Unused completion entry. */
@@ -1752,7 +1752,7 @@ NOTHROW(FCALL sig_multicompletion_alloc_nx)(struct sig_multicompletion *__restri
 	                                                    GFP_LOCKED | GFP_PREFLT);
 	if unlikely(!set)
 		return NULL; /* Allocation failed. */
-	for (i = 0; i < COMPILER_LENOF(self->sm_set.sms_routes); ++i)
+	for (i = 0; i < lengthof(self->sm_set.sms_routes); ++i)
 		set->sms_routes[i].tc_stat = TASK_CONNECTION_STAT_BROADCAST;
 
 	/* Insert the set into the list of known sets. */

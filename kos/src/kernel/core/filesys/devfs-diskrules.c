@@ -174,10 +174,10 @@ devdisk_partuuid_byname(struct devdiskruledir *__restrict UNUSED(self),
 		char text[COMPILER_STRLEN("00000000-0000-0000-0000-000000000000")];
 		memcpy(text, info->flu_name, sizeof(text));
 		if (info->flu_flags & AT_DOSPATH) {
-			for (i = 0; i < COMPILER_LENOF(text); ++i)
+			for (i = 0; i < lengthof(text); ++i)
 				text[i] = tolower(text[i]);
 		}
-		for (i = 0; i < COMPILER_LENOF(text); ++i) {
+		for (i = 0; i < lengthof(text); ++i) {
 			if (!islower(text[i]) && !isdigit(text[i]) && text[i] != '-')
 				return NULL;
 		}
@@ -206,7 +206,7 @@ devdisk_partuuid_byname(struct devdiskruledir *__restrict UNUSED(self),
 		uint8_t partno;
 		*(char *)mempcpy(text, info->flu_name, sizeof(text) - sizeof(char)) = '\0';
 		if (info->flu_flags & AT_DOSPATH) {
-			for (i = 0; i < COMPILER_LENOF(text); ++i)
+			for (i = 0; i < lengthof(text); ++i)
 				text[i] = tolower(text[i]);
 		}
 		for (i = 0; i < COMPILER_STRLEN("00000000-00"); ++i) {

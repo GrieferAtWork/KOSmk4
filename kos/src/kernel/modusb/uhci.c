@@ -2958,8 +2958,8 @@ PRIVATE ATTR_FREETEXT ATTR_PURE WUNUSED unsigned int KCALL
 uhci_find_pci_bar_ex(struct pci_device const *__restrict dev,
                      unsigned int requirements) {
 	unsigned int result, i;
-	result = COMPILER_LENOF(dev->pd_regions);
-	for (i = 0; i < COMPILER_LENOF(dev->pd_regions); ++i) {
+	result = lengthof(dev->pd_regions);
+	for (i = 0; i < lengthof(dev->pd_regions); ++i) {
 		if (dev->pd_regions[i].pmr_size == 0)
 			continue;
 		if (!dev->pd_regions[i].pmr_is_IO &&
@@ -2972,10 +2972,10 @@ uhci_find_pci_bar_ex(struct pci_device const *__restrict dev,
 			result = i;
 			break;
 		}
-		if (result == COMPILER_LENOF(dev->pd_regions)) {
+		if (result == lengthof(dev->pd_regions)) {
 			result = i;
 		} else {
-			result = COMPILER_LENOF(dev->pd_regions) + 1;
+			result = lengthof(dev->pd_regions) + 1;
 			break;
 		}
 	}
@@ -2997,16 +2997,16 @@ uhci_find_pci_bar(struct pci_device const *__restrict dev) {
 	flags = UHC_BAR_CORRECT_UNIQUE;
 again:
 	result = uhci_find_pci_bar_ex(dev, flags | UHC_BAR_CORRECT_IOTYPE | UHC_BAR_CORRECT_IOSIZE);
-	if (result < COMPILER_LENOF(dev->pd_regions))
+	if (result < lengthof(dev->pd_regions))
 		goto done;
 	result = uhci_find_pci_bar_ex(dev, flags | UHC_BAR_CORRECT_IOSIZE);
-	if (result < COMPILER_LENOF(dev->pd_regions))
+	if (result < lengthof(dev->pd_regions))
 		goto done;
 	result = uhci_find_pci_bar_ex(dev, flags | UHC_BAR_CORRECT_IOTYPE);
-	if (result < COMPILER_LENOF(dev->pd_regions))
+	if (result < lengthof(dev->pd_regions))
 		goto done;
 	result = uhci_find_pci_bar_ex(dev, flags);
-	if (result < COMPILER_LENOF(dev->pd_regions))
+	if (result < lengthof(dev->pd_regions))
 		goto done;
 	if (flags & UHC_BAR_CORRECT_UNIQUE) {
 		flags = 0;
@@ -3043,7 +3043,7 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 		return;
 	}
 	pci_bar = uhci_find_pci_bar(dev);
-	if unlikely(pci_bar >= COMPILER_LENOF(dev->pd_regions)) {
+	if unlikely(pci_bar >= lengthof(dev->pd_regions)) {
 		printk(FREESTR(KERN_ERR "[usb][pci:%" PRIp32 "] Failed to determine uhci I/O bar\n"),
 		       dev->pd_addr);
 		return;

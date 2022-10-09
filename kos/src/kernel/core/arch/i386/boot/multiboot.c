@@ -321,7 +321,7 @@ NOTHROW(KCALL x86_load_mb1info)(PHYS u32 info) {
 			iter = (mb_memory_map_t *)((uintptr_t)iter + KERNEL_CORE_BASE);
 			end  = (mb_memory_map_t *)((uintptr_t)end + KERNEL_CORE_BASE);
 			for (; iter < end; iter = (mb_memory_map_t *)((uintptr_t)&iter->addr + iter->size)) {
-				if (iter->type >= COMPILER_LENOF(memtype_bios_matrix))
+				if (iter->type >= lengthof(memtype_bios_matrix))
 					iter->type = 0;
 				if (memtype_bios_matrix[iter->type] >= PMEMBANK_TYPE_COUNT)
 					continue;
@@ -458,7 +458,7 @@ NOTHROW(KCALL x86_load_mb2info)(PHYS u32 info) {
 					end  = (mb2_memory_map_t *)((byte_t *)TAG(mb2_tag_mmap) + TAG(mb2_tag_mmap)->size);
 					for (; iter < end;
 					     iter = (mb2_memory_map_t *)((byte_t *)iter + TAG(mb2_tag_mmap)->entry_size)) {
-						if (iter->type >= COMPILER_LENOF(memtype_bios_matrix))
+						if (iter->type >= lengthof(memtype_bios_matrix))
 							iter->type = 0;
 						if (memtype_bios_matrix[iter->type] >= PMEMBANK_TYPE_COUNT)
 							continue;

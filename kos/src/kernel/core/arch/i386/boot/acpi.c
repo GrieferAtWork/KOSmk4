@@ -207,7 +207,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 	}
 	printk(FREESTR(KERN_DEBUG "[acpi] RSDPDescriptor located at %p [oem: %.?q, rev: %" PRIu8 "]\n"),
 	       (uintptr_t)rsdp - KERNEL_CORE_BASE,
-	       COMPILER_LENOF(rsdp->rsdp_oemid),
+	       lengthof(rsdp->rsdp_oemid),
 	       rsdp->rsdp_oemid,
 	       rsdp->rsdp_revision);
 	acpi_mode = ACPI_MODE_RSDT;
@@ -272,11 +272,11 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 				                        "%" PRIpN(__SIZEOF_PHYSADDR_T__) "..."
 				                        "%" PRIpN(__SIZEOF_PHYSADDR_T__) ", "
 				                        "oem: %.?q, oemtab: %.?q]\n"),
-				       i, COMPILER_LENOF(header.rsdp_signature), header.rsdp_signature,
+				       i, lengthof(header.rsdp_signature), header.rsdp_signature,
 				       (physaddr_t)base,
 				       (physaddr_t)base + header.rsdp_length - 1,
-				       COMPILER_LENOF(header.rsdp_oemid), header.rsdp_oemid,
-				       COMPILER_LENOF(header.rsdp_oemtableid), header.rsdp_oemtableid);
+				       lengthof(header.rsdp_oemid), header.rsdp_oemid,
+				       lengthof(header.rsdp_oemtableid), header.rsdp_oemtableid);
 				bzero(header.rsdp_signature, sizeof(header.rsdp_signature));
 				copytophys(base + offsetof(ACPISDTHeader, rsdp_signature),
 				           &header.rsdp_signature[0], sizeof(header.rsdp_signature));
@@ -286,11 +286,11 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 			                         "%" PRIpN(__SIZEOF_PHYSADDR_T__) "..."
 			                         "%" PRIpN(__SIZEOF_PHYSADDR_T__) ", "
 			                         "oem: %.?q, oemtab: %.?q]\n"),
-			       i, COMPILER_LENOF(header.rsdp_signature), header.rsdp_signature,
+			       i, lengthof(header.rsdp_signature), header.rsdp_signature,
 			       (physaddr_t)base,
 			       (physaddr_t)base + header.rsdp_length - 1,
-			       COMPILER_LENOF(header.rsdp_oemid), header.rsdp_oemid,
-			       COMPILER_LENOF(header.rsdp_oemtableid), header.rsdp_oemtableid);
+			       lengthof(header.rsdp_oemid), header.rsdp_oemid,
+			       lengthof(header.rsdp_oemtableid), header.rsdp_oemtableid);
 			minfo_addbank(base, (physaddr_t)header.rsdp_length, PMEMBANK_TYPE_DEVICE);
 		}
 	}

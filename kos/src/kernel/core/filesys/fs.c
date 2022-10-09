@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_CORE_FILESYS_FS_C
 #define GUARD_KERNEL_CORE_FILESYS_FS_C 1
 #define _GNU_SOURCE 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -44,7 +45,7 @@ DECL_BEGIN
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL fs_destroy)(struct fs *__restrict self) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(self->fs_dcwd); ++i)
+	for (i = 0; i < lengthof(self->fs_dcwd); ++i)
 		xdecref_unlikely(self->fs_dcwd[i]);
 	decref_unlikely(self->fs_cwd);
 	decref_unlikely(self->fs_root);
@@ -146,7 +147,7 @@ fs_clone(struct fs *__restrict self, bool clone_vfs) THROWS(E_BADALLOC) {
 	/* Duplicate path references. */
 	result->fs_root = incref(self->fs_root);
 	result->fs_cwd  = incref(self->fs_cwd);
-	for (i = 0; i < COMPILER_LENOF(self->fs_dcwd); ++i)
+	for (i = 0; i < lengthof(self->fs_dcwd); ++i)
 		result->fs_dcwd[i] = xincref(self->fs_dcwd[i]);
 	fs_pathlock_endread(self);
 	result->fs_vfs    = incref(self->fs_vfs);

@@ -997,7 +997,7 @@ again_read_word:
 		if unlikely(e2.p_word & P32_PAGE_F4MIB)
 			continue; /* 4MiB page. */
 		pageptr = e2.p_word >> P32_PAGE_SHIFT;
-		if unlikely(free_count >= COMPILER_LENOF(free_pages)) {
+		if unlikely(free_count >= lengthof(free_pages)) {
 			/* Must  sync  memory  before  we  can  actually  delete   pages.
 			 * Otherwise, other CPUs  may still be  using the mappings  after
 			 * they've  already been re-designated as general-purpose RAM, at
@@ -1357,7 +1357,7 @@ p32_doenum(struct p32_enumdat *__restrict data,
 			dbg_color_t oldcolor;
 			unsigned int i;
 			oldcolor = dbg_getcolor();
-			for (i = 0; i < COMPILER_LENOF(masks); ++i) {
+			for (i = 0; i < lengthof(masks); ++i) {
 				if (mask & masks[i].mask) {
 					dbg_setcolor(oldcolor);
 					if (word & masks[i].mask)

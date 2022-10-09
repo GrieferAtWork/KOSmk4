@@ -1136,7 +1136,7 @@ procfs_kos_kstat_printer(pformatprinter printer, void *arg,
 		".debug_line_str", ".debug_rnglists", ".debug_loclists",
 	};
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(section_names); ++i) {
+	for (i = 0; i < lengthof(section_names); ++i) {
 		if (print_kernel_section_size(printer, arg, section_names[i]) < 0)
 			return;
 	}

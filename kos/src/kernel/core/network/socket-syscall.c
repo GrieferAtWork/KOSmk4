@@ -44,6 +44,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <malloca.h>
+#include <stddef.h>
 #include <string.h>
 
 #ifdef __ARCH_HAVE_COMPAT
@@ -1678,7 +1679,7 @@ DEFINE_SYSCALL2(syscall_slong_t, socketcall,
 	syscall_ulong_t argv[SYS_SOCKETCALL_ARGC_MAX];
 
 	/* Validate call bounds. */
-	if unlikely(call >= COMPILER_LENOF(sys_socketcall_argc))
+	if unlikely(call >= lengthof(sys_socketcall_argc))
 		goto err_badcall;
 
 	/* Load arguments. */
@@ -1887,7 +1888,7 @@ DEFINE_COMPAT_SYSCALL2(compat_syscall_slong_t, socketcall,
 	compat_syscall_ulong_t argv[SYS_SOCKETCALL_ARGC_MAX];
 
 	/* Validate call bounds. */
-	if unlikely(call >= COMPILER_LENOF(sys_socketcall_argc))
+	if unlikely(call >= lengthof(sys_socketcall_argc))
 		goto err_badcall;
 
 	/* Load arguments. */

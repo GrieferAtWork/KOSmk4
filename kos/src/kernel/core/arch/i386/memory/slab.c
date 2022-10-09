@@ -34,6 +34,8 @@
 #include <hybrid/byteswap.h>
 #include <hybrid/unaligned.h>
 
+#include <stddef.h>
+
 DECL_BEGIN
 
 PRIVATE ATTR_FREETEXT void KCALL
@@ -120,7 +122,7 @@ PRIVATE ATTR_FREERODATA struct slab_api const slab_api_functions[] = {
 
 PRIVATE ATTR_USED ATTR_FREETEXT void KCALL kernel_disable_slab(void) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(slab_api_functions); ++i) {
+	for (i = 0; i < lengthof(slab_api_functions); ++i) {
 		override_slab_malloc(slab_api_functions[i].p_slab_malloc);
 		override_slab_kmalloc(slab_api_functions[i].p_slab_kmalloc,
 		                      slab_api_functions[i].slab_size);

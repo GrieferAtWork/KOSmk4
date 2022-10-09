@@ -300,7 +300,7 @@ PRIVATE struct av_sections_lock av_sections_cache[8];
 
 DBG_FINI(finalize_av_symbol_cache) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(av_sections_cache); ++i) {
+	for (i = 0; i < lengthof(av_sections_cache); ++i) {
 		if (!av_sections_cache[i].sl_module)
 			continue;
 		debug_addr2line_sections_unlock(&av_sections_cache[i].sl_dlsect);
@@ -337,7 +337,7 @@ NOTHROW(FCALL av_lock_sections)(void const *symbol_addr) {
 	if unlikely(!ADDR_ISKERN(symbol_addr))
 		goto done;
 #endif /* CONFIG_KERNEL_DEBUGGER_ASMVIEW_ADDR2LINE_IS_KERNEL_ONLY */
-	for (i = 0; i < COMPILER_LENOF(av_sections_cache); ++i) {
+	for (i = 0; i < lengthof(av_sections_cache); ++i) {
 		if (!av_sections_cache[i].sl_module) {
 			if (!resent)
 				resent = &av_sections_cache[i];
@@ -408,7 +408,7 @@ NOTHROW(FCALL av_lookup_symbol)(void const *symbol_addr) {
 	if unlikely(!ADDR_ISKERN(symbol_addr))
 		goto done;
 #endif /* CONFIG_KERNEL_DEBUGGER_ASMVIEW_ADDR2LINE_IS_KERNEL_ONLY */
-	for (i = 0; i < COMPILER_LENOF(av_symbol_cache); ++i) {
+	for (i = 0; i < lengthof(av_symbol_cache); ++i) {
 		if (!av_symbol_cache[i].s_name) {
 			if (!resent)
 				resent = &av_symbol_cache[i];

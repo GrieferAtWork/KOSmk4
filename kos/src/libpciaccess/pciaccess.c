@@ -24,6 +24,7 @@ gcc_opt.append("-O3"); // Force-enable optimizations (mainly for faster pci.ids 
  */
 #ifndef GUARD_LIBPCIACCESS_PCIACCESS_C
 #define GUARD_LIBPCIACCESS_PCIACCESS_C 1
+#define _KOS_SOURCE 1
 #define LIBPHYS_WANT_PROTOTYPES
 
 #include "api.h"
@@ -470,7 +471,7 @@ NOTHROW(CC pci_device_destroy)(struct pci_device *__restrict self) {
 	unsigned int i;
 
 	/* Cleanup lazy mappings of physical memory. */
-	for (i = 0; i < COMPILER_LENOF(self->pd_regions); ++i) {
+	for (i = 0; i < lengthof(self->pd_regions); ++i) {
 		if (self->pd_regions[i].pmr_memory != NULL) {
 			munmapphys(self->pd_regions[i].pmr_memory,
 			           self->pd_regions[i].pmr_size);
@@ -980,7 +981,7 @@ NOTHROW(CC libpci_device_map_range)(struct pci_device *__restrict self, physaddr
 	if unlikely(!self)
 		return EFAULT;
 	for (i = 0;; ++i) {
-		if (i >= COMPILER_LENOF(self->pd_regions))
+		if (i >= lengthof(self->pd_regions))
 			return ENOENT;
 		if (self->pd_regions[i].pmr_is_IO)
 			continue;
@@ -1642,7 +1643,7 @@ NOTHROW(CC libpci_device_open_io)(struct pci_device *__restrict self, port_t bas
 	unsigned int i;
 	COMPILER_IMPURE();
 	for (i = 0;; ++i) {
-		if (i >= COMPILER_LENOF(self->pd_regions))
+		if (i >= lengthof(self->pd_regions))
 			return NULL;
 		if (!self->pd_regions[i].pmr_is_IO)
 			continue;

@@ -19,11 +19,13 @@
  */
 #ifndef GUARD_LIBC_USER_MBCTYPE_C
 #define GUARD_LIBC_USER_MBCTYPE_C 1
+#define _KOS_SOURCE 1
 
 #include "../api.h"
 /**/
 
 #include <format-printer.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <unicode.h>
 
@@ -177,7 +179,7 @@ NOTHROW_NCX(LIBCCALL libc__setmbcp)(int cp)
 		unsigned int ch;
 		unsigned char *mbctype   = _mbctype + 1;
 		unsigned char *mbcasemap = _mbcasemap;
-		char cpname[COMPILER_LENOF("cp" PRIMAXu)];
+		char cpname[lengthof("cp" PRIMAXu)];
 		struct iconv_decode decoder;
 		struct iconv_printer decode_input;
 		struct format_snprintf_data printer;
@@ -256,7 +258,7 @@ NOTHROW_NCX(LIBCCALL libc__mbctouni_l)(unsigned int ch,
                                        locale_t locale)
 /*[[[body:libc__mbctouni_l]]]*/
 {
-	char cpname[COMPILER_LENOF("cp" PRIMAXu)];
+	char cpname[lengthof("cp" PRIMAXu)];
 	struct iconv_decode decoder;
 	struct iconv_printer decode_input;
 	struct format_snprintf_data printer;
@@ -317,7 +319,7 @@ NOTHROW_NCX(LIBCCALL libc__unitombc_l)(char32_t ch,
                                        locale_t locale)
 /*[[[body:libc__unitombc_l]]]*/
 {
-	char cpname[COMPILER_LENOF("cp" PRIMAXu)];
+	char cpname[lengthof("cp" PRIMAXu)];
 	struct iconv_encode encoder;
 	struct iconv_printer encode_input;
 	struct format_snprintf_data printer;

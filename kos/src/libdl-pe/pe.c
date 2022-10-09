@@ -290,7 +290,7 @@ libpe_LoadLibraryInPath(char const *__restrict path, size_t pathlen,
 	*iter = '\0';
 	{
 		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(lib_replacements); ++i) {
+		for (i = 0; i < lengthof(lib_replacements); ++i) {
 			if (strcmp(usedname, lib_replacements[i].lr_orig) != 0)
 				continue;
 			strcpy(usedname, lib_replacements[i].lr_repl);

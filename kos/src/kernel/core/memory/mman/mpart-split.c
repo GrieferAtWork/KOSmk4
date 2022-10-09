@@ -129,7 +129,7 @@ NOTHROW(FCALL trydecref_mman_of_mnode)(struct mnode *__restrict self) {
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_foreach_mmans_incref)(struct mpart *__restrict self) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		struct mnode *node;
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link)
 			tryincref_mman_of_mnode(node);
@@ -142,7 +142,7 @@ NOTHROW(FCALL mpart_foreach_mmans_incref)(struct mpart *__restrict self) {
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_foreach_mmans_decref)(struct mpart *__restrict self) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		struct mnode *node;
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link)
 			trydecref_mman_of_mnode(node);

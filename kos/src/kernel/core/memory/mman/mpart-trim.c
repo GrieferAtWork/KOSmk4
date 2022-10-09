@@ -326,7 +326,7 @@ NOTHROW(FCALL bitmovedown)(mpart_blkst_word_t *dst_bitset, size_t dst_index,
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_load_all_mhint_nodes)(struct mpart *__restrict self) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		struct mnode *node;
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
 			if unlikely(wasdestroyed(node->mn_mman))
@@ -453,7 +453,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_lstrip_nodes)(struct mpart *__restrict self,
                                   PAGEDIR_PAGEALIGNED mpart_reladdr_t num_bytes) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		struct mnode *node;
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
 			if unlikely(wasdestroyed(node->mn_mman))
@@ -766,7 +766,7 @@ again:
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) bool
 NOTHROW(FCALL mpart_has_mlock_nodes)(struct mpart const *__restrict self) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		struct mnode *node;
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
 			if (node->mn_flags & MNODE_F_MLOCK)
@@ -922,7 +922,7 @@ NOTHROW(FCALL mpart_async_split_before)(struct mpart *__restrict self,
 	{
 		unsigned int i;
 		lopart->mp_refcnt = 0;
-		for (i = 0; i < COMPILER_LENOF(hipart->_mp_nodlsts); ++i) {
+		for (i = 0; i < lengthof(hipart->_mp_nodlsts); ++i) {
 			struct mnode *node;
 			LIST_INIT(&lopart->_mp_nodlsts[i]);
 again_enum_hipart_nodlst:
@@ -1026,7 +1026,7 @@ again_enum_hipart_nodlst:
 	 * in addition  to dropping  references  from _all_  transferred  mmans. */
 	{
 		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(lopart->_mp_nodlsts); ++i) {
+		for (i = 0; i < lengthof(lopart->_mp_nodlsts); ++i) {
 			struct mnode *node;
 			LIST_FOREACH (node, &lopart->_mp_nodlsts[i], mn_link) {
 				struct mman *mm = node->mn_mman;
@@ -1391,7 +1391,7 @@ PRIVATE NOBLOCK NONNULL((1)) bool
 NOTHROW(FCALL mpart_foreach_mmans_incref)(struct mpart *__restrict self) {
 	bool result = false;
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		struct mnode *node;
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link)
 			result |= tryincref(node->mn_mman);
@@ -1403,7 +1403,7 @@ NOTHROW(FCALL mpart_foreach_mmans_incref)(struct mpart *__restrict self) {
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) void
 NOTHROW(FCALL mpart_decref_all_mmans)(struct mpart const *__restrict self) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		struct mnode *node;
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
 			if likely(!wasdestroyed(node->mn_mman))
@@ -1421,7 +1421,7 @@ NOTHROW(FCALL mpart_mappedby_mman_before)(struct mpart const *__restrict self,
                                           struct mnode const *stop,
                                           struct mman const *__restrict mm) {
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		struct mnode *node;
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
 			if (node == stop)
@@ -1443,7 +1443,7 @@ NOTHROW(FCALL mpart_unlock_all_mmans)(struct mpart const *__restrict self,
                                       struct mnode const *stop DFL(NULL)) {
 	struct mnode *node;
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
 			if (node == stop)
 				return; /* Stop on this node! */
@@ -1464,7 +1464,7 @@ PRIVATE NOBLOCK WUNUSED NONNULL((1)) struct mman *
 NOTHROW(FCALL mpart_lock_all_mmans)(struct mpart const *__restrict self) {
 	struct mnode *node;
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(self->_mp_nodlsts); ++i) {
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
 		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
 			if unlikely(wasdestroyed(node->mn_mman))
 				continue; /* Skip destroyed mmans */

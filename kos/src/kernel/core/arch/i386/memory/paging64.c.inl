@@ -2146,7 +2146,7 @@ NOTHROW(FCALL p64_pagedir_unmap_userspace)(void) {
 	u64 free_pages[64];
 #define FREEPAGE(pageptr)                                                        \
 	do {                                                                         \
-		if unlikely(free_count >= COMPILER_LENOF(free_pages)) {                  \
+		if unlikely(free_count >= lengthof(free_pages)) {                        \
 			/* Must  sync  memory  before  we  can  actually  delete  pages.     \
 			 * Otherwise, other CPUs may still  be using the mappings  after     \
 			 * they've already been re-designated as general-purpose RAM, at     \
@@ -2479,13 +2479,13 @@ NOTHROW(KCALL x86_initialize_paging)(void) {
 		used_pxx_page_fglobal = 0;
 	if (!HAVE_EXECUTE_DISABLE) {
 		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(p64_pageprot_table); ++i)
+		for (i = 0; i < lengthof(p64_pageprot_table); ++i)
 			p64_pageprot_table[i] &= ~P64_PAGE_FNOEXEC;
 	}
 	if (!HAVE_PAGE_ATTRIBUTE_TABLE) {
 		/* Disable PAT bits. */
 		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(p64_pageprot_table); ++i)
+		for (i = 0; i < lengthof(p64_pageprot_table); ++i)
 			p64_pageprot_table[i] &= ~(P64_PAGE_FPWT | P64_PAGE_FPCD | P64_PAGE_FPAT_4KIB);
 	}
 
@@ -2796,7 +2796,7 @@ p64_doenum(struct p64_enumdat *__restrict data,
 			unsigned int i;
 			oldcolor = dbg_getcolor();
 			word ^= P64_PAGE_FNOEXEC;
-			for (i = 0; i < COMPILER_LENOF(masks); ++i) {
+			for (i = 0; i < lengthof(masks); ++i) {
 				if (mask & masks[i].mask) {
 					dbg_setcolor(oldcolor);
 					if (word & masks[i].mask)

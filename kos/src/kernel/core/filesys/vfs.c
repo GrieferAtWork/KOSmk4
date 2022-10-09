@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_CORE_FILESYS_VFS_C
 #define GUARD_KERNEL_CORE_FILESYS_VFS_C 1
 #define _GNU_SOURCE 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -41,7 +42,7 @@ NOTHROW(FCALL vfs_destroy)(struct vfs *__restrict self) {
 	/* Decref DOS drive roots. */
 	{
 		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(self->vf_drives); ++i)
+		for (i = 0; i < lengthof(self->vf_drives); ++i)
 			xdecref(self->vf_drives[i]);
 	}
 

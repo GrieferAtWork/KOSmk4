@@ -39,6 +39,7 @@
 #include <assert.h>
 #include <format-printer.h> /* FORMATPRINTER_CC */
 #include <inttypes.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -605,7 +606,7 @@ PRIVATE NOBLOCK ATTR_CONST WUNUSED uint8_t
 NOTHROW(CC colorindex)(uint8_t r, uint8_t g, uint8_t b) {
 	uint8_t i, winner_index = 0;
 	uint16_t winner_distance = (uint16_t)-1;
-	for (i = 0; i < (uint8_t)COMPILER_LENOF(ansipal); ++i) {
+	for (i = 0; i < (uint8_t)lengthof(ansipal); ++i) {
 		uint16_t distance;
 		distance = color_distance(r, g, b,
 		                          ansipal[i][0],
@@ -1570,7 +1571,7 @@ do_ident_DA(struct ansitty *__restrict self) {
 /* DECRQPSR: \e[{what}$w */
 PRIVATE ATTR_NOINLINE NONNULL((1)) bool CC
 ansi_request_presentation_state_report(struct ansitty *__restrict self, unsigned int what) {
-	char response[COMPILER_LENOF(CC_SESC "P1$u"
+	char response[lengthof(CC_SESC "P1$u"
 	                             PRIMAXu ";" PRIMAXu ";1;"
 	                             "X;\x40;\x40;0;0;\x40;"
 	                             "B0BB"
@@ -2807,7 +2808,7 @@ done_insert_ansitty_flag_hedit:
 			case 6:
 				/* DSR */
 				if (self->at_ops.ato_output) {
-					char buf[COMPILER_LENOF(CC_SESC "[" PRIMAXu ";" PRIMAXu "R")];
+					char buf[lengthof(CC_SESC "[" PRIMAXu ";" PRIMAXu "R")];
 					size_t len;
 					ansitty_coord_t xy[2];
 					GETCURSOR(xy);
@@ -2908,7 +2909,7 @@ done_insert_ansitty_flag_hedit:
 					break;
 				}
 				{
-					char buf[COMPILER_LENOF(CC_SESC "[" PRIMAXu ";" PRIMAXu "$y")];
+					char buf[lengthof(CC_SESC "[" PRIMAXu ";" PRIMAXu "$y")];
 					size_t len = sprintf(buf, CC_SESC "[%u;%u$y", name, result);
 					OUTPUT(buf, len);
 				}
@@ -3695,7 +3696,7 @@ setcp_USASCII:
 	case STATE_CSI: {
 		size_t len;
 		len = self->at_esclen;
-		if unlikely(len >= COMPILER_LENOF(self->at_escape))
+		if unlikely(len >= lengthof(self->at_escape))
 			RACE(set_text_and_done);
 		if (ch >= ANSI_LOW && ch <= ANSI_HIGH) {
 			/* Process escape argument. */
@@ -3714,8 +3715,8 @@ do_process_csi:
 			break;
 		self->at_escape[len++] = (byte_t)ch;
 		self->at_esclen = len;
-		if unlikely(len >= COMPILER_LENOF(self->at_escape)) {
-			assert(len == COMPILER_LENOF(self->at_escape));
+		if unlikely(len >= lengthof(self->at_escape)) {
+			assert(len == lengthof(self->at_escape));
 			goto do_process_csi;
 		}
 	}	break;
@@ -3732,7 +3733,7 @@ do_process_csi:
 	case STATE_APC_C2: {
 		size_t len;
 		len = self->at_esclen;
-		if unlikely(len >= COMPILER_LENOF(self->at_escape))
+		if unlikely(len >= lengthof(self->at_escape))
 			RACE(set_text_and_done);
 		if (((byte_t)ch == (STATE_OSC_ISC2(state)
 		                    ? 0x9c      /* 0xc2 0x9c -> U+009C (ST: String Terminator) */
@@ -3761,11 +3762,11 @@ do_process_csi:
 		}
 		self->at_escape[len++] = CC_ESC;
 		self->at_esclen = len;
-		if unlikely(len >= COMPILER_LENOF(self->at_escape))
+		if unlikely(len >= lengthof(self->at_escape))
 			goto do_process_string_command;
 		self->at_escape[len++] = (byte_t)ch;
 		self->at_esclen = len;
-		if unlikely(len >= COMPILER_LENOF(self->at_escape))
+		if unlikely(len >= lengthof(self->at_escape))
 			goto do_process_string_command;
 		self->at_state = STATE_STRCMD_DEL_ESC(state);
 		break;
@@ -3776,7 +3777,7 @@ do_process_csi:
 	case STATE_PM:
 	case STATE_APC:
 		len = self->at_esclen;
-		if unlikely(len >= COMPILER_LENOF(self->at_escape))
+		if unlikely(len >= lengthof(self->at_escape))
 			RACE(set_text_and_done);
 		if ((byte_t)ch == CC_BEL) {
 do_process_string_command:
@@ -3802,8 +3803,8 @@ do_process_string_command:
 		}
 		self->at_escape[len++] = (byte_t)ch;
 		self->at_esclen = len;
-		if unlikely(len >= COMPILER_LENOF(self->at_escape)) {
-			assert(len == COMPILER_LENOF(self->at_escape));
+		if unlikely(len >= lengthof(self->at_escape)) {
+			assert(len == lengthof(self->at_escape));
 			goto do_process_string_command;
 		}
 	}	break;
@@ -3824,7 +3825,7 @@ do_process_string_command:
 
 	case STATE_ESC_6:
 		if (ch == 'n') {
-			char buf[COMPILER_LENOF(CC_SESC PRIMAXu ";" PRIMAXu "R")];
+			char buf[lengthof(CC_SESC PRIMAXu ";" PRIMAXu "R")];
 			ansitty_coord_t xy[2];
 			size_t len;
 			/* VT100: getcursor DSR */

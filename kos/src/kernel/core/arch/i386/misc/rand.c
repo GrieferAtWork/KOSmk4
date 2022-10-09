@@ -23,10 +23,14 @@
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
-#include <kernel/rand.h>
+
 #include <kernel/printk.h>
+#include <kernel/rand.h>
 #include <sched/x86/cmos.h>
+
 #include <sys/io.h>
+
+#include <stddef.h>
 
 DECL_BEGIN
 
@@ -39,17 +43,17 @@ PRIVATE ATTR_FREERODATA u8 const cmos_registers[] = {
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_rand_entropy)(void) {
 	unsigned int i;
-	u8 entropy[COMPILER_LENOF(cmos_registers)];
+	u8 entropy[lengthof(cmos_registers)];
 	u32 boot_seed = 0;
 
 	/* Gather entropy from CMOS registers. */
-	for (i = 0; i < COMPILER_LENOF(cmos_registers); ++i) {
+	for (i = 0; i < lengthof(cmos_registers); ++i) {
 		entropy[i] = cmos_rd(cmos_registers[i]);
 	}
 
 	/* Combine entropy to generate our boot seed. */
-	for (i = 0; i < COMPILER_LENOF(entropy); ++i) {
-		boot_seed <<= (32 / COMPILER_LENOF(entropy));
+	for (i = 0; i < lengthof(entropy); ++i) {
+		boot_seed <<= (32 / lengthof(entropy));
 		boot_seed ^= entropy[i];
 	}
 	/*boot_seed = 0xAB091919;*/

@@ -20,6 +20,7 @@
 #ifndef GUARD_LIBC_LIBC_ASSERT_C
 #define GUARD_LIBC_LIBC_ASSERT_C 1
 #define _KOS_KERNEL_SOURCE 1
+#define _KOS_SOURCE 1
 #define _UTF_SOURCE 1
 
 /* Keep this one the first */
@@ -39,6 +40,7 @@
 #include <ctype.h>
 #include <format-printer.h>
 #include <signal.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -210,7 +212,7 @@ NOTHROW(FCALL libc_assertion_failure_core)(struct assert_args *__restrict args) 
 		vsnprintf(message_buf, sizeof(message_buf),
 		          args->aa_format, vargs);
 		va_end(vargs);
-		message_buf[COMPILER_LENOF(message_buf) - 1] = 0;
+		message_buf[lengthof(message_buf) - 1] = 0;
 		if (*message_buf) {
 			size_t msglen;
 			msglen = strlen(message_buf);

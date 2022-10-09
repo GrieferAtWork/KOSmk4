@@ -80,7 +80,7 @@ NOTHROW(CC regno_i386_to_amd64)(unwind_regno_t regno) {
 	unwind_regno_t result;
 	PRIVATE DEFINE_386_to_amd64(i386_to_amd64);
 	result = CFI_X86_64_UNWIND_REGISTER_COUNT;
-	if likely(regno < COMPILER_LENOF(i386_to_amd64))
+	if likely(regno < lengthof(i386_to_amd64))
 		result = i386_to_amd64[regno];
 	return result;
 }

@@ -496,7 +496,7 @@ NOTHROW(FCALL system_cc_vfs_mounts)(struct vfs *__restrict self,
 PRIVATE ATTR_NOINLINE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(FCALL system_cc_vfs_drives)(struct vfs *__restrict self,
                                     struct ccinfo *__restrict info) {
-	REF struct path *paths[COMPILER_LENOF(self->vf_drives)];
+	REF struct path *paths[lengthof(self->vf_drives)];
 	unsigned int i;
 	if (!vfs_driveslock_tryread(self)) {
 		if (ccinfo_noblock(info))
@@ -504,15 +504,15 @@ NOTHROW(FCALL system_cc_vfs_drives)(struct vfs *__restrict self,
 		if (!vfs_driveslock_read_nx(self))
 			return;
 	}
-	for (i = 0; i < COMPILER_LENOF(self->vf_drives); ++i)
+	for (i = 0; i < lengthof(self->vf_drives); ++i)
 		paths[i] = xincref(self->vf_drives[i]);
 	vfs_driveslock_endread(self);
-	for (i = 0; i < COMPILER_LENOF(self->vf_drives); ++i) {
+	for (i = 0; i < lengthof(self->vf_drives); ++i) {
 		if (!paths[i])
 			continue;
 		system_cc_perpath_inherit_reference(paths[i], info);
 		if (ccinfo_isdone(info)) {
-			for (; i < COMPILER_LENOF(self->vf_drives); ++i) {
+			for (; i < lengthof(self->vf_drives); ++i) {
 				if (!paths[i])
 					continue;
 				if (ATOMIC_DECFETCH(paths[i]->p_refcnt) == 0) {
@@ -558,7 +558,7 @@ NOTHROW(FCALL system_cc_pervfs)(struct vfs *__restrict self,
 PRIVATE ATTR_NOINLINE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1, 2)) void
 NOTHROW(FCALL system_cc_fs_paths)(struct fs *__restrict self,
                                   struct ccinfo *__restrict info) {
-	REF struct path *paths[2 + COMPILER_LENOF(self->fs_dcwd)];
+	REF struct path *paths[2 + lengthof(self->fs_dcwd)];
 	unsigned int i;
 	if (!fs_pathlock_tryread(self)) {
 		if (ccinfo_noblock(info))
@@ -568,15 +568,15 @@ NOTHROW(FCALL system_cc_fs_paths)(struct fs *__restrict self,
 	}
 	paths[0] = xincref(self->fs_root);
 	paths[1] = xincref(self->fs_cwd);
-	for (i = 0; i < COMPILER_LENOF(self->fs_dcwd); ++i)
+	for (i = 0; i < lengthof(self->fs_dcwd); ++i)
 		paths[2 + i] = xincref(self->fs_dcwd[i]);
 	fs_pathlock_endread(self);
-	for (i = 0; i < COMPILER_LENOF(paths); ++i) {
+	for (i = 0; i < lengthof(paths); ++i) {
 		if (!paths[i])
 			continue;
 		system_cc_perpath_inherit_reference(paths[i], info);
 		if (ccinfo_isdone(info)) {
-			for (; i < COMPILER_LENOF(paths); ++i) {
+			for (; i < lengthof(paths); ++i) {
 				if (!paths[i])
 					continue;
 				if (ATOMIC_DECFETCH(paths[i]->p_refcnt) == 0) {

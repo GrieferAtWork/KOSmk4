@@ -43,6 +43,7 @@
 #include <asm/intrin.h>
 
 #include <assert.h>
+#include <stddef.h>
 #include <string.h>
 
 
@@ -218,7 +219,7 @@ NOTHROW(KCALL kernel_initialize_paging_p32)(void) {
 	if (!HAVE_PAGE_ATTRIBUTE_TABLE) {
 		/* Disable PAT bits. */
 		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(p32_pageperm_matrix_); ++i)
+		for (i = 0; i < lengthof(p32_pageperm_matrix_); ++i)
 			p32_pageperm_matrix_[i] &= ~(P32_PAGE_FPWT | P32_PAGE_FPCD | P32_PAGE_FPAT_4KIB);
 	}
 }
@@ -236,7 +237,7 @@ NOTHROW(KCALL kernel_initialize_paging_pae)(void) {
 	if __untraced(!HAVE_EXECUTE_DISABLE) {
 		unsigned int i;
 		/* Disable support for execute-disable. */
-		for (i = 0; i < COMPILER_LENOF(pae_pageprot_table_); ++i)
+		for (i = 0; i < lengthof(pae_pageprot_table_); ++i)
 			pae_pageprot_table_[i] &= ~PAE_PAGE_FNOEXEC;
 	} else {
 		u64 msr;
@@ -248,7 +249,7 @@ NOTHROW(KCALL kernel_initialize_paging_pae)(void) {
 	if (!HAVE_PAGE_ATTRIBUTE_TABLE) {
 		/* Disable PAT bits. */
 		unsigned int i;
-		for (i = 0; i < COMPILER_LENOF(pae_pageprot_table_); ++i)
+		for (i = 0; i < lengthof(pae_pageprot_table_); ++i)
 			pae_pageprot_table_[i] &= ~(PAE_PAGE_FPWT | PAE_PAGE_FPCD | PAE_PAGE_FPAT_4KIB);
 	}
 }

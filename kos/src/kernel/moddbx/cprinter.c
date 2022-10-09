@@ -123,7 +123,7 @@ print_typeflags(struct cprinter const *__restrict printer,
                 uintptr_t typeflags, bool include_leading_space) {
 	ssize_t temp, result = 0;
 	unsigned int i;
-	for (i = 0; i < COMPILER_LENOF(c_typeflags); ++i) {
+	for (i = 0; i < lengthof(c_typeflags); ++i) {
 		if (typeflags & c_typeflags[i].tf_flag) {
 			if (include_leading_space)
 				PRINT(" ");
@@ -205,7 +205,7 @@ again:
 			} else {
 				/* Select names of known types. */
 				unsigned int i;
-				for (i = 0; i < COMPILER_LENOF(builtin_type_names); ++i) {
+				for (i = 0; i < lengthof(builtin_type_names); ++i) {
 					if (typ == builtin_type_names[i].btn_type) {
 						type_name = builtin_type_names[i].btn_name;
 						goto got_type_name;
@@ -1708,7 +1708,7 @@ ctype_printvalue(struct ctyperef const *__restrict self,
 			} else {
 				/* Fallback: Print an unsigned integer value, either as decimal, or as hex. */
 				size_t decimal_len;
-				char decimal_repr[COMPILER_LENOF(PRIMAXdMAX)];
+				char decimal_repr[lengthof(PRIMAXdMAX)];
 				decimal_len = sprintf(decimal_repr, "%" PRIdMAX, value.u);
 				if (value.u < 255 || use_decimal_representation(decimal_repr, decimal_len)) {
 					DO((*P_PRINTER)(P_ARG, decimal_repr, decimal_len));

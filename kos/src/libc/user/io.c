@@ -19,6 +19,7 @@
  */
 #ifndef GUARD_LIBC_USER_IO_C
 #define GUARD_LIBC_USER_IO_C 1
+#define _KOS_SOURCE 1
 
 #include "../api.h"
 /**/
@@ -33,12 +34,13 @@
 #include <fcntl.h>
 #include <io.h>
 #include <malloc.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 
-#include "../libc/errno.h"
 #include "../libc/compat.h"
+#include "../libc/errno.h"
 #include "io.h"
 
 DECL_BEGIN
@@ -130,9 +132,9 @@ libc_dfind_read32(struct dfind *__restrict self,
 	finddata->time_write  = (typeof(finddata->time_write))st.st_mtime32;
 	finddata->size        = (typeof(finddata->size))st.st_size;
 	memcpy(finddata->name, ent->d_name,
-	       MIN(ent->d_namlen, COMPILER_LENOF(finddata->name)),
+	       MIN(ent->d_namlen, lengthof(finddata->name)),
 	       sizeof(char));
-	finddata->name[COMPILER_LENOF(finddata->name) - 1] = 0;
+	finddata->name[lengthof(finddata->name) - 1] = 0;
 	return 0;
 err:
 	return -1;
@@ -155,9 +157,9 @@ libc_dfind_read32i64(struct dfind *__restrict self,
 	finddata->time_write  = (typeof(finddata->time_write))st.st_mtime32;
 	finddata->size        = (typeof(finddata->size))st.st_size64;
 	memcpy(finddata->name, ent->d_name,
-	       MIN(ent->d_namlen, COMPILER_LENOF(finddata->name)),
+	       MIN(ent->d_namlen, lengthof(finddata->name)),
 	       sizeof(char));
-	finddata->name[COMPILER_LENOF(finddata->name) - 1] = 0;
+	finddata->name[lengthof(finddata->name) - 1] = 0;
 	return 0;
 err:
 	return -1;
@@ -180,9 +182,9 @@ libc_dfind_read64(struct dfind *__restrict self,
 	finddata->time_write  = (typeof(finddata->time_write))st.st_mtime64;
 	finddata->size        = (typeof(finddata->size))st.st_size64;
 	memcpy(finddata->name, ent->d_name,
-	       MIN(ent->d_namlen, COMPILER_LENOF(finddata->name)),
+	       MIN(ent->d_namlen, lengthof(finddata->name)),
 	       sizeof(char));
-	finddata->name[COMPILER_LENOF(finddata->name) - 1] = 0;
+	finddata->name[lengthof(finddata->name) - 1] = 0;
 	return 0;
 err:
 	return -1;

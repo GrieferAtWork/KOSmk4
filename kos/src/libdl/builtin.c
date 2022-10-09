@@ -1767,11 +1767,11 @@ NOTHROW_NCX(CC get_aux_section_def)(USER char const *name,
 	if (flags & DLLOCKSECTION_FINDEX) {
 		/* Special case: section index. */
 		uintptr_t index = (uintptr_t)name;
-		if (index >= COMPILER_LENOF(aux_sections))
+		if (index >= lengthof(aux_sections))
 			return (unsigned int)-1;
 		return (unsigned int)index;
 	}
-	for (i = 0; i < COMPILER_LENOF(aux_sections); ++i) {
+	for (i = 0; i < lengthof(aux_sections); ++i) {
 		if (strcmp(aux_sections[i].asd_name, name) == 0)
 			return i;
 	}
@@ -1870,7 +1870,7 @@ PRIVATE ATTR_CONST WUNUSED NONNULL((1, 2)) char const *
 NOTHROW(CC libdl_dlsectionname_aux)(USER DlSection *UNUSED(self),
                                     USER DlModule *UNUSED(mod),
                                     size_t index) {
-	assert(index < COMPILER_LENOF(aux_sections));
+	assert(index < lengthof(aux_sections));
 	return aux_sections[index].asd_name;
 }
 
@@ -3101,7 +3101,7 @@ DlModule_IteratePhdr(DlModule *__restrict self,
 		ph[0].p_flags   = PF_X | PF_W | PF_R;
 		ph[0].p_align   = 1;
 		info.dlpi_phdr  = ph;
-		info.dlpi_phnum = COMPILER_LENOF(ph);
+		info.dlpi_phnum = lengthof(ph);
 		result = (*callback)(&info, sizeof(info), arg);
 	}
 	return result;
@@ -3414,7 +3414,7 @@ NOTHROW_NCX(CC dlsym_builtin)(USER char const *name) THROWS(E_SEGFAULT) {
 	size_t lo, hi;
 	/* Do a binary search across `dlsym_builtin_table' */
 	lo = 0;
-	hi = COMPILER_LENOF(dlsym_builtin_table);
+	hi = lengthof(dlsym_builtin_table);
 	while (lo < hi) {
 		int cmp;
 		size_t index;

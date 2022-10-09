@@ -48,6 +48,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
+#include <stddef.h>
 #include <string.h>
 #include <unicode.h>
 
@@ -557,8 +558,8 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct kbddev *__restrict self,
 	assert(kbddev_map_writing(self));
 	key &= ~(KEY_FREPEAT);
 	result = keymap_translate_buf(&self->kd_map, key, mod, (char *)self->kd_pend,
-	                              COMPILER_LENOF(self->kd_pend));
-	if unlikely(result > COMPILER_LENOF(self->kd_pend))
+	                              lengthof(self->kd_pend));
+	if unlikely(result > lengthof(self->kd_pend))
 		goto nope; /* XXX: Better handling? */
 	if (!result) {
 		/* No layout-specific mapping given for this key.
@@ -609,10 +610,10 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct kbddev *__restrict self,
 			result = keymap_translate_buf(&self->kd_map, key,
 			                              mod & ~(KEYMOD_CTRL | KEYMOD_ALT),
 			                              (char *)&self->kd_pend[1],
-			                              COMPILER_LENOF(self->kd_pend) - 1);
+			                              lengthof(self->kd_pend) - 1);
 			if (result == 0)
 				goto done;
-			if unlikely(result > (COMPILER_LENOF(self->kd_pend) - 1))
+			if unlikely(result > (lengthof(self->kd_pend) - 1))
 				goto nope;
 			/* Prefix with 0x1b (ESC; aka. `\e') */
 			self->kd_pend[0] = (char)0x1b;
@@ -651,7 +652,7 @@ NOTHROW(KCALL keyboard_device_encode_cp)(struct kbddev *__restrict self,
 	REF struct mkttydev *tty;
 	struct ansittydev *atty;
 	char const *reader, *end;
-	char newbuf[COMPILER_LENOF(self->kd_pend)];
+	char newbuf[lengthof(self->kd_pend)];
 	size_t newlen;
 	tty = awref_get(&self->kd_tty);
 	if (!tty)
@@ -683,13 +684,13 @@ NOTHROW(KCALL keyboard_device_encode_cp)(struct kbddev *__restrict self,
 		encoded_length = memlen(tempbuf, 0, encoded_length); /* Stop on the first NUL-character */
 		if (!encoded_length) /* Fallback: Anything that can't be encoded must be discarded */
 			continue;
-		if (newlen + encoded_length >= COMPILER_LENOF(self->kd_pend))
+		if (newlen + encoded_length >= lengthof(self->kd_pend))
 			break; /* Sequence too long (drop trailing characters...) */
 		/* Append the newly encoded `tempbuf' */
 		memcpy(newbuf + newlen, tempbuf, encoded_length, sizeof(char));
 		newlen += encoded_length;
 	}
-	assert(newlen <= COMPILER_LENOF(self->kd_pend) - 1);
+	assert(newlen <= lengthof(self->kd_pend) - 1);
 	/* Apply the new pending character buffer. */
 	memcpy(self->kd_pend, newbuf, newlen, sizeof(char));
 	len = newlen;
@@ -1224,7 +1225,7 @@ continue_copy_keymap:
 		ch = *(char *)arg;
 		COMPILER_READ_BARRIER();
 		kbddev_map_write(me);
-		if (me->kd_pendsz < COMPILER_LENOF(me->kd_pend)) {
+		if (me->kd_pendsz < lengthof(me->kd_pend)) {
 			me->kd_pend[me->kd_pendsz] = ch;
 			++me->kd_pendsz;
 			kbddev_map_endwrite(me);
@@ -1238,18 +1239,18 @@ continue_copy_keymap:
 
 	case KBD_IOC_PUTSTR: {
 		struct kbd_string data;
-		byte_t new_buf[COMPILER_LENOF(me->kd_pend)];
+		byte_t new_buf[lengthof(me->kd_pend)];
 		size_t avail;
 		validate_readable(arg, sizeof(struct kbd_string));
 		COMPILER_READ_BARRIER();
 		memcpy(&data, arg, sizeof(struct kbd_string));
 		COMPILER_READ_BARRIER();
 		validate_readable(data.ks_text, data.ks_size);
-		if (data.ks_size > COMPILER_LENOF(me->kd_pend))
-			data.ks_size = COMPILER_LENOF(me->kd_pend);
+		if (data.ks_size > lengthof(me->kd_pend))
+			data.ks_size = lengthof(me->kd_pend);
 		memcpy(new_buf, data.ks_text, data.ks_size);
 		kbddev_map_write(me);
-		avail = COMPILER_LENOF(me->kd_pend) - me->kd_pendsz;
+		avail = lengthof(me->kd_pend) - me->kd_pendsz;
 		if (avail > data.ks_size)
 			avail = data.ks_size;
 		memcpy(&me->kd_pend[me->kd_pendsz], new_buf, avail);
