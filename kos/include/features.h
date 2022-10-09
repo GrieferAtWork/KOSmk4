@@ -294,10 +294,20 @@
 #endif /* _XOPEN_SOURCE < 200809L */
 #endif /* _NETBSD_SOURCE */
 
+#ifdef _MINIX_SOURCE
+#undef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE 1
+#undef _BSD_SOURCE
+#define _BSD_SOURCE 1
+#undef __USE_MINIX
+#define __USE_MINIX 1
+#endif /* _MINIX_SOURCE */
+
 /* Make available some BSD-specific extensions, such as `cfmakesane(3)' */
 #ifdef _BSD_SOURCE
 #undef _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE 1
+#undef __USE_BSD
 #define __USE_BSD 1
 /* BSD  name (not used in headers, but may be checked by
  * applications as a sort-of ACK that the system headers
@@ -755,6 +765,7 @@
 #undef __USE_OPENBSD
 #undef __USE_NETBSD
 #undef __USE_SOLARIS
+#undef __USE_MINIX
 
 #define __USE_KOS 1
 #define __USE_STRING_BWLQ 1
@@ -795,6 +806,7 @@
 #define __USE_OPENBSD 1
 #define __USE_NETBSD 1
 #define __USE_SOLARIS 1
+#define __USE_MINIX 1
 #endif /* _EVERY_SOURCE */
 
 /* You may `#define _DOS_SOURCE_CLEAN 1' alongside `_DOS_SOURCE' in order
