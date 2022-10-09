@@ -39,9 +39,6 @@
 #define __STDC_IEC_559__ 1
 #endif /* !__GCC_IEC_559 */
 
-#if 1
-#define __STDC_NO_COMPLEX__ 1 /* KOS doesn't implement <complex.h> (yet?) */
-#else
 #ifdef __GCC_IEC_559_COMPLEX
 #if (__GCC_IEC_559_COMPLEX + 0) > 0
 #define __STDC_IEC_559_COMPLEX__ 1
@@ -49,10 +46,10 @@
 #else /* __GCC_IEC_559_COMPLEX */
 #define __STDC_IEC_559_COMPLEX__ 1
 #endif /* !__GCC_IEC_559_COMPLEX */
-#endif
 
 #define __STDC_ISO_10646__ 201505L /* KOS's wchar_t uses unicode */
 
+/* #undef __STDC_NO_COMPLEX__ */ /* We do have <complex.h> support! */
 /* #undef __STDC_NO_THREADS__ */ /* We do have <threads.h> support! */
 
 
