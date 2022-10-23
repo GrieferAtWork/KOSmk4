@@ -91,6 +91,7 @@ NOTHROW(FCALL mpart_mmap_node_p)(struct mpart const *__restrict self,
 		/* Select permissions on a per-page basis! */
 		part        = PAGESIZE;
 		is_writable = mpart_iswritable(self, offset, PAGESIZE, node);
+
 		/* TODO: This can be done _much_ more efficiently:
 		 *   #1: Add a general rule that mem-part node-lists should be sorted by `mn_partoff'
 		 *   #2: Iterate the mem-part's list of nodes only once here when determining which

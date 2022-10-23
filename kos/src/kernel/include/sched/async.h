@@ -344,7 +344,14 @@ DATDEF struct lockop_slist /*  */ async_all_lops; /* Pending lock operations for
 #define async_all_available()  atomic_lock_available(&async_all_lock)
 #define async_all_waitfor()    atomic_lock_waitfor(&async_all_lock)
 #define async_all_waitfor_nx() atomic_lock_waitfor_nx(&async_all_lock)
+#define _async_all_incsize()   (void)++async_all_size
+#define _async_all_decsize()   (void)--async_all_size
+#define async_all_getsize()    async_all_size
 
+/* Insert/remove   `self'   to/from    `async_all_list'.
+ * The caller must be holding a lock to `async_all_lock' */
+#define async_all_insert(self) (_async_all_incsize(), LIST_INSERT_HEAD(&async_all_list, self, a_all))
+#define async_all_remove(self) (LIST_REMOVE(self, a_all), _async_all_decsize())
 
 
 

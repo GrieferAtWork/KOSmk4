@@ -286,7 +286,7 @@ struct linux_default_stdio_file {
 	FILE   ldsf_stdio;                                          /* The actual file object */
 #elif __SIZEOF_POINTER__ == 8
 	FILE   ldsf_stdio;                                          /* The actual file object */
-	byte_t ldsf_zero[sizeof(struct IO_FILE_84) - sizeof(FILE)]; /* Pad with 0-byts. */
+	byte_t ldsf_zero[sizeof(struct IO_FILE_84) - sizeof(FILE)]; /* Pad with 0-bytes. */
 #else /* __SIZEOF_POINTER__ == ... */
 #error "Unsupported sizeof(void *)"
 #endif /* __SIZEOF_POINTER__ != ... */

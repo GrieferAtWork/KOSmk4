@@ -156,6 +156,7 @@ mman_memset(struct mman *__restrict self,
 	else {
 		size_t tempbuf_size;
 		byte_t *tempbuf;
+
 		/* Copy via an intermediate buffer. */
 		tempbuf_size = get_stack_avail() / 2;
 		if (tempbuf_size > num_bytes)

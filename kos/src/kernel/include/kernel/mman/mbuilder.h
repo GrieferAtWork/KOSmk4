@@ -625,8 +625,8 @@ NOTHROW(FCALL mman_findunmapped_mbuilder)(struct mman const *__restrict self, ui
  * @param: flags:     Set of `MAP_GROWSDOWN | MAP_GROWSUP | MAP_32BIT | MAP_STACK | MAP_NOASLR'
  *                    Additionally,   `MAP_FIXED'   and  `MAP_FIXED_NOREPLACE'   are  accepted.
  *                    Unknown flags are silently ignored.
- * @return: PAGEDIR_PAGEALIGNED * : The load address addend to-be added to mappings.
- *                                  Pass   this   value   to   `mman_map_mbuilder()'
+ * @return: PAGEDIR_PAGEALIGNED * : The load address to-be added to mappings.
+ *                                  Pass this value to  `mman_map_mbuilder()'
  * @return: MAP_FAILED:             Locks had to be released, but another attempt might succeed.
  *                                  Reacquire  all  required  locks,  and  re-attempt  the call.
  * @throws: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to locate a suitably large address

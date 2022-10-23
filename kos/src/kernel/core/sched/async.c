@@ -142,8 +142,7 @@ again:
 	                        _ASYNC_ST_DELALL,
 	                        _ASYNC_ST_INIT_STOP))
 		goto again;
-	LIST_REMOVE(me, a_all); /* Actually remove from the list. */
-	--async_all_size;
+	async_all_remove(me); /* Actually remove from the list. */
 
 	/* The reference from `async_all_list'. Note that even after this
 	 * we're still holding another reference  to `me' that was  given
@@ -198,6 +197,7 @@ NOTHROW(FCALL async_completion)(struct sig_completion *__restrict self,
                                 struct sig_completion_context *__restrict context,
                                 void *buf, size_t bufsize) {
 	struct async *me;
+
 	/*sig_multicompletion_trydisconnectall(self);*/ /* TODO: Optimization */
 	me = container_of(sig_multicompletion_controller(self),
 	                  struct async, a_comp);
@@ -205,6 +205,7 @@ NOTHROW(FCALL async_completion)(struct sig_completion *__restrict self,
 		return sizeof(REF struct async *);
 	if unlikely(!tryincref(me))
 		return 0; /* Shouldn't really happen, but (might?) due to race conditions? */
+
 	/* Do all of the actual work in a post-completion callback. */
 	*(REF struct async **)buf = me; /* Inherit reference */
 	context->scc_post         = &async_postcompletion;
@@ -290,7 +291,7 @@ PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) struct async_thread_data *
 NOTHROW(FCALL async_thread_controller_findthread)(struct async_thread_controller *__restrict self,
                                                   struct task *__restrict thread) {
 	size_t i;
-	BSEARCH(i, self->atc_threads, self->atc_count, ->atd_thread, thread) {
+	BSEARCH (i, self->atc_threads, self->atc_count, ->atd_thread, thread) {
 		return self->atc_threads[i];
 	}
 	return NULL;
@@ -438,6 +439,7 @@ do_handle_timeout:
 						st = _ASYNC_ST_SLEEPING;
 						goto do_delete_job;
 					}
+
 					/* Keep the async job, and handle a regular trigger event.
 					 * If the status  still indicates SLEEPING,  change it  to
 					 * indicate a normal trigger event instead. */
@@ -508,6 +510,7 @@ again_rd_stat:
 				except_printf("canceling async job %p", job);
 			}
 		}
+
 		/* Get rid of this job */
 do_delete_job:
 		if (async_all_tryacquire()) {
@@ -516,8 +519,7 @@ do_delete_job:
 				async_all_release();
 				goto again_rd_stat;
 			}
-			LIST_REMOVE(job, a_all);
-			--async_all_size;
+			async_all_remove(job);
 			async_all_release();
 			decref_nokill(job); /* The reference from `async_all_list' */
 			decref(job);        /* The reference from `async_ready' (returned by `async_popready') */
@@ -558,6 +560,7 @@ again_do_work:
 		if (status != ASYNC_RESUME) {
 			struct aio_handle *aio;
 			bool did_set_stop;
+
 			/* Complete the async job. */
 			aio = ATOMIC_XCH(job->a_aio, NULL);
 
@@ -576,6 +579,7 @@ again_do_work:
 					goto decref_job_and_again;
 				goto again_rd_stat;
 			}
+
 			/* Non-cancel completion. */
 			if (aio) {
 				PREEMPTION_DISABLE();
@@ -611,9 +615,11 @@ again_rd_stat_before_reconnect:
 					async_tmo_release();
 					goto again_rd_stat_before_reconnect;
 				}
+
 				/* Insert `job' into the async-tmo-queue at the correct position. */
 				async_tmo_insert(job, timeout); /* Inherit reference */
 				async_tmo_release();
+
 				/* Directly jump back to the start and don't decref() job,
 				 * since  we've gifted out  reference to the timeout-list! */
 				goto again;
@@ -792,8 +798,7 @@ again:
 	}
 	if (!ATOMIC_CMPXCH_WEAK(me->a_stat, st, _ASYNC_ST_TRIGGERED))
 		goto again;
-	++async_all_size;
-	LIST_INSERT_HEAD(&async_all_list, me, a_all);
+	async_all_insert(me);
 
 	/* Use a post-lockop to add `self' to the ready list, as well
 	 * as  to  initialize  `a_comp'  and  send  `async_ready_sig' */
@@ -827,8 +832,7 @@ again:
 				goto again;
 			}
 			ATOMIC_ADD(self->a_refcnt, 2); /* +1: async_all_list, +1: async_ready */
-			++async_all_size;
-			LIST_INSERT_HEAD(&async_all_list, self, a_all);
+			async_all_insert(self);
 			async_all_release();
 
 			/* wake-up one of the async worker-threads. */
@@ -925,6 +929,7 @@ again_rd_stat:
 		                        _ASYNC_ST_TRIGGERED_STOP))
 			goto again_rd_stat;
 	}
+
 	/* Use a post-lockop to add the job to the ready-list. */
 	me->_a_tmopostlockop.plo_func = &async_addready_postlop;
 	return &me->_a_tmopostlockop;
@@ -948,6 +953,7 @@ PUBLIC NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct async *
 NOTHROW(FCALL async_cancel)(struct async *__restrict self) {
 	unsigned int st;
 	struct aio_handle *aio;
+
 	/* Deal with AIO cancel-completion */
 	aio = ATOMIC_XCH(self->a_aio, NULL);
 	if (aio != NULL)
@@ -973,8 +979,7 @@ again:
 				async_all_release();
 				goto again;
 			}
-			LIST_REMOVE(self, a_all); /* Remove from the all-list */
-			--async_all_size;
+			async_all_remove(self); /* Remove from the all-list */
 			async_all_release();
 
 			/* Disconnect completion signals & finalize the controller. */
@@ -1014,8 +1019,7 @@ do_async_cancel:
 						async_tmo_reap();
 						goto again;
 					}
-					LIST_REMOVE(self, a_all); /* Remove from the all-list */
-					--async_all_size;
+					async_all_remove(self); /* Remove from the all-list */
 					async_all_release_f();
 					LIST_REMOVE(self, a_tmolnk); /* Remove from the timeout list */
 					_async_tmo_release();
@@ -1043,6 +1047,7 @@ do_async_cancel:
 			                        _ASYNC_ST_READY_TMO,
 			                        _ASYNC_ST_DELTMO))
 				goto again;
+
 			/* Enqueue a lock-operation to remove `self' from the timeout list. */
 			incref(self);
 			self->_a_tmolockop.lo_func = &async_deltmo_lop;

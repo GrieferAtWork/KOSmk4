@@ -148,6 +148,7 @@ NOTHROW(FCALL mcorepage_allused)(struct mcorepage const *__restrict self) {
 		if (self->mcp_used[i] != (uintptr_t)-1)
 			return false; /* Still contains free slots! */
 	}
+	return true;
 #endif /* MCOREPAGE_BITSET_LENGTH != 1 */
 #else /* LAST_BITSET_WORD_PARTS == 0 */
 #if MCOREPAGE_BITSET_LENGTH == 1
@@ -158,6 +159,7 @@ NOTHROW(FCALL mcorepage_allused)(struct mcorepage const *__restrict self) {
 		if (self->mcp_used[i] != (uintptr_t)-1)
 			return false; /* Still contains free slots! */
 	}
+
 	/* Check the incomplete last word of the bitset for fully-in-use. */
 	return (self->mcp_used[MCOREPAGE_BITSET_LENGTH - 1] &
 	        LAST_BITSET_WORD_ALLUSED) == LAST_BITSET_WORD_ALLUSED;
@@ -175,8 +177,9 @@ NOTHROW(FCALL mcorepage_allfree)(struct mcorepage const *__restrict self) {
 	unsigned int i;
 	for (i = 0; i < MCOREPAGE_BITSET_LENGTH; ++i) {
 		if (self->mcp_used[i] != 0)
-			return false; /* Still contains free slots! */
+			return false; /* Still contains used slots! */
 	}
+	return true;
 #endif /* MCOREPAGE_BITSET_LENGTH != 1 */
 #else /* LAST_BITSET_WORD_PARTS == 0 */
 #if MCOREPAGE_BITSET_LENGTH == 1
@@ -185,8 +188,9 @@ NOTHROW(FCALL mcorepage_allfree)(struct mcorepage const *__restrict self) {
 	unsigned int i;
 	for (i = 0; i < (MCOREPAGE_BITSET_LENGTH - 1); ++i) {
 		if (self->mcp_used[i] != 0)
-			return false; /* Still contains free slots! */
+			return false; /* Still contains used slots! */
 	}
+
 	/* Check the incomplete last word of the bitset for fully-in-use. */
 	return (self->mcp_used[MCOREPAGE_BITSET_LENGTH - 1] &
 	        LAST_BITSET_WORD_ALLUSED) == 0;
@@ -252,7 +256,7 @@ NOTHROW(FCALL mcoreheap_alloc_impl)(void) {
 	index  = mcorepage_findfree(page);
 	result = &page->mcp_part[index];
 
-	/* Mark the chosed part as in-use. */
+	/* Mark the chosen part as in-use. */
 	INUSE_BITSET_TURNON(page, index);
 	--mcoreheap_freecount;
 
@@ -269,7 +273,6 @@ NOTHROW(FCALL mcoreheap_alloc_impl)(void) {
 /* Initialize and register the given `page' for dynamic allocations. */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mcoreheap_provide_page)(struct mcorepage *__restrict page) {
-
 	/* Initialize the in-use bitset to all-free. */
 	bzero(page->mcp_used, sizeof(page->mcp_used));
 
@@ -291,7 +294,7 @@ NOTHROW(FCALL is_coreheap_node)(struct mnode const *__restrict node) {
 		goto nope;
 
 	/* Make sure that `part' isn't externally visible.
-	 * This is requried since we don't intend on locking the part,
+	 * This is required since we don't intend on locking the part,
 	 * meaning that we have to be  certain that holding a lock  to
 	 * the kernel mman  will be  enough to keep  anyone else  from
 	 * seeing the part in question. */
@@ -350,8 +353,9 @@ NOTHROW(FCALL mcoreheap_replicate_extend_below)(struct mnode *__restrict node) {
 	ppage = part->mp_mem.mc_start - 1;
 	if (page_malloc_at(ppage) != PAGE_MALLOC_AT_SUCCESS)
 		goto fail;
-#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+
 	/* If necessary, make sure that the new page is prepared! */
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	if (!pagedir_prepareone(node->mn_minaddr - PAGESIZE)) {
 		page_ccfree(part->mp_mem.mc_start - 1, 1);
 		goto fail;
@@ -385,8 +389,9 @@ NOTHROW(FCALL mcoreheap_replicate_extend_above)(struct mnode *__restrict node) {
 	ppage = part->mp_mem.mc_start + part->mp_mem.mc_size;
 	if (page_malloc_at(ppage) != PAGE_MALLOC_AT_SUCCESS)
 		goto fail;
-#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+
 	/* If necessary, make sure that the new page is prepared! */
+#ifdef ARCH_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	if (!pagedir_prepareone(node->mn_maxaddr + 1)) {
 		page_ccfree(part->mp_mem.mc_start - 1, 1);
 		goto fail;
@@ -420,6 +425,7 @@ NOTHROW(FCALL mcoreheap_try_merge_nodes)(struct mnode *__restrict lo,
 	struct mpart *lopart, *hipart;
 	lopart = lo->mn_part;
 	hipart = hi->mn_part;
+
 	/* Try to merge memory. */
 	if ((lopart->mp_mem.mc_start + lopart->mp_mem.mc_size) == hipart->mp_mem.mc_start) {
 		/* Simple (but rather unlikely) case: the lo- and hi-parts are physically consecutive */

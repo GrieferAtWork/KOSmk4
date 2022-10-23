@@ -72,6 +72,7 @@ mpart_ll_allocmem(struct mpart *__restrict self,
 		self->mp_mem.mc_size  = res_pages;
 		goto done;
 	}
+
 	/* Must allocate pages into a page-vector. */
 	cv.ms_c = 1;
 	TRY {
@@ -96,6 +97,7 @@ mpart_ll_allocmem(struct mpart *__restrict self,
 		if unlikely(pp == PHYSPAGE_INVALID)
 			goto err_nophys_v;
 		assert(res_pages <= total_pages);
+
 		/* Check if the vector has to be extended. */
 		if ((cv.ms_c + 1) * sizeof(struct mchunk) > kmalloc_usable_size(cv.ms_v)) {
 			size_t new_alloc = cv.ms_c * 2;
@@ -121,6 +123,7 @@ mpart_ll_allocmem(struct mpart *__restrict self,
 			}
 			cv.ms_v = vec;
 		}
+
 		/* Append the new mem-chunk to the vector. */
 		cv.ms_v[cv.ms_c].mc_start = pp;
 		cv.ms_v[cv.ms_c].mc_size  = res_pages;
@@ -234,7 +237,6 @@ mpart_ll_populate(struct mpart *__restrict self,
 	/* Setup AIO */
 	aio_multihandle_generic_init(&hand);
 	TRY {
-
 		/* Figure out how we need to do initialization. */
 		if (self->mp_state == MPART_ST_MEM) {
 			(*mo_loadblocks)(file, fpos,

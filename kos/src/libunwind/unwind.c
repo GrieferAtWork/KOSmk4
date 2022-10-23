@@ -400,8 +400,10 @@ no_dl_info:
 		} else {
 			result = fde_locate_pc(pc, (byte_t const *)obj->ro_eh_frame, (byte_t const *)-1, bases);
 		}
-		if (result != NULL)
+		if (result != NULL) {
+			register_frame_aux_endread();
 			return result;
+		}
 	}
 	register_frame_aux_endread();
 
@@ -478,7 +480,8 @@ NOTHROW_NCX(CC libuw_unwind_fde_find_new)(void *dlmod, void const *absolute_pc,
 	result->f_bases.ub_tbase = NULL; /* Lazily loaded */
 	result->f_bases.ub_dbase = NULL; /* Lazily loaded */
 	error = libuw_unwind_fde_scan((byte_t const *)eh_frame_sect->ds_data,
-	                              (byte_t const *)eh_frame_sect->ds_data + eh_frame_sect->ds_size,
+	                              (byte_t const *)eh_frame_sect->ds_data +
+	                              /*           */ eh_frame_sect->ds_size,
 	                              absolute_pc, result, sizeof(void *));
 	dlunlocksection(eh_frame_sect);
 
@@ -502,6 +505,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_find)(void const *absolute_pc,
 	struct fde_cache_entry *fce;
 	void *dlmod;
 	unsigned int error;
+
 	/* Try to search the FDE-cache.
 	 * NOTE: To prevent deadlocks upon re-entrance, only
 	 *       _try_ to acquire locks here, and ignore the
@@ -515,6 +519,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_find)(void const *absolute_pc,
 				result->f_sigframe &= ~0x80; /* 0x80 is (ab-)used as R/B-bit */
 				return UNWIND_SUCCESS;
 			}
+
 			/* Module  was  deleted in  the  mean time...
 			 * Try to get rid of the stale cache entry... */
 			if (fde_cache_tryupgrade()) {
@@ -578,6 +583,7 @@ destroy_new_fce:
 	}
 	if unlikely(!fde_cache_tree_tryinsert(&fde_cache, fce)) {
 		struct fde_cache_entry *existing_fce;
+
 		/* Try to remove the existing cache entry. */
 		existing_fce = fde_cache_tree_rremove(&fde_cache, result->f_pcstart,
 		                                      (byte_t *)result->f_pcend - 1);

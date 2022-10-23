@@ -798,7 +798,7 @@ __IMPDEF void *(__DLFCN_VCC dlauxctrl)(void *__handle,
                                              * If  the  number  of  symbols  is  unknown,  `(size_t)-1'  written  to  `*pcount'. */
 #define DLAUXCTRL_ELF_GET_DYNSTR     0xef05 /* Returns the module's dynamic string table (`char const *') */
 #define DLAUXCTRL_ELF_GET_SHSTRTAB   0xef06 /* Returns the module's section header name string table (`char const *') */
-#define DLAUXCTRL_ELF_GET_LSYMBOL    0xef07 /* [ElfW(Sym) const *me(char const *name)] Return a pointer to the named local symbol. */
+#define DLAUXCTRL_ELF_GET_LSYMBOL    0xef07 /* [ElfW(Sym) const *dlauxctrl(..., char const *name)] Return a pointer to the named local symbol. */
 #endif /* __CRT_HAVE_dlauxctrl */
 
 #endif /* __USE_KOS */

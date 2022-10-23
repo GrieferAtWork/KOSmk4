@@ -86,7 +86,7 @@ DECL_BEGIN
  *   be done if there no unsynced changes (changes may still exist if the associated
  *   file doesn't support `mo_saveblocks').
  * - If the state can be set to `MPART_ST_VOID', make the change before also clearing
- *   `MPART_F_BLKST_INL',  as  dealloc `mp_blkst_ptr'  (if appropriate),  and setting
+ *   `MPART_F_BLKST_INL', and dealloc  `mp_blkst_ptr' (if  appropriate), and  setting
  *   `mp_blkst_ptr = NULL'.
  * - If the state cannot be set to `MPART_ST_VOID', consider offloading the part into
  *   swap  memory (for this purpose there should be  a flag that gets set by the orig

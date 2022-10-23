@@ -165,6 +165,7 @@ NOTHROW(FCALL get_segment_start_byflags)(struct userelf_module const *__restrict
 	void const *result;
 	ElfW(Half) i;
 	COMPILER_IMPURE();
+
 	/* Search for the lowest program header with the correct flags. */
 	for (result = (void const *)-1, i = 0; i < self->um_phnum; ++i) {
 		uintptr_t hdraddr;
@@ -216,6 +217,7 @@ NOTHROW(FCALL uem_get_dbase_386)(struct userelf_module *__restrict self) {
 #else /* UM_HYBRID */
 #define um_phdrs32 um_phdrs
 #endif /* !UM_HYBRID */
+
 	/* Special case for data-base on i386:
 	 * For reference, see glibc: `/sysdeps/generic/unwind-dw2-fde-glibc.c' */
 	uintptr_t result;
@@ -299,6 +301,7 @@ NOTHROW(FCALL uems_destroy)(struct userelf_module_section *__restrict self) {
 		                              (byte_t *)UM_any(mod->um_shdrs)) /
 		                     UM_sizeof(mod, UM_ElfW_Shdr));
 		assert(myindex < mod->um_shnum);
+
 		/* Replace a pointer to `self' with `NULL'.
 		 * There is the (very) unlikely case that someone reloaded
 		 * the section before we were able to delete out  pointer,
@@ -329,6 +332,7 @@ uems_getname(struct userelf_module_section *__restrict self) {
 	mod = (struct userelf_module *)self->ms_module;
 	assert(!wasdestroyed(mod));
 	stroffset = UM_field(mod, *self->ums_shdr, .sh_name);
+
 	/* Verify that the string table offset is in-bounds. */
 	if unlikely(stroffset >= UM_field(mod, mod->um_shdrs, [mod->um_shstrndx].sh_size))
 		return NULL;
@@ -442,6 +446,7 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 			ssize_t error;
 			struct zlib_reader reader;
 			zlib_reader_init(&reader, src_data + sizeof_cdhr, src_size);
+
 			/* Decompress data. */
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 			if (dbg_active) {
@@ -481,6 +486,7 @@ uems_getaddr_inflate(struct userelf_module_section *__restrict self,
 			zlib_reader_fini(&reader);
 			if unlikely(error < 0)
 				THROW(E_INVALID_ARGUMENT);
+
 			/* clear all trailing data that could not be read. */
 			if (dst_size > (size_t)error) {
 				bzero((byte_t *)dst_data + (size_t)error,
@@ -817,6 +823,7 @@ again:
 			if (module_relative_addr > sh_addr + sh_size)
 				continue;
 		}
+
 		/* Found it! (fill in section information for our caller) */
 		info->msi_name    = NULL;
 		info->msi_addr    = sh_addr;
@@ -898,6 +905,7 @@ NOTHROW(FCALL system_cc_mman_module_cache)(struct mman *__restrict self,
 		REF struct userelf_module *mod;
 		mod = LIST_FIRST(&FORMMAN(self, thismman_uemc));
 		LIST_UNBIND(mod, um_cache);
+
 		/* Drop  references  originally   held  by  the   cache.
 		 * Modules that end up dying are added to the dead-list,
 		 * where they will be destroyed once we've released  our
@@ -1182,6 +1190,7 @@ something_changed:
 			}
 			if unlikely(ATOMIC_READ(part->mp_file) != file)
 				goto something_changed;
+
 			/* Calculate the current file-position mapped at `node_addr',
 			 * and  make sure that it doesn't differ from what our caller
 			 * has told us to base our assumption upon.
@@ -1356,6 +1365,7 @@ set_node_nullptr:
 				assert(minaddr < maxaddr);
 again_locate_minmax:
 				mnode_tree_minmaxlocate(self->mm_mappings, minaddr, maxaddr, &mima);
+
 				/* If necessary, split larger nodes at program header bounds. */
 				TRY {
 					if unlikely(minaddr > (byte_t *)mnode_getminaddr(mima.mm_min)) {
@@ -1598,6 +1608,7 @@ uem_create_system_rtld(struct mman *__restrict self,
 			phsize = UM_sizeof_r(sizeof_pointer, UM_ElfW_Phdr) * RTLD_PHDR_COUNT;
 			if (OVERFLOW_UADD(phoff, phsize, &phend) || phend > file_size)
 				goto not_an_elf_file;
+
 			/* Allocate+load the Elf program header vector! */
 			if (mfile_read(file, UM_any(phdrv), phsize, phoff) < phsize)
 				goto not_an_elf_file;
@@ -1683,6 +1694,7 @@ uem_create_system_rtld(struct mman *__restrict self,
 				kfree(result);
 				RETHROW();
 			}
+
 			/* Copy program header information. */
 			memcpy(UM_any(result->um_phdrs), UM_any(phdrv), RTLD_PHDR_COUNT,
 			       UM_sizeof_r(sizeof_pointer, UM_ElfW_Phdr));
@@ -1744,7 +1756,6 @@ something_changed:
 				mman_mappings_minmaxlocate(self, result->md_loadmin,
 				                           result->md_loadmax, &mima);
 				if likely(mima.mm_min != NULL) {
-
 					/* Check if there is already a module mapping here... */
 					for (node = mima.mm_min;;) {
 						if unlikely(node->mn_module != NULL) {
@@ -2033,6 +2044,7 @@ uem_trycreate(struct mman *__restrict self,
 				continue; /* Not an immediate neighbor. */
 			minaddr = mnode_getminaddr(node);
 			maxaddr = mnode_getmaxaddr(node);
+
 			/* Don't let the recursive call bounce back the call to our
 			 * original node. - Do this by disallowing the inner callee
 			 * from checking our original node for adjacency. */
@@ -2061,6 +2073,7 @@ uem_trycreate(struct mman *__restrict self,
 				return UEM_TRYCREATE_UNLOCKED;
 			}
 		}
+
 		/* Special case: if this node was originally created by
 		 * a file mapping, but has since been unshared (as  the
 		 * result of a write), then the backing file will  have
@@ -2105,6 +2118,7 @@ uem_trycreate(struct mman *__restrict self,
 					}
 					minaddr = mnode_getminaddr(node);
 					maxaddr = mnode_getmaxaddr(node);
+
 					/* Try to create a module for `neighbor' */
 					result = uem_trycreate(self, neighbor, i == 0 ? 1 : 0);
 					if (result == UEM_TRYCREATE_UNLOCKED ||

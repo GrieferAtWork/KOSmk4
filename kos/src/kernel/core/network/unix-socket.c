@@ -219,7 +219,7 @@ NOTHROW(FCALL unix_server_fini)(struct unix_server *__restrict self) {
  * Note however that `acceptme_last->uc_next' may be undefined
  *
  * Additionally,  `was_i_accepted'  may  be  given  as  non-NULL, which
- * will  alter the  behavior if that  client was chosed  to be refused,
+ * will  alter the  behavior if that  client was chosen  to be refused,
  * such that this function returns `false' if that client in particular
  * was refused, and `true' otherwise. */
 PRIVATE NOBLOCK NONNULL((1)) bool

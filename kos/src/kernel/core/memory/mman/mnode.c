@@ -144,6 +144,7 @@ NOTHROW(FCALL mnode_unlink_from_part_lockop)(Toblockop(mpart) *__restrict self,
 	if ((me->mn_flags & (MNODE_F_MLOCK)) &&
 	    (part->mp_flags & (MPART_F_MLOCK | MPART_F_MLOCK_FROZEN)) == MPART_F_MLOCK)
 		mpart_maybe_clear_mlock(part);
+
 	/* Do the rest in post so we won't be holding a lock to the mem-part anymore:
 	 * >> weakdecref(me->mn_mman);
 	 * >> mnode_free(me); */
@@ -176,6 +177,7 @@ NOTHROW(FCALL mnode_destroy)(struct mnode *__restrict self) {
 			mpart_trim(part); /* This also inherits our reference to `part' */
 		} else {
 			Toblockop(mpart) *lop;
+
 			/* Must insert the node into the part's list of deleted nodes. */
 			weakincref(self->mn_mman); /* A weak reference here is required by the ABI */
 
@@ -387,6 +389,7 @@ mnode_split_or_unlock(struct mman *__restrict self,
 			kfree(hinode);
 			RETHROW();
 		}
+
 		/* Check if anything changed in the mean time. */
 reload_lonode_after_mman_lock:
 		lonode = mnode_tree_locate(self->mm_mappings, lonode_minaddr);
@@ -455,6 +458,7 @@ reload_lonode_after_mman_lock:
 	mpart_lock_release(part);
 	incref(part); /* The reference stored in `hinode->mn_part' */
 done_nopart:
+
 	/* Copy the is-writable attribute form `lonode' into `hinode' */
 	LIST_ENTRY_UNBOUND_INIT(&hinode->mn_writable);
 	if (LIST_ISBOUND(lonode, mn_writable))

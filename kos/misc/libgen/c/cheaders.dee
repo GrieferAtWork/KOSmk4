@@ -1690,7 +1690,7 @@ class LocalFunction {
 	public member prototype: FunctionPrototype | Callable;
 
 	@@Preprocessor conditions that  must be  met in  order
-	@@for this local function implementation to be chosed.
+	@@for this local function implementation to be chosen.
 	public member ppCond: string | UserString = "1";
 
 	@@Pieces of code that must be written before @ppCond can be evaluated

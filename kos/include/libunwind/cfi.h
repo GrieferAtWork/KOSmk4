@@ -553,7 +553,7 @@
  * You  should be able  to see that  for unwinding (iow: .eh_frame
  * expressions) and for arithmetic (iow:  when used in as  operand
  * of another instruction such as DW_OP_plus), both register value
- * an register pointer operands  behave exactly the same.  However
+ * and register pointer operands behave exactly the same.  However
  * there is a  difference when  these opcodse appear  inside of  a
  * location  expression (iow: .debug_info).  Here, the second list
  * of  interpretations  must  be used,  where  `DW_OP_breg0' would

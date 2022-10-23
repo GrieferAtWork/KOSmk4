@@ -70,6 +70,7 @@ NOTHROW(FCALL mfutex_remove_from_other_mpart_postlop)(Tobpostlockop(mpart) *__re
 	REF struct mpart *part;
 	struct mpartmeta *meta;
 	me = container_of(_lop, struct mfutex, _mfu_plop);
+
 	/* Figure out the *real* part, and remove `self' from _its_ tree! */
 again_read_part:
 	part = awref_get(&me->mfu_part);
@@ -254,6 +255,7 @@ NOTHROW(FCALL _mpart_dma_donelock)(REF struct mpart *__restrict self) {
 	 * to merge the part with some of its neighboring parts!
 	 * For this purpose, check `MPART_XF_MERGE_AFTER_DMA' */
 	uintptr_quarter_t xflags;
+
 	/* Do the broadcast first, since `self' might change when `mpart_merge()' is called. */
 	sig_broadcast(&self->mp_meta->mpm_dma_done);
 	xflags = ATOMIC_READ(self->mp_xflags);
@@ -325,6 +327,7 @@ mpart_createfutex(struct mpart *__restrict self, pos_t file_position)
 	REF struct mfutex *result;
 	struct mpartmeta *meta;
 	mpart_reladdr_t partrel_offset;
+
 	/* Enforce proper alignment. */
 	file_position &= ~(MFUTEX_ADDR_ALIGNMENT - 1);
 
@@ -371,8 +374,10 @@ check_old_futex:
 			goto done;
 		}
 		partrel_offset = (mpart_reladdr_t)(file_position - mpart_getminaddr(self));
+
 		/* Initialize the new futex object. */
 		mfutex_init(result, self, partrel_offset);
+
 		/* Try to insert the new futex into the tree. */
 		if (mpartmeta_ftx_tryinsert(meta, result)) {
 			++result->mfu_weakrefcnt; /* Tree-reference */
@@ -397,8 +402,10 @@ check_old_futex:
 			kfree(result);
 			RETHROW();
 		}
+
 		/* Initialize the new futex object. */
 		mfutex_init(result, self, partrel_offset);
+
 		/* Insert the new futex into the tree. */
 		++result->mfu_weakrefcnt; /* Tree-reference */
 		mpartmeta_ftx_insert(meta, result);
@@ -422,6 +429,7 @@ mpart_lookupfutex(struct mpart *__restrict self, pos_t file_position)
 		THROWS(E_WOULDBLOCK) {
 	REF struct mfutex *result = NULL;
 	struct mpartmeta *meta;
+
 	/* Enforce proper alignment. */
 	file_position &= ~(MFUTEX_ADDR_ALIGNMENT - 1);
 	meta = self->mp_meta;
@@ -560,6 +568,7 @@ mman_createfutex(struct mman *__restrict self, UNCHECKED void *addr)
 	struct mnode *node;
 again:
 	mman_lock_read(self);
+
 	/* Lookup the accessed node. */
 	node = mnode_tree_locate(self->mm_mappings, addr);
 	if unlikely(node == NULL || (part = node->mn_part) == NULL) {
@@ -600,6 +609,7 @@ mman_lookupfutex(struct mman *__restrict self, UNCHECKED void *addr)
 	struct mnode *node;
 again:
 	mman_lock_read(self);
+
 	/* Lookup the accessed node. */
 	node = mnode_tree_locate(self->mm_mappings, addr);
 	if (!node) {
@@ -631,6 +641,7 @@ unlock_mman_and_return_null:
 		mman_lock_endread(self);
 		FINALLY_DECREF_UNLIKELY(part);
 		mpartmeta_ftxlock_read(meta);
+
 		/* We may assume that  the backing mem-node didn't  get
 		 * unmapped in the mean time, since that would indicate
 		 * an error within the behavior of the calling program.

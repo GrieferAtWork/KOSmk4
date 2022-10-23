@@ -301,6 +301,7 @@ again_memaddr:
 		                                        physloc.mppl_size);
 		if unlikely(copy_error != 0) {
 			assert(copy_error <= physloc.mppl_size);
+
 			/* Deal with the case where the copy-error isn't total. */
 			if unlikely(copy_error < physloc.mppl_size) {
 				size_t ok = physloc.mppl_size - copy_error;
@@ -314,6 +315,7 @@ again_memaddr:
 				filepos += ok;
 				num_bytes -= ok;
 			}
+
 			/* Can't use memcpy_nopf() to transfer memory from the given buffer.
 			 * This can happen for 3 reasons:
 			 *  - The buffer hasn't been loaded into memory
@@ -336,9 +338,11 @@ again_memaddr:
 			                           num_bytes, LOCAL_prefault_flags);
 #endif /* !LOCAL_BUFFER_IS_IOV_BUFFER */
 #undef LOCAL_prefault_flags
+
 			/* If we've managed to prefault memory, then re-attempt the direct transfer. */
 			if (copy_error != 0)
 				goto again;
+
 			/* If  pre-faulting memory didn't work, then we
 			 * must use an intermediate buffer for transfer */
 #ifdef LOCAL_BUFFER_IS_AIO
@@ -449,6 +453,7 @@ again_memaddr:
 		                                        physloc.mppl_size);
 		if unlikely(copy_error != 0) {
 			assert(copy_error <= physloc.mppl_size);
+
 			/* Deal with the case where the copy-error isn't total. */
 			if unlikely(copy_error < physloc.mppl_size) {
 				size_t ok = physloc.mppl_size - copy_error;
@@ -462,6 +467,7 @@ again_memaddr:
 				/*offset += ok;*/
 				num_bytes -= ok;
 			}
+
 			/* Can't use memcpy_nopf() to transfer memory from the given buffer.
 			 * This can happen for 3 reasons:
 			 *  - The buffer hasn't been loaded into memory

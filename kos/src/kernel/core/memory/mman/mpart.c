@@ -376,6 +376,7 @@ NOTHROW(FCALL mpart_destroy_lop_rmall)(Tobpostlockop(mfile) *__restrict self,
 			return;
 		}
 	}
+
 	/* Finally, free the part proper. */
 	mpart_free(me);
 }
@@ -386,6 +387,7 @@ NOTHROW(FCALL mpart_destroy_lop_rmfile)(Toblockop(mfile) *__restrict self,
 	Tobpostlockop(mfile) *post;
 	struct mpart *me;
 	me = mpart_destroy_mfilelockop_decode(self);
+
 	/* Remove the dead part from the file's tree of parts. */
 	if likely(!mpart_isanon(me)) {
 		assert(!mfile_isanon(file));
@@ -393,6 +395,7 @@ NOTHROW(FCALL mpart_destroy_lop_rmfile)(Toblockop(mfile) *__restrict self,
 	}
 	DBG_memset(&me->mp_filent, 0xcc, sizeof(me->mp_filent));
 	post = mpart_destroy_mfilepostlockop_encode(me);
+
 	/* Remove from the all-parts list and free _after_ the
 	 * lock  to  the backing  mem-file has  been released. */
 	post->oplo_func = &mpart_destroy_lop_rmall;
@@ -468,8 +471,10 @@ again_service_lops:
 		Toblockop(mpart) *next;
 		Tobpostlockop(mpart) *later;
 		next = SLIST_NEXT(iter, olo_link);
+
 		/* Invoke the lock operation. */
 		later = (*iter->olo_func)(iter, self);
+
 		/* Enqueue operations for later execution. */
 		if (later != NULL)
 			SLIST_INSERT(&post, later, oplo_link);
@@ -482,6 +487,7 @@ again_service_lops:
 	if unlikely(!SLIST_EMPTY(&lops)) {
 		if likely(mpart_lock_tryacquire(self))
 			goto again_service_lops;
+
 		/* re-queue all stolen lops. */
 		iter = SLIST_FIRST(&lops);
 		while (SLIST_NEXT(iter, olo_link))
@@ -556,6 +562,7 @@ NOTHROW(FCALL mpart_getblockstate)(struct mpart const *__restrict self,
                                    size_t partrel_block_index) {
 	mpart_blkst_word_t word;
 	shift_t shift;
+
 	/* We're called from `mpart_hinted_mmap()', so we can't assert the lock! */
 	/*assert(mpart_lock_acquired(self));*/
 	assert(partrel_block_index < mpart_getblockcount(self, self->mp_file));
@@ -618,6 +625,7 @@ NOTHROW(FCALL mpart_hasblocksstate_init)(struct mpart *__restrict self) {
 		if (st == MPART_BLOCK_ST_INIT)
 			return true; /* Yup! There are INIT-parts... */
 	}
+
 	/* No INIT-part found (just clear the MAYBE_BLK_INIT flag) */
 	ATOMIC_AND(self->mp_flags, ~MPART_F_MAYBE_BLK_INIT);
 	return false;
@@ -646,6 +654,7 @@ mpart_sync_impl(struct mpart *__restrict self, bool keep_lock)
 again:
 	if (!(self->mp_flags & MPART_F_CHANGED) && !keep_lock)
 		goto done_noop_nolock;
+
 	/* Lock the part, load it into the core, make sure that  anyone
 	 * that might have write-access  right now has this  permission
 	 * revoked, and that there aren't any DMA operation in-process. */
@@ -687,6 +696,7 @@ again:
 			size_t bitset_words;
 			size_t bitset_size;
 			mpart_blkst_word_t *bitset;
+
 			/* Must allocate the bitset on the heap! */
 			bitset_words = CEILDIV(block_count, MPART_BLKST_BLOCKS_PER_WORD);
 			bitset_size  = bitset_words * sizeof(mpart_blkst_word_t);
@@ -703,6 +713,7 @@ again:
 					kfree(bitset);
 					RETHROW();
 				}
+
 				/* Check if anything's changed. */
 				if unlikely(!(self->mp_flags & MPART_F_CHANGED) ||
 				            file != self->mp_file ||
@@ -715,6 +726,7 @@ again:
 #endif /* !__OPTIMIZE_SIZE__ */
 					goto again;
 				}
+
 				/* Nothing's changed, so we can just write-back the new bitset. */
 			}
 
@@ -820,6 +832,7 @@ done_writeback:
 		mfile_trunclock_dec_nosignal(file);
 		sig_broadcast(&file->mf_initdone);
 		decref_unlikely(file);
+
 		/* Scan for more changes. */
 		goto again;
 	}
@@ -829,6 +842,7 @@ done_writeback:
 #ifndef __OPTIMIZE_SIZE__
 		mpart_lockops_reap(self);
 #endif /* !__OPTIMIZE_SIZE__ */
+
 		/* Wait until parts that are being initialized finish doing that. */
 		TRY {
 			{
@@ -840,6 +854,7 @@ done_writeback:
 					task_disconnectall();
 					RETHROW();
 				}
+
 				/* Check for init-parts once again. */
 				if unlikely(!mpart_hasblocksstate_init(self)) {
 					_mpart_lock_release(self);
@@ -851,12 +866,14 @@ done_writeback:
 				}
 				mpart_lock_release(self);
 			}
+
 			/* Wait for initialization to complete. */
 			task_waitfor();
 		} EXCEPT {
 			mpart_lockops_reap(self);
 			RETHROW();
 		}
+
 		/* Try again. (hopefully now, all INIT-blocks are gone) */
 		goto again;
 	}

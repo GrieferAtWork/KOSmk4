@@ -163,6 +163,7 @@ account_trailing_word:
 		if (num_words != 0) {
 			if (shift >= PAGESHIFT) {
 				size_t i;
+
 				/* Large blocks. -> Every changed block describes at least
 				 * 1 change page. - As such,  first count the # of  change
 				 * blocks,  which we can then simply convert into the # of
@@ -175,6 +176,7 @@ account_trailing_word:
 						word >>= MPART_BLOCK_STBITS;
 					}
 				}
+
 				/* Convert the # of changed blocks into the # of changed pages */
 				result <<= (shift - PAGESHIFT);
 			} else {
@@ -192,6 +194,7 @@ account_trailing_word:
 				blocks_per_page  = (physpagecnt_t)1 << page2block_shift;
 				for (i = 0; i < partrel_pageaddr; ++i) {
 					size_t j, count;
+
 					/* Check if any block at one of these indices is CHNG:
 					 *    [i << page2block_shift, (i+1) << page2block_shift) */
 					j     = i << page2block_shift;
@@ -209,6 +212,7 @@ account_trailing_word:
 				}
 				return result;
 			}
+
 			/* Figure out how many pages are still described by the trailing word. */
 			{
 				size_t checked_blocks, checked_bytes, checked_pages;
@@ -275,6 +279,7 @@ NOTHROW(FCALL mpart_memaddr_for_read)(struct mpart *__restrict self,
 		size_t i, min, max;
 		min = (partrel_offset) >> file->mf_blockshift;
 		max = (partrel_offset + result->mppl_size - 1) >> file->mf_blockshift;
+
 		/* Iterate  over blocks within the result range,
 		 * and ensure that they've all been initialized. */
 		for (i = min; i <= max; ++i) {
@@ -373,6 +378,7 @@ NOTHROW(FCALL mpart_memaddr_for_write)(struct mpart *__restrict self,
 					 * is  apart  of  the  same,  not-loaded  block! */
 					goto err_not_loaded;
 				}
+
 				/* For now, stop writing at the start of the last (NDEF/INIT) block. */
 				result->mppl_size = (max << file->mf_blockshift) - partrel_offset;
 				assertf(result->mppl_size != 0,
@@ -382,6 +388,7 @@ NOTHROW(FCALL mpart_memaddr_for_write)(struct mpart *__restrict self,
 				goto done; /* Prevent underflow when `max == 0' */
 			--max;
 		}
+
 		/* Iterate over whole blocks within the result range,
 		 * and  ensure  that  they  don't  use  INIT  states.
 		 *
@@ -616,6 +623,7 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 	}
 	if (st == MPART_BLOCK_ST_INIT) {
 		bool hasinit;
+
 		/* Special case: We must wait for someone else to finish initialization! */
 		incref(file);
 		_mpart_lock_release(self);
@@ -638,9 +646,11 @@ mpart_memload_and_unlock(struct mpart *__restrict self,
 		} else {
 			task_waitfor();
 		}
+
 		/* Return to the caller, since we've lost the lock to `self' */
 		return;
 	}
+
 	/* Set the initial part's state to INIT */
 	mpart_setblockstate(self, min, MPART_BLOCK_ST_INIT);
 
@@ -782,6 +792,7 @@ NOTHROW(FCALL mpart_memaddr_direct)(struct mpart *__restrict self,
 	} else {
 		size_t i, chunk_size;
 		assert(self->mp_state == MPART_ST_MEM_SC);
+
 		/* Difficult case: Must find the chunk containing the given offset. */
 		for (i = 0;;) {
 			assert(i < self->mp_mem_sc.ms_c);
@@ -810,6 +821,7 @@ NOTHROW(FCALL mpart_getphysaddr)(struct mpart *__restrict self,
 	} else {
 		size_t i, chunk_size;
 		assert(self->mp_state == MPART_ST_MEM_SC);
+
 		/* Difficult case: Must find the chunk containing the given offset. */
 		for (i = 0;;) {
 			assert(i < self->mp_mem_sc.ms_c);

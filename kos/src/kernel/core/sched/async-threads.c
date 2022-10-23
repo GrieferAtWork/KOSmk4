@@ -173,7 +173,7 @@ async_threads_setcount(size_t new_count) THROWS(E_BADALLOC) {
 			/* Spawn some more threads. */
 			num_more = new_count - old_count;
 			while (num_more--) {
-				decref(async_threads_spawn());
+				decref_unlikely(async_threads_spawn());
 			}
 		}
 	}

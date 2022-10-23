@@ -50,7 +50,7 @@ struct sig_completion_context {
 	struct task         *scc_caller; /* [1..1][const] The thread that (supposedly) is sending the  signal.
 	                                  * In  order to support functions like `sig_broadcast_as_nopr()', the
 	                                  * sig-post-completion callback should not make use of THIS_TASK, but
-	                                  * instead assume that `sender_thread' is the caller's thread. */
+	                                  * instead assume that `scc_caller' is the caller's thread. */
 	sig_postcompletion_t scc_post;   /* [0..1][out] When  non-NULL  upon  return  of  `sig_completion_t()',
 	                                  * this callback will be enqueued to-be executed with the buffer given
 	                                  * to  `sig_completion_t()'  once  all SMP-locks  have  been released.
@@ -397,8 +397,8 @@ NOTHROW(FCALL red_phase1)(struct sig_completion *__restrict self,
 	return sizeof(void *);
 }
 
-PRIVATE NOBLOCK NONNULL((1)) REF struct rising_edge_detector *
-NOTHROW(FCALL rising_edge_detector_create)(struct sig *__restrict signal) {
+PRIVATE NOBLOCK NONNULL((1)) REF struct rising_edge_detector *FCALL
+rising_edge_detector_create(struct sig *__restrict signal) THROWS(E_BADALLOC) {
 	REF struct rising_edge_detector *result;
 	result = (REF struct rising_edge_detector *)kmalloc(sizeof(REF struct rising_edge_detector),
 	                                                    GFP_NORMAL);

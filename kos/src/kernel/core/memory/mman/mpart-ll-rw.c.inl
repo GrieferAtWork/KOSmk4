@@ -86,6 +86,7 @@ NOTHROW(KCALL mpart_ll_bzeromemcc)(struct mpart *__restrict self,
 			rel_offset -= csize;
 		}
 		caddr = physpage2addr(self->mp_mem_sc.ms_v[i].mc_start);
+
 		/* Account for the remaining offset at the start of the chunk. */
 		caddr += rel_offset;
 		csize -= rel_offset;
@@ -93,12 +94,14 @@ NOTHROW(KCALL mpart_ll_bzeromemcc)(struct mpart *__restrict self,
 		for (;;) {
 			if (csize > num_bytes)
 				csize = num_bytes;
+
 			/* Perform I/O on this part of the chunk. */
 			LOCAL_doio(caddr, csize, rel_offset);
 			if (csize >= num_bytes)
 				break;
 			rel_offset += csize;
 			num_bytes -= csize;
+
 			/* Continue on with the next chunk. */
 			++i;
 			assert(i < self->mp_mem_sc.ms_c);

@@ -96,6 +96,7 @@ NOTHROW(FCALL mpart_mmap_force)(struct mpart const *__restrict self,
 			chunk_size -= offset;
 			if (chunk_size > size)
 				chunk_size = size;
+
 			/* Map (the requested sub-range of) this chunk */
 			assert(vec[i].mc_start != PHYSPAGE_INVALID);
 			LOCAL_pagedir_map(addr, chunk_size,

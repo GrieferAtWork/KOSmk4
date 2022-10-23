@@ -110,6 +110,7 @@ do_load_whole_pages_readonly:
 							break;
 						}
 					}
+
 					/* Load as continuous, read-only memory. */
 					addr_offset = (i - page_start) * PAGESIZE;
 					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
@@ -125,6 +126,7 @@ do_load_whole_pages_readonly:
 					while (endpage < page_end &&
 					       getstate(endpage) == MPART_BLOCK_ST_CHNG)
 						++endpage;
+
 					/* Load as continuous, read/write memory. */
 					addr_offset = (i - page_start) * PAGESIZE;
 					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
@@ -165,6 +167,7 @@ do_load_small_pages_readonly:
 							break;
 						}
 					}
+
 					/* Load as continuous, read-only memory. */
 					addr_offset = (i - page_start) * PAGESIZE;
 					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
@@ -184,6 +187,7 @@ do_load_small_pages_readonly:
 							break;
 						++endpage;
 					}
+
 					/* Load as continuous, read/write memory. */
 					addr_offset = (i - page_start) * PAGESIZE;
 					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
@@ -221,6 +225,7 @@ do_load_large_pages_readonly:
 							break;
 						}
 					}
+
 					/* Load as continuous, read-only memory. */
 					addr_offset = (i - page_start) * PAGESIZE;
 					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
@@ -236,6 +241,7 @@ do_load_large_pages_readonly:
 					while (endpage < page_end &&
 					       getstate(endpage >> block_to_page_shift) == MPART_BLOCK_ST_CHNG)
 						++endpage;
+
 					/* Load as continuous, read/write memory. */
 					addr_offset = (i - page_start) * PAGESIZE;
 					LOCAL_pagedir_map((byte_t *)addr + addr_offset,
@@ -335,6 +341,7 @@ NOTHROW(FCALL mpart_mmap)(struct mpart const *__restrict self,
 			chunk_size -= chunk_offset;
 			if (chunk_size > size)
 				chunk_size = size;
+
 			/* Map (the requested sub-range of) this chunk */
 			assert(vec[i].mc_start != PHYSPAGE_INVALID);
 			result |= LOCAL_mpart_mmap_p_impl(bitset, shift,

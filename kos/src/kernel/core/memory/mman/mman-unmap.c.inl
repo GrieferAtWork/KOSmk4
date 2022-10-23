@@ -112,7 +112,6 @@ mman_protect(struct mman *__restrict self,
 		return 0;
 
 	TRY {
-
 		/* Lock the memory manager. */
 again_acquire_lock:
 		mman_lock_acquire(self);
@@ -141,6 +140,7 @@ again_acquire_lock:
 
 		if (!(flags & MMAN_UNMAP_NOSPLIT)) {
 			byte_t *maxaddr;
+
 			/* Ensure that we're working on a properly page-aligned address range. */
 			if unlikely(!IS_ALIGNED((uintptr_t)addr, PAGESIZE)) {
 				num_bytes += (uintptr_t)addr & (PAGESIZE - 1);
@@ -234,6 +234,7 @@ again_acquire_lock:
 						}
 					}
 					mman_lock_release(self);
+
 					/* Throw the relevant exception. */
 					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, PAGESIZE);
 				}

@@ -225,8 +225,8 @@ NOTHROW(FCALL mbuilder_get_bounds_size)(struct mbuilder_norpc const *__restrict 
  * @param: flags:     Set of `MAP_GROWSDOWN | MAP_GROWSUP | MAP_32BIT | MAP_STACK | MAP_NOASLR'
  *                    Additionally,   `MAP_FIXED'   and  `MAP_FIXED_NOREPLACE'   are  accepted.
  *                    Unknown flags are silently ignored.
- * @return: PAGEDIR_PAGEALIGNED * : The load address addend to-be added to mappings.
- *                                  Pass   this   value   to   `mman_map_mbuilder()'
+ * @return: PAGEDIR_PAGEALIGNED * : The load address to-be added to mappings.
+ *                                  Pass this value to  `mman_map_mbuilder()'
  * @return: MAP_FAILED:             Locks had to be released, but another attempt might succeed.
  *                                  Reacquire  all  required  locks,  and  re-attempt  the call.
  * @throws: E_BADALLOC_INSUFFICIENT_VIRTUAL_MEMORY: Failed to locate a suitably large address
@@ -329,6 +329,7 @@ again:
 			was_prepared |= MMAN_MAP_MBUILDER_F_PREPARED;
 		if (was_prepared & MMAN_MAP_MBUILDER_F_PREPARED) {
 			pagedir_prot_t map_prot;
+
 			/* Try to map the associated part into the target mman's page directory. */
 			map_prot = mpart_mmap_node_p(node->mn_part,
 			                             self->mm_pagedir_p,
@@ -509,6 +510,7 @@ again:
 	while ((removeme = mman_mappings_rremove(self, minaddr, maxaddr)) != NULL) {
 		if (LIST_ISBOUND(removeme, mn_writable))
 			LIST_REMOVE(removeme, mn_writable);
+
 		/* Keep track of how many nodes are mapping some given module. */
 		if (removeme->mn_module)
 			module_dec_nodecount(removeme->mn_module);

@@ -145,9 +145,9 @@ NOTHROW(FCALL mbuilder_find_node_for_mpart)(struct mbuilder_norpc const *__restr
 
 struct mfile_map_for_reflow: mfile_map {
 	/* @override(.mfm_file, [REF]) */
-	uintptr_t                   mfmfr_nodeflags; /* Finalized values for `mnode::mn_flags'. */
-	uintptr_t                   mfmfr_mapaddr;   /* Finalized mapping base-address. (to-be re-added to all nodes) */
-	REF struct path            *mfmfr_fspath;    /* [0..1] Optional mapping path */
+	uintptr_t           mfmfr_nodeflags; /* Finalized values for `mnode::mn_flags'. */
+	uintptr_t           mfmfr_mapaddr;   /* Finalized mapping base-address. (to-be re-added to all nodes) */
+	REF struct path    *mfmfr_fspath;    /* [0..1] Optional mapping path */
 	REF struct fdirent *mfmfr_fsname;    /* [0..1] Optional mapping name */
 };
 
@@ -305,7 +305,7 @@ NOTHROW(FCALL mbuilder_insert_filemap)(/*in|out*/ struct mbuilder_norpc *__restr
 
 
 struct mb_unlock_all_parts_info: unlockinfo {
-	struct mbuilder_norpc *mualpi_builder; /* [1..1] The builder for on which we must invoke
+	struct mbuilder_norpc *mualpi_builder; /* [1..1] The builder on which we must invoke
 	                                        *        `mbuilder_partlocks_release()' */
 	struct unlockinfo     *mualpi_uunlock; /* [0..1] User-defined unlock-info callback.
 	                                        *        Will also be invoked, if given. */

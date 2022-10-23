@@ -272,7 +272,6 @@ NOTHROW(FCALL module_remove_from_mman)(struct module *__restrict self,
 		return;
 	}
 	for (node = mima.mm_min;;) {
-
 		/* Clear module self-pointers. */
 		if (node->mn_module == self) {
 #ifndef NDEBUG
@@ -301,6 +300,7 @@ NOTHROW(FCALL module_mman_cleanup_postlop)(Tobpostlockop(mman) *__restrict self,
                                            REF struct mman *__restrict mm) {
 	WEAK REF struct module *me;
 	me = container_of(self, struct module, _md_mmpostlop);
+
 	/* Drop inherited references */
 	assert(me->md_mman == mm);
 	DBG_memset(&me->md_mman, 0xcc, sizeof(me->md_mman));
@@ -406,6 +406,7 @@ module_aboveaddr(USER CHECKED void const *addr) {
 		result = uem_aboveaddr(CURRENT_MMAN, addr);
 		if (result)
 			return result;
+
 		/* Fallthru to find the first kernel-space module... */
 		addr = (USER CHECKED void *)KERNELSPACE_BASE;
 	}
@@ -440,6 +441,7 @@ module_next(struct module *prev) {
 #ifdef KERNELSPACE_HIGHMEM
 		if (result)
 			return result;
+
 		/* Find the first kernel-space module. */
 		return module_aboveaddr((USER CHECKED void *)KERNELSPACE_BASE);
 #else /* KERNELSPACE_HIGHMEM */
@@ -635,6 +637,7 @@ unwind_userspace_with_section(struct module *__restrict mod, void const *absolut
 	unwind_fde_t fde;
 	if (!tryincref(newmm))
 		return UNWIND_NO_FRAME;
+
 	/* Must switch VM to the one of `mod' in order to get user-space memory
 	 * into the expected  state for  the unwind  handler to  do its  thing. */
 	oldmm = task_xchmman_inherit(newmm);
@@ -721,6 +724,7 @@ unwind_userspace(void const *absolute_pc,
 			if ((sect = module_locksection(mod, section_names[i])) == NULL)
 				continue;
 			FINALLY_DECREF_UNLIKELY(sect);
+
 			/* Load a mapping for the section. */
 			if (i == 0) {
 				/* Special case: the `.eh_frame' must be allocated in user-space,
@@ -756,6 +760,7 @@ unwind_for_debug(void const *absolute_pc,
                  unwind_getreg_t reg_getter, void const *reg_getter_arg,
                  unwind_setreg_t reg_setter, void *reg_setter_arg) {
 	unsigned int result;
+
 	/* For non-userspace addresses, use the regular, old unwind() function! */
 	if (!ADDR_ISUSER(absolute_pc)) {
 		result = unwind(absolute_pc,

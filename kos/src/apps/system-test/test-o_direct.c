@@ -70,7 +70,7 @@ do_o_direct_test(char const *filename) {
 	blockalign = (size_t)1 << align.fbs_ioba;
 	GEd(blocksize, blockalign);
 
-	/* Allocate a properly aligned (and sized) buffer for I/O on at least 64 byts. */
+	/* Allocate a properly aligned (and sized) buffer for I/O on at least 64 bytes. */
 	bufsize = CEIL_ALIGN(64, blocksize);
 	buf     = memalign(blockalign, bufsize);
 	assertf(buf, "memalign(%" PRIuSIZ ", %" PRIuSIZ ") failed", blockalign, bufsize);

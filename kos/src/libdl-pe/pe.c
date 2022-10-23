@@ -1014,7 +1014,7 @@ libpe_linker_main(struct peexec_info *__restrict info,
 	if (peb->pp_argc) {
 		char *argv0 = peb->pp_argv[0];
 		if (argv0 && argv0[0] == '/') {
-			/* The system gave  us an absolute  unix-style path as  argv[0].
+			/* The kernel gave  us an absolute  unix-style path as  argv[0].
 			 * Because argv[0]  is traditionally  the  name of  the  program
 			 * (even though use of `exec*()' doesn't make that a necessity),
 			 * we automagically convert that argument into a DOS-path. */

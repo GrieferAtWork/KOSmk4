@@ -62,6 +62,7 @@ PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mnode_tree_foreach_set_unmapped)(struct mnode *__restrict root) {
 again:
 	ATOMIC_OR(root->mn_flags, MNODE_F_UNMAPPED);
+
 	/* Keep track of how many nodes are mapping a particular module. */
 	if (root->mn_module)
 		module_dec_nodecount(root->mn_module);

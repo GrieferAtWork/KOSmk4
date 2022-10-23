@@ -56,14 +56,14 @@
  *   - Whenever  a thread calls `connect()', it will become attached to `mysig',
  *     such that another thread sending that signal (as by `post()') will notify
  *     the original thread that called `connect()' of this condition.
- *   - For  this  purpose, it  doesn't  matter if  the  original thread  that called
- *     `connect()'  has  already called  `wait()'  (and has  been  de-scheduled), or
- *     is still busy doing other things, but is planning to call `wait()' eventually
- *   - The `task_waitfor()' function (when eventually  called) will then cause  the
- *     calling thread to suspend execution until one of the signals that its caller
- *     is  connection to has  been send (but note  that if one  of those signals is
- *     send before  `task_waitfor()' is  called, then  `task_waitfor()' will  never
- *     block to begin with, but return immediately)
+ *   - For  this purpose, it  doesn't matter if the  original thread that called
+ *     `connect()' has already called `wait()' (and began blocking), or is still
+ *     busy doing other things, but is planning to call `wait()' eventually
+ *   - The `task_waitfor()' function (when  eventually called) will then  cause
+ *     the  calling thread to  suspend execution until one  of the signals that
+ *     its  caller is connected to has been send (but note that if one of those
+ *     signals is send before `task_waitfor()' is called, then `task_waitfor()'
+ *     will never block to begin with, but return immediately)
  *   - The moment that `task_waitfor()' returns, _all_ connections that  the
  *     calling  thread had made  in the past will  have already been severed
  *     (to be even more precise: a connection is severed before `sig_send()'
@@ -100,16 +100,16 @@
  *     notified after it becomes so (s.a. line #15) As such, all possible  race
  *     conditions are handled here:
  *        case #1: `ATOMIC_WRITE(is_ready, true);' happens before `task_connect(&became_ready)':
- *                  - `&became_ready' will not be broadcast
+ *                  - `sig_broadcast(&became_ready)' has no-one to notify
  *                  - The caller of `wait_until_ready()' will notice this in line #6
  *                  - The `wait_until_ready()' function never starts blocking
  *                 Note that since this case is usually the most likely one, another test
  *                 of the `is_ready'  condition usually also  happens before the  initial
  *                 connect. Though since no connect()  will have happened at that  point,
- *                 this test isn't interlocked, and only there to speed up the case where
- *                 an object is already ready from the get-go.
- *                 Such models  are referred  to  as test+connect+test,  whereas  the
- *                 minimal requirement for race-less synchronization is connect+test.
+ *                 such a test wouldn't be interlocked, and can only ever serve to  speed
+ *                 up the case  where an object  is already ready  from the get-go.  Such
+ *                 models are  referred  to  as test+connect+test,  whereas  the  minimal
+ *                 requirement for race-less synchronization is connect+test.
  *        case #2: `ATOMIC_WRITE(is_ready, true);' happens after `task_connect(&became_ready)',
  *                 but before `ATOMIC_READ(is_ready)'.
  *                  - Line #6 will notice this, and disconnect from the `became_ready'
@@ -117,10 +117,11 @@
  *        case #3: `ATOMIC_WRITE(is_ready, true);' happens after `if (ATOMIC_READ(is_ready))'
  *                  - In this case, the caller of `wait_until_ready()' will end up inside of
  *                    `task_waitfor()', which will return as soon as line #15 gets executed.
- *                  - Because  by this point,  the waiting thread has  already been connected to
- *                    the `became_ready'  signal,  it  doesn't matter  if  `sig_broadcast()'  is
- *                    called before, or after `task_waitfor();'. In both cases, `task_waitfor()'
- *                    will not return before `sig_broadcast()' has been called.
+ *                  - Because by this point, the waiting thread has already been connected
+ *                    to the `became_ready' signal, it doesn't matter if `sig_broadcast()'
+ *                    is  called  before,  or  after  `task_waitfor();'.  In  both  cases,
+ *                    `task_waitfor()'  will not return  before `sig_broadcast()' has been
+ *                    called, but will return as soon as it has been called.
  */
 
 
@@ -129,20 +130,20 @@ DECL_BEGIN
 
 /* Signal reception priority order:
  *
- * In order to improve performance, signal sent through `struct sig'
- * may  not always reach all waiting / some specific waiting thread.
+ * In order to improve performance, signals sent through `struct sig'
+ * may not always reach all  waiting / some specific waiting  thread.
  *
  * sig_send():
  *    #1: Try to send a signal to the longest-living connection that
  *        wasn't established as a poll-connection, and return `true'
- *    #2: If no such connection exists,  but there are still  (alive)
- *        connections (iow: only  poll-connections remain),  randomly
- *        select one  of the  poll-based connections  and signal  it.
- *        (Note that "random" here may not actually be random at all,
- *        but,  in fact, be  allowed to depend to  the order in which
- *        connections had been enqueued).
+ *    #2: If no such connection exists, but there are still (alive)
+ *        connections (iow: only poll-connections remain), randomly
+ *        select one of the  poll-based connections and signal  it.
+ *        (Note that  "random" here  may not  actually required  to
+ *        be random at all, but, in  fact, is allowed to depend  to
+ *        the  order  in  which  connections  had  been  enqueued).
  *        Continue with step #1
- *    #3: If no (alive) connections are left, return `false'
+ *    #4: If no (alive) connections are left, return `false'
  *
  * sig_broadcast():
  *    #1: If there is any  (alive) connection (irregardless of  that
@@ -169,8 +170,8 @@ DECL_BEGIN
 
 
 /*[[[config CONFIG_TASK_STATIC_CONNECTIONS! = 3
- * Max number of signal connections guarantied to not invoke `kmalloc()'
- * and   potentially   throw   exceptions,  or   serve   RPC  functions.
+ * Max  number of signal  connections guarantied to not
+ * invoke `kmalloc()' and potentially throw exceptions.
  * ]]]*/
 #ifndef CONFIG_TASK_STATIC_CONNECTIONS
 #define CONFIG_TASK_STATIC_CONNECTIONS 3

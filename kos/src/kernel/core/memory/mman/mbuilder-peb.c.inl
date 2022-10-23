@@ -264,6 +264,7 @@ string_size_changed:
 
 		/* Lock the kernel VM, so we can steal the PEB node. */
 		mman_lock_write(&mman_kernel);
+
 		/* Ensure that the page directory is prepared to erase the temporary PEB mapping. */
 		if unlikely(!pagedir_prepare(peb_temp_base, peb_total_size)) {
 			mman_lock_endwrite(&mman_kernel);
@@ -276,6 +277,7 @@ string_size_changed:
 		                GFP_NORMAL);
 		RETHROW();
 	}
+
 	/* Steal the node used to hold the PEB */
 	stolen_node = (struct mbnode *)mnode_tree_remove(&mman_kernel.mm_mappings, peb_temp_base);
 	if likely(LIST_ISBOUND((struct mnode *)stolen_node, mn_writable))

@@ -528,6 +528,7 @@ PRIVATE NOBLOCK NONNULL((1)) bool FCALL
 mpart_split_data_alloc_hibitset(struct mpart_split_data *__restrict self) {
 	size_t hi_num_bytes, hi_block_count;
 	struct mpart *lopart = self->msd_lopart;
+
 	/* Dynamically allocate block-status bitset in hipart */
 	if (lopart->mp_flags & MPART_F_BLKST_INL)
 		goto done;
@@ -540,6 +541,7 @@ mpart_split_data_alloc_hibitset(struct mpart_split_data *__restrict self) {
 		size_t reqsize;
 		mpart_blkst_word_t *hi_bitset;
 		reqsize = CEILDIV(hi_block_count, MPART_BLKST_BLOCKS_PER_WORD) * sizeof(mpart_blkst_word_t);
+
 		/* Allocate a total of `reqsize' bytes. */
 		hi_bitset = (mpart_blkst_word_t *)krealloc_nx(self->msd_hibitset, reqsize,
 		                                              GFP_ATOMIC | GFP_CALLOC |
@@ -618,6 +620,7 @@ do_split_many_chunks_after_lo_pages:
 				++lo_vec_length;
 			newvec_length = MIN(lo_vec_length, hi_vec_length);
 			assert(newvec_length != 0);
+
 			/* Ensure that sufficient memory is available. */
 			vec = (struct mchunk *)krealloc_nx(self->msd_himvec,
 			                                   newvec_length * sizeof(struct mchunk),
@@ -890,6 +893,7 @@ relock_with_data:
 			max = mnode_getpartmaxaddr(lonode);
 			assert(min <= max);
 			assert(max < mpart_getsize(lopart));
+
 			/* NOTE: We _only_ have to create new nodes for those cases where
 			 *       the split position  lies _inside_ of  the range that  is
 			 *       actually being mapped by some node!
@@ -1136,8 +1140,10 @@ maybe_free_unused_hibitset:
 			          sizeof(mpart_blkst_word_t);
 			assert(kmalloc_usable_size(hi_bitset) >= reqsize);
 			assert(memxchr(hi_bitset, 0, reqsize) == NULL); /* We're assuming that `hi_bitset' is zero-initialized! */
+
 			/* Try to truncate the actual vector length to what we need. */
 			KMALLOC_TRY_TRUNCATE_LOCKED_ATOMIC_NX(hi_bitset, reqsize, GFP_CALLOC);
+
 			/* Now to actually copy the bits! */
 			for (i = 0; i < hi_block_count; ++i) {
 				unsigned int st;
@@ -1229,6 +1235,7 @@ clear_hipart_changed_bit:
 				SLIST_INSERT(&dead_mfutex, ftx, _mfu_dead);
 			}
 		}
+
 		/* Must re-insert dead futex objects into the old tree, such that
 		 * they  can be reap the normal way  once we unlock the old tree. */
 		if unlikely(!SLIST_EMPTY(&dead_mfutex)) {

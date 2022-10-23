@@ -20,6 +20,7 @@
 #ifndef GUARD_KERNEL_SRC_SCHED_COMM_C
 #define GUARD_KERNEL_SRC_SCHED_COMM_C 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -60,7 +61,10 @@ again:
 	COMPILER_READ_BARRIER();
 	/* For the duration of changing the name, a thread sets all
 	 * characters to `0xff'  (which as a  byte can't appear  in
-	 * proper UTF-8 as defined by the standard) */
+	 * proper UTF-8 as defined by the unicode standard). So  if
+	 * we encounter one such character, it must mean that  some
+	 * other  thread  is   currently  altering  `self's   name.
+	 * s.a. `task_setcomm()' */
 	for (i = 0; i < TASK_COMM_LEN; ++i) {
 		if (buf[i] == (char)0xff) {
 			preemption_tryyield();
@@ -115,6 +119,7 @@ task_setcomm_of(struct task *__restrict self, char const *__restrict name)
 	unsigned int status;
 	REF struct task_setcomm_rpc *rpc;
 	assert(!task_wasconnected());
+	size_t namelen;
 	if (self == THIS_TASK) {
 		/* Special (and much simpler) case: change our own name */
 		task_setcomm(name);
@@ -126,7 +131,9 @@ task_setcomm_of(struct task *__restrict self, char const *__restrict name)
 	rpc->tscr_refcnt = 2; /* +1: `rpc', +1: `task_setcomm_rpcfun' */
 	rpc->tscr_state  = TASK_SETCOMM_RPC_ST_PENDING;
 	sig_init(&rpc->tscr_done);
-	memcpy(rpc->tscr_name, name, TASK_COMM_LEN, sizeof(char));
+	namelen = strnlen(name, TASK_COMM_LEN - 1);
+	bzero(mempcpy(rpc->tscr_name, name, namelen, sizeof(char)),
+	      TASK_COMM_LEN - namelen, sizeof(char));
 	COMPILER_BARRIER();
 	task_connect(&rpc->tscr_done);
 
@@ -192,7 +199,7 @@ NOTHROW(FCALL task_setcomm)(char const *__restrict name) {
 	 *   the 0xff bytes and keep on looping until they disappear
 	 * - We then fill in the new task name. We know that the new
 	 *   name doesn't contain 0xff, so once all characters  have
-	 *   been written, other CPUs will stop seeing them and know
+	 *   been written, other CPUs will stop seeing 0xff and know
 	 *   that the new name is now complete
 	 * ---
 	 * This way we can set our own name without blocking, and any

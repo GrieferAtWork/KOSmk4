@@ -126,8 +126,11 @@ memfd_new(USER CHECKED char const *name)
 	size_t namelen = strlen(name);
 
 	/* This `249' is a linux-defined hard limit, and is documented under `man 2 memfd_create' */
-	if unlikely(namelen > 249)
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE, E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_NAME_TOO_LONG, namelen);
+	if unlikely(namelen > 249) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_MEMFD_CREATE_NAME_TOO_LONG,
+		      namelen);
+	}
 
 	memfd_name = (REF struct fdirent *)kmalloc(offsetof(struct fdirent, fd_name) +
 	                                           (namelen + 1) * sizeof(char),

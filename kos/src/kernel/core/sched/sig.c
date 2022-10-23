@@ -269,7 +269,7 @@ NOTHROW(FCALL task_connection_free)(struct task_connections *__restrict self,
 
 
 
-#if SIG_CONTROL_SMPLOCK != 0
+#if defined(SIG_CONTROL_SMPLOCK) && SIG_CONTROL_SMPLOCK != 0
 #define sig_smplock_set(con)      ((struct task_connection *)((uintptr_t)(con) | SIG_CONTROL_SMPLOCK))
 #define sig_smplock_clr(con)      ((struct task_connection *)((uintptr_t)(con) & ~SIG_CONTROL_SMPLOCK))
 #define sig_smplock_tst(con)      ((uintptr_t)(con) & SIG_CONTROL_SMPLOCK)
@@ -2235,7 +2235,9 @@ unlock_receiver_and_return_already:
 				}
 				return SIG_SEND_SELECT_SUCCESS;
 			}
+#ifndef CONFIG_NO_SMP
 			ATOMIC_AND(receiver->tc_stat, ~TASK_CONNECTION_STAT_FLOCK);
+#endif /* !CONFIG_NO_SMP */
 		}
 		if (receiver == sig_con)
 			break;

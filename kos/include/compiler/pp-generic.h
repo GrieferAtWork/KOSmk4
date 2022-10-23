@@ -25,7 +25,8 @@
 #define __PREPROCESSOR_HAVE_NAMED_VA_ARGS /* #define FOO(a...) */
 #elif (1 || defined(_MSC_VER) || defined(__GNUC__) ||          \
        defined(__TPP_VERSION__) || defined(__DCC_VERSION__) || \
-       defined(__DEEMON__))
+       defined(__DEEMON__) || defined(__STDC__) ||             \
+       defined(ALMOST_STDC) || defined(HAVE_STRINGIZE))
 #define __PREPROCESSOR_HAVE_CAT     /* #define CAT(a, b) a##b */
 #define __PREPROCESSOR_HAVE_STR     /* #define STR(x) #x */
 #define __PREPROCESSOR_HAVE_VA_ARGS /* __VA_ARGS__ */

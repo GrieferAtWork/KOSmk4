@@ -87,6 +87,7 @@ again:
 		}
 		task_disconnectall();
 	}
+
 	/* If writing has just become available, wake up writers. */
 	if (val >= (u64)UINT64_C(0xfffffffffffffffe))
 		sig_broadcast(&self->ef_signal);
@@ -125,6 +126,7 @@ handle_eventfd_sema_read(struct eventfd *__restrict self,
 		if (atomic64_cmpxch(&self->ef_value, val, val - 1))
 			break;
 	}
+
 	/* If writing has just become available, wake up writers. */
 	if (val >= (u64)UINT64_C(0xfffffffffffffffe))
 		sig_broadcast(&self->ef_signal);
@@ -154,6 +156,7 @@ handle_eventfd_fence_write(struct eventfd *__restrict self,
 				      E_INVALID_ARGUMENT_CONTEXT_EVENTFD_WRITE_FFFFFFFFFFFFFFFFh,
 				      (uintptr_t)-1);
 			}
+
 			/* Wait for something to happen. */
 			task_connect(&self->ef_signal);
 			newval = atomic64_read(&self->ef_value);
@@ -166,6 +169,7 @@ handle_eventfd_fence_write(struct eventfd *__restrict self,
 		}
 		if (!atomic64_cmpxch(&self->ef_value, oldval, newval))
 			continue;
+
 		/* Wake up a single reader. */
 		sig_send(&self->ef_signal);
 	}
@@ -251,8 +255,8 @@ DEFINE_SYSCALL2(fd_t, eventfd2,
 	if (flags & EFD_CLOEXEC)
 		mode |= IO_CLOEXEC;
 
-	/* Under KOS, the fence vs. semaphore differentiation
-	 * is made  through use  of the  handle's type  code. */
+	/* On KOS, the fence vs. semaphore differentiation
+	 * is made through use of the handle's type  code. */
 	type = HANDLE_TYPE_EVENTFD_FENCE;
 	if (flags & EFD_SEMAPHORE)
 		type = HANDLE_TYPE_EVENTFD_SEMA;

@@ -139,6 +139,7 @@ NOTHROW(FCALL mman_sync_p)(struct mman *__restrict self,
 		void *args[CPU_IPI_ARGCOUNT];
 		cpuset_t targets;
 		mman_getcpus(self, CPUSET_PTR(targets));
+
 		/* Check for special case: The kernel MMAN is being synced. */
 		if (self == &mman_kernel || ADDRRANGE_ISKERN_PARTIAL(addr, (byte_t *)addr + num_bytes))
 			CPUSET_SETFULL(targets);
@@ -163,6 +164,7 @@ NOTHROW(FCALL mman_syncone_p)(struct mman *__restrict self,
 		void *args[CPU_IPI_ARGCOUNT];
 		cpuset_t targets;
 		mman_getcpus(self, CPUSET_PTR(targets));
+
 		/* Check for special case: The kernel MMAN is being synced. */
 		if (self == &mman_kernel || ADDR_ISKERN(addr))
 			CPUSET_SETFULL(targets);
@@ -211,10 +213,12 @@ NOTHROW(FCALL mman_sync)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr,
 		struct mman *mymman = THIS_MMAN;
 		struct cpu *me      = THIS_CPU;
 		mman_getcpus(mymman, CPUSET_PTR(targets));
+
 		/* Check for special case: The kernel MMAN is being synced. */
 		if (unlikely(mymman == &mman_kernel) ||
 		    ADDRRANGE_ISKERN_PARTIAL(addr, (byte_t *)addr + num_bytes))
 			CPUSET_SETFULL(targets);
+
 		/* Don't use IPIs for the calling CPU */
 		CPUSET_REMOVE(targets, me->c_id);
 		args[0] = (void *)(uintptr_t)addr;
@@ -237,9 +241,11 @@ NOTHROW(FCALL mman_syncone)(PAGEDIR_PAGEALIGNED UNCHECKED void *addr) {
 		struct mman *mymman = THIS_MMAN;
 		struct cpu *me      = THIS_CPU;
 		mman_getcpus(mymman, CPUSET_PTR(targets));
+
 		/* Check for special case: The kernel MMAN is being synced. */
 		if (unlikely(mymman == &mman_kernel) || ADDR_ISKERN(addr))
 			CPUSET_SETFULL(targets);
+
 		/* Don't use IPIs for the calling CPU */
 		CPUSET_REMOVE(targets, me->c_id);
 		args[0] = (void *)(uintptr_t)addr;
@@ -263,9 +269,11 @@ NOTHROW(FCALL mman_syncall)(void) {
 		cpuset_t targets;
 		struct cpu *me = THIS_CPU;
 		mman_getcpus(mymman, CPUSET_PTR(targets));
+
 		/* Check for special case: The kernel MMAN is being synced. */
 		if unlikely(mymman == &mman_kernel)
 			CPUSET_SETFULL(targets);
+
 		/* Don't use IPIs for the calling CPU */
 		CPUSET_REMOVE(targets, me->c_id);
 		cpu_sendipi_cpuset(targets,
