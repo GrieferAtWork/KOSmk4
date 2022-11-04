@@ -947,6 +947,8 @@ function parseExceptionCodeOverrides(
 				} catch (...) {
 					continue;
 				}
+				macroName  = macroName.decode("utf-8");
+				macroValue = macroValue.decode("utf-8");
 				for (;;) {
 					local i = macroValue.find("/*");
 					if (i < 0)

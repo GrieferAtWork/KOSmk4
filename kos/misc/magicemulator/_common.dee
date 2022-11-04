@@ -152,10 +152,11 @@ class Addr2line {
 			func, none, text = text.partition("\n")...;
 			data, none, text = text.partition("\n")...;
 			local filename, line = data.scanf("%[^:]:%[A-Fa-f0-9]")...;
-			filename = filename.strip();
-			line = line.strip();
+			filename = filename.strip().decode("utf-8");
+			line = line.strip().decode("utf-8");
+			func = func.strip().decode("utf-8");
 			filename = normalizeFilenameForLog(filename);
-			yield (filename, line, func.strip());
+			yield (filename, line, func);
 		}
 	}
 	function close() {

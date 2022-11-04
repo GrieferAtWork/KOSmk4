@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1fbce779 */
+/* HASH CRC-32:0xe5facaba */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -840,7 +840,7 @@ INTDEF ATTR_RETNONNULL WUNUSED ATTR_IN(2) ATTR_IN_OPT(1) __ATTR_FORMAT_ARG(2) ch
  *                `stream'). The buffer is re-used in subsequence invocations
  *                of this function, and documentation states that it may also
  *                be invalidated during any  other I/O operation relating  to
- *                `stream', tough this isn't the case under KOS. */
+ *                `stream', though this isn't the case under KOS. */
 INTDEF WUNUSED ATTR_INOUT(1) ATTR_OUT_OPT(2) char *NOTHROW_NCX(LIBDCALL libd_fgetln)(FILE *__restrict stream, size_t *__restrict lenp);
 /* >> funopen(3), funopen64(3) */
 INTDEF WUNUSED FILE *NOTHROW_NCX(LIBDCALL libd_funopen)(void const *cookie, int (LIBKCALL *readfn)(void *cookie, char *buf, int num_bytes), int (LIBKCALL *writefn)(void *cookie, char const *buf, int num_bytes), off_t (LIBKCALL *seekfn)(void *cookie, off_t off, int whence), int (LIBKCALL *closefn)(void *cookie));

@@ -43,10 +43,10 @@ local function file_read8le(fp: File): int {
 	return int.frombytes(fp.read(8), "little", false);
 }
 
-function ElfSymbolHash(name: string): int {
+function ElfSymbolHash(name: Bytes): int {
 	local h = 0, g;
 	for (local c: name) {
-		h = ((h << 4) + c.ord()) & 0xffffffff;
+		h = ((h << 4) + c) & 0xffffffff;
 		g = h & 0xf0000000;
 		if (g) h ^= g >> 24;
 		h &= ~g;
@@ -262,7 +262,7 @@ again:
 }
 
 
-@@@param callback: Callable as callback(self: BoundStep, symbols: {(string, string, string, string, string, string)...})
+@@@param callback: Callable as callback(self: BoundStep, symbols: {(Bytes, Bytes, Bytes, Bytes, Bytes, Bytes)...})
 @@                 The strings are (symbolName, symbolType, symbolBind, symbolVisi, symbolSect, symbolSize)
 function enumerateSymbolsStep(elfBinary: string, callback: Callable): Step {
 	local result = Step();

@@ -2070,6 +2070,7 @@ PRIVATE char const repr_IOCTLS_89e0h[] =
 	 ((index) >= 0x5400 && (index) <= 0x5403) ? ((index) -= 0x5400, (result) = repr_KOS_IOCTLS_5400h, true) : \
 	 ((index) >= 0x5600 && (index) <= 0x5612) ? ((index) -= 0x5600, (result) = repr_KOS_IOCTLS_5600h, true) : \
 	 ((index) >= 0x6600 && (index) <= 0x6612) ? ((index) -= 0x6600, (result) = repr_KOS_IOCTLS_6600h, true) : \
+	 ((index) == 0x664c) ? ((index) = 0, (result) = repr_KOS_IOCTLS_664ch, true) : \
 	 ((index) >= 0x6680 && (index) <= 0x6685) ? ((index) -= 0x6680, (result) = repr_KOS_IOCTLS_6680h, true) : \
 	 ((index) >= 0x66c0 && (index) <= 0x66c1) ? ((index) -= 0x66c0, (result) = repr_KOS_IOCTLS_66c0h, true) : \
 	 ((index) >= 0x6d00 && (index) <= 0x6d13) ? ((index) -= 0x6d00, (result) = repr_KOS_IOCTLS_6d00h, true) : \
@@ -2108,6 +2109,8 @@ PRIVATE char const repr_KOS_IOCTLS_5600h[] =
 PRIVATE char const repr_KOS_IOCTLS_6600h[] =
 "FD_IOC_NOOP\0FD_IOC_POLLTEST\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0FD_IOC_DUPFD\0FD_IOC_CA"
 "ST\0FD_IOC_DESC";
+PRIVATE char const repr_KOS_IOCTLS_664ch[] =
+"FD_IOC_GETDIRECTIO";
 PRIVATE char const repr_KOS_IOCTLS_6680h[] =
 "FD_IOC_GETTYPE\0FD_IOC_GETKIND\0FD_IOC_GETMODE\0FD_IOC_GETADDR\0FD_I"
 "OC_GETRADDR\0FD_IOC_GETREFCNT";

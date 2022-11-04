@@ -97,6 +97,8 @@ function enumerateMacrosFromFile(filename: string,
 			} catch (...) {
 				continue;
 			}
+			macroName  = macroName.decode("utf-8");
+			macroValue = macroValue.decode("utf-8");
 			macroValue = removeComments(macroValue);
 			knownMacros[macroName] = macroValue.strip();
 		}

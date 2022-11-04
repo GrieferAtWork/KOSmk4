@@ -33,7 +33,7 @@ for (local line: (
 	} catch (...) {
 		continue;
 	}
-	SAL_MACRO_NAMES.insert(line);
+	SAL_MACRO_NAMES.insert(str line);
 }
 
 /* Some more identifiers we don't want libstdc++ to use

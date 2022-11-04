@@ -3067,7 +3067,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.access") ATTR_INOUT(1) int
 /* fgetln(3)                                                            */
 /************************************************************************/
 
-/*[[[head:libc_fgetln,hash:CRC-32=0x1b50850d]]]*/
+/*[[[head:libc_fgetln,hash:CRC-32=0x9f2272a2]]]*/
 /* >> fgetln(3)
  * A slightly more convenient (but way less portable) alternative to `fgets(3)'
  * This function automatically malloc's a  buffer of sufficient length for  the
@@ -3082,7 +3082,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.locked.access") ATTR_INOUT(1) int
  *                `stream'). The buffer is re-used in subsequence invocations
  *                of this function, and documentation states that it may also
  *                be invalidated during any  other I/O operation relating  to
- *                `stream', tough this isn't the case under KOS. */
+ *                `stream', though this isn't the case under KOS. */
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf") WUNUSED ATTR_INOUT(1) ATTR_OUT_OPT(2) char *
 NOTHROW_NCX(LIBCCALL libc_fgetln)(FILE *__restrict stream,
                                   size_t *__restrict lenp)

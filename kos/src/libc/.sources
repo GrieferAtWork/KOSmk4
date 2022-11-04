@@ -86,8 +86,8 @@ BEGIN
 	BEGIN GROUP("libs.libc") { LINK, ARCHIVE, MCOPY,
 			enumerateSymbolsStep(
 				elfBinary: f"{TARGET_BINPATH}{DISK_LIBPATH}libc.so",
-				callback: [](self: BoundStep, symbols: {(string, string, string, string, string)...}) {
-					local symbols_set: {string...} = HashSet();
+				callback: [](self: BoundStep, symbols: {(Bytes, Bytes, Bytes, Bytes, Bytes)...}) {
+					local symbols_set: {Bytes...} = HashSet();
 					local final CRT_DLSUBST_GLOBALS = {
 						"__peb", "environ", "_environ", "__environ",
 						"__argc", "__argv", "_pgmptr",
@@ -111,9 +111,9 @@ BEGIN
 							if (symbolName in LIBDL_SYMBOLS)
 								continue;
 							if (symbolName !in CRT_DLSUBST_GLOBALS)
-								print "WARNING: Unresolved symbol in libc:", repr symbolName;
+								print "WARNING: Unresolved symbol in libc:", repr str symbolName;
 						} else if (symbolName.startswith("libc_")) {
-							print "WARNING: Potentially unwanted libc export:", repr symbolName;
+							print "WARNING: Potentially unwanted libc export:", repr str symbolName;
 						}
 						symbols_set.insert(symbolName);
 					}

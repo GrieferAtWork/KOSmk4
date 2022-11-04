@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb9d1b8e */
+/* HASH CRC-32:0x84d2186e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -283,7 +283,7 @@ INTDEF ATTR_INOUT(1) int (LIBCCALL libc_fftruncate64_unlocked)(FILE *__restrict 
  *                `stream'). The buffer is re-used in subsequence invocations
  *                of this function, and documentation states that it may also
  *                be invalidated during any  other I/O operation relating  to
- *                `stream', tough this isn't the case under KOS. */
+ *                `stream', though this isn't the case under KOS. */
 INTDEF WUNUSED ATTR_INOUT(1) ATTR_OUT_OPT(2) char *NOTHROW_NCX(LIBCCALL libc_fgetln)(FILE *__restrict stream, size_t *__restrict lenp);
 /* >> funopen2(3), funopen2_64(3) */
 INTDEF WUNUSED FILE *NOTHROW_NCX(LIBCCALL libc_funopen2)(void const *cookie, ssize_t (LIBKCALL *readfn)(void *cookie, void *buf, size_t num_bytes), ssize_t (LIBKCALL *writefn)(void *cookie, void const *buf, size_t num_bytes), off_t (LIBKCALL *seekfn)(void *cookie, off_t off, int whence), int (LIBKCALL *flushfn)(void *cookie), int (LIBKCALL *closefn)(void *cookie));

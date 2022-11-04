@@ -3984,7 +3984,7 @@ char const *fmtcheck([[in_opt]] char const *user_format,
 @@               `stream'). The buffer is re-used in subsequence invocations
 @@               of this function, and documentation states that it may also
 @@               be invalidated during any  other I/O operation relating  to
-@@               `stream', tough this isn't the case under KOS.
+@@               `stream', though this isn't the case under KOS.
 [[guard, wunused, decl_include("<hybrid/typecore.h>")]]
 char *fgetln([[inout]] $FILE *__restrict stream,
              [[out_opt]] $size_t *__restrict lenp);

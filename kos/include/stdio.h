@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x364d96bd */
+/* HASH CRC-32:0xbdb0f34a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4920,7 +4920,7 @@ __CDECLARE_VOID(,__NOTHROW_NCX,fpurge,(__FILE *__stream),(__stream))
  *                `stream'). The buffer is re-used in subsequence invocations
  *                of this function, and documentation states that it may also
  *                be invalidated during any  other I/O operation relating  to
- *                `stream', tough this isn't the case under KOS. */
+ *                `stream', though this isn't the case under KOS. */
 __CDECLARE(__ATTR_WUNUSED __ATTR_INOUT(1) __ATTR_OUT_OPT(2),char *,__NOTHROW_NCX,fgetln,(__FILE *__restrict __stream, __SIZE_TYPE__ *__restrict __lenp),(__stream,__lenp))
 #endif /* !__fgetln_defined && __CRT_HAVE_fgetln */
 #endif /* __USE_BSD */

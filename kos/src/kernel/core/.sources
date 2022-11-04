@@ -203,8 +203,8 @@ BEGIN
 	BEGIN GROUP("kernel") { DILINK, MCOPY,
 			enumerateSymbolsStep(
 				elfBinary: KERNEL_BINARY,
-				callback: [](self: BoundStep, symbols: {(string, string, string, string, string)...}) {
-					local symbols_map: {string: int} = Dict();
+				callback: [](self: BoundStep, symbols: {(Bytes, Bytes, Bytes, Bytes, Bytes)...}) {
+					local symbols_map: {Bytes: int} = Dict();
 					for (local symbolName, symbolType, symbolBind,
 					           symbolVisi, symbolSize, none: symbols) {
 						if (symbolVisi != "DEFAULT")
@@ -215,7 +215,7 @@ BEGIN
 							continue;
 						if (symbolName.startswith("kernel_") && (symbolName.endswith("_start") ||
 							symbolName.endswith("_end") || symbolName.endswith("_size")))
-							print "WARNING: Potentially unwanted kernel export:",repr symbolName;
+							print "WARNING: Potentially unwanted kernel export:", repr str symbolName;
 						symbols_map[symbolName] = int(symbolSize);
 					}
 					if ("kernel_symbol_table" !in symbols_map) {
@@ -237,7 +237,7 @@ BEGIN
 						symbols_map["kernel_symbol_table"] =
 							TARGET.POINTER_SIZE + ((hash_mask + 1) * (8 + (2 * TARGET.POINTER_SIZE)));
 						@@Hash-vector of (name,size,hash)
-						local hash_vector: {(string, int, int) | none...} = [none] * (hash_mask + 1);
+						local hash_vector: {(Bytes, int, int) | none...} = [none] * (hash_mask + 1);
 						for (local name: sorted_keys) {
 							local hash = ElfSymbolHash(name);
 							local perturb, j;
@@ -284,7 +284,7 @@ BEGIN
 						for (local i: [:#hash_vector]) {
 							local data = hash_vector[i];
 							if (data is none) continue;
-							fp << ".Lname" << i << ":\n\t.string " << repr data[0] << "\n";
+							fp << ".Lname" << i << ":\n\t.string " << repr str data[0] << "\n";
 						}
 					});
 				}

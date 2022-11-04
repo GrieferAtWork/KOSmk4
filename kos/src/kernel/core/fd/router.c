@@ -90,6 +90,8 @@ for (local l: File.open("../../../../include/kos/kernel/handle.h")) {
 	if (id >= #handle_types)
 		handle_types.resize(id + 1, ("undefined", ""));
 	tail = try tail.scanf(" /" "* `%[^']")[0] catch (...) "";
+	name = name.decode("utf-8");
+	tail = tail.decode("utf-8");
 	handle_types[id] = (name.lower(), tail);
 }
 

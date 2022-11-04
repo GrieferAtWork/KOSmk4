@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Cleanup & fix stack-jumping when enumerating attributes"
-DEEMON_VERSION="18e9fc33d29784d551dc5babe7860ed563964227"
+#     v -- "Cleanup"
+DEEMON_VERSION="c849023fc3880064f31ff1dd18bdb2536a8f26ca"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
