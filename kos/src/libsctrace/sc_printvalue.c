@@ -592,6 +592,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #ifdef NEED_print_pollfds
 #define NEED_print_pollfd
+#define NEED_print_segfault
 #endif /* NEED_print_pollfds */
 
 #ifdef NEED_print_pollfd
@@ -605,6 +606,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #ifdef NEED_print_string_vector
 #define NEED_print_string
+#define NEED_print_segfault
 #endif /* NEED_print_string_vector */
 
 #ifdef NEED_print_timespec_vector
@@ -656,6 +658,10 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #define NEED_print_iovec_entry
 #endif /* NEED_print_iovecx64 */
 
+#if defined(NEED_print_iovecx32) || defined(NEED_print_iovecx64)
+#define NEED_print_segfault
+#endif /* NEED_print_iovecx32 || NEED_print_iovecx64 */
+
 #ifdef NEED_print_iovec_entry
 #define NEED_print_string_or_buffer
 #endif /* NEED_print_iovec_entry */
@@ -667,6 +673,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #ifdef NEED_print_fdset
 #define NEED_print_fd_t
+#define NEED_print_segfault
 #endif /* NEED_print_fdset */
 
 #ifdef NEED_print_sigmask_sigset_and_len
@@ -675,6 +682,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #ifdef NEED_print_sigset
 #define NEED_print_signo_t
+#define NEED_print_segfault
 #endif /* NEED_print_sigset */
 
 #ifdef NEED_print_socket_type
@@ -1771,6 +1779,17 @@ err:
 
 
 
+#ifdef NEED_print_segfault
+PRIVATE NONNULL((1)) ssize_t CC
+print_segfault(pformatprinter printer, void *arg) {
+	struct exception_data *data = except_data();
+	return format_printf(printer, arg, "<segfault:%p>",
+	                     data->e_args.e_segfault.s_addr);
+}
+#endif /* NEED_print_segfault */
+
+
+
 #ifdef NEED_print_pollfds
 PRIVATE NONNULL((1)) ssize_t CC
 print_pollfds(pformatprinter printer, void *arg,
@@ -1791,7 +1810,7 @@ print_pollfds(pformatprinter printer, void *arg,
 		} EXCEPT {
 			if (!was_thrown(E_SEGFAULT))
 				RETHROW();
-			PRINT("<segfault>");
+			DO(print_segfault(printer, arg));
 			goto done_rbracket;
 		}
 		DO(print_pollfd(printer, arg, &pfd));
@@ -2289,7 +2308,7 @@ print_string_vector(pformatprinter printer, void *arg,
 			} EXCEPT {
 				if (!was_thrown(E_SEGFAULT))
 					RETHROW();
-				PRINT("<segfault>");
+				DO(print_segfault(printer, arg));
 				break;
 			}
 			if (!string)
@@ -2305,7 +2324,7 @@ print_string_vector(pformatprinter printer, void *arg,
 			} EXCEPT {
 				if (!was_thrown(E_SEGFAULT))
 					RETHROW();
-				PRINT("<segfault>");
+				DO(print_segfault(printer, arg));
 			}
 		}
 		PRINT("]");
@@ -3117,7 +3136,7 @@ print_iovec_n(pformatprinter printer, void *arg, bool print_content,
 	} EXCEPT {
 		if (!was_thrown(E_SEGFAULT))
 			RETHROW();
-		PRINT("<segfault>");
+		DO(print_segfault(printer, arg));
 	}
 	if (used_count < count)
 		PRINT("," SYNSPACE2 "...");
@@ -3170,7 +3189,7 @@ print_fdset(pformatprinter printer, void *arg,
 	} EXCEPT {
 		if (!was_thrown(E_SEGFAULT))
 			RETHROW();
-		PRINT("<segfault>");
+		DO(print_segfault(printer, arg));
 	}
 	if (would_print_count > LIMIT_NFDS)
 		PRINT("," SYNSPACE2 "...");
@@ -3411,7 +3430,7 @@ print_sigset(pformatprinter printer, void *arg,
 			RETHROW();
 		if (!is_first)
 			PRINT("," SYNSPACE2);
-		PRINT("<segfault>");
+		DO(print_segfault(printer, arg));
 	}
 	if (has_prefix)
 		PRINT(SYNSPACE "}");

@@ -951,7 +951,7 @@ EOF
 # in order to have files in that folder mirror /kos/src/libiconv/include
 libiconv_mirror_include() {
 	echo "Checking for hard link: $KOS_ROOT/kos/src/libiconv/include/$1"
-	NLINK=$(stat --printf="%h" "$KOS_ROOT/kos/src/libiconv/include/$1" 2>/dev/null)
+	NLINK="$(stat --printf="%h" "$KOS_ROOT/kos/src/libiconv/include/$1" 2>/dev/null)"
 	if [[ "$NLINK" != 2 ]]; then
 		unlink "$KOS_ROOT/kos/src/libiconv/include/$1" > /dev/null 2>&1
 		if ln -P \
@@ -960,13 +960,12 @@ libiconv_mirror_include() {
 		> /dev/null 2>&1; then
 			echo "	Hard link created"
 		else
+			# As fallback (if the filesystem doesn't support hard links), just copy back the file
 			echo "	Failed to create hard link (use copy instead)"
 			cmd cp \
 				"$KOS_ROOT/kos/include/libiconv/$1" \
 				"$KOS_ROOT/kos/src/libiconv/include/$1"
 		fi
-		# As fallback (if the filesystem doesn't support hard links), just copy back the file
-
 	fi
 }
 cmd cd "$KOS_ROOT/kos/include/libiconv"
