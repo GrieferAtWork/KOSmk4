@@ -1508,27 +1508,27 @@ NOTHROW(FCALL cexpr_pushint)(struct ctyperef const *__restrict typ,
  * @return: DBX_EOK:    Success.
  * @return: DBX_ENOMEM: Insufficient memory.
  * @return: DBX_ENOENT: No such register. */
-PUBLIC dbx_errno_t /* Push `(auto)%[reg:id]' */
-NOTHROW(FCALL cexpr_pushregister_by_id)(unsigned int id) {
+PUBLIC dbx_errno_t /* Push `(auto)%[reg:regno]' */
+NOTHROW(FCALL cexpr_pushregister_by_id)(cpu_regno_t regno) {
 	struct cvalue *valp;
 	size_t buflen;
 	valp = _cexpr_pushalloc();
 	if unlikely(!valp)
 		return DBX_ENOMEM;
-	buflen = dbg_getregbyid(DBG_REGLEVEL_VIEW, id,
+	buflen = dbg_getregbyid(DBG_REGLEVEL_VIEW, regno,
 	                        valp->cv_register.r_ibuffer,
 	                        sizeof(valp->cv_register.r_ibuffer));
 	if unlikely(buflen > sizeof(valp->cv_register.r_ibuffer))
 		return DBX_EINTERN; /* Internal error */
 	if unlikely(!buflen)
 		return DBX_ENOENT; /* No such register */
-	valp->cv_type.ct_typ = ctype_for_register(id, buflen);
+	valp->cv_type.ct_typ = ctype_for_register(regno, buflen);
 	if unlikely(!valp->cv_type.ct_typ)
 		return DBX_EINTERN; /* Internal error */
 	ctypeinfo_init(&valp->cv_type.ct_info);
 	valp->cv_type.ct_flags    = CTYPEREF_FLAG_NORMAL;
 	valp->cv_kind             = CVALUE_KIND_REGISTER;
-	valp->cv_register.r_regid = id;
+	valp->cv_register.r_regid = regno;
 	if (cexpr_typeonly)
 		valp->cv_kind = CVALUE_KIND_VOID;
 	++cexpr_stacksize;

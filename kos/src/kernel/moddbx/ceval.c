@@ -609,15 +609,38 @@ NOTHROW(FCALL autocomplete_nontype_symbols)(struct cparser *__restrict self,
 	autocomplete_symbols(self, name, namelen, CMODSYM_DIP_NS_NONTYPE);
 }
 
+struct autocomplete_register_name_data {
+	struct cparser *self;
+	char const     *startswith_str;
+	size_t          startswith_len;
+};
+
+PRIVATE NONNULL((2)) ssize_t
+NOTHROW(LIBCPUSTATE_CC autocomplete_register_name_cb)(void *cookie,
+                                                      char const *__restrict name,
+                                                      size_t namelen) {
+	struct autocomplete_register_name_data *data;
+	data = (struct autocomplete_register_name_data *)cookie;
+	/* Check if the given startswith prefix applies to this register name */
+	if (namelen >= data->startswith_len &&
+	    memcasecmp(name, data->startswith_str, data->startswith_len) == 0) {
+		cparser_autocomplete(data->self,
+		                     name + data->startswith_len,
+		                     namelen - data->startswith_len);
+	}
+	return 0;
+}
+
 PRIVATE NONNULL((1)) void
 NOTHROW(FCALL autocomplete_register_name)(struct cparser *__restrict self,
                                           char const *__restrict name,
                                           size_t namelen) {
-	/* TODO: auto-complete register names that start with the given `name...+=namelen' */
-	/* TODO: Use `register_listnames(3)' */
-	(void)self;
-	(void)name;
-	(void)namelen;
+	/* auto-complete register names that start with the given `name...+=namelen' */
+	struct autocomplete_register_name_data data;
+	data.self           = self;
+	data.startswith_str = name;
+	data.startswith_len = namelen;
+	register_listnames(&autocomplete_register_name_cb, &data);
 }
 
 
@@ -816,12 +839,65 @@ doparen_expr:
 	case '%':
 	case '$': {
 		/* Register expression. */
+		char const *regname_start;
 		yield();
 		if unlikely(self->c_tok != CTOKEN_TOK_KEYWORD) {
 			if (self->c_autocom && self->c_tok == CTOKEN_TOK_EOF)
 				autocomplete_register_name(self, NULL, 0);
 			goto syn;
 		}
+
+		/* Special case: so-long  as there aren't any spaces, register
+		 *               names are allowed to contain '.', '(' and ')' */
+		regname_start = self->c_tokstart;
+		while (self->c_tokend < self->c_end) {
+			if (*self->c_tokend == '.') {
+				char const *kwdend = self->c_tokend;
+				char const *dotend = kwdend + 1;
+				cparser_yieldat(self, dotend); /* Parse keyword-like token after '.' */
+				if (self->c_tokstart != dotend || self->c_tok != CTOKEN_TOK_KEYWORD) {
+					if (self->c_tok == CTOKEN_TOK_EOF)
+						break; /* Accepted (for auto-complete) */
+					/* "." must immediately be followed by keyword here!
+					 * If it isn't, then roll back to the end of the preceding keyword. */
+					self->c_tokend = kwdend;
+					break;
+				}
+			} else if (*self->c_tokend == '(') {
+				/* Skip until matching ')' */
+				char const *keyword_before_paren;
+				unsigned int paren_recursion = 1;
+				keyword_before_paren = self->c_tokstart;
+				for (;;) {
+					char const *prev_token_end;
+					prev_token_end = self->c_tokend;
+					yield();
+					if (self->c_tokstart != prev_token_end)
+						break; /* Illegal space in sequence */
+					if (self->c_tok == CTOKEN_TOK_EOF) {
+						/* Unexpected EOF. -- For the purpose of auto-complete, we DO accept this */
+						paren_recursion = 0;
+						break;
+					}
+					if (self->c_tok == '(') {
+						++paren_recursion;
+					} else if (self->c_tok == ')') {
+						--paren_recursion;
+						if (paren_recursion == 0)
+							break;
+					}
+				}
+				if (paren_recursion != 0) {
+					/* Bad paren-sequence (roll back) */
+					cparser_yieldat(self, keyword_before_paren);
+					break;
+				}
+				break;
+			}
+		}
+		self->c_tokstart = regname_start;      /* Fake one long keyword */
+//		self->c_tok      = CTOKEN_TOK_KEYWORD; /* Not necessary */
+
 		result = cexpr_pushregister(self->c_tokstart,
 		                            cparser_toklen(self));
 		if unlikely(result != DBX_EOK) {

@@ -179,8 +179,8 @@ NOTHROW(FCALL cexpr_pushint)(struct ctyperef const *__restrict typ,
  * @return: DBX_EOK:    Success.
  * @return: DBX_ENOMEM: Insufficient memory.
  * @return: DBX_ENOENT: No such register. */
-FUNDEF dbx_errno_t /* Push `(auto)%[reg:id]' */
-NOTHROW(FCALL cexpr_pushregister_by_id)(unsigned int id);
+FUNDEF dbx_errno_t /* Push `(auto)%[reg:regno]' */
+NOTHROW(FCALL cexpr_pushregister_by_id)(cpu_regno_t regno);
 
 /* Same as above, but only require basic typ
  * information (typ flags, and name are pushed as 0/NULL) */
