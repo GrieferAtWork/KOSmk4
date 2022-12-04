@@ -117,7 +117,7 @@ DECL_BEGIN
  * >>     }
  * >>     if (0) {
  * >> tx_failed:
- * >>          // Actually done by returning `RTM_ABORT_FAILED'
+ * >>         // Actually done by returning `RTM_ABORT_FAILED'
  * >>         printf("Failed\n");
  * >>     }
  * >> }

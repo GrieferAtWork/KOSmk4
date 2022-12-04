@@ -1911,6 +1911,7 @@ err_unknown_section:
 		}
 		return result;
 	}
+
 	/* Support for formats other than ELF. */
 	if unlikely(self->dm_ops) {
 		size_t index;
@@ -1974,7 +1975,7 @@ again_read_section:
 			result->ds_cdata    = (void *)-1;
 			atomic_rwlock_init(&result->ds_module_lock);
 			if (info.dsi_addr) {
-				/* Section is already allocated in member. */
+				/* Section is already loaded in memory. */
 				result->ds_data  = info.dsi_addr;
 				result->ds_flags = DLSECTION_FLAG_NORMAL;
 				incref(self); /* Reference stored in `result->ds_module' */
@@ -2115,7 +2116,7 @@ again_read_elf_section:
 			result->ds_cdata    = (void *)-1;
 			atomic_rwlock_init(&result->ds_module_lock);
 			if (sect->sh_flags & SHF_ALLOC) {
-				/* Section is already allocated in member. */
+				/* Section is already loaded in memory. */
 				result->ds_data  = (void *)(self->dm_loadaddr + sect->sh_addr);
 				result->ds_flags = DLSECTION_FLAG_NORMAL;
 				incref(self); /* Reference stored in `result->ds_module' */
@@ -3436,7 +3437,7 @@ NOTHROW_NCX(CC dlsym_builtin)(USER char const *name) THROWS(E_SEGFAULT) {
 	case '_':
 		switch (*name++) {
 		case 'e':
-			goto check_environ; /* char **_environ */
+			goto check_nviron; /* char **_environ */
 
 		case 'p':
 			if (strcmp(name, "gmptr") == 0) /* char *_pgmptr */
@@ -3447,7 +3448,7 @@ NOTHROW_NCX(CC dlsym_builtin)(USER char const *name) THROWS(E_SEGFAULT) {
 			switch (*name++) {
 
 			case 'e':
-				goto check_environ; /* char **__environ */
+				goto check_nviron; /* char **__environ */
 
 			case 'a':
 				if (*name++ != 'r')
@@ -3497,7 +3498,7 @@ NOTHROW_NCX(CC dlsym_builtin)(USER char const *name) THROWS(E_SEGFAULT) {
 		break;
 
 	case 'e':
-check_environ:
+check_nviron:
 		if (strcmp(name, "nviron") == 0) /* char **environ */
 			return &dl_globals.dg_peb->pp_envp;
 		break;

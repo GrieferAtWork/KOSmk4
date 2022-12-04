@@ -43,6 +43,7 @@ DECL_BEGIN
 PUBLIC ATTR_PURE WUNUSED uintptr_t FCALL
 fdirent_hash(CHECKED USER /*utf-8*/ char const *text, u16 textlen)
 		THROWS(E_SEGFAULT) {
+	/* !!! Changes to this algorithm must be mirrored in `/kos/misc/libgen/fdirent_hash.dee' */
 	uintptr_t hash = FDIRENT_EMPTY_HASH;
 	uintptr_t const *iter, *end;
 

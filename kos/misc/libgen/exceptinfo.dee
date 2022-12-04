@@ -1434,7 +1434,9 @@ function printExceptNameFunctionBody(
 			printPreprocessorExpressionIf(File.stdout, strCond);
 			assumptions = ppexpr.createPPAssume();
 		}
-		ppCond = ppexpr.PPBranch(ppexpr.BRT_NOT, ppCond).optimize(assume: assumptions);
+		ppCond = ppexpr
+			.PPBranch(ppexpr.BRT_NOT, ppCond)
+			.optimize(assume: assumptions);
 		assumptions.addAssumption(ppCond);
 		printExceptNameFunctionBodyForMappings(
 			fp, mappings, classVariableName,

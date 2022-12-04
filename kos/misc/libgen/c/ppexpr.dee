@@ -1700,4 +1700,13 @@ assert optimize("(a || b) && (b || c) && (a || b || c)") == "(a || b) && (b || c
 assert optimize("(a || b || c) && (a || b) && (b || c)") == "(a || b) && (b || c)";
 assert optimize("(a && b) || (b && c) || (a && b && c)") == "(a && b) || (b && c)";
 assert optimize("(a && b && c) || (a && b) || (b && c)") == "(a && b) || (b && c)";
+
+// Assert that optimizer assumptions work
+assert optimize("foo && bar", "bar") == "foo";
+assert optimize("foo && bar", "foo && bar") == "1";
+assert optimize("foo && bar", "bar && foo") == "1";
+assert optimize("foo && bar", "foo * bar") == "1";
+assert optimize("foo && bar", "!foo") == "0";
+assert optimize("foo && bar", "!bar") == "0";
+assert optimize("foo && bar", "!foo && !bar") == "0";
 #endif /* __MAIN__ */

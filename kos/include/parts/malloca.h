@@ -76,7 +76,7 @@ __SYSDECL_BEGIN
 #ifdef __ARCH_PAGESIZE
 #define __MALLOCA_MAX __ARCH_PAGESIZE
 #else /* __ARCH_PAGESIZE */
-#define __MALLOCA_MAX 256
+#define __MALLOCA_MAX 1024
 #endif /* !__ARCH_PAGESIZE */
 #endif /* !__KERNEL__ */
 #endif /* !__MALLOCA_MAX */

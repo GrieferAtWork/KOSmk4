@@ -172,11 +172,7 @@ libphys_copyfromphys(void *dst, PHYS physaddr_t src, size_t num_bytes)
 
 PRIVATE ATTR_NOINLINE void CC
 touch_all_pages(void const *src, size_t num_bytes) {
-#ifdef __ARCH_PAGESIZE
-	size_t pagesize = __ARCH_PAGESIZE;
-#else /* __ARCH_PAGESIZE */
 	size_t pagesize = getpagesize();
-#endif /* !__ARCH_PAGESIZE */
 	if unlikely(!num_bytes)
 		return;
 	for (;;) {

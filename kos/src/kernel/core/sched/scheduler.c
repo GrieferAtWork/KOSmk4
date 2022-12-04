@@ -723,8 +723,7 @@ NOTHROW(FCALL sched_intern_high_priority_switch)(struct cpu *__restrict me,
 
 
 /* Wake-up a thread associated with the current CPU
- * @param: flags: Set of `TASK_WAKE_FNORMAL | TASK_WAKE_FHIGHPRIO'
- * @return: * : The new thread with which to continue execution. */
+ * @return: * : The thread with which to continue execution. */
 PUBLIC NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) struct task *
 NOTHROW(FCALL sched_intern_localwake)(struct cpu *__restrict me,
                                       struct task *__restrict caller,

@@ -60,7 +60,7 @@ typedef __UINTPTR_HALF_TYPE__ __except_class_t;
 typedef __UINTPTR_HALF_TYPE__ __except_subclass_t;
 
 /*[[[deemon (printExceptionDataStructs from ....misc.libgen.exceptinfo)(
-	escapeTypename: [](x) -> "__syscall_ulong_t /" "*{}*" "/".format({ x })); ]]]*/
+	escapeTypename: x -> f"__syscall_ulong_t /" f"*{x}*" f"/"); ]]]*/
 /* E_BADALLOC */
 struct exception_badalloc_data {
 	union {
