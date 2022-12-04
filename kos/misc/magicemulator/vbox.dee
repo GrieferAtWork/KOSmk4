@@ -94,6 +94,7 @@ function createVmdkDescriptor(diskFile: string): string {
 		f".{fs.fileof(diskFile).lstrip('.')}.vmdk");
 	if (!fs.stat.exists(resultFilename)) {
 		/* Lazily create the VBox descriptor for the disk image. */
+		local oldcwd = fs.getcwd();
 		fs.chdir(fs.headof(resultFilename));
 		runVBoxManageCommand({
 			"internalcommands",
@@ -103,6 +104,7 @@ function createVmdkDescriptor(diskFile: string): string {
 			"-rawdisk",
 			fs.tailof(diskFile)
 		});
+		fs.chdir(oldcwd);
 	}
 	return resultFilename;
 }
@@ -158,7 +160,8 @@ readmore:
 				local cnt;
 				try {
 					cnt = win32.ReadFile(hNamedPipe, buf);
-				} catch (...) {
+				} catch (e...) {
+					print("Terminating VBOX upon log error: ", type(e), ": ", e);
 					proc.terminate();
 					return;
 				}

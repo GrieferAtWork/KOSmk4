@@ -39,8 +39,6 @@ global writeStdout: Callable;
 @@its  absolute  path  if  found,  or  @none  other.
 function findExecutableInPath(path: string, name: string): string | none {
 	local filename = fs.joinpath(path, name);
-	if (fs.stat.exists(filename))
-		return filename;
 #ifdef __WINDOWS__
 	{
 		local exeFilename = filename + ".exe";
@@ -83,6 +81,8 @@ function findExecutableInPath(path: string, name: string): string | none {
 			return res;
 	}
 #endif /* __WINDOWS__ */
+	if (fs.stat.exists(filename))
+		return filename;
 	return none;
 }
 
