@@ -296,7 +296,7 @@ typedef __locale_t locale_t;
 #ifndef __errno_t_defined
 #define __errno_t_defined
 typedef __errno_t errno_t;
-#endif /* !errno_t_defined */
+#endif /* !__errno_t_defined */
 
 #ifndef __KERNEL__
 INTDEF NOBLOCK ATTR_CONST /*kos*/ errno_t *NOTHROW(LIBCCALL libc_errno_p)(void);
