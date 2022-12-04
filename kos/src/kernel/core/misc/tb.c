@@ -49,6 +49,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <libdebuginfo/unwind.h>
 #include <libinstrlen/instrlen.h>
+#include <libunwind/errno.h>
 #include <libunwind/unwind.h>
 
 DECL_BEGIN
@@ -88,7 +89,7 @@ do_print_traceback(pformatprinter printer, void *arg,
                    unwind_setreg_t reg_setter,
                    unsigned int n_skip) {
 	ssize_t temp, result;
-	unsigned int error;
+	unwind_errno_t error;
 	void *old_state;
 	void *pc, *sp, *last_good_sp;
 	old_state = alloca(state_size);

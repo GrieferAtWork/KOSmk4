@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a19db2a */
+/* HASH CRC-32:0x51886701 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3861,7 +3861,7 @@ DEFINE_PUBLIC_ALIAS(sys_debugtrap, libc_sys_debugtrap)
  * @param: unwind_error:     The  unwind  error that  caused the  coredump,  or `UNWIND_SUCCESS'  if unwinding
  *                           was  never  actually  performed,  and   `reason'  is  actually  a   `siginfo_t *'
  *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
-/* errno_t coredump(struct ucpustate const *curr_state, struct ucpustate const *orig_state, void const *const *traceback_vector, size_t traceback_length, union coredump_info const *reason, syscall_ulong_t unwind_error) */
+/* errno_t coredump(struct ucpustate const *curr_state, struct ucpustate const *orig_state, void const *const *traceback_vector, size_t traceback_length, union coredump_info const *reason, unwind_errno_t unwind_error) */
 INTERN_FUNCTION(libc_sys_coredump)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 8323090, enableExcept: false) */
 	b .
@@ -8221,7 +8221,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xdebugtrap, libc_sys_Xdebugtrap)
  * @param: unwind_error:     The  unwind  error that  caused the  coredump,  or `UNWIND_SUCCESS'  if unwinding
  *                           was  never  actually  performed,  and   `reason'  is  actually  a   `siginfo_t *'
  *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
-/* errno_t coredump(struct ucpustate const *curr_state, struct ucpustate const *orig_state, void const *const *traceback_vector, size_t traceback_length, union coredump_info const *reason, syscall_ulong_t unwind_error) */
+/* errno_t coredump(struct ucpustate const *curr_state, struct ucpustate const *orig_state, void const *const *traceback_vector, size_t traceback_length, union coredump_info const *reason, unwind_errno_t unwind_error) */
 INTERN_FUNCTION(libc_sys_Xcoredump)
 	/* TODO: arm_printLibcSyscallWrapper(sysno: 8323090, enableExcept: true) */
 	b .

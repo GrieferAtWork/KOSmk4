@@ -28,6 +28,7 @@
 #include <kos/types.h>
 
 #include <libunwind/cfi.h>
+#include <libunwind/errno.h>
 
 DECL_BEGIN
 
@@ -50,9 +51,9 @@ DECL_BEGIN
  * @return: UNWIND_SEGFAULT:         ...
  * @return: UNWIND_BADALLOC:         ...
  * @return: UNWIND_EMULATOR_*:       ... */
-INTDEF NONNULL((1)) unsigned int CC
+INTDEF NONNULL((1)) unwind_errno_t CC
 libuw_unwind_emulator_exec(unwind_emulator_t *__restrict self);
-INTDEF NONNULL((1)) unsigned int CC
+INTDEF NONNULL((1)) unwind_errno_t CC
 libuw_unwind_emulator_exec_autostack(unwind_emulator_t *__restrict self,
                                      unwind_ste_t const *pentry_stack_top,
                                      unwind_ste_t *pexit_stack_top,
@@ -90,7 +91,7 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
  * @return: UNWIND_SUCCESS:                      Success.
  * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `self'
  * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `self' */
-INTDEF NONNULL((1, 2, 4)) unsigned int
+INTDEF NONNULL((1, 2, 4)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_ste_addr)(unwind_ste_t const *__restrict self,
                                       unwind_getreg_t regget, void const *regget_arg,
                                       void **__restrict paddr);
@@ -110,12 +111,12 @@ NOTHROW_NCX(CC libuw_unwind_ste_addr)(unwind_ste_t const *__restrict self,
  * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `self'
  * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `self'
  * @return: UNWIND_SEGFAULT:                     Attempted to access faulty memory. */
-INTDEF NONNULL((1, 3, 5)) unsigned int
+INTDEF NONNULL((1, 3, 5)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_ste_read)(unwind_ste_t const *__restrict self, uint8_t addrsize,
                                       unwind_getreg_t regget, void const *regget_arg,
                                       void *__restrict dst, size_t num_bits,
                                       size_t dst_left_shift, size_t src_left_shift);
-INTDEF NONNULL((1, 3, 7)) unsigned int
+INTDEF NONNULL((1, 3, 7)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_ste_write)(unwind_ste_t const *__restrict self, uint8_t addrsize,
                                        /*[1..1]*/ unwind_getreg_t regget, void const *regget_arg,
                                        /*[0..1]*/ unwind_setreg_t regset, void *regset_arg,
@@ -155,7 +156,7 @@ NOTHROW_NCX(CC libuw_unwind_ste_write)(unwind_ste_t const *__restrict self, uint
  * @return: UNWIND_EMULATOR_NOT_WRITABLE:     Attempted to write to a read-only location expression.
  * @return: UNWIND_EMULATOR_BUFFER_TOO_SMALL: The given `bufsize' is too small.
  * @return: UNWIND_EMULATOR_NO_FUNCTION:      The associated location list is undefined for `module_relative_pc' */
-INTDEF NONNULL((1, 3, 8, 10)) unsigned int CC
+INTDEF NONNULL((1, 3, 8, 10)) unwind_errno_t CC
 libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self,
                                   unwind_emulator_sections_t const *sectinfo,
                                   unwind_getreg_t regget, void *regget_arg,
@@ -165,7 +166,7 @@ libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self
                                   size_t *__restrict pnum_written_bits,
                                   di_debuginfo_location_t const *frame_base_expression,
                                   void const *objaddr, uint8_t addrsize, uint8_t ptrsize);
-INTDEF NONNULL((1, 3, 5, 10, 12)) unsigned int CC
+INTDEF NONNULL((1, 3, 5, 10, 12)) unwind_errno_t CC
 libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self,
                                   unwind_emulator_sections_t const *sectinfo,
                                   unwind_getreg_t regget, void *regget_arg,

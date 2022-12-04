@@ -51,6 +51,7 @@
 #include <libdebuginfo/debug_aranges.h>
 #include <libdebuginfo/debug_info.h>
 #include <libdebuginfo/dwarf.h>
+#include <libdebuginfo/errno.h>
 
 /**/
 #include "include/cmodule.h"
@@ -2306,7 +2307,7 @@ NOTHROW(FCALL cmodule_findunit_from_pc_fallback)(struct cmodule const *__restric
 	 *           has a `DW_TAG_compile_unit' with a range-list which
 	 *           in turn contains `module_relative_pc' */
 	for (i = 0; i < self->cm_cuc; ++i) {
-		unsigned int error;
+		debuginfo_errno_t error;
 		di_debuginfo_cu_parser_t parser;
 		di_debuginfo_compile_unit_simple_t cu;
 		cmodunit_parser_from_dip(&self->cm_cuv[i], self, &parser, NULL);
@@ -2339,7 +2340,7 @@ NOTHROW(FCALL cmodule_findunit_from_pc)(struct cmodule const *__restrict self,
 	/* Try to make use of .debug_aranges to find the proper CU. */
 	if (self->cm_sections.ds_debug_aranges_start < self->cm_sections.ds_debug_aranges_end) {
 		uintptr_t debuginfo_cu_offset;
-		unsigned int error;
+		debuginfo_errno_t error;
 		error = debugaranges_locate(self->cm_sections.ds_debug_aranges_start,
 		                            self->cm_sections.ds_debug_aranges_end,
 		                            &debuginfo_cu_offset,
@@ -3121,7 +3122,7 @@ NOTHROW(FCALL cmod_symenum_locals_from_cu)(/*in|out(undef)*/ struct cmodsyminfo 
                                            cmod_symenum_callback_t cb, char const *startswith_name,
                                            size_t startswith_namelen, uintptr_t ns,
                                            ssize_t *__restrict presult) {
-	unsigned int error;
+	debuginfo_errno_t error;
 	ssize_t temp, result = 0;
 	uintptr_t cu_depth;
 	cu_depth = info->clv_parser.dup_child_depth;

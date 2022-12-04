@@ -26,6 +26,7 @@
 #include <bits/types.h>
 
 #include "cfi.h"
+#include "errno.h"
 
 /* The `.eh_frame' section shall  contain 1 or more  Call Frame Information (CFI)  records.
  * The number of records present shall be determined by size of the section as contained in
@@ -243,13 +244,13 @@ typedef struct unwind_fde_struct {
  * NOTE: The caller must pre-initialize `result->f_tbase' and `result->f_dbase'!
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
-typedef __ATTR_NONNULL_T((1, 2, 3)) unsigned int
+typedef __ATTR_NONNULL_T((1, 2, 3)) unwind_errno_t
 __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_LOAD)(__byte_t const **__restrict __peh_frame_reader,
                                                 __byte_t const *__restrict __eh_frame_end,
                                                 unwind_fde_t *__restrict __result,
                                                 __uint8_t __sizeof_address);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 3)) unsigned int
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 3)) unwind_errno_t
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_load)(__byte_t const **__restrict __peh_frame_reader,
                                             __byte_t const *__restrict __eh_frame_end,
                                             unwind_fde_t *__restrict __result,
@@ -263,14 +264,14 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_load)(__byte_t const **__restrict __peh_fr
  * @assume(!return || result->f_pcend > absolute_pc);
  * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `absolute_pc'.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
-typedef __ATTR_NONNULL_T((1, 2, 4)) unsigned int
+typedef __ATTR_NONNULL_T((1, 2, 4)) unwind_errno_t
 __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_SCAN)(__byte_t const *__restrict __eh_frame_start,
                                                 __byte_t const *__restrict __eh_frame_end,
                                                 void const *__absolute_pc,
                                                 unwind_fde_t *__restrict __result,
                                                 __uint8_t __sizeof_address);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4)) unsigned int
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4)) unwind_errno_t
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_scan)(__byte_t const *__restrict __eh_frame_start,
                                             __byte_t const *__restrict __eh_frame_end,
                                             void const *__absolute_pc,
@@ -372,12 +373,12 @@ typedef struct unwind_cfa_landing_state_struct {
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-typedef __ATTR_NONNULL_T((1, 2)) unsigned int
+typedef __ATTR_NONNULL_T((1, 2)) unwind_errno_t
 __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_EXEC)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                                 unwind_cfa_state_t *__restrict __result,
                                                 void const *__absolute_pc);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unsigned int
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unwind_errno_t
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_exec)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                             unwind_cfa_state_t *__restrict __result,
                                             void const *__absolute_pc);
@@ -398,12 +399,12 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_exec)(unwind_fde_t *__restrict __self, /* 
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-typedef __ATTR_NONNULL_T((1, 2)) unsigned int
+typedef __ATTR_NONNULL_T((1, 2)) unwind_errno_t
 __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_SIGFRAME_EXEC)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                                          unwind_cfa_sigframe_state_t *__restrict __result,
                                                          void const *__absolute_pc);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unsigned int
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unwind_errno_t
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_sigframe_exec)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                                      unwind_cfa_sigframe_state_t *__restrict __result,
                                                      void const *__absolute_pc);
@@ -424,13 +425,13 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_sigframe_exec)(unwind_fde_t *__restrict __
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-typedef __ATTR_NONNULL_T((1, 2)) unsigned int
+typedef __ATTR_NONNULL_T((1, 2)) unwind_errno_t
 __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_LANDING_EXEC)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                                         unwind_cfa_landing_state_t *__restrict __result,
                                                         void const *__absolute_pc,
                                                         void const *__landingpad_pc);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unsigned int
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unwind_errno_t
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_landing_exec)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                                     unwind_cfa_landing_state_t *__restrict __result,
                                                     void const *__absolute_pc,
@@ -452,13 +453,13 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_landing_exec)(unwind_fde_t *__restrict __s
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-typedef __ATTR_NONNULL_T((1, 2)) unsigned int
+typedef __ATTR_NONNULL_T((1, 2)) unwind_errno_t
 __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_RULE)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                                 unwind_cfa_register_t *__restrict __result,
                                                 unwind_regno_t __dw_regno,
                                                 void const *__absolute_pc);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unsigned int
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unwind_errno_t
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_rule)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                             unwind_cfa_register_t *__restrict __result,
                                             unwind_regno_t __dw_regno,
@@ -472,12 +473,12 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_rule)(unwind_fde_t *__restrict __self, /* 
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-typedef __ATTR_NONNULL_T((1, 2)) unsigned int
+typedef __ATTR_NONNULL_T((1, 2)) unwind_errno_t
 __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_EXEC_CFA)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                                     unwind_cfa_value_t *__restrict __result,
                                                     void const *__absolute_pc);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unsigned int
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unwind_errno_t
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_exec_cfa)(unwind_fde_t *__restrict __self, /* Only non-const for lazy initialized fields! */
                                                 unwind_cfa_value_t *__restrict __result,
                                                 void const *__absolute_pc);
@@ -498,14 +499,14 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_exec_cfa)(unwind_fde_t *__restrict __self,
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-typedef __ATTR_NONNULL_T((1, 2, 4, 6)) unsigned int
+typedef __ATTR_NONNULL_T((1, 2, 4, 6)) unwind_errno_t
 (LIBUNWIND_CC *PUNWIND_CFA_APPLY)(unwind_cfa_state_t *__restrict __self,
                                   unwind_fde_t *__restrict __fde, /* Only non-const for lazy initialized fields! */
                                   void const *__absolute_pc,
                                   unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
                                   unwind_setreg_t __reg_setter, void *__reg_setter_arg);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4, 6)) unsigned int LIBUNWIND_CC
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4, 6)) unwind_errno_t LIBUNWIND_CC
 unwind_cfa_apply(unwind_cfa_state_t *__restrict __self,
                  unwind_fde_t *__restrict __fde, /* Only non-const for lazy initialized fields! */
                  void const *__absolute_pc,
@@ -523,14 +524,14 @@ unwind_cfa_apply(unwind_cfa_state_t *__restrict __self,
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-typedef __ATTR_NONNULL_T((1, 2, 4, 6)) unsigned int
+typedef __ATTR_NONNULL_T((1, 2, 4, 6)) unwind_errno_t
 (LIBUNWIND_CC *PUNWIND_CFA_SIGFRAME_APPLY)(unwind_cfa_sigframe_state_t *__restrict __self,
                                            unwind_fde_t *__restrict __fde, /* Only non-const for lazy initialized fields! */
                                            void const *__absolute_pc,
                                            unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
                                            unwind_setreg_t __reg_setter, void *__reg_setter_arg);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4, 6)) unsigned int LIBUNWIND_CC
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4, 6)) unwind_errno_t LIBUNWIND_CC
 unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict __self,
                           unwind_fde_t *__restrict __fde, /* Only non-const for lazy initialized fields! */
                           void const *__absolute_pc,
@@ -548,14 +549,14 @@ unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict __self,
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-typedef __ATTR_NONNULL_T((1, 2, 4, 6)) unsigned int
+typedef __ATTR_NONNULL_T((1, 2, 4, 6)) unwind_errno_t
 (LIBUNWIND_CC *PUNWIND_CFA_LANDING_APPLY)(unwind_cfa_landing_state_t *__restrict __self,
                                           unwind_fde_t *__restrict __fde, /* Only non-const for lazy initialized fields! */
                                           void const *__absolute_pc,
                                           unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
                                           unwind_setreg_t __reg_setter, void *__reg_setter_arg);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4, 6)) unsigned int LIBUNWIND_CC
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4, 6)) unwind_errno_t LIBUNWIND_CC
 unwind_cfa_landing_apply(unwind_cfa_landing_state_t *__restrict __self,
                          unwind_fde_t *__restrict __fde, /* Only non-const for lazy initialized fields! */
                          void const *__absolute_pc,
@@ -572,14 +573,14 @@ unwind_cfa_landing_apply(unwind_cfa_landing_state_t *__restrict __self,
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-typedef __ATTR_NONNULL_T((1, 2, 3, 5)) unsigned int
+typedef __ATTR_NONNULL_T((1, 2, 3, 5)) unwind_errno_t
 (LIBUNWIND_CC *PUNWIND_FDE_CALCULATE_CFA)(unwind_fde_t *__restrict __fde, /* Only non-const for lazy initialized fields! */
                                           unwind_cfa_value_t const *__restrict __self,
                                           unwind_getreg_t __reg_getter,
                                           void const *__reg_getter_arg,
                                           __uintptr_t *__restrict __presult);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 3, 5)) unsigned int LIBUNWIND_CC
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 3, 5)) unwind_errno_t LIBUNWIND_CC
 unwind_fde_calculate_cfa(unwind_fde_t *__restrict __fde, /* Only non-const for lazy initialized fields! */
                          unwind_cfa_value_t const *__restrict __self,
                          unwind_getreg_t __reg_getter,

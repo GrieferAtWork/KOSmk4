@@ -51,6 +51,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <libdebuginfo/debug_info.h>
 #include <libdebuginfo/dwarf.h>
+#include <libdebuginfo/errno.h>
 #include <libunwind/dwarf.h>
 
 #include "debug_aranges.h"
@@ -488,7 +489,7 @@ do_fill_dynamic_cache:
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
-INTERN TEXTSECTION NONNULL((1, 2, 3, 4, 5)) unsigned int
+INTERN TEXTSECTION NONNULL((1, 2, 3, 4, 5)) debuginfo_errno_t
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadunit)(byte_t const **__restrict pdebug_info_reader,
                                                    byte_t const *__restrict debug_info_end,
                                                    di_debuginfo_cu_parser_sections_t const *__restrict sectinfo,
@@ -3483,7 +3484,7 @@ libdi_debuginfo_enum_locals_in_cu(di_enum_locals_sections_t const *__restrict se
                                   void *arg, ssize_t *__restrict presult,
                                   bool assume_correct_cu) {
 	bool result = false;
-	unsigned int error;
+	debuginfo_errno_t error;
 again:
 	switch (self->dup_comp.dic_tag) {
 
@@ -3813,7 +3814,7 @@ try_load_dynsym:
 
 INTERN NONNULL((1)) void
 NOTHROW_NCX(CC libdi_debug_sections_unlock)(di_debug_dl_sections_t *__restrict dl_sections) {
-	unsigned int i;
+	size_t i;
 	for (i = 0; i < sizeof(di_debug_dl_sections_t) / sizeof(REF module_section_t *); ++i) {
 		REF module_section_t *section;
 		section = ((REF module_section_t **)dl_sections)[i];

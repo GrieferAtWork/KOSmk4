@@ -44,6 +44,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <libdebuginfo/debug_info.h>
 #include <libdebuginfo/debug_line.h>
 #include <libdebuginfo/dwarf.h>
+#include <libdebuginfo/errno.h>
 #include <libunwind/dwarf.h>
 
 #include "debug_info.h"
@@ -339,7 +340,7 @@ PRIVATE byte_t const dwarf4_lne_filefmt[] = {
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
-INTERN TEXTSECTION NONNULL((1, 2, 3)) unsigned int
+INTERN TEXTSECTION NONNULL((1, 2, 3)) debuginfo_errno_t
 NOTHROW_NCX(CC libdi_debugline_loadunit)(byte_t const **__restrict preader,
                                          byte_t const *__restrict text_end,
                                          di_debugline_unit_t *__restrict result) {
@@ -518,7 +519,7 @@ typedef struct {
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: ...
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
-INTERN TEXTSECTION NONNULL((1, 2)) unsigned int
+INTERN TEXTSECTION NONNULL((1, 2)) debuginfo_errno_t
 NOTHROW_NCX(CC libdi_debugline_scanunit)(di_debugline_unit_t const *__restrict self,
                                          di_debugline_info_t *__restrict result,
                                          uintptr_t module_relative_pc) {

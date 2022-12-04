@@ -26,6 +26,8 @@
 
 #include <kos/bits/coredump.h>
 
+#include <libunwind/errno.h>
+
 DECL_BEGIN
 
 #ifdef __CC__
@@ -104,7 +106,7 @@ coredump_create(struct ucpustate const *curr_ustate,
                 void const *const *ktraceback_vector, size_t ktraceback_length,
                 struct kcpustate const *orig_kstate,
                 union coredump_info const *reason,
-                unsigned int unwind_error)
+                unwind_errno_t unwind_error)
 		THROWS(...);
 
 /* Create a coredump because of the given signal `si' */
@@ -123,7 +125,7 @@ coredump_create_for_signal(struct icpustate const *__restrict state,
 FUNDEF NONNULL((1, 2)) void FCALL
 coredump_create_for_exception(struct icpustate const *__restrict state,
                               struct exception_info const *__restrict info,
-                              bool originates_from_kernelspace);
+                              __BOOL originates_from_kernelspace);
 
 
 

@@ -53,7 +53,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <libunwind/api.h>
+#include <libunwind/errno.h>
 
 #if (defined(DEFINE_sys32_coredump) + \
      defined(DEFINE_sys64_coredump)) != 1
@@ -129,7 +129,7 @@ LOCAL_sys_coredump_impl(struct icpustate *__restrict return_state,
                         USER UNCHECKED LOCAL_struct_ucpustate const *orig_state,
                         USER UNCHECKED LOCAL_uintptr_t const *const *traceback_vector, size_t traceback_length,
                         USER UNCHECKED LOCAL_union_coredump_info const *reason,
-                        syscall_ulong_t unwind_error) {
+                        unwind_errno_t unwind_error) {
 	struct ucpustate curr_ustate, orig_ustate;
 	void **utb_vector;
 	signo_t signo = SIGABRT;
@@ -259,7 +259,7 @@ LOCAL_sys_coredump_rpc(struct rpc_context *__restrict ctx,
 	                        (USER UNCHECKED LOCAL_uintptr_t const *const *)ctx->rc_scinfo.rsi_regs[2],
 	                        (size_t)ctx->rc_scinfo.rsi_regs[3],
 	                        (USER UNCHECKED LOCAL_union_coredump_info const *)ctx->rc_scinfo.rsi_regs[4],
-	                        (syscall_ulong_t)ctx->rc_scinfo.rsi_regs[5]);
+	                        (unwind_errno_t)ctx->rc_scinfo.rsi_regs[5]);
 }
 
 /************************************************************************/
@@ -272,7 +272,7 @@ DEFINE_SYSCALL64_6(errno_t, coredump,
                    USER UNCHECKED LOCAL_pointer(void const) const *, traceback_vector,
                    size_t, traceback_length,
                    USER UNCHECKED LOCAL_union_coredump_info const *, reason,
-                   syscall_ulong_t, unwind_error)
+                   unwind_errno_t, unwind_error)
 #else /* DEFINE_sys64_coredump */
 DEFINE_SYSCALL32_6(errno_t, coredump,
                    USER UNCHECKED LOCAL_struct_ucpustate const *, curr_state,
@@ -280,7 +280,7 @@ DEFINE_SYSCALL32_6(errno_t, coredump,
                    USER UNCHECKED LOCAL_pointer(void const) const *, traceback_vector,
                    size_t, traceback_length,
                    USER UNCHECKED LOCAL_union_coredump_info const *, reason,
-                   syscall_ulong_t, unwind_error)
+                   unwind_errno_t, unwind_error)
 #endif /* !DEFINE_sys64_coredump */
 {
 	(void)curr_state;

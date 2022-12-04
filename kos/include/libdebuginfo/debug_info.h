@@ -35,6 +35,8 @@
 #include <libc/string.h>
 #include <libunwind/dwarf.h>
 
+#include "errno.h"
+
 /* Section containers & overlap:
  *
  * unwind_emulator_sections_t: .eh_frame_hdr, .eh_frame, .debug_frame, .debug_addr, .debug_loclists, .debug_loc, .debug_abbrev, .debug_info
@@ -309,7 +311,7 @@ typedef struct di_debuginfo_location_struct {
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
-typedef __ATTR_NONNULL_T((1, 2, 3, 4, 5)) unsigned int
+typedef __ATTR_NONNULL_T((1, 2, 3, 4, 5)) debuginfo_errno_t
 __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_LOADUNIT)(__byte_t const **__restrict pdebug_info_reader,
                                                                 __byte_t const *__restrict debug_info_end,
                                                                 di_debuginfo_cu_parser_sections_t const *__restrict sectinfo,
@@ -317,7 +319,7 @@ __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_CU_PARSER_LOADUNIT)(__byte_t const *
                                                                 di_debuginfo_cu_abbrev_t *__restrict abbrev,
                                                                 __byte_t const *first_component_pointer);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
-LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 3, 4, 5)) unsigned int
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 3, 4, 5)) debuginfo_errno_t
 __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_loadunit)(__byte_t const **__restrict pdebug_info_reader,
                                                             __byte_t const *__restrict debug_info_end,
                                                             di_debuginfo_cu_parser_sections_t const *__restrict sectinfo,
@@ -483,13 +485,13 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_rnglists_iterator_next)(di_debuginfo_rng
 
 /* Check if a given `module_relative_pc' is apart of the given range selector.
  * @param: self: The ranges object to query for `module_relative_pc' */
-typedef __ATTR_NONNULL_T((1, 2, 5)) unsigned int
+typedef __ATTR_NONNULL_T((1, 2, 5)) debuginfo_errno_t
 __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_RNGLISTS_CONTAINS)(di_debuginfo_rnglists_t const *__restrict self,
                                                                di_debuginfo_cu_parser_t const *__restrict parser,
                                                                __uintptr_t cu_base,
                                                                __uintptr_t module_relative_pc,
                                                                di_rnglists_sections_t const *__restrict sections);
-typedef __ATTR_NONNULL_T((1, 2, 5, 6, 7)) unsigned int
+typedef __ATTR_NONNULL_T((1, 2, 5, 6, 7)) debuginfo_errno_t
 __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_RNGLISTS_CONTAINS_EX)(di_debuginfo_rnglists_t const *__restrict self,
                                                                   di_debuginfo_cu_parser_t const *__restrict parser,
                                                                   __uintptr_t cu_base,
@@ -498,13 +500,13 @@ __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_RNGLISTS_CONTAINS_EX)(di_debuginfo_r
                                                                   __uintptr_t *__restrict poverlap_start,
                                                                   __uintptr_t *__restrict poverlap_end);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
-LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 5)) unsigned int
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 5)) debuginfo_errno_t
 __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_rnglists_contains)(di_debuginfo_rnglists_t const *__restrict self,
                                                            di_debuginfo_cu_parser_t const *__restrict parser,
                                                            __uintptr_t cu_base,
                                                            __uintptr_t module_relative_pc,
                                                            di_rnglists_sections_t const *__restrict sections);
-LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 5, 6, 7)) unsigned int
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 5, 6, 7)) debuginfo_errno_t
 __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_rnglists_contains_ex)(di_debuginfo_rnglists_t const *__restrict self,
                                                               di_debuginfo_cu_parser_t const *__restrict parser,
                                                               __uintptr_t cu_base,

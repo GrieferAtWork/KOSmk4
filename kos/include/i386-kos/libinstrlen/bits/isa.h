@@ -29,7 +29,7 @@
 
 #include <libemu86/emu86.h>
 #include <libinstrlen/api.h>
-#include <libunwind/api.h>
+#include <libunwind/errno.h>
 #ifdef __x86_64__
 #include <libunwind/cfi/x86_64.h>
 #else /* __x86_64__ */

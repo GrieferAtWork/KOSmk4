@@ -17,39 +17,23 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_COREDUMP_H
-#define _KOS_COREDUMP_H 1
+#ifndef _LIBDEBUGINFO_ERRNO_H
+#define _LIBDEBUGINFO_ERRNO_H 1
 
-#include <__stdinc.h>
+#include "api.h"
 
-#include <kos/bits/coredump.h> /* union coredump_info */
+/* Debug info error codes. */
+#define DEBUG_INFO_ERROR_SUCCESS 0 /* Function completed successfully. */
+#define DEBUG_INFO_ERROR_NOFRAME 1 /* No debug information associated with the given location. */
+#define DEBUG_INFO_ERROR_CORRUPT 2 /* Debug information has been corrupted. */
 
-#include <libunwind/errno.h> /* UNWIND_* */
+#ifdef __CC__
+__DECL_BEGIN
 
+/* Debug info error code (one of `DEBUG_INFO_ERROR_*') */
+typedef unsigned int debuginfo_errno_t;
 
-/* Coredump message string limits.
- * WARNING: These values as used as alloca() limits, so don't  set
- *          them too high, or else user-space may be able to cause
- *          a kernel-space stack overflow... */
-#define COREDUMP_ASSERT_EXPR_MAXLEN 512  /* ci_assert.ca_expr */
-#define COREDUMP_ASSERT_FILE_MAXLEN 512  /* ci_assert.ca_file */
-#define COREDUMP_ASSERT_FUNC_MAXLEN 256  /* ci_assert.ca_func */
-#define COREDUMP_ASSERT_MESG_MAXLEN 2048 /* ci_assert.ca_mesg */
-#define COREDUMP_DLERROR_MAXLEN     2048 /* ci_dlerror */
-#define COREDUMP_TRACEBACK_LIMIT    128  /* Max # of extended traceback entries. */
+__DECL_END
+#endif /* __CC__ */
 
-
-#define COREDUMP_INFO_ISEXCEPT(unwind_error)  \
-	((unwind_error) != UNWIND_SUCCESS &&      \
-	 (unwind_error) != UNWIND_USER_DLERROR && \
-	 (unwind_error) != UNWIND_USER_ASSERT &&  \
-	 (unwind_error) != UNWIND_USER_ACHECK)
-#define COREDUMP_INFO_ISSIGNAL(unwind_error) \
-	((unwind_error) == UNWIND_SUCCESS)
-#define COREDUMP_INFO_ISDLERROR(unwind_error) \
-	((unwind_error) == UNWIND_USER_DLERROR)
-#define COREDUMP_INFO_ISASSERT(unwind_error) \
-	((unwind_error) == UNWIND_USER_ASSERT || \
-	 (unwind_error) == UNWIND_USER_ACHECK)
-
-#endif /* !_KOS_COREDUMP_H */
+#endif /* !_LIBDEBUGINFO_ERRNO_H */

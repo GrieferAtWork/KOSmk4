@@ -44,6 +44,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <libdebuginfo/debug_info.h>
 #include <libdebuginfo/debug_line.h>
 #include <libdebuginfo/dwarf.h>
+#include <libdebuginfo/errno.h>
 #include <libdebuginfo/symtab.h>
 
 #include "addr2line.h"
@@ -142,14 +143,14 @@ NOTHROW_NCX(CC search_symtab)(di_addr2line_sections_t const *__restrict sections
 
 #define DEBUG_INFO_ERROR_NOLEVEL 3 /* No information is associated with the given level. */
 
-PRIVATE TEXTSECTION NONNULL((1, 2, 3)) unsigned int
+PRIVATE TEXTSECTION NONNULL((1, 2, 3)) debuginfo_errno_t
 NOTHROW_NCX(CC scan_cu_stmt_list)(di_debuginfo_compile_unit_t const *__restrict cu,
                                   di_addr2line_sections_t const *__restrict sections,
                                   di_debug_addr2line_t *__restrict result,
                                   uintptr_t module_relative_pc,
                                   uintptr_t level) {
 	if (cu->cu_stmt_list < (size_t)(sections->ds_debug_line_end - sections->ds_debug_line_start)) {
-		unsigned int error;
+		debuginfo_errno_t error;
 		di_debugline_unit_t unit;
 		di_debugline_info_t info;
 		byte_t const *debug_line_reader;
@@ -196,14 +197,14 @@ NOTHROW_NCX(CC scan_cu_stmt_list)(di_debuginfo_compile_unit_t const *__restrict 
 }
 
 
-PRIVATE ATTR_NOINLINE TEXTSECTION NONNULL((1, 2, 3)) unsigned int
+PRIVATE ATTR_NOINLINE TEXTSECTION NONNULL((1, 2, 3)) debuginfo_errno_t
 NOTHROW_NCX(CC search_cu)(di_debuginfo_cu_parser_t *__restrict self,
                           di_addr2line_sections_t const *__restrict sections,
                           di_debug_addr2line_t *__restrict result,
                           uintptr_t module_relative_pc,
                           uintptr_t level,
                           bool assume_correct_cu) {
-	unsigned int error;
+	debuginfo_errno_t error;
 again:
 	switch (self->dup_comp.dic_tag) {
 
@@ -559,7 +560,7 @@ err_corrupt:
  *                   always refers to the top-most, non-inlined source location.
  * @param: flags:    Set of `DEBUG_ADDR2LINE_F*'
  * >> di_debug_addr2line_t info;
- * >> unsigned int error;
+ * >> debuginfo_errno_t error;
  * >> uintptr_t level = 0;
  * >> do {
  * >>     error = debug_addr2line((uintptr_t)ptr, &info, level);
@@ -588,13 +589,13 @@ err_corrupt:
  *                                    levels know is. (all other  fields of `*result' are  NULL-
  *                                    initialized)
  * @return: DEBUG_INFO_ERROR_CORRUPT: Debug information is corrupted (`*result' was NULL-initialized). */
-INTERN TEXTSECTION NONNULL((1, 2)) unsigned int
+INTERN TEXTSECTION NONNULL((1, 2)) debuginfo_errno_t
 NOTHROW_NCX(CC libdi_debug_addr2line)(di_addr2line_sections_t const *__restrict sections,
                                       di_debug_addr2line_t *__restrict result,
                                       uintptr_t module_relative_pc,
                                       uintptr_t level,
                                       uintptr_t flags) {
-	unsigned int error;
+	debuginfo_errno_t error;
 	if unlikely(sections->ds_debug_line_end <= sections->ds_debug_line_start) {
 		/* Scan the symbol tables. */
 err_nodata_nolevel:
@@ -750,7 +751,7 @@ libdi_debug_addr2line_print_filename(pformatprinter printer, void *arg,
                                      char const *cubase, char const *pathname,
                                      char const *filename) {
 	ssize_t temp, result = 0;
-	unsigned int strid;
+	size_t strid;
 	if (pathname && (pathname[0] == '/' || pathname[0] == '\\' ||
 	                 (isalpha(pathname[0]) && pathname[1] == ':'))) {
 		cubase = NULL; /* `pathname' is an absolute path (can happen for
@@ -828,7 +829,7 @@ INTERN_CONST STRINGSECTION char const secname_dynstr[]         = ".dynstr";
  *                                    sections.
  *                                    In this case, `sections' and `dl_sections' will have both
  *                                    been initialized to all NULL-values. */
-INTERN TEXTSECTION NONNULL((2, 3)) unsigned int
+INTERN TEXTSECTION NONNULL((2, 3)) debuginfo_errno_t
 NOTHROW_NCX(CC libdi_debug_addr2line_sections_lock)(module_t *dl_handle,
                                                     di_addr2line_sections_t *__restrict sections,
                                                     di_addr2line_dl_sections_t *__restrict dl_sections) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x611aa544 */
+/* HASH CRC-32:0x1e9ff794 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2134,7 +2134,7 @@
 #define __NR32AT2_coredump                     (__HYBRID_PTR32(void const) const *, __HYBRID_PTR32(void const) const *)
 #define __NR32AT3_coredump                     (size_t, __size_t)
 #define __NR32AT4_coredump                     (union coredump_info32 const *, union coredump_info32 const *)
-#define __NR32AT5_coredump                     (syscall_ulong_t, __syscall_ulong_t)
+#define __NR32AT5_coredump                     (unwind_errno_t, unwind_errno_t)
 #define __NR32AT0_debugtrap                    (struct ucpustate32 const *, struct ucpustate32 const *)
 #define __NR32AT1_debugtrap                    (struct debugtrap_reason32 const *, struct debugtrap_reason32 const *)
 #define __NR32AT0_get_exception_handler        (__ULONG32_TYPE__ *, __ULONG32_TYPE__ *)
@@ -2666,7 +2666,7 @@
 #define __NR32AM_stime64(a, b, c, d, e, f)                      (__time64_t const *)a
 #define __NR32AM_userviofd(a, b, c, d, e, f)                    (__size_t)a, (__syscall_ulong_t)b
 #define __NR32AM_lseek64(a, b, c, d, e, f)                      (__fd_t)a, (__int64_t)((__uint64_t)b | (__uint64_t)c << 32), (__syscall_ulong_t)d
-#define __NR32AM_coredump(a, b, c, d, e, f)                     (struct ucpustate32 const *)a, (struct ucpustate32 const *)b, (__HYBRID_PTR32(void const) const *)c, (__size_t)d, (union coredump_info32 const *)e, (__syscall_ulong_t)f
+#define __NR32AM_coredump(a, b, c, d, e, f)                     (struct ucpustate32 const *)a, (struct ucpustate32 const *)b, (__HYBRID_PTR32(void const) const *)c, (__size_t)d, (union coredump_info32 const *)e, (unwind_errno_t)f
 #define __NR32AM_debugtrap(a, b, c, d, e, f)                    (struct ucpustate32 const *)a, (struct debugtrap_reason32 const *)b
 #define __NR32AM_get_exception_handler(a, b, c, d, e, f)        (__ULONG32_TYPE__ *)a, (__except_handler32_t *)b, (__HYBRID_PTR32(void) *)c
 #define __NR32AM_set_exception_handler(a, b, c, d, e, f)        (__syscall_ulong_t)a, (__except_handler_t)b, (void *)c

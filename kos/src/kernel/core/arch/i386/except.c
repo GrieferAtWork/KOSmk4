@@ -58,6 +58,7 @@
 #include <libregdump/x86.h>
 #include <libunwind/dwarf.h>
 #include <libunwind/eh_frame.h>
+#include <libunwind/errno.h>
 #include <libunwind/unwind.h>
 
 
@@ -160,7 +161,7 @@ NOTHROW(VCALL except_printf)(char const *__restrict reason, ...) {
 
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 PRIVATE ATTR_DBGTEXT void KCALL
-panic_uhe_dbg_main(unsigned int unwind_error,
+panic_uhe_dbg_main(unwind_errno_t unwind_error,
                    void const *last_pc,
                    struct exception_info *info) {
 	unsigned int i;
@@ -237,7 +238,7 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
                            struct ucpustate *__restrict state);
 
 INTERN ATTR_COLD NONNULL((2)) void FCALL
-halt_unhandled_exception(unsigned int unwind_error,
+halt_unhandled_exception(unwind_errno_t unwind_error,
                          struct kcpustate *__restrict unwind_state) {
 	struct exception_info *info;
 	void const *last_pc;

@@ -33,6 +33,7 @@
 #include <stddef.h>
 
 #include <libdebuginfo/debug_info.h>
+#include <libdebuginfo/errno.h>
 
 DECL_BEGIN
 
@@ -59,13 +60,13 @@ NOTHROW_NCX(CC libdi_debuginfo_rnglists_iterator_next)(di_debuginfo_rnglists_ite
 
 /* Check if a given `module_relative_pc' is apart of the given range selector.
  * @param: self: The ranges object to query for `module_relative_pc' */
-INTDEF NONNULL((1, 2, 5)) unsigned int
+INTDEF NONNULL((1, 2, 5)) debuginfo_errno_t
 NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains)(di_debuginfo_rnglists_t const *__restrict self,
                                                 di_debuginfo_cu_parser_t const *__restrict parser,
                                                 uintptr_t cu_base,
                                                 uintptr_t module_relative_pc,
                                                 di_rnglists_sections_t const *__restrict sections);
-INTDEF NONNULL((1, 2, 5, 6, 7)) unsigned int
+INTDEF NONNULL((1, 2, 5, 6, 7)) debuginfo_errno_t
 NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains_ex)(di_debuginfo_rnglists_t const *__restrict self,
                                                    di_debuginfo_cu_parser_t const *__restrict parser,
                                                    uintptr_t cu_base,
@@ -91,7 +92,7 @@ NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains_ex)(di_debuginfo_rnglists_t con
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
-INTDEF NONNULL((1, 2, 3, 4, 5)) unsigned int
+INTDEF NONNULL((1, 2, 3, 4, 5)) debuginfo_errno_t
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadunit)(byte_t const **__restrict pdebug_info_reader,
                                                    byte_t const *__restrict debug_info_end,
                                                    di_debuginfo_cu_parser_sections_t const *__restrict sectinfo,

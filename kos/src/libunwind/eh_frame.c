@@ -43,6 +43,7 @@
 
 #include <libunwind/cfi.h>
 #include <libunwind/eh_frame.h>
+#include <libunwind/errno.h>
 
 #include "cfi.h"
 #include "dwarf.h"
@@ -355,7 +356,7 @@ PRIVATE
 #else /* ... */
 	NONNULL((1, 2, 3, 4))
 #endif /* !... */
-	unsigned int
+	unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_exec_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                             IF_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t *common_init_regs,)
                                             IF_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT(byte_t *uncommon_init_regs,)
@@ -373,7 +374,7 @@ PRIVATE
 #else /* ... */
 	NONNULL((1, 2, 3, 4))
 #endif /* !... */
-	unsigned int
+	unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_sigframe_fde_exec_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                                      IF_CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t *common_init_regs,)
                                                      IF_CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT(byte_t *uncommon_init_regs,)
@@ -393,7 +394,7 @@ PRIVATE
 #else /* ... */
 	NONNULL((1, 2, 3, 4))
 #endif /* !... */
-	unsigned int
+	unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_landing_fde_exec_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                                     IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t *common_init_regs,)
                                                     IF_CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT(byte_t *uncommon_init_regs,)
@@ -404,14 +405,14 @@ NOTHROW_NCX(CC libuw_unwind_landing_fde_exec_until)(unwind_fde_t *__restrict sel
                                                     void const *absolute_pc);
 #endif /* LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES */
 
-PRIVATE NONNULL((1, 2, 3, 4)) unsigned int
+PRIVATE NONNULL((1, 2, 3, 4)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                                 byte_t const *reader,
                                                 byte_t const *end,
                                                 unwind_cfa_value_t *__restrict result,
                                                 void const *absolute_pc);
 
-PRIVATE NONNULL((1, 2, 3, 4)) unsigned int
+PRIVATE NONNULL((1, 2, 3, 4)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                                  byte_t const *reader,
                                                  byte_t const *end,
@@ -436,15 +437,17 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, 
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-INTERN NONNULL((1, 2)) unsigned int
+INTERN NONNULL((1, 2)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_rule)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                       unwind_cfa_register_t *__restrict result,
                                       unwind_regno_t dw_regno,
                                       void const *absolute_pc) {
-	unsigned int error;
+	unwind_errno_t error;
+
 	/* `libuw_unwind_fde_exec_rule_until()'  won't  initialize
 	 * the result, so pre-initialize it to an undefined state. */
 	result->cr_rule = DW_CFA_register_rule_undefined;
+
 	/* Start out by  scanning the evaluation-body,  as it's  most
 	 * likely to contain the unwind rule requested by the caller. */
 	error = libuw_unwind_fde_exec_rule_until(self,
@@ -473,11 +476,11 @@ NOTHROW_NCX(CC libuw_unwind_fde_rule)(unwind_fde_t *__restrict self, /* Only non
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-INTERN NONNULL((1, 2)) unsigned int
+INTERN NONNULL((1, 2)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                           unwind_cfa_value_t *__restrict result,
                                           void const *absolute_pc) {
-	unsigned int error;
+	unwind_errno_t error;
 	bzero(result, sizeof(*result));
 	error = libuw_unwind_fde_exec_cfa_until(self,
 	                                        self->f_inittext,
@@ -495,14 +498,14 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa)(unwind_fde_t *__restrict self, /* Only
 	return error;
 }
 
-PRIVATE NONNULL((1, 2, 3, 5)) unsigned int CC
+PRIVATE NONNULL((1, 2, 3, 5)) unwind_errno_t CC
 execute_eh_frame_expression(unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
                             byte_t const *__restrict expression_pointer,
                             unwind_getreg_t reg_getter,
                             void const *reg_callback_arg,
                             uintptr_t *__restrict presult,
                             uintptr_t cfa_value) {
-	unsigned int result;
+	unwind_errno_t result;
 	unwind_ste_t top;
 	unwind_emulator_t emulator;
 	size_t expr_length;
@@ -555,13 +558,13 @@ static_assert(CFI_REGISTER_MEMSIZE(__ARCH_COMPAT_SIZEOF_POINTER, CFI_UNWIND_REGI
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-INTERN NONNULL((1, 2, 3, 5)) unsigned int CC
+INTERN NONNULL((1, 2, 3, 5)) unwind_errno_t CC
 libuw_unwind_fde_calculate_cfa(unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
                                unwind_cfa_value_t const *__restrict self,
                                unwind_getreg_t reg_getter,
                                void const *reg_callback_arg,
                                uintptr_t *__restrict presult) {
-	unsigned int error;
+	unwind_errno_t error;
 	/* Calculate the CFA value. */
 	if (self->cv_type == UNWIND_CFA_VALUE_REGISTER) {
 		if unlikely(CFI_REGISTER_SIZE(fde->f_addrsize, self->cv_reg) != sizeof(uintptr_t))
@@ -597,7 +600,7 @@ err:
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-PRIVATE NONNULL((1, 2, 4, 6)) unsigned int CC
+PRIVATE NONNULL((1, 2, 4, 6)) unwind_errno_t CC
 _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
                           unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
                           void const *absolute_pc,
@@ -659,8 +662,8 @@ struct cfa_parser {
 	byte_t const *cp_end;    /* [1..1][const] End of CFA instructions. */
 };
 
-#define READ_CFA_INSTRUCTION_STARTCAPSULE ((unsigned int)-1)
-#define READ_CFA_INSTRUCTION_ENDCAPSULE   ((unsigned int)-2)
+#define READ_CFA_INSTRUCTION_STARTCAPSULE ((unwind_errno_t)-1)
+#define READ_CFA_INSTRUCTION_ENDCAPSULE   ((unwind_errno_t)-2)
 
 /* Yield the next capsule instruction and advance the parser.
  * @return: READ_CFA_INSTRUCTION_STARTCAPSULE: `parser->cp_reader' points after a `DW_CFA_KOS_startcapsule' instruction
@@ -668,9 +671,9 @@ struct cfa_parser {
  * @return: UNWIND_NO_FRAME:                   End-of-text, or `absolute_pc' has been reached.
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION:    [...]
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION:    [...] */
-PRIVATE NONNULL((1)) unsigned int
+PRIVATE NONNULL((1)) unwind_errno_t
 NOTHROW_NCX(CC read_capsule_instruction)(struct cfa_parser *__restrict parser) {
-	unsigned int result = UNWIND_NO_FRAME;
+	unwind_errno_t result = UNWIND_NO_FRAME;
 	byte_t const *cfa_reader = parser->cp_reader;
 	uintptr_t current_pc = parser->cp_pc;
 	while (cfa_reader < parser->cp_end/* &&
@@ -796,9 +799,9 @@ err_unknown_instruction:
  * capsules by essentially search for the first unmatched endcapsule opcode.
  * @return: READ_CFA_INSTRUCTION_ENDCAPSULE: Success
  * @return: * :                              Error */
-PRIVATE NONNULL((1)) unsigned int
+PRIVATE NONNULL((1)) unwind_errno_t
 NOTHROW_NCX(CC find_capsule_end)(struct cfa_parser *__restrict parser) {
-	unsigned int result;
+	unwind_errno_t result;
 	unsigned int recursion = 0;
 	for (;;) {
 		result = read_capsule_instruction(parser);
@@ -816,11 +819,11 @@ NOTHROW_NCX(CC find_capsule_end)(struct cfa_parser *__restrict parser) {
 }
 
 
-PRIVATE NONNULL((1, 2)) unsigned int
+PRIVATE NONNULL((1, 2)) unwind_errno_t
 NOTHROW_NCX(CC unwind_capsules)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                 unwind_cfa_landing_state_t *__restrict result,
                                 void const *absolute_pc, void const *landingpad_pc) {
-	unsigned int error;
+	unwind_errno_t error;
 	struct cfa_parser capsule_start;
 	struct cfa_parser capsule_end;
 	capsule_start.cp_fde    = self;
@@ -962,7 +965,7 @@ err:
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-INTERN NONNULL((1, 2)) unsigned int
+INTERN NONNULL((1, 2)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_landing_exec)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                               unwind_cfa_landing_state_t *__restrict result,
                                               void const *absolute_pc, void const *landingpad_pc) {
@@ -1147,7 +1150,7 @@ skip_expression:
 	return UNWIND_SUCCESS;
 #ifndef __KERNEL__
 	{
-		unsigned int error;
+		unwind_errno_t error;
 err_unknown_instruction:
 		error = UNWIND_CFA_UNKNOWN_INSTRUCTION;
 		goto err_common;
@@ -1181,13 +1184,13 @@ err_illegal_instruction:
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-INTERN NONNULL((1, 2, 4, 6)) unsigned int CC
+INTERN NONNULL((1, 2, 4, 6)) unwind_errno_t CC
 libuw_unwind_cfa_landing_apply(unwind_cfa_landing_state_t *__restrict self,
                                unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
                                void const *absolute_pc,
                                unwind_getreg_t reg_getter, void const *reg_getter_arg,
                                unwind_setreg_t reg_setter, void *reg_setter_arg) {
-	unsigned int error;
+	unwind_errno_t error;
 #ifdef LIBUNWIND_CONFIG_SUPPORT_CFI_CAPSULES
 	/* Quick check: If  no capsules were used, then only
 	 *              apply the LPA (LandingPadAdjustment) */

@@ -54,6 +54,7 @@
 #include <libdebuginfo/dwarf.h>
 #include <libunwind/cfi.h>
 #include <libunwind/eh_frame.h>
+#include <libunwind/errno.h>
 
 #include "cfi.h"
 #include "dwarf.h"
@@ -240,10 +241,10 @@ err:
 }
 #endif /* !__KERNEL__ */
 
-PRIVATE NONNULL((1, 2)) unsigned int CC
+PRIVATE NONNULL((1, 2)) unwind_errno_t CC
 libuw_unwind_emulator_make_const(unwind_emulator_t *__restrict self,
                                  unwind_ste_t *__restrict ste) {
-	unsigned int error;
+	unwind_errno_t error;
 	if (ste->s_type != UNWIND_STE_CONSTANT) {
 		if (ste->s_type == UNWIND_STE_REGISTER ||
 		    ste->s_type == UNWIND_STE_REGPOINTER) {
@@ -289,7 +290,7 @@ err_segfault:
 	return UNWIND_SEGFAULT;
 }
 
-PRIVATE NONNULL((1)) unsigned int CC
+PRIVATE NONNULL((1)) unwind_errno_t CC
 libuw_unwind_emulator_make_top_const(unwind_emulator_t *__restrict self) {
 	unwind_ste_t *ste;
 	assert(self->ue_stacksz >= 1);
@@ -297,13 +298,13 @@ libuw_unwind_emulator_make_top_const(unwind_emulator_t *__restrict self) {
 	return libuw_unwind_emulator_make_const(self, ste);
 }
 
-INTERN ATTR_NOINLINE NONNULL((1, 2)) unsigned int CC
+INTERN ATTR_NOINLINE NONNULL((1, 2)) unwind_errno_t CC
 libuw_unwind_call_function(unwind_emulator_t *__restrict self,
                            byte_t const *__restrict component_pointer) {
 	di_debuginfo_cu_parser_t parser;
 	di_debuginfo_cu_abbrev_t abbrev;
 	byte_t const *di_reader;
-	unsigned int di_error;
+	unwind_errno_t di_error;
 	di_debuginfo_component_attrib_t attr;
 	di_debuginfo_cu_parser_sections_t sect;
 	if unlikely(!self->ue_sectinfo)
@@ -335,7 +336,7 @@ libuw_unwind_call_function(unwind_emulator_t *__restrict self,
 	 * If present, it describes the CFA expression which we're supposed
 	 * to execute. - Otherwise, ignore and return immediately. */
 	DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, &parser) {
-		unsigned int result;
+		unwind_errno_t result;
 		di_debuginfo_location_t expr;
 		size_t length;
 		byte_t const *old_pc_start, *old_pc_end;
@@ -371,11 +372,11 @@ err_invalid_function:
 }
 
 
-PRIVATE ATTR_NOINLINE NONNULL((1)) unsigned int CC
+PRIVATE ATTR_NOINLINE NONNULL((1)) unwind_errno_t CC
 libuw_unwind_emulator_calculate_cfa(unwind_emulator_t *__restrict self) {
 	unwind_fde_t fde;
 	unwind_cfa_value_t cfa;
-	unsigned int error;
+	unwind_errno_t error;
 	union {
 		byte_t buf[CFI_REGISTER_MAXSIZE];
 		void *pc;
@@ -449,11 +450,11 @@ err:
  * @return: UNWIND_SUCCESS:                      Success.
  * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `self'
  * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `self' */
-INTERN NONNULL((1, 2, 4)) unsigned int
+INTERN NONNULL((1, 2, 4)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_ste_addr)(unwind_ste_t const *__restrict self,
                                       unwind_getreg_t regget, void const *regget_arg,
                                       void **__restrict paddr) {
-	unsigned int error;
+	unwind_errno_t error;
 	switch (self->s_type) {
 
 	case UNWIND_STE_REGISTER:
@@ -502,12 +503,12 @@ err:
  * @return: UNWIND_INVALID_REGISTER:             Invalid register referenced by `self'
  * @return: UNWIND_EMULATOR_ILLEGAL_INSTRUCTION: Invalid stack-value type in `self'
  * @return: UNWIND_SEGFAULT:                     Attempted to access faulty memory. */
-INTERN NONNULL((1, 3, 5)) unsigned int
+INTERN NONNULL((1, 3, 5)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_ste_read)(unwind_ste_t const *__restrict self, uint8_t addrsize,
                                       unwind_getreg_t regget, void const *regget_arg,
                                       void *__restrict dst, size_t num_bits,
                                       size_t dst_left_shift, size_t src_left_shift) {
-	unsigned int error;
+	unwind_errno_t error;
 	(void)addrsize;
 	switch (self->s_type) {
 
@@ -603,13 +604,13 @@ err:
 	return error;
 }
 
-INTERN NONNULL((1, 3, 7)) unsigned int
+INTERN NONNULL((1, 3, 7)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_ste_write)(unwind_ste_t const *__restrict self, uint8_t addrsize,
                                        /*[1..1]*/ unwind_getreg_t regget, void const *regget_arg,
                                        /*[0..1]*/ unwind_setreg_t regset, void *regset_arg,
                                        void const *__restrict src, size_t num_bits,
                                        size_t dst_left_shift, size_t src_left_shift) {
-	unsigned int error;
+	unwind_errno_t error;
 	(void)addrsize;
 	switch (self->s_type) {
 
@@ -683,12 +684,12 @@ err:
 }
 
 /* Do the equivalent of `READ_BITS(*ADDR_OF(ste))' */
-PRIVATE ATTR_NOINLINE NONNULL((1, 2)) unsigned int CC
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) unwind_errno_t CC
 libuw_unwind_emulator_read_from_piece(unwind_emulator_t *__restrict self,
                                       unwind_ste_t const *__restrict ste,
                                       uintptr_t num_bits,
                                       size_t target_left_shift) {
-	unsigned int result;
+	unwind_errno_t result;
 	if unlikely(((self->ue_piecebits + num_bits + NBBY - 1) / NBBY) > self->ue_piecesiz)
 		ERROR(err_buffer_too_small);
 	result = libuw_unwind_ste_read(ste,
@@ -708,12 +709,12 @@ err_buffer_too_small:
 
 
 /* Do the equivalent of `WRITE_BITS(*ADDR_OF(ste))' */
-PRIVATE ATTR_NOINLINE NONNULL((1, 2)) unsigned int CC
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) unwind_errno_t CC
 libuw_unwind_emulator_write_to_piece(unwind_emulator_t *__restrict self,
                                      unwind_ste_t const *__restrict ste,
                                      uintptr_t num_bits,
                                      size_t target_left_shift) {
-	unsigned int result;
+	unwind_errno_t result;
 	if unlikely(((self->ue_piecebits + num_bits + NBBY - 1) / NBBY) > self->ue_piecesiz)
 		ERROR(err_buffer_too_small);
 	result = libuw_unwind_ste_write(ste,
@@ -734,9 +735,9 @@ err_buffer_too_small:
 }
 
 
-PRIVATE NONNULL((1)) unsigned int CC
+PRIVATE NONNULL((1)) unwind_errno_t CC
 dispatch_DW_OP_entry_value(unwind_emulator_t *__restrict self) {
-	unsigned int result;
+	unwind_errno_t result;
 	uintptr_t length;
 	byte_t const *start_pc, *end_pc;
 	length   = dwarf_decode_uleb128(&self->ue_pc);
@@ -773,9 +774,9 @@ dispatch_DW_OP_entry_value(unwind_emulator_t *__restrict self) {
  * to resolve `DW_OP_GNU_encoded_addr+DW_EH_PE_funcrel' addresses.
  *
  * If the given `pc' doesn't belong to a function, return `0' */
-PRIVATE ATTR_NOINLINE WUNUSED NONNULL((2)) unsigned int
+PRIVATE ATTR_NOINLINE WUNUSED NONNULL((2)) unwind_errno_t
 NOTHROW_NCX(CC libuw_get_bases)(void const *pc, struct unwind_bases *__restrict bases) {
-	unsigned int unwind_error;
+	unwind_errno_t unwind_error;
 	unwind_fde_t fde;
 	unwind_error = libuw_unwind_fde_find(pc, &fde);
 	if (unwind_error == UNWIND_SUCCESS)
@@ -803,12 +804,12 @@ NOTHROW_NCX(CC libuw_get_bases)(void const *pc, struct unwind_bases *__restrict 
  * @return: UNWIND_SEGFAULT:         ...
  * @return: UNWIND_BADALLOC:         ...
  * @return: UNWIND_EMULATOR_*:       ... */
-INTERN ATTR_NOINLINE NONNULL((1)) unsigned int CC
+INTERN ATTR_NOINLINE NONNULL((1)) unwind_errno_t CC
 libuw_unwind_emulator_exec(unwind_emulator_t *__restrict self) {
 	byte_t const *pc;
 	size_t stacksz;
 	byte_t opcode;
-	unsigned int error;
+	unwind_errno_t error;
 	pc      = self->ue_pc;
 	stacksz = self->ue_stacksz;
 /*again:*/
@@ -1294,7 +1295,7 @@ do_make_second_const:
 		CASE(DW_OP_fbreg) {
 			byte_t const *expr, *old_pc_start, *old_pc_end;
 			di_debuginfo_location_t const *old_frame_base;
-			unsigned int error;
+			unwind_errno_t error;
 			size_t length;
 			if unlikely(!self->ue_framebase)
 				ERROR(err_illegal_instruction);
@@ -1359,7 +1360,7 @@ do_make_second_const:
 		CASE(DW_OP_piece) {
 			uintptr_t num_bits;
 			size_t target_left_shift;
-			unsigned int error;
+			unwind_errno_t error;
 			if unlikely(stacksz < 1)
 				ERROR(err_stack_underflow);
 			target_left_shift = 0;
@@ -1438,7 +1439,7 @@ do_read_bit_pieces:
 		CASE(DW_OP_call4)
 		CASE(DW_OP_call_ref) {
 			byte_t const *component_address;
-			unsigned int error;
+			unwind_errno_t error;
 			if unlikely(self->ue_sectinfo == NULL ||
 			            self->ue_sectinfo->ues_debug_info_start >= self->ue_sectinfo->ues_debug_info_end ||
 			            self->ue_sectinfo->ues_debug_abbrev_start >= self->ue_sectinfo->ues_debug_abbrev_end)
@@ -1506,7 +1507,7 @@ do_read_bit_pieces:
 			if unlikely(stacksz >= self->ue_stackmax)
 				ERROR(err_stack_overflow);
 			if (!self->ue_call_frame_cfa) {
-				unsigned int error;
+				unwind_errno_t error;
 				/* Evaluate the CFA value using the register state + regno-getter */
 				error = libuw_unwind_emulator_calculate_cfa(self);
 				if unlikely(error != UNWIND_SUCCESS) {
@@ -1615,7 +1616,7 @@ do_read_bit_pieces:
 
 		CASE(DW_OP_entry_value)
 		CASE(DW_OP_GNU_entry_value) {
-			unsigned int error;
+			unwind_errno_t error;
 			self->ue_pc      = pc;
 			self->ue_stacksz = stacksz;
 			/* Dispatch the instruction. */
@@ -1683,7 +1684,7 @@ err_invalid_function_direct:
 #define STACK_SIZE_INCREMENTS  16
 #define STACK_SIZE_LIMIT       512
 
-PRIVATE ATTR_NOINLINE NONNULL((1)) unsigned int CC
+PRIVATE ATTR_NOINLINE NONNULL((1)) unwind_errno_t CC
 libuw_unwind_emulator_exec_alloca_stack(unwind_emulator_t *__restrict self,
                                         unwind_ste_t const *pentry_stack_top,
                                         unwind_ste_t *pexit_stack_top,
@@ -1693,7 +1694,7 @@ libuw_unwind_emulator_exec_alloca_stack(unwind_emulator_t *__restrict self,
                                         size_t stack_size
 #endif /* __KERNEL__ */
                                         ) {
-	unsigned int result;
+	unwind_errno_t result;
 #ifdef __KERNEL__
 	unwind_ste_t *stack;
 	if (get_stack_avail() < ((256 * sizeof(void *)) + (stack_size * sizeof(unwind_ste_t))))
@@ -1744,12 +1745,12 @@ err_badalloc:
 #endif /* __KERNEL__ */
 }
 
-INTERN NONNULL((1)) unsigned int CC
+INTERN NONNULL((1)) unwind_errno_t CC
 libuw_unwind_emulator_exec_autostack(unwind_emulator_t *__restrict self,
                                      unwind_ste_t const *pentry_stack_top,
                                      unwind_ste_t *pexit_stack_top,
                                      uintptr_t *pexit_stack_top_const) {
-	unsigned int error;
+	unwind_errno_t error;
 	/* First off: Try  to allocate  an execution  stack on  our own stack.
 	 *            If that stack overflows, move  on to allocating a  stack
 	 *            on the heap (userspace), or carefully increase the stack
@@ -2268,7 +2269,7 @@ err:
  * @return: UNWIND_EMULATOR_NOT_WRITABLE:     Attempted to write to a read-only location expression.
  * @return: UNWIND_EMULATOR_BUFFER_TOO_SMALL: The given `bufsize' is too small.
  * @return: UNWIND_EMULATOR_NO_FUNCTION:      The associated location list is undefined for `module_relative_pc' */
-INTERN NONNULL((1, 3, 8, 10)) unsigned int CC
+INTERN NONNULL((1, 3, 8, 10)) unwind_errno_t CC
 libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self,
                                   unwind_emulator_sections_t const *sectinfo,
                                   unwind_getreg_t regget, void *regget_arg,
@@ -2281,7 +2282,7 @@ libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self
 	unwind_ste_t ste_top;
 	unwind_emulator_t emulator;
 	size_t expr_length;
-	unsigned int result;
+	unwind_errno_t result;
 	bzero(&emulator, sizeof(emulator));
 	bzero(buf, bufsize); /* Pre-initialize the buffer to all zeroes */
 
@@ -2328,7 +2329,7 @@ err_no_function:
 }
 
 
-INTERN NONNULL((1, 3, 5, 10, 12)) unsigned int CC
+INTERN NONNULL((1, 3, 5, 10, 12)) unwind_errno_t CC
 libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self,
                                   unwind_emulator_sections_t const *sectinfo,
                                   unwind_getreg_t regget, void *regget_arg,
@@ -2342,7 +2343,7 @@ libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self
 	unwind_ste_t ste_top;
 	unwind_emulator_t emulator;
 	size_t expr_length;
-	unsigned int result;
+	unwind_errno_t result;
 	bzero(&emulator, sizeof(emulator));
 
 	/* Select the proper function. */

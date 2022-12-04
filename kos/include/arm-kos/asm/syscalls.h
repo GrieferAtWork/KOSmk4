@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc789f211 */
+/* HASH CRC-32:0x9cefb931 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1302,7 +1302,7 @@
  * @param: unwind_error:     The  unwind  error that  caused the  coredump,  or `UNWIND_SUCCESS'  if unwinding
  *                           was  never  actually  performed,  and   `reason'  is  actually  a   `siginfo_t *'
  *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
-#define __NR_coredump                     __UINT32_C(0x7f0012) /* errno_t coredump(struct ucpustate const *curr_state, struct ucpustate const *orig_state, void const *const *traceback_vector, size_t traceback_length, union coredump_info const *reason, syscall_ulong_t unwind_error) */
+#define __NR_coredump                     __UINT32_C(0x7f0012) /* errno_t coredump(struct ucpustate const *curr_state, struct ucpustate const *orig_state, void const *const *traceback_vector, size_t traceback_length, union coredump_info const *reason, unwind_errno_t unwind_error) */
 #define __NR_lseek64                      __UINT32_C(0x7f0013) /* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
 /* Construct   a   user-vio-fd  object   supporting  mmap(2),   with  actual
  * memory  accesses  being dispatched  by  adding them  as  pending requests

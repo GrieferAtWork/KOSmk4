@@ -35,7 +35,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <kos/types.h>
 
 #include <libdebuginfo/unwind.h>
-#include <libunwind/api.h> /* `UNWIND_*' error codes. */
+#include <libunwind/errno.h> /* `UNWIND_*' error codes. */
 #include <libunwind/unwind.h>
 
 #include "unwind.h"
@@ -57,11 +57,11 @@ DECL_BEGIN
 
 
 #ifndef __KERNEL__
-PRIVATE ATTR_NOINLINE NONNULL((2, 4)) unsigned int CC
+PRIVATE ATTR_NOINLINE NONNULL((2, 4)) unwind_errno_t CC
 unwind_through_debug_frame(void const *absolute_pc,
                            unwind_getreg_t reg_getter, void const *reg_getter_arg,
                            unwind_setreg_t reg_setter, void *reg_setter_arg) {
-	unsigned int result = UNWIND_NO_FRAME;
+	unwind_errno_t result = UNWIND_NO_FRAME;
 	REF void *mod;
 	/* Lookup the backing module for the given `absolute_pc' */
 	mod = dlgethandle(absolute_pc, DLGETHANDLE_FINCREF);
@@ -121,11 +121,11 @@ unwind_through_debug_frame(void const *absolute_pc,
  * for user-space location for which the kernel doesn't already know how
  * to unwind them will fail with `UNWIND_NO_FRAME'.
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
-INTERN NONNULL((2, 4)) unsigned int CC
+INTERN NONNULL((2, 4)) unwind_errno_t CC
 libdi_unwind_for_debug(void const *absolute_pc,
                        unwind_getreg_t reg_getter, void const *reg_getter_arg,
                        unwind_setreg_t reg_setter, void *reg_setter_arg) {
-	unsigned int result;
+	unwind_errno_t result;
 
 	/* Try the regular unwind(3) function (from `libunwind.so'). */
 	result = unwind(absolute_pc,

@@ -23,6 +23,8 @@
 #include "api.h"
 /**/
 
+#include <libunwind/errno.h>
+
 #include "debug_info.h"
 
 #ifdef __CC__
@@ -53,12 +55,12 @@ struct unwind_emulator_struct;
  * @return: UNWIND_SEGFAULT:         ...
  * @return: UNWIND_BADALLOC:         ...
  * @return: UNWIND_EMULATOR_*:       ... */
-typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2, 3)) unsigned int
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2, 3)) unwind_errno_t
 __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGINFO_RUN_ENTRY_VALUE_EMULATOR)(struct unwind_emulator_struct *__restrict self,
                                                                       __byte_t const *cfi_start_pc,
                                                                       __byte_t const *cfi_end_pc);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
-LIBDEBUGINFO_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) unsigned int
+LIBDEBUGINFO_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 3)) unwind_errno_t
 __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_run_entry_value_emulator)(struct unwind_emulator_struct *__restrict self,
                                                                   __byte_t const *cfi_start_pc,
                                                                   __byte_t const *cfi_end_pc);

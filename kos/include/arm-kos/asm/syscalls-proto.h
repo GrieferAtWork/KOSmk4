@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x201560e5 */
+/* HASH CRC-32:0x11563e5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1994,7 +1994,7 @@
 #define __NRAT2_coredump                     (void const *const *, void const *const *)
 #define __NRAT3_coredump                     (size_t, __size_t)
 #define __NRAT4_coredump                     (union coredump_info const *, union coredump_info const *)
-#define __NRAT5_coredump                     (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT5_coredump                     (unwind_errno_t, unwind_errno_t)
 #define __NRAT0_lseek64                      (fd_t, __fd_t)
 #define __NRAT1_lseek64                      (int64_t, __int64_t)
 #define __NRAT2_lseek64                      (syscall_ulong_t, __syscall_ulong_t)
@@ -2574,7 +2574,7 @@
 #define __NRAM_set_exception_handler(a, b, c, d, e, f, g)        (__syscall_ulong_t)a, (__except_handler_t)b, (void *)c
 #define __NRAM_get_exception_handler(a, b, c, d, e, f, g)        (__syscall_ulong_t *)a, (__except_handler_t *)b, (void **)c
 #define __NRAM_debugtrap(a, b, c, d, e, f, g)                    (struct ucpustate const *)a, (struct debugtrap_reason const *)b
-#define __NRAM_coredump(a, b, c, d, e, f, g)                     (struct ucpustate const *)a, (struct ucpustate const *)b, (void const *const *)c, (__size_t)d, (union coredump_info const *)e, (__syscall_ulong_t)f
+#define __NRAM_coredump(a, b, c, d, e, f, g)                     (struct ucpustate const *)a, (struct ucpustate const *)b, (void const *const *)c, (__size_t)d, (union coredump_info const *)e, (unwind_errno_t)f
 #define __NRAM_lseek64(a, b, c, d, e, f, g)                      (__fd_t)a, (__int64_t)((__uint64_t)b | (__uint64_t)c << 32), (__syscall_ulong_t)d
 #define __NRAM_userviofd(a, b, c, d, e, f, g)                    (__size_t)a, (__syscall_ulong_t)b
 #define __NRAM_stime64(a, b, c, d, e, f, g)                      (__time64_t const *)a

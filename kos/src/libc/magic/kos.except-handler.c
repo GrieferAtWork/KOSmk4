@@ -157,7 +157,7 @@
  *         #5:    Unwind the stack  using `except_unwind(3)'  until an  exception
  *                handler is found. - If no handler can be found before the stack
  *                is fully unwound,  or if  an error occurs  during unwind  (s.a.
- *                `UNWIND_*' from <libunwind/api.h>), move on to step #SIG
+ *                `UNWIND_*' from <libunwind/errno.h>), move on to step #SIG
  *                Note that for this purpose, only catch-all handlers (i.e. `catch (...)')
  *                are considered viable handlers.
  *         #6:    If at least one handler was found, check if the associated module

@@ -51,14 +51,14 @@ NOTHROW_NCX(CC libdi_debuginfo_rnglists_iterator_next)(di_debuginfo_rnglists_ite
 #elif defined(DEFINE_libdi_debuginfo_rnglists_contains)
 /* Check if a given `module_relative_pc' is apart of the given range selector.
  * @param: self: The ranges object to query for `module_relative_pc' */
-INTERN NONNULL((1, 2, 5)) unsigned int
+INTERN NONNULL((1, 2, 5)) debuginfo_errno_t
 NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains)(di_debuginfo_rnglists_t const *__restrict self,
                                                   di_debuginfo_cu_parser_t const *__restrict parser,
                                                   uintptr_t cu_base,
                                                   uintptr_t module_relative_pc,
                                                   di_rnglists_sections_t const *__restrict sections)
 #else /* DEFINE_libdi_debuginfo_rnglists_contains */
-INTERN NONNULL((1, 2, 5, 6, 7)) unsigned int
+INTERN NONNULL((1, 2, 5, 6, 7)) debuginfo_errno_t
 NOTHROW_NCX(CC libdi_debuginfo_rnglists_contains_ex)(di_debuginfo_rnglists_t const *__restrict self,
                                                      di_debuginfo_cu_parser_t const *__restrict parser,
                                                      uintptr_t cu_base,

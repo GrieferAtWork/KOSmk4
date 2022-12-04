@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91ddb67f */
+/* HASH CRC-32:0xf5cc9e10 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2859,7 +2859,7 @@
 #define __NR32ATL2_coredump                     3                                                                    /* traceback_vector -> traceback_length */ 
 #define __NR32ATR3_coredump                     SC_REPR_SIZE_T                                                       /* traceback_length */ 
 #define __NR32ATR4_coredump                     SC_REPR_STRUCT_EXCEPTION_DATA32                                      /* reason */ 
-#define __NR32ATR5_coredump                     SC_REPR_UNWIND_ERROR                                                 /* unwind_error */ 
+#define __NR32ATR5_coredump                     SC_REPR_UNWIND_ERRNO_T                                               /* unwind_error */ 
 #define __NR32RTR_coredump                      SC_REPR_ERRNO_T                                                      /* return */
 #define __NR32ATR0_debugtrap                    SC_REPR_STRUCT_UCPUSTATE32                                           /* state */ 
 #define __NR32ATR1_debugtrap                    SC_REPR_STRUCT_DEBUGTRAP_REASON32                                    /* reason */ 

@@ -44,6 +44,7 @@
 #include <stddef.h>
 #include <string.h>
 
+#include <libunwind/errno.h>
 #include <libunwind/unwind.h>
 
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER
@@ -212,7 +213,7 @@ do_dbg_coredump(struct ucpustate const *curr_ustate,
                 size_t ktraceback_length,
                 struct kcpustate const *orig_kstate,
                 union coredump_info const *reason,
-                unsigned int unwind_error) {
+                unwind_errno_t unwind_error) {
 	STRUCT_DBG_ENTRY_INFO(8) entry;
 	entry.ei_argc    = 8;
 	entry.ei_argv[0] = (void *)(uintptr_t)traceback_vector;
@@ -324,7 +325,7 @@ coredump_create(struct ucpustate const *curr_ustate,
                 void const *const *ktraceback_vector, size_t ktraceback_length,
                 struct kcpustate const *orig_kstate,
                 union coredump_info const *reason,
-                unsigned int unwind_error)
+                unwind_errno_t unwind_error)
 		THROWS(...) {
 	size_t tbi;
 	assert(curr_ustate != NULL);

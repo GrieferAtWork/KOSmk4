@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9e886d6 */
+/* HASH CRC-32:0x9ffeeab8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3861,7 +3861,7 @@ DEFINE_PUBLIC_ALIAS(sys_userviofd, libc_sys_userviofd)
  * @param: unwind_error:     The  unwind  error that  caused the  coredump,  or `UNWIND_SUCCESS'  if unwinding
  *                           was  never  actually  performed,  and   `reason'  is  actually  a   `siginfo_t *'
  *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
-/* errno_t coredump(struct ucpustate64 const *curr_state, struct ucpustate64 const *orig_state, __HYBRID_PTR64(void const) const *traceback_vector, size_t traceback_length, union coredump_info64 const *reason, syscall_ulong_t unwind_error) */
+/* errno_t coredump(struct ucpustate64 const *curr_state, struct ucpustate64 const *orig_state, __HYBRID_PTR64(void const) const *traceback_vector, size_t traceback_length, union coredump_info64 const *reason, unwind_errno_t unwind_error) */
 INTERN_FUNCTION(libc_sys_coredump)
 	movq   $(0xffffffffffffffe3), %rax
 	movq   %rcx, %r10
@@ -8842,7 +8842,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xuserviofd, libc_sys_Xuserviofd)
  * @param: unwind_error:     The  unwind  error that  caused the  coredump,  or `UNWIND_SUCCESS'  if unwinding
  *                           was  never  actually  performed,  and   `reason'  is  actually  a   `siginfo_t *'
  *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
-/* errno_t coredump(struct ucpustate64 const *curr_state, struct ucpustate64 const *orig_state, __HYBRID_PTR64(void const) const *traceback_vector, size_t traceback_length, union coredump_info64 const *reason, syscall_ulong_t unwind_error) */
+/* errno_t coredump(struct ucpustate64 const *curr_state, struct ucpustate64 const *orig_state, __HYBRID_PTR64(void const) const *traceback_vector, size_t traceback_length, union coredump_info64 const *reason, unwind_errno_t unwind_error) */
 INTERN_FUNCTION(libc_sys_Xcoredump)
 	movq   $(0xffffffffffffffe3), %rax
 	movq   %rcx, %r10

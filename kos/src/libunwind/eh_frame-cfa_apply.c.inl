@@ -98,7 +98,7 @@ DECL_BEGIN
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-INTERN NONNULL((1, 2)) unsigned int
+INTERN NONNULL((1, 2)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_exec)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                       unwind_cfa_state_t *__restrict result,
                                       void const *absolute_pc)
@@ -116,13 +116,13 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec)(unwind_fde_t *__restrict self, /* Only non
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-INTERN NONNULL((1, 2)) unsigned int
+INTERN NONNULL((1, 2)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                                unwind_cfa_sigframe_state_t *__restrict result,
                                                void const *absolute_pc)
 #endif /* ... */
 {
-	unsigned int error;
+	unwind_errno_t error;
 	bzero(result, sizeof(*result));
 
 	/* Execute the init-body */
@@ -180,7 +180,7 @@ NOTHROW(CC guarded_memcpy)(void *dst, void const *src, size_t num_bytes);
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-INTERN NONNULL((1, 2, 4, 6)) unsigned int CC
+INTERN NONNULL((1, 2, 4, 6)) unwind_errno_t CC
 libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
                        unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
                        void const *absolute_pc,
@@ -195,7 +195,7 @@ libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-INTERN NONNULL((1, 2, 4, 6)) unsigned int CC
+INTERN NONNULL((1, 2, 4, 6)) unwind_errno_t CC
 libuw_unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
                                 unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
                                 void const *absolute_pc,
@@ -210,7 +210,7 @@ libuw_unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-PRIVATE NONNULL((1, 2, 4, 6)) unsigned int CC
+PRIVATE NONNULL((1, 2, 4, 6)) unwind_errno_t CC
 _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
                           unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
                           void const *absolute_pc,
@@ -218,7 +218,8 @@ _unwind_cfa_landing_apply(_unwind_cfa_landing_state_t *__restrict self,
                           unwind_setreg_t reg_setter, void *reg_setter_arg)
 #endif /* ... */
 {
-	unsigned int i, result;
+	unsigned int i;
+	unwind_errno_t result;
 	uintptr_t cfa;
 #ifdef LOCAL_CFI_UNWIND_UNCOMMON_REGISTER_SP
 #ifndef EH_FRAME_CFA_LANDING_APPLY

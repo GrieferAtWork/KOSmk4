@@ -38,6 +38,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <stdint.h>
 
 #include <libdebuginfo/debug_aranges.h>
+#include <libdebuginfo/errno.h>
 
 #include "debug_aranges.h"
 
@@ -53,7 +54,7 @@ DECL_BEGIN
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: ...
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
-INTERN TEXTSECTION NONNULL((1, 2, 3)) unsigned int
+INTERN TEXTSECTION NONNULL((1, 2, 3)) debuginfo_errno_t
 NOTHROW_NCX(CC libdi_debugaranges_locate)(byte_t const *__restrict debug_aranges_start,
                                           byte_t const *__restrict debug_aranges_end,
                                           uintptr_t *__restrict pdebug_info_cu_offset,

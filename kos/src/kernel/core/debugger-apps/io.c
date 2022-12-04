@@ -56,6 +56,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <libdebuginfo/unwind.h>
 #include <libdisasm/disassembler.h>
 #include <libinstrlen/instrlen.h>
+#include <libunwind/errno.h>
 #include <libunwind/unwind.h>
 
 DECL_BEGIN
@@ -380,7 +381,7 @@ DBG_COMMAND(trace,
             "\tInfo: Additional information\n") {
 #define LOG_STACK_REMAINDER 1
 	struct fcpustate state;
-	unsigned int error;
+	unwind_errno_t error;
 #ifdef LOG_STACK_REMAINDER
 	byte_t *last_good_sp;
 #endif /* LOG_STACK_REMAINDER */
@@ -459,7 +460,7 @@ DBG_COMMAND(u,
             "u\n"
             "\tUnwind the current source location to its call-site\n") {
 	struct fcpustate oldstate, newstate;
-	unsigned int error;
+	unwind_errno_t error;
 	void const *final_pc;
 	dbg_getallregs(DBG_REGLEVEL_VIEW, &oldstate);
 	memcpy(&newstate, &oldstate, sizeof(struct fcpustate));

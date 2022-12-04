@@ -97,6 +97,7 @@
 #include <libcmdline/decode.h>
 #include <libcmdline/encode.h>
 #include <libunwind/eh_frame.h>
+#include <libunwind/errno.h>
 #include <libunwind/unwind.h>
 #include <libzlib/inflate.h>
 
@@ -2522,11 +2523,11 @@ again:
 
 /* Lookup  the FDE descriptor for a given `absolute_pc',
  * whilst trying to make use of the FDE cache of `self'.
- * @return: * : One of `UNWIND_*' from <libunwind/api.h> */
-PUBLIC NOBLOCK NONNULL((1)) unsigned int
+ * @return: * : One of `UNWIND_*' from <libunwind/errno.h> */
+PUBLIC NOBLOCK NONNULL((1)) unwind_errno_t
 NOTHROW(FCALL driver_findfde)(struct driver *__restrict self, void const *absolute_pc,
                               unwind_fde_t *__restrict result) {
-	unsigned int status;
+	unwind_errno_t status;
 
 	/* Try to look through the driver's FDE cache for a descriptor. */
 	if (driver_eh_frame_cache_tryread(self)) {
@@ -2596,10 +2597,10 @@ cannot_cache:
  * caches for quick (O(log2)) repeated access to an FDE located within a known
  * function. */
 DEFINE_PUBLIC_ALIAS(unwind_fde_find, libuw_unwind_fde_find);
-INTERN NOBLOCK NONNULL((2)) unsigned int
+INTERN NOBLOCK NONNULL((2)) unwind_errno_t
 NOTHROW_NCX(KCALL libuw_unwind_fde_find)(void const *absolute_pc,
                                          unwind_fde_t *__restrict result) {
-	unsigned int error;
+	unwind_errno_t error;
 	REF struct driver *d;
 
 	/* Figure out which driver is mapped at the given `absolute_pc' */

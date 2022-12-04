@@ -28,6 +28,7 @@
 #include <kos/exec/module.h>         /* module_t */
 
 #include <libdebuginfo/addr2line.h>
+#include <libdebuginfo/errno.h>
 
 DECL_BEGIN
 
@@ -42,7 +43,7 @@ struct addr2line_buf {
 
 /* Lookup addr2line information for the given source address.
  * >> di_debug_addr2line_t info;
- * >> unsigned int error;
+ * >> debuginfo_errno_t error;
  * >> uintptr_t level = 0;
  * >> do {
  * >>     error = addr2line((uintptr_t)ptr, &info, level);
@@ -55,7 +56,7 @@ struct addr2line_buf {
  * >> } while (++level < info.al_levelcnt);
  * @param: module_relative_pc: The return value of `addr2line_begin()'
  */
-FUNDEF WUNUSED NONNULL((1, 3)) unsigned int
+FUNDEF WUNUSED NONNULL((1, 3)) debuginfo_errno_t
 NOTHROW(KCALL addr2line)(struct addr2line_buf const *__restrict info,
                          uintptr_t module_relative_pc,
                          di_debug_addr2line_t *__restrict result,

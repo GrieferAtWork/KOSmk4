@@ -38,7 +38,7 @@ DECL_BEGIN
  * address, as well as  keep track of a  lazily allocated address-tree of  FDE
  * caches for quick (O(log2)) repeated access to an FDE located within a known
  * function. */
-INTDEF NONNULL((2)) unsigned int
+INTDEF NONNULL((2)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_find)(void const *absolute_pc,
                                       unwind_fde_t *__restrict result);
 
@@ -50,7 +50,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_find)(void const *absolute_pc,
  *       should be  unwound; Not  after it.  - i.e.  range checking  is done  as:
  *       `absolute_pc >= start && absolute_pc < end'
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
-INTDEF NONNULL((2, 4)) unsigned int CC
+INTDEF NONNULL((2, 4)) unwind_errno_t CC
 linuw_unwind(void const *absolute_pc,
              unwind_getreg_t reg_getter, void const *reg_getter_arg,
              unwind_setreg_t reg_setter, void *reg_setter_arg);

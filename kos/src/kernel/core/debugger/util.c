@@ -45,6 +45,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <stdarg.h>
 #include <string.h>
 
+#include <libdebuginfo/errno.h>
+
 DECL_BEGIN
 
 #ifndef LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH
@@ -193,7 +195,7 @@ NOTHROW(KCALL do_dbg_addr2line_vprintf)(struct addr2line_buf const *__restrict a
                                         void const *start_pc, void const *end_pc,
                                         char const *message_format, va_list args) {
 	di_debug_addr2line_t info;
-	unsigned int error;
+	debuginfo_errno_t error;
 	u8 normal_fgcolor = ANSITTY_CL_WHITE;
 	u8 inline_fgcolor = ANSITTY_CL_AQUA;
 	if (ainfo->ds_mod && !module_isdriver(ainfo->ds_mod)) {

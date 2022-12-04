@@ -58,6 +58,7 @@ for (local o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3",
 #include <libcpustate/register.h>
 #include <libdebuginfo/dwarf.h>
 #include <libunwind/cfi.h>
+#include <libunwind/errno.h>
 
 #ifdef __ARCH_HAVE_COMPAT
 #include <compat/kos/exec/rtld.h>
@@ -850,7 +851,7 @@ cexpr_cfi_to_address_impl(struct cvalue *__restrict self,
 	size_t expr_length;
 	void const *pc;
 	uintptr_t module_relative_pc;
-	unsigned int result;
+	unwind_errno_t result;
 	di_debuginfo_compile_unit_simple_t cu;
 	byte_t temp_buffer[1];
 	bool second_pass;
@@ -1021,7 +1022,7 @@ NOTHROW(FCALL cexpr_cfi_to_address)(struct cvalue *__restrict self) {
 PUBLIC NONNULL((1, 2)) dbx_errno_t
 NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict self,
                                         void *buf, size_t buflen, bool write) {
-	unsigned int error;
+	unwind_errno_t error;
 	TRY {
 		if (!self->v_expr.l_expr &&
 		    !self->v_expr.l_llist4 &&

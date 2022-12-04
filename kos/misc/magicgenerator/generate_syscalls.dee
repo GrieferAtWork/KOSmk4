@@ -229,7 +229,8 @@ class CType {
 					++e;
 				local n = typename[:e];
 				if (n !in ["int", "short", "long", "char",
-				           "signed", "unsigned", "void"])
+				           "signed", "unsigned", "void",
+				           "unwind_errno_t"]) /* FIXME: `unwind_errno_t' here is an ugly hack! */
 					return "__" + typename;
 			}
 			return typename;

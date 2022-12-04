@@ -49,9 +49,4 @@
 /* Library name for use with `dlopen(3D)' */
 #define LIBDEBUGINFO_LIBRARY_NAME "libdebuginfo.so"
 
-/* Debug info error codes. */
-#define DEBUG_INFO_ERROR_SUCCESS 0 /* Function completed successfully. */
-#define DEBUG_INFO_ERROR_NOFRAME 1 /* No debug information associated with the given location. */
-#define DEBUG_INFO_ERROR_CORRUPT 2 /* Debug information has been corrupted. */
-
 #endif /* !_LIBDEBUGINFO_API_H */

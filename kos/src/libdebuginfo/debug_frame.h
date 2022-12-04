@@ -26,6 +26,7 @@
 #include <kos/types.h>
 
 #include <libdebuginfo/debug_frame.h>
+#include <libunwind/errno.h>
 
 DECL_BEGIN
 
@@ -34,7 +35,7 @@ DECL_BEGIN
  * written back to `*pdebug_frame_reader' after a previous call to `unwind_fde_load_df()'.
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
-INTDEF NONNULL((1, 2, 3, 4)) unsigned int
+INTDEF NONNULL((1, 2, 3, 4)) unwind_errno_t
 NOTHROW_NCX(CC libdi_unwind_fde_load_df)(byte_t const **__restrict pdebug_frame_reader,
                                          byte_t const *__restrict debug_frame_start,
                                          byte_t const *__restrict debug_frame_end,
@@ -47,7 +48,7 @@ NOTHROW_NCX(CC libdi_unwind_fde_load_df)(byte_t const **__restrict pdebug_frame_
  * @assume(!return || result->f_pcend > absolute_pc);
  * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `absolute_pc'.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
-INTDEF NONNULL((1, 2, 4)) unsigned int
+INTDEF NONNULL((1, 2, 4)) unwind_errno_t
 NOTHROW_NCX(CC libdi_unwind_fde_scan_df)(byte_t const *__restrict debug_frame_start,
                                          byte_t const *__restrict debug_frame_end,
                                          void const *absolute_pc,

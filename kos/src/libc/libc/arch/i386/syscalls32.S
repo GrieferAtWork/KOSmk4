@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a355a42 */
+/* HASH CRC-32:0x4dd5da5c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4434,7 +4434,7 @@ DEFINE_PUBLIC_ALIAS(sys_lseek64, libc_sys_lseek64)
  * @param: unwind_error:     The  unwind  error that  caused the  coredump,  or `UNWIND_SUCCESS'  if unwinding
  *                           was  never  actually  performed,  and   `reason'  is  actually  a   `siginfo_t *'
  *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
-/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void const) const *traceback_vector, size_t traceback_length, union coredump_info32 const *reason, syscall_ulong_t unwind_error) */
+/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void const) const *traceback_vector, size_t traceback_length, union coredump_info32 const *reason, unwind_errno_t unwind_error) */
 INTERN_FUNCTION(libc_sys_coredump)
 	movl   $(0xffffffee), %eax
 	jmp    libc_x86_exec_syscall6
@@ -8887,7 +8887,7 @@ DEFINE_PUBLIC_ALIAS(sys_Xlseek64, libc_sys_Xlseek64)
  * @param: unwind_error:     The  unwind  error that  caused the  coredump,  or `UNWIND_SUCCESS'  if unwinding
  *                           was  never  actually  performed,  and   `reason'  is  actually  a   `siginfo_t *'
  *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
-/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void const) const *traceback_vector, size_t traceback_length, union coredump_info32 const *reason, syscall_ulong_t unwind_error) */
+/* errno_t coredump(struct ucpustate32 const *curr_state, struct ucpustate32 const *orig_state, __HYBRID_PTR32(void const) const *traceback_vector, size_t traceback_length, union coredump_info32 const *reason, unwind_errno_t unwind_error) */
 INTERN_FUNCTION(libc_sys_Xcoredump)
 	movl   $(0xffffffee), %eax
 	jmp    libc_x86_exec_Xsyscall6

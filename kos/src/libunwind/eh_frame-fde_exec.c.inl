@@ -146,7 +146,7 @@ PRIVATE
 #else /* ... */
 	NONNULL((1, 2, 3, 4))
 #endif /* !... */
-	unsigned int
+	unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_exec_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                             IF_CFI_UNWIND_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t *common_init_regs,)
                                             IF_CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT(byte_t *uncommon_init_regs,)
@@ -176,7 +176,7 @@ PRIVATE
 #else /* ... */
 	NONNULL((1, 2, 3, 4))
 #endif /* !... */
-	unsigned int
+	unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_sigframe_fde_exec_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                                      IF_CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t *common_init_regs,)
                                                      IF_CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT(byte_t *uncommon_init_regs,)
@@ -194,7 +194,7 @@ PRIVATE
 #else /* ... */
 	NONNULL((1, 2, 3, 4))
 #endif /* !... */
-	unsigned int
+	unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_landing_fde_exec_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                                     IF_CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT(unwind_cfa_register_t *common_init_regs,)
                                                     IF_CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT(byte_t *uncommon_init_regs,)
@@ -210,7 +210,7 @@ NOTHROW_NCX(CC libuw_unwind_landing_fde_exec_until)(unwind_fde_t *__restrict sel
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-PRIVATE NONNULL((1, 2, 3, 4)) unsigned int
+PRIVATE NONNULL((1, 2, 3, 4)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                                 byte_t const *reader,
                                                 byte_t const *end,
@@ -230,7 +230,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa_until)(unwind_fde_t *__restrict self, /
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-PRIVATE NONNULL((1, 2, 3, 4)) unsigned int
+PRIVATE NONNULL((1, 2, 3, 4)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t *__restrict self, /* Only non-const for lazy initialized fields! */
                                                  byte_t const *reader,
                                                  byte_t const *end,
@@ -842,7 +842,7 @@ skip_expression:
 	return UNWIND_SUCCESS;
 #ifndef __KERNEL__
 	{
-		unsigned int error;
+		unwind_errno_t error;
 err_unknown_instruction:
 		error = UNWIND_CFA_UNKNOWN_INSTRUCTION;
 		goto err_common;

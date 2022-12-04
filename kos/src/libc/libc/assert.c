@@ -49,7 +49,7 @@
 #include <uchar.h>
 #include <unistd.h>
 
-#include <libunwind/api.h> /* UNWIND_USER_ABORT */
+#include <libunwind/errno.h> /* UNWIND_USER_ABORT */
 
 #include "assert.h"
 #include "sigreturn.h"
@@ -83,7 +83,7 @@ assert_printer(void *UNUSED(ignored), char const *__restrict data, size_t datale
 PRIVATE ATTR_COLD ATTR_NORETURN ATTR_SECTION(".text.crt.assert") NONNULL((1)) void CC
 trap_application(struct kcpustate *__restrict state,
                  union coredump_info *info,
-                 unsigned int unwind_error) {
+                 unwind_errno_t unwind_error) {
 
 	/* Try to do a coredump */
 #ifdef KCPUSTATE_IS_UCPUSTATE

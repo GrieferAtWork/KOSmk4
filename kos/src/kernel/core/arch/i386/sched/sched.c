@@ -59,6 +59,7 @@
 #include <stdarg.h>
 #include <string.h>
 
+#include <libunwind/errno.h>
 #include <libunwind/unwind.h>
 
 DECL_BEGIN
@@ -115,7 +116,7 @@ PRIVATE NOBLOCK ATTR_COLD u32
 NOTHROW(KCALL get_userspace_eflags)(struct task const *__restrict self) {
 	struct ucpustate st, ost;
 	void const *unwind_pc;
-	unsigned int unwind_error;
+	unwind_errno_t unwind_error;
 	assert(!PREEMPTION_ENABLED());
 	assert(self->t_cpu == THIS_CPU);
 	assert(!(self->t_flags & TASK_FKERNTHREAD));

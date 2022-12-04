@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98aec031 */
+/* HASH CRC-32:0x4c15a6fd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2165,7 +2165,7 @@
  * @param: unwind_error:     The  unwind  error that  caused the  coredump,  or `UNWIND_SUCCESS'  if unwinding
  *                           was  never  actually  performed,  and   `reason'  is  actually  a   `siginfo_t *'
  *                           Ignored when `reason == NULL', in which case `UNWIND_SUCCESS' is assumed instead. */
-/* errno_t coredump(struct ucpustate const *curr_state, struct ucpustate const *orig_state, void const *const *traceback_vector, size_t traceback_length, union coredump_info const *reason, syscall_ulong_t unwind_error) */
+/* errno_t coredump(struct ucpustate const *curr_state, struct ucpustate const *orig_state, void const *const *traceback_vector, size_t traceback_length, union coredump_info const *reason, unwind_errno_t unwind_error) */
 /* TODO: arm_printKernelSyscallWrapper_TODO(sysno: 8323090) */
 
 /* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */

@@ -56,8 +56,9 @@
 
 /* Support for `unwind_for_debug(3)' */
 #ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
-#include <libunwind/unwind.h>
 #include <libdebuginfo/debug_frame.h>
+#include <libunwind/errno.h>
+#include <libunwind/unwind.h>
 #endif /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
 
 DECL_BEGIN
@@ -625,13 +626,13 @@ DEFINE_PUBLIC_ALIAS(mman_module_next_nx, mman_module_next);
 
 
 #ifdef CONFIG_HAVE_KERNEL_USERELF_MODULES
-LOCAL NONNULL((1, 5, 7)) unsigned int KCALL
+LOCAL NONNULL((1, 5, 7)) unwind_errno_t KCALL
 unwind_userspace_with_section(struct module *__restrict mod, void const *absolute_pc,
                               byte_t const *eh_frame_data, size_t eh_frame_size,
                               unwind_getreg_t reg_getter, void const *reg_getter_arg,
                               unwind_setreg_t reg_setter, void *reg_setter_arg,
                               bool is_debug_frame) {
-	unsigned int result;
+	unwind_errno_t result;
 	REF struct mman *oldmm;
 	REF struct mman *newmm = mod->md_mman;
 	unwind_fde_t fde;
@@ -685,12 +686,12 @@ unwind_userspace_with_section(struct module *__restrict mod, void const *absolut
 	return result;
 }
 
-PRIVATE BLOCKING ATTR_NOINLINE NONNULL((2, 4)) unsigned int LIBUNWIND_CC
+PRIVATE BLOCKING ATTR_NOINLINE NONNULL((2, 4)) unwind_errno_t LIBUNWIND_CC
 unwind_userspace(void const *absolute_pc,
                  unwind_getreg_t reg_getter, void const *reg_getter_arg,
                  unwind_setreg_t reg_setter, void *reg_setter_arg) {
 	/* Unwind a user-space location. */
-	unsigned int result = UNWIND_NO_FRAME;
+	unwind_errno_t result = UNWIND_NO_FRAME;
 	REF struct module *mod;
 
 	/* Lookup the module at the given address. */
@@ -755,11 +756,11 @@ unwind_userspace(void const *absolute_pc,
 }
 
 
-PUBLIC BLOCKING NONNULL((2, 4)) unsigned int LIBDEBUGINFO_CC
+PUBLIC BLOCKING NONNULL((2, 4)) unwind_errno_t LIBDEBUGINFO_CC
 unwind_for_debug(void const *absolute_pc,
                  unwind_getreg_t reg_getter, void const *reg_getter_arg,
                  unwind_setreg_t reg_setter, void *reg_setter_arg) {
-	unsigned int result;
+	unwind_errno_t result;
 
 	/* For non-userspace addresses, use the regular, old unwind() function! */
 	if (!ADDR_ISUSER(absolute_pc)) {
@@ -777,7 +778,7 @@ unwind_for_debug(void const *absolute_pc,
 	return result;
 }
 #else /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
-PUBLIC NONNULL((2, 4)) unsigned int LIBDEBUGINFO_CC
+PUBLIC NONNULL((2, 4)) unwind_errno_t LIBDEBUGINFO_CC
 unwind_for_debug(void const *absolute_pc,
                  unwind_getreg_t reg_getter, void const *reg_getter_arg,
                  unwind_setreg_t reg_setter, void *reg_setter_arg) {

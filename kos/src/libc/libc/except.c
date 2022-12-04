@@ -51,6 +51,7 @@
 
 #include <libunwind/dwarf.h>
 #include <libunwind/eh_frame.h>
+#include <libunwind/errno.h>
 #include <libunwind/except.h>
 #include <libunwind/unwind.h>
 
@@ -321,12 +322,12 @@ libc_gxx_personality_v0(int version /* = 1 */,
                         struct _Unwind_Context *context);
 
 
-PRIVATE SECTION_EXCEPT_TEXT unsigned int __EXCEPT_UNWIND_CC
+PRIVATE SECTION_EXCEPT_TEXT unwind_errno_t __EXCEPT_UNWIND_CC
 unwind_fde(unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
            except_register_state_t *__restrict new_state,
            except_register_state_t const *__restrict old_state,
            void const *pc) {
-	unsigned int unwind_error;
+	unwind_errno_t unwind_error;
 	/* Execute the CFA program to generate the row of rules for our current source location. */
 #ifndef CFI_UNWIND_NO_SIGFRAME_COMMON_UNCOMMON_REGISTERS
 	if (fde->f_sigframe) {
@@ -359,14 +360,14 @@ done:
 }
 
 
-PRIVATE SECTION_EXCEPT_TEXT unsigned int __FCALL
+PRIVATE SECTION_EXCEPT_TEXT unwind_errno_t __FCALL
 unwind_landingpad(unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
                   except_register_state_t *__restrict state,
                   void const *except_pc) {
 	void const *landing_pad_pc;
 	unwind_cfa_landing_state_t cfa;
 	except_register_state_t new_state;
-	unsigned int unwind_error;
+	unwind_errno_t unwind_error;
 	landing_pad_pc = __EXCEPT_REGISTER_STATE_TYPE_RDPC(*state);
 	unwind_error   = unwind_fde_landing_exec(fde, &cfa, except_pc, landing_pad_pc);
 	if unlikely(unwind_error != UNWIND_SUCCESS)
@@ -439,8 +440,8 @@ trigger_coredump(except_register_state_t const *curr_state,
                  except_register_state_t const *orig_state,
                  struct exception_data const *exc,
                  void const **unwind_tracevector,
-                 unsigned int unwind_tracelength,
-                 unsigned int unwind_error) {
+                 size_t unwind_tracelength,
+                 unwind_errno_t unwind_error) {
 #ifndef __EXCEPT_REGISTER_STATE_TYPE_IS_UCPUSTATE
 	struct ucpustate curr_ust, orig_ust;
 	except_register_state_to_ucpustate(curr_state, &curr_ust);
@@ -513,13 +514,13 @@ try_raise_signal_from_exception(except_register_state_t const *__restrict state,
 DEFINE_PUBLIC_ALIAS(except_unwind, libc_except_unwind);
 INTERN SECTION_EXCEPT_TEXT WUNUSED except_register_state_t *
 NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_except_unwind)(except_register_state_t *__restrict state) {
-	unsigned int unwind_error;
+	unwind_errno_t unwind_error;
 	struct _Unwind_Context context;
 	except_register_state_t orig_state;
 	except_register_state_t oldstate;
 	void const *pc;
 #if EXCEPT_BACKTRACE_SIZE != 0
-	unsigned int orig_tracecount;
+	size_t orig_tracecount;
 	for (orig_tracecount = 0; orig_tracecount < EXCEPT_BACKTRACE_SIZE; ++orig_tracecount) {
 		if (!current.pt_except.ei_trace[orig_tracecount])
 			break;
@@ -575,7 +576,7 @@ search_fde:
 	/* Remember the current state PC as a new entry in the exception's traceback. */
 	if (current.pt_except.ei_trace[EXCEPT_BACKTRACE_SIZE - 1] == NULL) {
 #if EXCEPT_BACKTRACE_SIZE > 1
-		unsigned int i;
+		size_t i;
 		for (i = 0; i < EXCEPT_BACKTRACE_SIZE - 1; ++i) {
 			if (!current.pt_except.ei_trace[i])
 				break;
@@ -651,7 +652,7 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_exception_raise_phase_2)(except_register_sta
                                                              struct _Unwind_Exception *__restrict exception_object) {
 	struct _Unwind_Context context;
 	except_register_state_t oldstate, newstate;
-	unsigned int unwind_error;
+	unwind_errno_t unwind_error;
 	void const *pc;
 	ENSURE_LIBUNWIND_LOADED();
 	memcpy(&newstate, state, sizeof(newstate));
@@ -700,7 +701,7 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_exception_forceunwind_phase_2)(except_regist
                                                                    struct _Unwind_Exception *__restrict exception_object) {
 	struct _Unwind_Context context;
 	except_register_state_t oldstate, newstate;
-	unsigned int unwind_error;
+	unwind_errno_t unwind_error;
 	_Unwind_Stop_Fn stop;
 	void *stop_argument;
 	void const *pc;
@@ -772,7 +773,7 @@ NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_Unwind_Resume_impl)(except_register_state_t 
 INTERN SECTION_EXCEPT_TEXT NONNULL((1, 2)) except_register_state_t *
 NOTHROW_NCX(__EXCEPT_UNWIND_CC libc_Unwind_RaiseException_impl)(except_register_state_t *__restrict state,
                                                                 struct _Unwind_Exception *exception_object) {
-	unsigned int unwind_error;
+	unwind_errno_t unwind_error;
 	struct _Unwind_Context context;
 	except_register_state_t oldstate, newstate;
 	void const *pc;
@@ -848,7 +849,7 @@ libc_Unwind_Backtrace_impl(except_register_state_t *__restrict state,
 	struct _Unwind_Context context;
 	except_register_state_t oldstate;
 	_Unwind_Reason_Code reason;
-	unsigned int unwind_error;
+	unwind_errno_t unwind_error;
 	context.uc_state = state;
 	for (;;) {
 		void const *pc;
@@ -877,7 +878,7 @@ err_unwind:
 DEFINE_PUBLIC_ALIAS(_Unwind_GetCFA, libc_Unwind_GetCFA);
 INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED NONNULL((1)) _Unwind_Word
 NOTHROW_NCX(LIBCCALL libc_Unwind_GetCFA)(struct _Unwind_Context *__restrict self) { /* Only non-const for lazy initialized fields! */
-	unsigned int unwind_error;
+	unwind_errno_t unwind_error;
 	unwind_cfa_value_t cfa;
 	uintptr_t result;
 	ENSURE_LIBUNWIND_LOADED();
@@ -924,7 +925,7 @@ NOTHROW_NCX(LIBCCALL libc_Unwind_GetTextRelBase)(struct _Unwind_Context *__restr
 DEFINE_PUBLIC_ALIAS(_Unwind_FindEnclosingFunction, libc_Unwind_FindEnclosingFunction);
 INTERN SECTION_EXCEPT_TEXT ATTR_PURE WUNUSED void *
 NOTHROW_NCX(LIBCCALL libc_Unwind_FindEnclosingFunction)(void const *pc) {
-	unsigned int unwind_error;
+	unwind_errno_t unwind_error;
 	unwind_fde_t fde;
 	ENSURE_LIBUNWIND_LOADED();
 	unwind_error = unwind_fde_find(pc, &fde);
@@ -1147,7 +1148,7 @@ INTERN SECTION_EXCEPT_TEXT except_register_state_t *__EXCEPT_HANDLER_CC
 libc_except_handler4_impl(except_register_state_t *__restrict state,
                           struct exception_data *__restrict error) {
 	/* HINT: `libc_except_handler4()' is bound in `init.c:libc_init()' */
-	unsigned int unwind_error;
+	unwind_errno_t unwind_error;
 	struct _Unwind_Context context;
 	except_register_state_t oldstate, newstate;
 	except_register_state_t first_handler;
@@ -1249,7 +1250,7 @@ libc_except_handler4_impl(except_register_state_t *__restrict state,
 		/* Remember the current state PC as a new entry in the exception's traceback. */
 		if (info->ei_trace[EXCEPT_BACKTRACE_SIZE - 1] == NULL) {
 #if EXCEPT_BACKTRACE_SIZE > 1
-			unsigned int i;
+			size_t i;
 			for (i = 0; i < EXCEPT_BACKTRACE_SIZE - 1; ++i) {
 				if (!info->ei_trace[i])
 					break;

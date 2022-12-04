@@ -51,6 +51,7 @@
 #include <libinstrlen/instrlen.h>
 #include <libregdump/cpu-state.h>
 #include <libregdump/x86.h>
+#include <libunwind/errno.h>
 #include <libunwind/unwind.h>
 
 DECL_BEGIN
@@ -129,7 +130,7 @@ indent_regdump_print_format(struct regdump_printer *__restrict self,
 INTERN void FCALL
 x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
                                   PHYS pagedir_t *cr3) {
-	unsigned int error;
+	unwind_errno_t error;
 	bool is_first;
 	struct regdump_printer rd_printer;
 	struct desctab tab;
@@ -162,8 +163,8 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 		struct ucpustate old_state;
 		old_state = *ustate;
 		error = unwind_for_debug(is_first
-                                 ? ucpustate_getpc(&old_state)
-                                 : ucpustate_getpc(&old_state) - 1,
+		                         ? ucpustate_getpc(&old_state)
+		                         : ucpustate_getpc(&old_state) - 1,
 		                         &unwind_getreg_ucpustate, &old_state,
 		                         &unwind_setreg_ucpustate, ustate);
 		if (error != UNWIND_SUCCESS)

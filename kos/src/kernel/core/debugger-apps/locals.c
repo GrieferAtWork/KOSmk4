@@ -52,6 +52,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <libdebuginfo/debug_info.h>
 #include <libunwind/cfi.h>
+#include <libunwind/errno.h>
 #include <libunwind/unwind.h>
 
 #ifdef __ARCH_HAVE_COMPAT
@@ -108,7 +109,7 @@ PRIVATE uintptr_t _locals_current_module_loadaddr;
 
 
 /* @return: * : UNWIND_* */
-PRIVATE ATTR_DBGTEXT ATTR_NOINLINE unsigned int LIBDEBUGINFO_CC
+PRIVATE ATTR_DBGTEXT ATTR_NOINLINE unwind_errno_t LIBDEBUGINFO_CC
 do_print_local(void *UNUSED(arg),
                di_debuginfo_cu_parser_t const *__restrict parser,
                di_enum_locals_sections_t const *__restrict sections,
@@ -118,7 +119,7 @@ do_print_local(void *UNUSED(arg),
                di_debuginfo_type_t *__restrict type,
                uintptr_t module_relative_pc,
                size_t bufsize) {
-	unsigned int error;
+	unwind_errno_t error;
 	void *value_buffer;
 	size_t num_bits;
 	di_debug_sections_t const *debug_sections;
@@ -204,7 +205,7 @@ print_local(void *arg,
             di_debuginfo_variable_t *__restrict var,
             di_debuginfo_type_t *__restrict type,
             uintptr_t module_relative_pc) {
-	unsigned int error;
+	unwind_errno_t error;
 	size_t bufsize = type->t_sizeof;
 	var_fixname(var);
 	if (arg) {

@@ -38,6 +38,7 @@
 #include <stddef.h>
 
 #include <libunwind/eh_frame.h>
+#include <libunwind/errno.h>
 #include <libunwind/unwind.h>
 
 DECL_BEGIN
@@ -94,7 +95,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_int80)(struct unwind
 	struct ucpustate ustate;
 	struct rpc_syscall_info sc_info;
 	unwind_cfa_sigframe_state_t cfa;
-	unsigned int error;
+	unwind_errno_t error;
 	void const *pc;
 	kcpustate_to_ucpustate(state, &ustate);
 	pc = ucpustate_getpc(&ustate) - 1;
@@ -124,7 +125,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm32_sysenter)(struct unw
 	struct ucpustate ustate;
 	struct rpc_syscall_info sc_info;
 	unwind_cfa_sigframe_state_t cfa;
-	unsigned int error;
+	unwind_errno_t error;
 	void const *pc;
 	kcpustate_to_ucpustate(state, &ustate);
 	pc = ucpustate_getpc(&ustate) - 1;
@@ -158,7 +159,7 @@ NOTHROW(EXCEPT_PERSONALITY_CC x86_syscall_personality_asm64_syscall)(struct unwi
 	struct ucpustate ustate;
 	struct rpc_syscall_info sc_info;
 	unwind_cfa_sigframe_state_t cfa;
-	unsigned int error;
+	unwind_errno_t error;
 	void const *pc;
 	kcpustate_to_ucpustate(state, &ustate);
 	pc = ucpustate_getpc(&ustate) - 1;

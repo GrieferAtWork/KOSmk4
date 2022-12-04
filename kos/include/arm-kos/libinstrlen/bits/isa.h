@@ -48,7 +48,7 @@
 	 : INSTRLEN_ISA_ARM)
 
 #ifdef __CC__
-#include <libunwind/api.h>
+#include <libunwind/errno.h>
 #include <libunwind/cfi/arm.h>
 
 __DECL_BEGIN

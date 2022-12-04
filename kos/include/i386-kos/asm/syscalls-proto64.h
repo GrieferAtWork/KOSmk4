@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30b45eb8 */
+/* HASH CRC-32:0x117faff3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1712,7 +1712,7 @@
 #define __NRAT2_coredump                 (__HYBRID_PTR64(void const) const *, __HYBRID_PTR64(void const) const *)
 #define __NRAT3_coredump                 (size_t, __size_t)
 #define __NRAT4_coredump                 (union coredump_info64 const *, union coredump_info64 const *)
-#define __NRAT5_coredump                 (syscall_ulong_t, __syscall_ulong_t)
+#define __NRAT5_coredump                 (unwind_errno_t, unwind_errno_t)
 #define __NRAT0_mktty                    (char const *, char const *)
 #define __NRAT1_mktty                    (fd_t, __fd_t)
 #define __NRAT2_mktty                    (fd_t, __fd_t)
@@ -2169,7 +2169,7 @@
 #define __NRAM_rtm_end(a, b, c, d, e, f)                  /* nothing */
 #define __NRAM_rtm_begin(a, b, c, d, e, f)                /* nothing */
 #define __NRAM_userviofd(a, b, c, d, e, f)                (__size_t)a, (__syscall_ulong_t)b
-#define __NRAM_coredump(a, b, c, d, e, f)                 (struct ucpustate64 const *)a, (struct ucpustate64 const *)b, (__HYBRID_PTR64(void const) const *)c, (__size_t)d, (union coredump_info64 const *)e, (__syscall_ulong_t)f
+#define __NRAM_coredump(a, b, c, d, e, f)                 (struct ucpustate64 const *)a, (struct ucpustate64 const *)b, (__HYBRID_PTR64(void const) const *)c, (__size_t)d, (union coredump_info64 const *)e, (unwind_errno_t)f
 #define __NRAM_mktty(a, b, c, d, e, f)                    (char const *)a, (__fd_t)b, (__fd_t)c, (__syscall_ulong_t)d
 #define __NRAM_lfutexexpr(a, b, c, d, e, f)               (__uint64_t *)a, (void *)b, (struct lfutexexprx64 const *)c, (struct __timespecx64 const *)d, (__syscall_ulong_t)e
 #define __NRAM_lfutex(a, b, c, d, e, f)                   (__uint64_t *)a, (__syscall_ulong_t)b, (__uint64_t)c, (struct __timespecx64 const *)d, (__uint64_t)e

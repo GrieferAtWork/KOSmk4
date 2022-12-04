@@ -49,16 +49,16 @@
 DECL_BEGIN
 
 /* Functions we want to define: */
-INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_getreg_ucpustate)(struct ucpustate const *self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_getreg_ucpustate_exclusive)(struct ucpustate const *self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate)(struct ucpustate *self, unwind_regno_t dw_regno, void const *__restrict src);
-INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate_exclusive)(struct ucpustate *self, unwind_regno_t dw_regno, void const *__restrict src);
-INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_getreg_lcpustate)(struct lcpustate const *self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_getreg_lcpustate_exclusive)(struct lcpustate const *self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_setreg_lcpustate)(struct lcpustate *self, unwind_regno_t dw_regno, void const *__restrict src);
-INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_setreg_lcpustate_exclusive)(struct lcpustate *self, unwind_regno_t dw_regno, void const *__restrict src);
-INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_getreg_fcpustate)(struct fcpustate const *self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_setreg_fcpustate)(struct fcpustate *self, unwind_regno_t dw_regno, void const *__restrict src);
+INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_ucpustate)(struct ucpustate const *self, unwind_regno_t dw_regno, void *__restrict dst);
+INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_ucpustate_exclusive)(struct ucpustate const *self, unwind_regno_t dw_regno, void *__restrict dst);
+INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate)(struct ucpustate *self, unwind_regno_t dw_regno, void const *__restrict src);
+INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate_exclusive)(struct ucpustate *self, unwind_regno_t dw_regno, void const *__restrict src);
+INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_lcpustate)(struct lcpustate const *self, unwind_regno_t dw_regno, void *__restrict dst);
+INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_lcpustate_exclusive)(struct lcpustate const *self, unwind_regno_t dw_regno, void *__restrict dst);
+INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_lcpustate)(struct lcpustate *self, unwind_regno_t dw_regno, void const *__restrict src);
+INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_lcpustate_exclusive)(struct lcpustate *self, unwind_regno_t dw_regno, void const *__restrict src);
+INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_fcpustate)(struct fcpustate const *self, unwind_regno_t dw_regno, void *__restrict dst);
+INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_fcpustate)(struct fcpustate *self, unwind_regno_t dw_regno, void const *__restrict src);
 
 #define wr32(p_ptr, value) (*(uint32_t *)(p_ptr) = (value))
 #define rd32(p_ptr)        (*(uint32_t const *)(p_ptr))
@@ -66,7 +66,7 @@ INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_setreg_fcpustate
 /************************************************************************/
 /* Implicit register access                                             */
 /************************************************************************/
-PRIVATE NONNULL((2)) unsigned int
+PRIVATE NONNULL((2)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_getreg_implicit)(unwind_regno_t dw_regno,
                                              void *__restrict dst) {
 	uintptr_t value;
@@ -108,10 +108,10 @@ NOTHROW_NCX(CC libuw_unwind_getreg_implicit)(unwind_regno_t dw_regno,
 	return UNWIND_SUCCESS;
 }
 
-PRIVATE NONNULL((2)) unsigned int
+PRIVATE NONNULL((2)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_setreg_implicit)(unwind_regno_t dw_regno,
                                              void const *__restrict src) {
-	unsigned int result;
+	unwind_errno_t result;
 	uint32_t expected;
 	result = libuw_unwind_getreg_implicit(dw_regno, &expected);
 	if (result == UNWIND_SUCCESS && expected != rd32(src))
@@ -348,7 +348,7 @@ badreg:
 /************************************************************************/
 /* UCPUSTATE                                                            */
 /************************************************************************/
-INTERN NONNULL((1, 3)) unsigned int
+INTERN NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_getreg_ucpustate_exclusive)(struct ucpustate const *self,
                                                         unwind_regno_t dw_regno,
                                                         void *__restrict dst) {
@@ -359,7 +359,7 @@ NOTHROW_NCX(CC libuw_unwind_getreg_ucpustate_exclusive)(struct ucpustate const *
 	return UNWIND_SUCCESS;
 }
 
-INTERN NONNULL((1, 3)) unsigned int
+INTERN NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate_exclusive)(struct ucpustate *self,
                                                         unwind_regno_t dw_regno,
                                                         void const *__restrict src) {
@@ -370,7 +370,7 @@ NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate_exclusive)(struct ucpustate *self,
 	return UNWIND_SUCCESS;
 }
 
-INTERN NONNULL((1, 3)) unsigned int
+INTERN NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_getreg_ucpustate)(struct ucpustate const *self,
                                               unwind_regno_t dw_regno,
                                               void *__restrict dst) {
@@ -382,7 +382,7 @@ NOTHROW_NCX(CC libuw_unwind_getreg_ucpustate)(struct ucpustate const *self,
 	return libuw_unwind_getreg_implicit(dw_regno, dst);
 }
 
-INTERN NONNULL((1, 3)) unsigned int
+INTERN NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate)(struct ucpustate *self,
                                               unwind_regno_t dw_regno,
                                               void const *__restrict src) {
@@ -399,7 +399,7 @@ NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate)(struct ucpustate *self,
 /************************************************************************/
 /* LCPUSTATE                                                            */
 /************************************************************************/
-INTERN NONNULL((1, 3)) unsigned int
+INTERN NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_getreg_lcpustate_exclusive)(struct lcpustate const *self,
                                                         unwind_regno_t dw_regno,
                                                         void *__restrict dst) {
@@ -425,7 +425,7 @@ NOTHROW_NCX(CC libuw_unwind_getreg_lcpustate_exclusive)(struct lcpustate const *
 	return UNWIND_SUCCESS;
 }
 
-INTERN NONNULL((1, 3)) unsigned int
+INTERN NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_setreg_lcpustate_exclusive)(struct lcpustate *self,
                                                         unwind_regno_t dw_regno,
                                                         void const *__restrict src) {
@@ -453,22 +453,22 @@ NOTHROW_NCX(CC libuw_unwind_setreg_lcpustate_exclusive)(struct lcpustate *self,
 	return UNWIND_SUCCESS;
 }
 
-INTERN NONNULL((1, 3)) unsigned int
+INTERN NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_getreg_lcpustate)(struct lcpustate const *self,
                                               unwind_regno_t dw_regno,
                                               void *__restrict dst) {
-	unsigned int result;
+	unwind_errno_t result;
 	result = libuw_unwind_getreg_lcpustate_exclusive(self, dw_regno, dst);
 	if (result == UNWIND_INVALID_REGISTER)
 		result = libuw_unwind_getreg_implicit(dw_regno, dst);
 	return result;
 }
 
-INTERN NONNULL((1, 3)) unsigned int
+INTERN NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_setreg_lcpustate)(struct lcpustate *self,
                                               unwind_regno_t dw_regno,
                                               void const *__restrict src) {
-	unsigned int result;
+	unwind_errno_t result;
 	result = libuw_unwind_setreg_lcpustate_exclusive(self, dw_regno, src);
 	if (result == UNWIND_INVALID_REGISTER)
 		result = libuw_unwind_setreg_implicit(dw_regno, src);
@@ -543,7 +543,7 @@ badreg:
 	return NULL;
 }
 
-INTERN NONNULL((1, 3)) unsigned int
+INTERN NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_getreg_fcpustate)(struct fcpustate const *self,
                                               unwind_regno_t dw_regno,
                                               void *__restrict dst) {
@@ -554,7 +554,7 @@ NOTHROW_NCX(CC libuw_unwind_getreg_fcpustate)(struct fcpustate const *self,
 	return UNWIND_SUCCESS;
 }
 
-INTERN NONNULL((1, 3)) unsigned int
+INTERN NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_setreg_fcpustate)(struct fcpustate *self,
                                               unwind_regno_t dw_regno,
                                               void const *__restrict src) {

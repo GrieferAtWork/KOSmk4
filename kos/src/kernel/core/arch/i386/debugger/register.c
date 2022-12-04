@@ -56,6 +56,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <libcpustate/register.h>
 #include <libunwind/arch-register.h>
 #include <libunwind/cfi.h>
+#include <libunwind/errno.h>
 
 DECL_BEGIN
 
@@ -562,11 +563,11 @@ nocpu:
 /* Get/Set debugger register for some given level.
  * NOTE: These functions are written to be compatible with `unwind_getreg_t' / `unwind_setreg_t'
  * @param: arg: One of `DBG_REGLEVEL_*', cast as `(void *)(uintptr_t)DBG_REGLEVEL_*' */
-PUBLIC ATTR_DBGTEXT unsigned int
+PUBLIC ATTR_DBGTEXT unwind_errno_t
 NOTHROW(LIBUNWIND_CC dbg_getreg)(/*uintptr_t level*/ void const *arg,
                                  uintptr_half_t cfi_regno,
                                  void *__restrict buf) {
-	unsigned int error;
+	unwind_errno_t error;
 	switch ((unsigned int)(uintptr_t)arg) {
 
 	case DBG_REGLEVEL_EXIT:
@@ -625,11 +626,11 @@ done:
 	return error;
 }
 
-PUBLIC ATTR_DBGTEXT unsigned int
+PUBLIC ATTR_DBGTEXT unwind_errno_t
 NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void *arg,
                                  uintptr_half_t cfi_regno,
                                  void const *__restrict buf) {
-	unsigned int error;
+	unwind_errno_t error;
 	switch ((unsigned int)(uintptr_t)arg) {
 
 	case DBG_REGLEVEL_EXIT:
@@ -811,7 +812,7 @@ ok:
 }
 
 #ifdef __x86_64__
-PRIVATE WUNUSED unsigned int
+PRIVATE WUNUSED cpu_regno_t
 NOTHROW(KCALL transform_gsbase_register_indices)(unsigned int level, cpu_regno_t regno) {
 	/* Special handling: when we're currently returning to  kernel-space,
 	 *                   then we must switch %kernel_gs.base and %gs.base

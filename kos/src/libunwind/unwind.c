@@ -259,7 +259,7 @@ PRIVATE void
 NOTHROW(LIBCCALL remove_cache_references)(byte_t const *eh_frame,
                                           void const *tbase,
                                           void const *dbase) {
-	unsigned int error;
+	unwind_errno_t error;
 	unwind_fde_t fde;
 	for (;;) {
 		fde.f_tbase = tbase;
@@ -323,7 +323,7 @@ NOTHROW_NCX(CC fde_locate_pc)(void const *absolute_pc,
                               byte_t const *eh_frame_start,
                               byte_t const *eh_frame_end,
                               struct dwarf_eh_bases *__restrict bases) {
-	unsigned int error;
+	unwind_errno_t error;
 	unwind_fde_t fde;
 	fde.f_dbase = bases->deb_dbase;
 	fde.f_tbase = bases->deb_tbase;
@@ -423,10 +423,10 @@ DEFINE_PUBLIC_ALIAS(_Unwind_Find_FDE, libuw__Unwind_Find_FDE);
 /* Search auxiliary eh_frame sections registered via `__register_frame()'
  * and  friends for  FDE entries  containing `absolute_pc'.  Used when we
  * were unable to find FDE data through normal means. */
-PRIVATE NONNULL((2)) unsigned int
+PRIVATE NONNULL((2)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_find_rf)(void const *absolute_pc,
                                          unwind_fde_t *__restrict result) {
-	unsigned int error = UNWIND_NO_FRAME;
+	unwind_errno_t error = UNWIND_NO_FRAME;
 	struct rf_object *obj;
 	register_frame_aux_read();
 	/* Go through all explicitly registered register-frame objects
@@ -463,10 +463,10 @@ done:
 
 /* NOTE: In kernel-space, `libuw_unwind_fde_find()'  is
  *       in `/kos/src/kernel/core/memory/mman/driver.c' */
-PRIVATE NONNULL((1, 3)) unsigned int
+PRIVATE NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_find_new)(void *dlmod, void const *absolute_pc,
                                           unwind_fde_t *__restrict result) {
-	unsigned int error;
+	unwind_errno_t error;
 	struct dl_section *eh_frame_sect;
 
 	/* Lock the module's .eh_frame section into memory. */
@@ -499,12 +499,12 @@ err_no_section:
  * address, as well as  keep track of a  lazily allocated address-tree of  FDE
  * caches for quick (O(log2)) repeated access to an FDE located within a known
  * function. */
-INTERN NONNULL((2)) unsigned int
+INTERN NONNULL((2)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_fde_find)(void const *absolute_pc,
                                       unwind_fde_t *__restrict result) {
 	struct fde_cache_entry *fce;
 	void *dlmod;
-	unsigned int error;
+	unwind_errno_t error;
 
 	/* Try to search the FDE-cache.
 	 * NOTE: To prevent deadlocks upon re-entrance, only
@@ -625,11 +625,11 @@ DEFINE_PUBLIC_ALIAS(unwind_fde_find, libuw_unwind_fde_find);
  *       should be  unwound; Not  after it.  - i.e.  range checking  is done  as:
  *       `absolute_pc >= start && absolute_pc < end'
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
-INTERN NONNULL((2, 4)) unsigned int CC
+INTERN NONNULL((2, 4)) unwind_errno_t CC
 linuw_unwind(void const *absolute_pc,
              unwind_getreg_t reg_getter, void const *reg_getter_arg,
              unwind_setreg_t reg_setter, void *reg_setter_arg) {
-	unsigned int result;
+	unwind_errno_t result;
 	unwind_fde_t fde;
 	result = libuw_unwind_fde_find(absolute_pc, &fde);
 	if unlikely(result != UNWIND_SUCCESS)

@@ -32,6 +32,8 @@
 #include <kos/aref.h>
 #include <kos/exec/elf.h>
 
+#include <libunwind/errno.h>
+
 #ifdef __WANT_DRIVER__d_internals
 #include <hybrid/sched/atomic-rwlock.h>
 
@@ -672,8 +674,8 @@ struct unwind_fde_struct;
 
 /* Lookup  the FDE descriptor for a given `absolute_pc',
  * whilst trying to make use of the FDE cache of `self'.
- * @return: * : One of `UNWIND_*' from <libunwind/api.h> */
-FUNDEF NOBLOCK NONNULL((1)) unsigned int
+ * @return: * : One of `UNWIND_*' from <libunwind/errno.h> */
+FUNDEF NOBLOCK NONNULL((1)) unwind_errno_t
 NOTHROW(FCALL driver_findfde)(struct driver *__restrict self, void const *absolute_pc,
                               struct unwind_fde_struct *__restrict result);
 

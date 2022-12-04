@@ -25,6 +25,8 @@
 
 #include <bits/types.h>
 
+#include "errno.h"
+
 #ifdef __CC__
 __DECL_BEGIN
 
@@ -41,13 +43,13 @@ __DECL_BEGIN
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: ...
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
-typedef __ATTR_NONNULL_T((1, 2, 3)) unsigned int
+typedef __ATTR_NONNULL_T((1, 2, 3)) debuginfo_errno_t
 __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PDEBUGARANGES_LOCATE)(__byte_t const *__restrict debug_aranges_start,
                                                        __byte_t const *__restrict debug_aranges_end,
                                                        __uintptr_t *__restrict pdebug_info_cu_offset,
                                                        __uintptr_t module_relative_pc);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
-LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 3)) unsigned int
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 3)) debuginfo_errno_t
 __NOTHROW_NCX(LIBDEBUGINFO_CC debugaranges_locate)(__byte_t const *__restrict debug_aranges_start,
                                                    __byte_t const *__restrict debug_aranges_end,
                                                    __uintptr_t *__restrict pdebug_info_cu_offset,

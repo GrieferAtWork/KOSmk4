@@ -26,6 +26,7 @@
 #include <bits/types.h>
 
 #include <libunwind/eh_frame.h>
+#include <libunwind/errno.h>
 
 /* The .debug_frame section is (somewhat) different, such that we need
  * our own  versions of  `unwind_fde_scan()' and  `unwind_fde_load()'.
@@ -40,14 +41,14 @@ __DECL_BEGIN
  * written back to `*pdebug_frame_reader' after a previous call to `unwind_fde_load_df()'.
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
-typedef __ATTR_NONNULL_T((1, 2, 3, 4)) unsigned int
+typedef __ATTR_NONNULL_T((1, 2, 3, 4)) unwind_errno_t
 __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PUNWIND_FDE_LOAD_DF)(__byte_t **__restrict __pdebug_frame_reader,
                                                       __byte_t *__restrict __debug_frame_start,
                                                       __byte_t *__restrict __debug_frame_end,
                                                       unwind_fde_t *__restrict __result,
                                                       __uint8_t __sizeof_address);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
-LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 3, 4)) unsigned int
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 3, 4)) unwind_errno_t
 __NOTHROW_NCX(LIBDEBUGINFO_CC unwind_fde_load_df)(__byte_t **__restrict __pdebug_frame_reader,
                                                   __byte_t *__restrict __debug_frame_start,
                                                   __byte_t *__restrict __debug_frame_end,
@@ -61,14 +62,14 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC unwind_fde_load_df)(__byte_t **__restrict __pdebug
  * @assume(!return || result->f_pcend > absolute_pc);
  * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `absolute_pc'.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
-typedef __ATTR_NONNULL_T((1, 2, 4)) unsigned int
+typedef __ATTR_NONNULL_T((1, 2, 4)) unwind_errno_t
 __NOTHROW_NCX_T(LIBDEBUGINFO_CC *PUNWIND_FDE_SCAN_DF)(__byte_t const *__restrict __debug_frame_start,
                                                       __byte_t const *__restrict __debug_frame_end,
                                                       void const *__absolute_pc,
                                                       unwind_fde_t *__restrict __result,
                                                       __uint8_t __sizeof_address);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
-LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 4)) unsigned int
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1, 2, 4)) unwind_errno_t
 __NOTHROW_NCX(LIBDEBUGINFO_CC unwind_fde_scan_df)(__byte_t const *__restrict __debug_frame_start,
                                                   __byte_t const *__restrict __debug_frame_end,
                                                   void const *__absolute_pc,

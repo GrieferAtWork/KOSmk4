@@ -25,7 +25,8 @@
 
 #include <bits/types.h>
 
-#include <libunwind/cfi.h> /* unwind_getreg_t, unwind_setreg_t */
+#include <libunwind/cfi.h>   /* unwind_getreg_t, unwind_setreg_t */
+#include <libunwind/errno.h> /* unwind_errno_t */
 
 #ifdef __CC__
 __DECL_BEGIN
@@ -47,12 +48,12 @@ __DECL_BEGIN
  * for user-space location for which the kernel doesn't already know how
  * to unwind them will fail with `UNWIND_NO_FRAME'.
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
-typedef __ATTR_NONNULL_T((2, 4)) unsigned int
+typedef __ATTR_NONNULL_T((2, 4)) unwind_errno_t
 (LIBDEBUGINFO_CC *PUNWIND_FOR_DEBUG)(void const *__absolute_pc,
                                      unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
                                      unwind_setreg_t __reg_setter, void *__reg_setter_arg);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((2, 4)) unsigned int
+LIBUNWIND_DECL __ATTR_NONNULL((2, 4)) unwind_errno_t
 (LIBDEBUGINFO_CC unwind_for_debug)(void const *__absolute_pc,
                                    unwind_getreg_t __reg_getter, void const *__reg_getter_arg,
                                    unwind_setreg_t __reg_setter, void *__reg_setter_arg);

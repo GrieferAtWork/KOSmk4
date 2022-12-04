@@ -65,9 +65,9 @@
 
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
+#include <hybrid/sched/atomic-lock.h>
 #include <hybrid/sched/preemption.h>
 #include <hybrid/sequence/rbtree.h>
-#include <hybrid/sched/atomic-lock.h>
 
 #include <kos/aref.h>
 #include <kos/kernel/cpu-state-helpers.h>
@@ -83,6 +83,7 @@
 #include <string.h>
 
 #include <libinstrlen/instrlen.h>
+#include <libunwind/errno.h>
 #include <libunwind/unwind.h>
 
 /**/
@@ -2633,7 +2634,7 @@ NOTHROW(KCALL trace_malloc_generate_traceback)(void const **__restrict buffer, s
 	 * exceptions  and the like don't just randomly  fail because the kernel couldn't find
 	 * enough memory... */
 	for (;;) {
-		unsigned int unwind_error;
+		unwind_errno_t unwind_error;
 		if (n_skip == 0) {
 			*buffer++ = lcpustate_getpc(state);
 			if (!--buflen)

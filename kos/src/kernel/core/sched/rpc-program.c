@@ -71,6 +71,7 @@
 
 #include <libunwind/arch-register.h>
 #include <libunwind/cfi.h> /* unwind_getreg_t, unwind_setreg_t */
+#include <libunwind/errno.h>
 
 #if defined(__i386__) || defined(__x86_64__)
 #include <sched/x86/eflags-mask.h>
@@ -664,10 +665,10 @@ struct rpc_vm {
 #define rpc_vm_memset(self, addr, byte, num_bytes) rpc_mem_fill(&(self)->rv_mem, addr, byte, num_bytes)
 
 
-PRIVATE NONNULL((1, 3)) unsigned int LIBUNWIND_CC
+PRIVATE NONNULL((1, 3)) unwind_errno_t LIBUNWIND_CC
 rpc_vm_getreg_impl(void const *arg, unwind_regno_t dw_regno, void *__restrict dst) {
 	struct rpc_vm *me = (struct rpc_vm *)arg;
-	unsigned int result;
+	unwind_errno_t result;
 	result = unwind_getreg_ucpustate(&me->rv_cpu, dw_regno, dst);
 #ifdef CONFIG_HAVE_FPU
 	/* Check for FPU register */
@@ -688,10 +689,10 @@ rpc_vm_getreg_impl(void const *arg, unwind_regno_t dw_regno, void *__restrict ds
 	return result;
 }
 
-PRIVATE NONNULL((1, 3)) unsigned int LIBUNWIND_CC
+PRIVATE NONNULL((1, 3)) unwind_errno_t LIBUNWIND_CC
 rpc_vm_setreg_impl(void *arg, unwind_regno_t dw_regno, void const *__restrict src) {
 	struct rpc_vm *me = (struct rpc_vm *)arg;
-	unsigned int result;
+	unwind_errno_t result;
 	result = unwind_setreg_ucpustate(&me->rv_cpu, dw_regno, src);
 #ifdef CONFIG_HAVE_FPU
 	/* Check for FPU register */
@@ -727,7 +728,7 @@ rpc_vm_getsp(struct rpc_vm *__restrict self) {
 #ifdef NDEBUG
 	rpc_vm_getreg(self, CFI_UNWIND_REGISTER_SP(sizeof(void *)), &result);
 #else /* NDEBUG */
-	unsigned int error;
+	unwind_errno_t error;
 	error = rpc_vm_getreg(self, CFI_UNWIND_REGISTER_SP(sizeof(void *)), &result);
 	assertf(error == UNWIND_SUCCESS, "%u", error);
 #endif /* !NDEBUG */
@@ -744,7 +745,7 @@ rpc_vm_setsp(struct rpc_vm *__restrict self, USER UNCHECKED byte_t *value) {
 #ifdef NDEBUG
 	rpc_vm_setreg(self, CFI_UNWIND_REGISTER_SP(sizeof(void *)), &value);
 #else /* NDEBUG */
-	unsigned int error;
+	unwind_errno_t error;
 	error = rpc_vm_setreg(self, CFI_UNWIND_REGISTER_SP(sizeof(void *)), &value);
 	assertf(error == UNWIND_SUCCESS, "%u", error);
 #endif /* !NDEBUG */
@@ -935,7 +936,7 @@ rpc_vm_push2user_sigset(struct rpc_vm *__restrict self,
 PRIVATE NONNULL((1)) void FCALL
 rpc_vm_pushreg(struct rpc_vm *__restrict self, unwind_regno_t regno)
 		THROWS(E_ILLEGAL_RESOURCE_LIMIT_EXCEEDED, ...) {
-	unsigned int error;
+	unwind_errno_t error;
 	alignas(alignof(uintptr_t))
 	byte_t buf[CFI_REGISTER_MAXSIZE];
 	size_t adrsz = rpc_vm_addrsize(self);
@@ -973,7 +974,7 @@ rpc_vm_pushreg(struct rpc_vm *__restrict self, unwind_regno_t regno)
 
 PRIVATE NONNULL((1)) void FCALL
 rpc_vm_popreg(struct rpc_vm *__restrict self, unwind_regno_t regno) {
-	unsigned int error;
+	unwind_errno_t error;
 	alignas(alignof(uintptr_t))
 	byte_t buf[CFI_REGISTER_MAXSIZE];
 	size_t adrsz = rpc_vm_addrsize(self);
@@ -1011,7 +1012,7 @@ rpc_vm_popreg(struct rpc_vm *__restrict self, unwind_regno_t regno) {
 /* Push the given register onto the user-space. */
 PRIVATE NONNULL((1)) void FCALL
 rpc_vm_pushreg2user(struct rpc_vm *__restrict self, unwind_regno_t regno) {
-	unsigned int error;
+	unwind_errno_t error;
 	alignas(alignof(uintptr_t))
 	byte_t buf[CFI_REGISTER_MAXSIZE];
 	size_t adrsz = rpc_vm_addrsize(self);

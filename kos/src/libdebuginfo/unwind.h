@@ -28,6 +28,7 @@
 #include <kos/types.h>
 
 #include <libdebuginfo/unwind.h>
+#include <libunwind/errno.h>
 
 /* Figure out if unwind_for_debug() has already been defined externally somehow. */
 #undef HAVE_UNWIND_FOR_DEBUG_EXTERNALLY
@@ -55,14 +56,14 @@ DECL_BEGIN
  * for user-space location for which the kernel doesn't already know how
  * to unwind them will fail with `UNWIND_NO_FRAME'.
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
-INTDEF NONNULL((2, 4)) unsigned int CC
+INTDEF NONNULL((2, 4)) unwind_errno_t CC
 libdi_unwind_for_debug(void const *absolute_pc,
                        unwind_getreg_t reg_getter, void const *reg_getter_arg,
                        unwind_setreg_t reg_setter, void *reg_setter_arg);
 #endif /* !HAVE_UNWIND_FOR_DEBUG_EXTERNALLY */
 
 #ifdef HAVE_UNWIND_FOR_DEBUG_EXTERNALLY
-extern NONNULL((2, 4)) unsigned int CC
+extern NONNULL((2, 4)) unwind_errno_t CC
 libdi_unwind_for_debug(void const *absolute_pc,
                        unwind_getreg_t reg_getter, void const *reg_getter_arg,
                        unwind_setreg_t reg_setter, void *reg_setter_arg)

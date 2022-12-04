@@ -30,6 +30,7 @@
 #include <format-printer.h>
 
 #include <libdebuginfo/addr2line.h>
+#include <libdebuginfo/errno.h>
 
 DECL_BEGIN
 
@@ -49,7 +50,7 @@ DECL_BEGIN
  *                   always refers to the top-most, non-inlined source location.
  * @param: flags:    Set of `DEBUG_ADDR2LINE_F*'
  * >> di_debug_addr2line_t info;
- * >> unsigned int error;
+ * >> debuginfo_errno_t error;
  * >> uintptr_t level = 0;
  * >> do {
  * >>     error = debug_addr2line((uintptr_t)ptr, &info, level);
@@ -78,7 +79,7 @@ DECL_BEGIN
  *                                    levels know is. (all other  fields of `*result' are  NULL-
  *                                    initialized)
  * @return: DEBUG_INFO_ERROR_CORRUPT: Debug information is corrupted (`*result' was NULL-initialized). */
-INTDEF NONNULL((1, 2)) unsigned int
+INTDEF NONNULL((1, 2)) debuginfo_errno_t
 NOTHROW_NCX(CC libdi_debug_addr2line)(di_addr2line_sections_t const *__restrict sections,
                                       di_debug_addr2line_t *__restrict result,
                                       uintptr_t module_relative_pc,
@@ -106,7 +107,7 @@ libdi_debug_addr2line_print_filename(pformatprinter printer, void *arg,
  *                                    sections.
  *                                    In this case, `sections' and `dl_sections' will have both
  *                                    been initialized to all NULL-values. */
-INTDEF NONNULL((2, 3)) unsigned int
+INTDEF NONNULL((2, 3)) debuginfo_errno_t
 NOTHROW_NCX(CC libdi_debug_addr2line_sections_lock)(module_t *dl_handle,
                                                     di_addr2line_sections_t *__restrict sections,
                                                     di_addr2line_dl_sections_t *__restrict dl_sections);

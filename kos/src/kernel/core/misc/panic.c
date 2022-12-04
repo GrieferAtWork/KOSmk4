@@ -76,6 +76,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <libdebuginfo/unwind.h>
 #include <libinstrlen/instrlen.h>
+#include <libunwind/errno.h>
 #include <libunwind/unwind.h>
 
 #include "../../../libc/libc/assert.h" /* struct assert_args */
@@ -201,7 +202,7 @@ nope:
 INTERN ATTR_COLD ATTR_COLDTEXT NONNULL((1, 3)) void KCALL
 kernel_halt_dump_traceback(pformatprinter printer, void *arg,
                            struct ucpustate const *__restrict dumpstate) {
-	unsigned int error;
+	unwind_errno_t error;
 	struct ucpustate state;
 	struct exception_info saved_info;
 	struct exception_info *tls_info;

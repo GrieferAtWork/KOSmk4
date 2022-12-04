@@ -643,6 +643,7 @@ incdir("");
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/rbtree.h>
 #include <hybrid/sequence/vector.h>
+#include <hybrid/spcall.h>
 #include <hybrid/sync/atomic-lock.h>
 #include <hybrid/sync/atomic-once.h>
 #include <hybrid/sync/atomic-owner-rwlock.h>
@@ -858,6 +859,8 @@ incdir("");
 #include <libcpustate/api.h>
 #include <libcpustate/apply.h>
 #include <libcpustate/asm/features.h>
+#include <libcpustate/asm/register.h>
+#include <libcpustate/register.h>
 #include <libdebuginfo/addr2line.h>
 #include <libdebuginfo/api.h>
 #include <libdebuginfo/cfi_entry.h>
@@ -1048,6 +1051,7 @@ incdir("");
 #include <libunwind/cfi.h>
 #include <libunwind/dwarf.h>
 #include <libunwind/eh_frame.h>
+#include <libunwind/errno.h>
 #include <libunwind/except.h>
 #include <libunwind/unwind.h>
 #include <libutil.h>
@@ -1280,6 +1284,7 @@ incdir("");
 #include <strings.h>
 #include <stropts.h>
 #include <struct.h>
+#include <symcat.h>
 #include <sys/_default_fcntl.h>
 #include <sys/_intsup.h>
 #include <sys/_iovec.h>

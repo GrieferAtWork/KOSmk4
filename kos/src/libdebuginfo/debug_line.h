@@ -77,7 +77,7 @@ NOTHROW_NCX(CC libdi_debugline_loadfile)(di_debugline_unit_t *__restrict self, /
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
-INTDEF NONNULL((1, 2, 3)) unsigned int
+INTDEF NONNULL((1, 2, 3)) debuginfo_errno_t
 NOTHROW_NCX(CC libdi_debugline_loadunit)(byte_t const **__restrict preader,
                                          byte_t const *__restrict text_end,
                                          di_debugline_unit_t *__restrict result);
@@ -89,7 +89,7 @@ NOTHROW_NCX(CC libdi_debugline_loadunit)(byte_t const **__restrict preader,
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: ...
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
-INTDEF NONNULL((1, 2)) unsigned int
+INTDEF NONNULL((1, 2)) debuginfo_errno_t
 NOTHROW_NCX(CC libdi_debugline_scanunit)(di_debugline_unit_t const *__restrict self,
                                          di_debugline_info_t *__restrict result,
                                          uintptr_t module_relative_pc);

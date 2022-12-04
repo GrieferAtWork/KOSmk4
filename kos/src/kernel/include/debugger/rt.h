@@ -38,8 +38,8 @@
 
 #include <libcpustate/register.h> /* cpu_regno_t */
 #include <libinstrlen/bits/isa.h>
-#include <libunwind/api.h>
 #include <libunwind/cfi.h>
+#include <libunwind/errno.h>
 
 DECL_BEGIN
 
@@ -87,8 +87,8 @@ DATDEF struct cpu *const dbg_cpu;
 /* Get/Set debugger register for some given level.
  * NOTE: These functions are written to be compatible with `unwind_getreg_t' / `unwind_setreg_t'
  * @param: arg: One of `DBG_REGLEVEL_*', cast as `(void *)(uintptr_t)DBG_REGLEVEL_*' */
-FUNDEF unsigned int NOTHROW(LIBUNWIND_CC dbg_getreg)(/*uintptr_t level*/ void const *arg, uintptr_half_t cfi_regno, void *__restrict buf);
-FUNDEF unsigned int NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void *arg, uintptr_half_t cfi_regno, void const *__restrict buf);
+FUNDEF unwind_errno_t NOTHROW(LIBUNWIND_CC dbg_getreg)(/*uintptr_t level*/ void const *arg, uintptr_half_t cfi_regno, void *__restrict buf);
+FUNDEF unwind_errno_t NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void *arg, uintptr_half_t cfi_regno, void const *__restrict buf);
 
 /* Get/Set the PC/SP registers of a given register level. */
 #define dbg_getpcreg(level)        (byte_t const *)dbg_getregp(level, CFI_UNWIND_REGISTER_PC(sizeof(void *)))
@@ -113,7 +113,7 @@ NOTHROW(KCALL dbg_getregp)(unsigned int level, uintptr_half_t cfi_regno) {
 #ifdef NDEBUG
 	dbg_getreg((void *)(uintptr_t)level, cfi_regno, &result);
 #else /* NDEBUG */
-	unsigned int error;
+	unwind_errno_t error;
 	__hybrid_assert(CFI_REGISTER_SIZE(sizeof(void *), cfi_regno) == sizeof(uintptr_t));
 	error = dbg_getreg((void *)(uintptr_t)level, cfi_regno, &result);
 	__hybrid_assert(error == UNWIND_SUCCESS);
@@ -126,7 +126,7 @@ NOTHROW(KCALL dbg_setregp)(unsigned int level, uintptr_half_t cfi_regno, uintptr
 #ifdef NDEBUG
 	dbg_setreg((void *)(uintptr_t)level, cfi_regno, &value);
 #else /* NDEBUG */
-	unsigned int error;
+	unwind_errno_t error;
 	__hybrid_assert(CFI_REGISTER_SIZE(sizeof(void *), cfi_regno) == sizeof(uintptr_t));
 	error = dbg_setreg((void *)(uintptr_t)level, cfi_regno, &value);
 	__hybrid_assert(error == UNWIND_SUCCESS);

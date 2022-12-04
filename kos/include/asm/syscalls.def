@@ -166,6 +166,7 @@
 %[typeorg(<bits/os/sigset_with_size.h>: sigset_with_size)]
 %[typeorg(<bits/os/generic/sigset_with_size32.h>: __sigset_with_sizex32)]
 %[typeorg(<bits/os/generic/sigset_with_size64.h>: __sigset_with_sizex64)]
+%[typeorg(<libunwind/errno.h>: unwind_errno_t)]
 
 /* Define how specific struct names should be escaped in headers */
 %[struct_escape(iovecx32 = __iovecx32, iovecx64 = __iovecx64)]
@@ -317,6 +318,7 @@
 %[define_tostr(time_t               = TIME_T)]
 %[define_tostr(time32_t             = TIME_T)]
 %[define_tostr(time64_t             = TIME_T)]
+%[define_tostr(unwind_errno_t       = UNWIND_ERRNO_T)]
 
 
 
@@ -2405,19 +2407,19 @@ coredump:([tostr(STRUCT_UCPUSTATE)] struct ucpustate const *curr_state,
           [tostr(STRUCT_UCPUSTATE)] struct ucpustate const *orig_state,
           [tostr(VOID_VECTOR:traceback_length)] void const *const *traceback_vector, size_t traceback_length,
           [tostr(STRUCT_EXCEPTION_DATA)] union coredump_info const *reason,
-          [tostr(UNWIND_ERROR)] syscall_ulong_t unwind_error) -> errno_t;
+          unwind_errno_t unwind_error) -> errno_t;
 [doc_alias(coredump)][restart(must)]
 coredumpx32:([tostr(STRUCT_UCPUSTATE32)] struct ucpustate32 const *curr_state,
              [tostr(STRUCT_UCPUSTATE32)] struct ucpustate32 const *orig_state,
              [tostr(VOID_VECTOR32:traceback_length)] __HYBRID_PTR32(void const) const *traceback_vector, size_t traceback_length,
              [tostr(STRUCT_EXCEPTION_DATA32)] union coredump_info32 const *reason,
-             [tostr(UNWIND_ERROR)] syscall_ulong_t unwind_error) -> errno_t;
+             unwind_errno_t unwind_error) -> errno_t;
 [doc_alias(coredump)][restart(must)]
 coredumpx64:([tostr(STRUCT_UCPUSTATE64)] struct ucpustate64 const *curr_state,
              [tostr(STRUCT_UCPUSTATE64)] struct ucpustate64 const *orig_state,
              [tostr(VOID_VECTOR64:traceback_length)] __HYBRID_PTR64(void const) const *traceback_vector, size_t traceback_length,
              [tostr(STRUCT_EXCEPTION_DATA64)] union coredump_info64 const *reason,
-             [tostr(UNWIND_ERROR)] syscall_ulong_t unwind_error) -> errno_t;
+             unwind_errno_t unwind_error) -> errno_t;
 %[endgroup]
 
 

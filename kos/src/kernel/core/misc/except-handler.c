@@ -66,6 +66,7 @@
 #include <libunwind/cfi.h>
 #include <libunwind/dwarf.h>
 #include <libunwind/eh_frame.h>
+#include <libunwind/errno.h>
 #include <libunwind/unwind.h>
 
 #define kcpustate_get_unwind_exception(state)        __EXCEPT_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(*(state))
@@ -1146,14 +1147,14 @@ NOTHROW(FCALL userexcept_sysret_injectproc_and_marksignal_safe)(struct taskpid *
 /* Kernel/C++ exception integration                                     */
 /************************************************************************/
 
-PRIVATE NONNULL((1)) unsigned int
+PRIVATE NONNULL((1)) unwind_errno_t
 NOTHROW(FCALL unwind_landingpad)(unwind_fde_t *__restrict fde, /* Only non-const for lazy initialized fields! */
                                  struct kcpustate *__restrict state,
                                  void const *except_pc) {
 	void const *landing_pad_pc;
 	unwind_cfa_landing_state_t cfa;
 	struct kcpustate new_state;
-	unsigned int unwind_error;
+	unwind_errno_t unwind_error;
 	landing_pad_pc = kcpustate_getpc(state);
 	unwind_error   = unwind_fde_landing_exec(fde, &cfa, except_pc, landing_pad_pc);
 	if unlikely(unwind_error != UNWIND_SUCCESS)
@@ -1179,13 +1180,13 @@ done:
 
 
 INTDEF ATTR_COLD NONNULL((2)) void FCALL /* TODO: Standardize this function! (currently arch-specific) */
-halt_unhandled_exception(unsigned int unwind_error,
+halt_unhandled_exception(unwind_errno_t unwind_error,
                          struct kcpustate *__restrict unwind_state);
 
 DEFINE_PUBLIC_ALIAS(except_unwind, libc_except_unwind);
 INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct kcpustate *
 NOTHROW(FCALL libc_except_unwind)(struct kcpustate *__restrict state) {
-	unsigned int error;
+	unwind_errno_t error;
 	unwind_fde_t fde;
 	struct kcpustate old_state;
 	void const *pc;

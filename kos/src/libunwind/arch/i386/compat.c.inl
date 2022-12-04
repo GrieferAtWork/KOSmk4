@@ -39,8 +39,8 @@
 
 DECL_BEGIN
 
-INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_getreg_compat)(/*struct unwind_getreg_compat_data **/ void const *arg, unwind_regno_t regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unsigned int NOTHROW_NCX(CC libuw_unwind_setreg_compat)(/*struct unwind_setreg_compat_data **/ void *arg, unwind_regno_t regno, void const *__restrict src);
+INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_compat)(/*struct unwind_getreg_compat_data **/ void const *arg, unwind_regno_t regno, void *__restrict dst);
+INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_compat)(/*struct unwind_setreg_compat_data **/ void *arg, unwind_regno_t regno, void const *__restrict src);
 
 /*[[[deemon
 import fs;
@@ -86,10 +86,10 @@ NOTHROW(CC regno_i386_to_amd64)(unwind_regno_t regno) {
 }
 
 
-INTERN NONNULL((1, 3)) unsigned int
+INTERN NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_getreg_compat)(/*struct unwind_getreg_compat_data **/ void const *arg,
                                            unwind_regno_t regno, void *__restrict dst) {
-	unsigned int result;
+	unwind_errno_t result;
 	struct unwind_getreg_compat_data const *me;
 	me     = (struct unwind_getreg_compat_data const *)arg;
 	regno  = regno_i386_to_amd64(regno);
@@ -107,10 +107,10 @@ static_assert(offsetof(struct unwind_setreg_compat_data, uscd_arg) ==
               offsetof(struct unwind_getreg_compat_data, ugcd_arg));
 DEFINE_INTERN_ALIAS(libuw_unwind_setreg_compat, libuw_unwind_getreg_compat);
 #else
-INTERN NONNULL((1, 3)) unsigned int
+INTERN NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_setreg_compat)(/*struct unwind_setreg_compat_data **/ void *arg,
                                            unwind_regno_t regno, void const *__restrict src) {
-	unsigned int result;
+	unwind_errno_t result;
 	struct unwind_setreg_compat_data const *me;
 	me     = (struct unwind_setreg_compat_data const *)arg;
 	regno  = regno_i386_to_amd64(regno);

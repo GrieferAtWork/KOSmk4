@@ -41,16 +41,17 @@
 #include <libdebuginfo/debug_aranges.h>
 #include <libdebuginfo/debug_info.h>
 #include <libdebuginfo/debug_line.h>
+#include <libdebuginfo/errno.h>
 
 DECL_BEGIN
 
 /* Lookup addr2line information for the given source address. */
-PUBLIC ATTR_COLDTEXT NONNULL((1)) unsigned int
+PUBLIC ATTR_COLDTEXT NONNULL((1)) debuginfo_errno_t
 NOTHROW(KCALL addr2line)(struct addr2line_buf const *__restrict info,
                          uintptr_t module_relative_pc,
                          di_debug_addr2line_t *__restrict result,
                          uintptr_t level) {
-	unsigned int error;
+	debuginfo_errno_t error;
 	NESTED_TRY {
 		error = debug_addr2line(&info->ds_info,
 		                         result,
@@ -149,7 +150,7 @@ do_addr2line_vprintf(struct addr2line_buf const *__restrict ainfo,
                      va_list args) {
 	ssize_t result, temp;
 	di_debug_addr2line_t info;
-	unsigned int error;
+	debuginfo_errno_t error;
 	error = addr2line(ainfo, module_relative_start_pc, &info, 0);
 	if (error != DEBUG_INFO_ERROR_SUCCESS) {
 		if (mod) {
