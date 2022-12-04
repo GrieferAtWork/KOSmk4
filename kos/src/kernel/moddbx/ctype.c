@@ -41,6 +41,7 @@
 #include <stddef.h>
 #include <string.h>
 
+#include <libcpustate/register.h>
 #include <libdebuginfo/debug_info.h>
 #include <libdebuginfo/dwarf.h>
 
@@ -523,7 +524,7 @@ INTERN void NOTHROW(KCALL reset_builtin_types)(void) {
  * If no such type exists, return `NULL' instead.
  * @param: buflen: The required buffer size to hold `regno' */
 PUBLIC WUNUSED REF struct ctype *
-NOTHROW(FCALL ctype_for_register)(unsigned int regno, size_t buflen) {
+NOTHROW(FCALL ctype_for_register)(cpu_regno_t regno, size_t buflen) {
 	REF struct ctype *result;
 #if defined(__x86_64__) || defined(__i386__)
 	switch (regno & X86_REGISTER_CLASSMASK) {
@@ -597,7 +598,7 @@ try_pointer_register:
 		break;
 	}
 #endif /* __x86_64__ || __i386__ */
-	if unlikely(regno == ARCH_REGISTER_NONE)
+	if unlikely(regno == CPU_REGISTER_NONE)
 		return NULL;
 	if (buflen == 1) {
 		result = &ctype_u8;

@@ -332,7 +332,7 @@ DBG_COMMAND(r,
 		}
 
 		/* Special case: Also print the IA32_KERNEL_GS_BASE register! */
-		if (x86_dbg_getregbyid(DBG_REGLEVEL_VIEW, X86_REGISTER_MISC_KGSBASEQ, &kgsbase, 8) != 8)
+		if (dbg_getregbyid(DBG_REGLEVEL_VIEW, X86_REGISTER_MISC_KGSBASEQ, &kgsbase, 8) != 8)
 			kgsbase = (u64)dbg_current;
 		dbg_print(DBGSTR("              "));
 		debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_REGISTER_PREFIX);

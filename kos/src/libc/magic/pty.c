@@ -55,11 +55,13 @@ struct winsize;
 @@should store the  filename of  the PTY master  socket (as  already
 @@returned in `*amaster'). Note that the max length of this filename
 @@is implementation defined, with no way for the use to specify  how
-@@much  space  is is  available  in the  passed  buffer. As  such, a
-@@portable  application can  only ever  pass `NULL'  for this value.
-@@On  KOS, the value  written to `name' is  the absolute filename of
-@@the master-device in  the `/dev' filesystem,  which usually  means
+@@much space is available in the passed buffer. As such, a  portable
+@@application can only ever pass `NULL' for this value.
+@@
+@@On KOS, the value written to `name' is the absolute filename of
+@@the master-device in the `/dev' filesystem, which usually means
 @@that the written filename is something like `/dev/ptyp0'.
+@@
 @@NOTE: On KOS, this function is a system call, though in other
 @@      operating system it is often implemented via `open(2)',
 @@      possibly combined with `ioctl(2)'.

@@ -23,6 +23,7 @@
 #define _GNU_SOURCE 1
 
 #include "../../api.h"
+#include "../../register.h"
 /**/
 #include <hybrid/unaligned.h>
 
@@ -39,9 +40,6 @@
 #include <string.h>
 
 #include <libcpustate/register.h>
-
-#include "register.h"
-
 
 #ifdef __GNUC__
 /* Suppress warnings about accessing unaligned pointers in `struct desctab' */
@@ -64,7 +62,7 @@
 DECL_BEGIN
 
 PRIVATE size_t
-NOTHROW_NCX(CC getregval)(uintptr_t value, unsigned int regno,
+NOTHROW_NCX(CC getregval)(uintptr_t value, cpu_regno_t regno,
                           void *__restrict buf, size_t buflen) {
 	switch (regno & X86_REGISTER_SIZEMASK) {
 
@@ -96,7 +94,7 @@ NOTHROW_NCX(CC getregval)(uintptr_t value, unsigned int regno,
 }
 
 PRIVATE size_t
-NOTHROW_NCX(CC setregptr)(void *__restrict pvalue, unsigned int regno,
+NOTHROW_NCX(CC setregptr)(void *__restrict pvalue, cpu_regno_t regno,
                           void const *__restrict buf, size_t buflen) {
 	switch (regno & X86_REGISTER_SIZEMASK) {
 
@@ -130,7 +128,7 @@ NOTHROW_NCX(CC setregptr)(void *__restrict pvalue, unsigned int regno,
 }
 
 PRIVATE size_t
-NOTHROW_NCX(CC setregptr16p)(uintptr_t *__restrict pvalue, unsigned int regno,
+NOTHROW_NCX(CC setregptr16p)(uintptr_t *__restrict pvalue, cpu_regno_t regno,
                              void const *__restrict buf, size_t buflen) {
 	switch (regno & X86_REGISTER_SIZEMASK) {
 
@@ -149,7 +147,7 @@ NOTHROW_NCX(CC setregptr16p)(uintptr_t *__restrict pvalue, unsigned int regno,
 }
 
 PRIVATE size_t
-NOTHROW_NCX(CC setregptrp)(uintptr_t *__restrict pvalue, unsigned int regno,
+NOTHROW_NCX(CC setregptrp)(uintptr_t *__restrict pvalue, cpu_regno_t regno,
                            void const *__restrict buf, size_t buflen) {
 	switch (regno & X86_REGISTER_SIZEMASK) {
 
@@ -177,16 +175,9 @@ NOTHROW_NCX(CC setregptrp)(uintptr_t *__restrict pvalue, unsigned int regno,
 
 
 
-/* Get/set the value of a given register `regno' (one of `X86_REGISTER_*' from <asm/register.h>)
- * NOTE: When `return > buflen', then
- *       getreg_*: The contents of `buf' are undefined.
- *       setreg_*: The register was not written.
- * NOTE: Accepted register names are those found in comments in `<asm/registers.h>'
- * @param: regno: One of `X86_REGISTER_*' (from <asm/registers.h>)
- * @return: * :   The required buffer size, or 0 when `name' isn't recognized. */
-INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_getreg_gpregs)(struct gpregs const *__restrict self, unsigned int regno,
-                                     void *__restrict buf, size_t buflen) {
+PRIVATE NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_get_gpregs)(struct gpregs const *__restrict self, cpu_regno_t regno,
+                                    void *__restrict buf, size_t buflen) {
 	uintptr_t value;
 	if ((regno & X86_REGISTER_CLASSMASK) != X86_REGISTER_GENERAL_PURPOSE)
 		goto nope;
@@ -289,9 +280,9 @@ nope:
 	return getregval(value, regno, buf, buflen);
 }
 
-INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_setreg_gpregs)(struct gpregs *__restrict self, unsigned int regno,
-                                     void const *__restrict buf, size_t buflen) {
+PRIVATE NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_set_gpregs)(struct gpregs *__restrict self, cpu_regno_t regno,
+                                    void const *__restrict buf, size_t buflen) {
 	void *pvalue;
 	if ((regno & X86_REGISTER_CLASSMASK) != X86_REGISTER_GENERAL_PURPOSE)
 		goto nope;
@@ -394,9 +385,9 @@ nope:
 	return setregptr(pvalue, regno, buf, buflen);
 }
 
-INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_getreg_sgregs)(struct sgregs const *__restrict self, unsigned int regno,
-                                     void *__restrict buf, size_t buflen) {
+PRIVATE NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_get_sgregs)(struct sgregs const *__restrict self, cpu_regno_t regno,
+                                    void *__restrict buf, size_t buflen) {
 	u16 value;
 	if ((regno & X86_REGISTER_CLASSMASK) != X86_REGISTER_SEGMENT)
 		goto nope;
@@ -425,9 +416,9 @@ nope:
 	return getregval(value, regno, buf, buflen);
 }
 
-INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_setreg_sgregs)(struct sgregs *__restrict self, unsigned int regno,
-                                     void const *__restrict buf, size_t buflen) {
+PRIVATE NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_set_sgregs)(struct sgregs *__restrict self, cpu_regno_t regno,
+                                    void const *__restrict buf, size_t buflen) {
 	uintptr_t *pvalue;
 	if ((regno & X86_REGISTER_CLASSMASK) != X86_REGISTER_SEGMENT)
 		goto nope;
@@ -456,9 +447,9 @@ nope:
 	return setregptr16p(pvalue, regno, buf, buflen);
 }
 
-INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_getreg_coregs)(struct coregs const *__restrict self, unsigned int regno,
-                                     void *__restrict buf, size_t buflen) {
+PRIVATE NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_get_coregs)(struct coregs const *__restrict self, cpu_regno_t regno,
+                                    void *__restrict buf, size_t buflen) {
 	uintptr_t value;
 	if ((regno & X86_REGISTER_CLASSMASK) != X86_REGISTER_CONTROL)
 		goto nope;
@@ -487,9 +478,9 @@ nope:
 	return getregval(value, regno, buf, buflen);
 }
 
-INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_setreg_coregs)(struct coregs *__restrict self, unsigned int regno,
-                                     void const *__restrict buf, size_t buflen) {
+PRIVATE NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_set_coregs)(struct coregs *__restrict self, cpu_regno_t regno,
+                                    void const *__restrict buf, size_t buflen) {
 	uintptr_t *pvalue;
 	if ((regno & X86_REGISTER_CLASSMASK) != X86_REGISTER_CONTROL)
 		goto nope;
@@ -518,9 +509,9 @@ nope:
 	return setregptrp(pvalue, regno, buf, buflen);
 }
 
-INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_getreg_drregs)(struct drregs const *__restrict self, unsigned int regno,
-                                     void *__restrict buf, size_t buflen) {
+PRIVATE NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_get_drregs)(struct drregs const *__restrict self, cpu_regno_t regno,
+                                    void *__restrict buf, size_t buflen) {
 	uintptr_t value;
 	if ((regno & X86_REGISTER_CLASSMASK) != X86_REGISTER_CONTROL)
 		goto nope;
@@ -557,9 +548,9 @@ nope:
 	return getregval(value, regno, buf, buflen);
 }
 
-INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_setreg_drregs)(struct drregs *__restrict self, unsigned int regno,
-                                     void const *__restrict buf, size_t buflen) {
+PRIVATE NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_set_drregs)(struct drregs *__restrict self, cpu_regno_t regno,
+                                    void const *__restrict buf, size_t buflen) {
 	uintptr_t *pvalue;
 	if ((regno & X86_REGISTER_CLASSMASK) != X86_REGISTER_DEBUG)
 		goto nope;
@@ -596,18 +587,270 @@ nope:
 	return setregptrp(pvalue, regno, buf, buflen);
 }
 
+#ifdef __x86_64__
+#if defined(LIBCPUSTATE_HAVE_ICPUSTATE) || defined(LIBCPUSTATE_HAVE_SCPUSTATE) || defined(__INTELLISENSE__)
+PRIVATE NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_get_gpregsnsp)(struct gpregsnsp const *__restrict self, cpu_regno_t regno,
+                                              void *__restrict buf, size_t buflen) {
+	uintptr_t value;
+	if ((regno & X86_REGISTER_CLASSMASK) != X86_REGISTER_GENERAL_PURPOSE)
+		goto nope;
+	switch (regno & X86_REGISTER_IDMASK) {
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PAX & X86_REGISTER_IDMASK):
+		value = self->gp_Pax;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PCX & X86_REGISTER_IDMASK):
+		value = self->gp_Pcx;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PDX & X86_REGISTER_IDMASK):
+		value = self->gp_Pdx;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PBX & X86_REGISTER_IDMASK):
+		value = self->gp_Pbx;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PSP & X86_REGISTER_IDMASK):
+		if ((regno & X86_REGISTER_SIZEMASK) != X86_REGISTER_SIZEMASK_1BYTE)
+			goto nope;
+		value = self->gp_Pax >> 8;
+		break;
+	case (X86_REGISTER_GENERAL_PURPOSE_PBP & X86_REGISTER_IDMASK):
+		value = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
+		        ? (self->gp_Pcx >> 8)
+		        : self->gp_Pbp;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PSI & X86_REGISTER_IDMASK):
+		value = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
+		        ? (self->gp_Pdx >> 8)
+		        : self->gp_Psi;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PDI & X86_REGISTER_IDMASK):
+		value = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
+		        ? (self->gp_Pbx >> 8)
+		        : self->gp_Pdi;
+		break;
+
+#ifdef __x86_64__
+	case (X86_REGISTER_GENERAL_PURPOSE_P8 & X86_REGISTER_IDMASK):
+		value = self->gp_r8;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P9 & X86_REGISTER_IDMASK):
+		value = self->gp_r9;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P10 & X86_REGISTER_IDMASK):
+		value = self->gp_r10;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P11 & X86_REGISTER_IDMASK):
+		value = self->gp_r11;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P12 & X86_REGISTER_IDMASK):
+		value = self->gp_r12;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P13 & X86_REGISTER_IDMASK):
+		value = self->gp_r13;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P14 & X86_REGISTER_IDMASK):
+		value = self->gp_r14;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P15 & X86_REGISTER_IDMASK):
+		value = self->gp_r15;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_BPL & X86_REGISTER_IDMASK):
+		value = self->gp_Pbp;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_SIL & X86_REGISTER_IDMASK):
+		value = self->gp_Psi;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_DIL & X86_REGISTER_IDMASK):
+		value = self->gp_Pdi;
+		break;
+#endif /* __x86_64__ */
+
+	default:
+nope:
+		return 0;
+	}
+	return getregval(value, regno, buf, buflen);
+}
+
+PRIVATE NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_set_gpregsnsp)(struct gpregsnsp *__restrict self, cpu_regno_t regno,
+                                              void const *__restrict buf, size_t buflen) {
+	void *pvalue;
+	if ((regno & X86_REGISTER_CLASSMASK) != X86_REGISTER_GENERAL_PURPOSE)
+		goto nope;
+	switch (regno & X86_REGISTER_IDMASK) {
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PAX & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_Pax;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PCX & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_Pcx;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PDX & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_Pdx;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PBX & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_Pbx;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PSP & X86_REGISTER_IDMASK):
+		if ((regno & X86_REGISTER_SIZEMASK) != X86_REGISTER_SIZEMASK_1BYTE)
+			goto nope;
+		pvalue = (void *)((byte_t *)&self->gp_Pax + 1);
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PBP & X86_REGISTER_IDMASK):
+		pvalue = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
+		         ? (void *)((byte_t *)&self->gp_Pcx + 1)
+		         : (void *)&self->gp_Pbp;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PSI & X86_REGISTER_IDMASK):
+		pvalue = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
+		         ? (void *)((byte_t *)&self->gp_Pdx + 1)
+		         : (void *)&self->gp_Psi;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_PDI & X86_REGISTER_IDMASK):
+		pvalue = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
+		         ? (void *)((byte_t *)&self->gp_Pbx + 1)
+		         : (void *)&self->gp_Pdi;
+		break;
+
+#ifdef __x86_64__
+	case (X86_REGISTER_GENERAL_PURPOSE_P8 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r8;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P9 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r9;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P10 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r10;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P11 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r11;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P12 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r12;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P13 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r13;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P14 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r14;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_P15 & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_r15;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_BPL & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_Pbp;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_SIL & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_Psi;
+		break;
+
+	case (X86_REGISTER_GENERAL_PURPOSE_DIL & X86_REGISTER_IDMASK):
+		pvalue = &self->gp_Pdi;
+		break;
+#endif /* __x86_64__ */
+
+	default:
+nope:
+		return 0;
+	}
+	return setregptr(pvalue, regno, buf, buflen);
+}
+#endif /* LIBCPUSTATE_HAVE_ICPUSTATE || LIBCPUSTATE_HAVE_SCPUSTATE */
+
+PRIVATE NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_get_sgbase)(struct sgbase const *__restrict self, cpu_regno_t regno,
+                                           void *__restrict buf, size_t buflen) {
+	uintptr_t value;
+	if ((regno & X86_REGISTER_CLASSMASK) != X86_REGISTER_MISC)
+		goto nope;
+	switch (regno & X86_REGISTER_IDMASK) {
+
+	case (X86_REGISTER_MISC_FSBASE & X86_REGISTER_IDMASK):
+		value = self->sg_fsbase;
+		break;
+
+	case (X86_REGISTER_MISC_GSBASE & X86_REGISTER_IDMASK):
+		value = self->sg_gsbase;
+		break;
+
+	default:
+nope:
+		return 0;
+	}
+	return getregval(value, regno, buf, buflen);
+}
+
+PRIVATE NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_set_sgbase)(struct sgbase *__restrict self, cpu_regno_t regno,
+                                           void const *__restrict buf, size_t buflen) {
+	uintptr_t *pvalue;
+	if ((regno & X86_REGISTER_CLASSMASK) != X86_REGISTER_MISC)
+		goto nope;
+	switch (regno & X86_REGISTER_IDMASK) {
+
+	case (X86_REGISTER_MISC_FSBASE & X86_REGISTER_IDMASK):
+		pvalue = &self->sg_fsbase;
+		break;
+
+	case (X86_REGISTER_MISC_GSBASE & X86_REGISTER_IDMASK):
+		pvalue = &self->sg_gsbase;
+		break;
+
+	default:
+nope:
+		return 0;
+	}
+	return setregptrp(pvalue, regno, buf, buflen);
+}
+
+#endif /* __x86_64__ */
+
 INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_getreg_ucpustate)(struct ucpustate const *__restrict self, unsigned int regno,
-                                        void *__restrict buf, size_t buflen) {
+NOTHROW_NCX(CC libcpu_register_get_ucpustate)(struct ucpustate const *__restrict self, cpu_regno_t regno,
+                                              void *__restrict buf, size_t buflen) {
 	size_t result;
-	result = libcpu_getreg_gpregs(&self->ucs_gpregs, regno, buf, buflen);
+	result = libcpu_register_get_gpregs(&self->ucs_gpregs, regno, buf, buflen);
 	if (result != 0)
 		goto done;
-	result = libcpu_getreg_sgregs(&self->ucs_sgregs, regno, buf, buflen);
+	result = libcpu_register_get_sgregs(&self->ucs_sgregs, regno, buf, buflen);
 	if (result != 0)
 		goto done;
 #ifdef __x86_64__
-	result = libcpu_getreg_sgbase(&self->ucs_sgbase, regno, buf, buflen);
+	result = libcpu_register_get_sgbase(&self->ucs_sgbase, regno, buf, buflen);
 	if (result != 0)
 		goto done;
 #endif /* __x86_64__ */
@@ -663,17 +906,17 @@ done:
 }
 
 INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_setreg_ucpustate)(struct ucpustate *__restrict self, unsigned int regno,
-                                        void const *__restrict buf, size_t buflen) {
+NOTHROW_NCX(CC libcpu_register_set_ucpustate)(struct ucpustate *__restrict self, cpu_regno_t regno,
+                                              void const *__restrict buf, size_t buflen) {
 	size_t result;
-	result = libcpu_setreg_gpregs(&self->ucs_gpregs, regno, buf, buflen);
+	result = libcpu_register_set_gpregs(&self->ucs_gpregs, regno, buf, buflen);
 	if (result != 0)
 		goto done;
-	result = libcpu_setreg_sgregs(&self->ucs_sgregs, regno, buf, buflen);
+	result = libcpu_register_set_sgregs(&self->ucs_sgregs, regno, buf, buflen);
 	if (result != 0)
 		goto done;
 #ifdef __x86_64__
-	result = libcpu_setreg_sgbase(&self->ucs_sgbase, regno, buf, buflen);
+	result = libcpu_register_set_sgbase(&self->ucs_sgbase, regno, buf, buflen);
 	if (result != 0)
 		goto done;
 #endif /* __x86_64__ */
@@ -729,8 +972,8 @@ done:
 }
 
 INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_getreg_lcpustate)(struct lcpustate const *__restrict self, unsigned int regno,
-                                        void *__restrict buf, size_t buflen) {
+NOTHROW_NCX(CC libcpu_register_get_lcpustate)(struct lcpustate const *__restrict self, cpu_regno_t regno,
+                                              void *__restrict buf, size_t buflen) {
 	uintptr_t value;
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
 
@@ -792,8 +1035,8 @@ nope:
 }
 
 INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_setreg_lcpustate)(struct lcpustate *__restrict self, unsigned int regno,
-                                        void const *__restrict buf, size_t buflen) {
+NOTHROW_NCX(CC libcpu_register_set_lcpustate)(struct lcpustate *__restrict self, cpu_regno_t regno,
+                                              void const *__restrict buf, size_t buflen) {
 	void *pvalue;
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
 
@@ -851,10 +1094,10 @@ nope:
 }
 
 INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_getreg_kcpustate)(struct kcpustate const *__restrict self, unsigned int regno,
-                                        void *__restrict buf, size_t buflen) {
+NOTHROW_NCX(CC libcpu_register_get_kcpustate)(struct kcpustate const *__restrict self, cpu_regno_t regno,
+                                              void *__restrict buf, size_t buflen) {
 	size_t result;
-	result = libcpu_getreg_gpregs(&self->kcs_gpregs, regno, buf, buflen);
+	result = libcpu_register_get_gpregs(&self->kcs_gpregs, regno, buf, buflen);
 	if (result != 0)
 		goto done;
 	switch (regno) {
@@ -899,10 +1142,10 @@ done:
 }
 
 INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_setreg_kcpustate)(struct kcpustate *__restrict self, unsigned int regno,
-                                        void const *__restrict buf, size_t buflen) {
+NOTHROW_NCX(CC libcpu_register_set_kcpustate)(struct kcpustate *__restrict self, cpu_regno_t regno,
+                                              void const *__restrict buf, size_t buflen) {
 	size_t result;
-	result = libcpu_setreg_gpregs(&self->kcs_gpregs, regno, buf, buflen);
+	result = libcpu_register_set_gpregs(&self->kcs_gpregs, regno, buf, buflen);
 	if (result != 0)
 		goto done;
 	switch (regno) {
@@ -947,21 +1190,21 @@ done:
 }
 
 INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_getreg_fcpustate)(struct fcpustate const *__restrict self, unsigned int regno,
-                                        void *__restrict buf, size_t buflen) {
+NOTHROW_NCX(CC libcpu_register_get_fcpustate)(struct fcpustate const *__restrict self, cpu_regno_t regno,
+                                              void *__restrict buf, size_t buflen) {
 	uintptr_t value;
 	size_t result;
-	result = libcpu_getreg_gpregs(&self->fcs_gpregs, regno, buf, buflen);
+	result = libcpu_register_get_gpregs(&self->fcs_gpregs, regno, buf, buflen);
 	if (result != 0)
 		goto done;
-	result = libcpu_getreg_coregs(&self->fcs_coregs, regno, buf, buflen);
+	result = libcpu_register_get_coregs(&self->fcs_coregs, regno, buf, buflen);
 	if (result != 0)
 		goto done;
-	result = libcpu_getreg_drregs(&self->fcs_drregs, regno, buf, buflen);
+	result = libcpu_register_get_drregs(&self->fcs_drregs, regno, buf, buflen);
 	if (result != 0)
 		goto done;
 #ifdef __x86_64__
-	result = libcpu_getreg_sgbase(&self->fcs_sgbase, regno, buf, buflen);
+	result = libcpu_register_get_sgbase(&self->fcs_sgbase, regno, buf, buflen);
 	if (result != 0)
 		goto done;
 #endif /* __x86_64__ */
@@ -1032,21 +1275,21 @@ done:
 }
 
 INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_setreg_fcpustate)(struct fcpustate *__restrict self, unsigned int regno,
-                                        void const *__restrict buf, size_t buflen) {
+NOTHROW_NCX(CC libcpu_register_set_fcpustate)(struct fcpustate *__restrict self, cpu_regno_t regno,
+                                              void const *__restrict buf, size_t buflen) {
 	uintptr_t *pvalue;
 	size_t result;
-	result = libcpu_setreg_gpregs(&self->fcs_gpregs, regno, buf, buflen);
+	result = libcpu_register_set_gpregs(&self->fcs_gpregs, regno, buf, buflen);
 	if (result != 0)
 		goto done;
-	result = libcpu_setreg_coregs(&self->fcs_coregs, regno, buf, buflen);
+	result = libcpu_register_set_coregs(&self->fcs_coregs, regno, buf, buflen);
 	if (result != 0)
 		goto done;
-	result = libcpu_setreg_drregs(&self->fcs_drregs, regno, buf, buflen);
+	result = libcpu_register_set_drregs(&self->fcs_drregs, regno, buf, buflen);
 	if (result != 0)
 		goto done;
 #ifdef __x86_64__
-	result = libcpu_setreg_sgbase(&self->fcs_sgbase, regno, buf, buflen);
+	result = libcpu_register_set_sgbase(&self->fcs_sgbase, regno, buf, buflen);
 	if (result != 0)
 		goto done;
 #endif /* __x86_64__ */
@@ -1124,9 +1367,9 @@ done:
 	return result;
 }
 
-INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_getreg_sfpuenv)(struct sfpuenv const *__restrict self, unsigned int regno,
-                                      void *__restrict buf, size_t buflen) {
+PRIVATE NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_get_sfpuenv)(struct sfpuenv const *__restrict self, cpu_regno_t regno,
+                                            void *__restrict buf, size_t buflen) {
 	uintptr_t value;
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
 
@@ -1172,9 +1415,9 @@ NOTHROW_NCX(CC libcpu_getreg_sfpuenv)(struct sfpuenv const *__restrict self, uns
 	return getregval(value, regno, buf, buflen);
 }
 
-INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_setreg_sfpuenv)(struct sfpuenv *__restrict self, unsigned int regno,
-                                      void const *__restrict buf, size_t buflen) {
+PRIVATE NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_set_sfpuenv)(struct sfpuenv *__restrict self, cpu_regno_t regno,
+                                            void const *__restrict buf, size_t buflen) {
 	size_t result;
 	uintptr_t value;
 	switch (regno & X86_REGISTER_SIZEMASK) {
@@ -1259,21 +1502,21 @@ done:
 	return result;
 }
 
-INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_getreg_sfpustate)(struct sfpustate const *__restrict self, unsigned int regno,
-                                        void *__restrict buf, size_t buflen) {
+PRIVATE NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_get_sfpustate)(struct sfpustate const *__restrict self, cpu_regno_t regno,
+                                              void *__restrict buf, size_t buflen) {
 	if ((regno & X86_REGISTER_CLASSMASK) == X86_REGISTER_FLOAT &&
 	    (regno & X86_REGISTER_IDMASK) <= 7) {
 		if (buflen >= 10)
 			memcpy(buf, &self->fs_regs[regno & X86_REGISTER_IDMASK], 10);
 		return 10;
 	}
-	return libcpu_getreg_sfpuenv(&self->fs_env, regno, buf, buflen);
+	return libcpu_register_get_sfpuenv(&self->fs_env, regno, buf, buflen);
 }
 
-INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_setreg_sfpustate)(struct sfpustate *__restrict self, unsigned int regno,
-                                        void const *__restrict buf, size_t buflen) {
+PRIVATE NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_set_sfpustate)(struct sfpustate *__restrict self, cpu_regno_t regno,
+                                              void const *__restrict buf, size_t buflen) {
 	size_t result;
 	if ((regno & X86_REGISTER_CLASSMASK) == X86_REGISTER_FLOAT &&
 	    (regno & X86_REGISTER_IDMASK) <= 7) {
@@ -1281,7 +1524,7 @@ NOTHROW_NCX(CC libcpu_setreg_sfpustate)(struct sfpustate *__restrict self, unsig
 			memcpy(&self->fs_regs[regno & X86_REGISTER_IDMASK], buf, 10);
 		return 10;
 	}
-	result = libcpu_setreg_sfpuenv(&self->fs_env, regno, buf, buflen);
+	result = libcpu_register_set_sfpuenv(&self->fs_env, regno, buf, buflen);
 	if (result == 0 &&
 	    (regno & ~X86_REGISTER_SIZEMASK) == (X86_REGISTER_MISC_FTWX & ~X86_REGISTER_SIZEMASK)) {
 		uintptr_t value;
@@ -1326,9 +1569,9 @@ done:
 	return result;
 }
 
-INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_getreg_xfpustate)(struct xfpustate const *__restrict self, unsigned int regno,
-                                        void *__restrict buf, size_t buflen) {
+PRIVATE NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_get_xfpustate)(struct xfpustate const *__restrict self, cpu_regno_t regno,
+                                              void *__restrict buf, size_t buflen) {
 	uintptr_t value;
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
 
@@ -1413,9 +1656,9 @@ NOTHROW_NCX(CC libcpu_getreg_xfpustate)(struct xfpustate const *__restrict self,
 	return getregval(value, regno, buf, buflen);
 }
 
-INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_setreg_xfpustate)(struct xfpustate *__restrict self, unsigned int regno,
-                                        void const *__restrict buf, size_t buflen) {
+PRIVATE NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_set_xfpustate)(struct xfpustate *__restrict self, cpu_regno_t regno,
+                                              void const *__restrict buf, size_t buflen) {
 	size_t result;
 	uintptr_t value;
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
@@ -1544,274 +1787,44 @@ done:
 	return result;
 }
 
-#ifdef __x86_64__
-INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_getreg_gpregsnsp)(struct gpregsnsp const *__restrict self, unsigned int regno,
-                                        void *__restrict buf, size_t buflen) {
-	uintptr_t value;
-	if ((regno & X86_REGISTER_CLASSMASK) != X86_REGISTER_GENERAL_PURPOSE)
-		goto nope;
-	switch (regno & X86_REGISTER_IDMASK) {
 
-	case (X86_REGISTER_GENERAL_PURPOSE_PAX & X86_REGISTER_IDMASK):
-		value = self->gp_Pax;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_PCX & X86_REGISTER_IDMASK):
-		value = self->gp_Pcx;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_PDX & X86_REGISTER_IDMASK):
-		value = self->gp_Pdx;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_PBX & X86_REGISTER_IDMASK):
-		value = self->gp_Pbx;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_PSP & X86_REGISTER_IDMASK):
-		if ((regno & X86_REGISTER_SIZEMASK) != X86_REGISTER_SIZEMASK_1BYTE)
-			goto nope;
-		value = self->gp_Pax >> 8;
-		break;
-	case (X86_REGISTER_GENERAL_PURPOSE_PBP & X86_REGISTER_IDMASK):
-		value = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
-		        ? (self->gp_Pcx >> 8)
-		        : self->gp_Pbp;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_PSI & X86_REGISTER_IDMASK):
-		value = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
-		        ? (self->gp_Pdx >> 8)
-		        : self->gp_Psi;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_PDI & X86_REGISTER_IDMASK):
-		value = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
-		        ? (self->gp_Pbx >> 8)
-		        : self->gp_Pdi;
-		break;
-
-#ifdef __x86_64__
-	case (X86_REGISTER_GENERAL_PURPOSE_P8 & X86_REGISTER_IDMASK):
-		value = self->gp_r8;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_P9 & X86_REGISTER_IDMASK):
-		value = self->gp_r9;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_P10 & X86_REGISTER_IDMASK):
-		value = self->gp_r10;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_P11 & X86_REGISTER_IDMASK):
-		value = self->gp_r11;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_P12 & X86_REGISTER_IDMASK):
-		value = self->gp_r12;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_P13 & X86_REGISTER_IDMASK):
-		value = self->gp_r13;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_P14 & X86_REGISTER_IDMASK):
-		value = self->gp_r14;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_P15 & X86_REGISTER_IDMASK):
-		value = self->gp_r15;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_BPL & X86_REGISTER_IDMASK):
-		value = self->gp_Pbp;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_SIL & X86_REGISTER_IDMASK):
-		value = self->gp_Psi;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_DIL & X86_REGISTER_IDMASK):
-		value = self->gp_Pdi;
-		break;
-#endif /* __x86_64__ */
-
-	default:
-nope:
-		return 0;
-	}
-	return getregval(value, regno, buf, buflen);
-}
-
-INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_setreg_gpregsnsp)(struct gpregsnsp *__restrict self, unsigned int regno,
-                                        void const *__restrict buf, size_t buflen) {
-	void *pvalue;
-	if ((regno & X86_REGISTER_CLASSMASK) != X86_REGISTER_GENERAL_PURPOSE)
-		goto nope;
-	switch (regno & X86_REGISTER_IDMASK) {
-
-	case (X86_REGISTER_GENERAL_PURPOSE_PAX & X86_REGISTER_IDMASK):
-		pvalue = &self->gp_Pax;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_PCX & X86_REGISTER_IDMASK):
-		pvalue = &self->gp_Pcx;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_PDX & X86_REGISTER_IDMASK):
-		pvalue = &self->gp_Pdx;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_PBX & X86_REGISTER_IDMASK):
-		pvalue = &self->gp_Pbx;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_PSP & X86_REGISTER_IDMASK):
-		if ((regno & X86_REGISTER_SIZEMASK) != X86_REGISTER_SIZEMASK_1BYTE)
-			goto nope;
-		pvalue = (void *)((byte_t *)&self->gp_Pax + 1);
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_PBP & X86_REGISTER_IDMASK):
-		pvalue = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
-		         ? (void *)((byte_t *)&self->gp_Pcx + 1)
-		         : (void *)&self->gp_Pbp;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_PSI & X86_REGISTER_IDMASK):
-		pvalue = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
-		         ? (void *)((byte_t *)&self->gp_Pdx + 1)
-		         : (void *)&self->gp_Psi;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_PDI & X86_REGISTER_IDMASK):
-		pvalue = ((regno & X86_REGISTER_SIZEMASK) == X86_REGISTER_SIZEMASK_1BYTE)
-		         ? (void *)((byte_t *)&self->gp_Pbx + 1)
-		         : (void *)&self->gp_Pdi;
-		break;
-
-#ifdef __x86_64__
-	case (X86_REGISTER_GENERAL_PURPOSE_P8 & X86_REGISTER_IDMASK):
-		pvalue = &self->gp_r8;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_P9 & X86_REGISTER_IDMASK):
-		pvalue = &self->gp_r9;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_P10 & X86_REGISTER_IDMASK):
-		pvalue = &self->gp_r10;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_P11 & X86_REGISTER_IDMASK):
-		pvalue = &self->gp_r11;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_P12 & X86_REGISTER_IDMASK):
-		pvalue = &self->gp_r12;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_P13 & X86_REGISTER_IDMASK):
-		pvalue = &self->gp_r13;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_P14 & X86_REGISTER_IDMASK):
-		pvalue = &self->gp_r14;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_P15 & X86_REGISTER_IDMASK):
-		pvalue = &self->gp_r15;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_BPL & X86_REGISTER_IDMASK):
-		pvalue = &self->gp_Pbp;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_SIL & X86_REGISTER_IDMASK):
-		pvalue = &self->gp_Psi;
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_DIL & X86_REGISTER_IDMASK):
-		pvalue = &self->gp_Pdi;
-		break;
-#endif /* __x86_64__ */
-
-	default:
-nope:
-		return 0;
-	}
-	return setregptr(pvalue, regno, buf, buflen);
-}
-
-INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_getreg_sgbase)(struct sgbase const *__restrict self, unsigned int regno,
-                                     void *__restrict buf, size_t buflen) {
-	uintptr_t value;
-	if ((regno & X86_REGISTER_CLASSMASK) != X86_REGISTER_MISC)
-		goto nope;
-	switch (regno & X86_REGISTER_IDMASK) {
-
-	case (X86_REGISTER_MISC_FSBASE & X86_REGISTER_IDMASK):
-		value = self->sg_fsbase;
-		break;
-
-	case (X86_REGISTER_MISC_GSBASE & X86_REGISTER_IDMASK):
-		value = self->sg_gsbase;
-		break;
-
-	default:
-nope:
-		return 0;
-	}
-	return getregval(value, regno, buf, buflen);
-}
-
-INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_setreg_sgbase)(struct sgbase *__restrict self, unsigned int regno,
-                                     void const *__restrict buf, size_t buflen) {
-	uintptr_t *pvalue;
-	if ((regno & X86_REGISTER_CLASSMASK) != X86_REGISTER_MISC)
-		goto nope;
-	switch (regno & X86_REGISTER_IDMASK) {
-
-	case (X86_REGISTER_MISC_FSBASE & X86_REGISTER_IDMASK):
-		pvalue = &self->sg_fsbase;
-		break;
-
-	case (X86_REGISTER_MISC_GSBASE & X86_REGISTER_IDMASK):
-		pvalue = &self->sg_gsbase;
-		break;
-
-	default:
-nope:
-		return 0;
-	}
-	return setregptrp(pvalue, regno, buf, buflen);
-}
-
-#endif /* __x86_64__ */
-
-#if !defined(__KERNEL__) || defined(__INTELLISENSE__)
-INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_getreg_mcontext)(struct mcontext const *__restrict self, unsigned int regno,
-                                       void *__restrict buf, size_t buflen) {
+INTERN WUNUSED NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_get_fpustate)(struct fpustate const *__restrict state, cpu_regno_t regno,
+                                             void *__restrict buf, size_t buflen) {
 	size_t result;
-	result = libcpu_getreg_ucpustate(&self->mc_context, regno, buf, buflen);
+	if (fpustate_isssave(state)) {
+		result = libcpu_register_get_sfpustate(&state->f_ssave, regno, buf, buflen);
+	} else {
+		result = libcpu_register_get_xfpustate(&state->f_xsave, regno, buf, buflen);
+	}
+	return result;
+}
+
+INTERN NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_set_fpustate)(struct fpustate *__restrict state, cpu_regno_t regno,
+                                             void const *__restrict buf, size_t buflen) {
+	size_t result;
+	if (fpustate_isssave(state)) {
+		result = libcpu_register_set_sfpustate(&state->f_ssave, regno, buf, buflen);
+	} else {
+		result = libcpu_register_set_xfpustate(&state->f_xsave, regno, buf, buflen);
+	}
+	return result;
+}
+
+
+#if defined(LIBCPUSTATE_HAVE_MCONTEXT) || defined(LIBCPUSTATE_HAVE_UCONTEXT) || defined(__INTELLISENSE__)
+INTERN NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_get_mcontext)(struct mcontext const *__restrict self, cpu_regno_t regno,
+                                             void *__restrict buf, size_t buflen) {
+	size_t result;
+	result = libcpu_register_get_ucpustate(&self->mc_context, regno, buf, buflen);
 	if (result != 0)
 		goto done;
 	if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
-		if (fpustate_isxsave(&self->mc_fpu)) {
-			result = libcpu_getreg_xfpustate(&self->mc_fpu.f_xsave, regno, buf, buflen);
-			if (result != 0)
-				goto done;
-		} else {
-			result = libcpu_getreg_sfpustate(&self->mc_fpu.f_ssave, regno, buf, buflen);
-			if (result != 0)
-				goto done;
-		}
+		result = libcpu_register_get_fpustate(&self->mc_fpu, regno, buf, buflen);
+		if (result != 0)
+			goto done;
 	}
 	if (((regno & ~X86_REGISTER_SIZEMASK) == X86_REGISTER_CONTROL_CR2) &&
 	    (self->mc_flags & __MCONTEXT_FLAG_HAVECR2))
@@ -1821,22 +1834,16 @@ done:
 }
 
 INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_setreg_mcontext)(struct mcontext *__restrict self, unsigned int regno,
+NOTHROW_NCX(CC libcpu_register_set_mcontext)(struct mcontext *__restrict self, cpu_regno_t regno,
                                        void const *__restrict buf, size_t buflen) {
 	size_t result;
-	result = libcpu_setreg_ucpustate(&self->mc_context, regno, buf, buflen);
+	result = libcpu_register_set_ucpustate(&self->mc_context, regno, buf, buflen);
 	if (result != 0)
 		goto done;
 	if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
-		if (fpustate_isxsave(&self->mc_fpu)) {
-			result = libcpu_setreg_xfpustate(&self->mc_fpu.f_xsave, regno, buf, buflen);
-			if (result != 0)
-				goto done;
-		} else {
-			result = libcpu_setreg_sfpustate(&self->mc_fpu.f_ssave, regno, buf, buflen);
-			if (result != 0)
-				goto done;
-		}
+		result = libcpu_register_set_fpustate(&self->mc_fpu, regno, buf, buflen);
+		if (result != 0)
+			goto done;
 	}
 	if ((regno & ~X86_REGISTER_SIZEMASK) == X86_REGISTER_CONTROL_CR2) {
 		result = setregptrp((uintptr_t *)&self->mc_cr2, regno, buf, buflen);
@@ -1848,17 +1855,22 @@ done:
 	return 0;
 }
 
-DEFINE_INTERN_ALIAS(libcpu_getreg_ucontext, libcpu_getreg_mcontext);
-DEFINE_INTERN_ALIAS(libcpu_setreg_ucontext, libcpu_setreg_mcontext);
+DEFINE_INTERN_ALIAS(libcpu_register_get_ucontext, libcpu_register_get_mcontext);
+DEFINE_INTERN_ALIAS(libcpu_register_set_ucontext, libcpu_register_set_mcontext);
+#endif /* LIBCPUSTATE_HAVE_MCONTEXT || LIBCPUSTATE_HAVE_UCONTEXT */
 
-#endif /* !__KERNEL__ */
+
+#if defined(LIBCPUSTATE_HAVE_ICPUSTATE) || defined(LIBCPUSTATE_HAVE_SCPUSTATE) || defined(__INTELLISENSE__)
+#ifdef __x86_64__
+#define LIBCPUSTATE_IRREGS_STRUCT_TYPE struct irregs
+#else /* __x86_64__ */
+#define LIBCPUSTATE_IRREGS_STRUCT_TYPE struct irregs_kernel
+#endif /* !__x86_64__ */
 
 
-#if defined(__KERNEL__) || defined(__INTELLISENSE__)
-
-INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_getreg_irregs)(LIBCPUSTATE_IRREGS_STRUCT_TYPE const *__restrict self,
-                                     unsigned int regno, void *__restrict buf, size_t buflen) {
+PRIVATE NONNULL((1)) size_t
+NOTHROW_NCX(CC libcpu_register_get_irregs)(LIBCPUSTATE_IRREGS_STRUCT_TYPE const *__restrict self,
+                                           cpu_regno_t regno, void *__restrict buf, size_t buflen) {
 	uintptr_t value;
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
 
@@ -1907,120 +1919,15 @@ NOTHROW_NCX(CC libcpu_getreg_irregs)(LIBCPUSTATE_IRREGS_STRUCT_TYPE const *__res
 }
 
 INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC IRREGS_NAME(libcpu_setreg_irregs))(LIBCPUSTATE_IRREGS_STRUCT_TYPE IRREGS_INDIRECTION __restrict IRREGS_SELF,
-                                                  unsigned int regno, void const *__restrict buf, size_t buflen) {
-	size_t result;
-	uintptr_t value;
-	IRREGS_LOADSELF(LIBCPUSTATE_IRREGS_STRUCT_TYPE)
-	switch (regno & X86_REGISTER_SIZEMASK) {
-
-	case X86_REGISTER_SIZEMASK_1BYTE:
-		result = 1;
-		if (buflen < 1)
-			goto done;
-		value = *(u8 const *)buf;
-		break;
-
-	case X86_REGISTER_SIZEMASK_2BYTE:
-		result = 2;
-		if (buflen < 2)
-			goto done;
-		value = UNALIGNED_GET16((u16 const *)buf);
-		break;
-
-	case X86_REGISTER_SIZEMASK_4BYTE:
-		result = 4;
-		if (buflen < 4)
-			goto done;
-		value = UNALIGNED_GET32((u32 const *)buf);
-		break;
-
-#ifdef __x86_64__
-	case X86_REGISTER_SIZEMASK_8BYTE:
-		result = 8;
-		if (buflen < 8)
-			goto done;
-		value = UNALIGNED_GET64((u64 const *)buf);
-		break;
-#endif /* __x86_64__ */
-
-	default: goto nope;
-	}
-
-	switch (regno & ~X86_REGISTER_SIZEMASK) {
-
-	case (X86_REGISTER_MISC_PIP & ~X86_REGISTER_SIZEMASK):
-		irregs_setpip(self, value);
-		break;
-
-	case (X86_REGISTER_SEGMENT_CS & ~X86_REGISTER_SIZEMASK):
-		irregs_setcs(self, value);
-		break;
-
-	case (X86_REGISTER_MISC_PFLAGS & ~X86_REGISTER_SIZEMASK):
-		irregs_setpflags(self, value);
-		break;
-
-	case (X86_REGISTER_GENERAL_PURPOSE_PSP & ~X86_REGISTER_SIZEMASK):
-#ifdef __x86_64__
-		irregs_setuserpsp(self, value);
-#else /* __x86_64__ */
-		if (irregs_isuser(self)) {
-			irregs_setuserpsp(self, value);
-		} else {
-			struct irregs_kernel *new_irregs;
-			new_irregs = (struct irregs_kernel *)(value - SIZEOF_IRREGS32_KERNEL);
-			memcpy(new_irregs, self, SIZEOF_IRREGS32_KERNEL);
-			*pself = new_irregs;
-		}
-#endif /* !__x86_64__ */
-		break;
-
-	case (X86_REGISTER_SEGMENT_SS & ~X86_REGISTER_SIZEMASK):
-		if (!irregs_trysetss(self, value))
-			goto nope;
-		break;
-
-#ifndef __x86_64__
-	case (X86_REGISTER_SEGMENT_DS & ~X86_REGISTER_SIZEMASK):
-		if (!irregs_trysetds(self, value))
-			goto nope;
-		break;
-
-	case (X86_REGISTER_SEGMENT_ES & ~X86_REGISTER_SIZEMASK):
-		if (!irregs_trysetes(self, value))
-			goto nope;
-		break;
-
-	case (X86_REGISTER_SEGMENT_FS & ~X86_REGISTER_SIZEMASK):
-		if (!irregs_trysetfs(self, value))
-			goto nope;
-		break;
-
-	case (X86_REGISTER_SEGMENT_GS & ~X86_REGISTER_SIZEMASK):
-		if (!irregs_trysetgs(self, value))
-			goto nope;
-		break;
-#endif /* !__x86_64__ */
-
-	default:
-nope:
-		return 0;
-	}
-done:
-	return result;
-}
-
-INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_getreg_icpustate)(struct icpustate const *__restrict self,
-                                        unsigned int regno,
-                                        void *__restrict buf, size_t buflen) {
+NOTHROW_NCX(CC libcpu_register_get_icpustate)(struct icpustate const *__restrict self,
+                                              cpu_regno_t regno,
+                                              void *__restrict buf, size_t buflen) {
 	size_t result;
 #ifdef __x86_64__
-	result = libcpu_getreg_irregs(&self->ics_irregs, regno, buf, buflen);
+	result = libcpu_register_get_irregs(&self->ics_irregs, regno, buf, buflen);
 	if (result != 0)
 		goto done;
-	result = libcpu_getreg_gpregsnsp(&self->ics_gpregs, regno, buf, buflen);
+	result = libcpu_register_get_gpregsnsp(&self->ics_gpregs, regno, buf, buflen);
 #else /* __x86_64__ */
 	uintptr_t value;
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
@@ -2042,10 +1949,10 @@ NOTHROW_NCX(CC libcpu_getreg_icpustate)(struct icpustate const *__restrict self,
 		break;
 
 	default:
-		result = libcpu_getreg_gpregs(&self->ics_gpregs, regno, buf, buflen);
+		result = libcpu_register_get_gpregs(&self->ics_gpregs, regno, buf, buflen);
 		if (result != 0)
 			goto done;
-		result = libcpu_getreg_irregs(&self->ics_irregs, regno, buf, buflen);
+		result = libcpu_register_get_irregs(&self->ics_irregs, regno, buf, buflen);
 		goto done;
 	}
 	result = getregval(value, regno, buf, buflen);
@@ -2055,10 +1962,8 @@ done:
 }
 
 INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC IRREGS_NAME(libcpu_setreg_icpustate))(struct icpustate IRREGS_INDIRECTION __restrict IRREGS_SELF,
-                                                     unsigned int regno,
-                                                     void const *__restrict buf,
-                                                     size_t buflen) {
+NOTHROW_NCX(CC IRREGS_NAME(libcpu_register_set_icpustate))(struct icpustate IRREGS_INDIRECTION __restrict IRREGS_SELF,
+                                                           cpu_regno_t regno, void const *__restrict buf, size_t buflen) {
 	size_t result;
 	uintptr_t value;
 	IRREGS_LOADSELF(struct icpustate)
@@ -2146,9 +2051,9 @@ NOTHROW_NCX(CC IRREGS_NAME(libcpu_setreg_icpustate))(struct icpustate IRREGS_IND
 	default:
 nope:
 #ifdef __x86_64__
-		result = libcpu_setreg_gpregsnsp(&self->ics_gpregs, regno, buf, buflen);
+		result = libcpu_register_set_gpregsnsp(&self->ics_gpregs, regno, buf, buflen);
 #else /* __x86_64__ */
-		result = libcpu_setreg_gpregs(&self->ics_gpregs, regno, buf, buflen);
+		result = libcpu_register_set_gpregs(&self->ics_gpregs, regno, buf, buflen);
 #endif /* !__x86_64__ */
 		break;
 	}
@@ -2157,20 +2062,21 @@ done:
 }
 
 INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC libcpu_getreg_scpustate)(struct scpustate const *__restrict self, unsigned int regno,
-                                        void *__restrict buf, size_t buflen) {
+NOTHROW_NCX(CC libcpu_register_get_scpustate)(struct scpustate const *__restrict self,
+                                              cpu_regno_t regno,
+                                              void *__restrict buf, size_t buflen) {
 	size_t result;
 #ifdef __x86_64__
-	result = libcpu_getreg_irregs(&self->scs_irregs, regno, buf, buflen);
+	result = libcpu_register_get_irregs(&self->scs_irregs, regno, buf, buflen);
 	if (result != 0)
 		goto done;
-	result = libcpu_getreg_gpregsnsp(&self->scs_gpregs, regno, buf, buflen);
+	result = libcpu_register_get_gpregsnsp(&self->scs_gpregs, regno, buf, buflen);
 	if (result != 0)
 		goto done;
-	result = libcpu_getreg_sgregs(&self->scs_sgregs, regno, buf, buflen);
+	result = libcpu_register_get_sgregs(&self->scs_sgregs, regno, buf, buflen);
 	if (result != 0)
 		goto done;
-	result = libcpu_getreg_sgbase(&self->scs_sgbase, regno, buf, buflen);
+	result = libcpu_register_get_sgbase(&self->scs_sgbase, regno, buf, buflen);
 #else /* __x86_64__ */
 	uintptr_t value;
 	switch (regno & ~X86_REGISTER_SIZEMASK) {
@@ -2192,10 +2098,10 @@ NOTHROW_NCX(CC libcpu_getreg_scpustate)(struct scpustate const *__restrict self,
 		break;
 
 	default:
-		result = libcpu_getreg_gpregs(&self->scs_gpregs, regno, buf, buflen);
+		result = libcpu_register_get_gpregs(&self->scs_gpregs, regno, buf, buflen);
 		if (result != 0)
 			goto done;
-		result = libcpu_getreg_irregs(&self->scs_irregs, regno, buf, buflen);
+		result = libcpu_register_get_irregs(&self->scs_irregs, regno, buf, buflen);
 		goto done;
 	}
 	result = getregval(value, regno, buf, buflen);
@@ -2205,10 +2111,8 @@ done:
 }
 
 INTERN NONNULL((1)) size_t
-NOTHROW_NCX(CC IRREGS_NAME(libcpu_setreg_scpustate))(struct scpustate IRREGS_INDIRECTION __restrict IRREGS_SELF,
-                                                     unsigned int regno,
-                                                     void const *__restrict buf,
-                                                     size_t buflen) {
+NOTHROW_NCX(CC IRREGS_NAME(libcpu_register_set_scpustate))(struct scpustate IRREGS_INDIRECTION __restrict IRREGS_SELF,
+                                                           cpu_regno_t regno, void const *__restrict buf, size_t buflen) {
 	size_t result;
 	uintptr_t value;
 	IRREGS_LOADSELF(struct scpustate)
@@ -2293,12 +2197,12 @@ NOTHROW_NCX(CC IRREGS_NAME(libcpu_setreg_scpustate))(struct scpustate IRREGS_IND
 	default:
 nope:
 #ifdef __x86_64__
-		result = libcpu_setreg_gpregsnsp(&self->scs_gpregs, regno, buf, buflen);
+		result = libcpu_register_set_gpregsnsp(&self->scs_gpregs, regno, buf, buflen);
 		if (result != 0)
 			goto done;
-		result = libcpu_setreg_sgbase(&self->scs_sgbase, regno, buf, buflen);
+		result = libcpu_register_set_sgbase(&self->scs_sgbase, regno, buf, buflen);
 #else /* __x86_64__ */
-		result = libcpu_setreg_gpregs(&self->scs_gpregs, regno, buf, buflen);
+		result = libcpu_register_set_gpregs(&self->scs_gpregs, regno, buf, buflen);
 #endif /* !__x86_64__ */
 		break;
 	}
@@ -2306,53 +2210,33 @@ done:
 	return result;
 }
 
-#endif /* __KERNEL__ */
+#endif /* LIBCPUSTATE_HAVE_ICPUSTATE || LIBCPUSTATE_HAVE_SCPUSTATE */
 
 
 
 
 
-DEFINE_PUBLIC_ALIAS(getreg_gpregs, libcpu_getreg_gpregs);
-DEFINE_PUBLIC_ALIAS(setreg_gpregs, libcpu_setreg_gpregs);
-DEFINE_PUBLIC_ALIAS(getreg_sgregs, libcpu_getreg_sgregs);
-DEFINE_PUBLIC_ALIAS(setreg_sgregs, libcpu_setreg_sgregs);
-DEFINE_PUBLIC_ALIAS(getreg_coregs, libcpu_getreg_coregs);
-DEFINE_PUBLIC_ALIAS(setreg_coregs, libcpu_setreg_coregs);
-DEFINE_PUBLIC_ALIAS(getreg_drregs, libcpu_getreg_drregs);
-DEFINE_PUBLIC_ALIAS(setreg_drregs, libcpu_setreg_drregs);
-DEFINE_PUBLIC_ALIAS(getreg_ucpustate, libcpu_getreg_ucpustate);
-DEFINE_PUBLIC_ALIAS(setreg_ucpustate, libcpu_setreg_ucpustate);
-DEFINE_PUBLIC_ALIAS(getreg_lcpustate, libcpu_getreg_lcpustate);
-DEFINE_PUBLIC_ALIAS(setreg_lcpustate, libcpu_setreg_lcpustate);
-DEFINE_PUBLIC_ALIAS(getreg_kcpustate, libcpu_getreg_kcpustate);
-DEFINE_PUBLIC_ALIAS(setreg_kcpustate, libcpu_setreg_kcpustate);
-DEFINE_PUBLIC_ALIAS(getreg_fcpustate, libcpu_getreg_fcpustate);
-DEFINE_PUBLIC_ALIAS(setreg_fcpustate, libcpu_setreg_fcpustate);
-DEFINE_PUBLIC_ALIAS(getreg_sfpuenv, libcpu_getreg_sfpuenv);
-DEFINE_PUBLIC_ALIAS(setreg_sfpuenv, libcpu_setreg_sfpuenv);
-DEFINE_PUBLIC_ALIAS(getreg_sfpustate, libcpu_getreg_sfpustate);
-DEFINE_PUBLIC_ALIAS(setreg_sfpustate, libcpu_setreg_sfpustate);
-DEFINE_PUBLIC_ALIAS(getreg_xfpustate, libcpu_getreg_xfpustate);
-DEFINE_PUBLIC_ALIAS(setreg_xfpustate, libcpu_setreg_xfpustate);
-#ifdef __x86_64__
-DEFINE_PUBLIC_ALIAS(getreg_gpregsnsp, libcpu_getreg_gpregsnsp);
-DEFINE_PUBLIC_ALIAS(setreg_gpregsnsp, libcpu_setreg_gpregsnsp);
-DEFINE_PUBLIC_ALIAS(getreg_sgbase, libcpu_getreg_sgbase);
-DEFINE_PUBLIC_ALIAS(setreg_sgbase, libcpu_setreg_sgbase);
-#endif /* __x86_64__ */
+DEFINE_PUBLIC_ALIAS(register_get_ucpustate, libcpu_register_get_ucpustate);
+DEFINE_PUBLIC_ALIAS(register_set_ucpustate, libcpu_register_set_ucpustate);
+DEFINE_PUBLIC_ALIAS(register_get_lcpustate, libcpu_register_get_lcpustate);
+DEFINE_PUBLIC_ALIAS(register_set_lcpustate, libcpu_register_set_lcpustate);
+DEFINE_PUBLIC_ALIAS(register_get_kcpustate, libcpu_register_get_kcpustate);
+DEFINE_PUBLIC_ALIAS(register_set_kcpustate, libcpu_register_set_kcpustate);
+DEFINE_PUBLIC_ALIAS(register_get_fcpustate, libcpu_register_get_fcpustate);
+DEFINE_PUBLIC_ALIAS(register_set_fcpustate, libcpu_register_set_fcpustate);
+DEFINE_PUBLIC_ALIAS(register_get_fpustate, libcpu_register_get_fpustate);
+DEFINE_PUBLIC_ALIAS(register_set_fpustate, libcpu_register_set_fpustate);
 #if !defined(__KERNEL__) || defined(__INTELLISENSE__)
-DEFINE_PUBLIC_ALIAS(getreg_mcontext, libcpu_getreg_mcontext);
-DEFINE_PUBLIC_ALIAS(setreg_mcontext, libcpu_setreg_mcontext);
-DEFINE_PUBLIC_ALIAS(getreg_ucontext, libcpu_getreg_ucontext);
-DEFINE_PUBLIC_ALIAS(setreg_ucontext, libcpu_setreg_ucontext);
+DEFINE_PUBLIC_ALIAS(register_get_mcontext, libcpu_register_get_mcontext);
+DEFINE_PUBLIC_ALIAS(register_set_mcontext, libcpu_register_set_mcontext);
+DEFINE_PUBLIC_ALIAS(register_get_ucontext, libcpu_register_get_ucontext);
+DEFINE_PUBLIC_ALIAS(register_set_ucontext, libcpu_register_set_ucontext);
 #endif /* !__KERNEL__ || __INTELLISENSE__ */
 #if defined(__KERNEL__) || defined(__INTELLISENSE__)
-DEFINE_PUBLIC_ALIAS(getreg_irregs, libcpu_getreg_irregs);
-DEFINE_PUBLIC_ALIAS(IRREGS_NAME(setreg_irregs), IRREGS_NAME(libcpu_setreg_irregs));
-DEFINE_PUBLIC_ALIAS(getreg_icpustate, libcpu_getreg_icpustate);
-DEFINE_PUBLIC_ALIAS(IRREGS_NAME(setreg_icpustate), IRREGS_NAME(libcpu_setreg_icpustate));
-DEFINE_PUBLIC_ALIAS(getreg_scpustate, libcpu_getreg_scpustate);
-DEFINE_PUBLIC_ALIAS(IRREGS_NAME(setreg_scpustate), IRREGS_NAME(libcpu_setreg_scpustate));
+DEFINE_PUBLIC_ALIAS(register_get_icpustate, libcpu_register_get_icpustate);
+DEFINE_PUBLIC_ALIAS(IRREGS_NAME(register_set_icpustate), IRREGS_NAME(libcpu_register_set_icpustate));
+DEFINE_PUBLIC_ALIAS(register_get_scpustate, libcpu_register_get_scpustate);
+DEFINE_PUBLIC_ALIAS(IRREGS_NAME(register_set_scpustate), IRREGS_NAME(libcpu_register_set_scpustate));
 #endif /* __KERNEL__ || __INTELLISENSE__ */
 
 #undef IRREGS_NAME

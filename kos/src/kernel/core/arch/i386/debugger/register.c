@@ -704,7 +704,7 @@ done:
 }
 
 PRIVATE size_t
-NOTHROW(KCALL raw_dbg_getregbyid)(unsigned int level, unsigned int regno,
+NOTHROW(KCALL raw_dbg_getregbyid)(unsigned int level, cpu_regno_t regno,
                                   void *__restrict buf, size_t buflen) {
 	size_t result;
 	switch (level) {
@@ -718,37 +718,37 @@ NOTHROW(KCALL raw_dbg_getregbyid)(unsigned int level, unsigned int regno,
 				switch (x86_dbg_trapstatekind) {
 
 				case X86_DBG_STATEKIND_FCPU:
-					result = getreg((struct fcpustate *)x86_dbg_trapstate, regno, buf, buflen);
+					result = register_get((struct fcpustate *)x86_dbg_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
 
 				case X86_DBG_STATEKIND_UCPU:
-					result = getreg((struct ucpustate *)x86_dbg_trapstate, regno, buf, buflen);
+					result = register_get((struct ucpustate *)x86_dbg_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
 
 				case X86_DBG_STATEKIND_LCPU:
-					result = getreg((struct lcpustate *)x86_dbg_trapstate, regno, buf, buflen);
+					result = register_get((struct lcpustate *)x86_dbg_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
 
 				case X86_DBG_STATEKIND_KCPU:
-					result = getreg((struct kcpustate *)x86_dbg_trapstate, regno, buf, buflen);
+					result = register_get((struct kcpustate *)x86_dbg_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
 
 				case X86_DBG_STATEKIND_ICPU:
-					result = getreg((struct icpustate *)x86_dbg_trapstate, regno, buf, buflen);
+					result = register_get((struct icpustate *)x86_dbg_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
 
 				case X86_DBG_STATEKIND_SCPU:
-					result = getreg((struct scpustate *)x86_dbg_trapstate, regno, buf, buflen);
+					result = register_get((struct scpustate *)x86_dbg_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
@@ -769,13 +769,13 @@ NOTHROW(KCALL raw_dbg_getregbyid)(unsigned int level, unsigned int regno,
 			}
 #endif /* __x86_64__ */
 			/* Access the exit CPU state. */
-			return getreg(&x86_dbg_exitstate.de_state, regno, buf, buflen);
+			return register_get(&x86_dbg_exitstate.de_state, regno, buf, buflen);
 		}
 		ATTR_FALLTHROUGH
 	case DBG_REGLEVEL_ORIG:
 	case DBG_REGLEVEL_VIEW:
 		loadview();
-		result = getreg(VIEWSTATE(level), regno, buf, buflen);
+		result = register_get(VIEWSTATE(level), regno, buf, buflen);
 #ifdef __x86_64__
 		if (/*level == DBG_REGLEVEL_ORIG &&*/ result == 0) {
 			if (regno == X86_REGISTER_MISC_KGSBASEL) {
@@ -812,7 +812,7 @@ ok:
 
 #ifdef __x86_64__
 PRIVATE WUNUSED unsigned int
-NOTHROW(KCALL transform_gsbase_register_indices)(unsigned int level, unsigned int regno) {
+NOTHROW(KCALL transform_gsbase_register_indices)(unsigned int level, cpu_regno_t regno) {
 	/* Special handling: when we're currently returning to  kernel-space,
 	 *                   then we must switch %kernel_gs.base and %gs.base
 	 * This is required to maintain proper segment logic. */
@@ -851,8 +851,8 @@ NOTHROW(KCALL transform_gsbase_register_indices)(unsigned int level, unsigned in
  * @param: regno: One of `X86_REGISTER_*' (from <asm/registers.h>) or one of `X86_DBGREGISTER_*'
  * @return: * :   The required buffer size, or 0 when `regno' isn't recognized. */
 PUBLIC size_t
-NOTHROW(KCALL x86_dbg_getregbyid)(unsigned int level, unsigned int regno,
-                                  void *__restrict buf, size_t buflen) {
+NOTHROW(KCALL dbg_getregbyid)(unsigned int level, cpu_regno_t regno,
+                              void *__restrict buf, size_t buflen) {
 #ifdef __x86_64__
 	/* Special handling: when we're currently returning to  kernel-space,
 	 *                   then we must switch %kernel_gs.base and %gs.base
@@ -863,8 +863,8 @@ NOTHROW(KCALL x86_dbg_getregbyid)(unsigned int level, unsigned int regno,
 }
 
 PUBLIC size_t
-NOTHROW(KCALL x86_dbg_setregbyid)(unsigned int level, unsigned int regno,
-                                  void const *__restrict buf, size_t buflen) {
+NOTHROW(KCALL dbg_setregbyid)(unsigned int level, cpu_regno_t regno,
+                              void const *__restrict buf, size_t buflen) {
 	size_t result;
 
 #ifdef __x86_64__
@@ -885,45 +885,37 @@ NOTHROW(KCALL x86_dbg_setregbyid)(unsigned int level, unsigned int regno,
 				switch (x86_dbg_trapstatekind) {
 
 				case X86_DBG_STATEKIND_FCPU:
-					result = setreg((struct fcpustate *)x86_dbg_trapstate, regno, buf, buflen);
+					result = register_set_fcpustate_p((struct fcpustate **)&x86_dbg_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
 
 				case X86_DBG_STATEKIND_UCPU:
-					result = setreg((struct ucpustate *)x86_dbg_trapstate, regno, buf, buflen);
+					result = register_set_ucpustate_p((struct ucpustate **)&x86_dbg_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
 
 				case X86_DBG_STATEKIND_LCPU:
-					result = setreg((struct lcpustate *)x86_dbg_trapstate, regno, buf, buflen);
+					result = register_set_lcpustate_p((struct lcpustate **)&x86_dbg_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
 
 				case X86_DBG_STATEKIND_KCPU:
-					result = setreg((struct kcpustate *)x86_dbg_trapstate, regno, buf, buflen);
+					result = register_set_kcpustate_p((struct kcpustate **)&x86_dbg_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
 
 				case X86_DBG_STATEKIND_ICPU:
-#ifdef __x86_64__
-					result = setreg((struct icpustate *)x86_dbg_trapstate, regno, buf, buflen);
-#else /* __x86_64__ */
-					result = setreg((struct icpustate **)&x86_dbg_trapstate, regno, buf, buflen);
-#endif /* !__x86_64__ */
+					result = register_set_icpustate_p((struct icpustate **)&x86_dbg_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
 
 				case X86_DBG_STATEKIND_SCPU:
-#ifdef __x86_64__
-					result = setreg((struct scpustate *)x86_dbg_trapstate, regno, buf, buflen);
-#else /* __x86_64__ */
-					result = setreg((struct scpustate **)&x86_dbg_trapstate, regno, buf, buflen);
-#endif /* !__x86_64__ */
+					result = register_set_scpustate_p((struct scpustate **)&x86_dbg_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
@@ -944,13 +936,13 @@ NOTHROW(KCALL x86_dbg_setregbyid)(unsigned int level, unsigned int regno,
 			}
 #endif /* __x86_64__ */
 			/* Access the exit CPU state. */
-			return setreg(&x86_dbg_exitstate.de_state, regno, buf, buflen);
+			return register_set_fcpustate(&x86_dbg_exitstate.de_state, regno, buf, buflen);
 		}
 		ATTR_FALLTHROUGH
 	case DBG_REGLEVEL_ORIG:
 	case DBG_REGLEVEL_VIEW:
 		loadview();
-		result = setreg(VIEWSTATE(level), regno, buf, buflen);
+		result = register_set_fcpustate(VIEWSTATE(level), regno, buf, buflen);
 		if (level == DBG_REGLEVEL_ORIG && result != 0) {
 			saveorig();
 		}
@@ -1099,65 +1091,37 @@ NOTHROW(KCALL dbg_setallregs)(unsigned int level,
 		saveorig();
 }
 
+/* Return the ISA code for use with libinstrlen */
+PUBLIC ATTR_PURE WUNUSED instrlen_isa_t
+NOTHROW(KCALL dbg_instrlen_isa)(unsigned int level) {
+	instrlen_isa_t result;
+#ifdef __x86_64__
+	uintptr_t cs;
+	dbg_getreg((void *)(uintptr_t)level, CFI_X86_64_UNWIND_REGISTER_CS, &cs);
+	if (__KOS64_IS_CS64BIT(cs)) {
+		result = INSTRLEN_ISA_X86_64;
+	} else {
+		result = INSTRLEN_ISA_I386;
+	}
+#else /* __x86_64__ */
+	uintptr_t eflags;
+	dbg_getreg((void *)(uintptr_t)level, CFI_386_UNWIND_REGISTER_EFLAGS, &eflags);
+	if (eflags & EFLAGS_VM) {
+		result = INSTRLEN_ISA_8086;
+	} else {
+		result = INSTRLEN_ISA_I386;
+	}
+#endif /* !__x86_64__ */
+	return result;
+}
+
 /* Return the page directory of `dbg_current' */
 PUBLIC ATTR_PURE WUNUSED pagedir_phys_t
 NOTHROW(KCALL dbg_getpagedir)(void) {
 	uintptr_t result;
-	result = x86_dbg_getregbyidp(DBG_REGLEVEL_VIEW,
-	                             X86_REGISTER_CONTROL_CR3);
+	result = dbg_getregbyidp(DBG_REGLEVEL_VIEW,
+	                         X86_REGISTER_CONTROL_CR3);
 	return (pagedir_phys_t)result;
-}
-
-
-/* Get/set a register, given its (arch-specific) name
- * NOTE: When `return > buflen', then
- *       dbg_getregbyname: The contents of `buf' are undefined.
- *       dbg_setregbyname: The register was not written.
- * @return: * : The required buffer size, or 0 when `name' isn't recognized. */
-PUBLIC ATTR_DBGTEXT size_t
-NOTHROW(KCALL dbg_getregbyname)(unsigned int level, char const *__restrict name,
-                                size_t namelen, void *__restrict buf, size_t buflen) {
-	size_t result;
-	unsigned int nameid;
-	nameid = x86_dbg_regfromname(name, namelen);
-	result = x86_dbg_getregbyid(level, nameid, buf, buflen);
-	return result;
-}
-
-PUBLIC ATTR_DBGTEXT size_t
-NOTHROW(KCALL dbg_setregbyname)(unsigned int level, char const *__restrict name,
-                                size_t namelen, void const *__restrict buf, size_t buflen) {
-	size_t result;
-	unsigned int nameid;
-	nameid = x86_dbg_regfromname(name, namelen);
-	result = x86_dbg_setregbyid(level, nameid, buf, buflen);
-	return result;
-}
-
-
-/* Get/Set a pointer-sized register, given its ID */
-PUBLIC ATTR_PURE WUNUSED uintptr_t
-NOTHROW(KCALL x86_dbg_getregbyidp)(unsigned int level,
-                                   unsigned int regno) {
-	size_t reqlen;
-	uintptr_t result;
-	reqlen = x86_dbg_getregbyid(level, regno, &result, sizeof(result));
-	if (!reqlen || reqlen > sizeof(result))
-		return 0; /* Shouldn't happen... */
-	if (reqlen < sizeof(result))
-		bzero((byte_t *)&result + reqlen, sizeof(result) - reqlen);
-	return result;
-}
-
-PUBLIC bool
-NOTHROW(KCALL x86_dbg_setregbyidp)(unsigned int level,
-                                   unsigned int regno,
-                                   uintptr_t value) {
-	size_t reqlen;
-	reqlen = x86_dbg_setregbyid(level, regno, &value, sizeof(value));
-	if (!reqlen || reqlen > sizeof(value))
-		return false;
-	return true;
 }
 
 

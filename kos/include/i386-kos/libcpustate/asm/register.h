@@ -17,27 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_LIBCPUSTATE_ASM_FEATURES_H
-#define _I386_KOS_LIBCPUSTATE_ASM_FEATURES_H 1
+#ifndef _I386_KOS_LIBCPUSTATE_ASM_REGISTER_H
+#define _I386_KOS_LIBCPUSTATE_ASM_REGISTER_H 1
 
-#include <__stdinc.h>
+#include <asm/registers.h>
 
-#define LIBCPUSTATE_HAVE_UCPUSTATE
-#define LIBCPUSTATE_HAVE_LCPUSTATE
-#define LIBCPUSTATE_HAVE_KCPUSTATE
-#define LIBCPUSTATE_HAVE_FCPUSTATE
-#ifdef __KERNEL__
-#define LIBCPUSTATE_HAVE_ICPUSTATE
-#define LIBCPUSTATE_HAVE_SCPUSTATE
-#else /* __KERNEL__ */
-#define LIBCPUSTATE_HAVE_MCONTEXT
-#define LIBCPUSTATE_HAVE_UCONTEXT
-#endif /* !__KERNEL__ */
-#define LIBCPUSTATE_HAVE_FPUSTATE
+#define CPU_REGISTER_NONE X86_REGISTER_NONE
 
-#ifndef __x86_64__
-#define LIBCPUSTATE_HAVE_REGISTER_SET_ICPUSTATE_P_STATE
-#define LIBCPUSTATE_HAVE_REGISTER_SET_SCPUSTATE_P_STATE
-#endif /* !__x86_64__ */
-
-#endif /* !_I386_KOS_LIBCPUSTATE_ASM_FEATURES_H */
+#endif /* !_I386_KOS_LIBCPUSTATE_ASM_REGISTER_H */

@@ -1,4 +1,3 @@
-
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_INCLUDE_I386_KOS_DEBUGGER_ARCH_RT_H
-#define GUARD_KERNEL_INCLUDE_I386_KOS_DEBUGGER_ARCH_RT_H 1
+#ifndef GUARD_KERNEL_INCLUDE_ARM_KOS_DEBUGGER_ARCH_RT_H
+#define GUARD_KERNEL_INCLUDE_ARM_KOS_DEBUGGER_ARCH_RT_H 1
 
 #include <kernel/compiler.h>
 
@@ -226,26 +225,13 @@ NOTHROW(FCALL dbg_onstack)(void) {
 }
 #endif /* __CC__ */
 
-#ifdef __x86_64__
-#define dbg_current_iscompat() \
-	__KOS64_IS_CS32BIT(dbg_getregbyidp(DBG_REGLEVEL_VIEW, X86_REGISTER_SEGMENT_CS))
-#define dbg_current_sizeof_pointer() \
-	(dbg_current_iscompat() ? 4 : 8)
-#else /* __x86_64__ */
-#define dbg_current_sizeof_pointer() 4
-#endif /* !__x86_64__ */
-
-
 /* CPU state kind codes. */
-#define X86_DBG_STATEKIND_NONE 0 /* No DBG_REGLEVEL_TRAP-level CPU state */
-#define X86_DBG_STATEKIND_FCPU 1 /* `struct fcpustate' */
-#define X86_DBG_STATEKIND_UCPU 2 /* `struct ucpustate' */
-#define X86_DBG_STATEKIND_LCPU 3 /* `struct lcpustate' */
-#define X86_DBG_STATEKIND_KCPU 4 /* `struct kcpustate' */
-#define X86_DBG_STATEKIND_ICPU 5 /* `struct icpustate' */
-#define X86_DBG_STATEKIND_SCPU 6 /* `struct scpustate' */
+#define ARM_DBG_STATEKIND_NONE 0 /* No DBG_REGLEVEL_TRAP-level CPU state */
+#define ARM_DBG_STATEKIND_FCPU 1 /* `struct fcpustate' */
+#define ARM_DBG_STATEKIND_UCPU 2 /* `struct ucpustate' */
+#define ARM_DBG_STATEKIND_LCPU 3 /* `struct lcpustate' */
 
 DECL_END
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
-#endif /* !GUARD_KERNEL_INCLUDE_I386_KOS_DEBUGGER_ARCH_RT_H */
+#endif /* !GUARD_KERNEL_INCLUDE_ARM_KOS_DEBUGGER_ARCH_RT_H */

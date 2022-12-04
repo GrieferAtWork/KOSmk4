@@ -70,7 +70,7 @@ for (local xcs: APPLY_CPUSTATE) {
 	print("/" "************************************************************************" "/");
 	print("/" "* ", xcs.ljust(68), " *" "/");
 	print("/" "************************************************************************" "/");
-	print("#ifdef LIBCPUSTATE_HAVE_APPLY_", xcs.upper());
+	print("#ifdef LIBCPUSTATE_HAVE_", xcs.upper());
 	// Print apply symbol name
 	if (getPossibleAliasesForXCpuState(xcs)) {
 		print("#ifdef ", xcs.upper(), "_ALIAS");
@@ -100,14 +100,14 @@ for (local xcs: APPLY_CPUSTATE) {
 		print("__NOTHROW(LIBCPUSTATE_CC cpu_apply_", xcs, ")(struct ", xcs, " const *__restrict __state);");
 	}
 	print("#endif /" "* LIBCPUSTATE_WANT_PROTOTYPES *" "/");
-	print("#endif /" "* LIBCPUSTATE_HAVE_APPLY_", xcs.upper(), " *" "/");
+	print("#endif /" "* LIBCPUSTATE_HAVE_", xcs.upper(), " *" "/");
 }
 
 // Generate c++ overloads
 print("#if defined(__cplusplus) && defined(LIBCPUSTATE_WANT_PROTOTYPES)");
 print("extern \"C++\" {");
 for (local xcs: APPLY_CPUSTATE) {
-	print("#ifdef LIBCPUSTATE_HAVE_APPLY_", xcs.upper());
+	print("#ifdef LIBCPUSTATE_HAVE_", xcs.upper());
 	if (getPossibleAliasesForXCpuState(xcs)) {
 		print("#ifdef ", xcs.upper(), "_ALIAS");
 		print("__COMPILER_REDIRECT_VOID(LIBCPUSTATE_DECL,__ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)),__NOTHROW,LIBCPUSTATE_CC,cpu_apply,(struct ", xcs, " const *__restrict __state),__LIBCPU_APPLY_GENERATE_ASMNAME(", xcs.upper(), "_ALIAS),(__state))");
@@ -117,7 +117,7 @@ for (local xcs: APPLY_CPUSTATE) {
 	} else {
 		print("__COMPILER_REDIRECT_VOID(LIBCPUSTATE_DECL,__ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)),__NOTHROW,LIBCPUSTATE_CC,cpu_apply,(struct ", xcs, " const *__restrict __state),cpu_apply_", xcs, ",(__state))");
 	}
-	print("#endif /" "* LIBCPUSTATE_HAVE_APPLY_", xcs.upper(), " *" "/");
+	print("#endif /" "* LIBCPUSTATE_HAVE_", xcs.upper(), " *" "/");
 }
 print("} /" "* extern \"C++\" *" "/");
 print("#endif /" "* __cplusplus && LIBCPUSTATE_WANT_PROTOTYPES *" "/");
@@ -127,7 +127,7 @@ print("#endif /" "* __cplusplus && LIBCPUSTATE_WANT_PROTOTYPES *" "/");
 /************************************************************************/
 /* ucpustate                                                            */
 /************************************************************************/
-#ifdef LIBCPUSTATE_HAVE_APPLY_UCPUSTATE
+#ifdef LIBCPUSTATE_HAVE_UCPUSTATE
 #define PCPU_APPLY_UCPUSTATE_NAME "cpu_apply_ucpustate"
 /* Load the given CPU state and resume execute at its location. */
 typedef __ABNORMAL_RETURN __ATTR_NORETURN_T __ATTR_NONNULL_T((1)) void
@@ -136,14 +136,14 @@ __NOTHROW_T(LIBCPUSTATE_CC *PCPU_APPLY_UCPUSTATE)(struct ucpustate const *__rest
 LIBCPUSTATE_DECL __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void
 __NOTHROW(LIBCPUSTATE_CC cpu_apply_ucpustate)(struct ucpustate const *__restrict __state);
 #endif /* LIBCPUSTATE_WANT_PROTOTYPES */
-#endif /* LIBCPUSTATE_HAVE_APPLY_UCPUSTATE */
+#endif /* LIBCPUSTATE_HAVE_UCPUSTATE */
 
 
 
 /************************************************************************/
 /* lcpustate                                                            */
 /************************************************************************/
-#ifdef LIBCPUSTATE_HAVE_APPLY_LCPUSTATE
+#ifdef LIBCPUSTATE_HAVE_LCPUSTATE
 #ifdef LCPUSTATE_ALIAS
 #define PCPU_APPLY_LCPUSTATE_NAME "cpu_apply_" LCPUSTATE_ALIAS_STR
 #else /* LCPUSTATE_ALIAS */
@@ -161,14 +161,14 @@ LIBCPUSTATE_DECL __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void
 __NOTHROW(LIBCPUSTATE_CC cpu_apply_lcpustate)(struct lcpustate const *__restrict __state);
 #endif /* !LCPUSTATE_ALIAS */
 #endif /* LIBCPUSTATE_WANT_PROTOTYPES */
-#endif /* LIBCPUSTATE_HAVE_APPLY_LCPUSTATE */
+#endif /* LIBCPUSTATE_HAVE_LCPUSTATE */
 
 
 
 /************************************************************************/
 /* kcpustate                                                            */
 /************************************************************************/
-#ifdef LIBCPUSTATE_HAVE_APPLY_KCPUSTATE
+#ifdef LIBCPUSTATE_HAVE_KCPUSTATE
 #ifdef KCPUSTATE_ALIAS
 #define PCPU_APPLY_KCPUSTATE_NAME "cpu_apply_" KCPUSTATE_ALIAS_STR
 #else /* KCPUSTATE_ALIAS */
@@ -186,14 +186,14 @@ LIBCPUSTATE_DECL __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void
 __NOTHROW(LIBCPUSTATE_CC cpu_apply_kcpustate)(struct kcpustate const *__restrict __state);
 #endif /* !KCPUSTATE_ALIAS */
 #endif /* LIBCPUSTATE_WANT_PROTOTYPES */
-#endif /* LIBCPUSTATE_HAVE_APPLY_KCPUSTATE */
+#endif /* LIBCPUSTATE_HAVE_KCPUSTATE */
 
 
 
 /************************************************************************/
 /* icpustate                                                            */
 /************************************************************************/
-#ifdef LIBCPUSTATE_HAVE_APPLY_ICPUSTATE
+#ifdef LIBCPUSTATE_HAVE_ICPUSTATE
 #ifdef ICPUSTATE_ALIAS
 #define PCPU_APPLY_ICPUSTATE_NAME "cpu_apply_" ICPUSTATE_ALIAS_STR
 #else /* ICPUSTATE_ALIAS */
@@ -211,14 +211,14 @@ LIBCPUSTATE_DECL __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void
 __NOTHROW(LIBCPUSTATE_CC cpu_apply_icpustate)(struct icpustate const *__restrict __state);
 #endif /* !ICPUSTATE_ALIAS */
 #endif /* LIBCPUSTATE_WANT_PROTOTYPES */
-#endif /* LIBCPUSTATE_HAVE_APPLY_ICPUSTATE */
+#endif /* LIBCPUSTATE_HAVE_ICPUSTATE */
 
 
 
 /************************************************************************/
 /* scpustate                                                            */
 /************************************************************************/
-#ifdef LIBCPUSTATE_HAVE_APPLY_SCPUSTATE
+#ifdef LIBCPUSTATE_HAVE_SCPUSTATE
 #ifdef SCPUSTATE_ALIAS
 #define PCPU_APPLY_SCPUSTATE_NAME "cpu_apply_" SCPUSTATE_ALIAS_STR
 #else /* SCPUSTATE_ALIAS */
@@ -236,14 +236,14 @@ LIBCPUSTATE_DECL __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void
 __NOTHROW(LIBCPUSTATE_CC cpu_apply_scpustate)(struct scpustate const *__restrict __state);
 #endif /* !SCPUSTATE_ALIAS */
 #endif /* LIBCPUSTATE_WANT_PROTOTYPES */
-#endif /* LIBCPUSTATE_HAVE_APPLY_SCPUSTATE */
+#endif /* LIBCPUSTATE_HAVE_SCPUSTATE */
 
 
 
 /************************************************************************/
 /* fcpustate                                                            */
 /************************************************************************/
-#ifdef LIBCPUSTATE_HAVE_APPLY_FCPUSTATE
+#ifdef LIBCPUSTATE_HAVE_FCPUSTATE
 #ifdef FCPUSTATE_ALIAS
 #define PCPU_APPLY_FCPUSTATE_NAME "cpu_apply_" FCPUSTATE_ALIAS_STR
 #else /* FCPUSTATE_ALIAS */
@@ -261,14 +261,14 @@ LIBCPUSTATE_DECL __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void
 __NOTHROW(LIBCPUSTATE_CC cpu_apply_fcpustate)(struct fcpustate const *__restrict __state);
 #endif /* !FCPUSTATE_ALIAS */
 #endif /* LIBCPUSTATE_WANT_PROTOTYPES */
-#endif /* LIBCPUSTATE_HAVE_APPLY_FCPUSTATE */
+#endif /* LIBCPUSTATE_HAVE_FCPUSTATE */
 
 
 
 /************************************************************************/
 /* mcontext                                                             */
 /************************************************************************/
-#ifdef LIBCPUSTATE_HAVE_APPLY_MCONTEXT
+#ifdef LIBCPUSTATE_HAVE_MCONTEXT
 #define PCPU_APPLY_MCONTEXT_NAME "cpu_apply_mcontext"
 struct mcontext;
 /* Load the given CPU state and resume execute at its location. */
@@ -278,14 +278,14 @@ __NOTHROW_T(LIBCPUSTATE_CC *PCPU_APPLY_MCONTEXT)(struct mcontext const *__restri
 LIBCPUSTATE_DECL __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void
 __NOTHROW(LIBCPUSTATE_CC cpu_apply_mcontext)(struct mcontext const *__restrict __state);
 #endif /* LIBCPUSTATE_WANT_PROTOTYPES */
-#endif /* LIBCPUSTATE_HAVE_APPLY_MCONTEXT */
+#endif /* LIBCPUSTATE_HAVE_MCONTEXT */
 
 
 
 /************************************************************************/
 /* ucontext                                                             */
 /************************************************************************/
-#ifdef LIBCPUSTATE_HAVE_APPLY_UCONTEXT
+#ifdef LIBCPUSTATE_HAVE_UCONTEXT
 #define PCPU_APPLY_UCONTEXT_NAME "cpu_apply_ucontext"
 struct ucontext;
 /* Load the given CPU state and resume execute at its location. */
@@ -295,53 +295,53 @@ __NOTHROW_T(LIBCPUSTATE_CC *PCPU_APPLY_UCONTEXT)(struct ucontext const *__restri
 LIBCPUSTATE_DECL __ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)) void
 __NOTHROW(LIBCPUSTATE_CC cpu_apply_ucontext)(struct ucontext const *__restrict __state);
 #endif /* LIBCPUSTATE_WANT_PROTOTYPES */
-#endif /* LIBCPUSTATE_HAVE_APPLY_UCONTEXT */
+#endif /* LIBCPUSTATE_HAVE_UCONTEXT */
 #if defined(__cplusplus) && defined(LIBCPUSTATE_WANT_PROTOTYPES)
 extern "C++" {
-#ifdef LIBCPUSTATE_HAVE_APPLY_UCPUSTATE
+#ifdef LIBCPUSTATE_HAVE_UCPUSTATE
 __COMPILER_REDIRECT_VOID(LIBCPUSTATE_DECL,__ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)),__NOTHROW,LIBCPUSTATE_CC,cpu_apply,(struct ucpustate const *__restrict __state),cpu_apply_ucpustate,(__state))
-#endif /* LIBCPUSTATE_HAVE_APPLY_UCPUSTATE */
-#ifdef LIBCPUSTATE_HAVE_APPLY_LCPUSTATE
+#endif /* LIBCPUSTATE_HAVE_UCPUSTATE */
+#ifdef LIBCPUSTATE_HAVE_LCPUSTATE
 #ifdef LCPUSTATE_ALIAS
 __COMPILER_REDIRECT_VOID(LIBCPUSTATE_DECL,__ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)),__NOTHROW,LIBCPUSTATE_CC,cpu_apply,(struct lcpustate const *__restrict __state),__LIBCPU_APPLY_GENERATE_ASMNAME(LCPUSTATE_ALIAS),(__state))
 #else /* LCPUSTATE_ALIAS */
 __COMPILER_REDIRECT_VOID(LIBCPUSTATE_DECL,__ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)),__NOTHROW,LIBCPUSTATE_CC,cpu_apply,(struct lcpustate const *__restrict __state),cpu_apply_lcpustate,(__state))
 #endif /* !LCPUSTATE_ALIAS */
-#endif /* LIBCPUSTATE_HAVE_APPLY_LCPUSTATE */
-#ifdef LIBCPUSTATE_HAVE_APPLY_KCPUSTATE
+#endif /* LIBCPUSTATE_HAVE_LCPUSTATE */
+#ifdef LIBCPUSTATE_HAVE_KCPUSTATE
 #ifdef KCPUSTATE_ALIAS
 __COMPILER_REDIRECT_VOID(LIBCPUSTATE_DECL,__ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)),__NOTHROW,LIBCPUSTATE_CC,cpu_apply,(struct kcpustate const *__restrict __state),__LIBCPU_APPLY_GENERATE_ASMNAME(KCPUSTATE_ALIAS),(__state))
 #else /* KCPUSTATE_ALIAS */
 __COMPILER_REDIRECT_VOID(LIBCPUSTATE_DECL,__ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)),__NOTHROW,LIBCPUSTATE_CC,cpu_apply,(struct kcpustate const *__restrict __state),cpu_apply_kcpustate,(__state))
 #endif /* !KCPUSTATE_ALIAS */
-#endif /* LIBCPUSTATE_HAVE_APPLY_KCPUSTATE */
-#ifdef LIBCPUSTATE_HAVE_APPLY_ICPUSTATE
+#endif /* LIBCPUSTATE_HAVE_KCPUSTATE */
+#ifdef LIBCPUSTATE_HAVE_ICPUSTATE
 #ifdef ICPUSTATE_ALIAS
 __COMPILER_REDIRECT_VOID(LIBCPUSTATE_DECL,__ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)),__NOTHROW,LIBCPUSTATE_CC,cpu_apply,(struct icpustate const *__restrict __state),__LIBCPU_APPLY_GENERATE_ASMNAME(ICPUSTATE_ALIAS),(__state))
 #else /* ICPUSTATE_ALIAS */
 __COMPILER_REDIRECT_VOID(LIBCPUSTATE_DECL,__ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)),__NOTHROW,LIBCPUSTATE_CC,cpu_apply,(struct icpustate const *__restrict __state),cpu_apply_icpustate,(__state))
 #endif /* !ICPUSTATE_ALIAS */
-#endif /* LIBCPUSTATE_HAVE_APPLY_ICPUSTATE */
-#ifdef LIBCPUSTATE_HAVE_APPLY_SCPUSTATE
+#endif /* LIBCPUSTATE_HAVE_ICPUSTATE */
+#ifdef LIBCPUSTATE_HAVE_SCPUSTATE
 #ifdef SCPUSTATE_ALIAS
 __COMPILER_REDIRECT_VOID(LIBCPUSTATE_DECL,__ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)),__NOTHROW,LIBCPUSTATE_CC,cpu_apply,(struct scpustate const *__restrict __state),__LIBCPU_APPLY_GENERATE_ASMNAME(SCPUSTATE_ALIAS),(__state))
 #else /* SCPUSTATE_ALIAS */
 __COMPILER_REDIRECT_VOID(LIBCPUSTATE_DECL,__ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)),__NOTHROW,LIBCPUSTATE_CC,cpu_apply,(struct scpustate const *__restrict __state),cpu_apply_scpustate,(__state))
 #endif /* !SCPUSTATE_ALIAS */
-#endif /* LIBCPUSTATE_HAVE_APPLY_SCPUSTATE */
-#ifdef LIBCPUSTATE_HAVE_APPLY_FCPUSTATE
+#endif /* LIBCPUSTATE_HAVE_SCPUSTATE */
+#ifdef LIBCPUSTATE_HAVE_FCPUSTATE
 #ifdef FCPUSTATE_ALIAS
 __COMPILER_REDIRECT_VOID(LIBCPUSTATE_DECL,__ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)),__NOTHROW,LIBCPUSTATE_CC,cpu_apply,(struct fcpustate const *__restrict __state),__LIBCPU_APPLY_GENERATE_ASMNAME(FCPUSTATE_ALIAS),(__state))
 #else /* FCPUSTATE_ALIAS */
 __COMPILER_REDIRECT_VOID(LIBCPUSTATE_DECL,__ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)),__NOTHROW,LIBCPUSTATE_CC,cpu_apply,(struct fcpustate const *__restrict __state),cpu_apply_fcpustate,(__state))
 #endif /* !FCPUSTATE_ALIAS */
-#endif /* LIBCPUSTATE_HAVE_APPLY_FCPUSTATE */
-#ifdef LIBCPUSTATE_HAVE_APPLY_MCONTEXT
+#endif /* LIBCPUSTATE_HAVE_FCPUSTATE */
+#ifdef LIBCPUSTATE_HAVE_MCONTEXT
 __COMPILER_REDIRECT_VOID(LIBCPUSTATE_DECL,__ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)),__NOTHROW,LIBCPUSTATE_CC,cpu_apply,(struct mcontext const *__restrict __state),cpu_apply_mcontext,(__state))
-#endif /* LIBCPUSTATE_HAVE_APPLY_MCONTEXT */
-#ifdef LIBCPUSTATE_HAVE_APPLY_UCONTEXT
+#endif /* LIBCPUSTATE_HAVE_MCONTEXT */
+#ifdef LIBCPUSTATE_HAVE_UCONTEXT
 __COMPILER_REDIRECT_VOID(LIBCPUSTATE_DECL,__ABNORMAL_RETURN __ATTR_NORETURN __ATTR_NONNULL((1)),__NOTHROW,LIBCPUSTATE_CC,cpu_apply,(struct ucontext const *__restrict __state),cpu_apply_ucontext,(__state))
-#endif /* LIBCPUSTATE_HAVE_APPLY_UCONTEXT */
+#endif /* LIBCPUSTATE_HAVE_UCONTEXT */
 } /* extern "C++" */
 #endif /* __cplusplus && LIBCPUSTATE_WANT_PROTOTYPES */
 /*[[[end]]]*/

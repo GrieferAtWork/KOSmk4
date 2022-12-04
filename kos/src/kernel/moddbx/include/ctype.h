@@ -40,6 +40,7 @@
 #include <ieee754.h>
 #include <stdint.h> /* intmax_t */
 
+#include <libcpustate/register.h> /* cpu_regno_t */
 #include <libdebuginfo/debug_info.h>
 
 #ifdef __x86_64__
@@ -90,9 +91,9 @@ DECL_BEGIN
 #ifdef __x86_64__
 #define    CTYPE_KIND_FUNPROTO_CC_SYSVABI  0x0400
 #define    CTYPE_KIND_FUNPROTO_CC_MSABI    0x0500
-#define    CTYPE_KIND_FUNPROTO_CC_DEFAULT                                                \
-	(__KOS64_IS_CS32BIT(x86_dbg_getregbyidp(DBG_REGLEVEL_VIEW, X86_REGISTER_SEGMENT_CS)) \
-	 ? CTYPE_KIND_FUNPROTO_CC_CDECL                                                      \
+#define    CTYPE_KIND_FUNPROTO_CC_DEFAULT                                            \
+	(__KOS64_IS_CS32BIT(dbg_getregbyidp(DBG_REGLEVEL_VIEW, X86_REGISTER_SEGMENT_CS)) \
+	 ? CTYPE_KIND_FUNPROTO_CC_CDECL                                                  \
 	 : CTYPE_KIND_FUNPROTO_CC_SYSVABI)
 #else /* __x86_64__ */
 #define    CTYPE_KIND_FUNPROTO_CC_DEFAULT  CTYPE_KIND_FUNPROTO_CC_CDECL
@@ -278,7 +279,7 @@ NOTHROW(FCALL ctype_common)(struct ctype *a,
  * If no such type exists, return `NULL' instead.
  * @param: buflen: The required buffer size to hold `regno' */
 FUNDEF WUNUSED REF struct ctype *
-NOTHROW(FCALL ctype_for_register)(unsigned int regno, size_t buflen);
+NOTHROW(FCALL ctype_for_register)(cpu_regno_t regno, size_t buflen);
 
 struct ctypeenumname {
 	char const           *en_name;    /* [1..1] Name of the enum. */

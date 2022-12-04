@@ -55,6 +55,7 @@ for (local o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3",
 #include <stddef.h>
 #include <string.h>
 
+#include <libcpustate/register.h>
 #include <libdebuginfo/dwarf.h>
 #include <libunwind/cfi.h>
 
@@ -272,15 +273,15 @@ PRIVATE ATTR_PURE WUNUSED uintptr_t
 NOTHROW(FCALL get_user_tls_base_register)(void) {
 	uintptr_t result;
 #ifdef __x86_64__
-	x86_dbg_getregbyid(DBG_REGLEVEL_VIEW, X86_REGISTER_MISC_FSBASEQ,
-	                   &result, sizeof(result));
+	dbg_getregbyid(DBG_REGLEVEL_VIEW, X86_REGISTER_MISC_FSBASEQ,
+	               &result, sizeof(result));
 #elif defined(__i386__)
-	if (!x86_dbg_getregbyid(DBG_REGLEVEL_VIEW, X86_REGISTER_MISC_GSBASEL,
-	                        &result, sizeof(result)))
+	if (!dbg_getregbyid(DBG_REGLEVEL_VIEW, X86_REGISTER_MISC_GSBASEL,
+	                    &result, sizeof(result)))
 		result = FORTASK(dbg_current, this_x86_user_gsbase);
 #elif defined(__arm__)
-	if (!arm_dbg_getregbyid(DBG_REGLEVEL_VIEW, ARM_REGISTER_TLSBASE,
-	                        &result, sizeof(result)))
+	if (!dbg_getregbyid(DBG_REGLEVEL_VIEW, ARM_REGISTER_TLSBASE,
+	                    &result, sizeof(result)))
 		result = FORTASK(dbg_current, this_arm_user_tlsbase);
 #else /* ... */
 #error "Unsupported architecture"
@@ -1311,10 +1312,10 @@ NOTHROW(FCALL cvalue_flush)(struct cvalue *__restrict self) {
 			if unlikely(result != DBX_EOK)
 				goto done;
 		}
-		reqsize = arch_dbg_setregbyid(DBG_REGLEVEL_VIEW,
-		                              self->cv_register.r_regid,
-		                              self->cv_register.r_ibuffer,
-		                              bufneed);
+		reqsize = dbg_setregbyid(DBG_REGLEVEL_VIEW,
+		                         self->cv_register.r_regid,
+		                         self->cv_register.r_ibuffer,
+		                         bufneed);
 		if unlikely(reqsize != bufneed)
 			result = DBX_EINTERN;
 	}	break;
@@ -1514,9 +1515,9 @@ NOTHROW(FCALL cexpr_pushregister_by_id)(unsigned int id) {
 	valp = _cexpr_pushalloc();
 	if unlikely(!valp)
 		return DBX_ENOMEM;
-	buflen = arch_dbg_getregbyid(DBG_REGLEVEL_VIEW, id,
-	                             valp->cv_register.r_ibuffer,
-	                             sizeof(valp->cv_register.r_ibuffer));
+	buflen = dbg_getregbyid(DBG_REGLEVEL_VIEW, id,
+	                        valp->cv_register.r_ibuffer,
+	                        sizeof(valp->cv_register.r_ibuffer));
 	if unlikely(buflen > sizeof(valp->cv_register.r_ibuffer))
 		return DBX_EINTERN; /* Internal error */
 	if unlikely(!buflen)
@@ -3528,9 +3529,9 @@ NOTHROW(FCALL cexpr_pushsymbol_byname)(char const *__restrict name, size_t namel
  * @return: DBX_ENOENT: No register matches the given `name' */
 PUBLIC NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL cexpr_pushregister)(char const *__restrict name, size_t namelen) {
-	unsigned int regno;
-	regno = arch_dbg_regfromname(name, namelen);
-	if (regno == ARCH_REGISTER_NONE)
+	instrlen_isa_t isa = dbg_instrlen_isa(DBG_REGLEVEL_VIEW);
+	cpu_regno_t regno  = register_byname(isa, name, namelen);
+	if (regno == CPU_REGISTER_NONE)
 		return DBX_ENOENT;
 	return cexpr_pushregister_by_id(regno);
 }

@@ -36,6 +36,7 @@
 
 #include <stdbool.h>
 
+#include <libcpustate/register.h> /* cpu_regno_t */
 #include <libinstrlen/bits/isa.h>
 #include <libunwind/api.h>
 #include <libunwind/cfi.h>
@@ -132,6 +133,22 @@ NOTHROW(KCALL dbg_setregp)(unsigned int level, uintptr_half_t cfi_regno, uintptr
 #endif /* !NDEBUG */
 }
 
+
+/* Get/set a register, given its ID
+ * NOTE: When `return > buflen', then
+ *       dbg_getregbyname: The contents of `buf' are undefined.
+ *       dbg_setregbyname:  The  register   was  not   written.
+ * NOTE: Accepted register names are those found in comments in `<asm/registers.h>'
+ * @param: regno: One of the values from <asm/registers.h>
+ * @return: * :   The required buffer size, or 0 when `regno' isn't recognized. */
+FUNDEF size_t NOTHROW(KCALL dbg_getregbyid)(unsigned int level, cpu_regno_t regno, void *__restrict buf, size_t buflen);
+FUNDEF size_t NOTHROW(KCALL dbg_setregbyid)(unsigned int level, cpu_regno_t regno, void const *__restrict buf, size_t buflen);
+
+/* Get/Set a pointer-sized register, given its ID */
+FUNDEF ATTR_PURE WUNUSED uintptr_t NOTHROW(KCALL dbg_getregbyidp)(unsigned int level, cpu_regno_t regno);
+FUNDEF bool NOTHROW(KCALL dbg_setregbyidp)(unsigned int level, cpu_regno_t regno, uintptr_t value);
+
+
 /* Get/set a register, given its (arch-specific) name
  * NOTE: When `return > buflen', then
  *       dbg_getregbyname: The contents of `buf' are undefined.
@@ -143,23 +160,14 @@ FUNDEF bool NOTHROW(KCALL dbg_getregbynamep)(unsigned int level, char const *__r
 FUNDEF bool NOTHROW(KCALL dbg_setregbynamep)(unsigned int level, char const *__restrict name, size_t namelen, uintptr_t value);
 
 struct fcpustate;
-struct ucpustate;
 
 /* Get/set all registers. */
 FUNDEF void NOTHROW(KCALL dbg_getallregs)(unsigned int level, struct fcpustate *__restrict state);
 FUNDEF void NOTHROW(KCALL dbg_setallregs)(unsigned int level, struct fcpustate const *__restrict state);
 
 /* Return the ISA code for use with libinstrlen */
-#ifndef ARCH_DEBUGGER_RT_HAVE_DBG_INSTRLEN_ISA
-LOCAL ATTR_PURE WUNUSED instrlen_isa_t
-NOTHROW(KCALL dbg_instrlen_isa)(unsigned int level) {
-	instrlen_isa_t result;
-	struct fcpustate cs;
-	dbg_getallregs(level, &cs);
-	result = instrlen_isa_from_fcpustate(&cs);
-	return result;
-}
-#endif /* !ARCH_DEBUGGER_RT_HAVE_DBG_INSTRLEN_ISA */
+FUNDEF ATTR_PURE WUNUSED instrlen_isa_t
+NOTHROW(KCALL dbg_instrlen_isa)(unsigned int level);
 
 /* Return the page directory of `dbg_current' */
 FUNDEF ATTR_PURE WUNUSED pagedir_phys_t NOTHROW(KCALL dbg_getpagedir)(void);
@@ -170,7 +178,7 @@ FUNDEF ATTR_PURE WUNUSED bool NOTHROW(KCALL dbg_verifypagedir)(pagedir_phys_t pd
 /* [default(true)]
  * Allow managed memory access to be performed by  `dbg_(read|write)memory'
  * and friends. What this means is that (so-long as the kernel hasn't  been
- * poisoned, and this field is set to `true' (which is is during a debugger
+ * poisoned, and this field is set to `true' (which it is during a debugger
  * reset))  the below functions  can be used to  load lazy memory mappings,
  * and initiate the regular copy-on-write semantics expected by  high-level
  * memory access, and as would  also be done if  the access was being  done

@@ -614,6 +614,7 @@ NOTHROW(FCALL autocomplete_register_name)(struct cparser *__restrict self,
                                           char const *__restrict name,
                                           size_t namelen) {
 	/* TODO: auto-complete register names that start with the given `name...+=namelen' */
+	/* TODO: Use `register_listnames(3)' */
 	(void)self;
 	(void)name;
 	(void)namelen;

@@ -477,11 +477,11 @@ handle_retry_or_ignore:
 		dbg_current = THIS_TASK;
 		/* TODO: Make this part arch-independent */
 #ifdef __x86_64__
-		x86_dbg_setregbyidp(DBG_REGLEVEL_TRAP,
+		dbg_setregbyidp(DBG_REGLEVEL_TRAP,
 		                    X86_REGISTER_GENERAL_PURPOSE_RAX,
 		                    acheck_result);
 #elif defined(__i386__)
-		x86_dbg_setregbyidp(DBG_REGLEVEL_TRAP,
+		dbg_setregbyidp(DBG_REGLEVEL_TRAP,
 		                    X86_REGISTER_GENERAL_PURPOSE_EAX,
 		                    acheck_result);
 #elif defined(__arm__)
