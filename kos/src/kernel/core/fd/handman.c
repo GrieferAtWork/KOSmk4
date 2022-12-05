@@ -102,10 +102,10 @@ static_assert(sizeof(union handslot) == sizeof(struct handle));
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) unsigned int
 NOTHROW(FCALL find_overlarge_free_range)(union handslot const *__restrict base,
                                          unsigned int count) {
-	unsigned int i, effective_count;
-	if (OVERFLOW_USUB(count, HANDRANGE_FREESLOTS_SPLIT_THRESHOLD, &effective_count))
+	unsigned int i, max_overlarge_range_base;
+	if (OVERFLOW_USUB(count, HANDRANGE_FREESLOTS_SPLIT_THRESHOLD, &max_overlarge_range_base))
 		return count;
-	for (i = 0; i < effective_count;) {
+	for (i = 0; i < max_overlarge_range_base;) {
 		unsigned int j;
 		if (!handslot_isfree(&base[i])) {
 			++i;
@@ -138,7 +138,8 @@ NOTHROW(FCALL rfind_overlarge_free_range)(union handslot const *__restrict base,
 		for (;;) {
 			j = i - free_count;
 			if (free_count >= HANDRANGE_FREESLOTS_SPLIT_THRESHOLD) {
-				*p_freemax = j + HANDRANGE_FREESLOTS_SPLIT_THRESHOLD - 1;
+				*p_freemax = i;
+				++j; /* `base[j]' wasn't checked, yet */
 				while (j > 0 && handslot_isfree(&base[j - 1]))
 					--j;
 				return j;
@@ -219,7 +220,7 @@ again:
 		assertf(rel_freemin < count - HANDRANGE_FREESLOTS_SPLIT_THRESHOLD,
 		        "The case `freemin == count - HANDRANGE_FREESLOTS_SPLIT_THRESHOLD' "
 		        "would mean that the free-range extends to the end, but we've already "
-		        "handle the case of trailing free slots above!");
+		        "handled the case of trailing free slots above!");
 		locount = rel_freemin;
 		hicount = count - (rel_freemax + 1);
 		assert(locount > 0);
@@ -257,7 +258,7 @@ again:
 		assert(newrange->hr_minfd <= newrange->hr_maxfd);
 		assert(handrange_count(newrange) == hicount);
 		self->hr_maxfd = self->hr_minfd + rel_freemin - 1;
-		assert(handrange_count(self) == rel_freemin);
+		assert(handrange_count(self) == locount);
 
 		/* Transfer handle data. */
 		memcpy(&newrange->hr_hand[0],
@@ -287,7 +288,7 @@ again:
 		}
 
 		/* Release unused memory from `self'. */
-		reqsize = _handrange_sizeof(rel_freemin);
+		reqsize = _handrange_sizeof(locount);
 		if ((ATOMIC_READ(self->hr_nlops) != 0) ||
 		    (check_self__hr_joinlop && ATOMIC_READ(self->_hr_joinlop.olo_func) != NULL)) {
 			/* Must  use  inplace-realloc if  there  are LOP
