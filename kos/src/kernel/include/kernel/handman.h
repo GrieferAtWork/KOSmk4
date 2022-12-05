@@ -193,7 +193,8 @@ union handslot {
  * Note that once this threshold  is reached, _all_ leading/trailing  free
  * slots are freed, meaning that none will remain afterwards. -- This does
  * not specify how  many should  be left behind  during truncation,  which
- * always removes _all_ free slots.
+ * always removes _all_ free slots. It specifies how many free slots there
+ * have to be _before_ truncation is initiated.
  *
  * -> Truncation happens when `NUM_SLOTS > HANDRANGE_FREESLOTS_TRUNC_THRESHOLD',
  *    where  `NUM_SLOTS' is the # of leading  or trailing free-slots if a range.

@@ -79,6 +79,7 @@
 
 DECL_BEGIN
 
+static_assert(HANDRANGE_FREESLOTS_TRUNC_THRESHOLD > 1, "A trunc threshold of 0 doesn't make sense");
 static_assert(HANDRANGE_FREESLOTS_SPLIT_THRESHOLD > HANDRANGE_FREESLOTS_TRUNC_THRESHOLD);
 static_assert(sizeof(union handslot) == sizeof(struct handle));
 

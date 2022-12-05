@@ -251,14 +251,14 @@ again:
 				size_t new_usable;
 				new_list = (struct path_bucket *)kmalloc_nx((minmask + 1) *
 				                                            sizeof(struct path_bucket),
-				                                            info->ci_gfp |
+				                                            ccinfo_gfp(info) |
 				                                            GFP_ATOMIC | GFP_CALLOC);
 				if (!new_list && !ccinfo_noblock(info)) {
 					/* Try a blocking allocation. */
 					path_cldlock_endread(self);
 					new_list = (struct path_bucket *)kmalloc_nx((minmask + 1) *
 					                                            sizeof(struct path_bucket),
-					                                            info->ci_gfp | GFP_CALLOC);
+					                                            ccinfo_gfp(info) | GFP_CALLOC);
 					if (!new_list)
 						return; /* nope... */
 
@@ -940,7 +940,7 @@ do_enum_nonblocking:
 PRIVATE NOBLOCK_IF(ccinfo_noblock(info)) NONNULL((1)) void
 NOTHROW(KCALL system_cc_heap)(struct heap *__restrict self,
                               struct ccinfo *__restrict info) {
-	ccinfo_account(info, heap_trim(self, 0, info->ci_gfp));
+	ccinfo_account(info, heap_trim(self, 0, ccinfo_gfp(info)));
 }
 
 #ifdef CONFIG_HAVE_KERNEL_TRACE_MALLOC
@@ -1167,7 +1167,7 @@ NOTHROW(KCALL system_cc_ringbuffer)(struct ringbuffer *__restrict self,
 			                          self->rb_data,
 			                          self->rb_size,
 			                          self->rb_avail,
-			                          GFP_ATOMIC | info->ci_gfp,
+			                          GFP_ATOMIC | ccinfo_gfp(info),
 			                          GFP_NORMAL);
 			if likely(heapptr_getsiz(newbuf) != 0) {
 				assert(heapptr_getsiz(newbuf) >= self->rb_avail);
@@ -1225,7 +1225,7 @@ NOTHROW(KCALL system_cc_linebuffer)(struct linebuffer *__restrict self,
 		                          self->lb_line.lc_base,
 		                          self->lb_line.lc_alloc,
 		                          self->lb_line.lc_size,
-		                          GFP_ATOMIC | info->ci_gfp,
+		                          GFP_ATOMIC | ccinfo_gfp(info),
 		                          GFP_NORMAL);
 		if (heapptr_getsiz(newline) != 0) {
 			if (self->lb_line.lc_alloc > heapptr_getsiz(newline))

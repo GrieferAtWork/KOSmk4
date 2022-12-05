@@ -558,7 +558,8 @@ NOTHROW(KCALL fat_v_cc)(struct mfile *__restrict self,
 	assert(usable >= needed);
 	if (usable > needed) {
 		FatClusterIndex *newvec;
-		newvec = (FatClusterIndex *)krealloc_nx(dat->fn_clusterv, needed, info->ci_gfp);
+		newvec = (FatClusterIndex *)krealloc_nx(dat->fn_clusterv, needed,
+		                                        ccinfo_gfp(info));
 		if (newvec != NULL) {
 			size_t new_usable;
 			dat->fn_clusterv = newvec;

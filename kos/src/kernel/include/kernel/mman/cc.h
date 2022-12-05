@@ -52,6 +52,7 @@ struct ccinfo {
 /* Check if operation must be non-blocking. */
 #define ccinfo_noblock(self) ((self)->ci_gfp & GFP_ATOMIC)
 #define ccinfo_isdone(self)  ((self)->ci_bytes >= (self)->ci_minbytes)
+#define ccinfo_gfp(self)     (self)->ci_gfp
 
 /* Account for memory being freed. */
 #define ccinfo_account(self, num_bytes) \
