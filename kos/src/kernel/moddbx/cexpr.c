@@ -275,10 +275,10 @@ NOTHROW(FCALL get_user_tls_base_register)(void) {
 	uintptr_t result;
 #ifdef __x86_64__
 	dbg_rt_getregbyid(DBG_RT_REGLEVEL_VIEW, X86_REGISTER_MISC_FSBASEQ,
-	               &result, sizeof(result));
+	                  &result, sizeof(result));
 #elif defined(__i386__)
 	if (!dbg_rt_getregbyid(DBG_RT_REGLEVEL_VIEW, X86_REGISTER_MISC_GSBASEL,
-	                    &result, sizeof(result)))
+	                       &result, sizeof(result)))
 		result = FORTASK(dbg_current, this_x86_user_gsbase);
 #elif defined(__arm__)
 	if (!dbg_rt_getregbyid(DBG_RT_REGLEVEL_VIEW, ARM_REGISTER_TLSBASE,

@@ -178,7 +178,7 @@ did_update_x86_64_kernel:
 		local cmd, none, arg = l.partition("=")...;
 		switch (cmd) {
 		case "qemu":
-			if (qemu.startswith('"') && qemu.endswith('"'))
+			if (arg.startswith('"') && arg.endswith('"'))
 				arg = arg[1:-1].decode("c-escape");
 			qemu = arg;
 			if (fs.stat.isdir(qemu))
