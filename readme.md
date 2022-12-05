@@ -761,7 +761,7 @@ Alternatively (because `Open Folder` tends to be extremely laggy), you can also 
 - Whenever you add/delete a file to/from the KOS source tree, you have to re-run `make vs-proj` (After doing this, VS will detect this and ask you to re-load its project files. When prompted to, confirm this reload)
 - If you try to start KOS using the regular Run-button (or by pressing `F5`), you will not actually be debugging KOS, but will be debugging `deemon` as it is executing `/magic.dee` (though while it does so, deemon will still launch qemu and KOS as expected). To properly debug KOS, you have to do the following:
 	- Press `CTRL+ALT+A` to open the "Command Window"
-	- (First time only) type `alias d Debug.MIDebugLaunch /Executable:foo /OptionsFile:{{KOS_ROOT_DIRECTORY}}\kos\.vs\MIOptions.xml` and replace `{{KOS_ROOT_DIRECTORY}}` with the absolute path of the KOS source tree
+	- (First time only) type `alias d Debug.MIDebugLaunch /Executable:foo /OptionsFile:MIOptions.xml`
 	- From now on, you can start debugging KOS from the "Command Window" by typing `d`, followed by `ENTER`
 - After changing the target/configuration in VS, make sure you build at least once (`CTRL+SHIFT+B`) before running `d` from the "Command Window". If you fail to do so and run `d` immediately, you will actually launch whatever configuration you had selected previously.
 
