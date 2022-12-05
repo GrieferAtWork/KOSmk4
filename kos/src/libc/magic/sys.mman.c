@@ -1312,8 +1312,6 @@ after_mmap_attempt:
 						newsize = bufsize;
 						newbuf  = buf;
 					}
-					newsize = bufsize;
-					newbuf  = buf;
 				}
 			}
 			buffree += newsize - bufsize;

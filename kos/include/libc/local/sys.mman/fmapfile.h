@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa81e6cd5 */
+/* HASH CRC-32:0xb489c7ca */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -600,8 +600,6 @@ __after_mmap_attempt:
 						__newsize = __bufsize;
 						__newbuf  = __buf;
 					}
-					__newsize = __bufsize;
-					__newbuf  = __buf;
 				}
 			}
 			__buffree += __newsize - __bufsize;

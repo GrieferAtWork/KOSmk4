@@ -62,8 +62,8 @@ DATDEF bool const dbg_active;
 DATDEF struct task *dbg_current;
 
 /* [1..1] The cpu that is hosting the debugger (== THIS_TASK->t_cpu).
- *        Set to non-NULL before `dbg_active' becomes `true', and set
- *        to   `NULL'    before    `dbg_active'    becomes    `false' */
+ *        Set to non-NULL  before `dbg_active' becomes  `true',
+ *        and set to `NULL' before `dbg_active' becomes `false' */
 DATDEF struct cpu *const dbg_cpu;
 
 /* DBG register access level:

@@ -166,8 +166,8 @@ libd_usermatherr_wrapper(STRUCT_EXCEPTION *exc) {
 }
 
 DEFINE_PUBLIC_ALIAS(DOS$__setusermatherr, libd___setusermatherr);
-INTERN ATTR_SECTION(".text.crt.dos.application.init") void LIBDCALL
-libd___setusermatherr(int (LIBDCALL *fptr)(struct _exception *)) {
+INTERN ATTR_SECTION(".text.crt.dos.application.init") void
+NOTHROW_NCX(LIBDCALL libd___setusermatherr)(int (LIBDCALL *fptr)(struct _exception *)) {
 	/* Assign the function pointer to-be called by the wrapper. */
 	libd_usermatherr_fptr = fptr;
 

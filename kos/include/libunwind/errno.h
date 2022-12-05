@@ -57,7 +57,7 @@
 #define UNWIND_USER_ABORT                   68 /* (Used internally by libc): `abort()' or `std::terminate()' was called. */
 #define UNWIND_USER_ASSERT                  69 /* (Used internally by libc): Assertion failure (s.a. `assert_failed()') */
 #define UNWIND_USER_ACHECK                  70 /* (Used internally by libc): Assertion check failure (restartable assertion failure; aka. the one w/ the "retry" button). */
-#define UNWIND_USER_SSP                     71 /* (Used internally by libc): `__stack_chk_fail()' was called. */
+#define UNWIND_USER_SSP                     71 /* (Used internally by libc): Stack smash protection fault (`__stack_chk_fail()' was called). */
 #define UNWIND_USER_BADTLS                  72 /* (Used internally by libc): Bad TLS pointer (cannot load exception context). */
 
 

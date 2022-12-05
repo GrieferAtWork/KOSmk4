@@ -1303,6 +1303,7 @@ do_coredump_with_dlerror:
  * programs can use  them without needing  to specify additional  libraries
  * during link), the actual implementations are found in `libunwind.so'! */
 struct rf_object {
+	/* s.a. `struct rf_object' from `/kos/src/libunwind/unwind.c' */
 	void *_data[6];
 };
 
