@@ -730,6 +730,7 @@ static_assert(offsetof(struct __siginfox32_struct, __sig_si_sigval) == __OFFSET_
 static_assert(offsetof(struct __siginfox32_struct, _sifields._rt.si_sigval) == __OFFSET_SIGINFOX32_VALUE);
 static_assert(offsetof(struct __siginfox32_struct, _sifields._timer.si_sigval) == __OFFSET_SIGINFOX32_VALUE);
 static_assert(sizeof(struct __siginfox32_struct) == __SIZEOF_SIGINFOX32);
+static_assert(alignof(struct __siginfox32_struct) == __ALIGNOF_SIGINFOX32);
 
 
 
@@ -792,6 +793,7 @@ static_assert(offsetof(struct __siginfox64_struct, __sig_si_sigval) == __OFFSET_
 static_assert(offsetof(struct __siginfox64_struct, _sifields._rt.si_sigval) == __OFFSET_SIGINFOX64_VALUE);
 static_assert(offsetof(struct __siginfox64_struct, _sifields._timer.si_sigval) == __OFFSET_SIGINFOX64_VALUE);
 static_assert(sizeof(struct __siginfox64_struct) == __SIZEOF_SIGINFOX64);
+static_assert(alignof(struct __siginfox64_struct) == __ALIGNOF_SIGINFOX64);
 
 
 

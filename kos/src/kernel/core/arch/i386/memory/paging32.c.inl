@@ -414,7 +414,7 @@ DBG_COMMAND_AUTO(lspd, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
                  "\tor " AC_WHITE("THIS_MMAN") " should be dumped\n",
                  argc, argv) {
 	pagedir_phys_t pdir;
-	pdir = dbg_getpagedir();
+	pdir = dbg_rt_getpagedir();
 	if (argc == 2) {
 		if (strcmp(argv[1], lspd_str_kernel) == 0) {
 			pdir = pagedir_kernel_phys;

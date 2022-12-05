@@ -936,7 +936,7 @@ DBG_COMMAND(h,
             "\tOpen an interactive hex editor at ADDR\n",
             argc, argv) {
 	void *addr;
-	addr = dbg_getfaultpcreg(DBG_REGLEVEL_VIEW);
+	addr = dbg_getfaultpcreg(DBG_RT_REGLEVEL_VIEW);
 	if (argc >= 2) {
 		if (!dbg_evaladdr(argv[1], (uintptr_t *)&addr))
 			return DBG_STATUS_INVALID_ARGUMENTS;

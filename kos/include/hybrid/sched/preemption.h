@@ -111,6 +111,12 @@ typedef __hybrid_preemption_flag_t preemption_flag_t;
 #else /* __INTELLISENSE__ */
 #define preemption_flag_t        __hybrid_preemption_flag_t
 #endif /* !__INTELLISENSE__ */
+#ifdef __HYBRID_PREEMPTION_ON_VALUE
+#define PREEMPTION_ON_VALUE      __HYBRID_PREEMPTION_ON_VALUE
+#endif /* __HYBRID_PREEMPTION_ON_VALUE */
+#ifdef __HYBRID_PREEMPTION_OFF_VALUE
+#define PREEMPTION_OFF_VALUE     __HYBRID_PREEMPTION_OFF_VALUE
+#endif /* __HYBRID_PREEMPTION_OFF_VALUE */
 #define preemption_tryyield      __hybrid_preemption_tryyield
 #define preemption_tryyield_nopr __hybrid_preemption_tryyield_nopr
 #define preemption_tryyield_f    __hybrid_preemption_tryyield_f

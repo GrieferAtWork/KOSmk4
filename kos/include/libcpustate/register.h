@@ -203,35 +203,24 @@ for (local xcs: APPLY_CPUSTATE) {
 print("#if defined(__cplusplus) && defined(LIBCPUSTATE_WANT_PROTOTYPES)");
 print("extern \"C++\" {");
 for (local xcs: APPLY_CPUSTATE) {
-	print("#ifdef LIBCPUSTATE_HAVE_", xcs.upper());
-	if (getPossibleAliasesForXCpuState(xcs)) {
-		print("#ifdef ", xcs.upper(), "_ALIAS");
-		print("__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_WUNUSED __ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_get,(struct ", xcs, " const *__restrict __state, cpu_regno_t __regno, void *__restrict __buf, __size_t __buflen),__LIBCPU_REGISTER_GET_GENERATE_ASMNAME(", xcs.upper(), "_ALIAS),(__state,__regno,__buf,__buflen))");
-		print("#ifdef LIBCPUSTATE_HAVE_REGISTER_SET_", xcs.upper(), "_P_STATE");
-		print("__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set_p,(struct ", xcs, " **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),__LIBCPU_REGISTER_SET_P_GENERATE_ASMNAME(", xcs.upper(), "_ALIAS),(__p_state,__regno,__buf,__buflen))");
-		print("#else /" "* LIBCPUSTATE_HAVE_REGISTER_SET_", xcs.upper(), "_P_STATE *" "/");
-		print("__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set,(struct ", xcs, " *__restrict __state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),__LIBCPU_REGISTER_SET_GENERATE_ASMNAME(", xcs.upper(), "_ALIAS),(__state,__regno,__buf,__buflen))");
-		print("__FORCELOCAL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC register_set_p)(struct ", xcs, " **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen) { return register_set(*__p_state, __regno, __buf, __buflen); }");
-		print("#endif /" "* !LIBCPUSTATE_HAVE_REGISTER_SET_", xcs.upper(), "_P_STATE *" "/");
-		print("#else /" "* ", xcs.upper(), "_ALIAS *" "/");
-		print("__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_WUNUSED __ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_get,(struct ", xcs, " const *__restrict __state, cpu_regno_t __regno, void *__restrict __buf, __size_t __buflen),register_get_", xcs, ",(__state,__regno,__buf,__buflen))");
-		print("#ifdef LIBCPUSTATE_HAVE_REGISTER_SET_", xcs.upper(), "_P_STATE");
-		print("__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set_p,(struct ", xcs, " **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),register_set_", xcs, "_p,(__p_state,__regno,__buf,__buflen))");
-		print("#else /" "* LIBCPUSTATE_HAVE_REGISTER_SET_", xcs.upper(), "_P_STATE *" "/");
-		print("__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set,(struct ", xcs, " *__restrict __state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),register_set_", xcs, ",(__state,__regno,__buf,__buflen))");
-		print("__FORCELOCAL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC register_set_p)(struct ", xcs, " **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen) { return register_set(*__p_state, __regno, __buf, __buflen); }");
-		print("#endif /" "* !LIBCPUSTATE_HAVE_REGISTER_SET_", xcs.upper(), "_P_STATE *" "/");
-		print("#endif /" "* !", xcs.upper(), "_ALIAS *" "/");
+	local aliases = getPossibleAliasesForXCpuState(xcs);
+	if (aliases) {
+		print("#if defined(LIBCPUSTATE_HAVE_", xcs.upper(), ") && !defined(", xcs.upper(), "_ALIAS)");
 	} else {
-		print("__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_WUNUSED __ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_get,(struct ", xcs, " const *__restrict __state, cpu_regno_t __regno, void *__restrict __buf, __size_t __buflen),register_get_", xcs, ",(__state,__regno,__buf,__buflen))");
-		print("#ifdef LIBCPUSTATE_HAVE_REGISTER_SET_", xcs.upper(), "_P_STATE");
-		print("__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set_p,(struct ", xcs, " **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),register_set_", xcs, "_p,(__p_state,__regno,__buf,__buflen))");
-		print("#else /" "* LIBCPUSTATE_HAVE_REGISTER_SET_", xcs.upper(), "_P_STATE *" "/");
-		print("__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set,(struct ", xcs, " *__restrict __state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),register_set_", xcs, ",(__state,__regno,__buf,__buflen))");
-		print("__FORCELOCAL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC register_set_p)(struct ", xcs, " **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen) { return register_set(*__p_state, __regno, __buf, __buflen); }");
-		print("#endif /" "* !LIBCPUSTATE_HAVE_REGISTER_SET_", xcs.upper(), "_P_STATE *" "/");
+		print("#ifdef LIBCPUSTATE_HAVE_", xcs.upper());
 	}
-	print("#endif /" "* LIBCPUSTATE_HAVE_", xcs.upper(), " *" "/");
+	print("__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_WUNUSED __ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_get,(struct ", xcs, " const *__restrict __state, cpu_regno_t __regno, void *__restrict __buf, __size_t __buflen),register_get_", xcs, ",(__state,__regno,__buf,__buflen))");
+	print("#ifdef LIBCPUSTATE_HAVE_REGISTER_SET_", xcs.upper(), "_P_STATE");
+	print("__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set_p,(struct ", xcs, " **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),register_set_", xcs, "_p,(__p_state,__regno,__buf,__buflen))");
+	print("#else /" "* LIBCPUSTATE_HAVE_REGISTER_SET_", xcs.upper(), "_P_STATE *" "/");
+	print("__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set,(struct ", xcs, " *__restrict __state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),register_set_", xcs, ",(__state,__regno,__buf,__buflen))");
+	print("__FORCELOCAL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC register_set_p)(struct ", xcs, " **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen) { return register_set(*__p_state, __regno, __buf, __buflen); }");
+	print("#endif /" "* !LIBCPUSTATE_HAVE_REGISTER_SET_", xcs.upper(), "_P_STATE *" "/");
+	if (aliases) {
+		print("#endif /" "* LIBCPUSTATE_HAVE_", xcs.upper(), " && !", xcs.upper(), "_ALIAS *" "/");
+	} else {
+		print("#endif /" "* LIBCPUSTATE_HAVE_", xcs.upper(), " *" "/");
+	}
 }
 print("} /" "* extern \"C++\" *" "/");
 print("#endif /" "* __cplusplus && LIBCPUSTATE_WANT_PROTOTYPES *" "/");
@@ -815,16 +804,7 @@ __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,
 __FORCELOCAL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC register_set_p)(struct ucpustate **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen) { return register_set(*__p_state, __regno, __buf, __buflen); }
 #endif /* !LIBCPUSTATE_HAVE_REGISTER_SET_UCPUSTATE_P_STATE */
 #endif /* LIBCPUSTATE_HAVE_UCPUSTATE */
-#ifdef LIBCPUSTATE_HAVE_LCPUSTATE
-#ifdef LCPUSTATE_ALIAS
-__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_WUNUSED __ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_get,(struct lcpustate const *__restrict __state, cpu_regno_t __regno, void *__restrict __buf, __size_t __buflen),__LIBCPU_REGISTER_GET_GENERATE_ASMNAME(LCPUSTATE_ALIAS),(__state,__regno,__buf,__buflen))
-#ifdef LIBCPUSTATE_HAVE_REGISTER_SET_LCPUSTATE_P_STATE
-__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set_p,(struct lcpustate **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),__LIBCPU_REGISTER_SET_P_GENERATE_ASMNAME(LCPUSTATE_ALIAS),(__p_state,__regno,__buf,__buflen))
-#else /* LIBCPUSTATE_HAVE_REGISTER_SET_LCPUSTATE_P_STATE */
-__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set,(struct lcpustate *__restrict __state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),__LIBCPU_REGISTER_SET_GENERATE_ASMNAME(LCPUSTATE_ALIAS),(__state,__regno,__buf,__buflen))
-__FORCELOCAL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC register_set_p)(struct lcpustate **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen) { return register_set(*__p_state, __regno, __buf, __buflen); }
-#endif /* !LIBCPUSTATE_HAVE_REGISTER_SET_LCPUSTATE_P_STATE */
-#else /* LCPUSTATE_ALIAS */
+#if defined(LIBCPUSTATE_HAVE_LCPUSTATE) && !defined(LCPUSTATE_ALIAS)
 __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_WUNUSED __ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_get,(struct lcpustate const *__restrict __state, cpu_regno_t __regno, void *__restrict __buf, __size_t __buflen),register_get_lcpustate,(__state,__regno,__buf,__buflen))
 #ifdef LIBCPUSTATE_HAVE_REGISTER_SET_LCPUSTATE_P_STATE
 __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set_p,(struct lcpustate **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),register_set_lcpustate_p,(__p_state,__regno,__buf,__buflen))
@@ -832,18 +812,8 @@ __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,
 __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set,(struct lcpustate *__restrict __state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),register_set_lcpustate,(__state,__regno,__buf,__buflen))
 __FORCELOCAL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC register_set_p)(struct lcpustate **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen) { return register_set(*__p_state, __regno, __buf, __buflen); }
 #endif /* !LIBCPUSTATE_HAVE_REGISTER_SET_LCPUSTATE_P_STATE */
-#endif /* !LCPUSTATE_ALIAS */
-#endif /* LIBCPUSTATE_HAVE_LCPUSTATE */
-#ifdef LIBCPUSTATE_HAVE_KCPUSTATE
-#ifdef KCPUSTATE_ALIAS
-__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_WUNUSED __ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_get,(struct kcpustate const *__restrict __state, cpu_regno_t __regno, void *__restrict __buf, __size_t __buflen),__LIBCPU_REGISTER_GET_GENERATE_ASMNAME(KCPUSTATE_ALIAS),(__state,__regno,__buf,__buflen))
-#ifdef LIBCPUSTATE_HAVE_REGISTER_SET_KCPUSTATE_P_STATE
-__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set_p,(struct kcpustate **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),__LIBCPU_REGISTER_SET_P_GENERATE_ASMNAME(KCPUSTATE_ALIAS),(__p_state,__regno,__buf,__buflen))
-#else /* LIBCPUSTATE_HAVE_REGISTER_SET_KCPUSTATE_P_STATE */
-__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set,(struct kcpustate *__restrict __state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),__LIBCPU_REGISTER_SET_GENERATE_ASMNAME(KCPUSTATE_ALIAS),(__state,__regno,__buf,__buflen))
-__FORCELOCAL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC register_set_p)(struct kcpustate **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen) { return register_set(*__p_state, __regno, __buf, __buflen); }
-#endif /* !LIBCPUSTATE_HAVE_REGISTER_SET_KCPUSTATE_P_STATE */
-#else /* KCPUSTATE_ALIAS */
+#endif /* LIBCPUSTATE_HAVE_LCPUSTATE && !LCPUSTATE_ALIAS */
+#if defined(LIBCPUSTATE_HAVE_KCPUSTATE) && !defined(KCPUSTATE_ALIAS)
 __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_WUNUSED __ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_get,(struct kcpustate const *__restrict __state, cpu_regno_t __regno, void *__restrict __buf, __size_t __buflen),register_get_kcpustate,(__state,__regno,__buf,__buflen))
 #ifdef LIBCPUSTATE_HAVE_REGISTER_SET_KCPUSTATE_P_STATE
 __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set_p,(struct kcpustate **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),register_set_kcpustate_p,(__p_state,__regno,__buf,__buflen))
@@ -851,18 +821,8 @@ __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,
 __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set,(struct kcpustate *__restrict __state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),register_set_kcpustate,(__state,__regno,__buf,__buflen))
 __FORCELOCAL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC register_set_p)(struct kcpustate **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen) { return register_set(*__p_state, __regno, __buf, __buflen); }
 #endif /* !LIBCPUSTATE_HAVE_REGISTER_SET_KCPUSTATE_P_STATE */
-#endif /* !KCPUSTATE_ALIAS */
-#endif /* LIBCPUSTATE_HAVE_KCPUSTATE */
-#ifdef LIBCPUSTATE_HAVE_ICPUSTATE
-#ifdef ICPUSTATE_ALIAS
-__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_WUNUSED __ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_get,(struct icpustate const *__restrict __state, cpu_regno_t __regno, void *__restrict __buf, __size_t __buflen),__LIBCPU_REGISTER_GET_GENERATE_ASMNAME(ICPUSTATE_ALIAS),(__state,__regno,__buf,__buflen))
-#ifdef LIBCPUSTATE_HAVE_REGISTER_SET_ICPUSTATE_P_STATE
-__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set_p,(struct icpustate **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),__LIBCPU_REGISTER_SET_P_GENERATE_ASMNAME(ICPUSTATE_ALIAS),(__p_state,__regno,__buf,__buflen))
-#else /* LIBCPUSTATE_HAVE_REGISTER_SET_ICPUSTATE_P_STATE */
-__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set,(struct icpustate *__restrict __state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),__LIBCPU_REGISTER_SET_GENERATE_ASMNAME(ICPUSTATE_ALIAS),(__state,__regno,__buf,__buflen))
-__FORCELOCAL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC register_set_p)(struct icpustate **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen) { return register_set(*__p_state, __regno, __buf, __buflen); }
-#endif /* !LIBCPUSTATE_HAVE_REGISTER_SET_ICPUSTATE_P_STATE */
-#else /* ICPUSTATE_ALIAS */
+#endif /* LIBCPUSTATE_HAVE_KCPUSTATE && !KCPUSTATE_ALIAS */
+#if defined(LIBCPUSTATE_HAVE_ICPUSTATE) && !defined(ICPUSTATE_ALIAS)
 __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_WUNUSED __ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_get,(struct icpustate const *__restrict __state, cpu_regno_t __regno, void *__restrict __buf, __size_t __buflen),register_get_icpustate,(__state,__regno,__buf,__buflen))
 #ifdef LIBCPUSTATE_HAVE_REGISTER_SET_ICPUSTATE_P_STATE
 __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set_p,(struct icpustate **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),register_set_icpustate_p,(__p_state,__regno,__buf,__buflen))
@@ -870,18 +830,8 @@ __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,
 __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set,(struct icpustate *__restrict __state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),register_set_icpustate,(__state,__regno,__buf,__buflen))
 __FORCELOCAL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC register_set_p)(struct icpustate **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen) { return register_set(*__p_state, __regno, __buf, __buflen); }
 #endif /* !LIBCPUSTATE_HAVE_REGISTER_SET_ICPUSTATE_P_STATE */
-#endif /* !ICPUSTATE_ALIAS */
-#endif /* LIBCPUSTATE_HAVE_ICPUSTATE */
-#ifdef LIBCPUSTATE_HAVE_SCPUSTATE
-#ifdef SCPUSTATE_ALIAS
-__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_WUNUSED __ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_get,(struct scpustate const *__restrict __state, cpu_regno_t __regno, void *__restrict __buf, __size_t __buflen),__LIBCPU_REGISTER_GET_GENERATE_ASMNAME(SCPUSTATE_ALIAS),(__state,__regno,__buf,__buflen))
-#ifdef LIBCPUSTATE_HAVE_REGISTER_SET_SCPUSTATE_P_STATE
-__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set_p,(struct scpustate **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),__LIBCPU_REGISTER_SET_P_GENERATE_ASMNAME(SCPUSTATE_ALIAS),(__p_state,__regno,__buf,__buflen))
-#else /* LIBCPUSTATE_HAVE_REGISTER_SET_SCPUSTATE_P_STATE */
-__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set,(struct scpustate *__restrict __state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),__LIBCPU_REGISTER_SET_GENERATE_ASMNAME(SCPUSTATE_ALIAS),(__state,__regno,__buf,__buflen))
-__FORCELOCAL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC register_set_p)(struct scpustate **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen) { return register_set(*__p_state, __regno, __buf, __buflen); }
-#endif /* !LIBCPUSTATE_HAVE_REGISTER_SET_SCPUSTATE_P_STATE */
-#else /* SCPUSTATE_ALIAS */
+#endif /* LIBCPUSTATE_HAVE_ICPUSTATE && !ICPUSTATE_ALIAS */
+#if defined(LIBCPUSTATE_HAVE_SCPUSTATE) && !defined(SCPUSTATE_ALIAS)
 __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_WUNUSED __ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_get,(struct scpustate const *__restrict __state, cpu_regno_t __regno, void *__restrict __buf, __size_t __buflen),register_get_scpustate,(__state,__regno,__buf,__buflen))
 #ifdef LIBCPUSTATE_HAVE_REGISTER_SET_SCPUSTATE_P_STATE
 __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set_p,(struct scpustate **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),register_set_scpustate_p,(__p_state,__regno,__buf,__buflen))
@@ -889,18 +839,8 @@ __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,
 __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set,(struct scpustate *__restrict __state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),register_set_scpustate,(__state,__regno,__buf,__buflen))
 __FORCELOCAL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC register_set_p)(struct scpustate **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen) { return register_set(*__p_state, __regno, __buf, __buflen); }
 #endif /* !LIBCPUSTATE_HAVE_REGISTER_SET_SCPUSTATE_P_STATE */
-#endif /* !SCPUSTATE_ALIAS */
-#endif /* LIBCPUSTATE_HAVE_SCPUSTATE */
-#ifdef LIBCPUSTATE_HAVE_FCPUSTATE
-#ifdef FCPUSTATE_ALIAS
-__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_WUNUSED __ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_get,(struct fcpustate const *__restrict __state, cpu_regno_t __regno, void *__restrict __buf, __size_t __buflen),__LIBCPU_REGISTER_GET_GENERATE_ASMNAME(FCPUSTATE_ALIAS),(__state,__regno,__buf,__buflen))
-#ifdef LIBCPUSTATE_HAVE_REGISTER_SET_FCPUSTATE_P_STATE
-__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set_p,(struct fcpustate **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),__LIBCPU_REGISTER_SET_P_GENERATE_ASMNAME(FCPUSTATE_ALIAS),(__p_state,__regno,__buf,__buflen))
-#else /* LIBCPUSTATE_HAVE_REGISTER_SET_FCPUSTATE_P_STATE */
-__COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set,(struct fcpustate *__restrict __state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),__LIBCPU_REGISTER_SET_GENERATE_ASMNAME(FCPUSTATE_ALIAS),(__state,__regno,__buf,__buflen))
-__FORCELOCAL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC register_set_p)(struct fcpustate **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen) { return register_set(*__p_state, __regno, __buf, __buflen); }
-#endif /* !LIBCPUSTATE_HAVE_REGISTER_SET_FCPUSTATE_P_STATE */
-#else /* FCPUSTATE_ALIAS */
+#endif /* LIBCPUSTATE_HAVE_SCPUSTATE && !SCPUSTATE_ALIAS */
+#if defined(LIBCPUSTATE_HAVE_FCPUSTATE) && !defined(FCPUSTATE_ALIAS)
 __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_WUNUSED __ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_get,(struct fcpustate const *__restrict __state, cpu_regno_t __regno, void *__restrict __buf, __size_t __buflen),register_get_fcpustate,(__state,__regno,__buf,__buflen))
 #ifdef LIBCPUSTATE_HAVE_REGISTER_SET_FCPUSTATE_P_STATE
 __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set_p,(struct fcpustate **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),register_set_fcpustate_p,(__p_state,__regno,__buf,__buflen))
@@ -908,8 +848,7 @@ __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,
 __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_set,(struct fcpustate *__restrict __state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen),register_set_fcpustate,(__state,__regno,__buf,__buflen))
 __FORCELOCAL __ATTR_NONNULL((1)) __size_t __NOTHROW_NCX(LIBCPUSTATE_CC register_set_p)(struct fcpustate **__restrict __p_state, cpu_regno_t __regno, void const *__restrict __buf, __size_t __buflen) { return register_set(*__p_state, __regno, __buf, __buflen); }
 #endif /* !LIBCPUSTATE_HAVE_REGISTER_SET_FCPUSTATE_P_STATE */
-#endif /* !FCPUSTATE_ALIAS */
-#endif /* LIBCPUSTATE_HAVE_FCPUSTATE */
+#endif /* LIBCPUSTATE_HAVE_FCPUSTATE && !FCPUSTATE_ALIAS */
 #ifdef LIBCPUSTATE_HAVE_MCONTEXT
 __COMPILER_REDIRECT(LIBCPUSTATE_DECL,__ATTR_WUNUSED __ATTR_NONNULL((1)),__size_t,__NOTHROW_NCX,LIBCPUSTATE_CC,register_get,(struct mcontext const *__restrict __state, cpu_regno_t __regno, void *__restrict __buf, __size_t __buflen),register_get_mcontext,(__state,__regno,__buf,__buflen))
 #ifdef LIBCPUSTATE_HAVE_REGISTER_SET_MCONTEXT_P_STATE

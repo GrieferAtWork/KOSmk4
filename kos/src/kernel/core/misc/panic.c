@@ -447,7 +447,7 @@ panic_assert_chk_dbg_main(void *arg) {
 	struct assert_args *args;
 	unsigned int option;
 	args = (struct assert_args *)arg;
-	if (is_pc_always_ignored(dbg_getpcreg(DBG_REGLEVEL_TRAP))) {
+	if (is_pc_always_ignored(dbg_getpcreg(DBG_RT_REGLEVEL_TRAP))) {
 		option = ASSERTION_OPTION_IGNORE;
 		goto handle_retry_or_ignore;
 	}
@@ -464,7 +464,7 @@ panic_assert_chk_dbg_main(void *arg) {
 		for (i = 0; i < lengthof(always_ignored_assertions); ++i) {
 			if (always_ignored_assertions[i])
 				continue;
-			always_ignored_assertions[i] = dbg_getpcreg(DBG_REGLEVEL_TRAP);
+			always_ignored_assertions[i] = dbg_getpcreg(DBG_RT_REGLEVEL_TRAP);
 			break;
 		}
 		option = ASSERTION_OPTION_IGNORE;
@@ -478,17 +478,11 @@ handle_retry_or_ignore:
 		dbg_current = THIS_TASK;
 		/* TODO: Make this part arch-independent */
 #ifdef __x86_64__
-		dbg_setregbyidp(DBG_REGLEVEL_TRAP,
-		                    X86_REGISTER_GENERAL_PURPOSE_RAX,
-		                    acheck_result);
+		dbg_rt_setregbyidp(DBG_RT_REGLEVEL_TRAP, X86_REGISTER_GENERAL_PURPOSE_RAX, acheck_result);
 #elif defined(__i386__)
-		dbg_setregbyidp(DBG_REGLEVEL_TRAP,
-		                    X86_REGISTER_GENERAL_PURPOSE_EAX,
-		                    acheck_result);
+		dbg_rt_setregbyidp(DBG_RT_REGLEVEL_TRAP, X86_REGISTER_GENERAL_PURPOSE_EAX, acheck_result);
 #elif defined(__arm__)
-		arm_dbg_setregbyidp(DBG_REGLEVEL_TRAP,
-		                    ARM_REGISTER_GENERAL_PURPOSE_R0,
-		                    acheck_result);
+		dbg_rt_setregbyidp(DBG_RT_REGLEVEL_TRAP, ARM_REGISTER_R0, acheck_result);
 #else /* ... */
 #error "Unsupported arch"
 #endif /* !... */
@@ -567,8 +561,8 @@ PRIVATE ATTR_DBGTEXT void KCALL
 panic_genfail_dbg_main(/*char const **/ void *message) {
 	void const *pc, *prev_pc;
 	instrlen_isa_t isa;
-	pc      = dbg_getpcreg(DBG_REGLEVEL_TRAP);
-	isa     = dbg_instrlen_isa(DBG_REGLEVEL_TRAP);
+	pc      = dbg_getpcreg(DBG_RT_REGLEVEL_TRAP);
+	isa     = dbg_rt_instrlen_isa(DBG_RT_REGLEVEL_TRAP);
 	prev_pc = instruction_trypred(pc, isa);
 	dbg_printf(DBGSTR(AC_COLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON) "%s" AC_DEFCOLOR "%[vinfo:"
 	                  "file: " AC_WHITE("%f") " (line " AC_WHITE("%l") ", column " AC_WHITE("%c") ")\n"
@@ -659,8 +653,8 @@ panic_kernel_dbg_main(void *arg) {
 	void const *pc, *prev_pc;
 	instrlen_isa_t isa;
 	args = (struct panic_args *)arg;
-	pc      = dbg_getpcreg(DBG_REGLEVEL_TRAP);
-	isa     = dbg_instrlen_isa(DBG_REGLEVEL_TRAP);
+	pc      = dbg_getpcreg(DBG_RT_REGLEVEL_TRAP);
+	isa     = dbg_rt_instrlen_isa(DBG_RT_REGLEVEL_TRAP);
 	prev_pc = instruction_trypred(pc, isa);
 	dbg_printf(DBGSTR("Kernel Panic\n"
 	                  "%[vinfo:" "file: " AC_WHITE("%f") " (line " AC_WHITE("%l") ", column " AC_WHITE("%c") ")\n"

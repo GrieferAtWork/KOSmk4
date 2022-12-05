@@ -165,14 +165,6 @@ struct x86_dbg_hoststate {
 /* Host-thread special-state backup data. (saved/restored by `dbg_init()' and `dbg_fini()') */
 DATDEF struct x86_dbg_hoststate x86_dbg_hostbackup;
 
-/* DBG trap state information. */
-/* [valid_if(x86_dbg_trapstatekind != X86_DBG_STATEKIND_NONE)]
- * This is a `struct Xcpustate *' (depending on `x86_dbg_trapstatekind') */
-DATDEF void *x86_dbg_trapstate;
-/* The kind of state stored in `x86_dbg_trapstate' (one of `X86_DBG_STATEKIND_*') */
-DATDEF unsigned int x86_dbg_trapstatekind;
-
-
 /* The CPU state that gets loaded when `dbg_exit()' is called. */
 struct x86_dbg_exitstate_struct {
 	struct fcpustate de_state;         /* Full CPU state */
@@ -212,38 +204,16 @@ DATDEF struct idt_segment x86_dbgaltcoreidt[256];
 DATDEF struct desctab const x86_dbgaltcoreidt_ptr;
 #endif /* !CONFIG_NO_SMP */
 #endif /* !__x86_dbgidt_defined */
-
-#ifndef __dbg_stack_defined
-#define __dbg_stack_defined
-DATDEF byte_t dbg_stack[KERNEL_DEBUG_STACKSIZE];
-#endif /* !__dbg_stack_defined */
-
-FORCELOCAL WUNUSED bool
-NOTHROW(FCALL dbg_onstack)(void) {
-	void *sp = __rdsp();
-	return sp >= dbg_stack &&
-	       sp <= dbg_stack + KERNEL_DEBUG_STACKSIZE;
-}
 #endif /* __CC__ */
 
 #ifdef __x86_64__
 #define dbg_current_iscompat() \
-	__KOS64_IS_CS32BIT(dbg_getregbyidp(DBG_REGLEVEL_VIEW, X86_REGISTER_SEGMENT_CS))
+	__KOS64_IS_CS32BIT(dbg_rt_getregbyidp(DBG_RT_REGLEVEL_VIEW, X86_REGISTER_SEGMENT_CS))
 #define dbg_current_sizeof_pointer() \
 	(dbg_current_iscompat() ? 4 : 8)
 #else /* __x86_64__ */
 #define dbg_current_sizeof_pointer() 4
 #endif /* !__x86_64__ */
-
-
-/* CPU state kind codes. */
-#define X86_DBG_STATEKIND_NONE 0 /* No DBG_REGLEVEL_TRAP-level CPU state */
-#define X86_DBG_STATEKIND_FCPU 1 /* `struct fcpustate' */
-#define X86_DBG_STATEKIND_UCPU 2 /* `struct ucpustate' */
-#define X86_DBG_STATEKIND_LCPU 3 /* `struct lcpustate' */
-#define X86_DBG_STATEKIND_KCPU 4 /* `struct kcpustate' */
-#define X86_DBG_STATEKIND_ICPU 5 /* `struct icpustate' */
-#define X86_DBG_STATEKIND_SCPU 6 /* `struct scpustate' */
 
 DECL_END
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */

@@ -59,7 +59,7 @@ static_assert(sizeof(((union ieee854_float80 *)0)->ieee_nan) == 10);
 /*[[[deemon
 import * from .....misc.libgen.assert_offsetof;
 local files = {
-	"../../../../include/arm-kos/kos/kernel/cpu-state.h",
+	"../../../../include/arm-kos/kos/kernel/bits/cpu-state.h",
 };
 
 local include_prefixes = {
@@ -89,7 +89,7 @@ for (local f: files)
 	genAsserts(f);
 
 ]]]*/
-#include <kos/kernel/cpu-state.h>
+#include <kos/kernel/bits/cpu-state.h>
 
 /* struct ucpustate */
 static_assert(offsetof(struct ucpustate, ucs_cpsr) == OFFSET_UCPUSTATE_CPSR);
@@ -113,7 +113,6 @@ static_assert(sizeof(struct ucpustate) == SIZEOF_UCPUSTATE);
 static_assert(alignof(struct ucpustate) == ALIGNOF_UCPUSTATE);
 
 /* struct lcpustate */
-static_assert(offsetof(struct lcpustate, lcs_lr) == OFFSET_LCPUSTATE_LR);
 static_assert(offsetof(struct lcpustate, lcs_pc) == OFFSET_LCPUSTATE_PC);
 static_assert(offsetof(struct lcpustate, lcs_r10) == OFFSET_LCPUSTATE_R10);
 static_assert(offsetof(struct lcpustate, lcs_r11) == OFFSET_LCPUSTATE_R11);

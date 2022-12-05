@@ -617,7 +617,7 @@ NOTHROW(FCALL av_main)(void *addr) {
 		av_instrlen_da.d_target = DISASSEMBLER_TARGET_I386;
 #elif defined(__i386__)
 #ifndef __I386_NO_VM86
-	if (dbg_getregbyidp(DBG_REGLEVEL_VIEW, X86_REGISTER_MISC_EFLAGS) & EFLAGS_VM)
+	if (dbg_rt_getregbyidp(DBG_RT_REGLEVEL_VIEW, X86_REGISTER_MISC_EFLAGS) & EFLAGS_VM)
 		av_instrlen_da.d_target = DISASSEMBLER_TARGET_8086;
 #endif /* !__I386_NO_VM86 */
 #endif /* ... */
@@ -785,7 +785,7 @@ DBG_COMMAND(a,
             "a [ADDR=faultpc]\n"
             "\tOpen an interactive assembly view at ADDR\n",
             argc, argv) {
-	void *addr = dbg_getfaultpcreg(DBG_REGLEVEL_VIEW);
+	void *addr = dbg_getfaultpcreg(DBG_RT_REGLEVEL_VIEW);
 	if (argc >= 2) {
 		if (!dbg_evaladdr(argv[1], (uintptr_t *)&addr))
 			return DBG_STATUS_INVALID_ARGUMENTS;

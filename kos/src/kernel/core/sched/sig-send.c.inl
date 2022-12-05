@@ -280,7 +280,7 @@ NOTHROW(FCALL sig_broadcast_as_for_fini_cleanup_nopr)(struct sig *__restrict sel
 	assert(!preemption_ison());
 #define LOCAL_preemption_pushoff() (void)0
 #define LOCAL_preemption_pop()     (void)0
-#define LOCAL_was                  PREEMPTION_DISABLED_VALUE
+#define LOCAL_was                  PREEMPTION_OFF_VALUE
 #else /* HAVE_NOPREEMPT */
 	preemption_flag_t was;
 #define LOCAL_preemption_pushoff() preemption_pushoff(&was)
@@ -306,7 +306,9 @@ NOTHROW(FCALL sig_broadcast_as_for_fini_cleanup_nopr)(struct sig *__restrict sel
 #else /* HAVE_FOR_FINI */
 #define LOCAL_TASK_CONNECTION_STAT_FFINI 0
 #endif /* !HAVE_FOR_FINI */
+#ifndef CONFIG_NO_SMP
 again_disable_preemption:
+#endif /* !CONFIG_NO_SMP */
 	LOCAL_preemption_pushoff();
 #ifdef CONFIG_NO_SMP
 again:

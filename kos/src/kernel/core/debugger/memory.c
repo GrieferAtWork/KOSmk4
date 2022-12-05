@@ -51,9 +51,9 @@ DECL_BEGIN
 
 
 /* Return the page directory of `dbg_current' */
-PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_getpagedir")
+PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_rt_getpagedir")
 ATTR_PURE WUNUSED pagedir_phys_t
-NOTHROW(KCALL dbg_getpagedir)(void) {
+NOTHROW(KCALL dbg_rt_getpagedir)(void) {
 	struct mman *mm;
 	if (!dbg_current)
 		goto fallback;
@@ -66,8 +66,8 @@ fallback:
 }
 
 /* Verify that the given page directory isn't corrupt. */
-PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_verifypagedir") ATTR_PURE WUNUSED bool
-NOTHROW(KCALL dbg_verifypagedir)(pagedir_phys_t pdir) {
+PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_rt_verifypagedir") ATTR_PURE WUNUSED bool
+NOTHROW(KCALL dbg_rt_verifypagedir)(pagedir_phys_t pdir) {
 #if PAGEDIR_ALIGN > 1
 	if (!IS_ALIGNED((uintptr_t)pdir, PAGEDIR_ALIGN))
 		return false; /* Badly aligned. */
@@ -141,8 +141,8 @@ NOTHROW(KCALL dbg_readmemory)(void const *addr,
 		}
 	} else {
 		pagedir_phys_t pdir;
-		pdir = dbg_getpagedir();
-		if (!dbg_verifypagedir(pdir))
+		pdir = dbg_rt_getpagedir();
+		if (!dbg_rt_verifypagedir(pdir))
 			return num_bytes;
 		/* Leave interrupts unchanged, since we don't have to worry
 		 * about being preempted by another thread. (and if we are,
@@ -249,8 +249,8 @@ again_memcpy_nopf_kernel:
 		}
 		return error;
 	}
-	pdir = dbg_getpagedir();
-	if (!dbg_verifypagedir(pdir))
+	pdir = dbg_rt_getpagedir();
+	if (!dbg_rt_verifypagedir(pdir))
 		return num_bytes;
 	PAGEDIR_P_BEGINUSE_KEEP_PR(pdir) {
 again_memcpy_nopf:

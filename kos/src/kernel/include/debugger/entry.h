@@ -60,10 +60,10 @@ struct dbg_entry_info {
 		size_t      ei_argc;       /* Number of pointer-arguments taken by `ei_entry' */ \
 	}
 
-#ifndef __dbg_active_defined
-#define __dbg_active_defined
 /* Set to true while the debugger is currently active.
  * NOTE: This variable may be used to test if the system is being debugged. */
+#ifndef __dbg_active_defined
+#define __dbg_active_defined
 DATDEF bool dbg_active;
 #endif /* !__dbg_active_defined */
 

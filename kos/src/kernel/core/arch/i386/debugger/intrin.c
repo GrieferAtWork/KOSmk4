@@ -102,11 +102,11 @@ DBG_COMMAND(cli,
             "cli\n"
             "\tSet " AC_WITHCOLOR(ANSITTY_CL_DARK_GRAY, ANSITTY_CL_LIGHT_GRAY, "EFLAGS.IF = 0") "\n") {
 	uintptr_t pflags;
-	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
+	pflags = dbg_getregp(DBG_RT_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("cli EFLAGS.IF = 0 (was %u)\n"),
 	           pflags & EFLAGS_IF ? 1 : 0);
 	pflags &= ~EFLAGS_IF;
-	dbg_setregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
+	dbg_setregp(DBG_RT_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
 	return 0;
 }
 
@@ -114,11 +114,11 @@ DBG_COMMAND(sti,
             "sti\n"
             "\tSet " AC_WITHCOLOR(ANSITTY_CL_DARK_GRAY, ANSITTY_CL_LIGHT_GRAY, "EFLAGS.IF = 1") "\n") {
 	uintptr_t pflags;
-	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
+	pflags = dbg_getregp(DBG_RT_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("sti EFLAGS.IF = 1 (was %u)\n"),
 	           pflags & EFLAGS_IF ? 1 : 0);
 	pflags |= EFLAGS_IF;
-	dbg_setregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
+	dbg_setregp(DBG_RT_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
 	return 0;
 }
 
@@ -126,11 +126,11 @@ DBG_COMMAND(cld,
             "cld\n"
             "\tSet " AC_WITHCOLOR(ANSITTY_CL_DARK_GRAY, ANSITTY_CL_LIGHT_GRAY, "EFLAGS.DF = 0") "\n") {
 	uintptr_t pflags;
-	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
+	pflags = dbg_getregp(DBG_RT_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("cld EFLAGS.DF = 0 (was %u)\n"),
 	           pflags & EFLAGS_DF ? 1 : 0);
 	pflags &= ~EFLAGS_DF;
-	dbg_setregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
+	dbg_setregp(DBG_RT_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
 	return 0;
 }
 
@@ -138,11 +138,11 @@ DBG_COMMAND(std,
             "std\n"
             "\tSet " AC_WITHCOLOR(ANSITTY_CL_DARK_GRAY, ANSITTY_CL_LIGHT_GRAY, "EFLAGS.DF = 1") "\n") {
 	uintptr_t pflags;
-	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
+	pflags = dbg_getregp(DBG_RT_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("std EFLAGS.DF = 1 (was %u)\n"),
 	           pflags & EFLAGS_DF ? 1 : 0);
 	pflags |= EFLAGS_DF;
-	dbg_setregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
+	dbg_setregp(DBG_RT_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
 	return 0;
 }
 
@@ -150,11 +150,11 @@ DBG_COMMAND(clc,
             "clc\n"
             "\tSet " AC_WITHCOLOR(ANSITTY_CL_DARK_GRAY, ANSITTY_CL_LIGHT_GRAY, "EFLAGS.CF = 0") "\n") {
 	uintptr_t pflags;
-	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
+	pflags = dbg_getregp(DBG_RT_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("clc EFLAGS.CF = 0 (was %u)\n"),
 	           pflags & EFLAGS_CF ? 1 : 0);
 	pflags &= ~EFLAGS_CF;
-	dbg_setregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
+	dbg_setregp(DBG_RT_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
 	return 0;
 }
 
@@ -162,11 +162,11 @@ DBG_COMMAND(stc,
             "stc\n"
             "\tSet " AC_WITHCOLOR(ANSITTY_CL_DARK_GRAY, ANSITTY_CL_LIGHT_GRAY, "EFLAGS.CF = 1") "\n") {
 	uintptr_t pflags;
-	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
+	pflags = dbg_getregp(DBG_RT_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("stc EFLAGS.CF = 1 (was %u)\n"),
 	           pflags & EFLAGS_CF ? 1 : 0);
 	pflags |= EFLAGS_CF;
-	dbg_setregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
+	dbg_setregp(DBG_RT_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
 	return 0;
 }
 
@@ -174,12 +174,12 @@ DBG_COMMAND(cmc,
             "cmc\n"
             "\tSet " AC_WITHCOLOR(ANSITTY_CL_DARK_GRAY, ANSITTY_CL_LIGHT_GRAY, "EFLAGS.CF = -EFLAGS.CF") "\n") {
 	uintptr_t pflags;
-	pflags = dbg_getregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
+	pflags = dbg_getregp(DBG_RT_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS);
 	dbg_printf(DBGSTR("stc EFLAGS.CF = %u (was %u)\n"),
 	           pflags & EFLAGS_CF ? 0 : 1,
 	           pflags & EFLAGS_CF ? 1 : 0);
 	pflags ^= EFLAGS_CF;
-	dbg_setregp(DBG_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
+	dbg_setregp(DBG_RT_REGLEVEL_VIEW, CFI_UNWIND_REGISTER_PFLAGS, pflags);
 	return 0;
 }
 
@@ -195,10 +195,10 @@ DBG_COMMAND(lgdt,
 	    sscanf(argv[2], DBGSTR("%" SCNxPTR), &base) != 1)
 		return DBG_STATUS_INVALID_ARGUMENTS;
 	dbg_printf(DBGSTR("lgdt #%.4" PRIx16 " (%" PRIu16 "), %p\n"), limit, limit, base);
-	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
+	dbg_rt_getallregs(DBG_RT_REGLEVEL_VIEW, &fst);
 	fst.fcs_gdt.dt_limit = limit;
 	fst.fcs_gdt.dt_base  = base;
-	dbg_setallregs(DBG_REGLEVEL_VIEW, &fst);
+	dbg_rt_setallregs(DBG_RT_REGLEVEL_VIEW, &fst);
 	return 0;
 }
 
@@ -206,7 +206,7 @@ DBG_COMMAND(sgdt,
             "sgdt\n"
             "\tPrint the base and limit of the current Global Descriptor Table\n") {
 	struct fcpustate fst;
-	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
+	dbg_rt_getallregs(DBG_RT_REGLEVEL_VIEW, &fst);
 	dbg_printf(DBGSTR("sgdt %#.4" PRIx16 " (%" PRIu16 "), %p\n"),
 	           fst.fcs_gdt.dt_limit,
 	           fst.fcs_gdt.dt_limit,
@@ -227,10 +227,10 @@ DBG_COMMAND(lidt,
 		return DBG_STATUS_INVALID_ARGUMENTS;
 	dbg_printf(DBGSTR("lidt %#.4" PRIx16 " (%" PRIu16 "), %p\n"),
 	           limit, limit, base);
-	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
+	dbg_rt_getallregs(DBG_RT_REGLEVEL_VIEW, &fst);
 	fst.fcs_idt.dt_limit = limit;
 	fst.fcs_idt.dt_base  = base;
-	dbg_setallregs(DBG_REGLEVEL_VIEW, &fst);
+	dbg_rt_setallregs(DBG_RT_REGLEVEL_VIEW, &fst);
 	return 0;
 }
 
@@ -238,7 +238,7 @@ DBG_COMMAND(sidt,
             "sidt\n"
             "\tPrint the base and limit of the current Interrupt Descriptor Table\n") {
 	struct fcpustate fst;
-	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
+	dbg_rt_getallregs(DBG_RT_REGLEVEL_VIEW, &fst);
 	dbg_printf(DBGSTR("sidt %#.4" PRIx16 " (%" PRIu16 "), %p\n"),
 	           fst.fcs_idt.dt_limit,
 	           fst.fcs_idt.dt_limit,
@@ -289,7 +289,7 @@ DBG_COMMAND(r,
 	re_printer.rdp_printer     = &dbg_printer;
 	re_printer.rdp_printer_arg = NULL;
 	re_printer.rdp_format      = &debug_regdump_print_format;
-	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
+	dbg_rt_getallregs(DBG_RT_REGLEVEL_VIEW, &fst);
 	/* Implement a custom  register dumping  implementation
 	 * so that we can include IA32_KERNEL_GS_BASE on x86_64 */
 #ifdef __x86_64__
@@ -332,7 +332,7 @@ DBG_COMMAND(r,
 		}
 
 		/* Special case: Also print the IA32_KERNEL_GS_BASE register! */
-		if (dbg_getregbyid(DBG_REGLEVEL_VIEW, X86_REGISTER_MISC_KGSBASEQ, &kgsbase, 8) != 8)
+		if (dbg_rt_getregbyid(DBG_RT_REGLEVEL_VIEW, X86_REGISTER_MISC_KGSBASEQ, &kgsbase, 8) != 8)
 			kgsbase = (u64)dbg_current;
 		dbg_print(DBGSTR("              "));
 		debug_regdump_print_format(&re_printer, REGDUMP_FORMAT_REGISTER_PREFIX);

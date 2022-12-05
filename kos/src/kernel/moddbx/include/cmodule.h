@@ -321,7 +321,7 @@ typedef NONNULL_T((2)) ssize_t
 NOTHROW_T(FCALL *cmodule_enum_callback_t)(void *cookie, struct cmodule *__restrict mod);
 
 /* Enumerate all CModules that are currently visible in the following order:
- * >> void const *pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
+ * >> void const *pc = dbg_getpcreg(DBG_RT_REGLEVEL_VIEW);
  * >> ENUM(cmodule_ataddr(pc));
  * >> if (ADDR_ISKERN(pc)) {
  * >>     cmodule_enum_drivers();                     // Excluding `cmodule_ataddr(pc)'
@@ -384,8 +384,8 @@ NOTHROW(FCALL cmodule_locate)(module_t *__restrict mod);
 FUNDEF WUNUSED NONNULL((1)) REF struct cmodule *
 NOTHROW(FCALL cmodule_ataddr)(void const *addr);
 
-/* Return the CModule for  `dbg_getpcreg(DBG_REGLEVEL_VIEW)'
- * Same as `cmodule_ataddr(dbg_getpcreg(DBG_REGLEVEL_VIEW))' */
+/* Return the CModule for  `dbg_getpcreg(DBG_RT_REGLEVEL_VIEW)'
+ * Same as `cmodule_ataddr(dbg_getpcreg(DBG_RT_REGLEVEL_VIEW))' */
 FUNDEF WUNUSED REF struct cmodule *
 NOTHROW(FCALL cmodule_current)(void);
 
@@ -412,7 +412,7 @@ NOTHROW(FCALL cmodule_loadsyms)(struct cmodule *__restrict self);
  * symbol table of `self' (iow: `self->cm_symbols'). If this  table
  * contains a symbol matching `name', that symbol is then returned,
  * unless it has the `CMODSYM_DIP_NS_FCONFLICT' flag set, in  which
- * case  `dbg_getpcreg(DBG_REGLEVEL_VIEW)'  is  checked  for  being
+ * case `dbg_getpcreg(DBG_RT_REGLEVEL_VIEW)' is  checked for  being
  * apart of `self'. If  it is, try to  find the CU associated  with
  * that address. If such a CU exists, check that CU's symbol  table
  * for `name' once again. If  that table contains the given  `name'
@@ -548,10 +548,10 @@ NOTHROW(FCALL cmod_syminfo)(/*in|out*/ struct cmodsyminfo *__restrict info,
                             char const *__restrict name, size_t namelen,
                             uintptr_t ns DFL(CMODSYM_DIP_NS_NORMAL));
 
-/* Same as `cmod_syminfo()', but the caller is not required to fill in information
- * about any symbol at all, which are automatically loaded based on `dbg_current',
- * as well as `dbg_getpcreg(DBG_REGLEVEL_VIEW)'. However, upon success, the caller
- * is  required to call  `cmod_syminfo_local_fini(info)' once returned information
+/* Same as `cmod_syminfo()', but  the caller is not  required to fill in  information
+ * about  any symbol at  all, which are automatically  loaded based on `dbg_current',
+ * as well as `dbg_getpcreg(DBG_RT_REGLEVEL_VIEW)'. However, upon success, the caller
+ * is  required  to  call `cmod_syminfo_local_fini(info)'  once  returned information
  * is no longer being used.
  * @param: ns: Symbol namespace (one of `CMODSYM_DIP_NS_*')
  * @return: DBX_EOK:    Success

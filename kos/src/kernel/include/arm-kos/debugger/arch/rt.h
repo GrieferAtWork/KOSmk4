@@ -29,32 +29,6 @@
 
 #include <asm/intrin.h>
 #include <kos/kernel/paging.h>
-
-#ifdef __CC__
-DECL_BEGIN
-
-
-#ifndef __dbg_stack_defined
-#define __dbg_stack_defined
-DATDEF byte_t dbg_stack[KERNEL_DEBUG_STACKSIZE];
-#endif /* !__dbg_stack_defined */
-
-FORCELOCAL WUNUSED bool
-NOTHROW(FCALL dbg_onstack)(void) {
-	void *sp = __rdsp();
-	return sp >= dbg_stack &&
-	       sp <= dbg_stack + KERNEL_DEBUG_STACKSIZE;
-}
-
-DECL_END
-#endif /* __CC__ */
-
-/* CPU state kind codes. */
-#define ARM_DBG_STATEKIND_NONE 0 /* No DBG_REGLEVEL_TRAP-level CPU state */
-#define ARM_DBG_STATEKIND_FCPU 1 /* `struct fcpustate' */
-#define ARM_DBG_STATEKIND_UCPU 2 /* `struct ucpustate' */
-#define ARM_DBG_STATEKIND_LCPU 3 /* `struct lcpustate' */
-
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 
 #endif /* !GUARD_KERNEL_INCLUDE_ARM_KOS_DEBUGGER_ARCH_RT_H */

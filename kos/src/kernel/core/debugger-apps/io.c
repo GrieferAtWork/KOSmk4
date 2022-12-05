@@ -87,7 +87,7 @@ DBG_COMMAND(apply,
             "apply\n"
             "\tApply modifications made to the currently viewed register\n"
             "\tstate onto the return state (loaded when " AC_WHITE("exit") " is typed)\n") {
-	dbg_applyview();
+	dbg_rt_applyview();
 	return 0;
 }
 
@@ -97,8 +97,8 @@ DBG_COMMAND(undo,
 	struct fcpustate fst;
 	dbg_current = THIS_TASK;
 	/* Reset the view's register state. */
-	dbg_getallregs(DBG_REGLEVEL_ORIG, &fst);
-	dbg_setallregs(DBG_REGLEVEL_VIEW, &fst);
+	dbg_rt_getallregs(DBG_RT_REGLEVEL_ORIG, &fst);
+	dbg_rt_setallregs(DBG_RT_REGLEVEL_VIEW, &fst);
 	return 0;
 }
 
@@ -328,7 +328,7 @@ DBG_COMMAND(disasm,
 	void const *addr, *current_pc;
 	uintptr_t count;
 	struct disassembler da;
-	current_pc = dbg_getfaultpcreg(DBG_REGLEVEL_VIEW);
+	current_pc = dbg_getfaultpcreg(DBG_RT_REGLEVEL_VIEW);
 	addr       = current_pc;
 	if (argc >= 2) {
 		if (!dbg_evaladdr(argv[1], (uintptr_t *)&addr))
@@ -355,7 +355,7 @@ DBG_COMMAND(instrlen,
             argc, argv) {
 	void const *addr, *current_pc;
 	size_t length;
-	current_pc = dbg_getfaultpcreg(DBG_REGLEVEL_VIEW);
+	current_pc = dbg_getfaultpcreg(DBG_RT_REGLEVEL_VIEW);
 	addr       = current_pc;
 	if (argc >= 2) {
 		if (!dbg_evaladdr(argv[1], (uintptr_t *)&addr))
@@ -385,7 +385,7 @@ DBG_COMMAND(trace,
 #ifdef LOG_STACK_REMAINDER
 	byte_t *last_good_sp;
 #endif /* LOG_STACK_REMAINDER */
-	dbg_getallregs(DBG_REGLEVEL_VIEW, &state);
+	dbg_rt_getallregs(DBG_RT_REGLEVEL_VIEW, &state);
 #ifdef LOG_STACK_REMAINDER
 	last_good_sp = fcpustate_getsp(&state);
 #endif /* LOG_STACK_REMAINDER */
@@ -462,7 +462,7 @@ DBG_COMMAND(u,
 	struct fcpustate oldstate, newstate;
 	unwind_errno_t error;
 	void const *final_pc;
-	dbg_getallregs(DBG_REGLEVEL_VIEW, &oldstate);
+	dbg_rt_getallregs(DBG_RT_REGLEVEL_VIEW, &oldstate);
 	memcpy(&newstate, &oldstate, sizeof(struct fcpustate));
 	error = unwind_for_debug(fcpustate_getpc(&oldstate) - 1,
 	                         &unwind_getreg_fcpustate, &oldstate,
@@ -471,7 +471,7 @@ DBG_COMMAND(u,
 		dbg_printf(DBGSTR("Unwind failure: %u\n"), error);
 		memcpy(&newstate, &oldstate, sizeof(struct fcpustate));
 	} else {
-		dbg_setallregs(DBG_REGLEVEL_VIEW, &newstate);
+		dbg_rt_setallregs(DBG_RT_REGLEVEL_VIEW, &newstate);
 	}
 	final_pc = fcpustate_getpc(&newstate);
 	dbg_addr2line_printf(dbg_instruction_trypred(final_pc, instrlen_isa_from_fcpustate(&newstate)),
@@ -487,11 +487,11 @@ DBG_COMMAND(a2l,
             argc, argv) {
 	void const *addr, *current_pc;
 	instrlen_isa_t isa;
-	isa = dbg_instrlen_isa(DBG_REGLEVEL_VIEW);
+	isa = dbg_rt_instrlen_isa(DBG_RT_REGLEVEL_VIEW);
 again:
 	--argc;
 	++argv;
-	current_pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
+	current_pc = dbg_getpcreg(DBG_RT_REGLEVEL_VIEW);
 	current_pc = dbg_instruction_trypred(current_pc, isa);
 	addr = current_pc;
 	if (argc >= 1) {

@@ -39,7 +39,6 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <hybrid/byteorder.h>
 #include <hybrid/typecore.h>
 
-#include <asm/registers.h>
 #include <kos/kernel/cpu-state.h>
 
 #include <assert.h>
@@ -48,13 +47,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 
 #include <libcpustate/register.h>
 
-#if defined(__x86_64__) || defined(__i386__)
-#include <asm/registers-compat.h>
-#endif /* __x86_64__ || __i386__ */
-
 DECL_BEGIN
-
-PUBLIC uintptr_t volatile kernel_debug_on = KERNEL_DEBUG_ON_DEFAULT;
 
 /* The stack from which debug code is executed. */
 PUBLIC ATTR_DBGBSS byte_t dbg_stack[KERNEL_DEBUG_STACKSIZE] = {};
@@ -73,29 +66,35 @@ PUBLIC ATTR_DBGBSS struct task *dbg_current = NULL;
 DATDEF ATTR_DBGBSS struct cpu *dbg_cpu_ ASMNAME("dbg_cpu");
 PUBLIC ATTR_DBGBSS struct cpu *dbg_cpu_ = NULL;
 
-/* Apply changes made to `DBG_REGLEVEL_VIEW' onto `DBG_REGLEVEL_ORIG'. */
-PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_applyview")
-void NOTHROW(FCALL dbg_applyview)(void) {
+
+/* DBG trap state information. */
+PUBLIC ATTR_DBGBSS void *dbg_rt_trapstate            = NULL;
+PUBLIC ATTR_DBGBSS unsigned int dbg_rt_trapstatekind = DBG_RT_STATEKIND_NONE;
+
+
+/* Apply changes made to `DBG_RT_REGLEVEL_VIEW' onto `DBG_RT_REGLEVEL_ORIG'. */
+PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_rt_applyview")
+void NOTHROW(FCALL dbg_rt_applyview)(void) {
 	struct fcpustate fst;
-	dbg_getallregs(DBG_REGLEVEL_VIEW, &fst);
-	dbg_setallregs(DBG_REGLEVEL_ORIG, &fst);
+	dbg_rt_getallregs(DBG_RT_REGLEVEL_VIEW, &fst);
+	dbg_rt_setallregs(DBG_RT_REGLEVEL_ORIG, &fst);
 }
 
 /* Check if the register view has been changed. */
-PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_changedview")
-ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_changedview)(void) {
+PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_rt_changedview")
+ATTR_PURE WUNUSED bool NOTHROW(FCALL dbg_rt_changedview)(void) {
 	struct fcpustate view, orig;
-	dbg_getallregs(DBG_REGLEVEL_ORIG, &orig);
-	dbg_getallregs(DBG_REGLEVEL_VIEW, &view);
+	dbg_rt_getallregs(DBG_RT_REGLEVEL_ORIG, &orig);
+	dbg_rt_getallregs(DBG_RT_REGLEVEL_VIEW, &view);
 	return bcmp(&view, &orig, sizeof(struct fcpustate)) != 0;
 }
 
 /* Get/Set a pointer-sized register, given its ID */
-PUBLIC ATTR_WEAK ATTR_PURE WUNUSED ATTR_DBGTEXT_S("dbg_getregbyidp") uintptr_t
-NOTHROW(KCALL dbg_getregbyidp)(unsigned int level, cpu_regno_t regno) {
+PUBLIC ATTR_WEAK ATTR_PURE WUNUSED ATTR_DBGTEXT_S("dbg_rt_getregbyidp") uintptr_t
+NOTHROW(KCALL dbg_rt_getregbyidp)(unsigned int level, cpu_regno_t regno) {
 	uintptr_t result;
 	size_t reqlen;
-	reqlen = dbg_getregbyid(level, regno, &result, sizeof(result));
+	reqlen = dbg_rt_getregbyid(level, regno, &result, sizeof(result));
 	assert(reqlen && reqlen <= sizeof(result));
 	if (reqlen < sizeof(result)) {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
@@ -109,40 +108,40 @@ NOTHROW(KCALL dbg_getregbyidp)(unsigned int level, cpu_regno_t regno) {
 	return result;
 }
 
-PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_setregbyidp") bool
-NOTHROW(KCALL dbg_setregbyidp)(unsigned int level, cpu_regno_t regno, uintptr_t value) {
+PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_rt_setregbyidp") bool
+NOTHROW(KCALL dbg_rt_setregbyidp)(unsigned int level, cpu_regno_t regno, uintptr_t value) {
 	size_t reqlen;
-	reqlen = dbg_setregbyid(level, regno, &value, sizeof(value));
+	reqlen = dbg_rt_setregbyid(level, regno, &value, sizeof(value));
 	return reqlen && reqlen <= sizeof(value);
 }
 
 
 /* Get/set a register, given its ID
  * NOTE: When `return > buflen', then
- *       dbg_getregbyname: The contents of `buf' are undefined.
- *       dbg_setregbyname:  The  register   was  not   written.
+ *       dbg_rt_getregbyname: The contents of `buf' are undefined.
+ *       dbg_rt_setregbyname:  The  register   was  not   written.
  * NOTE: Accepted register names are those found in comments in `<asm/registers.h>'
  * @param: regno: One of the values from <asm/registers.h>
  * @return: * :   The required buffer size, or 0 when `regno' isn't recognized. */
-PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_getregbyid") size_t
-NOTHROW(KCALL dbg_getregbyid)(unsigned int level, cpu_regno_t regno,
+PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_rt_getregbyid") size_t
+NOTHROW(KCALL dbg_rt_getregbyid)(unsigned int level, cpu_regno_t regno,
                               void *__restrict buf, size_t buflen) {
 	size_t result;
 	struct fcpustate cs;
-	dbg_getallregs(level, &cs);
+	dbg_rt_getallregs(level, &cs);
 	result = register_get_fcpustate(&cs, regno, buf, buflen);
 	return result;
 }
 
-PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_setregbyid") size_t
-NOTHROW(KCALL dbg_setregbyid)(unsigned int level, cpu_regno_t regno,
+PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_rt_setregbyid") size_t
+NOTHROW(KCALL dbg_rt_setregbyid)(unsigned int level, cpu_regno_t regno,
                               void const *__restrict buf, size_t buflen) {
 	size_t result;
 	struct fcpustate cs;
-	dbg_getallregs(level, &cs);
+	dbg_rt_getallregs(level, &cs);
 	result = register_set_fcpustate(&cs, regno, buf, buflen);
 	if (result && result <= buflen)
-		dbg_setallregs(level, &cs);
+		dbg_rt_setallregs(level, &cs);
 	return result;
 }
 
@@ -150,57 +149,57 @@ NOTHROW(KCALL dbg_setregbyid)(unsigned int level, cpu_regno_t regno,
 
 /* Get/set a register, given its (arch-specific) name
  * NOTE: When `return > buflen', then
- *       dbg_getregbyname: The contents of `buf' are undefined.
- *       dbg_setregbyname: The register was not written.
+ *       dbg_rt_getregbyname: The contents of `buf' are undefined.
+ *       dbg_rt_setregbyname: The register was not written.
  * @return: * : The required buffer size, or 0 when `name' isn't recognized. */
-PUBLIC ATTR_DBGTEXT_S("dbg_getregbyname") size_t
-NOTHROW(KCALL dbg_getregbyname)(unsigned int level, char const *__restrict name,
+PUBLIC ATTR_DBGTEXT_S("dbg_rt_getregbyname") size_t
+NOTHROW(KCALL dbg_rt_getregbyname)(unsigned int level, char const *__restrict name,
                                 size_t namelen, void *__restrict buf, size_t buflen) {
-	instrlen_isa_t isa = dbg_instrlen_isa(level);
+	instrlen_isa_t isa = dbg_rt_instrlen_isa(level);
 	cpu_regno_t regno  = register_byname(isa, name, namelen);
 	if unlikely(regno == CPU_REGISTER_NONE)
 		return 0;
-	return dbg_getregbyid(level, regno, buf, buflen);
+	return dbg_rt_getregbyid(level, regno, buf, buflen);
 }
 
-PUBLIC ATTR_DBGTEXT_S("dbg_setregbyname") size_t
-NOTHROW(KCALL dbg_setregbyname)(unsigned int level, char const *__restrict name,
+PUBLIC ATTR_DBGTEXT_S("dbg_rt_setregbyname") size_t
+NOTHROW(KCALL dbg_rt_setregbyname)(unsigned int level, char const *__restrict name,
                                 size_t namelen, void const *__restrict buf, size_t buflen) {
-	instrlen_isa_t isa = dbg_instrlen_isa(level);
+	instrlen_isa_t isa = dbg_rt_instrlen_isa(level);
 	cpu_regno_t regno  = register_byname(isa, name, namelen);
 	if unlikely(regno == CPU_REGISTER_NONE)
 		return 0;
-	return dbg_setregbyid(level, regno, buf, buflen);
+	return dbg_rt_setregbyid(level, regno, buf, buflen);
 }
 
 
-PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_getregbynamep") bool
-NOTHROW(KCALL dbg_getregbynamep)(unsigned int level, char const *__restrict name,
+PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_rt_getregbynamep") bool
+NOTHROW(KCALL dbg_rt_getregbynamep)(unsigned int level, char const *__restrict name,
                                  size_t namelen, uintptr_t *__restrict result) {
-	instrlen_isa_t isa = dbg_instrlen_isa(level);
+	instrlen_isa_t isa = dbg_rt_instrlen_isa(level);
 	cpu_regno_t regno  = register_byname(isa, name, namelen);
 	if unlikely(regno == CPU_REGISTER_NONE)
 		return false;
-	*result = dbg_getregbyidp(level, regno);
+	*result = dbg_rt_getregbyidp(level, regno);
 	return true;
 }
 
-PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_setregbynamep") bool
-NOTHROW(KCALL dbg_setregbynamep)(unsigned int level, char const *__restrict name,
+PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_rt_setregbynamep") bool
+NOTHROW(KCALL dbg_rt_setregbynamep)(unsigned int level, char const *__restrict name,
                                  size_t namelen, uintptr_t value) {
-	instrlen_isa_t isa = dbg_instrlen_isa(level);
+	instrlen_isa_t isa = dbg_rt_instrlen_isa(level);
 	cpu_regno_t regno  = register_byname(isa, name, namelen);
 	if unlikely(regno == CPU_REGISTER_NONE)
 		return false;
-	return dbg_setregbyid(level, regno, &value, sizeof(value)) != 0;
+	return dbg_rt_setregbyid(level, regno, &value, sizeof(value)) != 0;
 }
 
 /* Return the ISA code for use with libinstrlen */
-PUBLIC ATTR_PURE WUNUSED ATTR_WEAK ATTR_DBGTEXT_S("dbg_instrlen_isa") instrlen_isa_t
-NOTHROW(KCALL dbg_instrlen_isa)(unsigned int level) {
+PUBLIC ATTR_PURE WUNUSED ATTR_WEAK ATTR_DBGTEXT_S("dbg_rt_instrlen_isa") instrlen_isa_t
+NOTHROW(KCALL dbg_rt_instrlen_isa)(unsigned int level) {
 	instrlen_isa_t result;
 	struct fcpustate cs;
-	dbg_getallregs(level, &cs);
+	dbg_rt_getallregs(level, &cs);
 	result = instrlen_isa_from_fcpustate(&cs);
 	return result;
 }

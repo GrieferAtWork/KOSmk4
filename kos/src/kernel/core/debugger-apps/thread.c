@@ -150,7 +150,7 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 		old_current = dbg_current;
 		dbg_current = thread;
 		dbg_printf(DBGSTR(" %[vinfo:%p:%Rf:%l:%n]"),
-		           dbg_getpcreg(DBG_REGLEVEL_TRAP));
+		           dbg_getpcreg(DBG_RT_REGLEVEL_TRAP));
 		dbg_current = old_current;
 	}
 	dbg_loadcolor();

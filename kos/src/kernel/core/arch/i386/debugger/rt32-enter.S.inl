@@ -26,11 +26,12 @@
 #include <debugger/rt.h>
 #include <kernel/x86/apic.h>
 
-#include <cfi.h>
 #include <asm/cpu-flags.h>
 #include <asm/instr/ttest.h>
 #include <kos/kernel/cpu-state-asm.h>
 #include <kos/kernel/cpu-state.h>
+
+#include <cfi.h>
 
 #if defined(DEFINE_DBG_ENTER_FCPUSTATE)
 #define L(x)                         x##_dbg_enter_fcpustate
@@ -38,42 +39,42 @@
 #define DBG_STATE_NAME_U             FCPUSTATE
 #define DEFINE_DBG_ENTER_XCPUSTATE_R dbg_enter_fcpustate_r
 #define DEFINE_DBG_ENTER_XCPUSTATE   dbg_enter_fcpustate
-#define X86_DBG_STATEKIND_XCPU       X86_DBG_STATEKIND_FCPU
+#define DBG_RT_STATEKIND_XCPU       DBG_RT_STATEKIND_FCPU
 #elif defined(DEFINE_DBG_ENTER_UCPUSTATE)
 #define L(x)                         x##_dbg_enter_ucpustate
 #define DBG_STATE_NAME               ucpustate
 #define DBG_STATE_NAME_U             UCPUSTATE
 #define DEFINE_DBG_ENTER_XCPUSTATE_R dbg_enter_ucpustate_r
 #define DEFINE_DBG_ENTER_XCPUSTATE   dbg_enter_ucpustate
-#define X86_DBG_STATEKIND_XCPU       X86_DBG_STATEKIND_UCPU
+#define DBG_RT_STATEKIND_XCPU       DBG_RT_STATEKIND_UCPU
 #elif defined(DEFINE_DBG_ENTER_LCPUSTATE)
 #define L(x)                         x##_dbg_enter_lcpustate
 #define DBG_STATE_NAME               lcpustate
 #define DBG_STATE_NAME_U             LCPUSTATE
 #define DEFINE_DBG_ENTER_XCPUSTATE_R dbg_enter_lcpustate_r
 #define DEFINE_DBG_ENTER_XCPUSTATE   dbg_enter_lcpustate
-#define X86_DBG_STATEKIND_XCPU       X86_DBG_STATEKIND_LCPU
+#define DBG_RT_STATEKIND_XCPU       DBG_RT_STATEKIND_LCPU
 #elif defined(DEFINE_DBG_ENTER_KCPUSTATE)
 #define L(x)                         x##_dbg_enter_kcpustate
 #define DBG_STATE_NAME               kcpustate
 #define DBG_STATE_NAME_U             KCPUSTATE
 #define DEFINE_DBG_ENTER_XCPUSTATE_R dbg_enter_kcpustate_r
 #define DEFINE_DBG_ENTER_XCPUSTATE   dbg_enter_kcpustate
-#define X86_DBG_STATEKIND_XCPU       X86_DBG_STATEKIND_KCPU
+#define DBG_RT_STATEKIND_XCPU       DBG_RT_STATEKIND_KCPU
 #elif defined(DEFINE_DBG_ENTER_ICPUSTATE)
 #define L(x)                         x##_dbg_enter_icpustate
 #define DBG_STATE_NAME               icpustate
 #define DBG_STATE_NAME_U             ICPUSTATE
 #define DEFINE_DBG_ENTER_XCPUSTATE_R dbg_enter_icpustate_r
 #define DEFINE_DBG_ENTER_XCPUSTATE   dbg_enter_icpustate
-#define X86_DBG_STATEKIND_XCPU       X86_DBG_STATEKIND_ICPU
+#define DBG_RT_STATEKIND_XCPU       DBG_RT_STATEKIND_ICPU
 #elif defined(DEFINE_DBG_ENTER_SCPUSTATE)
 #define L(x)                         x##_dbg_enter_scpustate
 #define DBG_STATE_NAME               scpustate
 #define DBG_STATE_NAME_U             SCPUSTATE
 #define DEFINE_DBG_ENTER_XCPUSTATE_R dbg_enter_scpustate_r
 #define DEFINE_DBG_ENTER_XCPUSTATE   dbg_enter_scpustate
-#define X86_DBG_STATEKIND_XCPU       X86_DBG_STATEKIND_SCPU
+#define DBG_RT_STATEKIND_XCPU       DBG_RT_STATEKIND_SCPU
 #elif defined(DEFINE_DBG_ENTER_HERE)
 #define L(x)                         x##_dbg_enter_here
 #elif defined(DEFINE_DBG)
@@ -221,10 +222,10 @@ L(.Ldone_lapicid_lock):
 	 * However,  we still have a lot to do  in order to set up the expected
 	 * debug-mode environment (including stack, segments, scheduling, etc.) */
 
-	/* First step: Check if  we've already  been in  debugger mode  before.
-	 *             If we were, then the debugger has tried to enter itself,
-	 *             in which case  we mustn't override  `DBG_REGLEVEL_EXIT',
-	 *             but should instead  reset the stack  and invoke the  new
+	/* First step: Check if  we've already  been  in debugger  mode  before.
+	 *             If  we were, then the debugger has tried to enter itself,
+	 *             in which case we mustn't override `DBG_RT_REGLEVEL_EXIT',
+	 *             but  should instead  reset the  stack and  invoke the new
 	 *             debugger entry point. */
 	EXTERN(dbg_active)
 	cmpb   $(0), %ss:dbg_active
@@ -355,15 +356,15 @@ L(.Ldont_reset_dbg_stack):
 	 *       In  the later case, we must keep the original trap state. */
 	cmpb   $(0), dbg_active
 	jne    1f
-	EXTERN(x86_dbg_trapstate)
-	EXTERN(x86_dbg_trapstatekind)
-#ifdef X86_DBG_STATEKIND_XCPU
-	movl   $(X86_DBG_STATEKIND_XCPU), x86_dbg_trapstatekind
-	movl   %edx, x86_dbg_trapstate
-#else /* X86_DBG_STATEKIND_XCPU */
-	movl   $(X86_DBG_STATEKIND_NONE), x86_dbg_trapstatekind
-	movl   $(0), x86_dbg_trapstate
-#endif /* !X86_DBG_STATEKIND_XCPU */
+	EXTERN(dbg_rt_trapstate)
+	EXTERN(dbg_rt_trapstatekind)
+#ifdef DBG_RT_STATEKIND_XCPU
+	movl   $(DBG_RT_STATEKIND_XCPU), dbg_rt_trapstatekind
+	movl   %edx, dbg_rt_trapstate
+#else /* DBG_RT_STATEKIND_XCPU */
+	movl   $(DBG_RT_STATEKIND_NONE), dbg_rt_trapstatekind
+	movl   $(0), dbg_rt_trapstate
+#endif /* !DBG_RT_STATEKIND_XCPU */
 1:
 
 	/* Setup the debugger entry point callback.
@@ -470,7 +471,7 @@ END(DBG_ENTER_NAME)
 #undef DBG_STATE_NAME_U
 #undef DEFINE_DBG_ENTER_XCPUSTATE_R
 #undef DEFINE_DBG_ENTER_XCPUSTATE
-#undef X86_DBG_STATEKIND_XCPU
+#undef DBG_RT_STATEKIND_XCPU
 
 #undef DEFINE_DBG_ENTER_SCPUSTATE
 #undef DEFINE_DBG_ENTER_ICPUSTATE

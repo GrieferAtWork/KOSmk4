@@ -274,14 +274,14 @@ PRIVATE ATTR_PURE WUNUSED uintptr_t
 NOTHROW(FCALL get_user_tls_base_register)(void) {
 	uintptr_t result;
 #ifdef __x86_64__
-	dbg_getregbyid(DBG_REGLEVEL_VIEW, X86_REGISTER_MISC_FSBASEQ,
+	dbg_rt_getregbyid(DBG_RT_REGLEVEL_VIEW, X86_REGISTER_MISC_FSBASEQ,
 	               &result, sizeof(result));
 #elif defined(__i386__)
-	if (!dbg_getregbyid(DBG_REGLEVEL_VIEW, X86_REGISTER_MISC_GSBASEL,
+	if (!dbg_rt_getregbyid(DBG_RT_REGLEVEL_VIEW, X86_REGISTER_MISC_GSBASEL,
 	                    &result, sizeof(result)))
 		result = FORTASK(dbg_current, this_x86_user_gsbase);
 #elif defined(__arm__)
-	if (!dbg_getregbyid(DBG_REGLEVEL_VIEW, ARM_REGISTER_TLSBASE,
+	if (!dbg_rt_getregbyid(DBG_RT_REGLEVEL_VIEW, ARM_REGISTER_TLSBASE,
 	                    &result, sizeof(result)))
 		result = FORTASK(dbg_current, this_arm_user_tlsbase);
 #else /* ... */
@@ -864,7 +864,7 @@ cexpr_cfi_to_address_impl(struct cvalue *__restrict self,
 	second_pass         = false;        /* Used to lazily calculate the correct `ue_tlsbase' (if used) */
 do_second_pass:
 	bzero(&cu, sizeof(cu));
-	pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
+	pc = dbg_getpcreg(DBG_RT_REGLEVEL_VIEW);
 	/* Select the proper function. */
 	module_relative_pc = (uintptr_t)pc;
 	if (mod) {
@@ -886,7 +886,7 @@ do_second_pass:
 	emulator.ue_pc_start           = emulator.ue_pc;
 	emulator.ue_pc_end             = emulator.ue_pc + expr_length;
 	emulator.ue_regget             = &dbg_getreg;
-	emulator.ue_regget_arg         = (void *)(uintptr_t)DBG_REGLEVEL_VIEW;
+	emulator.ue_regget_arg         = (void *)(uintptr_t)DBG_RT_REGLEVEL_VIEW;
 	emulator.ue_framebase          = &self->cv_expr.v_expr.v_framebase;
 	emulator.ue_objaddr            = self->cv_expr.v_expr.v_objaddr;
 	emulator.ue_bjmprem            = UNWIND_EMULATOR_BJMPREM_DEFAULT;
@@ -899,7 +899,7 @@ do_second_pass:
 #ifdef __ARCH_HAVE_COMPAT
 	if (dbg_current_iscompat()) {
 		unwind_getreg_compat_data_init(&compat_getreg_data, &dbg_getreg,
-		                               (void *)(uintptr_t)DBG_REGLEVEL_VIEW);
+		                               (void *)(uintptr_t)DBG_RT_REGLEVEL_VIEW);
 		emulator.ue_regget     = &unwind_getreg_compat;
 		emulator.ue_regget_arg = &compat_getreg_data;
 	}
@@ -907,7 +907,7 @@ do_second_pass:
 #define LOCAL_ue_regget_arg emulator.ue_regget_arg
 #else /* __ARCH_HAVE_COMPAT */
 #define LOCAL_ue_regget     (&dbg_getreg)
-#define LOCAL_ue_regget_arg ((void *)(uintptr_t)DBG_REGLEVEL_VIEW)
+#define LOCAL_ue_regget_arg ((void *)(uintptr_t)DBG_RT_REGLEVEL_VIEW)
 #endif /* !__ARCH_HAVE_COMPAT */
 
 	/* Execute the emulator. */
@@ -997,7 +997,7 @@ NOTHROW(FCALL cexpr_cfi_to_address)(struct cvalue *__restrict self) {
 		req_pdir = cmodule_mman(mod)->mm_pagedir_p;
 	/* This must run in the context of `cmodule_mman(mod)' */
 	if (old_pdir != req_pdir) {
-		if unlikely(!dbg_verifypagedir(req_pdir))
+		if unlikely(!dbg_rt_verifypagedir(req_pdir))
 			return DBX_EFAULT;
 		pagedir_set(req_pdir);
 	}
@@ -1041,7 +1041,7 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 			bzero(&cu, sizeof(cu));
 			cu.cu_ranges.r_startpc = self->v_cu_ranges_startpc;
 			cu.cu_addr_base        = self->v_cu_addr_base;
-			pc  = dbg_getpcreg(DBG_REGLEVEL_VIEW);
+			pc  = dbg_getpcreg(DBG_RT_REGLEVEL_VIEW);
 			mod = self->v_module;
 			/* Must execute these functions in the context of the VM associated with their module. */
 			{
@@ -1051,7 +1051,7 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 				if (!wasdestroyed(cmodule_mman(mod)))
 					req_pdir = cmodule_mman(mod)->mm_pagedir_p;
 				if (old_pdir != req_pdir) {
-					if unlikely(!dbg_verifypagedir(req_pdir))
+					if unlikely(!dbg_rt_verifypagedir(req_pdir))
 						return DBX_EFAULT;
 					pagedir_set(req_pdir);
 				}
@@ -1067,11 +1067,11 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 				if (dbg_current_iscompat()) {
 					struct unwind_getreg_compat_data compat_getreg_data;
 					unwind_getreg_compat_data_init(&compat_getreg_data, &dbg_getreg,
-					                               (void *)(uintptr_t)DBG_REGLEVEL_VIEW);
+					                               (void *)(uintptr_t)DBG_RT_REGLEVEL_VIEW);
 					if (write) {
 						struct unwind_setreg_compat_data compat_setreg_data;
 						unwind_setreg_compat_data_init(&compat_setreg_data, &dbg_setreg,
-						                               (void *)(uintptr_t)DBG_REGLEVEL_VIEW);
+						                               (void *)(uintptr_t)DBG_RT_REGLEVEL_VIEW);
 						error = debuginfo_location_setvalue(&self->v_expr,
 						                                    cmodule_unwind_emulator_sections(mod),
 						                                    &unwind_getreg_compat, &compat_getreg_data,
@@ -1095,8 +1095,8 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 					if (write) {
 						error = debuginfo_location_setvalue(&self->v_expr,
 						                                    cmodule_unwind_emulator_sections(mod),
-						                                    &dbg_getreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW,
-						                                    &dbg_setreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW, &cu,
+						                                    &dbg_getreg, (void *)(uintptr_t)DBG_RT_REGLEVEL_VIEW,
+						                                    &dbg_setreg, (void *)(uintptr_t)DBG_RT_REGLEVEL_VIEW, &cu,
 						                                    (uintptr_t)pc - module_getloadaddr(mod->cm_module),
 						                                    module_getloadaddr(mod->cm_module),
 						                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
@@ -1104,7 +1104,7 @@ NOTHROW(KCALL cvalue_cfiexpr_readwrite)(struct cvalue_cfiexpr const *__restrict 
 					} else {
 						error = debuginfo_location_getvalue(&self->v_expr,
 						                                    cmodule_unwind_emulator_sections(mod),
-						                                    &dbg_getreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW, &cu,
+						                                    &dbg_getreg, (void *)(uintptr_t)DBG_RT_REGLEVEL_VIEW, &cu,
 						                                    (uintptr_t)pc - module_getloadaddr(mod->cm_module),
 						                                    module_getloadaddr(mod->cm_module),
 						                                    buf, buflen, &num_accessed_bits, &self->v_framebase,
@@ -1313,7 +1313,7 @@ NOTHROW(FCALL cvalue_flush)(struct cvalue *__restrict self) {
 			if unlikely(result != DBX_EOK)
 				goto done;
 		}
-		reqsize = dbg_setregbyid(DBG_REGLEVEL_VIEW,
+		reqsize = dbg_rt_setregbyid(DBG_RT_REGLEVEL_VIEW,
 		                         self->cv_register.r_regid,
 		                         self->cv_register.r_ibuffer,
 		                         bufneed);
@@ -1516,7 +1516,7 @@ NOTHROW(FCALL cexpr_pushregister_by_id)(cpu_regno_t regno) {
 	valp = _cexpr_pushalloc();
 	if unlikely(!valp)
 		return DBX_ENOMEM;
-	buflen = dbg_getregbyid(DBG_REGLEVEL_VIEW, regno,
+	buflen = dbg_rt_getregbyid(DBG_RT_REGLEVEL_VIEW, regno,
 	                        valp->cv_register.r_ibuffer,
 	                        sizeof(valp->cv_register.r_ibuffer));
 	if unlikely(buflen > sizeof(valp->cv_register.r_ibuffer))
@@ -3217,9 +3217,9 @@ err_fault:
 }
 
 
-/* Push  a currently visible  symbol, as selected by  the code location from
- * `dbg_current' and any possibly modifications made to `DBG_REGLEVEL_VIEW',
- * given that symbol's `name'. For this  purpose, `name' can be (in  order):
+/* Push  a  currently visible  symbol, as  selected by  the code  location from
+ * `dbg_current' and any possibly modifications made to `DBG_RT_REGLEVEL_VIEW',
+ * given that symbol's  `name'. For  this purpose,  `name' can  be (in  order):
  *   - A function-to-compilation-unit-scoped variable/argument/enum
  *   - A PUBLIC/INTERN variable from the module containing the current PC
  * if (ADDR_ISUSER(CURRENT_PC)) {
@@ -3530,7 +3530,7 @@ NOTHROW(FCALL cexpr_pushsymbol_byname)(char const *__restrict name, size_t namel
  * @return: DBX_ENOENT: No register matches the given `name' */
 PUBLIC NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL cexpr_pushregister)(char const *__restrict name, size_t namelen) {
-	instrlen_isa_t isa = dbg_instrlen_isa(DBG_REGLEVEL_VIEW);
+	instrlen_isa_t isa = dbg_rt_instrlen_isa(DBG_RT_REGLEVEL_VIEW);
 	cpu_regno_t regno  = register_byname(isa, name, namelen);
 	if (regno == CPU_REGISTER_NONE)
 		return DBX_ENOENT;

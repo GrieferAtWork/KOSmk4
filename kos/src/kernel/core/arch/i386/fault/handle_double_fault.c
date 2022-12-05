@@ -142,7 +142,7 @@ panic_df_dbg_main(void *cr3)
 	                  "func: " AC_WHITE("%n") "\n"
 	                  "addr: " AC_WHITE("%p") "\n"
 	                  "]"),
-	           dbg_getpcreg(DBG_REGLEVEL_VIEW));
+	           dbg_getpcreg(DBG_RT_REGLEVEL_VIEW));
 	dbg_main(0);
 }
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */

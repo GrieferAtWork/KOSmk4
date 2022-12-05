@@ -67,38 +67,38 @@ INTERN ATTR_DBGBSS struct fcpustate x86_dbg_viewstate = {};
  *        in `x86_dbg_viewstate' and `x86_dbg_origstate' */
 INTERN ATTR_DBGBSS struct task *x86_dbg_viewthread = NULL;
 
-/* Convert `x86_dbg_trapstate' into an fcpustate. */
+/* Convert `dbg_rt_trapstate' into an fcpustate. */
 PRIVATE ATTR_DBGTEXT void
 NOTHROW(KCALL get_fcpustate_from_trapstate)(struct fcpustate *__restrict result) {
-	switch (x86_dbg_trapstatekind) {
+	switch (dbg_rt_trapstatekind) {
 
-	case X86_DBG_STATEKIND_FCPU:
-		memcpy(result, x86_dbg_trapstate, sizeof(struct fcpustate));
+	case DBG_RT_STATEKIND_FCPU:
+		memcpy(result, dbg_rt_trapstate, sizeof(struct fcpustate));
 		break;
 
-	case X86_DBG_STATEKIND_UCPU:
+	case DBG_RT_STATEKIND_UCPU:
 		memcpy(result, &x86_dbg_exitstate, sizeof(struct fcpustate));
-		fcpustate_assign_ucpustate(result, (struct ucpustate const *)x86_dbg_trapstate);
+		fcpustate_assign_ucpustate(result, (struct ucpustate const *)dbg_rt_trapstate);
 		break;
 
-	case X86_DBG_STATEKIND_LCPU:
+	case DBG_RT_STATEKIND_LCPU:
 		memcpy(result, &x86_dbg_exitstate, sizeof(struct fcpustate));
-		fcpustate_assign_lcpustate(result, (struct lcpustate const *)x86_dbg_trapstate);
+		fcpustate_assign_lcpustate(result, (struct lcpustate const *)dbg_rt_trapstate);
 		break;
 
-	case X86_DBG_STATEKIND_KCPU:
+	case DBG_RT_STATEKIND_KCPU:
 		memcpy(result, &x86_dbg_exitstate, sizeof(struct fcpustate));
-		fcpustate_assign_kcpustate(result, (struct kcpustate const *)x86_dbg_trapstate);
+		fcpustate_assign_kcpustate(result, (struct kcpustate const *)dbg_rt_trapstate);
 		break;
 
-	case X86_DBG_STATEKIND_ICPU:
+	case DBG_RT_STATEKIND_ICPU:
 		memcpy(result, &x86_dbg_exitstate, sizeof(struct fcpustate));
-		fcpustate_assign_icpustate(result, (struct icpustate const *)x86_dbg_trapstate);
+		fcpustate_assign_icpustate(result, (struct icpustate const *)dbg_rt_trapstate);
 		break;
 
-	case X86_DBG_STATEKIND_SCPU:
+	case DBG_RT_STATEKIND_SCPU:
 		memcpy(result, &x86_dbg_exitstate, sizeof(struct fcpustate));
-		fcpustate_assign_scpustate(result, (struct scpustate const *)x86_dbg_trapstate);
+		fcpustate_assign_scpustate(result, (struct scpustate const *)dbg_rt_trapstate);
 		break;
 
 	default:
@@ -107,21 +107,21 @@ NOTHROW(KCALL get_fcpustate_from_trapstate)(struct fcpustate *__restrict result)
 	}
 }
 
-/* Assign  the given `struct fcpustate'  to `x86_dbg_trapstate', and let
+/* Assign the given  `struct fcpustate' to  `dbg_rt_trapstate', and  let
  * registers not defined inside of it ripple down to `x86_dbg_exitstate' */
 PRIVATE ATTR_DBGTEXT void
 NOTHROW(KCALL set_trapstate_from_fcpustate)(struct fcpustate const *__restrict state) {
-	switch (x86_dbg_trapstatekind) {
-	case X86_DBG_STATEKIND_FCPU:
-		memcpy((struct fcpustate *)x86_dbg_trapstate, state, sizeof(struct fcpustate));
+	switch (dbg_rt_trapstatekind) {
+	case DBG_RT_STATEKIND_FCPU:
+		memcpy((struct fcpustate *)dbg_rt_trapstate, state, sizeof(struct fcpustate));
 		return;
 
-	case X86_DBG_STATEKIND_UCPU:
-		fcpustate_to_ucpustate(state, (struct ucpustate *)x86_dbg_trapstate);
+	case DBG_RT_STATEKIND_UCPU:
+		fcpustate_to_ucpustate(state, (struct ucpustate *)dbg_rt_trapstate);
 		break;
 
-	case X86_DBG_STATEKIND_LCPU:
-		fcpustate_to_lcpustate(state, (struct lcpustate *)x86_dbg_trapstate);
+	case DBG_RT_STATEKIND_LCPU:
+		fcpustate_to_lcpustate(state, (struct lcpustate *)dbg_rt_trapstate);
 #ifdef __x86_64__
 		/* Restore all registers except for `%r15', `%r14', `%r13', `%r12', ``rebp', `%rsp', `%rbx', `%rip' */
 		x86_dbg_exitstate.de_state.fcs_gpregs.gp_Pdi = state->fcs_gpregs.gp_Pdi;
@@ -148,8 +148,8 @@ NOTHROW(KCALL set_trapstate_from_fcpustate)(struct fcpustate const *__restrict s
 		x86_dbg_exitstate.de_state.fcs_Pflags        = state->fcs_Pflags;
 		break;
 
-	case X86_DBG_STATEKIND_KCPU:
-		fcpustate_to_kcpustate(state, (struct kcpustate *)x86_dbg_trapstate);
+	case DBG_RT_STATEKIND_KCPU:
+		fcpustate_to_kcpustate(state, (struct kcpustate *)dbg_rt_trapstate);
 		x86_dbg_exitstate.de_state.fcs_sgregs.sg_es  = state->fcs_sgregs.sg_es;
 		x86_dbg_exitstate.de_state.fcs_sgregs.sg_cs  = state->fcs_sgregs.sg_cs;
 		x86_dbg_exitstate.de_state.fcs_sgregs.sg_ss  = state->fcs_sgregs.sg_ss;
@@ -158,8 +158,8 @@ NOTHROW(KCALL set_trapstate_from_fcpustate)(struct fcpustate const *__restrict s
 		x86_dbg_exitstate.de_state.fcs_sgregs.sg_gs  = state->fcs_sgregs.sg_gs;
 		break;
 
-	case X86_DBG_STATEKIND_ICPU:
-		x86_dbg_trapstate = fcpustate_to_icpustate_p(state, (struct icpustate *)x86_dbg_trapstate);
+	case DBG_RT_STATEKIND_ICPU:
+		dbg_rt_trapstate = fcpustate_to_icpustate_p(state, (struct icpustate *)dbg_rt_trapstate);
 #ifdef __x86_64__
 		x86_dbg_exitstate.de_state.fcs_sgbase       = state->fcs_sgbase;
 		x86_dbg_exitstate.de_state.fcs_sgregs.sg_es = state->fcs_sgregs.sg_es;
@@ -169,8 +169,8 @@ NOTHROW(KCALL set_trapstate_from_fcpustate)(struct fcpustate const *__restrict s
 		x86_dbg_exitstate.de_state.fcs_sgregs.sg_gs = state->fcs_sgregs.sg_gs;
 		break;
 
-	case X86_DBG_STATEKIND_SCPU:
-		x86_dbg_trapstate = fcpustate_to_scpustate_p(state, (struct scpustate *)x86_dbg_trapstate);
+	case DBG_RT_STATEKIND_SCPU:
+		dbg_rt_trapstate = fcpustate_to_scpustate_p(state, (struct scpustate *)dbg_rt_trapstate);
 		break;
 
 	default:
@@ -178,8 +178,8 @@ NOTHROW(KCALL set_trapstate_from_fcpustate)(struct fcpustate const *__restrict s
 		memcpy(&x86_dbg_exitstate, state, sizeof(struct fcpustate));
 		return;
 	}
-	/* These registers are never present in trap states other than `X86_DBG_STATEKIND_FCPU'.
-	 * As  such, changes to the values of these  registers must cascade down to the debugger
+	/* These registers are never present in trap states other than `DBG_RT_STATEKIND_FCPU'.
+	 * As  such, changes to the values of these registers must cascade down to the debugger
 	 * exit state. */
 	x86_dbg_exitstate.de_state.fcs_sgregs.sg_tr  = state->fcs_sgregs.sg_tr16;
 	x86_dbg_exitstate.de_state.fcs_sgregs.sg_ldt = state->fcs_sgregs.sg_ldt16;
@@ -391,7 +391,7 @@ NOTHROW(KCALL loadview)(void) {
 			/* Special case: no thread loaded. */
 			bzero(&x86_dbg_origstate, sizeof(x86_dbg_origstate));
 		} else if (dbg_current == THIS_TASK) {
-			/* DBG_REGLEVEL_ORIG = DBG_REGLEVEL_TRAP */
+			/* DBG_RT_REGLEVEL_ORIG = DBG_RT_REGLEVEL_TRAP */
 			get_fcpustate_from_trapstate(&x86_dbg_origstate);
 #ifndef CONFIG_NO_SMP
 		} else if (dbg_current->t_cpu &&
@@ -556,13 +556,13 @@ nocpu:
 }
 
 #define VIEWSTATE(level)                                   \
-	((unsigned int)(uintptr_t)(level) == DBG_REGLEVEL_ORIG \
+	((unsigned int)(uintptr_t)(level) == DBG_RT_REGLEVEL_ORIG \
 	 ? &x86_dbg_origstate                                  \
 	 : &x86_dbg_viewstate)
 
 /* Get/Set debugger register for some given level.
  * NOTE: These functions are written to be compatible with `unwind_getreg_t' / `unwind_setreg_t'
- * @param: arg: One of `DBG_REGLEVEL_*', cast as `(void *)(uintptr_t)DBG_REGLEVEL_*' */
+ * @param: arg: One of `DBG_RT_REGLEVEL_*', cast as `(void *)(uintptr_t)DBG_RT_REGLEVEL_*' */
 PUBLIC ATTR_DBGTEXT unwind_errno_t
 NOTHROW(LIBUNWIND_CC dbg_getreg)(/*uintptr_t level*/ void const *arg,
                                  uintptr_half_t cfi_regno,
@@ -570,36 +570,36 @@ NOTHROW(LIBUNWIND_CC dbg_getreg)(/*uintptr_t level*/ void const *arg,
 	unwind_errno_t error;
 	switch ((unsigned int)(uintptr_t)arg) {
 
-	case DBG_REGLEVEL_EXIT:
-	case DBG_REGLEVEL_TRAP:
+	case DBG_RT_REGLEVEL_EXIT:
+	case DBG_RT_REGLEVEL_TRAP:
 		if (dbg_current == THIS_TASK) {
-			if ((unsigned int)(uintptr_t)arg == DBG_REGLEVEL_TRAP) {
+			if ((unsigned int)(uintptr_t)arg == DBG_RT_REGLEVEL_TRAP) {
 				/* NOTE: Use exclusive register access so that the exit state is used as
 				 *       fall-back, rather than the  current register state being  used! */
-				switch (x86_dbg_trapstatekind) {
+				switch (dbg_rt_trapstatekind) {
 
-				case X86_DBG_STATEKIND_FCPU:
-					error = unwind_getreg_fcpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
+				case DBG_RT_STATEKIND_FCPU:
+					error = unwind_getreg_fcpustate_exclusive(dbg_rt_trapstate, cfi_regno, buf);
 					break;
 
-				case X86_DBG_STATEKIND_UCPU:
-					error = unwind_getreg_ucpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
+				case DBG_RT_STATEKIND_UCPU:
+					error = unwind_getreg_ucpustate_exclusive(dbg_rt_trapstate, cfi_regno, buf);
 					break;
 
-				case X86_DBG_STATEKIND_LCPU:
-					error = unwind_getreg_lcpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
+				case DBG_RT_STATEKIND_LCPU:
+					error = unwind_getreg_lcpustate_exclusive(dbg_rt_trapstate, cfi_regno, buf);
 					break;
 
-				case X86_DBG_STATEKIND_KCPU:
-					error = unwind_getreg_kcpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
+				case DBG_RT_STATEKIND_KCPU:
+					error = unwind_getreg_kcpustate_exclusive(dbg_rt_trapstate, cfi_regno, buf);
 					break;
 
-				case X86_DBG_STATEKIND_ICPU:
-					error = unwind_getreg_icpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
+				case DBG_RT_STATEKIND_ICPU:
+					error = unwind_getreg_icpustate_exclusive(dbg_rt_trapstate, cfi_regno, buf);
 					break;
 
-				case X86_DBG_STATEKIND_SCPU:
-					error = unwind_getreg_scpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
+				case DBG_RT_STATEKIND_SCPU:
+					error = unwind_getreg_scpustate_exclusive(dbg_rt_trapstate, cfi_regno, buf);
 					break;
 
 				default:
@@ -613,8 +613,8 @@ NOTHROW(LIBUNWIND_CC dbg_getreg)(/*uintptr_t level*/ void const *arg,
 			return unwind_getreg_fcpustate(&x86_dbg_exitstate, cfi_regno, buf);
 		}
 		ATTR_FALLTHROUGH
-	case DBG_REGLEVEL_ORIG:
-	case DBG_REGLEVEL_VIEW:
+	case DBG_RT_REGLEVEL_ORIG:
+	case DBG_RT_REGLEVEL_VIEW:
 		loadview();
 		return unwind_getreg_fcpustate(VIEWSTATE(arg), cfi_regno, buf);
 
@@ -633,45 +633,45 @@ NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void *arg,
 	unwind_errno_t error;
 	switch ((unsigned int)(uintptr_t)arg) {
 
-	case DBG_REGLEVEL_EXIT:
-	case DBG_REGLEVEL_TRAP:
+	case DBG_RT_REGLEVEL_EXIT:
+	case DBG_RT_REGLEVEL_TRAP:
 		if (dbg_current == THIS_TASK) {
-			if ((unsigned int)(uintptr_t)arg == DBG_REGLEVEL_TRAP) {
+			if ((unsigned int)(uintptr_t)arg == DBG_RT_REGLEVEL_TRAP) {
 				/* NOTE: Use exclusive register access so that the exit state is used as
 				 *       fall-back, rather than the  current register state being  used! */
-				switch (x86_dbg_trapstatekind) {
+				switch (dbg_rt_trapstatekind) {
 
-				case X86_DBG_STATEKIND_FCPU:
-					error = unwind_setreg_fcpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
+				case DBG_RT_STATEKIND_FCPU:
+					error = unwind_setreg_fcpustate_exclusive(dbg_rt_trapstate, cfi_regno, buf);
 					break;
 
-				case X86_DBG_STATEKIND_UCPU:
-					error = unwind_setreg_ucpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
+				case DBG_RT_STATEKIND_UCPU:
+					error = unwind_setreg_ucpustate_exclusive(dbg_rt_trapstate, cfi_regno, buf);
 					break;
 
-				case X86_DBG_STATEKIND_LCPU:
-					error = unwind_setreg_lcpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
+				case DBG_RT_STATEKIND_LCPU:
+					error = unwind_setreg_lcpustate_exclusive(dbg_rt_trapstate, cfi_regno, buf);
 					break;
 
-				case X86_DBG_STATEKIND_KCPU:
-					error = unwind_setreg_kcpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
+				case DBG_RT_STATEKIND_KCPU:
+					error = unwind_setreg_kcpustate_exclusive(dbg_rt_trapstate, cfi_regno, buf);
 					break;
 
 #ifdef __x86_64__
-				case X86_DBG_STATEKIND_ICPU:
-					error = unwind_setreg_icpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
+				case DBG_RT_STATEKIND_ICPU:
+					error = unwind_setreg_icpustate_exclusive(dbg_rt_trapstate, cfi_regno, buf);
 					break;
 
-				case X86_DBG_STATEKIND_SCPU:
-					error = unwind_setreg_scpustate_exclusive(x86_dbg_trapstate, cfi_regno, buf);
+				case DBG_RT_STATEKIND_SCPU:
+					error = unwind_setreg_scpustate_exclusive(dbg_rt_trapstate, cfi_regno, buf);
 					break;
 #else /* __x86_64__ */
-				case X86_DBG_STATEKIND_ICPU:
-					error = unwind_setreg_icpustate_exclusive_p(&x86_dbg_trapstate, cfi_regno, buf);
+				case DBG_RT_STATEKIND_ICPU:
+					error = unwind_setreg_icpustate_exclusive_p(&dbg_rt_trapstate, cfi_regno, buf);
 					break;
 
-				case X86_DBG_STATEKIND_SCPU:
-					error = unwind_setreg_scpustate_exclusive_p(&x86_dbg_trapstate, cfi_regno, buf);
+				case DBG_RT_STATEKIND_SCPU:
+					error = unwind_setreg_scpustate_exclusive_p(&dbg_rt_trapstate, cfi_regno, buf);
 					break;
 #endif /* !__x86_64__ */
 
@@ -686,12 +686,12 @@ NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void *arg,
 			return unwind_setreg_fcpustate(&x86_dbg_exitstate, cfi_regno, buf);
 		}
 		ATTR_FALLTHROUGH
-	case DBG_REGLEVEL_ORIG:
-	case DBG_REGLEVEL_VIEW:
+	case DBG_RT_REGLEVEL_ORIG:
+	case DBG_RT_REGLEVEL_VIEW:
 		loadview();
 		error = unwind_setreg_fcpustate(VIEWSTATE(arg), cfi_regno, buf);
 		if (error == UNWIND_SUCCESS) {
-			if ((unsigned int)(uintptr_t)arg == DBG_REGLEVEL_ORIG)
+			if ((unsigned int)(uintptr_t)arg == DBG_RT_REGLEVEL_ORIG)
 				saveorig();
 		}
 		goto done;
@@ -710,46 +710,46 @@ NOTHROW(KCALL raw_dbg_getregbyid)(unsigned int level, cpu_regno_t regno,
 	size_t result;
 	switch (level) {
 
-	case DBG_REGLEVEL_EXIT:
-	case DBG_REGLEVEL_TRAP:
+	case DBG_RT_REGLEVEL_EXIT:
+	case DBG_RT_REGLEVEL_TRAP:
 		if (dbg_current == THIS_TASK) {
-			if (level == DBG_REGLEVEL_TRAP) {
+			if (level == DBG_RT_REGLEVEL_TRAP) {
 				/* NOTE: Use exclusive register access so that the exit state is used as
 				 *       fall-back, rather than the  current register state being  used! */
-				switch (x86_dbg_trapstatekind) {
+				switch (dbg_rt_trapstatekind) {
 
-				case X86_DBG_STATEKIND_FCPU:
-					result = register_get((struct fcpustate *)x86_dbg_trapstate, regno, buf, buflen);
+				case DBG_RT_STATEKIND_FCPU:
+					result = register_get((struct fcpustate *)dbg_rt_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
 
-				case X86_DBG_STATEKIND_UCPU:
-					result = register_get((struct ucpustate *)x86_dbg_trapstate, regno, buf, buflen);
+				case DBG_RT_STATEKIND_UCPU:
+					result = register_get((struct ucpustate *)dbg_rt_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
 
-				case X86_DBG_STATEKIND_LCPU:
-					result = register_get((struct lcpustate *)x86_dbg_trapstate, regno, buf, buflen);
+				case DBG_RT_STATEKIND_LCPU:
+					result = register_get((struct lcpustate *)dbg_rt_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
 
-				case X86_DBG_STATEKIND_KCPU:
-					result = register_get((struct kcpustate *)x86_dbg_trapstate, regno, buf, buflen);
+				case DBG_RT_STATEKIND_KCPU:
+					result = register_get((struct kcpustate *)dbg_rt_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
 
-				case X86_DBG_STATEKIND_ICPU:
-					result = register_get((struct icpustate *)x86_dbg_trapstate, regno, buf, buflen);
+				case DBG_RT_STATEKIND_ICPU:
+					result = register_get((struct icpustate *)dbg_rt_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
 
-				case X86_DBG_STATEKIND_SCPU:
-					result = register_get((struct scpustate *)x86_dbg_trapstate, regno, buf, buflen);
+				case DBG_RT_STATEKIND_SCPU:
+					result = register_get((struct scpustate *)dbg_rt_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
@@ -773,12 +773,12 @@ NOTHROW(KCALL raw_dbg_getregbyid)(unsigned int level, cpu_regno_t regno,
 			return register_get(&x86_dbg_exitstate.de_state, regno, buf, buflen);
 		}
 		ATTR_FALLTHROUGH
-	case DBG_REGLEVEL_ORIG:
-	case DBG_REGLEVEL_VIEW:
+	case DBG_RT_REGLEVEL_ORIG:
+	case DBG_RT_REGLEVEL_VIEW:
 		loadview();
 		result = register_get(VIEWSTATE(level), regno, buf, buflen);
 #ifdef __x86_64__
-		if (/*level == DBG_REGLEVEL_ORIG &&*/ result == 0) {
+		if (/*level == DBG_RT_REGLEVEL_ORIG &&*/ result == 0) {
 			if (regno == X86_REGISTER_MISC_KGSBASEL) {
 				u64 temp;
 				result = 0;
@@ -846,13 +846,13 @@ NOTHROW(KCALL transform_gsbase_register_indices)(unsigned int level, cpu_regno_t
 
 /* Get/set a register, given its ID
  * NOTE: When `return > buflen', then
- *       dbg_getregbyname: The contents of `buf' are undefined.
- *       dbg_setregbyname: The register was not written.
+ *       dbg_rt_getregbyname: The contents of `buf' are undefined.
+ *       dbg_rt_setregbyname: The register was not written.
  * NOTE: Accepted register names are those found in comments in `<asm/registers.h>'
  * @param: regno: One of `X86_REGISTER_*' (from <asm/registers.h>) or one of `X86_DBGREGISTER_*'
  * @return: * :   The required buffer size, or 0 when `regno' isn't recognized. */
 PUBLIC size_t
-NOTHROW(KCALL dbg_getregbyid)(unsigned int level, cpu_regno_t regno,
+NOTHROW(KCALL dbg_rt_getregbyid)(unsigned int level, cpu_regno_t regno,
                               void *__restrict buf, size_t buflen) {
 #ifdef __x86_64__
 	/* Special handling: when we're currently returning to  kernel-space,
@@ -864,7 +864,7 @@ NOTHROW(KCALL dbg_getregbyid)(unsigned int level, cpu_regno_t regno,
 }
 
 PUBLIC size_t
-NOTHROW(KCALL dbg_setregbyid)(unsigned int level, cpu_regno_t regno,
+NOTHROW(KCALL dbg_rt_setregbyid)(unsigned int level, cpu_regno_t regno,
                               void const *__restrict buf, size_t buflen) {
 	size_t result;
 
@@ -877,46 +877,46 @@ NOTHROW(KCALL dbg_setregbyid)(unsigned int level, cpu_regno_t regno,
 
 	switch (level) {
 
-	case DBG_REGLEVEL_EXIT:
-	case DBG_REGLEVEL_TRAP:
+	case DBG_RT_REGLEVEL_EXIT:
+	case DBG_RT_REGLEVEL_TRAP:
 		if (dbg_current == THIS_TASK) {
-			if (level == DBG_REGLEVEL_TRAP) {
+			if (level == DBG_RT_REGLEVEL_TRAP) {
 				/* NOTE: Use exclusive register access so that the exit state is used as
 				 *       fall-back, rather than the  current register state being  used! */
-				switch (x86_dbg_trapstatekind) {
+				switch (dbg_rt_trapstatekind) {
 
-				case X86_DBG_STATEKIND_FCPU:
-					result = register_set_fcpustate_p((struct fcpustate **)&x86_dbg_trapstate, regno, buf, buflen);
+				case DBG_RT_STATEKIND_FCPU:
+					result = register_set_fcpustate_p((struct fcpustate **)&dbg_rt_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
 
-				case X86_DBG_STATEKIND_UCPU:
-					result = register_set_ucpustate_p((struct ucpustate **)&x86_dbg_trapstate, regno, buf, buflen);
+				case DBG_RT_STATEKIND_UCPU:
+					result = register_set_ucpustate_p((struct ucpustate **)&dbg_rt_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
 
-				case X86_DBG_STATEKIND_LCPU:
-					result = register_set_lcpustate_p((struct lcpustate **)&x86_dbg_trapstate, regno, buf, buflen);
+				case DBG_RT_STATEKIND_LCPU:
+					result = register_set_lcpustate_p((struct lcpustate **)&dbg_rt_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
 
-				case X86_DBG_STATEKIND_KCPU:
-					result = register_set_kcpustate_p((struct kcpustate **)&x86_dbg_trapstate, regno, buf, buflen);
+				case DBG_RT_STATEKIND_KCPU:
+					result = register_set_kcpustate_p((struct kcpustate **)&dbg_rt_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
 
-				case X86_DBG_STATEKIND_ICPU:
-					result = register_set_icpustate_p((struct icpustate **)&x86_dbg_trapstate, regno, buf, buflen);
+				case DBG_RT_STATEKIND_ICPU:
+					result = register_set_icpustate_p((struct icpustate **)&dbg_rt_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
 
-				case X86_DBG_STATEKIND_SCPU:
-					result = register_set_scpustate_p((struct scpustate **)&x86_dbg_trapstate, regno, buf, buflen);
+				case DBG_RT_STATEKIND_SCPU:
+					result = register_set_scpustate_p((struct scpustate **)&dbg_rt_trapstate, regno, buf, buflen);
 					if (result != 0)
 						goto ok;
 					break;
@@ -940,15 +940,15 @@ NOTHROW(KCALL dbg_setregbyid)(unsigned int level, cpu_regno_t regno,
 			return register_set_fcpustate(&x86_dbg_exitstate.de_state, regno, buf, buflen);
 		}
 		ATTR_FALLTHROUGH
-	case DBG_REGLEVEL_ORIG:
-	case DBG_REGLEVEL_VIEW:
+	case DBG_RT_REGLEVEL_ORIG:
+	case DBG_RT_REGLEVEL_VIEW:
 		loadview();
 		result = register_set_fcpustate(VIEWSTATE(level), regno, buf, buflen);
-		if (level == DBG_REGLEVEL_ORIG && result != 0) {
+		if (level == DBG_RT_REGLEVEL_ORIG && result != 0) {
 			saveorig();
 		}
 #ifdef __x86_64__
-		else if (level == DBG_REGLEVEL_ORIG && result == 0) {
+		else if (level == DBG_RT_REGLEVEL_ORIG && result == 0) {
 			if (regno == X86_REGISTER_MISC_KGSBASEL) {
 				result = 4;
 				if (buflen >= 4) {
@@ -987,42 +987,42 @@ ok:
 
 /* Get/set all registers. */
 PUBLIC ATTR_DBGTEXT void
-NOTHROW(KCALL dbg_getallregs)(unsigned int level,
+NOTHROW(KCALL dbg_rt_getallregs)(unsigned int level,
                               struct fcpustate *__restrict state) {
 	switch (level) {
 
-	case DBG_REGLEVEL_EXIT:
-	case DBG_REGLEVEL_TRAP:
+	case DBG_RT_REGLEVEL_EXIT:
+	case DBG_RT_REGLEVEL_TRAP:
 		if (dbg_current == THIS_TASK) {
 			/* Access the exit CPU state. */
 			memcpy(state, &x86_dbg_exitstate, sizeof(struct fcpustate));
-			if (level == DBG_REGLEVEL_TRAP) {
+			if (level == DBG_RT_REGLEVEL_TRAP) {
 				/* NOTE: Use exclusive register access so that the exit state is used as
 				 *       fall-back, rather than the  current register state being  used! */
-				switch (x86_dbg_trapstatekind) {
+				switch (dbg_rt_trapstatekind) {
 
-				case X86_DBG_STATEKIND_FCPU:
-					memcpy(state, (struct fcpustate *)x86_dbg_trapstate, sizeof(struct fcpustate));
+				case DBG_RT_STATEKIND_FCPU:
+					memcpy(state, (struct fcpustate *)dbg_rt_trapstate, sizeof(struct fcpustate));
 					break;
 
-				case X86_DBG_STATEKIND_UCPU:
-					fcpustate_assign_ucpustate(state, (struct ucpustate *)x86_dbg_trapstate);
+				case DBG_RT_STATEKIND_UCPU:
+					fcpustate_assign_ucpustate(state, (struct ucpustate *)dbg_rt_trapstate);
 					break;
 
-				case X86_DBG_STATEKIND_LCPU:
-					fcpustate_assign_lcpustate(state, (struct lcpustate *)x86_dbg_trapstate);
+				case DBG_RT_STATEKIND_LCPU:
+					fcpustate_assign_lcpustate(state, (struct lcpustate *)dbg_rt_trapstate);
 					break;
 
-				case X86_DBG_STATEKIND_KCPU:
-					fcpustate_assign_kcpustate(state, (struct kcpustate *)x86_dbg_trapstate);
+				case DBG_RT_STATEKIND_KCPU:
+					fcpustate_assign_kcpustate(state, (struct kcpustate *)dbg_rt_trapstate);
 					break;
 
-				case X86_DBG_STATEKIND_ICPU:
-					fcpustate_assign_icpustate(state, (struct icpustate *)x86_dbg_trapstate);
+				case DBG_RT_STATEKIND_ICPU:
+					fcpustate_assign_icpustate(state, (struct icpustate *)dbg_rt_trapstate);
 					break;
 
-				case X86_DBG_STATEKIND_SCPU:
-					fcpustate_assign_scpustate(state, (struct scpustate *)x86_dbg_trapstate);
+				case DBG_RT_STATEKIND_SCPU:
+					fcpustate_assign_scpustate(state, (struct scpustate *)dbg_rt_trapstate);
 					break;
 
 				default: break;
@@ -1051,7 +1051,7 @@ done:
 }
 
 PUBLIC ATTR_DBGTEXT void
-NOTHROW(KCALL dbg_setallregs)(unsigned int level,
+NOTHROW(KCALL dbg_rt_setallregs)(unsigned int level,
                               struct fcpustate const *__restrict state) {
 #ifdef __x86_64__
 	struct fcpustate real_state;
@@ -1068,11 +1068,11 @@ NOTHROW(KCALL dbg_setallregs)(unsigned int level,
 #endif /* __x86_64__ */
 	switch (level) {
 
-	case DBG_REGLEVEL_EXIT:
-	case DBG_REGLEVEL_TRAP:
+	case DBG_RT_REGLEVEL_EXIT:
+	case DBG_RT_REGLEVEL_TRAP:
 		if (dbg_current == THIS_TASK) {
 			/* Access the exit CPU state. */
-			if (level == DBG_REGLEVEL_TRAP) {
+			if (level == DBG_RT_REGLEVEL_TRAP) {
 				/* NOTE: Use exclusive register access so that the exit state is used as
 				 *       fall-back, rather than the  current register state being  used! */
 				set_trapstate_from_fcpustate(state);
@@ -1088,13 +1088,13 @@ NOTHROW(KCALL dbg_setallregs)(unsigned int level,
 	loadview();
 	memcpy(VIEWSTATE(level), state,
 	       sizeof(struct fcpustate));
-	if (level == DBG_REGLEVEL_ORIG)
+	if (level == DBG_RT_REGLEVEL_ORIG)
 		saveorig();
 }
 
 /* Return the ISA code for use with libinstrlen */
 PUBLIC ATTR_PURE WUNUSED instrlen_isa_t
-NOTHROW(KCALL dbg_instrlen_isa)(unsigned int level) {
+NOTHROW(KCALL dbg_rt_instrlen_isa)(unsigned int level) {
 	instrlen_isa_t result;
 #ifdef __x86_64__
 	uintptr_t cs;
@@ -1118,9 +1118,9 @@ NOTHROW(KCALL dbg_instrlen_isa)(unsigned int level) {
 
 /* Return the page directory of `dbg_current' */
 PUBLIC ATTR_PURE WUNUSED pagedir_phys_t
-NOTHROW(KCALL dbg_getpagedir)(void) {
+NOTHROW(KCALL dbg_rt_getpagedir)(void) {
 	uintptr_t result;
-	result = dbg_getregbyidp(DBG_REGLEVEL_VIEW,
+	result = dbg_rt_getregbyidp(DBG_RT_REGLEVEL_VIEW,
 	                         X86_REGISTER_CONTROL_CR3);
 	return (pagedir_phys_t)result;
 }
@@ -1128,7 +1128,7 @@ NOTHROW(KCALL dbg_getpagedir)(void) {
 
 /* Check if the register view has been changed. */
 PUBLIC ATTR_DBGTEXT ATTR_PURE WUNUSED bool
-NOTHROW(FCALL dbg_changedview)(void) {
+NOTHROW(FCALL dbg_rt_changedview)(void) {
 	loadview();
 	return bcmp(&x86_dbg_origstate,
 	            &x86_dbg_viewstate,

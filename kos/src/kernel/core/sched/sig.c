@@ -645,7 +645,9 @@ NOTHROW(FCALL sig_intern_broadcast)(struct sig *self,
                                     struct sig_cleanup_callback *cleanup,
                                     uintptr_t phase_one_state,
                                     preemption_flag_t was) {
+#ifndef CONFIG_NO_SMP
 	uintptr_t ctl;
+#endif /* !CONFIG_NO_SMP */
 	struct sig_post_completion *phase2 = NULL;
 	struct sig_completion_context context;
 	struct task_connections *target_cons;
@@ -663,8 +665,12 @@ NOTHROW(FCALL sig_intern_broadcast)(struct sig *self,
 		sc_pending->tc_connext = NULL;
 	}
 again:
+#ifdef CONFIG_NO_SMP
+	con = ATOMIC_READ(self->s_con);
+#else /* CONFIG_NO_SMP */
 	ctl = ATOMIC_READ(self->s_ctl);
 	con = sig_smplock_clr(ctl);
+#endif /* !CONFIG_NO_SMP */
 	if (!con) {
 no_cons:
 		/* No one else here! (and nothing for us to do...) */
@@ -692,8 +698,13 @@ no_cons:
 #endif /* !CONFIG_NO_SMP */
 
 		/* Unlink `receiver' from the pending chain. */
+#ifdef CONFIG_NO_SMP
+		if (!ATOMIC_CMPXCH_WEAK(self->s_con, con, (uintptr_t)receiver->tc_signext))
+			goto again;
+#else /* CONFIG_NO_SMP */
 		if (!ATOMIC_CMPXCH_WEAK(self->s_ctl, ctl, (uintptr_t)receiver->tc_signext))
 			goto again;
+#endif /* !CONFIG_NO_SMP */
 	} else {
 		/* Find another receiver. */
 		struct task_connection **preceiver;
@@ -784,7 +795,9 @@ NOTHROW(FCALL sig_intern_send)(struct sig *self,
                                struct sig_cleanup_callback *cleanup,
                                preemption_flag_t was) {
 	bool result;
+#ifndef CONFIG_NO_SMP
 	uintptr_t ctl;
+#endif /* !CONFIG_NO_SMP */
 	struct sig_post_completion *phase2 = NULL;
 	struct sig_completion_context context;
 	struct task_connections *target_cons;
@@ -799,8 +812,12 @@ NOTHROW(FCALL sig_intern_send)(struct sig *self,
 		sc_pending->tc_connext = NULL;
 	}
 again:
+#ifdef CONFIG_NO_SMP
+	con = ATOMIC_READ(self->s_con);
+#else /* CONFIG_NO_SMP */
 	ctl = ATOMIC_READ(self->s_ctl);
 	con = sig_smplock_clr(ctl);
+#endif /* !CONFIG_NO_SMP */
 	if unlikely(!con) {
 		/* No one else here! (and nothing for us to do...)
 		 * This  is an  undefined situation,  since the  original call to
@@ -1000,6 +1017,7 @@ NOTHROW(FCALL sig_completion_runsingle)(struct sig *self,
                                         preemption_flag_t was) {
 	struct sig_post_completion *phase2 = NULL;
 	struct sig_completion_context context;
+	(void)self;
 	context.scc_sender = sender;
 	context.scc_caller = caller;
 
@@ -1027,7 +1045,9 @@ NOTHROW(FCALL sig_sendone_for_forwarding_and_unlock)(struct sig *self,
                                                      preemption_flag_t was) {
 	bool result = false;
 	bool is_broadcasting_poll = false;
+#ifndef CONFIG_NO_SMP
 	uintptr_t ctl;
+#endif /* !CONFIG_NO_SMP */
 	struct sig_completion *sc_pending = NULL;
 	struct task_connections *target_cons;
 	struct task_connection *receiver;
@@ -1036,8 +1056,12 @@ NOTHROW(FCALL sig_sendone_for_forwarding_and_unlock)(struct sig *self,
 	struct sig_completion_context context;
 	REF struct task *destroy_later = NULL;
 again:
+#ifdef CONFIG_NO_SMP
+	con = ATOMIC_READ(self->s_con);
+#else /* CONFIG_NO_SMP */
 	ctl = ATOMIC_READ(self->s_ctl);
 	con = sig_smplock_clr(ctl);
+#endif /* !CONFIG_NO_SMP */
 	if unlikely(!con) {
 no_cons:
 		/* No one else here! (and nothing for us to do...)

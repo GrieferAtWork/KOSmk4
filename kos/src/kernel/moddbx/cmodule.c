@@ -279,7 +279,7 @@ err:
 }
 
 /* Enumerate all CModules that are currently visible in the following order:
- * >> void const *pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
+ * >> void const *pc = dbg_getpcreg(DBG_RT_REGLEVEL_VIEW);
  * >> ENUM(cmodule_ataddr(pc));
  * >> if (ADDR_ISKERN(pc)) {
  * >>     cmodule_enum_drivers();                 // Excluding `cmodule_ataddr(pc)'
@@ -296,7 +296,7 @@ NOTHROW(FCALL cmodule_enum)(cmodule_enum_callback_t cb,
 	ssize_t result;
 	REF struct cmodule *pc_module;
 	void const *pc;
-	pc        = dbg_getpcreg(DBG_REGLEVEL_VIEW);
+	pc        = dbg_getpcreg(DBG_RT_REGLEVEL_VIEW);
 	pc_module = cmodule_ataddr(pc);
 	result    = cmodule_enum_with_hint(pc_module, cb, cookie);
 	xdecref(pc_module);
@@ -697,13 +697,13 @@ NOTHROW(FCALL cmodule_ataddr)(void const *addr) {
 	return result;
 }
 
-/* Return the CModule for  `dbg_getpcreg(DBG_REGLEVEL_VIEW)'
- * Same as `cmodule_ataddr(dbg_getpcreg(DBG_REGLEVEL_VIEW))' */
+/* Return the CModule for  `dbg_getpcreg(DBG_RT_REGLEVEL_VIEW)'
+ * Same as `cmodule_ataddr(dbg_getpcreg(DBG_RT_REGLEVEL_VIEW))' */
 PUBLIC WUNUSED REF struct cmodule *
 NOTHROW(FCALL cmodule_current)(void) {
 	void const *pc;
 	REF struct cmodule *result;
-	pc     = dbg_getpcreg(DBG_REGLEVEL_VIEW);
+	pc     = dbg_getpcreg(DBG_RT_REGLEVEL_VIEW);
 	result = cmodule_ataddr(pc);
 	return result;
 }
@@ -2151,7 +2151,7 @@ done:
  * symbol table of `self' (iow: `self->cm_symbols'). If this  table
  * contains a symbol matching `name', that symbol is then returned,
  * unless it has the `CMODSYM_DIP_NS_FCONFLICT' flag set, in  which
- * case  `dbg_getpcreg(DBG_REGLEVEL_VIEW)'  is  checked  for  being
+ * case `dbg_getpcreg(DBG_RT_REGLEVEL_VIEW)' is  checked for  being
  * apart of `self'. If  it is, try to  find the CU associated  with
  * that address. If such a CU exists, check that CU's symbol  table
  * for `name' once again. If  that table contains the given  `name'
@@ -2180,10 +2180,10 @@ NOTHROW(FCALL cmodule_getsym)(struct cmodule *__restrict self,
 	/* Check  if  the  symbol  we've  found  is  in  conflict  with other,
 	 * per-CU symbols. If this is the case, then we must lookup the symbol
 	 * once again within the table associated with the currently viewed PC
-	 * pointer, as returned by `dbg_getpcreg(DBG_REGLEVEL_VIEW)' */
+	 * pointer,  as   returned   by   `dbg_getpcreg(DBG_RT_REGLEVEL_VIEW)' */
 	if (result && (cmodsym_getns(result) & CMODSYM_DIP_NS_FCONFLICT)) {
 		void const *pc;
-		pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
+		pc = dbg_getpcreg(DBG_RT_REGLEVEL_VIEW);
 		if ((byte_t const *)pc >= cmodule_getloadmin(self) &&
 		    (byte_t const *)pc <= cmodule_getloadmax(self)) {
 			uintptr_t module_relative_pc;
@@ -2469,10 +2469,10 @@ NOTHROW(FCALL cmod_syminfo)(/*in|out*/ struct cmodsyminfo *__restrict info,
 	return data.error;
 }
 
-/* Same as `cmod_syminfo()', but the caller is not required to fill in information
- * about any symbol at all, which are automatically loaded based on `dbg_current',
- * as well as `dbg_getpcreg(DBG_REGLEVEL_VIEW)'. However, upon success, the caller
- * is  required to call  `cmod_syminfo_local_fini(info)' once returned information
+/* Same as `cmod_syminfo()', but  the caller is not  required to fill in  information
+ * about  any symbol at  all, which are automatically  loaded based on `dbg_current',
+ * as well as `dbg_getpcreg(DBG_RT_REGLEVEL_VIEW)'. However, upon success, the caller
+ * is  required  to  call `cmod_syminfo_local_fini(info)'  once  returned information
  * is no longer being used.
  * @param: ns: Symbol namespace (one of `CMODSYM_DIP_NS_*')
  * @return: DBX_EOK:    Success
@@ -2484,7 +2484,7 @@ NOTHROW(FCALL cmod_syminfo_local)(/*out*/ struct cmodsyminfo *__restrict info,
                                   uintptr_t ns) {
 	void const *pc;
 	dbx_errno_t result;
-	pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
+	pc = dbg_getpcreg(DBG_RT_REGLEVEL_VIEW);
 	/* Lookup the module that contains `pc' */
 	info->clv_mod = cmodule_ataddr(pc);
 	if (info->clv_mod) {
@@ -3403,7 +3403,7 @@ NOTHROW(FCALL cmod_symenum_local)(/*in(oob_only)|out(undef)*/ struct cmodsyminfo
                                   size_t startswith_namelen, uintptr_t ns, uintptr_t scope) {
 	void const *pc;
 	ssize_t result;
-	pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
+	pc = dbg_getpcreg(DBG_RT_REGLEVEL_VIEW);
 	/* Lookup the module that contains `pc' */
 	info->clv_mod = cmodule_ataddr(pc);
 	if (info->clv_mod) {

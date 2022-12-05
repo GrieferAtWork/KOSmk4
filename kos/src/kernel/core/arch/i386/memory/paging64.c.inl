@@ -2907,7 +2907,7 @@ DBG_COMMAND_AUTO(lspd, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
 		if (argc != 1)
 			return DBG_STATUS_INVALID_ARGUMENTS;
 	}
-	pdir = dbg_getpagedir();
+	pdir = dbg_rt_getpagedir();
 	if (pdir == pagedir_kernel_phys) {
 do_ls_kernel:
 		p64_do_lspd(512);

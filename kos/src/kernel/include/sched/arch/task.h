@@ -27,6 +27,8 @@ DECL_BEGIN
 
 #ifdef __CC__
 typedef int pflag_t;
+#define PREEMPTION_ENABLED_VALUE               1
+#define PREEMPTION_DISABLED_VALUE              0
 #define task_pause()                     (void)0
 #define PREEMPTION_ENABLE()              (void)0
 #define PREEMPTION_ENABLE_WAIT()         (void)0

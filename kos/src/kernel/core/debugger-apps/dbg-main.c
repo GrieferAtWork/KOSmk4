@@ -892,7 +892,7 @@ again_readline:
 		 * viewed state (thus informing the user that they need to type `apply' before
 		 * exit if they wish to return to the modified state) */
 		dbg_setcolor(dbg_getdefaultcolor());
-		if (dbg_changedview())
+		if (dbg_rt_changedview())
 			dbg_print(DBGSTR(AC_WITHCOLOR(ANSITTY_CL_LIME, ANSITTY_CL_DARK_GRAY, "!")));
 		dbg_print(DBGSTR("> "));
 		dbg_savecolor();

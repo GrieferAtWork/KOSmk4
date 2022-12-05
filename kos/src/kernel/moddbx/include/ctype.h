@@ -91,9 +91,9 @@ DECL_BEGIN
 #ifdef __x86_64__
 #define    CTYPE_KIND_FUNPROTO_CC_SYSVABI  0x0400
 #define    CTYPE_KIND_FUNPROTO_CC_MSABI    0x0500
-#define    CTYPE_KIND_FUNPROTO_CC_DEFAULT                                            \
-	(__KOS64_IS_CS32BIT(dbg_getregbyidp(DBG_REGLEVEL_VIEW, X86_REGISTER_SEGMENT_CS)) \
-	 ? CTYPE_KIND_FUNPROTO_CC_CDECL                                                  \
+#define    CTYPE_KIND_FUNPROTO_CC_DEFAULT                                                  \
+	(__KOS64_IS_CS32BIT(dbg_rt_getregbyidp(DBG_RT_REGLEVEL_VIEW, X86_REGISTER_SEGMENT_CS)) \
+	 ? CTYPE_KIND_FUNPROTO_CC_CDECL                                                        \
 	 : CTYPE_KIND_FUNPROTO_CC_SYSVABI)
 #else /* __x86_64__ */
 #define    CTYPE_KIND_FUNPROTO_CC_DEFAULT  CTYPE_KIND_FUNPROTO_CC_CDECL

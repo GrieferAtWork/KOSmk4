@@ -131,7 +131,7 @@ do_print_local(void *UNUSED(arg),
 #ifdef __ARCH_HAVE_COMPAT
 	if (dbg_current_iscompat()) {
 		struct unwind_getreg_compat_data compat_data;
-		unwind_getreg_compat_data_init(&compat_data, &dbg_getreg, (void *)(uintptr_t)DBG_REGLEVEL_VIEW);
+		unwind_getreg_compat_data_init(&compat_data, &dbg_getreg, (void *)(uintptr_t)DBG_RT_REGLEVEL_VIEW);
 		error = debuginfo_location_getvalue(&var->v_location,
 		                                    di_debug_sections_as_unwind_emulator_sections(debug_sections),
 		                                    &unwind_getreg_compat,
@@ -152,7 +152,7 @@ do_print_local(void *UNUSED(arg),
 		error = debuginfo_location_getvalue(&var->v_location,
 		                                    di_debug_sections_as_unwind_emulator_sections(debug_sections),
 		                                    &dbg_getreg,
-		                                    (void *)(uintptr_t)DBG_REGLEVEL_VIEW,
+		                                    (void *)(uintptr_t)DBG_RT_REGLEVEL_VIEW,
 		                                    di_debuginfo_compile_unit_as_simple(cu),
 		                                    module_relative_pc,
 		                                    _locals_current_module_loadaddr,
@@ -311,7 +311,7 @@ DBG_COMMAND(locals,
             "locals\n"
             "List the names, types and values of locally defined C variables at the current source location\n") {
 	/* Enumerate location variables. */
-	void const *pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
+	void const *pc = dbg_getpcreg(DBG_RT_REGLEVEL_VIEW);
 	enum_locals_at_with_debug_sections(pc, &print_local, NULL);
 	return 0;
 }
@@ -341,7 +341,7 @@ DBG_COMMAND(l,
             "different, in that instead of following C syntax, variable names are written "
             "first, and are also aligned alongside each other\n") {
 	size_t maxlen  = 0;
-	void const *pc = dbg_getpcreg(DBG_REGLEVEL_VIEW);
+	void const *pc = dbg_getpcreg(DBG_RT_REGLEVEL_VIEW);
 	/* Enumerate location variables. */
 	enum_locals_at_with_debug_sections(pc, &locals_maxlen, &maxlen);
 	enum_locals_at_with_debug_sections(pc, &print_local, &maxlen);

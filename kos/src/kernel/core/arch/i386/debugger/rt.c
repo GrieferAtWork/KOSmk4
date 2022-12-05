@@ -76,8 +76,8 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 DECL_BEGIN
 
 /* [1..1] The cpu that is hosting the debugger (== THIS_TASK->t_cpu).
- *        Set to non-NULL before `dbg_active' becomes `true', and set
- *        to   `NULL'    before    `dbg_active'    becomes    `false' */
+ *        Set to non-NULL  before `dbg_active' becomes  `true',
+ *        and set to `NULL' before `dbg_active' becomes `false' */
 DATDEF ATTR_DBGBSS struct cpu *dbg_cpu_ ASMNAME("dbg_cpu");
 
 
@@ -88,10 +88,6 @@ PUBLIC ATTR_DBGBSS struct x86_dbg_exitstate_struct x86_dbg_exitstate = {};
 /* [0..1] The thread who's view state is currently cached
  *        in `x86_dbg_viewstate' and `x86_dbg_origstate' */
 INTDEF struct task *x86_dbg_viewthread;
-
-/* DBG trap state information. */
-PUBLIC ATTR_DBGBSS void *x86_dbg_trapstate            = NULL;
-PUBLIC ATTR_DBGBSS unsigned int x86_dbg_trapstatekind = X86_DBG_STATEKIND_NONE;
 
 /* 1 + the LAPIC ID of the CPU currently holding the debugger lock.
  * This value is used with `lock cmpxchgw' to describe the  primary
@@ -1084,9 +1080,9 @@ INTERN ATTR_DBGTEXT void KCALL x86_dbg_fini(void) {
 	 * be updated in case the trap state was moved, as is required when
 	 * setting the kernel_esp  register of a  32-bit irregs  structure,
 	 * as found in  icpustate or  scpustate, both of  which may  appear
-	 * within the `x86_dbg_trapstate' pointer. */
-	if (x86_dbg_trapstatekind != X86_DBG_STATEKIND_NONE)
-		x86_dbg_exitstate.de_state.fcs_gpregs.gp_Pax = (uintptr_t)x86_dbg_trapstate;
+	 * within the `dbg_rt_trapstate' pointer. */
+	if (dbg_rt_trapstatekind != DBG_RT_STATEKIND_NONE)
+		x86_dbg_exitstate.de_state.fcs_gpregs.gp_Pax = (uintptr_t)dbg_rt_trapstate;
 	initok = 0;
 }
 
@@ -1174,54 +1170,6 @@ dbg_enter_scpustate_cr(dbg_entry_c_t entry, void const *data,
 	MAKEINFO(entry, data, num_bytes);
 	result = dbg_enter_scpustate_r(info, state);
 	return result;
-}
-
-PUBLIC ABNORMAL_RETURN ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
-dbg_enter_fcpustate_c(dbg_entry_c_t entry, void const *data,
-                      size_t num_bytes, struct fcpustate *__restrict state) {
-	struct fcpustate *new_state;
-	new_state = dbg_enter_fcpustate_cr(entry, data, num_bytes, state);
-	cpu_apply_fcpustate(new_state);
-}
-
-PUBLIC ABNORMAL_RETURN ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
-dbg_enter_ucpustate_c(dbg_entry_c_t entry, void const *data,
-                      size_t num_bytes, struct ucpustate *__restrict state) {
-	struct ucpustate *new_state;
-	new_state = dbg_enter_ucpustate_cr(entry, data, num_bytes, state);
-	cpu_apply_ucpustate(new_state);
-}
-
-PUBLIC ABNORMAL_RETURN ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
-dbg_enter_lcpustate_c(dbg_entry_c_t entry, void const *data,
-                      size_t num_bytes, struct lcpustate *__restrict state) {
-	struct lcpustate *new_state;
-	new_state = dbg_enter_lcpustate_cr(entry, data, num_bytes, state);
-	cpu_apply_lcpustate(new_state);
-}
-
-PUBLIC ABNORMAL_RETURN ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
-dbg_enter_kcpustate_c(dbg_entry_c_t entry, void const *data,
-                      size_t num_bytes, struct kcpustate *__restrict state) {
-	struct kcpustate *new_state;
-	new_state = dbg_enter_kcpustate_cr(entry, data, num_bytes, state);
-	cpu_apply_kcpustate(new_state);
-}
-
-PUBLIC ABNORMAL_RETURN ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
-dbg_enter_icpustate_c(dbg_entry_c_t entry, void const *data,
-                      size_t num_bytes, struct icpustate *__restrict state) {
-	struct icpustate *new_state;
-	new_state = dbg_enter_icpustate_cr(entry, data, num_bytes, state);
-	cpu_apply_icpustate(new_state);
-}
-
-PUBLIC ABNORMAL_RETURN ATTR_NORETURN NONNULL((1, 2, 4)) void FCALL
-dbg_enter_scpustate_c(dbg_entry_c_t entry, void const *data,
-                      size_t num_bytes, struct scpustate *__restrict state) {
-	struct scpustate *new_state;
-	new_state = dbg_enter_scpustate_cr(entry, data, num_bytes, state);
-	cpu_apply_scpustate(new_state);
 }
 
 DECL_END

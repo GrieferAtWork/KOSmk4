@@ -186,7 +186,7 @@ DBG_COMMAND_AUTO(lsmm, DBG_COMMANDHOOK_FLAG_AUTOEXCLUSIVE,
 		return DBG_STATUS_INVALID_ARGUMENTS;
 	/* Figure out  */
 	if (argc == 1) {
-		if (ADDR_ISUSER(dbg_getpcreg(DBG_REGLEVEL_VIEW)))
+		if (ADDR_ISUSER(dbg_getpcreg(DBG_RT_REGLEVEL_VIEW)))
 			goto douser;
 		mm = &mman_kernel;
 	} else if (strcmp(argv[1], lsmm_str_kernel) == 0) {

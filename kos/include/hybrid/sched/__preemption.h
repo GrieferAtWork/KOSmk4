@@ -117,6 +117,12 @@ __DECL_BEGIN
  * Opaque data type to represent a saved preemption state. */
 typedef struct { int __hpf_flag; } __hybrid_preemption_flag_t;
 #define __hybrid_preemption_flag_t __hybrid_preemption_flag_t
+#if defined(__KOS__) && defined(__KERNEL__)
+__hybrid_preemption_flag_t const __HYBRID_PREEMPTION_OFF_VALUE;
+__hybrid_preemption_flag_t const __HYBRID_PREEMPTION_ON_VALUE;
+#define __HYBRID_PREEMPTION_OFF_VALUE __HYBRID_PREEMPTION_OFF_VALUE
+#define __HYBRID_PREEMPTION_ON_VALUE  __HYBRID_PREEMPTION_ON_VALUE
+#endif /* __KOS__ && __KERNEL__ */
 
 /* >> preemption_ison(3H)
  * Check if preemption is currently enabled:
@@ -210,6 +216,8 @@ __DECL_END
 /* KOS Kernel version */
 #include <sched/task.h>
 #define __hybrid_preemption_flag_t          pflag_t
+#define __HYBRID_PREEMPTION_ON_VALUE        PREEMPTION_ENABLED_VALUE
+#define __HYBRID_PREEMPTION_OFF_VALUE       PREEMPTION_DISABLED_VALUE
 #define __hybrid_preemption_tryyield()      (void)task_tryyield_or_pause()
 #define __hybrid_preemption_ison()          PREEMPTION_ENABLED()
 #define __hybrid_preemption_wason(p_flag)   PREEMPTION_WASENABLED(*(p_flag))

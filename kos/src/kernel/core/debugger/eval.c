@@ -174,14 +174,14 @@ do_parse_as_hex:
 					continue;
 				break;
 			}
-			if (!dbg_getregbynamep(DBG_REGLEVEL_VIEW, name_start, (size_t)(p - name_start), &value))
+			if (!dbg_rt_getregbynamep(DBG_RT_REGLEVEL_VIEW, name_start, (size_t)(p - name_start), &value))
 				return ev_errorf(flags, DBGSTR("Invalid register %$q"), (size_t)(p - name_start), name_start);
 		}
 		break;
 
 	case '.':
 		/* Current address. */
-		value = (uintptr_t)dbg_getpcreg(DBG_REGLEVEL_VIEW);
+		value = (uintptr_t)dbg_getpcreg(DBG_RT_REGLEVEL_VIEW);
 		break;
 
 	case '+':
