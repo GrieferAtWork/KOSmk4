@@ -370,7 +370,7 @@ struct handrange {
  * this  one is used to mark pre-allocated handles as unused. (such
  * as due to a failure  at installing/allocating the actual  handle
  * object) */
-#define _handslot_abort(man, range, self)                                                   \
+#define _handslot_rollback(man, range, self)                                                \
 	do {                                                                                    \
 		unsigned int _mha_ohint, _mha_nhint;                                                \
 		__hybrid_assert((self)->mh_hand.h_type == _MANHANDLE_LOADMARKER);                   \
@@ -409,7 +409,7 @@ struct handman {
 	LLRBTREE_ROOT(handrange) hm_ranges;  /* [lock(hm_lock)][0..n] Root for the handle-range tree. */
 #endif /* !CONFIG_HANDMAN_USES_RBTREE */
 	struct sig               hm_changed; /* Broadcast whenever:
-	                                      *  - a handle is installed (both commit+abort)
+	                                      *  - a handle is installed (both commit+rollback)
 	                                      *  - a handle is closed
 	                                      *  - a handle is replaced
 	                                      *  - a handle's h_mode is changed. */
@@ -701,8 +701,8 @@ handman_tryfindnext(struct handman *__restrict self,
 
 /* Install a given handle  under a specific handle  number.
  * Note that this function doesn't accept symbolic handles.
- * NOTE: When `fd' is a non-committed handle, this function will block until
- *       the associated handle slot is  either committed, or aborted  before
+ * NOTE: When `fd' is a non-committed  handle, this function will block  until
+ *       the associated handle slot is either committed, or rolled back before
  *       re-attempting to override it (hence the `BLOCKING').
  * @param: self: The handle manager in which to install `hand'
  * @param: fd:   The FD to override. (Symbolic handles not allowed)
@@ -813,8 +813,8 @@ struct handle_install_data {
 
 
 /* Preserve a file descriptor slot to which the caller may either
- * commit a kernel object, or  abort its installation in case  of
- * an error during the object's creation.
+ * commit  a kernel object, or roll back its installation in case
+ * of an error during the object's creation.
  *
  * This 2-step process (including the ability of knowing what  will
  * eventually  become the object's  initial file descriptor number)
@@ -826,7 +826,7 @@ struct handle_install_data {
  * @param: data:  Handle installation data. (filled in)
  *                This data _must_ be finalized via a call to one of:
  *                 - handman_install_commit()
- *                 - handman_install_abort()
+ *                 - handman_install_rollback()
  *                ... both of which are NOBLOCK+NOTHROW and may therefor
  *                be called after any other object-specific point-of-no-
  *                return control-flow position.
@@ -907,9 +907,9 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL _handman_install_commit_inherit)(struct handle_install_data *__restrict self,
                                                iomode_t h_mode, uintptr_half_t h_type);
 
-/* Abort installation of a handle (s.a. `_handslot_abort()') */
+/* Abort installation of a handle (s.a. `_handslot_rollback()') */
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL handman_install_abort)(struct handle_install_data *__restrict self);
+NOTHROW(FCALL handman_install_rollback)(struct handle_install_data *__restrict self);
 /************************************************************************/
 
 
@@ -1062,7 +1062,7 @@ handles_install_openfd(struct handle const &__restrict hand,
  * >> TRY {
  * >>     kobj = CREATE_KERNEL_OBJECT();
  * >> } EXCEPT {
- * >>     handles_install_abort(&install);
+ * >>     handles_install_rollback(&install);
  * >>     RETHROW();
  * >> }
  * >> handles_install_commit_inherit(&install, kobj, IO_RDWR);
@@ -1089,7 +1089,7 @@ NOTHROW(FCALL handles_install_commit_inherit)(struct handle_install_data *__rest
                                               /*inherit(always)*/ REF void *h_data,
                                               iomode_t h_mode, uintptr_half_t h_type);
 FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(FCALL handles_install_abort)(struct handle_install_data *__restrict self);
+NOTHROW(FCALL handles_install_rollback)(struct handle_install_data *__restrict self);
 #ifdef __cplusplus
 extern "C++" {
 FUNDEF NOBLOCK NONNULL((1, 2)) void
@@ -1114,7 +1114,7 @@ HANDLE_FOREACH_TYPE(__FOREACH_HANDLES_INSTALL_COMMIT)
 	((data)->hid_man = THIS_HANDMAN, _handman_install_begin(data, ##__VA_ARGS__))
 #define handles_install_commit         handman_install_commit
 #define handles_install_commit_inherit handman_install_commit_inherit
-#define handles_install_abort          handman_install_abort
+#define handles_install_rollback       handman_install_rollback
 #endif /* !__INTELLISENSE__ */
 
 

@@ -259,7 +259,7 @@ DEFINE_SYSCALL4(fd_t, signalfd4, fd_t, fd,
 		TRY {
 			sfd = signalfd_create(sigmask, sigsetsize);
 		} EXCEPT {
-			handles_install_abort(&install);
+			handles_install_rollback(&install);
 			RETHROW();
 		}
 

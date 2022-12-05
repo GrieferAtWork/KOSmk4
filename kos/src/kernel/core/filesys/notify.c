@@ -1437,7 +1437,7 @@ PRIVATE fd_t KCALL sys_inotify_init_impl(syscall_ulong_t flags) {
 		maxevents = ATOMIC_READ(notifyfd_default_maxevents);
 		notfd     = notifyfd_new(maxevents);
 	} EXCEPT {
-		handles_install_abort(&install);
+		handles_install_rollback(&install);
 		RETHROW();
 	}
 	handles_install_commit_inherit(&install, notfd, iomode);

@@ -1034,7 +1034,7 @@ DEFINE_SYSCALL2(fd_t, userviofd,
 	TRY {
 		vio = uvio_create();
 	} EXCEPT {
-		handles_install_abort(&install);
+		handles_install_rollback(&install);
 		RETHROW();
 	}
 	atomic64_init(&vio->mf_filesize, initial_size);

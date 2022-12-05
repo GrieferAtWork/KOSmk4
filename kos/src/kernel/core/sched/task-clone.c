@@ -786,7 +786,7 @@ do_clone_pid:
 					task_clone_procpid(result, caller, clone_flags, args->tca_parent_tid);
 				}
 			} EXCEPT {
-				handles_install_abort(&install);
+				handles_install_rollback(&install);
 				RETHROW();
 			}
 			/* NOTE: From this point forth, normally nothing should be able to throw.

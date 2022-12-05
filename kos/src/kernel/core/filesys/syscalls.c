@@ -1469,7 +1469,7 @@ sys_openat_impl(fd_t dirfd, USER UNCHECKED char const *filename,
 		/* Do the open */
 		hand = path_open(dirfd, filename, oflags, mode);
 	} EXCEPT {
-		handles_install_abort(&install);
+		handles_install_rollback(&install);
 		RETHROW();
 	}
 

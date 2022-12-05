@@ -506,7 +506,7 @@ DEFINE_SYSCALL4(fd_t, mktty,
 		/* Install the tty. */
 		handles_install_commit(&install, tty, IO_RDWR);
 	} EXCEPT {
-		handles_install_abort(&install);
+		handles_install_rollback(&install);
 		RETHROW();
 	}
 	return (fd_t)result;

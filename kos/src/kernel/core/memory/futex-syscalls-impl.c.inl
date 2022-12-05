@@ -138,7 +138,7 @@ LOCAL_sys_lfutex_makefd_impl(USER UNCHECKED LOCAL_lfutex_t *uaddr,
 	TRY {
 		mfd = LOCAL_mfutexfd_new(ftx, uaddr, expr);
 	} EXCEPT {
-		handles_install_abort(&install);
+		handles_install_rollback(&install);
 		RETHROW();
 	}
 	handles_install_commit_inherit(&install, mfd, IO_RDWR);
@@ -385,7 +385,7 @@ DEFINE_SYSCALL5(errno_t, lfutexexpr,
 			TRY {
 				mfd = LOCAL_mfutexfd_new(f, base, expr);
 			} EXCEPT {
-				handles_install_abort(&install);
+				handles_install_rollback(&install);
 				RETHROW();
 			}
 			handles_install_commit_inherit(&install, mfd, IO_RDWR);

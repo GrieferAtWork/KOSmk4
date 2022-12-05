@@ -607,11 +607,11 @@ sys_pipe2_impl(USER UNCHECKED fd_t *pipedes, oflag_t flags) {
 			handles_install_commit(&rinstall, obj_reader, IO_RDONLY | mode);
 			handles_install_commit(&winstall, obj_writer, IO_WRONLY | mode);
 		} EXCEPT {
-			handles_install_abort(&winstall);
+			handles_install_rollback(&winstall);
 			RETHROW();
 		}
 	} EXCEPT {
-		handles_install_abort(&rinstall);
+		handles_install_rollback(&rinstall);
 		RETHROW();
 	}
 	return -EOK;

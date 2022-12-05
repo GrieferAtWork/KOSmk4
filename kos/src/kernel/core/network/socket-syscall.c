@@ -98,7 +98,7 @@ DEFINE_SYSCALL3(fd_t, socket,
 		/* Commit the new handle. */
 		handles_install_commit_inherit(&install, sock, mode);
 	} EXCEPT {
-		handles_install_abort(&install);
+		handles_install_rollback(&install);
 		RETHROW();
 	}
 	return result;
@@ -216,20 +216,20 @@ DEFINE_SYSCALL3(fd_t, accept, fd_t, sockfd,
 		TRY {
 			result = socket_accept((struct socket *)sock.h_data, sock.h_mode);
 		} EXCEPT {
-			handles_install_abort(&install);
+			handles_install_rollback(&install);
 			RETHROW();
 		}
 	}
 	if (!result) {
 		/* NOTE: We don't throw an exception for this case! */
-		handles_install_abort(&install);
+		handles_install_rollback(&install);
 		return -EWOULDBLOCK;
 	}
 	if (avail_addr_len) {
 		TRY {
 			*addr_len = socket_getpeername(result, addr, avail_addr_len);
 		} EXCEPT {
-			handles_install_abort(&install);
+			handles_install_rollback(&install);
 			decref_likely(result);
 			RETHROW();
 		}
@@ -279,20 +279,20 @@ DEFINE_SYSCALL4(fd_t, accept4, fd_t, sockfd,
 		TRY {
 			result = socket_accept((struct socket *)sock.h_data, sock.h_mode);
 		} EXCEPT {
-			handles_install_abort(&install);
+			handles_install_rollback(&install);
 			RETHROW();
 		}
 	}
 	if (!result) {
 		/* NOTE: We don't throw an exception for this case! */
-		handles_install_abort(&install);
+		handles_install_rollback(&install);
 		return -EWOULDBLOCK;
 	}
 	if (avail_addr_len) {
 		TRY {
 			*addr_len = socket_getpeername(result, addr, avail_addr_len);
 		} EXCEPT {
-			handles_install_abort(&install);
+			handles_install_rollback(&install);
 			decref_likely(result);
 			RETHROW();
 		}

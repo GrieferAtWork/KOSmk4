@@ -244,7 +244,7 @@ DEFINE_SYSCALL2(fd_t, eventfd2,
 	TRY {
 		efd = eventfd_create((u64)initval);
 	} EXCEPT {
-		handles_install_abort(&install);
+		handles_install_rollback(&install);
 		RETHROW();
 	}
 

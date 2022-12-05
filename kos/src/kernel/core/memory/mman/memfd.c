@@ -195,7 +195,7 @@ DEFINE_SYSCALL2(fd_t, memfd_create,
 		/* Construct the new mem-fd object. */
 		hand = memfd_new_with_filehandle(name);
 	} EXCEPT {
-		handles_install_abort(&install);
+		handles_install_rollback(&install);
 		RETHROW();
 	}
 

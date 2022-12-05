@@ -1806,7 +1806,7 @@ DEFINE_SYSCALL1(fd_t, epoll_create1, syscall_ulong_t, flags) {
 	TRY {
 		epoll = epoll_controller_create();
 	} EXCEPT {
-		handles_install_abort(&install);
+		handles_install_rollback(&install);
 		RETHROW();
 	}
 

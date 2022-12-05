@@ -577,11 +577,11 @@ DEFINE_SYSCALL5(errno_t, openpty,
 			handles_install_commit(&minstall, master, IO_RDWR);
 			handles_install_commit(&sinstall, slave, IO_RDWR);
 		} EXCEPT {
-			handles_install_abort(&minstall);
+			handles_install_rollback(&minstall);
 			RETHROW();
 		}
 	} EXCEPT {
-		handles_install_abort(&sinstall);
+		handles_install_rollback(&sinstall);
 		RETHROW();
 	}
 	return -EOK;
