@@ -43,10 +43,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#ifdef __ARCH_HAVE_COMPAT
-#include <libunwind/arch-register.h>
-#endif /* __ARCH_HAVE_COMPAT */
-
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 #include <sched/task.h>
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
@@ -59,6 +55,10 @@
 #include <libdebuginfo/debug_frame.h>
 #include <libunwind/errno.h>
 #include <libunwind/unwind.h>
+
+#ifdef __ARCH_HAVE_COMPAT
+#include <libunwind/register.h>
+#endif /* __ARCH_HAVE_COMPAT */
 #endif /* CONFIG_HAVE_KERNEL_USERELF_MODULES */
 
 DECL_BEGIN
@@ -698,14 +698,14 @@ unwind_userspace(void const *absolute_pc,
 	mod = module_fromaddr_nx(absolute_pc);
 	if likely(mod) {
 		unsigned int i;
-#ifdef LIBUNWIND_HAVE_COMPAT_REGISTER_WRAPPER
+#ifdef __ARCH_HAVE_COMPAT
 		struct unwind_getreg_compat_data compat_getreg_data;
 		struct unwind_setreg_compat_data compat_setreg_data;
-#endif /* LIBUNWIND_HAVE_COMPAT_REGISTER_WRAPPER */
+#endif /* __ARCH_HAVE_COMPAT */
 		FINALLY_DECREF_UNLIKELY(mod);
 
 		/* Check if compatibility mode support is needed. */
-#ifdef LIBUNWIND_HAVE_COMPAT_REGISTER_WRAPPER
+#ifdef __ARCH_HAVE_COMPAT
 		if (module_iscompat(mod)) {
 			unwind_getreg_compat_data_init(&compat_getreg_data, reg_getter, reg_getter_arg);
 			unwind_setreg_compat_data_init(&compat_setreg_data, reg_setter, reg_setter_arg);
@@ -714,7 +714,7 @@ unwind_userspace(void const *absolute_pc,
 			reg_getter_arg = &compat_getreg_data;
 			reg_setter_arg = &compat_setreg_data;
 		}
-#endif /* LIBUNWIND_HAVE_COMPAT_REGISTER_WRAPPER */
+#endif /* __ARCH_HAVE_COMPAT */
 
 		/* Search for the `.eh_frame' and `.debug_frame' sections. */
 		for (i = 0; i < 2; ++i) {

@@ -67,7 +67,7 @@ DECL_BEGIN
  * @return: 0 : The pointed-to instruction wasn't recognized. */
 #ifndef ARCH_HAVE_INSTRUCTION_LENGTH
 INTERN ATTR_PURE WUNUSED size_t
-NOTHROW_NCX(CC libil_instruction_length)(void const *pc, instrlen_isa_t isa) {
+NOTHROW_NCX(CC libil_instruction_length)(void const *pc, isa_t isa) {
 #ifdef ARCH_HAVE_INSTRUCTION_SUCC
 	byte_t *next_pc;
 	next_pc = libil_instruction_succ(pc, isa);
@@ -87,11 +87,11 @@ NOTHROW_NCX(CC libil_instruction_length)(void const *pc, instrlen_isa_t isa) {
 /* Return a pointer to the successor/predecessor instruction of `pc',
  * assuming  that `pc'  points to  the start  of another instruction.
  * WARNING: These functions may trigger a segmentation fault when `pc' is an invalid pointer.
- * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT')
+ * @param: isa: The ISA type (s.a. `Xcpustate_getisa()' or `ISA_DEFAULT')
  * @return: NULL: The pointed-to instruction wasn't recognized. */
 #ifndef ARCH_HAVE_INSTRUCTION_SUCC
 INTERN ATTR_PURE WUNUSED byte_t *
-NOTHROW_NCX(CC libil_instruction_succ)(void const *pc, instrlen_isa_t isa) {
+NOTHROW_NCX(CC libil_instruction_succ)(void const *pc, isa_t isa) {
 #ifdef ARCH_HAVE_INSTRUCTION_LENGTH
 	size_t length;
 	length = libil_instruction_length(pc, isa);
@@ -110,7 +110,7 @@ NOTHROW_NCX(CC libil_instruction_succ)(void const *pc, instrlen_isa_t isa) {
 #ifndef ARCH_HAVE_INSTRUCTION_PRED
 #ifdef LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH
 INTERN ATTR_PURE WUNUSED byte_t *
-NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, instrlen_isa_t isa) {
+NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, isa_t isa) {
 	(void)isa;
 	return (byte_t *)pc - LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH(isa);
 }
@@ -125,7 +125,7 @@ NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, instrlen_isa_t isa) {
 /* Return the length the longest valid instruction with a length <= maxlen that ends at `pc'
  * If no such instruction exists, return `0' instead. */
 PRIVATE ATTR_PURE WUNUSED uint8_t
-NOTHROW_NCX(CC predmaxone)(void const *pc, instrlen_isa_t isa, uint8_t maxlen) {
+NOTHROW_NCX(CC predmaxone)(void const *pc, isa_t isa, uint8_t maxlen) {
 	byte_t const *result;
 	result = (byte_t const *)pc - maxlen;
 #ifdef __NON_CALL_EXCEPTIONS
@@ -150,7 +150,7 @@ NOTHROW_NCX(CC predmaxone)(void const *pc, instrlen_isa_t isa, uint8_t maxlen) {
 
 
 INTERN ATTR_PURE WUNUSED byte_t *
-NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, instrlen_isa_t isa) {
+NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, isa_t isa) {
 	byte_t const *iter, *lowest_iter;
 	unsigned int i;
 	uint8_t maxlen[LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE];
@@ -209,10 +209,10 @@ done_backtrack:
 
 /* Same as above, but handle E_SEGFAULT (and E_WOULDBLOCK in kernel-space) by returning `NULL'
  * Other  exceptions are propagated normally (which could  happen due to VIO access emulation)
- * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT') */
+ * @param: isa: The ISA type (s.a. `Xcpustate_getisa()' or `ISA_DEFAULT') */
 #ifndef ARCH_HAVE_INSTRUCTION_SUCC_NX
 INTERN ATTR_PURE WUNUSED byte_t *
-NOTHROW_NCX(CC libil_instruction_succ_nx)(void const *pc, instrlen_isa_t isa) {
+NOTHROW_NCX(CC libil_instruction_succ_nx)(void const *pc, isa_t isa) {
 	byte_t *result;
 #ifdef __NON_CALL_EXCEPTIONS
 	NESTED_TRY
@@ -233,7 +233,7 @@ NOTHROW_NCX(CC libil_instruction_succ_nx)(void const *pc, instrlen_isa_t isa) {
 
 #ifndef ARCH_HAVE_INSTRUCTION_PRED_NX
 INTERN ATTR_PURE WUNUSED byte_t *
-NOTHROW_NCX(CC libil_instruction_pred_nx)(void const *pc, instrlen_isa_t isa) {
+NOTHROW_NCX(CC libil_instruction_pred_nx)(void const *pc, isa_t isa) {
 	byte_t *result;
 #ifdef __NON_CALL_EXCEPTIONS
 	NESTED_TRY
@@ -255,10 +255,10 @@ NOTHROW_NCX(CC libil_instruction_pred_nx)(void const *pc, instrlen_isa_t isa) {
 
 
 /* Same as `instruction_(succ|pred)_nx', but return pc +/- 1 instead of NULL.
- * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT') */
+ * @param: isa: The ISA type (s.a. `Xcpustate_getisa()' or `ISA_DEFAULT') */
 #ifndef ARCH_HAVE_INSTRUCTION_TRYSUCC
 INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED byte_t *
-NOTHROW_NCX(CC libil_instruction_trysucc)(void const *pc, instrlen_isa_t isa) {
+NOTHROW_NCX(CC libil_instruction_trysucc)(void const *pc, isa_t isa) {
 	byte_t *result;
 	result = libil_instruction_succ_nx(pc, isa);
 	if unlikely(!result)
@@ -269,7 +269,7 @@ NOTHROW_NCX(CC libil_instruction_trysucc)(void const *pc, instrlen_isa_t isa) {
 
 #ifndef ARCH_HAVE_INSTRUCTION_TRYPRED
 INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED byte_t *
-NOTHROW_NCX(CC libil_instruction_trypred)(void const *pc, instrlen_isa_t isa) {
+NOTHROW_NCX(CC libil_instruction_trypred)(void const *pc, isa_t isa) {
 	byte_t *result;
 	result = libil_instruction_pred_nx(pc, isa);
 	if unlikely(!result)

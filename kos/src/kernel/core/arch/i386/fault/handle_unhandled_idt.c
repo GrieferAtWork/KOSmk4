@@ -52,6 +52,7 @@
 #include <libregdump/cpu-state.h>
 #include <libregdump/x86.h>
 #include <libunwind/errno.h>
+#include <libunwind/register.h>
 #include <libunwind/unwind.h>
 
 DECL_BEGIN
@@ -139,7 +140,7 @@ x86_dump_ucpustate_register_state(struct ucpustate *__restrict ustate,
 	rd_printer.rdp_format      = &indent_regdump_print_format;
 	regdump_gpregs(&rd_printer, &ustate->ucs_gpregs);
 	regdump_ip(&rd_printer, (uintptr_t)ucpustate_getpc(ustate),
-	           instrlen_isa_from_ucpustate(ustate));
+	           ucpustate_getisa(ustate));
 	regdump_flags(&rd_printer, ustate->ucs_Pflags);
 	printk(KERN_EMERG "\n");
 	regdump_sgregs_with_cs_ss_tr_ldt(&rd_printer, &ustate->ucs_sgregs,

@@ -25,7 +25,7 @@
 
 #include <hybrid/compiler.h>
 
-#include <arm-kos/libinstrlen/bits/isa.h>
+#include <arm-kos/asm/isa.h>
 #include <kos/except.h>
 #include <kos/types.h>
 
@@ -39,9 +39,9 @@ DECL_BEGIN
  * WARNING: This function may trigger a segmentation fault when `pc' is an invalid pointer.
  * @return: 0 : The pointed-to instruction wasn't recognized. */
 INTERN ATTR_PURE WUNUSED size_t
-NOTHROW_NCX(CC libil_instruction_length)(void const *pc, instrlen_isa_t isa) {
+NOTHROW_NCX(CC libil_instruction_length)(void const *pc, isa_t isa) {
 	uint16_t instruction;
-	if (isa == INSTRLEN_ISA_ARM)
+	if (isa == ISA_ARM)
 		return 4; /* ARM instructions are always 4 bytes */
 
 	/* Special handling for thumb instructions
@@ -56,12 +56,12 @@ NOTHROW_NCX(CC libil_instruction_length)(void const *pc, instrlen_isa_t isa) {
 /* Return a pointer to the successor/predecessor instruction of `pc',
  * assuming  that `pc'  points to  the start  of another instruction.
  * WARNING: These functions may trigger a segmentation fault when `pc' is an invalid pointer.
- * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT')
+ * @param: isa: The ISA type (s.a. `Xcpustate_getisa()' or `ISA_DEFAULT')
  * @return: NULL: The pointed-to instruction wasn't recognized. */
 INTERN ATTR_PURE WUNUSED byte_t *
-NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, instrlen_isa_t isa) {
+NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, isa_t isa) {
 	uint16_t instruction;
-	if (isa == INSTRLEN_ISA_ARM)
+	if (isa == ISA_ARM)
 		return (byte_t *)pc - 4;
 
 	NESTED_TRY {
@@ -81,13 +81,13 @@ NOTHROW_NCX(CC libil_instruction_pred)(void const *pc, instrlen_isa_t isa) {
 }
 
 #define ARM_DEFAULT_ISA_LENGTH(isa) \
-	((isa) == INSTRLEN_ISA_ARM ? 4 : 2)
+	((isa) == ISA_ARM ? 4 : 2)
 
 
 /* Same as `instruction_(succ|pred)_nx', but return pc +/- 1 instead of NULL.
- * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT') */
+ * @param: isa: The ISA type (s.a. `Xcpustate_getisa()' or `ISA_DEFAULT') */
 INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED byte_t *
-NOTHROW_NCX(CC libil_instruction_trysucc)(void const *pc, instrlen_isa_t isa) {
+NOTHROW_NCX(CC libil_instruction_trysucc)(void const *pc, isa_t isa) {
 	byte_t *result;
 	result = libil_instruction_succ_nx(pc, isa);
 	if unlikely(!result)
@@ -95,7 +95,7 @@ NOTHROW_NCX(CC libil_instruction_trysucc)(void const *pc, instrlen_isa_t isa) {
 	return result;
 }
 INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED byte_t *
-NOTHROW_NCX(CC libil_instruction_trypred)(void const *pc, instrlen_isa_t isa) {
+NOTHROW_NCX(CC libil_instruction_trypred)(void const *pc, isa_t isa) {
 	byte_t *result;
 	result = libil_instruction_pred_nx(pc, isa);
 	if unlikely(!result)

@@ -32,13 +32,13 @@
 #include <hybrid/__assert.h>
 
 #include <asm/intrin.h> /* __rdsp() */
+#include <asm/isa.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/paging.h> /* KERNEL_DEBUG_STACKSIZE */
 
 #include <stdbool.h>
 
 #include <libcpustate/register.h> /* cpu_regno_t */
-#include <libinstrlen/bits/isa.h>
 #include <libunwind/cfi.h>
 #include <libunwind/errno.h>
 
@@ -115,7 +115,7 @@ FUNDEF unwind_errno_t NOTHROW(LIBUNWIND_CC dbg_setreg)(/*uintptr_t level*/ void 
 /* Return the fault program counter position
  * That is: the address of the last-executed instruction */
 #define dbg_getfaultpcreg(level) \
-	dbg_instruction_trypred(dbg_getpcreg(level), dbg_rt_instrlen_isa(level))
+	dbg_instruction_trypred(dbg_getpcreg(level), dbg_rt_getisa(level))
 
 
 LOCAL uintptr_t
@@ -177,8 +177,8 @@ FUNDEF void NOTHROW(KCALL dbg_rt_getallregs)(unsigned int level, struct fcpustat
 FUNDEF void NOTHROW(KCALL dbg_rt_setallregs)(unsigned int level, struct fcpustate const *__restrict state);
 
 /* Return the ISA code for use with libinstrlen */
-FUNDEF ATTR_PURE WUNUSED instrlen_isa_t
-NOTHROW(KCALL dbg_rt_instrlen_isa)(unsigned int level);
+FUNDEF ATTR_PURE WUNUSED isa_t
+NOTHROW(KCALL dbg_rt_getisa)(unsigned int level);
 
 /* Return the page directory of `dbg_current' */
 FUNDEF ATTR_PURE WUNUSED pagedir_phys_t NOTHROW(KCALL dbg_rt_getpagedir)(void);

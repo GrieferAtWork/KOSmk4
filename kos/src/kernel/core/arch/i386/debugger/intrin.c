@@ -298,7 +298,7 @@ DBG_COMMAND(r,
 		u64 kgsbase;
 		regdump_gpregs(&re_printer, &fst.fcs_gpregs);
 		regdump_ip(&re_printer, (uintptr_t)fcpustate_getpc(&fst),
-		           instrlen_isa_from_fcpustate(&fst));
+		           fcpustate_getisa(&fst));
 		sg.sg_gs = fst.fcs_sgregs.sg_gs16;
 		sg.sg_fs = fst.fcs_sgregs.sg_fs16;
 		sg.sg_es = fst.fcs_sgregs.sg_es16;

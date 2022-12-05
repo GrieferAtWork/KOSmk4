@@ -24,8 +24,8 @@ for (local o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3",
  */
 #ifndef GUARD_MODDBX_CEXPR_C
 #define GUARD_MODDBX_CEXPR_C 1
-#define _KOS_SOURCE 1
-#define __HAVE_FPU 1 /* Enable FPU access */
+#define _KOS_SOURCE          1
+#define __HAVE_FPU           1 /* Enable FPU access */
 
 /* DeBug eXtensions. */
 
@@ -64,7 +64,7 @@ for (local o: { "-mno-sse", "-mno-sse2", "-mno-sse3", "-mno-sse4", "-mno-ssse3",
 #include <compat/kos/exec/rtld.h>
 #include <compat/kos/types.h>
 
-#include <libunwind/arch-register.h> /* unwind_getreg_compat() */
+#include <libunwind/register.h> /* unwind_getreg_compat() */
 #endif /* __ARCH_HAVE_COMPAT */
 
 /**/
@@ -3530,7 +3530,7 @@ NOTHROW(FCALL cexpr_pushsymbol_byname)(char const *__restrict name, size_t namel
  * @return: DBX_ENOENT: No register matches the given `name' */
 PUBLIC NONNULL((1)) dbx_errno_t
 NOTHROW(FCALL cexpr_pushregister)(char const *__restrict name, size_t namelen) {
-	instrlen_isa_t isa = dbg_rt_instrlen_isa(DBG_RT_REGLEVEL_VIEW);
+	isa_t isa = dbg_rt_getisa(DBG_RT_REGLEVEL_VIEW);
 	cpu_regno_t regno  = register_byname(isa, name, namelen);
 	if (regno == CPU_REGISTER_NONE)
 		return DBX_ENOENT;

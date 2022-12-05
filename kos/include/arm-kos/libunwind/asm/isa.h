@@ -17,13 +17,41 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBUNWIND_ARCH_I386_COMPAT_C_INL
-#define GUARD_LIBUNWIND_ARCH_I386_COMPAT_C_INL 1
-#define _KOS_SOURCE 1
+#ifndef _ARM_KOS_LIBUNWIND_ASM_ISA_H
+#define _ARM_KOS_LIBUNWIND_ASM_ISA_H 1
 
-#include "../../api.h"
-/**/
+#include <__stdinc.h>
 
-#include <libunwind/register.h>
+#include <asm/isa.h>
 
-#endif /* !GUARD_LIBUNWIND_ARCH_I386_COMPAT_C_INL */
+/* >> isa_t unwind_getreg_getisa(unwind_getreg_t reg_getter, void *state);
+ * Determine and return the ISA code through use of an unwind register getter. */
+#define unwind_getreg_getisa(/*unwind_getreg_t*/ reg_getter, /*void **/ state) \
+	((_isa_getcpsr_from_unwind_getreg(reg_getter, state) & CPSR_T)             \
+	 ? ISA_THUMB                                                               \
+	 : ISA_ARM)
+
+#ifdef __CC__
+#include <hybrid/typecore.h>
+
+#include <libunwind/api.h>
+#include <libunwind/cfi/arm.h>
+#include <libunwind/errno.h>
+
+__DECL_BEGIN
+
+__LOCAL __UINTPTR_TYPE__
+_isa_getcpsr_from_unwind_getreg(unwind_errno_t (LIBUNWIND_CC *__reg_getter)(void const *__arg,
+                                                                            __UINTPTR_HALF_TYPE__ __dw_regno,
+                                                                            void *__restrict __dst),
+                                void *__state) {
+	__UINTPTR_TYPE__ __result;
+	if ((*__reg_getter)(__state, CFI_ARM_UNWIND_REGISTER_CPSR, &__result) != UNWIND_SUCCESS)
+		__result = 0;
+	return __result;
+}
+
+__DECL_END
+#endif /* __CC__ */
+
+#endif /* !_ARM_KOS_LIBUNWIND_ASM_ISA_H */

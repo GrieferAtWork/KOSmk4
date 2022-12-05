@@ -24,6 +24,7 @@
 #include <hybrid/host.h>
 
 #include <asm/intrin.h>
+#include <asm/isa.h>
 #include <bits/types.h>
 #include <kos/anno.h>
 
@@ -96,10 +97,12 @@ __DECL_BEGIN
 #define irregs32_isvm86(self)            0
 #define irregs32_isuser(self)            (irregs_isuser)((struct irregs_kernel const *)&(self)->ir_eip)
 #define irregs32_isuser_novm86(self)     (irregs_isuser)((struct irregs_kernel const *)&(self)->ir_eip)
+#define irregs32_getisa(self)            ISA_I386
 #else /* __I386_NO_VM86 */
 #define irregs32_isvm86(self)            (irregs_isvm86)((struct irregs_kernel const *)&(self)->ir_eip)
 #define irregs32_isuser(self)            (irregs_isuser)((struct irregs_kernel const *)&(self)->ir_eip)
 #define irregs32_isuser_novm86(self)     (irregs_isuser_novm86)((struct irregs_kernel const *)&(self)->ir_eip)
+#define irregs32_getisa(self)            (irregs32_isvm86(self) ? ISA_8086 : ISA_I386)
 #endif /* !__I386_NO_VM86 */
 #define irregs32_iskernel(self)          (!(irregs_isuser)((struct irregs_kernel const *)&(self)->ir_eip))
 #define irregs32_geteip(self)            (irregs_rdip)((struct irregs_kernel const *)&(self)->ir_eip)
@@ -116,11 +119,13 @@ __DECL_BEGIN
 #define irregs32_isuser_novm86(self)     ((self)->ir_cs16 & 3)
 #define irregs32_isuser(self)            ((self)->ir_cs16 & 3)
 #define irregs32_iskernel(self)          (!((self)->ir_cs16 & 3))
+#define irregs32_getisa(self)            ISA_I386
 #else /* __I386_NO_VM86 */
 #define irregs32_isvm86(self)            ((self)->ir_eflags & 0x20000)
 #define irregs32_isuser_novm86(self)     ((self)->ir_cs16 & 3)
 #define irregs32_isuser(self)            (((self)->ir_cs16 & 3) || irregs32_isvm86(self))
 #define irregs32_iskernel(self)          (!((self)->ir_cs16 & 3) && !irregs32_isvm86(self))
+#define irregs32_getisa(self)            (irregs32_isvm86(self) ? ISA_8086 : ISA_I386)
 #endif /* !__I386_NO_VM86 */
 #define irregs32_geteip(self)            ((__u32)(self)->ir_eip)
 #define irregs32_seteip(self, value)     ((self)->ir_eip = (value))
@@ -526,6 +531,7 @@ __NOTHROW_NCX(kcpustate32_to_icpustate32_p)(struct kcpustate32 const *__restrict
 			cb(icpustate32_getuseresp(self));      \
 		}                                          \
 	}	__WHILE0
+#define icpustate32_getisa(self)                 irregs32_getisa(&(self)->ics_irregs)
 #define icpustate32_isvm86(self)                 irregs32_isvm86(&(self)->ics_irregs)
 #define icpustate32_isuser_novm86(self)          irregs32_isuser_novm86(&(self)->ics_irregs)
 #define icpustate32_isuser(self)                 irregs32_isuser(&(self)->ics_irregs)
@@ -904,11 +910,13 @@ __NOTHROW_NCX(icpustate32_user_to_icpustate32_p)(struct icpustate32 const *__res
 #define scpustate32_isuser_novm86(self)          ((self)->scs_irregs.ir_cs16 & 3)
 #define scpustate32_isuser(self)                 ((self)->scs_irregs.ir_cs16 & 3)
 #define scpustate32_iskernel(self)               (!((self)->scs_irregs.ir_cs16 & 3))
+#define scpustate32_getisa(self)                 ISA_I386
 #else /* __I386_NO_VM86 */
 #define scpustate32_isvm86(self)                 ((self)->scs_irregs.ir_eflags & 0x20000)
 #define scpustate32_isuser_novm86(self)          ((self)->scs_irregs.ir_cs16 & 3)
 #define scpustate32_isuser(self)                 (((self)->scs_irregs.ir_cs16 & 3) || scpustate32_isvm86(self))
 #define scpustate32_iskernel(self)               (!((self)->scs_irregs.ir_cs16 & 3) && !scpustate32_isvm86(self))
+#define scpustate32_getisa(self)                 (scpustate32_isvm86(self) ? ISA_8086 : ISA_I386)
 #endif /* !__I386_NO_VM86 */
 #define scpustate32_getpreemption(self)          ((self)->scs_irregs.ir_eflags & 0x200)
 #define scpustate32_setpreemption(self, turn_on) (turn_on ? (void)((self)->scs_irregs.ir_eflags |= 0x200) : (void)((self)->scs_irregs.ir_eflags &= ~0x200))
@@ -1191,11 +1199,13 @@ __NOTHROW_NCX(scpustate32_user_to_scpustate32_p)(struct scpustate32 const *__res
 #define ucpustate32_isuser_novm86(self)    ((self)->ucs_cs16 & 3)
 #define ucpustate32_isuser(self)           ((self)->ucs_cs16 & 3)
 #define ucpustate32_iskernel(self)         (!((self)->ucs_cs16 & 3))
+#define ucpustate32_getisa(self)           ISA_I386
 #else /* __I386_NO_VM86 */
 #define ucpustate32_isvm86(self)           ((self)->ucs_eflags & 0x20000)
 #define ucpustate32_isuser_novm86(self)    ((self)->ucs_cs16 & 3)
 #define ucpustate32_isuser(self)           (((self)->ucs_cs16 & 3) || ucpustate32_isvm86(self))
 #define ucpustate32_iskernel(self)         (!((self)->ucs_cs16 & 3) && !ucpustate32_isvm86(self))
+#define ucpustate32_getisa(self)           (ucpustate32_isvm86(self) ? ISA_8086 : ISA_I386)
 #endif /* !__I386_NO_VM86 */
 #define ucpustate32_geteip(self)           ((__u32)(self)->ucs_eip)
 #define ucpustate32_seteip(self, value)    ((self)->ucs_eip = (value))
@@ -1377,11 +1387,13 @@ __NOTHROW_NCX(ucpustate32_to_scpustate32_p)(struct ucpustate32 const *__restrict
 #define fcpustate32_isuser_novm86(self)    ((self)->fcs_sgregs.sg_cs16 & 3)
 #define fcpustate32_isuser(self)           ((self)->fcs_sgregs.sg_cs16 & 3)
 #define fcpustate32_iskernel(self)         (!((self)->fcs_sgregs.sg_cs16 & 3))
+#define fcpustate32_getisa(self)           ISA_I386
 #else /* __I386_NO_VM86 */
 #define fcpustate32_isvm86(self)           ((self)->fcs_eflags & 0x20000)
 #define fcpustate32_isuser_novm86(self)    ((self)->fcs_sgregs.sg_cs16 & 3)
 #define fcpustate32_isuser(self)           (((self)->fcs_sgregs.sg_cs16 & 3) || fcpustate32_isvm86(self))
 #define fcpustate32_iskernel(self)         (!((self)->fcs_sgregs.sg_cs16 & 3) && !fcpustate32_isvm86(self))
+#define fcpustate32_getisa(self)           (fcpustate32_isvm86(self) ? ISA_8086 : ISA_I386)
 #endif /* !__I386_NO_VM86 */
 #define fcpustate32_geteip(self)           ((__u32)(self)->fcs_eip)
 #define fcpustate32_seteip(self, value)    ((self)->fcs_eip = (value))
@@ -1674,6 +1686,7 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define irregs_is64bit(self)                0
 #define irregs_isnative(self)               1
 #define irregs_iscompat(self)               0
+#define irregs_getisa(self)                 irregs32_getisa(self)
 #define irregs_getpreemption                irregs32_getpreemption
 #define irregs_setpreemption                irregs32_setpreemption
 #define irregs_getpip                       irregs32_geteip
@@ -1730,6 +1743,7 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define lcpustate_foreach_gpregs_elem       lcpustate32_foreach_gpregs_elem
 #define lcpustate_foreach_gpregs_size       lcpustate32_foreach_gpregs_size
 #define lcpustate_foreach_gpregs            lcpustate32_foreach_gpregs
+#define lcpustate_getisa(self)              ISA_I386
 #define lcpustate_getpip                    lcpustate32_geteip
 #define lcpustate_getpc                     (__byte_t const *)lcpustate32_geteip
 #define lcpustate_setpip                    lcpustate32_seteip
@@ -1764,6 +1778,7 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define kcpustate_foreach_gpregs_elem       kcpustate32_foreach_gpregs_elem
 #define kcpustate_foreach_gpregs_size       kcpustate32_foreach_gpregs_size
 #define kcpustate_foreach_gpregs            kcpustate32_foreach_gpregs
+#define kcpustate_getisa(self)              ISA_I386
 #define kcpustate_getpip                    kcpustate32_geteip
 #define kcpustate_getpc                     (__byte_t const *)kcpustate32_geteip
 #define kcpustate_setpip                    kcpustate32_seteip
@@ -1809,6 +1824,7 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define kcpustate_setreturn64(self, v)      gpregs_setreturn64(&(self)->kcs_gpregs, v)
 
 #define icpustate_foreach_gpregs            icpustate32_foreach_gpregs
+#define icpustate_getisa                    icpustate32_getisa
 #define icpustate_getpip                    icpustate32_geteip
 #define icpustate_getpc                     (__byte_t const *)icpustate32_geteip
 #define icpustate_setpip                    icpustate32_seteip
@@ -1911,6 +1927,7 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define icpustate_setreturn64(self, v)      gpregs_setreturn64(&(self)->ics_gpregs, v)
 
 #define scpustate_foreach_gpregs            scpustate32_foreach_gpregs
+#define scpustate_getisa                    scpustate32_getisa
 #define scpustate_getpip                    scpustate32_geteip
 #define scpustate_getpc                     (__byte_t const *)scpustate32_geteip
 #define scpustate_setpip                    scpustate32_seteip
@@ -2009,6 +2026,7 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define ucpustate_is64bit(self)             0
 #define ucpustate_isnative(self)            1
 #define ucpustate_iscompat(self)            0
+#define ucpustate_getisa                    ucpustate32_getisa
 #define ucpustate_getpc                     (__byte_t const *)ucpustate32_geteip
 #define ucpustate_getpip                    ucpustate32_geteip
 #define ucpustate_setpc(self, pc)           ucpustate32_seteip(self, (__u32)__COMPILER_REQTYPE(void const *, pc))
@@ -2064,6 +2082,7 @@ __NOTHROW_NCX(fcpustate32_to_scpustate32_p)(struct fcpustate32 const *__restrict
 #define fcpustate_is64bit(self)             0
 #define fcpustate_isnative(self)            1
 #define fcpustate_iscompat(self)            0
+#define fcpustate_getisa                    fcpustate32_getisa
 #define fcpustate_getpip                    fcpustate32_geteip
 #define fcpustate_getpc                     (__byte_t const *)fcpustate32_geteip
 #define fcpustate_setpip                    fcpustate32_seteip

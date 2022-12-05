@@ -56,6 +56,7 @@ local OPTIONAL_FUNCTIONS: {string...} = {
 	"current",
 	"isuser",
 	"iskern",
+	"getisa",
 };
 
 function getPossibleAliasesForXCpuState(name: string): {string...} {
@@ -260,6 +261,9 @@ for (local xcs: XCPUSTATE) {
 #if !defined(lcpustate_iskern) && defined(ucpustate_iskern)
 #define lcpustate_iskern ucpustate_iskern
 #endif /* !lcpustate_iskern && ucpustate_iskern */
+#if !defined(lcpustate_getisa) && defined(ucpustate_getisa)
+#define lcpustate_getisa ucpustate_getisa
+#endif /* !lcpustate_getisa && ucpustate_getisa */
 #endif /* LCPUSTATE_IS_?CPUSTATE */
 #ifndef lcpustate_getreturn
 #if __SIZEOF_POINTER__ <= 4
@@ -347,6 +351,9 @@ for (local xcs: XCPUSTATE) {
 #if !defined(kcpustate_iskern) && defined(ucpustate_iskern)
 #define kcpustate_iskern ucpustate_iskern
 #endif /* !kcpustate_iskern && ucpustate_iskern */
+#if !defined(kcpustate_getisa) && defined(ucpustate_getisa)
+#define kcpustate_getisa ucpustate_getisa
+#endif /* !kcpustate_getisa && ucpustate_getisa */
 #elif defined(KCPUSTATE_IS_LCPUSTATE)
 #ifndef kcpustate_getpc
 #define kcpustate_getpc lcpustate_getpc
@@ -396,6 +403,9 @@ for (local xcs: XCPUSTATE) {
 #if !defined(kcpustate_iskern) && defined(lcpustate_iskern)
 #define kcpustate_iskern lcpustate_iskern
 #endif /* !kcpustate_iskern && lcpustate_iskern */
+#if !defined(kcpustate_getisa) && defined(lcpustate_getisa)
+#define kcpustate_getisa lcpustate_getisa
+#endif /* !kcpustate_getisa && lcpustate_getisa */
 #endif /* KCPUSTATE_IS_?CPUSTATE */
 #ifndef kcpustate_getreturn
 #if __SIZEOF_POINTER__ <= 4
@@ -483,6 +493,9 @@ for (local xcs: XCPUSTATE) {
 #if !defined(icpustate_iskern) && defined(ucpustate_iskern)
 #define icpustate_iskern ucpustate_iskern
 #endif /* !icpustate_iskern && ucpustate_iskern */
+#if !defined(icpustate_getisa) && defined(ucpustate_getisa)
+#define icpustate_getisa ucpustate_getisa
+#endif /* !icpustate_getisa && ucpustate_getisa */
 #elif defined(ICPUSTATE_IS_LCPUSTATE)
 #ifndef icpustate_getpc
 #define icpustate_getpc lcpustate_getpc
@@ -532,6 +545,9 @@ for (local xcs: XCPUSTATE) {
 #if !defined(icpustate_iskern) && defined(lcpustate_iskern)
 #define icpustate_iskern lcpustate_iskern
 #endif /* !icpustate_iskern && lcpustate_iskern */
+#if !defined(icpustate_getisa) && defined(lcpustate_getisa)
+#define icpustate_getisa lcpustate_getisa
+#endif /* !icpustate_getisa && lcpustate_getisa */
 #elif defined(ICPUSTATE_IS_KCPUSTATE)
 #ifndef icpustate_getpc
 #define icpustate_getpc kcpustate_getpc
@@ -581,6 +597,9 @@ for (local xcs: XCPUSTATE) {
 #if !defined(icpustate_iskern) && defined(kcpustate_iskern)
 #define icpustate_iskern kcpustate_iskern
 #endif /* !icpustate_iskern && kcpustate_iskern */
+#if !defined(icpustate_getisa) && defined(kcpustate_getisa)
+#define icpustate_getisa kcpustate_getisa
+#endif /* !icpustate_getisa && kcpustate_getisa */
 #endif /* ICPUSTATE_IS_?CPUSTATE */
 #ifndef icpustate_getreturn
 #if __SIZEOF_POINTER__ <= 4
@@ -668,6 +687,9 @@ for (local xcs: XCPUSTATE) {
 #if !defined(scpustate_iskern) && defined(ucpustate_iskern)
 #define scpustate_iskern ucpustate_iskern
 #endif /* !scpustate_iskern && ucpustate_iskern */
+#if !defined(scpustate_getisa) && defined(ucpustate_getisa)
+#define scpustate_getisa ucpustate_getisa
+#endif /* !scpustate_getisa && ucpustate_getisa */
 #elif defined(SCPUSTATE_IS_LCPUSTATE)
 #ifndef scpustate_getpc
 #define scpustate_getpc lcpustate_getpc
@@ -717,6 +739,9 @@ for (local xcs: XCPUSTATE) {
 #if !defined(scpustate_iskern) && defined(lcpustate_iskern)
 #define scpustate_iskern lcpustate_iskern
 #endif /* !scpustate_iskern && lcpustate_iskern */
+#if !defined(scpustate_getisa) && defined(lcpustate_getisa)
+#define scpustate_getisa lcpustate_getisa
+#endif /* !scpustate_getisa && lcpustate_getisa */
 #elif defined(SCPUSTATE_IS_KCPUSTATE)
 #ifndef scpustate_getpc
 #define scpustate_getpc kcpustate_getpc
@@ -766,6 +791,9 @@ for (local xcs: XCPUSTATE) {
 #if !defined(scpustate_iskern) && defined(kcpustate_iskern)
 #define scpustate_iskern kcpustate_iskern
 #endif /* !scpustate_iskern && kcpustate_iskern */
+#if !defined(scpustate_getisa) && defined(kcpustate_getisa)
+#define scpustate_getisa kcpustate_getisa
+#endif /* !scpustate_getisa && kcpustate_getisa */
 #elif defined(SCPUSTATE_IS_ICPUSTATE)
 #ifndef scpustate_getpc
 #define scpustate_getpc icpustate_getpc
@@ -815,6 +843,9 @@ for (local xcs: XCPUSTATE) {
 #if !defined(scpustate_iskern) && defined(icpustate_iskern)
 #define scpustate_iskern icpustate_iskern
 #endif /* !scpustate_iskern && icpustate_iskern */
+#if !defined(scpustate_getisa) && defined(icpustate_getisa)
+#define scpustate_getisa icpustate_getisa
+#endif /* !scpustate_getisa && icpustate_getisa */
 #endif /* SCPUSTATE_IS_?CPUSTATE */
 #ifndef scpustate_getreturn
 #if __SIZEOF_POINTER__ <= 4
@@ -902,6 +933,9 @@ for (local xcs: XCPUSTATE) {
 #if !defined(fcpustate_iskern) && defined(ucpustate_iskern)
 #define fcpustate_iskern ucpustate_iskern
 #endif /* !fcpustate_iskern && ucpustate_iskern */
+#if !defined(fcpustate_getisa) && defined(ucpustate_getisa)
+#define fcpustate_getisa ucpustate_getisa
+#endif /* !fcpustate_getisa && ucpustate_getisa */
 #elif defined(FCPUSTATE_IS_LCPUSTATE)
 #ifndef fcpustate_getpc
 #define fcpustate_getpc lcpustate_getpc
@@ -951,6 +985,9 @@ for (local xcs: XCPUSTATE) {
 #if !defined(fcpustate_iskern) && defined(lcpustate_iskern)
 #define fcpustate_iskern lcpustate_iskern
 #endif /* !fcpustate_iskern && lcpustate_iskern */
+#if !defined(fcpustate_getisa) && defined(lcpustate_getisa)
+#define fcpustate_getisa lcpustate_getisa
+#endif /* !fcpustate_getisa && lcpustate_getisa */
 #elif defined(FCPUSTATE_IS_KCPUSTATE)
 #ifndef fcpustate_getpc
 #define fcpustate_getpc kcpustate_getpc
@@ -1000,6 +1037,9 @@ for (local xcs: XCPUSTATE) {
 #if !defined(fcpustate_iskern) && defined(kcpustate_iskern)
 #define fcpustate_iskern kcpustate_iskern
 #endif /* !fcpustate_iskern && kcpustate_iskern */
+#if !defined(fcpustate_getisa) && defined(kcpustate_getisa)
+#define fcpustate_getisa kcpustate_getisa
+#endif /* !fcpustate_getisa && kcpustate_getisa */
 #elif defined(FCPUSTATE_IS_ICPUSTATE)
 #ifndef fcpustate_getpc
 #define fcpustate_getpc icpustate_getpc
@@ -1049,6 +1089,9 @@ for (local xcs: XCPUSTATE) {
 #if !defined(fcpustate_iskern) && defined(icpustate_iskern)
 #define fcpustate_iskern icpustate_iskern
 #endif /* !fcpustate_iskern && icpustate_iskern */
+#if !defined(fcpustate_getisa) && defined(icpustate_getisa)
+#define fcpustate_getisa icpustate_getisa
+#endif /* !fcpustate_getisa && icpustate_getisa */
 #elif defined(FCPUSTATE_IS_SCPUSTATE)
 #ifndef fcpustate_getpc
 #define fcpustate_getpc scpustate_getpc
@@ -1098,6 +1141,9 @@ for (local xcs: XCPUSTATE) {
 #if !defined(fcpustate_iskern) && defined(scpustate_iskern)
 #define fcpustate_iskern scpustate_iskern
 #endif /* !fcpustate_iskern && scpustate_iskern */
+#if !defined(fcpustate_getisa) && defined(scpustate_getisa)
+#define fcpustate_getisa scpustate_getisa
+#endif /* !fcpustate_getisa && scpustate_getisa */
 #endif /* FCPUSTATE_IS_?CPUSTATE */
 #ifndef fcpustate_getreturn
 #if __SIZEOF_POINTER__ <= 4

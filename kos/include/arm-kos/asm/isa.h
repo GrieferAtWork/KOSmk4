@@ -17,13 +17,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBUNWIND_ARCH_I386_COMPAT_C_INL
-#define GUARD_LIBUNWIND_ARCH_I386_COMPAT_C_INL 1
-#define _KOS_SOURCE 1
+#ifndef _ARM_KOS_ASM_ISA_H
+#define _ARM_KOS_ASM_ISA_H 1
 
-#include "../../api.h"
-/**/
+#include <__stdinc.h>
 
-#include <libunwind/register.h>
+/* Default ISA type. */
+#define ISA_ARM   0
+#define ISA_THUMB 1
 
-#endif /* !GUARD_LIBUNWIND_ARCH_I386_COMPAT_C_INL */
+#ifdef __thumb__ /* -mthumb */
+#define ISA_DEFAULT ISA_ARM
+#else /* __thumb__ */
+#define ISA_DEFAULT ISA_THUMB
+#endif /* !__thumb__ */
+
+
+#ifdef __CC__
+#include <hybrid/typecore.h>
+
+__DECL_BEGIN
+typedef __UINT8_TYPE__ isa_t;
+__DECL_END
+#endif /* __CC__ */
+
+#endif /* !_ARM_KOS_ASM_ISA_H */

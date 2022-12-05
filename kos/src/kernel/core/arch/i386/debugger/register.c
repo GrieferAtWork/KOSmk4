@@ -54,9 +54,9 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <string.h>
 
 #include <libcpustate/register.h>
-#include <libunwind/arch-register.h>
 #include <libunwind/cfi.h>
 #include <libunwind/errno.h>
+#include <libunwind/register.h>
 
 DECL_BEGIN
 
@@ -1093,24 +1093,24 @@ NOTHROW(KCALL dbg_rt_setallregs)(unsigned int level,
 }
 
 /* Return the ISA code for use with libinstrlen */
-PUBLIC ATTR_PURE WUNUSED instrlen_isa_t
-NOTHROW(KCALL dbg_rt_instrlen_isa)(unsigned int level) {
-	instrlen_isa_t result;
+PUBLIC ATTR_PURE WUNUSED isa_t
+NOTHROW(KCALL dbg_rt_getisa)(unsigned int level) {
+	isa_t result;
 #ifdef __x86_64__
 	uintptr_t cs;
 	dbg_getreg((void *)(uintptr_t)level, CFI_X86_64_UNWIND_REGISTER_CS, &cs);
 	if (__KOS64_IS_CS64BIT(cs)) {
-		result = INSTRLEN_ISA_X86_64;
+		result = ISA_X86_64;
 	} else {
-		result = INSTRLEN_ISA_I386;
+		result = ISA_I386;
 	}
 #else /* __x86_64__ */
 	uintptr_t eflags;
 	dbg_getreg((void *)(uintptr_t)level, CFI_386_UNWIND_REGISTER_EFLAGS, &eflags);
 	if (eflags & EFLAGS_VM) {
-		result = INSTRLEN_ISA_8086;
+		result = ISA_8086;
 	} else {
-		result = INSTRLEN_ISA_I386;
+		result = ISA_I386;
 	}
 #endif /* !__x86_64__ */
 	return result;

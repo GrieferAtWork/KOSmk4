@@ -77,6 +77,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <libdebuginfo/unwind.h>
 #include <libinstrlen/instrlen.h>
 #include <libunwind/errno.h>
+#include <libunwind/register.h>
 #include <libunwind/unwind.h>
 
 #include "../../../libc/libc/assert.h" /* struct assert_args */
@@ -206,7 +207,7 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 	struct ucpustate state;
 	struct exception_info saved_info;
 	struct exception_info *tls_info;
-	instrlen_isa_t isa;
+	isa_t isa;
 #ifdef LOG_STACK_REMAINDER
 	byte_t *last_good_sp;
 #endif /* LOG_STACK_REMAINDER */
@@ -218,7 +219,7 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 #ifdef LOG_STACK_REMAINDER
 	last_good_sp = ucpustate_getsp(&state);
 #endif /* LOG_STACK_REMAINDER */
-	isa = instrlen_isa_from_ucpustate(&state);
+	isa = ucpustate_getisa(&state);
 	TRY {
 		addr2line_printf(printer, arg,
 		                 instruction_trypred(ucpustate_getpc(&state), isa),
@@ -243,7 +244,7 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 		TRY {
 			addr2line_printf(printer, arg,
 			                 instruction_trypred(ucpustate_getpc(&state),
-			                                     instrlen_isa_from_ucpustate(&state)),
+			                                     ucpustate_getisa(&state)),
 			                 ucpustate_getpc(&state),
 			                 "Called here [sp=%p]",
 			                 ucpustate_getsp(&state));
@@ -560,9 +561,9 @@ NOTHROW(FCALL libc_assertion_check_core)(struct assert_args *__restrict args) {
 PRIVATE ATTR_DBGTEXT void KCALL
 panic_genfail_dbg_main(/*char const **/ void *message) {
 	void const *pc, *prev_pc;
-	instrlen_isa_t isa;
+	isa_t isa;
 	pc      = dbg_getpcreg(DBG_RT_REGLEVEL_TRAP);
-	isa     = dbg_rt_instrlen_isa(DBG_RT_REGLEVEL_TRAP);
+	isa     = dbg_rt_getisa(DBG_RT_REGLEVEL_TRAP);
 	prev_pc = instruction_trypred(pc, isa);
 	dbg_printf(DBGSTR(AC_COLOR(ANSITTY_CL_WHITE, ANSITTY_CL_MAROON) "%s" AC_DEFCOLOR "%[vinfo:"
 	                  "file: " AC_WHITE("%f") " (line " AC_WHITE("%l") ", column " AC_WHITE("%c") ")\n"
@@ -651,10 +652,10 @@ PRIVATE ATTR_DBGTEXT void KCALL
 panic_kernel_dbg_main(void *arg) {
 	struct panic_args *args;
 	void const *pc, *prev_pc;
-	instrlen_isa_t isa;
+	isa_t isa;
 	args = (struct panic_args *)arg;
 	pc      = dbg_getpcreg(DBG_RT_REGLEVEL_TRAP);
-	isa     = dbg_rt_instrlen_isa(DBG_RT_REGLEVEL_TRAP);
+	isa     = dbg_rt_getisa(DBG_RT_REGLEVEL_TRAP);
 	prev_pc = instruction_trypred(pc, isa);
 	dbg_printf(DBGSTR("Kernel Panic\n"
 	                  "%[vinfo:" "file: " AC_WHITE("%f") " (line " AC_WHITE("%l") ", column " AC_WHITE("%c") ")\n"

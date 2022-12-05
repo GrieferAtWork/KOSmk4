@@ -17,13 +17,24 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBUNWIND_ARCH_I386_COMPAT_C_INL
-#define GUARD_LIBUNWIND_ARCH_I386_COMPAT_C_INL 1
-#define _KOS_SOURCE 1
+#ifndef _KOS_LIBUNWIND_ASM_FEATURES_H
+#define _KOS_LIBUNWIND_ASM_FEATURES_H 1
 
-#include "../../api.h"
-/**/
+#include <__stdinc.h>
+#include <compat/config.h>
 
-#include <libunwind/register.h>
+#define LIBUNWIND_HAVE_GETSETREG_UCPUSTATE
+#define LIBUNWIND_HAVE_GETSETREG_LCPUSTATE
+#define LIBUNWIND_HAVE_GETSETREG_KCPUSTATE
+#define LIBUNWIND_HAVE_GETSETREG_FCPUSTATE
+#define LIBUNWIND_HAVE_GETSETREG_ICPUSTATE
+#define LIBUNWIND_HAVE_GETSETREG_SCPUSTATE
+#define LIBUNWIND_HAVE_GETSETREG_MCONTEXT
+#define LIBUNWIND_HAVE_GETSETREG_UCONTEXT
+#define LIBUNWIND_HAVE_GETSETREG_FPUSTATE
 
-#endif /* !GUARD_LIBUNWIND_ARCH_I386_COMPAT_C_INL */
+#if defined(__ARCH_HAVE_COMPAT) && defined(__KERNEL__)
+#define LIBUNWIND_HAVE_GETSETREG_COMPAT
+#endif /* __ARCH_HAVE_COMPAT && __KERNEL__ */
+
+#endif /* !_KOS_LIBUNWIND_ASM_FEATURES_H */

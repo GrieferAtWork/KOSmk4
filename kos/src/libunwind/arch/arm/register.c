@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBUNWIND_ARCH_ARM_UNWIND_C
-#define GUARD_LIBUNWIND_ARCH_ARM_UNWIND_C 1
+#ifndef GUARD_LIBUNWIND_ARCH_ARM_REGISTER_C
+#define GUARD_LIBUNWIND_ARCH_ARM_REGISTER_C 1
 #define _KOS_KERNEL_SOURCE 1
 #define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
@@ -39,26 +39,15 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <libunwind/arch-register.h>
 #include <libunwind/cfi.h>
 #include <libunwind/cfi/arm.h>
+#include <libunwind/register.h>
 #include <libunwind/unwind.h>
 
+#include "../../register.h"
 #include "../../unwind.h"
 
 DECL_BEGIN
-
-/* Functions we want to define: */
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_ucpustate)(struct ucpustate const *self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_ucpustate_exclusive)(struct ucpustate const *self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate)(struct ucpustate *self, unwind_regno_t dw_regno, void const *__restrict src);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate_exclusive)(struct ucpustate *self, unwind_regno_t dw_regno, void const *__restrict src);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_lcpustate)(struct lcpustate const *self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_lcpustate_exclusive)(struct lcpustate const *self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_lcpustate)(struct lcpustate *self, unwind_regno_t dw_regno, void const *__restrict src);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_lcpustate_exclusive)(struct lcpustate *self, unwind_regno_t dw_regno, void const *__restrict src);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_fcpustate)(struct fcpustate const *self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_fcpustate)(struct fcpustate *self, unwind_regno_t dw_regno, void const *__restrict src);
 
 #define wr32(p_ptr, value) (*(uint32_t *)(p_ptr) = (value))
 #define rd32(p_ptr)        (*(uint32_t const *)(p_ptr))
@@ -565,6 +554,9 @@ NOTHROW_NCX(CC libuw_unwind_setreg_fcpustate)(struct fcpustate *self,
 	return UNWIND_SUCCESS;
 }
 
+/* fcpustate is totally complete, so the exclusive accessors are identical to the non-exclusive ones */
+DEFINE_INTERN_ALIAS(libuw_unwind_getreg_fcpustate_exclusive, libuw_unwind_getreg_fcpustate);
+DEFINE_INTERN_ALIAS(libuw_unwind_setreg_fcpustate_exclusive, libuw_unwind_setreg_fcpustate);
 
 /* Exports */
 DEFINE_PUBLIC_ALIAS(unwind_getreg_ucpustate, libuw_unwind_getreg_ucpustate);
@@ -576,8 +568,10 @@ DEFINE_PUBLIC_ALIAS(unwind_getreg_lcpustate_exclusive, libuw_unwind_getreg_lcpus
 DEFINE_PUBLIC_ALIAS(unwind_setreg_lcpustate, libuw_unwind_setreg_lcpustate);
 DEFINE_PUBLIC_ALIAS(unwind_setreg_lcpustate_exclusive, libuw_unwind_setreg_lcpustate_exclusive);
 DEFINE_PUBLIC_ALIAS(unwind_getreg_fcpustate, libuw_unwind_getreg_fcpustate);
+DEFINE_PUBLIC_ALIAS(unwind_getreg_fcpustate_exclusive, libuw_unwind_getreg_fcpustate_exclusive);
 DEFINE_PUBLIC_ALIAS(unwind_setreg_fcpustate, libuw_unwind_setreg_fcpustate);
+DEFINE_PUBLIC_ALIAS(unwind_setreg_fcpustate_exclusive, libuw_unwind_setreg_fcpustate_exclusive);
 
 DECL_END
 
-#endif /* !GUARD_LIBUNWIND_ARCH_ARM_UNWIND_C */
+#endif /* !GUARD_LIBUNWIND_ARCH_ARM_REGISTER_C */

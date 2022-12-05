@@ -33,7 +33,7 @@
 DECL_BEGIN
 
 /* [const] The type of FPU state used (One of `FPU_STATE_*') */
-DATDEF unsigned int const x86_fpustate_variant;
+DATDEF unsigned int const x86_fpustate_variant; /* TODO: Refactor documentation -- This should be the "preferred" variant */
 
 /* Save/Load the register state of the FPU unit (always uses `x86_fpustate_variant').
  * NOTE: `x86_fpustate_save()'  may  reset  the active  FPU  context before

@@ -177,6 +177,7 @@ incdir("");
 #include <asm/intrin-fpu.h>
 #include <asm/intrin.h>
 #include <asm/ioctl.h>
+#include <asm/isa.h>
 #include <asm/ls-syscalls.h>
 #include <asm/os/block.h>
 #include <asm/os/clock.h>
@@ -869,6 +870,7 @@ incdir("");
 #include <libdebuginfo/debug_info.h>
 #include <libdebuginfo/debug_line.h>
 #include <libdebuginfo/dwarf.h>
+#include <libdebuginfo/errno.h>
 #include <libdebuginfo/repr.h>
 #include <libdebuginfo/symtab.h>
 #include <libdebuginfo/unwind.h>
@@ -908,7 +910,6 @@ incdir("");
 #include <libiconv/transliterate.h>
 #include <libinstrlen/api.h>
 #include <libinstrlen/bits/instrlen.h>
-#include <libinstrlen/bits/isa.h>
 #include <libinstrlen/instrlen.h>
 #include <libintl.h>
 #include <libio.h>
@@ -1044,7 +1045,8 @@ incdir("");
 #include <libterm/api.h>
 #include <libterm/termio.h>
 #include <libunwind/api.h>
-#include <libunwind/arch-register.h>
+#include <libunwind/asm/features.h>
+#include <libunwind/asm/isa.h>
 #include <libunwind/cfi/arm.h>
 #include <libunwind/cfi/i386.h>
 #include <libunwind/cfi/x86_64.h>
@@ -1053,6 +1055,7 @@ incdir("");
 #include <libunwind/eh_frame.h>
 #include <libunwind/errno.h>
 #include <libunwind/except.h>
+#include <libunwind/register.h>
 #include <libunwind/unwind.h>
 #include <libutil.h>
 #include <libvideo/codec/api.h>

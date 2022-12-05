@@ -59,27 +59,27 @@ DEFINE_TEST(instrlen_x86_prevent_jcc_regression) {
 		        _a, (byte_t *)_a - code,                            \
 		        _b, (byte_t *)_b - code);                           \
 	}	__WHILE0
-	ASSERT_EQ(instruction_succ(code + 0, INSTRLEN_ISA_I386), code + 2); /* je    . + 1 */
-	ASSERT_EQ(instruction_succ(code + 2, INSTRLEN_ISA_I386), code + 3); /* movsb */
-	ASSERT_EQ(instruction_succ(code + 3, INSTRLEN_ISA_I386), code + 4); /* popl  %esi */
-	ASSERT_EQ(instruction_succ(code + 4, INSTRLEN_ISA_I386), code + 5); /* popl  %edi */
-	ASSERT_EQ(instruction_succ(code + 5, INSTRLEN_ISA_I386), code + 8); /* ret   $0xc */
+	ASSERT_EQ(instruction_succ(code + 0, ISA_I386), code + 2); /* je    . + 1 */
+	ASSERT_EQ(instruction_succ(code + 2, ISA_I386), code + 3); /* movsb */
+	ASSERT_EQ(instruction_succ(code + 3, ISA_I386), code + 4); /* popl  %esi */
+	ASSERT_EQ(instruction_succ(code + 4, ISA_I386), code + 5); /* popl  %edi */
+	ASSERT_EQ(instruction_succ(code + 5, ISA_I386), code + 8); /* ret   $0xc */
 
-#ifdef INSTRLEN_ISA_X86_64
-	ASSERT_EQ(instruction_succ(code + 0, INSTRLEN_ISA_X86_64), code + 2); /* je    . + 1 */
-	ASSERT_EQ(instruction_succ(code + 2, INSTRLEN_ISA_X86_64), code + 3); /* movsb */
-	ASSERT_EQ(instruction_succ(code + 3, INSTRLEN_ISA_X86_64), code + 4); /* popq  %rsi */
-	ASSERT_EQ(instruction_succ(code + 4, INSTRLEN_ISA_X86_64), code + 5); /* popq  %rdi */
-	ASSERT_EQ(instruction_succ(code + 5, INSTRLEN_ISA_X86_64), code + 8); /* ret   $0xc */
-#endif /* INSTRLEN_ISA_X86_64 */
+#ifdef ISA_X86_64
+	ASSERT_EQ(instruction_succ(code + 0, ISA_X86_64), code + 2); /* je    . + 1 */
+	ASSERT_EQ(instruction_succ(code + 2, ISA_X86_64), code + 3); /* movsb */
+	ASSERT_EQ(instruction_succ(code + 3, ISA_X86_64), code + 4); /* popq  %rsi */
+	ASSERT_EQ(instruction_succ(code + 4, ISA_X86_64), code + 5); /* popq  %rdi */
+	ASSERT_EQ(instruction_succ(code + 5, ISA_X86_64), code + 8); /* ret   $0xc */
+#endif /* ISA_X86_64 */
 
-#ifdef INSTRLEN_ISA_8086
-	ASSERT_EQ(instruction_succ(code + 0, INSTRLEN_ISA_8086), code + 2); /* je    . + 1 */
-	ASSERT_EQ(instruction_succ(code + 2, INSTRLEN_ISA_8086), code + 3); /* movsb */
-	ASSERT_EQ(instruction_succ(code + 3, INSTRLEN_ISA_8086), code + 4); /* popw  %si */
-	ASSERT_EQ(instruction_succ(code + 4, INSTRLEN_ISA_8086), code + 5); /* popw  %di */
-	ASSERT_EQ(instruction_succ(code + 5, INSTRLEN_ISA_8086), code + 8); /* ret   $0xc */
-#endif /* INSTRLEN_ISA_8086 */
+#ifdef ISA_8086
+	ASSERT_EQ(instruction_succ(code + 0, ISA_8086), code + 2); /* je    . + 1 */
+	ASSERT_EQ(instruction_succ(code + 2, ISA_8086), code + 3); /* movsb */
+	ASSERT_EQ(instruction_succ(code + 3, ISA_8086), code + 4); /* popw  %si */
+	ASSERT_EQ(instruction_succ(code + 4, ISA_8086), code + 5); /* popw  %di */
+	ASSERT_EQ(instruction_succ(code + 5, ISA_8086), code + 8); /* ret   $0xc */
+#endif /* ISA_8086 */
 #undef ASSERT_EQ
 
 	dlclose(libinstrlen);

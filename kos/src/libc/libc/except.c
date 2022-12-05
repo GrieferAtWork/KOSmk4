@@ -53,6 +53,7 @@
 #include <libunwind/eh_frame.h>
 #include <libunwind/errno.h>
 #include <libunwind/except.h>
+#include <libunwind/register.h>
 #include <libunwind/unwind.h>
 
 #include "dl.h"

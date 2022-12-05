@@ -101,7 +101,7 @@ x86_handle_bound_range(struct icpustate *__restrict state) {
 			return state;
 		}
 	} else {
-		next_pc = instruction_trysucc(curr_pc, instrlen_isa_from_icpustate(state));
+		next_pc = instruction_trysucc(curr_pc, icpustate_getisa(state));
 	}
 	PERTASK_SET(this_exception_faultaddr, curr_pc);
 	PERTASK_SET(this_exception_code, EXCEPT_CODEOF(E_INDEX_ERROR_OUT_OF_BOUNDS));

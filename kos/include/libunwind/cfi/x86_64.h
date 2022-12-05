@@ -581,8 +581,8 @@ printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_landing_register_uncommon2dw", g
 #define DEFINE_cfi_unwind_landing_register_common2dw(addrsize, name)   DEFINE_cfi_x86_64_unwind_landing_register_common2dw(name)
 #define DEFINE_cfi_unwind_landing_register_uncommon2dw(addrsize, name) DEFINE_cfi_x86_64_unwind_landing_register_uncommon2dw(name)
 
-#include <libunwind/arch-register.h> /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
-#ifdef LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER
+#include <libunwind/asm/features.h> /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
+#ifdef LIBUNWIND_HAVE_GETSETREG_COMPAT
 #include "i386.h"
 #define CFI_ADDRSIZE_ISCOMPAT(addrsize) __unlikely((addrsize) < 8)
 
@@ -716,7 +716,7 @@ printArrayDefineMacro("DEFINE_cfi_x86_64_unwind_landing_register_uncommon2dw", g
 #define DEFINE_cfi_unwind_landing_register_uncommon2dw(addrsize, name)           __PRIVATE_DEFINE_cfi_unwind_landing_register_uncommon2dw(addrsize, name)
 #endif /* ... */
 
-#endif /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#endif /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #endif /* __x86_64__ */
 
 

@@ -17,30 +17,42 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBINSTRLEN_ISA_H
-#define _LIBINSTRLEN_ISA_H 1
+#ifndef _I386_KOS_ASM_ISA_H
+#define _I386_KOS_ASM_ISA_H 1
 
 #include <__stdinc.h>
 
-/* Default ISA type. */
-#define INSTRLEN_ISA_DEFAULT 0
+#include <hybrid/typecore.h>
 
-/* Return the ISA type, given a CPU state structure. */
-#define instrlen_isa_from_icpustate(s) INSTRLEN_ISA_DEFAULT
-#define instrlen_isa_from_scpustate(s) INSTRLEN_ISA_DEFAULT
-#define instrlen_isa_from_ucpustate(s) INSTRLEN_ISA_DEFAULT
-#define instrlen_isa_from_kcpustate(s) INSTRLEN_ISA_DEFAULT
-#define instrlen_isa_from_lcpustate(s) INSTRLEN_ISA_DEFAULT
-#define instrlen_isa_from_fcpustate(s) INSTRLEN_ISA_DEFAULT
-#define instrlen_isa_from_unwind_getreg(/*unwind_getreg_t*/ reg_getter, /*void **/ state) \
-	INSTRLEN_ISA_DEFAULT
+/* ISA codes. */
+#if __SIZEOF_POINTER__ == 8
+#define ISA_X86_64 0
+#define ISA_I386   1
+#elif __SIZEOF_POINTER__ == 4
+#define ISA_I386 0
+#ifndef __I386_NO_VM86
+#define ISA_8086 1
+#endif /* !__I386_NO_VM86 */
+#elif __SIZEOF_POINTER__ == 2
+#define ISA_8086 0
+#endif /* !__x86_64__ */
+
+/* Default ISA type. */
+#if __SIZEOF_POINTER__ == 8 && defined(ISA_X86_64)
+#define ISA_DEFAULT ISA_X86_64
+#elif __SIZEOF_POINTER__ == 4 && defined(ISA_I386)
+#define ISA_DEFAULT ISA_I386
+#elif __SIZEOF_POINTER__ == 2 && defined(ISA_8086)
+#define ISA_DEFAULT ISA_8086
+#else /* __SIZEOF_POINTER__ == ... */
+#error "Unsupported __SIZEOF_POINTER__"
+#endif /* __SIZEOF_POINTER__ != ... */
+
 
 #ifdef __CC__
 __DECL_BEGIN
-
-typedef unsigned int instrlen_isa_t;
-
+typedef __UINT8_TYPE__ isa_t;
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_LIBINSTRLEN_ISA_H */
+#endif /* !_I386_KOS_ASM_ISA_H */

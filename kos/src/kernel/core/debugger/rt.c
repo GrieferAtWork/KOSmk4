@@ -39,6 +39,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <hybrid/byteorder.h>
 #include <hybrid/typecore.h>
 
+#include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 
 #include <assert.h>
@@ -155,7 +156,7 @@ NOTHROW(KCALL dbg_rt_setregbyid)(unsigned int level, cpu_regno_t regno,
 PUBLIC ATTR_DBGTEXT_S("dbg_rt_getregbyname") size_t
 NOTHROW(KCALL dbg_rt_getregbyname)(unsigned int level, char const *__restrict name,
                                 size_t namelen, void *__restrict buf, size_t buflen) {
-	instrlen_isa_t isa = dbg_rt_instrlen_isa(level);
+	isa_t isa = dbg_rt_getisa(level);
 	cpu_regno_t regno  = register_byname(isa, name, namelen);
 	if unlikely(regno == CPU_REGISTER_NONE)
 		return 0;
@@ -165,7 +166,7 @@ NOTHROW(KCALL dbg_rt_getregbyname)(unsigned int level, char const *__restrict na
 PUBLIC ATTR_DBGTEXT_S("dbg_rt_setregbyname") size_t
 NOTHROW(KCALL dbg_rt_setregbyname)(unsigned int level, char const *__restrict name,
                                 size_t namelen, void const *__restrict buf, size_t buflen) {
-	instrlen_isa_t isa = dbg_rt_instrlen_isa(level);
+	isa_t isa = dbg_rt_getisa(level);
 	cpu_regno_t regno  = register_byname(isa, name, namelen);
 	if unlikely(regno == CPU_REGISTER_NONE)
 		return 0;
@@ -176,7 +177,7 @@ NOTHROW(KCALL dbg_rt_setregbyname)(unsigned int level, char const *__restrict na
 PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_rt_getregbynamep") bool
 NOTHROW(KCALL dbg_rt_getregbynamep)(unsigned int level, char const *__restrict name,
                                  size_t namelen, uintptr_t *__restrict result) {
-	instrlen_isa_t isa = dbg_rt_instrlen_isa(level);
+	isa_t isa = dbg_rt_getisa(level);
 	cpu_regno_t regno  = register_byname(isa, name, namelen);
 	if unlikely(regno == CPU_REGISTER_NONE)
 		return false;
@@ -187,7 +188,7 @@ NOTHROW(KCALL dbg_rt_getregbynamep)(unsigned int level, char const *__restrict n
 PUBLIC ATTR_WEAK ATTR_DBGTEXT_S("dbg_rt_setregbynamep") bool
 NOTHROW(KCALL dbg_rt_setregbynamep)(unsigned int level, char const *__restrict name,
                                  size_t namelen, uintptr_t value) {
-	instrlen_isa_t isa = dbg_rt_instrlen_isa(level);
+	isa_t isa = dbg_rt_getisa(level);
 	cpu_regno_t regno  = register_byname(isa, name, namelen);
 	if unlikely(regno == CPU_REGISTER_NONE)
 		return false;
@@ -195,12 +196,12 @@ NOTHROW(KCALL dbg_rt_setregbynamep)(unsigned int level, char const *__restrict n
 }
 
 /* Return the ISA code for use with libinstrlen */
-PUBLIC ATTR_PURE WUNUSED ATTR_WEAK ATTR_DBGTEXT_S("dbg_rt_instrlen_isa") instrlen_isa_t
-NOTHROW(KCALL dbg_rt_instrlen_isa)(unsigned int level) {
-	instrlen_isa_t result;
+PUBLIC ATTR_PURE WUNUSED ATTR_WEAK ATTR_DBGTEXT_S("dbg_rt_getisa") isa_t
+NOTHROW(KCALL dbg_rt_getisa)(unsigned int level) {
+	isa_t result;
 	struct fcpustate cs;
 	dbg_rt_getallregs(level, &cs);
-	result = instrlen_isa_from_fcpustate(&cs);
+	result = fcpustate_getisa(&cs);
 	return result;
 }
 

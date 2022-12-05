@@ -24,11 +24,10 @@
 
 #include <bits/types.h>
 #include <kos/kernel/cpu-state.h>
+#include <asm/isa.h>
 #include <asm/cpu-flags.h>
 
 #include <asm/intrin.h>
-#ifndef __INTELLISENSE__
-#endif /* !__INTELLISENSE__ */
 
  /* These are the cpu-state helpers that may be used portably across all architectures:
  * - pc: Program Counter
@@ -57,6 +56,7 @@ __DECL_BEGIN
 #define fcpustate_isabt(self)   ((fcpustate_getcpsr(self) & CPSR_M) == CPSR_M_ABT)
 #define fcpustate_isund(self)   ((fcpustate_getcpsr(self) & CPSR_M) == CPSR_M_UND)
 #define fcpustate_isthumb(self) (fcpustate_getcpsr(self) & CPSR_T)
+#define fcpustate_getisa(self)  (fcpustate_isthumb(self) ? ISA_THUMB : ISA_ARM)
 
 /* Pointer-to-register */
 #define _fcpustate_p_r0(self)       (&(self)->fcs_usr.ucs_r0)
@@ -309,6 +309,7 @@ __NOTHROW_NCX(_fcpustate_p_banked)(struct fcpustate const *__restrict __self) {
 #define ucpustate_isabt(self)   ((ucpustate_getcpsr(self) & CPSR_M) == CPSR_M_ABT)
 #define ucpustate_isund(self)   ((ucpustate_getcpsr(self) & CPSR_M) == CPSR_M_UND)
 #define ucpustate_isthumb(self) (ucpustate_getcpsr(self) & CPSR_T)
+#define ucpustate_getisa(self)  (ucpustate_isthumb(self) ? ISA_THUMB : ISA_ARM)
 
 /* Preemption control */
 #define ucpustate_getpreemption(self)          ((ucpustate_getcpsr(self) & __ARM_CPSR_PREEMPTION) != 0)
@@ -350,6 +351,7 @@ __NOTHROW_NCX(_fcpustate_p_banked)(struct fcpustate const *__restrict __self) {
 #define kcpustate_getcpsr             ucpustate_getcpsr
 #define kcpustate_setcpsr             ucpustate_setcpsr
 #define kcpustate_isthumb             ucpustate_isthumb
+#define kcpustate_getisa              ucpustate_getisa
 #define icpustate_getr0               ucpustate_getr0
 #define icpustate_setr0               ucpustate_setr0
 #define icpustate_getr1               ucpustate_getr1
@@ -387,6 +389,7 @@ __NOTHROW_NCX(_fcpustate_p_banked)(struct fcpustate const *__restrict __self) {
 #define icpustate_isabt               ucpustate_isabt
 #define icpustate_isund               ucpustate_isund
 #define icpustate_isthumb             ucpustate_isthumb
+#define icpustate_getisa              ucpustate_getisa
 #define scpustate_getr0               ucpustate_getr0
 #define scpustate_setr0               ucpustate_setr0
 #define scpustate_getr1               ucpustate_getr1
@@ -424,6 +427,7 @@ __NOTHROW_NCX(_fcpustate_p_banked)(struct fcpustate const *__restrict __self) {
 #define scpustate_isabt               ucpustate_isabt
 #define scpustate_isund               ucpustate_isund
 #define scpustate_isthumb             ucpustate_isthumb
+#define scpustate_getisa              ucpustate_getisa
 
 
 
@@ -458,6 +462,7 @@ __NOTHROW_NCX(_fcpustate_p_banked)(struct fcpustate const *__restrict __self) {
 #define lcpustate_setpc_arm(self, apc) (void)((self)->lcs_pc = (apc))
 #define lcpustate_getpc(self)          (__byte_t const *)((self)->lcs_pc & ~1)
 #define lcpustate_isthumb(self)        ((self)->lcs_pc & 1)
+#define lcpustate_getisa(self)         (lcpustate_isthumb(self) ? ISA_THUMB : ISA_ARM)
 
 
 

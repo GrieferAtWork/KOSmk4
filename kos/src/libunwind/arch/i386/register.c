@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBUNWIND_ARCH_I386_UNWIND_C
-#define GUARD_LIBUNWIND_ARCH_I386_UNWIND_C 1
+#ifndef GUARD_LIBUNWIND_ARCH_I386_REGISTER_C
+#define GUARD_LIBUNWIND_ARCH_I386_REGISTER_C 1
 #define _KOS_KERNEL_SOURCE 1
 #define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
@@ -26,6 +26,7 @@
 #include "../../api.h"
 /**/
 
+#include "../../register.h"
 #include <hybrid/compiler.h>
 
 #include <asm/cpu-flags.h>
@@ -33,9 +34,9 @@
 #include <kos/kernel/cpu-state-helpers.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/fpu-state.h>
-#include <kos/kernel/x86/gdt.h>
 #include <kos/kernel/paging.h>
 #include <kos/kernel/types.h>
+#include <kos/kernel/x86/gdt.h>
 #include <kos/types.h>
 #include <sys/ucontext.h>
 
@@ -44,8 +45,10 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <libunwind/arch-register.h>
 #include <libunwind/cfi.h>
+#include <libunwind/cfi/i386.h>
+#include <libunwind/cfi/x86_64.h>
+#include <libunwind/register.h>
 #include <libunwind/unwind.h>
 
 #include "../../unwind.h"
@@ -53,7 +56,6 @@
 #ifdef __KERNEL__
 #include <kernel/paging.h>
 #endif /* __KERNEL__ */
-
 
 #if 1
 #define rdpptr_as16(p_ptr) (*(u16 const *)(p_ptr))
@@ -88,48 +90,8 @@ struct kcpustate;
 struct scpustate;
 struct icpustate;
 struct fcpustate;
-#if !defined(__KERNEL__) || defined(__INTELLISENSE__)
 struct ucontext;
 struct mcontext;
-#endif /* !__KERNEL__ || __INTELLISENSE__ */
-
-/* Register accessor callbacks for a variety of known cpu context structures. */
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_lcpustate)(struct lcpustate const *__restrict self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_lcpustate)(struct lcpustate *__restrict self, unwind_regno_t dw_regno, void const *__restrict src);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_ucpustate)(struct ucpustate const *__restrict self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate)(struct ucpustate *__restrict self, unwind_regno_t dw_regno, void const *__restrict src);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_kcpustate)(struct kcpustate const *__restrict self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_kcpustate)(struct kcpustate *__restrict self, unwind_regno_t dw_regno, void const *__restrict src);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_fcpustate)(struct fcpustate const *__restrict self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_fcpustate)(struct fcpustate *__restrict self, unwind_regno_t dw_regno, void const *__restrict src);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_lcpustate_exclusive)(struct lcpustate const *__restrict self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_lcpustate_exclusive)(struct lcpustate *__restrict self, unwind_regno_t dw_regno, void const *__restrict src);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_ucpustate_exclusive)(struct ucpustate const *__restrict self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate_exclusive)(struct ucpustate *__restrict self, unwind_regno_t dw_regno, void const *__restrict src);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_kcpustate_exclusive)(struct kcpustate const *__restrict self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_kcpustate_exclusive)(struct kcpustate *__restrict self, unwind_regno_t dw_regno, void const *__restrict src);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_fcpustate_exclusive)(struct fcpustate const *__restrict self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_fcpustate_exclusive)(struct fcpustate *__restrict self, unwind_regno_t dw_regno, void const *__restrict src);
-#if defined(__KERNEL__) || defined(__INTELLISENSE__)
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_scpustate)(struct scpustate const *__restrict self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC IRREGS_NAME(libuw_unwind_setreg_scpustate))(struct scpustate IRREGS_INDIRECTION __restrict self, unwind_regno_t dw_regno, void const *__restrict src);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_icpustate)(struct icpustate const *__restrict self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC IRREGS_NAME(libuw_unwind_setreg_icpustate))(struct icpustate IRREGS_INDIRECTION __restrict self, unwind_regno_t dw_regno, void const *__restrict src);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_scpustate_exclusive)(struct scpustate const *__restrict self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC IRREGS_NAME(libuw_unwind_setreg_scpustate_exclusive))(struct scpustate IRREGS_INDIRECTION __restrict self, unwind_regno_t dw_regno, void const *__restrict src);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_icpustate_exclusive)(struct icpustate const *__restrict self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC IRREGS_NAME(libuw_unwind_setreg_icpustate_exclusive))(struct icpustate IRREGS_INDIRECTION __restrict self, unwind_regno_t dw_regno, void const *__restrict src);
-#endif /* __KERNEL__ || __INTELLISENSE__ */
-#if !defined(__KERNEL__) || defined(__INTELLISENSE__)
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_ucontext)(struct ucontext const *__restrict self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_ucontext)(struct ucontext *__restrict self, unwind_regno_t dw_regno, void const *__restrict src);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_mcontext)(struct mcontext const *__restrict self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_mcontext)(struct mcontext *__restrict self, unwind_regno_t dw_regno, void const *__restrict src);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_ucontext_exclusive)(struct ucontext const *__restrict self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_ucontext_exclusive)(struct ucontext *__restrict self, unwind_regno_t dw_regno, void const *__restrict src);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_mcontext_exclusive)(struct mcontext const *__restrict self, unwind_regno_t dw_regno, void *__restrict dst);
-INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_mcontext_exclusive)(struct mcontext *__restrict self, unwind_regno_t dw_regno, void const *__restrict src);
-#endif /* !__KERNEL__ || __INTELLISENSE__ */
 
 #define MY_CS     SEGMENT_CURRENT_CODE_RPL
 #define MY_SS     SEGMENT_CURRENT_DATA_RPL
@@ -1299,146 +1261,60 @@ badreg:
 	return UNWIND_INVALID_REGISTER;
 }
 
+LOCAL NONNULL((1, 3)) unwind_errno_t
+NOTHROW_NCX(CC libuw_unwind_getreg_fpustate_base)(struct fpustate const *__restrict self,
+                                                  unwind_regno_t dw_regno,
+                                                  void *__restrict dst) {
+	unwind_errno_t result;
+	if (fpustate_isssave(self)) {
+		result = libuw_unwind_getreg_sfpustate_base(&self->f_ssave, dw_regno, dst);
+	} else {
+		result = libuw_unwind_getreg_xfpustate_base(&self->f_xsave, dw_regno, dst);
+	}
+	return result;
+}
+
+LOCAL NONNULL((1, 3)) unwind_errno_t
+NOTHROW_NCX(CC libuw_unwind_setreg_fpustate_base)(struct fpustate *__restrict self,
+                                                  unwind_regno_t dw_regno,
+                                                  void const *__restrict src) {
+	unwind_errno_t result;
+	if (fpustate_isssave(self)) {
+		result = libuw_unwind_setreg_sfpustate_base(&self->f_ssave, dw_regno, src);
+	} else {
+		result = libuw_unwind_setreg_xfpustate_base(&self->f_xsave, dw_regno, src);
+	}
+	return result;
+}
+
 
 #if !defined(__KERNEL__) || defined(__INTELLISENSE__)
 LOCAL NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_getreg_mcontext_base)(struct mcontext const *__restrict self,
                                                   unwind_regno_t dw_regno,
                                                   void *__restrict dst) {
-	switch (dw_regno) {
-
-	case CFI_UNWIND_REGISTER_MM0 ... CFI_UNWIND_REGISTER_MM7:
-		dw_regno -= CFI_UNWIND_REGISTER_MM0;
-		goto do_fpreg;
-	case CFI_UNWIND_REGISTER_ST0 ... CFI_UNWIND_REGISTER_ST7:
-		dw_regno -= CFI_UNWIND_REGISTER_ST0;
-do_fpreg:
-		if unlikely(!(self->mc_flags & MCONTEXT_FLAG_HAVEFPU))
-			goto badreg;
-		if (fpustate_isxsave(&self->mc_fpu)) {
-			memcpy(dst, &self->mc_fpu.f_xsave.fx_regs[dw_regno], 16);
-		} else {
-			bzero(mempcpy(dst, &self->mc_fpu.f_ssave.fs_regs[dw_regno], 10), 6);
+	unwind_errno_t result;
+	result = libuw_unwind_getreg_ucpustate_base(&self->mc_context, dw_regno, dst);
+	if (result == UNWIND_INVALID_REGISTER) {
+		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
+			result = libuw_unwind_getreg_fpustate_base(&self->mc_fpu, dw_regno, dst);
 		}
-		break;
-
-#ifdef __x86_64__
-	case CFI_UNWIND_REGISTER_XMM0 ... CFI_UNWIND_REGISTER_XMM15:
-#else /* __x86_64__ */
-	case CFI_UNWIND_REGISTER_XMM0 ... CFI_UNWIND_REGISTER_XMM7:
-#endif /* !__x86_64__ */
-		dw_regno -= CFI_UNWIND_REGISTER_XMM0;
-		if unlikely(!(self->mc_flags & MCONTEXT_FLAG_HAVEFPU))
-			goto badreg;
-		if unlikely(!fpustate_isxsave(&self->mc_fpu))
-			goto badreg;
-		memcpy((byte_t *)dst, &self->mc_fpu.f_xsave.fx_xmm[dw_regno], 16);
-		break;
-
-	case CFI_UNWIND_REGISTER_FCW:
-		if unlikely(!(self->mc_flags & MCONTEXT_FLAG_HAVEFPU))
-			goto badreg;
-		if (fpustate_isxsave(&self->mc_fpu)) {
-			wrpptr(dst, self->mc_fpu.f_xsave.fx_fcw);
-		} else {
-			wrpptr(dst, self->mc_fpu.f_ssave.fs_fcw);
-		}
-		break;
-
-	case CFI_UNWIND_REGISTER_FSW:
-		if unlikely(!(self->mc_flags & MCONTEXT_FLAG_HAVEFPU))
-			goto badreg;
-		if (fpustate_isxsave(&self->mc_fpu)) {
-			wrpptr(dst, self->mc_fpu.f_xsave.fx_fsw);
-		} else {
-			wrpptr(dst, self->mc_fpu.f_ssave.fs_fsw);
-		}
-		break;
-
-	case CFI_UNWIND_REGISTER_MXCSR:
-		if unlikely(!(self->mc_flags & MCONTEXT_FLAG_HAVEFPU))
-			goto badreg;
-		if unlikely(!fpustate_isxsave(&self->mc_fpu))
-			goto badreg;
-		wrpptr(dst, self->mc_fpu.f_xsave.fx_mxcsr);
-		break;
-
-	default:
-		return libuw_unwind_getreg_ucpustate_base(&self->mc_context, dw_regno, dst);
 	}
-	return UNWIND_SUCCESS;
-badreg:
-	return UNWIND_INVALID_REGISTER;
+	return result;
 }
 
 LOCAL NONNULL((1, 3)) unwind_errno_t
 NOTHROW_NCX(CC libuw_unwind_setreg_mcontext_base)(struct mcontext *__restrict self,
                                                   unwind_regno_t dw_regno,
                                                   void const *__restrict src) {
-	switch (dw_regno) {
-
-	case CFI_UNWIND_REGISTER_MM0 ... CFI_UNWIND_REGISTER_MM7:
-		dw_regno -= CFI_UNWIND_REGISTER_MM0;
-		goto do_fpreg;
-	case CFI_UNWIND_REGISTER_ST0 ... CFI_UNWIND_REGISTER_ST7:
-		dw_regno -= CFI_UNWIND_REGISTER_ST0;
-do_fpreg:
-		if unlikely(!(self->mc_flags & MCONTEXT_FLAG_HAVEFPU))
-			goto badreg;
-		if (fpustate_isxsave(&self->mc_fpu)) {
-			memcpy(&self->mc_fpu.f_xsave.fx_regs[dw_regno], src, 16);
-		} else {
-			memcpy(&self->mc_fpu.f_ssave.fs_regs[dw_regno], src, 10);
+	unwind_errno_t result;
+	result = libuw_unwind_setreg_ucpustate_base(&self->mc_context, dw_regno, src);
+	if (result == UNWIND_INVALID_REGISTER) {
+		if (self->mc_flags & MCONTEXT_FLAG_HAVEFPU) {
+			result = libuw_unwind_setreg_fpustate_base(&self->mc_fpu, dw_regno, src);
 		}
-		break;
-
-#ifdef __x86_64__
-	case CFI_UNWIND_REGISTER_XMM0 ... CFI_UNWIND_REGISTER_XMM15:
-#else /* __x86_64__ */
-	case CFI_UNWIND_REGISTER_XMM0 ... CFI_UNWIND_REGISTER_XMM7:
-#endif /* !__x86_64__ */
-		dw_regno -= CFI_UNWIND_REGISTER_XMM0;
-		if unlikely(!(self->mc_flags & MCONTEXT_FLAG_HAVEFPU))
-			goto badreg;
-		if unlikely(!fpustate_isxsave(&self->mc_fpu))
-			goto badreg;
-		memcpy(&self->mc_fpu.f_xsave.fx_xmm[dw_regno], src, 16);
-		break;
-
-	case CFI_UNWIND_REGISTER_FCW:
-		if unlikely(!(self->mc_flags & MCONTEXT_FLAG_HAVEFPU))
-			goto badreg;
-		if (fpustate_isxsave(&self->mc_fpu)) {
-			self->mc_fpu.f_xsave.fx_fcw = rdpptr_as16(src);
-		} else {
-			self->mc_fpu.f_ssave.fs_fcw = rdpptr_as16(src);
-		}
-		break;
-
-	case CFI_UNWIND_REGISTER_FSW:
-		if unlikely(!(self->mc_flags & MCONTEXT_FLAG_HAVEFPU))
-			goto badreg;
-		if (fpustate_isxsave(&self->mc_fpu)) {
-			self->mc_fpu.f_xsave.fx_fsw = rdpptr_as16(src);
-		} else {
-			self->mc_fpu.f_ssave.fs_fsw = rdpptr_as16(src);
-		}
-		break;
-
-	case CFI_UNWIND_REGISTER_MXCSR:
-		if unlikely(!(self->mc_flags & MCONTEXT_FLAG_HAVEFPU))
-			goto badreg;
-		if unlikely(!fpustate_isxsave(&self->mc_fpu))
-			goto badreg;
-		self->mc_fpu.f_xsave.fx_mxcsr = rdpptr_as32(src);
-		break;
-
-	default:
-		return libuw_unwind_setreg_ucpustate_base(&self->mc_context, dw_regno, src);
 	}
-	return UNWIND_SUCCESS;
-badreg:
-	return UNWIND_INVALID_REGISTER;
+	return result;
 }
 #endif /* !__KERNEL__ || __INTELLISENSE__ */
 
@@ -1545,22 +1421,14 @@ DEFINE_INTERN_ALIAS(libuw_unwind_setreg_ucontext, libuw_unwind_setreg_mcontext);
 DEFINE_INTERN_ALIAS(libuw_unwind_getreg_ucontext_exclusive, libuw_unwind_getreg_mcontext_exclusive);
 DEFINE_INTERN_ALIAS(libuw_unwind_setreg_ucontext_exclusive, libuw_unwind_setreg_mcontext_exclusive);
 #endif /* !__KERNEL__ || __INTELLISENSE__ */
-DEFINE_CPUSTATE_GETTERS(struct sfpustate const *,
-                        struct sfpustate *,
-                        libuw_unwind_getreg_sfpustate,
-                        libuw_unwind_getreg_sfpustate_base,
-                        libuw_unwind_getreg_sfpustate_exclusive,
-                        libuw_unwind_setreg_sfpustate,
-                        libuw_unwind_setreg_sfpustate_base,
-                        libuw_unwind_setreg_sfpustate_exclusive)
-DEFINE_CPUSTATE_GETTERS(struct xfpustate const *,
-                        struct xfpustate *,
-                        libuw_unwind_getreg_xfpustate,
-                        libuw_unwind_getreg_xfpustate_base,
-                        libuw_unwind_getreg_xfpustate_exclusive,
-                        libuw_unwind_setreg_xfpustate,
-                        libuw_unwind_setreg_xfpustate_base,
-                        libuw_unwind_setreg_xfpustate_exclusive)
+DEFINE_CPUSTATE_GETTERS(struct fpustate const *,
+                        struct fpustate *,
+                        libuw_unwind_getreg_fpustate,
+                        libuw_unwind_getreg_fpustate_base,
+                        libuw_unwind_getreg_fpustate_exclusive,
+                        libuw_unwind_setreg_fpustate,
+                        libuw_unwind_setreg_fpustate_base,
+                        libuw_unwind_setreg_fpustate_exclusive)
 #undef DEFINE_CPUSTATE_GETTERS
 
 DEFINE_PUBLIC_ALIAS(unwind_getreg_lcpustate, libuw_unwind_getreg_lcpustate);
@@ -1602,26 +1470,102 @@ DEFINE_PUBLIC_ALIAS(unwind_getreg_mcontext_exclusive, libuw_unwind_getreg_mconte
 DEFINE_PUBLIC_ALIAS(unwind_setreg_mcontext_exclusive, libuw_unwind_setreg_mcontext_exclusive);
 #endif /* !__KERNEL__ || __INTELLISENSE__ */
 
-DEFINE_PUBLIC_ALIAS(unwind_getreg_sfpustate, libuw_unwind_getreg_sfpustate);
-DEFINE_PUBLIC_ALIAS(unwind_setreg_sfpustate, libuw_unwind_setreg_sfpustate);
-DEFINE_PUBLIC_ALIAS(unwind_getreg_xfpustate, libuw_unwind_getreg_xfpustate);
-DEFINE_PUBLIC_ALIAS(unwind_setreg_xfpustate, libuw_unwind_setreg_xfpustate);
-DEFINE_PUBLIC_ALIAS(unwind_getreg_sfpustate_exclusive, libuw_unwind_getreg_sfpustate_exclusive);
-DEFINE_PUBLIC_ALIAS(unwind_setreg_sfpustate_exclusive, libuw_unwind_setreg_sfpustate_exclusive);
-DEFINE_PUBLIC_ALIAS(unwind_getreg_xfpustate_exclusive, libuw_unwind_getreg_xfpustate_exclusive);
-DEFINE_PUBLIC_ALIAS(unwind_setreg_xfpustate_exclusive, libuw_unwind_setreg_xfpustate_exclusive);
+DEFINE_PUBLIC_ALIAS(unwind_getreg_fpustate, libuw_unwind_getreg_fpustate);
+DEFINE_PUBLIC_ALIAS(unwind_setreg_fpustate, libuw_unwind_setreg_fpustate);
+DEFINE_PUBLIC_ALIAS(unwind_getreg_fpustate_exclusive, libuw_unwind_getreg_fpustate_exclusive);
+DEFINE_PUBLIC_ALIAS(unwind_setreg_fpustate_exclusive, libuw_unwind_setreg_fpustate_exclusive);
 
 #undef IRREGS_NAME
 #undef IRREGS_INDIRECTION
 #undef IRREGS_SELF
 #undef IRREGS_LOADSELF
 
+#ifdef LIBUNWIND_HAVE_GETSETREG_COMPAT
+INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_getreg_compat)(/*struct unwind_getreg_compat_data **/ void const *arg, unwind_regno_t regno, void *__restrict dst);
+INTDEF NONNULL((1, 3)) unwind_errno_t NOTHROW_NCX(CC libuw_unwind_setreg_compat)(/*struct unwind_setreg_compat_data **/ void *arg, unwind_regno_t regno, void const *__restrict src);
+
+/*[[[deemon
+import fs;
+import * from deemon;
+import * from .....misc.libgen.strendN;
+import * from .....misc.libgen.converter;
+local macros: {string: int} = Dict();
+function loadMacros(m: {string: string}) {
+	for (local name, value: m) {
+		if (name.startswith("CFI_386_UNWIND_REGISTER_E") || name.startswith("CFI_386_UNWIND_REGISTER_R"))
+			name = "CFI_386_UNWIND_REGISTER_P" + name[#"CFI_386_UNWIND_REGISTER_E":];
+		if (name.startswith("CFI_X86_64_UNWIND_REGISTER_E") || name.startswith("CFI_X86_64_UNWIND_REGISTER_R"))
+			name = "CFI_X86_64_UNWIND_REGISTER_P" + name[#"CFI_X86_64_UNWIND_REGISTER_R":];
+		macros[name] = value;
+	}
+}
+loadMacros(enumerateIntegerMacrosFromFile(fs.headof(__FILE__) + "/../../../../include/libunwind/cfi/i386.h"));
+loadMacros(enumerateIntegerMacrosFromFile(fs.headof(__FILE__) + "/../../../../include/libunwind/cfi/x86_64.h"));
+del macros["CFI_386_UNWIND_GPR_REGISTER_SIZE"];
+del macros["CFI_X86_64_UNWIND_GPR_REGISTER_SIZE"];
+printArrayDefineMacro("DEFINE_386_to_amd64",
+	generateArrayMapping(macros, "CFI_386_UNWIND_REGISTER_", "CFI_X86_64_UNWIND_REGISTER_"));
+]]]*/
+#define DEFINE_386_to_amd64(name)                                                                                      \
+	__UINT8_TYPE__ const name[102] = { 0,   2,   1,   3,   7,   6,   4,   5,   16,  49,  255, 33,  34,  35,  36,  37,  \
+	                                   38,  39,  40,  255, 255, 17,  18,  19,  20,  21,  22,  23,  24,  41,  42,  43,  \
+	                                   44,  45,  46,  47,  48,  65,  66,  64,  50,  51,  52,  53,  54,  55,  255, 255, \
+	                                   62,  63,  255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, \
+	                                   255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 118, 119, 120, \
+	                                   121, 122, 123, 124, 125, 126 }
+/*[[[end]]]*/
+
+/* Convert a given `CFI_386_UNWIND_REGISTER_*' register number to `CFI_X86_64_UNWIND_REGISTER_*' */
+PRIVATE ATTR_CONST WUNUSED unwind_regno_t
+NOTHROW(CC regno_i386_to_amd64)(unwind_regno_t regno) {
+	unwind_regno_t result;
+	PRIVATE DEFINE_386_to_amd64(i386_to_amd64);
+	result = CFI_X86_64_UNWIND_REGISTER_COUNT;
+	if likely(regno < lengthof(i386_to_amd64))
+		result = i386_to_amd64[regno];
+	return result;
+}
+
+
+INTERN NONNULL((1, 3)) unwind_errno_t
+NOTHROW_NCX(CC libuw_unwind_getreg_compat)(/*struct unwind_getreg_compat_data **/ void const *arg,
+                                           unwind_regno_t regno, void *__restrict dst) {
+	unwind_errno_t result;
+	struct unwind_getreg_compat_data const *me;
+	me     = (struct unwind_getreg_compat_data const *)arg;
+	regno  = regno_i386_to_amd64(regno);
+	result = (*me->ugcd_getreg)(me->ugcd_arg, regno, dst);
+	return result;
+}
+
+#if 1
+/* Abuse  the fact that getreg/setreg are actually the same here, and
+ * the only difference lies in what's the deal with the function that
+ * is being called. */
+static_assert(offsetof(struct unwind_setreg_compat_data, uscd_setreg) ==
+              offsetof(struct unwind_getreg_compat_data, ugcd_getreg));
+static_assert(offsetof(struct unwind_setreg_compat_data, uscd_arg) ==
+              offsetof(struct unwind_getreg_compat_data, ugcd_arg));
+DEFINE_INTERN_ALIAS(libuw_unwind_setreg_compat, libuw_unwind_getreg_compat);
+#else
+INTERN NONNULL((1, 3)) unwind_errno_t
+NOTHROW_NCX(CC libuw_unwind_setreg_compat)(/*struct unwind_setreg_compat_data **/ void *arg,
+                                           unwind_regno_t regno, void const *__restrict src) {
+	unwind_errno_t result;
+	struct unwind_setreg_compat_data const *me;
+	me     = (struct unwind_setreg_compat_data const *)arg;
+	regno  = regno_i386_to_amd64(regno);
+	result = (*me->uscd_setreg)(me->uscd_arg, regno, src);
+	return result;
+}
+#endif
+
+
+DEFINE_PUBLIC_ALIAS(unwind_getreg_compat, libuw_unwind_getreg_compat);
+DEFINE_PUBLIC_ALIAS(unwind_setreg_compat, libuw_unwind_setreg_compat);
+#endif /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
+
 DECL_END
 
-#ifndef __INTELLISENSE__
-#ifdef LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER
-#include "compat.c.inl"
-#endif /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
-#endif /* !__INTELLISENSE__ */
-
-#endif /* !GUARD_LIBUNWIND_ARCH_I386_UNWIND_C */
+#endif /* !GUARD_LIBUNWIND_ARCH_I386_REGISTER_C */

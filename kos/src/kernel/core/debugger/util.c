@@ -61,7 +61,7 @@ DECL_BEGIN
  * which is allowed to point into user-space, in which case user-space memory
  * is accessed through use of `dbg_readmemory()', rather than direct  access. */
 PUBLIC ATTR_DBGTEXT ATTR_PURE WUNUSED byte_t *
-NOTHROW(LIBINSTRLEN_CC dbg_instruction_succ_nx)(void const *pc, instrlen_isa_t isa) {
+NOTHROW(LIBINSTRLEN_CC dbg_instruction_succ_nx)(void const *pc, isa_t isa) {
 	/* This `12' must  be >=  the max number  of remaining  zero-bytes
 	 * following  after  any  other  sequence  of  instruction  bytes.
 	 * This is used to ensure that libdisasm sees that our instruction
@@ -84,7 +84,7 @@ NOTHROW(LIBINSTRLEN_CC dbg_instruction_succ_nx)(void const *pc, instrlen_isa_t i
 /* Return the length the longest valid instruction with a length <= maxlen that ends at `pc'
  * If no such instruction exists, return `0' instead. */
 PRIVATE ATTR_DBGTEXT ATTR_PURE WUNUSED u8
-NOTHROW_NCX(FCALL dbg_predmaxone)(void const *pc, instrlen_isa_t isa, u8 maxlen) {
+NOTHROW_NCX(FCALL dbg_predmaxone)(void const *pc, isa_t isa, u8 maxlen) {
 	byte_t const *result;
 	result = (byte_t const *)pc - maxlen;
 	for (; (uintptr_t)result < (uintptr_t)pc; ++result) {
@@ -104,7 +104,7 @@ NOTHROW_NCX(FCALL dbg_predmaxone)(void const *pc, instrlen_isa_t isa, u8 maxlen)
 #endif /* !LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE */
 
 PUBLIC ATTR_DBGTEXT ATTR_PURE WUNUSED byte_t *
-NOTHROW(LIBINSTRLEN_CC dbg_instruction_pred_nx)(void const *pc, instrlen_isa_t isa) {
+NOTHROW(LIBINSTRLEN_CC dbg_instruction_pred_nx)(void const *pc, isa_t isa) {
 	byte_t const *iter, *lowest_iter;
 	unsigned int i;
 	u8 maxlen[LIBINSTRLEN_ARCH_INSTRUCTION_VERIFY_DISTANCE];
@@ -152,7 +152,7 @@ done_backtrack:
 }
 
 PUBLIC ATTR_DBGTEXT ATTR_PURE ATTR_RETNONNULL WUNUSED byte_t *
-NOTHROW(LIBINSTRLEN_CC dbg_instruction_trysucc)(void const *pc, instrlen_isa_t isa) {
+NOTHROW(LIBINSTRLEN_CC dbg_instruction_trysucc)(void const *pc, isa_t isa) {
 	byte_t *result;
 	result = dbg_instruction_succ_nx(pc, isa);
 	if unlikely(!result)
@@ -161,7 +161,7 @@ NOTHROW(LIBINSTRLEN_CC dbg_instruction_trysucc)(void const *pc, instrlen_isa_t i
 }
 
 PUBLIC ATTR_DBGTEXT ATTR_PURE ATTR_RETNONNULL WUNUSED byte_t *
-NOTHROW(LIBINSTRLEN_CC dbg_instruction_trypred)(void const *pc, instrlen_isa_t isa) {
+NOTHROW(LIBINSTRLEN_CC dbg_instruction_trypred)(void const *pc, isa_t isa) {
 	byte_t *result;
 	result = dbg_instruction_pred_nx(pc, isa);
 	if unlikely(!result)

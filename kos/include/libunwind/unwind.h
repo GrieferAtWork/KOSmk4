@@ -27,8 +27,6 @@
 
 #include <bits/types.h>
 
-#include <libunwind/arch-register.h>
-
 #include "cfi.h"
 #include "eh_frame.h"
 #include "errno.h"
@@ -40,39 +38,6 @@
 
 #ifdef __CC__
 __DECL_BEGIN
-
-#ifndef __unwind_regno_t_defined
-#define __unwind_regno_t_defined
-typedef __UINTPTR_HALF_TYPE__ unwind_regno_t;
-#endif /* !__unwind_regno_t_defined */
-
-/* Register accessor callbacks for a variety of known cpu context structures. */
-#ifndef __KERNEL__
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_UCONTEXT)(/*struct ucontext*/ void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_UCONTEXT)(/*struct ucontext*/ void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_GETREG_MCONTEXT)(/*struct mcontext*/ void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
-typedef __ATTR_NONNULL_T((1, 3)) unwind_errno_t __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_SETREG_MCONTEXT)(/*struct mcontext*/ void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
-#ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_ucontext)(/*struct ucontext*/ void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucontext)(/*struct ucontext*/ void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_mcontext)(/*struct mcontext*/ void const *__arg, unwind_regno_t __dw_regno, void *__restrict __dst);
-LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) unwind_errno_t __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_mcontext)(/*struct mcontext*/ void *__arg, unwind_regno_t __dw_regno, void const *__restrict __src);
-#endif /* LIBUNWIND_WANT_PROTOTYPES */
-
-#ifndef LIBUNWIND_HAVE_EXCEPT_REGISTER_STATE_ACCESSORS
-#define LIBUNWIND_HAVE_EXCEPT_REGISTER_STATE_ACCESSORS 1
-typedef PUNWIND_GETREG_MCONTEXT PUNWIND_GETREG_EXCEPT_REGISTER_STATE;
-typedef PUNWIND_SETREG_MCONTEXT PUNWIND_SETREG_EXCEPT_REGISTER_STATE;
-#define UNWIND_GETREG_EXCEPT_REGISTER_STATE_NAME "unwind_getreg_mcontext"
-#define UNWIND_SETREG_EXCEPT_REGISTER_STATE_NAME "unwind_setreg_mcontext"
-#ifdef LIBUNWIND_WANT_PROTOTYPES
-#define unwind_getreg_except_register_state unwind_getreg_mcontext
-#define unwind_setreg_except_register_state unwind_setreg_mcontext
-#endif /* LIBUNWIND_WANT_PROTOTYPES */
-#endif /* !LIBUNWIND_HAVE_EXCEPT_REGISTER_STATE_ACCESSORS */
-#endif /* !__KERNEL__ */
-
-
 
 /* Lookup FDE information  associated with a  given program counter  position.
  * Using integration with KOS's DL extension APIs, this function automatically

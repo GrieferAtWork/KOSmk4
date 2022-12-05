@@ -49,7 +49,7 @@ DECL_BEGIN
 	(!((self)->rde_regno & REG_ISPREG)                               \
 	 ? (self)->rde_regno /* non-isa-specific register */             \
 	 : (((self)->rde_regno & ~REG_ISPREG & ~X86_REGISTER_SIZEMASK) | \
-	    (isa == INSTRLEN_ISA_I386 ? X86_REGISTER_SIZEMASK_4BYTE      \
+	    (isa == ISA_I386 ? X86_REGISTER_SIZEMASK_4BYTE      \
 	                              : X86_REGISTER_SIZEMASK_8BYTE)))
 #elif defined(__i386__)
 #define REG_NAME_MAXLEN 12
@@ -373,7 +373,7 @@ PRIVATE struct register_db_entry const register_db[] = {
  * @param: isa: Instruction-set-assembly to which the given name belongs
  * @return: CPU_REGISTER_NONE: No such register. */
 INTERN WUNUSED ATTR_PURE NONNULL((2)) cpu_regno_t
-NOTHROW_NCX(CC libcpu_register_byname)(instrlen_isa_t isa,
+NOTHROW_NCX(CC libcpu_register_byname)(isa_t isa,
                                        char const *__restrict name,
                                        size_t namelen) {
 	size_t i;

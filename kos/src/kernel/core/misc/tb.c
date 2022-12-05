@@ -50,6 +50,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <libdebuginfo/unwind.h>
 #include <libinstrlen/instrlen.h>
 #include <libunwind/errno.h>
+#include <libunwind/register.h>
 #include <libunwind/unwind.h>
 
 DECL_BEGIN
@@ -100,8 +101,8 @@ do_print_traceback(pformatprinter printer, void *arg,
 		--n_skip;
 		result = 0;
 	} else {
-		instrlen_isa_t isa;
-		isa = instrlen_isa_from_unwind_getreg(reg_getter, state);
+		isa_t isa;
+		isa = unwind_getreg_getisa(reg_getter, state);
 		result = addr2line_printf(printer, arg,
 		                          instruction_trypred(pc, isa),
 		                          pc, "sp=%p", sp);
@@ -120,8 +121,8 @@ do_print_traceback(pformatprinter printer, void *arg,
 		if (n_skip) {
 			--n_skip;
 		} else {
-			instrlen_isa_t isa;
-			isa = instrlen_isa_from_unwind_getreg(reg_getter, state);
+			isa_t isa;
+			isa = unwind_getreg_getisa(reg_getter, state);
 			temp = addr2line_printf(printer, arg,
 			                        instruction_trypred(pc, isa),
 			                        pc, "sp=%p", sp);
@@ -145,8 +146,8 @@ do_print_traceback(pformatprinter printer, void *arg,
 		if ((byte_t *)last_good_sp >= (byte_t *)minaddr &&
 		    (byte_t *)last_good_sp < (byte_t *)endaddr) {
 			bool is_first = true;
-			instrlen_isa_t isa;
-			isa = instrlen_isa_from_unwind_getreg(reg_getter, state);
+			isa_t isa;
+			isa = unwind_getreg_getisa(reg_getter, state);
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 			uintptr_t iter;
 			iter = FLOOR_ALIGN((uintptr_t)last_good_sp, sizeof(void *));

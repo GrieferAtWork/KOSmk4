@@ -69,9 +69,9 @@
 #include <stddef.h>
 #include <string.h>
 
-#include <libunwind/arch-register.h>
 #include <libunwind/cfi.h> /* unwind_getreg_t, unwind_setreg_t */
 #include <libunwind/errno.h>
+#include <libunwind/register.h>
 
 #if defined(__i386__) || defined(__x86_64__)
 #include <sched/x86/eflags-mask.h>
@@ -677,13 +677,7 @@ rpc_vm_getreg_impl(void const *arg, unwind_regno_t dw_regno, void *__restrict ds
 			fpustate_saveinto(&me->rv_fpu);
 			me->rv_flags |= RPC_VM_HAVEFPU;
 		}
-#if defined(__x86_64__) || defined(__i386__)
-		result = x86_fpustate_variant == FPU_STATE_SSTATE
-		         ? unwind_getreg_sfpustate(&me->rv_fpu, dw_regno, dst)
-		         : unwind_getreg_xfpustate(&me->rv_fpu, dw_regno, dst);
-#else /* __x86_64__ || __i386__ */
 		result = unwind_getreg_fpustate(&me->rv_fpu, dw_regno, dst);
-#endif /* !__x86_64__ && !__i386__ */
 	}
 #endif /* CONFIG_HAVE_FPU */
 	return result;
@@ -701,13 +695,7 @@ rpc_vm_setreg_impl(void *arg, unwind_regno_t dw_regno, void const *__restrict sr
 			fpustate_saveinto(&me->rv_fpu);
 			me->rv_flags |= RPC_VM_HAVEFPU;
 		}
-#if defined(__x86_64__) || defined(__i386__)
-		result = x86_fpustate_variant == FPU_STATE_SSTATE
-		         ? unwind_setreg_sfpustate(&me->rv_fpu, dw_regno, src)
-		         : unwind_setreg_xfpustate(&me->rv_fpu, dw_regno, src);
-#else /* __x86_64__ || __i386__ */
 		result = unwind_setreg_fpustate(&me->rv_fpu, dw_regno, src);
-#endif /* !__x86_64__ && !__i386__ */
 		if (result == UNWIND_SUCCESS)
 			me->rv_flags |= RPC_VM_HAVEFPU_MODIFIED;
 	}

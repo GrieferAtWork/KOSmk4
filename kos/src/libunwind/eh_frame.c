@@ -158,162 +158,162 @@ for (local name: [
 /* Normal common/uncommon */
 #ifndef cfi_unwind_register_dw2common
 PRIVATE DEFINE_cfi_unwind_register_dw2common(__SIZEOF_POINTER__, _cur_dw2common);
-#ifdef LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER
+#ifdef LIBUNWIND_HAVE_GETSETREG_COMPAT
 PRIVATE DEFINE_cfi_unwind_register_dw2common(__ARCH_COMPAT_SIZEOF_POINTER, _compat_cur_dw2common);
 #define cfi_unwind_register_dw2common(addrsize, dw_regno)                                                                        \
 	(CFI_ADDRSIZE_ISCOMPAT(addrsize) ? _convert_with_array(_compat_cur_dw2common, dw_regno, CFI_UNWIND_COMMON_REGISTER_MAXCOUNT) \
 	                                 : _convert_with_array(_cur_dw2common, dw_regno, CFI_UNWIND_COMMON_REGISTER_MAXCOUNT))
-#else /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#else /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #define cfi_unwind_register_dw2common(addrsize, dw_regno) \
 	_convert_with_array(_cur_dw2common, dw_regno, CFI_UNWIND_COMMON_REGISTER_MAXCOUNT)
-#endif /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#endif /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #endif /* !cfi_unwind_register_dw2common */
 
 #ifndef cfi_unwind_register_dw2uncommon
 PRIVATE DEFINE_cfi_unwind_register_dw2uncommon(__SIZEOF_POINTER__, _cur_dw2uncommon);
-#ifdef LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER
+#ifdef LIBUNWIND_HAVE_GETSETREG_COMPAT
 PRIVATE DEFINE_cfi_unwind_register_dw2uncommon(__ARCH_COMPAT_SIZEOF_POINTER, _compat_cur_dw2uncommon);
 #define cfi_unwind_register_dw2uncommon(addrsize, dw_regno)                                                                          \
 	(CFI_ADDRSIZE_ISCOMPAT(addrsize) ? _convert_with_array(_compat_cur_dw2uncommon, dw_regno, CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT) \
 	                                 : _convert_with_array(_cur_dw2uncommon, dw_regno, CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT))
-#else /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#else /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #define cfi_unwind_register_dw2uncommon(addrsize, dw_regno) \
 	_convert_with_array(_cur_dw2uncommon, dw_regno, CFI_UNWIND_UNCOMMON_REGISTER_MAXCOUNT)
-#endif /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#endif /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #endif /* !cfi_unwind_register_dw2uncommon */
 
 #ifndef cfi_unwind_register_common2dw
 PRIVATE DEFINE_cfi_unwind_register_common2dw(__SIZEOF_POINTER__, _cur_common2dw);
-#ifdef LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER
+#ifdef LIBUNWIND_HAVE_GETSETREG_COMPAT
 PRIVATE DEFINE_cfi_unwind_register_common2dw(__ARCH_COMPAT_SIZEOF_POINTER, _compat_cur_common2dw);
 #define cfi_unwind_register_common2dw(addrsize, common_regno)                                                                 \
 	(CFI_ADDRSIZE_ISCOMPAT(addrsize) ? _convert_with_array(_compat_cur_common2dw, common_regno, CFI_UNWIND_REGISTER_MAXCOUNT) \
 	                                 : _convert_with_array(_cur_common2dw, common_regno, CFI_UNWIND_REGISTER_MAXCOUNT))
-#else /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#else /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #define cfi_unwind_register_common2dw(addrsize, common_regno) \
 	_convert_with_array(_cur_common2dw, common_regno, CFI_UNWIND_REGISTER_MAXCOUNT)
-#endif /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#endif /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #endif /* !cfi_unwind_register_common2dw */
 
 #ifndef cfi_unwind_register_uncommon2dw
 PRIVATE DEFINE_cfi_unwind_register_uncommon2dw(__SIZEOF_POINTER__, _cur_uncommon2dw);
-#ifdef LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER
+#ifdef LIBUNWIND_HAVE_GETSETREG_COMPAT
 PRIVATE DEFINE_cfi_unwind_register_uncommon2dw(__ARCH_COMPAT_SIZEOF_POINTER, _compat_cur_uncommon2dw);
 #define cfi_unwind_register_uncommon2dw(addrsize, uncommon_regno)                                                                 \
 	(CFI_ADDRSIZE_ISCOMPAT(addrsize) ? _convert_with_array(_compat_cur_uncommon2dw, uncommon_regno, CFI_UNWIND_REGISTER_MAXCOUNT) \
 	                                 : _convert_with_array(_cur_uncommon2dw, uncommon_regno, CFI_UNWIND_REGISTER_MAXCOUNT))
-#else /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#else /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #define cfi_unwind_register_uncommon2dw(addrsize, uncommon_regno) \
 	_convert_with_array(_cur_uncommon2dw, uncommon_regno, CFI_UNWIND_REGISTER_MAXCOUNT)
-#endif /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#endif /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #endif /* !cfi_unwind_register_uncommon2dw */
 
 
 /* Sigframe common/uncommon */
 #ifndef cfi_unwind_sigframe_register_dw2common
 PRIVATE DEFINE_cfi_unwind_sigframe_register_dw2common(__SIZEOF_POINTER__, _cur_sigframe_dw2common);
-#ifdef LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER
+#ifdef LIBUNWIND_HAVE_GETSETREG_COMPAT
 PRIVATE DEFINE_cfi_unwind_sigframe_register_dw2common(__ARCH_COMPAT_SIZEOF_POINTER, _compat_cur_sigframe_dw2common);
 #define cfi_unwind_sigframe_register_dw2common(addrsize, dw_regno)                                                                                 \
 	(CFI_ADDRSIZE_ISCOMPAT(addrsize) ? _convert_with_array(_compat_cur_sigframe_dw2common, dw_regno, CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT) \
 	                                 : _convert_with_array(_cur_sigframe_dw2common, dw_regno, CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT))
-#else /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#else /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #define cfi_unwind_sigframe_register_dw2common(addrsize, dw_regno) \
 	_convert_with_array(_cur_sigframe_dw2common, dw_regno, CFI_UNWIND_SIGFRAME_COMMON_REGISTER_MAXCOUNT)
-#endif /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#endif /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #endif /* !cfi_unwind_sigframe_register_dw2common */
 
 #ifndef cfi_unwind_sigframe_register_dw2uncommon
 PRIVATE DEFINE_cfi_unwind_sigframe_register_dw2uncommon(__SIZEOF_POINTER__, _cur_sigframe_dw2uncommon);
-#ifdef LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER
+#ifdef LIBUNWIND_HAVE_GETSETREG_COMPAT
 PRIVATE DEFINE_cfi_unwind_sigframe_register_dw2uncommon(__ARCH_COMPAT_SIZEOF_POINTER, _compat_cur_sigframe_dw2uncommon);
 #define cfi_unwind_sigframe_register_dw2uncommon(addrsize, dw_regno)                                                                                   \
 	(CFI_ADDRSIZE_ISCOMPAT(addrsize) ? _convert_with_array(_compat_cur_sigframe_dw2uncommon, dw_regno, CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT) \
 	                                 : _convert_with_array(_cur_sigframe_dw2uncommon, dw_regno, CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT))
-#else /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#else /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #define cfi_unwind_sigframe_register_dw2uncommon(addrsize, dw_regno) \
 	_convert_with_array(_cur_sigframe_dw2uncommon, dw_regno, CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_MAXCOUNT)
-#endif /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#endif /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #endif /* !cfi_unwind_sigframe_register_dw2uncommon */
 
 #ifndef cfi_unwind_sigframe_register_common2dw
 PRIVATE DEFINE_cfi_unwind_sigframe_register_common2dw(__SIZEOF_POINTER__, _cur_sigframe_common2dw);
-#ifdef LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER
+#ifdef LIBUNWIND_HAVE_GETSETREG_COMPAT
 PRIVATE DEFINE_cfi_unwind_sigframe_register_common2dw(__ARCH_COMPAT_SIZEOF_POINTER, _compat_cur_sigframe_common2dw);
 #define cfi_unwind_sigframe_register_common2dw(addrsize, common_regno)                                                                 \
 	(CFI_ADDRSIZE_ISCOMPAT(addrsize) ? _convert_with_array(_compat_cur_sigframe_common2dw, common_regno, CFI_UNWIND_REGISTER_MAXCOUNT) \
 	                                 : _convert_with_array(_cur_sigframe_common2dw, common_regno, CFI_UNWIND_REGISTER_MAXCOUNT))
-#else /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#else /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #define cfi_unwind_sigframe_register_common2dw(addrsize, common_regno) \
 	_convert_with_array(_cur_sigframe_common2dw, common_regno, CFI_UNWIND_REGISTER_MAXCOUNT)
-#endif /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#endif /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #endif /* !cfi_unwind_sigframe_register_common2dw */
 
 #ifndef cfi_unwind_sigframe_register_uncommon2dw
 PRIVATE DEFINE_cfi_unwind_sigframe_register_uncommon2dw(__SIZEOF_POINTER__, _cur_sigframe_uncommon2dw);
-#ifdef LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER
+#ifdef LIBUNWIND_HAVE_GETSETREG_COMPAT
 PRIVATE DEFINE_cfi_unwind_sigframe_register_uncommon2dw(__ARCH_COMPAT_SIZEOF_POINTER, _compat_cur_sigframe_uncommon2dw);
 #define cfi_unwind_sigframe_register_uncommon2dw(addrsize, uncommon_regno)                                                                 \
 	(CFI_ADDRSIZE_ISCOMPAT(addrsize) ? _convert_with_array(_compat_cur_sigframe_uncommon2dw, uncommon_regno, CFI_UNWIND_REGISTER_MAXCOUNT) \
 	                                 : _convert_with_array(_cur_sigframe_uncommon2dw, uncommon_regno, CFI_UNWIND_REGISTER_MAXCOUNT))
-#else /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#else /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #define cfi_unwind_sigframe_register_uncommon2dw(addrsize, uncommon_regno) \
 	_convert_with_array(_cur_sigframe_uncommon2dw, uncommon_regno, CFI_UNWIND_REGISTER_MAXCOUNT)
-#endif /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#endif /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #endif /* !cfi_unwind_sigframe_register_uncommon2dw */
 
 
 /* Landing-pad common/uncommon */
 #ifndef cfi_unwind_landing_register_dw2common
 PRIVATE DEFINE_cfi_unwind_landing_register_dw2common(__SIZEOF_POINTER__, _cur_landing_dw2common);
-#ifdef LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER
+#ifdef LIBUNWIND_HAVE_GETSETREG_COMPAT
 PRIVATE DEFINE_cfi_unwind_landing_register_dw2common(__ARCH_COMPAT_SIZEOF_POINTER, _compat_cur_landing_dw2common);
 #define cfi_unwind_landing_register_dw2common(addrsize, dw_regno)                                                                                \
 	(CFI_ADDRSIZE_ISCOMPAT(addrsize) ? _convert_with_array(_compat_cur_landing_dw2common, dw_regno, CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT) \
 	                                 : _convert_with_array(_cur_landing_dw2common, dw_regno, CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT))
-#else /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#else /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #define cfi_unwind_landing_register_dw2common(addrsize, dw_regno) \
 	_convert_with_array(_cur_landing_dw2common, dw_regno, CFI_UNWIND_LANDING_COMMON_REGISTER_MAXCOUNT)
-#endif /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#endif /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #endif /* !cfi_unwind_landing_register_dw2common */
 
 #ifndef cfi_unwind_landing_register_dw2uncommon
 PRIVATE DEFINE_cfi_unwind_landing_register_dw2uncommon(__SIZEOF_POINTER__, _cur_landing_dw2uncommon);
-#ifdef LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER
+#ifdef LIBUNWIND_HAVE_GETSETREG_COMPAT
 PRIVATE DEFINE_cfi_unwind_landing_register_dw2uncommon(__ARCH_COMPAT_SIZEOF_POINTER, _compat_cur_landing_dw2uncommon);
 #define cfi_unwind_landing_register_dw2uncommon(addrsize, dw_regno)                                                                                  \
 	(CFI_ADDRSIZE_ISCOMPAT(addrsize) ? _convert_with_array(_compat_cur_landing_dw2uncommon, dw_regno, CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT) \
 	                                 : _convert_with_array(_cur_landing_dw2uncommon, dw_regno, CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT))
-#else /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#else /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #define cfi_unwind_landing_register_dw2uncommon(addrsize, dw_regno) \
 	_convert_with_array(_cur_landing_dw2uncommon, dw_regno, CFI_UNWIND_LANDING_UNCOMMON_REGISTER_MAXCOUNT)
-#endif /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#endif /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #endif /* !cfi_unwind_landing_register_dw2uncommon */
 
 #ifndef cfi_unwind_landing_register_common2dw
 PRIVATE DEFINE_cfi_unwind_landing_register_common2dw(__SIZEOF_POINTER__, _cur_landing_common2dw);
-#ifdef LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER
+#ifdef LIBUNWIND_HAVE_GETSETREG_COMPAT
 PRIVATE DEFINE_cfi_unwind_landing_register_common2dw(__ARCH_COMPAT_SIZEOF_POINTER, _compat_cur_landing_common2dw);
 #define cfi_unwind_landing_register_common2dw(addrsize, common_regno)                                                                 \
 	(CFI_ADDRSIZE_ISCOMPAT(addrsize) ? _convert_with_array(_compat_cur_landing_common2dw, common_regno, CFI_UNWIND_REGISTER_MAXCOUNT) \
 	                                 : _convert_with_array(_cur_landing_common2dw, common_regno, CFI_UNWIND_REGISTER_MAXCOUNT))
-#else /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#else /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #define cfi_unwind_landing_register_common2dw(addrsize, common_regno) \
 	_convert_with_array(_cur_landing_common2dw, common_regno, CFI_UNWIND_REGISTER_MAXCOUNT)
-#endif /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#endif /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #endif /* !cfi_unwind_landing_register_common2dw */
 
 #ifndef cfi_unwind_landing_register_uncommon2dw
 PRIVATE DEFINE_cfi_unwind_landing_register_uncommon2dw(__SIZEOF_POINTER__, _cur_landing_uncommon2dw);
-#ifdef LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER
+#ifdef LIBUNWIND_HAVE_GETSETREG_COMPAT
 PRIVATE DEFINE_cfi_unwind_landing_register_uncommon2dw(__ARCH_COMPAT_SIZEOF_POINTER, _compat_cur_landing_uncommon2dw);
 #define cfi_unwind_landing_register_uncommon2dw(addrsize, uncommon_regno)                                                                 \
 	(CFI_ADDRSIZE_ISCOMPAT(addrsize) ? _convert_with_array(_compat_cur_landing_uncommon2dw, uncommon_regno, CFI_UNWIND_REGISTER_MAXCOUNT) \
 	                                 : _convert_with_array(_cur_landing_uncommon2dw, uncommon_regno, CFI_UNWIND_REGISTER_MAXCOUNT))
-#else /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#else /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #define cfi_unwind_landing_register_uncommon2dw(addrsize, uncommon_regno) \
 	_convert_with_array(_cur_landing_uncommon2dw, uncommon_regno, CFI_UNWIND_REGISTER_MAXCOUNT)
-#endif /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#endif /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 #endif /* !cfi_unwind_landing_register_uncommon2dw */
 
 
@@ -542,12 +542,12 @@ static_assert(CFI_REGISTER_SIZE(sizeof(void *), CFI_UNWIND_REGISTER_SP(sizeof(vo
 static_assert(CFI_REGISTER_SIZE(sizeof(void *), CFI_UNWIND_REGISTER_PC(sizeof(void *))) == sizeof(void *));
 static_assert(CFI_REGISTER_MEMSIZE(sizeof(void *), CFI_UNWIND_REGISTER_SP(sizeof(void *))) == sizeof(uintptr_t));
 static_assert(CFI_REGISTER_MEMSIZE(sizeof(void *), CFI_UNWIND_REGISTER_PC(sizeof(void *))) == sizeof(void *));
-#ifdef LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER
+#ifdef LIBUNWIND_HAVE_GETSETREG_COMPAT
 static_assert(CFI_REGISTER_SIZE(__ARCH_COMPAT_SIZEOF_POINTER, CFI_UNWIND_REGISTER_SP(__ARCH_COMPAT_SIZEOF_POINTER)) == sizeof(uintptr_t));
 static_assert(CFI_REGISTER_SIZE(__ARCH_COMPAT_SIZEOF_POINTER, CFI_UNWIND_REGISTER_PC(__ARCH_COMPAT_SIZEOF_POINTER)) == sizeof(void *));
 static_assert(CFI_REGISTER_MEMSIZE(__ARCH_COMPAT_SIZEOF_POINTER, CFI_UNWIND_REGISTER_SP(__ARCH_COMPAT_SIZEOF_POINTER)) == __ARCH_COMPAT_SIZEOF_POINTER);
 static_assert(CFI_REGISTER_MEMSIZE(__ARCH_COMPAT_SIZEOF_POINTER, CFI_UNWIND_REGISTER_PC(__ARCH_COMPAT_SIZEOF_POINTER)) == __ARCH_COMPAT_SIZEOF_POINTER);
-#endif /* LIBUNWIND_WANT_COMPAT_REGISTER_WRAPPER */
+#endif /* LIBUNWIND_HAVE_GETSETREG_COMPAT */
 
 
 

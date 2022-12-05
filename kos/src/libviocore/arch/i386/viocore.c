@@ -144,7 +144,7 @@ libviocore_complete_except(struct vio_emulate_args *__restrict self,
 	{
 		byte_t const *pc, *next_pc;
 		pc      = (byte_t const *)CS(getpc)(self->vea_args.va_state);
-		next_pc = instruction_succ_nx(pc, _CS(instrlen_isa_from)(self->vea_args.va_state));
+		next_pc = instruction_succ_nx(pc, CS(getisa)(self->vea_args.va_state));
 		data->e_faultaddr = (void *)pc;
 		if (next_pc)
 			CS(setpc)(self->vea_args.va_state, next_pc);
@@ -2213,7 +2213,7 @@ libviocore_throw_unknown_instruction(struct vio_emulate_args *__restrict self,
 	byte_t const *pc, *next_pc;
 	unsigned int i;
 	pc      = (byte_t const *)CS(getpc)(self->vea_args.va_state);
-	next_pc = instruction_succ_nx(pc, _CS(instrlen_isa_from)(self->vea_args.va_state));
+	next_pc = instruction_succ_nx(pc, CS(getisa)(self->vea_args.va_state));
 	if (next_pc)
 		CS(setpc)(self->vea_args.va_state, next_pc);
 	PRINT_WARN("[vio] Illegal instruction %p:%#" PRIxPTR " "
@@ -2246,7 +2246,7 @@ libviocore_throw_exception(struct vio_emulate_args *__restrict self,
 	byte_t const *pc, *next_pc;
 	unsigned int i;
 	pc      = (byte_t const *)CS(getpc)(self->vea_args.va_state);
-	next_pc = instruction_succ_nx(pc, _CS(instrlen_isa_from)(self->vea_args.va_state));
+	next_pc = instruction_succ_nx(pc, CS(getisa)(self->vea_args.va_state));
 	if (next_pc)
 		CS(setpc)(self->vea_args.va_state, next_pc);
 	data = except_data();

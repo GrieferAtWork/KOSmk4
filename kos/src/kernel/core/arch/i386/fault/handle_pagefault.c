@@ -378,7 +378,7 @@ rethrow_exception_from_pf_handler(struct icpustate *__restrict state, void const
 	/* Use the regular `instruction_trysucc()' since we're actually inside
 	 * of a CATCH-block right now, meaning that it will already do all  of
 	 * the necessary work of preserving the old exception for us! */
-	pc = instruction_trysucc(pc, instrlen_isa_from_icpustate(state));
+	pc = instruction_trysucc(pc, icpustate_getisa(state));
 	icpustate_setpc(state, pc);
 	RETHROW();
 }
@@ -1152,7 +1152,7 @@ pop_connections_and_throw_segfault:
 #endif /* !__x86_64__ */
 		TRY {
 			void const *call_instr;
-			call_instr = instruction_pred_nx(callsite_pc, instrlen_isa_from_icpustate(state));
+			call_instr = instruction_pred_nx(callsite_pc, icpustate_getisa(state));
 			if likely(call_instr)
 				callsite_pc = call_instr;
 		} EXCEPT {
@@ -1220,7 +1220,7 @@ handle_noncanon_as_gpf:
 
 	/* Always make the state point to the instruction _after_ the one causing the problem. */
 	PERTASK_SET(this_exception_faultaddr, pc);
-	pc = instruction_trysucc(pc, instrlen_isa_from_icpustate(state));
+	pc = instruction_trysucc(pc, icpustate_getisa(state));
 	printk(KERN_DEBUG "[segfault] Fault at %p (page %p) [pc=%p,%p] [ecode=%#" PRIxPTR "]\n",
 	       addr, (void *)FLOOR_ALIGN((uintptr_t)addr, PAGESIZE),
 	       icpustate_getpc(state), pc, ecode);

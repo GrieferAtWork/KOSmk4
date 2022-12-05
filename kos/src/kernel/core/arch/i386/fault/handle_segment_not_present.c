@@ -384,7 +384,7 @@ x86_handle_segment_not_present(struct icpustate *__restrict state,
 			RETHROW();
 		}
 unsupported_instruction:
-		pc = instruction_succ_nx(orig_pc, instrlen_isa_from_icpustate(state));
+		pc = instruction_succ_nx(orig_pc, icpustate_getisa(state));
 		if (!pc)
 			pc = orig_pc;
 generic_failure:

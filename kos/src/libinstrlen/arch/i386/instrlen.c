@@ -173,11 +173,11 @@ ud:
 /* Return a pointer to the successor/predecessor instruction of `pc',
  * assuming  that `pc'  points to  the start  of another instruction.
  * WARNING: These functions may trigger a segmentation fault when `pc' is an invalid pointer.
- * @param: isa: The ISA type (s.a. `instrlen_isa_from_Xcpustate()' or `INSTRLEN_ISA_DEFAULT')
+ * @param: isa: The ISA type (s.a. `Xcpustate_getisa()' or `ISA_DEFAULT')
  * @return: NULL: The pointed-to instruction wasn't recognized. */
 INTERN ATTR_PURE WUNUSED byte_t *
 NOTHROW_NCX(CC libil_instruction_succ)(void const *pc,
-                                       instrlen_isa_t isa) {
+                                       isa_t isa) {
 	byte_t *result;
 	emu86_opcode_t opcode;
 	emu86_opflags_t op_flags;
@@ -194,7 +194,7 @@ NOTHROW_NCX(CC libil_instruction_succ)(void const *pc,
 	if unlikely(!libemu86_init())
 		return NULL;
 #endif /* !__KERNEL__ */
-	op_flags = instrlen_isa_to_emu86_opflags_t(isa);
+	op_flags = isa_to_emu86_opflags_t(isa);
 	result   = emu86_opcode_decode((byte_t *)pc, &opcode, &op_flags);
 	/* Make sure that the opcode isn't too great. */
 	if (opcode >= NUMBER_OF_EXPLICITLY_DEFINED_OPCODES) {

@@ -1216,7 +1216,7 @@ libregdump_do_ip_addr2line_info(struct regdump_printer *__restrict self,
 /* Print the InstructionPointer register. */
 INTERN NONNULL((1)) ssize_t CC
 libregdump_ip(struct regdump_printer *__restrict self,
-              uintptr_t ip, instrlen_isa_t isa) {
+              uintptr_t ip, isa_t isa) {
 	BEGIN;
 	format(REGDUMP_FORMAT_INDENT);
 	format(REGDUMP_FORMAT_REGISTER_PREFIX);

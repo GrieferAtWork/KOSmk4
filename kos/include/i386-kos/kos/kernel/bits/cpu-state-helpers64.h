@@ -24,6 +24,7 @@
 #include <hybrid/host.h>
 
 #include <asm/intrin.h>
+#include <asm/isa.h>
 #include <bits/types.h>
 #include <kos/anno.h>
 
@@ -207,6 +208,7 @@ __NOTHROW_NCX(gpregs64_to_gpregsnsp64)(struct gpregs64 const *__restrict __self,
 #endif /* !__KERNEL__ || !__x86_64__ */
 #define irregs64_is32bit(self)           __KOS64_IS_CS32BIT(irregs64_getcs(self))
 #define irregs64_is64bit(self)           __KOS64_IS_CS64BIT(irregs64_getcs(self))
+#define irregs64_getisa(self)            (irregs64_is64bit(self) ? ISA_X86_64 : ISA_I386)
 #define irregs64_getpreemption(self)     (irregs64_getrflags(self) & 0x200)
 #define irregs64_setpreemption(self, turn_on) irregs64_mskrflags(self, ~0x200, (turn_on) ? 0x200 : 0)
 #define irregs64_getuserrsp              irregs64_getrsp
@@ -501,6 +503,7 @@ __NOTHROW_NCX(kcpustate64_to_icpustate64_p)(struct kcpustate64 const *__restrict
 #define icpustate64_iskernel(self)               irregs64_iskernel(&(self)->ics_irregs)
 #define icpustate64_is32bit(self)                irregs64_is32bit(&(self)->ics_irregs)
 #define icpustate64_is64bit(self)                irregs64_is64bit(&(self)->ics_irregs)
+#define icpustate64_getisa(self)                 irregs64_getisa(&(self)->ics_irregs)
 #define icpustate64_getpreemption(self)          irregs64_getpreemption(&(self)->ics_irregs)
 #define icpustate64_setpreemption(self, turn_on) irregs64_setpreemption(&(self)->ics_irregs, turn_on)
 #define icpustate64_getrip(self)                 irregs64_getrip(&(self)->ics_irregs)
@@ -655,6 +658,7 @@ __NOTHROW_NCX(icpustate64_to_scpustate64_p)(struct icpustate64 const *__restrict
 #define scpustate64_iskernel(self)               (!((self)->scs_irregs.ir_cs16 & 3))
 #define scpustate64_is32bit(self)                __KOS64_IS_CS32BIT(scpustate64_getcs(self))
 #define scpustate64_is64bit(self)                __KOS64_IS_CS64BIT(scpustate64_getcs(self))
+#define scpustate64_getisa(self)                 (scpustate64_is64bit(self) ? ISA_X86_64 : ISA_I386)
 #define scpustate64_getpreemption(self)          ((self)->scs_irregs.ir_rflags & 0x200)
 #define scpustate64_setpreemption(self, turn_on) (turn_on ? (void)((self)->scs_irregs.ir_rflags |= 0x200) : (void)((self)->scs_irregs.ir_rflags &= ~0x200))
 #define scpustate64_getrip(self)                 ((__u64)(self)->scs_irregs.ir_rip)
@@ -763,6 +767,7 @@ __NOTHROW_NCX(scpustate64_to_scpustate64_p)(struct scpustate64 const *__restrict
 #define ucpustate64_iskernel(self)         (!((self)->ucs_cs16 & 3))
 #define ucpustate64_is32bit(self)          __KOS64_IS_CS32BIT((self)->ucs_cs16)
 #define ucpustate64_is64bit(self)          __KOS64_IS_CS64BIT((self)->ucs_cs16)
+#define ucpustate64_getisa(self)           (ucpustate64_is64bit(self) ? ISA_X86_64 : ISA_I386)
 #define ucpustate64_getrip(self)           ((__u64)(self)->ucs_rip)
 #define ucpustate64_setrip(self, value)    ((self)->ucs_rip = (value))
 #define ucpustate64_getrsp(self)           ((__u64)(self)->ucs_gpregs.gp_rsp)
@@ -888,6 +893,7 @@ __NOTHROW_NCX(ucpustate64_to_scpustate64_p)(struct ucpustate64 const *__restrict
 #define fcpustate64_iskernel(self)         (!((self)->fcs_sgregs.sg_cs16 & 3))
 #define fcpustate64_is32bit(self)          __KOS64_IS_CS32BIT((self)->fcs_sgregs.sg_cs16)
 #define fcpustate64_is64bit(self)          __KOS64_IS_CS64BIT((self)->fcs_sgregs.sg_cs16)
+#define fcpustate64_getisa(self)           (fcpustate64_is64bit(self) ? ISA_X86_64 : ISA_I386)
 #define fcpustate64_getrip(self)           ((__u64)(self)->fcs_rip)
 #define fcpustate64_setrip(self, value)    ((self)->fcs_rip = (value))
 #define fcpustate64_getrsp(self)           ((__u64)(self)->fcs_gpregs.gp_rsp)
@@ -1132,6 +1138,7 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define irregs_is64bit(self)                irregs64_is64bit(self)
 #define irregs_isnative(self)               irregs64_is64bit(self)
 #define irregs_iscompat(self)               irregs64_is32bit(self)
+#define irregs_getisa(self)                 irregs64_getisa(self)
 #define irregs_getpreemption                irregs64_getpreemption
 #define irregs_setpreemption                irregs64_setpreemption
 #define irregs_getpip                       irregs64_getrip
@@ -1163,6 +1170,7 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define lcpustate_foreach_gpregs_elem       lcpustate64_foreach_gpregs_elem
 #define lcpustate_foreach_gpregs_size       lcpustate64_foreach_gpregs_size
 #define lcpustate_foreach_gpregs            lcpustate64_foreach_gpregs
+#define lcpustate_getisa(self)              ISA_X86_64
 #define lcpustate_getpip                    lcpustate64_getrip
 #define lcpustate_getpc                     (__byte_t const *)lcpustate64_getrip
 #define lcpustate_setpip                    lcpustate64_setrip
@@ -1197,6 +1205,7 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define kcpustate_foreach_gpregs_elem       kcpustate64_foreach_gpregs_elem
 #define kcpustate_foreach_gpregs_size       kcpustate64_foreach_gpregs_size
 #define kcpustate_foreach_gpregs            kcpustate64_foreach_gpregs
+#define kcpustate_getisa(self)              ISA_X86_64
 #define kcpustate_getpip                    kcpustate64_getrip
 #define kcpustate_getpc                     (__byte_t const *)kcpustate64_getrip
 #define kcpustate_setpip                    kcpustate64_setrip
@@ -1250,6 +1259,7 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define icpustate_is64bit                   icpustate64_is64bit
 #define icpustate_isnative                  icpustate64_is64bit
 #define icpustate_iscompat                  icpustate64_is32bit
+#define icpustate_getisa                    icpustate64_getisa
 #define icpustate_getpreemption             icpustate64_getpreemption
 #define icpustate_setpreemption             icpustate64_setpreemption
 #define icpustate_getpip                    icpustate64_getrip
@@ -1351,6 +1361,7 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define scpustate_is64bit                   scpustate64_is64bit
 #define scpustate_isnative                  scpustate64_is64bit
 #define scpustate_iscompat                  scpustate64_is32bit
+#define scpustate_getisa                    scpustate64_getisa
 #define scpustate_getpreemption             scpustate64_getpreemption
 #define scpustate_setpreemption             scpustate64_setpreemption
 #define scpustate_getpip                    scpustate64_getrip
@@ -1441,6 +1452,7 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define ucpustate_is64bit                   ucpustate64_is64bit
 #define ucpustate_isnative                  ucpustate64_is64bit
 #define ucpustate_iscompat                  ucpustate64_is32bit
+#define ucpustate_getisa                    ucpustate64_getisa
 #define ucpustate_getpip                    ucpustate64_getrip
 #define ucpustate_getpc                     (__byte_t const *)ucpustate64_getrip
 #define ucpustate_setpip                    ucpustate64_setrip
@@ -1495,6 +1507,7 @@ __NOTHROW_NCX(fcpustate64_to_scpustate64_p)(struct fcpustate64 const *__restrict
 #define fcpustate_is64bit                   fcpustate64_is64bit
 #define fcpustate_isnative                  fcpustate64_is64bit
 #define fcpustate_iscompat                  fcpustate64_is32bit
+#define fcpustate_getisa                    fcpustate64_getisa
 #define fcpustate_getpip                    fcpustate64_getrip
 #define fcpustate_getpc                     (__byte_t const *)fcpustate64_getrip
 #define fcpustate_setpip                    fcpustate64_setrip

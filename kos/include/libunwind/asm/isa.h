@@ -17,13 +17,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBUNWIND_ARCH_I386_COMPAT_C_INL
-#define GUARD_LIBUNWIND_ARCH_I386_COMPAT_C_INL 1
-#define _KOS_SOURCE 1
+#ifndef _LIBUNWIND_ASM_ISA_H
+#define _LIBUNWIND_ASM_ISA_H 1
 
-#include "../../api.h"
-/**/
+#include <__stdinc.h>
 
-#include <libunwind/register.h>
+/* >> isa_t unwind_getreg_getisa(unwind_getreg_t reg_getter, void *state);
+ * Determine and return the ISA code through use of an unwind register getter. */
+#define unwind_getreg_getisa(/*unwind_getreg_t*/ reg_getter, /*void **/ state) \
+	ISA_DEFAULT
 
-#endif /* !GUARD_LIBUNWIND_ARCH_I386_COMPAT_C_INL */
+#endif /* !_LIBUNWIND_ASM_ISA_H */

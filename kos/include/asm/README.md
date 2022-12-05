@@ -25,6 +25,9 @@ Normally, `<asm/...>` headers are all internal and not meant to be directly incl
 	- Arch-specific intrinsic functions
 - `<asm/intrin-arith.h>`
 	- Arch-specific intrinsic, arithmetic functions
+- `<asm/isa.h>`
+	- `#define ISA_DEFAULT ...`
+	- `typedef ... isa_t;`
 - `<asm/farptr.h>`
 	- `T &loadfarptr(T &x);`
 	- Return a pointer to a far-off symbol, regardless of the used memory model

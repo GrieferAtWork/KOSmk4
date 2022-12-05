@@ -93,7 +93,7 @@ dbg_coredump(void const *const *traceback_vector,
              union coredump_info const *reason,
              uintptr_t unwind_error) {
 	size_t tbi;
-	instrlen_isa_t isa;
+	isa_t isa;
 	void const *current_pc;
 	/* We are now in debugger-mode. */
 	dbg_savecolor();
@@ -147,7 +147,7 @@ dbg_coredump(void const *const *traceback_vector,
 				dbg_print_siginfo(&siginfo);
 			dbg_addr2line_printf(reason->ci_except.e_faultaddr,
 			                     instruction_trysucc(reason->ci_except.e_faultaddr,
-			                                         instrlen_isa_from_kcpustate(orig_ustate)),
+			                                         kcpustate_getisa(orig_ustate)),
 			                     "faultaddr");
 		} else if (COREDUMP_INFO_ISSIGNAL(unwind_error)) {
 			dbg_print_siginfo(&reason->ci_signal);
@@ -166,9 +166,9 @@ dbg_coredump(void const *const *traceback_vector,
 				dbg_printf(DBGSTR("assert.mesg: " AC_YELLOW("%q") "\n"), reason->ci_assert.ca_mesg);
 		}
 	}
-	isa = INSTRLEN_ISA_DEFAULT;
+	isa = ISA_DEFAULT;
 	if (orig_kstate) {
-		isa = instrlen_isa_from_kcpustate(orig_kstate);
+		isa = kcpustate_getisa(orig_kstate);
 		dbg_addr2line_printf(kcpustate_getpc(orig_kstate),
 		                     instruction_trysucc(kcpustate_getpc(orig_kstate), isa),
 		                     DBGSTR("orig_kstate"));
@@ -178,7 +178,7 @@ dbg_coredump(void const *const *traceback_vector,
 		                     instruction_trysucc(ktraceback_vector[tbi], isa),
 		                     DBGSTR("ktraceback_vector[%" PRIuSIZ "]\n"), tbi);
 	}
-	isa = instrlen_isa_from_ucpustate(orig_ustate);
+	isa = ucpustate_getisa(orig_ustate);
 	dbg_addr2line_printf(ucpustate_getpc(orig_ustate),
 	                     instruction_trysucc(ucpustate_getpc(orig_ustate), isa),
 	                     DBGSTR("orig_ustate"));
@@ -192,7 +192,7 @@ dbg_coredump(void const *const *traceback_vector,
 	if (current_pc != ucpustate_getpc(orig_ustate) &&
 	    (traceback_length == 0 ||
 	     current_pc != traceback_vector[traceback_length - 1])) {
-		isa = dbg_rt_instrlen_isa(DBG_RT_REGLEVEL_TRAP);
+		isa = dbg_rt_getisa(DBG_RT_REGLEVEL_TRAP);
 		dbg_addr2line_printf(current_pc,
 		                     instruction_trysucc(current_pc, isa),
 		                     DBGSTR("curr_ustate"));

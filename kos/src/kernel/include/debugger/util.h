@@ -145,10 +145,10 @@ NOTHROW(KCALL dbg_addr2line_vprintf)(void const *start_pc, void const *end_pc,
 /* Helper wrappers to  determine the predecessor/successor  of a given  `pc',
  * which is allowed to point into user-space, in which case user-space memory
  * is accessed through use of `dbg_readmemory()', rather than direct  access. */
-FUNDEF ATTR_PURE WUNUSED byte_t *NOTHROW(LIBINSTRLEN_CC dbg_instruction_succ_nx)(void const *pc, instrlen_isa_t isa);
-FUNDEF ATTR_PURE WUNUSED byte_t *NOTHROW(LIBINSTRLEN_CC dbg_instruction_pred_nx)(void const *pc, instrlen_isa_t isa);
-FUNDEF ATTR_PURE ATTR_RETNONNULL WUNUSED byte_t *NOTHROW(LIBINSTRLEN_CC dbg_instruction_trysucc)(void const *pc, instrlen_isa_t isa);
-FUNDEF ATTR_PURE ATTR_RETNONNULL WUNUSED byte_t *NOTHROW(LIBINSTRLEN_CC dbg_instruction_trypred)(void const *pc, instrlen_isa_t isa);
+FUNDEF ATTR_PURE WUNUSED byte_t *NOTHROW(LIBINSTRLEN_CC dbg_instruction_succ_nx)(void const *pc, isa_t isa);
+FUNDEF ATTR_PURE WUNUSED byte_t *NOTHROW(LIBINSTRLEN_CC dbg_instruction_pred_nx)(void const *pc, isa_t isa);
+FUNDEF ATTR_PURE ATTR_RETNONNULL WUNUSED byte_t *NOTHROW(LIBINSTRLEN_CC dbg_instruction_trysucc)(void const *pc, isa_t isa);
+FUNDEF ATTR_PURE ATTR_RETNONNULL WUNUSED byte_t *NOTHROW(LIBINSTRLEN_CC dbg_instruction_trypred)(void const *pc, isa_t isa);
 #else /* !LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH */
 #define dbg_instruction_succ_nx(pc, isa) instruction_succ_nx(pc, isa)
 #define dbg_instruction_pred_nx(pc, isa) instruction_pred_nx(pc, isa)

@@ -57,6 +57,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <libdisasm/disassembler.h>
 #include <libinstrlen/instrlen.h>
 #include <libunwind/errno.h>
+#include <libunwind/register.h>
 #include <libunwind/unwind.h>
 
 DECL_BEGIN
@@ -361,7 +362,7 @@ DBG_COMMAND(instrlen,
 		if (!dbg_evaladdr(argv[1], (uintptr_t *)&addr))
 			return DBG_STATUS_INVALID_ARGUMENTS;
 	}
-	length = instruction_length(addr, INSTRLEN_ISA_DEFAULT);
+	length = instruction_length(addr, ISA_DEFAULT);
 	dbg_printf(DBGSTR("%" PRIuSIZ "\n"), length);
 	return 0;
 }
@@ -395,7 +396,7 @@ DBG_COMMAND(trace,
 #define SP_ARGS NULL
 #endif
 	dbg_addr2line_printf(dbg_instruction_trypred(fcpustate_getpc(&state),
-	                                             instrlen_isa_from_fcpustate(&state)),
+	                                             fcpustate_getisa(&state)),
 	                     fcpustate_getpc(&state), SP_ARGS);
 	for (;;) {
 		struct fcpustate old_state;
@@ -406,7 +407,7 @@ DBG_COMMAND(trace,
 		if (error != UNWIND_SUCCESS)
 			break;
 		dbg_addr2line_printf(dbg_instruction_trypred(fcpustate_getpc(&state),
-		                                             instrlen_isa_from_fcpustate(&state)),
+		                                             fcpustate_getisa(&state)),
 		                     fcpustate_getpc(&state), SP_ARGS);
 #ifdef LOG_STACK_REMAINDER
 		last_good_sp = fcpustate_getsp(&state);
@@ -446,7 +447,7 @@ DBG_COMMAND(trace,
 					dbg_printf(DBGSTR("Analyzing remainder of stack:\n"));
 					is_first = false;
 				}
-				dbg_addr2line_printf(dbg_instruction_trypred(pc, instrlen_isa_from_fcpustate(&state)),
+				dbg_addr2line_printf(dbg_instruction_trypred(pc, fcpustate_getisa(&state)),
 				                     pc, DBGSTR("pc@%p"), iter);
 			}
 		}
@@ -474,7 +475,7 @@ DBG_COMMAND(u,
 		dbg_rt_setallregs(DBG_RT_REGLEVEL_VIEW, &newstate);
 	}
 	final_pc = fcpustate_getpc(&newstate);
-	dbg_addr2line_printf(dbg_instruction_trypred(final_pc, instrlen_isa_from_fcpustate(&newstate)),
+	dbg_addr2line_printf(dbg_instruction_trypred(final_pc, fcpustate_getisa(&newstate)),
 	                     final_pc, DBGSTR("sp=%p"), final_pc);
 	return 0;
 }
@@ -486,8 +487,8 @@ DBG_COMMAND(a2l,
             "\tPrint the source location name for the given ADDR\n",
             argc, argv) {
 	void const *addr, *current_pc;
-	instrlen_isa_t isa;
-	isa = dbg_rt_instrlen_isa(DBG_RT_REGLEVEL_VIEW);
+	isa_t isa;
+	isa = dbg_rt_getisa(DBG_RT_REGLEVEL_VIEW);
 again:
 	--argc;
 	++argv;

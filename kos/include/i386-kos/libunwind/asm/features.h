@@ -17,13 +17,43 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBUNWIND_ARCH_I386_COMPAT_C_INL
-#define GUARD_LIBUNWIND_ARCH_I386_COMPAT_C_INL 1
-#define _KOS_SOURCE 1
+#ifndef _I386_KOS_LIBUNWIND_ASM_FEATURES_H
+#define _I386_KOS_LIBUNWIND_ASM_FEATURES_H 1
 
-#include "../../api.h"
-/**/
+#include <__stdinc.h>
 
-#include <libunwind/register.h>
+#include <hybrid/host.h>
 
-#endif /* !GUARD_LIBUNWIND_ARCH_I386_COMPAT_C_INL */
+#define LIBUNWIND_HAVE_GETSETREG_UCPUSTATE
+#define LIBUNWIND_HAVE_GETSETREG_LCPUSTATE
+#define LIBUNWIND_HAVE_GETSETREG_KCPUSTATE
+#define LIBUNWIND_HAVE_GETSETREG_FCPUSTATE
+#ifdef __KERNEL__
+#define LIBUNWIND_HAVE_GETSETREG_ICPUSTATE
+#define LIBUNWIND_HAVE_GETSETREG_SCPUSTATE
+#ifndef __x86_64__
+#define LIBUNWIND_HAVE_GETSETREG_ICPUSTATE_P
+#define LIBUNWIND_HAVE_GETSETREG_SCPUSTATE_P
+#endif /* !__x86_64__ */
+#else /* __KERNEL__ */
+#define LIBUNWIND_HAVE_GETSETREG_MCONTEXT
+#define LIBUNWIND_HAVE_GETSETREG_UCONTEXT
+#endif /* !__KERNEL__ */
+#define LIBUNWIND_HAVE_GETSETREG_FPUSTATE
+
+
+/* Because x86_64 uses different register indices for x86_64, we
+ * need a wrapper mechanism for converting i386 register indices
+ * to x86_64, and use this mechanism when unwind-ing 32-bit user
+ * modules. */
+#if defined(__x86_64__) && defined(__KERNEL__)
+/* Only provided for kernel-space (for now); User-space support
+ * could also be provided, but isn't needed and would  therefor
+ * only add unnecessary bloat!
+ * Even in kernel-space, we technically only need it for debug
+ * support in the  builtin debugger, but  no mandatory  system
+ * features. */
+#define LIBUNWIND_HAVE_GETSETREG_COMPAT
+#endif /* __x86_64__ && __KERNEL__ */
+
+#endif /* !_I386_KOS_LIBUNWIND_ASM_FEATURES_H */

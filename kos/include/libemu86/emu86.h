@@ -22,6 +22,7 @@
 
 #include "api.h"
 
+#include <asm/isa.h>
 #include <bits/types.h>
 
 /* Helpers for decoding/disassembling/emulation of x86 instructions. */
@@ -354,6 +355,68 @@ typedef __uint16_t emu86_opcode_t;
 
 /* Instruction flags (set of `EMU86_F_*'). */
 typedef __uint32_t emu86_opflags_t;
+
+/* Return the ISA code, given `emu86_opflags_t flags' */
+#ifdef EMU86_F_BITMASK
+#if (defined(EMU86_F_32BIT) && defined(EMU86_F_16BIT) && EMU86_F_BITMASK == 1 && \
+     defined(ISA_I386) && defined(ISA_8086) &&                                   \
+     (EMU86_F_32BIT == ISA_I386) && (EMU86_F_16BIT == ISA_8086))
+#define isa_from_emu86_opflags_t(/*emu86_opflags_t*/ flags) ((flags) & 1)
+#define isa_to_emu86_opflags_t(isa) isa
+#elif (defined(EMU86_F_64BIT) && defined(EMU86_F_32BIT) && EMU86_F_BITMASK == 1 && \
+       defined(ISA_X86_64) && defined(ISA_I386) &&                                 \
+       (EMU86_F_64BIT == ISA_X86_64) && (EMU86_F_32BIT == ISA_I386))
+#define isa_from_emu86_opflags_t(/*emu86_opflags_t*/ flags) ((flags) & 1)
+#define isa_to_emu86_opflags_t(isa) isa
+#endif
+#endif /* EMU86_F_BITMASK */
+#ifndef isa_from_emu86_opflags_t
+#if (LIBEMU86_CONFIG_WANT_16BIT && LIBEMU86_CONFIG_WANT_32BIT && LIBEMU86_CONFIG_WANT_64BIT)
+#elif (LIBEMU86_CONFIG_WANT_32BIT && LIBEMU86_CONFIG_WANT_64BIT)
+#if defined(ISA_X86_64) && defined(ISA_I386)
+#define isa_from_emu86_opflags_t(/*emu86_opflags_t*/ flags) \
+	(EMU86_F_IS32(flags) ? ISA_I386 : ISA_X86_64)
+#define isa_to_emu86_opflags_t(/*isa_t*/ isa) \
+	((isa) == ISA_X86_64 ? EMU86_F_64BIT : EMU86_F_32BIT)
+#endif /* ISA_X86_64 && ISA_I386 */
+#elif (LIBEMU86_CONFIG_WANT_16BIT && LIBEMU86_CONFIG_WANT_32BIT)
+#if defined(ISA_8086) && defined(ISA_I386)
+#define isa_from_emu86_opflags_t(/*emu86_opflags_t*/ flags) \
+	(EMU86_F_IS32(flags) ? ISA_I386 : ISA_8086)
+#define isa_to_emu86_opflags_t(/*isa_t*/ isa) \
+	((isa) == ISA_I386 ? EMU86_F_32BIT : EMU86_F_16BIT)
+#endif /* ISA_8086 && ISA_I386 */
+#elif (LIBEMU86_CONFIG_WANT_16BIT && LIBEMU86_CONFIG_WANT_64BIT)
+#if defined(ISA_X86_64) && defined(ISA_8086)
+#define isa_from_emu86_opflags_t(/*emu86_opflags_t*/ flags) \
+	(EMU86_F_IS64(flags) ? ISA_X86_64 : ISA_8086)
+#define isa_to_emu86_opflags_t(/*isa_t*/ isa) \
+	((isa) == ISA_X86_64 ? EMU86_F_16BIT : EMU86_F_32BIT)
+#endif /* ISA_X86_64 && ISA_8086 */
+#elif LIBEMU86_CONFIG_WANT_64BIT
+#ifdef ISA_X86_64
+#define isa_from_emu86_opflags_t(/*emu86_opflags_t*/ flags) ISA_X86_64
+#define isa_to_emu86_opflags_t(/*isa_t*/ isa) EMU86_F_64BIT
+#endif /* ISA_X86_64 */
+#elif LIBEMU86_CONFIG_WANT_32BIT
+#ifdef ISA_I386
+#define isa_from_emu86_opflags_t(/*emu86_opflags_t*/ flags) ISA_I386
+#define isa_to_emu86_opflags_t(/*isa_t*/ isa) EMU86_F_32BIT
+#endif /* ISA_I386 */
+#elif LIBEMU86_CONFIG_WANT_16BIT
+#ifdef ISA_8086
+#define isa_from_emu86_opflags_t(/*emu86_opflags_t*/ flags) ISA_8086
+#define isa_to_emu86_opflags_t(/*isa_t*/ isa) EMU86_F_16BIT
+#endif /* ISA_8086 */
+#else /* ... */
+#error "Invalid libemu86 configuration"
+#endif /* !... */
+#endif /* !isa_from_emu86_opflags_t */
+
+
+
+
+
 
 /* Decode an opcode from `pc', store it in `*popcode' and `*pflags',
  * before returning a pointer past the opcode's ID.

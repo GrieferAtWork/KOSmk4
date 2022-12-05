@@ -84,6 +84,7 @@
 
 #include <libinstrlen/instrlen.h>
 #include <libunwind/errno.h>
+#include <libunwind/register.h>
 #include <libunwind/unwind.h>
 
 /**/
@@ -358,7 +359,7 @@ trace_node_print_traceback(struct trace_node *__restrict self,
 		pc = trace_node_traceback_vector(self)[i];
 		if (!pc)
 			break;
-		prev_pc = instruction_trypred(pc, INSTRLEN_ISA_DEFAULT);
+		prev_pc = instruction_trypred(pc, ISA_DEFAULT);
 		if (i) {
 			temp = addr2line_printf(printer, arg, prev_pc, pc,
 			                        "Called here");
@@ -2398,7 +2399,7 @@ kmalloc_leaks_print(kmalloc_leaks_t leaks,
 		}
 		if (tracesize && pc) {
 			DO(addr2line_printf(&syslog_printer, SYSLOG_LEVEL_RAW,
-			                    instruction_trypred(pc, INSTRLEN_ISA_DEFAULT),
+			                    instruction_trypred(pc, ISA_DEFAULT),
 			                    pc, "Allocated here"));
 			for (i = 1; i < tracesize; ++i) {
 				void const *pc_ent;
@@ -2406,7 +2407,7 @@ kmalloc_leaks_print(kmalloc_leaks_t leaks,
 				if (!pc_ent)
 					break;
 				DO(addr2line_printf(printer, arg,
-				                    instruction_trypred(pc_ent, INSTRLEN_ISA_DEFAULT),
+				                    instruction_trypred(pc_ent, ISA_DEFAULT),
 				                    pc_ent, "Called here"));
 			}
 		}

@@ -37,6 +37,7 @@
 
 #include <libdebuginfo/addr2line.h>
 #include <libdebuginfo/unwind.h>
+#include <libunwind/register.h>
 #include <libunwind/unwind.h>
 
 #include "../libc/dl.h"

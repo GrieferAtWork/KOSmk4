@@ -56,7 +56,7 @@ if (gcc_opt.removeif([](x) -> x.startswith("-O")))
 #include <libunwind/unwind.h>
 
 #ifdef __ARCH_HAVE_COMPAT
-#include <libunwind/arch-register.h> /* unwind_getreg_compat() */
+#include <libunwind/register.h> /* unwind_getreg_compat() */
 #endif /* __ARCH_HAVE_COMPAT */
 
 DECL_BEGIN

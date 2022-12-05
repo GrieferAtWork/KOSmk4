@@ -178,7 +178,7 @@ NOTHROW_NCX(CC libcpu_register_flags)(cpu_regno_t regno);
  * @param: isa: Instruction-set-assembly to which the given name belongs
  * @return: CPU_REGISTER_NONE: No such register. */
 INTDEF WUNUSED ATTR_PURE NONNULL((2)) cpu_regno_t
-NOTHROW_NCX(CC libcpu_register_byname)(instrlen_isa_t isa,
+NOTHROW_NCX(CC libcpu_register_byname)(isa_t isa,
                                        char const *__restrict name,
                                        size_t namelen);
 

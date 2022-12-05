@@ -67,6 +67,7 @@
 #include <libunwind/dwarf.h>
 #include <libunwind/eh_frame.h>
 #include <libunwind/errno.h>
+#include <libunwind/register.h>
 #include <libunwind/unwind.h>
 
 #define kcpustate_get_unwind_exception(state)        __EXCEPT_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(*(state))

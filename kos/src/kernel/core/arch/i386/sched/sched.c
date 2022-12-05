@@ -60,6 +60,7 @@
 #include <string.h>
 
 #include <libunwind/errno.h>
+#include <libunwind/register.h>
 #include <libunwind/unwind.h>
 
 DECL_BEGIN

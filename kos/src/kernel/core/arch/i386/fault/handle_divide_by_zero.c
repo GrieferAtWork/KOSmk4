@@ -47,7 +47,7 @@ x86_handle_divide_by_zero(struct icpustate *__restrict state) {
 	 *       since inspecting program  text may  clobber the  error
 	 *       code when a segfault happens. */
 	curr_pc = icpustate_getpc(state);
-	next_pc = instruction_succ_nx(curr_pc, instrlen_isa_from_icpustate(state));
+	next_pc = instruction_succ_nx(curr_pc, icpustate_getisa(state));
 
 	/* TODO: This function can also get called due to divide overflow! */
 	/* TODO: This function can also get called due to `aam $0' */

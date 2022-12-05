@@ -477,7 +477,7 @@ NOTHROW(FCALL complete_except)(struct icpustate *__restrict self) {
 	{
 		void const *pc, *next_pc;
 		pc      = icpustate_getpc(self);
-		next_pc = instruction_succ_nx(pc, instrlen_isa_from_icpustate(self));
+		next_pc = instruction_succ_nx(pc, icpustate_getisa(self));
 		if (next_pc)
 			icpustate_setpc(self, next_pc);
 		PERTASK_SET(this_exception_faultaddr, pc);
@@ -508,7 +508,7 @@ NOTHROW(FCALL throw_illegal_instruction_exception)(struct icpustate *__restrict 
 	unsigned int i;
 	void const *pc, *next_pc;
 	pc      = icpustate_getpc(state);
-	next_pc = instruction_succ_nx(pc, instrlen_isa_from_icpustate(state));
+	next_pc = instruction_succ_nx(pc, icpustate_getisa(state));
 	if (next_pc)
 		icpustate_setpc(state, next_pc);
 	PERTASK_SET(this_exception_code, code);
@@ -535,7 +535,7 @@ NOTHROW(FCALL throw_exception)(struct icpustate *__restrict state,
 	unsigned int i;
 	void const *pc, *next_pc;
 	pc      = icpustate_getpc(state);
-	next_pc = instruction_succ_nx(pc, instrlen_isa_from_icpustate(state));
+	next_pc = instruction_succ_nx(pc, icpustate_getisa(state));
 	if (next_pc)
 		icpustate_setpc(state, next_pc);
 	PERTASK_SET(this_exception_code, code);
@@ -1105,7 +1105,7 @@ assert_canonical_pc(struct icpustate *__restrict state,
 		{
 			void const *call_instr;
 			call_instr = instruction_pred_nx(callsite_pc,
-			                                 instrlen_isa_from_icpustate(state));
+			                                 icpustate_getisa(state));
 			if likely(call_instr)
 				callsite_pc = call_instr;
 		}

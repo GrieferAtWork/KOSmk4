@@ -98,7 +98,7 @@ print_unhandled_exception(pformatprinter printer, void *arg,
 	rd_printer.rdp_format      = &indent_regdump_print_format;
 	regdump_gpregs(&rd_printer, &info.ei_state.kcs_gpregs);
 	regdump_ip(&rd_printer, kcpustate_getpip(&info.ei_state),
-	           instrlen_isa_from_kcpustate(&info.ei_state));
+	           kcpustate_getisa(&info.ei_state));
 	regdump_flags(&rd_printer, kcpustate_getpflags(&info.ei_state));
 	(*printer)(arg, "\n", 1);
 	is_first_pointer = true;
@@ -118,7 +118,7 @@ print_unhandled_exception(pformatprinter printer, void *arg,
 	}
 	addr2line_printf(tb_printer, tb_arg,
 	                 instruction_trypred(kcpustate_getpc(&info.ei_state),
-	                                     instrlen_isa_from_kcpustate(&info.ei_state)),
+	                                     kcpustate_getisa(&info.ei_state)),
 	                 kcpustate_getpc(&info.ei_state), "Thrown here");
 #if EXCEPT_BACKTRACE_SIZE != 0
 	for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i) {
@@ -126,7 +126,7 @@ print_unhandled_exception(pformatprinter printer, void *arg,
 			break;
 		addr2line_printf(tb_printer, tb_arg,
 		                 instruction_trypred(info.ei_trace[i],
-		                                     instrlen_isa_from_kcpustate(&info.ei_state)),
+		                                     kcpustate_getisa(&info.ei_state)),
 		                 info.ei_trace[i], "Called here");
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
@@ -166,7 +166,7 @@ panic_uhe_dbg_main(unwind_errno_t unwind_error,
                    struct exception_info *info) {
 	unsigned int i;
 	bool is_first_pointer;
-	instrlen_isa_t isa;
+	isa_t isa;
 	/* Dump the exception that occurred. */
 	except_print_short_description(&dbg_printer, NULL, &info->ei_data,
 	                               EXCEPT_PRINT_SHORT_DESCRIPTION_FLAG_TTY);
@@ -185,7 +185,7 @@ panic_uhe_dbg_main(unwind_errno_t unwind_error,
 		           info->ei_data.e_args.e_pointers[i],
 		           info->ei_data.e_args.e_pointers[i]);
 	}
-	isa = instrlen_isa_from_kcpustate(&info->ei_state);
+	isa = kcpustate_getisa(&info->ei_state);
 	dbg_addr2line_printf(instruction_trypred(kcpustate_getpc(&info->ei_state), isa),
 	                     kcpustate_getpc(&info->ei_state),
 	                     DBGSTR("Thrown here"));
@@ -242,10 +242,10 @@ halt_unhandled_exception(unwind_errno_t unwind_error,
                          struct kcpustate *__restrict unwind_state) {
 	struct exception_info *info;
 	void const *last_pc;
-	instrlen_isa_t isa;
+	isa_t isa;
 	_kernel_poison();
 	last_pc = kcpustate_getpc(unwind_state);
-	isa     = instrlen_isa_from_kcpustate(unwind_state);
+	isa     = kcpustate_getisa(unwind_state);
 	printk(KERN_RAW "\n\n\n");
 	print_unhandled_exception(&syslog_printer, SYSLOG_LEVEL_EMERG,
 	                          &syslog_printer, SYSLOG_LEVEL_RAW,
