@@ -1537,8 +1537,8 @@ __CSDECLARE(,int,@_sys_nerr@)
 #define @_sys_nerr@ @_sys_nerr@
 @@pp_endif@@
 @@pp_elif defined(__CRT_HAVE___sys_errlist) && defined(__CRT_HAVE___sys_nerr)@@
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,char const *const *,@__sys_errlist@,(void),())
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int *,@__sys_nerr@,(void),())
+__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,char const *const *,__NOTHROW,@__sys_errlist@,(void),())
+__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int *,__NOTHROW,@__sys_nerr@,(void),())
 @@pp_else@@
 #undef ___local_sys_errlist_defined
 @@pp_endif@@

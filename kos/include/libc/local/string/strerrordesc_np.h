@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea581777 */
+/* HASH CRC-32:0x4367d773 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,8 +61,8 @@ __CSDECLARE(,int,_sys_nerr)
 #define _sys_nerr _sys_nerr
 #endif /* !_sys_nerr */
 #elif defined(__CRT_HAVE___sys_errlist) && defined(__CRT_HAVE___sys_nerr)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,char const *const *,__sys_errlist,(void),())
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int *,__sys_nerr,(void),())
+__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,char const *const *,__NOTHROW,__sys_errlist,(void),())
+__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int *,__NOTHROW,__sys_nerr,(void),())
 #else /* ... */
 #undef ___local_sys_errlist_defined
 #endif /* !... */
