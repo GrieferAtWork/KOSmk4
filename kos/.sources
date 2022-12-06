@@ -171,10 +171,15 @@ END
 
 
 /* Copy libgcc.so.1 and libstdc++.so.1 to the disk */
-BEGIN_ANONYMOUS GROUP("libs.libgcc") { MCOPY };
-	options[OPT_MCOPY_OUTPUT] = DISK_LIBPATH + "libgcc_s.so.1";
-	options[OPT_MCOPY_INPUT]  = f"/bin/{TARGET_ARCH}-kos-common{DISK_LIBPATH}libgcc_s.so.1";
-END
+{
+	local libgcc_s_filename = f"bin/{TARGET_ARCH}-kos-common{DISK_LIBPATH}libgcc_s.so.1";
+	if (fs.stat.exists(libgcc_s_filename)) {
+		BEGIN_ANONYMOUS GROUP("libs.libgcc") { MCOPY };
+			options[OPT_MCOPY_OUTPUT] = DISK_LIBPATH + "libgcc_s.so.1";
+			options[OPT_MCOPY_INPUT]  = "/" + libgcc_s_filename;
+		END
+	}
+}
 
 BEGIN_ANONYMOUS GROUP("libs.libstdc++") { MCOPY };
 	options[OPT_MCOPY_OUTPUT] = DISK_LIBPATH + "libstdc++.so.6";

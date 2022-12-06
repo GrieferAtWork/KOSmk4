@@ -224,8 +224,8 @@ struct mnode {
 #else /* __WANT_MNODE__mn_dead */
 	_rbtree_node_mnode                  mn_mement;   /* [lock(mn_mman->mm_lock)] R/B tree entry of mman mappings. */
 #endif /* !__WANT_MNODE__mn_dead */
-	byte_t                             *mn_minaddr;  /* [const] Lowest address mapped by this node. */
-	byte_t                             *mn_maxaddr;  /* [const] Greatest address mapped by this node. */
+	/*PAGEDIR_PAGEALIGNED*/ byte_t     *mn_minaddr;  /* [const] Lowest address mapped by this node. */
+	byte_t                             *mn_maxaddr;  /* [const] Greatest address mapped by this node. (+1, and it's `PAGEDIR_PAGEALIGNED') */
 	uintptr_t                           mn_flags;    /* mem-node flags (Set of `MNODE_F_*') */
 	/*REF*/ struct mpart               *mn_part;     /* [0..1][const][valid_if(!MNODE_F_UNMAPPED && !wasdestroyed(mn_mman))]
 	                                                  * The bound mem-part. When set to NULL, then this node represents a reserved node. */
@@ -284,8 +284,8 @@ struct mnode {
 #else /* __WANT_MNODE__mn_dead */
 	RBTREE_NODE(mnode)                  mn_mement;   /* [lock(mn_mman->mm_lock)] R/B tree entry of mman mappings. */
 #endif /* !__WANT_MNODE__mn_dead */
-	byte_t                             *mn_minaddr;  /* [const] Lowest address mapped by this node. */
-	byte_t                             *mn_maxaddr;  /* [const] Greatest address mapped by this node. */
+	PAGEDIR_PAGEALIGNED byte_t         *mn_minaddr;  /* [const] Lowest address mapped by this node. */
+	byte_t                             *mn_maxaddr;  /* [const] Greatest address mapped by this node. (+1, and it's `PAGEDIR_PAGEALIGNED') */
 	uintptr_t                           mn_flags;    /* mem-node flags (Set of `MNODE_F_*') */
 	REF struct mpart                   *mn_part;     /* [0..1][const][valid_if(!MNODE_F_UNMAPPED && !wasdestroyed(mn_mman))]
 	                                                  * The bound mem-part. When set to NULL, then this node represents a reserved node. */

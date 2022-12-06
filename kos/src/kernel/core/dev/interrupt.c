@@ -43,6 +43,7 @@
 #include <stddef.h>
 #include <string.h>
 
+#ifdef ISR_VECTOR_IS_VALID
 DECL_BEGIN
 
 static_assert(!ISR_VECTOR_IS_VALID(ISR_VECTOR_INVALID));
@@ -1231,5 +1232,6 @@ ISR_SPECIFIC_VECTOR_ENUM(DEFINE_ISR_HANDLER)
 
 
 DECL_END
+#endif /* ISR_VECTOR_IS_VALID */
 
 #endif /* !GUARD_KERNEL_SRC_DEV_INTERRUPT_C */

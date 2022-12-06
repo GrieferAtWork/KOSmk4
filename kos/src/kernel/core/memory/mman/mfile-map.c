@@ -532,6 +532,11 @@ again:
 		/* Re-calculate the effective offset into the associated part. */
 		node->mn_partoff = (size_t)(node_map_minaddr - part_map_minaddr);
 
+		/* Ensure that  the node  is still  properly aligned  (this failing  means
+		 * that the file that is being mapped probably has corrupt part addresses) */
+		assert(IS_ALIGNED((uintptr_t)mnode_getminaddr(node), PAGESIZE));
+		assert(IS_ALIGNED((uintptr_t)mnode_getendaddr(node), PAGESIZE));
+
 		/* Remember this node as the predecessor. */
 		prev = node;
 	}

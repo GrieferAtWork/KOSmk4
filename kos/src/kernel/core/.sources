@@ -22,7 +22,7 @@ BEGIN
 	DEFINE({ "BUILDING_KERNEL_CORE" : "1" })
 	SET_NOSTDLIB()
 
-	local KENREL_LIBDL_BINARY_SOURCE = f"arch/{XARCH}/exec/libdl.S";
+	local KENREL_LIBDL_BINARY_SOURCE = f"arch/{XARCH}/exec/libdl.S.incbin";
 	local KERNEL_ASM_SOURCES = [
 		"../../libc/hybrid/arch/" + XARCH_ASMFILES,
 		"../../libunwind/arch/" + XARCH_ASMFILES,
@@ -195,7 +195,7 @@ BEGIN
 				})
 			};
 			SET_LANGUAGE("assembler-with-cpp")
-			SOURCE({ f"arch/{XARCH}/exec/libdl-compat.S" })
+			SOURCE({ f"arch/{XARCH}/exec/libdl-compat.S.incbin" })
 		END
 	}
 

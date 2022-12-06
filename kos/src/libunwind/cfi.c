@@ -68,7 +68,7 @@
 #include <malloc.h>
 #else /* !__KERNEL__ */
 #include <debugger/rt.h> /* dbg_active, dbg_current */
-#include <sched/task.h>  /* get_stack_avail() */
+#include <sched/task.h>  /* THIS_TASK, get_stack_avail() */
 #endif /* __KERNEL__ */
 
 DECL_BEGIN
@@ -1483,7 +1483,7 @@ do_read_bit_pieces:
 				goto do_make_top_const_or_register;
 			if (self->ue_tlsbase == (byte_t *)-1) {
 #ifdef __KERNEL__
-				RD_TLS_BASE_REGISTER(*(void **)&self->ue_tlsbase);
+				self->ue_tlsbase = (byte_t *)(void *)THIS_TASK;
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER
 				if unlikely(dbg_active)
 					self->ue_tlsbase = (byte_t *)dbg_current;

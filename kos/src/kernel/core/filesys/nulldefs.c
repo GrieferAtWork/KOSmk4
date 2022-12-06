@@ -49,6 +49,12 @@ gcc_opt.remove("-g"); // Disable debug informations for this file!
 
 DECL_BEGIN
 
+#ifdef __arm__
+/* FIXME: Ugly, hacky work-around */
+#define port_t unsigned short
+#endif /* __arm__ */
+
+
 /* NOTE: Don't  set `MFILE_FN_ATTRREADONLY' for these files, even though
  *       they've got a custom stat operator that overrides the timestamp
  *       values.

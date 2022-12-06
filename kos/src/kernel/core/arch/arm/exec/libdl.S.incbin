@@ -17,19 +17,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_CORE_ARCH_I386_EXEC_LIBDL_COMPAT_S
-#define GUARD_KERNEL_CORE_ARCH_I386_EXEC_LIBDL_COMPAT_S 1
+#ifndef GUARD_KERNEL_CORE_ARCH_ARM_EXEC_LIBDL_S_INCBIN
+#define GUARD_KERNEL_CORE_ARCH_ARM_EXEC_LIBDL_S_INCBIN 1
 
-.section .rodata.compat_execabi_system_rtld
-	.global compat_execabi_system_rtld
-	.type   compat_execabi_system_rtld, "object"
-	.align  4096 /* PAGESIZE */
-compat_execabi_system_rtld:
-	.incbin "bin/x86_64-kos/lib/libdl.rtld-flat.bin"
-	.align  4096 /* PAGESIZE */
-.global compat_execabi_system_rtld_size
-.type   compat_execabi_system_rtld_size, "object"
-	compat_execabi_system_rtld_size = . - compat_execabi_system_rtld
-.size compat_execabi_system_rtld, . - compat_execabi_system_rtld
+.section .rodata.execabi_system_rtld
+.incbin "bin/arm-kos/lib/libdl.rtld-flat.bin"
 
-#endif /* !GUARD_KERNEL_CORE_ARCH_I386_EXEC_LIBDL_COMPAT_S */
+#endif /* !GUARD_KERNEL_CORE_ARCH_ARM_EXEC_LIBDL_S_INCBIN */
