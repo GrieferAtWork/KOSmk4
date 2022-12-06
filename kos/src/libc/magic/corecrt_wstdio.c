@@ -693,7 +693,10 @@ __STDC_INT_AS_SSIZE_T _vwscanf_s_l([[in, format]] wchar_t const *format, $locale
 __STDC_INT_AS_SSIZE_T vfwprintf_s([[inout]] FILE *stream, [[in, format]] wchar_t const *format, $va_list args) {
 	return _vfwprintf_s_l(stream, format, NULL, args);
 }
-[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), requires_function(_vfwprintf_s_l)]]
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdout) && $has_function(_vfwprintf_s_l))]]
+[[impl_include("<libc/template/stdstreams.h>")]]
 __STDC_INT_AS_SSIZE_T vwprintf_s([[in, format]] wchar_t const *format, $va_list args) {
 	return _vfwprintf_s_l(stdout, format, NULL, args);
 }
@@ -706,7 +709,10 @@ __STDC_INT_AS_SSIZE_T vswprintf_s([[out(bufsize)]] wchar_t *buf, size_t bufsize,
 __STDC_INT_AS_SSIZE_T vfwscanf_s([[inout]] FILE *stream, [[in, format]] wchar_t const *format, $va_list args) {
 	return _vfwscanf_s_l(stream, format, NULL, args);
 }
-[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), requires_function(_vfwscanf_s_l), wunused]]
+[[wchar, decl_include("<features.h>", "<hybrid/typecore.h>"), wunused]]
+[[requires_include("<libc/template/stdstreams.h>")]]
+[[requires(defined(__LOCAL_stdin) && $has_function(_vfwscanf_s_l))]]
+[[impl_include("<libc/template/stdstreams.h>")]]
 __STDC_INT_AS_SSIZE_T vwscanf_s([[in, format]] wchar_t const *format, $va_list args) {
 	return _vfwscanf_s_l(stdin, format, NULL, args);
 }

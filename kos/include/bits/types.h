@@ -662,10 +662,8 @@ __DECL_END
 #undef __dev_t
 #undef __ino32_t
 #undef __ino64_t
-#undef __off_t
 #undef __off32_t
 #undef __off64_t
-#undef __pos_t
 #undef __pos32_t
 #undef __pos64_t
 #undef __clock_t

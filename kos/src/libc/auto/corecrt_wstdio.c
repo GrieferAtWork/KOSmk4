@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78f8fc5e */
+/* HASH CRC-32:0x6031f3b4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1485,11 +1485,13 @@ NOTHROW_NCX(LIBKCALL libc_vfwprintf_s)(FILE *stream,
                                        va_list args) {
 	return libc__vfwprintf_s_l(stream, format, NULL, args);
 }
+#include <libc/template/stdstreams.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_IN(1) ATTR_LIBC_C16PRINTF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd_vwprintf_s)(char16_t const *format,
                                       va_list args) {
 	return libd__vfwprintf_s_l(stdout, format, NULL, args);
 }
+#include <libc/template/stdstreams.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf") ATTR_IN(1) ATTR_LIBC_C32PRINTF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc_vwprintf_s)(char32_t const *format,
                                       va_list args) {
@@ -1521,11 +1523,13 @@ NOTHROW_NCX(LIBKCALL libc_vfwscanf_s)(FILE *stream,
                                       va_list args) {
 	return libc__vfwscanf_s_l(stream, format, NULL, args);
 }
+#include <libc/template/stdstreams.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") WUNUSED ATTR_IN(1) ATTR_LIBC_C16SCANF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBDCALL libd_vwscanf_s)(char16_t const *format,
                                      va_list args) {
 	return libd__vfwscanf_s_l(stdin, format, NULL, args);
 }
+#include <libc/template/stdstreams.h>
 INTERN ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf") WUNUSED ATTR_IN(1) ATTR_LIBC_C32SCANF(1, 0) __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBKCALL libc_vwscanf_s)(char32_t const *format,
                                      va_list args) {
