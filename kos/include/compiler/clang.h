@@ -859,6 +859,16 @@ extern void *realloc_in_place(void *, __SIZE_TYPE__);
 #ifdef __cplusplus
 } /* extern "C" */
 #endif /* __cplusplus */
+
+/* Make log output a little easier to read */
+#undef __builtin_expect
+#undef __NO_builtin_expect
+#undef __likely
+#undef __unlikely
+#define __builtin_expect(x, y) (x)
+#define __NO_builtin_expect
+#define __likely   /* Nothing */
+#define __unlikely /* Nothing */
 #endif /* __clang_tidy__ */
 
 #define __STATIC_IF(x)   if(x)

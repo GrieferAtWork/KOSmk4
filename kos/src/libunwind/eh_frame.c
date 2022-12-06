@@ -943,7 +943,7 @@ no_capsules:
 err:
 	/* If  we  get here  due  to a  specific  instruction, then
 	 * that instruction wasn't allowed wherever it appeared at. */
-	if (error >= (uintptr_t)-16)
+	if (error >= (unwind_errno_t)-16)
 		error = UNWIND_CFA_ILLEGAL_INSTRUCTION;
 	return error;
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbdc5df16 */
+/* HASH CRC-32:0x76e02870 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -505,6 +505,8 @@ NOTHROW_NCX(LIBCCALL libc_argz_replace)(char **__restrict pargz,
 
 
 			}
+			*pargz     = new_argz;
+			*pargz_len = new_argzlen;
 			pos = new_argz + (pos - old_argz);
 			/* Make space for extra data */
 			trailing_characters = new_argzlen - ((pos + repllen) - new_argz);

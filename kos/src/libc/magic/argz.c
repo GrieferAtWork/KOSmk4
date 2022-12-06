@@ -586,6 +586,8 @@ error_t argz_replace([[inout]] char **__restrict pargz,
 				return 1;
 @@pp_endif@@
 			}
+			*pargz     = new_argz;
+			*pargz_len = new_argzlen;
 			pos = new_argz + (pos - old_argz);
 			/* Make space for extra data */
 			trailing_characters = new_argzlen - ((pos + repllen) - new_argz);
