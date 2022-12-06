@@ -98,6 +98,10 @@ static_assert(sizeof(union handslot) == sizeof(struct handle));
 #define FD_MAX INT_MAX
 #endif /* !FD_MAX */
 
+/* Ensure that `FD_MAX' is signed-positive, and doesn't overflow */
+static_assert((int)FD_MAX == (unsigned int)FD_MAX);
+static_assert((int)FD_MAX >= 0);
+
 /* Find an overly large sequence of free slots and return the sequence's
  * starting index. When  no such range  exists, return `count'  instead. */
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) unsigned int
@@ -226,6 +230,7 @@ again:
 		hicount = count - (rel_freemax + 1);
 		assert(locount > 0);
 		assert(hicount > 0);
+
 		/* Can only do the split if `self' doesn't contain LOP handles
 		 * above the free range. */
 		if (ATOMIC_READ(self->hr_nlops) != 0) {
@@ -2203,17 +2208,21 @@ again_check_slot:
 	}
 
 	/* Validate that `fd' is allowed. */
-	if unlikely(fd < 0 || (unsigned int)fd > self->hm_maxfd) {
+	if unlikely((unsigned int)fd > self->hm_maxfd) {
 		unsigned int reason, maxfd, useend;
 		useend = handman_usefdend(self);
 		maxfd  = self->hm_maxfd;
 		handman_endwrite(self);
 		reason = E_INVALID_HANDLE_FILE_ILLEGAL;
-		if unlikely(fd < 0)
+		if (fd < 0)
 			reason = E_INVALID_HANDLE_FILE_NEGATIVE;
 		THROW(E_INVALID_HANDLE_FILE, (syscall_slong_t)fd,
 		      reason, useend, maxfd);
 	}
+	assertf(fd >= 0,
+	        "This can only happen when hm_maxfd=%#x is greater "
+	        "than INT_MAX, which it is not allowed to be set to.",
+	        self->hm_maxfd);
 
 	/* Slot hasn't been allocated, meaning we'll have to create it,
 	 * meaning that the total handle  count will have to  increase. */
@@ -2531,8 +2540,12 @@ again:
 		 *
 		 * -> Since we get here for invalid `minfd' values,
 		 *    only check if  `minfd' is once  we get  here. */
-		if unlikely(minfd < 0 || (unsigned int)minfd > self->hm_maxfd)
+		if unlikely((unsigned int)minfd > self->hm_maxfd)
 			handman_endwrite_and_throw_invalid_handle_for_dupfd(self, minfd);
+		assertf(minfd >= 0,
+		        "This can only happen when hm_maxfd=%#x is greater "
+		        "than INT_MAX, which it is not allowed to be set to.",
+		        self->hm_maxfd);
 
 		/* Try to expand another, existing range. */
 		result = handman_extendrange_or_unlock(self, (unsigned int)minfd, &newrange);

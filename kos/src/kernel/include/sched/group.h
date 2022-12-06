@@ -183,7 +183,7 @@ struct procgrp;
 struct procgrp_slot {
 	LLRBTREE_NODE(procgrp) pgs_link; /* [0..1][lock(:pgr_ns->[pn_par...]->pn_lock)]
 	                                  * Link entry within the associated PID namespace */
-	upid_t                 pgs_pid;  /* [const] PID relevant to this slot. (s.a. `__TASKPID_SLOT_*') */
+	upid_t                 pgs_pid;  /* [const] PID relevant to this slot. (s.a. `_TASKPID_SLOT_*') */
 };
 
 #define _procgrp_slot_getpidno(self) ((pid_t)((self).pgs_pid & _TASKPID_SLOT_PIDMASK))
@@ -210,7 +210,7 @@ struct procgrp {
 	                                                             * Members of  this list  automatically remove  themselves upon  being
 	                                                             * destroyed (aka. inside of `taskpid_destroy()'). */
 	REF struct pidns                            *pgr_ns;        /* [1..1][const] Top-level PID namespace containing this descriptor. */
-	COMPILER_FLEXIBLE_ARRAY(struct procgrp_slot, pgr_pids);     /* [const][tp_ns->pn_ind+1] Task PID value from different namespaces. */
+	COMPILER_FLEXIBLE_ARRAY(struct procgrp_slot, pgr_pids);     /* [const][tp_ns->pn_ind+1] Group PGID value from different namespaces. */
 };
 
 /* Destroy the given process group. */
@@ -220,7 +220,7 @@ DEFINE_REFCNT_FUNCTIONS(struct procgrp, pgr_refcnt, procgrp_destroy)
 
 
 /* Check if a given process group is considered "orphaned" (as per
- * posix's definition  of  what  a  "Orphaned Process Group"  is):
+ * posix's  definition  of what  an  "Orphaned Process Group" is):
  * """
  *    A process group in which the parent of every member is either itself
  *    a member of the  group or is  not a member  of the group's  session.
@@ -623,11 +623,11 @@ DATDEF struct procctl boottask_procctl;
 #define procctl_getrootpgid(self)     _task_getpgid(procctl_getprocgrp(self), procgrp_getrootpgid(_tgpgi_grp))     /* Return PGID of given `struct procctl' (in root namespace) */
 #define procctl_getnspgid(self, ns)   _task_getpgid(procctl_getprocgrp(self), procgrp_getnspgid(_tgpgi_grp, ns))   /* Return PGID of given `struct procctl' (in caller's namespace; panic/undefined if not mapped) */
 #define procctl_getnspgid_s(self, ns) _task_getpgid(procctl_getprocgrp(self), procgrp_getnspgid_s(_tgpgi_grp, ns)) /* Return PGID of given `struct procctl' (in caller's namespace; `0' if not mapped) */
-#define taskpid_getpgid(self)         procctl_getpgid(taskpid_getprocctl(self))                                       /* Return PGID of given `struct taskpid' (in caller's namespace; panic/undefined if not mapped) */
-#define taskpid_getpgid_s(self)       procctl_getpgid_s(taskpid_getprocctl(self))                                     /* Return PGID of given `struct taskpid' (in caller's namespace; `0' if not mapped) */
-#define taskpid_getrootpgid(self)     procctl_getrootpgid(taskpid_getprocctl(self))                                   /* Return PGID of given `struct taskpid' (in root namespace) */
-#define taskpid_getnspgid(self, ns)   procctl_getnspgid(taskpid_getprocctl(self), ns)                                 /* Return PGID of given `struct taskpid' (in given namespace; panic/undefined if not mapped) */
-#define taskpid_getnspgid_s(self, ns) procctl_getnspgid_s(taskpid_getprocctl(self), ns)                               /* Return PGID of given `struct taskpid' (in given namespace; `0' if not mapped) */
+#define taskpid_getpgid(self)         procctl_getpgid(taskpid_getprocctl(self))                                    /* Return PGID of given `struct taskpid' (in caller's namespace; panic/undefined if not mapped) */
+#define taskpid_getpgid_s(self)       procctl_getpgid_s(taskpid_getprocctl(self))                                  /* Return PGID of given `struct taskpid' (in caller's namespace; `0' if not mapped) */
+#define taskpid_getrootpgid(self)     procctl_getrootpgid(taskpid_getprocctl(self))                                /* Return PGID of given `struct taskpid' (in root namespace) */
+#define taskpid_getnspgid(self, ns)   procctl_getnspgid(taskpid_getprocctl(self), ns)                              /* Return PGID of given `struct taskpid' (in given namespace; panic/undefined if not mapped) */
+#define taskpid_getnspgid_s(self, ns) procctl_getnspgid_s(taskpid_getprocctl(self), ns)                            /* Return PGID of given `struct taskpid' (in given namespace; `0' if not mapped) */
 
 /* Return process group ID of the calling/given thread. */
 #define task_getpgid()                  _task_getmypgid(procgrp_getnspgid(_tgmpgi_grp, _tgmpgi_pid->tp_ns))   /* Return PGID of calling thread (in caller's namespace; panic/undefined if not mapped) */

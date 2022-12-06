@@ -205,7 +205,7 @@ NOTHROW(FCALL procgrp_destroy)(struct procgrp *__restrict self) {
 
 
 /* Check if a given process group is considered "orphaned" (as per
- * posix's definition  of  what  a  "Orphaned Process Group"  is):
+ * posix's  definition  of what  an  "Orphaned Process Group" is):
  * """
  *    A process group in which the parent of every member is either itself
  *    a member of the  group or is  not a member  of the group's  session.

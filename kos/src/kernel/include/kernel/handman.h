@@ -26,8 +26,8 @@
 #include <kernel/types.h>
 #include <sched/sig.h>
 
-#include <hybrid/sequence/rbtree.h>
 #include <hybrid/sched/atomic-rwlock.h>
+#include <hybrid/sequence/rbtree.h>
 
 #include <kos/kernel/paging.h>
 #include <kos/lockop.h>
@@ -36,15 +36,16 @@
 #include <hybrid/pp/__va_nargs.h>
 #endif /* !__INTELLISENSE__ */
 
-#ifdef CONFIG_HANDMAN_USES_LLRBTREE
-#undef CONFIG_HANDMAN_USES_RBTREE
-#elif defined(CONFIG_HANDMAN_USES_RBTREE)
+/*[[[config CONFIG_HANDMAN_USES_LLRBTREE = false]]]*/
+#ifdef CONFIG_NO_HANDMAN_USES_LLRBTREE
 #undef CONFIG_HANDMAN_USES_LLRBTREE
-#elif 1 /* Default: use RB-trees (slightly faster `ls /proc/pid/fd') */
-#define CONFIG_HANDMAN_USES_RBTREE
-#else /* ... */
-#define CONFIG_HANDMAN_USES_LLRBTREE
-#endif /* !... */
+#elif !defined(CONFIG_HANDMAN_USES_LLRBTREE)
+#define CONFIG_NO_HANDMAN_USES_LLRBTREE
+#elif (-CONFIG_HANDMAN_USES_LLRBTREE - 1) == -1
+#undef CONFIG_HANDMAN_USES_LLRBTREE
+#define CONFIG_NO_HANDMAN_USES_LLRBTREE
+#endif /* ... */
+/*[[[end]]]*/
 
 #ifdef __CC__
 DECL_BEGIN
@@ -215,11 +216,11 @@ union handslot {
 #define _HANDRANGE_F_TRUNC 0x00000002 /* FLAG: The range will be truncated (used internally) */
 
 struct handrange {
-#ifdef CONFIG_HANDMAN_USES_RBTREE
-	RBTREE_NODE(handrange)   hr_node;  /* [lock(:hm_lock)][0..1] Node in tree of handle ranges. */
-#else /* CONFIG_HANDMAN_USES_RBTREE */
+#ifdef CONFIG_HANDMAN_USES_LLRBTREE
 	LLRBTREE_NODE(handrange) hr_node;  /* [lock(:hm_lock)][0..1] Node in tree of handle ranges. */
-#endif /* !CONFIG_HANDMAN_USES_RBTREE */
+#else /* CONFIG_HANDMAN_USES_LLRBTREE */
+	RBTREE_NODE(handrange)   hr_node;  /* [lock(:hm_lock)][0..1] Node in tree of handle ranges. */
+#endif /* !CONFIG_HANDMAN_USES_LLRBTREE */
 	uintptr_t                hr_flags; /* [lock(:hm_lock)] Set of `HANDRANGE_F_*' */
 	unsigned int             hr_minfd; /* [lock(:hm_lock)] Min file descriptor contained by this range. */
 	unsigned int             hr_maxfd; /* [lock(:hm_lock)] Max file descriptor contained by this range. */
@@ -332,30 +333,32 @@ struct handrange {
  * had previously been reserved/allocated by a call to `handman_install_begin()'.
  *
  * Note that the order in which we update stuff here is extremely important:
- *  - First, we fill in the handle's data field. This could actually happen at any
+ * 1. First, we fill in the handle's data field. This could actually happen at any
  *    point  before the commit, as this field  doesn't have any meaning in regards
  *    to data ordering. However, if it needs to hold some sort of value, this must
  *    happen _before_ we fill in the second data word.
- *  - Then,  we must  update the cexec/cfork  fields, thus ensuring  that at no
+ * 2. Then,  we must  update the cexec/cfork  fields, thus ensuring  that at no
  *    point in time will they be `0' when there is a non-zero amount of handles
- *    with the relevant flag.
- *  - The second data word contains the handle's type/mode. -- Only the type  is
+ *    that are supposed to have the relevant attribute.
+ * 3. The second data word contains the handle's type/mode. -- Only the type  is
  *    truly important here,  as it encodes  the fact that  the handle was  still
  *    marked  as `_MANHANDLE_LOADMARKER'. Once we write to this word, the handle
  *    will no longer be marked as such, meaning that once we write this word, we
  *    have no way of undoing this operation without blocking. And even then, the
- *    moment we do that write, the handle will become visible in /proc/pid/fd or
- *    other places that can access process handles.
- *  - Finally, we do some cleanup by  decrementing `hr_nlops'. This is a  counter
+ *    moment we do that write, the handle will become visible in /proc/{pid}/fd,
+ *    as well as anywhere else that can access process handles.
+ * 4. Finally, we do some cleanup by  decrementing `hr_nlops'. This is a  counter
  *    for how many  handles are so-called  LOP-handles (s.a.  `_handslot_islop'),
  *    and  is used to prevent the range from being realloc'd. This is also a very
  *    special operation, as the moment we do the decrement, `range' may be free'd
- *    or realloc'd by another thread. However,  for the sake of cache  reduction,
+ *    or realloc'd by another thread. However, for the sake of saving on  memory,
  *    we also have to try and re-join a handle region with its neighbors whenever
- *    doing so becomes  allowed. (s.a.  `handrange_dec_nlops_and_maybe_rejoin()')
- *  - And lastly, we signify that handles changed.  -- This may be used for  any
+ *    doing so becomes possible. (s.a.  `handrange_dec_nlops_and_maybe_rejoin()',
+ *    which does all of this in a way that appears atomic)
+ * 5. And lastly, we broadcast that handles changed. -- This may be used for any
  *    purpose what-so-ever, but the primary  consumer is `dup2()', which  blocks
- *    if the target handle is used by a LOP handle (which we just stopped being) */
+ *    if  the target handle is used by a  LOP handle (meaning that us changing a
+ *    LOP handle to a regular handle have to wake such a consumer) */
 #define _handslot_commit_inherit(man, range, self, data, mode, type)      \
 	(__hybrid_atomic_store((self)->_mh_words[0], data, __ATOMIC_RELEASE), \
 	 _handslot_commit_inherit_with_preset_data(man, range, self, mode, type))
@@ -369,8 +372,8 @@ struct handrange {
 
 /* Similar to `_handslot_commit()', but rather than commit handles,
  * this  one is used to mark pre-allocated handles as unused. (such
- * as due to a failure  at installing/allocating the actual  handle
- * object) */
+ * as due to a failure at creating the kernel object the handle was
+ * supposed to point to) */
 #define _handslot_rollback(man, range, self)                                                \
 	do {                                                                                    \
 		unsigned int _mha_ohint, _mha_nhint;                                                \
@@ -404,11 +407,11 @@ struct handman {
 	WEAK refcnt_t            hm_refcnt;  /* Reference counter. */
 	struct atomic_rwlock     hm_lock;    /* Lock for this handle manager. */
 	Toblockop_slist(handman) hm_lops;    /* Lock operators for `hm_lock' */
-#ifdef CONFIG_HANDMAN_USES_RBTREE
-	RBTREE_ROOT(handrange)   hm_ranges;  /* [lock(hm_lock)][0..n] Root for the handle-range tree. */
-#else /* CONFIG_HANDMAN_USES_RBTREE */
+#ifdef CONFIG_HANDMAN_USES_LLRBTREE
 	LLRBTREE_ROOT(handrange) hm_ranges;  /* [lock(hm_lock)][0..n] Root for the handle-range tree. */
-#endif /* !CONFIG_HANDMAN_USES_RBTREE */
+#else /* CONFIG_HANDMAN_USES_LLRBTREE */
+	RBTREE_ROOT(handrange)   hm_ranges;  /* [lock(hm_lock)][0..n] Root for the handle-range tree. */
+#endif /* !CONFIG_HANDMAN_USES_LLRBTREE */
 	struct sig               hm_changed; /* Broadcast whenever:
 	                                      *  - a handle is installed (both commit+rollback)
 	                                      *  - a handle is closed
@@ -550,13 +553,13 @@ FUNDEF NOBLOCK ATTR_PURE WUNUSED struct handrange *NOTHROW(FCALL handrange_tree_
 FUNDEF NOBLOCK ATTR_PURE WUNUSED struct handrange *NOTHROW(FCALL handrange_tree_rlocate)(/*nullable*/ struct handrange *root, unsigned int minkey, unsigned int maxkey);
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL handrange_tree_insert)(struct handrange **__restrict proot, struct handrange *__restrict node);
 FUNDEF NOBLOCK NONNULL((1, 2)) void NOTHROW(FCALL handrange_tree_removenode)(struct handrange **__restrict proot, struct handrange *__restrict node);
-#ifdef CONFIG_HANDMAN_USES_RBTREE
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct handrange *NOTHROW(FCALL handrange_tree_prevnode)(struct handrange const *__restrict self);
-FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct handrange *NOTHROW(FCALL handrange_tree_nextnode)(struct handrange const *__restrict self);
-#else /* CONFIG_HANDMAN_USES_RBTREE */
+#ifdef CONFIG_HANDMAN_USES_LLRBTREE
 FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) struct handrange *NOTHROW(FCALL handrange_tree_prevnode)(struct handrange *root, struct handrange const *self);
 FUNDEF NOBLOCK WUNUSED NONNULL((1, 2)) struct handrange *NOTHROW(FCALL handrange_tree_nextnode)(struct handrange *root, struct handrange const *self);
-#endif /* !CONFIG_HANDMAN_USES_RBTREE */
+#else /* CONFIG_HANDMAN_USES_LLRBTREE */
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct handrange *NOTHROW(FCALL handrange_tree_prevnode)(struct handrange const *__restrict self);
+FUNDEF NOBLOCK WUNUSED NONNULL((1)) struct handrange *NOTHROW(FCALL handrange_tree_nextnode)(struct handrange const *__restrict self);
+#endif /* !CONFIG_HANDMAN_USES_LLRBTREE */
 FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL handrange_tree_minmaxlocate)(struct handrange *root, unsigned int minkey, unsigned int maxkey, struct handrange_tree_minmax *__restrict result);
 
 #define handman_ranges_first(self)                       \
@@ -570,25 +573,25 @@ FUNDEF NOBLOCK NONNULL((4)) void NOTHROW(FCALL handrange_tree_minmaxlocate)(stru
 	})
 #define handman_ranges_last(self)                        \
 	__XBLOCK({                                           \
-		struct handrange *__hrf_res = (self)->hm_ranges; \
-		if likely(__hrf_res != __NULLPTR) {              \
-			while (__hrf_res->hr_node.rb_rhs)            \
-				__hrf_res = __hrf_res->hr_node.rb_rhs;   \
+		struct handrange *__hrl_res = (self)->hm_ranges; \
+		if likely(__hrl_res != __NULLPTR) {              \
+			while (__hrl_res->hr_node.rb_rhs)            \
+				__hrl_res = __hrl_res->hr_node.rb_rhs;   \
 		}                                                \
-		__XRETURN __hrf_res;                             \
+		__XRETURN __hrl_res;                             \
 	})
 #define handman_ranges_locate(self, key)                          handrange_tree_locate((self)->hm_ranges, key)
 #define handman_ranges_rlocate(self, minkey, maxkey)              handrange_tree_rlocate((self)->hm_ranges, minkey, maxkey)
 #define handman_ranges_insert(self, range)                        handrange_tree_insert(&(self)->hm_ranges, range)
 #define handman_ranges_removenode(self, range)                    handrange_tree_removenode(&(self)->hm_ranges, range)
 #define handman_ranges_minmaxlocate(self, minkey, maxkey, result) handrange_tree_minmaxlocate((self)->hm_ranges, minkey, maxkey, result)
-#ifdef CONFIG_HANDMAN_USES_RBTREE
-#define handman_ranges_prev(self, range) handrange_tree_prevnode(range)
-#define handman_ranges_next(self, range) handrange_tree_nextnode(range)
-#else /* CONFIG_HANDMAN_USES_RBTREE */
+#ifdef CONFIG_HANDMAN_USES_LLRBTREE
 #define handman_ranges_prev(self, range) handrange_tree_prevnode((self)->hm_ranges, range)
 #define handman_ranges_next(self, range) handrange_tree_nextnode((self)->hm_ranges, range)
-#endif /* !CONFIG_HANDMAN_USES_RBTREE */
+#else /* CONFIG_HANDMAN_USES_LLRBTREE */
+#define handman_ranges_prev(self, range) handrange_tree_prevnode(range)
+#define handman_ranges_next(self, range) handrange_tree_nextnode(range)
+#endif /* !CONFIG_HANDMAN_USES_LLRBTREE */
 /************************************************************************/
 
 

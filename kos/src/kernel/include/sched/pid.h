@@ -67,7 +67,7 @@ DECL_BEGIN
  *       [taskpid] <--0..N--- [pidns] --+
  *        |    ^                 ^      |
  * weakref|    |                 |      | 0..1 (nested namespaces)
- *        |    | 0..1            +------+
+ *        |    | 1..1            +------+
  *        v    |
  *        [task]
  * ```

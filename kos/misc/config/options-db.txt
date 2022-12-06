@@ -103,6 +103,9 @@ kos/src/kernel/include/kernel/fpu.h
 kos/src/kernel/include/kernel/fs/notify-config.h
 	CONFIG_HAVE_KERNEL_FS_NOTIFY:bool=true
 
+kos/src/kernel/include/kernel/handman.h
+	CONFIG_HANDMAN_USES_LLRBTREE:bool=false
+
 kos/src/kernel/include/kernel/malloc-defs.h
 	CONFIG_HAVE_KERNEL_DEBUG_HEAP:bool=!defined(NDEBUG) && !defined(NDEBUG_HEAP)
 	CONFIG_HAVE_KERNEL_HEAP_RANDOMIZE_OFFSETS:bool=defined(CONFIG_HAVE_KERNEL_DEBUG_HEAP)

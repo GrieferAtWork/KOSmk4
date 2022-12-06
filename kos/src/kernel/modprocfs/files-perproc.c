@@ -1626,7 +1626,7 @@ no_exec:
 	           thread_cred ? ATOMIC_READ(thread_cred->c_egid) : 0,
 	           thread_cred ? ATOMIC_READ(thread_cred->c_sgid) : 0,
 	           thread_cred ? ATOMIC_READ(thread_cred->c_fsgid) : 0,
-	           thread_hman ? ATOMIC_READ(thread_hman->hm_maxfd) : 0,
+	           thread_hman ? ATOMIC_READ(thread_hman->hm_maxhand) : 0,
 	           thread_cred ? ATOMIC_READ(thread_cred->c_fsgid) : 0) < 0)
 		return;
 	if (thread_cred) {
