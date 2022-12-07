@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1190d8c5 */
+/* HASH CRC-32:0x1473fb5e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,7 +82,6 @@
 #define __CRT_HAVE_format_vprintf
 #define __CRT_HAVE_format_vscanf
 #define __CRT_HAVE_format_width
-#define __CRT_HAVE_guid_fromstr
 #define __CRT_HAVE_lockop_reap_atomic_lock
 #define __CRT_HAVE_lockop_reap_atomic_rwlock
 #define __CRT_HAVE_lockop_reap_ex
@@ -309,6 +308,7 @@
 #define __CRT_HAVE_unicode_writeutf16
 #define __CRT_HAVE_unicode_writeutf16_chk
 #define __CRT_HAVE_unicode_writeutf8
+#define __CRT_HAVE_uuid_fromstr
 #define __CRT_HAVE_vsnprintf
 #define __CRT_HAVE_vsprintf
 #define __CRT_HAVE_vsscanf

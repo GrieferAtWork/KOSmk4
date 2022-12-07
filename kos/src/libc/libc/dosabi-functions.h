@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64859360 */
+/* HASH CRC-32:0x47b8b86f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -688,9 +688,6 @@ DFUN(".text.crt.dos.fs.utility", libd__eof, libc__eof, TD, 1, TIn(__SIZEOF_FD_T_
 /* kos.dosfs */
 DFUN(".text.crt.dos.io.access", libd_dosfs_setenabled, libc_dosfs_setenabled, TD, 1, TD)
 
-/* kos.guid */
-DFUN(".text.crt.dos.sched.rpc", libd_guid_fromstr, libc_guid_fromstr, TP, 2, TP, TP)
-
 /* kos.nopf */
 #include <kos/bits/nopf.h>
 #ifndef __arch_readb_nopf
@@ -734,6 +731,9 @@ DFUN(".text.crt.dos.sched.rpc", libd_rpc_interrupt, libc_rpc_interrupt, TD, 2, T
 DFUN(".text.crt.dos.sched.rpc", libd_RpcSchedule, libc_RpcSchedule, TV, 5, TIn(__SIZEOF_PID_T__), TD, TP, TP, TI)
 DFUN(".text.crt.dos.sched.rpc", libd_RpcExec, libc_RpcExec, TV, 4, TIn(__SIZEOF_PID_T__), TD, TP, TP)
 DFUN(".text.crt.dos.sched.rpc", libd_RpcInterrupt, libc_RpcInterrupt, TV, 2, TIn(__SIZEOF_PID_T__), TD)
+
+/* kos.uuid */
+DFUN(".text.crt.dos.sched.rpc", libd_uuid_fromstr, libc_uuid_fromstr, TP, 2, TP, TP)
 
 /* langinfo */
 DFUN(".text.crt.dos.i18n", libd_nl_langinfo, libc_nl_langinfo, TP, 1, TD)

@@ -316,8 +316,8 @@ struct blkdev_makeparts_info {
 	/* New value for `struct blkdev::br_mbr_diskuid' */
 	byte_t br_mbr_diskuid[lengthof(((struct blkdev *)0)->bd_rootinfo.br_mbr_diskuid)];
 
-	/* New value for `struct blkdev::br_efi_guid' */
-	guid_t br_efi_guid;
+	/* New value for `struct blkdev::br_efi_uuid' */
+	uuid_t br_efi_uuid;
 };
 
 
@@ -334,8 +334,8 @@ struct blkdev_makeparts_info {
  *  - return->bd_partinfo.bp_mbr_sysno
  *  - return->bd_partinfo.bp_efi_name
  *  - return->bd_partinfo.bp_active
- *  - return->bd_partinfo.bp_efi_typeguid
- *  - return->bd_partinfo.bp_efi_partguid */
+ *  - return->bd_partinfo.bp_efi_typeuuid
+ *  - return->bd_partinfo.bp_efi_partuuid */
 PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct blkdev *FCALL
 blkdev_makeparts_create(struct blkdev *__restrict self,
                         struct blkdev_list *__restrict parts,
@@ -423,8 +423,8 @@ blkdev_makeparts_loadefi(struct blkdev *__restrict self,
 	if unlikely(efi->gpt_signature[7] != EFIMAG7)
 		goto fail_badsig;
 
-	/* Save partition GUID */
-	memcpy(&info->br_efi_guid, &efi->gpt_guid, sizeof(guid_t));
+	/* Save partition UUID */
+	memcpy(&info->br_efi_uuid, &efi->gpt_uuid, sizeof(uuid_t));
 
 	printk(KERN_INFO "[blk] EFI partition found at %#" PRIx64 " on "
 	                 "%.2" PRIxN(__SIZEOF_MAJOR_T__) ":"
@@ -540,8 +540,8 @@ blkdev_makeparts_loadefi(struct blkdev *__restrict self,
 #endif /* EFI_PART_F_ACTIVE > 0xff */
 		if (part_flags & EFI_PART_F_READONLY)
 			dev->mf_flags |= MFILE_F_READONLY; /* Sure: let's respect this flag! */
-		memcpy(&dev->bd_partinfo.bp_efi_typeguid, &part.p_type_guid, sizeof(guid_t));
-		memcpy(&dev->bd_partinfo.bp_efi_partguid, &part.p_part_guid, sizeof(guid_t));
+		memcpy(&dev->bd_partinfo.bp_efi_typeuuid, &part.p_type_uuid, sizeof(uuid_t));
+		memcpy(&dev->bd_partinfo.bp_efi_partuuid, &part.p_part_uuid, sizeof(uuid_t));
 	}
 
 	return true;
@@ -716,8 +716,8 @@ blkdev_makeparts_loadembr(struct blkdev *__restrict self,
 			}
 
 			dev->bd_partinfo.bp_active = 0; /* I don't think eMBR has a way to indicate active partitions... :( */
-			bzero(&dev->bd_partinfo.bp_efi_typeguid, sizeof(guid_t));
-			bzero(&dev->bd_partinfo.bp_efi_partguid, sizeof(guid_t));
+			bzero(&dev->bd_partinfo.bp_efi_typeuuid, sizeof(uuid_t));
+			bzero(&dev->bd_partinfo.bp_efi_partuuid, sizeof(uuid_t));
 		}
 nextpart:
 		/* Move to next partition */
@@ -881,8 +881,8 @@ make_normal_partition:
 			DBG_memset(dev->bd_partinfo.bp_efi_name, 0xcc, sizeof(dev->bd_partinfo.bp_efi_name));
 			dev->bd_partinfo.bp_efi_name[0] = '\0';
 			dev->bd_partinfo.bp_active      = mbr->mbr_part[i].pt.pt_bootable & PART_BOOTABLE_ACTICE;
-			bzero(&dev->bd_partinfo.bp_efi_typeguid, sizeof(guid_t));
-			bzero(&dev->bd_partinfo.bp_efi_partguid, sizeof(guid_t));
+			bzero(&dev->bd_partinfo.bp_efi_typeuuid, sizeof(uuid_t));
+			bzero(&dev->bd_partinfo.bp_efi_partuuid, sizeof(uuid_t));
 		}	break;
 
 		}
@@ -1327,7 +1327,7 @@ blkdev_repart(struct blkdev *__restrict self)
 
 	/* Save updated information. */
 	memcpy(self->bd_rootinfo.br_mbr_diskuid, info.br_mbr_diskuid, sizeof(info.br_mbr_diskuid));
-	memcpy(&self->bd_rootinfo.br_efi_guid, &info.br_efi_guid, sizeof(info.br_efi_guid));
+	memcpy(&self->bd_rootinfo.br_efi_uuid, &info.br_efi_uuid, sizeof(info.br_efi_uuid));
 
 	/* Step #7: Release lock to `self->bd_rootinfo.br_partslock' */
 	_blkdev_root_partslock_release(self);
@@ -1374,7 +1374,7 @@ blkdev_repart_and_register(struct blkdev *__restrict self)
 
 	/* Save root device information. */
 	memcpy(self->bd_rootinfo.br_mbr_diskuid, info.br_mbr_diskuid, sizeof(info.br_mbr_diskuid));
-	memcpy(&self->bd_rootinfo.br_efi_guid, &info.br_efi_guid, sizeof(info.br_efi_guid));
+	memcpy(&self->bd_rootinfo.br_efi_uuid, &info.br_efi_uuid, sizeof(info.br_efi_uuid));
 
 	/* Acquire locks */
 	TRY {

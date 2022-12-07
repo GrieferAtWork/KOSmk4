@@ -22,7 +22,7 @@
 
 #include <__stdinc.h>
 
-#include <kos/guid.h>
+#include <kos/uuid.h>
 #include <bits/types.h>
 
 __DECL_BEGIN
@@ -54,7 +54,7 @@ struct __ATTR_PACKED efi_descriptor {
 	__le64   gpt_backlba;            /* Backup LBA */
 	__le64   gpt_firstpart;          /* First usable LBA for partitions */
 	__le64   gpt_lastpart;           /* Last usable LBA for partitions */
-	guid_t   gpt_guid;               /* Disk GUID */
+	uuid_t   gpt_uuid;               /* Disk UUID */
 	__le64   gpt_partition_start;    /* Starting LBA for partition entries */
 	__le32   gpt_partition_count;    /* Size of the partition vector (in entries) */
 	__le32   gpt_partition_entsz;    /* Size of a single partition entry (Usually 128) */
@@ -72,8 +72,8 @@ struct __ATTR_PACKED efi_descriptor {
 
 #ifdef __CC__
 struct __ATTR_PACKED efi_partition {
-	guid_t p_type_guid; /* Partition type GUID */
-	guid_t p_part_guid; /* Unique partition GUID */
+	uuid_t p_type_uuid; /* Partition type UUID */
+	uuid_t p_part_uuid; /* Unique partition UUID */
 	__le64 p_part_min;  /* [<= p_part_end] First partition LBA index. */
 	__le64 p_part_end;  /* [>= p_part_min] Partition end LBA index. */
 	__le64 p_flags;     /* Partition flags (Set of `EFI_PART_F_*') */

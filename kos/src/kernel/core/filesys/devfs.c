@@ -57,7 +57,7 @@
 #include <kos/except.h>
 #include <kos/except/reason/fs.h>
 #include <kos/except/reason/inval.h>
-#include <kos/guid.h>
+#include <kos/uuid.h>
 #include <kos/kernel/handle.h>
 #include <kos/sched/shared-rwlock.h>
 #include <sys/mkdev.h>
@@ -1996,19 +1996,19 @@ device_lookup_byname(USER CHECKED char const *name,
 
 
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1, 2)) struct blkdev *
-NOTHROW(FCALL devfs_find_partguid)(struct fnode const *__restrict root,
-                                   guid_t const *__restrict guid,
+NOTHROW(FCALL devfs_find_partuuid)(struct fnode const *__restrict root,
+                                   uuid_t const *__restrict uuid,
                                    struct blkdev *result) {
 again:
 	if (fnode_isblkpart(root)) {
 		struct blkdev *dev;
 		dev = fnode_asblkdev(root);
-		if (bcmp(&dev->bd_partinfo.bp_efi_partguid, guid, sizeof(guid_t)) == 0)
+		if (bcmp(&dev->bd_partinfo.bp_efi_partuuid, uuid, sizeof(uuid_t)) == 0)
 			result = result ? (struct blkdev *)-1 : dev;
 	}
 	if (root->fn_supent.rb_lhs) {
 		if (root->fn_supent.rb_rhs)
-			result = devfs_find_partguid(root->fn_supent.rb_rhs, guid, result);
+			result = devfs_find_partuuid(root->fn_supent.rb_rhs, uuid, result);
 		root = root->fn_supent.rb_lhs;
 		goto again;
 	}
@@ -2019,19 +2019,19 @@ again:
 	return result;
 }
 
-/* Lookup a block device partition  by its `bp_efi_partguid'. Also  make
+/* Lookup a block device partition  by its `bp_efi_partuuid'. Also  make
  * sure that in the event of a partition being found, no other partition
- * exists that has the same GUID. If anything other than exactly 1  part
+ * exists that has the same UUID. If anything other than exactly 1  part
  * is found, return `NULL'. */
 PUBLIC WUNUSED NONNULL((1)) REF struct blkdev *FCALL
-device_lookup_bypartguid(guid_t const *__restrict guid)
+device_lookup_bypartuuid(uuid_t const *__restrict uuid)
 		THROWS(E_WOULDBLOCK) {
 	REF struct blkdev *result;
 	fsuper_nodes_read(&devfs);
 	result = NULL;
 	assert(devfs.fs_nodes != FSUPER_NODES_DELETED);
 	if likely(devfs.fs_nodes != NULL) {
-		result = devfs_find_partguid(devfs.fs_nodes, guid, NULL);
+		result = devfs_find_partuuid(devfs.fs_nodes, uuid, NULL);
 		if (result == (REF struct blkdev *)-1)
 			result = NULL; /* Ambiguous */
 	}
@@ -2044,8 +2044,8 @@ device_lookup_bypartguid(guid_t const *__restrict guid)
 /* Slightly more advanced version of `device_lookup_byname()':
  *  #1: If str starts with "/dev/": string += 5; stringlen -= 5;
  *  #2: Pass `string' to `device_lookup_byname()', and re-return if non-NULL
- *  #3: if `!S_ISCHR(st_mode)' and `string' matches FORMAT_GUID_T, decode a
- *      GUID and make use of `device_lookup_bypartguid'.
+ *  #3: if `!S_ISCHR(st_mode)' and `string' matches FORMAT_UUID_T, decode a
+ *      UUID and make use of `device_lookup_bypartuuid'.
  *  #4: if `st_mode != 0', do `sscanf(string, "%u:%u")' for a major/minor
  *      pair, construct a dev_t, and pass to `device_lookup_bydev()', and
  *      re-return if non-NULL
@@ -2064,10 +2064,10 @@ device_lookup_bystring(USER CHECKED char const *string,
 	result = device_lookup_byname(string, stringlen, st_mode);
 	if (result != NULL)
 		goto done;
-	if (!S_ISCHR(st_mode) && stringlen == GUID_STRLEN) {
-		guid_t guid;
-		if (guid_fromstr(string, &guid)) {
-			result = (REF struct device *)device_lookup_bypartguid(&guid);
+	if (!S_ISCHR(st_mode) && stringlen == UUID_STRLEN) {
+		uuid_t uuid;
+		if (uuid_fromstr(string, &uuid)) {
+			result = (REF struct device *)device_lookup_bypartuuid(&uuid);
 			if (result != NULL)
 				goto done;
 		}
@@ -2133,10 +2133,10 @@ do_dump_blkdev(struct blkdev *__restrict self,
 			dbg_printf(DBGSTR("\tsysno: " AC_WHITE("%#" PRIx8) "\n"), self->bd_partinfo.bp_mbr_sysno);
 		if (*self->bd_partinfo.bp_efi_name != '\0')
 			dbg_printf(DBGSTR("\tname: " AC_WHITE("%q") "\n"), self->bd_partinfo.bp_efi_name);
-		if (memxchr(&self->bd_partinfo.bp_efi_typeguid, 0, sizeof(self->bd_partinfo.bp_efi_typeguid)))
-			dbg_printf(DBGSTR("\ttypeguid: " AC_WHITE(FORMAT_GUID_T) "\n"), FORMAT_GUID_T_ARGS(self->bd_partinfo.bp_efi_typeguid));
-		if (memxchr(&self->bd_partinfo.bp_efi_partguid, 0, sizeof(self->bd_partinfo.bp_efi_partguid)))
-			dbg_printf(DBGSTR("\tpartguid: " AC_WHITE(FORMAT_GUID_T) "\n"), FORMAT_GUID_T_ARGS(self->bd_partinfo.bp_efi_partguid));
+		if (memxchr(&self->bd_partinfo.bp_efi_typeuuid, 0, sizeof(self->bd_partinfo.bp_efi_typeuuid)))
+			dbg_printf(DBGSTR("\ttypeuuid: " AC_WHITE(FORMAT_UUID_T) "\n"), FORMAT_UUID_T_ARGS(self->bd_partinfo.bp_efi_typeuuid));
+		if (memxchr(&self->bd_partinfo.bp_efi_partuuid, 0, sizeof(self->bd_partinfo.bp_efi_partuuid)))
+			dbg_printf(DBGSTR("\tpartuuid: " AC_WHITE(FORMAT_UUID_T) "\n"), FORMAT_UUID_T_ARGS(self->bd_partinfo.bp_efi_partuuid));
 	} else {
 		if (*self->bd_rootinfo.br_ata_serial_no != '\0')
 			dbg_printf(DBGSTR("\tserial_no: " AC_WHITE("%q") "\n"), self->bd_rootinfo.br_ata_serial_no);
@@ -2146,8 +2146,8 @@ do_dump_blkdev(struct blkdev *__restrict self,
 			dbg_printf(DBGSTR("\tmodel: " AC_WHITE("%q") "\n"), self->bd_rootinfo.br_ata_model);
 //		if (*self->bd_rootinfo.br_mbr_diskuid != '\0')
 //			dbg_printf(DBGSTR("\tdiskuid: " AC_WHITE("%q") "\n"), self->bd_rootinfo.br_mbr_diskuid);
-		if (memxchr(&self->bd_rootinfo.br_efi_guid, 0, sizeof(self->bd_rootinfo.br_efi_guid)))
-			dbg_printf(DBGSTR("\tguid: " AC_WHITE(FORMAT_GUID_T) "\n"), FORMAT_GUID_T_ARGS(self->bd_rootinfo.br_efi_guid));
+		if (memxchr(&self->bd_rootinfo.br_efi_uuid, 0, sizeof(self->bd_rootinfo.br_efi_uuid)))
+			dbg_printf(DBGSTR("\tuuid: " AC_WHITE(FORMAT_UUID_T) "\n"), FORMAT_UUID_T_ARGS(self->bd_rootinfo.br_efi_uuid));
 	}
 }
 

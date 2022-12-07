@@ -3368,7 +3368,6 @@
 #define __CRT_HAVE_group_member
 #define __CRT_HAVE_gsignal
 #define __CRT_HAVE_gtty
-#define __CRT_HAVE_guid_fromstr
 #define __CRT_HAVE_hasmntopt
 #define __CRT_HAVE_hcreate
 #define __CRT_HAVE_hcreate_r
@@ -6132,6 +6131,7 @@
 #define __CRT_HAVE_utmpxname
 #define __CRT_HAVE_uucopy
 #define __CRT_HAVE_uucopystr
+#define __CRT_HAVE_uuid_fromstr
 #define __CRT_HAVE_valloc
 #define __CRT_HAVE_vasnprintf
 #define __CRT_HAVE_vasprintf

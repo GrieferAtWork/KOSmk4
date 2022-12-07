@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4057413 */
+/* HASH CRC-32:0xc9686a77 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,62 +18,34 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_AUTO_KOS_GUID_C
-#define GUARD_LIBC_AUTO_KOS_GUID_C 1
+#ifndef GUARD_LIBC_AUTO_KOS_UUID_H
+#define GUARD_LIBC_AUTO_KOS_UUID_H 1
 
 #include "../api.h"
+
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include "kos.guid.h"
+#include <kos/uuid.h>
 
 DECL_BEGIN
 
-#include <libc/template/hex.h>
-/* >> guid_fromstr(3)
- * Convert a given `string' into a GUID
- * >> guid_t g;
- * >> guid_fromstr("054b1def-b2ae-4d99-a99c-54b9730c3dc3", &g);
- * @return: string + GUID_STRLEN: Success
- * @return: NULL:                 `string' isn't a valid GUID. */
-INTERN ATTR_SECTION(".text.crt.sched.rpc") ATTR_IN(1) ATTR_OUT(2) char const *
-NOTHROW_NCX(LIBCCALL libc_guid_fromstr)(char const string[__GUID_STRLEN],
-                                        guid_t *__restrict result) {
-	unsigned int i;
-	for (i = 0; i < 16; ++i) {
-		byte_t nibbles[2];
-		unsigned int j;
-
-		/* [05][4b][1d][ef]-[b2][ae]-[4d][99]-[a9][9c]-[54][b9][73][0c][3d][c3]
-		 *  0   1   2   3    4   5    6   7    8   9    10  11  12  13  14  15
-		 *
-		 * There are mandatory '-' characters before bytes: 4, 6, 8 and 10 */
-		if (!(i & 1) && i >= 4 && i <= 10) {
-			if (*string != '-')
-				goto inval;
-			++string;
-		}
-
-		/* Decode nibbles */
-		for (j = 0; j < 2; ++j) {
-			char ch = *string++;
-			if (!__libc_hex2int(ch, &nibbles[j]))
-				goto inval;
-		}
-
-		/* Convert nibbles to byte */
-		nibbles[0] <<= 4;
-		nibbles[0] |= nibbles[1];
-
-		/* Write byte to result GUID */
-		((byte_t *)result)[i] = nibbles[0];
-	}
-	return string;
-inval:
-	return NULL;
-}
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> uuid_fromstr(3)
+ * Convert a given `string' into a UUID
+ * >> uuid_t g;
+ * >> uuid_fromstr("054b1def-b2ae-4d99-a99c-54b9730c3dc3", &g);
+ * @return: string + UUID_STRLEN: Success
+ * @return: NULL:                 `string' isn't a valid UUID. */
+INTDEF ATTR_IN(1) ATTR_OUT(2) char const *NOTHROW_NCX(LIBDCALL libd_uuid_fromstr)(char const string[__UUID_STRLEN], uuid_t *__restrict result);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+/* >> uuid_fromstr(3)
+ * Convert a given `string' into a UUID
+ * >> uuid_t g;
+ * >> uuid_fromstr("054b1def-b2ae-4d99-a99c-54b9730c3dc3", &g);
+ * @return: string + UUID_STRLEN: Success
+ * @return: NULL:                 `string' isn't a valid UUID. */
+INTDEF ATTR_IN(1) ATTR_OUT(2) char const *NOTHROW_NCX(LIBCCALL libc_uuid_fromstr)(char const string[__UUID_STRLEN], uuid_t *__restrict result);
 
 DECL_END
 
-DEFINE_PUBLIC_ALIAS(guid_fromstr, libc_guid_fromstr);
-
-#endif /* !GUARD_LIBC_AUTO_KOS_GUID_C */
+#endif /* !GUARD_LIBC_AUTO_KOS_UUID_H */

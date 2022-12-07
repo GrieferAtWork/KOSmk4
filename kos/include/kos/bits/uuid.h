@@ -17,27 +17,27 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_BITS_GUID_H
-#define _KOS_BITS_GUID_H 1
+#ifndef _KOS_BITS_UUID_H
+#define _KOS_BITS_UUID_H 1
 
 #include <__stdinc.h>
 
 #include <bits/types.h>
 
 
-#define __OFFSET_GUID_A 0
-#define __OFFSET_GUID_B 4
-#define __OFFSET_GUID_C 6
-#define __OFFSET_GUID_D 8
-#define __OFFSET_GUID_E 10
-#define __SIZEOF_GUID   16
+#define __OFFSET_UUID_A 0
+#define __OFFSET_UUID_B 4
+#define __OFFSET_UUID_C 6
+#define __OFFSET_UUID_D 8
+#define __OFFSET_UUID_E 10
+#define __SIZEOF_UUID   16
 
 
 #ifdef __CC__
 __DECL_BEGIN
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
-#pragma push_macro("g_guid")
+#pragma push_macro("g_uuid")
 #pragma push_macro("g_a")
 #pragma push_macro("g_b")
 #pragma push_macro("g_c")
@@ -46,7 +46,7 @@ __DECL_BEGIN
 #pragma push_macro("g_e_2")
 #pragma push_macro("g_data")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
-#undef g_guid
+#undef g_uuid
 #undef g_a
 #undef g_b
 #undef g_c
@@ -57,7 +57,7 @@ __DECL_BEGIN
 
 /* Example: "054b1def-b2ae-4d99-a99c-54b9730c3dc3" */
 typedef union __ATTR_PACKED {
-	__u8       g_guid[16]; /* GUID */
+	__u8       g_uuid[16]; /* UUID */
 	struct {
 		__be32 g_a;
 		__be16 g_b;
@@ -66,7 +66,7 @@ typedef union __ATTR_PACKED {
 		__be32 g_e_1;
 		__be16 g_e_2;
 	}          g_data;
-} __guid_t;
+} __uuid_t;
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("g_data")
@@ -76,13 +76,13 @@ typedef union __ATTR_PACKED {
 #pragma pop_macro("g_c")
 #pragma pop_macro("g_b")
 #pragma pop_macro("g_a")
-#pragma pop_macro("g_guid")
+#pragma pop_macro("g_uuid")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
-/* Length of the string representation of a GUID */
-#define __GUID_STRLEN 36
+/* Length of the string representation of a UUID */
+#define __UUID_STRLEN 36
 
 __DECL_END
 #endif /* __CC__ */
 
-#endif /* !_KOS_BITS_GUID_H */
+#endif /* !_KOS_BITS_UUID_H */

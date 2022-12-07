@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f5ce9d2 */
+/* HASH CRC-32:0x20f0ebc8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -569,9 +569,6 @@ DEFINE_PUBLIC_ALIAS(DOS$_eof, libd__eof);
 /* kos.dosfs */
 DEFINE_PUBLIC_ALIAS(DOS$dosfs_setenabled, libd_dosfs_setenabled);
 
-/* kos.guid */
-DEFINE_PUBLIC_ALIAS(DOS$guid_fromstr, libd_guid_fromstr);
-
 /* kos.nopf */
 #include <kos/bits/nopf.h>
 #ifndef __arch_readb_nopf
@@ -615,6 +612,9 @@ DEFINE_PUBLIC_ALIAS(DOS$rpc_interrupt, libd_rpc_interrupt);
 DEFINE_PUBLIC_ALIAS(DOS$RpcSchedule, libd_RpcSchedule);
 DEFINE_PUBLIC_ALIAS(DOS$RpcExec, libd_RpcExec);
 DEFINE_PUBLIC_ALIAS(DOS$RpcInterrupt, libd_RpcInterrupt);
+
+/* kos.uuid */
+DEFINE_PUBLIC_ALIAS(DOS$uuid_fromstr, libd_uuid_fromstr);
 
 /* langinfo */
 DEFINE_PUBLIC_ALIAS(DOS$nl_langinfo, libd_nl_langinfo);

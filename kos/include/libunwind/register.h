@@ -58,9 +58,9 @@ typedef __UINTPTR_HALF_TYPE__ unwind_regno_t;
  * >>     unwind_errno_t error;
  * >>     struct my_cpustate_with_fpu const *me;
  * >>     me = (struct my_cpustate_with_fpu const *)arg;
- * >>     if ((error = unwind_getreg_xfpustate(me->cs_fpu, regno, dst)) != UNWIND_INVALID_REGISTER)
- * >>         return error;
  * >>     if ((error = unwind_getreg_ufpustate(me->cs_cpu, regno, dst)) != UNWIND_INVALID_REGISTER)
+ * >>         return error;
+ * >>     if ((error = unwind_getreg_fpustate(me->cs_fpu, regno, dst)) != UNWIND_INVALID_REGISTER)
  * >>         return error;
  * >>     return UNWIND_INVALID_REGISTER;
  * >> }
@@ -68,9 +68,9 @@ typedef __UINTPTR_HALF_TYPE__ unwind_regno_t;
  * >>     unwind_errno_t error;
  * >>     struct my_cpustate_with_fpu *me;
  * >>     me = (struct my_cpustate_with_fpu *)arg;
- * >>     if ((error = unwind_setreg_xfpustate(me->cs_fpu, regno, src)) != UNWIND_INVALID_REGISTER)
- * >>         return error;
  * >>     if ((error = unwind_setreg_ufpustate(me->cs_cpu, regno, src)) != UNWIND_INVALID_REGISTER)
+ * >>         return error;
+ * >>     if ((error = unwind_setreg_fpustate(me->cs_fpu, regno, src)) != UNWIND_INVALID_REGISTER)
  * >>         return error;
  * >>     return UNWIND_INVALID_REGISTER;
  * >> }

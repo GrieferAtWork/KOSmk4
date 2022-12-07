@@ -31,6 +31,8 @@
 
 #include <hybrid/unaligned.h>
 
+#include <kos/uuid.h>
+
 #include <ctype.h>
 #include <format-printer.h>
 #include <inttypes.h>
@@ -162,14 +164,14 @@ devdisk_partlabel_toname(struct devdiskruledir *__restrict UNUSED(self),
 /************************************************************************/
 /* /dev/disk/by-partuuid                                                */
 /************************************************************************/
-/* Either `bp_efi_partguid', or `TOHEX(*(u32 *)&br_mbr_diskuid[4]) + "-%.2x" % PARTNO' */
+/* Either `bp_efi_partuuid', or `TOHEX(*(u32 *)&br_mbr_diskuid[4]) + "-%.2x" % PARTNO' */
 
 INTERN WUNUSED NONNULL((1, 2)) REF struct blkdev *KCALL
 devdisk_partuuid_byname(struct devdiskruledir *__restrict UNUSED(self),
                         struct flookup_info *__restrict info) {
 	if (info->flu_namelen == COMPILER_STRLEN("00000000-0000-0000-0000-000000000000")) {
 		REF struct fnode *node;
-		guid_t guid;
+		uuid_t uuid;
 		unsigned int i;
 		char text[COMPILER_STRLEN("00000000-0000-0000-0000-000000000000")];
 		memcpy(text, info->flu_name, sizeof(text));
@@ -181,16 +183,16 @@ devdisk_partuuid_byname(struct devdiskruledir *__restrict UNUSED(self),
 			if (!islower(text[i]) && !isdigit(text[i]) && text[i] != '-')
 				return NULL;
 		}
-		if (!guid_fromstr(text, &guid))
+		if (!uuid_fromstr(text, &uuid))
 			return NULL;
-		if (GUID_EQUALS(guid, 00000000, 0000, 0000, 0000, 000000000000))
+		if (UUID_EQUALS(uuid, 00000000, 0000, 0000, 0000, 000000000000))
 			return NULL;
 		node = fsuper_nodeafter(&devfs, NULL);
 		while (node) {
 			FINALLY_DECREF_UNLIKELY(node);
 			if (fnode_isblkpart(node)) {
 				struct blkdev *dev = fnode_asblkdev(node);
-				if (bcmp(&dev->bd_partinfo.bp_efi_partguid, &guid, sizeof(guid)) == 0)
+				if (bcmp(&dev->bd_partinfo.bp_efi_partuuid, &uuid, sizeof(uuid)) == 0)
 					return mfile_asblkdev(incref(dev));
 			}
 			node = fsuper_nodeafter(&devfs, node);
@@ -243,15 +245,15 @@ devdisk_partuuid_toname(struct devdiskruledir *__restrict UNUSED(self),
 		return 0;
 	if (!blkdev_ispart(dev))
 		return 0;
-	if (!GUID_EQUALS(dev->bd_partinfo.bp_efi_partguid, 00000000, 0000, 0000, 0000, 000000000000)) {
-		/* EFI partition GUID. */
+	if (!UUID_EQUALS(dev->bd_partinfo.bp_efi_partuuid, 00000000, 0000, 0000, 0000, 000000000000)) {
+		/* EFI partition UUID. */
 		return format_printf(printer, arg,
 		                     "%.8" PRIx32 "-%.4" PRIx16 "-%.4" PRIx16 "-%.4" PRIx16 "-%.12" PRIx64,
-		                     GUID_A(dev->bd_partinfo.bp_efi_partguid),
-		                     GUID_B(dev->bd_partinfo.bp_efi_partguid),
-		                     GUID_C(dev->bd_partinfo.bp_efi_partguid),
-		                     GUID_D(dev->bd_partinfo.bp_efi_partguid),
-		                     GUID_E(dev->bd_partinfo.bp_efi_partguid));
+		                     UUID_A(dev->bd_partinfo.bp_efi_partuuid),
+		                     UUID_B(dev->bd_partinfo.bp_efi_partuuid),
+		                     UUID_C(dev->bd_partinfo.bp_efi_partuuid),
+		                     UUID_D(dev->bd_partinfo.bp_efi_partuuid),
+		                     UUID_E(dev->bd_partinfo.bp_efi_partuuid));
 	}
 
 	/* Fallback: MBR partition id. */

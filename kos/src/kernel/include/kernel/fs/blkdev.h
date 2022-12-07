@@ -27,7 +27,7 @@
 #include <hybrid/__unaligned.h>
 #include <hybrid/sched/atomic-lock.h>
 
-#include <kos/guid.h>
+#include <kos/uuid.h>
 #include <kos/lockop.h>
 
 #include <libc/string.h>
@@ -107,7 +107,7 @@ struct blkdev
 			char                    br_ata_fw_rev[9];     /* [const] NUL-termianted string (`struct hd_driveid::fw_rev', or empty if unknown or N/A) */
 			char                    br_ata_model[41];     /* [const] NUL-termianted string (`struct hd_driveid::model', or empty if unknown or N/A) */
 			byte_t                  br_mbr_diskuid[10];   /* [lock(br_partslock)] MBR disk uid (`struct mbr_sector::mbr_diskuid', or all zeroes if unknown or N/A) */
-			guid_t                  br_efi_guid;          /* [lock(br_partslock)] EFI disk GUID (`struct efi_descriptor::gpt_guid', or all zeroes if unknown or N/A) */
+			uuid_t                  br_efi_uuid;          /* [lock(br_partslock)] EFI disk UUID (`struct efi_descriptor::gpt_uuid', or all zeroes if unknown or N/A) */
 		} bd_rootinfo; /* [valid_if(blkdev_isroot(this))] */
 #define blkdev_get_mbr_disksig(self) \
 	__hybrid_unaligned_get32((uint32_t const *)&(self)->bd_rootinfo.br_mbr_diskuid[4])
@@ -140,8 +140,8 @@ struct blkdev
 			uint8_t             bp_active;        /* [const] Non-zero if this partition is "active" (s.a. `PART_BOOTABLE_ACTICE', `EFI_PART_F_ACTIVE') */
 			uint8_t            _bp_pad2;          /* ... */
 #endif /* !__WANT_BLKDEV_bd_partinfo__bp_blkdevlop */
-			guid_t              bp_efi_typeguid;  /* [const] EFI part type GUID (`struct efi_partition::p_type_guid', or all zeroes if unknown or N/A) */
-			guid_t              bp_efi_partguid;  /* [const] EFI part type GUID (`struct efi_partition::p_part_guid', or all zeroes if unknown or N/A) */
+			uuid_t              bp_efi_typeuuid;  /* [const] EFI part type UUID (`struct efi_partition::p_type_uuid', or all zeroes if unknown or N/A) */
+			uuid_t              bp_efi_partuuid;  /* [const] EFI part type UUID (`struct efi_partition::p_part_uuid', or all zeroes if unknown or N/A) */
 		} bd_partinfo; /* [valid_if(blkdev_ispart(this))] */
 
 	};
@@ -254,7 +254,7 @@ blkdev_v_ioctl(struct mfile *__restrict self, ioctl_t cmd,
 	 (self)->bd_rootinfo.br_max_retry = BLKDEV_MAX_RETRY_DEFAULT, \
 	 __libc_memset((self)->bd_rootinfo.br_mbr_diskuid, 0,         \
 	               sizeof((self)->bd_rootinfo.br_mbr_diskuid)),   \
-	 __libc_memset(&(self)->bd_rootinfo.br_efi_guid, 0, sizeof(guid_t)))
+	 __libc_memset(&(self)->bd_rootinfo.br_efi_uuid, 0, sizeof(uuid_t)))
 #define _blkdev_cinit(self, ops)                                      \
 	(__blkdev_cinit_common(self, ops),                                \
 	 atomic_lock_cinit(&(self)->bd_rootinfo.br_partslock),            \

@@ -31,7 +31,7 @@
 
 #include <bits/os/timespec.h>
 #include <kos/aref.h>
-#include <kos/guid.h>
+#include <kos/uuid.h>
 #include <kos/io.h> /* S_IFCHR, S_IFBLK */
 #include <kos/kernel/paging.h>
 #include <kos/lockop.h>
@@ -416,19 +416,19 @@ device_lookup_byname(USER CHECKED char const *name,
 
 struct blkdev;
 
-/* Lookup a block device partition  by its `bp_efi_partguid'. Also  make
+/* Lookup a block device partition  by its `bp_efi_partuuid'. Also  make
  * sure that in the event of a partition being found, no other partition
- * exists that has the same GUID. If anything other than exactly 1  part
+ * exists that has the same UUID. If anything other than exactly 1  part
  * is found, return `NULL'. */
 FUNDEF WUNUSED NONNULL((1)) REF struct blkdev *FCALL
-device_lookup_bypartguid(guid_t const *__restrict guid)
+device_lookup_bypartuuid(uuid_t const *__restrict uuid)
 		THROWS(E_WOULDBLOCK);
 
 /* Slightly more advanced version of `device_lookup_byname()':
  *  #1: If str starts with "/dev/": string += 5; stringlen -= 5;
  *  #2: Pass `string' to `device_lookup_byname()', and re-return if non-NULL
- *  #3: if `!S_ISCHR(st_mode)' and `string' matches FORMAT_GUID_T, decode a
- *      GUID and make use of `device_lookup_bypartguid'.
+ *  #3: if `!S_ISCHR(st_mode)' and `string' matches FORMAT_UUID_T, decode a
+ *      UUID and make use of `device_lookup_bypartuuid'.
  *  #4: if `st_mode != 0', do `sscanf(string, "%u:%u")' for a major/minor
  *      pair, construct a dev_t, and pass to `device_lookup_bydev()', and
  *      re-return if non-NULL

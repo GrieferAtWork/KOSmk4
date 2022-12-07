@@ -3214,7 +3214,6 @@
 #define __CRT_HAVE_group_member
 #define __CRT_HAVE_gsignal
 #define __CRT_HAVE_gtty
-#define __CRT_HAVE_guid_fromstr
 #define __CRT_HAVE_hasmntopt
 #define __CRT_HAVE_hcreate
 #define __CRT_HAVE_hcreate_r
@@ -5787,6 +5786,7 @@
 #define __CRT_HAVE_utmpxname
 #define __CRT_HAVE_uucopy
 #define __CRT_HAVE_uucopystr
+#define __CRT_HAVE_uuid_fromstr
 #define __CRT_HAVE_valloc
 #define __CRT_HAVE_vasnprintf
 #define __CRT_HAVE_vasprintf
@@ -8934,7 +8934,6 @@
 #define __CRT_HAVE_KOS$group_member
 #define __CRT_HAVE_KOS$gsignal
 #define __CRT_HAVE_KOS$gtty
-#define __CRT_HAVE_KOS$guid_fromstr
 #define __CRT_HAVE_KOS$hasmntopt
 #define __CRT_HAVE_KOS$hcreate
 #define __CRT_HAVE_KOS$hcreate_r
@@ -10493,6 +10492,7 @@
 #define __CRT_HAVE_KOS$utmpxname
 #define __CRT_HAVE_KOS$uucopy
 #define __CRT_HAVE_KOS$uucopystr
+#define __CRT_HAVE_KOS$uuid_fromstr
 #define __CRT_HAVE_KOS$valloc
 #define __CRT_HAVE_KOS$vasnprintf
 #define __CRT_HAVE_KOS$vasprintf
@@ -13561,7 +13561,6 @@
 #define __CRT_HAVE_DOS$group_member
 #define __CRT_HAVE_DOS$gsignal
 #define __CRT_HAVE_DOS$gtty
-#define __CRT_HAVE_DOS$guid_fromstr
 #define __CRT_HAVE_DOS$hasmntopt
 #define __CRT_HAVE_DOS$hcreate
 #define __CRT_HAVE_DOS$hcreate_r
@@ -15120,6 +15119,7 @@
 #define __CRT_HAVE_DOS$utmpxname
 #define __CRT_HAVE_DOS$uucopy
 #define __CRT_HAVE_DOS$uucopystr
+#define __CRT_HAVE_DOS$uuid_fromstr
 #define __CRT_HAVE_DOS$valloc
 #define __CRT_HAVE_DOS$vasnprintf
 #define __CRT_HAVE_DOS$vasprintf

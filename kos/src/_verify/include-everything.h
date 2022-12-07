@@ -680,7 +680,6 @@ incdir("");
 #include <kos/bits/exception_nest.h>
 #include <kos/bits/fastexcept.h>
 #include <kos/bits/futex-expr.h>
-#include <kos/bits/guid.h>
 #include <kos/bits/lockop.h>
 #include <kos/bits/nopf.h>
 #include <kos/bits/rpc.h>
@@ -694,6 +693,7 @@ incdir("");
 #include <kos/bits/ukern-struct.h>
 #include <kos/bits/ukern.h>
 #include <kos/bits/userprocmask.h>
+#include <kos/bits/uuid.h>
 #include <kos/capability.h>
 #include <kos/compat/linux-dirent.h>
 #include <kos/compat/linux-dirent64.h>
@@ -738,7 +738,6 @@ incdir("");
 #include <kos/fcntl.h>
 #include <kos/futex.h>
 #include <kos/futexexpr.h>
-#include <kos/guid.h>
 #include <kos/hybrid/heap.h>
 #include <kos/hybrid/sched-signal.h>
 #include <kos/io.h>
@@ -809,6 +808,7 @@ incdir("");
 #include <kos/types.h>
 #include <kos/ukern.h>
 #include <kos/unistd.h>
+#include <kos/uuid.h>
 #include <langinfo.h>
 #include <lastlog.h>
 #include <libansitty/ansitty.h>

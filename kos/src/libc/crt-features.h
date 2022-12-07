@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a023f33 */
+/* HASH CRC-32:0xb7fa6abc */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1984,7 +1984,6 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$gtty
-#define __CRT_HAVE_DOS$guid_fromstr
 #define __CRT_HAVE_DOS$hasmntopt
 #define __CRT_HAVE_DOS$hcreate
 #define __CRT_HAVE_DOS$hcreate_r
@@ -3746,6 +3745,7 @@
 #define __CRT_HAVE_DOS$utmpxname
 #define __CRT_HAVE_DOS$uucopy
 #define __CRT_HAVE_DOS$uucopystr
+#define __CRT_HAVE_DOS$uuid_fromstr
 #define __CRT_HAVE_DOS$valloc
 #define __CRT_HAVE_DOS$vasnprintf
 #define __CRT_HAVE_DOS$vasprintf
@@ -6311,9 +6311,6 @@
 #define __CRT_HAVE_group_member
 #define __CRT_HAVE_gsignal
 #define __CRT_HAVE_gtty
-#endif /* !__KERNEL__ */
-#define __CRT_HAVE_guid_fromstr
-#ifndef __KERNEL__
 #define __CRT_HAVE_hasmntopt
 #define __CRT_HAVE_hcreate
 #define __CRT_HAVE_hcreate_r
@@ -8196,6 +8193,9 @@
 #define __CRT_HAVE_utmpxname
 #define __CRT_HAVE_uucopy
 #define __CRT_HAVE_uucopystr
+#endif /* !__KERNEL__ */
+#define __CRT_HAVE_uuid_fromstr
+#ifndef __KERNEL__
 #define __CRT_HAVE_valloc
 #define __CRT_HAVE_vasnprintf
 #define __CRT_HAVE_vasprintf

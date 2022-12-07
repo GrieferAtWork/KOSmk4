@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a34335f */
+/* HASH CRC-32:0x8bb8f604 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,14 +18,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_guid_fromstr_defined
-#define __local_guid_fromstr_defined
+#ifndef __local_uuid_fromstr_defined
+#define __local_uuid_fromstr_defined
 #include <__crt.h>
-#include <kos/bits/guid.h>
+#include <kos/bits/uuid.h>
 #include <libc/template/hex.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(guid_fromstr) __ATTR_IN(1) __ATTR_OUT(2) char const *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(guid_fromstr))(char const __string[__GUID_STRLEN], __guid_t *__restrict __result) {
+__LOCAL_LIBC(uuid_fromstr) __ATTR_IN(1) __ATTR_OUT(2) char const *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(uuid_fromstr))(char const __string[__UUID_STRLEN], __uuid_t *__restrict __result) {
 	unsigned int __i;
 	for (__i = 0; __i < 16; ++__i) {
 		__BYTE_TYPE__ __nibbles[2];
@@ -52,7 +52,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(guid_fromstr))(char const __string[__
 		__nibbles[0] <<= 4;
 		__nibbles[0] |= __nibbles[1];
 
-		/* Write byte to result GUID */
+		/* Write byte to result UUID */
 		((__BYTE_TYPE__ *)__result)[__i] = __nibbles[0];
 	}
 	return __string;
@@ -60,8 +60,8 @@ __inval:
 	return __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_guid_fromstr_defined
-#define __local___localdep_guid_fromstr_defined
-#define __localdep_guid_fromstr __LIBC_LOCAL_NAME(guid_fromstr)
-#endif /* !__local___localdep_guid_fromstr_defined */
-#endif /* !__local_guid_fromstr_defined */
+#ifndef __local___localdep_uuid_fromstr_defined
+#define __local___localdep_uuid_fromstr_defined
+#define __localdep_uuid_fromstr __LIBC_LOCAL_NAME(uuid_fromstr)
+#endif /* !__local___localdep_uuid_fromstr_defined */
+#endif /* !__local_uuid_fromstr_defined */
