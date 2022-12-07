@@ -246,13 +246,13 @@ typedef struct unwind_fde_struct {
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
 typedef __ATTR_NONNULL_T((1, 2, 3)) unwind_errno_t
 __NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_LOAD)(__byte_t const **__restrict __peh_frame_reader,
-                                                __byte_t const *__restrict __eh_frame_end,
+                                                __byte_t const *__eh_frame_end,
                                                 unwind_fde_t *__restrict __result,
                                                 __uint8_t __sizeof_address);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 3)) unwind_errno_t
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_load)(__byte_t const **__restrict __peh_frame_reader,
-                                            __byte_t const *__restrict __eh_frame_end,
+                                            __byte_t const *__eh_frame_end,
                                             unwind_fde_t *__restrict __result,
                                             __uint8_t __sizeof_address);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
@@ -265,15 +265,15 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_load)(__byte_t const **__restrict __peh_fr
  * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `absolute_pc'.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
 typedef __ATTR_NONNULL_T((1, 2, 4)) unwind_errno_t
-__NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_SCAN)(__byte_t const *__restrict __eh_frame_start,
-                                                __byte_t const *__restrict __eh_frame_end,
+__NOTHROW_NCX_T(LIBUNWIND_CC *PUNWIND_FDE_SCAN)(__byte_t const *__eh_frame_start,
+                                                __byte_t const *__eh_frame_end,
                                                 void const *__absolute_pc,
                                                 unwind_fde_t *__restrict __result,
                                                 __uint8_t __sizeof_address);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
 LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4)) unwind_errno_t
-__NOTHROW_NCX(LIBUNWIND_CC unwind_fde_scan)(__byte_t const *__restrict __eh_frame_start,
-                                            __byte_t const *__restrict __eh_frame_end,
+__NOTHROW_NCX(LIBUNWIND_CC unwind_fde_scan)(__byte_t const *__eh_frame_start,
+                                            __byte_t const *__eh_frame_end,
                                             void const *__absolute_pc,
                                             unwind_fde_t *__restrict __result,
                                             __uint8_t __sizeof_address);

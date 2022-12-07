@@ -35,6 +35,8 @@
 #include <asm/cacheline.h>
 #include <asm/pageid.h>
 
+#include <libunwind/asm/features.h> /* LIBUNWIND_HAVE_ARM_EXIDX */
+
 #if defined(__i386__) || defined(__x86_64__)
 #include <kernel/x86/gdt.h>
 #include <kernel/x86/idt.h>
@@ -226,6 +228,29 @@ SECTIONS {
 		PROVIDE_HIDDEN(__kernel_eh_frame_size = ABSOLUTE(ABSOLUTE(__kernel_eh_frame_end) - ABSOLUTE(__kernel_eh_frame_start)));
 	}
 	PROVIDE_HIDDEN(__kernel_sect_eh_frame_size = ABSOLUTE(ABSOLUTE(.) - ABSOLUTE(__kernel_sect_eh_frame_start)));
+
+	/* Special support for ARM unwind information */
+#ifdef LIBUNWIND_HAVE_ARM_EXIDX
+	IP_ALIGN(__SIZEOF_POINTER__);
+	PROVIDE_HIDDEN(__kernel_sect_ARM_exidx_start = ABSOLUTE(.));
+	SECTION(.ARM_exidx) {
+		PROVIDE_HIDDEN(__kernel_ARM_exidx_start = ABSOLUTE(.));
+		KEEP(*(.ARM_exidx))
+		PROVIDE_HIDDEN(__kernel_ARM_exidx_end = ABSOLUTE(.));
+		PROVIDE_HIDDEN(__kernel_ARM_exidx_size = ABSOLUTE(ABSOLUTE(__kernel_ARM_exidx_end) - ABSOLUTE(__kernel_ARM_exidx_start)));
+	}
+	PROVIDE_HIDDEN(__kernel_sect_ARM_exidx_size = ABSOLUTE(ABSOLUTE(.) - ABSOLUTE(__kernel_sect_ARM_exidx_start)));
+
+	IP_ALIGN(__SIZEOF_POINTER__);
+	PROVIDE_HIDDEN(__kernel_sect_ARM_extab_start = ABSOLUTE(.));
+	SECTION(.ARM_extab) {
+		PROVIDE_HIDDEN(__kernel_ARM_extab_start = ABSOLUTE(.));
+		KEEP(*(.ARM_extab))
+		PROVIDE_HIDDEN(__kernel_ARM_extab_end = ABSOLUTE(.));
+		PROVIDE_HIDDEN(__kernel_ARM_extab_size = ABSOLUTE(ABSOLUTE(__kernel_ARM_extab_end) - ABSOLUTE(__kernel_ARM_extab_start)));
+	}
+	PROVIDE_HIDDEN(__kernel_sect_ARM_extab_size = ABSOLUTE(ABSOLUTE(.) - ABSOLUTE(__kernel_sect_ARM_extab_start)));
+#endif /* LIBUNWIND_HAVE_ARM_EXIDX */
 
 	PEROBJECT_SECTION(.pertask, __kernel_pertask, {
 		KEEP(*(.data.pertask.head))

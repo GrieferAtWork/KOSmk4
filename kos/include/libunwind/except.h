@@ -35,6 +35,8 @@
 
 #include <bits/types.h>
 
+#include <libunwind/asm/features.h>
+
 #include "eh_frame.h"
 
 #ifdef __KOS__
@@ -128,7 +130,13 @@ typedef enum {
 	_URC_INSTALL_CONTEXT          = 7, /* During `_UA_CLEANUP_PHASE': The handler was applied. - Resume execution */
 	_URC_CONTINUE_UNWIND          = 8  /* During  `_UA_SEARCH_PHASE': Continue searching in the next frame.
 	                                    * During `_UA_CLEANUP_PHASE': Continue unwinding to the next frame. */
+#ifdef LIBUNWIND_HAVE_UNWIND_VRS
+	,
+	_URC_OK      = _URC_NO_REASON, /* ARM-specific alias */
+	_URC_FAILURE = 9               /* unspecified failure of some kind */
+#endif /* LIBUNWIND_HAVE_UNWIND_VRS */
 } _Unwind_Reason_Code;
+
 
 typedef int _Unwind_Action; /* Set of `_UA_*' */
 #define _UA_SEARCH_PHASE  1   /* First phase: Search for a handler */
@@ -142,12 +150,80 @@ typedef __uintptr_t _Unwind_Word;            /* Unsigned unwind data-word */
 typedef __intptr_t  _Unwind_Sword;           /* Signed unwind data-word */
 typedef __uintptr_t _Unwind_Ptr;             /* Unwind pointer */
 typedef __uintptr_t _Unwind_Internal_Ptr;    /* Unwind pointer */
-typedef __uint64_t  _Unwind_Exception_Class; /* Unwind exception class (One of `_UEC_*'; may also be some unrecognized value) */
+
+/* Unwind exception class (One of `_UEC_*'; may also be some unrecognized value) */
+#ifdef LIBUNWIND_HAVE_UNWIND_VRS
+typedef char _Unwind_Exception_Class[8];
+#else /* LIBUNWIND_HAVE_UNWIND_VRS */
+typedef __uint64_t _Unwind_Exception_Class;
+#endif /* !LIBUNWIND_HAVE_UNWIND_VRS */
+
 struct _Unwind_Exception;
 typedef __ATTR_NONNULL_T((2)) void
 (__LIBKCALL *_Unwind_Exception_Cleanup_Fn)(_Unwind_Reason_Code __reason /* = _URC_FOREIGN_EXCEPTION_CAUGHT */,
                                            struct _Unwind_Exception *__restrict __exc);
 
+#ifdef LIBUNWIND_HAVE_UNWIND_VRS
+typedef _Unwind_Word _Unwind_EHT_Header;
+
+/* Unwind state (first argument of `_Unwind_Personality_Fn') */
+typedef enum {
+	_US_VIRTUAL_UNWIND_FRAME  = 0,
+	_US_UNWIND_FRAME_STARTING = 1,
+	_US_UNWIND_FRAME_RESUME   = 2,
+	_US_ACTION_MASK           = 3,
+	_US_FORCE_UNWIND          = 8,
+	_US_END_OF_STACK          = 16
+} _Unwind_State;
+
+/* Virtual Register Set*/
+typedef enum {
+	_UVRSC_CORE  = 0, /* integer register */
+	_UVRSC_VFP   = 1, /* vfp */
+	_UVRSC_FPA   = 2, /* fpa */
+	_UVRSC_WMMXD = 3, /* Intel WMMX data register */
+	_UVRSC_WMMXC = 4  /* Intel WMMX control register */
+} _Unwind_VRS_RegClass;
+
+typedef enum {
+	_UVRSD_UINT32 = 0,
+	_UVRSD_VFPX   = 1,
+	_UVRSD_FPAX   = 2,
+	_UVRSD_UINT64 = 3,
+	_UVRSD_FLOAT  = 4,
+	_UVRSD_DOUBLE = 5
+} _Unwind_VRS_DataRepresentation;
+
+typedef enum {
+	_UVRSR_OK              = 0,
+	_UVRSR_NOT_IMPLEMENTED = 1,
+	_UVRSR_FAILED          = 2
+} _Unwind_VRS_Result;
+
+/* Frame unwinding state.  */
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("data")
+#pragma push_macro("next")
+#pragma push_macro("bytes_left")
+#pragma push_macro("words_left")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef data
+#undef next
+#undef bytes_left
+#undef words_left
+typedef struct {
+	_Unwind_Word  data;       /* ??? */
+	_Unwind_Word *next;       /* ??? */
+	__uint8_t     bytes_left; /* ??? */
+	__uint8_t     words_left; /* ??? */
+} __gnu_unwind_state;
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("words_left")
+#pragma pop_macro("bytes_left")
+#pragma pop_macro("next")
+#pragma pop_macro("data")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#endif /* LIBUNWIND_HAVE_UNWIND_VRS */
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("exception_class")
@@ -159,12 +235,42 @@ typedef __ATTR_NONNULL_T((2)) void
 #undef exception_cleanup
 #undef private_1
 #undef private_2
-struct _Unwind_Exception {
+#ifdef LIBUNWIND_HAVE_UNWIND_VRS
+/* NOTE: On ARM/VRS, this structure is aliased as `_Unwind_Control_Block' */
+#define _Unwind_Control_Block _Unwind_Exception
+struct __ATTR_ALIGNED(8) _Unwind_Exception
+#else /* LIBUNWIND_HAVE_UNWIND_VRS */
+struct _Unwind_Exception
+#endif /* !LIBUNWIND_HAVE_UNWIND_VRS */
+{
 	_Unwind_Exception_Class      exception_class;   /* Exception class (one of `_UEC_*') */
 	_Unwind_Exception_Cleanup_Fn exception_cleanup; /* [0..1] Exception cleanup function
 	                                                 * This callback is invoked once the exception has been handled. */
-	_Unwind_Word                 private_1;         /* ... */
-	_Unwind_Word                 private_2;         /* ... */
+#ifdef LIBUNWIND_HAVE_UNWIND_VRS
+	struct {
+		_Unwind_Word reserved1; /* ??? */
+		_Unwind_Word reserved2; /* ??? */
+		_Unwind_Word reserved3; /* ??? */
+		_Unwind_Word reserved4; /* ??? */
+		_Unwind_Word reserved5; /* ??? */
+	} unwinder_cache;
+	struct {
+		_Unwind_Word sp;            /* ??? */
+		_Unwind_Word bitpattern[5]; /* ??? */
+	} barrier_cache;
+	struct {
+		_Unwind_Word bitpattern[4]; /* ??? */
+	} cleanup_cache;
+	struct {
+		_Unwind_Word fnstart;      /* ??? */
+		_Unwind_EHT_Header *ehtp;  /* ??? */
+		_Unwind_Word additional;   /* ??? */
+		_Unwind_Word reserved1;    /* ??? */
+	} pr_cache;
+#else /* LIBUNWIND_HAVE_UNWIND_VRS */
+	_Unwind_Word private_1; /* ... */
+	_Unwind_Word private_2; /* ... */
+#endif /* !LIBUNWIND_HAVE_UNWIND_VRS */
 };
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("private_2")
@@ -176,8 +282,13 @@ struct _Unwind_Exception {
 struct _Unwind_Context /* Opaque structure */
 #ifdef __USE_KOS
 {
-	unwind_fde_t             uc_fde;   /* FDE descriptor. */
 	except_register_state_t *uc_state; /* [1..1] The register state that is loaded when resuming execution. */
+#ifdef LIBUNWIND_HAVE_UNWIND_VRS
+	/* TODO: `.ARM.extab' data (and some way of telling if we're not actually using the `uc_fde'-format) */
+	unwind_fde_t uc_fde; /* FDE descriptor. */
+#else /* LIBUNWIND_HAVE_UNWIND_VRS */
+	unwind_fde_t uc_fde; /* FDE descriptor. */
+#endif /* !LIBUNWIND_HAVE_UNWIND_VRS */
 }
 #endif /* __USE_KOS */
 ;
@@ -195,12 +306,20 @@ typedef _Unwind_Reason_Code
 
 
 /* NOTE: `__gcc_personality_v0' has the prototype `_Unwind_Personality_Fn' */
+#ifdef LIBUNWIND_HAVE_UNWIND_VRS
+typedef __ATTR_NONNULL_T((2, 3)) _Unwind_Reason_Code
+__NOTHROW_NCX_T(__LIBKCALL *_Unwind_Personality_Fn)(_Unwind_State __state,
+                                                    struct _Unwind_Control_Block *__ucb,
+                                                    struct _Unwind_Context *__ctx);
+typedef _Unwind_Personality_Fn personality_routine;
+#else /* LIBUNWIND_HAVE_UNWIND_VRS */
 typedef __ATTR_NONNULL_T((4, 5)) _Unwind_Reason_Code
-(__LIBKCALL *_Unwind_Personality_Fn)(int __version /* = 1 */,
-                                     _Unwind_Action __actions,
-                                     _Unwind_Exception_Class __exception_class,
-                                     struct _Unwind_Exception *__restrict __ue_header,
-                                     struct _Unwind_Context *__restrict __context);
+__NOTHROW_NCX_T(__LIBKCALL *_Unwind_Personality_Fn)(int __version /* = 1 */,
+                                                    _Unwind_Action __actions,
+                                                    _Unwind_Exception_Class __exception_class,
+                                                    struct _Unwind_Exception *__restrict __ue_header,
+                                                    struct _Unwind_Context *__restrict __context);
+#endif /* !LIBUNWIND_HAVE_UNWIND_VRS */
 
 /* TODO: Declare these functions as __LIBKCALL, rather than __LIBCCALL! */
 
@@ -260,6 +379,27 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),_Unwind_Ptr,__NOTHROW_
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,void *,__NOTHROW_NCX,_Unwind_FindEnclosingFunction,(void __KOS_FIXED_CONST *__pc),(__pc))
 #endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_FindEnclosingFunction */
 
+/* arm-specific `_Unwind_VRS_*' API */
+#ifdef LIBUNWIND_HAVE_UNWIND_VRS
+#if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_VRS_Set)
+__CDECLARE(__ATTR_NONNULL((1, 5)),_Unwind_VRS_Result,__NOTHROW_NCX,_Unwind_VRS_Set,(struct _Unwind_Context *__ctx, _Unwind_VRS_RegClass __cls, _Unwind_Word __regno, _Unwind_VRS_DataRepresentation __repr, void /*__KOS_FIXED_CONST*/ *__src),(__ctx,__cls,__regno,__repr,__src))
+#endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_VRS_Set */
+#if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_VRS_Get)
+__CDECLARE(__ATTR_NONNULL((1, 5)),_Unwind_VRS_Result,__NOTHROW_NCX,_Unwind_VRS_Get,(struct _Unwind_Context /*__KOS_FIXED_CONST*/ *__ctx, _Unwind_VRS_RegClass __cls, _Unwind_Word __regno, _Unwind_VRS_DataRepresentation __repr, void *__dst),(__ctx,__cls,__regno,__repr,__dst))
+#endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_VRS_Get */
+#if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_VRS_Pop)
+__CDECLARE(__ATTR_NONNULL((1)),_Unwind_VRS_Result,__NOTHROW_NCX,_Unwind_VRS_Pop,(struct _Unwind_Context *__ctx, _Unwind_VRS_RegClass __cls, _Unwind_Word __regno, _Unwind_VRS_DataRepresentation __repr),(__ctx,__cls,__regno,__repr))
+#endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_VRS_Pop */
+#if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE__Unwind_Complete)
+__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,_Unwind_Complete,(struct _Unwind_Control_Block *__ucbp),(__ucbp))
+#endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE__Unwind_Complete */
+#if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE___gnu_unwind_frame)
+__CDECLARE(__ATTR_NONNULL((1, 2)),_Unwind_Reason_Code,__NOTHROW_NCX,__gnu_unwind_frame,(struct _Unwind_Control_Block *__ucb, struct _Unwind_Context *__ctx),(__ucb,__ctx))
+#endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE___gnu_unwind_frame */
+#if !defined(__CRT_KOS_PRIMARY) || defined(__CRT_HAVE___gnu_unwind_execute)
+__CDECLARE(__ATTR_NONNULL((1, 2)),_Unwind_Reason_Code,__NOTHROW_NCX,__gnu_unwind_execute,(struct _Unwind_Context *__ctx, __gnu_unwind_state *__state),(__ctx,__state))
+#endif /* !__CRT_KOS_PRIMARY || __CRT_HAVE___gnu_unwind_execute */
+#endif /* LIBUNWIND_HAVE_UNWIND_VRS */
 
 __DECL_END
 #endif /* __CC__ */

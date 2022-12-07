@@ -22,6 +22,8 @@
 
 #include <__stdinc.h>
 
+#include <libunwind/asm/features.h> /* LIBUNWIND_HAVE_ARM_EXIDX */
+
 __DECL_BEGIN
 
 /* Format codes for `E_NOT_EXECUTABLE_FAULTY' */
@@ -48,56 +50,60 @@ enum {
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADCLASS = 1,         /* e_ident[EI_CLASS] != ELFCLASS32/64 (as required by the host) */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADORDER,             /* e_ident[EI_DATA] != ELFDATA2LSB/MSB (as required by the host) */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADVERSION,           /* e_ident[EI_VERSION] != EV_CURRENT */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADVERSION2,          /* e_version != EV_CURRENT */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADTYPE,              /* e_type != ET_EXEC (or in the case of a driver: e_type != ET_DYN) */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADMACH,              /* e_machine != EM_* (as required by the host) */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADHEADER,            /* e_ehsize < offsetafter(ElfW(Ehdr), e_phnum) */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOSEGMENTS,           /* e_phnum == 0 */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADSEGMENTS,          /* e_phentsize != sizeof(ElfW(Phdr)) */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSEGMENTS,      /* e_phnum > ... (hard limit imposed by the host; i386/x86_64 uses 64 for this) */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_UNALIGNEDSEGMENT,     /* (p_offset & (getpagesize() - 1)) != (p_vaddr & (getpagesize() - 1)) */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_SEGMENTOVERLAP,       /* Loading of static binary failed due to overlapping segments */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADABI,               /* [unsigned char abi] Unsupported `EI_OSABI' for the indicated architecture */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADABIVERSION,        /* [unsigned char abi, unsigned char abiver] Unsupported `EI_ABIVERSION' for the indicated `EI_OSABI' */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_HEADERS,          /* Only when loading drivers: The program headers pointer is out-of-bounds */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_DYNAMIC,           /* Only when loading drivers: No `PT_DYNAMIC' program header found */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNAMIC,          /* Only when loading drivers: The `PT_DYNAMIC' program header is out-of-bounds */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_SONAME,            /* Only when loading drivers: No `DT_SONAME' or `DT_STRTAB' tag found */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SONAME,           /* Only when loading drivers: The `DT_STRTAB' tag isn't mapped, or the `DT_SONAME' tag is out-of-bounds */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSECTIONS,      /* Only when loading drivers: [ElfW(Half) e_shnum] e_shnum > ... (hard limit imposed by the host; by default, limit is 128) */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHENT,            /* Only when loading drivers: [ElfW(Half) e_shentsize] The `e_shentsize' fields doesn't equal `sizeof(ElfW(Shdr))' */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHSTRNDX,         /* Only when loading drivers: [ElfW(Half) e_shstrndx, ElfW(Half) e_shnum] The `e_shstrndx' field of the header is out-of-bounds */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHOFF,            /* Only when loading drivers: [uintptr_t e_shoff, size_t e_shnum, size_t image_size] The `e_shoff' / `e_shnum' fields of the header are out-of-bounds */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOBITS_SHSTRTAB,      /* Only when loading drivers: [ElfW(Half) e_shstrndx] The `.shstrtab' section header has a type `SHT_NOBITS' */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHSTRTAB,         /* Only when loading drivers: [uintptr_t sh_offset, size_t sh_size, size_t image_size] The `.shstrtab' section header points out-of-bounds */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_VADDR,       /* Only when loading drivers: [uintptr_t p_vaddr, size_t p_memsz] The virtual address bounds of a program header overflow */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_ALIGN,       /* Only when loading drivers: [size_t min_alignment] The alignment requirement of a program header isn't a power-of-2 */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_OFFSET,      /* Only when loading drivers: [ElfW(Off) p_offset, size_t p_filesz] Bad program header file-offset/size. */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_FSIZE,       /* Only when loading drivers: [size_t p_filesz, size_t p_memsz] Bad file-/mem-size interaction. */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NALLOC_EH_FRAME,      /* Only when loading drivers: [ElfW(Half) shndx] The `.eh_frame' section doesn't have the `SHF_ALLOC' flag set. */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_EH_FRAME,         /* Only when loading drivers: [uintptr_t sh_addr, size_t sh_size] The `.eh_frame' section address points out-of-bounds */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSTR,           /* Only when loading drivers: [uintptr_t tagval] The `DT_STRTAB' tag is mapped out-of-bounds */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMHASH,          /* Only when loading drivers: [uintptr_t tagval] The `DT_HASH' tag is mapped out-of-bounds */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_GNUSYMHASH,       /* Only when loading drivers: [uintptr_t tagval] The `DT_GNU_HASH' tag is mapped out-of-bounds */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSYM,           /* Only when loading drivers: [uintptr_t tagval] The `DT_DYNSYM' tag is mapped out-of-bounds */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMENT,           /* Only when loading drivers: [uintptr_t tagval] The `DT_SYMENT' tag contains an invalid value */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELAENT,          /* Only when loading drivers: [uintptr_t tagval] The `DT_RELAENT' tag contains an invalid value */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELENT,           /* Only when loading drivers: [uintptr_t tagval] The `DT_RELENT' tag contains an invalid value */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_INIT_FUNC,        /* Only when loading drivers: [intptr_t reladdr] A constructor callback is located out-of-bounds */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_NEEDED,           /* Only when loading drivers: [size_t depid] Bad dependency (either an index miss-match, or a bad filename) */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMBOL,           /* Only when loading drivers: [uintptr_t symid] Bad symbol index (symbol index is out-of-bounds) */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMNAME,          /* Only when loading drivers: [uintptr_t st_name] Bad symbol name (symbol name is out-of-bounds) */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_SYMBOL,            /* Only when loading drivers: [uintptr_t st_name] Relocation against unknown symbol (s.a. system log) */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_ARGCASH_X_BAD_NIBBLE, /* Only when loading drivers: Incomplete hex-nibble in hex-based arg$ driver argument. */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_ARGCASH_X_TOO_LONG,   /* Only when loading drivers: [size_t req_bytes, size_t given_bytes] Value of hex-based arg$ argument too long. */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_ARGCASH_D_ECANCELED,  /* Only when loading drivers: strtoimax_r() returned `ECANCELED' when parsing an integer argument. */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_ARGCASH_D_ERANGE,     /* Only when loading drivers: strtoimax_r() returned `ERANGE' when parsing an integer argument. */
-	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_ARGCASH_D_EINVAL,     /* Only when loading drivers: strtoimax_r() returned `EINVAL' when parsing an integer argument. */
-	E_NOT_EXECUTABLE_FAULTY_REASON_SHEBANG_NO_INTERP = 1024, /* No interpreter given (script file starts with #!, but no filename found) */
-	E_NOT_EXECUTABLE_FAULTY_REASON_SHEBANG_TRUNC,            /* Total length of the #!-line is too long */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADCLASS = 1,            /* e_ident[EI_CLASS] != ELFCLASS32/64 (as required by the host) */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADORDER,                /* e_ident[EI_DATA] != ELFDATA2LSB/MSB (as required by the host) */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADVERSION,              /* e_ident[EI_VERSION] != EV_CURRENT */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADVERSION2,             /* e_version != EV_CURRENT */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADTYPE,                 /* e_type != ET_EXEC (or in the case of a driver: e_type != ET_DYN) */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADMACH,                 /* e_machine != EM_* (as required by the host) */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADHEADER,               /* e_ehsize < offsetafter(ElfW(Ehdr), e_phnum) */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOSEGMENTS,              /* e_phnum == 0 */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADSEGMENTS,             /* e_phentsize != sizeof(ElfW(Phdr)) */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSEGMENTS,         /* e_phnum > ... (hard limit imposed by the host; i386/x86_64 uses 64 for this) */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_UNALIGNEDSEGMENT,        /* (p_offset & (getpagesize() - 1)) != (p_vaddr & (getpagesize() - 1)) */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_SEGMENTOVERLAP,          /* Loading of static binary failed due to overlapping segments */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADABI,                  /* [unsigned char abi] Unsupported `EI_OSABI' for the indicated architecture */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADABIVERSION,           /* [unsigned char abi, unsigned char abiver] Unsupported `EI_ABIVERSION' for the indicated `EI_OSABI' */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_HEADERS,             /* Only when loading drivers: The program headers pointer is out-of-bounds */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_DYNAMIC,              /* Only when loading drivers: No `PT_DYNAMIC' program header found */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNAMIC,             /* Only when loading drivers: The `PT_DYNAMIC' program header is out-of-bounds */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_SONAME,               /* Only when loading drivers: No `DT_SONAME' or `DT_STRTAB' tag found */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SONAME,              /* Only when loading drivers: The `DT_STRTAB' tag isn't mapped, or the `DT_SONAME' tag is out-of-bounds */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_TOOMANYSECTIONS,         /* Only when loading drivers: [ElfW(Half) e_shnum] e_shnum > ... (hard limit imposed by the host; by default, limit is 128) */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHENT,               /* Only when loading drivers: [ElfW(Half) e_shentsize] The `e_shentsize' fields doesn't equal `sizeof(ElfW(Shdr))' */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHSTRNDX,            /* Only when loading drivers: [ElfW(Half) e_shstrndx, ElfW(Half) e_shnum] The `e_shstrndx' field of the header is out-of-bounds */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHOFF,               /* Only when loading drivers: [uintptr_t e_shoff, size_t e_shnum, size_t image_size] The `e_shoff' / `e_shnum' fields of the header are out-of-bounds */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NOBITS_SHSTRTAB,         /* Only when loading drivers: [ElfW(Half) e_shstrndx] The `.shstrtab' section header has a type `SHT_NOBITS' */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SHSTRTAB,            /* Only when loading drivers: [uintptr_t sh_offset, size_t sh_size, size_t image_size] The `.shstrtab' section header points out-of-bounds */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_VADDR,          /* Only when loading drivers: [uintptr_t p_vaddr, size_t p_memsz] The virtual address bounds of a program header overflow */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_ALIGN,          /* Only when loading drivers: [size_t min_alignment] The alignment requirement of a program header isn't a power-of-2 */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_OFFSET,         /* Only when loading drivers: [ElfW(Off) p_offset, size_t p_filesz] Bad program header file-offset/size. */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_PHDR_FSIZE,          /* Only when loading drivers: [size_t p_filesz, size_t p_memsz] Bad file-/mem-size interaction. */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NALLOC_EH_FRAME,         /* Only when loading drivers: [ElfW(Half) shndx] The `.eh_frame' section doesn't have the `SHF_ALLOC' flag set. */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_EH_FRAME,            /* Only when loading drivers: [uintptr_t sh_addr, size_t sh_size] The `.eh_frame' section address points out-of-bounds */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSTR,              /* Only when loading drivers: [uintptr_t tagval] The `DT_STRTAB' tag is mapped out-of-bounds */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMHASH,             /* Only when loading drivers: [uintptr_t tagval] The `DT_HASH' tag is mapped out-of-bounds */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_GNUSYMHASH,          /* Only when loading drivers: [uintptr_t tagval] The `DT_GNU_HASH' tag is mapped out-of-bounds */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_DYNSYM,              /* Only when loading drivers: [uintptr_t tagval] The `DT_DYNSYM' tag is mapped out-of-bounds */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMENT,              /* Only when loading drivers: [uintptr_t tagval] The `DT_SYMENT' tag contains an invalid value */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELAENT,             /* Only when loading drivers: [uintptr_t tagval] The `DT_RELAENT' tag contains an invalid value */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_RELENT,              /* Only when loading drivers: [uintptr_t tagval] The `DT_RELENT' tag contains an invalid value */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_INIT_FUNC,           /* Only when loading drivers: [intptr_t reladdr] A constructor callback is located out-of-bounds */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_NEEDED,              /* Only when loading drivers: [size_t depid] Bad dependency (either an index miss-match, or a bad filename) */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMBOL,              /* Only when loading drivers: [uintptr_t symid] Bad symbol index (symbol index is out-of-bounds) */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_SYMNAME,             /* Only when loading drivers: [uintptr_t st_name] Bad symbol name (symbol name is out-of-bounds) */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NO_SYMBOL,               /* Only when loading drivers: [uintptr_t st_name] Relocation against unknown symbol (s.a. system log) */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_ARGCASH_X_BAD_NIBBLE,    /* Only when loading drivers: Incomplete hex-nibble in hex-based arg$ driver argument. */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_ARGCASH_X_TOO_LONG,      /* Only when loading drivers: [size_t req_bytes, size_t given_bytes] Value of hex-based arg$ argument too long. */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_ARGCASH_D_ECANCELED,     /* Only when loading drivers: strtoimax_r() returned `ECANCELED' when parsing an integer argument. */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_ARGCASH_D_ERANGE,        /* Only when loading drivers: strtoimax_r() returned `ERANGE' when parsing an integer argument. */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_ARGCASH_D_EINVAL,        /* Only when loading drivers: strtoimax_r() returned `EINVAL' when parsing an integer argument. */
+	E_NOT_EXECUTABLE_FAULTY_REASON_SHEBANG_NO_INTERP = 1024,    /* No interpreter given (script file starts with #!, but no filename found) */
+	E_NOT_EXECUTABLE_FAULTY_REASON_SHEBANG_TRUNC,               /* Total length of the #!-line is too long */
+#ifdef LIBUNWIND_HAVE_ARM_EXIDX
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NALLOC_ARM_EXIDX = 4096, /* Only when loading drivers: [ElfW(Half) shndx] The `.ARM.exidx' section doesn't have the `SHF_ALLOC' flag set. */
+	E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_ARM_EXIDX,           /* Only when loading drivers: [uintptr_t p_vaddr/sh_addr, size_t p_memsz/sh_size] The `.ARM.exidx' section address points out-of-bounds */
+#endif /* LIBUNWIND_HAVE_ARM_EXIDX */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -152,6 +158,10 @@ enum {
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_ARGCASH_D_EINVAL     E_NOT_EXECUTABLE_FAULTY_REASON_ELF_ARGCASH_D_EINVAL     /* Only when loading drivers: strtoimax_r() returned `EINVAL' when parsing an integer argument. */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_SHEBANG_NO_INTERP        E_NOT_EXECUTABLE_FAULTY_REASON_SHEBANG_NO_INTERP        /* No interpreter given (script file starts with #!, but no filename found) */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_SHEBANG_TRUNC            E_NOT_EXECUTABLE_FAULTY_REASON_SHEBANG_TRUNC            /* Total length of the #!-line is too long */
+#ifdef LIBUNWIND_HAVE_ARM_EXIDX
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NALLOC_ARM_EXIDX     E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NALLOC_ARM_EXIDX     /* Only when loading drivers: [ElfW(Half) shndx] The `.ARM.exidx' section doesn't have the `SHF_ALLOC' flag set. */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_ARM_EXIDX        E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_ARM_EXIDX        /* Only when loading drivers: [uintptr_t p_vaddr/sh_addr, size_t p_memsz/sh_size] The `.ARM.exidx' section address points out-of-bounds */
+#endif /* LIBUNWIND_HAVE_ARM_EXIDX */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADCLASS             1    /* e_ident[EI_CLASS] != ELFCLASS32/64 (as required by the host) */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BADORDER             2    /* e_ident[EI_DATA] != ELFDATA2LSB/MSB (as required by the host) */
@@ -203,6 +213,10 @@ enum {
 #define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_ARGCASH_D_EINVAL     48   /* Only when loading drivers: strtoimax_r() returned `EINVAL' when parsing an integer argument. */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_SHEBANG_NO_INTERP        1024 /* No interpreter given (script file starts with #!, but no filename found) */
 #define E_NOT_EXECUTABLE_FAULTY_REASON_SHEBANG_TRUNC            1025 /* Total length of the #!-line is too long */
+#ifdef LIBUNWIND_HAVE_ARM_EXIDX
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NALLOC_ARM_EXIDX     4096 /* Only when loading drivers: [ElfW(Half) shndx] The `.ARM.exidx' section doesn't have the `SHF_ALLOC' flag set. */
+#define E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_ARM_EXIDX        4097 /* Only when loading drivers: [uintptr_t p_vaddr/sh_addr, size_t p_memsz/sh_size] The `.ARM.exidx' section address points out-of-bounds */
+#endif /* LIBUNWIND_HAVE_ARM_EXIDX */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

@@ -37,8 +37,8 @@ DECL_BEGIN
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
 INTDEF NONNULL((1, 2, 3, 4)) unwind_errno_t
 NOTHROW_NCX(CC libdi_unwind_fde_load_df)(byte_t const **__restrict pdebug_frame_reader,
-                                         byte_t const *__restrict debug_frame_start,
-                                         byte_t const *__restrict debug_frame_end,
+                                         byte_t const *debug_frame_start,
+                                         byte_t const *debug_frame_end,
                                          unwind_fde_t *__restrict result,
                                          uint8_t sizeof_address);
 
@@ -49,8 +49,8 @@ NOTHROW_NCX(CC libdi_unwind_fde_load_df)(byte_t const **__restrict pdebug_frame_
  * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `absolute_pc'.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
 INTDEF NONNULL((1, 2, 4)) unwind_errno_t
-NOTHROW_NCX(CC libdi_unwind_fde_scan_df)(byte_t const *__restrict debug_frame_start,
-                                         byte_t const *__restrict debug_frame_end,
+NOTHROW_NCX(CC libdi_unwind_fde_scan_df)(byte_t const *debug_frame_start,
+                                         byte_t const *debug_frame_end,
                                          void const *absolute_pc,
                                          unwind_fde_t *__restrict result,
                                          uint8_t sizeof_address);

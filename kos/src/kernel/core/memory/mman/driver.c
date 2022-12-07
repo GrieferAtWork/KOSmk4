@@ -623,6 +623,10 @@ extern byte_t __kernel_free_start[];
 extern byte_t __kernel_free_size[];
 extern byte_t __kernel_eh_frame_start[];
 extern byte_t __kernel_eh_frame_end[];
+#ifdef LIBUNWIND_HAVE_ARM_EXIDX
+extern byte_t __kernel_ARM_exidx_start[];
+extern byte_t __kernel_ARM_exidx_end[];
+#endif /* LIBUNWIND_HAVE_ARM_EXIDX */
 
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL driver_free_)(struct driver *__restrict self) ASMNAME("driver_free");
@@ -751,6 +755,10 @@ PUBLIC struct driver kernel_driver = {
 	.d_eh_frame_end        = __kernel_eh_frame_end,
 	.d_eh_frame_cache      = NULL,
 	.d_eh_frame_cache_lock = ATOMIC_RWLOCK_INIT,
+#ifdef LIBUNWIND_HAVE_ARM_EXIDX
+	.d_ARM_exidx_start     = __kernel_ARM_exidx_start,
+	.d_ARM_exidx_end       = __kernel_ARM_exidx_end,
+#endif /* LIBUNWIND_HAVE_ARM_EXIDX */
 	.d_phnum               = 2,
 	.d_phdr                = {
 		/* [0] = */ ELFW(PHDR_INIT)(
@@ -4054,6 +4062,10 @@ NOTHROW(FCALL driver_destroy)(struct driver *__restrict self) {
 	DBG_memset(&self->_d_initthread, 0xcc, sizeof(self->_d_initthread));
 	DBG_memset(&self->d_phdr, 0xcc, self->d_phnum * sizeof(ElfW(Phdr)));
 	DBG_memset(&self->d_phnum, 0xcc, sizeof(self->d_phnum));
+#ifdef LIBUNWIND_HAVE_ARM_EXIDX
+	DBG_memset(&self->d_ARM_exidx_start, 0xcc, sizeof(self->d_ARM_exidx_start));
+	DBG_memset(&self->d_ARM_exidx_end, 0xcc, sizeof(self->d_ARM_exidx_end));
+#endif /* LIBUNWIND_HAVE_ARM_EXIDX */
 
 	/* Try to remove `self' from the current `drivers'. And if
 	 * that's not possible, set `loaded_drivers_contains_dead'
@@ -4451,6 +4463,10 @@ NOTHROW(FCALL image_read_nopf)(struct driver *__restrict self,
  * >> char const               *d_name;
  * >> byte_t const             *d_eh_frame_start;
  * >> byte_t const             *d_eh_frame_end;
+ * >> #ifdef LIBUNWIND_HAVE_ARM_EXIDX
+ * >> byte_t const             *d_ARM_exidx_start;
+ * >> byte_t const             *d_ARM_exidx_end;
+ * >> #endif // LIBUNWIND_HAVE_ARM_EXIDX
  * >> size_t                    d_dyncnt;
  * >> ElfW(Dyn) const          *d_dynhdr;
  * >> ElfW(Sym) const          *d_dynsym_tab;
@@ -4773,6 +4789,60 @@ got_dynsym_size:
 		}
 		break;
 	}
+
+	/* Locate this driver's `.ARM.exidx' section. */
+#ifdef LIBUNWIND_HAVE_ARM_EXIDX
+	self->d_ARM_exidx_start = NULL;
+	self->d_ARM_exidx_end   = NULL;
+	for (i = 0; i < self->d_phnum; ++i) {
+		if (self->d_phdr[i].p_type == PT_ARM_EXIDX) {
+			self->d_ARM_exidx_start = (byte_t const *)(self->d_module.md_loadaddr + self->d_phdr[i].p_vaddr);
+			self->d_ARM_exidx_end   = self->d_ARM_exidx_start + self->d_phdr[i].p_memsz;
+			if unlikely(self->d_ARM_exidx_start > self->d_ARM_exidx_end ||
+			            self->d_ARM_exidx_start < self->d_module.md_loadmin ||
+			            self->d_ARM_exidx_end > (self->d_module.md_loadmax + 1)) {
+				reasons[0] = self->d_phdr[i].p_vaddr;
+				reasons[1] = self->d_phdr[i].p_memsz;
+				return E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_EH_FRAME;
+			}
+			goto got_ARM_exidx;
+		}
+	}
+	/* Just in case its program-header is missing, also search for a section _named_ ".ARM.exidx" */
+	for (i = 0; i < self->d_shnum; ++i) {
+#define ARM_EXIDX_SECTION_NAME ".ARM.exidx"
+		char namebuf[sizeof(ARM_EXIDX_SECTION_NAME)];
+		if unlikely(self->d_shdr[i].sh_name >= self->d_shstrsiz)
+			continue;
+		if (memcpy_nopf(namebuf, self->d_shstrtab + self->d_shdr[i].sh_name, sizeof(namebuf)) != 0)
+			continue;
+		if (bcmp(namebuf, ARM_EXIDX_SECTION_NAME, sizeof(ARM_EXIDX_SECTION_NAME)) != 0)
+			continue;
+#undef ARM_EXIDX_SECTION_NAME
+		/* Found the `.ARM.exidx' section! */
+
+		/* Make sure that `.ARM.exidx' has the SHF_ALLOC flag set! */
+		if unlikely(!(self->d_shdr[i].sh_flags & SHF_ALLOC)) {
+			reasons[0] = i;
+			return E_NOT_EXECUTABLE_FAULTY_REASON_ELF_NALLOC_ARM_EXIDX;
+		}
+
+		/* Set `.ARM.exidx' section pointers. */
+		self->d_ARM_exidx_start = (byte_t const *)(self->d_module.md_loadaddr + self->d_shdr[i].sh_addr);
+		self->d_ARM_exidx_end   = self->d_ARM_exidx_start + self->d_shdr[i].sh_size;
+		if unlikely(self->d_ARM_exidx_start > self->d_ARM_exidx_end ||
+		            self->d_ARM_exidx_start < self->d_module.md_loadmin ||
+		            self->d_ARM_exidx_end > (self->d_module.md_loadmax + 1)) {
+			reasons[0] = self->d_shdr[i].sh_addr;
+			reasons[1] = self->d_shdr[i].sh_size;
+			return E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_ARM_EXIDX;
+		}
+		goto got_ARM_exidx;
+	}
+
+got_ARM_exidx:
+#endif /* LIBUNWIND_HAVE_ARM_EXIDX */
+
 	return 0;
 }
 
@@ -5290,6 +5360,10 @@ again_acquire_mman_lock:
 					 * >> char const               *d_name;
 					 * >> byte_t const             *d_eh_frame_start;
 					 * >> byte_t const             *d_eh_frame_end;
+					 * >> #ifdef LIBUNWIND_HAVE_ARM_EXIDX
+					 * >> byte_t const             *d_ARM_exidx_start;
+					 * >> byte_t const             *d_ARM_exidx_end;
+					 * >> #endif // LIBUNWIND_HAVE_ARM_EXIDX
 					 * >> size_t                    d_dyncnt;
 					 * >> ElfW(Dyn) const          *d_dynhdr;
 					 * >> ElfW(Sym) const          *d_dynsym_tab;

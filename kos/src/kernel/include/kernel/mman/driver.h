@@ -32,6 +32,7 @@
 #include <kos/aref.h>
 #include <kos/exec/elf.h>
 
+#include <libunwind/asm/features.h> /* LIBUNWIND_HAVE_ARM_EXIDX */
 #include <libunwind/errno.h>
 
 #ifdef __WANT_DRIVER__d_internals
@@ -419,6 +420,10 @@ struct driver
 #else /* __WANT_DRIVER__d_internals */
 	void                          *_d_intern2[3]; /* Used internally */
 #endif /* !__WANT_DRIVER__d_internals */
+#ifdef LIBUNWIND_HAVE_ARM_EXIDX
+	byte_t const                  *d_ARM_exidx_start; /* [0..1][<= d_ARM_exidx_end][const] Starting pointer for the `.ARM.exidx' section */
+	byte_t const                  *d_ARM_exidx_end;   /* [0..1][>= d_ARM_exidx_start][const] Ending pointer for the `.ARM.exidx' section */
+#endif /* LIBUNWIND_HAVE_ARM_EXIDX */
 
 	/* Driver program headers */
 	ElfW(Half)                     d_phnum;      /* [!0][const] (Max) number of program headers. */
@@ -504,6 +509,10 @@ DATDEF struct driver_section kernel_section_text;
 DATDEF struct driver_section kernel_section_rodata;
 DATDEF struct driver_section kernel_section_gcc_except_table;
 DATDEF struct driver_section kernel_section_eh_frame;
+#ifdef LIBUNWIND_HAVE_ARM_EXIDX
+DATDEF struct driver_section kernel_section_ARM_exidx;
+DATDEF struct driver_section kernel_section_ARM_extab;
+#endif /* LIBUNWIND_HAVE_ARM_EXIDX */
 DATDEF struct driver_section kernel_section_data;
 DATDEF struct driver_section kernel_section_bss;
 #ifdef CONFIG_HAVE_KERNEL_DEBUGGER

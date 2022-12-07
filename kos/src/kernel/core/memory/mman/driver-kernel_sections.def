@@ -21,6 +21,10 @@
 #error "Must #define INTERN_SECTION(name, type, flags, start, size, entsize, link, info) before #including this file"
 #endif /* !INTERN_SECTION */
 
+#include <debugger/config.h>
+
+#include <libunwind/asm/features.h>
+
 #ifndef EXPORT_SECTION
 #define EXPORT_SECTION(export_name, name, type, flags, start, size, entsize, link, info) \
 	INTERN_SECTION(export_name, name, type, flags, start, size, entsize, link, info)
@@ -66,6 +70,12 @@ INTDEF byte_t __kernel_sect_bss_size[];
 INTDEF byte_t __kernel_sect_dbg_hooks_start[];
 INTDEF byte_t __kernel_sect_dbg_hooks_size[];
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
+#ifdef LIBUNWIND_HAVE_ARM_EXIDX
+INTDEF byte_t __kernel_sect_ARM_exidx_start[];
+INTDEF byte_t __kernel_sect_ARM_exidx_size[];
+INTDEF byte_t __kernel_sect_ARM_extab_start[];
+INTDEF byte_t __kernel_sect_ARM_extab_size[];
+#endif /* LIBUNWIND_HAVE_ARM_EXIDX */
 #endif /* !SECTION_GLOBALS_DEFINED */
 
 EXPORT_SECTION(kernel_section_text, ".text", SHT_PROGBITS, SHF_ALLOC | SHF_EXECINSTR, __kernel_sect_text_start, __kernel_sect_text_size, 0, 0, 0)
@@ -75,6 +85,10 @@ EXPORT_SECTION(kernel_section_dbg_hooks, ".dbg.hooks", SHT_PROGBITS, SHF_ALLOC, 
 #endif /* CONFIG_HAVE_KERNEL_DEBUGGER */
 EXPORT_SECTION(kernel_section_gcc_except_table, ".gcc_except_table", SHT_PROGBITS, SHF_ALLOC, __kernel_sect_gcc_except_table_start, __kernel_sect_gcc_except_table_size, 0, 0, 0)
 EXPORT_SECTION(kernel_section_eh_frame, ".eh_frame", SHT_PROGBITS, SHF_ALLOC, __kernel_sect_eh_frame_start, __kernel_sect_eh_frame_size, 0, 0, 0)
+#ifdef LIBUNWIND_HAVE_ARM_EXIDX
+EXPORT_SECTION(kernel_section_ARM_exidx, ".ARM.exidx", SHT_ARM_EXIDX, SHF_ALLOC, __kernel_sect_ARM_exidx_start, __kernel_sect_ARM_exidx_size, 0, 0, 0)
+EXPORT_SECTION(kernel_section_ARM_extab, ".ARM.extab", SHT_PROGBITS, SHF_ALLOC, __kernel_sect_ARM_extab_start, __kernel_sect_ARM_extab_size, 0, 0, 0)
+#endif /* LIBUNWIND_HAVE_ARM_EXIDX */
 INTERN_SECTION(kernel_section_debug_line, ".debug_line", SHT_PROGBITS, SHF_ALLOC | SHF_COMPRESSED, __kernel_debug_line_start, __kernel_debug_line_size, 0, 0, 0)
 INTERN_SECTION(kernel_section_debug_info, ".debug_info", SHT_PROGBITS, SHF_ALLOC | SHF_COMPRESSED, __kernel_debug_info_start, __kernel_debug_info_size, 0, 0, 0)
 INTERN_SECTION(kernel_section_debug_aranges, ".debug_aranges", SHT_PROGBITS, SHF_ALLOC | SHF_COMPRESSED, __kernel_debug_aranges_start, __kernel_debug_aranges_size, 0, 0, 0)
