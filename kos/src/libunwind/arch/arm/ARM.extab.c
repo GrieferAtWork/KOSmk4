@@ -20,6 +20,31 @@
 #ifndef GUARD_LIBUNWIND_ARCH_ARM_ARM_EXTAB_C
 #define GUARD_LIBUNWIND_ARCH_ARM_ARM_EXTAB_C 1
 
+/* Exception ABI functions exported by libc.so */
+#define __CRT_HAVE__Unwind_RaiseException
+#define __CRT_HAVE__Unwind_Resume
+#define __CRT_HAVE__Unwind_Resume_or_Rethrow
+#define __CRT_HAVE__Unwind_DeleteException
+#define __CRT_HAVE__Unwind_GetGR
+#define __CRT_HAVE__Unwind_SetGR
+#define __CRT_HAVE__Unwind_GetIP
+#define __CRT_HAVE__Unwind_SetIP
+#define __CRT_HAVE__Unwind_GetLanguageSpecificData
+#define __CRT_HAVE__Unwind_GetRegionStart
+#define __CRT_HAVE__Unwind_GetIPInfo
+#define __CRT_HAVE__Unwind_ForcedUnwind
+#define __CRT_HAVE__Unwind_Backtrace
+#define __CRT_HAVE__Unwind_GetCFA
+#define __CRT_HAVE__Unwind_GetDataRelBase
+#define __CRT_HAVE__Unwind_GetTextRelBase
+#define __CRT_HAVE__Unwind_FindEnclosingFunction
+#define __CRT_HAVE__Unwind_VRS_Set
+#define __CRT_HAVE__Unwind_VRS_Get
+#define __CRT_HAVE__Unwind_VRS_Pop
+#define __CRT_HAVE__Unwind_Complete
+#define __CRT_HAVE___gnu_unwind_frame
+#define __CRT_HAVE___gnu_unwind_execute
+
 #include "../../api.h"
 /**/
 
@@ -118,6 +143,7 @@ DEFINE_PUBLIC_ALIAS(unwind_ARM_exidx_locate, libuw_unwind_ARM_exidx_locate);
 DEFINE_PUBLIC_ALIAS(__aeabi_unwind_cpp_pr0, libuw___aeabi_unwind_cpp_pr0);
 DEFINE_PUBLIC_ALIAS(__aeabi_unwind_cpp_pr1, libuw___aeabi_unwind_cpp_pr1);
 DEFINE_PUBLIC_ALIAS(__aeabi_unwind_cpp_pr2, libuw___aeabi_unwind_cpp_pr2);
+DEFINE_PUBLIC_ALIAS(__aeabi_unwind_cpp_prN, libuw___aeabi_unwind_cpp_prN);
 
 DECL_END
 
