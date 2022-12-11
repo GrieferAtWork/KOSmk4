@@ -1085,7 +1085,8 @@ function autom8File(filename: string, beforeWriteHook: Callable = none, quiet: b
 
 @@File extensions that should get hashed by autom8
 global final SHOULD_FORMAT_FILE_EXTENSIONS: {string...} = HashSet.Frozen({
-	"h", "hh", "c", "inl", "dee", "sh", "S", "def", "ld", "sources"
+	"h", "hh", "c", "inl", "dee", "sh", "S", "def", "ld", "sources",
+	"ctest"
 });
 
 function autom8FileWithWildcard(filename: string) {

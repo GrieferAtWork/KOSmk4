@@ -121,8 +121,8 @@ DEFINE_PUBLIC_ALIAS(__p__iob, libd___iob_func);   /* For DOS compatibility */
 DEFINE_PUBLIC_ALIAS(__iob_func, libd___iob_func); /* For DOS compatibility */
 INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.dos.FILE.std_files")
 FILE *NOTHROW(LIBDCALL libd___iob_func)(void) {
-	/* DOS doesn't have copy-relocations, we don't have
-	 * to  worry  about   `dlsym("_iob") != &libc_iob'. */
+	/* DOS doesn't  have copy-relocations,  so we  don't
+	 * have to worry about `dlsym("_iob") != &libc_iob'. */
 	return libc_iob;
 }
 
@@ -1812,7 +1812,7 @@ libc_siginfolist_init(char const **list, unsigned int count, signo_t signo) {
 #endif /* !... */
 #define DEFINE_LIBC_SIGINFO_LIST(name, N, signo)                                         \
 	PRIVATE ATTR_SECTION(".bss.crt.solaris") char const *libc_##name[N] = {};            \
-	DEFINE_PUBLIC_IDATA(name, libc_##name##_init, N * __SIZEOF_POINTER__);             \
+	DEFINE_PUBLIC_IDATA(name, libc_##name##_init, N * __SIZEOF_POINTER__);               \
 	INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.solaris")           \
 	char const **LIBCCALL libc_##name##_init(void) {                                     \
 		return libc_siginfolist_init(libc_##name, N, signo);                             \

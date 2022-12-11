@@ -124,9 +124,9 @@ static char const *libdl_symbols[] = {
 
 
 DEFINE_TEST(libdl_builtins) {
-	/* Test that all advertised libdl builtins can be loaded.
+	/* Test that all advertised libdl builtins can be  loaded.
 	 * All symbols are tested (and not just a couple of them),
-	 * because some of them have special code paths used for
+	 * because some of them have  special code paths used  for
 	 * lazy initialization. */
 	unsigned int i;
 	void *libdl = dlgetmodule("dl", DLGETHANDLE_FNORMAL);

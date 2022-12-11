@@ -187,8 +187,8 @@ DEFINE_TEST(ctype) {
 		testw32(ch);
 	}
 
-	/* Lots of code assumes the following, and the standards also say
-	 * that the NUL character isn't considered a space. But just to
+	/* Lots  of code assumes the following, and the standards also say
+	 * that  the NUL character  isn't considered a  space. But just to
 	 * be sure that our implementation gets it right, assert that fact */
 	assert(!isspace((unsigned char)'\0'));
 	assert(!isspace((unsigned char)0));
