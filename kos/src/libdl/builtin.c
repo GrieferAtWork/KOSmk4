@@ -1067,7 +1067,7 @@ got_result:
 }
 
 
-/* >> dladdr(3)
+/* >> dladdr(3D)
  * Query information on the symbol/module associated with a given `address'
  * @param: address: The address to query information about.
  * @param: info:    Output buffer for where to put information.

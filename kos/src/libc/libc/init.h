@@ -31,7 +31,7 @@ DECL_BEGIN
 /* Libc library initializer / finalizer.
  * These  functions are  bound to the  DT_INIT / DT_FINI  tags of libc.so.
  * Since use of __attribute__((constructor)) / __attribute__((destructor))
- * causes the creation  of 1 R_386_RELATIVE  relocation each (even  though
+ * causes the creation of one R_386_RELATIVE relocation each (even  though
  * such a relocation  would have  been completely unnecessary  if ELF  had
  * been designed to specify pointers  apart of .init/.fini to be  relative
  * to the associated module)

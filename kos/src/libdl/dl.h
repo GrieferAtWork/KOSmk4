@@ -404,7 +404,7 @@ NOTHROW(DLFCN_CC libdl_dlgethandle)(void const *static_pointer, unsigned int fla
 INTDEF WUNUSED REF_IF(!(return->dm_flags & RTLD_NODELETE) && (flags & DLGETHANDLE_FINCREF)) DlModule *
 NOTHROW_NCX(DLFCN_CC libdl_dlgetmodule)(USER char const *name, unsigned int flags) THROWS(E_SEGFAULT);
 
-/* >> dladdr(3)
+/* >> dladdr(3D)
  * Query information on the symbol/module associated with a given `address'
  * @param: address: The address to query information about.
  * @param: info:    Output buffer for where to put information.

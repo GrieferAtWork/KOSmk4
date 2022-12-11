@@ -814,7 +814,7 @@ __IMPDEF void *(__DLFCN_VCC dlauxctrl)(void *__handle,
 typedef struct __dl_info_struct Dl_info;
 #endif /* !__Dl_info_defined */
 
-/* >> dladdr(3)
+/* >> dladdr(3D)
  * Query information on the symbol/module associated with a given `address'
  * @param: address: The address to query information about.
  * @param: info:    Output buffer for where to put information.

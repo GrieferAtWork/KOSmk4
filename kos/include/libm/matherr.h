@@ -262,7 +262,7 @@ __LIBM_LOCAL_FUNC(kernel_standard) double
 (__LIBCCALL __kernel_standard)(double __arg1, double __arg2,
                                double __retval, enum __libm_matherr __type) {
 	__COMPILER_IMPURE();
-	/* Sorry, but we only implement `matherr(3)' handling in libc. */
+	/* Sorry, but the `matherr(3)' handling implementation only exists in libc. */
 	(void)__arg1;
 	(void)__arg2;
 	(void)__retval;
@@ -274,7 +274,7 @@ __LIBM_LOCAL_FUNC(kernel_standard_f) float
 (__LIBCCALL __kernel_standard_f)(float __arg1, float __arg2,
                                  float __retval, enum __libm_matherr __type) {
 	__COMPILER_IMPURE();
-	/* Sorry, but we only implement `matherr(3)' handling in libc. */
+	/* Sorry, but the `matherr(3)' handling implementation only exists in libc. */
 	(void)__arg1;
 	(void)__arg2;
 	(void)__retval;
@@ -287,7 +287,7 @@ __LIBM_LOCAL_FUNC(kernel_standard_l) __LONGDOUBLE
 (__LIBCCALL __kernel_standard_l)(__LONGDOUBLE __arg1, __LONGDOUBLE __arg2,
                                  __LONGDOUBLE __retval, enum __libm_matherr __type) {
 	__COMPILER_IMPURE();
-	/* Sorry, but we only implement `matherr(3)' handling in libc. */
+	/* Sorry, but the `matherr(3)' handling implementation only exists in libc. */
 	(void)__arg1;
 	(void)__arg2;
 	(void)__retval;

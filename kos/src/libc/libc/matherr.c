@@ -72,6 +72,7 @@ DECLARE_NOREL_GLOBAL_META(_LIB_VERSION_TYPE, _LIB_VERSION);
 DEFINE_NOREL_GLOBAL_META(_LIB_VERSION_TYPE, _LIB_VERSION, ".math.math");
 #define _LIB_VERSION GET_NOREL_GLOBAL(_LIB_VERSION)
 
+/* This function is referenced by `/kos/include/libm/matherr.h' */
 INTERN ATTR_CONST WUNUSED ATTR_SECTION(".text.crt.math.math") __LIBM_LIB_VERSION_TYPE
 NOTHROW(LIBCCALL libc___LIBM_GET_LIB_VERSION)(void) {
 	return (__LIBM_LIB_VERSION_TYPE)_LIB_VERSION;
@@ -109,7 +110,7 @@ INTERN ATTR_SECTION(".bss.crt.math.math") LPMATHERR libc_pdyn_matherr = NULL;
  * a __attribute__((visibility("default"))) symbol by the  name
  * "matherr", but  doing that  would result  in an  unnecessary
  * runtime relocation (and KOS's  libc is designed to  minimize
- * all such relocations to their bare minima) */
+ * all such relocations to their bare minimum) */
 PRIVATE ATTR_SECTION(".rodata.crt.math.math") char const name_matherr[] = "matherr";
 PRIVATE ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.math.math")
 LPMATHERR NOTHROW(LIBCCALL libc_get_matherr)(void) {
@@ -123,6 +124,7 @@ LPMATHERR NOTHROW(LIBCCALL libc_get_matherr)(void) {
 	}
 	return result;
 }
+
 PRIVATE WUNUSED NONNULL((1)) ATTR_SECTION(".text.crt.math.math") int
 NOTHROW(LIBCCALL libc_call_matherr)(STRUCT_EXCEPTION *__restrict exc) {
 	/* NOTE: If  there ever is a need to  support different ABIs on how `matherr(3)'
@@ -151,9 +153,10 @@ libc_math_funcname_from_pc(void const *return_pc_in_math_function) {
 	result = (char *)info.dli_sname;
 	if unlikely(!result)
 		return (char *)"?"; /* Really shouldn't happen */
+
 	/* Check for case where libdl gave us the "__*" alias for the function.
 	 * Note that we don't have to worry about the "libc_*" alias, since the
-	 * `dladdr()' function we're using  only search .dymsym, which  doesn't
+	 * `dladdr(3D)' function we're using only search .dymsym, which doesn't
 	 * contain INTERN symbols, but only PUBLIC ones. */
 	if (result[0] == '_' && result[1] == '_')
 		result += 2;
@@ -193,7 +196,7 @@ INTDEF double zero ASMNAME("__libc_matherr_zero");
 PRIVATE NONNULL((1)) ATTR_SECTION(".text.crt.math.math") void LIBCCALL
 libc_matherr_writerr(char const *__restrict message) {
 	/* Flush all streams, so our message appears at the very end. */
-	(void)fflush(NULL);
+	(void)flushall();
 
 	/* Directly write the message to the system `stderr' file. */
 	(void)write(STDERR_FILENO, message, strlen(message) * sizeof(char));
