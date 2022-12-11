@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ec09bd8 */
+/* HASH CRC-32:0xa829570a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -131,6 +131,7 @@ NOTHROW_NCX(LIBKCALL libc__ui64tow)(u64 val,
 	libc__ui64tow_s(val, buf, (size_t)-1, radix);
 	return buf;
 }
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/template/itoa_digits.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_OUTS(2, 3) errno_t
@@ -138,13 +139,15 @@ NOTHROW_NCX(LIBDCALL libd__itow_s)(int val,
                                    char16_t *buf,
                                    size_t buflen,
                                    int radix) {
+
 	char16_t *p;
-	int temp;
+	unsigned int temp;
 	if unlikely(radix < 2)
 		radix = 2;
 	if unlikely(radix > 36)
 		radix = 36;
 	p = buf;
+
 	if (val < 0) {
 		if (!buflen--) {
 
@@ -156,7 +159,8 @@ NOTHROW_NCX(LIBDCALL libd__itow_s)(int val,
 		*p++ = '-';
 		val = -val;
 	}
-	temp = val;
+
+	temp = (unsigned int)val;
 	do {
 		++p;
 	} while ((temp /= (unsigned int)radix) != 0);
@@ -167,13 +171,14 @@ NOTHROW_NCX(LIBDCALL libd__itow_s)(int val,
 
 
 	}
-	temp = val;
+	temp = (unsigned int)val;
 	*p = '\0';
 	do {
 		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_OUTS(2, 3) errno_t
@@ -181,13 +186,15 @@ NOTHROW_NCX(LIBKCALL libc__itow_s)(int val,
                                    char32_t *buf,
                                    size_t buflen,
                                    int radix) {
+
 	char32_t *p;
-	int temp;
+	unsigned int temp;
 	if unlikely(radix < 2)
 		radix = 2;
 	if unlikely(radix > 36)
 		radix = 36;
 	p = buf;
+
 	if (val < 0) {
 		if (!buflen--) {
 
@@ -199,7 +206,8 @@ NOTHROW_NCX(LIBKCALL libc__itow_s)(int val,
 		*p++ = '-';
 		val = -val;
 	}
-	temp = val;
+
+	temp = (unsigned int)val;
 	do {
 		++p;
 	} while ((temp /= (unsigned int)radix) != 0);
@@ -210,13 +218,14 @@ NOTHROW_NCX(LIBKCALL libc__itow_s)(int val,
 
 
 	}
-	temp = val;
+	temp = (unsigned int)val;
 	*p = '\0';
 	do {
 		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
 	} while ((temp /= (unsigned int)radix) != 0);
 	return 0;
 }
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/template/itoa_digits.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_OUTS(2, 3) errno_t
@@ -224,13 +233,15 @@ NOTHROW_NCX(LIBDCALL libd__ltow_s)(long val,
                                    char16_t *buf,
                                    size_t buflen,
                                    int radix) {
+
 	char16_t *p;
-	long temp;
+	unsigned long temp;
 	if unlikely(radix < 2)
 		radix = 2;
 	if unlikely(radix > 36)
 		radix = 36;
 	p = buf;
+
 	if (val < 0) {
 		if (!buflen--) {
 
@@ -242,10 +253,11 @@ NOTHROW_NCX(LIBDCALL libd__ltow_s)(long val,
 		*p++ = '-';
 		val = -val;
 	}
-	temp = val;
+
+	temp = (unsigned long)val;
 	do {
 		++p;
-	} while ((temp /= (unsigned int)radix) != 0);
+	} while ((temp /= (unsigned long)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 
 		return 34;
@@ -253,13 +265,14 @@ NOTHROW_NCX(LIBDCALL libd__ltow_s)(long val,
 
 
 	}
-	temp = val;
+	temp = (unsigned long)val;
 	*p = '\0';
 	do {
-		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
-	} while ((temp /= (unsigned int)radix) != 0);
+		*--p = _itoa_upper_digits[temp % (unsigned long)radix];
+	} while ((temp /= (unsigned long)radix) != 0);
 	return 0;
 }
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_OUTS(2, 3) errno_t
@@ -267,13 +280,15 @@ NOTHROW_NCX(LIBKCALL libc__ltow_s)(long val,
                                    char32_t *buf,
                                    size_t buflen,
                                    int radix) {
+
 	char32_t *p;
-	long temp;
+	unsigned long temp;
 	if unlikely(radix < 2)
 		radix = 2;
 	if unlikely(radix > 36)
 		radix = 36;
 	p = buf;
+
 	if (val < 0) {
 		if (!buflen--) {
 
@@ -285,10 +300,11 @@ NOTHROW_NCX(LIBKCALL libc__ltow_s)(long val,
 		*p++ = '-';
 		val = -val;
 	}
-	temp = val;
+
+	temp = (unsigned long)val;
 	do {
 		++p;
-	} while ((temp /= (unsigned int)radix) != 0);
+	} while ((temp /= (unsigned long)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 
 		return ERANGE;
@@ -296,12 +312,12 @@ NOTHROW_NCX(LIBKCALL libc__ltow_s)(long val,
 
 
 	}
-	temp = val;
+	temp = (unsigned long)val;
 	*p = '\0';
 	do {
-		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
-	} while ((temp /= (unsigned int)radix) != 0);
-	return EOK;
+		*--p = _itoa_upper_digits[temp % (unsigned long)radix];
+	} while ((temp /= (unsigned long)radix) != 0);
+	return 0;
 }
 #include <hybrid/typecore.h>
 #include <libc/errno.h>
@@ -311,6 +327,7 @@ NOTHROW_NCX(LIBDCALL libd__ultow_s)(unsigned long val,
                                     char16_t *buf,
                                     size_t buflen,
                                     int radix) {
+
 	char16_t *p;
 	unsigned long temp;
 	if unlikely(radix < 2)
@@ -318,10 +335,23 @@ NOTHROW_NCX(LIBDCALL libd__ultow_s)(unsigned long val,
 	if unlikely(radix > 36)
 		radix = 36;
 	p = buf;
-	temp = val;
+
+
+
+
+
+
+
+
+
+
+
+
+
+	temp = (unsigned long)val;
 	do {
 		++p;
-	} while ((temp /= (unsigned int)radix) != 0);
+	} while ((temp /= (unsigned long)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 
 		return 34;
@@ -329,11 +359,11 @@ NOTHROW_NCX(LIBDCALL libd__ultow_s)(unsigned long val,
 
 
 	}
-	temp = val;
+	temp = (unsigned long)val;
 	*p = '\0';
 	do {
-		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
-	} while ((temp /= (unsigned int)radix) != 0);
+		*--p = _itoa_upper_digits[temp % (unsigned long)radix];
+	} while ((temp /= (unsigned long)radix) != 0);
 	return 0;
 }
 #include <hybrid/typecore.h>
@@ -344,6 +374,7 @@ NOTHROW_NCX(LIBKCALL libc__ultow_s)(unsigned long val,
                                     char32_t *buf,
                                     size_t buflen,
                                     int radix) {
+
 	char32_t *p;
 	unsigned long temp;
 	if unlikely(radix < 2)
@@ -351,10 +382,23 @@ NOTHROW_NCX(LIBKCALL libc__ultow_s)(unsigned long val,
 	if unlikely(radix > 36)
 		radix = 36;
 	p = buf;
-	temp = val;
+
+
+
+
+
+
+
+
+
+
+
+
+
+	temp = (unsigned long)val;
 	do {
 		++p;
-	} while ((temp /= (unsigned int)radix) != 0);
+	} while ((temp /= (unsigned long)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 
 		return ERANGE;
@@ -362,14 +406,14 @@ NOTHROW_NCX(LIBKCALL libc__ultow_s)(unsigned long val,
 
 
 	}
-	temp = val;
+	temp = (unsigned long)val;
 	*p = '\0';
 	do {
-		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
-	} while ((temp /= (unsigned int)radix) != 0);
-	return EOK;
+		*--p = _itoa_upper_digits[temp % (unsigned long)radix];
+	} while ((temp /= (unsigned long)radix) != 0);
+	return 0;
 }
-#include <bits/types.h>
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/template/itoa_digits.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_OUTS(2, 3) errno_t
@@ -377,13 +421,15 @@ NOTHROW_NCX(LIBDCALL libd__i64tow_s)(s64 val,
                                      char16_t *buf,
                                      size_t buflen,
                                      int radix) {
+
 	char16_t *p;
-	s64 temp;
+	__UINT64_TYPE__ temp;
 	if unlikely(radix < 2)
 		radix = 2;
 	if unlikely(radix > 36)
 		radix = 36;
 	p = buf;
+
 	if (val < 0) {
 		if (!buflen--) {
 
@@ -395,10 +441,11 @@ NOTHROW_NCX(LIBDCALL libd__i64tow_s)(s64 val,
 		*p++ = '-';
 		val = -val;
 	}
-	temp = val;
+
+	temp = (__UINT64_TYPE__)val;
 	do {
 		++p;
-	} while ((temp /= (unsigned int)radix) != 0);
+	} while ((temp /= (__UINT64_TYPE__)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 
 		return 34;
@@ -406,14 +453,14 @@ NOTHROW_NCX(LIBDCALL libd__i64tow_s)(s64 val,
 
 
 	}
-	temp = val;
+	temp = (__UINT64_TYPE__)val;
 	*p = '\0';
 	do {
-		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
-	} while ((temp /= (unsigned int)radix) != 0);
+		*--p = _itoa_upper_digits[temp % (__UINT64_TYPE__)radix];
+	} while ((temp /= (__UINT64_TYPE__)radix) != 0);
 	return 0;
 }
-#include <bits/types.h>
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_OUTS(2, 3) errno_t
@@ -421,13 +468,15 @@ NOTHROW_NCX(LIBKCALL libc__i64tow_s)(s64 val,
                                      char32_t *buf,
                                      size_t buflen,
                                      int radix) {
+
 	char32_t *p;
-	s64 temp;
+	__UINT64_TYPE__ temp;
 	if unlikely(radix < 2)
 		radix = 2;
 	if unlikely(radix > 36)
 		radix = 36;
 	p = buf;
+
 	if (val < 0) {
 		if (!buflen--) {
 
@@ -439,10 +488,11 @@ NOTHROW_NCX(LIBKCALL libc__i64tow_s)(s64 val,
 		*p++ = '-';
 		val = -val;
 	}
-	temp = val;
+
+	temp = (__UINT64_TYPE__)val;
 	do {
 		++p;
-	} while ((temp /= (unsigned int)radix) != 0);
+	} while ((temp /= (__UINT64_TYPE__)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 
 		return ERANGE;
@@ -450,14 +500,14 @@ NOTHROW_NCX(LIBKCALL libc__i64tow_s)(s64 val,
 
 
 	}
-	temp = val;
+	temp = (__UINT64_TYPE__)val;
 	*p = '\0';
 	do {
-		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
-	} while ((temp /= (unsigned int)radix) != 0);
-	return EOK;
+		*--p = _itoa_upper_digits[temp % (__UINT64_TYPE__)radix];
+	} while ((temp /= (__UINT64_TYPE__)radix) != 0);
+	return 0;
 }
-#include <bits/types.h>
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/template/itoa_digits.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_OUTS(2, 3) errno_t
@@ -465,32 +515,46 @@ NOTHROW_NCX(LIBDCALL libd__ui64tow_s)(u64 val,
                                       char16_t *buf,
                                       size_t buflen,
                                       int radix) {
+
 	char16_t *p;
-	u64 temp;
+	__UINT64_TYPE__ temp;
 	if unlikely(radix < 2)
 		radix = 2;
 	if unlikely(radix > 36)
 		radix = 36;
 	p = buf;
-	temp = val;
+
+
+
+
+
+
+
+
+
+
+
+
+
+	temp = (__UINT64_TYPE__)val;
 	do {
 		++p;
-	} while ((temp /= (unsigned int)radix) != 0);
+	} while ((temp /= (__UINT64_TYPE__)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 
-		return ERANGE;
+		return 34;
 
 
 
 	}
-	temp = val;
+	temp = (__UINT64_TYPE__)val;
 	*p = '\0';
 	do {
-		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
-	} while ((temp /= (unsigned int)radix) != 0);
+		*--p = _itoa_upper_digits[temp % (__UINT64_TYPE__)radix];
+	} while ((temp /= (__UINT64_TYPE__)radix) != 0);
 	return 0;
 }
-#include <bits/types.h>
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_OUTS(2, 3) errno_t
@@ -498,17 +562,31 @@ NOTHROW_NCX(LIBKCALL libc__ui64tow_s)(u64 val,
                                       char32_t *buf,
                                       size_t buflen,
                                       int radix) {
+
 	char32_t *p;
-	u64 temp;
+	__UINT64_TYPE__ temp;
 	if unlikely(radix < 2)
 		radix = 2;
 	if unlikely(radix > 36)
 		radix = 36;
 	p = buf;
-	temp = val;
+
+
+
+
+
+
+
+
+
+
+
+
+
+	temp = (__UINT64_TYPE__)val;
 	do {
 		++p;
-	} while ((temp /= (unsigned int)radix) != 0);
+	} while ((temp /= (__UINT64_TYPE__)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 
 		return ERANGE;
@@ -516,11 +594,11 @@ NOTHROW_NCX(LIBKCALL libc__ui64tow_s)(u64 val,
 
 
 	}
-	temp = val;
+	temp = (__UINT64_TYPE__)val;
 	*p = '\0';
 	do {
-		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
-	} while ((temp /= (unsigned int)radix) != 0);
+		*--p = _itoa_upper_digits[temp % (__UINT64_TYPE__)radix];
+	} while ((temp /= (__UINT64_TYPE__)radix) != 0);
 	return 0;
 }
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_PURE WUNUSED ATTR_IN(1) s64

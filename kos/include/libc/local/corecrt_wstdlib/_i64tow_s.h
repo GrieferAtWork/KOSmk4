@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd380294 */
+/* HASH CRC-32:0xbf2b37f4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,18 +22,21 @@
 #define __local__i64tow_s_defined
 #include <__crt.h>
 #include <bits/types.h>
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/template/itoa_digits.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_i64tow_s) __ATTR_OUTS(2, 3) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_i64tow_s))(__INT64_TYPE__ __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix) {
+
 	__WCHAR_TYPE__ *__p;
-	__INT64_TYPE__ __temp;
+	__UINT64_TYPE__ __temp;
 	if __unlikely(__radix < 2)
 		__radix = 2;
 	if __unlikely(__radix > 36)
 		__radix = 36;
 	__p = __buf;
+
 	if (__val < 0) {
 		if (!__buflen--) {
 #ifdef __ERANGE
@@ -45,10 +48,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_i64tow_s))(__INT64_TYPE__ __val, __W
 		*__p++ = '-';
 		__val = -__val;
 	}
-	__temp = __val;
+
+	__temp = (__UINT64_TYPE__)__val;
 	do {
 		++__p;
-	} while ((__temp /= (unsigned int)__radix) != 0);
+	} while ((__temp /= (__UINT64_TYPE__)__radix) != 0);
 	if (__buflen <= (__SIZE_TYPE__)(__p - __buf)) {
 #ifdef __ERANGE
 		return __ERANGE;
@@ -56,12 +60,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_i64tow_s))(__INT64_TYPE__ __val, __W
 		return 1;
 #endif /* !__ERANGE */
 	}
-	__temp = __val;
+	__temp = (__UINT64_TYPE__)__val;
 	*__p = '\0';
 	do {
-		*--__p = __LOCAL_itoa_upper_digits[__temp % (unsigned int)__radix];
-	} while ((__temp /= (unsigned int)__radix) != 0);
-	return __EOK;
+		*--__p = __LOCAL_itoa_upper_digits[__temp % (__UINT64_TYPE__)__radix];
+	} while ((__temp /= (__UINT64_TYPE__)__radix) != 0);
+	return 0;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__i64tow_s_defined

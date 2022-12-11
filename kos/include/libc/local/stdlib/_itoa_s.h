@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d424382 */
+/* HASH CRC-32:0x4df6638d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,18 +22,21 @@
 #define __local__itoa_s_defined
 #include <__crt.h>
 #include <bits/types.h>
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/template/itoa_digits.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_itoa_s) __ATTR_OUTS(2, 3) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_itoa_s))(int __val, char *__buf, __SIZE_TYPE__ __buflen, int __radix) {
+
 	char *__p;
-	int __temp;
+	unsigned int __temp;
 	if __unlikely(__radix < 2)
 		__radix = 2;
 	if __unlikely(__radix > 36)
 		__radix = 36;
 	__p = __buf;
+
 	if (__val < 0) {
 		if (!__buflen--) {
 #ifdef __ERANGE
@@ -45,7 +48,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_itoa_s))(int __val, char *__buf, __S
 		*__p++ = '-';
 		__val = -__val;
 	}
-	__temp = __val;
+
+	__temp = (unsigned int)__val;
 	do {
 		++__p;
 	} while ((__temp /= (unsigned int)__radix) != 0);
@@ -56,7 +60,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_itoa_s))(int __val, char *__buf, __S
 		return 1;
 #endif /* !__ERANGE */
 	}
-	__temp = __val;
+	__temp = (unsigned int)__val;
 	*__p = '\0';
 	do {
 		*--__p = __LOCAL_itoa_upper_digits[__temp % (unsigned int)__radix];

@@ -1188,11 +1188,12 @@ $int64_t strto64_r([[in]] char const *__restrict nptr,
 %[define_template(tpl_strtoi_r<T, nptr, endptr, base, error> =
 	[[impl_include("<asm/os/errno.h>", "<hybrid/__overflow.h>")]]
 	[[impl_include("<libc/template/hex.h>", "<hybrid/limitcore.h>")]]
-	[[impl_include("<libc/unicode.h>")]]
+	[[impl_include("<libc/unicode.h>", "<hybrid/typecore.h>")]]
 {
 @@exec /*   */ global SIGNED = !"${T}".@startswith@("u");@@
 @@exec /*   */ global BITS = "${T}".@strip@("uint_t");@@
 @@exec /*   */ global su = SIGNED ? "s" : "u";@@
+@@exec /*   */ global TU = SIGNED ? "u${T}" : "${T}";@@
 @@if SIGNED@@
 	char sign;
 @@endif@@
@@ -1273,6 +1274,56 @@ $int64_t strto64_r([[in]] char const *__restrict nptr,
 		if unlikely(@@yield("__hybrid_overflow_" + su + "mul")@@(result, (unsigned int)${base}, &result) ||
 		/*       */ @@yield("__hybrid_overflow_" + su + "add")@@(result, digit, &result)) {
 @@if SIGNED@@
+			/* Check for special case: `strtoi(itos(T.MIN))' */
+			if ((@@yield(TU)@@)result == ((@@yield(TU)@@)0 - (@@yield(TU)@@)@@yield("__INT" + BITS + "_MIN__")@@) &&
+			    sign == '-') {
+				/* Must ensure that we're at the end of the input string. */
+				ch = *num_iter;
+				if (!__libc_hex2int(ch, &digit)) {
+@@pp_if $has_function(__unicode_descriptor)@@
+					/* Unicode decimal support */
+@@pp_if __SIZEOF_CHAR__ == 1@@
+					char const *new_num_iter;
+					char32_t uni;
+@@pp_ifndef __OPTIMIZE_SIZE__@@
+					if ((unsigned char)ch < 0x80) {
+						/* Not actually an overflow --> result is supposed to be `INTxx_MIN'! */
+						goto handle_not_an_overflow;
+					}
+@@pp_endif@@
+					new_num_iter = num_iter;
+					uni = @__libc_unicode_readutf8@(&new_num_iter);
+					if (__libc_unicode_asdigit(uni, (uint8_t)${base}, &digit)) {
+						goto handle_overflow;
+					} else
+@@pp_elif __SIZEOF_CHAR__ == 2@@
+					char16_t const *new_num_iter;
+					char32_t uni;
+					new_num_iter = (char16_t const *)num_iter;
+					uni = @__libc_unicode_readutf16@(&new_num_iter);
+					if (__libc_unicode_asdigit(uni, (uint8_t)${base}, &digit)) {
+						goto handle_overflow;
+					} else
+@@pp_else@@
+					if (__libc_unicode_asdigit(ch, (uint8_t)${base}, &digit)) {
+						goto handle_overflow;
+					} else
+@@pp_endif@@
+@@pp_endif@@
+					{
+						/* Not a digit valid for `radix' --> allowed */
+					}
+				} else {
+					if (digit < ${base})
+						goto handle_overflow;
+				}
+				/* Not actually an overflow --> result is supposed to be `INTxx_MIN'! */
+@@pp_if $has_function(__unicode_descriptor) && __SIZEOF_CHAR__ == 1 && !defined(__OPTIMIZE_SIZE__)@@
+handle_not_an_overflow:
+@@pp_endif@@
+				result = @@yield("__INT" + BITS + "_MIN__")@@;
+				goto return_not_an_overflow;
+			}
 handle_overflow:
 @@endif@@
 			/* Integer overflow. */
@@ -1368,6 +1419,9 @@ handle_overflow:
 		if (${endptr})
 			*${endptr} = (char *)${nptr};
 	} else {
+@@if SIGNED@@
+return_not_an_overflow:
+@@endif@@
 		if (${endptr}) {
 			*${endptr} = (char *)num_iter;
 			if (${error})
@@ -4540,22 +4594,22 @@ errno_t _dupenv_s([[out]] char **__restrict pbuf,
 %[insert:function(_ultoa = ultoa)]
 
 
-[[decl_include("<bits/types.h>")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_ltoa_s")]]
-[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_i64toa_s")]]
-[[impl_include("<libc/errno.h>", "<libc/template/itoa_digits.h>")]]
-[[section(".text.crt.dos.unicode.static.convert")]]
-[[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
-errno_t _itoa_s(int val, [[out(? <= buflen)]] char *buf, $size_t buflen, int radix) {
+%[define_template(tpl_itoa<T, UT, val, buf, buflen, radix> =
+	[[impl_include("<hybrid/typecore.h>")]]
+	[[impl_include("<libc/errno.h>")]]
+	[[impl_include("<libc/template/itoa_digits.h>")]]
+{
+@@exec global SIGNED = "${T}" != "${UT}";@@
 	char *p;
-	int temp;
-	if unlikely(radix < 2)
-		radix = 2;
-	if unlikely(radix > 36)
-		radix = 36;
-	p = buf;
-	if (val < 0) {
-		if (!buflen--) {
+	${UT} temp;
+	if unlikely(${radix} < 2)
+		${radix} = 2;
+	if unlikely(${radix} > 36)
+		${radix} = 36;
+	p = ${buf};
+@@if SIGNED@@
+	if (${val} < 0) {
+		if (!${buflen}--) {
 @@pp_ifdef ERANGE@@
 			return $ERANGE;
 @@pp_else@@
@@ -4563,104 +4617,52 @@ errno_t _itoa_s(int val, [[out(? <= buflen)]] char *buf, $size_t buflen, int rad
 @@pp_endif@@
 		}
 		*p++ = '-';
-		val = -val;
+		${val} = -${val};
 	}
-	temp = val;
+@@endif@@
+	temp = (${UT})${val};
 	do {
 		++p;
-	} while ((temp /= (unsigned int)radix) != 0);
-	if (buflen <= ($size_t)(p - buf)) {
+	} while ((temp /= (${UT})${radix}) != 0);
+	if (${buflen} <= ($size_t)(p - ${buf})) {
 @@pp_ifdef ERANGE@@
 		return $ERANGE;
 @@pp_else@@
 		return 1;
 @@pp_endif@@
 	}
-	temp = val;
+	temp = (${UT})${val};
 	*p = '\0';
 	do {
-		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
-	} while ((temp /= (unsigned int)radix) != 0);
+		*--p = _itoa_upper_digits[temp % (${UT})${radix}];
+	} while ((temp /= (${UT})${radix}) != 0);
 	return 0;
-}
+})]
+
+
+[[decl_include("<bits/types.h>")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == __SIZEOF_LONG__), alias("_ltoa_s")]]
+[[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8), alias("_i64toa_s")]]
+[[section(".text.crt.dos.unicode.static.convert")]]
+[[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
+errno_t _itoa_s(int val, [[out(? <= buflen)]] char *buf, $size_t buflen, int radix)
+	%{template(tpl_itoa<int, unsigned int, val, buf, buflen, radix>)}
 
 [[decl_include("<bits/types.h>")]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == __SIZEOF_INT__, "_itoa_s")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_i64toa_s")]]
 [[crt_intern_dos_alias(libd__itoa_s)]]
-[[impl_include("<libc/errno.h>", "<libc/template/itoa_digits.h>")]]
 [[section(".text.crt.dos.unicode.static.convert")]]
 //[[crt_dos_variant({ impl: libd_errno_kos2dosinvoke_libclibc]); })]]
-errno_t _ltoa_s(long val, [[out(? <= buflen)]] char *buf, $size_t buflen, int radix) {
-	char *p;
-	long temp;
-	if unlikely(radix < 2)
-		radix = 2;
-	if unlikely(radix > 36)
-		radix = 36;
-	p = buf;
-	if (val < 0) {
-		if (!buflen--) {
-@@pp_ifdef ERANGE@@
-			return $ERANGE;
-@@pp_else@@
-			return 1;
-@@pp_endif@@
-		}
-		*p++ = '-';
-		val = -val;
-	}
-	temp = val;
-	do {
-		++p;
-	} while ((temp /= (unsigned int)radix) != 0);
-	if (buflen <= ($size_t)(p - buf)) {
-@@pp_ifdef ERANGE@@
-		return $ERANGE;
-@@pp_else@@
-		return 1;
-@@pp_endif@@
-	}
-	temp = val;
-	*p = '\0';
-	do {
-		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
-	} while ((temp /= (unsigned int)radix) != 0);
-	return $EOK;
-}
+errno_t _ltoa_s(long val, [[out(? <= buflen)]] char *buf, $size_t buflen, int radix)
+	%{template(tpl_itoa<long, unsigned long, val, buf, buflen, radix>)}
 
 [[decl_include("<bits/types.h>")]]
 [[if($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8), alias("_ui64toa_s")]]
-[[impl_include("<hybrid/typecore.h>", "<libc/errno.h>")]]
-[[impl_include("<libc/template/itoa_digits.h>")]]
 [[section(".text.crt.dos.unicode.static.convert")]]
 [[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
-errno_t _ultoa_s(unsigned long val, [[out(? <= buflen)]] char *buf, $size_t buflen, int radix) {
-	char *p;
-	unsigned long temp;
-	if unlikely(radix < 2)
-		radix = 2;
-	if unlikely(radix > 36)
-		radix = 36;
-	p = buf;
-	temp = val;
-	do {
-		++p;
-	} while ((temp /= (unsigned int)radix) != 0);
-	if (buflen <= ($size_t)(p - buf)) {
-@@pp_ifdef ERANGE@@
-		return $ERANGE;
-@@pp_else@@
-		return 1;
-@@pp_endif@@
-	}
-	temp = val;
-	*p = '\0';
-	do {
-		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
-	} while ((temp /= (unsigned int)radix) != 0);
-	return $EOK;
-}
+errno_t _ultoa_s(unsigned long val, [[out(? <= buflen)]] char *buf, $size_t buflen, int radix)
+	%{template(tpl_itoa<unsigned long, unsigned long, val, buf, buflen, radix>)}
 
 
 %
@@ -4690,80 +4692,17 @@ char *_ui64toa($u64 val, [[out]] char *buf, int radix) {
 [[decl_include("<bits/types.h>")]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8, _ltoa_s)]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_INT__ == 8, _itoa_s)]]
-[[impl_include("<bits/types.h>")]]
-[[impl_include("<libc/errno.h>", "<libc/template/itoa_digits.h>")]]
 [[section(".text.crt.dos.unicode.static.convert")]]
 [[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
-errno_t _i64toa_s($s64 val, [[out(? <= buflen)]] char *buf, $size_t buflen, int radix) {
-	char *p;
-	s64 temp;
-	if unlikely(radix < 2)
-		radix = 2;
-	if unlikely(radix > 36)
-		radix = 36;
-	p = buf;
-	if (val < 0) {
-		if (!buflen--) {
-@@pp_ifdef ERANGE@@
-			return $ERANGE;
-@@pp_else@@
-			return 1;
-@@pp_endif@@
-		}
-		*p++ = '-';
-		val = -val;
-	}
-	temp = val;
-	do {
-		++p;
-	} while ((temp /= (unsigned int)radix) != 0);
-	if (buflen <= ($size_t)(p - buf)) {
-@@pp_ifdef ERANGE@@
-		return $ERANGE;
-@@pp_else@@
-		return 1;
-@@pp_endif@@
-	}
-	temp = val;
-	*p = '\0';
-	do {
-		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
-	} while ((temp /= (unsigned int)radix) != 0);
-	return $EOK;
-}
+errno_t _i64toa_s($s64 val, [[out(? <= buflen)]] char *buf, $size_t buflen, int radix)
+	%{template(tpl_itoa<__INT64_TYPE__, __UINT64_TYPE__, val, buf, buflen, radix>)}
 
 [[decl_include("<bits/types.h>")]]
 [[alt_variant_of($extended_include_prefix("<hybrid/typecore.h>")__SIZEOF_LONG__ == 8, _ultoa_s)]]
-[[impl_include("<bits/types.h>", "<libc/errno.h>")]]
-[[impl_include("<libc/template/itoa_digits.h>")]]
 [[section(".text.crt.dos.unicode.static.convert")]]
 [[crt_dos_variant({ impl: libd_errno_kos2dos(%[invoke_libc]) })]]
-errno_t _ui64toa_s($u64 val, [[out(? <= buflen)]] char *buf, $size_t buflen, int radix) {
-	char *p;
-	u64 temp;
-	if unlikely(radix < 2)
-		radix = 2;
-	if unlikely(radix > 36)
-		radix = 36;
-	p = buf;
-	temp = val;
-	do {
-		++p;
-	} while ((temp /= (unsigned int)radix) != 0);
-	if (buflen <= ($size_t)(p - buf)) {
-@@pp_ifdef ERANGE@@
-		return ERANGE;
-@@pp_else@@
-		return 1;
-@@pp_endif@@
-	}
-	temp = val;
-	*p = '\0';
-	do {
-		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
-	} while ((temp /= (unsigned int)radix) != 0);
-	return 0;
-}
+errno_t _ui64toa_s($u64 val, [[out(? <= buflen)]] char *buf, $size_t buflen, int radix)
+	%{template(tpl_itoa<__UINT64_TYPE__, __UINT64_TYPE__, val, buf, buflen, radix>)}
 
 
 %[insert:function(_strtoi64 = strto64)]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa04343aa */
+/* HASH CRC-32:0xe65b236 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2901,12 +2901,14 @@ NOTHROW_NCX(LIBKCALL libc_wcsnend)(char32_t const *__restrict str,
 #include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
 #include <libc/unicode.h>
+#include <hybrid/typecore.h>
 /* >> wcsto32_r(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) int32_t
 NOTHROW_NCX(LIBDCALL libd_wcsto32_r)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
                                      __STDC_INT_AS_UINT_T base,
                                      errno_t *error) {
+
 
 
 
@@ -2990,6 +2992,56 @@ NOTHROW_NCX(LIBDCALL libd_wcsto32_r)(char16_t const *__restrict nptr,
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
 		/*       */ __hybrid_overflow_sadd(result, digit, &result)) {
 
+			/* Check for special case: `strtoi(itos(T.MIN))' */
+			if ((uint32_t)result == ((uint32_t)0 - (uint32_t)__INT32_MIN__) &&
+			    sign == '-') {
+				/* Must ensure that we're at the end of the input string. */
+				ch = *num_iter;
+				if (!__libc_hex2int(ch, &digit)) {
+
+					/* Unicode decimal support */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+					char16_t const *new_num_iter;
+					char32_t uni;
+					new_num_iter = (char16_t const *)num_iter;
+					uni = __libc_unicode_readutf16(&new_num_iter);
+					if (__libc_unicode_asdigit(uni, (uint8_t)base, &digit)) {
+						goto handle_overflow;
+					} else
+
+
+
+
+
+
+					{
+						/* Not a digit valid for `radix' --> allowed */
+					}
+				} else {
+					if (digit < base)
+						goto handle_overflow;
+				}
+				/* Not actually an overflow --> result is supposed to be `INTxx_MIN'! */
+
+
+
+				result = __INT32_MIN__;
+				goto return_not_an_overflow;
+			}
 handle_overflow:
 
 			/* Integer overflow. */
@@ -3085,6 +3137,9 @@ handle_overflow:
 		if (endptr)
 			*endptr = (char16_t *)nptr;
 	} else {
+
+return_not_an_overflow:
+
 		if (endptr) {
 			*endptr = (char16_t *)num_iter;
 			if (error)
@@ -3111,12 +3166,14 @@ handle_overflow:
 #include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
 #include <libc/unicode.h>
+#include <hybrid/typecore.h>
 /* >> wcsto32_r(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) int32_t
 NOTHROW_NCX(LIBKCALL libc_wcsto32_r)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
                                      __STDC_INT_AS_UINT_T base,
                                      errno_t *error) {
+
 
 
 
@@ -3200,6 +3257,56 @@ NOTHROW_NCX(LIBKCALL libc_wcsto32_r)(char32_t const *__restrict nptr,
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
 		/*       */ __hybrid_overflow_sadd(result, digit, &result)) {
 
+			/* Check for special case: `strtoi(itos(T.MIN))' */
+			if ((uint32_t)result == ((uint32_t)0 - (uint32_t)__INT32_MIN__) &&
+			    sign == '-') {
+				/* Must ensure that we're at the end of the input string. */
+				ch = *num_iter;
+				if (!__libc_hex2int(ch, &digit)) {
+
+					/* Unicode decimal support */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+					if (__libc_unicode_asdigit(ch, (uint8_t)base, &digit)) {
+						goto handle_overflow;
+					} else
+
+
+					{
+						/* Not a digit valid for `radix' --> allowed */
+					}
+				} else {
+					if (digit < base)
+						goto handle_overflow;
+				}
+				/* Not actually an overflow --> result is supposed to be `INTxx_MIN'! */
+
+
+
+				result = __INT32_MIN__;
+				goto return_not_an_overflow;
+			}
 handle_overflow:
 
 			/* Integer overflow. */
@@ -3295,6 +3402,9 @@ handle_overflow:
 		if (endptr)
 			*endptr = (char32_t *)nptr;
 	} else {
+
+return_not_an_overflow:
+
 		if (endptr) {
 			*endptr = (char32_t *)num_iter;
 			if (error)
@@ -3321,12 +3431,14 @@ handle_overflow:
 #include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
 #include <libc/unicode.h>
+#include <hybrid/typecore.h>
 /* >> wcstou32_r(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) uint32_t
 NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
                                       char16_t **endptr,
                                       __STDC_INT_AS_UINT_T base,
                                       errno_t *error) {
+
 
 
 
@@ -3412,6 +3524,56 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 			/* Integer overflow. */
 			if (error) {
 
@@ -3505,6 +3667,9 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 		if (endptr)
 			*endptr = (char16_t *)nptr;
 	} else {
+
+
+
 		if (endptr) {
 			*endptr = (char16_t *)num_iter;
 			if (error)
@@ -3531,12 +3696,14 @@ NOTHROW_NCX(LIBDCALL libd_wcstou32_r)(char16_t const *__restrict nptr,
 #include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
 #include <libc/unicode.h>
+#include <hybrid/typecore.h>
 /* >> wcstou32_r(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) uint32_t
 NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
                                       char32_t **endptr,
                                       __STDC_INT_AS_UINT_T base,
                                       errno_t *error) {
+
 
 
 
@@ -3619,6 +3786,56 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
 		}
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
 		/*       */ __hybrid_overflow_uadd(result, digit, &result)) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3715,6 +3932,9 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32_r)(char32_t const *__restrict nptr,
 		if (endptr)
 			*endptr = (char32_t *)nptr;
 	} else {
+
+
+
 		if (endptr) {
 			*endptr = (char32_t *)num_iter;
 			if (error)
@@ -3809,12 +4029,14 @@ NOTHROW_NCX(LIBKCALL libc_wcstou32)(char32_t const *__restrict nptr,
 #include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
 #include <libc/unicode.h>
+#include <hybrid/typecore.h>
 /* >> wcsto64_r(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) int64_t
 NOTHROW_NCX(LIBDCALL libd_wcsto64_r)(char16_t const *__restrict nptr,
                                      char16_t **endptr,
                                      __STDC_INT_AS_UINT_T base,
                                      errno_t *error) {
+
 
 
 
@@ -3898,6 +4120,56 @@ NOTHROW_NCX(LIBDCALL libd_wcsto64_r)(char16_t const *__restrict nptr,
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
 		/*       */ __hybrid_overflow_sadd(result, digit, &result)) {
 
+			/* Check for special case: `strtoi(itos(T.MIN))' */
+			if ((uint64_t)result == ((uint64_t)0 - (uint64_t)__INT64_MIN__) &&
+			    sign == '-') {
+				/* Must ensure that we're at the end of the input string. */
+				ch = *num_iter;
+				if (!__libc_hex2int(ch, &digit)) {
+
+					/* Unicode decimal support */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+					char16_t const *new_num_iter;
+					char32_t uni;
+					new_num_iter = (char16_t const *)num_iter;
+					uni = __libc_unicode_readutf16(&new_num_iter);
+					if (__libc_unicode_asdigit(uni, (uint8_t)base, &digit)) {
+						goto handle_overflow;
+					} else
+
+
+
+
+
+
+					{
+						/* Not a digit valid for `radix' --> allowed */
+					}
+				} else {
+					if (digit < base)
+						goto handle_overflow;
+				}
+				/* Not actually an overflow --> result is supposed to be `INTxx_MIN'! */
+
+
+
+				result = __INT64_MIN__;
+				goto return_not_an_overflow;
+			}
 handle_overflow:
 
 			/* Integer overflow. */
@@ -3993,6 +4265,9 @@ handle_overflow:
 		if (endptr)
 			*endptr = (char16_t *)nptr;
 	} else {
+
+return_not_an_overflow:
+
 		if (endptr) {
 			*endptr = (char16_t *)num_iter;
 			if (error)
@@ -4019,12 +4294,14 @@ handle_overflow:
 #include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
 #include <libc/unicode.h>
+#include <hybrid/typecore.h>
 /* >> wcsto64_r(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) int64_t
 NOTHROW_NCX(LIBKCALL libc_wcsto64_r)(char32_t const *__restrict nptr,
                                      char32_t **endptr,
                                      __STDC_INT_AS_UINT_T base,
                                      errno_t *error) {
+
 
 
 
@@ -4108,6 +4385,56 @@ NOTHROW_NCX(LIBKCALL libc_wcsto64_r)(char32_t const *__restrict nptr,
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
 		/*       */ __hybrid_overflow_sadd(result, digit, &result)) {
 
+			/* Check for special case: `strtoi(itos(T.MIN))' */
+			if ((uint64_t)result == ((uint64_t)0 - (uint64_t)__INT64_MIN__) &&
+			    sign == '-') {
+				/* Must ensure that we're at the end of the input string. */
+				ch = *num_iter;
+				if (!__libc_hex2int(ch, &digit)) {
+
+					/* Unicode decimal support */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+					if (__libc_unicode_asdigit(ch, (uint8_t)base, &digit)) {
+						goto handle_overflow;
+					} else
+
+
+					{
+						/* Not a digit valid for `radix' --> allowed */
+					}
+				} else {
+					if (digit < base)
+						goto handle_overflow;
+				}
+				/* Not actually an overflow --> result is supposed to be `INTxx_MIN'! */
+
+
+
+				result = __INT64_MIN__;
+				goto return_not_an_overflow;
+			}
 handle_overflow:
 
 			/* Integer overflow. */
@@ -4203,6 +4530,9 @@ handle_overflow:
 		if (endptr)
 			*endptr = (char32_t *)nptr;
 	} else {
+
+return_not_an_overflow:
+
 		if (endptr) {
 			*endptr = (char32_t *)num_iter;
 			if (error)
@@ -4229,12 +4559,14 @@ handle_overflow:
 #include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
 #include <libc/unicode.h>
+#include <hybrid/typecore.h>
 /* >> wcstou64_r(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) uint64_t
 NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
                                       char16_t **endptr,
                                       __STDC_INT_AS_UINT_T base,
                                       errno_t *error) {
+
 
 
 
@@ -4320,6 +4652,56 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 			/* Integer overflow. */
 			if (error) {
 
@@ -4413,6 +4795,9 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 		if (endptr)
 			*endptr = (char16_t *)nptr;
 	} else {
+
+
+
 		if (endptr) {
 			*endptr = (char16_t *)num_iter;
 			if (error)
@@ -4439,12 +4824,14 @@ NOTHROW_NCX(LIBDCALL libd_wcstou64_r)(char16_t const *__restrict nptr,
 #include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
 #include <libc/unicode.h>
+#include <hybrid/typecore.h>
 /* >> wcstou64_r(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.convert") ATTR_LEAF ATTR_IN(1) ATTR_OUT_OPT(2) ATTR_OUT_OPT(4) uint64_t
 NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
                                       char32_t **endptr,
                                       __STDC_INT_AS_UINT_T base,
                                       errno_t *error) {
+
 
 
 
@@ -4527,6 +4914,56 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
 		}
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
 		/*       */ __hybrid_overflow_uadd(result, digit, &result)) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4623,6 +5060,9 @@ NOTHROW_NCX(LIBKCALL libc_wcstou64_r)(char32_t const *__restrict nptr,
 		if (endptr)
 			*endptr = (char32_t *)nptr;
 	} else {
+
+
+
 		if (endptr) {
 			*endptr = (char32_t *)num_iter;
 			if (error)

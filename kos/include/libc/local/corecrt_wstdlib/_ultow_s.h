@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x974f02d9 */
+/* HASH CRC-32:0x6494e217 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_ultow_s) __ATTR_OUTS(2, 3) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ultow_s))(unsigned long __val, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, int __radix) {
+
 	__WCHAR_TYPE__ *__p;
 	unsigned long __temp;
 	if __unlikely(__radix < 2)
@@ -35,10 +36,23 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ultow_s))(unsigned long __val, __WCH
 	if __unlikely(__radix > 36)
 		__radix = 36;
 	__p = __buf;
-	__temp = __val;
+
+
+
+
+
+
+
+
+
+
+
+
+
+	__temp = (unsigned long)__val;
 	do {
 		++__p;
-	} while ((__temp /= (unsigned int)__radix) != 0);
+	} while ((__temp /= (unsigned long)__radix) != 0);
 	if (__buflen <= (__SIZE_TYPE__)(__p - __buf)) {
 #ifdef __ERANGE
 		return __ERANGE;
@@ -46,12 +60,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ultow_s))(unsigned long __val, __WCH
 		return 1;
 #endif /* !__ERANGE */
 	}
-	__temp = __val;
+	__temp = (unsigned long)__val;
 	*__p = '\0';
 	do {
-		*--__p = __LOCAL_itoa_upper_digits[__temp % (unsigned int)__radix];
-	} while ((__temp /= (unsigned int)__radix) != 0);
-	return __EOK;
+		*--__p = __LOCAL_itoa_upper_digits[__temp % (unsigned long)__radix];
+	} while ((__temp /= (unsigned long)__radix) != 0);
+	return 0;
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep__ultow_s_defined

@@ -21,6 +21,7 @@
 #define GUARD_LIBC_LIBC_STRTOL_CTEST 1
 #undef NDEBUG
 #define _KOS_SOURCE 1
+#define _DOS_SOURCE 1
 
 /**/
 #include <hybrid/compiler.h>
@@ -30,11 +31,13 @@
 
 #include <assert.h>
 #include <errno.h>
+#include <limits.h>
 #include <stdlib.h>
+#include <string.h>
 
 DECL_BEGIN
 
-PRIVATE void to_test(int variant) {
+PRIVATE void do_test(int variant) {
 	errno_t error;
 	int64_t value;
 	char const *str, *endp;
@@ -89,16 +92,72 @@ PRIVATE void to_test(int variant) {
 }
 
 DEFINE_TEST(strtol) {
-	to_test(0);
-	to_test(1);
-	to_test(2);
-	to_test(3);
-	to_test(4);
-	to_test(5);
-	to_test(6);
-	to_test(7);
+	do_test(0);
+	do_test(1);
+	do_test(2);
+	do_test(3);
+	do_test(4);
+	do_test(5);
+	do_test(6);
+	do_test(7);
 
-	/* TODO: strtol(ltoa(LONG_MIN)) -- This currently fails with ERANGE, but shouldn't */
+#define ASSERT_CORRECT_INTxx_MIN(n, INTxx_MIN, INTxx_MIN_str, \
+                                 len, no_endptr_should_fail)  \
+	{                                                         \
+		errno_t error;                                        \
+		char const *s = INTxx_MIN_str;                        \
+		char *endptr;                                         \
+		int##n##_t val;                                       \
+		val = strto##n##_r(s, &endptr, 0, &error);            \
+		EQd##n(INTxx_MIN, val);                               \
+		EQd(0, error);                                        \
+		EQp(endptr, s + len);                                 \
+		val = strto##n##_r(s, NULL, 0, &error);               \
+		EQd##n(INTxx_MIN, val);                               \
+		EQd(no_endptr_should_fail ? EINVAL : 0, error);       \
+	}
+#define ASSERT_ERROR_INTxx_MIN(n, INTxx_MIN_str, len) \
+	{                                                 \
+		errno_t error;                                \
+		char const *s = INTxx_MIN_str;                \
+		char *endptr;                                 \
+		int##n##_t val;                               \
+		val = strto##n##_r(s, &endptr, 0, &error);    \
+		EQd##n(INT##n##_MIN, val);                    \
+		EQd(ERANGE, error);                           \
+		EQp(endptr, s + len);                         \
+		val = strto##n##_r(s, NULL, 0, &error);       \
+		EQd##n(INT##n##_MIN, val);                    \
+		EQd(ERANGE, error);                           \
+	}
+
+	/* strtol(ltoa(LONG_MIN)) must work correctly */
+	ASSERT_CORRECT_INTxx_MIN(64, INT64_MIN, "-9223372036854775808", 20, false);
+	ASSERT_CORRECT_INTxx_MIN(64, INT64_MIN, "-9223372036854775808  ", 20, false);
+	ASSERT_CORRECT_INTxx_MIN(64, INT64_MIN, "-9223372036854775808END", 20, true);
+	ASSERT_CORRECT_INTxx_MIN(32, INT32_MIN, "-2147483648", 11, false);
+	ASSERT_CORRECT_INTxx_MIN(32, INT32_MIN, "-2147483648  ", 11, false);
+	ASSERT_CORRECT_INTxx_MIN(32, INT32_MIN, "-2147483648END", 11, true);
+
+	/* strtol(ltoa(LONG_MIN))  must break if there are any extra
+	 * numbers, even after a number-sequence equal to INTxx_MIN. */
+	ASSERT_ERROR_INTxx_MIN(64, "-92233720368547758080", 21);
+	ASSERT_ERROR_INTxx_MIN(64, "-92233720368547758081", 21);
+	ASSERT_ERROR_INTxx_MIN(64, "-92233720368547758089", 21);
+	ASSERT_ERROR_INTxx_MIN(64, "-92233720368547758089", 21);
+	ASSERT_ERROR_INTxx_MIN(64, "-92233720368547758089  ", 21);
+	ASSERT_ERROR_INTxx_MIN(64, "-92233720368547758089END", 21);
+	ASSERT_ERROR_INTxx_MIN(64, "-9223372036854775808987654321", 29);
+	ASSERT_ERROR_INTxx_MIN(64, "-9223372036854775808987654321  ", 29);
+	ASSERT_ERROR_INTxx_MIN(64, "-9223372036854775808987654321END", 29);
+	ASSERT_ERROR_INTxx_MIN(32, "-21474836480", 12);
+	ASSERT_ERROR_INTxx_MIN(32, "-21474836481", 12);
+	ASSERT_ERROR_INTxx_MIN(32, "-21474836489", 12);
+	ASSERT_ERROR_INTxx_MIN(32, "-21474836489", 12);
+	ASSERT_ERROR_INTxx_MIN(32, "-21474836489  ", 12);
+	ASSERT_ERROR_INTxx_MIN(32, "-21474836489END", 12);
+#undef ASSERT_CORRECT_INTxx_MIN
+#undef ASSERT_ERROR_INTxx_MIN
 }
 
 DECL_END

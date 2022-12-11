@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x171cead */
+/* HASH CRC-32:0x5a72966b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,9 +41,11 @@ __NAMESPACE_LOCAL_END
 #include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
 #include <libc/unicode.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strto64_r) __ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2) __ATTR_OUT_OPT(4) __INT64_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strto64_r))(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base, __errno_t *__error) {
+
 
 
 
@@ -127,6 +129,56 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strto64_r))(char const *__restrict __
 		if __unlikely(__hybrid_overflow_smul(__result, (unsigned int)__base, &__result) ||
 		/*       */ __hybrid_overflow_sadd(__result, __digit, &__result)) {
 
+			/* Check for special case: `strtoi(itos(T.MIN))' */
+			if ((uint64_t)__result == ((uint64_t)0 - (uint64_t)__INT64_MIN__) &&
+			    __sign == '-') {
+				/* Must ensure that we're at the end of the input string. */
+				__ch = *__num_iter;
+				if (!__libc_hex2int(__ch, &__digit)) {
+#ifdef __CRT_HAVE___unicode_descriptor
+					/* Unicode decimal support */
+
+					char const *__new_num_iter;
+					__CHAR32_TYPE__ __uni;
+#ifndef __OPTIMIZE_SIZE__
+					if ((unsigned char)__ch < 0x80) {
+						/* Not actually an overflow --> result is supposed to be `INTxx_MIN'! */
+						goto __handle_not_an_overflow;
+					}
+#endif /* !__OPTIMIZE_SIZE__ */
+					__new_num_iter = __num_iter;
+					__uni = __libc_unicode_readutf8(&__new_num_iter);
+					if (__libc_unicode_asdigit(__uni, (__UINT8_TYPE__)__base, &__digit)) {
+						goto __handle_overflow;
+					} else
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif /* __CRT_HAVE___unicode_descriptor */
+					{
+						/* Not a digit valid for `radix' --> allowed */
+					}
+				} else {
+					if (__digit < __base)
+						goto __handle_overflow;
+				}
+				/* Not actually an overflow --> result is supposed to be `INTxx_MIN'! */
+#if defined(__CRT_HAVE___unicode_descriptor) && !defined(__OPTIMIZE_SIZE__)
+__handle_not_an_overflow:
+#endif /* __CRT_HAVE___unicode_descriptor && !__OPTIMIZE_SIZE__ */
+				__result = __INT64_MIN__;
+				goto __return_not_an_overflow;
+			}
 __handle_overflow:
 
 			/* Integer overflow. */
@@ -222,6 +274,9 @@ __handle_overflow:
 		if (__endptr)
 			*__endptr = (char *)__nptr;
 	} else {
+
+__return_not_an_overflow:
+
 		if (__endptr) {
 			*__endptr = (char *)__num_iter;
 			if (__error)

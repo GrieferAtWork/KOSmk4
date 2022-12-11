@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1991283b */
+/* HASH CRC-32:0x8bd9708e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -752,6 +752,7 @@ NOTHROW_NCX(LIBCCALL libc_strtold)(char const *__restrict nptr,
 #include <libc/template/hex.h>
 #include <hybrid/limitcore.h>
 #include <libc/unicode.h>
+#include <hybrid/typecore.h>
 /* >> strto32_r(3), strtou32_r(3), strto64_r(3), strtou64_r(3)
  * Safely parse & return an integer from `nptr', and store any potential
  * errors in `*error' (if non-NULL).  The following errors are  defined:
@@ -773,6 +774,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
                                       char **endptr,
                                       __STDC_INT_AS_UINT_T base,
                                       errno_t *error) {
+
 
 
 
@@ -855,6 +857,56 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
 		}
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
 		/*       */ __hybrid_overflow_uadd(result, digit, &result)) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -951,6 +1003,9 @@ NOTHROW_NCX(LIBCCALL libc_strtou32_r)(char const *__restrict nptr,
 		if (endptr)
 			*endptr = (char *)nptr;
 	} else {
+
+
+
 		if (endptr) {
 			*endptr = (char *)num_iter;
 			if (error)
@@ -993,6 +1048,7 @@ NOTHROW_NCX(LIBCCALL libc_strto32_r)(char const *__restrict nptr,
                                      char **endptr,
                                      __STDC_INT_AS_UINT_T base,
                                      errno_t *error) {
+
 
 
 
@@ -1076,6 +1132,56 @@ NOTHROW_NCX(LIBCCALL libc_strto32_r)(char const *__restrict nptr,
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
 		/*       */ __hybrid_overflow_sadd(result, digit, &result)) {
 
+			/* Check for special case: `strtoi(itos(T.MIN))' */
+			if ((uint32_t)result == ((uint32_t)0 - (uint32_t)__INT32_MIN__) &&
+			    sign == '-') {
+				/* Must ensure that we're at the end of the input string. */
+				ch = *num_iter;
+				if (!__libc_hex2int(ch, &digit)) {
+#ifdef __CRT_HAVE___unicode_descriptor
+					/* Unicode decimal support */
+
+					char const *new_num_iter;
+					char32_t uni;
+#ifndef __OPTIMIZE_SIZE__
+					if ((unsigned char)ch < 0x80) {
+						/* Not actually an overflow --> result is supposed to be `INTxx_MIN'! */
+						goto handle_not_an_overflow;
+					}
+#endif /* !__OPTIMIZE_SIZE__ */
+					new_num_iter = num_iter;
+					uni = __libc_unicode_readutf8(&new_num_iter);
+					if (__libc_unicode_asdigit(uni, (uint8_t)base, &digit)) {
+						goto handle_overflow;
+					} else
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif /* __CRT_HAVE___unicode_descriptor */
+					{
+						/* Not a digit valid for `radix' --> allowed */
+					}
+				} else {
+					if (digit < base)
+						goto handle_overflow;
+				}
+				/* Not actually an overflow --> result is supposed to be `INTxx_MIN'! */
+#if defined(__CRT_HAVE___unicode_descriptor) && !defined(__OPTIMIZE_SIZE__)
+handle_not_an_overflow:
+#endif /* __CRT_HAVE___unicode_descriptor && !__OPTIMIZE_SIZE__ */
+				result = __INT32_MIN__;
+				goto return_not_an_overflow;
+			}
 handle_overflow:
 
 			/* Integer overflow. */
@@ -1171,6 +1277,9 @@ handle_overflow:
 		if (endptr)
 			*endptr = (char *)nptr;
 	} else {
+
+return_not_an_overflow:
+
 		if (endptr) {
 			*endptr = (char *)num_iter;
 			if (error)
@@ -1213,6 +1322,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
                                       char **endptr,
                                       __STDC_INT_AS_UINT_T base,
                                       errno_t *error) {
+
 
 
 
@@ -1295,6 +1405,56 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
 		}
 		if unlikely(__hybrid_overflow_umul(result, (unsigned int)base, &result) ||
 		/*       */ __hybrid_overflow_uadd(result, digit, &result)) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1391,6 +1551,9 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_r)(char const *__restrict nptr,
 		if (endptr)
 			*endptr = (char *)nptr;
 	} else {
+
+
+
 		if (endptr) {
 			*endptr = (char *)num_iter;
 			if (error)
@@ -1433,6 +1596,7 @@ NOTHROW_NCX(LIBCCALL libc_strto64_r)(char const *__restrict nptr,
                                      char **endptr,
                                      __STDC_INT_AS_UINT_T base,
                                      errno_t *error) {
+
 
 
 
@@ -1516,6 +1680,56 @@ NOTHROW_NCX(LIBCCALL libc_strto64_r)(char const *__restrict nptr,
 		if unlikely(__hybrid_overflow_smul(result, (unsigned int)base, &result) ||
 		/*       */ __hybrid_overflow_sadd(result, digit, &result)) {
 
+			/* Check for special case: `strtoi(itos(T.MIN))' */
+			if ((uint64_t)result == ((uint64_t)0 - (uint64_t)__INT64_MIN__) &&
+			    sign == '-') {
+				/* Must ensure that we're at the end of the input string. */
+				ch = *num_iter;
+				if (!__libc_hex2int(ch, &digit)) {
+#ifdef __CRT_HAVE___unicode_descriptor
+					/* Unicode decimal support */
+
+					char const *new_num_iter;
+					char32_t uni;
+#ifndef __OPTIMIZE_SIZE__
+					if ((unsigned char)ch < 0x80) {
+						/* Not actually an overflow --> result is supposed to be `INTxx_MIN'! */
+						goto handle_not_an_overflow;
+					}
+#endif /* !__OPTIMIZE_SIZE__ */
+					new_num_iter = num_iter;
+					uni = __libc_unicode_readutf8(&new_num_iter);
+					if (__libc_unicode_asdigit(uni, (uint8_t)base, &digit)) {
+						goto handle_overflow;
+					} else
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif /* __CRT_HAVE___unicode_descriptor */
+					{
+						/* Not a digit valid for `radix' --> allowed */
+					}
+				} else {
+					if (digit < base)
+						goto handle_overflow;
+				}
+				/* Not actually an overflow --> result is supposed to be `INTxx_MIN'! */
+#if defined(__CRT_HAVE___unicode_descriptor) && !defined(__OPTIMIZE_SIZE__)
+handle_not_an_overflow:
+#endif /* __CRT_HAVE___unicode_descriptor && !__OPTIMIZE_SIZE__ */
+				result = __INT64_MIN__;
+				goto return_not_an_overflow;
+			}
 handle_overflow:
 
 			/* Integer overflow. */
@@ -1611,6 +1825,9 @@ handle_overflow:
 		if (endptr)
 			*endptr = (char *)nptr;
 	} else {
+
+return_not_an_overflow:
+
 		if (endptr) {
 			*endptr = (char *)num_iter;
 			if (error)
@@ -1892,7 +2109,6 @@ NOTHROW_NCX(LIBCCALL libc_fcvt_r)(double val,
 	return 0;
 #endif
 }
-#include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
 DEFINE_INTERN_ALIAS(libc_qgcvt, libc_gcvt);
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
@@ -1919,7 +2135,6 @@ NOTHROW_NCX(LIBCCALL libc_qgcvt)(__LONGDOUBLE val,
 	return buf;
 }
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
-#include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
 DEFINE_INTERN_ALIAS(libc_qecvt_r, libc_ecvt_r);
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
@@ -1945,7 +2160,6 @@ NOTHROW_NCX(LIBCCALL libc_qecvt_r)(__LONGDOUBLE val,
 #endif
 }
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
-#include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
 DEFINE_INTERN_ALIAS(libc_qfcvt_r, libc_fcvt_r);
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
@@ -1976,7 +2190,6 @@ NOTHROW_NCX(LIBCCALL libc_qfcvt_r)(__LONGDOUBLE val,
 static char qcvt_buffer[32];
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
-#include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
 DEFINE_INTERN_ALIAS(libc_qecvt, libc_ecvt);
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
@@ -1993,7 +2206,6 @@ NOTHROW_NCX(LIBCCALL libc_qecvt)(__LONGDOUBLE val,
 	return qcvt_buffer;
 }
 #endif /* !__ARCH_LONG_DOUBLE_IS_DOUBLE */
-#include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
 DEFINE_INTERN_ALIAS(libc_qfcvt, libc_fcvt);
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
@@ -2052,7 +2264,6 @@ NOTHROW_RPC(LIBCCALL libc_mkstemps64)(char *template_,
 	return libc_mkostemps64(template_, suffixlen, 0);
 }
 #endif /* __O_LARGEFILE */
-#include <hybrid/typecore.h>
 /* >> l64a(3), a64l(3)
  * Convert between `long' and base-64 encoded integer strings. */
 INTERN ATTR_SECTION(".text.crt.bsd") ATTR_RETNONNULL WUNUSED char *
@@ -2064,7 +2275,6 @@ NOTHROW_NCX(LIBCCALL libc_l64a)(long n) {
 	libc_l64a_r(n, buf, sizeof(buf));
 	return buf;
 }
-#include <hybrid/typecore.h>
 /* >> l64a(3), a64l(3)
  * Convert between `long' and base-64 encoded integer strings. */
 INTERN ATTR_SECTION(".text.crt.bsd") ATTR_PURE WUNUSED ATTR_IN(1) long
@@ -2189,7 +2399,6 @@ NOTHROW_NCX(LIBCCALL libc_fcvt)(double val,
 		return NULL;
 	return qcvt_buffer;
 }
-#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.application.options") WUNUSED ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) int
 NOTHROW_NCX(LIBCCALL libc_getsubopt)(char **__restrict optionp,
                                      char *const *__restrict tokens,
@@ -2297,7 +2506,6 @@ NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd) {
 		return NULL;
 	return buf;
 }
-#include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == 4
 DEFINE_INTERN_ALIAS(libc_strtol_l, libc_strto32_l);
 #elif __SIZEOF_LONG__ == 8
@@ -2312,7 +2520,6 @@ NOTHROW_NCX(LIBCCALL libc_strtol_l)(char const *__restrict nptr,
 	return libc_strtol(nptr, endptr, base);
 }
 #endif /* !... */
-#include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == 4
 DEFINE_INTERN_ALIAS(libc_strtoul_l, libc_strtou32_l);
 #elif __SIZEOF_LONG__ == 8
@@ -2327,7 +2534,6 @@ NOTHROW_NCX(LIBCCALL libc_strtoul_l)(char const *__restrict nptr,
 	return libc_strtoul(nptr, endptr, base);
 }
 #endif /* !... */
-#include <hybrid/typecore.h>
 #if __SIZEOF_LONG_LONG__ == 8
 DEFINE_INTERN_ALIAS(libc_strtoll_l, libc_strto64_l);
 #elif __SIZEOF_LONG_LONG__ == 4
@@ -2342,7 +2548,6 @@ NOTHROW_NCX(LIBCCALL libc_strtoll_l)(char const *__restrict nptr,
 	return libc_strtoll(nptr, endptr, base);
 }
 #endif /* !... */
-#include <hybrid/typecore.h>
 #if __SIZEOF_LONG_LONG__ == 8
 DEFINE_INTERN_ALIAS(libc_strtoull_l, libc_strtou64_l);
 #elif __SIZEOF_LONG_LONG__ == 4
@@ -2371,7 +2576,6 @@ NOTHROW_NCX(LIBCCALL libc_strtof_l)(char const *__restrict nptr,
 	(void)locale;
 	return libc_strtof(nptr, endptr);
 }
-#include <hybrid/typecore.h>
 #ifdef __ARCH_LONG_DOUBLE_IS_DOUBLE
 DEFINE_INTERN_ALIAS(libc_strtold_l, libc_strtod_l);
 #else /* __ARCH_LONG_DOUBLE_IS_DOUBLE */
@@ -3002,7 +3206,6 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.utility.stdlib") ATTR_INOU
 	libc_qsort_r(pbase, item_count, item_size, (int (LIBCCALL *)(void const *, void const *, void *))&_dwrap_sTPTP_TDTPTPTP_c0A0A1c1, &libd_qsort_r_cookie);
 }
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
-#include <hybrid/typecore.h>
 /* >> qsort_r(3) */
 INTERN ATTR_SECTION(".text.crt.utility.stdlib") ATTR_INOUT_OPT(1) NONNULL((4)) void
 (LIBCCALL libc_qsort_r)(void *pbase,
@@ -3516,13 +3719,15 @@ NOTHROW_NCX(LIBCCALL libc__itoa_s)(int val,
                                    char *buf,
                                    size_t buflen,
                                    int radix) {
+
 	char *p;
-	int temp;
+	unsigned int temp;
 	if unlikely(radix < 2)
 		radix = 2;
 	if unlikely(radix > 36)
 		radix = 36;
 	p = buf;
+
 	if (val < 0) {
 		if (!buflen--) {
 
@@ -3534,7 +3739,8 @@ NOTHROW_NCX(LIBCCALL libc__itoa_s)(int val,
 		*p++ = '-';
 		val = -val;
 	}
-	temp = val;
+
+	temp = (unsigned int)val;
 	do {
 		++p;
 	} while ((temp /= (unsigned int)radix) != 0);
@@ -3545,7 +3751,7 @@ NOTHROW_NCX(LIBCCALL libc__itoa_s)(int val,
 
 
 	}
-	temp = val;
+	temp = (unsigned int)val;
 	*p = '\0';
 	do {
 		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
@@ -3561,13 +3767,15 @@ NOTHROW_NCX(LIBCCALL libc__ltoa_s)(long val,
                                    char *buf,
                                    size_t buflen,
                                    int radix) {
+
 	char *p;
-	long temp;
+	unsigned long temp;
 	if unlikely(radix < 2)
 		radix = 2;
 	if unlikely(radix > 36)
 		radix = 36;
 	p = buf;
+
 	if (val < 0) {
 		if (!buflen--) {
 
@@ -3579,10 +3787,11 @@ NOTHROW_NCX(LIBCCALL libc__ltoa_s)(long val,
 		*p++ = '-';
 		val = -val;
 	}
-	temp = val;
+
+	temp = (unsigned long)val;
 	do {
 		++p;
-	} while ((temp /= (unsigned int)radix) != 0);
+	} while ((temp /= (unsigned long)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 
 		return ERANGE;
@@ -3590,12 +3799,12 @@ NOTHROW_NCX(LIBCCALL libc__ltoa_s)(long val,
 
 
 	}
-	temp = val;
+	temp = (unsigned long)val;
 	*p = '\0';
 	do {
-		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
-	} while ((temp /= (unsigned int)radix) != 0);
-	return EOK;
+		*--p = _itoa_upper_digits[temp % (unsigned long)radix];
+	} while ((temp /= (unsigned long)radix) != 0);
+	return 0;
 }
 #endif /* __SIZEOF_LONG__ != __SIZEOF_INT__ */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_OUTS(2, 3) errno_t
@@ -3611,6 +3820,7 @@ NOTHROW_NCX(LIBCCALL libc__ultoa_s)(unsigned long val,
                                     char *buf,
                                     size_t buflen,
                                     int radix) {
+
 	char *p;
 	unsigned long temp;
 	if unlikely(radix < 2)
@@ -3618,10 +3828,23 @@ NOTHROW_NCX(LIBCCALL libc__ultoa_s)(unsigned long val,
 	if unlikely(radix > 36)
 		radix = 36;
 	p = buf;
-	temp = val;
+
+
+
+
+
+
+
+
+
+
+
+
+
+	temp = (unsigned long)val;
 	do {
 		++p;
-	} while ((temp /= (unsigned int)radix) != 0);
+	} while ((temp /= (unsigned long)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 
 		return ERANGE;
@@ -3629,12 +3852,12 @@ NOTHROW_NCX(LIBCCALL libc__ultoa_s)(unsigned long val,
 
 
 	}
-	temp = val;
+	temp = (unsigned long)val;
 	*p = '\0';
 	do {
-		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
-	} while ((temp /= (unsigned int)radix) != 0);
-	return EOK;
+		*--p = _itoa_upper_digits[temp % (unsigned long)radix];
+	} while ((temp /= (unsigned long)radix) != 0);
+	return 0;
 }
 #if __SIZEOF_INT__ == 8
 DEFINE_INTERN_ALIAS(libc__i64toa, libc_itoa);
@@ -3672,20 +3895,21 @@ DEFINE_INTERN_ALIAS(libc__i64toa_s, libc__ltoa_s);
 #elif __SIZEOF_INT__ == 8
 DEFINE_INTERN_ALIAS(libc__i64toa_s, libc__itoa_s);
 #else /* ... */
-#include <bits/types.h>
 #include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_OUTS(2, 3) errno_t
 NOTHROW_NCX(LIBCCALL libc__i64toa_s)(s64 val,
                                      char *buf,
                                      size_t buflen,
                                      int radix) {
+
 	char *p;
-	s64 temp;
+	__UINT64_TYPE__ temp;
 	if unlikely(radix < 2)
 		radix = 2;
 	if unlikely(radix > 36)
 		radix = 36;
 	p = buf;
+
 	if (val < 0) {
 		if (!buflen--) {
 
@@ -3697,10 +3921,11 @@ NOTHROW_NCX(LIBCCALL libc__i64toa_s)(s64 val,
 		*p++ = '-';
 		val = -val;
 	}
-	temp = val;
+
+	temp = (__UINT64_TYPE__)val;
 	do {
 		++p;
-	} while ((temp /= (unsigned int)radix) != 0);
+	} while ((temp /= (__UINT64_TYPE__)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 
 		return ERANGE;
@@ -3708,12 +3933,12 @@ NOTHROW_NCX(LIBCCALL libc__i64toa_s)(s64 val,
 
 
 	}
-	temp = val;
+	temp = (__UINT64_TYPE__)val;
 	*p = '\0';
 	do {
-		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
-	} while ((temp /= (unsigned int)radix) != 0);
-	return EOK;
+		*--p = _itoa_upper_digits[temp % (__UINT64_TYPE__)radix];
+	} while ((temp /= (__UINT64_TYPE__)radix) != 0);
+	return 0;
 }
 #endif /* !... */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_OUTS(2, 3) errno_t
@@ -3726,24 +3951,37 @@ NOTHROW_NCX(LIBDCALL libd__ui64toa_s)(u64 val,
 #if __SIZEOF_LONG__ == 8
 DEFINE_INTERN_ALIAS(libc__ui64toa_s, libc__ultoa_s);
 #else /* __SIZEOF_LONG__ == 8 */
-#include <bits/types.h>
 #include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.dos.unicode.static.convert") ATTR_OUTS(2, 3) errno_t
 NOTHROW_NCX(LIBCCALL libc__ui64toa_s)(u64 val,
                                       char *buf,
                                       size_t buflen,
                                       int radix) {
+
 	char *p;
-	u64 temp;
+	__UINT64_TYPE__ temp;
 	if unlikely(radix < 2)
 		radix = 2;
 	if unlikely(radix > 36)
 		radix = 36;
 	p = buf;
-	temp = val;
+
+
+
+
+
+
+
+
+
+
+
+
+
+	temp = (__UINT64_TYPE__)val;
 	do {
 		++p;
-	} while ((temp /= (unsigned int)radix) != 0);
+	} while ((temp /= (__UINT64_TYPE__)radix) != 0);
 	if (buflen <= (size_t)(p - buf)) {
 
 		return ERANGE;
@@ -3751,11 +3989,11 @@ NOTHROW_NCX(LIBCCALL libc__ui64toa_s)(u64 val,
 
 
 	}
-	temp = val;
+	temp = (__UINT64_TYPE__)val;
 	*p = '\0';
 	do {
-		*--p = _itoa_upper_digits[temp % (unsigned int)radix];
-	} while ((temp /= (unsigned int)radix) != 0);
+		*--p = _itoa_upper_digits[temp % (__UINT64_TYPE__)radix];
+	} while ((temp /= (__UINT64_TYPE__)radix) != 0);
 	return 0;
 }
 #endif /* __SIZEOF_LONG__ != 8 */
