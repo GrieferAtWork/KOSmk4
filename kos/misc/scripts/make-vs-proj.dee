@@ -40,6 +40,8 @@ import * from deemon;
 import * from ..config.configs;
 import * from ..config.utils;
 import * from ..config.files;
+import ..libmagic.steps.c as c;
+import ..libmagic.toolchain.gcc as gcc;
 import fs;
 import util;
 
@@ -47,8 +49,14 @@ fs.chdir(fs.headof(__FILE__) + "/../../.."); /* $PROJPATH */
 
 global final ROOTDIR = fs.getcwd().replace("/", "\\").rstrip("\\");
 
+@@S.a. `SET_LANGUAGE("c++")' in `/kos/.sources'
+global final DEFAULT_COMPILE_LANGUAGE = "c++";
+
+global final DEFAULT_ADDITIONAL_OPTIONS = {
+	"-x", DEFAULT_COMPILE_LANGUAGE, "-std=c++17",
+	"-undef", "-nostdlib", "-nostdinc" };
 global final PROJ_GUID = "3CFDCE40-7387-4CB8-BC7A-79666A98C8A6";
-global final PROJ_TARGETS = Dict.Frozen(() -> {
+global final PROJ_TARGETS: {string: (string, {string...}, {string...})} = Dict.Frozen(() -> {
 	for (local targetName: listTargetNames()) {
 		local TARGET = import(f"..targets.{targetName}");
 		local VS_PROJECT_TARGET = try
@@ -61,22 +69,22 @@ global final PROJ_TARGETS = Dict.Frozen(() -> {
 		if (targetName == "i386")
 			VS_PROJECT_TARGET = "x86";
 #endif /* ENABLE_GDB */
-		yield (
-			f"{targetName}-kos",
-			(VS_PROJECT_TARGET, {
-				f"kos/include/{TARGET.XARCH}-kos",
-				f"kos/src/kernel/include/{TARGET.XARCH}-kos"
-			}, Tuple(
+		yield (f"{targetName}-kos", (
+			VS_PROJECT_TARGET,
+			Tuple(
 				for (local name, value: enumerateTargetSpecificMacros(targetName, TARGET))
 					f"{name}={value}"
-			))
-		);
+			),
+			{ f"kos/include/{TARGET.XARCH}-kos", f"kos/include" },
+			{ f"kos/src/kernel/include/{TARGET.XARCH}-kos", f"kos/src/kernel/include" },
+		));
 	}
 }());
-#define PORJ_TARGETS_INTERNAL_NAME(name) PROJ_TARGETS[name][0]
-#define PORJ_TARGETS_INC_PATHS(name)     PROJ_TARGETS[name][1]
-#define PORJ_TARGETS_DEFINES(name)       PROJ_TARGETS[name][2]
-#define PORJ_TARGETS_MAGIC_NAME(name)    (name).rsstrip("-kos")
+#define PORJ_TARGETS_INTERNAL_NAME(name)      PROJ_TARGETS[name][0]
+#define PORJ_TARGETS_DEFINES(name)            PROJ_TARGETS[name][1]
+#define PORJ_TARGETS_INC_PATHS(name)          PROJ_TARGETS[name][2]
+#define PORJ_TARGETS_KERNEL_INC_PATHS(name)   PROJ_TARGETS[name][3]
+#define PORJ_TARGETS_MAGIC_NAME(name)         (name).rsstrip("-kos")
 
 global final PROJ_CONFIGS = Dict.Frozen(() -> {
 	for (local configName: listConfigurationNames()) {
@@ -168,13 +176,6 @@ function createVsFile(filename: string, cb: Callable) {
 	}
 }
 
-function injectPath(): string {
-	/* For some reason, Visual Studio unsetenv's  $PATH when calling our build  script.
-	 * Work around this issue by saving $PATH at the time the project files were build,
-	 * so it can be injected into magic.dee, which will then restore it! */
-	return f"\"--environ=PATH={fs.environ["PATH"]}\"";
-}
-
 createVsFile("kos.sln", (fp: File) -> {
 	fp <<
 "Microsoft Visual Studio Solution File, Format Version 12.00\n"
@@ -232,41 +233,178 @@ createVsFile("kos.vcxproj", (fp: File) -> {
 	fp <<
 "	</ItemGroup>\n"
 "	<ItemGroup>\n";
-	for (local name: SORTED_FILE_NAMES) {
-		local typ = FILES[name];
+	for (local filename: SORTED_FILE_NAMES) {
+		local typ = FILES[filename];
 		if (typ == FILE_KIND_HDR) {
 			fp <<
-"		<ClInclude Include=\"" << projRelPath(name) << "\" />\n";
+"		<ClInclude Include=\"" << projRelPath(filename) << "\" />\n";
 		}
 	}
 	fp <<
 "	</ItemGroup>\n"
 "	<ItemGroup>\n";
-	for (local name: SORTED_FILE_NAMES) {
-		local typ = FILES[name];
+	for (local filename: SORTED_FILE_NAMES) {
+		local typ = FILES[filename];
 		if (typ !in [FILE_KIND_SRC, FILE_KIND_HDR]) {
 			fp <<
-"		<None Include=\"" << projRelPath(name) << "\" />\n";
+"		<None Include=\"" << projRelPath(filename) << "\" />\n";
 		}
 	}
 	fp <<
 "	</ItemGroup>\n"
 "	<ItemGroup>\n";
-	for (local name: SORTED_FILE_NAMES) {
-		local typ = FILES[name];
+	for (local filename: SORTED_FILE_NAMES) {
+		local typ = FILES[filename];
 		if (typ == FILE_KIND_SRC) {
-			name = projRelPath(name);
-			if (name.startswith(r"..\kos\src\kernel")) {
+			local relName = projRelPath(filename);
+			local extraIncDirs: {string...} = [];
+			local extraMacros: {string: string | none} = Dict();
+			local fileSpecificAdditionalOptions = DEFAULT_ADDITIONAL_OPTIONS;
+			local configSpecificExtraIncDirs: {(string, string): {string...}} = Dict();
+			if (relName.startswith(r"..\kos\src\kernel")) {
+				extraMacros["__KERNEL__"] = "1";
+				if (relName.startswith(r"..\kos\src\kernel\core"))
+					extraMacros["BUILDING_KERNEL_CORE"] = "1";
+				for (local config: PROJ_CONFIGS.keys.sorted()) {
+					for (local target: PROJ_TARGETS.keys.sorted()) {
+						local kernelIncPaths = List(PORJ_TARGETS_KERNEL_INC_PATHS(target));
+						configSpecificExtraIncDirs[(config, target)] = kernelIncPaths;
+					}
+				}
+			}
+
+			/* If the file has a custom magic build script, try to use that here! */
+			local magicBuildScript = c.getMagicBuildScript(filename);
+			if (magicBuildScript !is none) {
+				local options = Dict({
+					c.OPT_COMPILE_SOURCES: filename,
+					c.OPT_COMPILE_LANGUAGE: DEFAULT_COMPILE_LANGUAGE,
+					c.OPT_COMPILE_CCFLAGS: [],
+					c.OPT_COMPILE_PPFLAGS: [],
+					c.OPT_COMPILE_ASFLAGS: [],
+					c.OPT_COMPILE_INCPATH: [],
+					c.OPT_COMPILE_MACROS: Dict(),
+					gcc.OPT_GCC_OPTIONS: []
+				});
+				try {
+					exec(magicBuildScript, globals: { "options" : options, "step": none });
+				} catch (e...) {
+					print File.stderr: ("Exception while running build script for ", repr filename);
+					throw e;
+				}
+				local extraCcFlags = [];
+				extraCcFlags.extend(options.get(c.OPT_COMPILE_CCFLAGS));
+				extraCcFlags.extend(options.get(c.OPT_COMPILE_PPFLAGS));
+				extraCcFlags.extend(options.get(c.OPT_COMPILE_ASFLAGS));
+				extraCcFlags.extend(options.get(gcc.OPT_GCC_OPTIONS));
+				for (local name, value: options.get(c.OPT_COMPILE_MACROS))
+					extraCcFlags.append(f"-D{name}={value is none ? "1" : value}");
+				for (local incPath: options.get(c.OPT_COMPILE_INCPATH))
+					extraCcFlags.extend(f"-I{incPath}");
+				local numFlags = #extraCcFlags;
+				for (local i = 0; i < numFlags; ++i) {
+					local ccFlag = extraCcFlags[i];
+					switch (ccFlag) {
+
+					case "-x":
+						options[c.OPT_COMPILE_LANGUAGE] = extraCcFlags[i + 1];
+						++i;
+						continue;
+
+					case "-Os":
+						extraMacros.pop("__OPTIMIZE__", none);
+						extraMacros["__OPTIMIZE_SIZE__"] = none;
+						break;
+
+					case "-O3":
+					case "-O2":
+					case "-O1":
+					case "-O":
+						extraMacros.pop("__OPTIMIZE_SIZE__", none);
+						extraMacros["__OPTIMIZE__"] = none;
+						break;
+
+					case "-O0":
+						extraMacros.pop("__OPTIMIZE_SIZE__", none);
+						extraMacros.pop("__OPTIMIZE__", none);
+						break;
+
+						/* Don't warn about the following flags being ignored. */
+					case "-fexceptions":
+					case "-fno-exceptions":
+						break;
+
+					default:
+						if (ccFlag.startswith("-D")) {
+							local macName, none, macValue = ccFlag[2:].partition("=")...;
+							if (macValue in ["", "1"])
+								macValue = none;
+							extraMacros[macName] = macValue;
+						} else if (ccFlag.startswith("-I")) {
+							extraIncDirs.append(ccFlag[2:]);
+						} else {
+							print(filename, ":notice: Ignoring compiler flag from build script: ", repr ccFlag);
+						}
+						break;
+					}
+				}
+				local compileAsLanguage = options.get(c.OPT_COMPILE_LANGUAGE, DEFAULT_COMPILE_LANGUAGE);
+				if (compileAsLanguage != DEFAULT_COMPILE_LANGUAGE) {
+					/* Set custom language */
+					fileSpecificAdditionalOptions = List(fileSpecificAdditionalOptions);
+					local xOptIndex = fileSpecificAdditionalOptions.find("-x");
+					if (xOptIndex >= 0)
+						fileSpecificAdditionalOptions.erase(xOptIndex, 2);
+					fileSpecificAdditionalOptions.extend({ "-x", compileAsLanguage });
+				}
+			}
+
+			if (extraMacros || extraIncDirs || configSpecificExtraIncDirs ||
+			    (fileSpecificAdditionalOptions !== DEFAULT_ADDITIONAL_OPTIONS &&
+			     fileSpecificAdditionalOptions != DEFAULT_ADDITIONAL_OPTIONS)) {
 				fp <<
-"		<ClCompile Include=\"" << name << "\">\n"
-"			<PreprocessorDefinitions>$(NMakePreprocessorDefinitions);__KERNEL__";
-				if (name.startswith(r"..\kos\src\kernel\core"))
-					fp << ";BUILDING_KERNEL_CORE";
-				fp << "</PreprocessorDefinitions>\n"
+"		<ClCompile Include=\"" << relName << "\">\n";
+				if (extraMacros) {
+					fp <<
+"			<PreprocessorDefinitions>$(NMakePreprocessorDefinitions);"
+ 						<< ";".join(for (local name, value: extraMacros)
+							(value is none || value == "1")
+								? name : f"{name}={value}")
+						<< "</PreprocessorDefinitions>\n";
+				}
+				if (fileSpecificAdditionalOptions != DEFAULT_ADDITIONAL_OPTIONS) {
+					fp <<
+"			<AdditionalOptions>"
+						<< " ".join(fileSpecificAdditionalOptions)
+						<< "</AdditionalOptions>\n";
+				}
+				if (configSpecificExtraIncDirs) {
+					for (local config: PROJ_CONFIGS.keys.sorted()) {
+						for (local target: PROJ_TARGETS.keys.sorted()) {
+							local configExtraIncDirs = copy configSpecificExtraIncDirs.get((config, target));
+							if (configExtraIncDirs is none)
+								configExtraIncDirs = [];
+							configExtraIncDirs.extend(extraIncDirs);
+							if (configExtraIncDirs) {
+								local target_int = PORJ_TARGETS_INTERNAL_NAME(target);
+								fp <<
+"			<AdditionalIncludeDirectories Condition=\"'$(Configuration)|$(Platform)'=='" << config << "|" << target_int << "'\">"
+									<< ";".join(for (local p: configExtraIncDirs) ROOTDIR + "\\" + p.replace("/", "\\"))
+									<< ";$(NMakeIncludeSearchPath)</AdditionalIncludeDirectories>\n";
+							}
+						}
+					}
+				} else if (extraIncDirs) {
+					fp <<
+"			<AdditionalIncludeDirectories>"
+						<< ";".join(for (local p: extraIncDirs) ROOTDIR + "\\" + p.replace("/", "\\"))
+						<< ";$(NMakeIncludeSearchPath)</AdditionalIncludeDirectories>\n";
+				}
+				fp <<
 "		</ClCompile>\n";
 			} else {
 				fp <<
-"		<ClCompile Include=\"" << name << "\" />\n";
+"		<ClCompile Include=\"" << relName << "\" />\n";
 			}
 		}
 	}
@@ -324,16 +462,15 @@ createVsFile("kos.vcxproj", (fp: File) -> {
 			local target_int = PORJ_TARGETS_INTERNAL_NAME(target);
 			local incPaths = List(PORJ_TARGETS_INC_PATHS(target));
 			local defines  = ["__KOS__=1", "__unix__=1"];
-			incPaths.extend({ "kos/include", "kos/src/kernel/include" });
 			defines.extend(PORJ_TARGETS_DEFINES(target));
 			defines.extend(PROJ_CONFIGS_DEFINES(config));
 			fp <<
 "	<PropertyGroup Condition=\"'$(Configuration)|$(Platform)'=='" << config << "|" << target_int << "'\">\n"
-"		<IncludePath>" << ";".join(for (local p: incPaths) ROOTDIR + "\\" + p.replace("/", "\\")) << "</IncludePath>\n"
+"		<IncludePath />\n"
 "		<OutDir>" << ROOTDIR << "\\bin\\" << target << "-" << configShortHand << "</OutDir>\n"
 "		<IntDir>" << ROOTDIR << "\\build\\" << target << "-" << configShortHand << "</IntDir>\n"
 "		<TargetName>os\\kernel.bin</TargetName>\n"
-"		<ExecutablePath />\n"
+"		<ExecutablePath>$(PATH)</ExecutablePath>\n"
 "		<ReferencePath />\n"
 "		<LibraryPath />\n"
 "		<LibraryWPath />\n"
@@ -352,7 +489,6 @@ createVsFile("kos.vcxproj", (fp: File) -> {
 			" --format-error-messages"
 			" --target=" << PORJ_TARGETS_MAGIC_NAME(target) <<
 			" --config=" << configShortHand <<
-			" " << injectPath() <<
 			"\"</NMakeBuildCommandLine>\n"
 "		<NMakeReBuildCommandLine>C:\\Windows\\system32\\cmd.exe /C \"" << ROOTDIR << "\\binutils\\deemon\\deemon.exe"
 			" " << ROOTDIR << "\\magic.dee"
@@ -361,13 +497,13 @@ createVsFile("kos.vcxproj", (fp: File) -> {
 			" --format-error-messages"
 			" --target=" << PORJ_TARGETS_MAGIC_NAME(target) <<
 			" --config=" << configShortHand <<
-			" " << injectPath() <<
 			"\"</NMakeReBuildCommandLine>\n"
 "		<NMakeCleanCommandLine>CMD_NEW</NMakeCleanCommandLine>\n" /* ??? */
 "		<NMakeOutput>" << ROOTDIR << "\\bin\\" << target << "-" << configShortHand << "\\os\\kernel.bin</NMakeOutput>\n"
+"		<NMakeIncludeSearchPath>" << ";".join(for (local p: incPaths) ROOTDIR + "\\" + p.replace("/", "\\")) << "</NMakeIncludeSearchPath>\n"
 "		<NMakePreprocessorDefinitions>" << ";".join(defines) << "</NMakePreprocessorDefinitions>\n"
 "		<NMakeForcedIncludes>" << ROOTDIR << "\\kos\\include\\compiler\\intellisense-gcc.h</NMakeForcedIncludes>\n"
-"		<AdditionalOptions>-x c++ -std=c++17 -undef -nostdlib -nostdinc</AdditionalOptions>\n"
+"		<AdditionalOptions>" << " ".join(DEFAULT_ADDITIONAL_OPTIONS) << "</AdditionalOptions>\n"
 "	</PropertyGroup>\n";
 		}
 	}
@@ -447,23 +583,23 @@ createVsFile("kos.vcxproj.filters", (fp: File) -> {
 "	</ItemGroup>\n"
 "	<ItemGroup>\n";
 
-	function printFileFilterLocation(fp: File, decl: string, name: string) {
-		local filter = projFilterOf(name);
+	function printFileFilterLocation(fp: File, decl: string, filename: string) {
+		local filter = projFilterOf(filename);
 		if (filter) {
 			fp <<
-"		<" << decl << " Include=\"" << projRelPath(name) << "\">\n"
+"		<" << decl << " Include=\"" << projRelPath(filename) << "\">\n"
 "			<Filter>" << filter << "</Filter>\n"
 "		</" << decl << ">\n";
 		} else {
 			fp <<
-"		<" << decl << " Include=\"" << projRelPath(name) << "\" />\n";
+"		<" << decl << " Include=\"" << projRelPath(filename) << "\" />\n";
 		}
 	}
 
-	for (local name: SORTED_FILE_NAMES) {
-		local typ = FILES[name];
+	for (local filename: SORTED_FILE_NAMES) {
+		local typ = FILES[filename];
 		if (typ == FILE_KIND_HDR) {
-			printFileFilterLocation(fp, "ClInclude", name);
+			printFileFilterLocation(fp, "ClInclude", filename);
 		}
 	}
 
@@ -471,10 +607,10 @@ createVsFile("kos.vcxproj.filters", (fp: File) -> {
 "	</ItemGroup>\n"
 "	<ItemGroup>";
 
-	for (local name: SORTED_FILE_NAMES) {
-		local typ = FILES[name];
+	for (local filename: SORTED_FILE_NAMES) {
+		local typ = FILES[filename];
 		if (typ !in [FILE_KIND_SRC, FILE_KIND_HDR]) {
-			printFileFilterLocation(fp, "None", name);
+			printFileFilterLocation(fp, "None", filename);
 		}
 	}
 
@@ -482,10 +618,10 @@ createVsFile("kos.vcxproj.filters", (fp: File) -> {
 "	</ItemGroup>\n"
 "	<ItemGroup>";
 
-	for (local name: SORTED_FILE_NAMES) {
-		local typ = FILES[name];
+	for (local filename: SORTED_FILE_NAMES) {
+		local typ = FILES[filename];
 		if (typ == FILE_KIND_SRC) {
-			printFileFilterLocation(fp, "ClCompile", name);
+			printFileFilterLocation(fp, "ClCompile", filename);
 		}
 	}
 
@@ -531,7 +667,6 @@ createVsFile("kos.vcxproj.user", (fp: File) -> {
 			<< " --format-error-messages"
 			<< " --target=" << PORJ_TARGETS_MAGIC_NAME(target)
 			<< " --config=" << configShortHand
-			<< " " << injectPath()
 			<< "</LocalDebuggerCommandArguments>\n"
 "		<LocalDebuggerWorkingDirectory>" << ROOTDIR << "</LocalDebuggerWorkingDirectory>\n"
 #endif /* !ENABLE_GDB */

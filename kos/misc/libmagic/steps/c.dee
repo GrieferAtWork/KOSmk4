@@ -115,24 +115,90 @@ global final OPT_LINK_NOSTDLIB: string = "LINK.nostdlib";
 global final OPT_ARCHIVE_OUTPUT: string = "ARCHIVE.output";
 
 
-local final function readFileUntil(fp: File, end_pattern: string): string | none {
+local final function readFileUntil(fp: File, endPattern: string): string | none {
 	File.Writer result;
 	for (;;) {
 		local temp = fp.read(512);
 		if (!temp)
 			return none;
-		local pos = temp.find(end_pattern);
+		local pos = temp.find(endPattern);
 		if (pos < 0) {
 			result << temp;
 			continue;
 		}
 		result << temp[:pos];
-		temp = result.string.find(end_pattern);
+		temp = result.string.find(endPattern);
 		if (temp >= 0)
 			return result.string[:temp];
 		break;
 	}
 	return result.string;
+}
+
+function getMagicBuildScript(srcFile: string): string | none {
+	local fp = try File.open(srcFile, "r,nobuf") catch (...) none;
+	if (fp !is none) {
+		local header = fp.read(11);
+		local content;
+		if (header.startswith("\xEF\xBB\xBF"))
+			header = header[3:] + fp.read(3);
+		if (#header == 11) {
+			if (header.startswith("/*[[[magic")) {
+				if (header.isspace(10) || header.islf(10)) {
+					content = readFileUntil(fp, "]]]*/");
+					if (content is none)
+						goto err_bad_magic_tag;
+					return content;
+				}
+			} else if (header.startswith("//[[[magic")) {
+				if (header.isspace(10) || header.islf(10)) {
+					content = readFileUntil(fp, "]]]");
+					if (content is none)
+						goto err_bad_magic_tag;
+					File.Writer fixfp;
+					for (local l: content.splitlines(true)) {
+						if (l.startswith("//")) {
+							l = l[2:];
+						} else {
+							l = l.lstrip();
+							if (l.startswith("//")) {
+								l = l[2:];
+							} else {
+								goto err_bad_magic_tag;
+							}
+						}
+						fixfp << l;
+					}
+					return fixfp.string;
+				}
+			} else if (header.startswith("#[[[magic")) {
+				if (header.isspace(9) || header.islf(9)) {
+					content = readFileUntil(fp, "]]]");
+					if (content is none)
+						goto err_bad_magic_tag;
+					content = header[10:] + content;
+					File.Writer fixfp;
+					for (local l: content.splitlines(true)) {
+						if (l.startswith("#")) {
+							l = l[1:];
+						} else {
+							l = l.lstrip();
+							if (l.startswith("#")) {
+								l = l[1:];
+							} else {
+								goto err_bad_magic_tag;
+							}
+						}
+						fixfp << l;
+					}
+					return fixfp.string;
+				}
+			}
+		}
+	}
+	return none;
+err_bad_magic_tag:
+	throw Error(f"Bad magic tag in {repr srcFile}");
 }
 
 local final function getCompileOptions(self: BoundStep, srcFile: string): {string: Object} {
@@ -141,74 +207,13 @@ local final function getCompileOptions(self: BoundStep, srcFile: string): {strin
 	if (extra !is none)
 		result = mergeOptions(result, extra);
 	if (result.get(OPT_COMPILE_INLINE_SOURCE_FLAGS)) {
-		local fp = try File.open(srcFile, "r,nobuf") catch (...) none;
-		if (fp !is none) {
-			local header = fp.read(11);
-			local content;
-			if (header.startswith("\xEF\xBB\xBF"))
-				header = header[3:] + fp.read(3);
-			if (#header == 11) {
-				if (header.startswith("/*[[[magic")) {
-					if (header.isspace(10) || header.islf(10)) {
-						content = readFileUntil(fp, "]]]*/");
-						if (content is none)
-							goto err_bad_magic_tag;
-exec_content:
-						result = deepcopy result; /* Make sure that only 1 file is affected! */
-						exec(content, globals: { "options" : result, "step": self });
-					}
-				} else if (header.startswith("//[[[magic")) {
-					if (header.isspace(10) || header.islf(10)) {
-						content = readFileUntil(fp, "]]]");
-						if (content is none)
-							goto err_bad_magic_tag;
-						File.Writer fixfp;
-						for (local l: content.splitlines(true)) {
-							if (l.startswith("//")) {
-								l = l[2:];
-							} else {
-								l = l.lstrip();
-								if (l.startswith("//")) {
-									l = l[2:];
-								} else {
-									goto err_bad_magic_tag;
-								}
-							}
-							fixfp << l;
-						}
-						content = fixfp.string;
-						goto exec_content;
-					}
-				} else if (header.startswith("#[[[magic")) {
-					if (header.isspace(9) || header.islf(9)) {
-						content = readFileUntil(fp, "]]]");
-						if (content is none)
-							goto err_bad_magic_tag;
-						content = header[10:] + content;
-						File.Writer fixfp;
-						for (local l: content.splitlines(true)) {
-							if (l.startswith("#")) {
-								l = l[1:];
-							} else {
-								l = l.lstrip();
-								if (l.startswith("#")) {
-									l = l[1:];
-								} else {
-									goto err_bad_magic_tag;
-								}
-							}
-							fixfp << l;
-						}
-						content = fixfp.string;
-						goto exec_content;
-					}
-				}
-			}
+		local script = getMagicBuildScript(srcFile);
+		if (script !is none) {
+			result = deepcopy result; /* Make sure that only 1 file is affected! */
+			exec(script, globals: { "options" : result, "step": self });
 		}
 	}
 	return result;
-err_bad_magic_tag:
-	throw Error(f"Bad magic tag in {repr srcFile}");
 }
 
 
