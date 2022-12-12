@@ -343,7 +343,7 @@ union iconv_encode_data {
                                     *       is also a guaranty that the  output printer didn't return a  negative
                                     *       value, meaning you can use the `ICONV_HASERR' flag to determine where
                                     *       an  error came from, and the actual  returned value to figure out how
-                                    *       much of the input data could not be parsed. */
+                                    *       much of the (last chunk of) input data could not be parsed. */
 #define ICONV_ERR_ERROR          1 /* Same as `ICONV_ERR_ERRNO', but leave `errno' unchanged. */
 #define ICONV_ERR_DISCARD        2 /* Data that cannot be encoded/decoded is silently discarded. */
 #define ICONV_ERR_REPLACE        3 /* Replace characters that cannot be encoded/decoded with ascii  '?'

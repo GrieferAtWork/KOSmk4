@@ -40,16 +40,17 @@ DECL_BEGIN
 DEFINE_TEST(pthread_key) {
 	pthread_key_t key;
 	char const *val = "Pointed-to memory";
-	EQd(pthread_key_create(&key, NULL), EOK);
-	EQp(pthread_getspecific(key), NULL);
-	EQd(pthread_setspecific(key, val), EOK);
-	EQp(pthread_getspecific(key), val);
-	EQd(pthread_setspecific(key, NULL), EOK);
-	EQp(pthread_getspecific(key), NULL);
-	EQd(pthread_key_delete(key), EOK);
-	EQd(pthread_key_delete(key), EINVAL);        /* Trying to delete twice must yield EINVAL */
-	EQd(pthread_setspecific(key, NULL), EINVAL); /* Trying to write after delete must yield EINVAL */
-	EQp(pthread_getspecific(key), NULL);         /* Trying to read after delete must yield NULL */
+
+	EQ(EOK, /*   */ pthread_key_create(&key, NULL));
+	EQ(NULL, /*  */ pthread_getspecific(key));
+	EQ(EOK, /*   */ pthread_setspecific(key, val));
+	EQ(val, /*   */ pthread_getspecific(key));
+	EQ(EOK, /*   */ pthread_setspecific(key, NULL));
+	EQ(NULL, /*  */ pthread_getspecific(key));
+	EQ(EOK, /*   */ pthread_key_delete(key));
+	EQ(EINVAL, /**/ pthread_key_delete(key));        /* Trying to delete twice must yield EINVAL */
+	EQ(EINVAL, /**/ pthread_setspecific(key, NULL)); /* Trying to write after delete must yield EINVAL */
+	EQ(NULL, /*  */ pthread_getspecific(key));       /* Trying to read after delete must yield NULL */
 }
 
 DECL_END

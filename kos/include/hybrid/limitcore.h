@@ -48,16 +48,6 @@
 #define __PRIVATE_MIN_U(s)   __PRIVATE_MIN2_U(s)
 #define __PRIVATE_MAX_U(s)   __PRIVATE_MAX2_U(s)
 
-#ifdef __CHAR_MIN__
-#if __CHAR_MIN__ == 0 && !defined(__CHAR_UNSIGNED__)
-#define __CHAR_UNSIGNED__ 1
-#endif /* __CHAR_MIN__ == 0 && !__CHAR_UNSIGNED__ */
-#elif defined(_CHAR_UNSIGNED) || defined(_CHAR_IS_UNSIGNED)
-#ifndef __CHAR_UNSIGNED__
-#define __CHAR_UNSIGNED__ 1
-#endif /* !__CHAR_UNSIGNED__ */
-#endif
-
 #ifndef __SCHAR_MIN__
 #define __SCHAR_MIN__ __PRIVATE_MIN_S(__SIZEOF_CHAR__)
 #endif /* !__SCHAR_MIN__ */

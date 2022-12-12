@@ -74,201 +74,208 @@ __DECL_END
 /* Assertion check helpers                                              */
 /************************************************************************/
 
+#ifdef __INTELLISENSE__
+#define __OP(makevars, cond, cond_novars, expr_str, ...) (void)(cond_novars)
+#define _OPtPOS(v, v_str)                                (void)((v) >= 0)
+#define _OPtCMP(a, op, b, a_str, b_str)                  (void)((a)op(b))
+#define _OPtCMPf(a, op, b, a_str, b_str, format, ...)    (void)((a)op(b))
+#define _OPtBITON(bitmask, word, bitmask_str, word_str)  (void)(((word) & (bitmask)) == (bitmask))
+#define _OPtBITOFF(bitmask, word, bitmask_str, word_str) (void)(((word) & (bitmask)) == 0)
+#else /* __INTELLISENSE__ */
 #include <parts/assert-failed.h>
 #ifdef __assertion_checkf
-#define _OPt(a, op, b, T, PRIt, a_str, b_str)                         \
-	do {                                                              \
-		for (;;) {                                                    \
-			T _a = (a);                                               \
-			T _b = (b);                                               \
-			if (_a op _b)                                             \
-				break;                                                \
-			if (!__assertion_checkf(a_str " " #op " " b_str,          \
-			                        a_str " " #op " " b_str           \
-			                        " (%" PRIt " " #op " %" PRIt ")", \
-			                        _a, _b))                          \
-				break;                                                \
-		}                                                             \
-	}	__WHILE0
-#define _OPtPRED(a, op, b, T, PRIt, a_str, b_str, predicate)          \
-	do {                                                              \
-		for (;;) {                                                    \
-			T _a = (a);                                               \
-			T _b = (b);                                               \
-			if (predicate(_a, _b))                                    \
-				break;                                                \
-			if (!__assertion_checkf(a_str " " #op " " b_str,          \
-			                        a_str " " #op " " b_str           \
-			                        " (%" PRIt " " #op " %" PRIt ")", \
-			                        _a, _b))                          \
-				break;                                                \
-		}                                                             \
-	}	__WHILE0
+#define __OPEXPAND(...) __VA_ARGS__
+#define __OP(makevars, cond, cond_novars, expr_str, ...) \
+	do {                                                 \
+		__OPEXPAND makevars;                             \
+		if (cond)                                        \
+			break;                                       \
+		if (!__assertion_checkf(expr_str, __VA_ARGS__))  \
+			break;                                       \
+	}	__WHILE1
 #else /* __assertion_checkf */
 #include <parts/assert.h>
 #ifdef __do_assertf
-#define _OPt(a, op, b, T, PRIt, a_str, b_str)                                  \
-	do {                                                                       \
-		T _a = (a);                                                            \
-		T _b = (b);                                                            \
-		__do_assertf(_a op _b, a_str " " #op " " b_str,                        \
-		             a_str " " #op " " b_str " (%" PRIt " " #op " %" PRIt ")", \
-		             _a, _b);                                                  \
-	}	__WHILE0
-#define _OPtPRED(a, op, b, T, PRIt, a_str, b_str, predicate)                   \
-	do {                                                                       \
-		T _a = (a);                                                            \
-		T _b = (b);                                                            \
-		__do_assertf(predicate(_a, _b), a_str " " #op " " b_str,               \
-		             a_str " " #op " " b_str " (%" PRIt " " #op " %" PRIt ")", \
-		             _a, _b);                                                  \
+#define __OPEXPAND(...) __VA_ARGS__
+#define __OP(makevars, cond, cond_novars, expr_str, ...) \
+	do {                                                 \
+		__OPEXPAND makevars;                             \
+		__do_assertf(cond, expr_str, __VA_ARGS__);       \
 	}	__WHILE0
 #else /* __do_assertf */
 #include <assert.h>
-#define _OPt(a, op, b, T, PRIt, a_str, b_str)                assert((T)(a)op(T)(b))
-#define _OPtPRED(a, op, b, T, PRIt, a_str, b_str, predicate) assert(predicate((T)(a), (T)(b)))
+#define __OP(makevars, cond, cond_novars, expr_str, ...) assert(cond_novars)
 #endif /* !__do_assertf */
 #endif /* !__assertion_checkf */
 
-#include <inttypes.h>
+#include <bits/crt/inttypes.h>
+#ifdef __NO_FPU
+#define _TPRIfmt(Tob, fmtS, fmtU, fmtF, fmtP, ...)                                                                                                    \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((Tob) + 0), int),           fmtS("", __VA_ARGS__),                                  \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((Tob) + 0), unsigned),      fmtU("", __VA_ARGS__),                                  \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((Tob) + 0), long),          fmtS(__PRIN_PREFIX(__SIZEOF_LONG__), __VA_ARGS__),      \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((Tob) + 0), unsigned long), fmtU(__PRIN_PREFIX(__SIZEOF_LONG__), __VA_ARGS__),      \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((Tob) + 0), __LONGLONG),    fmtS(__PRIN_PREFIX(__SIZEOF_LONG_LONG__), __VA_ARGS__), \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((Tob) + 0), __ULONGLONG),   fmtU(__PRIN_PREFIX(__SIZEOF_LONG_LONG__), __VA_ARGS__), \
+	                      /*                                                               */ fmtP(__PRIP_PREFIX, __VA_ARGS__)))))))
+#elif defined(__COMPILER_HAVE_LONGDOUBLE)
+#define _TPRIfmt(Tob, fmtS, fmtU, fmtF, fmtP, ...)                                                                                                    \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((Tob) + 0), int),           fmtS("", __VA_ARGS__),                                  \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((Tob) + 0), unsigned),      fmtU("", __VA_ARGS__),                                  \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((Tob) + 0), long),          fmtS(__PRIN_PREFIX(__SIZEOF_LONG__), __VA_ARGS__),      \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((Tob) + 0), unsigned long), fmtU(__PRIN_PREFIX(__SIZEOF_LONG__), __VA_ARGS__),      \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((Tob) + 0), __LONGLONG),    fmtS(__PRIN_PREFIX(__SIZEOF_LONG_LONG__), __VA_ARGS__), \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((Tob) + 0), __ULONGLONG),   fmtU(__PRIN_PREFIX(__SIZEOF_LONG_LONG__), __VA_ARGS__), \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((Tob) + 0), float) ||                                                               \
+	                      __builtin_types_compatible_p(__typeof__((Tob) + 0), double),        fmtF("", __VA_ARGS__),                                  \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((Tob) + 0), __LONGDOUBLE),  fmtF("L", __VA_ARGS__),                                 \
+	                      /*                                                               */ fmtP(__PRIP_PREFIX, __VA_ARGS__)))))))))
+#else /* ... */
+#define _TPRIfmt(Tob, fmtS, fmtU, fmtF, fmtP, ...)                                                                                                    \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((Tob) + 0), int),           fmtS("", __VA_ARGS__),                                  \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((Tob) + 0), unsigned),      fmtU("", __VA_ARGS__),                                  \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((Tob) + 0), long),          fmtS(__PRIN_PREFIX(__SIZEOF_LONG__), __VA_ARGS__),      \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((Tob) + 0), unsigned long), fmtU(__PRIN_PREFIX(__SIZEOF_LONG__), __VA_ARGS__),      \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((Tob) + 0), __LONGLONG),    fmtS(__PRIN_PREFIX(__SIZEOF_LONG_LONG__), __VA_ARGS__), \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((Tob) + 0), __ULONGLONG),   fmtU(__PRIN_PREFIX(__SIZEOF_LONG_LONG__), __VA_ARGS__), \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((Tob) + 0), float) ||                                                               \
+	                      __builtin_types_compatible_p(__typeof__((Tob) + 0), double),        fmtF("", __VA_ARGS__),                                  \
+	                      /*                                                               */ fmtP(__PRIP_PREFIX, __VA_ARGS__))))))))
+#endif /* !... */
+#define __TPRIfmtposS(PRInPREFIX, _) "%" PRInPREFIX "d >= 0"
+#define __TPRIfmtposU(PRInPREFIX, _) "%1$" PRInPREFIX "u[%#1$" PRInPREFIX "x] >= 0"
+#define __TPRIfmtposF(PRInPREFIX, _) "%" PRInPREFIX "f >= 0.0"
+#define __TPRIfmtposP(PRInPREFIX, _) "%p >= 0"
+#define _OPtPOS(v, v_str)                                                             \
+	__OP((__typeof__(v) _v = (v)), _v >= 0, (v) >= 0,                                 \
+	     v_str " >= 0",                                                               \
+	     _TPRIfmt(_v, __TPRIfmtposS, __TPRIfmtposU, __TPRIfmtposF, __TPRIfmtposP, ~), \
+	     _v)
 
-/*[[[deemon
-for (local name, op: {
-	("LO", "<"),
-	("LE", "<="),
-	("EQ", "=="),
-	("NE", "!="),
-	("GR", ">"),
-	("GE", ">="),
-}) {
-	for (local i, T, PRIt: {
-		("d", "int", "\"d\""),
-		("u", "unsigned int", "\"u\""),
-		("x", "unsigned int", "\"x\""),
-		("s", "size_t", "PRIuSIZ"),
-		("ss", "ssize_t", "PRIdSIZ"),
-		("p", "void const *", "\"p\""),
-		("up", "uintptr_t", "PRIuPTR"),
-		("dp", "intptr_t", "PRIdPTR"),
-		("x32", "uint32_t", "PRIx32"),
-		("u32", "uint32_t", "PRIu32"),
-		("d32", "int32_t", "PRId32"),
-		("x64", "uint64_t", "PRIx64"),
-		("u64", "uint64_t", "PRIu64"),
-		("d64", "int64_t", "PRId64"),
-	}) {
-		print("#define ", name, i, "(a, b) _OPt(a, ", op, ", b, ", T, ", ", PRIt, ", #a, #b)");
-	}
-	print;
-}
-]]]*/
-#define LOd(a, b) _OPt(a, <, b, int, "d", #a, #b)
-#define LOu(a, b) _OPt(a, <, b, unsigned int, "u", #a, #b)
-#define LOx(a, b) _OPt(a, <, b, unsigned int, "x", #a, #b)
-#define LOs(a, b) _OPt(a, <, b, size_t, PRIuSIZ, #a, #b)
-#define LOss(a, b) _OPt(a, <, b, ssize_t, PRIdSIZ, #a, #b)
-#define LOp(a, b) _OPt(a, <, b, void const *, "p", #a, #b)
-#define LOup(a, b) _OPt(a, <, b, uintptr_t, PRIuPTR, #a, #b)
-#define LOdp(a, b) _OPt(a, <, b, intptr_t, PRIdPTR, #a, #b)
-#define LOx32(a, b) _OPt(a, <, b, uint32_t, PRIx32, #a, #b)
-#define LOu32(a, b) _OPt(a, <, b, uint32_t, PRIu32, #a, #b)
-#define LOd32(a, b) _OPt(a, <, b, int32_t, PRId32, #a, #b)
-#define LOx64(a, b) _OPt(a, <, b, uint64_t, PRIx64, #a, #b)
-#define LOu64(a, b) _OPt(a, <, b, uint64_t, PRIu64, #a, #b)
-#define LOd64(a, b) _OPt(a, <, b, int64_t, PRId64, #a, #b)
+#define __TPRIfmtcmpS(PRInPREFIX, op_str) "%" PRInPREFIX "d " op_str " %" PRInPREFIX "d"
+#define __TPRIfmtcmpU(PRInPREFIX, op_str) "%1$" PRInPREFIX "u[%#1$" PRInPREFIX "x] " op_str " %2$" PRInPREFIX "u[%#2$" PRInPREFIX "x]"
+#define __TPRIfmtcmpF(PRInPREFIX, op_str) "%" PRInPREFIX "f " op_str " %" PRInPREFIX "f"
+#define __TPRIfmtcmpP(PRInPREFIX, op_str) "%p " op_str " %p"
+#define _OPtCMP(a, op, b, a_str, b_str)                                                 \
+	__OP((__typeof__(1 ? (a) : (b)) _a = (a), _b = (b)), _a op _b, (a)op(b),            \
+	     a_str " " #op " " b_str,                                                       \
+	     _TPRIfmt(_a, __TPRIfmtcmpS, __TPRIfmtcmpU, __TPRIfmtcmpF, __TPRIfmtcmpP, #op), \
+	     _a, _b)
+#define _OPtCMPf(a, op, b, a_str, b_str, format, ...) \
+	_OPtCMP(a, op, b, a_str, b_str) /* TODO */
 
-#define LEd(a, b) _OPt(a, <=, b, int, "d", #a, #b)
-#define LEu(a, b) _OPt(a, <=, b, unsigned int, "u", #a, #b)
-#define LEx(a, b) _OPt(a, <=, b, unsigned int, "x", #a, #b)
-#define LEs(a, b) _OPt(a, <=, b, size_t, PRIuSIZ, #a, #b)
-#define LEss(a, b) _OPt(a, <=, b, ssize_t, PRIdSIZ, #a, #b)
-#define LEp(a, b) _OPt(a, <=, b, void const *, "p", #a, #b)
-#define LEup(a, b) _OPt(a, <=, b, uintptr_t, PRIuPTR, #a, #b)
-#define LEdp(a, b) _OPt(a, <=, b, intptr_t, PRIdPTR, #a, #b)
-#define LEx32(a, b) _OPt(a, <=, b, uint32_t, PRIx32, #a, #b)
-#define LEu32(a, b) _OPt(a, <=, b, uint32_t, PRIu32, #a, #b)
-#define LEd32(a, b) _OPt(a, <=, b, int32_t, PRId32, #a, #b)
-#define LEx64(a, b) _OPt(a, <=, b, uint64_t, PRIx64, #a, #b)
-#define LEu64(a, b) _OPt(a, <=, b, uint64_t, PRIu64, #a, #b)
-#define LEd64(a, b) _OPt(a, <=, b, int64_t, PRId64, #a, #b)
+#define __TPRIfmtbitX(PRInPREFIX, _) "%1$" PRInPREFIX "u[%#1$" PRInPREFIX "x] & %2$" PRInPREFIX "u[%#2$" PRInPREFIX "x] = %3$" PRInPREFIX "u[%#3$" PRInPREFIX "x]"
+#define _OPtBITON(bitmask, word, bitmask_str, word_str)                                  \
+	__OP((__typeof__((bitmask) & (word)) _bitmask = (bitmask), _word = (word)),          \
+	     (_bitmask & _word) == _bitmask, ((bitmask) & (word)) == (bitmask),              \
+	     bitmask_str " & " word_str " == " bitmask_str,                                  \
+	     _TPRIfmt(_word, __TPRIfmtbitX, __TPRIfmtbitX, __TPRIfmtbitX, __TPRIfmtbitX, ~), \
+	     _bitmask, _word, _bitmask & _word)
+#define _OPtBITOFF(bitmask, word, bitmask_str, word_str)                                 \
+	__OP((__typeof__((bitmask) & (word)) _bitmask = (bitmask), _word = (word)),          \
+	     !(_bitmask & _word), !((bitmask) & (word)),                                     \
+	     bitmask_str " & " word_str " == 0",                                             \
+	     _TPRIfmt(_word, __TPRIfmtbitX, __TPRIfmtbitX, __TPRIfmtbitX, __TPRIfmtbitX, ~), \
+	     _bitmask, _word, _bitmask & _word)
+#endif /* !__INTELLISENSE__ */
 
-#define EQd(a, b) _OPt(a, ==, b, int, "d", #a, #b)
-#define EQu(a, b) _OPt(a, ==, b, unsigned int, "u", #a, #b)
-#define EQx(a, b) _OPt(a, ==, b, unsigned int, "x", #a, #b)
-#define EQs(a, b) _OPt(a, ==, b, size_t, PRIuSIZ, #a, #b)
-#define EQss(a, b) _OPt(a, ==, b, ssize_t, PRIdSIZ, #a, #b)
-#define EQp(a, b) _OPt(a, ==, b, void const *, "p", #a, #b)
-#define EQup(a, b) _OPt(a, ==, b, uintptr_t, PRIuPTR, #a, #b)
-#define EQdp(a, b) _OPt(a, ==, b, intptr_t, PRIdPTR, #a, #b)
-#define EQx32(a, b) _OPt(a, ==, b, uint32_t, PRIx32, #a, #b)
-#define EQu32(a, b) _OPt(a, ==, b, uint32_t, PRIu32, #a, #b)
-#define EQd32(a, b) _OPt(a, ==, b, int32_t, PRId32, #a, #b)
-#define EQx64(a, b) _OPt(a, ==, b, uint64_t, PRIx64, #a, #b)
-#define EQu64(a, b) _OPt(a, ==, b, uint64_t, PRIu64, #a, #b)
-#define EQd64(a, b) _OPt(a, ==, b, int64_t, PRId64, #a, #b)
-
-#define NEd(a, b) _OPt(a, !=, b, int, "d", #a, #b)
-#define NEu(a, b) _OPt(a, !=, b, unsigned int, "u", #a, #b)
-#define NEx(a, b) _OPt(a, !=, b, unsigned int, "x", #a, #b)
-#define NEs(a, b) _OPt(a, !=, b, size_t, PRIuSIZ, #a, #b)
-#define NEss(a, b) _OPt(a, !=, b, ssize_t, PRIdSIZ, #a, #b)
-#define NEp(a, b) _OPt(a, !=, b, void const *, "p", #a, #b)
-#define NEup(a, b) _OPt(a, !=, b, uintptr_t, PRIuPTR, #a, #b)
-#define NEdp(a, b) _OPt(a, !=, b, intptr_t, PRIdPTR, #a, #b)
-#define NEx32(a, b) _OPt(a, !=, b, uint32_t, PRIx32, #a, #b)
-#define NEu32(a, b) _OPt(a, !=, b, uint32_t, PRIu32, #a, #b)
-#define NEd32(a, b) _OPt(a, !=, b, int32_t, PRId32, #a, #b)
-#define NEx64(a, b) _OPt(a, !=, b, uint64_t, PRIx64, #a, #b)
-#define NEu64(a, b) _OPt(a, !=, b, uint64_t, PRIu64, #a, #b)
-#define NEd64(a, b) _OPt(a, !=, b, int64_t, PRId64, #a, #b)
-
-#define GRd(a, b) _OPt(a, >, b, int, "d", #a, #b)
-#define GRu(a, b) _OPt(a, >, b, unsigned int, "u", #a, #b)
-#define GRx(a, b) _OPt(a, >, b, unsigned int, "x", #a, #b)
-#define GRs(a, b) _OPt(a, >, b, size_t, PRIuSIZ, #a, #b)
-#define GRss(a, b) _OPt(a, >, b, ssize_t, PRIdSIZ, #a, #b)
-#define GRp(a, b) _OPt(a, >, b, void const *, "p", #a, #b)
-#define GRup(a, b) _OPt(a, >, b, uintptr_t, PRIuPTR, #a, #b)
-#define GRdp(a, b) _OPt(a, >, b, intptr_t, PRIdPTR, #a, #b)
-#define GRx32(a, b) _OPt(a, >, b, uint32_t, PRIx32, #a, #b)
-#define GRu32(a, b) _OPt(a, >, b, uint32_t, PRIu32, #a, #b)
-#define GRd32(a, b) _OPt(a, >, b, int32_t, PRId32, #a, #b)
-#define GRx64(a, b) _OPt(a, >, b, uint64_t, PRIx64, #a, #b)
-#define GRu64(a, b) _OPt(a, >, b, uint64_t, PRIu64, #a, #b)
-#define GRd64(a, b) _OPt(a, >, b, int64_t, PRId64, #a, #b)
-
-#define GEd(a, b) _OPt(a, >=, b, int, "d", #a, #b)
-#define GEu(a, b) _OPt(a, >=, b, unsigned int, "u", #a, #b)
-#define GEx(a, b) _OPt(a, >=, b, unsigned int, "x", #a, #b)
-#define GEs(a, b) _OPt(a, >=, b, size_t, PRIuSIZ, #a, #b)
-#define GEss(a, b) _OPt(a, >=, b, ssize_t, PRIdSIZ, #a, #b)
-#define GEp(a, b) _OPt(a, >=, b, void const *, "p", #a, #b)
-#define GEup(a, b) _OPt(a, >=, b, uintptr_t, PRIuPTR, #a, #b)
-#define GEdp(a, b) _OPt(a, >=, b, intptr_t, PRIdPTR, #a, #b)
-#define GEx32(a, b) _OPt(a, >=, b, uint32_t, PRIx32, #a, #b)
-#define GEu32(a, b) _OPt(a, >=, b, uint32_t, PRIu32, #a, #b)
-#define GEd32(a, b) _OPt(a, >=, b, int32_t, PRId32, #a, #b)
-#define GEx64(a, b) _OPt(a, >=, b, uint64_t, PRIx64, #a, #b)
-#define GEu64(a, b) _OPt(a, >=, b, uint64_t, PRIu64, #a, #b)
-#define GEd64(a, b) _OPt(a, >=, b, int64_t, PRId64, #a, #b)
-/*[[[end]]]*/
-
-
+#include <libc/errno.h>
 #include <libc/string.h>
-#define CTEST_CMPSTR_LO(a, b) (strcmp(a, b) < 0)
-#define CTEST_CMPSTR_LE(a, b) (strcmp(a, b) <= 0)
-#define CTEST_CMPSTR_EQ(a, b) (strcmp(a, b) == 0)
-#define CTEST_CMPSTR_NE(a, b) (strcmp(a, b) != 0)
-#define CTEST_CMPSTR_GR(a, b) (strcmp(a, b) > 0)
-#define CTEST_CMPSTR_GE(a, b) (strcmp(a, b) >= 0)
 
-#define LOstr(a, b) _OPtPRED(a, <, b, char const *, "q", #a, #b, CTEST_CMPSTR_LO)
-#define LEstr(a, b) _OPtPRED(a, <=, b, char const *, "q", #a, #b, CTEST_CMPSTR_LE)
-#define EQstr(a, b) _OPtPRED(a, ==, b, char const *, "q", #a, #b, CTEST_CMPSTR_EQ)
-#define NEstr(a, b) _OPtPRED(a, !=, b, char const *, "q", #a, #b, CTEST_CMPSTR_NE)
-#define GRstr(a, b) _OPtPRED(a, >, b, char const *, "q", #a, #b, CTEST_CMPSTR_GR)
-#define GEstr(a, b) _OPtPRED(a, >=, b, char const *, "q", #a, #b, CTEST_CMPSTR_GE)
+#define _OPtSTR(a, op, b, a_str, b_str)            \
+	__OP((char const *_a = (a), *_b = (b);         \
+	      int _diff = __libc_strcmp(_a, _b)),      \
+	     _diff op 0, __libc_strcmp(a, b) op 0,     \
+	     "strcmp(" a_str ", " b_str ") " #op " 0", \
+	     "strcmp(%1$p, %2$p) == %3$d\n"            \
+	     "lhs: %1$q\n"                             \
+	     "rhs: %2$q",                              \
+	     _a, _b)
+#define _OPtMEM(a, op, b, num_bytes, a_str, b_str, num_bytes_str)             \
+	__OP((void const *_a = (a), *_b = (b); __size_t _num_bytes = (num_bytes); \
+	      int _diff = __libc_memcmp(_a, _b, _num_bytes)),                     \
+	     _diff op 0, __libc_memcmp(a, b, num_bytes) op 0,                     \
+	     "memcmp(" a_str ", " b_str ", " num_bytes_str ") " #op " 0",         \
+	     "memcmp(%1$p, %2$p, %3$" __PRIP_PREFIX "u) == %4$d\n"                \
+	     "MEM[" a_str "]:\n"                                                  \
+	     "%$3$1$[hex]\n"                                                      \
+	     "MEM[" b_str "]:\n"                                                  \
+	     "%$3$2$[hex]",                                                       \
+	     _a, _b, _num_bytes)
+/* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ * HINT: "%$3$2$[hex]\n" is decoded as:#
+ *         ||/|/|  /
+ *         || | |-/
+ *         || | |
+ *         || | \- Output as hex
+ *         || \--- Pointer operand    = args[2 - 1]
+ *         |\----- Fixed-buffer width = args[3 - 1]
+ *         \------ Fixed-buffer width prefix */
 
+
+
+/* Generic integer/pointer/float compare */
+#define EQ(expected, actual)   _OPtCMP(expected, ==, actual, #expected, #actual)
+#define NE(unexpected, actual) _OPtCMP(unexpected, !=, actual, #unexpected, #actual)
+#define LO(lhs, rhs)           _OPtCMP(lhs, <, rhs, #lhs, #rhs)
+#define LE(lhs, rhs)           _OPtCMP(lhs, <=, rhs, #lhs, #rhs)
+#define GR(lhs, rhs)           _OPtCMP(lhs, >, rhs, #lhs, #rhs)
+#define GE(lhs, rhs)           _OPtCMP(lhs, >=, rhs, #lhs, #rhs)
+
+/* Generic integer/pointer/float compare (with extra message addend) */
+#define EQf(expected, actual, format, ...)   _OPtCMPf(expected, ==, actual, #expected, #actual, format, __VA_ARGS__)
+#define NEf(unexpected, actual, format, ...) _OPtCMPf(unexpected, !=, actual, #unexpected, #actual, format, __VA_ARGS__)
+#define LOf(lhs, rhs, format, ...)           _OPtCMPf(lhs, <, rhs, #lhs, #rhs, format, __VA_ARGS__)
+#define LEf(lhs, rhs, format, ...)           _OPtCMPf(lhs, <=, rhs, #lhs, #rhs, format, __VA_ARGS__)
+#define GRf(lhs, rhs, format, ...)           _OPtCMPf(lhs, >, rhs, #lhs, #rhs, format, __VA_ARGS__)
+#define GEf(lhs, rhs, format, ...)           _OPtCMPf(lhs, >=, rhs, #lhs, #rhs, format, __VA_ARGS__)
+
+/* Assert: `{p} == NULL' or `{p} != NULL' */
+#define __ISnull_FMT(p)                                                                    \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((p) + 0), char *) ||     \
+	                      __builtin_types_compatible_p(__typeof__((p) + 0), char const *), \
+	                      "Not null: %1$p (%1$q)",                                         \
+	                      "Not null: %p")
+#define ISnull(p)    __OP((void const *_p = (p)), !_p, !(p), #p " == NULL", __ISnull_FMT(p), _p)
+#define ISnonnull(p) __OP((void const *_p = (p)), _p, (p), #p " != NULL", __NULLPTR)
+
+/* Assert: `{v} >= 0' */
+#define ISpos(v) _OPtPOS(v, #v)
+
+/* Assert: `errno == {expected_errno}' */
+#define EQerrno(expected_errno)                                                           \
+	__OP((__errno_t _expected_errno = (expected_errno), _errno_libc = __libc_geterrno()), \
+	     _expected_errno == _errno_libc, (expected_errno) == __libc_geterrno(),           \
+	     "errno == " #expected_errno,                                                     \
+	     "%d[%s] == %d[%s]",                                                              \
+	     _errno_libc, __libc_strerrorname_np(_errno_libc),                                \
+	     _expected_errno, __libc_strerrorname_np(_expected_errno))
+
+/* Assert that a given bitset is all 1s or 0s in `word' */
+#define ISbiton(set_bitmask, word)    _OPtBITON(set_bitmask, word, #set_bitmask, #word)
+#define ISbitoff(clear_bitmask, word) _OPtBITOFF(clear_bitmask, word, #clear_bitmask, #word)
+
+
+/* Compare the contents of string (s.a. `strcmp(3)') */
+#define EQstr(expected_strp, actual_strp) \
+	_OPtSTR(expected_strp, ==, actual_strp, #expected_strp, #actual_strp)
+#define NEstr(unexpected_strp, actual_strp) \
+	_OPtSTR(unexpected_strp, !=, actual_strp, #unexpected_strp, #actual_strp)
+#define LOstr(lhs, rhs) _OPtSTR(lhs, <, rhs, #lhs, #rhs)
+#define LEstr(lhs, rhs) _OPtSTR(lhs, <=, rhs, #lhs, #rhs)
+#define GRstr(lhs, rhs) _OPtSTR(lhs, >, rhs, #lhs, #rhs)
+#define GEstr(lhs, rhs) _OPtSTR(lhs, >=, rhs, #lhs, #rhs)
+
+
+/* Compare the contents of memory (s.lhs. `memcmp(3)') */
+#define EQmem(expected_baseptr, actual_baseptr, num_bytes) \
+	_OPtMEM(expected_baseptr, ==, actual_baseptr, num_bytes, #expected_baseptr, #actual_baseptr, #num_bytes)
+#define NEmem(unexpected_baseptr, actual_baseptr, num_bytes) \
+	_OPtMEM(unexpected_baseptr, !=, actual_baseptr, num_bytes, #unexpected_baseptr, #actual_baseptr, #num_bytes)
+#define LOmem(lhs, rhs, num_bytes) _OPtMEM(lhs, <, rhs, num_bytes, #lhs, #rhs, #num_bytes)
+#define LEmem(lhs, rhs, num_bytes) _OPtMEM(lhs, <=, rhs, num_bytes, #lhs, #rhs, #num_bytes)
+#define GRmem(lhs, rhs, num_bytes) _OPtMEM(lhs, >, rhs, num_bytes, #lhs, #rhs, #num_bytes)
+#define GEmem(lhs, rhs, num_bytes) _OPtMEM(lhs, >=, rhs, num_bytes, #lhs, #rhs, #num_bytes)
 
 
 #endif /* !_SYSTEM_TEST_CTEST_H */

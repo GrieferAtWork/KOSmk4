@@ -37,13 +37,11 @@ DECL_BEGIN
 
 PRIVATE void
 assert_wordexp(char const *expand_me, size_t num_words, ...) {
-	int error;
 	wordexp_t wx;
 	size_t i, common_count;
 	va_list args;
-	error = wordexp(expand_me, &wx, 0);
-	assertf(error == 0, "wordexp returned: %d", error);
-	EQs(wx.we_offs, 0);
+	EQ(0, wordexp(expand_me, &wx, 0));
+	EQ(0, wx.we_offs);
 	common_count = wx.we_wordc;
 	if (common_count > num_words)
 		common_count = num_words;
@@ -58,8 +56,8 @@ assert_wordexp(char const *expand_me, size_t num_words, ...) {
 		        i, expand_me, exp, got);
 	}
 	va_end(args);
-	EQs(wx.we_wordc, num_words);
-	EQp(wx.we_wordv[wx.we_wordc], (char *)NULL);
+	EQ(wx.we_wordc, num_words);
+	EQ((char *)NULL, wx.we_wordv[wx.we_wordc]);
 	wordfree(&wx);
 }
 
@@ -99,9 +97,9 @@ DEFINE_TEST(wordexp) {
 	assert_wordexp("a \"${TEST}\" b", 3, "a", "", "b");
 	assert_wordexp("a\"${TEST}\" b", 2, "a", "b");
 	assert_wordexp("a\"${TEST}\"b", 1, "ab");
-	assert(getenv("TEST") == NULL);
+	ISnull(getenv("TEST"));
 	assert_wordexp("a ${TEST=42} b", 3, "a", "42", "b");
-	assert(getenv("TEST") != NULL);
+	ISnonnull(getenv("TEST"));
 	EQstr("42", getenv("TEST"));
 	assert_wordexp("a ${TEST} b", 3, "a", "42", "b");
 	assert_wordexp("a \"${TEST}\" b", 3, "a", "42", "b");
@@ -173,15 +171,15 @@ DEFINE_TEST(wordexp) {
 
 	/* KOS extension: Variable assignment in math expressions. */
 	unsetenv("FOO");
-	assert(getenv("FOO") == NULL);
+	ISnull(getenv("FOO"));
 	assert_wordexp("$[FOO=42]", 1, "42");
-	assert(getenv("FOO") != NULL);
+	ISnonnull(getenv("FOO"));
 	EQstr("42", getenv("FOO"));
 	assert_wordexp("$[FOO++]", 1, "42");
-	assert(getenv("FOO") != NULL);
+	ISnonnull(getenv("FOO"));
 	EQstr("43", getenv("FOO"));
 	assert_wordexp("$[++FOO]", 1, "44");
-	assert(getenv("FOO") != NULL);
+	ISnonnull(getenv("FOO"));
 	EQstr("44", getenv("FOO"));
 	unsetenv("FOO");
 

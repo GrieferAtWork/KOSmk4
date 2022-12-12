@@ -48,7 +48,7 @@ PRIVATE void *MapFile(char const *filename, size_t *psize) {
 	fd = Open(filename, O_RDONLY);
 	FStat(fd, &st);
 	result = MMap(NULL, (size_t)st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-	assert(result != MAP_FAILED);
+	NE(MAP_FAILED, result);
 	if (psize)
 		*psize = (size_t)st.st_size;
 	close(fd);
@@ -65,14 +65,14 @@ DEFINE_TEST(keymap_translations) {
 	void *filedata; size_t filesize;
 	char buf[64]; size_t buflen;
 	km = dlopen(LIBKEYMAP_LIBRARY_NAME, RTLD_LOCAL);
-	assert(km);
+	ISnonnull(km);
 
 	*(void **)&keymap_openblob      = dlsym(km, "keymap_openblob");
 	*(void **)&keymap_codesize      = dlsym(km, "keymap_codesize");
 	*(void **)&keymap_translate_buf = dlsym(km, "keymap_translate_buf");
-	assert(keymap_openblob);
-	assert(keymap_codesize);
-	assert(keymap_translate_buf);
+	ISnonnull(keymap_openblob);
+	ISnonnull(keymap_codesize);
+	ISnonnull(keymap_translate_buf);
 
 	filedata = MapFile("/lib/keymap/de_DE", &filesize);
 	assert(keymap_openblob(&mymap, filedata, filesize) == true);
@@ -80,14 +80,14 @@ DEFINE_TEST(keymap_translations) {
 		ssize_t len;
 		uint8_t enc = mymap.km_defencoding;
 		len = keymap_codesize(mymap.km_ext, &enc, enc);
-		assertf(len > 0, "len = %Id", len);
+		LO(0, len);
 	}
-#define ASSERT_TRANSLATION(key, keymod, str)                                               \
-	do {                                                                                   \
-		buflen = keymap_translate_buf(&mymap, key, keymod, buf, sizeof(buf));              \
-		assertf(buflen == COMPILER_STRLEN(str), "buflen = %Iu", buflen);                   \
-		assertf(bcmp(buf, str, buflen, sizeof(char)) == 0, "%$q != %q", buflen, buf, str); \
-	} __WHILE0
+#define ASSERT_TRANSLATION(key, keymod, str)                                  \
+	do {                                                                      \
+		buflen = keymap_translate_buf(&mymap, key, keymod, buf, sizeof(buf)); \
+		EQ(COMPILER_STRLEN(str), buflen);                                     \
+		EQmem(buf, str, buflen * sizeof(char));                               \
+	}	__WHILE0
 	ASSERT_TRANSLATION(KEY_Q, 0, "q");
 	ASSERT_TRANSLATION(KEY_Q, KEYMOD_LSHIFT, "Q");
 	ASSERT_TRANSLATION(KEY_Q, KEYMOD_RSHIFT, "Q");
@@ -111,8 +111,8 @@ DEFINE_TEST(keymap_translations) {
 	ASSERT_TRANSLATION(KEY_8, KEYMOD_RCTRL | KEYMOD_RALT, "[");
 #undef ASSERT_TRANSLATION
 
-	assert(munmap(filedata, filesize) == 0);
-	assert(dlclose(km) == 0);
+	EQ(0, munmap(filedata, filesize));
+	EQ(0, dlclose(km));
 }
 
 DECL_END

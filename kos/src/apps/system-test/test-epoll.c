@@ -46,41 +46,41 @@ DEFINE_TEST(epoll) {
 	struct epoll_event ee;
 	struct epoll_event events[8];
 
-	NEd(-1, (epfd = epoll_create1(0))); /* NOLINT */
-	EQd(0, close(epfd));
-	NEd(-1, (epfd = epoll_create1(EPOLL_CLOEXEC)));
-	EQd(0, close(epfd));
-	NEd(-1, (epfd = epoll_create1(EPOLL_CLOFORK))); /* NOLINT */
-	EQd(0, close(epfd));
-	NEd(-1, (epfd = epoll_create1(EPOLL_CLOEXEC | EPOLL_CLOFORK)));
-	EQd(0, close(epfd));
+	ISpos((epfd = epoll_create1(0))); /* NOLINT */
+	EQ(0, close(epfd));
+	ISpos((epfd = epoll_create1(EPOLL_CLOEXEC)));
+	EQ(0, close(epfd));
+	ISpos((epfd = epoll_create1(EPOLL_CLOFORK))); /* NOLINT */
+	EQ(0, close(epfd));
+	ISpos((epfd = epoll_create1(EPOLL_CLOEXEC | EPOLL_CLOFORK)));
+	EQ(0, close(epfd));
 
-	NEd(-1, (epfd = epoll_create(42))); /* NOLINT */
+	ISpos((epfd = epoll_create(42))); /* NOLINT */
 
-	EQd(0, pipe(pipes)); /* NOLINT */
+	EQ(0, pipe(pipes)); /* NOLINT */
 
 	ee.events   = EPOLLIN;
 	ee.data.u64 = 1234;
-	EQd(0, epoll_ctl(epfd, EPOLL_CTL_ADD, pipes[0], &ee));
+	EQ(0, epoll_ctl(epfd, EPOLL_CTL_ADD, pipes[0], &ee));
 
 	ee.events   = EPOLLOUT;
 	ee.data.u64 = 4321;
-	EQd(0, epoll_ctl(epfd, EPOLL_CTL_ADD, pipes[1], &ee));
+	EQ(0, epoll_ctl(epfd, EPOLL_CTL_ADD, pipes[1], &ee));
 
 	/* Both pipes registered. At this point, epfd should indicate writable. */
-	EQss(1, epoll_wait(epfd, events, 8, 0));
-	EQx32(events[0].events, EPOLLOUT);
-	EQu64(events[0].data.u64, 4321);
-	EQss(1, epoll_wait(epfd, events, 8, 0));
-	EQx32(events[0].events, EPOLLOUT);
-	EQu64(events[0].data.u64, 4321);
+	EQ(1, epoll_wait(epfd, events, 8, 0));
+	EQ(EPOLLOUT, events[0].events);
+	EQ(4321, events[0].data.u64);
+	EQ(1, epoll_wait(epfd, events, 8, 0));
+	EQ(EPOLLOUT, events[0].events);
+	EQ(4321, events[0].data.u64);
 
 	/* Now write some data, which should cause readable to become set. */
-	EQss(3, write(pipes[1], "foo", 3));
+	EQ(3, write(pipes[1], "foo", 3));
 
 	/* Now both readable and writable should be set. */
 	for (int i = 0; i < 2; ++i) {
-		EQss(2, epoll_wait(epfd, events, 8, 0));
+		EQ(2, epoll_wait(epfd, events, 8, 0));
 		if (events[0].data.u64 == 4321) {
 			/* Swap the events */
 			struct epoll_event temp;
@@ -88,50 +88,50 @@ DEFINE_TEST(epoll) {
 			events[0] = events[1];
 			events[1] = temp;
 		}
-		EQx32(events[0].events, EPOLLIN);
-		EQu64(events[0].data.u64, 1234);
-		EQx32(events[1].events, EPOLLOUT);
-		EQu64(events[1].data.u64, 4321);
+		EQ(EPOLLIN, events[0].events);
+		EQ(1234, events[0].data.u64);
+		EQ(EPOLLOUT, events[1].events);
+		EQ(4321, events[1].data.u64);
 	}
 
 	/* Modify the controller. */
 	ee.events   = EPOLLIN | EPOLLONESHOT;
 	ee.data.u64 = 8888;
-	EQd(0, epoll_ctl(epfd, EPOLL_CTL_MOD, pipes[0], &ee));
-	EQd(0, epoll_ctl(epfd, EPOLL_CTL_DEL, pipes[1], NULL));
+	EQ(0, epoll_ctl(epfd, EPOLL_CTL_MOD, pipes[0], &ee));
+	EQ(0, epoll_ctl(epfd, EPOLL_CTL_DEL, pipes[1], NULL));
 
 	/* Readable should still be set, but writable was removed. */
-	EQss(1, epoll_wait(epfd, events, 8, 0));
-	EQx32(events[0].events, EPOLLIN);
-	EQu64(events[0].data.u64, 8888);
+	EQ(1, epoll_wait(epfd, events, 8, 0));
+	EQ(EPOLLIN, events[0].events);
+	EQ(8888, events[0].data.u64);
 
 	/* Without `KP_EPOLL_DELETE_ONESHOT', we  must manually  delete
 	 * monitors after they've become dormant. Note that by default,
 	 * this personality is off, but  as a kos-specific program,  we
 	 * also want to ensure that we can test all cases! */
 	if (!KSysctlGetPersonality(KP_EPOLL_DELETE_ONESHOT)) {
-		EQd(0, epoll_ctl(epfd, EPOLL_CTL_DEL, pipes[0], NULL));
+		EQ(0, epoll_ctl(epfd, EPOLL_CTL_DEL, pipes[0], NULL));
 	} else {
 		/* Automatically deleted. */
 	}
-	EQd(-1, epoll_ctl(epfd, EPOLL_CTL_DEL, pipes[0], NULL));
-	EQd(errno, ENOENT);
+	EQ(-1, epoll_ctl(epfd, EPOLL_CTL_DEL, pipes[0], NULL));
+	EQerrno(ENOENT);
 
 	/* Because of the one-shot, readable should not longer appear now! */
-	EQss(0, epoll_wait(epfd, events, 8, 0));
+	EQ(0, epoll_wait(epfd, events, 8, 0));
 
 	/* Re-add both pipes to the controller, so they are left dangling. */
 	ee.events   = EPOLLIN;
 	ee.data.u64 = 1234;
-	EQd(0, epoll_ctl(epfd, EPOLL_CTL_ADD, pipes[0], &ee));
+	EQ(0, epoll_ctl(epfd, EPOLL_CTL_ADD, pipes[0], &ee));
 	ee.events   = EPOLLOUT;
 	ee.data.u64 = 4321;
-	EQd(0, epoll_ctl(epfd, EPOLL_CTL_ADD, pipes[1], &ee));
+	EQ(0, epoll_ctl(epfd, EPOLL_CTL_ADD, pipes[1], &ee));
 
 	/* Close everything */
-	EQd(0, close(pipes[1]));
-	EQd(0, close(pipes[0]));
-	EQd(0, close(epfd));
+	EQ(0, close(pipes[1]));
+	EQ(0, close(pipes[0]));
+	EQ(0, close(epfd));
 }
 
 DEFINE_TEST(epoll_et) {
@@ -141,52 +141,52 @@ DEFINE_TEST(epoll_et) {
 	struct epoll_event events[8];
 	char buf[64];
 
-	NEd(-1, (epfd = epoll_create1(0))); /* NOLINT */
-	EQd(0, pipe(pipes)); /* NOLINT */
+	ISpos((epfd = epoll_create1(0))); /* NOLINT */
+	EQ(0, pipe(pipes)); /* NOLINT */
 	/* Make the reader pipe non-blocking. */
-	EQd(0, fcntl(pipes[0], F_SETFL, fcntl(pipes[0], F_GETFL) | O_NONBLOCK));
+	EQ(0, fcntl(pipes[0], F_SETFL, fcntl(pipes[0], F_GETFL) | O_NONBLOCK));
 
 	ee.events   = EPOLLIN | EPOLLET;
 	ee.data.u64 = 9999;
-	EQd(0, epoll_ctl(epfd, EPOLL_CTL_ADD, pipes[0], &ee));
+	EQ(0, epoll_ctl(epfd, EPOLL_CTL_ADD, pipes[0], &ee));
 
 
-	EQss(0, epoll_wait(epfd, events, 8, 0)); /* Nothing should be ready, yet */
-	EQss(3, write(pipes[1], "foo", 3));      /* Write some data. */
-	EQss(1, epoll_wait(epfd, events, 8, 0)); /* That should have triggered EPOLLET! */
-	EQx32(events[0].events, EPOLLIN);
-	EQu64(events[0].data.u64, 9999);
-	EQss(0, epoll_wait(epfd, events, 8, 0)); /* EPOLLET should only trigger once! */
-	EQss(0, epoll_wait(epfd, events, 8, 0)); /* EPOLLET should only trigger once! */
-	EQss(0, epoll_wait(epfd, events, 8, 0)); /* EPOLLET should only trigger once! */
+	EQ(0, epoll_wait(epfd, events, 8, 0)); /* Nothing should be ready, yet */
+	EQ(3, write(pipes[1], "foo", 3));      /* Write some data. */
+	EQ(1, epoll_wait(epfd, events, 8, 0)); /* That should have triggered EPOLLET! */
+	EQ(EPOLLIN, events[0].events);
+	EQ(9999, events[0].data.u64);
+	EQ(0, epoll_wait(epfd, events, 8, 0)); /* EPOLLET should only trigger once! */
+	EQ(0, epoll_wait(epfd, events, 8, 0)); /* EPOLLET should only trigger once! */
+	EQ(0, epoll_wait(epfd, events, 8, 0)); /* EPOLLET should only trigger once! */
 
 	/* Now consume the data */
-	EQss(3, read(pipes[0], buf, sizeof(buf)));
-	assertf(bcmp(buf, "foo", 3) == 0, "buf = %$[hex]", 3, buf);
+	EQ(3, read(pipes[0], buf, sizeof(buf)));
+	EQmem("foo", buf, 3);
 
-	EQss(0, epoll_wait(epfd, events, 8, 0)); /* Reading should still not be possible */
-	EQss(0, epoll_wait(epfd, events, 8, 0)); /* Reading should still not be possible */
-	EQss(0, epoll_wait(epfd, events, 8, 0)); /* Reading should still not be possible */
+	EQ(0, epoll_wait(epfd, events, 8, 0)); /* Reading should still not be possible */
+	EQ(0, epoll_wait(epfd, events, 8, 0)); /* Reading should still not be possible */
+	EQ(0, epoll_wait(epfd, events, 8, 0)); /* Reading should still not be possible */
 
 	/* Reading now should fail with EAGAIN because there is no data. */
-	EQss(-1, read(pipes[0], buf, sizeof(buf)));
-	EQd(errno, EAGAIN);
+	EQ(-1, read(pipes[0], buf, sizeof(buf)));
+	EQerrno(EAGAIN);
 
-	EQss(0, epoll_wait(epfd, events, 8, 0)); /* Reading should still not be possible */
-	EQss(0, epoll_wait(epfd, events, 8, 0)); /* Reading should still not be possible */
-	EQss(0, epoll_wait(epfd, events, 8, 0)); /* Reading should still not be possible */
+	EQ(0, epoll_wait(epfd, events, 8, 0)); /* Reading should still not be possible */
+	EQ(0, epoll_wait(epfd, events, 8, 0)); /* Reading should still not be possible */
+	EQ(0, epoll_wait(epfd, events, 8, 0)); /* Reading should still not be possible */
 
-	EQss(3, write(pipes[1], "bar", 3)); /* Write some data. */
+	EQ(3, write(pipes[1], "bar", 3)); /* Write some data. */
 
 	/* The appearance of new data should have once again caused an edge trigger! */
-	EQss(1, epoll_wait(epfd, events, 8, 0));
-	EQx32(events[0].events, EPOLLIN);
-	EQu64(events[0].data.u64, 9999);
-	EQss(0, epoll_wait(epfd, events, 8, 0)); /* EPOLLET should only trigger once! */
-	EQss(0, epoll_wait(epfd, events, 8, 0)); /* EPOLLET should only trigger once! */
-	EQss(0, epoll_wait(epfd, events, 8, 0)); /* EPOLLET should only trigger once! */
+	EQ(1, epoll_wait(epfd, events, 8, 0));
+	EQ(EPOLLIN, events[0].events);
+	EQ(9999, events[0].data.u64);
+	EQ(0, epoll_wait(epfd, events, 8, 0)); /* EPOLLET should only trigger once! */
+	EQ(0, epoll_wait(epfd, events, 8, 0)); /* EPOLLET should only trigger once! */
+	EQ(0, epoll_wait(epfd, events, 8, 0)); /* EPOLLET should only trigger once! */
 
-	EQss(3, write(pipes[1], "bar", 3)); /* Write even more data. */
+	EQ(3, write(pipes[1], "bar", 3)); /* Write even more data. */
 
 	/* Because the pipe was already non-empty, the second write should not trigger
 	 * EPOLLET again (although it doing so would technically be allowed, since the
@@ -205,32 +205,32 @@ DEFINE_TEST(epoll_et) {
 	 */
 #ifdef __linux__
 	{
-		ssize_t n = epoll_wait(epfd, events, 8, 0);
-		LEss(0, n);
+		ssize_t n;
+		LE(0, (n = epoll_wait(epfd, events, 8, 0)));
 		if (n > 1)
 			printf("warn: Writing to a non-empty pipe causes a secondary edge-event\n");
 	}
 #endif /* __linux__ */
-	EQss(0, epoll_wait(epfd, events, 8, 0));
-	EQss(0, epoll_wait(epfd, events, 8, 0));
-	EQss(0, epoll_wait(epfd, events, 8, 0));
+	EQ(0, epoll_wait(epfd, events, 8, 0));
+	EQ(0, epoll_wait(epfd, events, 8, 0));
+	EQ(0, epoll_wait(epfd, events, 8, 0));
 
 
 	ee.events   = EPOLLIN | EPOLLET;
 	ee.data.u64 = 9999;
 	/* Also throw in a test for `EPOLL_CTL_MOD' on deleted objects... */
-	EQd(0, epoll_ctl(epfd, EPOLL_CTL_MOD, pipes[0], &ee));
-	EQd(0, epoll_ctl(epfd, EPOLL_CTL_DEL, pipes[0], NULL));
-	EQd(-1, epoll_ctl(epfd, EPOLL_CTL_MOD, pipes[0], &ee)); /* We've just deleted `pipes[0]'! */
-	EQd(errno, ENOENT);
+	EQ(0, epoll_ctl(epfd, EPOLL_CTL_MOD, pipes[0], &ee));
+	EQ(0, epoll_ctl(epfd, EPOLL_CTL_DEL, pipes[0], NULL));
+	EQ(-1, epoll_ctl(epfd, EPOLL_CTL_MOD, pipes[0], &ee)); /* We've just deleted `pipes[0]'! */
+	EQerrno(ENOENT);
 	errno = 0;
 
-	EQd(-1, epoll_ctl(epfd, EPOLL_CTL_DEL, pipes[1], NULL)); /* The writer was never added! */
-	EQd(errno, ENOENT);
+	EQ(-1, epoll_ctl(epfd, EPOLL_CTL_DEL, pipes[1], NULL)); /* The writer was never added! */
+	EQerrno(ENOENT);
 
-	EQd(0, close(pipes[0]));
-	EQd(0, close(pipes[1]));
-	EQd(0, close(epfd));
+	EQ(0, close(pipes[0]));
+	EQ(0, close(pipes[1]));
+	EQ(0, close(epfd));
 }
 
 

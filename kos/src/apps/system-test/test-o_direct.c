@@ -59,16 +59,16 @@ do_o_direct_test(char const *filename) {
 	if (fd < 0) {
 		if (bcmp(filename, "/var/", 5 * sizeof(char)) == 0)
 			mkdir("/var/", 755);
-		LEd(0, (fd = open(filename, O_CREAT | O_EXCL | O_DIRECT | O_RDWR, 0644))); /* NOLINT */
+		ISpos((fd = open(filename, O_CREAT | O_EXCL | O_DIRECT | O_RDWR, 0644))); /* NOLINT */
 	}
 
 	/* Query alignment requirements. */
-	EQd(0, ioctl(fd, FILE_IOC_BLKSHIFT, &align));
+	EQ(0, ioctl(fd, FILE_IOC_BLKSHIFT, &align));
 
 	/* Buffer alignment requirements must be at most as restrictive as block-alignment. */
 	blocksize  = (size_t)1 << align.fbs_blck;
 	blockalign = (size_t)1 << align.fbs_ioba;
-	GEd(blocksize, blockalign);
+	GE(blocksize, blockalign);
 
 	/* Allocate a properly aligned (and sized) buffer for I/O on at least 64 bytes. */
 	bufsize = CEIL_ALIGN(64, blocksize);
@@ -80,32 +80,32 @@ do_o_direct_test(char const *filename) {
 	/* Unaligned I/O must produce errors. */
 	if (blocksize > 1) {
 		errno = 0;
-		EQss(-1, pwrite(fd, buf, bufsize - 1, 0));
-		EQd(errno, EINVAL);
+		EQ(-1, pwrite(fd, buf, bufsize - 1, 0));
+		EQerrno(EINVAL);
 		errno = 0;
-		EQss(-1, pwrite(fd, buf, bufsize, 1));
-		EQd(errno, EINVAL);
+		EQ(-1, pwrite(fd, buf, bufsize, 1));
+		EQerrno(EINVAL);
 	}
 	if (blockalign > 1) {
 		errno = 0;
-		EQss(-1, pwrite(fd, (byte_t *)buf + 1, bufsize, 0));
-		EQd(errno, EINVAL);
+		EQ(-1, pwrite(fd, (byte_t *)buf + 1, bufsize, 0));
+		EQerrno(EINVAL);
 	}
 
 	/* Now to actually do I/O */
-	EQss(bufsize, pwrite(fd, buf, bufsize, 0));
-	EQd(0, fstat(fd, &st));
-	EQu64((uint64_t)bufsize, (uint64_t)st.st_size);
+	EQ(bufsize, pwrite(fd, buf, bufsize, 0));
+	EQ(0, fstat(fd, &st));
+	EQ((uint64_t)bufsize, (uint64_t)st.st_size);
 
 	/* Also make sure that we can read back data. */
 	memset(buf, 0xcc, bufsize);
-	EQss(bufsize, pread(fd, buf, bufsize, 0));
+	EQ(bufsize, pread(fd, buf, bufsize, 0));
 	assertf(strcmp((char *)buf, "Test Data!") == 0,
 	        "%$[hex]\n", bufsize, buf);
 
 	/* Cleanup... */
-	EQd(0, unlink(filename));
-	EQd(0, close(fd));
+	EQ(0, unlink(filename));
+	EQ(0, close(fd));
 }
 
 DEFINE_TEST(o_direct) {

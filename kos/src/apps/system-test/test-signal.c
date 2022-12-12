@@ -40,7 +40,7 @@ DECL_BEGIN
 PRIVATE sig_atomic_t hand_called = 0;
 
 PRIVATE void myhand(signo_t signo) {
-	EQd(signo, SIGUSR1);
+	EQ(SIGUSR1, signo);
 	++hand_called;
 }
 
@@ -54,90 +54,89 @@ DEFINE_TEST(signal_works_correctly) {
 	bzero(&new_action, sizeof(new_action));
 	new_action.sa_handler = &myhand;
 	new_action.sa_flags   = 0;
-	EQd(sigaction(SIGUSR1, &new_action, &old_action), 0);
+	EQ(0, sigaction(SIGUSR1, &new_action, &old_action));
 
-	EQd(hand_called, 0);
+	EQ(0, hand_called);
 
 	/* Raise the signal. */
-	EQd(raise(SIGUSR1), 0);
+	EQ(0, raise(SIGUSR1));
 
 	/* Make sure that our handler got called. */
-	EQd(hand_called, 1);
+	EQ(1, hand_called);
 
 	/* Also test raising signals while they are masked. */
 	hand_called = 0;
-	EQd(sigemptyset(&newset), 0);
-	EQd(sigaddset(&newset, SIGUSR1), 0);
-	EQd(sigprocmask(SIG_BLOCK, &newset, &oldset), 0);
+	EQ(0, sigemptyset(&newset));
+	EQ(0, sigaddset(&newset, SIGUSR1));
+	EQ(0, sigprocmask(SIG_BLOCK, &newset, &oldset));
 
 	/* Raise the signal again. */
-	EQd(hand_called, 0);
-	EQd(raise(SIGUSR1), 0);
-	EQd(hand_called, 0);
+	EQ(0, hand_called);
+	EQ(0, raise(SIGUSR1));
+	EQ(0, hand_called);
 
 	/* Unmask the signal */
-	EQd(sigprocmask(SIG_SETMASK, &oldset, NULL), 0);
+	EQ(0, sigprocmask(SIG_SETMASK, &oldset, NULL));
 
 	/* Make sure that the handler was called after the signal was unmasked. */
-	EQd(hand_called, 1);
+	EQ(1, hand_called);
 
 	/* Now do some testing with `signalfd(2)' */
 	{
 		fd_t sfd;
 		struct signalfd_siginfo info;
 		hand_called = 0;
-		EQd(sigemptyset(&newset), 0);
-		sfd = signalfd(-1, &newset, SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK);
-		GEd(sfd, 0);
-		EQd(hand_called, 0);
+		EQ(0, sigemptyset(&newset));
+		ISpos((sfd = signalfd(-1, &newset, SFD_NONBLOCK | SFD_CLOEXEC | SFD_CLOFORK)));
+		EQ(0, hand_called);
 
 		/* Mask the signal */
-		EQd(sigprocmask(SIG_SETMASK, NULL, &newset), 0);
-		EQd(sigaddset(&newset, SIGUSR1), 0);
-		EQd(sigprocmask(SIG_SETMASK, &newset, &oldset), 0);
+		EQ(0, sigprocmask(SIG_SETMASK, NULL, &newset));
+		EQ(0, sigaddset(&newset, SIGUSR1));
+		EQ(0, sigprocmask(SIG_SETMASK, &newset, &oldset));
 
 		/* Raise the signal. */
-		EQd(raise(SIGUSR1), 0);
+		EQ(0, raise(SIGUSR1));
 
 		/* Handler shouldn't have been called. */
-		EQd(hand_called, 0);
+		EQ(0, hand_called);
 
 		/* Read from the signalfd. */
 		errno = 0;
-		EQss(read(sfd, &info, sizeof(info)), -1); /* No signals are within the signalfd's set */
-		EQd(errno, EWOULDBLOCK);
-		EQd(sigemptyset(&newset), 0);
-		EQd(sigaddset(&newset, SIGUSR1), 0);
-		EQd(signalfd(sfd, &newset, 0), sfd);
-		EQss(read(sfd, &info, sizeof(info)), sizeof(info));
+		EQ(-1, read(sfd, &info, sizeof(info))); /* No signals are within the signalfd's set */
+		EQerrno(EWOULDBLOCK);
+		EQ(0, sigemptyset(&newset));
+		EQ(0, sigaddset(&newset, SIGUSR1));
+		EQ(sfd, signalfd(sfd, &newset, 0));
+		EQ(sizeof(info), read(sfd, &info, sizeof(info)));
 
 		/* Restore the old signal mask */
-		EQd(sigprocmask(SIG_SETMASK, &oldset, NULL), 0);
+		EQ(0, sigprocmask(SIG_SETMASK, &oldset, NULL));
 
 		/* Handler shouldn't have been called because signalfd stole the signal. */
-		EQd(hand_called, 0);
+		EQ(0, hand_called);
 
 		/* Assert that the correct info was read from the signalfd */
-		EQu32(info.ssi_signo, SIGUSR1);
-		EQd32(info.ssi_errno, 0);
-		EQd32(info.ssi_code, SI_TKILL);
-		EQu32(info.ssi_pid, getpid());
-		EQu32(info.ssi_uid, getuid());
+		EQ(SIGUSR1, info.ssi_signo);
+		EQ(0, info.ssi_errno);
+		EQ(SI_TKILL, info.ssi_code);
+		EQ(getpid(), info.ssi_pid);
+		EQ(getuid(), info.ssi_uid);
 
 		/* Only 1 signal should be readable. */
 		errno = 0;
-		EQss(read(sfd, &info, sizeof(info)), -1);
-		EQd(errno, EWOULDBLOCK);
+		EQ(-1, read(sfd, &info, sizeof(info)));
+		EQerrno(EWOULDBLOCK);
 
 		/* Close the signal fd */
-		EQd(close(sfd), 0);
+		EQ(0, close(sfd));
 
 		/* Handler shouldn't have been called because signalfd stole the signal. */
-		EQd(hand_called, 0);
+		EQ(0, hand_called);
 	}
 
 	/* Restore the previous handler. */
-	EQd(sigaction(SIGUSR1, &old_action, NULL), 0);
+	EQ(0, sigaction(SIGUSR1, &old_action, NULL));
 }
 
 

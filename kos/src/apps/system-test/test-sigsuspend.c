@@ -40,7 +40,7 @@ DECL_BEGIN
 PRIVATE sig_atomic_t handler_called = 0;
 
 PRIVATE void myhandler(signo_t signo) {
-	EQd(signo, SIGUSR1);
+	EQ(SIGUSR1, signo);
 	++handler_called;
 }
 
@@ -50,44 +50,44 @@ DEFINE_TEST(sigsuspend) {
 
 	/* Install a custom signal handler. */
 	oldhand = signal(SIGUSR1, &myhandler);
-	NEup((uintptr_t)oldhand, (uintptr_t)SIG_ERR);
+	NE(SIG_ERR, oldhand);
 
 	/* Mask all signals. */
-	EQd(0, sigfillset(&mask));
-	EQd(0, sigprocmask(SIG_SETMASK, &mask, &omask));
-	EQu(0, handler_called);
+	EQ(0, sigfillset(&mask));
+	EQ(0, sigprocmask(SIG_SETMASK, &mask, &omask));
+	EQ(0, handler_called);
 
 #ifdef SYS_sigsuspend
 	/* Raise SIGUSR1 */
-	EQd(0, raise(SIGUSR1));
-	EQu(0, handler_called);
+	EQ(0, raise(SIGUSR1));
+	EQ(0, handler_called);
 
 	/* Wait for the signal using sigsuspend() */
-	EQd(0, sigdelset(&mask, SIGUSR1));
-	EQu(0, handler_called);
-	EQd(-EFAULT, sys_sigsuspend(NULL));
-	EQu(0, handler_called);
-	EQd(-EINTR, sys_sigsuspend((struct __old_sigset_struct const *)&mask));
+	EQ(0, sigdelset(&mask, SIGUSR1));
+	EQ(0, handler_called);
+	EQ(-EFAULT, sys_sigsuspend(NULL));
+	EQ(0, handler_called);
+	EQ(-EINTR, sys_sigsuspend((struct __old_sigset_struct const *)&mask));
 #else /* SYS_sigsuspend */
-	EQd(0, sigdelset(&mask, SIGUSR1));
+	EQ(0, sigdelset(&mask, SIGUSR1));
 	++handler_called; /* Pshht -- don't tell anyone ;) */
 #endif /* !SYS_sigsuspend */
-	EQu(1, handler_called);
+	EQ(1, handler_called);
 
 	/* Wait for the signal using rt_sigsuspend() */
-	EQu(1, handler_called);
-	EQd(0, raise(SIGUSR1));
-	EQu(1, handler_called);
-	EQd(-EFAULT, sys_rt_sigsuspend(NULL, sizeof(sigset_t)));
-	EQu(1, handler_called);
-	EQd(-EINTR, sys_rt_sigsuspend(&mask, sizeof(sigset_t)));
-	EQu(2, handler_called);
+	EQ(1, handler_called);
+	EQ(0, raise(SIGUSR1));
+	EQ(1, handler_called);
+	EQ(-EFAULT, sys_rt_sigsuspend(NULL, sizeof(sigset_t)));
+	EQ(1, handler_called);
+	EQ(-EINTR, sys_rt_sigsuspend(&mask, sizeof(sigset_t)));
+	EQ(2, handler_called);
 
 	/* Restore signal mask. */
-	EQd(0, sigprocmask(SIG_SETMASK, &omask, NULL));
-	EQu(2, handler_called);
-	NEup((uintptr_t)SIG_ERR, (uintptr_t)signal(SIGUSR1, oldhand));
-	EQu(2, handler_called);
+	EQ(0, sigprocmask(SIG_SETMASK, &omask, NULL));
+	EQ(2, handler_called);
+	NE(SIG_ERR, signal(SIGUSR1, oldhand));
+	EQ(2, handler_called);
 }
 
 DECL_END

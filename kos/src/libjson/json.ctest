@@ -101,17 +101,17 @@ PRIVATE void do_test_codec(byte_t const *codec) {
 	 * store the  results in  an associated  `struct my_struct' */
 	json_parser_init(&parser, json_input, COMPILER_STREND(json_input));
 	memset(&foo, 0xcc, sizeof(foo));
-	EQd(JSON_ERROR_OK, json_decode(&parser, codec, &foo, NULL));
-	EQd(10, foo.ms_alpha);
-	EQd(20, foo.ms_beta);
-	EQd(1, foo.ms_values[0]);
-	EQd(2, foo.ms_values[1]);
-	EQd(4, foo.ms_values[2]);
-	EQd(8, foo.ms_values[3]);
-	EQd(16, foo.ms_values[4]);
-	EQd(32, foo.ms_values[5]);
-	EQd(64, foo.ms_values[6]);
-	EQd(128, foo.ms_values[7]);
+	EQ(JSON_ERROR_OK, json_decode(&parser, codec, &foo, NULL));
+	EQ(10, foo.ms_alpha);
+	EQ(20, foo.ms_beta);
+	EQ(1, foo.ms_values[0]);
+	EQ(2, foo.ms_values[1]);
+	EQ(4, foo.ms_values[2]);
+	EQ(8, foo.ms_values[3]);
+	EQ(16, foo.ms_values[4]);
+	EQ(32, foo.ms_values[5]);
+	EQ(64, foo.ms_values[6]);
+	EQ(128, foo.ms_values[7]);
 	EQstr("This is\n my /*name*/", foo.ms_name);
 
 	/* Also assert the opposite: converting a C-structure to json (using both compact and pretty formats) */
@@ -137,7 +137,7 @@ PRIVATE void do_test_codec(byte_t const *codec) {
 		char foo_generated[512], *ptr;
 		ptr = foo_generated;
 		json_writer_init(&writer, &format_sprintf_printer, &ptr, JSON_WRITER_FORMAT_PRETTY);
-		EQd(JSON_ERROR_OK, json_encode(&writer, codec, &foo, NULL));
+		EQ(JSON_ERROR_OK, json_encode(&writer, codec, &foo, NULL));
 		assertf(ptr == foo_generated + COMPILER_STRLEN(foo_pretty_expected) &&
 		        bcmp(foo_generated, foo_pretty_expected, COMPILER_STRLEN(foo_pretty_expected), sizeof(char)) == 0,
 		        "Expected: %$q\n"
@@ -146,7 +146,7 @@ PRIVATE void do_test_codec(byte_t const *codec) {
 		        (size_t)(ptr - foo_generated), foo_generated);
 		ptr = foo_generated;
 		json_writer_init(&writer, &format_sprintf_printer, &ptr, JSON_WRITER_FORMAT_COMPACT);
-		EQd(JSON_ERROR_OK, json_encode(&writer, codec, &foo, NULL));
+		EQ(JSON_ERROR_OK, json_encode(&writer, codec, &foo, NULL));
 		assertf(ptr == foo_generated + COMPILER_STRLEN(foo_compact_expected) &&
 		        bcmp(foo_generated, foo_compact_expected, COMPILER_STRLEN(foo_compact_expected), sizeof(char)) == 0,
 		        "Expected: %$q\n"
@@ -179,13 +179,13 @@ DEFINE_TEST(json_codecs) {
 		struct json_parser parser;
 		char const *input = "{\"bar\":\"baz\",\"foo\":[10,20,30]}";
 		json_parser_init(&parser, input, strend(input));
-		EQd(JSON_ERROR_OK, json_parser_enterobject(&parser));
-		EQd(JSON_ERROR_OK, json_parser_findkey(&parser, "foo", 3));
-		EQd(JSON_ERROR_OK, json_parser_enterarray(&parser));
-		EQd(JSON_ERROR_OK, json_parser_findindex(&parser, 1));
+		EQ(JSON_ERROR_OK, json_parser_enterobject(&parser));
+		EQ(JSON_ERROR_OK, json_parser_findkey(&parser, "foo", 3));
+		EQ(JSON_ERROR_OK, json_parser_enterarray(&parser));
+		EQ(JSON_ERROR_OK, json_parser_findindex(&parser, 1));
 		memset(&value, 0xcc, sizeof(value));
-		EQd(JSON_ERROR_OK, json_parser_getnumber(&parser, &value));
-		EQdp(20, value);
+		EQ(JSON_ERROR_OK, json_parser_getnumber(&parser, &value));
+		EQ(20, value);
 	}
 
 	dlclose(libjson);

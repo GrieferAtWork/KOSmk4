@@ -44,14 +44,14 @@ DEFINE_TEST(libdl_aux_sections) {
 	sect = dllocksection(dlopen(NULL, 0), ".elf.ehdr",
 	                     DLLOCKSECTION_FNORMAL);
 	assertf(sect, "%s", dlerror());
-	EQs(sect->ds_size, sizeof(ElfW(Ehdr)));
+	EQ(sizeof(ElfW(Ehdr)), sect->ds_size);
 	{
 		ElfW(Ehdr) *ehdr;
 		ehdr = (ElfW(Ehdr) *)sect->ds_data;
-		EQu(ehdr->e_ident[EI_MAG0], ELFMAG0);
-		EQu(ehdr->e_ident[EI_MAG1], ELFMAG1);
-		EQu(ehdr->e_ident[EI_MAG2], ELFMAG2);
-		EQu(ehdr->e_ident[EI_MAG3], ELFMAG3);
+		EQ(ELFMAG0, ehdr->e_ident[EI_MAG0]);
+		EQ(ELFMAG1, ehdr->e_ident[EI_MAG1]);
+		EQ(ELFMAG2, ehdr->e_ident[EI_MAG2]);
+		EQ(ELFMAG3, ehdr->e_ident[EI_MAG3]);
 	}
 	dlunlocksection(sect);
 }
@@ -76,7 +76,7 @@ DEFINE_TEST(libdl_fromaddr) {
 	/* Test for the primary application. */
 	mod = dlgethandle(&my_static, DLGETHANDLE_FNORMAL);
 	assertf(mod, "%s", dlerror());
-	EQp(mod, dlopen(NULL, 0));
+	EQ(mod, dlopen(NULL, 0));
 }
 
 

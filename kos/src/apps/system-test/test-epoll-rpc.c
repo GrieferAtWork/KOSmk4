@@ -44,8 +44,8 @@ PRIVATE sig_atomic_t myrpc_called = 0;
 
 PRIVATE NONNULL((1)) void
 myrpc(struct rpc_context *__restrict ctx, void *cookie) {
-	EQup(ctx->rc_context, RPC_REASONCTX_ASYNC);
-	EQp(cookie, (void *)0x1234);
+	EQ(RPC_REASONCTX_ASYNC, ctx->rc_context);
+	EQ((void *)0x1234, cookie);
 	++myrpc_called;
 }
 
@@ -57,21 +57,21 @@ DEFINE_TEST(epoll_rpc) {
 	char data[5];
 	myrpc_called = 0;
 
-	NEd(-1, (epfd = epoll_create1(EPOLL_CLOEXEC | EPOLL_CLOFORK)));
-	EQd(0, pipe(pipes)); /* NOLINT */
+	ISpos((epfd = epoll_create1(EPOLL_CLOEXEC | EPOLL_CLOFORK)));
+	EQ(0, pipe(pipes)); /* NOLINT */
 
 	/* Setup a monitor that gets triggered as soon
 	 * as  reading from the pipe becomes possible. */
 	ee.events   = EPOLLIN;
 	ee.data.ptr = (void *)0x1234;
-	EQu(0, myrpc_called);
-	EQd(0, epoll_rpc_exec(epfd, pipes[0], &ee, gettid(),
+	EQ(0, myrpc_called);
+	EQ(0, epoll_rpc_exec(epfd, pipes[0], &ee, gettid(),
 	                      RPC_SYNCMODE_ASYNC | RPC_SYSRESTART_RESTART | RPC_DOMAIN_THREAD,
 	                      &myrpc));
-	EQu(0, myrpc_called);
+	EQ(0, myrpc_called);
 
 	/* Write some data to the pipe. */
-	EQss(5, write(pipes[1], "Hello", 5));
+	EQ(5, write(pipes[1], "Hello", 5));
 
 	/* Because we're using async RPCs, the RPC should have already been invoked!
 	 * WARNING: Normally when sending RPCs, there's the possibility that the RPC
@@ -83,17 +83,17 @@ DEFINE_TEST(epoll_rpc) {
 	 * entire RPC delivery process happens synchronously), no such transit-delay  exists
 	 * which allows us to immediately assert that the RPC already finished. */
 	COMPILER_READ_BARRIER();
-	EQu(1, myrpc_called);
+	EQ(1, myrpc_called);
 
 	/* Also  make sure that the in-pipe data is correct (though that's
 	 * kind-of a given and not ~really~ related to testing epoll RPCs) */
-	EQss(5, read(pipes[0], data, 5));
-	EQd(0, bcmp(data, "Hello", 5));
+	EQ(5, read(pipes[0], data, 5));
+	EQ(0, bcmp(data, "Hello", 5));
 
 	/* Cleanup */
-	EQd(0, close(pipes[0]));
-	EQd(0, close(pipes[1]));
-	EQd(0, close(epfd));
+	EQ(0, close(pipes[0]));
+	EQ(0, close(pipes[1]));
+	EQ(0, close(epfd));
 }
 
 DECL_END

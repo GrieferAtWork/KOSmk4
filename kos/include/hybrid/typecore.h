@@ -1173,6 +1173,22 @@
 #define __TYPEFOR_INTIB(n)  __PRIVATE_TYPEFOR_INTIB(n)
 #define __TYPEFOR_UINTIB(n) __PRIVATE_TYPEFOR_UINTIB(n)
 
+#ifndef __CHAR_UNSIGNED__
+#ifdef __CHAR_MIN__
+#if __CHAR_MIN__ == 0
+#define __CHAR_UNSIGNED__ 1
+#endif /* __CHAR_MIN__ == 0 */
+#elif defined(__SIGNED_CHARS__)
+/* #undef __CHAR_UNSIGNED__ */
+#elif defined(_CHAR_UNSIGNED) || defined(_CHAR_IS_UNSIGNED)
+#define __CHAR_UNSIGNED__ 1
+#elif '\xff' <= 0
+/* #undef __CHAR_UNSIGNED__ */
+#else /* ... */
+#define __CHAR_UNSIGNED__ 1
+#endif /* !... */
+#endif /* !__CHAR_UNSIGNED__ */
+
 #ifndef __CHAR8_TYPE__
 #if __SIZEOF_CHAR__ == 1
 #define __CHAR8_TYPE__ char
@@ -1347,8 +1363,18 @@
 #endif /* !__UINTPTR_TYPE__ */
 
 #ifndef __SIZE_TYPE__
+#ifdef __EDG_SIZE_TYPE__
+#define __SIZE_TYPE__ __ATTR_W64 __EDG_SIZE_TYPE__
+#else /* __EDG_SIZE_TYPE__ */
 #define __SIZE_TYPE__ __ATTR_W64 __TYPEFOR_UINTIB(__SIZEOF_SIZE_T__)
+#endif /* !__EDG_SIZE_TYPE__ */
 #endif /* !__SIZE_TYPE__ */
+
+#ifndef __PTRDIFF_TYPE__
+#ifdef __EDG_PTRDIFF_TYPE__
+#define __PTRDIFF_TYPE__ __EDG_PTRDIFF_TYPE__
+#endif /* __EDG_PTRDIFF_TYPE__ */
+#endif /* __PTRDIFF_TYPE__ */
 
 #ifndef __SIZEOF_INTMAX_T__
 #ifdef __INTMAX_MAX__
@@ -1890,7 +1916,7 @@ __NAMESPACE_INT_END
 
 
 
-#if (defined(_NATIVE_CHAR16_T_DEFINED) ||                                                                               \
+#if (defined(_NATIVE_CHAR16_T_DEFINED) || defined(__CHAR16_T_AND_CHAR32_T) ||                                           \
      (defined(__cpp_unicode_characters) && __cpp_unicode_characters + 0 >= 200704) ||                                   \
      (defined(_HAS_CHAR16_T_LANGUAGE_SUPPORT) && _HAS_CHAR16_T_LANGUAGE_SUPPORT + 0) ||                                 \
      (defined(__cplusplus) &&                                                                                           \

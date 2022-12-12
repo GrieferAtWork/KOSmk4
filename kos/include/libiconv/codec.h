@@ -118,7 +118,7 @@ __NOTHROW_NCX(LIBICONV_CC iconv_same_codec_name)(char const *__restrict a,
  * In case of a single-byte codec, go through all bytes that appear in the file
  * and count which of them occur how often before narrowing down candidates  by
  * excluding any where decoding would result in non-printable characters  other
- * than those needed for text (e.g. line-feeds, spaces, and unicode prefixes).
+ * than those needed for text (i.e. line-feeds, spaces, and unicode prefixes).
  *
  * Once the set of codecs capable of decoding the file into something that looks
  * like text is determined, use each of them to try and decode the text to UTF-8

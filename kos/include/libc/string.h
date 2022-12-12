@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f7f6f89 */
+/* HASH CRC-32:0xa22958f7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -133,6 +133,8 @@
  * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 #define __libc_mempcpy __libc_core_mempcpy
 #endif /* !__fast_mempcpy_defined */
+#define __libc_strerrordesc_np __libc_core_strerrordesc_np
+#define __libc_strerrorname_np __libc_core_strerrorname_np
 #ifdef __fast_bzero_defined
 #define __libc_bzero (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(bzero))
 #else /* __fast_bzero_defined */

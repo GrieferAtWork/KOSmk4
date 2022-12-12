@@ -44,7 +44,8 @@ DEFINE_TEST(aio) {
 	fd_t pipefds[2];
 	struct aiocb aio;
 	struct aiocb *aio_list[] = { &aio };
-	EQd(pipe(pipefds), 0); /* NOLINT */
+
+	EQ(0, pipe(pipefds)); /* NOLINT */
 
 	/* Start reading from the pipe. */
 	bzero(&aio, sizeof(aio));
@@ -52,27 +53,27 @@ DEFINE_TEST(aio) {
 	aio.aio_buf                   = buf;
 	aio.aio_nbytes                = sizeof(buf);
 	aio.aio_sigevent.sigev_notify = SIGEV_NONE;
-	EQd(aio_read(&aio), 0);
-	EQd(aio_error(&aio), EINPROGRESS);
+	EQ(0, aio_read(&aio));
+	EQ(EINPROGRESS, aio_error(&aio));
 
 	/* Write some data to the pipe. */
-	EQss(write(pipefds[1], "test data", 9), 9);
-	EQd(close(pipefds[1]), 0);
+	EQ(9, write(pipefds[1], "test data", 9));
+	EQ(0, close(pipefds[1]));
 
 	/* Wait for AIO to complete. */
-	EQd(TEMP_FAILURE_RETRY(aio_suspend(aio_list, 1, NULL)), 0);
-	EQd(close(pipefds[0]), 0);
+	EQ(0, TEMP_FAILURE_RETRY(aio_suspend(aio_list, 1, NULL)));
+	EQ(0, close(pipefds[0]));
 
 	/* Ensure that AIO has the correct contents. */
-	EQd(aio_error(&aio), 0);
-	EQss(aio_return(&aio), 9);
+	EQ(aio_error(&aio), 0);
+	EQ(aio_return(&aio), 9);
 
 	/* Reading `aio_return()' a second time should fail with EINVAL */
 	errno = 0;
-	EQss(aio_return(&aio), -1);
-	EQd(errno, EINVAL);
+	EQ(-1, aio_return(&aio));
+	EQerrno(EINVAL);
 
-	assertf(bcmp(buf, "test data", 9) == 0, "%$q", 9, buf);
+	EQmem("test data", buf, 9);
 }
 
 DECL_END

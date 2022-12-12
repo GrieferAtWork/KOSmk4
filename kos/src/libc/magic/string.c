@@ -1522,7 +1522,7 @@ int strncasecmp_l([[in]] char const *s1,
 	return strncasecmp(s1, s2, maxlen);
 }
 
-[[const, wunused, nothrow, kernel]]
+[[const, wunused, nothrow, kernel, libc]]
 [[decl_include("<bits/types.h>"), impl_prefix(
 @@pp_ifndef __BUILDING_LIBC@@
 @@pp_ifndef ___local_sys_errlist_defined@@
@@ -2004,7 +2004,7 @@ char const *strerrordesc_np($errno_t errnum) {
 @@pp_endif@@
 }
 
-[[kernel, const, wunused, nothrow]]
+[[const, wunused, nothrow, kernel, libc]]
 [[decl_include("<bits/types.h>"), alias("strerrno")]]
 [[if(!defined(__KERNEL__)), export_as("strerrno")]]
 [[crt_dos_variant({

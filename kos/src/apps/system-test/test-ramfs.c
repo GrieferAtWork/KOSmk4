@@ -46,35 +46,35 @@ DEFINE_TEST(ramfs) {
 	umount("/tmp/submount");
 	rmdir("/tmp/submount");
 
-	EQd(0, mkdir("/tmp/submount", 0755));
-	EQd(0, mount(NULL, "/tmp/submount", "ramfs", 0, NULL));
+	EQ(0, mkdir("/tmp/submount", 0755));
+	EQ(0, mount(NULL, "/tmp/submount", "ramfs", 0, NULL));
 
 	/* Assert that the correct errors are produced when
 	 * trying  to  do non-sense  with  mounting points. */
-	EQd(-1, mkdir("/tmp/submount", 0755));
-	EQd(errno, EEXIST);
-	EQd(-1, rmdir("/tmp/submount"));
-	EQd(errno, EBUSY);
+	EQ(-1, mkdir("/tmp/submount", 0755));
+	EQerrno(EEXIST);
+	EQ(-1, rmdir("/tmp/submount"));
+	EQerrno(EBUSY);
 
-	LEd(0, (fd = open("/tmp/submount/myfile.txt", O_CREAT | O_EXCL | O_WRONLY, 0644))); /* NOLINT */
+	ISpos((fd = open("/tmp/submount/myfile.txt", O_CREAT | O_EXCL | O_WRONLY, 0644))); /* NOLINT */
 	{
 		static char const s[] = "File contents...\n";
-		EQss(sizeof(s) - sizeof(char),
-		     write(fd, s, sizeof(s) - sizeof(char)));
+		EQ(sizeof(s) - sizeof(char),
+		   write(fd, s, sizeof(s) - sizeof(char)));
 	}
-	EQd(0, close(fd));
+	EQ(0, close(fd));
 
 	/* Also create files in a recursive sub-directory (so that
 	 * `fsuper_delete()'  has to recursive  in order to delete
 	 * everything). */
-	EQd(0, mkdir("/tmp/submount/subdir", 0755));
-	LEd(0, (fd = open("/tmp/submount/subdir/foo.bar", O_CREAT | O_EXCL | O_WRONLY, 0644))); /* NOLINT */
+	EQ(0, mkdir("/tmp/submount/subdir", 0755));
+	ISpos((fd = open("/tmp/submount/subdir/foo.bar", O_CREAT | O_EXCL | O_WRONLY, 0644))); /* NOLINT */
 	{
 		static char const s[] = "foo.bar file contents...\n";
-		EQss(sizeof(s) - sizeof(char),
+		EQ(sizeof(s) - sizeof(char),
 		     write(fd, s, sizeof(s) - sizeof(char)));
 	}
-	EQd(0, close(fd));
+	EQ(0, close(fd));
 
 	/* Unmount without first deleting "myfile.txt"
 	 *
@@ -83,8 +83,8 @@ DEFINE_TEST(ramfs) {
 	 * are  complete, we always  assert that there  are no memory leaks,
 	 * which this test leaves  behind in case `fsuper_delete()'  doesn't
 	 * handle this case correctly. */
-	EQd(0, umount("/tmp/submount"));
-	EQd(0, rmdir("/tmp/submount"));
+	EQ(0, umount("/tmp/submount"));
+	EQ(0, rmdir("/tmp/submount"));
 }
 
 DECL_END

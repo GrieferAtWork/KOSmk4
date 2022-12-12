@@ -47,21 +47,21 @@ PRIVATE ucontext_t uctx_func2;
 
 PRIVATE void func1(void) {
 	++state;
-	assert(state == 5);
+	EQ(5, state);
 	ctest_substatf("state = 5\n");
-	assert(swapcontext(&uctx_func1, &uctx_func2) == 0);
+	EQ(0, swapcontext(&uctx_func1, &uctx_func2));
 	++state;
-	assert(state == 7);
+	EQ(7, state);
 	ctest_substatf("state = 7\n");
 }
 
 PRIVATE void func2(void) {
 	++state;
-	assert(state == 4);
+	EQ(4, state);
 	ctest_substatf("state = 4\n");
-	assert(swapcontext(&uctx_func2, &uctx_func1) == 0);
+	EQ(0, swapcontext(&uctx_func2, &uctx_func1));
 	++state;
-	assert(state == 6);
+	EQ(6, state);
 	ctest_substatf("state = 6\n");
 }
 
@@ -71,30 +71,30 @@ static void *func2_stack[1024];
 DEFINE_TEST(ucontext) {
 	state = 0;
 	ctest_substatf("state = 0\n");
-	assert(getcontext(&uctx_func1) == 0);
+	EQ(0, getcontext(&uctx_func1));
 	++state;
-	assert(state == 1);
+	EQ(1, state);
 	ctest_substatf("state = 1\n");
 	uctx_func1.uc_stack.ss_sp   = func1_stack;
 	uctx_func1.uc_stack.ss_size = sizeof(func1_stack);
 	uctx_func1.uc_link          = &uctx_main;
 	makecontext(&uctx_func1, &func1, 0);
 
-	assert(getcontext(&uctx_func2) == 0);
+	EQ(0, getcontext(&uctx_func2));
 	++state;
-	assert(state == 2);
+	EQ(2, state);
 	ctest_substatf("state = 2\n");
 	uctx_func2.uc_stack.ss_sp   = func2_stack;
 	uctx_func2.uc_stack.ss_size = sizeof(func2_stack);
 	uctx_func2.uc_link          = &uctx_func1;
 	makecontext(&uctx_func2, &func2, 0);
 	++state;
-	assert(state == 3);
+	EQ(3, state);
 	ctest_substatf("state = 3\n");
 
-	assert(swapcontext(&uctx_main, &uctx_func2) == 0);
+	EQ(0, swapcontext(&uctx_main, &uctx_func2));
 	++state;
-	assert(state == 8);
+	EQ(8, state);
 	ctest_substatf("state = 8\n");
 }
 

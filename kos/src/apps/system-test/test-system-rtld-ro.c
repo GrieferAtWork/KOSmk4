@@ -63,20 +63,20 @@ DEFINE_TEST(system_rtld_ro) {
 		fd_t tempfd;
 		char name[sizeof("/proc/self/fd/" PRIMAXd)];
 		/* Make the FD appear in procfs */
-		NEd(-1, (tempfd = dup(AT_FDSYSRTLD))); /* NOLINT */
+		ISpos((tempfd = dup(AT_FDSYSRTLD))); /* NOLINT */
 		sprintf(name, "/proc/self/fd/%d", tempfd);
-		NEd(-1, (sysrtld = open(name, O_RDWR))); /* NOLINT */
+		ISpos((sysrtld = open(name, O_RDWR))); /* NOLINT */
 		/* And with that, we should have a writable file descriptor! */
-		EQd(0, close(tempfd));
+		EQ(0, close(tempfd));
 	}
 
-	EQd(0, fstat(sysrtld, &st));
+	EQ(0, fstat(sysrtld, &st));
 	assert(st.st_size > 0);
-	LEss(1, pread(sysrtld, buf, sizeof(buf), 0));
+	LE(1, pread(sysrtld, buf, sizeof(buf), 0));
 
 	errno = 0;
-	EQss(-1, pwrite(sysrtld, buf, sizeof(buf), 0));
-	EQd(errno, EROFS); /* EROFS for `E_FSERROR_READONLY' (because writing isn't allowed) */
+	EQ(-1, pwrite(sysrtld, buf, sizeof(buf), 0));
+	EQerrno(EROFS); /* EROFS for `E_FSERROR_READONLY' (because writing isn't allowed) */
 
 	/* Make sure that we're not able to clear the `MFILE_F_READONLY' flag.
 	 * We should be prevented from doing  so because the system RTLD  uses
@@ -84,48 +84,50 @@ DEFINE_TEST(system_rtld_ro) {
 	 * changed. */
 	{
 		int ro = -1;
-		EQd(0, ioctl(sysrtld, FILE_IOC_GETRO, &ro));
-		EQd(ro, 1);
+		EQ(0, ioctl(sysrtld, FILE_IOC_GETRO, &ro));
+		EQ(ro, 1);
 
 		ro = 0;
 		errno = 0;
-		EQd(-1, ioctl(sysrtld, FILE_IOC_SETRO, &ro));
-		EQd(errno, EPERM); /* s.a. `E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS' */
+		EQ(-1, ioctl(sysrtld, FILE_IOC_SETRO, &ro));
+		EQerrno(EPERM); /* s.a. `E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS' */
 		errno = 0;
 	}
 
 	/* Also make sure that `FS_IOC_GETFLAGS' / `FS_IOC_SETFLAGS' can't be used to clear READONLY */
 	{
 		long flags = 0;
-		EQd(0, ioctl(sysrtld, FS_IOC_GETFLAGS, &flags));
+		EQ(0, ioctl(sysrtld, FS_IOC_GETFLAGS, &flags));
 		assert(flags & FS_IMMUTABLE_FL);
 		flags &= ~FS_IMMUTABLE_FL;
-		EQd(-1, ioctl(sysrtld, FS_IOC_SETFLAGS, &flags));
-		EQd(errno, EPERM); /* s.a. `E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS' */
+		EQ(-1, ioctl(sysrtld, FS_IOC_SETFLAGS, &flags));
+		EQerrno(EPERM); /* s.a. `E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS' */
 		flags = 0;
-		EQd(-1, ioctl(sysrtld, FS_IOC_SETFLAGS, &flags));
-		EQd(errno, EPERM); /* s.a. `E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS' */
+		EQ(-1, ioctl(sysrtld, FS_IOC_SETFLAGS, &flags));
+		EQerrno(EPERM); /* s.a. `E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS' */
 	}
 
 	errno = 0;
-	EQss(-1, pwrite(sysrtld, buf, sizeof(buf), 0));
-	EQd(errno, EROFS); /* EROFS for `E_FSERROR_READONLY' (because writing isn't allowed) */
+	EQ(-1, pwrite(sysrtld, buf, sizeof(buf), 0));
+	EQerrno(EROFS); /* EROFS for `E_FSERROR_READONLY' (because writing isn't allowed) */
 
-	errno = 0, ps = getpagesize();
-	EQp(MAP_FAILED, (map = mmap(NULL, ps, PROT_READ | PROT_WRITE, MAP_SHARED, sysrtld, 0)));
-	EQd(EROFS, errno); /* EROFS for `E_FSERROR_READONLY' (because WRITE+SHARED aren't allowed) */
+	errno = 0;
+	ps = getpagesize();
+	EQ(MAP_FAILED, (map = mmap(NULL, ps, PROT_READ | PROT_WRITE, MAP_SHARED, sysrtld, 0)));
+	EQerrno(EROFS); /* EROFS for `E_FSERROR_READONLY' (because WRITE+SHARED aren't allowed) */
 
-	NEp(MAP_FAILED, (map = mmap(NULL, ps, PROT_READ | PROT_WRITE, MAP_PRIVATE, sysrtld, 0)));
+	NE(MAP_FAILED, (map = mmap(NULL, ps, PROT_READ | PROT_WRITE, MAP_PRIVATE, sysrtld, 0)));
 	if (ps > sizeof(buf))
 		ps = sizeof(buf);
 	if (ps > st.st_size)
 		ps = (size_t)st.st_size;
-	EQd(0, bcmp(map, buf, ps));
-	EQd(0, munmap(map, getpagesize()));
+	EQ(0, bcmp(map, buf, ps));
+	EQ(0, munmap(map, getpagesize()));
 
 	/* Make sure that mprotect() also can't be used to gain write access. */
-	errno = 0, ps = getpagesize();
-	NEp(MAP_FAILED, (map = mmap(NULL, ps, PROT_READ, MAP_SHARED, sysrtld, 0)));
+	errno = 0;
+	ps = getpagesize();
+	NE(MAP_FAILED, (map = mmap(NULL, ps, PROT_READ, MAP_SHARED, sysrtld, 0)));
 	if (mprotect(map, ps, PROT_READ | PROT_WRITE) == 0) {
 		/* Even though the mprotect succeeds, actually trying to modify the
 		 * pointed-to memory sees the #PF handler throw E_FSERROR_READONLY. */
@@ -141,33 +143,33 @@ DEFINE_TEST(system_rtld_ro) {
 		}
 	} else {
 		/* EACCES in case `sysrtld' is IO_RDONLY */
-		EQd(errno, EACCES);
+		EQerrno(EACCES);
 	}
-	EQd(0, munmap(map, ps));
+	EQ(0, munmap(map, ps));
 
 	if (sysrtld != AT_FDSYSRTLD)
-		EQd(0, close(sysrtld));
+		EQ(0, close(sysrtld));
 	errno = 0;
-	EQd(-1, close(AT_FDSYSRTLD));
-	EQd(errno, EBADF); /* Cannot be closed */
+	EQ(-1, close(AT_FDSYSRTLD));
+	EQerrno(EBADF); /* Cannot be closed */
 
 	/* Make sure that mmap(MAP_SHARED) on an IO_RDONLY handle works as expected.
 	 * In this case, the  expected exception is E_INVALID_HANDLE_OPERATION  with
 	 * op-code  `E_INVALID_HANDLE_OPERATION_MMAP_SHARED_RDWR',  which  is   then
 	 * translated to `EACCES' (matching posix behavior) */
 	errno = 0;
-	EQp(MAP_FAILED, (map = mmap(NULL, ps, PROT_READ | PROT_WRITE, MAP_SHARED, AT_FDSYSRTLD, 0)));
-	EQd(errno, EACCES);
-	NEp(MAP_FAILED, (map = mmap(NULL, ps, PROT_READ, MAP_SHARED, AT_FDSYSRTLD, 0)));
+	EQ(MAP_FAILED, (map = mmap(NULL, ps, PROT_READ | PROT_WRITE, MAP_SHARED, AT_FDSYSRTLD, 0)));
+	EQerrno(EACCES);
+	NE(MAP_FAILED, (map = mmap(NULL, ps, PROT_READ, MAP_SHARED, AT_FDSYSRTLD, 0)));
 
 	/* Try to mprotect() a memory mapping created by PROT_READ+MAP_SHARED of a  non-IO_RDWR
 	 * file descriptor must fail with EACCES. (E_INVALID_HANDLE_OPERATION_MMAP_SHARED_RDWR)
 	 *
 	 * s.a. kernel:MNODE_F_PDENYWRITE */
 	errno = 0;
-	EQd(-1, mprotect(map, ps, PROT_READ | PROT_WRITE));
-	EQd(errno, EACCES);
-	EQd(0, munmap(map, ps));
+	EQ(-1, mprotect(map, ps, PROT_READ | PROT_WRITE));
+	EQerrno(EACCES);
+	EQ(0, munmap(map, ps));
 
 }
 

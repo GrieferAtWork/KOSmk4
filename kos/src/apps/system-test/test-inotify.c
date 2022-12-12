@@ -47,100 +47,101 @@ PRIVATE byte_t _inotify_buf[offsetof(struct inotify_event, name) +
 #define inotify_buf     ((struct inotify_event *)_inotify_buf)
 #define INOTIFY_BUFSIZE sizeof(_inotify_buf)
 
-PRIVATE void assert_inotify_event(fd_t notify_fd, watchfd_t wd, uint32_t mask, char const *name) {
+PRIVATE void
+assert_inotify_event(fd_t notify_fd, watchfd_t wd,
+                     uint32_t mask, char const *name) {
 	ssize_t size, exp_size;
 	size     = read(notify_fd, inotify_buf, INOTIFY_BUFSIZE);
 	exp_size = offsetof(struct inotify_event, name);
 	if (name)
 		exp_size += (strlen(name) + 1) * sizeof(char);
-	EQss(size, exp_size);
+	EQ(size, exp_size);
 	if (name) {
-		assertf(strcmp(inotify_buf->name, name) == 0,
-		        "%q != %q", inotify_buf->name, name);
-		EQu32(inotify_buf->len, strlen(name) + 1);
+		EQstr(inotify_buf->name, name);
+		EQ(inotify_buf->len, strlen(name) + 1);
 	} else {
-		EQu32(inotify_buf->len, 0);
+		EQ(inotify_buf->len, 0);
 	}
-	EQu32(inotify_buf->mask, mask);
-	EQd32(inotify_buf->wd, wd);
+	EQ(inotify_buf->mask, mask);
+	EQ(inotify_buf->wd, wd);
 }
 
 PRIVATE void assert_inotify_empty(fd_t notify_fd) {
 	errno = 0;
-	EQss(-1, read(notify_fd, inotify_buf, INOTIFY_BUFSIZE));
-	EQd(errno, EWOULDBLOCK);
+	EQ(-1, read(notify_fd, inotify_buf, INOTIFY_BUFSIZE));
+	EQerrno(EWOULDBLOCK);
 }
 
 DEFINE_TEST(inotify) {
 	fd_t notify_fd;
 	watchfd_t wfd;
 	fd_t fd;
-	LEd(0, (notify_fd = inotify_init1(IN_CLOEXEC | IN_NONBLOCK)));
+	ISpos((notify_fd = inotify_init1(IN_CLOEXEC | IN_NONBLOCK)));
 	assert_inotify_empty(notify_fd);
-	LEd(0, (wfd = inotify_add_watch(notify_fd, "/tmp", IN_ALL_EVENTS | IN_ONLYDIR)));
+	ISpos((wfd = inotify_add_watch(notify_fd, "/tmp", IN_ALL_EVENTS | IN_ONLYDIR)));
 	assert_inotify_empty(notify_fd);
 
 	/* Test: `IN_OPEN' */
-	LEd(0, (fd = open("/tmp", O_RDONLY))); /* NOLINT */
+	ISpos((fd = open("/tmp", O_RDONLY))); /* NOLINT */
 	assert_inotify_event(notify_fd, wfd, IN_OPEN | IN_ISDIR, NULL);
 	assert_inotify_empty(notify_fd);
 
 	/* Test: `IN_CLOSE_NOWRITE' */
-	EQd(0, close(fd));
+	EQ(0, close(fd));
 	assert_inotify_event(notify_fd, wfd, IN_CLOSE_NOWRITE | IN_ISDIR, NULL);
 	assert_inotify_empty(notify_fd);
 
 	/* Test: `IN_CREATE' */
-	LEd(0, (fd = open("/tmp/testfile", O_RDWR | O_CREAT, 0644))); /* NOLINT */
+	ISpos((fd = open("/tmp/testfile", O_RDWR | O_CREAT, 0644))); /* NOLINT */
 	assert_inotify_event(notify_fd, wfd, IN_CREATE, "testfile");
 	assert_inotify_empty(notify_fd);
 
 	/* Test: `IN_ATTRIB' */
-	EQd(0, fchmod(fd, 0777));
+	EQ(0, fchmod(fd, 0777));
 	assert_inotify_event(notify_fd, wfd, IN_ATTRIB, "testfile");
 	assert_inotify_empty(notify_fd);
 
 	/* Test: `IN_MODIFY' */
-	EQss(7, write(fd, "Content", 7));
+	EQ(7, write(fd, "Content", 7));
 	assert_inotify_event(notify_fd, wfd, IN_MODIFY, "testfile");
 	assert_inotify_empty(notify_fd);
 
 	/* Test: `IN_CLOSE_WRITE' */
-	EQd(0, close(fd));
+	EQ(0, close(fd));
 	assert_inotify_event(notify_fd, wfd, IN_CLOSE_NOWRITE, "testfile"); /* FIXME: This should be `IN_CLOSE_WRITE' */
 	assert_inotify_empty(notify_fd);
 
 	/* Test: `IN_DELETE' */
-	EQd(0, unlink("/tmp/testfile"));
+	EQ(0, unlink("/tmp/testfile"));
 	assert_inotify_event(notify_fd, wfd, IN_ATTRIB, "testfile"); /* Because `st_nlink' was changed (same thing happens on linux, too!) */
 	assert_inotify_event(notify_fd, wfd, IN_DELETE, "testfile");
 	assert_inotify_empty(notify_fd);
 
 
 	/* Cleanup (and also test invocation of `inotify_rm_watch') */
-	EQd(0, inotify_rm_watch(notify_fd, wfd));
+	EQ(0, inotify_rm_watch(notify_fd, wfd));
 	assert_inotify_event(notify_fd, wfd, IN_IGNORED | IN_ISDIR, NULL); /* Triggered by `inotify_rm_watch(2)' */
 	assert_inotify_empty(notify_fd);
-	LEd(0, (fd = open("/tmp", O_RDONLY))); /* NOLINT */
+	ISpos((fd = open("/tmp", O_RDONLY))); /* NOLINT */
 	assert_inotify_empty(notify_fd);
-	EQd(0, close(fd));
+	EQ(0, close(fd));
 	assert_inotify_empty(notify_fd);
-	EQd(0, close(notify_fd));
+	EQ(0, close(notify_fd));
 
 	/* Also test closing a notifyfd without first removing watches, as well as with pending events */
-	LEd(0, (notify_fd = inotify_init1(IN_CLOEXEC | IN_NONBLOCK)));
+	ISpos((notify_fd = inotify_init1(IN_CLOEXEC | IN_NONBLOCK)));
 	assert_inotify_empty(notify_fd);
-	LEd(0, (wfd = inotify_add_watch(notify_fd, "/tmp", IN_ALL_EVENTS | IN_ONLYDIR)));
+	ISpos((wfd = inotify_add_watch(notify_fd, "/tmp", IN_ALL_EVENTS | IN_ONLYDIR)));
 	/* This generates `IN_OPEN', but we won't consume that event! */
-	LEd(0, (fd = open("/tmp", O_RDONLY))); /* NOLINT */
-	EQd(0, close(fd));
-	EQd(0, close(notify_fd));
+	ISpos((fd = open("/tmp", O_RDONLY))); /* NOLINT */
+	EQ(0, close(fd));
+	EQ(0, close(notify_fd));
 }
 
 
 PRIVATE sig_atomic_t volatile sigio = 0;
 PRIVATE void sigio_handler(signo_t signo) {
-	EQd(SIGUSR1, signo);
+	EQ(SIGUSR1, signo);
 	++sigio;
 }
 
@@ -152,39 +153,39 @@ DEFINE_TEST(dnotify) {
 	ohand = signal(SIGUSR1, &sigio_handler);
 
 	/* Setup SIGIO-based notification for events on /tmp */
-	LEd(0, (dirfd = open("/tmp", O_RDONLY))); /* NOLINT */
-	EQd(0, fcntl(dirfd, F_NOTIFY,
-	             DN_ACCESS | DN_MODIFY | DN_CREATE |
-	             DN_DELETE | DN_RENAME | DN_ATTRIB |
-	             DN_MULTISHOT));
-	EQd(SIGIO, fcntl(dirfd, F_GETSIG));
-	EQd(0, fcntl(dirfd, F_SETSIG, SIGUSR1));
-	EQd(SIGUSR1, fcntl(dirfd, F_GETSIG));
-	EQd(getpid(), fcntl(dirfd, F_GETOWN));
-	EQd(0, fcntl(dirfd, F_SETOWN, getpid()));
-	EQu(0, sigio);
+	ISpos((dirfd = open("/tmp", O_RDONLY))); /* NOLINT */
+	EQ(0, fcntl(dirfd, F_NOTIFY,
+	            DN_ACCESS | DN_MODIFY | DN_CREATE |
+	            DN_DELETE | DN_RENAME | DN_ATTRIB |
+	            DN_MULTISHOT));
+	EQ(SIGIO, fcntl(dirfd, F_GETSIG));
+	EQ(0, fcntl(dirfd, F_SETSIG, SIGUSR1));
+	EQ(SIGUSR1, fcntl(dirfd, F_GETSIG));
+	EQ(getpid(), fcntl(dirfd, F_GETOWN));
+	EQ(0, fcntl(dirfd, F_SETOWN, getpid()));
+	EQ(0, sigio);
 
 	/* Trigger some events and assert that each of them raises SIGUSR1 */
-	LEd(0, (fd = open("/tmp/foo", O_WRONLY | O_CREAT, 0644))); /* NOLINT */
-	EQu(1, sigio); /* DN_CREATE */
+	ISpos((fd = open("/tmp/foo", O_WRONLY | O_CREAT, 0644))); /* NOLINT */
+	EQ(1, sigio); /* DN_CREATE */
 
-	EQss(5, write(fd, "Hello", 5));
-	EQu(2, sigio); /* DN_MODIFY+DN_ATTRIB */
+	EQ(5, write(fd, "Hello", 5));
+	EQ(2, sigio); /* DN_MODIFY+DN_ATTRIB */
 
-	EQd(0, close(fd));
-	EQu(2, sigio); /* <no event> */
+	EQ(0, close(fd));
+	EQ(2, sigio); /* <no event> */
 
-	EQd(0, chmod("/tmp/foo", 0666));
-	EQu(3, sigio); /* DN_ATTRIB */
+	EQ(0, chmod("/tmp/foo", 0666));
+	EQ(3, sigio); /* DN_ATTRIB */
 
-	EQd(0, unlink("/tmp/foo"));
-	EQu(4, sigio); /* DN_DELETE */
+	EQ(0, unlink("/tmp/foo"));
+	EQ(4, sigio); /* DN_DELETE */
 
-	EQd(0, close(dirfd));
-	EQu(4, sigio); /* <no event> */
+	EQ(0, close(dirfd));
+	EQ(4, sigio); /* <no event> */
 
 	signal(SIGUSR1, ohand);
-	EQu(4, sigio); /* <no event> */
+	EQ(4, sigio); /* <no event> */
 }
 
 

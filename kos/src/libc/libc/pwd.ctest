@@ -57,8 +57,8 @@ DEFINE_TEST(passwd) {
 	assertf(ent, "%m");
 	EQstr("pw_name", ent->pw_name);
 	EQstr("pw_passwd", ent->pw_passwd);
-	EQu((uid_t)1234, ent->pw_uid);
-	EQu((gid_t)5678, ent->pw_gid);
+	EQ((uid_t)1234, ent->pw_uid);
+	EQ((gid_t)5678, ent->pw_gid);
 	EQstr("pw_gecos", ent->pw_gecos);
 	EQstr("pw_dir", ent->pw_dir);
 	EQstr("pw_shell", ent->pw_shell);
@@ -67,8 +67,8 @@ DEFINE_TEST(passwd) {
 	assertf(ent, "%m");
 	EQstr("pw_name", ent->pw_name);
 	EQstr("pw_passwd", ent->pw_passwd);
-	EQu((uid_t)1234, ent->pw_uid);
-	EQu((gid_t)5678, ent->pw_gid);
+	EQ((uid_t)1234, ent->pw_uid);
+	EQ((gid_t)5678, ent->pw_gid);
 	EQstr("", ent->pw_gecos);
 	EQstr("pw_dir", ent->pw_dir);
 	EQstr("pw_shell", ent->pw_shell);
@@ -77,15 +77,15 @@ DEFINE_TEST(passwd) {
 	assertf(ent, "%m");
 	EQstr("pw_name", ent->pw_name);
 	EQstr("pw_passwd", ent->pw_passwd);
-	EQu((uid_t)1234, ent->pw_uid);
-	EQu((gid_t)5678, ent->pw_gid);
+	EQ((uid_t)1234, ent->pw_uid);
+	EQ((gid_t)5678, ent->pw_gid);
 	EQstr("", ent->pw_gecos);
 	EQstr("", ent->pw_dir);
 	EQstr("", ent->pw_shell);
 
 	ent = fgetpwent(pwd);
 	assert(!ent);
-	EQd(0, fclose(pwd));
+	EQ(0, fclose(pwd));
 }
 
 
@@ -109,39 +109,39 @@ DEFINE_TEST(group) {
 	assertf(ent, "%m");
 	EQstr("gr_name", ent->gr_name);
 	EQstr("gr_passwd", ent->gr_passwd);
-	EQu((gid_t)1234, ent->gr_gid);
-	EQp(NULL, ent->gr_mem[0]);
+	EQ((gid_t)1234, ent->gr_gid);
+	ISnull(ent->gr_mem[0]);
 
 	ent = fgetgrent(grp);
 	assertf(ent, "%m");
 	EQstr("gr_name", ent->gr_name);
 	EQstr("gr_passwd", ent->gr_passwd);
-	EQu((gid_t)1234, ent->gr_gid);
+	EQ((gid_t)1234, ent->gr_gid);
 	EQstr("", ent->gr_mem[0]);
-	EQp(NULL, ent->gr_mem[1]);
+	ISnull(ent->gr_mem[1]);
 
 	ent = fgetgrent(grp);
 	assertf(ent, "%m");
 	EQstr("gr_name", ent->gr_name);
 	EQstr("gr_passwd", ent->gr_passwd);
-	EQu((gid_t)1234, ent->gr_gid);
+	EQ((gid_t)1234, ent->gr_gid);
 	EQstr("", ent->gr_mem[0]);
 	EQstr("", ent->gr_mem[1]);
-	EQp(NULL, ent->gr_mem[2]);
+	ISnull(ent->gr_mem[2]);
 
 	ent = fgetgrent(grp);
 	assertf(ent, "%m");
 	EQstr("gr_name", ent->gr_name);
 	EQstr("gr_passwd", ent->gr_passwd);
-	EQu((gid_t)1234, ent->gr_gid);
+	EQ((gid_t)1234, ent->gr_gid);
 	EQstr("gr_mem[0]", ent->gr_mem[0]);
 	EQstr("gr_mem[1]", ent->gr_mem[1]);
 	EQstr("...", ent->gr_mem[2]);
-	EQp(NULL, ent->gr_mem[3]);
+	ISnull(ent->gr_mem[3]);
 
 	ent = fgetgrent(grp);
 	assert(!ent);
-	EQd(0, fclose(grp));
+	EQ(0, fclose(grp));
 }
 
 DECL_END

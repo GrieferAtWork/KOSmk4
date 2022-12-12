@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd097e450 */
+/* HASH CRC-32:0x5ef23757 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -266,6 +266,23 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_INS(2, 3) __ATTR_OUTS(1, 3) __A
 /* >> mempcpy(3)
  * Same as `memcpy', but return `dst + n_bytes', rather than `dst' */
 #define __libc_core_mempcpy __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mempcpy)
+#endif /* !... */
+#ifdef __CRT_HAVE_strerrordesc_np
+#include <bits/types.h>
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__libc_core_strerrordesc_np,(__errno_t __errnum),strerrordesc_np,(__errnum))
+#else /* __CRT_HAVE_strerrordesc_np */
+#include <libc/local/string/strerrordesc_np.h>
+#define __libc_core_strerrordesc_np __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerrordesc_np)
+#endif /* !__CRT_HAVE_strerrordesc_np */
+#ifdef __CRT_HAVE_strerrorname_np
+#include <bits/types.h>
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__libc_core_strerrorname_np,(__errno_t __errnum),strerrorname_np,(__errnum))
+#elif defined(__CRT_HAVE_strerrno)
+#include <bits/types.h>
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__libc_core_strerrorname_np,(__errno_t __errnum),strerrno,(__errnum))
+#else /* ... */
+#include <libc/local/string/strerrorname_np.h>
+#define __libc_core_strerrorname_np __NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerrorname_np)
 #endif /* !... */
 #ifdef __CRT_HAVE_bzero
 #include <hybrid/typecore.h>

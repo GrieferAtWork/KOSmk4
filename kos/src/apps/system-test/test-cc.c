@@ -38,7 +38,6 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <string.h>
 #include <unistd.h>
 
 DECL_BEGIN
@@ -53,10 +52,10 @@ DEFINE_TEST(cc) {
 	fd = open("/var/testfile.txt", O_CREAT | O_EXCL | O_WRONLY, 0644); /* NOLINT */
 	if (fd < 0) {
 		mkdir("/var/", 755);
-		LEd(0, (fd = open("/var/testfile.txt", O_CREAT | O_EXCL | O_WRONLY, 0644))); /* NOLINT */
+		ISpos((fd = open("/var/testfile.txt", O_CREAT | O_EXCL | O_WRONLY, 0644))); /* NOLINT */
 	}
-	EQss(DATSZ, pwrite(fd, dat, DATSZ, 512));
-	EQd(0, close(fd));
+	EQ(DATSZ, pwrite(fd, dat, DATSZ, 512));
+	EQ(0, close(fd));
 
 	/* sync+cc to force unload all data relating to "testfile.txt" from memory */
 	sync();
@@ -75,22 +74,18 @@ DEFINE_TEST(cc) {
 	 *
 	 * This test ensures that this no longer happens, and that file data is preserved
 	 * across sync+cc, even  if the first  access thereafter happens  to be a  write. */
-	LEd(0, (fd = open("/var/testfile.txt", O_WRONLY | O_APPEND))); /* NOLINT */
-	EQss(4, write(fd, "tail", 4));
-	EQd(0, close(fd));
+	ISpos((fd = open("/var/testfile.txt", O_WRONLY | O_APPEND))); /* NOLINT */
+	EQ(4, write(fd, "tail", 4));
+	EQ(0, close(fd));
 	sync();
 	ksysctl(KSYSCTL_SYSTEM_CLEARCACHES);
 
-	LEd(0, (fd = open("/var/testfile.txt", O_RDONLY))); /* NOLINT */
-	EQss(DATSZ, pread(fd, buf, DATSZ, 512));
-	assertf(bcmp(buf, dat, DATSZ) == 0,
-	        "buf = %$q\n"
-	        "dat = %$q\n",
-	        DATSZ, buf,
-	        DATSZ, dat);
+	ISpos((fd = open("/var/testfile.txt", O_RDONLY))); /* NOLINT */
+	EQ(DATSZ, pread(fd, buf, DATSZ, 512));
+	EQmem(dat, buf, DATSZ);
 
-	EQd(0, close(fd));
-	EQd(0, unlink("/var/testfile.txt"));
+	EQ(0, close(fd));
+	EQ(0, unlink("/var/testfile.txt"));
 }
 
 DECL_END

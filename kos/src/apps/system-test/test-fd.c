@@ -40,7 +40,7 @@ PRIVATE void r_open(fd_t srcfd, fd_t minfd, fd_t maxfd) {
 		return;
 	count = (unsigned int)(maxfd - minfd) + 1;
 	for (; count; --count, ++minfd) {
-		EQd(minfd, dup2(srcfd, minfd));
+		EQ(minfd, dup2(srcfd, minfd));
 	}
 }
 
@@ -56,13 +56,13 @@ PRIVATE void r_close(fd_t minfd, fd_t maxfd, int method) {
 		unsigned int count;
 		count = (unsigned int)(maxfd - minfd) + 1;
 		for (; count; --count, ++minfd) {
-			EQd(0, close(minfd));
+			EQ(0, close(minfd));
 		}
 	} else {
 		unsigned int count;
 		count = (unsigned int)(maxfd - minfd) + 1;
 		for (; count; --count) {
-			EQd(0, close(maxfd));
+			EQ(0, close(maxfd));
 			--maxfd;
 		}
 	}
@@ -75,7 +75,7 @@ DEFINE_TEST(fd) {
 	 * for our process. -- That way, if  any of the below ends up  leaking
 	 * references, that will show up  in `leaks(1)' once all "normal"  fds
 	 * to this object have been closed. */
-	NEd(-1, (srcfd = eventfd(0, 0)));
+	ISpos((srcfd = eventfd(0, 0)));
 
 	/* Test  opening  and closing  a far-away  handle range
 	 * Close the range using a number of different methods,
@@ -90,33 +90,33 @@ DEFINE_TEST(fd) {
 	/* Also test the case where we punch a hole into a `struct handrange' */
 	r_open(srcfd, 0x1000, 0x1020);
 	r_close(0x1001, 0x101f, METHOD_CLOSE_RANGE);
-	EQd(0, close(0x1000));
-	EQd(0, close(0x1020));
+	EQ(0, close(0x1000));
+	EQ(0, close(0x1020));
 
 	/* dup2() can also be used to override handles -- Test this control path as well */
-	EQd(0x1000, dup2(srcfd, 0x1000));
-	EQd(0x1000, dup2(srcfd, 0x1000));
-	EQd(0x1000, dup2(srcfd, 0x1000));
-	EQd(0x1000, dup2(srcfd, 0x1000));
-	EQd(0, close(0x1000));
+	EQ(0x1000, dup2(srcfd, 0x1000));
+	EQ(0x1000, dup2(srcfd, 0x1000));
+	EQ(0x1000, dup2(srcfd, 0x1000));
+	EQ(0x1000, dup2(srcfd, 0x1000));
+	EQ(0, close(0x1000));
 
 	/* Also test `F_DUPFD' and `F_DUPFD_CLOEXEC' */
-	EQd(0x1000, fcntl(srcfd, F_DUPFD, 0x1000));
-	EQd(0x1001, fcntl(srcfd, F_DUPFD_CLOEXEC, 0x1000));
-	EQd(0x1002, fcntl(srcfd, F_DUPFD, 0x1000));
-	EQd(0x1003, fcntl(srcfd, F_DUPFD_CLOEXEC, 0x1000));
-	EQd(0, fcntl(0x1000, F_GETFD));
-	EQd(FD_CLOEXEC, fcntl(0x1001, F_GETFD));
-	EQd(0, fcntl(0x1002, F_GETFD));
-	EQd(FD_CLOEXEC, fcntl(0x1003, F_GETFD));
-	EQd(0, close_range(0x1000, 0x1003, 0));
+	EQ(0x1000, fcntl(srcfd, F_DUPFD, 0x1000));
+	EQ(0x1001, fcntl(srcfd, F_DUPFD_CLOEXEC, 0x1000));
+	EQ(0x1002, fcntl(srcfd, F_DUPFD, 0x1000));
+	EQ(0x1003, fcntl(srcfd, F_DUPFD_CLOEXEC, 0x1000));
+	EQ(0, fcntl(0x1000, F_GETFD));
+	EQ(FD_CLOEXEC, fcntl(0x1001, F_GETFD));
+	EQ(0, fcntl(0x1002, F_GETFD));
+	EQ(FD_CLOEXEC, fcntl(0x1003, F_GETFD));
+	EQ(0, close_range(0x1000, 0x1003, 0));
 
 	/* Also test the case where we extend a range (but not by installing into an adjacent slot) */
-	EQd(0x1000, dup2(srcfd, 0x1000));
-	EQd(0x1003, dup2(srcfd, 0x1003));
-	EQd(0, close(0x1000));
-	EQd(0, close(0x1003));
-	EQd(0, close(srcfd));
+	EQ(0x1000, dup2(srcfd, 0x1000));
+	EQ(0x1003, dup2(srcfd, 0x1003));
+	EQ(0, close(0x1000));
+	EQ(0, close(0x1003));
+	EQ(0, close(srcfd));
 }
 
 

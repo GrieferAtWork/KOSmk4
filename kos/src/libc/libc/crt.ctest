@@ -41,12 +41,12 @@ DEFINE_TEST(strto32_works_correctly) {
 	char *p = (char *)"0,3fb";
 	uint32_t a, b;
 	a = strto32(p, &p, 16);
-	assert(*p == ',');
+	EQ(',', *p);
 	++p;
 	b = strto32(p, &p, 16);
-	assert(*p == '\0');
-	assert(a == 0);
-	assert(b == 0x3fb);
+	EQ('\0', *p);
+	EQ(0, a);
+	EQ(0x3fb, b);
 }
 
 
@@ -64,12 +64,12 @@ DEFINE_TEST(strtod_works_correctly) {
 	assert(unicode_isdigit('5'));
 	assert(!unicode_isalpha('0'));
 	assert(unicode_isdigit('0'));
-	EQu(unicode_getnumeric('1'), 1);
-	EQu(unicode_getnumeric('5'), 5);
-	EQu(unicode_getnumeric('0'), 0);
+	EQ(1, unicode_getnumeric('1'));
+	EQ(5, unicode_getnumeric('5'));
+	EQ(0, unicode_getnumeric('0'));
 
 	n = sscanf(p, "%lf ,%lf", &a, &b);
-	assertf(n == 2, "n = %Id", n);
+	EQ(2, n);
 	assertf(fabs(a - 1.0) < 0.01, "a = %f", a);
 	assertf(fabs(b - 1.5) < 0.01, "b = %f", b);
 

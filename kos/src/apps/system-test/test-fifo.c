@@ -50,91 +50,91 @@ DEFINE_TEST(fifo) {
 	unlink(FIFO_NAME);
 
 	/* Create the FIFO filesystem object. */
-	EQd(0, mknod(FIFO_NAME, S_IFIFO | 0644, 0));
+	EQ(0, mknod(FIFO_NAME, S_IFIFO | 0644, 0));
 
 	/* Use stat to verify that this is indeed the correct kind of file. */
-	EQd(0, stat(FIFO_NAME, &st));
+	EQ(0, stat(FIFO_NAME, &st));
 	assert(S_ISFIFO(st.st_mode));
 
 	/* Attempting to open the write-end before a read-end must cause ENXIO
 	 * NOTE: This only happens when `O_NONBLOCK' is given. Without the later
 	 *       flag,  this operation would block until a reader would open the
 	 *       fifo */
-	EQd(-1, (wr = open(FIFO_NAME, O_WRONLY | O_NONBLOCK))); /* NOLINT */
-	EQd(errno, ENXIO);
+	EQ(-1, (wr = open(FIFO_NAME, O_WRONLY | O_NONBLOCK))); /* NOLINT */
+	EQerrno(ENXIO);
 
-	NEd(-1, (rd = open(FIFO_NAME, O_RDONLY | O_NONBLOCK))); /* NOLINT */
-	NEd(-1, (wr = open(FIFO_NAME, O_WRONLY | O_NONBLOCK))); /* NOLINT */
-	EQss(6, write(wr, "foobar", 6));
+	ISpos((rd = open(FIFO_NAME, O_RDONLY | O_NONBLOCK))); /* NOLINT */
+	ISpos((wr = open(FIFO_NAME, O_WRONLY | O_NONBLOCK))); /* NOLINT */
+	EQ(6, write(wr, "foobar", 6));
 
-	EQss(3, read(rd, buf, 3));
+	EQ(3, read(rd, buf, 3));
 	assertf(bcmp(buf, "foo", 3) == 0, "%$q", 3, buf);
 
-	EQss(3, read(rd, buf, 3));
+	EQ(3, read(rd, buf, 3));
 	assertf(bcmp(buf, "bar", 3) == 0, "%$q", 3, buf);
 
 	/* The fifo should now be empty,  but because `wr' is still  opened,
 	 * attempting to read from it should trigger EWOULDBLOCK (or EAGAIN,
 	 * although those 2 are defined as the same error-code under KOS)! */
-	EQss(-1, read(rd, buf, 3));
-	EQd(errno, EWOULDBLOCK);
+	EQ(-1, read(rd, buf, 3));
+	EQerrno(EWOULDBLOCK);
 
 	/* Now close the write-end */
-	EQd(0, close(wr));
+	EQ(0, close(wr));
 
 	/* Try to read from our reader-end now should indicate END-OF-FILE */
-	EQss(0, read(rd, buf, 3));
+	EQ(0, read(rd, buf, 3));
 
 	/* Open the fifo for writing once again.
 	 * NOTE: Don't pass O_NONBLOCK this time around, since the presence
 	 *       of our  reader (rd)  should  prevent this  from  blocking! */
-	NEd(-1, (wr = open(FIFO_NAME, O_WRONLY))); /* NOLINT */
+	ISpos((wr = open(FIFO_NAME, O_WRONLY))); /* NOLINT */
 
 	/* Trying to read from the FIFO should once again indicate
 	 * EWOULDBLOCK,   since  there's  a  writer  (once  again) */
-	EQss(-1, read(rd, buf, 3));
-	EQd(errno, EWOULDBLOCK);
+	EQ(-1, read(rd, buf, 3));
+	EQerrno(EWOULDBLOCK);
 
 	/* Ensure that we can use frealpath() with named pipes! */
 	assertf(frealpath(wr, buf, sizeof(buf)) == buf, "%m");
-	assertf(strcmp(buf, FIFO_NAME) == 0, "%$q", buf);
+	EQstr(FIFO_NAME, buf);
 	assertf(frealpath(rd, buf, sizeof(buf)) == buf, "%m");
-	assertf(strcmp(buf, FIFO_NAME) == 0, "%$q", buf);
+	EQstr(FIFO_NAME, buf);
 
 	/* Also verify that readlink("/proc/self/fd") works with named pipes! */
 	sprintf(buf, "/proc/self/fd/%d", wr);
-	EQss(strlen(FIFO_NAME), readlink(buf, buf, sizeof(buf)));
+	EQ(strlen(FIFO_NAME), readlink(buf, buf, sizeof(buf)));
 	assertf(bcmp(buf, FIFO_NAME, strlen(FIFO_NAME) * sizeof(char)) == 0, "%$q", buf);
 
 	sprintf(buf, "/proc/self/fd/%d", rd);
-	EQss(strlen(FIFO_NAME), readlink(buf, buf, sizeof(buf)));
+	EQ(strlen(FIFO_NAME), readlink(buf, buf, sizeof(buf)));
 	assertf(bcmp(buf, FIFO_NAME, strlen(FIFO_NAME) * sizeof(char)) == 0, "%$q", buf);
 
 	/* Delete the FIFO */
-	EQd(0, unlink(FIFO_NAME));
+	EQ(0, unlink(FIFO_NAME));
 
 	/* Communication should still  be possible. -  The fifo simply  became
 	 * anonymous (i.e. more akin to a regular pipe, as created by pipe(2)) */
-	EQss(-1, read(rd, buf, 3));
-	EQd(errno, EWOULDBLOCK);
+	EQ(-1, read(rd, buf, 3));
+	EQerrno(EWOULDBLOCK);
 
-	EQss(6, write(wr, "foobar", 6));
+	EQ(6, write(wr, "foobar", 6));
 
-	EQss(6, read(rd, buf, 64));
-	assertf(bcmp(buf, "foobar", 6) == 0, "%$q", 6, buf);
+	EQ(6, read(rd, buf, 64));
+	EQmem("foobar", buf, 6);
 
 	/* The fifo should now be empty, but still connected. */
-	EQss(-1, read(rd, buf, 3));
-	EQd(errno, EWOULDBLOCK);
+	EQ(-1, read(rd, buf, 3));
+	EQerrno(EWOULDBLOCK);
 
 	/* Close the writer. */
-	EQd(0, close(wr));
+	EQ(0, close(wr));
 
 	/* With the writer gone, we should now be able to read EOF */
-	EQss(0, read(rd, buf, 3));
+	EQ(0, read(rd, buf, 3));
 
 	/* Finally, close the reader as well. */
-	EQd(0, close(rd));
+	EQ(0, close(rd));
 }
 
 

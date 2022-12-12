@@ -39,25 +39,25 @@ DEFINE_TEST(unicode) {
 	PRIVATE unsigned char const data[] = { 0xe2, 0x99, 0xa0, 7, 8, 9 };
 	mbs = MBSTATE_INIT;
 	error = unicode_c8toc32(&wc, (char *)data, 0, &mbs);
-	assert(error == (size_t)-2); /* Incomplete */
+	EQ((size_t)-2, error); /* Incomplete */
 
 	mbs = MBSTATE_INIT;
 	error = unicode_c8toc32(&wc, (char *)data, 1, &mbs);
-	assert(error == (size_t)-2); /* Incomplete */
+	EQ((size_t)-2, error); /* Incomplete */
 
 	mbs = MBSTATE_INIT;
 	error = unicode_c8toc32(&wc, (char *)data, 2, &mbs);
-	assert(error == (size_t)-2); /* Incomplete */
+	EQ((size_t)-2, error); /* Incomplete */
 
 	mbs = MBSTATE_INIT;
 	error = unicode_c8toc32(&wc, (char *)data, 3, &mbs);
-	assert(error == 3);
-	assert(wc == 0x2660);
+	EQ(3, error);
+	EQ(0x2660, wc);
 
 	mbs = MBSTATE_INIT;
 	error = unicode_c8toc32(&wc, (char *)data, 6, &mbs);
-	assert(error == 3);
-	assert(wc == 0x2660);
+	EQ(3, error);
+	EQ(0x2660, wc);
 }
 
 

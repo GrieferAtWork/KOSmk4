@@ -84,14 +84,14 @@ PRIVATE void create_nodes(unsigned int const order[10]) {
 		create_node(id, node_values[id]);
 	}
 	for (i = 0; i < lengthof(nodes); ++i)
-		EQp(rb_locate(tree, node_values[i]), &nodes[i]);
+		EQ(rb_locate(tree, node_values[i]), &nodes[i]);
 #ifndef TESTING_LEFT_LEANING
 	for (i = 1; i < lengthof(nodes) - 1; ++i) {
-		EQp(rb_prevnode(&nodes[i]), &nodes[i - 1]);
-		EQp(rb_nextnode(&nodes[i]), &nodes[i + 1]);
+		EQ(rb_prevnode(&nodes[i]), &nodes[i - 1]);
+		EQ(rb_nextnode(&nodes[i]), &nodes[i + 1]);
 	}
-	EQp(rb_prevnode(&nodes[0]), NULL);
-	EQp(rb_nextnode(&nodes[lengthof(nodes) - 1]), NULL);
+	EQ(rb_prevnode(&nodes[0]), NULL);
+	EQ(rb_nextnode(&nodes[lengthof(nodes) - 1]), NULL);
 #endif /* !TESTING_LEFT_LEANING */
 }
 
@@ -99,9 +99,9 @@ PRIVATE void pop_nodes(unsigned int const order[10]) {
 	unsigned int i;
 	for (i = 0; i < lengthof(nodes); ++i) {
 		unsigned int id = order[i];
-		EQp(rb_remove(&tree, node_values[id]), &nodes[id]);
+		EQ(rb_remove(&tree, node_values[id]), &nodes[id]);
 	}
-	EQp(tree, NULL);
+	EQ(tree, NULL);
 }
 
 PRIVATE void create_and_pop_nodes(unsigned int const ins_order[10],

@@ -51,9 +51,9 @@ DEFINE_TEST(multi_threading) {
 	int result;
 	did_run_my_thread_main = false;
 	COMPILER_BARRIER();
-	EQd(thrd_success, thrd_create(&thread, &my_thread_main, (void *)message_pointer));
+	EQ(thrd_success, thrd_create(&thread, &my_thread_main, (void *)message_pointer));
 	COMPILER_BARRIER();
-	EQd(thrd_success, thrd_join(thread, &result));
+	EQ(thrd_success, thrd_join(thread, &result));
 	assertf(did_run_my_thread_main, "Thread not actually executed");
 	assertf(result == 1234, "result = %d", result);
 }

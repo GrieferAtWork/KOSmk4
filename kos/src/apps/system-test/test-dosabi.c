@@ -71,35 +71,33 @@ DEFINE_TEST(dosabi) {
 	static char const dir[]   = "\\path\\to\\some\\file\\";
 	static char const file[]  = "some_file";
 	static char const ext[]   = ".txt";
-#define ASSERT_STRINGS_EQUAL(a, b) \
-	assertf(strcmp(a, b) == 0, "%q != %q", a, b)
-	EQd(0, KOS__makepath_s(kos_fullpath, sizeof(kos_fullpath), drive, dir, file, ext));
-	EQd(0, DOS__makepath_s(dos_fullpath, sizeof(dos_fullpath), drive, dir, file, ext));
-	ASSERT_STRINGS_EQUAL(kos_fullpath, dos_fullpath);
-	ASSERT_STRINGS_EQUAL(kos_fullpath, "C:\\path\\to\\some\\file\\some_file.txt");
+	EQ(0, KOS__makepath_s(kos_fullpath, sizeof(kos_fullpath), drive, dir, file, ext));
+	EQ(0, DOS__makepath_s(dos_fullpath, sizeof(dos_fullpath), drive, dir, file, ext));
+	EQstr("C:\\path\\to\\some\\file\\some_file.txt", kos_fullpath);
+	EQstr("C:\\path\\to\\some\\file\\some_file.txt", dos_fullpath);
 	{
 		char buf_drive[64];
 		char buf_dir[64];
 		char buf_file[64];
 		char buf_ext[64];
-		EQd(0, KOS__splitpath_s(kos_fullpath,
-		                        buf_drive, sizeof(buf_drive),
-		                        buf_dir, sizeof(buf_dir),
-		                        buf_file, sizeof(buf_file),
-		                        buf_ext, sizeof(buf_ext)));
-		ASSERT_STRINGS_EQUAL(buf_drive, drive);
-		ASSERT_STRINGS_EQUAL(buf_dir, dir);
-		ASSERT_STRINGS_EQUAL(buf_file, file);
-		ASSERT_STRINGS_EQUAL(buf_ext, ext);
-		EQd(0, DOS__splitpath_s(kos_fullpath,
-		                        buf_drive, sizeof(buf_drive),
-		                        buf_dir, sizeof(buf_dir),
-		                        buf_file, sizeof(buf_file),
-		                        buf_ext, sizeof(buf_ext)));
-		ASSERT_STRINGS_EQUAL(buf_drive, drive);
-		ASSERT_STRINGS_EQUAL(buf_dir, dir);
-		ASSERT_STRINGS_EQUAL(buf_file, file);
-		ASSERT_STRINGS_EQUAL(buf_ext, ext);
+		EQ(0, KOS__splitpath_s(kos_fullpath,
+		                       buf_drive, sizeof(buf_drive),
+		                       buf_dir, sizeof(buf_dir),
+		                       buf_file, sizeof(buf_file),
+		                       buf_ext, sizeof(buf_ext)));
+		EQstr(drive, buf_drive);
+		EQstr(dir, buf_dir);
+		EQstr(file, buf_file);
+		EQstr(ext, buf_ext);
+		EQ(0, DOS__splitpath_s(kos_fullpath,
+		                       buf_drive, sizeof(buf_drive),
+		                       buf_dir, sizeof(buf_dir),
+		                       buf_file, sizeof(buf_file),
+		                       buf_ext, sizeof(buf_ext)));
+		EQstr(drive, buf_drive);
+		EQstr(dir, buf_dir);
+		EQstr(file, buf_file);
+		EQstr(ext, buf_ext);
 	}
 }
 

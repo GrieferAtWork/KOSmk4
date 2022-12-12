@@ -42,17 +42,17 @@ DEFINE_TEST(fat_symlinks) {
 	sync();                              /* sync */
 	ksysctl(KSYSCTL_SYSTEM_CLEARCACHES); /* cc */
 
-	EQd(0, symlink("link1-text", "/var/test-symlink"));
-	EQss(10, readlink("/var/test-symlink", buf, sizeof(buf)));
+	EQ(0, symlink("link1-text", "/var/test-symlink"));
+	EQ(10, readlink("/var/test-symlink", buf, sizeof(buf)));
 	buf[10] = 0;
-	assertf(strcmp(buf, "link1-text") == 0, "buf: %q (should be 'link1-text')", buf);
-	EQd(0, unlink("/var/test-symlink"));
+	EQstr("link1-text", buf);
+	EQ(0, unlink("/var/test-symlink"));
 
-	EQd(0, symlink("link2-text", "/var/test-symlink"));
-	EQss(10, readlink("/var/test-symlink", buf, sizeof(buf)));
+	EQ(0, symlink("link2-text", "/var/test-symlink"));
+	EQ(10, readlink("/var/test-symlink", buf, sizeof(buf)));
 	buf[10] = 0;
-	assertf(strcmp(buf, "link2-text") == 0, "buf: %q (should be 'link2-text')", buf);
-	EQd(0, unlink("/var/test-symlink"));
+	EQstr("link2-text", buf);
+	EQ(0, unlink("/var/test-symlink"));
 }
 
 DECL_END
