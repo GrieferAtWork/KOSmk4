@@ -97,15 +97,24 @@ for name in form menu ncurses++ ncurses panel; do
 	install_symlink_nodisk /$TARGET_LIBPATH/lib${name}.a      lib${name}w.a
 	install_symlink_nodisk /$TARGET_LIBPATH/lib${name}.so     lib${name}w.so
 	install_symlink_nodisk /$TARGET_LIBPATH/lib${name}.so.6   lib${name}w.so.6
-	install_symlink_nodisk /$TARGET_LIBPATH/lib${name}.so.6.1 lib${name}w.so.6.1
+	install_symlink_nodisk /$TARGET_LIBPATH/lib${name}.so.6.3 lib${name}w.so.6.3
 	install_symlink_nodisk /$TARGET_LIBPATH/lib${name}_g.a    lib${name}w_g.a
 	if test x"$MODE_DRYRUN" != xno; then
 		echo "> pkg_config '/usr/share/pkgconfig/${name}.pc' (alias for '/usr/share/pkgconfig/${name}w.pc')"
 	else
 		dst_filename="$PKG_CONFIG_PATH/${name}.pc"
-		echo "Installing pkg_config file $dst_filename"
-		unlink "$dst_filename" > /dev/null 2>&1
-		cmd ln -s "${name}w.pc" "$dst_filename"
+		short_dst_filename="$dst_filename"
+		if [[ "$short_dst_filename" == "$KOS_ROOT/"* ]]; then
+			short_dst_filename="\$KOS_ROOT${short_dst_filename:${#KOS_ROOT}}"
+		fi
+		printf "\e[${UI_COLCFG_FILETYPE}mpkg\e[m \e[${UI_COLCFG_PATH_RAW}m%-${UI_PATHCOL_WIDTH}s\e[m [raw]" "$short_dst_filename" >&2
+		if ! [ -L "$dst_filename" ]; then
+			unlink "$dst_filename" > /dev/null 2>&1
+			cmd ln -s "${name}w.pc" "$dst_filename"
+			echo -e "\e[${UI_COLCFG_OK}m ok\e[m" >&2
+		else
+			echo -e "\e[${UI_COLCFG_OK}m already installed\e[m" >&2
+		fi
 	fi
 done
 

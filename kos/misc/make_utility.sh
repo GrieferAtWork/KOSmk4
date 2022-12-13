@@ -578,7 +578,7 @@ install_symlink_nodisk() {
 		local TARGET_COMMON_DISPATH="$SYSROOT_BIN_TARGET_COMMON/$DISPATH"
 		local DIDUPDATE="no"
 		printf "\e[${UI_COLCFG_FILETYPE}mlnk\e[m \e[${UI_COLCFG_PATH_NODISK}m%-${UI_PATHCOL_WIDTH}s\e[m [nodisk]" "\$DESTDIR/$DISPATH" >&2
-		if ! [ -f "$TARGET_COMMON_DISPATH" ] || \
+		if ! [ -L "$TARGET_COMMON_DISPATH" ] || \
 		     [ "$(readlink "$TARGET_COMMON_DISPATH")" != "$2" ]; then
 			unlink "$TARGET_COMMON_DISPATH" > /dev/null 2>&1
 			echo -n " common" >&2
@@ -593,7 +593,7 @@ install_symlink_nodisk() {
 			local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
 			local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
 			echo -n " ${BUILD_CONFIG:${#TARGET_NAME}+5}" >&2
-			if test x"$DIDUPDATE" == xyes || ! [ -f "$CONFIG_DISPATH" ]; then
+			if test x"$DIDUPDATE" == xyes || ! [ -L "$CONFIG_DISPATH" ]; then
 				unlink "$CONFIG_DISPATH" > /dev/null 2>&1
 				echo -n ":bin" >&2
 				if ! ln -r -s "$TARGET_COMMON_DISPATH" "$CONFIG_DISPATH" > /dev/null 2>&1; then
