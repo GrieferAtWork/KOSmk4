@@ -121,7 +121,7 @@ _hook_before_install_disk() {
 	cmd rm -rf "$DESTDIR/lib/python2.7/unittest/test"
 
 	# We don't want to install the configuration (which contains a 10MiB static version of libpython)
-	cmd rm -rf "$DESTDIR/lib/python2.7/config"
+	cmd rm -rf "$DESTDIR/$TARGET_LIBPATH/python2.7/config"
 
 
 	. "$KOS_MISC/utilities/misc/target-info.sh"
@@ -156,7 +156,7 @@ INSTALL_SKIP="
 . "$KOS_MISC/utilities/misc/gnu_make.sh"
 
 # Install modules under `/lib/python2.7/[os.py...]'
-install_path_hardcopy /$TARGET_LIBPATH/python2.7 "$DESTDIR/lib/python2.7"
+install_path_hardcopy /lib/python2.7 "$DESTDIR/lib/python2.7"
 
 # Install config header
 if [ "$TARGET_NAME" == "i386" ] || [ "$TARGET_NAME" == "x86_64" ]; then
