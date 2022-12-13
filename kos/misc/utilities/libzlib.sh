@@ -21,7 +21,7 @@
 ZLIB_VERSION_MAJOR="1"
 ZLIB_VERSION="$ZLIB_VERSION_MAJOR.2.11"
 SRCPATH="$KOS_ROOT/binutils/src/zlib-$ZLIB_VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/zlib-$ZLIB_VERSION"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/zlib-$ZLIB_VERSION"
 
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/libz.so.$ZLIB_VERSION" ]; then
 	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then

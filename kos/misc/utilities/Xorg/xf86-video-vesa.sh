@@ -1,4 +1,4 @@
-#TEST: require_utility Xorg/xf86-video-vesa "$TARGET_SYSROOT/$TARGET_LIBPATH/xorg/modules/drivers/vesa_drv.so"
+#TEST: require_utility Xorg/xf86-video-vesa "$SYSROOT_BIN_TARGET_COMMON/$TARGET_LIBPATH/xorg/modules/drivers/vesa_drv.so"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied

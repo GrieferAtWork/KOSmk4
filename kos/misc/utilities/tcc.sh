@@ -1,4 +1,4 @@
-#TEST: require_utility tcc "$TARGET_SYSROOT/bin/tcc"
+#TEST: require_utility tcc "$SYSROOT_BIN_TARGET_COMMON/bin/tcc"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -21,7 +21,7 @@
 if [ -z "$VERSION" ]; then VERSION="0.9.27"; fi
 
 SRCPATH="$KOS_ROOT/binutils/src/tcc-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/tcc-$VERSION"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/tcc-$VERSION"
 if [ "$MODE_FORCE_MAKE" == yes ] || \
    [ "$MODE_FORCE_CONF" == yes ] || ! \
    [ -f "$OPTPATH/$TARGET_NAME-tcc" ]; then
@@ -34,7 +34,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || \
 		cmd tar jxvf "tcc-$VERSION.tar.bz2"
 	fi
 	rm -rf "$OPTPATH" > /dev/null 2>&1
-	cmd cp -R "$SRCPATH" "$BINUTILS_SYSROOT/opt/"
+	cmd cp -R "$SRCPATH" "$SYSROOT_BINUTILS_TARGET/opt/"
 	cmd cd "$OPTPATH"
 	apply_patch "$OPTPATH" "$KOS_PATCHES/tcc-$VERSION.patch"
 	cmd bash configure \

@@ -18,7 +18,7 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-require_utility libncurses "$TARGET_SYSROOT/$TARGET_LIBPATH/libncursesw.so"
+require_utility libncurses "$SYSROOT_BIN_TARGET_COMMON/$TARGET_LIBPATH/libncursesw.so"
 
 PACKAGE_URL="https://ftp.gnu.org/gnu/readline/readline-8.1.tar.gz"
 PACKAGE_NAME="libreadline-8.1"

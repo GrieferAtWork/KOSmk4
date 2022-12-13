@@ -24,7 +24,7 @@ VERSION="1.1.1g"
 SO_VERSION="1.1"
 
 SRCPATH="$KOS_ROOT/binutils/src/openssl-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/openssl-$VERSION"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/openssl-$VERSION"
 
 # NOTE: This is the path within the KOS disk image!
 OPENSSLDIR="/usr/lib/ssl"

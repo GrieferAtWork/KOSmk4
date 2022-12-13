@@ -1,4 +1,4 @@
-#TEST: require_utility vitetris "$TARGET_SYSROOT/bin/vitetris"
+#TEST: require_utility vitetris "$SYSROOT_BIN_TARGET_COMMON/bin/vitetris"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -21,7 +21,7 @@
 if [ -z "$VERSION" ]; then VERSION="0.58.0"; fi
 
 SRCPATH="$KOS_ROOT/binutils/src/vitetris-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/vitetris-$VERSION"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/vitetris-$VERSION"
 EXEPATH="$OPTPATH/tetris"
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$EXEPATH" ]; then
 	set_archpath
@@ -36,7 +36,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$EXEPATH" ]; then
 			fi
 			cmd tar xvf "vitetris-$VERSION.tar.gz"
 		fi
-		cmd cp -R "$SRCPATH" "$BINUTILS_SYSROOT/opt/"
+		cmd cp -R "$SRCPATH" "$SYSROOT_BINUTILS_TARGET/opt/"
 	fi
 	cmd cd "$OPTPATH"
 	cmd bash configure CC="$CC" CFLAGS="-ggdb"

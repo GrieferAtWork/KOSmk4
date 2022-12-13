@@ -29,7 +29,7 @@ SO_VERSION_MAJOR="1"
 SO_VERSION="$SO_VERSION_MAJOR.0.0"
 
 SRCPATH="$KOS_ROOT/binutils/src/x/libXxf86dga-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/x/libXxf86dga-$VERSION"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/x/libXxf86dga-$VERSION"
 
 # libXxf86dga
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/src/.libs/libXxf86dga.so.$SO_VERSION" ]; then

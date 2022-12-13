@@ -1,4 +1,4 @@
-#TEST: require_utility nano "$TARGET_SYSROOT/bin/nano"
+#TEST: require_utility nano "$SYSROOT_BIN_TARGET_COMMON/bin/nano"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -18,7 +18,7 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-require_utility libncurses "$TARGET_SYSROOT/$TARGET_LIBPATH/libncursesw.so"
+require_utility libncurses "$SYSROOT_BIN_TARGET_COMMON/$TARGET_LIBPATH/libncursesw.so"
 require_utility file       "$PKG_CONFIG_PATH/libmagic.pc"
 PACKAGE_URL="https://nano-editor.org/dist/v4/nano-4.4.tar.xz"
 

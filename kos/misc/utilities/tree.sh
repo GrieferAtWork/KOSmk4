@@ -1,4 +1,4 @@
-#TEST: require_utility tree "$TARGET_SYSROOT/bin/tree"
+#TEST: require_utility tree "$SYSROOT_BIN_TARGET_COMMON/bin/tree"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied

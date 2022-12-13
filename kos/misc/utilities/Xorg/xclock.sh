@@ -1,4 +1,4 @@
-#TEST: require_utility xclock "$TARGET_SYSROOT/bin/xclock"
+#TEST: require_utility xclock "$SYSROOT_BIN_TARGET_COMMON/bin/xclock"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied

@@ -20,12 +20,12 @@
 
 VERSION="1.14.1"
 SRCPATH="$KOS_ROOT/binutils/src/Xorg/xcb-proto-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/Xorg/xcb-proto-$VERSION"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/Xorg/xcb-proto-$VERSION"
 
 require_program python
 
 # xcb-proto
-if ! [ -f "$BINUTILS_SYSROOT/usr/local/lib/python2.7/site-packages/xcbgen/__init__.py" ]; then
+if ! [ -f "$SYSROOT_BINUTILS_TARGET/usr/local/lib/python2.7/site-packages/xcbgen/__init__.py" ]; then
 	if ! [ -f "$OPTPATH/Makefile" ]; then
 		if ! [ -f "$SRCPATH/configure" ]; then
 			cmd mkdir -p "$KOS_ROOT/binutils/src/Xorg"
@@ -40,8 +40,8 @@ if ! [ -f "$BINUTILS_SYSROOT/usr/local/lib/python2.7/site-packages/xcbgen/__init
 		cmd mkdir -p "$OPTPATH"
 		cmd cd "$OPTPATH"
 		cmd bash "../../../../src/Xorg/xcb-proto-$VERSION/configure" \
-			--prefix="$BINUTILS_SYSROOT/usr/local" \
-			--exec-prefix="$BINUTILS_SYSROOT/usr/local"
+			--prefix="$SYSROOT_BINUTILS_TARGET/usr/local" \
+			--exec-prefix="$SYSROOT_BINUTILS_TARGET/usr/local"
 	fi
 	cmd cd "$OPTPATH"
 	cmd make -j $MAKE_PARALLEL_COUNT
@@ -50,13 +50,13 @@ fi
 
 # Install the PKG_CONFIG file
 install_rawfile_stdin "$PKG_CONFIG_PATH/xcb-proto.pc" <<EOF
-prefix=$BINUTILS_SYSROOT/usr/local
-exec_prefix=$BINUTILS_SYSROOT/usr/local
-datarootdir=$BINUTILS_SYSROOT/usr/local/share
-datadir=$BINUTILS_SYSROOT/usr/local/share
-libdir=$BINUTILS_SYSROOT/usr/local/lib
-xcbincludedir=$BINUTILS_SYSROOT/usr/local/share/xcb
-pythondir=$BINUTILS_SYSROOT/usr/local/lib/python2.7/site-packages
+prefix=$SYSROOT_BINUTILS_TARGET/usr/local
+exec_prefix=$SYSROOT_BINUTILS_TARGET/usr/local
+datarootdir=$SYSROOT_BINUTILS_TARGET/usr/local/share
+datadir=$SYSROOT_BINUTILS_TARGET/usr/local/share
+libdir=$SYSROOT_BINUTILS_TARGET/usr/local/lib
+xcbincludedir=$SYSROOT_BINUTILS_TARGET/usr/local/share/xcb
+pythondir=$SYSROOT_BINUTILS_TARGET/usr/local/lib/python2.7/site-packages
 
 Name: XCB Proto
 Description: X protocol descriptions for XCB

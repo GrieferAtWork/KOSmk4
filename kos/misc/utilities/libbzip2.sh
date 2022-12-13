@@ -20,7 +20,7 @@
 
 VERSION="1.0.8"
 SRCPATH="$KOS_ROOT/binutils/src/libbzip2-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/libbzip2-$VERSION"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/libbzip2-$VERSION"
 
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/libbz2.a" ]; then
 	if ! [ -f "$SRCPATH/bzlib.c" ]; then

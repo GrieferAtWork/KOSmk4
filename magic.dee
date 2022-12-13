@@ -261,6 +261,13 @@ function main(argv: {string...}) {
 			OPT_EMULATOR_OPTIONS[emulatorOptions.CMDLINE] = " ".join(args);
 			args = { };
 			break;
+		case "--install-sh":
+			/* TODO:
+			 * - Like with `make_utility.sh', this option should cause magic to do
+			 *   a normal build, but redirect  build progress messages to  stderr.
+			 * - MTOOLS steps are overwritten to instead print a shell-script that
+			 *   can  be used to  copy produced binaries  into a custom `$DESTDIR' */
+			break;
 		case "--config":
 			/* List available configs */
 			print("Available configurations:");

@@ -29,46 +29,46 @@ fi
 # Extract the package name from its filename
 if test -z "$PACKAGE_NAME"; then
 	PACKAGE_NAME="$_PACKAGE_URL_FILENAME"
-	if [[ "$PACKAGE_NAME" == *.tar* ]]; then
+	if [[ "$PACKAGE_NAME" == *".tar"* ]]; then
 		PACKAGE_NAME="${PACKAGE_NAME%.tar*}"
-	elif [[ "$PACKAGE_NAME" == *.git* ]]; then
+	elif [[ "$PACKAGE_NAME" == *".git"* ]]; then
 		PACKAGE_NAME="${PACKAGE_NAME%.git*}"
 	fi
-	if [[ "$PACKAGE_NAME" == "$_PACKAGE_URL_FILENAME" ]]; then
-		echo "Unable to determine PACKAGE_NAME from"
-		echo "	PACKAGE_URL:           '$PACKAGE_URL'"
-		echo "	PACKAGE_GIT_URL:       '$PACKAGE_GIT_URL'"
-		echo "	_PACKAGE_URL_FILENAME: '$_PACKAGE_URL_FILENAME'"
+	if test "$PACKAGE_NAME" == "$_PACKAGE_URL_FILENAME"; then
+		echo -e "\e[${UI_COLCFG_ERR}mUnable to determine PACKAGE_NAME\e[m from" >&2
+		echo -e "	PACKAGE_URL:           '\e[${UI_COLCFG_NAME}m$PACKAGE_URL\e[m'" >&2
+		echo -e "	PACKAGE_GIT_URL:       '\e[${UI_COLCFG_NAME}m$PACKAGE_GIT_URL\e[m'" >&2
+		echo -e "	_PACKAGE_URL_FILENAME: '\e[${UI_COLCFG_NAME}m$_PACKAGE_URL_FILENAME\e[m'" >&2
 		exit 1
 	fi
 fi
 
 if test -z "$PACKAGE_RAWNAME"; then
 	PACKAGE_RAWNAME="$PACKAGE_NAME"
-	if [[ "$PACKAGE_RAWNAME" == *-* ]]; then
+	if [[ "$PACKAGE_RAWNAME" == *"-"* ]]; then
 		PACKAGE_RAWNAME="${PACKAGE_RAWNAME%-*}"
 	fi
-#	if [[ "$PACKAGE_RAWNAME" == "$PACKAGE_NAME" ]]; then
-#		echo "Unable to determine PACKAGE_RAWNAME from"
-#		echo "	PACKAGE_NAME:          '$PACKAGE_NAME'"
-#		echo "	PACKAGE_URL:           '$PACKAGE_URL'"
-#		echo "	PACKAGE_GIT_URL:       '$PACKAGE_GIT_URL'"
-#		echo "	_PACKAGE_URL_FILENAME: '$_PACKAGE_URL_FILENAME'"
+#	if test "$PACKAGE_RAWNAME" == "$PACKAGE_NAME"; then
+#		echo "Unable to determine PACKAGE_RAWNAME from" >&2
+#		echo -e "	PACKAGE_NAME:          '\e[${UI_COLCFG_NAME}m$PACKAGE_NAME\e[m'" >&2
+#		echo -e "	PACKAGE_URL:           '\e[${UI_COLCFG_NAME}m$PACKAGE_URL\e[m'" >&2
+#		echo -e "	PACKAGE_GIT_URL:       '\e[${UI_COLCFG_NAME}m$PACKAGE_GIT_URL\e[m'" >&2
+#		echo -e "	_PACKAGE_URL_FILENAME: '\e[${UI_COLCFG_NAME}m$_PACKAGE_URL_FILENAME\e[m'" >&2
 #		exit 1
 #	fi
 fi
 
 if test -z "$PACKAGE_VERSION"; then
 	PACKAGE_VERSION="$PACKAGE_NAME"
-	if [[ "$PACKAGE_VERSION" == *-* ]]; then
+	if [[ "$PACKAGE_VERSION" == *"-"* ]]; then
 		PACKAGE_VERSION="${PACKAGE_VERSION#*-}"
 	fi
-	if [[ "$PACKAGE_VERSION" == "$PACKAGE_NAME" ]]; then
+	if test "$PACKAGE_VERSION" == "$PACKAGE_NAME"; then
 		PACKAGE_VERSION=""
-#		echo "Unable to determine PACKAGE_VERSION from"
-#		echo "	PACKAGE_NAME:          $PACKAGE_NAME"
-#		echo "	PACKAGE_URL:           $PACKAGE_URL"
-#		echo "	_PACKAGE_URL_FILENAME: $_PACKAGE_URL_FILENAME"
+#		echo "Unable to determine PACKAGE_VERSION from" >&2
+#		echo -e "	PACKAGE_NAME:          '\e[${UI_COLCFG_NAME}m$PACKAGE_NAME\e[m'" >&2
+#		echo -e "	PACKAGE_URL:           '\e[${UI_COLCFG_NAME}m$PACKAGE_URL\e[m'" >&2
+#		echo -e "	_PACKAGE_URL_FILENAME: '\e[${UI_COLCFG_NAME}m$_PACKAGE_URL_FILENAME\e[m'" >&2
 #		exit 1
 	fi
 fi
@@ -99,53 +99,53 @@ if test -z "$PACKAGE_HOST";           then PACKAGE_HOST="$TARGET_NAME-linux-gnu"
 if test -z "$PACKAGE_TARGET";         then PACKAGE_TARGET="$PACKAGE_HOST"; fi
 
 
-echo "gnu_make: PACKAGE_RAWNAME    '$PACKAGE_RAWNAME'"
-echo "gnu_make: PACKAGE_VERSION    '$PACKAGE_VERSION'"
-echo "gnu_make: PACKAGE_NAME       '$PACKAGE_NAME'"
+echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_RAWNAME    '\e[${UI_COLCFG_NAME}m$PACKAGE_RAWNAME\e[m'" >&2
+echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_VERSION    '\e[${UI_COLCFG_NAME}m$PACKAGE_VERSION\e[m'" >&2
+echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_NAME       '\e[${UI_COLCFG_NAME}m$PACKAGE_NAME\e[m'" >&2
 if ! test -z "$PACKAGE_URL"; then
-	echo "gnu_make: PACKAGE_URL        '$PACKAGE_URL'"
+	echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_URL        '\e[${UI_COLCFG_NAME}m$PACKAGE_URL\e[m'" >&2
 elif ! test -z "$PACKAGE_GIT_URL"; then
-	echo "gnu_make: PACKAGE_GIT_URL    '$PACKAGE_GIT_URL'"
+	echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_GIT_URL    '\e[${UI_COLCFG_NAME}m$PACKAGE_GIT_URL\e[m'" >&2
 	if ! test -z "$PACKAGE_GIT_COMMIT"; then
-		echo "gnu_make: PACKAGE_GIT_COMMIT '$PACKAGE_GIT_COMMIT'"
+		echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_GIT_COMMIT '\e[${UI_COLCFG_NAME}m$PACKAGE_GIT_COMMIT\e[m'" >&2
 	fi
 fi
 
-#echo "gnu_make: PACKAGE_PREFIX         '$PACKAGE_PREFIX'"
-#echo "gnu_make: PACKAGE_EPREFIX        '$PACKAGE_EPREFIX'"
-#echo "gnu_make: PACKAGE_BINDIR         '$PACKAGE_BINDIR'"
-#echo "gnu_make: PACKAGE_SBINDIR        '$PACKAGE_SBINDIR'"
-#echo "gnu_make: PACKAGE_LIBEXECDIR     '$PACKAGE_LIBEXECDIR'"
-#echo "gnu_make: PACKAGE_SYSCONFDIR     '$PACKAGE_SYSCONFDIR'"
-#echo "gnu_make: PACKAGE_SHAREDSTATEDIR '$PACKAGE_SHAREDSTATEDIR'"
-#echo "gnu_make: PACKAGE_LOCALSTATEDIR  '$PACKAGE_LOCALSTATEDIR'"
-#echo "gnu_make: PACKAGE_LIBDIR         '$PACKAGE_LIBDIR'"
-#echo "gnu_make: PACKAGE_INCLUDEDIR     '$PACKAGE_INCLUDEDIR'"
-#echo "gnu_make: PACKAGE_OLDINCLUDEDIR  '$PACKAGE_OLDINCLUDEDIR'"
-#echo "gnu_make: PACKAGE_DATAROOTDIR    '$PACKAGE_DATAROOTDIR'"
-#echo "gnu_make: PACKAGE_DATADIR        '$PACKAGE_DATADIR'"
-#echo "gnu_make: PACKAGE_INFODIR        '$PACKAGE_INFODIR'"
-#echo "gnu_make: PACKAGE_LOCALEDIR      '$PACKAGE_LOCALEDIR'"
-#echo "gnu_make: PACKAGE_MANDIR         '$PACKAGE_MANDIR'"
-#echo "gnu_make: PACKAGE_DOCDIR         '$PACKAGE_DOCDIR'"
-#echo "gnu_make: PACKAGE_HTMLDIR        '$PACKAGE_HTMLDIR'"
-#echo "gnu_make: PACKAGE_DVIDIR         '$PACKAGE_DVIDIR'"
-#echo "gnu_make: PACKAGE_PDFDIR         '$PACKAGE_PDFDIR'"
-#echo "gnu_make: PACKAGE_PSDIR          '$PACKAGE_PSDIR'"
-#echo "gnu_make: PACKAGE_HOST   '$PACKAGE_HOST'"
-#echo "gnu_make: PACKAGE_TARGET '$PACKAGE_TARGET'"
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_PREFIX         '\e[${UI_COLCFG_NAME}m$PACKAGE_PREFIX\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_EPREFIX        '\e[${UI_COLCFG_NAME}m$PACKAGE_EPREFIX\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_BINDIR         '\e[${UI_COLCFG_NAME}m$PACKAGE_BINDIR\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_SBINDIR        '\e[${UI_COLCFG_NAME}m$PACKAGE_SBINDIR\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_LIBEXECDIR     '\e[${UI_COLCFG_NAME}m$PACKAGE_LIBEXECDIR\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_SYSCONFDIR     '\e[${UI_COLCFG_NAME}m$PACKAGE_SYSCONFDIR\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_SHAREDSTATEDIR '\e[${UI_COLCFG_NAME}m$PACKAGE_SHAREDSTATEDIR\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_LOCALSTATEDIR  '\e[${UI_COLCFG_NAME}m$PACKAGE_LOCALSTATEDIR\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_LIBDIR         '\e[${UI_COLCFG_NAME}m$PACKAGE_LIBDIR\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_INCLUDEDIR     '\e[${UI_COLCFG_NAME}m$PACKAGE_INCLUDEDIR\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_OLDINCLUDEDIR  '\e[${UI_COLCFG_NAME}m$PACKAGE_OLDINCLUDEDIR\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_DATAROOTDIR    '\e[${UI_COLCFG_NAME}m$PACKAGE_DATAROOTDIR\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_DATADIR        '\e[${UI_COLCFG_NAME}m$PACKAGE_DATADIR\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_INFODIR        '\e[${UI_COLCFG_NAME}m$PACKAGE_INFODIR\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_LOCALEDIR      '\e[${UI_COLCFG_NAME}m$PACKAGE_LOCALEDIR\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_MANDIR         '\e[${UI_COLCFG_NAME}m$PACKAGE_MANDIR\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_DOCDIR         '\e[${UI_COLCFG_NAME}m$PACKAGE_DOCDIR\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_HTMLDIR        '\e[${UI_COLCFG_NAME}m$PACKAGE_HTMLDIR\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_DVIDIR         '\e[${UI_COLCFG_NAME}m$PACKAGE_DVIDIR\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_PDFDIR         '\e[${UI_COLCFG_NAME}m$PACKAGE_PDFDIR\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_PSDIR          '\e[${UI_COLCFG_NAME}m$PACKAGE_PSDIR\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_HOST   '\e[${UI_COLCFG_NAME}m$PACKAGE_HOST\e[m'" >&2
+#echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: PACKAGE_TARGET '\e[${UI_COLCFG_NAME}m$PACKAGE_TARGET\e[m'" >&2
 
 
 _UTILITY_RELPATH=""
-if [[ "$UTILITY_NAME" == */* ]]; then
+if [[ "$UTILITY_NAME" == *"/"* ]]; then
 	_UTILITY_RELPATH="${UTILITY_NAME%/*}"
 	if ! test -z "$_UTILITY_RELPATH"; then
 		_UTILITY_RELPATH="$_UTILITY_RELPATH/"
 	fi
 fi
 SRCPATH="$KOS_ROOT/binutils/src/${_UTILITY_RELPATH}$PACKAGE_NAME"
-OPTPATH="$BINUTILS_SYSROOT/opt/${_UTILITY_RELPATH}$PACKAGE_NAME"
-DESTDIR="$BINUTILS_SYSROOT/opt/${_UTILITY_RELPATH}${PACKAGE_NAME}-install"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/${_UTILITY_RELPATH}$PACKAGE_NAME"
+DESTDIR="$SYSROOT_BINUTILS_TARGET/opt/${_UTILITY_RELPATH}${PACKAGE_NAME}-install"
 
 # libtool tends to be buggy when using DESTDIR install, and tries to
 # include host system libraries during linking when it really shouldn't
@@ -156,9 +156,9 @@ DESTDIR="$BINUTILS_SYSROOT/opt/${_UTILITY_RELPATH}${PACKAGE_NAME}-install"
 # headers.
 . "$KOS_MISC/utilities/misc/gcc_hack.sh"
 
-if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
-	if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/_didmake" ]; then
-		if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then
+if test x"$MODE_FORCE_MAKE" == xyes || ! [ -d "$DESTDIR" ]; then
+	if test x"$MODE_FORCE_MAKE" == xyes || ! [ -f "$OPTPATH/_didmake" ]; then
+		if test x"$MODE_FORCE_CONF" == xyes || ! [ -f "$OPTPATH/Makefile" ]; then
 			if ! [ -f "$SRCPATH/configure" ]; then
 				# Remove $SRCPATH if it's just an empty directory
 				rmdir "$SRCPATH" > /dev/null 2>&1
@@ -186,7 +186,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 							cmd tar xvf "$_PACKAGE_URL_WANTED_FILENAME" -C "$SRCPATH"
 						else
 							# Unrecognized package distribution format
-							echo "No known way of extracting files from: '$_PACKAGE_URL_FILENAME'"
+							echo -e "\e[${UI_COLCFG_ERR}mNo known way of extracting files\e[m from: '\e[${UI_COLCFG_NAME}m$_PACKAGE_URL_FILENAME\e[m'" >&2
 							exit 1
 						fi
 					elif ! test -z "$PACKAGE_GIT_URL"; then
@@ -203,14 +203,14 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 							cmd git clone "$PACKAGE_GIT_URL"
 						fi
 					else
-						echo "No way of downloading $PACKAGE_NAME"
+						echo -e "\e[${UI_COLCFG_ERR}mNo way of downloading\e[m \e[${UI_COLCFG_NAME}m$PACKAGE_NAME\e[m" >&2
 					fi
 				fi
 				cmd cd "$SRCPATH"
 				# Fix-up doubly-packaged packages
 				while [[ `ls -A | wc -l` == 1 ]]; do
 					subdirname=`ls -A`
-					echo "Fix-up doubly-packed package '$subdirname' -> '${PACKAGE_NAME}'"
+					echo -e "Fix-up doubly-packed package '\e[${UI_COLCFG_NAME}m$subdirname\e[m' -> '\e[${UI_COLCFG_NAME}m${PACKAGE_NAME}\e[m'" >&2
 					rm -r "$BINUTILS_SOURCES/.${PACKAGE_NAME}-real" > /dev/null 2>&1
 					cmd mv "$subdirname" "../.${PACKAGE_NAME}-real"
 					cmd cd ".."
@@ -232,7 +232,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 						elif [ -f "$SRCPATH/configure.in" ]; then
 							_PACKAGE_AUTOCONF_INPUT="$SRCPATH/configure.in"
 						else
-							echo "Not a GNU autoconf project (missing file: 'configure')"
+							echo -e "\e[${UI_COLCFG_ERR}mNot a GNU autoconf project\e[m (missing file: '\e[${UI_COLCFG_NAME}mconfigure\e[m')" >&2
 							exit 1
 						fi
 						# Check for autoconf dependencies of this project
@@ -281,22 +281,22 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 				if test -z "$CONFIGURE"; then CONFIGURE=(); fi
 				CONFIGURE+=("${PACKAGE_CONFIGURE[@]}")
 				if ! test -z "$CONFIGURE"; then
-					echo "Using given \$PACKAGE_CONFIGURE and \$CONFIGURE options:"
+					echo -e "Using given \e[${UI_COLCFG_NAME}m\$PACKAGE_CONFIGURE\e[m and \e[${UI_COLCFG_NAME}m\$CONFIGURE\e[m options:" >&2
 					for opt in "${CONFIGURE[@]}"; do
-						echo "	option: $opt"
+						echo -e "	option: \e[${UI_COLCFG_NAME}m$opt\e[m" >&2
 					done
 				fi
 			else
 				# Auto-detect supported, but unset options
 				if ! [ -f "$SRCPATH/._configure_help" ]; then
-					echo "Creating file: '$SRCPATH/._configure_help'"
+					echo -e "\e[${UI_COLCFG_ACTION}mhelp\e[m: '\e[${UI_COLCFG_NAME}m$SRCPATH/._configure_help\e[m'" >&2
 					cmd "$SH" "$SRCPATH/configure" --help > "$SRCPATH/._configure_help.temp" 2>&1
 					cmd mv "$SRCPATH/._configure_help.temp" "$SRCPATH/._configure_help"
 				fi
 				if ! test -z "$CONFIGURE"; then
-					echo "Using given \$CONFIGURE options:"
+					echo -e "Using given \e[${UI_COLCFG_NAME}m\$CONFIGURE\e[m options:" >&2
 					for opt in "${CONFIGURE[@]}"; do
-						echo "	option: $opt"
+						echo -e "	option: \e[${UI_COLCFG_NAME}m$opt\e[m" >&2
 					done
 				else
 					CONFIGURE=()
@@ -311,18 +311,18 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 				}
 				addconf() {
 					if ! hasconf "$1"; then
-						echo "	option: $1$2"
+						echo -e "	option: \e[${UI_COLCFG_NAME}m$1$2\e[m" >&2
 						CONFIGURE+=("$1$2");
 					fi
 				}
 				addconfx() {
 					if ! hasconfx "$1"; then
-						echo "	option: $1"
+						echo -e "	option: \e[${UI_COLCFG_NAME}m$1\e[m" >&2
 						CONFIGURE+=("$1");
 					fi
 				}
 
-				echo "Scanning '$SRCPATH/configure --help' for options..."
+				echo -e "\e[${UI_COLCFG_ACTION}mscan\e[m: options from '\e[${UI_COLCFG_NAME}m$SRCPATH/configure --help\e[m'..." >&2
 				while IFS= read -r line; do
 					case "$line" in
 					*--prefix=*)             addconf "--prefix="         "$PACKAGE_PREFIX"; ;;
@@ -353,7 +353,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 
 					# System root
 					*--with-sysroot*)
-						addconf "--with-sysroot=" "$BINUTILS_SYSROOT"
+						addconf "--with-sysroot=" "$SYSROOT_BINUTILS_TARGET"
 						;;
 
 					# Install location
@@ -623,26 +623,26 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]; then
 				CONFIG_SITE="$PACKAGE_CONFIG_SITE
 $CONFIG_SITE"
 				if ! test -z "$CONFIG_SITE"; then
-					echo "Using given \$PACKAGE_CONFIG_SITE and \$CONFIG_SITE options:"
+					echo -e "Using given \e[${UI_COLCFG_NAME}m\$PACKAGE_CONFIG_SITE\e[m and \e[${UI_COLCFG_NAME}m\$CONFIG_SITE\e[m options:" >&2
 					while IFS= read -r line; do
-						echo "	>> $line"
+						echo -e "	>> \e[${UI_COLCFG_NAME}m$line\e[m" >&2
 					done <<< "$CONFIG_SITE"
 				fi
 			else
 				# Auto-detect necessary config.site options
 				if ! test -z "$CONFIG_SITE"; then
-					echo "Using given \$CONFIG_SITE options:"
+					echo -e "Using given \e[${UI_COLCFG_NAME}m\$CONFIG_SITE\e[m options:" >&2
 					while IFS= read -r line; do
-						echo "	>> $line"
+						echo -e "	>> \e[${UI_COLCFG_NAME}m$line\e[m" >&2
 					done <<< "$CONFIG_SITE"
 					CONFIG_SITE="
 $CONFIG_SITE"
 				fi
-				echo "Scanning '$SRCPATH/configure' for needed config.site options..."
+				echo -e "\e[${UI_COLCFG_ACTION}mscan\e[m: for needed \e[${UI_COLCFG_NAME}mconfig.site\e[m options for '\e[${UI_COLCFG_NAME}m$SRCPATH/configure\e[m'..." >&2
 				_config_site_option() {
 					if ! [[ "$CONFIG_SITE" == *"
 $1="* ]]; then
-						echo "	config.site: $1=$2"
+						echo -e "	config.site: \e[${UI_COLCFG_NAME}m$1=$2\e[m" >&2
 						CONFIG_SITE="$CONFIG_SITE
 $1=$2"
 					fi
@@ -1729,7 +1729,7 @@ $1=$2"
 							"Version:"*)  READLINE_VERSION="${readline_config_line:8}"; ;;
 							*) ;;
 							esac
-						done < "$BINUTILS_SYSROOT/opt/pkg_config/readline.pc"
+						done < "$SYSROOT_BINUTILS_TARGET/opt/pkg_config/readline.pc"
 						_config_site_option "ac_cv_rl_version" "$READLINE_VERSION"; ;;
 					*bash_cv_wcontinued_broken*)
 						_config_site_option "bash_cv_wcontinued_broken" "no"; ;;
@@ -1775,23 +1775,23 @@ $1=$2"
 				fi
 				${GM_HOOK_BEFORE_CONFIGURE:-:}
 				cmd cd "$OPTPATH"
-				echo "gnu_make: Now running $PACKAGE_NAME: './configure'..."
+				echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: Now running \e[${UI_COLCFG_NAME}m$PACKAGE_NAME\e[m: '\e[${UI_COLCFG_NAME}m./configure\e[m'..." >&2
 				cmd "$SH" "$SRCPATH/configure" "${CONFIGURE[@]}"
 			) || exit $?
 			${GM_HOOK_AFTER_CONFIGURE:-:}
-		fi # if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ];
+		fi # if test x"$MODE_FORCE_CONF" == xyes || ! [ -f "$OPTPATH/Makefile" ];
 		${GM_HOOK_BEFORE_MAKE:-:}
 		cmd cd "$OPTPATH"
-		echo "gnu_make: Now running $PACKAGE_NAME: 'make'..."
+		echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: Now running \e[${UI_COLCFG_NAME}m$PACKAGE_NAME\e[m: '\e[${UI_COLCFG_NAME}mmake\e[m'..." >&2
 		cmd make -j "$MAKE_PARALLEL_COUNT"
 		${GM_HOOK_AFTER_MAKE:-:}
 		> "$OPTPATH/_didmake"
-	fi     # if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/_didmake" ]
+	fi     # if test x"$MODE_FORCE_MAKE" == xyes || ! [ -f "$OPTPATH/_didmake" ]
 	cmd cd "$OPTPATH"
 	# Don't directly install to $DESTDIR to prevent a successful install
 	# from being detected when "make install" fails, or get interrupted.
 	rm -r "$DESTDIR-temp" > /dev/null 2>&1
-	echo "gnu_make: Now running $PACKAGE_NAME: 'make install'..."
+	echo -e "\e[${UI_COLCFG_ACTION}mgnu_make\e[m: Now running \e[${UI_COLCFG_NAME}m$PACKAGE_NAME\e[m: '\e[${UI_COLCFG_NAME}mmake install\e[m'..." >&2
 	(
 		export DESTDIR="$DESTDIR-temp"
 		${GM_HOOK_BEFORE_INSTALL:-:}
@@ -1800,7 +1800,7 @@ $1=$2"
 	${GM_HOOK_AFTER_INSTALL:-:}
 	rm -r "$DESTDIR" > /dev/null 2>&1
 	cmd mv "$DESTDIR-temp" "$DESTDIR"
-fi         # if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -d "$DESTDIR" ]
+fi         # if test x"$MODE_FORCE_MAKE" == xyes || ! [ -d "$DESTDIR" ]
 
 # Install to disk
 . "$KOS_MISC/utilities/misc/install-DESTDIR.sh"

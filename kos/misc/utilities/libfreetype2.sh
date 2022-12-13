@@ -28,7 +28,7 @@ SO_VERSION_MAJOR="6"
 SO_VERSION="$SO_VERSION_MAJOR.17.2"
 
 SRCPATH="$KOS_ROOT/binutils/src/libfreetype2-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/libfreetype2-$VERSION"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/libfreetype2-$VERSION"
 
 # libfreetype2
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/objs/.libs/libfreetype.so.$SO_VERSION" ]; then
@@ -55,7 +55,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/objs/.libs/libfreetype.so.$
 			> "$SRCPATH/.include_fixed"
 		fi
 		cmd rm -rf "$OPTPATH"
-		cmd cp -R "$SRCPATH" "$BINUTILS_SYSROOT/opt"
+		cmd cp -R "$SRCPATH" "$SYSROOT_BINUTILS_TARGET/opt"
 		cmd cd "$OPTPATH"
 		(
 			export CC="${CROSS_PREFIX}gcc"

@@ -32,7 +32,7 @@ exit 0
 
 VERSION="1.0.7"
 SRCPATH="$KOS_ROOT/binutils/src/x/twm-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/x/twm-$VERSION"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/x/twm-$VERSION"
 
 # NOTE: On cygwin, you must install `bison`
 require_program yacc

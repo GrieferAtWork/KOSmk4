@@ -1,4 +1,4 @@
-#TEST: require_utility nano "$TARGET_SYSROOT/bin/nyancat"
+#TEST: require_utility nano "$SYSROOT_BIN_TARGET_COMMON/bin/nyancat"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -19,7 +19,7 @@
 # 3. This notice may not be removed or altered from any source distribution.
 
 SRCPATH="$KOS_ROOT/binutils/src/nyancat-git"
-OPTPATH="$BINUTILS_SYSROOT/opt/nyancat"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/nyancat"
 
 if ! [ -f "$SRCPATH/src/nyancat.c" ]; then
 	# https://stackoverflow.com/questions/3489173/how-to-clone-git-repository-with-specific-revision-changeset

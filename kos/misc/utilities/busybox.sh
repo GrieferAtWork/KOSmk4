@@ -1,4 +1,4 @@
-#TEST: require_utility busybox "$TARGET_SYSROOT/bin/busybox"
+#TEST: require_utility busybox "$SYSROOT_BIN_TARGET_COMMON/bin/busybox"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -21,7 +21,7 @@
 if [ -z "$VERSION" ]; then VERSION="1.31.0"; fi
 
 ## Check final output binary
-OPTPATH="$BINUTILS_SYSROOT/opt/busybox-$VERSION"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/busybox-$VERSION"
 SRCPATH="$KOS_ROOT/binutils/src/busybox-$VERSION"
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "${OPTPATH}/busybox_unstripped" ]; then
 	## Check arch makefile
@@ -37,7 +37,7 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "${OPTPATH}/busybox_unstripped" ]; th
 		if [ -d "${OPTPATH}" ]; then
 			cmd rm -rf "${OPTPATH}"
 		fi
-		cmd cp -R "${SRCPATH}" "$BINUTILS_SYSROOT/opt/"
+		cmd cp -R "${SRCPATH}" "$SYSROOT_BINUTILS_TARGET/opt/"
 	fi
 	apply_patch "${OPTPATH}" "$KOS_PATCHES/busybox-$VERSION.patch"
 	cmd cd "${OPTPATH}"

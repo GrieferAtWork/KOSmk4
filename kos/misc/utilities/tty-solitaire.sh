@@ -1,4 +1,4 @@
-#TEST: require_utility tty-solitaire "$TARGET_SYSROOT/bin/ttysolitaire"
+#TEST: require_utility tty-solitaire "$SYSROOT_BIN_TARGET_COMMON/bin/ttysolitaire"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -18,11 +18,11 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-require_utility libncurses "$TARGET_SYSROOT/$TARGET_LIBPATH/libncursesw.so"
+require_utility libncurses "$SYSROOT_BIN_TARGET_COMMON/$TARGET_LIBPATH/libncursesw.so"
 
 VERSION="0268d6df09990cbb85682b1ad947b8d602acb097"
 SRCPATH="$KOS_ROOT/binutils/src/tty-solitaire"
-OPTPATH="$BINUTILS_SYSROOT/opt/tty-solitaire"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/tty-solitaire"
 EXEFILE="$OPTPATH/ttysolitaire"
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$EXEFILE" ]; then
 	if ! [ -f "$SRCPATH/Makefile" ]; then

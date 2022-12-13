@@ -23,7 +23,7 @@ SHLIB_VERSION_MAJOR="7"
 SHLIB_VERSION="$SHLIB_VERSION_MAJOR.1.0"
 
 SRCPATH="$KOS_ROOT/binutils/src/libffi-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/libffi-$VERSION"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/libffi-$VERSION"
 
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/.libs/libffi.so.$SHLIB_VERSION" ]; then
 	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then

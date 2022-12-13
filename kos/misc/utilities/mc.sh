@@ -1,4 +1,4 @@
-#TEST: require_utility mc "$TARGET_SYSROOT/bin/mc"
+#TEST: require_utility mc "$SYSROOT_BIN_TARGET_COMMON/bin/mc"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -18,7 +18,7 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-require_utility libncurses "$TARGET_SYSROOT/$TARGET_LIBPATH/libncursesw.so"
+require_utility libncurses "$SYSROOT_BIN_TARGET_COMMON/$TARGET_LIBPATH/libncursesw.so"
 require_utility libglib    "$PKG_CONFIG_PATH/glib-2.0.pc"
 require_utility libpcre    "$PKG_CONFIG_PATH/libpcre.pc"
 PACKAGE_URL="http://ftp.midnight-commander.org/mc-4.8.27.tar.xz"

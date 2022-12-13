@@ -1,4 +1,4 @@
-#TEST: require_utility nudoku "$TARGET_SYSROOT/bin/nudoku"
+#TEST: require_utility nudoku "$SYSROOT_BIN_TARGET_COMMON/bin/nudoku"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -18,12 +18,12 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-require_utility libncurses "$TARGET_SYSROOT/$TARGET_LIBPATH/libncursesw.so"
+require_utility libncurses "$SYSROOT_BIN_TARGET_COMMON/$TARGET_LIBPATH/libncursesw.so"
 
 if [ -z "$VERSION" ]; then VERSION="2.0.0"; fi
 
 SRCPATH="$KOS_ROOT/binutils/src/nudoku-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/nudoku-$VERSION"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/nudoku-$VERSION"
 EXEFILE="$OPTPATH/nudoku"
 
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$EXEFILE" ]; then

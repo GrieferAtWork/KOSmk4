@@ -1,4 +1,4 @@
-#TEST: require_utility coreutils "$TARGET_SYSROOT/bin/join"
+#TEST: require_utility coreutils "$SYSROOT_BIN_TARGET_COMMON/bin/join"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied

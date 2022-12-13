@@ -1,4 +1,4 @@
-#TEST: require_utility bash "$TARGET_SYSROOT/bin/bash"
+#TEST: require_utility bash "$SYSROOT_BIN_TARGET_COMMON/bin/bash"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -18,7 +18,7 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-require_utility libncurses "$TARGET_SYSROOT/$TARGET_LIBPATH/libncursesw.so"
+require_utility libncurses "$SYSROOT_BIN_TARGET_COMMON/$TARGET_LIBPATH/libncursesw.so"
 require_utility libreadline "$PKG_CONFIG_PATH/readline.pc"
 
 PACKAGE_URL="https://ftp.gnu.org/gnu/bash/bash-5.1.16.tar.gz"

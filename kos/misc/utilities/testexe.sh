@@ -18,7 +18,7 @@
 # 3. This notice may not be removed or altered from any source distribution.
 
 SRCPATH="$KOS_ROOT/binutils/src/testexe"
-OPTPATH="$BINUTILS_SYSROOT/opt/testexe"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/testexe"
 cmd mkdir -p "$SRCPATH"
 cmd mkdir -p "$OPTPATH"
 cmd cat > "$SRCPATH/main.c" <<EOF

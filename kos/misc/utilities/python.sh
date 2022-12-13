@@ -19,8 +19,8 @@
 # 3. This notice may not be removed or altered from any source distribution.
 
 require_utility libexpat   "$PKG_CONFIG_PATH/expat.pc"
-require_utility libffi     "$TARGET_SYSROOT/$TARGET_LIBPATH/libffi.so"
-require_utility libncurses "$TARGET_SYSROOT/$TARGET_LIBPATH/libncursesw.so"
+require_utility libffi     "$SYSROOT_BIN_TARGET_COMMON/$TARGET_LIBPATH/libffi.so"
+require_utility libncurses "$SYSROOT_BIN_TARGET_COMMON/$TARGET_LIBPATH/libncursesw.so"
 require_utility libzlib    "$PKG_CONFIG_PATH/zlib.pc"
 
 PACKAGE_URL="https://www.python.org/ftp/python/2.7.16/Python-2.7.16.tar.xz"
@@ -86,7 +86,7 @@ build_missing_module() {
 	shift
 	if ! [ -f "$DESTDIR/lib/python2.7/lib-dynload/$name.so" ]; then
 		cmd cd "$OPTPATH"
-		echo "Building module that python didn't realize it could built: $name"
+		echo "Building module that python didn't realize it could built: $name" >&2
 		vcmd "${CROSS_PREFIX}gcc" \
 			-shared -fno-strict-aliasing -ggdb -DNDEBUG \
 			-g -fwrapv -O3 -Wall -Wstrict-prototypes -L. \
@@ -94,7 +94,7 @@ build_missing_module() {
 			-o "$DESTDIR/lib/python2.7/lib-dynload/$name.so" $* \
 			-lpython2.7
 	else
-		echo "Module was actually built: $name"
+		echo "Module was actually built: $name" >&2
 	fi
 }
 

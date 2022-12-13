@@ -45,7 +45,7 @@ XORG_CONFIGURE_LOCALE_LIB_DIR="$XORG_CONFIGURE_LIBDIR/X11/locale"
 
 XORG_MACROS_VERSION="1.19.2"
 XORG_MACROS_SRCPATH="$KOS_ROOT/binutils/src/Xorg/xorg-macros-$XORG_MACROS_VERSION"
-XORG_MACROS_OPTPATH="$BINUTILS_SYSROOT/opt/Xorg/xorg-macros-$XORG_MACROS_VERSION"
+XORG_MACROS_OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/Xorg/xorg-macros-$XORG_MACROS_VERSION"
 
 # xorg-macros
 if ! [ -f "$PKG_CONFIG_PATH/xorg-macros.pc" ]; then
@@ -77,8 +77,8 @@ if ! [ -f "$PKG_CONFIG_PATH/xorg-macros.pc" ]; then
 			export CXXCPP="${CROSS_PREFIX}cpp"
 			export CXXFLAGS="-ggdb"
 			cmd bash "../../../../src/Xorg/xorg-macros-$XORG_MACROS_VERSION/configure" \
-				--prefix="$BINUTILS_SYSROOT/usr/local" \
-				--exec-prefix="$BINUTILS_SYSROOT/usr/local"
+				--prefix="$SYSROOT_BINUTILS_TARGET/usr/local" \
+				--exec-prefix="$SYSROOT_BINUTILS_TARGET/usr/local"
 		) || exit $?
 	fi
 	cmd cd "$XORG_MACROS_OPTPATH"
@@ -86,19 +86,19 @@ if ! [ -f "$PKG_CONFIG_PATH/xorg-macros.pc" ]; then
 	cmd make -j $MAKE_PARALLEL_COUNT install
 
 	# The actual macros file is:
-	#     $BINUTILS_SYSROOT/usr/local/share/aclocal/xorg-macros.m4
+	#     $SYSROOT_BINUTILS_TARGET/usr/local/share/aclocal/xorg-macros.m4
 	cat > "$PKG_CONFIG_PATH/xorg-macros.pc" <<EOF
-prefix=$BINUTILS_SYSROOT/usr/local
-exec_prefix=$BINUTILS_SYSROOT/usr/local
+prefix=$SYSROOT_BINUTILS_TARGET/usr/local
+exec_prefix=$SYSROOT_BINUTILS_TARGET/usr/local
 includedir=$KOS_ROOT/kos/include
-datarootdir=$BINUTILS_SYSROOT/usr/local/share
-datadir=$BINUTILS_SYSROOT/usr/local/share
+datarootdir=$SYSROOT_BINUTILS_TARGET/usr/local/share
+datadir=$SYSROOT_BINUTILS_TARGET/usr/local/share
 PACKAGE=util-macros
 # Used by XORG_INSTALL
-pkgdatadir=$BINUTILS_SYSROOT/usr/local/share/util-macros
+pkgdatadir=$SYSROOT_BINUTILS_TARGET/usr/local/share/util-macros
 # docdir is kept for backwards compatibility with XORG_INSTALL from
 # util-macros 1.4
-docdir=$BINUTILS_SYSROOT/usr/local/share/util-macros
+docdir=$SYSROOT_BINUTILS_TARGET/usr/local/share/util-macros
 
 Name: X.Org Macros
 Description: A set of autoconf project macros for X.Org modules

@@ -1,4 +1,4 @@
-#TEST: require_utility myman "$TARGET_SYSROOT/bin/myman"
+#TEST: require_utility myman "$SYSROOT_BIN_TARGET_COMMON/bin/myman"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -18,12 +18,12 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-require_utility libncurses "$TARGET_SYSROOT/$TARGET_LIBPATH/libncursesw.so"
+require_utility libncurses "$SYSROOT_BIN_TARGET_COMMON/$TARGET_LIBPATH/libncursesw.so"
 
 
 VERSION="dbbff0eb8bd7f5a404f0a8fa11fcafbf1d826a80";
 SRCPATH="$KOS_ROOT/binutils/src/minecurses-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/minecurses-$VERSION"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/minecurses-$VERSION"
 EXEFILE="$OPTPATH/minecurses"
 
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$EXEFILE" ]; then

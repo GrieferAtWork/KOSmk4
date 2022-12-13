@@ -118,13 +118,13 @@ if [[ "$UTILITY_NAME" == */* ]]; then
 	fi
 fi
 SRCPATH="$KOS_ROOT/binutils/src/${_UTILITY_RELPATH}$PACKAGE_NAME"
-OPTPATH="$BINUTILS_SYSROOT/opt/${_UTILITY_RELPATH}$PACKAGE_NAME"
-DESTDIR="$BINUTILS_SYSROOT/opt/${_UTILITY_RELPATH}${PACKAGE_NAME}-install"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/${_UTILITY_RELPATH}$PACKAGE_NAME"
+DESTDIR="$SYSROOT_BINUTILS_TARGET/opt/${_UTILITY_RELPATH}${PACKAGE_NAME}-install"
 
-MESON_CROSSFILE="$BINUTILS_SYSROOT/opt/meson/cross.txt"
+MESON_CROSSFILE="$SYSROOT_BINUTILS_TARGET/opt/meson/cross.txt"
 if ! [ -f "$MESON_CROSSFILE" ] || [ "$MESON_CROSSFILE" -ot "$KOS_MISC/utilities/misc/meson.sh" ]; then
 	. "$KOS_MISC/utilities/misc/target-info.sh"
-	cmd mkdir -p "$BINUTILS_SYSROOT/opt/meson"
+	cmd mkdir -p "$SYSROOT_BINUTILS_TARGET/opt/meson"
 	cmd cat > "$MESON_CROSSFILE" <<EOF
 [host_machine]
 system = 'linux'
@@ -150,7 +150,7 @@ pkgconfig = '$(which pkg-config 2> /dev/null || echo "pkg-config")'
 cmake = '$(which cmake 2> /dev/null || echo "cmake")'
 
 [properties]
-sys_root = '$BINUTILS_SYSROOT'
+sys_root = '$SYSROOT_BINUTILS_TARGET'
 pkg_config_libdir = '$PKG_CONFIG_LIBDIR'
 sizeof_char = $TARGET_CONFIG_SIZEOF_CHAR
 sizeof_short = $TARGET_CONFIG_SIZEOF_SHORT

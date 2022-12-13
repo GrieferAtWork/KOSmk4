@@ -1,4 +1,4 @@
-#TEST: require_utility kos-headers "$TARGET_SYSROOT/usr/include/string.h"
+#TEST: require_utility kos-headers "$SYSROOT_BIN_TARGET_COMMON/usr/include/string.h"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -22,8 +22,8 @@
 install_path /usr/include "${KOS_ROOT}/kos/include"
 
 # Create a small test source file for use with <tcc>
-cmd mkdir -p "$BINUTILS_SYSROOT/opt"
-cat > "$BINUTILS_SYSROOT/opt/hello-header-temp.c" <<EOF
+cmd mkdir -p "$SYSROOT_BINUTILS_TARGET/opt"
+cat > "$SYSROOT_BINUTILS_TARGET/opt/hello-header-temp.c" <<EOF
 #include <stdio.h>
 
 int main() {
@@ -32,5 +32,5 @@ int main() {
 }
 EOF
 
-install_file /usr/src/hello-header.c "$BINUTILS_SYSROOT/opt/hello-header-temp.c"
-unlink "$BINUTILS_SYSROOT/opt/hello-header-temp.c" > /dev/null 2>&1
+install_file /usr/src/hello-header.c "$SYSROOT_BINUTILS_TARGET/opt/hello-header-temp.c"
+unlink "$SYSROOT_BINUTILS_TARGET/opt/hello-header-temp.c" > /dev/null 2>&1

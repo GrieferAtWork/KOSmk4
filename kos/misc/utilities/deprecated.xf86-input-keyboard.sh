@@ -23,7 +23,7 @@ exit 0
 
 VERSION="1.6.1"
 SRCPATH="$KOS_ROOT/binutils/src/x/xf86-input-keyboard-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/x/xf86-input-keyboard-$VERSION"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/x/xf86-input-keyboard-$VERSION"
 
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/src/.libs/kbd_drv.so" ]; then
 	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then

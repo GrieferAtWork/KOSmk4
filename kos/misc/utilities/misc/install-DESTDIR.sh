@@ -142,16 +142,23 @@ $scan
 
 			*/aclocal/*.m4)
 				m4_filename="${line##*/}"
-				dst_filename="$BINUTILS_SYSROOT/usr/local/share/aclocal/$m4_filename"
+				dst_filename="$SYSROOT_BINUTILS_TARGET/usr/local/share/aclocal/$m4_filename"
 				if test x"$MODE_DRYRUN" != xno; then
-					echo "> aclocal_m4_config '$src_filename'"
-				elif ! [ -f "$dst_filename" ] || [ "$src_filename" -nt "$dst_filename" ]; then
-					echo "Installing aclocal_m4_config file $dst_filename"
-					unlink "$dst_filename" > /dev/null 2>&1
-					cmd mkdir -p "$BINUTILS_SYSROOT/usr/local/share/aclocal"
-					cmd cp "$src_filename" "$dst_filename"
+					echo "> aclocal_m4_config '$src_filename'" >&2
 				else
-					echo "Installing aclocal_m4_config file $dst_filename (up to date)"
+					short_dst_filename="$dst_filename"
+					if [[ "$short_dst_filename" == "$KOS_ROOT/"* ]]; then
+						short_dst_filename="\$KOS_ROOT${short_dst_filename:${#KOS_ROOT}}"
+					fi
+					printf "\e[${UI_COLCFG_FILETYPE}mm4 \e[m \e[${UI_COLCFG_PATH_RAW}m%-${UI_PATHCOL_WIDTH}s\e[m [raw]" "$short_dst_filename" >&2
+					if ! [ -f "$dst_filename" ] || [ "$src_filename" -nt "$dst_filename" ]; then
+						unlink "$dst_filename" > /dev/null 2>&1
+						cmd mkdir -p "$SYSROOT_BINUTILS_TARGET/usr/local/share/aclocal"
+						cmd cp "$src_filename" "$dst_filename"
+						echo -e "\e[${UI_COLCFG_OK}m ok\e[m" >&2
+					else
+						echo -e "\e[${UI_COLCFG_OK}m already installed\e[m" >&2
+					fi
 				fi
 				;;
 
@@ -160,83 +167,90 @@ $scan
 				dst_filename="$PKG_CONFIG_PATH/$pc_filename"
 				if test x"$MODE_DRYRUN" != xno; then
 					echo "> pkg_config '$src_filename'"
-				elif ! [ -f "$dst_filename" ] || [ "$src_filename" -nt "$dst_filename" ]; then
-					echo "Installing pkg_config file $dst_filename"
-					unlink "$dst_filename" > /dev/null 2>&1
-					while IFS= read -r pc_line; do
-						case "$pc_line" in
-
-						prefix=*)              pc_line="prefix=$PACKAGE_PREFIX" ;;
-						exec_prefix=*)         pc_line="exec_prefix=$PACKAGE_EPREFIX" ;;
-						libdir=*)              pc_line="libdir=$KOS_ROOT/bin/$TARGET_NAME-kos$PACKAGE_LIBDIR" ;;
-						includedir=*)          pc_line="includedir=$KOS_ROOT/kos/include" ;;
-
-						# These are needed for Xorg
-						sdkdir=/include)       pc_line="sdkdir=$KOS_ROOT/kos/include" ;;
-						sdkdir=/include/*)     pc_line="sdkdir=$KOS_ROOT/kos/include/${pc_line:16}" ;;
-						sdkdir=/usr/include)   pc_line="sdkdir=$KOS_ROOT/kos/include" ;;
-						sdkdir=/usr/include/*) pc_line="sdkdir=$KOS_ROOT/kos/include/${pc_line:20}" ;;
-
-						Cflags:*)
-							pc_line="${pc_line:7}"
-							new_pc_line=""
-							for arg in $pc_line; do
-								case "$arg" in
-								-I\${includedir})
-									arg=""
-									;;
-								-I\${includedir}/*)
-									arg="-I$KOS_ROOT/kos/include/${arg:16}"
-									;;
-								"-I${KOS_ROOT}/*")
-									# This is allowed
-									;;
-								-I/*)
-									# Don't point at build system paths
-									arg=""
-									;;
-								*)
-									;;
-								esac
-								if ! test -z "$arg"; then
-									new_pc_line="$new_pc_line $arg"
-								fi
-							done
-							pc_line="Cflags:$new_pc_line"
-							;;
-
-						Libs:*)
-							pc_line="${pc_line:5}"
-							new_pc_line=""
-							for arg in $pc_line; do
-								case "$arg" in
-								-L\${libdir})
-									arg=""
-									;;
-								"-L${KOS_ROOT}/*")
-									# This is allowed
-									;;
-								-L/*)
-									# Don't point at build system paths (I'm looking at you, *ncurses*...)
-									arg=""
-									;;
-								*)
-									;;
-								esac
-								if ! test -z "$arg"; then
-									new_pc_line="$new_pc_line $arg"
-								fi
-							done
-							pc_line="Libs:$new_pc_line"
-							;;
-
-						*)
-							;;
-						esac
-						echo "$pc_line" >> "$dst_filename"
-					done < "$src_filename"
 				else
-					echo "Installing pkg_config file $dst_filename (up to date)"
+					short_dst_filename="$dst_filename"
+					if [[ "$short_dst_filename" == "$KOS_ROOT/"* ]]; then
+						short_dst_filename="\$KOS_ROOT${short_dst_filename:${#KOS_ROOT}}"
+					fi
+					printf "\e[${UI_COLCFG_FILETYPE}mpkg\e[m \e[${UI_COLCFG_PATH_RAW}m%-${UI_PATHCOL_WIDTH}s\e[m [raw]" "$short_dst_filename" >&2
+					if ! [ -f "$dst_filename" ] || [ "$src_filename" -nt "$dst_filename" ]; then
+						unlink "$dst_filename" > /dev/null 2>&1
+						while IFS= read -r pc_line; do
+							case "$pc_line" in
+
+							prefix=*)              pc_line="prefix=$PACKAGE_PREFIX" ;;
+							exec_prefix=*)         pc_line="exec_prefix=$PACKAGE_EPREFIX" ;;
+							libdir=*)              pc_line="libdir=$KOS_ROOT/bin/$TARGET_NAME-kos$PACKAGE_LIBDIR" ;;
+							includedir=*)          pc_line="includedir=$KOS_ROOT/kos/include" ;;
+
+							# These are needed for Xorg
+							sdkdir=/include)       pc_line="sdkdir=$KOS_ROOT/kos/include" ;;
+							sdkdir=/include/*)     pc_line="sdkdir=$KOS_ROOT/kos/include/${pc_line:16}" ;;
+							sdkdir=/usr/include)   pc_line="sdkdir=$KOS_ROOT/kos/include" ;;
+							sdkdir=/usr/include/*) pc_line="sdkdir=$KOS_ROOT/kos/include/${pc_line:20}" ;;
+
+							Cflags:*)
+								pc_line="${pc_line:7}"
+								new_pc_line=""
+								for arg in $pc_line; do
+									case "$arg" in
+									-I\${includedir})
+										arg=""
+										;;
+									-I\${includedir}/*)
+										arg="-I$KOS_ROOT/kos/include/${arg:16}"
+										;;
+									"-I${KOS_ROOT}/*")
+										# This is allowed
+										;;
+									-I/*)
+										# Don't point at build system paths
+										arg=""
+										;;
+									*)
+										;;
+									esac
+									if ! test -z "$arg"; then
+										new_pc_line="$new_pc_line $arg"
+									fi
+								done
+								pc_line="Cflags:$new_pc_line"
+								;;
+
+							Libs:*)
+								pc_line="${pc_line:5}"
+								new_pc_line=""
+								for arg in $pc_line; do
+									case "$arg" in
+									-L\${libdir})
+										arg=""
+										;;
+									"-L${KOS_ROOT}/*")
+										# This is allowed
+										;;
+									-L/*)
+										# Don't point at build system paths (I'm looking at you, *ncurses*...)
+										arg=""
+										;;
+									*)
+										;;
+									esac
+									if ! test -z "$arg"; then
+										new_pc_line="$new_pc_line $arg"
+									fi
+								done
+								pc_line="Libs:$new_pc_line"
+								;;
+
+							*)
+								;;
+							esac
+							echo "$pc_line" >> "$dst_filename"
+						done < "$src_filename"
+						echo -e "\e[${UI_COLCFG_OK}m ok\e[m" >&2
+					else
+						echo -e "\e[${UI_COLCFG_OK}m already installed\e[m" >&2
+					fi
 				fi
 				;;
 

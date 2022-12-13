@@ -17,13 +17,13 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-CMAKE_TOOLCHAIN_FILE="$BINUTILS_SYSROOT/opt/_cmake/toolchain.cmake"
-CMAKE_MODULE_PATH="$BINUTILS_SYSROOT/opt/_cmake/Modules"
+CMAKE_TOOLCHAIN_FILE="$SYSROOT_BINUTILS_TARGET/opt/_cmake/toolchain.cmake"
+CMAKE_MODULE_PATH="$SYSROOT_BINUTILS_TARGET/opt/_cmake/Modules"
 
 install_rawfile_stdin "$CMAKE_TOOLCHAIN_FILE" <<EOF
 set(CMAKE_SYSTEM_NAME Kos)
 set(CMAKE_SYSTEM_PROCESSOR $TARGET_CPUNAME)
-set(CMAKE_MODULE_PATH "$BINUTILS_SYSROOT/opt/_cmake/Modules")
+set(CMAKE_MODULE_PATH "$SYSROOT_BINUTILS_TARGET/opt/_cmake/Modules")
 
 set(CMAKE_SYSROOT "")
 # 'CMAKE_STAGING_PREFIX' is the runtime install location (so root of the KOS disk; iow: "/")

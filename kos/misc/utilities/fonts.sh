@@ -1,4 +1,4 @@
-#TEST: require_utility fonts "$TARGET_SYSROOT/lib/fonts/u_vga16"
+#TEST: require_utility fonts "$SYSROOT_BIN_TARGET_COMMON/lib/fonts/u_vga16"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied

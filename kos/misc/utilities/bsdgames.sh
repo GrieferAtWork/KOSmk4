@@ -1,4 +1,4 @@
-#TEST: require_utility - "$TARGET_SYSROOT/bin/-"
+#TEST: require_utility - "$SYSROOT_BIN_TARGET_COMMON/bin/-"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -18,7 +18,7 @@
 #    misrepresented as being the original software.
 # 3. This notice may not be removed or altered from any source distribution.
 
-require_utility libncurses "$TARGET_SYSROOT/$TARGET_LIBPATH/libncursesw.so"
+require_utility libncurses "$SYSROOT_BIN_TARGET_COMMON/$TARGET_LIBPATH/libncursesw.so"
 require_utility openssl    "$PKG_CONFIG_PATH/openssl.pc"
 
 # bsd-games is-working status:
@@ -74,8 +74,8 @@ require_utility openssl    "$PKG_CONFIG_PATH/openssl.pc"
 
 
 SRCPATH="$KOS_ROOT/binutils/src/bsdgames-git"
-OPTPATH="$BINUTILS_SYSROOT/opt/bsdgames"
-DESTDIR="$BINUTILS_SYSROOT/opt/bsdgames-install"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/bsdgames"
+DESTDIR="$SYSROOT_BINUTILS_TARGET/opt/bsdgames-install"
 
 # Not tested if working w/o, but here for safety
 . "$KOS_MISC/utilities/misc/gcc_hack.sh"

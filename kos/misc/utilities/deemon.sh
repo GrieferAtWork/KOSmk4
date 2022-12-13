@@ -1,4 +1,4 @@
-#TEST: require_utility deemon "$TARGET_SYSROOT/bin/deemon"
+#TEST: require_utility deemon "$SYSROOT_BIN_TARGET_COMMON/bin/deemon"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -21,7 +21,7 @@
 require_utility libffi "$PKG_CONFIG_PATH/libffi.pc"
 
 SRCPATH="$KOS_ROOT/binutils/src/deemon-git/deemon"
-OPTPATH="$BINUTILS_SYSROOT/opt/deemon"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/deemon"
 
 if ! [ -f "$SRCPATH/configure" ]; then
 	rm -rf "$KOS_ROOT/binutils/src/deemon-git" > /dev/null 2>&1

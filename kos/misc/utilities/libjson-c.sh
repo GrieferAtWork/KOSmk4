@@ -27,7 +27,7 @@ SHLIB_VERSION_MAJOR="5"
 SHLIB_VERSION="$SHLIB_VERSION_MAJOR.1.0"
 
 SRCPATH="$KOS_ROOT/binutils/src/libjson-c-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/libjson-c-$VERSION"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/libjson-c-$VERSION"
 
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/libjson-c.so.$SHLIB_VERSION" ]; then
 	if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/Makefile" ]; then

@@ -1,4 +1,4 @@
-#TEST: require_utility 2048 "$TARGET_SYSROOT/bin/2048"
+#TEST: require_utility 2048 "$SYSROOT_BIN_TARGET_COMMON/bin/2048"
 # Copyright (c) 2019-2022 Griefer@Work
 #
 # This software is provided 'as-is', without any express or implied
@@ -20,7 +20,7 @@
 
 VERSION="9b387c3071d962a1c923f66b5caa3f849d519a0c"
 SRCPATH="$KOS_ROOT/binutils/src/2048.c"
-OPTPATH="$BINUTILS_SYSROOT/opt/2048.c"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/2048.c"
 EXEFILE="$OPTPATH/2048"
 
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$EXEFILE" ]; then

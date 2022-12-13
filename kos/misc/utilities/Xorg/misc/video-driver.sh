@@ -30,7 +30,7 @@ if test -z "$DRIVER_NAME"; then
 fi
 
 SRCPATH="$KOS_ROOT/binutils/src/Xorg/$NAME-$VERSION"
-OPTPATH="$BINUTILS_SYSROOT/opt/Xorg/$NAME-$VERSION"
+OPTPATH="$SYSROOT_BINUTILS_TARGET/opt/Xorg/$NAME-$VERSION"
 BINFILE="$OPTPATH/src/.libs/${DRIVER_NAME}_drv.so"
 
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$BINFILE" ]; then
