@@ -102,12 +102,17 @@ LOCAL_ucpustate_decode(struct icpustate const *__restrict return_state,
 		THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
 #ifdef DEFINE_sys32_coredump
 	ucpustate32_to_ucpustate(ust, result);
+	cpustate_verify_usereflags((u32)icpustate_getpflags(return_state),
+	                           (u32)ucpustate_getpflags(result),
+	                           /* Accept `EFLAGS_RF' (needed for coredump on exception) */
+	                           EFLAGS_RF | (u32)cred_allow_eflags_modify_mask());
 #else /* DEFINE_sys32_coredump */
 	ucpustate64_to_ucpustate(ust, result);
-#endif /* !DEFINE_sys32_coredump */
-	cpustate_verify_userpflags(icpustate_getpflags(return_state),
+	cpustate_verify_userrflags(icpustate_getpflags(return_state),
 	                           ucpustate_getpflags(result),
-	                           cred_allow_eflags_modify_mask());
+	                           /* Accept `EFLAGS_RF' (needed for coredump on exception) */
+	                           EFLAGS_RF | cred_allow_eflags_modify_mask());
+#endif /* !DEFINE_sys32_coredump */
 #ifdef DEFINE_sys32_coredump
 #ifndef __I386_NO_VM86
 	if (!icpustate_isvm86(return_state))

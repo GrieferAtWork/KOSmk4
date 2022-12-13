@@ -73,6 +73,10 @@
 #include <libunwind/errno.h>
 #include <libunwind/register.h>
 
+#ifdef __x86_64__
+#include <asm/registers.h>
+#endif /* __x86_64__ */
+
 #if defined(__i386__) || defined(__x86_64__)
 #include <sched/x86/eflags-mask.h>
 #endif /* __i386__ || __x86_64__ */
@@ -2005,9 +2009,29 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 
 		/* Write-back the register state (and verify that all values are allowed) */
 #if defined(__i386__) || defined(__x86_64__)
-		cpustate_verify_userpflags(icpustate_getpflags(state),
-		                           ucpustate_getpflags(&vm.rv_cpu),
-		                           cred_allow_eflags_modify_mask());
+#ifdef __x86_64__
+		TRY
+#endif /* __x86_64__ */
+		{
+			/* NOTE: DON'T allow changing `EFLAGS_RF' here! `vm.rv_cpu' gets pre-populated
+			 *       from `state', and if we allowed changes to it here, RPC handles would
+			 *       be  able to affect the behavior of a debugger trying to step across a
+			 *       hw-breakpoint (%drN). */
+			cpustate_verify_userpflags(icpustate_getpflags(state),
+			                           ucpustate_getpflags(&vm.rv_cpu),
+			                           cred_allow_eflags_modify_mask());
+		}
+#ifdef __x86_64__
+		EXCEPT {
+			if (was_thrown(E_INVALID_ARGUMENT_BAD_VALUE)) {
+				assert(PERTASK_GET(this_exception_args.e_pointers[0]) == E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER);
+				assert(PERTASK_GET(this_exception_args.e_pointers[1]) == X86_REGISTER_MISC_RFLAGS);
+				if (icpustate_is32bit(state))
+					PERTASK_SET(this_exception_args.e_pointers[1], X86_REGISTER_MISC_EFLAGS);
+			}
+			RETHROW();
+		}
+#endif /* __x86_64__ */
 #ifndef __x86_64__
 #ifndef __I386_NO_VM86
 		if (!(ucpustate_getpflags(&vm.rv_cpu) & EFLAGS_VM))
@@ -2096,9 +2120,18 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 		icpustate_setuserss(state, ucpustate_getss(&vm.rv_cpu));
 		gpregs_to_gpregsnsp(&vm.rv_cpu.ucs_gpregs, &state->ics_gpregs);
 		{
+			/* Mask `%Pflags', as specified by `x86_user_eflags_mask' */
 			union x86_user_eflags_mask_union word;
-			/* Mask %Pflags, as specified by `x86_user_eflags_mask' */
 			word.uem_word = atomic64_read(&x86_user_eflags_mask);
+			if (ucpustate_getpip(&vm.rv_cpu) != icpustate_getpip(state)) {
+				/* If the RPC is redirecting to a different PC, we clear the RF flag
+				 * in order to allow a debugger to set a hw-breakpoint on the  first
+				 * instruction of the RPC handler.
+				 *
+				 * Without this special handling, a hw-breakpoint there wouldn't get
+				 * triggered  (only  the  second  instruction  could  trigger  one). */
+				word.uem_mask &= ~EFLAGS_RF;
+			}
 			ucpustate_mskpflags(&vm.rv_cpu, word.uem_mask, word.uem_flag);
 		}
 		icpustate_setpflags(state, ucpustate_getpflags(&vm.rv_cpu));

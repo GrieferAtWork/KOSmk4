@@ -1091,8 +1091,10 @@ assert_canonical_pc(struct icpustate *__restrict state,
 		is_compat = icpustate_is32bit(state);
 		if (is_compat) {
 			callsite_pc = (void const *)(uintptr_t)(*(u32 const *)sp);
+			sp += 4;
 		} else {
 			callsite_pc = *(void const *const *)sp;
+			sp += 8;
 		}
 		/* Verify the call-site program counter. */
 		if (icpustate_isuser(state) ? ((byte_t const *)callsite_pc >= (byte_t const *)USERSPACE_END)
@@ -1101,7 +1103,7 @@ assert_canonical_pc(struct icpustate *__restrict state,
 			goto set_noncanon_pc_exception;
 		}
 		icpustate_setpc(state, callsite_pc);
-		icpustate_setsp(state, is_compat ? sp + 4 : sp + 8);
+		icpustate_setsp(state, (void *)sp);
 		{
 			void const *call_instr;
 			call_instr = instruction_pred_nx(callsite_pc,

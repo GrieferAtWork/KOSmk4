@@ -34,6 +34,7 @@
 
 #include <hybrid/host.h>
 
+#include <asm/cpu-flags.h>
 #include <kos/bits/except-handler32.h>
 #include <kos/bits/exception_data32.h>
 #include <kos/kernel/cpu-state-helpers.h>
@@ -210,9 +211,10 @@ userexcept_callhandler(struct icpustate *__restrict state,
 	icpustate_setusersp(state, user_error);
 	icpustate_setpc(state, (void *)handler);
 	{
+		/* Mask `%Pflags', as specified by `x86_user_eflags_mask' */
 		union x86_user_eflags_mask_union word;
 		word.uem_word = atomic64_read(&x86_user_eflags_mask);
-		/* Mask %eflags, as specified by `x86_user_eflags_mask' */
+		word.uem_mask &= ~EFLAGS_RF; /* Always clear `EFLAGS_RF' so hw-breakpoints work on exception handler entry */
 		icpustate_mskpflags(state, word.uem_mask, word.uem_flag);
 	}
 	COMPILER_WRITE_BARRIER();
@@ -282,9 +284,10 @@ x86_userexcept_callhandler64(struct icpustate *__restrict state,
 	icpustate_setusersp(state, user_error);
 	icpustate_setpc(state, (void *)handler);
 	{
+		/* Mask `%Pflags', as specified by `x86_user_eflags_mask' */
 		union x86_user_eflags_mask_union word;
 		word.uem_word = atomic64_read(&x86_user_eflags_mask);
-		/* Mask %eflags, as specified by `x86_user_eflags_mask' */
+		word.uem_mask &= ~EFLAGS_RF; /* Always clear `EFLAGS_RF' so hw-breakpoints work on exception handler entry */
 		icpustate_mskpflags(state, word.uem_mask, word.uem_flag);
 	}
 	COMPILER_WRITE_BARRIER();

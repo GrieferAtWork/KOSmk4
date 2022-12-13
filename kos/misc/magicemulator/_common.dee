@@ -170,32 +170,32 @@ class Addr2line {
 }
 
 function printFormattedAddr2line(
-		format: string,
+		format: Bytes,
 		file: string, line: string,
 		func: string, addr: string) {
 	for (local i = 0; i < #format; ++i) {
 		local ch = format[i];
-		if (ch != "%" || i == #format-1) {
-			writeStdout(ch);
+		if (ch != "%".ord() || i == #format-1) {
+			writeStdout(Bytes({ ch }));
 		} else {
 			++i;
 			ch = format[i];
-			if (ch == "f") {
+			if (ch == "f".ord()) {
 				writeStdout(file);
-			} else if (ch == "l") {
+			} else if (ch == "l".ord()) {
 				writeStdout(str line);
-			} else if (ch == "c") {
+			} else if (ch == "c".ord()) {
 				writeStdout("0");
-			} else if (ch == "n") {
+			} else if (ch == "n".ord()) {
 				writeStdout(func);
-			} else if (ch == "<") {
+			} else if (ch == "<".ord()) {
 				writeStdout("0");
-			} else if (ch == ">") {
+			} else if (ch == ">".ord()) {
 				writeStdout("0");
-			} else if (ch == "p") {
+			} else if (ch == "p".ord()) {
 				writeStdout(addr.upper().lsstrip("0X"));
 			} else {
-				writeStdout("%" + ch);
+				writeStdout("%" + string.chr(ch));
 			}
 		}
 	}
@@ -529,7 +529,7 @@ again_find_match:
 					goto again_find_match;
 				}
 				local command = text[i:end];
-				local argument = "";
+				local argument = "".bytes();
 				if (":" in command)
 					command, none, argument = command.partition(":")...;
 				switch (command.strip()) {

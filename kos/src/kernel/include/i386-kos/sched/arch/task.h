@@ -352,10 +352,11 @@ DATDEF ATTR_PERTASK struct irregs this_x86_sysret_iret;
 DATDEF ATTR_PERTASK uintptr_t const this_x86_kernel_psp0;
 #endif /* !___this_x86_kernel_psp0_defined */
 
-/* Return  a  pointer  to   the  original  user-space  IRET   tail  of  the  calling   thread.
- * This is the pointer to the IRET structure located at the base of the caller's kernel stack.
- * NOTE: The caller must ensure that preemption is disabled,
- *       and that  `thread' is  hosted by  the calling  CPU. */
+/* Return a pointer to the original user-space IRET tail of the given thread.
+ * This is the pointer to the IRET structure located at the base of the given
+ * thread's kernel stack.
+ * NOTE: The caller must ensure that `thread == THIS_TASK', or that preemption
+ *       is disabled, and that `thread' is hosted by the caller's current CPU. */
 #define x86_get_irregs(thread) \
 	((struct irregs *)FORTASK(thread, *(uintptr_t *)&this_x86_kernel_psp0) - 1)
 
@@ -365,10 +366,11 @@ DATDEF ATTR_PERTASK struct irregs_kernel this_x86_sysret_iret;
 
 struct irregs_user;
 
-/* Return  a  pointer  to   the  original  user-space  IRET   tail  of  the  calling   thread.
- * This is the pointer to the IRET structure located at the base of the caller's kernel stack.
- * NOTE: The caller must ensure that preemption is disabled,
- *       and that  `thread' is  hosted by  the calling  CPU. */
+/* Return a pointer to the original user-space IRET tail of the given thread.
+ * This is the pointer to the IRET structure located at the base of the given
+ * thread's kernel stack.
+ * NOTE: The caller must ensure that `thread == THIS_TASK', or that preemption
+ *       is disabled, and that `thread' is hosted by the caller's current CPU. */
 #ifdef __I386_NO_VM86
 #define x86_get_irregs(thread) \
 	((struct irregs_user *)FORTASK(thread, *(uintptr_t *)&this_x86_kernel_psp0) - 1)
@@ -385,7 +387,12 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict thread);
 #endif /* !__x86_64__ */
 
 
-/* Safely get/set the values of saved registers that may be modified by RPC redirection. */
+/* Safely get/set the values of saved registers that may be modified by RPC redirection.
+ *
+ * These functions always get/set the registers that they'd appear WITHOUT RPC redirection:
+ * - If `x86_userexcept_sysret' wasn't injected: access `self->[...]'
+ * - If `x86_userexcept_sysret' was injected:    access `this_x86_sysret_iret.[...]'
+ */
 
 /* Check if `self' returns to user-space. */
 FUNDEF NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) __BOOL

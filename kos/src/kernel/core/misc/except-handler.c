@@ -208,7 +208,7 @@ userexcept_callsignal_and_maybe_restart_syscall(struct icpustate *__restrict sta
                                                 struct rpc_syscall_info const *sc_info)
 		THROWS(E_SEGFAULT) {
 
-	/* Figure out if the system should be restarted. */
+	/* Figure out if the system call should be restarted. */
 	if (sc_info != NULL) {
 		bool should_restart;
 		int syscall_restart_mode = kernel_syscall_restartmode(sc_info);

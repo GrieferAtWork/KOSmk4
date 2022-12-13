@@ -27,6 +27,7 @@
 
 #ifndef __INTELLISENSE__
 #include <asm/registers.h>
+#include <asm/registers-compat.h>
 #include <kos/except.h>
 #include <kos/except/reason/inval.h>
 #include "../x86/gdt.h"
@@ -37,20 +38,42 @@
 __DECL_BEGIN
 
 /* Verify that only bits maskable by `MODIFYABLE_MASK' have changed. */
-__LOCAL void (cpustate_verify_userpflags)(__uintptr_t __old_pflags,
-                                          __uintptr_t __new_pflags,
-                                          __uintptr_t __modifyable_mask)
+__LOCAL void (cpustate_verify_usereflags)(__uint32_t __old_eflags,
+                                          __uint32_t __new_eflags,
+                                          __uint32_t __modifyable_mask)
 		__THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
 #ifndef __INTELLISENSE__
-	if __unlikely((__old_pflags & ~__modifyable_mask) !=
-	              (__new_pflags & ~__modifyable_mask)) {
+	if __unlikely((__old_eflags & ~__modifyable_mask) !=
+	              (__new_eflags & ~__modifyable_mask)) {
 		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
 		      X86_REGISTER_MISC_EFLAGS,
-		      __new_pflags);
+		      __new_eflags, __old_eflags, __modifyable_mask);
 	}
 #endif /* !__INTELLISENSE__ */
 }
+
+#ifdef __x86_64__
+/* Verify that only bits maskable by `MODIFYABLE_MASK' have changed. */
+__LOCAL void (cpustate_verify_userrflags)(__uint64_t __old_rflags,
+                                          __uint64_t __new_rflags,
+                                          __uint64_t __modifyable_mask)
+		__THROWS(E_INVALID_ARGUMENT_BAD_VALUE) {
+#ifndef __INTELLISENSE__
+	if __unlikely((__old_rflags & ~__modifyable_mask) !=
+	              (__new_rflags & ~__modifyable_mask)) {
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
+		      X86_REGISTER_MISC_RFLAGS,
+		      __new_rflags, __old_rflags, __modifyable_mask);
+	}
+#endif /* !__INTELLISENSE__ */
+}
+#define cpustate_verify_userpflags cpustate_verify_userrflags
+#else /* __x86_64__ */
+#define cpustate_verify_userpflags cpustate_verify_usereflags
+#endif /* !__x86_64__ */
+
 
 /* Verify that `V_CS' is a valid user-space segment register. */
 __LOCAL void (cpustate_verify_usercs)(__u16 __v_cs)

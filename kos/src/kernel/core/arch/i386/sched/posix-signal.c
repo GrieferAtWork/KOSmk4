@@ -155,9 +155,9 @@ sys_ksigreturn32_impl(struct icpustate *__restrict state,
 		cs     = restore_cpu->ucs_cs16;
 		eflags = ucpustate32_geteflags(restore_cpu);
 		COMPILER_READ_BARRIER();
-		cpustate_verify_userpflags(icpustate_getpflags(state),
-		                           eflags,
-		                           cred_allow_eflags_modify_mask());
+		cpustate_verify_usereflags((u32)icpustate_getpflags(state), eflags,
+		                           /* Accept `EFLAGS_RF' (needed return-from-exception-handler) */
+		                           EFLAGS_RF | cred_allow_eflags_modify_mask());
 #ifndef __x86_64__
 #ifndef __I386_NO_VM86
 		if (eflags & EFLAGS_VM) {
@@ -321,9 +321,9 @@ sys_ksigreturn64_impl(struct icpustate *__restrict state,
 		cs     = restore_cpu->ucs_cs16;
 		rflags = ucpustate64_getrflags(restore_cpu);
 		COMPILER_READ_BARRIER();
-		cpustate_verify_userpflags(icpustate_getpflags(state),
-		                           rflags,
-		                           cred_allow_eflags_modify_mask());
+		cpustate_verify_userrflags(icpustate_getpflags(state), rflags,
+		                           /* Accept `EFLAGS_RF' (needed return-from-exception-handler) */
+		                           EFLAGS_RF | cred_allow_eflags_modify_mask());
 		/* Validate segment register indices before actually restoring them. */
 		cpustate_verify_usercs(cs);
 		cpustate_verify_userss(ss);

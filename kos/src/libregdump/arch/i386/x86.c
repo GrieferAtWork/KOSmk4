@@ -1049,7 +1049,7 @@ libregdump_flags(struct regdump_printer *__restrict self,
 	}
 	PRINT(" [iopl=");
 	format(REGDUMP_FORMAT_VALUE_PREFIX);
-	printf("%u", EFLAGS_GTIOPL(flags));
+	printf("%u", EFLAGS_GETIOPL(flags));
 	format(REGDUMP_FORMAT_VALUE_SUFFIX);
 	PRINT("]");
 	END;

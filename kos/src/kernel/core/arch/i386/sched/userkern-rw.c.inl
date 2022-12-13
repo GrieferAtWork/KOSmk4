@@ -270,8 +270,24 @@ userkern_set_arch_specific_field(struct vioargs *__restrict args,
 		*presult = (VALUE_TYPE)icpustate_getpflags(state);
 #else /* DEFINE_IO_READ */
 		uintptr_t pflags_mask = cred_allow_eflags_modify_mask();
-		cpustate_verify_userpflags(icpustate_getpflags(state),
-		                           value, pflags_mask);
+#ifdef __x86_64__
+		TRY
+#endif /* __x86_64__ */
+		{
+			cpustate_verify_userpflags(icpustate_getpflags(state),
+			                           value, pflags_mask);
+		}
+#ifdef __x86_64__
+		EXCEPT {
+			if (was_thrown(E_INVALID_ARGUMENT_BAD_VALUE)) {
+				assert(PERTASK_GET(this_exception_args.e_pointers[0]) == E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER);
+				assert(PERTASK_GET(this_exception_args.e_pointers[1]) == X86_REGISTER_MISC_RFLAGS);
+				if (icpustate_is32bit(state))
+					PERTASK_SET(this_exception_args.e_pointers[1], X86_REGISTER_MISC_EFLAGS);
+			}
+			RETHROW();
+		}
+#endif /* __x86_64__ */
 		icpustate_setpflags(state, value);
 #endif /* !DEFINE_IO_READ */
 	}	break;

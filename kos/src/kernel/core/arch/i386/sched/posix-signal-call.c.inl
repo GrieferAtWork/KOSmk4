@@ -479,10 +479,11 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 	icpustate_setpip(state, (LOCAL_uintptr_t)(uintptr_t)action->sa_handler);
 	icpustate_setuserpsp(state, (LOCAL_uintptr_t)(uintptr_t)usp);
 
-	/* Mask %Pflags, as specified by `x86_user_eflags_mask' */
 	{
+		/* Mask `%Pflags', as specified by `x86_user_eflags_mask' */
 		union x86_user_eflags_mask_union word;
 		word.uem_word = atomic64_read(&x86_user_eflags_mask);
+		word.uem_mask &= ~EFLAGS_RF; /* Always clear `EFLAGS_RF' so hw-breakpoints work on signal handler entry */
 		icpustate_mskpflags(state, word.uem_mask, word.uem_flag);
 	}
 	return state;

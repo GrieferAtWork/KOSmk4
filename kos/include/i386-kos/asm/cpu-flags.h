@@ -34,27 +34,34 @@
 #define EFLAGS_IOPL(n)     (((n) & 3) << 12)      /* [bit(12,13)] I/O Privilege Level (System). */
 #define EFLAGS_IOPLMASK    __UINT32_C(0x00003000) /* [bit(12,13)] I/O Privilege Level (System). */
 #define EFLAGS_NT          __UINT32_C(0x00004000) /* [bit(14)] Nested Task Flag (System). */
-#define EFLAGS_RF          __UINT32_C(0x00010000) /* [bit(16)] Resume Flag (System). */
+#define EFLAGS_RF          __UINT32_C(0x00010000) /* [bit(16)] Resume Flag (System).
+                                                   * Suppress %drN-style instruction breakpoints for 1 instruction.
+                                                   * Cleared  before execution of every instruction (after checking
+                                                   * for %drN-style instruction breakpoints))
+                                                   * Used to prevent hw-breakpoints from triggering multiple times
+                                                   * when the attached instruction causes a #PF (or similar),  and
+                                                   * ends up being executed more than once by the hardware. */
 #define EFLAGS_VM          __UINT32_C(0x00020000) /* [bit(17)] Virtual 8086 Mode (System). */
 #define EFLAGS_AC          __UINT32_C(0x00040000) /* [bit(18)] Alignment Check (System). */
 #define EFLAGS_VIF         __UINT32_C(0x00080000) /* [bit(19)] Virtual Interrupt Flag (System). */
 #define EFLAGS_VIP         __UINT32_C(0x00100000) /* [bit(20)] Virtual Interrupt Pending (System). */
 #define EFLAGS_ID          __UINT32_C(0x00200000) /* [bit(21)] ID Flag (System). */
-#define EFLAGS_GTIOPL(flags) (((flags) >> 12) & 3)
+#define EFLAGS_GETIOPL(flags) (((flags) >> 12) & 3)
 
-/* Mask  of  bits  that user-space  may  assume to  always  be modifiable
- * There are a couple of  bits in here that  I wish weren't available  to
- * ring#3, however ring#3 already has implicit access to them since these
- * are the bits that `popf[l|q]' allows to be modified, so there'd be  no
- * point in restricting this set in any form.
- * The  only thing  that I don't  understand about this  is `EFLAGS.AC', because
- * there are 2  dedicated instructions  `stac' and `clac'  that can  be used  to
- * set/clear  that  bit. However  attempting to  do so  (normally) causes  a #GP
- * if done  so from  ring#3 (and  there is  no way  to disable  this other  than
- * emulating  these  instructions  for  ring#3  from  kernel-space,  as  done by
- * the KOS kernel). So it doesn't actually make sense to lock those instructions
- * as being privileged  when in  fact everything they  might be  useful for  can
- * already  be  done  via the  `popf'  instruction (which  isn't  privileged for
+/* Mask of bits that user-space may assume to always be modifiable. There are
+ * a  couple of bits in here that I wish weren't available to ring#3, however
+ * ring#3  already has implicit access to them  since these are the bits that
+ * `popf[l|q]' allows to be modified, so  there'd be no point in  restricting
+ * this set in any form.
+ *
+ * The only thing that I don't understand about this is `EFLAGS.AC', because
+ * there are 2 dedicated instructions `stac' and `clac' that can be used  to
+ * set/clear that bit. However attempting to  do so (normally) causes a  #GP
+ * if done so from ring#3  (and there is no way  to disable this other  than
+ * emulating these instructions for ring#3 from kernel-space, as done by the
+ * KOS kernel). So it doesn't actually make sense to lock those instructions
+ * as being privileged when in fact everything they might be useful for  can
+ * already  be done via  the `popf' instruction  (which isn't privileged for
  * `EFLAGS.AC' and cannot be made to be privileged, either...) */
 #define EFLAGS_UMASK                                                         \
 	(EFLAGS_CF | EFLAGS_PF | EFLAGS_AF | EFLAGS_ZF | EFLAGS_SF | EFLAGS_TF | \

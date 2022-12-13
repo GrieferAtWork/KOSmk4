@@ -128,7 +128,7 @@ NOTHROW(FCALL cpl_setiopl_impl)(void *buf, struct task *__restrict thread) {
 	old_pflags = thread == THIS_TASK
 	             ? irregs_getpflags(irregs)
 	             : irregs->ir_Pflags;
-	old_iopl   = EFLAGS_GTIOPL(old_pflags);
+	old_iopl   = EFLAGS_GETIOPL(old_pflags);
 	if (old_iopl == args->ia_new_iopl) {
 		was_set = true;
 	} else if (!allow_change) {
@@ -152,7 +152,7 @@ PUBLIC unsigned int KCALL
 x86_getiopl(struct task *__restrict thread) {
 	uintptr_t pflags;
 	cpu_private_function_call(thread, &cpl_getiopl_impl, &pflags);
-	return EFLAGS_GTIOPL(pflags);
+	return EFLAGS_GETIOPL(pflags);
 }
 
 PUBLIC unsigned int KCALL
@@ -184,7 +184,7 @@ sys_iopl_impl(struct icpustate *__restrict state,
 		      level);
 	}
 	pflags    = icpustate_getpflags(state);
-	old_level = EFLAGS_GTIOPL(pflags);
+	old_level = EFLAGS_GETIOPL(pflags);
 	/* Only require HWIO permissions when raising the IOPL level. */
 	if (level > old_level)
 		require(CAP_SYS_RAWIO);

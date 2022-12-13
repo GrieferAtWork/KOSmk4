@@ -233,8 +233,9 @@ sys_do_debugtrap32_impl(struct icpustate *__restrict return_state,
 		cs     = ustate->ucs_cs16;
 		eflags = ustate->ucs_eflags;
 		COMPILER_READ_BARRIER();
-		cpustate_verify_userpflags(icpustate_getpflags(return_state),
-		                           eflags, eflags_mask);
+		cpustate_verify_usereflags((u32)icpustate_getpflags(return_state),
+		                           /* Accept `EFLAGS_RF' (needed for debug trap on exception) */
+		                           EFLAGS_RF | eflags, eflags_mask);
 #ifndef __x86_64__
 #ifndef __I386_NO_VM86
 		if (icpustate_isvm86(return_state))
@@ -303,8 +304,9 @@ sys_do_debugtrap64_impl(struct icpustate *__restrict return_state,
 		cs     = ustate->ucs_cs16;
 		rflags = ustate->ucs_rflags;
 		COMPILER_READ_BARRIER();
-		cpustate_verify_userpflags(icpustate_getpflags(return_state),
-		                           rflags, rflags_mask);
+		cpustate_verify_userrflags(icpustate_getpflags(return_state),
+		                           /* Accept `EFLAGS_RF' (needed for debug trap on exception) */
+		                           EFLAGS_RF | rflags, rflags_mask);
 		/* Validate segment register indices before actually restoring them. */
 		cpustate_verify_usercs(cs);
 		cpustate_verify_usergs(gs);
