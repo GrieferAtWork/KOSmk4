@@ -1,4 +1,3 @@
-/* HASH CRC-32:0xb429e6ab */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,24 +29,16 @@
 #ifndef _SYS_SYSMACROS_H
 #define _SYS_SYSMACROS_H 1
 
-#include <__stdinc.h>
-#include <__crt.h>
-
-#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
-#pragma GCC system_header
-#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
-
 #include <sys/mkdev.h>
 
-#include <asm/os/mkdev.h>
-#if defined(__CRT_HAVE_major) || defined(__CRT_HAVE_gnu_dev_major) || defined(__MKDEV_CURRENT_VERSION)
-#define gnu_dev_major(dev)            major(dev)
-#endif /* __CRT_HAVE_major || __CRT_HAVE_gnu_dev_major || __MKDEV_CURRENT_VERSION */
-#if defined(__CRT_HAVE_minor) || defined(__CRT_HAVE_gnu_dev_minor) || defined(__MKDEV_CURRENT_VERSION)
-#define gnu_dev_minor(dev)            minor(dev)
-#endif /* __CRT_HAVE_minor || __CRT_HAVE_gnu_dev_minor || __MKDEV_CURRENT_VERSION */
-#if defined(__CRT_HAVE_makedev) || defined(__CRT_HAVE_gnu_dev_makedev) || defined(__MKDEV_CURRENT_VERSION)
+#ifdef major
+#define gnu_dev_major(dev) major(dev)
+#endif /* major */
+#ifdef minor
+#define gnu_dev_minor(dev) minor(dev)
+#endif /* minor */
+#ifdef makedev
 #define gnu_dev_makedev(major, minor) makedev(major, minor)
-#endif /* __CRT_HAVE_makedev || __CRT_HAVE_gnu_dev_makedev || __MKDEV_CURRENT_VERSION */
+#endif /* makedev */
 
 #endif /* !_SYS_SYSMACROS_H */

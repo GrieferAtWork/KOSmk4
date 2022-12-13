@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3f7f4e9 */
+/* HASH CRC-32:0xfc1862f1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -190,9 +190,9 @@ __SYSDECL_END
 	 __CCAST(minor_t)(((minor_t)1 << __MKDEV_MINOR_BITS(__MKDEV_CURRENT_VERSION)) - 1))
 #endif /* !... */
 
-#define __makedev(version, major, minor)                      \
-	((__CCAST(dev_t)(major) << __MKDEV_MAJOR_SHFT(version)) | \
-	 (__CCAST(dev_t)(minor) << __MKDEV_MINOR_SHFT(version)))
+#define __makedev(version, maj, min)                        \
+	((__CCAST(dev_t)(maj) << __MKDEV_MAJOR_SHFT(version)) | \
+	 (__CCAST(dev_t)(min) << __MKDEV_MINOR_SHFT(version)))
 #define __major(version, dev)                                 \
 	(__CCAST(major_t)((dev) >> __MKDEV_MAJOR_SHFT(version)) & \
 	 __CCAST(major_t)(((major_t)1 << __MKDEV_MAJOR_BITS(version)) - 1))
@@ -200,5 +200,23 @@ __SYSDECL_END
 	(__CCAST(minor_t)((dev) >> __MKDEV_MINOR_SHFT(version)) & \
 	 __CCAST(minor_t)(((minor_t)1 << __MKDEV_MINOR_BITS(version)) - 1))
 #endif /* __MKDEV_CURRENT_VERSION && __KOS__ && __KERNEL__ */
+
+
+/* Some programs think that unless macros `minor', `major' and `makedev' have  been
+ * defined, the `dev_t'-API won't be available. Since on KOS, we also try to define
+ * these  functions as... well: functions, we still  have define the macros so that
+ * `#ifdef minor'-style checks can be used
+ *
+ * Example: MC (midnight commander) (/lib/unixcompat.h:26-39)
+ */
+#if !defined(minor) && (defined(__CRT_HAVE_minor) || defined(__CRT_HAVE_gnu_dev_minor) || defined(__MKDEV_CURRENT_VERSION))
+#define minor(dev) minor(dev)
+#endif /* !minor && (__CRT_HAVE_minor || __CRT_HAVE_gnu_dev_minor || __MKDEV_CURRENT_VERSION) */
+#if !defined(major) && (defined(__CRT_HAVE_major) || defined(__CRT_HAVE_gnu_dev_major) || defined(__MKDEV_CURRENT_VERSION))
+#define major(dev) major(dev)
+#endif /* !major && (__CRT_HAVE_major || __CRT_HAVE_gnu_dev_major || __MKDEV_CURRENT_VERSION) */
+#if !defined(makedev) && (defined(__CRT_HAVE_makedev) || defined(__CRT_HAVE_gnu_dev_makedev) || defined(__MKDEV_CURRENT_VERSION))
+#define makedev(maj, min) makedev(maj, min)
+#endif /* !makedev && (__CRT_HAVE_makedev || __CRT_HAVE_gnu_dev_makedev || __MKDEV_CURRENT_VERSION) */
 
 #endif /* !_SYS_MKDEV_H */

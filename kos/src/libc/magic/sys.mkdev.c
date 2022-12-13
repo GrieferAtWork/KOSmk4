@@ -210,9 +210,9 @@ __SYSDECL_END
 	 __CCAST(minor_t)(((minor_t)1 << __MKDEV_MINOR_BITS(__MKDEV_CURRENT_VERSION)) - 1))
 #endif /* !... */
 
-#define __makedev(version, major, minor)                      \
-	((__CCAST(dev_t)(major) << __MKDEV_MAJOR_SHFT(version)) | \
-	 (__CCAST(dev_t)(minor) << __MKDEV_MINOR_SHFT(version)))
+#define __makedev(version, maj, min)                        \
+	((__CCAST(dev_t)(maj) << __MKDEV_MAJOR_SHFT(version)) | \
+	 (__CCAST(dev_t)(min) << __MKDEV_MINOR_SHFT(version)))
 #define __major(version, dev)                                 \
 	(__CCAST(major_t)((dev) >> __MKDEV_MAJOR_SHFT(version)) & \
 	 __CCAST(major_t)(((major_t)1 << __MKDEV_MAJOR_BITS(version)) - 1))
@@ -220,5 +220,25 @@ __SYSDECL_END
 	(__CCAST(minor_t)((dev) >> __MKDEV_MINOR_SHFT(version)) & \
 	 __CCAST(minor_t)(((minor_t)1 << __MKDEV_MINOR_BITS(version)) - 1))
 #endif /* __MKDEV_CURRENT_VERSION && __KOS__ && __KERNEL__ */
+
+
+/* Some programs think that unless macros `minor', `major' and `makedev' have  been
+ * defined, the `dev_t'-API won't be available. Since on KOS, we also try to define
+ * these  functions as... well: functions, we still  have define the macros so that
+ * `#ifdef minor'-style checks can be used
+ *
+ * Example: MC (midnight commander) (/lib/unixcompat.h:26-39)
+ */
+}
+%[insert:pp_if(!defined(@minor@) && $has_function(minor))]
+%#define minor(dev) minor(dev)
+%[insert:pp_endif]
+%[insert:pp_if(!defined(@major@) && $has_function(major))]
+%#define major(dev) major(dev)
+%[insert:pp_endif]
+%[insert:pp_if(!defined(@makedev@) && $has_function(makedev))]
+%#define makedev(maj, min) makedev(maj, min)
+%[insert:pp_endif]
+%{
 
 }
