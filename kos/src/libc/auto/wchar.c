@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe65b236 */
+/* HASH CRC-32:0x5abe2f0b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2993,7 +2993,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsto32_r)(char16_t const *__restrict nptr,
 		/*       */ __hybrid_overflow_sadd(result, digit, &result)) {
 
 			/* Check for special case: `strtoi(itos(T.MIN))' */
-			if ((uint32_t)result == ((uint32_t)0 - (uint32_t)__INT32_MIN__) &&
+			if ((__UINT32_TYPE__)result == ((__UINT32_TYPE__)0 - (__UINT32_TYPE__)__INT32_MIN__) &&
 			    sign == '-') {
 				/* Must ensure that we're at the end of the input string. */
 				ch = *num_iter;
@@ -3258,7 +3258,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsto32_r)(char32_t const *__restrict nptr,
 		/*       */ __hybrid_overflow_sadd(result, digit, &result)) {
 
 			/* Check for special case: `strtoi(itos(T.MIN))' */
-			if ((uint32_t)result == ((uint32_t)0 - (uint32_t)__INT32_MIN__) &&
+			if ((__UINT32_TYPE__)result == ((__UINT32_TYPE__)0 - (__UINT32_TYPE__)__INT32_MIN__) &&
 			    sign == '-') {
 				/* Must ensure that we're at the end of the input string. */
 				ch = *num_iter;
@@ -4121,7 +4121,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsto64_r)(char16_t const *__restrict nptr,
 		/*       */ __hybrid_overflow_sadd(result, digit, &result)) {
 
 			/* Check for special case: `strtoi(itos(T.MIN))' */
-			if ((uint64_t)result == ((uint64_t)0 - (uint64_t)__INT64_MIN__) &&
+			if ((__UINT64_TYPE__)result == ((__UINT64_TYPE__)0 - (__UINT64_TYPE__)__INT64_MIN__) &&
 			    sign == '-') {
 				/* Must ensure that we're at the end of the input string. */
 				ch = *num_iter;
@@ -4386,7 +4386,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsto64_r)(char32_t const *__restrict nptr,
 		/*       */ __hybrid_overflow_sadd(result, digit, &result)) {
 
 			/* Check for special case: `strtoi(itos(T.MIN))' */
-			if ((uint64_t)result == ((uint64_t)0 - (uint64_t)__INT64_MIN__) &&
+			if ((__UINT64_TYPE__)result == ((__UINT64_TYPE__)0 - (__UINT64_TYPE__)__INT64_MIN__) &&
 			    sign == '-') {
 				/* Must ensure that we're at the end of the input string. */
 				ch = *num_iter;

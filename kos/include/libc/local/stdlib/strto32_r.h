@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdab66147 */
+/* HASH CRC-32:0xb38371cf */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -130,7 +130,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strto32_r))(char const *__restrict __
 		/*       */ __hybrid_overflow_sadd(__result, __digit, &__result)) {
 
 			/* Check for special case: `strtoi(itos(T.MIN))' */
-			if ((uint32_t)__result == ((uint32_t)0 - (uint32_t)__INT32_MIN__) &&
+			if ((__UINT32_TYPE__)__result == ((__UINT32_TYPE__)0 - (__UINT32_TYPE__)__INT32_MIN__) &&
 			    __sign == '-') {
 				/* Must ensure that we're at the end of the input string. */
 				__ch = *__num_iter;

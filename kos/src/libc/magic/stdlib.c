@@ -1193,7 +1193,7 @@ $int64_t strto64_r([[in]] char const *__restrict nptr,
 @@exec /*   */ global SIGNED = !"${T}".@startswith@("u");@@
 @@exec /*   */ global BITS = "${T}".@strip@("uint_t");@@
 @@exec /*   */ global su = SIGNED ? "s" : "u";@@
-@@exec /*   */ global TU = SIGNED ? "u${T}" : "${T}";@@
+@@exec /*   */ global TU = "__UINT" + BITS + "_TYPE__";@@
 @@if SIGNED@@
 	char sign;
 @@endif@@
