@@ -39,7 +39,19 @@ if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$EXEPATH" ]; then
 		cmd cp -R "$SRCPATH" "$SYSROOT_BINUTILS_TARGET/opt/"
 	fi
 	cmd cd "$OPTPATH"
-	cmd bash configure CC="$CC" CFLAGS="-ggdb"
+	cmd bash configure \
+		--enable-2player \
+		--disable-joystick \
+		--disable-network \
+		--disable-curses \
+		--disable-xlib \
+		--disable-allegro \
+		--enable-term_resizing \
+		--enable-menu \
+		--enable-blockstyles \
+		--disable-pctimer \
+		CC="$CC" \
+		CFLAGS="-ggdb"
 	cmd make -j $MAKE_PARALLEL_COUNT
 fi
 install_file /bin/vitetris "$EXEPATH"
