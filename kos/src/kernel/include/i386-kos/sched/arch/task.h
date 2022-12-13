@@ -102,8 +102,9 @@ FORCELOCAL ATTR_ARTIFICIAL unsigned int NOTHROW(__x86_task_tryyield_or_pause)(vo
  * that causes `__asm__ __volatile__' by  itself to be considered  as
  * NOTHROW, forcing one to wrap by an inline function:
  *     https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94357
+ * @throws: E_WOULDBLOCK_PREEMPTED: When preemption is disabled.
  */
-FORCELOCAL ATTR_ARTIFICIAL void (__x86_task_yield)(void) {
+FORCELOCAL ATTR_ARTIFICIAL void (__x86_task_yield)(void) /*THROWS(E_WOULDBLOCK_PREEMPTED)*/ {
 #ifdef __x86_64__
 	__asm__ __volatile__("call task_yield" : : : "%rax", "%rcx", "memory");
 #else /* __x86_64__ */
@@ -326,7 +327,7 @@ NOTHROW(__x86_preemption_pop)(pflag_t flag) {
  * >>     {
  * >>         irr = GET_KERNEL_STACK_BASE() - sizeof(struct irregs_user);
  * >>     }
- * >>     memcpy(&PERTASK(this_x86_sysret_iret),irr,
+ * >>     memcpy(&PERTASK(this_x86_sysret_iret), irr,
  * >>            sizeof(struct irregs_kernel));
  * >>     irr->ir_eip    = &x86_userexcept_sysret;
  * >>     irr->ir_cs     = SEGMENT_KERNEL_CS;
@@ -392,6 +393,9 @@ NOTHROW(FCALL x86_get_irregs)(struct task const *__restrict thread);
  * These functions always get/set the registers that they'd appear WITHOUT RPC redirection:
  * - If `x86_userexcept_sysret' wasn't injected: access `self->[...]'
  * - If `x86_userexcept_sysret' was injected:    access `this_x86_sysret_iret.[...]'
+ *
+ * These functions must _ONLY_ be used when `self' points into the calling thread's
+ * stack. DON'T use these to  try and set the  registers of some different  thread.
  */
 
 /* Check if `self' returns to user-space. */
