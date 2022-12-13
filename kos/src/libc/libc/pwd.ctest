@@ -29,7 +29,6 @@
 #include <kos/types.h>
 #include <system-test/ctest.h>
 
-#include <assert.h>
 #include <errno.h>
 #include <grp.h>
 #include <pwd.h>
@@ -49,12 +48,12 @@ PRIVATE char const pwdfile[] =
 
 DEFINE_TEST(passwd) {
 	struct passwd *ent;
-	FILE *pwd = fmemopen((void *)pwdfile, sizeof(pwdfile) - sizeof(char), "r");
-	assertf(pwd, "%m");
+	FILE *pwd;
+	ISnonnullf((pwd = fmemopen((void *)pwdfile, sizeof(pwdfile) - sizeof(char), "r")), "%m");
 
 	errno = EOK;
-	ent = fgetpwent(pwd);
-	assertf(ent, "%m");
+	ISnonnullf((ent = fgetpwent(pwd)), "%m");
+	EQerrno(EOK);
 	EQstr("pw_name", ent->pw_name);
 	EQstr("pw_passwd", ent->pw_passwd);
 	EQ((uid_t)1234, ent->pw_uid);
@@ -63,8 +62,8 @@ DEFINE_TEST(passwd) {
 	EQstr("pw_dir", ent->pw_dir);
 	EQstr("pw_shell", ent->pw_shell);
 
-	ent = fgetpwent(pwd);
-	assertf(ent, "%m");
+	ISnonnullf((ent = fgetpwent(pwd)), "%m");
+	EQerrno(EOK);
 	EQstr("pw_name", ent->pw_name);
 	EQstr("pw_passwd", ent->pw_passwd);
 	EQ((uid_t)1234, ent->pw_uid);
@@ -73,8 +72,8 @@ DEFINE_TEST(passwd) {
 	EQstr("pw_dir", ent->pw_dir);
 	EQstr("pw_shell", ent->pw_shell);
 
-	ent = fgetpwent(pwd);
-	assertf(ent, "%m");
+	ISnonnullf((ent = fgetpwent(pwd)), "%m");
+	EQerrno(EOK);
 	EQstr("pw_name", ent->pw_name);
 	EQstr("pw_passwd", ent->pw_passwd);
 	EQ((uid_t)1234, ent->pw_uid);
@@ -83,8 +82,8 @@ DEFINE_TEST(passwd) {
 	EQstr("", ent->pw_dir);
 	EQstr("", ent->pw_shell);
 
-	ent = fgetpwent(pwd);
-	assert(!ent);
+	ISnull((ent = fgetpwent(pwd)));
+	EQerrno(EOK);
 	EQ(0, fclose(pwd));
 }
 
@@ -101,27 +100,27 @@ PRIVATE char const grpfile[] =
 
 DEFINE_TEST(group) {
 	struct group *ent;
-	FILE *grp = fmemopen((void *)grpfile, sizeof(grpfile) - sizeof(char), "r");
-	assertf(grp, "%m");
+	FILE *grp;
+	ISnonnullf((grp = fmemopen((void *)grpfile, sizeof(grpfile) - sizeof(char), "r")), "%m");
 
 	errno = EOK;
-	ent = fgetgrent(grp);
-	assertf(ent, "%m");
+	ISnonnullf((ent = fgetgrent(grp)), "%m");
+	EQerrno(EOK);
 	EQstr("gr_name", ent->gr_name);
 	EQstr("gr_passwd", ent->gr_passwd);
 	EQ((gid_t)1234, ent->gr_gid);
 	ISnull(ent->gr_mem[0]);
 
-	ent = fgetgrent(grp);
-	assertf(ent, "%m");
+	ISnonnullf((ent = fgetgrent(grp)), "%m");
+	EQerrno(EOK);
 	EQstr("gr_name", ent->gr_name);
 	EQstr("gr_passwd", ent->gr_passwd);
 	EQ((gid_t)1234, ent->gr_gid);
 	EQstr("", ent->gr_mem[0]);
 	ISnull(ent->gr_mem[1]);
 
-	ent = fgetgrent(grp);
-	assertf(ent, "%m");
+	ISnonnullf((ent = fgetgrent(grp)), "%m");
+	EQerrno(EOK);
 	EQstr("gr_name", ent->gr_name);
 	EQstr("gr_passwd", ent->gr_passwd);
 	EQ((gid_t)1234, ent->gr_gid);
@@ -129,8 +128,8 @@ DEFINE_TEST(group) {
 	EQstr("", ent->gr_mem[1]);
 	ISnull(ent->gr_mem[2]);
 
-	ent = fgetgrent(grp);
-	assertf(ent, "%m");
+	ISnonnullf((ent = fgetgrent(grp)), "%m");
+	EQerrno(EOK);
 	EQstr("gr_name", ent->gr_name);
 	EQstr("gr_passwd", ent->gr_passwd);
 	EQ((gid_t)1234, ent->gr_gid);
@@ -139,8 +138,8 @@ DEFINE_TEST(group) {
 	EQstr("...", ent->gr_mem[2]);
 	ISnull(ent->gr_mem[3]);
 
-	ent = fgetgrent(grp);
-	assert(!ent);
+	ISnull((ent = fgetgrent(grp)));
+	EQerrno(EOK);
 	EQ(0, fclose(grp));
 }
 

@@ -29,7 +29,6 @@
 #include <kos/types.h>
 #include <system-test/ctest.h>
 
-#include <assert.h>
 #include <errno.h>
 #include <signal.h>
 #include <stddef.h>
@@ -49,8 +48,7 @@ DEFINE_TEST(sigsuspend) {
 	sigset_t mask, omask;
 
 	/* Install a custom signal handler. */
-	oldhand = signal(SIGUSR1, &myhandler);
-	NE(SIG_ERR, oldhand);
+	NE(SIG_ERR, (oldhand = signal(SIGUSR1, &myhandler)));
 
 	/* Mask all signals. */
 	EQ(0, sigfillset(&mask));

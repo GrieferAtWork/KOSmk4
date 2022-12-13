@@ -51,7 +51,7 @@ PRIVATE void r_close(fd_t minfd, fd_t maxfd, int method) {
 	if (minfd > maxfd)
 		return;
 	if (method == METHOD_CLOSE_RANGE) {
-		close_range((unsigned int)minfd, (unsigned int)maxfd, 0);
+		EQ(0, close_range((unsigned int)minfd, (unsigned int)maxfd, 0));
 	} else if (method == METHOD_UP) {
 		unsigned int count;
 		count = (unsigned int)(maxfd - minfd) + 1;

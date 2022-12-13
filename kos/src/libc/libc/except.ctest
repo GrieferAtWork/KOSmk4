@@ -89,41 +89,41 @@ DEFINE_TEST(kernel_exceptions_function_correctly_with_cxx_handlers) {
 	assert(reached_outer);
 
 	/* Also make sure that `except_name()' works correctly. */
-	EQstr(except_name(EXCEPT_CODEOF(E_OK)), /*                                */ "E_OK");
-	EQstr(except_name(EXCEPT_CODEOF(E_BADALLOC)), /*                          */ "E_BADALLOC");
-	EQstr(except_name(EXCEPT_CODEOF(E_BADALLOC_INSUFFICIENT_SWAP_SPACE)), /*  */ "E_BADALLOC_INSUFFICIENT_SWAP_SPACE");
-	EQstr(except_name(EXCEPT_CODEOF(E_INVALID_HANDLE)), /*                    */ "E_INVALID_HANDLE");
-	EQstr(except_name(EXCEPT_CODEOF(E_INVALID_HANDLE_NET_OPERATION)), /*      */ "E_INVALID_HANDLE_NET_OPERATION");
-	EQstr(except_name(EXCEPT_CODEOF(E_FSERROR)), /*                           */ "E_FSERROR");
-	EQstr(except_name(EXCEPT_CODEOF(E_FSERROR_DELETED)), /*                   */ "E_FSERROR_DELETED");
-	EQstr(except_name(EXCEPT_CODEOF(E_FSERROR_IS_A_MOUNTING_POINT)), /*       */ "E_FSERROR_IS_A_MOUNTING_POINT");
-	EQstr(except_name(EXCEPT_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION)), /*     */ "E_FSERROR_UNSUPPORTED_OPERATION");
-	EQstr(except_name(EXCEPT_CODEOF(E_NET_ERROR)), /*                         */ "E_NET_ERROR");
-	EQstr(except_name(EXCEPT_CODEOF(E_NET_HOST_UNREACHABLE)), /*              */ "E_NET_HOST_UNREACHABLE");
-	EQstr(except_name(EXCEPT_CODEOF(E_NOT_EXECUTABLE_NOT_A_BINARY)), /*       */ "E_NOT_EXECUTABLE_NOT_A_BINARY");
-	EQstr(except_name(EXCEPT_CODEOF(E_INSUFFICIENT_RIGHTS)), /*               */ "E_INSUFFICIENT_RIGHTS");
-	EQstr(except_name(EXCEPT_CODEOF(E_BUFFER_TOO_SMALL)), /*                  */ "E_BUFFER_TOO_SMALL");
-	EQstr(except_name(EXCEPT_CODEOF(E_INTERRUPT)), /*                         */ "E_INTERRUPT");
-	EQstr(except_name(EXCEPT_CODEOF(E_EXIT_THREAD)), /*                       */ "E_EXIT_THREAD");
-	EQstr(except_name(EXCEPT_CODEOF(E_EXIT_PROCESS)), /*                      */ "E_EXIT_PROCESS");
-	EQstr(except_name(EXCEPT_CODEOF(E_UNHANDLED_INTERRUPT)), /*               */ "E_UNHANDLED_INTERRUPT");
-	EQstr(except_name(EXCEPT_CODEOF(E_SEGFAULT)), /*                          */ "E_SEGFAULT");
-	EQstr(except_name(EXCEPT_CODEOF(E_SEGFAULT_UNMAPPED)), /*                 */ "E_SEGFAULT_UNMAPPED");
-	EQstr(except_name(EXCEPT_CODEOF(E_BREAKPOINT)), /*                        */ "E_BREAKPOINT");
-	EQstr(except_name(EXCEPT_CODEOF(E_DIVIDE_BY_ZERO)), /*                    */ "E_DIVIDE_BY_ZERO");
-	EQstr(except_name(EXCEPT_CODEOF(E_OVERFLOW)), /*                          */ "E_OVERFLOW");
-	EQstr(except_name(EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION)), /*               */ "E_ILLEGAL_INSTRUCTION");
-	EQstr(except_name(EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND)), /*   */ "E_ILLEGAL_INSTRUCTION_BAD_OPERAND");
+	EQstr("E_OK" /*                                */, except_name(EXCEPT_CODEOF(E_OK)));
+	EQstr("E_BADALLOC" /*                          */, except_name(EXCEPT_CODEOF(E_BADALLOC)));
+	EQstr("E_BADALLOC_INSUFFICIENT_SWAP_SPACE" /*  */, except_name(EXCEPT_CODEOF(E_BADALLOC_INSUFFICIENT_SWAP_SPACE)));
+	EQstr("E_INVALID_HANDLE" /*                    */, except_name(EXCEPT_CODEOF(E_INVALID_HANDLE)));
+	EQstr("E_INVALID_HANDLE_NET_OPERATION" /*      */, except_name(EXCEPT_CODEOF(E_INVALID_HANDLE_NET_OPERATION)));
+	EQstr("E_FSERROR" /*                           */, except_name(EXCEPT_CODEOF(E_FSERROR)));
+	EQstr("E_FSERROR_DELETED" /*                   */, except_name(EXCEPT_CODEOF(E_FSERROR_DELETED)));
+	EQstr("E_FSERROR_IS_A_MOUNTING_POINT" /*       */, except_name(EXCEPT_CODEOF(E_FSERROR_IS_A_MOUNTING_POINT)));
+	EQstr("E_FSERROR_UNSUPPORTED_OPERATION" /*     */, except_name(EXCEPT_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION)));
+	EQstr("E_NET_ERROR" /*                         */, except_name(EXCEPT_CODEOF(E_NET_ERROR)));
+	EQstr("E_NET_HOST_UNREACHABLE" /*              */, except_name(EXCEPT_CODEOF(E_NET_HOST_UNREACHABLE)));
+	EQstr("E_NOT_EXECUTABLE_NOT_A_BINARY" /*       */, except_name(EXCEPT_CODEOF(E_NOT_EXECUTABLE_NOT_A_BINARY)));
+	EQstr("E_INSUFFICIENT_RIGHTS" /*               */, except_name(EXCEPT_CODEOF(E_INSUFFICIENT_RIGHTS)));
+	EQstr("E_BUFFER_TOO_SMALL" /*                  */, except_name(EXCEPT_CODEOF(E_BUFFER_TOO_SMALL)));
+	EQstr("E_INTERRUPT" /*                         */, except_name(EXCEPT_CODEOF(E_INTERRUPT)));
+	EQstr("E_EXIT_THREAD" /*                       */, except_name(EXCEPT_CODEOF(E_EXIT_THREAD)));
+	EQstr("E_EXIT_PROCESS" /*                      */, except_name(EXCEPT_CODEOF(E_EXIT_PROCESS)));
+	EQstr("E_UNHANDLED_INTERRUPT" /*               */, except_name(EXCEPT_CODEOF(E_UNHANDLED_INTERRUPT)));
+	EQstr("E_SEGFAULT" /*                          */, except_name(EXCEPT_CODEOF(E_SEGFAULT)));
+	EQstr("E_SEGFAULT_UNMAPPED" /*                 */, except_name(EXCEPT_CODEOF(E_SEGFAULT_UNMAPPED)));
+	EQstr("E_BREAKPOINT" /*                        */, except_name(EXCEPT_CODEOF(E_BREAKPOINT)));
+	EQstr("E_DIVIDE_BY_ZERO" /*                    */, except_name(EXCEPT_CODEOF(E_DIVIDE_BY_ZERO)));
+	EQstr("E_OVERFLOW" /*                          */, except_name(EXCEPT_CODEOF(E_OVERFLOW)));
+	EQstr("E_ILLEGAL_INSTRUCTION" /*               */, except_name(EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION)));
+	EQstr("E_ILLEGAL_INSTRUCTION_BAD_OPERAND" /*   */, except_name(EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_BAD_OPERAND)));
 #ifdef E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX
-	EQstr(except_name(EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX)), /**/ "E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX");
+	EQstr("E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX" /**/, except_name(EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX)));
 #endif /* E_ILLEGAL_INSTRUCTION_X86_BAD_PREFIX */
 #ifdef E_ILLEGAL_INSTRUCTION_X86_INTERRUPT
-	EQstr(except_name(EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT)), /* */ "E_ILLEGAL_INSTRUCTION_X86_INTERRUPT");
+	EQstr("E_ILLEGAL_INSTRUCTION_X86_INTERRUPT" /* */, except_name(EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_X86_INTERRUPT)));
 #endif /* E_ILLEGAL_INSTRUCTION_X86_INTERRUPT */
-	EQstr(except_name(EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER)), /*      */ "E_ILLEGAL_INSTRUCTION_REGISTER");
-	EQstr(except_name(EXCEPT_CODEOF(E_STACK_OVERFLOW)), /*                    */ "E_STACK_OVERFLOW");
-	EQstr(except_name(EXCEPT_CODEOF(E_INDEX_ERROR)), /*                       */ "E_INDEX_ERROR");
-	EQstr(except_name(EXCEPT_CODEOF(E_INDEX_ERROR_OUT_OF_BOUNDS)), /*         */ "E_INDEX_ERROR_OUT_OF_BOUNDS");
+	EQstr("E_ILLEGAL_INSTRUCTION_REGISTER" /*      */, except_name(EXCEPT_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER)));
+	EQstr("E_STACK_OVERFLOW" /*                    */, except_name(EXCEPT_CODEOF(E_STACK_OVERFLOW)));
+	EQstr("E_INDEX_ERROR" /*                       */, except_name(EXCEPT_CODEOF(E_INDEX_ERROR)));
+	EQstr("E_INDEX_ERROR_OUT_OF_BOUNDS" /*         */, except_name(EXCEPT_CODEOF(E_INDEX_ERROR_OUT_OF_BOUNDS)));
 }
 
 

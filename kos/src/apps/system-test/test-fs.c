@@ -251,23 +251,16 @@ PRIVATE void testPath(char const *path) {
 		EQ(0, fstatat(dfd, "test2", &st2, 0));
 
 		/* Should be the same file. */
-		assertf(bcmp(&st1, &st2, sizeof(struct stat)) == 0,
-		        "st1:\n%$[hex]\n"
-		        "st2:\n%$[hex]\n",
-		        sizeof(st1), &st1,
-		        sizeof(st2), &st2);
-
+		EQmem(&st1, &st2, sizeof(struct stat));
 		assertf(S_ISREG(st1.st_mode),
 		        "%q (%#" PRIxN(__SIZEOF_MODE_T__) ")",
 		        (strmode(st1.st_mode, modestr), modestr),
 		        st1.st_mode);
-		assertf((st1.st_mode & 0777) == 0444,
-		        "%q (%#" PRIxN(__SIZEOF_MODE_T__) ")",
-		        (strmode(st1.st_mode, modestr), modestr),
-		        st1.st_mode);
-		assertf(st1.st_size == 3,
-		        "st1.st_size = %#" PRIxN(__SIZEOF_POS_T__),
-		        (pos_t)st1.st_size);
+		EQf(0444, st1.st_mode & 0777,
+		    "%q (%#" PRIxN(__SIZEOF_MODE_T__) ")",
+		    (strmode(st1.st_mode, modestr), modestr),
+		    st1.st_mode);
+		EQ(3, st1.st_size);
 
 		/* Verify the text contents of both files */
 		assertFileText(dfd, "test", "HL1");

@@ -158,9 +158,8 @@ PRIVATE void do_test_codec(byte_t const *codec) {
 
 DEFINE_TEST(json_codecs) {
 	void *libjson;
-	libjson = dlopen(LIBJSON_LIBRARY_NAME, RTLD_LOCAL);
-	assertf(libjson, "dlerror(): %s", dlerror());
-#define DLSYM(x) (*(void **)&x = dlsym(libjson, #x), assertf(x, "dlerror(): %s", dlerror()))
+	ISnonnullf((libjson = dlopen(LIBJSON_LIBRARY_NAME, RTLD_LOCAL)), "%s", dlerror());
+#define DLSYM(x) ISnonnullf((*(void **)&x = dlsym(libjson, #x)), "%s", dlerror())
 	DLSYM(json_parser_init);
 	DLSYM(json_decode);
 	DLSYM(json_encode);
@@ -188,7 +187,7 @@ DEFINE_TEST(json_codecs) {
 		EQ(20, value);
 	}
 
-	dlclose(libjson);
+	EQ(0, dlclose(libjson));
 }
 
 

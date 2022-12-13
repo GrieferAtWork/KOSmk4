@@ -567,10 +567,12 @@ NOTHROW_NCX(LIBCCALL libc_close_range)(unsigned int minfd,
 }
 /*[[[end:libc_close_range]]]*/
 
-/*[[[head:libd_access,hash:CRC-32=0x614462fe]]]*/
+/*[[[head:libd_access,hash:CRC-32=0x33b8235a]]]*/
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `file', testing for `type' */
+ * Test for access to the specified file `file', testing for `type'
+ * @return: 0 : Access would be granted
+ * @return: -1: Access would be denied (s.a. `errno') */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.fs.property") WUNUSED ATTR_IN(1) int
 NOTHROW_RPC(LIBDCALL libd_access)(char const *file,
                                   __STDC_INT_AS_UINT_T type)
@@ -580,10 +582,12 @@ NOTHROW_RPC(LIBDCALL libd_access)(char const *file,
 }
 /*[[[end:libd_access]]]*/
 
-/*[[[head:libc_access,hash:CRC-32=0xa04c6382]]]*/
+/*[[[head:libc_access,hash:CRC-32=0x2a318517]]]*/
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `file', testing for `type' */
+ * Test for access to the specified file `file', testing for `type'
+ * @return: 0 : Access would be granted
+ * @return: -1: Access would be denied (s.a. `errno') */
 INTERN ATTR_SECTION(".text.crt.fs.property") WUNUSED ATTR_IN(1) int
 NOTHROW_RPC(LIBCCALL libc_access)(char const *file,
                                   __STDC_INT_AS_UINT_T type)

@@ -41,9 +41,9 @@ DECL_BEGIN
 DEFINE_TEST(libdl_aux_sections) {
 	struct dl_section *sect;
 	/* Test auxiliary sections. */
-	sect = dllocksection(dlopen(NULL, 0), ".elf.ehdr",
-	                     DLLOCKSECTION_FNORMAL);
-	assertf(sect, "%s", dlerror());
+	ISnonnullf((sect = dllocksection(dlopen(NULL, 0), ".elf.ehdr",
+	                                 DLLOCKSECTION_FNORMAL)),
+	           "%s", dlerror());
 	EQ(sizeof(ElfW(Ehdr)), sect->ds_size);
 	{
 		ElfW(Ehdr) *ehdr;
@@ -65,18 +65,15 @@ DEFINE_TEST(libdl_fromaddr) {
 	/* Don't pass a pointer to `dlopen' because that  address
 	 * may (read: is) part of the main programs .plt where it
 	 * exists as an indirection to call the real function. */
-	raw_dlopen = dlsym(RTLD_DEFAULT, "dlopen");
-	assertf(raw_dlopen, "%s", dlerror());
-	mod = dlgethandle(raw_dlopen, DLGETHANDLE_FNORMAL);
-	assertf(mod, "%s", dlerror());
-	name = dlmodulename(mod);
-	assertf(name, "%s", dlerror());
-	assertf(strcmp(basename(name), "libdl.so") == 0, "%q", name);
+	ISnonnullf((raw_dlopen = dlsym(RTLD_DEFAULT, "dlopen")), "%s", dlerror());
+	ISnonnullf((mod = dlgethandle(raw_dlopen, DLGETHANDLE_FNORMAL)), "%s", dlerror());
+	ISnonnullf((name = dlmodulename(mod)), "%s", dlerror());
+	EQstrf("libdl.so", basename(name), "name:%q", name);
 
 	/* Test for the primary application. */
-	mod = dlgethandle(&my_static, DLGETHANDLE_FNORMAL);
-	assertf(mod, "%s", dlerror());
-	EQ(mod, dlopen(NULL, 0));
+	ISnonnullf((mod = dlgethandle(&my_static, DLGETHANDLE_FNORMAL)), "%s", dlerror());
+	ISnonnullf(dlopen(NULL, 0), "%s", dlerror());
+	EQ(dlopen(NULL, 0), mod);
 }
 
 
@@ -129,11 +126,12 @@ DEFINE_TEST(libdl_builtins) {
 	 * because some of them have  special code paths used  for
 	 * lazy initialization. */
 	unsigned int i;
-	void *libdl = dlgetmodule("dl", DLGETHANDLE_FNORMAL);
-	assertf(libdl, "%s", dlerror());
+	void *libdl;
+	ISnonnullf((libdl = dlgetmodule("dl", DLGETHANDLE_FNORMAL)), "%s", dlerror());
 	for (i = 0; i < lengthof(libdl_symbols); ++i) {
-		void *sym = dlsym(libdl, libdl_symbols[i]);
-		assertf(sym, "%s:%s", libdl_symbols[i], dlerror());
+		void *sym;
+		ISnonnullf((sym = dlsym(libdl, libdl_symbols[i])),
+		           "%s:%s", libdl_symbols[i], dlerror());
 	}
 }
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c9d4ba3 */
+/* HASH CRC-32:0x87a65853 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -208,11 +208,15 @@ INTDEF WUNUSED fd_t NOTHROW_NCX(LIBCCALL libc_dup)(fd_t fd);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_close)(fd_t fd);
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `file', testing for `type' */
+ * Test for access to the specified file `file', testing for `type'
+ * @return: 0 : Access would be granted
+ * @return: -1: Access would be denied (s.a. `errno') */
 INTDEF WUNUSED ATTR_IN(1) int NOTHROW_RPC(LIBDCALL libd_access)(char const *file, __STDC_INT_AS_UINT_T type);
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `file', testing for `type' */
+ * Test for access to the specified file `file', testing for `type'
+ * @return: 0 : Access would be granted
+ * @return: -1: Access would be denied (s.a. `errno') */
 INTDEF WUNUSED ATTR_IN(1) int NOTHROW_RPC(LIBCCALL libc_access)(char const *file, __STDC_INT_AS_UINT_T type);
 /* >> chdir(2)
  * Change the current working directory to `path' */

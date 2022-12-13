@@ -28,35 +28,28 @@
 
 #include <uchar.h>
 #include <unicode.h>
-#include <assert.h>
 
 DECL_BEGIN
 
 DEFINE_TEST(unicode) {
 	char32_t wc;
-	size_t error;
 	mbstate_t mbs;
 	PRIVATE unsigned char const data[] = { 0xe2, 0x99, 0xa0, 7, 8, 9 };
-	mbs = MBSTATE_INIT;
-	error = unicode_c8toc32(&wc, (char *)data, 0, &mbs);
-	EQ((size_t)-2, error); /* Incomplete */
+	mbstate_init(&mbs);
+	EQ((size_t)-2, unicode_c8toc32(&wc, (char *)data, 0, &mbs)); /* Incomplete */
 
-	mbs = MBSTATE_INIT;
-	error = unicode_c8toc32(&wc, (char *)data, 1, &mbs);
-	EQ((size_t)-2, error); /* Incomplete */
+	mbstate_init(&mbs);
+	EQ((size_t)-2, unicode_c8toc32(&wc, (char *)data, 1, &mbs)); /* Incomplete */
 
-	mbs = MBSTATE_INIT;
-	error = unicode_c8toc32(&wc, (char *)data, 2, &mbs);
-	EQ((size_t)-2, error); /* Incomplete */
+	mbstate_init(&mbs);
+	EQ((size_t)-2, unicode_c8toc32(&wc, (char *)data, 2, &mbs)); /* Incomplete */
 
-	mbs = MBSTATE_INIT;
-	error = unicode_c8toc32(&wc, (char *)data, 3, &mbs);
-	EQ(3, error);
+	mbstate_init(&mbs);
+	EQ(3, unicode_c8toc32(&wc, (char *)data, 3, &mbs));
 	EQ(0x2660, wc);
 
-	mbs = MBSTATE_INIT;
-	error = unicode_c8toc32(&wc, (char *)data, 6, &mbs);
-	EQ(3, error);
+	mbstate_init(&mbs);
+	EQ(3, unicode_c8toc32(&wc, (char *)data, 6, &mbs));
 	EQ(0x2660, wc);
 }
 

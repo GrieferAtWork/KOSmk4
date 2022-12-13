@@ -68,10 +68,10 @@ DEFINE_TEST(fifo) {
 	EQ(6, write(wr, "foobar", 6));
 
 	EQ(3, read(rd, buf, 3));
-	assertf(bcmp(buf, "foo", 3) == 0, "%$q", 3, buf);
+	EQmem("foo", buf, 3);
 
 	EQ(3, read(rd, buf, 3));
-	assertf(bcmp(buf, "bar", 3) == 0, "%$q", 3, buf);
+	EQmem("bar", buf, 3);
 
 	/* The fifo should now be empty,  but because `wr' is still  opened,
 	 * attempting to read from it should trigger EWOULDBLOCK (or EAGAIN,
@@ -96,19 +96,19 @@ DEFINE_TEST(fifo) {
 	EQerrno(EWOULDBLOCK);
 
 	/* Ensure that we can use frealpath() with named pipes! */
-	assertf(frealpath(wr, buf, sizeof(buf)) == buf, "%m");
+	EQf(buf, frealpath(wr, buf, sizeof(buf)), "%m");
 	EQstr(FIFO_NAME, buf);
-	assertf(frealpath(rd, buf, sizeof(buf)) == buf, "%m");
+	EQf(buf, frealpath(rd, buf, sizeof(buf)), "%m");
 	EQstr(FIFO_NAME, buf);
 
 	/* Also verify that readlink("/proc/self/fd") works with named pipes! */
-	sprintf(buf, "/proc/self/fd/%d", wr);
+	ISpos(sprintf(buf, "/proc/self/fd/%d", wr));
 	EQ(strlen(FIFO_NAME), readlink(buf, buf, sizeof(buf)));
-	assertf(bcmp(buf, FIFO_NAME, strlen(FIFO_NAME) * sizeof(char)) == 0, "%$q", buf);
+	EQmem(FIFO_NAME, buf, strlen(FIFO_NAME) * sizeof(char));
 
-	sprintf(buf, "/proc/self/fd/%d", rd);
+	ISpos(sprintf(buf, "/proc/self/fd/%d", rd));
 	EQ(strlen(FIFO_NAME), readlink(buf, buf, sizeof(buf)));
-	assertf(bcmp(buf, FIFO_NAME, strlen(FIFO_NAME) * sizeof(char)) == 0, "%$q", buf);
+	EQmem(FIFO_NAME, buf, strlen(FIFO_NAME) * sizeof(char));
 
 	/* Delete the FIFO */
 	EQ(0, unlink(FIFO_NAME));

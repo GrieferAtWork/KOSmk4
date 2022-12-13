@@ -47,10 +47,8 @@ DEFINE_TEST(instrlen_x86_prevent_jcc_regression) {
 	};
 	void *libinstrlen;
 	PINSTRUCTION_SUCC instruction_succ;
-	libinstrlen = dlopen(LIBINSTRLEN_LIBRARY_NAME, RTLD_LOCAL);
-	assertf(libinstrlen, "dlerror(): %s", dlerror());
-	*(void **)&instruction_succ = dlsym(libinstrlen, "instruction_succ");
-	assertf(instruction_succ, "dlerror(): %s", dlerror());
+	ISnonnullf((libinstrlen = dlopen(LIBINSTRLEN_LIBRARY_NAME, RTLD_LOCAL)), "%s", dlerror());
+	ISnonnullf((*(void **)&instruction_succ = dlsym(libinstrlen, "instruction_succ")), "%s", dlerror());
 
 #define EQcodeptr(a, b)                                             \
 	do {                                                            \

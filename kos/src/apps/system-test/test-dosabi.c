@@ -28,7 +28,6 @@
 #include <kos/types.h>
 #include <system-test/ctest.h>
 
-#include <assert.h>
 #include <string.h>
 
 DECL_BEGIN

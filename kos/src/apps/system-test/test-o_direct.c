@@ -57,7 +57,7 @@ do_o_direct_test(char const *filename) {
 	unlink(filename);
 	fd = open(filename, O_CREAT | O_EXCL | O_DIRECT | O_RDWR, 0644); /* NOLINT */
 	if (fd < 0) {
-		if (bcmp(filename, "/var/", 5 * sizeof(char)) == 0)
+		if (bcmp(filename, "/var/", 5, sizeof(char)) == 0)
 			mkdir("/var/", 755);
 		ISpos((fd = open(filename, O_CREAT | O_EXCL | O_DIRECT | O_RDWR, 0644))); /* NOLINT */
 	}
@@ -72,8 +72,9 @@ do_o_direct_test(char const *filename) {
 
 	/* Allocate a properly aligned (and sized) buffer for I/O on at least 64 bytes. */
 	bufsize = CEIL_ALIGN(64, blocksize);
-	buf     = memalign(blockalign, bufsize);
-	assertf(buf, "memalign(%" PRIuSIZ ", %" PRIuSIZ ") failed", blockalign, bufsize);
+	ISnonnullf((buf = memalign(blockalign, bufsize)),
+	           "memalign(%" PRIuSIZ ", %" PRIuSIZ ") failed",
+	           blockalign, bufsize);
 	bzero(buf, bufsize);
 	strcpy((char *)buf, "Test Data!");
 
@@ -95,7 +96,7 @@ do_o_direct_test(char const *filename) {
 	/* Now to actually do I/O */
 	EQ(bufsize, pwrite(fd, buf, bufsize, 0));
 	EQ(0, fstat(fd, &st));
-	EQ((uint64_t)bufsize, (uint64_t)st.st_size);
+	EQ((uint64_t)st.st_size, (uint64_t)bufsize);
 
 	/* Also make sure that we can read back data. */
 	memset(buf, 0xcc, bufsize);

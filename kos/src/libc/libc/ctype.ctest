@@ -58,117 +58,117 @@ DECL_BEGIN
 
 static void testc(int ch) {
 	/* <ctype.h> */
-	assertf(ascii_tolower(ch) == tolower(ch), "%d", ch);
-	assertf(ascii_toupper(ch) == toupper(ch), "%d", ch);
-	assertf(!!ascii_iscntrl(ch) == !!iscntrl(ch), "%d", ch);
-	assertf(!!ascii_isspace(ch) == !!isspace(ch), "%d", ch);
-	assertf(!!ascii_isupper(ch) == !!isupper(ch), "%d", ch);
-	assertf(!!ascii_islower(ch) == !!islower(ch), "%d", ch);
-	assertf(!!ascii_isalpha(ch) == !!isalpha(ch), "%d", ch);
-	assertf(!!ascii_isdigit(ch) == !!isdigit(ch), "%d", ch);
-	assertf(!!ascii_isxdigit(ch) == !!isxdigit(ch), "%d", ch);
-	assertf(!!ascii_isalnum(ch) == !!isalnum(ch), "%d", ch);
-	assertf(!!ascii_ispunct(ch) == !!ispunct(ch), "%d", ch);
-	assertf(!!ascii_isgraph(ch) == !!isgraph(ch), "%d", ch);
-	assertf(!!ascii_isprint(ch) == !!isprint(ch), "%d", ch);
-	assertf(!!ascii_isblank(ch) == !!isblank(ch), "%d", ch);
+	EQf(ascii_tolower(ch), tolower(ch), "%d", ch);
+	EQf(ascii_toupper(ch), toupper(ch), "%d", ch);
+	EQf(!!ascii_iscntrl(ch), !!iscntrl(ch), "%d", ch);
+	EQf(!!ascii_isspace(ch), !!isspace(ch), "%d", ch);
+	EQf(!!ascii_isupper(ch), !!isupper(ch), "%d", ch);
+	EQf(!!ascii_islower(ch), !!islower(ch), "%d", ch);
+	EQf(!!ascii_isalpha(ch), !!isalpha(ch), "%d", ch);
+	EQf(!!ascii_isdigit(ch), !!isdigit(ch), "%d", ch);
+	EQf(!!ascii_isxdigit(ch), !!isxdigit(ch), "%d", ch);
+	EQf(!!ascii_isalnum(ch), !!isalnum(ch), "%d", ch);
+	EQf(!!ascii_ispunct(ch), !!ispunct(ch), "%d", ch);
+	EQf(!!ascii_isgraph(ch), !!isgraph(ch), "%d", ch);
+	EQf(!!ascii_isprint(ch), !!isprint(ch), "%d", ch);
+	EQf(!!ascii_isblank(ch), !!isblank(ch), "%d", ch);
 
 	/* <unicode.h> */
-	assertf(ascii_tolower(ch) == unicode_tolower(ch), "%d", ch);
-	assertf(ascii_toupper(ch) == unicode_toupper(ch), "%d", ch);
+	EQf(ascii_tolower(ch), unicode_tolower(ch), "%d", ch);
+	EQf(ascii_toupper(ch), unicode_toupper(ch), "%d", ch);
 	/* Unicode feature macros (may) contain optimizations based on the
 	 * sizeof() of the  given character variable.  As such, test  both
 	 * variations! */
-	assertf(!!ascii_iscntrl(ch) == !!unicode_iscntrl((char32_t)ch), "%d", ch);
-	assertf(!!ascii_iscntrl(ch) == !!unicode_iscntrl((char)ch), "%d", ch);
-	assertf(!!ascii_isspace(ch) == !!unicode_isspace((char32_t)ch), "%d", ch);
-	assertf(!!ascii_isspace(ch) == !!unicode_isspace((char)ch), "%d", ch);
-	assertf(!!ascii_isupper(ch) == !!unicode_isupper((char32_t)ch), "%d", ch);
-	assertf(!!ascii_isupper(ch) == !!unicode_isupper((char)ch), "%d", ch);
-	assertf(!!ascii_islower(ch) == !!unicode_islower((char32_t)ch), "%d", ch);
-	assertf(!!ascii_islower(ch) == !!unicode_islower((char)ch), "%d", ch);
-	assertf(!!ascii_isalpha(ch) == !!unicode_isalpha((char32_t)ch), "%d", ch);
-	assertf(!!ascii_isalpha(ch) == !!unicode_isalpha((char)ch), "%d", ch);
-	assertf(!!ascii_isdigit(ch) == !!unicode_isdigit((char32_t)ch), "%d", ch);
-	assertf(!!ascii_isdigit(ch) == !!unicode_isdigit((char)ch), "%d", ch);
-	assertf(!!ascii_isxdigit(ch) == !!unicode_isxdigit((char32_t)ch), "%d", ch);
-	assertf(!!ascii_isxdigit(ch) == !!unicode_isxdigit((char)ch), "%d", ch);
-	assertf(!!ascii_isalnum(ch) == !!unicode_isalnum((char32_t)ch), "%d", ch);
-	assertf(!!ascii_isalnum(ch) == !!unicode_isalnum((char)ch), "%d", ch);
-	assertf(!!ascii_ispunct(ch) == !!unicode_ispunct((char32_t)ch), "%d", ch);
-	assertf(!!ascii_ispunct(ch) == !!unicode_ispunct((char)ch), "%d", ch);
-	assertf(!!ascii_isgraph(ch) == !!unicode_isgraph((char32_t)ch), "%d", ch);
-	assertf(!!ascii_isgraph(ch) == !!unicode_isgraph((char)ch), "%d", ch);
-	assertf(!!ascii_isprint(ch) == !!unicode_isprint((char32_t)ch), "%d", ch);
-	assertf(!!ascii_isprint(ch) == !!unicode_isprint((char)ch), "%d", ch);
-	assertf(!!ascii_isblank(ch) == !!unicode_isblank((char32_t)ch), "%d", ch);
-	assertf(!!ascii_isblank(ch) == !!unicode_isblank((char)ch), "%d", ch);
+	EQf(!!ascii_iscntrl(ch), !!unicode_iscntrl((char32_t)ch), "%d", ch);
+	EQf(!!ascii_iscntrl(ch), !!unicode_iscntrl((char)ch), "%d", ch);
+	EQf(!!ascii_isspace(ch), !!unicode_isspace((char32_t)ch), "%d", ch);
+	EQf(!!ascii_isspace(ch), !!unicode_isspace((char)ch), "%d", ch);
+	EQf(!!ascii_isupper(ch), !!unicode_isupper((char32_t)ch), "%d", ch);
+	EQf(!!ascii_isupper(ch), !!unicode_isupper((char)ch), "%d", ch);
+	EQf(!!ascii_islower(ch), !!unicode_islower((char32_t)ch), "%d", ch);
+	EQf(!!ascii_islower(ch), !!unicode_islower((char)ch), "%d", ch);
+	EQf(!!ascii_isalpha(ch), !!unicode_isalpha((char32_t)ch), "%d", ch);
+	EQf(!!ascii_isalpha(ch), !!unicode_isalpha((char)ch), "%d", ch);
+	EQf(!!ascii_isdigit(ch), !!unicode_isdigit((char32_t)ch), "%d", ch);
+	EQf(!!ascii_isdigit(ch), !!unicode_isdigit((char)ch), "%d", ch);
+	EQf(!!ascii_isxdigit(ch), !!unicode_isxdigit((char32_t)ch), "%d", ch);
+	EQf(!!ascii_isxdigit(ch), !!unicode_isxdigit((char)ch), "%d", ch);
+	EQf(!!ascii_isalnum(ch), !!unicode_isalnum((char32_t)ch), "%d", ch);
+	EQf(!!ascii_isalnum(ch), !!unicode_isalnum((char)ch), "%d", ch);
+	EQf(!!ascii_ispunct(ch), !!unicode_ispunct((char32_t)ch), "%d", ch);
+	EQf(!!ascii_ispunct(ch), !!unicode_ispunct((char)ch), "%d", ch);
+	EQf(!!ascii_isgraph(ch), !!unicode_isgraph((char32_t)ch), "%d", ch);
+	EQf(!!ascii_isgraph(ch), !!unicode_isgraph((char)ch), "%d", ch);
+	EQf(!!ascii_isprint(ch), !!unicode_isprint((char32_t)ch), "%d", ch);
+	EQf(!!ascii_isprint(ch), !!unicode_isprint((char)ch), "%d", ch);
+	EQf(!!ascii_isblank(ch), !!unicode_isblank((char32_t)ch), "%d", ch);
+	EQf(!!ascii_isblank(ch), !!unicode_isblank((char)ch), "%d", ch);
 }
 
 static void testw(wint_t ch) {
 	if (ch == WEOF) {
-		assertf(WEOF == towlower(ch), "%d", ch);
-		assertf(WEOF == towupper(ch), "%d", ch);
+		EQf(WEOF, towlower(ch), "%d", ch);
+		EQf(WEOF, towupper(ch), "%d", ch);
 	} else {
-		assertf((wint_t)ascii_tolower(ch) == towlower(ch), "%d", ch);
-		assertf((wint_t)ascii_toupper(ch) == towupper(ch), "%d", ch);
+		EQf((wint_t)ascii_tolower(ch), towlower(ch), "%d", ch);
+		EQf((wint_t)ascii_toupper(ch), towupper(ch), "%d", ch);
 	}
-	assertf(!!ascii_iscntrl(ch) == !!iswcntrl(ch), "%d", ch);
-	assertf(!!ascii_isspace(ch) == !!iswspace(ch), "%d", ch);
-	assertf(!!ascii_isupper(ch) == !!iswupper(ch), "%d", ch);
-	assertf(!!ascii_islower(ch) == !!iswlower(ch), "%d", ch);
-	assertf(!!ascii_isalpha(ch) == !!iswalpha(ch), "%d", ch);
-	assertf(!!ascii_isdigit(ch) == !!iswdigit(ch), "%d", ch);
-	assertf(!!ascii_isxdigit(ch) == !!iswxdigit(ch), "%d", ch);
-	assertf(!!ascii_isalnum(ch) == !!iswalnum(ch), "%d", ch);
-	assertf(!!ascii_ispunct(ch) == !!iswpunct(ch), "%d", ch);
-	assertf(!!ascii_isgraph(ch) == !!iswgraph(ch), "%d", ch);
-	assertf(!!ascii_isprint(ch) == !!iswprint(ch), "%d", ch);
-	assertf(!!ascii_isblank(ch) == !!iswblank(ch), "%d", ch);
+	EQf(!!ascii_iscntrl(ch), !!iswcntrl(ch), "%d", ch);
+	EQf(!!ascii_isspace(ch), !!iswspace(ch), "%d", ch);
+	EQf(!!ascii_isupper(ch), !!iswupper(ch), "%d", ch);
+	EQf(!!ascii_islower(ch), !!iswlower(ch), "%d", ch);
+	EQf(!!ascii_isalpha(ch), !!iswalpha(ch), "%d", ch);
+	EQf(!!ascii_isdigit(ch), !!iswdigit(ch), "%d", ch);
+	EQf(!!ascii_isxdigit(ch), !!iswxdigit(ch), "%d", ch);
+	EQf(!!ascii_isalnum(ch), !!iswalnum(ch), "%d", ch);
+	EQf(!!ascii_ispunct(ch), !!iswpunct(ch), "%d", ch);
+	EQf(!!ascii_isgraph(ch), !!iswgraph(ch), "%d", ch);
+	EQf(!!ascii_isprint(ch), !!iswprint(ch), "%d", ch);
+	EQf(!!ascii_isblank(ch), !!iswblank(ch), "%d", ch);
 }
 
 static void testw16(wint16_t ch) {
 	if (ch == WEOF16) {
-		assertf(WEOF16 == tolower16(ch), "%d", ch);
-		assertf(WEOF16 == toupper16(ch), "%d", ch);
+		EQf(WEOF16, tolower16(ch), "%d", ch);
+		EQf(WEOF16, toupper16(ch), "%d", ch);
 	} else {
-		assertf((wint16_t)ascii_tolower(ch) == tolower16(ch), "%d", ch);
-		assertf((wint16_t)ascii_toupper(ch) == toupper16(ch), "%d", ch);
+		EQf((wint16_t)ascii_tolower(ch), tolower16(ch), "%d", ch);
+		EQf((wint16_t)ascii_toupper(ch), toupper16(ch), "%d", ch);
 	}
-	assertf(!!ascii_iscntrl(ch) == !!iscntrl16(ch), "%d", ch);
-	assertf(!!ascii_isspace(ch) == !!isspace16(ch), "%d", ch);
-	assertf(!!ascii_isupper(ch) == !!isupper16(ch), "%d", ch);
-	assertf(!!ascii_islower(ch) == !!islower16(ch), "%d", ch);
-	assertf(!!ascii_isalpha(ch) == !!isalpha16(ch), "%d", ch);
-	assertf(!!ascii_isdigit(ch) == !!isdigit16(ch), "%d", ch);
-	assertf(!!ascii_isxdigit(ch) == !!isxdigit16(ch), "%d", ch);
-	assertf(!!ascii_isalnum(ch) == !!isalnum16(ch), "%d", ch);
-	assertf(!!ascii_ispunct(ch) == !!ispunct16(ch), "%d", ch);
-	assertf(!!ascii_isgraph(ch) == !!isgraph16(ch), "%d", ch);
-	assertf(!!ascii_isprint(ch) == !!isprint16(ch), "%d", ch);
-	assertf(!!ascii_isblank(ch) == !!isblank16(ch), "%d", ch);
+	EQf(!!ascii_iscntrl(ch), !!iscntrl16(ch), "%d", ch);
+	EQf(!!ascii_isspace(ch), !!isspace16(ch), "%d", ch);
+	EQf(!!ascii_isupper(ch), !!isupper16(ch), "%d", ch);
+	EQf(!!ascii_islower(ch), !!islower16(ch), "%d", ch);
+	EQf(!!ascii_isalpha(ch), !!isalpha16(ch), "%d", ch);
+	EQf(!!ascii_isdigit(ch), !!isdigit16(ch), "%d", ch);
+	EQf(!!ascii_isxdigit(ch), !!isxdigit16(ch), "%d", ch);
+	EQf(!!ascii_isalnum(ch), !!isalnum16(ch), "%d", ch);
+	EQf(!!ascii_ispunct(ch), !!ispunct16(ch), "%d", ch);
+	EQf(!!ascii_isgraph(ch), !!isgraph16(ch), "%d", ch);
+	EQf(!!ascii_isprint(ch), !!isprint16(ch), "%d", ch);
+	EQf(!!ascii_isblank(ch), !!isblank16(ch), "%d", ch);
 }
 
 static void testw32(wint32_t ch) {
 	if (ch == WEOF32) {
-		assertf(WEOF32 == tolower32(ch), "%d", ch);
-		assertf(WEOF32 == toupper32(ch), "%d", ch);
+		EQf(WEOF32, tolower32(ch), "%d", ch);
+		EQf(WEOF32, toupper32(ch), "%d", ch);
 	} else {
-		assertf((wint32_t)ascii_tolower(ch) == tolower32(ch), "%d", ch);
-		assertf((wint32_t)ascii_toupper(ch) == toupper32(ch), "%d", ch);
+		EQf((wint32_t)ascii_tolower(ch), tolower32(ch), "%d", ch);
+		EQf((wint32_t)ascii_toupper(ch), toupper32(ch), "%d", ch);
 	}
-	assertf(!!ascii_iscntrl(ch) == !!iscntrl32(ch), "%d", ch);
-	assertf(!!ascii_isspace(ch) == !!isspace32(ch), "%d", ch);
-	assertf(!!ascii_isupper(ch) == !!isupper32(ch), "%d", ch);
-	assertf(!!ascii_islower(ch) == !!islower32(ch), "%d", ch);
-	assertf(!!ascii_isalpha(ch) == !!isalpha32(ch), "%d", ch);
-	assertf(!!ascii_isdigit(ch) == !!isdigit32(ch), "%d", ch);
-	assertf(!!ascii_isxdigit(ch) == !!isxdigit32(ch), "%d", ch);
-	assertf(!!ascii_isalnum(ch) == !!isalnum32(ch), "%d", ch);
-	assertf(!!ascii_ispunct(ch) == !!ispunct32(ch), "%d", ch);
-	assertf(!!ascii_isgraph(ch) == !!isgraph32(ch), "%d", ch);
-	assertf(!!ascii_isprint(ch) == !!isprint32(ch), "%d", ch);
-	assertf(!!ascii_isblank(ch) == !!isblank32(ch), "%d", ch);
+	EQf(!!ascii_iscntrl(ch), !!iscntrl32(ch), "%d", ch);
+	EQf(!!ascii_isspace(ch), !!isspace32(ch), "%d", ch);
+	EQf(!!ascii_isupper(ch), !!isupper32(ch), "%d", ch);
+	EQf(!!ascii_islower(ch), !!islower32(ch), "%d", ch);
+	EQf(!!ascii_isalpha(ch), !!isalpha32(ch), "%d", ch);
+	EQf(!!ascii_isdigit(ch), !!isdigit32(ch), "%d", ch);
+	EQf(!!ascii_isxdigit(ch), !!isxdigit32(ch), "%d", ch);
+	EQf(!!ascii_isalnum(ch), !!isalnum32(ch), "%d", ch);
+	EQf(!!ascii_ispunct(ch), !!ispunct32(ch), "%d", ch);
+	EQf(!!ascii_isgraph(ch), !!isgraph32(ch), "%d", ch);
+	EQf(!!ascii_isprint(ch), !!isprint32(ch), "%d", ch);
+	EQf(!!ascii_isblank(ch), !!isblank32(ch), "%d", ch);
 }
 
 

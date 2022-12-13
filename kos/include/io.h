@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7980452c */
+/* HASH CRC-32:0x6e9edc46 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -320,28 +320,38 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(creat, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUN
 #ifdef __CRT_HAVE_access
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `file', testing for `type' */
+ * Test for access to the specified file `file', testing for `type'
+ * @return: 0 : Access would be granted
+ * @return: -1: Access would be denied (s.a. `errno') */
 __CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,access,(char const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
 #elif defined(__CRT_HAVE__access)
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `file', testing for `type' */
+ * Test for access to the specified file `file', testing for `type'
+ * @return: 0 : Access would be granted
+ * @return: -1: Access would be denied (s.a. `errno') */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,access,(char const *__file, __STDC_INT_AS_UINT_T __type),_access,(__file,__type))
 #elif defined(__CRT_HAVE___access)
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `file', testing for `type' */
+ * Test for access to the specified file `file', testing for `type'
+ * @return: 0 : Access would be granted
+ * @return: -1: Access would be denied (s.a. `errno') */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,access,(char const *__file, __STDC_INT_AS_UINT_T __type),__access,(__file,__type))
 #elif defined(__CRT_HAVE___libc_access)
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `file', testing for `type' */
+ * Test for access to the specified file `file', testing for `type'
+ * @return: 0 : Access would be granted
+ * @return: -1: Access would be denied (s.a. `errno') */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,access,(char const *__file, __STDC_INT_AS_UINT_T __type),__libc_access,(__file,__type))
 #elif defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat)
 #include <libc/local/unistd/access.h>
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `file', testing for `type' */
+ * Test for access to the specified file `file', testing for `type'
+ * @return: 0 : Access would be granted
+ * @return: -1: Access would be denied (s.a. `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(access, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(1) int __NOTHROW_RPC(__LIBCCALL access)(char const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(access))(__file, __type); })
 #else /* ... */
 #undef __access_defined
@@ -679,28 +689,38 @@ __CREDIRECT(__ATTR_INS(2, 3),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void cons
 #ifdef __CRT_HAVE_access
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `file', testing for `type' */
+ * Test for access to the specified file `file', testing for `type'
+ * @return: 0 : Access would be granted
+ * @return: -1: Access would be denied (s.a. `errno') */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,_access,(char const *__file, __STDC_INT_AS_UINT_T __type),access,(__file,__type))
 #elif defined(__CRT_HAVE__access)
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `file', testing for `type' */
+ * Test for access to the specified file `file', testing for `type'
+ * @return: 0 : Access would be granted
+ * @return: -1: Access would be denied (s.a. `errno') */
 __CDECLARE(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,_access,(char const *__file, __STDC_INT_AS_UINT_T __type),(__file,__type))
 #elif defined(__CRT_HAVE___access)
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `file', testing for `type' */
+ * Test for access to the specified file `file', testing for `type'
+ * @return: 0 : Access would be granted
+ * @return: -1: Access would be denied (s.a. `errno') */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,_access,(char const *__file, __STDC_INT_AS_UINT_T __type),__access,(__file,__type))
 #elif defined(__CRT_HAVE___libc_access)
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `file', testing for `type' */
+ * Test for access to the specified file `file', testing for `type'
+ * @return: 0 : Access would be granted
+ * @return: -1: Access would be denied (s.a. `errno') */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(1),int,__NOTHROW_RPC,_access,(char const *__file, __STDC_INT_AS_UINT_T __type),__libc_access,(__file,__type))
 #elif defined(__AT_FDCWD) && defined(__CRT_HAVE_faccessat)
 #include <libc/local/unistd/access.h>
 /* >> access(2)
  * @param: type: Set of `X_OK | W_OK | R_OK'
- * Test for access to the specified file `file', testing for `type' */
+ * Test for access to the specified file `file', testing for `type'
+ * @return: 0 : Access would be granted
+ * @return: -1: Access would be denied (s.a. `errno') */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(1) int __NOTHROW_RPC(__LIBCCALL _access)(char const *__file, __STDC_INT_AS_UINT_T __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(access))(__file, __type); }
 #endif /* ... */
 #if defined(__CRT_HAVE_creat) && (!defined(__USE_FILE_OFFSET64) || !defined(__O_LARGEFILE) || !__O_LARGEFILE)

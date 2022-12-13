@@ -71,7 +71,7 @@ DEFINE_TEST(system_rtld_ro) {
 	}
 
 	EQ(0, fstat(sysrtld, &st));
-	assert(st.st_size > 0);
+	LO(0, st.st_size);
 	LE(1, pread(sysrtld, buf, sizeof(buf), 0));
 
 	errno = 0;
@@ -85,7 +85,7 @@ DEFINE_TEST(system_rtld_ro) {
 	{
 		int ro = -1;
 		EQ(0, ioctl(sysrtld, FILE_IOC_GETRO, &ro));
-		EQ(ro, 1);
+		EQ(1, ro);
 
 		ro = 0;
 		errno = 0;
@@ -98,7 +98,7 @@ DEFINE_TEST(system_rtld_ro) {
 	{
 		long flags = 0;
 		EQ(0, ioctl(sysrtld, FS_IOC_GETFLAGS, &flags));
-		assert(flags & FS_IMMUTABLE_FL);
+		ISbiton(FS_IMMUTABLE_FL, flags);
 		flags &= ~FS_IMMUTABLE_FL;
 		EQ(-1, ioctl(sysrtld, FS_IOC_SETFLAGS, &flags));
 		EQerrno(EPERM); /* s.a. `E_ILLEGAL_OPERATION_CONTEXT_READONLY_FILE_FLAGS' */
@@ -121,7 +121,7 @@ DEFINE_TEST(system_rtld_ro) {
 		ps = sizeof(buf);
 	if (ps > st.st_size)
 		ps = (size_t)st.st_size;
-	EQ(0, bcmp(map, buf, ps));
+	EQmem(buf, map, ps);
 	EQ(0, munmap(map, getpagesize()));
 
 	/* Make sure that mprotect() also can't be used to gain write access. */

@@ -32,7 +32,6 @@
 #include <sys/stat.h>
 #include <system-test/ctest.h>
 
-#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -71,8 +70,7 @@ DEFINE_TEST(ramfs) {
 	ISpos((fd = open("/tmp/submount/subdir/foo.bar", O_CREAT | O_EXCL | O_WRONLY, 0644))); /* NOLINT */
 	{
 		static char const s[] = "foo.bar file contents...\n";
-		EQ(sizeof(s) - sizeof(char),
-		     write(fd, s, sizeof(s) - sizeof(char)));
+		EQ(sizeof(s) - sizeof(char), write(fd, s, sizeof(s) - sizeof(char)));
 	}
 	EQ(0, close(fd));
 

@@ -42,7 +42,6 @@
 #include <system-test/ctest.h>
 
 #include <errno.h>
-#include <assert.h>
 #include <string.h>
 #include <dlfcn.h>
 #include <signal.h>
@@ -61,11 +60,7 @@ DEFINE_TEST(idata) {
 	for (i = 0; i < (unsigned int)sys_nerr; ++i) {
 		char const *a = sys_errlist[i];
 		char const *b = strerrordesc_np(i);
-		assertf(a == b,
-		        "i = %u\n"
-		        "a = %p (%q)\n"
-		        "b = %p (%q)\n",
-		        i, a, a, b, b);
+		EQf(a, b, "i = %u", i);
 	}
 	{
 		char const *const *sys_siglist_p;
@@ -75,18 +70,14 @@ DEFINE_TEST(idata) {
 		 * that variable may have been copied out of libc because
 		 * it was likely linked with a R_xxx_COPY relocation. */
 		sys_siglist_p  = (char const *const *)dlsym(RTLD_DEFAULT, "sys_siglist");
-		assertf(sys_siglist_p != NULL, "%s", dlerror());
+		ISnonnullf(sys_siglist_p, "%s", dlerror());
 		_sys_siglist_p = (char const *const *)dlsym(RTLD_DEFAULT, "_sys_siglist");
-		assertf(_sys_siglist_p != NULL, "%s", dlerror());
-		assertf(sys_siglist_p == _sys_siglist_p, "%p != %p", sys_siglist_p, _sys_siglist_p);
+		ISnonnullf(_sys_siglist_p, "%s", dlerror());
+		EQ(sys_siglist_p, _sys_siglist_p);
 		for (i = 0; i < NSIG; ++i) {
 			char const *a = sys_siglist_p[i];
 			char const *b = sigdescr_np(i);
-			assertf(a == b,
-			        "i = %u\n"
-			        "a = %p (%q)\n"
-			        "b = %p (%q)\n",
-			        i, a, a, b, b);
+			EQf(a, b, "i = %u", i);
 		}
 	}
 

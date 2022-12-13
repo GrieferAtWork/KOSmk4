@@ -48,24 +48,6 @@ DEFINE_TEST(math_rounding) {
 		assertf(isfinite(_a), "%f", _a);       \
 		assertf(_a == _b, "%f != %f", _a, _b); \
 	})
-#define EQI(a, b)                              \
-	({                                         \
-		volatile int _a = (a);                 \
-		volatile int _b = (b);                 \
-		assertf(_a == _b, "%d != %d", _a, _b); \
-	})
-#define EQL(a, b)                                \
-	({                                           \
-		volatile long _a = (a);                  \
-		volatile long _b = (b);                  \
-		assertf(_a == _b, "%ld != %ld", _a, _b); \
-	})
-#define EQLL(a, b)                                 \
-	({                                             \
-		volatile __LONGLONG _a = (a);              \
-		volatile __LONGLONG _b = (b);              \
-		assertf(_a == _b, "%lld != %lld", _a, _b); \
-	})
 	EQFLT(round(a), 1.0);
 	EQFLT(round(b), 2.0);
 	EQFLT(round(c), 2.0);
@@ -73,19 +55,19 @@ DEFINE_TEST(math_rounding) {
 	EQFLT(round(e), -2.0);
 	EQFLT(round(f), -2.0);
 
-	EQL(lround(a), 1);
-	EQL(lround(b), 2);
-	EQL(lround(c), 2);
-	EQL(lround(d), -1);
-	EQL(lround(e), -2);
-	EQL(lround(f), -2);
+	EQ(1, lround(a));
+	EQ(2, lround(b));
+	EQ(2, lround(c));
+	EQ(-1, lround(d));
+	EQ(-2, lround(e));
+	EQ(-2, lround(f));
 
-	EQLL(llround(a), 1);
-	EQLL(llround(b), 2);
-	EQLL(llround(c), 2);
-	EQLL(llround(d), -1);
-	EQLL(llround(e), -2);
-	EQLL(llround(f), -2);
+	EQ(1, llround(a));
+	EQ(2, llround(b));
+	EQ(2, llround(c));
+	EQ(-1, llround(d));
+	EQ(-2, llround(e));
+	EQ(-2, llround(f));
 
 	EQFLT(floor(a), 1.0);
 	EQFLT(floor(b), 1.0);
@@ -108,48 +90,46 @@ DEFINE_TEST(math_rounding) {
 	EQFLT(trunc(e), -1.0);
 	EQFLT(trunc(f), -1.0);
 
-	fesetround(FE_TONEAREST);
-	EQI(fegetround(), FE_TONEAREST);
-	EQFLT(nearbyint(a), round(a)); EQL(lrint(a), 1);  EQLL(llrint(a), 1);
-	EQFLT(nearbyint(b), round(b)); EQL(lrint(b), 2);  EQLL(llrint(b), 2);
-	EQFLT(nearbyint(c), round(c)); EQL(lrint(c), 2);  EQLL(llrint(c), 2);
-	EQFLT(nearbyint(d), round(d)); EQL(lrint(d), -1); EQLL(llrint(d), -1);
-	EQFLT(nearbyint(e), round(e)); EQL(lrint(e), -2); EQLL(llrint(e), -2);
-	EQFLT(nearbyint(f), round(f)); EQL(lrint(f), -2); EQLL(llrint(f), -2);
-	EQI(fegetround(), FE_TONEAREST);
+	EQ(0, fesetround(FE_TONEAREST));
+	EQ(FE_TONEAREST, fegetround());
+	EQFLT(nearbyint(a), round(a)); EQ(1, lrint(a));  EQ(1, llrint(a));
+	EQFLT(nearbyint(b), round(b)); EQ(2, lrint(b));  EQ(2, llrint(b));
+	EQFLT(nearbyint(c), round(c)); EQ(2, lrint(c));  EQ(2, llrint(c));
+	EQFLT(nearbyint(d), round(d)); EQ(-1, lrint(d)); EQ(-1, llrint(d));
+	EQFLT(nearbyint(e), round(e)); EQ(-2, lrint(e)); EQ(-2, llrint(e));
+	EQFLT(nearbyint(f), round(f)); EQ(-2, lrint(f)); EQ(-2, llrint(f));
+	EQ(FE_TONEAREST, fegetround());
 
-	fesetround(FE_DOWNWARD);
-	EQI(fegetround(), FE_DOWNWARD);
-	EQFLT(nearbyint(a), floor(a)); EQL(lrint(a), 1);  EQLL(llrint(a), 1);
-	EQFLT(nearbyint(b), floor(b)); EQL(lrint(b), 1);  EQLL(llrint(b), 1);
-	EQFLT(nearbyint(c), floor(c)); EQL(lrint(c), 1);  EQLL(llrint(c), 1);
-	EQFLT(nearbyint(d), floor(d)); EQL(lrint(d), -2); EQLL(llrint(d), -2);
-	EQFLT(nearbyint(e), floor(e)); EQL(lrint(e), -2); EQLL(llrint(e), -2);
-	EQFLT(nearbyint(f), floor(f)); EQL(lrint(f), -2); EQLL(llrint(f), -2);
-	EQI(fegetround(), FE_DOWNWARD);
+	EQ(0, fesetround(FE_DOWNWARD));
+	EQ(FE_DOWNWARD, fegetround());
+	EQFLT(nearbyint(a), floor(a)); EQ(1, lrint(a));  EQ(1, llrint(a));
+	EQFLT(nearbyint(b), floor(b)); EQ(1, lrint(b));  EQ(1, llrint(b));
+	EQFLT(nearbyint(c), floor(c)); EQ(1, lrint(c));  EQ(1, llrint(c));
+	EQFLT(nearbyint(d), floor(d)); EQ(-2, lrint(d)); EQ(-2, llrint(d));
+	EQFLT(nearbyint(e), floor(e)); EQ(-2, lrint(e)); EQ(-2, llrint(e));
+	EQFLT(nearbyint(f), floor(f)); EQ(-2, lrint(f)); EQ(-2, llrint(f));
+	EQ(FE_DOWNWARD, fegetround());
 
-	fesetround(FE_UPWARD);
-	EQI(fegetround(), FE_UPWARD);
-	EQFLT(nearbyint(a), ceil(a)); EQL(lrint(a), 2);  EQLL(llrint(a), 2);
-	EQFLT(nearbyint(b), ceil(b)); EQL(lrint(b), 2);  EQLL(llrint(b), 2);
-	EQFLT(nearbyint(c), ceil(c)); EQL(lrint(c), 2);  EQLL(llrint(c), 2);
-	EQFLT(nearbyint(d), ceil(d)); EQL(lrint(d), -1); EQLL(llrint(d), -1);
-	EQFLT(nearbyint(e), ceil(e)); EQL(lrint(e), -1); EQLL(llrint(e), -1);
-	EQFLT(nearbyint(f), ceil(f)); EQL(lrint(f), -1); EQLL(llrint(f), -1);
-	EQI(fegetround(), FE_UPWARD);
+	EQ(0, fesetround(FE_UPWARD));
+	EQ(FE_UPWARD, fegetround());
+	EQFLT(nearbyint(a), ceil(a)); EQ(2, lrint(a));  EQ(2, llrint(a));
+	EQFLT(nearbyint(b), ceil(b)); EQ(2, lrint(b));  EQ(2, llrint(b));
+	EQFLT(nearbyint(c), ceil(c)); EQ(2, lrint(c));  EQ(2, llrint(c));
+	EQFLT(nearbyint(d), ceil(d)); EQ(-1, lrint(d)); EQ(-1, llrint(d));
+	EQFLT(nearbyint(e), ceil(e)); EQ(-1, lrint(e)); EQ(-1, llrint(e));
+	EQFLT(nearbyint(f), ceil(f)); EQ(-1, lrint(f)); EQ(-1, llrint(f));
+	EQ(FE_UPWARD, fegetround());
 
-	fesetround(FE_TOWARDZERO);
-	EQI(fegetround(), FE_TOWARDZERO);
-	EQFLT(nearbyint(a), trunc(a)); EQL(lrint(a), 1);  EQLL(llrint(a), 1);
-	EQFLT(nearbyint(b), trunc(b)); EQL(lrint(b), 1);  EQLL(llrint(b), 1);
-	EQFLT(nearbyint(c), trunc(c)); EQL(lrint(c), 1);  EQLL(llrint(c), 1);
-	EQFLT(nearbyint(d), trunc(d)); EQL(lrint(d), -1); EQLL(llrint(d), -1);
-	EQFLT(nearbyint(e), trunc(e)); EQL(lrint(e), -1); EQLL(llrint(e), -1);
-	EQFLT(nearbyint(f), trunc(f)); EQL(lrint(f), -1); EQLL(llrint(f), -1);
-	EQI(fegetround(), FE_TOWARDZERO);
+	EQ(0, fesetround(FE_TOWARDZERO));
+	EQ(FE_TOWARDZERO, fegetround());
+	EQFLT(nearbyint(a), trunc(a)); EQ(1, lrint(a));  EQ(1, llrint(a));
+	EQFLT(nearbyint(b), trunc(b)); EQ(1, lrint(b));  EQ(1, llrint(b));
+	EQFLT(nearbyint(c), trunc(c)); EQ(1, lrint(c));  EQ(1, llrint(c));
+	EQFLT(nearbyint(d), trunc(d)); EQ(-1, lrint(d)); EQ(-1, llrint(d));
+	EQFLT(nearbyint(e), trunc(e)); EQ(-1, lrint(e)); EQ(-1, llrint(e));
+	EQFLT(nearbyint(f), trunc(f)); EQ(-1, lrint(f)); EQ(-1, llrint(f));
+	EQ(FE_TOWARDZERO, fegetround());
 
-#undef EQLL
-#undef EQL
 #undef EQFLT
 }
 

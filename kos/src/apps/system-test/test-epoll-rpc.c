@@ -29,8 +29,6 @@
 #include <sys/epoll.h>
 #include <system-test/ctest.h>
 
-#include <assert.h>
-#include <err.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>

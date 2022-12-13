@@ -29,7 +29,6 @@
 #include <kos/types.h>
 #include <system-test/ctest.h>
 
-#include <assert.h>
 #include <errno.h>
 #include <limits.h>
 #include <stdint.h>
@@ -117,19 +116,19 @@ DEFINE_TEST(strtol) {
 		EQ(INTxx_MIN, val);                                   \
 		EQ(no_endptr_should_fail ? EINVAL : 0, error);        \
 	}
-#define ASSERT_ERROR_INTxx_MIN(n, INTxx_MIN_str, len) \
-	{                                                 \
-		errno_t error;                                \
-		char const *s = INTxx_MIN_str;                \
-		char *endptr;                                 \
-		int##n##_t val;                               \
-		val = strto##n##_r(s, &endptr, 0, &error);    \
-		EQ(INT##n##_MIN, val);                        \
-		EQ(ERANGE, error);                            \
-		EQ(endptr, s + len);                          \
-		val = strto##n##_r(s, NULL, 0, &error);       \
-		EQ(INT##n##_MIN, val);                        \
-		EQ(ERANGE, error);                            \
+#define ASSERT_ERANGE_INTxx_MIN(n, INTxx_MIN_str, len) \
+	{                                                  \
+		errno_t error;                                 \
+		char const *s = INTxx_MIN_str;                 \
+		char *endptr;                                  \
+		int##n##_t val;                                \
+		val = strto##n##_r(s, &endptr, 0, &error);     \
+		EQ(INT##n##_MIN, val);                         \
+		EQ(ERANGE, error);                             \
+		EQ(endptr, s + len);                           \
+		val = strto##n##_r(s, NULL, 0, &error);        \
+		EQ(INT##n##_MIN, val);                         \
+		EQ(ERANGE, error);                             \
 	}
 
 	/* strtol(ltoa(LONG_MIN)) must work correctly */
@@ -142,23 +141,23 @@ DEFINE_TEST(strtol) {
 
 	/* strtol(ltoa(LONG_MIN))  must break if there are any extra
 	 * numbers, even after a number-sequence equal to INTxx_MIN. */
-	ASSERT_ERROR_INTxx_MIN(64, "-92233720368547758080", 21);
-	ASSERT_ERROR_INTxx_MIN(64, "-92233720368547758081", 21);
-	ASSERT_ERROR_INTxx_MIN(64, "-92233720368547758089", 21);
-	ASSERT_ERROR_INTxx_MIN(64, "-92233720368547758089", 21);
-	ASSERT_ERROR_INTxx_MIN(64, "-92233720368547758089  ", 21);
-	ASSERT_ERROR_INTxx_MIN(64, "-92233720368547758089END", 21);
-	ASSERT_ERROR_INTxx_MIN(64, "-9223372036854775808987654321", 29);
-	ASSERT_ERROR_INTxx_MIN(64, "-9223372036854775808987654321  ", 29);
-	ASSERT_ERROR_INTxx_MIN(64, "-9223372036854775808987654321END", 29);
-	ASSERT_ERROR_INTxx_MIN(32, "-21474836480", 12);
-	ASSERT_ERROR_INTxx_MIN(32, "-21474836481", 12);
-	ASSERT_ERROR_INTxx_MIN(32, "-21474836489", 12);
-	ASSERT_ERROR_INTxx_MIN(32, "-21474836489", 12);
-	ASSERT_ERROR_INTxx_MIN(32, "-21474836489  ", 12);
-	ASSERT_ERROR_INTxx_MIN(32, "-21474836489END", 12);
+	ASSERT_ERANGE_INTxx_MIN(64, "-92233720368547758080", 21);
+	ASSERT_ERANGE_INTxx_MIN(64, "-92233720368547758081", 21);
+	ASSERT_ERANGE_INTxx_MIN(64, "-92233720368547758089", 21);
+	ASSERT_ERANGE_INTxx_MIN(64, "-92233720368547758089", 21);
+	ASSERT_ERANGE_INTxx_MIN(64, "-92233720368547758089  ", 21);
+	ASSERT_ERANGE_INTxx_MIN(64, "-92233720368547758089END", 21);
+	ASSERT_ERANGE_INTxx_MIN(64, "-9223372036854775808987654321", 29);
+	ASSERT_ERANGE_INTxx_MIN(64, "-9223372036854775808987654321  ", 29);
+	ASSERT_ERANGE_INTxx_MIN(64, "-9223372036854775808987654321END", 29);
+	ASSERT_ERANGE_INTxx_MIN(32, "-21474836480", 12);
+	ASSERT_ERANGE_INTxx_MIN(32, "-21474836481", 12);
+	ASSERT_ERANGE_INTxx_MIN(32, "-21474836489", 12);
+	ASSERT_ERANGE_INTxx_MIN(32, "-21474836489", 12);
+	ASSERT_ERANGE_INTxx_MIN(32, "-21474836489  ", 12);
+	ASSERT_ERANGE_INTxx_MIN(32, "-21474836489END", 12);
 #undef ASSERT_CORRECT_INTxx_MIN
-#undef ASSERT_ERROR_INTxx_MIN
+#undef ASSERT_ERANGE_INTxx_MIN
 }
 
 DECL_END

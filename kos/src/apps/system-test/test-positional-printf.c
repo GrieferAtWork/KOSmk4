@@ -41,10 +41,7 @@ assert_printf_equals(char const *expected,
 	va_start(args, format);
 	actual = vstrdupf(format, args);
 	va_end(args);
-	assertf(strcmp(expected, actual) == 0,
-	        "expected: %q\n"
-	        "actual:   %q\n",
-	        expected, actual);
+	EQstr(expected, actual);
 	free(actual);
 }
 

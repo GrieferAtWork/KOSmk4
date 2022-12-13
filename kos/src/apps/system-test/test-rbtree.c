@@ -28,7 +28,6 @@
 
 #include <kos/types.h>
 
-#include <assert.h>
 #include <stdbool.h>
 #include <stddef.h>
 
@@ -84,14 +83,14 @@ PRIVATE void create_nodes(unsigned int const order[10]) {
 		create_node(id, node_values[id]);
 	}
 	for (i = 0; i < lengthof(nodes); ++i)
-		EQ(rb_locate(tree, node_values[i]), &nodes[i]);
+		EQ(&nodes[i], rb_locate(tree, node_values[i]));
 #ifndef TESTING_LEFT_LEANING
 	for (i = 1; i < lengthof(nodes) - 1; ++i) {
-		EQ(rb_prevnode(&nodes[i]), &nodes[i - 1]);
-		EQ(rb_nextnode(&nodes[i]), &nodes[i + 1]);
+		EQ(&nodes[i - 1], rb_prevnode(&nodes[i]));
+		EQ(&nodes[i + 1], rb_nextnode(&nodes[i]));
 	}
-	EQ(rb_prevnode(&nodes[0]), NULL);
-	EQ(rb_nextnode(&nodes[lengthof(nodes) - 1]), NULL);
+	ISnull(rb_prevnode(&nodes[0]));
+	ISnull(rb_nextnode(&nodes[lengthof(nodes) - 1]));
 #endif /* !TESTING_LEFT_LEANING */
 }
 
@@ -99,9 +98,9 @@ PRIVATE void pop_nodes(unsigned int const order[10]) {
 	unsigned int i;
 	for (i = 0; i < lengthof(nodes); ++i) {
 		unsigned int id = order[i];
-		EQ(rb_remove(&tree, node_values[id]), &nodes[id]);
+		EQ(&nodes[id], rb_remove(&tree, node_values[id]));
 	}
-	EQ(tree, NULL);
+	ISnull(tree);
 }
 
 PRIVATE void create_and_pop_nodes(unsigned int const ins_order[10],

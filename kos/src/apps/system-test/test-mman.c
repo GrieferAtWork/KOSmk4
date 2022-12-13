@@ -29,7 +29,6 @@
 #include <sys/types.h>
 #include <system-test/ctest.h>
 
-#include <assert.h>
 #include <errno.h>
 #include <inttypes.h>
 #include <stddef.h>
@@ -40,10 +39,9 @@ DECL_BEGIN
 
 DEFINE_TEST(mlock_and_mincore) {
 	void *p;
-	size_t ps;
+	size_t ps = getpagesize();
 	uint8_t incore[2];
 
-	ps = getpagesize();
 	NE(MAP_FAILED, (p = mmap(NULL, ps, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON | MAP_LOCKED, -1, 0)));
 
 	/* Technically, mincore() is meant to be used for file mappings,
@@ -105,10 +103,9 @@ DEFINE_TEST(mlock_and_mincore) {
 /* Test the mremap(2) system call. */
 DEFINE_TEST(mremap) {
 	void *p;
-	size_t ps;
+	size_t ps = getpagesize();
 	uint8_t incore[2];
 
-	ps = getpagesize();
 	NE(MAP_FAILED, (p = mmap(NULL, ps, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANON | MAP_LOCKED, -1, 0)));
 	incore[0] = 0xcc;
 	EQ(0, mincore(p, ps, incore));

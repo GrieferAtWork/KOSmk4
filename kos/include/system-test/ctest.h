@@ -75,12 +75,15 @@ __DECL_END
 /************************************************************************/
 
 #ifdef __INTELLISENSE__
-#define __OP(makevars, cond, cond_novars, expr_str, ...) (void)(cond_novars)
-#define _OPtPOS(v, v_str)                                (void)((v) >= 0)
-#define _OPtCMP(a, op, b, a_str, b_str)                  (void)((a)op(b))
-#define _OPtCMPf(a, op, b, a_str, b_str, format, ...)    (void)((a)op(b))
-#define _OPtBITON(bitmask, word, bitmask_str, word_str)  (void)(((word) & (bitmask)) == (bitmask))
-#define _OPtBITOFF(bitmask, word, bitmask_str, word_str) (void)(((word) & (bitmask)) == 0)
+#define __OP(makevars, cond, cond_novars, expr_str, ...)       (void)(cond_novars)
+#define _OPtPOS(v, v_str)                                      (void)((v) >= 0)
+#define _OPtPOSf(v, v_str, ...)                                (void)((v) >= 0)
+#define _OPtCMP(a, op, b, a_str, b_str)                        (void)((a)op(b))
+#define _OPtCMPf(a, op, b, a_str, b_str, format, ...)          (void)((a)op(b))
+#define _OPtBITON(bitmask, word, bitmask_str, word_str)        (void)(((word) & (bitmask)) == (bitmask))
+#define _OPtBITOFF(bitmask, word, bitmask_str, word_str)       (void)(((word) & (bitmask)) == 0)
+#define _OPtBITONf(bitmask, word, bitmask_str, word_str, ...)  (void)(((word) & (bitmask)) == (bitmask))
+#define _OPtBITOFFf(bitmask, word, bitmask_str, word_str, ...) (void)(((word) & (bitmask)) == 0)
 #else /* __INTELLISENSE__ */
 #include <parts/assert-failed.h>
 #ifdef __assertion_checkf
@@ -151,6 +154,7 @@ __DECL_END
 	     v_str " >= 0",                                                               \
 	     _TPRIfmt(_v, __TPRIfmtposS, __TPRIfmtposU, __TPRIfmtposF, __TPRIfmtposP, ~), \
 	     _v)
+#define _OPtPOSf(v, v_str, ...) _OPtPOS(v, v_str) /* TODO */
 
 #define __TPRIfmtcmpS(PRInPREFIX, op_str) "%" PRInPREFIX "d " op_str " %" PRInPREFIX "d"
 #define __TPRIfmtcmpU(PRInPREFIX, op_str) "%1$" PRInPREFIX "u[%#1$" PRInPREFIX "x] " op_str " %2$" PRInPREFIX "u[%#2$" PRInPREFIX "x]"
@@ -177,6 +181,20 @@ __DECL_END
 	     bitmask_str " & " word_str " == 0",                                             \
 	     _TPRIfmt(_word, __TPRIfmtbitX, __TPRIfmtbitX, __TPRIfmtbitX, __TPRIfmtbitX, ~), \
 	     _bitmask, _word, _bitmask & _word)
+
+#define __TPRIfmtbitXf(PRInPREFIX, _) "%" PRInPREFIX "u[%#" PRInPREFIX "x] & %" PRInPREFIX "u[%#" PRInPREFIX "x] = %" PRInPREFIX "u[%#" PRInPREFIX "x]"
+#define _OPtBITONf(bitmask, word, bitmask_str, word_str, format, ...)                                    \
+	__OP((__typeof__((bitmask) & (word)) _bitmask = (bitmask), _word = (word)),                          \
+	     (_bitmask & _word) == _bitmask, ((bitmask) & (word)) == (bitmask),                              \
+	     bitmask_str " & " word_str " == " bitmask_str,                                                  \
+	     _TPRIfmt(_word, __TPRIfmtbitXf, __TPRIfmtbitXf, __TPRIfmtbitXf, __TPRIfmtbitXf, ~) "\n" format, \
+	     _bitmask, _bitmask, _word, _word, _bitmask & _word, _bitmask & _word, ##__VA_ARGS__)
+#define _OPtBITOFFf(bitmask, word, bitmask_str, word_str, format, ...)                                   \
+	__OP((__typeof__((bitmask) & (word)) _bitmask = (bitmask), _word = (word)),                          \
+	     !(_bitmask & _word), !((bitmask) & (word)),                                                     \
+	     bitmask_str " & " word_str " == 0",                                                             \
+	     _TPRIfmt(_word, __TPRIfmtbitXf, __TPRIfmtbitXf, __TPRIfmtbitXf, __TPRIfmtbitXf, ~) "\n" format, \
+	     _bitmask, _bitmask, _word, _word, _bitmask & _word, _bitmask & _word, ##__VA_ARGS__)
 #endif /* !__INTELLISENSE__ */
 
 #include <libc/errno.h>
@@ -190,7 +208,7 @@ __DECL_END
 	     "strcmp(%1$p, %2$p) == %3$d\n"            \
 	     "lhs: %1$q\n"                             \
 	     "rhs: %2$q",                              \
-	     _a, _b)
+	     _a, _b, _diff)
 #define _OPtMEM(a, op, b, num_bytes, a_str, b_str, num_bytes_str)             \
 	__OP((void const *_a = (a), *_b = (b); __size_t _num_bytes = (num_bytes); \
 	      int _diff = __libc_memcmp(_a, _b, _num_bytes)),                     \
@@ -201,7 +219,7 @@ __DECL_END
 	     "%$3$1$[hex]\n"                                                      \
 	     "MEM[" b_str "]:\n"                                                  \
 	     "%$3$2$[hex]",                                                       \
-	     _a, _b, _num_bytes)
+	     _a, _b, _num_bytes, _diff)
 /* ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
  * HINT: "%$3$2$[hex]\n" is decoded as:#
  *         ||/|/|  /
@@ -211,6 +229,26 @@ __DECL_END
  *         || \--- Pointer operand    = args[2 - 1]
  *         |\----- Fixed-buffer width = args[3 - 1]
  *         \------ Fixed-buffer width prefix */
+#define _OPtSTRf(a, op, b, a_str, b_str, format, ...) \
+	__OP((char const *_a = (a), *_b = (b);            \
+	      int _diff = __libc_strcmp(_a, _b)),         \
+	     _diff op 0, __libc_strcmp(a, b) op 0,        \
+	     "strcmp(" a_str ", " b_str ") " #op " 0",    \
+	     "strcmp(%p, %p) == %d\n"                     \
+	     "lhs: %q\n"                                  \
+	     "rhs: %q\n" format,                          \
+	     _a, _b, _diff, _a, _b, ##__VA_ARGS__)
+#define _OPtMEMf(a, op, b, num_bytes, a_str, b_str, num_bytes_str, format, ...) \
+	__OP((void const *_a = (a), *_b = (b); __size_t _num_bytes = (num_bytes);   \
+	      int _diff = __libc_memcmp(_a, _b, _num_bytes)),                       \
+	     _diff op 0, __libc_memcmp(a, b, num_bytes) op 0,                       \
+	     "memcmp(" a_str ", " b_str ", " num_bytes_str ") " #op " 0",           \
+	     "memcmp(%p, %p, %" __PRIP_PREFIX "u) == %d\n"                          \
+	     "MEM[" a_str "]:\n"                                                    \
+	     "%$[hex]\n"                                                            \
+	     "MEM[" b_str "]:\n"                                                    \
+	     "%$[hex]\n" format,                                                    \
+	     _a, _b, _num_bytes, _diff, _num_bytes, _a, _num_bytes, _b, ##__VA_ARGS__)
 
 
 
@@ -236,11 +274,14 @@ __DECL_END
 	                      __builtin_types_compatible_p(__typeof__((p) + 0), char const *), \
 	                      "Not null: %1$p (%1$q)",                                         \
 	                      "Not null: %p")
-#define ISnull(p)    __OP((void const *_p = (p)), !_p, !(p), #p " == NULL", __ISnull_FMT(p), _p)
-#define ISnonnull(p) __OP((void const *_p = (p)), _p, (p), #p " != NULL", __NULLPTR)
+#define ISnull(p)          __OP((void const *_p = (p)), !_p, !(p), #p " == NULL", __ISnull_FMT(p), _p)
+#define ISnullf(p, ...)    __OP((void const *_p = (p)), !_p, !(p), #p " == NULL", __ISnull_FMT(p), _p) /* TODO */
+#define ISnonnull(p)       __OP((void const *_p = (p)), _p, (p), #p " != NULL", __NULLPTR)
+#define ISnonnullf(p, ...) __OP((void const *_p = (p)), _p, (p), #p " != NULL", __VA_ARGS__)
 
 /* Assert: `{v} >= 0' */
-#define ISpos(v) _OPtPOS(v, #v)
+#define ISpos(v)       _OPtPOS(v, #v)
+#define ISposf(v, ...) _OPtPOSf(v, #v, __VA_ARGS__)
 
 /* Assert: `errno == {expected_errno}' */
 #define EQerrno(expected_errno)                                                           \
@@ -250,10 +291,19 @@ __DECL_END
 	     "%d[%s] == %d[%s]",                                                              \
 	     _errno_libc, __libc_strerrorname_np(_errno_libc),                                \
 	     _expected_errno, __libc_strerrorname_np(_expected_errno))
+#define EQerrnof(expected_errno, format, ...)                                             \
+	__OP((__errno_t _expected_errno = (expected_errno), _errno_libc = __libc_geterrno()), \
+	     _expected_errno == _errno_libc, (expected_errno) == __libc_geterrno(),           \
+	     "errno == " #expected_errno,                                                     \
+	     "%d[%s] == %d[%s]\n" format,                                                     \
+	     _errno_libc, __libc_strerrorname_np(_errno_libc),                                \
+	     _expected_errno, __libc_strerrorname_np(_expected_errno), ##__VA_ARGS__)
 
 /* Assert that a given bitset is all 1s or 0s in `word' */
-#define ISbiton(set_bitmask, word)    _OPtBITON(set_bitmask, word, #set_bitmask, #word)
-#define ISbitoff(clear_bitmask, word) _OPtBITOFF(clear_bitmask, word, #clear_bitmask, #word)
+#define ISbiton(set_bitmask, word)          _OPtBITON(set_bitmask, word, #set_bitmask, #word)
+#define ISbitoff(clear_bitmask, word)       _OPtBITOFF(clear_bitmask, word, #clear_bitmask, #word)
+#define ISbitonf(set_bitmask, word, ...)    _OPtBITONf(set_bitmask, word, #set_bitmask, #word, __VA_ARGS__)
+#define ISbitofff(clear_bitmask, word, ...) _OPtBITOFFf(clear_bitmask, word, #clear_bitmask, #word, __VA_ARGS__)
 
 
 /* Compare the contents of string (s.a. `strcmp(3)') */
@@ -265,6 +315,14 @@ __DECL_END
 #define LEstr(lhs, rhs) _OPtSTR(lhs, <=, rhs, #lhs, #rhs)
 #define GRstr(lhs, rhs) _OPtSTR(lhs, >, rhs, #lhs, #rhs)
 #define GEstr(lhs, rhs) _OPtSTR(lhs, >=, rhs, #lhs, #rhs)
+#define EQstrf(expected_strp, actual_strp, ...) \
+	_OPtSTRf(expected_strp, ==, actual_strp, #expected_strp, #actual_strp, __VA_ARGS__)
+#define NEstrf(unexpected_strp, actual_strp, ...) \
+	_OPtSTRf(unexpected_strp, !=, actual_strp, #unexpected_strp, #actual_strp, __VA_ARGS__)
+#define LOstrf(lhs, rhs, ...) _OPtSTRf(lhs, <, rhs, #lhs, #rhs, __VA_ARGS__)
+#define LEstrf(lhs, rhs, ...) _OPtSTRf(lhs, <=, rhs, #lhs, #rhs, __VA_ARGS__)
+#define GRstrf(lhs, rhs, ...) _OPtSTRf(lhs, >, rhs, #lhs, #rhs, __VA_ARGS__)
+#define GEstrf(lhs, rhs, ...) _OPtSTRf(lhs, >=, rhs, #lhs, #rhs, __VA_ARGS__)
 
 
 /* Compare the contents of memory (s.lhs. `memcmp(3)') */
@@ -276,6 +334,14 @@ __DECL_END
 #define LEmem(lhs, rhs, num_bytes) _OPtMEM(lhs, <=, rhs, num_bytes, #lhs, #rhs, #num_bytes)
 #define GRmem(lhs, rhs, num_bytes) _OPtMEM(lhs, >, rhs, num_bytes, #lhs, #rhs, #num_bytes)
 #define GEmem(lhs, rhs, num_bytes) _OPtMEM(lhs, >=, rhs, num_bytes, #lhs, #rhs, #num_bytes)
+#define EQmemf(expected_baseptr, actual_baseptr, num_bytes, ...) \
+	_OPtMEMf(expected_baseptr, ==, actual_baseptr, num_bytes, #expected_baseptr, #actual_baseptr, #num_bytes, __VA_ARGS__)
+#define NEmemf(unexpected_baseptr, actual_baseptr, num_bytes, ...) \
+	_OPtMEMf(unexpected_baseptr, !=, actual_baseptr, num_bytes, #unexpected_baseptr, #actual_baseptr, #num_bytes, __VA_ARGS__)
+#define LOmemf(lhs, rhs, num_bytes, ...) _OPtMEMf(lhs, <, rhs, num_bytes, #lhs, #rhs, #num_bytes, __VA_ARGS__)
+#define LEmemf(lhs, rhs, num_bytes, ...) _OPtMEMf(lhs, <=, rhs, num_bytes, #lhs, #rhs, #num_bytes, __VA_ARGS__)
+#define GRmemf(lhs, rhs, num_bytes, ...) _OPtMEMf(lhs, >, rhs, num_bytes, #lhs, #rhs, #num_bytes, __VA_ARGS__)
+#define GEmemf(lhs, rhs, num_bytes, ...) _OPtMEMf(lhs, >=, rhs, num_bytes, #lhs, #rhs, #num_bytes, __VA_ARGS__)
 
 
 #endif /* !_SYSTEM_TEST_CTEST_H */

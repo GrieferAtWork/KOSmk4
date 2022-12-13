@@ -64,13 +64,14 @@ DEFINE_TEST(fparseln_works) {
 	unsigned int readlines = 0;
 	unsigned int empty_lines = 0;
 	char *line;
-	FILE *fp = fmemopen((char *)text, COMPILER_STRLEN(text), "r");
-	assertf(fp, "%d:%s:%s", errno, strerrorname_np(errno), strerrordesc_np(errno));
+	FILE *fp;
+	ISnonnullf((fp = fmemopen((char *)text, COMPILER_STRLEN(text), "r")),
+	           "%d:%s:%s", errno, strerrorname_np(errno), strerrordesc_np(errno));
 	for (;;) {
 		unsigned long lno;
 		char *endptr;
-		line = fparseln(fp, NULL, NULL, NULL, FPARSELN_UNESCALL);
-		assertf(line, "%d:%s:%s", errno, strerrorname_np(errno), strerrordesc_np(errno));
+		ISnonnullf((line = fparseln(fp, NULL, NULL, NULL, FPARSELN_UNESCALL)),
+		           "%d:%s:%s", errno, strerrorname_np(errno), strerrordesc_np(errno));
 		if (!*line) {
 			free(line);
 			if (readlines == 6) {
@@ -82,12 +83,12 @@ DEFINE_TEST(fparseln_works) {
 			assert(feof(fp));
 			break;
 		}
-		assertf(line[0] == 'l', "%q", line);
-		assertf(line[1] == 'n', "%q", line);
-		assertf(line[2] == '#', "%q", line);
+		EQf('l', line[0], "%q", line);
+		EQf('n', line[1], "%q", line);
+		EQf('#', line[2], "%q", line);
 		lno = strtoul(line + 3, &endptr, 10);
-		assertf(*endptr == 0, "%q (%q)", line, endptr);
-		assertf(lno == readlines, "%q (%lu != %u)", line, lno, readlines);
+		EQf(0, *endptr, "%q (%q)", line, endptr);
+		EQf(readlines, lno, "%q", line);
 		free(line);
 		++readlines;
 	}

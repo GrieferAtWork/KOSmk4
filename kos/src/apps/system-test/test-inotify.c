@@ -30,7 +30,6 @@
 #include <sys/stat.h>
 #include <system-test/ctest.h>
 
-#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -150,7 +149,7 @@ DEFINE_TEST(dnotify) {
 	fd_t dirfd, fd;
 	sighandler_t ohand;
 	sigio = 0;
-	ohand = signal(SIGUSR1, &sigio_handler);
+	NE(SIG_ERR, (ohand = signal(SIGUSR1, &sigio_handler)));
 
 	/* Setup SIGIO-based notification for events on /tmp */
 	ISpos((dirfd = open("/tmp", O_RDONLY))); /* NOLINT */
@@ -184,7 +183,7 @@ DEFINE_TEST(dnotify) {
 	EQ(0, close(dirfd));
 	EQ(4, sigio); /* <no event> */
 
-	signal(SIGUSR1, ohand);
+	NE(SIG_ERR, signal(SIGUSR1, ohand));
 	EQ(4, sigio); /* <no event> */
 }
 

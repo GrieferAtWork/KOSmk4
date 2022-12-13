@@ -45,54 +45,42 @@ DEFINE_TEST(pty_works_correctly) {
 	char name[64], buf[sizeof(pty_child_data) + 16];
 	fd_t master, slave;
 	struct stat st;
-	ssize_t error;
 	pid_t cpid;
-	if (openpty(&master, &slave, name, NULL, NULL))
-		err(1, "openpty() failed");
+	EQ(0, openpty(&master, &slave, name, NULL, NULL));
+
 	/* Make  sure that  the file  indicated by  `sys_openpty()' actually exists.
 	 * This file should be apart of the /dev/ filesystem, however POSIX  doesn't
 	 * actually require that it be placed anywhere in particular, so just assert
 	 * that it exists. */
-	if (stat(name, &st) != 0)
-		err(1, "Failed to stat(%q)", name);
+	EQ(0, stat(name, &st));
 
 	/* Write some data into the PTY pipe buffer form inside of another process. */
-	cpid = fork();
+	ISpos((cpid = fork()));
 	if (cpid == 0) {
-		if ((error = write(slave, pty_child_data, sizeof(pty_child_data))) != sizeof(pty_child_data))
-			err(1, "Failed to write to slave (%" PRIdSIZ ")", error);
+		EQ(sizeof(pty_child_data), write(slave, pty_child_data, sizeof(pty_child_data)));
 		_Exit(0);
 	}
-	if (cpid < 0)
-		err(1, "fork() failed");
 
 	/* Read the data that was written by the child process. */
-	if ((error = read(master, buf, sizeof(buf))) != sizeof(pty_child_data))
-		err(1, "Error, or unexpected amount of data read from master (%" PRIdSIZ ")", error);
-	if (bcmp(buf, pty_child_data, sizeof(pty_child_data)) != 0)
-		err(1, "Wrong data read by master: %$q", sizeof(pty_child_data), buf);
+	EQ(sizeof(pty_child_data), read(master, buf, sizeof(buf)));
+	EQmem(pty_child_data, buf, sizeof(pty_child_data));
 
 	/* Wait for the child process to exit. - As long as the child is still alive,
 	 * we're still sharing the handles for the slave/master endpoint of the  PTY,
 	 * meaning  that us close()-ing them below may  not actually cause the PTY to
 	 * be destroyed. */
 	errno = 0;
-	while (waitpid(cpid, NULL, 0) != cpid) {
-		if (errno == EINTR)
-			continue;
-		if (errno)
-			err(1, "waitpid(%d) failed", cpid);
-	}
+	while (waitpid(cpid, NULL, 0) != cpid)
+		EQerrno(EINTR);
 
 	/* Closing the slave-side will cause the master to always indicate EOF.
 	 * Alternatively, closing the master-side first would cause the slave-side to do the same.
 	 * NOTE: Attempting to read from `master' before closing `slave' would block
 	 *       until `slave' was closed,  or until at least  one byte of data  was
 	 *       written to `slave' */
-	close(slave);
-	if ((error = read(master, buf, sizeof(buf))) != 0)
-		err(1, "Expected EOF after slave was closed (%" PRIdSIZ ")", error);
-	close(master);
+	EQ(0, close(slave));
+	EQ(0, read(master, buf, sizeof(buf)));
+	EQ(0, close(master));
 
 	/* Make  sure that after both the master _and_ slave have been closed, the /dev/
 	 * file (who's existence we've asserted  earlier) goes away without any  further
@@ -100,8 +88,8 @@ DEFINE_TEST(pty_works_correctly) {
 	 * we, but also some other process could do to prevent the file from going away,
 	 * however, starting out with a clean system state, the file(s) should always go
 	 * away without any additional hassle) */
-	if (stat(name, &st) == 0)
-		err(1, "stat(%q) still succeeds after master and slave were deleted", name);
+	EQ(-1, stat(name, &st));
+	EQerrno(ENOENT);
 }
 
 

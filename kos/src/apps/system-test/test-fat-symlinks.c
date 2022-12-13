@@ -27,7 +27,6 @@
 #include <kos/ksysctl.h>
 #include <system-test/ctest.h>
 
-#include <assert.h>
 #include <string.h>
 #include <unistd.h>
 

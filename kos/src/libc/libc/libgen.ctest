@@ -69,9 +69,9 @@ DEFINE_TEST(libgen) {
 	{
 		char *s;
 		s = dirname(NULL);
-		assertf(strcmp(s, ".") == 0, "dirname: %q", s);
+		EQstr(".", s);
 		s = __xpg_basename(NULL);
-		assertf(strcmp(s, ".") == 0, "xpg_basename: %q", s);
+		EQstr(".", s);
 	}
 }
 

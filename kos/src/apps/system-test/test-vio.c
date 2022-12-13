@@ -106,49 +106,42 @@ DEFINE_TEST(vio) {
 	size_t ps = getpagesize();
 	void *addr;
 	volatile void *viobase;
-	int error;
 	fd_t viofd;
-	addr = mmap(NULL, 3 * ps, PROT_READ | PROT_WRITE,
-	            MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-	assertf(addr != MAP_FAILED, "errno = %u (%m)", errno);
+	NEf(MAP_FAILED,
+	    (addr = mmap(NULL, 3 * ps, PROT_READ | PROT_WRITE,
+	                 MAP_PRIVATE | MAP_ANONYMOUS, -1, 0)),
+	    "errno = %u (%m)", errno);
 	/* Fill the newly mapped memory with all 1-bits */
 	memset(addr, 0xff, 3 * ps);
 
 	/* Punch a hole into the middle of the 3 pages. */
-	error = munmap((byte_t *)addr + ps, ps);
-	assertf(error == 0, "error = %d, errno = %u (%m)", error, errno);
+	EQf(0, munmap((byte_t *)addr + ps, ps), "errno = %u (%m)", errno);
 
 	/* Load the VIO library */
-	libvio = dlopen(LIBVIO_LIBRARY_NAME, RTLD_LAZY | RTLD_GLOBAL);
-	assertf(libvio, "%q", dlerror());
-	*(void **)&vio_create  = dlsym(libvio, "vio_create");
-	assertf(vio_create, "%q", dlerror());
-	*(void **)&vio_destroy = dlsym(libvio, "vio_destroy");
-	assertf(vio_destroy, "%q", dlerror());
+	ISnonnullf((libvio = dlopen(LIBVIO_LIBRARY_NAME, RTLD_LAZY | RTLD_GLOBAL)), "%s", dlerror());
+	ISnonnullf((*(void **)&vio_create  = dlsym(libvio, "vio_create")), "%s", dlerror());
+	ISnonnullf((*(void **)&vio_destroy = dlsym(libvio, "vio_destroy")), "%s", dlerror());
 
 	/* Create the VIO controller. */
-	viofd = vio_create(&myvio_ops, NULL, ps, O_CLOEXEC);
-	assertf(viofd >= 0, "viofd = %d, errno = %u (%m)",
-			viofd, errno);
+	ISposf((viofd = vio_create(&myvio_ops, NULL, ps, O_CLOEXEC)), "errno = %u (%m)", errno);
 
 	/* Map our VIO region into the hole we punched above. */
-	viobase = mmap((byte_t *)addr + ps, ps, PROT_READ | PROT_WRITE,
-	               MAP_PRIVATE | MAP_FILE | MAP_FIXED, viofd, 0);
-	assertf(viobase == (byte_t *)addr + ps,
-	        "viobase = %p, errno = %u (%m)",
-	        viobase, errno);
+	EQf((byte_t *)addr + ps,
+	    (viobase = mmap((byte_t *)addr + ps, ps, PROT_READ | PROT_WRITE,
+	                    MAP_PRIVATE | MAP_FILE | MAP_FIXED, viofd, 0)),
+	    "errno = %u (%m)", errno);
 
 	/* All right! Everything's been set up */
-	assert(num_vio_read == 0);
-	assert(num_vio_write == 0);
+	EQ(0, num_vio_read);
+	EQ(0, num_vio_write);
 
 	/* First test: make sure that reading/writing is correctly dispatched */
 	sink = ((u32 volatile *)viobase)[0];
-	assert(num_vio_read == 1);
-	assert(num_vio_write == 0);
+	EQ(1, num_vio_read);
+	EQ(0, num_vio_write);
 	((u32 volatile *)viobase)[0] = sink;
-	assert(num_vio_read == 1);
-	assert(num_vio_write == 1);
+	EQ(1, num_vio_read);
+	EQ(1, num_vio_write);
 
 	/* This  is where  it gets a  bit complicated, because  we're testing to
 	 * ensure that  reading/writing from  an unaligned  memory address  near
@@ -248,9 +241,9 @@ DEFINE_TEST(vio) {
 	}
 
 	/* Cleanup... */
-	vio_destroy(viofd);
-	dlclose(libvio);
-	munmap(addr, 3 * ps);
+	EQ(0, vio_destroy(viofd));
+	EQ(0, dlclose(libvio));
+	EQ(0, munmap(addr, 3 * ps));
 }
 
 

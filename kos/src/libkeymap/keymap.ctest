@@ -51,7 +51,7 @@ PRIVATE void *MapFile(char const *filename, size_t *psize) {
 	NE(MAP_FAILED, result);
 	if (psize)
 		*psize = (size_t)st.st_size;
-	close(fd);
+	EQ(0, close(fd));
 	return result;
 }
 
@@ -64,15 +64,10 @@ DEFINE_TEST(keymap_translations) {
 	struct keymap mymap;
 	void *filedata; size_t filesize;
 	char buf[64]; size_t buflen;
-	km = dlopen(LIBKEYMAP_LIBRARY_NAME, RTLD_LOCAL);
-	ISnonnull(km);
-
-	*(void **)&keymap_openblob      = dlsym(km, "keymap_openblob");
-	*(void **)&keymap_codesize      = dlsym(km, "keymap_codesize");
-	*(void **)&keymap_translate_buf = dlsym(km, "keymap_translate_buf");
-	ISnonnull(keymap_openblob);
-	ISnonnull(keymap_codesize);
-	ISnonnull(keymap_translate_buf);
+	ISnonnullf((km = dlopen(LIBKEYMAP_LIBRARY_NAME, RTLD_LOCAL)), "%s", dlerror());
+	ISnonnullf((*(void **)&keymap_openblob      = dlsym(km, "keymap_openblob")), "%s", dlerror());
+	ISnonnullf((*(void **)&keymap_codesize      = dlsym(km, "keymap_codesize")), "%s", dlerror());
+	ISnonnullf((*(void **)&keymap_translate_buf = dlsym(km, "keymap_translate_buf")), "%s", dlerror());
 
 	filedata = MapFile("/lib/keymap/de_DE", &filesize);
 	assert(keymap_openblob(&mymap, filedata, filesize) == true);

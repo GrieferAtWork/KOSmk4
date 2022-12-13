@@ -32,7 +32,6 @@
 #include <sys/un.h>
 #include <system-test/ctest.h>
 
-#include <err.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
@@ -50,94 +49,67 @@ DEFINE_TEST(unix_socket) {
 	struct stat st;
 
 	/* Server */
-	server_sock = socket(AF_UNIX, SOCK_STREAM, PF_UNIX); /* NOLINT */
-	if (server_sock < 0)
-		err(1, "socket() failed");
+	ISpos((server_sock = socket(AF_UNIX, SOCK_STREAM, PF_UNIX))); /* NOLINT */
 	sa.sun_family = AF_UNIX;
-	sprintf(sa.sun_path, "/tmp/.my_unix_socket");
+	ISpos(sprintf(sa.sun_path, "/tmp/.my_unix_socket"));
 	unlink(sa.sun_path);
-	if (bind(server_sock, (struct sockaddr *)&sa, sizeof(sa)) < 0)
-		err(1, "bind() failed");
-	if (listen(server_sock, 8) < 0)
-		err(1, "listen() failed");
-	if (stat(sa.sun_path, &st) < 0)
-		err(1, "stat() failed");
+	EQ(0, bind(server_sock, (struct sockaddr *)&sa, sizeof(sa)));
+	EQ(0, listen(server_sock, 8));
+	EQ(0, stat(sa.sun_path, &st));
 
 	/* Client (NOTE: `SOCK_NONBLOCK' means async connect) */
-	client_sock = socket(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK, PF_UNIX); /* NOLINT */
-	if (client_sock < 0)
-		err(1, "socket() failed");
-	if (connect(client_sock, (struct sockaddr *)&sa, sizeof(sa)) < 0)
-		err(1, "connect() failed");
+	ISpos((client_sock = socket(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK, PF_UNIX))); /* NOLINT */
+	EQ(0, connect(client_sock, (struct sockaddr *)&sa, sizeof(sa)));
 
 	/* Accept the client */
-	accept_sock = accept(server_sock, NULL, NULL); /* NOLINT */
-	if (accept_sock < 0)
-		err(1, "accept() failed");
+	ISpos((accept_sock = accept(server_sock, NULL, NULL))); /* NOLINT */
 
 	/* Acknowledge the accept from the client-side, and check for errors. */
 	{
 		struct pollfd pfd[1];
 		pfd[0].fd     = client_sock;
 		pfd[0].events = POLLOUT;
-		if (poll(pfd, 1, -1) <= 0)
-			err(1, "poll() failed");
+		LO(0, poll(pfd, 1, -1));
 	}
 
 	/* Make the client socket synchronous */
-	fcntl(client_sock, F_SETFL, fcntl(client_sock, F_GETFL) & ~O_NONBLOCK);
+	{
+		int fl;
+		NE(-1, (fl = fcntl(client_sock, F_GETFL)));
+		EQ(0, fcntl(client_sock, F_SETFL, fl & ~O_NONBLOCK));
+	}
 
 	/* Read out the connect error from the client socket. */
 	{
 		int error = ENOSYS;
 		socklen_t error_len = sizeof(error);
-		if (getsockopt(client_sock, SOL_SOCKET, SO_ERROR, &error, &error_len) < 0)
-			err(1, "getsockopt() failed");
-		if (error_len != sizeof(error))
-			errc(1, EINVAL, "getsockopt(SO_ERROR) returned error_len=%u", (unsigned int)error_len);
-		if (error != EOK)
-			errc(1, error, "getsockopt(SO_ERROR) returned an error");
+		EQ(0, getsockopt(client_sock, SOL_SOCKET, SO_ERROR, &error, &error_len));
+		EQ(sizeof(error), error_len);
+		EQ(EOK, error);
 	}
 
 	/* At this point, we've got a full-duplex connection.
 	 * Time to send some data. */
 	{
 		char buf[128];
-		ssize_t len;
 		static char const msg1[] = "A->C";
 		static char const msg2[] = "C->A";
 		static char const msg3[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
-		len = write(accept_sock, msg1, sizeof(msg1) - sizeof(char));
-		if (len != sizeof(msg1) - sizeof(char))
-			err(1, "write(accept_sock) returned: %" PRIdSIZ, len);
-		len = read(client_sock, buf, sizeof(buf));
-		if (len != sizeof(msg1) - sizeof(char))
-			err(1, "read(client_sock) returned: %" PRIdSIZ, len);
-		if (bcmp(buf, msg1, sizeof(msg1) - sizeof(char)) != 0)
-			errc(1, EINVAL, "read(client_sock) returned data %$q", len, buf);
-		len = write(client_sock, msg2, sizeof(msg2) - sizeof(char));
-		if (len != sizeof(msg2) - sizeof(char))
-			err(1, "write(client_sock) returned: %" PRIdSIZ, len);
-		len = read(accept_sock, buf, sizeof(buf));
-		if (len != sizeof(msg2) - sizeof(char))
-			err(1, "read(accept_sock) returned: %" PRIdSIZ, len);
-		if (bcmp(buf, msg2, sizeof(msg2) - sizeof(char)) != 0)
-			errc(1, EINVAL, "read(accept_sock) returned data %$q", len, buf);
-
-		len = write(accept_sock, msg3, sizeof(msg3) - sizeof(char));
-		if (len != sizeof(msg3) - sizeof(char))
-			err(1, "write(accept_sock) returned: %" PRIdSIZ, len);
-		len = read(client_sock, buf, sizeof(buf));
-		if (len != sizeof(msg3) - sizeof(char))
-			err(1, "read(client_sock) returned: %" PRIdSIZ, len);
-		if (bcmp(buf, msg3, sizeof(msg3) - sizeof(char)) != 0)
-			errc(1, EINVAL, "read(client_sock) returned data %$q", len, buf);
+		EQ(sizeof(msg1) - sizeof(char), write(accept_sock, msg1, sizeof(msg1) - sizeof(char)));
+		EQ(sizeof(msg1) - sizeof(char), read(client_sock, buf, sizeof(buf)));
+		EQmem(msg1, buf, sizeof(msg1) - sizeof(char));
+		EQ(sizeof(msg2) - sizeof(char), write(client_sock, msg2, sizeof(msg2) - sizeof(char)));
+		EQ(sizeof(msg2) - sizeof(char), read(accept_sock, buf, sizeof(buf)));
+		EQmem(msg2, buf, sizeof(msg2) - sizeof(char));
+		EQ(sizeof(msg3) - sizeof(char), write(accept_sock, msg3, sizeof(msg3) - sizeof(char)));
+		EQ(sizeof(msg3) - sizeof(char), read(client_sock, buf, sizeof(buf)));
+		EQmem(msg3, buf, sizeof(msg3) - sizeof(char));
 	}
 
-	close(accept_sock);
-	close(client_sock);
-	close(server_sock);
+	EQ(0, close(accept_sock));
+	EQ(0, close(client_sock));
+	EQ(0, close(server_sock));
 }
 
 

@@ -31,7 +31,6 @@
 #include <sys/stat.h>
 #include <system-test/ctest.h>
 
-#include <assert.h>
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>

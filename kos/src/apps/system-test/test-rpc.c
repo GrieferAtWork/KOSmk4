@@ -47,7 +47,7 @@ my_rpc_function(struct rpc_context *__restrict ctx,
 	/* This is the context expected from `rpc_serve()' */
 	EQ(RPC_REASONCTX_SYSINT, ctx->rc_context);
 	EQ(SYS_rpc_serve, ctx->rc_scinfo.rsi_sysno);
-	assert(!(ctx->rc_scinfo.rsi_flags & RPC_SYSCALL_INFO_FEXCEPT));
+	ISbitoff(RPC_SYSCALL_INFO_FEXCEPT, ctx->rc_scinfo.rsi_flags);
 	EQ(-EINTR, ucpustate_getreturn(ctx->rc_state));
 	++rpc_function_called;
 }

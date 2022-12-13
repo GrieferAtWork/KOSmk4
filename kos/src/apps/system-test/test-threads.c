@@ -39,9 +39,7 @@ PRIVATE bool did_run_my_thread_main = false;
 PRIVATE int my_thread_main(void *ptr) {
 	assertf(!did_run_my_thread_main,
 	        "Thread main already executed");
-	assertf((char *)ptr == message_pointer,
-	        "ptr = %p, message_pointer = %p",
-	        ptr, message_pointer);
+	EQ(message_pointer, (char *)ptr);
 	did_run_my_thread_main = true;
 	return 1234;
 }
@@ -55,7 +53,7 @@ DEFINE_TEST(multi_threading) {
 	COMPILER_BARRIER();
 	EQ(thrd_success, thrd_join(thread, &result));
 	assertf(did_run_my_thread_main, "Thread not actually executed");
-	assertf(result == 1234, "result = %d", result);
+	EQ(1234, result);
 }
 
 

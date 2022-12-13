@@ -1313,6 +1313,8 @@ int close($fd_t fd);
 @@>> access(2)
 @@@param: type: Set of `X_OK | W_OK | R_OK'
 @@Test for access to the specified file `file', testing for `type'
+@@@return: 0 : Access would be granted
+@@@return: -1: Access would be denied (s.a. `errno')
 [[cp, guard, wunused, crt_dos_variant, decl_include("<features.h>")]]
 [[dos_only_export_alias("_access")]]
 [[export_alias("__access", "__libc_access")]]

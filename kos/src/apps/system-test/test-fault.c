@@ -48,8 +48,6 @@ DECL_BEGIN
 
 #define assert_except_code(code) \
 	assertf(was_thrown(code), "except_code(): %#Ix", except_code())
-#define assert_eq_ptr(a, b) \
-	assertf((uintptr_t)(a) == (uintptr_t)(b), "%p != %p", (uintptr_t)(a), (uintptr_t)(b))
 #define assert_range(a, b, shift)                                      \
 	assertf(((uintptr_t)(a) - (uintptr_t)(b)) <= (uintptr_t)(shift) || \
 	        ((uintptr_t)(b) - (uintptr_t)(a)) <= (uintptr_t)(shift),   \
@@ -423,7 +421,7 @@ test_addr_op(unsigned int op, void *addr, bool is_canon, bool is_vio) {
 			exp_mask    |= E_SEGFAULT_CONTEXT_VIO;
 			exp_context |= E_SEGFAULT_CONTEXT_VIO;
 		} else {
-			assert_eq_ptr(except_data()->e_args.e_segfault.s_addr, addr);
+			EQ(addr, (void *)except_data()->e_args.e_segfault.s_addr);
 		}
 		assert_eq_msk(except_data()->e_args.e_segfault.s_context, exp_mask, exp_context);
 	}
@@ -464,7 +462,7 @@ PRIVATE void test_addr(void *addr, bool is_canon, bool is_vio) {
 			 * max # number of bytes on the data-bus minus 1 */
 			assert_range(except_data()->e_args.e_segfault.s_addr, addr, WORDMASK);
 		} else {
-			assert_eq_ptr(except_data()->e_args.e_segfault.s_addr, addr);
+			EQ(addr, (void *)except_data()->e_args.e_segfault.s_addr);
 		}
 		assert_eq_msk(except_data()->e_args.e_segfault.s_context,
 		              E_SEGFAULT_CONTEXT_NONCANON |

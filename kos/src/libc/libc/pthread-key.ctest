@@ -29,7 +29,6 @@
 #include <kos/types.h>
 #include <system-test/ctest.h>
 
-#include <assert.h>
 #include <errno.h>
 #include <pthread.h>
 #include <stddef.h>
