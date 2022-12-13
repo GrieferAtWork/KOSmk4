@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix bug in `DeeTuple_ExtendInherited()`"
-DEEMON_VERSION="7f2cb283f66e0d65f4eea1895588732f931ddb03"
+#     v -- "Fix configure script for detecting fixed-item-width memcpy/memmove"
+DEEMON_VERSION="260ce0cedc26c9aa82f6f259655ce7e43092526b"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
