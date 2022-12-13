@@ -755,7 +755,7 @@ install_path_hardcopy() {
 #>> rundeemon <ARGS...>
 # Invoke `deemon $*`
 rundeemon() {
-	"$KOS_ROOT/binutils/deemon/deemon" "${*[@]}"
+	"$KOS_ROOT/binutils/deemon/deemon" "$@"
 	return $?
 }
 

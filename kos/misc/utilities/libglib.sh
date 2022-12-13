@@ -37,7 +37,7 @@ CONFIGURE=(
 
 # Don't install these files the "normal" way:
 INSTALL_SKIP="
-/lib/glib-2.0/include/glibconfig.h
+/$TARGET_LIBPATH/glib-2.0/include/glibconfig.h
 "
 
 # Fix the messed-up header include system as far as that is possible
@@ -61,11 +61,11 @@ if [ "$TARGET_NAME" == "i386" ] || [ "$TARGET_NAME" == "x86_64" ]; then
 	if [ "$TARGET_NAME" == "i386" ]; then
 		install_rawfile \
 			"$KOS_ROOT/kos/include/$TARGET_INCPATH/glibconfig32.h" \
-			"$DESTDIR/lib/glib-2.0/include/glibconfig.h"
+			"$DESTDIR/$TARGET_LIBPATH/glib-2.0/include/glibconfig.h"
 	else
 		install_rawfile \
 			"$KOS_ROOT/kos/include/$TARGET_INCPATH/glibconfig64.h" \
-			"$DESTDIR/lib/glib-2.0/include/glibconfig.h"
+			"$DESTDIR/$TARGET_LIBPATH/glib-2.0/include/glibconfig.h"
 	fi
 	install_rawfile_stdin "$KOS_ROOT/kos/include/$TARGET_INCPATH/glibconfig.h" <<EOF
 #ifndef _I386_KOS_GLIBCONFIG_H
@@ -83,7 +83,7 @@ if [ "$TARGET_NAME" == "i386" ] || [ "$TARGET_NAME" == "x86_64" ]; then
 EOF
 else
 	install_rawfile \
-		"$DESTDIR/lib/glib-2.0/include/glibconfig.h" \
+		"$DESTDIR/$TARGET_LIBPATH/glib-2.0/include/glibconfig.h" \
 		"$KOS_ROOT/kos/include/$TARGET_INCPATH/glibconfig.h"
 fi
 
