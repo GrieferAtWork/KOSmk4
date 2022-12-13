@@ -275,6 +275,17 @@ install_rawfile_stdin() {
 	fi
 }
 
+load_BUILD_CONFIG_NAMES() {
+	if test -z "$BUILD_CONFIG_NAMES"; then
+		local OLDPWD="$(pwd)"
+		cmd cd "$KOS_ROOT/bin"
+		BUILD_CONFIG_NAMES=($TARGET_NAME-kos-*)
+		cmd cd "$OLDPWD"
+		# Remove $TARGET_NAME-kos-common from list of config names
+		BUILD_CONFIG_NAMES=("${BUILD_CONFIG_NAMES[@]/$TARGET_NAME-kos-common}")
+	fi
+}
+
 
 #>> install_file <ABSOLUTE_DISK_PATH> <SOURCE>
 install_file() {
@@ -295,33 +306,27 @@ install_file() {
 		else
 			echo "Installing file $TARGET_NAME-kos:/$DISPATH (up to date)"
 		fi
-		local OLDPWD="$(pwd)"
-		cmd cd "$KOS_ROOT/bin"
-		local BUILD_CONFIG_NAMES=$(echo $TARGET_NAME-kos-*)
-		cmd cd "$OLDPWD"
-		local TARGET_DISPATH_MODIFIED="$(stat -c %Y "$TARGET_DISPATH")"
-		for BUILD_CONFIG in $BUILD_CONFIG_NAMES; do
-			if [ "$BUILD_CONFIG" != "$TARGET_NAME-kos-common" ]; then
-				local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
-				local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
-				local DISKIMAGE="$CONFIG_SYSROOT/disk.img"
-				if [ -f "$DISKIMAGE" ]; then
-					if [ "$DIDUPDATE" == yes ] || ! [ -f "$CONFIG_DISPATH" ] || \
-					   [ "$TARGET_DISPATH_MODIFIED" -gt "$(stat -c %Y "$CONFIG_DISPATH")" ]; then
-						echo "    Conf: '$CONFIG_SYSROOT'"
-						unlink "$CONFIG_DISPATH" > /dev/null 2>&1
-						if ! ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH" > /dev/null 2>&1; then
-							cmd mkdir -p "$(dirname "$CONFIG_DISPATH")"
-							cmd ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH"
-						fi
-						echo "        Disk: '$DISKIMAGE'"
+		load_BUILD_CONFIG_NAMES
+		for BUILD_CONFIG in "${BUILD_CONFIG_NAMES[@]}"; do
+			local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
+			local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
+			local DISKIMAGE="$CONFIG_SYSROOT/disk.img"
+			if [ -f "$DISKIMAGE" ]; then
+				if [ "$DIDUPDATE" == yes ] || ! [ -f "$CONFIG_DISPATH" ] || \
+				   [ "$TARGET_DISPATH" -nt "$CONFIG_DISPATH" ]; then
+					echo "    Conf: '$CONFIG_SYSROOT'"
+					unlink "$CONFIG_DISPATH" > /dev/null 2>&1
+					if ! ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH" > /dev/null 2>&1; then
+						cmd mkdir -p "$(dirname "$CONFIG_DISPATH")"
+						cmd ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH"
+					fi
+					echo "        Disk: '$DISKIMAGE'"
+					mtools_install_file "$DISKIMAGE" "$DISPATH" "$2"
+				else
+					echo "    Conf: '$CONFIG_SYSROOT' (up to date)"
+					if [ "$MODE_FORCE_DISK" == "yes" ]; then
+						echo "        Disk: '$DISKIMAGE' (forced)"
 						mtools_install_file "$DISKIMAGE" "$DISPATH" "$2"
-					else
-						echo "    Conf: '$CONFIG_SYSROOT' (up to date)"
-						if [ "$MODE_FORCE_DISK" == "yes" ]; then
-							echo "        Disk: '$DISKIMAGE' (forced)"
-							mtools_install_file "$DISKIMAGE" "$DISPATH" "$2"
-						fi
 					fi
 				fi
 			fi
@@ -353,31 +358,26 @@ install_symlink() {
 		else
 			echo "Installing symlink $TARGET_NAME-kos:/$DISPATH (up to date)"
 		fi
-		local OLDPWD="$(pwd)"
-		cmd cd "$KOS_ROOT/bin"
-		local BUILD_CONFIG_NAMES=$(echo $TARGET_NAME-kos-*)
-		cmd cd "$OLDPWD"
-		for BUILD_CONFIG in $BUILD_CONFIG_NAMES; do
-			if [ "$BUILD_CONFIG" != "$TARGET_NAME-kos-common" ]; then
-				local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
-				local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
-				local DISKIMAGE="$CONFIG_SYSROOT/disk.img"
-				if [ -f "$DISKIMAGE" ]; then
-					if [ "$DIDUPDATE" == yes ] || ! [ -f "$CONFIG_DISPATH" ]; then
-						echo "    Conf: '$CONFIG_SYSROOT'"
-						unlink "$CONFIG_DISPATH" > /dev/null 2>&1
-						if ! ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH" > /dev/null 2>&1; then
-							cmd mkdir -p "$(dirname "$CONFIG_DISPATH")"
-							cmd ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH"
-						fi
-						echo "        Disk: '$DISKIMAGE'"
+		load_BUILD_CONFIG_NAMES
+		for BUILD_CONFIG in "${BUILD_CONFIG_NAMES[@]}"; do
+			local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
+			local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
+			local DISKIMAGE="$CONFIG_SYSROOT/disk.img"
+			if [ -f "$DISKIMAGE" ]; then
+				if [ "$DIDUPDATE" == yes ] || ! [ -f "$CONFIG_DISPATH" ]; then
+					echo "    Conf: '$CONFIG_SYSROOT'"
+					unlink "$CONFIG_DISPATH" > /dev/null 2>&1
+					if ! ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH" > /dev/null 2>&1; then
+						cmd mkdir -p "$(dirname "$CONFIG_DISPATH")"
+						cmd ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH"
+					fi
+					echo "        Disk: '$DISKIMAGE'"
+					mtools_install_symlink "$DISKIMAGE" "$DISPATH" "$2"
+				else
+					echo "    Conf: '$CONFIG_SYSROOT' (up to date)"
+					if [ "$MODE_FORCE_DISK" == "yes" ]; then
+						echo "        Disk: '$DISKIMAGE' (forced)"
 						mtools_install_symlink "$DISKIMAGE" "$DISPATH" "$2"
-					else
-						echo "    Conf: '$CONFIG_SYSROOT' (up to date)"
-						if [ "$MODE_FORCE_DISK" == "yes" ]; then
-							echo "        Disk: '$DISKIMAGE' (forced)"
-							mtools_install_symlink "$DISKIMAGE" "$DISPATH" "$2"
-						fi
 					fi
 				fi
 			fi
@@ -405,24 +405,19 @@ install_symlink_nodisk() {
 		else
 			echo "Installing symlink $TARGET_NAME-kos:/$DISPATH (up to date)"
 		fi
-		local OLDPWD="$(pwd)"
-		cmd cd "$KOS_ROOT/bin"
-		local BUILD_CONFIG_NAMES=$(echo $TARGET_NAME-kos-*)
-		cmd cd "$OLDPWD"
-		for BUILD_CONFIG in $BUILD_CONFIG_NAMES; do
-			if [ "$BUILD_CONFIG" != "$TARGET_NAME-kos-common" ]; then
-				local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
-				local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
-				if [ "$DIDUPDATE" == yes ] || ! [ -f "$CONFIG_DISPATH" ]; then
-					echo "    Conf: '$CONFIG_SYSROOT'"
-					unlink "$CONFIG_DISPATH" > /dev/null 2>&1
-					if ! ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH" > /dev/null 2>&1; then
-						cmd mkdir -p "$(dirname "$CONFIG_DISPATH")"
-						cmd ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH"
-					fi
-				else
-					echo "    Conf: '$CONFIG_SYSROOT' (up to date)"
+		load_BUILD_CONFIG_NAMES
+		for BUILD_CONFIG in "${BUILD_CONFIG_NAMES[@]}"; do
+			local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
+			local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
+			if [ "$DIDUPDATE" == yes ] || ! [ -f "$CONFIG_DISPATH" ]; then
+				echo "    Conf: '$CONFIG_SYSROOT'"
+				unlink "$CONFIG_DISPATH" > /dev/null 2>&1
+				if ! ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH" > /dev/null 2>&1; then
+					cmd mkdir -p "$(dirname "$CONFIG_DISPATH")"
+					cmd ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH"
 				fi
+			else
+				echo "    Conf: '$CONFIG_SYSROOT' (up to date)"
 			fi
 		done
 	fi
@@ -443,28 +438,22 @@ install_mkdir() {
 		else
 			echo "Installing dir $TARGET_NAME-kos:/$DISPATH (up to date)"
 		fi
-		local OLDPWD="$(pwd)"
-		cmd cd "$KOS_ROOT/bin"
-		local BUILD_CONFIG_NAMES=$(echo $TARGET_NAME-kos-*)
-		cmd cd "$OLDPWD"
-		local TARGET_DISPATH_MODIFIED="$(stat -c %Y "$TARGET_DISPATH")"
-		for BUILD_CONFIG in $BUILD_CONFIG_NAMES; do
-			if [ "$BUILD_CONFIG" != "$TARGET_NAME-kos-common" ]; then
-				local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
-				local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
-				local DISKIMAGE="$CONFIG_SYSROOT/disk.img"
-				if [ -f "$DISKIMAGE" ]; then
-					if [ "$DIDUPDATE" == yes ] || ! [ -d "$CONFIG_DISPATH" ]; then
-						echo "    Conf: '$CONFIG_SYSROOT'"
-						cmd mkdir -p "$CONFIG_DISPATH"
-						echo "        Disk: '$DISKIMAGE'"
+		load_BUILD_CONFIG_NAMES
+		for BUILD_CONFIG in "${BUILD_CONFIG_NAMES[@]}"; do
+			local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
+			local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
+			local DISKIMAGE="$CONFIG_SYSROOT/disk.img"
+			if [ -f "$DISKIMAGE" ]; then
+				if [ "$DIDUPDATE" == yes ] || ! [ -d "$CONFIG_DISPATH" ]; then
+					echo "    Conf: '$CONFIG_SYSROOT'"
+					cmd mkdir -p "$CONFIG_DISPATH"
+					echo "        Disk: '$DISKIMAGE'"
+					mtools_makedir "$DISKIMAGE" "$DISPATH"
+				else
+					echo "    Conf: '$CONFIG_SYSROOT' (up to date)"
+					if [ "$MODE_FORCE_DISK" == "yes" ]; then
+						echo "        Disk: '$DISKIMAGE' (forced)"
 						mtools_makedir "$DISKIMAGE" "$DISPATH"
-					else
-						echo "    Conf: '$CONFIG_SYSROOT' (up to date)"
-						if [ "$MODE_FORCE_DISK" == "yes" ]; then
-							echo "        Disk: '$DISKIMAGE' (forced)"
-							mtools_makedir "$DISKIMAGE" "$DISPATH"
-						fi
 					fi
 				fi
 			fi
@@ -491,24 +480,19 @@ install_file_nodisk() {
 		else
 			echo "Installing file $TARGET_NAME-kos:/$DISPATH (up to date)"
 		fi
-		local OLDPWD="$(pwd)"
-		cmd cd "$KOS_ROOT/bin"
-		local BUILD_CONFIG_NAMES=$(echo $TARGET_NAME-kos-*)
-		cmd cd "$OLDPWD"
-		for BUILD_CONFIG in $BUILD_CONFIG_NAMES; do
-			if [ "$BUILD_CONFIG" != "$TARGET_NAME-kos-common" ]; then
-				local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
-				local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
-				if [ "$DIDUPDATE" == yes ] || ! [ -e "$CONFIG_DISPATH" ]; then
-					echo "    Conf: '$CONFIG_SYSROOT'"
-					unlink "$CONFIG_DISPATH" > /dev/null 2>&1
-					if ! ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH" > /dev/null 2>&1; then
-						cmd mkdir -p "$(dirname "$CONFIG_DISPATH")"
-						cmd ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH"
-					fi
-				else
-					echo "    Conf: '$CONFIG_SYSROOT' (up to date)"
+		load_BUILD_CONFIG_NAMES
+		for BUILD_CONFIG in "${BUILD_CONFIG_NAMES[@]}"; do
+			local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
+			local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
+			if [ "$DIDUPDATE" == yes ] || ! [ -e "$CONFIG_DISPATH" ]; then
+				echo "    Conf: '$CONFIG_SYSROOT'"
+				unlink "$CONFIG_DISPATH" > /dev/null 2>&1
+				if ! ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH" > /dev/null 2>&1; then
+					cmd mkdir -p "$(dirname "$CONFIG_DISPATH")"
+					cmd ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH"
 				fi
+			else
+				echo "    Conf: '$CONFIG_SYSROOT' (up to date)"
 			fi
 		done
 	fi
@@ -530,30 +514,25 @@ install_path() {
 		else
 			echo "Installing path $TARGET_NAME-kos:/$DISPATH/* (up to date)"
 		fi
-		local OLDPWD="$(pwd)"
-		cmd cd "$KOS_ROOT/bin"
-		local BUILD_CONFIG_NAMES=$(echo $TARGET_NAME-kos-*)
-		cmd cd "$OLDPWD"
-		for BUILD_CONFIG in $BUILD_CONFIG_NAMES; do
-			if [ "$BUILD_CONFIG" != "$TARGET_NAME-kos-common" ]; then
-				local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
-				local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
-				local DISKIMAGE="$CONFIG_SYSROOT/disk.img"
-				if [ -f "$DISKIMAGE" ]; then
-					if [ "$(readlink -f "$CONFIG_DISPATH")" != \
-					     "$(readlink -f "$TARGET_DISPATH")" ]; then
-						echo "    Conf: '$CONFIG_SYSROOT'"
-						unlink "$CONFIG_DISPATH" > /dev/null 2>&1
-						if ! ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH" > /dev/null 2>&1; then
-							cmd mkdir -p "$(dirname "$CONFIG_DISPATH")"
-							cmd ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH"
-						fi
-					else
-						echo "    Conf: '$CONFIG_SYSROOT' (up to date)"
+		load_BUILD_CONFIG_NAMES
+		for BUILD_CONFIG in "${BUILD_CONFIG_NAMES[@]}"; do
+			local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
+			local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
+			local DISKIMAGE="$CONFIG_SYSROOT/disk.img"
+			if [ -f "$DISKIMAGE" ]; then
+				if [ "$(readlink -f "$CONFIG_DISPATH")" != \
+				     "$(readlink -f "$TARGET_DISPATH")" ]; then
+					echo "    Conf: '$CONFIG_SYSROOT'"
+					unlink "$CONFIG_DISPATH" > /dev/null 2>&1
+					if ! ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH" > /dev/null 2>&1; then
+						cmd mkdir -p "$(dirname "$CONFIG_DISPATH")"
+						cmd ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH"
 					fi
-					echo "        Disk: '$DISKIMAGE'"
-					mtools_install_path "$DISKIMAGE" "$DISPATH" "$2"
+				else
+					echo "    Conf: '$CONFIG_SYSROOT' (up to date)"
 				fi
+				echo "        Disk: '$DISKIMAGE'"
+				mtools_install_path "$DISKIMAGE" "$DISPATH" "$2"
 			fi
 		done
 	fi
@@ -572,30 +551,25 @@ install_path_hardcopy() {
 			unlink "$TARGET_DISPATH" > /dev/null 2>&1
 			cmd cp -R -n "$2" "$TARGET_DISPATH"
 		fi
-		local OLDPWD="$(pwd)"
-		cmd cd "$KOS_ROOT/bin"
-		local BUILD_CONFIG_NAMES=$(echo $TARGET_NAME-kos-*)
-		cmd cd "$OLDPWD"
-		for BUILD_CONFIG in $BUILD_CONFIG_NAMES; do
-			if [ "$BUILD_CONFIG" != "$TARGET_NAME-kos-common" ]; then
-				local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
-				local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
-				local DISKIMAGE="$CONFIG_SYSROOT/disk.img"
-				if [ -f "$DISKIMAGE" ]; then
-					if [ "$(readlink -f "$CONFIG_DISPATH")" != \
-					     "$(readlink -f "$TARGET_DISPATH")" ]; then
-						echo "    Conf: '$CONFIG_SYSROOT'"
-						unlink "$CONFIG_DISPATH" > /dev/null 2>&1
-						if ! ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH" > /dev/null 2>&1; then
-							cmd mkdir -p "$(dirname "$CONFIG_DISPATH")"
-							cmd ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH"
-						fi
-					else
-						echo "    Conf: '$CONFIG_SYSROOT' (up to date)"
+		load_BUILD_CONFIG_NAMES
+		for BUILD_CONFIG in "${BUILD_CONFIG_NAMES[@]}"; do
+			local CONFIG_SYSROOT="$KOS_ROOT/bin/$BUILD_CONFIG"
+			local CONFIG_DISPATH="$CONFIG_SYSROOT/$DISPATH"
+			local DISKIMAGE="$CONFIG_SYSROOT/disk.img"
+			if [ -f "$DISKIMAGE" ]; then
+				if [ "$(readlink -f "$CONFIG_DISPATH")" != \
+				     "$(readlink -f "$TARGET_DISPATH")" ]; then
+					echo "    Conf: '$CONFIG_SYSROOT'"
+					unlink "$CONFIG_DISPATH" > /dev/null 2>&1
+					if ! ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH" > /dev/null 2>&1; then
+						cmd mkdir -p "$(dirname "$CONFIG_DISPATH")"
+						cmd ln -r -s "$TARGET_DISPATH" "$CONFIG_DISPATH"
 					fi
-					echo "    Disk: '$DISKIMAGE'"
-					mtools_install_path "$DISKIMAGE" "$DISPATH" "$2"
+				else
+					echo "    Conf: '$CONFIG_SYSROOT' (up to date)"
 				fi
+				echo "    Disk: '$DISKIMAGE'"
+				mtools_install_path "$DISKIMAGE" "$DISPATH" "$2"
 			fi
 		done
 	fi
