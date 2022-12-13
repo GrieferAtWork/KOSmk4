@@ -1,0 +1,88 @@
+diff -Naur tree-orig/color.c tree/color.c
+--- tree-orig/color.c	2022-02-17 19:52:29.786523000 +0100
++++ tree/color.c	2022-12-13 20:50:44.378041700 +0100
+@@ -45,7 +45,7 @@
+   DOT_EXTENSION, ERROR
+ };
+ 
+-bool colorize = FALSE, ansilines = FALSE, linktargetcolor = FALSE;
++bool colorize = FALSE, linktargetcolor = FALSE;
+ char *term, termmatch = FALSE, istty;
+ char *leftcode = NULL, *rightcode = NULL, *endcode = NULL;
+ 
+diff -Naur tree-orig/tree.c tree/tree.c
+--- tree-orig/tree.c	2022-02-17 19:52:29.791519000 +0100
++++ tree/tree.c	2022-12-13 20:52:07.083807300 +0100
+@@ -76,7 +76,7 @@
+ extern struct xtable *gtable[256], *utable[256];
+ extern struct inotable *itable[256];
+ /* color.c */
+-extern bool colorize, ansilines, linktargetcolor;
++extern bool colorize, linktargetcolor;
+ extern char *leftcode, *rightcode, *endcode;
+ extern const struct linedraw *linedraw;
+ 
+@@ -94,9 +94,10 @@
+   q = p = dtotal = ftotal = 0;
+   aflag = dflag = fflag = lflag = pflag = sflag = Fflag = uflag = gflag = FALSE;
+   Dflag = qflag = Nflag = Qflag = Rflag = hflag = Hflag = siflag = cflag = FALSE;
+-  noindent = force_color = nocolor = xdev = noreport = nolinks = reverse = FALSE;
++  noindent = nocolor = xdev = noreport = nolinks = reverse = FALSE;
+   ignorecase = matchdirs = dirsfirst = inodeflag = devflag = Xflag = Jflag = FALSE;
+   duflag = pruneflag = FALSE;
++  force_color = TRUE;
+   flimit = 0;
+   dirs = xmalloc(sizeof(int) * (maxdirs=4096));
+   memset(dirs, 0, sizeof(int) * maxdirs);
+@@ -174,8 +175,10 @@
+ 	  break;
+ 	case 'C':
+ 	  force_color = TRUE;
++	  nocolor = FALSE;
+ 	  break;
+ 	case 'n':
++	  force_color = FALSE;
+ 	  nocolor = TRUE;
+ 	  break;
+ 	case 'x':
+@@ -195,9 +198,6 @@
+ 	  }
+ 	  ipattern = argv[n++];
+ 	  break;
+-	case 'A':
+-	  ansilines = TRUE;
+-	  break;
+ 	case 'S':
+ 	  charset = "IBM437";
+ 	  break;
+@@ -650,7 +650,6 @@
+ 	"  --sort X      Select sort: name,version,size,mtime,ctime.\n"
+ 	"  ------- Graphics options ------\n"
+ 	"  -i            Don't print indentation lines.\n"
+-	"  -A            Print ANSI lines graphic indentation lines.\n"
+ 	"  -S            Print with CP437 (console) graphics indentation lines.\n"
+ 	"  -n            Turn colorization off always (-C overrides).\n"
+ 	"  -C            Turn colorization on always.\n"
+@@ -1102,7 +1101,6 @@
+ {
+   int i;
+ 
+-  if (ansilines) {
+     if (dirs[0]) fprintf(outfile,"\033(0");
+     for(i=0; dirs[i] && i <= maxlevel; i++) {
+       if (dirs[i+1]) {
+@@ -1114,14 +1112,6 @@
+       }
+     }
+     if (dirs[0]) fprintf(outfile,"\033(B");
+-  } else {
+-    if (Hflag) fprintf(outfile,"\t");
+-    for(i=0; dirs[i] && i <= maxlevel; i++) {
+-      fprintf(outfile,"%s ",
+-	      dirs[i+1] ? (dirs[i]==1 ? linedraw->vert     : (Hflag? "&nbsp;&nbsp;&nbsp;" : "   ") )
+-			: (dirs[i]==1 ? linedraw->vert_left:linedraw->corner));
+-    }
+-  }
+ }
+ 
+ 
