@@ -316,7 +316,7 @@ BEGIN
 		SOURCE({ KENREL_LIBDL_BINARY_SOURCE })
 		if (TARGET_ARCH == "x86_64") {
 			/* For compatibility-mode (include the 32-bit version of libdl.so) */
-			SOURCE({ f"arch/{XARCH}/exec/libdl-compat.S" })
+			SOURCE({ f"arch/{XARCH}/exec/libdl-compat.S.incbin" })
 		}
 	END
 
