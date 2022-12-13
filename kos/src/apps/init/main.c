@@ -309,7 +309,7 @@ done_tmpfs:
 			if (errno == ENOENT) {
 				dprintf(STDOUT_FILENO,
 				        "Did you remember to install:\n"
-				        "\t" AC_WHITE("bash kos/misc/make_utility.sh " KOS_BUILD_CONFIG_TOOLCHAIN_BUILD " busybox") "\n");
+				        "\t" AC_WHITE("bash kos/misc/make_utility.sh " KOS_BUILD_CONFIG_TOOLCHAIN_BUILD_ARCH " busybox") "\n");
 			}
 			for (;;) {
 				char buf[1];
