@@ -162,7 +162,7 @@ BEGIN_ANONYMOUS GROUP("disk") { MFORMAT };
 	options[OPT_NOFORCE] = true; /* Don't re-create the disk when doing a forced re-build. */
 
 	/* Set disk format parameters */
-	options[OPT_MFORMAT_TOTAL_SECTORS]    = 0x100000;
+	options[OPT_MFORMAT_TOTAL_SECTORS]    = 0x200000;
 	options[OPT_MFORMAT_HEADS]            = 2;
 	options[OPT_MFORMAT_SECTORS_PER_HEAD] = 128;
 	options[OPT_MFORMAT_VOLUME_LABEL]     = "KOS";
