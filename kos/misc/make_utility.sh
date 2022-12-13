@@ -83,7 +83,9 @@ vxcmd() {
 dirname() {
 	echo "${1%/*}"
 }
-
+basename() {
+	echo "${1##*/}"
+}
 
 # Print options for recursive calls to make_utility.sh
 print_make_utility_options() {

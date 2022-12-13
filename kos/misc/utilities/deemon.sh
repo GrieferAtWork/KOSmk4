@@ -52,16 +52,16 @@ install_file /bin/deemon "$OPTPATH/deemon"
 
 # install dex modules
 for filename in $OPTPATH/lib/*.so; do
-	install_file "/usr/$TARGET_LIBPATH/deemon/$(basename -- "$filename")" "$filename"
+	install_file "/usr/$TARGET_LIBPATH/deemon/$(basename "$filename")" "$filename"
 done
 
 # install user-code modules
 for filename in $SRCPATH/lib/*.dee; do
-	install_file "/usr/$TARGET_LIBPATH/deemon/$(basename -- "$filename")" "$filename"
+	install_file "/usr/$TARGET_LIBPATH/deemon/$(basename "$filename")" "$filename"
 done
 
 for folder in _codecs net python rt; do
 	for filename in $SRCPATH/lib/$folder/*.dee; do
-		install_file "/usr/$TARGET_LIBPATH/deemon/$folder/$(basename -- "$filename")" "$filename"
+		install_file "/usr/$TARGET_LIBPATH/deemon/$folder/$(basename "$filename")" "$filename"
 	done
 done
