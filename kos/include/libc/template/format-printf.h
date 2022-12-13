@@ -246,11 +246,11 @@ __nextfmt:
 
 #ifdef __NO_PRINTF_POSITIONAL
 	case '?':
-#if __SIZEOF_POINTER__ > __VA_SIZE
+#if __SIZEOF_SIZE_T__ > __VA_SIZE
 		__width = __PRINTF_VARG(__size_t);
 		__flags |= __PRINTF_F_HASWIDTH;
 		goto __nextfmt;
-#endif /* __SIZEOF_POINTER__ > __VA_SIZE */
+#endif /* __SIZEOF_SIZE_T__ > __VA_SIZE */
 	case '*':
 		__width = (__size_t)__PRINTF_VARG(unsigned);
 		__flags |= __PRINTF_F_HASWIDTH;
@@ -261,13 +261,13 @@ __nextfmt:
 		__ATTR_FALLTHROUGH
 	case '.': /* Precision. */
 		__ch = *__FORMAT_FORMAT++;
-#if __SIZEOF_POINTER__ > __VA_SIZE
+#if __SIZEOF_SIZE_T__ > __VA_SIZE
 		if (__ch == '*') {
 			__precision = (__size_t)__PRINTF_VARG(unsigned);
 		} else if (__ch == '?')
-#else /* __SIZEOF_POINTER__ > __VA_SIZE */
+#else /* __SIZEOF_SIZE_T__ > __VA_SIZE */
 		if (__ch == '*' || __ch == '?')
-#endif /* __SIZEOF_POINTER__ <= __VA_SIZE */
+#endif /* __SIZEOF_SIZE_T__ <= __VA_SIZE */
 		{
 			__IF0 {
 	case '$':
@@ -312,20 +312,20 @@ __nextfmt:
 				if __unlikely(__posch != '$')
 					goto __broken_format;
 				++__FORMAT_FORMAT;
-#if __SIZEOF_POINTER__ > __VA_SIZE
+#if __SIZEOF_SIZE_T__ > __VA_SIZE
 				if (__ch == '*') {
 					__precision = (__size_t)__p_args[__posidx - 1].__p_unsigned;
 				} else
-#endif /* __SIZEOF_POINTER__ > __VA_SIZE */
+#endif /* __SIZEOF_SIZE_T__ > __VA_SIZE */
 				{
 					__precision = __p_args[__posidx - 1].__p___size_t;
 				}
 			} else {
-#if __SIZEOF_POINTER__ > __VA_SIZE
+#if __SIZEOF_SIZE_T__ > __VA_SIZE
 				if (__ch == '*') {
 					__precision = (__size_t)__builtin_va_arg(__FORMAT_ARGS, unsigned);
 				} else
-#endif /* __SIZEOF_POINTER__ > __VA_SIZE */
+#endif /* __SIZEOF_SIZE_T__ > __VA_SIZE */
 				{
 					__precision = __builtin_va_arg(__FORMAT_ARGS, __size_t);
 				}
@@ -361,20 +361,20 @@ __nextfmt:
 			if __unlikely(__posch != '$')
 				goto __broken_format;
 			++__FORMAT_FORMAT;
-#if __SIZEOF_POINTER__ > __VA_SIZE
+#if __SIZEOF_SIZE_T__ > __VA_SIZE
 			if (__ch == '*') {
 				__width = (__size_t)__p_args[__posidx - 1].__p_unsigned;
 			} else
-#endif /* __SIZEOF_POINTER__ > __VA_SIZE */
+#endif /* __SIZEOF_SIZE_T__ > __VA_SIZE */
 			{
 				__width = __p_args[__posidx - 1].__p___size_t;
 			}
 		} else {
-#if __SIZEOF_POINTER__ > __VA_SIZE
+#if __SIZEOF_SIZE_T__ > __VA_SIZE
 			if (__ch == '*') {
 				__width = (__size_t)__builtin_va_arg(__FORMAT_ARGS, unsigned);
 			} else
-#endif /* __SIZEOF_POINTER__ > __VA_SIZE */
+#endif /* __SIZEOF_SIZE_T__ > __VA_SIZE */
 			{
 				__width = __builtin_va_arg(__FORMAT_ARGS, __size_t);
 			}
@@ -1084,6 +1084,12 @@ __check_string_error_and_print_tail:
 		(void)__xformat_arg;
 		(void)__xformat_argsize;
 #define __COMPARE_NAME(x) (__COMPILER_STRLEN(x) == __xformat_size && __libc_bcmpc(x, __xformat_start, __COMPILER_STRLEN(x), sizeof(char)) == 0)
+
+
+
+		/************************************************************************/
+		/* "%[hex]"                                                             */
+		/************************************************************************/
 #ifndef __NO_PRINTF_HEX
 		if (__COMPARE_NAME("hex")) {
 #ifndef __FORMAT_HEXDUMP_FNORMAL
@@ -1135,6 +1141,12 @@ __check_string_error_and_print_tail:
 			break;
 		}
 #endif /* !__NO_PRINTF_HEX */
+
+
+
+		/************************************************************************/
+		/* "%[gen]"                                                             */
+		/************************************************************************/
 #ifndef __NO_PRINTF_GEN
 		if (__COMPARE_NAME("gen")) {
 #if __CHAR_SIZE == __SIZEOF_CHAR__
@@ -1213,6 +1225,12 @@ __check_string_error_and_print_tail:
 			goto __broken_format;
 		}
 #endif /* !__NO_PRINTF_GEN */
+
+
+
+		/************************************************************************/
+		/* "%[disasm]"                                                          */
+		/************************************************************************/
 #ifndef __NO_PRINTF_DISASM
 		if (__COMPARE_NAME("disasm")) {
 			void *__p = __PRINTF_VARGPTR();
@@ -1264,6 +1282,12 @@ __check_string_error_and_print_tail:
 			break;
 		}
 #endif /* !__NO_PRINTF_DISASM */
+
+
+
+		/************************************************************************/
+		/* "%[vinfo]"                                                           */
+		/************************************************************************/
 #ifndef __NO_PRINTF_VINFO
 #if __CHAR_SIZE == __SIZEOF_CHAR__ /* TODO: Other char sizes! */
 #if 1 /* USE_LIBDEBUGINFO */
@@ -1593,6 +1617,8 @@ __err_vinfo:
 #endif
 #endif /* __CHAR_SIZE == __SIZEOF_CHAR__ */ /* TODO: Other char sizes! */
 #endif /* !__NO_PRINTF_VINFO */
+
+		/* XXX: API to dynamically register additional printf-hooks? */
 		goto __broken_format;
 #undef __COMPARE_NAME
 	}	break;
@@ -2242,9 +2268,9 @@ __again_posscan2_infmt:
 							 * this detail is neither officially documented, nor an intended feature. -- It's just
 							 * a consequence on how positional argument support was implemented.
 							 *
-							 * So with all of that  in mind: rather than simply  skipping the current format  token,
-							 * we skip the entire format string when the user attempts to mix varargs specifies with
-							 * positional arguments. */
+							 * So with all of that in mind:  rather than simply skipping the current  format
+							 * token, we skip the entire format string when the user attempts to mix varargs
+							 * with positional arguments. */
 							while (*__FORMAT_FORMAT++)
 								;
 							goto __end;
@@ -2320,12 +2346,12 @@ __set_explicit_precision_size_t:
 					 *  - "%.*42..." (same as "%42.*..."),
 					 *  - "%.?42..." (same as "%42.*..."),
 					 * which must be interpreted as width=42, and precision=varargs:uint/size_t. */
-#if __SIZEOF_POINTER__ > __VA_SIZE
+#if __SIZEOF_SIZE_T__ > __VA_SIZE
 					if (__old_format_format[1] == '*') {
 						__precision = (__size_t)__builtin_va_arg(__FORMAT_ARGS, unsigned);
 						__flags |= __PRINTF_F_HASPREC;
 					} else
-#endif /* __SIZEOF_POINTER__ > __VA_SIZE */
+#endif /* __SIZEOF_SIZE_T__ > __VA_SIZE */
 					{
 						goto __set_explicit_precision_size_t;
 					}
@@ -2343,11 +2369,11 @@ __set_explicit_precision_size_t:
 					 *
 					 * But really though: if you use the above, something is probably
 					 * wrong with your code... */
-#if __SIZEOF_POINTER__ > __VA_SIZE
+#if __SIZEOF_SIZE_T__ > __VA_SIZE
 					if (*__old_format_format == '*') {
 						(void)__builtin_va_arg(__FORMAT_ARGS, unsigned);
 					} else
-#endif /* __SIZEOF_POINTER__ > __VA_SIZE */
+#endif /* __SIZEOF_SIZE_T__ > __VA_SIZE */
 					{
 						(void)__builtin_va_arg(__FORMAT_ARGS, __size_t);
 					}

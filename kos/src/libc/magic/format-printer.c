@@ -262,6 +262,31 @@
  *            - Any other character[-sequence] is forwarded as-is
  *      - `%[...]' Other sequences are reserved for future usage
  *
+ *  - Interaction between '%$' for fixed-precision, and positional arguments:
+ *    >> printf("fixed-precision: %$1$2$q", (size_t)4, "foo"); // prints: 'fixed-precision: "foo\0"'
+ *    >> printf("positional-arg:  %1$q", "foo");               // prints: 'positional-arg:  "foo"'
+ *    When '$' is encountered in a position where it isn't preceded by a number,
+ *    it is interpreted as introducing a fixed-precision modifier (iow: "%$" has
+ *    now been processed). When the format string also uses positional arguments,
+ *    that fixed-precision modifier is then loaded from a positional argument.
+ *    (iow: "%$1$"  has now been processed, indicating that the first argument is
+ *    of  type `size_t', and  shall be used as  the fixed-precision modifier). At
+ *    this  point, regular string processing continues, and "2$" is now processed
+ *    as the argument selector for the data object that will be printed. Finally,
+ *    the trailing "q" is processed to mean "Quoted string".
+ *
+ *    It should be obvious that a format-encoded width-argument cannot be used  with
+ *    such a format-string  "%200$1$2$s", because  the parser would  think that  the
+ *    leading "200$" was a request for a positional argument. Instead, you can write
+ *    "%200:?1$2$s" (remember: "$" for fixed-precision is an alias for ":?").
+ *
+ *    When not using positional arguments, but still want to use '$' together with a
+ *    format-encoded width-argument, you can use the fact that KOS doesn't enforce a
+ *    mandatory ordering between format flags, precision, and width:
+ *        >> printf("a%$25sb", (size_t)2, "foo"); // prints: 'a                       fob'
+ *    Because the '$' doesn't follow a number here, this will not trigger positional
+ *    argument  mode,  but  still  load  a  fixed-precision  argument  from varargs.
+ *
  *  - Our format_printf()  implementation treats  all  invalid uses  as  weak
  *    undefined behavior. This means that when facing invalid printf  control
  *    sequences, it will never produce  any errors (return a negative  value)
