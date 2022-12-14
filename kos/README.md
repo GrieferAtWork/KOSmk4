@@ -6,7 +6,7 @@
 - `./misc`
 	- Build tools and scripts needed for compiling/maintaining KOS
 - `./src`
-	- Root folder system library- and kernel sources
+	- Root folder for system library- and kernel sources
 
 
 ### Files

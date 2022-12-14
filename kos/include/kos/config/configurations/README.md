@@ -18,8 +18,9 @@ A couple of special macros can/must be defined:
 	- This macro must always be defined to a string matching the name of the containing file (with the trailing `.h` removed)
 	- Consumers of this macro expect it to represent the value passed to magic via its `--config={NAME_OF_CONFIG}` option
 - `#define CONFIG_PRETTY_NAME "Pretty description of configuration"`
-	- An option, pretty description of the configuration (can be human-readable).
+	- An optional, pretty description of the configuration (meant to be human-readable).
 	- If defined, this description is used to name the configuration within IDEs.
+		- e.g. This is the name that is used to identify the configuration in Visual Studio or VSCode
 	- If omitted, `CONFIG_NAME` is instead used for this purpose.
 
 
@@ -35,7 +36,7 @@ options["GCC.options"] = ["-O2", "-fstack-protector-strong"];
 ]]]*/
 ```
 
-It is executed as deemon code whenever `magic.dee` is invoked. The context inside of which it is called provides for a global variable `options` that represents a dict of additional `libmagic` compile options which will later be overlayed on-top of previously defined options originating from `.sources` files. Note that the overlay created here can be overwritten yet again through use of per-sourcefile `/*[[[magic ...]]]*/` scripts (e.g. `/kos/src/libdebuginfo/addr2line.c`).
+It is executed as deemon code whenever `magic.dee` is invoked. It is called in a context of a global variable `options` that represents a dict of additional `libmagic` compile options which will later be overlayed on-top of previously defined options originating from `.sources` files. Note that the overlay created here can be overwritten yet again through use of per-sourcefile `/*[[[magic ...]]]*/` scripts (e.g. `/kos/src/libdebuginfo/addr2line.c`).
 
 As such, the full priority-order of compiler option sources is:
 
@@ -47,7 +48,7 @@ As such, the full priority-order of compiler option sources is:
 
 ### Notes
 
-Except for the cases of the 4 builtin configurations, `magic.dee` will always inject a macro `-DCONFIG_HEADER="configurations/{NAME_OF_CONFIG}.h"`. This is needed so that the inclusion of `#include <kos/config/config.h>` is able to find your custom configuration header.
+Except for the cases of the 4 builtin configurations, `magic.dee` will always inject a macro `'-DCONFIG_HEADER="configurations/{NAME_OF_CONFIG}.h"'`. This is needed so that the inclusion of `#include <kos/config/config.h>` is able to find your custom configuration header.
 
 The macro is injected as would be done by a magic script:
 
