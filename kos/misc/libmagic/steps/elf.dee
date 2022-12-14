@@ -141,11 +141,11 @@ function flattenElfBinary(
 						/* TODO */
 						continue;
 					}
-					print("PHDR: v:", p_vaddr.hex(), ", p:", p_paddr.hex(),
+					print log: ("PHDR: v:", p_vaddr.hex(), ", p:", p_paddr.hex(),
 						", o:", p_offset.hex(), ", ms:", p_memsz.hex(),
 						", fs:", p_filesz.hex());
 					if (p_paddr < physBase) {
-						print("Error: ", repr inputFile, ".PHDR[", phi, "].p_paddr(",
+						print log: ("Error: ", repr inputFile, ".PHDR[", phi, "].p_paddr(",
 							p_paddr.hex(), ") < ", physBase.hex());
 						throw Error("Program header physical address is out of bounds");
 					}
@@ -277,6 +277,7 @@ function enumerateSymbolsStep(elfBinary: string, callback: Callable): Step {
 		local r, w = ipc.Pipe.new()...;
 		r = File.Buffer(r, "ro,c,none"); /* line-buffered */
 		readelf.stdout = w;
+		readelf.stderr = log;
 		readelf.start();
 		w.close();
 		try {

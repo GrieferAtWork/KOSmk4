@@ -1,0 +1,109 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import * from ..libmagic;
+import .mtools as mt;
+import .c as c;
+import Mutex from threading;
+
+global INSTALL_SH_OUTFILE: File = File.stdout;
+global INSTALL_SH_OUTFILE_LOCK: Mutex = Mutex();
+global DID_PRINT_KOS_ROOT: bool = false;
+
+function MCOPY_install_sh_run(self: BoundStep): {Waitable...} {
+	local group: Group = self.group;
+	local options: {string: Object} = group.options;
+	local input: string = self.userData;
+	local final DISK_MMD_CACHE: string = "MTOOLS.disk_mmd_cache";
+	local toolchainOptions: {string: Object} = self.toolchain.options;
+	local mmdCache: {string: {string...}} = toolchainOptions.get(DISK_MMD_CACHE);
+	if (mmdCache is none)
+		toolchainOptions[DISK_MMD_CACHE] = mmdCache = Dict();
+	local diskname: string = "install-sh";
+	local knownDirs: HashSet with string = mmdCache.get(diskname);
+	if (knownDirs is none)
+		mmdCache[diskname] = knownDirs = HashSet();
+	local output: string = mt.MCOPY_getOutputFilename(options, input);
+	local outputDirname: string = output.rpartition("/")[0];
+	if (outputDirname !in knownDirs) {
+		with (INSTALL_SH_OUTFILE_LOCK)
+			print INSTALL_SH_OUTFILE: ('mkdir -p "$DESTDIR/', outputDirname, '"');
+		/* Important: add `outputDirname' to the list of known directories _AFTER_
+		 *            we've  printed the command.  Otherwise, another thread might
+		 *            end up trying to copy a  file into that folder by  injecting
+		 *            a cp statement before our mkdir ends up being printed. */
+		knownDirs.insert(outputDirname);
+	}
+	if (!DID_PRINT_KOS_ROOT) {
+		local rootDir = ROOTDIR;
+#ifdef __WINDOWS__
+		rootDir = rootDir.replace(r"\", "/");
+		if (#rootDir >= 2 && rootDir[1] == ":") {
+			local drive = rootDir[0].lower();
+			rootDir = f"/cygdrive/{drive}{rootDir[2:]}";
+		}
+#endif /* __WINDOWS__ */
+		rootDir = rootDir.rstrip("/");
+		with (INSTALL_SH_OUTFILE_LOCK)
+			print INSTALL_SH_OUTFILE: ('KOS_ROOT="${KOS_ROOT:-', rootDir, '}"');
+		DID_PRINT_KOS_ROOT = true;
+	}
+	with (INSTALL_SH_OUTFILE_LOCK)
+		print INSTALL_SH_OUTFILE: ('cp "$KOS_ROOT/', input, '" "$DESTDIR/', output, '"');
+	return {};
+}
+
+function MTOOLS_install_sh_getDummyOutputFile(self: BoundStep): {string...} {
+	yield ROOTDIR + "dummy-disk";
+}
+
+@@Install hooks to override the behavior of mtools build steps
+function hook() {
+	mt.MFORMAT = Step(
+		name: "MFORMAT",
+		options: {
+			mt.OPT_MFORMAT_TOTAL_SECTORS,
+			mt.OPT_MFORMAT_HEADS,
+			mt.OPT_MFORMAT_SECTORS_PER_HEAD,
+			mt.OPT_MFORMAT_VOLUME_LABEL,
+		},
+		run: none,
+		tostr: mt.MFORMAT_tostr,
+		getProducedFiles: MTOOLS_install_sh_getDummyOutputFile,
+	);
+	mt.MCOPY = Step(
+		name: "MCOPY",
+		options: {
+			mt.OPT_MCOPY_OUTPUT,
+			mt.OPT_MCOPY_INPUT,
+			c.OPT_LINK_OUTPUT,
+		},
+		split: mt.MCOPY_split,
+		run: MCOPY_install_sh_run,
+		tostr: mt.MCOPY_tostr,
+		getModifiedOutputFiles: MTOOLS_install_sh_getDummyOutputFile,
+		getRequiredFiles: mt.MCOPY_getRequiredFiles,
+	);
+
+	/* Print the install-sh-prefix script */
+	with (local fp = File.open("kos/misc/utilities/misc/install-sh-prefix.sh", "rb"))
+		INSTALL_SH_OUTFILE.write(fp.read());
+}

@@ -111,9 +111,9 @@ BEGIN
 							if (symbolName in LIBDL_SYMBOLS)
 								continue;
 							if (symbolName !in CRT_DLSUBST_GLOBALS)
-								print "WARNING: Unresolved symbol in libc:", repr str symbolName;
+								print log: "WARNING: Unresolved symbol in libc:", repr str symbolName;
 						} else if (symbolName.startswith("libc_")) {
-							print "WARNING: Potentially unwanted libc export:", repr str symbolName;
+							print log: "WARNING: Potentially unwanted libc export:", repr str symbolName;
 						}
 						symbols_set.insert(symbolName);
 					}

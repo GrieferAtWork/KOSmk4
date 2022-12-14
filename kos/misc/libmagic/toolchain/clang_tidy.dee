@@ -52,20 +52,20 @@ function joinClangTidyAndTeeOutputIntoCtoFile(
 				if (l.startswith("In file included from ")) {
 					try {
 						local filename, line = l.scanf("In file included from %[^:]:%[^,:]")...;
-						print normalizeFilenameForLog(filename.decode("utf-8")),;
-						print "(",;
-						print line.strip().rstrip(","),;
-						print "): In file included from here...";
+						print log: (
+							normalizeFilenameForLog(filename.decode("utf-8")),
+							"(", line.strip().rstrip(","),
+							"): In file included from here...");
 						continue;
 					} catch (...) {
 					}
 				} else if (l.startswith("                 from")) {
 					try {
 						local filename, line = l.scanf(" from %[^:]:%[^:]")...;
-						print normalizeFilenameForLog(filename.decode("utf-8")),;
-						print "(",;
-						print line.rstrip().rstrip(",").rstrip(),;
-						print "): ... Which was included here";
+						print log: (
+							normalizeFilenameForLog(filename.decode("utf-8")),
+							"(", line.rstrip().rstrip(",").rstrip(),
+							"): ... Which was included here");
 						continue;
 					} catch (...) {
 					}
@@ -81,16 +81,13 @@ function joinClangTidyAndTeeOutputIntoCtoFile(
 								l.scanf(" inlined from '%[^']' at %[^:]:%[^:]:")...;
 							column = none;
 						}
-						print normalizeFilenameForLog(filename.decode("utf-8")),;
-						print "(",;
-						print line.strip(),;
+						print log: (
+							normalizeFilenameForLog(filename.decode("utf-8")),
+							"(", line.strip()),;
 						if (column) {
-							print ",",;
-							print column,;
+							print log: (",", column),;
 						}
-						print "): inlined from '",;
-						print fundecl,;
-						print "':";
+						print log: ("): inlined from '", fundecl, "':");
 						continue;
 					} catch (...) {
 					}
@@ -142,15 +139,13 @@ again_handle_col:
 							col2 = col;
 						}
 					}
-					print normalizeFilenameForLog(filename.decode("utf-8")),;
+					print log: (normalizeFilenameForLog(filename.decode("utf-8"))),;
 					if (line !is none) {
-						print "(",;
-						print line,;
+						print log: ("(", line),;
 						if (column !is none) {
-							print ",",;
-							print column,;
+							print log: (",", column),;
 						}
-						print ")",;
+						print log: (")"),;
 					}
 					strippedLine = strippedLine[col2:].rstrip();
 					if (strippedLine.endswith("]")) {
@@ -181,27 +176,24 @@ again_handle_col:
 									++lastcol;
 							}
 							if (categoryEnd > 0) {
-								print strippedLine[:categoryEnd].rstrip(),;
-								print " ",;
-								print tag.lstrip("[").rstrip("]"),;
-								print " ",;
-								print strippedLine[categoryEnd:lastcol].lstrip(),;
+								print log: (
+									strippedLine[:categoryEnd].rstrip(), " ",
+									tag.lstrip("[").rstrip("]"), " ",
+									strippedLine[categoryEnd:lastcol].lstrip()),;
 							} else {
-								print strippedLine[:lastcol],;
-								print tag,;
-								print " ",;
+								print log: (strippedLine[:lastcol], tag, " "),;
 							}
-							print strippedLine[lastcol:tagStart].rstrip();
+							print log: (strippedLine[lastcol:tagStart].rstrip());
 							continue;
 						}
 					}
-					print strippedLine;
+					print log: (strippedLine);
 					continue;
 				}
 normal_line:
-				print l.rstrip();
+				print log: (l.rstrip());
 			} else {
-				print l,;
+				print log: (l),;
 			}
 		}
 		clangTidyStdout.close();
@@ -319,7 +311,7 @@ function createClangTidyProcess(
 	proc.stdout = w;
 	proc.stderr = w;
 	if (toolchain.config.VERBOSE)
-		print "Exec", repr proc.cmdline;
+		print log: ("Exec ", repr proc.cmdline);
 	proc.start();
 	local thr;
 	try {

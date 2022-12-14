@@ -69,6 +69,16 @@ vcmd() {
 	}
 }
 
+#>> vcmd_inline <ARGV...>
+vcmd_inline() {
+	echo "run: $*" >&2
+	$* || {
+		local error=$?
+		echo -e "\e[${UI_COLCFG_ERR}mERROR\e[m: Command failed '\e[${UI_COLCFG_NAME}m$*\e[m' -> '\e[${UI_COLCFG_NAME}m$error\e[m'" >&2
+		exit $error
+	}
+}
+
 #>> vxcmd <ARGV...>
 vxcmd() {
 	echo "run: $*" >&2
@@ -221,13 +231,16 @@ require_utility() {
 	if ! [ -f "$2" ]; then
 		if test x"$MODE_RECURSIVE" == xyes; then
 			echo -e "Required untility not installed: \e[${UI_COLCFG_NAME}m$1\e[m (file '\e[${UI_COLCFG_NAME}m$(shortname "$2")\e[m' does't exist; install automatically)" >&2
-			vcmd "$SH" "$KOS_MISC/make_utility.sh" $(print_make_utility_options) "$TARGET_NAME" "$1"
+			vcmd_inline "$SH" "$KOS_MISC/make_utility.sh" $(print_make_utility_options) "$TARGET_NAME" "$1"
 		else
 			echo -e "\e[${UI_COLCFG_ERR}mRequired untility not installed\e[m: \e[${UI_COLCFG_NAME}m$1\e[m (file '\e[${UI_COLCFG_NAME}m$(shortname "$2")\e[m' does't exist)" >&2
 			echo -e "Resolve this issue by running:" >&2
 			echo -e "\$ \e[${UI_COLCFG_NAME}m$SH make_utility.sh $TARGET_NAME $1\e[m" >&2
 			exit 1
 		fi
+	elif test x"$MODE_RECURSIVE" == xyes; then
+		echo -e "Recursively installing: \e[${UI_COLCFG_NAME}m$1\e[m" >&2
+		vcmd_inline "$SH" "$KOS_MISC/make_utility.sh" $(print_make_utility_options) "$TARGET_NAME" "$1"
 	fi
 }
 
@@ -281,7 +294,7 @@ mtools_install_symlink() {
 
 install_sh_print_KOS_ROOT() {
 	if test -z "$INSTALL_SH_PRINTED_KOS_ROOT"; then
-		printf 'KOS_ROOT="${KOS_ROOT:-%s}"\n' "$KOS_ROOT"
+		printf 'KOS_ROOT="${KOS_ROOT:-%s}"\n' "$KOS_ROOT" || exit $?
 		INSTALL_SH_PRINTED_KOS_ROOT=yes
 	fi
 }
@@ -290,13 +303,22 @@ install_sh_print_SRC_DESTDIR() {
 	if test -z "$INSTALL_SH_PRINTED_SRC_DESTDIR"; then
 		if [[ "$DESTDIR" == "$KOS_ROOT/"* ]]; then
 			install_sh_print_KOS_ROOT
-			printf 'SRC_DESTDIR="$KOS_ROOT%s"\n' "${DESTDIR:${#KOS_ROOT}}"
+			printf 'SRC_DESTDIR="$KOS_ROOT%s"\n' "${DESTDIR:${#KOS_ROOT}}" || exit $?
 		else
-			printf 'SRC_DESTDIR="%s"\n' "$DESTDIR"
+			printf 'SRC_DESTDIR="%s"\n' "$DESTDIR" || exit $?
 		fi
 		INSTALL_SH_PRINTED_SRC_DESTDIR=yes
 	fi
 }
+
+if test x"$MODE_INSTALL_SH" != xno; then
+	# Output the header needed for install scripts
+	cat "$KOS_ROOT/kos/misc/utilities/misc/install-sh-prefix.sh" || {
+		error=$?
+		echo -e "\e[${UI_COLCFG_ERR}mERROR\e[m: Command failed '\e[${UI_COLCFG_NAME}mcat \"$KOS_ROOT/kos/misc/utilities/misc/install-sh-prefix.sh\"\e[m' -> '\e[${UI_COLCFG_NAME}m$error\e[m'" >&2
+		exit $error
+	}
+fi
 
 
 #>> install_sh_raw_mkdir <DIRPATH>
@@ -308,7 +330,7 @@ install_sh_raw_mkdir() {
 			install_sh_print_KOS_ROOT
 			REL_DIRPATH="\$KOS_ROOT${1:${#KOS_ROOT}}"
 		fi
-		printf '#mkdir -p "%s"\n' "$REL_DIRPATH"
+		printf '#mkdir -p "%s"\n' "$REL_DIRPATH" || exit $?
 		INSTALL_SH_RAW_DIRS+=("$1")
 	fi
 }
@@ -317,7 +339,7 @@ install_sh_raw_mkdir() {
 INSTALL_SH_DIRS=()
 install_sh_mkdir() {
 	if ! [[ " ${INSTALL_SH_DIRS[@]} " =~ " ${1} " ]] && ! test -z "$1"; then
-		printf 'mkdir -p "%s"\n' "\$DESTDIR$1"
+		printf 'mkdir -p "%s"\n' "\$DESTDIR$1" || exit $?
 		INSTALL_SH_DIRS+=("$1")
 	fi
 }
@@ -328,7 +350,7 @@ install_sh_mkdir_com() {
 	if ! [[ " ${INSTALL_SH_DIRS[@]} " =~ " ${1} " ]] && \
 	   ! [[ " ${INSTALL_SH_DIRS_COM[@]} " =~ " ${1} " ]] && \
 	   ! test -z "$1"; then
-		printf '#mkdir -p "%s"\n' "\$DESTDIR$1"
+		printf '#mkdir -p "%s"\n' "\$DESTDIR$1" || exit $?
 		INSTALL_SH_DIRS_COM+=("$1")
 	fi
 }
@@ -422,7 +444,7 @@ install_file() {
 			REL_SRC="\$KOS_ROOT${2:${#KOS_ROOT}}"
 		fi
 		install_sh_mkdir "${1%/*}"
-		printf 'cp "%s" "$DESTDIR%s"\n' "$REL_SRC" "$1"
+		printf 'cp "%s" "$DESTDIR%s"\n' "$REL_SRC" "$1" || exit $?
 	elif test x"$MODE_DRYRUN" != xno; then
 		echo "install_file '$1' '$2'"
 	else
@@ -479,7 +501,7 @@ install_file_nodisk() {
 			REL_SRC="\$KOS_ROOT${2:${#KOS_ROOT}}"
 		fi
 		install_sh_mkdir_com "${1%/*}"
-		printf '#cp "%s" "$DESTDIR%s"\n' "$REL_SRC" "$1"
+		printf '#cp "%s" "$DESTDIR%s"\n' "$REL_SRC" "$1" || exit $?
 	elif test x"$MODE_DRYRUN" != xno; then
 		echo "> install_file_nodisk '$1' '$2'"
 	else
@@ -519,7 +541,7 @@ install_file_nodisk() {
 install_symlink() {
 	if test x"$MODE_INSTALL_SH" != xno; then
 		install_sh_mkdir "${1%/*}"
-		printf 'ln -s "%s" "$DESTDIR%s"\n' "$2" "$1"
+		printf 'ln -s "%s" "$DESTDIR%s"\n' "$2" "$1" || exit $?
 	elif test x"$MODE_DRYRUN" != xno; then
 		echo "install_symlink '$1' '$2'"
 	else
@@ -570,7 +592,7 @@ install_symlink() {
 install_symlink_nodisk() {
 	if test x"$MODE_INSTALL_SH" != xno; then
 		install_sh_mkdir_com "${1%/*}"
-		printf '#ln -s "%s" "$DESTDIR%s"\n' "$2" "$1"
+		printf '#ln -s "%s" "$DESTDIR%s"\n' "$2" "$1" || exit $?
 	elif test x"$MODE_DRYRUN" != xno; then
 		echo "> install_symlink_nodisk '$1' '$2'"
 	else
@@ -656,7 +678,7 @@ install_path() {
 			REL_SRC="\$KOS_ROOT${2:${#KOS_ROOT}}"
 		fi
 		install_sh_mkdir "${1%/*}"
-		printf 'cp -R "%s" "$DESTDIR%s"\n' "$REL_SRC" "$1"
+		printf 'cp -R "%s" "$DESTDIR%s"\n' "$REL_SRC" "$1" || exit $?
 	elif test x"$MODE_DRYRUN" != xno; then
 		echo "> install_path '$1' '$2'"
 	else
@@ -711,7 +733,7 @@ install_path_hardcopy() {
 			REL_SRC="\$KOS_ROOT${2:${#KOS_ROOT}}"
 		fi
 		install_sh_mkdir "${1%/*}"
-		printf 'cp -R "%s" "$DESTDIR%s"\n' "$REL_SRC" "$1"
+		printf 'cp -R "%s" "$DESTDIR%s"\n' "$REL_SRC" "$1" || exit $?
 	elif test x"$MODE_DRYRUN" != xno; then
 		echo "> install_path_hardcopy '$1' '$2'"
 	else
@@ -839,7 +861,7 @@ esac
 
 UTILITY_SCRIPT="$KOS_ROOT/kos/misc/utilities/$UTILITY_NAME.sh"
 if ! [ -f "$UTILITY_SCRIPT" ]; then
-	echo -e "Unknown utility \e[${UI_COLCFG_ERR}m$UTILITY_NAME\e[m" >&2
+	echo -e "\e[${UI_COLCFG_ERR}mUnknown utility\e[m \e[${UI_COLCFG_NAME}m$UTILITY_NAME\e[m" >&2
 	exit 1
 fi
 

@@ -624,7 +624,7 @@ local final function COMPILE_WITH_ASM_FILTER_run(
 
 			/* Step #2: Create the modded assembly file */
 			if (config.VERBOSE)
-				print "ASM_FILTER", repr asmFile, "-->", repr modFile;
+				print log: ("ASM_FILTER ", repr asmFile, " --> ", repr modFile);
 			with (local infp = File.open(asmFile, "rb")) {
 				with (local outfp = File.open(modFile, "wb")) {
 					filter(infp, outfp);

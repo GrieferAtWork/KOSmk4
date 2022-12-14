@@ -61,9 +61,9 @@ toolchain:
 
 
 # Important utilities
-install-busybox:
+busybox:
 	"$(SH)" "$(ROOT)/kos/misc/make_utility.sh" $(TARGET) busybox
-.PHONY: install-busybox
+.PHONY: busybox
 
 
 # Code generation
@@ -73,6 +73,19 @@ syscalls:
 	"$(DEEMON)" kos/misc/magicgenerator/generate_syscalls.dee
 	"$(DEEMON)" kos/misc/magicgenerator/generate_syscalls.dee $(TARGET)
 .PHONY: headers syscalls
+
+
+
+# Install to custom $DESTDIR
+install-system:
+	"$(DEEMON)" "$(ROOT)/magic.dee" --target=$(TARGET) --config=$(CONFIG) --install-sh | "$(SH)"
+.PHONY: install-system
+install-%:
+	@UTILITY_NAME="$@"; \
+		"$(SH)" "$(ROOT)/kos/misc/make_utility.sh" --install-sh --recursive \
+			$(TARGET) $${UTILITY_NAME:8} | "$(SH)"
+.PHONY: install-%
+
 
 
 # Misc script invocations

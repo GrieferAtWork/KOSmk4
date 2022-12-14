@@ -30,6 +30,7 @@ git clone --recursive https://github.com/GrieferAtWork/KOSmk4
 	- [Building 3rd party programs](#building_3rd_party_programs)
 	- [`deemon magic.dee`](#magic)
 	- [Configuring KOS](#configuring)
+	- [Installing KOS](#installing)
 - [Programming KOS with an IDE](#programming)
 - [Notes on building KOS](#building-notes)
 - [Using various emulators to run KOS](#emulators)
@@ -633,6 +634,8 @@ To help you understand how this script works to do what it does, here is a docum
 - `--format-error-messages`
 	- Format GCC's and LD's error messages from forms such as `file:line[:column]:...` into what is accepted by Visual Studio's `file(line[,column]) : ...` format (allowing you to click such lines within build output)
 	- Passed by default when building was started by pressing CTRL+SHIFT+B in Visual Studio
+- `--install-sh`
+	- Print a shell-script to stdout that can be used to install the selected KOS configuration to `$DESTDIR` (see also [Installing KOS](#installing))
 - `--`
 	- Join the remainder of the argument list into a single string seperated by 1-wide space characters and pass that string into the emulator for use as the kernel commandline
 		- e.g. `deemon magic.dee -- init=/bin/system-test` will run `system-test` after boot instead of `/bin/init`
@@ -734,6 +737,83 @@ Name   | Pretty name        | Extra GCC commandline options
 `nOnD` | `NDEBUG`           | `-DNDEBUG`
 `OD`   | `Optimize, DEBUG`  | `-O2 -fstack-protector-strong`
 `OnD`  | `Optimize, NDEBUG` | `-O3 -DNDEBUG`
+
+
+
+
+
+
+<a name="installing"></a>
+## Installing KOS
+
+To install (and eventually run) KOS on real hardware, the easiest way is to get a USB thumbdrive, format it as FAT32 (caution: make sure it doesn't get formatted as VFAT), and install [GRUB](https://www.gnu.org/software/grub/) or some other multiboot- or multiboot2-compliant bootloader onto it.
+
+With that done, you can use the KOS build system to build everything you're going to need, as well as have it generate+execute some shell-scripts which can then be used to copy everything onto your USB thumbdrive:
+
+```sh
+export TARGET="i386"
+export CONFIG="nOD"
+export DESTDIR="/path/to/kos/install"
+make install-system
+make install-busybox
+```
+
+
+If you don't want to use `make`, but execute the commands yourself, here is how installing works:
+
+```sh
+deemon magic.dee --install-sh --target=i386 --config=nOD > install.sh
+bash kos/misc/make_utility.sh --install-sh i386 busybox >> install.sh
+```
+
+This process can later be repeated for any 3rd party utility you wish to install. At this point, `install.sh` should look like this:
+
+```
+[...]
+mkdir -p "$DESTDIR/os/drivers"
+KOS_ROOT="${KOS_ROOT:-/cygdrive/e/c/kls/kos}"
+cp "$KOS_ROOT/bin/i386-kos-nOD/os/drivers/tar" "$DESTDIR/os/drivers/tar"
+mkdir -p "$DESTDIR/lib"
+cp "$KOS_ROOT/bin/i386-kos-nOD/lib/libbios86.so" "$DESTDIR/lib/libbios86.so"
+cp "$KOS_ROOT/bin/i386-kos-nOD/os/drivers/pe" "$DESTDIR/os/drivers/pe"
+mkdir -p "$DESTDIR/bin"
+cp "$KOS_ROOT/bin/i386-kos-nOD/bin/init" "$DESTDIR/bin/init"
+cp "$KOS_ROOT/bin/i386-kos-nOD/os/drivers/procfs" "$DESTDIR/os/drivers/procfs"
+[...]
+ln -s "busybox" "$DESTDIR/bin/script"
+ln -s "busybox" "$DESTDIR/bin/scriptreplay"
+ln -s "busybox" "$DESTDIR/bin/setpriv"
+ln -s "busybox" "$DESTDIR/bin/setsid"
+ln -s "../bin/busybox" "$DESTDIR/sbin/swapon"
+ln -s "../bin/busybox" "$DESTDIR/sbin/swapoff"
+ln -s "../bin/busybox" "$DESTDIR/sbin/switch_root"
+ln -s "busybox" "$DESTDIR/bin/taskset"
+ln -s "busybox" "$DESTDIR/bin/umount"
+ln -s "busybox" "$DESTDIR/bin/unshare"
+ln -s "busybox" "$DESTDIR/bin/wall"
+mkdir -p "$DESTDIR/etc"
+ln -s "/proc/mounts" "$DESTDIR/etc/mtab"
+```
+
+Finally, you can execute this script like so (but make sure to replace `/path/to/kos/install` with where you mounted the USB thumbdrive on your host computer):
+
+```sh
+cat "install.sh" | DESTDIR="/path/to/kos/install" bash
+```
+
+Once this has been done, you should be able to boot KOS from within grub by loading it from `/os/kernel.bin`, whilst supplying it the necessary USB drivers as multiboot modules, so that it's able to detect the thumbdrive and mount it during booting.
+
+Note that it's also possible to directly stream these build scripts into bash like so:
+
+```sh
+deemon magic.dee --install-sh --target=i386 --config=nOD | DESTDIR="/path/to/kos/install" bash
+bash kos/misc/make_utility.sh --recursive --install-sh i386 busybox | DESTDIR="/path/to/kos/install" bash
+bash kos/misc/make_utility.sh --recursive --install-sh i386 vitetris | DESTDIR="/path/to/kos/install" bash
+bash kos/misc/make_utility.sh --recursive --install-sh i386 nano | DESTDIR="/path/to/kos/install" bash
+...
+```
+
+That way, you only need a single commandline to install each component.
 
 
 

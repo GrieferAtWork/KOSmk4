@@ -26,10 +26,10 @@ import * from deemon;
 import OPT_LINK_OUTPUT from .c;
 import * from ..libmagic;
 
-@@Toolchain configuratino: string
+@@Toolchain configuration: string
 @@The filename of the MTOOLS base executable (`mtools.exe')
 global final TOOLCHAIN_MTOOLS_EXE  = "MTOOLS.exe";
-@@Toolchain configuratino: string
+@@Toolchain configuration: string
 @@The filename of the MTOOLS disk
 global final TOOLCHAIN_MTOOLS_DISK = "MTOOLS.disk";
 
@@ -49,23 +49,24 @@ global final OPT_MCOPY_OUTPUT = "MCOPY.output";
 global final OPT_MCOPY_INPUT = "MCOPY.input";
 
 
-local final function mtoolsInvoke(
-		self: BoundStep, cmd: string, args: {string...}): Waitable {
+function mtoolsInvoke(self: BoundStep, cmd: string, args: {string...}): Waitable {
 	local toolchainOptions = self.toolchain.options;
 	local proc = ipc.Process(
 		toolchainOptions[TOOLCHAIN_MTOOLS_EXE],
 		["-c", cmd, "-i", toolchainOptions[TOOLCHAIN_MTOOLS_DISK], args...]);
 	if (self.toolchain.config.VERBOSE)
-		print "Exec", repr proc.cmdline;
+		print log: "Exec", repr proc.cmdline;
+	proc.stdout = log;
+	proc.stderr = log;
 	proc.start();
 	return WaitableJoin(proc);
 }
 
-local final function MTOOLS_getModifiedOutputFiles(self: BoundStep): {string...} {
+function MTOOLS_getModifiedOutputFiles(self: BoundStep): {string...} {
 	yield self.toolchain.options[TOOLCHAIN_MTOOLS_DISK];
 }
 
-local final function MFORMAT_run(self: BoundStep): {Waitable...} {
+function MFORMAT_run(self: BoundStep): {Waitable...} {
 	local options = self.group.options;
 	local disk = self.toolchain.options[TOOLCHAIN_MTOOLS_DISK];
 	local num_sectors = options[OPT_MFORMAT_TOTAL_SECTORS];
@@ -86,12 +87,12 @@ local final function MFORMAT_run(self: BoundStep): {Waitable...} {
 	yield mtoolsInvoke(self, "mformat", args);
 }
 
-local final function MFORMAT_tostr(self: BoundStep): string {
+function MFORMAT_tostr(self: BoundStep): string {
 	return f"Mformat {repr self.toolchain.options[TOOLCHAIN_MTOOLS_DISK]}";
 }
 
 
-local final function MMD(self: BoundStep, cache: HashSet with string, path: string) {
+function MMD(self: BoundStep, cache: HashSet with string, path: string) {
 	path = path.replace("\\", "/").strip("/").strip();
 	local head, none, tail = path.rpartition("/")...;
 	if (tail)
@@ -105,7 +106,7 @@ local final function MMD(self: BoundStep, cache: HashSet with string, path: stri
 	}
 }
 
-local final function MCOPY_split(self: BoundStep): {BoundStep...} {
+function MCOPY_split(self: BoundStep): {BoundStep...} {
 	local group = self.group;
 	local options = group.options;
 	local input = options.get(OPT_MCOPY_INPUT);
@@ -115,7 +116,7 @@ local final function MCOPY_split(self: BoundStep): {BoundStep...} {
 		yield self.createChildStep(f);
 }
 
-local final function MCOPY_getOutputFilename(
+function MCOPY_getOutputFilename(
 		options: {string: Object}, input: string): string {
 	local result = options[OPT_MCOPY_OUTPUT].replace("\\", "/").lstrip("/");
 	if (result.endswith("/"))
@@ -123,7 +124,7 @@ local final function MCOPY_getOutputFilename(
 	return result;
 }
 
-local final function MCOPY_run(self: BoundStep): {Waitable...} {
+function MCOPY_run(self: BoundStep): {Waitable...} {
 	local th = Thread((self: BoundStep) -> {
 		local group: Group = self.group;
 		local options: {string: Object} = group.options;
@@ -150,11 +151,11 @@ local final function MCOPY_run(self: BoundStep): {Waitable...} {
 	yield WaitableJoin(th);
 }
 
-local final function MCOPY_getRequiredFiles(self: BoundStep): {string...} {
+function MCOPY_getRequiredFiles(self: BoundStep): {string...} {
 	yield self.userData;
 }
 
-local final function MCOPY_tostr(self: BoundStep): string {
+function MCOPY_tostr(self: BoundStep): string {
 	local group = self.group;
 	local options = group.options;
 	return f"Mcopy {self.toolchain.options[TOOLCHAIN_MTOOLS_DISK]}:{group.options[OPT_MCOPY_OUTPUT]}";
@@ -163,7 +164,7 @@ local final function MCOPY_tostr(self: BoundStep): string {
 
 @@MFORMAT
 @@Create a new disk
-global final MFORMAT = Step(
+global MFORMAT = Step(
 	name: "MFORMAT",
 	options: {
 		OPT_MFORMAT_TOTAL_SECTORS,
@@ -178,7 +179,7 @@ global final MFORMAT = Step(
 
 @@MCOPY
 @@A step used to copy `OPT_MCOPY_INPUT' to the mtools disk `OPT_MCOPY_OUTPUT'
-global final MCOPY = Step(
+global MCOPY = Step(
 	name: "MCOPY",
 	options: {
 		OPT_MCOPY_OUTPUT,

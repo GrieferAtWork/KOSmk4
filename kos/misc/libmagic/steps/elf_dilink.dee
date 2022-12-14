@@ -87,7 +87,7 @@ local final function DILINK_run(self: BoundStep): string {
 				}
 			}
 		} catch (e...) {
-			print repr e;
+			print log: repr e;
 		}
 		local linkOutput = options[OPT_LINK_OUTPUT];
 		local linkAttemptOutput = config.getBuildArtifact(group, linkOutput, ".di_attempt");
@@ -104,7 +104,7 @@ local final function DILINK_run(self: BoundStep): string {
 		for (;;) {
 			/* Do the link */
 link_again_with_new_guesses:
-			print "DILINK Sections:", repr guessedSectionOffsetsAndSizes;
+			print log: "DILINK Sections:", repr guessedSectionOffsetsAndSizes;
 			local opt_ldFlags = List(options.get(OPT_LINK_LDFLAGS));
 			local totalDebugSize = 1;
 			for (local sectionName, startSymbolName, sizeSymbolName: bindings) {
@@ -163,6 +163,7 @@ link_again_with_new_guesses:
 				local r, w = ipc.Pipe.new()...;
 				r = File.Buffer(r, "ro,c,none"); /* line-buffered */
 				readelf.stdout = w;
+				readelf.stderr = log;
 				readelf.start();
 				w.close();
 				try {

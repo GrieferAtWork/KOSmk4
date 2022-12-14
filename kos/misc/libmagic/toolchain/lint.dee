@@ -26,33 +26,33 @@ import ipc;
 import fs;
 
 function printCurrentLocation(location: (string, string, string | none), text: string) {
-	print(location[0], "(", location[1]),;
+	print log: (location[0], "(", location[1]),;
 	if (location[2] !is none)
 		print(",", location[2]),;
-	print(") : "),;
+	print log: (") : "),;
 	local lowerText = text.lower();
 	if ("error" in lowerText) {
-		print("error : "),;
+		print log: ("error : "),;
 	} else if ("warning" in lowerText) {
-		print("warning : "),;
+		print log: ("warning : "),;
 	} else if ("not parseable" in lowerText) {
-		print("error : "),;
+		print log: ("error : "),;
 	} else if ("invalid character" in lowerText) {
-		print("error : "),;
+		print log: ("error : "),;
 	} else if ("already defined" in lowerText) {
-		print("warning : "),;
+		print log: ("warning : "),;
 	} else if ("to ignore" in lowerText) {
-		print("warning : "),;
+		print log: ("warning : "),;
 	} else if ("have incompatible types" in lowerText) {
-		print("warning : "),;
+		print log: ("warning : "),;
 	} else if ("arrow access field of non-struct or union" in lowerText) {
-		print("warning : "),;
+		print log: ("warning : "),;
 	} else if ("passed storage" in lowerText && "not completely" in lowerText) {
-		print("warning : "),;
+		print log: ("warning : "),;
 	} else if ("declared with inconsistent type" in lowerText) {
-		print("warning : "),;
+		print log: ("warning : "),;
 	}
-	print(". ".join(text.strip().splitlines(false)));
+	print log: (". ".join(text.strip().splitlines(false)));
 }
 
 function joinLintAndTeeOutputIntoLioFile(
@@ -78,20 +78,20 @@ function joinLintAndTeeOutputIntoLioFile(
 				if (strippedLine.startswith("In file included from ")) {
 					try {
 						local filename, line = strippedLine.scanf("In file included from %[^:]:%[^,:]")...;
-						print normalizeFilenameForLog(filename.decode("utf-8")),;
-						print "(",;
-						print line.strip().rstrip(","),;
-						print "): In file included from here...";
+						print log: normalizeFilenameForLog(filename.decode("utf-8")),;
+						print log: "(",;
+						print log: line.strip().rstrip(","),;
+						print log: "): In file included from here...";
 						continue;
 					} catch (...) {
 					}
 				} else if (l.startswith("     ") && strippedLine.startswith("from ")) {
 					try {
 						local filename, line = strippedLine.scanf("from %[^:]:%[^:]")...;
-						print normalizeFilenameForLog(filename.decode("utf-8")),;
-						print "(",;
-						print line.rstrip().rstrip(",").rstrip(),;
-						print "): ... Which was included here";
+						print log: normalizeFilenameForLog(filename.decode("utf-8")),;
+						print log: "(",;
+						print log: line.rstrip().rstrip(",").rstrip(),;
+						print log: "): ... Which was included here";
 						continue;
 					} catch (...) {
 					}
@@ -134,9 +134,9 @@ function joinLintAndTeeOutputIntoLioFile(
 					currentLocation = none;
 					currentLocationText = none;
 				}
-				print l.rstrip();
+				print log: l.rstrip();
 			} else {
-				print l,;
+				print log: l,;
 			}
 		}
 		if (currentLocationText !is none)
@@ -197,7 +197,7 @@ function createLintProcess(
 	proc.stdout = w;
 	proc.stderr = w;
 	if (toolchain.config.VERBOSE)
-		print "Exec", repr proc.cmdline;
+		print log: "Exec", repr proc.cmdline;
 	proc.start();
 	local thr;
 	try {

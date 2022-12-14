@@ -208,8 +208,10 @@ global class GCCToolchain: Toolchain {
 			kind: string,
 			p: ipc.Process): Waitable {
 		if (this.config.VERBOSE)
-			print "Exec", repr p.cmdline;
+			print log: "Exec", repr p.cmdline;
 		if (!this.config.FORMAT_ERRORS) {
+			p.stdout = log;
+			p.stderr = log;
 			p.start();
 			return WaitableJoin(p);
 		}
@@ -245,14 +247,14 @@ global class GCCToolchain: Toolchain {
 											l[col + 1:col2].decode("utf-8"));
 										local lineNo = l[col2+1:lineno_end];
 										local message = l[lineno_end:].strip().lstrip(":").lstrip();
-										print script_path,;
-										print "(",;
-										print lineNo,;
-										print "): error: ",;
-										print message,;
-										print " (from ",;
-										print repr(ld_path),;
-										print ")";
+										print log: script_path,;
+										print log: "(",;
+										print log: lineNo,;
+										print log: "): error: ",;
+										print log: message,;
+										print log: " (from ",;
+										print log: repr(ld_path),;
+										print log: ")";
 										continue;
 									}
 								}
@@ -272,19 +274,19 @@ global class GCCToolchain: Toolchain {
 								function printSourceMessage(
 										sourceFile: string, lineNo: string, message: string,
 										currentInFunction: (string, string) | none) {
-									print sourceFile,;
-									print "(",;
-									print lineNo,;
-									print "): error: ",;
-									print message,;
+									print log: sourceFile,;
+									print log: "(",;
+									print log: lineNo,;
+									print log: "): error: ",;
+									print log: message,;
 									if (currentInFunction !is none) {
-										print " (in ",;
-										print repr(currentInFunction[1]),;
-										print " defined by ",;
-										print repr(currentInFunction[0]),;
-										print ")",;
+										print log: " (in ",;
+										print log: repr(currentInFunction[1]),;
+										print log: " defined by ",;
+										print log: repr(currentInFunction[0]),;
+										print log: ")",;
 									}
-									print;
+									print log:;
 								}
 								/* Capture: <SOURCE_FILE>:<LINENO>: <MESSAGE> */
 								if (l.isdigit(col + 1, col2)) {
@@ -313,14 +315,14 @@ global class GCCToolchain: Toolchain {
 												sectionName = sectionLocation;
 												sectionOffset = "0";
 											}
-											print objFile,;
-											print ": error: ",;
-											print message,;
-											print " (in section ",;
-											print repr(sectionName),;
-											print " at offset ",;
-											print sectionOffset,;
-											print ")";
+											print log: objFile,;
+											print log: ": error: ",;
+											print log: message,;
+											print log: " (in section ",;
+											print log: repr(sectionName),;
+											print log: " at offset ",;
+											print log: sectionOffset,;
+											print log: ")";
 											continue;
 										}
 									}
@@ -352,27 +354,27 @@ global class GCCToolchain: Toolchain {
 								}
 							}
 						}
-						print l.rstrip();
+						print log: l.rstrip();
 					}
 				} else for (local l: r) {
 					/* Format errors */
 					if (l.startswith("In file included from ")) {
 						try {
 							local filename, line = l.scanf("In file included from %[^:]:%[^,:]")...;
-							print normalizeFilenameForLog(filename.decode("utf-8")),;
-							print "(",;
-							print line.strip().rstrip(","),;
-							print "): In file included from here...";
+							print log: normalizeFilenameForLog(filename.decode("utf-8")),;
+							print log: "(",;
+							print log: line.strip().rstrip(","),;
+							print log: "): In file included from here...";
 							continue;
 						} catch (...) {
 						}
 					} else if (l.startswith("                 from")) {
 						try {
 							local filename, line = l.scanf(" from %[^:]:%[^:]")...;
-							print normalizeFilenameForLog(filename.decode("utf-8")),;
-							print "(",;
-							print line.rstrip().rstrip(",").rstrip(),;
-							print "): ... Which was included here";
+							print log: normalizeFilenameForLog(filename.decode("utf-8")),;
+							print log: "(",;
+							print log: line.rstrip().rstrip(",").rstrip(),;
+							print log: "): ... Which was included here";
 							continue;
 						} catch (...) {
 						}
@@ -388,16 +390,16 @@ global class GCCToolchain: Toolchain {
 									l.scanf(" inlined from '%[^']' at %[^:]:%[^:]:")...;
 								column = none;
 							}
-							print normalizeFilenameForLog(filename.decode("utf-8")),;
-							print "(",;
-							print line.strip(),;
+							print log: normalizeFilenameForLog(filename.decode("utf-8")),;
+							print log: "(",;
+							print log: line.strip(),;
 							if (column) {
-								print ",",;
-								print column,;
+								print log: ",",;
+								print log: column,;
 							}
-							print "): inlined from '",;
-							print fundecl,;
-							print "':";
+							print log: "): inlined from '",;
+							print log: fundecl,;
+							print log: "':";
 							continue;
 						} catch (...) {
 						}
@@ -434,20 +436,20 @@ again_handle_col:
 							line = none;
 							col2 = col;
 						}
-						print normalizeFilenameForLog(filename.decode("utf-8")),;
+						print log: normalizeFilenameForLog(filename.decode("utf-8")),;
 						if (line !is none) {
-							print "(",;
-							print line,;
+							print log: "(",;
+							print log: line,;
 							if (column !is none) {
-								print ",",;
-								print column,;
+								print log: ",",;
+								print log: column,;
 							}
-							print ")",;
+							print log: ")",;
 						}
-						print l[col2:].rstrip();
+						print log: l[col2:].rstrip();
 						continue;
 					}
-					print l.rstrip();
+					print log: l.rstrip();
 				}
 				r.close();
 			} catch (...) {
@@ -691,6 +693,8 @@ again_handle_col:
 				}
 			}
 			local proc = ipc.Process("gcc", { "-c", "-o", testObjectFile, testSourceFile });
+			proc.stdout = log;
+			proc.stderr = log;
 			proc.start();
 			joinProcess(proc);
 		}
@@ -706,7 +710,7 @@ again_handle_col:
 			joinProcess(proc);
 		} catch (...) {
 			for (local l: output.decode("utf-8").splitlines(false))
-				print ">>", l;
+				print log: ">>", l;
 			throw;
 		}
 		local collect2Cmdline = none;
@@ -744,14 +748,14 @@ again_handle_col:
 				if (!x.startswith("-L") && !x.startswith("-l") && x != testObjectFile)
 					normalizePath(x)),
 		);
-		print "Warning: Missing toolchain cache:";
-		print "toolchain.provideStdlibCache(";
-		print "\t",;
-		print repr cacheKey,;
-		print ",";
-		print "\t",;
-		print repr result;
-		print ");";
+		print log: "Warning: Missing toolchain cache:";
+		print log: "toolchain.provideStdlibCache(";
+		print log: "\t",;
+		print log: repr cacheKey,;
+		print log: ",";
+		print log: "\t",;
+		print log: repr result;
+		print log: ");";
 		_stdlibCache[cacheKey] = result;
 		_stdlibCache[(language, gccOptions)] = result;
 		return result;

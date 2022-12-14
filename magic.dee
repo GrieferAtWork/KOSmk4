@@ -82,7 +82,7 @@ function loadMissingSettings() {
 	local targetName, configName =
 		import(".kos.misc.scripts.vsautoconfig")
 			.parseCurrentVsConfiguration("kos/.vs/ProjectSettings.json")...;
-	print "Automatically loaded settings:", repr targetName, repr configName;
+	print log: "Automatically loaded settings:", repr targetName, repr configName;
 	if (TARGET_ARCH !is bound)
 		TARGET_ARCH = targetName;
 	if (config.CONFIG is none)
@@ -158,7 +158,7 @@ function setBinTargetLink(target_arch: string, target_name: string) {
 			} catch (...) {
 			}
 		}
-		print("Changing libpath: `ln -s ", repr(target_name), " ", repr(selConfigFile), "`");
+		print log: ("Changing libpath: `ln -s ", repr(target_name), " ", repr(selConfigFile), "`");
 		local p = ipc.Process(HOST_EXE("bash"), [ "-c",
 			f"ln -s {repr target_name} {repr selConfigFile}"
 		]);
@@ -220,7 +220,7 @@ function build(reconfigure: Callable = none, binTargetName: string = none) {
 
 function main(argv: {string...}) {
 	local args = List(argv);
-	print repr args;
+	print log: repr args;
 	while (args) {
 		local arg = args.pop(0);
 		switch (arg) {
@@ -262,11 +262,13 @@ function main(argv: {string...}) {
 			args = { };
 			break;
 		case "--install-sh":
-			/* TODO:
-			 * - Like with `make_utility.sh', this option should cause magic to do
-			 *   a normal build, but redirect  build progress messages to  stderr.
-			 * - MTOOLS steps are overwritten to instead print a shell-script that
-			 *   can  be used to  copy produced binaries  into a custom `$DESTDIR' */
+			/* Like with `make_utility.sh', this option should cause magic to do
+			 * a normal build, but redirect  build progress messages to  stderr.
+			 *
+			 * MTOOLS steps are overwritten to instead print a shell-script that
+			 * can  be used to  copy produced binaries  into a custom `$DESTDIR' */
+			OPT_EMULATOR_USED = none;
+			import(".kos.misc.libmagic.steps.mtools-install-sh").hook();
 			break;
 		case "--config":
 			/* List available configs */
@@ -450,13 +452,13 @@ _err_unknown_argument:
 try {
 	main([...][1:]);
 } @[interrupt] catch (e...) {
-	print e;
-	print repr Traceback.current;
+	print log: e;
+	print log: repr Traceback.current;
 	File.Buffer.sync();
-	print "ERROR";
+	print log: "ERROR";
 	AppExit.exit(1);
 }
 File.Buffer.sync();
-print "DONE";
+print log: "DONE";
 AppExit.exit(0);
 #endif

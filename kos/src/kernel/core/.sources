@@ -214,8 +214,8 @@ BEGIN
 						if (symbolType == "NOTYPE")
 							continue;
 						if (symbolName.startswith("kernel_") && (symbolName.endswith("_start") ||
-							symbolName.endswith("_end") || symbolName.endswith("_size")))
-							print "WARNING: Potentially unwanted kernel export:", repr str symbolName;
+						    symbolName.endswith("_end") || symbolName.endswith("_size")))
+							print log: "WARNING: Potentially unwanted kernel export:", repr str symbolName;
 						symbols_map[symbolName] = int(symbolSize);
 					}
 					if ("kernel_symbol_table" !in symbols_map) {

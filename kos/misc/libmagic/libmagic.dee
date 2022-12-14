@@ -105,6 +105,8 @@ import * from errors;
 
 /* TODO: Use collections.UniqueSet instead of HashSet! */
 
+global log = File.stderr;
+
 
 @@Option: bool
 @@An  option that  may be  used for  any group to
@@ -1101,10 +1103,10 @@ function orderGroups(toolchainsAndGroups: {(Toolchain, {Group...})...}): ({Bound
 						goto did_resolve;
 					}
 				}
-				print "ERROR: Recursive dependency:";
-				print "\t          ", s;
+				print log: "ERROR: Recursive dependency:";
+				print log: "\t          ", s;
 				for (local e: chain)
-					print "\tdepends on", e;
+					print log: "\tdepends on", e;
 				throw Error("Recursive dependency");
 			}
 did_resolve:
@@ -1155,14 +1157,14 @@ function executeBuildSteps(steps: {BoundStep...}, recheck: {BoundStep...}, maxPa
 		local avgMissing  = (float)numMissing + (float)numRunning / 2;
 		local avgFinished = (float)numFinished + (float)numRunning / 2;
 		local progress = try ((avgFinished / (avgMissing + avgFinished))) catch(...) 1.0;
-		print "[" + marker + numRunning + ":" + str(int(progress * 100.0)).rjust(3) + "%",;
+		print log: ("[", marker, numRunning, ":", str(int(progress * 100.0)).rjust(3), "%"),;
 		if (!message.startswith("[")) {
-			print "] ",;
+			print log: ("] "),;
 		} else {
-			print " ",;
+			print log: (" "),;
 			message = message[1:];
 		}
-		print message;
+		print log: message;
 	}
 	function printStepStatus(marker: string, step: BoundStep, message: string) {
 		printStatus(marker,
@@ -1197,7 +1199,7 @@ again:
 			if ((unchangedIterations % 10) == 9) {
 				printStatus(LOG_UPDATE_MARKER, "Still waiting on:");
 				for (local x: runningSteps)
-					print "\t" + x;
+					print log: "\t" + x;
 			}
 			Thread.sleep(JOIN_WAIT_DELAY);
 			++unchangedIterations;
@@ -1251,7 +1253,7 @@ again:
 			if ((unchangedIterations % 10) == 9) {
 				printStatus(LOG_UPDATE_MARKER, "Still waiting on:");
 				for (local x: runningSteps)
-					print "\t" + x;
+					print log: "\t" + x;
 			}
 			Thread.sleep(JOIN_WAIT_DELAY);
 			++unchangedIterations;
@@ -1481,10 +1483,10 @@ again_search_fin_steps:
 					goto again_search_fin_steps;
 				}
 			}
-			print "Restarting the following steps:";
+			print log: "Restarting the following steps:";
 			for (local s: missingSteps) {
-				print "\t",;
-				print s;
+				print log: "\t",;
+				print log: s;
 			}
 			goto search_next_step;
 		}
@@ -1505,7 +1507,7 @@ class Timed {
 	operator leave() {
 		import tick from time;
 		local end = tick();
-		print "Timed:", name, "took", (end - start);
+		print log: ("Timed: ", name, " took ", (end - start));
 	}
 }
 #endif
