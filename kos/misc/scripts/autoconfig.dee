@@ -1,0 +1,191 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import fs;
+import posix;
+import * from deemon;
+import * from time;
+import parseCurrentVsConfiguration from .vsautoconfig;
+
+@@Get the configuration @(target, config, last-modified) triple of the previous build
+function getPreviousBuildConfiguration(rootDir: string, targetName: string | none = none): (string, string, Time) | none {
+	local resultTimestamp = none;
+	local resultTargetName = targetName;
+	if (targetName is none) {
+		/* Figure out `targetName' was enumerating symlinks in "{rootDir}/bin"
+		 * and  picking whichever has the most-recent last-modified timestamp. */
+		local mostRecentTargets = [];
+		for (local ent: posix.opendir(rootDir + "bin")) {
+			if (ent.d_type != posix.DT_LNK)
+				continue;
+			if (!ent.d_name.endswith("-kos"))
+				continue;
+			local entTargetName = ent.d_name[:-4];
+			local st = posix.lstat(ent.d_fullname);
+			if (resultTimestamp is none)
+				resultTimestamp = st.st_mtime;
+			if (st.st_mtime > resultTimestamp) {
+				mostRecentTargets = [entTargetName];
+				resultTimestamp = st.st_mtime;
+			} else if (st.st_mtime == resultTimestamp) {
+				mostRecentTargets.append(entTargetName);
+			}
+		}
+		if (!mostRecentTargets) {
+			return none;
+		} else if (#mostRecentTargets == 1) {
+			resultTargetName = mostRecentTargets.first;
+		} else {
+			mostRecentTargets = HashSet(mostRecentTargets);
+			if (mostRecentTargets == { "i386", "x86_64" }) {
+				/* Special case:  when both  i386 and  x86_64 were  linked
+				 * at the  same time,  it's  probably because  x86_64  was
+				 * build and needed to re-direct the compat-mode bin-path. */
+				resultTargetName = mostRecentTargets.first;
+			} else {
+				return none;
+			}
+		}
+	}
+
+	/* Figure out what the "{rootDir}/bin/{resultTargetName}-kos" link points to */
+	local targetLinkFilename = f"{rootDir}/bin/{resultTargetName}-kos";
+	if (resultTimestamp is none)
+		resultTimestamp = posix.lstat(targetLinkFilename).st_mtime;
+	local targetLinkText = posix.readlink(targetLinkFilename);
+	local targetLinkExpectedPrefix = f"{resultTargetName}-kos-";
+	if (!targetLinkText.startswith(targetLinkExpectedPrefix)) {
+		if (targetName is none && resultTargetName == "i386" &&
+		    targetLinkText.startswith("x86_64-kos-")) {
+			/* Special case: last build was for x86_64 */
+			resultTargetName         = "x86_64";
+			targetLinkExpectedPrefix = "x86_64-kos-";
+		} else {
+			return none;
+		}
+	}
+	local targetLinkConfig = targetLinkText[#targetLinkExpectedPrefix:];
+	return (resultTargetName, targetLinkConfig, resultTimestamp);
+}
+
+@@Get the configuration from @"{rootDir}/.vs/MIOptions.xml"
+function getMiOptionsBuildConfig(rootDir: string): (Bytes, Bytes) | none {
+	local miOptionsFilename = f"{rootDir}/.vs/MIOptions.xml";
+	for (local line: File.open(miOptionsFilename, "rb")) {
+		final local PREFIX = "DebugServerArgs=";
+		local pos = line.find(PREFIX);
+		if (pos < 0)
+			continue;
+		line = line[pos + #PREFIX:];
+		line = line.strip().strip('"').strip();
+		local targetStart = line.find("--target=");
+		if (targetStart < 0)
+			break;
+		local configStart = line.find("--config=");
+		if (configStart < 0)
+			break;
+		targetStart += #"--target=";
+		configStart += #"--config=";
+		return (
+			line[targetStart:].partition(" ")[0],
+			line[configStart:].partition(" ")[0],
+		);
+	}
+	return none;
+}
+
+@@Try to automatically determine the target/config for which to build
+@@This function is used when you invoke `magic.dee` without supplying
+@@a `--target=` or `--config=` option. It is also used by `make` when
+@@needing (buf missing) a `TARGET` or `CONFIG` argument.
+@@
+@@The actual behavior of this function is not guarantied, but it tries
+@@to figure out the target/configuration which KOS has last been built
+@@for, though there is no guaranty that it will succeed in doing so.
+function getAutoConfig(rootDir: string, targetName: string | none = none): (string, string) | (none, none) {
+	local vsLastModified = none;
+	local vsTargetName, vsConfigName;
+	try {
+		local vsConfigFilename = f"{rootDir}kos/.vs/ProjectSettings.json";
+		vsTargetName, vsConfigName = parseCurrentVsConfiguration(vsConfigFilename)...;
+		vsLastModified = posix.stat(vsConfigFilename).st_mtime;
+	} catch (...) {
+	}
+	if (vsLastModified is none) {
+		vsTargetName = none;
+		vsConfigName = none;
+	}
+
+	/* If the user selected an architecture, we may only respect
+	 * VS  settings  if  they  indicate  the  same architecture! */
+	if (vsTargetName !is none && targetName !is none && vsTargetName != targetName) {
+		vsLastModified = none;
+		vsTargetName = none;
+		vsConfigName = none;
+	}
+
+	/* If it  exists,  "{rootDir}/.vs/MIOptions.xml"  is  a  guarantied
+	 * indicator of the last build-config. However, we only want to use
+	 * this source if the  vcxproj-files are newer than  vsLastModified */
+	local vcxprojLastModified;
+	try {
+		vcxprojLastModified = posix.lstat(f"{rootDir}/.vs/kos.vcxproj").st_mtime;
+	} catch (...) {
+		vcxprojLastModified = none;
+	}
+	if (vcxprojLastModified !is none &&
+	    (vsLastModified is none || vcxprojLastModified >= vsLastModified)) {
+		local miTargetName, miConfigName;
+		try {
+			miTargetName, miConfigName = getMiOptionsBuildConfig(rootDir)...;
+			miTargetName = miTargetName.decode("utf-8");
+			miConfigName = miConfigName.decode("utf-8");
+		} catch (...) {
+			miTargetName = none;
+			miConfigName = none;
+		}
+		if (miTargetName !is none && miConfigName !is none &&
+		    (targetName is none || miTargetName == targetName))
+			return (miTargetName, miConfigName);
+	}
+
+
+	/* HINT: lb = LastBuild */
+	local lbTargetName, lbConfigName, lbLastModified =
+		getPreviousBuildConfiguration(rootDir, targetName)...;
+
+	/* Figure out  which build  config  we want  to  use
+	 * (try to pick whichever was updated most recently) */
+	if (lbLastModified is none)
+		goto return_vs_build_config;
+	if (vsLastModified is none)
+		goto return_last_build_config;
+	if (vsLastModified > lbLastModified)
+		goto return_vs_build_config;
+	if (lbLastModified > vsLastModified)
+		goto return_last_build_config;
+	if (vsTargetName == lbTargetName && vsConfigName == lbConfigName)
+		goto return_last_build_config;
+	return (none, none);
+return_vs_build_config:
+	return (vsTargetName, vsConfigName);
+return_last_build_config:
+	return (lbTargetName, lbConfigName);
+}

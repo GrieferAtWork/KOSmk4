@@ -18,13 +18,6 @@
 # 3. This notice may not be removed or altered from any source distribution.
 
 ### Collection of helpful commands for working with KOS
-ifndef TARGET
-TARGET := i386
-endif
-ifndef CONFIG
-CONFIG := nOD
-endif
-
 ifeq ($(OS),Windows_NT)
 EXE := .exe
 else
@@ -36,14 +29,30 @@ ROOT   := .
 DEEMON := $(ROOT)/binutils/deemon/deemon$(EXE)
 BIN    := $(ROOT)/bin/$(TARGET)-kos-$(CONFIG)
 
+ifdef TARGET
+TARGET_ARG = --target=$(TARGET)
+else
+TARGET_ARG =
+TARGET = $(shell TGT="$$("$(DEEMON)" magic.dee --target 2>/dev/null)"; echo "$${TGT%%-*}")
+endif
+ifdef CONFIG
+CONFIG_ARG = --config=$(CONFIG)
+else
+CONFIG_ARG =
+CONFIG = $(shell TGT="$$("$(DEEMON)" magic.dee --target 2>/dev/null)"; echo "$${TGT##*-}")
+endif
+
+print-selected-target-info:
+	@echo TARGET: $(TARGET)
+	@echo CONFIG: $(CONFIG)
 
 # KOS
 launch:
-	"$(DEEMON)" "$(ROOT)/magic.dee" --target=$(TARGET) --config=$(CONFIG)
+	"$(DEEMON)" "$(ROOT)/magic.dee" $(TARGET_ARG) $(CONFIG_ARG)
 build:
-	"$(DEEMON)" "$(ROOT)/magic.dee" --target=$(TARGET) --config=$(CONFIG) --build-only
+	"$(DEEMON)" "$(ROOT)/magic.dee" $(TARGET_ARG) $(CONFIG_ARG) --build-only
 run:
-	"$(DEEMON)" "$(ROOT)/magic.dee" --target=$(TARGET) --config=$(CONFIG) --run-only
+	"$(DEEMON)" "$(ROOT)/magic.dee" $(TARGET_ARG) $(CONFIG_ARG) --run-only
 .PHONY: launch build run
 .DEFAULT_GOAL := launch
 
@@ -78,7 +87,7 @@ syscalls:
 
 # Install to custom $DESTDIR
 install-system:
-	"$(DEEMON)" "$(ROOT)/magic.dee" --target=$(TARGET) --config=$(CONFIG) --install-sh | "$(SH)"
+	"$(DEEMON)" "$(ROOT)/magic.dee" $(TARGET_ARG) $(CONFIG_ARG) --install-sh | "$(SH)"
 .PHONY: install-system
 install-%:
 	@UTILITY_NAME="$@"; \

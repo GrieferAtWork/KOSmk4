@@ -71,6 +71,7 @@ function parseCurrentVsConfiguration(filename: string): (string,string) {
 		config = config.strip();
 		local debug = none;
 		local optimize = false;
+		/* TODO: Support for custom configurations */
 		for (local opt: config.split(",")) {
 			opt = opt.strip();
 			switch (opt.upper()) {

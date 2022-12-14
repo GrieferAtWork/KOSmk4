@@ -79,9 +79,12 @@ function onEmulatorStarted() {
 }
 
 function loadMissingSettings() {
-	local targetName, configName =
-		import(".kos.misc.scripts.vsautoconfig")
-			.parseCurrentVsConfiguration("kos/.vs/ProjectSettings.json")...;
+	local targetName, configName = import(".kos.misc.scripts.autoconfig").getAutoConfig(
+		rootDir: ROOTDIR, targetName: TARGET_ARCH is bound ? TARGET_ARCH : none)...;
+	if (targetName is none || configName is none) {
+		print log: "Unable to automatically determine --target=... and/or --config=...";
+		AppExit.exit(1);
+	}
 	print log: "Automatically loaded settings:", repr targetName, repr configName;
 	if (TARGET_ARCH !is bound)
 		TARGET_ARCH = targetName;
@@ -147,20 +150,20 @@ function buildToolchainsAndGroups() {
 	}
 }
 
-function setBinTargetLink(target_arch: string, target_name: string) {
+function setBinTargetLink(targetArch: string, targetName: string) {
 	/* Make sure that the correct bin-config is selected. */
-	local selConfigFile = f"bin/{target_arch}-kos";
+	local selConfigFile = f"bin/{targetArch}-kos";
 	local selConfig = readlink(selConfigFile);
-	if (selConfig !is string || selConfig != target_name) {
+	if (selConfig !is string || selConfig != targetName) {
 		if (selConfig !is none) {
 			try {
 				fs.unlink(selConfigFile);
 			} catch (...) {
 			}
 		}
-		print log: ("Changing libpath: `ln -s ", repr(target_name), " ", repr(selConfigFile), "`");
+		print log: ("Changing libpath: `ln -s ", repr(targetName), " ", repr(selConfigFile), "`");
 		local p = ipc.Process(HOST_EXE("bash"), [ "-c",
-			f"ln -s {repr target_name} {repr selConfigFile}"
+			f"ln -s {repr targetName} {repr selConfigFile}"
 		]);
 		p.start();
 		joinProcess(p);
@@ -270,6 +273,11 @@ function main(argv: {string...}) {
 			OPT_EMULATOR_USED = none;
 			import(".kos.misc.libmagic.steps.mtools-install-sh").hook();
 			break;
+		case "--target":
+			if (config.CONFIG is none || TARGET_ARCH !is bound)
+				loadMissingSettings();
+			print(TARGET_ARCH, "-kos-", config.CONFIG.name);
+			AppExit.exit(0);
 		case "--config":
 			/* List available configs */
 			print("Available configurations:");
@@ -279,7 +287,6 @@ function main(argv: {string...}) {
 		default:
 			if ("=" in arg) {
 				local name, none, value = arg.partition("=")...;
-				local final BOOLMAP = { "0": false, "1": true };
 				switch (name) {
 				case "--echo":
 					print "ECHO:", repr(value);
@@ -289,7 +296,7 @@ function main(argv: {string...}) {
 					break;
 				case "--emulator-setopt": {
 					if ("=" !in value)
-						throw Error("--emulator-setopt requires the operand to contain \"=\", which isn't the case for " + repr(value));
+						throw Error(f"--emulator-setopt requires the operand to contain '=', but {repr(value)} doesn't");
 					local optnam, none, optval = value.partition("=")...;
 					OPT_EMULATOR_OPTIONS[optnam] = optval;
 				}	break;
@@ -299,9 +306,10 @@ function main(argv: {string...}) {
 				case "--changed":
 					setForceChanged(normalizePath(value, true));
 					break;
-				case "--verbose":
+				case "--verbose": {
+					local final BOOLMAP = { "0": false, "1": true };
 					config.VERBOSE = BOOLMAP[value];
-					break;
+				}	break;
 				case "--gdb":
 					OPT_EMULATOR_OPTIONS[emulatorOptions.GDB] = value;
 					break;
@@ -324,7 +332,7 @@ function main(argv: {string...}) {
 				case "--vcautotargetconfig": {
 					local targetName, configName =
 						import(".kos.misc.scripts.vsautoconfig")
-						.parseCurrentVsConfiguration(value)...;
+							.parseCurrentVsConfiguration(value)...;
 					TARGET_ARCH = targetName;
 					config.CONFIG = configs.getConfiguration(configName);
 				}	break;
