@@ -1,6 +1,8 @@
 
 ### Sub-folders
 
+- `./build`
+	- Various helper scripts used by the build system `/magic.dee`
 - `./config`
 	- KOS System configurations API and database of available configuration options
 - `./doc`

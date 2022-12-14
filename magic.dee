@@ -79,7 +79,7 @@ function onEmulatorStarted() {
 }
 
 function loadMissingSettings() {
-	local targetName, configName = import(".kos.misc.scripts.autoconfig").getAutoConfig(
+	local targetName, configName = import(".kos.misc.build.autoconfig").getAutoConfig(
 		rootDir: ROOTDIR, targetName: TARGET_ARCH is bound ? TARGET_ARCH : none)...;
 	if (targetName is none || configName is none) {
 		print log: "Unable to automatically determine --target=... and/or --config=...";
@@ -331,7 +331,7 @@ function main(argv: {string...}) {
 					break;
 				case "--vcautotargetconfig": {
 					local targetName, configName =
-						import(".kos.misc.scripts.vsautoconfig")
+						import(".kos.misc.build.vsautoconfig")
 							.parseCurrentVsConfiguration(value)...;
 					TARGET_ARCH = targetName;
 					config.CONFIG = configs.getConfiguration(configName);
@@ -416,7 +416,7 @@ _err_unknown_argument:
 	if (!OPT_DONT_BUILD) {
 		/* Update the vs MIEngine work-around config build */
 		if (fs.stat.isdir(".vs")) {
-			import(".kos.misc.scripts.make-vs-proj-update-mioptions")
+			import(".kos.misc.build.make-vs-proj-update-mioptions")
 				.selectMiOptions(TARGET_ARCH, config.CONFIG.name);
 		}
 		if (hasattr(TARGET, "build")) {

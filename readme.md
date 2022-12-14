@@ -670,7 +670,7 @@ To help you understand how this script works to do what it does, here is a docum
 	- This is implemented by taking all build steps with a dependency on `FILE`, then forming a set of all of the groups of those files, before finally running all steps and dependencies of those groups
 	- The given `FILE` is interpreted relative to the PWD set when `magic.dee` got invoked
 	- This option is intended to be mapped to a key combination within your IDE, where `FILE` should be passed as the file that is currently opened, allowing you to quickly build (only) the part of the system that you currently have opened.
-		- On how to do this in Visual Studio, see `$PROJPATH/kos/misc/scripts/vsautoconfig.dee`
+		- On how to do this in Visual Studio, see `$PROJPATH/kos/misc/build/vsautoconfig.dee`
 - `--regen=PATTERN`
 	- Same as `--gen=...`, but select files using a regular expression pattern
 	- The given `PATTERN` doesn't get formatted according to the PWD set when `magic.dee` got invoked

@@ -99,7 +99,7 @@ install-%:
 
 # Misc script invocations
 vs-proj:
-	"$(DEEMON)" kos/misc/scripts/make-vs-proj.dee
+	"$(DEEMON)" kos/misc/build/make-vs-proj.dee
 .PHONY: vs-proj
 
 ifeq ($(MAKECMDGOALS),me a sandwich)
