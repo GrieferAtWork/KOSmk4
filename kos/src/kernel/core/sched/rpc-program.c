@@ -2013,9 +2013,9 @@ task_userrpc_runprogram(rpc_cpustate_t *__restrict state,
 		TRY
 #endif /* __x86_64__ */
 		{
-			/* NOTE: DON'T allow changing `EFLAGS_RF' here! `vm.rv_cpu' gets pre-populated
-			 *       from `state', and if we allowed changes to it here, RPC handles would
-			 *       be  able to affect the behavior of a debugger trying to step across a
+			/* NOTE: DON'T  allow changing `EFLAGS_RF' here! `vm.rv_cpu' gets pre-populated
+			 *       from `state', and if we allowed changes to it here, RPC handlers would
+			 *       be able to affect the behavior of  a debugger trying to step across  a
 			 *       hw-breakpoint (%drN). */
 			cpustate_verify_userpflags(icpustate_getpflags(state),
 			                           ucpustate_getpflags(&vm.rv_cpu),
