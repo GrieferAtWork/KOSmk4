@@ -478,6 +478,7 @@ mpart_split_data_alloc_mnodes(struct mpart_split_data *__restrict self) {
 			return false;
 		}
 		SLIST_INSERT(&self->msd_hinodes, new_node, _mn_alloc);
+		++self->msd_hinodec;
 	}
 	return true;
 }
@@ -881,59 +882,73 @@ relock_with_data:
 	 * NOTE: There's no need to re-map anything, because the backing physical memory
 	 *       doesn't actually change at any point! */
 	{
-		struct mnode *lonode;
-		for (lonode = LIST_FIRST(&lopart->mp_copy); lonode;) {
-			mpart_reladdr_t min, max;
-			if unlikely(wasdestroyed(lonode->mn_mman))
-				continue; /* Skip nodes that were destroyed. */
-			if unlikely(lonode->mn_flags & MNODE_F_UNMAPPED)
-				continue; /* Skip nodes that were unmapped. (NOTE: We're holding a lock to `lonode->mn_mman') */
-			assert(lonode->mn_part == lopart);
-			min = mnode_getpartminaddr(lonode);
-			max = mnode_getpartmaxaddr(lonode);
-			assert(min <= max);
-			assert(max < mpart_getsize(lopart));
+		unsigned int i;
+		for (i = 0; i < lengthof(lopart->_mp_nodlsts); ++i) {
+			struct mnode *lonode;
+			LIST_FOREACH_SAFE (lonode, &lopart->_mp_nodlsts[i], mn_link) {
+				mpart_reladdr_t min, max;
+				if unlikely(wasdestroyed(lonode->mn_mman))
+					continue; /* Skip nodes that were destroyed. */
+				if unlikely(lonode->mn_flags & MNODE_F_UNMAPPED)
+					continue; /* Skip nodes that were unmapped. (NOTE: We're holding a lock to `lonode->mn_mman') */
+				assert(lonode->mn_part == lopart);
+				min = mnode_getpartminaddr(lonode);
+				max = mnode_getpartmaxaddr(lonode);
+				assert(min <= max);
+				assert(max < mpart_getsize(lopart));
+				assertf(mpart_getnodlst_from_mnodeflags(hipart, lonode->mn_flags) == &hipart->_mp_nodlsts[i],
+				        "Node indicates list:           %s\n"
+				        "but we found the node in list: %s\n",
+				        (lonode->mn_flags & MNODE_F_SHARED) ? "shared" : "copy",
+				        (&lopart->_mp_nodlsts[i] == &lopart->mp_share) ? "shared" : "copy");
+				if (min >= data.msd_offset) {
+					/* Our `lonode' is entirely located within `hipart' -> move it in there */
+					LIST_REMOVE(lonode, mn_link);
+					LIST_INSERT_HEAD(&hipart->_mp_nodlsts[i], lonode, mn_link);
+					decref_nokill(lopart);
+					lonode->mn_part = hipart;
+					++hipart->mp_refcnt;
+					lonode->mn_partoff -= data.msd_offset;
+				} else if (/*min < data.msd_offset && */ data.msd_offset <= max) {
+					/* NOTE: We _only_ have to create new nodes for those cases where
+					 *       the split position  lies _inside_ of  the range that  is
+					 *       actually being mapped by some node!
+					 * s.a. `mnode_getpartminaddr() ... mnode_getpartmaxaddr()' */
+					struct mnode *hinode;
+					size_t noderel_offset;
+					/* This one must be split! */
+					assertf(!(lonode->mn_flags & MNODE_F_NOSPLIT),
+					        "Not allowed to split this node (at %p...%p)",
+					        mnode_getminaddr(lonode),
+					        mnode_getmaxaddr(lonode));
+					assert(!SLIST_EMPTY(&data.msd_hinodes));
+					hinode = SLIST_FIRST(&data.msd_hinodes);
+					SLIST_REMOVE_HEAD(&data.msd_hinodes, _mn_alloc);
+					noderel_offset     = data.msd_offset - min;
+					hinode->mn_flags   = lonode->mn_flags;
+					hinode->mn_minaddr = lonode->mn_minaddr + noderel_offset;
+					hinode->mn_maxaddr = lonode->mn_maxaddr;
+					assert(!wasdestroyed(lonode->mn_mman)); /* We don't weakincref because the mman wasn't destroyed, yet! */
+					hinode->mn_mman    = lonode->mn_mman;
+					hinode->mn_part    = hipart;
+					++hipart->mp_refcnt;
+					hinode->mn_partoff = 0;
+					LIST_INSERT_HEAD(&hipart->_mp_nodlsts[i], hinode, mn_link);
+					LIST_ENTRY_UNBOUND_INIT(&hinode->mn_writable);
+					if (LIST_ISBOUND(lonode, mn_writable))
+						LIST_INSERT_HEAD(&hinode->mn_mman->mm_writable, hinode, mn_writable);
+					hinode->mn_fspath = xincref(lonode->mn_fspath);
+					hinode->mn_fsname = xincref(lonode->mn_fsname);
+					hinode->mn_module = lonode->mn_module;
+					if (hinode->mn_module)
+						module_inc_nodecount(hinode->mn_module);
 
-			/* NOTE: We _only_ have to create new nodes for those cases where
-			 *       the split position  lies _inside_ of  the range that  is
-			 *       actually being mapped by some node!
-			 * s.a. `mnode_getpartminaddr() ... mnode_getpartmaxaddr()' */
-			if (min < data.msd_offset && data.msd_offset <= max) {
-				struct mnode *hinode;
-				struct mnode_list *list;
-				size_t noderel_offset;
-				/* This one must be split! */
-				assertf(!(lonode->mn_flags & MNODE_F_NOSPLIT),
-				        "Not allowed to split this node (at %p...%p)",
-				        mnode_getminaddr(lonode),
-				        mnode_getmaxaddr(lonode));
-				assert(!SLIST_EMPTY(&data.msd_hinodes));
-				hinode = SLIST_FIRST(&data.msd_hinodes);
-				SLIST_REMOVE_HEAD(&data.msd_hinodes, _mn_alloc);
-				noderel_offset     = data.msd_offset - min;
-				hinode->mn_flags   = lonode->mn_flags;
-				hinode->mn_minaddr = lonode->mn_minaddr + noderel_offset;
-				hinode->mn_maxaddr = lonode->mn_maxaddr;
-				hinode->mn_mman    = weakincref(lonode->mn_mman);
-				hinode->mn_part    = hipart;
-				++hipart->mp_refcnt;
-				hinode->mn_partoff = lonode->mn_partoff + data.msd_offset;
-				list = mpart_getnodlst_from_mnodeflags(hipart, hinode->mn_flags);
-				LIST_INSERT_HEAD(list, hinode, mn_link);
-				LIST_ENTRY_UNBOUND_INIT(&hinode->mn_writable);
-				if (LIST_ISBOUND(lonode, mn_writable))
-					LIST_INSERT_HEAD(&hinode->mn_mman->mm_writable, hinode, mn_writable);
-				hinode->mn_fspath = xincref(lonode->mn_fspath);
-				hinode->mn_fsname = xincref(lonode->mn_fsname);
-				hinode->mn_module = lonode->mn_module;
-				if (hinode->mn_module)
-					module_inc_nodecount(hinode->mn_module);
-
-				/* Update/re-insert both nodes. */
-				mman_mappings_removenode(lonode->mn_mman, lonode);
-				lonode->mn_maxaddr = hinode->mn_minaddr - 1;
-				mman_mappings_insert(lonode->mn_mman, lonode);
-				mman_mappings_insert(hinode->mn_mman, hinode);
+					/* Update/re-insert both nodes. */
+					mman_mappings_removenode(lonode->mn_mman, lonode);
+					lonode->mn_maxaddr = hinode->mn_minaddr - 1;
+					mman_mappings_insert(lonode->mn_mman, lonode);
+					mman_mappings_insert(hinode->mn_mman, hinode);
+				}
 			}
 		}
 	} /* Scope */
