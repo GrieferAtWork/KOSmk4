@@ -393,7 +393,7 @@ do_realloc_in_extend_after_unlock:
 
 				/* Allocate the new chunk. */
 				chunk.mc_start = mfile_alloc_physmem(self->mp_file, missing_pages, &chunk.mc_size);
-				if unlikely(data->scd_copy_mem.mc_start == PHYSPAGE_INVALID)
+				if unlikely(chunk.mc_start == PHYSPAGE_INVALID)
 					goto err_badalloc_after_unlock; /* Insufficient physical memory. */
 				assert(chunk.mc_size <= missing_pages);
 				data->scd_copy_mem_sc.ms_v[data->scd_copy_mem_sc.ms_c] = chunk;
@@ -444,7 +444,7 @@ extend_vector:
 
 		/* Allocate the new chunk. */
 		chunk.mc_start = mfile_alloc_physmem(self->mp_file, missing_pages, &chunk.mc_size);
-		if unlikely(data->scd_copy_mem.mc_start == PHYSPAGE_INVALID)
+		if unlikely(chunk.mc_start == PHYSPAGE_INVALID)
 			goto err_badalloc; /* Insufficient physical memory. */
 		data->scd_copy_mem_sc.ms_v[data->scd_copy_mem_sc.ms_c] = chunk;
 		++data->scd_copy_mem_sc.ms_c;

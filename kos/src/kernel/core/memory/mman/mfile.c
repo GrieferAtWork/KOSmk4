@@ -73,6 +73,7 @@ NOTHROW(FCALL mfile_alloc_physmem)(struct mfile *__restrict self,
 	size_t page_alignment;
 	assert(self->mf_iobashift <= self->mf_blockshift);
 	assert(max_pages != 0);
+	DBG_memset(res_pages, 0xcc, sizeof(*res_pages));
 #ifndef NDEBUG
 	if (self->mf_blockshift > PAGESHIFT) {
 		size_t size_alignment;
@@ -95,9 +96,11 @@ NOTHROW(FCALL mfile_alloc_physmem)(struct mfile *__restrict self,
 	if unlikely(result == PHYSPAGE_INVALID) {
 		result = page_malloc(page_alignment);
 		if (result != PHYSPAGE_INVALID) {
+			*res_pages = page_alignment;
 			if (!IS_ALIGNED(result, page_alignment)) {
 				page_ccfree(result, max_pages);
 				result = PHYSPAGE_INVALID;
+				DBG_memset(res_pages, 0xcc, sizeof(*res_pages));
 			}
 		}
 		return result;
