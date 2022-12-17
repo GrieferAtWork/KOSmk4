@@ -235,13 +235,16 @@ NOTHROW(FCALL mpart_setcore_data_fini)(struct mpart_setcore_data *__restrict sel
 		mchunk_freemem(&self->scd_copy_mem);
 		break;
 
-	case MPART_ST_SWP_SC:
+	case MPART_ST_MEM_SC:
 		mchunkvec_freemem(self->scd_copy_mem_sc.ms_v,
 		                  self->scd_copy_mem_sc.ms_c);
 		kfree(self->scd_copy_mem_sc.ms_v);
 		break;
 
 	default:
+		assertf(self->scd_copy_state == MPART_ST_VOID,
+		        "self->scd_copy_state: %u",
+		        self->scd_copy_state);
 		break;
 	}
 }
