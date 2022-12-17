@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LIBREGEX_RE_H
-#define _LIBREGEX_RE_H 1
+#ifndef _LIBREGEX_REGCOMP_H
+#define _LIBREGEX_REGCOMP_H 1
 
 #include "api.h"
 
@@ -43,10 +43,10 @@ typedef int re_errno_t;
 #define RE_EBRACE   9  /* Unmatched '{'. */
 #define RE_BADBR    10 /* Invalid contents of '{...}'. */
 #define RE_ERANGE   11 /* Invalid range end (e.g. '[z-a]'). */
-#define RE_ESPACE   12 /* Out of memory, or `RE_DUP_MAX' exceeded (or more than 255 variables). */
+#define RE_ESPACE   12 /* Out of memory. */
 #define RE_BADRPT   13 /* Nothing is preceding '+', '*', '?' or '{'. */
 #define RE_EEND     14 /* Unexpected end of pattern. */
-#define RE_ESIZE    15 /* Compiled pattern bigger than 2^16 bytes. */
+#define RE_ESIZE    15 /* Too large (pattern violates some hard limit that isn't the currently available ram) */
 #define RE_ERPAREN  16 /* Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set) */
 
 
@@ -207,7 +207,6 @@ typedef int re_errno_t;
  *      an empty word.
  *
  *
- *
  * TODO: "(?<=X)"   -- Current input position must be preceded by "X"
  * TODO: "(?<!X)"   -- Current input position must not be preceded by "X"
  * TODO: "(?=X)"    -- Current input position must be succeeded by "X"
@@ -220,16 +219,22 @@ typedef int re_errno_t;
 enum {
 
 	/* Opcodes for matching (and thus: consuming) input */
-	REOP_EXACT,                /* [+1+n] Followed by 1 byte N = *PC++, followed by N more bytes that must be matched exactly (N must be >= 2) */
-	REOP_EXACT_UTF8_ICASE,     /* [+1+n] Followed by a COUNT-byte, followed by a `COUNT'-character long utf-8 string (matches utf-8 character contained in said string). (COUNT must be >= 1) */
+	REOP_EXACT,                /* [+1+n] Followed by 1 byte N = *PC++, followed by N more bytes that must be matched exactly
+	                            * NOTE: N must be >= 2 */
 	REOP_EXACT_ASCII_ICASE,    /* [+1+n] Like 'REOP_EXACT', but strings are both ascii, and casing should be ignored (used instead of
-	                            * `REOP_EXACT_UTF8_ICASE' when the pattern string is ascii-only, or when `RE_SYNTAX_NO_UTF8' was set) */
+	                            * `REOP_EXACT_UTF8_ICASE' when the pattern string is ascii-only, or when `RE_SYNTAX_NO_UTF8' was set)
+	                            * NOTE: N must be >= 2 */
+	REOP_EXACT_UTF8_ICASE,     /* [+1+n] Followed  by  a  COUNT-byte, followed  by  a `COUNT'-character
+	                            * long utf-8 string (matches utf-8 character contained in said string).
+	                            * NOTE: COUNT must be >= 1 */
 	REOP_ANY,                  /* [+0] Match any character */
+	REOP_ANY_NOTLF,            /* [+0] Match any character (except ASCII line-feeds) */
+#define REOP_ANY_NOTLF_UTF8 REOP_UTF8_ISLF_NOT
 	REOP_ANY_NOTNUL,           /* [+0] Match any character (except '\0') */
-	REOP_ANY_NOTNUL_NOTLF,     /* [+0] Match any character (except '\0' or line-feeds) */
-#define REOP_ANY_NOTLF REOP_UTF8_ISLF_NOT /* Match any character (except line-feeds) */
+	REOP_ANY_NOTNUL_NOTLF,     /* [+0] Match any character (except '\0' or ASCII line-feeds) */
+	REOP_ANY_NOTNUL_NOTLF_UTF8, /* [+0] Match any character (except '\0' or ASCII line-feeds) */
 	REOP_CHAR,                 /* [+1] Followed by 1 byte that must be matched exactly */
-	REOP_CHAR2,                /* [+2] Followed by 2 bytes, one of which must be matched exactly (for "[ab]" or "a" in ICASE-mode) */
+	REOP_CHAR2,                /* [+2] Followed by 2 bytes, one of which must be matched exactly (for "[ab]" or "a" -> "[aA]" in ICASE-mode) */
 	REOP_CONTAINS_UTF8,        /* [+1+n] Followed by a COUNT-byte, followed by a `COUNT'-character long utf-8 string (matches utf-8 character contained in said string). */
 	REOP_CONTAINS_UTF8_NOT,    /* [+1+n] Followed by a COUNT-byte, followed by a `COUNT'-character long utf-8 string (matches utf-8 character not contained in said string). */
 	REOP_BITSET,               /* [+1+n] Followed by a LAYOUT-byte, followed by `REOP_BITSET_LAYOUT_GETBYTES(LAYOUT)' bitset bytes.
@@ -246,6 +251,7 @@ enum {
 	                            * >> }
 	                            * NOTE: If the bitset would need to contain non-ascii characters, `REOP_CONTAINS_UTF8' is used instead. */
 	REOP_BITSET_NOT,           /* [+1+n] Same as REOP_BITSET, but the return value of `is_char_in_set' is inverted */
+	REOP_BITSET_UTF8_NOT,      /* [+1+n] Same as `REOP_BITSET_NOT', but non-matching character must be utf-8 */
 	REOP_GROUP_MATCH,          /* [+1] Re-match the contents of the (N = *PC++)'th already-matched group; If group start/end aren't, triggers a match-failure. */
 	REOP_GROUP_MATCH_J3,       /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 3 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_MATCH_J4,       /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 4 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
@@ -258,30 +264,38 @@ enum {
 #define REOP_GROUP_MATCH_JMIN  REOP_GROUP_MATCH_J3
 #define REOP_GROUP_MATCH_JMAX  REOP_GROUP_MATCH_J10
 #define REOP_GROUP_MATCH_Jn(n) (REOP_GROUP_MATCH_J3 + (n) - 3)
+#define REOP_GROUP_MATCH_Joff(opcode) (3 + (opcode) - REOP_GROUP_MATCH_J3)
 
 	/* Numerical attribute classes */
+#define REOP_ASCII_ISDIGIT_cmp_MIN REOP_ASCII_ISDIGIT_EQ
 	REOP_ASCII_ISDIGIT_EQ,     /* [+1] Match `isdigit(ch) && (ch - 0x30) == *PC++' */
 	REOP_ASCII_ISDIGIT_NE,     /* [+1] Match `isdigit(ch) && (ch - 0x30) != *PC++' */
 	REOP_ASCII_ISDIGIT_LO,     /* [+1] Match `isdigit(ch) && (ch - 0x30) <  *PC++' */
 	REOP_ASCII_ISDIGIT_LE,     /* [+1] Match `isdigit(ch) && (ch - 0x30) <= *PC++' */
 	REOP_ASCII_ISDIGIT_GR,     /* [+1] Match `isdigit(ch) && (ch - 0x30) >  *PC++' */
 	REOP_ASCII_ISDIGIT_GE,     /* [+1] Match `isdigit(ch) && (ch - 0x30) >= *PC++' */
+#define REOP_ASCII_ISDIGIT_cmp_MAX REOP_ASCII_ISDIGIT_GE
+#define REOP_UTF8_ISDIGIT_cmp_MIN REOP_UTF8_ISDIGIT_EQ
 	REOP_UTF8_ISDIGIT_EQ,      /* [+1] Match `unicode_isdigit(ch) && unicode_getnumeric(ch) == *PC++' */
 	REOP_UTF8_ISDIGIT_NE,      /* [+1] Match `unicode_isdigit(ch) && unicode_getnumeric(ch) != *PC++' */
 	REOP_UTF8_ISDIGIT_LO,      /* [+1] Match `unicode_isdigit(ch) && unicode_getnumeric(ch) <  *PC++' */
 	REOP_UTF8_ISDIGIT_LE,      /* [+1] Match `unicode_isdigit(ch) && unicode_getnumeric(ch) <= *PC++' */
 	REOP_UTF8_ISDIGIT_GR,      /* [+1] Match `unicode_isdigit(ch) && unicode_getnumeric(ch) >  *PC++' */
 	REOP_UTF8_ISDIGIT_GE,      /* [+1] Match `unicode_isdigit(ch) && unicode_getnumeric(ch) >= *PC++' */
+#define REOP_UTF8_ISDIGIT_cmp_MAX REOP_UTF8_ISDIGIT_GE
+#define REOP_UTF8_ISNUMERIC_cmp_MIN REOP_UTF8_ISNUMERIC_EQ
 	REOP_UTF8_ISNUMERIC_EQ,    /* [+1] Match `unicode_isnumeric(ch) && unicode_getnumeric(ch) == *PC++' */
 	REOP_UTF8_ISNUMERIC_NE,    /* [+1] Match `unicode_isnumeric(ch) && unicode_getnumeric(ch) != *PC++' */
 	REOP_UTF8_ISNUMERIC_LO,    /* [+1] Match `unicode_isnumeric(ch) && unicode_getnumeric(ch) <  *PC++' */
 	REOP_UTF8_ISNUMERIC_LE,    /* [+1] Match `unicode_isnumeric(ch) && unicode_getnumeric(ch) <= *PC++' */
 	REOP_UTF8_ISNUMERIC_GR,    /* [+1] Match `unicode_isnumeric(ch) && unicode_getnumeric(ch) >  *PC++' */
 	REOP_UTF8_ISNUMERIC_GE,    /* [+1] Match `unicode_isnumeric(ch) && unicode_getnumeric(ch) >= *PC++' */
+#define REOP_UTF8_ISNUMERIC_cmp_MAX REOP_UTF8_ISNUMERIC_GE
 
 	/* Special trait classes */
 	/* TODO: Deal with `RE_SYNTAX_HAT_LISTS_NOT_NEWLINE' */
 #define REOP_TRAIT_ASCII_MIN REOP_ASCII_ISCNTRL
+#define REOP_TRAIT_ASCII_ISNOT(x) ((((x) - REOP_ASCII_ISCNTRL_NOT) & 1) == 0)
 	REOP_ASCII_ISCNTRL,         /* [+0] consume trait `iscntrl(ch) == true' */
 	REOP_ASCII_ISCNTRL_NOT,     /* [+0] consume trait `iscntrl(ch) == false' */
 	REOP_ASCII_ISSPACE,         /* [+0] consume trait `isspace(ch) == true' */
@@ -313,6 +327,7 @@ enum {
 #define REOP_TRAIT_ASCII_MAX REOP_ASCII_ISSYMCONT_NOT
 
 #define REOP_TRAIT_UTF8_MIN REOP_UTF8_ISCNTRL
+#define REOP_TRAIT_UTF8_ISNOT(x) ((((x) - REOP_UTF8_ISCNTRL_NOT) & 1) == 0)
 	REOP_UTF8_ISCNTRL,         /* [+0] consume trait `unicode_iscntrl(ch) == true' */
 	REOP_UTF8_ISCNTRL_NOT,     /* [+0] consume trait `unicode_iscntrl(ch) == false' */
 	REOP_UTF8_ISSPACE,         /* [+0] consume trait `unicode_isspace(ch) == true' */
@@ -359,24 +374,33 @@ enum {
 
 	/* Opcodes for asserting the current position in input (these don't consume anything) */
 #define REOP_AT_MIN REOP_AT_SOI
-	REOP_AT_SOI,     /* [+0] Start-of-input */
-	REOP_AT_EOI,     /* [+0] End-of-input */
-	REOP_AT_SOL,     /* [+0] Start-of-line (following a line-feed, or `REOP_AT_SOI' unless `REG_NOTBOL' was set) */
-	REOP_AT_EOL,     /* [+0] End-of-line (preceding a line-feed, or `REOP_AT_EOI' unless `REG_NOTEOL' was set) */
-	REOP_AT_WOB,     /* [+0] WOrdBoundary (preceding and next character have non-equal `issymcont(ch)'; OOB counts as `issymcont == false') */
-	REOP_AT_WOB_NOT, /* [+0] NOT WOrdBoundary (preceding and next character have equal `issymcont(ch)'; OOB counts as `issymcont == false') */
-	REOP_AT_SOW,     /* [+0] StartOfWord (preceding and next character are `!issymcont(lhs) && issymcont(rhs)'; OOB counts as `issymcont == false') */
-	REOP_AT_EOW,     /* [+0] EndOfWord (preceding and next character are `issymcont(lhs) && !issymcont(rhs)'; OOB counts as `issymcont == false') */
-	REOP_AT_SOS,     /* [+0] StartOfSymbol (preceding and next character are `!issymcont(lhs) && issymstrt(rhs)'; OOB counts as `issymcont[/strt] == false') */
-#define REOP_AT_EOS REOP_AT_EOW
-#define REOP_AT_MAX REOP_AT_SOS
+	REOP_AT_SOI,          /* [+0] Start-of-input */
+	REOP_AT_EOI,          /* [+0] End-of-input */
+	REOP_AT_SOL,          /* [+0] Start-of-line (following a line-feed, or `REOP_AT_SOI' unless `RE_EXEC_NOTBOL' was set) */
+	REOP_AT_SOL_UTF8,     /* [+0] Start-of-line (following a line-feed, or `REOP_AT_SOI' unless `RE_EXEC_NOTBOL' was set) */
+	REOP_AT_EOL,          /* [+0] End-of-line (preceding a line-feed, or `REOP_AT_EOI' unless `RE_EXEC_NOTEOL' was set) */
+	REOP_AT_EOL_UTF8,     /* [+0] End-of-line (preceding a line-feed, or `REOP_AT_EOI' unless `RE_EXEC_NOTEOL' was set) */
+	REOP_AT_WOB,          /* [+0] WOrdBoundary (preceding and next character have non-equal `issymcont(ch)'; OOB counts as `issymcont == false') */
+	REOP_AT_WOB_UTF8,     /* [+0] WOrdBoundary (preceding and next character have non-equal `unicode_issymcont(ch)'; OOB counts as `unicode_issymcont == false') */
+	REOP_AT_WOB_NOT,      /* [+0] NOT WOrdBoundary (preceding and next character have equal `issymcont(ch)'; OOB counts as `unicode_issymcont == false') */
+	REOP_AT_WOB_UTF8_NOT, /* [+0] NOT WOrdBoundary (preceding and next character have equal `unicode_issymcont(ch)'; OOB counts as `issymcont == false') */
+	REOP_AT_SOW,          /* [+0] StartOfWord (preceding and next character are `!issymcont(lhs) && issymcont(rhs)'; OOB counts as `issymcont == false') */
+	REOP_AT_SOW_UTF8,     /* [+0] StartOfWord (preceding and next character are `!unicode_issymcont(lhs) && unicode_issymcont(rhs)'; OOB counts as `unicode_issymcont == false') */
+	REOP_AT_EOW,          /* [+0] EndOfWord (preceding and next character are `issymcont(lhs) && !issymcont(rhs)'; OOB counts as `issymcont == false') */
+	REOP_AT_EOW_UTF8,     /* [+0] EndOfWord (preceding and next character are `unicode_issymcont(lhs) && !unicode_issymcont(rhs)'; OOB counts as `unicode_issymcont == false') */
+#define REOP_AT_SOS REOP_AT_SOW
+	REOP_AT_SOS_UTF8,     /* [+0] StartOfSymbol (preceding and next character are `!unicode_issymcont(lhs) && unicode_issymstrt(rhs)'; OOB counts as `issymcont[/strt] == false') */
+#define REOP_AT_EOS      REOP_AT_EOW
+#define REOP_AT_EOS_UTF8 REOP_AT_EOW_UTF8
+#define REOP_AT_MAX      REOP_AT_SOS_UTF8
 
 	/* Opcodes for expression logic and processing. */
 	REOP_GROUP_START,           /* [+1] Mark the start of the (N = *PC++)'th group; open "(" (current input pointer is written to `regmatch_t[N].rm_so') */
 	REOP_GROUP_END,             /* [+1] Mark the end of the (N = *PC++)'th group; closing ")" (current input pointer is written to `regmatch_t[N].rm_eo') */
-#define REOP_GROUP_END_JMIN  REOP_GROUP_END_J3
-#define REOP_GROUP_END_JMAX  REOP_GROUP_END_J10
-#define REOP_GROUP_END_Jn(n) (REOP_GROUP_END_J3 + (n) - 3)
+#define REOP_GROUP_END_JMIN         REOP_GROUP_END_J3
+#define REOP_GROUP_END_JMAX         REOP_GROUP_END_J10
+#define REOP_GROUP_END_Jn(n)        (REOP_GROUP_END_J3 + (n) - 3)
+#define REOP_GROUP_END_Joff(opcode) (3 + (opcode) - REOP_GROUP_END_J3)
 	REOP_GROUP_END_J3,          /* [+1] Same as `REOP_GROUP_END', but skip the next 3 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_END_J4,          /* [+1] Same as `REOP_GROUP_END', but skip the next 4 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_END_J5,          /* [+1] Same as `REOP_GROUP_END', but skip the next 5 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
@@ -385,12 +409,12 @@ enum {
 	REOP_GROUP_END_J8,          /* [+1] Same as `REOP_GROUP_END', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_END_J9,          /* [+1] Same as `REOP_GROUP_END', but skip the next 9 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_END_J10,         /* [+1] Same as `REOP_GROUP_END', but skip the next 10 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
-	REOP_JMP,                   /* [+2] 16-bit, signed, relative jump (relative to instruction end) */
 	REOP_JMP_ONFAIL,            /* [+2] push onto the "on-failure stack" a 16-bit, signed, relative addr */
+	REOP_JMP,                   /* [+2] 16-bit, signed, relative jump (relative to instruction end) */
 	REOP_JMP_AND_RETURN_ONFAIL, /* [+2] push onto the "on-failure stack" the address of the next instruction before doing `REOP_JMP' */
-	REOP_SETVAR,                /* [+2] VAR = VARS[*PC++]; VAR = *PC++; */
 	REOP_DEC_JMP,               /* [+3] VAR = VARS[*PC++]; if VAR != 0, do `--VAR', followed by `REOP_JMP'; else, do nothing (and leave `VAR' unchanged) */
 	REOP_DEC_JMP_AND_RETURN_ONFAIL, /* [+3] VAR = VARS[*PC++]; if VAR != 0, do `--VAR', followed by `REOP_JMP_AND_RETURN_ONFAIL'; else, do nothing (and leave `VAR' and the "on-failure stack" unchanged) */
+	REOP_SETVAR,                /* [+2] VAR = VARS[*PC++]; VAR = *PC++; */
 	REOP_NOP,                   /* [+0] No-op (for padding to get alignment right) */
 	REOP_MATCHED,               /* [+0] Text has been matched (end of instruction stream)
 	                             * If  the "on-failure stack" is  non-empty (and the  current match isn't perfect),
@@ -471,43 +495,44 @@ typedef __uint32_t re_token_t;
 #define RE_TOKEN_BASE          0x110000             /* First regex token number */
 #define RE_TOKEN_EOF           (RE_TOKEN_BASE + 0)  /* End-of-pattern */
 #define RE_TOKEN_ISSUFFIX(x) ((x) >= RE_TOKEN_PLUS && (x) <= RE_TOKEN_STARTINTERVAL)
-#define RE_TOKEN_PLUS          (RE_TOKEN_BASE + 1)  /* '+' */
-#define RE_TOKEN_STAR          (RE_TOKEN_BASE + 2)  /* '*' */
-#define RE_TOKEN_QMARK         (RE_TOKEN_BASE + 3)  /* '?' */
-#define RE_TOKEN_STARTINTERVAL (RE_TOKEN_BASE + 4)  /* '{' */
-#define RE_TOKEN_STARTSET      (RE_TOKEN_BASE + 5)  /* '[' */
-#define RE_TOKEN_STARTGROUP    (RE_TOKEN_BASE + 6)  /* '(' */
-#define RE_TOKEN_ENDGROUP      (RE_TOKEN_BASE + 7)  /* ')' */
-#define RE_TOKEN_ALTERNATION   (RE_TOKEN_BASE + 8)  /* '|' */
-#define RE_TOKEN_BK_w          (RE_TOKEN_BASE + 9)  /* '\w' */
-#define RE_TOKEN_BK_W          (RE_TOKEN_BASE + 10) /* '\W' */
-#define RE_TOKEN_BK_s          (RE_TOKEN_BASE + 11) /* '\s' */
-#define RE_TOKEN_BK_S          (RE_TOKEN_BASE + 12) /* '\S' */
-#define RE_TOKEN_BK_d          (RE_TOKEN_BASE + 13) /* '\d' */
-#define RE_TOKEN_BK_D          (RE_TOKEN_BASE + 14) /* '\D' */
-#define RE_TOKEN_BK_n          (RE_TOKEN_BASE + 15) /* '\n' */
+#define RE_TOKEN_ANY           (RE_TOKEN_BASE + 1)  /* '.' */
+#define RE_TOKEN_PLUS          (RE_TOKEN_BASE + 2)  /* '+' */
+#define RE_TOKEN_STAR          (RE_TOKEN_BASE + 3)  /* '*' */
+#define RE_TOKEN_QMARK         (RE_TOKEN_BASE + 4)  /* '?' */
+#define RE_TOKEN_STARTINTERVAL (RE_TOKEN_BASE + 5)  /* '{' */
+#define RE_TOKEN_STARTSET      (RE_TOKEN_BASE + 6)  /* '[' */
+#define RE_TOKEN_STARTGROUP    (RE_TOKEN_BASE + 7)  /* '(' */
+#define RE_TOKEN_ENDGROUP      (RE_TOKEN_BASE + 8)  /* ')' */
+#define RE_TOKEN_ALTERNATION   (RE_TOKEN_BASE + 9)  /* '|' */
+#define RE_TOKEN_BK_w          (RE_TOKEN_BASE + 10)  /* '\w' */
+#define RE_TOKEN_BK_W          (RE_TOKEN_BASE + 11) /* '\W' */
+#define RE_TOKEN_BK_s          (RE_TOKEN_BASE + 12) /* '\s' */
+#define RE_TOKEN_BK_S          (RE_TOKEN_BASE + 13) /* '\S' */
+#define RE_TOKEN_BK_d          (RE_TOKEN_BASE + 14) /* '\d' */
+#define RE_TOKEN_BK_D          (RE_TOKEN_BASE + 15) /* '\D' */
+#define RE_TOKEN_BK_n          (RE_TOKEN_BASE + 16) /* '\n' */
 #define RE_TOKEN_AT_MIN        RE_TOKEN_AT_SOL
-#define RE_TOKEN_AT_SOL        (RE_TOKEN_BASE + 16) /* "^" */
-#define RE_TOKEN_AT_EOL        (RE_TOKEN_BASE + 17) /* "$" */
-#define RE_TOKEN_AT_SOI        (RE_TOKEN_BASE + 18) /* "\`" */
-#define RE_TOKEN_AT_EOI        (RE_TOKEN_BASE + 19) /* "\'" */
-#define RE_TOKEN_AT_WOB        (RE_TOKEN_BASE + 20) /* "\b" */
-#define RE_TOKEN_AT_WOB_NOT    (RE_TOKEN_BASE + 21) /* "\B" */
-#define RE_TOKEN_AT_SOW        (RE_TOKEN_BASE + 22) /* "\<" */
-#define RE_TOKEN_AT_EOW        (RE_TOKEN_BASE + 23) /* "\>" */
-#define RE_TOKEN_AT_SOS        (RE_TOKEN_BASE + 24) /* "\_<" */
-#define RE_TOKEN_AT_EOS        (RE_TOKEN_BASE + 25) /* "\_>" */
+#define RE_TOKEN_AT_SOL        (RE_TOKEN_BASE + 17) /* "^" */
+#define RE_TOKEN_AT_EOL        (RE_TOKEN_BASE + 18) /* "$" */
+#define RE_TOKEN_AT_SOI        (RE_TOKEN_BASE + 19) /* "\`" */
+#define RE_TOKEN_AT_EOI        (RE_TOKEN_BASE + 20) /* "\'" */
+#define RE_TOKEN_AT_WOB        (RE_TOKEN_BASE + 21) /* "\b" */
+#define RE_TOKEN_AT_WOB_NOT    (RE_TOKEN_BASE + 22) /* "\B" */
+#define RE_TOKEN_AT_SOW        (RE_TOKEN_BASE + 23) /* "\<" */
+#define RE_TOKEN_AT_EOW        (RE_TOKEN_BASE + 24) /* "\>" */
+#define RE_TOKEN_AT_SOS        (RE_TOKEN_BASE + 25) /* "\_<" */
+#define RE_TOKEN_AT_EOS        (RE_TOKEN_BASE + 26) /* "\_>" */
 #define RE_TOKEN_AT_MAX        RE_TOKEN_AT_EOS
-#define RE_TOKEN_BKREF_1       (RE_TOKEN_BASE + 26) /* "\1" */
-#define RE_TOKEN_BKREF_2       (RE_TOKEN_BASE + 27) /* "\2" */
-#define RE_TOKEN_BKREF_3       (RE_TOKEN_BASE + 28) /* "\3" */
-#define RE_TOKEN_BKREF_4       (RE_TOKEN_BASE + 29) /* "\4" */
-#define RE_TOKEN_BKREF_5       (RE_TOKEN_BASE + 30) /* "\5" */
-#define RE_TOKEN_BKREF_6       (RE_TOKEN_BASE + 31) /* "\6" */
-#define RE_TOKEN_BKREF_7       (RE_TOKEN_BASE + 32) /* "\7" */
-#define RE_TOKEN_BKREF_8       (RE_TOKEN_BASE + 33) /* "\8" */
-#define RE_TOKEN_BKREF_9       (RE_TOKEN_BASE + 34) /* "\9" */
-#define RE_TOKEN_UNMATCHED_BK  (RE_TOKEN_BASE + 35) /* "\" (followed by EOF; for `RE_EESCAPE') */
+#define RE_TOKEN_BKREF_1       (RE_TOKEN_BASE + 27) /* "\1" */
+#define RE_TOKEN_BKREF_2       (RE_TOKEN_BASE + 28) /* "\2" */
+#define RE_TOKEN_BKREF_3       (RE_TOKEN_BASE + 29) /* "\3" */
+#define RE_TOKEN_BKREF_4       (RE_TOKEN_BASE + 30) /* "\4" */
+#define RE_TOKEN_BKREF_5       (RE_TOKEN_BASE + 31) /* "\5" */
+#define RE_TOKEN_BKREF_6       (RE_TOKEN_BASE + 32) /* "\6" */
+#define RE_TOKEN_BKREF_7       (RE_TOKEN_BASE + 33) /* "\7" */
+#define RE_TOKEN_BKREF_8       (RE_TOKEN_BASE + 34) /* "\8" */
+#define RE_TOKEN_BKREF_9       (RE_TOKEN_BASE + 35) /* "\9" */
+#define RE_TOKEN_UNMATCHED_BK  (RE_TOKEN_BASE + 36) /* "\" (followed by EOF; for `RE_EESCAPE') */
 
 /* Parse and yield the next regex-token pointed-to by `self->rep_pos'.
  * @return: * : A unicode character, or one of `RE_TOKEN_*' */
@@ -521,11 +546,22 @@ __NOTHROW_NCX(LIBREGEX_CC re_parser_yield)(struct re_parser *__restrict self);
 
 
 
+struct re_code {
+	__byte_t   rc_fmap[256]; /* Fast map: take the first byte of the string to match as index:
+	                          * - rc_fmap[input[0]] == 0xff --> input will never match
+	                          * - rc_fmap[input[0]] != 0xff --> Start executing at `PC = rc_code + rc_fmap[input[0]]' */
+	__size_t   rc_minmatch;  /* The smallest input length that can be matched by `rc_code' (or `0' when `rc_code' can match epsilon) */
+	__size_t   rc_maxmatch;  /* The largest input length that can be matched by `rc_code' (or `SIZE_MAX' when `rc_code' can match an infinitely long input string) */
+	__uint16_t rc_ngrps;     /* # of groups currently defined */
+	__uint16_t rc_nvars;     /* # of variables referenced by code */
+	__COMPILER_FLEXIBLE_ARRAY(__byte_t, rc_code); /* Code buffer (instructions) */
+};
+
 
 /* Regex compiler structure */
 struct re_compiler {
 	struct re_parser rec_parser;     /* Underlying parser. */
-	__byte_t        *rec_cbase;      /* [?..1][<= rec_cend][owned] Base-pointer for output code-buffer. */
+	__byte_t        *rec_cbase;      /* [?..1][<= rec_cend][owned] Base-pointer for output code-buffer. (points at `struct re_code') */
 	__byte_t        *rec_estart;     /* [?..1][<= rec_cpos] Start-pointer for current expression's code. */
 	__byte_t        *rec_cpos;       /* [?..1][>= rec_cbase && <= rec_cend] Pointer to next unset opcode in code-buffer. */
 	__byte_t        *rec_cend;       /* [?..1][>= rec_cbase] End-pointer for output code-buffer. */
@@ -533,7 +569,7 @@ struct re_compiler {
 	__uint16_t       rec_nvar;       /* # of variables referenced by code / id of next unreferenced variable */
 	__uint8_t        rec_grpinfo[9]; /* Information about the first 9 groups (for back-references); each is a set of `RE_COMPILER_GRPINFO_*' */
 #define RE_COMPILER_GRPINFO_DEFINED 0x01 /* Group has been defined */
-#define RE_COMPILER_GRPINFO_EPSILON 0x02 /* Group contents are able to match epsilon (for `REOP_GROUP_MATCH_NONEMPTY') */
+#define RE_COMPILER_GRPINFO_EPSILON 0x02 /* Group contents are able to match epsilon (for `REOP_GROUP_MATCH_Jn') */
 };
 
 #define re_compiler_init(self, pattern, syntax)                  \
@@ -558,7 +594,7 @@ struct re_compiler {
  * - *rec_parser.rep_pos    == '\0'
  * - rec_parser.rep_pos     == strend(rec_parser.rep_pat)
  * - rec_parser.rep_syntax  == <unchanged>
- * - rec_parser.rec_cbase   == <code-base-pointer>
+ * - rec_parser.rec_cbase   == <pointer-to-struct re_code>
  * - rec_parser.rec_estart  == <undefined>
  * - rec_parser.rec_cpos    == <undefined>
  * - rec_parser.rec_cend    == <code-end-pointer (1 past the `REOP_MATCHED[_PERFECT]' opcode)>
@@ -591,4 +627,4 @@ __NOTHROW_NCX(LIBREGEX_CC re_compiler_compile)(struct re_compiler *__restrict se
 
 __DECL_END
 
-#endif /* !_LIBREGEX_RE_H */
+#endif /* !_LIBREGEX_REGCOMP_H */

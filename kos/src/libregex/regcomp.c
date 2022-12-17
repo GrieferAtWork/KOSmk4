@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBREGEX_RE_C
-#define GUARD_LIBREGEX_RE_C 1
+#ifndef GUARD_LIBREGEX_REGCOMP_C
+#define GUARD_LIBREGEX_REGCOMP_C 1
 #define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
 #define LIBREGEX_WANT_PROTOTYPES
@@ -42,18 +42,18 @@
 #include <unicode.h>
 
 #include <libc/template/hex.h>
-#include <libregex/re.h>
+#include <libregex/regcomp.h>
 
-#include "re.h"
+#include "regcomp.h"
 
-
-#define RE_COMP_MAXSIZE     0x10000 /* 2^16 (as specified by `RE_ESIZE') */
+/* Regex compile-time configuration */
+#define RE_COMP_MAXSIZE     0x10000 /* 2^16 (hard limit on how large regex code blobs may get) */
 #define RE_COMP_ALIGN_INT16 1       /* If non-zero, compiler should align int16 operands */
+
+DECL_BEGIN
 
 #undef re_parser_yield
 #define re_parser_yield(self) libre_parser_yield(self)
-
-DECL_BEGIN
 
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset
@@ -79,6 +79,9 @@ NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self) {
 	case '\0':
 		--self->rep_pos;
 		return RE_TOKEN_EOF;
+
+	case '.':
+		return RE_TOKEN_ANY;
 
 	case '[':
 		return RE_TOKEN_STARTSET;
@@ -461,9 +464,9 @@ NOTHROW_NCX(CC re_opcode_next)(uint8_t const *__restrict p_instr) {
 		uint8_t count;
 		count = *p_instr++;
 		assert(count >= 1);
-		for (; count; --count) {
+		do {
 			unicode_readutf8((char **)p_instr);
-		}
+		} while (--count);
 	}	break;
 
 	case REOP_BITSET:
@@ -976,7 +979,7 @@ again:
 		uint8_t gid;
 		byte_t *body;
 		if unlikely(self->rec_ngrp >= 0x100)
-			return RE_ESPACE; /* Too many groups */
+			return RE_ESIZE; /* Too many groups */
 		gid = self->rec_ngrp++;
 
 		/* Generate the introductory `REOP_GROUP_START' instruction */
@@ -1027,20 +1030,52 @@ again:
 		/* TODO: special set matches */
 		return RE_BADPAT;
 
+	case RE_TOKEN_ANY: {
+		uint8_t opcode;
+		switch (self->rec_parser.rep_syntax & (RE_SYNTAX_DOT_NEWLINE |
+		                                       RE_SYNTAX_DOT_NOT_NULL |
+		                                       RE_SYNTAX_NO_UTF8)) {
+		case 0:
+			opcode = REOP_ANY_NOTLF_UTF8;
+			break;
+		case RE_SYNTAX_NO_UTF8:
+			opcode = REOP_ANY_NOTLF;
+			break;
+		case RE_SYNTAX_DOT_NEWLINE:
+		case RE_SYNTAX_DOT_NEWLINE | RE_SYNTAX_NO_UTF8:
+			opcode = REOP_ANY;
+			break;
+		case RE_SYNTAX_DOT_NOT_NULL:
+			opcode = REOP_ANY_NOTNUL_NOTLF;
+			break;
+		case RE_SYNTAX_DOT_NOT_NULL | RE_SYNTAX_NO_UTF8:
+			opcode = REOP_ANY_NOTNUL_NOTLF_UTF8;
+			break;
+		case RE_SYNTAX_DOT_NEWLINE | RE_SYNTAX_DOT_NOT_NULL:
+		case RE_SYNTAX_DOT_NEWLINE | RE_SYNTAX_DOT_NOT_NULL | RE_SYNTAX_NO_UTF8:
+			opcode = REOP_ANY_NOTNUL;
+			break;
+		default: __builtin_unreachable();
+		}
+		if (!re_compiler_putc(self, opcode))
+			goto err_nomem;
+	}	break;
+
 	case RE_TOKEN_AT_MIN ... RE_TOKEN_AT_MAX: {
-		static uint8_t const at_opcodes[(RE_TOKEN_AT_MAX - RE_TOKEN_AT_MIN) + 1] = {
-			[(RE_TOKEN_AT_SOL - RE_TOKEN_AT_MIN)]     = REOP_AT_SOI,
-			[(RE_TOKEN_AT_EOL - RE_TOKEN_AT_MIN)]     = REOP_AT_EOI,
-			[(RE_TOKEN_AT_SOI - RE_TOKEN_AT_MIN)]     = REOP_AT_SOL,
-			[(RE_TOKEN_AT_EOI - RE_TOKEN_AT_MIN)]     = REOP_AT_EOL,
-			[(RE_TOKEN_AT_WOB - RE_TOKEN_AT_MIN)]     = REOP_AT_WOB,
-			[(RE_TOKEN_AT_WOB_NOT - RE_TOKEN_AT_MIN)] = REOP_AT_WOB_NOT,
-			[(RE_TOKEN_AT_SOW - RE_TOKEN_AT_MIN)]     = REOP_AT_SOW,
-			[(RE_TOKEN_AT_EOW - RE_TOKEN_AT_MIN)]     = REOP_AT_EOW,
-			[(RE_TOKEN_AT_SOS - RE_TOKEN_AT_MIN)]     = REOP_AT_SOS,
-			[(RE_TOKEN_AT_EOS - RE_TOKEN_AT_MIN)]     = REOP_AT_EOS,
+		static uint8_t const at_opcodes[(RE_TOKEN_AT_MAX - RE_TOKEN_AT_MIN) + 1][2] = {
+			[(RE_TOKEN_AT_SOL - RE_TOKEN_AT_MIN)]     = { REOP_AT_SOI, REOP_AT_SOI },
+			[(RE_TOKEN_AT_EOL - RE_TOKEN_AT_MIN)]     = { REOP_AT_EOI, REOP_AT_EOI },
+			[(RE_TOKEN_AT_SOI - RE_TOKEN_AT_MIN)]     = { REOP_AT_SOL, REOP_AT_SOL_UTF8 },
+			[(RE_TOKEN_AT_EOI - RE_TOKEN_AT_MIN)]     = { REOP_AT_EOL, REOP_AT_EOL_UTF8 },
+			[(RE_TOKEN_AT_WOB - RE_TOKEN_AT_MIN)]     = { REOP_AT_WOB, REOP_AT_WOB_UTF8 },
+			[(RE_TOKEN_AT_WOB_NOT - RE_TOKEN_AT_MIN)] = { REOP_AT_WOB_NOT, REOP_AT_WOB_UTF8_NOT },
+			[(RE_TOKEN_AT_SOW - RE_TOKEN_AT_MIN)]     = { REOP_AT_SOW, REOP_AT_SOW_UTF8 },
+			[(RE_TOKEN_AT_EOW - RE_TOKEN_AT_MIN)]     = { REOP_AT_EOW, REOP_AT_EOW_UTF8 },
+			[(RE_TOKEN_AT_SOS - RE_TOKEN_AT_MIN)]     = { REOP_AT_SOS, REOP_AT_SOS_UTF8 },
+			[(RE_TOKEN_AT_EOS - RE_TOKEN_AT_MIN)]     = { REOP_AT_EOS, REOP_AT_EOS_UTF8 },
 		};
-		uint8_t opcode = at_opcodes[tok - RE_TOKEN_AT_MIN];
+		uint8_t opcode = at_opcodes[tok - RE_TOKEN_AT_MIN]
+		                           [(self->rec_parser.rep_syntax & RE_SYNTAX_NO_UTF8) ? 0 : 1];
 		if (!re_compiler_putc(self, opcode))
 			goto err_nomem;
 		/* Parse another prefix expression since location assertions don't count as prefixes! */
@@ -1309,7 +1344,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 
 			/* Allocate variable IDs */
 			if unlikely(!re_compiler_allocvar(self, &var_id))
-				goto err_nomem;
+				goto err_esize;
 
 			/* Make space for code we want to insert in the front */
 			writer = self->rec_estart;
@@ -1416,7 +1451,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 
 		/* Allocate variable IDs */
 		if unlikely(!re_compiler_allocvar(self, &var_id))
-			goto err_nomem;
+			goto err_esize;
 
 		/* Make space for code we want to insert in the front */
 		writer = self->rec_estart;
@@ -1513,7 +1548,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 
 		/* Allocate variable IDs */
 		if unlikely(!re_compiler_allocvar(self, &var_id))
-			goto err_nomem;
+			goto err_esize;
 
 		/* Make space for code we want to insert in the front */
 		writer = self->rec_estart;
@@ -1589,9 +1624,9 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 
 		/* Allocate variable IDs */
 		if unlikely(!re_compiler_allocvar(self, &var1_id))
-			goto err_nomem;
+			goto err_esize;
 		if unlikely(!re_compiler_allocvar(self, &var2_id))
-			goto err_nomem;
+			goto err_esize;
 
 		/* Make space for code we want to insert in the front */
 		writer = self->rec_estart;
@@ -1642,11 +1677,12 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		self->rec_cpos = writer;
 	}
 
-
 done_suffix:
 	return RE_NOERROR;
 err_nomem:
 	return RE_ESPACE;
+err_esize:
+	return RE_ESIZE;
 }
 
 /* Compile prefix expressions: literals, '[...]' and '(...)'
@@ -1937,7 +1973,7 @@ err_nomem:
  * - *rec_parser.rep_pos    == '\0'
  * - rec_parser.rep_pos     == strend(rec_parser.rep_pat)
  * - rec_parser.rep_syntax  == <unchanged>
- * - rec_parser.rec_cbase   == <code-base-pointer>
+ * - rec_parser.rec_cbase   == <pointer-to-struct re_code>
  * - rec_parser.rec_estart  == <undefined>
  * - rec_parser.rec_cpos    == <undefined>
  * - rec_parser.rec_cend    == <code-end-pointer (1 past the `REOP_MATCHED[_PERFECT]' opcode)>
@@ -1964,6 +2000,11 @@ NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self) {
 	re_errno_t error;
 	uint8_t finish_opcode;
 	re_token_t trailing_token;
+
+	/* Make space for the `struct re_code' header */
+	if unlikely(!re_compiler_require(self, offsetof(struct re_code, rc_code)))
+		goto err_nomem;
+	self->rec_cpos += offsetof(struct re_code, rc_code);
 
 	/* Do the actual compilation */
 	error = re_compiler_compile_alternation(self);
@@ -1999,6 +2040,19 @@ NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self) {
 	DBG_memset(&self->rec_cpos, 0xcc, sizeof(self->rec_cpos));
 	DBG_memset(&self->rec_estart, 0xcc, sizeof(self->rec_estart));
 
+	/* Fill in the regex code header. */
+	{
+		struct re_code *header;
+		header = (struct re_code *)self->rec_cbase;
+		header->rc_ngrps = self->rec_ngrp;
+		header->rc_nvars = self->rec_nvar;
+		/* TODO: Properly calculate the fastmap (instead of dispatching everything at PC=0) */
+		/* TODO: Properly calculate the min/max match sizes */
+		header->rc_minmatch = 0;
+		header->rc_maxmatch = SIZE_MAX;
+		bzero(header->rc_fmap, sizeof(header->rc_fmap));
+	}
+
 	return RE_NOERROR;
 err_nomem:
 	error = RE_ESPACE;
@@ -2018,4 +2072,4 @@ DEFINE_PUBLIC_ALIAS(re_compiler_compile, libre_compiler_compile);
 
 DECL_END
 
-#endif /* !GUARD_LIBREGEX_RE_C */
+#endif /* !GUARD_LIBREGEX_REGCOMP_C */

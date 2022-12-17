@@ -17,8 +17,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBREGEX_RE_H
-#define GUARD_LIBREGEX_RE_H 1
+#ifndef GUARD_LIBREGEX_REGCOMP_H
+#define GUARD_LIBREGEX_REGCOMP_H 1
 
 #include "api.h"
 
@@ -26,7 +26,7 @@
 
 #include <kos/types.h>
 
-#include <libregex/re.h>
+#include <libregex/regcomp.h>
 
 DECL_BEGIN
 
@@ -44,7 +44,7 @@ NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self);
  * - *rec_parser.rep_pos    == '\0'
  * - rec_parser.rep_pos     == strend(rec_parser.rep_pat)
  * - rec_parser.rep_syntax  == <unchanged>
- * - rec_parser.rec_cbase   == <code-base-pointer>
+ * - rec_parser.rec_cbase   == <pointer-to-struct re_code>
  * - rec_parser.rec_estart  == <undefined>
  * - rec_parser.rec_cpos    == <undefined>
  * - rec_parser.rec_cend    == <code-end-pointer (1 past the `REOP_MATCHED[_PERFECT]' opcode)>
@@ -69,7 +69,6 @@ NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self);
 INTDEF WUNUSED NONNULL((1)) re_errno_t
 NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self);
 
-
 DECL_END
 
-#endif /* !GUARD_LIBREGEX_RE_H */
+#endif /* !GUARD_LIBREGEX_REGCOMP_H */
