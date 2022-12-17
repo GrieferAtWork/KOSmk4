@@ -494,9 +494,8 @@ NOTHROW(KCALL kmalloc_untrace)(void *base, size_t num_bytes) ASMNAME("kmalloc_un
  * When `ptr' is a SLAB-pointer, this function will also always return `0'
  * @param: tb:     Buffer to-be filled with traceback PC-locations pointer.
  * @param: buflen: Available buffer length in `tb' (# of allocated entries; not bytes)
- * @param: p_alloc_roottid: When non-NULL, store  the root-namespace TID  of the  thread
- *                          that originally allocated the block of `ptr' (when allocated
- *                          by a kernel thread, TID=0 will be returned)
+ * @param: p_alloc_roottid: When  non-NULL, store the root-namespace TID of the
+ *                          thread that originally allocated the block of `ptr'
  * @return: * :    The total number of traceback PC-locations available for `ptr'
  *                 When `> buflen', not all locations were written to `*tb',  and
  *                 the caller should re-attempt the call with more space. */
