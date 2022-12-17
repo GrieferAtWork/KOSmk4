@@ -168,8 +168,8 @@ again:
 	result->f_sigframe = 0;
 
 	/* No personality function by default. */
-	result->f_persofun = 0;
-	result->f_lsdaaddr = 0;
+	result->f_persofun = NULL;
+	result->f_lsdaaddr = NULL;
 	if (cie_augstr[0] == 'z') {
 		char const *aug_iter = cie_augstr;
 		/* Interpret the augmentation string. */
