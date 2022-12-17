@@ -675,6 +675,28 @@ mfault_or_unlock(struct mfault *__restrict self)
 	assert(acc_offs + acc_size > acc_offs);
 	assert(acc_offs + acc_size <= mpart_getsize(part));
 
+#if 1
+	/* If the part hasn't been loaded into the core, and the area we're
+	 * going  to access is so large enough,  then try to split the part
+	 * into a couple of smaller parts, so that the range that needs  to
+	 * be loaded into the core becomes smaller. */
+	if (!MPART_ST_INCORE(part->mp_state) && !(part->mp_flags & MPART_F_NOSPLIT)) {
+		size_t part_size       = mpart_getsize(part);
+		size_t split_threshold = self->mfl_size * 64;
+		if (part_size > split_threshold) {
+			pos_t split1_filepos;
+			pos_t split2_filepos;
+			split1_filepos = part->mp_minaddr + acc_offs;
+			split2_filepos = split1_filepos + acc_size;
+			mpart_lock_release(part);
+			unlockinfo_unlock(&self->mfl_unlck);
+			xdecref(mpart_split(part, split1_filepos));
+			xdecref(mpart_split(part, split2_filepos));
+			goto nope;
+		}
+	}
+#endif
+
 	/* Whatever happens, we always need the part to be re-locked into the core. */
 	if (!mpart_setcore_or_unlock(part, &self->mfl_unlck, &self->mfl_scdat))
 		goto nope;
