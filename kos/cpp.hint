@@ -1461,6 +1461,9 @@
 #define BITSET(num_bits) struct{unsigned int _bs_bits[42];}
 #define ATOMIC_ONCE_RUN(self, ...) __VA_ARGS__
 
+#define bit_decl(x,n) x[n]
+#define bit_foreach(x,y,z) for(;;)
+
 #define _ANNO_MALLOC(a)
 #define _ANNO_FREE(a)
 #define _ANNO_REALLOC(a,b)

@@ -200,7 +200,6 @@ DEFINE_TEST(regex) {
 	EQ(-RE_NOMATCH, re_match("(a|b){4}a", "babaX"));
 	EQ(-RE_NOMATCH, re_match("(a|b){4}a", "ababX"));
 	EQ(-RE_NOMATCH, re_match("(a|b){4}a", "bbbbX"));
-	/* TODO: More tests */
 
 	/* Cleanup */
 	EQ(0, dlclose(libregex));

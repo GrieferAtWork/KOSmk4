@@ -197,6 +197,7 @@ ForEachMacros:
   - PCI_FOREACH_DEVICE_CLASS
   - __STATIC_IF
   - __STATIC_ELSE
+  - bit_foreach
 # By putting paren-attributes as IfMacros, we prevent clang-format
 # from screwing up (more often than it would otherwise).
 IfMacros:

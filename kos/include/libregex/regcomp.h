@@ -242,11 +242,13 @@ enum {
 #define REOP_ANY_NOTLF_UTF8 REOP_UTF8_ISLF_NOT
 	REOP_ANY_NOTNUL,           /* [+0] Match any character (except '\0') */
 	REOP_ANY_NOTNUL_NOTLF,     /* [+0] Match any character (except '\0' or ASCII line-feeds) */
-	REOP_ANY_NOTNUL_NOTLF_UTF8, /* [+0] Match any character (except '\0' or ASCII line-feeds) */
+	REOP_ANY_NOTNUL_NOTLF_UTF8, /* [+0] Match any character (except '\0' or unicode line-feeds) */
 	REOP_CHAR,                 /* [+1] Followed by 1 byte that must be matched exactly */
 	REOP_CHAR2,                /* [+2] Followed by 2 bytes, one of which must be matched exactly (for "[ab]" or "a" -> "[aA]" in ICASE-mode) */
-	REOP_CONTAINS_UTF8,        /* [+1+n] Followed by a COUNT-byte, followed by a `COUNT'-character long utf-8 string (matches utf-8 character contained in said string). */
-	REOP_CONTAINS_UTF8_NOT,    /* [+1+n] Followed by a COUNT-byte, followed by a `COUNT'-character long utf-8 string (matches utf-8 character not contained in said string). */
+	REOP_CONTAINS_UTF8,        /* [+1+n] Followed by a COUNT-byte, followed by a `COUNT'-character long utf-8 string (matches utf-8 character contained in said string).
+	                            * NOTE: COUNT must be >= 2 */
+	REOP_CONTAINS_UTF8_NOT,    /* [+1+n] Followed by a COUNT-byte, followed by a `COUNT'-character long utf-8 string (matches utf-8 character not contained in said string).
+	                            * NOTE: COUNT must be >= 1 */
 	REOP_BITSET,               /* [+1+n] Followed by a LAYOUT-byte, followed by `REOP_BITSET_LAYOUT_GETBYTES(LAYOUT)' bitset bytes.
 	                            * >> bool is_char_in_set(byte_t const *layout_ptr, uint8_t ch) {
 	                            * >>     uint8_t layout      = *layout_ptr++;
@@ -277,14 +279,6 @@ enum {
 #define REOP_GROUP_MATCH_Joff(opcode) (3 + (opcode) - REOP_GROUP_MATCH_J3)
 
 	/* Numerical attribute classes */
-#define REOP_ASCII_ISDIGIT_cmp_MIN REOP_ASCII_ISDIGIT_EQ
-	REOP_ASCII_ISDIGIT_EQ,     /* [+1] Match `isdigit(ch) && (ch - 0x30) == *PC++' */
-	REOP_ASCII_ISDIGIT_NE,     /* [+1] Match `isdigit(ch) && (ch - 0x30) != *PC++' */
-	REOP_ASCII_ISDIGIT_LO,     /* [+1] Match `isdigit(ch) && (ch - 0x30) <  *PC++' */
-	REOP_ASCII_ISDIGIT_LE,     /* [+1] Match `isdigit(ch) && (ch - 0x30) <= *PC++' */
-	REOP_ASCII_ISDIGIT_GR,     /* [+1] Match `isdigit(ch) && (ch - 0x30) >  *PC++' */
-	REOP_ASCII_ISDIGIT_GE,     /* [+1] Match `isdigit(ch) && (ch - 0x30) >= *PC++' */
-#define REOP_ASCII_ISDIGIT_cmp_MAX REOP_ASCII_ISDIGIT_GE
 #define REOP_UTF8_ISDIGIT_cmp_MIN REOP_UTF8_ISDIGIT_EQ
 	REOP_UTF8_ISDIGIT_EQ,      /* [+1] Match `unicode_isdigit(ch) && unicode_getnumeric(ch) == *PC++' */
 	REOP_UTF8_ISDIGIT_NE,      /* [+1] Match `unicode_isdigit(ch) && unicode_getnumeric(ch) != *PC++' */
@@ -561,7 +555,6 @@ struct re_code {
 	                          * - rc_fmap[input[0]] == 0xff --> input will never match
 	                          * - rc_fmap[input[0]] != 0xff --> Start executing at `PC = rc_code + rc_fmap[input[0]]' */
 	__size_t   rc_minmatch;  /* The smallest input length that can be matched by `rc_code' (or `0' when `rc_code' can match epsilon) */
-	__size_t   rc_maxmatch;  /* The largest input length that can be matched by `rc_code' (or `SIZE_MAX' when `rc_code' can match an infinitely long input string) */
 	__uint16_t rc_ngrps;     /* # of groups currently defined (<= 0x100) */
 	__uint16_t rc_nvars;     /* # of variables referenced by code (<= 0x100) */
 	__COMPILER_FLEXIBLE_ARRAY(__byte_t, rc_code); /* Code buffer (`REOP_*' instruction stream) */

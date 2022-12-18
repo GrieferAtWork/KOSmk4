@@ -45,6 +45,7 @@
 #include <libregex/regcomp.h>
 
 #include "regcomp.h"
+#include "regfast.h"
 
 #ifndef NDEBUG
 #include <format-printer.h>
@@ -448,8 +449,8 @@ NOTHROW_NCX(CC re_compiler_putn)(struct re_compiler *__restrict self,
 
 
 /* Return a pointer to the next instruction */
-PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint8_t *
-NOTHROW_NCX(CC re_opcode_next)(uint8_t const *__restrict p_instr) {
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) uint8_t *
+NOTHROW_NCX(CC libre_opcode_next)(uint8_t const *__restrict p_instr) {
 	uint8_t opcode = *p_instr++;
 	switch (opcode) {
 
@@ -457,7 +458,7 @@ NOTHROW_NCX(CC re_opcode_next)(uint8_t const *__restrict p_instr) {
 	case REOP_EXACT_ASCII_ICASE: {
 		uint8_t length;
 		length = *p_instr++;
-		//assert(length >= 2); // TODO: re-enable me
+		assert(length >= 2);
 		p_instr += length;
 	}	break;
 
@@ -482,12 +483,6 @@ NOTHROW_NCX(CC re_opcode_next)(uint8_t const *__restrict p_instr) {
 	case REOP_CHAR:
 	case REOP_GROUP_MATCH:
 	case REOP_GROUP_MATCH_JMIN ... REOP_GROUP_MATCH_JMAX:
-	case REOP_ASCII_ISDIGIT_EQ:
-	case REOP_ASCII_ISDIGIT_NE:
-	case REOP_ASCII_ISDIGIT_LO:
-	case REOP_ASCII_ISDIGIT_LE:
-	case REOP_ASCII_ISDIGIT_GR:
-	case REOP_ASCII_ISDIGIT_GE:
 	case REOP_UTF8_ISDIGIT_EQ:
 	case REOP_UTF8_ISDIGIT_NE:
 	case REOP_UTF8_ISDIGIT_LO:
@@ -917,7 +912,8 @@ err_nomem:
 
 
 PRIVATE WUNUSED NONNULL((1)) re_errno_t
-NOTHROW_NCX(CC re_compiler_compile_alternation)(struct re_compiler *__restrict self);
+NOTHROW_NCX(CC re_compiler_compile_alternation)(struct re_compiler *__restrict self,
+                                                int insert_REOP_GROUP_START_gid);
 
 /* Special return value for `re_compiler_compile_prefix':
  * the prefix has  just concluded with  `REOP_GROUP_END',
@@ -983,6 +979,7 @@ again:
 		uint8_t gid;
 		byte_t *body;
 		uintptr_t old_syntax;
+		int alternation_insert_gid;
 
 		if unlikely(self->rec_ngrp >= 0x100)
 			return RE_ESIZE; /* Too many groups */
@@ -992,16 +989,48 @@ again:
 		old_syntax = self->rec_parser.rep_syntax;
 		self->rec_parser.rep_syntax &= ~RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD;
 
-		/* Generate the introductory `REOP_GROUP_START' instruction */
+		/* Optimization: "(a|b)" normally compiles as:
+		 * >> 0x0000:    REOP_GROUP_START 0
+		 * >> 0x0002:    REOP_JMP_ONFAIL  1f
+		 * >> 0x0005:    REOP_CHAR        "a"
+		 * >> 0x0007:    REOP_JMP         2f
+		 * >> 0x000a: 1: REOP_CHAR        "b"
+		 * >> 0x000c: 2: REOP_GROUP_END   0
+		 * With a fast-map: ["ab": @0x0000]
+		 *
+		 * However, if we compiled it like this:
+		 * >> 0x0000:    REOP_JMP_ONFAIL  1f
+		 * >> 0x0003:    REOP_GROUP_START 0
+		 * >> 0x0005:    REOP_CHAR        "a"
+		 * >> 0x0007:    REOP_JMP         2f
+		 * >> 0x000a: 1: REOP_GROUP_START 0
+		 * >> 0x000c:    REOP_CHAR        "b"
+		 * >> 0x000e: 2: REOP_GROUP_END   0
+		 * Then the fastmap would be compiled as:
+		 *    - "a": @0x0003
+		 *    - "b": @0x000a
+		 *
+		 * NOTE: Only do this if the base-expression starts with
+		 *       a  group that contains  at least 1 alternation! */
 		expr_start_offset = (size_t)(self->rec_estart - self->rec_cbase);
-		if (!re_compiler_putc(self, REOP_GROUP_START))
-			goto err_nomem;
-		if (!re_compiler_putc(self, gid))
-			goto err_nomem;
+		assert(self->rec_cpos >= ((struct re_code *)self->rec_cbase)->rc_code);
+		if (self->rec_cpos <= ((struct re_code *)self->rec_cbase)->rc_code) {
+			/* Instruct `re_compiler_compile_alternation()' to
+			 * generate the REOP_GROUP_START  opcodes for  us,
+			 * alongside each alternation it comes across. */
+			alternation_insert_gid = gid;
+		} else {
+			/* Generate the introductory `REOP_GROUP_START' instruction */
+			alternation_insert_gid = -1;
+			if (!re_compiler_putc(self, REOP_GROUP_START))
+				goto err_nomem;
+			if (!re_compiler_putc(self, gid))
+				goto err_nomem;
+		}
 
 		/* Compile the actual contents of the group. */
 		group_start_offset = (size_t)(self->rec_cpos - self->rec_cbase);
-		error = re_compiler_compile_alternation(self);
+		error = re_compiler_compile_alternation(self, alternation_insert_gid);
 		if unlikely(error != RE_NOERROR)
 			return error;
 
@@ -1017,17 +1046,18 @@ again:
 		 * s.a. us clearing `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' above. */
 		self->rec_parser.rep_syntax = old_syntax;
 
+		/* Mark the end of the group (this opcode may be overwritten later) */
+		if (!re_compiler_putc(self, REOP_GROUP_END))
+			goto err_nomem;
+		if (!re_compiler_putc(self, gid))
+			goto err_nomem;
+
 		/* Figure out if the group is able to match EPSION */
 		if unlikely(!re_compiler_require(self, 1))
 			goto err_nomem;
 		*self->rec_cpos = REOP_MATCHED_PERFECT;
 		body = self->rec_cbase + group_start_offset;
 		group_matches_epsilon = re_code_matches_epsilon(body);
-
-		/* Mark the end of the group (this opcode may be overwritten later) */
-		*self->rec_cpos++ = REOP_GROUP_END;
-		if (!re_compiler_putc(self, gid))
-			goto err_nomem;
 
 		/* Restore the expression-start offset to point at the `REOP_GROUP_START' opcode. */
 		self->rec_estart = self->rec_cbase + expr_start_offset;
@@ -1350,7 +1380,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		 *       so that those groups are properly matched by `regexec(3)' */
 		byte_t *writer = self->rec_estart;
 		byte_t *reader = self->rec_estart;
-		for (; reader < self->rec_cpos; reader = re_opcode_next(reader)) {
+		for (; reader < self->rec_cpos; reader = libre_opcode_next(reader)) {
 			byte_t opcode = *reader;
 			if (opcode >= REOP_GROUP_END_JMIN && opcode <= REOP_GROUP_END_JMAX)
 				opcode = REOP_GROUP_END; /* Undo Jn opcode transformation (groups are never followed by a loop suffix) */
@@ -1698,7 +1728,8 @@ NOTHROW_NCX(CC re_compiler_thread_fwd_jump)(byte_t *__restrict p_jmp_instruction
 
 /* Compile a sequence of prefix/suffix expressions, as well as '|' */
 PRIVATE WUNUSED NONNULL((1)) re_errno_t
-NOTHROW_NCX(CC re_compiler_compile_alternation)(struct re_compiler *__restrict self) {
+NOTHROW_NCX(CC re_compiler_compile_alternation)(struct re_compiler *__restrict self,
+                                                int insert_REOP_GROUP_START_gid) {
 	re_errno_t error;
 	size_t initial_alternation_jmpoff;
 	size_t previous_alternation_deltaoff;
@@ -1712,6 +1743,12 @@ again:
 	current_alternation_startoff = (size_t)(self->rec_cpos - self->rec_cbase);
 
 	/* Compile expression sequences. */
+	if (insert_REOP_GROUP_START_gid >= 0) {
+		if (!re_compiler_putc(self, REOP_GROUP_START))
+			goto err_nomem;
+		if (!re_compiler_putc(self, (byte_t)insert_REOP_GROUP_START_gid))
+			goto err_nomem;
+	}
 	for (;;) {
 		char const *old_tokptr;
 		old_tokptr = self->rec_parser.rep_pos;
@@ -1870,7 +1907,7 @@ NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self) {
 	self->rec_cpos += offsetof(struct re_code, rc_code);
 
 	/* Do the actual compilation */
-	error = re_compiler_compile_alternation(self);
+	error = re_compiler_compile_alternation(self, -1);
 	if unlikely(error != RE_NOERROR)
 		goto err;
 
@@ -1909,11 +1946,9 @@ NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self) {
 		header = (struct re_code *)self->rec_cbase;
 		header->rc_ngrps = self->rec_ngrp;
 		header->rc_nvars = self->rec_nvar;
-		/* TODO: Properly calculate the fastmap (instead of dispatching everything at PC=0) */
-		/* TODO: Properly calculate the min/max match sizes */
-		header->rc_minmatch = 0;
-		header->rc_maxmatch = SIZE_MAX;
-		bzero(header->rc_fmap, sizeof(header->rc_fmap));
+
+		/* Calculate code properties. */
+		libre_code_makefast(header);
 	}
 
 	return RE_NOERROR;
@@ -1944,22 +1979,51 @@ NOTHROW_NCX(CC libre_code_disasm)(struct re_code const *__restrict self,
 #define printf(...) DO(format_printf(printer, arg, __VA_ARGS__))
 	byte_t const *code, *next;
 	ssize_t temp, result = 0;
-	/* TODO: Print fast-map */
-	printf("match: {%" PRIuSIZ "-", self->rc_minmatch);
-	if (self->rc_maxmatch == SIZE_MAX) {
-		PRINT("inf}\n");
-	} else {
-		printf("%" PRIuSIZ "}\n", self->rc_minmatch);
+	unsigned int i;
+	bool is_first_fmap_entry;
+	PRINT("fmap: [");
+	/* Print the fast-map */
+	is_first_fmap_entry = true;
+	for (i = 0; i < 256;) {
+		char buf[3];
+		unsigned int fend, fcnt;
+		byte_t fmap_offset;
+		fmap_offset = self->rc_fmap[i];
+		if (fmap_offset == 0xff) {
+			++i;
+			continue;
+		}
+		fend = i + 1;
+		while (fend < 256 && self->rc_fmap[fend] == fmap_offset)
+			++fend;
+		fcnt = fend - i;
+		if (fcnt > 3) {
+			buf[0] = (char)i;
+			buf[1] = '-';
+			buf[2] = (char)(fend - 1);
+			fcnt   = 3;
+		} else {
+			buf[0] = (char)(i + 0);
+			buf[1] = (char)(i + 1);
+			buf[2] = (char)(i + 2);
+		}
+		printf("%s\t%$q: %#.4" PRIx8 "\n", is_first_fmap_entry ? "\n" : "",
+		       (size_t)fcnt, buf, (uint8_t)fmap_offset);
+		is_first_fmap_entry = false;
+		i = fend;
 	}
-	printf("ngrps: %" PRIu16 "\n"
+	printf("]\n"
+	       "minmatch: %" PRIuSIZ "\n"
+	       "ngrps: %" PRIu16 "\n"
 	       "nvars: %" PRIu16 "\n",
+	       self->rc_minmatch,
 	       self->rc_ngrps,
 	       self->rc_nvars);
 	for (code = self->rc_code;; code = next) {
 		size_t offset;
 		byte_t opcode;
 		char const *opcode_repr;
-		next   = re_opcode_next(code);
+		next   = libre_opcode_next(code);
 		offset = (size_t)(code - self->rc_code);
 		opcode = *code++;
 		printf("%#.4" PRIxSIZ ": ", offset);

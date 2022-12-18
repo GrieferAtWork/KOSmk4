@@ -55,6 +55,21 @@ __ATTR_MALLOC __ATTR_WUNUSED bitstr_t *(bit_alloc)(int nbits);
 #define bit_decl(self, nbits) \
 	((self)[bitstr_size(nbits)])
 
+#ifdef __USE_KOS
+#ifdef __INTELLISENSE__
+__ATTR_NONNULL((1)) void (bit_setall)(bitstr_t *self, int nbits);
+__ATTR_NONNULL((1)) void (bit_clearall)(bitstr_t *self, int nbits);
+#else /* __INTELLISENSE__ */
+#define bit_setall(self, nbits)   __libc_memset(self, 0xff, bitstr_size(nbits) * sizeof(bitstr_t))
+#define bit_clearall(self, nbits) __libc_bzero(self, bitstr_size(nbits) * sizeof(bitstr_t))
+#endif /* !__INTELLISENSE__ */
+#define bit_foreach(bitno, self, nbits)             \
+	for ((bitno) = 0; (bitno) < (nbits); ++(bitno)) \
+		if (!bit_test(self, bitno))                 \
+			;                                       \
+		else
+#endif /* __USE_KOS */
+
 /* Check if `bitno' of `self' set */
 #ifdef __INTELLISENSE__
 __ATTR_WUNUSED __ATTR_NONNULL((1)) __BOOL (bit_test)(bitstr_t const *self, int bitno);

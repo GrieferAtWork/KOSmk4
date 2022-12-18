@@ -687,18 +687,79 @@ NOTHROW_NCX(CC re_interpreter_consume_repeat)(struct re_interpreter *__restrict 
 }
 
 
-/* ASCII character trait flags (s.a. `/kos/kos/include/bits/crt/ctype.h') */
-#define CTYPE_C_FLAG_CNTRL  0x01
-#define CTYPE_C_FLAG_SPACE  0x02
-#define CTYPE_C_FLAG_LOWER  0x04
-#define CTYPE_C_FLAG_UPPER  0x08
-#define CTYPE_C_FLAG_ALPHA  0x0c
-#define CTYPE_C_FLAG_DIGIT  0x10
-#define CTYPE_C_FLAG_XDIGIT 0x30
-#define CTYPE_C_FLAG_ALNUM  0x1c
-#define CTYPE_C_FLAG_PUNCT  0x40
-#define CTYPE_C_FLAG_GRAPH  0x5c
-#define CTYPE_C_FLAG_PRINT  0xdc
+INTERN_CONST byte_t const libre_ascii_traits[] = {
+#define DEF_TRAIT(opcode, mask) [(opcode - REOP_TRAIT_ASCII_MIN)] = mask
+	DEF_TRAIT(REOP_ASCII_ISCNTRL, CTYPE_C_FLAG_CNTRL),      /* `iscntrl(ch) == true' */
+	DEF_TRAIT(REOP_ASCII_ISCNTRL_NOT, CTYPE_C_FLAG_CNTRL),  /* `iscntrl(ch) == false' */
+	DEF_TRAIT(REOP_ASCII_ISSPACE, CTYPE_C_FLAG_SPACE),      /* `isspace(ch) == true' */
+	DEF_TRAIT(REOP_ASCII_ISSPACE_NOT, CTYPE_C_FLAG_SPACE),  /* `isspace(ch) == false' */
+	DEF_TRAIT(REOP_ASCII_ISUPPER, CTYPE_C_FLAG_UPPER),      /* `isupper(ch) == true' */
+	DEF_TRAIT(REOP_ASCII_ISUPPER_NOT, CTYPE_C_FLAG_UPPER),  /* `isupper(ch) == false' */
+	DEF_TRAIT(REOP_ASCII_ISLOWER, CTYPE_C_FLAG_LOWER),      /* `islower(ch) == true' */
+	DEF_TRAIT(REOP_ASCII_ISLOWER_NOT, CTYPE_C_FLAG_LOWER),  /* `islower(ch) == false' */
+	DEF_TRAIT(REOP_ASCII_ISALPHA, CTYPE_C_FLAG_ALPHA),      /* `isalpha(ch) == true' */
+	DEF_TRAIT(REOP_ASCII_ISALPHA_NOT, CTYPE_C_FLAG_ALPHA),  /* `isalpha(ch) == false' */
+	DEF_TRAIT(REOP_ASCII_ISDIGIT, CTYPE_C_FLAG_DIGIT),      /* `isdigit(ch) == true' */
+	DEF_TRAIT(REOP_ASCII_ISDIGIT_NOT, CTYPE_C_FLAG_DIGIT),  /* `isdigit(ch) == false' */
+	DEF_TRAIT(REOP_ASCII_ISXDIGIT, CTYPE_C_FLAG_DIGIT),     /* `isxdigit(ch) == true' */
+	DEF_TRAIT(REOP_ASCII_ISXDIGIT_NOT, CTYPE_C_FLAG_DIGIT), /* `isxdigit(ch) == false' */
+	DEF_TRAIT(REOP_ASCII_ISALNUM, CTYPE_C_FLAG_ALNUM),      /* `isalnum(ch) == true' */
+	DEF_TRAIT(REOP_ASCII_ISALNUM_NOT, CTYPE_C_FLAG_ALNUM),  /* `isalnum(ch) == false' */
+	DEF_TRAIT(REOP_ASCII_ISPUNCT, CTYPE_C_FLAG_PUNCT),      /* `ispunct(ch) == true' */
+	DEF_TRAIT(REOP_ASCII_ISPUNCT_NOT, CTYPE_C_FLAG_PUNCT),  /* `ispunct(ch) == false' */
+	DEF_TRAIT(REOP_ASCII_ISGRAPH, CTYPE_C_FLAG_GRAPH),      /* `isgraph(ch) == true' */
+	DEF_TRAIT(REOP_ASCII_ISGRAPH_NOT, CTYPE_C_FLAG_GRAPH),  /* `isgraph(ch) == false' */
+	DEF_TRAIT(REOP_ASCII_ISPRINT, CTYPE_C_FLAG_PRINT),      /* `isprint(ch) == true' */
+	DEF_TRAIT(REOP_ASCII_ISPRINT_NOT, CTYPE_C_FLAG_PRINT),  /* `isprint(ch) == false' */
+#undef DEF_TRAIT
+};
+
+INTERN_CONST uint16_t const libre_unicode_traits[] = {
+#define DEF_TRAIT(opcode, mask) [(opcode - REOP_TRAIT_UTF8_MIN)] = mask
+	DEF_TRAIT(REOP_UTF8_ISCNTRL, __UNICODE_ISCNTRL),         /* `unicode_iscntrl(ch) == true' */
+	DEF_TRAIT(REOP_UTF8_ISCNTRL_NOT, __UNICODE_ISCNTRL),     /* `unicode_iscntrl(ch) == false' */
+	DEF_TRAIT(REOP_UTF8_ISSPACE, __UNICODE_ISSPACE),         /* `unicode_isspace(ch) == true' */
+	DEF_TRAIT(REOP_UTF8_ISSPACE_NOT, __UNICODE_ISSPACE),     /* `unicode_isspace(ch) == false' */
+	DEF_TRAIT(REOP_UTF8_ISUPPER, __UNICODE_ISUPPER),         /* `unicode_isupper(ch) == true' */
+	DEF_TRAIT(REOP_UTF8_ISUPPER_NOT, __UNICODE_ISUPPER),     /* `unicode_isupper(ch) == false' */
+	DEF_TRAIT(REOP_UTF8_ISLOWER, __UNICODE_ISLOWER),         /* `unicode_islower(ch) == true' */
+	DEF_TRAIT(REOP_UTF8_ISLOWER_NOT, __UNICODE_ISLOWER),     /* `unicode_islower(ch) == false' */
+	DEF_TRAIT(REOP_UTF8_ISALPHA, __UNICODE_ISALPHA),         /* `unicode_isalpha(ch) == true' */
+	DEF_TRAIT(REOP_UTF8_ISALPHA_NOT, __UNICODE_ISALPHA),     /* `unicode_isalpha(ch) == false' */
+	DEF_TRAIT(REOP_UTF8_ISDIGIT, __UNICODE_ISDIGIT),         /* `unicode_isdigit(ch) == true' */
+	DEF_TRAIT(REOP_UTF8_ISDIGIT_NOT, __UNICODE_ISDIGIT),     /* `unicode_isdigit(ch) == false' */
+	DEF_TRAIT(REOP_UTF8_ISXDIGIT, __UNICODE_ISXDIGIT),       /* `unicode_isxdigit(ch) == true' */
+	DEF_TRAIT(REOP_UTF8_ISXDIGIT_NOT, __UNICODE_ISXDIGIT),   /* `unicode_isxdigit(ch) == false' */
+	DEF_TRAIT(REOP_UTF8_ISALNUM, __UNICODE_ISALNUM),         /* `unicode_isalnum(ch) == true' */
+	DEF_TRAIT(REOP_UTF8_ISALNUM_NOT, __UNICODE_ISALNUM),     /* `unicode_isalnum(ch) == false' */
+	DEF_TRAIT(REOP_UTF8_ISPUNCT, __UNICODE_ISPUNCT),         /* `unicode_ispunct(ch) == true' */
+	DEF_TRAIT(REOP_UTF8_ISPUNCT_NOT, __UNICODE_ISPUNCT),     /* `unicode_ispunct(ch) == false' */
+	DEF_TRAIT(REOP_UTF8_ISGRAPH, __UNICODE_ISGRAPH),         /* `unicode_isgraph(ch) == true' */
+	DEF_TRAIT(REOP_UTF8_ISGRAPH_NOT, __UNICODE_ISGRAPH),     /* `unicode_isgraph(ch) == false' */
+	DEF_TRAIT(REOP_UTF8_ISPRINT, __UNICODE_ISPRINT),         /* `unicode_isprint(ch) == true' */
+	DEF_TRAIT(REOP_UTF8_ISPRINT_NOT, __UNICODE_ISPRINT),     /* `unicode_isprint(ch) == false' */
+	DEF_TRAIT(REOP_UTF8_ISBLANK, __UNICODE_ISBLANK),         /* `unicode_isblank(ch) == true' */
+	DEF_TRAIT(REOP_UTF8_ISBLANK_NOT, __UNICODE_ISBLANK),     /* `unicode_isblank(ch) == false' */
+	DEF_TRAIT(REOP_UTF8_ISSYMSTRT, __UNICODE_ISSYMSTRT),     /* `unicode_issymstrt(ch) == true' */
+	DEF_TRAIT(REOP_UTF8_ISSYMSTRT_NOT, __UNICODE_ISSYMSTRT), /* `unicode_issymstrt(ch) == false' */
+	DEF_TRAIT(REOP_UTF8_ISSYMCONT, __UNICODE_ISSYMCONT),     /* `unicode_issymcont(ch) == true' */
+	DEF_TRAIT(REOP_UTF8_ISSYMCONT_NOT, __UNICODE_ISSYMCONT), /* `unicode_issymcont(ch) == false' */
+	DEF_TRAIT(REOP_UTF8_ISTAB, __UNICODE_ISTAB),             /* `unicode_istab(ch) == true' */
+	DEF_TRAIT(REOP_UTF8_ISTAB_NOT, __UNICODE_ISTAB),         /* `unicode_istab(ch) == false' */
+	DEF_TRAIT(REOP_UTF8_ISWHITE, __UNICODE_ISWHITE),         /* `unicode_iswhite(ch) == true' */
+	DEF_TRAIT(REOP_UTF8_ISWHITE_NOT, __UNICODE_ISWHITE),     /* `unicode_iswhite(ch) == false' */
+	DEF_TRAIT(REOP_UTF8_ISEMPTY, __UNICODE_ISEMPTY),         /* `unicode_isempty(ch) == true' */
+	DEF_TRAIT(REOP_UTF8_ISEMPTY_NOT, __UNICODE_ISEMPTY),     /* `unicode_isempty(ch) == false' */
+	DEF_TRAIT(REOP_UTF8_ISLF, __UNICODE_ISLF),               /* `unicode_islf(ch) == true' */
+	DEF_TRAIT(REOP_UTF8_ISLF_NOT, __UNICODE_ISLF),           /* `unicode_islf(ch) == false' */
+	DEF_TRAIT(REOP_UTF8_ISHEX, __UNICODE_ISHEX),             /* `unicode_ishex(ch) == true' */
+	DEF_TRAIT(REOP_UTF8_ISHEX_NOT, __UNICODE_ISHEX),         /* `unicode_ishex(ch) == false' */
+	DEF_TRAIT(REOP_UTF8_ISTITLE, __UNICODE_ISTITLE),         /* `unicode_istitle(ch) == true' */
+	DEF_TRAIT(REOP_UTF8_ISTITLE_NOT, __UNICODE_ISTITLE),     /* `unicode_istitle(ch) == false' */
+	DEF_TRAIT(REOP_UTF8_ISNUMERIC, __UNICODE_ISNUMERIC),     /* `unicode_isnumeric(ch) == true' */
+	DEF_TRAIT(REOP_UTF8_ISNUMERIC_NOT, __UNICODE_ISNUMERIC), /* `unicode_isnumeric(ch) == false' */
+#undef DEF_TRAIT
+};
 
 
 /* Execute the regex interpreter.
@@ -727,8 +788,12 @@ NOTHROW_NCX(CC libre_interp_exec)(__register struct re_interpreter *__restrict s
 			byte_t fmap;
 			fmap = *self->ri_in_ptr;
 			fmap = code->rc_fmap[fmap];
-			if (fmap == 0xff)
+			if (fmap == 0xff) {
+				/* Initial character never matches, but are we able to match epsilon? */
+				if (code->rc_minmatch == 0)
+					return -RE_NOERROR; /* epsilon match! */
 				return -RE_NOMATCH;
+			}
 			pc += fmap;
 		} else if (code->rc_minmatch > 0) {
 			/* Input buffer is epsilon, but regex has a non-  zero
@@ -919,7 +984,7 @@ dispatch:
 			byte_t count = getb();
 			char32_t ch;
 			byte_t const *newpc;
-			assert(count >= 1);
+			assert(count >= 2);
 			if (re_interpreter_is_eoi(self))
 				ONFAIL();
 			ch = re_interpreter_readutf8(self);
@@ -1071,41 +1136,6 @@ dispatch:
 
 
 		/* Numerical attribute classes */
-		TARGET(REOP_ASCII_ISDIGIT_cmp_MIN ... REOP_ASCII_ISDIGIT_cmp_MAX) {
-			byte_t ch, digit, operand = getb();
-			bool ismatch;
-			if (re_interpreter_is_eoi(self))
-				ONFAIL();
-			ch = re_interpreter_readbyte(self);
-			if (!isdigit(ch))
-				ONFAIL();
-			digit = ch - '0';
-			switch (opcode) {
-			case REOP_ASCII_ISDIGIT_EQ:
-				ismatch = digit == operand;
-				break;
-			case REOP_ASCII_ISDIGIT_NE:
-				ismatch = digit != operand;
-				break;
-			case REOP_ASCII_ISDIGIT_LO:
-				ismatch = digit < operand;
-				break;
-			case REOP_ASCII_ISDIGIT_LE:
-				ismatch = digit <= operand;
-				break;
-			case REOP_ASCII_ISDIGIT_GR:
-				ismatch = digit > operand;
-				break;
-			case REOP_ASCII_ISDIGIT_GE:
-				ismatch = digit >= operand;
-				break;
-			default: __builtin_unreachable();
-			}
-			if (ismatch)
-				DISPATCH();
-			ONFAIL();
-		}
-
 		TARGET(REOP_UTF8_ISDIGIT_cmp_MIN ... REOP_UTF8_ISDIGIT_cmp_MAX)
 		TARGET(REOP_UTF8_ISNUMERIC_cmp_MIN ... REOP_UTF8_ISNUMERIC_cmp_MAX) {
 			char32_t ch;
@@ -1185,39 +1215,13 @@ dispatch:
 			static_assert(REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISGRAPH_NOT));
 			static_assert(!REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISPRINT));
 			static_assert(REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISPRINT_NOT));
-			static byte_t const traits[] = {
-#define DEF_TRAIT(opcode, mask) [(opcode - REOP_TRAIT_ASCII_MIN)] = mask
-				DEF_TRAIT(REOP_ASCII_ISCNTRL, CTYPE_C_FLAG_CNTRL),      /* `iscntrl(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISCNTRL_NOT, CTYPE_C_FLAG_CNTRL),  /* `iscntrl(ch) == false' */
-				DEF_TRAIT(REOP_ASCII_ISSPACE, CTYPE_C_FLAG_SPACE),      /* `isspace(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISSPACE_NOT, CTYPE_C_FLAG_SPACE),  /* `isspace(ch) == false' */
-				DEF_TRAIT(REOP_ASCII_ISUPPER, CTYPE_C_FLAG_UPPER),      /* `isupper(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISUPPER_NOT, CTYPE_C_FLAG_UPPER),  /* `isupper(ch) == false' */
-				DEF_TRAIT(REOP_ASCII_ISLOWER, CTYPE_C_FLAG_LOWER),      /* `islower(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISLOWER_NOT, CTYPE_C_FLAG_LOWER),  /* `islower(ch) == false' */
-				DEF_TRAIT(REOP_ASCII_ISALPHA, CTYPE_C_FLAG_ALPHA),      /* `isalpha(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISALPHA_NOT, CTYPE_C_FLAG_ALPHA),  /* `isalpha(ch) == false' */
-				DEF_TRAIT(REOP_ASCII_ISDIGIT, CTYPE_C_FLAG_DIGIT),      /* `isdigit(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISDIGIT_NOT, CTYPE_C_FLAG_DIGIT),  /* `isdigit(ch) == false' */
-				DEF_TRAIT(REOP_ASCII_ISXDIGIT, CTYPE_C_FLAG_DIGIT),     /* `isxdigit(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISXDIGIT_NOT, CTYPE_C_FLAG_DIGIT), /* `isxdigit(ch) == false' */
-				DEF_TRAIT(REOP_ASCII_ISALNUM, CTYPE_C_FLAG_ALNUM),      /* `isalnum(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISALNUM_NOT, CTYPE_C_FLAG_ALNUM),  /* `isalnum(ch) == false' */
-				DEF_TRAIT(REOP_ASCII_ISPUNCT, CTYPE_C_FLAG_PUNCT),      /* `ispunct(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISPUNCT_NOT, CTYPE_C_FLAG_PUNCT),  /* `ispunct(ch) == false' */
-				DEF_TRAIT(REOP_ASCII_ISGRAPH, CTYPE_C_FLAG_GRAPH),      /* `isgraph(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISGRAPH_NOT, CTYPE_C_FLAG_GRAPH),  /* `isgraph(ch) == false' */
-				DEF_TRAIT(REOP_ASCII_ISPRINT, CTYPE_C_FLAG_PRINT),      /* `isprint(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISPRINT_NOT, CTYPE_C_FLAG_PRINT),  /* `isprint(ch) == false' */
-#undef DEF_TRAIT
-			};
 			byte_t ch;
 			byte_t ch_flags, trait;
 			if (re_interpreter_is_eoi(self))
 				ONFAIL();
 			ch       = re_interpreter_readbyte(self);
 			ch_flags = __ctype_C_flags[ch];
-			trait    = traits[opcode - REOP_TRAIT_ASCII_MIN];
+			trait    = libre_ascii_traits[opcode - REOP_TRAIT_ASCII_MIN];
 			ch_flags &= trait;
 			if (REOP_TRAIT_ASCII_ISNOT(opcode)) {
 				if (ch_flags == 0)
@@ -1243,15 +1247,15 @@ dispatch:
 			switch (opcode) {
 			case REOP_ASCII_ISBLANK:
 			case REOP_ASCII_ISBLANK_NOT:
-				hastrait = isblank(ch);
+				hastrait = !!isblank(ch);
 				break;
 			case REOP_ASCII_ISSYMSTRT:
 			case REOP_ASCII_ISSYMSTRT_NOT:
-				hastrait = issymstrt(ch);
+				hastrait = !!issymstrt(ch);
 				break;
 			case REOP_ASCII_ISSYMCONT:
 			case REOP_ASCII_ISSYMCONT_NOT:
-				hastrait = issymcont(ch);
+				hastrait = !!issymcont(ch);
 				break;
 			default: __builtin_unreachable();
 			}
@@ -1314,59 +1318,13 @@ dispatch:
 			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISTITLE_NOT));
 			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISNUMERIC));
 			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISNUMERIC_NOT));
-			static uint16_t const traits[] = {
-#define DEF_TRAIT(opcode, mask) [(opcode - REOP_TRAIT_UTF8_MIN)] = mask
-				DEF_TRAIT(REOP_UTF8_ISCNTRL, __UNICODE_ISCNTRL),         /* `unicode_iscntrl(ch) == true' */
-				DEF_TRAIT(REOP_UTF8_ISCNTRL_NOT, __UNICODE_ISCNTRL),     /* `unicode_iscntrl(ch) == false' */
-				DEF_TRAIT(REOP_UTF8_ISSPACE, __UNICODE_ISSPACE),         /* `unicode_isspace(ch) == true' */
-				DEF_TRAIT(REOP_UTF8_ISSPACE_NOT, __UNICODE_ISSPACE),     /* `unicode_isspace(ch) == false' */
-				DEF_TRAIT(REOP_UTF8_ISUPPER, __UNICODE_ISUPPER),         /* `unicode_isupper(ch) == true' */
-				DEF_TRAIT(REOP_UTF8_ISUPPER_NOT, __UNICODE_ISUPPER),     /* `unicode_isupper(ch) == false' */
-				DEF_TRAIT(REOP_UTF8_ISLOWER, __UNICODE_ISLOWER),         /* `unicode_islower(ch) == true' */
-				DEF_TRAIT(REOP_UTF8_ISLOWER_NOT, __UNICODE_ISLOWER),     /* `unicode_islower(ch) == false' */
-				DEF_TRAIT(REOP_UTF8_ISALPHA, __UNICODE_ISALPHA),         /* `unicode_isalpha(ch) == true' */
-				DEF_TRAIT(REOP_UTF8_ISALPHA_NOT, __UNICODE_ISALPHA),     /* `unicode_isalpha(ch) == false' */
-				DEF_TRAIT(REOP_UTF8_ISDIGIT, __UNICODE_ISDIGIT),         /* `unicode_isdigit(ch) == true' */
-				DEF_TRAIT(REOP_UTF8_ISDIGIT_NOT, __UNICODE_ISDIGIT),     /* `unicode_isdigit(ch) == false' */
-				DEF_TRAIT(REOP_UTF8_ISXDIGIT, __UNICODE_ISXDIGIT),       /* `unicode_isxdigit(ch) == true' */
-				DEF_TRAIT(REOP_UTF8_ISXDIGIT_NOT, __UNICODE_ISXDIGIT),   /* `unicode_isxdigit(ch) == false' */
-				DEF_TRAIT(REOP_UTF8_ISALNUM, __UNICODE_ISALNUM),         /* `unicode_isalnum(ch) == true' */
-				DEF_TRAIT(REOP_UTF8_ISALNUM_NOT, __UNICODE_ISALNUM),     /* `unicode_isalnum(ch) == false' */
-				DEF_TRAIT(REOP_UTF8_ISPUNCT, __UNICODE_ISPUNCT),         /* `unicode_ispunct(ch) == true' */
-				DEF_TRAIT(REOP_UTF8_ISPUNCT_NOT, __UNICODE_ISPUNCT),     /* `unicode_ispunct(ch) == false' */
-				DEF_TRAIT(REOP_UTF8_ISGRAPH, __UNICODE_ISGRAPH),         /* `unicode_isgraph(ch) == true' */
-				DEF_TRAIT(REOP_UTF8_ISGRAPH_NOT, __UNICODE_ISGRAPH),     /* `unicode_isgraph(ch) == false' */
-				DEF_TRAIT(REOP_UTF8_ISPRINT, __UNICODE_ISPRINT),         /* `unicode_isprint(ch) == true' */
-				DEF_TRAIT(REOP_UTF8_ISPRINT_NOT, __UNICODE_ISPRINT),     /* `unicode_isprint(ch) == false' */
-				DEF_TRAIT(REOP_UTF8_ISBLANK, __UNICODE_ISBLANK),         /* `unicode_isblank(ch) == true' */
-				DEF_TRAIT(REOP_UTF8_ISBLANK_NOT, __UNICODE_ISBLANK),     /* `unicode_isblank(ch) == false' */
-				DEF_TRAIT(REOP_UTF8_ISSYMSTRT, __UNICODE_ISSYMSTRT),     /* `unicode_issymstrt(ch) == true' */
-				DEF_TRAIT(REOP_UTF8_ISSYMSTRT_NOT, __UNICODE_ISSYMSTRT), /* `unicode_issymstrt(ch) == false' */
-				DEF_TRAIT(REOP_UTF8_ISSYMCONT, __UNICODE_ISSYMCONT),     /* `unicode_issymcont(ch) == true' */
-				DEF_TRAIT(REOP_UTF8_ISSYMCONT_NOT, __UNICODE_ISSYMCONT), /* `unicode_issymcont(ch) == false' */
-				DEF_TRAIT(REOP_UTF8_ISTAB, __UNICODE_ISTAB),             /* `unicode_istab(ch) == true' */
-				DEF_TRAIT(REOP_UTF8_ISTAB_NOT, __UNICODE_ISTAB),         /* `unicode_istab(ch) == false' */
-				DEF_TRAIT(REOP_UTF8_ISWHITE, __UNICODE_ISWHITE),         /* `unicode_iswhite(ch) == true' */
-				DEF_TRAIT(REOP_UTF8_ISWHITE_NOT, __UNICODE_ISWHITE),     /* `unicode_iswhite(ch) == false' */
-				DEF_TRAIT(REOP_UTF8_ISEMPTY, __UNICODE_ISEMPTY),         /* `unicode_isempty(ch) == true' */
-				DEF_TRAIT(REOP_UTF8_ISEMPTY_NOT, __UNICODE_ISEMPTY),     /* `unicode_isempty(ch) == false' */
-				DEF_TRAIT(REOP_UTF8_ISLF, __UNICODE_ISLF),               /* `unicode_islf(ch) == true' */
-				DEF_TRAIT(REOP_UTF8_ISLF_NOT, __UNICODE_ISLF),           /* `unicode_islf(ch) == false' */
-				DEF_TRAIT(REOP_UTF8_ISHEX, __UNICODE_ISHEX),             /* `unicode_ishex(ch) == true' */
-				DEF_TRAIT(REOP_UTF8_ISHEX_NOT, __UNICODE_ISHEX),         /* `unicode_ishex(ch) == false' */
-				DEF_TRAIT(REOP_UTF8_ISTITLE, __UNICODE_ISTITLE),         /* `unicode_istitle(ch) == true' */
-				DEF_TRAIT(REOP_UTF8_ISTITLE_NOT, __UNICODE_ISTITLE),     /* `unicode_istitle(ch) == false' */
-				DEF_TRAIT(REOP_UTF8_ISNUMERIC, __UNICODE_ISNUMERIC),     /* `unicode_isnumeric(ch) == true' */
-				DEF_TRAIT(REOP_UTF8_ISNUMERIC_NOT, __UNICODE_ISNUMERIC), /* `unicode_isnumeric(ch) == false' */
-#undef DEF_TRAIT
-			};
 			char32_t ch;
 			uint16_t ch_flags, trait;
 			if (re_interpreter_is_eoi(self))
 				ONFAIL();
 			ch       = re_interpreter_readutf8(self);
 			ch_flags = __unicode_descriptor(ch)->__ut_flags;
-			trait    = traits[opcode - REOP_TRAIT_UTF8_MIN];
+			trait    = libre_unicode_traits[opcode - REOP_TRAIT_UTF8_MIN];
 			ch_flags &= trait;
 			if (REOP_TRAIT_UTF8_ISNOT(opcode)) {
 				if (ch_flags == 0)
@@ -1703,11 +1661,22 @@ NOTHROW_NCX(CC libre_exec_match)(struct re_exec const *__restrict exec,
 	ssize_t result;
 	re_errno_t error;
 	struct re_interpreter *interp;
+
+	/* Quick check: is the given buffer large enough to ever match the pattern? */
+	{
+		size_t total_left;
+		if (OVERFLOW_USUB(exec->rx_endoff, exec->rx_startoff, &total_left))
+			total_left = 0;
+		if (exec->rx_code->rc_minmatch > total_left)
+			return -RE_NOMATCH; /* Buffer is to small to ever match */
+	}
+
 	/* Setup */
 	interp = re_interpreter_alloc(exec->rx_code->rc_nvars);
 	error  = re_interpreter_init(interp, exec, nmatch, pmatch);
 	if unlikely(error != 0)
 		goto err;
+
 	/* Execute */
 	result = libre_interp_exec(interp);
 	if (result == -RE_NOERROR)
@@ -1741,10 +1710,10 @@ NOTHROW_NCX(CC libre_exec_search)(struct re_exec const *__restrict exec, size_t 
 	re_errno_t error;
 	struct re_interpreter *interp;
 	struct re_interpreter_inptr used_inptr;
-	size_t match_offset, total_left, min_match;
-	total_left = exec->rx_endoff - exec->rx_startoff;
-	min_match  = exec->rx_code->rc_minmatch;
-	if (OVERFLOW_USUB(total_left, min_match, &total_left))
+	size_t match_offset, total_left;
+	if (OVERFLOW_USUB(exec->rx_endoff, exec->rx_startoff, &total_left))
+		total_left = 0;
+	if (OVERFLOW_USUB(total_left, exec->rx_code->rc_minmatch, &total_left))
 		return -RE_NOMATCH; /* Buffer is to small to ever match */
 
 	/* Clamp the max possible search area */
@@ -1799,10 +1768,10 @@ NOTHROW_NCX(CC libre_exec_rsearch)(struct re_exec const *__restrict exec, size_t
 	re_errno_t error;
 	struct re_interpreter *interp;
 	struct re_interpreter_inptr used_inptr;
-	size_t match_offset, total_left, min_match;
-	total_left = exec->rx_endoff - exec->rx_startoff;
-	min_match  = exec->rx_code->rc_minmatch;
-	if (OVERFLOW_USUB(total_left, min_match, &total_left))
+	size_t match_offset, total_left;
+	if (OVERFLOW_USUB(exec->rx_endoff, exec->rx_startoff, &total_left))
+		total_left = 0;
+	if (OVERFLOW_USUB(total_left, exec->rx_code->rc_minmatch, &total_left))
 		return -RE_NOMATCH; /* Buffer is to small to ever match */
 
 	/* Clamp the max possible search area */
