@@ -84,6 +84,67 @@ DECL_BEGIN
 /* RE PARSER                                                            */
 /************************************************************************/
 
+struct re_interval {
+	uint8_t ri_min;  /* Interval lower bound */
+	uint8_t ri_max;  /* [valid_if(!ri_many)] Interval upper bound */
+	bool    ri_many; /* true if `> 1' is accepted (encountered '*' or '+') */
+};
+
+/* Parse a regex interval expression, with `*p_pattern' pointing AFTER the leading '{'
+ * @return: true:  Interval is OK
+ * @return: false: Interval is malformed */
+PRIVATE WUNUSED NONNULL((1)) bool
+NOTHROW_NCX(CC parse_interval)(char const **__restrict p_pattern, uintptr_t syntax,
+                               struct re_interval *__restrict result) {
+	/* Parse an interval */
+	char const *pattern = *p_pattern;
+	errno_t parse_errno = 0;
+	uint32_t interval_min, interval_max;
+	interval_min = strtou32_r(pattern, (char **)&pattern, 10, &parse_errno);
+	if unlikely(parse_errno != 0)
+		return false;
+	result->ri_many  = false;
+	interval_max = interval_min;
+	if (*pattern == ',') {
+		++pattern;
+		if ((syntax & RE_SYNTAX_NO_BK_BRACES)
+		    ? (pattern[0] == '}')
+		    : (pattern[0] == '\0' && pattern[1] == '}')) {
+			result->ri_many = true;
+		} else {
+			interval_max = strtou32_r(pattern, (char **)&pattern, 10, &parse_errno);
+			if unlikely(parse_errno != 0)
+				return false;
+		}
+	}
+	if (syntax & RE_SYNTAX_NO_BK_BRACES) {
+		if (pattern[0] != '}')
+			return false;
+		++pattern;
+	} else {
+		if (pattern[0] != '\\')
+			return false;
+		if (pattern[1] != '}')
+			return false;
+		pattern += 2;
+	}
+	if unlikely(interval_min > interval_max)
+		return false;
+	if unlikely(interval_max > UINT8_MAX)
+		return false;
+	*p_pattern = pattern;
+	result->ri_min = (uint8_t)interval_min;
+	result->ri_max = (uint8_t)interval_max;
+	return true;
+}
+
+/* Check if `p' (which must point after the leading '{') is a valid interval */
+PRIVATE WUNUSED NONNULL((1)) bool
+NOTHROW_NCX(CC is_a_valid_interval)(char const *__restrict p, uintptr_t syntax) {
+	struct re_interval interval;
+	return parse_interval((char const **)&p, syntax, &interval);
+}
+
 /* Parse and yield the next regex-token pointed-to by `self->rep_pos'
  * @return: * : A unicode character, or one of `RE_TOKEN_*' */
 INTERN WUNUSED NONNULL((1)) re_token_t
@@ -105,8 +166,10 @@ NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self) {
 	case '{':
 		if ((self->rep_syntax & (RE_SYNTAX_INTERVALS | RE_SYNTAX_NO_BK_BRACES)) ==
 		    /*               */ (RE_SYNTAX_INTERVALS | RE_SYNTAX_NO_BK_BRACES)) {
-			/* TODO: RE_SYNTAX_INVALID_INTERVAL_ORD */
-			return RE_TOKEN_STARTINTERVAL;
+			if (!(self->rep_syntax & RE_SYNTAX_INVALID_INTERVAL_ORD))
+				return RE_TOKEN_STARTINTERVAL; /* '{' is always an interval */
+			if (is_a_valid_interval(self->rep_pos, self->rep_syntax))
+				return RE_TOKEN_STARTINTERVAL; /* '{' followed by a valid interval is OK */
 		}
 		break;
 
@@ -194,8 +257,10 @@ NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self) {
 		case '{':
 			if ((self->rep_syntax & (RE_SYNTAX_INTERVALS | RE_SYNTAX_NO_BK_BRACES)) ==
 			    /*               */ (RE_SYNTAX_INTERVALS)) {
-				/* TODO: RE_SYNTAX_INVALID_INTERVAL_ORD */
-				return RE_TOKEN_STARTINTERVAL;
+				if (!(self->rep_syntax & RE_SYNTAX_INVALID_INTERVAL_ORD))
+					return RE_TOKEN_STARTINTERVAL;
+				if (is_a_valid_interval(self->rep_pos, self->rep_syntax))
+					return RE_TOKEN_STARTINTERVAL; /* '{' followed by a valid interval is OK */
 			}
 			break;
 
@@ -305,6 +370,16 @@ NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self) {
 				++self->rep_pos;
 				return RE_TOKEN_AT_EOS;
 			}
+			break;
+
+		case 'A':
+			if (!(self->rep_syntax & RE_SYNTAX_NO_KOS_OPS))
+				return RE_TOKEN_AT_SOI;
+			break;
+
+		case 'Z':
+			if (!(self->rep_syntax & RE_SYNTAX_NO_KOS_OPS))
+				return RE_TOKEN_AT_EOI;
 			break;
 
 		case '1' ... '9':
@@ -1695,47 +1770,16 @@ NOTHROW_NCX(CC re_compiler_compile_suffix)(struct re_compiler *__restrict self,
 		for (;;) {
 			if (tok == RE_TOKEN_STARTINTERVAL) {
 				/* Parse an interval */
-				errno_t parse_errno = 0;
-				uint32_t new_interval_min, new_interval_max;
-				new_interval_min = strtou32_r(self->rec_parser.rep_pos,
-				                              (char **)&self->rec_parser.rep_pos,
-				                              10, &parse_errno);
-				if unlikely(parse_errno != 0)
+				struct re_interval interval;
+				if unlikely(!parse_interval((char const **)&self->rec_parser.rep_pos,
+				                            self->rec_parser.rep_syntax, &interval))
 					goto err_badinterval;
-				new_interval_max = new_interval_min;
-				if (*self->rec_parser.rep_pos == ',') {
-					++self->rec_parser.rep_pos;
-					if ((self->rec_parser.rep_syntax & RE_SYNTAX_NO_BK_BRACES)
-					    ? (self->rec_parser.rep_pos[0] == '}')
-					    : (self->rec_parser.rep_pos[0] == '\0' && self->rec_parser.rep_pos[1] == '}')) {
-						accept_many = true;
-					} else {
-						new_interval_max = strtou32_r(self->rec_parser.rep_pos,
-						                              (char **)&self->rec_parser.rep_pos,
-						                              10, &parse_errno);
-						if unlikely(parse_errno != 0)
-							goto err_badinterval;
-					}
-				}
-				if (self->rec_parser.rep_syntax & RE_SYNTAX_NO_BK_BRACES) {
-					if (self->rec_parser.rep_pos[0] != '}')
-						goto err_badinterval;
-					++self->rec_parser.rep_pos;
-				} else {
-					if (self->rec_parser.rep_pos[0] != '\\')
-						goto err_badinterval;
-					if (self->rec_parser.rep_pos[1] != '}')
-						goto err_badinterval;
-					self->rec_parser.rep_pos += 2;
-				}
-				if unlikely(new_interval_min > new_interval_max)
-					goto err_badinterval;
-				if unlikely(new_interval_max > UINT8_MAX)
-					goto err_badinterval;
+				accept_many |= interval.ri_many;
+
 				/* Merge new interval with already-parsed interval */
-				if unlikely(!accept_zero && OVERFLOW_UMUL(interval_min, (uint8_t)new_interval_min, &interval_min))
+				if unlikely(!accept_zero && OVERFLOW_UMUL(interval_min, interval.ri_min, &interval_min))
 					goto err_badinterval;
-				if unlikely(!accept_many && OVERFLOW_UMUL(interval_max, (uint8_t)new_interval_max, &interval_max))
+				if unlikely(!accept_many && OVERFLOW_UMUL(interval_max, interval.ri_max, &interval_max))
 					goto err_badinterval;
 			} else {
 				accept_zero |= tok == RE_TOKEN_STAR || tok == RE_TOKEN_QMARK;
