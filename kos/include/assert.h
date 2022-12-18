@@ -79,6 +79,10 @@
 #define assert_failed(...) __assertion_failedf(__NULLPTR, __VA_ARGS__)
 #endif /* __USE_KOS */
 #elif defined(NDEBUG)
+/* Must still `#include "parts/assert.h"', since it may need to `#define static_assert(...)' */
+#ifndef __do_assert
+#include "parts/assert.h"
+#endif /* !__do_assert */
 #ifdef __NO_builtin_assume
 #define assert(expr)            (void)0
 #define __assert_assume(expr)   (void)0
