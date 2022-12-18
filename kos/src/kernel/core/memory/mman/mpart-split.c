@@ -254,12 +254,35 @@ NOTHROW(FCALL mpart_lock_all_mmans)(struct mpart *__restrict self) {
 }
 
 
+#ifndef NDEBUG
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_assert_all_mmans_locked)(struct mpart *__restrict self) {
+	unsigned int i;
+	for (i = 0; i < lengthof(self->_mp_nodlsts); ++i) {
+		struct mnode *node;
+		LIST_FOREACH (node, &self->_mp_nodlsts[i], mn_link) {
+			struct mman *mm;
+			mm = node->mn_mman;
+			if unlikely(wasdestroyed(mm))
+				continue;
+			assertf(mman_lock_acquired(mm),
+			        "No lock held for mman %p",
+			        mm);
+		}
+	}
+}
+#else /* !NDEBUG */
+#define mpart_assert_all_mmans_locked(self) (void)0
+#endif /* NDEBUG */
+
+
 
 /* Do the reverse of `mpart_lock_all_mmans()' */
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_unlock_all_mmans)(struct mpart *__restrict self) {
 	struct mnode *node;
 	struct mman *mm;
+	mpart_assert_all_mmans_locked(self);
 	LIST_FOREACH (node, &self->mp_share, mn_link) {
 		mm = node->mn_mman;
 		if unlikely(wasdestroyed(mm))
@@ -286,6 +309,8 @@ NOTHROW(FCALL mpart_unlock_all_mmans2)(struct mpart *__restrict lopart,
                                        struct mpart *__restrict hipart) {
 	struct mnode *node;
 	struct mman *mm;
+	mpart_assert_all_mmans_locked(lopart);
+	mpart_assert_all_mmans_locked(hipart);
 	LIST_FOREACH (node, &lopart->mp_share, mn_link) {
 		mm = node->mn_mman;
 		if unlikely(wasdestroyed(mm))
