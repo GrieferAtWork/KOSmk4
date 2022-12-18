@@ -2188,36 +2188,100 @@ NOTHROW_NCX(CC libre_code_disasm)(struct re_code const *__restrict self,
 			printf("contains_utf8_not %$q", (size_t)(next - code), code);
 		}	break;
 
-		//TODO: case REOP_BITSET:
-		//TODO: case REOP_BITSET_NOT:
-		//TODO: case REOP_BITSET_UTF8_NOT:
-		//TODO: case REOP_GROUP_MATCH:
-		//TODO: case REOP_GROUP_MATCH_J3:
-		//TODO: case REOP_GROUP_MATCH_J4:
-		//TODO: case REOP_GROUP_MATCH_J5:
-		//TODO: case REOP_GROUP_MATCH_J6:
-		//TODO: case REOP_GROUP_MATCH_J7:
-		//TODO: case REOP_GROUP_MATCH_J8:
-		//TODO: case REOP_GROUP_MATCH_J9:
-		//TODO: case REOP_GROUP_MATCH_J10:
-		//TODO: case REOP_ASCII_ISDIGIT_EQ:
-		//TODO: case REOP_ASCII_ISDIGIT_NE:
-		//TODO: case REOP_ASCII_ISDIGIT_LO:
-		//TODO: case REOP_ASCII_ISDIGIT_LE:
-		//TODO: case REOP_ASCII_ISDIGIT_GR:
-		//TODO: case REOP_ASCII_ISDIGIT_GE:
-		//TODO: case REOP_UTF8_ISDIGIT_EQ:
-		//TODO: case REOP_UTF8_ISDIGIT_NE:
-		//TODO: case REOP_UTF8_ISDIGIT_LO:
-		//TODO: case REOP_UTF8_ISDIGIT_LE:
-		//TODO: case REOP_UTF8_ISDIGIT_GR:
-		//TODO: case REOP_UTF8_ISDIGIT_GE:
-		//TODO: case REOP_UTF8_ISNUMERIC_EQ:
-		//TODO: case REOP_UTF8_ISNUMERIC_NE:
-		//TODO: case REOP_UTF8_ISNUMERIC_LO:
-		//TODO: case REOP_UTF8_ISNUMERIC_LE:
-		//TODO: case REOP_UTF8_ISNUMERIC_GR:
-		//TODO: case REOP_UTF8_ISNUMERIC_GE:
+		case REOP_BITSET:
+		case REOP_BITSET_NOT:
+		case REOP_BITSET_UTF8_NOT: {
+			unsigned int i;
+			uint8_t layout      = *code++;
+			uint8_t minch       = REOP_BITSET_LAYOUT_GETBASE(layout);
+			uint8_t bitset_size = REOP_BITSET_LAYOUT_GETBYTES(layout);
+			unsigned int bitset_bits = bitset_size * 8;
+			switch (opcode) {
+			case REOP_BITSET:
+				opcode_repr = "bitset";
+				break;
+			case REOP_BITSET_NOT:
+				opcode_repr = "bitset_not";
+				break;
+			case REOP_BITSET_UTF8_NOT:
+				opcode_repr = "bitset_utf8_not";
+				break;
+			default: __builtin_unreachable();
+			}
+			printf("%s [", opcode_repr);
+			for (i = 0; i < bitset_bits;) {
+				char repr[3];
+				unsigned int endi, rangec;
+				if ((code[i / 8] & (1 << (i % 8))) == 0) {
+					++i;
+					continue;
+				}
+				endi = i + 1;
+				while (endi < bitset_bits && (code[endi / 8] & (1 << (endi % 8))) != 0)
+					++endi;
+				rangec = endi - i;
+				if (rangec > 3) {
+					repr[0] = (char)(minch + i);
+					repr[1] = '-';
+					repr[2] = (char)(minch + endi - 1);
+				} else {
+					repr[0] = (char)(minch + i + 0);
+					repr[1] = (char)(minch + i + 1);
+					repr[2] = (char)(minch + i + 2);
+				}
+				printf("%#$q", (size_t)rangec, repr);
+				i = endi;
+			}
+			PRINT("]");
+		}	break;
+
+		case REOP_GROUP_MATCH: {
+			uint8_t gid = *code++;
+			printf("group_match %" PRIu8, gid);
+		}	break;
+
+		case REOP_GROUP_MATCH_JMIN ... REOP_GROUP_MATCH_JMAX: {
+			uint8_t gid       = *code++;
+			byte_t const *jmp = code + REOP_GROUP_MATCH_Joff(opcode);
+			printf("group_match %" PRIu8 ", @%#.4" PRIxSIZ,
+			       gid, (size_t)(jmp - self->rc_code));
+		}	break;
+
+		case REOP_UTF8_ISDIGIT_cmp_MIN ... REOP_UTF8_ISDIGIT_cmp_MAX:
+		case REOP_UTF8_ISNUMERIC_cmp_MIN ... REOP_UTF8_ISNUMERIC_cmp_MAX: {
+			char const *op;
+			byte_t digit = '0' + *code++;
+			switch (opcode) {
+			case REOP_UTF8_ISDIGIT_EQ:
+			case REOP_UTF8_ISNUMERIC_EQ:
+				op = "==";
+				break;
+			case REOP_UTF8_ISDIGIT_NE:
+			case REOP_UTF8_ISNUMERIC_NE:
+				op = "!=";
+				break;
+			case REOP_UTF8_ISDIGIT_LO:
+			case REOP_UTF8_ISNUMERIC_LO:
+				op = "<";
+				break;
+			case REOP_UTF8_ISDIGIT_LE:
+			case REOP_UTF8_ISNUMERIC_LE:
+				op = "<=";
+				break;
+			case REOP_UTF8_ISDIGIT_GR:
+			case REOP_UTF8_ISNUMERIC_GR:
+				op = ">";
+				break;
+			case REOP_UTF8_ISDIGIT_GE:
+			case REOP_UTF8_ISNUMERIC_GE:
+				op = ">=";
+				break;
+			default: __builtin_unreachable();
+			}
+			printf("utf8_is%s %s, \"%c\"",
+			       (opcode >= REOP_UTF8_ISDIGIT_cmp_MIN && opcode <= REOP_UTF8_ISDIGIT_cmp_MAX) ? "digit" : "numeric",
+			       op, digit);
+		}	break;
 
 		case REOP_GROUP_START: {
 			uint8_t gid = *code++;
