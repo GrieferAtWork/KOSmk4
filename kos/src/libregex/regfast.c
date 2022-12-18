@@ -468,7 +468,7 @@ again:
 			uint8_t layout      = getb();
 			uint8_t minch       = REOP_BITSET_LAYOUT_GETBASE(layout);
 			uint8_t bitset_size = REOP_BITSET_LAYOUT_GETBYTES(layout);
-			uint8_t bitset_bits = bitset_size * 8;
+			unsigned int bitset_bits = bitset_size * 8;
 			unsigned int i;
 			assert(((unsigned int)minch + (unsigned int)bitset_size) <= 0x100);
 			for (i = 0; i < bitset_bits; ++i) {
@@ -488,7 +488,7 @@ again:
 			uint8_t layout      = getb();
 			uint8_t minch       = REOP_BITSET_LAYOUT_GETBASE(layout);
 			uint8_t bitset_size = REOP_BITSET_LAYOUT_GETBYTES(layout);
-			uint8_t bitset_bits = bitset_size * 8;
+			unsigned int bitset_bits = bitset_size * 8;
 			unsigned int i;
 			assert(((unsigned int)minch + (unsigned int)bitset_size) <= 0x100);
 			for (i = 0; i < bitset_bits; ++i) {

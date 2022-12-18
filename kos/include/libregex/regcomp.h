@@ -254,7 +254,7 @@ enum {
 	                            * >>     uint8_t layout      = *layout_ptr++;
 	                            * >>     uint8_t minch       = REOP_BITSET_LAYOUT_GETBASE(layout);
 	                            * >>     uint8_t bitset_size = REOP_BITSET_LAYOUT_GETBYTES(layout);
-	                            * >>     uint8_t bitset_bits = bitset_size * 8;
+	                            * >>     unsigned int bitset_bits = bitset_size * 8;
 	                            * >>     if (OVERFLOW_USUB(ch, minch, &ch))
 	                            * >>         return false;
 	                            * >>     if (ch >= bitset_bits)

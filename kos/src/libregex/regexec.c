@@ -1028,7 +1028,7 @@ dispatch:
 			byte_t layout        = getb();
 			uint8_t bitset_minch = REOP_BITSET_LAYOUT_GETBASE(layout);
 			uint8_t bitset_size  = REOP_BITSET_LAYOUT_GETBYTES(layout);
-			uint8_t bitset_bits  = bitset_size * 8;
+			unsigned int bitset_bits = bitset_size * 8;
 			if (re_interpreter_is_eoi(self))
 				ONFAIL();
 			ch = re_interpreter_readbyte(self);
@@ -1048,7 +1048,7 @@ dispatch:
 			byte_t layout        = getb();
 			uint8_t bitset_minch = REOP_BITSET_LAYOUT_GETBASE(layout);
 			uint8_t bitset_size  = REOP_BITSET_LAYOUT_GETBYTES(layout);
-			uint8_t bitset_bits  = bitset_size * 8;
+			unsigned int bitset_bits = bitset_size * 8;
 			if (re_interpreter_is_eoi(self))
 				ONFAIL();
 			ch = re_interpreter_readbyte(self);
@@ -1068,7 +1068,7 @@ dispatch:
 			byte_t layout        = getb();
 			uint8_t bitset_minch = REOP_BITSET_LAYOUT_GETBASE(layout);
 			uint8_t bitset_size  = REOP_BITSET_LAYOUT_GETBYTES(layout);
-			uint8_t bitset_bits  = bitset_size * 8;
+			unsigned int bitset_bits = bitset_size * 8;
 			if (re_interpreter_is_eoi(self))
 				ONFAIL();
 			ch = re_interpreter_readutf8(self);
