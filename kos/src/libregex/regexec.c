@@ -126,8 +126,9 @@ struct re_interpreter {
 #define re_interpreter_in_chunkendoffset(self)  ((size_t)((self)->ri_in_cend - (self)->ri_in_vbase))     /* Offset at the end of the currently loaded chunk */
 #define re_interpreter_in_curoffset(self)       ((size_t)((self)->ri_in_ptr - (self)->ri_in_vbase))      /* Current offset from start of initial chunk */
 #define re_interpreter_in_totalleft(self)       (re_interpreter_in_chunkleft(self) + (self)->ri_in_mcnt) /* Total # of bytes of input left */
+#define re_interpreter_in_totalleftX(self)      (re_interpreter_in_totalleft(self) + (self)->ri_exec->rx_extra)
 
-#define re_interpreter_is_soi(self)  ((self)->ri_in_ptr <= (self)->ri_in_vbase)
+#define re_interpreter_is_soi(self)  ((self)->ri_in_ptr == (self)->ri_in_vbase) /* Must compare `==' in case `ri_in_vbase' had an underflow (`<' w/o underflow would already be an illegal state!) */
 #define re_interpreter_is_eoi(self)  ((self)->ri_in_ptr >= (self)->ri_in_cend && (self)->ri_in_mcnt <= 0)
 #define re_interpreter_is_eoiX(self) ((self)->ri_in_ptr >= (self)->ri_in_cend && (self)->ri_in_mcnt <= 0 && (self)->ri_exec->rx_extra <= 0)
 
@@ -277,14 +278,13 @@ NOTHROW_NCX(CC re_interpreter_peekmem_bck)(struct re_interpreter const *__restri
 	return result;
 }
 
-/* Peek memory that will be read in the future, copying up to `max_bytes' bytes of it into `buf'. */
-#define re_interpreter_peekmem_fwd(self, buf, max_bytes) \
-	re_interpreter_inptr_peekmem_fwd(&(self)->ri_in, buf, max_bytes)
+/* Peek memory that will be read in the future, copying up to `max_bytes' bytes of it into `buf'.
+ * NOTE: This function also allows access to trailing `rx_extra' extra bytes. */
 PRIVATE WUNUSED NONNULL((1)) size_t
-NOTHROW_NCX(CC re_interpreter_inptr_peekmem_fwd)(struct re_interpreter_inptr const *__restrict self,
-                                                 void *buf, size_t max_bytes) {
+NOTHROW_NCX(CC re_interpreter_peekmem_fwd)(struct re_interpreter const *__restrict self,
+                                           void *buf, size_t max_bytes) {
 	size_t avail, result;
-	size_t total_left = re_interpreter_in_totalleft(self);
+	size_t total_left = re_interpreter_in_totalleftX(self);
 	if (max_bytes > total_left)
 		max_bytes = total_left;
 	result = max_bytes;
@@ -340,9 +340,8 @@ NOTHROW_NCX(CC re_interpreter_prevutf8)(struct re_interpreter const *__restrict 
 }
 
 /* Return the next utf-8 character that will be read from input */
-#define re_interpreter_nextutf8(self) re_interpreter_inptr_nextutf8(&(self)->ri_in)
 PRIVATE WUNUSED NONNULL((1)) char32_t
-NOTHROW_NCX(CC re_interpreter_inptr_nextutf8)(struct re_interpreter_inptr const *__restrict self) {
+NOTHROW_NCX(CC re_interpreter_nextutf8)(struct re_interpreter const *__restrict self) {
 	if likely(re_interpreter_in_chunk_cangetc(self)) {
 		uint8_t seqlen;
 		byte_t nextbyte = *self->ri_in_ptr;
@@ -369,7 +368,7 @@ NOTHROW_NCX(CC re_interpreter_inptr_nextutf8)(struct re_interpreter_inptr const 
 	{
 		size_t utf8_len;
 		char utf8[UNICODE_UTF8_MAXLEN], *reader;
-		utf8_len = re_interpreter_inptr_peekmem_fwd(self, utf8, sizeof(utf8));
+		utf8_len = re_interpreter_peekmem_fwd(self, utf8, sizeof(utf8));
 		reader   = utf8;
 		assert(utf8_len != 0);
 		return unicode_readutf8_n(&reader, utf8 + utf8_len);
@@ -594,13 +593,6 @@ load_normal_iov:
 	self->ri_onfailc = 0;
 	self->ri_onfaila = 0;
 	DBG_memset(self->ri_vars, 0xcc, exec->rx_code->rc_nvars * sizeof(byte_t));
-
-	/* Verify that we initialized everything correctly. */
-	assertf(re_interpreter_in_totalleft(self) == (exec->rx_endoff - exec->rx_startoff),
-	        "re_interpreter_in_totalleft(self):   %Iu\n",
-	        "exec->rx_endoff - exec->rx_startoff: %Iu\n",
-	        re_interpreter_in_totalleft(self),
-	        exec->rx_endoff - exec->rx_startoff);
 	return RE_NOERROR;
 }
 
