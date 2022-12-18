@@ -1,3 +1,7 @@
+/*[[[magic
+// Compile as `c', so we can use the "register" keyword for optimization hints
+options["COMPILE.language"] = "c";
+]]]*/
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -102,6 +106,7 @@ struct re_interpreter {
 	struct re_onfailure_item       *ri_onfailv;   /* [0..ri_onfailc][owned(free)] On-failure stack */
 	size_t                          ri_onfailc;   /* [<= ri_onfaila] # of elements on the on-failure stack */
 	size_t                          ri_onfaila;   /* Allocated # of elements of `ri_onfailv' */
+	struct re_interpreter_inptr     ri_bmatch;    /* USED INTERNALLY: pending best match */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, ri_vars);     /* [ri_exec->rx_code->rc_nvars] Space for variables used by code. */
 };
 #define re_interpreter_inptr_in_advance1(self)                                                           \
@@ -335,7 +340,7 @@ NOTHROW_NCX(CC re_interpreter_prevutf8)(struct re_interpreter const *__restrict 
 		utf8_len = re_interpreter_peekmem_bck(self, utf8, sizeof(utf8));
 		reader   = utf8 + utf8_len;
 		assert(utf8_len != 0);
-		return unicode_readutf8_rev_n(&reader, utf8);
+		return unicode_readutf8_rev_n((char const **)&reader, utf8);
 	}
 }
 
@@ -371,7 +376,7 @@ NOTHROW_NCX(CC re_interpreter_nextutf8)(struct re_interpreter const *__restrict 
 		utf8_len = re_interpreter_peekmem_fwd(self, utf8, sizeof(utf8));
 		reader   = utf8;
 		assert(utf8_len != 0);
-		return unicode_readutf8_n(&reader, utf8 + utf8_len);
+		return unicode_readutf8_n((char const **)&reader, utf8 + utf8_len);
 	}
 }
 
@@ -437,7 +442,7 @@ again:
 				}
 			}
 			reader = utf8;
-			return unicode_readutf8_n(&reader, dst);
+			return unicode_readutf8_n((char const **)&reader, dst);
 		}
 	} else {
 		re_interpreter_inptr_nextchunk(self);
@@ -707,10 +712,9 @@ NOTHROW_NCX(CC re_interpreter_consume_repeat)(struct re_interpreter *__restrict 
  * @return: -RE_ESPACE:  Out of memory
  * @return: -RE_ESIZE:   On-failure stack before too large. */
 PRIVATE WUNUSED NONNULL((1)) re_errno_t
-NOTHROW_NCX(CC libre_interp_exec)(struct re_interpreter *__restrict self) {
-	struct re_interpreter_inptr best_match;
-	byte_t opcode;
-	byte_t const *pc;
+NOTHROW_NCX(CC libre_interp_exec)(__register struct re_interpreter *__restrict self) {
+	__register byte_t opcode;
+	__register byte_t const *pc;
 
 	/* Initialize program counter. */
 	{
@@ -734,9 +738,9 @@ NOTHROW_NCX(CC libre_interp_exec)(struct re_interpreter *__restrict self) {
 	}
 
 	/* Initialize the best match as not-matched-yet */
-	best_match.ri_in_ptr  = (byte_t *)1;
-	best_match.ri_in_cend = (byte_t *)0;
-#define best_match_isvalid() (best_match.ri_in_ptr <= best_match.ri_in_cend)
+	self->ri_bmatch.ri_in_ptr  = (byte_t *)1;
+	self->ri_bmatch.ri_in_cend = (byte_t *)0;
+#define best_match_isvalid() (self->ri_bmatch.ri_in_ptr <= self->ri_bmatch.ri_in_cend)
 
 	/* Helper macros */
 #define DISPATCH()     goto dispatch
@@ -820,13 +824,14 @@ dispatch:
 
 		TARGET(REOP_EXACT_UTF8_ICASE) {
 			byte_t count = getb();
+			byte_t const *newpc = pc;
 			assert(count >= 1);
 			do {
 				char32_t expected, actual;
 				if (re_interpreter_is_eoi(self))
 					ONFAIL();
 				actual   = re_interpreter_readutf8(self);
-				expected = unicode_readutf8((char **)&pc);
+				expected = unicode_readutf8((char const **)&newpc);
 				if (actual != expected) {
 					actual   = unicode_tolower(actual);
 					expected = unicode_tolower(expected);
@@ -834,6 +839,7 @@ dispatch:
 						ONFAIL();
 				}
 			} while (--count);
+			pc = newpc;
 			DISPATCH();
 		}
 
@@ -912,13 +918,15 @@ dispatch:
 		TARGET(REOP_CONTAINS_UTF8) {
 			byte_t count = getb();
 			char32_t ch;
+			byte_t const *newpc;
 			assert(count >= 1);
 			if (re_interpreter_is_eoi(self))
 				ONFAIL();
 			ch = re_interpreter_readutf8(self);
+			newpc = pc;
 			for (;;) {
 				char32_t other_ch;
-				other_ch = unicode_readutf8((char **)&pc);
+				other_ch = unicode_readutf8((char const **)&newpc);
 				if (ch == other_ch)
 					break;
 				if (!--count)
@@ -926,23 +934,27 @@ dispatch:
 			}
 			/* Consume remaining characters */
 			for (; count; --count)
-				unicode_readutf8((char **)&pc);
+				unicode_readutf8((char const **)&newpc);
+			pc = newpc;
 			DISPATCH();
 		}
 
 		TARGET(REOP_CONTAINS_UTF8_NOT) {
 			byte_t count = getb();
 			char32_t ch;
+			byte_t const *newpc;
 			assert(count >= 1);
 			if (re_interpreter_is_eoi(self))
 				ONFAIL();
 			ch = re_interpreter_readutf8(self);
+			newpc = pc;
 			do {
 				char32_t other_ch;
-				other_ch = unicode_readutf8((char **)&pc);
+				other_ch = unicode_readutf8((char const **)&newpc);
 				if (ch == other_ch)
 					ONFAIL();
 			} while (--count);
+			pc = newpc;
 			DISPATCH();
 		}
 
@@ -1620,18 +1632,18 @@ dispatch:
 				 *    than the previous best match, and replace the previous
 				 *    one if the new one is better. */
 				if (!best_match_isvalid() || (re_interpreter_in_curoffset(self) >
-				                              re_interpreter_in_curoffset(&best_match)))
-					best_match = self->ri_in;
+				                              re_interpreter_in_curoffset(&self->ri_bmatch)))
+					self->ri_bmatch = self->ri_in;
 				ONFAIL();
 			}
 
 			/* No more on-fail branches
 			 * -> check  if the current match is better than the best. If
 			 *    it isn't, then restore the best match before returning. */
-			if (best_match_isvalid() && (re_interpreter_in_curoffset(&best_match) >
+			if (best_match_isvalid() && (re_interpreter_in_curoffset(&self->ri_bmatch) >
 			                             re_interpreter_in_curoffset(self))) {
 return_best_match:
-				self->ri_in = best_match;
+				self->ri_in = self->ri_bmatch;
 			}
 			/* Fallthru to the PERFECT_MATCH opcode */
 			return -RE_NOERROR;
