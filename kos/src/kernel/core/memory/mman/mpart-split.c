@@ -280,6 +280,58 @@ NOTHROW(FCALL mpart_unlock_all_mmans)(struct mpart *__restrict self) {
 	}
 }
 
+/* Unlock all the mmans of a given pair of mparts. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(FCALL mpart_unlock_all_mmans2)(struct mpart *__restrict lopart,
+                                       struct mpart *__restrict hipart) {
+	struct mnode *node;
+	struct mman *mm;
+	LIST_FOREACH (node, &lopart->mp_share, mn_link) {
+		mm = node->mn_mman;
+		if unlikely(wasdestroyed(mm))
+			continue;
+		if (mnode_list_contains_mman(LIST_FIRST(&hipart->mp_share), mm))
+			continue; /* Will be enumerated later. */
+		if (mnode_list_contains_mman(LIST_FIRST(&hipart->mp_copy), mm))
+			continue; /* Will be enumerated later. */
+		if (mnode_list_contains_mman(LIST_FIRST(&lopart->mp_copy), mm))
+			continue; /* Will be enumerated later. */
+		if (mnode_list_contains_mman(LIST_FIRST(&lopart->mp_share), mm, node))
+			continue; /* Already enumerated. */
+		mman_lock_release(mm);
+	}
+	LIST_FOREACH (node, &lopart->mp_copy, mn_link) {
+		mm = node->mn_mman;
+		if unlikely(wasdestroyed(mm))
+			continue;
+		if (mnode_list_contains_mman(LIST_FIRST(&hipart->mp_share), mm))
+			continue; /* Will be enumerated later. */
+		if (mnode_list_contains_mman(LIST_FIRST(&hipart->mp_copy), mm))
+			continue; /* Will be enumerated later. */
+		if (mnode_list_contains_mman(LIST_FIRST(&lopart->mp_copy), mm, node))
+			continue; /* Already enumerated. */
+		mman_lock_release(mm);
+	}
+	LIST_FOREACH (node, &hipart->mp_share, mn_link) {
+		mm = node->mn_mman;
+		if unlikely(wasdestroyed(mm))
+			continue;
+		if (mnode_list_contains_mman(LIST_FIRST(&hipart->mp_copy), mm))
+			continue; /* Will be enumerated later. */
+		if (mnode_list_contains_mman(LIST_FIRST(&hipart->mp_share), mm, node))
+			continue; /* Already enumerated. */
+		mman_lock_release(mm);
+	}
+	LIST_FOREACH (node, &hipart->mp_copy, mn_link) {
+		mm = node->mn_mman;
+		if unlikely(wasdestroyed(mm))
+			continue;
+		if (mnode_list_contains_mman(LIST_FIRST(&hipart->mp_copy), mm, node))
+			continue; /* Already enumerated. */
+		mman_lock_release(mm);
+	}
+}
+
 /* Call  `mpart_lock_all_mmans()',  and upon  release  the following
  * locks before waiting on the blocking mman, and returning `false':
  *    - mpart_foreach_mmans_decref(self);
@@ -902,7 +954,11 @@ relock_with_data:
 				        (lonode->mn_flags & MNODE_F_SHARED) ? "shared" : "copy",
 				        (&lopart->_mp_nodlsts[i] == &lopart->mp_share) ? "shared" : "copy");
 				if (min >= data.msd_offset) {
-					/* Our `lonode' is entirely located within `hipart' -> move it in there */
+					/* Our `lonode' is entirely located within `hipart' -> move it in there
+					 *
+					 * NOTE: This also moves the reference we (might be) holding to `lonode->mn_mman',
+					 *       by  having it be  inherited by `hipart' (which  will eventually drop said
+					 *       reference in `mpart_foreach_mmans_decref(hipart)') */
 					LIST_REMOVE(lonode, mn_link);
 					LIST_INSERT_HEAD(&hipart->_mp_nodlsts[i], lonode, mn_link);
 					decref_nokill(lopart);
@@ -931,6 +987,7 @@ relock_with_data:
 					assert(!wasdestroyed(lonode->mn_mman)); /* We don't weakincref because the mman wasn't destroyed, yet! */
 					hinode->mn_mman    = lonode->mn_mman;
 					hinode->mn_part    = hipart;
+					incref(lonode->mn_mman); /* This incref will later be dropped by `mpart_foreach_mmans_decref(hipart)' */
 					++hipart->mp_refcnt;
 					hinode->mn_partoff = 0;
 					LIST_INSERT_HEAD(&hipart->_mp_nodlsts[i], hinode, mn_link);
@@ -946,6 +1003,8 @@ relock_with_data:
 					/* Update/re-insert both nodes. */
 					mman_mappings_removenode(lonode->mn_mman, lonode);
 					lonode->mn_maxaddr = hinode->mn_minaddr - 1;
+					assert(IS_ALIGNED((uintptr_t)lonode->mn_minaddr, PAGESIZE));
+					assert(IS_ALIGNED((uintptr_t)lonode->mn_maxaddr + 1, PAGESIZE));
 					mman_mappings_insert(lonode->mn_mman, lonode);
 					mman_mappings_insert(hinode->mn_mman, hinode);
 				}
@@ -1311,8 +1370,9 @@ clear_hipart_changed_bit:
 
 
 	/* Release locks. */
-	mpart_unlock_all_mmans(self);
-	mpart_foreach_mmans_decref(self);
+	mpart_unlock_all_mmans2(lopart, hipart);
+	mpart_foreach_mmans_decref(hipart);
+	mpart_foreach_mmans_decref(lopart);
 
 	/* Also release the lock to the (new) `hipart'
 	 * This lock was originally acquired (so-to-say) by initializing the new
