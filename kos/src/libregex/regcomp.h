@@ -28,6 +28,10 @@
 
 #include <libregex/regcomp.h>
 
+#ifndef NDEBUG
+#include <format-printer.h>
+#endif /* !NDEBUG */
+
 DECL_BEGIN
 
 /* Parse and yield the next regex-token pointed-to by `self->rep_pos'
@@ -68,6 +72,13 @@ NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self);
  * @return: RE_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set) */
 INTDEF WUNUSED NONNULL((1)) re_errno_t
 NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self);
+
+#ifndef NDEBUG
+/* Print a disassembly of `self' (for debugging) */
+INTDEF NONNULL((1)) ssize_t
+NOTHROW_NCX(CC libre_code_disasm)(struct re_code const *__restrict self,
+                                  pformatprinter printer, void *arg);
+#endif /* !NDEBUG */
 
 DECL_END
 

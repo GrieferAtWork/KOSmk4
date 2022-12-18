@@ -154,11 +154,11 @@ struct trace_node {
 #define trace_node_leak_getxrefs(self)        ((size_t)(self)->tn_link.rb_rhs)
 #define trace_node_leak_setxrefs(self, value) ((self)->tn_link.rb_rhs = (struct trace_node *)(size_t)(value))
 #if CONFIG_KERNEL_MALL_HEAD_SIZE != 0 || CONFIG_KERNEL_MALL_TAIL_SIZE != 0
-#define trace_node_leak_getscan_uminmax(self, scan_umin, scan_umax)        \
-	((self)->tn_kind == TRACE_NODE_KIND_MALL                               \
+#define trace_node_leak_getscan_uminmax(self, scan_umin, scan_umax)               \
+	((self)->tn_kind == TRACE_NODE_KIND_MALL                                      \
 	 ? (void)((scan_umin) = trace_node_umin(self) + CONFIG_KERNEL_MALL_HEAD_SIZE, \
 	          (scan_umax) = trace_node_umax(self) - CONFIG_KERNEL_MALL_TAIL_SIZE) \
-	 : (void)((scan_umin) = trace_node_umin(self),                         \
+	 : (void)((scan_umin) = trace_node_umin(self),                                \
 	          (scan_umax) = trace_node_umax(self)))
 #else /* CONFIG_KERNEL_MALL_HEAD_SIZE != 0 || CONFIG_KERNEL_MALL_TAIL_SIZE != 0 */
 #define trace_node_leak_getscan_uminmax(self, scan_umin, scan_umax) \
@@ -728,7 +728,7 @@ NOTHROW(KCALL kmalloc_validate_node)(unsigned int n_skip,
 			while (*(byte_t const *)base == ((byte_t const *)&word)[(uintptr_t)base & 3])
 				base = (u32 const *)((byte_t const *)base + 1);
 			kernel_panic_n(n_skip + 1,
-			               "Corrupted MALL header in at %p (offset %" PRIdSIZ " from %p...%p)\n"
+			               "Corrupted MALL header at %p (offset %" PRIdSIZ " from %p...%p)\n"
 			               "%$[hex]\n"
 			               "%[gen:c]",
 			               base, (uintptr_t)base - (trace_node_umin(node) + CONFIG_KERNEL_MALL_HEAD_SIZE),
@@ -750,7 +750,7 @@ NOTHROW(KCALL kmalloc_validate_node)(unsigned int n_skip,
 			while (*(byte_t const *)base == ((byte_t const *)&word)[(uintptr_t)base & 3])
 				base = (u32 const *)((byte_t const *)base + 1);
 			kernel_panic_n(n_skip + 1,
-			               "Corrupted MALL tail in at %p (offset %" PRIdSIZ " from %p...%p; "
+			               "Corrupted MALL tail at %p (offset %" PRIdSIZ " from %p...%p; "
 			               "offset %" PRIuSIZ " from end of usable memory)\n"
 			               "%$[hex]\n"
 			               "%[gen:c]",
@@ -2333,9 +2333,9 @@ kmalloc_leaks_print(kmalloc_leaks_t leaks,
 			 * tell  the user where/how  the leaking memory  was allocated. However, since
 			 * slab allocators are always allowed to either...
 			 *
-			 *   - Allocate regular kmalloc()-style memory (as a matter of fact, most calls
-			 *     to slab allocators actually use compile-time dispatching from inside  of
-			 *     a FORCELOCAL kmalloc() wrapper)
+			 *   - Allocate regular kmalloc()-style memory (as  a matter of fact, most  calls
+			 *     to slab allocators actually stem from compile-time dispatching from inside
+			 *     of a FORCELOCAL kmalloc() wrapper)
 			 *     Booting with `noslab' will modify the  text of these functions to  directly
 			 *     call forward to the regular heap functions, which are then able to generate
 			 *     proper tracebacks.
@@ -2348,8 +2348,8 @@ kmalloc_leaks_print(kmalloc_leaks_t leaks,
 			 *     return `NULL', which  is indicative  of their  inability to  find space  for
 			 *     additional slab memory.
 			 *
-			 * ... we can tell the user to reboot with "noslab" to turn of the system, thus
-			 *     causing tracebacks to be generated for  all the cases where slabs  would
+			 * ... we can tell the user to reboot with "noslab" to turn off the system, thus
+			 *     causing  tracebacks to be  generated for all the  cases where slabs would
 			 *     normally be used. */
 			if (!gc_slab_leak_did_notify_noslab_boot_option) {
 				gc_slab_leak_did_notify_noslab_boot_option = true;

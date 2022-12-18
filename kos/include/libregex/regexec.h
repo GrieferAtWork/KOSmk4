@@ -31,14 +31,17 @@ struct re_code;
 struct iovec;
 
 /* Flags for `re_exec_matchv' */
-#define RE_EXEC_NOTBOL 0x0001 /* '^' (REOP_AT_SOL) doesn't match at `rx_startoff' (but only at an actual begin-of-line) */
-#define RE_EXEC_NOTEOL 0x0002 /* '$' (REOP_AT_EOL) doesn't match at `rx_endoff' (but only before an actual line-feed) */
+#define RE_EXEC_NOTBOL 0x0001 /* '^' (REOP_AT_SOL) doesn't match at the start of the input buffer (but only at an actual begin-of-line) */
+#define RE_EXEC_NOTEOL 0x0002 /* '$' (REOP_AT_EOL) doesn't match at the end of the input buffer (but only before an actual line-feed) */
 
 struct re_exec {
 	struct re_code const *rx_code;     /* [1..1] Regex code */
 	struct iovec const   *rx_iov;      /* [0..*] I/O vector of input data to scan */
 	__size_t              rx_startoff; /* Starting byte offset into `rx_iov' of data to match. */
 	__size_t              rx_endoff;   /* Ending byte offset into `rx_iov' of data to match. */
+	__size_t              rx_extra;    /* Number of extra bytes that can still be read after `rx_endoff'
+	                                    * Usually `0', but when  non-zero, `REOP_AT_*' opcodes will  try
+	                                    * to read this extra memory in order to check matches. */
 	unsigned int          rx_eflags;   /* Execution flags (set of `RE_EXEC_*') */
 };
 

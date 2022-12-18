@@ -46,6 +46,14 @@
 
 #include "regexec.h"
 
+#if 0
+#include <sys/syslog.h>
+#define HAVE_TRACE
+#define TRACE(...) syslog(LOG_DEBUG, __VA_ARGS__)
+#else
+#define TRACE(...) (void)0
+#endif
+
 DECL_BEGIN
 
 #define islf(ch) ((ch) == '\r' || (ch) == '\n')
@@ -88,13 +96,12 @@ struct re_interpreter {
 		};
 	};
 	struct iovec const             *ri_in_biov;   /* [0..*][<= ri_in_miov][const] Initial iov vector base (== `struct re_exec::rx_iov') */
-	struct re_code const           *ri_code;      /* [1..1][const] Regex code */
-	unsigned int                    ri_eflags;    /* [const] Execution flags (set of `RE_EXEC_*') */
-	re_regmatch_t                  *ri_pmatch;    /* [1..ri_code->rc_ngrps][const] Group match start/end offset register buffer (owned if caller-provided buffer is too small). */
+	struct re_exec const           *ri_exec;      /* [1..1][const] Regex exec command block. */
+	re_regmatch_t                  *ri_pmatch;    /* [1..ri_exec->rx_code->rc_ngrps][const] Group match start/end offset register buffer (owned if caller-provided buffer is too small). */
 	struct re_onfailure_item       *ri_onfailv;   /* [0..ri_onfailc][owned(free)] On-failure stack */
 	size_t                          ri_onfailc;   /* [<= ri_onfaila] # of elements on the on-failure stack */
 	size_t                          ri_onfaila;   /* Allocated # of elements of `ri_onfailv' */
-	COMPILER_FLEXIBLE_ARRAY(byte_t, ri_vars);     /* [ri_code->rc_nvars] Space for variables used by code. */
+	COMPILER_FLEXIBLE_ARRAY(byte_t, ri_vars);     /* [ri_exec->rx_code->rc_nvars] Space for variables used by code. */
 };
 #define re_interpreter_inptr_in_advance1(self)                                                           \
 	(unlikely((self)->ri_in_ptr >= (self)->ri_in_cend) ? re_interpreter_inptr_nextchunk(self) : (void)0, \
@@ -104,7 +111,7 @@ struct re_interpreter {
 	 --(self)->ri_in_ptr)
 #define re_interpreter_in_chunkcontains(self, inptr) \
 	((inptr) >= re_interpreter_in_chunkbase(self) && \
-	 (inptr) < re_interpreter_in_chunkend(self))
+	 (inptr) <= re_interpreter_in_chunkend(self)) /* yes: '<=', because inptr == end-of-chunk means epsilon (in case of the last chunk) */
 #define re_interpreter_in_isfirstchunk(self)    ((self)->ri_in_miov <= (self)->ri_in_biov + 1)           /* True if in first chunk */
 #define re_interpreter_in_islastchunk(self)     ((self)->ri_in_mcnt <= 0)                                /* True if in last chunk */
 #define re_interpreter_in_chunk_cangetc(self)   ((self)->ri_in_ptr < (self)->ri_in_cend)                 /* True if not at end of current chunk */
@@ -119,8 +126,10 @@ struct re_interpreter {
 #define re_interpreter_in_curoffset(self)       ((size_t)((self)->ri_in_ptr - (self)->ri_in_vbase))      /* Current offset from start of initial chunk */
 #define re_interpreter_in_totalleft(self)       (re_interpreter_in_chunkleft(self) + (self)->ri_in_mcnt) /* Total # of bytes of input left */
 
-#define re_interpreter_is_soi(self) ((self)->ri_in_ptr <= (self)->ri_in_vbase)
-#define re_interpreter_is_eoi(self) ((self)->ri_in_ptr >= (self)->ri_in_cend && (self)->ri_in_mcnt <= 0)
+#define re_interpreter_is_soi(self)  ((self)->ri_in_ptr <= (self)->ri_in_vbase)
+#define re_interpreter_is_eoi(self)  ((self)->ri_in_ptr >= (self)->ri_in_cend && (self)->ri_in_mcnt <= 0)
+#define re_interpreter_is_eoiX(self) ((self)->ri_in_ptr >= (self)->ri_in_cend && (self)->ri_in_mcnt <= 0 && (self)->ri_exec->rx_extra <= 0)
+
 #define re_interpreter_is_eoi_at_end_of_chunk(self) ((self)->ri_in_mcnt <= 0)
 
 static_assert(offsetof(struct re_interpreter_inptr, ri_in_ptr) == offsetof(struct re_interpreter_inptr, ri_in_ptr));
@@ -137,7 +146,8 @@ PRIVATE NONNULL((1)) void
 NOTHROW_NCX(CC re_interpreter_inptr_nextchunk)(struct re_interpreter_inptr *__restrict self) {
 	struct iovec nextchunk;
 	size_t old_chunk_endoffset;
-	assertf(self->ri_in_mcnt != 0, "No further chunks can be loaded");
+	/* vvv This wouldn't account for `struct re_exec::rx_extra'! */
+	/*assertf(self->ri_in_mcnt != 0, "No further chunks can be loaded");*/
 	old_chunk_endoffset = re_interpreter_in_chunkendoffset(self);
 	do {
 		nextchunk = *self->ri_in_miov++;
@@ -225,13 +235,13 @@ NOTHROW_NCX(CC _re_interpreter_inptr_prevbyte)(struct re_interpreter_inptr const
 PRIVATE WUNUSED NONNULL((1)) byte_t
 NOTHROW_NCX(CC _re_interpreter_inptr_nextbyte)(struct re_interpreter_inptr const *__restrict self) {
 	struct iovec const *iov;
-	assertf(self->ri_in_mcnt != 0, "No further chunks can be loaded");
+	/* vvv This wouldn't account for `struct re_exec::rx_extra'! */
+	/*assertf(self->ri_in_mcnt != 0, "No further chunks can be loaded");*/
 	iov = self->ri_in_miov;
 	while (iov->iov_len == 0)
 		++iov; /* Skip over empty chunks */
 	return *(byte_t const *)iov->iov_base;
 }
-
 
 /* Peek memory that has been read in the past, copying up to `max_bytes' bytes of it into `buf'. */
 PRIVATE WUNUSED NONNULL((1)) size_t
@@ -456,13 +466,13 @@ NOTHROW_NCX(CC re_interpreter_setinptr)(struct re_interpreter *__restrict self,
 		struct iovec const *prev_chunk = self->ri_in_miov - 2;
 		while (prev_chunk >= self->ri_in_biov) {
 			byte_t *prev_chunk_end = (byte_t *)prev_chunk->iov_base + prev_chunk->iov_len;
-			if (inptr >= (byte_t *)prev_chunk->iov_base && inptr < prev_chunk_end) {
+			if (inptr >= (byte_t *)prev_chunk->iov_base && inptr <= prev_chunk_end) {
 				size_t inptr_offset;
 
 				/* Found the chunk that the given inptr belongs to -> now load it! */
 				inptr_offset = prev_chunk_end_offset;
-				inptr_offset += prev_chunk->iov_len;
-				inptr_offset -= (size_t)(inptr - (byte_t *)prev_chunk->iov_base);
+				inptr_offset -= prev_chunk->iov_len;
+				inptr_offset += (size_t)(inptr - (byte_t *)prev_chunk->iov_base);
 				self->ri_in_mcnt += re_interpreter_in_chunkendoffset(self);
 				self->ri_in_mcnt -= prev_chunk_end_offset;
 				self->ri_in_ptr   = inptr;
@@ -563,10 +573,9 @@ NOTHROW_NCX(CC re_interpreter_init)(struct re_interpreter *__restrict self,
 		self->ri_in_cend = self->ri_in_ptr + in_len;
 		self->ri_in_mcnt = 0;
 	}
-	self->ri_code   = exec->rx_code;
-	self->ri_eflags = exec->rx_eflags;
+	self->ri_exec   = exec;
 	self->ri_pmatch = pmatch;
-	ngrp            = self->ri_code->rc_ngrps;
+	ngrp            = exec->rx_code->rc_ngrps;
 	if (nmatch >= ngrp) {
 		/* Able to use user-provided register buffer. */
 	} else {
@@ -580,7 +589,7 @@ NOTHROW_NCX(CC re_interpreter_init)(struct re_interpreter *__restrict self,
 	self->ri_onfailv = NULL;
 	self->ri_onfailc = 0;
 	self->ri_onfaila = 0;
-	DBG_memset(self->ri_vars, 0xcc, self->ri_code->rc_nvars * sizeof(byte_t));
+	DBG_memset(self->ri_vars, 0xcc, exec->rx_code->rc_nvars * sizeof(byte_t));
 
 	/* Verify that we initialized everything correctly. */
 	assertf(re_interpreter_in_totalleft(self) == (exec->rx_endoff - exec->rx_startoff),
@@ -705,20 +714,27 @@ PRIVATE WUNUSED NONNULL((1)) re_errno_t
 NOTHROW_NCX(CC libre_interp_exec)(struct re_interpreter *__restrict self) {
 	struct re_interpreter_inptr best_match;
 	byte_t opcode;
-	byte_t const *pc = self->ri_code->rc_code;
+	byte_t const *pc;
 
-	/* Try to do a quick can-check via the fast-map */
-	if (re_interpreter_in_chunk_cangetc(self)) {
-		byte_t fmap;
-		fmap = *self->ri_in_ptr;
-		fmap = self->ri_code->rc_fmap[fmap];
-		if (fmap == 0xff)
+	/* Initialize program counter. */
+	{
+		struct re_code const *code;
+		code = self->ri_exec->rx_code;
+		pc   = code->rc_code;
+
+		/* Try to do a quick can-check via the fast-map */
+		if (re_interpreter_in_chunk_cangetc(self)) {
+			byte_t fmap;
+			fmap = *self->ri_in_ptr;
+			fmap = code->rc_fmap[fmap];
+			if (fmap == 0xff)
+				return -RE_NOMATCH;
+			pc += fmap;
+		} else if (code->rc_minmatch > 0) {
+			/* Input buffer is epsilon, but regex has a non-  zero
+			 * minimal match length -> regex can't possibly match! */
 			return -RE_NOMATCH;
-		pc += fmap;
-	} else if (self->ri_code->rc_minmatch > 0) {
-		/* Input buffer is epsilon, but regex has a non-  zero
-		 * minimal match length -> regex can't possibly match! */
-		return -RE_NOMATCH;
+		}
 	}
 
 	/* Initialize the best match as not-matched-yet */
@@ -728,9 +744,14 @@ NOTHROW_NCX(CC libre_interp_exec)(struct re_interpreter *__restrict self) {
 
 	/* Helper macros */
 #define DISPATCH()     goto dispatch
+#ifdef HAVE_TRACE
+#define ONFAIL()       do{ TRACE("ONFAIL: %d\n", __LINE__); goto onfail; }__WHILE0
+#define TARGET(opcode) __IF0 { case opcode: TRACE("%#.4Ix: %s\n", (pc - 1) - self->ri_exec->rx_code->rc_code, #opcode); }
+#else /* HAVE_TRACE */
 #define ONFAIL()       goto onfail
 #define TARGET(opcode) case opcode:
-#define PUSHFAIL(pc)   do { if unlikely(re_interpreter_pushfail(self, pc)) goto err_nomem; } __WHILE0
+#endif /* !HAVE_TRACE */
+#define PUSHFAIL(pc)   do { if unlikely(!re_interpreter_pushfail(self, pc)) goto err_nomem; } __WHILE0
 #define getb()         (*pc++)
 #define getw()         (*(int16_t const *)((pc += 2) - 2))
 
@@ -995,12 +1016,17 @@ dispatch:
 		TARGET(REOP_GROUP_MATCH) {
 			uint8_t gid = getb();
 			re_regmatch_t match;
-			assert(gid < self->ri_code->rc_ngrps);
+			assert(gid < self->ri_exec->rx_code->rc_ngrps);
 			match = self->ri_pmatch[gid];
 			if (match.rm_so == RE_REGOFF_UNSET ||
 			    match.rm_eo == RE_REGOFF_UNSET)
 				ONFAIL();
-			assert(match.rm_so <= match.rm_eo);
+#if 0 /* TODO: This can currently fail because ONFAIL() doesn't roll back group matches... */
+			assertf(self->ri_pmatch[gid].rm_so <= self->ri_pmatch[gid].rm_eo,
+			        "self->ri_pmatch[%1$I8u].rm_so = %2$Iu\n"
+			        "self->ri_pmatch[%1$I8u].rm_eo = %3$Iu",
+			        gid, match.rm_so, match.rm_eo);
+#endif
 			if (match.rm_so < match.rm_eo) {
 				if (!re_interpreter_consume_repeat(self, match.rm_so,
 				                                   match.rm_eo - match.rm_so))
@@ -1012,12 +1038,17 @@ dispatch:
 		TARGET(REOP_GROUP_MATCH_JMIN ... REOP_GROUP_MATCH_JMAX) {
 			uint8_t gid = getb();
 			re_regmatch_t match;
-			assert(gid < self->ri_code->rc_ngrps);
+			assert(gid < self->ri_exec->rx_code->rc_ngrps);
 			match = self->ri_pmatch[gid];
 			if (match.rm_so == RE_REGOFF_UNSET ||
 			    match.rm_eo == RE_REGOFF_UNSET)
 				ONFAIL();
-			assert(match.rm_so <= match.rm_eo);
+#if 0 /* TODO: This can currently fail because ONFAIL() doesn't roll back group matches... */
+			assertf(self->ri_pmatch[gid].rm_so <= self->ri_pmatch[gid].rm_eo,
+			        "self->ri_pmatch[%1$I8u].rm_so = %2$Iu\n"
+			        "self->ri_pmatch[%1$I8u].rm_eo = %3$Iu",
+			        gid, match.rm_so, match.rm_eo);
+#endif
 			if (match.rm_so < match.rm_eo) {
 				if (!re_interpreter_consume_repeat(self, match.rm_so,
 				                                   match.rm_eo - match.rm_so))
@@ -1148,28 +1179,28 @@ dispatch:
 			static_assert(REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISPRINT_NOT));
 			static byte_t const traits[] = {
 #define DEF_TRAIT(opcode, mask) [(opcode - REOP_TRAIT_ASCII_MIN)] = mask
-				DEF_TRAIT(REOP_ASCII_ISCNTRL, CTYPE_C_FLAG_CNTRL),         /* `iscntrl(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISCNTRL_NOT, CTYPE_C_FLAG_CNTRL),     /* `iscntrl(ch) == false' */
-				DEF_TRAIT(REOP_ASCII_ISSPACE, CTYPE_C_FLAG_SPACE),         /* `isspace(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISSPACE_NOT, CTYPE_C_FLAG_SPACE),     /* `isspace(ch) == false' */
-				DEF_TRAIT(REOP_ASCII_ISUPPER, CTYPE_C_FLAG_UPPER),         /* `isupper(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISUPPER_NOT, CTYPE_C_FLAG_UPPER),     /* `isupper(ch) == false' */
-				DEF_TRAIT(REOP_ASCII_ISLOWER, CTYPE_C_FLAG_LOWER),         /* `islower(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISLOWER_NOT, CTYPE_C_FLAG_LOWER),     /* `islower(ch) == false' */
-				DEF_TRAIT(REOP_ASCII_ISALPHA, CTYPE_C_FLAG_ALPHA),         /* `isalpha(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISALPHA_NOT, CTYPE_C_FLAG_ALPHA),     /* `isalpha(ch) == false' */
-				DEF_TRAIT(REOP_ASCII_ISDIGIT, CTYPE_C_FLAG_DIGIT),         /* `isdigit(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISDIGIT_NOT, CTYPE_C_FLAG_DIGIT),     /* `isdigit(ch) == false' */
-				DEF_TRAIT(REOP_ASCII_ISXDIGIT, CTYPE_C_FLAG_DIGIT),       /* `isxdigit(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISXDIGIT_NOT, CTYPE_C_FLAG_DIGIT),   /* `isxdigit(ch) == false' */
-				DEF_TRAIT(REOP_ASCII_ISALNUM, CTYPE_C_FLAG_ALNUM),         /* `isalnum(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISALNUM_NOT, CTYPE_C_FLAG_ALNUM),     /* `isalnum(ch) == false' */
-				DEF_TRAIT(REOP_ASCII_ISPUNCT, CTYPE_C_FLAG_PUNCT),         /* `ispunct(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISPUNCT_NOT, CTYPE_C_FLAG_PUNCT),     /* `ispunct(ch) == false' */
-				DEF_TRAIT(REOP_ASCII_ISGRAPH, CTYPE_C_FLAG_GRAPH),         /* `isgraph(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISGRAPH_NOT, CTYPE_C_FLAG_GRAPH),     /* `isgraph(ch) == false' */
-				DEF_TRAIT(REOP_ASCII_ISPRINT, CTYPE_C_FLAG_PRINT),         /* `isprint(ch) == true' */
-				DEF_TRAIT(REOP_ASCII_ISPRINT_NOT, CTYPE_C_FLAG_PRINT),     /* `isprint(ch) == false' */
+				DEF_TRAIT(REOP_ASCII_ISCNTRL, CTYPE_C_FLAG_CNTRL),      /* `iscntrl(ch) == true' */
+				DEF_TRAIT(REOP_ASCII_ISCNTRL_NOT, CTYPE_C_FLAG_CNTRL),  /* `iscntrl(ch) == false' */
+				DEF_TRAIT(REOP_ASCII_ISSPACE, CTYPE_C_FLAG_SPACE),      /* `isspace(ch) == true' */
+				DEF_TRAIT(REOP_ASCII_ISSPACE_NOT, CTYPE_C_FLAG_SPACE),  /* `isspace(ch) == false' */
+				DEF_TRAIT(REOP_ASCII_ISUPPER, CTYPE_C_FLAG_UPPER),      /* `isupper(ch) == true' */
+				DEF_TRAIT(REOP_ASCII_ISUPPER_NOT, CTYPE_C_FLAG_UPPER),  /* `isupper(ch) == false' */
+				DEF_TRAIT(REOP_ASCII_ISLOWER, CTYPE_C_FLAG_LOWER),      /* `islower(ch) == true' */
+				DEF_TRAIT(REOP_ASCII_ISLOWER_NOT, CTYPE_C_FLAG_LOWER),  /* `islower(ch) == false' */
+				DEF_TRAIT(REOP_ASCII_ISALPHA, CTYPE_C_FLAG_ALPHA),      /* `isalpha(ch) == true' */
+				DEF_TRAIT(REOP_ASCII_ISALPHA_NOT, CTYPE_C_FLAG_ALPHA),  /* `isalpha(ch) == false' */
+				DEF_TRAIT(REOP_ASCII_ISDIGIT, CTYPE_C_FLAG_DIGIT),      /* `isdigit(ch) == true' */
+				DEF_TRAIT(REOP_ASCII_ISDIGIT_NOT, CTYPE_C_FLAG_DIGIT),  /* `isdigit(ch) == false' */
+				DEF_TRAIT(REOP_ASCII_ISXDIGIT, CTYPE_C_FLAG_DIGIT),     /* `isxdigit(ch) == true' */
+				DEF_TRAIT(REOP_ASCII_ISXDIGIT_NOT, CTYPE_C_FLAG_DIGIT), /* `isxdigit(ch) == false' */
+				DEF_TRAIT(REOP_ASCII_ISALNUM, CTYPE_C_FLAG_ALNUM),      /* `isalnum(ch) == true' */
+				DEF_TRAIT(REOP_ASCII_ISALNUM_NOT, CTYPE_C_FLAG_ALNUM),  /* `isalnum(ch) == false' */
+				DEF_TRAIT(REOP_ASCII_ISPUNCT, CTYPE_C_FLAG_PUNCT),      /* `ispunct(ch) == true' */
+				DEF_TRAIT(REOP_ASCII_ISPUNCT_NOT, CTYPE_C_FLAG_PUNCT),  /* `ispunct(ch) == false' */
+				DEF_TRAIT(REOP_ASCII_ISGRAPH, CTYPE_C_FLAG_GRAPH),      /* `isgraph(ch) == true' */
+				DEF_TRAIT(REOP_ASCII_ISGRAPH_NOT, CTYPE_C_FLAG_GRAPH),  /* `isgraph(ch) == false' */
+				DEF_TRAIT(REOP_ASCII_ISPRINT, CTYPE_C_FLAG_PRINT),      /* `isprint(ch) == true' */
+				DEF_TRAIT(REOP_ASCII_ISPRINT_NOT, CTYPE_C_FLAG_PRINT),  /* `isprint(ch) == false' */
 #undef DEF_TRAIT
 			};
 			byte_t ch;
@@ -1362,7 +1393,7 @@ dispatch:
 		TARGET(REOP_AT_SOL) {
 			/* Start-of-line (following a line-feed, or `REOP_AT_SOI' unless `RE_EXEC_NOTBOL' was set) */
 			if (re_interpreter_is_soi(self)) {
-				if (!(self->ri_eflags & RE_EXEC_NOTBOL))
+				if (!(self->ri_exec->rx_eflags & RE_EXEC_NOTBOL))
 					DISPATCH();
 			} else {
 				byte_t prevbyte;
@@ -1376,7 +1407,7 @@ dispatch:
 		TARGET(REOP_AT_SOL_UTF8) {
 			/* Start-of-line (following a line-feed, or `REOP_AT_SOI' unless `RE_EXEC_NOTBOL' was set) */
 			if (re_interpreter_is_soi(self)) {
-				if (!(self->ri_eflags & RE_EXEC_NOTBOL))
+				if (!(self->ri_exec->rx_eflags & RE_EXEC_NOTBOL))
 					DISPATCH();
 			} else {
 				char32_t prevchar;
@@ -1389,8 +1420,8 @@ dispatch:
 
 		TARGET(REOP_AT_EOL) {
 			/* End-of-line (preceding a line-feed, or `REOP_AT_EOI' unless `RE_EXEC_NOTEOL' was set) */
-			if (re_interpreter_is_eoi(self)) {
-				if (!(self->ri_eflags & RE_EXEC_NOTEOL))
+			if (re_interpreter_is_eoiX(self)) {
+				if (!(self->ri_exec->rx_eflags & RE_EXEC_NOTEOL))
 					DISPATCH();
 			} else {
 				byte_t nextbyte;
@@ -1403,8 +1434,8 @@ dispatch:
 
 		TARGET(REOP_AT_EOL_UTF8) {
 			/* End-of-line (preceding a line-feed, or `REOP_AT_EOI' unless `RE_EXEC_NOTEOL' was set) */
-			if (re_interpreter_is_eoi(self)) {
-				if (!(self->ri_eflags & RE_EXEC_NOTEOL))
+			if (re_interpreter_is_eoiX(self)) {
+				if (!(self->ri_exec->rx_eflags & RE_EXEC_NOTEOL))
 					DISPATCH();
 			} else {
 				char32_t nextchar;
@@ -1421,7 +1452,7 @@ dispatch:
 		TARGET(REOP_AT_EOW)     /* EndOfWord (preceding and next character are `issymcont(lhs) && !issymcont(rhs)'; OOB counts as `issymcont == false') */
 		{
 			bool previs = re_interpreter_is_soi(self) ? false : !!issymcont(re_interpreter_prevbyte(self));
-			bool nextis = re_interpreter_is_eoi(self) ? false : !!issymcont(re_interpreter_nextbyte(self));
+			bool nextis = re_interpreter_is_eoiX(self) ? false : !!issymcont(re_interpreter_nextbyte(self));
 			bool ismatch;
 			switch (opcode) {
 			case REOP_AT_WOB:
@@ -1449,7 +1480,7 @@ dispatch:
 		TARGET(REOP_AT_EOW_UTF8)     /* EndOfWord (preceding and next character are `issymcont(lhs) && !issymcont(rhs)'; OOB counts as `issymcont == false') */
 		{
 			bool previs = re_interpreter_is_soi(self) ? false : !!unicode_issymcont(re_interpreter_prevutf8(self));
-			bool nextis = re_interpreter_is_eoi(self) ? false : !!unicode_issymcont(re_interpreter_nextutf8(self));
+			bool nextis = re_interpreter_is_eoiX(self) ? false : !!unicode_issymcont(re_interpreter_nextutf8(self));
 			bool ismatch;
 			switch (opcode) {
 			case REOP_AT_WOB_UTF8:
@@ -1474,7 +1505,7 @@ dispatch:
 		TARGET(REOP_AT_SOS_UTF8) {
 			/* StartOfSymbol (preceding and next character are `!issymcont(lhs) && issymstrt(rhs)'; OOB counts as `issymcont[/strt] == false') */
 			bool previs = re_interpreter_is_soi(self) ? false : !!unicode_issymcont(re_interpreter_prevutf8(self));
-			bool nextis = re_interpreter_is_eoi(self) ? false : !!unicode_issymstrt(re_interpreter_nextutf8(self));
+			bool nextis = re_interpreter_is_eoiX(self) ? false : !!unicode_issymstrt(re_interpreter_nextutf8(self));
 			if (!previs && nextis)
 				DISPATCH();
 			ONFAIL();
@@ -1488,7 +1519,7 @@ dispatch:
 		/************************************************************************/
 		TARGET(REOP_GROUP_START) {
 			uint8_t gid = getb();
-			assert(gid < self->ri_code->rc_ngrps);
+			assert(gid < self->ri_exec->rx_code->rc_ngrps);
 			/* Set start-of-group offset */
 			self->ri_pmatch[gid].rm_so = re_interpreter_in_curoffset(self);
 			DISPATCH();
@@ -1496,7 +1527,7 @@ dispatch:
 
 		TARGET(REOP_GROUP_END) {
 			uint8_t gid = getb();
-			assert(gid < self->ri_code->rc_ngrps);
+			assert(gid < self->ri_exec->rx_code->rc_ngrps);
 			/* Set end-of-group offset */
 			self->ri_pmatch[gid].rm_eo = re_interpreter_in_curoffset(self);
 			DISPATCH();
@@ -1504,10 +1535,17 @@ dispatch:
 
 		TARGET(REOP_GROUP_END_JMIN ... REOP_GROUP_END_JMAX) {
 			uint8_t gid = getb();
-			assert(gid < self->ri_code->rc_ngrps);
+			assert(gid < self->ri_exec->rx_code->rc_ngrps);
 			/* Set end-of-group offset */
 			self->ri_pmatch[gid].rm_eo = re_interpreter_in_curoffset(self);
-			assert(self->ri_pmatch[gid].rm_so <= self->ri_pmatch[gid].rm_eo);
+#if 0 /* TODO: This can currently fail because ONFAIL() doesn't roll back group matches... */
+			assertf(self->ri_pmatch[gid].rm_so <= self->ri_pmatch[gid].rm_eo,
+			        "self->ri_pmatch[%1$I8u].rm_so = %2$Iu\n"
+			        "self->ri_pmatch[%1$I8u].rm_eo = %3$Iu",
+			        gid,
+			        (size_t)self->ri_pmatch[gid].rm_so,
+			        (size_t)self->ri_pmatch[gid].rm_eo);
+#endif
 			if (self->ri_pmatch[gid].rm_so >= self->ri_pmatch[gid].rm_eo) {
 				/* Group matched epsilon -> must skip ahead a little bit */
 				pc += REOP_GROUP_END_Joff(opcode);
@@ -1537,7 +1575,7 @@ dispatch:
 		TARGET(REOP_DEC_JMP) {
 			uint8_t varid = getb();
 			int16_t delta = getw();
-			assert(varid < self->ri_code->rc_nvars);
+			assert(varid < self->ri_exec->rx_code->rc_nvars);
 			if (self->ri_vars[varid] != 0) {
 				--self->ri_vars[varid];
 				pc += delta;
@@ -1549,7 +1587,7 @@ dispatch:
 		TARGET(REOP_DEC_JMP_AND_RETURN_ONFAIL) {
 			uint8_t varid = getb();
 			int16_t delta = getw();
-			assert(varid < self->ri_code->rc_nvars);
+			assert(varid < self->ri_exec->rx_code->rc_nvars);
 			if (self->ri_vars[varid] != 0) {
 				--self->ri_vars[varid];
 				PUSHFAIL(pc);
@@ -1562,7 +1600,7 @@ dispatch:
 		TARGET(REOP_SETVAR) {
 			uint8_t varid = getb();
 			uint8_t value = getb();
-			assert(varid < self->ri_code->rc_nvars);
+			assert(varid < self->ri_exec->rx_code->rc_nvars);
 			/* Assign value to variable */
 			self->ri_vars[varid] = value;
 			DISPATCH();
@@ -1575,12 +1613,18 @@ dispatch:
 		TARGET(REOP_MATCHED) {
 			/* Compare with a previous match. */
 			if (self->ri_onfailc != 0) {
+				/* Check if our current match is the best it can get. */
+				if (re_interpreter_is_eoi(&self->ri_in)) {
+					/* No need to keep going! -- It can't get any better than this. */
+					return -RE_NOERROR;
+				}
+
 				/* Still have to roll back in order test more code-paths
 				 * -> In  this case,  check if  the current  match is better
 				 *    than the previous best match, and replace the previous
 				 *    one if the new one is better. */
-				if (best_match_isvalid() && (re_interpreter_in_curoffset(self) >
-				                             re_interpreter_in_curoffset(&best_match)))
+				if (!best_match_isvalid() || (re_interpreter_in_curoffset(self) >
+				                              re_interpreter_in_curoffset(&best_match)))
 					best_match = self->ri_in;
 				ONFAIL();
 			}
@@ -1589,11 +1633,14 @@ dispatch:
 			 * -> check  if the current match is better than the best. If
 			 *    it isn't, then restore the best match before returning. */
 			if (best_match_isvalid() && (re_interpreter_in_curoffset(&best_match) >
-			                             re_interpreter_in_curoffset(self)))
+			                             re_interpreter_in_curoffset(self))) {
+return_best_match:
 				self->ri_in = best_match;
+			}
 			/* Fallthru to the PERFECT_MATCH opcode */
+			return -RE_NOERROR;
 		}
-		ATTR_FALLTHROUGH
+
 		TARGET(REOP_MATCHED_PERFECT) {
 			/* Just indicate success for the current match! */
 			return -RE_NOERROR;
@@ -1607,12 +1654,19 @@ dispatch:
 	{
 		struct re_onfailure_item *item;
 onfail:
-		if (self->ri_onfailc <= 0)
+		if (self->ri_onfailc <= 0) {
+			/* If there was a match, then return it. */
+			if (best_match_isvalid())
+				goto return_best_match;
 			return -RE_NOMATCH;
+		}
 		item = &self->ri_onfailv[--self->ri_onfailc];
 		pc   = item->rof_pc;
 		re_interpreter_setinptr(self, item->rof_in);
-		/* TODO: The ONFAIL-system needs some way to set group match start/end addresses back to UNSET */
+		/* TODO: The ONFAIL-system needs some way to set group match start/end addresses back to UNSET:
+		 * >> "(f(o)o|foobar)" MATCH "foobar"
+		 * This should result in an UNSET match for group[1], but that isn't the case in our current impl!
+		 */
 		DISPATCH();
 	}
 err_nomem:

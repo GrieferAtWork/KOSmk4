@@ -27,6 +27,10 @@
 #include <libc/string.h>
 #include <libc/malloc.h>
 
+#ifndef NDEBUG
+#include <bits/crt/format-printer.h>
+#endif /* !NDEBUG */
+
 __DECL_BEGIN
 
 /* RE error codes */
@@ -484,9 +488,9 @@ struct re_parser {
 	__uintptr_t rep_syntax; /* [const] RE syntax flags (set of `RE_SYNTAX_*') */
 };
 
-#define re_parser_init(self, pattern)      \
-	(void)((self)->rep_pos    = (pattern), \
-	       (self)->rep_pat    = (pattern), \
+#define re_parser_init(self, pattern, syntax) \
+	(void)((self)->rep_pos    = (pattern),    \
+	       (self)->rep_pat    = (pattern),    \
 	       (self)->rep_syntax = (syntax))
 
 /* Regex token (one of `RE_TOKEN_*', or a utf-32 character (or byte when `RE_SYNTAX_NO_UTF8' is set)) */
@@ -552,9 +556,9 @@ struct re_code {
 	                          * - rc_fmap[input[0]] != 0xff --> Start executing at `PC = rc_code + rc_fmap[input[0]]' */
 	__size_t   rc_minmatch;  /* The smallest input length that can be matched by `rc_code' (or `0' when `rc_code' can match epsilon) */
 	__size_t   rc_maxmatch;  /* The largest input length that can be matched by `rc_code' (or `SIZE_MAX' when `rc_code' can match an infinitely long input string) */
-	__uint16_t rc_ngrps;     /* # of groups currently defined */
-	__uint16_t rc_nvars;     /* # of variables referenced by code */
-	__COMPILER_FLEXIBLE_ARRAY(__byte_t, rc_code); /* Code buffer (instructions) */
+	__uint16_t rc_ngrps;     /* # of groups currently defined (<= 0x100) */
+	__uint16_t rc_nvars;     /* # of variables referenced by code (<= 0x100) */
+	__COMPILER_FLEXIBLE_ARRAY(__byte_t, rc_code); /* Code buffer (`REOP_*' instruction stream) */
 };
 
 
@@ -584,6 +588,15 @@ struct re_compiler {
 #define re_compiler_yield(self)        re_parser_yield(&(self)->rec_parser)
 #define re_compiler_yieldat(self, pos) re_parser_yieldat(&(self)->rec_parser, pos)
 #endif /* LIBREGEX_WANT_PROTOTYPES */
+
+
+/* Pack the result of the given reg-ex compiler `self',
+ * and return its  produced `struct re_code'. Use  this
+ * function INSTEAD  OF `re_compiler_fini()'  following
+ * a successful call to `re_compiler_compile()' */
+#define re_compiler_pack(self) \
+	((struct re_code *)(self)->rec_cbase)
+
 
 /* Parse and compile the pattern given to `self' to generate code.
  * Even upon error, `self' remains  in a valid state (except  that
@@ -622,6 +635,21 @@ __NOTHROW_NCX_T(LIBREGEX_CC *PRE_COMPILER_COMPILE)(struct re_compiler *__restric
 LIBREGEX_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) re_errno_t
 __NOTHROW_NCX(LIBREGEX_CC re_compiler_compile)(struct re_compiler *__restrict self);
 #endif /* LIBREGEX_WANT_PROTOTYPES */
+
+
+
+/* Print a disassembly of `self' (for debugging) */
+typedef __ATTR_NONNULL_T((1)) __ssize_t
+__NOTHROW_NCX_T(LIBREGEX_CC *PRE_CODE_DISASM)(struct re_code const *__restrict self,
+                                              __pformatprinter printer, void *arg);
+#ifndef NDEBUG
+#ifdef LIBREGEX_WANT_PROTOTYPES
+LIBREGEX_DECL __ATTR_NONNULL((1)) __ssize_t
+__NOTHROW_NCX(LIBREGEX_CC re_code_disasm)(struct re_code const *__restrict self,
+                                          __pformatprinter printer, void *arg);
+#endif /* LIBREGEX_WANT_PROTOTYPES */
+#endif /* !NDEBUG */
+
 
 
 

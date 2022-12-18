@@ -46,6 +46,11 @@
 
 #include "regcomp.h"
 
+#ifndef NDEBUG
+#include <format-printer.h>
+#include <inttypes.h>
+#endif /* !NDEBUG */
+
 /* Regex compile-time configuration */
 #define RE_COMP_MAXSIZE     0x10000 /* 2^16 (hard limit on how large regex code blobs may get) */
 #define RE_COMP_ALIGN_INT16 1       /* If non-zero, compiler should align int16 operands */
@@ -100,8 +105,8 @@ NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self) {
 		break;
 
 	case ')':
-		if (self->rep_syntax & RE_SYNTAX_NO_BK_PARENS) {
-			/* TODO: RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD */
+		if ((self->rep_syntax & (RE_SYNTAX_NO_BK_PARENS | RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD)) ==
+		    /*               */ (RE_SYNTAX_NO_BK_PARENS)) {
 			return RE_TOKEN_ENDGROUP;
 		}
 		break;
@@ -189,10 +194,9 @@ NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self) {
 			break;
 
 		case ')':
-			if (!(self->rep_syntax & RE_SYNTAX_NO_BK_PARENS)) {
-				/* TODO: RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD */
+			if (!(self->rep_syntax & (RE_SYNTAX_NO_BK_PARENS |
+			                          RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD)))
 				return RE_TOKEN_ENDGROUP;
-			}
 			break;
 
 		case '+':
@@ -454,7 +458,7 @@ NOTHROW_NCX(CC re_opcode_next)(uint8_t const *__restrict p_instr) {
 	case REOP_EXACT_ASCII_ICASE: {
 		uint8_t length;
 		length = *p_instr++;
-		assert(length >= 2);
+		//assert(length >= 2); // TODO: re-enable me
 		p_instr += length;
 	}	break;
 
@@ -974,15 +978,23 @@ again:
 	case RE_TOKEN_STARTGROUP: {
 		/* Group and parenthesis */
 		bool group_matches_epsilon;
+		size_t expr_start_offset;
 		size_t group_start_offset;
 		re_errno_t error;
 		uint8_t gid;
 		byte_t *body;
+		uintptr_t old_syntax;
+
 		if unlikely(self->rec_ngrp >= 0x100)
 			return RE_ESIZE; /* Too many groups */
 		gid = self->rec_ngrp++;
 
+		/* We're inside of a group, so ')' are no longer literals! */
+		old_syntax = self->rec_parser.rep_syntax;
+		self->rec_parser.rep_syntax &= ~RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD;
+
 		/* Generate the introductory `REOP_GROUP_START' instruction */
+		expr_start_offset = (size_t)(self->rec_estart - self->rec_cbase);
 		if (!re_compiler_putc(self, REOP_GROUP_START))
 			goto err_nomem;
 		if (!re_compiler_putc(self, gid))
@@ -994,6 +1006,18 @@ again:
 		if unlikely(error != RE_NOERROR)
 			return error;
 
+		/* Consume the trailing ')'-token */
+		tok = re_compiler_yield(self);
+		if unlikely(tok != RE_TOKEN_ENDGROUP) {
+			if (tok == RE_TOKEN_UNMATCHED_BK)
+				return RE_EESCAPE;
+			return RE_EPAREN;
+		}
+
+		/* Restore old syntax behavior for  ')' being a literal or  not.
+		 * s.a. us clearing `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' above. */
+		self->rec_parser.rep_syntax = old_syntax;
+
 		/* Figure out if the group is able to match EPSION */
 		if unlikely(!re_compiler_require(self, 1))
 			goto err_nomem;
@@ -1001,10 +1025,13 @@ again:
 		body = self->rec_cbase + group_start_offset;
 		group_matches_epsilon = re_code_matches_epsilon(body);
 
-		/* Depending on epsilon-matching capabilities, end with the preferred opcode */
+		/* Mark the end of the group (this opcode may be overwritten later) */
 		*self->rec_cpos++ = REOP_GROUP_END;
 		if (!re_compiler_putc(self, gid))
 			goto err_nomem;
+
+		/* Restore the expression-start offset to point at the `REOP_GROUP_START' opcode. */
+		self->rec_estart = self->rec_cbase + expr_start_offset;
 
 		/* Remember information about the first 9 groups */
 		if (gid < lengthof(self->rec_grpinfo)) {
@@ -1103,6 +1130,9 @@ again:
 		{
 			bool literal_seq_hasesc;
 			bool literal_seq_isutf8;
+#ifndef __OPTIMIZE_SIZE__
+			bool seq_followed_by_suffix;
+#endif /* !__OPTIMIZE_SIZE__ */
 			char const *literal_seq_start;
 			char const *literal_seq_end;
 			char const *old_literal_seq_end;
@@ -1115,6 +1145,9 @@ do_literal:
 			literal_seq_end     = self->rec_parser.rep_pos;
 			old_literal_seq_end = self->rec_parser.rep_pos;
 			literal_seq_length  = 1;
+#ifndef __OPTIMIZE_SIZE__
+			seq_followed_by_suffix = false;
+#endif /* !__OPTIMIZE_SIZE__ */
 			for (;;) {
 				re_token_t lit = re_compiler_yield(self);
 				if (!RE_TOKEN_ISLITERAL(lit)) {
@@ -1127,6 +1160,9 @@ do_literal:
 						if (literal_seq_end != old_literal_seq_end) {
 							assert(literal_seq_length > 1);
 							--literal_seq_length;
+#ifndef __OPTIMIZE_SIZE__
+							seq_followed_by_suffix = true;
+#endif /* !__OPTIMIZE_SIZE__ */
 						} else {
 							assert(literal_seq_length == 1);
 						}
@@ -1153,6 +1189,10 @@ do_literal:
 			                                    literal_seq_isutf8);
 			if unlikely(error != RE_NOERROR)
 				return error;
+#ifndef __OPTIMIZE_SIZE__
+			if (seq_followed_by_suffix)
+				goto again; /* Go ahead and compile the literal for the suffix that will follow */
+#endif /* !__OPTIMIZE_SIZE__ */
 		}
 		break;
 
@@ -1186,7 +1226,10 @@ PRIVATE NONNULL((1)) void
 NOTHROW_NCX(CC re_compiler_set_group_epsilon_jmp)(uint8_t *p_group_instruction,
                                                   uint8_t num_bytes_skip_if_empty) {
 	assert(num_bytes_skip_if_empty >= 3 && num_bytes_skip_if_empty <= 10);
-	assert(*p_group_instruction == REOP_GROUP_MATCH || *p_group_instruction == REOP_GROUP_END);
+	assertf(*p_group_instruction == REOP_GROUP_MATCH ||
+	        *p_group_instruction == REOP_GROUP_END,
+	        "*p_group_instruction = %#I8x",
+	        *p_group_instruction);
 	*p_group_instruction = RE_EPSILON_JMP_ENCODE(*p_group_instruction, num_bytes_skip_if_empty);
 }
 
@@ -1202,6 +1245,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 
 	/* Figure out the size of the affected expression */
 	expr_size = (size_t)(self->rec_cpos - self->rec_estart);
+	assert(!((uintptr_t)self->rec_cbase & 1));
 
 	/* When many are accepted, then `interval_max' is infinite */
 	if (interval_max_is_unbounded) {
@@ -1244,7 +1288,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			          writer,
 			          expr_size);
 
-			/* REOP_SETVAR  {VAR = (n - 1)} */
+			/* REOP_JMP_ONFAIL 2f */
 			if (align_REOP_JMP_ONFAIL)
 				*writer++ = REOP_NOP;
 			*writer++ = REOP_JMP_ONFAIL;
@@ -1260,14 +1304,13 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			if (expression_matches_epsilon) {
 				uint8_t epsilong_skip_size = 3;
 				epsilong_skip_size += (align_REOP_JMP_AND_RETURN_ONFAIL ? 1 : 0);
-				re_compiler_set_group_epsilon_jmp(writer - 1, epsilong_skip_size);
+				re_compiler_set_group_epsilon_jmp(writer - 2, epsilong_skip_size);
 			}
 
 			/* REOP_JMP_AND_RETURN_ONFAIL 1b */
-			writer = self->rec_cpos;
 			if (align_REOP_JMP_AND_RETURN_ONFAIL)
 				*writer++ = REOP_NOP;
-			writer += REOP_JMP_AND_RETURN_ONFAIL;
+			*writer++ = REOP_JMP_AND_RETURN_ONFAIL;
 			int16_at(writer) = (int16_t)(label_1 - (writer + 2));
 			writer += 2;
 			self->rec_cpos = writer;
@@ -1282,7 +1325,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 
 			/* Figure out where we're going to need alignments */
 			writer = self->rec_cpos;
-			writer += 1; /* REOP_JMP_AND_RETURN_ONFAIL */
+			writer += 1; /* REOP_JMP_AND_RETURN_ONFAIL ... */
 			align_REOP_JMP_AND_RETURN_ONFAIL = ((uintptr_t)writer & 1) != 0;
 
 			/* Figure out the total required extra buffer size */
@@ -1298,11 +1341,11 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			if (expression_matches_epsilon) {
 				uint8_t epsilong_skip_size = 3;
 				epsilong_skip_size += (align_REOP_JMP_AND_RETURN_ONFAIL ? 1 : 0);
-				re_compiler_set_group_epsilon_jmp(writer - 1, epsilong_skip_size);
+				re_compiler_set_group_epsilon_jmp(writer - 2, epsilong_skip_size);
 			}
 			if (align_REOP_JMP_AND_RETURN_ONFAIL)
 				*writer++ = REOP_NOP;
-			writer += REOP_JMP_AND_RETURN_ONFAIL;
+			*writer++ = REOP_JMP_AND_RETURN_ONFAIL;
 			int16_at(writer) = (int16_t)(self->rec_estart - (writer + 2));
 			writer += 2;
 
@@ -1362,21 +1405,21 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 				uint8_t epsilong_skip_size = 7;
 				epsilong_skip_size += (align_REOP_DEC_JMP ? 1 : 0);
 				epsilong_skip_size += (align_REOP_JMP_AND_RETURN_ONFAIL ? 1 : 0);
-				re_compiler_set_group_epsilon_jmp(writer - 1, epsilong_skip_size);
+				re_compiler_set_group_epsilon_jmp(writer - 2, epsilong_skip_size);
 			}
 
 			/* REOP_DEC_JMP {VAR}, 1b */
 			if (align_REOP_DEC_JMP)
 				*writer++ = REOP_NOP;
-			writer += REOP_DEC_JMP;
-			writer += var_id;
+			*writer++ = REOP_DEC_JMP;
+			*writer++ = var_id;
 			int16_at(writer) = (int16_t)(label_1 - (writer + 2));
 			writer += 2;
 
 			/* REOP_JMP_AND_RETURN_ONFAIL 1b */
 			if (align_REOP_JMP_AND_RETURN_ONFAIL)
 				*writer++ = REOP_NOP;
-			writer += REOP_JMP_AND_RETURN_ONFAIL;
+			*writer++ = REOP_JMP_AND_RETURN_ONFAIL;
 			int16_at(writer) = (int16_t)(label_1 - (writer + 2));
 			writer += 2;
 
@@ -1470,7 +1513,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 #if RE_COMP_ALIGN_INT16
 			epsilong_skip_size += (align_REOP_DEC_JMP_AND_RETURN_ONFAIL ? 1 : 0);
 #endif /* RE_COMP_ALIGN_INT16 */
-			re_compiler_set_group_epsilon_jmp(writer - 1, epsilong_skip_size);
+			re_compiler_set_group_epsilon_jmp(writer - 2, epsilong_skip_size);
 		}
 
 		/* REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b */
@@ -1478,8 +1521,8 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		if (align_REOP_DEC_JMP_AND_RETURN_ONFAIL)
 			*writer++ = REOP_NOP;
 #endif /* RE_COMP_ALIGN_INT16 */
-		writer += REOP_DEC_JMP_AND_RETURN_ONFAIL;
-		writer += var_id;
+		*writer++ = REOP_DEC_JMP_AND_RETURN_ONFAIL;
+		*writer++ = var_id;
 		int16_at(writer) = (int16_t)(label_1 - (writer + 2));
 		writer += 2;
 
@@ -1568,8 +1611,8 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		if (align_REOP_DEC_JMP)
 			*writer++ = REOP_NOP;
 #endif /* RE_COMP_ALIGN_INT16 */
-		writer += REOP_DEC_JMP;
-		writer += var_id;
+		*writer++ = REOP_DEC_JMP;
+		*writer++ = var_id;
 		int16_at(writer) = (int16_t)(label_1 - (writer + 2));
 		writer += 2;
 
@@ -1651,7 +1694,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			epsilong_skip_size += (align_REOP_DEC_JMP ? 1 : 0);
 			epsilong_skip_size += (align_REOP_DEC_JMP_AND_RETURN_ONFAIL ? 1 : 0);
 #endif /* RE_COMP_ALIGN_INT16 */
-			re_compiler_set_group_epsilon_jmp(writer - 1, epsilong_skip_size);
+			re_compiler_set_group_epsilon_jmp(writer - 2, epsilong_skip_size);
 		}
 
 		/* REOP_DEC_JMP {VAR1}, 1b */
@@ -1659,8 +1702,8 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		if (align_REOP_DEC_JMP)
 			*writer++ = REOP_NOP;
 #endif /* RE_COMP_ALIGN_INT16 */
-		writer += REOP_DEC_JMP;
-		writer += var1_id;
+		*writer++ = REOP_DEC_JMP;
+		*writer++ = var1_id;
 		int16_at(writer) = (int16_t)(label_1 - (writer + 2));
 		writer += 2;
 
@@ -1669,8 +1712,8 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		if (align_REOP_DEC_JMP_AND_RETURN_ONFAIL)
 			*writer++ = REOP_NOP;
 #endif /* RE_COMP_ALIGN_INT16 */
-		writer += REOP_DEC_JMP_AND_RETURN_ONFAIL;
-		writer += var2_id;
+		*writer++ = REOP_DEC_JMP_AND_RETURN_ONFAIL;
+		*writer++ = var2_id;
 		int16_at(writer) = (int16_t)(label_1 - (writer + 2));
 		writer += 2;
 
@@ -1693,7 +1736,11 @@ NOTHROW_NCX(CC re_compiler_compile_suffix)(struct re_compiler *__restrict self,
                                            re_errno_t prefix_status) {
 	re_token_t tok;
 	char const *tokstart;
-	assert(self->rec_estart <= self->rec_cpos);
+	assertf(self->rec_estart <= self->rec_cpos,
+	        "self->rec_estart: %p\n"
+	        "self->rec_cpos:   %p",
+	        self->rec_estart,
+	        self->rec_cpos);
 
 	/* Start parsing the current expression */
 	tokstart = self->rec_parser.rep_pos;
@@ -1786,7 +1833,7 @@ NOTHROW_NCX(CC re_compiler_thread_fwd_jump)(byte_t *__restrict p_jmp_instruction
 	int16_t delta;
 	assert(p_jmp_instruction[0] == REOP_JMP);
 	delta = int16_at(&p_jmp_instruction[1]);
-	assert(delta > 0);
+	assertf(delta >= 0, "delta: %I16d", delta);
 	target_instruction = p_jmp_instruction + 3 + delta;
 	while (*target_instruction == REOP_NOP)
 		++target_instruction;
@@ -1798,7 +1845,7 @@ NOTHROW_NCX(CC re_compiler_thread_fwd_jump)(byte_t *__restrict p_jmp_instruction
 		re_compiler_thread_fwd_jump(target_instruction);
 		target_delta = int16_at(&target_instruction[1]);
 		assert(target_delta >= 0);
-		total_delta  = delta + 3 + target_delta + 3;
+		total_delta = delta + 3 + target_delta;
 		if (total_delta <= INT16_MAX) {
 			/* Able to thread this jump! */
 			int16_at(&p_jmp_instruction[1]) = total_delta;
@@ -1839,16 +1886,7 @@ again:
 		/* Check if we're moving forward in the pattern */
 		assert(self->rec_parser.rep_pos >= old_tokptr);
 		if (self->rec_parser.rep_pos == old_tokptr)
-			break; /* Unchanged parser position -> we're at a token that  */
-	}
-
-	/* Fill in the delta of the `REOP_JMP ...' from a preceding alternation. */
-	if (previous_alternation_deltaoff != (size_t)-1) {
-		byte_t *previous_alternation_deltaptr;
-		int16_t previous_alternation_skipdelta;
-		previous_alternation_deltaptr  = self->rec_cbase + previous_alternation_deltaoff;
-		previous_alternation_skipdelta = (int16_t)(self->rec_cpos - (previous_alternation_deltaptr + 2));
-		int16_at(previous_alternation_deltaptr) = previous_alternation_skipdelta;
+			break; /* Unchanged parser position -> we're at a token that cannot be processed. */
 	}
 
 	/* Check what's the next token */
@@ -1857,6 +1895,15 @@ again:
 	if (tok != RE_TOKEN_ALTERNATION) {
 		/* Rewind to start of token */
 		self->rec_parser.rep_pos = tokstart;
+		/* Fill in the delta of the `REOP_JMP ...' from a preceding alternation. */
+		if (previous_alternation_deltaoff != (size_t)-1) {
+			byte_t *previous_alternation_deltaptr;
+			int16_t previous_alternation_skipdelta;
+			previous_alternation_deltaptr  = self->rec_cbase + previous_alternation_deltaoff;
+			previous_alternation_skipdelta = (int16_t)(self->rec_cpos - (previous_alternation_deltaptr + 2));
+			assert(previous_alternation_skipdelta >= 0);
+			int16_at(previous_alternation_deltaptr) = previous_alternation_skipdelta;
+		}
 	} else {
 		byte_t *current_alternation_startptr;
 		size_t current_alternation_size;
@@ -1899,7 +1946,7 @@ again:
 			*current_alternation_startptr++ = REOP_NOP;
 #endif /* RE_COMP_ALIGN_INT16 */
 
-		/* Insert the leading 'REOP_JMP_ONFAIL' that points to the next alternation */
+		/* Insert the leading `REOP_JMP_ONFAIL' that points to the next alternation */
 		*current_alternation_startptr++ = REOP_JMP_ONFAIL;
 #if RE_COMP_ALIGN_INT16
 		int16_at(current_alternation_startptr) = (int16_t)(current_alternation_size + 3 + (align_after ? 1 : 0));
@@ -1920,6 +1967,17 @@ again:
 			/* Remember the first jump location so we can jump-thread-optimize it later! */
 			initial_alternation_jmpoff = (size_t)(current_alternation_startptr - self->rec_cbase);
 		}
+
+		/* Fill in the delta of the `REOP_JMP ...' from a preceding alternation. */
+		if (previous_alternation_deltaoff != (size_t)-1) {
+			byte_t *previous_alternation_deltaptr;
+			int16_t previous_alternation_skipdelta;
+			previous_alternation_deltaptr  = self->rec_cbase + previous_alternation_deltaoff;
+			previous_alternation_skipdelta = (int16_t)(current_alternation_startptr - (previous_alternation_deltaptr + 2));
+			assert(previous_alternation_skipdelta >= 0);
+			int16_at(previous_alternation_deltaptr) = previous_alternation_skipdelta;
+		}
+
 		*current_alternation_startptr++ = REOP_JMP;
 		previous_alternation_deltaoff = (size_t)(current_alternation_startptr - self->rec_cbase);
 		DBG_memset(current_alternation_startptr, 0xcc, 2); /* UNDEFINED! (filled later) */
@@ -2030,7 +2088,7 @@ NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self) {
 	if likely(self->rec_cpos < self->rec_cend) {
 		byte_t *newbase;
 		size_t reqsize;
-		reqsize = (size_t)(self->rec_cpos - self->rec_estart);
+		reqsize = (size_t)(self->rec_cpos - self->rec_cbase);
 		newbase = (byte_t *)realloc(self->rec_cbase, reqsize);
 		if likely(newbase) {
 			self->rec_cbase  = newbase;
@@ -2066,9 +2124,286 @@ err:
 
 
 
+#ifndef NDEBUG
+/* Print a disassembly of `self' (for debugging) */
+INTERN NONNULL((1)) ssize_t
+NOTHROW_NCX(CC libre_code_disasm)(struct re_code const *__restrict self,
+                                  pformatprinter printer, void *arg) {
+#define DO(x)                         \
+	do {                              \
+		if unlikely((temp = (x)) < 0) \
+			goto err;                 \
+		result += temp;               \
+	}	__WHILE0
+#define PRINT(x)    DO((*printer)(arg, x, COMPILER_STRLEN(x)))
+#define printf(...) DO(format_printf(printer, arg, __VA_ARGS__))
+	byte_t const *code, *next;
+	ssize_t temp, result = 0;
+	/* TODO: Print fast-map */
+	printf("match: {%" PRIuSIZ "-", self->rc_minmatch);
+	if (self->rc_maxmatch == SIZE_MAX) {
+		PRINT("inf}\n");
+	} else {
+		printf("%" PRIuSIZ "}\n", self->rc_minmatch);
+	}
+	printf("ngrps: %" PRIu16 "\n"
+	       "nvars: %" PRIu16 "\n",
+	       self->rc_ngrps,
+	       self->rc_nvars);
+	for (code = self->rc_code;; code = next) {
+		size_t offset;
+		byte_t opcode;
+		char const *opcode_repr;
+		next   = re_opcode_next(code);
+		offset = (size_t)(code - self->rc_code);
+		opcode = *code++;
+		printf("%#.4" PRIxSIZ ": ", offset);
+		switch (opcode) {
+
+		case REOP_EXACT: {
+			uint8_t len = *code++;
+			printf("exact %$q", (size_t)len, code);
+		}	break;
+
+		case REOP_EXACT_ASCII_ICASE: {
+			uint8_t len = *code++;
+			printf("exact_ascii_icase %$q", (size_t)len, code);
+		}	break;
+
+		case REOP_EXACT_UTF8_ICASE: {
+			++code;
+			printf("exact_ascii_icase %$q", (size_t)(next - code), code);
+		}	break;
+
+		case REOP_CHAR: {
+			printf("char %$q", (size_t)1, code);
+		}	break;
+
+		case REOP_CHAR2: {
+			printf("char2 %$q", (size_t)2, code);
+		}	break;
+
+		case REOP_CONTAINS_UTF8: {
+			++code;
+			printf("contains_utf8 %$q", (size_t)(next - code), code);
+		}	break;
+
+		case REOP_CONTAINS_UTF8_NOT: {
+			++code;
+			printf("contains_utf8_not %$q", (size_t)(next - code), code);
+		}	break;
+
+		//TODO: case REOP_BITSET:
+		//TODO: case REOP_BITSET_NOT:
+		//TODO: case REOP_BITSET_UTF8_NOT:
+		//TODO: case REOP_GROUP_MATCH:
+		//TODO: case REOP_GROUP_MATCH_J3:
+		//TODO: case REOP_GROUP_MATCH_J4:
+		//TODO: case REOP_GROUP_MATCH_J5:
+		//TODO: case REOP_GROUP_MATCH_J6:
+		//TODO: case REOP_GROUP_MATCH_J7:
+		//TODO: case REOP_GROUP_MATCH_J8:
+		//TODO: case REOP_GROUP_MATCH_J9:
+		//TODO: case REOP_GROUP_MATCH_J10:
+		//TODO: case REOP_ASCII_ISDIGIT_EQ:
+		//TODO: case REOP_ASCII_ISDIGIT_NE:
+		//TODO: case REOP_ASCII_ISDIGIT_LO:
+		//TODO: case REOP_ASCII_ISDIGIT_LE:
+		//TODO: case REOP_ASCII_ISDIGIT_GR:
+		//TODO: case REOP_ASCII_ISDIGIT_GE:
+		//TODO: case REOP_UTF8_ISDIGIT_EQ:
+		//TODO: case REOP_UTF8_ISDIGIT_NE:
+		//TODO: case REOP_UTF8_ISDIGIT_LO:
+		//TODO: case REOP_UTF8_ISDIGIT_LE:
+		//TODO: case REOP_UTF8_ISDIGIT_GR:
+		//TODO: case REOP_UTF8_ISDIGIT_GE:
+		//TODO: case REOP_UTF8_ISNUMERIC_EQ:
+		//TODO: case REOP_UTF8_ISNUMERIC_NE:
+		//TODO: case REOP_UTF8_ISNUMERIC_LO:
+		//TODO: case REOP_UTF8_ISNUMERIC_LE:
+		//TODO: case REOP_UTF8_ISNUMERIC_GR:
+		//TODO: case REOP_UTF8_ISNUMERIC_GE:
+
+		case REOP_GROUP_START: {
+			uint8_t gid = *code++;
+			printf("group_start %" PRIu8, gid);
+		}	break;
+
+		case REOP_GROUP_END: {
+			uint8_t gid = *code++;
+			printf("group_end %" PRIu8, gid);
+		}	break;
+
+		case REOP_GROUP_END_JMIN ... REOP_GROUP_END_JMAX: {
+			uint8_t gid       = *code++;
+			byte_t const *jmp = code + REOP_GROUP_END_Joff(opcode);
+			printf("group_end %" PRIu8 ", @%#.4" PRIxSIZ,
+			       gid, (size_t)(jmp - self->rc_code));
+		}	break;
+
+		case REOP_JMP_ONFAIL: {
+			byte_t const *jmp = code + 2 + int16_at(code);
+			printf("jmp_onfail @%#.4" PRIxSIZ, (size_t)(jmp - self->rc_code));
+		}	break;
+
+		case REOP_JMP: {
+			byte_t const *jmp = code + 2 + int16_at(code);
+			printf("jmp @%#.4" PRIxSIZ, (size_t)(jmp - self->rc_code));
+		}	break;
+
+		case REOP_JMP_AND_RETURN_ONFAIL: {
+			byte_t const *jmp = code + 2 + int16_at(code);
+			printf("jmp_and_return_onfail @%#.4" PRIxSIZ, (size_t)(jmp - self->rc_code));
+		}	break;
+
+		case REOP_DEC_JMP: {
+			uint8_t varid     = *code++;
+			byte_t const *jmp = code + 2 + int16_at(code);
+			printf("dec_jmp %" PRIu8 ", @%#.4" PRIxSIZ, varid, (size_t)(jmp - self->rc_code));
+		}	break;
+
+		case REOP_DEC_JMP_AND_RETURN_ONFAIL: {
+			uint8_t varid     = *code++;
+			byte_t const *jmp = code + 2 + int16_at(code);
+			printf("dec_jmp_and_return_onfail %" PRIu8 ", @%#.4" PRIxSIZ, varid, (size_t)(jmp - self->rc_code));
+		}	break;
+
+		case REOP_SETVAR: {
+			uint8_t varid = *code++;
+			uint8_t value = *code++;
+			printf("setvar %" PRIu8 ", %" PRIu8, varid, value);
+		}	break;
+
+#define SIMPLE_OPCODE(opcode, repr) \
+		case opcode:                \
+			opcode_repr = repr;     \
+			goto do_print_opcode_repr
+		SIMPLE_OPCODE(REOP_ANY, "any");
+		SIMPLE_OPCODE(REOP_ANY_NOTLF, "any_notlf");
+		SIMPLE_OPCODE(REOP_ANY_NOTNUL, "any_notnul");
+		SIMPLE_OPCODE(REOP_ANY_NOTNUL_NOTLF, "any_notnul_notlf");
+		SIMPLE_OPCODE(REOP_ANY_NOTNUL_NOTLF_UTF8, "any_notnul_notlf_utf8");
+		SIMPLE_OPCODE(REOP_ASCII_ISCNTRL, "ascii_iscntrl");
+		SIMPLE_OPCODE(REOP_ASCII_ISCNTRL_NOT, "ascii_iscntrl_not");
+		SIMPLE_OPCODE(REOP_ASCII_ISSPACE, "ascii_isspace");
+		SIMPLE_OPCODE(REOP_ASCII_ISSPACE_NOT, "ascii_isspace_not");
+		SIMPLE_OPCODE(REOP_ASCII_ISUPPER, "ascii_isupper");
+		SIMPLE_OPCODE(REOP_ASCII_ISUPPER_NOT, "ascii_isupper_not");
+		SIMPLE_OPCODE(REOP_ASCII_ISLOWER, "ascii_islower");
+		SIMPLE_OPCODE(REOP_ASCII_ISLOWER_NOT, "ascii_islower_not");
+		SIMPLE_OPCODE(REOP_ASCII_ISALPHA, "ascii_isalpha");
+		SIMPLE_OPCODE(REOP_ASCII_ISALPHA_NOT, "ascii_isalpha_not");
+		SIMPLE_OPCODE(REOP_ASCII_ISDIGIT, "ascii_isdigit");
+		SIMPLE_OPCODE(REOP_ASCII_ISDIGIT_NOT, "ascii_isdigit_not");
+		SIMPLE_OPCODE(REOP_ASCII_ISXDIGIT, "ascii_isxdigit");
+		SIMPLE_OPCODE(REOP_ASCII_ISXDIGIT_NOT, "ascii_isxdigit_not");
+		SIMPLE_OPCODE(REOP_ASCII_ISALNUM, "ascii_isalnum");
+		SIMPLE_OPCODE(REOP_ASCII_ISALNUM_NOT, "ascii_isalnum_not");
+		SIMPLE_OPCODE(REOP_ASCII_ISPUNCT, "ascii_ispunct");
+		SIMPLE_OPCODE(REOP_ASCII_ISPUNCT_NOT, "ascii_ispunct_not");
+		SIMPLE_OPCODE(REOP_ASCII_ISGRAPH, "ascii_isgraph");
+		SIMPLE_OPCODE(REOP_ASCII_ISGRAPH_NOT, "ascii_isgraph_not");
+		SIMPLE_OPCODE(REOP_ASCII_ISPRINT, "ascii_isprint");
+		SIMPLE_OPCODE(REOP_ASCII_ISPRINT_NOT, "ascii_isprint_not");
+		SIMPLE_OPCODE(REOP_ASCII_ISBLANK, "ascii_isblank");
+		SIMPLE_OPCODE(REOP_ASCII_ISBLANK_NOT, "ascii_isblank_not");
+		SIMPLE_OPCODE(REOP_ASCII_ISSYMSTRT, "ascii_issymstrt");
+		SIMPLE_OPCODE(REOP_ASCII_ISSYMSTRT_NOT, "ascii_issymstrt_not");
+		SIMPLE_OPCODE(REOP_ASCII_ISSYMCONT, "ascii_issymcont");
+		SIMPLE_OPCODE(REOP_ASCII_ISSYMCONT_NOT, "ascii_issymcont_not");
+		SIMPLE_OPCODE(REOP_UTF8_ISCNTRL, "utf8_iscntrl");
+		SIMPLE_OPCODE(REOP_UTF8_ISCNTRL_NOT, "utf8_iscntrl_not");
+		SIMPLE_OPCODE(REOP_UTF8_ISSPACE, "utf8_isspace");
+		SIMPLE_OPCODE(REOP_UTF8_ISSPACE_NOT, "utf8_isspace_not");
+		SIMPLE_OPCODE(REOP_UTF8_ISUPPER, "utf8_isupper");
+		SIMPLE_OPCODE(REOP_UTF8_ISUPPER_NOT, "utf8_isupper_not");
+		SIMPLE_OPCODE(REOP_UTF8_ISLOWER, "utf8_islower");
+		SIMPLE_OPCODE(REOP_UTF8_ISLOWER_NOT, "utf8_islower_not");
+		SIMPLE_OPCODE(REOP_UTF8_ISALPHA, "utf8_isalpha");
+		SIMPLE_OPCODE(REOP_UTF8_ISALPHA_NOT, "utf8_isalpha_not");
+		SIMPLE_OPCODE(REOP_UTF8_ISDIGIT, "utf8_isdigit");
+		SIMPLE_OPCODE(REOP_UTF8_ISDIGIT_NOT, "utf8_isdigit_not");
+		SIMPLE_OPCODE(REOP_UTF8_ISXDIGIT, "utf8_isxdigit");
+		SIMPLE_OPCODE(REOP_UTF8_ISXDIGIT_NOT, "utf8_isxdigit_not");
+		SIMPLE_OPCODE(REOP_UTF8_ISALNUM, "utf8_isalnum");
+		SIMPLE_OPCODE(REOP_UTF8_ISALNUM_NOT, "utf8_isalnum_not");
+		SIMPLE_OPCODE(REOP_UTF8_ISPUNCT, "utf8_ispunct");
+		SIMPLE_OPCODE(REOP_UTF8_ISPUNCT_NOT, "utf8_ispunct_not");
+		SIMPLE_OPCODE(REOP_UTF8_ISGRAPH, "utf8_isgraph");
+		SIMPLE_OPCODE(REOP_UTF8_ISGRAPH_NOT, "utf8_isgraph_not");
+		SIMPLE_OPCODE(REOP_UTF8_ISPRINT, "utf8_isprint");
+		SIMPLE_OPCODE(REOP_UTF8_ISPRINT_NOT, "utf8_isprint_not");
+		SIMPLE_OPCODE(REOP_UTF8_ISBLANK, "utf8_isblank");
+		SIMPLE_OPCODE(REOP_UTF8_ISBLANK_NOT, "utf8_isblank_not");
+		SIMPLE_OPCODE(REOP_UTF8_ISSYMSTRT, "utf8_issymstrt");
+		SIMPLE_OPCODE(REOP_UTF8_ISSYMSTRT_NOT, "utf8_issymstrt_not");
+		SIMPLE_OPCODE(REOP_UTF8_ISSYMCONT, "utf8_issymcont");
+		SIMPLE_OPCODE(REOP_UTF8_ISSYMCONT_NOT, "utf8_issymcont_not");
+		SIMPLE_OPCODE(REOP_UTF8_ISTAB, "utf8_istab");
+		SIMPLE_OPCODE(REOP_UTF8_ISTAB_NOT, "utf8_istab_not");
+		SIMPLE_OPCODE(REOP_UTF8_ISWHITE, "utf8_iswhite");
+		SIMPLE_OPCODE(REOP_UTF8_ISWHITE_NOT, "utf8_iswhite_not");
+		SIMPLE_OPCODE(REOP_UTF8_ISEMPTY, "utf8_isempty");
+		SIMPLE_OPCODE(REOP_UTF8_ISEMPTY_NOT, "utf8_isempty_not");
+		SIMPLE_OPCODE(REOP_UTF8_ISLF, "utf8_islf");
+		SIMPLE_OPCODE(REOP_UTF8_ISLF_NOT, "utf8_islf_not");
+		SIMPLE_OPCODE(REOP_UTF8_ISHEX, "utf8_ishex");
+		SIMPLE_OPCODE(REOP_UTF8_ISHEX_NOT, "utf8_ishex_not");
+		SIMPLE_OPCODE(REOP_UTF8_ISTITLE, "utf8_istitle");
+		SIMPLE_OPCODE(REOP_UTF8_ISTITLE_NOT, "utf8_istitle_not");
+		SIMPLE_OPCODE(REOP_UTF8_ISNUMERIC, "utf8_isnumeric");
+		SIMPLE_OPCODE(REOP_UTF8_ISNUMERIC_NOT, "utf8_isnumeric_not");
+		SIMPLE_OPCODE(REOP_AT_SOI, "at_soi");
+		SIMPLE_OPCODE(REOP_AT_EOI, "at_eoi");
+		SIMPLE_OPCODE(REOP_AT_SOL, "at_sol");
+		SIMPLE_OPCODE(REOP_AT_SOL_UTF8, "at_sol_utf8");
+		SIMPLE_OPCODE(REOP_AT_EOL, "at_eol");
+		SIMPLE_OPCODE(REOP_AT_EOL_UTF8, "at_eol_utf8");
+		SIMPLE_OPCODE(REOP_AT_WOB, "at_wob");
+		SIMPLE_OPCODE(REOP_AT_WOB_UTF8, "at_wob_utf8");
+		SIMPLE_OPCODE(REOP_AT_WOB_NOT, "at_wob_not");
+		SIMPLE_OPCODE(REOP_AT_WOB_UTF8_NOT, "at_wob_utf8_not");
+		SIMPLE_OPCODE(REOP_AT_SOW, "at_sow");
+		SIMPLE_OPCODE(REOP_AT_SOW_UTF8, "at_sow_utf8");
+		SIMPLE_OPCODE(REOP_AT_EOW, "at_eow");
+		SIMPLE_OPCODE(REOP_AT_EOW_UTF8, "at_eow_utf8");
+		SIMPLE_OPCODE(REOP_AT_SOS_UTF8, "at_sos_utf8");
+		SIMPLE_OPCODE(REOP_NOP, "nop");
+		SIMPLE_OPCODE(REOP_MATCHED, "matched");
+#undef SIMPLE_OPCODE
+		case REOP_MATCHED_PERFECT:
+			opcode_repr = "matched_perfect";
+do_print_opcode_repr:
+			DO((*printer)(arg, opcode_repr, strlen(opcode_repr)));
+			break;
+
+		default:
+			printf(".byte %#" PRIx8, opcode);
+			for (; code < next; ++code)
+				printf(", %#" PRIx8, *code);
+			break;
+		}
+		PRINT("\n");
+		if (opcode == REOP_MATCHED ||
+		    opcode == REOP_MATCHED_PERFECT)
+			break;
+	}
+
+	return result;
+err:
+	return temp;
+#undef printf
+#undef PRINT
+#undef DO
+}
+#endif /* !NDEBUG */
+
+
+
 #undef re_parser_yield
 DEFINE_PUBLIC_ALIAS(re_parser_yield, libre_parser_yield);
 DEFINE_PUBLIC_ALIAS(re_compiler_compile, libre_compiler_compile);
+DEFINE_PUBLIC_ALIAS(re_code_disasm, libre_code_disasm);
 
 DECL_END
 

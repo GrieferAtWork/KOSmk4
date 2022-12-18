@@ -1,0 +1,198 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBREGEX_REGEX_CTEST
+#define GUARD_LIBREGEX_REGEX_CTEST 1
+#define _KOS_SOURCE 1
+#undef NDEBUG
+
+#include <hybrid/compiler.h>
+
+#include <bits/os/iovec.h>
+#include <kos/types.h>
+#include <sys/syslog.h>
+#include <system-test/ctest.h>
+
+#include <assert.h>
+#include <dlfcn.h>
+#include <malloc.h>
+#include <stdio.h>
+#include <string.h>
+
+#include <libiberty.h>
+#include <libregex/regcomp.h>
+#include <libregex/regexec.h>
+
+DECL_BEGIN
+
+#undef DUMP_DISASM
+#if 0
+#define DUMP_DISASM
+#endif
+
+PRIVATE PRE_COMPILER_COMPILE re_compiler_compile;
+#ifdef DUMP_DISASM
+PRIVATE PRE_CODE_DISASM re_code_disasm;
+#endif /* DUMP_DISASM */
+PRIVATE PRE_EXEC_MATCH re_exec_match;
+PRIVATE PRE_EXEC_SEARCH re_exec_search;
+PRIVATE PRE_EXEC_RSEARCH re_exec_rsearch;
+
+PRIVATE struct re_code *re_compile(char const *pattern) {
+	struct re_code *result;
+	re_errno_t error;
+	struct re_compiler compiler;
+	re_compiler_init(&compiler, pattern,
+	                 RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS |
+	                 RE_SYNTAX_CHAR_CLASSES |
+	                 RE_SYNTAX_CONTEXT_INVALID_OPS |
+	                 RE_SYNTAX_DOT_NOT_NULL |
+	                 RE_SYNTAX_INTERVALS |
+	                 RE_SYNTAX_NO_BK_BRACES |
+	                 RE_SYNTAX_NO_BK_PARENS |
+	                 RE_SYNTAX_NO_BK_VBAR |
+	                 RE_SYNTAX_NO_EMPTY_RANGES |
+	                 RE_SYNTAX_CONTEXT_INVALID_DUP);
+	error = re_compiler_compile(&compiler);
+	EQ(RE_NOERROR, error);
+	result = re_compiler_pack(&compiler);
+#ifdef DUMP_DISASM
+	if (re_code_disasm)
+		re_code_disasm(result, &syslog_printer, SYSLOG_PRINTER_CLOSURE(LOG_DEBUG));
+#endif /* DUMP_DISASM */
+	return result;
+}
+
+PRIVATE ssize_t re_match_code(struct re_code const *code, char const *input) {
+	ssize_t result;
+	struct re_exec exec;
+	size_t input_len   = strlen(input);
+	struct iovec iov[] = { { (void *)input, input_len } };
+	exec.rx_code       = code;
+	exec.rx_iov        = iov;
+	exec.rx_startoff   = 0;
+	exec.rx_endoff     = input_len;
+	exec.rx_extra      = 0;
+	exec.rx_eflags     = 0;
+	/* Do the match */
+	result = re_exec_match(&exec, 0, NULL);
+
+	/* Also attempt the match where every character of `input' appears in its own iov chunk. */
+	{
+		ssize_t result2;
+		size_t i;
+		struct iovec *chunks;
+		chunks = (struct iovec *)xmalloc((2 * input_len) * sizeof(struct iovec));
+		for (i = 0; i < input_len; ++i) {
+			chunks[(i * 2) + 0].iov_base = NULL;
+			chunks[(i * 2) + 0].iov_len  = 0;
+			chunks[(i * 2) + 1].iov_base = (void *)&input[i];
+			chunks[(i * 2) + 1].iov_len  = 1;
+		}
+		exec.rx_iov = chunks;
+		result2     = re_exec_match(&exec, 0, NULL);
+		EQ(result, result2);
+		free(chunks);
+	}
+
+	return result;
+}
+
+PRIVATE ssize_t re_match(char const *pattern, char const *input) {
+	struct re_code *code;
+	ssize_t result;
+	code   = re_compile(pattern);
+	result = re_match_code(code, input);
+	free(code);
+	return result;
+}
+
+DEFINE_TEST(regex) {
+	void *libregex;
+	ISnonnullf((libregex = dlopen(LIBREGEX_LIBRARY_NAME, RTLD_LOCAL)), "%s", dlerror());
+#define DLSYM(x) ISnonnullf((*(void **)&x = dlsym(libregex, #x)), "%s", dlerror())
+	DLSYM(re_compiler_compile);
+	DLSYM(re_exec_match);
+	DLSYM(re_exec_search);
+	DLSYM(re_exec_rsearch);
+#undef DLSYM
+#ifdef DUMP_DISASM
+	*(void **)&re_code_disasm = dlsym(libregex, "re_code_disasm");
+#endif /* DUMP_DISASM */
+
+	/* Test some regular expressions */
+	EQ(3, re_match("abc", "abc"));
+	EQ(3, re_match("abc", "abcd"));
+	EQ(3, re_match("ab*c", "abc"));
+	EQ(7, re_match("ab+c", "abbbbbc"));
+	EQ(3, re_match("ab?c", "abc"));
+	EQ(2, re_match("ab?c", "ac"));
+	EQ(-RE_NOMATCH, re_match("ab?c", "abd"));
+	EQ(-RE_NOMATCH, re_match("ab+c", "abbbbbd"));
+	EQ(6, re_match("abbbbb", "abbbbbd"));
+	EQ(6, re_match("ab+", "abbbbbd"));
+	EQ(-RE_NOMATCH, re_match("a.+", "a"));
+	EQ(2, re_match("a.+", "ax"));
+	EQ(0, re_match("()", "foobar"));
+	EQ(1, re_match("(|f)", "foobar"));
+	EQ(1, re_match("(f|)", "foobar"));
+	EQ(0, re_match("()*", "foobar"));
+	EQ(1, re_match("(|f)*", "foobar"));
+	EQ(1, re_match("(f|)*", "foobar"));
+	EQ(3, re_match("(|f|o)*", "foobar"));
+	EQ(3, re_match("(f||o)*", "foobar"));
+	EQ(3, re_match("(f|o|)*", "foobar"));
+	EQ(5, re_match("(|f|o|ba)*", "foobar"));
+	EQ(5, re_match("(f|o||ba)*", "foobar"));
+	EQ(5, re_match("(f||o|ba)*", "foobar"));
+	EQ(5, re_match("(f|o|ba|)*", "foobar"));
+	EQ(6, re_match("(|f|o|ba|r)*", "foobar"));
+	EQ(6, re_match("(f|o||ba|r)*", "foobar"));
+	EQ(6, re_match("(f|o|ba|r|)*", "foobar"));
+	EQ(9, re_match("(|f|o|ba|r)*", "foobarfffb"));
+	EQ(9, re_match("(f|o||ba|r)*", "foobarfffb"));
+	EQ(9, re_match("(f|o|ba|r|)*", "foobarfffb"));
+	EQ(11, re_match("(|f|o|ba|r)*", "foobarfffba"));
+	EQ(11, re_match("(f|o||ba|r)*", "foobarfffba"));
+	EQ(11, re_match("(f|o|ba|r|)*", "foobarfffba"));
+	EQ(0, re_match("()?", "foobar"));
+	EQ(0, re_match("x?", "foobar"));
+	EQ(0, re_match("x*", "foobar"));
+	EQ(-RE_NOMATCH, re_match("x+", "foobar"));
+	EQ(3, re_match("(abc|def)", "abcdefX"));
+	EQ(3, re_match("(abc|defX)", "abcdefX"));
+	EQ(7, re_match("(abc|defX)*", "abcdefX"));
+	EQ(7, re_match("(abc|defX)*", "abcdefXY"));
+	EQ(3, re_match("(abc|def)", "abcdefX"));
+	EQ(6, re_match("(abc|def)*", "abcdefX"));
+	EQ(6, re_match("(abc|def)+", "abcdefX"));
+	EQ(3, re_match("(abc|def){1}", "abcabcdefabcX"));
+	EQ(9, re_match("(abc|def){1,3}", "abcabcdefabcX"));
+	EQ(12, re_match("(abc|def){1,}", "abcabcdefabcX"));
+	EQ(12, re_match("(abc|def){1,4}", "abcabcdefabcX"));
+	/* TODO: More tests */
+
+	/* Cleanup */
+	EQ(0, dlclose(libregex));
+}
+
+
+DECL_END
+
+#endif /* !GUARD_LIBREGEX_REGEX_CTEST */
