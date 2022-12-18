@@ -757,7 +757,9 @@ again:
 	{
 		/* We get here after having reached a byte-match of some kind.
 		 * With that in mind, we can now proceed to optimize the  min-
-		 * match attribute of the code. */
+		 * match attribute of the code.
+		 *
+		 * Note that it is OK */
 		size_t max_minmatch_depth;
 got_match:
 		/* The max recursion for calculating the min-match attribute.

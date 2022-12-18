@@ -553,8 +553,19 @@ __NOTHROW_NCX(LIBREGEX_CC re_parser_yield)(struct re_parser *__restrict self);
 struct re_code {
 	__byte_t   rc_fmap[256]; /* Fast map: take the first byte of the string to match as index:
 	                          * - rc_fmap[input[0]] == 0xff --> input will never match
-	                          * - rc_fmap[input[0]] != 0xff --> Start executing at `PC = rc_code + rc_fmap[input[0]]' */
-	__size_t   rc_minmatch;  /* The smallest input length that can be matched by `rc_code' (or `0' when `rc_code' can match epsilon) */
+	                          * - rc_fmap[input[0]] != 0xff --> Start executing at `PC = rc_code + rc_fmap[input[0]]'
+	                          * Allowed  to be `0x00', even if the regex never accepts input starting with that byte.
+	                          * iow: all 256 possible bytes indicating `0x00' is always valid.
+	                          * The only assumptions that may be made are:
+	                          *  -> rc_fmap[X] == 0xff --> `rc_code' always rejects input whose first byte is `X'
+	                          *  -> rc_fmap[X] >  0x00 --> `rc_code'  only ever handles a first byte `X' in a branch
+	                          *                            that begins at  this offset (e.g.  "abc|def" can set  the
+	                          *                            fmap offset for "d"  to directly point at  `exact "def"')
+	                          *                            Note that this doesn't guaranty that `rc_code' won't just
+	                          *                            always reject input whose first byte is `X'!
+	                          *  -> rc_fmap[X] == 0x00 --> `rc_code' may or may not accept input starting with `X' */
+	__size_t   rc_minmatch;  /* The smallest input length that can be matched by `rc_code' (or `0' when `rc_code' can match epsilon)
+	                          * NOTE: Allowed to be less than the *true* minimum-match length of `rc_code'; iow: `0' is always valid */
 	__uint16_t rc_ngrps;     /* # of groups currently defined (<= 0x100) */
 	__uint16_t rc_nvars;     /* # of variables referenced by code (<= 0x100) */
 	__COMPILER_FLEXIBLE_ARRAY(__byte_t, rc_code); /* Code buffer (`REOP_*' instruction stream) */

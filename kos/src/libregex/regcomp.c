@@ -55,6 +55,17 @@
 /* Regex compile-time configuration */
 #define RE_COMP_MAXSIZE 0x10000 /* 2^16 (hard limit on how large regex code blobs may get) */
 
+/* Max length for alternation bytecode prefixes.
+ * -> These are generated is it later becomes possible to produce per-byte fastmap
+ *    offsets,  by replicating regex prefixes (`REOP_AT_*' and `REOP_GROUP_START')
+ *    before each element of a top-level alternation.
+ *    iow: "^(foo|bar)$" is compiled as "(^foo|^bar)$",
+ *         with  a fast-map that dispatches "f" and "b"
+ *         directly to the relevant alternation.
+ * -> For this purpose, only generate up to `ALTERNATION_PREFIX_MAXLEN' bytes
+ *    of prefix instructions before giving up and not repeating any prefixes. */
+#define ALTERNATION_PREFIX_MAXLEN 16
+
 DECL_BEGIN
 
 #undef re_parser_yield
@@ -911,9 +922,16 @@ err_nomem:
 }
 
 
+#if ALTERNATION_PREFIX_MAXLEN > 0
 PRIVATE WUNUSED NONNULL((1)) re_errno_t
 NOTHROW_NCX(CC re_compiler_compile_alternation)(struct re_compiler *__restrict self,
-                                                int insert_REOP_GROUP_START_gid);
+                                                void const *alternation_prefix,
+                                                size_t alternation_prefix_size);
+#else /* ALTERNATION_PREFIX_MAXLEN > 0 */
+PRIVATE WUNUSED NONNULL((1)) re_errno_t
+NOTHROW_NCX(CC _re_compiler_compile_alternation)(struct re_compiler *__restrict self);
+#define re_compiler_compile_alternation(self, ...) _re_compiler_compile_alternation(self)
+#endif /* ALTERNATION_PREFIX_MAXLEN <= 0 */
 
 /* Special return value for `re_compiler_compile_prefix':
  * the prefix has  just concluded with  `REOP_GROUP_END',
@@ -927,6 +945,33 @@ PRIVATE WUNUSED NONNULL((1)) re_errno_t
 NOTHROW_NCX(CC re_compiler_compile_prefix)(struct re_compiler *__restrict self) {
 	re_token_t tok;
 	char const *tokstart;
+#if ALTERNATION_PREFIX_MAXLEN > 0
+	byte_t alternation_prefix[ALTERNATION_PREFIX_MAXLEN];
+	size_t alternation_prefix_len;
+	bool alternation_prefix_wanted;
+#define alternation_prefix_hasspace(num_bytes) ((ALTERNATION_PREFIX_MAXLEN - alternation_prefix_len) >= (num_bytes))
+#define alternation_prefix_putc(byte)       (void)(alternation_prefix[alternation_prefix_len++] = (byte))
+#define alternation_prefix_putn(p, n)       (void)(memcpy(&alternation_prefix[alternation_prefix_len], p, n), alternation_prefix_len += (n))
+#define alternation_prefix_dump()                                                    \
+	do {                                                                             \
+		if (alternation_prefix_len > 0) {                                            \
+			if (!re_compiler_putn(self, alternation_prefix, alternation_prefix_len)) \
+				goto err_nomem;                                                      \
+			alternation_prefix_wanted = false;                                       \
+		}                                                                            \
+	}	__WHILE0
+#else /* ALTERNATION_PREFIX_MAXLEN > 0 */
+#define alternation_prefix_hasspace(num_bytes) 0
+#define alternation_prefix_dump() (void)0
+#endif /* ALTERNATION_PREFIX_MAXLEN <= 0 */
+
+
+	/* Check if we want to produce alternation prefixes. */
+#if ALTERNATION_PREFIX_MAXLEN > 0
+	assert(self->rec_cpos >= ((struct re_code *)self->rec_cbase)->rc_code);
+	alternation_prefix_wanted = self->rec_cpos <= ((struct re_code *)self->rec_cbase)->rc_code;
+	alternation_prefix_len    = 0;
+#endif /* ALTERNATION_PREFIX_MAXLEN > 0 */
 again:
 	self->rec_estart = self->rec_cpos; /* Start of new (sub-)expression */
 
@@ -979,7 +1024,6 @@ again:
 		uint8_t gid;
 		byte_t *body;
 		uintptr_t old_syntax;
-		int alternation_insert_gid;
 
 		if unlikely(self->rec_ngrp >= 0x100)
 			return RE_ESIZE; /* Too many groups */
@@ -1013,15 +1057,21 @@ again:
 		 * NOTE: Only do this if the base-expression starts with
 		 *       a  group that contains  at least 1 alternation! */
 		expr_start_offset = (size_t)(self->rec_estart - self->rec_cbase);
-		assert(self->rec_cpos >= ((struct re_code *)self->rec_cbase)->rc_code);
-		if (self->rec_cpos <= ((struct re_code *)self->rec_cbase)->rc_code) {
-			/* Instruct `re_compiler_compile_alternation()' to
-			 * generate the REOP_GROUP_START  opcodes for  us,
-			 * alongside each alternation it comes across. */
-			alternation_insert_gid = gid;
-		} else {
+#if ALTERNATION_PREFIX_MAXLEN > 0
+		if (alternation_prefix_wanted) {
+			if (!alternation_prefix_hasspace(2)) {
+				alternation_prefix_dump();
+				goto do_group_start_without_alternation;
+			}
+			alternation_prefix_putc(REOP_GROUP_START);
+			alternation_prefix_putc(gid);
+		} else
+#endif /* ALTERNATION_PREFIX_MAXLEN > 0 */
+		{
 			/* Generate the introductory `REOP_GROUP_START' instruction */
-			alternation_insert_gid = -1;
+#if ALTERNATION_PREFIX_MAXLEN > 0
+do_group_start_without_alternation:
+#endif /* ALTERNATION_PREFIX_MAXLEN > 0 */
 			if (!re_compiler_putc(self, REOP_GROUP_START))
 				goto err_nomem;
 			if (!re_compiler_putc(self, gid))
@@ -1030,7 +1080,7 @@ again:
 
 		/* Compile the actual contents of the group. */
 		group_start_offset = (size_t)(self->rec_cpos - self->rec_cbase);
-		error = re_compiler_compile_alternation(self, alternation_insert_gid);
+		error = re_compiler_compile_alternation(self, alternation_prefix, alternation_prefix_len);
 		if unlikely(error != RE_NOERROR)
 			return error;
 
@@ -1070,9 +1120,11 @@ again:
 		}
 		if (group_matches_epsilon)
 			return RE_COMPILER_COMPILE_PREFIX__AFTER_EPSILON_GROUP;
+		return RE_NOERROR;
 	}	break;
 
 	case RE_TOKEN_STARTSET:
+		alternation_prefix_dump();
 		/* TODO: set match */
 		return RE_BADPAT;
 
@@ -1083,6 +1135,7 @@ again:
 	case RE_TOKEN_BK_d:
 	case RE_TOKEN_BK_D:
 	case RE_TOKEN_BK_n:
+		alternation_prefix_dump();
 		/* TODO: special set matches */
 		return RE_BADPAT;
 
@@ -1113,6 +1166,7 @@ again:
 			break;
 		default: __builtin_unreachable();
 		}
+		alternation_prefix_dump();
 		if (!re_compiler_putc(self, opcode))
 			goto err_nomem;
 	}	break;
@@ -1132,6 +1186,20 @@ again:
 		};
 		uint8_t opcode = at_opcodes[tok - RE_TOKEN_AT_MIN]
 		                           [(self->rec_parser.rep_syntax & RE_SYNTAX_NO_UTF8) ? 0 : 1];
+
+		/* `REOP_AT_*' qualify for being written as alternation prefixes! */
+#if ALTERNATION_PREFIX_MAXLEN > 0
+		if (alternation_prefix_wanted) {
+			if (alternation_prefix_hasspace(1)) {
+				alternation_prefix_putc(opcode);
+				/* Parse another prefix expression since location assertions don't count as prefixes! */
+				goto again;
+			} else {
+				alternation_prefix_dump();
+			}
+		}
+#endif /* ALTERNATION_PREFIX_MAXLEN > 0 */
+
 		if (!re_compiler_putc(self, opcode))
 			goto err_nomem;
 		/* Parse another prefix expression since location assertions don't count as prefixes! */
@@ -1145,6 +1213,7 @@ again:
 		ginfo = self->rec_grpinfo[gid];
 		if (!(ginfo & RE_COMPILER_GRPINFO_DEFINED))
 			return RE_ESUBREG;
+		alternation_prefix_dump();
 		if (!re_compiler_putc(self, REOP_GROUP_MATCH))
 			goto err_nomem;
 		if (!re_compiler_putc(self, gid))
@@ -1154,9 +1223,9 @@ again:
 	}	break;
 
 	default:
-		if (!RE_TOKEN_ISLITERAL(tok))
+		if (!RE_TOKEN_ISLITERAL(tok)) {
 			return RE_BADPAT;
-		{
+		} else {
 			bool literal_seq_hasesc;
 			bool literal_seq_isutf8;
 #ifndef __OPTIMIZE_SIZE__
@@ -1210,6 +1279,7 @@ do_literal:
 				literal_seq_isutf8 = false; /* They're always just bytes! */
 
 			/* Encode the literal sequence */
+			alternation_prefix_dump();
 			error = re_compiler_compile_literal_seq(self,
 			                                    literal_seq_start,
 			                                    literal_seq_end,
@@ -1726,10 +1796,20 @@ NOTHROW_NCX(CC re_compiler_thread_fwd_jump)(byte_t *__restrict p_jmp_instruction
 }
 
 
-/* Compile a sequence of prefix/suffix expressions, as well as '|' */
+/* Compile a sequence of prefix/suffix expressions, as well as '|'
+ * @param: alternation_prefix: A code-blob that is inserted before
+ *                             the  body  of  every   alternation.
+ * @param: alternation_prefix_size: *ditto* */
+#if ALTERNATION_PREFIX_MAXLEN > 0
 PRIVATE WUNUSED NONNULL((1)) re_errno_t
 NOTHROW_NCX(CC re_compiler_compile_alternation)(struct re_compiler *__restrict self,
-                                                int insert_REOP_GROUP_START_gid) {
+                                                void const *alternation_prefix,
+                                                size_t alternation_prefix_size)
+#else /* ALTERNATION_PREFIX_MAXLEN > 0 */
+PRIVATE WUNUSED NONNULL((1)) re_errno_t
+NOTHROW_NCX(CC _re_compiler_compile_alternation)(struct re_compiler *__restrict self)
+#endif /* ALTERNATION_PREFIX_MAXLEN <= 0 */
+{
 	re_errno_t error;
 	size_t initial_alternation_jmpoff;
 	size_t previous_alternation_deltaoff;
@@ -1742,13 +1822,15 @@ NOTHROW_NCX(CC re_compiler_compile_alternation)(struct re_compiler *__restrict s
 again:
 	current_alternation_startoff = (size_t)(self->rec_cpos - self->rec_cbase);
 
-	/* Compile expression sequences. */
-	if (insert_REOP_GROUP_START_gid >= 0) {
-		if (!re_compiler_putc(self, REOP_GROUP_START))
-			goto err_nomem;
-		if (!re_compiler_putc(self, (byte_t)insert_REOP_GROUP_START_gid))
+	/* Insert the alternation prefix (if one was given) */
+#if ALTERNATION_PREFIX_MAXLEN > 0
+	if (alternation_prefix_size > 0) {
+		if (!re_compiler_putn(self, alternation_prefix, alternation_prefix_size))
 			goto err_nomem;
 	}
+#endif /* ALTERNATION_PREFIX_MAXLEN > 0 */
+
+	/* Compile expression sequences. */
 	for (;;) {
 		char const *old_tokptr;
 		old_tokptr = self->rec_parser.rep_pos;
@@ -1907,7 +1989,7 @@ NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self) {
 	self->rec_cpos += offsetof(struct re_code, rc_code);
 
 	/* Do the actual compilation */
-	error = re_compiler_compile_alternation(self, -1);
+	error = re_compiler_compile_alternation(self, NULL, 0);
 	if unlikely(error != RE_NOERROR)
 		goto err;
 
