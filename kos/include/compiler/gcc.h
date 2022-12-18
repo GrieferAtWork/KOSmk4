@@ -261,7 +261,9 @@
 
 #ifndef __cplusplus
 /* XXX: When was this added in C? */
+#ifndef __INTELLISENSE__
 #define __COMPILER_HAVE_AUTOTYPE
+#endif /* !__INTELLISENSE__ */
 #elif __has_feature(cxx_auto_type) || (defined(__cplusplus) && __GCC_VERSION_NUM >= 40400)
 #define __auto_type auto
 #define __COMPILER_HAVE_AUTOTYPE
@@ -280,7 +282,8 @@
 #define __STATIC_ASSERT_MSG static_assert
 #elif (defined(_Static_assert) || __has_feature(c_static_assert) ||                                   \
        (!defined(__cplusplus) && ((defined(__STDC_VERSION__) && (__STDC_VERSION__ + 0) >= 201112L) || \
-                                  (__GCC_VERSION_NUM >= 40600 && !defined(__STRICT_ANSI__)))))
+                                  (__GCC_VERSION_NUM >= 40600 && !defined(__STRICT_ANSI__) &&         \
+                                   !defined(__INTELLISENSE__)))))
 #define __STATIC_ASSERT_IS__Static_assert
 #define __STATIC_ASSERT(expr) _Static_assert(expr, #expr)
 #define __STATIC_ASSERT_MSG   _Static_assert
@@ -1001,8 +1004,13 @@ template<class __T1, class __T2> struct __gcc_types_compatible:
 #if defined(__OPTIMIZE__) && __has_attribute(__access__)/* && (__GCC_VERSION_NUM <= FIXED_IN_VERSION)*/
 #define __COMPILER_HAVE_BUG_GCC_105689
 #define __COMPILER_WORKAROUND_GCC_105689(ptr)  __asm__("" : : "X" (ptr))
+#ifdef __COMPILER_HAVE_AUTOTYPE
 #define __COMPILER_WORKAROUND_GCC_105689_MAC(self, ...) \
 	({ __auto_type __cw_105689_self = (self); __COMPILER_WORKAROUND_GCC_105689(__cw_105689_self); __VA_ARGS__; })
+#else /* __COMPILER_HAVE_AUTOTYPE */
+#define __COMPILER_WORKAROUND_GCC_105689_MAC(self, ...) \
+	({ __typeof__(self) __cw_105689_self = (self); __COMPILER_WORKAROUND_GCC_105689(__cw_105689_self); __VA_ARGS__; })
+#endif /* !__COMPILER_HAVE_AUTOTYPE */
 #endif /* ... */
 
 /************************************************************************/

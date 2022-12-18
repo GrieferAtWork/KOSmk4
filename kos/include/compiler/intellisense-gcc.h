@@ -47,10 +47,12 @@
 #define __GNUG__                           12
 #define __GNUC_MINOR__                     1
 #define __GNUC_PATCHLEVEL__                0
+#ifdef __cplusplus
 #define __GXX_ABI_VERSION                  1013
 #define __GXX_EXPERIMENTAL_CXX0X__         1
 #define __GXX_RTTI                         1
 #define __GXX_WEAK__                       1
+#endif /* __cplusplus */
 #define __DEPRECATED                       1
 #define __VERSION__                        "12.1.0"
 #define __STDC_UTF_16__                    1
@@ -176,6 +178,7 @@ static_assert(sizeof(wchar_t) == __SIZEOF_WCHAR_T__, "WTF Intellisense?");
 #endif /* __cplusplus == 201402L */
 
 
+#ifdef __cplusplus
 namespace __intern {
 
 /* Intellisense doesn't emulate `__int128' properly  (or rather: at all; it  only
@@ -620,6 +623,9 @@ template<class __VT> typename ____INTELLISENSE_enableif<____INTELLISENSE_issigne
 #endif
 
 } /* namespace __intern */
+#else /* __cplusplus */
+#define __LONGDOUBLE long double
+#endif /* !__cplusplus */
 
 
 /* Intellisense forgets about a whole bunch of builtin functions defined by GCC: */
@@ -729,9 +735,15 @@ int __builtin_iswupper(/*__WINT_TYPE__*/ unsigned int);
 int __builtin_iswxdigit(/*__WINT_TYPE__*/ unsigned int);
 int __builtin_towlower(/*__WINT_TYPE__*/ unsigned int);
 int __builtin_towupper(/*__WINT_TYPE__*/ unsigned int);
+#ifdef __cplusplus
 void *__builtin_aggregate_incoming_address(...);
 void *__builtin_apply(void (*)(...), void *, __INTELLISENSE_SIZE_TYPE__);
 void *__builtin_apply_args(...);
+#else /* __cplusplus */
+void *__builtin_aggregate_incoming_address();
+void *__builtin_apply(void (*)(), void *, __INTELLISENSE_SIZE_TYPE__);
+void *__builtin_apply_args();
+#endif /* !__cplusplus */
 void *__builtin_calloc(__INTELLISENSE_SIZE_TYPE__, __INTELLISENSE_SIZE_TYPE__);
 int __builtin_clzimax(/*__UINTMAX_TYPE__*/ unsigned long long);
 int __builtin_ctzimax(/*__UINTMAX_TYPE__*/ unsigned long long);
@@ -756,11 +768,19 @@ int __builtin_isinfl(__LONGDOUBLE);
 int __builtin_isnanf(float);
 int __builtin_isnanl(__LONGDOUBLE);
 void *__builtin_malloc(__INTELLISENSE_SIZE_TYPE__);
+#ifdef __cplusplus
 template<class __T> void *__builtin_next_arg(__T const &);
+#else /* __cplusplus */
+#define __builtin_next_arg(T) ((void *)0)
+#endif /* !__cplusplus */
 int __builtin_parityimax(/*__UINTMAX_TYPE__*/ unsigned long long);
 int __builtin_popcountimax(/*__UINTMAX_TYPE__*/ unsigned long long);
 void __builtin_return(void *);
+#ifdef __cplusplus
 void *__builtin_saveregs(...);
+#else /* __cplusplus */
+void *__builtin_saveregs();
+#endif /* !__cplusplus */
 long int __builtin_strfmon(char *, __INTELLISENSE_SIZE_TYPE__, char const *, ...);
 __INTELLISENSE_SIZE_TYPE__ __builtin_strftime(char *, __INTELLISENSE_SIZE_TYPE__, char const *, void const *);
 void __builtin_update_setjmp_buf(void *);
@@ -835,12 +855,21 @@ __INTELLISENSE_SIZE_TYPE__ __builtin_strnlen(char const *, __INTELLISENSE_SIZE_T
 long __builtin_expect_with_probability(long __exp, long __c, double __probability);
 int __builtin_strcmp_eq(void const *, void const *, __INTELLISENSE_SIZE_TYPE__); /* Yes, that's the prototype... */
 int __builtin_strncmp_eq(void const *, void const *, __INTELLISENSE_SIZE_TYPE__);
+#ifdef __cplusplus
 template<class __T> __T __builtin_speculation_safe_value(__T __val, __T __failval = 0);
 void *__builtin_speculation_safe_value_ptr(void *, void * = nullptr);
 /*__UINT8_TYPE__*/ unsigned char __builtin_speculation_safe_value_1(/*__UINT8_TYPE__*/ unsigned char, /*__UINT8_TYPE__*/ unsigned char = 0);
 /*__UINT16_TYPE__*/ unsigned short __builtin_speculation_safe_value_2(/*__UINT16_TYPE__*/ unsigned short, /*__UINT16_TYPE__*/ unsigned short = 0);
 /*__UINT32_TYPE__*/ unsigned int __builtin_speculation_safe_value_4(/*__UINT32_TYPE__*/ unsigned int, /*__UINT32_TYPE__*/ unsigned int = 0);
 /*__UINT64_TYPE__*/ unsigned long long __builtin_speculation_safe_value_8(/*__UINT64_TYPE__*/ unsigned long long, /*__UINT64_TYPE__*/ unsigned long long = 0);
+#else /* __cplusplus */
+#define __builtin_speculation_safe_value(val, ...)     val
+#define __builtin_speculation_safe_value_ptr(val, ...) val
+#define __builtin_speculation_safe_value_1(val, ...)   val
+#define __builtin_speculation_safe_value_2(val, ...)   val
+#define __builtin_speculation_safe_value_4(val, ...)   val
+#define __builtin_speculation_safe_value_8(val, ...)   val
+#endif /* !__cplusplus */
 void __cyg_profile_func_enter(void *, void *);
 void __cyg_profile_func_exit(void *, void *);
 #ifdef __SIZEOF_INT128__

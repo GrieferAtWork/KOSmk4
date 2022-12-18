@@ -24,12 +24,10 @@
 #error "This header is only meant for syntax highlighting. - Don't let your real compiler see it!"
 #endif /* !__INTELLISENSE__ */
 
-#ifndef __cplusplus
-#error "Syntax highlighting depends on C++ features being available"
-#endif /* !__cplusplus */
+#ifdef __cplusplus
+extern "C++" {
 
 #undef __event
-
 namespace __intern {
 
 template<class __UID, bool __ALLOW_INT_OPS, class __T>
@@ -449,14 +447,18 @@ unsigned long long __intellisense_beswap64(unsigned long long);
 #endif /* __BYTE_ORDER__ != /*__ORDER_LITTLE_ENDIAN__*/ 1234 */
 
 }
+#endif /* __cplusplus */
 
 #ifndef __INTELLISENSE_GCC__
 unsigned short __builtin_bswap16(unsigned short);
 unsigned int __builtin_bswap32(unsigned int);
+#ifdef __cplusplus
 unsigned long __builtin_bswap32(unsigned long);
+#endif /* __cplusplus */
 unsigned long long __builtin_bswap64(unsigned long long);
 #endif /* !__INTELLISENSE_GCC__ */
 
+#ifdef __cplusplus
 template<class __UID, bool __ALLOW_INT_OPS, class __T, class __S> typename __intern::____INTELLISENSE_promote<__S>::__type operator + (__S,__intern::____intellisense_altint<__UID, __ALLOW_INT_OPS, __T>);
 template<class __UID, bool __ALLOW_INT_OPS, class __T, class __S> typename __intern::____INTELLISENSE_promote<__S>::__type operator - (__S,__intern::____intellisense_altint<__UID, __ALLOW_INT_OPS, __T>);
 template<class __UID, bool __ALLOW_INT_OPS, class __T, class __S> typename __intern::____INTELLISENSE_promote<__S>::__type operator * (__S,__intern::____intellisense_altint<__UID, __ALLOW_INT_OPS, __T>);
@@ -465,8 +467,6 @@ template<class __UID, bool __ALLOW_INT_OPS, class __T, class __S> typename __int
 template<class __UID, bool __ALLOW_INT_OPS, class __T, class __S> typename __intern::____INTELLISENSE_promote<__S>::__type operator & (__S,__intern::____intellisense_altint<__UID, __ALLOW_INT_OPS, __T>);
 template<class __UID, bool __ALLOW_INT_OPS, class __T, class __S> typename __intern::____INTELLISENSE_promote<__S>::__type operator | (__S,__intern::____intellisense_altint<__UID, __ALLOW_INT_OPS, __T>);
 template<class __UID, bool __ALLOW_INT_OPS, class __T, class __S> typename __intern::____INTELLISENSE_promote<__S>::__type operator ^ (__S,__intern::____intellisense_altint<__UID, __ALLOW_INT_OPS, __T>);
-
-
 
 template<class __TA, class __TB, class __TR>
 typename __intern::____INTELLISENSE_enableif<
@@ -510,26 +510,35 @@ typename __intern::____INTELLISENSE_enableif<
 	__intern::____INTELLISENSE_isarith<__TB>::__value &&
 	__intern::____INTELLISENSE_isarith<__TR>::__value,
 bool>::__type __builtin_mul_overflow_p(__TA __lhs, __TB __rhs, __TR __res_type);
+#define ____INTELLISENSE_BOOL bool
+#else /* __cplusplus */
+#define ____INTELLISENSE_BOOL _Bool
+#define __builtin_add_overflow(lhs, rhs, res)        (*(res) = (lhs) + (rhs), 0)
+#define __builtin_sub_overflow(lhs, rhs, res)        (*(res) = (lhs) - (rhs), 0)
+#define __builtin_mul_overflow(lhs, rhs, res)        (*(res) = (lhs) * (rhs), 0)
+#define __builtin_add_overflow_p(lhs, rhs, res_type) ((lhs) + (rhs), 0)
+#define __builtin_sub_overflow_p(lhs, rhs, res_type) ((lhs) - (rhs), 0)
+#define __builtin_mul_overflow_p(lhs, rhs, res_type) ((lhs) * (rhs), 0)
+#endif /* !__cplusplus */
 
-
-bool __builtin_sadd_overflow(int __a, int __b, int *__res);
-bool __builtin_saddl_overflow(long __a, long __b, long *__res);
-bool __builtin_saddll_overflow(long long __a, long long __b, long long *__res);
-bool __builtin_uadd_overflow(unsigned int __a, unsigned int __b, unsigned int *__res);
-bool __builtin_uaddl_overflow(unsigned long __a, unsigned long __b, unsigned long *__res);
-bool __builtin_uaddll_overflow(unsigned long long __a, unsigned long long __b, unsigned long long *__res);
-bool __builtin_ssub_overflow(int __a, int __b, int *__res);
-bool __builtin_ssubl_overflow(long __a, long __b, long *__res);
-bool __builtin_ssubll_overflow(long long __a, long long __b, long long *__res);
-bool __builtin_usub_overflow(unsigned int __a, unsigned int __b, unsigned int *__res);
-bool __builtin_usubl_overflow(unsigned long __a, unsigned long __b, unsigned long *__res);
-bool __builtin_usubll_overflow(unsigned long long __a, unsigned long long __b, unsigned long long *__res);
-bool __builtin_smul_overflow(int __a, int __b, int *__res);
-bool __builtin_smull_overflow(long __a, long __b, long *__res);
-bool __builtin_smulll_overflow(long long __a, long long __b, long long *__res);
-bool __builtin_umul_overflow(unsigned int __a, unsigned int __b, unsigned int *__res);
-bool __builtin_umull_overflow(unsigned long __a, unsigned long __b, unsigned long *__res);
-bool __builtin_umulll_overflow(unsigned long long __a, unsigned long long __b, unsigned long long *__res);
+____INTELLISENSE_BOOL __builtin_sadd_overflow(int __a, int __b, int *__res);
+____INTELLISENSE_BOOL __builtin_saddl_overflow(long __a, long __b, long *__res);
+____INTELLISENSE_BOOL __builtin_saddll_overflow(long long __a, long long __b, long long *__res);
+____INTELLISENSE_BOOL __builtin_uadd_overflow(unsigned int __a, unsigned int __b, unsigned int *__res);
+____INTELLISENSE_BOOL __builtin_uaddl_overflow(unsigned long __a, unsigned long __b, unsigned long *__res);
+____INTELLISENSE_BOOL __builtin_uaddll_overflow(unsigned long long __a, unsigned long long __b, unsigned long long *__res);
+____INTELLISENSE_BOOL __builtin_ssub_overflow(int __a, int __b, int *__res);
+____INTELLISENSE_BOOL __builtin_ssubl_overflow(long __a, long __b, long *__res);
+____INTELLISENSE_BOOL __builtin_ssubll_overflow(long long __a, long long __b, long long *__res);
+____INTELLISENSE_BOOL __builtin_usub_overflow(unsigned int __a, unsigned int __b, unsigned int *__res);
+____INTELLISENSE_BOOL __builtin_usubl_overflow(unsigned long __a, unsigned long __b, unsigned long *__res);
+____INTELLISENSE_BOOL __builtin_usubll_overflow(unsigned long long __a, unsigned long long __b, unsigned long long *__res);
+____INTELLISENSE_BOOL __builtin_smul_overflow(int __a, int __b, int *__res);
+____INTELLISENSE_BOOL __builtin_smull_overflow(long __a, long __b, long *__res);
+____INTELLISENSE_BOOL __builtin_smulll_overflow(long long __a, long long __b, long long *__res);
+____INTELLISENSE_BOOL __builtin_umul_overflow(unsigned int __a, unsigned int __b, unsigned int *__res);
+____INTELLISENSE_BOOL __builtin_umull_overflow(unsigned long __a, unsigned long __b, unsigned long *__res);
+____INTELLISENSE_BOOL __builtin_umulll_overflow(unsigned long long __a, unsigned long long __b, unsigned long long *__res);
 
 
 /* Fix some broken c++ feature macros */
@@ -538,6 +547,7 @@ bool __builtin_umulll_overflow(unsigned long long __a, unsigned long long __b, u
 #undef __cpp_static_assert
 #define __cpp_static_assert 201411
 #endif
+} /* extern "C++" */
 #endif /* __cplusplus */
 
 
