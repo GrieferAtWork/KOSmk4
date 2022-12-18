@@ -186,6 +186,20 @@ DEFINE_TEST(regex) {
 	EQ(9, re_match("(abc|def){1,3}", "abcabcdefabcX"));
 	EQ(12, re_match("(abc|def){1,}", "abcabcdefabcX"));
 	EQ(12, re_match("(abc|def){1,4}", "abcabcdefabcX"));
+
+	/* Make sure that code variables work correctly. */
+	EQ(5, re_match("(a|b){4}a", "aaaaaaaa"));
+	EQ(5, re_match("(a|b){4}a", "babaaaaa"));
+	EQ(5, re_match("(a|b){4}a", "ababaaaa"));
+	EQ(5, re_match("(a|b){4}a", "bbbbaaaa"));
+	EQ(5, re_match("(b|a){4}a", "aaaaaaaa"));
+	EQ(5, re_match("(b|a){4}a", "babaaaaa"));
+	EQ(5, re_match("(b|a){4}a", "ababaaaa"));
+	EQ(5, re_match("(b|a){4}a", "bbbbaaaa"));
+	EQ(-RE_NOMATCH, re_match("(a|b){4}a", "aaaaX"));
+	EQ(-RE_NOMATCH, re_match("(a|b){4}a", "babaX"));
+	EQ(-RE_NOMATCH, re_match("(a|b){4}a", "ababX"));
+	EQ(-RE_NOMATCH, re_match("(a|b){4}a", "bbbbX"));
 	/* TODO: More tests */
 
 	/* Cleanup */

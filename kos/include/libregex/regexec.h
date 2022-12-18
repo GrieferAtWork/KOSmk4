@@ -38,7 +38,8 @@ struct re_exec {
 	struct re_code const *rx_code;     /* [1..1] Regex code */
 	struct iovec const   *rx_iov;      /* [0..*] I/O vector of input data to scan */
 	__size_t              rx_startoff; /* Starting byte offset into `rx_iov' of data to match. */
-	__size_t              rx_endoff;   /* Ending byte offset into `rx_iov' of data to match. */
+	__size_t              rx_endoff;   /* Ending byte offset into `rx_iov' of data to match. (when `<= rx_startoff && rx_extra == 0',
+	                                    * input data is epsilon,  and `rx_iov' will  never be dereferenced;  iow: can be  undefined). */
 	__size_t              rx_extra;    /* Number of extra bytes that can still be read after `rx_endoff'
 	                                    * Usually `0', but when  non-zero, `REOP_AT_*' opcodes will  try
 	                                    * to read this extra memory in order to check matches. */

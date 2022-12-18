@@ -155,6 +155,12 @@ typedef int re_errno_t;
  *     >>                REOP_JMP_AND_RETURN_ONFAIL 1b
  *     >>             2:
  *
+ *     >> "X{0,m}"       REOP_JMP_ONFAIL 2f
+ *     >>                REOP_SETVAR  {VAR = (m - 1)}
+ *     >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
+ *     >>                REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b
+ *     >>            2:
+ *
  *     >> "X{1,m}"       REOP_SETVAR  {VAR = (m - 1)}
  *     >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
  *     >>                REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b
@@ -419,7 +425,7 @@ enum {
 	REOP_DEC_JMP,               /* [+3] VAR = VARS[*PC++]; if VAR != 0, do `--VAR', followed by `REOP_JMP'; else, do nothing (and leave `VAR' unchanged) */
 	REOP_DEC_JMP_AND_RETURN_ONFAIL, /* [+3] VAR = VARS[*PC++]; if VAR != 0, do `--VAR', followed by `REOP_JMP_AND_RETURN_ONFAIL'; else, do nothing (and leave `VAR' and the "on-failure stack" unchanged) */
 	REOP_SETVAR,                /* [+2] VAR = VARS[*PC++]; VAR = *PC++; */
-	REOP_NOP,                   /* [+0] No-op (for padding to get alignment right) */
+	REOP_NOP,                   /* [+0] No-op */
 	REOP_MATCHED,               /* [+0] Text has been matched (end of instruction stream)
 	                             * If  the "on-failure stack" is  non-empty (and the  current match isn't perfect),
 	                             * the current match is saved as a candidate, and the "on-failure stack" is popped.

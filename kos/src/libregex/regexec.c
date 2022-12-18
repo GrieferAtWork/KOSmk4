@@ -29,6 +29,7 @@
 
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
+#include <hybrid/unaligned.h>
 
 #include <bits/os/iovec.h>
 
@@ -540,13 +541,16 @@ NOTHROW_NCX(CC re_interpreter_init)(struct re_interpreter *__restrict self,
 	size_t chunkoff         = 0;
 	if unlikely(startoff >= endoff) {
 		static struct iovec const empty_iov = { NULL, 0 };
-		/* Special case: input buffer is empty. */
+		/* Special case: input buffer is epsilon. */
+		startoff = 0;
+		endoff   = 0;
+		if (exec->rx_extra != 0)
+			goto load_normal_iov;
 		iov              = &empty_iov;
-		startoff         = 0;
-		endoff           = 0;
 		self->ri_in_biov = iov;
 	} else {
 		/* Seek ahead until the first relevant chunk */
+load_normal_iov:
 		self->ri_in_biov = iov;
 		while (startoff >= iov->iov_len) {
 			chunkoff += iov->iov_len;
@@ -753,7 +757,7 @@ NOTHROW_NCX(CC libre_interp_exec)(struct re_interpreter *__restrict self) {
 #endif /* !HAVE_TRACE */
 #define PUSHFAIL(pc)   do { if unlikely(!re_interpreter_pushfail(self, pc)) goto err_nomem; } __WHILE0
 #define getb()         (*pc++)
-#define getw()         (*(int16_t const *)((pc += 2) - 2))
+#define getw()         (pc += 2, (int16_t)UNALIGNED_GET16((uint16_t const *)(pc - 2)))
 
 	/* The main dispatch loop */
 dispatch:

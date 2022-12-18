@@ -52,8 +52,7 @@
 #endif /* !NDEBUG */
 
 /* Regex compile-time configuration */
-#define RE_COMP_MAXSIZE     0x10000 /* 2^16 (hard limit on how large regex code blobs may get) */
-#define RE_COMP_ALIGN_INT16 1       /* If non-zero, compiler should align int16 operands */
+#define RE_COMP_MAXSIZE 0x10000 /* 2^16 (hard limit on how large regex code blobs may get) */
 
 DECL_BEGIN
 
@@ -1251,141 +1250,62 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 	if (interval_max_is_unbounded) {
 		if (interval_min == 0) {
 			byte_t *writer, *label_1, *label_2;
-			bool align_REOP_JMP_ONFAIL;
-			bool align_REOP_JMP_AND_RETURN_ONFAIL;
-			size_t req_bufsize;
 			/* >> "X*"           REOP_JMP_ONFAIL 2f
 			 * >>             1: <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
 			 * >>                REOP_JMP_AND_RETURN_ONFAIL 1b
 			 * >>             2: */
-
-			/* Figure out where we're going to need alignments */
-			writer = self->rec_estart;
-			writer += 1; /* REOP_JMP_ONFAIL ... */
-			align_REOP_JMP_ONFAIL = ((uintptr_t)writer & 1) != 0;
-			if (align_REOP_JMP_ONFAIL)
-				writer += 1;
-			writer += 2;         /* ...             2f */
-			writer += expr_size; /* <X> */
-			writer += 1;         /* REOP_JMP_AND_RETURN_ONFAIL ... */
-			align_REOP_JMP_AND_RETURN_ONFAIL = ((uintptr_t)writer & 1) != 0;
-
-			/* Figure out the total required extra buffer size */
-			req_bufsize = 0 +
-			              (align_REOP_JMP_ONFAIL ? 1 : 0) +
-			              3 + /* REOP_JMP_ONFAIL 2f */
-			              (align_REOP_JMP_AND_RETURN_ONFAIL ? 1 : 0) +
-			              3 + /* REOP_JMP_AND_RETURN_ONFAIL 1b */
-			              0;
-			if unlikely(!re_compiler_require(self, req_bufsize))
+			if unlikely(!re_compiler_require(self, 6))
 				goto err_nomem;
 
 			/* Make space for code we want to insert in the front */
 			writer = self->rec_estart;
-			memmoveup(writer +
-			          (align_REOP_JMP_ONFAIL ? 1 : 0) +
-			          3,
-			          writer,
-			          expr_size);
+			memmoveup(writer + 3, writer, expr_size);
 
 			/* REOP_JMP_ONFAIL 2f */
-			if (align_REOP_JMP_ONFAIL)
-				*writer++ = REOP_NOP;
 			*writer++ = REOP_JMP_ONFAIL;
-			label_2 = writer + 2 + expr_size +
-			          (align_REOP_JMP_AND_RETURN_ONFAIL ? 1 : 0) +
-			          3;
+			label_2 = writer + 2 + expr_size + 3;
 			int16_at(writer) = (int16_t)(label_2 - (writer + 2));
 			writer += 2;
 
 			/* This is where the "1:" is in the pseudo-code */
 			label_1 = writer;
 			writer += expr_size;
-			if (expression_matches_epsilon) {
-				uint8_t epsilong_skip_size = 3;
-				epsilong_skip_size += (align_REOP_JMP_AND_RETURN_ONFAIL ? 1 : 0);
-				re_compiler_set_group_epsilon_jmp(writer - 2, epsilong_skip_size);
-			}
+			if (expression_matches_epsilon)
+				re_compiler_set_group_epsilon_jmp(writer - 2, 3);
 
 			/* REOP_JMP_AND_RETURN_ONFAIL 1b */
-			if (align_REOP_JMP_AND_RETURN_ONFAIL)
-				*writer++ = REOP_NOP;
 			*writer++ = REOP_JMP_AND_RETURN_ONFAIL;
 			int16_at(writer) = (int16_t)(label_1 - (writer + 2));
 			writer += 2;
 			self->rec_cpos = writer;
 			goto done_suffix;
 		} else if (interval_min == 1) {
-			bool align_REOP_JMP_AND_RETURN_ONFAIL;
 			byte_t *writer;
-			size_t req_bufsize;
 			/* >> "X+"        1: <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
 			 * >>                REOP_JMP_AND_RETURN_ONFAIL 1b
 			 * >>             2: */
-
-			/* Figure out where we're going to need alignments */
-			writer = self->rec_cpos;
-			writer += 1; /* REOP_JMP_AND_RETURN_ONFAIL ... */
-			align_REOP_JMP_AND_RETURN_ONFAIL = ((uintptr_t)writer & 1) != 0;
-
-			/* Figure out the total required extra buffer size */
-			req_bufsize = 0 +
-			              (align_REOP_JMP_AND_RETURN_ONFAIL ? 1 : 0) +
-			              3 + /* REOP_JMP_AND_RETURN_ONFAIL 1b */
-			              0;
-			if unlikely(!re_compiler_require(self, req_bufsize))
+			if unlikely(!re_compiler_require(self, 3))
 				goto err_nomem;
 
 			/* REOP_JMP_AND_RETURN_ONFAIL 1b */
 			writer = self->rec_cpos;
-			if (expression_matches_epsilon) {
-				uint8_t epsilong_skip_size = 3;
-				epsilong_skip_size += (align_REOP_JMP_AND_RETURN_ONFAIL ? 1 : 0);
-				re_compiler_set_group_epsilon_jmp(writer - 2, epsilong_skip_size);
-			}
-			if (align_REOP_JMP_AND_RETURN_ONFAIL)
-				*writer++ = REOP_NOP;
+			if (expression_matches_epsilon)
+				re_compiler_set_group_epsilon_jmp(writer - 2, 3);
 			*writer++ = REOP_JMP_AND_RETURN_ONFAIL;
 			int16_at(writer) = (int16_t)(self->rec_estart - (writer + 2));
 			writer += 2;
-
 			self->rec_cpos = writer;
 			goto done_suffix;
 		} else {
 			uint8_t var_id;
 			byte_t *writer, *label_1;
-			bool align_REOP_DEC_JMP;
-			bool align_REOP_JMP_AND_RETURN_ONFAIL;
-			size_t req_bufsize;
 			/* >> "X{n,}"        REOP_SETVAR  {VAR = (n - 1)}
 			 * >>             1: <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
 			 * >>                REOP_DEC_JMP {VAR}, 1b
 			 * >>                REOP_JMP_AND_RETURN_ONFAIL 1b
 			 * >>             2: */
-
-			/* Figure out where we're going to need alignments */
-			writer = self->rec_estart;
-			writer += 3; /* REOP_SETVAR  {VAR = (n - 1)} */
-			writer += expr_size;
-			writer += 2; /* REOP_DEC_JMP {VAR}, ... */
-			align_REOP_DEC_JMP = ((uintptr_t)writer & 1) != 0;
-			if (align_REOP_DEC_JMP)
-				writer += 1;
-			writer += 2; /* ...                 1b */
-			writer += 1; /* REOP_JMP_AND_RETURN_ONFAIL ... */
-			align_REOP_JMP_AND_RETURN_ONFAIL = ((uintptr_t)writer & 1) != 0;
-
-			/* Figure out the total required extra buffer size */
-			req_bufsize = 3 + /* REOP_SETVAR  {VAR = (n - 1)} */
-			              (align_REOP_DEC_JMP ? 1 : 0) +
-			              4 + /* REOP_DEC_JMP {VAR}, 1b */
-			              (align_REOP_JMP_AND_RETURN_ONFAIL ? 1 : 0) +
-			              3 + /* REOP_JMP_AND_RETURN_ONFAIL 1b */
-			              0;
-			if unlikely(!re_compiler_require(self, req_bufsize))
+			if unlikely(!re_compiler_require(self, 10))
 				goto err_nomem;
-
-			/* Allocate variable IDs */
 			if unlikely(!re_compiler_allocvar(self, &var_id))
 				goto err_esize;
 
@@ -1401,24 +1321,16 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			/* This is where the "1:" is in the pseudo-code */
 			label_1 = writer;
 			writer += expr_size;
-			if (expression_matches_epsilon) {
-				uint8_t epsilong_skip_size = 7;
-				epsilong_skip_size += (align_REOP_DEC_JMP ? 1 : 0);
-				epsilong_skip_size += (align_REOP_JMP_AND_RETURN_ONFAIL ? 1 : 0);
-				re_compiler_set_group_epsilon_jmp(writer - 2, epsilong_skip_size);
-			}
+			if (expression_matches_epsilon)
+				re_compiler_set_group_epsilon_jmp(writer - 2, 7);
 
 			/* REOP_DEC_JMP {VAR}, 1b */
-			if (align_REOP_DEC_JMP)
-				*writer++ = REOP_NOP;
 			*writer++ = REOP_DEC_JMP;
 			*writer++ = var_id;
 			int16_at(writer) = (int16_t)(label_1 - (writer + 2));
 			writer += 2;
 
 			/* REOP_JMP_AND_RETURN_ONFAIL 1b */
-			if (align_REOP_JMP_AND_RETURN_ONFAIL)
-				*writer++ = REOP_NOP;
 			*writer++ = REOP_JMP_AND_RETURN_ONFAIL;
 			int16_at(writer) = (int16_t)(label_1 - (writer + 2));
 			writer += 2;
@@ -1459,10 +1371,6 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 	if (interval_min == 1) {
 		uint8_t var_id;
 		byte_t *writer, *label_1;
-#if RE_COMP_ALIGN_INT16
-		bool align_REOP_DEC_JMP_AND_RETURN_ONFAIL;
-#endif /* RE_COMP_ALIGN_INT16 */
-		size_t req_bufsize;
 
 		/* Check for special (and simple) case: always match exactly 1 */
 		if (interval_max == 1)
@@ -1472,27 +1380,8 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		 * >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
 		 * >>                REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b
 		 * >>            2: */
-
-		/* Figure out where we're going to need alignments */
-#if RE_COMP_ALIGN_INT16
-		writer = self->rec_estart;
-		writer += 3; /* REOP_SETVAR  {VAR = (m - 1)} */
-		writer += expr_size;
-		writer += 2; /* REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, ... */
-		align_REOP_DEC_JMP_AND_RETURN_ONFAIL = ((uintptr_t)writer & 1) != 0;
-#endif /* RE_COMP_ALIGN_INT16 */
-
-		/* Figure out the total required extra buffer size */
-		req_bufsize = 3 + /* REOP_SETVAR  {VAR = (m - 1)} */
-#if RE_COMP_ALIGN_INT16
-		              (align_REOP_DEC_JMP_AND_RETURN_ONFAIL ? 1 : 0) +
-#endif /* RE_COMP_ALIGN_INT16 */
-		              4 + /* REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b */
-		              0;
-		if unlikely(!re_compiler_require(self, req_bufsize))
+		if unlikely(!re_compiler_require(self, 7))
 			goto err_nomem;
-
-		/* Allocate variable IDs */
 		if unlikely(!re_compiler_allocvar(self, &var_id))
 			goto err_esize;
 
@@ -1508,19 +1397,10 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		/* This is where the "1:" is in the pseudo-code */
 		label_1 = writer;
 		writer += expr_size;
-		if (expression_matches_epsilon) {
-			uint8_t epsilong_skip_size = 4;
-#if RE_COMP_ALIGN_INT16
-			epsilong_skip_size += (align_REOP_DEC_JMP_AND_RETURN_ONFAIL ? 1 : 0);
-#endif /* RE_COMP_ALIGN_INT16 */
-			re_compiler_set_group_epsilon_jmp(writer - 2, epsilong_skip_size);
-		}
+		if (expression_matches_epsilon)
+			re_compiler_set_group_epsilon_jmp(writer - 2, 4);
 
 		/* REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b */
-#if RE_COMP_ALIGN_INT16
-		if (align_REOP_DEC_JMP_AND_RETURN_ONFAIL)
-			*writer++ = REOP_NOP;
-#endif /* RE_COMP_ALIGN_INT16 */
 		*writer++ = REOP_DEC_JMP_AND_RETURN_ONFAIL;
 		*writer++ = var_id;
 		int16_at(writer) = (int16_t)(label_1 - (writer + 2));
@@ -1530,72 +1410,85 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		goto done_suffix;
 	}
 
-	if (interval_min == 0 && interval_max == 1) {
-		/* >> "X?"           REOP_JMP_ONFAIL 1f
-		 * >>                <X>
-		 * >>             1: */
-		byte_t *writer;
-#if RE_COMP_ALIGN_INT16
-		bool align_REOP_JMP_ONFAIL = ((uintptr_t)(self->rec_estart + 1) & 1) != 0;
-#endif /* RE_COMP_ALIGN_INT16 */
-		size_t req_bufsize;
-		req_bufsize = 3 +
-#if RE_COMP_ALIGN_INT16
-		              (align_REOP_JMP_ONFAIL ? 1 : 0) +
-#endif /* RE_COMP_ALIGN_INT16 */
-		              0;
-		if unlikely(!re_compiler_require(self, req_bufsize))
-			goto err_nomem;
-		memmoveup(self->rec_estart + req_bufsize,
-		          self->rec_estart, expr_size);
-		writer = self->rec_estart;
-#if RE_COMP_ALIGN_INT16
-		if (align_REOP_JMP_ONFAIL)
-			*writer++ = REOP_NOP;
-#endif /* RE_COMP_ALIGN_INT16 */
-		*writer++ = REOP_JMP_ONFAIL;
-		int16_at(writer) = (int16_t)expr_size;
-		self->rec_cpos += req_bufsize;
-		goto done_suffix;
+	if (interval_min == 0) {
+		if (interval_max == 1) {
+			/* >> "X?"           REOP_JMP_ONFAIL 1f
+			 * >>                <X>
+			 * >>             1: */
+			byte_t *writer;
+			if unlikely(!re_compiler_require(self, 3))
+				goto err_nomem;
+			self->rec_cpos = (byte_t *)mempmoveup(self->rec_estart + 3, self->rec_estart, expr_size);
+			writer = self->rec_estart;
+			*writer++ = REOP_JMP_ONFAIL;
+			int16_at(writer) = (int16_t)expr_size;
+			goto done_suffix;
+		} else {
+			uint8_t var_id;
+			byte_t *writer, *label_1, *label_2;
+			/* >> "X{0,m}"       REOP_JMP_ONFAIL 2f
+			 * >>                REOP_SETVAR  {VAR = (m - 1)}
+			 * >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
+			 * >>                REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b
+			 * >>            2: */
+			if unlikely(!re_compiler_require(self, 10))
+				goto err_nomem;
+			if unlikely(!re_compiler_allocvar(self, &var_id))
+				goto err_esize;
+
+			/* Make space for code we want to insert in the front */
+			writer = self->rec_estart;
+			memmoveup(writer + 6, writer, expr_size);
+
+			/* Figure out the location of `label_2' */
+			label_2 = writer;
+			label_2 += 3; /* REOP_JMP_ONFAIL 2f */
+			label_2 += 3; /* REOP_SETVAR  {VAR = (m - 1)} */
+			label_2 += expr_size;
+			label_2 += 4; /* REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b */
+
+			/* REOP_JMP_ONFAIL 2f */
+			*writer++ = REOP_JMP_ONFAIL;
+			int16_at(writer) = (int16_t)(label_2 - (writer + 2));
+			writer += 2;
+
+			/* REOP_SETVAR  {VAR = (m - 1)} */
+			*writer++ = REOP_SETVAR;
+			*writer++ = var_id;
+			*writer++ = interval_max - 1;
+
+			/* This is where the "1:" is in the pseudo-code */
+			label_1 = writer;
+			writer += expr_size;
+			if (expression_matches_epsilon)
+				re_compiler_set_group_epsilon_jmp(writer - 2, 4);
+
+			/* REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b */
+			*writer++ = REOP_DEC_JMP_AND_RETURN_ONFAIL;
+			*writer++ = var_id;
+			int16_at(writer) = (int16_t)(label_1 - (writer + 2));
+			writer += 2;
+
+			self->rec_cpos = writer;
+			goto done_suffix;
+		}
+		__builtin_unreachable();
 	}
 
 	if (interval_min == interval_max) {
+		uint8_t var_id;
+		byte_t *writer, *label_1;
 		/* >> "X{n}"         REOP_SETVAR  {VAR = (n - 1)}
 		 * >>             1: <X>
 		 * >>                REOP_DEC_JMP {VAR}, 1b */
-		uint8_t var_id;
-		byte_t *writer, *label_1;
-#if RE_COMP_ALIGN_INT16
-		bool align_REOP_DEC_JMP;
-#endif /* RE_COMP_ALIGN_INT16 */
-		size_t req_bufsize;
-
-		/* Figure out where we're going to need alignments */
-#if RE_COMP_ALIGN_INT16
-		writer = self->rec_estart;
-		writer += 3;         /* REOP_SETVAR  {VAR = (n - 1)} */
-		writer += expr_size; /* <X> */
-		writer += 2;         /* REOP_DEC_JMP {VAR}, ... */
-		align_REOP_DEC_JMP = ((uintptr_t)writer & 1) != 0;
-#endif /* RE_COMP_ALIGN_INT16 */
-
-		/* Figure out the total required extra buffer size */
-		req_bufsize = 3 + /* REOP_SETVAR  {VAR = (n - 1)} */
-#if RE_COMP_ALIGN_INT16
-		              (align_REOP_DEC_JMP ? 1 : 0) +
-#endif /* RE_COMP_ALIGN_INT16 */
-		              4 + /* REOP_DEC_JMP {VAR}, 1b */
-		              0;
-		if unlikely(!re_compiler_require(self, req_bufsize))
+		if unlikely(!re_compiler_require(self, 7))
 			goto err_nomem;
-
-		/* Allocate variable IDs */
 		if unlikely(!re_compiler_allocvar(self, &var_id))
 			goto err_esize;
 
 		/* Make space for code we want to insert in the front */
 		writer = self->rec_estart;
-		writer = (byte_t *)memmoveup(writer + 3, writer, expr_size);
+		memmoveup(writer + 3, writer, expr_size);
 
 		/* REOP_SETVAR  {VAR = (n - 1)} */
 		*writer++ = REOP_SETVAR;
@@ -1607,10 +1500,6 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		writer += expr_size;
 
 		/* REOP_DEC_JMP {VAR}, 1b */
-#if RE_COMP_ALIGN_INT16
-		if (align_REOP_DEC_JMP)
-			*writer++ = REOP_NOP;
-#endif /* RE_COMP_ALIGN_INT16 */
 		*writer++ = REOP_DEC_JMP;
 		*writer++ = var_id;
 		int16_at(writer) = (int16_t)(label_1 - (writer + 2));
@@ -1629,40 +1518,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 	{
 		uint8_t var1_id, var2_id;
 		byte_t *writer, *label_1;
-#if RE_COMP_ALIGN_INT16
-		bool align_REOP_DEC_JMP;
-		bool align_REOP_DEC_JMP_AND_RETURN_ONFAIL;
-#endif /* RE_COMP_ALIGN_INT16 */
-		size_t req_bufsize;
-
-		/* Figure out where we're going to need alignments */
-#if RE_COMP_ALIGN_INT16
-		writer = self->rec_estart;
-		writer += 3;         /* REOP_SETVAR  {VAR1 = n - 1} */
-		writer += 3;         /* REOP_SETVAR  {VAR2 = (m - n)} */
-		writer += expr_size; /* <X> */
-		writer += 2;         /* REOP_DEC_JMP {VAR1}, ... */
-		align_REOP_DEC_JMP = ((uintptr_t)writer & 1) != 0;
-		if (align_REOP_DEC_JMP)
-			++writer;
-		writer += 2;         /* ...                  1b */
-		writer += 2;         /* REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR2}, ... */
-		align_REOP_DEC_JMP_AND_RETURN_ONFAIL = ((uintptr_t)writer & 1) != 0;
-#endif /* RE_COMP_ALIGN_INT16 */
-
-		/* Figure out the total required extra buffer size */
-		req_bufsize = 3 + /* REOP_SETVAR  {VAR1 = n - 1} */
-		              3 + /* REOP_SETVAR  {VAR2 = (m - n)} */
-#if RE_COMP_ALIGN_INT16
-		              (align_REOP_DEC_JMP ? 1 : 0) +
-#endif /* RE_COMP_ALIGN_INT16 */
-		              4 + /* REOP_DEC_JMP {VAR1}, 1b */
-#if RE_COMP_ALIGN_INT16
-		              (align_REOP_DEC_JMP_AND_RETURN_ONFAIL ? 1 : 0) +
-#endif /* RE_COMP_ALIGN_INT16 */
-		              4 + /* REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR2}, 1b */
-		              0;
-		if unlikely(!re_compiler_require(self, req_bufsize))
+		if unlikely(!re_compiler_require(self, 14))
 			goto err_nomem;
 
 		/* Allocate variable IDs */
@@ -1688,30 +1544,16 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		/* This is where the "1:" is in the pseudo-code */
 		label_1 = writer;
 		writer += expr_size;
-		if (expression_matches_epsilon) {
-			uint8_t epsilong_skip_size = 8;
-#if RE_COMP_ALIGN_INT16
-			epsilong_skip_size += (align_REOP_DEC_JMP ? 1 : 0);
-			epsilong_skip_size += (align_REOP_DEC_JMP_AND_RETURN_ONFAIL ? 1 : 0);
-#endif /* RE_COMP_ALIGN_INT16 */
-			re_compiler_set_group_epsilon_jmp(writer - 2, epsilong_skip_size);
-		}
+		if (expression_matches_epsilon)
+			re_compiler_set_group_epsilon_jmp(writer - 2, 8);
 
 		/* REOP_DEC_JMP {VAR1}, 1b */
-#if RE_COMP_ALIGN_INT16
-		if (align_REOP_DEC_JMP)
-			*writer++ = REOP_NOP;
-#endif /* RE_COMP_ALIGN_INT16 */
 		*writer++ = REOP_DEC_JMP;
 		*writer++ = var1_id;
 		int16_at(writer) = (int16_t)(label_1 - (writer + 2));
 		writer += 2;
 
 		/* REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR2}, 1b */
-#if RE_COMP_ALIGN_INT16
-		if (align_REOP_DEC_JMP_AND_RETURN_ONFAIL)
-			*writer++ = REOP_NOP;
-#endif /* RE_COMP_ALIGN_INT16 */
 		*writer++ = REOP_DEC_JMP_AND_RETURN_ONFAIL;
 		*writer++ = var2_id;
 		int16_at(writer) = (int16_t)(label_1 - (writer + 2));
@@ -1907,62 +1749,25 @@ again:
 	} else {
 		byte_t *current_alternation_startptr;
 		size_t current_alternation_size;
-#if RE_COMP_ALIGN_INT16
-		bool align_before, align_after;
-		/* Figure out where alignment no-ops need to be inserted. */
-		current_alternation_startptr = self->rec_cbase + current_alternation_startoff;
-		current_alternation_size     = (size_t)(self->rec_cpos - current_alternation_startptr);
-		current_alternation_startptr += 1;
-		align_before = ((uintptr_t)current_alternation_startptr & 1) != 0;
-		if (align_before)
-			current_alternation_startptr += 1;
-		current_alternation_startptr += 2;
-		current_alternation_startptr += current_alternation_size;
-		current_alternation_startptr += 1;
-		align_after = ((uintptr_t)current_alternation_startptr & 1) != 0;
-#endif /* RE_COMP_ALIGN_INT16 */
 
 		/* Ensure that we've got enough memory for `REOP_JMP' and `REOP_JMP_ONFAIL' */
-#if RE_COMP_ALIGN_INT16
-		if unlikely(!re_compiler_require(self, 6 + (align_before ? 1 : 0) + (align_after ? 1 : 0)))
-			goto err_nomem;
-#else /* RE_COMP_ALIGN_INT16 */
 		if unlikely(!re_compiler_require(self, 6))
 			goto err_nomem;
-#endif /* !RE_COMP_ALIGN_INT16 */
 		current_alternation_startptr = self->rec_cbase + current_alternation_startoff;
 		current_alternation_size     = (size_t)(self->rec_cpos - current_alternation_startptr);
-#if RE_COMP_ALIGN_INT16
-		memmoveup(current_alternation_startptr + 3 + (align_before ? 1 : 0),
-		          current_alternation_startptr,
-		          current_alternation_size);
-#else /* RE_COMP_ALIGN_INT16 */
 		memmoveup(current_alternation_startptr + 3,
 		          current_alternation_startptr,
 		          current_alternation_size);
-#endif /* !RE_COMP_ALIGN_INT16 */
-#if RE_COMP_ALIGN_INT16
-		if (align_before)
-			*current_alternation_startptr++ = REOP_NOP;
-#endif /* RE_COMP_ALIGN_INT16 */
 
 		/* Insert the leading `REOP_JMP_ONFAIL' that points to the next alternation */
 		*current_alternation_startptr++ = REOP_JMP_ONFAIL;
-#if RE_COMP_ALIGN_INT16
-		int16_at(current_alternation_startptr) = (int16_t)(current_alternation_size + 3 + (align_after ? 1 : 0));
-#else /* RE_COMP_ALIGN_INT16 */
 		int16_at(current_alternation_startptr) = (int16_t)(current_alternation_size + 3);
-#endif /* !RE_COMP_ALIGN_INT16 */
 		current_alternation_startptr += 2;
 		current_alternation_startptr += current_alternation_size;
 
 		/* Write  the `REOP_JMP' instruction after the alternation
 		 * Note that the offset of this instruction will be filled
 		 * after the next alternation has been compiled. */
-#if RE_COMP_ALIGN_INT16
-		if (align_after)
-			*current_alternation_startptr++ = REOP_NOP;
-#endif /* RE_COMP_ALIGN_INT16 */
 		if (initial_alternation_jmpoff == (size_t)-1) {
 			/* Remember the first jump location so we can jump-thread-optimize it later! */
 			initial_alternation_jmpoff = (size_t)(current_alternation_startptr - self->rec_cbase);
