@@ -135,7 +135,7 @@ typedef int re_errno_t;
  *     >>                REOP_JMP_AND_RETURN_ONFAIL 1b
  *     >>             2:
  *
- *     >> "X{0}"         REOP_NOP        // Or just no instruction at all
+ *     >> "X{0}"         REOP_NOP   // Or just no instructions at all (but note that group start/end opcodes are retained!)
  *
  *     >> "X{1}"         <X>
  *
@@ -271,10 +271,8 @@ enum {
 	REOP_GROUP_MATCH_J6,       /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 6 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_MATCH_J7,       /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 7 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_MATCH_J8,       /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
-	REOP_GROUP_MATCH_J9,       /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 9 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
-	REOP_GROUP_MATCH_J10,      /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 10 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 #define REOP_GROUP_MATCH_JMIN  REOP_GROUP_MATCH_J3
-#define REOP_GROUP_MATCH_JMAX  REOP_GROUP_MATCH_J10
+#define REOP_GROUP_MATCH_JMAX  REOP_GROUP_MATCH_J8
 #define REOP_GROUP_MATCH_Jn(n) (REOP_GROUP_MATCH_J3 + (n) - 3)
 #define REOP_GROUP_MATCH_Joff(opcode) (3 + (opcode) - REOP_GROUP_MATCH_J3)
 
@@ -300,34 +298,34 @@ enum {
 	/* TODO: Deal with `RE_SYNTAX_HAT_LISTS_NOT_NEWLINE' */
 #define REOP_TRAIT_ASCII_MIN REOP_ASCII_ISCNTRL
 #define REOP_TRAIT_ASCII_ISNOT(x) ((((x) - REOP_ASCII_ISCNTRL_NOT) & 1) == 0)
-	REOP_ASCII_ISCNTRL,         /* [+0] consume trait `iscntrl(ch) == true' */
-	REOP_ASCII_ISCNTRL_NOT,     /* [+0] consume trait `iscntrl(ch) == false' */
-	REOP_ASCII_ISSPACE,         /* [+0] consume trait `isspace(ch) == true' */
-	REOP_ASCII_ISSPACE_NOT,     /* [+0] consume trait `isspace(ch) == false' */
-	REOP_ASCII_ISUPPER,         /* [+0] consume trait `isupper(ch) == true' */
-	REOP_ASCII_ISUPPER_NOT,     /* [+0] consume trait `isupper(ch) == false' */
-	REOP_ASCII_ISLOWER,         /* [+0] consume trait `islower(ch) == true' */
-	REOP_ASCII_ISLOWER_NOT,     /* [+0] consume trait `islower(ch) == false' */
-	REOP_ASCII_ISALPHA,         /* [+0] consume trait `isalpha(ch) == true' */
-	REOP_ASCII_ISALPHA_NOT,     /* [+0] consume trait `isalpha(ch) == false' */
-	REOP_ASCII_ISDIGIT,         /* [+0] consume trait `isdigit(ch) == true' */
-	REOP_ASCII_ISDIGIT_NOT,     /* [+0] consume trait `isdigit(ch) == false' */
-	REOP_ASCII_ISXDIGIT,        /* [+0] consume trait `isxdigit(ch) == true' */
-	REOP_ASCII_ISXDIGIT_NOT,    /* [+0] consume trait `isxdigit(ch) == false' */
-	REOP_ASCII_ISALNUM,         /* [+0] consume trait `isalnum(ch) == true' */
-	REOP_ASCII_ISALNUM_NOT,     /* [+0] consume trait `isalnum(ch) == false' */
-	REOP_ASCII_ISPUNCT,         /* [+0] consume trait `ispunct(ch) == true' */
-	REOP_ASCII_ISPUNCT_NOT,     /* [+0] consume trait `ispunct(ch) == false' */
-	REOP_ASCII_ISGRAPH,         /* [+0] consume trait `isgraph(ch) == true' */
-	REOP_ASCII_ISGRAPH_NOT,     /* [+0] consume trait `isgraph(ch) == false' */
-	REOP_ASCII_ISPRINT,         /* [+0] consume trait `isprint(ch) == true' */
-	REOP_ASCII_ISPRINT_NOT,     /* [+0] consume trait `isprint(ch) == false' */
-	REOP_ASCII_ISBLANK,         /* [+0] consume trait `isblank(ch) == true' */
-	REOP_ASCII_ISBLANK_NOT,     /* [+0] consume trait `isblank(ch) == false' */
-	REOP_ASCII_ISSYMSTRT,       /* [+0] consume trait `issymstrt(ch) == true' */
-	REOP_ASCII_ISSYMSTRT_NOT,   /* [+0] consume trait `issymstrt(ch) == false' */
-	REOP_ASCII_ISSYMCONT,       /* [+0] consume trait `issymcont(ch) == true' */
-	REOP_ASCII_ISSYMCONT_NOT,   /* [+0] consume trait `issymcont(ch) == false' */
+	REOP_ASCII_ISCNTRL,        /* [+0] consume trait `iscntrl(ch) == true' */
+	REOP_ASCII_ISCNTRL_NOT,    /* [+0] consume trait `iscntrl(ch) == false' */
+	REOP_ASCII_ISSPACE,        /* [+0] consume trait `isspace(ch) == true' */
+	REOP_ASCII_ISSPACE_NOT,    /* [+0] consume trait `isspace(ch) == false' */
+	REOP_ASCII_ISUPPER,        /* [+0] consume trait `isupper(ch) == true' */
+	REOP_ASCII_ISUPPER_NOT,    /* [+0] consume trait `isupper(ch) == false' */
+	REOP_ASCII_ISLOWER,        /* [+0] consume trait `islower(ch) == true' */
+	REOP_ASCII_ISLOWER_NOT,    /* [+0] consume trait `islower(ch) == false' */
+	REOP_ASCII_ISALPHA,        /* [+0] consume trait `isalpha(ch) == true' */
+	REOP_ASCII_ISALPHA_NOT,    /* [+0] consume trait `isalpha(ch) == false' */
+	REOP_ASCII_ISDIGIT,        /* [+0] consume trait `isdigit(ch) == true' */
+	REOP_ASCII_ISDIGIT_NOT,    /* [+0] consume trait `isdigit(ch) == false' */
+	REOP_ASCII_ISXDIGIT,       /* [+0] consume trait `isxdigit(ch) == true' */
+	REOP_ASCII_ISXDIGIT_NOT,   /* [+0] consume trait `isxdigit(ch) == false' */
+	REOP_ASCII_ISALNUM,        /* [+0] consume trait `isalnum(ch) == true' */
+	REOP_ASCII_ISALNUM_NOT,    /* [+0] consume trait `isalnum(ch) == false' */
+	REOP_ASCII_ISPUNCT,        /* [+0] consume trait `ispunct(ch) == true' */
+	REOP_ASCII_ISPUNCT_NOT,    /* [+0] consume trait `ispunct(ch) == false' */
+	REOP_ASCII_ISGRAPH,        /* [+0] consume trait `isgraph(ch) == true' */
+	REOP_ASCII_ISGRAPH_NOT,    /* [+0] consume trait `isgraph(ch) == false' */
+	REOP_ASCII_ISPRINT,        /* [+0] consume trait `isprint(ch) == true' */
+	REOP_ASCII_ISPRINT_NOT,    /* [+0] consume trait `isprint(ch) == false' */
+	REOP_ASCII_ISBLANK,        /* [+0] consume trait `isblank(ch) == true' */
+	REOP_ASCII_ISBLANK_NOT,    /* [+0] consume trait `isblank(ch) == false' */
+	REOP_ASCII_ISSYMSTRT,      /* [+0] consume trait `issymstrt(ch) == true' */
+	REOP_ASCII_ISSYMSTRT_NOT,  /* [+0] consume trait `issymstrt(ch) == false' */
+	REOP_ASCII_ISSYMCONT,      /* [+0] consume trait `issymcont(ch) == true' */
+	REOP_ASCII_ISSYMCONT_NOT,  /* [+0] consume trait `issymcont(ch) == false' */
 #define REOP_TRAIT_ASCII_MAX REOP_ASCII_ISSYMCONT_NOT
 
 #define REOP_TRAIT_UTF8_MIN REOP_UTF8_ISCNTRL
@@ -402,7 +400,7 @@ enum {
 	REOP_GROUP_START,           /* [+1] Mark the start of the (N = *PC++)'th group; open "(" (current input pointer is written to `regmatch_t[N].rm_so') */
 	REOP_GROUP_END,             /* [+1] Mark the end of the (N = *PC++)'th group; closing ")" (current input pointer is written to `regmatch_t[N].rm_eo') */
 #define REOP_GROUP_END_JMIN         REOP_GROUP_END_J3
-#define REOP_GROUP_END_JMAX         REOP_GROUP_END_J10
+#define REOP_GROUP_END_JMAX         REOP_GROUP_END_J8
 #define REOP_GROUP_END_Jn(n)        (REOP_GROUP_END_J3 + (n) - 3)
 #define REOP_GROUP_END_Joff(opcode) (3 + (opcode) - REOP_GROUP_END_J3)
 	REOP_GROUP_END_J3,          /* [+1] Same as `REOP_GROUP_END', but skip the next 3 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
@@ -411,8 +409,6 @@ enum {
 	REOP_GROUP_END_J6,          /* [+1] Same as `REOP_GROUP_END', but skip the next 6 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_END_J7,          /* [+1] Same as `REOP_GROUP_END', but skip the next 7 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_END_J8,          /* [+1] Same as `REOP_GROUP_END', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
-	REOP_GROUP_END_J9,          /* [+1] Same as `REOP_GROUP_END', but skip the next 9 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
-	REOP_GROUP_END_J10,         /* [+1] Same as `REOP_GROUP_END', but skip the next 10 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_JMP_ONFAIL,            /* [+2] push onto the "on-failure stack" a 16-bit, signed, relative addr */
 	REOP_JMP,                   /* [+2] 16-bit, signed, relative jump (relative to instruction end) */
 	REOP_JMP_AND_RETURN_ONFAIL, /* [+2] push onto the "on-failure stack" the address of the next instruction before doing `REOP_JMP' */

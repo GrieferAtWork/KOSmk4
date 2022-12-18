@@ -1378,28 +1378,28 @@ err_nomem:
 
 
 #define RE_EPSILON_JMP_ENCODE(baseop, offset) ((baseop) + 1 + (offset) - 3)
+static_assert(REOP_GROUP_MATCH_JMIN == REOP_GROUP_MATCH_J3);
 static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_MATCH, 3) == REOP_GROUP_MATCH_J3);
 static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_MATCH, 4) == REOP_GROUP_MATCH_J4);
 static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_MATCH, 5) == REOP_GROUP_MATCH_J5);
 static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_MATCH, 6) == REOP_GROUP_MATCH_J6);
 static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_MATCH, 7) == REOP_GROUP_MATCH_J7);
 static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_MATCH, 8) == REOP_GROUP_MATCH_J8);
-static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_MATCH, 9) == REOP_GROUP_MATCH_J9);
-static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_MATCH, 10) == REOP_GROUP_MATCH_J10);
+static_assert(REOP_GROUP_MATCH_JMAX == REOP_GROUP_MATCH_J8);
+static_assert(REOP_GROUP_END_JMIN == REOP_GROUP_END_J3);
 static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_END, 3) == REOP_GROUP_END_J3);
 static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_END, 4) == REOP_GROUP_END_J4);
 static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_END, 5) == REOP_GROUP_END_J5);
 static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_END, 6) == REOP_GROUP_END_J6);
 static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_END, 7) == REOP_GROUP_END_J7);
 static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_END, 8) == REOP_GROUP_END_J8);
-static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_END, 9) == REOP_GROUP_END_J9);
-static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_END, 10) == REOP_GROUP_END_J10);
+static_assert(REOP_GROUP_END_JMAX == REOP_GROUP_END_J8);
 
 
 PRIVATE NONNULL((1)) void
 NOTHROW_NCX(CC re_compiler_set_group_epsilon_jmp)(uint8_t *p_group_instruction,
                                                   uint8_t num_bytes_skip_if_empty) {
-	assert(num_bytes_skip_if_empty >= 3 && num_bytes_skip_if_empty <= 10);
+	assert(num_bytes_skip_if_empty >= 3 && num_bytes_skip_if_empty <= 8);
 	assertf(*p_group_instruction == REOP_GROUP_MATCH ||
 	        *p_group_instruction == REOP_GROUP_END,
 	        "*p_group_instruction = %#I8x",
@@ -2051,6 +2051,20 @@ NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self) {
 		finish_opcode = REOP_MATCHED_PERFECT;
 	if (!re_compiler_putc(self, finish_opcode))
 		goto err_nomem;
+
+	/* XXX: On host platforms without unaligned memory access, reflow generated code
+	 *      by inserting `REOP_NOP' opcodes before instructions with unaligned  jump
+	 *      offsets.
+	 *
+	 * What makes this complicated is the fact that doing so can break  jump-offsets,
+	 * meaning that such a mechanism would first have to identify all jumps, the make
+	 * relocations for each of them, then go through and insert padding NOPs,  before
+	 * finally re-applying relocations, thus fixing the jump-offsets it just broken.
+	 *
+	 * Furthermore, I'm not entirely certain if doing this would even be beneficial
+	 * to  performance, as the extra NOPs must be just as slow as the unconditional
+	 * unaligned reads currently done by `getw()' in "./regexec.c".
+	 */
 
 	/* (try to) free unused memory from the code-buffer. */
 	if likely(self->rec_cpos < self->rec_cend) {
