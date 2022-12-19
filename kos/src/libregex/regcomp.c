@@ -1,3 +1,7 @@
+/*[[[magic
+// "sorry, unimplemented: non-trivial designated initializers not supported"  -- UGH!
+options["COMPILE.language"] = "c";
+]]]*/
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +31,11 @@
 /**/
 #include <hybrid/compiler.h>
 
+#include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 
 #include <kos/types.h>
+#include <sys/bitstring.h>
 
 #include <assert.h>
 #include <ctype.h>
@@ -498,7 +504,10 @@ NOTHROW_NCX(CC re_compiler_require)(struct re_compiler *__restrict self,
 		self->rec_cend  = new_base + new_size;
 		if (new_base != old_base) {
 			/* Update pointers for the the block currently being compiled. */
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuse-after-free" /* No: this use of `old_base' after free is OK! */
 			ptrdiff_t delta = new_base - old_base;
+#pragma GCC diagnostic pop
 			self->rec_estart += delta;
 			self->rec_cpos += delta;
 		}
@@ -555,7 +564,7 @@ NOTHROW_NCX(CC libre_opcode_next)(uint8_t const *__restrict p_instr) {
 		count = *p_instr++;
 		assert(count >= 1);
 		do {
-			unicode_readutf8((char **)p_instr);
+			unicode_readutf8((char const **)p_instr);
 		} while (--count);
 	}	break;
 
@@ -567,6 +576,7 @@ NOTHROW_NCX(CC libre_opcode_next)(uint8_t const *__restrict p_instr) {
 	}	break;
 
 	case REOP_CHAR:
+	case REOP_NCHAR:
 	case REOP_GROUP_MATCH:
 	case REOP_GROUP_MATCH_JMIN ... REOP_GROUP_MATCH_JMAX:
 	case REOP_UTF8_ISDIGIT_EQ:
@@ -588,6 +598,9 @@ NOTHROW_NCX(CC libre_opcode_next)(uint8_t const *__restrict p_instr) {
 		break;
 
 	case REOP_CHAR2:
+	case REOP_NCHAR2:
+	case REOP_RANGE:
+	case REOP_NRANGE:
 	case REOP_JMP:
 	case REOP_JMP_ONFAIL:
 	case REOP_JMP_AND_RETURN_ONFAIL:
@@ -1008,10 +1021,275 @@ NOTHROW_NCX(CC _re_compiler_compile_alternation)(struct re_compiler *__restrict 
 #define re_compiler_compile_alternation(self, ...) _re_compiler_compile_alternation(self)
 #endif /* ALTERNATION_PREFIX_MAXLEN <= 0 */
 
+struct charset_def {
+	/* NOTE: Sets with undefined ASCII-set opcodes specify `REOP_NOP' as opcode. */
+	char    csd_name[8];       /* Charset name */
+	uint8_t csd_opcodes[2][2]; /* Charset opcodes:
+	                            * >> {
+	                            * >>     { REOP_ASCII_IS{set}, REOP_ASCII_IS{set}_NOT },
+	                            * >>     { REOP_UTF8_IS{set}, REOP_UTF8_IS{set}_NOT }
+	                            * >> } */
+};
+
+
+PRIVATE struct charset_def const charsets[] = {
+#define DEF_CHARSET(name, ascii_y, ascii_n, utf8_y, utf8_n) \
+	{ name, { { ascii_y, ascii_n }, { utf8_y, utf8_n } } }
+	DEF_CHARSET("cntrl", REOP_ASCII_ISCNTRL, REOP_ASCII_ISCNTRL_NOT, REOP_UTF8_ISCNTRL, REOP_UTF8_ISCNTRL_NOT),
+	DEF_CHARSET("space", REOP_ASCII_ISSPACE, REOP_ASCII_ISSPACE_NOT, REOP_UTF8_ISSPACE, REOP_UTF8_ISSPACE_NOT),
+	DEF_CHARSET("upper", REOP_ASCII_ISUPPER, REOP_ASCII_ISUPPER_NOT, REOP_UTF8_ISUPPER, REOP_UTF8_ISUPPER_NOT),
+	DEF_CHARSET("lower", REOP_ASCII_ISLOWER, REOP_ASCII_ISLOWER_NOT, REOP_UTF8_ISLOWER, REOP_UTF8_ISLOWER_NOT),
+	DEF_CHARSET("alpha", REOP_ASCII_ISALPHA, REOP_ASCII_ISALPHA_NOT, REOP_UTF8_ISALPHA, REOP_UTF8_ISALPHA_NOT),
+	DEF_CHARSET("digit", REOP_ASCII_ISDIGIT, REOP_ASCII_ISDIGIT_NOT, REOP_UTF8_ISDIGIT, REOP_UTF8_ISDIGIT_NOT),
+	DEF_CHARSET("xdigit", REOP_ASCII_ISXDIGIT, REOP_ASCII_ISXDIGIT_NOT, REOP_UTF8_ISXDIGIT, REOP_UTF8_ISXDIGIT_NOT),
+	DEF_CHARSET("alnum", REOP_ASCII_ISALNUM, REOP_ASCII_ISALNUM_NOT, REOP_UTF8_ISALNUM, REOP_UTF8_ISALNUM_NOT),
+	DEF_CHARSET("punct", REOP_ASCII_ISPUNCT, REOP_ASCII_ISPUNCT_NOT, REOP_UTF8_ISPUNCT, REOP_UTF8_ISPUNCT_NOT),
+	DEF_CHARSET("graph", REOP_ASCII_ISGRAPH, REOP_ASCII_ISGRAPH_NOT, REOP_UTF8_ISGRAPH, REOP_UTF8_ISGRAPH_NOT),
+	DEF_CHARSET("print", REOP_ASCII_ISPRINT, REOP_ASCII_ISPRINT_NOT, REOP_UTF8_ISPRINT, REOP_UTF8_ISPRINT_NOT),
+	DEF_CHARSET("blank", REOP_NOP, REOP_NOP, REOP_UTF8_ISBLANK, REOP_UTF8_ISBLANK_NOT),
+	DEF_CHARSET("symstrt", REOP_ASCII_ISSYMSTRT, REOP_ASCII_ISSYMSTRT_NOT, REOP_UTF8_ISSYMSTRT, REOP_UTF8_ISSYMSTRT_NOT),
+	DEF_CHARSET("symcont", REOP_ASCII_ISSYMCONT, REOP_ASCII_ISSYMCONT_NOT, REOP_UTF8_ISSYMCONT, REOP_UTF8_ISSYMCONT_NOT),
+	DEF_CHARSET("tab", REOP_NOP, REOP_NOP, REOP_UTF8_ISTAB, REOP_UTF8_ISTAB_NOT),
+	DEF_CHARSET("white", REOP_NOP, REOP_NOP, REOP_UTF8_ISWHITE, REOP_UTF8_ISWHITE_NOT),
+	DEF_CHARSET("empty", REOP_NOP, REOP_NOP, REOP_UTF8_ISEMPTY, REOP_UTF8_ISEMPTY_NOT),
+	DEF_CHARSET("lf", REOP_NOP, REOP_NOP, REOP_UTF8_ISLF, REOP_UTF8_ISLF_NOT),
+	DEF_CHARSET("hex", REOP_NOP, REOP_NOP, REOP_UTF8_ISHEX, REOP_UTF8_ISHEX_NOT),
+	DEF_CHARSET("title", REOP_ASCII_ISTITLE, REOP_ASCII_ISTITLE_NOT, REOP_UTF8_ISTITLE, REOP_UTF8_ISTITLE_NOT),
+	DEF_CHARSET("numeric", REOP_ASCII_ISNUMERIC, REOP_ASCII_ISNUMERIC_NOT, REOP_UTF8_ISNUMERIC, REOP_UTF8_ISNUMERIC_NOT),
+#undef DEF_CHARSET
+};
+
+/* Find the charset definition, given its `name' */
+PRIVATE WUNUSED struct charset_def const *
+NOTHROW_NCX(CC charset_find)(char const *__restrict name, size_t namelen) {
+	size_t i;
+	if (namelen >= lengthof(charsets[0].csd_name))
+		return NULL;
+	for (i = 0; i < lengthof(charsets); ++i) {
+		struct charset_def const *set = &charsets[i];
+		if (bcmp(set->csd_name, name, namelen) == 0 &&
+		    set->csd_name[namelen] == '\0')
+			return set;
+	}
+	return NULL;
+}
+
+PRIVATE byte_t const ascii_charset_code[] = {
+#define ASCII_CHARSET_CODE_OFFSETOF_ISBLANK 0
+#define ASCII_CHARSET_CODE_SIZEOF_ISBLANK   4
+	REOP_CHAR2, 0x09, 0x20,
+	REOP_MATCHED,
+
+#define ASCII_CHARSET_CODE_OFFSETOF_ISBLANK_NOT \
+	(ASCII_CHARSET_CODE_OFFSETOF_ISBLANK + ASCII_CHARSET_CODE_SIZEOF_ISBLANK)
+#define ASCII_CHARSET_CODE_SIZEOF_ISBLANK_NOT 4
+	REOP_NCHAR2, 0x09, 0x20,
+	REOP_MATCHED,
+
+#define ASCII_CHARSET_CODE_OFFSETOF_ISTAB \
+	(ASCII_CHARSET_CODE_OFFSETOF_ISBLANK_NOT + ASCII_CHARSET_CODE_SIZEOF_ISBLANK_NOT)
+#define ASCII_CHARSET_CODE_SIZEOF_ISTAB 3
+	REOP_CHAR, 0x09,
+	REOP_MATCHED,
+
+#define ASCII_CHARSET_CODE_OFFSETOF_ISTAB_NOT \
+	(ASCII_CHARSET_CODE_OFFSETOF_ISTAB + ASCII_CHARSET_CODE_SIZEOF_ISTAB)
+#define ASCII_CHARSET_CODE_SIZEOF_ISTAB_NOT 3
+	REOP_NCHAR, 0x09,
+	REOP_MATCHED,
+
+#define ASCII_CHARSET_CODE_OFFSETOF_ISWHITE \
+	(ASCII_CHARSET_CODE_OFFSETOF_ISTAB_NOT + ASCII_CHARSET_CODE_SIZEOF_ISTAB_NOT)
+#define ASCII_CHARSET_CODE_SIZEOF_ISWHITE 3
+	REOP_CHAR, 0x20,
+	REOP_MATCHED,
+
+#define ASCII_CHARSET_CODE_OFFSETOF_ISWHITE_NOT \
+	(ASCII_CHARSET_CODE_OFFSETOF_ISWHITE + ASCII_CHARSET_CODE_SIZEOF_ISWHITE)
+#define ASCII_CHARSET_CODE_SIZEOF_ISWHITE_NOT 3
+	REOP_NCHAR, 0x20,
+	REOP_MATCHED,
+
+#define ASCII_CHARSET_CODE_OFFSETOF_ISEMPTY \
+	(ASCII_CHARSET_CODE_OFFSETOF_ISWHITE_NOT + ASCII_CHARSET_CODE_SIZEOF_ISWHITE_NOT)
+#define ASCII_CHARSET_CODE_SIZEOF_ISEMPTY 8
+	REOP_BITSET, REOP_BITSET_LAYOUT_BUILD(0x00, 5),
+	/* 00-07 */ 0x00,
+	/* 08-0f */ 0x00 | (1 << (0x09 - 0x08))
+	/*            */ | (1 << (0x0b - 0x08))
+	/*            */ | (1 << (0x0c - 0x08)),
+	/* 10-17 */ 0x00,
+	/* 18-1f */ 0x00,
+	/* 20-27 */ 0x00 | (1 << (0x20 - 0x20)),
+	REOP_MATCHED,
+
+#define ASCII_CHARSET_CODE_OFFSETOF_ISEMPTY_NOT \
+	(ASCII_CHARSET_CODE_OFFSETOF_ISEMPTY + ASCII_CHARSET_CODE_SIZEOF_ISEMPTY)
+#define ASCII_CHARSET_CODE_SIZEOF_ISEMPTY_NOT 8
+	REOP_BITSET_NOT, REOP_BITSET_LAYOUT_BUILD(0x00, 5),
+	/* 00-07 */ 0x00,
+	/* 08-0f */ 0x00 | (1 << (0x09 - 0x08))
+	/*            */ | (1 << (0x0b - 0x08))
+	/*            */ | (1 << (0x0c - 0x08)),
+	/* 10-17 */ 0x00,
+	/* 18-1f */ 0x00,
+	/* 20-27 */ 0x00 | (1 << (0x20 - 0x20)),
+	REOP_MATCHED,
+
+#define ASCII_CHARSET_CODE_OFFSETOF_ISLF \
+	(ASCII_CHARSET_CODE_OFFSETOF_ISEMPTY_NOT + ASCII_CHARSET_CODE_SIZEOF_ISEMPTY_NOT)
+#define ASCII_CHARSET_CODE_SIZEOF_ISLF 4
+	REOP_CHAR2, 0x0a, 0x0d,
+	REOP_MATCHED,
+
+#define ASCII_CHARSET_CODE_OFFSETOF_ISLF_NOT \
+	(ASCII_CHARSET_CODE_OFFSETOF_ISLF + ASCII_CHARSET_CODE_SIZEOF_ISLF)
+#define ASCII_CHARSET_CODE_SIZEOF_ISLF_NOT 4
+	REOP_NCHAR2, 0x0a, 0x0d,
+	REOP_MATCHED,
+
+#define ASCII_CHARSET_CODE_OFFSETOF_ISHEX \
+	(ASCII_CHARSET_CODE_OFFSETOF_ISLF_NOT + ASCII_CHARSET_CODE_SIZEOF_ISLF_NOT)
+#define ASCII_CHARSET_CODE_SIZEOF_ISHEX 8
+	REOP_BITSET, REOP_BITSET_LAYOUT_BUILD(0x40, 5),
+	/* 40-47 */ 0x00 | (1 << (0x41 - 0x40))  /* A */
+	/*            */ | (1 << (0x42 - 0x40))  /* B */
+	/*            */ | (1 << (0x43 - 0x40))  /* C */
+	/*            */ | (1 << (0x44 - 0x40))  /* D */
+	/*            */ | (1 << (0x45 - 0x40))  /* E */
+	/*            */ | (1 << (0x46 - 0x40)), /* F */
+	/* 48-4f */ 0x00,
+	/* 50-57 */ 0x00,
+	/* 58-5f */ 0x00,
+	/* 60-67 */ 0x00 | (1 << (0x61 - 0x60))  /* a */
+	/*            */ | (1 << (0x62 - 0x60))  /* b */
+	/*            */ | (1 << (0x63 - 0x60))  /* c */
+	/*            */ | (1 << (0x64 - 0x60))  /* d */
+	/*            */ | (1 << (0x65 - 0x60))  /* e */
+	/*            */ | (1 << (0x66 - 0x60)), /* f */
+	REOP_MATCHED,
+
+#define ASCII_CHARSET_CODE_OFFSETOF_ISHEX_NOT \
+	(ASCII_CHARSET_CODE_OFFSETOF_ISHEX + ASCII_CHARSET_CODE_SIZEOF_ISHEX)
+#define ASCII_CHARSET_CODE_SIZEOF_ISHEX_NOT 8
+	REOP_BITSET_NOT, REOP_BITSET_LAYOUT_BUILD(0x40, 5),
+	/* 40-47 */ 0x00 | (1 << (0x41 - 0x40))  /* A */
+	/*            */ | (1 << (0x42 - 0x40))  /* B */
+	/*            */ | (1 << (0x43 - 0x40))  /* C */
+	/*            */ | (1 << (0x44 - 0x40))  /* D */
+	/*            */ | (1 << (0x45 - 0x40))  /* E */
+	/*            */ | (1 << (0x46 - 0x40)), /* F */
+	/* 48-4f */ 0x00,
+	/* 50-57 */ 0x00,
+	/* 58-5f */ 0x00,
+	/* 60-67 */ 0x00 | (1 << (0x61 - 0x60))  /* a */
+	/*            */ | (1 << (0x62 - 0x60))  /* b */
+	/*            */ | (1 << (0x63 - 0x60))  /* c */
+	/*            */ | (1 << (0x64 - 0x60))  /* d */
+	/*            */ | (1 << (0x65 - 0x60))  /* e */
+	/*            */ | (1 << (0x66 - 0x60)), /* f */
+	REOP_MATCHED,
+};
+static_assert(ASCII_CHARSET_CODE_OFFSETOF_ISHEX_NOT <= 0xff);
+
+/* Figure out which of the custom ascii-set opcode has the lowest ID (needed for ascii-charset offset table) */
+enum {
+	_MIN_ASCII_CUSTOM_CHARSET_OPCODE_A = MIN_C(REOP_UTF8_ISBLANK, REOP_UTF8_ISBLANK_NOT),
+	_MIN_ASCII_CUSTOM_CHARSET_OPCODE_B = MIN_C(_MIN_ASCII_CUSTOM_CHARSET_OPCODE_A, REOP_UTF8_ISTAB, REOP_UTF8_ISTAB_NOT),
+	_MIN_ASCII_CUSTOM_CHARSET_OPCODE_C = MIN_C(_MIN_ASCII_CUSTOM_CHARSET_OPCODE_B, REOP_UTF8_ISWHITE, REOP_UTF8_ISWHITE_NOT),
+	_MIN_ASCII_CUSTOM_CHARSET_OPCODE_D = MIN_C(_MIN_ASCII_CUSTOM_CHARSET_OPCODE_C, REOP_UTF8_ISEMPTY, REOP_UTF8_ISEMPTY_NOT),
+	_MIN_ASCII_CUSTOM_CHARSET_OPCODE_E = MIN_C(_MIN_ASCII_CUSTOM_CHARSET_OPCODE_D, REOP_UTF8_ISLF, REOP_UTF8_ISLF_NOT),
+	_MIN_ASCII_CUSTOM_CHARSET_OPCODE_F = MIN_C(_MIN_ASCII_CUSTOM_CHARSET_OPCODE_E, REOP_UTF8_ISHEX, REOP_UTF8_ISHEX_NOT),
+	_MIN_ASCII_CUSTOM_CHARSET_OPCODE = _MIN_ASCII_CUSTOM_CHARSET_OPCODE_F
+};
+PRIVATE byte_t const ascii_charset_code_offsets[] = {
+#define DEF_CHARSET_CODE_OFFSET(opcode, offset) [(opcode - _MIN_ASCII_CUSTOM_CHARSET_OPCODE)] = offset
+	DEF_CHARSET_CODE_OFFSET(REOP_UTF8_ISBLANK, ASCII_CHARSET_CODE_OFFSETOF_ISBLANK),
+	DEF_CHARSET_CODE_OFFSET(REOP_UTF8_ISBLANK_NOT, ASCII_CHARSET_CODE_OFFSETOF_ISBLANK_NOT),
+	DEF_CHARSET_CODE_OFFSET(REOP_UTF8_ISTAB, ASCII_CHARSET_CODE_OFFSETOF_ISTAB),
+	DEF_CHARSET_CODE_OFFSET(REOP_UTF8_ISTAB_NOT, ASCII_CHARSET_CODE_OFFSETOF_ISTAB_NOT),
+	DEF_CHARSET_CODE_OFFSET(REOP_UTF8_ISWHITE, ASCII_CHARSET_CODE_OFFSETOF_ISWHITE),
+	DEF_CHARSET_CODE_OFFSET(REOP_UTF8_ISWHITE_NOT, ASCII_CHARSET_CODE_OFFSETOF_ISWHITE_NOT),
+	DEF_CHARSET_CODE_OFFSET(REOP_UTF8_ISEMPTY, ASCII_CHARSET_CODE_OFFSETOF_ISEMPTY),
+	DEF_CHARSET_CODE_OFFSET(REOP_UTF8_ISEMPTY_NOT, ASCII_CHARSET_CODE_OFFSETOF_ISEMPTY_NOT),
+	DEF_CHARSET_CODE_OFFSET(REOP_UTF8_ISLF, ASCII_CHARSET_CODE_OFFSETOF_ISLF),
+	DEF_CHARSET_CODE_OFFSET(REOP_UTF8_ISLF_NOT, ASCII_CHARSET_CODE_OFFSETOF_ISLF_NOT),
+	DEF_CHARSET_CODE_OFFSET(REOP_UTF8_ISHEX, ASCII_CHARSET_CODE_OFFSETOF_ISHEX),
+	DEF_CHARSET_CODE_OFFSET(REOP_UTF8_ISHEX_NOT, ASCII_CHARSET_CODE_OFFSETOF_ISHEX_NOT),
+#undef DEF_CHARSET_CODE_OFFSET
+};
+
+
+PRIVATE WUNUSED NONNULL((1, 2)) re_errno_t
+NOTHROW_NCX(CC re_compiler_compile_charset)(struct re_compiler *__restrict self,
+                                            struct charset_def const *__restrict charset,
+                                            bool negate) {
+	uint8_t const *ascii_code;
+	size_t ascii_size;
+	uint8_t opcode;
+	opcode = charset->csd_opcodes[(self->rec_parser.rep_syntax & RE_SYNTAX_NO_UTF8) ? 0 : 1]
+	                             [negate ? 1 : 0];
+	if (opcode != REOP_NOP) {
+		/* Simple case: the set has a dedicated opcode! */
+		if (!re_compiler_putc(self, opcode))
+			goto err_nomem;
+		goto charset_done;
+	}
+
+	/* Complicated case: need to encode the set in some other way.
+	 * For this purpose, we:
+	 * #1: Lookup the unicode-opcode in `ascii_charset_code_offsets'
+	 * #2: Use the offset we just got on `ascii_charset_code'
+	 * #3: Copy the code from `ascii_charset_code' into the compiler */
+	assert(self->rec_parser.rep_syntax & RE_SYNTAX_NO_UTF8);
+	opcode = charset->csd_opcodes[1][negate ? 1 : 0];
+	opcode = ascii_charset_code_offsets[opcode - _MIN_ASCII_CUSTOM_CHARSET_OPCODE];
+	ascii_code = ascii_charset_code + opcode;
+	ascii_size = rawmemlen(ascii_code, REOP_MATCHED);
+	if unlikely(!re_compiler_putn(self, ascii_code, ascii_size))
+		goto err_nomem;
+
+charset_done:
+	return RE_NOERROR;
+err_nomem:
+	return RE_ESPACE;
+}
+
 PRIVATE WUNUSED NONNULL((1)) re_errno_t
 NOTHROW_NCX(CC re_compiler_compile_set)(struct re_compiler *__restrict self) {
-	(void)self;
-	/* TODO: set match */
+	bitstr_t bit_decl(bytes, 256);
+	bool negate     = false;
+	char const *pat = self->rec_parser.rep_pos;
+	if (*pat == '^') {
+		negate = true;
+		++pat;
+	}
+	/* Check if this is a character class. */
+	if (*pat == ':' && (self->rec_parser.rep_syntax & RE_SYNTAX_CHAR_CLASSES)) {
+		struct charset_def const *charset;
+		char const *charset_nameend;
+		size_t charset_namelen;
+		++pat; /* Skip leading ':' */
+		charset_nameend = strchr(pat, ':');
+		if unlikely(!charset_nameend)
+			return RE_EEND; /* Unexpected end of pattern. */
+		charset_namelen = (size_t)(charset_nameend - pat);
+		charset         = charset_find(pat, charset_namelen);
+		if unlikely(!charset) {
+			/* TODO: Support for custom digit/numeric classes: '[:digit<7:]' */
+			return RE_ECTYPE;
+		}
+		pat = charset_nameend + 1;
+		if (*pat++ != ']')
+			return RE_BADPAT;
+		self->rec_parser.rep_pos = pat;
+		return re_compiler_compile_charset(self, charset, negate);
+	}
+
+	/* Figure out what bytes are explicitly mentioned by the pattern.
+	 * Unicode   characters   mentioned  are   collected   in  `TODO' */
+	bit_clearall(bytes, 256);
+	/* TODO: parse user-defined character-set */
 	return RE_BADPAT;
 }
 
@@ -1233,21 +1511,14 @@ do_group_start_without_alternation:
 		assert(self->rec_parser.rep_syntax & RE_SYNTAX_NO_UTF8);
 		assert(tok == RE_TOKEN_BK_n || tok == RE_TOKEN_BK_N);
 		if (tok == RE_TOKEN_BK_n) {
-			if (!re_compiler_putc(self, REOP_CHAR2))
-				goto err_nomem;
-			if (!re_compiler_putc(self, 0x0a)) /* LF */
-				goto err_nomem;
-			if (!re_compiler_putc(self, 0x0d)) /* CR */
+			if unlikely(!re_compiler_putn(self,
+			                              ascii_charset_code + ASCII_CHARSET_CODE_OFFSETOF_ISLF,
+			                              ASCII_CHARSET_CODE_SIZEOF_ISLF - 1))
 				goto err_nomem;
 		} else {
-			if (!re_compiler_putc(self, REOP_BITSET_NOT))
-				goto err_nomem;
-			if (!re_compiler_putc(self, REOP_BITSET_LAYOUT_BUILD(0x00, 2)))
-				goto err_nomem;
-			if (!re_compiler_putc(self, 0x00)) /* 00-07 */
-				goto err_nomem;
-			if (!re_compiler_putc(self, (1 << (0x0a - 8)) | /* LF */
-			                            (1 << (0x0d - 8)))) /* CR */
+			if unlikely(!re_compiler_putn(self,
+			                              ascii_charset_code + ASCII_CHARSET_CODE_OFFSETOF_ISLF_NOT,
+			                              ASCII_CHARSET_CODE_SIZEOF_ISLF_NOT - 1))
 				goto err_nomem;
 		}
 		goto done_prefix;
@@ -1401,11 +1672,11 @@ do_literal:
 			/* Encode the literal sequence */
 			alternation_prefix_dump();
 			error = re_compiler_compile_literal_seq(self,
-			                                    literal_seq_start,
-			                                    literal_seq_end,
-			                                    literal_seq_length,
-			                                    literal_seq_hasesc,
-			                                    literal_seq_isutf8);
+			                                        literal_seq_start,
+			                                        literal_seq_end,
+			                                        literal_seq_length,
+			                                        literal_seq_hasesc,
+			                                        literal_seq_isutf8);
 			if unlikely(error != RE_NOERROR)
 				return error;
 #ifndef __OPTIMIZE_SIZE__
@@ -2230,12 +2501,26 @@ NOTHROW_NCX(CC libre_code_disasm)(struct re_code const *__restrict self,
 			printf("exact_ascii_icase %$q", (size_t)(next - code), code);
 		}	break;
 
-		case REOP_CHAR: {
-			printf("char %$q", (size_t)1, code);
+		case REOP_CHAR:
+		case REOP_NCHAR: {
+			printf("%schar %$q",
+			       opcode == REOP_NCHAR ? "n" : "",
+			       (size_t)1, code);
 		}	break;
 
-		case REOP_CHAR2: {
-			printf("char2 %$q", (size_t)2, code);
+		case REOP_CHAR2:
+		case REOP_NCHAR2: {
+			printf("%schar2 %$q",
+			       opcode == REOP_NCHAR2 ? "n" : "",
+			       (size_t)2, code);
+		}	break;
+
+		case REOP_RANGE:
+		case REOP_NRANGE: {
+			printf("%srange '%#$q-%#$q'",
+			       opcode == REOP_NRANGE ? "n" : "",
+			       (size_t)1, code + 0,
+			       (size_t)1, code + 1);
 		}	break;
 
 		case REOP_CONTAINS_UTF8: {
@@ -2284,6 +2569,7 @@ NOTHROW_NCX(CC libre_code_disasm)(struct re_code const *__restrict self,
 					repr[0] = (char)(minch + i);
 					repr[1] = '-';
 					repr[2] = (char)(minch + endi - 1);
+					rangec  = 3;
 				} else {
 					repr[0] = (char)(minch + i + 0);
 					repr[1] = (char)(minch + i + 1);
@@ -2424,8 +2710,6 @@ NOTHROW_NCX(CC libre_code_disasm)(struct re_code const *__restrict self,
 		SIMPLE_OPCODE(REOP_ASCII_ISGRAPH_NOT, "ascii_isgraph_not");
 		SIMPLE_OPCODE(REOP_ASCII_ISPRINT, "ascii_isprint");
 		SIMPLE_OPCODE(REOP_ASCII_ISPRINT_NOT, "ascii_isprint_not");
-		SIMPLE_OPCODE(REOP_ASCII_ISBLANK, "ascii_isblank");
-		SIMPLE_OPCODE(REOP_ASCII_ISBLANK_NOT, "ascii_isblank_not");
 		SIMPLE_OPCODE(REOP_ASCII_ISSYMSTRT, "ascii_issymstrt");
 		SIMPLE_OPCODE(REOP_ASCII_ISSYMSTRT_NOT, "ascii_issymstrt_not");
 		SIMPLE_OPCODE(REOP_ASCII_ISSYMCONT, "ascii_issymcont");

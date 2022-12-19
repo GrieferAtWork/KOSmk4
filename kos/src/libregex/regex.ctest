@@ -54,7 +54,8 @@ PRIVATE PRE_EXEC_MATCH re_exec_match;
 PRIVATE PRE_EXEC_SEARCH re_exec_search;
 PRIVATE PRE_EXEC_RSEARCH re_exec_rsearch;
 
-PRIVATE struct re_code *re_compile(char const *pattern) {
+PRIVATE struct re_code *re_compile(char const *pattern,
+                                   uintptr_t extra_syntax_flags) {
 	struct re_code *result;
 	re_errno_t error;
 	struct re_compiler compiler;
@@ -68,7 +69,8 @@ PRIVATE struct re_code *re_compile(char const *pattern) {
 	                 RE_SYNTAX_NO_BK_PARENS |
 	                 RE_SYNTAX_NO_BK_VBAR |
 	                 RE_SYNTAX_NO_EMPTY_RANGES |
-	                 RE_SYNTAX_CONTEXT_INVALID_DUP);
+	                 RE_SYNTAX_CONTEXT_INVALID_DUP |
+	                 extra_syntax_flags);
 	error = re_compiler_compile(&compiler);
 	EQ(RE_NOERROR, error);
 	result = re_compiler_pack(&compiler);
@@ -114,13 +116,18 @@ PRIVATE ssize_t re_match_code(struct re_code const *code, char const *input) {
 	return result;
 }
 
-PRIVATE ssize_t re_match(char const *pattern, char const *input) {
+PRIVATE ssize_t re_match_syntax(char const *pattern, char const *input,
+                                uintptr_t extra_syntax_flags) {
 	struct re_code *code;
 	ssize_t result;
-	code   = re_compile(pattern);
+	code   = re_compile(pattern, extra_syntax_flags);
 	result = re_match_code(code, input);
 	free(code);
 	return result;
+}
+
+PRIVATE ssize_t re_match(char const *pattern, char const *input) {
+	return re_match_syntax(pattern, input, 0);
 }
 
 DEFINE_TEST(regex) {
@@ -205,6 +212,12 @@ DEFINE_TEST(regex) {
 	EQ(1, re_match("\\n", "\nfoo"));
 	EQ(-RE_NOMATCH, re_match("\\N", "\rfoo"));
 	EQ(-RE_NOMATCH, re_match("\\N", "\nfoo"));
+
+	/* Ensure that character sets work in both ASCII and UTF-8 mode. */
+	EQ(12, re_match_syntax("[:hex:]+", "abcdefABCDEF_", 0));
+	EQ(12, re_match_syntax("[:hex:]+", "abcdefABCDEF_", RE_SYNTAX_NO_UTF8));
+	EQ(-RE_NOMATCH, re_match_syntax("[:hex:]+", "_abcdefABCDEF", 0));
+	EQ(-RE_NOMATCH, re_match_syntax("[:hex:]+", "_abcdefABCDEF", RE_SYNTAX_NO_UTF8));
 
 	/* Cleanup */
 	EQ(0, dlclose(libregex));

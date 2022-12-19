@@ -245,7 +245,11 @@ enum {
 	REOP_ANY_NOTNUL_NOTLF,     /* [+0] Match any character (except '\0' or ASCII line-feeds) */
 	REOP_ANY_NOTNUL_NOTLF_UTF8, /* [+0] Match any character (except '\0' or unicode line-feeds) */
 	REOP_CHAR,                 /* [+1] Followed by 1 byte that must be matched exactly */
+	REOP_NCHAR,                /* [+1] Followed by 1 byte that must not be matched exactly */
 	REOP_CHAR2,                /* [+2] Followed by 2 bytes, one of which must be matched exactly (for "[ab]" or "a" -> "[aA]" in ICASE-mode) */
+	REOP_NCHAR2,               /* [+2] Followed by 2 bytes, neither of which may be matched */
+	REOP_RANGE,                /* [+2] Followed by 2 bytes, with input having to match `ch >= pc[0] && ch <= pc[1]' */
+	REOP_NRANGE,               /* [+2] Followed by 2 bytes, with input having to match `ch < pc[0] || ch > pc[1]' */
 	REOP_CONTAINS_UTF8,        /* [+1+n] Followed by a COUNT-byte, followed by a `COUNT'-character long utf-8 string (matches utf-8 character contained in said string).
 	                            * NOTE: COUNT must be >= 2 */
 	REOP_CONTAINS_UTF8_NOT,    /* [+1+n] Followed by a COUNT-byte, followed by a `COUNT'-character long utf-8 string (matches utf-8 character not contained in said string).
@@ -321,12 +325,16 @@ enum {
 	REOP_ASCII_ISGRAPH_NOT,    /* [+0] consume trait `isgraph(ch) == false' */
 	REOP_ASCII_ISPRINT,        /* [+0] consume trait `isprint(ch) == true' */
 	REOP_ASCII_ISPRINT_NOT,    /* [+0] consume trait `isprint(ch) == false' */
-	REOP_ASCII_ISBLANK,        /* [+0] consume trait `isblank(ch) == true' */
-	REOP_ASCII_ISBLANK_NOT,    /* [+0] consume trait `isblank(ch) == false' */
-	REOP_ASCII_ISSYMSTRT,      /* [+0] consume trait `issymstrt(ch) == true' */
-	REOP_ASCII_ISSYMSTRT_NOT,  /* [+0] consume trait `issymstrt(ch) == false' */
-	REOP_ASCII_ISSYMCONT,      /* [+0] consume trait `issymcont(ch) == true' */
-	REOP_ASCII_ISSYMCONT_NOT,  /* [+0] consume trait `issymcont(ch) == false' */
+	REOP_ASCII_ISSYMSTRT,      /* [+0] consume trait `issymstrt(ch) == true'  (isalpha || '_' || '$') */
+	REOP_ASCII_ISSYMSTRT_NOT,  /* [+0] consume trait `issymstrt(ch) == false' (isalpha || '_' || '$') */
+	REOP_ASCII_ISSYMCONT,      /* [+0] consume trait `issymcont(ch) == true'  (isalnum || '_' || '$') */
+	REOP_ASCII_ISSYMCONT_NOT,  /* [+0] consume trait `issymcont(ch) == false' (isalnum || '_' || '$') */
+	/* Some ascii aliases (where dedicated opcodes still exist) */
+#define REOP_ASCII_ISTITLE       REOP_ASCII_ISUPPER
+#define REOP_ASCII_ISTITLE_NOT   REOP_ASCII_ISUPPER_NOT
+#define REOP_ASCII_ISNUMERIC     REOP_ASCII_ISDIGIT
+#define REOP_ASCII_ISNUMERIC_NOT REOP_ASCII_ISDIGIT_NOT
+
 #define REOP_TRAIT_ASCII_MAX REOP_ASCII_ISSYMCONT_NOT
 
 #define REOP_TRAIT_UTF8_MIN REOP_UTF8_ISCNTRL

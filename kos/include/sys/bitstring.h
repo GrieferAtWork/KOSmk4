@@ -59,9 +59,16 @@ __ATTR_MALLOC __ATTR_WUNUSED bitstr_t *(bit_alloc)(int nbits);
 #ifdef __INTELLISENSE__
 __ATTR_NONNULL((1)) void (bit_setall)(bitstr_t *self, int nbits);
 __ATTR_NONNULL((1)) void (bit_clearall)(bitstr_t *self, int nbits);
+__ATTR_NONNULL((1)) void (bit_flipall)(bitstr_t *self, int nbits);
 #else /* __INTELLISENSE__ */
 #define bit_setall(self, nbits)   __libc_memset(self, 0xff, bitstr_size(nbits) * sizeof(bitstr_t))
 #define bit_clearall(self, nbits) __libc_bzero(self, bitstr_size(nbits) * sizeof(bitstr_t))
+#define bit_flipall(self, nbits)                                   \
+	do {                                                           \
+		__SIZE_TYPE__ __bfa_i;                                     \
+		for (__bfa_i = 0; __bfa_i < bitstr_size(nbits); ++__bfa_i) \
+			(self)[__bfa_i] ^= 0xff;                               \
+	}	__WHILE0
 #endif /* !__INTELLISENSE__ */
 #define bit_foreach(bitno, self, nbits)             \
 	for ((bitno) = 0; (bitno) < (nbits); ++(bitno)) \
@@ -90,6 +97,15 @@ __ATTR_NONNULL((1)) void (bit_clear)(bitstr_t *__restrict self, int bitno);
 #else /* __INTELLISENSE__ */
 #define bit_clear(self, bitno) (void)((self)[_bit_byte(bitno)] &= ~_bit_mask(bitno))
 #endif /* !__INTELLISENSE__ */
+
+#ifdef __USE_KOS
+/* Flip the state of `bitno' of `self' */
+#ifdef __INTELLISENSE__
+__ATTR_NONNULL((1)) void (bit_flip)(bitstr_t *__restrict self, int bitno);
+#else /* __INTELLISENSE__ */
+#define bit_flip(self, bitno) (void)((self)[_bit_byte(bitno)] ^= _bit_mask(bitno))
+#endif /* !__INTELLISENSE__ */
+#endif /* __USE_KOS */
 
 #define __bit_nclear_impl(self, minbyte, maxbyte, minbyte_bitno, maxbyte_bitno) \
 	((minbyte >= maxbyte)                                                       \

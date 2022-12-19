@@ -99,6 +99,40 @@ NOTHROW_NCX(CC fastmap_setpcr)(byte_t fmap[256],
 	}
 }
 
+PRIVATE NONNULL((1, 2, 4)) void
+NOTHROW_NCX(CC fastmap_setpc_nbyte)(byte_t fmap[256],
+                                    struct re_code *__restrict self,
+                                    byte_t nbyte,
+                                    byte_t const *enter_pc) {
+	unsigned int i;
+	size_t enter_offset = enter_pc - self->rc_code;
+	if (enter_offset >= 0xff)
+		enter_offset = 0;
+	for (i = 0; i <= 0xff; ++i) {
+		if (i != nbyte) {
+			if (fmap[i] > (byte_t)enter_offset)
+				fmap[i] = (byte_t)enter_offset;
+		}
+	}
+}
+
+PRIVATE NONNULL((1, 2, 5)) void
+NOTHROW_NCX(CC fastmap_setpc_nbyte2)(byte_t fmap[256],
+                                     struct re_code *__restrict self,
+                                     byte_t nbyte1, byte_t nbyte2,
+                                     byte_t const *enter_pc) {
+	unsigned int i;
+	size_t enter_offset = enter_pc - self->rc_code;
+	if (enter_offset >= 0xff)
+		enter_offset = 0;
+	for (i = 0; i <= 0xff; ++i) {
+		if (i != nbyte1 && i != nbyte2) {
+			if (fmap[i] > (byte_t)enter_offset)
+				fmap[i] = (byte_t)enter_offset;
+		}
+	}
+}
+
 PRIVATE NONNULL((1)) void
 NOTHROW_NCX(CC re_code_setminmatch)(struct re_code *__restrict self,
                                     size_t minmatch) {
@@ -172,13 +206,17 @@ again:
 			goto again;
 		}
 
-		TARGET(REOP_CHAR) {
+		TARGET(REOP_CHAR)
+		TARGET(REOP_NCHAR) {
 			curr_minmatch += 1;
 			pc += 1;
 			goto again;
 		}
 
-		TARGET(REOP_CHAR2) {
+		TARGET(REOP_CHAR2)
+		TARGET(REOP_NCHAR2)
+		TARGET(REOP_RANGE)
+		TARGET(REOP_NRANGE) {
 			curr_minmatch += 1;
 			pc += 2;
 			goto again;
@@ -428,9 +466,40 @@ again:
 			GOTMATCH();
 		}
 
+		TARGET(REOP_NCHAR) {
+			fastmap_setpc_nbyte(fmap, self, pc[0], enter_pc);
+			minmatch = 1;
+			pc += 1;
+			GOTMATCH();
+		}
+
 		TARGET(REOP_CHAR2) {
 			fastmap_setpc(fmap, self, pc[0], enter_pc);
 			fastmap_setpc(fmap, self, pc[1], enter_pc);
+			minmatch = 1;
+			pc += 2;
+			GOTMATCH();
+		}
+
+		TARGET(REOP_NCHAR2) {
+			fastmap_setpc_nbyte2(fmap, self, pc[0], pc[1], enter_pc);
+			minmatch = 1;
+			pc += 2;
+			GOTMATCH();
+		}
+
+		TARGET(REOP_RANGE) {
+			fastmap_setpcr(fmap, self, pc[0], pc[1], enter_pc);
+			minmatch = 1;
+			pc += 2;
+			GOTMATCH();
+		}
+
+		TARGET(REOP_NRANGE) {
+			if (pc[0] > 0x00)
+				fastmap_setpcr(fmap, self, 0x00, pc[0] - 1, enter_pc);
+			if (pc[1] < 0xff)
+				fastmap_setpcr(fmap, self, pc[1] + 1, 0xff, enter_pc);
 			minmatch = 1;
 			pc += 2;
 			GOTMATCH();
@@ -588,8 +657,6 @@ again:
 			GOTMATCH();
 		}
 
-		TARGET(REOP_ASCII_ISBLANK)
-		TARGET(REOP_ASCII_ISBLANK_NOT)
 		TARGET(REOP_ASCII_ISSYMSTRT)
 		TARGET(REOP_ASCII_ISSYMSTRT_NOT)
 		TARGET(REOP_ASCII_ISSYMCONT)
@@ -598,10 +665,6 @@ again:
 			for (i = 0; i < 256; ++i) {
 				bool hastrait;
 				switch (opcode) {
-				case REOP_ASCII_ISBLANK:
-				case REOP_ASCII_ISBLANK_NOT:
-					hastrait = !!isblank((unsigned char)i);
-					break;
 				case REOP_ASCII_ISSYMSTRT:
 				case REOP_ASCII_ISSYMSTRT_NOT:
 					hastrait = !!issymstrt((unsigned char)i);

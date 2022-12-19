@@ -592,7 +592,8 @@ load_normal_iov:
 		if unlikely(!self->ri_pmatch)
 			return RE_ESPACE;
 	}
-	/* Set all offsets to UINT_MAX */
+	/* Set all offsets to RE_REGOFF_UNSET */
+	static_assert(RE_REGOFF_UNSET == (re_regoff_t)-1);
 	memset(self->ri_pmatch, 0xff, ngrp * sizeof(re_regmatch_t));
 	self->ri_onfailv = NULL;
 	self->ri_onfailc = 0;
@@ -967,6 +968,18 @@ dispatch:
 			ONFAIL();
 		}
 
+		TARGET(REOP_NCHAR) {
+			/* Followed by 1 byte that must not be matched exactly */
+			byte_t ch, b;
+			if (re_interpreter_is_eoi(self))
+				ONFAIL();
+			b  = getb();
+			ch = re_interpreter_readbyte(self);
+			if (ch != b)
+				DISPATCH();
+			ONFAIL();
+		}
+
 		TARGET(REOP_CHAR2) {
 			/* Followed by 2 bytes, one of which must be matched exactly (for "[ab]" or "a" -> "[aA]" in ICASE-mode) */
 			byte_t ch, b1, b2;
@@ -976,6 +989,45 @@ dispatch:
 			b2 = getb();
 			ch = re_interpreter_readbyte(self);
 			if (ch == b1 || ch == b2)
+				DISPATCH();
+			ONFAIL();
+		}
+
+		TARGET(REOP_NCHAR2) {
+			/* Followed by 2 bytes, neither of which may be matched */
+			byte_t ch, b1, b2;
+			if (re_interpreter_is_eoi(self))
+				ONFAIL();
+			b1 = getb();
+			b2 = getb();
+			ch = re_interpreter_readbyte(self);
+			if (ch != b1 && ch != b2)
+				DISPATCH();
+			ONFAIL();
+		}
+
+		TARGET(REOP_RANGE) {
+			/* Followed by 2 bytes, with input having to match `ch >= pc[0] && ch <= pc[1]' */
+			byte_t ch, lo, hi;
+			if (re_interpreter_is_eoi(self))
+				ONFAIL();
+			lo = getb();
+			hi = getb();
+			ch = re_interpreter_readbyte(self);
+			if (ch >= lo && ch <= hi)
+				DISPATCH();
+			ONFAIL();
+		}
+
+		TARGET(REOP_NRANGE) {
+			/* Followed by 2 bytes, with input having to match `ch >= pc[0] && ch <= pc[1]' */
+			byte_t ch, lo, hi;
+			if (re_interpreter_is_eoi(self))
+				ONFAIL();
+			lo = getb();
+			hi = getb();
+			ch = re_interpreter_readbyte(self);
+			if (ch < lo || ch > hi)
 				DISPATCH();
 			ONFAIL();
 		}
@@ -1233,8 +1285,6 @@ dispatch:
 			ONFAIL();
 		}
 
-		TARGET(REOP_ASCII_ISBLANK)
-		TARGET(REOP_ASCII_ISBLANK_NOT)
 		TARGET(REOP_ASCII_ISSYMSTRT)
 		TARGET(REOP_ASCII_ISSYMSTRT_NOT)
 		TARGET(REOP_ASCII_ISSYMCONT)
@@ -1245,10 +1295,6 @@ dispatch:
 				ONFAIL();
 			ch = re_interpreter_readbyte(self);
 			switch (opcode) {
-			case REOP_ASCII_ISBLANK:
-			case REOP_ASCII_ISBLANK_NOT:
-				hastrait = !!isblank(ch);
-				break;
 			case REOP_ASCII_ISSYMSTRT:
 			case REOP_ASCII_ISSYMSTRT_NOT:
 				hastrait = !!issymstrt(ch);
