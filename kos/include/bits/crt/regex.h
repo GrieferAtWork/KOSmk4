@@ -58,7 +58,7 @@ struct re_pattern_buffer {
 	unsigned __REPB_PREFIX(no_sub) : 1;           /* [== ((syntax & RE_SYNTAX_NO_SUB) != 0)] */
 	unsigned __REPB_PREFIX(not_bol) : 1;          /* Input argument bit for `re_match[_2](3)' and `re_search[_2](3)' (`== REG_NOTBOL') */
 	unsigned __REPB_PREFIX(not_eol) : 1;          /* Input argument bit for `re_match[_2](3)' and `re_search[_2](3)' (`== REG_NOTEOL') */
-	unsigned __REPB_PREFIX(newline_anchor) : 1;   /* [== ((syntax & RE_SYNTAX_ANCHORS_IGNORE_FLAGS) != 0)] */
+	unsigned __REPB_PREFIX(newline_anchor) : 1;   /* [== ((syntax & RE_SYNTAX_ANCHORS_IGNORE_EFLAGS) != 0)] */
 };
 
 #ifdef __USE_KOS

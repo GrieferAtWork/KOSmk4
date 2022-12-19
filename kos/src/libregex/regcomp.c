@@ -1210,7 +1210,7 @@ do_group_start_without_alternation:
 		return re_compiler_compile_set(self);
 
 	case RE_TOKEN_BK_MIN ... RE_TOKEN_BK_MAX: {
-		static byte_t const set_opcodes[][2] = {
+		static uint8_t const set_opcodes[][2] = {
 			[(RE_TOKEN_BK_w - RE_TOKEN_BK_MIN)] = { REOP_ASCII_ISSYMCONT, REOP_UTF8_ISSYMCONT },
 			[(RE_TOKEN_BK_W - RE_TOKEN_BK_MIN)] = { REOP_ASCII_ISSYMCONT_NOT, REOP_UTF8_ISSYMCONT_NOT },
 			[(RE_TOKEN_BK_s - RE_TOKEN_BK_MIN)] = { REOP_ASCII_ISSPACE, REOP_UTF8_ISSPACE },
@@ -1220,7 +1220,7 @@ do_group_start_without_alternation:
 			[(RE_TOKEN_BK_n - RE_TOKEN_BK_MIN)] = { REOP_NOP, REOP_UTF8_ISLF },
 			[(RE_TOKEN_BK_N - RE_TOKEN_BK_MIN)] = { REOP_NOP, REOP_UTF8_ISLF_NOT },
 		};
-		byte_t opcode;
+		uint8_t opcode;
 		alternation_prefix_dump();
 		opcode = set_opcodes[tok - RE_TOKEN_BK_MIN]
 		                    [(self->rec_parser.rep_syntax & RE_SYNTAX_NO_UTF8) ? 0 : 1];
@@ -1301,6 +1301,10 @@ do_group_start_without_alternation:
 		};
 		uint8_t opcode = at_opcodes[tok - RE_TOKEN_AT_MIN]
 		                           [(self->rec_parser.rep_syntax & RE_SYNTAX_NO_UTF8) ? 0 : 1];
+
+		/* Deal with special handling for '^' and '$' */
+		if (REOP_AT_SOLEOL_CHECK(opcode) && !(self->rec_parser.rep_syntax & RE_SYNTAX_ANCHORS_IGNORE_EFLAGS))
+			opcode = REOP_AT_SOLEOL_MAKEX(opcode);
 
 		/* `REOP_AT_*' qualify for being written as alternation prefixes! */
 #if ALTERNATION_PREFIX_MAXLEN > 0
@@ -2474,6 +2478,10 @@ NOTHROW_NCX(CC libre_code_disasm)(struct re_code const *__restrict self,
 		SIMPLE_OPCODE(REOP_AT_SOL_UTF8, "at_sol_utf8");
 		SIMPLE_OPCODE(REOP_AT_EOL, "at_eol");
 		SIMPLE_OPCODE(REOP_AT_EOL_UTF8, "at_eol_utf8");
+		SIMPLE_OPCODE(REOP_AT_SOXL, "at_soxl");
+		SIMPLE_OPCODE(REOP_AT_SOXL_UTF8, "at_soxl_utf8");
+		SIMPLE_OPCODE(REOP_AT_EOXL, "at_eoxl");
+		SIMPLE_OPCODE(REOP_AT_EOXL_UTF8, "at_eoxl_utf8");
 		SIMPLE_OPCODE(REOP_AT_WOB, "at_wob");
 		SIMPLE_OPCODE(REOP_AT_WOB_UTF8, "at_wob_utf8");
 		SIMPLE_OPCODE(REOP_AT_WOB_NOT, "at_wob_not");

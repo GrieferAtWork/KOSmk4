@@ -201,6 +201,11 @@ DEFINE_TEST(regex) {
 	EQ(-RE_NOMATCH, re_match("(a|b){4}a", "ababX"));
 	EQ(-RE_NOMATCH, re_match("(a|b){4}a", "bbbbX"));
 
+	EQ(1, re_match("\\n", "\rfoo"));
+	EQ(1, re_match("\\n", "\nfoo"));
+	EQ(-RE_NOMATCH, re_match("\\N", "\rfoo"));
+	EQ(-RE_NOMATCH, re_match("\\N", "\nfoo"));
+
 	/* Cleanup */
 	EQ(0, dlclose(libregex));
 }

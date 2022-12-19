@@ -161,7 +161,7 @@ static_assert(RE_ICASE == RE_SYNTAX_ICASE);
 static_assert(RE_CARET_ANCHORS_HERE == RE_SYNTAX_CARET_ANCHORS_HERE);
 static_assert(RE_CONTEXT_INVALID_DUP == RE_SYNTAX_CONTEXT_INVALID_DUP);
 static_assert(RE_NO_SUB == RE_SYNTAX_NO_SUB);
-static_assert(RE_ANCHORS_IGNORE_FLAGS == RE_SYNTAX_ANCHORS_IGNORE_FLAGS);
+static_assert(RE_ANCHORS_IGNORE_EFLAGS == RE_SYNTAX_ANCHORS_IGNORE_EFLAGS);
 static_assert(RE_NO_UTF8 == RE_SYNTAX_NO_UTF8);
 static_assert(RE_NO_KOS_OPS == RE_SYNTAX_NO_KOS_OPS);
 
@@ -237,7 +237,7 @@ NOTHROW_NCX(LIBCCALL libc_re_compile_pattern)(char const *pattern,
 	self->can_be_null      = code->rc_minmatch == 0 ? 1 : 0;
 	self->fastmap_accurate = 1;
 	self->no_sub           = (comp.rec_parser.rep_syntax & RE_SYNTAX_NO_SUB) ? 1 : 0;
-	self->newline_anchor   = (comp.rec_parser.rep_syntax & RE_SYNTAX_ANCHORS_IGNORE_FLAGS) ? 1 : 0;
+	self->newline_anchor   = (comp.rec_parser.rep_syntax & RE_SYNTAX_ANCHORS_IGNORE_EFLAGS) ? 1 : 0;
 	return NULL;
 }
 /*[[[end:libc_re_compile_pattern]]]*/
@@ -602,7 +602,7 @@ NOTHROW_NCX(LIBCCALL libc_regcomp)(regex_t *__restrict self,
 		syntax |= RE_SYNTAX_ICASE;
 	if (cflags & REG_NEWLINE) {
 		syntax &= ~RE_SYNTAX_DOT_NEWLINE;
-		syntax |= RE_SYNTAX_HAT_LISTS_NOT_NEWLINE | RE_SYNTAX_ANCHORS_IGNORE_FLAGS;
+		syntax |= RE_SYNTAX_HAT_LISTS_NOT_NEWLINE | RE_SYNTAX_ANCHORS_IGNORE_EFLAGS;
 	}
 	if (cflags & REG_NOSUB)
 		syntax |= RE_SYNTAX_NO_SUB;
@@ -625,7 +625,7 @@ NOTHROW_NCX(LIBCCALL libc_regcomp)(regex_t *__restrict self,
 	self->can_be_null      = code->rc_minmatch == 0 ? 1 : 0;
 	self->fastmap_accurate = 1;
 	self->no_sub           = (comp.rec_parser.rep_syntax & RE_SYNTAX_NO_SUB) ? 1 : 0;
-	self->newline_anchor   = (comp.rec_parser.rep_syntax & RE_SYNTAX_ANCHORS_IGNORE_FLAGS) ? 1 : 0;
+	self->newline_anchor   = (comp.rec_parser.rep_syntax & RE_SYNTAX_ANCHORS_IGNORE_EFLAGS) ? 1 : 0;
 	return RE_NOERROR;
 }
 /*[[[end:libc_regcomp]]]*/

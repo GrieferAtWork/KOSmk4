@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x811b9d3a */
+/* HASH CRC-32:0x58163c5c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -352,9 +352,9 @@ typedef __reg_syntax_t reg_syntax_t; /* Set of `RE_*' (see below) */
 #endif /* !RE_NO_SUB && __RE_NO_SUB */
 #ifdef __USE_KOS
 /* '^' and '$' operators will ignore `RE_EXEC_NOTBOL' and `RE_EXEC_NOTEOL' */
-#if !defined(RE_ANCHORS_IGNORE_FLAGS) && defined(__RE_ANCHORS_IGNORE_FLAGS)
-#define RE_ANCHORS_IGNORE_FLAGS __RE_ANCHORS_IGNORE_FLAGS
-#endif /* !RE_ANCHORS_IGNORE_FLAGS && __RE_ANCHORS_IGNORE_FLAGS */
+#if !defined(RE_ANCHORS_IGNORE_EFLAGS) && defined(__RE_ANCHORS_IGNORE_EFLAGS)
+#define RE_ANCHORS_IGNORE_EFLAGS __RE_ANCHORS_IGNORE_EFLAGS
+#endif /* !RE_ANCHORS_IGNORE_EFLAGS && __RE_ANCHORS_IGNORE_EFLAGS */
 /* If set, pattern is byte-based (rather than a utf-8 string; e.g. '[ä]' is like '[\xC3\xA4]'). Also disables support for '\uABCD', '\UABCDABCD' */
 #if !defined(RE_NO_UTF8) && defined(__RE_NO_UTF8)
 #define RE_NO_UTF8 __RE_NO_UTF8
@@ -426,7 +426,7 @@ typedef __ULONGPTR_TYPE__ active_reg_t; /* ??? */
 #define REG_ICASE    __REG_ICASE    /* Ignore casing during matching (s.a. `RE_ICASE') */
 #endif /* !REG_ICASE && __REG_ICASE */
 #if !defined(REG_NEWLINE) && defined(__REG_NEWLINE)
-#define REG_NEWLINE  __REG_NEWLINE  /* Clears `RE_DOT_NEWLINE'; sets `RE_HAT_LISTS_NOT_NEWLINE | RE_ANCHORS_IGNORE_FLAGS' */
+#define REG_NEWLINE  __REG_NEWLINE  /* Clears `RE_DOT_NEWLINE'; sets `RE_HAT_LISTS_NOT_NEWLINE | RE_ANCHORS_IGNORE_EFLAGS' */
 #endif /* !REG_NEWLINE && __REG_NEWLINE */
 #if !defined(REG_NOSUB) && defined(__REG_NOSUB)
 #define REG_NOSUB    __REG_NOSUB    /* `regexec(3)' will ignore the `nmatch' and `pmatch' arguments (s.a. `RE_NO_SUB'). */

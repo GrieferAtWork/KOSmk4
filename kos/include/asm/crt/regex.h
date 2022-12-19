@@ -71,7 +71,7 @@
 #define __RE_CONTEXT_INVALID_DUP       0x01000000 /* If set, '{' appearing at the start, or after '(', '|' or '}' results in `RE_BADRPT'; else, behavior is governed by `RE_CONTEXT_INVALID_OPS' */
 #define __RE_NO_SUB                    0x02000000 /* Used to implement `RE_NOSUB' */
 #ifdef __CRT_KOS
-#define __RE_ANCHORS_IGNORE_FLAGS      0x20000000 /* '^' and '$' operators will ignore `RE_EXEC_NOTBOL' and `RE_EXEC_NOTEOL' */
+#define __RE_ANCHORS_IGNORE_EFLAGS     0x20000000 /* '^' and '$' operators will ignore `RE_EXEC_NOTBOL' and `RE_EXEC_NOTEOL' */
 #define __RE_NO_UTF8                   0x40000000 /* If set, pattern is byte-based (rather than a utf-8 string; e.g. '[ä]' is like '[\xC3\xA4]'). Also disables support for '\uABCD', '\UABCDABCD' */
 #define __RE_NO_KOS_OPS                0x80000000 /* If set, disable support for python- and kos-extensions: '\n', "[^:<foo>:]", '\d', '\D', '\0123', '\xAB', '\uABCD', '\UABCDABCD', '\A', '\Z' */
 #endif /* __CRT_KOS */
@@ -88,7 +88,7 @@
 /* Flags for `regcomp(3)'s `cflags' argument. */
 #define __REG_EXTENDED 0x0001 /* Use `RE_POSIX_MINIMAL_BASIC' instead of `RE_POSIX_BASIC' */
 #define __REG_ICASE    0x0002 /* Ignore casing during matching (s.a. `RE_ICASE') */
-#define __REG_NEWLINE  0x0004 /* Clears `RE_DOT_NEWLINE'; sets `RE_HAT_LISTS_NOT_NEWLINE | RE_ANCHORS_IGNORE_FLAGS' */
+#define __REG_NEWLINE  0x0004 /* Clears `RE_DOT_NEWLINE'; sets `RE_HAT_LISTS_NOT_NEWLINE | RE_ANCHORS_IGNORE_EFLAGS' */
 #define __REG_NOSUB    0x0008 /* `regexec(3)' will ignore the `nmatch' and `pmatch' arguments (s.a. `RE_NO_SUB'). */
 
 /* Flags for `regexec(3)'s `eflags' argument. */

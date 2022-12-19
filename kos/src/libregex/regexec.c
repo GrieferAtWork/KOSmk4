@@ -1359,6 +1359,58 @@ dispatch:
 		TARGET(REOP_AT_SOL) {
 			/* Start-of-line (following a line-feed, or `REOP_AT_SOI' unless `RE_EXEC_NOTBOL' was set) */
 			if (re_interpreter_is_soi(self)) {
+				DISPATCH();
+			} else {
+				byte_t prevbyte;
+				prevbyte = re_interpreter_prevbyte(self);
+				if (islf(prevbyte))
+					DISPATCH();
+			}
+			ONFAIL();
+		}
+
+		TARGET(REOP_AT_SOL_UTF8) {
+			/* Start-of-line (following a line-feed, or `REOP_AT_SOI' unless `RE_EXEC_NOTBOL' was set) */
+			if (re_interpreter_is_soi(self)) {
+				DISPATCH();
+			} else {
+				char32_t prevchar;
+				prevchar = re_interpreter_prevutf8(self);
+				if (unicode_islf(prevchar))
+					DISPATCH();
+			}
+			ONFAIL();
+		}
+
+		TARGET(REOP_AT_EOL) {
+			/* End-of-line (preceding a line-feed, or `REOP_AT_EOI' unless `RE_EXEC_NOTEOL' was set) */
+			if (re_interpreter_is_eoiX(self)) {
+				DISPATCH();
+			} else {
+				byte_t nextbyte;
+				nextbyte = re_interpreter_nextbyte(self);
+				if (islf(nextbyte))
+					DISPATCH();
+			}
+			ONFAIL();
+		}
+
+		TARGET(REOP_AT_EOL_UTF8) {
+			/* End-of-line (preceding a line-feed, or `REOP_AT_EOI' unless `RE_EXEC_NOTEOL' was set) */
+			if (re_interpreter_is_eoiX(self)) {
+				DISPATCH();
+			} else {
+				char32_t nextchar;
+				nextchar = re_interpreter_nextutf8(self);
+				if (unicode_islf(nextchar))
+					DISPATCH();
+			}
+			ONFAIL();
+		}
+
+		TARGET(REOP_AT_SOXL) {
+			/* Start-of-line (following a line-feed, or `REOP_AT_SOI' unless `RE_EXEC_NOTBOL' was set) */
+			if (re_interpreter_is_soi(self)) {
 				if (!(self->ri_exec->rx_eflags & RE_EXEC_NOTBOL))
 					DISPATCH();
 			} else {
@@ -1370,7 +1422,7 @@ dispatch:
 			ONFAIL();
 		}
 
-		TARGET(REOP_AT_SOL_UTF8) {
+		TARGET(REOP_AT_SOXL_UTF8) {
 			/* Start-of-line (following a line-feed, or `REOP_AT_SOI' unless `RE_EXEC_NOTBOL' was set) */
 			if (re_interpreter_is_soi(self)) {
 				if (!(self->ri_exec->rx_eflags & RE_EXEC_NOTBOL))
@@ -1384,7 +1436,7 @@ dispatch:
 			ONFAIL();
 		}
 
-		TARGET(REOP_AT_EOL) {
+		TARGET(REOP_AT_EOXL) {
 			/* End-of-line (preceding a line-feed, or `REOP_AT_EOI' unless `RE_EXEC_NOTEOL' was set) */
 			if (re_interpreter_is_eoiX(self)) {
 				if (!(self->ri_exec->rx_eflags & RE_EXEC_NOTEOL))
@@ -1398,7 +1450,7 @@ dispatch:
 			ONFAIL();
 		}
 
-		TARGET(REOP_AT_EOL_UTF8) {
+		TARGET(REOP_AT_EOXL_UTF8) {
 			/* End-of-line (preceding a line-feed, or `REOP_AT_EOI' unless `RE_EXEC_NOTEOL' was set) */
 			if (re_interpreter_is_eoiX(self)) {
 				if (!(self->ri_exec->rx_eflags & RE_EXEC_NOTEOL))
