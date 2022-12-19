@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47b8b86f */
+/* HASH CRC-32:0x50cf26ba */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1946,7 +1946,7 @@ DFUN(".text.crt.dos.database.pwd", libd_pw_dup, libc_pw_dup, TP, 1, TP)
 DFUN(".text.crt.dos.bsd", libd_readpassphrase, libc_readpassphrase, TP, 4, TP, TP, TI, TD)
 
 /* regex */
-DFUN(".text.crt.dos.utility.regex", libd_re_set_syntax, libc_re_set_syntax, TP, 1, TP)
+DFUN(".text.crt.dos.utility.regex", libd_re_set_syntax, libc_re_set_syntax, TIn(__SIZEOF_REG_SYNTAX_T__), 1, TIn(__SIZEOF_REG_SYNTAX_T__))
 DFUN(".text.crt.dos.utility.regex", libd_re_compile_pattern, libc_re_compile_pattern, TP, 3, TP, TI, TP)
 DFUN(".text.crt.dos.utility.regex", libd_re_compile_fastmap, libc_re_compile_fastmap, TD, 1, TP)
 DFUN(".text.crt.dos.utility.regex", libd_re_search, libc_re_search, TD, 6, TP, TP, TD, TD, TD, TP)
@@ -1958,6 +1958,7 @@ DFUN(".text.crt.dos.utility.regex", libd_regcomp, libc_regcomp, TD, 3, TP, TP, T
 DFUN(".text.crt.dos.utility.regex", libd_regexec, libc_regexec, TD, 5, TP, TP, TI, TP, TD)
 DFUN(".text.crt.dos.utility.regex", libd_regerror, libc_regerror, TI, 4, TD, TP, TP, TI)
 DFUN(".text.crt.dos.utility.regex", libd_regfree, libc_regfree, TV, 1, TP)
+DFUN(".text.crt.dos.utility.regex", libd_regerrordesc_np, libc_regerrordesc_np, TP, 1, TD)
 
 /* resolv */
 DFUN(".text.crt.dos.net.nameser", libd_fp_nquery, libc_fp_nquery, TV, 3, TP, TD, TP)

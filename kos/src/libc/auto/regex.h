@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x997c79e7 */
+/* HASH CRC-32:0x7a432c1e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,46 +30,234 @@
 DECL_BEGIN
 
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
-/* Sets the current default syntax to `syntax', and return the old syntax.
- * You  can  also  simply  assign  to  the  `re_syntax_options'   variable */
+/* >> re_set_syntax(3)
+ * Set  the  regex  syntax used  by  `re_compile_pattern(3)', and
+ * return the old default syntax (same as `re_syntax_options(3)') */
 INTDEF reg_syntax_t NOTHROW_NCX(LIBDCALL libd_re_set_syntax)(reg_syntax_t syntax);
-/* Compile   the   regular  expression   `pattern',  with   length  `length'
- * and  syntax  given by  the  global `re_syntax_options',  into  the buffer
- * `buffer'.  Return  NULL  if  successful,  and  an  error  string  if not.
- * To  free  the allocated  storage, you  must  call `regfree'  on `buffer'.
- * Note  that  the  translate table  must  either have  been  initialized by
- * `regcomp', with a malloc'd value, or set to NULL before calling `regfree' */
-INTDEF char const *NOTHROW_NCX(LIBDCALL libd_re_compile_pattern)(char const *pattern, size_t length, struct re_pattern_buffer *buffer);
-/* Compile  a  fastmap   for  the   compiled  pattern  in   `buffer';  used   to
- * accelerate searches. Return 0 if successful and `-2' if was an internal error */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_re_compile_fastmap)(struct re_pattern_buffer *buffer);
-/* Search in the  string `string'  (with length `length')  for the  pattern
- * compiled into `buffer'. Start searching at position `start', for `range'
- * characters.  Return  the starting  position of  the  match, `-1'  for no
- * match,  or   `-2'  for   an  internal   error.  Also   return   register
- * information in  `regs'  (if  `regs' and  `buffer'->no_sub  are  nonzero) */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_re_search)(struct re_pattern_buffer *buffer, char const *string, int length, int start, int range, struct re_registers *regs);
-/* Like `re_search', but search in the concatenation of `string1'
- * and `string2'. Also,  stop searching  at index  `start + stop' */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_re_search_2)(struct re_pattern_buffer *buffer, char const *string1, int length1, char const *string2, int length2, int start, int range, struct re_registers *regs, int stop);
-/* Like `re_search', but return how many characters in `string'
- * the regexp in `buffer' matched, starting at position `start' */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_re_match)(struct re_pattern_buffer *buffer, char const *string, int length, int start, struct re_registers *regs);
-/* Relates to `re_match' as `re_search_2' relates to `re_search' */
-INTDEF int NOTHROW_NCX(LIBDCALL libd_re_match_2)(struct re_pattern_buffer *buffer, char const *string1, int length1, char const *string2, int length2, int start, struct re_registers *regs, int stop);
-/* Set  `regs'   to  hold   `num_regs'  registers,   storing  them   in  `starts'   and
- * `ends'.   Subsequent  matches  using  `buffer'  and  `regs'  will  use  this  memory
- * for  recording  register  information.  `starts'   and  `ends'  must  be   allocated
- * with  malloc, and must each be at  least ``num_regs' * sizeof(regoff_t)' bytes long.
- * If `num_regs == 0', then subsequent matches should allocate their own register data.
- * Unless this function is called, the first search or match using
- * PATTERN_BUFFER will allocate its own register data, without freeing the old data */
-INTDEF void NOTHROW_NCX(LIBDCALL libd_re_set_registers)(struct re_pattern_buffer *buffer, struct re_registers *regs, unsigned int num_regs, regoff_t *starts, regoff_t *ends);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_regcomp)(regex_t *__restrict preg, char const *__restrict pattern, int cflags);
-INTDEF int NOTHROW_NCX(LIBDCALL libd_regexec)(regex_t const *__restrict preg, char const *__restrict string, size_t nmatch, regmatch_t pmatch[__restrict_arr], int eflags);
-INTDEF size_t NOTHROW_NCX(LIBDCALL libd_regerror)(int errcode, regex_t const *__restrict preg, char *__restrict errbuf, size_t errbuf_size);
-INTDEF void NOTHROW_NCX(LIBDCALL libd_regfree)(regex_t *preg);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> re_set_syntax(3)
+ * Set  the  regex  syntax used  by  `re_compile_pattern(3)', and
+ * return the old default syntax (same as `re_syntax_options(3)') */
+INTDEF reg_syntax_t NOTHROW_NCX(LIBCCALL libc_re_set_syntax)(reg_syntax_t syntax);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> re_compile_pattern(3)
+ * Compile a regular expression pattern (s.a. re_compiler_compile(3R)')
+ * @param: pattern: Regex pattern string
+ * @param: length:  Length of regex pattern string (in bytes)
+ * @param: self:    The `regex_t' object to initialize.
+ * @return: NULL:   Success
+ * @return: * :     An error message, as would be produced by `regerror(3)' */
+INTDEF ATTR_INS(1, 2) ATTR_OUT(3) char const *NOTHROW_NCX(LIBDCALL libd_re_compile_pattern)(char const *pattern, size_t length, regex_t *self);
+/* >> re_compile_fastmap(3)
+ * Compile the fast-map of `self'. No-op on KOS, where the fastmap is always compiled immediatly.
+ * @return: 0 : Always returns `0' */
+INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBDCALL libd_re_compile_fastmap)(regex_t *self);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> re_compile_fastmap(3)
+ * Compile the fast-map of `self'. No-op on KOS, where the fastmap is always compiled immediatly.
+ * @return: 0 : Always returns `0' */
+INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc_re_compile_fastmap)(regex_t *self);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> re_search(3)
+ * Perform a regex search for the first matching byte-offset in `[start,start+range)'.
+ * The  accessed area of  the input buffer  is restricted to `[string,string+length)'.
+ * @param: self:   The compiled regex pattern to use. NOTE: regex `eflags' are set as:
+ *                  - `REG_NOTBOL = self->__not_bol'
+ *                  - `REG_NOTEOL = self->__not_eol'
+ *                 Sadly, this make this interface really badly designed, as this choice
+ *                 (which was made by Glibc  btw), prevents multiple threads from  using
+ *                 the same `regex_t' buffer simultaneously. Though note that this  same
+ *                 restriction doesn't apply to  `regexec(3)', or (when targeting  KOS),
+ *                 if  you completely by-pass  the `<regex.h>' API  and directly talk to
+ *                 the public API of `libregex.so' from `<libregex/regexec.h>'.
+ * @param: string: Base pointer for input data.
+ * @param: length: Length of input data (in bytes)
+ * @param: start:  Starting offset where to begin searching
+ * @param: range:  The max # of searches to attempt at successive byte-offsets starting at `start'
+ * @param: regs:   Group match information (like `regexec(3)'s `nmatch' and `pmatch' arguments)
+ * @return: >= 0:  Was able to discover a match at this offset. (always `< range')
+ * @return: -1:    No match was found
+ * @return: -2:    Internal error (probably meaning out-of-memory) */
+INTDEF ATTR_IN(1) ATTR_INS(2, 3) ATTR_OUT_OPT(6) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_re_search)(regex_t __KOS_FIXED_CONST *self, char const *string, __STDC_INT_AS_SIZE_T length, __STDC_INT_AS_SIZE_T start, __STDC_INT_AS_SIZE_T range, struct __re_registers *regs);
+/* >> re_search_2(3)
+ * Same as `re_search(3)',  but use the  virtual concatenation of  `string1...+=length1'
+ * and  `string2...+=length2' as input  buffer. Also: use `stop'  as the end-offset into
+ * this  virtual buffer of where to stop  doing non-extra accessing accesses (extra data
+ * accesses are positional assertion checks at the end of the regex pattern, such as '$'
+ * checking  if it is followed by a line-feed being allowed to read until the actual end
+ * of the virtual buffer,  whilst actual byte-matching is  only allowed to happen  until
+ * an offset of `stop' bytes has been reached)
+ *
+ * Note that on KOS, the underlying API used is `re_exec_search(3R)' from `libregex.so'
+ * and exposed in `<libregex/regexec.h>', which allows for the virtual concatenation of
+ * not just 2, but an arbitrary number of buffers which are then used as input.
+ *
+ * @param: self:    The compiled regex pattern to use. NOTE: regex `eflags' are set as:
+ *                   - `REG_NOTBOL = self->__not_bol'
+ *                   - `REG_NOTEOL = self->__not_eol'
+ *                  Sadly, this make this interface really badly designed, as this choice
+ *                  (which was made by Glibc  btw), prevents multiple threads from  using
+ *                  the same `regex_t' buffer simultaneously. Though note that this  same
+ *                  restriction doesn't apply to  `regexec(3)', or (when targeting  KOS),
+ *                  if  you completely by-pass  the `<regex.h>' API  and directly talk to
+ *                  the public API of `libregex.so' from `<libregex/regexec.h>'.
+ * @param: string1: First base pointer for input data.
+ * @param: length1: Length of first input data (in bytes)
+ * @param: string2: Second base pointer for input data.
+ * @param: length2: Length of second input data (in bytes)
+ * @param: start:   Starting offset where to begin searching
+ * @param: range:   The max # of searches to attempt at successive byte-offsets starting at `start'
+ * @param: regs:    Group match information (like `regexec(3)'s `nmatch' and `pmatch' arguments)
+ * @param: stop:    Offset into the virtual input buffer that marks its end (must be `<= length1+length2')
+ * @return: >= 0:   Was able to discover a match at this offset. (always `< range')
+ * @return: -1:     No match was found
+ * @return: -2:     Internal error (probably meaning out-of-memory) */
+INTDEF ATTR_IN(1) ATTR_INS(2, 3) ATTR_INS(4, 5) ATTR_OUT_OPT(8) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_re_search_2)(regex_t __KOS_FIXED_CONST *self, char const *string1, __STDC_INT_AS_SIZE_T length1, char const *string2, __STDC_INT_AS_SIZE_T length2, __STDC_INT_AS_SIZE_T start, __STDC_INT_AS_SIZE_T range, struct __re_registers *regs, __STDC_INT_AS_SIZE_T stop);
+/* >> re_match(3)
+ * Match input data `[string+start,string+length)' against the regex pattern `self'
+ * The accessed area of the input buffer is restricted to `[string,string+length)'.
+ * @param: self:   The compiled regex pattern to use. NOTE: regex `eflags' are set as:
+ *                  - `REG_NOTBOL = self->__not_bol'
+ *                  - `REG_NOTEOL = self->__not_eol'
+ *                 Sadly, this make this interface really badly designed, as this choice
+ *                 (which was made by Glibc  btw), prevents multiple threads from  using
+ *                 the same `regex_t' buffer simultaneously. Though note that this  same
+ *                 restriction doesn't apply to  `regexec(3)', or (when targeting  KOS),
+ *                 if  you completely by-pass  the `<regex.h>' API  and directly talk to
+ *                 the public API of `libregex.so' from `<libregex/regexec.h>'.
+ * @param: string: Base pointer for input data.
+ * @param: length: Length of input data (in bytes)
+ * @param: start:  Starting offset where to begin searching
+ * @param: regs:   Group match information (like `regexec(3)'s `nmatch' and `pmatch' arguments)
+ * @return: >= 0:  The number of bytes starting at `start' that were matched against `self'
+ * @return: -1:    No match was found
+ * @return: -2:    Internal error (probably meaning out-of-memory) */
+INTDEF ATTR_IN(1) ATTR_INS(2, 3) ATTR_OUT_OPT(5) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_re_match)(regex_t __KOS_FIXED_CONST *self, char const *string, __STDC_INT_AS_SIZE_T length, __STDC_INT_AS_SIZE_T start, struct __re_registers *regs);
+/* >> re_match_2(3)
+ * Same  as `re_match(3)',  but use  the virtual  concatenation of `string1...+=length1'
+ * and  `string2...+=length2' as input  buffer. Also: use `stop'  as the end-offset into
+ * this  virtual buffer of where to stop  doing non-extra accessing accesses (extra data
+ * accesses are positional assertion checks at the end of the regex pattern, such as '$'
+ * checking  if it is followed by a line-feed being allowed to read until the actual end
+ * of the virtual buffer,  whilst actual byte-matching is  only allowed to happen  until
+ * an offset of `stop' bytes has been reached)
+ *
+ * Note that on KOS, the underlying API used is `re_exec_match(3R)' from  `libregex.so'
+ * and exposed in `<libregex/regexec.h>', which allows for the virtual concatenation of
+ * not just 2, but an arbitrary number of buffers which are then used as input.
+ *
+ * @param: self:    The compiled regex pattern to use. NOTE: regex `eflags' are set as:
+ *                   - `REG_NOTBOL = self->__not_bol'
+ *                   - `REG_NOTEOL = self->__not_eol'
+ *                  Sadly, this make this interface really badly designed, as this choice
+ *                  (which was made by Glibc  btw), prevents multiple threads from  using
+ *                  the same `regex_t' buffer simultaneously. Though note that this  same
+ *                  restriction doesn't apply to  `regexec(3)', or (when targeting  KOS),
+ *                  if  you completely by-pass  the `<regex.h>' API  and directly talk to
+ *                  the public API of `libregex.so' from `<libregex/regexec.h>'.
+ * @param: string1: First base pointer for input data.
+ * @param: length1: Length of first input data (in bytes)
+ * @param: string2: Second base pointer for input data.
+ * @param: length2: Length of second input data (in bytes)
+ * @param: start:   Starting offset where to begin searching
+ * @param: range:   The max # of searches to attempt at successive byte-offsets starting at `start'
+ * @param: regs:    Group match information (like `regexec(3)'s `nmatch' and `pmatch' arguments)
+ * @param: stop:    Offset into the virtual input buffer that marks its end (must be `<= length1+length2')
+ * @return: >= 0:   The number of bytes starting at `start' that were matched against `self'
+ * @return: -1:     No match was found
+ * @return: -2:     Internal error (probably meaning out-of-memory) */
+INTDEF ATTR_IN(1) ATTR_INS(2, 3) ATTR_INS(4, 5) ATTR_OUT_OPT(7) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_re_match_2)(regex_t __KOS_FIXED_CONST *self, char const *string1, __STDC_INT_AS_SIZE_T length1, char const *string2, __STDC_INT_AS_SIZE_T length2, __STDC_INT_AS_SIZE_T start, struct __re_registers *regs, __STDC_INT_AS_SIZE_T stop);
+/* >> re_set_registers(3)
+ * Initializes `regs', and sets some weird internal flag in `self' (which it doesn't do on KOS) */
+INTDEF ATTR_INOUT(1) ATTR_OUT(2) void NOTHROW_NCX(LIBDCALL libd_re_set_registers)(regex_t *self, struct __re_registers *regs, unsigned int num_regs, regoff_t *starts, regoff_t *ends);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> re_set_registers(3)
+ * Initializes `regs', and sets some weird internal flag in `self' (which it doesn't do on KOS) */
+INTDEF ATTR_INOUT(1) ATTR_OUT(2) void NOTHROW_NCX(LIBCCALL libc_re_set_registers)(regex_t *self, struct __re_registers *regs, unsigned int num_regs, regoff_t *starts, regoff_t *ends);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> regcomp(3)
+ * Compile a regular expression `pattern' and initialize `self'
+ * @param: self:    Storage for the produced regex pattern.
+ * @param: pattern: The pattern to compile.
+ * @param: cflags:  Set of `REG_EXTENDED | REG_ICASE | REG_NEWLINE | REG_NOSUB'
+ * @return: REG_NOERROR: Success
+ * @return: REG_BADPAT:  General pattern syntax error.
+ * @return: REG_ECTYPE:  Invalid/unknown character class name.
+ * @return: REG_EESCAPE: Trailing backslash.
+ * @return: REG_ESUBREG: Invalid back reference.
+ * @return: REG_EBRACK:  Unmatched '['.
+ * @return: REG_EPAREN:  Unmatched '('.
+ * @return: REG_EBRACE:  Unmatched '{'.
+ * @return: REG_BADBR:   Invalid contents of '{...}'.
+ * @return: REG_ERANGE:  Invalid range end (e.g. '[z-a]').
+ * @return: REG_ESPACE:  Out of memory.
+ * @return: REG_BADRPT:  Nothing is preceding '+', '*', '?' or '{'.
+ * @return: REG_EEND:    Unexpected end of pattern.
+ * @return: REG_ESIZE:   Compiled pattern bigger than 2^16 bytes.
+ * @return: REG_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
+ * @return: REG_ENOSYS:  Unable to load `libregex.so' (shouldn't happen) */
+INTDEF ATTR_IN(2) ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_regcomp)(regex_t *__restrict self, char const *__restrict pattern, int cflags);
+/* >> regcomp(3)
+ * Compile a regular expression `pattern' and initialize `self'
+ * @param: self:   Storage for the produced regex pattern.
+ * @param: string: Input data base pointer (must be a NUL-terminated string, unless `REG_STARTEND' is given)
+ * @param: nmatch: Max # of group start/end-offsets to write to `*pmatch' (ignored if `REG_NOSUB' was set)
+ * @param: pmatch: Storage for at least `nmatch' group start/end-offsets (ignored if `REG_NOSUB' was set)
+ * @param: eflags: Set of `REG_NOTBOL | REG_NOTEOL | REG_STARTEND'
+ * @return: REG_NOERROR: Success
+ * @return: REG_NOMATCH: General pattern syntax error.
+ * @return: REG_ESPACE:  Out of memory.
+ * @return: REG_ENOSYS:  Unable to load `libregex.so' (shouldn't happen) */
+INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_INOUTS(4, 3) int NOTHROW_NCX(LIBDCALL libd_regexec)(regex_t const *__restrict self, char const *__restrict string, size_t nmatch, regmatch_t pmatch[__restrict_arr], int eflags);
+/* >> regerror(3)
+ * Produce a human-readable description for a regex error code `errcode' (s.a. `regerrordesc_np(3)')
+ * @param: errcode: Regex error code (one of `REG_*'; s.a. `reg_errcode_t')
+ * @param: self:    The compiled regex pattern that produced the error (unused in this impl)
+ * @return: * :     The required buffer size (including a trailing '\0'-byte) */
+INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) size_t NOTHROW_NCX(LIBDCALL libd_regerror)(int errcode, regex_t const *__restrict self, char *__restrict errbuf, size_t errbuf_size);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> regerror(3)
+ * Produce a human-readable description for a regex error code `errcode' (s.a. `regerrordesc_np(3)')
+ * @param: errcode: Regex error code (one of `REG_*'; s.a. `reg_errcode_t')
+ * @param: self:    The compiled regex pattern that produced the error (unused in this impl)
+ * @return: * :     The required buffer size (including a trailing '\0'-byte) */
+INTDEF ATTR_IN(2) ATTR_OUTS(3, 4) size_t NOTHROW_NCX(LIBCCALL libc_regerror)(int errcode, regex_t const *__restrict self, char *__restrict errbuf, size_t errbuf_size);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> regfree(3)
+ * Free dynamic memory allocated during a successful call to `regcomp(3)'
+ * @param: self: The compiled regex pattern to destroy */
+INTDEF void NOTHROW_NCX(LIBDCALL libd_regfree)(regex_t *self);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> regfree(3)
+ * Free dynamic memory allocated during a successful call to `regcomp(3)'
+ * @param: self: The compiled regex pattern to destroy */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_regfree)(regex_t *self);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> regerrordesc_np(3)
+ * Return a human-readable description for a given regex `errcode'
+ * @param: errcode: Regex error code (one of `REG_*'; s.a. `reg_errcode_t')
+ * @return: * :   The human-readable description for `errcode'
+ * @return: NULL: No description is available for `errcode' */
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBDCALL libd_regerrordesc_np)(int errcode);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> regerrordesc_np(3)
+ * Return a human-readable description for a given regex `errcode'
+ * @param: errcode: Regex error code (one of `REG_*'; s.a. `reg_errcode_t')
+ * @return: * :   The human-readable description for `errcode'
+ * @return: NULL: No description is available for `errcode' */
+INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_regerrordesc_np)(int errcode);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

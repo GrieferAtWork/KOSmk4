@@ -177,8 +177,8 @@ typedef int re_errno_t;
  *       already-compiled code can simply be done whilst ignoring the chance
  *       of  relocations. This is because jumps are relative, and will never
  *       jump out of- or into some block "<X>".
- *       As  such, in order  to compile (e.g.)  "X{n,m}", simply compile "X",
- *       then memmoveup() its bytecode to insert the 2 `REOP_SETVAR' opcodes,
+ *       As such, in  order to  compile (e.g.) "X{n,m}",  simply compile  "X",
+ *       then memmoveup(3) its bytecode to insert the 2 `REOP_SETVAR' opcodes,
  *       with the guaranty that no jump offsets ever need to be adjusted.
  *
  * NOTES:
@@ -378,10 +378,14 @@ enum {
 #define REOP_AT_MIN REOP_AT_SOI
 	REOP_AT_SOI,          /* [+0] Start-of-input */
 	REOP_AT_EOI,          /* [+0] End-of-input */
-	REOP_AT_SOL,          /* [+0] Start-of-line (following a line-feed, or `REOP_AT_SOI' unless `RE_EXEC_NOTBOL' was set) */
-	REOP_AT_SOL_UTF8,     /* [+0] Start-of-line (following a line-feed, or `REOP_AT_SOI' unless `RE_EXEC_NOTBOL' was set) */
-	REOP_AT_EOL,          /* [+0] End-of-line (preceding a line-feed, or `REOP_AT_EOI' unless `RE_EXEC_NOTEOL' was set) */
-	REOP_AT_EOL_UTF8,     /* [+0] End-of-line (preceding a line-feed, or `REOP_AT_EOI' unless `RE_EXEC_NOTEOL' was set) */
+	REOP_AT_SOL,          /* [+0] Start-of-line (following a line-feed, or `REOP_AT_SOI') */
+	REOP_AT_SOL_UTF8,     /* [+0] Start-of-line (following a line-feed, or `REOP_AT_SOI') */
+	REOP_AT_EOL,          /* [+0] End-of-line (preceding a line-feed, or `REOP_AT_EOI') */
+	REOP_AT_EOL_UTF8,     /* [+0] End-of-line (preceding a line-feed, or `REOP_AT_EOI') */
+	REOP_AT_SOXL,         /* [+0] Start-of-line (following a line-feed, or `REOP_AT_SOI' unless `RE_EXEC_NOTBOL' was set) */
+	REOP_AT_SOXL_UTF8,    /* [+0] Start-of-line (following a line-feed, or `REOP_AT_SOI' unless `RE_EXEC_NOTBOL' was set) */
+	REOP_AT_EOXL,         /* [+0] End-of-line (preceding a line-feed, or `REOP_AT_EOI' unless `RE_EXEC_NOTEOL' was set) */
+	REOP_AT_EOXL_UTF8,    /* [+0] End-of-line (preceding a line-feed, or `REOP_AT_EOI' unless `RE_EXEC_NOTEOL' was set) */
 	REOP_AT_WOB,          /* [+0] WOrdBoundary (preceding and next character have non-equal `issymcont(ch)'; OOB counts as `issymcont == false') */
 	REOP_AT_WOB_UTF8,     /* [+0] WOrdBoundary (preceding and next character have non-equal `unicode_issymcont(ch)'; OOB counts as `unicode_issymcont == false') */
 	REOP_AT_WOB_NOT,      /* [+0] NOT WOrdBoundary (preceding and next character have equal `issymcont(ch)'; OOB counts as `unicode_issymcont == false') */
@@ -458,11 +462,12 @@ enum {
 #define RE_SYNTAX_CARET_ANCHORS_HERE        0x00800000 /* Alias for `RE_SYNTAX_CONTEXT_INDEP_ANCHORS', but only for '^', and used internally */
 #define RE_SYNTAX_CONTEXT_INVALID_DUP       0x01000000 /* If set, '{' appearing at the start, or after '(', '|' or '}' results in `RE_BADRPT'; else, behavior is governed by `RE_SYNTAX_CONTEXT_INVALID_OPS' */
 #define RE_SYNTAX_NO_SUB                    0x02000000 /* Ignored... (used at a different point to implement `RE_NOSUB') */
+#define RE_SYNTAX_ANCHORS_IGNORE_FLAGS      0x20000000 /* '^' and '$' operators will ignore `RE_EXEC_NOTBOL' and `RE_EXEC_NOTEOL' */
 #define RE_SYNTAX_NO_UTF8                   0x40000000 /* If set, pattern is byte-based (rather than a utf-8 string; e.g. '[ä]' is like '[\xC3\xA4]'). Also disables support for '\uABCD', '\UABCDABCD' */
 #define RE_SYNTAX_NO_KOS_OPS                0x80000000 /* If set, disable support for python- and kos-extensions: '\n', "[^:<foo>:]", '\d', '\D', '\0123', '\xAB', '\uABCD', '\UABCDABCD', '\A', '\Z' */
 
 /* Regex parser structure.
- * The behavior of `re_parser_yield()' is affected by the following syntax flags:
+ * The behavior of `re_parser_yield(3R)' is affected by the following syntax flags:
  * - RE_SYNTAX_BK_PLUS_QM
  * - RE_SYNTAX_CONTEXT_INDEP_ANCHORS
  * - RE_SYNTAX_INTERVALS
@@ -480,7 +485,7 @@ enum {
  * - RE_SYNTAX_NO_KOS_OPS */
 struct re_parser {
 	char const *rep_pos;    /* [1..1][>= rep_pat] Pointer to next pattern-character that has yet to be compiled. */
-	char const *rep_pat;    /* [1..1] Pointer to the start of the pattern being compiled. */
+	char const *rep_pat;    /* [1..1][const] Pointer to the start of the pattern being compiled. */
 	__uintptr_t rep_syntax; /* [const] RE syntax flags (set of `RE_SYNTAX_*') */
 };
 
@@ -598,16 +603,16 @@ struct re_compiler {
 
 /* Pack the result of the given reg-ex compiler `self',
  * and return its  produced `struct re_code'. Use  this
- * function INSTEAD  OF `re_compiler_fini()'  following
- * a successful call to `re_compiler_compile()' */
+ * function INSTEAD OF `re_compiler_fini(3R)' following
+ * a successful call to `re_compiler_compile(3R)' */
 #define re_compiler_pack(self) \
 	((struct re_code *)(self)->rec_cbase)
 
 
-/* Parse and compile the pattern given to `self' to generate code.
- * Even upon error, `self' remains  in a valid state (except  that
- * you're  not allowed to  call `re_compiler_compile()' again), so
- * that the caller has to invoke `re_compiler_fini()' in order  to
+/* Parse  and compile the pattern given to `self' to generate code.
+ * Even  upon error, `self'  remains in a  valid state (except that
+ * you're  not allowed to call `re_compiler_compile(3R)' again), so
+ * that the caller has to invoke `re_compiler_fini(3R)' in order to
  * perform cleanup.
  * Upon success, members of `self' are initialized as:
  * - *rec_parser.rep_pos    == '\0'

@@ -27,14 +27,18 @@
 
 #include <hybrid/atomic.h>
 
+#include <bits/os/iovec.h>
+
 #include <assert.h>
 #include <errno.h>
 #include <malloc.h>
+#include <regex.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
 
-#include <libregex/regex.h>
+#include <libregex/regcomp.h>
+#include <libregex/regexec.h>
 
 #include "../libc/dl.h"
 #include "../libc/globals.h"
@@ -46,452 +50,649 @@ DECL_BEGIN
 #define REGEX_RODATA ATTR_SECTION(".rodata.crt.utility.regex")
 #define REGEX_BSS    ATTR_SECTION(".bss.crt.utility.regex")
 
-#ifndef LIBREGEX_WANT_PROTOTYPES
+/* Define dynamic, lazy imports from `libregex.so' */
 #define DEFINE_REGEX_BINDING(T, name)                     \
 	PRIVATE REGEX_BSS T pdyn_##name               = NULL; \
 	PRIVATE REGEX_RODATA char const name_##name[] = #name
 PRIVATE REGEX_BSS void *libregex = NULL;
-DEFINE_REGEX_BINDING(PREGEX_MATCHESPTR, regex_matchesptr);
-DEFINE_REGEX_BINDING(PREGEX_FIND, regex_find);
-DEFINE_REGEX_BINDING(PREGEX_RFIND, regex_rfind);
-DEFINE_REGEX_BINDING(PREGEX_FINDPTR, regex_findptr);
-DEFINE_REGEX_BINDING(PREGEX_RFINDPTR, regex_rfindptr);
-DEFINE_REGEX_BINDING(PREGEX_FINDEX, regex_findex);
-DEFINE_REGEX_BINDING(PREGEX_RFINDEX, regex_rfindex);
-#define regex_matchesptr (*pdyn_regex_matchesptr)
-#define regex_find       (*pdyn_regex_find)
-#define regex_rfind      (*pdyn_regex_rfind)
-#define regex_findptr    (*pdyn_regex_findptr)
-#define regex_rfindptr   (*pdyn_regex_rfindptr)
-#define regex_findex     (*pdyn_regex_findex)
-#define regex_rfindex    (*pdyn_regex_rfindex)
+DEFINE_REGEX_BINDING(PRE_COMPILER_COMPILE, re_compiler_compile);
+DEFINE_REGEX_BINDING(PRE_EXEC_MATCH, re_exec_match);
+DEFINE_REGEX_BINDING(PRE_EXEC_SEARCH, re_exec_search);
+DEFINE_REGEX_BINDING(PRE_EXEC_RSEARCH, re_exec_rsearch);
+#undef DEFINE_REGEX_BINDING
 
-#define REGEX_ONDEMAND()   regex_ondemand()
-PRIVATE bool LIBCCALL regex_ondemand(void) {
-	void *lregex;
-	if likely(pdyn_regex_rfindex)
+#define re_compiler_compile (*pdyn_re_compiler_compile)
+#define re_exec_match       (*pdyn_re_exec_match)
+#define re_exec_search      (*pdyn_re_exec_search)
+#define re_exec_rsearch     (*pdyn_re_exec_rsearch)
+
+PRIVATE WUNUSED bool LIBCCALL libregex_load(void) {
+	void *lib;
+	if likely(pdyn_re_exec_rsearch)
 		return true;
 again_read_libregex:
-	lregex = ATOMIC_READ(libregex);
-	if unlikely(lregex == (void *)-1)
+	lib = ATOMIC_READ(libregex);
+	if unlikely(lib == (void *)-1)
 		return false;
-	if (lregex == NULL) {
-		lregex = dlopen(LIBREGEX_LIBRARY_NAME, RTLD_LOCAL);
-		if unlikely(!lregex)
-			lregex = (void *)-1;
-		if unlikely(!ATOMIC_CMPXCH(libregex, NULL, lregex)) {
-			if (lregex != (void *)-1)
-				dlclose(lregex);
+	if (lib == NULL) {
+		lib = dlopen(LIBREGEX_LIBRARY_NAME, RTLD_LOCAL);
+		if unlikely(!lib)
+			lib = (void *)-1;
+		if unlikely(!ATOMIC_CMPXCH(libregex, NULL, lib)) {
+			if (lib != (void *)-1)
+				dlclose(lib);
 			goto again_read_libregex;
 		}
 	}
-#define BIND(pdyn_FUNC, name_FUNC)                       \
-	do {                                                 \
-		*(void **)&pdyn_FUNC = dlsym(lregex, name_FUNC); \
-		if unlikely(!pdyn_FUNC)                          \
-			goto err;                                    \
+#define BIND(pdyn_FUNC, name_FUNC)                    \
+	do {                                              \
+		*(void **)&pdyn_FUNC = dlsym(lib, name_FUNC); \
+		if unlikely(!pdyn_FUNC)                       \
+			goto err;                                 \
 	}	__WHILE0
-	BIND(pdyn_regex_matchesptr, name_regex_matchesptr);
-	BIND(pdyn_regex_find, name_regex_find);
-	BIND(pdyn_regex_rfind, name_regex_rfind);
-	BIND(pdyn_regex_findptr, name_regex_findptr);
-	BIND(pdyn_regex_rfindptr, name_regex_rfindptr);
-	BIND(pdyn_regex_findex, name_regex_findex);
-	/* Make sure that `pdyn_regex_rfindex' is loaded last (since it's
-	 * the one we check above for our fast-pass already-loaded check) */
+	BIND(pdyn_re_compiler_compile, name_re_compiler_compile);
+	BIND(pdyn_re_exec_match, name_re_exec_match);
+	BIND(pdyn_re_exec_search, name_re_exec_search);
+	/* Make sure that `pdyn_re_exec_rsearch' is loaded last (since it's
+	 * the one we check above  for our fast-pass already-loaded  check) */
 	COMPILER_WRITE_BARRIER();
-	BIND(pdyn_regex_rfindex, name_regex_rfindex);
+	BIND(pdyn_re_exec_rsearch, name_re_exec_rsearch);
 	COMPILER_WRITE_BARRIER();
 #undef BIND
 	return true;
 err:
-	if (ATOMIC_CMPXCH(libregex, lregex, (void *)-1))
-		dlclose(lregex);
+	if (ATOMIC_CMPXCH(libregex, lib, (void *)-1))
+		dlclose(lib);
 	return false;
 }
 
-#undef DEFINE_REGEX_BINDING
-#else /* !LIBREGEX_WANT_PROTOTYPES */
-#define REGEX_ONDEMAND()   true
-#endif /* LIBREGEX_WANT_PROTOTYPES */
+
+/************************************************************************/
+/* Assert that constants from `<regex.h>' are compatible with `libregex.so' */
+/************************************************************************/
+
+/* Execution flags... */
+static_assert(REG_NOTBOL == RE_EXEC_NOTBOL);
+static_assert(REG_NOTEOL == RE_EXEC_NOTEOL);
+
+/* Error codes... */
+static_assert(REG_NOERROR == RE_NOERROR);
+static_assert(REG_NOMATCH == RE_NOMATCH);
+static_assert(REG_BADPAT == RE_BADPAT);
+static_assert(REG_ECOLLATE == RE_ECOLLATE);
+static_assert(REG_ECTYPE == RE_ECTYPE);
+static_assert(REG_EESCAPE == RE_EESCAPE);
+static_assert(REG_ESUBREG == RE_ESUBREG);
+static_assert(REG_EBRACK == RE_EBRACK);
+static_assert(REG_EPAREN == RE_EPAREN);
+static_assert(REG_EBRACE == RE_EBRACE);
+static_assert(REG_BADBR == RE_BADBR);
+static_assert(REG_ERANGE == RE_ERANGE);
+static_assert(REG_ESPACE == RE_ESPACE);
+static_assert(REG_BADRPT == RE_BADRPT);
+static_assert(REG_EEND == RE_EEND);
+static_assert(REG_ESIZE == RE_ESIZE);
+static_assert(REG_ERPAREN == RE_ERPAREN);
+
+/* Syntax flags... */
+static_assert(RE_BACKSLASH_ESCAPE_IN_LISTS == RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS);
+static_assert(RE_BK_PLUS_QM == RE_SYNTAX_BK_PLUS_QM);
+static_assert(RE_CHAR_CLASSES == RE_SYNTAX_CHAR_CLASSES);
+static_assert(RE_CONTEXT_INDEP_ANCHORS == RE_SYNTAX_CONTEXT_INDEP_ANCHORS);
+static_assert(RE_CONTEXT_INDEP_OPS == RE_SYNTAX_CONTEXT_INDEP_OPS);
+static_assert(RE_CONTEXT_INVALID_OPS == RE_SYNTAX_CONTEXT_INVALID_OPS);
+static_assert(RE_DOT_NEWLINE == RE_SYNTAX_DOT_NEWLINE);
+static_assert(RE_DOT_NOT_NULL == RE_SYNTAX_DOT_NOT_NULL);
+static_assert(RE_HAT_LISTS_NOT_NEWLINE == RE_SYNTAX_HAT_LISTS_NOT_NEWLINE);
+static_assert(RE_INTERVALS == RE_SYNTAX_INTERVALS);
+static_assert(RE_LIMITED_OPS == RE_SYNTAX_LIMITED_OPS);
+static_assert(RE_NEWLINE_ALT == RE_SYNTAX_NEWLINE_ALT);
+static_assert(RE_NO_BK_BRACES == RE_SYNTAX_NO_BK_BRACES);
+static_assert(RE_NO_BK_PARENS == RE_SYNTAX_NO_BK_PARENS);
+static_assert(RE_NO_BK_REFS == RE_SYNTAX_NO_BK_REFS);
+static_assert(RE_NO_BK_VBAR == RE_SYNTAX_NO_BK_VBAR);
+static_assert(RE_NO_EMPTY_RANGES == RE_SYNTAX_NO_EMPTY_RANGES);
+static_assert(RE_UNMATCHED_RIGHT_PAREN_ORD == RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD);
+static_assert(RE_NO_POSIX_BACKTRACKING == RE_SYNTAX_NO_POSIX_BACKTRACKING);
+static_assert(RE_NO_GNU_OPS == RE_SYNTAX_NO_GNU_OPS);
+static_assert(RE_DEBUG == RE_SYNTAX_DEBUG);
+static_assert(RE_INVALID_INTERVAL_ORD == RE_SYNTAX_INVALID_INTERVAL_ORD);
+static_assert(RE_ICASE == RE_SYNTAX_ICASE);
+static_assert(RE_CARET_ANCHORS_HERE == RE_SYNTAX_CARET_ANCHORS_HERE);
+static_assert(RE_CONTEXT_INVALID_DUP == RE_SYNTAX_CONTEXT_INVALID_DUP);
+static_assert(RE_NO_SUB == RE_SYNTAX_NO_SUB);
+static_assert(RE_ANCHORS_IGNORE_FLAGS == RE_SYNTAX_ANCHORS_IGNORE_FLAGS);
+static_assert(RE_NO_UTF8 == RE_SYNTAX_NO_UTF8);
+static_assert(RE_NO_KOS_OPS == RE_SYNTAX_NO_KOS_OPS);
+
+/* Ensure that libregex's `re_regmatch_t' is binary-compatible with the `regmatch_t' exposed in `<regex.h>' */
+#define sizeof_field(s, m) sizeof(((s *)0)->m)
+static_assert(sizeof(re_regmatch_t) == sizeof(regmatch_t));
+static_assert(alignof(re_regmatch_t) == alignof(regmatch_t));
+static_assert(offsetof(re_regmatch_t, rm_so) == offsetof(regmatch_t, rm_so));
+static_assert(offsetof(re_regmatch_t, rm_eo) == offsetof(regmatch_t, rm_eo));
+static_assert(sizeof_field(re_regmatch_t, rm_so) == sizeof_field(regmatch_t, rm_so));
+static_assert(sizeof_field(re_regmatch_t, rm_eo) == sizeof_field(regmatch_t, rm_eo));
+#undef sizeof_field
 
 
+/************************************************************************/
+/* DEFAULT REGEX SYNTAX FOR `re_compile_pattern(3)'                     */
+/************************************************************************/
+#undef re_syntax_options
+PUBLIC ATTR_WEAK ATTR_SECTION(".bss.crt.utility.regex") /* Weak so programs can override */
+reg_syntax_t re_syntax_options = RE_SYNTAX_EMACS;       /* Must be `RE_SYNTAX_EMACS' for Glibc compat */
+#define re_syntax_options GET_NOREL_GLOBAL(re_syntax_options)
 
 
-/*[[[head:libc_re_set_syntax,hash:CRC-32=0x17dca2c5]]]*/
-/* Sets the current default syntax to `syntax', and return the old syntax.
- * You  can  also  simply  assign  to  the  `re_syntax_options'   variable */
-INTERN ATTR_SECTION(".text.crt.utility.regex") reg_syntax_t
-NOTHROW_NCX(LIBCCALL libc_re_set_syntax)(reg_syntax_t syntax)
-/*[[[body:libc_re_set_syntax]]]*/
-{
-	return ATOMIC_XCH(re_syntax_options, syntax);
+/* Convert posix standard regex matches into Glibc's weird, proprietary format. */
+PRIVATE ATTR_SECTION(".text.crt.utility.regex") NONNULL((1, 2)) void
+NOTHROW_NCX(LIBCCALL regmatch2glibc)(regmatch_t const *__restrict matches,
+                                     struct re_registers *__restrict regs) {
+	size_t i;
+	for (i = 0; i < regs->num_regs; ++i) {
+		regs->start[i] = matches[i].rm_so;
+		regs->end[i]   = matches[i].rm_eo;
+	}
 }
-/*[[[end:libc_re_set_syntax]]]*/
 
-/*[[[head:libc_re_compile_pattern,hash:CRC-32=0x79f5d025]]]*/
-/* Compile   the   regular  expression   `pattern',  with   length  `length'
- * and  syntax  given by  the  global `re_syntax_options',  into  the buffer
- * `buffer'.  Return  NULL  if  successful,  and  an  error  string  if not.
- * To  free  the allocated  storage, you  must  call `regfree'  on `buffer'.
- * Note  that  the  translate table  must  either have  been  initialized by
- * `regcomp', with a malloc'd value, or set to NULL before calling `regfree' */
-INTERN ATTR_SECTION(".text.crt.utility.regex") char const *
+
+
+/*[[[head:libc_re_compile_pattern,hash:CRC-32=0xc2053a8c]]]*/
+/* >> re_compile_pattern(3)
+ * Compile a regular expression pattern (s.a. re_compiler_compile(3R)')
+ * @param: pattern: Regex pattern string
+ * @param: length:  Length of regex pattern string (in bytes)
+ * @param: self:    The `regex_t' object to initialize.
+ * @return: NULL:   Success
+ * @return: * :     An error message, as would be produced by `regerror(3)' */
+INTERN ATTR_SECTION(".text.crt.utility.regex") ATTR_INS(1, 2) ATTR_OUT(3) char const *
 NOTHROW_NCX(LIBCCALL libc_re_compile_pattern)(char const *pattern,
                                               size_t length,
-                                              struct re_pattern_buffer *buffer)
+                                              regex_t *self)
 /*[[[body:libc_re_compile_pattern]]]*/
 {
-	if unlikely(!buffer)
-		return strerrorname_np(EINVAL);
-	buffer->buffer = (unsigned char *)strndup(pattern, length);
-	if unlikely(!buffer->buffer)
-		return strerrorname_np(libc_geterrno());
+	re_errno_t error;
+	struct re_compiler comp;
+	struct re_code *code;
+	if unlikely(!libregex_load())
+		return regerrordesc_np(REG_ENOSYS);
+
+	/* Initialize the regex compiler */
+	(void)length; /* TODO: Must respect the `length' argument! */
+	re_compiler_init(&comp, pattern, re_syntax_options);
+
+	/* Compile the pattern. */
+	error = re_compiler_compile(&comp);
+	if unlikely(error != RE_NOERROR) {
+		re_compiler_fini(&comp);
+		return regerrordesc_np(error);
+	}
+	code = re_compiler_pack(&comp);
+
+	/* Compilation was successful -> fill in `self' */
+	self->buffer           = (typeof(self->buffer))code;
+	self->syntax           = comp.rec_parser.rep_syntax;
+	self->re_nsub          = code->rc_ngrps;
+	self->can_be_null      = code->rc_minmatch == 0 ? 1 : 0;
+	self->fastmap_accurate = 1;
+	self->no_sub           = (comp.rec_parser.rep_syntax & RE_SYNTAX_NO_SUB) ? 1 : 0;
+	self->newline_anchor   = (comp.rec_parser.rep_syntax & RE_SYNTAX_ANCHORS_IGNORE_FLAGS) ? 1 : 0;
 	return NULL;
 }
 /*[[[end:libc_re_compile_pattern]]]*/
 
-/*[[[head:libc_re_compile_fastmap,hash:CRC-32=0xcd4ace1]]]*/
-/* Compile  a  fastmap   for  the   compiled  pattern  in   `buffer';  used   to
- * accelerate searches. Return 0 if successful and `-2' if was an internal error */
-INTERN ATTR_SECTION(".text.crt.utility.regex") int
-NOTHROW_NCX(LIBCCALL libc_re_compile_fastmap)(struct re_pattern_buffer *buffer)
-/*[[[body:libc_re_compile_fastmap]]]*/
-{
-	(void)buffer; /* no-op */
-	COMPILER_IMPURE();
-	return 0;
-}
-/*[[[end:libc_re_compile_fastmap]]]*/
-
-/*[[[head:libc_re_search,hash:CRC-32=0x8d5f631c]]]*/
-/* Search in the  string `string'  (with length `length')  for the  pattern
- * compiled into `buffer'. Start searching at position `start', for `range'
- * characters.  Return  the starting  position of  the  match, `-1'  for no
- * match,  or   `-2'  for   an  internal   error.  Also   return   register
- * information in  `regs'  (if  `regs' and  `buffer'->no_sub  are  nonzero) */
-INTERN ATTR_SECTION(".text.crt.utility.regex") int
-NOTHROW_NCX(LIBCCALL libc_re_search)(struct re_pattern_buffer *buffer,
+/*[[[head:libc_re_search,hash:CRC-32=0x979c31a9]]]*/
+/* >> re_search(3)
+ * Perform a regex search for the first matching byte-offset in `[start,start+range)'.
+ * The  accessed area of  the input buffer  is restricted to `[string,string+length)'.
+ * @param: self:   The compiled regex pattern to use. NOTE: regex `eflags' are set as:
+ *                  - `REG_NOTBOL = self->__not_bol'
+ *                  - `REG_NOTEOL = self->__not_eol'
+ *                 Sadly, this make this interface really badly designed, as this choice
+ *                 (which was made by Glibc  btw), prevents multiple threads from  using
+ *                 the same `regex_t' buffer simultaneously. Though note that this  same
+ *                 restriction doesn't apply to  `regexec(3)', or (when targeting  KOS),
+ *                 if  you completely by-pass  the `<regex.h>' API  and directly talk to
+ *                 the public API of `libregex.so' from `<libregex/regexec.h>'.
+ * @param: string: Base pointer for input data.
+ * @param: length: Length of input data (in bytes)
+ * @param: start:  Starting offset where to begin searching
+ * @param: range:  The max # of searches to attempt at successive byte-offsets starting at `start'
+ * @param: regs:   Group match information (like `regexec(3)'s `nmatch' and `pmatch' arguments)
+ * @return: >= 0:  Was able to discover a match at this offset. (always `< range')
+ * @return: -1:    No match was found
+ * @return: -2:    Internal error (probably meaning out-of-memory) */
+INTERN ATTR_SECTION(".text.crt.utility.regex") ATTR_IN(1) ATTR_INS(2, 3) ATTR_OUT_OPT(6) __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc_re_search)(regex_t __KOS_FIXED_CONST *self,
                                      char const *string,
-                                     int length,
-                                     int start,
-                                     int range,
-                                     struct re_registers *regs)
+                                     __STDC_INT_AS_SIZE_T length,
+                                     __STDC_INT_AS_SIZE_T start,
+                                     __STDC_INT_AS_SIZE_T range,
+                                     struct __re_registers *regs)
 /*[[[body:libc_re_search]]]*/
 {
-	return libc_re_search_2(buffer,
-	                        string,
-	                        length,
-	                        NULL,
-	                        0,
-	                        start,
-	                        range,
-	                        regs,
-	                        range);
+	struct re_exec exec;
+	struct iovec iov[1];
+	ssize_t status;
+	if unlikely(!libregex_load())
+		return -2;
+
+	/* Set-up in regex execution controller. */
+	iov[0].iov_base  = (void *)string;
+	iov[0].iov_len   = (size_t)length;
+	exec.rx_code     = regex_getcode(self);
+	exec.rx_iov      = iov;
+	exec.rx_startoff = (size_t)start;
+	exec.rx_endoff   = (size_t)start + (size_t)length;
+	exec.rx_extra    = 0;
+	exec.rx_eflags   = 0;
+	if (self->not_bol)
+		exec.rx_eflags |= RE_EXEC_NOTBOL;
+	if (self->not_eol)
+		exec.rx_eflags |= RE_EXEC_NOTEOL;
+
+	/* Execute the search-request */
+	if (regs && regs->num_regs) {
+		re_regmatch_t *matches;
+		matches = (re_regmatch_t *)malloc(regs->num_regs, sizeof(re_regmatch_t));
+		if unlikely(!matches)
+			return -2;
+		status = re_exec_search(&exec, (size_t)range, regs->num_regs, matches, NULL);
+		if (status >= 0)
+			regmatch2glibc((regmatch_t const *)matches, regs);
+		free(matches);
+	} else {
+		status = re_exec_search(&exec, (size_t)range, 0, NULL, NULL);
+	}
+	if (status >= 0)
+		return status;
+	if (status == -RE_NOMATCH)
+		return -1;
+	return -2; /* "internal" error */
 }
 /*[[[end:libc_re_search]]]*/
 
-/*[[[head:libc_re_search_2,hash:CRC-32=0xafae72f0]]]*/
-/* Like `re_search', but search in the concatenation of `string1'
- * and `string2'. Also,  stop searching  at index  `start + stop' */
-INTERN ATTR_SECTION(".text.crt.utility.regex") int
-NOTHROW_NCX(LIBCCALL libc_re_search_2)(struct re_pattern_buffer *buffer,
+/*[[[head:libc_re_search_2,hash:CRC-32=0xac92fcd5]]]*/
+/* >> re_search_2(3)
+ * Same as `re_search(3)',  but use the  virtual concatenation of  `string1...+=length1'
+ * and  `string2...+=length2' as input  buffer. Also: use `stop'  as the end-offset into
+ * this  virtual buffer of where to stop  doing non-extra accessing accesses (extra data
+ * accesses are positional assertion checks at the end of the regex pattern, such as '$'
+ * checking  if it is followed by a line-feed being allowed to read until the actual end
+ * of the virtual buffer,  whilst actual byte-matching is  only allowed to happen  until
+ * an offset of `stop' bytes has been reached)
+ *
+ * Note that on KOS, the underlying API used is `re_exec_search(3R)' from `libregex.so'
+ * and exposed in `<libregex/regexec.h>', which allows for the virtual concatenation of
+ * not just 2, but an arbitrary number of buffers which are then used as input.
+ *
+ * @param: self:    The compiled regex pattern to use. NOTE: regex `eflags' are set as:
+ *                   - `REG_NOTBOL = self->__not_bol'
+ *                   - `REG_NOTEOL = self->__not_eol'
+ *                  Sadly, this make this interface really badly designed, as this choice
+ *                  (which was made by Glibc  btw), prevents multiple threads from  using
+ *                  the same `regex_t' buffer simultaneously. Though note that this  same
+ *                  restriction doesn't apply to  `regexec(3)', or (when targeting  KOS),
+ *                  if  you completely by-pass  the `<regex.h>' API  and directly talk to
+ *                  the public API of `libregex.so' from `<libregex/regexec.h>'.
+ * @param: string1: First base pointer for input data.
+ * @param: length1: Length of first input data (in bytes)
+ * @param: string2: Second base pointer for input data.
+ * @param: length2: Length of second input data (in bytes)
+ * @param: start:   Starting offset where to begin searching
+ * @param: range:   The max # of searches to attempt at successive byte-offsets starting at `start'
+ * @param: regs:    Group match information (like `regexec(3)'s `nmatch' and `pmatch' arguments)
+ * @param: stop:    Offset into the virtual input buffer that marks its end (must be `<= length1+length2')
+ * @return: >= 0:   Was able to discover a match at this offset. (always `< range')
+ * @return: -1:     No match was found
+ * @return: -2:     Internal error (probably meaning out-of-memory) */
+INTERN ATTR_SECTION(".text.crt.utility.regex") ATTR_IN(1) ATTR_INS(2, 3) ATTR_INS(4, 5) ATTR_OUT_OPT(8) __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc_re_search_2)(regex_t __KOS_FIXED_CONST *self,
                                        char const *string1,
-                                       int length1,
+                                       __STDC_INT_AS_SIZE_T length1,
                                        char const *string2,
-                                       int length2,
-                                       int start,
-                                       int range,
-                                       struct re_registers *regs,
-                                       int stop)
+                                       __STDC_INT_AS_SIZE_T length2,
+                                       __STDC_INT_AS_SIZE_T start,
+                                       __STDC_INT_AS_SIZE_T range,
+                                       struct __re_registers *regs,
+                                       __STDC_INT_AS_SIZE_T stop)
 /*[[[body:libc_re_search_2]]]*/
 {
-	if (!REGEX_ONDEMAND())
+	struct re_exec exec;
+	struct iovec iov[2];
+	ssize_t status;
+	if unlikely(!libregex_load())
 		return -2;
-	(void)buffer;
-	(void)string1;
-	(void)length1;
-	(void)string2;
-	(void)length2;
-	(void)start;
-	(void)range;
-	(void)regs;
-	(void)stop;
-	//TODO:regex_find(string, );
-	CRT_UNIMPLEMENTED("re_search_2"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+
+	/* Set-up in regex execution controller. */
+	iov[0].iov_base  = (void *)string1;
+	iov[0].iov_len   = (size_t)length1;
+	iov[1].iov_base  = (void *)string2;
+	iov[1].iov_len   = (size_t)length2;
+	exec.rx_code     = regex_getcode(self);
+	exec.rx_iov      = iov;
+	exec.rx_startoff = (size_t)start;
+	exec.rx_endoff   = (size_t)start + (size_t)stop;
+	exec.rx_extra    = (size_t)stop - ((size_t)length1 + (size_t)length2);
+	exec.rx_eflags   = 0;
+	if (self->not_bol)
+		exec.rx_eflags |= RE_EXEC_NOTBOL;
+	if (self->not_eol)
+		exec.rx_eflags |= RE_EXEC_NOTEOL;
+
+	/* Execute the search-request */
+	if (regs && regs->num_regs) {
+		re_regmatch_t *matches;
+		matches = (re_regmatch_t *)malloc(regs->num_regs, sizeof(re_regmatch_t));
+		if unlikely(!matches)
+			return -2;
+		status = re_exec_search(&exec, (size_t)range, regs->num_regs, matches, NULL);
+		if (status >= 0)
+			regmatch2glibc((regmatch_t const *)matches, regs);
+		free(matches);
+	} else {
+		status = re_exec_search(&exec, (size_t)range, 0, NULL, NULL);
+	}
+	if (status >= 0)
+		return status;
+	if (status == -RE_NOMATCH)
+		return -1;
+	return -2; /* "internal" error */
 }
 /*[[[end:libc_re_search_2]]]*/
 
-/*[[[head:libc_re_match,hash:CRC-32=0x6dab06a6]]]*/
-/* Like `re_search', but return how many characters in `string'
- * the regexp in `buffer' matched, starting at position `start' */
-INTERN ATTR_SECTION(".text.crt.utility.regex") int
-NOTHROW_NCX(LIBCCALL libc_re_match)(struct re_pattern_buffer *buffer,
+/*[[[head:libc_re_match,hash:CRC-32=0x5074d92c]]]*/
+/* >> re_match(3)
+ * Match input data `[string+start,string+length)' against the regex pattern `self'
+ * The accessed area of the input buffer is restricted to `[string,string+length)'.
+ * @param: self:   The compiled regex pattern to use. NOTE: regex `eflags' are set as:
+ *                  - `REG_NOTBOL = self->__not_bol'
+ *                  - `REG_NOTEOL = self->__not_eol'
+ *                 Sadly, this make this interface really badly designed, as this choice
+ *                 (which was made by Glibc  btw), prevents multiple threads from  using
+ *                 the same `regex_t' buffer simultaneously. Though note that this  same
+ *                 restriction doesn't apply to  `regexec(3)', or (when targeting  KOS),
+ *                 if  you completely by-pass  the `<regex.h>' API  and directly talk to
+ *                 the public API of `libregex.so' from `<libregex/regexec.h>'.
+ * @param: string: Base pointer for input data.
+ * @param: length: Length of input data (in bytes)
+ * @param: start:  Starting offset where to begin searching
+ * @param: regs:   Group match information (like `regexec(3)'s `nmatch' and `pmatch' arguments)
+ * @return: >= 0:  The number of bytes starting at `start' that were matched against `self'
+ * @return: -1:    No match was found
+ * @return: -2:    Internal error (probably meaning out-of-memory) */
+INTERN ATTR_SECTION(".text.crt.utility.regex") ATTR_IN(1) ATTR_INS(2, 3) ATTR_OUT_OPT(5) __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc_re_match)(regex_t __KOS_FIXED_CONST *self,
                                     char const *string,
-                                    int length,
-                                    int start,
-                                    struct re_registers *regs)
+                                    __STDC_INT_AS_SIZE_T length,
+                                    __STDC_INT_AS_SIZE_T start,
+                                    struct __re_registers *regs)
 /*[[[body:libc_re_match]]]*/
 {
-	return libc_re_match_2(buffer,
-	                       string,
-	                       length,
-	                       NULL,
-	                       0,
-	                       start,
-	                       regs,
-	                       length);
+	struct re_exec exec;
+	struct iovec iov[1];
+	ssize_t status;
+	if unlikely(!libregex_load())
+		return -2;
+
+	/* Set-up in regex execution controller. */
+	iov[0].iov_base  = (void *)string;
+	iov[0].iov_len   = (size_t)length;
+	exec.rx_code     = regex_getcode(self);
+	exec.rx_iov      = iov;
+	exec.rx_startoff = (size_t)start;
+	exec.rx_endoff   = (size_t)start + (size_t)length;
+	exec.rx_extra    = 0;
+	exec.rx_eflags   = 0;
+	if (self->not_bol)
+		exec.rx_eflags |= RE_EXEC_NOTBOL;
+	if (self->not_eol)
+		exec.rx_eflags |= RE_EXEC_NOTEOL;
+
+	/* Execute the match-request */
+	if (regs && regs->num_regs) {
+		re_regmatch_t *matches;
+		matches = (re_regmatch_t *)malloc(regs->num_regs, sizeof(re_regmatch_t));
+		if unlikely(!matches)
+			return -2;
+		status = re_exec_match(&exec, regs->num_regs, matches);
+		if (status >= 0)
+			regmatch2glibc((regmatch_t const *)matches, regs);
+		free(matches);
+	} else {
+		status = re_exec_match(&exec, 0, NULL);
+	}
+	if (status >= 0)
+		return status;
+	if (status == -RE_NOMATCH)
+		return -1;
+	return -2; /* "internal" error */
 }
 /*[[[end:libc_re_match]]]*/
 
-/*[[[head:libc_re_match_2,hash:CRC-32=0x572fd06d]]]*/
-/* Relates to `re_match' as `re_search_2' relates to `re_search' */
-INTERN ATTR_SECTION(".text.crt.utility.regex") int
-NOTHROW_NCX(LIBCCALL libc_re_match_2)(struct re_pattern_buffer *buffer,
+/*[[[head:libc_re_match_2,hash:CRC-32=0xca7bdc41]]]*/
+/* >> re_match_2(3)
+ * Same  as `re_match(3)',  but use  the virtual  concatenation of `string1...+=length1'
+ * and  `string2...+=length2' as input  buffer. Also: use `stop'  as the end-offset into
+ * this  virtual buffer of where to stop  doing non-extra accessing accesses (extra data
+ * accesses are positional assertion checks at the end of the regex pattern, such as '$'
+ * checking  if it is followed by a line-feed being allowed to read until the actual end
+ * of the virtual buffer,  whilst actual byte-matching is  only allowed to happen  until
+ * an offset of `stop' bytes has been reached)
+ *
+ * Note that on KOS, the underlying API used is `re_exec_match(3R)' from  `libregex.so'
+ * and exposed in `<libregex/regexec.h>', which allows for the virtual concatenation of
+ * not just 2, but an arbitrary number of buffers which are then used as input.
+ *
+ * @param: self:    The compiled regex pattern to use. NOTE: regex `eflags' are set as:
+ *                   - `REG_NOTBOL = self->__not_bol'
+ *                   - `REG_NOTEOL = self->__not_eol'
+ *                  Sadly, this make this interface really badly designed, as this choice
+ *                  (which was made by Glibc  btw), prevents multiple threads from  using
+ *                  the same `regex_t' buffer simultaneously. Though note that this  same
+ *                  restriction doesn't apply to  `regexec(3)', or (when targeting  KOS),
+ *                  if  you completely by-pass  the `<regex.h>' API  and directly talk to
+ *                  the public API of `libregex.so' from `<libregex/regexec.h>'.
+ * @param: string1: First base pointer for input data.
+ * @param: length1: Length of first input data (in bytes)
+ * @param: string2: Second base pointer for input data.
+ * @param: length2: Length of second input data (in bytes)
+ * @param: start:   Starting offset where to begin searching
+ * @param: range:   The max # of searches to attempt at successive byte-offsets starting at `start'
+ * @param: regs:    Group match information (like `regexec(3)'s `nmatch' and `pmatch' arguments)
+ * @param: stop:    Offset into the virtual input buffer that marks its end (must be `<= length1+length2')
+ * @return: >= 0:   The number of bytes starting at `start' that were matched against `self'
+ * @return: -1:     No match was found
+ * @return: -2:     Internal error (probably meaning out-of-memory) */
+INTERN ATTR_SECTION(".text.crt.utility.regex") ATTR_IN(1) ATTR_INS(2, 3) ATTR_INS(4, 5) ATTR_OUT_OPT(7) __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc_re_match_2)(regex_t __KOS_FIXED_CONST *self,
                                       char const *string1,
-                                      int length1,
+                                      __STDC_INT_AS_SIZE_T length1,
                                       char const *string2,
-                                      int length2,
-                                      int start,
-                                      struct re_registers *regs,
-                                      int stop)
+                                      __STDC_INT_AS_SIZE_T length2,
+                                      __STDC_INT_AS_SIZE_T start,
+                                      struct __re_registers *regs,
+                                      __STDC_INT_AS_SIZE_T stop)
 /*[[[body:libc_re_match_2]]]*/
-/*AUTO*/{
-	(void)buffer;
-	(void)string1;
-	(void)length1;
-	(void)string2;
-	(void)length2;
-	(void)start;
-	(void)regs;
-	(void)stop;
-	CRT_UNIMPLEMENTEDF("re_match_2(buffer: %p, string1: %q, length1: %x, string2: %q, length2: %x, start: %x, regs: %p, stop: %x)", buffer, string1, length1, string2, length2, start, regs, stop); /* TODO */
-	return libc_seterrno(ENOSYS);
+{
+	struct re_exec exec;
+	struct iovec iov[2];
+	ssize_t status;
+	if unlikely(!libregex_load())
+		return -2;
+
+	/* Set-up in regex execution controller. */
+	iov[0].iov_base  = (void *)string1;
+	iov[0].iov_len   = (size_t)length1;
+	iov[1].iov_base  = (void *)string2;
+	iov[1].iov_len   = (size_t)length2;
+	exec.rx_code     = regex_getcode(self);
+	exec.rx_iov      = iov;
+	exec.rx_startoff = (size_t)start;
+	exec.rx_endoff   = (size_t)start + (size_t)stop;
+	exec.rx_extra    = (size_t)stop - ((size_t)length1 + (size_t)length2);
+	exec.rx_eflags   = 0;
+	if (self->not_bol)
+		exec.rx_eflags |= RE_EXEC_NOTBOL;
+	if (self->not_eol)
+		exec.rx_eflags |= RE_EXEC_NOTEOL;
+
+	/* Execute the match-request */
+	if (regs && regs->num_regs) {
+		re_regmatch_t *matches;
+		matches = (re_regmatch_t *)malloc(regs->num_regs, sizeof(re_regmatch_t));
+		if unlikely(!matches)
+			return -2;
+		status = re_exec_match(&exec, regs->num_regs, matches);
+		if (status >= 0)
+			regmatch2glibc((regmatch_t const *)matches, regs);
+		free(matches);
+	} else {
+		status = re_exec_match(&exec, 0, NULL);
+	}
+	if (status >= 0)
+		return status;
+	if (status == -RE_NOMATCH)
+		return -1;
+	return -2; /* "internal" error */
 }
 /*[[[end:libc_re_match_2]]]*/
 
-/*[[[head:libc_re_set_registers,hash:CRC-32=0x3540e920]]]*/
-/* Set  `regs'   to  hold   `num_regs'  registers,   storing  them   in  `starts'   and
- * `ends'.   Subsequent  matches  using  `buffer'  and  `regs'  will  use  this  memory
- * for  recording  register  information.  `starts'   and  `ends'  must  be   allocated
- * with  malloc, and must each be at  least ``num_regs' * sizeof(regoff_t)' bytes long.
- * If `num_regs == 0', then subsequent matches should allocate their own register data.
- * Unless this function is called, the first search or match using
- * PATTERN_BUFFER will allocate its own register data, without freeing the old data */
-INTERN ATTR_SECTION(".text.crt.utility.regex") void
-NOTHROW_NCX(LIBCCALL libc_re_set_registers)(struct re_pattern_buffer *buffer,
-                                            struct re_registers *regs,
-                                            unsigned int num_regs,
-                                            regoff_t *starts,
-                                            regoff_t *ends)
-/*[[[body:libc_re_set_registers]]]*/
-/*AUTO*/{
-	(void)buffer;
-	(void)regs;
-	(void)num_regs;
-	(void)starts;
-	(void)ends;
-	CRT_UNIMPLEMENTEDF("re_set_registers(buffer: %p, regs: %p, num_regs: %x, starts: %p, ends: %p)", buffer, regs, num_regs, starts, ends); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_re_set_registers]]]*/
-
-
-#define REGEX_USE_PCRE
-
-/* Until KOS implements regular expressions proper, we (try to) use libpcre */
-#ifdef REGEX_USE_PCRE
-#define PCRE_REG_ICASE     0x0001
-#define PCRE_REG_NEWLINE   0x0002
-#define PCRE_REG_NOTBOL    0x0004
-#define PCRE_REG_NOTEOL    0x0008
-#define PCRE_REG_DOTALL    0x0010
-#define PCRE_REG_NOSUB     0x0020
-#define PCRE_REG_UTF8      0x0040
-#define PCRE_REG_STARTEND  0x0080
-#define PCRE_REG_NOTEMPTY  0x0100
-#define PCRE_REG_UNGREEDY  0x0200
-#define PCRE_REG_UCP       0x0400
-typedef struct {
-	void *re_pcre;
-	size_t re_nsub;
-	size_t re_erroffset;
-} pcre_regex_t;
-
-#define PCRE_REGEX_ENCODE(self) \
-	(((pcre_regex_t *)(self))->re_nsub = (self)->re_nsub)
-#define PCRE_REGEX_DECODE(self) \
-	((self)->re_nsub = ((pcre_regex_t *)(self))->re_nsub)
-
-
-typedef int (*PREGCOMP)(pcre_regex_t *, const char *, int);
-typedef int (*PREGEXEC)(const pcre_regex_t *, const char *, size_t, regmatch_t *, int);
-typedef size_t (*PREGERROR)(int, const pcre_regex_t *, char *, size_t);
-typedef void (*PREGFREE)(pcre_regex_t *);
-
-PRIVATE ATTR_SECTION(".bss.crt.utility.regex") void *libpcre = NULL;
-PRIVATE ATTR_SECTION(".bss.crt.utility.regex") PREGCOMP pdyn_pcre_regcomp   = NULL;
-PRIVATE ATTR_SECTION(".bss.crt.utility.regex") PREGEXEC pdyn_pcre_regexec   = NULL;
-PRIVATE ATTR_SECTION(".bss.crt.utility.regex") PREGERROR pdyn_pcre_regerror = NULL;
-PRIVATE ATTR_SECTION(".bss.crt.utility.regex") PREGFREE pdyn_pcre_regfree   = NULL;
-PRIVATE ATTR_SECTION(".text.crt.utility.regex") bool LIBCCALL load_pcre(void) {
-	void *lib;
-	if (libpcre != NULL)
-		return libpcre != (void *)-1;
-	lib = dlopen("libpcreposix.so.0", RTLD_LAZY | RTLD_LOCAL);
-	if (!lib)
-		goto fail;
-	if ((*(void **)&pdyn_pcre_regcomp = dlsym(lib, "regcomp")) == NULL)
-		goto fail;
-	if ((*(void **)&pdyn_pcre_regexec = dlsym(lib, "regexec")) == NULL)
-		goto fail;
-	if ((*(void **)&pdyn_pcre_regerror = dlsym(lib, "regerror")) == NULL)
-		goto fail;
-	if ((*(void **)&pdyn_pcre_regfree = dlsym(lib, "regfree")) == NULL)
-		goto fail;
-	if (!ATOMIC_CMPXCH(libpcre, NULL, lib))
-		dlclose(lib);
-	return ATOMIC_READ(libpcre) != (void *)-1;
-fail:
-	libpcre = (void *)-1;
-	return false;
-}
-#endif /* REGEX_USE_PCRE */
-
-
-/*[[[head:libc_regcomp,hash:CRC-32=0xd2f28c93]]]*/
-INTERN ATTR_SECTION(".text.crt.utility.regex") int
-NOTHROW_NCX(LIBCCALL libc_regcomp)(regex_t *__restrict preg,
+/*[[[head:libc_regcomp,hash:CRC-32=0x9aa167ba]]]*/
+/* >> regcomp(3)
+ * Compile a regular expression `pattern' and initialize `self'
+ * @param: self:    Storage for the produced regex pattern.
+ * @param: pattern: The pattern to compile.
+ * @param: cflags:  Set of `REG_EXTENDED | REG_ICASE | REG_NEWLINE | REG_NOSUB'
+ * @return: REG_NOERROR: Success
+ * @return: REG_BADPAT:  General pattern syntax error.
+ * @return: REG_ECTYPE:  Invalid/unknown character class name.
+ * @return: REG_EESCAPE: Trailing backslash.
+ * @return: REG_ESUBREG: Invalid back reference.
+ * @return: REG_EBRACK:  Unmatched '['.
+ * @return: REG_EPAREN:  Unmatched '('.
+ * @return: REG_EBRACE:  Unmatched '{'.
+ * @return: REG_BADBR:   Invalid contents of '{...}'.
+ * @return: REG_ERANGE:  Invalid range end (e.g. '[z-a]').
+ * @return: REG_ESPACE:  Out of memory.
+ * @return: REG_BADRPT:  Nothing is preceding '+', '*', '?' or '{'.
+ * @return: REG_EEND:    Unexpected end of pattern.
+ * @return: REG_ESIZE:   Compiled pattern bigger than 2^16 bytes.
+ * @return: REG_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
+ * @return: REG_ENOSYS:  Unable to load `libregex.so' (shouldn't happen) */
+INTERN ATTR_SECTION(".text.crt.utility.regex") ATTR_IN(2) ATTR_OUT(1) int
+NOTHROW_NCX(LIBCCALL libc_regcomp)(regex_t *__restrict self,
                                    char const *__restrict pattern,
                                    int cflags)
 /*[[[body:libc_regcomp]]]*/
 {
-#ifdef REGEX_USE_PCRE
-	if (load_pcre()) {
-		int result;
-		int new_cflags = 0;
-		if (cflags & REG_ICASE)
-			new_cflags |= PCRE_REG_ICASE;
-		if (cflags & REG_NEWLINE)
-			new_cflags |= PCRE_REG_NEWLINE;
-		if (cflags & REG_NOSUB)
-			new_cflags |= PCRE_REG_NOSUB;
-		PCRE_REGEX_ENCODE(preg);
-		result = (*pdyn_pcre_regcomp)((pcre_regex_t *)preg, pattern, new_cflags);
-		PCRE_REGEX_DECODE(preg);
-		return result;
+	re_errno_t error;
+	struct re_compiler comp;
+	struct re_code *code;
+	reg_syntax_t syntax;
+	if unlikely(!libregex_load())
+		return REG_ENOSYS;
+
+	/* Figure out syntax flags */
+	syntax = RE_SYNTAX_POSIX_BASIC;
+	if (cflags & REG_EXTENDED)
+		syntax = RE_SYNTAX_POSIX_EXTENDED;
+	if (cflags & REG_ICASE)
+		syntax |= RE_SYNTAX_ICASE;
+	if (cflags & REG_NEWLINE) {
+		syntax &= ~RE_SYNTAX_DOT_NEWLINE;
+		syntax |= RE_SYNTAX_HAT_LISTS_NOT_NEWLINE | RE_SYNTAX_ANCHORS_IGNORE_FLAGS;
 	}
-#endif /* REGEX_USE_PCRE */
-	(void)preg;
-	(void)pattern;
-	(void)cflags;
-	CRT_UNIMPLEMENTEDF("regcomp(%p, %q, %x)", preg, pattern, cflags); /* TODO */
-	return libc_seterrno(ENOSYS);
+	if (cflags & REG_NOSUB)
+		syntax |= RE_SYNTAX_NO_SUB;
+
+	/* Initialize the regex compiler */
+	re_compiler_init(&comp, pattern, syntax);
+
+	/* Compile the pattern. */
+	error = re_compiler_compile(&comp);
+	if unlikely(error != RE_NOERROR) {
+		re_compiler_fini(&comp);
+		return error;
+	}
+	code = re_compiler_pack(&comp);
+
+	/* Compilation was successful -> fill in `self' */
+	self->buffer           = (typeof(self->buffer))code;
+	self->syntax           = comp.rec_parser.rep_syntax;
+	self->re_nsub          = code->rc_ngrps;
+	self->can_be_null      = code->rc_minmatch == 0 ? 1 : 0;
+	self->fastmap_accurate = 1;
+	self->no_sub           = (comp.rec_parser.rep_syntax & RE_SYNTAX_NO_SUB) ? 1 : 0;
+	self->newline_anchor   = (comp.rec_parser.rep_syntax & RE_SYNTAX_ANCHORS_IGNORE_FLAGS) ? 1 : 0;
+	return RE_NOERROR;
 }
 /*[[[end:libc_regcomp]]]*/
 
-/*[[[head:libc_regexec,hash:CRC-32=0xec92f4c2]]]*/
-INTERN ATTR_SECTION(".text.crt.utility.regex") int
-NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict preg,
+/*[[[head:libc_regexec,hash:CRC-32=0xc53c78d6]]]*/
+/* >> regcomp(3)
+ * Compile a regular expression `pattern' and initialize `self'
+ * @param: self:   Storage for the produced regex pattern.
+ * @param: string: Input data base pointer (must be a NUL-terminated string, unless `REG_STARTEND' is given)
+ * @param: nmatch: Max # of group start/end-offsets to write to `*pmatch' (ignored if `REG_NOSUB' was set)
+ * @param: pmatch: Storage for at least `nmatch' group start/end-offsets (ignored if `REG_NOSUB' was set)
+ * @param: eflags: Set of `REG_NOTBOL | REG_NOTEOL | REG_STARTEND'
+ * @return: REG_NOERROR: Success
+ * @return: REG_NOMATCH: General pattern syntax error.
+ * @return: REG_ESPACE:  Out of memory.
+ * @return: REG_ENOSYS:  Unable to load `libregex.so' (shouldn't happen) */
+INTERN ATTR_SECTION(".text.crt.utility.regex") ATTR_IN(1) ATTR_IN(2) ATTR_INOUTS(4, 3) int
+NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict self,
                                    char const *__restrict string,
                                    size_t nmatch,
                                    regmatch_t pmatch[__restrict_arr],
                                    int eflags)
 /*[[[body:libc_regexec]]]*/
 {
-#ifdef REGEX_USE_PCRE
-	if (load_pcre()) {
-		int result;
-		int new_eflags = 0;
-		if (eflags & REG_NOTBOL)
-			new_eflags |= PCRE_REG_NOTBOL;
-		if (eflags & REG_NOTEOL)
-			new_eflags |= PCRE_REG_NOTEOL;
-		if (eflags & REG_STARTEND)
-			new_eflags |= PCRE_REG_STARTEND;
-		PCRE_REGEX_ENCODE(preg);
-		result = (*pdyn_pcre_regexec)((pcre_regex_t *)preg, string, nmatch, pmatch, new_eflags);
-		/*PCRE_REGEX_DECODE(preg);*/
-		return result;
+	struct re_exec exec;
+	struct iovec iov[1];
+	ssize_t status;
+	if unlikely(!libregex_load())
+		return -2;
+
+	/* If compiled with `REG_NOSUB', don't fill in `pmatch' */
+	if (self->no_sub)
+		nmatch = 0;
+
+	/* Set-up in regex execution controller. */
+	if (eflags & REG_STARTEND) {
+		exec.rx_startoff = (size_t)pmatch[0].rm_so;
+		exec.rx_endoff   = (size_t)pmatch[0].rm_eo;
+	} else {
+		exec.rx_startoff = 0;
+		exec.rx_endoff   = strlen(string);
 	}
-#endif /* REGEX_USE_PCRE */
-	(void)preg;
-	(void)string;
-	(void)nmatch;
-	(void)pmatch;
-	(void)eflags;
-	CRT_UNIMPLEMENTEDF("regexec(%p, %q, %Ix, %p, %x)", preg, string, nmatch, pmatch, eflags); /* TODO */
-	libc_seterrno(ENOSYS);
-	/* TODO: Implement this function proper.
-	 *       Current, it returning -1 is a work-around for the Xorg server. */
-	return -1;
+	iov[0].iov_base = (void *)string;
+	iov[0].iov_len  = (size_t)exec.rx_endoff;
+	exec.rx_code    = regex_getcode(self);
+	exec.rx_iov     = iov;
+	exec.rx_extra   = 0;
+	exec.rx_eflags  = eflags;
+
+	/* Execute the match-request */
+	status = re_exec_match(&exec, nmatch, (re_regmatch_t *)pmatch);
+	if (status >= 0)
+		return REG_NOERROR;
+	return -status;
 }
 /*[[[end:libc_regexec]]]*/
 
-/*[[[head:libc_regerror,hash:CRC-32=0xbfc3249d]]]*/
-INTERN ATTR_SECTION(".text.crt.utility.regex") size_t
-NOTHROW_NCX(LIBCCALL libc_regerror)(int errcode,
-                                    regex_t const *__restrict preg,
-                                    char *__restrict errbuf,
-                                    size_t errbuf_size)
-/*[[[body:libc_regerror]]]*/
-{
-#ifdef REGEX_USE_PCRE
-	if (load_pcre()) {
-		size_t result;
-		PCRE_REGEX_ENCODE(preg);
-		result = (*pdyn_pcre_regerror)(errcode, (pcre_regex_t *)preg, errbuf, errbuf_size);
-		/*PCRE_REGEX_DECODE(preg);*/
-		return result;
-	}
-#endif /* REGEX_USE_PCRE */
-	(void)errcode;
-	(void)preg;
-	(void)errbuf;
-	(void)errbuf_size;
-	CRT_UNIMPLEMENTEDF("regerror(%x, %p, %q, %Ix)", errcode, preg, errbuf, errbuf_size); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:libc_regerror]]]*/
-
-/*[[[head:libc_regfree,hash:CRC-32=0xbb22ec1a]]]*/
-INTERN ATTR_SECTION(".text.crt.utility.regex") void
-NOTHROW_NCX(LIBCCALL libc_regfree)(regex_t *preg)
-/*[[[body:libc_regfree]]]*/
-{
-#ifdef REGEX_USE_PCRE
-	if (load_pcre()) {
-		PCRE_REGEX_ENCODE(preg);
-		(*pdyn_pcre_regfree)((pcre_regex_t *)preg);
-		return;
-	}
-#endif /* REGEX_USE_PCRE */
-	(void)preg;
-	CRT_UNIMPLEMENTEDF("regfree(%p)", preg); /* TODO */
-	libc_seterrno(ENOSYS);
-}
-/*[[[end:libc_regfree]]]*/
 
 
-
-
-
-/*[[[start:exports,hash:CRC-32=0xac5be75f]]]*/
-DEFINE_PUBLIC_ALIAS(re_set_syntax, libc_re_set_syntax);
+/*[[[start:exports,hash:CRC-32=0x64ce18e9]]]*/
 DEFINE_PUBLIC_ALIAS(re_compile_pattern, libc_re_compile_pattern);
-DEFINE_PUBLIC_ALIAS(re_compile_fastmap, libc_re_compile_fastmap);
 DEFINE_PUBLIC_ALIAS(re_search, libc_re_search);
 DEFINE_PUBLIC_ALIAS(re_search_2, libc_re_search_2);
 DEFINE_PUBLIC_ALIAS(re_match, libc_re_match);
 DEFINE_PUBLIC_ALIAS(re_match_2, libc_re_match_2);
-DEFINE_PUBLIC_ALIAS(re_set_registers, libc_re_set_registers);
 DEFINE_PUBLIC_ALIAS(regcomp, libc_regcomp);
 DEFINE_PUBLIC_ALIAS(regexec, libc_regexec);
-DEFINE_PUBLIC_ALIAS(regerror, libc_regerror);
-DEFINE_PUBLIC_ALIAS(regfree, libc_regfree);
 /*[[[end:exports]]]*/
 
 DECL_END

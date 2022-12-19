@@ -39,10 +39,10 @@ DECL_BEGIN
 INTDEF WUNUSED NONNULL((1)) re_token_t
 NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self);
 
-/* Parse and compile the pattern given to `self' to generate code.
- * Even upon error, `self' remains  in a valid state (except  that
- * you're  not allowed to  call `re_compiler_compile()' again), so
- * that the caller has to invoke `re_compiler_fini()' in order  to
+/* Parse  and compile the pattern given to `self' to generate code.
+ * Even  upon error, `self'  remains in a  valid state (except that
+ * you're  not allowed to call `re_compiler_compile(3R)' again), so
+ * that the caller has to invoke `re_compiler_fini(3R)' in order to
  * perform cleanup.
  * Upon success, members of `self' are initialized as:
  * - *rec_parser.rep_pos    == '\0'

@@ -1990,10 +1990,10 @@ err_nomem:
 }
 
 
-/* Parse and compile the pattern given to `self' to generate code.
- * Even upon error, `self' remains  in a valid state (except  that
- * you're  not allowed to  call `re_compiler_compile()' again), so
- * that the caller has to invoke `re_compiler_fini()' in order  to
+/* Parse  and compile the pattern given to `self' to generate code.
+ * Even  upon error, `self'  remains in a  valid state (except that
+ * you're  not allowed to call `re_compiler_compile(3R)' again), so
+ * that the caller has to invoke `re_compiler_fini(3R)' in order to
  * perform cleanup.
  * Upon success, members of `self' are initialized as:
  * - *rec_parser.rep_pos    == '\0'
@@ -2052,9 +2052,9 @@ NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self) {
 	if (!re_compiler_putc(self, finish_opcode))
 		goto err_nomem;
 
-	/* XXX: On host platforms without unaligned memory access, reflow generated code
-	 *      by inserting `REOP_NOP' opcodes before instructions with unaligned  jump
-	 *      offsets.
+	/* XXX: On host architectures without unaligned memory access, reflow generated
+	 *      code by inserting `REOP_NOP' opcodes before instructions with unaligned
+	 *      jump offsets.
 	 *
 	 * What makes this complicated is the fact that doing so can break  jump-offsets,
 	 * meaning that such a mechanism would first have to identify all jumps, the make

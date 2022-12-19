@@ -24,6 +24,7 @@
 #include "../api.h"
 /**/
 
+#include <bits/crt/regex.h> /* __reg_syntax_t */
 #include <kos/types.h>
 
 #ifdef __CC__
@@ -162,12 +163,10 @@ DECLARE_NOREL_GLOBAL_META(int, error_one_per_line);
 
 /* <regex.h> */
 #undef re_syntax_options
-#ifndef __reg_syntax_t_defined
-#define __reg_syntax_t_defined
-typedef __ULONGPTR_TYPE__ reg_syntax_t; /* Set of `RE_*' */
-#endif /* !__reg_syntax_t_defined */
-DECLARE_NOREL_GLOBAL_META(reg_syntax_t, re_syntax_options);
-#define re_syntax_options GET_NOREL_GLOBAL(re_syntax_options)
+#undef __LOCAL_re_syntax_options
+DECLARE_NOREL_GLOBAL_META(__reg_syntax_t, re_syntax_options);
+#define re_syntax_options         GET_NOREL_GLOBAL(re_syntax_options)
+#define __LOCAL_re_syntax_options GET_NOREL_GLOBAL(re_syntax_options)
 
 
 /* <time.h> */

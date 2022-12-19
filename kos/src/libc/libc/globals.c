@@ -78,8 +78,7 @@ PUBLIC ATTR_SECTION(".bss.crt.error") int error_one_per_line = 0;
 
 /* <regex.h> */
 #undef re_syntax_options
-DEFINE_NOREL_GLOBAL_META(reg_syntax_t, re_syntax_options, ".crt.utility.regex");
-PUBLIC ATTR_SECTION(".bss.crt.utility.regex") reg_syntax_t re_syntax_options = 0;
+DEFINE_NOREL_GLOBAL_META(__reg_syntax_t, re_syntax_options, ".crt.utility.regex");
 
 
 /* <time.h> */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20f0ebc8 */
+/* HASH CRC-32:0x8b0223b3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1823,6 +1823,7 @@ DEFINE_PUBLIC_ALIAS(DOS$regcomp, libd_regcomp);
 DEFINE_PUBLIC_ALIAS(DOS$regexec, libd_regexec);
 DEFINE_PUBLIC_ALIAS(DOS$regerror, libd_regerror);
 DEFINE_PUBLIC_ALIAS(DOS$regfree, libd_regfree);
+DEFINE_PUBLIC_ALIAS(DOS$regerrordesc_np, libd_regerrordesc_np);
 
 /* resolv */
 DEFINE_PUBLIC_ALIAS(DOS$__fp_nquery, libd_fp_nquery);

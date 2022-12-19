@@ -1028,7 +1028,8 @@ incdir("");
 #include <libregdump/printer.h>
 #include <libregdump/register.h>
 #include <libregex/api.h>
-#include <libregex/regex.h>
+#include <libregex/regcomp.h>
+#include <libregex/regexec.h>
 #include <libsctrace/api.h>
 #include <libsctrace/repr-types.h>
 #include <libsctrace/sctrace.h>

@@ -67,7 +67,7 @@ NOTHROW_NCX(CC libre_exec_match)(struct re_exec const *__restrict exec,
  *                 are written, but only on success; iow: when `return >= 0')
  *                 Offsets written INCLUDE `exec->rx_startoff'
  * @param: p_match_size: When non-NULL, store the # of bytes that were here on success
- *                       This would have been  the return value of  `re_exec_match()'.
+ *                       This would have been the return value of `re_exec_match(3R)'.
  * @return: >= 0:        The offset where the matched area starts (`< exec->rx_startoff + search_range').
  * @return: -RE_NOMATCH: Nothing was matched
  * @return: -RE_ESPACE:  Out of memory
@@ -76,9 +76,9 @@ INTDEF WUNUSED NONNULL((1)) ssize_t
 NOTHROW_NCX(CC libre_exec_search)(struct re_exec const *__restrict exec, size_t search_range,
                                   size_t nmatch, re_regmatch_t *pmatch, size_t *p_match_size);
 
-/* Same as `re_exec_search()', but perform searching with starting
- * offsets in  `[exec->rx_endoff - search_range, exec->rx_endoff)'
- * Too  great values for `search_range' are automatically clamped.
+/* Same as `re_exec_search(3R)', but perform searching with starting
+ * offsets  in   `[exec->rx_endoff - search_range, exec->rx_endoff)'
+ * Too great values  for `search_range'  are automatically  clamped.
  * The return value will thus also be within that same range. */
 INTDEF WUNUSED NONNULL((1)) ssize_t
 NOTHROW_NCX(CC libre_exec_rsearch)(struct re_exec const *__restrict exec, size_t search_range,

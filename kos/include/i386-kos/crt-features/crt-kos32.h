@@ -4374,6 +4374,7 @@
 #define __CRT_HAVE_recvmsg
 #define __CRT_HAVE_regcomp
 #define __CRT_HAVE_regerror
+#define __CRT_HAVE_regerrordesc_np
 #define __CRT_HAVE_regexec
 #define __CRT_HAVE_regfree
 #define __CRT_HAVE_remainder

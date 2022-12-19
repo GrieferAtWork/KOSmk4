@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb182fbc1 */
+/* HASH CRC-32:0xd609ccae */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -136,9 +136,9 @@
 #ifdef __CRT_HAVE_pthread_getcpuclockid
 #define _POSIX_THREAD_CPUTIME                0       /* Clock support in threads must be also checked at runtime. */
 #endif /* __CRT_HAVE_pthread_getcpuclockid */
-#if defined(__CRT_HAVE_regcomp) && defined(__CRT_HAVE_regerror) && defined(__CRT_HAVE_regexec) && defined(__CRT_HAVE_regfree)
+#if defined(__CRT_HAVE_regcomp) && defined(__CRT_HAVE_regexec) && (defined(__CRT_HAVE_regfree) || ((defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)) && defined(__CRT_KOS)))
 #define _POSIX_REGEXP                        1       /* We provides regular expression handling. */
-#endif /* __CRT_HAVE_regcomp && __CRT_HAVE_regerror && __CRT_HAVE_regexec && __CRT_HAVE_regfree */
+#endif /* __CRT_HAVE_regcomp && __CRT_HAVE_regexec && (__CRT_HAVE_regfree || ((__CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free) && __CRT_KOS)) */
 #if defined(__CRT_HAVE_pthread_rwlock_destroy) && defined(__CRT_HAVE_pthread_rwlock_init) && defined(__CRT_HAVE_pthread_rwlock_rdlock) && defined(__CRT_HAVE_pthread_rwlock_tryrdlock) && defined(__CRT_HAVE_pthread_rwlock_trywrlock) && defined(__CRT_HAVE_pthread_rwlock_unlock) && defined(__CRT_HAVE_pthread_rwlock_wrlock) && defined(__CRT_HAVE_pthread_rwlockattr_destroy) && defined(__CRT_HAVE_pthread_rwlockattr_init)
 #define _POSIX_READER_WRITER_LOCKS           200809L /* Reader/Writer locks are available. */
 #endif /* __CRT_HAVE_pthread_rwlock_destroy && __CRT_HAVE_pthread_rwlock_init && __CRT_HAVE_pthread_rwlock_rdlock && __CRT_HAVE_pthread_rwlock_tryrdlock && __CRT_HAVE_pthread_rwlock_trywrlock && __CRT_HAVE_pthread_rwlock_unlock && __CRT_HAVE_pthread_rwlock_wrlock && __CRT_HAVE_pthread_rwlockattr_destroy && __CRT_HAVE_pthread_rwlockattr_init */

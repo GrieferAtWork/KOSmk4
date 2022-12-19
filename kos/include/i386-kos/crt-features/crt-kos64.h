@@ -4218,6 +4218,7 @@
 #define __CRT_HAVE_recvmsg
 #define __CRT_HAVE_regcomp
 #define __CRT_HAVE_regerror
+#define __CRT_HAVE_regerrordesc_np
 #define __CRT_HAVE_regexec
 #define __CRT_HAVE_regfree
 #define __CRT_HAVE_remainder
@@ -9844,6 +9845,7 @@
 #define __CRT_HAVE_KOS$recvmsg
 #define __CRT_HAVE_KOS$regcomp
 #define __CRT_HAVE_KOS$regerror
+#define __CRT_HAVE_KOS$regerrordesc_np
 #define __CRT_HAVE_KOS$regexec
 #define __CRT_HAVE_KOS$regfree
 #define __CRT_HAVE_KOS$remainder
@@ -14471,6 +14473,7 @@
 #define __CRT_HAVE_DOS$recvmsg
 #define __CRT_HAVE_DOS$regcomp
 #define __CRT_HAVE_DOS$regerror
+#define __CRT_HAVE_DOS$regerrordesc_np
 #define __CRT_HAVE_DOS$regexec
 #define __CRT_HAVE_DOS$regfree
 #define __CRT_HAVE_DOS$remainder

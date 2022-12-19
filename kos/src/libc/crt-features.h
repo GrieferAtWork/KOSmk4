@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7fa6abc */
+/* HASH CRC-32:0x5c816609 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3003,6 +3003,7 @@
 #define __CRT_HAVE_DOS$recvmsg
 #define __CRT_HAVE_DOS$regcomp
 #define __CRT_HAVE_DOS$regerror
+#define __CRT_HAVE_DOS$regerrordesc_np
 #define __CRT_HAVE_DOS$regexec
 #define __CRT_HAVE_DOS$regfree
 #define __CRT_HAVE_DOS$remainder
@@ -7334,6 +7335,7 @@
 #define __CRT_HAVE_recvmsg
 #define __CRT_HAVE_regcomp
 #define __CRT_HAVE_regerror
+#define __CRT_HAVE_regerrordesc_np
 #define __CRT_HAVE_regexec
 #define __CRT_HAVE_regfree
 #define __CRT_HAVE_remainder

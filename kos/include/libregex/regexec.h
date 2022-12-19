@@ -30,7 +30,7 @@ __DECL_BEGIN
 struct re_code;
 struct iovec;
 
-/* Flags for `re_exec_matchv' */
+/* Flags for `re_exec_match(3R)' */
 #define RE_EXEC_NOTBOL 0x0001 /* '^' (REOP_AT_SOL) doesn't match at the start of the input buffer (but only at an actual begin-of-line) */
 #define RE_EXEC_NOTEOL 0x0002 /* '$' (REOP_AT_EOL) doesn't match at the end of the input buffer (but only before an actual line-feed) */
 
@@ -84,7 +84,7 @@ __NOTHROW_NCX(LIBREGEX_CC re_exec_match)(struct re_exec const *__restrict exec,
  *                 are written, but only on success; iow: when `return >= 0')
  *                 Offsets written INCLUDE `exec->rx_startoff'
  * @param: p_match_size: When non-NULL, store the # of bytes that were here on success
- *                       This would have been  the return value of  `re_exec_match()'.
+ *                       This would have been the return value of `re_exec_match(3R)'.
  * @return: >= 0:        The offset where the matched area starts (`< exec->rx_startoff + search_range').
  * @return: -RE_NOMATCH: Nothing was matched
  * @return: -RE_ESPACE:  Out of memory
@@ -98,9 +98,9 @@ __NOTHROW_NCX(LIBREGEX_CC re_exec_search)(struct re_exec const *__restrict exec,
                                           size_t nmatch, re_regmatch_t *pmatch, size_t *p_match_size);
 #endif /* LIBREGEX_WANT_PROTOTYPES */
 
-/* Same as `re_exec_search()', but perform searching with starting
- * offsets in  `[exec->rx_endoff - search_range, exec->rx_endoff)'
- * Too  great values for `search_range' are automatically clamped.
+/* Same as `re_exec_search(3R)', but perform searching with starting
+ * offsets  in   `[exec->rx_endoff - search_range, exec->rx_endoff)'
+ * Too great values  for `search_range'  are automatically  clamped.
  * The return value will thus also be within that same range. */
 typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) __ssize_t
 __NOTHROW_NCX_T(LIBREGEX_CC *PRE_EXEC_RSEARCH)(struct re_exec const *__restrict exec, size_t search_range,
