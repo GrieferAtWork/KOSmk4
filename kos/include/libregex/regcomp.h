@@ -72,6 +72,7 @@ typedef int re_errno_t;
  *     >> "\w"                  <[:symcont:]>            (HINT: Also allowed in []-sets)
  *     >> "\W"                  <[^:symcont:]>           (HINT: Also allowed in []-sets)
  *     >> "\n"                  <[:lf:]>                 (HINT: Also allowed in []-sets)     [kos-extension]
+ *     >> "\N"                  <[^:lf:]>                (HINT: Also allowed in []-sets)     [kos-extension]
  *     >> "[:<foo>:]"           REOP_UTF8_IS<foo>                                            [some classes are kos extensions]
  *     >> "[^:<foo>:]"          REOP_UTF8_IS<foo>_NOT                                        [kos-extension]
  *     >> "[:digit<OP><N>:]"    REOP_UTF8_ISDIGIT_<OP> <N>     [1]                           [kos-extension]
@@ -430,8 +431,9 @@ enum {
 };
 
 /* Helper macros for `REOP_BITSET' and `REOP_BITSET_NOT' */
-#define REOP_BITSET_LAYOUT_GETBYTES(layout) (((layout)&0x1f) + 1)
-#define REOP_BITSET_LAYOUT_GETBASE(layout)  ((layout)&0xe0)
+#define REOP_BITSET_LAYOUT_GETBYTES(layout)       (((layout)&0x1f) + 1)
+#define REOP_BITSET_LAYOUT_GETBASE(layout)        ((layout)&0xe0)
+#define REOP_BITSET_LAYOUT_BUILD(base, num_bytes) ((base) | ((num_bytes)-1))
 
 
 
@@ -464,7 +466,7 @@ enum {
 #define RE_SYNTAX_NO_SUB                    0x02000000 /* Ignored... (used at a different point to implement `RE_NOSUB') */
 #define RE_SYNTAX_ANCHORS_IGNORE_FLAGS      0x20000000 /* '^' and '$' operators will ignore `RE_EXEC_NOTBOL' and `RE_EXEC_NOTEOL' */
 #define RE_SYNTAX_NO_UTF8                   0x40000000 /* If set, pattern is byte-based (rather than a utf-8 string; e.g. '[ä]' is like '[\xC3\xA4]'). Also disables support for '\uABCD', '\UABCDABCD' */
-#define RE_SYNTAX_NO_KOS_OPS                0x80000000 /* If set, disable support for python- and kos-extensions: '\n', "[^:<foo>:]", '\d', '\D', '\0123', '\xAB', '\uABCD', '\UABCDABCD', '\A', '\Z' */
+#define RE_SYNTAX_NO_KOS_OPS                0x80000000 /* If set, disable support for python- and kos-extensions: '\n', '\N', "[^:<foo>:]", '\d', '\D', '\0123', '\xAB', '\uABCD', '\UABCDABCD', '\A', '\Z' */
 
 /* Regex parser structure.
  * The behavior of `re_parser_yield(3R)' is affected by the following syntax flags:
@@ -509,35 +511,38 @@ typedef __uint32_t re_token_t;
 #define RE_TOKEN_STARTGROUP    (RE_TOKEN_BASE + 7)  /* '(' */
 #define RE_TOKEN_ENDGROUP      (RE_TOKEN_BASE + 8)  /* ')' */
 #define RE_TOKEN_ALTERNATION   (RE_TOKEN_BASE + 9)  /* '|' */
-#define RE_TOKEN_BK_w          (RE_TOKEN_BASE + 10)  /* '\w' */
-#define RE_TOKEN_BK_W          (RE_TOKEN_BASE + 11) /* '\W' */
-#define RE_TOKEN_BK_s          (RE_TOKEN_BASE + 12) /* '\s' */
-#define RE_TOKEN_BK_S          (RE_TOKEN_BASE + 13) /* '\S' */
-#define RE_TOKEN_BK_d          (RE_TOKEN_BASE + 14) /* '\d' */
-#define RE_TOKEN_BK_D          (RE_TOKEN_BASE + 15) /* '\D' */
-#define RE_TOKEN_BK_n          (RE_TOKEN_BASE + 16) /* '\n' */
+#define RE_TOKEN_BK_MIN        RE_TOKEN_BK_w
+#define RE_TOKEN_BK_w          (RE_TOKEN_BASE + 10) /* '\w' (<[:symcont:]>  -- REOP_ASCII_ISSYMCONT / REOP_UTF8_ISSYMCONT) */
+#define RE_TOKEN_BK_W          (RE_TOKEN_BASE + 11) /* '\W' (<[^:symcont:]> -- REOP_ASCII_ISSYMCONT_NOT / REOP_UTF8_ISSYMCONT_NOT) */
+#define RE_TOKEN_BK_s          (RE_TOKEN_BASE + 12) /* '\s' (<[:space:]>    -- REOP_ASCII_ISSPACE / REOP_UTF8_ISSPACE) */
+#define RE_TOKEN_BK_S          (RE_TOKEN_BASE + 13) /* '\S' (<[^:space:]>   -- REOP_ASCII_ISSPACE_NOT / REOP_UTF8_ISSPACE_NOT) */
+#define RE_TOKEN_BK_d          (RE_TOKEN_BASE + 14) /* '\d' (<[:digit:]>    -- REOP_ASCII_ISDIGIT / REOP_UTF8_ISDIGIT) */
+#define RE_TOKEN_BK_D          (RE_TOKEN_BASE + 15) /* '\D' (<[^:digit:]>   -- REOP_ASCII_ISDIGIT_NOT / REOP_UTF8_ISDIGIT_NOT) */
+#define RE_TOKEN_BK_n          (RE_TOKEN_BASE + 16) /* '\n' (<[:lf:]>       -- [\r\n] / REOP_UTF8_ISLF) */
+#define RE_TOKEN_BK_N          (RE_TOKEN_BASE + 17) /* '\N' (<[:lf:]>       -- [^\r\n] / REOP_UTF8_ISLF_NOT) */
+#define RE_TOKEN_BK_MAX        RE_TOKEN_BK_N
 #define RE_TOKEN_AT_MIN        RE_TOKEN_AT_SOL
-#define RE_TOKEN_AT_SOL        (RE_TOKEN_BASE + 17) /* "^" */
-#define RE_TOKEN_AT_EOL        (RE_TOKEN_BASE + 18) /* "$" */
-#define RE_TOKEN_AT_SOI        (RE_TOKEN_BASE + 19) /* "\`" */
-#define RE_TOKEN_AT_EOI        (RE_TOKEN_BASE + 20) /* "\'" */
-#define RE_TOKEN_AT_WOB        (RE_TOKEN_BASE + 21) /* "\b" */
-#define RE_TOKEN_AT_WOB_NOT    (RE_TOKEN_BASE + 22) /* "\B" */
-#define RE_TOKEN_AT_SOW        (RE_TOKEN_BASE + 23) /* "\<" */
-#define RE_TOKEN_AT_EOW        (RE_TOKEN_BASE + 24) /* "\>" */
-#define RE_TOKEN_AT_SOS        (RE_TOKEN_BASE + 25) /* "\_<" */
-#define RE_TOKEN_AT_EOS        (RE_TOKEN_BASE + 26) /* "\_>" */
+#define RE_TOKEN_AT_SOL        (RE_TOKEN_BASE + 18) /* "^" */
+#define RE_TOKEN_AT_EOL        (RE_TOKEN_BASE + 19) /* "$" */
+#define RE_TOKEN_AT_SOI        (RE_TOKEN_BASE + 20) /* "\`" */
+#define RE_TOKEN_AT_EOI        (RE_TOKEN_BASE + 21) /* "\'" */
+#define RE_TOKEN_AT_WOB        (RE_TOKEN_BASE + 22) /* "\b" */
+#define RE_TOKEN_AT_WOB_NOT    (RE_TOKEN_BASE + 23) /* "\B" */
+#define RE_TOKEN_AT_SOW        (RE_TOKEN_BASE + 24) /* "\<" */
+#define RE_TOKEN_AT_EOW        (RE_TOKEN_BASE + 25) /* "\>" */
+#define RE_TOKEN_AT_SOS        (RE_TOKEN_BASE + 26) /* "\_<" */
+#define RE_TOKEN_AT_EOS        (RE_TOKEN_BASE + 27) /* "\_>" */
 #define RE_TOKEN_AT_MAX        RE_TOKEN_AT_EOS
-#define RE_TOKEN_BKREF_1       (RE_TOKEN_BASE + 27) /* "\1" */
-#define RE_TOKEN_BKREF_2       (RE_TOKEN_BASE + 28) /* "\2" */
-#define RE_TOKEN_BKREF_3       (RE_TOKEN_BASE + 29) /* "\3" */
-#define RE_TOKEN_BKREF_4       (RE_TOKEN_BASE + 30) /* "\4" */
-#define RE_TOKEN_BKREF_5       (RE_TOKEN_BASE + 31) /* "\5" */
-#define RE_TOKEN_BKREF_6       (RE_TOKEN_BASE + 32) /* "\6" */
-#define RE_TOKEN_BKREF_7       (RE_TOKEN_BASE + 33) /* "\7" */
-#define RE_TOKEN_BKREF_8       (RE_TOKEN_BASE + 34) /* "\8" */
-#define RE_TOKEN_BKREF_9       (RE_TOKEN_BASE + 35) /* "\9" */
-#define RE_TOKEN_UNMATCHED_BK  (RE_TOKEN_BASE + 36) /* "\" (followed by EOF; for `RE_EESCAPE') */
+#define RE_TOKEN_BKREF_1       (RE_TOKEN_BASE + 28) /* "\1" */
+#define RE_TOKEN_BKREF_2       (RE_TOKEN_BASE + 29) /* "\2" */
+#define RE_TOKEN_BKREF_3       (RE_TOKEN_BASE + 30) /* "\3" */
+#define RE_TOKEN_BKREF_4       (RE_TOKEN_BASE + 31) /* "\4" */
+#define RE_TOKEN_BKREF_5       (RE_TOKEN_BASE + 32) /* "\5" */
+#define RE_TOKEN_BKREF_6       (RE_TOKEN_BASE + 33) /* "\6" */
+#define RE_TOKEN_BKREF_7       (RE_TOKEN_BASE + 34) /* "\7" */
+#define RE_TOKEN_BKREF_8       (RE_TOKEN_BASE + 35) /* "\8" */
+#define RE_TOKEN_BKREF_9       (RE_TOKEN_BASE + 36) /* "\9" */
+#define RE_TOKEN_UNMATCHED_BK  (RE_TOKEN_BASE + 37) /* "\" (followed by EOF; for `RE_EESCAPE') */
 
 /* Parse and yield the next regex-token pointed-to by `self->rep_pos'.
  * @return: * : A unicode character, or one of `RE_TOKEN_*' */

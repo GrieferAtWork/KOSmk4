@@ -1008,6 +1008,13 @@ NOTHROW_NCX(CC _re_compiler_compile_alternation)(struct re_compiler *__restrict 
 #define re_compiler_compile_alternation(self, ...) _re_compiler_compile_alternation(self)
 #endif /* ALTERNATION_PREFIX_MAXLEN <= 0 */
 
+PRIVATE WUNUSED NONNULL((1)) re_errno_t
+NOTHROW_NCX(CC re_compiler_compile_set)(struct re_compiler *__restrict self) {
+	(void)self;
+	/* TODO: set match */
+	return RE_BADPAT;
+}
+
 /* Special return value for `re_compiler_compile_prefix':
  * the prefix has  just concluded with  `REOP_GROUP_END',
  * or `REOP_GROUP_MATCH' opcode, but the referenced group
@@ -1196,23 +1203,55 @@ do_group_start_without_alternation:
 		if (group_matches_epsilon)
 			return RE_COMPILER_COMPILE_PREFIX__AFTER_EPSILON_GROUP;
 		return RE_NOERROR;
-	}	break;
+	}
 
 	case RE_TOKEN_STARTSET:
 		alternation_prefix_dump();
-		/* TODO: set match */
-		return RE_BADPAT;
+		return re_compiler_compile_set(self);
 
-	case RE_TOKEN_BK_w:
-	case RE_TOKEN_BK_W:
-	case RE_TOKEN_BK_s:
-	case RE_TOKEN_BK_S:
-	case RE_TOKEN_BK_d:
-	case RE_TOKEN_BK_D:
-	case RE_TOKEN_BK_n:
+	case RE_TOKEN_BK_MIN ... RE_TOKEN_BK_MAX: {
+		static byte_t const set_opcodes[][2] = {
+			[(RE_TOKEN_BK_w - RE_TOKEN_BK_MIN)] = { REOP_ASCII_ISSYMCONT, REOP_UTF8_ISSYMCONT },
+			[(RE_TOKEN_BK_W - RE_TOKEN_BK_MIN)] = { REOP_ASCII_ISSYMCONT_NOT, REOP_UTF8_ISSYMCONT_NOT },
+			[(RE_TOKEN_BK_s - RE_TOKEN_BK_MIN)] = { REOP_ASCII_ISSPACE, REOP_UTF8_ISSPACE },
+			[(RE_TOKEN_BK_S - RE_TOKEN_BK_MIN)] = { REOP_ASCII_ISSPACE_NOT, REOP_UTF8_ISSPACE_NOT },
+			[(RE_TOKEN_BK_d - RE_TOKEN_BK_MIN)] = { REOP_ASCII_ISDIGIT, REOP_UTF8_ISDIGIT },
+			[(RE_TOKEN_BK_D - RE_TOKEN_BK_MIN)] = { REOP_ASCII_ISDIGIT_NOT, REOP_UTF8_ISDIGIT_NOT },
+			[(RE_TOKEN_BK_n - RE_TOKEN_BK_MIN)] = { REOP_NOP, REOP_UTF8_ISLF },
+			[(RE_TOKEN_BK_N - RE_TOKEN_BK_MIN)] = { REOP_NOP, REOP_UTF8_ISLF_NOT },
+		};
+		byte_t opcode;
 		alternation_prefix_dump();
-		/* TODO: special set matches */
-		return RE_BADPAT;
+		opcode = set_opcodes[tok - RE_TOKEN_BK_MIN]
+		                    [(self->rec_parser.rep_syntax & RE_SYNTAX_NO_UTF8) ? 0 : 1];
+		if (opcode != REOP_NOP) {
+			if (!re_compiler_putc(self, opcode))
+				goto err_nomem;
+			goto done_prefix;
+		}
+		/* Special handling for '\n' and '\N' in ascii-mode */
+		assert(self->rec_parser.rep_syntax & RE_SYNTAX_NO_UTF8);
+		assert(tok == RE_TOKEN_BK_n || tok == RE_TOKEN_BK_N);
+		if (tok == RE_TOKEN_BK_n) {
+			if (!re_compiler_putc(self, REOP_CHAR2))
+				goto err_nomem;
+			if (!re_compiler_putc(self, 0x0a)) /* LF */
+				goto err_nomem;
+			if (!re_compiler_putc(self, 0x0d)) /* CR */
+				goto err_nomem;
+		} else {
+			if (!re_compiler_putc(self, REOP_BITSET_NOT))
+				goto err_nomem;
+			if (!re_compiler_putc(self, REOP_BITSET_LAYOUT_BUILD(0x00, 2)))
+				goto err_nomem;
+			if (!re_compiler_putc(self, 0x00)) /* 00-07 */
+				goto err_nomem;
+			if (!re_compiler_putc(self, (1 << (0x0a - 8)) | /* LF */
+			                            (1 << (0x0d - 8)))) /* CR */
+				goto err_nomem;
+		}
+		goto done_prefix;
+	}
 
 	case RE_TOKEN_ANY: {
 		uint8_t opcode;
@@ -1244,7 +1283,8 @@ do_group_start_without_alternation:
 		alternation_prefix_dump();
 		if (!re_compiler_putc(self, opcode))
 			goto err_nomem;
-	}	break;
+		goto done_prefix;
+	}
 
 	case RE_TOKEN_AT_MIN ... RE_TOKEN_AT_MAX: {
 		static uint8_t const at_opcodes[(RE_TOKEN_AT_MAX - RE_TOKEN_AT_MIN) + 1][2] = {
@@ -1279,7 +1319,7 @@ do_group_start_without_alternation:
 			goto err_nomem;
 		/* Parse another prefix expression since location assertions don't count as prefixes! */
 		goto again;
-	}	break;
+	}
 
 	case RE_TOKEN_BKREF_1 ... RE_TOKEN_BKREF_9: {
 		uint8_t gid = tok - RE_TOKEN_BKREF_1;
@@ -1295,7 +1335,8 @@ do_group_start_without_alternation:
 			goto err_nomem;
 		if (ginfo & RE_COMPILER_GRPINFO_EPSILON)
 			return RE_COMPILER_COMPILE_PREFIX__AFTER_EPSILON_GROUP;
-	}	break;
+		goto done_prefix;
+	}
 
 	default:
 		if (!RE_TOKEN_ISLITERAL(tok)) {
@@ -1371,6 +1412,7 @@ do_literal:
 		break;
 
 	}
+done_prefix:
 	return RE_NOERROR;
 err_nomem:
 	return RE_ESPACE;
