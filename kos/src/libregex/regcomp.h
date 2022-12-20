@@ -69,7 +69,8 @@ NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self);
  * @return: RE_BADRPT:  Nothing is preceding '+', '*', '?' or '{'.
  * @return: RE_EEND:    Unexpected end of pattern.
  * @return: RE_ESIZE:   Compiled pattern bigger than 2^16 bytes.
- * @return: RE_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set) */
+ * @return: RE_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
+ * @return: RE_EILLSET: Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
 INTDEF WUNUSED NONNULL((1)) re_errno_t
 NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self);
 

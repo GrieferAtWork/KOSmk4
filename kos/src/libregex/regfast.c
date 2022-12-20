@@ -379,18 +379,6 @@ NOTHROW_NCX(CC cs_gather_matching_bytes)(bitstr_t matchend_bytes[],
 	while ((cs_opcode = *pc++) != RECS_DONE) {
 		switch (cs_opcode) {
 
-		case RECS_BITSET_MIN ... RECS_BITSET_MAX: {
-			uint8_t minch       = RECS_BITSET_GETBASE(cs_opcode);
-			uint8_t bitset_size = RECS_BITSET_GETBYTES(cs_opcode);
-			unsigned int i, bitset_bits = bitset_size * 8;
-			for (i = 0; i < bitset_bits; ++i) {
-				if ((pc[i / 8] & (1 << (i % 8))) != 0) {
-					bit_set(matchend_bytes, (byte_t)(i + minch));
-				}
-			}
-			pc += bitset_size;
-		}	break;
-
 		case RECS_CHAR: {
 			bit_set(matchend_bytes, pc[0]);
 			if (is_unicode) {
@@ -453,7 +441,10 @@ NOTHROW_NCX(CC cs_gather_matching_bytes)(bitstr_t matchend_bytes[],
 
 		case RECS_ISX_MIN ... RECS_ISX_MAX: {
 			byte_t i;
-			uint16_t traits = libre_unicode_traits[cs_opcode - RECS_ISX_MIN];
+			uint16_t traits;
+			if (!is_unicode)
+				goto do_cs_bitset;
+			traits = libre_unicode_traits[cs_opcode - RECS_ISX_MIN];
 			assertf(is_unicode, "Trait opcodes are only valid in unicode-mode");
 			for (i = 0; i < 0x80; ++i) {
 				uint16_t ch_flags;
@@ -465,7 +456,25 @@ NOTHROW_NCX(CC cs_gather_matching_bytes)(bitstr_t matchend_bytes[],
 			}
 		}	break;
 
-		default: __builtin_unreachable();
+		default:
+			if (cs_opcode >= RECS_BITSET_MIN &&
+			    cs_opcode <= (is_unicode ? RECS_BITSET_UTF8_MAX
+			                             : RECS_BITSET_BYTE_MAX)) {
+				uint8_t minch, bitset_size;
+				unsigned int i, bitset_bits;
+do_cs_bitset:
+				minch       = RECS_BITSET_GETBASE(cs_opcode);
+				bitset_size = RECS_BITSET_GETBYTES(cs_opcode);
+				bitset_bits = bitset_size * 8;
+				for (i = 0; i < bitset_bits; ++i) {
+					if ((pc[i / 8] & (1 << (i % 8))) != 0) {
+						bit_set(matchend_bytes, (byte_t)(i + minch));
+					}
+				}
+				pc += bitset_size;
+				break;
+			}
+			__builtin_unreachable();
 		}
 	}
 	return pc;

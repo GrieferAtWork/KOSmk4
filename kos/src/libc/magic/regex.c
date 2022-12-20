@@ -66,6 +66,7 @@
 %[assume_defined_in_kos_userspace(REG_EEND, __REG_EEND)]
 %[assume_defined_in_kos_userspace(REG_ESIZE, __REG_ESIZE)]
 %[assume_defined_in_kos_userspace(REG_ERPAREN, __REG_ERPAREN)]
+%[assume_defined_in_kos_userspace(REG_EILLSET, __REG_EILLSET)]
 %[assume_defined_in_kos_userspace(RE_BACKSLASH_ESCAPE_IN_LISTS, __RE_BACKSLASH_ESCAPE_IN_LISTS)]
 %[assume_defined_in_kos_userspace(RE_BK_PLUS_QM, __RE_BK_PLUS_QM)]
 %[assume_defined_in_kos_userspace(RE_CHAR_CLASSES, __RE_CHAR_CLASSES)]
@@ -184,6 +185,9 @@ typedef enum {
 #ifdef __REG_ERPAREN
 	REG_ERPAREN  = __REG_ERPAREN, /* Unmatched ')' (only when `RE_UNMATCHED_RIGHT_PAREN_ORD' was set) */
 #endif /* __REG_ERPAREN */
+#ifdef __REG_EILLSET
+	REG_EILLSET  = __REG_EILLSET, /* Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
+#endif /* __REG_EILLSET */
 } reg_errcode_t;
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -244,6 +248,9 @@ typedef enum {
 #ifdef __REG_ERPAREN
 #define REG_ERPAREN  REG_ERPAREN  /* Unmatched ')' (only when `RE_UNMATCHED_RIGHT_PAREN_ORD' was set) */
 #endif /* __REG_ERPAREN */
+#ifdef __REG_EILLSET
+#define REG_EILLSET  REG_EILLSET  /* Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
+#endif /* __REG_EILLSET */
 #else /* __COMPILER_PREFERR_ENUMS */
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #ifdef __REG_ENOSYS
@@ -301,6 +308,9 @@ typedef enum {
 #ifdef __REG_ERPAREN
 #define REG_ERPAREN  __REG_ERPAREN  /* Unmatched ')' (only when `RE_UNMATCHED_RIGHT_PAREN_ORD' was set) */
 #endif /* __REG_ERPAREN */
+#ifdef __REG_EILLSET
+#define REG_EILLSET  __REG_EILLSET  /* Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
+#endif /* __REG_EILLSET */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
@@ -751,6 +761,7 @@ void re_set_registers([[inout]] regex_t *self, [[out]] struct __re_registers *re
 @@@return: REG_EEND:    Unexpected end of pattern.
 @@@return: REG_ESIZE:   Compiled pattern bigger than 2^16 bytes.
 @@@return: REG_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
+@@@return: REG_EILLSET: Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]")
 @@@return: REG_ENOSYS:  Unable to load `libregex.so' (shouldn't happen)
 [[decl_include("<bits/crt/regex.h>")]]
 int regcomp([[out]] regex_t *__restrict self, [[in]] char const *__restrict pattern, int cflags);
@@ -868,6 +879,9 @@ char const *regerrordesc_np(int errcode) {
 @@pp_endif@@
 @@pp_ifdef __REG_ERPAREN@@
 	case __REG_ERPAREN: /* */ result = "Unmatched )"; break;
+@@pp_endif@@
+@@pp_ifdef __REG_EILLSET@@
+	case __REG_EILLSET: /* */ result = "Cannot combine raw bytes with unicode characters in charsets"; break;
 @@pp_endif@@
 	default: result = NULL; break;
 	}

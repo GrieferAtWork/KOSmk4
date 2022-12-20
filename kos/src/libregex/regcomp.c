@@ -181,6 +181,8 @@ NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self) {
 		return RE_TOKEN_ANY;
 
 	case '[':
+		/* TODO: A single-element charset (e.g. "[$]") should be parsed as a literal.
+		 *       That way, the compiler can directly merge it with adjacent literals! */
 		return RE_TOKEN_STARTSET;
 
 	case '{':
@@ -651,7 +653,7 @@ NOTHROW_NCX(CC libre_opcode_next)(uint8_t const *__restrict p_instr) {
 		uint8_t cs_opcode;
 		while ((cs_opcode = *p_instr++) != RECS_DONE) {
 			switch (cs_opcode) {
-			case RECS_BITSET_MIN ... RECS_BITSET_MAX:
+			case RECS_BITSET_MIN ... RECS_BITSET_BYTE_MAX:
 				p_instr += RECS_BITSET_GETBYTES(cs_opcode);
 				break;
 			case RECS_CHAR:
@@ -1771,6 +1773,7 @@ do_copy_ctype_c_trait_mask:
 			bit_flipall(bytes, 256);
 		} else {
 			self->rec_cbase[start_offset] = REOP_NCS_UTF8;
+			goto check_bytes_only_ascii;
 		}
 	} else {
 		if (self->rec_parser.rep_syntax & RE_SYNTAX_NO_UTF8) {
@@ -1785,6 +1788,17 @@ do_copy_ctype_c_trait_mask:
 			self->rec_cbase[start_offset] = REOP_CS_BYTE;
 		} else {
 			self->rec_cbase[start_offset] = REOP_CS_UTF8;
+check_bytes_only_ascii:
+			/* Patterns like "[Ä\xC3]" are invalid, since you can't both
+			 * match the singular byte "\xC3", as well as the utf-8 byte
+			 * sequence "\xC3\x84" (well...  technically you could,  but
+			 * not by using a charset)
+			 *
+			 * To keep things from escalating, we only allow ascii-chars
+			 * being bitset-matched when encoding a utf-8 based charset. */
+			if (bit_nanyset(bytes, 0x80, 0xff)) {
+				goto err_EILLSET;
+			}
 		}
 	}
 
@@ -1809,8 +1823,7 @@ do_copy_ctype_c_trait_mask:
 			if ((self->rec_cpos == self->rec_cbase + start_offset + 1)) {
 				unsigned int nbytes = bit_popcount(bytes, 256);
 				if ((nbytes <= REOP_CONTAINS_UTF8_MAX_ASCII_COUNT) &&
-				    ((count + nbytes) <= 0xff) &&
-				    !bit_nanyset(bytes, 0x80, 0xff)) {
+				    ((count + nbytes) <= 0xff)) {
 					/* Yes: we can use `REOP_[N]CONTAINS_UTF8'! */
 					self->rec_cpos[-1] = negate ? REOP_NCONTAINS_UTF8
 					                            : REOP_CONTAINS_UTF8;
@@ -1960,6 +1973,9 @@ do_copy_ctype_c_trait_mask:
 		num_bytes = CEILDIV(num_bits, 8);
 		assertf(num_bytes <= 0x20, "%" PRIuSIZ, num_bytes);
 		cs_opcode = RECS_BITSET_BUILD(base, num_bytes);
+		assertf((cs_opcode <= RECS_BITSET_UTF8_MAX) ||
+		        (self->rec_cbase[start_offset] == REOP_CS_BYTE),
+		        "This should have been asserted by the err_EILLSET check above");
 		if (!re_compiler_putc(self, cs_opcode))
 			goto err_nomem;
 		static_assert(sizeof(*bytes) == sizeof(byte_t));
@@ -1981,6 +1997,9 @@ err_nomem:
 		goto _err_common;
 err_EESCAPE:
 		error = RE_EESCAPE;
+		goto _err_common;
+err_EILLSET:
+		error = RE_EILLSET;
 		goto _err_common;
 err_BADPAT:
 		error = RE_BADPAT;
@@ -2670,7 +2689,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		if (interval_min == 0) {
 			byte_t *writer, *label_1, *label_2;
 			/* >> "X*"           REOP_JMP_ONFAIL 2f
-			 * >>             1: <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
+			 * >>             1: <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
 			 * >>                REOP_JMP_AND_RETURN_ONFAIL 1b
 			 * >>             2: */
 			if unlikely(!re_compiler_require(self, 6))
@@ -2700,7 +2719,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			goto done_suffix;
 		} else if (interval_min == 1) {
 			byte_t *writer;
-			/* >> "X+"        1: <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
+			/* >> "X+"        1: <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
 			 * >>                REOP_JMP_AND_RETURN_ONFAIL 1b
 			 * >>             2: */
 			if unlikely(!re_compiler_require(self, 3))
@@ -2719,7 +2738,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			uint8_t var_id;
 			byte_t *writer, *label_1;
 			/* >> "X{n,}"        REOP_SETVAR  {VAR = (n - 1)}
-			 * >>             1: <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
+			 * >>             1: <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
 			 * >>                REOP_DEC_JMP {VAR}, 1b
 			 * >>                REOP_JMP_AND_RETURN_ONFAIL 1b
 			 * >>             2: */
@@ -2796,7 +2815,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			goto done_suffix;
 
 		/* >> "X{1,m}"       REOP_SETVAR  {VAR = (m - 1)}
-		 * >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
+		 * >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
 		 * >>                REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b
 		 * >>            2: */
 		if unlikely(!re_compiler_require(self, 7))
@@ -2847,7 +2866,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			byte_t *writer, *label_1, *label_2;
 			/* >> "X{0,m}"       REOP_JMP_ONFAIL 2f
 			 * >>                REOP_SETVAR  {VAR = (m - 1)}
-			 * >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
+			 * >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
 			 * >>                REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b
 			 * >>            2: */
 			if unlikely(!re_compiler_require(self, 10))
@@ -2930,7 +2949,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 
 	/* >> "X{n,m}"       REOP_SETVAR  {VAR1 = n - 1}
 	 * >>                REOP_SETVAR  {VAR2 = (m - n)}
-	 * >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
+	 * >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
 	 * >>                REOP_DEC_JMP {VAR1}, 1b
 	 * >>                REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR2}, 1b
 	 * >>            2: */
@@ -3264,7 +3283,8 @@ err_nomem:
  * @return: RE_BADRPT:  Nothing is preceding '+', '*', '?' or '{'.
  * @return: RE_EEND:    Unexpected end of pattern.
  * @return: RE_ESIZE:   Compiled pattern bigger than 2^16 bytes.
- * @return: RE_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set) */
+ * @return: RE_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
+ * @return: RE_EILLSET: Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
 INTERN WUNUSED NONNULL((1)) re_errno_t
 NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self) {
 	re_errno_t error;
@@ -3474,39 +3494,6 @@ NOTHROW_NCX(CC libre_code_disasm)(struct re_code const *__restrict self,
 				isfirst = false;
 				switch (cs_opcode) {
 
-				case RECS_BITSET_MIN ... RECS_BITSET_MAX: {
-					uint8_t minch       = RECS_BITSET_GETBASE(cs_opcode);
-					uint8_t bitset_size = RECS_BITSET_GETBYTES(cs_opcode);
-					unsigned int bitset_bits = bitset_size * 8;
-					PRINT("bitset [");
-					for (i = 0; i < bitset_bits;) {
-						char repr[3];
-						unsigned int endi, rangec;
-						if ((pc[i / 8] & (1 << (i % 8))) == 0) {
-							++i;
-							continue;
-						}
-						endi = i + 1;
-						while (endi < bitset_bits && (pc[endi / 8] & (1 << (endi % 8))) != 0)
-							++endi;
-						rangec = endi - i;
-						if (rangec > 3) {
-							repr[0] = (char)(minch + i);
-							repr[1] = '-';
-							repr[2] = (char)(minch + endi - 1);
-							rangec  = 3;
-						} else {
-							repr[0] = (char)(minch + i + 0);
-							repr[1] = (char)(minch + i + 1);
-							repr[2] = (char)(minch + i + 2);
-						}
-						printf("%#$q", (size_t)rangec, repr);
-						i = endi;
-					}
-					pc += bitset_size;
-					PRINT("]");
-				}	break;
-
 				case RECS_CHAR:
 				case RECS_CHAR2: {
 					byte_t const *endpc = pc;
@@ -3559,6 +3546,8 @@ NOTHROW_NCX(CC libre_code_disasm)(struct re_code const *__restrict self,
 
 				case RECS_ISX_MIN ... RECS_ISX_MAX: {
 					char const *cs_name;
+					if (opcode == REOP_CS_BYTE)
+						goto do_cs_bitset;
 					switch (cs_opcode) {
 					case RECS_ISCNTRL:
 						cs_name = "cntrl";
@@ -3629,6 +3618,44 @@ NOTHROW_NCX(CC libre_code_disasm)(struct re_code const *__restrict self,
 				}	break;
 
 				default:
+					if (cs_opcode >= RECS_BITSET_MIN &&
+					    cs_opcode <= (opcode == REOP_CS_BYTE ? RECS_BITSET_BYTE_MAX
+					                                         : RECS_BITSET_UTF8_MAX)) {
+						uint8_t minch, bitset_size;
+						unsigned int bitset_bits;
+do_cs_bitset:
+						minch       = RECS_BITSET_GETBASE(cs_opcode);
+						bitset_size = RECS_BITSET_GETBYTES(cs_opcode);
+						bitset_bits = bitset_size * 8;
+						PRINT("bitset [");
+						for (i = 0; i < bitset_bits;) {
+							char repr[3];
+							unsigned int endi, rangec;
+							if ((pc[i / 8] & (1 << (i % 8))) == 0) {
+								++i;
+								continue;
+							}
+							endi = i + 1;
+							while (endi < bitset_bits && (pc[endi / 8] & (1 << (endi % 8))) != 0)
+								++endi;
+							rangec = endi - i;
+							if (rangec > 3) {
+								repr[0] = (char)(minch + i);
+								repr[1] = '-';
+								repr[2] = (char)(minch + endi - 1);
+								rangec  = 3;
+							} else {
+								repr[0] = (char)(minch + i + 0);
+								repr[1] = (char)(minch + i + 1);
+								repr[2] = (char)(minch + i + 2);
+							}
+							printf("%#$q", (size_t)rangec, repr);
+							i = endi;
+						}
+						pc += bitset_size;
+						PRINT("]");
+						break;
+					}
 					printf("<BAD BYTE %#.2" PRIx8 ">", cs_opcode);
 					break;
 				}

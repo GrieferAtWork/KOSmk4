@@ -722,7 +722,7 @@ again:
 	cs_opcode = *pc++;
 	switch (cs_opcode) {
 
-	case RECS_BITSET_MIN ... RECS_BITSET_MAX:
+	case RECS_BITSET_MIN ... RECS_BITSET_BYTE_MAX:
 		pc += RECS_BITSET_GETBYTES(cs_opcode);
 		goto again;
 
@@ -759,7 +759,7 @@ again:
 	cs_opcode = *pc++;
 	switch (cs_opcode) {
 
-	case RECS_BITSET_MIN ... RECS_BITSET_MAX:
+	case RECS_BITSET_MIN ... RECS_BITSET_UTF8_MAX:
 		pc += RECS_BITSET_GETBYTES(cs_opcode);
 		goto again;
 
@@ -1148,7 +1148,7 @@ REOP_CS_BYTE_dispatch:
 			opcode = getb();
 			switch (opcode) {
 
-			case RECS_BITSET_MIN ... RECS_BITSET_MAX: {
+			case RECS_BITSET_MIN ... RECS_BITSET_BYTE_MAX: {
 				uint8_t bitset_minch = REOP_BITSET_LAYOUT_GETBASE(opcode);
 				uint8_t bitset_size  = REOP_BITSET_LAYOUT_GETBYTES(opcode);
 				byte_t bitset_rel_ch;
@@ -1221,7 +1221,7 @@ REOP_CS_UTF8_dispatch:
 			opcode = getb();
 			switch (opcode) {
 
-			case RECS_BITSET_MIN ... RECS_BITSET_MAX: {
+			case RECS_BITSET_MIN ... RECS_BITSET_UTF8_MAX: {
 				uint8_t bitset_minch = REOP_BITSET_LAYOUT_GETBASE(opcode);
 				uint8_t bitset_size  = REOP_BITSET_LAYOUT_GETBYTES(opcode);
 				byte_t bitset_rel_ch;
@@ -1333,7 +1333,7 @@ REOP_NCS_UTF8_dispatch:
 			opcode = getb();
 			switch (opcode) {
 
-			case RECS_BITSET_MIN ... RECS_BITSET_MAX: {
+			case RECS_BITSET_MIN ... RECS_BITSET_UTF8_MAX: {
 				uint8_t bitset_minch = REOP_BITSET_LAYOUT_GETBASE(opcode);
 				uint8_t bitset_size  = REOP_BITSET_LAYOUT_GETBYTES(opcode);
 				byte_t bitset_rel_ch;
@@ -1830,6 +1830,11 @@ onfail:
 		/* TODO: The ONFAIL-system needs some way to set group match start/end addresses back to UNSET:
 		 * >> "(f(o)o|foobar)" MATCH "foobar"
 		 * This should result in an UNSET match for group[1], but that isn't the case in our current impl!
+		 *
+		 * Idea: `REOP_GROUP_START' pushes a special ONFAIL item which -- when unwound --  will
+		 *       restore the offset as it was  prior to the `REOP_GROUP_START' being  executed.
+		 *       For all other purposes (including REOP_POP_ONFAIL), these special ONFAIL items
+		 *       are simply skipped over.
 		 */
 		DISPATCH();
 	}

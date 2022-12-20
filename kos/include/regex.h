@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83ad00d4 */
+/* HASH CRC-32:0x5120fb9d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -120,6 +120,9 @@ typedef enum {
 #ifdef __REG_ERPAREN
 	REG_ERPAREN  = __REG_ERPAREN, /* Unmatched ')' (only when `RE_UNMATCHED_RIGHT_PAREN_ORD' was set) */
 #endif /* __REG_ERPAREN */
+#ifdef __REG_EILLSET
+	REG_EILLSET  = __REG_EILLSET, /* Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
+#endif /* __REG_EILLSET */
 } reg_errcode_t;
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -180,6 +183,9 @@ typedef enum {
 #ifdef __REG_ERPAREN
 #define REG_ERPAREN  REG_ERPAREN  /* Unmatched ')' (only when `RE_UNMATCHED_RIGHT_PAREN_ORD' was set) */
 #endif /* __REG_ERPAREN */
+#ifdef __REG_EILLSET
+#define REG_EILLSET  REG_EILLSET  /* Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
+#endif /* __REG_EILLSET */
 #else /* __COMPILER_PREFERR_ENUMS */
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #ifdef __REG_ENOSYS
@@ -237,6 +243,9 @@ typedef enum {
 #ifdef __REG_ERPAREN
 #define REG_ERPAREN  __REG_ERPAREN  /* Unmatched ')' (only when `RE_UNMATCHED_RIGHT_PAREN_ORD' was set) */
 #endif /* __REG_ERPAREN */
+#ifdef __REG_EILLSET
+#define REG_EILLSET  __REG_EILLSET  /* Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
+#endif /* __REG_EILLSET */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
@@ -690,6 +699,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(re_set_registers, __FORCELOCAL __ATTR_ARTIFICIAL
  * @return: REG_EEND:    Unexpected end of pattern.
  * @return: REG_ESIZE:   Compiled pattern bigger than 2^16 bytes.
  * @return: REG_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
+ * @return: REG_EILLSET: Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]")
  * @return: REG_ENOSYS:  Unable to load `libregex.so' (shouldn't happen) */
 __CDECLARE_OPT(__ATTR_IN(2) __ATTR_OUT(1),int,__NOTHROW_NCX,regcomp,(regex_t *__restrict __self, char const *__restrict __pattern, int __cflags),(__self,__pattern,__cflags))
 /* >> regcomp(3)

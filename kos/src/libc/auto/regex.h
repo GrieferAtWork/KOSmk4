@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a432c1e */
+/* HASH CRC-32:0x93c762cd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -201,6 +201,7 @@ INTDEF ATTR_INOUT(1) ATTR_OUT(2) void NOTHROW_NCX(LIBCCALL libc_re_set_registers
  * @return: REG_EEND:    Unexpected end of pattern.
  * @return: REG_ESIZE:   Compiled pattern bigger than 2^16 bytes.
  * @return: REG_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
+ * @return: REG_EILLSET: Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]")
  * @return: REG_ENOSYS:  Unable to load `libregex.so' (shouldn't happen) */
 INTDEF ATTR_IN(2) ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_regcomp)(regex_t *__restrict self, char const *__restrict pattern, int cflags);
 /* >> regcomp(3)

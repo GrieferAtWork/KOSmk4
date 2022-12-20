@@ -52,6 +52,7 @@ typedef int re_errno_t;
 #define RE_EEND     14 /* Unexpected end of pattern. */
 #define RE_ESIZE    15 /* Too large (pattern violates some hard limit that isn't the currently available ram) */
 #define RE_ERPAREN  16 /* Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set) */
+#define RE_EILLSET  17 /* Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
 
 
 
@@ -107,6 +108,7 @@ typedef int re_errno_t;
  *
  *     >> "X|Y"          REOP_JMP_ONFAIL  1f
  *     >>                <X>
+ *     >>                REOP_MAYBE_POP_ONFAIL   // TODO
  *     >>                REOP_JMP         2f
  *     >>                // HINT: Another `REOP_JMP_ONFAIL' to <Z> would go here if it existed
  *     >>            1:  <Y>
@@ -114,23 +116,29 @@ typedef int re_errno_t;
  *
  *     >> "X|Y|Z"        REOP_JMP_ONFAIL 1f
  *     >>                <X>
+ *     >>                REOP_MAYBE_POP_ONFAIL   // TODO
  *     >>                REOP_JMP        3f
  *     >>            1:  REOP_JMP_ONFAIL 2f
  *     >>                <Y>
+ *     >>                REOP_MAYBE_POP_ONFAIL   // TODO
  *     >>                REOP_JMP        3f
  *     >>            2:  <Z>
  *     >>            3:
  *
  *     >> "X?"           REOP_JMP_ONFAIL 1f
  *     >>                <X>
+ *     >>                REOP_MAYBE_POP_ONFAIL   // TODO
  *     >>            1:
  *
  *     >> "X*"           REOP_JMP_ONFAIL 2f
- *     >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
+ *     >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
+ *     >>                REOP_MAYBE_POP_ONFAIL   // TODO
  *     >>                REOP_JMP_AND_RETURN_ONFAIL 1b
  *     >>            2:
  *
- *     >> "X+"       1:  <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
+ *     >> "X+"       1:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
+ *     >>                // TODO: POP_ONFAIL??? -- Nothing pushed on first iteration; maybe something
+ *     >>                //                        like `REOP_PUSH_DUMMY_ONFAIL' before the "1:"?
  *     >>                REOP_JMP_AND_RETURN_ONFAIL 1b
  *     >>            2:
  *
@@ -149,26 +157,30 @@ typedef int re_errno_t;
  *     >>                REOP_DEC_JMP {VAR}, 1b
  *
  *     >> "X{n,}"        REOP_SETVAR  {VAR = (n - 1)}
- *     >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
+ *     >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
  *     >>                REOP_DEC_JMP {VAR}, 1b
+ *     >>                // TODO: POP_ONFAIL???
  *     >>                REOP_JMP_AND_RETURN_ONFAIL 1b
  *     >>            2:
  *
  *     >> "X{0,m}"       REOP_JMP_ONFAIL 2f
  *     >>                REOP_SETVAR  {VAR = (m - 1)}
- *     >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
+ *     >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
+ *     >>                REOP_MAYBE_POP_ONFAIL   // TODO
  *     >>                REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b
  *     >>            2:
  *
  *     >> "X{1,m}"       REOP_SETVAR  {VAR = (m - 1)}
- *     >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
+ *     >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
+ *     >>                // TODO: POP_ONFAIL???
  *     >>                REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b
  *     >>            2:
  *
  *     >> "X{n,m}"       REOP_SETVAR  {VAR1 = n - 1}
  *     >>                REOP_SETVAR  {VAR2 = (m - n)}
- *     >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
+ *     >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
  *     >>                REOP_DEC_JMP {VAR1}, 1b
+ *     >>                // TODO: POP_ONFAIL???
  *     >>                REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR2}, 1b
  *     >>            2:
  *
@@ -239,21 +251,9 @@ enum {
 	                         * >>     return (layout_ptr[ch / 8] & (1 << (ch % 8))) != 0;
 	                         * >> }
 	                         * NOTE: In utf-8 mode, only ASCII characters may be encoded via bitsets. */
-	RECS_BITSET_MAX = 0xe3, /* [+RECS_BITSET_GETBYTES(.)] Last bitset opcode (encodes bitset for range E0h-FFh) */
-#define RECS_BITSET_GETBYTES(cs_opcode)    (((cs_opcode)&0x1f) + 1)
-#define RECS_BITSET_GETBASE(cs_opcode)     ((cs_opcode)&0xe0)
-#define RECS_BITSET_BUILD(base, num_bytes) ((base) | ((num_bytes)-1))
-#define RECS_BITSET_BASEFOR(minbyte)       ((minbyte)&0xe0)
-	RECS_DONE,              /* End of charset sequence */
-	RECS_CHAR,              /* [+1] Followed by 1 byte (or utf8-character) that is apart of the bitset */
-	RECS_CHAR2,             /* [+2] Followed by 2 bytes (or utf8-characters) that are apart of the bitset */
-	RECS_RANGE,             /* [+2] Followed by 2 bytes (or utf8-characters) that form a `[lo,hi]' inclusive range of bytes apart of the bitset */
-	RECS_RANGE_ICASE,       /* [+2] Followed by 2 utf8-characters that form a `[lo,hi]' inclusive range of bytes apart of the bitset
-	                         *      the 2 utf8-characters must both be lower-case (ONLY VALID IN UTF-8 MODE) */
-	RECS_CONTAINS,          /* [+1+n] Followed by a COUNT-byte, followed  by a `COUNT'-character long byte/utf-8  string
-	                         * Whether or not COUNT ares bytes/utf-8 depends on the `REOP_CS_*' starting opcode. Matches
-	                         * a character contained in said string. NOTE: COUNT must be >= 3 */
-
+	/* In utf-8 mode, this can be lowered to 0x63, since in this context, bitsets are only allowed
+	 * to  define  ASCII characters  (so  the last-valid  opcode  is `RECS_BITSET_BUILD(0x60, 4)') */
+	RECS_BITSET_UTF8_MAX = 0x63, /* [+RECS_BITSET_GETBYTES(.)] Last utf8-bitset opcode (encodes bitset for range 60h-7Fh) */
 #define RECS_ISX_MIN RECS_ISCNTRL
 	RECS_ISCNTRL,           /* [+0] consume trait `unicode_iscntrl(ch)'   (ONLY VALID IN UTF-8 MODE) */
 	RECS_ISSPACE,           /* [+0] consume trait `unicode_isspace(ch)'   (ONLY VALID IN UTF-8 MODE) */
@@ -277,6 +277,22 @@ enum {
 	RECS_ISTITLE,           /* [+0] consume trait `unicode_istitle(ch)'   (ONLY VALID IN UTF-8 MODE) */
 	RECS_ISNUMERIC,         /* [+0] consume trait `unicode_isnumeric(ch)' (ONLY VALID IN UTF-8 MODE) */
 #define RECS_ISX_MAX RECS_ISNUMERIC
+
+
+	RECS_BITSET_BYTE_MAX = 0xe3, /* [+RECS_BITSET_GETBYTES(.)] Last byte-bitset opcode (encodes bitset for range E0h-FFh) */
+#define RECS_BITSET_GETBYTES(cs_opcode)    (((cs_opcode)&0x1f) + 1)
+#define RECS_BITSET_GETBASE(cs_opcode)     ((cs_opcode)&0xe0)
+#define RECS_BITSET_BUILD(base, num_bytes) ((base) | ((num_bytes)-1))
+#define RECS_BITSET_BASEFOR(minbyte)       ((minbyte)&0xe0)
+	RECS_DONE,              /* End of charset sequence */
+	RECS_CHAR,              /* [+1] Followed by 1 byte (or utf8-character) that is apart of the bitset */
+	RECS_CHAR2,             /* [+2] Followed by 2 bytes (or utf8-characters) that are apart of the bitset */
+	RECS_RANGE,             /* [+2] Followed by 2 bytes (or utf8-characters) that form a `[lo,hi]' inclusive range of bytes apart of the bitset */
+	RECS_RANGE_ICASE,       /* [+2] Followed by 2 utf8-characters that form a `[lo,hi]' inclusive range of bytes apart of the bitset
+	                         *      the 2 utf8-characters must both be lower-case (ONLY VALID IN UTF-8 MODE) */
+	RECS_CONTAINS,          /* [+1+n] Followed by a COUNT-byte, followed  by a `COUNT'-character long byte/utf-8  string
+	                         * Whether or not COUNT ares bytes/utf-8 depends on the `REOP_CS_*' starting opcode. Matches
+	                         * a character contained in said string. NOTE: COUNT must be >= 3 */
 };
 
 /* Regex opcodes (always encoded as a single byte) */
@@ -391,6 +407,7 @@ enum {
 	                             * used  (note that a  candidate consists of `{ end_input_pointer, regmatch_t[] }')
 	                             * Candidate A is better than B if `A.end_input_pointer > B.end_input_pointer' */
 	REOP_MATCHED_PERFECT,       /* [+0] Same as `REOP_MATCHED', but act as though the match was perfect (even if it might not be; s.a. `RE_SYNTAX_NO_POSIX_BACKTRACKING') */
+	REOP_MAYBE_POP_ONFAIL,      /* [+0] Marker for the peephole optimizer (cannot appear at runtime, and treated as an illegal instruction) */
 };
 
 /* Helper macros for `REOP_BITSET' and `REOP_BITSET_NOT' */
@@ -611,7 +628,8 @@ struct re_compiler {
  * @return: RE_BADRPT:  Nothing is preceding '+', '*', '?' or '{'.
  * @return: RE_EEND:    Unexpected end of pattern.
  * @return: RE_ESIZE:   Compiled pattern bigger than 2^16 bytes.
- * @return: RE_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set) */
+ * @return: RE_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
+ * @return: RE_EILLSET: Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
 typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) re_errno_t
 __NOTHROW_NCX_T(LIBREGEX_CC *PRE_COMPILER_COMPILE)(struct re_compiler *__restrict self);
 #ifdef LIBREGEX_WANT_PROTOTYPES

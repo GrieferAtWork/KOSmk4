@@ -41,6 +41,9 @@
 #define __REG_EEND     14   /* Unexpected end of pattern. */
 #define __REG_ESIZE    15   /* Too large (pattern violates some hard limit that isn't the currently available ram) */
 #define __REG_ERPAREN  16   /* Unmatched ')' (only when `RE_UNMATCHED_RIGHT_PAREN_ORD' was set) */
+#ifdef __CRT_KOS
+#define __REG_EILLSET  17   /* Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
+#endif /* __CRT_KOS */
 
 
 /* Regex syntax options */

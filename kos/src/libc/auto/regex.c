@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3b859ff */
+/* HASH CRC-32:0x51e8fdde */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -161,6 +161,9 @@ NOTHROW_NCX(LIBCCALL libc_regerrordesc_np)(int errcode) {
 
 
 	case __REG_ERPAREN: /* */ result = "Unmatched )"; break;
+
+
+	case __REG_EILLSET: /* */ result = "Cannot combine raw bytes with unicode characters in charsets"; break;
 
 	default: result = NULL; break;
 	}
