@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x985dcf2f */
+/* HASH CRC-32:0x2ea2850e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,12 +45,12 @@ __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGLONG,__NOTHROW_NCX,
 __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGLONG,__NOTHROW_NCX,__localdep_strtoll,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),_strtoi64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoimax) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
 __CREDIRECT(__ATTR_LEAF __ATTR_IN(1) __ATTR_OUT_OPT(2),__LONGLONG,__NOTHROW_NCX,__localdep_strtoll,(char const *__restrict __nptr, char **__endptr, __STDC_INT_AS_UINT_T __base),strtoimax,(__nptr,__endptr,__base))
-#elif __SIZEOF_LONG__ == 8
+#elif __SIZEOF_LONG_LONG__ == 8
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strto64.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strtoll __NAMESPACE_LOCAL_TYPEHAX(__LONGLONG(__LIBCCALL*)(char const *__restrict,char **,__STDC_INT_AS_UINT_T),__LONGLONG(__LIBCCALL&)(char const *__restrict,char **,__STDC_INT_AS_UINT_T),strto64)
-#elif __SIZEOF_LONG__ == 4
+#elif __SIZEOF_LONG_LONG__ == 4
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdlib/strto32.h>
 __NAMESPACE_LOCAL_BEGIN
