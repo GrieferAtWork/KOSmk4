@@ -208,16 +208,19 @@ DEFINE_TEST(regex) {
 	EQ(-RE_NOMATCH, re_match("(a|b){4}a", "ababX"));
 	EQ(-RE_NOMATCH, re_match("(a|b){4}a", "bbbbX"));
 
+	EQ(1, re_match("\\?", "?"));
+
 	EQ(1, re_match("\\n", "\rfoo"));
 	EQ(1, re_match("\\n", "\nfoo"));
 	EQ(-RE_NOMATCH, re_match("\\N", "\rfoo"));
 	EQ(-RE_NOMATCH, re_match("\\N", "\nfoo"));
 
 	/* Ensure that character sets work in both ASCII and UTF-8 mode. */
-	//TODO: EQ(12, re_match_syntax("[[:hex:]]+", "abcdefABCDEF_", 0));
-	//TODO: EQ(12, re_match_syntax("[[:hex:]]+", "abcdefABCDEF_", RE_SYNTAX_NO_UTF8));
-	//TODO: EQ(-RE_NOMATCH, re_match_syntax("[[:hex:]]+", "_abcdefABCDEF", 0));
-	//TODO: EQ(-RE_NOMATCH, re_match_syntax("[[:hex:]]+", "_abcdefABCDEF", RE_SYNTAX_NO_UTF8));
+	EQ(12, re_match_syntax("[[:hex:]]+", "abcdefABCDEF_", 0));
+	EQ(12, re_match_syntax("[[:hex:]]+", "abcdefABCDEF_", RE_SYNTAX_NO_UTF8));
+	EQ(-RE_NOMATCH, re_match_syntax("[[:hex:]]+", "_abcdefABCDEF", 0));
+	EQ(-RE_NOMATCH, re_match_syntax("[[:hex:]]+", "_abcdefABCDEF", RE_SYNTAX_NO_UTF8));
+	EQ(14, re_match_syntax("[[:hex:]ä]+", "äabcdefABCDEF_", 0));
 
 	/* Cleanup */
 	EQ(0, dlclose(libregex));

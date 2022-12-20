@@ -244,6 +244,118 @@ __LOCAL __ATTR_NONNULL((1, 3)) void
 }
 #endif /* !... */
 
+#ifdef __USE_KOS
+#define bit_noneset(self, nbits) (!bit_anyset(self, nbits))
+__LOCAL __ATTR_NONNULL((1)) __BOOL
+(bit_anyset)(bitstr_t *__restrict __self, unsigned int __nbits) {
+	unsigned int __i;
+	for (__i = 0; __i < (__nbits >> 3); ++__i) {
+		if (__self[__i] != 0)
+			return 1;
+	}
+	if (__nbits & 7) {
+		if (__self[__i] & ((1 << (__nbits & 7)) - 1))
+			return 1;
+	}
+	return 0;
+}
+__LOCAL __ATTR_NONNULL((1)) __BOOL
+(bit_allset)(bitstr_t *__restrict __self, unsigned int __nbits) {
+	unsigned int __i;
+	for (__i = 0; __i < (__nbits >> 3); ++__i) {
+		if (__self[__i] != 0xff)
+			return 0;
+	}
+	if (__nbits & 7) {
+		bitstr_t __mask = ((1 << (__nbits & 7)) - 1);
+		if ((__self[__i] & __mask) != __mask)
+			return 0;
+	}
+	return 1;
+}
+__LOCAL __ATTR_NONNULL((1)) __BOOL
+(bit_nanyset)(bitstr_t *__restrict __self, unsigned int __minbitno, unsigned int __maxbitno) {
+	__register __size_t __minbyte = (__size_t)_bit_byte(__minbitno);
+	__register __size_t __maxbyte = (__size_t)_bit_byte(__maxbitno);
+	if (__minbyte >= __maxbyte) {
+		if (__self[__maxbyte] & ~((0xff >> (8 - (__minbitno & 7))) |
+		                          (0xff << ((__maxbitno & 7) + 1))))
+			return 1;
+	} else {
+		__register __size_t __i;
+		if (__self[__minbyte] & ~(0xff >> (8 - (__minbitno & 7))))
+			return 1;
+		for (__i = __minbyte + 1; __i < __maxbyte; ++__i) {
+			if (__self[__i] != 0)
+				return 1;
+		}
+		if (__self[__maxbyte] & ~(0xff << ((__maxbitno & 7) + 1)))
+			return 1;
+	}
+	return 0;
+}
+__LOCAL __ATTR_NONNULL((1)) unsigned int
+(bit_popcount)(bitstr_t *__restrict __self, unsigned int __nbits) {
+	unsigned int __result = 0;
+	unsigned int __i;
+	for (__i = 0; __i < (__nbits >> 3); ++__i) {
+		__result += __hybrid_popcount8(__self[__i]);
+	}
+	if (__nbits & 7) {
+		bitstr_t __mask = ((1 << (__nbits & 7)) - 1);
+		__result += __hybrid_popcount8(__self[__i] & __mask);
+	}
+	return __result;
+}
+
+/* Count-leading-zeroes (undefined when `self' doesn't contain any set bits) */
+__LOCAL __ATTR_NONNULL((1)) unsigned int
+(bit_clz)(bitstr_t *__restrict __self) {
+	bitstr_t __word;
+	unsigned int __result = 0;
+	for (; *__self == 0; ++__self)
+		__result += 8;
+	__word = *__self;
+	while (!(__word & 1)) {
+		++__result;
+		__word >>= 1;
+	}
+	return __result;
+}
+
+/* Count-trailing-zeroes (undefined when `self' doesn't contain any set bits) */
+__LOCAL __ATTR_NONNULL((1)) unsigned int
+(bit_ctz)(bitstr_t *__restrict __self, unsigned int __nbits) {
+	bitstr_t __word;
+	unsigned int __result  = 0;
+	unsigned int __byteoff = __nbits >> 3;
+	if (__nbits & 7) {
+		__word = __self[__byteoff];
+		__word <<= 8 - (__nbits & 7);
+		if (__word) {
+			while (!(__word & 0x80)) {
+				__word <<= 1;
+				++__result;
+			}
+			return __result;
+		}
+		__result = __nbits & 7;
+	}
+	if (__byteoff) {
+		--__byteoff;
+		for (; __self[__byteoff] == 0; --__byteoff)
+			__result += 8;
+		__word = __self[__byteoff];
+		while (!(__word & 0x80)) {
+			++__result;
+			__word <<= 1;
+		}
+	}
+	return __result;
+}
+#endif /* __USE_KOS */
+
+
 __DECL_END
 #endif /* __CC__ */
 

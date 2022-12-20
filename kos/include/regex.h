@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58163c5c */
+/* HASH CRC-32:0x83ad00d4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -254,7 +254,7 @@ typedef __reg_syntax_t reg_syntax_t; /* Set of `RE_*' (see below) */
 #if !defined(RE_BK_PLUS_QM) && defined(__RE_BK_PLUS_QM)
 #define RE_BK_PLUS_QM __RE_BK_PLUS_QM
 #endif /* !RE_BK_PLUS_QM && __RE_BK_PLUS_QM */
-/* Support for char-classes (e.g. `[:alpha:]') */
+/* Support for char-classes (e.g. `[[:alpha:]]') */
 #if !defined(RE_CHAR_CLASSES) && defined(__RE_CHAR_CLASSES)
 #define RE_CHAR_CLASSES __RE_CHAR_CLASSES
 #endif /* !RE_CHAR_CLASSES && __RE_CHAR_CLASSES */
@@ -334,7 +334,7 @@ typedef __reg_syntax_t reg_syntax_t; /* Set of `RE_*' (see below) */
 #if !defined(RE_INVALID_INTERVAL_ORD) && defined(__RE_INVALID_INTERVAL_ORD)
 #define RE_INVALID_INTERVAL_ORD __RE_INVALID_INTERVAL_ORD
 #endif /* !RE_INVALID_INTERVAL_ORD && __RE_INVALID_INTERVAL_ORD */
-/* Casing is ignored by literal-matches, and '[:lower:]', '[:upper:]', '[:title:]' are aliases for '[:alpha:]' */
+/* Casing is ignored by literal-matches, and '[[:lower:]]', '[[:upper:]]', '[[:title:]]' are aliases for '[[:alpha:]]' */
 #if !defined(RE_ICASE) && defined(__RE_ICASE)
 #define RE_ICASE __RE_ICASE
 #endif /* !RE_ICASE && __RE_ICASE */

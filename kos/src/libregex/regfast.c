@@ -390,31 +390,57 @@ NOTHROW_NCX(CC cs_gather_matching_bytes)(bitstr_t matchend_bytes[],
 			pc += bitset_size;
 		}	break;
 
-		case RECS_CHAR:
+		case RECS_CHAR: {
 			bit_set(matchend_bytes, pc[0]);
-			pc += 1;
-			break;
+			if (is_unicode) {
+				pc += unicode_utf8seqlen[*pc];
+			} else {
+				pc += 1;
+			}
+		}	break;
 
 		case RECS_CHAR2:
-			bit_set(matchend_bytes, pc[0]);
-			bit_set(matchend_bytes, pc[1]);
-			pc += 2;
+			if (is_unicode) {
+				/* Match the relevant utf-8 lead bytes */
+				bit_set(matchend_bytes, *pc);
+				pc += unicode_utf8seqlen[*pc];
+				bit_set(matchend_bytes, *pc);
+				pc += unicode_utf8seqlen[*pc];
+			} else {
+				bit_set(matchend_bytes, pc[0]);
+				bit_set(matchend_bytes, pc[1]);
+				pc += 2;
+			}
 			break;
-
+		case RECS_RANGE_ICASE:
+			assert(is_unicode);
+			ATTR_FALLTHROUGH
 		case RECS_RANGE:
-			bit_nset(matchend_bytes, pc[0], (pc[1] - pc[0]) + 1);
-			pc += 2;
+			if (is_unicode) {
+				char32_t lo, hi;
+				lo = unicode_readutf8((char const **)&pc);
+				hi = unicode_readutf8((char const **)&pc);
+				if (hi >= 0x80) {
+					/* Match all utf-8 lead bytes */
+					bit_nset(matchend_bytes, 0xc0, 0xff);
+					hi = 0x7f;
+				}
+				if (lo < 0x80)
+					bit_nset(matchend_bytes, lo, hi);
+			} else {
+				bit_nset(matchend_bytes, pc[0], pc[1]);
+				pc += 2;
+			}
 			break;
 
 		case RECS_CONTAINS: {
 			uint8_t len = *pc++;
 			assert(len >= 1);
 			if (is_unicode) {
+				/* Match all possible utf-8 lead bytes */
 				do {
-					char32_t ch;
-					ch = unicode_readutf8((char const **)&pc);
-					if (ch < 0x80)
-						bit_set(matchend_bytes, (byte_t)ch);
+					bit_set(matchend_bytes, (byte_t)*pc);
+					pc += unicode_utf8seqlen[*pc];
 				} while (--len);
 			} else {
 				do {
@@ -580,7 +606,7 @@ again:
 			assert(count >= 2);
 			do {
 				fastmap_setpc(fmap, self, *pc, enter_pc);
-				unicode_readutf8((char const **)&pc);
+				pc += unicode_utf8seqlen[*pc];
 			} while (--count);
 			minmatch = 1;
 			GOTMATCH();
@@ -594,7 +620,7 @@ again:
 			assert(count >= 1);
 			do {
 				bit_clear(acepted_bytes, *pc);
-				unicode_readutf8((char const **)&pc);
+				pc += unicode_utf8seqlen[*pc];
 			} while (--count);
 			bit_foreach (bitno, acepted_bytes, 256) {
 				fastmap_setpc(fmap, self, (byte_t)bitno, enter_pc);
@@ -614,15 +640,12 @@ again:
 			                              opcode == REOP_NCS_UTF8);
 			switch (opcode) {
 			case REOP_CS_BYTE:
-				break;
 			case REOP_CS_UTF8:
-				/* Compiler would have used `REOP_CS_BYTE' if no unicode chars that could match. */
-				bit_nset(matchend_bytes, 0xc0, 0xff);
 				break;
 			case REOP_NCS_UTF8:
 				/* Flip the meaning of matched bytes. */
 				bit_flipall(matchend_bytes, 256);
-				/* Compiler would have used `REOP_CS_BYTE' if no unicode chars that could match. */
+				/* Always match all unicode bytes, since 1 lead byte can match many actual characters. */
 				bit_nset(matchend_bytes, 0xc0, 0xff);
 				break;
 			default: __builtin_unreachable();

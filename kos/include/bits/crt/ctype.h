@@ -55,7 +55,7 @@
 __DECL_BEGIN __LIBC __UINT8_TYPE__ const __ctype_C_flags[256] __CASMNAME_SAME("__ctype_C_flags"); __DECL_END
 #endif /* !____ctype_C_flags_defined */
 
-/* WARNING: The magic character trait flags below are directly referenced by `/kos/kos/src/libregex/regexec.h' */
+/* WARNING: The magic character trait flags below are directly referenced by `/kos/kos/src/libregex/regcomp.c' */
 #define __crt_iscntrl(ch)  (__ctype_C_flags[(__UINT8_TYPE__)(ch)] & 0x01)
 #define __crt_isspace(ch)  (__ctype_C_flags[(__UINT8_TYPE__)(ch)] & 0x02)
 #define __crt_islower(ch)  (__ctype_C_flags[(__UINT8_TYPE__)(ch)] & 0x04)

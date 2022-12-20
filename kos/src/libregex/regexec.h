@@ -30,20 +30,6 @@
 
 DECL_BEGIN
 
-/* ASCII character trait flags (s.a. `/kos/kos/include/bits/crt/ctype.h') */
-#define CTYPE_C_FLAG_CNTRL  0x01
-#define CTYPE_C_FLAG_SPACE  0x02
-#define CTYPE_C_FLAG_LOWER  0x04
-#define CTYPE_C_FLAG_UPPER  0x08
-#define CTYPE_C_FLAG_ALPHA  0x0c
-#define CTYPE_C_FLAG_DIGIT  0x10
-#define CTYPE_C_FLAG_XDIGIT 0x30
-#define CTYPE_C_FLAG_ALNUM  0x1c
-#define CTYPE_C_FLAG_PUNCT  0x40
-#define CTYPE_C_FLAG_GRAPH  0x5c
-#define CTYPE_C_FLAG_PRINT  0xdc
-
-
 /* Execute a regular expression.
  * @param: nmatch: # of elements to fill in `pmatch'
  * @param: pmatch: Offsets of matched groups (up to the first `nmatch' groups

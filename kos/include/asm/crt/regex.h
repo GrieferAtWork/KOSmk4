@@ -46,7 +46,7 @@
 /* Regex syntax options */
 #define __RE_BACKSLASH_ESCAPE_IN_LISTS 0x00000001 /* '\' can be used to escape characters in sets: '[a\[\]\-]' */
 #define __RE_BK_PLUS_QM                0x00000002 /* If clear: '+' and '?' are operators and '\+' and '\?' are literals; if set: the opposite is the case. */
-#define __RE_CHAR_CLASSES              0x00000004 /* Support for char-classes (e.g. `[:alpha:]') */
+#define __RE_CHAR_CLASSES              0x00000004 /* Support for char-classes (e.g. `[[:alpha:]]') */
 #define __RE_CONTEXT_INDEP_ANCHORS     0x00000008 /* '^' and '$' are always anchors (as opposed to only at the start/end or after/before a '(' and ')') */
 #define __RE_CONTEXT_INDEP_OPS         0x00000010 /* Ignored... */
 #define __RE_CONTEXT_INVALID_OPS       0x00000020 /* '*', '+', '{' and '?' appearing at the start or after '(' or '|' results in `RE_BADRPT'; If not set, they are treated as literals. */
@@ -66,7 +66,7 @@
 #define __RE_NO_GNU_OPS                0x00080000 /* If set, disable support for '\<', '\>', '\b', '\B', '\w', '\W', '\s', '\S', '\`' and "\'" */
 #define __RE_DEBUG                     0x00100000 /* Ignored... */
 #define __RE_INVALID_INTERVAL_ORD      0x00200000 /* Invalid intervals like "a{b" are treated as literals (i.e. like "a\{b") */
-#define __RE_ICASE                     0x00400000 /* Casing is ignored by literal-matches, and '[:lower:]', '[:upper:]', '[:title:]' are aliases for '[:alpha:]' */
+#define __RE_ICASE                     0x00400000 /* Casing is ignored by literal-matches, and '[[:lower:]]', '[[:upper:]]', '[[:title:]]' are aliases for '[[:alpha:]]' */
 #define __RE_CARET_ANCHORS_HERE        0x00800000 /* Alias for `RE_CONTEXT_INDEP_ANCHORS', but only for '^', and used internally */
 #define __RE_CONTEXT_INVALID_DUP       0x01000000 /* If set, '{' appearing at the start, or after '(', '|' or '}' results in `RE_BADRPT'; else, behavior is governed by `RE_CONTEXT_INVALID_OPS' */
 #define __RE_NO_SUB                    0x02000000 /* Used to implement `RE_NOSUB' */

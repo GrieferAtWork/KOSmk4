@@ -391,7 +391,7 @@ NOTHROW_NCX(CC re_interpreter_nextutf8)(struct re_interpreter const *__restrict 
 
 /* Read a utf-8 character whilst advancing the input pointer. */
 #define re_interpreter_readutf8(self) re_interpreter_inptr_readutf8(&(self)->ri_in)
-PRIVATE WUNUSED NONNULL((1)) char32_t
+PRIVATE NONNULL((1)) char32_t
 NOTHROW_NCX(CC re_interpreter_inptr_readutf8)(struct re_interpreter_inptr *__restrict self) {
 again:
 	if likely(re_interpreter_in_chunk_cangetc(self)) {
@@ -422,8 +422,8 @@ again:
 			char utf8[UNICODE_UTF8_MAXLEN], *dst, *reader;
 			firstchunk = re_interpreter_in_chunkleft(self);
 			assert(seqlen > firstchunk);
-			missing = seqlen - firstchunk;
 			dst     = (char *)mempcpy(utf8, self->ri_in_ptr, firstchunk);
+			missing = seqlen - firstchunk;
 			re_interpreter_inptr_nextchunk(self);
 			left = re_interpreter_in_totalleft(self);
 			if (missing > left)
@@ -433,7 +433,7 @@ again:
 					size_t avail = re_interpreter_in_chunkleft(self);
 					if (avail > missing)
 						avail = missing;
-					dst = (char *)mempcpy(utf8, self->ri_in_ptr, avail);
+					dst = (char *)mempcpy(dst, self->ri_in_ptr, avail);
 					missing -= avail;
 					self->ri_in_ptr += avail;
 					if (!missing)
@@ -767,22 +767,22 @@ again:
 		break;
 
 	case RECS_CHAR:
-		pc += 1;
+		pc += unicode_utf8seqlen[*pc];
 		goto again;
 
 	case RECS_CHAR2:
 	case RECS_RANGE:
-		pc += 2;
+	case RECS_RANGE_ICASE:
+		pc += unicode_utf8seqlen[*pc];
+		pc += unicode_utf8seqlen[*pc];
 		goto again;
 
 	case RECS_CONTAINS: {
 		byte_t len = *pc++;
-		byte_t const *newpc = pc;
 		assert(len >= 1);
 		do {
-			unicode_readutf8((char const **)&newpc);
+			pc += unicode_utf8seqlen[*pc];
 		} while (--len);
-		pc = newpc;
 		goto again;
 	}
 
@@ -1243,35 +1243,67 @@ REOP_CS_UTF8_dispatch:
 				__builtin_unreachable();
 
 			case RECS_CHAR: {
-				byte_t match = getb();
+				byte_t const *newpc = pc;
+				char32_t match;
+				match = unicode_readutf8((char const **)&newpc);
+				pc    = newpc;
 				if (ch == match)
 					goto REOP_CS_UTF8_onmatch;
 				goto REOP_CS_UTF8_dispatch;
 			}
 
 			case RECS_CHAR2: {
-				byte_t match1 = getb();
-				byte_t match2 = getb();
+				byte_t const *newpc = pc;
+				char32_t match1, match2;
+				match1 = unicode_readutf8((char const **)&newpc);
+				match2 = unicode_readutf8((char const **)&newpc);
+				pc     = newpc;
 				if (ch == match1 || ch == match2)
 					goto REOP_CS_UTF8_onmatch;
 				goto REOP_CS_UTF8_dispatch;
 			}
 
 			case RECS_RANGE: {
-				byte_t match_lo = getb();
-				byte_t match_hi = getb();
+				byte_t const *newpc = pc;
+				char32_t match_lo, match_hi;
+				match_lo = unicode_readutf8((char const **)&newpc);
+				match_hi = unicode_readutf8((char const **)&newpc);
+				pc       = newpc;
 				if (ch >= match_lo && ch <= match_hi)
+					goto REOP_CS_UTF8_onmatch;
+				goto REOP_CS_UTF8_dispatch;
+			}
+
+			case RECS_RANGE_ICASE: {
+				byte_t const *newpc = pc;
+				char32_t match_lo, match_hi, lower_ch;
+				match_lo = unicode_readutf8((char const **)&newpc);
+				match_hi = unicode_readutf8((char const **)&newpc);
+				pc       = newpc;
+				lower_ch = unicode_tolower(ch);
+				if (lower_ch >= match_lo && lower_ch <= match_hi)
 					goto REOP_CS_UTF8_onmatch;
 				goto REOP_CS_UTF8_dispatch;
 			}
 
 			case RECS_CONTAINS: {
 				byte_t len = getb();
-				if (memchr(pc, ch, len) != NULL) {
-					pc += len;
-					goto REOP_CS_UTF8_onmatch;
-				}
-				pc += len;
+				byte_t const *newpc = pc;
+				assert(len >= 3);
+				do {
+					char32_t expected_ch;
+					--len;
+					expected_ch = unicode_readutf8((char const **)&newpc);
+					if (ch == expected_ch) {
+						while (len) {
+							newpc += unicode_utf8seqlen[*newpc];
+							--len;
+						}
+						pc = newpc;
+						goto REOP_CS_UTF8_onmatch;
+					}
+				} while (len);
+				pc = newpc;
 				goto REOP_CS_UTF8_dispatch;
 			}
 
@@ -1320,35 +1352,61 @@ REOP_NCS_UTF8_dispatch:
 				DISPATCH();
 
 			case RECS_CHAR: {
-				byte_t match = getb();
+				byte_t const *newpc = pc;
+				char32_t match;
+				match = unicode_readutf8((char const **)&newpc);
+				pc    = newpc;
 				if (ch == match)
 					ONFAIL();
 				goto REOP_NCS_UTF8_dispatch;
 			}
 
 			case RECS_CHAR2: {
-				byte_t match1 = getb();
-				byte_t match2 = getb();
+				byte_t const *newpc = pc;
+				char32_t match1, match2;
+				match1 = unicode_readutf8((char const **)&newpc);
+				match2 = unicode_readutf8((char const **)&newpc);
+				pc     = newpc;
 				if (ch == match1 || ch == match2)
 					ONFAIL();
 				goto REOP_NCS_UTF8_dispatch;
 			}
 
 			case RECS_RANGE: {
-				byte_t match_lo = getb();
-				byte_t match_hi = getb();
+				byte_t const *newpc = pc;
+				char32_t match_lo, match_hi;
+				match_lo = unicode_readutf8((char const **)&newpc);
+				match_hi = unicode_readutf8((char const **)&newpc);
+				pc       = newpc;
 				if (ch >= match_lo && ch <= match_hi)
+					ONFAIL();
+				goto REOP_NCS_UTF8_dispatch;
+			}
+
+			case RECS_RANGE_ICASE: {
+				byte_t const *newpc = pc;
+				char32_t match_lo, match_hi, lower_ch;
+				match_lo = unicode_readutf8((char const **)&newpc);
+				match_hi = unicode_readutf8((char const **)&newpc);
+				pc       = newpc;
+				lower_ch = unicode_tolower(ch);
+				if (lower_ch >= match_lo && lower_ch <= match_hi)
 					ONFAIL();
 				goto REOP_NCS_UTF8_dispatch;
 			}
 
 			case RECS_CONTAINS: {
 				byte_t len = getb();
-				if (memchr(pc, ch, len) != NULL) {
-					pc += len;
-					ONFAIL();
-				}
-				pc += len;
+				byte_t const *newpc = pc;
+				assert(len >= 3);
+				do {
+					char32_t expected_ch;
+					--len;
+					expected_ch = unicode_readutf8((char const **)&newpc);
+					if (ch == expected_ch)
+						ONFAIL();
+				} while (len);
+				pc = newpc;
 				goto REOP_NCS_UTF8_dispatch;
 			}
 

@@ -31,6 +31,7 @@ options["COMPILE.language"] = "c";
 /**/
 #include <hybrid/compiler.h>
 
+#include <hybrid/align.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 
@@ -72,6 +73,11 @@ options["COMPILE.language"] = "c";
  *    of prefix instructions before giving up and not repeating any prefixes. */
 #define ALTERNATION_PREFIX_MAXLEN 16
 
+/* Must # of  ASCII characters that  should appear in  the
+ * operand of `REOP_[N]CONTAINS_UTF8', before the compiler
+ * should produce a `REOP_[N]CS_UTF8'-sequence instead. */
+#define REOP_CONTAINS_UTF8_MAX_ASCII_COUNT 4
+
 DECL_BEGIN
 
 #undef re_parser_yield
@@ -84,6 +90,13 @@ DECL_BEGIN
 #endif /* NDEBUG || NDEBUG_FINI */
 
 #define int16_at(p) (*(int16_t *)(p))
+
+#define tswap(T, a, b)   \
+	do {                 \
+		T _temp = (b);   \
+		(b)     = (a);   \
+		(a)     = _temp; \
+	}	__WHILE0
 
 
 /************************************************************************/
@@ -220,7 +233,7 @@ NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self) {
 			return RE_TOKEN_AT_EOL; /* Always special at end of pattern */
 		if ((self->rep_pos[0] == ')') && (self->rep_syntax & RE_SYNTAX_NO_BK_PARENS))
 			return RE_TOKEN_AT_EOL; /* Always special before group-close */
-		if ((self->rep_pos[0] == '\\' && self->rep_pos[1] == '(') && !(self->rep_syntax & RE_SYNTAX_NO_BK_PARENS))
+		if ((self->rep_pos[0] == '\\' && self->rep_pos[1] == ')') && !(self->rep_syntax & RE_SYNTAX_NO_BK_PARENS))
 			return RE_TOKEN_AT_EOL; /* Always special before group-close */
 		break;
 
@@ -337,6 +350,11 @@ NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self) {
 				return RE_TOKEN_BK_n;
 			break;
 
+		case 'N':
+			if (!(self->rep_syntax & RE_SYNTAX_NO_KOS_OPS))
+				return RE_TOKEN_BK_N;
+			break;
+
 		case '`':
 			if (!(self->rep_syntax & RE_SYNTAX_NO_GNU_OPS))
 				return RE_TOKEN_AT_SOI;
@@ -400,12 +418,12 @@ NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self) {
 			ATTR_FALLTHROUGH
 		case 'x': {
 			uint32_t ord;
-			unsigned int i, digits;
+			unsigned int i, ndigits;
 			if (self->rep_syntax & RE_SYNTAX_NO_KOS_OPS)
 				break;
-			digits = ch == 'U' ? 8 : ch == 'u' ? 4 : 2;
-			ord    = 0;
-			for (i = 0; i < digits; ++i, ++self->rep_pos) {
+			ndigits = ch == 'U' ? 8 : ch == 'u' ? 4 : 2;
+			ord     = 0;
+			for (i = 0; i < ndigits; ++i, ++self->rep_pos) {
 				uint8_t nibble;
 				char hexchar = *self->rep_pos;
 				if (!__libc_hex2int(hexchar, &nibble)) {
@@ -417,13 +435,17 @@ NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self) {
 			}
 			if unlikely(ord >= RE_TOKEN_BASE) {
 				/* Guard against illegal unicode characters. */
-				self->rep_pos -= digits;
+				self->rep_pos -= ndigits;
 				goto default_escaped_char;
 			}
 			if (ch == 'x') {
-				/* Special case: This one's 80h-FFh must be encoded as `RE_TOKEN_BYTE80h_MIN' */
-				if (ord >= 0x80)
+				/* Special case: This one's 80h-FFh must be encoded as `RE_TOKEN_BYTE80h_MIN',
+				 *               as it's not supposed to  match U+0080-U+00FF, but rather  the
+				 *               raw bytes 80h-FFh. */
+				if (ord >= 0x80) {
+					ord -= 0x80;
 					ord += RE_TOKEN_BYTE80h_MIN;
+				}
 			}
 			return ord;
 		}	break;
@@ -461,7 +483,7 @@ handle_utf8:
 	default:
 		break;
 	}
-	return ch; /* Regular case: just a literal */
+	return ch; /* Default case: match a literal */
 }
 
 
@@ -547,6 +569,30 @@ NOTHROW_NCX(CC re_compiler_putn)(struct re_compiler *__restrict self,
 	return false;
 }
 
+/* Return a pointer to the start of the utf-8 character that contains `cptr' */
+PRIVATE ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
+NOTHROW_NCX(CC utf8_baseptr)(char const *__restrict cptr) {
+	while (unicode_utf8seqlen[(unsigned char)*cptr] == 0)
+		--cptr; /* Seek backwards until we hit a non-follow-up byte. */
+	return (char *)cptr;
+}
+
+/* Same  as   `unicode_readutf8(3)',   but   don't   advance   `cptr'
+ * It is assumed that `cptr' points to the start of a utf-8 sequence. */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1)) char32_t
+NOTHROW_NCX(CC utf8_charat)(char const *__restrict cptr) {
+	return unicode_readutf8((char const **)&cptr);
+}
+
+/* Skip over `n' utf-8 characters. */
+PRIVATE ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) char *
+NOTHROW_NCX(CC utf8_skipn)(char const *__restrict cptr, size_t n) {
+	for (; n; --n)
+		cptr += unicode_utf8seqlen[(unsigned char)*cptr];
+	return (char *)cptr;
+}
+
+
 
 /* Return a pointer to the next instruction */
 INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint8_t *
@@ -569,7 +615,7 @@ NOTHROW_NCX(CC libre_opcode_next)(uint8_t const *__restrict p_instr) {
 		count = *p_instr++;
 		assert(count >= 1);
 		do {
-			unicode_readutf8((char const **)p_instr);
+			p_instr += unicode_utf8seqlen[*p_instr];
 		} while (--count);
 	}	break;
 
@@ -583,11 +629,21 @@ NOTHROW_NCX(CC libre_opcode_next)(uint8_t const *__restrict p_instr) {
 				p_instr += RECS_BITSET_GETBYTES(cs_opcode);
 				break;
 			case RECS_CHAR:
-				p_instr += 1;
+				if (opcode == REOP_CS_BYTE) {
+					p_instr += 1;
+				} else {
+					p_instr += unicode_utf8seqlen[*p_instr];
+				}
 				break;
 			case RECS_CHAR2:
 			case RECS_RANGE:
-				p_instr += 2;
+			case RECS_RANGE_ICASE:
+				if (opcode == REOP_CS_BYTE) {
+					p_instr += 2;
+				} else {
+					p_instr += unicode_utf8seqlen[*p_instr];
+					p_instr += unicode_utf8seqlen[*p_instr];
+				}
 				break;
 			case RECS_CONTAINS: {
 				uint8_t count = *p_instr++;
@@ -596,7 +652,7 @@ NOTHROW_NCX(CC libre_opcode_next)(uint8_t const *__restrict p_instr) {
 					p_instr += count;
 				} else {
 					do {
-						unicode_readutf8((char const **)p_instr);
+						p_instr += unicode_utf8seqlen[*p_instr];
 					} while (--count);
 				}
 			}	break;
@@ -678,6 +734,10 @@ NOTHROW_NCX(CC re_compiler_compile_literal_byte)(struct re_compiler *__restrict 
 			        "and KOS doesn't support any other locale");
 			if (!re_compiler_putc(self, REOP_BYTE2))
 				goto err_nomem;
+			if ((unsigned char)lower > (unsigned char)upper) {
+				/* `REOP_BYTE2' requires that the 2 bytes be sorted. */
+				tswap(char, lower, upper);
+			}
 			if (!re_compiler_putc(self, (unsigned char)lower))
 				goto err_nomem;
 			if (!re_compiler_putc(self, (unsigned char)upper))
@@ -693,6 +753,16 @@ done_literal:
 	return RE_NOERROR;
 err_nomem:
 	return RE_ESPACE;
+}
+
+PRIVATE int __LIBCCALL compare_char32_t(void const *a, void const *b) {
+	char32_t lhs = *(char32_t const *)a;
+	char32_t rhs = *(char32_t const *)b;
+	if (lhs < rhs)
+		return -1;
+	if (lhs > rhs)
+		return 1;
+	return 0;
 }
 
 /* Encode a literal unicode character.
@@ -734,6 +804,8 @@ NOTHROW_NCX(CC re_compiler_compile_literal_uni)(struct re_compiler *__restrict s
 			char icase_utf8[lengthof(chars) * UNICODE_UTF8_MAXLEN], *endp;
 			size_t icase_utf8_len;
 			uint8_t i;
+			/* Must sort `chars', as required by `REOP_CONTAINS_UTF8' */
+			qsort(chars, nchars, sizeof(char32_t), &compare_char32_t);
 			for (endp = icase_utf8, i = 0; i < nchars; ++i)
 				endp = unicode_writeutf8(endp, chars[i]);
 			icase_utf8_len = (size_t)(endp - icase_utf8);
@@ -906,7 +978,7 @@ NOTHROW_NCX(CC re_compiler_compile_unescaped_literal_seq)(struct re_compiler *__
 				}
 				continue;
 			}
-			unicode_readutf8(&literal_seq_iter);
+			literal_seq_iter += unicode_utf8seqlen[(unsigned char)*literal_seq_iter];
 			++num_leading_chars;
 		}
 
@@ -954,15 +1026,22 @@ NOTHROW_NCX(CC re_compiler_compile_literal_seq)(struct re_compiler *__restrict s
 	 * regex encoded sequence of literal characters, with properties
 	 * described by `literal_seq_hasesc' and `literal_seq_isutf8'. */
 	assert(literal_seq_length >= 1);
+	assert(self->rec_parser.rep_pos == literal_seq_end);
 	if (literal_seq_length == 1) {
 		/* Special case: single-character literal */
-		byte_t literal_byte;
+		re_token_t literal_tok;
+		self->rec_parser.rep_pos = literal_seq_start;
+		literal_tok = re_compiler_yield(self);
+		assert(self->rec_parser.rep_pos == literal_seq_end);
+		assert(RE_TOKEN_ISLITERAL(literal_tok));
 		if (literal_seq_isutf8) {
-			char32_t literal_char = unicode_readutf8(&literal_seq_start);
-			return re_compiler_compile_literal_uni(self, literal_char);
+			assert(RE_TOKEN_ISUTF8(literal_tok));
+			return re_compiler_compile_literal_uni(self, (char32_t)literal_tok);
 		}
-		literal_byte = (byte_t)literal_seq_start[0];
-		return re_compiler_compile_literal_byte(self, literal_byte);
+		assert(!RE_TOKEN_ISUTF8(literal_tok));
+		if (RE_TOKEN_ISBYTE80h(literal_tok))
+			literal_tok = RE_TOKEN_GETBYTE80h(literal_tok);
+		return re_compiler_compile_literal_byte(self, (byte_t)literal_tok);
 	}
 
 	/* multi-character literal (using `REOP_EXACT' and friends) */
@@ -1042,11 +1121,12 @@ NOTHROW_NCX(CC _re_compiler_compile_alternation)(struct re_compiler *__restrict 
 #endif /* ALTERNATION_PREFIX_MAXLEN <= 0 */
 
 struct charset_def {
-	char    csd_name[8]; /* Charset name */
+	char    csd_name[7]; /* Charset name */
 	uint8_t csd_opcode;  /* Charset opcode (one of `RECS_*') */
 };
 
 
+/* Known character sets, and their corresponding `RECS_*' opcodes. */
 PRIVATE struct charset_def const charsets[] = {
 	{ "cntrl", RECS_ISCNTRL },
 	{ "space", RECS_ISSPACE },
@@ -1068,7 +1148,7 @@ PRIVATE struct charset_def const charsets[] = {
 	{ "lf", RECS_ISLF },
 	{ "hex", RECS_ISHEX },
 	{ "title", RECS_ISTITLE },
-	{ "numeric", RECS_ISNUMERIC },
+	{ { 'n', 'u', 'm', 'e', 'r', 'i', 'c' }, RECS_ISNUMERIC },
 };
 
 /* Find  the charset definition, given its `name'
@@ -1076,22 +1156,198 @@ PRIVATE struct charset_def const charsets[] = {
 PRIVATE WUNUSED uint8_t
 NOTHROW_NCX(CC charset_find)(char const *__restrict name, size_t namelen) {
 	size_t i;
-	if (namelen >= lengthof(charsets[0].csd_name))
+	if (namelen > lengthof(charsets[0].csd_name))
 		return RECS_DONE;
 	for (i = 0; i < lengthof(charsets); ++i) {
 		struct charset_def const *set = &charsets[i];
 		if (bcmp(set->csd_name, name, namelen) == 0 &&
-		    set->csd_name[namelen] == '\0')
+		    (namelen >= lengthof(charsets[i].csd_name) ||
+		     set->csd_name[namelen] == '\0'))
 			return set->csd_opcode;
 	}
 	return RECS_DONE;
 }
 
+struct unicode_charset {
+	char  *ucs_basep; /* [0..1][<= ucs_endp][owned] Charset base pointer.
+	                   *
+	                   * The charset itself is a tightly packed utf-8  string,
+	                   * with all of its containing characters sorted by their
+	                   * unicode ordinal values.
+	                   *
+	                   * Because  unicode lead bytes can be differentiated from
+	                   * unicode follow-up bytes, it is always possible to find
+	                   * the start of a  character, given an arbitrary  pointer
+	                   * into its sequence (thus: this array can be  bsearch'd) */
+	char  *ucs_endp;  /* [0..1][>= ucs_basep] Charset end pointer. */
+	size_t ucs_count; /* # of unicode characters in this set. */
+};
+
+#define unicode_charset_init(self)    (void)((self)->ucs_basep = (self)->ucs_endp = NULL, (self)->ucs_count = 0)
+#define unicode_charset_fini(self)    free((self)->ucs_basep)
+#define unicode_charset_isempty(self) ((self)->ucs_basep <= (self)->ucs_endp)
+
+/* Insert (if it's not already contained) the given `ch' into `self'
+ * @return:  1: The given `ch' was already contained in `self' (and thus wasn't inserted)
+ * @return:  0: The given `ch' has been inserted into `self'
+ * @return: -1: Error: insufficient memory. */
+PRIVATE WUNUSED NONNULL((1)) int
+NOTHROW_NCX(CC unicode_charset_insert)(struct unicode_charset *__restrict self,
+                                       char32_t ch) {
+	size_t utf8_len, oldsize, newsize, avlsize;
+	char utf8[UNICODE_UTF8_MAXLEN];
+	char *lo, *hi;
+	lo = self->ucs_basep;
+	hi = self->ucs_endp;
+	while (lo < hi) {
+		char32_t mch;
+		char *mid;
+		mid = lo + ((size_t)(hi - lo) >> 1);
+		mid = utf8_baseptr(mid);
+		mch = utf8_charat(mid);
+		if (ch < mch) {
+			hi = mid;
+		} else if (ch > mch) {
+			lo = mid + unicode_utf8seqlen[(unsigned char)*mid];
+		} else {
+			/* Already contained in set. */
+			return 1;
+		}
+	}
+	assert(lo == hi);
+
+	/* Must insert `ch' at `lo' */
+	utf8_len = (size_t)(unicode_writeutf8(utf8, ch) - utf8);
+	oldsize  = (size_t)(self->ucs_endp - self->ucs_basep);
+	newsize  = oldsize + utf8_len;
+	avlsize  = malloc_usable_size(self->ucs_basep);
+	if (newsize > avlsize) {
+		char *newbuf;
+		size_t newalloc = avlsize * 2;
+		if (newalloc < 16)
+			newalloc = 16;
+		if (newalloc < newsize)
+			newalloc = newsize;
+		newbuf = (char *)realloc(self->ucs_basep, newalloc, sizeof(char));
+		if unlikely(!newbuf) {
+			newalloc = newsize;
+			newbuf   = (char *)realloc(self->ucs_basep, newalloc, sizeof(char));
+			if unlikely(!newbuf)
+				return -1;
+		}
+		lo = newbuf + (lo - self->ucs_basep);
+		hi = newbuf + (hi - self->ucs_basep);
+		self->ucs_basep = newbuf;
+		self->ucs_endp  = newbuf + oldsize;
+	}
+
+	/* Insert the utf8-sequence at the required offset. */
+	memmoveup(lo + utf8_len, lo, (size_t)(self->ucs_endp - lo), sizeof(char));
+	memcpy(lo, utf8, utf8_len, sizeof(char));
+	self->ucs_endp += utf8_len;
+	assert(self->ucs_endp == self->ucs_basep + newsize);
+	++self->ucs_count;
+	return 0;
+}
+
+PRIVATE WUNUSED NONNULL((1)) bool
+NOTHROW_NCX(CC charvec_contains)(char32_t const *chv, size_t chc, char32_t ch) {
+	size_t i;
+	for (i = 0; i < chc; ++i) {
+		if (chv[i] == ch)
+			return true;
+	}
+	return false;
+}
+
+PRIVATE WUNUSED NONNULL((1, 2)) int
+NOTHROW_NCX(CC unicode_charset_insertall)(struct unicode_charset *__restrict self,
+                                          char32_t const *chv, size_t chc) {
+	size_t i;
+	if (chc > 0) {
+		if unlikely(unicode_charset_insert(self, chv[0]) == -1)
+			goto err;
+		if (chc > 1) {
+			for (i = 1; i < chc; ++i) {
+				char32_t ch = chv[i];
+				if (charvec_contains(chv, i, ch))
+					continue;
+				if unlikely(unicode_charset_insert(self, ch) == -1)
+					goto err;
+			}
+		}
+	}
+	return 0;
+err:
+	return -1;
+}
+
+/* Generate code `RECS_RANGE lo, hi' */
+PRIVATE WUNUSED NONNULL((1)) bool
+NOTHROW_NCX(CC re_compiler_cs_encode_unirange)(struct re_compiler *__restrict self,
+                                               char32_t lo, char32_t hi) {
+	size_t codelen;
+	byte_t code[1 + (2 * UNICODE_UTF8_MAXLEN)], *writer;
+	writer    = code;
+	*writer++ = (self->rec_parser.rep_syntax & RE_SYNTAX_ICASE) ? RECS_RANGE_ICASE : RECS_RANGE;
+	writer    = (byte_t *)unicode_writeutf8((char *)writer, lo);
+	writer    = (byte_t *)unicode_writeutf8((char *)writer, hi);
+	codelen   = (size_t)(writer - code);
+	return re_compiler_putn(self, code, codelen);
+}
+
+/* ASCII character trait flags (s.a. `/kos/kos/include/bits/crt/ctype.h') */
+#define CTYPE_C_FLAG_CNTRL  0x01
+#define CTYPE_C_FLAG_SPACE  0x02
+#define CTYPE_C_FLAG_LOWER  0x04
+#define CTYPE_C_FLAG_UPPER  0x08
+#define CTYPE_C_FLAG_ALPHA  0x0c
+#define CTYPE_C_FLAG_DIGIT  0x10
+#define CTYPE_C_FLAG_XDIGIT 0x30
+#define CTYPE_C_FLAG_ALNUM  0x1c
+#define CTYPE_C_FLAG_PUNCT  0x40
+#define CTYPE_C_FLAG_GRAPH  0x5c
+#define CTYPE_C_FLAG_PRINT  0xdc
+
+/* Mapping from `RECS_ISxxx - RECS_ISX_MIN' to `CTYPE_C_FLAG_*'.
+ *
+ * Those cases where mask exists encode `0' as mask, causing the
+ * handler to do a custom encode below. */
+PRIVATE uint8_t const ctype_c_trait_masks[] = {
+#define DEF_CTYPE_TRAIT_MASK(opcode, mask) [((opcode) - RECS_ISX_MIN)] = mask
+	DEF_CTYPE_TRAIT_MASK(RECS_ISCNTRL, CTYPE_C_FLAG_CNTRL),
+	DEF_CTYPE_TRAIT_MASK(RECS_ISSPACE, CTYPE_C_FLAG_SPACE),
+	DEF_CTYPE_TRAIT_MASK(RECS_ISUPPER, CTYPE_C_FLAG_UPPER),
+	DEF_CTYPE_TRAIT_MASK(RECS_ISLOWER, CTYPE_C_FLAG_LOWER),
+	DEF_CTYPE_TRAIT_MASK(RECS_ISALPHA, CTYPE_C_FLAG_ALPHA),
+	DEF_CTYPE_TRAIT_MASK(RECS_ISDIGIT, CTYPE_C_FLAG_DIGIT),
+	DEF_CTYPE_TRAIT_MASK(RECS_ISXDIGIT, CTYPE_C_FLAG_XDIGIT),
+	DEF_CTYPE_TRAIT_MASK(RECS_ISALNUM, CTYPE_C_FLAG_ALNUM),
+	DEF_CTYPE_TRAIT_MASK(RECS_ISPUNCT, CTYPE_C_FLAG_PUNCT),
+	DEF_CTYPE_TRAIT_MASK(RECS_ISGRAPH, CTYPE_C_FLAG_GRAPH),
+	DEF_CTYPE_TRAIT_MASK(RECS_ISPRINT, CTYPE_C_FLAG_PRINT),
+	DEF_CTYPE_TRAIT_MASK(RECS_ISBLANK, 0),
+	DEF_CTYPE_TRAIT_MASK(RECS_ISSYMSTRT, 0),
+	DEF_CTYPE_TRAIT_MASK(RECS_ISSYMCONT, 0),
+	DEF_CTYPE_TRAIT_MASK(RECS_ISTAB, 0),
+	DEF_CTYPE_TRAIT_MASK(RECS_ISWHITE, 0),
+	DEF_CTYPE_TRAIT_MASK(RECS_ISEMPTY, 0),
+	DEF_CTYPE_TRAIT_MASK(RECS_ISLF, 0),
+	DEF_CTYPE_TRAIT_MASK(RECS_ISHEX, 0),
+	DEF_CTYPE_TRAIT_MASK(RECS_ISTITLE, CTYPE_C_FLAG_UPPER),
+	DEF_CTYPE_TRAIT_MASK(RECS_ISNUMERIC, CTYPE_C_FLAG_DIGIT),
+#undef DEF_CTYPE_TRAIT_MASK
+};
+
 PRIVATE WUNUSED NONNULL((1)) re_errno_t
 NOTHROW_NCX(CC re_compiler_compile_set)(struct re_compiler *__restrict self) {
+#define CHARSET_COUNT ((RECS_ISX_MAX - RECS_ISX_MIN) + 1)
 	bitstr_t bit_decl(bytes, 256);
+	bitstr_t bit_decl(charsets, CHARSET_COUNT);
+	struct unicode_charset uchars; /* Extra unicode characters to add to the set. */
 	bool negate     = false;
 	char const *pat = self->rec_parser.rep_pos;
+	size_t start_offset; /* Set code start offset (offset of `REOP_[N]CS_*' opcode) */
 	if (*pat == '^') {
 		negate = true;
 		++pat;
@@ -1099,10 +1355,442 @@ NOTHROW_NCX(CC re_compiler_compile_set)(struct re_compiler *__restrict self) {
 
 	/* By default, we don't match any bytes. */
 	bit_clearall(bytes, 256);
-	(void)negate;
-	(void)charset_find;
-	/* TODO */
-	return RE_BADPAT;
+	bit_clearall(charsets, CHARSET_COUNT);
+	unicode_charset_init(&uchars);
+	if unlikely(!re_compiler_require(self, 1)) /* Will need at least 1 byte */
+		goto err_nomem;
+	start_offset = (size_t)(self->rec_cpos - self->rec_cbase);
+	++self->rec_cpos; /* Reserve space for leading `REOP_[N]CS_*' character. */
+
+	/* Special case: if the character immediately after the open '[' is
+	 * either ']' or '-', it will  not have its usual special  meaning. */
+	if (*pat == ']' || *pat == '-') {
+		bit_set(bytes, *pat);
+		++pat;
+	}
+
+loop_next:
+	for (;;) {
+		unsigned char ch = (unsigned char)*pat++;
+		switch (ch) {
+
+		case '\0':
+			goto err_EEND;
+
+		case ']':
+			self->rec_parser.rep_pos = pat;
+			goto done_loop;
+
+		case '[':
+			if ((*pat == ':') &&
+			    (self->rec_parser.rep_syntax & RE_SYNTAX_CHAR_CLASSES)) {
+				/* character classes */
+				uint8_t cs_opcode;
+				char *csend;
+				pat += 1;
+				csend = strchr(pat, ':');
+				if unlikely(!csend)
+					goto err_EEND;
+				cs_opcode = charset_find(pat, (size_t)(csend - pat));
+				if unlikely(cs_opcode == RECS_DONE)
+					goto err_ECTYPE;
+				if (self->rec_parser.rep_syntax & RE_SYNTAX_ICASE) {
+					/* Transform char-classes in ICASE-mode */
+					if (cs_opcode == RECS_ISUPPER || cs_opcode == RECS_ISLOWER || cs_opcode == RECS_ISTITLE)
+						cs_opcode = RECS_ISALNUM;
+				}
+				csend += 1;
+				if unlikely(*csend != ']')
+					goto err_BADPAT;
+				csend += 1;
+				pat = csend;
+
+				/* Add the selected charset to the collection of ones that have been used. */
+				bit_set(charsets, cs_opcode - RECS_ISX_MIN);
+				goto loop_next;
+			}
+			goto encode_literal;
+
+		case '\\':
+			if (self->rec_parser.rep_syntax & RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS) {
+				/* Special case: backslash-escape sequences are allowed in charsets */
+				/* TODO */
+			}
+			goto encode_literal;
+
+		default:
+encode_literal:
+			if (ch >= 0x80 && !(self->rec_parser.rep_syntax & RE_SYNTAX_NO_UTF8)) {
+				char32_t lochar;
+				--pat;
+				lochar = unicode_readutf8((char const **)&pat);
+				if unlikely(lochar < 0x80) {
+					ch = (unsigned char)lochar;
+					goto encode_ascii_ch;
+				}
+				if (pat[0] == '-' && pat[1] != ']') {
+					/* Unicode character range. */
+					char32_t hichar;
+					++pat; /* Skip over '-' character */
+					hichar = unicode_readutf8((char const **)&pat);
+					if (hichar < lochar) {
+						/* Bad range lo/hi bounds */
+						if (self->rec_parser.rep_syntax & RE_SYNTAX_NO_EMPTY_RANGES)
+							goto err_ERANGE;
+						goto loop_next; /* Ignore range. */
+					}
+					if (self->rec_parser.rep_syntax & RE_SYNTAX_ICASE) {
+						lochar = unicode_tolower(lochar);
+						hichar = unicode_tolower(hichar);
+						if unlikely(lochar > hichar)
+							tswap(char32_t, lochar, hichar);
+					}
+
+					/* Special case: "[ä-ä]" is encoded as "[ä]" */
+					if (lochar == hichar)
+						goto add_lochar_to_unicode_charset;
+
+					/* Directly encode the utf-8 sequence length. */
+					if unlikely(!re_compiler_cs_encode_unirange(self, lochar, hichar))
+						goto err_nomem;
+					goto loop_next;
+				}
+
+				/* Add unicode character to unicode set. */
+add_lochar_to_unicode_charset:
+				if (self->rec_parser.rep_syntax & RE_SYNTAX_ICASE) {
+					char32_t chars[4];
+					chars[0] = lochar;
+					chars[1] = unicode_tolower(lochar);
+					chars[2] = unicode_toupper(lochar);
+					chars[3] = unicode_totitle(lochar);
+					if unlikely(unicode_charset_insertall(&uchars, chars, 4) < 0)
+						goto err_nomem;
+				} else {
+					if unlikely(unicode_charset_insert(&uchars, lochar) < 0)
+						goto err_nomem;
+				}
+				goto loop_next;
+			}
+encode_ascii_ch:
+			if (pat[0] == '-' && pat[1] != ']') {
+				/* Ascii character range. */
+				unsigned char hichar = (unsigned char)pat[1];
+				pat += 2;
+				if (hichar < ch) {
+					/* Bad range lo/hi bounds */
+					if (self->rec_parser.rep_syntax & RE_SYNTAX_NO_EMPTY_RANGES)
+						goto err_ERANGE;
+					goto loop_next; /* Ignore range. */
+				}
+				bit_nset(bytes, ch, hichar);
+			} else {
+				bit_set(bytes, ch);
+			}
+			break;
+		}
+	}
+done_loop:
+
+	/* In ASCII-mode, we're not allowed to encode charsets. Instead, we
+	 * have to essentially hard-code  ctype attributes in the  charset. */
+	if (self->rec_parser.rep_syntax & RE_SYNTAX_NO_UTF8) {
+		int csid_offset;
+		assert(unicode_charset_isempty(&uchars));
+		bit_foreach (csid_offset, charsets, CHARSET_COUNT) {
+			uint8_t ctype_c_trait_mask;
+			ctype_c_trait_mask = ctype_c_trait_masks[csid_offset];
+			if (ctype_c_trait_mask != 0) {
+				/* Can just copy attributes from `__ctype_C_flags' */
+				unsigned int i;
+do_copy_ctype_c_trait_mask:
+				for (i = 0; i < 256; ++i) {
+					if ((__ctype_C_flags[i] & ctype_c_trait_mask) != 0)
+						bit_set(bytes, i);
+				}
+			} else {
+				/* Need some custom handling (s.a. 0-cases in `ctype_c_trait_masks') */
+				switch (csid_offset) {
+				case RECS_ISBLANK - RECS_ISX_MIN:
+					bit_set(bytes, 0x09);
+					bit_set(bytes, 0x20);
+					break;
+				case RECS_ISSYMSTRT - RECS_ISX_MIN:
+					bit_set(bytes, 0x24); /* '$' */
+					bit_set(bytes, 0x5f); /* '_' */
+					ctype_c_trait_mask = CTYPE_C_FLAG_ALPHA;
+					goto do_copy_ctype_c_trait_mask;
+				case RECS_ISSYMCONT - RECS_ISX_MIN:
+					bit_set(bytes, 0x24); /* '$' */
+					bit_set(bytes, 0x5f); /* '_' */
+					ctype_c_trait_mask = CTYPE_C_FLAG_ALNUM;
+					goto do_copy_ctype_c_trait_mask;
+				case RECS_ISEMPTY - RECS_ISX_MIN:
+					bit_set(bytes, 0x20); /* ' ' */
+					ATTR_FALLTHROUGH
+				case RECS_ISTAB - RECS_ISX_MIN:
+					bit_set(bytes, 0x09); /* '\t' */
+					bit_set(bytes, 0x0b); /* VT */
+					bit_set(bytes, 0x0c); /* FF */
+					break;
+				case RECS_ISWHITE - RECS_ISX_MIN:
+					bit_set(bytes, 0x20); /* ' ' */
+					break;
+				case RECS_ISLF - RECS_ISX_MIN:
+					bit_set(bytes, 0x0a); /* '\n' */
+					bit_set(bytes, 0x0d); /* '\r' */
+					break;
+				case RECS_ISHEX - RECS_ISX_MIN:
+					bit_nset(bytes, 0x41, 0x46); /* 'A-F' */
+					bit_nset(bytes, 0x61, 0x66); /* 'a-f' */
+					break;
+				default: __builtin_unreachable();
+				}
+			}
+		}
+	}
+
+	/* In ICASE-mode, must merge the is-set state of 'A-Z' and 'a-z' in the ASCII area */
+	if (self->rec_parser.rep_syntax & RE_SYNTAX_ICASE) {
+		byte_t b;
+		for (b = 0x41; b <= 0x5a; ++b) {
+			if (bit_test(bytes, b) || bit_test(bytes, b | 0x20)) {
+				bit_set(bytes, b);
+				bit_set(bytes, b | 0x20);
+			}
+		}
+	}
+
+	/* Figure out how we want to represent everything. */
+	if (negate) {
+		if (self->rec_parser.rep_syntax & RE_SYNTAX_NO_UTF8) {
+			self->rec_cbase[start_offset] = REOP_CS_BYTE;
+			bit_flipall(bytes, 256);
+		} else {
+			self->rec_cbase[start_offset] = REOP_NCS_UTF8;
+		}
+	} else {
+		if (self->rec_parser.rep_syntax & RE_SYNTAX_NO_UTF8) {
+			self->rec_cbase[start_offset] = REOP_CS_BYTE;
+		} else if ((self->rec_cpos == self->rec_cbase + start_offset + 1) &&
+		           (uchars.ucs_count == 0) &&
+		           (bit_noneset(charsets, CHARSET_COUNT))) {
+			/* Special case: even when compiling  in utf-8-mode,  we can  still
+			 *               encode bitsets as  their more efficient  byte-mode
+			 *               encoding, so-long as the pattern could never match
+			 *               a multi-byte utf-8 character! */
+			self->rec_cbase[start_offset] = REOP_CS_BYTE;
+		} else {
+			self->rec_cbase[start_offset] = REOP_CS_UTF8;
+		}
+	}
+
+	if (!(self->rec_parser.rep_syntax & RE_SYNTAX_NO_UTF8)) {
+		/* Encode `charsets' (if in utf-8 mode) */
+		int csid_offset;
+		bit_foreach (csid_offset, charsets, CHARSET_COUNT) {
+			byte_t cs_opcode = RECS_ISX_MIN + csid_offset;
+			if (!re_compiler_putc(self, cs_opcode))
+				goto err_nomem;
+			/* TODO: In non-negate-mode, try to clear the charset's bits from `bytes', so we don't
+			 *       encode  matching bytes redundantly  (optimizes "[[:hex:]a-f]" -> "[[:hex:]]") */
+		}
+
+		/* Encode `uchars' (if in utf-8 mode) */
+		if (uchars.ucs_count > 0) {
+			char *basep  = uchars.ucs_basep;
+			size_t count = uchars.ucs_count;
+			/* Special case: if the set contains only unicode chars, and
+			 *               no  char-sets, and is  short enough to fit,
+			 *               then encode as `REOP_[N]CONTAINS_UTF8' */
+			if ((self->rec_cpos == self->rec_cbase + start_offset + 1)) {
+				unsigned int nbytes = bit_popcount(bytes, 256);
+				if ((nbytes <= REOP_CONTAINS_UTF8_MAX_ASCII_COUNT) &&
+				    ((count + nbytes) <= 0xff) &&
+				    !bit_nanyset(bytes, 0x80, 0xff)) {
+					/* Yes: we can use `REOP_[N]CONTAINS_UTF8'! */
+					self->rec_cpos[-1] = negate ? REOP_NCONTAINS_UTF8
+					                            : REOP_CONTAINS_UTF8;
+					if (!re_compiler_putc(self, (byte_t)count + nbytes))
+						goto err_nomem;
+					if (nbytes != 0) {
+						/* Include ASCII characters in the CONTAINS-match. */
+						byte_t b;
+						for (b = 0; b < 0x80; ++b) {
+							if (bit_test(bytes, b)) {
+								if (!re_compiler_putc(self, b))
+									goto err_nomem;
+							}
+						}
+					}
+					if (!re_compiler_putn(self, basep, (size_t)(uchars.ucs_endp - basep)))
+						goto err_nomem;
+					goto done;
+				}
+			}
+
+			while (count > 0xff) {
+				/* Must encode in multiple sets. */
+				char *new_basep;
+				new_basep = utf8_skipn(basep, 255);
+				if (!re_compiler_putc(self, RECS_CONTAINS))
+					goto err_nomem;
+				if (!re_compiler_putc(self, 255))
+					goto err_nomem;
+				if (!re_compiler_putn(self, basep, (size_t)(new_basep - basep)))
+					goto err_nomem;
+				basep = new_basep;
+				count -= 0xff;
+			}
+			if (count == 2) {
+				if (!re_compiler_putc(self, RECS_CHAR2))
+					goto err_nomem;
+			} else if (count == 1) {
+				if (!re_compiler_putc(self, RECS_CHAR))
+					goto err_nomem;
+			} else {
+				if (!re_compiler_putc(self, RECS_CONTAINS))
+					goto err_nomem;
+				if (!re_compiler_putc(self, (byte_t)count))
+					goto err_nomem;
+			}
+			if (!re_compiler_putn(self, basep, (size_t)(uchars.ucs_endp - basep)))
+				goto err_nomem;
+		}
+	}
+
+	/* Encode `bytes' (with optimizations in  case no other prefixes were  written
+	 * yet, iow: when `self->rec_cpos == self->rec_cbase + start_offset', in which
+	 * case try to encode as `REOP_[N]BYTE', `REOP_[N]BYTE2' or `REOP_[N]RANGE') */
+	if (self->rec_cpos == self->rec_cbase + start_offset) {
+		/* Nothing out of the ordinary happened, yet.
+		 * -> Check if we can encode `bytes' as one of:
+		 *    - REOP_[N]BYTE
+		 *    - REOP_[N]BYTE2
+		 *    - REOP_[N]RANGE
+		 */
+		unsigned int b;
+		unsigned int popcount;
+		byte_t range_lo, range_hi;
+		for (b = 0;; ++b) {
+			if (b >= 256)
+				goto put_terminator; /* Empty bytes? -- ok... (but this won't ever match anything) */
+			if (bit_test(bytes, b))
+				break;
+		}
+		/* Found the first matching character.
+		 * -> check if we can encode this via `REOP_[N]RANGE'. */
+		popcount = 1;
+		range_lo = (byte_t)b;
+		range_hi = (byte_t)b;
+		while (range_hi < (256 - 1) && bit_test(bytes, range_hi + 1)) {
+			++range_hi;
+			++popcount;
+		}
+		if (range_hi >= 0xff || !bit_nanyset(bytes, range_hi + 1, 0xff)) {
+			/* We're dealing with a singular, continuous range [range_lo,range_hi] */
+			unsigned int rangelen = (range_hi - range_lo) + 1;
+			assert(rangelen >= 1);
+			if (rangelen == 1) {
+				/* The entire set matches only a single byte, specific. */
+				assert(range_lo == range_hi);
+				self->rec_cpos[-1] = negate ? REOP_NBYTE : REOP_BYTE;
+				if (!re_compiler_putc(self, range_lo))
+					goto err_nomem;
+				goto done;
+			} else if (rangelen == 2) {
+				/* The entire set matches only 2 different bytes. */
+				assert(range_lo + 1 == range_hi);
+				self->rec_cpos[-1] = negate ? REOP_NBYTE2 : REOP_BYTE2;
+				if (!re_compiler_putc(self, range_lo))
+					goto err_nomem;
+				if (!re_compiler_putc(self, range_hi))
+					goto err_nomem;
+				goto done;
+			} else {
+				/* The entire set matches only a specific range of bytes */
+				assert(range_lo + 1 == range_hi);
+				self->rec_cpos[-1] = negate ? REOP_NRANGE : REOP_RANGE;
+				if (!re_compiler_putc(self, range_lo))
+					goto err_nomem;
+				if (!re_compiler_putc(self, range_hi))
+					goto err_nomem;
+				goto done;
+			}
+			goto done;
+		}
+		if (popcount == 1) {
+			/* Check if we can find another matching byte somewhere `> b' */
+			b += 2;                     /* b+1 was already checked, so start at b += 2 */
+			while (!bit_test(bytes, b)) /* We know that there must be more set bits, because `!bit_nanyset' */
+				++b;
+			/* At this point, we know that `range_lo' and `b' are part of the set.
+			 * -> If these are the only 2, then we can generate `REOP_[N]BYTE2'. */
+			if (b >= 0xff || !bit_nanyset(bytes, b + 1, 0xff)) {
+				self->rec_cpos[-1] = negate ? REOP_NBYTE2 : REOP_BYTE2;
+				if (!re_compiler_putc(self, range_lo))
+					goto err_nomem;
+				if (!re_compiler_putc(self, b))
+					goto err_nomem;
+				goto done;
+			}
+		}
+	}
+
+	/* Check if there are even any bytes _to_ encode. */
+	if unlikely(!bit_anyset(bytes, 256)) {
+		/* No byte-matches specified -> don't encode a bitset.
+		 * - This can easily happen for (e.g.) "[[:alpha:]]" in utf-8 mode,
+		 *   where it  encodes  to  `REOP_CS_UTF8, RECS_ISALPHA, RECS_DONE'
+		 */
+		goto put_terminator;
+	}
+
+	/* No special encoding is possible -> must instead use `RECS_BITSET_MIN'! */
+	{
+		byte_t cs_opcode;
+		byte_t minset, maxset, base, num_bits, num_bytes;
+		minset    = 0x00 + bit_clz(bytes);
+		maxset    = 0xff - bit_ctz(bytes, 256);
+		base      = RECS_BITSET_BASEFOR(minset);
+		num_bits  = (maxset + 1) - base;
+		num_bytes = CEILDIV(num_bits, 8);
+		assertf(num_bytes <= 0x20, "%" PRIuSIZ, num_bytes);
+		cs_opcode = RECS_BITSET_BUILD(base, num_bytes);
+		if (!re_compiler_putc(self, cs_opcode))
+			goto err_nomem;
+		static_assert(sizeof(*bytes) == sizeof(byte_t));
+		if (!re_compiler_putn(self, bytes + (base / 8), num_bytes))
+			goto err_nomem;
+	} /* scope... */
+
+	/* Terminate the generated character-set */
+put_terminator:
+	if (!re_compiler_putc(self, RECS_DONE))
+		goto err_nomem;
+done:
+	unicode_charset_fini(&uchars);
+	return RE_NOERROR;
+	{
+		re_errno_t error;
+err_nomem:
+		error = RE_ESPACE;
+		goto _err_common;
+err_BADPAT:
+		error = RE_BADPAT;
+		goto _err_common;
+err_ERANGE:
+		error = RE_ERANGE;
+		goto _err_common;
+err_ECTYPE:
+		error = RE_ECTYPE;
+		goto _err_common;
+err_EEND:
+		error = RE_EEND;
+_err_common:
+		unicode_charset_fini(&uchars);
+		return error;
+	}
 }
 
 /* Special return value for `re_compiler_compile_prefix':
@@ -1302,8 +1990,163 @@ do_group_start_without_alternation:
 	case RE_TOKEN_BK_w:
 	case RE_TOKEN_BK_W: {
 		if (self->rec_parser.rep_syntax & RE_SYNTAX_NO_UTF8) {
-			/* TODO */
-			return RE_BADPAT;
+			static byte_t const issymcont_y_code[] = {
+				REOP_CS_BYTE,
+				RECS_BITSET_BUILD(0x20, 12),
+				/* 20-27 */ 0x00 | (1 << (0x24 % 8)), /* $ */
+				/* 28-2F */ 0x00,
+				/* 30-37 */ 0x00 | (1 << (0x30 % 8))  /* 0 */
+				/*            */ | (1 << (0x31 % 8))  /* 1 */
+				/*            */ | (1 << (0x32 % 8))  /* 2 */
+				/*            */ | (1 << (0x33 % 8))  /* 3 */
+				/*            */ | (1 << (0x34 % 8))  /* 4 */
+				/*            */ | (1 << (0x35 % 8))  /* 5 */
+				/*            */ | (1 << (0x36 % 8))  /* 6 */
+				/*            */ | (1 << (0x37 % 8)), /* 7 */
+				/* 38-3F */ 0x00 | (1 << (0x38 % 8))  /* 8 */
+				/*            */ | (1 << (0x39 % 8)), /* 9 */
+				/* 40-47 */ 0x00 | (1 << (0x41 % 8))  /* A */
+				/*            */ | (1 << (0x42 % 8))  /* B */
+				/*            */ | (1 << (0x43 % 8))  /* C */
+				/*            */ | (1 << (0x44 % 8))  /* D */
+				/*            */ | (1 << (0x45 % 8))  /* E */
+				/*            */ | (1 << (0x46 % 8))  /* F */
+				/*            */ | (1 << (0x47 % 8)), /* G */
+				/* 48-4F */ 0x00 | (1 << (0x48 % 8))  /* H */
+				/*            */ | (1 << (0x49 % 8))  /* I */
+				/*            */ | (1 << (0x4a % 8))  /* J */
+				/*            */ | (1 << (0x4b % 8))  /* K */
+				/*            */ | (1 << (0x4c % 8))  /* L */
+				/*            */ | (1 << (0x4d % 8))  /* M */
+				/*            */ | (1 << (0x4e % 8))  /* N */
+				/*            */ | (1 << (0x4f % 8)), /* O */
+				/* 50-57 */ 0x00 | (1 << (0x50 % 8))  /* P */
+				/*            */ | (1 << (0x51 % 8))  /* Q */
+				/*            */ | (1 << (0x52 % 8))  /* R */
+				/*            */ | (1 << (0x53 % 8))  /* S */
+				/*            */ | (1 << (0x54 % 8))  /* T */
+				/*            */ | (1 << (0x55 % 8))  /* U */
+				/*            */ | (1 << (0x56 % 8))  /* V */
+				/*            */ | (1 << (0x57 % 8)), /* W */
+				/* 58-5F */ 0x00 | (1 << (0x58 % 8))  /* X */
+				/*            */ | (1 << (0x59 % 8))  /* Y */
+				/*            */ | (1 << (0x5a % 8))  /* Z */
+				/*            */ | (1 << (0x5f % 8)), /* _ */
+				/* 60-67 */ 0x00 | (1 << (0x61 % 8))  /* a */
+				/*            */ | (1 << (0x62 % 8))  /* b */
+				/*            */ | (1 << (0x63 % 8))  /* c */
+				/*            */ | (1 << (0x64 % 8))  /* d */
+				/*            */ | (1 << (0x65 % 8))  /* e */
+				/*            */ | (1 << (0x66 % 8))  /* f */
+				/*            */ | (1 << (0x67 % 8)), /* g */
+				/* 68-6F */ 0x00 | (1 << (0x68 % 8))  /* h */
+				/*            */ | (1 << (0x69 % 8))  /* i */
+				/*            */ | (1 << (0x6a % 8))  /* j */
+				/*            */ | (1 << (0x6b % 8))  /* k */
+				/*            */ | (1 << (0x6c % 8))  /* l */
+				/*            */ | (1 << (0x6d % 8))  /* m */
+				/*            */ | (1 << (0x6e % 8))  /* n */
+				/*            */ | (1 << (0x6f % 8)), /* o */
+				/* 70-77 */ 0x00 | (1 << (0x70 % 8))  /* p */
+				/*            */ | (1 << (0x71 % 8))  /* q */
+				/*            */ | (1 << (0x72 % 8))  /* r */
+				/*            */ | (1 << (0x73 % 8))  /* s */
+				/*            */ | (1 << (0x74 % 8))  /* t */
+				/*            */ | (1 << (0x75 % 8))  /* u */
+				/*            */ | (1 << (0x76 % 8))  /* v */
+				/*            */ | (1 << (0x77 % 8)), /* w */
+				/* 78-7F */ 0x00 | (1 << (0x78 % 8))  /* x */
+				/*            */ | (1 << (0x79 % 8))  /* y */
+				/*            */ | (1 << (0x7a % 8)), /* z */
+				RECS_DONE
+			};
+			static byte_t const issymcont_n_code[] = {
+				REOP_CS_BYTE,
+				RECS_BITSET_BUILD(0x00, 32),
+				/* 00-0F */ 0xff, 0xff,
+				/* 10-1F */ 0xff, 0xff,
+				/* 20-27 */ 0xff & ~(1 << (0x24 % 8)), /* $ */
+				/* 28-2F */ 0xff,
+				/* 30-37 */ 0xff & ~(1 << (0x30 % 8))  /* 0 */
+				/*            */ & ~(1 << (0x31 % 8))  /* 1 */
+				/*            */ & ~(1 << (0x32 % 8))  /* 2 */
+				/*            */ & ~(1 << (0x33 % 8))  /* 3 */
+				/*            */ & ~(1 << (0x34 % 8))  /* 4 */
+				/*            */ & ~(1 << (0x35 % 8))  /* 5 */
+				/*            */ & ~(1 << (0x36 % 8))  /* 6 */
+				/*            */ & ~(1 << (0x37 % 8)), /* 7 */
+				/* 38-3F */ 0xff & ~(1 << (0x38 % 8))  /* 8 */
+				/*            */ & ~(1 << (0x39 % 8)), /* 9 */
+				/* 40-47 */ 0xff & ~(1 << (0x41 % 8))  /* A */
+				/*            */ & ~(1 << (0x42 % 8))  /* B */
+				/*            */ & ~(1 << (0x43 % 8))  /* C */
+				/*            */ & ~(1 << (0x44 % 8))  /* D */
+				/*            */ & ~(1 << (0x45 % 8))  /* E */
+				/*            */ & ~(1 << (0x46 % 8))  /* F */
+				/*            */ & ~(1 << (0x47 % 8)), /* G */
+				/* 48-4F */ 0xff & ~(1 << (0x48 % 8))  /* H */
+				/*            */ & ~(1 << (0x49 % 8))  /* I */
+				/*            */ & ~(1 << (0x4a % 8))  /* J */
+				/*            */ & ~(1 << (0x4b % 8))  /* K */
+				/*            */ & ~(1 << (0x4c % 8))  /* L */
+				/*            */ & ~(1 << (0x4d % 8))  /* M */
+				/*            */ & ~(1 << (0x4e % 8))  /* N */
+				/*            */ & ~(1 << (0x4f % 8)), /* O */
+				/* 50-57 */ 0xff & ~(1 << (0x50 % 8))  /* P */
+				/*            */ & ~(1 << (0x51 % 8))  /* Q */
+				/*            */ & ~(1 << (0x52 % 8))  /* R */
+				/*            */ & ~(1 << (0x53 % 8))  /* S */
+				/*            */ & ~(1 << (0x54 % 8))  /* T */
+				/*            */ & ~(1 << (0x55 % 8))  /* U */
+				/*            */ & ~(1 << (0x56 % 8))  /* V */
+				/*            */ & ~(1 << (0x57 % 8)), /* W */
+				/* 58-5F */ 0xff & ~(1 << (0x58 % 8))  /* X */
+				/*            */ & ~(1 << (0x59 % 8))  /* Y */
+				/*            */ & ~(1 << (0x5a % 8))  /* Z */
+				/*            */ & ~(1 << (0x5f % 8)), /* _ */
+				/* 60-67 */ 0xff & ~(1 << (0x61 % 8))  /* a */
+				/*            */ & ~(1 << (0x62 % 8))  /* b */
+				/*            */ & ~(1 << (0x63 % 8))  /* c */
+				/*            */ & ~(1 << (0x64 % 8))  /* d */
+				/*            */ & ~(1 << (0x65 % 8))  /* e */
+				/*            */ & ~(1 << (0x66 % 8))  /* f */
+				/*            */ & ~(1 << (0x67 % 8)), /* g */
+				/* 68-6F */ 0xff & ~(1 << (0x68 % 8))  /* h */
+				/*            */ & ~(1 << (0x69 % 8))  /* i */
+				/*            */ & ~(1 << (0x6a % 8))  /* j */
+				/*            */ & ~(1 << (0x6b % 8))  /* k */
+				/*            */ & ~(1 << (0x6c % 8))  /* l */
+				/*            */ & ~(1 << (0x6d % 8))  /* m */
+				/*            */ & ~(1 << (0x6e % 8))  /* n */
+				/*            */ & ~(1 << (0x6f % 8)), /* o */
+				/* 70-77 */ 0xff & ~(1 << (0x70 % 8))  /* p */
+				/*            */ & ~(1 << (0x71 % 8))  /* q */
+				/*            */ & ~(1 << (0x72 % 8))  /* r */
+				/*            */ & ~(1 << (0x73 % 8))  /* s */
+				/*            */ & ~(1 << (0x74 % 8))  /* t */
+				/*            */ & ~(1 << (0x75 % 8))  /* u */
+				/*            */ & ~(1 << (0x76 % 8))  /* v */
+				/*            */ & ~(1 << (0x77 % 8)), /* w */
+				/* 78-7F */ 0xff & ~(1 << (0x78 % 8))  /* x */
+				/*            */ & ~(1 << (0x79 % 8))  /* y */
+				/*            */ & ~(1 << (0x7a % 8)), /* z */
+				/* 80-8F */ 0xff, 0xff,
+				/* 90-9F */ 0xff, 0xff,
+				/* A0-AF */ 0xff, 0xff,
+				/* B0-BF */ 0xff, 0xff,
+				/* C0-CF */ 0xff, 0xff,
+				/* D0-DF */ 0xff, 0xff,
+				/* E0-EF */ 0xff, 0xff,
+				/* F0-FF */ 0xff, 0xff,
+				RECS_DONE
+			};
+			if (tok == RE_TOKEN_BK_W) {
+				if unlikely(!re_compiler_putn(self, issymcont_n_code, sizeof(issymcont_n_code)))
+					goto err_nomem;
+			} else {
+				if unlikely(!re_compiler_putn(self, issymcont_y_code, sizeof(issymcont_y_code)))
+					goto err_nomem;
+			}
 		} else {
 			if (!re_compiler_putc(self, tok == RE_TOKEN_BK_W ? REOP_NCS_UTF8
 			                                                 : REOP_CS_UTF8))
@@ -1319,8 +2162,52 @@ do_group_start_without_alternation:
 	case RE_TOKEN_BK_s:
 	case RE_TOKEN_BK_S: {
 		if (self->rec_parser.rep_syntax & RE_SYNTAX_NO_UTF8) {
-			/* TODO */
-			return RE_BADPAT;
+			static byte_t const isspace_y_code[] = {
+				REOP_CS_BYTE,
+				RECS_BITSET_BUILD(0x00, 5),
+				/* 00-07 */ 0x00,
+				/* 08-0F */ 0x00 | (1 << (0x09 % 8))
+				/*            */ | (1 << (0x0A % 8))
+				/*            */ | (1 << (0x0B % 8))
+				/*            */ | (1 << (0x0C % 8))
+				/*            */ | (1 << (0x0D % 8)),
+				/* 10-17 */ 0x00,
+				/* 18-1F */ 0x00,
+				/* 20-27 */ 0x00 | (1 << (0x20 % 8)),
+				RECS_DONE
+			};
+			static byte_t const isspace_n_code[] = {
+				REOP_CS_BYTE,
+				RECS_BITSET_BUILD(0x00, 32),
+				/* 00-0F */ 0xff, 0xff & ~(1 << (0x09 % 8))
+				/*                  */ & ~(1 << (0x0A % 8))
+				/*                  */ & ~(1 << (0x0B % 8))
+				/*                  */ & ~(1 << (0x0C % 8))
+				/*                  */ & ~(1 << (0x0D % 8)),
+				/* 10-1F */ 0xff, 0xff,
+				/* 20-2F */ 0xff & ~(1 << (0x20 % 8)), 0xff,
+				/* 30-3F */ 0xff, 0xff,
+				/* 40-4F */ 0xff, 0xff,
+				/* 50-5F */ 0xff, 0xff,
+				/* 60-6F */ 0xff, 0xff,
+				/* 70-7F */ 0xff, 0xff,
+				/* 80-8F */ 0xff, 0xff,
+				/* 90-9F */ 0xff, 0xff,
+				/* A0-AF */ 0xff, 0xff,
+				/* B0-BF */ 0xff, 0xff,
+				/* C0-CF */ 0xff, 0xff,
+				/* D0-DF */ 0xff, 0xff,
+				/* E0-EF */ 0xff, 0xff,
+				/* F0-FF */ 0xff, 0xff,
+				RECS_DONE
+			};
+			if (tok == RE_TOKEN_BK_W) {
+				if unlikely(!re_compiler_putn(self, isspace_n_code, sizeof(isspace_n_code)))
+					goto err_nomem;
+			} else {
+				if unlikely(!re_compiler_putn(self, isspace_y_code, sizeof(isspace_y_code)))
+					goto err_nomem;
+			}
 		} else {
 			if (!re_compiler_putc(self, (tok == RE_TOKEN_BK_W) ? REOP_NCS_UTF8 : REOP_CS_UTF8))
 				goto err_nomem;
@@ -2369,6 +3256,7 @@ NOTHROW_NCX(CC libre_code_disasm)(struct re_code const *__restrict self,
 		case REOP_CS_UTF8:
 		case REOP_NCS_UTF8: {
 			uint8_t cs_opcode;
+			bool isfirst;
 			switch (opcode) {
 			case REOP_CS_BYTE:
 				opcode_repr = "cs_byte";
@@ -2382,14 +3270,18 @@ NOTHROW_NCX(CC libre_code_disasm)(struct re_code const *__restrict self,
 			default: __builtin_unreachable();
 			}
 			printf("%s [", opcode_repr);
+			isfirst = true;
 			while ((cs_opcode = *pc++) != RECS_DONE) {
+				if (!isfirst)
+					PRINT(", ");
+				isfirst = false;
 				switch (cs_opcode) {
 
 				case RECS_BITSET_MIN ... RECS_BITSET_MAX: {
-					uint8_t layout      = *pc++; // Layout is the RECS_BITSET_* opcode
-					uint8_t minch       = RECS_BITSET_GETBASE(layout);
-					uint8_t bitset_size = RECS_BITSET_GETBYTES(layout);
+					uint8_t minch       = RECS_BITSET_GETBASE(cs_opcode);
+					uint8_t bitset_size = RECS_BITSET_GETBYTES(cs_opcode);
 					unsigned int bitset_bits = bitset_size * 8;
+					PRINT("bitset [");
 					for (i = 0; i < bitset_bits;) {
 						char repr[3];
 						unsigned int endi, rangec;
@@ -2415,36 +3307,56 @@ NOTHROW_NCX(CC libre_code_disasm)(struct re_code const *__restrict self,
 						i = endi;
 					}
 					pc += bitset_size;
+					PRINT("]");
 				}	break;
 
 				case RECS_CHAR:
-					printf("%#$q", (size_t)1, pc);
-					pc += 1;
-					break;
-
-				case RECS_CHAR2:
-					printf("%#$q", (size_t)2, pc);
-					pc += 2;
-					break;
+				case RECS_CHAR2: {
+					byte_t const *endpc = pc;
+					printf("char%s ", cs_opcode == RECS_CHAR2 ? "2" : "");
+					if (opcode == REOP_CS_BYTE) {
+						endpc += 1;
+						if (cs_opcode == RECS_CHAR2)
+							endpc += 1;
+					} else {
+						endpc += unicode_utf8seqlen[*endpc];
+						if (cs_opcode == RECS_CHAR2)
+							endpc += unicode_utf8seqlen[*endpc];
+					}
+					printf("%$q", (size_t)(endpc - pc), pc);
+					pc = endpc;
+				}	break;
 
 				case RECS_RANGE:
-					printf("%#$q-%#$q", (size_t)1, pc[0], (size_t)1, pc[1]);
-					pc += 2;
+				case RECS_RANGE_ICASE:
+					printf("range%s ", cs_opcode == RECS_RANGE_ICASE ? "_icase" : "");
+					if (opcode == REOP_CS_BYTE) {
+						printf("'%#$q-%#$q'", (size_t)1, &pc[0], (size_t)1, &pc[1]);
+						pc += 2;
+					} else {
+						byte_t const *char2;
+						byte_t const *endp;
+						char2 = pc + unicode_utf8seqlen[*pc];
+						endp  = char2 + unicode_utf8seqlen[*char2];
+						printf("'%#$q-%#$q'", (size_t)(char2 - pc), pc, (size_t)(endp - char2), char2);
+						pc = endp;
+					}
 					break;
 
 				case RECS_CONTAINS: {
 					uint8_t count = *pc++;
 					byte_t const *cs_opcode_end;
 					assert(count >= 1);
+					PRINT("contains ");
 					if (opcode == REOP_CS_BYTE) {
 						cs_opcode_end = pc + count;
 					} else {
 						cs_opcode_end = pc;
 						do {
-							unicode_readutf8((char const **)&cs_opcode_end);
+							cs_opcode_end += unicode_utf8seqlen[*cs_opcode_end];
 						} while (--count);
 					}
-					printf("%#$q", (size_t)(cs_opcode_end - pc), pc);
+					printf("%$q", (size_t)(cs_opcode_end - pc), pc);
 					pc = cs_opcode_end;
 				}	break;
 
@@ -2516,7 +3428,7 @@ NOTHROW_NCX(CC libre_code_disasm)(struct re_code const *__restrict self,
 						break;
 					default: __builtin_unreachable();
 					}
-					printf("[:%s:]", cs_name);
+					printf("is%s", cs_name);
 				}	break;
 
 				default:

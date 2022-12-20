@@ -69,20 +69,20 @@ typedef int re_errno_t;
  *     >> "[a-z]"                REOP_BITSET "[a-z]"      (NOTE: multi-byte utf-8 characters are encoded using `REOP_CONTAINS_UTF8')
  *     >> "[^a-z]"               REOP_BITSET_NOT "[a-z]"  (NOTE: multi-byte utf-8 characters are encoded using `REOP_NCONTAINS_UTF8')
  *     >> "\<1-9>"               REOP_GROUP_MATCH <1-9>   // Replaced by `REOP_GROUP_MATCH_Jn' if followed by a repeat-suffix
- *     >> "\w"                   <[[:symcont:]]>          (HINT: Also allowed in []-sets)
- *     >> "\W"                   <[^[:symcont:]]>         (HINT: Also allowed in []-sets)
- *     >> "\n"                   <[[:lf:]]>               (HINT: Also allowed in []-sets)     [kos-extension]
- *     >> "\N"                   <[^[:lf:]]>              (HINT: Also allowed in []-sets)     [kos-extension]
- *     >> "[[:<foo>:]]"          REOP_UTF8_IS<foo>                                            [some classes are kos extensions]
- *     >> "[^[:<foo>:]]"         REOP_UTF8_IS<foo>_NOT                                        [kos-extension]
- *     >> "\s"                   <[[:space:]]>            (HINT: Also allowed in []-sets)
- *     >> "\S"                   <[^[:space:]]>           (HINT: Also allowed in []-sets)
- *     >> "\d"                   <[[:digit:]]>            (HINT: Also allowed in []-sets)     [python-extension]
- *     >> "\D"                   <[^[:digit:]]>           (HINT: Also allowed in []-sets)     [python-extension]
- *     >> "\0123"                REOP_BYTE '\0123'        (octal-byte)                        [kos-extension]
- *     >> "\xAB"                 REOP_BYTE '\xAB'         (hex-byte)                          [kos-extension]
- *     >> "\uABCD"               REOP_EXACT "\uABCD"      (utf-8 encoded)                     [kos-extension]
- *     >> "\UABCDABCD"           REOP_EXACT "\UABCDABCD"  (utf-8 encoded)                     [kos-extension]
+ *     >> "\w"                   <[[:symcont:]]>          (HINT: Also allowed in []-sets when RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS)
+ *     >> "\W"                   <[^[:symcont:]]>         (HINT: Also allowed in []-sets when RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS)
+ *     >> "\n"                   <[[:lf:]]>               (HINT: Also allowed in []-sets when RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS)     [kos-extension]
+ *     >> "\N"                   <[^[:lf:]]>              (HINT: Also allowed in []-sets when RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS)     [kos-extension]
+ *     >> "[[:<foo>:]]"          REOP_UTF8_IS<foo>                                                                                     [some classes are kos extensions]
+ *     >> "[^[:<foo>:]]"         REOP_UTF8_IS<foo>_NOT                                                                                 [kos-extension]
+ *     >> "\s"                   <[[:space:]]>            (HINT: Also allowed in []-sets when RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS)
+ *     >> "\S"                   <[^[:space:]]>           (HINT: Also allowed in []-sets when RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS)
+ *     >> "\d"                   <[[:digit:]]>            (HINT: Also allowed in []-sets when RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS)     [python-extension]
+ *     >> "\D"                   <[^[:digit:]]>           (HINT: Also allowed in []-sets when RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS)     [python-extension]
+ *     >> "\0123"                REOP_BYTE '\0123'        (octal-byte)                                                                 [kos-extension]
+ *     >> "\xAB"                 REOP_BYTE '\xAB'         (hex-byte)                                                                   [kos-extension]
+ *     >> "\uABCD"               REOP_EXACT "\uABCD"      (utf-8 encoded)                                                              [kos-extension]
+ *     >> "\UABCDABCD"           REOP_EXACT "\UABCDABCD"  (utf-8 encoded)                                                              [kos-extension]
  *
  * [1]: <OP> is one of "=" (or "=="), "!=", "<", "<=", ">", ">="
  *
@@ -264,13 +264,16 @@ enum {
 #define RECS_BITSET_GETBYTES(cs_opcode)    (((cs_opcode)&0x1f) + 1)
 #define RECS_BITSET_GETBASE(cs_opcode)     ((cs_opcode)&0xe0)
 #define RECS_BITSET_BUILD(base, num_bytes) ((base) | ((num_bytes)-1))
+#define RECS_BITSET_BASEFOR(minbyte)       ((minbyte)&0xe0)
 	RECS_DONE,              /* End of charset sequence */
-	RECS_CHAR,              /* [+1] Followed by 1 byte (or latin-1 character) that is apart of the bitset */
-	RECS_CHAR2,             /* [+2] Followed by 2 bytes (or latin-1 characters) that are apart of the bitset */
-	RECS_RANGE,             /* [+2] Followed by 2 bytes (or latin-1 characters) that form a `[lo,hi]' inclusive range of bytes apart of the bitset */
+	RECS_CHAR,              /* [+1] Followed by 1 byte (or utf8-character) that is apart of the bitset */
+	RECS_CHAR2,             /* [+2] Followed by 2 bytes (or utf8-characters) that are apart of the bitset */
+	RECS_RANGE,             /* [+2] Followed by 2 bytes (or utf8-characters) that form a `[lo,hi]' inclusive range of bytes apart of the bitset */
+	RECS_RANGE_ICASE,       /* [+2] Followed by 2 utf8-characters that form a `[lo,hi]' inclusive range of bytes apart of the bitset
+	                         *      the 2 utf8-characters must both be lower-case (ONLY VALID IN UTF-8 MODE) */
 	RECS_CONTAINS,          /* [+1+n] Followed by a COUNT-byte, followed  by a `COUNT'-character long byte/utf-8  string
 	                         * Whether or not COUNT ares bytes/utf-8 depends on the `REOP_CS_*' starting opcode. Matches
-	                         * a character contained in said string. NOTE: COUNT must be >= 1 */
+	                         * a character contained in said string. NOTE: COUNT must be >= 3 */
 
 #define RECS_ISX_MIN RECS_ISCNTRL
 	RECS_ISCNTRL,           /* [+0] consume trait `unicode_iscntrl(ch)'   (ONLY VALID IN UTF-8 MODE) */
@@ -323,13 +326,20 @@ enum {
 #define REOP_ANY_MAX REOP_ANY_NOTNUL_NOTLF_UTF8
 	REOP_BYTE,                 /* [+1] Followed by 1 byte that must be matched exactly */
 	REOP_NBYTE,                /* [+1] Followed by 1 byte that must not be matched exactly */
-	REOP_BYTE2,                /* [+2] Followed by 2 bytes, one of which must be matched exactly (for "[ab]" or "a" -> "[aA]" in ICASE-mode) */
-	REOP_NBYTE2,               /* [+2] Followed by 2 bytes, neither of which may be matched */
+	REOP_BYTE2,                /* [+2] Followed by 2 bytes, one of which must be matched exactly (for "[ab]" or "a" -> "[aA]" in ICASE-mode) (the 2 bytes must be sorted ascendingly) */
+	REOP_NBYTE2,               /* [+2] Followed by 2 bytes, neither of which may be matched (the 2 bytes must be sorted ascendingly) */
 	REOP_RANGE,                /* [+2] Followed by 2 bytes, with input having to match `ch >= pc[0] && ch <= pc[1]' */
 	REOP_NRANGE,               /* [+2] Followed by 2 bytes, with input having to match `ch < pc[0] || ch > pc[1]' */
-	REOP_CONTAINS_UTF8,        /* [+1+n] Followed by a COUNT-byte, followed by a `COUNT'-character long utf-8 string (matches utf-8 character contained in said string).
+	/* TODO: Re-design `REOP_CONTAINS_UTF8' / `REOP_NCONTAINS_UTF8'  to allow for binary  search!
+	 *       For this, instead of encoding a COUNT-byte, we need to encode the actual # of bytes,
+	 *       with the assumption that the # of bytes ends at the perfect end of a utf-8 char. */
+	REOP_CONTAINS_UTF8,        /* [+1+n] Followed by a COUNT-byte, followed by a `COUNT'-character long utf-8 string
+	                            * - Matches utf-8 character contained in said string
+	                            * - The utf-8 character in the follow-up string must be sorted ascendingly by their ordinal values
 	                            * NOTE: COUNT must be >= 2 */
-	REOP_NCONTAINS_UTF8,       /* [+1+n] Followed by a COUNT-byte, followed by a `COUNT'-character long utf-8 string (matches utf-8 character not contained in said string).
+	REOP_NCONTAINS_UTF8,       /* [+1+n] Followed by a COUNT-byte, followed by a `COUNT'-character long utf-8 string
+	                            * - Matches utf-8 character NOT contained in said string
+	                            * - The utf-8 character in the follow-up string must be sorted ascendingly by their ordinal values
 	                            * NOTE: COUNT must be >= 1 */
 	REOP_CS_UTF8,              /* [+*] Followed by a `RECS_*' sequence which the next utf-8 character must match */
 	REOP_CS_BYTE,              /* [+*] Followed by a `RECS_*' sequence which the next byte must match */
@@ -413,7 +423,7 @@ enum {
 /* Regex syntax flags */
 #define RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS 0x00000001 /* '\' can be used to escape characters in sets: '[a\[\]\-]' */
 #define RE_SYNTAX_BK_PLUS_QM                0x00000002 /* If clear: '+' and '?' are operators and '\+' and '\?' are literals; if set: the opposite is the case. */
-#define RE_SYNTAX_CHAR_CLASSES              0x00000004 /* Support for char-classes (e.g. `[:alpha:]') */
+#define RE_SYNTAX_CHAR_CLASSES              0x00000004 /* Support for char-classes (e.g. `[[:alpha:]]') */
 #define RE_SYNTAX_CONTEXT_INDEP_ANCHORS     0x00000008 /* '^' and '$' are always anchors (as opposed to only at the start/end or after/before a '(' and ')') */
 #define RE_SYNTAX_CONTEXT_INDEP_OPS         0x00000010 /* Ignored... */
 #define RE_SYNTAX_CONTEXT_INVALID_OPS       0x00000020 /* '*', '+', '{' and '?' appearing at the start or after '(' or '|' results in `RE_BADRPT'; If not set, they are treated as literals. */
@@ -433,7 +443,7 @@ enum {
 #define RE_SYNTAX_NO_GNU_OPS                0x00080000 /* If set, disable support for '\<', '\>', '\b', '\B', '\w', '\W', '\s', '\S', '\`' and "\'" */
 #define RE_SYNTAX_DEBUG                     0x00100000 /* Ignored... */
 #define RE_SYNTAX_INVALID_INTERVAL_ORD      0x00200000 /* Invalid intervals like "a{b" are treated as literals (i.e. like "a\{b") */
-#define RE_SYNTAX_ICASE                     0x00400000 /* Casing is ignored by literal-matches, and '[:lower:]', '[:upper:]', '[:title:]' are aliases for '[:alpha:]' */
+#define RE_SYNTAX_ICASE                     0x00400000 /* Casing is ignored by literal-matches, and '[[:lower:]]', '[[:upper:]]', '[[:title:]]' are aliases for '[[:alpha:]]' */
 #define RE_SYNTAX_CARET_ANCHORS_HERE        0x00800000 /* Alias for `RE_SYNTAX_CONTEXT_INDEP_ANCHORS', but only for '^', and used internally */
 #define RE_SYNTAX_CONTEXT_INVALID_DUP       0x01000000 /* If set, '{' appearing at the start, or after '(', '|' or '}' results in `RE_BADRPT'; else, behavior is governed by `RE_SYNTAX_CONTEXT_INVALID_OPS' */
 #define RE_SYNTAX_NO_SUB                    0x02000000 /* Ignored... (used at a different point to implement `RE_NOSUB') */
@@ -477,7 +487,7 @@ typedef __uint32_t re_token_t;
 #define RE_TOKEN_BYTE80h_MAX   (RE_TOKEN_BASE + 0x7f) /* "\xff" */
 #define RE_TOKEN_XBASE         0x110080               /* First custom regex token number */
 #define RE_TOKEN_ISBYTE80h(x)  ((x) >= RE_TOKEN_BYTE80h_MIN && (x) <= RE_TOKEN_BYTE80h_MAX)
-#define RE_TOKEN_GETBYTE80h(x) ((__byte_t)((x) - RE_TOKEN_BYTE80h_MIN))
+#define RE_TOKEN_GETBYTE80h(x) ((__byte_t)(0x80 + (x) - RE_TOKEN_BYTE80h_MIN))
 #define RE_TOKEN_ISUTF8(x)     ((x) >= 0x80 && (x) < RE_TOKEN_BASE)
 #define RE_TOKEN_ISLITERAL(x)  ((x) < RE_TOKEN_XBASE)
 #define RE_TOKEN_EOF           (RE_TOKEN_XBASE + 0)  /* End-of-pattern */
