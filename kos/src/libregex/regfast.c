@@ -240,7 +240,8 @@ again:
 			return;
 		}
 
-		TARGET(REOP_AT_MIN ... REOP_AT_MAX) {
+		TARGET(REOP_AT_MIN ... REOP_AT_MAX)
+		TARGET(REOP_POP_ONFAIL) {
 			goto again;
 		}
 
@@ -670,7 +671,8 @@ again:
 			goto again;
 		}
 
-		TARGET(REOP_AT_MIN ... REOP_AT_MAX) {
+		TARGET(REOP_AT_MIN ... REOP_AT_MAX)
+		TARGET(REOP_POP_ONFAIL) {
 			/* Note how we don't adjust `enter_pc' here! */
 			goto again;
 		}

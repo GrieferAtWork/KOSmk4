@@ -397,6 +397,7 @@ enum {
 	REOP_GROUP_END_J6,          /* [+1] Same as `REOP_GROUP_END', but skip the next 6 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_END_J7,          /* [+1] Same as `REOP_GROUP_END', but skip the next 7 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_END_J8,          /* [+1] Same as `REOP_GROUP_END', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
+	REOP_POP_ONFAIL,            /* [+0] Pop the top-most element from the on-fail stack */
 	REOP_JMP_ONFAIL,            /* [+2] push onto the "on-failure stack" a 16-bit, signed, relative addr */
 	REOP_JMP,                   /* [+2] 16-bit, signed, relative jump (relative to instruction end) */
 	REOP_JMP_AND_RETURN_ONFAIL, /* [+2] push onto the "on-failure stack" the address of the next instruction before doing `REOP_JMP' */

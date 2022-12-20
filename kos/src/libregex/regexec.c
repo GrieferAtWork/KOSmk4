@@ -1711,6 +1711,12 @@ REOP_NCS_UTF8_dispatch:
 			DISPATCH();
 		}
 
+		TARGET(REOP_POP_ONFAIL) {
+			assert(self->ri_onfailc != 0);
+			--self->ri_onfailc;
+			DISPATCH();
+		}
+
 		TARGET(REOP_JMP_ONFAIL) {
 			int16_t delta = getw();
 			PUSHFAIL(pc + delta);
