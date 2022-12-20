@@ -1835,6 +1835,7 @@ onfail:
 		 *       restore the offset as it was  prior to the `REOP_GROUP_START' being  executed.
 		 *       For all other purposes (including REOP_POP_ONFAIL), these special ONFAIL items
 		 *       are simply skipped over.
+		 *       XXX: This still doesn't solve how to restore `self->ri_bmatch'
 		 */
 		DISPATCH();
 	}
