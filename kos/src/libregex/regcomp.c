@@ -53,6 +53,7 @@ options["COMPILE.language"] = "c";
 
 #include "regcomp.h"
 #include "regfast.h"
+#include "regpeep.h"
 
 #ifndef NDEBUG
 #include <format-printer.h>
@@ -1756,6 +1757,15 @@ do_copy_ctype_c_trait_mask:
 
 	/* Figure out how we want to represent everything. */
 	if (negate) {
+		if (self->rec_parser.rep_syntax & RE_SYNTAX_HAT_LISTS_NOT_NEWLINE) {
+			/* Implicitly exclude line-feeds from the charset. */
+			if (self->rec_parser.rep_syntax & RE_SYNTAX_NO_UTF8) {
+				bit_set(bytes, 0x0a); /* '\n' */
+				bit_set(bytes, 0x0d); /* '\r' */
+			} else {
+				bit_set(charsets, RECS_ISLF - RECS_ISX_MIN);
+			}
+		}
 		if (self->rec_parser.rep_syntax & RE_SYNTAX_NO_UTF8) {
 			self->rec_cbase[start_offset] = REOP_CS_BYTE;
 			bit_flipall(bytes, 256);
@@ -1768,9 +1778,9 @@ do_copy_ctype_c_trait_mask:
 		} else if ((self->rec_cpos == self->rec_cbase + start_offset + 1) &&
 		           (uchars.ucs_count == 0) &&
 		           (bit_noneset(charsets, CHARSET_COUNT))) {
-			/* Special case: even when compiling  in utf-8-mode,  we can  still
-			 *               encode bitsets as  their more efficient  byte-mode
-			 *               encoding, so-long as the pattern could never match
+			/* Special case: even  when compiling in  utf-8-mode, we can still
+			 *               encode charsets in their more efficient byte-mode
+			 *               encoding,  so-long as the pattern can never match
 			 *               a multi-byte utf-8 character! */
 			self->rec_cbase[start_offset] = REOP_CS_BYTE;
 		} else {
@@ -3286,19 +3296,10 @@ NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self) {
 	if (!re_compiler_putc(self, finish_opcode))
 		goto err_nomem;
 
-	/* XXX: On host architectures without unaligned memory access, reflow generated
-	 *      code by inserting `REOP_NOP' opcodes before instructions with unaligned
-	 *      jump offsets.
-	 *
-	 * What makes this complicated is the fact that doing so can break  jump-offsets,
-	 * meaning that such a mechanism would first have to identify all jumps, the make
-	 * relocations for each of them, then go through and insert padding NOPs,  before
-	 * finally re-applying relocations, thus fixing the jump-offsets it just broken.
-	 *
-	 * Furthermore, I'm not entirely certain if doing this would even be beneficial
-	 * to  performance, as the extra NOPs must be just as slow as the unconditional
-	 * unaligned reads currently done by `getw()' in "./regexec.c".
-	 */
+	/* Apply peephole optimizations to the code produced by `self' */
+	error = libre_code_makepeep(self);
+	if unlikely(error != RE_NOERROR)
+		goto err;
 
 	/* (try to) free unused memory from the code-buffer. */
 	if likely(self->rec_cpos < self->rec_cend) {

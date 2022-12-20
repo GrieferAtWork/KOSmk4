@@ -107,27 +107,6 @@ typedef int re_errno_t;
  *
  *     >> "X|Y"          REOP_JMP_ONFAIL  1f
  *     >>                <X>
- *     >>                // TODO: If `<X>' didn't push extra onfail items (that it didn't pop),
- *     >>                //       and <Y> can never match after <X> has matched, then we can
- *     >>                //       pop the ONFAIL item here!
- *     >>                // TODO: This should be implement via a peephole optimizer that compares
- *     >>                //       the matches of bi-branches. If no input exists that can possibly
- *     >>                //       match both branches, then the on-fail item can be popped at the
- *     >>                //       point where this becomes a guaranty in the non-failing branch.
- *     >>                //    -> Optimize "ab?c"  -> once "ab" has been matched, there's no
- *     >>                //       point in keeping the on-fail item that could match input "ac",
- *     >>                //       since we already know that it could never match
- *     >>                //    -> Optimize "a([[:alpha:]]X[bB]|[[:lower:]]Y[bB])c" Once 'X' has been
- *     >>                //       matched in the first branch, it is a guaranty that the second branch
- *     >>                //       can never be matched (until then it wasn't, since input exists that
- *     >>                //       can match both [[:alpha:]] and [[:lower:]]).
- *     >>                // TODO: If both branches always consume the same number of bytes/characters
- *     >>                //       (prior to joining back together), then the non-failing branch can pop
- *     >>                //       the on-fail item prior to re-joining.
- *     >>                //    -> Optimize "a(foo|[Ff]oo)b"  -> once "afoo" has been matched, there's no
- *     >>                //       point in keeping the on-fail item for "[Ff]oo". Even though it could
- *     >>                //       also match input "afoob", it won't be able to do so any better than
- *     >>                //       the "foo" branch.
  *     >>                REOP_JMP         2f
  *     >>                // HINT: Another `REOP_JMP_ONFAIL' to <Z> would go here if it existed
  *     >>            1:  <Y>
@@ -473,7 +452,6 @@ struct re_parser {
 	char const *rep_pos;    /* [1..1][>= rep_pat] Pointer to next pattern-character that has yet to be compiled. */
 	char const *rep_pat;    /* [1..1][const] Pointer to the start of the pattern being compiled. */
 	__uintptr_t rep_syntax; /* [const] RE syntax flags (set of `RE_SYNTAX_*') */
-	/* TODO: pre-load the currently pending token */
 };
 
 #define re_parser_init(self, pattern, syntax) \

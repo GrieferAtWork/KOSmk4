@@ -1712,7 +1712,7 @@ REOP_NCS_UTF8_dispatch:
 		}
 
 		TARGET(REOP_POP_ONFAIL) {
-			assert(self->ri_onfailc != 0);
+			assert(self->ri_onfailc > 0);
 			--self->ri_onfailc;
 			DISPATCH();
 		}
