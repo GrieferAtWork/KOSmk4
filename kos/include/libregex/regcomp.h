@@ -60,31 +60,29 @@ typedef int re_errno_t;
  * ================================================ Compilation ================================================
  *
  * Simple matches:
- *     >> "x"                   REOP_CHAR 'x'
- *     >> "abc"                 REOP_EXACT "abc"
- *     >> "."                   REOP_ANY
- *     >> "[<x>]"               REOP_CHAR 'x'            (can be used to escape other characters)
- *     >> "\\"                  REOP_CHAR '\'
- *     >> "\<x>"                REOP_CHAR 'x'            (caution: many characters here have special meaning!)
- *     >> "[a-z]"               REOP_BITSET "[a-z]"      (NOTE: multi-byte utf-8 characters are encoded using `REOP_CONTAINS_UTF8')
- *     >> "[^a-z]"              REOP_BITSET_NOT "[a-z]"  (NOTE: multi-byte utf-8 characters are encoded using `REOP_CONTAINS_UTF8_NOT')
- *     >> "\<1-9>"              REOP_GROUP_MATCH <1-9>   // Replaced by `REOP_GROUP_MATCH_Jn' if followed by a repeat-suffix
- *     >> "\w"                  <[:symcont:]>            (HINT: Also allowed in []-sets)
- *     >> "\W"                  <[^:symcont:]>           (HINT: Also allowed in []-sets)
- *     >> "\n"                  <[:lf:]>                 (HINT: Also allowed in []-sets)     [kos-extension]
- *     >> "\N"                  <[^:lf:]>                (HINT: Also allowed in []-sets)     [kos-extension]
- *     >> "[:<foo>:]"           REOP_UTF8_IS<foo>                                            [some classes are kos extensions]
- *     >> "[^:<foo>:]"          REOP_UTF8_IS<foo>_NOT                                        [kos-extension]
- *     >> "[:digit<OP><N>:]"    REOP_UTF8_ISDIGIT_<OP> <N>     [1]                           [kos-extension]
- *     >> "[:numeric<OP><N>:]"  REOP_UTF8_ISNUMERIC_<OP> <N>   [1]                           [kos-extension]
- *     >> "\s"                  <[:space:]>              (HINT: Also allowed in []-sets)
- *     >> "\S"                  <[^:space:]>             (HINT: Also allowed in []-sets)
- *     >> "\d"                  <[:digit:]>              (HINT: Also allowed in []-sets)     [python-extension]
- *     >> "\D"                  <[^:digit:]>             (HINT: Also allowed in []-sets)     [python-extension]
- *     >> "\0123"               REOP_CHAR '\0123'        (octal-byte)                        [kos-extension]
- *     >> "\xAB"                REOP_CHAR '\xAB'         (hex-byte)                          [kos-extension]
- *     >> "\uABCD"              REOP_CHAR '\uABCD'       (utf-8 encoded)                     [kos-extension]
- *     >> "\UABCDABCD"          REOP_CHAR '\UABCDABCD'   (utf-8 encoded)                     [kos-extension]
+ *     >> "x"                    REOP_BYTE 'x'
+ *     >> "abc"                  REOP_EXACT "abc"
+ *     >> "."                    REOP_ANY
+ *     >> "[<x>]"                REOP_BYTE 'x'            (can be used to escape other characters)
+ *     >> "\\"                   REOP_BYTE '\'
+ *     >> "\<x>"                 REOP_BYTE 'x'            (caution: many characters here have special meaning!)
+ *     >> "[a-z]"                REOP_BITSET "[a-z]"      (NOTE: multi-byte utf-8 characters are encoded using `REOP_CONTAINS_UTF8')
+ *     >> "[^a-z]"               REOP_BITSET_NOT "[a-z]"  (NOTE: multi-byte utf-8 characters are encoded using `REOP_NCONTAINS_UTF8')
+ *     >> "\<1-9>"               REOP_GROUP_MATCH <1-9>   // Replaced by `REOP_GROUP_MATCH_Jn' if followed by a repeat-suffix
+ *     >> "\w"                   <[[:symcont:]]>          (HINT: Also allowed in []-sets)
+ *     >> "\W"                   <[^[:symcont:]]>         (HINT: Also allowed in []-sets)
+ *     >> "\n"                   <[[:lf:]]>               (HINT: Also allowed in []-sets)     [kos-extension]
+ *     >> "\N"                   <[^[:lf:]]>              (HINT: Also allowed in []-sets)     [kos-extension]
+ *     >> "[[:<foo>:]]"          REOP_UTF8_IS<foo>                                            [some classes are kos extensions]
+ *     >> "[^[:<foo>:]]"         REOP_UTF8_IS<foo>_NOT                                        [kos-extension]
+ *     >> "\s"                   <[[:space:]]>            (HINT: Also allowed in []-sets)
+ *     >> "\S"                   <[^[:space:]]>           (HINT: Also allowed in []-sets)
+ *     >> "\d"                   <[[:digit:]]>            (HINT: Also allowed in []-sets)     [python-extension]
+ *     >> "\D"                   <[^[:digit:]]>           (HINT: Also allowed in []-sets)     [python-extension]
+ *     >> "\0123"                REOP_BYTE '\0123'        (octal-byte)                        [kos-extension]
+ *     >> "\xAB"                 REOP_BYTE '\xAB'         (hex-byte)                          [kos-extension]
+ *     >> "\uABCD"               REOP_EXACT "\uABCD"      (utf-8 encoded)                     [kos-extension]
+ *     >> "\UABCDABCD"           REOP_EXACT "\UABCDABCD"  (utf-8 encoded)                     [kos-extension]
  *
  * [1]: <OP> is one of "=" (or "=="), "!=", "<", "<=", ">", ">="
  *
@@ -109,32 +107,53 @@ typedef int re_errno_t;
  *
  *     >> "X|Y"          REOP_JMP_ONFAIL  1f
  *     >>                <X>
+ *     >>                // TODO: If `<X>' didn't push extra onfail items (that it didn't pop),
+ *     >>                //       and <Y> can never match after <X> has matched, then we can
+ *     >>                //       pop the ONFAIL item here!
+ *     >>                // TODO: This should be implement via a peephole optimizer that compares
+ *     >>                //       the matches of bi-branches. If no input exists that can possibly
+ *     >>                //       match both branches, then the on-fail item can be popped at the
+ *     >>                //       point where this becomes a guaranty in the non-failing branch.
+ *     >>                //    -> Optimize "ab?c"  -> once "ab" has been matched, there's no
+ *     >>                //       point in keeping the on-fail item that could match input "ac",
+ *     >>                //       since we already know that it could never match
+ *     >>                //    -> Optimize "a([[:alpha:]]X[bB]|[[:lower:]]Y[bB])c" Once 'X' has been
+ *     >>                //       matched in the first branch, it is a guaranty that the second branch
+ *     >>                //       can never be matched (until then it wasn't, since input exists that
+ *     >>                //       can match both [[:alpha:]] and [[:lower:]]).
+ *     >>                // TODO: If both branches always consume the same number of bytes/characters
+ *     >>                //       (prior to joining back together), then the non-failing branch can pop
+ *     >>                //       the on-fail item prior to re-joining.
+ *     >>                //    -> Optimize "a(foo|[Ff]oo)b"  -> once "afoo" has been matched, there's no
+ *     >>                //       point in keeping the on-fail item for "[Ff]oo". Even though it could
+ *     >>                //       also match input "afoob", it won't be able to do so any better than
+ *     >>                //       the "foo" branch.
  *     >>                REOP_JMP         2f
- *     >>                # HINT: Another `REOP_JMP_ONFAIL' to <Z> would go here if it existed
- *     >>             1: <Y>
- *     >>             2:
+ *     >>                // HINT: Another `REOP_JMP_ONFAIL' to <Z> would go here if it existed
+ *     >>            1:  <Y>
+ *     >>            2:
  *
- *     >> "X|Y|Z"        REOP_JMP_ONFAIL  1f
+ *     >> "X|Y|Z"        REOP_JMP_ONFAIL 1f
  *     >>                <X>
- *     >>                REOP_JMP         3f
- *     >>             1: REOP_JMP_ONFAIL  2f
+ *     >>                REOP_JMP        3f
+ *     >>            1:  REOP_JMP_ONFAIL 2f
  *     >>                <Y>
- *     >>                REOP_JMP         3f
- *     >>             2: <Z>
- *     >>             3:
+ *     >>                REOP_JMP        3f
+ *     >>            2:  <Z>
+ *     >>            3:
  *
  *     >> "X?"           REOP_JMP_ONFAIL 1f
  *     >>                <X>
- *     >>             1:
+ *     >>            1:
  *
  *     >> "X*"           REOP_JMP_ONFAIL 2f
- *     >>             1: <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
+ *     >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
  *     >>                REOP_JMP_AND_RETURN_ONFAIL 1b
- *     >>             2:
+ *     >>            2:
  *
- *     >> "X+"        1: <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
+ *     >> "X+"       1:  <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
  *     >>                REOP_JMP_AND_RETURN_ONFAIL 1b
- *     >>             2:
+ *     >>            2:
  *
  *     >> "X{0}"         REOP_NOP   // Or just no instructions at all (but note that group start/end opcodes are retained!)
  *
@@ -147,14 +166,14 @@ typedef int re_errno_t;
  *     >> "X{1,}"        <X+>
  *
  *     >> "X{n}"         REOP_SETVAR  {VAR = (n - 1)}
- *     >>             1: <X>
+ *     >>            1:  <X>
  *     >>                REOP_DEC_JMP {VAR}, 1b
  *
  *     >> "X{n,}"        REOP_SETVAR  {VAR = (n - 1)}
- *     >>             1: <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
+ *     >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)' transformed to jump to `2f'
  *     >>                REOP_DEC_JMP {VAR}, 1b
  *     >>                REOP_JMP_AND_RETURN_ONFAIL 1b
- *     >>             2:
+ *     >>            2:
  *
  *     >> "X{0,m}"       REOP_JMP_ONFAIL 2f
  *     >>                REOP_SETVAR  {VAR = (m - 1)}
@@ -226,6 +245,58 @@ typedef int re_errno_t;
  */
 
 
+/* Regex charset opcodes */
+enum {
+	RECS_BITSET_MIN,        /* [+RECS_BITSET_GETBYTES(.)] First bitset opcode (s.a. `RECS_BITSET_*')
+	                         * >> bool is_char_in_set(byte_t const *layout_ptr, uint8_t ch) {
+	                         * >>     uint8_t layout      = *layout_ptr++; // Layout is the RECS_BITSET_* opcode
+	                         * >>     uint8_t minch       = RECS_BITSET_GETBASE(layout);
+	                         * >>     uint8_t bitset_size = RECS_BITSET_GETBYTES(layout);
+	                         * >>     unsigned int bitset_bits = bitset_size * 8;
+	                         * >>     if (OVERFLOW_USUB(ch, minch, &ch))
+	                         * >>         return false;
+	                         * >>     if (ch >= bitset_bits)
+	                         * >>         return false;
+	                         * >>     return (layout_ptr[ch / 8] & (1 << (ch % 8))) != 0;
+	                         * >> }
+	                         * NOTE: In utf-8 mode, only ASCII characters may be encoded via bitsets. */
+	RECS_BITSET_MAX = 0xe3, /* [+RECS_BITSET_GETBYTES(.)] Last bitset opcode (encodes bitset for range E0h-FFh) */
+#define RECS_BITSET_GETBYTES(cs_opcode)    (((cs_opcode)&0x1f) + 1)
+#define RECS_BITSET_GETBASE(cs_opcode)     ((cs_opcode)&0xe0)
+#define RECS_BITSET_BUILD(base, num_bytes) ((base) | ((num_bytes)-1))
+	RECS_DONE,              /* End of charset sequence */
+	RECS_CHAR,              /* [+1] Followed by 1 byte (or latin-1 character) that is apart of the bitset */
+	RECS_CHAR2,             /* [+2] Followed by 2 bytes (or latin-1 characters) that are apart of the bitset */
+	RECS_RANGE,             /* [+2] Followed by 2 bytes (or latin-1 characters) that form a `[lo,hi]' inclusive range of bytes apart of the bitset */
+	RECS_CONTAINS,          /* [+1+n] Followed by a COUNT-byte, followed  by a `COUNT'-character long byte/utf-8  string
+	                         * Whether or not COUNT ares bytes/utf-8 depends on the `REOP_CS_*' starting opcode. Matches
+	                         * a character contained in said string. NOTE: COUNT must be >= 1 */
+
+#define RECS_ISX_MIN RECS_ISCNTRL
+	RECS_ISCNTRL,           /* [+0] consume trait `unicode_iscntrl(ch)'   (ONLY VALID IN UTF-8 MODE) */
+	RECS_ISSPACE,           /* [+0] consume trait `unicode_isspace(ch)'   (ONLY VALID IN UTF-8 MODE) */
+	RECS_ISUPPER,           /* [+0] consume trait `unicode_isupper(ch)'   (ONLY VALID IN UTF-8 MODE) */
+	RECS_ISLOWER,           /* [+0] consume trait `unicode_islower(ch)'   (ONLY VALID IN UTF-8 MODE) */
+	RECS_ISALPHA,           /* [+0] consume trait `unicode_isalpha(ch)'   (ONLY VALID IN UTF-8 MODE) */
+	RECS_ISDIGIT,           /* [+0] consume trait `unicode_isdigit(ch)'   (ONLY VALID IN UTF-8 MODE) */
+	RECS_ISXDIGIT,          /* [+0] consume trait `unicode_isxdigit(ch)'  (ONLY VALID IN UTF-8 MODE) */
+	RECS_ISALNUM,           /* [+0] consume trait `unicode_isalnum(ch)'   (ONLY VALID IN UTF-8 MODE) */
+	RECS_ISPUNCT,           /* [+0] consume trait `unicode_ispunct(ch)'   (ONLY VALID IN UTF-8 MODE) */
+	RECS_ISGRAPH,           /* [+0] consume trait `unicode_isgraph(ch)'   (ONLY VALID IN UTF-8 MODE) */
+	RECS_ISPRINT,           /* [+0] consume trait `unicode_isprint(ch)'   (ONLY VALID IN UTF-8 MODE) */
+	RECS_ISBLANK,           /* [+0] consume trait `unicode_isblank(ch)'   (ONLY VALID IN UTF-8 MODE) */
+	RECS_ISSYMSTRT,         /* [+0] consume trait `unicode_issymstrt(ch)' (ONLY VALID IN UTF-8 MODE) */
+	RECS_ISSYMCONT,         /* [+0] consume trait `unicode_issymcont(ch)' (ONLY VALID IN UTF-8 MODE) */
+	RECS_ISTAB,             /* [+0] consume trait `unicode_istab(ch)'     (ONLY VALID IN UTF-8 MODE) */
+	RECS_ISWHITE,           /* [+0] consume trait `unicode_iswhite(ch)'   (ONLY VALID IN UTF-8 MODE) */
+	RECS_ISEMPTY,           /* [+0] consume trait `unicode_isempty(ch)'   (ONLY VALID IN UTF-8 MODE) */
+	RECS_ISLF,              /* [+0] consume trait `unicode_islf(ch)'      (ONLY VALID IN UTF-8 MODE) */
+	RECS_ISHEX,             /* [+0] consume trait `unicode_ishex(ch)'     (ONLY VALID IN UTF-8 MODE) */
+	RECS_ISTITLE,           /* [+0] consume trait `unicode_istitle(ch)'   (ONLY VALID IN UTF-8 MODE) */
+	RECS_ISNUMERIC,         /* [+0] consume trait `unicode_isnumeric(ch)' (ONLY VALID IN UTF-8 MODE) */
+#define RECS_ISX_MAX RECS_ISNUMERIC
+};
+
 /* Regex opcodes (always encoded as a single byte) */
 enum {
 
@@ -238,37 +309,31 @@ enum {
 	REOP_EXACT_UTF8_ICASE,     /* [+1+n] Followed  by  a  COUNT-byte, followed  by  a `COUNT'-character
 	                            * long utf-8 string (matches utf-8 character contained in said string).
 	                            * NOTE: COUNT must be >= 1 */
-	REOP_ANY,                  /* [+0] Match any character */
+#define REOP_MAKEANY(want_nul, want_lf, want_utf8) \
+	((REOP_ANY) + ((want_nul) ? 0 : 4) + ((want_lf) ? 0 : 2) + ((want_utf8) ? 1 : 0))
+#define REOP_ANY_MIN REOP_ANY
+	REOP_ANY,                  /* [+0] Match any byte */
+	REOP_ANY_UTF8,             /* [+0] Match any character */
 	REOP_ANY_NOTLF,            /* [+0] Match any character (except ASCII line-feeds) */
-#define REOP_ANY_NOTLF_UTF8 REOP_UTF8_ISLF_NOT
-	REOP_ANY_NOTNUL,           /* [+0] Match any character (except '\0') */
+	REOP_ANY_NOTLF_UTF8,       /* [+0] Match any utf-8 character (except unicode line-feeds) */
+	REOP_ANY_NOTNUL,           /* [+0] Match any byte (except '\0') */
+	REOP_ANY_NOTNUL_UTF8,      /* [+0] Match any utf-8 character (except '\0') */
 	REOP_ANY_NOTNUL_NOTLF,     /* [+0] Match any character (except '\0' or ASCII line-feeds) */
 	REOP_ANY_NOTNUL_NOTLF_UTF8, /* [+0] Match any character (except '\0' or unicode line-feeds) */
-	REOP_CHAR,                 /* [+1] Followed by 1 byte that must be matched exactly */
-	REOP_NCHAR,                /* [+1] Followed by 1 byte that must not be matched exactly */
-	REOP_CHAR2,                /* [+2] Followed by 2 bytes, one of which must be matched exactly (for "[ab]" or "a" -> "[aA]" in ICASE-mode) */
-	REOP_NCHAR2,               /* [+2] Followed by 2 bytes, neither of which may be matched */
+#define REOP_ANY_MAX REOP_ANY_NOTNUL_NOTLF_UTF8
+	REOP_BYTE,                 /* [+1] Followed by 1 byte that must be matched exactly */
+	REOP_NBYTE,                /* [+1] Followed by 1 byte that must not be matched exactly */
+	REOP_BYTE2,                /* [+2] Followed by 2 bytes, one of which must be matched exactly (for "[ab]" or "a" -> "[aA]" in ICASE-mode) */
+	REOP_NBYTE2,               /* [+2] Followed by 2 bytes, neither of which may be matched */
 	REOP_RANGE,                /* [+2] Followed by 2 bytes, with input having to match `ch >= pc[0] && ch <= pc[1]' */
 	REOP_NRANGE,               /* [+2] Followed by 2 bytes, with input having to match `ch < pc[0] || ch > pc[1]' */
 	REOP_CONTAINS_UTF8,        /* [+1+n] Followed by a COUNT-byte, followed by a `COUNT'-character long utf-8 string (matches utf-8 character contained in said string).
 	                            * NOTE: COUNT must be >= 2 */
-	REOP_CONTAINS_UTF8_NOT,    /* [+1+n] Followed by a COUNT-byte, followed by a `COUNT'-character long utf-8 string (matches utf-8 character not contained in said string).
+	REOP_NCONTAINS_UTF8,       /* [+1+n] Followed by a COUNT-byte, followed by a `COUNT'-character long utf-8 string (matches utf-8 character not contained in said string).
 	                            * NOTE: COUNT must be >= 1 */
-	REOP_BITSET,               /* [+1+n] Followed by a LAYOUT-byte, followed by `REOP_BITSET_LAYOUT_GETBYTES(LAYOUT)' bitset bytes.
-	                            * >> bool is_char_in_set(byte_t const *layout_ptr, uint8_t ch) {
-	                            * >>     uint8_t layout      = *layout_ptr++;
-	                            * >>     uint8_t minch       = REOP_BITSET_LAYOUT_GETBASE(layout);
-	                            * >>     uint8_t bitset_size = REOP_BITSET_LAYOUT_GETBYTES(layout);
-	                            * >>     unsigned int bitset_bits = bitset_size * 8;
-	                            * >>     if (OVERFLOW_USUB(ch, minch, &ch))
-	                            * >>         return false;
-	                            * >>     if (ch >= bitset_bits)
-	                            * >>         return false;
-	                            * >>     return (layout_ptr[ch / 8] & (1 << (ch % 8))) != 0;
-	                            * >> }
-	                            * NOTE: If the bitset would need to contain non-ascii characters, `REOP_CONTAINS_UTF8' is used instead. */
-	REOP_BITSET_NOT,           /* [+1+n] Same as REOP_BITSET, but the return value of `is_char_in_set' is inverted */
-	REOP_BITSET_UTF8_NOT,      /* [+1+n] Same as `REOP_BITSET_NOT', but non-matching character must be utf-8 */
+	REOP_CS_UTF8,              /* [+*] Followed by a `RECS_*' sequence which the next utf-8 character must match */
+	REOP_CS_BYTE,              /* [+*] Followed by a `RECS_*' sequence which the next byte must match */
+	REOP_NCS_UTF8,             /* [+*] Followed by a `RECS_*' sequence which the next utf-8 character must not match */
 	REOP_GROUP_MATCH,          /* [+1] Re-match the contents of the (N = *PC++)'th already-matched group; If group start/end aren't, triggers a match-failure. */
 	REOP_GROUP_MATCH_J3,       /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 3 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_MATCH_J4,       /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 4 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
@@ -280,108 +345,6 @@ enum {
 #define REOP_GROUP_MATCH_JMAX  REOP_GROUP_MATCH_J8
 #define REOP_GROUP_MATCH_Jn(n) (REOP_GROUP_MATCH_J3 + (n) - 3)
 #define REOP_GROUP_MATCH_Joff(opcode) (3 + (opcode) - REOP_GROUP_MATCH_J3)
-
-	/* Numerical attribute classes */
-#define REOP_UTF8_ISDIGIT_cmp_MIN REOP_UTF8_ISDIGIT_EQ
-	REOP_UTF8_ISDIGIT_EQ,      /* [+1] Match `unicode_isdigit(ch) && unicode_getnumeric(ch) == *PC++' */
-	REOP_UTF8_ISDIGIT_NE,      /* [+1] Match `unicode_isdigit(ch) && unicode_getnumeric(ch) != *PC++' */
-	REOP_UTF8_ISDIGIT_LO,      /* [+1] Match `unicode_isdigit(ch) && unicode_getnumeric(ch) <  *PC++' */
-	REOP_UTF8_ISDIGIT_LE,      /* [+1] Match `unicode_isdigit(ch) && unicode_getnumeric(ch) <= *PC++' */
-	REOP_UTF8_ISDIGIT_GR,      /* [+1] Match `unicode_isdigit(ch) && unicode_getnumeric(ch) >  *PC++' */
-	REOP_UTF8_ISDIGIT_GE,      /* [+1] Match `unicode_isdigit(ch) && unicode_getnumeric(ch) >= *PC++' */
-#define REOP_UTF8_ISDIGIT_cmp_MAX REOP_UTF8_ISDIGIT_GE
-#define REOP_UTF8_ISNUMERIC_cmp_MIN REOP_UTF8_ISNUMERIC_EQ
-	REOP_UTF8_ISNUMERIC_EQ,    /* [+1] Match `unicode_isnumeric(ch) && unicode_getnumeric(ch) == *PC++' */
-	REOP_UTF8_ISNUMERIC_NE,    /* [+1] Match `unicode_isnumeric(ch) && unicode_getnumeric(ch) != *PC++' */
-	REOP_UTF8_ISNUMERIC_LO,    /* [+1] Match `unicode_isnumeric(ch) && unicode_getnumeric(ch) <  *PC++' */
-	REOP_UTF8_ISNUMERIC_LE,    /* [+1] Match `unicode_isnumeric(ch) && unicode_getnumeric(ch) <= *PC++' */
-	REOP_UTF8_ISNUMERIC_GR,    /* [+1] Match `unicode_isnumeric(ch) && unicode_getnumeric(ch) >  *PC++' */
-	REOP_UTF8_ISNUMERIC_GE,    /* [+1] Match `unicode_isnumeric(ch) && unicode_getnumeric(ch) >= *PC++' */
-#define REOP_UTF8_ISNUMERIC_cmp_MAX REOP_UTF8_ISNUMERIC_GE
-
-	/* Special trait classes */
-	/* TODO: Deal with `RE_SYNTAX_HAT_LISTS_NOT_NEWLINE' */
-#define REOP_TRAIT_ASCII_MIN REOP_ASCII_ISCNTRL
-#define REOP_TRAIT_ASCII_ISNOT(x) ((((x) - REOP_ASCII_ISCNTRL_NOT) & 1) == 0)
-	REOP_ASCII_ISCNTRL,        /* [+0] consume trait `iscntrl(ch) == true' */
-	REOP_ASCII_ISCNTRL_NOT,    /* [+0] consume trait `iscntrl(ch) == false' */
-	REOP_ASCII_ISSPACE,        /* [+0] consume trait `isspace(ch) == true' */
-	REOP_ASCII_ISSPACE_NOT,    /* [+0] consume trait `isspace(ch) == false' */
-	REOP_ASCII_ISUPPER,        /* [+0] consume trait `isupper(ch) == true' */
-	REOP_ASCII_ISUPPER_NOT,    /* [+0] consume trait `isupper(ch) == false' */
-	REOP_ASCII_ISLOWER,        /* [+0] consume trait `islower(ch) == true' */
-	REOP_ASCII_ISLOWER_NOT,    /* [+0] consume trait `islower(ch) == false' */
-	REOP_ASCII_ISALPHA,        /* [+0] consume trait `isalpha(ch) == true' */
-	REOP_ASCII_ISALPHA_NOT,    /* [+0] consume trait `isalpha(ch) == false' */
-	REOP_ASCII_ISDIGIT,        /* [+0] consume trait `isdigit(ch) == true' */
-	REOP_ASCII_ISDIGIT_NOT,    /* [+0] consume trait `isdigit(ch) == false' */
-	REOP_ASCII_ISXDIGIT,       /* [+0] consume trait `isxdigit(ch) == true' */
-	REOP_ASCII_ISXDIGIT_NOT,   /* [+0] consume trait `isxdigit(ch) == false' */
-	REOP_ASCII_ISALNUM,        /* [+0] consume trait `isalnum(ch) == true' */
-	REOP_ASCII_ISALNUM_NOT,    /* [+0] consume trait `isalnum(ch) == false' */
-	REOP_ASCII_ISPUNCT,        /* [+0] consume trait `ispunct(ch) == true' */
-	REOP_ASCII_ISPUNCT_NOT,    /* [+0] consume trait `ispunct(ch) == false' */
-	REOP_ASCII_ISGRAPH,        /* [+0] consume trait `isgraph(ch) == true' */
-	REOP_ASCII_ISGRAPH_NOT,    /* [+0] consume trait `isgraph(ch) == false' */
-	REOP_ASCII_ISPRINT,        /* [+0] consume trait `isprint(ch) == true' */
-	REOP_ASCII_ISPRINT_NOT,    /* [+0] consume trait `isprint(ch) == false' */
-	REOP_ASCII_ISSYMSTRT,      /* [+0] consume trait `issymstrt(ch) == true'  (isalpha || '_' || '$') */
-	REOP_ASCII_ISSYMSTRT_NOT,  /* [+0] consume trait `issymstrt(ch) == false' (isalpha || '_' || '$') */
-	REOP_ASCII_ISSYMCONT,      /* [+0] consume trait `issymcont(ch) == true'  (isalnum || '_' || '$') */
-	REOP_ASCII_ISSYMCONT_NOT,  /* [+0] consume trait `issymcont(ch) == false' (isalnum || '_' || '$') */
-	/* Some ascii aliases (where dedicated opcodes still exist) */
-#define REOP_ASCII_ISTITLE       REOP_ASCII_ISUPPER
-#define REOP_ASCII_ISTITLE_NOT   REOP_ASCII_ISUPPER_NOT
-#define REOP_ASCII_ISNUMERIC     REOP_ASCII_ISDIGIT
-#define REOP_ASCII_ISNUMERIC_NOT REOP_ASCII_ISDIGIT_NOT
-
-#define REOP_TRAIT_ASCII_MAX REOP_ASCII_ISSYMCONT_NOT
-
-#define REOP_TRAIT_UTF8_MIN REOP_UTF8_ISCNTRL
-#define REOP_TRAIT_UTF8_ISNOT(x) ((((x) - REOP_UTF8_ISCNTRL_NOT) & 1) == 0)
-	REOP_UTF8_ISCNTRL,         /* [+0] consume trait `unicode_iscntrl(ch) == true' */
-	REOP_UTF8_ISCNTRL_NOT,     /* [+0] consume trait `unicode_iscntrl(ch) == false' */
-	REOP_UTF8_ISSPACE,         /* [+0] consume trait `unicode_isspace(ch) == true' */
-	REOP_UTF8_ISSPACE_NOT,     /* [+0] consume trait `unicode_isspace(ch) == false' */
-	REOP_UTF8_ISUPPER,         /* [+0] consume trait `unicode_isupper(ch) == true' */
-	REOP_UTF8_ISUPPER_NOT,     /* [+0] consume trait `unicode_isupper(ch) == false' */
-	REOP_UTF8_ISLOWER,         /* [+0] consume trait `unicode_islower(ch) == true' */
-	REOP_UTF8_ISLOWER_NOT,     /* [+0] consume trait `unicode_islower(ch) == false' */
-	REOP_UTF8_ISALPHA,         /* [+0] consume trait `unicode_isalpha(ch) == true' */
-	REOP_UTF8_ISALPHA_NOT,     /* [+0] consume trait `unicode_isalpha(ch) == false' */
-	REOP_UTF8_ISDIGIT,         /* [+0] consume trait `unicode_isdigit(ch) == true' */
-	REOP_UTF8_ISDIGIT_NOT,     /* [+0] consume trait `unicode_isdigit(ch) == false' */
-	REOP_UTF8_ISXDIGIT,        /* [+0] consume trait `unicode_isxdigit(ch) == true' */
-	REOP_UTF8_ISXDIGIT_NOT,    /* [+0] consume trait `unicode_isxdigit(ch) == false' */
-	REOP_UTF8_ISALNUM,         /* [+0] consume trait `unicode_isalnum(ch) == true' */
-	REOP_UTF8_ISALNUM_NOT,     /* [+0] consume trait `unicode_isalnum(ch) == false' */
-	REOP_UTF8_ISPUNCT,         /* [+0] consume trait `unicode_ispunct(ch) == true' */
-	REOP_UTF8_ISPUNCT_NOT,     /* [+0] consume trait `unicode_ispunct(ch) == false' */
-	REOP_UTF8_ISGRAPH,         /* [+0] consume trait `unicode_isgraph(ch) == true' */
-	REOP_UTF8_ISGRAPH_NOT,     /* [+0] consume trait `unicode_isgraph(ch) == false' */
-	REOP_UTF8_ISPRINT,         /* [+0] consume trait `unicode_isprint(ch) == true' */
-	REOP_UTF8_ISPRINT_NOT,     /* [+0] consume trait `unicode_isprint(ch) == false' */
-	REOP_UTF8_ISBLANK,         /* [+0] consume trait `unicode_isblank(ch) == true' */
-	REOP_UTF8_ISBLANK_NOT,     /* [+0] consume trait `unicode_isblank(ch) == false' */
-	REOP_UTF8_ISSYMSTRT,       /* [+0] consume trait `unicode_issymstrt(ch) == true' */
-	REOP_UTF8_ISSYMSTRT_NOT,   /* [+0] consume trait `unicode_issymstrt(ch) == false' */
-	REOP_UTF8_ISSYMCONT,       /* [+0] consume trait `unicode_issymcont(ch) == true' */
-	REOP_UTF8_ISSYMCONT_NOT,   /* [+0] consume trait `unicode_issymcont(ch) == false' */
-	REOP_UTF8_ISTAB,           /* [+0] consume trait `unicode_istab(ch) == true' */
-	REOP_UTF8_ISTAB_NOT,       /* [+0] consume trait `unicode_istab(ch) == false' */
-	REOP_UTF8_ISWHITE,         /* [+0] consume trait `unicode_iswhite(ch) == true' */
-	REOP_UTF8_ISWHITE_NOT,     /* [+0] consume trait `unicode_iswhite(ch) == false' */
-	REOP_UTF8_ISEMPTY,         /* [+0] consume trait `unicode_isempty(ch) == true' */
-	REOP_UTF8_ISEMPTY_NOT,     /* [+0] consume trait `unicode_isempty(ch) == false' */
-	REOP_UTF8_ISLF,            /* [+0] consume trait `unicode_islf(ch) == true' */
-	REOP_UTF8_ISLF_NOT,        /* [+0] consume trait `unicode_islf(ch) == false' */
-	REOP_UTF8_ISHEX,           /* [+0] consume trait `unicode_ishex(ch) == true' */
-	REOP_UTF8_ISHEX_NOT,       /* [+0] consume trait `unicode_ishex(ch) == false' */
-	REOP_UTF8_ISTITLE,         /* [+0] consume trait `unicode_istitle(ch) == true' */
-	REOP_UTF8_ISTITLE_NOT,     /* [+0] consume trait `unicode_istitle(ch) == false' */
-	REOP_UTF8_ISNUMERIC,       /* [+0] consume trait `unicode_isnumeric(ch) == true' */
-	REOP_UTF8_ISNUMERIC_NOT,   /* [+0] consume trait `unicode_isnumeric(ch) == false' */
-#define REOP_TRAIT_UTF8_MAX REOP_UTF8_ISNUMERIC_NOT
 
 	/* Opcodes for asserting the current position in input (these don't consume anything) */
 #define REOP_AT_MIN REOP_AT_SOI
@@ -456,7 +419,7 @@ enum {
 #define RE_SYNTAX_CONTEXT_INVALID_OPS       0x00000020 /* '*', '+', '{' and '?' appearing at the start or after '(' or '|' results in `RE_BADRPT'; If not set, they are treated as literals. */
 #define RE_SYNTAX_DOT_NEWLINE               0x00000040 /* '.' matches line-feeds (if not set, then it doesn't) */
 #define RE_SYNTAX_DOT_NOT_NULL              0x00000080 /* '.' doesn't match '\0' (if not set, then it does) */
-#define RE_SYNTAX_HAT_LISTS_NOT_NEWLINE     0x00000100 /* '[^abc]' will not match line-feeds (as though line-feeds were part of the set of characters never matched). If not set, [^]-sets will match them (unless explicitly added to the set of unmatched characters) */
+#define RE_SYNTAX_HAT_LISTS_NOT_NEWLINE     0x00000100 /* '[^abc]' will never match line-feeds (as though line-feeds were part of the set of characters never matched). If not set, [^]-sets will match them (unless explicitly added to the set of unmatched characters) */
 #define RE_SYNTAX_INTERVALS                 0x00000200 /* Enable support for intervals: 'x{1,2}' (if not set, '{' and '}' are literals, though escaping is governed by `RE_SYNTAX_NO_BK_BRACES') */
 #define RE_SYNTAX_LIMITED_OPS               0x00000400 /* If set, support for '+', '?' and '|' is disabled (if not set, support is enabled, though escaping is governed by `RE_SYNTAX_BK_PLUS_QM' and `RE_SYNTAX_NO_BK_VBAR') */
 #define RE_SYNTAX_NEWLINE_ALT               0x00000800 /* '\n' (embedded ASCII 10h) is treated like as an alias for the '|'-operator (if not set, '\n' is a literal; but note the kos-exception "\" "n", which matches that 2-character sequence against arbitrary line-feeds) */
@@ -499,6 +462,7 @@ struct re_parser {
 	char const *rep_pos;    /* [1..1][>= rep_pat] Pointer to next pattern-character that has yet to be compiled. */
 	char const *rep_pat;    /* [1..1][const] Pointer to the start of the pattern being compiled. */
 	__uintptr_t rep_syntax; /* [const] RE syntax flags (set of `RE_SYNTAX_*') */
+	/* TODO: pre-load the currently pending token */
 };
 
 #define re_parser_init(self, pattern, syntax) \
@@ -508,51 +472,55 @@ struct re_parser {
 
 /* Regex token (one of `RE_TOKEN_*', or a utf-32 character (or byte when `RE_SYNTAX_NO_UTF8' is set)) */
 typedef __uint32_t re_token_t;
-#define RE_TOKEN_ISLITERAL(x)  ((x) < RE_TOKEN_BASE)
-#define RE_TOKEN_BASE          0x110000             /* First regex token number */
-#define RE_TOKEN_EOF           (RE_TOKEN_BASE + 0)  /* End-of-pattern */
-#define RE_TOKEN_ISSUFFIX(x) ((x) >= RE_TOKEN_PLUS && (x) <= RE_TOKEN_STARTINTERVAL)
-#define RE_TOKEN_ANY           (RE_TOKEN_BASE + 1)  /* '.' */
-#define RE_TOKEN_PLUS          (RE_TOKEN_BASE + 2)  /* '+' */
-#define RE_TOKEN_STAR          (RE_TOKEN_BASE + 3)  /* '*' */
-#define RE_TOKEN_QMARK         (RE_TOKEN_BASE + 4)  /* '?' */
-#define RE_TOKEN_STARTINTERVAL (RE_TOKEN_BASE + 5)  /* '{' */
-#define RE_TOKEN_STARTSET      (RE_TOKEN_BASE + 6)  /* '[' */
-#define RE_TOKEN_STARTGROUP    (RE_TOKEN_BASE + 7)  /* '(' */
-#define RE_TOKEN_ENDGROUP      (RE_TOKEN_BASE + 8)  /* ')' */
-#define RE_TOKEN_ALTERNATION   (RE_TOKEN_BASE + 9)  /* '|' */
-#define RE_TOKEN_BK_MIN        RE_TOKEN_BK_w
-#define RE_TOKEN_BK_w          (RE_TOKEN_BASE + 10) /* '\w' (<[:symcont:]>  -- REOP_ASCII_ISSYMCONT / REOP_UTF8_ISSYMCONT) */
-#define RE_TOKEN_BK_W          (RE_TOKEN_BASE + 11) /* '\W' (<[^:symcont:]> -- REOP_ASCII_ISSYMCONT_NOT / REOP_UTF8_ISSYMCONT_NOT) */
-#define RE_TOKEN_BK_s          (RE_TOKEN_BASE + 12) /* '\s' (<[:space:]>    -- REOP_ASCII_ISSPACE / REOP_UTF8_ISSPACE) */
-#define RE_TOKEN_BK_S          (RE_TOKEN_BASE + 13) /* '\S' (<[^:space:]>   -- REOP_ASCII_ISSPACE_NOT / REOP_UTF8_ISSPACE_NOT) */
-#define RE_TOKEN_BK_d          (RE_TOKEN_BASE + 14) /* '\d' (<[:digit:]>    -- REOP_ASCII_ISDIGIT / REOP_UTF8_ISDIGIT) */
-#define RE_TOKEN_BK_D          (RE_TOKEN_BASE + 15) /* '\D' (<[^:digit:]>   -- REOP_ASCII_ISDIGIT_NOT / REOP_UTF8_ISDIGIT_NOT) */
-#define RE_TOKEN_BK_n          (RE_TOKEN_BASE + 16) /* '\n' (<[:lf:]>       -- [\r\n] / REOP_UTF8_ISLF) */
-#define RE_TOKEN_BK_N          (RE_TOKEN_BASE + 17) /* '\N' (<[:lf:]>       -- [^\r\n] / REOP_UTF8_ISLF_NOT) */
-#define RE_TOKEN_BK_MAX        RE_TOKEN_BK_N
+#define RE_TOKEN_BASE          0x110000               /* First regex token number */
+#define RE_TOKEN_BYTE80h_MIN   RE_TOKEN_BASE          /* "\x80" */
+#define RE_TOKEN_BYTE80h_MAX   (RE_TOKEN_BASE + 0x7f) /* "\xff" */
+#define RE_TOKEN_XBASE         0x110080               /* First custom regex token number */
+#define RE_TOKEN_ISBYTE80h(x)  ((x) >= RE_TOKEN_BYTE80h_MIN && (x) <= RE_TOKEN_BYTE80h_MAX)
+#define RE_TOKEN_GETBYTE80h(x) ((__byte_t)((x) - RE_TOKEN_BYTE80h_MIN))
+#define RE_TOKEN_ISUTF8(x)     ((x) >= 0x80 && (x) < RE_TOKEN_BASE)
+#define RE_TOKEN_ISLITERAL(x)  ((x) < RE_TOKEN_XBASE)
+#define RE_TOKEN_EOF           (RE_TOKEN_XBASE + 0)  /* End-of-pattern */
+#define RE_TOKEN_ISSUFFIX(x)   ((x) >= RE_TOKEN_PLUS && (x) <= RE_TOKEN_STARTINTERVAL)
+#define RE_TOKEN_ANY           (RE_TOKEN_XBASE + 1)  /* '.' */
+#define RE_TOKEN_PLUS          (RE_TOKEN_XBASE + 2)  /* '+' */
+#define RE_TOKEN_STAR          (RE_TOKEN_XBASE + 3)  /* '*' */
+#define RE_TOKEN_QMARK         (RE_TOKEN_XBASE + 4)  /* '?' */
+#define RE_TOKEN_STARTINTERVAL (RE_TOKEN_XBASE + 5)  /* '{' */
+#define RE_TOKEN_STARTSET      (RE_TOKEN_XBASE + 6)  /* '[' */
+#define RE_TOKEN_STARTGROUP    (RE_TOKEN_XBASE + 7)  /* '(' */
+#define RE_TOKEN_ENDGROUP      (RE_TOKEN_XBASE + 8)  /* ')' */
+#define RE_TOKEN_ALTERNATION   (RE_TOKEN_XBASE + 9)  /* '|' */
+#define RE_TOKEN_BK_w          (RE_TOKEN_XBASE + 10) /* '\w' (<[:symcont:]>  -- REOP_ASCII_ISSYMCONT / REOP_UTF8_ISSYMCONT) */
+#define RE_TOKEN_BK_W          (RE_TOKEN_XBASE + 11) /* '\W' (<[^:symcont:]> -- REOP_ASCII_ISSYMCONT_NOT / REOP_UTF8_ISSYMCONT_NOT) */
+#define RE_TOKEN_BK_s          (RE_TOKEN_XBASE + 12) /* '\s' (<[:space:]>    -- REOP_ASCII_ISSPACE / REOP_UTF8_ISSPACE) */
+#define RE_TOKEN_BK_S          (RE_TOKEN_XBASE + 13) /* '\S' (<[^:space:]>   -- REOP_ASCII_ISSPACE_NOT / REOP_UTF8_ISSPACE_NOT) */
+#define RE_TOKEN_BK_d          (RE_TOKEN_XBASE + 14) /* '\d' (<[:digit:]>    -- REOP_ASCII_ISDIGIT / REOP_UTF8_ISDIGIT) */
+#define RE_TOKEN_BK_D          (RE_TOKEN_XBASE + 15) /* '\D' (<[^:digit:]>   -- REOP_ASCII_ISDIGIT_NOT / REOP_UTF8_ISDIGIT_NOT) */
+#define RE_TOKEN_BK_n          (RE_TOKEN_XBASE + 16) /* '\n' (<[:lf:]>       -- [\r\n] / REOP_UTF8_ISLF) */
+#define RE_TOKEN_BK_N          (RE_TOKEN_XBASE + 17) /* '\N' (<[:lf:]>       -- [^\r\n] / REOP_UTF8_ISLF_NOT) */
 #define RE_TOKEN_AT_MIN        RE_TOKEN_AT_SOL
-#define RE_TOKEN_AT_SOL        (RE_TOKEN_BASE + 18) /* "^" */
-#define RE_TOKEN_AT_EOL        (RE_TOKEN_BASE + 19) /* "$" */
-#define RE_TOKEN_AT_SOI        (RE_TOKEN_BASE + 20) /* "\`" */
-#define RE_TOKEN_AT_EOI        (RE_TOKEN_BASE + 21) /* "\'" */
-#define RE_TOKEN_AT_WOB        (RE_TOKEN_BASE + 22) /* "\b" */
-#define RE_TOKEN_AT_WOB_NOT    (RE_TOKEN_BASE + 23) /* "\B" */
-#define RE_TOKEN_AT_SOW        (RE_TOKEN_BASE + 24) /* "\<" */
-#define RE_TOKEN_AT_EOW        (RE_TOKEN_BASE + 25) /* "\>" */
-#define RE_TOKEN_AT_SOS        (RE_TOKEN_BASE + 26) /* "\_<" */
-#define RE_TOKEN_AT_EOS        (RE_TOKEN_BASE + 27) /* "\_>" */
+#define RE_TOKEN_AT_SOL        (RE_TOKEN_XBASE + 18) /* "^" */
+#define RE_TOKEN_AT_EOL        (RE_TOKEN_XBASE + 19) /* "$" */
+#define RE_TOKEN_AT_SOI        (RE_TOKEN_XBASE + 20) /* "\`" */
+#define RE_TOKEN_AT_EOI        (RE_TOKEN_XBASE + 21) /* "\'" */
+#define RE_TOKEN_AT_WOB        (RE_TOKEN_XBASE + 22) /* "\b" */
+#define RE_TOKEN_AT_WOB_NOT    (RE_TOKEN_XBASE + 23) /* "\B" */
+#define RE_TOKEN_AT_SOW        (RE_TOKEN_XBASE + 24) /* "\<" */
+#define RE_TOKEN_AT_EOW        (RE_TOKEN_XBASE + 25) /* "\>" */
+#define RE_TOKEN_AT_SOS        (RE_TOKEN_XBASE + 26) /* "\_<" */
+#define RE_TOKEN_AT_EOS        (RE_TOKEN_XBASE + 27) /* "\_>" */
 #define RE_TOKEN_AT_MAX        RE_TOKEN_AT_EOS
-#define RE_TOKEN_BKREF_1       (RE_TOKEN_BASE + 28) /* "\1" */
-#define RE_TOKEN_BKREF_2       (RE_TOKEN_BASE + 29) /* "\2" */
-#define RE_TOKEN_BKREF_3       (RE_TOKEN_BASE + 30) /* "\3" */
-#define RE_TOKEN_BKREF_4       (RE_TOKEN_BASE + 31) /* "\4" */
-#define RE_TOKEN_BKREF_5       (RE_TOKEN_BASE + 32) /* "\5" */
-#define RE_TOKEN_BKREF_6       (RE_TOKEN_BASE + 33) /* "\6" */
-#define RE_TOKEN_BKREF_7       (RE_TOKEN_BASE + 34) /* "\7" */
-#define RE_TOKEN_BKREF_8       (RE_TOKEN_BASE + 35) /* "\8" */
-#define RE_TOKEN_BKREF_9       (RE_TOKEN_BASE + 36) /* "\9" */
-#define RE_TOKEN_UNMATCHED_BK  (RE_TOKEN_BASE + 37) /* "\" (followed by EOF; for `RE_EESCAPE') */
+#define RE_TOKEN_BKREF_1       (RE_TOKEN_XBASE + 28) /* "\1" */
+#define RE_TOKEN_BKREF_2       (RE_TOKEN_XBASE + 29) /* "\2" */
+#define RE_TOKEN_BKREF_3       (RE_TOKEN_XBASE + 30) /* "\3" */
+#define RE_TOKEN_BKREF_4       (RE_TOKEN_XBASE + 31) /* "\4" */
+#define RE_TOKEN_BKREF_5       (RE_TOKEN_XBASE + 32) /* "\5" */
+#define RE_TOKEN_BKREF_6       (RE_TOKEN_XBASE + 33) /* "\6" */
+#define RE_TOKEN_BKREF_7       (RE_TOKEN_XBASE + 34) /* "\7" */
+#define RE_TOKEN_BKREF_8       (RE_TOKEN_XBASE + 35) /* "\8" */
+#define RE_TOKEN_BKREF_9       (RE_TOKEN_XBASE + 36) /* "\9" */
+#define RE_TOKEN_UNMATCHED_BK  (RE_TOKEN_XBASE + 37) /* "\" (followed by EOF; for `RE_EESCAPE') */
 
 /* Parse and yield the next regex-token pointed-to by `self->rep_pos'.
  * @return: * : A unicode character, or one of `RE_TOKEN_*' */

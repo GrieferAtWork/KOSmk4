@@ -688,80 +688,111 @@ NOTHROW_NCX(CC re_interpreter_consume_repeat)(struct re_interpreter *__restrict 
 }
 
 
-INTERN_CONST byte_t const libre_ascii_traits[] = {
-#define DEF_TRAIT(opcode, mask) [(opcode - REOP_TRAIT_ASCII_MIN)] = mask
-	DEF_TRAIT(REOP_ASCII_ISCNTRL, CTYPE_C_FLAG_CNTRL),      /* `iscntrl(ch) == true' */
-	DEF_TRAIT(REOP_ASCII_ISCNTRL_NOT, CTYPE_C_FLAG_CNTRL),  /* `iscntrl(ch) == false' */
-	DEF_TRAIT(REOP_ASCII_ISSPACE, CTYPE_C_FLAG_SPACE),      /* `isspace(ch) == true' */
-	DEF_TRAIT(REOP_ASCII_ISSPACE_NOT, CTYPE_C_FLAG_SPACE),  /* `isspace(ch) == false' */
-	DEF_TRAIT(REOP_ASCII_ISUPPER, CTYPE_C_FLAG_UPPER),      /* `isupper(ch) == true' */
-	DEF_TRAIT(REOP_ASCII_ISUPPER_NOT, CTYPE_C_FLAG_UPPER),  /* `isupper(ch) == false' */
-	DEF_TRAIT(REOP_ASCII_ISLOWER, CTYPE_C_FLAG_LOWER),      /* `islower(ch) == true' */
-	DEF_TRAIT(REOP_ASCII_ISLOWER_NOT, CTYPE_C_FLAG_LOWER),  /* `islower(ch) == false' */
-	DEF_TRAIT(REOP_ASCII_ISALPHA, CTYPE_C_FLAG_ALPHA),      /* `isalpha(ch) == true' */
-	DEF_TRAIT(REOP_ASCII_ISALPHA_NOT, CTYPE_C_FLAG_ALPHA),  /* `isalpha(ch) == false' */
-	DEF_TRAIT(REOP_ASCII_ISDIGIT, CTYPE_C_FLAG_DIGIT),      /* `isdigit(ch) == true' */
-	DEF_TRAIT(REOP_ASCII_ISDIGIT_NOT, CTYPE_C_FLAG_DIGIT),  /* `isdigit(ch) == false' */
-	DEF_TRAIT(REOP_ASCII_ISXDIGIT, CTYPE_C_FLAG_DIGIT),     /* `isxdigit(ch) == true' */
-	DEF_TRAIT(REOP_ASCII_ISXDIGIT_NOT, CTYPE_C_FLAG_DIGIT), /* `isxdigit(ch) == false' */
-	DEF_TRAIT(REOP_ASCII_ISALNUM, CTYPE_C_FLAG_ALNUM),      /* `isalnum(ch) == true' */
-	DEF_TRAIT(REOP_ASCII_ISALNUM_NOT, CTYPE_C_FLAG_ALNUM),  /* `isalnum(ch) == false' */
-	DEF_TRAIT(REOP_ASCII_ISPUNCT, CTYPE_C_FLAG_PUNCT),      /* `ispunct(ch) == true' */
-	DEF_TRAIT(REOP_ASCII_ISPUNCT_NOT, CTYPE_C_FLAG_PUNCT),  /* `ispunct(ch) == false' */
-	DEF_TRAIT(REOP_ASCII_ISGRAPH, CTYPE_C_FLAG_GRAPH),      /* `isgraph(ch) == true' */
-	DEF_TRAIT(REOP_ASCII_ISGRAPH_NOT, CTYPE_C_FLAG_GRAPH),  /* `isgraph(ch) == false' */
-	DEF_TRAIT(REOP_ASCII_ISPRINT, CTYPE_C_FLAG_PRINT),      /* `isprint(ch) == true' */
-	DEF_TRAIT(REOP_ASCII_ISPRINT_NOT, CTYPE_C_FLAG_PRINT),  /* `isprint(ch) == false' */
-#undef DEF_TRAIT
-};
-
+/* Map `X - RECS_ISX_MIN' to `__UNICODE_IS*' flags. */
 INTERN_CONST uint16_t const libre_unicode_traits[] = {
-#define DEF_TRAIT(opcode, mask) [(opcode - REOP_TRAIT_UTF8_MIN)] = mask
-	DEF_TRAIT(REOP_UTF8_ISCNTRL, __UNICODE_ISCNTRL),         /* `unicode_iscntrl(ch) == true' */
-	DEF_TRAIT(REOP_UTF8_ISCNTRL_NOT, __UNICODE_ISCNTRL),     /* `unicode_iscntrl(ch) == false' */
-	DEF_TRAIT(REOP_UTF8_ISSPACE, __UNICODE_ISSPACE),         /* `unicode_isspace(ch) == true' */
-	DEF_TRAIT(REOP_UTF8_ISSPACE_NOT, __UNICODE_ISSPACE),     /* `unicode_isspace(ch) == false' */
-	DEF_TRAIT(REOP_UTF8_ISUPPER, __UNICODE_ISUPPER),         /* `unicode_isupper(ch) == true' */
-	DEF_TRAIT(REOP_UTF8_ISUPPER_NOT, __UNICODE_ISUPPER),     /* `unicode_isupper(ch) == false' */
-	DEF_TRAIT(REOP_UTF8_ISLOWER, __UNICODE_ISLOWER),         /* `unicode_islower(ch) == true' */
-	DEF_TRAIT(REOP_UTF8_ISLOWER_NOT, __UNICODE_ISLOWER),     /* `unicode_islower(ch) == false' */
-	DEF_TRAIT(REOP_UTF8_ISALPHA, __UNICODE_ISALPHA),         /* `unicode_isalpha(ch) == true' */
-	DEF_TRAIT(REOP_UTF8_ISALPHA_NOT, __UNICODE_ISALPHA),     /* `unicode_isalpha(ch) == false' */
-	DEF_TRAIT(REOP_UTF8_ISDIGIT, __UNICODE_ISDIGIT),         /* `unicode_isdigit(ch) == true' */
-	DEF_TRAIT(REOP_UTF8_ISDIGIT_NOT, __UNICODE_ISDIGIT),     /* `unicode_isdigit(ch) == false' */
-	DEF_TRAIT(REOP_UTF8_ISXDIGIT, __UNICODE_ISXDIGIT),       /* `unicode_isxdigit(ch) == true' */
-	DEF_TRAIT(REOP_UTF8_ISXDIGIT_NOT, __UNICODE_ISXDIGIT),   /* `unicode_isxdigit(ch) == false' */
-	DEF_TRAIT(REOP_UTF8_ISALNUM, __UNICODE_ISALNUM),         /* `unicode_isalnum(ch) == true' */
-	DEF_TRAIT(REOP_UTF8_ISALNUM_NOT, __UNICODE_ISALNUM),     /* `unicode_isalnum(ch) == false' */
-	DEF_TRAIT(REOP_UTF8_ISPUNCT, __UNICODE_ISPUNCT),         /* `unicode_ispunct(ch) == true' */
-	DEF_TRAIT(REOP_UTF8_ISPUNCT_NOT, __UNICODE_ISPUNCT),     /* `unicode_ispunct(ch) == false' */
-	DEF_TRAIT(REOP_UTF8_ISGRAPH, __UNICODE_ISGRAPH),         /* `unicode_isgraph(ch) == true' */
-	DEF_TRAIT(REOP_UTF8_ISGRAPH_NOT, __UNICODE_ISGRAPH),     /* `unicode_isgraph(ch) == false' */
-	DEF_TRAIT(REOP_UTF8_ISPRINT, __UNICODE_ISPRINT),         /* `unicode_isprint(ch) == true' */
-	DEF_TRAIT(REOP_UTF8_ISPRINT_NOT, __UNICODE_ISPRINT),     /* `unicode_isprint(ch) == false' */
-	DEF_TRAIT(REOP_UTF8_ISBLANK, __UNICODE_ISBLANK),         /* `unicode_isblank(ch) == true' */
-	DEF_TRAIT(REOP_UTF8_ISBLANK_NOT, __UNICODE_ISBLANK),     /* `unicode_isblank(ch) == false' */
-	DEF_TRAIT(REOP_UTF8_ISSYMSTRT, __UNICODE_ISSYMSTRT),     /* `unicode_issymstrt(ch) == true' */
-	DEF_TRAIT(REOP_UTF8_ISSYMSTRT_NOT, __UNICODE_ISSYMSTRT), /* `unicode_issymstrt(ch) == false' */
-	DEF_TRAIT(REOP_UTF8_ISSYMCONT, __UNICODE_ISSYMCONT),     /* `unicode_issymcont(ch) == true' */
-	DEF_TRAIT(REOP_UTF8_ISSYMCONT_NOT, __UNICODE_ISSYMCONT), /* `unicode_issymcont(ch) == false' */
-	DEF_TRAIT(REOP_UTF8_ISTAB, __UNICODE_ISTAB),             /* `unicode_istab(ch) == true' */
-	DEF_TRAIT(REOP_UTF8_ISTAB_NOT, __UNICODE_ISTAB),         /* `unicode_istab(ch) == false' */
-	DEF_TRAIT(REOP_UTF8_ISWHITE, __UNICODE_ISWHITE),         /* `unicode_iswhite(ch) == true' */
-	DEF_TRAIT(REOP_UTF8_ISWHITE_NOT, __UNICODE_ISWHITE),     /* `unicode_iswhite(ch) == false' */
-	DEF_TRAIT(REOP_UTF8_ISEMPTY, __UNICODE_ISEMPTY),         /* `unicode_isempty(ch) == true' */
-	DEF_TRAIT(REOP_UTF8_ISEMPTY_NOT, __UNICODE_ISEMPTY),     /* `unicode_isempty(ch) == false' */
-	DEF_TRAIT(REOP_UTF8_ISLF, __UNICODE_ISLF),               /* `unicode_islf(ch) == true' */
-	DEF_TRAIT(REOP_UTF8_ISLF_NOT, __UNICODE_ISLF),           /* `unicode_islf(ch) == false' */
-	DEF_TRAIT(REOP_UTF8_ISHEX, __UNICODE_ISHEX),             /* `unicode_ishex(ch) == true' */
-	DEF_TRAIT(REOP_UTF8_ISHEX_NOT, __UNICODE_ISHEX),         /* `unicode_ishex(ch) == false' */
-	DEF_TRAIT(REOP_UTF8_ISTITLE, __UNICODE_ISTITLE),         /* `unicode_istitle(ch) == true' */
-	DEF_TRAIT(REOP_UTF8_ISTITLE_NOT, __UNICODE_ISTITLE),     /* `unicode_istitle(ch) == false' */
-	DEF_TRAIT(REOP_UTF8_ISNUMERIC, __UNICODE_ISNUMERIC),     /* `unicode_isnumeric(ch) == true' */
-	DEF_TRAIT(REOP_UTF8_ISNUMERIC_NOT, __UNICODE_ISNUMERIC), /* `unicode_isnumeric(ch) == false' */
+#define DEF_TRAIT(opcode, mask) [(opcode - RECS_ISX_MIN)] = mask
+	DEF_TRAIT(RECS_ISCNTRL, __UNICODE_ISCNTRL),         /* `unicode_iscntrl(ch)' */
+	DEF_TRAIT(RECS_ISSPACE, __UNICODE_ISSPACE),         /* `unicode_isspace(ch)' */
+	DEF_TRAIT(RECS_ISUPPER, __UNICODE_ISUPPER),         /* `unicode_isupper(ch)' */
+	DEF_TRAIT(RECS_ISLOWER, __UNICODE_ISLOWER),         /* `unicode_islower(ch)' */
+	DEF_TRAIT(RECS_ISALPHA, __UNICODE_ISALPHA),         /* `unicode_isalpha(ch)' */
+	DEF_TRAIT(RECS_ISDIGIT, __UNICODE_ISDIGIT),         /* `unicode_isdigit(ch)' */
+	DEF_TRAIT(RECS_ISXDIGIT, __UNICODE_ISXDIGIT),       /* `unicode_isxdigit(ch)' */
+	DEF_TRAIT(RECS_ISALNUM, __UNICODE_ISALNUM),         /* `unicode_isalnum(ch)' */
+	DEF_TRAIT(RECS_ISPUNCT, __UNICODE_ISPUNCT),         /* `unicode_ispunct(ch)' */
+	DEF_TRAIT(RECS_ISGRAPH, __UNICODE_ISGRAPH),         /* `unicode_isgraph(ch)' */
+	DEF_TRAIT(RECS_ISPRINT, __UNICODE_ISPRINT),         /* `unicode_isprint(ch)' */
+	DEF_TRAIT(RECS_ISBLANK, __UNICODE_ISBLANK),         /* `unicode_isblank(ch)' */
+	DEF_TRAIT(RECS_ISSYMSTRT, __UNICODE_ISSYMSTRT),     /* `unicode_issymstrt(ch)' */
+	DEF_TRAIT(RECS_ISSYMCONT, __UNICODE_ISSYMCONT),     /* `unicode_issymcont(ch)' */
+	DEF_TRAIT(RECS_ISTAB, __UNICODE_ISTAB),             /* `unicode_istab(ch)' */
+	DEF_TRAIT(RECS_ISWHITE, __UNICODE_ISWHITE),         /* `unicode_iswhite(ch)' */
+	DEF_TRAIT(RECS_ISEMPTY, __UNICODE_ISEMPTY),         /* `unicode_isempty(ch)' */
+	DEF_TRAIT(RECS_ISLF, __UNICODE_ISLF),               /* `unicode_islf(ch)' */
+	DEF_TRAIT(RECS_ISHEX, __UNICODE_ISHEX),             /* `unicode_ishex(ch)' */
+	DEF_TRAIT(RECS_ISTITLE, __UNICODE_ISTITLE),         /* `unicode_istitle(ch)' */
+	DEF_TRAIT(RECS_ISNUMERIC, __UNICODE_ISNUMERIC),     /* `unicode_isnumeric(ch)' */
 #undef DEF_TRAIT
 };
 
+PRIVATE ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) byte_t const *
+NOTHROW_NCX(CC CS_BYTE_seek_end)(__register byte_t const *__restrict pc) {
+	__register byte_t cs_opcode;
+again:
+	cs_opcode = *pc++;
+	switch (cs_opcode) {
+
+	case RECS_BITSET_MIN ... RECS_BITSET_MAX:
+		pc += RECS_BITSET_GETBYTES(cs_opcode);
+		goto again;
+
+	case RECS_DONE:
+		break;
+
+	case RECS_CHAR:
+		pc += 1;
+		goto again;
+
+	case RECS_CHAR2:
+	case RECS_RANGE:
+		pc += 2;
+		goto again;
+
+	case RECS_CONTAINS: {
+		byte_t len = *pc++;
+		assert(len >= 1);
+		pc += len;
+		goto again;
+	}
+
+		/* No need to handle trait opcodes (those aren't valid in byte-mode) */
+
+	default: __builtin_unreachable();
+	}
+	return pc;
+}
+
+PRIVATE ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) byte_t const *
+NOTHROW_NCX(CC CS_UTF8_seek_end)(__register byte_t const *__restrict pc) {
+	__register byte_t cs_opcode;
+again:
+	cs_opcode = *pc++;
+	switch (cs_opcode) {
+
+	case RECS_BITSET_MIN ... RECS_BITSET_MAX:
+		pc += RECS_BITSET_GETBYTES(cs_opcode);
+		goto again;
+
+	case RECS_DONE:
+		break;
+
+	case RECS_CHAR:
+		pc += 1;
+		goto again;
+
+	case RECS_CHAR2:
+	case RECS_RANGE:
+		pc += 2;
+		goto again;
+
+	case RECS_CONTAINS: {
+		byte_t len = *pc++;
+		byte_t const *newpc = pc;
+		assert(len >= 1);
+		do {
+			unicode_readutf8((char const **)&newpc);
+		} while (--len);
+		pc = newpc;
+		goto again;
+	}
+
+	case RECS_ISX_MIN ... RECS_ISX_MAX:
+		goto again;
+
+	default: __builtin_unreachable();
+	}
+	return pc;
+}
 
 /* Execute the regex interpreter.
  * NOTE: The caller is  responsible for loading  a non-empty  chunk,
@@ -916,6 +947,13 @@ dispatch:
 			DISPATCH();
 		}
 
+		TARGET(REOP_ANY_UTF8) {
+			if (re_interpreter_is_eoi(self))
+				ONFAIL();
+			(void)re_interpreter_readutf8(self);
+			DISPATCH();
+		}
+
 		TARGET(REOP_ANY_NOTLF) {
 			byte_t ch;
 			if (re_interpreter_is_eoi(self))
@@ -926,12 +964,32 @@ dispatch:
 			DISPATCH();
 		}
 
+		TARGET(REOP_ANY_NOTLF_UTF8) {
+			char32_t ch;
+			if (re_interpreter_is_eoi(self))
+				ONFAIL();
+			ch = re_interpreter_readutf8(self);
+			if (unicode_islf(ch))
+				ONFAIL();
+			DISPATCH();
+		}
+
 		TARGET(REOP_ANY_NOTNUL) {
 			byte_t ch;
 			if (re_interpreter_is_eoi(self))
 				ONFAIL();
 			ch = re_interpreter_readbyte(self);
 			if (ch == '\0')
+				ONFAIL();
+			DISPATCH();
+		}
+
+		TARGET(REOP_ANY_NOTNUL_UTF8) {
+			char32_t ch;
+			if (re_interpreter_is_eoi(self))
+				ONFAIL();
+			ch = re_interpreter_readbyte(self);
+			if (ch == (char32_t)'\0')
 				ONFAIL();
 			DISPATCH();
 		}
@@ -956,7 +1014,7 @@ dispatch:
 			DISPATCH();
 		}
 
-		TARGET(REOP_CHAR) {
+		TARGET(REOP_BYTE) {
 			/* Followed by 1 byte that must be matched exactly */
 			byte_t ch, b;
 			if (re_interpreter_is_eoi(self))
@@ -968,7 +1026,7 @@ dispatch:
 			ONFAIL();
 		}
 
-		TARGET(REOP_NCHAR) {
+		TARGET(REOP_NBYTE) {
 			/* Followed by 1 byte that must not be matched exactly */
 			byte_t ch, b;
 			if (re_interpreter_is_eoi(self))
@@ -980,7 +1038,7 @@ dispatch:
 			ONFAIL();
 		}
 
-		TARGET(REOP_CHAR2) {
+		TARGET(REOP_BYTE2) {
 			/* Followed by 2 bytes, one of which must be matched exactly (for "[ab]" or "a" -> "[aA]" in ICASE-mode) */
 			byte_t ch, b1, b2;
 			if (re_interpreter_is_eoi(self))
@@ -993,7 +1051,7 @@ dispatch:
 			ONFAIL();
 		}
 
-		TARGET(REOP_NCHAR2) {
+		TARGET(REOP_NBYTE2) {
 			/* Followed by 2 bytes, neither of which may be matched */
 			byte_t ch, b1, b2;
 			if (re_interpreter_is_eoi(self))
@@ -1056,7 +1114,7 @@ dispatch:
 			DISPATCH();
 		}
 
-		TARGET(REOP_CONTAINS_UTF8_NOT) {
+		TARGET(REOP_NCONTAINS_UTF8) {
 			byte_t count = getb();
 			char32_t ch;
 			byte_t const *newpc;
@@ -1075,69 +1133,244 @@ dispatch:
 			DISPATCH();
 		}
 
-		TARGET(REOP_BITSET) {
+
+
+		/************************************************************************/
+		/* BITSET OPCODES                                                       */
+		/************************************************************************/
+		TARGET(REOP_CS_BYTE) {
 			byte_t ch;
-			byte_t layout        = getb();
-			uint8_t bitset_minch = REOP_BITSET_LAYOUT_GETBASE(layout);
-			uint8_t bitset_size  = REOP_BITSET_LAYOUT_GETBYTES(layout);
-			unsigned int bitset_bits = bitset_size * 8;
 			if (re_interpreter_is_eoi(self))
 				ONFAIL();
 			ch = re_interpreter_readbyte(self);
-			if (!OVERFLOW_USUB(ch, bitset_minch, &ch)) {
-				if (ch < bitset_bits) {
-					if ((pc[ch / 8] & (1 << (ch % 8))) != 0) {
-						pc += bitset_size;
-						DISPATCH();
+REOP_CS_BYTE_dispatch:
+			opcode = getb();
+			switch (opcode) {
+
+			case RECS_BITSET_MIN ... RECS_BITSET_MAX: {
+				uint8_t bitset_minch = REOP_BITSET_LAYOUT_GETBASE(opcode);
+				uint8_t bitset_size  = REOP_BITSET_LAYOUT_GETBYTES(opcode);
+				byte_t bitset_rel_ch;
+				if (!OVERFLOW_USUB(ch, bitset_minch, &bitset_rel_ch)) {
+					unsigned int bitset_bits = bitset_size * 8;
+					if (bitset_rel_ch < bitset_bits) {
+						if ((pc[bitset_rel_ch / 8] & (1 << (bitset_rel_ch % 8))) != 0) {
+							pc += bitset_size;
+							goto REOP_CS_BYTE_onmatch;
+						}
 					}
 				}
+				pc += bitset_size;
+				goto REOP_CS_BYTE_dispatch;
 			}
-			ONFAIL();
-		}
 
-		TARGET(REOP_BITSET_NOT) {
-			byte_t ch;
-			byte_t layout        = getb();
-			uint8_t bitset_minch = REOP_BITSET_LAYOUT_GETBASE(layout);
-			uint8_t bitset_size  = REOP_BITSET_LAYOUT_GETBYTES(layout);
-			unsigned int bitset_bits = bitset_size * 8;
-			if (re_interpreter_is_eoi(self))
+			case RECS_DONE:
+				/* Reached the end of the char-set without any match */
 				ONFAIL();
-			ch = re_interpreter_readbyte(self);
-			if (!OVERFLOW_USUB(ch, bitset_minch, &ch)) {
-				if (ch < bitset_bits) {
-					if ((pc[ch / 8] & (1 << (ch % 8))) != 0)
-						ONFAIL();
-				}
+				__builtin_unreachable();
+
+			case RECS_CHAR: {
+				byte_t match = getb();
+				if (ch == match)
+					goto REOP_CS_BYTE_onmatch;
+				goto REOP_CS_BYTE_dispatch;
 			}
-			pc += bitset_size;
+
+			case RECS_CHAR2: {
+				byte_t match1 = getb();
+				byte_t match2 = getb();
+				if (ch == match1 || ch == match2)
+					goto REOP_CS_BYTE_onmatch;
+				goto REOP_CS_BYTE_dispatch;
+			}
+
+			case RECS_RANGE: {
+				byte_t match_lo = getb();
+				byte_t match_hi = getb();
+				if (ch >= match_lo && ch <= match_hi)
+					goto REOP_CS_BYTE_onmatch;
+				goto REOP_CS_BYTE_dispatch;
+			}
+
+			case RECS_CONTAINS: {
+				byte_t len = getb();
+				if (memchr(pc, ch, len) != NULL) {
+					pc += len;
+					goto REOP_CS_BYTE_onmatch;
+				}
+				pc += len;
+				goto REOP_CS_BYTE_dispatch;
+			}
+
+			/* No need to handle trait opcodes (those aren't valid in byte-mode) */
+
+			default: __builtin_unreachable();
+			}
+REOP_CS_BYTE_onmatch:
+			pc = CS_BYTE_seek_end(pc);
 			DISPATCH();
 		}
 
-		TARGET(REOP_BITSET_UTF8_NOT) {
+		TARGET(REOP_CS_UTF8) {
 			char32_t ch;
-			byte_t byte_ch;
-			byte_t layout        = getb();
-			uint8_t bitset_minch = REOP_BITSET_LAYOUT_GETBASE(layout);
-			uint8_t bitset_size  = REOP_BITSET_LAYOUT_GETBYTES(layout);
-			unsigned int bitset_bits = bitset_size * 8;
 			if (re_interpreter_is_eoi(self))
 				ONFAIL();
 			ch = re_interpreter_readutf8(self);
-			if (ch <= 0xff) { /* `> 0xff' can never be apart of the bitset, which can only describe 00-FF */
-				if (!OVERFLOW_USUB((uint8_t)ch, bitset_minch, &byte_ch)) {
-					if (ch < bitset_bits) {
-						if ((pc[ch / 8] & (1 << (ch % 8))) != 0)
-							ONFAIL();
+REOP_CS_UTF8_dispatch:
+			opcode = getb();
+			switch (opcode) {
+
+			case RECS_BITSET_MIN ... RECS_BITSET_MAX: {
+				uint8_t bitset_minch = REOP_BITSET_LAYOUT_GETBASE(opcode);
+				uint8_t bitset_size  = REOP_BITSET_LAYOUT_GETBYTES(opcode);
+				byte_t bitset_rel_ch;
+				if (ch < 0x80 && !OVERFLOW_USUB(ch, bitset_minch, &bitset_rel_ch)) {
+					unsigned int bitset_bits = bitset_size * 8;
+					if (bitset_rel_ch < bitset_bits) {
+						if ((pc[bitset_rel_ch / 8] & (1 << (bitset_rel_ch % 8))) != 0) {
+							pc += bitset_size;
+							goto REOP_CS_UTF8_onmatch;
+						}
 					}
 				}
+				pc += bitset_size;
+				goto REOP_CS_UTF8_dispatch;
 			}
-			pc += bitset_size;
+
+			case RECS_DONE:
+				/* Reached the end of the char-set without any match */
+				ONFAIL();
+				__builtin_unreachable();
+
+			case RECS_CHAR: {
+				byte_t match = getb();
+				if (ch == match)
+					goto REOP_CS_UTF8_onmatch;
+				goto REOP_CS_UTF8_dispatch;
+			}
+
+			case RECS_CHAR2: {
+				byte_t match1 = getb();
+				byte_t match2 = getb();
+				if (ch == match1 || ch == match2)
+					goto REOP_CS_UTF8_onmatch;
+				goto REOP_CS_UTF8_dispatch;
+			}
+
+			case RECS_RANGE: {
+				byte_t match_lo = getb();
+				byte_t match_hi = getb();
+				if (ch >= match_lo && ch <= match_hi)
+					goto REOP_CS_UTF8_onmatch;
+				goto REOP_CS_UTF8_dispatch;
+			}
+
+			case RECS_CONTAINS: {
+				byte_t len = getb();
+				if (memchr(pc, ch, len) != NULL) {
+					pc += len;
+					goto REOP_CS_UTF8_onmatch;
+				}
+				pc += len;
+				goto REOP_CS_UTF8_dispatch;
+			}
+
+			case RECS_ISX_MIN ... RECS_ISX_MAX: {
+				uint16_t trait    = libre_unicode_traits[opcode - RECS_ISX_MIN];
+				uint16_t ch_flags = __unicode_descriptor(ch)->__ut_flags;
+				uint16_t ch_mask  = ch_flags & trait;
+				if (ch_mask != 0)
+					goto REOP_CS_UTF8_onmatch;
+				goto REOP_CS_UTF8_dispatch;
+			}
+
+			default: __builtin_unreachable();
+			}
+REOP_CS_UTF8_onmatch:
+			pc = CS_UTF8_seek_end(pc);
 			DISPATCH();
 		}
 
+		TARGET(REOP_NCS_UTF8) {
+			char32_t ch;
+			if (re_interpreter_is_eoi(self))
+				ONFAIL();
+			ch = re_interpreter_readutf8(self);
+REOP_NCS_UTF8_dispatch:
+			opcode = getb();
+			switch (opcode) {
 
-		/* Group repetition */
+			case RECS_BITSET_MIN ... RECS_BITSET_MAX: {
+				uint8_t bitset_minch = REOP_BITSET_LAYOUT_GETBASE(opcode);
+				uint8_t bitset_size  = REOP_BITSET_LAYOUT_GETBYTES(opcode);
+				byte_t bitset_rel_ch;
+				if (ch < 0x80 && !OVERFLOW_USUB(ch, bitset_minch, &bitset_rel_ch)) {
+					unsigned int bitset_bits = bitset_size * 8;
+					if (bitset_rel_ch < bitset_bits) {
+						if ((pc[bitset_rel_ch / 8] & (1 << (bitset_rel_ch % 8))) != 0)
+							ONFAIL();
+					}
+				}
+				pc += bitset_size;
+				goto REOP_NCS_UTF8_dispatch;
+			}
+
+			case RECS_DONE:
+				/* Reached the end of the char-set without a miss-match */
+				DISPATCH();
+
+			case RECS_CHAR: {
+				byte_t match = getb();
+				if (ch == match)
+					ONFAIL();
+				goto REOP_NCS_UTF8_dispatch;
+			}
+
+			case RECS_CHAR2: {
+				byte_t match1 = getb();
+				byte_t match2 = getb();
+				if (ch == match1 || ch == match2)
+					ONFAIL();
+				goto REOP_NCS_UTF8_dispatch;
+			}
+
+			case RECS_RANGE: {
+				byte_t match_lo = getb();
+				byte_t match_hi = getb();
+				if (ch >= match_lo && ch <= match_hi)
+					ONFAIL();
+				goto REOP_NCS_UTF8_dispatch;
+			}
+
+			case RECS_CONTAINS: {
+				byte_t len = getb();
+				if (memchr(pc, ch, len) != NULL) {
+					pc += len;
+					ONFAIL();
+				}
+				pc += len;
+				goto REOP_NCS_UTF8_dispatch;
+			}
+
+			case RECS_ISX_MIN ... RECS_ISX_MAX: {
+				uint16_t trait    = libre_unicode_traits[opcode - RECS_ISX_MIN];
+				uint16_t ch_flags = __unicode_descriptor(ch)->__ut_flags;
+				uint16_t ch_mask  = ch_flags & trait;
+				if (ch_mask != 0)
+					ONFAIL();
+				goto REOP_NCS_UTF8_dispatch;
+			}
+
+			default: __builtin_unreachable();
+			}
+			__builtin_unreachable();
+		}
+
+
+
+		/************************************************************************/
+		/* Group repetition                                                     */
+		/************************************************************************/
 		TARGET(REOP_GROUP_MATCH) {
 			uint8_t gid = getb();
 			re_regmatch_t match;
@@ -1184,204 +1417,6 @@ dispatch:
 			}
 			DISPATCH();
 		}
-
-
-
-		/* Numerical attribute classes */
-		TARGET(REOP_UTF8_ISDIGIT_cmp_MIN ... REOP_UTF8_ISDIGIT_cmp_MAX)
-		TARGET(REOP_UTF8_ISNUMERIC_cmp_MIN ... REOP_UTF8_ISNUMERIC_cmp_MAX) {
-			char32_t ch;
-			uint64_t digit;
-			byte_t operand = getb();
-			bool ismatch;
-			if (re_interpreter_is_eoi(self))
-				ONFAIL();
-			ch = re_interpreter_readutf8(self);
-			if (opcode >= REOP_UTF8_ISDIGIT_cmp_MIN &&
-			    opcode <= REOP_UTF8_ISDIGIT_cmp_MAX) {
-				if (!unicode_isdigit(ch))
-					ONFAIL();
-			} else {
-				if (!unicode_isnumeric(ch))
-					ONFAIL();
-			}
-			digit = unicode_getnumeric64(ch);
-			switch (opcode) {
-			case REOP_UTF8_ISDIGIT_EQ:
-			case REOP_UTF8_ISNUMERIC_EQ:
-				ismatch = digit == operand;
-				break;
-			case REOP_UTF8_ISDIGIT_NE:
-			case REOP_UTF8_ISNUMERIC_NE:
-				ismatch = digit != operand;
-				break;
-			case REOP_UTF8_ISDIGIT_LO:
-			case REOP_UTF8_ISNUMERIC_LO:
-				ismatch = digit < operand;
-				break;
-			case REOP_UTF8_ISDIGIT_LE:
-			case REOP_UTF8_ISNUMERIC_LE:
-				ismatch = digit <= operand;
-				break;
-			case REOP_UTF8_ISDIGIT_GR:
-			case REOP_UTF8_ISNUMERIC_GR:
-				ismatch = digit > operand;
-				break;
-			case REOP_UTF8_ISDIGIT_GE:
-			case REOP_UTF8_ISNUMERIC_GE:
-				ismatch = digit >= operand;
-				break;
-			default: __builtin_unreachable();
-			}
-			if (ismatch)
-				DISPATCH();
-			ONFAIL();
-		}
-
-
-
-
-		/************************************************************************/
-		/* ASCII character traits                                               */
-		/************************************************************************/
-		TARGET(REOP_TRAIT_ASCII_MIN ... REOP_ASCII_ISPRINT_NOT) {
-			static_assert(!REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISCNTRL));
-			static_assert(REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISCNTRL_NOT));
-			static_assert(!REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISSPACE));
-			static_assert(REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISSPACE_NOT));
-			static_assert(!REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISUPPER));
-			static_assert(REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISUPPER_NOT));
-			static_assert(!REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISLOWER));
-			static_assert(REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISLOWER_NOT));
-			static_assert(!REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISALPHA));
-			static_assert(REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISALPHA_NOT));
-			static_assert(!REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISDIGIT));
-			static_assert(REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISDIGIT_NOT));
-			static_assert(!REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISXDIGIT));
-			static_assert(REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISXDIGIT_NOT));
-			static_assert(!REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISALNUM));
-			static_assert(REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISALNUM_NOT));
-			static_assert(!REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISPUNCT));
-			static_assert(REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISPUNCT_NOT));
-			static_assert(!REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISGRAPH));
-			static_assert(REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISGRAPH_NOT));
-			static_assert(!REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISPRINT));
-			static_assert(REOP_TRAIT_ASCII_ISNOT(REOP_ASCII_ISPRINT_NOT));
-			byte_t ch;
-			byte_t ch_flags, trait;
-			if (re_interpreter_is_eoi(self))
-				ONFAIL();
-			ch       = re_interpreter_readbyte(self);
-			ch_flags = __ctype_C_flags[ch];
-			trait    = libre_ascii_traits[opcode - REOP_TRAIT_ASCII_MIN];
-			ch_flags &= trait;
-			if (REOP_TRAIT_ASCII_ISNOT(opcode)) {
-				if (ch_flags == 0)
-					DISPATCH();
-			} else {
-				if (ch_flags != 0)
-					DISPATCH();
-			}
-			ONFAIL();
-		}
-
-		TARGET(REOP_ASCII_ISSYMSTRT)
-		TARGET(REOP_ASCII_ISSYMSTRT_NOT)
-		TARGET(REOP_ASCII_ISSYMCONT)
-		TARGET(REOP_ASCII_ISSYMCONT_NOT) {
-			byte_t ch;
-			bool hastrait;
-			if (re_interpreter_is_eoi(self))
-				ONFAIL();
-			ch = re_interpreter_readbyte(self);
-			switch (opcode) {
-			case REOP_ASCII_ISSYMSTRT:
-			case REOP_ASCII_ISSYMSTRT_NOT:
-				hastrait = !!issymstrt(ch);
-				break;
-			case REOP_ASCII_ISSYMCONT:
-			case REOP_ASCII_ISSYMCONT_NOT:
-				hastrait = !!issymcont(ch);
-				break;
-			default: __builtin_unreachable();
-			}
-			if (REOP_TRAIT_ASCII_ISNOT(opcode)) {
-				if (!hastrait)
-					DISPATCH();
-			} else {
-				if (hastrait)
-					DISPATCH();
-			}
-			ONFAIL();
-		}
-
-
-
-
-		/************************************************************************/
-		/* Unicode character traits                                             */
-		/************************************************************************/
-		TARGET(REOP_TRAIT_UTF8_MIN ... REOP_TRAIT_UTF8_MAX) {
-			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISCNTRL));
-			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISCNTRL_NOT));
-			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISSPACE));
-			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISSPACE_NOT));
-			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISUPPER));
-			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISUPPER_NOT));
-			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISLOWER));
-			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISLOWER_NOT));
-			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISALPHA));
-			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISALPHA_NOT));
-			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISDIGIT));
-			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISDIGIT_NOT));
-			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISXDIGIT));
-			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISXDIGIT_NOT));
-			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISALNUM));
-			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISALNUM_NOT));
-			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISPUNCT));
-			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISPUNCT_NOT));
-			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISGRAPH));
-			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISGRAPH_NOT));
-			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISPRINT));
-			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISPRINT_NOT));
-			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISBLANK));
-			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISBLANK_NOT));
-			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISSYMSTRT));
-			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISSYMSTRT_NOT));
-			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISSYMCONT));
-			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISSYMCONT_NOT));
-			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISTAB));
-			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISTAB_NOT));
-			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISWHITE));
-			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISWHITE_NOT));
-			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISEMPTY));
-			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISEMPTY_NOT));
-			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISLF));
-			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISLF_NOT));
-			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISHEX));
-			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISHEX_NOT));
-			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISTITLE));
-			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISTITLE_NOT));
-			static_assert(!REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISNUMERIC));
-			static_assert(REOP_TRAIT_UTF8_ISNOT(REOP_UTF8_ISNUMERIC_NOT));
-			char32_t ch;
-			uint16_t ch_flags, trait;
-			if (re_interpreter_is_eoi(self))
-				ONFAIL();
-			ch       = re_interpreter_readutf8(self);
-			ch_flags = __unicode_descriptor(ch)->__ut_flags;
-			trait    = libre_unicode_traits[opcode - REOP_TRAIT_UTF8_MIN];
-			ch_flags &= trait;
-			if (REOP_TRAIT_UTF8_ISNOT(opcode)) {
-				if (ch_flags == 0)
-					DISPATCH();
-			} else {
-				if (ch_flags != 0)
-					DISPATCH();
-			}
-			ONFAIL();
-		}
-
 
 
 

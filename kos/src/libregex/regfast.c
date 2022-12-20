@@ -140,8 +140,9 @@ NOTHROW_NCX(CC re_code_setminmatch)(struct re_code *__restrict self,
 		self->rc_minmatch = minmatch;
 }
 
-INTDEF byte_t const libre_ascii_traits[];     /* from "./regexec.c" */
+/* Map `X - RECS_ISX_MIN' to `__UNICODE_IS*' flags. */
 INTDEF uint16_t const libre_unicode_traits[]; /* from "./regexec.c" */
+
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) uint8_t * /* from "./regcomp.c" */
 NOTHROW_NCX(CC libre_opcode_next)(uint8_t const *__restrict p_instr);
 
@@ -197,24 +198,20 @@ again:
 			goto again;
 		}
 
-		TARGET(REOP_ANY)
-		TARGET(REOP_ANY_NOTLF)
-		TARGET(REOP_ANY_NOTNUL)
-		TARGET(REOP_ANY_NOTNUL_NOTLF)
-		TARGET(REOP_ANY_NOTNUL_NOTLF_UTF8) {
+		TARGET(REOP_ANY_MIN ... REOP_ANY_MAX) {
 			curr_minmatch += 1;
 			goto again;
 		}
 
-		TARGET(REOP_CHAR)
-		TARGET(REOP_NCHAR) {
+		TARGET(REOP_BYTE)
+		TARGET(REOP_NBYTE) {
 			curr_minmatch += 1;
 			pc += 1;
 			goto again;
 		}
 
-		TARGET(REOP_CHAR2)
-		TARGET(REOP_NCHAR2)
+		TARGET(REOP_BYTE2)
+		TARGET(REOP_NBYTE2)
 		TARGET(REOP_RANGE)
 		TARGET(REOP_NRANGE) {
 			curr_minmatch += 1;
@@ -222,16 +219,12 @@ again:
 			goto again;
 		}
 
-		/* All of these opcode always match (at least) 1 character. */
+		/* All of these opcode always match (at least) 1 byte. */
 		TARGET(REOP_CONTAINS_UTF8)
-		TARGET(REOP_CONTAINS_UTF8_NOT)
-		TARGET(REOP_BITSET)
-		TARGET(REOP_BITSET_NOT)
-		TARGET(REOP_BITSET_UTF8_NOT)
-		TARGET(REOP_UTF8_ISDIGIT_cmp_MIN ... REOP_UTF8_ISDIGIT_cmp_MAX)
-		TARGET(REOP_UTF8_ISNUMERIC_cmp_MIN ... REOP_UTF8_ISNUMERIC_cmp_MAX)
-		TARGET(REOP_TRAIT_ASCII_MIN ... REOP_TRAIT_ASCII_MAX)
-		TARGET(REOP_TRAIT_UTF8_MIN ... REOP_TRAIT_UTF8_MAX) {
+		TARGET(REOP_NCONTAINS_UTF8)
+		TARGET(REOP_CS_BYTE)
+		TARGET(REOP_CS_UTF8)
+		TARGET(REOP_NCS_UTF8) {
 			curr_minmatch += 1;
 			pc = libre_opcode_next(opcode_start);
 			goto again;
@@ -377,6 +370,80 @@ NOTHROW_NCX(CC populate_fastmap_bibranch)(byte_t fmap[256],
 	}
 }
 
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) byte_t const *
+NOTHROW_NCX(CC cs_gather_matching_bytes)(bitstr_t matchend_bytes[],
+                                         byte_t const *__restrict pc,
+                                         bool is_unicode) {
+	byte_t cs_opcode;
+	while ((cs_opcode = *pc++) != RECS_DONE) {
+		switch (cs_opcode) {
+
+		case RECS_BITSET_MIN ... RECS_BITSET_MAX: {
+			uint8_t minch       = RECS_BITSET_GETBASE(cs_opcode);
+			uint8_t bitset_size = RECS_BITSET_GETBYTES(cs_opcode);
+			unsigned int i, bitset_bits = bitset_size * 8;
+			for (i = 0; i < bitset_bits; ++i) {
+				if ((pc[i / 8] & (1 << (i % 8))) != 0) {
+					bit_set(matchend_bytes, (byte_t)(i + minch));
+				}
+			}
+			pc += bitset_size;
+		}	break;
+
+		case RECS_CHAR:
+			bit_set(matchend_bytes, pc[0]);
+			pc += 1;
+			break;
+
+		case RECS_CHAR2:
+			bit_set(matchend_bytes, pc[0]);
+			bit_set(matchend_bytes, pc[1]);
+			pc += 2;
+			break;
+
+		case RECS_RANGE:
+			bit_nset(matchend_bytes, pc[0], (pc[1] - pc[0]) + 1);
+			pc += 2;
+			break;
+
+		case RECS_CONTAINS: {
+			uint8_t len = *pc++;
+			assert(len >= 1);
+			if (is_unicode) {
+				do {
+					char32_t ch;
+					ch = unicode_readutf8((char const **)&pc);
+					if (ch < 0x80)
+						bit_set(matchend_bytes, (byte_t)ch);
+				} while (--len);
+			} else {
+				do {
+					bit_set(matchend_bytes, pc[0]);
+					pc += 1;
+				} while (--len);
+			}
+		}	break;
+
+		case RECS_ISX_MIN ... RECS_ISX_MAX: {
+			byte_t i;
+			uint16_t traits = libre_unicode_traits[cs_opcode - RECS_ISX_MIN];
+			assertf(is_unicode, "Trait opcodes are only valid in unicode-mode");
+			for (i = 0; i < 0x80; ++i) {
+				uint16_t ch_flags;
+				ch_flags = __unicode_descriptor((char32_t)i)->__ut_flags;
+				ch_flags &= traits;
+				if (ch_flags != 0) {
+					bit_set(matchend_bytes, i);
+				}
+			}
+		}	break;
+
+		default: __builtin_unreachable();
+		}
+	}
+	return pc;
+}
+
 PRIVATE NONNULL((1, 2, 3, 4, 5)) void
 NOTHROW_NCX(CC populate_fastmap)(byte_t fmap[256],
                                  struct re_code *self,
@@ -430,13 +497,15 @@ again:
 			GOTMATCH();
 		}
 
-		TARGET(REOP_ANY) {
+		TARGET(REOP_ANY)
+		TARGET(REOP_ANY_UTF8) {
 			fastmap_setpcr(fmap, self, 0x00, 0xff, enter_pc);
 			minmatch = 1;
 			GOTMATCH();
 		}
 
-		TARGET(REOP_ANY_NOTLF) {
+		TARGET(REOP_ANY_NOTLF)
+		TARGET(REOP_ANY_NOTLF_UTF8) {
 			fastmap_setpcr(fmap, self, 0x00 + 0, 0x0a - 1, enter_pc);
 			fastmap_setpcr(fmap, self, 0x0a + 1, 0x0d - 1, enter_pc);
 			fastmap_setpcr(fmap, self, 0x0d + 1, 0xff + 0, enter_pc);
@@ -444,7 +513,8 @@ again:
 			GOTMATCH();
 		}
 
-		TARGET(REOP_ANY_NOTNUL) {
+		TARGET(REOP_ANY_NOTNUL)
+		TARGET(REOP_ANY_NOTNUL_UTF8) {
 			fastmap_setpcr(fmap, self, 0x01, 0xff, enter_pc);
 			minmatch = 1;
 			GOTMATCH();
@@ -459,21 +529,21 @@ again:
 			GOTMATCH();
 		}
 
-		TARGET(REOP_CHAR) {
+		TARGET(REOP_BYTE) {
 			fastmap_setpc(fmap, self, pc[0], enter_pc);
 			minmatch = 1;
 			pc += 1;
 			GOTMATCH();
 		}
 
-		TARGET(REOP_NCHAR) {
+		TARGET(REOP_NBYTE) {
 			fastmap_setpc_nbyte(fmap, self, pc[0], enter_pc);
 			minmatch = 1;
 			pc += 1;
 			GOTMATCH();
 		}
 
-		TARGET(REOP_CHAR2) {
+		TARGET(REOP_BYTE2) {
 			fastmap_setpc(fmap, self, pc[0], enter_pc);
 			fastmap_setpc(fmap, self, pc[1], enter_pc);
 			minmatch = 1;
@@ -481,7 +551,7 @@ again:
 			GOTMATCH();
 		}
 
-		TARGET(REOP_NCHAR2) {
+		TARGET(REOP_NBYTE2) {
 			fastmap_setpc_nbyte2(fmap, self, pc[0], pc[1], enter_pc);
 			minmatch = 1;
 			pc += 2;
@@ -516,7 +586,7 @@ again:
 			GOTMATCH();
 		}
 
-		TARGET(REOP_CONTAINS_UTF8_NOT) {
+		TARGET(REOP_NCONTAINS_UTF8) {
 			int bitno;
 			uint8_t count = getb();
 			bitstr_t bit_decl(acepted_bytes, 256);
@@ -533,40 +603,34 @@ again:
 			GOTMATCH();
 		}
 
-		TARGET(REOP_BITSET) {
-			uint8_t layout      = getb();
-			uint8_t minch       = REOP_BITSET_LAYOUT_GETBASE(layout);
-			uint8_t bitset_size = REOP_BITSET_LAYOUT_GETBYTES(layout);
-			unsigned int bitset_bits = bitset_size * 8;
+		TARGET(REOP_CS_BYTE)
+		TARGET(REOP_CS_UTF8)
+		TARGET(REOP_NCS_UTF8) {
 			unsigned int i;
-			assert(((unsigned int)minch + (unsigned int)bitset_size) <= 0x100);
-			for (i = 0; i < bitset_bits; ++i) {
-				if ((pc[i / 8] & (1 << (i % 8))) != 0) {
-					fastmap_setpc(fmap, self, (byte_t)(minch + i), enter_pc);
-				}
+			bitstr_t bit_decl(matchend_bytes, 256);
+			bit_clearall(matchend_bytes, 256);
+			pc = cs_gather_matching_bytes(matchend_bytes, pc,
+			                              opcode == REOP_CS_UTF8 ||
+			                              opcode == REOP_NCS_UTF8);
+			switch (opcode) {
+			case REOP_CS_BYTE:
+				break;
+			case REOP_CS_UTF8:
+				/* Compiler would have used `REOP_CS_BYTE' if no unicode chars that could match. */
+				bit_nset(matchend_bytes, 0xc0, 0xff);
+				break;
+			case REOP_NCS_UTF8:
+				/* Flip the meaning of matched bytes. */
+				bit_flipall(matchend_bytes, 256);
+				/* Compiler would have used `REOP_CS_BYTE' if no unicode chars that could match. */
+				bit_nset(matchend_bytes, 0xc0, 0xff);
+				break;
+			default: __builtin_unreachable();
+			}
+			bit_foreach (i, matchend_bytes, 256) {
+				fastmap_setpc(fmap, self, (byte_t)i, enter_pc);
 			}
 			minmatch = 1;
-			pc += bitset_size;
-			GOTMATCH();
-		}
-
-		TARGET(REOP_BITSET_UTF8_NOT)
-			fastmap_setpcr(fmap, self, 0xc0, 0xff, enter_pc);
-			ATTR_FALLTHROUGH
-		TARGET(REOP_BITSET_NOT) {
-			uint8_t layout      = getb();
-			uint8_t minch       = REOP_BITSET_LAYOUT_GETBASE(layout);
-			uint8_t bitset_size = REOP_BITSET_LAYOUT_GETBYTES(layout);
-			unsigned int bitset_bits = bitset_size * 8;
-			unsigned int i;
-			assert(((unsigned int)minch + (unsigned int)bitset_size) <= 0x100);
-			for (i = 0; i < bitset_bits; ++i) {
-				if ((pc[i / 8] & (1 << (i % 8))) == 0) {
-					fastmap_setpc(fmap, self, (byte_t)(minch + i), enter_pc);
-				}
-			}
-			minmatch = 1;
-			pc += bitset_size;
 			GOTMATCH();
 		}
 
@@ -581,124 +645,6 @@ again:
 			 * so  we can unconditionally follow the special epsilon-jmp */
 			pc += REOP_GROUP_MATCH_Joff(opcode);
 			goto again;
-		}
-
-		/* Numerical attribute classes */
-		TARGET(REOP_UTF8_ISDIGIT_cmp_MIN ... REOP_UTF8_ISDIGIT_cmp_MAX)
-		TARGET(REOP_UTF8_ISNUMERIC_cmp_MIN ... REOP_UTF8_ISNUMERIC_cmp_MAX) {
-			byte_t operand = '0' + getb();
-			fastmap_setpcr(fmap, self, 0xc0, 0xff, enter_pc);
-			if (operand <= 9) {
-				switch (opcode) {
-				case REOP_UTF8_ISDIGIT_EQ:
-				case REOP_UTF8_ISNUMERIC_EQ:
-					fastmap_setpc(fmap, self, operand, enter_pc);
-					break;
-				case REOP_UTF8_ISDIGIT_NE:
-				case REOP_UTF8_ISNUMERIC_NE:
-					fastmap_setpcr(fmap, self, '0', operand - 1, enter_pc);
-					fastmap_setpcr(fmap, self, operand + 1, '9', enter_pc);
-					break;
-				case REOP_UTF8_ISDIGIT_LO:
-				case REOP_UTF8_ISNUMERIC_LO:
-					fastmap_setpcr(fmap, self, '0', operand - 1, enter_pc);
-					break;
-				case REOP_UTF8_ISDIGIT_LE:
-				case REOP_UTF8_ISNUMERIC_LE:
-					fastmap_setpcr(fmap, self, '0', operand, enter_pc);
-					break;
-				case REOP_UTF8_ISDIGIT_GR:
-				case REOP_UTF8_ISNUMERIC_GR:
-					fastmap_setpcr(fmap, self, operand + 1, '9', enter_pc);
-					break;
-				case REOP_UTF8_ISDIGIT_GE:
-				case REOP_UTF8_ISNUMERIC_GE:
-					fastmap_setpcr(fmap, self, operand, '9', enter_pc);
-					break;
-				default: __builtin_unreachable();
-				}
-			} else {
-				switch (opcode) {
-				case REOP_UTF8_ISDIGIT_NE:
-				case REOP_UTF8_ISNUMERIC_NE:
-				case REOP_UTF8_ISDIGIT_LO:
-				case REOP_UTF8_ISNUMERIC_LO:
-				case REOP_UTF8_ISDIGIT_LE:
-				case REOP_UTF8_ISNUMERIC_LE:
-					fastmap_setpcr(fmap, self, '0', '9', enter_pc);
-					break;
-				case REOP_UTF8_ISDIGIT_EQ:
-				case REOP_UTF8_ISNUMERIC_EQ:
-				case REOP_UTF8_ISDIGIT_GR:
-				case REOP_UTF8_ISNUMERIC_GR:
-				case REOP_UTF8_ISDIGIT_GE:
-				case REOP_UTF8_ISNUMERIC_GE:
-					break;
-				default: __builtin_unreachable();
-				}
-			}
-			minmatch = 1;
-			GOTMATCH();
-		}
-
-		TARGET(REOP_TRAIT_ASCII_MIN ... REOP_ASCII_ISPRINT_NOT) {
-			byte_t flags, trait;
-			unsigned int i;
-			trait = libre_ascii_traits[opcode - REOP_TRAIT_ASCII_MIN];
-			for (i = 0; i < 256; ++i) {
-				flags = __ctype_C_flags[i];
-				flags &= trait;
-				if (REOP_TRAIT_ASCII_ISNOT(opcode))
-					flags = !flags;
-				if (flags != 0)
-					fastmap_setpc(fmap, self, (byte_t)i, enter_pc);
-			}
-			minmatch = 1;
-			GOTMATCH();
-		}
-
-		TARGET(REOP_ASCII_ISSYMSTRT)
-		TARGET(REOP_ASCII_ISSYMSTRT_NOT)
-		TARGET(REOP_ASCII_ISSYMCONT)
-		TARGET(REOP_ASCII_ISSYMCONT_NOT) {
-			unsigned int i;
-			for (i = 0; i < 256; ++i) {
-				bool hastrait;
-				switch (opcode) {
-				case REOP_ASCII_ISSYMSTRT:
-				case REOP_ASCII_ISSYMSTRT_NOT:
-					hastrait = !!issymstrt((unsigned char)i);
-					break;
-				case REOP_ASCII_ISSYMCONT:
-				case REOP_ASCII_ISSYMCONT_NOT:
-					hastrait = !!issymcont((unsigned char)i);
-					break;
-				default: __builtin_unreachable();
-				}
-				if (REOP_TRAIT_ASCII_ISNOT(opcode))
-					hastrait = !hastrait;
-				if (hastrait)
-					fastmap_setpc(fmap, self, (byte_t)i, enter_pc);
-			}
-			minmatch = 1;
-			GOTMATCH();
-		}
-
-		TARGET(REOP_TRAIT_UTF8_MIN ... REOP_TRAIT_UTF8_MAX) {
-			unsigned int i;
-			uint16_t ch_flags, trait;
-			trait = libre_unicode_traits[opcode - REOP_TRAIT_UTF8_MIN];
-			for (i = 0x00; i < 0x80; ++i) {
-				ch_flags = __unicode_descriptor((char32_t)i)->__ut_flags;
-				ch_flags &= trait;
-				if (REOP_TRAIT_UTF8_ISNOT(opcode))
-					ch_flags = !ch_flags;
-				if (ch_flags != 0)
-					fastmap_setpc(fmap, self, (byte_t)i, enter_pc);
-			}
-			fastmap_setpcr(fmap, self, 0xc0, 0xff, enter_pc);
-			minmatch = 1;
-			GOTMATCH();
 		}
 
 		TARGET(REOP_AT_MIN ... REOP_AT_MAX) {
