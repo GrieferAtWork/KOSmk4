@@ -69,8 +69,8 @@ typedef int re_errno_t;
  *     >> "[a-z]"                REOP_BITSET "[a-z]"      (NOTE: multi-byte utf-8 characters are encoded using `REOP_CONTAINS_UTF8')
  *     >> "[^a-z]"               REOP_BITSET_NOT "[a-z]"  (NOTE: multi-byte utf-8 characters are encoded using `REOP_NCONTAINS_UTF8')
  *     >> "\<1-9>"               REOP_GROUP_MATCH <1-9>   // Replaced by `REOP_GROUP_MATCH_Jn' if followed by a repeat-suffix
- *     >> "\w"                   <[[:symcont:]]>          (HINT: Also allowed in []-sets when RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS)
- *     >> "\W"                   <[^[:symcont:]]>         (HINT: Also allowed in []-sets when RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS)
+ *     >> "\w"                   <[[:symcont:]]>          (HINT: Also allowed in []-sets when RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS && !RE_SYNTAX_NO_KOS_OPS)
+ *     >> "\W"                   <[^[:symcont:]]>         (HINT: Also allowed in []-sets when RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS && !RE_SYNTAX_NO_KOS_OPS)
  *     >> "\n"                   <[[:lf:]]>               (HINT: Also allowed in []-sets when RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS)     [kos-extension]
  *     >> "\N"                   <[^[:lf:]]>              (HINT: Also allowed in []-sets when RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS)     [kos-extension]
  *     >> "[[:<foo>:]]"          REOP_UTF8_IS<foo>                                                                                     [some classes are kos extensions]

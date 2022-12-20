@@ -411,6 +411,31 @@ NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self) {
 				return RE_TOKEN_BKREF_1 + (ch - '1');
 			break;
 
+		case '0': {
+			uint32_t ord;
+			unsigned int i, ndigits;
+			if (self->rep_syntax & RE_SYNTAX_NO_KOS_OPS)
+				break;
+			ord     = 0;
+			ndigits = 3;
+			for (i = 0; i < ndigits; ++i, ++self->rep_pos) {
+				uint8_t nibble;
+				char octchar = *self->rep_pos;
+				if (octchar >= '0' && octchar <= '7') {
+					nibble = (uint8_t)(octchar - '0');
+				} else {
+					break;
+				}
+				ord <<= 3;
+				ord |= nibble;
+			}
+			if (ord >= 0x80) {
+				ord -= 0x80;
+				ord += RE_TOKEN_BYTE80h_MIN;
+			}
+			return ord;
+		}	break;
+
 		case 'u':
 		case 'U':
 			if (self->rep_syntax & RE_SYNTAX_NO_UTF8)
@@ -1339,6 +1364,105 @@ PRIVATE uint8_t const ctype_c_trait_masks[] = {
 #undef DEF_CTYPE_TRAIT_MASK
 };
 
+/* Yield a charset literal. Returns:
+ * - A unicode ordinal  (return < RE_TOKEN_BASE)
+ * - A raw byte literal (return >= RE_TOKEN_BYTE80h_MIN && return <= RE_TOKEN_BYTE80h_MAX)
+ * - RE_TOKEN_UNMATCHED_BK when an unmatched '\' is encountered
+ */
+PRIVATE WUNUSED NONNULL((1)) char32_t
+NOTHROW_NCX(CC re_parser_yield_cs_literal)(struct re_parser *__restrict self) {
+	unsigned char ch;
+	ch = (unsigned char)*self->rep_pos++;
+	if (ch >= 0x80) {
+decpos_and_readutf8:
+		--self->rep_pos;
+		return unicode_readutf8((char const **)&self->rep_pos);
+	}
+	if ((ch == '\\') &&
+	    (self->rep_syntax & (RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS | RE_SYNTAX_NO_KOS_OPS)) ==
+	    /*               */ (RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS)) {
+		ch = (unsigned char)*self->rep_pos++;
+		switch (ch) {
+
+		case '\0':
+			self->rep_pos -= 2; /* Keep on repeating this token! */
+			return RE_TOKEN_UNMATCHED_BK;
+
+		case '0': {
+			uint32_t ord;
+			unsigned int i, ndigits;
+			if (self->rep_syntax & RE_SYNTAX_NO_KOS_OPS)
+				break;
+			ord     = 0;
+			ndigits = 3;
+			for (i = 0; i < ndigits; ++i, ++self->rep_pos) {
+				uint8_t nibble;
+				char octchar = *self->rep_pos;
+				if (octchar >= '0' && octchar <= '7') {
+					nibble = (uint8_t)(octchar - '0');
+				} else {
+					break;
+				}
+				ord <<= 3;
+				ord |= nibble;
+			}
+			if (ord >= 0x80) {
+				ord -= 0x80;
+				ord += RE_TOKEN_BYTE80h_MIN;
+			}
+			return ord;
+		}	break;
+
+		case 'u':
+		case 'U':
+			if (self->rep_syntax & RE_SYNTAX_NO_UTF8)
+				break;
+			ATTR_FALLTHROUGH
+		case 'x': {
+			uint32_t ord;
+			unsigned int i, ndigits;
+			if (self->rep_syntax & RE_SYNTAX_NO_KOS_OPS)
+				break;
+			ndigits = ch == 'U' ? 8 : ch == 'u' ? 4 : 2;
+			ord     = 0;
+			for (i = 0; i < ndigits; ++i, ++self->rep_pos) {
+				uint8_t nibble;
+				char hexchar = *self->rep_pos;
+				if (!__libc_hex2int(hexchar, &nibble)) {
+					self->rep_pos -= i;
+					goto default_escaped_char;
+				}
+				ord <<= 4;
+				ord |= nibble;
+			}
+			if unlikely(ord >= RE_TOKEN_BASE) {
+				/* Guard against illegal unicode characters. */
+				self->rep_pos -= ndigits;
+				goto default_escaped_char;
+			}
+			if (ch == 'x') {
+				/* Special case: This one's 80h-FFh must be encoded as `RE_TOKEN_BYTE80h_MIN',
+				 *               as it's not supposed to  match U+0080-U+00FF, but rather  the
+				 *               raw bytes 80h-FFh. */
+				if (ord >= 0x80) {
+					ord -= 0x80;
+					ord += RE_TOKEN_BYTE80h_MIN;
+				}
+			}
+			return ord;
+		}	break;
+
+		case 0x80 ... 0xff:
+			goto decpos_and_readutf8;
+
+		default:
+default_escaped_char:
+			break;
+		}
+	}
+	return ch;
+}
+
 PRIVATE WUNUSED NONNULL((1)) re_errno_t
 NOTHROW_NCX(CC re_compiler_compile_set)(struct re_compiler *__restrict self) {
 #define CHARSET_COUNT ((RECS_ISX_MAX - RECS_ISX_MIN) + 1)
@@ -1346,11 +1470,10 @@ NOTHROW_NCX(CC re_compiler_compile_set)(struct re_compiler *__restrict self) {
 	bitstr_t bit_decl(charsets, CHARSET_COUNT);
 	struct unicode_charset uchars; /* Extra unicode characters to add to the set. */
 	bool negate     = false;
-	char const *pat = self->rec_parser.rep_pos;
 	size_t start_offset; /* Set code start offset (offset of `REOP_[N]CS_*' opcode) */
-	if (*pat == '^') {
+	if (*self->rec_parser.rep_pos == '^') {
 		negate = true;
-		++pat;
+		++self->rec_parser.rep_pos;
 	}
 
 	/* By default, we don't match any bytes. */
@@ -1364,34 +1487,36 @@ NOTHROW_NCX(CC re_compiler_compile_set)(struct re_compiler *__restrict self) {
 
 	/* Special case: if the character immediately after the open '[' is
 	 * either ']' or '-', it will  not have its usual special  meaning. */
-	if (*pat == ']' || *pat == '-') {
-		bit_set(bytes, *pat);
-		++pat;
+	if (*self->rec_parser.rep_pos == ']' || *self->rec_parser.rep_pos == '-') {
+		bit_set(bytes, *self->rec_parser.rep_pos);
+		++self->rec_parser.rep_pos;
 	}
 
 loop_next:
 	for (;;) {
-		unsigned char ch = (unsigned char)*pat++;
+		char32_t uchar, hichar;
+		unsigned char ch;
+		ch = (unsigned char)*self->rec_parser.rep_pos++;
 		switch (ch) {
 
 		case '\0':
 			goto err_EEND;
 
 		case ']':
-			self->rec_parser.rep_pos = pat;
 			goto done_loop;
 
 		case '[':
-			if ((*pat == ':') &&
-			    (self->rec_parser.rep_syntax & RE_SYNTAX_CHAR_CLASSES)) {
+			if ((self->rec_parser.rep_syntax & RE_SYNTAX_CHAR_CLASSES) &&
+			    (*self->rec_parser.rep_pos == ':')) {
 				/* character classes */
 				uint8_t cs_opcode;
-				char *csend;
-				pat += 1;
-				csend = strchr(pat, ':');
+				char const *csend, *csstart;
+				self->rec_parser.rep_pos += 1;
+				csstart = self->rec_parser.rep_pos;
+				csend   = strchr(csstart, ':');
 				if unlikely(!csend)
 					goto err_EEND;
-				cs_opcode = charset_find(pat, (size_t)(csend - pat));
+				cs_opcode = charset_find(csstart, (size_t)(csend - csstart));
 				if unlikely(cs_opcode == RECS_DONE)
 					goto err_ECTYPE;
 				if (self->rec_parser.rep_syntax & RE_SYNTAX_ICASE) {
@@ -1403,7 +1528,7 @@ loop_next:
 				if unlikely(*csend != ']')
 					goto err_BADPAT;
 				csend += 1;
-				pat = csend;
+				self->rec_parser.rep_pos = csend;
 
 				/* Add the selected charset to the collection of ones that have been used. */
 				bit_set(charsets, cs_opcode - RECS_ISX_MIN);
@@ -1414,44 +1539,96 @@ loop_next:
 		case '\\':
 			if (self->rec_parser.rep_syntax & RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS) {
 				/* Special case: backslash-escape sequences are allowed in charsets */
-				/* TODO */
+				ch = (unsigned char)*self->rec_parser.rep_pos++;
+				if unlikely(ch == '\0')
+					goto err_EEND;
+				if (!(self->rec_parser.rep_syntax & RE_SYNTAX_NO_KOS_OPS)) {
+					switch (ch) {
+
+					case '\0':
+						goto err_EEND;
+
+					case 'w':
+					case 'W':
+						/* TODO */
+						break;
+
+					case 'n':
+					case 'N':
+						/* TODO */
+						break;
+
+					case 's':
+					case 'S':
+						/* TODO */
+						break;
+
+					case 'd':
+					case 'D':
+						/* TODO */
+						break;
+
+					case '0':
+					case 'u':
+					case 'U':
+					case 'x':
+						self->rec_parser.rep_pos -= 2;
+						uchar = re_parser_yield_cs_literal(&self->rec_parser);
+						if unlikely(uchar == RE_TOKEN_UNMATCHED_BK)
+							goto err_EESCAPE;
+						if (RE_TOKEN_ISBYTE80h(uchar)) {
+							ch = (unsigned char)(byte_t)RE_TOKEN_GETBYTE80h(uchar);
+							goto encode_byte_ch;
+						}
+						goto encode_uchar;
+
+					default: break;
+					}
+				}
+				goto encode_literal;
 			}
 			goto encode_literal;
 
 		default:
 encode_literal:
 			if (ch >= 0x80 && !(self->rec_parser.rep_syntax & RE_SYNTAX_NO_UTF8)) {
-				char32_t lochar;
-				--pat;
-				lochar = unicode_readutf8((char const **)&pat);
-				if unlikely(lochar < 0x80) {
-					ch = (unsigned char)lochar;
-					goto encode_ascii_ch;
+				--self->rec_parser.rep_pos;
+				uchar = unicode_readutf8((char const **)&self->rec_parser.rep_pos);
+encode_uchar:
+				if unlikely(uchar < 0x80) {
+					ch = (unsigned char)uchar;
+					goto encode_byte_ch;
 				}
-				if (pat[0] == '-' && pat[1] != ']') {
+				if (self->rec_parser.rep_pos[0] == '-' &&
+				    self->rec_parser.rep_pos[1] != ']') {
 					/* Unicode character range. */
-					char32_t hichar;
-					++pat; /* Skip over '-' character */
-					hichar = unicode_readutf8((char const **)&pat);
-					if (hichar < lochar) {
+					++self->rec_parser.rep_pos; /* Skip over '-' character */
+					hichar = re_parser_yield_cs_literal(&self->rec_parser);
+					if unlikely(hichar == RE_TOKEN_UNMATCHED_BK)
+						goto err_EESCAPE;
+					if (RE_TOKEN_ISBYTE80h(hichar))
+						goto handle_bad_unicode_range; /* Something like "[ä-\xAB]" isn't allowed */
+encode_unicode_range:
+					if (hichar < uchar) {
+handle_bad_unicode_range:
 						/* Bad range lo/hi bounds */
 						if (self->rec_parser.rep_syntax & RE_SYNTAX_NO_EMPTY_RANGES)
 							goto err_ERANGE;
 						goto loop_next; /* Ignore range. */
 					}
 					if (self->rec_parser.rep_syntax & RE_SYNTAX_ICASE) {
-						lochar = unicode_tolower(lochar);
+						uchar = unicode_tolower(uchar);
 						hichar = unicode_tolower(hichar);
-						if unlikely(lochar > hichar)
-							tswap(char32_t, lochar, hichar);
+						if unlikely(uchar > hichar)
+							tswap(char32_t, uchar, hichar);
 					}
 
 					/* Special case: "[ä-ä]" is encoded as "[ä]" */
-					if (lochar == hichar)
+					if (uchar == hichar)
 						goto add_lochar_to_unicode_charset;
 
 					/* Directly encode the utf-8 sequence length. */
-					if unlikely(!re_compiler_cs_encode_unirange(self, lochar, hichar))
+					if unlikely(!re_compiler_cs_encode_unirange(self, uchar, hichar))
 						goto err_nomem;
 					goto loop_next;
 				}
@@ -1460,30 +1637,46 @@ encode_literal:
 add_lochar_to_unicode_charset:
 				if (self->rec_parser.rep_syntax & RE_SYNTAX_ICASE) {
 					char32_t chars[4];
-					chars[0] = lochar;
-					chars[1] = unicode_tolower(lochar);
-					chars[2] = unicode_toupper(lochar);
-					chars[3] = unicode_totitle(lochar);
+					chars[0] = uchar;
+					chars[1] = unicode_tolower(uchar);
+					chars[2] = unicode_toupper(uchar);
+					chars[3] = unicode_totitle(uchar);
 					if unlikely(unicode_charset_insertall(&uchars, chars, 4) < 0)
 						goto err_nomem;
 				} else {
-					if unlikely(unicode_charset_insert(&uchars, lochar) < 0)
+					if unlikely(unicode_charset_insert(&uchars, uchar) < 0)
 						goto err_nomem;
 				}
 				goto loop_next;
 			}
-encode_ascii_ch:
-			if (pat[0] == '-' && pat[1] != ']') {
+encode_byte_ch:
+			if (self->rec_parser.rep_pos[0] == '-' &&
+			    self->rec_parser.rep_pos[1] != ']') {
 				/* Ascii character range. */
-				unsigned char hichar = (unsigned char)pat[1];
-				pat += 2;
-				if (hichar < ch) {
+				unsigned char hibyte;
+				++self->rec_parser.rep_pos;
+				hichar = re_parser_yield_cs_literal(&self->rec_parser);
+				if unlikely(hichar == RE_TOKEN_UNMATCHED_BK)
+					goto err_EESCAPE;
+				if (RE_TOKEN_ISBYTE80h(hichar)) {
+					hibyte = RE_TOKEN_GETBYTE80h(hichar);
+				} else if (RE_TOKEN_ISUTF8(hichar)) {
+					if unlikely(ch >= 0x80)
+						goto handle_bad_byte_range; /* Something like "[\xAB-ä]" isn't allowed */
+					/* Handle something like "[a-ä]" */
+					uchar = (char32_t)ch;
+					goto encode_unicode_range;
+				} else {
+					hibyte = (unsigned char)hichar;
+				}
+				if (hibyte < ch) {
+handle_bad_byte_range:
 					/* Bad range lo/hi bounds */
 					if (self->rec_parser.rep_syntax & RE_SYNTAX_NO_EMPTY_RANGES)
 						goto err_ERANGE;
 					goto loop_next; /* Ignore range. */
 				}
-				bit_nset(bytes, ch, hichar);
+				bit_nset(bytes, ch, hibyte);
 			} else {
 				bit_set(bytes, ch);
 			}
@@ -1775,6 +1968,9 @@ done:
 		re_errno_t error;
 err_nomem:
 		error = RE_ESPACE;
+		goto _err_common;
+err_EESCAPE:
+		error = RE_EESCAPE;
 		goto _err_common;
 err_BADPAT:
 		error = RE_BADPAT;

@@ -1102,9 +1102,10 @@ dispatch:
 			for (;;) {
 				char32_t other_ch;
 				other_ch = unicode_readutf8((char const **)&newpc);
+				--count;
 				if (ch == other_ch)
 					break;
-				if (!--count)
+				if (!count)
 					ONFAIL();
 			}
 			/* Consume remaining characters */

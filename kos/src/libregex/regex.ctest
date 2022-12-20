@@ -221,6 +221,27 @@ DEFINE_TEST(regex) {
 	EQ(-RE_NOMATCH, re_match_syntax("[[:hex:]]+", "_abcdefABCDEF", 0));
 	EQ(-RE_NOMATCH, re_match_syntax("[[:hex:]]+", "_abcdefABCDEF", RE_SYNTAX_NO_UTF8));
 	EQ(14, re_match_syntax("[[:hex:]ä]+", "äabcdefABCDEF_", 0));
+	EQ(3, re_match_syntax("[^[:lower:]Ä]+", "FOOÄBAR", 0));
+	EQ(8, re_match_syntax("[^[:lower:]]+", "FOOÄBAR", 0));
+
+	/* Byte-escapes must work properly */
+	EQ(2, re_match_syntax("\\xAB\\xCD", "\xAB\xCD\xCD\xEF", 0));
+	EQ(3, re_match_syntax("\\xAB\\xCD+", "\xAB\xCD\xCD\xEF", 0));
+	EQ(1, re_match_syntax("[\\xAB\\xCD]", "\xAB\xCD\xCD\xEF", 0));
+	EQ(1, re_match_syntax("[\\xAB\\xCD]", "\xCD\xAB\xCD\xEF", 0));
+	EQ(3, re_match_syntax("[\\xAB\\xCD]+", "\xAB\xCD\xCD\xEF", 0));
+
+	/* Unicode-escape must also work (and not get confused for byte-escape) */
+	EQ(4, re_match_syntax("\\u00AB\\u00CD", "«ÍÍï", 0));
+	EQ(4, re_match_syntax("\\U000000AB\\U000000CD", "«ÍÍï", 0));
+	EQ(6, re_match_syntax("\\u00AB\\u00CD+", "«ÍÍï", 0));
+	EQ(6, re_match_syntax("\\U000000AB\\U000000CD+", "«ÍÍï", 0));
+	EQ(2, re_match_syntax("[\\u00AB\\u00CD]", "«ÍÍï", 0));
+	EQ(2, re_match_syntax("[\\U000000AB\\U000000CD]", "«ÍÍï", 0));
+	EQ(2, re_match_syntax("[\\u00AB\\u00CD]", "Í«Íï", 0));
+	EQ(2, re_match_syntax("[\\U000000AB\\U000000CD]", "Í«Íï", 0));
+	EQ(6, re_match_syntax("[\\u00AB\\u00CD]+", "«ÍÍï", 0));
+	EQ(6, re_match_syntax("[\\U000000AB\\U000000CD]+", "«ÍÍï", 0));
 
 	/* Cleanup */
 	EQ(0, dlclose(libregex));
