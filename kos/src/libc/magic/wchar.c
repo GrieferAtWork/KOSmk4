@@ -2322,11 +2322,17 @@ wcsrstrip(*) %{generate(str2wcs("strrstrip"))}
 wcsstrip(*) %{generate(str2wcs("strstrip"))}
 
 
-
+@@>> wmemcasecmp(3)
+[[wchar]]
+wmemcasecmp(*) %{generate(str2wcs("memcasecmp"))}
 
 %
 %#ifdef __USE_XOPEN2K8
 %[default:section(".text.crt{|.dos}.wchar.unicode.locale.memory")]
+
+@@>> wmemcasecmp_l(3)
+[[wchar]]
+wmemcasecmp_l(*) %{generate(str2wcs("memcasecmp_l"))}
 
 @@>> wcsncoll_l(3)
 [[wchar, dos_export_alias("_wcsncoll_l")]]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf45cee19 */
+/* HASH CRC-32:0xfc964dd4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4010,8 +4010,24 @@ __CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1),wchar_t *,__NOTHROW_NCX
 /* >> wcsstrip(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(wcsstrip, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) wchar_t *__NOTHROW_NCX(__LIBCCALL wcsstrip)(wchar_t *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsstrip))(__str); })
 #endif /* !__CRT_HAVE_wcsstrip */
+#ifdef __CRT_HAVE_wmemcasecmp
+/* >> wmemcasecmp(3) */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,wmemcasecmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars),(__s1,__s2,__num_chars))
+#else /* __CRT_HAVE_wmemcasecmp */
+#include <libc/local/wchar/wmemcasecmp.h>
+/* >> wmemcasecmp(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wmemcasecmp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL wmemcasecmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemcasecmp))(__s1, __s2, __num_chars); })
+#endif /* !__CRT_HAVE_wmemcasecmp */
 
 #ifdef __USE_XOPEN2K8
+#ifdef __CRT_HAVE_wmemcasecmp_l
+/* >> wmemcasecmp_l(3) */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,wmemcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars, __locale_t __locale),(__s1,__s2,__num_chars,__locale))
+#else /* __CRT_HAVE_wmemcasecmp_l */
+#include <libc/local/wchar/wmemcasecmp_l.h>
+/* >> wmemcasecmp_l(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wmemcasecmp_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL wmemcasecmp_l)(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemcasecmp_l))(__s1, __s2, __num_chars, __locale); })
+#endif /* !__CRT_HAVE_wmemcasecmp_l */
 #ifdef __CRT_HAVE_wcsncoll_l
 /* >> wcsncoll_l(3) */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,wcsncoll_l,(wchar_t const *__s1, wchar_t const *__s2, __SIZE_TYPE__ __maxlen, __locale_t __locale),(__s1,__s2,__maxlen,__locale))

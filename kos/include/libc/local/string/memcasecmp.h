@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd6052a93 */
+/* HASH CRC-32:0x6dd918e2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,22 +44,31 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_tolower_defined */
 __LOCAL_LIBC(memcasecmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcasecmp))(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes) {
-	__BYTE_TYPE__ const *__p1 = (__BYTE_TYPE__ const *)__s1;
-	__BYTE_TYPE__ const *__p2 = (__BYTE_TYPE__ const *)__s2;
-	__BYTE_TYPE__ __v1, __v2;
-	__v1 = __v2 = 0;
-	while (__n_bytes--) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcasecmp))(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars) {
+	unsigned char const *__p1 = (unsigned char const *)__s1;
+	unsigned char const *__p2 = (unsigned char const *)__s2;
+	unsigned char __v1, __v2;
+	__v1 = 0;
+	__v2 = 0;
+	while (__num_chars--) {
 		__v1 = *__p1++;
 		__v2 = *__p2++;
 		if (__v1 != __v2) {
-			__v1 = (__BYTE_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_tolower)(__v1);
-			__v2 = (__BYTE_TYPE__)(__NAMESPACE_LOCAL_SYM __localdep_tolower)(__v2);
+			__v1 = (unsigned char)(__NAMESPACE_LOCAL_SYM __localdep_tolower)(__v1);
+			__v2 = (unsigned char)(__NAMESPACE_LOCAL_SYM __localdep_tolower)(__v2);
 			if (__v1 != __v2)
 				break;
 		}
 	}
+#if __SIZEOF_INT__ > 1
 	return (int)__v1 - (int)__v2;
+#else /* __SIZEOF_INT__ > 1 */
+	if (__v1 < __v2)
+		return -1;
+	if (__v1 > __v2)
+		return 1;
+	return 0;
+#endif /* __SIZEOF_INT__ <= 1 */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_memcasecmp_defined

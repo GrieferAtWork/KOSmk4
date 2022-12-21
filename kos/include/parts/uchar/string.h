@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1b9547d */
+/* HASH CRC-32:0x354aeee0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3605,7 +3605,67 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) cha
 /* >> wcsstrip(3) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(c32strip, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_IN(1) char32_t *__NOTHROW_NCX(__LIBKCALL c32strip)(char32_t *__str) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32strip))(__str); })
 #endif /* !... */
+#if defined(__CRT_HAVE_wmemcasecmp) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+/* >> wmemcasecmp(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c16memcasecmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars),wmemcasecmp,(__s1,__s2,__num_chars))
+#elif defined(__CRT_HAVE_DOS$wmemcasecmp)
+/* >> wmemcasecmp(3) */
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c16memcasecmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars),wmemcasecmp,(__s1,__s2,__num_chars))
+#elif __SIZEOF_WCHAR_T__ == 2
+#include <libc/local/wchar/wmemcasecmp.h>
+/* >> wmemcasecmp(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBDCALL c16memcasecmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemcasecmp))(__s1, __s2, __num_chars); }
+#else /* ... */
+#include <libc/local/parts.uchar.string/c16memcasecmp.h>
+/* >> wmemcasecmp(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16memcasecmp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBDCALL c16memcasecmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16memcasecmp))(__s1, __s2, __num_chars); })
+#endif /* !... */
+#if defined(__CRT_HAVE_wmemcasecmp) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+/* >> wmemcasecmp(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c32memcasecmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars),wmemcasecmp,(__s1,__s2,__num_chars))
+#elif defined(__CRT_HAVE_KOS$wmemcasecmp)
+/* >> wmemcasecmp(3) */
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c32memcasecmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars),wmemcasecmp,(__s1,__s2,__num_chars))
+#elif __SIZEOF_WCHAR_T__ == 4
+#include <libc/local/wchar/wmemcasecmp.h>
+/* >> wmemcasecmp(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBKCALL c32memcasecmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemcasecmp))(__s1, __s2, __num_chars); }
+#else /* ... */
+#include <libc/local/parts.uchar.string/c32memcasecmp.h>
+/* >> wmemcasecmp(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32memcasecmp, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBKCALL c32memcasecmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32memcasecmp))(__s1, __s2, __num_chars); })
+#endif /* !... */
 #ifdef __USE_XOPEN2K8
+#if defined(__CRT_HAVE_wmemcasecmp_l) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
+/* >> wmemcasecmp_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c16memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars, __locale_t __locale),wmemcasecmp_l,(__s1,__s2,__num_chars,__locale))
+#elif defined(__CRT_HAVE_DOS$wmemcasecmp_l)
+/* >> wmemcasecmp_l(3) */
+__CREDIRECT_DOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c16memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars, __locale_t __locale),wmemcasecmp_l,(__s1,__s2,__num_chars,__locale))
+#elif __SIZEOF_WCHAR_T__ == 2
+#include <libc/local/wchar/wmemcasecmp_l.h>
+/* >> wmemcasecmp_l(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBDCALL c16memcasecmp_l)(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemcasecmp_l))(__s1, __s2, __num_chars, __locale); }
+#else /* ... */
+#include <libc/local/parts.uchar.string/c16memcasecmp_l.h>
+/* >> wmemcasecmp_l(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16memcasecmp_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBDCALL c16memcasecmp_l)(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16memcasecmp_l))(__s1, __s2, __num_chars, __locale); })
+#endif /* !... */
+#if defined(__CRT_HAVE_wmemcasecmp_l) && __SIZEOF_WCHAR_T__ == 4 && defined(__LIBCCALL_IS_LIBKCALL)
+/* >> wmemcasecmp_l(3) */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c32memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars, __locale_t __locale),wmemcasecmp_l,(__s1,__s2,__num_chars,__locale))
+#elif defined(__CRT_HAVE_KOS$wmemcasecmp_l)
+/* >> wmemcasecmp_l(3) */
+__CREDIRECT_KOS(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,c32memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars, __locale_t __locale),wmemcasecmp_l,(__s1,__s2,__num_chars,__locale))
+#elif __SIZEOF_WCHAR_T__ == 4
+#include <libc/local/wchar/wmemcasecmp_l.h>
+/* >> wmemcasecmp_l(3) */
+__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBKCALL c32memcasecmp_l)(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wmemcasecmp_l))(__s1, __s2, __num_chars, __locale); }
+#else /* ... */
+#include <libc/local/parts.uchar.string/c32memcasecmp_l.h>
+/* >> wmemcasecmp_l(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32memcasecmp_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBKCALL c32memcasecmp_l)(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32memcasecmp_l))(__s1, __s2, __num_chars, __locale); })
+#endif /* !... */
 #if defined(__CRT_HAVE_wcscasestr_l) && __SIZEOF_WCHAR_T__ == 2 && defined(__LIBCCALL_IS_LIBDCALL)
 /* >> wcscasestr_l(3) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),char16_t *,__NOTHROW_NCX,c16casestr_l,(char16_t const *__haystack, char16_t const *__needle, __locale_t __locale),wcscasestr_l,(__haystack,__needle,__locale))

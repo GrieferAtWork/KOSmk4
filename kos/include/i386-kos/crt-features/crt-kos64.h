@@ -6020,6 +6020,8 @@
 #define __CRT_HAVE_wlchown
 #define __CRT_HAVE_wlink
 #define __CRT_HAVE_wlinkat
+#define __CRT_HAVE_wmemcasecmp
+#define __CRT_HAVE_wmemcasecmp_l
 #define __CRT_HAVE_wmemchr
 #define __CRT_HAVE_wmemcmp
 #define __CRT_HAVE_wmemcpy
@@ -10721,6 +10723,8 @@
 #define __CRT_HAVE_KOS$wlchown
 #define __CRT_HAVE_KOS$wlink
 #define __CRT_HAVE_KOS$wlinkat
+#define __CRT_HAVE_KOS$wmemcasecmp
+#define __CRT_HAVE_KOS$wmemcasecmp_l
 #define __CRT_HAVE_KOS$wmemchr
 #define __CRT_HAVE_KOS$wmemcmp
 #define __CRT_HAVE_KOS$wmemcpy
@@ -15350,6 +15354,8 @@
 #define __CRT_HAVE_DOS$wlchown
 #define __CRT_HAVE_DOS$wlink
 #define __CRT_HAVE_DOS$wlinkat
+#define __CRT_HAVE_DOS$wmemcasecmp
+#define __CRT_HAVE_DOS$wmemcasecmp_l
 #define __CRT_HAVE_DOS$wmemchr
 #define __CRT_HAVE_DOS$wmemcmp
 #define __CRT_HAVE_DOS$wmemcpy

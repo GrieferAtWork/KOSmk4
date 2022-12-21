@@ -195,8 +195,13 @@ c32rstrip(*) %{uchar32("wcsrstrip")}
 c16strip(*) %{uchar16("wcsstrip")}
 c32strip(*) %{uchar32("wcsstrip")}
 
+c16memcasecmp(*) %{uchar16("wmemcasecmp")}
+c32memcasecmp(*) %{uchar32("wmemcasecmp")}
 
 %#ifdef __USE_XOPEN2K8
+c16memcasecmp_l(*) %{uchar16("wmemcasecmp_l")}
+c32memcasecmp_l(*) %{uchar32("wmemcasecmp_l")}
+
 c16casestr_l(*) %{uchar16("wcscasestr_l")}
 c32casestr_l(*) %{uchar32("wcscasestr_l")}
 c16casecmp_l(*) %{uchar16("wcscasecmp_l")}

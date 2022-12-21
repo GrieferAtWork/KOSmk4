@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b9faeae */
+/* HASH CRC-32:0x1dc11340 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,25 +22,44 @@
 #define __local_strcasestr_l_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_strcasecmp_l_defined
-#define __local___localdep_strcasecmp_l_defined
-#ifdef __CRT_HAVE_strcasecmp_l
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),strcasecmp_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE__stricmp_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),_stricmp_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE___strcasecmp_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),__strcasecmp_l,(__s1,__s2,__locale))
+#ifndef __local___localdep_memcasecmp_l_defined
+#define __local___localdep_memcasecmp_l_defined
+#ifdef __CRT_HAVE_memcasecmp_l
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars, __locale_t __locale),memcasecmp_l,(__s1,__s2,__num_chars,__locale))
+#elif defined(__CRT_HAVE__memicmp_l)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars, __locale_t __locale),_memicmp_l,(__s1,__s2,__num_chars,__locale))
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/string/strcasecmp_l.h>
+#include <libc/local/string/memcasecmp_l.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_strcasecmp_l __LIBC_LOCAL_NAME(strcasecmp_l)
+#define __localdep_memcasecmp_l __LIBC_LOCAL_NAME(memcasecmp_l)
 #endif /* !... */
-#endif /* !__local___localdep_strcasecmp_l_defined */
+#endif /* !__local___localdep_memcasecmp_l_defined */
+#ifndef __local___localdep_strlen_defined
+#define __local___localdep_strlen_defined
+#ifdef __CRT_HAVE_strlen
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
+#else /* __CRT_HAVE_strlen */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/strlen.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
+#endif /* !__CRT_HAVE_strlen */
+#endif /* !__local___localdep_strlen_defined */
 __LOCAL_LIBC(strcasestr_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcasestr_l))(char const *__haystack, char const *__needle, __locale_t __locale) {
+	__SIZE_TYPE__ __needle_len = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__needle);
 	for (; *__haystack; ++__haystack) {
-		if ((__NAMESPACE_LOCAL_SYM __localdep_strcasecmp_l)(__haystack, __needle, __locale) == 0)
+		if ((__NAMESPACE_LOCAL_SYM __localdep_memcasecmp_l)(__haystack, __needle, __needle_len * sizeof(char), __locale) == 0)
 			return (char *)__haystack;
 	}
 	return __NULLPTR;

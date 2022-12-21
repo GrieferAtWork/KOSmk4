@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa8ad684 */
+/* HASH CRC-32:0xda6e7838 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2036,10 +2036,10 @@ INTDEF ATTR_LEAF ATTR_RETNONNULL ATTR_OUTS(1, 3) NONNULL((1)) void *NOTHROW_NCX(
 INTDEF ATTR_LEAF ATTR_RETNONNULL ATTR_OUTS(1, 3) NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_mempatq)(void *__restrict dst, uint64_t pattern, size_t n_bytes);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> memcasecmp(3), memcasecmp_l(3) */
-INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_memcasecmp)(void const *s1, void const *s2, size_t n_bytes);
+INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_memcasecmp)(void const *s1, void const *s2, size_t num_chars);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 /* >> memcasecmp(3), memcasecmp_l(3) */
-INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_memcasecmp)(void const *s1, void const *s2, size_t n_bytes);
+INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_memcasecmp)(void const *s1, void const *s2, size_t num_chars);
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> memcasemem(3), memcasemem_l(3)
  * Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
@@ -2066,11 +2066,11 @@ INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) void *NOT
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> memcasecmp(3), memcasecmp_l(3) */
-INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_memcasecmp_l)(void const *s1, void const *s2, size_t n_bytes, locale_t locale);
+INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_memcasecmp_l)(void const *s1, void const *s2, size_t num_chars, locale_t locale);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> memcasecmp(3), memcasecmp_l(3) */
-INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_memcasecmp_l)(void const *s1, void const *s2, size_t n_bytes, locale_t locale);
+INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_memcasecmp_l)(void const *s1, void const *s2, size_t num_chars, locale_t locale);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> memcasemem(3), memcasemem_l(3)

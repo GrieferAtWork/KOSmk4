@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x801dd44c */
+/* HASH CRC-32:0xfc4f8af4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -617,6 +617,14 @@ INTDEF ATTR_RETNONNULL WUNUSED ATTR_IN(1) char32_t *NOTHROW_NCX(LIBKCALL libc_wc
 INTDEF ATTR_RETNONNULL WUNUSED ATTR_IN(1) char16_t *NOTHROW_NCX(LIBDCALL libd_wcsstrip)(char16_t *str);
 /* >> wcsstrip(3) */
 INTDEF ATTR_RETNONNULL WUNUSED ATTR_IN(1) char32_t *NOTHROW_NCX(LIBKCALL libc_wcsstrip)(char32_t *str);
+/* >> wmemcasecmp(3) */
+INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_wmemcasecmp)(void const *s1, void const *s2, size_t num_chars);
+/* >> wmemcasecmp(3) */
+INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(LIBKCALL libc_wmemcasecmp)(void const *s1, void const *s2, size_t num_chars);
+/* >> wmemcasecmp_l(3) */
+INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_wmemcasecmp_l)(void const *s1, void const *s2, size_t num_chars, locale_t locale);
+/* >> wmemcasecmp_l(3) */
+INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(LIBKCALL libc_wmemcasecmp_l)(void const *s1, void const *s2, size_t num_chars, locale_t locale);
 /* >> wcsncoll_l(3) */
 INTDEF ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int NOTHROW_NCX(LIBDCALL libd_wcsncoll_l)(char16_t const *s1, char16_t const *s2, size_t maxlen, locale_t locale);
 /* >> wcsncoll_l(3) */

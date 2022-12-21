@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1cc57da */
+/* HASH CRC-32:0x21506c52 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -5334,8 +5334,9 @@ NOTHROW_NCX(LIBKCALL libc_wcsnupr)(char32_t *__restrict str,
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcscasestr)(char16_t const *haystack,
                                       char16_t const *needle) {
+	size_t needle_len = libd_wcslen(needle);
 	for (; *haystack; ++haystack) {
-		if (libd_wcscasecmp(haystack, needle) == 0)
+		if (libd_wmemcasecmp(haystack, needle, needle_len * sizeof(char16_t)) == 0)
 			return (char16_t *)haystack;
 	}
 	return NULL;
@@ -5344,8 +5345,9 @@ NOTHROW_NCX(LIBDCALL libd_wcscasestr)(char16_t const *haystack,
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcscasestr)(char32_t const *haystack,
                                       char32_t const *needle) {
+	size_t needle_len = libc_wcslen(needle);
 	for (; *haystack; ++haystack) {
-		if (libc_wcscasecmp(haystack, needle) == 0)
+		if (libc_wmemcasecmp(haystack, needle, needle_len * sizeof(char32_t)) == 0)
 			return (char32_t *)haystack;
 	}
 	return NULL;
@@ -6292,6 +6294,84 @@ NOTHROW_NCX(LIBKCALL libc_wcsstrip)(char32_t *str) {
 	str = libc_wcsrstrip(str);
 	return str;
 }
+/* >> wmemcasecmp(3) */
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
+NOTHROW_NCX(LIBDCALL libd_wmemcasecmp)(void const *s1,
+                                       void const *s2,
+                                       size_t num_chars) {
+	char16_t const *p1 = (char16_t const *)s1;
+	char16_t const *p2 = (char16_t const *)s2;
+	char16_t v1, v2;
+	v1 = 0;
+	v2 = 0;
+	while (num_chars--) {
+		v1 = *p1++;
+		v2 = *p2++;
+		if (v1 != v2) {
+			v1 = (char16_t)libd_towlower(v1);
+			v2 = (char16_t)libd_towlower(v2);
+			if (v1 != v2)
+				break;
+		}
+	}
+#if __SIZEOF_INT__ > 2
+	return (int)v1 - (int)v2;
+#else /* __SIZEOF_INT__ > 2 */
+	if (v1 < v2)
+		return -1;
+	if (v1 > v2)
+		return 1;
+	return 0;
+#endif /* __SIZEOF_INT__ <= 2 */
+}
+/* >> wmemcasecmp(3) */
+INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
+NOTHROW_NCX(LIBKCALL libc_wmemcasecmp)(void const *s1,
+                                       void const *s2,
+                                       size_t num_chars) {
+	char32_t const *p1 = (char32_t const *)s1;
+	char32_t const *p2 = (char32_t const *)s2;
+	char32_t v1, v2;
+	v1 = 0;
+	v2 = 0;
+	while (num_chars--) {
+		v1 = *p1++;
+		v2 = *p2++;
+		if (v1 != v2) {
+			v1 = (char32_t)libc_towlower(v1);
+			v2 = (char32_t)libc_towlower(v2);
+			if (v1 != v2)
+				break;
+		}
+	}
+#if __SIZEOF_INT__ > 4
+	return (int)v1 - (int)v2;
+#else /* __SIZEOF_INT__ > 4 */
+	if (v1 < v2)
+		return -1;
+	if (v1 > v2)
+		return 1;
+	return 0;
+#endif /* __SIZEOF_INT__ <= 4 */
+}
+/* >> wmemcasecmp_l(3) */
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
+NOTHROW_NCX(LIBDCALL libd_wmemcasecmp_l)(void const *s1,
+                                         void const *s2,
+                                         size_t num_chars,
+                                         locale_t locale) {
+	(void)locale;
+	return libd_wmemcasecmp(s1, s2, num_chars);
+}
+/* >> wmemcasecmp_l(3) */
+INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
+NOTHROW_NCX(LIBKCALL libc_wmemcasecmp_l)(void const *s1,
+                                         void const *s2,
+                                         size_t num_chars,
+                                         locale_t locale) {
+	(void)locale;
+	return libc_wmemcasecmp(s1, s2, num_chars);
+}
 /* >> wcsncoll_l(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wcsncoll_l)(char16_t const *s1,
@@ -6429,8 +6509,9 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memor
 NOTHROW_NCX(LIBDCALL libd_wcscasestr_l)(char16_t const *haystack,
                                         char16_t const *needle,
                                         locale_t locale) {
+	size_t needle_len = libd_wcslen(needle);
 	for (; *haystack; ++haystack) {
-		if (libd_wcscasecmp_l(haystack, needle, locale) == 0)
+		if (libd_wmemcasecmp_l(haystack, needle, needle_len * sizeof(char16_t), locale) == 0)
 			return (char16_t *)haystack;
 	}
 	return NULL;
@@ -6440,8 +6521,9 @@ INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_PURE WUNUSED A
 NOTHROW_NCX(LIBKCALL libc_wcscasestr_l)(char32_t const *haystack,
                                         char32_t const *needle,
                                         locale_t locale) {
+	size_t needle_len = libc_wcslen(needle);
 	for (; *haystack; ++haystack) {
-		if (libc_wcscasecmp_l(haystack, needle, locale) == 0)
+		if (libc_wmemcasecmp_l(haystack, needle, needle_len * sizeof(char32_t), locale) == 0)
 			return (char32_t *)haystack;
 	}
 	return NULL;
@@ -7358,6 +7440,10 @@ DEFINE_PUBLIC_ALIAS(DOS$wcsrstrip, libd_wcsrstrip);
 DEFINE_PUBLIC_ALIAS(wcsrstrip, libc_wcsrstrip);
 DEFINE_PUBLIC_ALIAS(DOS$wcsstrip, libd_wcsstrip);
 DEFINE_PUBLIC_ALIAS(wcsstrip, libc_wcsstrip);
+DEFINE_PUBLIC_ALIAS(DOS$wmemcasecmp, libd_wmemcasecmp);
+DEFINE_PUBLIC_ALIAS(wmemcasecmp, libc_wmemcasecmp);
+DEFINE_PUBLIC_ALIAS(DOS$wmemcasecmp_l, libd_wmemcasecmp_l);
+DEFINE_PUBLIC_ALIAS(wmemcasecmp_l, libc_wmemcasecmp_l);
 DEFINE_PUBLIC_ALIAS(DOS$_wcsncoll_l, libd_wcsncoll_l);
 DEFINE_PUBLIC_ALIAS(DOS$wcsncoll_l, libd_wcsncoll_l);
 DEFINE_PUBLIC_ALIAS(wcsncoll_l, libc_wcsncoll_l);

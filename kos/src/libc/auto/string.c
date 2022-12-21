@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc326669f */
+/* HASH CRC-32:0x324af415 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -673,8 +673,9 @@ NOTHROW_NCX(LIBCCALL libc_memmem)(void const *haystack,
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) char *
 NOTHROW_NCX(LIBCCALL libc_strcasestr)(char const *haystack,
                                       char const *needle) {
+	size_t needle_len = libc_strlen(needle);
 	for (; *haystack; ++haystack) {
-		if (libc_strcasecmp(haystack, needle) == 0)
+		if (libc_memcasecmp(haystack, needle, needle_len * sizeof(char)) == 0)
 			return (char *)haystack;
 	}
 	return NULL;
@@ -5077,22 +5078,31 @@ NOTHROW_NCX(LIBCCALL libc_mempatq)(void *__restrict dst,
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_memcasecmp)(void const *s1,
                                       void const *s2,
-                                      size_t n_bytes) {
-	byte_t const *p1 = (byte_t const *)s1;
-	byte_t const *p2 = (byte_t const *)s2;
-	byte_t v1, v2;
-	v1 = v2 = 0;
-	while (n_bytes--) {
+                                      size_t num_chars) {
+	unsigned char const *p1 = (unsigned char const *)s1;
+	unsigned char const *p2 = (unsigned char const *)s2;
+	unsigned char v1, v2;
+	v1 = 0;
+	v2 = 0;
+	while (num_chars--) {
 		v1 = *p1++;
 		v2 = *p2++;
 		if (v1 != v2) {
-			v1 = (byte_t)libc_tolower(v1);
-			v2 = (byte_t)libc_tolower(v2);
+			v1 = (unsigned char)libc_tolower(v1);
+			v2 = (unsigned char)libc_tolower(v2);
 			if (v1 != v2)
 				break;
 		}
 	}
+#if __SIZEOF_INT__ > 1
 	return (int)v1 - (int)v2;
+#else /* __SIZEOF_INT__ > 1 */
+	if (v1 < v2)
+		return -1;
+	if (v1 > v2)
+		return 1;
+	return 0;
+#endif /* __SIZEOF_INT__ <= 1 */
 }
 #ifndef __KERNEL__
 #include <features.h>
@@ -5144,10 +5154,10 @@ got_candidate:
 INTERN ATTR_SECTION(".text.crt.unicode.locale.memory") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
 NOTHROW_NCX(LIBCCALL libc_memcasecmp_l)(void const *s1,
                                         void const *s2,
-                                        size_t n_bytes,
+                                        size_t num_chars,
                                         locale_t locale) {
 	(void)locale;
-	return libc_memcasecmp(s1, s2, n_bytes);
+	return libc_memcasecmp(s1, s2, num_chars);
 }
 #include <features.h>
 /* >> memcasemem(3), memcasemem_l(3)
@@ -5201,8 +5211,9 @@ INTERN ATTR_SECTION(".text.crt.unicode.locale.memory") ATTR_PURE WUNUSED ATTR_IN
 NOTHROW_NCX(LIBCCALL libc_strcasestr_l)(char const *haystack,
                                         char const *needle,
                                         locale_t locale) {
+	size_t needle_len = libc_strlen(needle);
 	for (; *haystack; ++haystack) {
-		if (libc_strcasecmp_l(haystack, needle, locale) == 0)
+		if (libc_memcasecmp_l(haystack, needle, needle_len * sizeof(char), locale) == 0)
 			return (char *)haystack;
 	}
 	return NULL;

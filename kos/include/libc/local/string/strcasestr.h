@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8d8277a */
+/* HASH CRC-32:0xe8ace07b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,33 +22,49 @@
 #define __local_strcasestr_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_strcasecmp_defined
-#define __local___localdep_strcasecmp_defined
-#if __has_builtin(__builtin_strcasecmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcasecmp)
-__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_strcasecmp,(char const *__s1, char const *__s2),strcasecmp,{ return __builtin_strcasecmp(__s1, __s2); })
-#elif defined(__CRT_HAVE_strcasecmp)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_strcasecmp,(char const *__s1, char const *__s2),strcasecmp,(__s1,__s2))
-#elif defined(__CRT_HAVE__stricmp)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_strcasecmp,(char const *__s1, char const *__s2),_stricmp,(__s1,__s2))
-#elif defined(__CRT_HAVE__strcmpi)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_strcasecmp,(char const *__s1, char const *__s2),_strcmpi,(__s1,__s2))
-#elif defined(__CRT_HAVE_stricmp)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_strcasecmp,(char const *__s1, char const *__s2),stricmp,(__s1,__s2))
-#elif defined(__CRT_HAVE_strcmpi)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_strcasecmp,(char const *__s1, char const *__s2),strcmpi,(__s1,__s2))
-#elif defined(__CRT_HAVE___strcasecmp)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_strcasecmp,(char const *__s1, char const *__s2),__strcasecmp,(__s1,__s2))
+#ifndef __local___localdep_memcasecmp_defined
+#define __local___localdep_memcasecmp_defined
+#ifdef __CRT_HAVE_memcasecmp
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars),memcasecmp,(__s1,__s2,__num_chars))
+#elif defined(__CRT_HAVE_memicmp)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars),memicmp,(__s1,__s2,__num_chars))
+#elif defined(__CRT_HAVE__memicmp)
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars),_memicmp,(__s1,__s2,__num_chars))
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <libc/local/string/strcasecmp.h>
+#include <libc/local/string/memcasecmp.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_strcasecmp __LIBC_LOCAL_NAME(strcasecmp)
+#define __localdep_memcasecmp __LIBC_LOCAL_NAME(memcasecmp)
 #endif /* !... */
-#endif /* !__local___localdep_strcasecmp_defined */
+#endif /* !__local___localdep_memcasecmp_defined */
+#ifndef __local___localdep_strlen_defined
+#define __local___localdep_strlen_defined
+#ifdef __CRT_HAVE_strlen
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
+#else /* __CRT_HAVE_strlen */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/strlen.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
+#endif /* !__CRT_HAVE_strlen */
+#endif /* !__local___localdep_strlen_defined */
 __LOCAL_LIBC(strcasestr) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcasestr))(char const *__haystack, char const *__needle) {
+	__SIZE_TYPE__ __needle_len = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__needle);
 	for (; *__haystack; ++__haystack) {
-		if ((__NAMESPACE_LOCAL_SYM __localdep_strcasecmp)(__haystack, __needle) == 0)
+		if ((__NAMESPACE_LOCAL_SYM __localdep_memcasecmp)(__haystack, __needle, __needle_len * sizeof(char)) == 0)
 			return (char *)__haystack;
 	}
 	return __NULLPTR;

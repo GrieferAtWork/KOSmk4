@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56208bba */
+/* HASH CRC-32:0x7f884c82 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,25 +22,39 @@
 #define __local_wcscasestr_l_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_wcscasecmp_l_defined
-#define __local___localdep_wcscasecmp_l_defined
-#ifdef __CRT_HAVE_wcscasecmp_l
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_wcscasecmp_l,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __locale_t __locale),wcscasecmp_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE__wcsicmp_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_wcscasecmp_l,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __locale_t __locale),_wcsicmp_l,(__s1,__s2,__locale))
-#elif defined(__CRT_HAVE___wcscasecmp_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_wcscasecmp_l,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __locale_t __locale),__wcscasecmp_l,(__s1,__s2,__locale))
-#else /* ... */
+#ifndef __local___localdep_wcslen_defined
+#define __local___localdep_wcslen_defined
+#ifdef __CRT_HAVE_wcslen
 __NAMESPACE_LOCAL_END
-#include <libc/local/wchar/wcscasecmp_l.h>
+#include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-#define __localdep_wcscasecmp_l __LIBC_LOCAL_NAME(wcscasecmp_l)
-#endif /* !... */
-#endif /* !__local___localdep_wcscasecmp_l_defined */
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcslen,(__WCHAR_TYPE__ const *__restrict __str),wcslen,(__str))
+#else /* __CRT_HAVE_wcslen */
+__NAMESPACE_LOCAL_END
+#include <libc/local/wchar/wcslen.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_wcslen __LIBC_LOCAL_NAME(wcslen)
+#endif /* !__CRT_HAVE_wcslen */
+#endif /* !__local___localdep_wcslen_defined */
+#ifndef __local___localdep_wmemcasecmp_l_defined
+#define __local___localdep_wmemcasecmp_l_defined
+#ifdef __CRT_HAVE_wmemcasecmp_l
+__NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 3) __ATTR_INS(2, 3) __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wmemcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_chars, __locale_t __locale),wmemcasecmp_l,(__s1,__s2,__num_chars,__locale))
+#else /* __CRT_HAVE_wmemcasecmp_l */
+__NAMESPACE_LOCAL_END
+#include <libc/local/wchar/wmemcasecmp_l.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_wmemcasecmp_l __LIBC_LOCAL_NAME(wmemcasecmp_l)
+#endif /* !__CRT_HAVE_wmemcasecmp_l */
+#endif /* !__local___localdep_wmemcasecmp_l_defined */
 __LOCAL_LIBC(wcscasestr_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcscasestr_l))(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__needle, __locale_t __locale) {
+	__SIZE_TYPE__ __needle_len = (__NAMESPACE_LOCAL_SYM __localdep_wcslen)(__needle);
 	for (; *__haystack; ++__haystack) {
-		if ((__NAMESPACE_LOCAL_SYM __localdep_wcscasecmp_l)(__haystack, __needle, __locale) == 0)
+		if ((__NAMESPACE_LOCAL_SYM __localdep_wmemcasecmp_l)(__haystack, __needle, __needle_len * sizeof(__WCHAR_TYPE__), __locale) == 0)
 			return (__WCHAR_TYPE__ *)__haystack;
 	}
 	return __NULLPTR;

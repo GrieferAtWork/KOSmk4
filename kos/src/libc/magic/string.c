@@ -1288,8 +1288,9 @@ void *memrchr([[in(n_bytes)]] void const *__restrict haystack, int needle, $size
 	[([[in]] char *haystack, [[in]] char const *needle): [[nullable]] char *]
 	[([[in]] char const *haystack, [[in]] char const *needle): [[nullable]] char const *]
 {
+	size_t needle_len = strlen(needle);
 	for (; *haystack; ++haystack) {
-		if (strcasecmp(haystack, needle) == 0)
+		if (memcasecmp(haystack, needle, needle_len * sizeof(char)) == 0)
 			return (char *)haystack;
 	}
 	return NULL;
@@ -6508,23 +6509,32 @@ void *__NOTHROW_NCX(mempsetc)(void *__restrict __dst, __T __byte, size_t __word_
 [[if(!defined(__KERNEL__)), export_as("memicmp")]]
 [[if(!defined(__KERNEL__)), dos_only_export_as("_memicmp")]]
 [[section(".text.crt{|.dos}.unicode.static.memory")]]
-int memcasecmp([[in(n_bytes)]] void const *s1,
-               [[in(n_bytes)]] void const *s2, $size_t n_bytes) {
-	byte_t const *p1 = (byte_t const *)s1;
-	byte_t const *p2 = (byte_t const *)s2;
-	byte_t v1, v2;
-	v1 = v2 = 0;
-	while (n_bytes--) {
+int memcasecmp([[in(num_chars)]] void const *s1,
+               [[in(num_chars)]] void const *s2, $size_t num_chars) {
+	unsigned char const *p1 = (unsigned char const *)s1;
+	unsigned char const *p2 = (unsigned char const *)s2;
+	unsigned char v1, v2;
+	v1 = 0;
+	v2 = 0;
+	while (num_chars--) {
 		v1 = *p1++;
 		v2 = *p2++;
 		if (v1 != v2) {
-			v1 = (byte_t)tolower(v1);
-			v2 = (byte_t)tolower(v2);
+			v1 = (unsigned char)tolower(v1);
+			v2 = (unsigned char)tolower(v2);
 			if (v1 != v2)
 				break;
 		}
 	}
+@@pp_if __SIZEOF_CHAR__ < __SIZEOF_INT__@@
 	return (int)v1 - (int)v2;
+@@pp_else@@
+	if (v1 < v2)
+		return -1;
+	if (v1 > v2)
+		return 1;
+	return 0;
+@@pp_endif@@
 }
 
 
@@ -6581,11 +6591,11 @@ got_candidate:
 [[decl_include("<hybrid/typecore.h>"), doc_alias("memcasecmp")]]
 [[pure, wunused, dos_only_export_alias("_memicmp_l")]]
 [[section(".text.crt{|.dos}.unicode.locale.memory")]]
-int memcasecmp_l([[in(n_bytes)]] void const *s1,
-                 [[in(n_bytes)]] void const *s2,
-                 $size_t n_bytes, $locale_t locale) {
+int memcasecmp_l([[in(num_chars)]] void const *s1,
+                 [[in(num_chars)]] void const *s2,
+                 $size_t num_chars, $locale_t locale) {
 	(void)locale;
-	return memcasecmp(s1, s2, n_bytes);
+	return memcasecmp(s1, s2, num_chars);
 }
 
 
@@ -6635,8 +6645,9 @@ char *strcasestr_l([[in]] char const *haystack, [[in]] char const *needle, $loca
 	[([[in]] char *haystack, [[in]] char const *needle, $locale_t locale): char *]
 	[([[in]] char const *haystack, [[in]] char const *needle, $locale_t locale): char const *]
 {
+	size_t needle_len = strlen(needle);
 	for (; *haystack; ++haystack) {
-		if (strcasecmp_l(haystack, needle, locale) == 0)
+		if (memcasecmp_l(haystack, needle, needle_len * sizeof(char), locale) == 0)
 			return (char *)haystack;
 	}
 	return NULL;
