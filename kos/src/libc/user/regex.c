@@ -656,7 +656,7 @@ NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict self,
 	struct iovec iov[1];
 	ssize_t status;
 	if unlikely(!libregex_load())
-		return -2;
+		return REG_ENOSYS;
 
 	/* If compiled with `REG_NOSUB', don't fill in `pmatch' */
 	if (self->no_sub)
