@@ -2726,7 +2726,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			label_1 = writer;
 			writer += expr_size;
 			if (expression_matches_epsilon)
-				re_compiler_set_group_epsilon_jmp(writer - 2, 6);
+				re_compiler_set_group_epsilon_jmp(writer - 2, 3 + 3);
 
 			/* REOP_MAYBE_POP_ONFAIL */
 			*writer++ = REOP_MAYBE_POP_ONFAIL;
@@ -2764,7 +2764,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			label_1 = writer;
 			writer += expr_size;
 			if (expression_matches_epsilon)
-				re_compiler_set_group_epsilon_jmp(writer - 2, 6);
+				re_compiler_set_group_epsilon_jmp(writer - 2, 3 + 3);
 
 			/* REOP_MAYBE_POP_ONFAIL */
 			*writer++ = REOP_MAYBE_POP_ONFAIL;
@@ -2813,7 +2813,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			label_2 = writer;
 			writer += expr_size;
 			if (expression_matches_epsilon)
-				re_compiler_set_group_epsilon_jmp(writer - 2, 10);
+				re_compiler_set_group_epsilon_jmp(writer - 2, 3 + 4 + 3);
 
 			/* REOP_MAYBE_POP_ONFAIL */
 			*writer++ = REOP_MAYBE_POP_ONFAIL;
@@ -2902,7 +2902,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		label_1 = writer;
 		writer += expr_size;
 		if (expression_matches_epsilon)
-			re_compiler_set_group_epsilon_jmp(writer - 2, 7);
+			re_compiler_set_group_epsilon_jmp(writer - 2, 3 + 4);
 
 		/* REOP_MAYBE_POP_ONFAIL */
 		*writer++ = REOP_MAYBE_POP_ONFAIL;
@@ -2978,7 +2978,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			label_1 = writer;
 			writer += expr_size;
 			if (expression_matches_epsilon)
-				re_compiler_set_group_epsilon_jmp(writer - 2, 7);
+				re_compiler_set_group_epsilon_jmp(writer - 2, 3 + 4);
 
 			/* REOP_MAYBE_POP_ONFAIL */
 			*writer++ = REOP_MAYBE_POP_ONFAIL;
@@ -3076,7 +3076,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		label_2 = writer;
 		writer += expr_size;
 		if (expression_matches_epsilon)
-			re_compiler_set_group_epsilon_jmp(writer - 2, 11);
+			re_compiler_set_group_epsilon_jmp(writer - 2, 3 + 4 + 4);
 
 		/* REOP_MAYBE_POP_ONFAIL */
 		*writer++ = REOP_MAYBE_POP_ONFAIL;
