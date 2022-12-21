@@ -171,7 +171,9 @@ __CSDECLARE(,struct in6_addr const,in6addr_loopback) /* ::1 */
 #define INET_ADDRSTRLEN  16
 #define INET6_ADDRSTRLEN 46
 
-}%(auto_source){
+}
+%[declare_known_section_class(".crt.net.inet.6")]
+%(auto_source){
 #ifndef __KERNEL__
 INTDEF struct in6_addr const libc_in6addr_any;
 INTDEF struct in6_addr const libc_in6addr_loopback;

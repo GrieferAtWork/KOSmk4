@@ -78,7 +78,9 @@ SECTIONS {
 	} PHDR(text)
 
 	.text : {
-		*(.text.__x86.*)
+#if defined(__i386__) || defined(__x86_64__)
+		*(.text.__x86.* .text.__x86)
+#endif /* __i386__ || __x86_64__ */
 #ifdef NEED___libc_errno_access_core_start
 		/* Hacky premature declaration of sections so we can let  the
 		 * linker calculate the bounding address range which needs to

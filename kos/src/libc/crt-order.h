@@ -314,7 +314,7 @@
 	CB(PREFIX.crt.net.rpc) \
 	CB(PREFIX.crt.net.db) \
 	CB(PREFIX.crt.net.interface) \
-	CB(PREFIX.crt.net.convert PREFIX.crt.net.inet.6.RFC_2292 PREFIX.crt.net.inet.6.RFC_3542 PREFIX.crt.net.inet.6.bind_reserved PREFIX.crt.net.inet.6.ipv4_source_filter PREFIX.crt.net.inet.6.source_filter PREFIX.crt.net.nameser) \
+	CB(PREFIX.crt.net.convert PREFIX.crt.net.inet.6 PREFIX.crt.net.inet.6.RFC_2292 PREFIX.crt.net.inet.6.RFC_3542 PREFIX.crt.net.inet.6.bind_reserved PREFIX.crt.net.inet.6.ipv4_source_filter PREFIX.crt.net.inet.6.source_filter PREFIX.crt.net.nameser) \
 	CB(PREFIX.crt.application.options) \
 	CB(PREFIX.crt.io.tty) \
 	CB(PREFIX.crt.random.random PREFIX.crt.random.srandom PREFIX.crt.random) \
