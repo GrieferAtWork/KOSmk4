@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7af6849a */
+/* HASH CRC-32:0xc4f98701 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,12 +74,12 @@ __NAMESPACE_LOCAL_END
 #ifndef ____vfwscanf_getc_defined
 #define ____vfwscanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__
+#if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_WINT_T__
 __LOCAL_LIBC(vfwscanf_getc) __format_word_t
 (__FORMATPRINTER_CC __vfwscanf_getc)(void *__arg) {
 	return (__format_word_t)(__NAMESPACE_LOCAL_SYM __localdep_fgetwc)((__FILE *)__arg);
 }
-#endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__ */
+#endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_WINT_T__ */
 __LOCAL_LIBC(vfwscanf_ungetc) __SSIZE_TYPE__
 (__FORMATPRINTER_CC __vfwscanf_ungetc)(void *__arg, __format_word_t __word) {
 	return (__NAMESPACE_LOCAL_SYM __localdep_ungetwc)((__WINT_TYPE__)__word, (__FILE *)__arg);
@@ -89,17 +89,17 @@ __NAMESPACE_LOCAL_END
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vfwscanf) __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __ATTR_LIBC_WSCANF(2, 0) __STDC_INT_AS_SIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(vfwscanf))(__FILE *__restrict __stream, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args) __THROWS(...) {
-#if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_FORMAT_WORD_T__ == __SIZEOF_INT__
+#if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_FORMAT_WORD_T__ == __SIZEOF_WINT_T__
 	return (__NAMESPACE_LOCAL_SYM __localdep_format_vwscanf)((__pformatgetc)(void *)&(__NAMESPACE_LOCAL_SYM __localdep_fgetwc),
 	                      &__NAMESPACE_LOCAL_SYM __vfwscanf_ungetc,
 	                      (void *)__stream,
 	                      __format, __args);
-#else /* __LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_FORMAT_WORD_T__ == __SIZEOF_INT__ */
+#else /* __LIBCCALL_IS_FORMATPRINTER_CC && __SIZEOF_FORMAT_WORD_T__ == __SIZEOF_WINT_T__ */
 	return (__NAMESPACE_LOCAL_SYM __localdep_format_vwscanf)(&__NAMESPACE_LOCAL_SYM __vfwscanf_getc,
 	                      &__NAMESPACE_LOCAL_SYM __vfwscanf_ungetc,
 	                      (void *)__stream,
 	                      __format, __args);
-#endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__ */
+#endif /* !__LIBCCALL_IS_FORMATPRINTER_CC || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_WINT_T__ */
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_vfwscanf_defined

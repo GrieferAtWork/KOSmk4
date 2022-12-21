@@ -29,7 +29,11 @@
 #error "Unsupported version of KOS"
 #endif /* __KOS_VERSION__ < 400 */
 
+#if __SIZEOF_SIZE_T__ >= 4
+#define __SIZEOF_FORMAT_WORD_T__ __SIZEOF_SIZE_T__
+#else /* __SIZEOF_SIZE_T__ >= 4 */
 #define __SIZEOF_FORMAT_WORD_T__ 4
+#endif /* __SIZEOF_SIZE_T__ < 4 */
 
 #ifdef __CC__
 __DECL_BEGIN

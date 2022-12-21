@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5abe2f0b */
+/* HASH CRC-32:0x1cc57da */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1776,12 +1776,12 @@ NOTHROW_NCX(LIBKCALL libc_wcstoull)(char32_t const *__restrict nptr,
 #ifndef ____vfc16scanf_getc_defined
 #define ____vfc16scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__LIBDCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__
+#if !defined(__LIBDCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != 2
 __LOCAL_LIBC(vfc16scanf_getc) __format_word_t
 (__FORMATPRINTER_CC vfc16scanf_getc)(void *arg) {
 	return (__format_word_t)libd_fgetwc((FILE *)arg);
 }
-#endif /* !__LIBDCALL_IS_FORMATPRINTER_CC || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__ */
+#endif /* !__LIBDCALL_IS_FORMATPRINTER_CC || __SIZEOF_FORMAT_WORD_T__ != 2 */
 __LOCAL_LIBC(vfc16scanf_ungetc) ssize_t
 (__FORMATPRINTER_CC vfc16scanf_ungetc)(void *arg, __format_word_t word) {
 	return libd_ungetwc((wint16_t)word, (FILE *)arg);
@@ -1793,28 +1793,28 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.sca
 (LIBDCALL libd_vfwscanf)(FILE *__restrict stream,
                          char16_t const *__restrict format,
                          va_list args) THROWS(...) {
-#if defined(__LIBDCALL_IS_FORMATPRINTER_CC) && __SIZEOF_FORMAT_WORD_T__ == __SIZEOF_INT__
+#if defined(__LIBDCALL_IS_FORMATPRINTER_CC) && __SIZEOF_FORMAT_WORD_T__ == 2
 	return libd_format_vwscanf((pformatgetc)(void *)&libd_fgetwc,
 	                      &__NAMESPACE_LOCAL_SYM vfc16scanf_ungetc,
 	                      (void *)stream,
 	                      format, args);
-#else /* __LIBDCALL_IS_FORMATPRINTER_CC && __SIZEOF_FORMAT_WORD_T__ == __SIZEOF_INT__ */
+#else /* __LIBDCALL_IS_FORMATPRINTER_CC && __SIZEOF_FORMAT_WORD_T__ == 2 */
 	return libd_format_vwscanf(&__NAMESPACE_LOCAL_SYM vfc16scanf_getc,
 	                      &__NAMESPACE_LOCAL_SYM vfc16scanf_ungetc,
 	                      (void *)stream,
 	                      format, args);
-#endif /* !__LIBDCALL_IS_FORMATPRINTER_CC || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__ */
+#endif /* !__LIBDCALL_IS_FORMATPRINTER_CC || __SIZEOF_FORMAT_WORD_T__ != 2 */
 }
 #include <hybrid/typecore.h>
 #ifndef ____vfc32scanf_getc_defined
 #define ____vfc32scanf_getc_defined
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__LIBKCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__
+#if !defined(__LIBKCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != 4
 __LOCAL_LIBC(vfc32scanf_getc) __format_word_t
 (__FORMATPRINTER_CC vfc32scanf_getc)(void *arg) {
 	return (__format_word_t)libc_fgetwc((FILE *)arg);
 }
-#endif /* !__LIBKCALL_IS_FORMATPRINTER_CC || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__ */
+#endif /* !__LIBKCALL_IS_FORMATPRINTER_CC || __SIZEOF_FORMAT_WORD_T__ != 4 */
 __LOCAL_LIBC(vfc32scanf_ungetc) ssize_t
 (__FORMATPRINTER_CC vfc32scanf_ungetc)(void *arg, __format_word_t word) {
 	return libc_ungetwc((wint32_t)word, (FILE *)arg);
@@ -1826,17 +1826,17 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.read.scanf") WUNUSED ATTR_IN(2)
 (LIBKCALL libc_vfwscanf)(FILE *__restrict stream,
                          char32_t const *__restrict format,
                          va_list args) THROWS(...) {
-#if defined(__LIBKCALL_IS_FORMATPRINTER_CC) && __SIZEOF_FORMAT_WORD_T__ == __SIZEOF_INT__
+#if defined(__LIBKCALL_IS_FORMATPRINTER_CC) && __SIZEOF_FORMAT_WORD_T__ == 4
 	return libc_format_vwscanf((pformatgetc)(void *)&libc_fgetwc,
 	                      &__NAMESPACE_LOCAL_SYM vfc32scanf_ungetc,
 	                      (void *)stream,
 	                      format, args);
-#else /* __LIBKCALL_IS_FORMATPRINTER_CC && __SIZEOF_FORMAT_WORD_T__ == __SIZEOF_INT__ */
+#else /* __LIBKCALL_IS_FORMATPRINTER_CC && __SIZEOF_FORMAT_WORD_T__ == 4 */
 	return libc_format_vwscanf(&__NAMESPACE_LOCAL_SYM vfc32scanf_getc,
 	                      &__NAMESPACE_LOCAL_SYM vfc32scanf_ungetc,
 	                      (void *)stream,
 	                      format, args);
-#endif /* !__LIBKCALL_IS_FORMATPRINTER_CC || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__ */
+#endif /* !__LIBKCALL_IS_FORMATPRINTER_CC || __SIZEOF_FORMAT_WORD_T__ != 4 */
 }
 #include <libc/template/stdstreams.h>
 /* >> vwscanf(3) */
@@ -2732,12 +2732,12 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.printf") ATTR_IN(1) ATT
 #ifndef ____vfc16scanf_unlocked_getc_defined
 #define ____vfc16scanf_unlocked_getc_defined
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__LIBDCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__
+#if !defined(__LIBDCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != 2
 __LOCAL_LIBC(vfc16scanf_unlocked_getc) __format_word_t
 (__FORMATPRINTER_CC vfc16scanf_unlocked_getc)(void *arg) {
 	return (__format_word_t)libd_fgetwc_unlocked((FILE *)arg);
 }
-#endif /* !__LIBDCALL_IS_FORMATPRINTER_CC || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__ */
+#endif /* !__LIBDCALL_IS_FORMATPRINTER_CC || __SIZEOF_FORMAT_WORD_T__ != 2 */
 __LOCAL_LIBC(vfc16scanf_unlocked_ungetc) ssize_t
 (__FORMATPRINTER_CC vfc16scanf_unlocked_ungetc)(void *arg, __format_word_t word) {
 	return libd_ungetwc_unlocked((wint16_t)word, (FILE *)arg);
@@ -2749,28 +2749,28 @@ INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.s
 (LIBDCALL libd_vfwscanf_unlocked)(FILE *__restrict stream,
                                   char16_t const *__restrict format,
                                   va_list args) THROWS(...) {
-#if defined(__LIBDCALL_IS_FORMATPRINTER_CC) && __SIZEOF_FORMAT_WORD_T__ == __SIZEOF_INT__
+#if defined(__LIBDCALL_IS_FORMATPRINTER_CC) && __SIZEOF_FORMAT_WORD_T__ == 2
 	return libd_format_vwscanf((pformatgetc)(void *)&libd_fgetwc_unlocked,
 	                      &__NAMESPACE_LOCAL_SYM vfc16scanf_unlocked_ungetc,
 	                      (void *)stream,
 	                      format, args);
-#else /* __LIBDCALL_IS_FORMATPRINTER_CC && __SIZEOF_FORMAT_WORD_T__ == __SIZEOF_INT__ */
+#else /* __LIBDCALL_IS_FORMATPRINTER_CC && __SIZEOF_FORMAT_WORD_T__ == 2 */
 	return libd_format_vwscanf(&__NAMESPACE_LOCAL_SYM vfc16scanf_unlocked_getc,
 	                      &__NAMESPACE_LOCAL_SYM vfc16scanf_unlocked_ungetc,
 	                      (void *)stream,
 	                      format, args);
-#endif /* !__LIBDCALL_IS_FORMATPRINTER_CC || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__ */
+#endif /* !__LIBDCALL_IS_FORMATPRINTER_CC || __SIZEOF_FORMAT_WORD_T__ != 2 */
 }
 #include <hybrid/typecore.h>
 #ifndef ____vfc32scanf_unlocked_getc_defined
 #define ____vfc32scanf_unlocked_getc_defined
 __NAMESPACE_LOCAL_BEGIN
-#if !defined(__LIBKCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__
+#if !defined(__LIBKCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != 4
 __LOCAL_LIBC(vfc32scanf_unlocked_getc) __format_word_t
 (__FORMATPRINTER_CC vfc32scanf_unlocked_getc)(void *arg) {
 	return (__format_word_t)libc_fgetwc_unlocked((FILE *)arg);
 }
-#endif /* !__LIBKCALL_IS_FORMATPRINTER_CC || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__ */
+#endif /* !__LIBKCALL_IS_FORMATPRINTER_CC || __SIZEOF_FORMAT_WORD_T__ != 4 */
 __LOCAL_LIBC(vfc32scanf_unlocked_ungetc) ssize_t
 (__FORMATPRINTER_CC vfc32scanf_unlocked_ungetc)(void *arg, __format_word_t word) {
 	return libc_ungetwc_unlocked((wint32_t)word, (FILE *)arg);
@@ -2782,17 +2782,17 @@ INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") WUNUSED ATTR_IN(
 (LIBKCALL libc_vfwscanf_unlocked)(FILE *__restrict stream,
                                   char32_t const *__restrict format,
                                   va_list args) THROWS(...) {
-#if defined(__LIBKCALL_IS_FORMATPRINTER_CC) && __SIZEOF_FORMAT_WORD_T__ == __SIZEOF_INT__
+#if defined(__LIBKCALL_IS_FORMATPRINTER_CC) && __SIZEOF_FORMAT_WORD_T__ == 4
 	return libc_format_vwscanf((pformatgetc)(void *)&libc_fgetwc_unlocked,
 	                      &__NAMESPACE_LOCAL_SYM vfc32scanf_unlocked_ungetc,
 	                      (void *)stream,
 	                      format, args);
-#else /* __LIBKCALL_IS_FORMATPRINTER_CC && __SIZEOF_FORMAT_WORD_T__ == __SIZEOF_INT__ */
+#else /* __LIBKCALL_IS_FORMATPRINTER_CC && __SIZEOF_FORMAT_WORD_T__ == 4 */
 	return libc_format_vwscanf(&__NAMESPACE_LOCAL_SYM vfc32scanf_unlocked_getc,
 	                      &__NAMESPACE_LOCAL_SYM vfc32scanf_unlocked_ungetc,
 	                      (void *)stream,
 	                      format, args);
-#endif /* !__LIBKCALL_IS_FORMATPRINTER_CC || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__ */
+#endif /* !__LIBKCALL_IS_FORMATPRINTER_CC || __SIZEOF_FORMAT_WORD_T__ != 4 */
 }
 #include <libc/template/stdstreams.h>
 /* >> vwscanf(3) */

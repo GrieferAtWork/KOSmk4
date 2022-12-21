@@ -1037,7 +1037,7 @@ wcstoull(*) %{generate(str2wcs("strtoull"))}
 @@pp_ifndef ____vfwscanf_getc_defined@@
 #define ____vfwscanf_getc_defined
 @@push_namespace(local)@@
-@@pp_if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__@@
+@@pp_if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_WINT_T__@@
 __LOCAL_LIBC(@vfwscanf_getc@) __format_word_t
 (__FORMATPRINTER_CC vfwscanf_getc)(void *arg) {
 	return (__format_word_t)fgetwc((FILE *)arg);
@@ -1055,7 +1055,7 @@ __LOCAL_LIBC(@vfwscanf_ungetc@) ssize_t
 @@pp_ifndef ____vfc16scanf_getc_defined@@
 #define ____vfc16scanf_getc_defined
 @@push_namespace(local)@@
-@@pp_if !defined(__LIBDCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__@@
+@@pp_if !defined(__LIBDCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != 2@@
 __LOCAL_LIBC(@vfc16scanf_getc@) __format_word_t
 (__FORMATPRINTER_CC vfc16scanf_getc)(void *arg) {
 	return (__format_word_t)fgetc16((FILE *)arg);
@@ -1073,7 +1073,7 @@ __LOCAL_LIBC(@vfc16scanf_ungetc@) ssize_t
 @@pp_ifndef ____vfc32scanf_getc_defined@@
 #define ____vfc32scanf_getc_defined
 @@push_namespace(local)@@
-@@pp_if !defined(__LIBKCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__@@
+@@pp_if !defined(__LIBKCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != 4@@
 __LOCAL_LIBC(@vfc32scanf_getc@) __format_word_t
 (__FORMATPRINTER_CC vfc32scanf_getc)(void *arg) {
 	return (__format_word_t)fgetc32((FILE *)arg);
@@ -1097,7 +1097,7 @@ __LOCAL_LIBC(@vfc32scanf_ungetc@) ssize_t
 __STDC_INT_AS_SIZE_T vfwscanf([[inout]] FILE *__restrict stream,
                               [[in, format]] wchar_t const *__restrict format,
                               $va_list args) {
-@@pp_if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_FORMAT_WORD_T__ == __SIZEOF_INT__@@
+@@pp_if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_FORMAT_WORD_T__ == __SIZEOF_WINT_T__@@
 	return format_vwscanf((pformatgetc)(void *)&fgetwc,
 	                      &__NAMESPACE_LOCAL_SYM vfwscanf_ungetc,
 	                      (void *)stream,
@@ -1785,7 +1785,7 @@ __STDC_INT_AS_SIZE_T vwprintf_unlocked([[in, format]] wchar_t const *__restrict 
 @@pp_ifndef ____vfwscanf_unlocked_getc_defined@@
 #define ____vfwscanf_unlocked_getc_defined
 @@push_namespace(local)@@
-@@pp_if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__@@
+@@pp_if !defined(__LIBCCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_WINT_T__@@
 __LOCAL_LIBC(@vfwscanf_unlocked_getc@) __format_word_t
 (__FORMATPRINTER_CC vfwscanf_unlocked_getc)(void *arg) {
 	return (__format_word_t)fgetwc_unlocked((FILE *)arg);
@@ -1803,7 +1803,7 @@ __LOCAL_LIBC(@vfwscanf_unlocked_ungetc@) ssize_t
 @@pp_ifndef ____vfc16scanf_unlocked_getc_defined@@
 #define ____vfc16scanf_unlocked_getc_defined
 @@push_namespace(local)@@
-@@pp_if !defined(__LIBDCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__@@
+@@pp_if !defined(__LIBDCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != 2@@
 __LOCAL_LIBC(@vfc16scanf_unlocked_getc@) __format_word_t
 (__FORMATPRINTER_CC vfc16scanf_unlocked_getc)(void *arg) {
 	return (__format_word_t)fgetc16_unlocked((FILE *)arg);
@@ -1821,7 +1821,7 @@ __LOCAL_LIBC(@vfc16scanf_unlocked_ungetc@) ssize_t
 @@pp_ifndef ____vfc32scanf_unlocked_getc_defined@@
 #define ____vfc32scanf_unlocked_getc_defined
 @@push_namespace(local)@@
-@@pp_if !defined(__LIBKCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != __SIZEOF_INT__@@
+@@pp_if !defined(__LIBKCALL_IS_FORMATPRINTER_CC) || __SIZEOF_FORMAT_WORD_T__ != 4@@
 __LOCAL_LIBC(@vfc32scanf_unlocked_getc@) __format_word_t
 (__FORMATPRINTER_CC vfc32scanf_unlocked_getc)(void *arg) {
 	return (__format_word_t)fgetc32_unlocked((FILE *)arg);
@@ -1845,7 +1845,7 @@ __LOCAL_LIBC(@vfc32scanf_unlocked_ungetc@) ssize_t
 __STDC_INT_AS_SIZE_T vfwscanf_unlocked([[inout]] $FILE *__restrict stream,
                                        [[in, format]] wchar_t const *__restrict format,
                                        $va_list args) {
-@@pp_if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_FORMAT_WORD_T__ == __SIZEOF_INT__@@
+@@pp_if defined(__LIBCCALL_IS_FORMATPRINTER_CC) && __SIZEOF_FORMAT_WORD_T__ == __SIZEOF_WINT_T__@@
 	return format_vwscanf((pformatgetc)(void *)&fgetwc_unlocked,
 	                      &__NAMESPACE_LOCAL_SYM vfwscanf_unlocked_ungetc,
 	                      (void *)stream,

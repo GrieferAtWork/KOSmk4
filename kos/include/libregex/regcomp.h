@@ -251,8 +251,8 @@ enum {
 	                         * >>     return (layout_ptr[ch / 8] & (1 << (ch % 8))) != 0;
 	                         * >> }
 	                         * NOTE: In utf-8 mode, only ASCII characters may be encoded via bitsets. */
-	/* In utf-8 mode, this can be lowered to 0x63, since in this context, bitsets are only allowed
-	 * to  define  ASCII characters  (so  the last-valid  opcode  is `RECS_BITSET_BUILD(0x60, 4)') */
+	/* In utf-8 mode, the lowest-possible bitset opcode is 0x63, since in this context, bitsets are only
+	 * allowed to define  ASCII characters  (so the last-valid  opcode is  `RECS_BITSET_BUILD(0x60, 4)') */
 	RECS_BITSET_UTF8_MAX = 0x63, /* [+RECS_BITSET_GETBYTES(.)] Last utf8-bitset opcode (encodes bitset for range 60h-7Fh) */
 #define RECS_ISX_MIN RECS_ISCNTRL
 	RECS_ISCNTRL,           /* [+0] consume trait `unicode_iscntrl(ch)'   (ONLY VALID IN UTF-8 MODE) */
@@ -278,20 +278,20 @@ enum {
 	RECS_ISNUMERIC,         /* [+0] consume trait `unicode_isnumeric(ch)' (ONLY VALID IN UTF-8 MODE) */
 #define RECS_ISX_MAX RECS_ISNUMERIC
 
-
 	RECS_BITSET_BYTE_MAX = 0xe3, /* [+RECS_BITSET_GETBYTES(.)] Last byte-bitset opcode (encodes bitset for range E0h-FFh) */
 #define RECS_BITSET_GETBYTES(cs_opcode)    (((cs_opcode)&0x1f) + 1)
 #define RECS_BITSET_GETBASE(cs_opcode)     ((cs_opcode)&0xe0)
 #define RECS_BITSET_BUILD(base, num_bytes) ((base) | ((num_bytes)-1))
 #define RECS_BITSET_BASEFOR(minbyte)       ((minbyte)&0xe0)
+
 	RECS_DONE,              /* End of charset sequence */
 	RECS_CHAR,              /* [+1] Followed by 1 byte (or utf8-character) that is apart of the bitset */
 	RECS_CHAR2,             /* [+2] Followed by 2 bytes (or utf8-characters) that are apart of the bitset */
 	RECS_RANGE,             /* [+2] Followed by 2 bytes (or utf8-characters) that form a `[lo,hi]' inclusive range of bytes apart of the bitset */
 	RECS_RANGE_ICASE,       /* [+2] Followed by 2 utf8-characters that form a `[lo,hi]' inclusive range of bytes apart of the bitset
 	                         *      the 2 utf8-characters must both be lower-case (ONLY VALID IN UTF-8 MODE) */
-	RECS_CONTAINS,          /* [+1+n] Followed by a COUNT-byte, followed  by a `COUNT'-character long byte/utf-8  string
-	                         * Whether or not COUNT ares bytes/utf-8 depends on the `REOP_CS_*' starting opcode. Matches
+	RECS_CONTAINS,          /* [+1+n] Followed by a COUNT-byte, followed by a `COUNT'-character long byte/utf-8 string.
+	                         * Whether or not COUNT are bytes/utf-8 depends on the `REOP_CS_*' starting opcode. Matches
 	                         * a character contained in said string. NOTE: COUNT must be >= 3 */
 };
 
@@ -410,11 +410,6 @@ enum {
 	REOP_MAYBE_POP_ONFAIL,      /* [+0] Marker for the peephole optimizer (cannot appear at runtime, and treated as an illegal instruction) */
 };
 
-/* Helper macros for `REOP_BITSET' and `REOP_BITSET_NOT' */
-#define REOP_BITSET_LAYOUT_GETBYTES(layout)       (((layout)&0x1f) + 1)
-#define REOP_BITSET_LAYOUT_GETBASE(layout)        ((layout)&0xe0)
-#define REOP_BITSET_LAYOUT_BUILD(base, num_bytes) ((base) | ((num_bytes)-1))
-
 
 
 /* Regex syntax flags */
@@ -444,6 +439,9 @@ enum {
 #define RE_SYNTAX_CARET_ANCHORS_HERE        0x00800000 /* Alias for `RE_SYNTAX_CONTEXT_INDEP_ANCHORS', but only for '^', and used internally */
 #define RE_SYNTAX_CONTEXT_INVALID_DUP       0x01000000 /* If set, '{' appearing at the start, or after '(', '|' or '}' results in `RE_BADRPT'; else, behavior is governed by `RE_SYNTAX_CONTEXT_INVALID_OPS' */
 #define RE_SYNTAX_NO_SUB                    0x02000000 /* Ignored... (used at a different point to implement `RE_NOSUB') */
+/*      RE_SYNTAX_                          0x04000000  * ... */
+/*      RE_SYNTAX_                          0x08000000  * ... */
+/*      RE_SYNTAX_                          0x10000000  * ... */
 #define RE_SYNTAX_ANCHORS_IGNORE_EFLAGS     0x20000000 /* '^' and '$' operators will ignore `RE_EXEC_NOTBOL' and `RE_EXEC_NOTEOL' */
 #define RE_SYNTAX_NO_UTF8                   0x40000000 /* If set, pattern is byte-based (rather than a utf-8 string; e.g. '[ä]' is like '[\xC3\xA4]'). Also disables support for '\uABCD', '\UABCDABCD' */
 #define RE_SYNTAX_NO_KOS_OPS                0x80000000 /* If set, disable support for python- and kos-extensions: '\n', '\N', "[^:<foo>:]", '\d', '\D', '\0123', '\xAB', '\uABCD', '\UABCDABCD', '\A', '\Z' */
@@ -539,24 +537,25 @@ __NOTHROW_NCX(LIBREGEX_CC re_parser_yield)(struct re_parser *__restrict self);
 #endif /* LIBREGEX_WANT_PROTOTYPES */
 
 
-
+/* The compiled regex output structure produced by `re_compiler_compile(3R)' */
 struct re_code {
-	__byte_t   rc_fmap[256]; /* Fast map: take the first byte of the string to match as index:
+	__byte_t   rc_fmap[256]; /* Fast map: take the first byte of input data to match as index:
 	                          * - rc_fmap[input[0]] == 0xff --> input will never match
 	                          * - rc_fmap[input[0]] != 0xff --> Start executing at `PC = rc_code + rc_fmap[input[0]]'
 	                          * Allowed  to be `0x00', even if the regex never accepts input starting with that byte.
 	                          * iow: all 256 possible bytes indicating `0x00' is always valid.
 	                          * The only assumptions that may be made are:
-	                          *  -> rc_fmap[X] == 0xff --> `rc_code' always rejects input whose first byte is `X'
-	                          *  -> rc_fmap[X] >  0x00 --> `rc_code'  only ever handles a first byte `X' in a branch
-	                          *                            that begins at  this offset (e.g.  "abc|def" can set  the
-	                          *                            fmap offset for "d"  to directly point at  `exact "def"')
-	                          *                            Note that this doesn't guaranty that `rc_code' won't just
-	                          *                            always reject input whose first byte is `X'!
-	                          *  -> rc_fmap[X] == 0x00 --> `rc_code' may or may not accept input starting with `X' */
+	                          * -> rc_fmap[X] == 0xff --> `rc_code' always rejects input whose first byte is `X'
+	                          * -> rc_fmap[X] >  0x00 --> `rc_code'  only ever handles a first byte `X' in a branch
+	                          *                           that begins at  this offset (e.g.  "abc|def" can set  the
+	                          *                           fmap offset for "d"  to directly point at  `exact "def"')
+	                          *                           Note that this doesn't guaranty that `rc_code' won't just
+	                          *                           always reject input whose first byte is `X'!
+	                          * -> rc_fmap[X] == 0x00 --> `rc_code' may or may not accept input starting with `X' */
 	__size_t   rc_minmatch;  /* The smallest input length that can be matched by `rc_code' (or `0' when `rc_code' can match epsilon)
-	                          * NOTE: Allowed to be less than the *true* minimum-match length of `rc_code'; iow: `0' is always valid */
-	__uint16_t rc_ngrps;     /* # of groups currently defined (<= 0x100) */
+	                          * NOTE: Allowed to be less than the *true* minimum-match length of `rc_code'; iow: `0' is always valid
+	                          * -> The only assumption allowed is that input smaller than this will never match. */
+	__uint16_t rc_ngrps;     /* # of groups referenced by code (<= 0x100) */
 	__uint16_t rc_nvars;     /* # of variables referenced by code (<= 0x100) */
 	__COMPILER_FLEXIBLE_ARRAY(__byte_t, rc_code); /* Code buffer (`REOP_*' instruction stream) */
 };

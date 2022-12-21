@@ -1149,8 +1149,8 @@ REOP_CS_BYTE_dispatch:
 			switch (opcode) {
 
 			case RECS_BITSET_MIN ... RECS_BITSET_BYTE_MAX: {
-				uint8_t bitset_minch = REOP_BITSET_LAYOUT_GETBASE(opcode);
-				uint8_t bitset_size  = REOP_BITSET_LAYOUT_GETBYTES(opcode);
+				uint8_t bitset_minch = RECS_BITSET_GETBASE(opcode);
+				uint8_t bitset_size  = RECS_BITSET_GETBYTES(opcode);
 				byte_t bitset_rel_ch;
 				if (!OVERFLOW_USUB(ch, bitset_minch, &bitset_rel_ch)) {
 					unsigned int bitset_bits = bitset_size * 8;
@@ -1222,8 +1222,8 @@ REOP_CS_UTF8_dispatch:
 			switch (opcode) {
 
 			case RECS_BITSET_MIN ... RECS_BITSET_UTF8_MAX: {
-				uint8_t bitset_minch = REOP_BITSET_LAYOUT_GETBASE(opcode);
-				uint8_t bitset_size  = REOP_BITSET_LAYOUT_GETBYTES(opcode);
+				uint8_t bitset_minch = RECS_BITSET_GETBASE(opcode);
+				uint8_t bitset_size  = RECS_BITSET_GETBYTES(opcode);
 				byte_t bitset_rel_ch;
 				if (ch < 0x80 && !OVERFLOW_USUB(ch, bitset_minch, &bitset_rel_ch)) {
 					unsigned int bitset_bits = bitset_size * 8;
@@ -1334,8 +1334,8 @@ REOP_NCS_UTF8_dispatch:
 			switch (opcode) {
 
 			case RECS_BITSET_MIN ... RECS_BITSET_UTF8_MAX: {
-				uint8_t bitset_minch = REOP_BITSET_LAYOUT_GETBASE(opcode);
-				uint8_t bitset_size  = REOP_BITSET_LAYOUT_GETBYTES(opcode);
+				uint8_t bitset_minch = RECS_BITSET_GETBASE(opcode);
+				uint8_t bitset_size  = RECS_BITSET_GETBYTES(opcode);
 				byte_t bitset_rel_ch;
 				if (ch < 0x80 && !OVERFLOW_USUB(ch, bitset_minch, &bitset_rel_ch)) {
 					unsigned int bitset_bits = bitset_size * 8;
