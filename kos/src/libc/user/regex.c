@@ -66,10 +66,9 @@ DEFINE_REGEX_BINDING(PRE_EXEC_RSEARCH, re_exec_rsearch);
 #define re_exec_search      (*pdyn_re_exec_search)
 #define re_exec_rsearch     (*pdyn_re_exec_rsearch)
 
-PRIVATE WUNUSED bool LIBCCALL libregex_load(void) {
+#define libregex_load() (likely(pdyn_re_exec_rsearch) || _libregex_load())
+PRIVATE WUNUSED bool LIBCCALL _libregex_load(void) {
 	void *lib;
-	if likely(pdyn_re_exec_rsearch)
-		return true;
 again_read_libregex:
 	lib = ATOMIC_READ(libregex);
 	if unlikely(lib == (void *)-1)
