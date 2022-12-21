@@ -71,8 +71,10 @@ DECL_BEGIN
 #endif /* NDEBUG || NDEBUG_FINI */
 
 struct re_onfailure_item {
-	byte_t const *rof_in; /* [1..1] Input data pointer to restore (points into some input buffer) */
-	byte_t const *rof_pc; /* [1..1] Program counter to restore */
+	byte_t const *rof_in; /* [0..1] Input data pointer to restore (points into some input buffer)
+	                       *        Set to NULL for dummy on-fail items. */
+	byte_t const *rof_pc; /* [1..1][valid_if(rof_in != NULL)] Program counter to restore
+	                       * NOTE: (only used for identification when `rof_in == NULL') */
 };
 
 struct re_interpreter_inptr {
@@ -613,35 +615,57 @@ NOTHROW_NCX(CC re_interpreter_fini)(struct re_interpreter *__restrict self,
 	}
 }
 
+PRIVATE WUNUSED NONNULL((1)) bool
+NOTHROW_NCX(CC re_interpreter_resize)(struct re_interpreter *__restrict self) {
+	struct re_onfailure_item *new_onfail_v;
+	size_t new_onfail_a;
+	/* Must allocate more space for the on-fail buffer. */
+	new_onfail_a = self->ri_onfaila * 2;
+	if (new_onfail_a < 16)
+		new_onfail_a = 16;
+	/* TODO: There should be some upper limit on how many onfail items are  allowed
+	 *       before a soft failure should be triggered (similar to the 16K limit on
+	 *       regex code size) */
+	new_onfail_v = (struct re_onfailure_item *)realloc(self->ri_onfailv, new_onfail_a,
+	                                                   sizeof(struct re_onfailure_item));
+	if unlikely(!new_onfail_v) {
+		new_onfail_a = self->ri_onfailc + 1;
+		new_onfail_v = (struct re_onfailure_item *)realloc(self->ri_onfailv, new_onfail_a,
+		                                                   sizeof(struct re_onfailure_item));
+		if unlikely(!new_onfail_v)
+			return false; /* Out-of-memory :( */
+	}
+	self->ri_onfailv = new_onfail_v;
+	self->ri_onfaila = new_onfail_a;
+	return true;
+}
+
 PRIVATE WUNUSED NONNULL((1, 2)) bool
 NOTHROW_NCX(CC re_interpreter_pushfail)(struct re_interpreter *__restrict self,
                                         byte_t const *pc) {
 	struct re_onfailure_item *item;
 	assert(self->ri_onfailc <= self->ri_onfaila);
 	if unlikely(self->ri_onfailc >= self->ri_onfaila) {
-		struct re_onfailure_item *new_onfail_v;
-		size_t new_onfail_a;
-		/* Must allocate more space for the on-fail buffer. */
-		new_onfail_a = self->ri_onfaila * 2;
-		if (new_onfail_a < 16)
-			new_onfail_a = 16;
-		/* TODO: There should be some upper limit on how many onfail items are  allowed
-		 *       before a soft failure should be triggered (similar to the 16K limit on
-		 *       regex code size) */
-		new_onfail_v = (struct re_onfailure_item *)realloc(self->ri_onfailv, new_onfail_a,
-		                                                   sizeof(struct re_onfailure_item));
-		if unlikely(!new_onfail_v) {
-			new_onfail_a = self->ri_onfailc + 1;
-			new_onfail_v = (struct re_onfailure_item *)realloc(self->ri_onfailv, new_onfail_a,
-			                                                   sizeof(struct re_onfailure_item));
-			if unlikely(!new_onfail_v)
-				return false; /* Out-of-memory :( */
-		}
-		self->ri_onfailv = new_onfail_v;
-		self->ri_onfaila = new_onfail_a;
+		if unlikely(!re_interpreter_resize(self))
+			return false;
 	}
 	item = &self->ri_onfailv[self->ri_onfailc++];
 	item->rof_in = self->ri_in_ptr;
+	item->rof_pc = pc;
+	return true;
+}
+
+PRIVATE WUNUSED NONNULL((1)) bool
+NOTHROW_NCX(CC re_interpreter_pushfail_dummy)(struct re_interpreter *__restrict self,
+                                              byte_t const *pc) {
+	struct re_onfailure_item *item;
+	assert(self->ri_onfailc <= self->ri_onfaila);
+	if unlikely(self->ri_onfailc >= self->ri_onfaila) {
+		if unlikely(!re_interpreter_resize(self))
+			return false;
+	}
+	item = &self->ri_onfailv[self->ri_onfailc++];
+	item->rof_in = NULL;
 	item->rof_pc = pc;
 	return true;
 }
@@ -848,9 +872,10 @@ NOTHROW_NCX(CC libre_interp_exec)(__register struct re_interpreter *__restrict s
 #define ONFAIL()       goto onfail
 #define TARGET(opcode) case opcode:
 #endif /* !HAVE_TRACE */
-#define PUSHFAIL(pc)   do { if unlikely(!re_interpreter_pushfail(self, pc)) goto err_nomem; } __WHILE0
-#define getb()         (*pc++)
-#define getw()         (pc += 2, (int16_t)UNALIGNED_GET16((uint16_t const *)(pc - 2)))
+#define PUSHFAIL(pc)       do { if unlikely(!re_interpreter_pushfail(self, pc)) goto err_nomem; } __WHILE0
+#define PUSHFAIL_DUMMY(pc) do { if unlikely(!re_interpreter_pushfail_dummy(self, pc)) goto err_nomem; } __WHILE0
+#define getb()             (*pc++)
+#define getw()             (pc += 2, (int16_t)UNALIGNED_GET16((uint16_t const *)(pc - 2)))
 
 	/* The main dispatch loop */
 dispatch:
@@ -1717,9 +1742,31 @@ REOP_NCS_UTF8_dispatch:
 			DISPATCH();
 		}
 
+		TARGET(REOP_POP_ONFAIL_AT) {
+			int16_t delta = getw();
+			byte_t const *target_pc;
+			target_pc = pc + delta;
+			do {
+				assertf(self->ri_onfailc > 0, "PC %p not found in on-fail stack", target_pc);
+				--self->ri_onfailc;
+			} while (self->ri_onfailv[self->ri_onfailc].rof_pc != target_pc);
+			DISPATCH();
+		}
+
 		TARGET(REOP_JMP_ONFAIL) {
 			int16_t delta = getw();
 			PUSHFAIL(pc + delta);
+			DISPATCH();
+		}
+
+		TARGET(REOP_JMP_ONFAIL_DUMMY_AT) {
+			int16_t delta = getw();
+			PUSHFAIL_DUMMY(pc + delta);
+			DISPATCH();
+		}
+
+		TARGET(REOP_JMP_ONFAIL_DUMMY) {
+			PUSHFAIL_DUMMY(NULL);
 			DISPATCH();
 		}
 

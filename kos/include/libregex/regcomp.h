@@ -108,7 +108,7 @@ typedef int re_errno_t;
  *
  *     >> "X|Y"          REOP_JMP_ONFAIL  1f
  *     >>                <X>
- *     >>                REOP_MAYBE_POP_ONFAIL   // TODO
+ *     >>                REOP_MAYBE_POP_ONFAIL   // Replaced with `REOP_POP_ONFAIL_AT 1f'
  *     >>                REOP_JMP         2f
  *     >>                // HINT: Another `REOP_JMP_ONFAIL' to <Z> would go here if it existed
  *     >>            1:  <Y>
@@ -116,29 +116,29 @@ typedef int re_errno_t;
  *
  *     >> "X|Y|Z"        REOP_JMP_ONFAIL 1f
  *     >>                <X>
- *     >>                REOP_MAYBE_POP_ONFAIL   // TODO
+ *     >>                REOP_MAYBE_POP_ONFAIL   // Replaced with `REOP_POP_ONFAIL_AT 1f'
  *     >>                REOP_JMP        3f
  *     >>            1:  REOP_JMP_ONFAIL 2f
  *     >>                <Y>
- *     >>                REOP_MAYBE_POP_ONFAIL   // TODO
+ *     >>                REOP_MAYBE_POP_ONFAIL   // Replaced with `REOP_POP_ONFAIL_AT 2f'
  *     >>                REOP_JMP        3f
  *     >>            2:  <Z>
  *     >>            3:
  *
  *     >> "X?"           REOP_JMP_ONFAIL 1f
  *     >>                <X>
- *     >>                REOP_MAYBE_POP_ONFAIL   // TODO
+ *     >>                REOP_MAYBE_POP_ONFAIL   // Replaced with `REOP_POP_ONFAIL_AT 1f'
  *     >>            1:
  *
  *     >> "X*"           REOP_JMP_ONFAIL 2f
  *     >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
- *     >>                REOP_MAYBE_POP_ONFAIL   // TODO
+ *     >>                REOP_MAYBE_POP_ONFAIL   // Replaced with `REOP_POP_ONFAIL_AT 2f'
  *     >>                REOP_JMP_AND_RETURN_ONFAIL 1b
  *     >>            2:
  *
- *     >> "X+"       1:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
- *     >>                // TODO: POP_ONFAIL??? -- Nothing pushed on first iteration; maybe something
- *     >>                //                        like `REOP_PUSH_DUMMY_ONFAIL' before the "1:"?
+ *     >> "X+"           REOP_JMP_ONFAIL_DUMMY_AT 2f
+ *     >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
+ *     >>                REOP_MAYBE_POP_ONFAIL   // Replaced with `REOP_POP_ONFAIL_AT 2f'
  *     >>                REOP_JMP_AND_RETURN_ONFAIL 1b
  *     >>            2:
  *
@@ -157,32 +157,35 @@ typedef int re_errno_t;
  *     >>                REOP_DEC_JMP {VAR}, 1b
  *
  *     >> "X{n,}"        REOP_SETVAR  {VAR = (n - 1)}
- *     >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
+ *     >>            1:  REOP_JMP_ONFAIL_DUMMY_AT 3f
+ *     >>            2:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `3f'
+ *     >>                REOP_MAYBE_POP_ONFAIL   // Replaced with `REOP_POP_ONFAIL_AT 2f'
  *     >>                REOP_DEC_JMP {VAR}, 1b
- *     >>                // TODO: POP_ONFAIL???
- *     >>                REOP_JMP_AND_RETURN_ONFAIL 1b
- *     >>            2:
+ *     >>                REOP_JMP_AND_RETURN_ONFAIL 2b
+ *     >>            3:
  *
- *     >> "X{0,m}"       REOP_JMP_ONFAIL 2f
- *     >>                REOP_SETVAR  {VAR = (m - 1)}
+ *     >> "X{0,m}"       REOP_SETVAR  {VAR = (m - 1)}
+ *     >>                REOP_JMP_ONFAIL 2f
  *     >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
- *     >>                REOP_MAYBE_POP_ONFAIL   // TODO
+ *     >>                REOP_MAYBE_POP_ONFAIL   // Replaced with `REOP_POP_ONFAIL_AT 2f'
  *     >>                REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b
  *     >>            2:
  *
  *     >> "X{1,m}"       REOP_SETVAR  {VAR = (m - 1)}
+ *     >>                REOP_JMP_ONFAIL_DUMMY_AT 2f
  *     >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
- *     >>                // TODO: POP_ONFAIL???
+ *     >>                REOP_MAYBE_POP_ONFAIL   // Replaced with `REOP_POP_ONFAIL_AT 2f'
  *     >>                REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b
  *     >>            2:
  *
  *     >> "X{n,m}"       REOP_SETVAR  {VAR1 = n - 1}
  *     >>                REOP_SETVAR  {VAR2 = (m - n)}
- *     >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
+ *     >>            1:  REOP_JMP_ONFAIL_DUMMY_AT 3f
+ *     >>            2:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `3f'
+ *     >>                REOP_MAYBE_POP_ONFAIL   // Replaced with `REOP_POP_ONFAIL_AT 3f'
  *     >>                REOP_DEC_JMP {VAR1}, 1b
- *     >>                // TODO: POP_ONFAIL???
- *     >>                REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR2}, 1b
- *     >>            2:
+ *     >>                REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR2}, 2b
+ *     >>            3:
  *
  * HINT: Using the above  compilation patterns, inserting  code in front  of
  *       already-compiled code can simply be done whilst ignoring the chance
@@ -346,8 +349,11 @@ enum {
 	REOP_GROUP_MATCH_J6,       /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 6 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_MATCH_J7,       /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 7 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_MATCH_J8,       /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
+	REOP_GROUP_MATCH_J9,       /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
+	REOP_GROUP_MATCH_J10,      /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
+	REOP_GROUP_MATCH_J11,      /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 #define REOP_GROUP_MATCH_JMIN  REOP_GROUP_MATCH_J3
-#define REOP_GROUP_MATCH_JMAX  REOP_GROUP_MATCH_J8
+#define REOP_GROUP_MATCH_JMAX  REOP_GROUP_MATCH_J11
 #define REOP_GROUP_MATCH_Jn(n) (REOP_GROUP_MATCH_J3 + (n) - 3)
 #define REOP_GROUP_MATCH_Joff(opcode) (3 + (opcode) - REOP_GROUP_MATCH_J3)
 
@@ -383,7 +389,7 @@ enum {
 	REOP_GROUP_START,           /* [+1] Mark the start of the (N = *PC++)'th group; open "(" (current input pointer is written to `regmatch_t[N].rm_so') */
 	REOP_GROUP_END,             /* [+1] Mark the end of the (N = *PC++)'th group; closing ")" (current input pointer is written to `regmatch_t[N].rm_eo') */
 #define REOP_GROUP_END_JMIN         REOP_GROUP_END_J3
-#define REOP_GROUP_END_JMAX         REOP_GROUP_END_J8
+#define REOP_GROUP_END_JMAX         REOP_GROUP_END_J11
 #define REOP_GROUP_END_Jn(n)        (REOP_GROUP_END_J3 + (n) - 3)
 #define REOP_GROUP_END_Joff(opcode) (3 + (opcode) - REOP_GROUP_END_J3)
 	REOP_GROUP_END_J3,          /* [+1] Same as `REOP_GROUP_END', but skip the next 3 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
@@ -392,8 +398,15 @@ enum {
 	REOP_GROUP_END_J6,          /* [+1] Same as `REOP_GROUP_END', but skip the next 6 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_END_J7,          /* [+1] Same as `REOP_GROUP_END', but skip the next 7 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_END_J8,          /* [+1] Same as `REOP_GROUP_END', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
+	REOP_GROUP_END_J9,          /* [+1] Same as `REOP_GROUP_END', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
+	REOP_GROUP_END_J10,         /* [+1] Same as `REOP_GROUP_END', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
+	REOP_GROUP_END_J11,         /* [+1] Same as `REOP_GROUP_END', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_POP_ONFAIL,            /* [+0] Pop the top-most element from the on-fail stack */
+	REOP_POP_ONFAIL_AT,         /* [+2] Pop on-fail stack items until one is found referencing the given 16-bit, signed, relative address. Then, pop one more (i.e. the one at the referenced address). */
 	REOP_JMP_ONFAIL,            /* [+2] push onto the "on-failure stack" a 16-bit, signed, relative addr */
+	REOP_JMP_ONFAIL_DUMMY_AT,   /* [+2] Push a dummy on-fail stack item (that will be skipped during on-fail unwinding, but not by `REOP_POP_ONFAIL')
+	                             *      Operand is a 16-bit, signed, relative addr used to identify the on-fail item (for `REOP_POP_ONFAIL_AT'). */
+	REOP_JMP_ONFAIL_DUMMY,      /* [+0] Like `REOP_JMP_ONFAIL_DUMMY_AT', but the produced on-failure item can't be identified by `REOP_POP_ONFAIL_AT' */
 	REOP_JMP,                   /* [+2] 16-bit, signed, relative jump (relative to instruction end) */
 	REOP_JMP_AND_RETURN_ONFAIL, /* [+2] push onto the "on-failure stack" the address of the next instruction before doing `REOP_JMP' */
 	REOP_DEC_JMP,               /* [+3] VAR = VARS[*PC++]; if VAR != 0, do `--VAR', followed by `REOP_JMP'; else, do nothing (and leave `VAR' unchanged) */
@@ -407,7 +420,8 @@ enum {
 	                             * used  (note that a  candidate consists of `{ end_input_pointer, regmatch_t[] }')
 	                             * Candidate A is better than B if `A.end_input_pointer > B.end_input_pointer' */
 	REOP_MATCHED_PERFECT,       /* [+0] Same as `REOP_MATCHED', but act as though the match was perfect (even if it might not be; s.a. `RE_SYNTAX_NO_POSIX_BACKTRACKING') */
-	REOP_MAYBE_POP_ONFAIL,      /* [+0] Marker for the peephole optimizer (cannot appear at runtime, and treated as an illegal instruction) */
+	REOP_MAYBE_POP_ONFAIL,      /* [+2] Marker for the peephole optimizer (cannot appear at runtime, and treated as an illegal instruction)
+	                             * The  2   operand   bytes   are   undefined  (and   used   as   placeholder   for   `REOP_POP_ONFAIL_AT') */
 };
 
 

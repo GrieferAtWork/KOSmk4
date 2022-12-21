@@ -31,8 +31,8 @@
 DECL_BEGIN
 
 /* Apply peephole optimizations to the code produced by `self' */
-INTDEF NONNULL((1)) re_errno_t
-NOTHROW_NCX(CC libre_code_makepeep)(struct re_compiler *__restrict self);
+INTDEF NONNULL((1)) void
+NOTHROW_NCX(CC libre_compiler_peephole)(struct re_compiler *__restrict self);
 
 DECL_END
 

@@ -654,7 +654,8 @@ NOTHROW_NCX(CC libre_opcode_next)(uint8_t const *__restrict p_instr) {
 		while ((cs_opcode = *p_instr++) != RECS_DONE) {
 			switch (cs_opcode) {
 			case RECS_BITSET_MIN ... RECS_BITSET_BYTE_MAX:
-				p_instr += RECS_BITSET_GETBYTES(cs_opcode);
+				if (cs_opcode <= RECS_BITSET_UTF8_MAX || opcode == REOP_CS_BYTE)
+					p_instr += RECS_BITSET_GETBYTES(cs_opcode);
 				break;
 			case RECS_CHAR:
 				if (opcode == REOP_CS_BYTE) {
@@ -707,6 +708,9 @@ NOTHROW_NCX(CC libre_opcode_next)(uint8_t const *__restrict p_instr) {
 	case REOP_JMP_ONFAIL:
 	case REOP_JMP_AND_RETURN_ONFAIL:
 	case REOP_SETVAR:
+	case REOP_MAYBE_POP_ONFAIL:
+	case REOP_POP_ONFAIL_AT:
+	case REOP_JMP_ONFAIL_DUMMY_AT:
 		p_instr += 2;
 		break;
 
@@ -2648,7 +2652,10 @@ static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_MATCH, 5) == REOP_GROUP_MATCH_J5)
 static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_MATCH, 6) == REOP_GROUP_MATCH_J6);
 static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_MATCH, 7) == REOP_GROUP_MATCH_J7);
 static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_MATCH, 8) == REOP_GROUP_MATCH_J8);
-static_assert(REOP_GROUP_MATCH_JMAX == REOP_GROUP_MATCH_J8);
+static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_MATCH, 9) == REOP_GROUP_MATCH_J9);
+static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_MATCH, 10) == REOP_GROUP_MATCH_J10);
+static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_MATCH, 11) == REOP_GROUP_MATCH_J11);
+static_assert(REOP_GROUP_MATCH_JMAX == REOP_GROUP_MATCH_J11);
 static_assert(REOP_GROUP_END_JMIN == REOP_GROUP_END_J3);
 static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_END, 3) == REOP_GROUP_END_J3);
 static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_END, 4) == REOP_GROUP_END_J4);
@@ -2656,13 +2663,16 @@ static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_END, 5) == REOP_GROUP_END_J5);
 static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_END, 6) == REOP_GROUP_END_J6);
 static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_END, 7) == REOP_GROUP_END_J7);
 static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_END, 8) == REOP_GROUP_END_J8);
-static_assert(REOP_GROUP_END_JMAX == REOP_GROUP_END_J8);
+static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_END, 9) == REOP_GROUP_END_J9);
+static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_END, 10) == REOP_GROUP_END_J10);
+static_assert(RE_EPSILON_JMP_ENCODE(REOP_GROUP_END, 11) == REOP_GROUP_END_J11);
+static_assert(REOP_GROUP_END_JMAX == REOP_GROUP_END_J11);
 
 
 PRIVATE NONNULL((1)) void
 NOTHROW_NCX(CC re_compiler_set_group_epsilon_jmp)(uint8_t *p_group_instruction,
                                                   uint8_t num_bytes_skip_if_empty) {
-	assert(num_bytes_skip_if_empty >= 3 && num_bytes_skip_if_empty <= 8);
+	assert(num_bytes_skip_if_empty >= 3 && num_bytes_skip_if_empty <= 11);
 	assertf(*p_group_instruction == REOP_GROUP_MATCH ||
 	        *p_group_instruction == REOP_GROUP_END,
 	        "*p_group_instruction = %#I8x",
@@ -2690,9 +2700,10 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			byte_t *writer, *label_1, *label_2;
 			/* >> "X*"           REOP_JMP_ONFAIL 2f
 			 * >>             1: <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
+			 * >>                REOP_MAYBE_POP_ONFAIL   // Replaced with `REOP_POP_ONFAIL_AT 2f'
 			 * >>                REOP_JMP_AND_RETURN_ONFAIL 1b
 			 * >>             2: */
-			if unlikely(!re_compiler_require(self, 6))
+			if unlikely(!re_compiler_require(self, 9))
 				goto err_nomem;
 
 			/* Make space for code we want to insert in the front */
@@ -2701,7 +2712,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 
 			/* REOP_JMP_ONFAIL 2f */
 			*writer++ = REOP_JMP_ONFAIL;
-			label_2 = writer + 2 + expr_size + 3;
+			label_2 = writer + 2 + expr_size + 3 + 3;
 			int16_at(writer) = (int16_t)(label_2 - (writer + 2));
 			writer += 2;
 
@@ -2709,26 +2720,49 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			label_1 = writer;
 			writer += expr_size;
 			if (expression_matches_epsilon)
-				re_compiler_set_group_epsilon_jmp(writer - 2, 3);
+				re_compiler_set_group_epsilon_jmp(writer - 2, 6);
+
+			/* REOP_MAYBE_POP_ONFAIL */
+			*writer++ = REOP_MAYBE_POP_ONFAIL;
+			writer += 2;
 
 			/* REOP_JMP_AND_RETURN_ONFAIL 1b */
 			*writer++ = REOP_JMP_AND_RETURN_ONFAIL;
 			int16_at(writer) = (int16_t)(label_1 - (writer + 2));
 			writer += 2;
+			assert(label_2 == writer);
+
 			self->rec_cpos = writer;
 			goto done_suffix;
 		} else if (interval_min == 1) {
 			byte_t *writer;
-			/* >> "X+"        1: <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
+			/* >> "X+"           REOP_JMP_ONFAIL_DUMMY_AT 2f
+			 * >>             1: <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
+			 * >>                REOP_MAYBE_POP_ONFAIL   // Replaced with `REOP_POP_ONFAIL_AT 2f'
 			 * >>                REOP_JMP_AND_RETURN_ONFAIL 1b
 			 * >>             2: */
-			if unlikely(!re_compiler_require(self, 3))
+			if unlikely(!re_compiler_require(self, 9))
 				goto err_nomem;
 
-			/* REOP_JMP_AND_RETURN_ONFAIL 1b */
-			writer = self->rec_cpos;
+			/* Make space for code we want to insert in the front */
+			writer = self->rec_estart;
+			memmoveup(writer + 3, writer, expr_size);
+
+			/* REOP_JMP_ONFAIL_DUMMY_AT 2f */
+			*writer++ = REOP_JMP_ONFAIL_DUMMY_AT;
+			writer += 2;
+			int16_at(writer - 2) = (int16_t)((writer + expr_size + 6) - writer);
+
+			/* <X> */
+			writer += expr_size;
 			if (expression_matches_epsilon)
-				re_compiler_set_group_epsilon_jmp(writer - 2, 3);
+				re_compiler_set_group_epsilon_jmp(writer - 2, 6);
+
+			/* REOP_MAYBE_POP_ONFAIL */
+			*writer++ = REOP_MAYBE_POP_ONFAIL;
+			writer += 2;
+
+			/* REOP_JMP_AND_RETURN_ONFAIL 1b */
 			*writer++ = REOP_JMP_AND_RETURN_ONFAIL;
 			int16_at(writer) = (int16_t)(self->rec_estart - (writer + 2));
 			writer += 2;
@@ -2736,31 +2770,44 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			goto done_suffix;
 		} else {
 			uint8_t var_id;
-			byte_t *writer, *label_1;
+			byte_t *writer, *label_1, *label_2, *label_3;
 			/* >> "X{n,}"        REOP_SETVAR  {VAR = (n - 1)}
-			 * >>             1: <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
+			 * >>            1:  REOP_JMP_ONFAIL_DUMMY_AT 3f
+			 * >>            2:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `3f'
+			 * >>                REOP_MAYBE_POP_ONFAIL   // Replaced with `REOP_POP_ONFAIL_AT 2f'
 			 * >>                REOP_DEC_JMP {VAR}, 1b
-			 * >>                REOP_JMP_AND_RETURN_ONFAIL 1b
-			 * >>             2: */
-			if unlikely(!re_compiler_require(self, 10))
+			 * >>                REOP_JMP_AND_RETURN_ONFAIL 2b
+			 * >>            3: */
+			if unlikely(!re_compiler_require(self, 16))
 				goto err_nomem;
 			if unlikely(!re_compiler_allocvar(self, &var_id))
 				goto err_esize;
 
 			/* Make space for code we want to insert in the front */
 			writer = self->rec_estart;
-			memmoveup(writer + 3, writer, expr_size);
+			memmoveup(writer + 6, writer, expr_size);
 
 			/* REOP_SETVAR  {VAR = (n - 1)} */
 			*writer++ = REOP_SETVAR;
 			*writer++ = var_id;
 			*writer++ = interval_min - 1;
 
-			/* This is where the "1:" is in the pseudo-code */
+			/* REOP_JMP_ONFAIL_DUMMY_AT 3f */
 			label_1 = writer;
+			label_3 = writer + 3 + expr_size + 3 + 4 + 3;
+			*writer++ = REOP_JMP_ONFAIL_DUMMY_AT;
+			int16_at(writer) = (int16_t)(label_3 - (writer + 2));
+			writer += 2;
+
+			/* <X> */
+			label_2 = writer;
 			writer += expr_size;
 			if (expression_matches_epsilon)
-				re_compiler_set_group_epsilon_jmp(writer - 2, 7);
+				re_compiler_set_group_epsilon_jmp(writer - 2, 10);
+
+			/* REOP_MAYBE_POP_ONFAIL */
+			*writer++ = REOP_MAYBE_POP_ONFAIL;
+			writer += 2;
 
 			/* REOP_DEC_JMP {VAR}, 1b */
 			*writer++ = REOP_DEC_JMP;
@@ -2768,10 +2815,11 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			int16_at(writer) = (int16_t)(label_1 - (writer + 2));
 			writer += 2;
 
-			/* REOP_JMP_AND_RETURN_ONFAIL 1b */
+			/* REOP_JMP_AND_RETURN_ONFAIL 2b */
 			*writer++ = REOP_JMP_AND_RETURN_ONFAIL;
-			int16_at(writer) = (int16_t)(label_1 - (writer + 2));
+			int16_at(writer) = (int16_t)(label_2 - (writer + 2));
 			writer += 2;
+			assert(label_3 == writer);
 
 			self->rec_cpos = writer;
 			goto done_suffix;
@@ -2808,41 +2856,54 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 
 	if (interval_min == 1) {
 		uint8_t var_id;
-		byte_t *writer, *label_1;
+		byte_t *writer, *label_1, *label_2;
 
 		/* Check for special (and simple) case: always match exactly 1 */
 		if (interval_max == 1)
 			goto done_suffix;
 
 		/* >> "X{1,m}"       REOP_SETVAR  {VAR = (m - 1)}
+		 * >>                REOP_JMP_ONFAIL_DUMMY_AT 2f
 		 * >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
+		 * >>                REOP_MAYBE_POP_ONFAIL   // Replaced with `REOP_POP_ONFAIL_AT 2f'
 		 * >>                REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b
 		 * >>            2: */
-		if unlikely(!re_compiler_require(self, 7))
+		if unlikely(!re_compiler_require(self, 13))
 			goto err_nomem;
 		if unlikely(!re_compiler_allocvar(self, &var_id))
 			goto err_esize;
 
 		/* Make space for code we want to insert in the front */
 		writer = self->rec_estart;
-		memmoveup(writer + 3, writer, expr_size);
+		memmoveup(writer + 6, writer, expr_size);
 
 		/* REOP_SETVAR  {VAR = (m - 1)} */
 		*writer++ = REOP_SETVAR;
 		*writer++ = var_id;
 		*writer++ = interval_max - 1;
 
-		/* This is where the "1:" is in the pseudo-code */
+		/* REOP_JMP_ONFAIL_DUMMY_AT 3f */
+		label_2 = writer + 3 + expr_size + 3 + 4;
+		*writer++ = REOP_JMP_ONFAIL_DUMMY_AT;
+		int16_at(writer) = (int16_t)(label_2 - (writer + 2));
+		writer += 2;
+
+		/* <X> */
 		label_1 = writer;
 		writer += expr_size;
 		if (expression_matches_epsilon)
-			re_compiler_set_group_epsilon_jmp(writer - 2, 4);
+			re_compiler_set_group_epsilon_jmp(writer - 2, 7);
+
+		/* REOP_MAYBE_POP_ONFAIL */
+		*writer++ = REOP_MAYBE_POP_ONFAIL;
+		writer += 2;
 
 		/* REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b */
 		*writer++ = REOP_DEC_JMP_AND_RETURN_ONFAIL;
 		*writer++ = var_id;
 		int16_at(writer) = (int16_t)(label_1 - (writer + 2));
 		writer += 2;
+		assert(label_2 == writer);
 
 		self->rec_cpos = writer;
 		goto done_suffix;
@@ -2852,24 +2913,38 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		if (interval_max == 1) {
 			/* >> "X?"           REOP_JMP_ONFAIL 1f
 			 * >>                <X>
-			 * >>             1: */
+			 * >>                REOP_MAYBE_POP_ONFAIL   // Replaced with `REOP_POP_ONFAIL_AT 1f'
+			 * >>            1: */
 			byte_t *writer;
-			if unlikely(!re_compiler_require(self, 3))
+			if unlikely(!re_compiler_require(self, 6))
 				goto err_nomem;
-			self->rec_cpos = (byte_t *)mempmoveup(self->rec_estart + 3, self->rec_estart, expr_size);
 			writer = self->rec_estart;
+			memmoveup(writer + 3, writer, expr_size);
+
+			/* REOP_JMP_ONFAIL 1f */
 			*writer++ = REOP_JMP_ONFAIL;
-			int16_at(writer) = (int16_t)expr_size;
+			int16_at(writer) = (int16_t)(expr_size + 3);
+			writer += 2;
+
+			/* <X> */
+			writer += expr_size;
+
+			/* REOP_MAYBE_POP_ONFAIL */
+			*writer++ = REOP_MAYBE_POP_ONFAIL;
+			writer += 2;
+
+			self->rec_cpos = writer;
 			goto done_suffix;
 		} else {
 			uint8_t var_id;
 			byte_t *writer, *label_1, *label_2;
-			/* >> "X{0,m}"       REOP_JMP_ONFAIL 2f
-			 * >>                REOP_SETVAR  {VAR = (m - 1)}
+			/* >> "X{0,m}"       REOP_SETVAR  {VAR = (m - 1)}
+			 * >>                REOP_JMP_ONFAIL 2f
 			 * >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
+			 * >>                REOP_MAYBE_POP_ONFAIL   // Replaced with `REOP_POP_ONFAIL_AT 2f'
 			 * >>                REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b
 			 * >>            2: */
-			if unlikely(!re_compiler_require(self, 10))
+			if unlikely(!re_compiler_require(self, 13))
 				goto err_nomem;
 			if unlikely(!re_compiler_allocvar(self, &var_id))
 				goto err_esize;
@@ -2878,34 +2953,33 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			writer = self->rec_estart;
 			memmoveup(writer + 6, writer, expr_size);
 
-			/* Figure out the location of `label_2' */
-			label_2 = writer;
-			label_2 += 3; /* REOP_JMP_ONFAIL 2f */
-			label_2 += 3; /* REOP_SETVAR  {VAR = (m - 1)} */
-			label_2 += expr_size;
-			label_2 += 4; /* REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b */
-
-			/* REOP_JMP_ONFAIL 2f */
-			*writer++ = REOP_JMP_ONFAIL;
-			int16_at(writer) = (int16_t)(label_2 - (writer + 2));
-			writer += 2;
-
 			/* REOP_SETVAR  {VAR = (m - 1)} */
 			*writer++ = REOP_SETVAR;
 			*writer++ = var_id;
 			*writer++ = interval_max - 1;
 
-			/* This is where the "1:" is in the pseudo-code */
+			/* REOP_JMP_ONFAIL 2f */
+			label_2 = writer + 3 + expr_size + 3 + 4;
+			*writer++ = REOP_JMP_ONFAIL;
+			int16_at(writer) = (int16_t)(label_2 - (writer + 2));
+			writer += 2;
+
+			/* <X> */
 			label_1 = writer;
 			writer += expr_size;
 			if (expression_matches_epsilon)
-				re_compiler_set_group_epsilon_jmp(writer - 2, 4);
+				re_compiler_set_group_epsilon_jmp(writer - 2, 7);
+
+			/* REOP_MAYBE_POP_ONFAIL */
+			*writer++ = REOP_MAYBE_POP_ONFAIL;
+			writer += 2;
 
 			/* REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b */
 			*writer++ = REOP_DEC_JMP_AND_RETURN_ONFAIL;
 			*writer++ = var_id;
 			int16_at(writer) = (int16_t)(label_1 - (writer + 2));
 			writer += 2;
+			assert(label_2 == writer);
 
 			self->rec_cpos = writer;
 			goto done_suffix;
@@ -2949,14 +3023,16 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 
 	/* >> "X{n,m}"       REOP_SETVAR  {VAR1 = n - 1}
 	 * >>                REOP_SETVAR  {VAR2 = (m - n)}
-	 * >>            1:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
+	 * >>            1:  REOP_JMP_ONFAIL_DUMMY_AT 3f
+	 * >>            2:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `3f'
+	 * >>                REOP_MAYBE_POP_ONFAIL   // Replaced with `REOP_POP_ONFAIL_AT 3f'
 	 * >>                REOP_DEC_JMP {VAR1}, 1b
-	 * >>                REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR2}, 1b
-	 * >>            2: */
+	 * >>                REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR2}, 2b
+	 * >>            3: */
 	{
 		uint8_t var1_id, var2_id;
-		byte_t *writer, *label_1;
-		if unlikely(!re_compiler_require(self, 14))
+		byte_t *writer, *label_1, *label_2, *label_3;
+		if unlikely(!re_compiler_require(self, 20))
 			goto err_nomem;
 
 		/* Allocate variable IDs */
@@ -2967,7 +3043,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 
 		/* Make space for code we want to insert in the front */
 		writer = self->rec_estart;
-		memmoveup(writer + 6, writer, expr_size);
+		memmoveup(writer + 9, writer, expr_size);
 
 		/* REOP_SETVAR  {VAR1 = n - 1} */
 		*writer++ = REOP_SETVAR;
@@ -2979,11 +3055,22 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		*writer++ = var2_id;
 		*writer++ = interval_max - interval_min;
 
-		/* This is where the "1:" is in the pseudo-code */
+		/* 1:  REOP_JMP_ONFAIL_DUMMY_AT 3f */
 		label_1 = writer;
+		label_3 = writer + 3 + expr_size + 3 + 4 + 4;
+		*writer++ = REOP_JMP_ONFAIL_DUMMY_AT;
+		int16_at(writer) = (int16_t)(label_3 - (writer + 2));
+		writer += 2;
+
+		/* 2:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `3f' */
+		label_2 = writer;
 		writer += expr_size;
 		if (expression_matches_epsilon)
-			re_compiler_set_group_epsilon_jmp(writer - 2, 8);
+			re_compiler_set_group_epsilon_jmp(writer - 2, 11);
+
+		/* REOP_MAYBE_POP_ONFAIL */
+		*writer++ = REOP_MAYBE_POP_ONFAIL;
+		writer += 2;
 
 		/* REOP_DEC_JMP {VAR1}, 1b */
 		*writer++ = REOP_DEC_JMP;
@@ -2991,11 +3078,12 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		int16_at(writer) = (int16_t)(label_1 - (writer + 2));
 		writer += 2;
 
-		/* REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR2}, 1b */
+		/* REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR2}, 2b */
 		*writer++ = REOP_DEC_JMP_AND_RETURN_ONFAIL;
 		*writer++ = var2_id;
-		int16_at(writer) = (int16_t)(label_1 - (writer + 2));
+		int16_at(writer) = (int16_t)(label_2 - (writer + 2));
 		writer += 2;
+		assert(label_3 == writer);
 
 		self->rec_cpos = writer;
 	}
@@ -3176,8 +3264,8 @@ again:
 		byte_t *current_alternation_startptr;
 		size_t current_alternation_size;
 
-		/* Ensure that we've got enough memory for `REOP_JMP' and `REOP_JMP_ONFAIL' */
-		if unlikely(!re_compiler_require(self, 6))
+		/* Ensure that we've got enough memory for `REOP_JMP_ONFAIL', `REOP_MAYBE_POP_ONFAIL', and `REOP_JMP' */
+		if unlikely(!re_compiler_require(self, 9))
 			goto err_nomem;
 		current_alternation_startptr = self->rec_cbase + current_alternation_startoff;
 		current_alternation_size     = (size_t)(self->rec_cpos - current_alternation_startptr);
@@ -3187,9 +3275,11 @@ again:
 
 		/* Insert the leading `REOP_JMP_ONFAIL' that points to the next alternation */
 		*current_alternation_startptr++ = REOP_JMP_ONFAIL;
-		int16_at(current_alternation_startptr) = (int16_t)(current_alternation_size + 3);
+		int16_at(current_alternation_startptr) = (int16_t)(current_alternation_size + 6);
 		current_alternation_startptr += 2;
 		current_alternation_startptr += current_alternation_size;
+		*current_alternation_startptr++ = REOP_MAYBE_POP_ONFAIL;
+		current_alternation_startptr += 2;
 
 		/* Write  the `REOP_JMP' instruction after the alternation
 		 * Note that the offset of this instruction will be filled
@@ -3222,9 +3312,11 @@ again:
 		/* Up until now, we've compiled the expression "X|Y|Z" as:
 		 * >>    REOP_JMP_ONFAIL  1f
 		 * >>    <X>
+		 * >>    REOP_MAYBE_POP_ONFAIL   // Replaced with `REOP_POP_ONFAIL_AT 1f'
 		 * >>    REOP_JMP         2f // << `initial_alternation_jmp' points to this instruction
 		 * >> 1: REOP_JMP_ONFAIL  3f
 		 * >>    <Y>
+		 * >>    REOP_MAYBE_POP_ONFAIL   // Replaced with `REOP_POP_ONFAIL_AT 1f'
 		 * >> 2: REOP_JMP         4f
 		 * >> 3: <Z>
 		 * >> 4:
@@ -3317,9 +3409,7 @@ NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self) {
 		goto err_nomem;
 
 	/* Apply peephole optimizations to the code produced by `self' */
-	error = libre_code_makepeep(self);
-	if unlikely(error != RE_NOERROR)
-		goto err;
+	libre_compiler_peephole(self);
 
 	/* (try to) free unused memory from the code-buffer. */
 	if likely(self->rec_cpos < self->rec_cend) {
@@ -3418,7 +3508,7 @@ NOTHROW_NCX(CC libre_code_disasm)(struct re_code const *__restrict self,
 		size_t offset;
 		byte_t opcode;
 		char const *opcode_repr;
-		nextpc   = libre_opcode_next(pc);
+		nextpc = libre_opcode_next(pc);
 		offset = (size_t)(pc - self->rc_code);
 		opcode = *pc++;
 		printf("%#.4" PRIxSIZ ": ", offset);
@@ -3661,6 +3751,7 @@ do_cs_bitset:
 				}
 			}
 			PRINT("]");
+			assertf(pc == nextpc, "pc - nextpc = %Id", pc - nextpc);
 		}	break;
 
 		case REOP_GROUP_MATCH: {
@@ -3692,9 +3783,19 @@ do_cs_bitset:
 			       gid, (size_t)(jmp - self->rc_code));
 		}	break;
 
+		case REOP_POP_ONFAIL_AT: {
+			byte_t const *jmp = pc + 2 + int16_at(pc);
+			printf("pop_onfail_at @%#.4" PRIxSIZ, (size_t)(jmp - self->rc_code));
+		}	break;
+
 		case REOP_JMP_ONFAIL: {
 			byte_t const *jmp = pc + 2 + int16_at(pc);
 			printf("jmp_onfail @%#.4" PRIxSIZ, (size_t)(jmp - self->rc_code));
+		}	break;
+
+		case REOP_JMP_ONFAIL_DUMMY_AT: {
+			byte_t const *jmp = pc + 2 + int16_at(pc);
+			printf("jmp_onfail_dummy_at @%#.4" PRIxSIZ, (size_t)(jmp - self->rc_code));
 		}	break;
 
 		case REOP_JMP: {
@@ -3757,7 +3858,10 @@ do_cs_bitset:
 		SIMPLE_OPCODE(REOP_AT_EOW_UTF8, "at_eow_utf8");
 		SIMPLE_OPCODE(REOP_AT_SOS_UTF8, "at_sos_utf8");
 		SIMPLE_OPCODE(REOP_NOP, "nop");
+		SIMPLE_OPCODE(REOP_JMP_ONFAIL_DUMMY, "jmp_onfail_dummy");
+		SIMPLE_OPCODE(REOP_POP_ONFAIL, "pop_onfail");
 		SIMPLE_OPCODE(REOP_MATCHED, "matched");
+		SIMPLE_OPCODE(REOP_MAYBE_POP_ONFAIL, "[maybe_pop_onfail]");
 #undef SIMPLE_OPCODE
 		case REOP_MATCHED_PERFECT:
 			opcode_repr = "matched_perfect";

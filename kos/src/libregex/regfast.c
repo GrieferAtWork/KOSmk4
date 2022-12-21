@@ -241,7 +241,14 @@ again:
 		}
 
 		TARGET(REOP_AT_MIN ... REOP_AT_MAX)
-		TARGET(REOP_POP_ONFAIL) {
+		TARGET(REOP_POP_ONFAIL)
+		TARGET(REOP_JMP_ONFAIL_DUMMY) {
+			goto again;
+		}
+
+		TARGET(REOP_POP_ONFAIL_AT)
+		TARGET(REOP_JMP_ONFAIL_DUMMY_AT) {
+			pc += 2;
 			goto again;
 		}
 
@@ -681,8 +688,16 @@ again:
 		}
 
 		TARGET(REOP_AT_MIN ... REOP_AT_MAX)
-		TARGET(REOP_POP_ONFAIL) {
+		TARGET(REOP_JMP_ONFAIL_DUMMY)
+		TARGET(REOP_POP_ONFAIL){
 			/* Note how we don't adjust `enter_pc' here! */
+			goto again;
+		}
+
+		TARGET(REOP_JMP_ONFAIL_DUMMY_AT)
+		TARGET(REOP_POP_ONFAIL_AT) {
+			/* Note how we don't adjust `enter_pc' here! */
+			pc += 2;
 			goto again;
 		}
 
