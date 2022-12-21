@@ -827,7 +827,7 @@ dispatch:
 		if (total_delta > INT16_MIN && total_delta < INT16_MAX)
 			int16_at(pc - 2) = (int16_t)total_delta;
 		goto dispatch;
-	}	break;
+	}
 
 	default:
 		/* Note how we don't follow `REOP_JMP' or `REOP_DEC_JMP' here!
@@ -1007,7 +1007,6 @@ again:
 		pc = libre_opcode_next(pc - 1);
 		goto again;
 	}
-
 }
 
 

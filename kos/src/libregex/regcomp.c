@@ -1556,24 +1556,20 @@ loop_next:
 						goto err_EEND;
 
 					case 'w':
-					case 'W':
-						/* TODO */
-						break;
+						bit_set(charsets, RECS_ISSYMCONT - RECS_ISX_MIN);
+						goto loop_next;
 
 					case 'n':
-					case 'N':
-						/* TODO */
-						break;
+						bit_set(charsets, RECS_ISLF - RECS_ISX_MIN);
+						goto loop_next;
 
 					case 's':
-					case 'S':
-						/* TODO */
-						break;
+						bit_set(charsets, RECS_ISSPACE - RECS_ISX_MIN);
+						goto loop_next;
 
 					case 'd':
-					case 'D':
-						/* TODO */
-						break;
+						bit_set(charsets, RECS_ISDIGIT - RECS_ISX_MIN);
+						goto loop_next;
 
 					case '0':
 					case 'u':
