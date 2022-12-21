@@ -54,21 +54,24 @@ PRIVATE PRE_EXEC_MATCH re_exec_match;
 PRIVATE PRE_EXEC_SEARCH re_exec_search;
 PRIVATE PRE_EXEC_RSEARCH re_exec_rsearch;
 
+#define DEFAULT_SYNTAX_FLAGS               \
+	(RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS | \
+	 RE_SYNTAX_CHAR_CLASSES |              \
+	 RE_SYNTAX_CONTEXT_INVALID_OPS |       \
+	 RE_SYNTAX_DOT_NOT_NULL |              \
+	 RE_SYNTAX_INTERVALS |                 \
+	 RE_SYNTAX_NO_BK_BRACES |              \
+	 RE_SYNTAX_NO_BK_PARENS |              \
+	 RE_SYNTAX_NO_BK_VBAR |                \
+	 RE_SYNTAX_NO_EMPTY_RANGES |           \
+	 RE_SYNTAX_CONTEXT_INVALID_DUP)
+
 PRIVATE re_errno_t re_compile_error(char const *pattern,
-                                         uintptr_t extra_syntax_flags) {
+                                    uintptr_t extra_syntax_flags) {
 	re_errno_t error;
 	struct re_compiler compiler;
 	re_compiler_init(&compiler, pattern,
-	                 RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS |
-	                 RE_SYNTAX_CHAR_CLASSES |
-	                 RE_SYNTAX_CONTEXT_INVALID_OPS |
-	                 RE_SYNTAX_DOT_NOT_NULL |
-	                 RE_SYNTAX_INTERVALS |
-	                 RE_SYNTAX_NO_BK_BRACES |
-	                 RE_SYNTAX_NO_BK_PARENS |
-	                 RE_SYNTAX_NO_BK_VBAR |
-	                 RE_SYNTAX_NO_EMPTY_RANGES |
-	                 RE_SYNTAX_CONTEXT_INVALID_DUP |
+	                 DEFAULT_SYNTAX_FLAGS |
 	                 extra_syntax_flags);
 	error = re_compiler_compile(&compiler);
 	NE(RE_NOERROR, error);
@@ -82,16 +85,7 @@ PRIVATE struct re_code *re_compile(char const *pattern,
 	re_errno_t error;
 	struct re_compiler compiler;
 	re_compiler_init(&compiler, pattern,
-	                 RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS |
-	                 RE_SYNTAX_CHAR_CLASSES |
-	                 RE_SYNTAX_CONTEXT_INVALID_OPS |
-	                 RE_SYNTAX_DOT_NOT_NULL |
-	                 RE_SYNTAX_INTERVALS |
-	                 RE_SYNTAX_NO_BK_BRACES |
-	                 RE_SYNTAX_NO_BK_PARENS |
-	                 RE_SYNTAX_NO_BK_VBAR |
-	                 RE_SYNTAX_NO_EMPTY_RANGES |
-	                 RE_SYNTAX_CONTEXT_INVALID_DUP |
+	                 DEFAULT_SYNTAX_FLAGS |
 	                 extra_syntax_flags);
 	error = re_compiler_compile(&compiler);
 	EQ(RE_NOERROR, error);
