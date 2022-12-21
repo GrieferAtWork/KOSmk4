@@ -2694,6 +2694,12 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 	expr_size = (size_t)(self->rec_cpos - self->rec_estart);
 	assert(!((uintptr_t)self->rec_cbase & 1));
 
+	/* TODO: Any use-case that is implemented via `REOP_JMP_ONFAIL_DUMMY_AT' should
+	 *       first  check if `expr_size'  is smaller than `EXPR_DUPLICATE_MAXSIZE'.
+	 *       If that is the case, then encode the expression twice:
+	 *       e.g. "X+" can be encoded as "XX*" (which doesn't use dummy on-fail handlers)
+	 */
+
 	/* When many are accepted, then `interval_max' is infinite */
 	if (interval_max_is_unbounded) {
 		if (interval_min == 0) {

@@ -224,7 +224,7 @@ NOTHROW_NCX(CC input_can_match_both_ex)(struct re_code const *code,
 	byte_t opcode1, opcode2;
 #define swap_interpreters()                                        \
 	do {                                                           \
-		tswap(byte_t, opcode1, opcode2);                            \
+		tswap(byte_t, opcode1, opcode2);                           \
 		tswap(struct re_mini_interpreter *, int1_copy, int2_copy); \
 	}	__WHILE0
 
@@ -498,6 +498,7 @@ compare_ascii_utf8_icase_exact:
 			}
 			default: __builtin_unreachable();
 			}
+			__builtin_unreachable();
 		}
 
 		case REOP_CONTAINS_UTF8:

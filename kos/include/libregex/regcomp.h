@@ -187,6 +187,12 @@ typedef int re_errno_t;
  *     >>                REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR2}, 2b
  *     >>            3:
  *
+ * When <X> is small enough:
+ *     >> "X+"           <XX*>
+ *     >> "X{n,}"        <XX{n-1,}>      // For "n >= 2", and size of "X" multiplied by "n"
+ *     >> "X{1,m}"       <XX{0,m-1}>
+ *     >> "X{n,m}"       <XX{n-1,m-1}>   // For "n >= 2", and size of "X" multiplied by "n"
+ *
  * HINT: Using the above  compilation patterns, inserting  code in front  of
  *       already-compiled code can simply be done whilst ignoring the chance
  *       of  relocations. This is because jumps are relative, and will never
@@ -421,7 +427,11 @@ enum {
 	                             * Candidate A is better than B if `A.end_input_pointer > B.end_input_pointer' */
 	REOP_MATCHED_PERFECT,       /* [+0] Same as `REOP_MATCHED', but act as though the match was perfect (even if it might not be; s.a. `RE_SYNTAX_NO_POSIX_BACKTRACKING') */
 	REOP_MAYBE_POP_ONFAIL,      /* [+2] Marker for the peephole optimizer (cannot appear at runtime, and treated as an illegal instruction)
-	                             * The  2   operand   bytes   are   undefined  (and   used   as   placeholder   for   `REOP_POP_ONFAIL_AT') */
+	                             * - The 2 operand bytes are undefined (and used as placeholder for `REOP_POP_ONFAIL_AT')
+	                             * - Encoding  as `REOP_POP_ONFAIL_AT' only happens if no  input can match both branches of
+	                             *   the associated bi-branch expression (as started by either `REOP_JMP_ONFAIL_DUMMY[_AT]'
+	                             *   or `REOP_JMP_ONFAIL')
+	                             * - When this encoding cannot be used, this opcode is instead `REOP_NOP'd away. */
 };
 
 
