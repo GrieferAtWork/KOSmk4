@@ -143,8 +143,8 @@ NOTHROW_NCX(CC re_code_setminmatch)(struct re_code *__restrict self,
 /* Map `X - RECS_ISX_MIN' to `__UNICODE_IS*' flags. */
 INTDEF uint16_t const libre_unicode_traits[]; /* from "./regexec.c" */
 
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) uint8_t * /* from "./regcomp.c" */
-NOTHROW_NCX(CC libre_opcode_next)(uint8_t const *__restrict p_instr);
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) byte_t * /* from "./regcomp.c" */
+NOTHROW_NCX(CC libre_opcode_next)(byte_t const *__restrict p_instr);
 
 #define getb() (*pc++)
 #define getw() (pc += 2, (int16_t)UNALIGNED_GET16((uint16_t const *)(pc - 2)))
@@ -430,7 +430,7 @@ NOTHROW_NCX(CC cs_gather_matching_bytes)(bitstr_t matchend_bytes[],
 			break;
 
 		case RECS_CONTAINS: {
-			uint8_t len = *pc++;
+			byte_t len = *pc++;
 			assert(len >= 1);
 			if (is_unicode) {
 				/* Match all possible utf-8 lead bytes */
@@ -509,7 +509,7 @@ again:
 #define GOTMATCH() goto got_match
 
 		TARGET(REOP_EXACT) {
-			uint8_t len = getb();
+			byte_t len = getb();
 			fastmap_setpc(fmap, self, pc[0], enter_pc);
 			minmatch = len;
 			pc += len;
@@ -517,7 +517,7 @@ again:
 		}
 
 		TARGET(REOP_EXACT_ASCII_ICASE) {
-			uint8_t len      = getb();
+			byte_t len = getb();
 			unsigned char ch = (unsigned char)pc[0];
 			fastmap_setpc(fmap, self, (byte_t)tolower(ch), enter_pc);
 			fastmap_setpc(fmap, self, (byte_t)toupper(ch), enter_pc);
@@ -527,7 +527,7 @@ again:
 		}
 
 		TARGET(REOP_EXACT_UTF8_ICASE) {
-			uint8_t len = getb();
+			byte_t len = getb();
 			unsigned char ch = (unsigned char)pc[0];
 			if (ch >= 0xc0) {
 				fastmap_setpcr(fmap, self, 0xc0, 0xff, enter_pc);
@@ -619,7 +619,7 @@ again:
 		}
 
 		TARGET(REOP_CONTAINS_UTF8) {
-			uint8_t count = getb();
+			byte_t count = getb();
 			assert(count >= 2);
 			do {
 				fastmap_setpc(fmap, self, *pc, enter_pc);
@@ -631,7 +631,7 @@ again:
 
 		TARGET(REOP_NCONTAINS_UTF8) {
 			int bitno;
-			uint8_t count = getb();
+			byte_t count = getb();
 			bitstr_t bit_decl(acepted_bytes, 256);
 			bit_setall(acepted_bytes, 256);
 			assert(count >= 1);

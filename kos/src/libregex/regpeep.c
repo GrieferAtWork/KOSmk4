@@ -38,10 +38,14 @@ gcc_opt.append("-Os");
 
 #include <kos/types.h>
 
+#include <alloca.h>
 #include <assert.h>
+#include <ctype.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 #include <string.h>
+#include <unicode.h>
 
 #include <libregex/regcomp.h>
 
@@ -58,6 +62,13 @@ gcc_opt.append("-Os");
 
 DECL_BEGIN
 
+#define tswap(T, a, b)   \
+	do {                 \
+		T _temp = (b);   \
+		(b)     = (a);   \
+		(a)     = _temp; \
+	}	__WHILE0
+
 /* Check if 2 range overlap. */
 #define RANGES_OVERLAP(r1_min, r1_max, r2_min, r2_max) \
 	((r1_max) >= (r2_min) && (r2_max) >= (r1_min))
@@ -66,29 +77,561 @@ DECL_BEGIN
 #define getw()      (pc += 2, (int16_t)UNALIGNED_GET16((uint16_t const *)(pc - 2)))
 #define int16_at(p) (*(int16_t *)(p))
 
-INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) uint8_t * /* from "./regcomp.c" */
-NOTHROW_NCX(CC libre_opcode_next)(uint8_t const *__restrict p_instr);
+INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) byte_t * /* from "./regcomp.c" */
+NOTHROW_NCX(CC libre_opcode_next)(byte_t const *__restrict p_instr);
+
+struct re_mini_interpreter {
+	byte_t const                    *rmi_pc;         /* [1..1] PC for current instruction */
+	byte_t const                    *rmi_endpc;      /* [1..1] Hard program end pointer */
+	byte_t const                    *rmi_exact_data; /* [?..1] Data pointer for EXACT-like opcodes */
+	uint8_t                          rmi_exact_nrem; /* # of remaining elements in `rmi_exact_data' */
+	COMPILER_FLEXIBLE_ARRAY(uint8_t, rmi_vars); /* Values for code variables. */
+};
+
+#define _re_mini_interpreter_sizeof(nvars) \
+	(offsetof(struct re_mini_interpreter, rmi_vars) + (nvars) * sizeof(uint8_t))
+#define re_mini_interpreter_alloc(nvars) \
+	((struct re_mini_interpreter *)alloca(_re_mini_interpreter_sizeof(nvars)))
+#define re_mini_interpreter_init(self, pc, endpc) \
+	(void)((self)->rmi_pc = (pc), (self)->rmi_endpc = (endpc), (self)->rmi_exact_nrem = 0)
+
+/* Check if the interpreter is part-way into an EXACT-like opcode */
+#define re_mini_interpreter_inpartialexact(self) \
+	((self)->rmi_exact_nrem != 0)
+
+/* Skip opcodes that don't relate to input matching, or otherwise
+ * require special handling  (such as bi-branching  instructions)
+ *
+ * Also hard-stops if `self->rmi_endpc' is reached.
+ * @return: * :              The currently loaded opcode
+ * @return: REOP_MATCHED:    End-of-instruction-stream (or `rmi_endpc' reached)
+ * @return: REOP_JMP_ONFAIL: At a bi-branch opcode (`int16_at(self->rmi_pc)' is the relevant delta)
+ */
+PRIVATE NONNULL((1)) byte_t
+NOTHROW_NCX(CC re_mini_interpreter_getopcode)(struct re_mini_interpreter *__restrict self) {
+	byte_t opcode;
+	byte_t const *pc = self->rmi_pc;
+again:
+	if (pc == self->rmi_endpc) {
+		opcode = REOP_MATCHED;
+		goto done;
+	}
+	opcode = *pc++;
+	switch (opcode) {
+
+	case REOP_EXACT:
+	case REOP_EXACT_ASCII_ICASE:
+	case REOP_EXACT_UTF8_ICASE:
+		if (self->rmi_exact_nrem == 0) {
+			self->rmi_exact_data = pc + 1;
+			self->rmi_exact_nrem = *pc;
+			assert(self->rmi_exact_nrem > 0);
+		}
+		--pc;
+		goto done;
+
+	case REOP_GROUP_START:
+	case REOP_GROUP_END:
+	case REOP_GROUP_END_JMIN ... REOP_GROUP_END_JMAX:
+		/* Don't care about groups */
+		++pc;
+		goto again;
+
+	case REOP_AT_MIN ... REOP_AT_MAX:
+		/* REOP_AT_* opcodes aren't enough to say for certain that branches never match.
+		 * There are some cases where they could say so (e.g. when both branches specify
+		 * AT-instructions that mutually exclusive), but  that's too complicated for  us
+		 * to really care. */
+		goto again;
+
+	case REOP_POP_ONFAIL:
+	case REOP_JMP_ONFAIL_DUMMY:
+	case REOP_NOP:
+		goto again;
+
+	case REOP_POP_ONFAIL_AT:
+	case REOP_JMP_ONFAIL_DUMMY_AT:
+		pc += 2;
+		goto again;
+
+	case REOP_JMP: {
+		int16_t delta;
+		/* Unconditional jumps can just be followed */
+		delta = getw();
+		pc += delta;
+		goto again;
+	}
+
+	case REOP_JMP_AND_RETURN_ONFAIL:
+		opcode = REOP_JMP_ONFAIL;
+		goto done;
+
+	case REOP_DEC_JMP: {
+		/* This is why we're implementing variables! */
+		byte_t varid = getb();
+		int16_t delta = getw();
+		if (self->rmi_vars[varid] != 0) {
+			--self->rmi_vars[varid];
+			pc += delta;
+		}
+		goto again;
+	}
+
+	case REOP_DEC_JMP_AND_RETURN_ONFAIL: {
+		byte_t varid = getb();
+		pc += 2; /* delta */
+		if (self->rmi_vars[varid] != 0) {
+			--self->rmi_vars[varid];
+			/* In this scenario, the instruction is bi-branching! */
+			pc -= 3; /* Act like the varid was `REOP_JMP_AND_RETURN_ONFAIL' */
+			opcode = REOP_JMP_ONFAIL;
+			goto done;
+		}
+		goto again;
+	}
+
+	case REOP_SETVAR: {
+		byte_t varid = getb();
+		byte_t value = getb();
+		self->rmi_vars[varid] = value;
+		goto again;
+	}
+
+	case REOP_MATCHED_PERFECT:
+		/* Normalize to `REOP_MATCHED' */
+		opcode = REOP_MATCHED;
+		--pc;
+		goto done;
+
+	default:
+		/* Matching opcode (let the caller deal with this) */
+		--pc;
+		goto done;
+	}
+	__builtin_unreachable();
+done:
+	self->rmi_pc = pc;
+	return opcode;
+}
+
+PRIVATE WUNUSED NONNULL((1, 2, 3)) bool
+NOTHROW_NCX(CC input_can_match_both_ex)(struct re_code const *code,
+                                        struct re_mini_interpreter *int1,
+                                        struct re_mini_interpreter *int2) {
+	/* Process and compare opcodes from our 2 interpreters. */
+	struct re_mini_interpreter *int1_copy;
+	struct re_mini_interpreter *int2_copy;
+	byte_t opcode1, opcode2;
+#define swap_interpreters()                                        \
+	do {                                                           \
+		tswap(byte_t, opcode1, opcode2);                            \
+		tswap(struct re_mini_interpreter *, int1_copy, int2_copy); \
+	}	__WHILE0
+
+	int1_copy = NULL;
+	int2_copy = NULL;
+again:
+	opcode1 = re_mini_interpreter_getopcode(int1);
+	opcode2 = re_mini_interpreter_getopcode(int2);
+
+	/* Check for bi-branch */
+	if (opcode1 == REOP_JMP_ONFAIL) {
+		/* Must check both branches. */
+		byte_t const *pc1, *pc2;
+		pc1 = int1->rmi_pc + 3;
+		pc2 = pc1 + int16_at(pc1 - 2);
+		if (int1_copy == NULL)
+			int1_copy = re_mini_interpreter_alloc(code->rc_nvars);
+		if (int2_copy == NULL)
+			int2_copy = re_mini_interpreter_alloc(code->rc_nvars);
+		memcpy(int1_copy, int1, _re_mini_interpreter_sizeof(code->rc_nvars));
+		memcpy(int2_copy, int2, _re_mini_interpreter_sizeof(code->rc_nvars));
+		int1_copy->rmi_pc = pc2;
+		if (input_can_match_both_ex(code, int1_copy, int2_copy))
+			return true;
+		int1->rmi_pc = pc1;
+		goto again;
+	}
+	if (opcode2 == REOP_JMP_ONFAIL) {
+		/* Must check both branches. */
+		byte_t const *pc1, *pc2;
+		pc1 = int2->rmi_pc + 3;
+		pc2 = pc1 + int16_at(pc1 - 2);
+		if (int1_copy == NULL)
+			int1_copy = re_mini_interpreter_alloc(code->rc_nvars);
+		if (int2_copy == NULL)
+			int2_copy = re_mini_interpreter_alloc(code->rc_nvars);
+		memcpy(int1_copy, int1, _re_mini_interpreter_sizeof(code->rc_nvars));
+		memcpy(int2_copy, int2, _re_mini_interpreter_sizeof(code->rc_nvars));
+		int2_copy->rmi_pc = pc2;
+		if (input_can_match_both_ex(code, int1_copy, int2_copy))
+			return true;
+		int2->rmi_pc = pc1;
+		goto again;
+	}
+
+	if (opcode1 != opcode2) {
+		if (opcode1 == REOP_MATCHED || opcode2 == REOP_MATCHED) {
+			/* One of the 2 interpreters reached its end before the other.
+			 * -> Because of different length-requirements, it's  impossible
+			 *    for any kind of input to exist that matches both branches! */
+			return false;
+		}
+	} else {
+		byte_t const *int1_nextpc, *int2_nextpc;
+		/* Same opcodes */
+		if (opcode1 == REOP_MATCHED)
+			return true; /* Both branches reached their end simultaneously -> bi-matching input does exist */
+
+		/* Special case: it's literally the same instruction */
+		if unlikely(int1->rmi_pc == int2->rmi_pc)
+			return true;
+
+		/* Check if both branches use the exact same instruction.
+		 * If so,  then  skip  ahead  to  the  next  instruction.
+		 *
+		 * Note that we can only do this when not partially into an exact-data opcode
+		 */
+		if (!re_mini_interpreter_inpartialexact(int1) &&
+		    !re_mini_interpreter_inpartialexact(int2)) {
+			int1_nextpc = libre_opcode_next(int1->rmi_pc);
+			int2_nextpc = libre_opcode_next(int2->rmi_pc);
+			if (((size_t)(int1_nextpc - int1->rmi_pc) == (size_t)(int2_nextpc - int2->rmi_pc)) &&
+			    bcmp(int1->rmi_pc, int2->rmi_pc, (size_t)(int1_nextpc - int1->rmi_pc)) == 0) {
+				/* Literally the same instruction, so just look at what comes after. */
+				int1->rmi_pc = int1_nextpc;
+				int2->rmi_pc = int2_nextpc;
+				goto again;
+			}
+		}
+	}
+
+	/* Actually compare stuff matched by opcodes:
+	 * - REOP_EXACT
+	 * - REOP_EXACT_ASCII_ICASE
+	 * - REOP_EXACT_UTF8_ICASE
+	 * - REOP_ANY_MIN ... REOP_ANY_MAX   (for simplicity, we treat all of these as `REOP_ANY')
+	 * - REOP_BYTE
+	 * - REOP_NBYTE
+	 * - REOP_BYTE2
+	 * - REOP_NBYTE2
+	 * - REOP_RANGE
+	 * - REOP_NRANGE
+	 * - REOP_CONTAINS_UTF8
+	 * - REOP_NCONTAINS_UTF8
+	 * - REOP_CS_UTF8
+	 * - REOP_CS_BYTE
+	 * - REOP_NCS_UTF8
+	 */
+	switch (opcode1) {
+
+	case REOP_ANY_MIN ... REOP_ANY_MAX:
+		int1->rmi_pc += 1;
+		switch (opcode2) {
+
+		case REOP_EXACT:
+		case REOP_EXACT_ASCII_ICASE:
+			if (!int2->rmi_exact_nrem)
+				goto int2_after_exact_data;
+			++int2->rmi_exact_data;
+			--int2->rmi_exact_nrem;
+			goto again;
+
+		case REOP_EXACT_UTF8_ICASE:
+			if (!int2->rmi_exact_nrem)
+				goto int2_after_exact_data;
+			int2->rmi_exact_data += unicode_utf8seqlen[*int2->rmi_exact_data];
+			--int2->rmi_exact_nrem;
+			goto again;
+
+		case REOP_ANY_MIN ... REOP_ANY_MAX:
+		case REOP_BYTE:
+		case REOP_NBYTE:
+		case REOP_BYTE2:
+		case REOP_NBYTE2:
+		case REOP_RANGE:
+		case REOP_NRANGE:
+		case REOP_CONTAINS_UTF8:
+		case REOP_NCONTAINS_UTF8:
+		case REOP_CS_UTF8:
+		case REOP_CS_BYTE:
+		case REOP_NCS_UTF8:
+			int2->rmi_pc = libre_opcode_next(int2->rmi_pc);
+			goto again;
+
+		default: break;
+		}
+		goto can_match_both;
+
+	case REOP_EXACT:
+		if (!int1->rmi_exact_nrem)
+			goto int1_after_exact_data;
+		switch (opcode2) {
+
+		case REOP_EXACT:
+			for (;;) {
+				byte_t int1_exact_byte;
+				byte_t int2_exact_byte;
+				if (!int1->rmi_exact_nrem)
+					goto int1_after_exact_data;
+				if (!int2->rmi_exact_nrem)
+					goto int2_after_exact_data;
+				int1_exact_byte = *int1->rmi_exact_data++;
+				int2_exact_byte = *int2->rmi_exact_data++;
+				if (int1_exact_byte != int2_exact_byte)
+					return false; /* Miss-matching exact sequence */
+				--int1->rmi_exact_nrem;
+				--int2->rmi_exact_nrem;
+			}
+			__builtin_unreachable();
+
+		case REOP_EXACT_ASCII_ICASE:
+compare_ascii_icase_exact:
+			for (;;) {
+				byte_t int1_exact_byte;
+				byte_t int2_exact_byte;
+				if (!int1->rmi_exact_nrem)
+					goto int1_after_exact_data;
+				if (!int2->rmi_exact_nrem)
+					goto int2_after_exact_data;
+				int1_exact_byte = *int1->rmi_exact_data++;
+				int2_exact_byte = *int2->rmi_exact_data++;
+				if (int1_exact_byte != int2_exact_byte) {
+					int1_exact_byte = (byte_t)tolower(int1_exact_byte);
+					int2_exact_byte = (byte_t)tolower(int2_exact_byte);
+					if (int1_exact_byte != int2_exact_byte)
+						return false; /* Miss-matching exact sequence */
+				}
+				--int1->rmi_exact_nrem;
+				--int2->rmi_exact_nrem;
+			}
+			__builtin_unreachable();
+
+		case REOP_EXACT_UTF8_ICASE:
+compare_ascii_utf8_icase_exact:
+			for (;;) {
+				byte_t int1_exact_byte;
+				char32_t int2_exact_utf8;
+				if (!int1->rmi_exact_nrem)
+					goto int1_after_exact_data;
+				if (!int2->rmi_exact_nrem)
+					goto int2_after_exact_data;
+				int1_exact_byte = *int1->rmi_exact_data++;
+				int2_exact_utf8 = unicode_readutf8((char const **)&int2->rmi_exact_data);
+				if (int1_exact_byte != int2_exact_utf8) {
+					int1_exact_byte = (byte_t)tolower(int1_exact_byte);
+					int2_exact_utf8 = unicode_tolower(int2_exact_utf8);
+					if (int1_exact_byte != int2_exact_utf8)
+						return false; /* Miss-matching exact sequence */
+				}
+				--int1->rmi_exact_nrem;
+				--int2->rmi_exact_nrem;
+			}
+			__builtin_unreachable();
+
+		case REOP_ANY_MIN ... REOP_ANY_MAX:
+			++int1->rmi_exact_data;
+			--int1->rmi_exact_nrem;
+			++int2->rmi_pc;
+			goto again;
+
+		case REOP_BYTE:
+		case REOP_NBYTE:
+		case REOP_BYTE2:
+		case REOP_NBYTE2:
+		case REOP_RANGE:
+		case REOP_NRANGE: {
+			byte_t b1;
+			b1 = *int1->rmi_exact_data++;
+			--int1->rmi_exact_nrem;
+			switch (opcode2) {
+			case REOP_BYTE: {
+				byte_t b2;
+				++int2->rmi_pc;
+				b2 = *int2->rmi_pc++;
+				if (b1 != b2)
+					return false; /* "(f|[g])" -> no input can match both */
+				goto again;
+			}
+			case REOP_NBYTE: {
+				byte_t b2;
+				b2 = *int2->rmi_pc++;
+				if (b1 == b2)
+					return false; /* "(f|[^f])" -> no input can match both */
+				goto again;
+			}
+			case REOP_BYTE2: {
+				byte_t b2_1, b2_2;
+				++int2->rmi_pc;
+				b2_1 = *int2->rmi_pc++;
+				b2_2 = *int2->rmi_pc++;
+				if (b1 != b2_1 && b1 != b2_2)
+					return false; /* "(f|[gh])" -> no input can match both */
+				goto again;
+			}
+			case REOP_NBYTE2: {
+				byte_t b2_1, b2_2;
+				++int2->rmi_pc;
+				b2_1 = *int2->rmi_pc++;
+				b2_2 = *int2->rmi_pc++;
+				if (b1 == b2_1 || b1 == b2_2)
+					return false; /* "(f|[^f])" -> no input can match both */
+				goto again;
+			}
+			case REOP_RANGE: {
+				byte_t b2_1, b2_2;
+				++int2->rmi_pc;
+				b2_1 = *int2->rmi_pc++;
+				b2_2 = *int2->rmi_pc++;
+				if (b1 < b2_1 || b1 > b2_2)
+					return false; /* "(f|[g-z])" -> no input can match both */
+				goto again;
+			}
+			case REOP_NRANGE: {
+				byte_t b2_1, b2_2;
+				++int2->rmi_pc;
+				b2_1 = *int2->rmi_pc++;
+				b2_2 = *int2->rmi_pc++;
+				if (b1 >= b2_1 && b1 <= b2_2)
+					return false; /* "(f|[^e-g])" -> no input can match both */
+				goto again;
+			}
+			default: __builtin_unreachable();
+			}
+		}
+
+		case REOP_CONTAINS_UTF8:
+		case REOP_NCONTAINS_UTF8:
+		case REOP_CS_UTF8:
+		case REOP_CS_BYTE:
+		case REOP_NCS_UTF8:
+			/* TODO */
+
+		default: break;
+		}
+		goto can_match_both;
+
+	case REOP_EXACT_ASCII_ICASE:
+		if (!int1->rmi_exact_nrem)
+			goto int1_after_exact_data;
+		switch (opcode2) {
+
+		case REOP_EXACT:
+		case REOP_EXACT_ASCII_ICASE:
+			goto compare_ascii_icase_exact;
+
+		case REOP_EXACT_UTF8_ICASE:
+			goto compare_ascii_utf8_icase_exact;
+
+		case REOP_ANY_MIN ... REOP_ANY_MAX:
+			++int1->rmi_exact_data;
+			--int1->rmi_exact_nrem;
+			int2->rmi_pc += 1;
+			goto again;
+
+		case REOP_BYTE:
+		case REOP_NBYTE:
+		case REOP_BYTE2:
+		case REOP_NBYTE2:
+		case REOP_RANGE:
+		case REOP_NRANGE:
+		case REOP_CONTAINS_UTF8:
+		case REOP_NCONTAINS_UTF8:
+		case REOP_CS_UTF8:
+		case REOP_CS_BYTE:
+		case REOP_NCS_UTF8:
+			/* TODO */
+
+		default: break;
+		}
+		goto can_match_both;
+
+	case REOP_EXACT_UTF8_ICASE:
+		if (!int1->rmi_exact_nrem)
+			goto int1_after_exact_data;
+		switch (opcode2) {
+
+		case REOP_EXACT:
+		case REOP_EXACT_ASCII_ICASE:
+			swap_interpreters();
+			goto compare_ascii_utf8_icase_exact;
+
+		case REOP_EXACT_UTF8_ICASE:
+			goto compare_ascii_icase_exact;
+
+		case REOP_ANY_MIN ... REOP_ANY_MAX:
+			int1->rmi_exact_data += unicode_utf8seqlen[*int1->rmi_exact_data];
+			--int1->rmi_exact_nrem;
+			int2->rmi_pc += 1;
+			goto again;
+
+		case REOP_BYTE:
+		case REOP_NBYTE:
+		case REOP_BYTE2:
+		case REOP_NBYTE2:
+		case REOP_RANGE:
+		case REOP_NRANGE:
+		case REOP_CONTAINS_UTF8:
+		case REOP_NCONTAINS_UTF8:
+		case REOP_CS_UTF8:
+		case REOP_CS_BYTE:
+		case REOP_NCS_UTF8:
+			/* TODO */
+
+		default: break;
+		}
+		goto can_match_both;
+
+	case REOP_BYTE:
+	case REOP_NBYTE:
+	case REOP_BYTE2:
+	case REOP_NBYTE2:
+	case REOP_RANGE:
+	case REOP_NRANGE:
+	case REOP_CONTAINS_UTF8:
+	case REOP_NCONTAINS_UTF8:
+	case REOP_CS_UTF8:
+	case REOP_CS_BYTE:
+	case REOP_NCS_UTF8:
+		/* TODO */
+
+	default:
+		goto can_match_both;
+	}
+
+can_match_both:
+
+	/* Safety-case: assume that input _can_ match both sides */
+	return true;
+int1_after_exact_data:
+	int1->rmi_pc = int1->rmi_exact_data;
+	goto again;
+int2_after_exact_data:
+	int2->rmi_pc = int2->rmi_exact_data;
+	goto again;
+}
+
 
 /* Check if input exists that can match both code at `pc1' and `pc2'
  * @param: pc_end: PC for the (sub-)expression end address. We're allowed  to
- *                 assume that when either `pc1'  or `pc2' high this  address
+ *                 assume that when either `pc1'  or `pc2' hits this  address
  *                 (but not at the same time), on all possible branches, then
  *                 no input exists that can match both branches.
  *                 Example: "b?" -> no input can both match "b" and the epsilon-branch
  * @return: true:  Yes, such input _does_ in deed exist (or it might if unsure).
  * @return: false: No, it's always one or the other. */
-PRIVATE WUNUSED NONNULL((1, 2)) bool
-NOTHROW_NCX(CC input_can_match_both)(byte_t const *pc1,
+PRIVATE WUNUSED NONNULL((1, 2, 3, 4)) bool
+NOTHROW_NCX(CC input_can_match_both)(struct re_code const *code,
+                                     byte_t const *pc1,
                                      byte_t const *pc2,
                                      byte_t const *pc_end) {
-	/* TODO: parse and  compare matches  done by  opcodes.
-	 *       For  bi-branches,  we must  return the  || of
-	 *       both branches with the other caller-given pc. */
-	(void)pc1;
-	(void)pc2;
-	(void)pc_end;
-
-	return true;
+	struct re_mini_interpreter *int1;
+	struct re_mini_interpreter *int2;
+	int1 = re_mini_interpreter_alloc(code->rc_nvars);
+	int2 = re_mini_interpreter_alloc(code->rc_nvars);
+	re_mini_interpreter_init(int1, pc1, pc_end);
+	re_mini_interpreter_init(int2, pc2, pc_end);
+	return input_can_match_both_ex(code, int1, int2);
 }
 
 /* Find the next unbalanced `REOP_MAYBE_POP_ONFAIL' opcode. */
@@ -152,8 +695,9 @@ dispatch:
  * It  is assumed that the given range forms a singular basic-block,
  * in that all code-paths within the range eventually converge  back
  * at `pc_end' */
-PRIVATE NONNULL((1, 2)) unsigned int
-NOTHROW_NCX(CC peep_onfail_stack)(byte_t *pc,
+PRIVATE NONNULL((1, 2, 3)) unsigned int
+NOTHROW_NCX(CC peep_onfail_stack)(struct re_code *code,
+                                  byte_t *pc,
                                   byte_t *pc_end) {
 	unsigned int result;
 	byte_t opcode;
@@ -188,11 +732,11 @@ dispatch:
 		expr_end   = find_unbalanced_maybe_pop_onfail(expr_start);
 		assert(*expr_end == REOP_MAYBE_POP_ONFAIL);
 		assert(expr_end < pc_end);
-		inner_flags = peep_onfail_stack(expr_start, expr_end); /* Recursively optimize */
+		inner_flags = peep_onfail_stack(code, expr_start, expr_end); /* Recursively optimize */
 		result |= inner_flags;
 
 		/* Figure out how we should replace the trailing `REOP_MAYBE_POP_ONFAIL' */
-		bimatch_possible = input_can_match_both(expr_start, onfail_pc, pc_end);
+		bimatch_possible = input_can_match_both(code, expr_start, onfail_pc, pc_end);
 		if (bimatch_possible) {
 			/* Even after the non-failing branch has been matched, it is still possible
 			 * for input to be constructed such that we'll need to roll-back to run the
@@ -521,7 +1065,8 @@ NOTHROW_NCX(CC libre_compiler_peephole)(struct re_compiler *__restrict self) {
 	 *    also match input "afoob", it won't be  able to do so any better  than
 	 *    the "foo" branch.
 	 */
-	peep_onfail_stack(((struct re_code *)self->rec_cbase)->rc_code,
+	peep_onfail_stack(((struct re_code *)self->rec_cbase),
+	                  ((struct re_code *)self->rec_cbase)->rc_code,
 	                  self->rec_cpos);
 
 	/* Remove all NOP opcodes from the code-stream */

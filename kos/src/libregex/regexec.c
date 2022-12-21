@@ -539,7 +539,7 @@ PRIVATE WUNUSED NONNULL((1, 2)) re_errno_t
 NOTHROW_NCX(CC re_interpreter_init)(struct re_interpreter *__restrict self,
                                     struct re_exec const *__restrict exec,
                                     size_t nmatch, re_regmatch_t *pmatch) {
-	uint8_t ngrp;
+	uint16_t ngrp;
 	size_t in_len;
 	struct iovec const *iov = exec->rx_iov;
 	size_t startoff         = exec->rx_startoff;
@@ -1456,7 +1456,7 @@ REOP_NCS_UTF8_dispatch:
 		/* Group repetition                                                     */
 		/************************************************************************/
 		TARGET(REOP_GROUP_MATCH) {
-			uint8_t gid = getb();
+			byte_t gid = getb();
 			re_regmatch_t match;
 			assert(gid < self->ri_exec->rx_code->rc_ngrps);
 			match = self->ri_pmatch[gid];
@@ -1478,7 +1478,7 @@ REOP_NCS_UTF8_dispatch:
 		}
 
 		TARGET(REOP_GROUP_MATCH_JMIN ... REOP_GROUP_MATCH_JMAX) {
-			uint8_t gid = getb();
+			byte_t gid = getb();
 			re_regmatch_t match;
 			assert(gid < self->ri_exec->rx_code->rc_ngrps);
 			match = self->ri_pmatch[gid];
@@ -1701,7 +1701,7 @@ REOP_NCS_UTF8_dispatch:
 		/* Opcodes for expression logic and processing.                         */
 		/************************************************************************/
 		TARGET(REOP_GROUP_START) {
-			uint8_t gid = getb();
+			byte_t gid = getb();
 			assert(gid < self->ri_exec->rx_code->rc_ngrps);
 			/* Set start-of-group offset */
 			self->ri_pmatch[gid].rm_so = re_interpreter_in_curoffset(self);
@@ -1709,7 +1709,7 @@ REOP_NCS_UTF8_dispatch:
 		}
 
 		TARGET(REOP_GROUP_END) {
-			uint8_t gid = getb();
+			byte_t gid = getb();
 			assert(gid < self->ri_exec->rx_code->rc_ngrps);
 			/* Set end-of-group offset */
 			self->ri_pmatch[gid].rm_eo = re_interpreter_in_curoffset(self);
@@ -1717,7 +1717,7 @@ REOP_NCS_UTF8_dispatch:
 		}
 
 		TARGET(REOP_GROUP_END_JMIN ... REOP_GROUP_END_JMAX) {
-			uint8_t gid = getb();
+			byte_t gid = getb();
 			assert(gid < self->ri_exec->rx_code->rc_ngrps);
 			/* Set end-of-group offset */
 			self->ri_pmatch[gid].rm_eo = re_interpreter_in_curoffset(self);
@@ -1737,8 +1737,13 @@ REOP_NCS_UTF8_dispatch:
 		}
 
 		TARGET(REOP_POP_ONFAIL) {
+#if 1 /* FIXME: Ugly work-around because of fast-map jump-ahead */
+			if (self->ri_onfailc > 0) /* Can be `0' because of the fmap */
+				--self->ri_onfailc;
+#else
 			assert(self->ri_onfailc > 0);
 			--self->ri_onfailc;
+#endif
 			DISPATCH();
 		}
 
@@ -1746,10 +1751,20 @@ REOP_NCS_UTF8_dispatch:
 			int16_t delta = getw();
 			byte_t const *target_pc;
 			target_pc = pc + delta;
+#if 1 /* FIXME: Ugly work-around because of fast-map jump-ahead */
+			while (self->ri_onfailc > 0) {
+				--self->ri_onfailc;
+				if (self->ri_onfailv[self->ri_onfailc].rof_pc == target_pc)
+					break;
+			}
+#else
+			byte_t const *target_pc;
+			target_pc = pc + delta;
 			do {
 				assertf(self->ri_onfailc > 0, "PC %p not found in on-fail stack", target_pc);
 				--self->ri_onfailc;
 			} while (self->ri_onfailv[self->ri_onfailc].rof_pc != target_pc);
+#endif
 			DISPATCH();
 		}
 
@@ -1784,7 +1799,7 @@ REOP_NCS_UTF8_dispatch:
 		}
 
 		TARGET(REOP_DEC_JMP) {
-			uint8_t varid = getb();
+			byte_t varid = getb();
 			int16_t delta = getw();
 			assert(varid < self->ri_exec->rx_code->rc_nvars);
 			if (self->ri_vars[varid] != 0) {
@@ -1796,7 +1811,7 @@ REOP_NCS_UTF8_dispatch:
 		}
 
 		TARGET(REOP_DEC_JMP_AND_RETURN_ONFAIL) {
-			uint8_t varid = getb();
+			byte_t varid = getb();
 			int16_t delta = getw();
 			assert(varid < self->ri_exec->rx_code->rc_nvars);
 			if (self->ri_vars[varid] != 0) {
@@ -1809,8 +1824,8 @@ REOP_NCS_UTF8_dispatch:
 		}
 
 		TARGET(REOP_SETVAR) {
-			uint8_t varid = getb();
-			uint8_t value = getb();
+			byte_t varid = getb();
+			byte_t value = getb();
 			assert(varid < self->ri_exec->rx_code->rc_nvars);
 			/* Assign value to variable */
 			self->ri_vars[varid] = value;
@@ -1872,7 +1887,9 @@ onfail:
 			return -RE_NOMATCH;
 		}
 		item = &self->ri_onfailv[--self->ri_onfailc];
-		pc   = item->rof_pc;
+		if (item->rof_in == NULL)
+			goto onfail; /* Skip dummy on-fail stack element. */
+		pc = item->rof_pc;
 		re_interpreter_setinptr(self, item->rof_in);
 		/* TODO: The ONFAIL-system needs some way to set group match start/end addresses back to UNSET:
 		 * >> "(f(o)o|foobar)" MATCH "foobar"

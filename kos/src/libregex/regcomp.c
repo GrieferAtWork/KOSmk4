@@ -623,14 +623,14 @@ NOTHROW_NCX(CC utf8_skipn)(char const *__restrict cptr, size_t n) {
 
 
 /* Return a pointer to the next instruction */
-INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) uint8_t *
-NOTHROW_NCX(CC libre_opcode_next)(uint8_t const *__restrict p_instr) {
-	uint8_t opcode = *p_instr++;
+INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) byte_t *
+NOTHROW_NCX(CC libre_opcode_next)(byte_t const *__restrict p_instr) {
+	byte_t opcode = *p_instr++;
 	switch (opcode) {
 
 	case REOP_EXACT:
 	case REOP_EXACT_ASCII_ICASE: {
-		uint8_t length;
+		byte_t length;
 		length = *p_instr++;
 		assert(length >= 2);
 		p_instr += length;
@@ -639,7 +639,7 @@ NOTHROW_NCX(CC libre_opcode_next)(uint8_t const *__restrict p_instr) {
 	case REOP_EXACT_UTF8_ICASE:
 	case REOP_CONTAINS_UTF8:
 	case REOP_NCONTAINS_UTF8: {
-		uint8_t count;
+		byte_t count;
 		count = *p_instr++;
 		assert(count >= 1);
 		do {
@@ -650,7 +650,7 @@ NOTHROW_NCX(CC libre_opcode_next)(uint8_t const *__restrict p_instr) {
 	case REOP_CS_BYTE:
 	case REOP_CS_UTF8:
 	case REOP_NCS_UTF8: {
-		uint8_t cs_opcode;
+		byte_t cs_opcode;
 		while ((cs_opcode = *p_instr++) != RECS_DONE) {
 			switch (cs_opcode) {
 			case RECS_BITSET_MIN ... RECS_BITSET_BYTE_MAX:
@@ -675,7 +675,7 @@ NOTHROW_NCX(CC libre_opcode_next)(uint8_t const *__restrict p_instr) {
 				}
 				break;
 			case RECS_CONTAINS: {
-				uint8_t count = *p_instr++;
+				byte_t count = *p_instr++;
 				assert(count >= 1);
 				if (opcode == REOP_CS_BYTE) {
 					p_instr += count;
@@ -2735,7 +2735,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			self->rec_cpos = writer;
 			goto done_suffix;
 		} else if (interval_min == 1) {
-			byte_t *writer;
+			byte_t *writer, *label_1, *label_2;
 			/* >> "X+"           REOP_JMP_ONFAIL_DUMMY_AT 2f
 			 * >>             1: <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `2f'
 			 * >>                REOP_MAYBE_POP_ONFAIL   // Replaced with `REOP_POP_ONFAIL_AT 2f'
@@ -2749,11 +2749,13 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			memmoveup(writer + 3, writer, expr_size);
 
 			/* REOP_JMP_ONFAIL_DUMMY_AT 2f */
+			label_2 = writer + 3 + expr_size + 3 + 3;
 			*writer++ = REOP_JMP_ONFAIL_DUMMY_AT;
+			int16_at(writer) = (int16_t)(label_2 - (writer + 2));
 			writer += 2;
-			int16_at(writer - 2) = (int16_t)((writer + expr_size + 6) - writer);
 
 			/* <X> */
+			label_1 = writer;
 			writer += expr_size;
 			if (expression_matches_epsilon)
 				re_compiler_set_group_epsilon_jmp(writer - 2, 6);
@@ -2764,8 +2766,10 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 
 			/* REOP_JMP_AND_RETURN_ONFAIL 1b */
 			*writer++ = REOP_JMP_AND_RETURN_ONFAIL;
-			int16_at(writer) = (int16_t)(self->rec_estart - (writer + 2));
+			int16_at(writer) = (int16_t)(label_1 - (writer + 2));
 			writer += 2;
+			assert(label_2 == writer);
+
 			self->rec_cpos = writer;
 			goto done_suffix;
 		} else {
@@ -3434,6 +3438,13 @@ NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self) {
 
 		/* Calculate code properties. */
 		libre_code_makefast(header);
+
+		/* TODO: FIXME: Non-zero fmap offsets are  allowed to skip across  `REOP_JMP_ONFAIL'
+		 *              opcodes (and others that also push  on-fail items). As a result,  it
+		 *              regexec starts executing code that assumes a non-empty on-fail stack
+		 *              with one that is actually empty.
+		 * Currently, this is being worked around by regexec() ignoring empty on-fail stacks
+		 * when opcodes try to pop items from said stack. */
 	}
 
 	return RE_NOERROR;
