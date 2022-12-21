@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23164047 */
+/* HASH CRC-32:0xdd047150 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -244,6 +244,7 @@ NOTHROW_NCX(LIBKCALL libc___wcserror_s)(char32_t *buf,
 	(void)(char32_t *)libc_memcpyl(buf, msg, msglen);
 	return 0;
 }
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_INOUTS(1, 4) errno_t
@@ -276,6 +277,7 @@ NOTHROW_NCX(LIBDCALL libd__wcsnset_s)(char16_t *__restrict buf,
 	__libc_memsetc(iter, 0, remaining, 2);
 	return 0;
 }
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_INOUTS(1, 4) errno_t
@@ -308,6 +310,7 @@ NOTHROW_NCX(LIBKCALL libc__wcsnset_s)(char32_t *__restrict buf,
 	__libc_memsetc(iter, 0, remaining, 4);
 	return 0;
 }
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_INOUTS(1, 2) errno_t
@@ -329,6 +332,7 @@ NOTHROW_NCX(LIBDCALL libd__wcsset_s)(char16_t *dst,
 	__libc_memsetc(p, 0, remaining, 2);
 	return 0;
 }
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/string.h>
 INTERN ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_INOUTS(1, 2) errno_t
@@ -568,6 +572,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscat_s)(char32_t *dst,
 		return 34;
 	return 0;
 }
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/string.h>
 /* >> wcscpy_s(3) */
@@ -590,6 +595,7 @@ NOTHROW_NCX(LIBDCALL libd_wcscpy_s)(char16_t *dst,
 	__libc_memsetc(iter, 0, remaining, 2);
 	return 0;
 }
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/string.h>
 /* >> wcscpy_s(3) */
@@ -612,6 +618,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscpy_s)(char32_t *dst,
 	__libc_memsetc(iter, 0, remaining, 4);
 	return 0;
 }
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/string.h>
 /* >> wcsncat_s(3) */
@@ -654,6 +661,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsncat_s)(char16_t *dst,
 	__libc_memsetc(iter, 0, remaining, 2);
 	return 0;
 }
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/string.h>
 /* >> wcsncat_s(3) */
@@ -696,6 +704,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsncat_s)(char32_t *dst,
 	__libc_memsetc(iter, 0, remaining, 4);
 	return 0;
 }
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/string.h>
 /* >> wcsncpy_s(3) */
@@ -738,6 +747,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsncpy_s)(char16_t *dst,
 	__libc_memsetc(iter, 0, remaining, 2);
 	return 0;
 }
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 #include <libc/string.h>
 /* >> wcsncpy_s(3) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e08cb30 */
+/* HASH CRC-32:0x7265feee */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,8 +27,7 @@ __LOCAL_LIBC(wcspbrk) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2) __WCH
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcspbrk))(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__accept) {
 	__WCHAR_TYPE__ __haych, __ch;
 	while ((__haych = *__haystack++) != '\0') {
-		__WCHAR_TYPE__ const *__ned_iter;
-		__ned_iter = __accept;
+		__WCHAR_TYPE__ const *__ned_iter = __accept;
 		while ((__ch = *__ned_iter++) != '\0') {
 			if (__haych == __ch)
 				return (__WCHAR_TYPE__ *)__haystack - 1;

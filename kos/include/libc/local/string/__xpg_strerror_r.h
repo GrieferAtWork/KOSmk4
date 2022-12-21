@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5701e693 */
+/* HASH CRC-32:0x5218cda8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,6 +63,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_strlen */
 #endif /* !__local___localdep_strlen_defined */
 __NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
 #include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(__xpg_strerror_r) __ATTR_COLD __ATTR_OUTS(2, 3) __errno_t

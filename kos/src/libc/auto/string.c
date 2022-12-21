@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x324af415 */
+/* HASH CRC-32:0x9a45ad70 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -134,6 +134,7 @@ NOTHROW_NCX(LIBCCALL libc_memrmem0)(void const *haystack, size_t haystacklen,
 
 #endif /* !__KERNEL__ */
 #ifndef LIBC_ARCH_HAVE_MEMCPY
+#include <hybrid/typecore.h>
 /* >> memcpy(3)
  * Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
@@ -149,6 +150,7 @@ NOTHROW_NCX(LIBCCALL libc_memcpy)(void *__restrict dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCPY */
 #ifndef LIBC_ARCH_HAVE_MEMMOVE
+#include <hybrid/typecore.h>
 /* >> memmove(3)
  * Move memory between potentially overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
@@ -173,6 +175,7 @@ NOTHROW_NCX(LIBCCALL libc_memmove)(void *dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMMOVE */
 #ifndef LIBC_ARCH_HAVE_MEMSET
+#include <hybrid/typecore.h>
 /* >> memset(3)
  * Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
@@ -187,6 +190,7 @@ NOTHROW_NCX(LIBCCALL libc_memset)(void *__restrict dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMSET */
 #ifndef LIBC_ARCH_HAVE_MEMCMP
+#include <hybrid/typecore.h>
 /* >> memcmp(3)
  * Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
@@ -215,6 +219,7 @@ NOTHROW_NCX(LIBCCALL libc_memcmp)(void const *s1,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCMP */
 #ifndef LIBC_ARCH_HAVE_MEMCHR
+#include <hybrid/typecore.h>
 /* >> memchr(3)
  * Ascendingly search for `needle', starting at `haystack'.
  * Return `NULL' if `needle' wasn't found. */
@@ -231,6 +236,7 @@ NOTHROW_NCX(LIBCCALL libc_memchr)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMCHR */
 #ifndef LIBC_ARCH_HAVE_STRLEN
+#include <hybrid/typecore.h>
 /* >> strlen(3)
  * Return the length of the string in characters (Same as `rawmemlen[...](str, '\0')') */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) size_t
@@ -368,6 +374,7 @@ NOTHROW_NCX(LIBCCALL libc_strcat)(char *__restrict dst,
 #endif /* !LIBC_ARCH_HAVE_STRCAT */
 #ifndef __KERNEL__
 #ifndef LIBC_ARCH_HAVE_STRNCAT
+#include <hybrid/typecore.h>
 /* >> strncat(3)
  * Copy at most max_srclen (or rather: exactly `strnlen(src, max_srclen)')
  * characters   to    `strend(buf)',   and    always   re-return    `buf'. */
@@ -418,8 +425,7 @@ NOTHROW_NCX(LIBCCALL libc_strpbrk)(char const *haystack,
                                    char const *accept) {
 	char haych, ch;
 	while ((haych = *haystack++) != '\0') {
-		char const *ned_iter;
-		ned_iter = accept;
+		char const *ned_iter = accept;
 		while ((ch = *ned_iter++) != '\0') {
 			if (haych == ch)
 				return (char *)haystack - 1;
@@ -443,6 +449,7 @@ NOTHROW_NCX(LIBCCALL libc_strcoll)(char const *s1,
 }
 #endif /* !LIBC_ARCH_HAVE_STRCOLL */
 #ifndef LIBC_ARCH_HAVE_STRXFRM
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_INS(2, 3) ATTR_OUTS(1, 3) size_t
 NOTHROW_NCX(LIBCCALL libc_strxfrm)(char *dst,
                                    char const *__restrict src,
@@ -455,6 +462,7 @@ NOTHROW_NCX(LIBCCALL libc_strxfrm)(char *dst,
 #endif /* !LIBC_ARCH_HAVE_STRXFRM */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.errno") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
 NOTHROW_NCX(LIBDCALL libd_strerror)(errno_t errnum) { return libc_strerror(libd_errno_dos2kos(errnum)); }
+#include <bits/types.h>
 #include <libc/template/itoa_digits.h>
 INTERN ATTR_SECTION(".text.crt.errno") ATTR_COLD ATTR_RETNONNULL WUNUSED char *
 NOTHROW_NCX(LIBCCALL libc_strerror)(errno_t errnum) {
@@ -511,6 +519,7 @@ NOTHROW_NCX(LIBCCALL libc_stpcpy)(char *__restrict buf,
 #endif /* !LIBC_ARCH_HAVE_STPCPY */
 #ifndef __KERNEL__
 #ifndef LIBC_ARCH_HAVE_STPNCPY
+#include <hybrid/typecore.h>
 /* >> stpncpy(3) */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_RETNONNULL ATTR_INS(2, 3) ATTR_OUTS(1, 3) NONNULL((1, 2)) char *
 NOTHROW_NCX(LIBCCALL libc_stpncpy)(char *__restrict buf,
@@ -567,6 +576,7 @@ NOTHROW_NCX(LIBCCALL libc_strsignal)(signo_t signo) {
 	}
 	return result;
 }
+#include <hybrid/typecore.h>
 INTERN ATTR_SECTION(".text.crt.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_INS(1, 2) char *
 NOTHROW_NCX(LIBCCALL libc_strndup)(char const *__restrict str,
                                    size_t max_chars) {
@@ -613,6 +623,7 @@ NOTHROW_NCX(LIBCCALL libc_strtok_r)(char *str,
 }
 #endif /* !__KERNEL__ */
 #ifndef LIBC_ARCH_HAVE_MEMRCHR
+#include <hybrid/typecore.h>
 /* >> memrchr(3)
  * Descendingly search for `needle', starting at `haystack + n_bytes'.
  * Return `NULL' if `needle' wasn't found. */
@@ -631,6 +642,7 @@ NOTHROW_NCX(LIBCCALL libc_memrchr)(void const *__restrict haystack,
 #ifndef __KERNEL__
 #ifndef LIBC_ARCH_HAVE_MEMMEM
 #include <features.h>
+#include <hybrid/typecore.h>
 /* >> memmem(3)
  * Return the first address of a sub-string `needle...+=needlelen'
  * stored within `haystack...+=haystacklen'
@@ -668,6 +680,7 @@ NOTHROW_NCX(LIBCCALL libc_memmem)(void const *haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMMEM */
 #endif /* !__KERNEL__ */
+#include <hybrid/typecore.h>
 /* >> strcasestr(3), strcasestr_l(3)
  * Same as `strstr', but ignore casing */
 INTERN ATTR_SECTION(".text.crt.unicode.static.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) char *
@@ -694,7 +707,6 @@ NOTHROW_NCX(LIBCCALL libc_strchrnul)(char const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_STRCHRNUL */
 #ifndef LIBC_ARCH_HAVE_RAWMEMCHR
-#include <hybrid/typecore.h>
 /* >> rawmemchr(3)
  * Same as `memchr' with a search limit of `(size_t)-1' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_IN(1) void *
@@ -827,7 +839,6 @@ NOTHROW_NCX(LIBCCALL libc_mempcpy)(void *__restrict dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMPCPY */
 #ifndef __KERNEL__
-#include <hybrid/typecore.h>
 /* >> strfry(3) */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_INOUT(1) char *
 NOTHROW_NCX(LIBCCALL libc_strfry)(char *__restrict str) {
@@ -843,7 +854,6 @@ NOTHROW_NCX(LIBCCALL libc_strfry)(char *__restrict str) {
 	}
 	return str;
 }
-#include <hybrid/typecore.h>
 /* >> memfrob(3)
  * Xor every byte in `buf...+=num_bytes' with decimal `42' (yeah...)
  * Always re-return the given `buf' */
@@ -2913,22 +2923,22 @@ NOTHROW_NCX(LIBCCALL libc_strncasecmp)(char const *s1,
 	return 0;
 }
 #ifndef __KERNEL__
-#include <hybrid/typecore.h>
 #if __SIZEOF_INT__ == __SIZEOF_LONG__ && !defined(LIBC_ARCH_HAVE_FFSL)
 DEFINE_INTERN_ALIAS(libc_ffs, libc_ffsl);
 #elif __SIZEOF_INT__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)
 DEFINE_INTERN_ALIAS(libc_ffs, libc_ffsll);
 #elif !defined(LIBC_ARCH_HAVE_FFS)
+#include <features.h>
 #include <hybrid/__bit.h>
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_CONST WUNUSED __STDC_INT_AS_UINT_T
 NOTHROW(LIBCCALL libc_ffs)(int i) {
 	return (__STDC_INT_AS_UINT_T)__hybrid_ffs((unsigned int)i);
 }
 #endif /* ... */
-#include <hybrid/typecore.h>
 #if __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__ && !defined(LIBC_ARCH_HAVE_FFSLL)
 DEFINE_INTERN_ALIAS(libc_ffsl, libc_ffsll);
 #elif !defined(LIBC_ARCH_HAVE_FFSL)
+#include <features.h>
 #include <hybrid/__bit.h>
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_CONST WUNUSED __STDC_INT_AS_UINT_T
 NOTHROW(LIBCCALL libc_ffsl)(long i) {
@@ -2936,6 +2946,7 @@ NOTHROW(LIBCCALL libc_ffsl)(long i) {
 }
 #endif /* ... */
 #ifndef LIBC_ARCH_HAVE_FFSLL
+#include <features.h>
 #include <hybrid/__bit.h>
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_CONST WUNUSED __STDC_INT_AS_UINT_T
 NOTHROW(LIBCCALL libc_ffsll)(__LONGLONG i) {
@@ -3538,7 +3549,6 @@ NOTHROW_NCX(LIBCCALL libc_rawmemrlenl)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMRLENL */
 #ifndef LIBC_ARCH_HAVE_MEMCPYQ
-#include <hybrid/typecore.h>
 /* Copy memory between non-overlapping memory blocks. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_IN(2) ATTR_OUT(1) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memcpyq)(void *__restrict dst,
@@ -3570,7 +3580,6 @@ NOTHROW_NCX(LIBCCALL libc_mempcpyq)(void *__restrict dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMPCPYQ */
 #ifndef LIBC_ARCH_HAVE_MEMMOVEQ
-#include <hybrid/typecore.h>
 /* Move memory between potentially overlapping memory blocks. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_LEAF ATTR_IN(2) ATTR_OUT(1) uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memmoveq)(void *dst,
@@ -3622,7 +3631,6 @@ NOTHROW_NCX(LIBCCALL libc_mempmoveq)(void *__restrict dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMPMOVEQ */
 #ifndef LIBC_ARCH_HAVE_MEMMOVEUPQ
-#include <hybrid/typecore.h>
 #include <hybrid/__assert.h>
 #include <bits/crt/inttypes.h>
 /* Move memory between potentially overlapping memory blocks. (assumes that `dst >= src || !n_qwords') */
@@ -3661,7 +3669,6 @@ NOTHROW_NCX(LIBCCALL libc_memmoveupq)(void *dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMMOVEUPQ */
 #ifndef LIBC_ARCH_HAVE_MEMMOVEDOWNQ
-#include <hybrid/typecore.h>
 #include <hybrid/__assert.h>
 #include <bits/crt/inttypes.h>
 /* Move memory between potentially overlapping memory blocks. (assumes that `dst <= src || !n_qwords') */
@@ -3907,7 +3914,6 @@ NOTHROW_NCX(LIBCCALL libc_memrxchr)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMRXCHR */
 #ifndef LIBC_ARCH_HAVE_RAWMEMXCHR
-#include <hybrid/typecore.h>
 /* Same as `rawmemchr', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED ATTR_IN(1) void *
 NOTHROW_NCX(LIBCCALL libc_rawmemxchr)(void const *__restrict haystack,
@@ -3921,7 +3927,6 @@ NOTHROW_NCX(LIBCCALL libc_rawmemxchr)(void const *__restrict haystack,
 }
 #endif /* !LIBC_ARCH_HAVE_RAWMEMXCHR */
 #ifndef LIBC_ARCH_HAVE_RAWMEMRXCHR
-#include <hybrid/typecore.h>
 /* Same as `rawmemrchr', but search for non-matching locations. */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) void *
 NOTHROW_NCX(LIBCCALL libc_rawmemrxchr)(void const *__restrict haystack,
@@ -4895,7 +4900,6 @@ NOTHROW_NCX(LIBCCALL libc_mempmovedown)(void *dst,
 }
 #endif /* !LIBC_ARCH_HAVE_MEMPMOVEDOWN */
 #ifndef LIBC_ARCH_HAVE_RAWMEMRCHR
-#include <hybrid/typecore.h>
 /* >> rawmemrchr(3)
  * Same as `memrchr' without a search limit, starting at `haystack - 1' */
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1)) void *
@@ -5565,6 +5569,7 @@ next:
 	}
 	return (int)((unsigned char)string_ch - (unsigned char)pattern_ch);
 }
+#include <parts/malloca.h>
 INTERN ATTR_SECTION(".text.crt.unicode.locale.memory") ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) size_t
 NOTHROW_NCX(LIBCCALL libc_fuzzy_memcasecmp_l)(void const *s1,
                                               size_t s1_bytes,
@@ -5627,6 +5632,7 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcasecmp_l)(void const *s1,
 	__freea(v0);
 	return temp;
 }
+#include <parts/malloca.h>
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(3) size_t
 NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpw)(void const *s1,
                                          size_t s1_words,
@@ -5685,6 +5691,7 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpw)(void const *s1,
 	__freea(v0);
 	return temp;
 }
+#include <parts/malloca.h>
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(3) size_t
 NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpl)(void const *s1,
                                          size_t s1_dwords,
@@ -5743,6 +5750,7 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpl)(void const *s1,
 	__freea(v0);
 	return temp;
 }
+#include <parts/malloca.h>
 INTERN ATTR_SECTION(".text.crt.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(3) size_t
 NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpq)(void const *s1,
                                          size_t s1_qwords,
@@ -6031,7 +6039,6 @@ NOTHROW_NCX(LIBCCALL libc_strstartcmpz)(char const *str,
 	 * much sense. */
 	return -1;
 }
-#include <hybrid/typecore.h>
 /* >> bitcpy(3)
  * Copy exactly `num_bits' from `src_base+(src_bit_offset/NBBY)' to `dst_base+(dst_bit_offset/NBBY)',
  * doing a byte-wise copy  but leaving bits not  meant to be copied  untouched. Inside of  individual

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c62569a */
+/* HASH CRC-32:0xfc87112d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,6 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__CRT_HAVE_signalnumber */
 #endif /* !__local___localdep_signalnumber_defined */
 __NAMESPACE_LOCAL_END
+#include <hybrid/typecore.h>
 #include <asm/os/signal.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strtosigno) __ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __signo_t

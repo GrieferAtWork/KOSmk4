@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21506c52 */
+/* HASH CRC-32:0x927fe5e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -559,6 +559,7 @@ NOTHROW_NCX(LIBKCALL libc_wcscoll)(char32_t const *s1,
 	/* XXX: Implement properly? */
 	return libc_wcscmp(s1, s2);
 }
+#include <hybrid/typecore.h>
 /* >> wcsxfrm(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_INS(2, 3) ATTR_OUTS(1, 3) size_t
 NOTHROW_NCX(LIBDCALL libd_wcsxfrm)(char16_t *dst,
@@ -569,6 +570,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsxfrm)(char16_t *dst,
 	libc_memcpy(dst, src, n * sizeof(char16_t));
 	return n;
 }
+#include <hybrid/typecore.h>
 /* >> wcsxfrm(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_INS(2, 3) ATTR_OUTS(1, 3) size_t
 NOTHROW_NCX(LIBKCALL libc_wcsxfrm)(char32_t *dst,
@@ -784,6 +786,7 @@ NOTHROW_NCX(LIBKCALL libc_wcstok)(char32_t *str,
 	return str;
 }
 #ifndef LIBC_ARCH_HAVE_C16SLEN
+#include <hybrid/typecore.h>
 /* >> wcslen(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) size_t
 NOTHROW_NCX(LIBDCALL libd_wcslen)(char16_t const *__restrict str) {
@@ -791,6 +794,7 @@ NOTHROW_NCX(LIBDCALL libd_wcslen)(char16_t const *__restrict str) {
 }
 #endif /* !LIBC_ARCH_HAVE_C16SLEN */
 #ifndef LIBC_ARCH_HAVE_C32SLEN
+#include <hybrid/typecore.h>
 /* >> wcslen(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) size_t
 NOTHROW_NCX(LIBKCALL libc_wcslen)(char32_t const *__restrict str) {
@@ -893,8 +897,7 @@ NOTHROW_NCX(LIBDCALL libd_wcspbrk)(char16_t const *haystack,
                                    char16_t const *accept) {
 	char16_t haych, ch;
 	while ((haych = *haystack++) != '\0') {
-		char16_t const *ned_iter;
-		ned_iter = accept;
+		char16_t const *ned_iter = accept;
 		while ((ch = *ned_iter++) != '\0') {
 			if (haych == ch)
 				return (char16_t *)haystack - 1;
@@ -908,8 +911,7 @@ NOTHROW_NCX(LIBKCALL libc_wcspbrk)(char32_t const *haystack,
                                    char32_t const *accept) {
 	char32_t haych, ch;
 	while ((haych = *haystack++) != '\0') {
-		char32_t const *ned_iter;
-		ned_iter = accept;
+		char32_t const *ned_iter = accept;
 		while ((ch = *ned_iter++) != '\0') {
 			if (haych == ch)
 				return (char32_t *)haystack - 1;
@@ -5330,6 +5332,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnupr)(char32_t *__restrict str,
 		*iter = (char32_t)libc_towupper((char32_t)ch);
 	return str;
 }
+#include <hybrid/typecore.h>
 /* >> wcscasestr(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcscasestr)(char16_t const *haystack,
@@ -5341,6 +5344,7 @@ NOTHROW_NCX(LIBDCALL libd_wcscasestr)(char16_t const *haystack,
 	}
 	return NULL;
 }
+#include <hybrid/typecore.h>
 /* >> wcscasestr(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcscasestr)(char32_t const *haystack,
@@ -5498,6 +5502,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsfry)(char32_t *__restrict str) {
 	}
 	return str;
 }
+#include <hybrid/typecore.h>
 /* >> wcsndup(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_INS(1, 2) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcsndup)(char16_t const *__restrict str,
@@ -5509,6 +5514,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsndup)(char16_t const *__restrict str,
 	}
 	return result;
 }
+#include <hybrid/typecore.h>
 /* >> wcsndup(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.heap.strdup") ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_INS(1, 2) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcsndup)(char32_t const *__restrict str,
@@ -5590,6 +5596,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnrchrnul)(char32_t const *__restrict haystack,
 	}
 	return (char32_t *)result;
 }
+#include <hybrid/typecore.h>
 /* >> wcsoff(3)
  * Same as `wcschrnul', but return the offset from `str', rather than the actual address */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) size_t
@@ -5597,6 +5604,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsoff)(char16_t const *__restrict haystack,
                                   char16_t needle) {
 	return (size_t)(libd_wcschrnul(haystack, needle) - haystack);
 }
+#include <hybrid/typecore.h>
 /* >> wcsoff(3)
  * Same as `wcschrnul', but return the offset from `str', rather than the actual address */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) size_t
@@ -5604,6 +5612,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsoff)(char32_t const *__restrict haystack,
                                   char32_t needle) {
 	return (size_t)(libc_wcschrnul(haystack, needle) - haystack);
 }
+#include <hybrid/typecore.h>
 /* >> wcsroff(3)
  * Same as `wcsrchrnul', but return the offset from `str', rather than the actual address */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) size_t
@@ -5611,6 +5620,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsroff)(char16_t const *__restrict haystack,
                                    char16_t needle) {
 	return (size_t)(libd_wcsrchrnul(haystack, needle) - haystack);
 }
+#include <hybrid/typecore.h>
 /* >> wcsroff(3)
  * Same as `wcsrchrnul', but return the offset from `str', rather than the actual address */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) size_t
@@ -5618,6 +5628,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsroff)(char32_t const *__restrict haystack,
                                    char32_t needle) {
 	return (size_t)(libc_wcsrchrnul(haystack, needle) - haystack);
 }
+#include <hybrid/typecore.h>
 /* >> wcsnoff(3)
  * Same as `wcsnchrnul', but return the offset from `str', rather than the actual address */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) size_t
@@ -5626,6 +5637,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsnoff)(char16_t const *__restrict haystack,
                                    size_t maxlen) {
 	return (size_t)(libd_wcsnchrnul(haystack, needle, maxlen) - haystack);
 }
+#include <hybrid/typecore.h>
 /* >> wcsnoff(3)
  * Same as `wcsnchrnul', but return the offset from `str', rather than the actual address */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) size_t
@@ -5634,6 +5646,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnoff)(char32_t const *__restrict haystack,
                                    size_t maxlen) {
 	return (size_t)(libc_wcsnchrnul(haystack, needle, maxlen) - haystack);
 }
+#include <hybrid/typecore.h>
 /* >> wcsnroff(3)
  * Same as `wcsnrchrnul', but return the offset from `str', rather than the actual address */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) size_t
@@ -5642,6 +5655,7 @@ NOTHROW_NCX(LIBDCALL libd_wcsnroff)(char16_t const *__restrict haystack,
                                     size_t maxlen) {
 	return (size_t)(libd_wcsnrchrnul(haystack, needle, maxlen) - haystack);
 }
+#include <hybrid/typecore.h>
 /* >> wcsnroff(3)
  * Same as `wcsnrchrnul', but return the offset from `str', rather than the actual address */
 INTERN ATTR_SECTION(".text.crt.wchar.string.memory") ATTR_PURE WUNUSED ATTR_IN(1) size_t
@@ -5678,6 +5692,7 @@ NOTHROW_NCX(LIBKCALL libc_fuzzy_wcsncmp)(char32_t const *s1,
                                          size_t s2_maxlen) {
 	return libc_fuzzy_memcmpl(s1, libc_wcsnlen(s1, s1_maxlen), s2, libc_wcsnlen(s2, s2_maxlen));
 }
+#include <hybrid/typecore.h>
 #include <parts/malloca.h>
 /* >> fuzzy_wmemcasecmp(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.static.memory") ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) size_t
@@ -5741,6 +5756,7 @@ NOTHROW_NCX(LIBDCALL libd_fuzzy_wmemcasecmp)(char16_t const *s1,
 	__freea(v0);
 	return temp;
 }
+#include <hybrid/typecore.h>
 #include <parts/malloca.h>
 /* >> fuzzy_wmemcasecmp(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.static.memory") ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) size_t
@@ -6294,6 +6310,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsstrip)(char32_t *str) {
 	str = libc_wcsrstrip(str);
 	return str;
 }
+#include <hybrid/typecore.h>
 /* >> wmemcasecmp(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.read.scanf") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
 NOTHROW_NCX(LIBDCALL libd_wmemcasecmp)(void const *s1,
@@ -6324,6 +6341,7 @@ NOTHROW_NCX(LIBDCALL libd_wmemcasecmp)(void const *s1,
 	return 0;
 #endif /* __SIZEOF_INT__ <= 2 */
 }
+#include <hybrid/typecore.h>
 /* >> wmemcasecmp(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.FILE.unlocked.read.scanf") ATTR_PURE WUNUSED ATTR_INS(1, 3) ATTR_INS(2, 3) NONNULL((1, 2)) int
 NOTHROW_NCX(LIBKCALL libc_wmemcasecmp)(void const *s1,
@@ -6504,6 +6522,7 @@ NOTHROW_NCX(LIBKCALL libc_wcsnupr_l)(char32_t *__restrict str,
 		*iter = (char32_t)libc_towupper_l((char32_t)ch, locale);
 	return str;
 }
+#include <hybrid/typecore.h>
 /* >> wcscasestr_l(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) char16_t *
 NOTHROW_NCX(LIBDCALL libd_wcscasestr_l)(char16_t const *haystack,
@@ -6516,6 +6535,7 @@ NOTHROW_NCX(LIBDCALL libd_wcscasestr_l)(char16_t const *haystack,
 	}
 	return NULL;
 }
+#include <hybrid/typecore.h>
 /* >> wcscasestr_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_PURE WUNUSED ATTR_IN(1) ATTR_IN(2) char32_t *
 NOTHROW_NCX(LIBKCALL libc_wcscasestr_l)(char32_t const *haystack,
@@ -6528,6 +6548,8 @@ NOTHROW_NCX(LIBKCALL libc_wcscasestr_l)(char32_t const *haystack,
 	}
 	return NULL;
 }
+#include <hybrid/typecore.h>
+#include <parts/malloca.h>
 /* >> fuzzy_wmemcasecmp_l(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) size_t
 NOTHROW_NCX(LIBDCALL libd_fuzzy_wmemcasecmp_l)(char16_t const *s1,
@@ -6591,6 +6613,8 @@ NOTHROW_NCX(LIBDCALL libd_fuzzy_wmemcasecmp_l)(char16_t const *s1,
 	__freea(v0);
 	return temp;
 }
+#include <hybrid/typecore.h>
+#include <parts/malloca.h>
 /* >> fuzzy_wmemcasecmp_l(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_PURE WUNUSED ATTR_INS(1, 2) ATTR_INS(3, 4) NONNULL((1, 3)) size_t
 NOTHROW_NCX(LIBKCALL libc_fuzzy_wmemcasecmp_l)(char32_t const *s1,
@@ -6790,6 +6814,7 @@ next:
 	}
 	return (int)((char32_t)wcsing_ch - (char32_t)pattern_ch);
 }
+#include <hybrid/typecore.h>
 /* >> wcslcat(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF ATTR_IN(2) ATTR_INOUTS(1, 3) NONNULL((1)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcslcat)(char16_t *__restrict dst,
@@ -6804,6 +6829,7 @@ NOTHROW_NCX(LIBDCALL libd_wcslcat)(char16_t *__restrict dst,
 	new_dst[copy_size] = '\0';
 	return result + (new_dst - dst);
 }
+#include <hybrid/typecore.h>
 /* >> wcslcat(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_LEAF ATTR_IN(2) ATTR_INOUTS(1, 3) NONNULL((1)) size_t
 NOTHROW_NCX(LIBKCALL libc_wcslcat)(char32_t *__restrict dst,
@@ -6818,6 +6844,7 @@ NOTHROW_NCX(LIBKCALL libc_wcslcat)(char32_t *__restrict dst,
 	new_dst[copy_size] = '\0';
 	return result + (new_dst - dst);
 }
+#include <hybrid/typecore.h>
 /* >> wcslcpy(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.unicode.locale.memory") ATTR_LEAF ATTR_IN(2) ATTR_OUTS(1, 3) NONNULL((1)) size_t
 NOTHROW_NCX(LIBDCALL libd_wcslcpy)(char16_t *__restrict dst,
@@ -6829,6 +6856,7 @@ NOTHROW_NCX(LIBDCALL libd_wcslcpy)(char16_t *__restrict dst,
 	dst[copy_size] = '\0';
 	return result;
 }
+#include <hybrid/typecore.h>
 /* >> wcslcpy(3) */
 INTERN ATTR_SECTION(".text.crt.wchar.unicode.locale.memory") ATTR_LEAF ATTR_IN(2) ATTR_OUTS(1, 3) NONNULL((1)) size_t
 NOTHROW_NCX(LIBKCALL libc_wcslcpy)(char32_t *__restrict dst,

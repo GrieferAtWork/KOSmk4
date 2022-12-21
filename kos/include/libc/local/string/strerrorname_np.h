@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58b44dde */
+/* HASH CRC-32:0xd8c1fc29 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,6 +22,7 @@
 #define __local_strerrorname_np_defined
 #include <__crt.h>
 #include <bits/types.h>
+#include <hybrid/typecore.h>
 #include <asm/os/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strerrorname_np) __ATTR_CONST __ATTR_WUNUSED char const *
