@@ -736,13 +736,102 @@ NOTHROW_NCX(CC re_compiler_allocvar)(struct re_compiler *__restrict self,
 }
 
 
-/* Check if code pointed-at by `p_instr' is able to match EPSILON
- * Code at `p_instr' must be terminated by `REOP_MATCHED_PERFECT' */
+/* Check if code pointed-at by `pc' is able to match EPSILON
+ * Code at `pc' must be terminated by `REOP_MATCHED_PERFECT' */
 PRIVATE WUNUSED NONNULL((1)) bool
-NOTHROW_NCX(CC re_code_matches_epsilon)(uint8_t const *__restrict p_instr) {
-	(void)p_instr;
-	/* TODO: Just call regexec() on an empty buffer once that's been implemented */
-	return true;
+NOTHROW_NCX(CC re_code_matches_epsilon)(byte_t const *__restrict pc) {
+	byte_t opcode;
+dispatch:
+	opcode = *pc++;
+	switch (opcode) {
+
+	case REOP_EXACT:
+	case REOP_EXACT_ASCII_ICASE:
+	case REOP_EXACT_UTF8_ICASE:
+	case REOP_ANY_MIN ... REOP_ANY_MAX:
+	case REOP_BYTE:
+	case REOP_NBYTE:
+	case REOP_BYTE2:
+	case REOP_NBYTE2:
+	case REOP_RANGE:
+	case REOP_NRANGE:
+	case REOP_CONTAINS_UTF8:
+	case REOP_NCONTAINS_UTF8:
+	case REOP_CS_UTF8:
+	case REOP_CS_BYTE:
+	case REOP_NCS_UTF8:
+	case REOP_GROUP_MATCH: /* If it was an epsilon-match, `REOP_GROUP_MATCH_Jn' would have been used. */
+		return false;
+
+	case REOP_GROUP_MATCH_JMIN ... REOP_GROUP_MATCH_JMAX:
+		/* Group match, where matched group can itself match epsilon
+		 * As such, this opcode, too,  is able to match epsilon  (so
+		 * keep looking for something that makes epsilon impossible) */
+	case REOP_GROUP_START:
+	case REOP_GROUP_END:
+	case REOP_GROUP_END_JMIN ... REOP_GROUP_END_JMAX:
+		++pc; /* gid */
+		goto dispatch;
+
+	case REOP_AT_MIN ... REOP_AT_MAX:
+	case REOP_POP_ONFAIL:
+	case REOP_JMP_ONFAIL_DUMMY:
+	case REOP_NOP:
+		goto dispatch;
+
+	case REOP_POP_ONFAIL_AT:
+	case REOP_JMP_ONFAIL_DUMMY_AT:
+	case REOP_SETVAR:
+	case REOP_MAYBE_POP_ONFAIL:
+		pc += 2;
+		goto dispatch;
+
+	case REOP_JMP_ONFAIL:
+	case REOP_JMP_AND_RETURN_ONFAIL: {
+		int16_t delta;
+		delta = int16_at(pc);
+		pc += 2;
+		if (delta > 0 && re_code_matches_epsilon(pc + delta))
+			return true;
+		goto dispatch;
+	}
+
+	case REOP_JMP: {
+		int16_t delta;
+		delta = int16_at(pc);
+		pc += 2;
+		pc += delta;
+		goto dispatch;
+	}
+
+	case REOP_DEC_JMP: {
+		int16_t delta;
+		++pc; /* varid */
+		delta = int16_at(pc);
+		pc += 2;
+		if (delta >= 0)
+			pc += delta;
+		goto dispatch;
+	}
+
+	case REOP_DEC_JMP_AND_RETURN_ONFAIL: {
+		int16_t delta;
+		++pc; /* varid */
+		delta = int16_at(pc);
+		pc += 2;
+		if (delta > 0 && re_code_matches_epsilon(pc + delta))
+			return true;
+		goto dispatch;
+	}
+
+	case REOP_MATCHED:
+	case REOP_MATCHED_PERFECT:
+		/* End reached before any proper match -> epsilon can match */
+		return true;
+
+	default: __builtin_unreachable();
+	}
+	__builtin_unreachable();
 }
 
 
