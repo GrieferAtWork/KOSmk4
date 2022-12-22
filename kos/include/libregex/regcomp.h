@@ -262,7 +262,7 @@ enum {
 	                         * NOTE: In utf-8 mode, only ASCII characters may be encoded via bitsets. */
 	/* In utf-8 mode, the lowest-possible bitset opcode is 0x63, since in this context, bitsets are only
 	 * allowed to define  ASCII characters  (so the last-valid  opcode is  `RECS_BITSET_BUILD(0x60, 4)') */
-	RECS_BITSET_UTF8_MAX = 0x63, /* [+RECS_BITSET_GETBYTES(.)] Last utf8-bitset opcode (encodes bitset for range 60h-7Fh) */
+	RECS_BITSET_MAX_UTF8 = 0x63, /* [+RECS_BITSET_GETBYTES(.)] Last utf8-bitset opcode (encodes bitset for range 60h-7Fh) */
 #define RECS_ISX_MIN RECS_ISCNTRL
 	RECS_ISCNTRL,           /* [+0] consume trait `unicode_iscntrl(ch)'   (ONLY VALID IN UTF-8 MODE) */
 	RECS_ISSPACE,           /* [+0] consume trait `unicode_isspace(ch)'   (ONLY VALID IN UTF-8 MODE) */
@@ -287,7 +287,7 @@ enum {
 	RECS_ISNUMERIC,         /* [+0] consume trait `unicode_isnumeric(ch)' (ONLY VALID IN UTF-8 MODE) */
 #define RECS_ISX_MAX RECS_ISNUMERIC
 
-	RECS_BITSET_BYTE_MAX = 0xe3, /* [+RECS_BITSET_GETBYTES(.)] Last byte-bitset opcode (encodes bitset for range E0h-FFh) */
+	RECS_BITSET_MAX_BYTE = 0xe3, /* [+RECS_BITSET_GETBYTES(.)] Last byte-bitset opcode (encodes bitset for range E0h-FFh) */
 #define RECS_BITSET_GETBYTES(cs_opcode)    (((cs_opcode)&0x1f) + 1)
 #define RECS_BITSET_GETBASE(cs_opcode)     ((cs_opcode)&0xe0)
 #define RECS_BITSET_BUILD(base, num_bytes) ((base) | ((num_bytes)-1))

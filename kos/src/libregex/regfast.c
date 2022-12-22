@@ -465,8 +465,8 @@ NOTHROW_NCX(CC cs_gather_matching_bytes)(bitstr_t matchend_bytes[],
 
 		default:
 			if (cs_opcode >= RECS_BITSET_MIN &&
-			    cs_opcode <= (is_unicode ? RECS_BITSET_UTF8_MAX
-			                             : RECS_BITSET_BYTE_MAX)) {
+			    cs_opcode <= (is_unicode ? RECS_BITSET_MAX_UTF8
+			                             : RECS_BITSET_MAX_BYTE)) {
 				uint8_t minch, bitset_size;
 				unsigned int i, bitset_bits;
 do_cs_bitset:

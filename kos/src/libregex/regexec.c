@@ -726,27 +726,27 @@ NOTHROW_NCX(CC re_interpreter_consume_repeat)(struct re_interpreter *__restrict 
 /* Map `X - RECS_ISX_MIN' to `__UNICODE_IS*' flags. */
 INTERN_CONST uint16_t const libre_unicode_traits[] = {
 #define DEF_TRAIT(opcode, mask) [(opcode - RECS_ISX_MIN)] = mask
-	DEF_TRAIT(RECS_ISCNTRL, __UNICODE_ISCNTRL),         /* `unicode_iscntrl(ch)' */
-	DEF_TRAIT(RECS_ISSPACE, __UNICODE_ISSPACE),         /* `unicode_isspace(ch)' */
-	DEF_TRAIT(RECS_ISUPPER, __UNICODE_ISUPPER),         /* `unicode_isupper(ch)' */
-	DEF_TRAIT(RECS_ISLOWER, __UNICODE_ISLOWER),         /* `unicode_islower(ch)' */
-	DEF_TRAIT(RECS_ISALPHA, __UNICODE_ISALPHA),         /* `unicode_isalpha(ch)' */
-	DEF_TRAIT(RECS_ISDIGIT, __UNICODE_ISDIGIT),         /* `unicode_isdigit(ch)' */
-	DEF_TRAIT(RECS_ISXDIGIT, __UNICODE_ISXDIGIT),       /* `unicode_isxdigit(ch)' */
-	DEF_TRAIT(RECS_ISALNUM, __UNICODE_ISALNUM),         /* `unicode_isalnum(ch)' */
-	DEF_TRAIT(RECS_ISPUNCT, __UNICODE_ISPUNCT),         /* `unicode_ispunct(ch)' */
-	DEF_TRAIT(RECS_ISGRAPH, __UNICODE_ISGRAPH),         /* `unicode_isgraph(ch)' */
-	DEF_TRAIT(RECS_ISPRINT, __UNICODE_ISPRINT),         /* `unicode_isprint(ch)' */
-	DEF_TRAIT(RECS_ISBLANK, __UNICODE_ISBLANK),         /* `unicode_isblank(ch)' */
-	DEF_TRAIT(RECS_ISSYMSTRT, __UNICODE_ISSYMSTRT),     /* `unicode_issymstrt(ch)' */
-	DEF_TRAIT(RECS_ISSYMCONT, __UNICODE_ISSYMCONT),     /* `unicode_issymcont(ch)' */
-	DEF_TRAIT(RECS_ISTAB, __UNICODE_ISTAB),             /* `unicode_istab(ch)' */
-	DEF_TRAIT(RECS_ISWHITE, __UNICODE_ISWHITE),         /* `unicode_iswhite(ch)' */
-	DEF_TRAIT(RECS_ISEMPTY, __UNICODE_ISEMPTY),         /* `unicode_isempty(ch)' */
-	DEF_TRAIT(RECS_ISLF, __UNICODE_ISLF),               /* `unicode_islf(ch)' */
-	DEF_TRAIT(RECS_ISHEX, __UNICODE_ISHEX),             /* `unicode_ishex(ch)' */
-	DEF_TRAIT(RECS_ISTITLE, __UNICODE_ISTITLE),         /* `unicode_istitle(ch)' */
-	DEF_TRAIT(RECS_ISNUMERIC, __UNICODE_ISNUMERIC),     /* `unicode_isnumeric(ch)' */
+	DEF_TRAIT(RECS_ISCNTRL, __UNICODE_ISCNTRL),     /* `unicode_iscntrl(ch)' */
+	DEF_TRAIT(RECS_ISSPACE, __UNICODE_ISSPACE),     /* `unicode_isspace(ch)' */
+	DEF_TRAIT(RECS_ISUPPER, __UNICODE_ISUPPER),     /* `unicode_isupper(ch)' */
+	DEF_TRAIT(RECS_ISLOWER, __UNICODE_ISLOWER),     /* `unicode_islower(ch)' */
+	DEF_TRAIT(RECS_ISALPHA, __UNICODE_ISALPHA),     /* `unicode_isalpha(ch)' */
+	DEF_TRAIT(RECS_ISDIGIT, __UNICODE_ISDIGIT),     /* `unicode_isdigit(ch)' */
+	DEF_TRAIT(RECS_ISXDIGIT, __UNICODE_ISXDIGIT),   /* `unicode_isxdigit(ch)' */
+	DEF_TRAIT(RECS_ISALNUM, __UNICODE_ISALNUM),     /* `unicode_isalnum(ch)' */
+	DEF_TRAIT(RECS_ISPUNCT, __UNICODE_ISPUNCT),     /* `unicode_ispunct(ch)' */
+	DEF_TRAIT(RECS_ISGRAPH, __UNICODE_ISGRAPH),     /* `unicode_isgraph(ch)' */
+	DEF_TRAIT(RECS_ISPRINT, __UNICODE_ISPRINT),     /* `unicode_isprint(ch)' */
+	DEF_TRAIT(RECS_ISBLANK, __UNICODE_ISBLANK),     /* `unicode_isblank(ch)' */
+	DEF_TRAIT(RECS_ISSYMSTRT, __UNICODE_ISSYMSTRT), /* `unicode_issymstrt(ch)' */
+	DEF_TRAIT(RECS_ISSYMCONT, __UNICODE_ISSYMCONT), /* `unicode_issymcont(ch)' */
+	DEF_TRAIT(RECS_ISTAB, __UNICODE_ISTAB),         /* `unicode_istab(ch)' */
+	DEF_TRAIT(RECS_ISWHITE, __UNICODE_ISWHITE),     /* `unicode_iswhite(ch)' */
+	DEF_TRAIT(RECS_ISEMPTY, __UNICODE_ISEMPTY),     /* `unicode_isempty(ch)' */
+	DEF_TRAIT(RECS_ISLF, __UNICODE_ISLF),           /* `unicode_islf(ch)' */
+	DEF_TRAIT(RECS_ISHEX, __UNICODE_ISHEX),         /* `unicode_ishex(ch)' */
+	DEF_TRAIT(RECS_ISTITLE, __UNICODE_ISTITLE),     /* `unicode_istitle(ch)' */
+	DEF_TRAIT(RECS_ISNUMERIC, __UNICODE_ISNUMERIC), /* `unicode_isnumeric(ch)' */
 #undef DEF_TRAIT
 };
 
@@ -757,7 +757,7 @@ again:
 	cs_opcode = *pc++;
 	switch (cs_opcode) {
 
-	case RECS_BITSET_MIN ... RECS_BITSET_BYTE_MAX:
+	case RECS_BITSET_MIN ... RECS_BITSET_MAX_BYTE:
 		pc += RECS_BITSET_GETBYTES(cs_opcode);
 		goto again;
 
@@ -794,7 +794,7 @@ again:
 	cs_opcode = *pc++;
 	switch (cs_opcode) {
 
-	case RECS_BITSET_MIN ... RECS_BITSET_UTF8_MAX:
+	case RECS_BITSET_MIN ... RECS_BITSET_MAX_UTF8:
 		pc += RECS_BITSET_GETBYTES(cs_opcode);
 		goto again;
 
@@ -1210,7 +1210,7 @@ REOP_CS_BYTE_dispatch:
 			opcode = getb();
 			switch (opcode) {
 
-			case RECS_BITSET_MIN ... RECS_BITSET_BYTE_MAX: {
+			case RECS_BITSET_MIN ... RECS_BITSET_MAX_BYTE: {
 				uint8_t bitset_minch = RECS_BITSET_GETBASE(opcode);
 				uint8_t bitset_size  = RECS_BITSET_GETBYTES(opcode);
 				byte_t bitset_rel_ch;
@@ -1283,7 +1283,7 @@ REOP_CS_UTF8_dispatch:
 			opcode = getb();
 			switch (opcode) {
 
-			case RECS_BITSET_MIN ... RECS_BITSET_UTF8_MAX: {
+			case RECS_BITSET_MIN ... RECS_BITSET_MAX_UTF8: {
 				uint8_t bitset_minch = RECS_BITSET_GETBASE(opcode);
 				uint8_t bitset_size  = RECS_BITSET_GETBYTES(opcode);
 				byte_t bitset_rel_ch;
@@ -1395,7 +1395,7 @@ REOP_NCS_UTF8_dispatch:
 			opcode = getb();
 			switch (opcode) {
 
-			case RECS_BITSET_MIN ... RECS_BITSET_UTF8_MAX: {
+			case RECS_BITSET_MIN ... RECS_BITSET_MAX_UTF8: {
 				uint8_t bitset_minch = RECS_BITSET_GETBASE(opcode);
 				uint8_t bitset_size  = RECS_BITSET_GETBYTES(opcode);
 				byte_t bitset_rel_ch;

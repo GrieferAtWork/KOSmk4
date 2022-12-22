@@ -661,8 +661,8 @@ NOTHROW_NCX(CC libre_opcode_next)(byte_t const *__restrict p_instr) {
 		byte_t cs_opcode;
 		while ((cs_opcode = *p_instr++) != RECS_DONE) {
 			switch (cs_opcode) {
-			case RECS_BITSET_MIN ... RECS_BITSET_BYTE_MAX:
-				if (cs_opcode <= RECS_BITSET_UTF8_MAX || opcode == REOP_CS_BYTE)
+			case RECS_BITSET_MIN ... RECS_BITSET_MAX_BYTE:
+				if (cs_opcode <= RECS_BITSET_MAX_UTF8 || opcode == REOP_CS_BYTE)
 					p_instr += RECS_BITSET_GETBYTES(cs_opcode);
 				break;
 			case RECS_CHAR:
@@ -2088,7 +2088,7 @@ check_bytes_only_ascii:
 		num_bytes = CEILDIV(num_bits, 8);
 		assertf(num_bytes <= 0x20, "%" PRIuSIZ, num_bytes);
 		cs_opcode = RECS_BITSET_BUILD(base, num_bytes);
-		assertf((cs_opcode <= RECS_BITSET_UTF8_MAX) ||
+		assertf((cs_opcode <= RECS_BITSET_MAX_UTF8) ||
 		        (self->rec_cbase[start_offset] == REOP_CS_BYTE),
 		        "This should have been asserted by the err_EILLSET check above");
 		if (!re_compiler_putc(self, cs_opcode))
@@ -3828,8 +3828,8 @@ NOTHROW_NCX(CC libre_code_disasm)(struct re_code const *__restrict self,
 
 				default:
 					if (cs_opcode >= RECS_BITSET_MIN &&
-					    cs_opcode <= (opcode == REOP_CS_BYTE ? RECS_BITSET_BYTE_MAX
-					                                         : RECS_BITSET_UTF8_MAX)) {
+					    cs_opcode <= (opcode == REOP_CS_BYTE ? RECS_BITSET_MAX_BYTE
+					                                         : RECS_BITSET_MAX_UTF8)) {
 						uint8_t minch, bitset_size;
 						unsigned int bitset_bits;
 do_cs_bitset:
