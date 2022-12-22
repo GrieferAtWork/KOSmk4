@@ -166,6 +166,12 @@ DEFINE_TEST(regex) {
 	EQ(7, re_match("ab+c", "abbbbbc"));
 	EQ(3, re_match("ab?c", "abc"));
 	EQ(2, re_match("ab?c", "ac"));
+	EQ(1, re_match("ab?", "a"));
+	EQ(2, re_match("ab?", "ab"));
+	EQ(1, re_match("a(|b)", "a"));
+	EQ(2, re_match("a(|b)", "ab"));
+	EQ(1, re_match("a(b|)", "a"));
+	EQ(2, re_match("a(b|)", "ab"));
 	EQ(-RE_NOMATCH, re_match("ab?c", "abd"));
 	EQ(-RE_NOMATCH, re_match("ab+c", "abbbbbd"));
 	EQ(6, re_match("abbbbb", "abbbbbd"));

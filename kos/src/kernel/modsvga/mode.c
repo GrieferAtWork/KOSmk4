@@ -332,10 +332,10 @@ INTERN_CONST struct vidlck_ops const svgalck_ops = {
 /************************************************************************/
 
 /* Try to do optical character recognition on `cell->sgc_lines'
- * It sound more fancy than it is. - We just compare the  lines
+ * It sounds more fancy than it is. - We just compare the lines
  * with `basevga_defaultfont' and see if we get a match.
  *
- * Upon error, return `0' (which should be disabled as U+FFFD: �) */
+ * Upon error, return `0' (which should be displayed as U+FFFD: �) */
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((1)) byte_t
 NOTHROW(FCALL try_ocr_on_gfxcell)(struct svga_gfxcell const *__restrict cell) {
 	unsigned int i;

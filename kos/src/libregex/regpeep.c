@@ -99,6 +99,17 @@ struct re_mini_interpreter {
 #define re_mini_interpreter_inpartialexact(self) \
 	((self)->rmi_exact_nrem != 0)
 
+/* Read a utf-8 character from the REOP_EXACT-buffer of `self' */
+PRIVATE NONNULL((1)) char32_t
+NOTHROW_NCX(CC re_mini_interpreter_exact_readutf8)(struct re_mini_interpreter *__restrict self) {
+	char32_t result;
+	char const *uptr = (char const *)self->rmi_exact_data;
+	result = unicode_readutf8_n(&uptr, uptr + self->rmi_exact_nrem);
+	self->rmi_exact_nrem -= ((byte_t const *)uptr - self->rmi_exact_data);
+	self->rmi_exact_data = (byte_t const *)uptr;
+	return result;
+}
+
 /* Skip opcodes that don't relate to input matching, or otherwise
  * require special handling  (such as bi-branching  instructions)
  *
@@ -128,6 +139,16 @@ again:
 			assert(self->rmi_exact_nrem > 0);
 		}
 		--pc;
+		goto done;
+
+	case REOP_BYTE:
+		/* Act like "byte X" is actually "exact X" */
+		if (self->rmi_exact_nrem == 0) {
+			self->rmi_exact_data = pc;
+			self->rmi_exact_nrem = 1;
+		}
+		--pc;
+		opcode = REOP_EXACT;
 		goto done;
 
 	case REOP_GROUP_START:
@@ -311,7 +332,6 @@ again:
 	 * - REOP_EXACT_ASCII_ICASE
 	 * - REOP_EXACT_UTF8_ICASE
 	 * - REOP_ANY_MIN ... REOP_ANY_MAX   (for simplicity, we treat all of these as `REOP_ANY')
-	 * - REOP_BYTE
 	 * - REOP_NBYTE
 	 * - REOP_BYTE2
 	 * - REOP_NBYTE2
@@ -333,8 +353,16 @@ again:
 		case REOP_EXACT_ASCII_ICASE:
 			if (!int2->rmi_exact_nrem)
 				goto int2_after_exact_data;
-			++int2->rmi_exact_data;
-			--int2->rmi_exact_nrem;
+			if (opcode1 == REOP_ANY_UTF8 ||
+			    opcode1 == REOP_ANY_NOTLF_UTF8 ||
+			    opcode1 == REOP_ANY_NOTNUL_UTF8 ||
+			    opcode1 == REOP_ANY_NOTNUL_NOTLF_UTF8) {
+				/* Must consume a utf-8 character from `int2' */
+				re_mini_interpreter_exact_readutf8(int2);
+			} else {
+				++int2->rmi_exact_data;
+				--int2->rmi_exact_nrem;
+			}
 			goto again;
 
 		case REOP_EXACT_UTF8_ICASE:
@@ -345,7 +373,6 @@ again:
 			goto again;
 
 		case REOP_ANY_MIN ... REOP_ANY_MAX:
-		case REOP_BYTE:
 		case REOP_NBYTE:
 		case REOP_BYTE2:
 		case REOP_NBYTE2:
@@ -429,13 +456,24 @@ compare_ascii_utf8_icase_exact:
 			}
 			__builtin_unreachable();
 
-		case REOP_ANY_MIN ... REOP_ANY_MAX:
+		case REOP_ANY:
+		case REOP_ANY_NOTLF:
+		case REOP_ANY_NOTNUL:
+		case REOP_ANY_NOTNUL_NOTLF:
 			++int1->rmi_exact_data;
 			--int1->rmi_exact_nrem;
 			++int2->rmi_pc;
 			goto again;
 
-		case REOP_BYTE:
+		case REOP_ANY_UTF8:
+		case REOP_ANY_NOTLF_UTF8:
+		case REOP_ANY_NOTNUL_UTF8:
+		case REOP_ANY_NOTNUL_NOTLF_UTF8:
+			/* Must consume a utf-8 character from the exact-stream */
+			re_mini_interpreter_exact_readutf8(int1);
+			++int2->rmi_pc;
+			goto again;
+
 		case REOP_NBYTE:
 		case REOP_BYTE2:
 		case REOP_NBYTE2:
@@ -445,14 +483,6 @@ compare_ascii_utf8_icase_exact:
 			b1 = *int1->rmi_exact_data++;
 			--int1->rmi_exact_nrem;
 			switch (opcode2) {
-			case REOP_BYTE: {
-				byte_t b2;
-				++int2->rmi_pc;
-				b2 = *int2->rmi_pc++;
-				if (b1 != b2)
-					return false; /* "(f|[g])" -> no input can match both */
-				goto again;
-			}
 			case REOP_NBYTE: {
 				byte_t b2;
 				b2 = *int2->rmi_pc++;
@@ -530,12 +560,53 @@ compare_ascii_utf8_icase_exact:
 			int2->rmi_pc += 1;
 			goto again;
 
-		case REOP_BYTE:
 		case REOP_NBYTE:
 		case REOP_BYTE2:
-		case REOP_NBYTE2:
+		case REOP_NBYTE2: {
+			byte_t b1;
+			b1 = *int1->rmi_exact_data++;
+			b1 = tolower(b1);
+			--int1->rmi_exact_nrem;
+			switch (opcode2) {
+			case REOP_NBYTE: {
+				byte_t b2;
+				b2 = *int2->rmi_pc++;
+				b2 = tolower(b2);
+				if (b1 == b2)
+					return false; /* "(f|[^f])" -> no input can match both */
+				goto again;
+			}
+			case REOP_BYTE2: {
+				byte_t b2_1, b2_2;
+				++int2->rmi_pc;
+				b2_1 = *int2->rmi_pc++;
+				b2_2 = *int2->rmi_pc++;
+				b2_1 = tolower(b2_1);
+				b2_2 = tolower(b2_2);
+				if (b1 != b2_1 && b1 != b2_2)
+					return false; /* "(f|[gh])" -> no input can match both */
+				goto again;
+			}
+			case REOP_NBYTE2: {
+				byte_t b2_1, b2_2;
+				++int2->rmi_pc;
+				b2_1 = *int2->rmi_pc++;
+				b2_2 = *int2->rmi_pc++;
+				b2_1 = tolower(b2_1);
+				b2_2 = tolower(b2_2);
+				if (b1 == b2_1 || b1 == b2_2)
+					return false; /* "(f|[^f])" -> no input can match both */
+				goto again;
+			}
+			default: __builtin_unreachable();
+			}
+			__builtin_unreachable();
+		}
+
 		case REOP_RANGE:
 		case REOP_NRANGE:
+			goto can_match_both; /* Too complicated... */
+
 		case REOP_CONTAINS_UTF8:
 		case REOP_NCONTAINS_UTF8:
 		case REOP_CS_UTF8:
@@ -566,7 +637,6 @@ compare_ascii_utf8_icase_exact:
 			int2->rmi_pc += 1;
 			goto again;
 
-		case REOP_BYTE:
 		case REOP_NBYTE:
 		case REOP_BYTE2:
 		case REOP_NBYTE2:
@@ -583,8 +653,74 @@ compare_ascii_utf8_icase_exact:
 		}
 		goto can_match_both;
 
-	case REOP_BYTE:
-	case REOP_NBYTE:
+	case REOP_NBYTE: {
+		byte_t int1_nbyte;
+		++int1->rmi_pc;
+		int1_nbyte = *int1->rmi_pc++;
+		switch (opcode2) {
+
+		case REOP_EXACT:
+			if (!int2->rmi_exact_nrem) {
+				int1->rmi_pc -= 2;
+				goto int2_after_exact_data;
+			}
+			if (int1_nbyte == *int2->rmi_exact_data)
+				return false; /* "([^x]|xyz)" */
+			++int2->rmi_exact_data;
+			--int2->rmi_exact_nrem;
+			goto again;
+
+		case REOP_EXACT_ASCII_ICASE:
+			if (!int2->rmi_exact_nrem) {
+				int1->rmi_pc -= 2;
+				goto int2_after_exact_data;
+			}
+			if (tolower(int1_nbyte) == tolower(*int2->rmi_exact_data))
+				return false; /* "([^x]|xyz)" */
+			++int2->rmi_exact_data;
+			--int2->rmi_exact_nrem;
+			goto again;
+
+		case REOP_EXACT_UTF8_ICASE: {
+			char32_t int2_char;
+			if (!int2->rmi_exact_nrem) {
+				int1->rmi_pc -= 2;
+				goto int2_after_exact_data;
+			}
+			int2_char = re_mini_interpreter_exact_readutf8(int2);
+			if ((byte_t)tolower(int1_nbyte) == unicode_tolower(int2_char))
+				return false; /* "([^x]|xyz)" */
+			goto again;
+		}
+
+		case REOP_ANY_MIN ... REOP_ANY_MAX:
+			int2->rmi_pc += 1;
+			goto again;
+
+		case REOP_NBYTE:
+			/* Perfect equality of opcodes was already checked above! */
+			goto can_match_both;
+
+		case REOP_BYTE2:
+		case REOP_NBYTE2:
+		case REOP_RANGE:
+		case REOP_NRANGE:
+		case REOP_CONTAINS_UTF8:
+		case REOP_NCONTAINS_UTF8:
+		case REOP_CS_UTF8:
+		case REOP_CS_BYTE:
+		case REOP_NCS_UTF8:
+			/* Because all of these always match at least 2 different bytes, and
+			 * because the int1-opcode matches all  bytes except for 1, we  know
+			 * that there is always  at least one byte  that is matched by  both
+			 * branches. */
+			goto can_match_both;
+
+		default: break;
+		}
+		goto can_match_both;
+	}
+
 	case REOP_BYTE2:
 	case REOP_NBYTE2:
 	case REOP_RANGE:
