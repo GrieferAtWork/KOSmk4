@@ -407,8 +407,10 @@ enum {
 	REOP_GROUP_END_J9,          /* [+1] Same as `REOP_GROUP_END', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_END_J10,         /* [+1] Same as `REOP_GROUP_END', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_END_J11,         /* [+1] Same as `REOP_GROUP_END', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
-	REOP_POP_ONFAIL,            /* [+0] Pop the top-most element from the on-fail stack */
-	REOP_POP_ONFAIL_AT,         /* [+2] Pop on-fail stack items until one is found referencing the given 16-bit, signed, relative address. Then, pop one more (i.e. the one at the referenced address). */
+	REOP_POP_ONFAIL,            /* [+0] Pop the top-most element from the on-fail stack (no-op if the stack is empty) */
+	REOP_POP_ONFAIL_AT,         /* [+2] Pop on-fail stack items until one is found referencing the given 16-bit, signed, relative address.
+	                             * Then, pop one more (i.e. the one at the referenced address). (if the referenced address doesn't  exist,
+	                             * the on-fail stack is cleared) */
 	REOP_JMP_ONFAIL,            /* [+2] push onto the "on-failure stack" a 16-bit, signed, relative addr */
 	REOP_JMP_ONFAIL_DUMMY_AT,   /* [+2] Push a dummy on-fail stack item (that will be skipped during on-fail unwinding, but not by `REOP_POP_ONFAIL')
 	                             *      Operand is a 16-bit, signed, relative addr used to identify the on-fail item (for `REOP_POP_ONFAIL_AT'). */

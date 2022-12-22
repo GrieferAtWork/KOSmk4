@@ -3513,8 +3513,8 @@ NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self) {
 		reqsize = (size_t)(self->rec_cpos - self->rec_cbase);
 		newbase = (byte_t *)realloc(self->rec_cbase, reqsize);
 		if likely(newbase) {
-			self->rec_cbase  = newbase;
-			self->rec_cend   = newbase + reqsize;
+			self->rec_cbase = newbase;
+			self->rec_cend  = newbase + reqsize;
 		}
 	}
 	DBG_memset(&self->rec_cpos, 0xcc, sizeof(self->rec_cpos));
@@ -3529,13 +3529,6 @@ NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self) {
 
 		/* Calculate code properties. */
 		libre_code_makefast(header);
-
-		/* TODO: FIXME: Non-zero fmap offsets are  allowed to skip across  `REOP_JMP_ONFAIL'
-		 *              opcodes (and others that also push  on-fail items). As a result,  it
-		 *              regexec starts executing code that assumes a non-empty on-fail stack
-		 *              with one that is actually empty.
-		 * Currently, this is being worked around by regexec() ignoring empty on-fail stacks
-		 * when opcodes try to pop items from said stack. */
 	}
 
 	return RE_NOERROR;

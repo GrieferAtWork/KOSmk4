@@ -1737,13 +1737,8 @@ REOP_NCS_UTF8_dispatch:
 		}
 
 		TARGET(REOP_POP_ONFAIL) {
-#if 1 /* FIXME: Ugly work-around because of fast-map jump-ahead */
 			if (self->ri_onfailc > 0) /* Can be `0' because of the fmap */
 				--self->ri_onfailc;
-#else
-			assert(self->ri_onfailc > 0);
-			--self->ri_onfailc;
-#endif
 			DISPATCH();
 		}
 
@@ -1751,20 +1746,11 @@ REOP_NCS_UTF8_dispatch:
 			int16_t delta = getw();
 			byte_t const *target_pc;
 			target_pc = pc + delta;
-#if 1 /* FIXME: Ugly work-around because of fast-map jump-ahead */
-			while (self->ri_onfailc > 0) {
+			while (self->ri_onfailc > 0) { /* pc might not exist because of the fmap */
 				--self->ri_onfailc;
 				if (self->ri_onfailv[self->ri_onfailc].rof_pc == target_pc)
 					break;
 			}
-#else
-			byte_t const *target_pc;
-			target_pc = pc + delta;
-			do {
-				assertf(self->ri_onfailc > 0, "PC %p not found in on-fail stack", target_pc);
-				--self->ri_onfailc;
-			} while (self->ri_onfailv[self->ri_onfailc].rof_pc != target_pc);
-#endif
 			DISPATCH();
 		}
 
