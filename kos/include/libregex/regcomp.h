@@ -589,14 +589,15 @@ struct re_code {
 
 /* Regex compiler structure */
 struct re_compiler {
-	struct re_parser rec_parser;     /* Underlying parser. */
-	__byte_t        *rec_cbase;      /* [?..1][<= rec_cend][owned] Base-pointer for output code-buffer. (points at `struct re_code') */
-	__byte_t        *rec_estart;     /* [?..1][<= rec_cpos] Start-pointer for current expression's code. */
-	__byte_t        *rec_cpos;       /* [?..1][>= rec_cbase && <= rec_cend] Pointer to next unset opcode in code-buffer. */
-	__byte_t        *rec_cend;       /* [?..1][>= rec_cbase] End-pointer for output code-buffer. */
-	__uint16_t       rec_ngrp;       /* # of groups currently defined / id of next group */
-	__uint16_t       rec_nvar;       /* # of variables referenced by code / id of next unreferenced variable */
-	__uint8_t        rec_grpinfo[9]; /* Information about the first 9 groups (for back-references); each is a set of `RE_COMPILER_GRPINFO_*' */
+	struct re_parser    rec_parser;     /* Underlying parser. */
+	union {
+		struct re_code *rec_code;       /* [?..1][owned] Regex code object that is being produced. */
+		__byte_t       *rec_cbase;      /* [?..1][<= rec_cend][owned] Base-pointer for output code-buffer. */
+	};
+	__byte_t           *rec_estart;     /* [?..1][<= rec_cpos] Start-pointer for current expression's code. */
+	__byte_t           *rec_cpos;       /* [?..1][>= rec_cbase && <= rec_cend] Pointer to next unset opcode in code-buffer. */
+	__byte_t           *rec_cend;       /* [?..1][>= rec_cbase] End-pointer for output code-buffer. */
+	__uint8_t           rec_grpinfo[9]; /* Information about the first 9 groups (for back-references); each is a set of `RE_COMPILER_GRPINFO_*' */
 #define RE_COMPILER_GRPINFO_DEFINED 0x01 /* Group has been defined */
 #define RE_COMPILER_GRPINFO_EPSILON 0x02 /* Group contents are able to match epsilon (for `REOP_GROUP_MATCH_Jn') */
 };
@@ -619,8 +620,7 @@ struct re_compiler {
  * and return its  produced `struct re_code'. Use  this
  * function INSTEAD OF `re_compiler_fini(3R)' following
  * a successful call to `re_compiler_compile(3R)' */
-#define re_compiler_pack(self) \
-	((struct re_code *)(self)->rec_cbase)
+#define re_compiler_pack(self) ((self)->rec_code)
 
 
 /* Parse  and compile the pattern given to `self' to generate code.

@@ -161,6 +161,11 @@ static_assert(sizeof(wchar_t) == __SIZEOF_WCHAR_T__, "WTF Intellisense?");
 #define __SEG_GS 1
 #endif /* __x86_64__ || __i386__ */
 
+
+#ifndef __cplusplus
+#define __builtin_choose_expr(c, tt, ff) ((c) ? (tt) : (ff))
+#else /* !__cplusplus */
+
 #if __cplusplus == 201406L
 #undef __cplusplus
 #define __cplusplus 201402L
@@ -178,7 +183,6 @@ static_assert(sizeof(wchar_t) == __SIZEOF_WCHAR_T__, "WTF Intellisense?");
 #endif /* __cplusplus == 201402L */
 
 
-#ifdef __cplusplus
 namespace __intern {
 
 /* Intellisense doesn't emulate `__int128' properly  (or rather: at all; it  only

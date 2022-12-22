@@ -729,9 +729,9 @@ NOTHROW_NCX(CC libre_opcode_next)(byte_t const *__restrict p_instr) {
 PRIVATE WUNUSED NONNULL((1, 2)) bool
 NOTHROW_NCX(CC re_compiler_allocvar)(struct re_compiler *__restrict self,
                                      uint8_t *__restrict p_vid) {
-	if (self->rec_nvar >= 0x100)
+	if unlikely(self->rec_code->rc_nvars >= 0x100)
 		return false;
-	*p_vid = self->rec_nvar++;
+	*p_vid = self->rec_code->rc_nvars++;
 	return true;
 }
 
@@ -2142,8 +2142,8 @@ NOTHROW_NCX(CC re_compiler_compile_prefix)(struct re_compiler *__restrict self) 
 
 	/* Check if we want to produce alternation prefixes. */
 #if ALTERNATION_PREFIX_MAXLEN > 0
-	assert(self->rec_cpos >= ((struct re_code *)self->rec_cbase)->rc_code);
-	alternation_prefix_wanted = self->rec_cpos <= ((struct re_code *)self->rec_cbase)->rc_code;
+	assert(self->rec_cpos >= self->rec_code->rc_code);
+	alternation_prefix_wanted = self->rec_cpos <= self->rec_code->rc_code;
 	alternation_prefix_len    = 0;
 #endif /* ALTERNATION_PREFIX_MAXLEN > 0 */
 again:
@@ -2199,9 +2199,9 @@ again:
 		byte_t *body;
 		uintptr_t old_syntax;
 
-		if unlikely(self->rec_ngrp >= 0x100)
+		if unlikely(self->rec_code->rc_ngrps >= 0x100)
 			return RE_ESIZE; /* Too many groups */
-		gid = self->rec_ngrp++;
+		gid = self->rec_code->rc_ngrps++;
 
 		/* We're inside of a group, so ')' are no longer literals! */
 		old_syntax = self->rec_parser.rep_syntax;
@@ -3488,6 +3488,10 @@ NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self) {
 	if unlikely(error != RE_NOERROR)
 		goto err;
 
+	/* Initialize the regex code header */
+	self->rec_code->rc_ngrps = 0;
+	self->rec_code->rc_nvars = 0;
+
 	/* Check that everything has been parsed. */
 	trailing_token = re_compiler_yield(self);
 	if unlikely(trailing_token != RE_TOKEN_EOF) {
@@ -3520,16 +3524,8 @@ NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self) {
 	DBG_memset(&self->rec_cpos, 0xcc, sizeof(self->rec_cpos));
 	DBG_memset(&self->rec_estart, 0xcc, sizeof(self->rec_estart));
 
-	/* Fill in the regex code header. */
-	{
-		struct re_code *header;
-		header = (struct re_code *)self->rec_cbase;
-		header->rc_ngrps = self->rec_ngrp;
-		header->rc_nvars = self->rec_nvar;
-
-		/* Calculate code properties. */
-		libre_code_makefast(header);
-	}
+	/* Generate the fast-map, as well as the min-match attribute. */
+	libre_code_makefast(self->rec_code);
 
 	return RE_NOERROR;
 err_nomem:
@@ -3626,14 +3622,14 @@ NOTHROW_NCX(CC libre_code_disasm)(struct re_code const *__restrict self,
 
 		case REOP_BYTE:
 		case REOP_NBYTE: {
-			printf("%schar %$q",
+			printf("%sbyte %$q",
 			       opcode == REOP_NBYTE ? "n" : "",
 			       (size_t)1, pc);
 		}	break;
 
 		case REOP_BYTE2:
 		case REOP_NBYTE2: {
-			printf("%schar2 %$q",
+			printf("%sbyte2 %$q",
 			       opcode == REOP_NBYTE2 ? "n" : "",
 			       (size_t)2, pc);
 		}	break;

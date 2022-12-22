@@ -89,7 +89,7 @@ struct re_mini_interpreter {
 };
 
 #define _re_mini_interpreter_sizeof(nvars) \
-	(offsetof(struct re_mini_interpreter, rmi_vars) + (nvars) * sizeof(uint8_t))
+	(offsetof(struct re_mini_interpreter, rmi_vars) + ((nvars) * sizeof(uint8_t)))
 #define re_mini_interpreter_alloc(nvars) \
 	((struct re_mini_interpreter *)alloca(_re_mini_interpreter_sizeof(nvars)))
 #define re_mini_interpreter_init(self, pc, endpc) \
@@ -248,7 +248,6 @@ NOTHROW_NCX(CC input_can_match_both_ex)(struct re_code const *code,
 		tswap(byte_t, opcode1, opcode2);                           \
 		tswap(struct re_mini_interpreter *, int1_copy, int2_copy); \
 	}	__WHILE0
-
 	int1_copy = NULL;
 	int2_copy = NULL;
 again:
@@ -261,16 +260,17 @@ again:
 		byte_t const *pc1, *pc2;
 		pc1 = int1->rmi_pc + 3;
 		pc2 = pc1 + int16_at(pc1 - 2);
+		assert(code->rc_nvars <= 0x100);
 		if (int1_copy == NULL)
 			int1_copy = re_mini_interpreter_alloc(code->rc_nvars);
 		if (int2_copy == NULL)
 			int2_copy = re_mini_interpreter_alloc(code->rc_nvars);
 		memcpy(int1_copy, int1, _re_mini_interpreter_sizeof(code->rc_nvars));
 		memcpy(int2_copy, int2, _re_mini_interpreter_sizeof(code->rc_nvars));
-		int1_copy->rmi_pc = pc2;
+		int1_copy->rmi_pc = pc1;
 		if (input_can_match_both_ex(code, int1_copy, int2_copy))
 			return true;
-		int1->rmi_pc = pc1;
+		int1->rmi_pc = pc2;
 		goto again;
 	}
 	if (opcode2 == REOP_JMP_ONFAIL) {
@@ -278,16 +278,17 @@ again:
 		byte_t const *pc1, *pc2;
 		pc1 = int2->rmi_pc + 3;
 		pc2 = pc1 + int16_at(pc1 - 2);
+		assert(code->rc_nvars <= 0x100);
 		if (int1_copy == NULL)
 			int1_copy = re_mini_interpreter_alloc(code->rc_nvars);
 		if (int2_copy == NULL)
 			int2_copy = re_mini_interpreter_alloc(code->rc_nvars);
 		memcpy(int1_copy, int1, _re_mini_interpreter_sizeof(code->rc_nvars));
 		memcpy(int2_copy, int2, _re_mini_interpreter_sizeof(code->rc_nvars));
-		int2_copy->rmi_pc = pc2;
+		int2_copy->rmi_pc = pc1;
 		if (input_can_match_both_ex(code, int1_copy, int2_copy))
 			return true;
-		int2->rmi_pc = pc1;
+		int2->rmi_pc = pc2;
 		goto again;
 	}
 
@@ -987,7 +988,7 @@ NOTHROW_NCX(CC libre_compiler_delcode)(struct re_compiler *__restrict self,
 	assert(num_bytes >= 1);
 
 	/* Adjust relative jumps that go across the deleted range. */
-	pc = ((struct re_code *)self->rec_cbase)->rc_code;
+	pc = self->rec_code->rc_code;
 again:
 	opcode = getb();
 	switch (opcode) {
@@ -1118,7 +1119,7 @@ again:
 PRIVATE NONNULL((1)) void
 NOTHROW_NCX(CC libre_compiler_delnops)(struct re_compiler *__restrict self) {
 	byte_t *pc, opcode;
-	pc = ((struct re_code *)self->rec_cbase)->rc_code;
+	pc = self->rec_code->rc_code;
 again:
 	opcode = getb();
 	switch (opcode) {
@@ -1201,8 +1202,8 @@ NOTHROW_NCX(CC libre_compiler_peephole)(struct re_compiler *__restrict self) {
 	 *    also match input "afoob", it won't be  able to do so any better  than
 	 *    the "foo" branch.
 	 */
-	peep_onfail_stack(((struct re_code *)self->rec_cbase),
-	                  ((struct re_code *)self->rec_cbase)->rc_code,
+	peep_onfail_stack(self->rec_code,
+	                  self->rec_code->rc_code,
 	                  self->rec_cpos);
 
 	/* Remove all NOP opcodes from the code-stream */
