@@ -71,9 +71,8 @@ PRIVATE re_errno_t re_compile_error(char const *pattern,
                                     uintptr_t extra_syntax_flags) {
 	re_errno_t error;
 	struct re_compiler compiler;
-	re_compiler_init(&compiler, pattern,
-	                 DEFAULT_SYNTAX_FLAGS |
-	                 extra_syntax_flags);
+	re_compiler_init(&compiler, pattern, strend(pattern),
+	                 DEFAULT_SYNTAX_FLAGS | extra_syntax_flags);
 	error = re_compiler_compile(&compiler);
 	NE(RE_NOERROR, error);
 	re_compiler_fini(&compiler);
@@ -85,9 +84,8 @@ PRIVATE struct re_code *re_compile(char const *pattern,
 	struct re_code *result;
 	re_errno_t error;
 	struct re_compiler compiler;
-	re_compiler_init(&compiler, pattern,
-	                 DEFAULT_SYNTAX_FLAGS |
-	                 extra_syntax_flags);
+	re_compiler_init(&compiler, pattern, strend(pattern),
+	                 DEFAULT_SYNTAX_FLAGS | extra_syntax_flags);
 	error = re_compiler_compile(&compiler);
 	EQ(RE_NOERROR, error);
 	result = re_compiler_pack(&compiler);

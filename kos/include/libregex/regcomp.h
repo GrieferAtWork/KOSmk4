@@ -492,14 +492,23 @@ enum {
  * - RE_SYNTAX_NO_UTF8
  * - RE_SYNTAX_NO_KOS_OPS */
 struct re_parser {
-	char const *rep_pos;    /* [1..1][>= rep_pat] Pointer to next pattern-character that has yet to be compiled. */
+	char const *rep_pos;    /* [1..1][>= rep_pat && <= rep_end] Pointer to next pattern-character that has yet to be compiled. */
 	char const *rep_pat;    /* [1..1][const] Pointer to the start of the pattern being compiled. */
+	char const *rep_end;    /* [1..1][>= rep_pat][const] Pattern end
+	                         * WARNING: This memory address must be dereferencable, and point to a NUL-byte!
+	                         * -> Internally, the parser only checks for end-of-pattern when it hits a  NUL-
+	                         *    byte, at which point it check if  that byte appeared at `rep_end'. If  so,
+	                         *    then the end of the pattern has been reached; if not, then the NUL-byte it
+	                         *    just found is encoded as a literal NUL-byte (e.g. 'exact "\0"').
+	                         * -> This makes it possible for the pattern to match NUL-bytes in input, without
+	                         *    needing to make use of other kos-extensions like "\0", "\x00", or  similar. */
 	__uintptr_t rep_syntax; /* [const] RE syntax flags (set of `RE_SYNTAX_*') */
 };
 
-#define re_parser_init(self, pattern, syntax) \
-	(void)((self)->rep_pos    = (pattern),    \
-	       (self)->rep_pat    = (pattern),    \
+#define re_parser_init(self, pattern, pattern_end, syntax) \
+	(void)((self)->rep_pos    = (pattern),                 \
+	       (self)->rep_pat    = (pattern),                 \
+	       (self)->rep_end    = (pattern_end),             \
 	       (self)->rep_syntax = (syntax))
 
 /* Regex token (one of `RE_TOKEN_*', or a utf-32 character (or byte when `RE_SYNTAX_NO_UTF8' is set)) */
@@ -608,10 +617,10 @@ struct re_compiler {
 #define RE_COMPILER_GRPINFO_EPSILON 0x02 /* Group contents are able to match epsilon (for `REOP_GROUP_MATCH_Jn') */
 };
 
-#define re_compiler_init(self, pattern, syntax)                  \
-	(void)(re_parser_init(&(self)->rec_parser, pattern, syntax), \
-	       (self)->rec_cbase = (self)->rec_estart = __NULLPTR,   \
-	       (self)->rec_cpos = (self)->rec_cend = __NULLPTR,      \
+#define re_compiler_init(self, pattern, pattern_end, syntax)                  \
+	(void)(re_parser_init(&(self)->rec_parser, pattern, pattern_end, syntax), \
+	       (self)->rec_cbase = (self)->rec_estart = __NULLPTR,                \
+	       (self)->rec_cpos = (self)->rec_cend = __NULLPTR,                   \
 	       __libc_bzero((self)->rec_grpinfo, sizeof((self)->rec_grpinfo)))
 #define re_compiler_fini(self) \
 	(void)__libc_free((self)->rec_cbase)
@@ -635,7 +644,7 @@ struct re_compiler {
  * perform cleanup.
  * Upon success, members of `self' are initialized as:
  * - *rec_parser.rep_pos    == '\0'
- * - rec_parser.rep_pos     == strend(rec_parser.rep_pat)
+ * - rec_parser.rep_pos     == rec_parser.rep_end
  * - rec_parser.rep_syntax  == <unchanged>
  * - rec_parser.rec_cbase   == <pointer-to-struct re_code>
  * - rec_parser.rec_estart  == <undefined>

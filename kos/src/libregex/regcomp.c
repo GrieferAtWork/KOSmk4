@@ -129,7 +129,7 @@ NOTHROW_NCX(CC parse_interval)(char const **__restrict p_pattern, uintptr_t synt
 		++pattern;
 		if ((syntax & RE_SYNTAX_NO_BK_BRACES)
 		    ? (pattern[0] == '}')
-		    : (pattern[0] == '\0' && pattern[1] == '}')) {
+		    : (pattern[0] == '\\' && pattern[1] == '}')) {
 			result->ri_many = true;
 		} else {
 			interval_max = strtou32_r(pattern, (char **)&pattern, 10, &parse_errno);
@@ -174,8 +174,12 @@ NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self) {
 	switch (ch) {
 
 	case '\0':
-		--self->rep_pos;
-		return RE_TOKEN_EOF;
+		assert(self->rep_pos - 1 <= self->rep_end);
+		if (self->rep_pos - 1 >= self->rep_end) {
+			--self->rep_pos;
+			return RE_TOKEN_EOF;
+		}
+		break; /* Encode as a literal NUL-byte */
 
 	case '.':
 		return RE_TOKEN_ANY;
@@ -232,7 +236,7 @@ NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self) {
 	case '$':
 		if (self->rep_syntax & RE_SYNTAX_CONTEXT_INDEP_ANCHORS)
 			return RE_TOKEN_AT_EOL;
-		if (self->rep_pos[0] == '\0')
+		if (self->rep_pos[0] == '\0' && self->rep_pos >= self->rep_end)
 			return RE_TOKEN_AT_EOL; /* Always special at end of pattern */
 		if ((self->rep_pos[0] == ')') && (self->rep_syntax & RE_SYNTAX_NO_BK_PARENS))
 			return RE_TOKEN_AT_EOL; /* Always special before group-close */
@@ -273,8 +277,12 @@ NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self) {
 		switch (ch) {
 
 		case '\0':
-			self->rep_pos -= 2; /* Keep on repeating this token! */
-			return RE_TOKEN_UNMATCHED_BK;
+			assert(self->rep_pos - 1 <= self->rep_end);
+			if (self->rep_pos - 1 >= self->rep_end) {
+				self->rep_pos -= 2; /* Keep on repeating this token! */
+				return RE_TOKEN_UNMATCHED_BK;
+			}
+			goto default_escaped_char;
 
 		case '{':
 			if ((self->rep_syntax & (RE_SYNTAX_INTERVALS | RE_SYNTAX_NO_BK_BRACES)) ==
@@ -497,7 +505,7 @@ handle_utf8:
 		/* Make sure that `unicode_readutf8(3)' won't access out-of-bounds memory */
 		seqlen = unicode_utf8seqlen[ch];
 		for (i = 0; i < seqlen; ++i) {
-			if (self->rep_pos[i] == '\0') {
+			if (self->rep_pos[i] == '\0' && (self->rep_pos + i) >= self->rep_end) {
 				self->rep_pos += i;
 				return RE_TOKEN_EOF;
 			}
@@ -1463,6 +1471,7 @@ PRIVATE uint8_t const ctype_c_trait_masks[] = {
 /* Yield a charset literal. Returns:
  * - A unicode ordinal  (return < RE_TOKEN_BASE)
  * - A raw byte literal (return >= RE_TOKEN_BYTE80h_MIN && return <= RE_TOKEN_BYTE80h_MAX)
+ * - RE_TOKEN_EOF when the trailing '\0'-char is reached
  * - RE_TOKEN_UNMATCHED_BK when an unmatched '\' is encountered
  */
 PRIVATE WUNUSED NONNULL((1)) char32_t
@@ -1474,6 +1483,11 @@ decpos_and_readutf8:
 		--self->rep_pos;
 		return unicode_readutf8((char const **)&self->rep_pos);
 	}
+	assert(self->rep_pos - 1 <= self->rep_end);
+	if (ch == '\0' && (self->rep_pos - 1 >= self->rep_end)) {
+		--self->rep_pos;
+		return RE_TOKEN_EOF;
+	}
 	if ((ch == '\\') &&
 	    (self->rep_syntax & (RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS | RE_SYNTAX_NO_KOS_OPS)) ==
 	    /*               */ (RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS)) {
@@ -1481,8 +1495,12 @@ decpos_and_readutf8:
 		switch (ch) {
 
 		case '\0':
-			self->rep_pos -= 2; /* Keep on repeating this token! */
-			return RE_TOKEN_UNMATCHED_BK;
+			assert(self->rep_pos - 1 <= self->rep_end);
+			if (self->rep_pos - 1 >= self->rep_end) {
+				self->rep_pos -= 2; /* Keep on repeating this token! */
+				return RE_TOKEN_UNMATCHED_BK;
+			}
+			goto default_escaped_char;
 
 		case '0': {
 			uint32_t ord;
@@ -1596,7 +1614,10 @@ loop_next:
 		switch (ch) {
 
 		case '\0':
-			goto err_EEND;
+			assert(self->rec_parser.rep_pos - 1 <= self->rec_parser.rep_end);
+			if (self->rec_parser.rep_pos - 1 >= self->rec_parser.rep_end)
+				goto err_EEND;   /* Actual EOF */
+			goto encode_literal; /* Literal NUL-byte */
 
 		case ']':
 			goto done_loop;
@@ -1636,13 +1657,13 @@ loop_next:
 			if (self->rec_parser.rep_syntax & RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS) {
 				/* Special case: backslash-escape sequences are allowed in charsets */
 				ch = (unsigned char)*self->rec_parser.rep_pos++;
-				if unlikely(ch == '\0')
-					goto err_EEND;
+				assert(self->rec_parser.rep_pos - 1 <= self->rec_parser.rep_end);
+				if unlikely(ch == '\0' && (self->rec_parser.rep_pos - 1 >= self->rec_parser.rep_end)) {
+					--self->rec_parser.rep_pos;
+					goto err_EESCAPE;
+				}
 				if (!(self->rec_parser.rep_syntax & RE_SYNTAX_NO_KOS_OPS)) {
 					switch (ch) {
-
-					case '\0':
-						goto err_EEND;
 
 					case 'w':
 						bit_set(charsets, RECS_ISSYMCONT - RECS_ISX_MIN);
@@ -1666,6 +1687,7 @@ loop_next:
 					case 'x':
 						self->rec_parser.rep_pos -= 2;
 						uchar = re_parser_yield_cs_literal(&self->rec_parser);
+						assert(uchar != RE_TOKEN_EOF);
 						if unlikely(uchar == RE_TOKEN_UNMATCHED_BK)
 							goto err_EESCAPE;
 						if (RE_TOKEN_ISBYTE80h(uchar)) {
@@ -1696,6 +1718,8 @@ encode_uchar:
 					/* Unicode character range. */
 					++self->rec_parser.rep_pos; /* Skip over '-' character */
 					hichar = re_parser_yield_cs_literal(&self->rec_parser);
+					if unlikely(hichar == RE_TOKEN_EOF)
+						goto err_EEND;
 					if unlikely(hichar == RE_TOKEN_UNMATCHED_BK)
 						goto err_EESCAPE;
 					if (RE_TOKEN_ISBYTE80h(hichar))
@@ -1748,6 +1772,8 @@ encode_byte_ch:
 				unsigned char hibyte;
 				++self->rec_parser.rep_pos;
 				hichar = re_parser_yield_cs_literal(&self->rec_parser);
+				if unlikely(hichar == RE_TOKEN_EOF)
+					goto err_EEND;
 				if unlikely(hichar == RE_TOKEN_UNMATCHED_BK)
 					goto err_EESCAPE;
 				if (RE_TOKEN_ISBYTE80h(hichar)) {
@@ -3447,7 +3473,7 @@ err_nomem:
  * perform cleanup.
  * Upon success, members of `self' are initialized as:
  * - *rec_parser.rep_pos    == '\0'
- * - rec_parser.rep_pos     == strend(rec_parser.rep_pat)
+ * - rec_parser.rep_pos     == rec_parser.rep_end
  * - rec_parser.rep_syntax  == <unchanged>
  * - rec_parser.rec_cbase   == <pointer-to-struct re_code>
  * - rec_parser.rec_estart  == <undefined>

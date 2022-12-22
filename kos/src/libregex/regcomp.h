@@ -46,7 +46,7 @@ NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self);
  * perform cleanup.
  * Upon success, members of `self' are initialized as:
  * - *rec_parser.rep_pos    == '\0'
- * - rec_parser.rep_pos     == strend(rec_parser.rep_pat)
+ * - rec_parser.rep_pos     == rec_parser.rep_end
  * - rec_parser.rep_syntax  == <unchanged>
  * - rec_parser.rec_cbase   == <pointer-to-struct re_code>
  * - rec_parser.rec_estart  == <undefined>

@@ -36,6 +36,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <libregex/regcomp.h>
 #include <libregex/regexec.h>
@@ -215,18 +216,52 @@ NOTHROW_NCX(LIBCCALL libc_re_compile_pattern)(char const *pattern,
 	re_errno_t error;
 	struct re_compiler comp;
 	struct re_code *code;
+	char *used_pattern;
 	if unlikely(!libregex_load())
 		return regerrordesc_np(REG_ENOSYS);
 
 	/* Initialize the regex compiler */
-	(void)length; /* TODO: Must respect the `length' argument! */
-	re_compiler_init(&comp, pattern, re_syntax_options);
+	{
+		char const *pattern_end;
+		size_t pagesize = getpagesize();
+		size_t pagemask = pagesize - 1;
+		used_pattern    = (char *)pattern;
+		pattern_end     = pattern + length;
+		/* Check if the `pattern + length - 1' and `pattern + length' are located within the
+		 * same page. If so,  the we can (sneakily)  check if `pattern + length' might  just
+		 * happen to be a NUL-character.
+		 *
+		 * If  it is, then we can just pass  the caller-given pattern to the regex compiler
+		 * as-is. But if it isn't, then we have to allocate a temporary copy of the pattern
+		 * that features an additional NUL-character at its end. */
+		if ((((uintptr_t)(pattern_end - 0) & pagemask) !=
+		     ((uintptr_t)(pattern_end - 1) & pagemask)) ||
+		    (*pattern_end != '\0')) {
+			/* Need to use a temp copy of `pattern' that actually has a NUL-byte where we need it. */
+			used_pattern = (char *)malloc(length + 1, sizeof(char));
+			if unlikely(!used_pattern) {
+				error = REG_ESPACE;
+				goto return_error;
+			}
+			*(char *)mempcpy(used_pattern, pattern, length, sizeof(char)) = '\0';
+		}
+	}
+	re_compiler_init(&comp,
+	                 used_pattern,
+	                 used_pattern + length,
+	                 re_syntax_options);
 
 	/* Compile the pattern. */
 	error = re_compiler_compile(&comp);
+
+	/* If we had to use a custom pattern buffer, free that buffer now. */
+	if (used_pattern != (char *)pattern)
+		free(used_pattern);
+
+	/* Check for errors */
 	if unlikely(error != RE_NOERROR) {
 		re_compiler_fini(&comp);
-		return regerrordesc_np(error);
+		goto return_error;
 	}
 	code = re_compiler_pack(&comp);
 
@@ -239,6 +274,8 @@ NOTHROW_NCX(LIBCCALL libc_re_compile_pattern)(char const *pattern,
 	self->no_sub           = (comp.rec_parser.rep_syntax & RE_SYNTAX_NO_SUB) ? 1 : 0;
 	self->newline_anchor   = (comp.rec_parser.rep_syntax & RE_SYNTAX_ANCHORS_IGNORE_EFLAGS) ? 1 : 0;
 	return NULL;
+return_error:
+	return regerrordesc_np(error);
 }
 /*[[[end:libc_re_compile_pattern]]]*/
 
@@ -621,7 +658,7 @@ NOTHROW_NCX(LIBCCALL libc_regcomp)(regex_t *__restrict self,
 		syntax |= RE_SYNTAX_NO_SUB;
 
 	/* Initialize the regex compiler */
-	re_compiler_init(&comp, pattern, syntax);
+	re_compiler_init(&comp, pattern, strend(pattern), syntax);
 
 	/* Compile the pattern. */
 	error = re_compiler_compile(&comp);
