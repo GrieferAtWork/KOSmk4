@@ -3483,14 +3483,14 @@ NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self) {
 		goto err_nomem;
 	self->rec_cpos += offsetof(struct re_code, rc_code);
 
+	/* Initialize the regex code header */
+	self->rec_code->rc_ngrps = 0;
+	self->rec_code->rc_nvars = 0;
+
 	/* Do the actual compilation */
 	error = re_compiler_compile_alternation(self, NULL, 0);
 	if unlikely(error != RE_NOERROR)
 		goto err;
-
-	/* Initialize the regex code header */
-	self->rec_code->rc_ngrps = 0;
-	self->rec_code->rc_nvars = 0;
 
 	/* Check that everything has been parsed. */
 	trailing_token = re_compiler_yield(self);

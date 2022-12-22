@@ -606,7 +606,6 @@ struct re_compiler {
 	(void)(re_parser_init(&(self)->rec_parser, pattern, syntax), \
 	       (self)->rec_cbase = (self)->rec_estart = __NULLPTR,   \
 	       (self)->rec_cpos = (self)->rec_cend = __NULLPTR,      \
-	       (self)->rec_ngrp = (self)->rec_nvar = 0,              \
 	       __libc_bzero((self)->rec_grpinfo, sizeof((self)->rec_grpinfo)))
 #define re_compiler_fini(self) \
 	(void)__libc_free((self)->rec_cbase)
