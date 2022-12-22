@@ -47,11 +47,13 @@ typedef struct {
 struct re_exec {
 	struct re_code const *rx_code;     /* [1..1] Regex code */
 	size_t                rx_nmatch;   /* Max # of group matches to write to `rx_pmatch' (at most `rx_code->rc_ngrps' will ever be written) */
-	re_regmatch_t        *rx_pmatch;   /* [0..rx_nmatch] Output buffer for group matches
+	re_regmatch_t        *rx_pmatch;   /* [?..rx_nmatch] Output buffer for group matches
 	                                    * - Up to the first `rx_nmatch' groups are written, but only on success
 	                                    * - Upon failure, the contents of this buffer are left in an undefined state
 	                                    * - Offsets written INCLUDE `rx_startoff' (i.e. are always `>= rx_startoff') */
-	struct iovec const   *rx_iov;      /* [0..*] I/O vector of input data to scan */
+	struct iovec const   *rx_iov;      /* [?..*][valid_if(rx_startoff < rx_endoff || rx_extra != 0)]
+	                                    * I/O vector of input data to scan (goes on until chunks totaling
+	                                    * at least  `rx_endoff + rx_extra' bytes  have been  encountered) */
 	__size_t              rx_startoff; /* Starting byte offset into `rx_iov' of data to match. */
 	__size_t              rx_endoff;   /* Ending byte offset into `rx_iov' of data to match. (when `<= rx_startoff && rx_extra == 0',
 	                                    * input data is epsilon,  and `rx_iov' will  never be dereferenced;  iow: can be  undefined). */
