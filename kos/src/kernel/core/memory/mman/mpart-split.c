@@ -202,7 +202,7 @@ NOTHROW(FCALL mpart_lock_all_mmans)(struct mpart *__restrict self) {
 			continue; /* Already enumerated. */
 		if (!mman_lock_tryacquire(mm)) {
 			struct mman *blocking_mm = mm;
-			/* Cannot be lock immediately. */
+			/* Cannot be locked immediately. */
 			while (node != LIST_FIRST(&self->mp_copy)) {
 				node = LIST_PREV_UNSAFE(node, mn_link);
 				mm   = node->mn_mman;
@@ -224,7 +224,7 @@ NOTHROW(FCALL mpart_lock_all_mmans)(struct mpart *__restrict self) {
 		if (mnode_list_contains_mman(LIST_FIRST(&self->mp_share), mm, node))
 			continue; /* Already enumerated. */
 		if (!mman_lock_tryacquire(mm)) {
-			/* Cannot be lock immediately. */
+			/* Cannot be locked immediately. */
 			struct mman *blocking_mm = mm;
 			/* Unlock all share-nodes (that have already been locked). */
 			while (node != LIST_FIRST(&self->mp_share)) {
@@ -527,7 +527,7 @@ NOTHROW(FCALL mpart_get_swp_offset_after_split)(struct mpart const *__restrict s
  *
  * Otherwise (if no locks were released), return `true' */
 PRIVATE NOBLOCK NONNULL((1)) bool FCALL
-mpart_split_data_alloc_mnodes(struct mpart_split_data *__restrict self) {
+mpart_split_data_alloc_mnodes_or_unlock(struct mpart_split_data *__restrict self) {
 	size_t needed;
 	needed = mpart_count_needed_nodes_for_hipart(self);
 
@@ -564,7 +564,7 @@ mpart_split_data_alloc_mnodes(struct mpart_split_data *__restrict self) {
 
 /* Allocate `self->msd_himeta' if necessary. */
 PRIVATE NOBLOCK NONNULL((1)) bool FCALL
-mpart_split_data_alloc_himeta(struct mpart_split_data *__restrict self) {
+mpart_split_data_alloc_himeta_or_unlock(struct mpart_split_data *__restrict self) {
 	struct mpartmeta *lometa;
 	lometa = self->msd_lopart->mp_meta;
 	if (lometa == NULL)
@@ -603,7 +603,7 @@ done:
 
 /* Allocate `self->msd_hibitset' if necessary. */
 PRIVATE NOBLOCK NONNULL((1)) bool FCALL
-mpart_split_data_alloc_hibitset(struct mpart_split_data *__restrict self) {
+mpart_split_data_alloc_hibitset_or_unlock(struct mpart_split_data *__restrict self) {
 	size_t hi_num_bytes, hi_block_count;
 	struct mpart *lopart = self->msd_lopart;
 
@@ -666,7 +666,7 @@ NOTHROW(FCALL mchunkvec_split_after)(struct mchunkvec const *__restrict self,
 
 /* Allocate `self->msd_himvec' if necessary. */
 PRIVATE NOBLOCK NONNULL((1)) bool FCALL
-mpart_split_data_alloc_himvec(struct mpart_split_data *__restrict self) {
+mpart_split_data_alloc_himvec_or_unlock(struct mpart_split_data *__restrict self) {
 	/* Dynamically allocate the vector needed for scattered mem/swp in hipart */
 	struct mpart *lopart = self->msd_lopart;
 	switch (lopart->mp_state) {
@@ -885,8 +885,7 @@ release_and_return_null:
 			goto again;
 
 		/* Step #4: Make all of the necessary allocations. */
-restart_alloc:
-		if (!mpart_split_data_alloc_mnodes(&data)) {
+		if (!mpart_split_data_alloc_mnodes_or_unlock(&data)) {
 relock_with_data:
 			mpart_lock_acquire_and_initdone_nodma(self);
 			if unlikely(data.msd_offset >= mpart_getsize(self))
@@ -902,12 +901,12 @@ relock_with_data:
 			if (!mpart_lock_meta_futex_or_unlock_and_decref(self))
 				goto relock_with_data;
 		}
-		if (!mpart_split_data_alloc_himeta(&data))
-			goto restart_alloc;
-		if (!mpart_split_data_alloc_hibitset(&data))
-			goto restart_alloc;
-		if (!mpart_split_data_alloc_himvec(&data))
-			goto restart_alloc;
+		if (!mpart_split_data_alloc_himeta_or_unlock(&data))
+			goto again;
+		if (!mpart_split_data_alloc_hibitset_or_unlock(&data))
+			goto again;
+		if (!mpart_split_data_alloc_himvec_or_unlock(&data))
+			goto again;
 
 		/* Step #5: If the associated file isn't anonymous, then we must
 		 *          also acquire a lock to it, so that we can insert the
