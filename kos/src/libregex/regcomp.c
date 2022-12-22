@@ -214,15 +214,15 @@ NOTHROW_NCX(CC libre_parser_yield)(struct re_parser *__restrict self) {
 			return RE_TOKEN_AT_SOL; /* Always special at start of pattern */
 		if (self->rep_pos[-1] == '(') {
 			/* Also special if following a non-escaped open-group */
-			unsigned int num_bks = 0;
+			bool is_escaled = false;
 			char const *iter = self->rep_pos - 2;
 			while (iter >= self->rep_pat && *iter == '\\') {
 				--iter;
-				++num_bks;
+				is_escaled = !is_escaled;
 			}
 			if (!(self->rep_syntax & RE_SYNTAX_NO_BK_PARENS))
-				++num_bks; /* Invert meaning of escaped vs. non-escaped */
-			if ((num_bks & 1) == 0) {
+				is_escaled = !is_escaled; /* Invert meaning of escaped vs. non-escaped */
+			if (!is_escaled) {
 				/* '^' is following a non-escaped '(' -> it's an AT-marker! */
 				return RE_TOKEN_AT_SOL;
 			}
@@ -2639,6 +2639,7 @@ do_group_start_without_alternation:
 		if (!(ginfo & RE_COMPILER_GRPINFO_DEFINED))
 			return RE_ESUBREG;
 		alternation_prefix_dump();
+		self->rec_code->rc_flags |= RE_CODE_FLAG_NEEDGROUPS;
 		if (!re_compiler_putc(self, REOP_GROUP_MATCH))
 			goto err_nomem;
 		if (!re_compiler_putc(self, gid))
@@ -2777,7 +2778,6 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 
 	/* Figure out the size of the affected expression */
 	expr_size = (size_t)(self->rec_cpos - self->rec_estart);
-	assert(!((uintptr_t)self->rec_cbase & 1));
 
 	/* TODO: Any use-case that is implemented via `REOP_JMP_ONFAIL_DUMMY_AT' should
 	 *       first  check if `expr_size'  is smaller than `EXPR_DUPLICATE_MAXSIZE'.
@@ -3486,6 +3486,8 @@ NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self) {
 	/* Initialize the regex code header */
 	self->rec_code->rc_ngrps = 0;
 	self->rec_code->rc_nvars = 0;
+	self->rec_code->rc_flags = RE_CODE_FLAG_NORMAL;
+	self->rec_code->rc_flags |= RE_CODE_FLAG_OPTGROUPS; /* TODO: Only set this flag if necessary. */
 
 	/* Do the actual compilation */
 	error = re_compiler_compile_alternation(self, NULL, 0);

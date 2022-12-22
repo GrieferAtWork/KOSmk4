@@ -102,7 +102,6 @@ PRIVATE ssize_t re_match_code(struct re_code const *code, char const *input,
                               size_t exp_matchc, re_regmatch_t const *exp_matchv) {
 	ssize_t result;
 	struct re_exec exec;
-	re_regmatch_t *matches;
 	size_t input_len   = strlen(input);
 	struct iovec iov[] = { { (void *)input, input_len } };
 	exec.rx_code       = code;
@@ -111,10 +110,11 @@ PRIVATE ssize_t re_match_code(struct re_code const *code, char const *input,
 	exec.rx_endoff     = input_len;
 	exec.rx_extra      = 0;
 	exec.rx_eflags     = 0;
-	matches = (re_regmatch_t *)xmalloc(exp_matchc * sizeof(re_regmatch_t));
+	exec.rx_nmatch     = exp_matchc;
+	exec.rx_pmatch     = (re_regmatch_t *)xmalloc(exp_matchc * sizeof(re_regmatch_t));
 	/* Do the match */
-	result = re_exec_match(&exec, exp_matchc, matches);
-	EQmem(matches, exp_matchv, exp_matchc * sizeof(re_regmatch_t));
+	result = re_exec_match(&exec);
+	EQmem(exec.rx_pmatch, exp_matchv, exp_matchc * sizeof(re_regmatch_t));
 
 	/* Also attempt the match where every character of `input' appears in its own iov chunk. */
 	{
@@ -129,11 +129,13 @@ PRIVATE ssize_t re_match_code(struct re_code const *code, char const *input,
 			chunks[(i * 2) + 1].iov_len  = 1;
 		}
 		exec.rx_iov = chunks;
-		result2     = re_exec_match(&exec, exp_matchc, matches);
+		result2     = re_exec_match(&exec);
 		EQ(result, result2);
-		EQmem(matches, exp_matchv, exp_matchc * sizeof(re_regmatch_t));
+		EQmem(exec.rx_pmatch, exp_matchv, exp_matchc * sizeof(re_regmatch_t));
 		free(chunks);
 	}
+
+	free(exec.rx_pmatch);
 	return result;
 }
 #define re_match_syntax(pattern, input, extra_syntax_flags) _re_match_syntax(pattern, input, 0, NULL, extra_syntax_flags)

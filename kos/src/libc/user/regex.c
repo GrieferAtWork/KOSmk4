@@ -298,12 +298,15 @@ NOTHROW_NCX(LIBCCALL libc_re_search)(regex_t __KOS_FIXED_CONST *self,
 		matches = (re_regmatch_t *)malloc(regs->num_regs, sizeof(re_regmatch_t));
 		if unlikely(!matches)
 			return -2;
-		status = re_exec_search(&exec, (size_t)range, regs->num_regs, matches, NULL);
+		exec.rx_nmatch = regs->num_regs;
+		exec.rx_pmatch = matches;
+		status = re_exec_search(&exec, (size_t)range, NULL);
 		if (status >= 0)
 			regmatch2glibc((regmatch_t const *)matches, regs);
 		free(matches);
 	} else {
-		status = re_exec_search(&exec, (size_t)range, 0, NULL, NULL);
+		exec.rx_nmatch = 0;
+		status = re_exec_search(&exec, (size_t)range, NULL);
 	}
 	if (status >= 0)
 		return status;
@@ -387,12 +390,15 @@ NOTHROW_NCX(LIBCCALL libc_re_search_2)(regex_t __KOS_FIXED_CONST *self,
 		matches = (re_regmatch_t *)malloc(regs->num_regs, sizeof(re_regmatch_t));
 		if unlikely(!matches)
 			return -2;
-		status = re_exec_search(&exec, (size_t)range, regs->num_regs, matches, NULL);
+		exec.rx_nmatch = regs->num_regs;
+		exec.rx_pmatch = matches;
+		status = re_exec_search(&exec, (size_t)range, NULL);
 		if (status >= 0)
 			regmatch2glibc((regmatch_t const *)matches, regs);
 		free(matches);
 	} else {
-		status = re_exec_search(&exec, (size_t)range, 0, NULL, NULL);
+		exec.rx_nmatch = 0;
+		status = re_exec_search(&exec, (size_t)range, NULL);
 	}
 	if (status >= 0)
 		return status;
@@ -456,12 +462,15 @@ NOTHROW_NCX(LIBCCALL libc_re_match)(regex_t __KOS_FIXED_CONST *self,
 		matches = (re_regmatch_t *)malloc(regs->num_regs, sizeof(re_regmatch_t));
 		if unlikely(!matches)
 			return -2;
-		status = re_exec_match(&exec, regs->num_regs, matches);
+		exec.rx_nmatch = regs->num_regs;
+		exec.rx_pmatch = matches;
+		status = re_exec_match(&exec);
 		if (status >= 0)
 			regmatch2glibc((regmatch_t const *)matches, regs);
 		free(matches);
 	} else {
-		status = re_exec_match(&exec, 0, NULL);
+		exec.rx_nmatch = 0;
+		status = re_exec_match(&exec);
 	}
 	if (status >= 0)
 		return status;
@@ -544,12 +553,15 @@ NOTHROW_NCX(LIBCCALL libc_re_match_2)(regex_t __KOS_FIXED_CONST *self,
 		matches = (re_regmatch_t *)malloc(regs->num_regs, sizeof(re_regmatch_t));
 		if unlikely(!matches)
 			return -2;
-		status = re_exec_match(&exec, regs->num_regs, matches);
+		exec.rx_nmatch = regs->num_regs;
+		exec.rx_pmatch = matches;
+		status = re_exec_match(&exec);
 		if (status >= 0)
 			regmatch2glibc((regmatch_t const *)matches, regs);
 		free(matches);
 	} else {
-		status = re_exec_match(&exec, 0, NULL);
+		exec.rx_nmatch = 0;
+		status = re_exec_match(&exec);
 	}
 	if (status >= 0)
 		return status;
@@ -675,9 +687,11 @@ NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict self,
 	exec.rx_iov     = iov;
 	exec.rx_extra   = 0;
 	exec.rx_eflags  = eflags;
+	exec.rx_nmatch  = nmatch;
+	exec.rx_pmatch  = (re_regmatch_t *)pmatch;
 
 	/* Execute the match-request */
-	status = re_exec_match(&exec, nmatch, (re_regmatch_t *)pmatch);
+	status = re_exec_match(&exec);
 	if (status >= 0)
 		return REG_NOERROR;
 	return -status;

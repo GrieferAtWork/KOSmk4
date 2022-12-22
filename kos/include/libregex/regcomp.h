@@ -428,6 +428,8 @@ enum {
 	                             * used  (note that a  candidate consists of `{ end_input_pointer, regmatch_t[] }')
 	                             * Candidate A is better than B if `A.end_input_pointer > B.end_input_pointer' */
 	REOP_MATCHED_PERFECT,       /* [+0] Same as `REOP_MATCHED', but act as though the match was perfect (even if it might not be; s.a. `RE_SYNTAX_NO_POSIX_BACKTRACKING') */
+	/* ==== END OF ACTUAL RUNTIME OPCODES ==== */
+
 	REOP_MAYBE_POP_ONFAIL,      /* [+2] Marker for the peephole optimizer (cannot appear at runtime, and treated as an illegal instruction)
 	                             * - The 2 operand bytes are undefined (and used as placeholder for `REOP_POP_ONFAIL_AT')
 	                             * - Encoding  as `REOP_POP_ONFAIL_AT' only happens if no  input can match both branches of
@@ -583,6 +585,10 @@ struct re_code {
 	                          * -> The only assumption allowed is that input smaller than this will never match. */
 	__uint16_t rc_ngrps;     /* # of groups referenced by code (<= 0x100) */
 	__uint16_t rc_nvars;     /* # of variables referenced by code (<= 0x100) */
+	__uint8_t  rc_flags;     /* Regex code flags (set of `RE_CODE_FLAG_*') */
+#define RE_CODE_FLAG_NORMAL     0x00 /* Normal flags. */
+#define RE_CODE_FLAG_NEEDGROUPS 0x01 /* Groups are expected to be correct (set if `REOP_GROUP_MATCH*' opcodes are used) */
+#define RE_CODE_FLAG_OPTGROUPS  0x02 /* The regex code contains optional groups (e.g. "foo(x)?bar" or "foo(|b(a)r)") */
 	__COMPILER_FLEXIBLE_ARRAY(__byte_t, rc_code); /* Code buffer (`REOP_*' instruction stream) */
 };
 

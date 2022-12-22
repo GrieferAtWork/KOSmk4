@@ -535,11 +535,10 @@ NOTHROW_NCX(CC re_interpreter_inptr_setoffset)(struct re_interpreter_inptr *__re
 	((struct re_interpreter *)alloca(offsetof(struct re_interpreter, ri_vars) + (nvars) * sizeof(byte_t)))
 
 /* Initialize a given regex */
+#define re_interpreter_fini(self) free((self)->ri_onfailv)
 PRIVATE WUNUSED NONNULL((1, 2)) re_errno_t
 NOTHROW_NCX(CC re_interpreter_init)(struct re_interpreter *__restrict self,
-                                    struct re_exec const *__restrict exec,
-                                    size_t nmatch, re_regmatch_t *pmatch) {
-	uint16_t ngrp;
+                                    struct re_exec const *__restrict exec) {
 	size_t in_len;
 	struct iovec const *iov = exec->rx_iov;
 	size_t startoff         = exec->rx_startoff;
@@ -583,20 +582,7 @@ load_normal_iov:
 		self->ri_in_cend = self->ri_in_ptr + in_len;
 		self->ri_in_mcnt = 0;
 	}
-	self->ri_exec   = exec;
-	self->ri_pmatch = pmatch;
-	ngrp            = exec->rx_code->rc_ngrps;
-	if (nmatch >= ngrp) {
-		/* Able to use user-provided register buffer. */
-	} else {
-		/* Need to use our own register buffer. */
-		self->ri_pmatch = (re_regmatch_t *)malloc(ngrp, sizeof(re_regmatch_t));
-		if unlikely(!self->ri_pmatch)
-			return RE_ESPACE;
-	}
-	/* Set all offsets to RE_REGOFF_UNSET */
-	static_assert(RE_REGOFF_UNSET == (re_regoff_t)-1);
-	memset(self->ri_pmatch, 0xff, ngrp * sizeof(re_regmatch_t));
+	self->ri_exec    = exec;
 	self->ri_onfailv = NULL;
 	self->ri_onfailc = 0;
 	self->ri_onfaila = 0;
@@ -604,16 +590,41 @@ load_normal_iov:
 	return RE_NOERROR;
 }
 
-PRIVATE NONNULL((1)) void
-NOTHROW_NCX(CC re_interpreter_fini)(struct re_interpreter *__restrict self,
-                                    size_t nmatch, re_regmatch_t *pmatch) {
-	free(self->ri_onfailv);
-	if (self->ri_pmatch != pmatch) {
-		/* Must copy over match information into user-provided buffer. */
-		memcpy(pmatch, self->ri_pmatch, nmatch, sizeof(re_regmatch_t));
-		free(self->ri_pmatch);
-	}
-}
+/* Initialize the match-buffer of `self' */
+#define re_interpreter_init_match(self, exec)                                             \
+	do {                                                                                  \
+		uint16_t _ngrp;                                                                   \
+		(self)->ri_pmatch = (exec)->rx_pmatch;                                            \
+		_ngrp             = (exec)->rx_code->rc_ngrps;                                    \
+		if ((exec)->rx_nmatch >= _ngrp) {                                                 \
+			/* Able to use user-provided register buffer. */                              \
+		} else {                                                                          \
+			/* Need to use our own group start/end-offset buffer.                         \
+			 * NOTE: stack-allocated, because max size is 256*8 = 2048 bytes. */          \
+			(self)->ri_pmatch = (re_regmatch_t *)alloca(_ngrp * sizeof(re_regmatch_t));   \
+		}                                                                                 \
+		/* Set all offsets to RE_REGOFF_UNSET (if they're written back at the end,        \
+		 * of if the code being executed expects unset groups to be marked properly) */   \
+		if ((exec)->rx_nmatch || ((exec)->rx_code->rc_flags & RE_CODE_FLAG_NEEDGROUPS)) { \
+			memsetc((self)->ri_pmatch, RE_REGOFF_UNSET,                                   \
+			        _ngrp * 2, sizeof(re_regoff_t));                                      \
+		}                                                                                 \
+	}	__WHILE0
+
+/* Copy the matches produced by `self' back into the caller-provided
+ * buffer, unless it was the caller-provided buffer that was used by
+ * the interpreter. */
+#define re_interpreter_copy_match(self)                                       \
+	do {                                                                      \
+		if ((self)->ri_pmatch != (self)->ri_exec->rx_pmatch) {                \
+			/* Must copy over match information into user-provided buffer. */ \
+			memcpy((self)->ri_exec->rx_pmatch,                                \
+			       (self)->ri_pmatch,                                         \
+			       (self)->ri_exec->rx_nmatch,                                \
+			       sizeof(re_regmatch_t));                                    \
+		}                                                                     \
+	}	__WHILE0
+
 
 PRIVATE WUNUSED NONNULL((1)) bool
 NOTHROW_NCX(CC re_interpreter_resize)(struct re_interpreter *__restrict self) {
@@ -859,17 +870,29 @@ NOTHROW_NCX(CC libre_interp_exec)(__register struct re_interpreter *__restrict s
 			/* Input buffer is epsilon, and we can match epsilon
 			 *
 			 * In  this case, simply set the start/end-offsets of
-			 * all groups to the base-offset of the input buffer.
-			 *
-			 * FIMXE: This technically produces  wrong results for  "(|foo(b)ar)",
-			 *        since in this case, the second group would have to be unset! */
+			 * all groups to the base-offset of the input buffer. */
 			static_assert(sizeof(re_regmatch_t) == 2 * sizeof(re_regoff_t));
 do_epsilon_match:
-			memsetc(self->ri_pmatch,
-			        (re_regoff_t)self->ri_exec->rx_startoff,
-			        self->ri_exec->rx_code->rc_ngrps * 2,
-			        sizeof(re_regoff_t));
-			return -RE_NOERROR;
+			if (self->ri_exec->rx_nmatch == 0) {
+				/* Caller doesn't care about matches -> don't have to fill in groups properly! */
+				return -RE_NOERROR;
+			} else if (self->ri_exec->rx_code->rc_flags & RE_CODE_FLAG_OPTGROUPS) {
+				/* Special case: when the code contains optional groups (e.g. "(|foo(b)ar)"),
+				 *               then we can't just blindly fill all groups in as matching at
+				 *               offset=rx_startoff.  In the given example. group[0] needs to
+				 *               have those offsets, but group[1] needs to remain UNSET!
+				 * -> As such, fallthru to below and actually execute the regex code, so it
+				 *    can go down the epsilon-match path  and fill in exactly those  groups
+				 *    that should be filled in. */
+			} else {
+				/* Code doesn't have optional group; i.e. all offsets of all groups can
+				 * simply be set to the start-offset */
+				memsetc(self->ri_pmatch,
+				        (re_regoff_t)self->ri_exec->rx_startoff,
+				        self->ri_exec->rx_code->rc_ngrps * 2,
+				        sizeof(re_regoff_t));
+				return -RE_NOERROR;
+			}
 		}
 	}
 
@@ -1910,17 +1933,12 @@ err_nomem:
 
 
 /* Execute a regular expression.
- * @param: nmatch: # of elements to fill in `pmatch'
- * @param: pmatch: Offsets of matched groups (up to the first `nmatch' groups
- *                 are written, but only on success; iow: when `return >= 0')
- *                 Offsets written INCLUDE `exec->rx_startoff'
  * @return: >= 0:        The # of bytes starting at `exec->rx_startoff' that got matched.
  * @return: -RE_NOMATCH: Nothing was matched
  * @return: -RE_ESPACE:  Out of memory
  * @return: -RE_ESIZE:   On-failure stack before too large. */
 INTERN WUNUSED NONNULL((1)) ssize_t
-NOTHROW_NCX(CC libre_exec_match)(struct re_exec const *__restrict exec,
-                                 size_t nmatch, re_regmatch_t *pmatch) {
+NOTHROW_NCX(CC libre_exec_match)(struct re_exec const *__restrict exec) {
 	ssize_t result;
 	re_errno_t error;
 	struct re_interpreter *interp;
@@ -1936,15 +1954,18 @@ NOTHROW_NCX(CC libre_exec_match)(struct re_exec const *__restrict exec,
 
 	/* Setup */
 	interp = re_interpreter_alloc(exec->rx_code->rc_nvars);
-	error  = re_interpreter_init(interp, exec, nmatch, pmatch);
+	error  = re_interpreter_init(interp, exec);
 	if unlikely(error != 0)
 		goto err;
+	re_interpreter_init_match(interp, exec);
 
 	/* Execute */
 	result = libre_interp_exec(interp);
-	if (result == -RE_NOERROR)
+	if (result == -RE_NOERROR) {
 		result = re_interpreter_in_curoffset(interp) - exec->rx_startoff;
-	re_interpreter_fini(interp, nmatch, pmatch);
+		re_interpreter_copy_match(interp);
+	}
+	re_interpreter_fini(interp);
 	return result;
 err:
 	return -error;
@@ -1956,10 +1977,6 @@ err:
  * regex matches will be performed.
  * @param: search_range: One plus the max starting  byte offset (from `exec->rx_startoff')  to
  *                       check. Too great values for `search_range' are automatically clamped.
- * @param: nmatch: # of elements to fill in `pmatch'
- * @param: pmatch: Offsets of matched groups (up to the first `nmatch' groups
- *                 are written, but only on success; iow: when `return >= 0')
- *                 Offsets written INCLUDE `exec->rx_startoff'
  * @param: p_match_size: When non-NULL, store the # of bytes that were here on success
  *                       This would have been the return value of `re_exec_match(3R)'.
  * @return: >= 0:        The offset where the matched area starts (`< exec->rx_startoff + search_range').
@@ -1967,8 +1984,8 @@ err:
  * @return: -RE_ESPACE:  Out of memory
  * @return: -RE_ESIZE:   On-failure stack before too large. */
 INTERN WUNUSED NONNULL((1)) ssize_t
-NOTHROW_NCX(CC libre_exec_search)(struct re_exec const *__restrict exec, size_t search_range,
-                                  size_t nmatch, re_regmatch_t *pmatch, size_t *p_match_size) {
+NOTHROW_NCX(CC libre_exec_search)(struct re_exec const *__restrict exec,
+                                  size_t search_range, size_t *p_match_size) {
 	ssize_t result;
 	re_errno_t error;
 	struct re_interpreter *interp;
@@ -1987,9 +2004,10 @@ NOTHROW_NCX(CC libre_exec_search)(struct re_exec const *__restrict exec, size_t 
 
 	/* Setup */
 	interp = re_interpreter_alloc(exec->rx_code->rc_nvars);
-	error  = re_interpreter_init(interp, exec, nmatch, pmatch);
+	error  = re_interpreter_init(interp, exec);
 	if unlikely(error != 0)
 		goto err;
+	re_interpreter_init_match(interp, exec);
 
 	/* Do the search-loop */
 	used_inptr   = interp->ri_in;
@@ -2002,6 +2020,7 @@ NOTHROW_NCX(CC libre_exec_search)(struct re_exec const *__restrict exec, size_t 
 				if (p_match_size != NULL)
 					*p_match_size = re_interpreter_in_curoffset(interp) - exec->rx_startoff;
 				result = (ssize_t)match_offset;
+				re_interpreter_copy_match(interp);
 			}
 			break;
 		}
@@ -2014,7 +2033,7 @@ NOTHROW_NCX(CC libre_exec_search)(struct re_exec const *__restrict exec, size_t 
 	}
 
 	/* Cleanup */
-	re_interpreter_fini(interp, nmatch, pmatch);
+	re_interpreter_fini(interp);
 	return result;
 err:
 	return -error;
@@ -2025,8 +2044,8 @@ err:
  * Too great values  for `search_range'  are automatically  clamped.
  * The return value will thus also be within that same range. */
 INTERN WUNUSED NONNULL((1)) ssize_t
-NOTHROW_NCX(CC libre_exec_rsearch)(struct re_exec const *__restrict exec, size_t search_range,
-                                   size_t nmatch, re_regmatch_t *pmatch, size_t *p_match_size) {
+NOTHROW_NCX(CC libre_exec_rsearch)(struct re_exec const *__restrict exec,
+                                   size_t search_range, size_t *p_match_size) {
 	ssize_t result;
 	re_errno_t error;
 	struct re_interpreter *interp;
@@ -2045,9 +2064,10 @@ NOTHROW_NCX(CC libre_exec_rsearch)(struct re_exec const *__restrict exec, size_t
 
 	/* Setup */
 	interp = re_interpreter_alloc(exec->rx_code->rc_nvars);
-	error  = re_interpreter_init(interp, exec, nmatch, pmatch);
+	error  = re_interpreter_init(interp, exec);
 	if unlikely(error != 0)
 		goto err;
+	re_interpreter_init_match(interp, exec);
 
 	/* Do the search-loop */
 	re_interpreter_inptr_advance(&interp->ri_in, total_left);
@@ -2061,6 +2081,7 @@ NOTHROW_NCX(CC libre_exec_rsearch)(struct re_exec const *__restrict exec, size_t
 				if (p_match_size != NULL)
 					*p_match_size = re_interpreter_in_curoffset(interp) - exec->rx_startoff;
 				result = (ssize_t)match_offset;
+				re_interpreter_copy_match(interp);
 			}
 			break;
 		}
@@ -2073,7 +2094,7 @@ NOTHROW_NCX(CC libre_exec_rsearch)(struct re_exec const *__restrict exec, size_t
 	}
 
 	/* Cleanup */
-	re_interpreter_fini(interp, nmatch, pmatch);
+	re_interpreter_fini(interp);
 	return result;
 err:
 	return -error;
