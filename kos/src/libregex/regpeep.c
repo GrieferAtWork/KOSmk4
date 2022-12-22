@@ -968,8 +968,8 @@ dispatch:
 	default:
 		/* Note how we don't follow `REOP_JMP' or `REOP_DEC_JMP' here!
 		 *
-		 * That's because we're no a logic-analyzer, but only here to locate
-		 * positions that */
+		 * That's because we're no a logic-analyzer, but only here to
+		 * locate  sub-expressions that qualify for pop_onfail usage. */
 		pc = libre_opcode_next(pc - 1);
 		goto dispatch;
 	}
