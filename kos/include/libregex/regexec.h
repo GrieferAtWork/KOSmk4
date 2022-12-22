@@ -73,14 +73,14 @@ LIBREGEX_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) __ssize_t
 __NOTHROW_NCX(LIBREGEX_CC re_exec_match)(struct re_exec const *__restrict exec);
 #endif /* LIBREGEX_WANT_PROTOTYPES */
 
-/* Similar to `re_exec_match', try to match pattern  against the given input buffer. Do  this
+/* Similar to `re_exec_match', try to match a pattern against the given input buffer. Do this
  * with increasing offsets for the first `search_range' bytes, meaning at most `search_range'
  * regex matches will be performed.
  * @param: search_range: One plus the max starting  byte offset (from `exec->rx_startoff')  to
  *                       check. Too great values for `search_range' are automatically clamped.
- * @param: p_match_size: When non-NULL, store the # of bytes that were here on success
- *                       This would have been the return value of `re_exec_match(3R)'.
- * @return: >= 0:        The offset where the matched area starts (`< exec->rx_startoff + search_range').
+ * @param: p_match_size: When non-NULL, set to the # of bytes that were actually matched.
+ *                       This would have  been the return  value of  `re_exec_match(3R)'.
+ * @return: >= 0:        The offset where the matched area starts (in `[exec->rx_startoff, exec->rx_startoff + search_range)').
  * @return: -RE_NOMATCH: Nothing was matched
  * @return: -RE_ESPACE:  Out of memory
  * @return: -RE_ESIZE:   On-failure stack before too large. */

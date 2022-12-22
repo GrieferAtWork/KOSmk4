@@ -688,12 +688,12 @@ NOTHROW_NCX(CC re_interpreter_pushfail_dummy)(struct re_interpreter *__restrict 
  * - Upon failure (repeat wasn't matched), return `false' and
  *   leave the current input pointer of `self' undefined (but
  *   valid)
- * Assumes that `num_bytes != 0' */
+ * Assumes that `num_bytes > 0' */
 PRIVATE WUNUSED NONNULL((1)) bool
 NOTHROW_NCX(CC re_interpreter_consume_repeat)(struct re_interpreter *__restrict self,
                                               re_regoff_t offset, size_t num_bytes) {
 	struct re_interpreter_inptr srcptr;
-	assert(num_bytes != 0);
+	assert(num_bytes > 0);
 	srcptr = self->ri_in;
 	re_interpreter_inptr_setoffset(&srcptr, offset);
 	for (;;) {
@@ -1971,14 +1971,14 @@ err:
 }
 
 
-/* Similar to `re_exec_match', try to match pattern  against the given input buffer. Do  this
+/* Similar to `re_exec_match', try to match a pattern against the given input buffer. Do this
  * with increasing offsets for the first `search_range' bytes, meaning at most `search_range'
  * regex matches will be performed.
  * @param: search_range: One plus the max starting  byte offset (from `exec->rx_startoff')  to
  *                       check. Too great values for `search_range' are automatically clamped.
- * @param: p_match_size: When non-NULL, store the # of bytes that were here on success
- *                       This would have been the return value of `re_exec_match(3R)'.
- * @return: >= 0:        The offset where the matched area starts (`< exec->rx_startoff + search_range').
+ * @param: p_match_size: When non-NULL, set to the # of bytes that were actually matched.
+ *                       This would have  been the return  value of  `re_exec_match(3R)'.
+ * @return: >= 0:        The offset where the matched area starts (in `[exec->rx_startoff, exec->rx_startoff + search_range)').
  * @return: -RE_NOMATCH: Nothing was matched
  * @return: -RE_ESPACE:  Out of memory
  * @return: -RE_ESIZE:   On-failure stack before too large. */
