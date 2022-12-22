@@ -876,7 +876,7 @@ do_epsilon_match:
 			if (self->ri_exec->rx_nmatch == 0) {
 				/* Caller doesn't care about matches -> don't have to fill in groups properly! */
 				return -RE_NOERROR;
-			} else if (self->ri_exec->rx_code->rc_flags & RE_CODE_FLAG_OPTGROUPS) {
+			} else if (code->rc_flags & RE_CODE_FLAG_OPTGROUPS) {
 				/* Special case: when the code contains optional groups (e.g. "(|foo(b)ar)"),
 				 *               then we can't just blindly fill all groups in as matching at
 				 *               offset=rx_startoff.  In the given example. group[0] needs to
@@ -889,8 +889,7 @@ do_epsilon_match:
 				 * simply be set to the start-offset */
 				memsetc(self->ri_pmatch,
 				        (re_regoff_t)self->ri_exec->rx_startoff,
-				        self->ri_exec->rx_code->rc_ngrps * 2,
-				        sizeof(re_regoff_t));
+				        code->rc_ngrps * 2, sizeof(re_regoff_t));
 				return -RE_NOERROR;
 			}
 		}
