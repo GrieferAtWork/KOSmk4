@@ -268,6 +268,10 @@ DEFINE_TEST(regex) {
 	/* Ensure that illegal charsets aren't accepted. */
 	EQ(RE_EILLSET, re_compile_error("[Ä\\xC3]", 0));
 
+	/* Ensure that peephole work with this corner-case. */
+	EQ(5, re_match("a(foo|[Ff]oo)b", "afoob"));
+	EQ(5, re_match("a(foo|[Ff]oo)b", "aFoob"));
+
 	/* Cleanup */
 	EQ(0, dlclose(libregex));
 }
