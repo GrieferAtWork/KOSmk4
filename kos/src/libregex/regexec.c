@@ -847,7 +847,7 @@ NOTHROW_NCX(CC libre_interp_exec)(__register struct re_interpreter *__restrict s
 			if (fmap == 0xff) {
 				/* Initial character never matches, but are we able to match epsilon? */
 				if (code->rc_minmatch == 0)
-					return -RE_NOERROR; /* epsilon match! */
+					goto do_epsilon_match; /* epsilon match! */
 				return -RE_NOMATCH;
 			}
 			pc += fmap;
@@ -855,6 +855,21 @@ NOTHROW_NCX(CC libre_interp_exec)(__register struct re_interpreter *__restrict s
 			/* Input buffer is epsilon, but regex has a non-  zero
 			 * minimal match length -> regex can't possibly match! */
 			return -RE_NOMATCH;
+		} else {
+			/* Input buffer is epsilon, and we can match epsilon
+			 *
+			 * In  this case, simply set the start/end-offsets of
+			 * all groups to the base-offset of the input buffer.
+			 *
+			 * FIMXE: This technically produces  wrong results for  "(|foo(b)ar)",
+			 *        since in this case, the second group would have to be unset! */
+			static_assert(sizeof(re_regmatch_t) == 2 * sizeof(re_regoff_t));
+do_epsilon_match:
+			memsetc(self->ri_pmatch,
+			        (re_regoff_t)self->ri_exec->rx_startoff,
+			        self->ri_exec->rx_code->rc_ngrps * 2,
+			        sizeof(re_regoff_t));
+			return -RE_NOERROR;
 		}
 	}
 
@@ -1463,12 +1478,10 @@ REOP_NCS_UTF8_dispatch:
 			if (match.rm_so == RE_REGOFF_UNSET ||
 			    match.rm_eo == RE_REGOFF_UNSET)
 				ONFAIL();
-#if 0 /* TODO: This can currently fail because ONFAIL() doesn't roll back group matches... */
 			assertf(self->ri_pmatch[gid].rm_so <= self->ri_pmatch[gid].rm_eo,
 			        "self->ri_pmatch[%1$I8u].rm_so = %2$Iu\n"
 			        "self->ri_pmatch[%1$I8u].rm_eo = %3$Iu",
 			        gid, match.rm_so, match.rm_eo);
-#endif
 			if (match.rm_so < match.rm_eo) {
 				if (!re_interpreter_consume_repeat(self, match.rm_so,
 				                                   match.rm_eo - match.rm_so))
@@ -1485,12 +1498,10 @@ REOP_NCS_UTF8_dispatch:
 			if (match.rm_so == RE_REGOFF_UNSET ||
 			    match.rm_eo == RE_REGOFF_UNSET)
 				ONFAIL();
-#if 0 /* TODO: This can currently fail because ONFAIL() doesn't roll back group matches... */
 			assertf(self->ri_pmatch[gid].rm_so <= self->ri_pmatch[gid].rm_eo,
 			        "self->ri_pmatch[%1$I8u].rm_so = %2$Iu\n"
 			        "self->ri_pmatch[%1$I8u].rm_eo = %3$Iu",
 			        gid, match.rm_so, match.rm_eo);
-#endif
 			if (match.rm_so < match.rm_eo) {
 				if (!re_interpreter_consume_repeat(self, match.rm_so,
 				                                   match.rm_eo - match.rm_so))
@@ -1721,14 +1732,12 @@ REOP_NCS_UTF8_dispatch:
 			assert(gid < self->ri_exec->rx_code->rc_ngrps);
 			/* Set end-of-group offset */
 			self->ri_pmatch[gid].rm_eo = re_interpreter_in_curoffset(self);
-#if 0 /* TODO: This can currently fail because ONFAIL() doesn't roll back group matches... */
 			assertf(self->ri_pmatch[gid].rm_so <= self->ri_pmatch[gid].rm_eo,
 			        "self->ri_pmatch[%1$I8u].rm_so = %2$Iu\n"
 			        "self->ri_pmatch[%1$I8u].rm_eo = %3$Iu",
 			        gid,
 			        (size_t)self->ri_pmatch[gid].rm_so,
 			        (size_t)self->ri_pmatch[gid].rm_eo);
-#endif
 			if (self->ri_pmatch[gid].rm_so >= self->ri_pmatch[gid].rm_eo) {
 				/* Group matched epsilon -> must skip ahead a little bit */
 				pc += REOP_GROUP_END_Joff(opcode);

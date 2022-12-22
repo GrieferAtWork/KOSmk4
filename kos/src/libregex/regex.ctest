@@ -32,6 +32,7 @@
 #include <assert.h>
 #include <dlfcn.h>
 #include <malloc.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -97,9 +98,11 @@ PRIVATE struct re_code *re_compile(char const *pattern,
 	return result;
 }
 
-PRIVATE ssize_t re_match_code(struct re_code const *code, char const *input) {
+PRIVATE ssize_t re_match_code(struct re_code const *code, char const *input,
+                              size_t exp_matchc, re_regmatch_t const *exp_matchv) {
 	ssize_t result;
 	struct re_exec exec;
+	re_regmatch_t *matches;
 	size_t input_len   = strlen(input);
 	struct iovec iov[] = { { (void *)input, input_len } };
 	exec.rx_code       = code;
@@ -108,8 +111,10 @@ PRIVATE ssize_t re_match_code(struct re_code const *code, char const *input) {
 	exec.rx_endoff     = input_len;
 	exec.rx_extra      = 0;
 	exec.rx_eflags     = 0;
+	matches = (re_regmatch_t *)xmalloc(exp_matchc * sizeof(re_regmatch_t));
 	/* Do the match */
-	result = re_exec_match(&exec, 0, NULL);
+	result = re_exec_match(&exec, exp_matchc, matches);
+	EQmem(matches, exp_matchv, exp_matchc * sizeof(re_regmatch_t));
 
 	/* Also attempt the match where every character of `input' appears in its own iov chunk. */
 	{
@@ -124,27 +129,42 @@ PRIVATE ssize_t re_match_code(struct re_code const *code, char const *input) {
 			chunks[(i * 2) + 1].iov_len  = 1;
 		}
 		exec.rx_iov = chunks;
-		result2     = re_exec_match(&exec, 0, NULL);
+		result2     = re_exec_match(&exec, exp_matchc, matches);
 		EQ(result, result2);
+		EQmem(matches, exp_matchv, exp_matchc * sizeof(re_regmatch_t));
 		free(chunks);
 	}
-
 	return result;
 }
-
-PRIVATE ssize_t re_match_syntax(char const *pattern, char const *input,
+#define re_match_syntax(pattern, input, extra_syntax_flags) _re_match_syntax(pattern, input, 0, NULL, extra_syntax_flags)
+#define re_match_syntax_g(pattern, input, extra_syntax_flags, ...)                   \
+	({                                                                               \
+		static re_regmatch_t const _matches[] = __VA_ARGS__;                         \
+		_re_match(pattern, input, lengthof(_matches), _matches, extra_syntax_flags); \
+	})
+PRIVATE ssize_t _re_match_syntax(char const *pattern, char const *input,
+                                size_t exp_matchc, re_regmatch_t const *exp_matchv,
                                 uintptr_t extra_syntax_flags) {
 	struct re_code *code;
 	ssize_t result;
 	code   = re_compile(pattern, extra_syntax_flags);
-	result = re_match_code(code, input);
+	result = re_match_code(code, input, exp_matchc, exp_matchv);
 	free(code);
 	return result;
 }
 
-PRIVATE ssize_t re_match(char const *pattern, char const *input) {
-	return re_match_syntax(pattern, input, 0);
+#define re_match(pattern, input) _re_match(pattern, input, 0, NULL)
+#define re_match_g(pattern, input, ...)                          \
+	({                                                           \
+		static re_regmatch_t const _matches[] = __VA_ARGS__;     \
+		_re_match(pattern, input, lengthof(_matches), _matches); \
+	})
+PRIVATE ssize_t _re_match(char const *pattern, char const *input,
+                          size_t exp_matchc, re_regmatch_t const *exp_matchv) {
+	return _re_match_syntax(pattern, input, exp_matchc, exp_matchv, 0);
 }
+
+#define REGMATCH(so, eo) { so, eo }
 
 DEFINE_TEST(regex) {
 	void *libregex;
@@ -168,63 +188,81 @@ DEFINE_TEST(regex) {
 	EQ(2, re_match("ab?c", "ac"));
 	EQ(1, re_match("ab?", "a"));
 	EQ(2, re_match("ab?", "ab"));
-	EQ(1, re_match("a(|b)", "a"));
-	EQ(2, re_match("a(|b)", "ab"));
-	EQ(1, re_match("a(b|)", "a"));
-	EQ(2, re_match("a(b|)", "ab"));
+	EQ(1, re_match_g("a(|b)", "a", { REGMATCH(1, 1) }));
+	EQ(2, re_match_g("a(|b)", "ab", { REGMATCH(1, 2) }));
+	EQ(1, re_match_g("a(b|)", "a", { REGMATCH(1, 1) }));
+	EQ(2, re_match_g("a(b|)", "ab", { REGMATCH(1, 2) }));
 	EQ(-RE_NOMATCH, re_match("ab?c", "abd"));
 	EQ(-RE_NOMATCH, re_match("ab+c", "abbbbbd"));
 	EQ(6, re_match("abbbbb", "abbbbbd"));
 	EQ(6, re_match("ab+", "abbbbbd"));
 	EQ(-RE_NOMATCH, re_match("a.+", "a"));
 	EQ(2, re_match("a.+", "ax"));
-	EQ(0, re_match("()", "foobar"));
-	EQ(1, re_match("(|f)", "foobar"));
-	EQ(1, re_match("(f|)", "foobar"));
-	EQ(0, re_match("()*", "foobar"));
-	EQ(1, re_match("(|f)*", "foobar"));
-	EQ(1, re_match("(f|)*", "foobar"));
-	EQ(3, re_match("(|f|o)*", "foobar"));
-	EQ(3, re_match("(f||o)*", "foobar"));
-	EQ(3, re_match("(f|o|)*", "foobar"));
-	EQ(5, re_match("(|f|o|ba)*", "foobar"));
-	EQ(5, re_match("(f|o||ba)*", "foobar"));
-	EQ(5, re_match("(f||o|ba)*", "foobar"));
-	EQ(5, re_match("(f|o|ba|)*", "foobar"));
-	EQ(6, re_match("(|f|o|ba|r)*", "foobar"));
-	EQ(6, re_match("(f|o||ba|r)*", "foobar"));
-	EQ(6, re_match("(f|o|ba|r|)*", "foobar"));
-	EQ(9, re_match("(|f|o|ba|r)*", "foobarfffb"));
-	EQ(9, re_match("(f|o||ba|r)*", "foobarfffb"));
-	EQ(9, re_match("(f|o|ba|r|)*", "foobarfffb"));
-	EQ(11, re_match("(|f|o|ba|r)*", "foobarfffba"));
-	EQ(11, re_match("(f|o||ba|r)*", "foobarfffba"));
-	EQ(11, re_match("(f|o|ba|r|)*", "foobarfffba"));
-	EQ(0, re_match("()?", "foobar"));
+	EQ(0, re_match_g("()", "foobar", { REGMATCH(0, 0) }));
+	EQ(1, re_match_g("(|f)", "foobar", { REGMATCH(0, 1) }));
+	EQ(1, re_match_g("(f|)", "foobar", { REGMATCH(0, 1) }));
+	EQ(0, re_match_g("()*", "foobar", { REGMATCH(0, 0) }));
+	EQ(1, re_match_g("(|f)*", "foobar", { REGMATCH(1, 1) }));
+	EQ(1, re_match_g("(f|)*", "foobar", { REGMATCH(1, 1) }));
+//	EQ(1, re_match_g("(f)*", "foobar", { REGMATCH(0, 1) })); // FIXME: on-fail doesn't restore groups
+	EQ(3, re_match_g("(|f|o)*", "foobar", { REGMATCH(3, 3) }));
+	EQ(3, re_match_g("(f||o)*", "foobar", { REGMATCH(3, 3) }));
+	EQ(3, re_match_g("(f|o|)*", "foobar", { REGMATCH(3, 3) }));
+//	EQ(3, re_match_g("(f|o)*", "foobar", { REGMATCH(2, 3) })); // FIXME: on-fail doesn't restore groups
+	EQ(5, re_match_g("(|f|o|ba)*", "foobar", { REGMATCH(5, 5) }));
+	EQ(5, re_match_g("(f|o||ba)*", "foobar", { REGMATCH(5, 5) }));
+	EQ(5, re_match_g("(f||o|ba)*", "foobar", { REGMATCH(5, 5) }));
+	EQ(5, re_match_g("(f|o|ba|)*", "foobar", { REGMATCH(5, 5) }));
+//	EQ(5, re_match_g("(f|o|ba)*", "foobar", { REGMATCH(3, 5) })); // FIXME: on-fail doesn't restore groups
+	EQ(6, re_match_g("(|f|o|ba|r)*", "foobar", { REGMATCH(6, 6) }));
+	EQ(6, re_match_g("(f|o||ba|r)*", "foobar", { REGMATCH(6, 6) }));
+	EQ(6, re_match_g("(f|o|ba|r|)*", "foobar", { REGMATCH(6, 6) }));
+//	EQ(6, re_match_g("(f|o|ba|r)*", "foobar", { REGMATCH(5, 6) })); // FIXME: on-fail doesn't restore groups
+	EQ(9, re_match_g("(|f|o|ba|r)*", "foobarfffb", { REGMATCH(9, 9) }));
+	EQ(9, re_match_g("(f|o||ba|r)*", "foobarfffb", { REGMATCH(9, 9) }));
+	EQ(9, re_match_g("(f|o|ba|r|)*", "foobarfffb", { REGMATCH(9, 9) }));
+	EQ(11, re_match_g("(|f|o|ba|r)*", "foobarfffba", { REGMATCH(11, 11) }));
+	EQ(11, re_match_g("(f|o||ba|r)*", "foobarfffba", { REGMATCH(11, 11) }));
+	EQ(11, re_match_g("(f|o|ba|r|)*", "foobarfffba", { REGMATCH(11, 11) }));
+	EQ(0, re_match_g("()?", "foobar", { REGMATCH(0, 0) }));
 	EQ(0, re_match("x?", "foobar"));
 	EQ(0, re_match("x*", "foobar"));
 	EQ(-RE_NOMATCH, re_match("x+", "foobar"));
-	EQ(3, re_match("(abc|def)", "abcdefX"));
-	EQ(3, re_match("(abc|defX)", "abcdefX"));
+	EQ(3, re_match_g("(abc|def)", "abcdefX", { REGMATCH(0, 3) }));
+	EQ(3, re_match_g("(abc|defX)", "abcdefX", { REGMATCH(0, 3) }));
+#if 0 // FIXME: on-fail doesn't restore groups
+	EQ(7, re_match_g("(abc|defX)*", "abcdefX", { REGMATCH(3, 7) }));
+	EQ(7, re_match_g("(abc|defX)*", "abcdefXY", { REGMATCH(3, 7) }));
+#else
 	EQ(7, re_match("(abc|defX)*", "abcdefX"));
 	EQ(7, re_match("(abc|defX)*", "abcdefXY"));
-	EQ(3, re_match("(abc|def)", "abcdefX"));
+#endif
+	EQ(3, re_match_g("(abc|def)", "abcdefX", { REGMATCH(0, 3) }));
+#if 0 // FIXME: on-fail doesn't restore groups
+	EQ(6, re_match_g("(abc|def)*", "abcdefX", { REGMATCH(3, 6) }));
+	EQ(6, re_match_g("(abc|def)+", "abcdefX", { REGMATCH(3, 6) }));
+#else
 	EQ(6, re_match("(abc|def)*", "abcdefX"));
 	EQ(6, re_match("(abc|def)+", "abcdefX"));
-	EQ(3, re_match("(abc|def){1}", "abcabcdefabcX"));
-	EQ(9, re_match("(abc|def){1,3}", "abcabcdefabcX"));
+#endif
+	EQ(3, re_match_g("(abc|def){1}", "abcabcdefabcX", { REGMATCH(0, 3) }));
+	EQ(9, re_match_g("(abc|def){1,3}", "abcabcdefabcX", { REGMATCH(6, 9) }));
+#if 0 // FIXME: on-fail doesn't restore groups
+	EQ(12, re_match_g("(abc|def){1,}", "abcabcdefabcX", { REGMATCH(9, 12) }));
+#else
 	EQ(12, re_match("(abc|def){1,}", "abcabcdefabcX"));
-	EQ(12, re_match("(abc|def){1,4}", "abcabcdefabcX"));
+#endif
+	EQ(12, re_match_g("(abc|def){1,4}", "abcabcdefabcX", { REGMATCH(9, 12) }));
 
 	/* Make sure that code variables work correctly. */
-	EQ(5, re_match("(a|b){4}a", "aaaaaaaa"));
-	EQ(5, re_match("(a|b){4}a", "babaaaaa"));
-	EQ(5, re_match("(a|b){4}a", "ababaaaa"));
-	EQ(5, re_match("(a|b){4}a", "bbbbaaaa"));
-	EQ(5, re_match("(b|a){4}a", "aaaaaaaa"));
-	EQ(5, re_match("(b|a){4}a", "babaaaaa"));
-	EQ(5, re_match("(b|a){4}a", "ababaaaa"));
-	EQ(5, re_match("(b|a){4}a", "bbbbaaaa"));
+	EQ(5, re_match_g("(a|b){4}a", "aaaaaaaa", { REGMATCH(3, 4) }));
+	EQ(5, re_match_g("(a|b){4}a", "babaaaaa", { REGMATCH(3, 4) }));
+	EQ(5, re_match_g("(a|b){4}a", "ababaaaa", { REGMATCH(3, 4) }));
+	EQ(5, re_match_g("(a|b){4}a", "bbbbaaaa", { REGMATCH(3, 4) }));
+	EQ(5, re_match_g("(b|a){4}a", "aaaaaaaa", { REGMATCH(3, 4) }));
+	EQ(5, re_match_g("(b|a){4}a", "babaaaaa", { REGMATCH(3, 4) }));
+	EQ(5, re_match_g("(b|a){4}a", "ababaaaa", { REGMATCH(3, 4) }));
+	EQ(5, re_match_g("(b|a){4}a", "bbbbaaaa", { REGMATCH(3, 4) }));
 	EQ(-RE_NOMATCH, re_match("(a|b){4}a", "aaaaX"));
 	EQ(-RE_NOMATCH, re_match("(a|b){4}a", "babaX"));
 	EQ(-RE_NOMATCH, re_match("(a|b){4}a", "ababX"));
@@ -269,8 +307,11 @@ DEFINE_TEST(regex) {
 	EQ(RE_EILLSET, re_compile_error("[Ä\\xC3]", 0));
 
 	/* Ensure that peephole work with this corner-case. */
-	EQ(5, re_match("a(foo|[Ff]oo)b", "afoob"));
-	EQ(5, re_match("a(foo|[Ff]oo)b", "aFoob"));
+	EQ(5, re_match_g("a(foo|[Ff]oo)b", "afoob", { REGMATCH(1, 4) }));
+	EQ(5, re_match_g("a(foo|[Ff]oo)b", "aFoob", { REGMATCH(1, 4) }));
+
+	EQ(6, re_match_g("foo?(o)bar", "foobar", { REGMATCH(2, 3) }));
+	EQ(6, re_match_g("fo(o?o)bar", "foobar", { REGMATCH(2, 3) }));
 
 	/* Cleanup */
 	EQ(0, dlclose(libregex));
