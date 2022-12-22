@@ -838,7 +838,7 @@ again:
  * @return: -RE_NOERROR: Input was matched.
  * @return: -RE_NOMATCH: Nothing was matched
  * @return: -RE_ESPACE:  Out of memory
- * @return: -RE_ESIZE:   On-failure stack before too large. */
+ * @return: -RE_ESIZE:   On-failure stack became too large. */
 PRIVATE WUNUSED NONNULL((1)) re_errno_t
 NOTHROW_NCX(CC libre_interp_exec)(__register struct re_interpreter *__restrict self) {
 	__register byte_t opcode;
@@ -1935,7 +1935,7 @@ err_nomem:
  * @return: >= 0:        The # of bytes starting at `exec->rx_startoff' that got matched.
  * @return: -RE_NOMATCH: Nothing was matched
  * @return: -RE_ESPACE:  Out of memory
- * @return: -RE_ESIZE:   On-failure stack before too large. */
+ * @return: -RE_ESIZE:   On-failure stack became too large. */
 INTERN WUNUSED NONNULL((1)) ssize_t
 NOTHROW_NCX(CC libre_exec_match)(struct re_exec const *__restrict exec) {
 	ssize_t result;
@@ -1981,7 +1981,7 @@ err:
  * @return: >= 0:        The offset where the matched area starts (in `[exec->rx_startoff, exec->rx_startoff + search_range)').
  * @return: -RE_NOMATCH: Nothing was matched
  * @return: -RE_ESPACE:  Out of memory
- * @return: -RE_ESIZE:   On-failure stack before too large. */
+ * @return: -RE_ESIZE:   On-failure stack became too large. */
 INTERN WUNUSED NONNULL((1)) ssize_t
 NOTHROW_NCX(CC libre_exec_search)(struct re_exec const *__restrict exec,
                                   size_t search_range, size_t *p_match_size) {
