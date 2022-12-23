@@ -73,9 +73,11 @@ DECL_BEGIN
 #define RANGES_OVERLAP(r1_min, r1_max, r2_min, r2_max) \
 	((r1_max) >= (r2_min) && (r2_max) >= (r1_min))
 
-#define getb()      (*pc++)
-#define getw()      (pc += 2, (int16_t)UNALIGNED_GET16((uint16_t const *)(pc - 2)))
-#define int16_at(p) (*(int16_t *)(p))
+#define delta16_get(p)    ((int16_t)UNALIGNED_GET16((uint16_t const *)(p)))
+#define delta16_set(p, v) UNALIGNED_SET16((uint16_t *)(p), (uint16_t)(int16_t)(v))
+
+#define getb() (*pc++)
+#define getw() (pc += 2, delta16_get(pc - 2))
 
 INTDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) byte_t * /* from "./regcomp.c" */
 NOTHROW_NCX(CC libre_opcode_next)(byte_t const *__restrict p_instr);
@@ -116,7 +118,7 @@ NOTHROW_NCX(CC re_mini_interpreter_exact_readutf8)(struct re_mini_interpreter *_
  * Also hard-stops if `self->rmi_endpc' is reached.
  * @return: * :              The currently loaded opcode
  * @return: REOP_MATCHED:    End-of-instruction-stream (or `rmi_endpc' reached)
- * @return: REOP_JMP_ONFAIL: At a bi-branch opcode (`int16_at(self->rmi_pc)' is the relevant delta)
+ * @return: REOP_JMP_ONFAIL: At a bi-branch opcode (`delta16_get(self->rmi_pc)' is the relevant delta)
  */
 PRIVATE NONNULL((1)) byte_t
 NOTHROW_NCX(CC re_mini_interpreter_getopcode)(struct re_mini_interpreter *__restrict self) {
@@ -259,7 +261,7 @@ again:
 		/* Must check both branches. */
 		byte_t const *pc1, *pc2;
 		pc1 = int1->rmi_pc + 3;
-		pc2 = pc1 + int16_at(pc1 - 2);
+		pc2 = pc1 + delta16_get(pc1 - 2);
 		assert(code->rc_nvars <= 0x100);
 		if (int1_copy == NULL)
 			int1_copy = re_mini_interpreter_alloc(code->rc_nvars);
@@ -277,7 +279,7 @@ again:
 		/* Must check both branches. */
 		byte_t const *pc1, *pc2;
 		pc1 = int2->rmi_pc + 3;
-		pc2 = pc1 + int16_at(pc1 - 2);
+		pc2 = pc1 + delta16_get(pc1 - 2);
 		assert(code->rc_nvars <= 0x100);
 		if (int1_copy == NULL)
 			int1_copy = re_mini_interpreter_alloc(code->rc_nvars);
@@ -899,7 +901,7 @@ dispatch:
 			if (inner_flags & PEEP_ONFAIL_STACK_F_UNBALANCED_ONFAIL) {
 				/* Need to encode the more complicated `REOP_POP_ONFAIL_AT' opcode. */
 				*expr_end++ = REOP_POP_ONFAIL_AT;
-				int16_at(expr_end) = (int16_t)(onfail_pc - (expr_end + 2));
+				delta16_set(expr_end, onfail_pc - (expr_end + 2));
 				expr_end += 2;
 			} else {
 				/* Can encode the simple `REOP_POP_ONFAIL' opcode. */
@@ -951,7 +953,7 @@ dispatch:
 		target_pc = pc + delta;
 		while (*target_pc == REOP_JMP) {
 			++target_pc;
-			delta     = int16_at(target_pc);
+			delta     = delta16_get(target_pc);
 			target_pc = target_pc + 2 + delta;
 		}
 		total_delta = target_pc - pc;
@@ -962,7 +964,7 @@ dispatch:
 			goto dispatch;
 		}
 		if (total_delta > INT16_MIN && total_delta < INT16_MAX)
-			int16_at(pc - 2) = (int16_t)total_delta;
+			delta16_set(pc - 2, total_delta);
 		goto dispatch;
 	}
 
@@ -1056,7 +1058,7 @@ again:
 		byte_t *skip_minpc, *skip_maxpc;
 
 		/* `*pc' points at a 16-bit relative jump-offset */
-		old_delta = int16_at(pc);
+		old_delta = delta16_get(pc);
 		pc += 2;
 		if (old_delta < 0) {
 			skip_maxpc = pc - 1;
@@ -1077,9 +1079,9 @@ again:
 			 */
 			if (del_minpc >= skip_minpc) {
 				/* The entire delete-range lies within the area skipped over by the jump */
-				int16_at(pc - 2) += num_bytes;
+				delta16_set(pc - 2, delta16_get(pc - 2) + num_bytes);
 			} else {
-				int16_at(pc - 2) = (int16_t)((del_maxpc + 1) - pc);
+				delta16_set(pc - 2, (del_maxpc + 1) - pc);
 			}
 		} else if (old_delta > 0) {
 			skip_minpc = pc;
@@ -1100,11 +1102,11 @@ again:
 			 */
 			if (del_maxpc <= skip_maxpc) {
 				/* Deleted range is entirely contained in skipped area */
-				int16_at(pc - 2) -= (byte_t)num_bytes;
+				delta16_set(pc - 2, delta16_get(pc - 2) - (byte_t)num_bytes);
 			} else {
 				/* Deleted range extends past end of jump-area
 				 * -> As such, the jump must go to the start of the deleted area */
-				int16_at(pc - 2) = (int16_t)(del_minpc - pc);
+				delta16_set(pc - 2, del_minpc - pc);
 			}
 		}
 		goto again;

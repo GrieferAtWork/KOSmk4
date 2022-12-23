@@ -64,15 +64,13 @@ DECL_BEGIN
 
 #define islf(ch) ((ch) == '\r' || (ch) == '\n')
 
-
 #if !defined(NDEBUG) && !defined(NDEBUG_FINI)
 #define DBG_memset memset
 #else /* !NDEBUG && !NDEBUG_FINI */
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
-
-
+#define delta16_get(p) ((int16_t)UNALIGNED_GET16((uint16_t const *)(p)))
 
 #define RE_ONFAILURE_ITEM_DUMMY_INPTR                         ((byte_t const *)512) /* == 256 * 2 (256 being the max # of groups per pattern, and 2 being the # of offsets per group) */
 #define RE_ONFAILURE_ITEM_SPECIAL_CHECK(inptr)                ((uintptr_t)(inptr) <= (uintptr_t)RE_ONFAILURE_ITEM_DUMMY_INPTR)
@@ -80,7 +78,6 @@ DECL_BEGIN
 #define RE_ONFAILURE_ITEM_GROUP_RESTORE_ISSTART(inptr)        ((uintptr_t)(inptr) & 1)
 #define RE_ONFAILURE_ITEM_GROUP_RESTORE_GETGID(inptr)         ((uintptr_t)(inptr) >> 1)
 #define RE_ONFAILURE_ITEM_GROUP_RESTORE_ENCODE(is_start, gid) ((byte_t const *)(uintptr_t)(((gid) << 1) | (is_start)))
-
 
 struct re_onfailure_item {
 	byte_t const *rof_in; /* [0..1] Input data pointer to restore (points into some input buffer)
@@ -964,7 +961,7 @@ do_epsilon_match:
 #define PUSHFAIL_DUMMY(pc)  do { if unlikely(!re_interpreter_pushfail_dummy(self, RE_ONFAILURE_ITEM_DUMMY_INPTR, pc)) goto err_nomem; } __WHILE0
 #define PUSHFAIL_EX(in, pc) do { if unlikely(!re_interpreter_pushfail_dummy(self, in, pc)) goto err_nomem; } __WHILE0
 #define getb()              (*pc++)
-#define getw()              (pc += 2, (int16_t)UNALIGNED_GET16((uint16_t const *)(pc - 2)))
+#define getw()              (pc += 2, delta16_get(pc - 2))
 
 	/* The main dispatch loop */
 dispatch:

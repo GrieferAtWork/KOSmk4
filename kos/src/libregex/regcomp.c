@@ -34,6 +34,7 @@ options["COMPILE.language"] = "c";
 #include <hybrid/align.h>
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
+#include <hybrid/unaligned.h>
 
 #include <kos/types.h>
 #include <sys/bitstring.h>
@@ -90,7 +91,8 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
-#define int16_at(p) (*(int16_t *)(p))
+#define delta16_get(p)    ((int16_t)UNALIGNED_GET16((uint16_t const *)(p)))
+#define delta16_set(p, v) UNALIGNED_SET16((uint16_t *)(p), (uint16_t)(int16_t)(v))
 
 #define tswap(T, a, b)   \
 	do {                 \
@@ -797,7 +799,7 @@ dispatch:
 	case REOP_JMP_ONFAIL:
 	case REOP_JMP_AND_RETURN_ONFAIL: {
 		int16_t delta;
-		delta = int16_at(pc);
+		delta = delta16_get(pc);
 		pc += 2;
 		if (delta > 0 && re_code_matches_epsilon(pc + delta))
 			return true;
@@ -806,7 +808,7 @@ dispatch:
 
 	case REOP_JMP: {
 		int16_t delta;
-		delta = int16_at(pc);
+		delta = delta16_get(pc);
 		pc += 2;
 		pc += delta;
 		goto dispatch;
@@ -815,7 +817,7 @@ dispatch:
 	case REOP_DEC_JMP: {
 		int16_t delta;
 		++pc; /* varid */
-		delta = int16_at(pc);
+		delta = delta16_get(pc);
 		pc += 2;
 		if (delta >= 0)
 			pc += delta;
@@ -825,7 +827,7 @@ dispatch:
 	case REOP_DEC_JMP_AND_RETURN_ONFAIL: {
 		int16_t delta;
 		++pc; /* varid */
-		delta = int16_at(pc);
+		delta = delta16_get(pc);
 		pc += 2;
 		if (delta > 0 && re_code_matches_epsilon(pc + delta))
 			return true;
@@ -2830,7 +2832,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			/* REOP_JMP_ONFAIL 2f */
 			*writer++ = REOP_JMP_ONFAIL;
 			label_2 = writer + 2 + expr_size + 3 + 3;
-			int16_at(writer) = (int16_t)(label_2 - (writer + 2));
+			delta16_set(writer, label_2 - (writer + 2));
 			writer += 2;
 
 			/* This is where the "1:" is in the pseudo-code */
@@ -2845,7 +2847,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 
 			/* REOP_JMP_AND_RETURN_ONFAIL 1b */
 			*writer++ = REOP_JMP_AND_RETURN_ONFAIL;
-			int16_at(writer) = (int16_t)(label_1 - (writer + 2));
+			delta16_set(writer, label_1 - (writer + 2));
 			writer += 2;
 			assert(label_2 == writer);
 
@@ -2868,7 +2870,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			/* REOP_JMP_ONFAIL_DUMMY_AT 2f */
 			label_2 = writer + 3 + expr_size + 3 + 3;
 			*writer++ = REOP_JMP_ONFAIL_DUMMY_AT;
-			int16_at(writer) = (int16_t)(label_2 - (writer + 2));
+			delta16_set(writer, label_2 - (writer + 2));
 			writer += 2;
 
 			/* <X> */
@@ -2883,7 +2885,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 
 			/* REOP_JMP_AND_RETURN_ONFAIL 1b */
 			*writer++ = REOP_JMP_AND_RETURN_ONFAIL;
-			int16_at(writer) = (int16_t)(label_1 - (writer + 2));
+			delta16_set(writer, label_1 - (writer + 2));
 			writer += 2;
 			assert(label_2 == writer);
 
@@ -2917,7 +2919,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			label_1 = writer;
 			label_3 = writer + 3 + expr_size + 3 + 4 + 3;
 			*writer++ = REOP_JMP_ONFAIL_DUMMY_AT;
-			int16_at(writer) = (int16_t)(label_3 - (writer + 2));
+			delta16_set(writer, label_3 - (writer + 2));
 			writer += 2;
 
 			/* <X> */
@@ -2933,12 +2935,12 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			/* REOP_DEC_JMP {VAR}, 1b */
 			*writer++ = REOP_DEC_JMP;
 			*writer++ = var_id;
-			int16_at(writer) = (int16_t)(label_1 - (writer + 2));
+			delta16_set(writer, label_1 - (writer + 2));
 			writer += 2;
 
 			/* REOP_JMP_AND_RETURN_ONFAIL 2b */
 			*writer++ = REOP_JMP_AND_RETURN_ONFAIL;
-			int16_at(writer) = (int16_t)(label_2 - (writer + 2));
+			delta16_set(writer, label_2 - (writer + 2));
 			writer += 2;
 			assert(label_3 == writer);
 
@@ -3006,7 +3008,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		/* REOP_JMP_ONFAIL_DUMMY_AT 3f */
 		label_2 = writer + 3 + expr_size + 3 + 4;
 		*writer++ = REOP_JMP_ONFAIL_DUMMY_AT;
-		int16_at(writer) = (int16_t)(label_2 - (writer + 2));
+		delta16_set(writer, label_2 - (writer + 2));
 		writer += 2;
 
 		/* <X> */
@@ -3022,7 +3024,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		/* REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b */
 		*writer++ = REOP_DEC_JMP_AND_RETURN_ONFAIL;
 		*writer++ = var_id;
-		int16_at(writer) = (int16_t)(label_1 - (writer + 2));
+		delta16_set(writer, label_1 - (writer + 2));
 		writer += 2;
 		assert(label_2 == writer);
 
@@ -3044,7 +3046,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 
 			/* REOP_JMP_ONFAIL 1f */
 			*writer++ = REOP_JMP_ONFAIL;
-			int16_at(writer) = (int16_t)(expr_size + 3);
+			delta16_set(writer, expr_size + 3);
 			writer += 2;
 
 			/* <X> */
@@ -3082,7 +3084,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			/* REOP_JMP_ONFAIL 2f */
 			label_2 = writer + 3 + expr_size + 3 + 4;
 			*writer++ = REOP_JMP_ONFAIL;
-			int16_at(writer) = (int16_t)(label_2 - (writer + 2));
+			delta16_set(writer, label_2 - (writer + 2));
 			writer += 2;
 
 			/* <X> */
@@ -3098,7 +3100,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 			/* REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR}, 1b */
 			*writer++ = REOP_DEC_JMP_AND_RETURN_ONFAIL;
 			*writer++ = var_id;
-			int16_at(writer) = (int16_t)(label_1 - (writer + 2));
+			delta16_set(writer, label_1 - (writer + 2));
 			writer += 2;
 			assert(label_2 == writer);
 
@@ -3135,7 +3137,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		/* REOP_DEC_JMP {VAR}, 1b */
 		*writer++ = REOP_DEC_JMP;
 		*writer++ = var_id;
-		int16_at(writer) = (int16_t)(label_1 - (writer + 2));
+		delta16_set(writer, label_1 - (writer + 2));
 		writer += 2;
 
 		self->rec_cpos = writer;
@@ -3180,7 +3182,7 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		label_1 = writer;
 		label_3 = writer + 3 + expr_size + 3 + 4 + 4;
 		*writer++ = REOP_JMP_ONFAIL_DUMMY_AT;
-		int16_at(writer) = (int16_t)(label_3 - (writer + 2));
+		delta16_set(writer, label_3 - (writer + 2));
 		writer += 2;
 
 		/* 2:  <X>     // Last instruction is `REOP_*_Jn(N)'-transformed to jump to `3f' */
@@ -3196,13 +3198,13 @@ NOTHROW_NCX(CC re_compiler_compile_repeat)(struct re_compiler *__restrict self,
 		/* REOP_DEC_JMP {VAR1}, 1b */
 		*writer++ = REOP_DEC_JMP;
 		*writer++ = var1_id;
-		int16_at(writer) = (int16_t)(label_1 - (writer + 2));
+		delta16_set(writer, label_1 - (writer + 2));
 		writer += 2;
 
 		/* REOP_DEC_JMP_AND_RETURN_ONFAIL {VAR2}, 2b */
 		*writer++ = REOP_DEC_JMP_AND_RETURN_ONFAIL;
 		*writer++ = var2_id;
-		int16_at(writer) = (int16_t)(label_2 - (writer + 2));
+		delta16_set(writer, label_2 - (writer + 2));
 		writer += 2;
 		assert(label_3 == writer);
 
@@ -3290,7 +3292,7 @@ NOTHROW_NCX(CC re_compiler_thread_fwd_jump)(byte_t *__restrict p_jmp_instruction
 	byte_t *target_instruction;
 	int16_t delta;
 	assert(p_jmp_instruction[0] == REOP_JMP);
-	delta = int16_at(&p_jmp_instruction[1]);
+	delta = delta16_get(&p_jmp_instruction[1]);
 	assertf(delta >= 0, "delta: %I16d", delta);
 	target_instruction = p_jmp_instruction + 3 + delta;
 	while (*target_instruction == REOP_NOP)
@@ -3301,12 +3303,12 @@ NOTHROW_NCX(CC re_compiler_thread_fwd_jump)(byte_t *__restrict p_jmp_instruction
 		int16_t target_delta;
 		int32_t total_delta;
 		re_compiler_thread_fwd_jump(target_instruction);
-		target_delta = int16_at(&target_instruction[1]);
+		target_delta = delta16_get(&target_instruction[1]);
 		assert(target_delta >= 0);
 		total_delta = delta + 3 + target_delta;
 		if (total_delta <= INT16_MAX) {
 			/* Able to thread this jump! */
-			int16_at(&p_jmp_instruction[1]) = total_delta;
+			delta16_set(&p_jmp_instruction[1], total_delta);
 		}
 	}
 }
@@ -3379,7 +3381,7 @@ again:
 			previous_alternation_deltaptr  = self->rec_cbase + previous_alternation_deltaoff;
 			previous_alternation_skipdelta = (int16_t)(self->rec_cpos - (previous_alternation_deltaptr + 2));
 			assert(previous_alternation_skipdelta >= 0);
-			int16_at(previous_alternation_deltaptr) = previous_alternation_skipdelta;
+			delta16_set(previous_alternation_deltaptr, previous_alternation_skipdelta);
 		}
 	} else {
 		byte_t *current_alternation_startptr;
@@ -3396,7 +3398,7 @@ again:
 
 		/* Insert the leading `REOP_JMP_ONFAIL' that points to the next alternation */
 		*current_alternation_startptr++ = REOP_JMP_ONFAIL;
-		int16_at(current_alternation_startptr) = (int16_t)(current_alternation_size + 6);
+		delta16_set(current_alternation_startptr, current_alternation_size + 6);
 		current_alternation_startptr += 2;
 		current_alternation_startptr += current_alternation_size;
 		*current_alternation_startptr++ = REOP_MAYBE_POP_ONFAIL;
@@ -3417,7 +3419,7 @@ again:
 			previous_alternation_deltaptr  = self->rec_cbase + previous_alternation_deltaoff;
 			previous_alternation_skipdelta = (int16_t)(current_alternation_startptr - (previous_alternation_deltaptr + 2));
 			assert(previous_alternation_skipdelta >= 0);
-			int16_at(previous_alternation_deltaptr) = previous_alternation_skipdelta;
+			delta16_set(previous_alternation_deltaptr, previous_alternation_skipdelta);
 		}
 
 		*current_alternation_startptr++ = REOP_JMP;
@@ -3903,39 +3905,39 @@ do_cs_bitset:
 		}	break;
 
 		case REOP_POP_ONFAIL_AT: {
-			byte_t const *jmp = pc + 2 + int16_at(pc);
+			byte_t const *jmp = pc + 2 + delta16_get(pc);
 			printf("pop_onfail_at @%#.4" PRIxSIZ, (size_t)(jmp - self->rc_code));
 		}	break;
 
 		case REOP_JMP_ONFAIL: {
-			byte_t const *jmp = pc + 2 + int16_at(pc);
+			byte_t const *jmp = pc + 2 + delta16_get(pc);
 			printf("jmp_onfail @%#.4" PRIxSIZ, (size_t)(jmp - self->rc_code));
 		}	break;
 
 		case REOP_JMP_ONFAIL_DUMMY_AT: {
-			byte_t const *jmp = pc + 2 + int16_at(pc);
+			byte_t const *jmp = pc + 2 + delta16_get(pc);
 			printf("jmp_onfail_dummy_at @%#.4" PRIxSIZ, (size_t)(jmp - self->rc_code));
 		}	break;
 
 		case REOP_JMP: {
-			byte_t const *jmp = pc + 2 + int16_at(pc);
+			byte_t const *jmp = pc + 2 + delta16_get(pc);
 			printf("jmp @%#.4" PRIxSIZ, (size_t)(jmp - self->rc_code));
 		}	break;
 
 		case REOP_JMP_AND_RETURN_ONFAIL: {
-			byte_t const *jmp = pc + 2 + int16_at(pc);
+			byte_t const *jmp = pc + 2 + delta16_get(pc);
 			printf("jmp_and_return_onfail @%#.4" PRIxSIZ, (size_t)(jmp - self->rc_code));
 		}	break;
 
 		case REOP_DEC_JMP: {
 			uint8_t varid     = *pc++;
-			byte_t const *jmp = pc + 2 + int16_at(pc);
+			byte_t const *jmp = pc + 2 + delta16_get(pc);
 			printf("dec_jmp %" PRIu8 ", @%#.4" PRIxSIZ, varid, (size_t)(jmp - self->rc_code));
 		}	break;
 
 		case REOP_DEC_JMP_AND_RETURN_ONFAIL: {
 			uint8_t varid     = *pc++;
-			byte_t const *jmp = pc + 2 + int16_at(pc);
+			byte_t const *jmp = pc + 2 + delta16_get(pc);
 			printf("dec_jmp_and_return_onfail %" PRIu8 ", @%#.4" PRIxSIZ, varid, (size_t)(jmp - self->rc_code));
 		}	break;
 
