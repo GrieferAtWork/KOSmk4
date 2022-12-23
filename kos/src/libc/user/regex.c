@@ -186,6 +186,15 @@ reg_syntax_t re_syntax_options = RE_SYNTAX_EMACS;       /* Must be `RE_SYNTAX_EM
 #define re_syntax_options GET_NOREL_GLOBAL(re_syntax_options)
 
 
+/* For Glibc-compat, define a public symbol:
+ *    >> extern unsigned int re_max_failures;
+ *
+ * This symbol is used by `libregex.so' to limit  the
+ * max size of the regex interpreter's on-fail stack. */
+PUBLIC ATTR_SECTION(".data.crt.utility.regex")
+unsigned int re_max_failures = 2000;
+
+
 /* Convert posix standard regex matches into Glibc's weird, proprietary format. */
 PRIVATE ATTR_SECTION(".text.crt.utility.regex") NONNULL((1, 2)) void
 NOTHROW_NCX(LIBCCALL regmatch2glibc)(regmatch_t const *__restrict matches,
@@ -196,8 +205,6 @@ NOTHROW_NCX(LIBCCALL regmatch2glibc)(regmatch_t const *__restrict matches,
 		regs->end[i]   = matches[i].rm_eo;
 	}
 }
-
-
 
 /*[[[head:libc_re_compile_pattern,hash:CRC-32=0xc2053a8c]]]*/
 /* >> re_compile_pattern(3)

@@ -40,6 +40,7 @@ options["COMPILE.language"] = "c";
 #include <alloca.h>
 #include <assert.h>
 #include <ctype.h>
+#include <dlfcn.h>
 #include <inttypes.h>
 #include <malloc.h>
 #include <stdbool.h>
@@ -641,17 +642,54 @@ load_normal_iov:
 	}	__WHILE0
 
 
+/* The min number of regex failures that are always allowed
+ *
+ * While the on-fail stack's size is below this, we won't
+ * even look at `re_max_failures(3)' */
+#define RE_MIN_FAILURES 128
+
+/* This one has to be int-sized for Glibc-compat. Technically, Glibc
+ * defines this one as  `int', there's no need  to do that; we  just
+ * interpret the variable as unsigned int!
+ *
+ * The actual symbol itself is defined in libc, but we don't want to
+ * hard-link against it, and so simply load it lazily on first  use. */
+PRIVATE unsigned int const *pdyn_re_max_failures = NULL;
+
+PRIVATE ATTR_NOINLINE ATTR_PURE WUNUSED size_t
+NOTHROW(CC get_re_max_failures)(void) {
+	if (pdyn_re_max_failures == NULL) {
+		pdyn_re_max_failures = (unsigned int const *)dlsym(RTLD_DEFAULT, "re_max_failures");
+		if unlikely(pdyn_re_max_failures == NULL) {
+			/* Shouldn't get here, but just to be safe... */
+			static unsigned int const default_re_max_failures = 2000;
+			pdyn_re_max_failures = &default_re_max_failures;
+		}
+	}
+	return (size_t)*pdyn_re_max_failures;
+}
+
 PRIVATE WUNUSED NONNULL((1)) bool
 NOTHROW_NCX(CC re_interpreter_resize)(struct re_interpreter *__restrict self) {
 	struct re_onfailure_item *new_onfail_v;
 	size_t new_onfail_a;
 	/* Must allocate more space for the on-fail buffer. */
 	new_onfail_a = self->ri_onfaila * 2;
-	if (new_onfail_a < 16)
-		new_onfail_a = 16;
-	/* TODO: There should be some upper limit on how many onfail items are  allowed
-	 *       before a soft failure should be triggered (similar to the 16K limit on
-	 *       regex code size) */
+
+	if (new_onfail_a < RE_MIN_FAILURES) {
+		new_onfail_a = RE_MIN_FAILURES;
+	} else {
+		/* Limit how many failure items there can be */
+		size_t max_count = get_re_max_failures();
+		if (new_onfail_a > max_count) {
+			new_onfail_a = max_count;
+			if (new_onfail_a < RE_MIN_FAILURES)
+				new_onfail_a = RE_MIN_FAILURES; /* Never go  */
+			if (self->ri_onfailc >= new_onfail_a)
+				return false; /* New limit is too low for current requirements. */
+		}
+	}
+
 	new_onfail_v = (struct re_onfailure_item *)realloc(self->ri_onfailv, new_onfail_a,
 	                                                   sizeof(struct re_onfailure_item));
 	if unlikely(!new_onfail_v) {
@@ -2097,6 +2135,11 @@ onfail:
 	}
 	__builtin_unreachable();
 err_nomem:
+	/* Check for special case: on-fail stack got too large. */
+	if (self->ri_onfailc >= self->ri_onfaila &&
+	    self->ri_onfailc > 0 &&
+	    self->ri_onfaila >= get_re_max_failures())
+		return -RE_ESIZE;
 	return -RE_ESPACE;
 #undef PUSHFAIL_EX
 #undef PUSHFAIL_DUMMY

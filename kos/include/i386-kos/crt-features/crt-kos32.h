@@ -4335,6 +4335,7 @@
 #define __CRT_HAVE_re_compile_pattern
 #define __CRT_HAVE_re_match
 #define __CRT_HAVE_re_match_2
+#define __CRT_HAVE_re_max_failures
 #define __CRT_HAVE_re_search
 #define __CRT_HAVE_re_search_2
 #define __CRT_HAVE_re_set_registers

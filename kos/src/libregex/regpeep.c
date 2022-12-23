@@ -1121,7 +1121,7 @@ again:
 		goto again;
 	}
 
-	/* Jump-offsets have been adjusted. - Now to actually removed data. */
+	/* Jump-offsets have been adjusted. - Now to actually delete opcodes. */
 	memmovedown(delpc,
 	            delpc + num_bytes,
 	            self->rec_cpos - (delpc + num_bytes));
@@ -1199,14 +1199,6 @@ NOTHROW_NCX(CC libre_compiler_peephole)(struct re_compiler *__restrict self) {
 	 *    >>     REOP_CS_UTF8    [RECS_CHAR2 "bB"]
 	 *    >> 2:  REOP_GROUP_END  0
 	 *    >>     REOP_BYTE       "c"
-	 * -> Care must be taken not to insert an `REOP_POP_ONFAIL' opcode AFTER
-	 *    the failing and non-failing branches have already re-joined. (XXX:
-	 *    why not let the compiler produce a filler  `REOP_MAYBE_POP_ONFAIL'
-	 *    opcode if appropriate? We could  then replace/move that opcode  to
-	 *    the earliest-most location, and  replace with `REOP_NOP' if  input
-	 *    exists that matches both branches, or `REOP_POP_ONFAIL' if no such
-	 *    input exists)
-	 *
 	 *
 	 * If both branches always consume  the same number of  bytes/characters
 	 * (prior to joining back together), then the non-failing branch can pop
