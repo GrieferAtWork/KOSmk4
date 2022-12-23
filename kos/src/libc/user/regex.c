@@ -28,6 +28,7 @@
 #include <hybrid/atomic.h>
 
 #include <bits/os/iovec.h>
+#include <kos/exec/idata.h>
 
 #include <assert.h>
 #include <errno.h>
@@ -186,6 +187,27 @@ static_assert(sizeof_field(re_regmatch_t, rm_eo) == sizeof_field(regmatch_t, rm_
 PUBLIC ATTR_SECTION(".bss.crt.compat.glibc.regex") char *loc1 = NULL;
 PUBLIC ATTR_SECTION(".bss.crt.compat.glibc.regex") char *loc2 = NULL;
 PUBLIC ATTR_SECTION(".bss.crt.compat.glibc.regex") char *locs = NULL; /* NOTE: Never used internally! */
+
+
+/************************************************************************/
+/* Symbols for compatibility with libc4/5                                */
+/************************************************************************/
+INTERN ATTR_SECTION(".bss.crt.compat.glibc.regex")
+char const *libc_re_error_msg[__REG_ECOUNT] = {}; /* "libc-5.4.7/libc/regex/rx.c:3922" */
+DEFINE_PUBLIC_IDATA(re_error_msg, libc_resolve_re_error_msg, __REG_ECOUNT * __SIZEOF_POINTER__);
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED ATTR_SECTION(".text.crt.compat.linux") char const **
+NOTHROW_NCX(LIBCCALL libc_resolve_re_error_msg)(void) {
+	if (!libc_re_error_msg[lengthof(libc_re_error_msg) - 1]) {
+		size_t i;
+		for (i = 0; i < lengthof(libc_re_error_msg); ++i) {
+			COMPILER_WRITE_BARRIER();
+			libc_re_error_msg[i] = regerrordesc_np(i);
+			COMPILER_WRITE_BARRIER();
+		}
+	}
+	return libc_re_error_msg;
+}
+
 
 
 

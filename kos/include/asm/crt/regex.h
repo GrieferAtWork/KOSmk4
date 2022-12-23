@@ -44,6 +44,7 @@
 #ifdef __CRT_KOS
 #define __REG_EILLSET  17   /* Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
 #endif /* __CRT_KOS */
+#define __REG_ECOUNT 18 /* # of defined regex error codes. */
 
 
 /* Regex syntax options */

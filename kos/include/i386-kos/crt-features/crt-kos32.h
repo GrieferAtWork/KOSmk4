@@ -4339,6 +4339,7 @@
 #define __CRT_HAVE_re_comp
 #define __CRT_HAVE_re_compile_fastmap
 #define __CRT_HAVE_re_compile_pattern
+#define __CRT_HAVE_re_error_msg
 #define __CRT_HAVE_re_exec
 #define __CRT_HAVE_re_match
 #define __CRT_HAVE_re_match_2
