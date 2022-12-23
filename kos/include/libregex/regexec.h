@@ -30,7 +30,7 @@ __DECL_BEGIN
 struct re_code;
 struct iovec;
 
-/* Flags for `re_exec_match(3R)' */
+/* Flags for `struct re_exec::rx_eflags' */
 #define RE_EXEC_NOTBOL 0x0001 /* '^' (REOP_AT_SOL) doesn't match at the start of the input buffer (but only at an actual begin-of-line) */
 #define RE_EXEC_NOTEOL 0x0002 /* '$' (REOP_AT_EOL) doesn't match at the end of the input buffer (but only before an actual line-feed) */
 
@@ -41,8 +41,10 @@ typedef int re_sregoff_t;
 #define RE_REGOFF_UNSET ((re_regoff_t)-1)
 
 typedef struct {
-	re_regoff_t rm_so;
-	re_regoff_t rm_eo;
+	re_regoff_t rm_so; /* [<= rm_eo] Group starting offset (offset of first byte within the group)
+	                    * - Set to `RE_REGOFF_UNSET' if the group was never encountered. */
+	re_regoff_t rm_eo; /* [>= rm_so] Group end offset (offset of first byte past the group)
+	                    * - Set to `RE_REGOFF_UNSET' if the group was never encountered. */
 } re_regmatch_t;
 
 struct re_exec {
@@ -61,7 +63,7 @@ struct re_exec {
 	__size_t              rx_extra;    /* Number of extra bytes that can still be read after `rx_endoff'
 	                                    * Usually `0', but when  non-zero, `REOP_AT_*' opcodes will  try
 	                                    * to read this extra memory in order to check matches. */
-	unsigned int          rx_eflags;   /* Execution flags (set of `RE_EXEC_*') */
+	unsigned int          rx_eflags;   /* Execution-flags (set of `RE_EXEC_*') */
 };
 
 /* Execute a regular expression.
@@ -99,7 +101,8 @@ __NOTHROW_NCX(LIBREGEX_CC re_exec_search)(struct re_exec const *__restrict exec,
 /* Same as `re_exec_search(3R)', but perform searching with starting
  * offsets  in   `[exec->rx_endoff - search_range, exec->rx_endoff)'
  * Too great values  for `search_range'  are automatically  clamped.
- * The return value will thus also be within that same range. */
+ * The  return value will thus be the greatest byte-offset where the
+ * given pattern matches that is still within that range. */
 typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) __ssize_t
 __NOTHROW_NCX_T(LIBREGEX_CC *PRE_EXEC_RSEARCH)(struct re_exec const *__restrict exec,
                                                size_t search_range, size_t *p_match_size);

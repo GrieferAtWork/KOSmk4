@@ -2220,7 +2220,8 @@ err:
 /* Same as `re_exec_search(3R)', but perform searching with starting
  * offsets  in   `[exec->rx_endoff - search_range, exec->rx_endoff)'
  * Too great values  for `search_range'  are automatically  clamped.
- * The return value will thus also be within that same range. */
+ * The  return value will thus be the greatest byte-offset where the
+ * given pattern matches that is still within that range. */
 INTERN WUNUSED NONNULL((1)) ssize_t
 NOTHROW_NCX(CC libre_exec_rsearch)(struct re_exec const *__restrict exec,
                                    size_t search_range, size_t *p_match_size) {
