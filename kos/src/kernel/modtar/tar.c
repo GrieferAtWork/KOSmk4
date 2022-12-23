@@ -82,8 +82,7 @@ static_assert(sizeof(struct tarhdr) == 500);
 /************************************************************************/
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL tardirent_v_destroy)(struct fdirent *__restrict self) {
-	struct tardirent *me;
-	me = container_of(self, struct tardirent, td_ent);
+	struct tardirent *me = fdirent_astar(self);
 	decref(me->td_filp);
 	kfree(me);
 }
@@ -92,16 +91,12 @@ PRIVATE BLOCKING WUNUSED NONNULL((1, 2)) REF struct fnode *KCALL
 tardirent_v_opennode(struct fdirent *__restrict self,
                      struct fdirnode *__restrict dir_)
 		THROWS(E_BADALLOC, E_IOERROR, ...) {
-	struct tardirnode *dir;
-	struct tardirent *me;
-	struct tarsuper *super;
+	struct tardirnode *dir = fdirnode_astar(dir_);
+	struct tardirent *me   = fdirent_astar(self);
+	struct tarsuper *super = fsuper_astar(dir->fn_super);
+	struct tarfile *tfile  = me->td_filp;
 	struct tarfdat *rfdat;
-	struct tarfile *tfile;
 	REF struct fnode *result;
-	dir   = (struct tardirnode *)dir_;
-	me    = container_of(self, struct tardirent, td_ent);
-	super = container_of(dir->fn_super, struct tarsuper, ts_super);
-	tfile = me->td_filp;
 
 	/* Check if this file is already open. */
 again:
@@ -340,7 +335,7 @@ err:
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL tardir_v_destroy)(struct mfile *__restrict self) {
 	struct tardirnode *me;
-	me = (struct tardirnode *)fnode_asdir(self);
+	me = fdirnode_astar(mfile_asdir(self));
 	decref(me->tdn_fdat.tfd_filp);
 	fdirnode_v_destroy(self);
 }
@@ -383,8 +378,8 @@ tardir_v_lookup(struct fdirnode *__restrict self,
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	struct tarfile *tf;
 	char filename[256]; /* TAR cannot contain filenames longer than this, even with USTAR */
-	struct tardirnode *me  = (struct tardirnode *)self;
-	struct tarsuper *super = container_of(me->fn_super, struct tarsuper, ts_super);
+	struct tardirnode *me  = fdirnode_astar(self);
+	struct tarsuper *super = fsuper_astar(me->fn_super);
 	char const *prefix_str;
 	uint8_t prefix_len;
 	size_t filename_len;
@@ -640,11 +635,11 @@ return_tf:
 
 
 struct tardirenum: fdirenum {
-	/* Enumerate files based  on `tf_pos'  (iow: disk  position)
-	 * For this purpose, we seekdir() simply alters the absolute
-	 * on-disk  position, and readdir() yields the first tarfile
-	 * that  has a name  that starts with the  prefix of the dir
-	 * being enumerated, followed by a '/', and doesn't  contain
+	/* Enumerate  files based on  `tf_pos' (iow: disk position)
+	 * For  this purpose, seekdir()  simply alters the absolute
+	 * on-disk position, and readdir() yields the first tarfile
+	 * that has a name that starts  with the prefix of the  dir
+	 * being enumerated, followed by a '/', and doesn't contain
 	 * any additional '/'s thereafter.
 	 *
 	 * - Use  `ts_nfile' to determine if all files until the min disk
@@ -656,7 +651,9 @@ struct tardirenum: fdirenum {
 	char const      *tde_dirname; /* [0..tde_dirsize][const] Required filename prefix. (excluding a trailing '/') */
 	uint8_t          tde_dirsize; /* [const] Length of `tde_dirname'. */
 };
+#define fdirenum_astar(self) ((struct tardirenum *)(self))
 
+/* Check for interrupts (so a user can CTRL+C long-running fs operations) */
 LOCAL NONNULL((1)) void FCALL
 tarsuper_serve_or_unlock(struct tarsuper *__restrict self) {
 	TRY {
@@ -909,8 +906,8 @@ tardirenum_v_readdir(struct fdirenum *__restrict self, USER CHECKED struct diren
                      size_t bufsize, readdir_mode_t readdir_mode, iomode_t UNUSED(mode))
 		THROWS(E_SEGFAULT, E_IOERROR, ...) {
 	REF struct tarfile *tf;
-	struct tardirenum *me  = (struct tardirenum *)self;
-	struct tarsuper *super = container_of(me->de_dir->fn_super, struct tarsuper, ts_super);
+	struct tardirenum *me  = fdirenum_astar(self);
+	struct tarsuper *super = fsuper_astar(me->de_dir->fn_super);
 	pos_t oldpos, newpos;
 	char const *tf_basename;
 	uint8_t tf_baselen;
@@ -970,7 +967,7 @@ PRIVATE BLOCKING NONNULL((1)) pos_t KCALL
 tardirenum_v_seekdir(struct fdirenum *__restrict self,
                      off_t offset, unsigned int whence)
 		THROWS(E_OVERFLOW, E_INVALID_ARGUMENT_UNKNOWN_COMMAND, E_IOERROR, ...) {
-	struct tardirenum *me  = (struct tardirenum *)self;
+	struct tardirenum *me  = fdirenum_astar(self);
 	uint64_t newpos;
 	switch (whence) {
 
@@ -1025,11 +1022,11 @@ PRIVATE struct fdirenum_ops const tardirenum_ops = {
 PRIVATE BLOCKING NONNULL((1)) void KCALL
 tardir_v_enum(struct fdirenum *__restrict result)
 		THROWS(E_IOERROR, ...) {
-	struct tardirenum *rt  = (struct tardirenum *)result;
-	struct tardirnode *dir = (struct tardirnode *)rt->de_dir;
+	struct tardirenum *rt  = fdirenum_astar(result);
+	struct tardirnode *dir = fdirnode_astar(rt->de_dir);
 	/* Fill in fields. */
 	rt->de_ops    = &tardirenum_ops;
-	rt->tde_super = container_of(rt->de_dir->fn_super, struct tarsuper, ts_super);
+	rt->tde_super = fsuper_astar(rt->de_dir->fn_super);
 	atomic64_init(&rt->tde_pos, 0);
 	rt->tde_dirname = dir->tdn_fdat.tfd_name;
 	rt->tde_dirsize = dir->tdn_fdat.tfd_nlen;
@@ -1045,7 +1042,7 @@ tardir_v_enum(struct fdirenum *__restrict result)
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL tarreg_v_destroy)(struct mfile *__restrict self) {
 	struct tarregnode *me;
-	me = (struct tarregnode *)fnode_asreg(self);
+	me = fregnode_astar(fnode_asreg(self));
 	decref(me->trn_fdat.tfd_filp);
 	fregnode_v_destroy(self);
 }
@@ -1054,8 +1051,8 @@ PRIVATE BLOCKING NONNULL((1, 5)) void KCALL
 tarreg_v_loadblocks(struct mfile *__restrict self, pos_t addr,
                     physaddr_t buf, size_t num_bytes,
                     struct aio_multihandle *__restrict aio) {
-	struct tarregnode *me  = (struct tarregnode *)mfile_asreg(self);
-	struct tarsuper *super = container_of(me->fn_super, struct tarsuper, ts_super);
+	struct tarregnode *me  = fregnode_astar(mfile_asreg(self));
+	struct tarsuper *super = fsuper_astar(me->fn_super);
 	fsuper_dev_rdsectors_async_chk(&super->ts_super,
 	                               tarfile_getdpos(me->trn_fdat.tfd_filp) + addr,
 	                               buf, num_bytes, aio);
@@ -1071,7 +1068,7 @@ tarreg_v_loadblocks(struct mfile *__restrict self, pos_t addr,
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL tarlnk_v_destroy)(struct mfile *__restrict self) {
 	struct tarlnknode *me;
-	me = (struct tarlnknode *)fnode_aslnk(self);
+	me = flnknode_astar(fnode_aslnk(self));
 	decref(me->tln_fdat.tfd_filp);
 	flnknode_v_destroy(self);
 }
@@ -1081,7 +1078,7 @@ tarlnk_v_linkstr(struct flnknode *__restrict self)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	char const *result;
 	struct tarlnknode *me;
-	me     = (struct tarlnknode *)fnode_aslnk(self);
+	me     = flnknode_astar(fnode_aslnk(self));
 	result = tarfile_getlnkstr(me->tln_fdat.tfd_filp);
 
 	/* Use the symlink text length as filesize. */
@@ -1100,7 +1097,7 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL tarsuper_v_destroy)(struct mfile *__restrict self) {
 	size_t i;
 	struct tarsuper *me;
-	me = container_of(fnode_assuper(self), struct tarsuper, ts_super);
+	me = fsuper_astar(fnode_assuper(self));
 	assert(!me->ts_fdat.tfd_filp);
 	for (i = 0; i < me->ts_filec; ++i)
 		decref_likely(me->ts_filev[i]);
@@ -1111,7 +1108,7 @@ NOTHROW(KCALL tarsuper_v_destroy)(struct mfile *__restrict self) {
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL tarsuper_v_free)(struct fnode *__restrict self) {
 	struct tarsuper *me;
-	me = container_of(fnode_assuper(self), struct tarsuper, ts_super);
+	me = fsuper_astar(fnode_assuper(self));
 	kfree(me);
 }
 
@@ -1122,7 +1119,7 @@ NOTHROW(KCALL tarsuper_v_cc)(struct mfile *__restrict self,
 	struct tarfile_slist deadfiles;
 	struct tarsuper *me;
 	SLIST_INIT(&deadfiles);
-	me = container_of(mfile_assuper(self), struct tarsuper, ts_super);
+	me = fsuper_astar(mfile_assuper(self));
 
 	if (!tarsuper_trywrite(me)) {
 		if (ccinfo_noblock(info))
@@ -1161,7 +1158,7 @@ NOTHROW(KCALL tarsuper_v_cc)(struct mfile *__restrict self,
 		newlist = me->ts_filev;
 		newlist = (REF struct tarfile **)krealloc_nx(newlist,
 		                                             me->ts_filec * sizeof(REF struct tarfile *),
-		                                             GFP_NORMAL);
+		                                             GFP_NORMAL | ccinfo_gfp(info));
 		if likely(newlist) {
 			size_t new_usable;
 			new_usable   = kmalloc_usable_size(newlist);
@@ -1892,7 +1889,7 @@ tarfs_open(struct ffilesys *__restrict UNUSED(filesys),
 	result->ts_super.fs_feat.sf_rec_xfer_align     = TBLOCKSIZE;
 	result->ts_super.fs_feat.sf_name_max           = 255;
 	result->ts_super.fs_feat.sf_filesizebits       = 32;
-	return &result->ts_super;
+	return tarsuper_assuper(result);
 }
 
 

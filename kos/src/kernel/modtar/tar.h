@@ -123,7 +123,7 @@ struct tarfdat {
 	                               * note the special case for the root directory. */
 	char const         *tfd_name; /* [0..tfd_nlen][const] Absolute filename (points into `tfd_filp',
 	                               * but  may not necessary  NUL-term in case  this is a directory). */
-	uint8_t             tfd_nlen; /* [const] Length of `tfd_name' (in characters); anything after must be ignored. */
+	uint8_t             tfd_nlen; /* [const] Length of `tfd_name' (in char-s); anything after must be ignored. */
 };
 
 
@@ -204,6 +204,15 @@ struct tarsuper {
 #define /*BLOCKING*/ tarsuper_waitwrite(self)    shared_rwlock_waitwrite(&(self)->ts_lock)
 #define /*BLOCKING*/ tarsuper_waitread_nx(self)  shared_rwlock_waitread_nx(&(self)->ts_lock)
 #define /*BLOCKING*/ tarsuper_waitwrite_nx(self) shared_rwlock_waitwrite_nx(&(self)->ts_lock)
+
+
+/* Casting helpers */
+#define fdirent_astar(self)    container_of(self, struct tardirent, td_ent)
+#define fdirnode_astar(self)   ((struct tardirnode *)(self))
+#define fregnode_astar(self)   ((struct tarregnode *)(self))
+#define flnknode_astar(self)   ((struct tarlnknode *)(self))
+#define fsuper_astar(self)     container_of(self, struct tarsuper, ts_super)
+#define tarsuper_assuper(self) (&(self)->ts_super)
 
 
 /* Operator tables. */
