@@ -67,11 +67,11 @@
 DECL_BEGIN
 
 /*
- * NOTE: This implementation (should) be logic-compatible with gLibc.
+ * NOTE: This implementation (should) be logic-compatible with Glibc.
  *       Though obviously several  KOS-specific extensions have  been
  *       added, too.
  *
- * However, this is NOT the implementation from gLibc. The  implementation
+ * However, this is NOT the implementation from Glibc. The  implementation
  * found in here has  been written from  scratch to best  fit KOS and  its
  * conventions, as well as because I really wanted to write my own wordexp
  * processor =P
@@ -826,7 +826,7 @@ again_switch_tok:
 			if unlikely(self->wxpr_val == 0) {
 				if unlikely(self->wxpr_dead)
 					goto again_switch_tok; /* Ignore runtime errors */
-				return WX_SYNTAX();        /* gLibc also returns this error for divide-by-zero */
+				return WX_SYNTAX();        /* Glibc also returns this error for divide-by-zero */
 			}
 			if (tok == '/') {
 				self->wxpr_val = lhs / self->wxpr_val;

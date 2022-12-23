@@ -48,7 +48,7 @@
 #endif /* __RLIMIT_RSS */
 
 #if 1
-/* This is what gLibc defines for this constant... */
+/* This is what Glibc defines for this constant... */
 #define __VLIMIT_INFINITY 0x7fffffff
 #else
 /* ... But given the implementation being a wrapper for `setrlimit(2)',

@@ -2214,13 +2214,13 @@ typedef __errno_t errno_t;
 #endif /* !_tzname && __tzname */
 }
 
-/* Under true DOS, these functions are actually exposed. However, gLibc already
+/* Under true DOS, these functions are actually exposed. However, Glibc already
  * defines symbols like `__daylight' to be the actual data objects, whereas DOS
  * defines them as functions returning pointers to the data objects.
  *
  * This namespace collision can easily be resolved by declaring DOS$__daylight, but
  * the header-symbol collision cannot be resolved. As a result, we only declare the
- * gLibc variant, so-as to guaranty a uniform meaning for `__daylight' */
+ * Glibc variant, so-as to guaranty a uniform meaning for `__daylight' */
 [[ignore, nodos, cc(LIBDCALL), no_crt_self_export, no_crt_self_import]]
 [[export_alias("DOS$__daylight"), if(defined(__CRT_DOS)), preferred_alias("__daylight")]]
 [[requires_include("<libc/template/daylight.h>"), requires(defined(__LOCAL_daylight))]]
@@ -2246,7 +2246,7 @@ typedef __errno_t errno_t;
 }
 
 
-/* gLibc doesn't have `__dstbias', so this one we can expose. */
+/* Glibc doesn't have `__dstbias', so this one we can expose. */
 [[nodos, cc(LIBDCALL), no_crt_self_export, no_crt_self_import, decl_include("<hybrid/typecore.h>")]]
 [[export_alias("DOS$__dstbias"), if(defined(__CRT_DOS)), preferred_alias("__dstbias")]]
 [[requires_include("<libc/template/dstbias.h>"), requires(defined(__LOCAL_dstbias))]]

@@ -22,7 +22,7 @@
 #ifndef _BITS_XOPEN_LIM_H
 #define _BITS_XOPEN_LIM_H 1
 
-/* NOTE: This file must _always_ be kept for GLibc compatibility! */
+/* NOTE: This file must _always_ be kept for Glibc compatibility! */
 
 #include "../features.h"
 

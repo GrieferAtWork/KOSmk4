@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeca2a7c9 */
+/* HASH CRC-32:0x8957c83c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@
 #include <asm/crt/locale.h>
 #include <hybrid/typecore.h>
 
-#define __USE_GNU_GETTEXT 1 /* We're emulating glibc's <libintl.h> */
+#define __USE_GNU_GETTEXT 1 /* We're emulating Glibc's <libintl.h> */
 #define __GNU_GETTEXT_SUPPORTED_REVISION(major) ((major) == 0 ? 1 : -1)
 
 #ifdef __CC__

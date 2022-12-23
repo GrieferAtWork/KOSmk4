@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb82878f */
+/* HASH CRC-32:0x25d5e167 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,8 +40,8 @@
 
 /*
  * Note  that the KOS implementations of these functions was written entirely
- * from scratch, only using GLibc's implementation as a reference (which also
- * resulted in me discovering some bugs in GLibc's version that I'm not going
+ * from scratch, only using Glibc's implementation as a reference (which also
+ * resulted in me discovering some bugs in Glibc's version that I'm not going
  * to  report because at least in my  mind, these are just suuuuch _absolute_
  * beginner's mistakes...)
  * The function's that I've fixed are:
@@ -74,7 +74,7 @@ typedef __errno_t error_t;
  * The overall length of the argz-string is  tracked at the offset from its  base
  * pointer, to the first  byte after a trailing  '\0' character that follows  the
  * last of the many sub-strings. An empty argz-string is thus represented as  any
- * base-pointer in conjunction with `*pargz_len=0'. (But note that GLibc seems to
+ * base-pointer in conjunction with `*pargz_len=0'. (But note that Glibc seems to
  * suggest that certain APIs  should be used under  the assumption that an  empty
  * argz-string  can also be represented with the base pointer `*pargz=NULL'. This
  * kind of behavior is _NOT_ actually supported  by the API, and only implied  by
@@ -98,7 +98,7 @@ __CDECLARE(__ATTR_IN(1) __ATTR_OUT(2) __ATTR_OUT(3),error_t,__NOTHROW_NCX,argz_c
  * The overall length of the argz-string is  tracked at the offset from its  base
  * pointer, to the first  byte after a trailing  '\0' character that follows  the
  * last of the many sub-strings. An empty argz-string is thus represented as  any
- * base-pointer in conjunction with `*pargz_len=0'. (But note that GLibc seems to
+ * base-pointer in conjunction with `*pargz_len=0'. (But note that Glibc seems to
  * suggest that certain APIs  should be used under  the assumption that an  empty
  * argz-string  can also be represented with the base pointer `*pargz=NULL'. This
  * kind of behavior is _NOT_ actually supported  by the API, and only implied  by
@@ -123,7 +123,7 @@ __CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2) __ATTR_OUT(3),error_t,__NOTHROW_NCX,argz_
  * The overall length of the argz-string is  tracked at the offset from its  base
  * pointer, to the first  byte after a trailing  '\0' character that follows  the
  * last of the many sub-strings. An empty argz-string is thus represented as  any
- * base-pointer in conjunction with `*pargz_len=0'. (But note that GLibc seems to
+ * base-pointer in conjunction with `*pargz_len=0'. (But note that Glibc seems to
  * suggest that certain APIs  should be used under  the assumption that an  empty
  * argz-string  can also be represented with the base pointer `*pargz=NULL'. This
  * kind of behavior is _NOT_ actually supported  by the API, and only implied  by
@@ -148,7 +148,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(argz_create, __FORCELOCAL __ATTR_ARTIFICIAL __AT
  * The overall length of the argz-string is  tracked at the offset from its  base
  * pointer, to the first  byte after a trailing  '\0' character that follows  the
  * last of the many sub-strings. An empty argz-string is thus represented as  any
- * base-pointer in conjunction with `*pargz_len=0'. (But note that GLibc seems to
+ * base-pointer in conjunction with `*pargz_len=0'. (But note that Glibc seems to
  * suggest that certain APIs  should be used under  the assumption that an  empty
  * argz-string  can also be represented with the base pointer `*pargz=NULL'. This
  * kind of behavior is _NOT_ actually supported  by the API, and only implied  by
@@ -172,7 +172,7 @@ __CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2) __ATTR_OUT(3),error_t,__NOTHROW_NCX,__arg
  * The overall length of the argz-string is  tracked at the offset from its  base
  * pointer, to the first  byte after a trailing  '\0' character that follows  the
  * last of the many sub-strings. An empty argz-string is thus represented as  any
- * base-pointer in conjunction with `*pargz_len=0'. (But note that GLibc seems to
+ * base-pointer in conjunction with `*pargz_len=0'. (But note that Glibc seems to
  * suggest that certain APIs  should be used under  the assumption that an  empty
  * argz-string  can also be represented with the base pointer `*pargz=NULL'. This
  * kind of behavior is _NOT_ actually supported  by the API, and only implied  by
@@ -197,7 +197,7 @@ __CDECLARE(__ATTR_IN(1) __ATTR_OUT(2) __ATTR_OUT(3),error_t,__NOTHROW_NCX,__argz
  * The overall length of the argz-string is  tracked at the offset from its  base
  * pointer, to the first  byte after a trailing  '\0' character that follows  the
  * last of the many sub-strings. An empty argz-string is thus represented as  any
- * base-pointer in conjunction with `*pargz_len=0'. (But note that GLibc seems to
+ * base-pointer in conjunction with `*pargz_len=0'. (But note that Glibc seems to
  * suggest that certain APIs  should be used under  the assumption that an  empty
  * argz-string  can also be represented with the base pointer `*pargz=NULL'. This
  * kind of behavior is _NOT_ actually supported  by the API, and only implied  by
@@ -799,7 +799,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(4) __ATTR_INOUT(1) __ATTR_INOUT(2) __AT
  * the given `replace_count' is incremented by one (if `replace_count' is non-NULL)
  * @return: 0:      Success
  * @return: ENOMEM: Insufficient heap memory (can only happen when `strlen(with) > strlen(str)',
- *                  but  note  that  the GLibc  implementation  of this  function  is completely
+ *                  but  note  that  the Glibc  implementation  of this  function  is completely
  *                  unreadable and may be able to return this for other cases as well...) */
 __CDECLARE(__ATTR_IN(4) __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_INOUT_OPT(5) __ATTR_IN_OPT(3),error_t,__NOTHROW_NCX,argz_replace,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str, char const *__restrict __with, unsigned int *__restrict __replace_count),(__pargz,__pargz_len,__str,__with,__replace_count))
 #elif defined(__CRT_HAVE___argz_replace)
@@ -809,7 +809,7 @@ __CDECLARE(__ATTR_IN(4) __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_INOUT_OPT(5) __AT
  * the given `replace_count' is incremented by one (if `replace_count' is non-NULL)
  * @return: 0:      Success
  * @return: ENOMEM: Insufficient heap memory (can only happen when `strlen(with) > strlen(str)',
- *                  but  note  that  the GLibc  implementation  of this  function  is completely
+ *                  but  note  that  the Glibc  implementation  of this  function  is completely
  *                  unreadable and may be able to return this for other cases as well...) */
 __CREDIRECT(__ATTR_IN(4) __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_INOUT_OPT(5) __ATTR_IN_OPT(3),error_t,__NOTHROW_NCX,argz_replace,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str, char const *__restrict __with, unsigned int *__restrict __replace_count),__argz_replace,(__pargz,__pargz_len,__str,__with,__replace_count))
 #elif (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free))
@@ -820,7 +820,7 @@ __CREDIRECT(__ATTR_IN(4) __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_INOUT_OPT(5) __A
  * the given `replace_count' is incremented by one (if `replace_count' is non-NULL)
  * @return: 0:      Success
  * @return: ENOMEM: Insufficient heap memory (can only happen when `strlen(with) > strlen(str)',
- *                  but  note  that  the GLibc  implementation  of this  function  is completely
+ *                  but  note  that  the Glibc  implementation  of this  function  is completely
  *                  unreadable and may be able to return this for other cases as well...) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(argz_replace, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(4) __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_INOUT_OPT(5) __ATTR_IN_OPT(3) error_t __NOTHROW_NCX(__LIBCCALL argz_replace)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str, char const *__restrict __with, unsigned int *__restrict __replace_count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_replace))(__pargz, __pargz_len, __str, __with, __replace_count); })
 #endif /* ... */
@@ -831,7 +831,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(argz_replace, __FORCELOCAL __ATTR_ARTIFICIAL __A
  * the given `replace_count' is incremented by one (if `replace_count' is non-NULL)
  * @return: 0:      Success
  * @return: ENOMEM: Insufficient heap memory (can only happen when `strlen(with) > strlen(str)',
- *                  but  note  that  the GLibc  implementation  of this  function  is completely
+ *                  but  note  that  the Glibc  implementation  of this  function  is completely
  *                  unreadable and may be able to return this for other cases as well...) */
 __CREDIRECT(__ATTR_IN(4) __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_INOUT_OPT(5) __ATTR_IN_OPT(3),error_t,__NOTHROW_NCX,__argz_replace,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str, char const *__restrict __with, unsigned int *__restrict __replace_count),argz_replace,(__pargz,__pargz_len,__str,__with,__replace_count))
 #elif defined(__CRT_HAVE___argz_replace)
@@ -841,7 +841,7 @@ __CREDIRECT(__ATTR_IN(4) __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_INOUT_OPT(5) __A
  * the given `replace_count' is incremented by one (if `replace_count' is non-NULL)
  * @return: 0:      Success
  * @return: ENOMEM: Insufficient heap memory (can only happen when `strlen(with) > strlen(str)',
- *                  but  note  that  the GLibc  implementation  of this  function  is completely
+ *                  but  note  that  the Glibc  implementation  of this  function  is completely
  *                  unreadable and may be able to return this for other cases as well...) */
 __CDECLARE(__ATTR_IN(4) __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_INOUT_OPT(5) __ATTR_IN_OPT(3),error_t,__NOTHROW_NCX,__argz_replace,(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str, char const *__restrict __with, unsigned int *__restrict __replace_count),(__pargz,__pargz_len,__str,__with,__replace_count))
 #elif (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free))
@@ -852,7 +852,7 @@ __CDECLARE(__ATTR_IN(4) __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_INOUT_OPT(5) __AT
  * the given `replace_count' is incremented by one (if `replace_count' is non-NULL)
  * @return: 0:      Success
  * @return: ENOMEM: Insufficient heap memory (can only happen when `strlen(with) > strlen(str)',
- *                  but  note  that  the GLibc  implementation  of this  function  is completely
+ *                  but  note  that  the Glibc  implementation  of this  function  is completely
  *                  unreadable and may be able to return this for other cases as well...) */
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(4) __ATTR_INOUT(1) __ATTR_INOUT(2) __ATTR_INOUT_OPT(5) __ATTR_IN_OPT(3) error_t __NOTHROW_NCX(__LIBCCALL __argz_replace)(char **__restrict __pargz, size_t *__restrict __pargz_len, char const *__restrict __str, char const *__restrict __with, unsigned int *__restrict __replace_count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(argz_replace))(__pargz, __pargz_len, __str, __with, __replace_count); }
 #endif /* ... */
@@ -870,7 +870,7 @@ extern "C++" {
  * >> for (entry = argz_len ? argz : NULL; entry != NULL;
  * >>      entry = argz_next(argz, argz_len, entry))
  * >>     handle_entry(my_entry);
- * Note  that  GLibc documents  the second  usage  case slightly  different, and
+ * Note  that  Glibc documents  the second  usage  case slightly  different, and
  * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
  * thus assuming that an empty argz-string (i.e. `argz_len == 0') always has its
  * base pointer set to `NULL'  (which isn't something consistently enforced,  or
@@ -894,7 +894,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_IN_OPT(3) __ATTR_
  * >> for (entry = argz_len ? argz : NULL; entry != NULL;
  * >>      entry = argz_next(argz, argz_len, entry))
  * >>     handle_entry(my_entry);
- * Note  that  GLibc documents  the second  usage  case slightly  different, and
+ * Note  that  Glibc documents  the second  usage  case slightly  different, and
  * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
  * thus assuming that an empty argz-string (i.e. `argz_len == 0') always has its
  * base pointer set to `NULL'  (which isn't something consistently enforced,  or
@@ -920,7 +920,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_IN_OPT(3) __ATTR_
  * >> for (entry = argz_len ? argz : NULL; entry != NULL;
  * >>      entry = argz_next(argz, argz_len, entry))
  * >>     handle_entry(my_entry);
- * Note  that  GLibc documents  the second  usage  case slightly  different, and
+ * Note  that  Glibc documents  the second  usage  case slightly  different, and
  * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
  * thus assuming that an empty argz-string (i.e. `argz_len == 0') always has its
  * base pointer set to `NULL'  (which isn't something consistently enforced,  or
@@ -948,7 +948,7 @@ extern "C++" {
  * >> for (entry = argz_len ? argz : NULL; entry != NULL;
  * >>      entry = argz_next(argz, argz_len, entry))
  * >>     handle_entry(my_entry);
- * Note  that  GLibc documents  the second  usage  case slightly  different, and
+ * Note  that  Glibc documents  the second  usage  case slightly  different, and
  * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
  * thus assuming that an empty argz-string (i.e. `argz_len == 0') always has its
  * base pointer set to `NULL'  (which isn't something consistently enforced,  or
@@ -972,7 +972,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_IN_OPT(3) __ATTR_
  * >> for (entry = argz_len ? argz : NULL; entry != NULL;
  * >>      entry = argz_next(argz, argz_len, entry))
  * >>     handle_entry(my_entry);
- * Note  that  GLibc documents  the second  usage  case slightly  different, and
+ * Note  that  Glibc documents  the second  usage  case slightly  different, and
  * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
  * thus assuming that an empty argz-string (i.e. `argz_len == 0') always has its
  * base pointer set to `NULL'  (which isn't something consistently enforced,  or
@@ -998,7 +998,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_IN_OPT(3) __ATTR_
  * >> for (entry = argz_len ? argz : NULL; entry != NULL;
  * >>      entry = argz_next(argz, argz_len, entry))
  * >>     handle_entry(my_entry);
- * Note  that  GLibc documents  the second  usage  case slightly  different, and
+ * Note  that  Glibc documents  the second  usage  case slightly  different, and
  * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
  * thus assuming that an empty argz-string (i.e. `argz_len == 0') always has its
  * base pointer set to `NULL'  (which isn't something consistently enforced,  or
@@ -1027,7 +1027,7 @@ extern "C++" {
  * >> for (entry = argz_len ? argz : NULL; entry != NULL;
  * >>      entry = argz_next(argz, argz_len, entry))
  * >>     handle_entry(my_entry);
- * Note  that  GLibc documents  the second  usage  case slightly  different, and
+ * Note  that  Glibc documents  the second  usage  case slightly  different, and
  * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
  * thus assuming that an empty argz-string (i.e. `argz_len == 0') always has its
  * base pointer set to `NULL'  (which isn't something consistently enforced,  or
@@ -1051,7 +1051,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATT
  * >> for (entry = argz_len ? argz : NULL; entry != NULL;
  * >>      entry = argz_next(argz, argz_len, entry))
  * >>     handle_entry(my_entry);
- * Note  that  GLibc documents  the second  usage  case slightly  different, and
+ * Note  that  Glibc documents  the second  usage  case slightly  different, and
  * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
  * thus assuming that an empty argz-string (i.e. `argz_len == 0') always has its
  * base pointer set to `NULL'  (which isn't something consistently enforced,  or
@@ -1077,7 +1077,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATT
  * >> for (entry = argz_len ? argz : NULL; entry != NULL;
  * >>      entry = argz_next(argz, argz_len, entry))
  * >>     handle_entry(my_entry);
- * Note  that  GLibc documents  the second  usage  case slightly  different, and
+ * Note  that  Glibc documents  the second  usage  case slightly  different, and
  * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
  * thus assuming that an empty argz-string (i.e. `argz_len == 0') always has its
  * base pointer set to `NULL'  (which isn't something consistently enforced,  or
@@ -1106,7 +1106,7 @@ extern "C++" {
  * >> for (entry = argz_len ? argz : NULL; entry != NULL;
  * >>      entry = argz_next(argz, argz_len, entry))
  * >>     handle_entry(my_entry);
- * Note  that  GLibc documents  the second  usage  case slightly  different, and
+ * Note  that  Glibc documents  the second  usage  case slightly  different, and
  * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
  * thus assuming that an empty argz-string (i.e. `argz_len == 0') always has its
  * base pointer set to `NULL'  (which isn't something consistently enforced,  or
@@ -1130,7 +1130,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_IN_OPT(3) __ATTR_
  * >> for (entry = argz_len ? argz : NULL; entry != NULL;
  * >>      entry = argz_next(argz, argz_len, entry))
  * >>     handle_entry(my_entry);
- * Note  that  GLibc documents  the second  usage  case slightly  different, and
+ * Note  that  Glibc documents  the second  usage  case slightly  different, and
  * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
  * thus assuming that an empty argz-string (i.e. `argz_len == 0') always has its
  * base pointer set to `NULL'  (which isn't something consistently enforced,  or
@@ -1156,7 +1156,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_IN_OPT(3) __ATTR_
  * >> for (entry = argz_len ? argz : NULL; entry != NULL;
  * >>      entry = argz_next(argz, argz_len, entry))
  * >>     handle_entry(my_entry);
- * Note  that  GLibc documents  the second  usage  case slightly  different, and
+ * Note  that  Glibc documents  the second  usage  case slightly  different, and
  * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
  * thus assuming that an empty argz-string (i.e. `argz_len == 0') always has its
  * base pointer set to `NULL'  (which isn't something consistently enforced,  or
@@ -1184,7 +1184,7 @@ extern "C++" {
  * >> for (entry = argz_len ? argz : NULL; entry != NULL;
  * >>      entry = argz_next(argz, argz_len, entry))
  * >>     handle_entry(my_entry);
- * Note  that  GLibc documents  the second  usage  case slightly  different, and
+ * Note  that  Glibc documents  the second  usage  case slightly  different, and
  * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
  * thus assuming that an empty argz-string (i.e. `argz_len == 0') always has its
  * base pointer set to `NULL'  (which isn't something consistently enforced,  or
@@ -1208,7 +1208,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_IN_OPT(3) __ATTR_
  * >> for (entry = argz_len ? argz : NULL; entry != NULL;
  * >>      entry = argz_next(argz, argz_len, entry))
  * >>     handle_entry(my_entry);
- * Note  that  GLibc documents  the second  usage  case slightly  different, and
+ * Note  that  Glibc documents  the second  usage  case slightly  different, and
  * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
  * thus assuming that an empty argz-string (i.e. `argz_len == 0') always has its
  * base pointer set to `NULL'  (which isn't something consistently enforced,  or
@@ -1234,7 +1234,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATTR_IN_OPT(3) __ATTR_
  * >> for (entry = argz_len ? argz : NULL; entry != NULL;
  * >>      entry = argz_next(argz, argz_len, entry))
  * >>     handle_entry(my_entry);
- * Note  that  GLibc documents  the second  usage  case slightly  different, and
+ * Note  that  Glibc documents  the second  usage  case slightly  different, and
  * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
  * thus assuming that an empty argz-string (i.e. `argz_len == 0') always has its
  * base pointer set to `NULL'  (which isn't something consistently enforced,  or
@@ -1263,7 +1263,7 @@ extern "C++" {
  * >> for (entry = argz_len ? argz : NULL; entry != NULL;
  * >>      entry = argz_next(argz, argz_len, entry))
  * >>     handle_entry(my_entry);
- * Note  that  GLibc documents  the second  usage  case slightly  different, and
+ * Note  that  Glibc documents  the second  usage  case slightly  different, and
  * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
  * thus assuming that an empty argz-string (i.e. `argz_len == 0') always has its
  * base pointer set to `NULL'  (which isn't something consistently enforced,  or
@@ -1287,7 +1287,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATT
  * >> for (entry = argz_len ? argz : NULL; entry != NULL;
  * >>      entry = argz_next(argz, argz_len, entry))
  * >>     handle_entry(my_entry);
- * Note  that  GLibc documents  the second  usage  case slightly  different, and
+ * Note  that  Glibc documents  the second  usage  case slightly  different, and
  * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
  * thus assuming that an empty argz-string (i.e. `argz_len == 0') always has its
  * base pointer set to `NULL'  (which isn't something consistently enforced,  or
@@ -1313,7 +1313,7 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INS(1, 2) __ATT
  * >> for (entry = argz_len ? argz : NULL; entry != NULL;
  * >>      entry = argz_next(argz, argz_len, entry))
  * >>     handle_entry(my_entry);
- * Note  that  GLibc documents  the second  usage  case slightly  different, and
+ * Note  that  Glibc documents  the second  usage  case slightly  different, and
  * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
  * thus assuming that an empty argz-string (i.e. `argz_len == 0') always has its
  * base pointer set to `NULL'  (which isn't something consistently enforced,  or

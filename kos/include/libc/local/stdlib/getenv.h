@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3c40af9 */
+/* HASH CRC-32:0x89d648f6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,7 +99,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getenv))(char const *__varname) {
 		 * the first 2 characters from the environ-string against the
 		 * expected pattern based on the caller's `varname'.
 		 *
-		 * As far as portability goes, gLibc makes the same assumption. */
+		 * As far as portability goes, Glibc makes the same assumption. */
 		if __unlikely(!__namelen) {
 			__result = __NULLPTR;
 		} else {

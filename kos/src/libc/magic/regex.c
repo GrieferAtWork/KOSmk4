@@ -319,7 +319,7 @@ typedef enum {
 typedef __reg_syntax_t reg_syntax_t; /* Set of `RE_*' (see below) */
 #endif /* __CC__ */
 
-/* GLibc-compatible regex syntax flags */
+/* Glibc-compatible regex syntax flags */
 /* '\' can be used to escape characters in sets: '[a\[\]\-]' */
 #if !defined(RE_BACKSLASH_ESCAPE_IN_LISTS) && defined(__RE_BACKSLASH_ESCAPE_IN_LISTS)
 #define RE_BACKSLASH_ESCAPE_IN_LISTS __RE_BACKSLASH_ESCAPE_IN_LISTS

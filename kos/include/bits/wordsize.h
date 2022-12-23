@@ -20,7 +20,7 @@
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/bits/wordsize.h) */
 /* (#) Portability: GNU C Library (/bits/wordsize.h) */
 #ifndef __WORDSIZE
-/* NOTE: This file must _always_ be kept for GLibc compatibility! */
+/* NOTE: This file must _always_ be kept for Glibc compatibility! */
 
 #include <hybrid/typecore.h>
 

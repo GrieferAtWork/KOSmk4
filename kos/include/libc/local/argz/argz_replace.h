@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60546d47 */
+/* HASH CRC-32:0x38af55fa */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -137,19 +137,19 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_replace))(char **__restrict __pa
 		return 0; /* no-op */
 	__repllen = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__with);
 	__find_offset = 0;
-	/* I have no  idea what the  GLibc implementation does  here, and I'm  not
+	/* I have no  idea what the  Glibc implementation does  here, and I'm  not
 	 * quite sure it  knows either.  - At first  I though  that this  function
 	 * was supposed to  only replace  entries of  an argz-string  as a  whole,
 	 * but now I  believe it's just  supposed to do  replacement of any  match
-	 * found.  However, GLibc appears to be utterly afraid of using `memmem()'
+	 * found.  However, Glibc appears to be utterly afraid of using `memmem()'
 	 * for  this,  and instead  opt's to  using  `argz_next()' to  iterate the
 	 * argz-vector, and doing  `strstr()' on each  element, before doing  some
 	 * dark  voodoo magic  with `strndup()',  temporary buffers,  and god only
 	 * knows why  there are  even delayed  calls to  `argz_add()' in  there???
-	 * If  this implementation doesn't do exactly what GLibc does, don't fault
-	 * me.  Every  function in  this file  was originally  created as  a GLibc
+	 * If  this implementation doesn't do exactly what Glibc does, don't fault
+	 * me.  Every  function in  this file  was originally  created as  a Glibc
 	 * extension, so there really isn't any official documentation on intended
-	 * behavior other than GLibc reference implementation.
+	 * behavior other than Glibc reference implementation.
 	 * Anyways... At least my version is readable... */
 	while (__find_offset < *__pargz_len) {
 		char *__pos;

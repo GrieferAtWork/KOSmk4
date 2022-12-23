@@ -4331,7 +4331,7 @@ PRIVATE ATTR_PURE WUNUSED NONNULL((1)) void const *
 NOTHROW(FCALL driver_get_dbase)(struct driver const *__restrict self) {
 #if defined(__i386__) && !defined(__x86_64__)
 	/* Special case for data-base on i386:
-	 * For reference, see glibc: `/sysdeps/generic/unwind-dw2-fde-glibc.c' */
+	 * For reference, see Glibc: `/sysdeps/generic/unwind-dw2-fde-glibc.c' */
 	size_t i;
 	for (i = 0; i < self->d_dyncnt; ++i) {
 		if (self->d_dynhdr[i].d_tag == DT_PLTGOT) {

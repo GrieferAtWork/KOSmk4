@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5facaba */
+/* HASH CRC-32:0x9341add3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -541,12 +541,12 @@ INTDEF void NOTHROW_NCX(LIBDCALL libd_funlockfile)(FILE *__restrict stream);
  * @return: != 0 : Failed to acquire lock */
 INTDEF WUNUSED ATTR_INOUT(1) int NOTHROW_NCX(LIBDCALL libd_ftrylockfile)(FILE *__restrict stream);
 /* >> __overflow(3)
- * This is essentially gLibc's version of `_flsbuf(3)' (but sadly not binary compatible) */
+ * This is essentially Glibc's version of `_flsbuf(3)' (but sadly not binary compatible) */
 INTDEF ATTR_INOUT(1) int (LIBDCALL libd___overflow)(FILE *stream, int ch) THROWS(...);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 /* >> __overflow(3)
- * This is essentially gLibc's version of `_flsbuf(3)' (but sadly not binary compatible) */
+ * This is essentially Glibc's version of `_flsbuf(3)' (but sadly not binary compatible) */
 INTDEF ATTR_INOUT(1) int (LIBCCALL libc___overflow)(FILE *stream, int ch) THROWS(...);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

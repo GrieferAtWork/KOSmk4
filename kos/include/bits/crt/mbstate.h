@@ -30,16 +30,16 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 struct __mbstate {
 #ifdef __CRT_GLC_PRIMARY
-	/* Under native gLibc, this structure is 8 bytes large. */
+	/* Under native Glibc, this structure is 8 bytes large. */
 	union {
 		__UINT32_TYPE__ __mb_word; /* Used by KOS auxillary functions.
 		                            * Share offset with  `__count' so  that when  `__count == 0',
 		                            * our custom `__mbstate_isempty()' still indicates correctly. */
-		int __count; /* Used by gLibc */
+		int __count; /* Used by Glibc */
 	};
 	union {
-		__WINT_TYPE__ __wch; /* Used by gLibc */
-		char __wchb[4];      /* Used by gLibc */
+		__WINT_TYPE__ __wch; /* Used by Glibc */
+		char __wchb[4];      /* Used by Glibc */
 	} __value;
 #else /* __CRT_GLC_PRIMARY */
 	/* This structure  must not  exceed  4 bytes,  so  we

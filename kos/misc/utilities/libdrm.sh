@@ -26,7 +26,7 @@ PACKAGE_URL="https://dri.freedesktop.org/libdrm/libdrm-2.4.100.tar.gz"
 
 #Hacks:
 # - "-fcommon":                error "multiple definition of `nouveau_debug';"
-# - "-D_GLIBC_BLOAT_SOURCE=1": relies <pthread.h> including <time.h> (as it does in glibc)
+# - "-D_GLIBC_BLOAT_SOURCE=1": relies <pthread.h> including <time.h> (as it does in Glibc)
 PACKAGE_CCFLAGS="-fcommon -D_GLIBC_BLOAT_SOURCE=1"
 
 # Automatically build+install using autoconf

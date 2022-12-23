@@ -34,7 +34,7 @@ struct iovec;
 #define RE_EXEC_NOTBOL 0x0001 /* '^' (REOP_AT_SOL) doesn't match at the start of the input buffer (but only at an actual begin-of-line) */
 #define RE_EXEC_NOTEOL 0x0002 /* '$' (REOP_AT_EOL) doesn't match at the end of the input buffer (but only before an actual line-feed) */
 
-/* *sigh* this has to be an int for glibc compat (but it should have been a `size_t')
+/* *sigh* this has to be an int for Glibc compat (but it should have been a `size_t')
  * NOTE: When nothing got matched for some given group, set to `RE_REGOFF_UNSET'. */
 typedef unsigned int re_regoff_t;
 typedef int re_sregoff_t;

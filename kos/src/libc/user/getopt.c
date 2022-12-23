@@ -34,7 +34,9 @@
 
 DECL_BEGIN
 
-/* DISCLAIMER: The implementation in this file is derived from that of glibc. */
+/* DISCLAIMER: The implementation in this file is derived from that of Glibc. */
+/* TODO: Write KOS its own getopt(3) implementation (instead of copying one) */
+
 /* Getopt for GNU.
    Copyright (C) 1987-2017 Free Software Foundation, Inc.
    This file is part of the GNU C Library and is also part of gnulib.

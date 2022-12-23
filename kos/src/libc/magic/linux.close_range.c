@@ -35,7 +35,7 @@
 __SYSDECL_BEGIN
 
 /*
- * Linux doesn't normally define this function here (and gLibc doesn't actually export it by-name),
+ * Linux doesn't normally define this function here (and Glibc doesn't actually export it by-name),
  * but  3rd party programs exist that already make  use of this function (*cough* glib) and somehow
  * expect this function to magically appear from out-of-nowhere
  *
@@ -43,7 +43,7 @@ __SYSDECL_BEGIN
  * it here since programs that include this header /probably/ will also want to use this function...
  *
  * Also note that <unistd.h> includes this header under __USE_GNU (even though like already stated,
- * gLibc doesn't actually expose this function yet). The reason we do this is once again 3rd  party
+ * Glibc doesn't actually expose this function yet). The reason we do this is once again 3rd  party
  * program compatibility.
  *
  * For some reason, glib expects (in "glib/gspawn.c") that both `CLOSE_RANGE_CLOEXEC' and `close_range'

@@ -1,7 +1,7 @@
 
 ### Missing functions (ABI)
 
-- GLibc:
+- Glibc:
 	- Misc:
 		- `__register_atfork()`
 		- `inotify_add_watch()`
@@ -124,8 +124,8 @@
 
 ### Missing headers
 
-- `<a.out.h>`               (GLibc!)
-- `<argp.h>`                (GLibc!)
+- `<a.out.h>`               (Glibc!)
+- `<argp.h>`                (Glibc!)
 - `<bsd/netinet/ip_icmp.h>` (libbsd)
 - `<bsd/md5.h>`             (libbsd)
 - `<bsd/sys/tree.h>`        (libbsd)
@@ -133,12 +133,12 @@
 - `<bsd/vis.h>`             (libbsd)
 - `<corecrt_share.h>`       (DOS)
 - `<corecrt_terminate.h>`   (DOS)
-- `<fmtmsg.h>`              (GLibc!)
-- `<gshadow.h>`             (GLibc!)
-- `<mcheck.h>`              (GLibc!)
-- `<regexp.h>`              (GLibc!)
+- `<fmtmsg.h>`              (Glibc!)
+- `<gshadow.h>`             (Glibc!)
+- `<mcheck.h>`              (Glibc!)
+- `<regexp.h>`              (Glibc!)
 - `<share.h>`               (DOS)
-- `<stab.h>`                (GLibc!)
+- `<stab.h>`                (Glibc!)
 - `<sys/fanotify.h>`        (linux)
 - `<sys/gmon.h>`            (linux)
 - `<sys/gmon_out.h>`        (linux: Only some macros, and structs)
@@ -157,7 +157,7 @@
 - `<sys/va_list.h>`         (OpenSolaris)
 - `<sys/varargs.h>`         (OpenSolaris)
 - `<timeconv.h>`            (libbsd)
-- `<thread_db.h>`           (GLibc!)
+- `<thread_db.h>`           (Glibc!)
 - libiberty:
 	- `<libiberty/fibheap.h>`
 	- `<libiberty/floatformat.h>`
@@ -178,10 +178,10 @@
 - `<libiberty/demangle.h>`
 - `<nlist.h>`              (libbsd)
 - `<bsd/nlist.h>`          (libbsd)
-- `<_G_config.h>`          (GLibc!)
-- `<gconv.h>`              (GLibc!)
-- `<nss.h>`                (GLibc!)
-- `<printf.h>`             (GLibc!)
+- `<_G_config.h>`          (Glibc!)
+- `<gconv.h>`              (Glibc!)
+- `<nss.h>`                (Glibc!)
+- `<printf.h>`             (Glibc!)
 - `<rpc/auth.h>`
 - `<rpc/auth_des.h>`
 - `<rpc/auth_unix.h>`

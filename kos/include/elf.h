@@ -54,9 +54,9 @@
 #include <bits/elf.h>
 #endif /* __USE_KOS */
 
-/* The contents of this file  were originally based on GLibc  /usr/include/elf.h
+/* The contents of this file  were originally based on Glibc  /usr/include/elf.h
  * Note however that heavy additions were made and more documentation was added,
- * meaning  that  the   original  should  be   retrieved  from  GLibc   instead.
+ * meaning  that  the   original  should  be   retrieved  from  Glibc   instead.
  * Additional sources:
  *  - https://docs.oracle.com/cd/E19253-01/817-1984/chapter6-14428/index.html
  *  - GNU Binutils (internal headers)

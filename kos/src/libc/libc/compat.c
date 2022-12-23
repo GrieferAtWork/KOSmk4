@@ -187,7 +187,7 @@ FILE **NOTHROW(LIBDCALL libc_resolve_stdtty)(void) {
 
 
 /************************************************************************/
-/* Old glibc stdio compat                                               */
+/* Old Glibc stdio compat                                               */
 /************************************************************************/
 
 /* NOTE: The `84' relates to the expected 32-bit struct size */
@@ -983,7 +983,7 @@ uint32_t const libc___huge_val[2] = {
 
 
 /************************************************************************/
-/* Misc gLibc functions that don't appear in headers                    */
+/* Misc Glibc functions that don't appear in headers                    */
 /************************************************************************/
 DEFINE_PUBLIC_ALIAS(create_module, libc_create_module);
 INTERN ATTR_SECTION(".text.crt.compat.glibc") caddr_t
@@ -1087,7 +1087,7 @@ NOTHROW_NCX(LIBCCALL libc_getdents)(fd_t fd, struct linux_dirent *buf, size_t co
 
 /* At  least that's the  one I've been  using for ABI reference.
  * Note however that KOS's libc _is_ providing various functions
- * that have since been removed from gLibc, meaning that this is
+ * that have since been removed from Glibc, meaning that this is
  * really kind-of meaningless in terms of information... */
 INTDEF char const libc_gnu_libc_version_full[];
 INTDEF char const libc_gnu_nptl_version_full[];

@@ -57,13 +57,13 @@ DECL_BEGIN
  * from libdl (though excluding the function we need to fill in that
  * table, which is `dlsym(3D)')
  *
- * The  reason we do  this because on  most architectures, each jump
- * relocation will require  some form of  initialization to be  done
- * by libdl during _every_ _single_ _initialization_ of the  library
- * in question. And while glibc and  the like couldn't give less  of
- * a ra7'5 a$$ about the performance impact this has on the  startup
- * time of practically any application  on the system (since  pretty
- * much all applications are linked against libc), I personally _do_
+ * The reason we do this  because on most architectures, each  jump
+ * relocation will require some form  of initialization to be  done
+ * by libdl during _every_ _single_ _initialization_ of the library
+ * in question. And while Glibc and the like couldn't give less  of
+ * a ra7'5 a$$ about the performance impact this has on the startup
+ * time of practically any application on the system (since  pretty
+ * much all applications are linked  against libc), I for one  _do_
  * care.
  *
  * So any lazy relocation against  functions from libdl is  replaced

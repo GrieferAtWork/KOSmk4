@@ -181,7 +181,7 @@
  *
  *  - MSVC-style control for "%n" (s.a. `_set_printf_count_output(3)'; defaults to enabled)
  *
- *  - gLibc-style "%m" (print string returned by `strerror(errno)')
+ *  - Glibc-style "%m" (print string returned by `strerror(errno)')
  *
  *  - Positional arguments: printf("<%4$d %3$d %2$d %1$d>", 10, 20, 30, 40); // "<40 30 20 10>"
  *    Including support for using them as flexible width/precision:

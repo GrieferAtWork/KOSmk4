@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb5ec56f */
+/* HASH CRC-32:0xb2bf4bbe */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -150,7 +150,7 @@ typedef struct sigevent sigevent_t;
  * >>             result = -sys_rt_sigqueueinfo(info.si_pid, info.si_signo, &info);
  * >>         } else {
  * >>             // PORTABILITY WARNING: Support for this case isn't implemented by
- * >>             //                      gLibc, which only supports `SIGEV_SIGNAL'!
+ * >>             //                      Glibc, which only supports `SIGEV_SIGNAL'!
  * >>             result = -sys_rt_tgsigqueueinfo(info.si_pid, ev->_sigev_tid,
  * >>                                             info.si_signo, &info);
  * >>         }

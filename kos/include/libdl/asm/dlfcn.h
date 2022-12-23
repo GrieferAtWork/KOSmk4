@@ -88,12 +88,12 @@ __DECL_BEGIN
 #endif /* __KOS_VERSION__ < 400 */
 #endif /* __KOS__ || __CRT_KOS || (__KOS__ && __BUILDING_LIBDL) */
 
-/* Stuff from GLibc that also exist under KOS */
+/* Stuff from Glibc that also exist under KOS */
 #define __CRT_HAVE_dladdr
 #define __CRT_HAVE_dl_iterate_phdr
 #define __CRT_HAVE_dlinfo
 
-/* Stuff from GLibc that doesn't exist under KOS (for now...) */
+/* Stuff from Glibc that doesn't exist under KOS (for now...) */
 #if !defined(__KOS__) && !defined(__CRT_KOS)
 #define __Lmid_t      __LONGPTR_TYPE__
 #define __LM_ID_BASE  0    /* Initial namespace. */
@@ -108,14 +108,14 @@ __DECL_BEGIN
 #ifdef __CRT_HAVE_dlinfo
 #define __RTLD_DI_LMID        1  /* Unsupported on KOS */
 #define __RTLD_DI_LINKMAP     2  /* [struct link_map **arg] -- *arg = GET_LINK_MAP_FOR(handle) (on KOS: this is the same as `handle') */
-#define __RTLD_DI_CONFIGADDR  3  /* [Dl_info *arg] Fill in `dli_fname' (module filename) and `dli_fbase' (module start address; NOT load address! Unsupported by gLibc!) */
+#define __RTLD_DI_CONFIGADDR  3  /* [Dl_info *arg] Fill in `dli_fname' (module filename) and `dli_fbase' (module start address; NOT load address! Unsupported by Glibc!) */
 #define __RTLD_DI_SERINFO     4  /* [Dl_serinfo *arg] Return search path information */
 #define __RTLD_DI_SERINFOSIZE 5  /* [Dl_serinfo *arg] Like `__RTLD_DI_SERINFO', but only fill in `dls_size' and `dls_cnt' */
 #define __RTLD_DI_ORIGIN      6  /* [char *arg] strcpy() the `$ORIGIN' of this module (WARNING: UNBOUNDED BUFFER COPY) */
-#define __RTLD_DI_PROFILENAME 7  /* Unsupported on KOS (and neither supported by gLibc) */
-#define __RTLD_DI_PROFILEOUT  8  /* Unsupported on KOS (and neither supported by gLibc) */
+#define __RTLD_DI_PROFILENAME 7  /* Unsupported on KOS (and neither supported by Glibc) */
+#define __RTLD_DI_PROFILEOUT  8  /* Unsupported on KOS (and neither supported by Glibc) */
 #if defined(__KOS__) || defined(__CRT_GLC)
-/* linux / gLibc */
+/* linux / Glibc */
 #define __RTLD_DI_TLS_MODID   9  /* [size_t *arg] Store TLS module id (on KOS: this is the same as `handle') */
 #define __RTLD_DI_TLS_DATA    10 /* [void **arg] Same as `dltlsaddr(3)', but don't allocate TLS if not already done -- Writes NULL if not allocated or no PT_TLS segment */
 #define __RTLD_DI_MAX         10

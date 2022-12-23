@@ -360,158 +360,139 @@
 #endif /* __USE_GNU */
 
 
-/* DISCLAIMER: Documentation  strings for MADV_*, POSIX_MADV_* and MCL_* were
- *             taken from glibc /usr/include/i386-linux-gnu/bits/mman-linux.h */
-/* Definitions for POSIX memory map interface.  Linux generic version.
-   Copyright (C) 2001-2016 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
-
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public
-   License as published by the Free Software Foundation; either
-   version 2.1 of the License, or (at your option) any later version.
-
-   The GNU C Library is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   Lesser General Public License for more details.
-
-   You should have received a copy of the GNU Lesser General Public
-   License along with the GNU C Library; if not, see
-   <http://www.gnu.org/licenses/>.  */
-
-
 /************************************************************************/
 /* Advice to `madvise(2)'.                                              */
 /************************************************************************/
 #ifdef __USE_MISC
-/* No further special treatment. */
+/* ??? */
 #if !defined(MADV_NORMAL) && defined(__MADV_NORMAL)
 #define MADV_NORMAL __MADV_NORMAL
 #endif /* !MADV_NORMAL && __MADV_NORMAL */
 
-/* Expect random page references. */
+/* ??? */
 #if !defined(MADV_RANDOM) && defined(__MADV_RANDOM)
 #define MADV_RANDOM __MADV_RANDOM
 #endif /* !MADV_RANDOM && __MADV_RANDOM */
 
-/* Expect sequential page references. */
+/* ??? */
 #if !defined(MADV_SEQUENTIAL) && defined(__MADV_SEQUENTIAL)
 #define MADV_SEQUENTIAL __MADV_SEQUENTIAL
 #endif /* !MADV_SEQUENTIAL && __MADV_SEQUENTIAL */
 
-/* Will need these pages. */
+/* ??? */
 #if !defined(MADV_WILLNEED) && defined(__MADV_WILLNEED)
 #define MADV_WILLNEED __MADV_WILLNEED
 #endif /* !MADV_WILLNEED && __MADV_WILLNEED */
 
-/* Don't need these pages. */
+/* ??? */
 #if !defined(MADV_DONTNEED) && defined(__MADV_DONTNEED)
 #define MADV_DONTNEED __MADV_DONTNEED
 #endif /* !MADV_DONTNEED && __MADV_DONTNEED */
 
-/* Remove these pages and resources. */
+/* ??? */
 #if !defined(MADV_REMOVE) && defined(__MADV_REMOVE)
 #define MADV_REMOVE __MADV_REMOVE
 #endif /* !MADV_REMOVE && __MADV_REMOVE */
 
-/* Do not inherit across fork. */
+/* ??? */
 #if !defined(MADV_DONTFORK) && defined(__MADV_DONTFORK)
 #define MADV_DONTFORK __MADV_DONTFORK
 #endif /* !MADV_DONTFORK && __MADV_DONTFORK */
 
-/* Do inherit across fork. */
+/* ??? */
 #if !defined(MADV_DOFORK) && defined(__MADV_DOFORK)
 #define MADV_DOFORK __MADV_DOFORK
 #endif /* !MADV_DOFORK && __MADV_DOFORK */
 
-/* KSM may merge identical pages. */
+/* ??? */
 #if !defined(MADV_MERGEABLE) && defined(__MADV_MERGEABLE)
 #define MADV_MERGEABLE __MADV_MERGEABLE
 #endif /* !MADV_MERGEABLE && __MADV_MERGEABLE */
 
-/* KSM may not merge identical pages. */
+/* ??? */
 #if !defined(MADV_UNMERGEABLE) && defined(__MADV_UNMERGEABLE)
 #define MADV_UNMERGEABLE __MADV_UNMERGEABLE
 #endif /* !MADV_UNMERGEABLE && __MADV_UNMERGEABLE */
 
-/* Worth backing with hugepages. */
+/* ??? */
 #if !defined(MADV_HUGEPAGE) && defined(__MADV_HUGEPAGE)
 #define MADV_HUGEPAGE __MADV_HUGEPAGE
 #endif /* !MADV_HUGEPAGE && __MADV_HUGEPAGE */
 
-/* Not worth backing with hugepages. */
+/* ??? */
 #if !defined(MADV_NOHUGEPAGE) && defined(__MADV_NOHUGEPAGE)
 #define MADV_NOHUGEPAGE __MADV_NOHUGEPAGE
 #endif /* !MADV_NOHUGEPAGE && __MADV_NOHUGEPAGE */
 
-/* Explicity exclude from the core dump, overrides the coredump filter bits. */
+/* ??? */
 #if !defined(MADV_DONTDUMP) && defined(__MADV_DONTDUMP)
 #define MADV_DONTDUMP __MADV_DONTDUMP
 #endif /* !MADV_DONTDUMP && __MADV_DONTDUMP */
 
-/* Clear the MADV_DONTDUMP flag. */
+/* ??? */
 #if !defined(MADV_DODUMP) && defined(__MADV_DODUMP)
 #define MADV_DODUMP __MADV_DODUMP
 #endif /* !MADV_DODUMP && __MADV_DODUMP */
 
-/* Poison a page for testing. */
+/* ??? */
 #if !defined(MADV_HWPOISON) && defined(__MADV_HWPOISON)
 #define MADV_HWPOISON __MADV_HWPOISON
 #endif /* !MADV_HWPOISON && __MADV_HWPOISON */
 #endif /* __USE_MISC */
 
 
+
 /************************************************************************/
-/* The POSIX people had to invent similar names for the same things.    */
+/* Advice to `posix_madvise(2)'.                                        */
 /************************************************************************/
 #ifdef __USE_XOPEN2K
-/* No further special treatment. */
+/* ??? */
 #if !defined(POSIX_MADV_NORMAL) && defined(__POSIX_MADV_NORMAL)
 #define POSIX_MADV_NORMAL __POSIX_MADV_NORMAL
 #endif /* !POSIX_MADV_NORMAL && __POSIX_MADV_NORMAL */
 
-/* Expect random page references. */
+/* ??? */
 #if !defined(POSIX_MADV_RANDOM) && defined(__POSIX_MADV_RANDOM)
 #define POSIX_MADV_RANDOM __POSIX_MADV_RANDOM
 #endif /* !POSIX_MADV_RANDOM && __POSIX_MADV_RANDOM */
 
-/* Expect sequential page references. */
+/* ??? */
 #if !defined(POSIX_MADV_SEQUENTIAL) && defined(__POSIX_MADV_SEQUENTIAL)
 #define POSIX_MADV_SEQUENTIAL __POSIX_MADV_SEQUENTIAL
 #endif /* !POSIX_MADV_SEQUENTIAL && __POSIX_MADV_SEQUENTIAL */
 
-/* Will need these pages. */
+/* ??? */
 #if !defined(POSIX_MADV_WILLNEED) && defined(__POSIX_MADV_WILLNEED)
 #define POSIX_MADV_WILLNEED __POSIX_MADV_WILLNEED
 #endif /* !POSIX_MADV_WILLNEED && __POSIX_MADV_WILLNEED */
 
-/* Don't need these pages. */
+/* ??? */
 #if !defined(POSIX_MADV_DONTNEED) && defined(__POSIX_MADV_DONTNEED)
 #define POSIX_MADV_DONTNEED __POSIX_MADV_DONTNEED
 #endif /* !POSIX_MADV_DONTNEED && __POSIX_MADV_DONTNEED */
 #endif /* __USE_XOPEN2K */
 
 
+
 /************************************************************************/
 /* Flags for `mlockall()'.                                              */
 /************************************************************************/
-#ifndef MCL_CURRENT
-/* Lock all currently mapped pages. */
+
+/* ??? */
 #if !defined(MCL_CURRENT) && defined(__MCL_CURRENT)
 #define MCL_CURRENT __MCL_CURRENT
 #endif /* !MCL_CURRENT && __MCL_CURRENT */
 
-/* Lock all additions to address space. */
+/* ??? */
 #if !defined(MCL_FUTURE) && defined(__MCL_FUTURE)
 #define MCL_FUTURE __MCL_FUTURE
 #endif /* !MCL_FUTURE && __MCL_FUTURE */
 
-/* Lock all pages that are faulted in. */
+/* Delegate population of locked memory until the first access. */
 #if !defined(MCL_ONFAULT) && defined(__MCL_ONFAULT)
 #define MCL_ONFAULT __MCL_ONFAULT
 #endif /* !MCL_ONFAULT && __MCL_ONFAULT */
-#endif /* !MCL_CURRENT */
+
 
 
 /************************************************************************/
@@ -550,6 +531,7 @@
 #if !defined(MLOCK_ONFAULT) && defined(__MLOCK_ONFAULT)
 #define MLOCK_ONFAULT __MLOCK_ONFAULT
 #endif /* !MLOCK_ONFAULT && __MLOCK_ONFAULT */
+
 
 
 /************************************************************************/

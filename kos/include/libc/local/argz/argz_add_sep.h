@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a5d78d3 */
+/* HASH CRC-32:0xffac5508 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,7 +84,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_add_sep))(char **__restrict __pa
 	if __unlikely(!__slen)
 		return 0;
 	__oldlen = *__pargz_len;
-	/* Note that GLibc actually has a bug here that causes it to write `NULL'
+	/* Note that Glibc actually has a bug here that causes it to write `NULL'
 	 * into  the given  `*pargz' pointer  when the  allocation fails, instead
 	 * of leaving that  pointer in  its original state  (allowing the  caller
 	 * to cleanup  the argz-array,  instead of  forcing the  array to  become

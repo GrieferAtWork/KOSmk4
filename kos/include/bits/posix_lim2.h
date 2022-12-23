@@ -20,7 +20,7 @@
 #ifndef _BITS_POSIX_LIM2_H
 #define _BITS_POSIX_LIM2_H 1
 
-/* NOTE: This file must _always_ be kept for GLibc compatibility! */
+/* NOTE: This file must _always_ be kept for Glibc compatibility! */
 
 #include "../features.h"
 

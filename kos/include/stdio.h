@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbdb0f34a */
+/* HASH CRC-32:0xcbed1a5e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3203,29 +3203,29 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),int,__NOTHROW_NCX,ftrylockfile,(__FIL
 #endif /* __USE_POSIX || __USE_REENTRANT */
 #ifdef __CRT_HAVE__filbuf
 /* >> __uflow(3)
- * This is essentially gLibc's version of `_filbuf(3)' (but sadly not binary compatible) */
+ * This is essentially Glibc's version of `_filbuf(3)' (but sadly not binary compatible) */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),int,__NOTHROW_NCX,__uflow,(__FILE *__stream),_filbuf,(__stream))
 #elif defined(__CRT_HAVE___uflow)
 /* >> __uflow(3)
- * This is essentially gLibc's version of `_filbuf(3)' (but sadly not binary compatible) */
+ * This is essentially Glibc's version of `_filbuf(3)' (but sadly not binary compatible) */
 __CDECLARE(__ATTR_WUNUSED __ATTR_INOUT(1),int,__NOTHROW_NCX,__uflow,(__FILE *__stream),(__stream))
 #elif defined(__CRT_HAVE___underflow)
 /* >> __uflow(3)
- * This is essentially gLibc's version of `_filbuf(3)' (but sadly not binary compatible) */
+ * This is essentially Glibc's version of `_filbuf(3)' (but sadly not binary compatible) */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),int,__NOTHROW_NCX,__uflow,(__FILE *__stream),__underflow,(__stream))
 #elif defined(__CRT_HAVE___srget)
 /* >> __uflow(3)
- * This is essentially gLibc's version of `_filbuf(3)' (but sadly not binary compatible) */
+ * This is essentially Glibc's version of `_filbuf(3)' (but sadly not binary compatible) */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),int,__NOTHROW_NCX,__uflow,(__FILE *__stream),__srget,(__stream))
 #endif /* ... */
 #ifdef __CRT_HAVE___overflow
 /* >> __overflow(3)
- * This is essentially gLibc's version of `_flsbuf(3)' (but sadly not binary compatible) */
+ * This is essentially Glibc's version of `_flsbuf(3)' (but sadly not binary compatible) */
 __CDECLARE(__ATTR_INOUT(1),int,__THROWING,__overflow,(__FILE *__stream, int __ch),(__stream,__ch))
 #elif defined(__CRT_HAVE__flsbuf) || defined(__CRT_HAVE___swbuf)
 #include <libc/local/stdio/__overflow.h>
 /* >> __overflow(3)
- * This is essentially gLibc's version of `_flsbuf(3)' (but sadly not binary compatible) */
+ * This is essentially Glibc's version of `_flsbuf(3)' (but sadly not binary compatible) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(__overflow, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) int (__LIBCCALL __overflow)(__FILE *__stream, int __ch) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__overflow))(__stream, __ch); })
 #endif /* ... */
 

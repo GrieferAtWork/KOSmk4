@@ -161,7 +161,7 @@ PRIVATE ATTR_SECTION(".text.crt.system.auxv") void LIBCCALL random_init(void) {
 }
 
 
-/* gLibc exports a symbol:
+/* Glibc exports a symbol:
  * >> extern int __libc_enable_secure;
  *
  * That is non-zero  if the program  was launched under  `AT_SECURE'

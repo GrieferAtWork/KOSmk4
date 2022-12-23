@@ -169,6 +169,6 @@
 
 #define __MCL_CURRENT 1 /* ??? */
 #define __MCL_FUTURE  2 /* ??? */
-#define __MCL_ONFAULT 4 /* ??? */
+#define __MCL_ONFAULT 4 /* Delegate population of locked memory until the first access. */
 
 #endif /* !_ASM_OS_KOS_MMAN_H */

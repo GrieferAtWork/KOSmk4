@@ -625,11 +625,11 @@ __NAMESPACE_STD_USING(size_t)
  * Annotations:
  *   [std]: The function is defined by the C standard
  *           - `memcpy()'
- *   [glc]: The function is also provided by GLibc, and is likely
+ *   [glc]: The function is also provided by Glibc, and is likely
  *          apart of some posix/unix standard
  *           - `rawmemchr()'
  *   [kos]: The function is kos-specific, or apart of a standard other than
- *          the C standard, or one  of the standards implemented by  GLibc.
+ *          the C standard, or one  of the standards implemented by  Glibc.
  *           - `strend()' - Not apart of any standard (that I know of) -> KOS-specific
  *           - `strlwr()' - Can also be found in DOS -> DOS-specific, but also provided by KOS
  */

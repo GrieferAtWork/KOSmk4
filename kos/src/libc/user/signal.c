@@ -195,7 +195,7 @@ NOTHROW(LIBCCALL libc___p_sys_siglist)(void)
 /*[[[end:libc___p_sys_siglist]]]*/
 
 
-/* Not (currently) exposed in headers,  but here for compatibility with  gLibc:
+/* Not (currently) exposed in headers,  but here for compatibility with  Glibc:
  * This is an array of strings that is similar to `sys_siglist', only that this
  * one points to the strings returned by `sigabbrev_np(3)'.
  *
@@ -204,7 +204,7 @@ NOTHROW(LIBCCALL libc___p_sys_siglist)(void)
  * >> printf("%s\n", sys_sigabbrev[SIGINT]); // "INT\n" */
 #undef sys_sigabbrev
 PRIVATE ATTR_SECTION(".bss.crt.errno.sys_siglist") char const *libc_sys_sigabbrev[NSIG] = { NULL };
-DEFINE_PUBLIC_IDATA(sys_sigabbrev, libc___p_sys_sigabbrev, NSIG * __SIZEOF_POINTER__); /* GLibc symbol (not defined in headers) */
+DEFINE_PUBLIC_IDATA(sys_sigabbrev, libc___p_sys_sigabbrev, NSIG * __SIZEOF_POINTER__); /* Glibc symbol (not defined in headers) */
 DEFINE_PUBLIC_IDATA(sys_signame, libc___p_sys_sigabbrev, NSIG * __SIZEOF_POINTER__);   /* FreeBSD symbol */
 
 INTERN ATTR_SECTION(".text.crt.errno.sys_siglist")
@@ -232,7 +232,7 @@ DEFINE_PUBLIC_ALIAS(sys_nsig, libc_sys_nsig);
 
 
 
-/* Weird function exported by  gLibc that's a (kind-of)  wrapper
+/* Weird function exported by  Glibc that's a (kind-of)  wrapper
  * around `sys_rt_sigqueueinfo(2)'. Seems related to <resolv.h>? */
 INTERN ATTR_SECTION(".text.crt.compat.glibc") int
 NOTHROW_NCX(LIBCCALL libc___gai_sigqueue)(signo_t signo,

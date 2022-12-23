@@ -25,7 +25,7 @@
 
 %{
 
-/* NOTE: This file must _always_ be kept for GLibc compatibility! */
+/* NOTE: This file must _always_ be kept for Glibc compatibility! */
 
 }%[insert:prefix(
 #include <features.h>

@@ -379,7 +379,7 @@ NOTHROW_NCX(LIBCCALL libc_glc_fstatat64)(fd_t dirfd,
 
 
 /************************************************************************/
-/* Compatibility for gLibc's mess of different stat structures...       */
+/* Compatibility for Glibc's mess of different stat structures...       */
 /************************************************************************/
 
 

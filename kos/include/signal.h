@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ae3258e */
+/* HASH CRC-32:0x6bd29451 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2469,7 +2469,7 @@ __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_sigqueue,(__pthread_t __pthread, __s
 #define SIGSET_INIT_FULL __SIGSET_INIT((__ULONGPTR_TYPE__)-1)
 #endif /* __USE_KOS */
 
-/* GLibc function aliases originally found in <bits/sigset.h>
+/* Glibc function aliases originally found in <bits/sigset.h>
  * Because these don't violate namespacing rules, and because
  * <bits/sigset.h> is included unconditionally, we also define
  * these unconditionally! */
@@ -2612,9 +2612,9 @@ __CEIDECLARE(__ATTR_INOUT(1),int,__NOTHROW_NCX,__sigdelset,(struct __sigset_stru
  *              Not returned by the kernel-version of this function! */
 __LOCAL __ATTR_INOUT(1) int __NOTHROW_NCX(__LIBCCALL __sigdelset)(struct __sigset_struct *__set, __signo_t __signo) { __ULONGPTR_TYPE__ __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] &= ~__mask; return 0; }
 #endif /* !... */
-/* These appear in glibc under these  names, however these names collide  with
+/* These appear in Glibc under these  names, however these names collide  with
  * some escapes in a couple of places, so only define them when we're supposed
- * to emulate glibc as closely as possible. */
+ * to emulate Glibc as closely as possible. */
 #ifdef __USE_GLIBC_BLOAT
 #undef __sigmask
 #undef __sigword

@@ -34,7 +34,7 @@
 #include <sys/user.h>
 
 
-/* This file is derived from GLibc /usr/include/i386-linux-gnu/sys/procfs.h */
+/* This file is derived from Glibc /usr/include/i386-linux-gnu/sys/procfs.h */
 /* Copyright (C) 2001-2016 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 

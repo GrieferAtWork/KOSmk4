@@ -21,7 +21,7 @@
 #ifndef _BITS_TIMEX_H
 #define _BITS_TIMEX_H 1
 
-/* NOTE: This file must _always_ be kept for GLibc compatibility! */
+/* NOTE: This file must _always_ be kept for Glibc compatibility! */
 
 #include <__stdinc.h>
 

@@ -92,7 +92,7 @@
 %[declare_user_export("DOS$fstat", "DOS$fstat64")]
 %[declare_user_export("DOS$fstatat", "DOS$fstatat64")]
 
-/* GLibc's stat function family */
+/* Glibc's stat function family */
 %[declare_user_export("stat", "stat64")]
 %[declare_user_export("lstat", "lstat64")]
 %[declare_user_export("fstat", "fstat64")]
@@ -448,9 +448,9 @@ typedef __blksize_t blksize_t;
  * >> int CDECL [NEW: _fstat64i32](fd_t fd, struct __dos_stat64i32 *buf) = _fstat64;
  * >> int CDECL [NEW: _stat64i32](char const *filename, struct __dos_stat64i32 *buf) = _stat64;
  *
- * NOTE: Since KOS uses a different `stat' buffer than glibc, but still wants  to
+ * NOTE: Since KOS uses a different `stat' buffer than Glibc, but still wants  to
  *       maintain binary compatibility, the `stat()' function provided internally
- *       accepts a glibc-compatible stat buffer,  while the functions making  use
+ *       accepts a Glibc-compatible stat buffer,  while the functions making  use
  *       of  what we (and  the kernel) defines as  its stat()-buffer are actually
  *       named 'kstat()' */
 

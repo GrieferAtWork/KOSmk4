@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ecbc49f */
+/* HASH CRC-32:0x78ddffa1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,8 +53,8 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__local___localdep_vfwprintf_defined */
 __LOCAL_LIBC(__stdio_common_vfwprintf_p) __ATTR_IN(3) __ATTR_INOUT(2) __ATTR_LIBC_WPRINTF_P(3, 0) __STDC_INT_AS_SSIZE_T
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__stdio_common_vfwprintf_p))(__UINT64_TYPE__ __options, __FILE *__stream, __WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args) {
-	/* NOTE: DOS positional arguments work the same as gLibc's, only that
-	 *       glibc and KOS already bake  them into the normal  `wprintf'. */
+	/* NOTE: DOS positional arguments work the same as Glibc's, only that
+	 *       Glibc and KOS already bake  them into the normal  `wprintf'. */
 	(void)__locale;
 	(void)__options;
 	return (__NAMESPACE_LOCAL_SYM __localdep_vfwprintf)(__stream, __format, __args);

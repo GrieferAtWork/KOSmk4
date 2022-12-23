@@ -95,10 +95,10 @@
 #endif /* _BROKEN_CCOMPAT_SOURCE || _GLIBCXX_SHARED */
 
 /* When  exposed  in  headers,  the  behavior  of  memmem()  and memrmem()
- * differs from the behavior found in gLibc's implementation (of memmem())
+ * differs from the behavior found in Glibc's implementation (of memmem())
  * #define _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE (kos-specific)
  *    -> memmem() or memrmem() called with `needlelen' set to ZERO(0), return `NULL'
- * #undef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE  (gLibc-compatible)
+ * #undef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE  (Glibc-compatible)
  *    -> memmem() or memrmem() called with `needlelen' set to ZERO(0), return:
  *       memmem():  `haystack'
  *       memrmem(): `haystack + haystacklen' */
@@ -213,7 +213,7 @@
 
 /* 64-bit time_t extensions for KOS
  * (By the time of this writing, but I'm guessing by 2038-01-19T03:14:07 this'll
- * be similar to  what gLibc will  have to do  if it doesn't  wan'na roll  over)
+ * be similar to  what Glibc will  have to do  if it doesn't  wan'na roll  over)
  * Also available as extensions in other libcs:
  *  - defined(_TIME64_SOURCE):
  *    - KOS-specific feature macro
@@ -632,19 +632,19 @@
 #endif /* _UTF_SOURCE */
 
 
-/* Enable closer emulation of gLibc headers in cases  where
+/* Enable closer emulation of Glibc headers in cases  where
  * standards leave the  implementation behavior open.  This
  * mainly affects optional  include implications in  system
  * headers. For example, POSIX allows (but doesn't require)
- * <aio.h> to also #include <sys/types.h>, where gLibc does
+ * <aio.h> to also #include <sys/types.h>, where Glibc does
  * perform  this inclusion, however doing so isn't actually
  * necessary under KOS.
  *
  * When `_GLIBC_BLOAT_SOURCE'  is defined,  non-portable,
  * implicit includes are emulated more closely to what is
- * also done by gLibc, note however that this  additional
+ * also done by Glibc, note however that this  additional
  * level of  compatibility is  not  backed by  any  fixed
- * standard, but depends  solely on  what gLibc  actually
+ * standard, but depends  solely on  what Glibc  actually
  * does in relation  to fixed standards  (such as  POSIX) */
 #ifdef _GLIBC_BLOAT_SOURCE
 #undef __USE_GLIBC_BLOAT
@@ -959,7 +959,7 @@
 #include "stdc-predef.h"
 #endif /* !_STDC_PREDEF_H */
 
-/* KOS headers are always trying to emulate gLibc in some way... */
+/* KOS headers are always trying to emulate Glibc in some way... */
 #undef __GNU_LIBRARY__
 #define __GNU_LIBRARY__ 6
 #define __GLIBC__       2

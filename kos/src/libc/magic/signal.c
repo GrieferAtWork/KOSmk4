@@ -2981,7 +2981,7 @@ $errno_t pthread_sigqueue($pthread_t pthread,
 
 
 %
-%/* GLibc function aliases originally found in <bits/sigset.h>
+%/* Glibc function aliases originally found in <bits/sigset.h>
 % * Because these don't violate namespacing rules, and because
 % * <bits/sigset.h> is included unconditionally, we also define
 % * these unconditionally! */
@@ -3001,9 +3001,9 @@ DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO
 %[insert:function(__sigdelset = sigdelset)]
 
 %{
-/* These appear in glibc under these  names, however these names collide  with
+/* These appear in Glibc under these  names, however these names collide  with
  * some escapes in a couple of places, so only define them when we're supposed
- * to emulate glibc as closely as possible. */
+ * to emulate Glibc as closely as possible. */
 #ifdef __USE_GLIBC_BLOAT
 #undef __sigmask
 #undef __sigword

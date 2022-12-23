@@ -23,7 +23,7 @@
 /* DO NOTE REMOVE THIS FILE!
  *
  * It, and its contents are here for compatibility
- * with  older   versions  of   GLibc  on   linux!
+ * with  older   versions  of   Glibc  on   linux!
  *
  * Some (old) 3rd party code may exist that directly
  * includes this file.

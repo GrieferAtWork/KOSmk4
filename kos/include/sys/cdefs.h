@@ -47,7 +47,7 @@
 #endif /* !_FEATURES_H */
 
 /* NOTE: KOS doesn't actually make use of this header!
- *    >> It is only provided to define all the stuff glibc does,
+ *    >> It is only provided to define all the stuff Glibc does,
  *       allowing  the KOS toolchain  the potential of compiling
  *       applications  that may rely on this non-standard header
  *       and its contents. */
@@ -575,7 +575,7 @@
 #endif /* __USE_BSD */
 
 
-/* On GLibc, this header unconditionally #includes <bits/wordsize.h>,
+/* On Glibc, this header unconditionally #includes <bits/wordsize.h>,
  * which  defines  a  bunch of  arch-specific  configuration helpers.
  * Since programs might therefor expect <sys/cdefs.h> to define those
  * same macros on  other platforms, emulate  macros from that  header

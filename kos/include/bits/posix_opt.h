@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd609ccae */
+/* HASH CRC-32:0x13adade7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 
-/* NOTE: This file must _always_ be kept for GLibc compatibility! */
+/* NOTE: This file must _always_ be kept for Glibc compatibility! */
 
 #include <features.h>
 #include <asm/os/termios.h> /* __VDISABLE */

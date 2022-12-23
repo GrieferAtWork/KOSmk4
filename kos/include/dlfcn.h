@@ -833,7 +833,7 @@ __NOTHROW_NCX(__DLFCN_CC dladdr)(void const *__address,
 #define RTLD_DI_LINKMAP     __RTLD_DI_LINKMAP     /* [struct link_map **arg] -- *arg = GET_LINK_MAP_FOR(handle) (on KOS: this is the same as `handle') */
 #endif /* !RTLD_DI_LINKMAP && __RTLD_DI_LINKMAP */
 #if !defined(RTLD_DI_CONFIGADDR) && defined(__RTLD_DI_CONFIGADDR)
-#define RTLD_DI_CONFIGADDR  __RTLD_DI_CONFIGADDR  /* [Dl_info *arg] Fill in `dli_fname' (module filename) and `dli_fbase' (module start address; NOT load address! Unsupported by gLibc!) */
+#define RTLD_DI_CONFIGADDR  __RTLD_DI_CONFIGADDR  /* [Dl_info *arg] Fill in `dli_fname' (module filename) and `dli_fbase' (module start address; NOT load address! Unsupported by Glibc!) */
 #endif /* !RTLD_DI_CONFIGADDR && __RTLD_DI_CONFIGADDR */
 #if !defined(RTLD_DI_SERINFO) && defined(__RTLD_DI_SERINFO)
 typedef struct __Dl_serpath Dl_serpath;
@@ -847,10 +847,10 @@ typedef struct __Dl_serinfo Dl_serinfo;
 #define RTLD_DI_ORIGIN      __RTLD_DI_ORIGIN      /* [char *arg] strcpy(3) the `$ORIGIN' of this module (WARNING: UNBOUNDED BUFFER COPY) */
 #endif /* !RTLD_DI_ORIGIN && __RTLD_DI_ORIGIN */
 #if !defined(RTLD_DI_PROFILENAME) && defined(__RTLD_DI_PROFILENAME)
-#define RTLD_DI_PROFILENAME __RTLD_DI_PROFILENAME /* Unsupported on KOS (and neither supported by gLibc) */
+#define RTLD_DI_PROFILENAME __RTLD_DI_PROFILENAME /* Unsupported on KOS (and neither supported by Glibc) */
 #endif /* !RTLD_DI_PROFILENAME && __RTLD_DI_PROFILENAME */
 #if !defined(RTLD_DI_PROFILEOUT) && defined(__RTLD_DI_PROFILEOUT)
-#define RTLD_DI_PROFILEOUT  __RTLD_DI_PROFILEOUT  /* Unsupported on KOS (and neither supported by gLibc) */
+#define RTLD_DI_PROFILEOUT  __RTLD_DI_PROFILEOUT  /* Unsupported on KOS (and neither supported by Glibc) */
 #endif /* !RTLD_DI_PROFILEOUT && __RTLD_DI_PROFILEOUT */
 #if !defined(RTLD_DI_TLS_MODID) && defined(__RTLD_DI_TLS_MODID)
 #define RTLD_DI_TLS_MODID   __RTLD_DI_TLS_MODID   /* [size_t *arg] Store TLS module id (on KOS: this is the same as `handle') */

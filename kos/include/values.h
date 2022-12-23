@@ -37,7 +37,7 @@
 #include <hybrid/limitcore.h>
 #include <hybrid/typecore.h>
 
-/* GLibc includes these two headers unconditionally,
+/* Glibc includes these two headers unconditionally,
  * but as an extension KOS doesn't. */
 #ifdef __USE_GLIBC_BLOAT
 #include "float.h"

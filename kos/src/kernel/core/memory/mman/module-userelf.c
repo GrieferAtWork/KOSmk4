@@ -219,7 +219,7 @@ NOTHROW(FCALL uem_get_dbase_386)(struct userelf_module *__restrict self) {
 #endif /* !UM_HYBRID */
 
 	/* Special case for data-base on i386:
-	 * For reference, see glibc: `/sysdeps/generic/unwind-dw2-fde-glibc.c' */
+	 * For reference, see Glibc: `/sysdeps/generic/unwind-dw2-fde-glibc.c' */
 	uintptr_t result;
 	if (self->_um_DT_PLTGOT == (uint32_t)-1) {
 		size_t i;

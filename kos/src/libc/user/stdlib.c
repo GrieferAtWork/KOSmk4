@@ -365,7 +365,7 @@ NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname)
 		 * first 2 characters from the environ-string against the  the
 		 * expected pattern based on the caller's `varname'.
 		 *
-		 * As far as portability goes, gLibc makes the same assumption. */
+		 * As far as portability goes, Glibc makes the same assumption. */
 		if unlikely(!namelen) {
 			result = NULL;
 		} else {

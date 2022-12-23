@@ -1201,7 +1201,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dlinfo)(USER DlModule *self, int request,
 
 	case RTLD_DI_ORIGIN: {
 		/* Copy the origin path (without a trailing '/')
-		 * XXX: I think gLibc also doesn't include the '/', but I haven't checked... */
+		 * XXX: I think Glibc also doesn't include the '/', but I haven't checked... */
 		size_t dirlen;
 		dirlen = strroff(self->dm_filename, '/');
 		if (dirlen != (size_t)-1)
@@ -2815,7 +2815,7 @@ libdl_dlauxctrl(USER DlModule *self, unsigned int cmd, ...)
 
 #if defined(__i386__) && !defined(__x86_64__)
 		/* Special case for data-base on i386:
-		 * For reference, see glibc: `/sysdeps/generic/unwind-dw2-fde-glibc.c' */
+		 * For reference, see Glibc: `/sysdeps/generic/unwind-dw2-fde-glibc.c' */
 #define DEFINED_DLAUXCTRL_GET_DATABASE
 	case DLAUXCTRL_GET_DATABASE:
 		/* Must return the relocated value for `DT_PLTGOT'.

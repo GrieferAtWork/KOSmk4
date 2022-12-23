@@ -218,7 +218,7 @@
 	.cpu.ucontext                     # <ucontext.h>
 	.wordexp                          # <wordexp.h>
 	.libattr                          # <attr/libattr.h>
-	.glibc.* .glibc                   # GLibc-specific stuff
+	.glibc.* .glibc                   # Glibc-specific stuff
 	.bsd.stringlist                   # BSD's <stringlist.h> header
 	.bsd.* .bsd                       # Misc BSD functions
 	.solaris.* .solaris               # Misc Solaris functions

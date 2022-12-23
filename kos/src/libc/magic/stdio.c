@@ -2588,11 +2588,11 @@ int ftrylockfile([[inout]] $FILE *__restrict stream);
 %#endif /* __USE_POSIX || __USE_REENTRANT */
 
 @@>> __uflow(3)
-@@This is essentially gLibc's version of `_filbuf(3)' (but sadly not binary compatible)
+@@This is essentially Glibc's version of `_filbuf(3)' (but sadly not binary compatible)
 [[wunused]] int __uflow([[inout]] $FILE *stream) = _filbuf;
 
 @@>> __overflow(3)
-@@This is essentially gLibc's version of `_flsbuf(3)' (but sadly not binary compatible)
+@@This is essentially Glibc's version of `_flsbuf(3)' (but sadly not binary compatible)
 [[cp_stdio, section(".text.crt{|.dos}.FILE.locked.write.write")]]
 [[requires_function(_flsbuf)]]
 int __overflow([[inout]] $FILE *stream, int ch) {
@@ -5209,8 +5209,8 @@ __STDC_INT_AS_SSIZE_T __stdio_common_vfprintf_s($uint64_t options, [[inout]] $FI
 __STDC_INT_AS_SSIZE_T __stdio_common_vfprintf_p($uint64_t options, [[inout]] $FILE *stream,
                                                 [[in, format]] char const *format,
                                                 $locale_t locale, $va_list args) {
-	/* NOTE: DOS positional arguments work the same as gLibc's, only that
-	 *       glibc and KOS  already bake them  into the normal  `printf'. */
+	/* NOTE: DOS positional arguments work the same as Glibc's, only that
+	 *       Glibc and KOS  already bake them  into the normal  `printf'. */
 	(void)locale;
 	(void)options;
 	return vfprintf(stream, format, args);
@@ -5255,8 +5255,8 @@ __STDC_INT_AS_SSIZE_T __stdio_common_vsprintf_p($uint64_t options, char *buf, $s
                                                 $locale_t locale, $va_list args) {
 	__STDC_INT_AS_SSIZE_T result;
 	(void)locale;
-	/* NOTE: DOS positional arguments work the same as gLibc's, only that
-	 *       glibc and KOS  already bake them  into the normal  `printf'. */
+	/* NOTE: DOS positional arguments work the same as Glibc's, only that
+	 *       Glibc and KOS  already bake them  into the normal  `printf'. */
 	result = vsnprintf(buf, bufsize, format, args);
 	if (!(options & _CRT_INTERNAL_PRINTF_STANDARD_SNPRINTF_BEHAVIOR) && (size_t)result > bufsize)
 		result = bufsize;

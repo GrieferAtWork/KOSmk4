@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76e02870 */
+/* HASH CRC-32:0x61ceda7b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ DECL_BEGIN
  * The overall length of the argz-string is  tracked at the offset from its  base
  * pointer, to the first  byte after a trailing  '\0' character that follows  the
  * last of the many sub-strings. An empty argz-string is thus represented as  any
- * base-pointer in conjunction with `*pargz_len=0'. (But note that GLibc seems to
+ * base-pointer in conjunction with `*pargz_len=0'. (But note that Glibc seems to
  * suggest that certain APIs  should be used under  the assumption that an  empty
  * argz-string  can also be represented with the base pointer `*pargz=NULL'. This
  * kind of behavior is _NOT_ actually supported  by the API, and only implied  by
@@ -274,7 +274,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_add_sep)(char **__restrict pargz,
 	if unlikely(!slen)
 		return 0;
 	oldlen = *pargz_len;
-	/* Note that GLibc actually has a bug here that causes it to write `NULL'
+	/* Note that Glibc actually has a bug here that causes it to write `NULL'
 	 * into  the given  `*pargz' pointer  when the  allocation fails, instead
 	 * of leaving that  pointer in  its original state  (allowing the  caller
 	 * to cleanup  the argz-array,  instead of  forcing the  array to  become
@@ -390,11 +390,11 @@ NOTHROW_NCX(LIBCCALL libc_argz_insert)(char **__restrict pargz,
 
 	}
 	/* Adjust  `before'  to  point  to  the  start  of  an  entry
-	 * Note that GLibc has a bug here that causes it to  accessed
+	 * Note that Glibc has a bug here that causes it to  accessed
 	 * memory before `*pargz' when `before' points into the first
 	 * element of the argz vector.
 	 * -> That bug is fixed here!
-	 * As such, GLibc's version would only work when `((char *)malloc(N))[-1] == 0'
+	 * As such, Glibc's version would only work when `((char *)malloc(N))[-1] == 0'
 	 * for  an  arbitrary  N  that   results  in  `malloc()'  returning   non-NULL.
 	 * Glibc's version of this:
 	 * >> if (before > *argz)
@@ -435,7 +435,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_insert)(char **__restrict pargz,
  * the given `replace_count' is incremented by one (if `replace_count' is non-NULL)
  * @return: 0:      Success
  * @return: ENOMEM: Insufficient heap memory (can only happen when `strlen(with) > strlen(str)',
- *                  but  note  that  the GLibc  implementation  of this  function  is completely
+ *                  but  note  that  the Glibc  implementation  of this  function  is completely
  *                  unreadable and may be able to return this for other cases as well...) */
 INTERN ATTR_SECTION(".text.crt.string.argz") ATTR_IN(4) ATTR_INOUT(1) ATTR_INOUT(2) ATTR_INOUT_OPT(5) ATTR_IN_OPT(3) error_t
 NOTHROW_NCX(LIBCCALL libc_argz_replace)(char **__restrict pargz,
@@ -452,19 +452,19 @@ NOTHROW_NCX(LIBCCALL libc_argz_replace)(char **__restrict pargz,
 		return 0; /* no-op */
 	repllen = libc_strlen(with);
 	find_offset = 0;
-	/* I have no  idea what the  GLibc implementation does  here, and I'm  not
+	/* I have no  idea what the  Glibc implementation does  here, and I'm  not
 	 * quite sure it  knows either.  - At first  I though  that this  function
 	 * was supposed to  only replace  entries of  an argz-string  as a  whole,
 	 * but now I  believe it's just  supposed to do  replacement of any  match
-	 * found.  However, GLibc appears to be utterly afraid of using `memmem()'
+	 * found.  However, Glibc appears to be utterly afraid of using `memmem()'
 	 * for  this,  and instead  opt's to  using  `argz_next()' to  iterate the
 	 * argz-vector, and doing  `strstr()' on each  element, before doing  some
 	 * dark  voodoo magic  with `strndup()',  temporary buffers,  and god only
 	 * knows why  there are  even delayed  calls to  `argz_add()' in  there???
-	 * If  this implementation doesn't do exactly what GLibc does, don't fault
-	 * me.  Every  function in  this file  was originally  created as  a GLibc
+	 * If  this implementation doesn't do exactly what Glibc does, don't fault
+	 * me.  Every  function in  this file  was originally  created as  a Glibc
 	 * extension, so there really isn't any official documentation on intended
-	 * behavior other than GLibc reference implementation.
+	 * behavior other than Glibc reference implementation.
 	 * Anyways... At least my version is readable... */
 	while (find_offset < *pargz_len) {
 		char *pos;
@@ -536,7 +536,7 @@ NOTHROW_NCX(LIBCCALL libc_argz_replace)(char **__restrict pargz,
  * >> for (entry = argz_len ? argz : NULL; entry != NULL;
  * >>      entry = argz_next(argz, argz_len, entry))
  * >>     handle_entry(my_entry);
- * Note  that  GLibc documents  the second  usage  case slightly  different, and
+ * Note  that  Glibc documents  the second  usage  case slightly  different, and
  * writes `for (entry = argz; entry; entry = argz_next(argz, argz_len, entry))`,
  * thus assuming that an empty argz-string (i.e. `argz_len == 0') always has its
  * base pointer set to `NULL'  (which isn't something consistently enforced,  or

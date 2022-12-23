@@ -8,7 +8,7 @@ It is designed with a *lot* of tricks up its sleeve to aid during debugging, suc
 
 In general, KOS isn't designed to re-invent the wheel (no square wheels here), but rather tries to make said metaphorical wheel look and roll as well as possible. What this means is that:
 - KOS tries to be fully [POSIX](http://www.open-std.org/jtc1/sc22/open/n4217.pdf) compliant
-- KOS tries to be fully API- and ABI-compatible with Linux/GNU/GLibc/... on all supported architectures
+- KOS tries to be fully API- and ABI-compatible with Linux/GNU/Glibc/... on all supported architectures
 - KOS's source components are very tightly interwoven with each other, and both headers and sources make use of the many GCC extensions that exist to both improve generated code, as well as inducing the behavior of different functions
 - KOS's sources and headers contain a lot of documentation and I try to give every *magic* number that gets used a proper name. So to understand how KOS works, all that you need to do is to read the documentation of whatever you're looking at
 - KOS also includes a DOS/NT emulation mode that allows console programs compiled for NT (using TCC/MinGW/VC/VC++/...) to be executed under KOS. Also note that to do so, KOS will link PE binaries against ELF shared libraries, as PE loading is implemented as an extension to ELF loading (yes: it gets complicated, but it works).
@@ -355,7 +355,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 			- Have you ever done `readelf -rW /lib/i386-linux-gnu/libc.so.6`?
 			- Do you realize that every single one of the lines your terminal just got spammed with will slow down the startup of any program you run on your system?
 				- Even with lazy symbol resolving, rtld has to perform 1 write to memory for every relocation it finds during startup
-			- Well... Doing the same with my `libc.so`, I'm counting 14 relocations (But mine still has all the same functionality, with almost 100% API-compatibility, and at least 95% ABI-compatibility). And that's not even mentioning all of the extensions found in KOS's libc, but missing from glibc.
+			- Well... Doing the same with my `libc.so`, I'm counting 14 relocations (But mine still has all the same functionality, with almost 100% API-compatibility, and at least 95% ABI-compatibility). And that's not even mentioning all of the extensions found in KOS's libc, but missing from Glibc.
 		- Enourmous support for practically everything also found in GLIBc (plus some KOS exceptions, plus a larger number of extensions from other platforms such as BSD or Solaris)
 		- Of note is the fact that the KOS system headers aren't dependent on KOS's particular libc implementation
 			- The system headers will automatically try to detect libc features and substitute anything that isn't supported with inline functions to provide KOS-specific extensions such as `strend()` in a truely portable (as in: not bound to KOS) manner
@@ -992,7 +992,7 @@ WARNING: NOTHING IN THE FOLLOWING SECTION IS LEGAL ADVICE, OR MAY BE CONSIDERED 
 
 Certain components of KOS, its (system-)headers, libraries, or some other component found as part of its source tree, as one is presented with in whatever form of distribution you may encouter it (KOS's source tree) in, may contain few parts that are not necessarily licensed under the ZLib license (the ZLib license being the primary license under which all of the *new* (as in: specifically written for the purpose of use with KOS) code falls)
 
-~~One example for this would be the implementation of the libc function `qsort()`, as exported from the header `<stdlib.h>`, who's implementation has been lifted from GLibc (which is not licensed under ZLib, and as such requires derived code's direct (as in: static inclusion during linking, or automatic inline substitution during compilation, as opposed to dynamic linking at runtime) use in any derived software to also comply with its (GLibc's) license agreement)~~
+~~One example for this would be the implementation of the libc function `qsort()`, as exported from the header `<stdlib.h>`, who's implementation has been lifted from Glibc (which is not licensed under ZLib, and as such requires derived code's direct (as in: static inclusion during linking, or automatic inline substitution during compilation, as opposed to dynamic linking at runtime) use in any derived software to also comply with its (Glibc's) license agreement)~~
 
 For this purpose, note that the ZLib license is compatible with GPL ~~(which is the license that applies to the aformentioned `qsort()` function)~~, meaning that use of KOS in its entirety in any product requires that product to comply with the requirements of both GPL, as well as ZLib.
 

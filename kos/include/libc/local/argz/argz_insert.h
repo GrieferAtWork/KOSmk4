@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29fc9651 */
+/* HASH CRC-32:0xfc3249ff */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -121,11 +121,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_insert))(char **__restrict __par
 #endif /* !__EINVAL */
 	}
 	/* Adjust  `before'  to  point  to  the  start  of  an  entry
-	 * Note that GLibc has a bug here that causes it to  accessed
+	 * Note that Glibc has a bug here that causes it to  accessed
 	 * memory before `*pargz' when `before' points into the first
 	 * element of the argz vector.
 	 * -> That bug is fixed here!
-	 * As such, GLibc's version would only work when `((char *)malloc(N))[-1] == 0'
+	 * As such, Glibc's version would only work when `((char *)malloc(N))[-1] == 0'
 	 * for  an  arbitrary  N  that   results  in  `malloc()'  returning   non-NULL.
 	 * Glibc's version of this:
 	 * >> if (before > *argz)

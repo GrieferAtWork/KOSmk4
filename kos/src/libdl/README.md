@@ -6,7 +6,7 @@
 - [amd64-elf-abi.pdf](https://people.freebsd.org/~obrien/amd64-elf-abi.pdf)
 
 ### Changes/Extensions to ELF specs (all architectures)
-- When execution is passed to an application's `main()` function, `libdl.so` does not make any provisions for a pre-initialized auxiliary information vector. For binary compatibility, an empty Aux-vector may be passed, but aux information in general is instead calculated/initialized on-demand, and must be accessed through use of `libc`'s `getauxval(3)` function, as found in `<sys/auxv.h>` (this header and its function `getauxval(3)` also exist in glibc and may therefor be considered portable)
+- When execution is passed to an application's `main()` function, `libdl.so` does not make any provisions for a pre-initialized auxiliary information vector. For binary compatibility, an empty Aux-vector may be passed, but aux information in general is instead calculated/initialized on-demand, and must be accessed through use of `libc`'s `getauxval(3)` function, as found in `<sys/auxv.h>` (this header and its function `getauxval(3)` also exist in Glibc and may therefor be considered portable)
 	- Similarly, an application linked without need for dynamic linking also will not have an auxiliary vector made available by the kernel
 - Runtime configuration options
 	- Supported LD environment variables

@@ -24,11 +24,11 @@
 #include "hybrid/host.h"
 
 /* Automatically detect the linked CRT
- *   - __CRT_CYG          (windows / cygwin)
+ *   - __CRT_CYG          (windows / Cygwin)
  *   - __CRT_DOS          (windows / msvcrt.dll)
  *   - __CRT_FREESTANDING (freestanding / none)
  *   - __CRT_GENERIC      (generic / *)
- *   - __CRT_GLC          (linux / glibc.so)
+ *   - __CRT_GLC          (linux / Glibc)
  *   - __CRT_KOS          (kos / libc.so)
  *   - __CRT_KOS_KERNEL   (kos / kernel.bin)
  * XXX: Sometimes referenced, but not fully implemented:

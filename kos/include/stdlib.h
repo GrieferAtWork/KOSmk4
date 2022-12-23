@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51bbd5b0 */
+/* HASH CRC-32:0x5410577d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2811,7 +2811,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(realpath, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS)
 /* NOTE: I didn't come up with this function (https://docs.oracle.com/cd/E36784_01/html/E36874/frealpath-3c.html),
- *       but it seems to be something that GLibc isn't implementing for some reason...
+ *       but it seems to be something that Glibc isn't implementing for some reason...
  *       Because of that, I didn't really know where to put this, so I put it in the
  *       same _SOURCE-block as its `realpath()' companion. */
 #ifdef __CRT_HAVE_frealpath

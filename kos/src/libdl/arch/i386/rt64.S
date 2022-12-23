@@ -113,7 +113,7 @@ INTERN_FUNCTION(dl_load_lazy_relocation)
 	 *  - 16(%rsp)     == User-return-address
 	 *  - 24 + ?(%rsp) == Undefined/user-owned
 	 *
-	 * HINT: In glibc, this function's equivalent is called `_dl_runtime_resolve' */
+	 * HINT: In Glibc, this function's equivalent is called `_dl_runtime_resolve' */
 	.cfi_startproc
 	.cfi_adjust_cfa_offset 16 /* MODULE + JMPREL_index */
 	/* Save registers */

@@ -102,7 +102,7 @@ struct __IO_FILE {
 	{                                                                \
 		/* .if_ptr     = */ if_ptr_,                                 \
 		/* .if_cnt     = */ if_cnt_,                                 \
-		/* .__if_pad0  = */ -1, /* Important for glibc compat! */    \
+		/* .__if_pad0  = */ -1, /* Important for Glibc compat! */    \
 		/* .if_base    = */ if_base_,                                \
 		/* .if_flag    = */ if_flag_,                                \
 		/* .if_fd      = */ if_fd_,                                  \

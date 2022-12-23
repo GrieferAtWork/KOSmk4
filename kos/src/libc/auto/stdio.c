@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42bb930e */
+/* HASH CRC-32:0x51512b30 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1308,7 +1308,7 @@ INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.putc") int
 	return libc_fputc_unlocked(ch, stdout);
 }
 /* >> __overflow(3)
- * This is essentially gLibc's version of `_flsbuf(3)' (but sadly not binary compatible) */
+ * This is essentially Glibc's version of `_flsbuf(3)' (but sadly not binary compatible) */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.write.write") ATTR_INOUT(1) int
 (LIBCCALL libc___overflow)(FILE *stream,
                            int ch) THROWS(...) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41f20e37 */
+/* HASH CRC-32:0xe3591b4e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -105,7 +105,7 @@
  *
  *  - MSVC-style control for "%n" (s.a. `_set_printf_count_output(3)'; defaults to enabled)
  *
- *  - gLibc-style "%m" (print string returned by `strerror(errno)')
+ *  - Glibc-style "%m" (print string returned by `strerror(errno)')
  *
  *  - Positional arguments: printf("<%4$d %3$d %2$d %1$d>", 10, 20, 30, 40); // "<40 30 20 10>"
  *    Including support for using them as flexible width/precision:

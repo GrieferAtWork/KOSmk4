@@ -1247,7 +1247,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getaffinity_np)(pthread_attr_t const *att
 		}
 		/* Check if the given buffer is too small. */
 		if (cpusetsize < setsize)
-			return EINVAL; /* GLibc returns EINVAL here (I would have used ERANGE for this, but whatever...) */
+			return EINVAL; /* Glibc returns EINVAL here (I would have used ERANGE for this, but whatever...) */
 		p = (byte_t *)mempcpy(cpuset, attr->pa_cpuset, setsize);
 		/* Fill in the remainder with zeroes */
 		bzero(p, cpusetsize - setsize);
@@ -1892,7 +1892,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cancel)(pthread_t pthread)
 	/* TODO: Support for `PTHREAD_CANCEL_ENABLE' / `PTHREAD_CANCEL_DISABLE':
 	 *  - Could be implemented by using a dedicated signal here, and having
 	 *    the thread be able to mask/unmask it via `pthread_setcancelstate'
-	 *  - As far as I know, picking a dedicated signal is also how glibc
+	 *  - As far as I know, picking a dedicated signal is also how Glibc
 	 *    goes about implementing this. (only that it uses regular,  old
 	 *    posix signal handlers, rather than fancy RPCs like we do)
 	 *  - Currently, this right here uses SIGRPC for RPC delivery */
@@ -3015,7 +3015,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_consistent)(pthread_mutex_t *mutex)
  * We implement posix r/w-locks as follows:
  *
  * - PTHREAD_RWLOCK_PREFER_READER_NP,  PTHREAD_RWLOCK_PREFER_WRITER_NP:
- *   These act identical (as they also do in glibc), and allow the lock
+ *   These act identical (as they also do in Glibc), and allow the lock
  *   to be used for recursive read-locks. (write-lock are never allowed
  *   to be recursive)
  * - PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP:

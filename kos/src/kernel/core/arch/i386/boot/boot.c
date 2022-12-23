@@ -556,7 +556,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *     it  is auxiliarly to  .eh_frame, but differs in  that it contains a
 	 *     lookup-table like:
 	 *         >> [{ pc_min: pointer, pc_max: pointer, eh_frame_data: pointer }...]
-	 *     I  couldn't find documentation on the actual format, but glibc has
+	 *     I  couldn't find documentation on the actual format, but Glibc has
 	 *     a file that is used to parse this table, so it can tell how that's
 	 *     supposed to be done.
 	 */

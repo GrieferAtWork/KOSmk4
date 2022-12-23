@@ -27,7 +27,7 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-/* Return libc version information. (gLibc-specific, but emulated on KOS for ABI compat) */
+/* Return libc version information. (Glibc-specific, but emulated on KOS for ABI compat) */
 __CDECLARE_OPT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char const *,__NOTHROW,gnu_get_libc_release,(void),())
 __CDECLARE_OPT(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char const *,__NOTHROW,gnu_get_libc_version,(void),())
 

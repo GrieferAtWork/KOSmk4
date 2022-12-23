@@ -347,8 +347,8 @@ __STDC_INT_AS_SSIZE_T __stdio_common_vfwprintf_s($uint64_t options, [[inout]] FI
 __STDC_INT_AS_SSIZE_T __stdio_common_vfwprintf_p($uint64_t options, [[inout]] FILE *stream,
                                                  [[in, format]] wchar_t const *format,
                                                  $locale_t locale, $va_list args) {
-	/* NOTE: DOS positional arguments work the same as gLibc's, only that
-	 *       glibc and KOS already bake  them into the normal  `wprintf'. */
+	/* NOTE: DOS positional arguments work the same as Glibc's, only that
+	 *       Glibc and KOS already bake  them into the normal  `wprintf'. */
 	(void)locale;
 	(void)options;
 	return vfwprintf(stream, format, args);
@@ -388,8 +388,8 @@ __STDC_INT_AS_SSIZE_T __stdio_common_vswprintf_p($uint64_t options, wchar_t *buf
                                                  $locale_t locale, $va_list args) {
 	__STDC_INT_AS_SSIZE_T result;
 	(void)locale;
-	/* NOTE: DOS positional arguments work the same as gLibc's, only that
-	 *       glibc and KOS already bake  them into the normal  `wprintf'. */
+	/* NOTE: DOS positional arguments work the same as Glibc's, only that
+	 *       Glibc and KOS already bake  them into the normal  `wprintf'. */
 	result = vswprintf(buf, bufsize, format, args);
 	if (!(options & _CRT_INTERNAL_PRINTF_STANDARD_SNPRINTF_BEHAVIOR) && (size_t)result > bufsize)
 		result = bufsize;

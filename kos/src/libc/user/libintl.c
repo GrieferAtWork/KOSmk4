@@ -1518,7 +1518,7 @@ INTERN ATTR_SECTION(".bss.crt.i18n") int libc__nl_msg_cat_cntr = 0;
 DEFINE_PUBLIC_ALIAS(_nl_msg_cat_cntr, libc__nl_msg_cat_cntr);
 
 /* Export the default domain directory by-name. (XXX: In the  original
- * glibc, programs could override this symbol and have libintl pick up
+ * Glibc, programs could override this symbol and have libintl pick up
  * on that during initialization; this  could easily be added to  KOS,
  * but I've yet to do so since  I don't think that programs should  do
  * something  like that, because  `bindtextdomain(3)' already does the
@@ -1527,7 +1527,7 @@ DEFINE_PUBLIC_ALIAS(_nl_msg_cat_cntr, libc__nl_msg_cat_cntr);
 DEFINE_PUBLIC_ALIAS(_nl_default_dirname, default_domain_dir);
 
 /* I don't really know what this symbol is supposed to be all about.
- * It's exported by glibc as `struct binding *_nl_domain_bindings;',
+ * It's exported by Glibc as `struct binding *_nl_domain_bindings;',
  * and looks like some kind of interface to internals.
  *
  * It  has to be exported because configure scripts exist that check
@@ -1539,7 +1539,7 @@ DEFINE_PUBLIC_ALIAS(_nl_default_dirname, default_domain_dir);
 INTERN ATTR_SECTION(".bss.crt.i18n") int *libc__nl_domain_bindings = NULL;
 DEFINE_PUBLIC_ALIAS(_nl_domain_bindings, libc__nl_domain_bindings);
 
-/* This one is (probably accidentally) exported by glibc. Supposedly,
+/* This one is (probably accidentally) exported by Glibc. Supposedly,
  * it is used to  facilitate translations of libc-internal  messages,
  * though we don't use it any only provide it for compat. */
 INTERN ATTR_SECTION(".rodata.crt.i18n")

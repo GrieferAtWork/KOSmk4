@@ -608,7 +608,7 @@ char *getenv([[in]] char const *varname) {
 		 * the first 2 characters from the environ-string against the
 		 * expected pattern based on the caller's `varname'.
 		 *
-		 * As far as portability goes, gLibc makes the same assumption. */
+		 * As far as portability goes, Glibc makes the same assumption. */
 		if unlikely(!namelen) {
 			result = NULL;
 		} else {
@@ -2435,7 +2435,7 @@ char *realpath([[in]] char const *filename, char *resolved) {
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS)
 %/* NOTE: I didn't come up with this function (https://docs.oracle.com/cd/E36784_01/html/E36874/frealpath-3c.html),
-% *       but it seems to be something that GLibc isn't implementing for some reason...
+% *       but it seems to be something that Glibc isn't implementing for some reason...
 % *       Because of that, I didn't really know where to put this, so I put it in the
 % *       same _SOURCE-block as its `realpath()' companion. */
 @@>> frealpath(3)

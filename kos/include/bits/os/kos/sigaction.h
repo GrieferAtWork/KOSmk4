@@ -28,6 +28,7 @@
  *    - struct sigaction { ... };
  */
 
+#include <__crt.h>
 #include <__stdinc.h>
 #include <features.h>
 
@@ -120,7 +121,7 @@ typedef void (__LIBKCALL *__sigaction_sa_restorer_t)(void);
 typedef __sigaction_sa_handler_t __sighandler_t;
 #endif /* !____sighandler_t_defined */
 
-/* This is the struct accepted by `sigaction(3)' (iow: the one from libc; assuming glibc compat) */
+/* This is the struct accepted by `sigaction(3)' (iow: the one from libc; assuming Glibc compat) */
 struct sigaction /*[PREFIX(sa_)]*/ {
 #ifdef __ARCH_HAVE_KERNEL_SIGACTION_IS_LIBC_SIGACTION
 #ifdef __ARCH_HAVE_IRIX_KERNEL_SIGACTION

@@ -151,7 +151,7 @@ NOTHROW_NCX(LIBCCALL sigevent_notify)(struct sigevent const *__restrict self) {
 			result = -sys_rt_sigqueueinfo(info.si_pid, info.si_signo, &info);
 		} else {
 			/* PORTABILITY WARNING: Support for this case isn't implemented by
-			 *                      gLibc, which only supports `SIGEV_SIGNAL'! */
+			 *                      Glibc, which only supports `SIGEV_SIGNAL'! */
 			result = -sys_rt_tgsigqueueinfo(info.si_pid, self->_sigev_tid,
 			                                info.si_signo, &info);
 		}
@@ -943,7 +943,7 @@ NOTHROW_NCX(LIBCCALL start_aio_listio)(int mode, struct aio *const list[__restri
 	 * Also  note that if something ends up  preventing this notify from succeeding, then
 	 * we mustn't return to indicate an error, but still update our thread's `errno'.
 	 *
-	 * This same behavior can also be seen in gLibc! */
+	 * This same behavior can also be seen in Glibc! */
 	if unlikely(!nent) {
 no_wait_aio:
 		if (mode == LIO_NOWAIT && sigev != NULL) {

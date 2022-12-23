@@ -168,7 +168,7 @@ INTERN_FUNCTION(dl_load_lazy_relocation)
 	 * with which the user intends to invoke the lazily linked function, we must
 	 * make sure that we don't clobber any of their registers!
 	 *
-	 * HINT: In glibc, this function's equivalent is called `_dl_runtime_resolve'
+	 * HINT: In Glibc, this function's equivalent is called `_dl_runtime_resolve'
 	 */
 	.cfi_startproc
 	.cfi_adjust_cfa_offset 8 /* MODULE + JMPREL_offset */

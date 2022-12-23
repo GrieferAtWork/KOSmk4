@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef _BITS_OS_DEFINES_H
-/* This header only does something when it's included from glibc++'s "c++config.h" header! */
+/* This header only does something when it's included from libstdc++'s "c++config.h" header! */
 #ifdef _GLIBCXX_CXX_CONFIG_H
 #define _BITS_OS_DEFINES_H 1
 

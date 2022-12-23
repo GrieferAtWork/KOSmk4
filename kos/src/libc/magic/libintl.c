@@ -38,7 +38,7 @@
 #include <hybrid/typecore.h>
 )]%{
 
-#define __USE_GNU_GETTEXT 1 /* We're emulating glibc's <libintl.h> */
+#define __USE_GNU_GETTEXT 1 /* We're emulating Glibc's <libintl.h> */
 #define __GNU_GETTEXT_SUPPORTED_REVISION(major) ((major) == 0 ? 1 : -1)
 
 #ifdef __CC__

@@ -164,7 +164,7 @@ typedef __TYPEFOR_UINTIB(__SIZEOF_PTHREAD_T) __pthread_t;
 #ifdef __CC__
 struct __cpu_set_struct;
 typedef struct __pthread_attr_s {
-	/* NOTE: This  structure shares binary compatibility with GLibc (for the most part)
+	/* NOTE: This  structure shares binary compatibility with Glibc (for the most part)
 	 *       The  only difference is that we allow  the re-use of `pa_cpusetsize' as an
 	 *       in-line 32/64-bit cpuset, thus preventing the need to dynamically allocate
 	 *       small cpu sets on the  heap when most of  the time those structures  would
@@ -276,7 +276,7 @@ struct __pthread_internal_slist __pthread_slist_t;
 #endif /* !__PTHREAD_MUTEX_HAVE_PREV */
 
 /* Internal mutex kind values (for `m_kind').
- * These are compatible with GLibc */
+ * These are compatible with Glibc */
 #define PTHREAD_MUTEX_KIND_MASK_NP     0x003 /* Mask for `PTHREAD_MUTEX_TIMED', `PTHREAD_MUTEX_RECURSIVE', ... */
 #define PTHREAD_MUTEX_ROBUST_NORMAL_NP 0x010 /* Unused (on KOS) */
 #define PTHREAD_MUTEX_PRIO_INHERIT_NP  0x020 /* Unused (on KOS) */

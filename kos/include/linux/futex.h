@@ -95,9 +95,9 @@ struct robust_list {
 
 /* Per-thread list head:
  * NOTE: this structure is part of the syscall ABI, and must only  be
- * changed  if the change is first communicated with the glibc folks.
+ * changed  if the change is first communicated with the Glibc folks.
  * (When an incompatible change is done, we'll increase the structure
- *  size, which glibc will detect) */
+ * size, which Glibc will detect) */
 struct robust_list_head {
 
 	/* The head of the list. Points back to itself if empty: */
