@@ -529,7 +529,8 @@ typedef struct __regmatch regmatch_t;
 
 %{
 
-/* Regex syntax used by `re_compile_pattern(3)'. */
+/* Regex syntax used by `re_compile_pattern(3)'.
+ * By default, this is set to `RE_SYNTAX_EMACS'. */
 #ifndef re_syntax_options
 #ifdef __LOCAL_re_syntax_options
 #define re_syntax_options __LOCAL_re_syntax_options
@@ -888,6 +889,46 @@ char const *regerrordesc_np(int errcode) {
 	return result;
 }
 %#endif /* __USE_KOS */
+
+
+%
+%#ifdef _REGEX_RE_COMP
+
+@@>> re_comp(3)
+@@Compare the given `pattern' and assign it to an internal regex buffer which can
+@@then later be used in conjunction with `re_exec(3)'. The Syntax options used by
+@@this function are  `re_syntax_options | RE_ANCHORS_IGNORE_EFLAGS'. By  default,
+@@the global `re_syntax_options' is set to `RE_SYNTAX_EMACS'.
+@@WARNING: This function is not thread-safe!
+@@@param: pattern: The pattern to compile (or `NULL' to verify that a pattern has already been compiled)
+@@@return: NULL:   Success
+@@@return: * :     Error (returned pointer is the human-readable error message, as returned by `regerrordesc_np(3)')
+@@                 In this case, the internal, static regex buffer is left unaltered.
+[[section(".text.crt.compat.glibc.regex")]]
+char __KOS_FIXED_CONST *re_comp([[nullable]] const char *pattern);
+
+@@>> re_exec(3)
+@@Try to match the regex previous compiled by `re_comp(3)'
+@@against some sub-string of `string'. This is equivalent to:
+@@>> re_search(&REGEX_COMPILED_BY_RE_COMP, // self
+@@>>           string,                     // string
+@@>>           strlen(string),             // length
+@@>>           0,                          // start
+@@>>           strlen(string),             // range
+@@>>           NULL) >= 0                  // regs
+@@Note that to  force matching to  only happen at  the start of  `string',
+@@the pattern passed to `re_comp(3)' should begin with "^" (thus requiring
+@@that the pattern only matches at the start, or after a line-feed).
+@@
+@@If `re_comp(3)' has never been called, always returns `0'
+@@@param: string: The pattern to compile (or `NULL' to verify that a pattern has already been compiled)
+@@@return: 1:     The given `string' contains (at least) one matching sub-string
+@@@return: 0:     The given `string' does not contain a sub-string that matches the previously compiled pattern.
+[[pure, wunused, section(".text.crt.compat.glibc.regex")]]
+int re_exec([[nonnull]] const char *string);
+
+%#endif /* _REGEX_RE_COMP */
+
 
 %{
 

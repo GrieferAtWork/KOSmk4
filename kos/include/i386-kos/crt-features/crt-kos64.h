@@ -4176,8 +4176,10 @@
 #define __CRT_HAVE_rawmemxlenw
 #define __CRT_HAVE_rcmd
 #define __CRT_HAVE_rcmd_af
+#define __CRT_HAVE_re_comp
 #define __CRT_HAVE_re_compile_fastmap
 #define __CRT_HAVE_re_compile_pattern
+#define __CRT_HAVE_re_exec
 #define __CRT_HAVE_re_match
 #define __CRT_HAVE_re_match_2
 #define __CRT_HAVE_re_max_failures
@@ -9811,8 +9813,10 @@
 #define __CRT_HAVE_KOS$rawmemxlenw
 #define __CRT_HAVE_KOS$rcmd
 #define __CRT_HAVE_KOS$rcmd_af
+#define __CRT_HAVE_KOS$re_comp
 #define __CRT_HAVE_KOS$re_compile_fastmap
 #define __CRT_HAVE_KOS$re_compile_pattern
+#define __CRT_HAVE_KOS$re_exec
 #define __CRT_HAVE_KOS$re_match
 #define __CRT_HAVE_KOS$re_match_2
 #define __CRT_HAVE_KOS$re_search
@@ -14441,8 +14445,10 @@
 #define __CRT_HAVE_DOS$rawmemxlenw
 #define __CRT_HAVE_DOS$rcmd
 #define __CRT_HAVE_DOS$rcmd_af
+#define __CRT_HAVE_DOS$re_comp
 #define __CRT_HAVE_DOS$re_compile_fastmap
 #define __CRT_HAVE_DOS$re_compile_pattern
+#define __CRT_HAVE_DOS$re_exec
 #define __CRT_HAVE_DOS$re_match
 #define __CRT_HAVE_DOS$re_match_2
 #define __CRT_HAVE_DOS$re_search

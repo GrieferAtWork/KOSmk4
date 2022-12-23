@@ -743,8 +743,122 @@ NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict self,
 /*[[[end:libc_regexec]]]*/
 
 
+/* The static buffer used by `re_comp(3)' and `re_exec(3)' */
+PRIVATE ATTR_SECTION(".bss.crt.compat.glibc.regex")
+struct re_code *libc_re_comp_buffer = NULL;
 
-/*[[[start:exports,hash:CRC-32=0x64ce18e9]]]*/
+PRIVATE ATTR_SECTION(".rodata.crt.compat.glibc.regex")
+char const libc_re_comp_no_pattern_errmsg[] = "No previous regular expression";
+
+
+/*[[[head:libc_re_comp,hash:CRC-32=0xce6dd18]]]*/
+/* >> re_comp(3)
+ * Compare the given `pattern' and assign it to an internal regex buffer which can
+ * then later be used in conjunction with `re_exec(3)'. The Syntax options used by
+ * this function are  `re_syntax_options | RE_ANCHORS_IGNORE_EFLAGS'. By  default,
+ * the global `re_syntax_options' is set to `RE_SYNTAX_EMACS'.
+ * WARNING: This function is not thread-safe!
+ * @param: pattern: The pattern to compile (or `NULL' to verify that a pattern has already been compiled)
+ * @return: NULL:   Success
+ * @return: * :     Error (returned pointer is the human-readable error message, as returned by `regerrordesc_np(3)')
+ *                  In this case, the internal, static regex buffer is left unaltered. */
+INTERN ATTR_SECTION(".text.crt.compat.glibc.regex") char __KOS_FIXED_CONST *
+NOTHROW_NCX(LIBCCALL libc_re_comp)(const char *pattern)
+/*[[[body:libc_re_comp]]]*/
+{
+	re_errno_t error;
+	struct re_code *oldpat;
+	struct re_compiler comp;
+	if (pattern == NULL) {
+		if (libc_re_comp_buffer == NULL)
+			return NULL;
+		return (char *)libc_re_comp_no_pattern_errmsg;
+	}
+	if unlikely(!libregex_load())
+		return (char *)regerrordesc_np(REG_ENOSYS);
+
+	/* Initialize the regex compiler */
+	re_compiler_init(&comp, pattern, strend(pattern),
+	                 re_syntax_options | RE_ANCHORS_IGNORE_EFLAGS);
+
+	/* Compile the pattern. */
+	error = re_compiler_compile(&comp);
+	if unlikely(error != RE_NOERROR) {
+		re_compiler_fini(&comp);
+		return (char *)regerrordesc_np(error);
+	}
+
+	/* Remember the newly compiled regex code blob. */
+	oldpat = libc_re_comp_buffer;
+	libc_re_comp_buffer = re_compiler_pack(&comp);
+	free(oldpat);
+
+	/* Indicate no-error. */
+	return NULL;
+}
+/*[[[end:libc_re_comp]]]*/
+
+/*[[[head:libc_re_exec,hash:CRC-32=0xb1611a3c]]]*/
+/* >> re_exec(3)
+ * Try to match the regex previous compiled by `re_comp(3)'
+ * against some sub-string of `string'. This is equivalent to:
+ * >> re_search(&REGEX_COMPILED_BY_RE_COMP, // self
+ * >>           string,                     // string
+ * >>           strlen(string),             // length
+ * >>           0,                          // start
+ * >>           strlen(string),             // range
+ * >>           NULL) >= 0                  // regs
+ * Note that to  force matching to  only happen at  the start of  `string',
+ * the pattern passed to `re_comp(3)' should begin with "^" (thus requiring
+ * that the pattern only matches at the start, or after a line-feed).
+ *
+ * If `re_comp(3)' has never been called, always returns `0'
+ * @param: string: The pattern to compile (or `NULL' to verify that a pattern has already been compiled)
+ * @return: 1:     The given `string' contains (at least) one matching sub-string
+ * @return: 0:     The given `string' does not contain a sub-string that matches the previously compiled pattern. */
+INTERN ATTR_SECTION(".text.crt.compat.glibc.regex") ATTR_PURE WUNUSED NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc_re_exec)(const char *string)
+/*[[[body:libc_re_exec]]]*/
+{
+	size_t len;
+	struct re_exec exec;
+	struct iovec iov[1];
+	ssize_t status;
+
+	/* Initialize the regex execution controller. */
+	len              = strlen(string);
+	exec.rx_startoff = 0;
+	exec.rx_endoff   = len;
+	iov[0].iov_base  = (void *)string;
+	iov[0].iov_len   = len;
+	exec.rx_code     = libc_re_comp_buffer;
+	exec.rx_iov      = iov;
+	exec.rx_extra    = 0;
+	exec.rx_eflags   = 0;
+	exec.rx_nmatch   = 0;
+	if unlikely(!exec.rx_code)
+		return 0; /* No pattern was ever compiled. */
+
+#if 0 /* NOTE: Since we know that a pattern has been compiled, we can
+       *       also safely assume that `libregex.so' has been loaded. */
+	if unlikely(!libregex_load())
+		return 0;
+#endif
+
+	/* Execute the match-request.
+	 *
+	 * Note how we use `re_exec_search()' here, since we
+	 * don't just want to match at the start of `string' */
+	status = re_exec_search(&exec, len, NULL);
+
+	/* Return indicative of a match having happened somewhere */
+	return status >= 0 ? 1 : 0;
+}
+/*[[[end:libc_re_exec]]]*/
+
+
+
+/*[[[start:exports,hash:CRC-32=0x80680e6b]]]*/
 DEFINE_PUBLIC_ALIAS(re_compile_pattern, libc_re_compile_pattern);
 DEFINE_PUBLIC_ALIAS(re_search, libc_re_search);
 DEFINE_PUBLIC_ALIAS(re_search_2, libc_re_search_2);
@@ -752,6 +866,8 @@ DEFINE_PUBLIC_ALIAS(re_match, libc_re_match);
 DEFINE_PUBLIC_ALIAS(re_match_2, libc_re_match_2);
 DEFINE_PUBLIC_ALIAS(regcomp, libc_regcomp);
 DEFINE_PUBLIC_ALIAS(regexec, libc_regexec);
+DEFINE_PUBLIC_ALIAS(re_comp, libc_re_comp);
+DEFINE_PUBLIC_ALIAS(re_exec, libc_re_exec);
 /*[[[end:exports]]]*/
 
 DECL_END

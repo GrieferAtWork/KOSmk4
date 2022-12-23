@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9492586 */
+/* HASH CRC-32:0xdb8af425 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2941,8 +2941,10 @@
 #define __CRT_HAVE_DOS$rawmemxlenw
 #define __CRT_HAVE_DOS$rcmd
 #define __CRT_HAVE_DOS$rcmd_af
+#define __CRT_HAVE_DOS$re_comp
 #define __CRT_HAVE_DOS$re_compile_fastmap
 #define __CRT_HAVE_DOS$re_compile_pattern
+#define __CRT_HAVE_DOS$re_exec
 #define __CRT_HAVE_DOS$re_match
 #define __CRT_HAVE_DOS$re_match_2
 #define __CRT_HAVE_DOS$re_search
@@ -7281,8 +7283,10 @@
 #define __CRT_HAVE_rawmemxlenw
 #define __CRT_HAVE_rcmd
 #define __CRT_HAVE_rcmd_af
+#define __CRT_HAVE_re_comp
 #define __CRT_HAVE_re_compile_fastmap
 #define __CRT_HAVE_re_compile_pattern
+#define __CRT_HAVE_re_exec
 #define __CRT_HAVE_re_match
 #define __CRT_HAVE_re_match_2
 #define __CRT_HAVE_re_search

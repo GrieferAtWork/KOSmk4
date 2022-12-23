@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93c762cd */
+/* HASH CRC-32:0x6a6b42d4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -259,6 +259,37 @@ INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBDCALL libd_regerrordesc_np)
  * @return: NULL: No description is available for `errcode' */
 INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_regerrordesc_np)(int errcode);
 #endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> re_comp(3)
+ * Compare the given `pattern' and assign it to an internal regex buffer which can
+ * then later be used in conjunction with `re_exec(3)'. The Syntax options used by
+ * this function are  `re_syntax_options | RE_ANCHORS_IGNORE_EFLAGS'. By  default,
+ * the global `re_syntax_options' is set to `RE_SYNTAX_EMACS'.
+ * WARNING: This function is not thread-safe!
+ * @param: pattern: The pattern to compile (or `NULL' to verify that a pattern has already been compiled)
+ * @return: NULL:   Success
+ * @return: * :     Error (returned pointer is the human-readable error message, as returned by `regerrordesc_np(3)')
+ *                  In this case, the internal, static regex buffer is left unaltered. */
+INTDEF char __KOS_FIXED_CONST *NOTHROW_NCX(LIBDCALL libd_re_comp)(const char *pattern);
+/* >> re_exec(3)
+ * Try to match the regex previous compiled by `re_comp(3)'
+ * against some sub-string of `string'. This is equivalent to:
+ * >> re_search(&REGEX_COMPILED_BY_RE_COMP, // self
+ * >>           string,                     // string
+ * >>           strlen(string),             // length
+ * >>           0,                          // start
+ * >>           strlen(string),             // range
+ * >>           NULL) >= 0                  // regs
+ * Note that to  force matching to  only happen at  the start of  `string',
+ * the pattern passed to `re_comp(3)' should begin with "^" (thus requiring
+ * that the pattern only matches at the start, or after a line-feed).
+ *
+ * If `re_comp(3)' has never been called, always returns `0'
+ * @param: string: The pattern to compile (or `NULL' to verify that a pattern has already been compiled)
+ * @return: 1:     The given `string' contains (at least) one matching sub-string
+ * @return: 0:     The given `string' does not contain a sub-string that matches the previously compiled pattern. */
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_re_exec)(const char *string);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 
 DECL_END
 

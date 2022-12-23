@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc400609e */
+/* HASH CRC-32:0x22e460e3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -183,6 +183,35 @@ INTDEF ATTR_IN(2) ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_regcomp)(regex_t *__
  * @return: REG_ESPACE:  Out of memory.
  * @return: REG_ENOSYS:  Unable to load `libregex.so' (shouldn't happen) */
 INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_INOUTS(4, 3) int NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict self, char const *__restrict string, size_t nmatch, regmatch_t pmatch[__restrict_arr], int eflags);
+/* >> re_comp(3)
+ * Compare the given `pattern' and assign it to an internal regex buffer which can
+ * then later be used in conjunction with `re_exec(3)'. The Syntax options used by
+ * this function are  `re_syntax_options | RE_ANCHORS_IGNORE_EFLAGS'. By  default,
+ * the global `re_syntax_options' is set to `RE_SYNTAX_EMACS'.
+ * WARNING: This function is not thread-safe!
+ * @param: pattern: The pattern to compile (or `NULL' to verify that a pattern has already been compiled)
+ * @return: NULL:   Success
+ * @return: * :     Error (returned pointer is the human-readable error message, as returned by `regerrordesc_np(3)')
+ *                  In this case, the internal, static regex buffer is left unaltered. */
+INTDEF char __KOS_FIXED_CONST *NOTHROW_NCX(LIBCCALL libc_re_comp)(const char *pattern);
+/* >> re_exec(3)
+ * Try to match the regex previous compiled by `re_comp(3)'
+ * against some sub-string of `string'. This is equivalent to:
+ * >> re_search(&REGEX_COMPILED_BY_RE_COMP, // self
+ * >>           string,                     // string
+ * >>           strlen(string),             // length
+ * >>           0,                          // start
+ * >>           strlen(string),             // range
+ * >>           NULL) >= 0                  // regs
+ * Note that to  force matching to  only happen at  the start of  `string',
+ * the pattern passed to `re_comp(3)' should begin with "^" (thus requiring
+ * that the pattern only matches at the start, or after a line-feed).
+ *
+ * If `re_comp(3)' has never been called, always returns `0'
+ * @param: string: The pattern to compile (or `NULL' to verify that a pattern has already been compiled)
+ * @return: 1:     The given `string' contains (at least) one matching sub-string
+ * @return: 0:     The given `string' does not contain a sub-string that matches the previously compiled pattern. */
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_re_exec)(const char *string);
 #endif /* !__KERNEL__ */
 
 DECL_END
