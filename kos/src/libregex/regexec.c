@@ -123,7 +123,9 @@ struct re_interpreter {
 	size_t                          ri_onfailc;   /* [<= ri_onfaila] # of elements on the on-failure stack */
 	size_t                          ri_onfaila;   /* Allocated # of elements of `ri_onfailv' */
 	struct re_interpreter_inptr     ri_bmatch;    /* USED INTERNALLY: pending best match */
-	re_regmatch_t                  *ri_bmatch_g;  /* [0..ri_exec->rx_code->rc_ngrps] Group match buffer for `ri_bmatch' */
+	re_regmatch_t                  *ri_bmatch_g;  /* [1..ri_exec->rx_code->rc_ngrps]
+	                                               * [valid_if(best_match_isvalid() && ri_exec->rx_nmatch != 0)]
+	                                               * Group match buffer for `ri_bmatch' */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, ri_vars);     /* [ri_exec->rx_code->rc_nvars] Space for variables used by code. */
 };
 
@@ -947,7 +949,6 @@ do_epsilon_match:
 	/* Initialize the best match as not-matched-yet */
 	self->ri_bmatch.ri_in_ptr  = (byte_t *)1;
 	self->ri_bmatch.ri_in_cend = (byte_t *)0;
-	self->ri_bmatch_g          = NULL;
 #define best_match_isvalid() (self->ri_bmatch.ri_in_ptr <= self->ri_bmatch.ri_in_cend)
 
 	/* Helper macros */
@@ -2014,13 +2015,12 @@ do_set_group_eo_and_dispatch_j:
 				      (self->ri_exec->rx_nmatch && is_regmatch_better(self->ri_pmatch, self->ri_bmatch_g,
 				                                                      self->ri_exec->rx_code->rc_ngrps))))) {
 					struct re_exec const *exec;
-					self->ri_bmatch = self->ri_in;
 					/* Check if also have to  save the current state of  group-matches
 					 * This is only necessary if the caller wants us to produce group-
 					 * range match offsets. */
 					exec = self->ri_exec;
 					if (exec->rx_nmatch) {
-						if (self->ri_bmatch_g == NULL) {
+						if (!best_match_isvalid()) {
 							self->ri_bmatch_g = (re_regmatch_t *)alloca(exec->rx_code->rc_ngrps *
 							                                            sizeof(re_regmatch_t));
 						}
@@ -2028,6 +2028,7 @@ do_set_group_eo_and_dispatch_j:
 						       exec->rx_code->rc_ngrps,
 						       sizeof(re_regmatch_t));
 					}
+					self->ri_bmatch = self->ri_in;
 				}
 				ONFAIL();
 			}
@@ -2042,7 +2043,7 @@ do_set_group_eo_and_dispatch_j:
 			                                                      self->ri_exec->rx_code->rc_ngrps))))) {
 return_best_match:
 				self->ri_in = self->ri_bmatch;
-				if (self->ri_bmatch_g) {
+				if (self->ri_exec->rx_nmatch) {
 					/* Must also restore the current state of group-matches */
 					memcpy(self->ri_pmatch, self->ri_bmatch_g,
 					       self->ri_exec->rx_code->rc_ngrps,
@@ -2097,6 +2098,7 @@ onfail:
 		re_interpreter_setinptr(self, item->rof_in);
 		DISPATCH();
 	}
+	__builtin_unreachable();
 err_nomem:
 	return -RE_ESPACE;
 #undef PUSHFAIL_EX
