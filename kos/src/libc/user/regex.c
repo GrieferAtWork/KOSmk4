@@ -687,18 +687,23 @@ NOTHROW_NCX(LIBCCALL libc_regcomp)(regex_t *__restrict self,
 }
 /*[[[end:libc_regcomp]]]*/
 
-/*[[[head:libc_regexec,hash:CRC-32=0xc53c78d6]]]*/
-/* >> regcomp(3)
- * Compile a regular expression `pattern' and initialize `self'
- * @param: self:   Storage for the produced regex pattern.
- * @param: string: Input data base pointer (must be a NUL-terminated string, unless `REG_STARTEND' is given)
- * @param: nmatch: Max # of group start/end-offsets to write to `*pmatch' (ignored if `REG_NOSUB' was set)
+/*[[[head:libc_regexec,hash:CRC-32=0x82761448]]]*/
+/* >> regexec(3)
+ * Execute a compiled regular expression `pattern' on the priveded string.
+ * - This function searches for the FIRST position in `string' at which `self' can be matched.
+ * - When `nmatch > 0' (and `REG_NOSUB' wasn't set), the matched address-range is stored in `pmatch[0]'
+ * - When `nmatch > 1' (and `REG_NOSUB' wasn't set), the start/end-offsets of "(...)"-groups are stored
+ *   here for up to the  first `nmatch - 1' groups. Non-existant groups  are assigned `-1' in  offsets.
+ * - When nothing was matched, and `nmatch > 0' (and `REG_NOSUB' wasn't set), the offsets of all elements
+ *   of `pmatch' are set to `-1' (thus indicating a lack of any sort of match).
+ * @param: self:   The compiled regex pattern.
+ * @param: string: Input data that should be matched (must be a NUL-terminated string, unless `REG_STARTEND' is given)
+ * @param: nmatch: one plus max # of group start/end-offsets to write to `*pmatch' (ignored if `REG_NOSUB' was set)
+ *                 When non-zero, `pmatch[0]' will receive the start/end offsets where `self' matched in  `string'.
  * @param: pmatch: Storage for at least `nmatch' group start/end-offsets (ignored if `REG_NOSUB' was set)
  * @param: eflags: Set of `REG_NOTBOL | REG_NOTEOL | REG_STARTEND'
- * @return: REG_NOERROR: Success
- * @return: REG_NOMATCH: General pattern syntax error.
- * @return: REG_ESPACE:  Out of memory.
- * @return: REG_ENOSYS:  Unable to load `libregex.so' (shouldn't happen) */
+ * @return: 0:           Success
+ * @return: REG_NOMATCH: Nothing was matched, or some internal error happened */
 INTERN ATTR_SECTION(".text.crt.utility.regex") ATTR_IN(1) ATTR_IN(2) ATTR_INOUTS(4, 3) int
 NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict self,
                                    char const *__restrict string,
@@ -710,8 +715,9 @@ NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict self,
 	struct re_exec exec;
 	struct iovec iov[1];
 	ssize_t status;
+	size_t match_size;
 	if unlikely(!libregex_load())
-		return REG_ENOSYS;
+		return REG_NOMATCH;
 
 	/* If compiled with `REG_NOSUB', don't fill in `pmatch' */
 	if (self->no_sub)
@@ -733,12 +739,37 @@ NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict self,
 	exec.rx_eflags  = eflags;
 	exec.rx_nmatch  = nmatch;
 	exec.rx_pmatch  = (re_regmatch_t *)pmatch;
+	if (nmatch) {
+		/* Make space for the slot that will take the entire matched area. */
+		--exec.rx_nmatch;
+		++exec.rx_pmatch;
+	}
 
 	/* Execute the match-request */
-	status = re_exec_match(&exec);
-	if (status >= 0)
-		return REG_NOERROR;
-	return -status;
+	status = re_exec_search(&exec, exec.rx_endoff - exec.rx_startoff, &match_size);
+	if (status < 0) {
+		/* Mark all match registers as non-matching. */
+		memsetc(pmatch, (regoff_t)-1, 2 * nmatch, sizeof(regoff_t));
+		return REG_NOMATCH;
+	}
+
+	/* Fill in extra match information if the caller provided space for it. */
+	if (nmatch) {
+		/* "The entire regular expression's match addresses are stored in pmatch[0]." */
+		pmatch[0].rm_so = (size_t)status;
+		pmatch[0].rm_eo = (size_t)status + match_size;
+
+		/* If space for more groups than actually exist  was
+		 * given, must fill in unused groups as not-matched. */
+		++pmatch;
+		--nmatch;
+		if (nmatch > self->re_nsub) {
+			pmatch += self->re_nsub;
+			nmatch -= self->re_nsub;
+			memsetc(pmatch, (regoff_t)-1, 2 * nmatch, sizeof(regoff_t));
+		}
+	}
+	return 0;
 }
 /*[[[end:libc_regexec]]]*/
 

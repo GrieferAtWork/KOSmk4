@@ -767,17 +767,22 @@ void re_set_registers([[inout]] regex_t *self, [[out]] struct __re_registers *re
 [[decl_include("<bits/crt/regex.h>")]]
 int regcomp([[out]] regex_t *__restrict self, [[in]] char const *__restrict pattern, int cflags);
 
-@@>> regcomp(3)
-@@Compile a regular expression `pattern' and initialize `self'
-@@@param: self:   Storage for the produced regex pattern.
-@@@param: string: Input data base pointer (must be a NUL-terminated string, unless `REG_STARTEND' is given)
-@@@param: nmatch: Max # of group start/end-offsets to write to `*pmatch' (ignored if `REG_NOSUB' was set)
+@@>> regexec(3)
+@@Execute a compiled regular expression `pattern' on the priveded string.
+@@- This function searches for the FIRST position in `string' at which `self' can be matched.
+@@- When `nmatch > 0' (and `REG_NOSUB' wasn't set), the matched address-range is stored in `pmatch[0]'
+@@- When `nmatch > 1' (and `REG_NOSUB' wasn't set), the start/end-offsets of "(...)"-groups are stored
+@@  here for up to the  first `nmatch - 1' groups. Non-existant groups  are assigned `-1' in  offsets.
+@@- When nothing was matched, and `nmatch > 0' (and `REG_NOSUB' wasn't set), the offsets of all elements
+@@  of `pmatch' are set to `-1' (thus indicating a lack of any sort of match).
+@@@param: self:   The compiled regex pattern.
+@@@param: string: Input data that should be matched (must be a NUL-terminated string, unless `REG_STARTEND' is given)
+@@@param: nmatch: one plus max # of group start/end-offsets to write to `*pmatch' (ignored if `REG_NOSUB' was set)
+@@                When non-zero, `pmatch[0]' will receive the start/end offsets where `self' matched in  `string'.
 @@@param: pmatch: Storage for at least `nmatch' group start/end-offsets (ignored if `REG_NOSUB' was set)
 @@@param: eflags: Set of `REG_NOTBOL | REG_NOTEOL | REG_STARTEND'
-@@@return: REG_NOERROR: Success
-@@@return: REG_NOMATCH: General pattern syntax error.
-@@@return: REG_ESPACE:  Out of memory.
-@@@return: REG_ENOSYS:  Unable to load `libregex.so' (shouldn't happen)
+@@@return: 0:           Success
+@@@return: REG_NOMATCH: Nothing was matched, or some internal error happened
 [[decl_include("<hybrid/typecore.h>", "<bits/crt/regex.h>")]]
 int regexec([[in]] regex_t const *__restrict self, [[in]] char const *__restrict string,
             size_t nmatch, [[inout(nmatch)]] regmatch_t pmatch[__restrict_arr], int eflags);
