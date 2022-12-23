@@ -371,12 +371,15 @@ DEFINE_SYSCALL2(errno_t, munlock,
 
 #ifdef __ARCH_WANT_SYSCALL_MLOCKALL
 DEFINE_SYSCALL1(errno_t, mlockall, syscall_ulong_t, flags) {
+	unsigned int mlock_flags = MLOCK_NOW;
 	VALIDATE_FLAGSET(flags, MCL_CURRENT | MCL_FUTURE | MCL_ONFAULT,
 	                 E_INVALID_ARGUMENT_CONTEXT_MLOCKALL_FLAGS);
 	/* NOTE: Currently, only `MCL_ONFAULT' has an affect. The
 	 *       other  flags  are recognized  (for compatibility
 	 *       with linux), but are otherwise ignored. */
-	mman_mlockall(THIS_MMAN, flags & MCL_ONFAULT);
+	if (flags & MCL_ONFAULT)
+		mlock_flags |= MLOCK_ONFAULT;
+	mman_mlockall(THIS_MMAN, mlock_flags);
 	return EOK;
 }
 #endif /* __ARCH_WANT_SYSCALL_MLOCKALL */
