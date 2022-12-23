@@ -2334,6 +2334,7 @@
 #define __CRT_HAVE_adjtime64
 #define __CRT_HAVE_adjtimex
 #define __CRT_HAVE_adjtimex64
+#define __CRT_HAVE_advance
 #define __CRT_HAVE_aio_cancel
 #define __CRT_HAVE_aio_cancel64
 #define __CRT_HAVE_aio_error
@@ -3601,6 +3602,8 @@
 #define __CRT_HAVE_llroundl
 #define __CRT_HAVE_llseek
 #define __CRT_HAVE_lltostr
+#define __CRT_HAVE_loc1
+#define __CRT_HAVE_loc2
 #define __CRT_HAVE_loc_aton
 #define __CRT_HAVE_loc_ntoa
 #define __CRT_HAVE_localeconv
@@ -3615,6 +3618,7 @@
 #define __CRT_HAVE_lockop_reap_ex
 #define __CRT_HAVE_lockop_reap_shared_lock
 #define __CRT_HAVE_lockop_reap_shared_rwlock
+#define __CRT_HAVE_locs
 #define __CRT_HAVE_log
 #define __CRT_HAVE_log10
 #define __CRT_HAVE_log10f
@@ -4755,6 +4759,7 @@
 #define __CRT_HAVE_stdin
 #define __CRT_HAVE_stdout
 #define __CRT_HAVE_stdtty
+#define __CRT_HAVE_step
 #define __CRT_HAVE_stime
 #define __CRT_HAVE_stime64
 #define __CRT_HAVE_stpcpy

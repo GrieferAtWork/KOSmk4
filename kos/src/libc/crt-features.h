@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb8af425 */
+/* HASH CRC-32:0x59cd2914 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1036,6 +1036,7 @@
 #define __CRT_HAVE_DOS$adjtime64
 #define __CRT_HAVE_DOS$adjtimex
 #define __CRT_HAVE_DOS$adjtimex64
+#define __CRT_HAVE_DOS$advance
 #define __CRT_HAVE_DOS$aio_cancel
 #define __CRT_HAVE_DOS$aio_cancel64
 #define __CRT_HAVE_DOS$aio_error
@@ -3330,6 +3331,7 @@
 #define __CRT_HAVE_DOS$statfs64
 #define __CRT_HAVE_DOS$statvfs
 #define __CRT_HAVE_DOS$statvfs64
+#define __CRT_HAVE_DOS$step
 #define __CRT_HAVE_DOS$stime
 #define __CRT_HAVE_DOS$stime64
 #define __CRT_HAVE_DOS$stpcpy
@@ -5296,6 +5298,7 @@
 #define __CRT_HAVE_adjtime64
 #define __CRT_HAVE_adjtimex
 #define __CRT_HAVE_adjtimex64
+#define __CRT_HAVE_advance
 #define __CRT_HAVE_aio_cancel
 #define __CRT_HAVE_aio_cancel64
 #define __CRT_HAVE_aio_error
@@ -7772,6 +7775,7 @@
 #define __CRT_HAVE_statfs64
 #define __CRT_HAVE_statvfs
 #define __CRT_HAVE_statvfs64
+#define __CRT_HAVE_step
 #define __CRT_HAVE_stime
 #define __CRT_HAVE_stime64
 #endif /* !__KERNEL__ */

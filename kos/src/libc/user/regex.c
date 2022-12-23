@@ -178,6 +178,19 @@ static_assert(sizeof_field(re_regmatch_t, rm_eo) == sizeof_field(regmatch_t, rm_
 
 
 /************************************************************************/
+/* GLOBAL DATA SYMBOLS FOR `<regexp.h>'                                 */
+/************************************************************************/
+#undef loc1
+#undef loc2
+#undef locs
+PUBLIC ATTR_SECTION(".bss.crt.compat.glibc.regex") char *loc1 = NULL;
+PUBLIC ATTR_SECTION(".bss.crt.compat.glibc.regex") char *loc2 = NULL;
+PUBLIC ATTR_SECTION(".bss.crt.compat.glibc.regex") char *locs = NULL; /* NOTE: Never used internally! */
+
+
+
+
+/************************************************************************/
 /* DEFAULT REGEX SYNTAX FOR `re_compile_pattern(3)'                     */
 /************************************************************************/
 #undef re_syntax_options
@@ -687,7 +700,7 @@ NOTHROW_NCX(LIBCCALL libc_regcomp)(regex_t *__restrict self,
 }
 /*[[[end:libc_regcomp]]]*/
 
-/*[[[head:libc_regexec,hash:CRC-32=0x82761448]]]*/
+/*[[[head:libc_regexec,hash:CRC-32=0x28fdbea2]]]*/
 /* >> regexec(3)
  * Execute a compiled regular expression `pattern' on the priveded string.
  * - This function searches for the FIRST position in `string' at which `self' can be matched.
@@ -704,7 +717,7 @@ NOTHROW_NCX(LIBCCALL libc_regcomp)(regex_t *__restrict self,
  * @param: eflags: Set of `REG_NOTBOL | REG_NOTEOL | REG_STARTEND'
  * @return: 0:           Success
  * @return: REG_NOMATCH: Nothing was matched, or some internal error happened */
-INTERN ATTR_SECTION(".text.crt.utility.regex") ATTR_IN(1) ATTR_IN(2) ATTR_INOUTS(4, 3) int
+INTERN ATTR_SECTION(".text.crt.utility.regex") ATTR_IN(1) ATTR_IN(2) int
 NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict self,
                                    char const *__restrict string,
                                    size_t nmatch,

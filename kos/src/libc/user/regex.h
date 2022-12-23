@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2aa2b23f */
+/* HASH CRC-32:0x5f443394 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -187,7 +187,7 @@ INTDEF ATTR_IN(2) ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_regcomp)(regex_t *__
  * @param: eflags: Set of `REG_NOTBOL | REG_NOTEOL | REG_STARTEND'
  * @return: 0:           Success
  * @return: REG_NOMATCH: Nothing was matched, or some internal error happened */
-INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_INOUTS(4, 3) int NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict self, char const *__restrict string, size_t nmatch, regmatch_t pmatch[__restrict_arr], int eflags);
+INTDEF ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict self, char const *__restrict string, size_t nmatch, regmatch_t pmatch[__restrict_arr], int eflags);
 /* >> re_comp(3)
  * Compare the given `pattern' and assign it to an internal regex buffer which can
  * then later be used in conjunction with `re_exec(3)'. The Syntax options used by

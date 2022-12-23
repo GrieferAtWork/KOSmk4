@@ -785,7 +785,7 @@ int regcomp([[out]] regex_t *__restrict self, [[in]] char const *__restrict patt
 @@@return: REG_NOMATCH: Nothing was matched, or some internal error happened
 [[decl_include("<hybrid/typecore.h>", "<bits/crt/regex.h>")]]
 int regexec([[in]] regex_t const *__restrict self, [[in]] char const *__restrict string,
-            size_t nmatch, [[inout(nmatch)]] regmatch_t pmatch[__restrict_arr], int eflags);
+            size_t nmatch, regmatch_t pmatch[__restrict_arr], int eflags);
 
 
 @@>> regerror(3)

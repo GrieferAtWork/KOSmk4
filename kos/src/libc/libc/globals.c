@@ -81,6 +81,15 @@ PUBLIC ATTR_SECTION(".bss.crt.error") int error_one_per_line = 0;
 DEFINE_NOREL_GLOBAL_META(__reg_syntax_t, re_syntax_options, ".crt.utility.regex");
 
 
+/* <regexp.h> */
+#undef loc1
+#undef loc2
+#undef locs
+DEFINE_NOREL_GLOBAL_META(char *, loc1, ".crt.compat.glibc.regex");
+DEFINE_NOREL_GLOBAL_META(char *, loc2, ".crt.compat.glibc.regex");
+/*DEFINE_NOREL_GLOBAL_META(char *, locs, ".crt.compat.glibc.regex");*/ /* Never used */
+
+
 /* <time.h> */
 #undef tzname
 #undef timezone

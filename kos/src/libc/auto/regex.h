@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xddea1ba2 */
+/* HASH CRC-32:0xa9bd6e7b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -220,7 +220,7 @@ INTDEF ATTR_IN(2) ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_regcomp)(regex_t *__
  * @param: eflags: Set of `REG_NOTBOL | REG_NOTEOL | REG_STARTEND'
  * @return: 0:           Success
  * @return: REG_NOMATCH: Nothing was matched, or some internal error happened */
-INTDEF ATTR_IN(1) ATTR_IN(2) ATTR_INOUTS(4, 3) int NOTHROW_NCX(LIBDCALL libd_regexec)(regex_t const *__restrict self, char const *__restrict string, size_t nmatch, regmatch_t pmatch[__restrict_arr], int eflags);
+INTDEF ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_regexec)(regex_t const *__restrict self, char const *__restrict string, size_t nmatch, regmatch_t pmatch[__restrict_arr], int eflags);
 /* >> regerror(3)
  * Produce a human-readable description for a regex error code `errcode' (s.a. `regerrordesc_np(3)')
  * @param: errcode: Regex error code (one of `REG_*'; s.a. `reg_errcode_t')

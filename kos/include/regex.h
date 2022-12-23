@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7a9134a */
+/* HASH CRC-32:0xc49ef8b8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -719,7 +719,7 @@ __CDECLARE_OPT(__ATTR_IN(2) __ATTR_OUT(1),int,__NOTHROW_NCX,regcomp,(regex_t *__
  * @param: eflags: Set of `REG_NOTBOL | REG_NOTEOL | REG_STARTEND'
  * @return: 0:           Success
  * @return: REG_NOMATCH: Nothing was matched, or some internal error happened */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_IN(2) __ATTR_INOUTS(4, 3),int,__NOTHROW_NCX,regexec,(regex_t const *__restrict __self, char const *__restrict __string, size_t __nmatch, regmatch_t __pmatch[__restrict_arr], int __eflags),(__self,__string,__nmatch,__pmatch,__eflags))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,regexec,(regex_t const *__restrict __self, char const *__restrict __string, size_t __nmatch, regmatch_t __pmatch[__restrict_arr], int __eflags),(__self,__string,__nmatch,__pmatch,__eflags))
 #ifdef __CRT_HAVE_regerror
 /* >> regerror(3)
  * Produce a human-readable description for a regex error code `errcode' (s.a. `regerrordesc_np(3)')

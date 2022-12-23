@@ -169,6 +169,24 @@ DECLARE_NOREL_GLOBAL_META(__reg_syntax_t, re_syntax_options);
 #define __LOCAL_re_syntax_options GET_NOREL_GLOBAL(re_syntax_options)
 
 
+/* <regexp.h> */
+#undef loc1
+#undef loc2
+#undef locs
+#undef __LOCAL_loc1
+#undef __LOCAL_loc2
+#undef __LOCAL_locs
+DECLARE_NOREL_GLOBAL_META(char *, loc1);
+DECLARE_NOREL_GLOBAL_META(char *, loc2);
+/*DECLARE_NOREL_GLOBAL_META(char *, locs);*/ /* Never used */
+#define loc1         GET_NOREL_GLOBAL(loc1)
+#define loc2         GET_NOREL_GLOBAL(loc2)
+#define locs         GET_NOREL_GLOBAL(locs)
+#define __LOCAL_loc1 GET_NOREL_GLOBAL(loc1)
+#define __LOCAL_loc2 GET_NOREL_GLOBAL(loc2)
+#define __LOCAL_locs GET_NOREL_GLOBAL(locs)
+
+
 /* <time.h> */
 #undef __tzname
 #undef __timezone
