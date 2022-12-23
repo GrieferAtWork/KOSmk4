@@ -40,6 +40,7 @@ options["COMPILE.language"] = "c";
 #include <alloca.h>
 #include <assert.h>
 #include <ctype.h>
+#include <inttypes.h>
 #include <malloc.h>
 #include <stdbool.h>
 #include <stddef.h>
@@ -70,11 +71,24 @@ DECL_BEGIN
 #define DBG_memset(...) (void)0
 #endif /* NDEBUG || NDEBUG_FINI */
 
+
+
+
+#define RE_ONFAILURE_ITEM_DUMMY_INPTR                         ((byte_t const *)512) /* == 256 * 2 (256 being the max # of groups per pattern, and 2 being the # of offsets per group) */
+#define RE_ONFAILURE_ITEM_SPECIAL_CHECK(inptr)                ((uintptr_t)(inptr) <= (uintptr_t)RE_ONFAILURE_ITEM_DUMMY_INPTR)
+#define RE_ONFAILURE_ITEM_GROUP_RESTORE_CHECK(inptr)          ((uintptr_t)(inptr) < (uintptr_t)RE_ONFAILURE_ITEM_DUMMY_INPTR)
+#define RE_ONFAILURE_ITEM_GROUP_RESTORE_ISSTART(inptr)        ((uintptr_t)(inptr) & 1)
+#define RE_ONFAILURE_ITEM_GROUP_RESTORE_GETGID(inptr)         ((uintptr_t)(inptr) >> 1)
+#define RE_ONFAILURE_ITEM_GROUP_RESTORE_ENCODE(is_start, gid) ((byte_t const *)(uintptr_t)(((gid) << 1) | (is_start)))
+
+
 struct re_onfailure_item {
 	byte_t const *rof_in; /* [0..1] Input data pointer to restore (points into some input buffer)
-	                       *        Set to NULL for dummy on-fail items. */
-	byte_t const *rof_pc; /* [1..1][valid_if(rof_in != NULL)] Program counter to restore
-	                       * NOTE: (only used for identification when `rof_in == NULL') */
+	                       * - Set to `RE_ONFAILURE_ITEM_DUMMY_INPTR' for dummy on-fail items.
+	                       * - Set to `RE_ONFAILURE_ITEM_GROUP_RESTORE_ENCODE()' if `rof_pc' encodes
+	                       *   the start- or end-offset that should be restored for a group on fail. */
+	byte_t const *rof_pc; /* [1..1] Program counter to restore
+	                       * NOTE: only used for identification when `rof_in == RE_ONFAILURE_ITEM_DUMMY_INPTR' */
 };
 
 struct re_interpreter_inptr {
@@ -109,8 +123,10 @@ struct re_interpreter {
 	size_t                          ri_onfailc;   /* [<= ri_onfaila] # of elements on the on-failure stack */
 	size_t                          ri_onfaila;   /* Allocated # of elements of `ri_onfailv' */
 	struct re_interpreter_inptr     ri_bmatch;    /* USED INTERNALLY: pending best match */
+	re_regmatch_t                  *ri_bmatch_g;  /* [0..ri_exec->rx_code->rc_ngrps] Group match buffer for `ri_bmatch' */
 	COMPILER_FLEXIBLE_ARRAY(byte_t, ri_vars);     /* [ri_exec->rx_code->rc_nvars] Space for variables used by code. */
 };
+
 #define re_interpreter_inptr_in_advance1(self)                                                           \
 	(unlikely((self)->ri_in_ptr >= (self)->ri_in_cend) ? re_interpreter_inptr_nextchunk(self) : (void)0, \
 	 ++(self)->ri_in_ptr)
@@ -668,7 +684,7 @@ NOTHROW_NCX(CC re_interpreter_pushfail)(struct re_interpreter *__restrict self,
 
 PRIVATE WUNUSED NONNULL((1)) bool
 NOTHROW_NCX(CC re_interpreter_pushfail_dummy)(struct re_interpreter *__restrict self,
-                                              byte_t const *pc) {
+                                              byte_t const *in, byte_t const *pc) {
 	struct re_onfailure_item *item;
 	assert(self->ri_onfailc <= self->ri_onfaila);
 	if unlikely(self->ri_onfailc >= self->ri_onfaila) {
@@ -676,7 +692,7 @@ NOTHROW_NCX(CC re_interpreter_pushfail_dummy)(struct re_interpreter *__restrict 
 			return false;
 	}
 	item = &self->ri_onfailv[self->ri_onfailc++];
-	item->rof_in = NULL;
+	item->rof_in = in;
 	item->rof_pc = pc;
 	return true;
 }
@@ -829,6 +845,39 @@ again:
 	return pc;
 }
 
+/* Check if reg-match `a' is better than `b' */
+PRIVATE ATTR_PURE WUNUSED NONNULL((1, 2)) bool
+NOTHROW_NCX(CC is_regmatch_better)(re_regmatch_t const *__restrict a,
+                                   re_regmatch_t const *__restrict b,
+                                   uint16_t nregs) {
+	uint16_t i;
+	for (i = 0; i < nregs; ++i) {
+		re_sregoff_t a_startoff, a_endoff;
+		re_sregoff_t b_startoff, b_endoff;
+
+		/* We prefer groups that end later. */
+		a_endoff = (re_sregoff_t)a[i].rm_eo;
+		b_endoff = (re_sregoff_t)b[i].rm_eo;
+		if (a_endoff > b_endoff)
+			return true;
+		if (a_endoff < b_endoff)
+			return false;
+
+		/* We prefer groups that start earlier. */
+		a_startoff = (re_sregoff_t)a[i].rm_so;
+		b_startoff = (re_sregoff_t)b[i].rm_so;
+		if (a_startoff < b_startoff)
+			return true;
+		if (a_startoff > b_startoff)
+			return false;
+	}
+
+	/* The group matches are identical (but indicate `false'
+	 * since that  allows our  caller  to skip  some  stuff) */
+	return false;
+}
+
+
 /* Execute the regex interpreter.
  * NOTE: The caller is  responsible for loading  a non-empty  chunk,
  *       unless the entire input buffer is empty. iow: this function
@@ -898,21 +947,23 @@ do_epsilon_match:
 	/* Initialize the best match as not-matched-yet */
 	self->ri_bmatch.ri_in_ptr  = (byte_t *)1;
 	self->ri_bmatch.ri_in_cend = (byte_t *)0;
+	self->ri_bmatch_g          = NULL;
 #define best_match_isvalid() (self->ri_bmatch.ri_in_ptr <= self->ri_bmatch.ri_in_cend)
 
 	/* Helper macros */
 #define DISPATCH()     goto dispatch
 #ifdef HAVE_TRACE
 #define ONFAIL()       do{ TRACE("ONFAIL: %d\n", __LINE__); goto onfail; }__WHILE0
-#define TARGET(opcode) __IF0 { case opcode: TRACE("%#.4Ix: %s\n", (pc - 1) - self->ri_exec->rx_code->rc_code, #opcode); }
+#define TARGET(opcode) __IF0 { case opcode: TRACE("%#.4" PRIxSIZ ": %s\n", (size-t)((pc - 1) - self->ri_exec->rx_code->rc_code), #opcode); }
 #else /* HAVE_TRACE */
 #define ONFAIL()       goto onfail
 #define TARGET(opcode) case opcode:
 #endif /* !HAVE_TRACE */
-#define PUSHFAIL(pc)       do { if unlikely(!re_interpreter_pushfail(self, pc)) goto err_nomem; } __WHILE0
-#define PUSHFAIL_DUMMY(pc) do { if unlikely(!re_interpreter_pushfail_dummy(self, pc)) goto err_nomem; } __WHILE0
-#define getb()             (*pc++)
-#define getw()             (pc += 2, (int16_t)UNALIGNED_GET16((uint16_t const *)(pc - 2)))
+#define PUSHFAIL(pc)        do { if unlikely(!re_interpreter_pushfail(self, pc)) goto err_nomem; } __WHILE0
+#define PUSHFAIL_DUMMY(pc)  do { if unlikely(!re_interpreter_pushfail_dummy(self, RE_ONFAILURE_ITEM_DUMMY_INPTR, pc)) goto err_nomem; } __WHILE0
+#define PUSHFAIL_EX(in, pc) do { if unlikely(!re_interpreter_pushfail_dummy(self, in, pc)) goto err_nomem; } __WHILE0
+#define getb()              (*pc++)
+#define getw()              (pc += 2, (int16_t)UNALIGNED_GET16((uint16_t const *)(pc - 2)))
 
 	/* The main dispatch loop */
 dispatch:
@@ -1501,9 +1552,9 @@ REOP_NCS_UTF8_dispatch:
 			    match.rm_eo == RE_REGOFF_UNSET)
 				ONFAIL();
 			assertf(self->ri_pmatch[gid].rm_so <= self->ri_pmatch[gid].rm_eo,
-			        "self->ri_pmatch[%1$I8u].rm_so = %2$Iu\n"
-			        "self->ri_pmatch[%1$I8u].rm_eo = %3$Iu",
-			        gid, match.rm_so, match.rm_eo);
+			        "self->ri_pmatch[%1$" PRIu8 "].rm_so = %2$" PRIuSIZ "\n"
+			        "self->ri_pmatch[%1$" PRIu8 "].rm_eo = %3$" PRIuSIZ,
+			        gid, (size_t)match.rm_so, (size_t)match.rm_eo);
 			if (match.rm_so < match.rm_eo) {
 				if (!re_interpreter_consume_repeat(self, match.rm_so,
 				                                   match.rm_eo - match.rm_so))
@@ -1521,9 +1572,9 @@ REOP_NCS_UTF8_dispatch:
 			    match.rm_eo == RE_REGOFF_UNSET)
 				ONFAIL();
 			assertf(self->ri_pmatch[gid].rm_so <= self->ri_pmatch[gid].rm_eo,
-			        "self->ri_pmatch[%1$I8u].rm_so = %2$Iu\n"
-			        "self->ri_pmatch[%1$I8u].rm_eo = %3$Iu",
-			        gid, match.rm_so, match.rm_eo);
+			        "self->ri_pmatch[%1$" PRIu8 "].rm_so = %2$" PRIuSIZ "\n"
+			        "self->ri_pmatch[%1$" PRIu8 "].rm_eo = %3$" PRIuSIZ,
+			        gid, (size_t)match.rm_so, (size_t)match.rm_eo);
 			if (match.rm_so < match.rm_eo) {
 				if (!re_interpreter_consume_repeat(self, match.rm_so,
 				                                   match.rm_eo - match.rm_so))
@@ -1736,6 +1787,31 @@ REOP_NCS_UTF8_dispatch:
 		TARGET(REOP_GROUP_START) {
 			byte_t gid = getb();
 			assert(gid < self->ri_exec->rx_code->rc_ngrps);
+			if (self->ri_onfailc && /* No need to make a backup if it can't be restored */
+			    (self->ri_pmatch[gid].rm_so != re_interpreter_in_curoffset(self))) {
+				/* Must push (or override an old) on-fail item to restore old group start-offset */
+				size_t i = self->ri_onfailc;
+				do {
+					byte_t const *oldin;
+					--i;
+					oldin = self->ri_onfailv[i].rof_in;
+					if (RE_ONFAILURE_ITEM_GROUP_RESTORE_CHECK(oldin)) {
+						/* Check if we can override this on-fail item. */
+						if (RE_ONFAILURE_ITEM_GROUP_RESTORE_ISSTART(oldin) &&
+						    RE_ONFAILURE_ITEM_GROUP_RESTORE_GETGID(oldin) == gid) {
+							self->ri_onfailv[i].rof_pc = (byte_t const *)(uintptr_t)self->ri_pmatch[gid].rm_so;
+							goto do_set_group_so_and_dispatch;
+						}
+					} else {
+						/* Must actually push an new on-fail item. */
+						break;
+					}
+				} while (i);
+				/* Push a new on-fail item. */
+				PUSHFAIL_EX(RE_ONFAILURE_ITEM_GROUP_RESTORE_ENCODE(1, gid),
+				            (byte_t const *)(uintptr_t)self->ri_pmatch[gid].rm_so);
+			}
+do_set_group_so_and_dispatch:
 			/* Set start-of-group offset */
 			self->ri_pmatch[gid].rm_so = re_interpreter_in_curoffset(self);
 			DISPATCH();
@@ -1744,19 +1820,75 @@ REOP_NCS_UTF8_dispatch:
 		TARGET(REOP_GROUP_END) {
 			byte_t gid = getb();
 			assert(gid < self->ri_exec->rx_code->rc_ngrps);
+			if (self->ri_onfailc && /* No need to make a backup if it can't be restored */
+			    (self->ri_pmatch[gid].rm_eo != re_interpreter_in_curoffset(self))) {
+				/* Must push (or override an old) on-fail item to restore old group end-offset */
+				size_t i = self->ri_onfailc;
+				do {
+					byte_t const *oldin;
+					--i;
+					oldin = self->ri_onfailv[i].rof_in;
+					if (RE_ONFAILURE_ITEM_GROUP_RESTORE_CHECK(oldin)) {
+						/* Check if we can override this on-fail item. */
+						if (!RE_ONFAILURE_ITEM_GROUP_RESTORE_ISSTART(oldin) &&
+						    RE_ONFAILURE_ITEM_GROUP_RESTORE_GETGID(oldin) == gid) {
+							self->ri_onfailv[i].rof_pc = (byte_t const *)(uintptr_t)self->ri_pmatch[gid].rm_eo;
+							goto do_set_group_eo_and_dispatch;
+						}
+					} else {
+						/* Must actually push an new on-fail item. */
+						break;
+					}
+				} while (i);
+				/* Push a new on-fail item. */
+				PUSHFAIL_EX(RE_ONFAILURE_ITEM_GROUP_RESTORE_ENCODE(0, gid),
+				            (byte_t const *)(uintptr_t)self->ri_pmatch[gid].rm_eo);
+			}
+do_set_group_eo_and_dispatch:
 			/* Set end-of-group offset */
 			self->ri_pmatch[gid].rm_eo = re_interpreter_in_curoffset(self);
+			assertf(self->ri_pmatch[gid].rm_so <= self->ri_pmatch[gid].rm_eo,
+			        "self->ri_pmatch[%1$" PRIu8 "].rm_so = %2$" PRIuSIZ "\n"
+			        "self->ri_pmatch[%1$" PRIu8 "].rm_eo = %3$" PRIuSIZ,
+			        gid,
+			        (size_t)self->ri_pmatch[gid].rm_so,
+			        (size_t)self->ri_pmatch[gid].rm_eo);
 			DISPATCH();
 		}
 
 		TARGET(REOP_GROUP_END_JMIN ... REOP_GROUP_END_JMAX) {
 			byte_t gid = getb();
 			assert(gid < self->ri_exec->rx_code->rc_ngrps);
+			if (self->ri_onfailc && /* No need to make a backup if it can't be restored */
+			    (self->ri_pmatch[gid].rm_eo != re_interpreter_in_curoffset(self))) {
+				/* Must push (or override an old) on-fail item to restore old group end-offset */
+				size_t i = self->ri_onfailc;
+				do {
+					byte_t const *oldin;
+					--i;
+					oldin = self->ri_onfailv[i].rof_in;
+					if (RE_ONFAILURE_ITEM_GROUP_RESTORE_CHECK(oldin)) {
+						/* Check if we can override this on-fail item. */
+						if (!RE_ONFAILURE_ITEM_GROUP_RESTORE_ISSTART(oldin) &&
+						    RE_ONFAILURE_ITEM_GROUP_RESTORE_GETGID(oldin) == gid) {
+							self->ri_onfailv[i].rof_pc = (byte_t const *)(uintptr_t)self->ri_pmatch[gid].rm_eo;
+							goto do_set_group_eo_and_dispatch_j;
+						}
+					} else {
+						/* Must actually push an new on-fail item. */
+						break;
+					}
+				} while (i);
+				/* Push a new on-fail item. */
+				PUSHFAIL_EX(RE_ONFAILURE_ITEM_GROUP_RESTORE_ENCODE(0, gid),
+				            (byte_t const *)(uintptr_t)self->ri_pmatch[gid].rm_eo);
+			}
+do_set_group_eo_and_dispatch_j:
 			/* Set end-of-group offset */
 			self->ri_pmatch[gid].rm_eo = re_interpreter_in_curoffset(self);
 			assertf(self->ri_pmatch[gid].rm_so <= self->ri_pmatch[gid].rm_eo,
-			        "self->ri_pmatch[%1$I8u].rm_so = %2$Iu\n"
-			        "self->ri_pmatch[%1$I8u].rm_eo = %3$Iu",
+			        "self->ri_pmatch[%1$" PRIu8 "].rm_so = %2$" PRIuSIZ "\n"
+			        "self->ri_pmatch[%1$" PRIu8 "].rm_eo = %3$" PRIuSIZ,
 			        gid,
 			        (size_t)self->ri_pmatch[gid].rm_so,
 			        (size_t)self->ri_pmatch[gid].rm_eo);
@@ -1768,8 +1900,13 @@ REOP_NCS_UTF8_dispatch:
 		}
 
 		TARGET(REOP_POP_ONFAIL) {
-			if (self->ri_onfailc > 0) /* Can be `0' because of the fmap */
-				--self->ri_onfailc;
+			if (self->ri_onfailc > 0) { /* Can be `0' because of the fmap */
+				do {
+					--self->ri_onfailc;
+				} while (self->ri_onfailc && /* vvv keep popping until the stack becomes empty,
+				                              *     of we removed a non-group-restore  element. */
+				         RE_ONFAILURE_ITEM_GROUP_RESTORE_CHECK(self->ri_onfailv[self->ri_onfailc].rof_in));
+			}
 			DISPATCH();
 		}
 
@@ -1779,7 +1916,8 @@ REOP_NCS_UTF8_dispatch:
 			target_pc = pc + delta;
 			while (self->ri_onfailc > 0) { /* pc might not exist because of the fmap */
 				--self->ri_onfailc;
-				if (self->ri_onfailv[self->ri_onfailc].rof_pc == target_pc)
+				if (self->ri_onfailv[self->ri_onfailc].rof_pc == target_pc &&
+				    !RE_ONFAILURE_ITEM_GROUP_RESTORE_CHECK(self->ri_onfailv[self->ri_onfailc].rof_in))
 					break;
 			}
 			DISPATCH();
@@ -1858,27 +1996,58 @@ REOP_NCS_UTF8_dispatch:
 			if (self->ri_onfailc != 0) {
 				/* Check if our current match is the best it can get. */
 				if (re_interpreter_is_eoi(&self->ri_in)) {
-					/* No need to keep going! -- It can't get any better than this. */
-					return -RE_NOERROR;
+					/* No need to keep going! -- It can't get any better than this.
+					 *
+					 * BUT: if the caller  also wants  group matches, we  have to  find
+					 *      the best one of those, also (so no early exit in that case) */
+					if (self->ri_exec->rx_nmatch == 0)
+						return -RE_NOERROR;
 				}
 
 				/* Still have to roll back in order test more code-paths
 				 * -> In  this case,  check if  the current  match is better
 				 *    than the previous best match, and replace the previous
 				 *    one if the new one is better. */
-				if (!best_match_isvalid() || (re_interpreter_in_curoffset(self) >
-				                              re_interpreter_in_curoffset(&self->ri_bmatch)))
+				if (!best_match_isvalid() ||
+				    ((re_interpreter_in_curoffset(self) > re_interpreter_in_curoffset(&self->ri_bmatch)) ||
+				     (re_interpreter_in_curoffset(self) == re_interpreter_in_curoffset(&self->ri_bmatch) &&
+				      (self->ri_exec->rx_nmatch && is_regmatch_better(self->ri_pmatch, self->ri_bmatch_g,
+				                                                      self->ri_exec->rx_code->rc_ngrps))))) {
+					struct re_exec const *exec;
 					self->ri_bmatch = self->ri_in;
+					/* Check if also have to  save the current state of  group-matches
+					 * This is only necessary if the caller wants us to produce group-
+					 * range match offsets. */
+					exec = self->ri_exec;
+					if (exec->rx_nmatch) {
+						if (self->ri_bmatch_g == NULL) {
+							self->ri_bmatch_g = (re_regmatch_t *)alloca(exec->rx_code->rc_ngrps *
+							                                            sizeof(re_regmatch_t));
+						}
+						memcpy(self->ri_bmatch_g, self->ri_pmatch,
+						       exec->rx_code->rc_ngrps,
+						       sizeof(re_regmatch_t));
+					}
+				}
 				ONFAIL();
 			}
 
 			/* No more on-fail branches
 			 * -> check  if the current match is better than the best. If
 			 *    it isn't, then restore the best match before returning. */
-			if (best_match_isvalid() && (re_interpreter_in_curoffset(&self->ri_bmatch) >
-			                             re_interpreter_in_curoffset(self))) {
+			if (best_match_isvalid() &&
+			    ((re_interpreter_in_curoffset(&self->ri_bmatch) > re_interpreter_in_curoffset(self)) ||
+			     (re_interpreter_in_curoffset(&self->ri_bmatch) == re_interpreter_in_curoffset(self) &&
+			      (self->ri_exec->rx_nmatch && is_regmatch_better(self->ri_bmatch_g, self->ri_pmatch,
+			                                                      self->ri_exec->rx_code->rc_ngrps))))) {
 return_best_match:
 				self->ri_in = self->ri_bmatch;
+				if (self->ri_bmatch_g) {
+					/* Must also restore the current state of group-matches */
+					memcpy(self->ri_pmatch, self->ri_bmatch_g,
+					       self->ri_exec->rx_code->rc_ngrps,
+					       sizeof(re_regmatch_t));
+				}
 			}
 			/* Fallthru to the PERFECT_MATCH opcode */
 			return -RE_NOERROR;
@@ -1904,24 +2073,34 @@ onfail:
 			return -RE_NOMATCH;
 		}
 		item = &self->ri_onfailv[--self->ri_onfailc];
-		if (item->rof_in == NULL)
-			goto onfail; /* Skip dummy on-fail stack element. */
+		/* Check for special on-fail stack items. */
+		if (RE_ONFAILURE_ITEM_SPECIAL_CHECK(item->rof_in)) {
+			re_regoff_t regoff;
+			uint8_t gid;
+			if (item->rof_in == RE_ONFAILURE_ITEM_DUMMY_INPTR)
+				goto onfail; /* Skip dummy on-fail stack element. */
+
+			/* Restore group start/end offset. */
+			gid = RE_ONFAILURE_ITEM_GROUP_RESTORE_GETGID(item->rof_in);
+			assert(gid < self->ri_exec->rx_code->rc_ngrps);
+			regoff = (re_regoff_t)(uintptr_t)item->rof_pc;
+			if (RE_ONFAILURE_ITEM_GROUP_RESTORE_ISSTART(item->rof_in)) {
+				TRACE("%d: ri_pmatch[%" PRIu8 "].rm_so = %d\n", __LINE__, gid, (int)(re_sregoff_t)regoff);
+				self->ri_pmatch[gid].rm_so = regoff;
+			} else {
+				TRACE("%d: ri_pmatch[%" PRIu8 "].rm_eo = %d\n", __LINE__, gid, (int)(re_sregoff_t)regoff);
+				self->ri_pmatch[gid].rm_eo = regoff;
+			}
+			goto onfail;
+		}
 		pc = item->rof_pc;
 		re_interpreter_setinptr(self, item->rof_in);
-		/* TODO: The ONFAIL-system needs some way to set group match start/end addresses back to UNSET:
-		 * >> "(f(o)o|foobar)" MATCH "foobar"
-		 * This should result in an UNSET match for group[1], but that isn't the case in our current impl!
-		 *
-		 * Idea: `REOP_GROUP_START' pushes a special ONFAIL item which -- when unwound --  will
-		 *       restore the offset as it was  prior to the `REOP_GROUP_START' being  executed.
-		 *       For all other purposes (including REOP_POP_ONFAIL), these special ONFAIL items
-		 *       are simply skipped over.
-		 *       XXX: This still doesn't solve how to restore `self->ri_bmatch'
-		 */
 		DISPATCH();
 	}
 err_nomem:
 	return -RE_ESPACE;
+#undef PUSHFAIL_EX
+#undef PUSHFAIL_DUMMY
 #undef PUSHFAIL
 #undef TARGET
 #undef ONFAIL

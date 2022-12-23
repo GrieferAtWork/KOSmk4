@@ -37,6 +37,7 @@ struct iovec;
 /* *sigh* this has to be an int for glibc compat (but it should have been a `size_t')
  * NOTE: When nothing got matched for some given group, set to `RE_REGOFF_UNSET'. */
 typedef unsigned int re_regoff_t;
+typedef int re_sregoff_t;
 #define RE_REGOFF_UNSET ((re_regoff_t)-1)
 
 typedef struct {

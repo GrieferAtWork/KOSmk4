@@ -202,56 +202,44 @@ DEFINE_TEST(regex) {
 	EQ(1, re_match_g("(|f)", "foobar", { REGMATCH(0, 1) }));
 	EQ(1, re_match_g("(f|)", "foobar", { REGMATCH(0, 1) }));
 	EQ(0, re_match_g("()*", "foobar", { REGMATCH(0, 0) }));
-	EQ(1, re_match_g("(|f)*", "foobar", { REGMATCH(1, 1) }));
-	EQ(1, re_match_g("(f|)*", "foobar", { REGMATCH(1, 1) }));
-//	EQ(1, re_match_g("(f)*", "foobar", { REGMATCH(0, 1) })); // FIXME: on-fail doesn't restore groups
-	EQ(3, re_match_g("(|f|o)*", "foobar", { REGMATCH(3, 3) }));
-	EQ(3, re_match_g("(f||o)*", "foobar", { REGMATCH(3, 3) }));
-	EQ(3, re_match_g("(f|o|)*", "foobar", { REGMATCH(3, 3) }));
-//	EQ(3, re_match_g("(f|o)*", "foobar", { REGMATCH(2, 3) })); // FIXME: on-fail doesn't restore groups
-	EQ(5, re_match_g("(|f|o|ba)*", "foobar", { REGMATCH(5, 5) }));
-	EQ(5, re_match_g("(f|o||ba)*", "foobar", { REGMATCH(5, 5) }));
-	EQ(5, re_match_g("(f||o|ba)*", "foobar", { REGMATCH(5, 5) }));
-	EQ(5, re_match_g("(f|o|ba|)*", "foobar", { REGMATCH(5, 5) }));
-//	EQ(5, re_match_g("(f|o|ba)*", "foobar", { REGMATCH(3, 5) })); // FIXME: on-fail doesn't restore groups
-	EQ(6, re_match_g("(|f|o|ba|r)*", "foobar", { REGMATCH(6, 6) }));
-	EQ(6, re_match_g("(f|o||ba|r)*", "foobar", { REGMATCH(6, 6) }));
-	EQ(6, re_match_g("(f|o|ba|r|)*", "foobar", { REGMATCH(6, 6) }));
-//	EQ(6, re_match_g("(f|o|ba|r)*", "foobar", { REGMATCH(5, 6) })); // FIXME: on-fail doesn't restore groups
-	EQ(9, re_match_g("(|f|o|ba|r)*", "foobarfffb", { REGMATCH(9, 9) }));
-	EQ(9, re_match_g("(f|o||ba|r)*", "foobarfffb", { REGMATCH(9, 9) }));
-	EQ(9, re_match_g("(f|o|ba|r|)*", "foobarfffb", { REGMATCH(9, 9) }));
-	EQ(11, re_match_g("(|f|o|ba|r)*", "foobarfffba", { REGMATCH(11, 11) }));
-	EQ(11, re_match_g("(f|o||ba|r)*", "foobarfffba", { REGMATCH(11, 11) }));
-	EQ(11, re_match_g("(f|o|ba|r|)*", "foobarfffba", { REGMATCH(11, 11) }));
+	EQ(1, re_match_g("(|f)*", "foobar", { REGMATCH(0, 1) }));
+	EQ(1, re_match_g("(f|)*", "foobar", { REGMATCH(0, 1) }));
+	EQ(1, re_match_g("(f)*", "foobar", { REGMATCH(0, 1) }));
+	EQ(3, re_match_g("(|f|o)*", "foobar", { REGMATCH(2, 3) }));
+	EQ(3, re_match_g("(f||o)*", "foobar", { REGMATCH(2, 3) }));
+	EQ(3, re_match_g("(f|o|)*", "foobar", { REGMATCH(2, 3) }));
+	EQ(3, re_match_g("(f|o)*", "foobar", { REGMATCH(2, 3) }));
+	EQ(5, re_match_g("(|f|o|ba)*", "foobar", { REGMATCH(3, 5) }));
+	EQ(5, re_match_g("(f|o||ba)*", "foobar", { REGMATCH(3, 5) }));
+	EQ(5, re_match_g("(f||o|ba)*", "foobar", { REGMATCH(3, 5) }));
+	EQ(5, re_match_g("(f|o|ba|)*", "foobar", { REGMATCH(3, 5) }));
+	EQ(5, re_match_g("(f|o|ba)*", "foobar", { REGMATCH(3, 5) }));
+	EQ(6, re_match_g("(|f|o|ba|r)*", "foobar", { REGMATCH(5, 6) }));
+	EQ(6, re_match_g("(f|o||ba|r)*", "foobar", { REGMATCH(5, 6) }));
+	EQ(6, re_match_g("(f|o|ba|r|)*", "foobar", { REGMATCH(5, 6) }));
+	EQ(6, re_match_g("(f|o|ba|r)*", "foobar", { REGMATCH(5, 6) }));
+	EQ(9, re_match_g("(|f|o|ba|r)*", "foobarfffb", { REGMATCH(8, 9) }));
+	EQ(9, re_match_g("(f|o||ba|r)*", "foobarfffb", { REGMATCH(8, 9) }));
+	EQ(9, re_match_g("(f|o|ba|r|)*", "foobarfffb", { REGMATCH(8, 9) }));
+	EQ(9, re_match_g("(f|o|ba|r)*", "foobarfffb", { REGMATCH(8, 9) }));
+	EQ(11, re_match_g("(|f|o|ba|r)*", "foobarfffba", { REGMATCH(9, 11) }));
+	EQ(11, re_match_g("(f|o||ba|r)*", "foobarfffba", { REGMATCH(9, 11) }));
+	EQ(11, re_match_g("(f|o|ba|r|)*", "foobarfffba", { REGMATCH(9, 11) }));
+	EQ(11, re_match_g("(f|o|ba|r)*", "foobarfffba", { REGMATCH(9, 11) }));
 	EQ(0, re_match_g("()?", "foobar", { REGMATCH(0, 0) }));
 	EQ(0, re_match("x?", "foobar"));
 	EQ(0, re_match("x*", "foobar"));
 	EQ(-RE_NOMATCH, re_match("x+", "foobar"));
 	EQ(3, re_match_g("(abc|def)", "abcdefX", { REGMATCH(0, 3) }));
 	EQ(3, re_match_g("(abc|defX)", "abcdefX", { REGMATCH(0, 3) }));
-#if 0 // FIXME: on-fail doesn't restore groups
 	EQ(7, re_match_g("(abc|defX)*", "abcdefX", { REGMATCH(3, 7) }));
 	EQ(7, re_match_g("(abc|defX)*", "abcdefXY", { REGMATCH(3, 7) }));
-#else
-	EQ(7, re_match("(abc|defX)*", "abcdefX"));
-	EQ(7, re_match("(abc|defX)*", "abcdefXY"));
-#endif
 	EQ(3, re_match_g("(abc|def)", "abcdefX", { REGMATCH(0, 3) }));
-#if 0 // FIXME: on-fail doesn't restore groups
 	EQ(6, re_match_g("(abc|def)*", "abcdefX", { REGMATCH(3, 6) }));
 	EQ(6, re_match_g("(abc|def)+", "abcdefX", { REGMATCH(3, 6) }));
-#else
-	EQ(6, re_match("(abc|def)*", "abcdefX"));
-	EQ(6, re_match("(abc|def)+", "abcdefX"));
-#endif
 	EQ(3, re_match_g("(abc|def){1}", "abcabcdefabcX", { REGMATCH(0, 3) }));
 	EQ(9, re_match_g("(abc|def){1,3}", "abcabcdefabcX", { REGMATCH(6, 9) }));
-#if 0 // FIXME: on-fail doesn't restore groups
 	EQ(12, re_match_g("(abc|def){1,}", "abcabcdefabcX", { REGMATCH(9, 12) }));
-#else
-	EQ(12, re_match("(abc|def){1,}", "abcabcdefabcX"));
-#endif
 	EQ(12, re_match_g("(abc|def){1,4}", "abcabcdefabcX", { REGMATCH(9, 12) }));
 
 	/* Make sure that code variables work correctly. */
@@ -310,8 +298,12 @@ DEFINE_TEST(regex) {
 	EQ(5, re_match_g("a(foo|[Ff]oo)b", "afoob", { REGMATCH(1, 4) }));
 	EQ(5, re_match_g("a(foo|[Ff]oo)b", "aFoob", { REGMATCH(1, 4) }));
 
+	/* Ensure that group matching works when combined with rollback. */
 	EQ(6, re_match_g("foo?(o)bar", "foobar", { REGMATCH(2, 3) }));
 	EQ(6, re_match_g("fo(o?o)bar", "foobar", { REGMATCH(2, 3) }));
+
+	/* Ensure that the regex interpreter prefers larger groups. */
+	EQ(6, re_match_g(".*(.*).*", "foobar", { REGMATCH(0, 6) }));
 
 	/* Cleanup */
 	EQ(0, dlclose(libregex));

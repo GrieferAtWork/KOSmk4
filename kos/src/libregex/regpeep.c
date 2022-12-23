@@ -966,6 +966,18 @@ dispatch:
 		goto dispatch;
 	}
 
+	/* TODO: Merge adjacent EXACT-like opcodes if there isn't a jump-target that points in-between them.
+	 * This can happen as the result of:
+	 * - Sets which the compiler doesn't already combine: "foo[bb]ar" -> "foobar"
+	 * - Unrolled repeat operations: "fo{10}bar" -> "foooooooooobar"
+	 */
+
+	/* TODO: Remove unnecessary group_start/_end opcodes:
+	 * Happens as a result of unrolled repeat operations:
+	 *     "f(o){10}bar" -> "f(o)(o)(o)(o)(o)(o)(o)(o)(o)(o)bar"
+	 * Can be optimized to: "fooooooooo(o)bar"
+	 */
+
 	default:
 		/* Note how we don't follow `REOP_JMP' or `REOP_DEC_JMP' here!
 		 *

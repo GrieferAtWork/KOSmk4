@@ -110,8 +110,8 @@ typedef int re_errno_t;
  *     >>                <X>
  *     >>                REOP_MAYBE_POP_ONFAIL   // Replaced with `REOP_POP_ONFAIL_AT 1f'
  *     >>                REOP_JMP         2f
- *     >>                // HINT: Another `REOP_JMP_ONFAIL' to <Z> would go here if it existed
- *     >>            1:  <Y>
+ *     >>            1:  // HINT: Another `REOP_JMP_ONFAIL' to <Z> would go here if it existed
+ *     >>                <Y>
  *     >>            2:
  *
  *     >> "X|Y|Z"        REOP_JMP_ONFAIL 1f
@@ -210,7 +210,7 @@ typedef int re_errno_t;
  *   replacing the last opcode:
  *    - REOP_GROUP_MATCH -> REOP_GROUP_MATCH_Jn
  *    - REOP_GROUP_END -> REOP_GROUP_END_Jn
- *   This opcode replacement is not performed when <X> doesn't match epsilon.
+ *   This opcode replacement is not performed when <X> cannot match epsilon.
  *   -> This transformation has to be done to prevent infinite loops in "()+",
  *      which would otherwise be encoded as:
  *      >> 1:  REOP_GROUP_START {GID}
@@ -392,8 +392,12 @@ enum {
 #define REOP_AT_MAX      REOP_AT_SOS_UTF8
 
 	/* Opcodes for expression logic and processing. */
-	REOP_GROUP_START,           /* [+1] Mark the start of the (N = *PC++)'th group; open "(" (current input pointer is written to `regmatch_t[N].rm_so') */
-	REOP_GROUP_END,             /* [+1] Mark the end of the (N = *PC++)'th group; closing ")" (current input pointer is written to `regmatch_t[N].rm_eo') */
+	REOP_GROUP_START,           /* [+1] Mark the start of the (N = *PC++)'th group; open "("
+	                             * - The current input pointer is written to `regmatch_t[N].rm_so'
+	                             * - Writes a backup of the old `regmatch_t[N].rm_so' that is restored on-fail. */
+	REOP_GROUP_END,             /* [+1] Mark the end of the (N = *PC++)'th group; closing ")"
+	                             * - The current input pointer is written to `regmatch_t[N].rm_eo')
+	                             * - Writes a backup of the old `regmatch_t[N].rm_eo' that is restored on-fail. */
 #define REOP_GROUP_END_JMIN         REOP_GROUP_END_J3
 #define REOP_GROUP_END_JMAX         REOP_GROUP_END_J11
 #define REOP_GROUP_END_Jn(n)        (REOP_GROUP_END_J3 + (n) - 3)
