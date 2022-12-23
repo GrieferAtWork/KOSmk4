@@ -1069,7 +1069,7 @@ void **NOTHROW_NCX(LIBCCALL libc_resolve___libc_stack_end)(void) {
 
 
 /************************************************************************/
-/* Misc libc4/5 functions that don't appear in headers                  */
+/* Misc libc4/5 stuff that doesn't appear in headers                    */
 /************************************************************************/
 DEFINE_PUBLIC_ALIAS(getdents, libc_getdents);
 DEFINE_PUBLIC_ALIAS(__getdents, libc_getdents);

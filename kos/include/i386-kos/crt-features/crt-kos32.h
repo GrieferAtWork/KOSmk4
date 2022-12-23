@@ -342,6 +342,7 @@
 #define __CRT_HAVE___assert_fail
 #define __CRT_HAVE___assert_func
 #define __CRT_HAVE___assert_perror_fail
+#define __CRT_HAVE___assert_program_name
 #define __CRT_HAVE___assertfail
 #define __CRT_HAVE___atan
 #define __CRT_HAVE___atan2
