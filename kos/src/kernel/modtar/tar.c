@@ -1301,18 +1301,31 @@ INTERN_CONST struct fsuper_ops const tarsuper_ops = {
 PRIVATE WUNUSED uint32_t FCALL
 decode_oct(char const *str, size_t len)
 		THROWS(E_FSERROR_CORRUPTED_FILE_SYSTEM) {
+#define isspace_or_nul(ch) (isspace(ch) || (ch) == '\0')
 	uint32_t result = 0;
-	while (len--) {
+	if unlikely(isspace_or_nul(*str)) {
+		/* Some produces of tar files think they're cool and insert
+		 * spaces  before octal fields  (for whatever f'ing reason) */
+		do {
+			++str;
+			--len;
+		} while (len && isspace_or_nul(*str));
+		if unlikely(!len)
+			goto done;
+	}
+	do {
 		char ch = *str++;
+		--len;
 		if (ch >= '0' && ch <= '7') {
 			result <<= 3;
 			result |= ch - '0';
-		} else if (isspace(ch) || ch == '\0') {
+		} else if (isspace_or_nul(ch)) {
 			break;
 		} else {
 			THROW(E_FSERROR_CORRUPTED_FILE_SYSTEM);
 		}
-	}
+	} while (len);
+done:
 	return result;
 }
 
