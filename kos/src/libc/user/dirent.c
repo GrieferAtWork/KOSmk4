@@ -703,7 +703,7 @@ dirent_glibc32_to_libc5(struct glibc_dirent32 *__restrict self) {
 	 * Instead, their `struct dirent' matched `struct old_linux_direntx32',
 	 * which is identical to `struct glibc_dirent32', except that it  lacks
 	 * the `d_type' field (which becomes the first name-char instead) */
-	self = (struct glibc_dirent32 *)memcpy((byte_t *)self + 1, self, 10);
+	self = (struct glibc_dirent32 *)memmoveup((byte_t *)self + 1, self, 10);
 	return self;
 }
 
