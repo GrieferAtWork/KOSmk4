@@ -61,6 +61,19 @@ NOTHROW_NCX(LIBDCALL libd_wcstok_nosafe)(char16_t *string,
 }
 
 
+/* Define the `_mb_shift' used and exported by libc4/5
+ *
+ * This one's used internally by `mbrtowc(3)' and `wcrtomb(3)' when the
+ * caller doesn't supply their  own `mbstate_t *mbs' item, with  libc's
+ * internally buffer for this having been exported by libc4/5.
+ * -> As such, we do the same for binary compat. */
+#undef _mb_shift
+INTDEF mbstate_t libc__mb_shift;
+INTERN ATTR_SECTION(".bss.crt.compat.linux") mbstate_t libc__mb_shift = MBSTATE_INIT;
+DEFINE_PUBLIC_ALIAS(_mb_shift, libc__mb_shift);
+#define _mb_shift GET_NOREL_GLOBAL(_mb_shift)
+
+
 
 
 

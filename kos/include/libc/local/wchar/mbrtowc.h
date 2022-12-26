@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1dbe7576 */
+/* HASH CRC-32:0x529974e6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,9 +54,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbrtowc))(__WCHAR_TYPE__ *__pwc, char
 	__SIZE_TYPE__ __error;
 	__WCHAR_TYPE__ __fallback_wc;
 	if (__mbs == __NULLPTR) {
-		/* TODO: For whatever reason, libc4/5 exported this `mbrtowc_ps' as `_mb_shift' */
+
+
+
+		/* For whatever reason, libc4/5 exported this `mbrtowc_ps' as `_mb_shift' */
 		static struct __mbstate __mbrtowc_ps = __MBSTATE_INIT;
 		__mbs = &__mbrtowc_ps;
+
 	}
 	if (__str == __NULLPTR) {
 		__mbstate_init(__mbs);

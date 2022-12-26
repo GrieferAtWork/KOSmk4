@@ -24,7 +24,8 @@
 #include "../api.h"
 /**/
 
-#include <bits/crt/regex.h> /* __reg_syntax_t */
+#include <bits/crt/mbstate.h> /* struct __mbstate */
+#include <bits/crt/regex.h>   /* __reg_syntax_t */
 #include <kos/types.h>
 
 #ifdef __CC__
@@ -310,6 +311,12 @@ DECLARE_NOREL_GLOBAL_META(char *, libiberty_concat_ptr);
 #undef __libc_single_threaded
 DECLARE_NOREL_GLOBAL_META(char, __libc_single_threaded);
 #define __libc_single_threaded GET_NOREL_GLOBAL(__libc_single_threaded)
+
+
+/* <wchar.h> */
+#undef _mb_shift
+DECLARE_NOREL_GLOBAL_META(struct __mbstate, _mb_shift);
+#define _mb_shift GET_NOREL_GLOBAL(_mb_shift)
 
 
 /* Misc... */

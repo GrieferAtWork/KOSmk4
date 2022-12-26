@@ -1742,6 +1742,7 @@
 #define __CRT_HAVE__makepath
 #define __CRT_HAVE__makepath_s
 #define __CRT_HAVE__malloc_dbg
+#define __CRT_HAVE__mb_shift
 #define __CRT_HAVE__mbbtombc
 #define __CRT_HAVE__mbbtombc_l
 #define __CRT_HAVE__mbbtype

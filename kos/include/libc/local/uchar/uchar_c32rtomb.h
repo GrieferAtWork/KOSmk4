@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ce2e3e7 */
+/* HASH CRC-32:0x1853d249 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,6 +42,11 @@ __LOCAL_LIBC(uchar_c32rtomb) __ATTR_INOUT_OPT(3) __ATTR_OUT_OPT(1) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBKCALL __LIBC_LOCAL_NAME(uchar_c32rtomb))(char *__restrict __str, __CHAR32_TYPE__ __wc, struct __mbstate *__mbs) {
 	char *__endptr;
 	__SIZE_TYPE__ __result;
+
+
+
+
+
 
 
 

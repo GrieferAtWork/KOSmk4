@@ -157,6 +157,11 @@ DEFINE_NOREL_GLOBAL_META(char *, libiberty_concat_ptr, ".crt.libiberty");
 DEFINE_NOREL_GLOBAL_META(char, __libc_single_threaded, ".crt.sched.pthread");
 
 
+/* <wchar.h> */
+#undef _mb_shift
+DEFINE_NOREL_GLOBAL_META(struct __mbstate, _mb_shift, ".crt.compat.linux");
+
+
 /* Misc... */
 #undef __libc_enable_secure
 DEFINE_NOREL_GLOBAL_META(int, __libc_enable_secure, ".crt.compat.glibc");

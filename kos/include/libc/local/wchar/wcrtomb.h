@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x824faf83 */
+/* HASH CRC-32:0x172d585d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,8 +45,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcrtomb))(char *__restrict __str, __W
 #if __SIZEOF_WCHAR_T__ == 2
 	/* unicode_c16toc8() */
 	if (!__mbs) {
+
+
+
+		/* For whatever reason, libc4/5 exported this `wcrtomb_ps' as `_mb_shift' */
 		static struct __mbstate __wcrtomb_ps = __MBSTATE_INIT;
 		__mbs = &__wcrtomb_ps;
+
 	}
 	if (!__str) {
 		__mbstate_init(__mbs);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x927fe5e */
+/* HASH CRC-32:0x78e9f93a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -146,9 +146,13 @@ NOTHROW_NCX(LIBDCALL libd_mbrtowc)(char16_t *pwc,
 	size_t error;
 	char16_t fallback_wc;
 	if (mbs == NULL) {
-		/* TODO: For whatever reason, libc4/5 exported this `mbrtowc_ps' as `_mb_shift' */
-		static mbstate_t mbrtowc_ps = __MBSTATE_INIT;
-		mbs = &mbrtowc_ps;
+
+		mbs = &_mb_shift;
+
+
+
+
+
 	}
 	if (str == NULL) {
 		mbstate_init(mbs);
@@ -179,9 +183,13 @@ NOTHROW_NCX(LIBKCALL libc_mbrtowc)(char32_t *pwc,
 	size_t error;
 	char32_t fallback_wc;
 	if (mbs == NULL) {
-		/* TODO: For whatever reason, libc4/5 exported this `mbrtowc_ps' as `_mb_shift' */
-		static mbstate_t mbrtowc_ps = __MBSTATE_INIT;
-		mbs = &mbrtowc_ps;
+
+		mbs = &_mb_shift;
+
+
+
+
+
 	}
 	if (str == NULL) {
 		mbstate_init(mbs);
@@ -213,8 +221,13 @@ NOTHROW_NCX(LIBDCALL libd_wcrtomb)(char *__restrict str,
 
 	/* unicode_c16toc8() */
 	if (!mbs) {
-		static mbstate_t wcrtomb_ps = __MBSTATE_INIT;
-		mbs = &wcrtomb_ps;
+
+		mbs = &_mb_shift;
+
+
+
+
+
 	}
 	if (!str) {
 		mbstate_init(mbs);
@@ -260,6 +273,11 @@ NOTHROW_NCX(LIBKCALL libc_wcrtomb)(char *__restrict str,
                                    mbstate_t *mbs) {
 	char *endptr;
 	size_t result;
+
+
+
+
+
 
 
 

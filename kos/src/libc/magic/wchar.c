@@ -336,9 +336,13 @@ size_t mbrtowc([[out_opt]] wchar_t *pwc,
 	size_t error;
 	wchar_t fallback_wc;
 	if (mbs == NULL) {
-		/* TODO: For whatever reason, libc4/5 exported this `mbrtowc_ps' as `_mb_shift' */
+@@pp_ifdef __BUILDING_LIBC@@
+		mbs = &_mb_shift;
+@@pp_else@@
+		/* For whatever reason, libc4/5 exported this `mbrtowc_ps' as `_mb_shift' */
 		static mbstate_t mbrtowc_ps = __MBSTATE_INIT;
 		mbs = &mbrtowc_ps;
+@@pp_endif@@
 	}
 	if (str == NULL) {
 		mbstate_init(mbs);
@@ -377,8 +381,13 @@ size_t wcrtomb([[out_opt]] char *__restrict str/*char str[MB_CUR_MAX]*/, wchar_t
 @@pp_if __SIZEOF_WCHAR_T__ == 2@@
 	/* unicode_c16toc8() */
 	if (!mbs) {
+@@pp_ifdef __BUILDING_LIBC@@
+		mbs = &_mb_shift;
+@@pp_else@@
+		/* For whatever reason, libc4/5 exported this `wcrtomb_ps' as `_mb_shift' */
 		static mbstate_t wcrtomb_ps = @__MBSTATE_INIT@;
 		mbs = &wcrtomb_ps;
+@@pp_endif@@
 	}
 	if (!str) {
 		mbstate_init(mbs);
