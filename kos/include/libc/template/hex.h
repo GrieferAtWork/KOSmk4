@@ -26,6 +26,7 @@
 #else /* _hex_value */
 #include <__crt.h>
 #include <hybrid/typecore.h>
+#ifndef __LOCAL__hex_value
 #ifdef _hex_value
 #define __LOCAL__hex_value _hex_value
 #elif defined(__CRT_HAVE__hex_value)
@@ -38,6 +39,7 @@ __CSDECLARE2(,unsigned char const _hex_value[256],_hex_value)
 #define __LOCAL__hex_value _hex_value
 #endif /* __NO_COMPILER_SREDIRECT */
 #endif /* ... */
+#endif /* !__LOCAL__hex_value */
 #endif /* !_hex_value */
 #endif /* !__LOCAL__hex_value */
 

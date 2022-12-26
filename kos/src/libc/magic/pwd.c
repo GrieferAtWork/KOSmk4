@@ -192,6 +192,8 @@ struct passwd *getpwnam([[in]] char const *name) {
 [[cp, wunused, decl_include("<bits/crt/db/passwd.h>"), export_as("_fgetpwent")]]
 struct passwd *fgetpwent([[inout]] $FILE *__restrict stream);
 
+/* TODO: extern struct passwd *_fgetpwent(FILE *fp, char **buf, int *len); */
+
 [[wunused, pure, static]]
 bool nss_checkfield([[in_opt]] char const *field) {
 	if (!field)

@@ -27,7 +27,6 @@
 #include <kos/exec/elf.h> /* ELF_ARCH_DATA */
 #include <kos/exec/idata.h>
 #include <kos/exec/rtld.h> /* RTLD_PLATFORM */
-#include <kos/syscalls.h>
 #include <linux/prctl.h> /* PR_KOS_GET_AT_SECURE */
 #include <sys/random.h>
 
@@ -36,12 +35,12 @@
 #include <signal.h> /* SIGSTKSZ */
 #include <stddef.h> /* offsetafter */
 #include <stdlib.h>
-#include <syscall.h>
 #include <time.h>   /* CLK_TCK */
 #include <unistd.h> /* preadall */
 
 #include "../libc/dl.h"
 #include "../libc/globals.h"
+#include "../libc/syscalls.h"
 #include "sys.auxv.h"
 
 #if defined(__i386__) && !defined(__x86_64__)
@@ -50,80 +49,6 @@
 
 #include <string.h> /* preadall */
 #endif /* __i386__ && !__x86_64__ */
-
-#ifndef __NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES
-#undef __WANT_SYSCALL_ARGUMENT_TYPES
-#define __WANT_SYSCALL_ARGUMENT_TYPES
-#include <asm/syscalls-proto.h>
-#endif /* !__NRFEAT_DEFINED_SYSCALL_ARGUMENT_TYPES */
-
-#define SYSCALL_ARG_TYPE_OF3(a, b)      b
-#define SYSCALL_ARG_TYPE_OF2(x)         SYSCALL_ARG_TYPE_OF3 x
-#define SYSCALL_ARG_TYPE_OF(name, argi) SYSCALL_ARG_TYPE_OF2(__NRAT##argi##_##name)
-
-#if __SIZEOF_UID_T__ != 4
-#ifdef SYS_getuid
-#undef SYS_getuid32
-#endif /* SYS_getuid */
-#ifdef SYS_geteuid
-#undef SYS_geteuid32
-#endif /* SYS_geteuid */
-#ifdef SYS_getresuid
-#undef SYS_getresuid32
-#endif /* SYS_getresuid */
-#endif /* __SIZEOF_UID_T__ != 4 */
-
-#if __SIZEOF_GID_T__ != 4
-#ifdef SYS_getgid
-#undef SYS_getgid32
-#endif /* SYS_getgid */
-#ifdef SYS_getegid
-#undef SYS_getegid32
-#endif /* SYS_getegid */
-#ifdef SYS_getresgid
-#undef SYS_getresgid32
-#endif /* SYS_getresgid */
-#endif /* __SIZEOF_GID_T__ != 4 */
-
-#ifdef SYS_getuid32
-#define _sys_getuid() (uid_t)sys_getuid32()
-#else /* SYS_getuid32 */
-#define _sys_getuid() (uid_t)sys_getuid()
-#endif /* SYS_getuid32 */
-#ifdef SYS_geteuid32
-#define _sys_geteuid() (uid_t)sys_geteuid32()
-#else /* SYS_geteuid32 */
-#define _sys_geteuid() (uid_t)sys_geteuid()
-#endif /* !SYS_geteuid32 */
-#ifdef SYS_getresuid32
-#define _sys_getresuid(ruid, euid, suid) \
-	sys_getresuid32((uint32_t *)(ruid), (uint32_t *)(euid), (uint32_t *)(suid))
-#else /* SYS_getresuid32 */
-#define _sys_getresuid(ruid, euid, suid)                     \
-	sys_getresuid((SYSCALL_ARG_TYPE_OF(getresuid, 0))(ruid), \
-	              (SYSCALL_ARG_TYPE_OF(getresuid, 1))(euid), \
-	              (SYSCALL_ARG_TYPE_OF(getresuid, 2))(suid))
-#endif /* !SYS_getresuid32 */
-
-#ifdef SYS_getgid32
-#define _sys_getgid() (gid_t)sys_getgid32()
-#else /* SYS_getgid32 */
-#define _sys_getgid() (gid_t)sys_getgid()
-#endif /* SYS_getgid32 */
-#ifdef SYS_getegid32
-#define _sys_getegid() (gid_t)sys_getegid32()
-#else /* SYS_getegid32 */
-#define _sys_getegid() (gid_t)sys_getegid()
-#endif /* !SYS_getegid32 */
-#ifdef SYS_getresgid32
-#define _sys_getresgid(rgid, egid, sgid) \
-	sys_getresgid32((uint32_t *)(rgid), (uint32_t *)(egid), (uint32_t *)(sgid))
-#else /* SYS_getresgid32 */
-#define _sys_getresgid(rgid, egid, sgid)                     \
-	sys_getresgid((SYSCALL_ARG_TYPE_OF(getresgid, 0))(rgid), \
-	              (SYSCALL_ARG_TYPE_OF(getresgid, 1))(egid), \
-	              (SYSCALL_ARG_TYPE_OF(getresgid, 2))(sgid))
-#endif /* !SYS_getresgid32 */
 
 DECL_BEGIN
 
