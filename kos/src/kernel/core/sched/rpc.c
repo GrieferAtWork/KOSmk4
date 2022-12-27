@@ -68,7 +68,7 @@ static_assert(offsetof(struct pending_rpc, pr_kern.k_func) == offsetof(struct pe
 static_assert(offsetafter(struct pending_rpc, pr_kern.k_func) == offsetafter(struct pending_rpc_head, prh_func));
 
 /* [0..n][lock(INSERT(ATOMIC), CLEAR(ATOMIC && THIS_TASK))]
- * Pending RPCs. (Set of `THIS_RPCS_TERMINATED' when RPCs may no longer
+ * Pending RPCs. (Set to `THIS_RPCS_TERMINATED' when RPCs may no longer
  * be executed, and all that were there prior to this becoming the case
  * are/were serviced with `RPC_REASONCTX_SHUTDOWN') */
 PUBLIC ATTR_PERTASK ATTR_ALIGN(struct pending_rpc_slist) this_rpcs = SLIST_HEAD_INITIALIZER(this_rpcs);

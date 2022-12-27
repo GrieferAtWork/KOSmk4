@@ -141,7 +141,7 @@ SLIST_HEAD(pending_rpc_slist, pending_rpc);
 #endif /* !__pending_rpc_slist_defined */
 
 /* [0..n][lock(INSERT(ATOMIC), CLEAR(ATOMIC && THIS_TASK))]
- * Pending RPCs. (Set of `THIS_RPCS_TERMINATED' when RPCs may no longer
+ * Pending RPCs. (Set to `THIS_RPCS_TERMINATED' when RPCs may no longer
  * be executed, and all that were there prior to this becoming the case
  * are/were serviced with `RPC_REASONCTX_SHUTDOWN') */
 DATDEF ATTR_PERTASK struct pending_rpc_slist this_rpcs;
