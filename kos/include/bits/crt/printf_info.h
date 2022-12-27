@@ -71,7 +71,7 @@ struct printf_info {
 	__STDC_INT_AS_SIZE_T prec;              /* Precision. */
 	__STDC_INT_AS_SIZE_T width;             /* Width. */
 	__WCHAR32_TYPE__     spec;              /* Final format specification letter */
-	unsigned int         is_long_double: 1; /* "L" */
+	unsigned int         is_long_double: 1; /* "L" (and "ll") */
 	unsigned int         is_short      : 1; /* "h" */
 	unsigned int         is_long       : 1; /* "l" */
 	unsigned int         alt           : 1; /* "#" */
@@ -86,7 +86,7 @@ struct printf_info {
 	unsigned int         is_binary128  : 1; /* ??? */
 	unsigned int       __pad           : 3; /* ...*/
 	__UINT16_TYPE__      user;              /* User-defined modifiers (s.a. `register_printf_modifier(3)') */
-	__WCHAR32_TYPE__     pad;               /* ??? */
+	__WCHAR32_TYPE__     pad;               /* Padding character */
 };
 
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
@@ -129,7 +129,10 @@ typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 2, 3)) __STDC_INT_AS_SSIZE_T
  *                   At most `n' elements can be filled, and the return value  is
  *                   the # of elements needed. When `return > n', the contents of
  *                   this array are left undefined.
- * @param: size:     ???
+ * @param: size:     To-be filled with the buffer size taken by `printf_va_arg_function'
+ *                   At most  `n'  elements can  be  filled,  and the  return  value  is
+ *                   the #  of  elements  needed. When  `return > n',  the  contents  of
+ *                   this array are left undefined.
  * @return: >= 0:    The # of arguments used by this handler (at most this many elements have been filled in `argtypes')
  * @return: -1:      Unable to handle format specifier */
 typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 3, 4)) __STDC_INT_AS_SSIZE_T
@@ -141,7 +144,7 @@ typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1, 3)) __STDC_INT_AS_SSIZE_T
                                        __SIZE_TYPE__ __n, int *__argtypes);
 
 /* Handler for custom printf argument decoder functions
- * @param: mem: Target buffer (XXX: How large is this buffer???)
+ * @param: mem: Target buffer (buffer size is given by `printf_arginfo_size_function()')
  * @param: ap:  va_list source buffer. */
 typedef __ATTR_NONNULL_T((1, 2)) void
 (__LIBKCALL __printf_va_arg_function)(void *__mem, __builtin_va_list *__ap);
@@ -155,7 +158,7 @@ enum {
 	PA_STRING,  /* `va_arg(char const *)' (NUL-terminated) */
 	PA_WSTRING, /* `va_arg(wchar_t const *)' (NUL-terminated) */
 	PA_POINTER, /* `va_arg(void *)' */
-	PA_FLOAT,   /* `va_arg(float)' (??? Why is this here? The C standard says that floats get promoted to double!) */
+	PA_FLOAT,   /* `(float)va_arg(double)' */
 	PA_DOUBLE,  /* `va_arg(double)' */
 	PA_LAST     /* First dynamically allocated (by `register_printf_type(3)') type-code */
 };

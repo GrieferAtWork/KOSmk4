@@ -76,8 +76,8 @@
 
 %(auto_source){
 #include "../libc/dl.h"      /* Use libc's relocation-optimized dl* functions. */
-#include "../libc/string.h"  /* Dependency of `#include <libc/template/format-printf.h>' */
-#include "../libc/unicode.h" /* Dependency of `#include <libc/template/format-scanf.h>' */
+#include "../auto/string.h"  /* Dependency of `#include <libc/template/format-printf.h>' */
+#include "../user/unicode.h" /* Dependency of `#include <libc/template/format-scanf.h>' */
 /**/
 #include <hybrid/__assert.h> /* Dependency of `#include <libc/template/format-printf.h>' */
 #include <hybrid/__alloca.h> /* Dependency of `#include <libc/template/format-printf.h>' */

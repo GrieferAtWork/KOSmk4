@@ -54,6 +54,24 @@
 #define __FORMAT_PRINTER           printer
 #define __FORMAT_ARG               arg
 #define __FORMAT_ARGS              args
+
+#define __PRINTF_HOOKS
+
+
+#ifdef __PRINTF_HOOKS
+#include <bits/crt/printf_info.h>
+extern void specsup_printf_read(void);
+extern void specsup_printf_endread(void);
+extern char const *format_mod_consume8(char const *__restrict format, struct printf_info *__restrict info);
+extern char16_t const *format_mod_consume16(char16_t const *__restrict format, struct printf_info *__restrict info);
+extern char32_t const *format_mod_consume32(char32_t const *__restrict format, struct printf_info *__restrict info);
+extern __size_t printf_typeinfo_extrasize(int const *typev, __STDC_INT_AS_SIZE_T const *sizev, __size_t argc);
+extern void **printf_typeinfo_load(int const *typev, __STDC_INT_AS_SIZE_T const *sizev, size_t argc, __BYTE_TYPE__ *outbuf, __BYTE_TYPE__ const *pdata, __builtin_va_list *p_args, __BOOL should_construct_array);
+extern __ssize_t invoke_printf_function8(__pformatprinter printer, void *arg, struct printf_info const *info, void const *const *args);
+extern __ssize_t invoke_printf_function16(__pc16formatprinter printer, void *arg, struct printf_info const *info, void const *const *args);
+extern __ssize_t invoke_printf_function32(__pc32formatprinter printer, void *arg, struct printf_info const *info, void const *const *args);
+extern __printf_arginfo_size_function **__printf_arginfo_table;
+#endif /* __PRINTF_HOOKS */
 #endif /* __INTELLISENSE__ */
 
 #include <hybrid/typecore.h>
@@ -190,12 +208,30 @@ format_vprintf(__pformatprinter __FORMAT_PRINTER,
 #define __PRINTF_VARG(T)   __builtin_va_arg(__FORMAT_ARGS, T)
 #define __PRINTF_VARGPTR() __builtin_va_arg(__FORMAT_ARGS, void *)
 #endif /* __NO_PRINTF_POSITIONAL */
-	__SSIZE_TYPE__ __temp, __result = 0;
+#ifdef __PRINTF_HOOKS
+#define __PRINTF_IF_HOOKS(x) x;
+	struct printf_info pinfo;
+	/* alloca'd buffer */
+	__BYTE_TYPE__ *alloca_buffer = NULL;
+	__SIZE_TYPE__ alloca_bufsiz = 0;
+#define ALLOCA_BUFFER_REQUIRE(num_bytes) \
+	(alloca_bufsiz >= (num_bytes) ||     \
+	 (alloca_bufsiz = (num_bytes),       \
+	  alloca_buffer = (__BYTE_TYPE__ *)__hybrid_alloca(alloca_bufsiz), 1))
+#define __width     pinfo.width
+#define __precision pinfo.prec
+#else /* __PRINTF_HOOKS */
+#define __PRINTF_IF_HOOKS(x) /* nothing */
 	__size_t __width, __precision;
+#endif /* !__PRINTF_HOOKS */
+	__SSIZE_TYPE__ __temp, __result = 0;
 	__CHAR_TYPE const *__flush_start;
 	__CHAR_TYPE __ch;
-	unsigned int __flags;
-	unsigned int __length;
+	unsigned int __flags, __length;
+#ifdef __PRINTF_HOOKS
+	specsup_printf_read();
+#endif /* !__PRINTF_HOOKS */
+
 	__flush_start = __FORMAT_FORMAT;
 __next:
 	__ch = *__FORMAT_FORMAT++;
@@ -214,33 +250,178 @@ __next:
 	__flush_start = __FORMAT_FORMAT;
 
 	/* Format option. */
-	__flags     = __PRINTF_F_NONE;
-	__length    = 0;
+	__flags  = __PRINTF_F_NONE;
+	__length = 0;
+#ifdef __PRINTF_HOOKS
+#if __SIZEOF_INT__ == 1
+#define PINFO_SET_1(pinfo) /* nothing */
+#elif __SIZEOF_CHAR__ == 1
+#define PINFO_SET_1(pinfo) pinfo.is_char = 1;
+#elif __SIZEOF_SHORT__ == 1
+#define PINFO_SET_1(pinfo) pinfo.is_short = 1;
+#elif __SIZEOF_LONG__ == 1
+#define PINFO_SET_1(pinfo) pinfo.is_short = 1;
+#elif __SIZEOF_LONG_LONG__ == 1
+#define PINFO_SET_1(pinfo) pinfo.is_long = 1, pinfo.is_long_double = 1;
+#endif /* __SIZEOF_SIZE_T__ == ... */
+#if __SIZEOF_INT__ == 2
+#define PINFO_SET_2(pinfo) /* nothing */
+#elif __SIZEOF_CHAR__ == 2
+#define PINFO_SET_2(pinfo) pinfo.is_char = 1;
+#elif __SIZEOF_SHORT__ == 2
+#define PINFO_SET_2(pinfo) pinfo.is_short = 1;
+#elif __SIZEOF_LONG__ == 2
+#define PINFO_SET_2(pinfo) pinfo.is_short = 1;
+#elif __SIZEOF_LONG_LONG__ == 2
+#define PINFO_SET_2(pinfo) pinfo.is_long = 1, pinfo.is_long_double = 1;
+#endif /* __SIZEOF_SIZE_T__ == ... */
+#if __SIZEOF_INT__ == 4
+#define PINFO_SET_4(pinfo) /* nothing */
+#elif __SIZEOF_CHAR__ == 4
+#define PINFO_SET_4(pinfo) pinfo.is_char = 1;
+#elif __SIZEOF_SHORT__ == 4
+#define PINFO_SET_4(pinfo) pinfo.is_short = 1;
+#elif __SIZEOF_LONG__ == 4
+#define PINFO_SET_4(pinfo) pinfo.is_short = 1;
+#elif __SIZEOF_LONG_LONG__ == 4
+#define PINFO_SET_4(pinfo) pinfo.is_long = 1, pinfo.is_long_double = 1;
+#endif /* __SIZEOF_SIZE_T__ == ... */
+#if __SIZEOF_INT__ == 8
+#define PINFO_SET_8(pinfo) /* nothing */
+#elif __SIZEOF_CHAR__ == 8
+#define PINFO_SET_8(pinfo) pinfo.is_char = 1;
+#elif __SIZEOF_SHORT__ == 8
+#define PINFO_SET_8(pinfo) pinfo.is_short = 1;
+#elif __SIZEOF_LONG__ == 8
+#define PINFO_SET_8(pinfo) pinfo.is_short = 1;
+#elif __SIZEOF_LONG_LONG__ == 8
+#define PINFO_SET_8(pinfo) pinfo.is_long = 1, pinfo.is_long_double = 1;
+#endif /* __SIZEOF_SIZE_T__ == ... */
+#define _PINFO_SET_N(pinfo, n) PINFO_SET_##n(pinfo)
+#define PINFO_SET_N(pinfo, n) _PINFO_SET_N(pinfo, n)
+	__libc_bzero(&pinfo, sizeof(pinfo));
+	pinfo.pad = ' ';
+#if __CHAR_SIZE > 1
+	pinfo.wide = 1;
+#endif /* __CHAR_SIZE > 1 */
+#else /* __PRINTF_HOOKS */
 	__width     = 0;
 	__precision = 0;
+#endif /* !__PRINTF_HOOKS */
 __nextfmt:
+
+	/* Try to consume a user-defined modifier flag */
+#ifdef __PRINTF_HOOKS
+#if __CHAR_SIZE == 1
+	__FORMAT_FORMAT = format_mod_consume8(__FORMAT_FORMAT, &pinfo);
+#elif __CHAR_SIZE == 2
+	__FORMAT_FORMAT = format_mod_consume16(__FORMAT_FORMAT, &pinfo);
+#else /* __CHAR_SIZE == ... */
+	__FORMAT_FORMAT = format_mod_consume32(__FORMAT_FORMAT, &pinfo);
+#endif /* __CHAR_SIZE != ... */
+#endif /* __PRINTF_HOOKS */
+
+	/* Load the next format-character */
 	__ch = *__FORMAT_FORMAT++;
+
+	/* Check if there is a user-defined arginfo-handler for `__ch' */
+#ifdef __PRINTF_HOOKS
+#if __CHAR_SIZE > 1
+	if (__ch <= 0xff && (!__p_args || __p_arg))
+#else /* __CHAR_SIZE > 1 */
+	if (!__p_args || __p_arg)
+#endif /* __CHAR_SIZE <= 1 */
+	{
+		__printf_arginfo_size_function *arginfo_handler;
+#if __CHAR_SIZE > 1
+		arginfo_handler = __printf_arginfo_table[__ch];
+#else /* __CHAR_SIZE > 1 */
+		arginfo_handler = __printf_arginfo_table[(unsigned char)__ch];
+#endif /* __CHAR_SIZE <= 1 */
+		if (arginfo_handler) {
+			void **argv;
+			int *typebuf, num_args;
+			__STDC_INT_AS_SIZE_T *sizebuf;
+			__SIZE_TYPE__ reqsize;
+#if __CHAR_SIZE > 1
+			pinfo.spec = (__WCHAR32_TYPE__)__ch;
+#else /* __CHAR_SIZE > 1 */
+			pinfo.spec = (__WCHAR32_TYPE__)(unsigned char)__ch;
+#endif /* __CHAR_SIZE <= 1 */
+			ALLOCA_BUFFER_REQUIRE(1 * 2 * sizeof(int));
+			typebuf = (int *)(alloca_buffer + 0 * sizeof(int));
+			sizebuf = (__STDC_INT_AS_SIZE_T *)(alloca_buffer + 1 * sizeof(int));
+			__libc_bzero(sizebuf, sizeof(int));
+			num_args = (*arginfo_handler)(&pinfo, 1, typebuf, sizebuf);
+			if (num_args > 1) {
+				int new_num_args;
+again_load_arginfo_handler:
+				ALLOCA_BUFFER_REQUIRE(num_args * 2 * sizeof(int));
+				typebuf = (int *)(alloca_buffer + 0 * sizeof(int));
+				sizebuf = (__STDC_INT_AS_SIZE_T *)(alloca_buffer + num_args * sizeof(int));
+				__libc_bzero(sizebuf, num_args * sizeof(int));
+				new_num_args = (*arginfo_handler)(&pinfo, 1, typebuf, sizebuf);
+				if __unlikely(new_num_args > num_args) {
+					num_args = new_num_args;
+					goto again_load_arginfo_handler;
+				}
+			}
+			if __unlikely(num_args < 0) {
+				__temp = (__SSIZE_TYPE__)num_args;
+				goto __err;
+			}
+
+			/* Package arguments consumed by the arginfo handlers. */
+			reqsize = num_args * sizeof(void *);
+			if (__p_arg == __NULLPTR)
+				reqsize += printf_typeinfo_extrasize(typebuf, sizebuf, num_args);
+			ALLOCA_BUFFER_REQUIRE(reqsize);
+			argv = printf_typeinfo_load(typebuf, sizebuf, (size_t)num_args, alloca_buffer,
+			                            (__BYTE_TYPE__ const *)(__p_arg ? __p_arg->__p_ptr : __NULLPTR),
+			                            (__builtin_va_list *)&__FORMAT_ARGS, 1);
+
+			/* Invoke the actual printf-handler. */
+#if __CHAR_SIZE == 1
+			__temp = invoke_printf_function8(__FORMAT_PRINTER, __FORMAT_ARG, &pinfo, argv);
+#elif __CHAR_SIZE == 2
+			__temp = invoke_printf_function16(__FORMAT_PRINTER, __FORMAT_ARG, &pinfo, argv);
+#else /* __CHAR_SIZE == ... */
+			__temp = invoke_printf_function32(__FORMAT_PRINTER, __FORMAT_ARG, &pinfo, argv);
+#endif /* __CHAR_SIZE != ... */
+			if __unlikely(__temp < 0)
+				goto __err;
+			__result += __temp;
+			goto __next;
+		}
+	}
+#endif /* __PRINTF_HOOKS */
+
 	switch (__ch) {
 
 	case '%':
-		__flush_start = __FORMAT_FORMAT-1;
+		__flush_start = __FORMAT_FORMAT - 1;
 		goto __next;
 
 	case '\0':
 		goto __end;
 	case '-':
+		__PRINTF_IF_HOOKS(pinfo.left = 1)
 		__flags |= __PRINTF_F_LJUST;
 		goto __nextfmt;
 	case '+':
+		__PRINTF_IF_HOOKS(pinfo.showsign = 1)
 		__flags |= __PRINTF_F_SIGN;
 		goto __nextfmt;
 	case ' ':
+		__PRINTF_IF_HOOKS(pinfo.space = 1)
 		__flags |= __PRINTF_F_SPACE;
 		goto __nextfmt;
 	case '#':
+		__PRINTF_IF_HOOKS(pinfo.alt = 1)
 		__flags |= __PRINTF_F_PREFIX;
 		goto __nextfmt;
 	case '0':
+		__PRINTF_IF_HOOKS(pinfo.pad = '0')
 		__flags |= __PRINTF_F_PADZERO;
 		goto __nextfmt;
 
@@ -385,32 +566,39 @@ __nextfmt:
 #endif /* !__NO_PRINTF_POSITIONAL */
 
 	case 'h':
-		if (*__FORMAT_FORMAT != 'h') {
-			__length = __PRINTF_LENGTH_H;
-		} else {
+		if (*__FORMAT_FORMAT == 'h') {
 			++__FORMAT_FORMAT;
+			__PRINTF_IF_HOOKS(pinfo.is_char = 1)
 			__length = __PRINTF_LENGTH_HH;
+		} else {
+			__PRINTF_IF_HOOKS(pinfo.is_short = 1)
+			__length = __PRINTF_LENGTH_H;
 		}
 		goto __nextfmt;
 
 	case 'l':
-		if (*__FORMAT_FORMAT != 'l') {
-			__length = __PRINTF_LENGTH_l;
-		} else {
+		__PRINTF_IF_HOOKS(pinfo.is_long = 1)
+		if (*__FORMAT_FORMAT == 'l') {
+			__PRINTF_IF_HOOKS(pinfo.is_long_double = 1)
 			++__FORMAT_FORMAT;
 			__length = __PRINTF_LENGTH_LL;
+		} else {
+			__length = __PRINTF_LENGTH_l;
 		}
 		goto __nextfmt;
 
 	case 'z':
+		__PRINTF_IF_HOOKS(PINFO_SET_N(pinfo, __SIZEOF_SIZE_T__))
 		__length = __PRINTF_LENGTH_Z;
 		goto __nextfmt;
 
 	case 't':
+		__PRINTF_IF_HOOKS(PINFO_SET_N(pinfo, __SIZEOF_PTRDIFF_T__))
 		__length = __PRINTF_LENGTH_T;
 		goto __nextfmt;
 
 	case 'L':
+		__PRINTF_IF_HOOKS(pinfo.is_long_double = 1)
 		__length = __PRINTF_LENGTH_L;
 		goto __nextfmt;
 
@@ -418,19 +606,24 @@ __nextfmt:
 		__ch = *__FORMAT_FORMAT++;
 		if (__ch == '8') {
 			__length = __PRINTF_LENGTH_I8;
+			__PRINTF_IF_HOOKS(PINFO_SET_N(pinfo, 1))
 		} else if (__ch == '1' && *__FORMAT_FORMAT == '6') {
 			++__FORMAT_FORMAT;
 			__length = __PRINTF_LENGTH_I16;
+			__PRINTF_IF_HOOKS(PINFO_SET_N(pinfo, 2))
 		} else if (__ch == '3' && *__FORMAT_FORMAT == '2') {
 			++__FORMAT_FORMAT;
 			__length = __PRINTF_LENGTH_I32;
+			__PRINTF_IF_HOOKS(PINFO_SET_N(pinfo, 4))
 		} else if (__ch == '6' && *__FORMAT_FORMAT == '4') {
 			++__FORMAT_FORMAT;
 	case 'j':
 			__length = __PRINTF_LENGTH_I64;
+			__PRINTF_IF_HOOKS(PINFO_SET_N(pinfo, 8))
 		} else {
 			--__FORMAT_FORMAT;
 			__length = __PRINTF_LENGTH_SIZE;
+			__PRINTF_IF_HOOKS(PINFO_SET_N(pinfo, __SIZEOF_SIZE_T__))
 		}
 		goto __nextfmt;
 
@@ -1997,6 +2190,15 @@ __begin_positional_for_width_or_precision:
 						if (__ch != '%')
 							continue;
 __again_posscan1_infmt:
+#ifdef __PRINTF_HOOKS
+#if __CHAR_SIZE == 1
+						__iter = format_mod_consume8(__iter, __NULLPTR);
+#elif __CHAR_SIZE == 2
+						__iter = format_mod_consume16(__iter, __NULLPTR);
+#else /* __CHAR_SIZE == ... */
+						__iter = format_mod_consume32(__iter, __NULLPTR);
+#endif /* __CHAR_SIZE != ... */
+#endif /* __PRINTF_HOOKS */
 						__ch = *__iter++;
 						switch (__ch) {
 						case '\0':
@@ -2069,6 +2271,9 @@ __after_posscan1_infmt:
 						__size_t __type_idx;
 						unsigned int __type_code;
 						unsigned int __type_length;
+#ifdef __PRINTF_HOOKS
+						struct printf_info type_pinfo;
+#endif /* __PRINTF_HOOKS */
 						__ch = *__iter++;
 						if (__ch == '\0')
 							goto __after_posscan2_infmt;
@@ -2078,8 +2283,54 @@ __begin_posscan2_infmt:
 						__type_idx    = 0;
 						__type_code   = 0;
 						__type_length = 0;
+#ifdef __PRINTF_HOOKS
+						__libc_bzero(&type_pinfo, sizeof(type_pinfo));
+						type_pinfo.pad = ' ';
+#if __CHAR_SIZE > 1
+						type_pinfo.wide = 1;
+#endif /* __CHAR_SIZE > 1 */
+#endif /* __PRINTF_HOOKS */
 __again_posscan2_infmt:
+#ifdef __PRINTF_HOOKS
+#if __CHAR_SIZE == 1
+						__iter = format_mod_consume8(__iter, &type_pinfo);
+#elif __CHAR_SIZE == 2
+						__iter = format_mod_consume16(__iter, &type_pinfo);
+#else /* __CHAR_SIZE == ... */
+						__iter = format_mod_consume32(__iter, &type_pinfo);
+#endif /* __CHAR_SIZE != ... */
+#endif /* __PRINTF_HOOKS */
 						__ch = *__iter++;
+
+						/* Check if there is a user-defined arginfo-handler for `__ch' */
+#ifdef __PRINTF_HOOKS
+#if __CHAR_SIZE > 1
+						if (__ch <= 0xff)
+#endif /* __CHAR_SIZE > 1 */
+						{
+							__printf_arginfo_size_function *arginfo_handler;
+#if __CHAR_SIZE > 1
+							arginfo_handler = __printf_arginfo_table[__ch];
+#else /* __CHAR_SIZE > 1 */
+							arginfo_handler = __printf_arginfo_table[(unsigned char)__ch];
+#endif /* __CHAR_SIZE <= 1 */
+							if (arginfo_handler) {
+#if __CHAR_SIZE > 1
+								__type_code = 256 + (unsigned int)__ch;
+#else /* __CHAR_SIZE > 1 */
+								__type_code = 256 + (unsigned int)(unsigned char)__ch;
+#endif /* __CHAR_SIZE <= 1 */
+								__type_code |= type_pinfo.is_long_double << 9;
+								__type_code |= type_pinfo.is_short << 10;
+								__type_code |= type_pinfo.is_long << 11;
+								__type_code |= type_pinfo.is_char << 12;
+								/* Bits 13-15 are still available */
+								__type_code |= type_pinfo.user << 16;
+								goto __posscan2_set_typecode;
+							}
+						}
+#endif /* __PRINTF_HOOKS */
+
 						switch (__ch) {
 						case '\0':
 							goto __after_posscan2_infmt;
@@ -2122,30 +2373,39 @@ __again_posscan2_infmt:
 						}	break;
 
 						case 'h':
-							if (*__iter != 'h') {
-								__type_length = __PRINTF_LENGTH_H;
-							} else {
+							if (*__iter == 'h') {
 								++__iter;
 								__type_length = __PRINTF_LENGTH_HH;
+								__PRINTF_IF_HOOKS(type_pinfo.is_char = 1)
+							} else {
+								__type_length = __PRINTF_LENGTH_H;
+								__PRINTF_IF_HOOKS(type_pinfo.is_short = 1)
 							}
 							goto __again_posscan2_infmt;
+
 						case 'l':
-							if (*__iter != 'l') {
-								__type_length = __PRINTF_LENGTH_l;
-							} else {
+							__PRINTF_IF_HOOKS(type_pinfo.is_long = 1)
+							if (*__iter == 'l') {
 								++__iter;
 								__type_length = __PRINTF_LENGTH_LL;
+								__PRINTF_IF_HOOKS(type_pinfo.is_long_double = 1)
+							} else {
+								__type_length = __PRINTF_LENGTH_l;
 							}
 							goto __again_posscan2_infmt;
+
 						case 'z':
+							__PRINTF_IF_HOOKS(PINFO_SET_N(type_pinfo, __SIZEOF_SIZE_T__))
 							__type_length = __PRINTF_LENGTH_Z;
 							goto __again_posscan2_infmt;
 
 						case 't':
+							__PRINTF_IF_HOOKS(PINFO_SET_N(type_pinfo, __SIZEOF_PTRDIFF_T__))
 							__type_length = __PRINTF_LENGTH_T;
 							goto __again_posscan2_infmt;
 
 						case 'L':
+							__PRINTF_IF_HOOKS(type_pinfo.is_long_double = 1)
 							__type_length = __PRINTF_LENGTH_L;
 							goto __again_posscan2_infmt;
 
@@ -2153,19 +2413,24 @@ __again_posscan2_infmt:
 							__ch = *__iter++;
 							if (__ch == '8') {
 								__type_length = __PRINTF_LENGTH_I8;
+								__PRINTF_IF_HOOKS(PINFO_SET_N(type_pinfo, 1))
 							} else if (__ch == '1' && *__iter == '6') {
 								++__iter;
 								__type_length = __PRINTF_LENGTH_I16;
+								__PRINTF_IF_HOOKS(PINFO_SET_N(type_pinfo, 2))
 							} else if (__ch == '3' && *__iter == '2') {
 								++__iter;
 								__type_length = __PRINTF_LENGTH_I32;
+								__PRINTF_IF_HOOKS(PINFO_SET_N(type_pinfo, 4))
 							} else if (__ch == '6' && *__iter == '4') {
 								++__iter;
 						case 'j':
 								__type_length = __PRINTF_LENGTH_I64;
+								__PRINTF_IF_HOOKS(PINFO_SET_N(type_pinfo, 8))
 							} else {
 								--__iter;
 								__type_length = __PRINTF_LENGTH_SIZE;
+								__PRINTF_IF_HOOKS(PINFO_SET_N(type_pinfo, __SIZEOF_SIZE_T__))
 							}
 							goto __again_posscan2_infmt;
 
@@ -2260,6 +2525,10 @@ __again_posscan2_infmt:
 						}	break;
 
 						}
+
+#ifdef __PRINTF_HOOKS
+__posscan2_set_typecode:
+#endif /* __PRINTF_HOOKS */
 						if __unlikely(!__type_idx) {
 #if 1
 							/* Completely  abort printing, since  use of positional  arguments requires that _all_
@@ -2289,6 +2558,65 @@ __after_posscan2_infmt:
 						for (__posi = 0; __posi < __posidx; ++__posi) {
 							unsigned int __type_code;
 							__type_code = __p_args[__posi].__p_unsigned;
+#ifdef __PRINTF_HOOKS
+							if (__type_code >= 256) {
+								__uint8_t type_id;
+								void *blob_buffer;
+								int *typebuf, num_args;
+								__STDC_INT_AS_SIZE_T *sizebuf;
+								__SIZE_TYPE__ reqsize;
+								__printf_arginfo_size_function *arginfo_handler;
+								struct printf_info type_pinfo;
+								/* Re-extract printf info from `__type_code' */
+								__libc_bzero(&type_pinfo, sizeof(type_pinfo));
+								type_pinfo.pad = ' ';
+#if __CHAR_SIZE > 1
+								type_pinfo.wide = 1;
+#endif /* __CHAR_SIZE > 1 */
+								type_pinfo.is_long_double = (__type_code >> 9) & 1;
+								type_pinfo.is_short       = (__type_code >> 10) & 1;
+								type_pinfo.is_long        = (__type_code >> 11) & 1;
+								type_pinfo.is_char        = (__type_code >> 12) & 1;
+								type_pinfo.user           = (__type_code >> 16);
+								type_id         = (__type_code >> 1) & 0xff;
+								type_pinfo.spec = (__WCHAR32_TYPE__)type_id;
+								arginfo_handler = __printf_arginfo_table[type_id];
+								__hybrid_assert(arginfo_handler);
+								ALLOCA_BUFFER_REQUIRE(1 * 2 * sizeof(int));
+								typebuf = (int *)(alloca_buffer + 0 * sizeof(int));
+								sizebuf = (__STDC_INT_AS_SIZE_T *)(alloca_buffer + 1 * sizeof(int));
+								__libc_bzero(sizebuf, sizeof(int));
+								num_args = (*arginfo_handler)(&pinfo, 1, typebuf, sizebuf);
+								if (num_args > 1) {
+									int new_num_args;
+positional_arg_again_load_arginfo_handler:
+									ALLOCA_BUFFER_REQUIRE(num_args * 2 * sizeof(int));
+									typebuf = (int *)(alloca_buffer + 0 * sizeof(int));
+									sizebuf = (__STDC_INT_AS_SIZE_T *)(alloca_buffer + num_args * sizeof(int));
+									__libc_bzero(sizebuf, num_args * sizeof(int));
+									new_num_args = (*arginfo_handler)(&pinfo, 1, typebuf, sizebuf);
+									if __unlikely(new_num_args > num_args) {
+										num_args = new_num_args;
+										goto positional_arg_again_load_arginfo_handler;
+									}
+								}
+								if __unlikely(num_args < 0) {
+									__temp = (__SSIZE_TYPE__)num_args;
+									goto __err;
+								}
+
+								/* Package arguments consumed by the arginfo handlers. */
+								reqsize = printf_typeinfo_extrasize(typebuf, sizebuf, num_args);
+								blob_buffer = __hybrid_alloca(reqsize);
+								printf_typeinfo_load(typebuf, sizebuf, (size_t)num_args,
+								                     (__BYTE_TYPE__ *)blob_buffer,
+								                     (__BYTE_TYPE__ const *)__NULLPTR,
+								                     (__builtin_va_list *)&__FORMAT_ARGS, 0);
+								__p_args[__posi].__p_ptr = blob_buffer;
+								continue;
+							}
+#endif /* __PRINTF_HOOKS */
+
 							switch (__type_code) {
 
 #if (!defined(__NO_PRINTF_FLOATING_POINT) && !defined(__NO_FPU))
@@ -2398,12 +2726,24 @@ __end:
 			goto __err;
 		__result += __temp;
 	}
+#ifdef __PRINTF_HOOKS
+	__do_return_result:
+	specsup_printf_endread();
+	return __result;
+__err:
+	__result = __temp;
+	goto __do_return_result;
+#else /* __PRINTF_HOOKS */
 	return __result;
 __err:
 	return __temp;
+#endif /* !__PRINTF_HOOKS */
+#undef __PRINTF_IF_HOOKS
 #undef __PRINTF_HAVE_LBRACKET
 #undef __PRINTF_VARGPTR
 #undef __PRINTF_VARG
+#undef __width
+#undef __precision
 }
 
 #undef __FORMAT_ESCAPE

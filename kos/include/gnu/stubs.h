@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x999a03e0 */
+/* HASH CRC-32:0x79419e19 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -445,9 +445,6 @@
 #define __stub_random_r
 #define __stub_rcmd
 #define __stub_rcmd_af
-#define __stub_register_printf_modifier
-#define __stub_register_printf_specifier
-#define __stub_register_printf_type
 #define __stub___res_close
 #define __stub_res_close
 #define __stub___res_dnok

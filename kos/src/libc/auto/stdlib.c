@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97f85c88 */
+/* HASH CRC-32:0x9d8b8fcb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2030,6 +2030,8 @@ INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") char const libc__i
 #undef libc__itoa_upper_digits
 __asm__(".hidden libc__itoa_lower_digits\n"
         ".hidden libc__itoa_upper_digits\n"
+        ".global libc__itoa_lower_digits\n"
+        ".global libc__itoa_upper_digits\n"
         ".type   libc__itoa_lower_digits, \"object\"\n"
         ".type   libc__itoa_upper_digits, \"object\"\n"
         ".set    .Ldisp_itoa_lower_digits, libc__itoa_digits - 1\n"       /* Prevent size aliasing */

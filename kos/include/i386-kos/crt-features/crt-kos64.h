@@ -1014,6 +1014,8 @@
 #define __CRT_HAVE___prev_mknod
 #define __CRT_HAVE___prev_stat
 #define __CRT_HAVE___prev_ustat
+#define __CRT_HAVE___printf_arginfo_table
+#define __CRT_HAVE___printf_function_table
 #define __CRT_HAVE___progname
 #define __CRT_HAVE___progname_full
 #define __CRT_HAVE___pthread_cleanup_routine

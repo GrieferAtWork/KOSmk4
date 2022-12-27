@@ -55,6 +55,7 @@ struct __mbstate {
 #define __MBSTATE_INIT { 0 }
 #endif /* !__CRT_GLC_PRIMARY */
 #define __mbstate_init(x)    (void)((x)->__mb_word = 0)
+#define __mbstate_cinit(x)   (void)__hybrid_assert((x)->__mb_word == 0)
 #define __mbstate_isempty(x) ((x)->__mb_word == 0)
 
 #define __MBSTATE_TYPE_MASK     0xfc000000

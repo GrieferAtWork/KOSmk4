@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdcdead8c */
+/* HASH CRC-32:0xf2809aca */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,10 +76,14 @@ typedef __printf_arginfo_size_function printf_arginfo_size_function;
 typedef __printf_arginfo_function printf_arginfo_function;
 typedef __printf_va_arg_function printf_va_arg_function;
 
-/* >> register_printf_specifier(3), register_printf_function(3) */
-__CDECLARE_OPT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,register_printf_specifier,(int __spec, printf_function *__func, printf_arginfo_size_function *__arginfo),(__spec,__func,__arginfo))
-/* >> register_printf_specifier(3), register_printf_function(3) */
-__CDECLARE_OPT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,register_printf_function,(int __spec, printf_function *__func, printf_arginfo_function *__arginfo),(__spec,__func,__arginfo))
+/* >> register_printf_specifier(3), register_printf_function(3)
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,register_printf_specifier,(__STDC_INT_AS_UINT_T __spec, printf_function *__func, printf_arginfo_size_function *__arginfo),(__spec,__func,__arginfo))
+/* >> register_printf_specifier(3), register_printf_function(3)
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+__CDECLARE_OPT(,int,__NOTHROW_NCX,register_printf_function,(__STDC_INT_AS_UINT_T __spec, printf_function *__func, printf_arginfo_function *__arginfo),(__spec,__func,__arginfo))
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,register_printf_modifier,(__WCHAR32_TYPE__ const *__str),(__str))
 __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,register_printf_type,(printf_va_arg_function *__fct),(__fct))
 __CDECLARE_OPT(__ATTR_OUTS(3, 2) __ATTR_NONNULL((1)),size_t,__NOTHROW_NCX,parse_printf_format,(char const *__restrict __fmt, size_t __n, int *__restrict __argtypes),(__fmt,__n,__argtypes))

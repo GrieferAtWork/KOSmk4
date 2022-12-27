@@ -95,17 +95,19 @@ typedef __printf_va_arg_function printf_va_arg_function;
 
 
 @@>> register_printf_specifier(3), register_printf_function(3)
-[[decl_include("<bits/crt/printf_info.h>")]]
-int register_printf_specifier(int spec,
-                              [[nonnull]] printf_function *func,
-                              [[nonnull]] printf_arginfo_size_function *arginfo);
+@@@return: 0 : Success
+@@@return: -1: Error (s.a. `errno')
+[[decl_include("<features.h>", "<bits/crt/printf_info.h>")]]
+int register_printf_specifier(__STDC_INT_AS_UINT_T spec,
+                              printf_function *func,
+                              printf_arginfo_size_function *arginfo);
 
 [[doc_alias("register_printf_specifier")]]
-[[decl_include("<bits/crt/printf_info.h>")]]
+[[decl_include("<features.h>", "<bits/crt/printf_info.h>")]]
 [[crt_intern_alias("register_printf_specifier")]]
-int register_printf_function(int spec,
-                             [[nonnull]] printf_function *func,
-                             [[nonnull]] printf_arginfo_function *arginfo);
+int register_printf_function(__STDC_INT_AS_UINT_T spec,
+                             printf_function *func,
+                             printf_arginfo_function *arginfo);
 
 [[wunused]]
 [[decl_include("<hybrid/typecore.h>")]]

@@ -162,6 +162,13 @@ DEFINE_NOREL_GLOBAL_META(char, __libc_single_threaded, ".crt.sched.pthread");
 DEFINE_NOREL_GLOBAL_META(struct __mbstate, _mb_shift, ".crt.compat.linux");
 
 
+/* <printf.h> */
+#undef __printf_function_table
+#undef __printf_arginfo_table
+DEFINE_NOREL_GLOBAL_META(__printf_function **, __printf_function_table, ".crt.compat.glibc.printf");
+DEFINE_NOREL_GLOBAL_META(__printf_arginfo_size_function **, __printf_arginfo_table, ".crt.compat.glibc.printf");
+
+
 /* Misc... */
 #undef __libc_enable_secure
 DEFINE_NOREL_GLOBAL_META(int, __libc_enable_secure, ".crt.compat.glibc");

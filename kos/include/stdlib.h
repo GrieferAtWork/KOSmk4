@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5410577d */
+/* HASH CRC-32:0x10d4f32 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2304,8 +2304,6 @@ __LOCAL_LIBC_CONST_DATA(_itoa_digits) char const _itoa_digits[101] =
 #ifndef _itoa_lower_digits
 #ifdef __LOCAL_itoa_lower_digits
 #define _itoa_lower_digits __LOCAL_itoa_lower_digits
-#elif defined(__CRT_HAVE__itoa_digits)
-#define _itoa_lower_digits (_itoa_digits + 0)
 #elif defined(__CRT_HAVE__itoa_lower_digits)
 __CSDECLARE2(,char const _itoa_lower_digits[37],_itoa_lower_digits)
 #define _itoa_lower_digits _itoa_lower_digits
@@ -2318,8 +2316,6 @@ __CSDECLARE2(,char const _itoa_lower_digits[37],_itoa_lower_digits)
 #ifndef _itoa_upper_digits
 #ifdef __LOCAL_itoa_upper_digits
 #define _itoa_upper_digits __LOCAL_itoa_upper_digits
-#elif defined(__CRT_HAVE__itoa_digits)
-#define _itoa_upper_digits (_itoa_digits + 64)
 #elif defined(__CRT_HAVE__itoa_upper_digits)
 __CSDECLARE2(,char const _itoa_upper_digits[37],_itoa_upper_digits)
 #define _itoa_upper_digits _itoa_upper_digits

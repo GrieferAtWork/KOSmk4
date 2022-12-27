@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b46f3b7 */
+/* HASH CRC-32:0x50da272d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,10 +30,14 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-/* >> register_printf_specifier(3), register_printf_function(3) */
-INTDEF NONNULL((2, 3)) int NOTHROW_NCX(LIBCCALL libc_register_printf_specifier)(int spec, printf_function *func, printf_arginfo_size_function *arginfo);
-/* >> register_printf_specifier(3), register_printf_function(3) */
-INTDEF NONNULL((2, 3)) int NOTHROW_NCX(LIBCCALL libc_register_printf_function)(int spec, printf_function *func, printf_arginfo_function *arginfo);
+/* >> register_printf_specifier(3), register_printf_function(3)
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_register_printf_specifier)(__STDC_INT_AS_UINT_T spec, printf_function *func, printf_arginfo_size_function *arginfo);
+/* >> register_printf_specifier(3), register_printf_function(3)
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_register_printf_function)(__STDC_INT_AS_UINT_T spec, printf_function *func, printf_arginfo_function *arginfo);
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_register_printf_modifier)(__WCHAR32_TYPE__ const *str);
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_register_printf_type)(printf_va_arg_function *fct);
 INTDEF ATTR_OUTS(3, 2) NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_parse_printf_format)(char const *__restrict fmt, size_t n, int *__restrict argtypes);

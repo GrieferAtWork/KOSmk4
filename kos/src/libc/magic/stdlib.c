@@ -1774,6 +1774,8 @@ INTERN_CONST ATTR_SECTION(".rodata.crt.unicode.static.ctype") char const libc__i
 #undef libc__itoa_upper_digits
 __asm__(".hidden libc__itoa_lower_digits\n"
         ".hidden libc__itoa_upper_digits\n"
+        ".global libc__itoa_lower_digits\n"
+        ".global libc__itoa_upper_digits\n"
         ".type   libc__itoa_lower_digits, \"object\"\n"
         ".type   libc__itoa_upper_digits, \"object\"\n"
         ".set    .Ldisp_itoa_lower_digits, libc__itoa_digits - 1\n"       /* Prevent size aliasing */
@@ -1832,8 +1834,6 @@ __LOCAL_LIBC_CONST_DATA(_itoa_digits) char const _itoa_digits[101] =
 #ifndef _itoa_lower_digits
 #ifdef __LOCAL_itoa_lower_digits
 #define _itoa_lower_digits __LOCAL_itoa_lower_digits
-#elif defined(__CRT_HAVE__itoa_digits)
-#define _itoa_lower_digits (_itoa_digits + 0)
 #elif defined(__CRT_HAVE__itoa_lower_digits)
 __CSDECLARE2(,char const _itoa_lower_digits[37],_itoa_lower_digits)
 #define _itoa_lower_digits _itoa_lower_digits
@@ -1846,8 +1846,6 @@ __CSDECLARE2(,char const _itoa_lower_digits[37],_itoa_lower_digits)
 #ifndef _itoa_upper_digits
 #ifdef __LOCAL_itoa_upper_digits
 #define _itoa_upper_digits __LOCAL_itoa_upper_digits
-#elif defined(__CRT_HAVE__itoa_digits)
-#define _itoa_upper_digits (_itoa_digits + 64)
 #elif defined(__CRT_HAVE__itoa_upper_digits)
 __CSDECLARE2(,char const _itoa_upper_digits[37],_itoa_upper_digits)
 #define _itoa_upper_digits _itoa_upper_digits
