@@ -106,7 +106,7 @@ global final FILE_KIND_SRC = 2;
 global final FILE_KIND_IGN = 3;
 global final HEADER_MAPPING: {string: int} = {
 	"h"         : FILE_KIND_HDR,
-	"inl"       : FILE_KIND_HDR,
+	"inl"       : FILE_KIND_SRC,
 	""          : FILE_KIND_HDR,
 	"c"         : FILE_KIND_SRC,
 	"stackdump" : FILE_KIND_IGN,
