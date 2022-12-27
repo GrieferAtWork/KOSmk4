@@ -81,7 +81,10 @@ typedef struct __mbstate mbstate_t;
 #define IO_HASVTAB      __IO_FILE_IONOFD    /* The file uses a V-table, rather than a file descriptor. */
 #ifdef __IO_FILE_IONOLOCK
 #define IO_NOLOCK       __IO_FILE_IONOLOCK  /* The buffer does not perform any locking (s.a. `__fsetlocking()') */
-#endif /* __IO_FILE_IONOLOCK */
+#define _IO_NOLOCK_OPT  __IO_FILE_IONOLOCK  /* The buffer does not perform any locking (s.a. `__fsetlocking()') */
+#else /* __IO_FILE_IONOLOCK */
+#define _IO_NOLOCK_OPT  0
+#endif /* !__IO_FILE_IONOLOCK */
 
 /* Flags not defined by deemon, but required by the C standard. */
 #define IO_EOF          __IO_FILE_IOEOF /* Set when the file pointed to by 'if_fd' has been exhausted. */

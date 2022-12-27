@@ -1,0 +1,83 @@
+/* Copyright (c) 2019-2022 Griefer@Work                                       *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement (see the following) in the product     *
+ *    documentation is required:                                              *
+ *    Portions Copyright (c) 2019-2022 Griefer@Work                           *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBC_LIBC_PRINTF_CTEST
+#define GUARD_LIBC_LIBC_PRINTF_CTEST 1
+#define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
+#undef NDEBUG
+
+/**/
+#include <hybrid/compiler.h>
+
+#include <kos/types.h>
+#include <system-test/ctest.h>
+
+#include <printf.h>
+#include <stdio.h>
+#include <stddef.h>
+/**/
+
+DECL_BEGIN
+
+PRIVATE int my_printf_function(FILE *stream,
+                               struct printf_info const *info,
+                               void const *const *args) {
+	int a = *(int const *)args[0];
+	int b = *(int const *)args[1];
+	(void)info;
+	return fprintf(stream, "[%d:cool:%d]", a, b);
+}
+
+PRIVATE int my_arginfo_function(struct printf_info const *info,
+                                size_t n, int *argtypes) {
+	(void)info;
+	if (n >= 2) {
+		argtypes[0] = PA_INT;
+		argtypes[1] = PA_INT;
+	}
+	return 2;
+}
+
+DEFINE_TEST(register_printf_function) {
+	char buf[256];
+	EQ(0, register_printf_function('K', &my_printf_function, &my_arginfo_function));
+
+	sprintf(buf, "a%Kb", 10, 20);
+	EQstr("a[10:cool:20]b", buf);
+
+	sprintf(buf, "a%Kb%Kc", 10, 22, 42, 77);
+	EQstr("a[10:cool:22]b[42:cool:77]c", buf);
+
+	sprintf(buf, "a%1$Kb", 20, 10);
+	EQstr("a[20:cool:10]b", buf);
+
+	sprintf(buf, "a%1$Kb%1$Kc", 10, 22);
+	EQstr("a[10:cool:22]b[10:cool:22]c", buf);
+
+	sprintf(buf, "%2$sa%1$Kb%1$Kc%2$s", 10, 22, "MyString");
+	EQstr("MyStringa[10:cool:22]b[10:cool:22]cMyString", buf);
+
+	sprintf(buf, "%1$sa%2$Kb%2$Kc%1$s", "MyString", 10, 22);
+	EQstr("MyStringa[10:cool:22]b[10:cool:22]cMyString", buf);
+}
+
+DECL_END
+
+#endif /* !GUARD_LIBC_LIBC_PRINTF_CTEST */

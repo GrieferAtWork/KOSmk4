@@ -484,7 +484,7 @@ NOTHROW_NCX(LIBCCALL printf_typeinfo_extrasize)(int const *typev,
 	size_t i, result = 0;
 	for (i = 0; i < argc; ++i) {
 		size_t argsize;
-		unsigned int argtype = typev[i];
+		unsigned int argtype = (unsigned int)typev[i];
 		if (argtype & PA_FLAG_PTR)
 			goto do_pointer;
 		switch (argtype & 0xff) {
@@ -533,12 +533,23 @@ do_pointer:
 	return result;
 }
 
+#ifdef __VA_LIST_IS_ARRAY
+PRIVATE ATTR_SECTION(".text.crt.compat.glibc.printf") void **
+NOTHROW_NCX(LIBCCALL printf_typeinfo_load)(int const *typev,
+                                           __STDC_INT_AS_SIZE_T const *sizev,
+                                           size_t argc, byte_t *outbuf,
+                                           byte_t const *pdata, va_list vargs,
+                                           bool should_construct_array)
+#else /* __VA_LIST_IS_ARRAY */
 PRIVATE ATTR_SECTION(".text.crt.compat.glibc.printf") void **
 NOTHROW_NCX(LIBCCALL printf_typeinfo_load)(int const *typev,
                                            __STDC_INT_AS_SIZE_T const *sizev,
                                            size_t argc, byte_t *outbuf,
                                            byte_t const *pdata, va_list *p_args,
-                                           bool should_construct_array) {
+                                           bool should_construct_array)
+#define vargs (*p_args)
+#endif /* !__VA_LIST_IS_ARRAY */
+{
 	size_t i;
 	void **result;
 	result = (void **)outbuf;
@@ -546,40 +557,38 @@ NOTHROW_NCX(LIBCCALL printf_typeinfo_load)(int const *typev,
 		outbuf += argc * sizeof(void *); /* Elements of array passed to `printf_function' */
 	for (i = 0; i < argc; ++i) {
 		size_t argsize;
-		unsigned int argtype = typev[i];
-		if (should_construct_array)
-			result[i] = (void *)outbuf;
+		unsigned int argtype = (unsigned int)typev[i];
 		if (argtype & PA_FLAG_PTR)
 			goto do_pointer;
 		switch (argtype & 0xff) {
 		case PA_INT:
 			if (argtype & PA_FLAG_LONG_LONG) {
 				if (pdata == NULL)
-					*(__LONGLONG *)outbuf = va_arg(*p_args, __LONGLONG);
+					*(__LONGLONG *)outbuf = va_arg(vargs, __LONGLONG);
 				argsize = __SIZEOF_LONG_LONG__;
 			} else if (argtype & PA_FLAG_LONG) {
 				if (pdata == NULL)
-					*(long *)outbuf = va_arg(*p_args, long);
+					*(long *)outbuf = va_arg(vargs, long);
 				argsize = __SIZEOF_LONG__;
 			} else if (argtype & PA_FLAG_SHORT) {
 				if (pdata == NULL)
-					*(short *)outbuf = (short)va_arg(*p_args, int);
+					*(short *)outbuf = (short)va_arg(vargs, int);
 				argsize = __SIZEOF_SHORT__;
 			} else {
 				if (pdata == NULL)
-					*(int *)outbuf = va_arg(*p_args, int);
+					*(int *)outbuf = va_arg(vargs, int);
 				argsize = __SIZEOF_INT__;
 			}
 			break;
 		case PA_CHAR:
 			argsize = __SIZEOF_CHAR__;
 			if (pdata == NULL)
-				*(char *)outbuf = (char)va_arg(*p_args, int);
+				*(char *)outbuf = (char)va_arg(vargs, int);
 			break;
 		case PA_WCHAR:
 			argsize = __SIZEOF_WCHAR_T__;
 			if (pdata == NULL)
-				*(wchar_t *)outbuf = (wchar_t)va_arg(*p_args, wint_t);
+				*(wchar_t *)outbuf = (wchar_t)va_arg(vargs, wint_t);
 			break;
 		case PA_STRING:
 		case PA_WSTRING:
@@ -587,44 +596,46 @@ NOTHROW_NCX(LIBCCALL printf_typeinfo_load)(int const *typev,
 do_pointer:
 			argsize = __SIZEOF_POINTER__;
 			if (pdata == NULL)
-				*(void **)outbuf = (void *)va_arg(*p_args, void *);
+				*(void **)outbuf = (void *)va_arg(vargs, void *);
 			break;
 		case PA_FLOAT:
 			argsize = __SIZEOF_FLOAT__;
 			if (pdata == NULL)
-				*(float *)outbuf = (float)va_arg(*p_args, double);
+				*(float *)outbuf = (float)va_arg(vargs, double);
 			break;
 		case PA_DOUBLE:
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 			if (argtype & PA_FLAG_LONG_DOUBLE) {
 				argsize = __SIZEOF_LONG_DOUBLE__;
 				if (pdata == NULL)
-					*(__LONGDOUBLE *)outbuf = va_arg(*p_args, __LONGDOUBLE);
+					*(__LONGDOUBLE *)outbuf = va_arg(vargs, __LONGDOUBLE);
 			} else
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 			{
 				argsize = __SIZEOF_DOUBLE__;
 				if (pdata == NULL)
-					*(double *)outbuf = va_arg(*p_args, double);
+					*(double *)outbuf = va_arg(vargs, double);
 			}
 			break;
 
 		default:
 			argsize = sizev[i];
 			break;
-
 		}
-		if (pdata) {
-			memcpy(outbuf, pdata, argsize);
+		if (pdata == NULL) {
+			if (should_construct_array)
+				result[i] = (void *)outbuf;
 			argsize = CEIL_ALIGN(argsize, __ALIGNOF_MAX_ALIGN_T__);
 			outbuf += argsize;
-			pdata += argsize;
 		} else {
+			if (should_construct_array)
+				result[i] = (void *)pdata;
 			argsize = CEIL_ALIGN(argsize, __ALIGNOF_MAX_ALIGN_T__);
-			outbuf += argsize;
+			pdata += argsize;
 		}
 	}
 	return result;
+#undef vargs
 }
 
 
@@ -634,6 +645,9 @@ struct format_file_printer: FILE {
 	void              *ffp_arg;     /* Output printer cookie */
 	ssize_t            ffp_error;   /* Format output error code. */
 };
+
+#define FORMAT_FILE_PRINTER_FLAGS \
+	(IO_RW | IO_HASVTAB | IO_NODYNSCALE | IO_NOTATTY | _IO_NOLOCK_OPT)
 
 
 PRIVATE ATTR_SECTION(".text.crt.compat.glibc.printf") ssize_t LIBKCALL
@@ -656,7 +670,7 @@ NOTHROW_NCX(LIBCCALL format_file_printer_init)(struct format_file_printer *__res
 	 *       that allows one to  open a write-only stream  on-top
 	 *       of a `pformatprinter'. */
 	bzero(self, sizeof(*self));
-	self->if_flag     = __IO_FILE_IONOFD;
+	self->if_flag     = FORMAT_FILE_PRINTER_FLAGS;
 	self->if_exdata   = &self->ffp_exdat;
 	self->ffp_printer = printer;
 	self->ffp_arg     = arg;
@@ -673,17 +687,19 @@ invoke_printf_function8(pformatprinter printer, void *arg,
 	ssize_t result;
 	struct format_file_printer ffile;
 	__printf_function *handler;
-	assert(info->spec <= 0xff);
+	assertf(info->spec <= 0xff, "%u", (unsigned int)info->spec);
 	handler = __printf_function_table[info->spec];
-	assert(handler);
+	assertf(handler, "%u", (unsigned int)info->spec);
 
 	/* Setup a simple on-stack FILE that writes to `printer' */
 	format_file_printer_init(&ffile, printer, arg);
 
 	/* Actually invoke the handler. */
-	result = (ssize_t)(*handler)(&ffile, info, args);
+	result = (ssize_t)(*handler)(file_touser(&ffile), info, args);
 	if (ffile.ffp_error < 0 && result >= 0)
 		result = ffile.ffp_error;
+	assert(!(ffile.if_flag & IO_MALLBUF));
+	assert(ffile.if_bufsiz == 0);
 	return result;
 }
 
@@ -715,7 +731,7 @@ PRIVATE ATTR_SECTION(".text.crt.compat.glibc.printf") NONNULL((1, 2)) void
 NOTHROW_NCX(LIBCCALL format_file_c16printer_init)(struct format_file_c16printer *__restrict self,
                                                   pc16formatprinter printer, void *arg) {
 	bzero(self, sizeof(*self));
-	self->if_flag            = __IO_FILE_IONOFD;
+	self->if_flag            = FORMAT_FILE_PRINTER_FLAGS;
 	self->if_exdata          = &self->ffp_exdat;
 	self->ffp_out.fd_printer = printer;
 	self->ffp_out.fd_arg     = arg;
@@ -732,17 +748,19 @@ invoke_printf_function16(pc16formatprinter printer, void *arg,
 	ssize_t result;
 	struct format_file_c16printer ffile;
 	__printf_function *handler;
-	assert(info->spec <= 0xff);
+	assertf(info->spec <= 0xff, "%u", (unsigned int)info->spec);
 	handler = __printf_function_table[info->spec];
-	assert(handler);
+	assertf(handler, "%u", (unsigned int)info->spec);
 
 	/* Setup a simple on-stack FILE that writes to `printer' */
 	format_file_c16printer_init(&ffile, printer, arg);
 
 	/* Actually invoke the handler. */
-	result = (ssize_t)(*handler)(&ffile, info, args);
+	result = (ssize_t)(*handler)(file_touser(&ffile), info, args);
 	if (ffile.ffp_error < 0 && result >= 0)
 		result = ffile.ffp_error;
+	assert(!(ffile.if_flag & IO_MALLBUF));
+	assert(ffile.if_bufsiz == 0);
 	return result;
 }
 
@@ -771,7 +789,7 @@ PRIVATE ATTR_SECTION(".text.crt.compat.glibc.printf") NONNULL((1, 2)) void
 NOTHROW_NCX(LIBCCALL format_file_c32printer_init)(struct format_file_c32printer *__restrict self,
                                                   pc32formatprinter printer, void *arg) {
 	bzero(self, sizeof(*self));
-	self->if_flag            = __IO_FILE_IONOFD;
+	self->if_flag            = FORMAT_FILE_PRINTER_FLAGS;
 	self->if_exdata          = &self->ffp_exdat;
 	self->ffp_out.fd_printer = printer;
 	self->ffp_out.fd_arg     = arg;
@@ -788,17 +806,19 @@ invoke_printf_function32(pc32formatprinter printer, void *arg,
 	ssize_t result;
 	struct format_file_c32printer ffile;
 	__printf_function *handler;
-	assert(info->spec <= 0xff);
+	assertf(info->spec <= 0xff, "%u", (unsigned int)info->spec);
 	handler = __printf_function_table[info->spec];
-	assert(handler);
+	assertf(handler, "%u", (unsigned int)info->spec);
 
 	/* Setup a simple on-stack FILE that writes to `printer' */
 	format_file_c32printer_init(&ffile, printer, arg);
 
 	/* Actually invoke the handler. */
-	result = (ssize_t)(*handler)(&ffile, info, args);
+	result = (ssize_t)(*handler)(file_touser(&ffile), info, args);
 	if (ffile.ffp_error < 0 && result >= 0)
 		result = ffile.ffp_error;
+	assert(!(ffile.if_flag & IO_MALLBUF));
+	assert(ffile.if_bufsiz == 0);
 	return result;
 }
 

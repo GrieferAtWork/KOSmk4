@@ -66,7 +66,11 @@ extern char const *format_mod_consume8(char const *__restrict format, struct pri
 extern char16_t const *format_mod_consume16(char16_t const *__restrict format, struct printf_info *__restrict info);
 extern char32_t const *format_mod_consume32(char32_t const *__restrict format, struct printf_info *__restrict info);
 extern __size_t printf_typeinfo_extrasize(int const *typev, __STDC_INT_AS_SIZE_T const *sizev, __size_t argc);
+#ifdef __VA_LIST_IS_ARRAY
+extern void **printf_typeinfo_load(int const *typev, __STDC_INT_AS_SIZE_T const *sizev, size_t argc, __BYTE_TYPE__ *outbuf, __BYTE_TYPE__ const *pdata, __builtin_va_list vargs, __BOOL should_construct_array);
+#else /* __VA_LIST_IS_ARRAY */
 extern void **printf_typeinfo_load(int const *typev, __STDC_INT_AS_SIZE_T const *sizev, size_t argc, __BYTE_TYPE__ *outbuf, __BYTE_TYPE__ const *pdata, __builtin_va_list *p_args, __BOOL should_construct_array);
+#endif /* !__VA_LIST_IS_ARRAY */
 extern __ssize_t invoke_printf_function8(__pformatprinter printer, void *arg, struct printf_info const *info, void const *const *args);
 extern __ssize_t invoke_printf_function16(__pc16formatprinter printer, void *arg, struct printf_info const *info, void const *const *args);
 extern __ssize_t invoke_printf_function32(__pc32formatprinter printer, void *arg, struct printf_info const *info, void const *const *args);
@@ -342,7 +346,7 @@ __nextfmt:
 			void **argv;
 			int *typebuf, num_args;
 			__STDC_INT_AS_SIZE_T *sizebuf;
-			__SIZE_TYPE__ reqsize;
+			__SIZE_TYPE__ reqsize, metasize;
 #if __CHAR_SIZE > 1
 			pinfo.spec = (__WCHAR32_TYPE__)__ch;
 #else /* __CHAR_SIZE > 1 */
@@ -356,15 +360,16 @@ __nextfmt:
 			if (num_args > 1) {
 				int new_num_args;
 again_load_arginfo_handler:
-				ALLOCA_BUFFER_REQUIRE(num_args * 2 * sizeof(int));
+				ALLOCA_BUFFER_REQUIRE((size_t)(unsigned int)num_args * 2 * sizeof(int));
 				typebuf = (int *)(alloca_buffer + 0 * sizeof(int));
-				sizebuf = (__STDC_INT_AS_SIZE_T *)(alloca_buffer + num_args * sizeof(int));
+				sizebuf = (__STDC_INT_AS_SIZE_T *)(alloca_buffer + (size_t)(unsigned int)num_args * sizeof(int));
 				__libc_bzero(sizebuf, num_args * sizeof(int));
-				new_num_args = (*arginfo_handler)(&pinfo, 1, typebuf, sizebuf);
+				new_num_args = (*arginfo_handler)(&pinfo, (size_t)(unsigned int)num_args, typebuf, sizebuf);
 				if __unlikely(new_num_args > num_args) {
 					num_args = new_num_args;
 					goto again_load_arginfo_handler;
 				}
+				num_args = new_num_args;
 			}
 			if __unlikely(num_args < 0) {
 				__temp = (__SSIZE_TYPE__)num_args;
@@ -372,13 +377,21 @@ again_load_arginfo_handler:
 			}
 
 			/* Package arguments consumed by the arginfo handlers. */
-			reqsize = num_args * sizeof(void *);
+			metasize = (size_t)(unsigned int)num_args * 2 * sizeof(int); /* Required space for meta-data */
+			reqsize  = metasize;
+			reqsize += (size_t)(unsigned int)num_args * sizeof(void *); /* Required space for args-array */
 			if (__p_arg == __NULLPTR)
-				reqsize += printf_typeinfo_extrasize(typebuf, sizebuf, num_args);
+				reqsize += printf_typeinfo_extrasize(typebuf, sizebuf, (size_t)(unsigned int)num_args);
 			ALLOCA_BUFFER_REQUIRE(reqsize);
-			argv = printf_typeinfo_load(typebuf, sizebuf, (size_t)num_args, alloca_buffer,
+#ifdef __VA_LIST_IS_ARRAY
+			argv = printf_typeinfo_load(typebuf, sizebuf, (size_t)(unsigned int)num_args, alloca_buffer + metasize,
 			                            (__BYTE_TYPE__ const *)(__p_arg ? __p_arg->__p_ptr : __NULLPTR),
-			                            (__builtin_va_list *)&__FORMAT_ARGS, 1);
+			                            __FORMAT_ARGS, 1);
+#else /* __VA_LIST_IS_ARRAY */
+			argv = printf_typeinfo_load(typebuf, sizebuf, (size_t)(unsigned int)num_args, alloca_buffer + metasize,
+			                            (__BYTE_TYPE__ const *)(__p_arg ? __p_arg->__p_ptr : __NULLPTR),
+			                            &__FORMAT_ARGS, 1);
+#endif /* !__VA_LIST_IS_ARRAY */
 
 			/* Invoke the actual printf-handler. */
 #if __CHAR_SIZE == 1
@@ -391,6 +404,7 @@ again_load_arginfo_handler:
 			if __unlikely(__temp < 0)
 				goto __err;
 			__result += __temp;
+			__flush_start = __FORMAT_FORMAT;
 			goto __next;
 		}
 	}
@@ -2578,27 +2592,28 @@ __after_posscan2_infmt:
 								type_pinfo.is_long        = (__type_code >> 11) & 1;
 								type_pinfo.is_char        = (__type_code >> 12) & 1;
 								type_pinfo.user           = (__type_code >> 16);
-								type_id         = (__type_code >> 1) & 0xff;
+								type_id         = (__type_code - 256) & 0xff;
 								type_pinfo.spec = (__WCHAR32_TYPE__)type_id;
 								arginfo_handler = __printf_arginfo_table[type_id];
-								__hybrid_assert(arginfo_handler);
+								__hybrid_assertf(arginfo_handler, "type_code = %#x", __type_code);
 								ALLOCA_BUFFER_REQUIRE(1 * 2 * sizeof(int));
 								typebuf = (int *)(alloca_buffer + 0 * sizeof(int));
 								sizebuf = (__STDC_INT_AS_SIZE_T *)(alloca_buffer + 1 * sizeof(int));
 								__libc_bzero(sizebuf, sizeof(int));
-								num_args = (*arginfo_handler)(&pinfo, 1, typebuf, sizebuf);
+								num_args = (*arginfo_handler)(&type_pinfo, 1, typebuf, sizebuf);
 								if (num_args > 1) {
 									int new_num_args;
 positional_arg_again_load_arginfo_handler:
-									ALLOCA_BUFFER_REQUIRE(num_args * 2 * sizeof(int));
+									ALLOCA_BUFFER_REQUIRE((size_t)(unsigned int)num_args * 2 * sizeof(int));
 									typebuf = (int *)(alloca_buffer + 0 * sizeof(int));
-									sizebuf = (__STDC_INT_AS_SIZE_T *)(alloca_buffer + num_args * sizeof(int));
-									__libc_bzero(sizebuf, num_args * sizeof(int));
-									new_num_args = (*arginfo_handler)(&pinfo, 1, typebuf, sizebuf);
+									sizebuf = (__STDC_INT_AS_SIZE_T *)(alloca_buffer + (size_t)(unsigned int)num_args * sizeof(int));
+									__libc_bzero(sizebuf, (size_t)(unsigned int)num_args * sizeof(int));
+									new_num_args = (*arginfo_handler)(&type_pinfo, (size_t)(unsigned int)num_args, typebuf, sizebuf);
 									if __unlikely(new_num_args > num_args) {
 										num_args = new_num_args;
 										goto positional_arg_again_load_arginfo_handler;
 									}
+									num_args = new_num_args;
 								}
 								if __unlikely(num_args < 0) {
 									__temp = (__SSIZE_TYPE__)num_args;
@@ -2606,12 +2621,19 @@ positional_arg_again_load_arginfo_handler:
 								}
 
 								/* Package arguments consumed by the arginfo handlers. */
-								reqsize = printf_typeinfo_extrasize(typebuf, sizebuf, num_args);
+								reqsize = printf_typeinfo_extrasize(typebuf, sizebuf, (size_t)(unsigned int)num_args);
 								blob_buffer = __hybrid_alloca(reqsize);
-								printf_typeinfo_load(typebuf, sizebuf, (size_t)num_args,
+#ifdef __VA_LIST_IS_ARRAY
+								printf_typeinfo_load(typebuf, sizebuf, (size_t)(unsigned int)num_args,
 								                     (__BYTE_TYPE__ *)blob_buffer,
 								                     (__BYTE_TYPE__ const *)__NULLPTR,
-								                     (__builtin_va_list *)&__FORMAT_ARGS, 0);
+								                     __FORMAT_ARGS, 0);
+#else /* __VA_LIST_IS_ARRAY */
+								printf_typeinfo_load(typebuf, sizebuf, (size_t)(unsigned int)num_args,
+								                     (__BYTE_TYPE__ *)blob_buffer,
+								                     (__BYTE_TYPE__ const *)__NULLPTR,
+								                     &__FORMAT_ARGS, 0);
+#endif /* !__VA_LIST_IS_ARRAY */
 								__p_args[__posi].__p_ptr = blob_buffer;
 								continue;
 							}
