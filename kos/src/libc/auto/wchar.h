@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc4f8af4 */
+/* HASH CRC-32:0x39283351 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,8 @@
 
 DECL_BEGIN
 
+#include <bits/crt/wformat-printer.h>
+#include <bits/crt/uformat-printer.h>
 #ifndef __errno_t_defined
 #define __errno_t_defined
 typedef __errno_t errno_t;
@@ -375,6 +377,28 @@ INTDEF ATTR_IN(1) ATTR_INOUT(2) __STDC_INT_AS_SIZE_T (LIBKCALL libc_fputws_unloc
 INTDEF ATTR_IN(3) ATTR_IN(4) ATTR_LIBC_C16FTIME(3, 0) ATTR_OUTS(1, 2) size_t NOTHROW_NCX(LIBDCALL libd_wcsftime_l)(char16_t *__restrict buf, size_t maxsize, char16_t const *__restrict format, struct tm const *__restrict tp, locale_t locale);
 /* >> wcsftime_l(3) */
 INTDEF ATTR_IN(3) ATTR_IN(4) ATTR_LIBC_C32FTIME(3, 0) ATTR_OUTS(1, 2) size_t NOTHROW_NCX(LIBKCALL libc_wcsftime_l)(char32_t *__restrict buf, size_t maxsize, char32_t const *__restrict format, struct tm const *__restrict tp, locale_t locale);
+/* >> fopen_wprinter(3)
+ * Create and return a new write-only file-stream that will write to the given printer.
+ * Note  that by default, the buffering is enabled for the file-stream, meaning you may
+ * have to call `fflush(return)' before printed data is committed to the given printer.
+ * - Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+ * - When `printer' returns a negative value, `ferror(return)' becomes set
+ * - When calling `fflush(return)', with the current unicode sequence is incomplete,
+ *   that function will return with `-1' and `errno == EILSEQ'
+ * @return: * :   A file-stream that emits its data to `printer'
+ * @return: NULL: Insufficient memory. */
+INTDEF WUNUSED NONNULL((1)) FILE *NOTHROW_NCX(LIBDCALL libd_fopen_wprinter)(__pc16formatprinter printer, void *arg);
+/* >> fopen_wprinter(3)
+ * Create and return a new write-only file-stream that will write to the given printer.
+ * Note  that by default, the buffering is enabled for the file-stream, meaning you may
+ * have to call `fflush(return)' before printed data is committed to the given printer.
+ * - Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+ * - When `printer' returns a negative value, `ferror(return)' becomes set
+ * - When calling `fflush(return)', with the current unicode sequence is incomplete,
+ *   that function will return with `-1' and `errno == EILSEQ'
+ * @return: * :   A file-stream that emits its data to `printer'
+ * @return: NULL: Insufficient memory. */
+INTDEF WUNUSED NONNULL((1)) FILE *NOTHROW_NCX(LIBKCALL libc_fopen_wprinter)(__pc32formatprinter printer, void *arg);
 /* >> fwprintf(3), vfwprintf(3), fwprintf_unlocked(3), vfwprintf_unlocked(3) */
 INTDEF ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C16PRINTF(2, 0) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfwprintf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, va_list args) THROWS(...);
 /* >> fwprintf(3), vfwprintf(3), fwprintf_unlocked(3), vfwprintf_unlocked(3) */

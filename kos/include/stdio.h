@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd575e515 */
+/* HASH CRC-32:0xa8277e3c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3921,7 +3921,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fsetpos64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
  * Create and return a new write-only file-stream that will write to the given printer.
  * Note  that by default, the buffering is enabled for the file-stream, meaning you may
  * have to call `fflush(return)' before printed data is committed to the given printer.
- * Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+ * - Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+ * - When `printer' returns a negative value, `ferror(return)' becomes set
  * @return: * :   A file-stream that emits its data to `printer'
  * @return: NULL: Insufficient memory. */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FILE *,__NOTHROW_NCX,fopen_printer,(__pformatprinter __printer, void *__arg),(__printer,__arg))
@@ -3931,7 +3932,8 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FILE *,__NOTHROW_NCX,fopen_print
  * Create and return a new write-only file-stream that will write to the given printer.
  * Note  that by default, the buffering is enabled for the file-stream, meaning you may
  * have to call `fflush(return)' before printed data is committed to the given printer.
- * Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+ * - Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+ * - When `printer' returns a negative value, `ferror(return)' becomes set
  * @return: * :   A file-stream that emits its data to `printer'
  * @return: NULL: Insufficient memory. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(fopen_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __FILE *__NOTHROW_NCX(__LIBCCALL fopen_printer)(__pformatprinter __printer, void *__arg) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fopen_printer))(__printer, __arg); })

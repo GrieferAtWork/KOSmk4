@@ -33,6 +33,10 @@
 #include <uchar.h>
 #endif /* !_UCHAR_H */
 
+#ifdef __USE_KOS
+#include <bits/crt/uformat-printer.h>
+#endif /* __USE_KOS */
+
 #ifndef WEOF16
 #define WEOF16 __WEOF16
 #define WEOF32 __WEOF32
@@ -176,6 +180,9 @@ open_c32memstream(*) %{uchar32("open_wmemstream")}
 
 %
 %#ifdef __USE_KOS
+fopen_c16printer(*) %{uchar16("fopen_wprinter")}
+fopen_c32printer(*) %{uchar32("fopen_wprinter")}
+
 file_c16printer(*) %{uchar16("file_wprinter")}
 file_c32printer(*) %{uchar32("file_wprinter")}
 file_c16printer_unlocked(*) %{uchar16("file_wprinter_unlocked")}

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8784bf59 */
+/* HASH CRC-32:0x8ae68630 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -7430,11 +7430,21 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strdupf, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_M
 #ifdef __INTELLISENSE__
 #define mstrdupa  mstrdupa
 #define mstrndupa mstrndupa
+#ifdef __malloca_mayfail
+extern __ATTR_MALLOC __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
+__NOTHROW_NCX(mstrdupa)(char const *__restrict __string);
+#else /* __malloca_mayfail */
 extern __ATTR_MALLOC __ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(mstrdupa)(char const *__restrict __string);
+#endif /* !__malloca_mayfail */
 #if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
+#ifdef __malloca_mayfail
+extern __ATTR_MALLOC __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
+__NOTHROW_NCX(mstrndupa)(char const *__restrict __string, __size_t __maxlen);
+#else /* __malloca_mayfail */
 extern __ATTR_MALLOC __ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(mstrndupa)(char const *__restrict __string, __size_t __maxlen);
+#endif /* !__malloca_mayfail */
 #endif /* __USE_XOPEN2K8 || __USE_DOS */
 #elif defined(__NO_XBLOCK)
 __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_NONNULL((2)) char *

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95b34b8c */
+/* HASH CRC-32:0x55000778 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1624,6 +1624,11 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$fopen_unlocked
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+#define __CRT_HAVE_DOS$fopen_wprinter
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$fopencookie
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -5913,6 +5918,7 @@
 #define __CRT_HAVE_fopen_printer
 #define __CRT_HAVE_fopen_s
 #define __CRT_HAVE_fopen_unlocked
+#define __CRT_HAVE_fopen_wprinter
 #define __CRT_HAVE_fopencookie
 #define __CRT_HAVE_fopendirat
 #define __CRT_HAVE_fork

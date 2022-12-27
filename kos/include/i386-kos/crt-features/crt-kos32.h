@@ -2942,6 +2942,7 @@
 #define __CRT_HAVE_fopen_printer
 #define __CRT_HAVE_fopen_s
 #define __CRT_HAVE_fopen_unlocked
+#define __CRT_HAVE_fopen_wprinter
 #define __CRT_HAVE_fopencookie
 #define __CRT_HAVE_fopendirat
 #define __CRT_HAVE_fork
@@ -7145,6 +7146,7 @@
 #define __CRT_HAVE_KOS$fopen
 #define __CRT_HAVE_KOS$fopen64
 #define __CRT_HAVE_KOS$fopen_s
+#define __CRT_HAVE_KOS$fopen_wprinter
 #define __CRT_HAVE_KOS$fopendirat
 #define __CRT_HAVE_KOS$format_8tow
 #define __CRT_HAVE_KOS$format_vwprintf
@@ -8192,6 +8194,7 @@
 #define __CRT_HAVE_DOS$fopen
 #define __CRT_HAVE_DOS$fopen64
 #define __CRT_HAVE_DOS$fopen_s
+#define __CRT_HAVE_DOS$fopen_wprinter
 #define __CRT_HAVE_DOS$fopendirat
 #define __CRT_HAVE_DOS$format_8tow
 #define __CRT_HAVE_DOS$format_vwprintf

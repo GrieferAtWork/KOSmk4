@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x238d407b */
+/* HASH CRC-32:0x30ae015a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -656,7 +656,8 @@ INTDEF ATTR_IN(2) ATTR_INOUT(1) int (LIBDCALL libd_fsetpos64)(FILE *__restrict s
  * Create and return a new write-only file-stream that will write to the given printer.
  * Note  that by default, the buffering is enabled for the file-stream, meaning you may
  * have to call `fflush(return)' before printed data is committed to the given printer.
- * Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+ * - Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+ * - When `printer' returns a negative value, `ferror(return)' becomes set
  * @return: * :   A file-stream that emits its data to `printer'
  * @return: NULL: Insufficient memory. */
 INTDEF WUNUSED NONNULL((1)) FILE *NOTHROW_NCX(LIBDCALL libd_fopen_printer)(__pformatprinter printer, void *arg);
@@ -666,7 +667,8 @@ INTDEF WUNUSED NONNULL((1)) FILE *NOTHROW_NCX(LIBDCALL libd_fopen_printer)(__pfo
  * Create and return a new write-only file-stream that will write to the given printer.
  * Note  that by default, the buffering is enabled for the file-stream, meaning you may
  * have to call `fflush(return)' before printed data is committed to the given printer.
- * Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+ * - Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+ * - When `printer' returns a negative value, `ferror(return)' becomes set
  * @return: * :   A file-stream that emits its data to `printer'
  * @return: NULL: Insufficient memory. */
 INTDEF WUNUSED NONNULL((1)) FILE *NOTHROW_NCX(LIBCCALL libc_fopen_printer)(__pformatprinter printer, void *arg);

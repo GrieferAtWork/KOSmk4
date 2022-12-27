@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc964dd4 */
+/* HASH CRC-32:0x83bffe95 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -330,6 +330,7 @@ __NAMESPACE_STD_USING(wmempmove)
 #include <kos/anno.h>
 
 #ifdef __USE_KOS
+#include <bits/crt/wformat-printer.h>
 #include <parts/malloca.h>
 #endif /* __USE_KOS */
 
@@ -2946,6 +2947,35 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcsftime_l, __FORCELOCAL __ATTR_ARTIFICIAL __ATT
 
 /* KOS FILE extension functions. */
 
+#ifdef __CRT_HAVE_fopen_wprinter
+/* >> fopen_wprinter(3)
+ * Create and return a new write-only file-stream that will write to the given printer.
+ * Note  that by default, the buffering is enabled for the file-stream, meaning you may
+ * have to call `fflush(return)' before printed data is committed to the given printer.
+ * - Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+ * - When `printer' returns a negative value, `ferror(return)' becomes set
+ * - When calling `fflush(return)', with the current unicode sequence is incomplete,
+ *   that function will return with `-1' and `errno == EILSEQ'
+ * @return: * :   A file-stream that emits its data to `printer'
+ * @return: NULL: Insufficient memory. */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FILE *,__NOTHROW_NCX,fopen_wprinter,(__pwformatprinter __printer, void *__arg),(__printer,__arg))
+#else /* __CRT_HAVE_fopen_wprinter */
+#include <bits/types.h>
+#if (defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && (defined(__CRT_HAVE_funopen2_64) || defined(__CRT_HAVE_funopen2))
+#include <libc/local/wchar/fopen_wprinter.h>
+/* >> fopen_wprinter(3)
+ * Create and return a new write-only file-stream that will write to the given printer.
+ * Note  that by default, the buffering is enabled for the file-stream, meaning you may
+ * have to call `fflush(return)' before printed data is committed to the given printer.
+ * - Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+ * - When `printer' returns a negative value, `ferror(return)' becomes set
+ * - When calling `fflush(return)', with the current unicode sequence is incomplete,
+ *   that function will return with `-1' and `errno == EILSEQ'
+ * @return: * :   A file-stream that emits its data to `printer'
+ * @return: NULL: Insufficient memory. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(fopen_wprinter, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __FILE *__NOTHROW_NCX(__LIBCCALL fopen_wprinter)(__pwformatprinter __printer, void *__arg) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fopen_wprinter))(__printer, __arg); })
+#endif /* (__CRT_HAVE_malloc || __CRT_HAVE___libc_malloc || __CRT_HAVE_calloc || __CRT_HAVE___libc_calloc || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc || __CRT_HAVE_memalign || __CRT_HAVE_aligned_alloc || __CRT_HAVE___libc_memalign || __CRT_HAVE_posix_memalign) && (__CRT_HAVE_funopen2_64 || __CRT_HAVE_funopen2) */
+#endif /* !__CRT_HAVE_fopen_wprinter */
 #if defined(__CRT_HAVE_file_wprinter_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* >> file_wprinter(3), file_wprinter_unlocked(3)
  * For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument */

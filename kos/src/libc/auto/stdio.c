@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2da90fc7 */
+/* HASH CRC-32:0xc16fb0b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1825,7 +1825,8 @@ NOTHROW_NCX(VLIBCCALL libc_obstack_printf)(struct obstack *__restrict self,
  * Create and return a new write-only file-stream that will write to the given printer.
  * Note  that by default, the buffering is enabled for the file-stream, meaning you may
  * have to call `fflush(return)' before printed data is committed to the given printer.
- * Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+ * - Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+ * - When `printer' returns a negative value, `ferror(return)' becomes set
  * @return: * :   A file-stream that emits its data to `printer'
  * @return: NULL: Insufficient memory. */
 INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED NONNULL((1)) FILE *

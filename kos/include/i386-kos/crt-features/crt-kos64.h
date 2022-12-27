@@ -2788,6 +2788,7 @@
 #define __CRT_HAVE_fopen_printer
 #define __CRT_HAVE_fopen_s
 #define __CRT_HAVE_fopen_unlocked
+#define __CRT_HAVE_fopen_wprinter
 #define __CRT_HAVE_fopencookie
 #define __CRT_HAVE_fopendirat
 #define __CRT_HAVE_fork
@@ -8636,6 +8637,7 @@
 #define __CRT_HAVE_KOS$fopen_printer
 #define __CRT_HAVE_KOS$fopen_s
 #define __CRT_HAVE_KOS$fopen_unlocked
+#define __CRT_HAVE_KOS$fopen_wprinter
 #define __CRT_HAVE_KOS$fopencookie
 #define __CRT_HAVE_KOS$fopendirat
 #define __CRT_HAVE_KOS$forkpty
@@ -13271,6 +13273,7 @@
 #define __CRT_HAVE_DOS$fopen_printer
 #define __CRT_HAVE_DOS$fopen_s
 #define __CRT_HAVE_DOS$fopen_unlocked
+#define __CRT_HAVE_DOS$fopen_wprinter
 #define __CRT_HAVE_DOS$fopencookie
 #define __CRT_HAVE_DOS$fopendirat
 #define __CRT_HAVE_DOS$forkpty

@@ -73,6 +73,8 @@
 }
 
 %(auto_header){
+#include <bits/crt/wformat-printer.h>
+#include <bits/crt/uformat-printer.h>
 #ifndef __errno_t_defined
 #define __errno_t_defined
 typedef __errno_t errno_t;
@@ -105,6 +107,7 @@ typedef size_t rsize_t;
 )]%{
 
 #ifdef __USE_KOS
+#include <bits/crt/wformat-printer.h>
 #include <parts/malloca.h>
 #endif /* __USE_KOS */
 
@@ -1704,6 +1707,112 @@ $size_t wcsftime_l([[out(return <= maxsize)]] wchar_t *__restrict buf, $size_t m
 %
 %/* KOS FILE extension functions. */
 %
+
+%[define(DEFINE_FREE_AND_RETURN_ZERO =
+@@pp_ifndef ____free_and_return_zero_defined@@
+#define ____free_and_return_zero_defined
+@@pp_if $has_function(free)@@
+@@push_namespace(local)@@
+__LOCAL_LIBC(@free_and_return_zero@) int
+(__LIBKCALL __free_and_return_zero)(void *arg) {
+	free(arg);
+	return 0;
+}
+@@pop_namespace@@
+@@pp_endif@@
+@@pp_endif@@
+)]
+
+%[define(DEFINE_FOPEN_WPRINTER_FLUSH =
+@@pp_ifndef ____fopen_wprinter_flush_defined@@
+#define ____fopen_wprinter_flush_defined
+@@push_namespace(local)@@
+__LOCAL_LIBC(@fopen_wprinter_flush@) int
+(__LIBKCALL __fopen_wprinter_flush)(void *arg) {
+	struct __local_format_8tow_data {   /* == `struct format_8tow_data' */
+		$pwformatprinter fd_printer;    /* [1..1] Inner printer */
+		void            *fd_arg;        /* Argument for `fd_printer' */
+		$mbstate_t       fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+	} *me = (struct __local_format_8tow_data *)arg;
+
+	/* Verify that the mbstate is in an empty state. */
+	if (__mbstate_isempty(&me->fd_incomplete))
+		return 0;
+
+	/* If it isn't then we must indicate an illegal-sequence error. */
+@@pp_ifdef EILSEQ@@
+	return libc_seterrno(EILSEQ);
+@@pp_else@@
+	return libc_seterrno(1);
+@@pp_endif@@
+}
+@@pop_namespace@@
+@@pp_endif@@
+)]
+
+
+@@>> fopen_wprinter(3)
+@@Create and return a new write-only file-stream that will write to the given printer.
+@@Note  that by default, the buffering is enabled for the file-stream, meaning you may
+@@have to call `fflush(return)' before printed data is committed to the given printer.
+@@- Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+@@- When `printer' returns a negative value, `ferror(return)' becomes set
+@@- When calling `fflush(return)', with the current unicode sequence is incomplete,
+@@  that function will return with `-1' and `errno == EILSEQ'
+@@@return: * :   A file-stream that emits its data to `printer'
+@@@return: NULL: Insufficient memory.
+[[wunused, wchar, decl_include("<bits/crt/wformat-printer.h>")]]
+[[requires($has_function(malloc, format_8tow) &&
+           ($has_function(funopen2_64) || $has_function(funopen2)))]]
+[[impl_include("<bits/crt/wformat-printer.h>", "<hybrid/typecore.h>")]]
+[[impl_include("<bits/crt/mbstate.h>", "<libc/errno.h>")]]
+[[impl_prefix(DEFINE_FREE_AND_RETURN_ZERO)]]
+[[impl_prefix(DEFINE_FOPEN_WPRINTER_FLUSH)]]
+[[section(".text.crt{|.dos}.wchar.FILE.locked.access")]]
+$FILE *fopen_wprinter([[nonnull]] __pwformatprinter printer, void *arg) {
+	FILE *result;
+	struct __local_format_8tow_data {   /* == `struct format_8tow_data' */
+		$pwformatprinter fd_printer;    /* [1..1] Inner printer */
+		void            *fd_arg;        /* Argument for `fd_printer' */
+		$mbstate_t       fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+	} *cookie;
+	cookie = (struct __local_format_8tow_data *)malloc(sizeof(struct __local_format_8tow_data));
+	if unlikely(!cookie)
+		return NULL;
+	cookie->fd_printer = printer;
+	cookie->fd_arg     = arg;
+	__mbstate_init(&cookie->fd_incomplete);
+
+	/* KOS's pformatprinter is ABI-compatible with the `writefn' of `funopen2(3)' / `funopen2_64(3)'
+	 * -> As such, this function can super-easily be implemented with the help of that one! */
+@@pp_if $has_function(free)@@
+@@pp_if $has_function(funopen2_64)@@
+	result = funopen2_64(cookie, NULL, (ssize_t (LIBKCALL *)(void *, void const *, size_t))&format_8tow, NULL,
+	                     &__NAMESPACE_LOCAL_SYM __fopen_wprinter_flush,
+	                     &__NAMESPACE_LOCAL_SYM __free_and_return_zero);
+@@pp_else@@
+	result = funopen2(cookie, NULL, (ssize_t (LIBKCALL *)(void *, void const *, size_t))&format_8tow, NULL,
+	                  &__NAMESPACE_LOCAL_SYM __fopen_wprinter_flush,
+	                  &__NAMESPACE_LOCAL_SYM __free_and_return_zero);
+@@pp_endif@@
+@@pp_else@@
+@@pp_if $has_function(funopen2_64)@@
+	result = funopen2_64(cookie, NULL, (ssize_t (LIBKCALL *)(void *, void const *, size_t))&format_8tow,
+	                     NULL, &__NAMESPACE_LOCAL_SYM __fopen_wprinter_flush, NULL);
+@@pp_else@@
+	result = funopen2(cookie, NULL, (ssize_t (LIBKCALL *)(void *, void const *, size_t))&format_8tow,
+	                  NULL, &__NAMESPACE_LOCAL_SYM __fopen_wprinter_flush, NULL);
+@@pp_endif@@
+@@pp_endif@@
+
+	/* Cleanup on error. */
+@@pp_if $has_function(free)@@
+	if unlikely(!result)
+		free(cookie);
+@@pp_endif@@
+	return result;
+}
+
 
 @@>> file_wprinter(3), file_wprinter_unlocked(3)
 @@For use with `format_wprintf()' and friends: Prints to a `FILE *' closure argument

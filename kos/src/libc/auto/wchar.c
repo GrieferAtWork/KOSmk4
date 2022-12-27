@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78e9f93a */
+/* HASH CRC-32:0x35b38add */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2671,6 +2671,196 @@ NOTHROW_NCX(LIBKCALL libc_wcsftime_l)(char32_t *__restrict buf,
                                       locale_t locale) {
 	(void)locale;
 	return libc_wcsftime(buf, maxsize, format, tp);
+}
+#include <bits/crt/uformat-printer.h>
+#include <hybrid/typecore.h>
+#include <bits/crt/mbstate.h>
+#include <libc/errno.h>
+#ifndef ____free_and_return_zero_defined
+#define ____free_and_return_zero_defined
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(free_and_return_zero) int
+(__LIBKCALL __free_and_return_zero)(void *arg) {
+	libc_free(arg);
+	return 0;
+}
+__NAMESPACE_LOCAL_END
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+#endif /* !____free_and_return_zero_defined */
+#ifndef ____fopen_wprinter_flush_defined
+#define ____fopen_wprinter_flush_defined
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(fopen_wprinter_flush) int
+(__LIBKCALL __fopen_wprinter_flush)(void *arg) {
+	struct __local_format_8tow_data {   /* == `struct format_8tow_data' */
+		pwformatprinter fd_printer;    /* [1..1] Inner printer */
+		void            *fd_arg;        /* Argument for `fd_printer' */
+		mbstate_t       fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+	} *me = (struct __local_format_8tow_data *)arg;
+
+	/* Verify that the mbstate is in an empty state. */
+	if (__mbstate_isempty(&me->fd_incomplete))
+		return 0;
+
+	/* If it isn't then we must indicate an illegal-sequence error. */
+#ifdef EILSEQ
+	return libc_seterrno(EILSEQ);
+#else /* EILSEQ */
+	return libc_seterrno(1);
+#endif /* !EILSEQ */
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____fopen_wprinter_flush_defined */
+/* >> fopen_wprinter(3)
+ * Create and return a new write-only file-stream that will write to the given printer.
+ * Note  that by default, the buffering is enabled for the file-stream, meaning you may
+ * have to call `fflush(return)' before printed data is committed to the given printer.
+ * - Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+ * - When `printer' returns a negative value, `ferror(return)' becomes set
+ * - When calling `fflush(return)', with the current unicode sequence is incomplete,
+ *   that function will return with `-1' and `errno == EILSEQ'
+ * @return: * :   A file-stream that emits its data to `printer'
+ * @return: NULL: Insufficient memory. */
+INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access") WUNUSED NONNULL((1)) FILE *
+NOTHROW_NCX(LIBDCALL libd_fopen_wprinter)(__pc16formatprinter printer,
+                                          void *arg) {
+	FILE *result;
+	struct __local_format_8tow_data {   /* == `struct format_8tow_data' */
+		pc16formatprinter fd_printer;    /* [1..1] Inner printer */
+		void            *fd_arg;        /* Argument for `fd_printer' */
+		mbstate_t       fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+	} *cookie;
+	cookie = (struct __local_format_8tow_data *)libc_malloc(sizeof(struct __local_format_8tow_data));
+	if unlikely(!cookie)
+		return NULL;
+	cookie->fd_printer = printer;
+	cookie->fd_arg     = arg;
+	__mbstate_init(&cookie->fd_incomplete);
+
+	/* KOS's pformatprinter is ABI-compatible with the `writefn' of `funopen2(3)' / `funopen2_64(3)'
+	 * -> As such, this function can super-easily be implemented with the help of that one! */
+
+
+	result = libc_funopen2_64(cookie, NULL, (ssize_t (LIBKCALL *)(void *, void const *, size_t))&libd_format_8tow, NULL,
+	                     &__NAMESPACE_LOCAL_SYM __fopen_wprinter_flush,
+	                     &__NAMESPACE_LOCAL_SYM __free_and_return_zero);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	/* Cleanup on error. */
+
+	if unlikely(!result)
+		libc_free(cookie);
+
+	return result;
+}
+#include <bits/crt/uformat-printer.h>
+#include <hybrid/typecore.h>
+#include <bits/crt/mbstate.h>
+#include <libc/errno.h>
+#ifndef ____free_and_return_zero_defined
+#define ____free_and_return_zero_defined
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE___libc_free)
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(free_and_return_zero) int
+(__LIBKCALL __free_and_return_zero)(void *arg) {
+	libc_free(arg);
+	return 0;
+}
+__NAMESPACE_LOCAL_END
+#endif /* __CRT_HAVE_free || __CRT_HAVE_cfree || __CRT_HAVE___libc_free */
+#endif /* !____free_and_return_zero_defined */
+#ifndef ____fopen_wprinter_flush_defined
+#define ____fopen_wprinter_flush_defined
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(fopen_wprinter_flush) int
+(__LIBKCALL __fopen_wprinter_flush)(void *arg) {
+	struct __local_format_8tow_data {   /* == `struct format_8tow_data' */
+		pwformatprinter fd_printer;    /* [1..1] Inner printer */
+		void            *fd_arg;        /* Argument for `fd_printer' */
+		mbstate_t       fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+	} *me = (struct __local_format_8tow_data *)arg;
+
+	/* Verify that the mbstate is in an empty state. */
+	if (__mbstate_isempty(&me->fd_incomplete))
+		return 0;
+
+	/* If it isn't then we must indicate an illegal-sequence error. */
+#ifdef EILSEQ
+	return libc_seterrno(EILSEQ);
+#else /* EILSEQ */
+	return libc_seterrno(1);
+#endif /* !EILSEQ */
+}
+__NAMESPACE_LOCAL_END
+#endif /* !____fopen_wprinter_flush_defined */
+/* >> fopen_wprinter(3)
+ * Create and return a new write-only file-stream that will write to the given printer.
+ * Note  that by default, the buffering is enabled for the file-stream, meaning you may
+ * have to call `fflush(return)' before printed data is committed to the given printer.
+ * - Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+ * - When `printer' returns a negative value, `ferror(return)' becomes set
+ * - When calling `fflush(return)', with the current unicode sequence is incomplete,
+ *   that function will return with `-1' and `errno == EILSEQ'
+ * @return: * :   A file-stream that emits its data to `printer'
+ * @return: NULL: Insufficient memory. */
+INTERN ATTR_SECTION(".text.crt.wchar.FILE.locked.access") WUNUSED NONNULL((1)) FILE *
+NOTHROW_NCX(LIBKCALL libc_fopen_wprinter)(__pc32formatprinter printer,
+                                          void *arg) {
+	FILE *result;
+	struct __local_format_8tow_data {   /* == `struct format_8tow_data' */
+		pc32formatprinter fd_printer;    /* [1..1] Inner printer */
+		void            *fd_arg;        /* Argument for `fd_printer' */
+		mbstate_t       fd_incomplete; /* Incomplete utf-8 sequence part (initialize to 0) */
+	} *cookie;
+	cookie = (struct __local_format_8tow_data *)libc_malloc(sizeof(struct __local_format_8tow_data));
+	if unlikely(!cookie)
+		return NULL;
+	cookie->fd_printer = printer;
+	cookie->fd_arg     = arg;
+	__mbstate_init(&cookie->fd_incomplete);
+
+	/* KOS's pformatprinter is ABI-compatible with the `writefn' of `funopen2(3)' / `funopen2_64(3)'
+	 * -> As such, this function can super-easily be implemented with the help of that one! */
+
+
+	result = libc_funopen2_64(cookie, NULL, (ssize_t (LIBKCALL *)(void *, void const *, size_t))&libc_format_8tow, NULL,
+	                     &__NAMESPACE_LOCAL_SYM __fopen_wprinter_flush,
+	                     &__NAMESPACE_LOCAL_SYM __free_and_return_zero);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	/* Cleanup on error. */
+
+	if unlikely(!result)
+		libc_free(cookie);
+
+	return result;
 }
 /* >> fwprintf(3), vfwprintf(3), fwprintf_unlocked(3), vfwprintf_unlocked(3) */
 INTERN ATTR_OPTIMIZE_SIZE ATTR_SECTION(".text.crt.dos.wchar.FILE.unlocked.write.printf") ATTR_IN(2) ATTR_INOUT(1) ATTR_LIBC_C16PRINTF(2, 0) __STDC_INT_AS_SIZE_T
@@ -7293,6 +7483,8 @@ DEFINE_PUBLIC_ALIAS(DOS$__wcsftime_l, libd_wcsftime_l);
 DEFINE_PUBLIC_ALIAS(DOS$wcsftime_l, libd_wcsftime_l);
 DEFINE_PUBLIC_ALIAS(__wcsftime_l, libc_wcsftime_l);
 DEFINE_PUBLIC_ALIAS(wcsftime_l, libc_wcsftime_l);
+DEFINE_PUBLIC_ALIAS(DOS$fopen_wprinter, libd_fopen_wprinter);
+DEFINE_PUBLIC_ALIAS(fopen_wprinter, libc_fopen_wprinter);
 DEFINE_PUBLIC_ALIAS(DOS$vfwprintf_unlocked, libd_vfwprintf_unlocked);
 DEFINE_PUBLIC_ALIAS(vfwprintf_unlocked, libc_vfwprintf_unlocked);
 DEFINE_PUBLIC_ALIAS(DOS$fwprintf_unlocked, libd_fwprintf_unlocked);
