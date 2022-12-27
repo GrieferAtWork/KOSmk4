@@ -3844,6 +3844,7 @@
 #define __CRT_HAVE_p_section
 #define __CRT_HAVE_p_time
 #define __CRT_HAVE_p_type
+#define __CRT_HAVE_parse_printf_format
 #define __CRT_HAVE_partition_delete
 #define __CRT_HAVE_partition_new
 #define __CRT_HAVE_partition_print
@@ -3936,6 +3937,8 @@
 #define __CRT_HAVE_prev_ustat
 #define __CRT_HAVE_printf
 #define __CRT_HAVE_printf_s
+#define __CRT_HAVE_printf_size
+#define __CRT_HAVE_printf_size_info
 #define __CRT_HAVE_printf_unlocked
 #define __CRT_HAVE_prlimit
 #define __CRT_HAVE_prlimit64
@@ -4231,6 +4234,10 @@
 #define __CRT_HAVE_regerrordesc_np
 #define __CRT_HAVE_regexec
 #define __CRT_HAVE_regfree
+#define __CRT_HAVE_register_printf_function
+#define __CRT_HAVE_register_printf_modifier
+#define __CRT_HAVE_register_printf_specifier
+#define __CRT_HAVE_register_printf_type
 #define __CRT_HAVE_remainder
 #define __CRT_HAVE_remainderf
 #define __CRT_HAVE_remainderl

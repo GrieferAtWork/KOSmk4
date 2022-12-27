@@ -18,7 +18,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
-/* (#) Portability: uClibc        (/include/regex.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/regexp.h) */
+/* (#) Portability: GNU C Library (/misc/regexp.h) */
+/* (#) Portability: NetBSD        (/include/regexp.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/regexp.h) */
+/* (#) Portability: libc4/5       (/include/regexp.h) */
+/* (#) Portability: libc6         (/include/regexp.h) */
+/* (#) Portability: mintlib       (/include/regexp.h) */
+/* (#) Portability: uClibc        (/include/regexp.h) */
 }
 
 %[define_replacement(regex_t = "struct re_pattern_buffer")]

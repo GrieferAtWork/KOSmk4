@@ -181,7 +181,6 @@
 - `<_G_config.h>`          (Glibc!)
 - `<gconv.h>`              (Glibc!)
 - `<nss.h>`                (Glibc!)
-- `<printf.h>`             (Glibc!)
 - `<rpc/auth.h>`
 - `<rpc/auth_des.h>`
 - `<rpc/auth_unix.h>`

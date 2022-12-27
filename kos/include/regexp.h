@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x912beb86 */
+/* HASH CRC-32:0x33fee6bd */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: uClibc        (/include/regex.h) */
+/* (#) Portability: EMX kLIBC     (/libc/include/regexp.h) */
+/* (#) Portability: GNU C Library (/misc/regexp.h) */
+/* (#) Portability: NetBSD        (/include/regexp.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/regexp.h) */
+/* (#) Portability: libc4/5       (/include/regexp.h) */
+/* (#) Portability: libc6         (/include/regexp.h) */
+/* (#) Portability: mintlib       (/include/regexp.h) */
+/* (#) Portability: uClibc        (/include/regexp.h) */
 #ifndef _REGEXP_H
 #define _REGEXP_H 1
 

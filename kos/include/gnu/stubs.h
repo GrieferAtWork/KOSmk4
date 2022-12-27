@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ea71d9c */
+/* HASH CRC-32:0x999a03e0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -404,6 +404,7 @@
 #define __stub_p_time
 #define __stub___p_type
 #define __stub_p_type
+#define __stub_parse_printf_format
 #define __stub_pex_free
 #define __stub_pex_get_status
 #define __stub_pex_get_times
@@ -419,6 +420,8 @@
 #define __stub_posix_fadvise64
 #define __stub_posix_fallocate64
 #define __stub_posix_openpt
+#define __stub_printf_size
+#define __stub_printf_size_info
 #define __stub_pthread_atfork
 #define __stub_pthread_barrier_destroy
 #define __stub_pthread_barrier_init
@@ -442,6 +445,9 @@
 #define __stub_random_r
 #define __stub_rcmd
 #define __stub_rcmd_af
+#define __stub_register_printf_modifier
+#define __stub_register_printf_specifier
+#define __stub_register_printf_type
 #define __stub___res_close
 #define __stub_res_close
 #define __stub___res_dnok
