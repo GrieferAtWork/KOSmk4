@@ -20,6 +20,9 @@
 /* Disable warnings emit by some headers under certain circumstances. */
 #define __NO_WARNINGS 1
 
+/* Prevent `<regexp.h>' from defining `compile(3)' */
+#define __DO_NOT_DEFINE_COMPILE
+
 
 /* In order to  ensure that all  of our system  headers work nice  with each  other,
  * try to include every single one at the same time in the following configurations:
@@ -160,6 +163,7 @@ incdir("");
 #include <asm/crt/process.h>
 #include <asm/crt/pthreadvalues.h>
 #include <asm/crt/readpassphrase.h>
+#include <asm/crt/regex.h>
 #include <asm/crt/resolv.h>
 #include <asm/crt/semaphore.h>
 #include <asm/crt/stdio.h>
@@ -179,6 +183,8 @@ incdir("");
 #include <asm/ioctl.h>
 #include <asm/isa.h>
 #include <asm/ls-syscalls.h>
+#include <asm/nomem-arch.h>
+#include <asm/nomem.h>
 #include <asm/os/block.h>
 #include <asm/os/clock.h>
 #include <asm/os/dirent.h>
@@ -294,9 +300,11 @@ incdir("");
 #include <bits/crt/obstack.h>
 #include <bits/crt/partition.h>
 #include <bits/crt/posix_spawn.h>
+#include <bits/crt/printf_info.h>
 #include <bits/crt/pthreadtypes.h>
 #include <bits/crt/pthreadtypesizes.h>
 #include <bits/crt/random-data.h>
+#include <bits/crt/regex.h>
 #include <bits/crt/resolv.h>
 #include <bits/crt/semaphore.h>
 #include <bits/crt/setjmp.h>
@@ -1244,6 +1252,7 @@ incdir("");
 #include <paths.h>
 #include <pciaccess.h>
 #include <poll.h>
+#include <printf.h>
 #include <process.h>
 #include <pthread.h>
 #include <pthread_np.h>
@@ -1253,6 +1262,7 @@ incdir("");
 #include <re_comp.h>
 #include <readpassphrase.h>
 #include <regex.h>
+#include <regexp.h>
 #include <resolv.h>
 #include <rpc/netdb.h>
 #include <sal.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9341add3 */
+/* HASH CRC-32:0x238d407b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -652,6 +652,26 @@ INTDEF ATTR_INOUT(1) ATTR_OUT(2) int (LIBDCALL libd_fgetpos64)(FILE *__restrict 
 /* >> fsetpos(3), fsetpos64(3)
  * Set the file position of `stream' to `pos', as previously initialized with a call to `fgetpos()' */
 INTDEF ATTR_IN(2) ATTR_INOUT(1) int (LIBDCALL libd_fsetpos64)(FILE *__restrict stream, fpos64_t const *__restrict pos) THROWS(...);
+/* >> fopen_printer(3)
+ * Create and return a new write-only file-stream that will write to the given printer.
+ * Note  that by default, the buffering is enabled for the file-stream, meaning you may
+ * have to call `fflush(return)' before printed data is committed to the given printer.
+ * Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+ * @return: * :   A file-stream that emits its data to `printer'
+ * @return: NULL: Insufficient memory. */
+INTDEF WUNUSED NONNULL((1)) FILE *NOTHROW_NCX(LIBDCALL libd_fopen_printer)(__pformatprinter printer, void *arg);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> fopen_printer(3)
+ * Create and return a new write-only file-stream that will write to the given printer.
+ * Note  that by default, the buffering is enabled for the file-stream, meaning you may
+ * have to call `fflush(return)' before printed data is committed to the given printer.
+ * Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+ * @return: * :   A file-stream that emits its data to `printer'
+ * @return: NULL: Insufficient memory. */
+INTDEF WUNUSED NONNULL((1)) FILE *NOTHROW_NCX(LIBCCALL libc_fopen_printer)(__pformatprinter printer, void *arg);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> asprintf(3), vasprintf(3)
  * Print the given `format' into a newly allocated, heap-allocated string which is then stored in `*pstr' */
 INTDEF ATTR_IN(2) ATTR_LIBC_PRINTF(2, 0) ATTR_OUT(1) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd_vasprintf)(char **__restrict pstr, char const *__restrict format, va_list args);

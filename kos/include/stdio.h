@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbed1a5e */
+/* HASH CRC-32:0xd575e515 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3916,6 +3916,26 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fsetpos64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 #endif /* __USE_LARGEFILE64 */
 
 #ifdef __USE_KOS
+#ifdef __CRT_HAVE_fopen_printer
+/* >> fopen_printer(3)
+ * Create and return a new write-only file-stream that will write to the given printer.
+ * Note  that by default, the buffering is enabled for the file-stream, meaning you may
+ * have to call `fflush(return)' before printed data is committed to the given printer.
+ * Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+ * @return: * :   A file-stream that emits its data to `printer'
+ * @return: NULL: Insufficient memory. */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__FILE *,__NOTHROW_NCX,fopen_printer,(__pformatprinter __printer, void *__arg),(__printer,__arg))
+#elif (defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_funopen2_64) || ((defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE___libc_malloc) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE___libc_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE___libc_memalign) || defined(__CRT_HAVE_posix_memalign)) && defined(__CRT_HAVE_funopen2)) || (defined(__CRT_HAVE_funopen2) && __SIZEOF_OFF_T__ == __SIZEOF_OFF32_T__)
+#include <libc/local/stdio/fopen_printer.h>
+/* >> fopen_printer(3)
+ * Create and return a new write-only file-stream that will write to the given printer.
+ * Note  that by default, the buffering is enabled for the file-stream, meaning you may
+ * have to call `fflush(return)' before printed data is committed to the given printer.
+ * Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+ * @return: * :   A file-stream that emits its data to `printer'
+ * @return: NULL: Insufficient memory. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(fopen_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __FILE *__NOTHROW_NCX(__LIBCCALL fopen_printer)(__pformatprinter __printer, void *__arg) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fopen_printer))(__printer, __arg); })
+#endif /* ... */
 #if defined(__CRT_HAVE_file_printer_unlocked) && defined(__USE_STDIO_UNLOCKED)
 /* >> file_printer(3)
  * For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */

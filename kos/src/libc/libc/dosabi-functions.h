@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x159bbb10 */
+/* HASH CRC-32:0x94e3e92 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2288,6 +2288,7 @@ DFUN(".text.crt.dos.FILE.locked.seek.seek", libd_fseeko64, libc_fseeko64, TD, 3,
 DFUN(".text.crt.dos.FILE.locked.seek.seek", libd_ftello64, libc_ftello64, TIn(__SIZEOF_OFF64_T__), 1, TP)
 DFUN(".text.crt.dos.FILE.locked.seek.pos", libd_fgetpos64, libc_fgetpos64, TD, 2, TP, TP)
 DFUN(".text.crt.dos.FILE.locked.seek.pos", libd_fsetpos64, libc_fsetpos64, TD, 2, TP, TP)
+DFUN(".text.crt.dos.FILE.locked.access", libd_fopen_printer, libc_fopen_printer, TP, 2, TP, TP)
 DFUN(".text.crt.dos.heap.strdup", libd_vasprintf, libc_vasprintf, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.FILE.locked.access", libd_fdreopen, libc_fdreopen, TP, 3, TIn(__SIZEOF_FD_T__), TP, TP)
 DFUN(".text.crt.dos.FILE.unlocked.access", libd_fdreopen_unlocked, libc_fdreopen_unlocked, TP, 3, TIn(__SIZEOF_FD_T__), TP, TP)

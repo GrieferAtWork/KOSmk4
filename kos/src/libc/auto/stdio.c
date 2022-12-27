@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51512b30 */
+/* HASH CRC-32:0x2da90fc7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1820,6 +1820,24 @@ NOTHROW_NCX(VLIBCCALL libc_obstack_printf)(struct obstack *__restrict self,
 	result = libc_obstack_vprintf(self, format, args);
 	va_end(args);
 	return result;
+}
+/* >> fopen_printer(3)
+ * Create and return a new write-only file-stream that will write to the given printer.
+ * Note  that by default, the buffering is enabled for the file-stream, meaning you may
+ * have to call `fflush(return)' before printed data is committed to the given printer.
+ * Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+ * @return: * :   A file-stream that emits its data to `printer'
+ * @return: NULL: Insufficient memory. */
+INTERN ATTR_SECTION(".text.crt.FILE.locked.access") WUNUSED NONNULL((1)) FILE *
+NOTHROW_NCX(LIBCCALL libc_fopen_printer)(__pformatprinter printer,
+                                         void *arg) {
+	/* KOS's pformatprinter is ABI-compatible with the `writefn' of `funopen2(3)' / `funopen2_64(3)'
+	 * -> As such, this function can super-easily be implemented with the help of that one! */
+
+	return libc_funopen2_64(arg, NULL, (ssize_t (LIBKCALL *)(void *, void const *, size_t))printer, NULL, NULL, NULL);
+
+
+
 }
 #include <hybrid/__assert.h>
 #ifndef __format_aprintf_data_defined
@@ -4354,6 +4372,7 @@ DEFINE_PUBLIC_ALIAS(DOS$obstack_printf, libd_obstack_printf);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(obstack_printf, libc_obstack_printf);
+DEFINE_PUBLIC_ALIAS(fopen_printer, libc_fopen_printer);
 DEFINE_PUBLIC_ALIAS(vasprintf, libc_vasprintf);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

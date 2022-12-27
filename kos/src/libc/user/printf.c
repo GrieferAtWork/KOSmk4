@@ -666,9 +666,6 @@ format_file_printer_write(void *cookie, void const *buf, size_t num_bytes) {
 PRIVATE ATTR_SECTION(".text.crt.compat.glibc.printf") NONNULL((1, 2)) void
 NOTHROW_NCX(LIBCCALL format_file_printer_init)(struct format_file_printer *__restrict self,
                                                pformatprinter printer, void *arg) {
-	/* TODO: Add a new function `fopen_printer(3)' to `<stdio.h>'
-	 *       that allows one to  open a write-only stream  on-top
-	 *       of a `pformatprinter'. */
 	bzero(self, sizeof(*self));
 	self->if_flag     = FORMAT_FILE_PRINTER_FLAGS;
 	self->if_exdata   = &self->ffp_exdat;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16531a05 */
+/* HASH CRC-32:0x3d03d0d6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2293,6 +2293,7 @@ DEFINE_PUBLIC_ALIAS(DOS$fgetpos64, libd_fgetpos64);
 DEFINE_PUBLIC_ALIAS(DOS$_IO_fgetpos64, libd_fgetpos64);
 DEFINE_PUBLIC_ALIAS(DOS$fsetpos64, libd_fsetpos64);
 DEFINE_PUBLIC_ALIAS(DOS$_IO_fsetpos64, libd_fsetpos64);
+DEFINE_PUBLIC_ALIAS(DOS$fopen_printer, libd_fopen_printer);
 DEFINE_PUBLIC_ALIAS(DOS$vasprintf, libd_vasprintf);
 DEFINE_PUBLIC_ALIAS(DOS$fdreopen, libd_fdreopen);
 DEFINE_PUBLIC_ALIAS(DOS$fdreopen_unlocked, libd_fdreopen_unlocked);

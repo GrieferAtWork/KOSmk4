@@ -2785,6 +2785,7 @@
 #define __CRT_HAVE_fnmatch
 #define __CRT_HAVE_fopen
 #define __CRT_HAVE_fopen64
+#define __CRT_HAVE_fopen_printer
 #define __CRT_HAVE_fopen_s
 #define __CRT_HAVE_fopen_unlocked
 #define __CRT_HAVE_fopencookie
@@ -8632,6 +8633,7 @@
 #define __CRT_HAVE_KOS$fnmatch
 #define __CRT_HAVE_KOS$fopen
 #define __CRT_HAVE_KOS$fopen64
+#define __CRT_HAVE_KOS$fopen_printer
 #define __CRT_HAVE_KOS$fopen_s
 #define __CRT_HAVE_KOS$fopen_unlocked
 #define __CRT_HAVE_KOS$fopencookie
@@ -13266,6 +13268,7 @@
 #define __CRT_HAVE_DOS$fnmatch
 #define __CRT_HAVE_DOS$fopen
 #define __CRT_HAVE_DOS$fopen64
+#define __CRT_HAVE_DOS$fopen_printer
 #define __CRT_HAVE_DOS$fopen_s
 #define __CRT_HAVE_DOS$fopen_unlocked
 #define __CRT_HAVE_DOS$fopencookie

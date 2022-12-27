@@ -2939,6 +2939,7 @@
 #define __CRT_HAVE_fnmatch
 #define __CRT_HAVE_fopen
 #define __CRT_HAVE_fopen64
+#define __CRT_HAVE_fopen_printer
 #define __CRT_HAVE_fopen_s
 #define __CRT_HAVE_fopen_unlocked
 #define __CRT_HAVE_fopencookie

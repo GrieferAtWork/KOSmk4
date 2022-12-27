@@ -3285,6 +3285,27 @@ int fsetpos64([[inout]] $FILE *__restrict stream,
 %#ifdef __USE_KOS
 %[default:section(".text.crt{|.dos}.FILE.locked.write.write")]
 
+@@>> fopen_printer(3)
+@@Create and return a new write-only file-stream that will write to the given printer.
+@@Note  that by default, the buffering is enabled for the file-stream, meaning you may
+@@have to call `fflush(return)' before printed data is committed to the given printer.
+@@Buffering can be disabled with `setvbuf(return, NULL, _IONBF, 0)'
+@@@return: * :   A file-stream that emits its data to `printer'
+@@@return: NULL: Insufficient memory.
+[[wunused, section(".text.crt{|.dos}.FILE.locked.access")]]
+[[requires($has_function(funopen2_64) || $has_function(funopen2))]]
+[[decl_include("<bits/crt/format-printer.h>")]]
+$FILE *fopen_printer([[nonnull]] __pformatprinter printer, void *arg) {
+	/* KOS's pformatprinter is ABI-compatible with the `writefn' of `funopen2(3)' / `funopen2_64(3)'
+	 * -> As such, this function can super-easily be implemented with the help of that one! */
+@@pp_if $has_function(funopen2_64)@@
+	return funopen2_64(arg, NULL, (ssize_t (LIBKCALL *)(void *, void const *, size_t))printer, NULL, NULL, NULL);
+@@pp_else@@
+	return funopen2(arg, NULL, (ssize_t (LIBKCALL *)(void *, void const *, size_t))printer, NULL, NULL, NULL);
+@@pp_endif@@
+}
+/* TODO: Also define `fopen_wprinter(3)' in `<wchar.h>' */
+
 @@>> file_printer(3)
 @@For use with `format_printf()' and friends: Prints to a `FILE *' closure argument
 [[decl_include("<hybrid/typecore.h>"), decl_include("<bits/crt/format-printer.h>")]]
