@@ -25,6 +25,7 @@
 #include <kernel/rt/except-syscall.h> /* CONFIG_HAVE_KERNEL_USERPROCMASK */
 #include <kernel/types.h>
 
+#include <asm/os/signal.h>
 #include <bits/os/sigset.h>
 #include <kos/aref.h>
 
@@ -43,6 +44,21 @@ DECL_BEGIN
 #define __sigset_t_defined
 typedef struct __sigset_struct sigset_t;
 #endif /* !__sigset_t_defined */
+
+/* Add/remove all unmaskable signals to/from a given `sigset_t' */
+#if __sigset_word_c(__SIGKILL) == __sigset_word_c(__SIGSTOP)
+#define sigaddset_nmi(self) \
+	(void)((self)->__val[__sigset_word_c(__SIGKILL)] |= (__sigset_mask(__SIGKILL) | __sigset_mask(__SIGSTOP)))
+#define sigdelset_nmi(self) \
+	(void)((self)->__val[__sigset_word_c(__SIGKILL)] &= ~(__sigset_mask(__SIGKILL) | __sigset_mask(__SIGSTOP)))
+#else /* __sigset_word_c(__SIGKILL) == __sigset_word_c(__SIGSTOP) */
+#define sigaddset_nmi(self)                                                       \
+	(void)((self)->__val[__sigset_word_c(__SIGKILL)] |= __sigset_mask(__SIGKILL), \
+	       (self)->__val[__sigset_word_c(__SIGSTOP)] |= __sigset_mask(__SIGSTOP))
+#define sigdelset_nmi(self)                                                        \
+	(void)((self)->__val[__sigset_word_c(__SIGKILL)] &= ~__sigset_mask(__SIGKILL), \
+	       (self)->__val[__sigset_word_c(__SIGSTOP)] &= ~__sigset_mask(__SIGSTOP))
+#endif /* __sigset_word_c(__SIGKILL) != __sigset_word_c(__SIGSTOP) */
 
 /************************************************************************/
 /* SIGNAL MASK                                                          */

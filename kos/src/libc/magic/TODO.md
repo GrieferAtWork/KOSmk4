@@ -136,7 +136,6 @@
 - `<fmtmsg.h>`              (Glibc!)
 - `<gshadow.h>`             (Glibc!)
 - `<mcheck.h>`              (Glibc!)
-- `<regexp.h>`              (Glibc!)
 - `<share.h>`               (DOS)
 - `<stab.h>`                (Glibc!)
 - `<sys/fanotify.h>`        (linux)

@@ -432,8 +432,7 @@ sys_ppoll_generic(struct icpustate *__restrict state,
 		       0xff, sizeof(sigset_t) - sigsetsize);
 
 		/* These signals cannot be masked.  */
-		sigdelset(&these, SIGSTOP);
-		sigdelset(&these, SIGKILL);
+		sigdelset_nmi(&these);
 
 		/* Prepare the calling thread for a sigsuspend() operation. */
 		sigmask_prepare_sigsuspend();

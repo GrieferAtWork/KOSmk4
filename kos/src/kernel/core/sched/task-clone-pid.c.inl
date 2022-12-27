@@ -474,8 +474,7 @@ unlock_everything_and_do_load_userprocmask:
 							umasksize = sizeof(sigset_t);
 						memset(mempcpy(&caller_sigmask, umask, umasksize),
 						       0xff, sizeof(sigset_t) - umasksize);
-						sigdelset(&caller_sigmask, SIGKILL);
-						sigdelset(&caller_sigmask, SIGSTOP);
+						sigdelset_nmi(&caller_sigmask);
 						have_caller_sigmask = true;
 						goto again_lock_ns;
 					}

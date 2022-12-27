@@ -35,6 +35,7 @@
 #include <sched/posix-signalfd.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
+#include <sched/sigmask.h>
 
 #include <hybrid/atomic.h>
 
@@ -66,9 +67,9 @@ signalfd_create(USER CHECKED sigset_t const *mask, size_t sigsetsize)
 		signalfd_free(result);
 		RETHROW();
 	}
+
 	/* Make sure that we never include SIGKILL or SIGSTOP in the mask. */
-	sigdelset(&result->sf_mask, SIGKILL);
-	sigdelset(&result->sf_mask, SIGSTOP);
+	sigdelset_nmi(&result->sf_mask);
 	return result;
 }
 
@@ -212,8 +213,7 @@ update_signalfd(fd_t fd,
 	 * before applying it, thus ensuring  that at no point  in
 	 * time a signalfd descriptor exists that would be capable
 	 * of handling these 2 signal. */
-	sigdelset(&newmask, SIGKILL);
-	sigdelset(&newmask, SIGSTOP);
+	sigdelset_nmi(&newmask);
 	COMPILER_BARRIER();
 	memcpy(&sfd->sf_mask, &newmask, sizeof(sigset_t));
 

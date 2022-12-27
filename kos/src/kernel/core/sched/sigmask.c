@@ -235,16 +235,12 @@ usersigmask_ismasked_chk(signo_t signo) THROWS(E_SEGFAULT) {
  * Userspace is unable to block these signals, no matter what they do. */
 #undef NMI_SIGNALS_ALL_SAME_WORD
 #undef NMI_SIGNALS_IN_WORD0
-#undef __CCAST
-#define __CCAST(T) /* Nothing */
-#if __sigset_word(SIGKILL) ==  __sigset_word(SIGSTOP)
+#if __sigset_word_c(SIGKILL) ==  __sigset_word_c(SIGSTOP)
 #define NMI_SIGNALS_ALL_SAME_WORD
-#if __sigset_word(SIGKILL) ==  0
+#if __sigset_word_c(SIGKILL) ==  0
 #define NMI_SIGNALS_IN_WORD0
-#endif /* __sigset_word(SIGKILL) ==  0 */
-#endif /* __sigset_word(SIGKILL) ==  __sigset_word(SIGSTOP) */
-#undef __CCAST
-#define __CCAST /* Nothing */
+#endif /* __sigset_word_c(SIGKILL) ==  0 */
+#endif /* __sigset_word_c(SIGKILL) ==  __sigset_word_c(SIGSTOP) */
 
 
 /* Inherit/clear/set SIGKILL and SIGSTOP within a given signal set */

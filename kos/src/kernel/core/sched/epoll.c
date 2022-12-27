@@ -2029,8 +2029,7 @@ sys_epoll_pwait_impl(struct icpustate *__restrict state,
 		       0xff, sizeof(sigset_t) - sigsetsize);
 
 		/* These signals cannot be masked.  */
-		sigdelset(&these, SIGSTOP);
-		sigdelset(&these, SIGKILL);
+		sigdelset_nmi(&these);
 
 		/* Validate other arguments. */
 		validate_writablem(events, maxevents, sizeof(struct epoll_event));

@@ -162,8 +162,7 @@ LOCAL_userexcept_callsignal(struct icpustate *__restrict state,
 			sigaddset(&maskthese, siginfo->si_signo);
 
 		/* Never mask SIGKILL or SIGSTOP */
-		sigdelset(&maskthese, SIGKILL);
-		sigdelset(&maskthese, SIGSTOP);
+		sigdelset_nmi(&maskthese);
 
 		/* If changes were made, then we must restore `old_sigmask' later on. */
 		must_restore_sigmask = sigmask_getmask_and_blockmask(&old_sigmask, &maskthese);

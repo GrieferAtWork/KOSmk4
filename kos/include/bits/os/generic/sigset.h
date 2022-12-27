@@ -112,7 +112,8 @@ struct __old_sigset_struct {
 #endif /* __CC__ */
 
 /* Return the mask or index for a specific signal `sig' within some sigset. */
-#define __sigset_mask(sig) ((__CCAST(__ULONGPTR_TYPE__) 1) << (((sig)-1) % (8 * __SIZEOF_POINTER__)))
-#define __sigset_word(sig) (__CCAST(__ULONGPTR_TYPE__)(((sig)-1) / (8 * __SIZEOF_POINTER__)))
+#define __sigset_mask(sig)   (__UINTPTR_C(1) << (((sig)-1) % (8 * __SIZEOF_POINTER__)))
+#define __sigset_word(sig)   ((__CCAST(__ULONGPTR_TYPE__)(sig)-1) / (8 * __SIZEOF_POINTER__))
+#define __sigset_word_c(sig) (((sig)-1) / (8 * __SIZEOF_POINTER__))
 
 #endif /* !_BITS_OS_GENERIC_SIGSET_H */

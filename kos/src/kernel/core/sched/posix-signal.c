@@ -36,6 +36,7 @@
 #include <sched/posix-signal.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
+#include <sched/sigmask.h>
 #include <sched/task.h>
 #include <sched/tsc.h>
 
@@ -696,8 +697,7 @@ DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
 	      sizeof(sigset_t) - sigsetsize);
 
 	/* Make sure that we don't steal these signals */
-	sigdelset(&these, SIGKILL);
-	sigdelset(&these, SIGSTOP);
+	sigdelset_nmi(&these);
 
 	if (uts) {
 		validate_readable(uts, sizeof(*uts));
@@ -740,8 +740,7 @@ DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait_time64,
 	      sizeof(sigset_t) - sigsetsize);
 
 	/* Make sure that we don't steal these signals */
-	sigdelset(&these, SIGKILL);
-	sigdelset(&these, SIGSTOP);
+	sigdelset_nmi(&these);
 	if (uts) {
 		validate_readable(uts, sizeof(*uts));
 		abs_timeout = relktime_from_user_rel(uts);
@@ -774,8 +773,7 @@ DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
 	      sizeof(sigset_t) - sigsetsize);
 
 	/* Make sure that we don't steal these signals */
-	sigdelset(&these, SIGKILL);
-	sigdelset(&these, SIGSTOP);
+	sigdelset_nmi(&these);
 	if (uts) {
 		validate_readable(uts, sizeof(*uts));
 		abs_timeout = relktime_from_user_rel(uts);
@@ -821,8 +819,7 @@ DEFINE_COMPAT_SYSCALL4(syscall_slong_t, rt_sigtimedwait_time64,
 	      sizeof(sigset_t) - sigsetsize);
 
 	/* Make sure that we don't steal these signals */
-	sigdelset(&these, SIGKILL);
-	sigdelset(&these, SIGSTOP);
+	sigdelset_nmi(&these);
 	if (uts) {
 		validate_readable(uts, sizeof(*uts));
 		abs_timeout = relktime_from_user_rel(uts);

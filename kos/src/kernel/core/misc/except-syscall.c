@@ -358,8 +358,7 @@ load_userprocmask_into_kernelspace(USER CHECKED struct userprocmask *ctl) {
 		old_sigsetsize = sizeof(sigset_t);
 	memset(mempcpy(&newmask, old_sigset, old_sigsetsize),
 	       0xff, sizeof(sigset_t) - old_sigsetsize);
-	sigdelset(&newmask, SIGKILL);
-	sigdelset(&newmask, SIGSTOP);
+	sigdelset_nmi(&newmask);
 
 	/* Install the updated signal mask. */
 	memcpy(&THIS_KERNEL_SIGMASK, &newmask, sizeof(sigset_t));
