@@ -2181,6 +2181,7 @@
 #define __CRT_HAVE_acoshl
 #define __CRT_HAVE_acosl
 #define __CRT_HAVE_addmntent
+#define __CRT_HAVE_addseverity
 #define __CRT_HAVE_adjtime
 #define __CRT_HAVE_adjtime64
 #define __CRT_HAVE_adjtimex
@@ -2782,6 +2783,7 @@
 #define __CRT_HAVE_fmodf
 #define __CRT_HAVE_fmodl
 #define __CRT_HAVE_fmtcheck
+#define __CRT_HAVE_fmtmsg
 #define __CRT_HAVE_fnmatch
 #define __CRT_HAVE_fopen
 #define __CRT_HAVE_fopen64
@@ -8112,6 +8114,7 @@
 #define __CRT_HAVE_KOS$acoshl
 #define __CRT_HAVE_KOS$acosl
 #define __CRT_HAVE_KOS$addmntent
+#define __CRT_HAVE_KOS$addseverity
 #define __CRT_HAVE_KOS$adjtime
 #define __CRT_HAVE_KOS$adjtime64
 #define __CRT_HAVE_KOS$adjtimex
@@ -8631,6 +8634,7 @@
 #define __CRT_HAVE_KOS$fmodf
 #define __CRT_HAVE_KOS$fmodl
 #define __CRT_HAVE_KOS$fmtcheck
+#define __CRT_HAVE_KOS$fmtmsg
 #define __CRT_HAVE_KOS$fnmatch
 #define __CRT_HAVE_KOS$fopen
 #define __CRT_HAVE_KOS$fopen64
@@ -12748,6 +12752,7 @@
 #define __CRT_HAVE_DOS$acoshl
 #define __CRT_HAVE_DOS$acosl
 #define __CRT_HAVE_DOS$addmntent
+#define __CRT_HAVE_DOS$addseverity
 #define __CRT_HAVE_DOS$adjtime
 #define __CRT_HAVE_DOS$adjtime64
 #define __CRT_HAVE_DOS$adjtimex
@@ -13267,6 +13272,7 @@
 #define __CRT_HAVE_DOS$fmodf
 #define __CRT_HAVE_DOS$fmodl
 #define __CRT_HAVE_DOS$fmtcheck
+#define __CRT_HAVE_DOS$fmtmsg
 #define __CRT_HAVE_DOS$fnmatch
 #define __CRT_HAVE_DOS$fopen
 #define __CRT_HAVE_DOS$fopen64

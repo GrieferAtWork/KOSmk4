@@ -2334,6 +2334,7 @@
 #define __CRT_HAVE_acoshl
 #define __CRT_HAVE_acosl
 #define __CRT_HAVE_addmntent
+#define __CRT_HAVE_addseverity
 #define __CRT_HAVE_adjtime
 #define __CRT_HAVE_adjtime64
 #define __CRT_HAVE_adjtimex
@@ -2936,6 +2937,7 @@
 #define __CRT_HAVE_fmodf
 #define __CRT_HAVE_fmodl
 #define __CRT_HAVE_fmtcheck
+#define __CRT_HAVE_fmtmsg
 #define __CRT_HAVE_fnmatch
 #define __CRT_HAVE_fopen
 #define __CRT_HAVE_fopen64

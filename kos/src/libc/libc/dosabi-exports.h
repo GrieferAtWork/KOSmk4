@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d03d0d6 */
+/* HASH CRC-32:0x4f3fd346 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -468,6 +468,10 @@ DEFINE_PUBLIC_ALIAS(DOS$_control87, libd__control87);
 DEFINE_PUBLIC_ALIAS(DOS$__control87_2, libd___control87_2);
 DEFINE_PUBLIC_ALIAS(DOS$_fpclass, libd__fpclass);
 DEFINE_PUBLIC_ALIAS(DOS$_fpclassf, libd__fpclassf);
+
+/* fmtmsg */
+DEFINE_PUBLIC_ALIAS(DOS$fmtmsg, libd_fmtmsg);
+DEFINE_PUBLIC_ALIAS(DOS$addseverity, libd_addseverity);
 
 /* fnmatch */
 DEFINE_PUBLIC_ALIAS(DOS$fnmatch, libd_fnmatch);

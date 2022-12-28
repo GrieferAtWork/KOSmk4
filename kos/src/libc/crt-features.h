@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55000778 */
+/* HASH CRC-32:0xedee0fd3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1032,6 +1032,7 @@
 #define __CRT_HAVE_DOS$acoshl
 #define __CRT_HAVE_DOS$acosl
 #define __CRT_HAVE_DOS$addmntent
+#define __CRT_HAVE_DOS$addseverity
 #define __CRT_HAVE_DOS$adjtime
 #define __CRT_HAVE_DOS$adjtime64
 #define __CRT_HAVE_DOS$adjtimex
@@ -1610,6 +1611,7 @@
 #define __CRT_HAVE_DOS$fmodf
 #define __CRT_HAVE_DOS$fmodl
 #define __CRT_HAVE_DOS$fmtcheck
+#define __CRT_HAVE_DOS$fmtmsg
 #define __CRT_HAVE_DOS$fnmatch
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
@@ -5304,6 +5306,7 @@
 #define __CRT_HAVE_acoshl
 #define __CRT_HAVE_acosl
 #define __CRT_HAVE_addmntent
+#define __CRT_HAVE_addseverity
 #define __CRT_HAVE_adjtime
 #define __CRT_HAVE_adjtime64
 #define __CRT_HAVE_adjtimex
@@ -5912,6 +5915,7 @@
 #define __CRT_HAVE_fmodf
 #define __CRT_HAVE_fmodl
 #define __CRT_HAVE_fmtcheck
+#define __CRT_HAVE_fmtmsg
 #define __CRT_HAVE_fnmatch
 #define __CRT_HAVE_fopen
 #define __CRT_HAVE_fopen64

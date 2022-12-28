@@ -133,7 +133,6 @@
 - `<bsd/vis.h>`             (libbsd)
 - `<corecrt_share.h>`       (DOS)
 - `<corecrt_terminate.h>`   (DOS)
-- `<fmtmsg.h>`              (Glibc!)
 - `<gshadow.h>`             (Glibc!)
 - `<mcheck.h>`              (Glibc!)
 - `<share.h>`               (DOS)

@@ -86,7 +86,7 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
 
 
 
-/* A system call and ABI for a user-space-controlled sigprocmask()  using
+/* A system call and ABI for a user-space-controlled sigprocmask(). Using
  * this, user-space can  block/unblock signals without  having to do  any
  * system calls in the case where no signal arrived in the mean time, and
  * in  the case where a signal did arrive in the mean time, only 1 system
@@ -121,8 +121,8 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  *       - A call to the actual `sys_sigprocmask(2)' system call (_NOT_ the libc variant
  *         described further below).
  *         In this case, rather than modifying its own, original signal mask, the kernel
- *         will instead load the `pm_sigmask' point, and apply the same modifications it
- *         would  have applied to  the thread's internal  (kernel-space) signal mask the
+ *         will  instead load the `pm_sigmask' pointer, and apply the same modifications
+ *         it would have applied to the thread's internal (kernel-space) signal mask the
  *         signal set pointed-to by user-space. In this case, the system call doesn't do
  *         anything  that couldn't already be implemented in user-space, but still works
  *         as expected for the sake of compatibility.

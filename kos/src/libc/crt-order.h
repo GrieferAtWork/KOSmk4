@@ -204,6 +204,7 @@
 	.system.* .system                 # Misc. system functions
 	.debug                            # Misc. debug functions
 	.assert                           # Assertion functions
+	.fmtmsg                           # <fmtmsg.h>
 	.ssp.* .ssp                       # Stack smash protection
 	.fs.* .fs                         # All other filesystem functions
 	.sched.resource                   # Resource limit functions
@@ -344,6 +345,7 @@
 	CB(PREFIX.crt.system.adjtime PREFIX.crt.system.getauxval PREFIX.crt.system.info PREFIX.crt.system.ioperm PREFIX.crt.system.mman PREFIX.crt.system.ptrace PREFIX.crt.system.reboot PREFIX.crt.system.rtm PREFIX.crt.system.syslog PREFIX.crt.system.utility) \
 	CB(PREFIX.crt.debug) \
 	CB(PREFIX.crt.assert) \
+	CB(PREFIX.crt.fmtmsg) \
 	CB(PREFIX.crt.ssp.string.memory) \
 	CB(PREFIX.crt.fs.environ.heap PREFIX.crt.fs.exec.posix_spawn PREFIX.crt.fs.exec.spawn PREFIX.crt.fs.exec.system PREFIX.crt.fs.fts PREFIX.crt.fs.ftw PREFIX.crt.fs.statfs.statfs PREFIX.crt.fs.statfs.statvfs) \
 	CB(PREFIX.crt.sched.resource) \
@@ -522,6 +524,7 @@
 	CB(PREFIX.crt.dos.system.adjtime PREFIX.crt.dos.system.info PREFIX.crt.dos.system.ioperm PREFIX.crt.dos.system.mman PREFIX.crt.dos.system.ptrace PREFIX.crt.dos.system.reboot PREFIX.crt.dos.system.syslog PREFIX.crt.dos.system.utility PREFIX.crt.dos.system) \
 	CB(PREFIX.crt.dos.debug) \
 	CB(PREFIX.crt.dos.assert) \
+	CB(PREFIX.crt.dos.fmtmsg) \
 	CB(PREFIX.crt.dos.ssp.string.memory) \
 	CB(PREFIX.crt.dos.fs.dlfcn PREFIX.crt.dos.fs.exec.posix_spawn PREFIX.crt.dos.fs.exec.spawn PREFIX.crt.dos.fs.exec.system PREFIX.crt.dos.fs.fts PREFIX.crt.dos.fs.io PREFIX.crt.dos.fs.statfs.statfs PREFIX.crt.dos.fs.statfs.statvfs) \
 	CB(PREFIX.crt.dos.sched.resource) \
