@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5508695 */
+/* HASH CRC-32:0xf2a62e90 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ DECL_BEGIN
  * @return: MM_NOTOK: Arguments are bad
  * @return: MM_OK:    Success
  * @return: MM_NOMSG: Failed to print message to `stderr(3)' */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_fmtmsg)(long classification, const char *label, int severity, char const *text, char const *action, char const *tag);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_fmtmsg)(long classification, const char *label, __STDC_INT_AS_UINT_T severity, char const *text, char const *action, char const *tag);
 /* >> addseverity(3)
  * Add  (`s != NULL') or remove  (`s == NULL') custom severity levels.
  * By default (and these cannot be overwritten or removed), levels 0-4
@@ -74,7 +74,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_fmtmsg)(long classification, const char *la
  * @return: MM_NOTOK: The given `severity' is `< 5' (errno was not modified)
  * @return: MM_NOTOK: Out of memory (errno was set to `ENOMEM')
  * @return: MM_NOTOK: No such `severity' and `s == NULL' (errno was not modified) */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_addseverity)(int severity, const char *s);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_addseverity)(__STDC_INT_AS_UINT_T severity, const char *s);
 #endif /* !__KERNEL__ */
 
 DECL_END

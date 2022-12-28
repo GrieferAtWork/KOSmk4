@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34f94560 */
+/* HASH CRC-32:0x67c96455 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -142,7 +142,7 @@ __SYSDECL_BEGIN
  * @return: MM_NOTOK: Arguments are bad
  * @return: MM_OK:    Success
  * @return: MM_NOMSG: Failed to print message to `stderr(3)' */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,fmtmsg,(long __classification, const char *__label, int __severity, char const *__text, char const *__action, char const *__tag),(__classification,__label,__severity,__text,__action,__tag))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,fmtmsg,(long __classification, const char *__label, __STDC_INT_AS_UINT_T __severity, char const *__text, char const *__action, char const *__tag),(__classification,__label,__severity,__text,__action,__tag))
 
 #ifdef __USE_MISC
 /* >> addseverity(3)
@@ -167,7 +167,7 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,fmtmsg,(long __classification, const char *__l
  * @return: MM_NOTOK: The given `severity' is `< 5' (errno was not modified)
  * @return: MM_NOTOK: Out of memory (errno was set to `ENOMEM')
  * @return: MM_NOTOK: No such `severity' and `s == NULL' (errno was not modified) */
-__CDECLARE_OPT(,int,__NOTHROW_NCX,addseverity,(int __severity, const char *__s),(__severity,__s))
+__CDECLARE_OPT(,int,__NOTHROW_NCX,addseverity,(__STDC_INT_AS_UINT_T __severity, const char *__s),(__severity,__s))
 #endif /* __USE_MISC */
 
 __SYSDECL_END

@@ -40,9 +40,11 @@
 
 %[default:section(".text.crt{|.dos}.fmtmsg")]
 
-%{
+%[insert:prefix(
 #include <features.h>
+)]%[insert:prefix(
 #include <asm/crt/fmtmsg.h>
+)]%{
 
 /* Possible flags for `fmtmsg(3)::classification' */
 #if !defined(MM_HARD) && defined(__MM_HARD)
@@ -141,9 +143,10 @@ __SYSDECL_BEGIN
 @@@return: MM_NOTOK: Arguments are bad
 @@@return: MM_OK:    Success
 @@@return: MM_NOMSG: Failed to print message to `stderr(3)'
+[[decl_include("<features.h>")]]
 int fmtmsg(long classification,
            [[nullable]] const char *label,
-           int severity,
+           __STDC_INT_AS_UINT_T severity,
            [[nullable]] char const *text,
            [[nullable]] char const *action,
            [[nullable]] char const *tag);
@@ -173,7 +176,8 @@ int fmtmsg(long classification,
 @@@return: MM_NOTOK: The given `severity' is `< 5' (errno was not modified)
 @@@return: MM_NOTOK: Out of memory (errno was set to `ENOMEM')
 @@@return: MM_NOTOK: No such `severity' and `s == NULL' (errno was not modified)
-int addseverity(int severity, [[nullable]] const char *s);
+[[decl_include("<features.h>")]]
+int addseverity(__STDC_INT_AS_UINT_T severity, [[nullable]] const char *s);
 %#endif /* __USE_MISC */
 
 

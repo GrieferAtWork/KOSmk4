@@ -127,7 +127,7 @@ NOTHROW_NCX(LIBCCALL inject_hooks)(void) {
 PRIVATE ATTR_SECTION(".bss.crt.compat.glibc.printf")
 struct shared_rwlock specsup_printf = SHARED_RWLOCK_INIT;
 
-/* Helpers for accessing `struct specsup_printf::ts_lock' */
+/* Helpers for accessing `specsup_printf' */
 #define /*        */ _specsup_printf_reap()        (void)0
 #define /*        */ specsup_printf_reap()         (void)0
 #define /*        */ specsup_printf_mustreap()     0

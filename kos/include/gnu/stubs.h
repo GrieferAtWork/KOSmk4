@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcce04047 */
+/* HASH CRC-32:0x79419e19 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,7 +98,6 @@
 #define __stub__wtempnam
 #define __stub__wtmpnam
 #define __stub__wtmpnam_s
-#define __stub_addseverity
 #define __stub___adjtimex
 #define __stub___libc_adjtimex
 #define __stub_adjtimex
@@ -166,7 +165,6 @@
 #define __stub_fgetwln
 #define __stub_fmaxmag
 #define __stub_fminmag
-#define __stub_fmtmsg
 #define __stub___fp_nquery
 #define __stub_fp_nquery
 #define __stub___fp_query
