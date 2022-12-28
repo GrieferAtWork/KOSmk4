@@ -1075,18 +1075,21 @@ struct format_snprintf_data {
 	__SIZE_TYPE__ sd_bufsiz; /* Remaining buffer size. */
 };
 #endif /* !__format_snprintf_data_defined */
-#define FORMAT_SNPRINTF_INIT(buf, bufsize)       { buf, bufsize }
-#define format_snprintf_init(self, buf, bufsize) ((self)->sd_buffer = (buf), (self)->sd_bufsiz = (bufsize))
+#define FORMAT_SNPRINTF_INIT(buf, bufsize) { buf, bufsize }
+#define format_snprintf_init(self, buf, bufsize) \
+	(void)((self)->sd_buffer = (buf), (self)->sd_bufsiz = (bufsize))
 
 }
 
 
 @@>> format_snprintf_printer(3)
 @@Format-printer implementation for printing to a string buffer like `snprintf(3)' would
-@@WARNING: No trailing NUL-character is implicitly appended
-@@NOTE: The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
-@@NOTE: The   number   of   required   characters   is   `arg->sd_buffer - <orig_buf>',  or
-@@      alternatively the sum of return values of all calls to `format_snprintf_printer(3)'
+@@NOTES:
+@@ - No trailing NUL-character is implicitly appended !!!
+@@ - The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
+@@ - The number  of required  characters is  `arg->sd_buffer - <orig_buf>', and  is
+@@   equal to the sum of return values of all calls to `format_snprintf_printer(3)'
+@@ - There is no error-case, so this function never returns a negative result
 [[kernel, no_crt_dos_wrapper, cc(__FORMATPRINTER_CC)]]
 [[decl_include("<bits/crt/format-printer.h>", "<hybrid/typecore.h>")]]
 $ssize_t format_snprintf_printer([[nonnull]] /*struct format_snprintf_data**/ void *arg,
@@ -1157,8 +1160,9 @@ struct format_aprintf_data {
 };
 #endif /* !__format_aprintf_data_defined */
 
-#define FORMAT_APRINTF_DATA_INIT        { __NULLPTR, 0, 0 }
-#define format_aprintf_data_init(self)  ((self)->ap_base = __NULLPTR, (self)->ap_avail = (self)->ap_used = 0)
+#define FORMAT_APRINTF_DATA_INIT { __NULLPTR, 0, 0 }
+#define format_aprintf_data_init(self) \
+	(void)((self)->ap_base = __NULLPTR, (self)->ap_avail = (self)->ap_used = 0)
 #define format_aprintf_data_cinit(self)             \
 	(__hybrid_assert((self)->ap_base == __NULLPTR), \
 	 __hybrid_assert((self)->ap_avail == 0),        \

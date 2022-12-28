@@ -66,6 +66,7 @@
 %[assume_defined_in_kos_userspace(REG_EEND, __REG_EEND)]
 %[assume_defined_in_kos_userspace(REG_ESIZE, __REG_ESIZE)]
 %[assume_defined_in_kos_userspace(REG_ERPAREN, __REG_ERPAREN)]
+%[assume_defined_in_kos_userspace(REG_EILLSEQ, __REG_EILLSEQ)]
 %[assume_defined_in_kos_userspace(REG_EILLSET, __REG_EILLSET)]
 %[assume_defined_in_kos_userspace(RE_BACKSLASH_ESCAPE_IN_LISTS, __RE_BACKSLASH_ESCAPE_IN_LISTS)]
 %[assume_defined_in_kos_userspace(RE_BK_PLUS_QM, __RE_BK_PLUS_QM)]
@@ -108,15 +109,34 @@
 #include "../libc/globals.h"
 }
 
-%{
-#include <features.h>
+%(auto_header){
+#include <bits/crt/format-printer.h>
+}
 
+%[insert:prefix(
+#include <features.h>
+)]%{
+
+}%[insert:prefix(
 #include <hybrid/typecore.h>
+)]%{
 
 #include <asm/crt/limits.h> /* __RE_DUP_MAX */
 #include <asm/crt/regex.h>
+}%[insert:prefix(
 #include <bits/crt/regex.h>
+)]%[insert:prefix(
+#include <bits/types.h>
+)]%{
+
+#ifdef __USE_KOS
+#include <bits/crt/format-printer.h>
+#include <bits/os/iovec.h>
+#endif /* __USE_KOS */
+
+#ifdef __USE_GLIBC_BLOAT
 #include <sys/types.h>
+#endif /* __USE_GLIBC_BLOAT */
 
 /* NOTE: On KOS, regex is implemented by a dedicated library that gets loaded by libc
  *       once  the demand to do so comes up,  in order to emulate POSIX and GNU regex
@@ -185,6 +205,24 @@ typedef enum {
 #ifdef __REG_ERPAREN
 	REG_ERPAREN  = __REG_ERPAREN, /* Unmatched ')' (only when `RE_UNMATCHED_RIGHT_PAREN_ORD' was set) */
 #endif /* __REG_ERPAREN */
+#ifdef __REG_EMPTY
+	REG_EMPTY    = __REG_EMPTY, /* ??? */
+#endif /* __REG_EMPTY */
+#ifdef __REG_ASSERT
+	REG_ASSERT   = __REG_ASSERT, /* ??? */
+#endif /* __REG_ASSERT */
+#ifdef __REG_INVARG
+	REG_INVARG   = __REG_INVARG, /* ??? */
+#endif /* __REG_INVARG */
+#ifdef __REG_ATOI
+	REG_ATOI     = __REG_ATOI, /* ??? */
+#endif /* __REG_ATOI */
+#ifdef __REG_ITOA
+	REG_ITOA     = __REG_ITOA, /* ??? */
+#endif /* __REG_ITOA */
+#ifdef __REG_EILLSEQ
+	REG_EILLSEQ  = __REG_EILLSEQ, /* Illegal unicode character (when `RE_NO_UTF8' wasn't set) */
+#endif /* __REG_EILLSEQ */
 #ifdef __REG_EILLSET
 	REG_EILLSET  = __REG_EILLSET, /* Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
 #endif /* __REG_EILLSET */
@@ -248,6 +286,24 @@ typedef enum {
 #ifdef __REG_ERPAREN
 #define REG_ERPAREN  REG_ERPAREN  /* Unmatched ')' (only when `RE_UNMATCHED_RIGHT_PAREN_ORD' was set) */
 #endif /* __REG_ERPAREN */
+#ifdef __REG_EMPTY
+#define REG_EMPTY    REG_EMPTY    /* ??? */
+#endif /* __REG_EMPTY */
+#ifdef __REG_ASSERT
+#define REG_ASSERT   REG_ASSERT   /* ??? */
+#endif /* __REG_ASSERT */
+#ifdef __REG_INVARG
+#define REG_INVARG   REG_INVARG   /* ??? */
+#endif /* __REG_INVARG */
+#ifdef __REG_ATOI
+#define REG_ATOI     REG_ATOI     /* ??? */
+#endif /* __REG_ATOI */
+#ifdef __REG_ITOA
+#define REG_ITOA     REG_ITOA     /* ??? */
+#endif /* __REG_ITOA */
+#ifdef __REG_EILLSEQ
+#define REG_EILLSEQ  REG_EILLSEQ  /* Illegal unicode character (when `RE_NO_UTF8' wasn't set) */
+#endif /* __REG_EILLSEQ */
 #ifdef __REG_EILLSET
 #define REG_EILLSET  REG_EILLSET  /* Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
 #endif /* __REG_EILLSET */
@@ -308,6 +364,24 @@ typedef enum {
 #ifdef __REG_ERPAREN
 #define REG_ERPAREN  __REG_ERPAREN  /* Unmatched ')' (only when `RE_UNMATCHED_RIGHT_PAREN_ORD' was set) */
 #endif /* __REG_ERPAREN */
+#ifdef __REG_EMPTY
+#define REG_EMPTY    __REG_EMPTY    /* ??? */
+#endif /* __REG_EMPTY */
+#ifdef __REG_ASSERT
+#define REG_ASSERT   __REG_ASSERT   /* ??? */
+#endif /* __REG_ASSERT */
+#ifdef __REG_INVARG
+#define REG_INVARG   __REG_INVARG   /* ??? */
+#endif /* __REG_INVARG */
+#ifdef __REG_ATOI
+#define REG_ATOI     __REG_ATOI     /* ??? */
+#endif /* __REG_ATOI */
+#ifdef __REG_ITOA
+#define REG_ITOA     __REG_ITOA     /* ??? */
+#endif /* __REG_ITOA */
+#ifdef __REG_EILLSEQ
+#define REG_EILLSEQ  __REG_EILLSEQ  /* Illegal unicode character (when `RE_NO_UTF8' wasn't set) */
+#endif /* __REG_EILLSEQ */
 #ifdef __REG_EILLSET
 #define REG_EILLSET  __REG_EILLSET  /* Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
 #endif /* __REG_EILLSET */
@@ -493,6 +567,9 @@ typedef __ULONGPTR_TYPE__ active_reg_t; /* ??? */
 #endif /* __USE_GNU */
 
 /* Flags for `regcomp(3)'s `cflags' argument. */
+#ifndef REG_BASIC
+#define REG_BASIC 0 /* Use `RE_POSIX_BASIC' */
+#endif /* !REG_BASIC */
 #if !defined(REG_EXTENDED) && defined(__REG_EXTENDED)
 #define REG_EXTENDED __REG_EXTENDED /* Use `RE_POSIX_MINIMAL_BASIC' instead of `RE_POSIX_BASIC' */
 #endif /* !REG_EXTENDED && __REG_EXTENDED */
@@ -505,6 +582,19 @@ typedef __ULONGPTR_TYPE__ active_reg_t; /* ??? */
 #if !defined(REG_NOSUB) && defined(__REG_NOSUB)
 #define REG_NOSUB    __REG_NOSUB    /* `regexec(3)' will ignore the `nmatch' and `pmatch' arguments (s.a. `RE_NO_SUB'). */
 #endif /* !REG_NOSUB && __REG_NOSUB */
+#if !defined(REG_NOSPEC) && defined(__REG_NOSPEC)
+#define REG_NOSPEC   __REG_NOSPEC   /* ??? */
+#endif /* !REG_NOSPEC && __REG_NOSPEC */
+#if !defined(REG_PEND) && defined(__REG_PEND)
+#define REG_PEND     __REG_PEND     /* ??? */
+#endif /* !REG_PEND && __REG_PEND */
+#if !defined(REG_DUMP) && defined(__REG_DUMP)
+#define REG_DUMP     __REG_DUMP     /* ??? */
+#endif /* !REG_DUMP && __REG_DUMP */
+#if !defined(REG_GNU) && defined(__REG_GNU)
+#define REG_GNU      __REG_GNU      /* ??? */
+#endif /* !REG_GNU && __REG_GNU */
+
 
 /* Flags for `regexec(3)'s `eflags' argument. */
 #if !defined(REG_NOTBOL) && defined(__REG_NOTBOL)
@@ -518,10 +608,39 @@ typedef __ULONGPTR_TYPE__ active_reg_t; /* ??? */
                                      * in the input buffer (allowing '\0' to be included in input  data). */
 #endif /* !REG_STARTEND && __REG_STARTEND */
 
+/* Some hint flags from NetBSD (which we 0 out if not available) */
+#ifndef REG_TRACE
+#ifdef __REG_TRACE
+#define REG_TRACE __REG_TRACE
+#else /* __REG_TRACE */
+#define REG_TRACE 0
+#endif /* !__REG_TRACE */
+#endif /* !REG_TRACE */
+#ifndef REG_LARGE
+#ifdef __REG_LARGE
+#define REG_LARGE __REG_LARGE
+#else /* __REG_LARGE */
+#define REG_LARGE 0
+#endif /* !__REG_LARGE */
+#endif /* !REG_LARGE */
+#ifndef REG_BACKR
+#ifdef __REG_BACKR
+#define REG_BACKR __REG_BACKR
+#else /* __REG_BACKR */
+#define REG_BACKR 0
+#endif /* !__REG_BACKR */
+#endif /* !REG_BACKR */
+
+
 #ifdef __CC__
 typedef struct re_pattern_buffer regex_t;
 typedef __regoff_t regoff_t;
 typedef struct __regmatch regmatch_t;
+
+#ifndef __size_t_defined
+#define __size_t_defined
+typedef __size_t size_t;
+#endif /* !__size_t_defined */
 
 }
 
@@ -762,6 +881,7 @@ void re_set_registers([[inout]] regex_t *self, [[out]] struct __re_registers *re
 @@@return: REG_EEND:    Unexpected end of pattern.
 @@@return: REG_ESIZE:   Compiled pattern bigger than 2^16 bytes.
 @@@return: REG_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
+@@@return: REG_EILLSEQ: Illegal unicode character (when `RE_NO_UTF8' wasn't set)
 @@@return: REG_EILLSET: Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]")
 @@@return: REG_ENOSYS:  Unable to load `libregex.so' (shouldn't happen)
 [[decl_include("<bits/crt/regex.h>")]]
@@ -886,8 +1006,20 @@ char const *regerrordesc_np(int errcode) {
 @@pp_ifdef __REG_ERPAREN@@
 	case __REG_ERPAREN: /* */ result = "Unmatched )"; break;
 @@pp_endif@@
+@@pp_ifdef __REG_EILLSEQ@@
+	case __REG_EILLSEQ: /* */ result = "Illegal unicode character"; break;
+@@pp_endif@@
 @@pp_ifdef __REG_EILLSET@@
 	case __REG_EILLSET: /* */ result = "Cannot combine raw bytes with unicode characters in charsets"; break;
+@@pp_endif@@
+@@pp_ifdef __REG_EMPTY@@
+	case __REG_EMPTY: /*   */ result = "?"; break;
+@@pp_endif@@
+@@pp_ifdef __REG_ASSERT@@
+	case __REG_ASSERT: /*  */ result = "?"; break;
+@@pp_endif@@
+@@pp_ifdef __REG_INVARG@@
+	case __REG_INVARG: /*  */ result = "?"; break;
 @@pp_endif@@
 	default: result = NULL; break;
 	}
@@ -910,7 +1042,7 @@ char const *regerrordesc_np(int errcode) {
 @@@return: * :     Error (returned pointer is the human-readable error message, as returned by `regerrordesc_np(3)')
 @@                 In this case, the internal, static regex buffer is left unaltered.
 [[section(".text.crt.compat.glibc.regex")]]
-char __KOS_FIXED_CONST *re_comp([[nullable]] const char *pattern);
+char __KOS_FIXED_CONST *re_comp([[nullable]] char const *pattern);
 
 @@>> re_exec(3)
 @@Try to match the regex previous compiled by `re_comp(3)'
@@ -930,9 +1062,246 @@ char __KOS_FIXED_CONST *re_comp([[nullable]] const char *pattern);
 @@@return: 1:     The given `string' contains (at least) one matching sub-string
 @@@return: 0:     The given `string' does not contain a sub-string that matches the previously compiled pattern.
 [[pure, wunused, section(".text.crt.compat.glibc.regex")]]
-int re_exec([[nonnull]] const char *string);
+int re_exec([[nonnull]] char const *string);
 
 %#endif /* _REGEX_RE_COMP */
+
+%
+%#ifdef __USE_KOS
+@@>> regsubprint(3), regsubprintv(3)
+@@Perform sed-like substitution of from `sed_format' using matches previously obtained from `regexec(3)'.
+@@This  function  writes  the  NUL-terminated   string  `sed_format'  to  `printer',  whilst   replacing:
+@@ - '&'  with the contents of `pmatch[0]' (or an empty string when `nmatch == 0')
+@@ - '\N' with the contents of `pmatch[N]' (or an empty string when `nmatch <= N'; N must be in `[0,9]')
+@@ - '\&' Prints a literal '&'
+@@ - '\\' Prints a literal '\'
+@@NOTE: Matches that are unset (i.e. use start/end offset `-1') produce empty strings
+@@@param: printer:    Output printer
+@@@param: arg:        Cookie argument for `printer'
+@@@param: sed_format: Sed format string
+@@@param: srcbase:    IOV base (offsets from `pmatch' point into this)
+@@@param: nmatch:     The # of matches defined by `pmatch'
+@@@param: pmatch:     Vector of matches
+@@@return: >= 0:      Sum of positive return values of `printer'
+@@@return: -1:        First negative return value of `printer'
+[[decl_include("<bits/crt/format-printer.h>", "<bits/crt/regex.h>")]]
+[[decl_include("<bits/os/iovec.h>", "<hybrid/typecore.h>")]]
+[[impl_include("<hybrid/typecore.h>")]]
+ssize_t regsubprintv([[nonnull]] __pformatprinter printer, void *arg,
+                     [[in]] char const *sed_format,
+                     [[nonnull]] struct iovec const *srcbase, size_t nmatch,
+                     [[in(nmatch)]] regmatch_t const pmatch[__restrict_arr]) {
+	size_t imatch;
+	ssize_t temp, result = 0;
+	char ch;
+	char const *flush_start;
+	flush_start = sed_format;
+again:
+	ch = *sed_format++;
+	switch (ch) {
+
+	case '\0':
+		--sed_format;
+		break;
+
+	case '&':
+		imatch = 0;
+insert_imatch:
+		/* Flush until the start of the insert-sequence */
+		--sed_format;
+		if (sed_format > flush_start) {
+			temp = (*printer)(arg, flush_start, (size_t)(sed_format - flush_start));
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
+		}
+		if (*sed_format == '\\')
+			++sed_format;
+		++sed_format;
+		flush_start = sed_format;
+
+		/* Insert the `imatch'th element from `pmatch' */
+		if (imatch < nmatch && (pmatch[imatch].@rm_so@ != (regoff_t)-1 &&
+		                        pmatch[imatch].@rm_eo@ != (regoff_t)-1)) {
+			size_t offset, count;
+			offset = (size_t)pmatch[imatch].@rm_so@;
+			count  = (size_t)(pmatch[imatch].@rm_eo@ - pmatch[imatch].@rm_so@);
+			if (count > 0) {
+				/* Seek until the first source iov item. */
+				struct iovec const *iov = srcbase;
+				while (offset >= iov->@iov_len@) {
+					offset -= iov->@iov_len@;
+					++iov;
+				}
+				/* Print the next `count' bytes starting at `iov[+offset]' */
+				for (;;) {
+					size_t partlen;
+					partlen = iov->@iov_len@ - offset;
+					if (partlen > count)
+						partlen = count;
+					temp = (*printer)(arg, (char const *)((byte_t const *)iov->@iov_base@ + offset), partlen);
+					if unlikely(temp < 0)
+						goto err;
+					result += temp;
+					if (partlen >= count)
+						break;
+					count -= partlen;
+					offset = 0;
+					++iov;
+				}
+			}
+		}
+		goto again;
+
+	case '\\':
+		ch = *sed_format;
+		if (ch >= '0' && ch <= '9') {
+			imatch = (size_t)(ch - '0');
+			goto insert_imatch;
+		} else if (ch == '&' || ch == '\\') {
+			/* Escaped character */
+			--sed_format;
+			if (sed_format > flush_start) {
+				temp = (*printer)(arg, flush_start, (size_t)(sed_format - flush_start));
+				if unlikely(temp < 0)
+					goto err;
+				result += temp;
+			}
+			++sed_format;
+			flush_start = sed_format; /* Flush the escaped char the next time around */
+			++sed_format;
+		}
+		goto again;
+
+	default:
+		goto again;
+	}
+
+	/* Flush any left-over remainder. */
+	if (sed_format > flush_start) {
+		temp = (*printer)(arg, flush_start, (size_t)(sed_format - flush_start));
+		if unlikely(temp < 0)
+			goto err;
+		result += temp;
+	}
+	return result;
+err:
+	return temp;
+}
+
+[[doc_alias("regsubprintv"), requires_function(regsubprintv)]]
+[[decl_include("<bits/crt/format-printer.h>", "<bits/crt/regex.h>", "<hybrid/typecore.h>")]]
+[[impl_include("<bits/os/iovec.h>", "<hybrid/typecore.h>")]]
+ssize_t regsubprint([[nonnull]] __pformatprinter printer, void *arg,
+                    [[in]] char const *sed_format,
+                    [[nonnull]] void const *srcbase, size_t nmatch,
+                    [[in(nmatch)]] regmatch_t const pmatch[__restrict_arr]) {
+	struct iovec iov[1];
+	iov[0].@iov_base@ = (void *)srcbase;
+	iov[0].@iov_len@  = (size_t)-1;
+	return regsubprintv(printer, arg, sed_format, iov, nmatch, pmatch);
+}
+
+%#endif /* __USE_KOS */
+
+
+%[define(DEFINE_FORMAT_APRINTF_DATA =
+@@pp_ifndef __format_aprintf_data_defined@@
+#define __format_aprintf_data_defined
+struct format_aprintf_data {
+	char         *@ap_base@;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+	__SIZE_TYPE__ @ap_avail@; /* Unused buffer size */
+	__SIZE_TYPE__ @ap_used@;  /* Used buffer size */
+};
+@@pp_endif@@
+)]
+
+
+%
+%#ifdef __USE_NETBSD
+@@>> regnsub(3)
+@@Wrapper for `regsubprint(3)' that writes the produced string into `buf...+=len'
+@@@param: buf:        Output buffer base pointer
+@@@param: len:        Length of `buf'
+@@@param: sed_format: Sed format string
+@@@param: pmatch:     A 10-element-long list of matches
+@@@param: srcbase:    Source base pointer
+@@@return: * :        Required buffer length (excluding a trailing NUL-character).
+@@                    NOTE: On NetBSD, the return value is signed, but that didn't make
+@@                          sense  since there is no error-case, so I made it unsigned.
+[[decl_include("<bits/crt/regex.h>", "<hybrid/typecore.h>")]]
+[[impl_include("<hybrid/typecore.h>")]]
+[[requires_function(regsubprint, format_snprintf_printer)]]
+size_t regnsub([[out(? <= len)]] char *buf, size_t len,
+               [[in]] char const *sed_format,
+               [[nonnull/*in(10)*/]] regmatch_t const *pmatch,
+               [[in]] char const *srcbase) {
+	size_t result;
+	struct __local_format_snprintf_data {
+		char  *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
+		size_t sd_bufsiz; /* Remaining buffer size. */
+	} pdata;
+	pdata.sd_buffer = buf;
+	pdata.sd_bufsiz = len;
+
+	/* Do the substitution-print. */
+	result = (size_t)regsubprint(&format_snprintf_printer, &pdata,
+	                             sed_format, srcbase, 10, pmatch);
+
+	/* Append trailing NUL-terminator (if there is still space for it). */
+	if (pdata.sd_bufsiz)
+		*pdata.sd_buffer = '\0';
+
+	/* Return required buffer size (excluding the trailing NUL) */
+	return result;
+}
+
+
+@@>> regasub(3)
+@@Wrapper for `regsubprint(3)' that dynamically allocates a buffer and stores it in `*p_buf'
+@@@param: p_buf:      Pointer to output buffer of sed-replaced text (terminated by '\0')
+@@                    On error, `NULL' will be stored in this pointer.
+@@@param: sed_format: Sed format string
+@@@param: pmatch:     A 10-element-long list of matches
+@@@param: srcbase:    Source base pointer
+@@@return: * :        Length of the string stored in `*p_buf' (excluding the trailing '\0')
+@@@return: -1:        [errno=ENOMEM] Out of memory
+[[decl_include("<bits/crt/regex.h>", "<hybrid/typecore.h>")]]
+[[impl_prefix(DEFINE_FORMAT_APRINTF_DATA)]]
+[[requires_function(format_aprintf_pack, format_aprintf_printer, regsubprint)]]
+ssize_t regasub([[out]] char **p_buf, [[in]] char const *sed_format,
+                [[nonnull/*in(10)*/]] regmatch_t const *pmatch,
+                [[in]] char const *srcbase) {
+	struct format_aprintf_data pdata;
+	ssize_t result;
+	char *resstr;
+
+	/* Setup malloc-based printer. */
+	pdata.@ap_base@  = NULL;
+	pdata.@ap_avail@ = 0;
+	pdata.@ap_used@  = 0;
+
+	/* Do the substitution-print. */
+	result = regsubprint(&format_aprintf_printer, &pdata,
+	                     sed_format, srcbase, 10, pmatch);
+	if unlikely(result < 0)
+		goto err;
+
+	/* package the produced string. */
+	resstr = format_aprintf_pack(&pdata, (size_t *)&result);
+	*p_buf = resstr;
+	if unlikely(!resstr)
+		result = -1;
+	return result;
+err:
+@@pp_if $has_function(free)@@
+	free(pdata.@ap_base@);
+@@pp_endif@@
+	*p_buf = NULL;
+	return -1;
+}
+
+%#endif /* __USE_NETBSD */
 
 
 %{

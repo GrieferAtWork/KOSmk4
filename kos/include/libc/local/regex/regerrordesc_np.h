@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba068722 */
+/* HASH CRC-32:0x5ebc6ce6 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,9 +81,21 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(regerrordesc_np))(int __errcode) {
 #ifdef __REG_ERPAREN
 	case __REG_ERPAREN: /* */ __result = "Unmatched )"; break;
 #endif /* __REG_ERPAREN */
+#ifdef __REG_EILLSEQ
+	case __REG_EILLSEQ: /* */ __result = "Illegal unicode character"; break;
+#endif /* __REG_EILLSEQ */
 #ifdef __REG_EILLSET
 	case __REG_EILLSET: /* */ __result = "Cannot combine raw bytes with unicode characters in charsets"; break;
 #endif /* __REG_EILLSET */
+#ifdef __REG_EMPTY
+	case __REG_EMPTY: /*   */ __result = "?"; break;
+#endif /* __REG_EMPTY */
+#ifdef __REG_ASSERT
+	case __REG_ASSERT: /*  */ __result = "?"; break;
+#endif /* __REG_ASSERT */
+#ifdef __REG_INVARG
+	case __REG_INVARG: /*  */ __result = "?"; break;
+#endif /* __REG_INVARG */
 	default: __result = __NULLPTR; break;
 	}
 	return __result;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa94d3bde */
+/* HASH CRC-32:0xfa85ec8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -805,10 +805,12 @@ NOTHROW_NCX(__FORMATPRINTER_CC libc_format_sprintf_printer)(void *arg,
 }
 /* >> format_snprintf_printer(3)
  * Format-printer implementation for printing to a string buffer like `snprintf(3)' would
- * WARNING: No trailing NUL-character is implicitly appended
- * NOTE: The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
- * NOTE: The   number   of   required   characters   is   `arg->sd_buffer - <orig_buf>',  or
- *       alternatively the sum of return values of all calls to `format_snprintf_printer(3)' */
+ * NOTES:
+ *  - No trailing NUL-character is implicitly appended !!!
+ *  - The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
+ *  - The number  of required  characters is  `arg->sd_buffer - <orig_buf>', and  is
+ *    equal to the sum of return values of all calls to `format_snprintf_printer(3)'
+ *  - There is no error-case, so this function never returns a negative result */
 INTERN ATTR_SECTION(".text.crt.string.format") ATTR_INS(2, 3) NONNULL((1)) ssize_t
 NOTHROW_NCX(__FORMATPRINTER_CC libc_format_snprintf_printer)(void *arg,
                                                              char const *__restrict data,

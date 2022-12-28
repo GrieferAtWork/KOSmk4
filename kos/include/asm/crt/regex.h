@@ -38,13 +38,29 @@
 #define __REG_ERANGE   11   /* Invalid range end (e.g. '[z-a]'). */
 #define __REG_ESPACE   12   /* Out of memory. */
 #define __REG_BADRPT   13   /* Nothing is preceding '+', '*', '?' or '{'. */
+#if defined(__CRT_KOS) || defined(__CRT_GLC)
 #define __REG_EEND     14   /* Unexpected end of pattern. */
 #define __REG_ESIZE    15   /* Too large (pattern violates some hard limit that isn't the currently available ram) */
 #define __REG_ERPAREN  16   /* Unmatched ')' (only when `RE_UNMATCHED_RIGHT_PAREN_ORD' was set) */
 #ifdef __CRT_KOS
-#define __REG_EILLSET  17   /* Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
-#endif /* __CRT_KOS */
-#define __REG_ECOUNT 18 /* # of defined regex error codes. */
+#define __REG_EILLSEQ  17   /* Illegal unicode character (when `RE_NO_UTF8' wasn't set) */
+#define __REG_EILLSET  18   /* Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
+#define __REG_ECOUNT   19   /* # of defined regex error codes. */
+#else /* __CRT_KOS */
+#define __REG_ECOUNT   17   /* # of defined regex error codes. */
+#endif /* !__CRT_KOS */
+#elif defined(__NetBSD__)
+#define __REG_EMPTY    14   /* ??? */
+#define __REG_ASSERT   15   /* ??? */
+#define __REG_INVARG   16   /* ??? */
+#define __REG_EILLSEQ  17   /* Illegal unicode character (when `RE_NO_UTF8' wasn't set) */
+#define __REG_ECOUNT   18   /* # of defined regex error codes. */
+#define __REG_ATOI     255  /* ??? */
+#define __REG_ITOA     0400 /* ??? */
+#else /* ... */
+#define __REG_ECOUNT   17   /* # of defined regex error codes. */
+#endif /* ... */
+
 
 
 /* Regex syntax options */
@@ -92,14 +108,30 @@
 /* Flags for `regcomp(3)'s `cflags' argument. */
 #define __REG_EXTENDED 0x0001 /* Use `RE_POSIX_MINIMAL_BASIC' instead of `RE_POSIX_BASIC' */
 #define __REG_ICASE    0x0002 /* Ignore casing during matching (s.a. `RE_ICASE') */
+#ifdef __NetBSD__
+#define __REG_NOSUB    0x0004 /* `regexec(3)' will ignore the `nmatch' and `pmatch' arguments (s.a. `RE_NO_SUB'). */
+#define __REG_NEWLINE  0x0008 /* Clears `RE_DOT_NEWLINE'; sets `RE_HAT_LISTS_NOT_NEWLINE | RE_ANCHORS_IGNORE_EFLAGS' */
+#define __REG_NOSPEC   0x0010 /* ??? */
+#define __REG_PEND     0x0020 /* ??? */
+#define __REG_DUMP     0x0040 /* ??? */
+#define __REG_GNU      0x0080 /* ??? */
+#else /* __NetBSD__ */
 #define __REG_NEWLINE  0x0004 /* Clears `RE_DOT_NEWLINE'; sets `RE_HAT_LISTS_NOT_NEWLINE | RE_ANCHORS_IGNORE_EFLAGS' */
 #define __REG_NOSUB    0x0008 /* `regexec(3)' will ignore the `nmatch' and `pmatch' arguments (s.a. `RE_NO_SUB'). */
+#endif /* !__NetBSD__ */
+
+
 
 /* Flags for `regexec(3)'s `eflags' argument. */
 #define __REG_NOTBOL   0x0001 /* '^' doesn't match the start of input data (but only at an actual begin-of-line) */
 #define __REG_NOTEOL   0x0002 /* '$' doesn't match the end of input data (but only before an actual line-feed) */
 #define __REG_STARTEND 0x0004 /* Use `pmatch[0]' on input to determine the search start/end-offsets
                                * in the input buffer (allowing '\0' to be included in input  data). */
+#ifdef __NetBSD__
+#define __REG_TRACE 00400
+#define __REG_LARGE 01000
+#define __REG_BACKR 02000
+#endif /* __NetBSD__ */
 
 
 #endif /* !_ASM_CRT_REGEX_H */

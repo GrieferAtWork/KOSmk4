@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xedee0fd3 */
+/* HASH CRC-32:0xf484e8c5 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3016,11 +3016,15 @@
 #define __CRT_HAVE_DOS$recvmmsg
 #define __CRT_HAVE_DOS$recvmmsg64
 #define __CRT_HAVE_DOS$recvmsg
+#define __CRT_HAVE_DOS$regasub
 #define __CRT_HAVE_DOS$regcomp
 #define __CRT_HAVE_DOS$regerror
 #define __CRT_HAVE_DOS$regerrordesc_np
 #define __CRT_HAVE_DOS$regexec
 #define __CRT_HAVE_DOS$regfree
+#define __CRT_HAVE_DOS$regnsub
+#define __CRT_HAVE_DOS$regsubprint
+#define __CRT_HAVE_DOS$regsubprintv
 #define __CRT_HAVE_DOS$remainder
 #define __CRT_HAVE_DOS$remainderf
 #define __CRT_HAVE_DOS$remainderl
@@ -7361,6 +7365,7 @@
 #define __CRT_HAVE_recvmmsg
 #define __CRT_HAVE_recvmmsg64
 #define __CRT_HAVE_recvmsg
+#define __CRT_HAVE_regasub
 #define __CRT_HAVE_regcomp
 #define __CRT_HAVE_regerror
 #define __CRT_HAVE_regerrordesc_np
@@ -7370,6 +7375,9 @@
 #define __CRT_HAVE_register_printf_modifier
 #define __CRT_HAVE_register_printf_specifier
 #define __CRT_HAVE_register_printf_type
+#define __CRT_HAVE_regnsub
+#define __CRT_HAVE_regsubprint
+#define __CRT_HAVE_regsubprintv
 #define __CRT_HAVE_remainder
 #define __CRT_HAVE_remainderf
 #define __CRT_HAVE_remainderl

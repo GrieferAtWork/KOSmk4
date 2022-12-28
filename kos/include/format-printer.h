@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3591b4e */
+/* HASH CRC-32:0x20bd98ce */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -578,25 +578,30 @@ struct format_snprintf_data {
 	__SIZE_TYPE__ sd_bufsiz; /* Remaining buffer size. */
 };
 #endif /* !__format_snprintf_data_defined */
-#define FORMAT_SNPRINTF_INIT(buf, bufsize)       { buf, bufsize }
-#define format_snprintf_init(self, buf, bufsize) ((self)->sd_buffer = (buf), (self)->sd_bufsiz = (bufsize))
+#define FORMAT_SNPRINTF_INIT(buf, bufsize) { buf, bufsize }
+#define format_snprintf_init(self, buf, bufsize) \
+	(void)((self)->sd_buffer = (buf), (self)->sd_bufsiz = (bufsize))
 
 #ifdef __CRT_HAVE_format_snprintf_printer
 /* >> format_snprintf_printer(3)
  * Format-printer implementation for printing to a string buffer like `snprintf(3)' would
- * WARNING: No trailing NUL-character is implicitly appended
- * NOTE: The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
- * NOTE: The   number   of   required   characters   is   `arg->sd_buffer - <orig_buf>',  or
- *       alternatively the sum of return values of all calls to `format_snprintf_printer(3)' */
+ * NOTES:
+ *  - No trailing NUL-character is implicitly appended !!!
+ *  - The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
+ *  - The number  of required  characters is  `arg->sd_buffer - <orig_buf>', and  is
+ *    equal to the sum of return values of all calls to `format_snprintf_printer(3)'
+ *  - There is no error-case, so this function never returns a negative result */
 __LIBC __ATTR_INS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_snprintf_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) __CASMNAME_SAME("format_snprintf_printer");
 #else /* __CRT_HAVE_format_snprintf_printer */
 #include <libc/local/format-printer/format_snprintf_printer.h>
 /* >> format_snprintf_printer(3)
  * Format-printer implementation for printing to a string buffer like `snprintf(3)' would
- * WARNING: No trailing NUL-character is implicitly appended
- * NOTE: The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
- * NOTE: The   number   of   required   characters   is   `arg->sd_buffer - <orig_buf>',  or
- *       alternatively the sum of return values of all calls to `format_snprintf_printer(3)' */
+ * NOTES:
+ *  - No trailing NUL-character is implicitly appended !!!
+ *  - The number of written characters is `<orig_bufsize> - arg->sd_bufsiz'
+ *  - The number  of required  characters is  `arg->sd_buffer - <orig_buf>', and  is
+ *    equal to the sum of return values of all calls to `format_snprintf_printer(3)'
+ *  - There is no error-case, so this function never returns a negative result */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_snprintf_printer, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INS(2, 3) __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__FORMATPRINTER_CC format_snprintf_printer)(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_snprintf_printer))(__arg, __data, __datalen); })
 #endif /* !__CRT_HAVE_format_snprintf_printer */
 #ifdef __CRT_HAVE_format_width
@@ -638,8 +643,9 @@ struct format_aprintf_data {
 };
 #endif /* !__format_aprintf_data_defined */
 
-#define FORMAT_APRINTF_DATA_INIT        { __NULLPTR, 0, 0 }
-#define format_aprintf_data_init(self)  ((self)->ap_base = __NULLPTR, (self)->ap_avail = (self)->ap_used = 0)
+#define FORMAT_APRINTF_DATA_INIT { __NULLPTR, 0, 0 }
+#define format_aprintf_data_init(self) \
+	(void)((self)->ap_base = __NULLPTR, (self)->ap_avail = (self)->ap_used = 0)
 #define format_aprintf_data_cinit(self)             \
 	(__hybrid_assert((self)->ap_base == __NULLPTR), \
 	 __hybrid_assert((self)->ap_avail == 0),        \

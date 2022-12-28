@@ -52,7 +52,8 @@ typedef int re_errno_t;
 #define RE_EEND     14 /* Unexpected end of pattern. */
 #define RE_ESIZE    15 /* Too large (pattern violates some hard limit that isn't the currently available ram) */
 #define RE_ERPAREN  16 /* Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set) */
-#define RE_EILLSET  17 /* Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
+#define RE_EILLSEQ  17 /* Illegal unicode character (when `RE_NO_UTF8' wasn't set) (TODO: Implement me) */
+#define RE_EILLSET  18 /* Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
 
 
 

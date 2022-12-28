@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f443394 */
+/* HASH CRC-32:0xdacd9a33 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -168,6 +168,7 @@ INTDEF ATTR_IN(1) ATTR_INS(2, 3) ATTR_INS(4, 5) ATTR_OUT_OPT(7) __STDC_INT_AS_SS
  * @return: REG_EEND:    Unexpected end of pattern.
  * @return: REG_ESIZE:   Compiled pattern bigger than 2^16 bytes.
  * @return: REG_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
+ * @return: REG_EILLSEQ: Illegal unicode character (when `RE_NO_UTF8' wasn't set)
  * @return: REG_EILLSET: Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]")
  * @return: REG_ENOSYS:  Unable to load `libregex.so' (shouldn't happen) */
 INTDEF ATTR_IN(2) ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_regcomp)(regex_t *__restrict self, char const *__restrict pattern, int cflags);
@@ -198,7 +199,7 @@ INTDEF ATTR_IN(1) ATTR_IN(2) int NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t cons
  * @return: NULL:   Success
  * @return: * :     Error (returned pointer is the human-readable error message, as returned by `regerrordesc_np(3)')
  *                  In this case, the internal, static regex buffer is left unaltered. */
-INTDEF char __KOS_FIXED_CONST *NOTHROW_NCX(LIBCCALL libc_re_comp)(const char *pattern);
+INTDEF char __KOS_FIXED_CONST *NOTHROW_NCX(LIBCCALL libc_re_comp)(char const *pattern);
 /* >> re_exec(3)
  * Try to match the regex previous compiled by `re_comp(3)'
  * against some sub-string of `string'. This is equivalent to:
@@ -216,7 +217,7 @@ INTDEF char __KOS_FIXED_CONST *NOTHROW_NCX(LIBCCALL libc_re_comp)(const char *pa
  * @param: string: The pattern to compile (or `NULL' to verify that a pattern has already been compiled)
  * @return: 1:     The given `string' contains (at least) one matching sub-string
  * @return: 0:     The given `string' does not contain a sub-string that matches the previously compiled pattern. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_re_exec)(const char *string);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_re_exec)(char const *string);
 #endif /* !__KERNEL__ */
 
 DECL_END

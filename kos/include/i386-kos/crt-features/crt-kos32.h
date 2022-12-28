@@ -4427,6 +4427,7 @@
 #define __CRT_HAVE_recvmmsg
 #define __CRT_HAVE_recvmmsg64
 #define __CRT_HAVE_recvmsg
+#define __CRT_HAVE_regasub
 #define __CRT_HAVE_regcomp
 #define __CRT_HAVE_regerror
 #define __CRT_HAVE_regerrordesc_np
@@ -4436,6 +4437,9 @@
 #define __CRT_HAVE_register_printf_modifier
 #define __CRT_HAVE_register_printf_specifier
 #define __CRT_HAVE_register_printf_type
+#define __CRT_HAVE_regnsub
+#define __CRT_HAVE_regsubprint
+#define __CRT_HAVE_regsubprintv
 #define __CRT_HAVE_remainder
 #define __CRT_HAVE_remainderf
 #define __CRT_HAVE_remainderl

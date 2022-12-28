@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9bd6e7b */
+/* HASH CRC-32:0xed719f0e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,6 +29,7 @@
 
 DECL_BEGIN
 
+#include <bits/crt/format-printer.h>
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> re_set_syntax(3)
  * Set  the  regex  syntax used  by  `re_compile_pattern(3)', and
@@ -201,6 +202,7 @@ INTDEF ATTR_INOUT(1) ATTR_OUT(2) void NOTHROW_NCX(LIBCCALL libc_re_set_registers
  * @return: REG_EEND:    Unexpected end of pattern.
  * @return: REG_ESIZE:   Compiled pattern bigger than 2^16 bytes.
  * @return: REG_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
+ * @return: REG_EILLSEQ: Illegal unicode character (when `RE_NO_UTF8' wasn't set)
  * @return: REG_EILLSET: Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]")
  * @return: REG_ENOSYS:  Unable to load `libregex.so' (shouldn't happen) */
 INTDEF ATTR_IN(2) ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_regcomp)(regex_t *__restrict self, char const *__restrict pattern, int cflags);
@@ -275,7 +277,7 @@ INTDEF ATTR_CONST WUNUSED char const *NOTHROW_NCX(LIBCCALL libc_regerrordesc_np)
  * @return: NULL:   Success
  * @return: * :     Error (returned pointer is the human-readable error message, as returned by `regerrordesc_np(3)')
  *                  In this case, the internal, static regex buffer is left unaltered. */
-INTDEF char __KOS_FIXED_CONST *NOTHROW_NCX(LIBDCALL libd_re_comp)(const char *pattern);
+INTDEF char __KOS_FIXED_CONST *NOTHROW_NCX(LIBDCALL libd_re_comp)(char const *pattern);
 /* >> re_exec(3)
  * Try to match the regex previous compiled by `re_comp(3)'
  * against some sub-string of `string'. This is equivalent to:
@@ -293,8 +295,132 @@ INTDEF char __KOS_FIXED_CONST *NOTHROW_NCX(LIBDCALL libd_re_comp)(const char *pa
  * @param: string: The pattern to compile (or `NULL' to verify that a pattern has already been compiled)
  * @return: 1:     The given `string' contains (at least) one matching sub-string
  * @return: 0:     The given `string' does not contain a sub-string that matches the previously compiled pattern. */
-INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_re_exec)(const char *string);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_re_exec)(char const *string);
+/* >> regsubprint(3), regsubprintv(3)
+ * Perform sed-like substitution of from `sed_format' using matches previously obtained from `regexec(3)'.
+ * This  function  writes  the  NUL-terminated   string  `sed_format'  to  `printer',  whilst   replacing:
+ *  - '&'  with the contents of `pmatch[0]' (or an empty string when `nmatch == 0')
+ *  - '\N' with the contents of `pmatch[N]' (or an empty string when `nmatch <= N'; N must be in `[0,9]')
+ *  - '\&' Prints a literal '&'
+ *  - '\\' Prints a literal '\'
+ * NOTE: Matches that are unset (i.e. use start/end offset `-1') produce empty strings
+ * @param: printer:    Output printer
+ * @param: arg:        Cookie argument for `printer'
+ * @param: sed_format: Sed format string
+ * @param: srcbase:    IOV base (offsets from `pmatch' point into this)
+ * @param: nmatch:     The # of matches defined by `pmatch'
+ * @param: pmatch:     Vector of matches
+ * @return: >= 0:      Sum of positive return values of `printer'
+ * @return: -1:        First negative return value of `printer' */
+INTDEF ATTR_IN(3) ATTR_INS(6, 5) NONNULL((1, 4)) ssize_t NOTHROW_NCX(LIBDCALL libd_regsubprintv)(__pformatprinter printer, void *arg, char const *sed_format, struct iovec const *srcbase, size_t nmatch, regmatch_t const pmatch[__restrict_arr]);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> regsubprint(3), regsubprintv(3)
+ * Perform sed-like substitution of from `sed_format' using matches previously obtained from `regexec(3)'.
+ * This  function  writes  the  NUL-terminated   string  `sed_format'  to  `printer',  whilst   replacing:
+ *  - '&'  with the contents of `pmatch[0]' (or an empty string when `nmatch == 0')
+ *  - '\N' with the contents of `pmatch[N]' (or an empty string when `nmatch <= N'; N must be in `[0,9]')
+ *  - '\&' Prints a literal '&'
+ *  - '\\' Prints a literal '\'
+ * NOTE: Matches that are unset (i.e. use start/end offset `-1') produce empty strings
+ * @param: printer:    Output printer
+ * @param: arg:        Cookie argument for `printer'
+ * @param: sed_format: Sed format string
+ * @param: srcbase:    IOV base (offsets from `pmatch' point into this)
+ * @param: nmatch:     The # of matches defined by `pmatch'
+ * @param: pmatch:     Vector of matches
+ * @return: >= 0:      Sum of positive return values of `printer'
+ * @return: -1:        First negative return value of `printer' */
+INTDEF ATTR_IN(3) ATTR_INS(6, 5) NONNULL((1, 4)) ssize_t NOTHROW_NCX(LIBCCALL libc_regsubprintv)(__pformatprinter printer, void *arg, char const *sed_format, struct iovec const *srcbase, size_t nmatch, regmatch_t const pmatch[__restrict_arr]);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> regsubprint(3), regsubprintv(3)
+ * Perform sed-like substitution of from `sed_format' using matches previously obtained from `regexec(3)'.
+ * This  function  writes  the  NUL-terminated   string  `sed_format'  to  `printer',  whilst   replacing:
+ *  - '&'  with the contents of `pmatch[0]' (or an empty string when `nmatch == 0')
+ *  - '\N' with the contents of `pmatch[N]' (or an empty string when `nmatch <= N'; N must be in `[0,9]')
+ *  - '\&' Prints a literal '&'
+ *  - '\\' Prints a literal '\'
+ * NOTE: Matches that are unset (i.e. use start/end offset `-1') produce empty strings
+ * @param: printer:    Output printer
+ * @param: arg:        Cookie argument for `printer'
+ * @param: sed_format: Sed format string
+ * @param: srcbase:    IOV base (offsets from `pmatch' point into this)
+ * @param: nmatch:     The # of matches defined by `pmatch'
+ * @param: pmatch:     Vector of matches
+ * @return: >= 0:      Sum of positive return values of `printer'
+ * @return: -1:        First negative return value of `printer' */
+INTDEF ATTR_IN(3) ATTR_INS(6, 5) NONNULL((1, 4)) ssize_t NOTHROW_NCX(LIBDCALL libd_regsubprint)(__pformatprinter printer, void *arg, char const *sed_format, void const *srcbase, size_t nmatch, regmatch_t const pmatch[__restrict_arr]);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> regsubprint(3), regsubprintv(3)
+ * Perform sed-like substitution of from `sed_format' using matches previously obtained from `regexec(3)'.
+ * This  function  writes  the  NUL-terminated   string  `sed_format'  to  `printer',  whilst   replacing:
+ *  - '&'  with the contents of `pmatch[0]' (or an empty string when `nmatch == 0')
+ *  - '\N' with the contents of `pmatch[N]' (or an empty string when `nmatch <= N'; N must be in `[0,9]')
+ *  - '\&' Prints a literal '&'
+ *  - '\\' Prints a literal '\'
+ * NOTE: Matches that are unset (i.e. use start/end offset `-1') produce empty strings
+ * @param: printer:    Output printer
+ * @param: arg:        Cookie argument for `printer'
+ * @param: sed_format: Sed format string
+ * @param: srcbase:    IOV base (offsets from `pmatch' point into this)
+ * @param: nmatch:     The # of matches defined by `pmatch'
+ * @param: pmatch:     Vector of matches
+ * @return: >= 0:      Sum of positive return values of `printer'
+ * @return: -1:        First negative return value of `printer' */
+INTDEF ATTR_IN(3) ATTR_INS(6, 5) NONNULL((1, 4)) ssize_t NOTHROW_NCX(LIBCCALL libc_regsubprint)(__pformatprinter printer, void *arg, char const *sed_format, void const *srcbase, size_t nmatch, regmatch_t const pmatch[__restrict_arr]);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> regnsub(3)
+ * Wrapper for `regsubprint(3)' that writes the produced string into `buf...+=len'
+ * @param: buf:        Output buffer base pointer
+ * @param: len:        Length of `buf'
+ * @param: sed_format: Sed format string
+ * @param: pmatch:     A 10-element-long list of matches
+ * @param: srcbase:    Source base pointer
+ * @return: * :        Required buffer length (excluding a trailing NUL-character).
+ *                     NOTE: On NetBSD, the return value is signed, but that didn't make
+ *                           sense  since there is no error-case, so I made it unsigned. */
+INTDEF ATTR_IN(3) ATTR_IN(5) ATTR_OUTS(1, 2) NONNULL((4)) size_t NOTHROW_NCX(LIBDCALL libd_regnsub)(char *buf, size_t len, char const *sed_format, regmatch_t const *pmatch, char const *srcbase);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> regnsub(3)
+ * Wrapper for `regsubprint(3)' that writes the produced string into `buf...+=len'
+ * @param: buf:        Output buffer base pointer
+ * @param: len:        Length of `buf'
+ * @param: sed_format: Sed format string
+ * @param: pmatch:     A 10-element-long list of matches
+ * @param: srcbase:    Source base pointer
+ * @return: * :        Required buffer length (excluding a trailing NUL-character).
+ *                     NOTE: On NetBSD, the return value is signed, but that didn't make
+ *                           sense  since there is no error-case, so I made it unsigned. */
+INTDEF ATTR_IN(3) ATTR_IN(5) ATTR_OUTS(1, 2) NONNULL((4)) size_t NOTHROW_NCX(LIBCCALL libc_regnsub)(char *buf, size_t len, char const *sed_format, regmatch_t const *pmatch, char const *srcbase);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> regasub(3)
+ * Wrapper for `regsubprint(3)' that dynamically allocates a buffer and stores it in `*p_buf'
+ * @param: p_buf:      Pointer to output buffer of sed-replaced text (terminated by '\0')
+ *                     On error, `NULL' will be stored in this pointer.
+ * @param: sed_format: Sed format string
+ * @param: pmatch:     A 10-element-long list of matches
+ * @param: srcbase:    Source base pointer
+ * @return: * :        Length of the string stored in `*p_buf' (excluding the trailing '\0')
+ * @return: -1:        [errno=ENOMEM] Out of memory */
+INTDEF ATTR_IN(2) ATTR_IN(4) ATTR_OUT(1) NONNULL((3)) ssize_t NOTHROW_NCX(LIBDCALL libd_regasub)(char **p_buf, char const *sed_format, regmatch_t const *pmatch, char const *srcbase);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> regasub(3)
+ * Wrapper for `regsubprint(3)' that dynamically allocates a buffer and stores it in `*p_buf'
+ * @param: p_buf:      Pointer to output buffer of sed-replaced text (terminated by '\0')
+ *                     On error, `NULL' will be stored in this pointer.
+ * @param: sed_format: Sed format string
+ * @param: pmatch:     A 10-element-long list of matches
+ * @param: srcbase:    Source base pointer
+ * @return: * :        Length of the string stored in `*p_buf' (excluding the trailing '\0')
+ * @return: -1:        [errno=ENOMEM] Out of memory */
+INTDEF ATTR_IN(2) ATTR_IN(4) ATTR_OUT(1) NONNULL((3)) ssize_t NOTHROW_NCX(LIBCCALL libc_regasub)(char **p_buf, char const *sed_format, regmatch_t const *pmatch, char const *srcbase);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

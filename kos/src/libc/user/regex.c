@@ -650,7 +650,7 @@ NOTHROW_NCX(LIBCCALL libc_re_match_2)(regex_t __KOS_FIXED_CONST *self,
 }
 /*[[[end:libc_re_match_2]]]*/
 
-/*[[[head:libc_regcomp,hash:CRC-32=0x6d541a0b]]]*/
+/*[[[head:libc_regcomp,hash:CRC-32=0x85c64ee6]]]*/
 /* >> regcomp(3)
  * Compile a regular expression `pattern' and initialize `self'
  * @param: self:    Storage for the produced regex pattern.
@@ -671,6 +671,7 @@ NOTHROW_NCX(LIBCCALL libc_re_match_2)(regex_t __KOS_FIXED_CONST *self,
  * @return: REG_EEND:    Unexpected end of pattern.
  * @return: REG_ESIZE:   Compiled pattern bigger than 2^16 bytes.
  * @return: REG_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
+ * @return: REG_EILLSEQ: Illegal unicode character (when `RE_NO_UTF8' wasn't set)
  * @return: REG_EILLSET: Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]")
  * @return: REG_ENOSYS:  Unable to load `libregex.so' (shouldn't happen) */
 INTERN ATTR_SECTION(".text.crt.utility.regex") ATTR_IN(2) ATTR_OUT(1) int
@@ -817,7 +818,7 @@ PRIVATE ATTR_SECTION(".rodata.crt.compat.glibc.regex")
 char const libc_re_comp_no_pattern_errmsg[] = "No previous regular expression";
 
 
-/*[[[head:libc_re_comp,hash:CRC-32=0xce6dd18]]]*/
+/*[[[head:libc_re_comp,hash:CRC-32=0xf99796c9]]]*/
 /* >> re_comp(3)
  * Compare the given `pattern' and assign it to an internal regex buffer which can
  * then later be used in conjunction with `re_exec(3)'. The Syntax options used by
@@ -829,7 +830,7 @@ char const libc_re_comp_no_pattern_errmsg[] = "No previous regular expression";
  * @return: * :     Error (returned pointer is the human-readable error message, as returned by `regerrordesc_np(3)')
  *                  In this case, the internal, static regex buffer is left unaltered. */
 INTERN ATTR_SECTION(".text.crt.compat.glibc.regex") char __KOS_FIXED_CONST *
-NOTHROW_NCX(LIBCCALL libc_re_comp)(const char *pattern)
+NOTHROW_NCX(LIBCCALL libc_re_comp)(char const *pattern)
 /*[[[body:libc_re_comp]]]*/
 {
 	re_errno_t error;
@@ -864,7 +865,7 @@ NOTHROW_NCX(LIBCCALL libc_re_comp)(const char *pattern)
 }
 /*[[[end:libc_re_comp]]]*/
 
-/*[[[head:libc_re_exec,hash:CRC-32=0xb1611a3c]]]*/
+/*[[[head:libc_re_exec,hash:CRC-32=0xcfee9c6b]]]*/
 /* >> re_exec(3)
  * Try to match the regex previous compiled by `re_comp(3)'
  * against some sub-string of `string'. This is equivalent to:
@@ -883,7 +884,7 @@ NOTHROW_NCX(LIBCCALL libc_re_comp)(const char *pattern)
  * @return: 1:     The given `string' contains (at least) one matching sub-string
  * @return: 0:     The given `string' does not contain a sub-string that matches the previously compiled pattern. */
 INTERN ATTR_SECTION(".text.crt.compat.glibc.regex") ATTR_PURE WUNUSED NONNULL((1)) int
-NOTHROW_NCX(LIBCCALL libc_re_exec)(const char *string)
+NOTHROW_NCX(LIBCCALL libc_re_exec)(char const *string)
 /*[[[body:libc_re_exec]]]*/
 {
 	size_t len;
