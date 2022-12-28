@@ -52,7 +52,7 @@ typedef int re_errno_t;
 #define RE_EEND     14 /* Unexpected end of pattern. */
 #define RE_ESIZE    15 /* Too large (pattern violates some hard limit that isn't the currently available ram) */
 #define RE_ERPAREN  16 /* Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set) */
-#define RE_EILLSEQ  17 /* Illegal unicode character (when `RE_NO_UTF8' wasn't set) (TODO: Implement me) */
+#define RE_EILLSEQ  17 /* Illegal unicode character (when `RE_NO_UTF8' wasn't set) */
 #define RE_EILLSET  18 /* Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
 
 
@@ -566,7 +566,8 @@ typedef __uint32_t re_token_t;
 #define RE_TOKEN_BKREF_7       (RE_TOKEN_XBASE + 34) /* "\7" */
 #define RE_TOKEN_BKREF_8       (RE_TOKEN_XBASE + 35) /* "\8" */
 #define RE_TOKEN_BKREF_9       (RE_TOKEN_XBASE + 36) /* "\9" */
-#define RE_TOKEN_UNMATCHED_BK  (RE_TOKEN_XBASE + 37) /* "\" (followed by EOF; for `RE_EESCAPE') */
+#define RE_TOKEN_UNMATCHED_BK  (RE_TOKEN_XBASE + 38) /* "\" (followed by EOF; for `RE_EESCAPE') */
+#define RE_TOKEN_ILLSEQ        (RE_TOKEN_XBASE + 39) /* Illegal unicode sequence */
 
 /* Parse and yield the next regex-token pointed-to by `self->rep_pos'.
  * @return: * : A unicode character, or one of `RE_TOKEN_*' */
@@ -673,6 +674,7 @@ struct re_compiler {
  * @return: RE_EEND:    Unexpected end of pattern.
  * @return: RE_ESIZE:   Compiled pattern bigger than 2^16 bytes.
  * @return: RE_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
+ * @return: RE_EILLSEQ: Illegal unicode character (when `RE_NO_UTF8' wasn't set)
  * @return: RE_EILLSET: Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
 typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) re_errno_t
 __NOTHROW_NCX_T(LIBREGEX_CC *PRE_COMPILER_COMPILE)(struct re_compiler *__restrict self);

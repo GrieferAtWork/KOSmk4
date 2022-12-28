@@ -501,20 +501,22 @@ default_escaped_char:
 		char32_t uni;
 		uint8_t i, seqlen;
 handle_utf8:
-		if (self->rep_syntax & RE_SYNTAX_NO_UTF8)
-			break; /* Always emit byte-literals */
+		if (self->rep_syntax & RE_SYNTAX_NO_UTF8) {
+			/* Always emit byte-literals */
+			return RE_TOKEN_BYTE80h_MIN + (ch - 0x80);
+		}
 		--self->rep_pos;
 		/* Make sure that `unicode_readutf8(3)' won't access out-of-bounds memory */
 		seqlen = unicode_utf8seqlen[ch];
 		for (i = 0; i < seqlen; ++i) {
-			if (self->rep_pos[i] == '\0' && (self->rep_pos + i) >= self->rep_end) {
-				self->rep_pos += i;
-				return RE_TOKEN_EOF;
-			}
+			if (self->rep_pos[i] == '\0' && (self->rep_pos + i) >= self->rep_end)
+				return RE_TOKEN_ILLSEQ;
 		}
 		uni = unicode_readutf8(&self->rep_pos);
-		if unlikely(uni >= RE_TOKEN_BASE)
-			uni = 0; /* Guard against illegal unicode characters. */
+		if unlikely(uni >= RE_TOKEN_BASE) {
+			self->rep_pos -= seqlen;
+			return RE_TOKEN_ILLSEQ;
+		}
 		return uni;
 	}	break;
 
@@ -1475,15 +1477,29 @@ PRIVATE uint8_t const ctype_c_trait_masks[] = {
  * - A raw byte literal (return >= RE_TOKEN_BYTE80h_MIN && return <= RE_TOKEN_BYTE80h_MAX)
  * - RE_TOKEN_EOF when the trailing '\0'-char is reached
  * - RE_TOKEN_UNMATCHED_BK when an unmatched '\' is encountered
+ * - RE_TOKEN_ILLSEQ when at an illegal unicode sequence
  */
 PRIVATE WUNUSED NONNULL((1)) char32_t
 NOTHROW_NCX(CC re_parser_yield_cs_literal)(struct re_parser *__restrict self) {
 	unsigned char ch;
 	ch = (unsigned char)*self->rep_pos++;
 	if (ch >= 0x80) {
+		char32_t uni;
+		uint8_t i, seqlen;
 decpos_and_readutf8:
 		--self->rep_pos;
-		return unicode_readutf8((char const **)&self->rep_pos);
+		/* Make sure that `unicode_readutf8(3)' won't access out-of-bounds memory */
+		seqlen = unicode_utf8seqlen[ch];
+		for (i = 0; i < seqlen; ++i) {
+			if (self->rep_pos[i] == '\0' && (self->rep_pos + i) >= self->rep_end)
+				return RE_TOKEN_EOF;
+		}
+		uni = unicode_readutf8(&self->rep_pos);
+		if unlikely(uni >= RE_TOKEN_BASE) {
+			self->rep_pos -= seqlen;
+			return RE_TOKEN_ILLSEQ;
+		}
+		return uni;
 	}
 	assert(self->rep_pos - 1 <= self->rep_end);
 	if (ch == '\0' && (self->rep_pos - 1 >= self->rep_end)) {
@@ -1692,6 +1708,8 @@ loop_next:
 						assert(uchar != RE_TOKEN_EOF);
 						if unlikely(uchar == RE_TOKEN_UNMATCHED_BK)
 							goto err_EESCAPE;
+						if unlikely(uchar == RE_TOKEN_ILLSEQ)
+							goto err_EILLSEQ;
 						if (RE_TOKEN_ISBYTE80h(uchar)) {
 							ch = (unsigned char)(byte_t)RE_TOKEN_GETBYTE80h(uchar);
 							goto encode_byte_ch;
@@ -1724,6 +1742,8 @@ encode_uchar:
 						goto err_EEND;
 					if unlikely(hichar == RE_TOKEN_UNMATCHED_BK)
 						goto err_EESCAPE;
+					if unlikely(hichar == RE_TOKEN_ILLSEQ)
+						goto err_EILLSEQ;
 					if (RE_TOKEN_ISBYTE80h(hichar))
 						goto handle_bad_unicode_range; /* Something like "[ä-\xAB]" isn't allowed */
 encode_unicode_range:
@@ -1778,6 +1798,8 @@ encode_byte_ch:
 					goto err_EEND;
 				if unlikely(hichar == RE_TOKEN_UNMATCHED_BK)
 					goto err_EESCAPE;
+				if unlikely(hichar == RE_TOKEN_ILLSEQ)
+					goto err_EILLSEQ;
 				if (RE_TOKEN_ISBYTE80h(hichar)) {
 					hibyte = RE_TOKEN_GETBYTE80h(hichar);
 				} else if (RE_TOKEN_ISUTF8(hichar)) {
@@ -2115,6 +2137,9 @@ err_nomem:
 err_EESCAPE:
 		error = RE_EESCAPE;
 		goto _err_common;
+err_EILLSEQ:
+		error = RE_EILLSEQ;
+		goto _err_common;
 err_EILLSET:
 		error = RE_EILLSET;
 		goto _err_common;
@@ -2191,6 +2216,9 @@ again:
 
 	case RE_TOKEN_UNMATCHED_BK: /* Unmatched '\' */
 		return RE_EESCAPE;
+
+	case RE_TOKEN_ILLSEQ: /* Illegal unicode sequence */
+		return RE_EILLSEQ;
 
 	case RE_TOKEN_STARTINTERVAL:
 		if (self->rec_parser.rep_syntax & (RE_SYNTAX_CONTEXT_INVALID_DUP |
@@ -2291,6 +2319,8 @@ do_group_start_without_alternation:
 		if unlikely(tok != RE_TOKEN_ENDGROUP) {
 			if (tok == RE_TOKEN_UNMATCHED_BK)
 				return RE_EESCAPE;
+			if (tok == RE_TOKEN_ILLSEQ)
+				return RE_EILLSEQ;
 			return RE_EPAREN;
 		}
 
@@ -3499,6 +3529,7 @@ err_nomem:
  * @return: RE_EEND:    Unexpected end of pattern.
  * @return: RE_ESIZE:   Compiled pattern bigger than 2^16 bytes.
  * @return: RE_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
+ * @return: RE_EILLSEQ: Illegal unicode character (when `RE_NO_UTF8' wasn't set)
  * @return: RE_EILLSET: Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
 INTERN WUNUSED NONNULL((1)) re_errno_t
 NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self) {

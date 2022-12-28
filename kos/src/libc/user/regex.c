@@ -134,6 +134,7 @@ static_assert(REG_BADRPT == RE_BADRPT);
 static_assert(REG_EEND == RE_EEND);
 static_assert(REG_ESIZE == RE_ESIZE);
 static_assert(REG_ERPAREN == RE_ERPAREN);
+static_assert(REG_EILLSEQ == RE_EILLSEQ);
 static_assert(REG_EILLSET == RE_EILLSET);
 
 /* Syntax flags... */
