@@ -327,6 +327,10 @@ DEFINE_TEST(regex) {
 	EQ(-RE_NOMATCH, re_match("[[.tab.]]+", "foo"));
 	EQ(RE_ECOLLATE, re_compile_error("[[.BAD COLL NAME.]]", 0));
 
+	/* Ensure that unicode brace-escape works */
+	EQ(6, re_match("[\\u{1234 ABCD}]+", "\u1234\uABCDxxxxxxxxxxxxxxxxx"));
+	EQ(2, re_match("[\\u{7E 7F}]+", "\x7E\x7Fxxxxxxxxxxxxxxxxx"));
+
 	/* Cleanup */
 	EQ(0, dlclose(libregex));
 }

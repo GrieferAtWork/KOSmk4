@@ -85,6 +85,8 @@ typedef int re_errno_t;
  *     >> "\xAB"                 REOP_BYTE '\xAB'         (hex-byte)                                                                   [kos-extension]
  *     >> "\uABCD"               REOP_EXACT "\uABCD"      (utf-8 encoded)                                                              [kos-extension]
  *     >> "\UABCDABCD"           REOP_EXACT "\UABCDABCD"  (utf-8 encoded)                                                              [kos-extension]
+ *     >> "\u{1234 5689}"        REOP_EXACT "\u1234\u5689" (utf-8 encoded)                                                             [unicode-extension] (TODO)
+ *     >> "[\u{1234 5689}]"      <[\u1234\u5689]>         (utf-8 encoded)                                                              [unicode-extension]
  *
  * [1]: <OP> is one of "=" (or "=="), "!=", "<", "<=", ">", ">="
  *
@@ -518,56 +520,59 @@ struct re_parser {
 
 /* Regex token (one of `RE_TOKEN_*', or a utf-32 character (or byte when `RE_SYNTAX_NO_UTF8' is set)) */
 typedef __uint32_t re_token_t;
-#define RE_TOKEN_BASE          0x110000               /* First regex token number */
-#define RE_TOKEN_BYTE80h_MIN   RE_TOKEN_BASE          /* "\x80" */
-#define RE_TOKEN_BYTE80h_MAX   (RE_TOKEN_BASE + 0x7f) /* "\xff" */
-#define RE_TOKEN_XBASE         0x110080               /* First custom regex token number */
-#define RE_TOKEN_ISBYTE80h(x)  ((x) >= RE_TOKEN_BYTE80h_MIN && (x) <= RE_TOKEN_BYTE80h_MAX)
-#define RE_TOKEN_GETBYTE80h(x) ((__byte_t)(0x80 + (x) - RE_TOKEN_BYTE80h_MIN))
-#define RE_TOKEN_ISUTF8(x)     ((x) >= 0x80 && (x) < RE_TOKEN_BASE)
-#define RE_TOKEN_ISLITERAL(x)  ((x) < RE_TOKEN_XBASE)
-#define RE_TOKEN_EOF           (RE_TOKEN_XBASE + 0)  /* End-of-pattern */
-#define RE_TOKEN_ISSUFFIX(x)   ((x) >= RE_TOKEN_PLUS && (x) <= RE_TOKEN_STARTINTERVAL)
-#define RE_TOKEN_ANY           (RE_TOKEN_XBASE + 1)  /* '.' */
-#define RE_TOKEN_PLUS          (RE_TOKEN_XBASE + 2)  /* '+' */
-#define RE_TOKEN_STAR          (RE_TOKEN_XBASE + 3)  /* '*' */
-#define RE_TOKEN_QMARK         (RE_TOKEN_XBASE + 4)  /* '?' */
-#define RE_TOKEN_STARTINTERVAL (RE_TOKEN_XBASE + 5)  /* '{' */
-#define RE_TOKEN_STARTSET      (RE_TOKEN_XBASE + 6)  /* '[' */
-#define RE_TOKEN_STARTGROUP    (RE_TOKEN_XBASE + 7)  /* '(' */
-#define RE_TOKEN_ENDGROUP      (RE_TOKEN_XBASE + 8)  /* ')' */
-#define RE_TOKEN_ALTERNATION   (RE_TOKEN_XBASE + 9)  /* '|' */
-#define RE_TOKEN_BK_w          (RE_TOKEN_XBASE + 10) /* '\w' (<[:symcont:]>  -- REOP_ASCII_ISSYMCONT / REOP_UTF8_ISSYMCONT) */
-#define RE_TOKEN_BK_W          (RE_TOKEN_XBASE + 11) /* '\W' (<[^:symcont:]> -- REOP_ASCII_ISSYMCONT_NOT / REOP_UTF8_ISSYMCONT_NOT) */
-#define RE_TOKEN_BK_s          (RE_TOKEN_XBASE + 12) /* '\s' (<[:space:]>    -- REOP_ASCII_ISSPACE / REOP_UTF8_ISSPACE) */
-#define RE_TOKEN_BK_S          (RE_TOKEN_XBASE + 13) /* '\S' (<[^:space:]>   -- REOP_ASCII_ISSPACE_NOT / REOP_UTF8_ISSPACE_NOT) */
-#define RE_TOKEN_BK_d          (RE_TOKEN_XBASE + 14) /* '\d' (<[:digit:]>    -- REOP_ASCII_ISDIGIT / REOP_UTF8_ISDIGIT) */
-#define RE_TOKEN_BK_D          (RE_TOKEN_XBASE + 15) /* '\D' (<[^:digit:]>   -- REOP_ASCII_ISDIGIT_NOT / REOP_UTF8_ISDIGIT_NOT) */
-#define RE_TOKEN_BK_n          (RE_TOKEN_XBASE + 16) /* '\n' (<[:lf:]>       -- [\r\n] / REOP_UTF8_ISLF) */
-#define RE_TOKEN_BK_N          (RE_TOKEN_XBASE + 17) /* '\N' (<[:lf:]>       -- [^\r\n] / REOP_UTF8_ISLF_NOT) */
-#define RE_TOKEN_AT_MIN        RE_TOKEN_AT_SOL
-#define RE_TOKEN_AT_SOL        (RE_TOKEN_XBASE + 18) /* "^" */
-#define RE_TOKEN_AT_EOL        (RE_TOKEN_XBASE + 19) /* "$" */
-#define RE_TOKEN_AT_SOI        (RE_TOKEN_XBASE + 20) /* "\`" */
-#define RE_TOKEN_AT_EOI        (RE_TOKEN_XBASE + 21) /* "\'" */
-#define RE_TOKEN_AT_WOB        (RE_TOKEN_XBASE + 22) /* "\b" */
-#define RE_TOKEN_AT_WOB_NOT    (RE_TOKEN_XBASE + 23) /* "\B" */
-#define RE_TOKEN_AT_SOW        (RE_TOKEN_XBASE + 24) /* "\<" */
-#define RE_TOKEN_AT_EOW        (RE_TOKEN_XBASE + 25) /* "\>" */
-#define RE_TOKEN_AT_SOS        (RE_TOKEN_XBASE + 26) /* "\_<" */
-#define RE_TOKEN_AT_EOS        (RE_TOKEN_XBASE + 27) /* "\_>" */
-#define RE_TOKEN_AT_MAX        RE_TOKEN_AT_EOS
-#define RE_TOKEN_BKREF_1       (RE_TOKEN_XBASE + 28) /* "\1" */
-#define RE_TOKEN_BKREF_2       (RE_TOKEN_XBASE + 29) /* "\2" */
-#define RE_TOKEN_BKREF_3       (RE_TOKEN_XBASE + 30) /* "\3" */
-#define RE_TOKEN_BKREF_4       (RE_TOKEN_XBASE + 31) /* "\4" */
-#define RE_TOKEN_BKREF_5       (RE_TOKEN_XBASE + 32) /* "\5" */
-#define RE_TOKEN_BKREF_6       (RE_TOKEN_XBASE + 33) /* "\6" */
-#define RE_TOKEN_BKREF_7       (RE_TOKEN_XBASE + 34) /* "\7" */
-#define RE_TOKEN_BKREF_8       (RE_TOKEN_XBASE + 35) /* "\8" */
-#define RE_TOKEN_BKREF_9       (RE_TOKEN_XBASE + 36) /* "\9" */
-#define RE_TOKEN_UNMATCHED_BK  (RE_TOKEN_XBASE + 38) /* "\" (followed by EOF; for `RE_EESCAPE') */
-#define RE_TOKEN_ILLSEQ        (RE_TOKEN_XBASE + 39) /* Illegal unicode sequence */
+#define RE_TOKEN_BASE           0x110000               /* First regex token number */
+#define RE_TOKEN_BYTE80h_MIN    RE_TOKEN_BASE          /* "\x80" */
+#define RE_TOKEN_BYTE80h_MAX    (RE_TOKEN_BASE + 0x7f) /* "\xff" */
+#define RE_TOKEN_XBASE          0x110080               /* First custom regex token number */
+#define RE_TOKEN_ISBYTE80h(x)   ((x) >= RE_TOKEN_BYTE80h_MIN && (x) <= RE_TOKEN_BYTE80h_MAX)
+#define RE_TOKEN_GETBYTE80h(x)  ((__byte_t)(0x80 + (x) - RE_TOKEN_BYTE80h_MIN))
+#define RE_TOKEN_ISUTF8(x)      ((x) >= 0x80 && (x) < RE_TOKEN_BASE)
+#define RE_TOKEN_ISLITERAL(x)   ((x) < RE_TOKEN_XBASE)
+#define RE_TOKEN_ISSUFFIX(x)    ((x) >= RE_TOKEN_PLUS && (x) <= RE_TOKEN_STARTINTERVAL)
+#define RE_TOKEN_ANY            (RE_TOKEN_XBASE + 1)  /* '.' */
+#define RE_TOKEN_PLUS           (RE_TOKEN_XBASE + 2)  /* '+' */
+#define RE_TOKEN_STAR           (RE_TOKEN_XBASE + 3)  /* '*' */
+#define RE_TOKEN_QMARK          (RE_TOKEN_XBASE + 4)  /* '?' */
+#define RE_TOKEN_STARTINTERVAL  (RE_TOKEN_XBASE + 5)  /* '{' */
+#define RE_TOKEN_STARTSET       (RE_TOKEN_XBASE + 6)  /* '[' */
+#define RE_TOKEN_STARTGROUP     (RE_TOKEN_XBASE + 7)  /* '(' */
+#define RE_TOKEN_ENDGROUP       (RE_TOKEN_XBASE + 8)  /* ')' */
+#define RE_TOKEN_ALTERNATION    (RE_TOKEN_XBASE + 9)  /* '|' */
+#define RE_TOKEN_BK_w           (RE_TOKEN_XBASE + 10) /* '\w' (<[:symcont:]>  -- REOP_ASCII_ISSYMCONT / REOP_UTF8_ISSYMCONT) */
+#define RE_TOKEN_BK_W           (RE_TOKEN_XBASE + 11) /* '\W' (<[^:symcont:]> -- REOP_ASCII_ISSYMCONT_NOT / REOP_UTF8_ISSYMCONT_NOT) */
+#define RE_TOKEN_BK_s           (RE_TOKEN_XBASE + 12) /* '\s' (<[:space:]>    -- REOP_ASCII_ISSPACE / REOP_UTF8_ISSPACE) */
+#define RE_TOKEN_BK_S           (RE_TOKEN_XBASE + 13) /* '\S' (<[^:space:]>   -- REOP_ASCII_ISSPACE_NOT / REOP_UTF8_ISSPACE_NOT) */
+#define RE_TOKEN_BK_d           (RE_TOKEN_XBASE + 14) /* '\d' (<[:digit:]>    -- REOP_ASCII_ISDIGIT / REOP_UTF8_ISDIGIT) */
+#define RE_TOKEN_BK_D           (RE_TOKEN_XBASE + 15) /* '\D' (<[^:digit:]>   -- REOP_ASCII_ISDIGIT_NOT / REOP_UTF8_ISDIGIT_NOT) */
+#define RE_TOKEN_BK_n           (RE_TOKEN_XBASE + 16) /* '\n' (<[:lf:]>       -- [\r\n] / REOP_UTF8_ISLF) */
+#define RE_TOKEN_BK_N           (RE_TOKEN_XBASE + 17) /* '\N' (<[:lf:]>       -- [^\r\n] / REOP_UTF8_ISLF_NOT) */
+#define RE_TOKEN_AT_MIN         RE_TOKEN_AT_SOL
+#define RE_TOKEN_AT_SOL         (RE_TOKEN_XBASE + 18) /* "^" */
+#define RE_TOKEN_AT_EOL         (RE_TOKEN_XBASE + 19) /* "$" */
+#define RE_TOKEN_AT_SOI         (RE_TOKEN_XBASE + 20) /* "\`" */
+#define RE_TOKEN_AT_EOI         (RE_TOKEN_XBASE + 21) /* "\'" */
+#define RE_TOKEN_AT_WOB         (RE_TOKEN_XBASE + 22) /* "\b" */
+#define RE_TOKEN_AT_WOB_NOT     (RE_TOKEN_XBASE + 23) /* "\B" */
+#define RE_TOKEN_AT_SOW         (RE_TOKEN_XBASE + 24) /* "\<" */
+#define RE_TOKEN_AT_EOW         (RE_TOKEN_XBASE + 25) /* "\>" */
+#define RE_TOKEN_AT_SOS         (RE_TOKEN_XBASE + 26) /* "\_<" */
+#define RE_TOKEN_AT_EOS         (RE_TOKEN_XBASE + 27) /* "\_>" */
+#define RE_TOKEN_AT_MAX         RE_TOKEN_AT_EOS
+#define RE_TOKEN_BKREF_1        (RE_TOKEN_XBASE + 28) /* "\1" */
+#define RE_TOKEN_BKREF_2        (RE_TOKEN_XBASE + 29) /* "\2" */
+#define RE_TOKEN_BKREF_3        (RE_TOKEN_XBASE + 30) /* "\3" */
+#define RE_TOKEN_BKREF_4        (RE_TOKEN_XBASE + 31) /* "\4" */
+#define RE_TOKEN_BKREF_5        (RE_TOKEN_XBASE + 32) /* "\5" */
+#define RE_TOKEN_BKREF_6        (RE_TOKEN_XBASE + 33) /* "\6" */
+#define RE_TOKEN_BKREF_7        (RE_TOKEN_XBASE + 34) /* "\7" */
+#define RE_TOKEN_BKREF_8        (RE_TOKEN_XBASE + 35) /* "\8" */
+#define RE_TOKEN_BKREF_9        (RE_TOKEN_XBASE + 36) /* "\9" */
+#define RE_TOKEN_ERROR(code)    (RE_TOKEN_XBASE + 37 + (code)) /* Propagate error-condition */
+#define RE_TOKEN_ISERROR(code)  ((code) >= RE_TOKEN_ERROR(0))
+#define RE_TOKEN_GETERROR(code) ((re_errno_t)((code)-RE_TOKEN_ERROR(0)))
+#define RE_TOKEN_UNMATCHED_BK   RE_TOKEN_ERROR(RE_EESCAPE)
+#define RE_TOKEN_ILLSEQ         RE_TOKEN_ERROR(RE_EILLSEQ)
+#define RE_TOKEN_EOF            RE_TOKEN_ERROR(RE_EEND)
 
 /* Parse and yield the next regex-token pointed-to by `self->rep_pos'.
  * @return: * : A unicode character, or one of `RE_TOKEN_*' */
