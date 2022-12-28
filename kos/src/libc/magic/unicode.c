@@ -2248,6 +2248,9 @@ __LONGDOUBLE __unicode_descriptor_digitld($uint8_t digit_idx);
 
 @@>> unicode_fold(3)
 @@Fold the given unicode character `ch'
+@@@param: ch:  The unicode character to case-fold
+@@@param: buf: Output buffer for the case-folding sequence
+@@@return: * : A pointer into `buf' to 1 past the last-written character
 [[libc, inline, no_extern_inline, nonnull, userimpl]]
 [[decl_include("<hybrid/typecore.h>")]]
 char32_t *unicode_fold(char32_t ch, [[out]] char32_t buf[3]) {

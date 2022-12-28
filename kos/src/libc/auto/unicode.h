@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe323819a */
+/* HASH CRC-32:0xa2a9b82c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -592,7 +592,10 @@ INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBDCALL libd___unicode_descriptor_digi
  * @param: digit_idx: As read from `__unitraits::__ut_digit_idx' */
 INTDEF ATTR_CONST WUNUSED __LONGDOUBLE NOTHROW(LIBDCALL libd___unicode_descriptor_digitld)(uint8_t digit_idx);
 /* >> unicode_fold(3)
- * Fold the given unicode character `ch' */
+ * Fold the given unicode character `ch'
+ * @param: ch:  The unicode character to case-fold
+ * @param: buf: Output buffer for the case-folding sequence
+ * @return: * : A pointer into `buf' to 1 past the last-written character */
 INTDEF ATTR_RETNONNULL ATTR_OUT(2) char32_t *NOTHROW_NCX(LIBDCALL libd_unicode_fold)(char32_t ch, char32_t buf[3]);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27bb45c6 */
+/* HASH CRC-32:0x5a3734ef */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1419,11 +1419,17 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__unicode_descrip
 
 #ifdef __CRT_HAVE_unicode_fold
 /* >> unicode_fold(3)
- * Fold the given unicode character `ch' */
+ * Fold the given unicode character `ch'
+ * @param: ch:  The unicode character to case-fold
+ * @param: buf: Output buffer for the case-folding sequence
+ * @return: * : A pointer into `buf' to 1 past the last-written character */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_OUT(2),char32_t *,__NOTHROW_NCX,unicode_fold,(char32_t __ch, char32_t __buf[3]),(__ch,__buf))
 #else /* __CRT_HAVE_unicode_fold */
 /* >> unicode_fold(3)
- * Fold the given unicode character `ch' */
+ * Fold the given unicode character `ch'
+ * @param: ch:  The unicode character to case-fold
+ * @param: buf: Output buffer for the case-folding sequence
+ * @return: * : A pointer into `buf' to 1 past the last-written character */
 __LOCAL __ATTR_RETNONNULL __ATTR_OUT(2) char32_t *__NOTHROW_NCX(__LIBCCALL unicode_fold)(char32_t __ch, char32_t __buf[3]) { __buf[0] = __ch; return __buf + 1; }
 #endif /* !__CRT_HAVE_unicode_fold */
 

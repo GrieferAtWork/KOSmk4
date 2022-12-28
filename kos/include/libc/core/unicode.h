@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2660232a */
+/* HASH CRC-32:0x54ec622 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -214,12 +214,18 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGDOUBLE,__NOTHROW,__libc_core___uni
 #ifdef __CRT_HAVE_unicode_fold
 #include <hybrid/typecore.h>
 /* >> unicode_fold(3)
- * Fold the given unicode character `ch' */
+ * Fold the given unicode character `ch'
+ * @param: ch:  The unicode character to case-fold
+ * @param: buf: Output buffer for the case-folding sequence
+ * @return: * : A pointer into `buf' to 1 past the last-written character */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_OUT(2),__CHAR32_TYPE__ *,__NOTHROW_NCX,__libc_core_unicode_fold,(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __buf[3]),unicode_fold,(__ch,__buf))
 #else /* __CRT_HAVE_unicode_fold */
 #include <hybrid/typecore.h>
 /* >> unicode_fold(3)
- * Fold the given unicode character `ch' */
+ * Fold the given unicode character `ch'
+ * @param: ch:  The unicode character to case-fold
+ * @param: buf: Output buffer for the case-folding sequence
+ * @return: * : A pointer into `buf' to 1 past the last-written character */
 __LOCAL __ATTR_RETNONNULL __ATTR_OUT(2) __CHAR32_TYPE__ *__NOTHROW_NCX(__LIBCCALL __libc_core_unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __buf[3]) { __buf[0] = __ch; return __buf + 1; }
 #endif /* !__CRT_HAVE_unicode_fold */
 

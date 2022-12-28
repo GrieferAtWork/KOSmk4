@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xffc5d1b */
+/* HASH CRC-32:0xe54bb26d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,7 +84,10 @@
 #define __libc___unicode_descriptor_digitld __libc_core___unicode_descriptor_digitld
 #endif /* !____libc___unicode_descriptor_digitld_defined && ____libc_core___unicode_descriptor_digitld_defined */
 /* >> unicode_fold(3)
- * Fold the given unicode character `ch' */
+ * Fold the given unicode character `ch'
+ * @param: ch:  The unicode character to case-fold
+ * @param: buf: Output buffer for the case-folding sequence
+ * @return: * : A pointer into `buf' to 1 past the last-written character */
 #define __libc_unicode_fold __libc_core_unicode_fold
 #define __LIBC_UNICODE_UTF8_MAXLEN              8
 #define __LIBC_UNICODE_UTF8_CURLEN              7

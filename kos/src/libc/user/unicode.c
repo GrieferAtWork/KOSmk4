@@ -184,9 +184,12 @@ NOTHROW(LIBCCALL libc___unicode_descriptor_digitld)(uint8_t digit_idx)
 #endif /* MAGIC:alias */
 /*[[[end:libc___unicode_descriptor_digitld]]]*/
 
-/*[[[head:libc_unicode_fold,hash:CRC-32=0x33fdf49d]]]*/
+/*[[[head:libc_unicode_fold,hash:CRC-32=0x6a9568d6]]]*/
 /* >> unicode_fold(3)
- * Fold the given unicode character `ch' */
+ * Fold the given unicode character `ch'
+ * @param: ch:  The unicode character to case-fold
+ * @param: buf: Output buffer for the case-folding sequence
+ * @return: * : A pointer into `buf' to 1 past the last-written character */
 INTERN ATTR_SECTION(".text.crt.unicode.UTF") ATTR_RETNONNULL ATTR_OUT(2) char32_t *
 NOTHROW_NCX(LIBCCALL libc_unicode_fold)(char32_t ch,
                                         char32_t buf[3])

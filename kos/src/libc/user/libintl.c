@@ -68,7 +68,7 @@ DECL_BEGIN
 
 
 
-/* Broadcast a notification that return value of `gettext()' may have changed. */
+/* Broadcast a notification that return values of `gettext()' may have changed. */
 #ifndef notify_gettext_maybe_changed
 #define notify_gettext_maybe_changed() \
 	(void)(++_nl_msg_cat_cntr)
@@ -1541,7 +1541,7 @@ DEFINE_PUBLIC_ALIAS(_nl_domain_bindings, libc__nl_domain_bindings);
 
 /* This one is (probably accidentally) exported by Glibc. Supposedly,
  * it is used to  facilitate translations of libc-internal  messages,
- * though we don't use it any only provide it for compat. */
+ * though we don't use it and only provide it for compat. */
 INTERN ATTR_SECTION(".rodata.crt.i18n")
 char const libc__libc_intl_domainname[] = "libc";
 DEFINE_PUBLIC_ALIAS(_libc_intl_domainname, libc__libc_intl_domainname);
