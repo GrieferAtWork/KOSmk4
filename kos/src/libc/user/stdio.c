@@ -1422,6 +1422,7 @@ file_ungetc(FILE *__restrict self, unsigned char ch) {
 
 	/* Finally, insert the character into the buffer. */
 unget_in_buffer:
+	self->if_flag &= ~IO_EOF;
 	*--self->if_ptr = (uint8_t)(unsigned char)(unsigned int)ch;
 	++self->if_cnt;
 	return (int)(unsigned int)ch;
@@ -1433,7 +1434,18 @@ err:
 	return EOF;
 }
 
-
+INTERN WUNUSED ATTR_SECTION(".text.crt.FILE.core.read") NONNULL((1)) int LIBCCALL
+file_sungetc(FILE *__restrict self) {
+	int result;
+	if (self->if_ptr > self->if_base) {
+		self->if_flag &= ~IO_EOF;
+		result = *--self->if_ptr;
+		++self->if_cnt;
+	} else {
+		result = EOF;
+	}
+	return result;
+}
 
 INTERN WUNUSED ATTR_SECTION(".text.crt.FILE.core.write") NONNULL((1)) int LIBCCALL
 file_truncate(FILE *__restrict self, pos64_t new_size) {
@@ -2591,6 +2603,229 @@ NOTHROW_NCX(LIBCCALL libc_ungetc)(int ch,
 	return result;
 }
 /*[[[end:libc_ungetc]]]*/
+
+/* From: libc4/5 */
+DEFINE_PUBLIC_ALIAS(_IO_sputbackc, libc__IO_sputbackc);
+DEFINE_PUBLIC_ALIAS(_IO_default_pbackfail, libc__IO_sputbackc);
+INTERN ATTR_SECTION(".text.crt.compat.linux") int
+NOTHROW_NCX(LIBCCALL libc__IO_sputbackc)(FILE *__restrict stream, int ch) {
+	return libc_ungetc(ch, stream);
+}
+
+DEFINE_PUBLIC_ALIAS(_IO_sungetc, libc__IO_sungetc);
+INTERN ATTR_SECTION(".text.crt.compat.linux") int
+NOTHROW_NCX(LIBCCALL libc__IO_sungetc)(FILE *__restrict stream) {
+	int result;
+	if unlikely(!stream)
+		return libc_seterrno_and_return_EOF(EINVAL);
+	stream = file_fromuser(stream);
+	if (FMUSTLOCK(stream)) {
+		file_lock_write(stream);
+		result = file_sungetc(stream);
+		file_lock_endwrite(stream);
+	} else {
+		result = file_sungetc(stream);
+	}
+	return result;
+}
+
+DEFINE_PUBLIC_ALIAS(_IO_un_link, libc__IO_nop);        /* Supposed to call `allfiles_remove(stream)' here that would break `fclose(3)' */
+DEFINE_PUBLIC_ALIAS(_IO_link_in, libc__IO_nop);        /* Supposed to call `allfiles_insert(stream)' here that would break `fclose(3)' */
+DEFINE_PUBLIC_ALIAS(_IO_default_finish, libc__IO_nop); /* Supposed to do cleanup, but we only do that in `fclose(3)' */
+DEFINE_PUBLIC_ALIAS(_IO_unsave_markers, libc__IO_nop); /* Supposed to clean up markers (which we don't implement) */
+DEFINE_PUBLIC_ALIAS(_IO_remove_marker, libc__IO_nop);  /* Supposed to clean up markers (which we don't implement) */
+INTERN ATTR_SECTION(".text.crt.compat.linux") NONNULL((1)) void
+NOTHROW_NCX(LIBCCALL libc__IO_nop)(FILE *__restrict stream) {
+	(void)stream;
+	COMPILER_IMPURE();
+}
+
+DEFINE_PUBLIC_ALIAS(_IO_unbuffer_all, libc__IO_unbuffer_all);
+INTERN ATTR_SECTION(".text.crt.compat.linux") void
+NOTHROW_NCX(LIBCCALL libc__IO_unbuffer_all)(void) {
+	FILE *fp;
+	all_files_read();
+	LIST_FOREACH (fp, &all_files, if_exdata->io_link) {
+		setvbuf(file_touser(fp), NULL, _IONBF, 0);
+	}
+	all_files_endread();
+}
+
+DEFINE_PUBLIC_ALIAS(_IO_ignore, libc__IO_ignore);
+INTERN ATTR_SECTION(".text.crt.compat.linux") NONNULL((1)) size_t
+NOTHROW_NCX(LIBCCALL libc__IO_ignore)(FILE *__restrict stream, size_t n) {
+	size_t result = 0;
+	/* Super inefficient, but we're only here for compat, so that's OK. */
+	while (result < n) {
+		if (fgetc(stream) == EOF)
+			break;
+		++result;
+	}
+	return result;
+}
+
+DEFINE_PUBLIC_ALIAS(_IO_padn, libc__IO_padn);
+INTERN ATTR_SECTION(".text.crt.compat.linux") NONNULL((1)) ssize_t
+NOTHROW_NCX(LIBCCALL libc__IO_padn)(FILE *__restrict stream, int padch, size_t n) {
+	size_t result = 0;
+	/* Super inefficient, but we're only here for compat, so that's OK. */
+	while (result < n) {
+		if (fputc(padch, stream) == EOF)
+			break;
+		++result;
+	}
+	return result;
+}
+
+DEFINE_PUBLIC_ALIAS(_IO_do_write, libc__IO_do_write);
+INTERN ATTR_SECTION(".text.crt.compat.linux") NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc__IO_do_write)(FILE *__restrict stream,
+                                        void const *buf, size_t buflen) {
+	size_t result;
+	result = fwrite(buf, 1, buflen, stream);
+	return result == buflen ? 0 : EOF;
+}
+
+DEFINE_PUBLIC_ALIAS(_IO_default_xsputn, libc__IO_default_xsputn);
+INTERN ATTR_SECTION(".text.crt.compat.linux") NONNULL((1)) size_t
+NOTHROW_NCX(LIBCCALL libc__IO_default_xsputn)(FILE *__restrict stream,
+                                              void const *buf, size_t buflen) {
+	return fwrite(buf, 1, buflen, stream);
+}
+
+DEFINE_PUBLIC_ALIAS(_IO_sgetn, libc__IO_sgetn);
+DEFINE_PUBLIC_ALIAS(_IO_default_xsgetn, libc__IO_sgetn);
+INTERN ATTR_SECTION(".text.crt.compat.linux") NONNULL((1)) size_t
+NOTHROW_NCX(LIBCCALL libc__IO_sgetn)(FILE *__restrict stream,
+                                     void *buf, size_t buflen) {
+	return fread(buf, 1, buflen, stream);
+}
+
+DEFINE_PUBLIC_ALIAS(_IO_nobackup_pbackfail, libc__IO_nobackup_pbackfail);
+INTERN ATTR_SECTION(".text.crt.compat.linux") NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc__IO_nobackup_pbackfail)(FILE *__restrict stream, int ch) {
+	stream = file_fromuser(stream);
+	if (stream->if_ptr > stream->if_base) {
+		--stream->if_ptr;
+		++stream->if_cnt;
+	}
+	if (stream->if_cnt && ch != EOF)
+		*stream->if_ptr = (unsigned char)(unsigned int)ch;
+	return (int)(unsigned int)(unsigned char)(unsigned int)ch;
+}
+
+DEFINE_PUBLIC_ALIAS(_IO_setb, libc__IO_setb);
+INTERN ATTR_SECTION(".text.crt.compat.linux") NONNULL((1)) void
+NOTHROW_NCX(LIBCCALL libc__IO_setb)(FILE *__restrict stream,
+                                    void *bufbase,
+                                    void *bufend,
+                                    int set_IO_MALLBUF) {
+	stream = file_fromuser(stream);
+	if (stream->if_flag & IO_MALLBUF)
+		free(stream->if_base);
+	stream->if_flag &= ~(IO_MALLBUF | IO_NODYNSCALE | IO_LNBUF | IO_LNIFTYY);
+	stream->if_ptr  = (unsigned char *)bufbase;
+	stream->if_base = (unsigned char *)bufbase;
+	stream->if_cnt  = (uint32_t)(size_t)((byte_t *)bufend - (byte_t *)bufbase);
+	stream->if_exdata->io_chng = stream->if_base;
+	if (set_IO_MALLBUF)
+		stream->if_flag |= IO_MALLBUF;
+}
+
+DEFINE_PUBLIC_ALIAS(_IO_doallocbuf, libc__IO_doallocbuf);
+DEFINE_PUBLIC_ALIAS(_IO_default_doallocate, libc__IO_doallocbuf);
+INTERN ATTR_SECTION(".text.crt.compat.linux") NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc__IO_doallocbuf)(FILE *__restrict stream) {
+	stream = file_fromuser(stream);
+	if (stream->if_cnt != 0 || stream->if_ptr > stream->if_base)
+		goto done; /* Already has a buffer. */
+	if (file_setmode(stream, NULL, _IOFBF, IOBUF_MIN) == 0)
+		goto done; /* Was able to assign a dynamically allocated buffer. */
+	/* Fun fact: KOS's stdio also has an inline buffer. And even though
+	 * it's  normally only there for DOS-compat, we can actually use it
+	 * for its intended purpose here! */
+	libc__IO_setb(file_touser(stream),
+	              stream->if_charbuf,
+	              stream->if_charbuf + lengthof(stream->if_charbuf),
+	              0);
+done:
+	return 1; /* NOTE: Only `_IO_default_doallocate()' has return value (`_IO_doallocbuf()' returns void) */
+}
+
+INTERN ATTR_SECTION(".text.crt.compat.linux") NONNULL((1)) int64_t
+NOTHROW_NCX(LIBCCALL libc__IO_return_M1_R1)(FILE *__restrict stream) {
+	(void)stream;
+	COMPILER_IMPURE();
+	return -1;
+}
+INTERN ATTR_SECTION(".text.crt.compat.linux") NONNULL((1)) int64_t
+NOTHROW_NCX(LIBCCALL libc__IO_return_0_R1)(FILE *__restrict stream) {
+	(void)stream;
+	COMPILER_IMPURE();
+	return 0;
+}
+#ifdef __LIBCCALL_CALLER_CLEANUP
+#define libc__IO_return_M1_R2 libc__IO_return_M1_R1
+#define libc__IO_return_M1_R3 libc__IO_return_M1_R1
+#define libc__IO_return_0_R2  libc__IO_return_0_R1
+#define libc__IO_return_0_R3  libc__IO_return_0_R1
+#else /* __LIBCCALL_CALLER_CLEANUP */
+INTERN ATTR_SECTION(".text.crt.compat.linux") NONNULL((1)) int64_t
+NOTHROW_NCX(LIBCCALL libc__IO_return_M1_R2)(FILE *__restrict stream, void *a) {
+	(void)stream;
+	(void)a;
+	COMPILER_IMPURE();
+	return -1;
+}
+INTERN ATTR_SECTION(".text.crt.compat.linux") NONNULL((1)) int64_t
+NOTHROW_NCX(LIBCCALL libc__IO_return_M1_R3)(FILE *__restrict stream, void *a, void *b) {
+	(void)stream;
+	(void)a;
+	(void)b;
+	COMPILER_IMPURE();
+	return -1;
+}
+INTERN ATTR_SECTION(".text.crt.compat.linux") NONNULL((1)) int64_t
+NOTHROW_NCX(LIBCCALL libc__IO_return_0_R2)(FILE *__restrict stream, void *a) {
+	(void)stream;
+	(void)a;
+	COMPILER_IMPURE();
+	return 0;
+}
+INTERN ATTR_SECTION(".text.crt.compat.linux") NONNULL((1)) int64_t
+NOTHROW_NCX(LIBCCALL libc__IO_return_0_R3)(FILE *__restrict stream, void *a, void *b) {
+	(void)stream;
+	(void)a;
+	(void)b;
+	COMPILER_IMPURE();
+	return 0;
+}
+#endif /* !__LIBCCALL_CALLER_CLEANUP */
+DEFINE_PUBLIC_ALIAS(_IO_default_underflow, libc__IO_return_M1_R1);
+DEFINE_PUBLIC_ALIAS(_IO_default_seek, libc__IO_return_M1_R3);
+DEFINE_PUBLIC_ALIAS(_IO_default_stat, libc__IO_return_M1_R2);
+DEFINE_PUBLIC_ALIAS(_IO_default_read, libc__IO_return_M1_R3);
+DEFINE_PUBLIC_ALIAS(_IO_default_sync, libc__IO_return_0_R1);
+DEFINE_PUBLIC_ALIAS(_IO_default_write, libc__IO_return_0_R3);
+DEFINE_PUBLIC_ALIAS(_IO_marker_delta, libc__IO_return_0_R1);
+DEFINE_PUBLIC_ALIAS(_IO_marker_difference, libc__IO_return_0_R2);
+DEFINE_PUBLIC_ALIAS(_IO_init_marker, libc__IO_return_0_R2); /* Actually returns void */
+DEFINE_PUBLIC_ALIAS(_IO_least_marker, libc__IO_return_0_R1);
+
+/* We don't keep track of any column values... (so don't implement these) */
+DEFINE_PUBLIC_ALIAS(_IO_get_column, libc__IO_return_M1_R1);
+DEFINE_PUBLIC_ALIAS(_IO_set_column, libc__IO_return_0_R2);
+DEFINE_PUBLIC_ALIAS(_IO_adjust_column, libc__IO_adjust_column);
+INTERN ATTR_SECTION(".text.crt.compat.linux") unsigned int
+NOTHROW_NCX(LIBCCALL libc__IO_adjust_column)(unsigned int start,
+                                             char const *line,
+                                             unsigned int count) {
+	COMPILER_IMPURE();
+	(void)line;
+	(void)count;
+	return start;
+}
+
 
 /*[[[head:libc_ungetc_unlocked,hash:CRC-32=0x96fcb2cb]]]*/
 INTERN ATTR_SECTION(".text.crt.FILE.unlocked.read.getc") ATTR_INOUT(2) int
@@ -4021,7 +4256,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x3698e634]]]*/
+/*[[[start:exports,hash:CRC-32=0xf27cb155]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$__rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$rename, libd_rename);
@@ -4037,11 +4272,13 @@ DEFINE_PUBLIC_ALIAS(_IO_fclose, libc_fclose);
 DEFINE_PUBLIC_ALIAS(fclose, libc_fclose);
 DEFINE_PUBLIC_ALIAS(fflush, libc_fflush);
 DEFINE_PUBLIC_ALIAS(_IO_fflush, libc_fflush);
+DEFINE_PUBLIC_ALIAS(_IO_sync, libc_fflush);
 DEFINE_PUBLIC_ALIAS(setvbuf, libc_setvbuf);
 DEFINE_PUBLIC_ALIAS(_IO_setvbuf, libc_setvbuf);
 DEFINE_PUBLIC_ALIAS(getc, libc_fgetc);
 DEFINE_PUBLIC_ALIAS(fgetc, libc_fgetc);
 DEFINE_PUBLIC_ALIAS(_IO_getc, libc_fgetc);
+DEFINE_PUBLIC_ALIAS(_IO_default_uflow, libc_fgetc);
 DEFINE_PUBLIC_ALIAS(putc, libc_fputc);
 DEFINE_PUBLIC_ALIAS(fputc, libc_fputc);
 DEFINE_PUBLIC_ALIAS(_IO_putc, libc_fputc);
@@ -4194,6 +4431,7 @@ DEFINE_PUBLIC_ALIAS(funopen2, libc_funopen2);
 DEFINE_PUBLIC_ALIAS(funopen2_64, libc_funopen2_64);
 DEFINE_PUBLIC_ALIAS(_flushall, libc__flushall);
 DEFINE_PUBLIC_ALIAS(_IO_flush_all, libc__flushall);
+DEFINE_PUBLIC_ALIAS(_IO_cleanup, libc__flushall);
 DEFINE_PUBLIC_ALIAS(_rmtmp, libc__rmtmp);
 DEFINE_PUBLIC_ALIAS(__uflow, libc__filbuf);
 DEFINE_PUBLIC_ALIAS(__underflow, libc__filbuf);

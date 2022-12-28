@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc16fb0b */
+/* HASH CRC-32:0x2b93b39 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4335,6 +4335,7 @@ DEFINE_PUBLIC_ALIAS(DOS$removeat, libd_removeat);
 DEFINE_PUBLIC_ALIAS(removeat, libc_removeat);
 DEFINE_PUBLIC_ALIAS(tmpnam_r, libc_tmpnam_r);
 DEFINE_PUBLIC_ALIAS(_IO_setbuffer, libc_setbuffer);
+DEFINE_PUBLIC_ALIAS(_IO_default_setbuf, libc_setbuffer);
 DEFINE_PUBLIC_ALIAS(setbuffer, libc_setbuffer);
 DEFINE_PUBLIC_ALIAS(setlinebuf, libc_setlinebuf);
 DEFINE_PUBLIC_ALIAS(vasnprintf, libc_vasnprintf);

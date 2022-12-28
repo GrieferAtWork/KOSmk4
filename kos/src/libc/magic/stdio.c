@@ -856,7 +856,7 @@ int fclose([[inout]] FILE *__restrict stream);
 
 @@>> fflush(3)
 @@Flush any unwritten data from `stream' to the underlying filesystem/TTY
-[[std, cp_stdio, no_crt_self_import, no_crt_self_export, export_as(CNL_fflush...)]]
+[[std, cp_stdio, no_crt_self_import, no_crt_self_export, export_as(CNL_fflush...), kos_export_as("_IO_sync")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), alias(CNL_fflush_unlocked...)]]
 [[                                                                           alias(CNL_fflush...)]]
 [[                                                                           alias(CNL_fflush_unlocked...)]]
@@ -903,7 +903,7 @@ int setvbuf([[inout]] FILE *__restrict stream,
 @@Read and return a single character from `stream'
 @@If  the given `stream' has been exhausted or if an error occurred, `EOF' is
 @@returned and the exact cause can be determined by using `ferror' and `feof'
-[[std, cp_stdio, no_crt_self_import, no_crt_self_export, export_as(CNL_fgetc...)]]
+[[std, cp_stdio, no_crt_self_import, no_crt_self_export, export_as(CNL_fgetc...), kos_export_as("_IO_default_uflow")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), alias(CNL_fgetc_unlocked...)]]
 [[                                                                           alias(CNL_fgetc...)]]
 [[                                                                           alias(CNL_fgetc_unlocked...)]]
@@ -1771,7 +1771,7 @@ char *tmpnam_r([[out_opt]] char *buf) {
 
 @@>> setbuffer(3)
 @@Specify the location and size for the buffer to-be used by `stream'
-[[decl_include("<hybrid/typecore.h>"), export_alias("_IO_setbuffer")]]
+[[decl_include("<hybrid/typecore.h>"), export_alias("_IO_setbuffer"), kos_export_as("_IO_default_setbuf")]]
 [[requires_include("<asm/crt/stdio.h>"), impl_include("<asm/crt/stdio.h>")]]
 [[requires(defined(___IOFBF) && defined(___IONBF) && $has_function(setvbuf))]]
 [[section(".text.crt{|.dos}.FILE.locked.read.utility")]]
@@ -4910,7 +4910,7 @@ $FILE *_fsopen([[in]] char const *filename,
 
 %[insert:function(_fdopen = fdopen)]
 
-[[cp_stdio, userimpl, no_crt_self_import, no_crt_self_export, export_as(CNL_flushall...)]]
+[[cp_stdio, userimpl, no_crt_self_import, no_crt_self_export, export_as(CNL_flushall...), kos_export_as("_IO_cleanup")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), alias(CNL_flushall_unlocked...)]]
 [[                                                                           alias(CNL_flushall...)]]
 [[                                                                           alias(CNL_flushall_unlocked...)]]

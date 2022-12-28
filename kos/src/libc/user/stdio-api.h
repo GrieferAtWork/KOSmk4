@@ -219,6 +219,7 @@ INTDEF NONNULL((1)) size_t LIBCCALL file_writedata(FILE *__restrict self, void c
 INTDEF NONNULL((1)) pos64_t LIBCCALL file_seek(FILE *__restrict self, off64_t off, int whence);
 INTDEF WUNUSED NONNULL((1)) int LIBCCALL file_getc(FILE *__restrict self);
 INTDEF WUNUSED NONNULL((1)) int LIBCCALL file_ungetc(FILE *__restrict self, unsigned char ch);
+INTERN WUNUSED NONNULL((1)) int LIBCCALL file_sungetc(FILE *__restrict self);
 INTDEF WUNUSED NONNULL((1)) int LIBCCALL file_truncate(FILE *__restrict self, pos64_t new_size);
 
 /* @param: poflags: When non-NULL, filled with `O_*'
