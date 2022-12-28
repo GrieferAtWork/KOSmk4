@@ -52,7 +52,7 @@
 #define FCALL __FCALL
 #endif /* !FCALL */
 
-#if !defined(NDEBUG) && 1
+#if !defined(NDEBUG) && 0
 #include <syslog.h>
 #define WX_DEBUG(format, ...) \
 	syslog(LOG_DEBUG, "[libc][wordexp][%d] " format, __LINE__, ##__VA_ARGS__)
