@@ -1595,6 +1595,155 @@ default_escaped_char:
 	return ch;
 }
 
+struct collating_char {
+	char cc_name[23]; /* Collating char name */
+	char cc_char;     /* ASCII character */
+};
+
+/* Collating character names from the POSIX locale (NOTE: must be sorted by `cc_name'). */
+PRIVATE struct collating_char const posix_locale_cchars[] = {
+#define CCHAR(name, ascii_ch) { name, ascii_ch }
+	{ "ACK", /*                 */ 0x06 },
+	{ "BEL", /*                 */ 0x07 },
+	{ "BS", /*                  */ 0x08 },
+	{ "CAN", /*                 */ 0x18 },
+	{ "CR", /*                  */ 0x0d },
+	{ "DC1", /*                 */ 0x11 },
+	{ "DC2", /*                 */ 0x12 },
+	{ "DC3", /*                 */ 0x13 },
+	{ "DC4", /*                 */ 0x14 },
+	{ "DEL", /*                 */ 0x7f },
+	{ "DLE", /*                 */ 0x10 },
+	{ "EM", /*                  */ 0x19 },
+	{ "ENQ", /*                 */ 0x05 },
+	{ "EOT", /*                 */ 0x04 },
+	{ "ESC", /*                 */ 0x1b },
+	{ "ETB", /*                 */ 0x17 },
+	{ "ETX", /*                 */ 0x03 },
+	{ "FF", /*                  */ 0x0c },
+	{ "FS", /*                  */ 0x1c },
+	{ "GS", /*                  */ 0x1d },
+	{ "HT", /*                  */ 0x09 },
+	{ "IS1", /*                 */ 0x1f },
+	{ "IS2", /*                 */ 0x1e },
+	{ "IS3", /*                 */ 0x1d },
+	{ "IS4", /*                 */ 0x1c },
+	{ "LF", /*                  */ 0x0a },
+	{ "NAK", /*                 */ 0x15 },
+	{ "NUL", /*                 */ 0x01 },
+	{ "RS", /*                  */ 0x1e },
+	{ "SI", /*                  */ 0x0f },
+	{ "SO", /*                  */ 0x0e },
+	{ "SOH", /*                 */ 0x01 },
+	{ "STX", /*                 */ 0x02 },
+	{ "SUB", /*                 */ 0x1a },
+	{ "SYN", /*                 */ 0x16 },
+	{ "US", /*                  */ 0x1f },
+	{ "VT", /*                  */ 0x0b },
+	{ "alert", /*               */ 0x07 },
+	{ "ampersand", /*           */ '&' },
+	{ "apostrophe", /*          */ '\'' },
+	{ "asterisk", /*            */ '*' },
+	{ "backslash", /*           */ '\\' },
+	{ "backspace", /*           */ 0x08 },
+	{ "carriage-return", /*     */ 0x0d },
+	{ "circumflex", /*          */ '^' },
+	{ "circumflex-accent", /*   */ '^' },
+	{ "colon", /*               */ ':' },
+	{ "comma", /*               */ ',' },
+	{ "commercial-at", /*       */ '@' },
+	{ "dollar-sign", /*         */ '$' },
+	{ "eight", /*               */ '8' },
+	{ "equals-sign", /*         */ '=' },
+	{ "exclamation-mark", /*    */ '!' },
+	{ "five", /*                */ '5' },
+	{ "form-feed", /*           */ 0x0c },
+	{ "four", /*                */ '4' },
+	{ "full-stop", /*           */ '.' },
+	{ "grave-accent", /*        */ '`' },
+	{ "greater-than-sign", /*   */ '>' },
+	{ "hyphen", /*              */ '-' },
+	{ "hyphen-minus", /*        */ '-' },
+	{ "left-brace", /*          */ '{' },
+	{ "left-curly-bracket", /*  */ '{' },
+	{ "left-parenthesis", /*    */ '(' },
+	{ "left-square-bracket", /* */ '[' },
+	{ "less-than-sign", /*      */ '<' },
+	{ "low-line", /*            */ '_' },
+	{ "newline", /*             */ 0x0a },
+	{ "nine", /*                */ '9' },
+	{ "number-sign", /*         */ '#' },
+	{ "one", /*                 */ '1' },
+	{ "percent-sign", /*        */ '%' },
+	{ "period", /*              */ '.' },
+	{ "plus-sign", /*           */ '+' },
+	{ "question-mark", /*       */ '?' },
+	{ "quotation-mark", /*      */ '"' },
+	{ "reverse-solidus", /*     */ '\\' },
+	{ "right-brace", /*         */ '}' },
+	{ "right-curly-bracket", /* */ '}' },
+	{ "right-parenthesis", /*   */ ')' },
+	{ "right-square-bracket", /**/ ']' },
+	{ "semicolon", /*           */ ';' },
+	{ "seven", /*               */ '7' },
+	{ "six", /*                 */ '6' },
+	{ "slash", /*               */ '/' },
+	{ "solidus", /*             */ '/' },
+	{ "space", /*               */ ' ' },
+	{ "tab", /*                 */ 0x09 },
+	{ "three", /*               */ '3' },
+	{ "tilde", /*               */ '~' },
+	{ "two", /*                 */ '2' },
+	{ "underscore", /*          */ '_' },
+	{ "vertical-line", /*       */ '|' },
+	{ "vertical-tab", /*        */ 0x0b },
+	{ "zero", /*                */ '0' },
+#undef CCHAR
+};
+
+/* Parse a collating character, or a single unicode character
+ * - Returns `RE_TOKEN_EOF' if EOF was reached
+ * - Returns `RE_TOKEN_ILLSEQ' when at an illegal unicode sequence */
+PRIVATE WUNUSED NONNULL((1)) char32_t
+NOTHROW_NCX(CC re_parser_yield_collating_char)(struct re_parser *__restrict self) {
+	unsigned char ch;
+	size_t len;
+	ch = *self->rep_pos;
+	if (ch >= 0x80) /* Unicode chars can never be apart of collations */
+		return re_parser_yield_cs_literal(self);
+	if unlikely(!ch && self->rep_pos == self->rep_end)
+		return RE_TOKEN_EOF;
+	len = 1;
+	while (self->rep_pos[len] != '.' &&
+	       self->rep_pos[len] != '=' &&
+	       self->rep_pos[len] != '\0')
+		++len;
+	if (len > 1) {
+		/* Check if we can find the named collating char in `posix_locale_cchars' */
+		size_t lo = 0, hi = lengthof(posix_locale_cchars);
+		while (lo < hi) {
+			int diff;
+			size_t i;
+			i    = lo + ((hi - lo) >> 1);
+			diff = strcmpz(posix_locale_cchars[i].cc_name,
+			               self->rep_pos, len);
+			if (diff < 0) {
+				lo = i + 1;
+			} else if (diff > 0) {
+				hi = i;
+			} else {
+				/* Found it! */
+				self->rep_pos += len;
+				return (char32_t)(unsigned char)posix_locale_cchars[i].cc_char;
+			}
+		}
+	}
+
+	/* Regular, old ASCII character */
+	++self->rep_pos;
+	return ch;
+}
+
 PRIVATE WUNUSED NONNULL((1)) re_errno_t
 NOTHROW_NCX(CC re_compiler_compile_set)(struct re_compiler *__restrict self) {
 #define CHARSET_COUNT ((RECS_ISX_MAX - RECS_ISX_MIN) + 1)
@@ -1669,6 +1818,28 @@ loop_next:
 				bit_set(charsets, cs_opcode - RECS_ISX_MIN);
 				goto loop_next;
 			}
+			if ((*self->rec_parser.rep_pos == '.') ||
+			    (*self->rec_parser.rep_pos == '=')) {
+				/* Collating elements and equivalence classes */
+				char collmode = *self->rec_parser.rep_pos;
+				self->rec_parser.rep_pos += 1;
+				uchar = re_parser_yield_collating_char(&self->rec_parser);
+				if unlikely(uchar == RE_TOKEN_EOF)
+					goto err_EEND;
+				if unlikely(uchar == RE_TOKEN_ILLSEQ)
+					goto err_EILLSEQ;
+				if unlikely(*self->rec_parser.rep_pos != collmode)
+					goto err_ECOLLATE;
+				++self->rec_parser.rep_pos;
+				if unlikely(*self->rec_parser.rep_pos != ']')
+					goto err_BADPAT;
+				++self->rec_parser.rep_pos;
+				if (collmode == '=') {
+					/* TODO: Unicode equivalence classes (libc's <unicode.h> needs an API for this):
+					 * >> "[[=a=]]" must be similar to like "[aäâ]"  (plus any other character) */
+				}
+				goto encode_uchar_or_byte80h;
+			}
 			goto encode_literal;
 
 		case '\\':
@@ -1710,6 +1881,7 @@ loop_next:
 							goto err_EESCAPE;
 						if unlikely(uchar == RE_TOKEN_ILLSEQ)
 							goto err_EILLSEQ;
+encode_uchar_or_byte80h:
 						if (RE_TOKEN_ISBYTE80h(uchar)) {
 							ch = (unsigned char)(byte_t)RE_TOKEN_GETBYTE80h(uchar);
 							goto encode_byte_ch;
@@ -2151,6 +2323,9 @@ err_ERANGE:
 		goto _err_common;
 err_ECTYPE:
 		error = RE_ECTYPE;
+		goto _err_common;
+err_ECOLLATE:
+		error = RE_ECOLLATE;
 		goto _err_common;
 err_EEND:
 		error = RE_EEND;
@@ -3514,23 +3689,24 @@ err_nomem:
  * - rec_parser.rec_ngrp    == <greaters-referenced-group + 1>
  * - rec_parser.rec_nvar    == <greaters-referenced-var + 1>
  * - rec_parser.rec_grpinfo == <undefined>
- * @return: RE_NOERROR: Success
- * @return: RE_BADPAT:  General pattern syntax error.
- * @return: RE_ECTYPE:  Invalid/unknown character class name.
- * @return: RE_EESCAPE: Trailing backslash.
- * @return: RE_ESUBREG: Invalid back reference.
- * @return: RE_EBRACK:  Unmatched '['.
- * @return: RE_EPAREN:  Unmatched '('.
- * @return: RE_EBRACE:  Unmatched '{'.
- * @return: RE_BADBR:   Invalid contents of '{...}'.
- * @return: RE_ERANGE:  Invalid range end (e.g. '[z-a]').
- * @return: RE_ESPACE:  Out of memory.
- * @return: RE_BADRPT:  Nothing is preceding '+', '*', '?' or '{'.
- * @return: RE_EEND:    Unexpected end of pattern.
- * @return: RE_ESIZE:   Compiled pattern bigger than 2^16 bytes.
- * @return: RE_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
- * @return: RE_EILLSEQ: Illegal unicode character (when `RE_NO_UTF8' wasn't set)
- * @return: RE_EILLSET: Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
+ * @return: RE_NOERROR:  Success
+ * @return: RE_BADPAT:   General pattern syntax error.
+ * @return: RE_ECOLLATE: Unsupported/unknown collating character (in '[[.xxx.]]' and '[[=xxx=]]')
+ * @return: RE_ECTYPE:   Invalid/unknown character class name.
+ * @return: RE_EESCAPE:  Trailing backslash.
+ * @return: RE_ESUBREG:  Invalid back reference.
+ * @return: RE_EBRACK:   Unmatched '['.
+ * @return: RE_EPAREN:   Unmatched '('.
+ * @return: RE_EBRACE:   Unmatched '{'.
+ * @return: RE_BADBR:    Invalid contents of '{...}'.
+ * @return: RE_ERANGE:   Invalid range end (e.g. '[z-a]').
+ * @return: RE_ESPACE:   Out of memory.
+ * @return: RE_BADRPT:   Nothing is preceding '+', '*', '?' or '{'.
+ * @return: RE_EEND:     Unexpected end of pattern.
+ * @return: RE_ESIZE:    Compiled pattern bigger than 2^16 bytes.
+ * @return: RE_ERPAREN:  Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
+ * @return: RE_EILLSEQ:  Illegal unicode character (when `RE_NO_UTF8' wasn't set)
+ * @return: RE_EILLSET:  Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
 INTERN WUNUSED NONNULL((1)) re_errno_t
 NOTHROW_NCX(CC libre_compiler_compile)(struct re_compiler *__restrict self) {
 	re_errno_t error;

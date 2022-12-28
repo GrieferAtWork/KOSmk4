@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed719f0e */
+/* HASH CRC-32:0x5fa9eb89 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -187,24 +187,25 @@ INTDEF ATTR_INOUT(1) ATTR_OUT(2) void NOTHROW_NCX(LIBCCALL libc_re_set_registers
  * @param: self:    Storage for the produced regex pattern.
  * @param: pattern: The pattern to compile.
  * @param: cflags:  Set of `REG_EXTENDED | REG_ICASE | REG_NEWLINE | REG_NOSUB'
- * @return: REG_NOERROR: Success
- * @return: REG_BADPAT:  General pattern syntax error.
- * @return: REG_ECTYPE:  Invalid/unknown character class name.
- * @return: REG_EESCAPE: Trailing backslash.
- * @return: REG_ESUBREG: Invalid back reference.
- * @return: REG_EBRACK:  Unmatched '['.
- * @return: REG_EPAREN:  Unmatched '('.
- * @return: REG_EBRACE:  Unmatched '{'.
- * @return: REG_BADBR:   Invalid contents of '{...}'.
- * @return: REG_ERANGE:  Invalid range end (e.g. '[z-a]').
- * @return: REG_ESPACE:  Out of memory.
- * @return: REG_BADRPT:  Nothing is preceding '+', '*', '?' or '{'.
- * @return: REG_EEND:    Unexpected end of pattern.
- * @return: REG_ESIZE:   Compiled pattern bigger than 2^16 bytes.
- * @return: REG_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
- * @return: REG_EILLSEQ: Illegal unicode character (when `RE_NO_UTF8' wasn't set)
- * @return: REG_EILLSET: Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]")
- * @return: REG_ENOSYS:  Unable to load `libregex.so' (shouldn't happen) */
+ * @return: REG_NOERROR:  Success
+ * @return: REG_BADPAT:   General pattern syntax error.
+ * @return: REG_ECOLLATE: Unsupported/unknown collating character (in '[[.xxx.]]' and '[[=xxx=]]')
+ * @return: REG_ECTYPE:   Invalid/unknown character class name.
+ * @return: REG_EESCAPE:  Trailing backslash.
+ * @return: REG_ESUBREG:  Invalid back reference.
+ * @return: REG_EBRACK:   Unmatched '['.
+ * @return: REG_EPAREN:   Unmatched '('.
+ * @return: REG_EBRACE:   Unmatched '{'.
+ * @return: REG_BADBR:    Invalid contents of '{...}'.
+ * @return: REG_ERANGE:   Invalid range end (e.g. '[z-a]').
+ * @return: REG_ESPACE:   Out of memory.
+ * @return: REG_BADRPT:   Nothing is preceding '+', '*', '?' or '{'.
+ * @return: REG_EEND:     Unexpected end of pattern.
+ * @return: REG_ESIZE:    Compiled pattern bigger than 2^16 bytes.
+ * @return: REG_ERPAREN:  Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
+ * @return: REG_EILLSEQ:  Illegal unicode character (when `RE_NO_UTF8' wasn't set)
+ * @return: REG_EILLSET:  Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]")
+ * @return: REG_ENOSYS:   Unable to load `libregex.so' (shouldn't happen) */
 INTDEF ATTR_IN(2) ATTR_OUT(1) int NOTHROW_NCX(LIBDCALL libd_regcomp)(regex_t *__restrict self, char const *__restrict pattern, int cflags);
 /* >> regexec(3)
  * Execute a compiled regular expression `pattern' on the priveded string.

@@ -38,7 +38,7 @@ typedef int re_errno_t;
 #define RE_NOERROR  0  /* Success. */
 #define RE_NOMATCH  1  /* Didn't find a match (for `regexec(3)'). */
 #define RE_BADPAT   2  /* General pattern syntax error. */
-#define RE_ECOLLATE 3  /* ??? */
+#define RE_ECOLLATE 3  /* Unsupported/unknown collating character (in '[[.xxx.]]' and '[[=xxx=]]') */
 #define RE_ECTYPE   4  /* Invalid/unknown character class name. */
 #define RE_EESCAPE  5  /* Trailing '\'. */
 #define RE_ESUBREG  6  /* Back reference to group that was never initialized. */
@@ -659,23 +659,24 @@ struct re_compiler {
  * - rec_parser.rec_ngrp    == <greaters-referenced-group + 1>
  * - rec_parser.rec_nvar    == <greaters-referenced-var + 1>
  * - rec_parser.rec_grpinfo == <undefined>
- * @return: RE_NOERROR: Success
- * @return: RE_BADPAT:  General pattern syntax error.
- * @return: RE_ECTYPE:  Invalid/unknown character class name.
- * @return: RE_EESCAPE: Trailing backslash.
- * @return: RE_ESUBREG: Invalid back reference.
- * @return: RE_EBRACK:  Unmatched '['.
- * @return: RE_EPAREN:  Unmatched '('.
- * @return: RE_EBRACE:  Unmatched '{'.
- * @return: RE_BADBR:   Invalid contents of '{...}'.
- * @return: RE_ERANGE:  Invalid range end (e.g. '[z-a]').
- * @return: RE_ESPACE:  Out of memory.
- * @return: RE_BADRPT:  Nothing is preceding '+', '*', '?' or '{'.
- * @return: RE_EEND:    Unexpected end of pattern.
- * @return: RE_ESIZE:   Compiled pattern bigger than 2^16 bytes.
- * @return: RE_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
- * @return: RE_EILLSEQ: Illegal unicode character (when `RE_NO_UTF8' wasn't set)
- * @return: RE_EILLSET: Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
+ * @return: RE_NOERROR:  Success
+ * @return: RE_BADPAT:   General pattern syntax error.
+ * @return: RE_ECOLLATE: Unsupported/unknown collating character (in '[[.xxx.]]' and '[[=xxx=]]')
+ * @return: RE_ECTYPE:   Invalid/unknown character class name.
+ * @return: RE_EESCAPE:  Trailing backslash.
+ * @return: RE_ESUBREG:  Invalid back reference.
+ * @return: RE_EBRACK:   Unmatched '['.
+ * @return: RE_EPAREN:   Unmatched '('.
+ * @return: RE_EBRACE:   Unmatched '{'.
+ * @return: RE_BADBR:    Invalid contents of '{...}'.
+ * @return: RE_ERANGE:   Invalid range end (e.g. '[z-a]').
+ * @return: RE_ESPACE:   Out of memory.
+ * @return: RE_BADRPT:   Nothing is preceding '+', '*', '?' or '{'.
+ * @return: RE_EEND:     Unexpected end of pattern.
+ * @return: RE_ESIZE:    Compiled pattern bigger than 2^16 bytes.
+ * @return: RE_ERPAREN:  Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
+ * @return: RE_EILLSEQ:  Illegal unicode character (when `RE_NO_UTF8' wasn't set)
+ * @return: RE_EILLSET:  Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]") */
 typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) re_errno_t
 __NOTHROW_NCX_T(LIBREGEX_CC *PRE_COMPILER_COMPILE)(struct re_compiler *__restrict self);
 #ifdef LIBREGEX_WANT_PROTOTYPES

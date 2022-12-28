@@ -164,7 +164,7 @@ typedef enum {
 	REG_BADPAT   = __REG_BADPAT, /* General pattern syntax error. */
 #endif /* __REG_BADPAT */
 #ifdef __REG_ECOLLATE
-	REG_ECOLLATE = __REG_ECOLLATE, /* ??? */
+	REG_ECOLLATE = __REG_ECOLLATE, /* Unsupported/unknown collating character (in '[[.xxx.]]' and '[[=xxx=]]') */
 #endif /* __REG_ECOLLATE */
 #ifdef __REG_ECTYPE
 	REG_ECTYPE   = __REG_ECTYPE, /* Invalid/unknown character class name. */
@@ -245,7 +245,7 @@ typedef enum {
 #define REG_BADPAT   REG_BADPAT   /* General pattern syntax error. */
 #endif /* __REG_BADPAT */
 #ifdef __REG_ECOLLATE
-#define REG_ECOLLATE REG_ECOLLATE /* ??? */
+#define REG_ECOLLATE REG_ECOLLATE /* Unsupported/unknown collating character (in '[[.xxx.]]' and '[[=xxx=]]') */
 #endif /* __REG_ECOLLATE */
 #ifdef __REG_ECTYPE
 #define REG_ECTYPE   REG_ECTYPE   /* Invalid/unknown character class name. */
@@ -323,7 +323,7 @@ typedef enum {
 #define REG_BADPAT   __REG_BADPAT   /* General pattern syntax error. */
 #endif /* __REG_BADPAT */
 #ifdef __REG_ECOLLATE
-#define REG_ECOLLATE __REG_ECOLLATE /* ??? */
+#define REG_ECOLLATE __REG_ECOLLATE /* Unsupported/unknown collating character (in '[[.xxx.]]' and '[[=xxx=]]') */
 #endif /* __REG_ECOLLATE */
 #ifdef __REG_ECTYPE
 #define REG_ECTYPE   __REG_ECTYPE   /* Invalid/unknown character class name. */
@@ -866,24 +866,25 @@ void re_set_registers([[inout]] regex_t *self, [[out]] struct __re_registers *re
 @@@param: self:    Storage for the produced regex pattern.
 @@@param: pattern: The pattern to compile.
 @@@param: cflags:  Set of `REG_EXTENDED | REG_ICASE | REG_NEWLINE | REG_NOSUB'
-@@@return: REG_NOERROR: Success
-@@@return: REG_BADPAT:  General pattern syntax error.
-@@@return: REG_ECTYPE:  Invalid/unknown character class name.
-@@@return: REG_EESCAPE: Trailing backslash.
-@@@return: REG_ESUBREG: Invalid back reference.
-@@@return: REG_EBRACK:  Unmatched '['.
-@@@return: REG_EPAREN:  Unmatched '('.
-@@@return: REG_EBRACE:  Unmatched '{'.
-@@@return: REG_BADBR:   Invalid contents of '{...}'.
-@@@return: REG_ERANGE:  Invalid range end (e.g. '[z-a]').
-@@@return: REG_ESPACE:  Out of memory.
-@@@return: REG_BADRPT:  Nothing is preceding '+', '*', '?' or '{'.
-@@@return: REG_EEND:    Unexpected end of pattern.
-@@@return: REG_ESIZE:   Compiled pattern bigger than 2^16 bytes.
-@@@return: REG_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
-@@@return: REG_EILLSEQ: Illegal unicode character (when `RE_NO_UTF8' wasn't set)
-@@@return: REG_EILLSET: Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]")
-@@@return: REG_ENOSYS:  Unable to load `libregex.so' (shouldn't happen)
+@@@return: REG_NOERROR:  Success
+@@@return: REG_BADPAT:   General pattern syntax error.
+@@@return: REG_ECOLLATE: Unsupported/unknown collating character (in '[[.xxx.]]' and '[[=xxx=]]')
+@@@return: REG_ECTYPE:   Invalid/unknown character class name.
+@@@return: REG_EESCAPE:  Trailing backslash.
+@@@return: REG_ESUBREG:  Invalid back reference.
+@@@return: REG_EBRACK:   Unmatched '['.
+@@@return: REG_EPAREN:   Unmatched '('.
+@@@return: REG_EBRACE:   Unmatched '{'.
+@@@return: REG_BADBR:    Invalid contents of '{...}'.
+@@@return: REG_ERANGE:   Invalid range end (e.g. '[z-a]').
+@@@return: REG_ESPACE:   Out of memory.
+@@@return: REG_BADRPT:   Nothing is preceding '+', '*', '?' or '{'.
+@@@return: REG_EEND:     Unexpected end of pattern.
+@@@return: REG_ESIZE:    Compiled pattern bigger than 2^16 bytes.
+@@@return: REG_ERPAREN:  Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
+@@@return: REG_EILLSEQ:  Illegal unicode character (when `RE_NO_UTF8' wasn't set)
+@@@return: REG_EILLSET:  Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]")
+@@@return: REG_ENOSYS:   Unable to load `libregex.so' (shouldn't happen)
 [[decl_include("<bits/crt/regex.h>")]]
 int regcomp([[out]] regex_t *__restrict self, [[in]] char const *__restrict pattern, int cflags);
 

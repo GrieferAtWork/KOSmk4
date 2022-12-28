@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa2c40d3 */
+/* HASH CRC-32:0x2f20fae9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,7 +88,7 @@ typedef enum {
 	REG_BADPAT   = __REG_BADPAT, /* General pattern syntax error. */
 #endif /* __REG_BADPAT */
 #ifdef __REG_ECOLLATE
-	REG_ECOLLATE = __REG_ECOLLATE, /* ??? */
+	REG_ECOLLATE = __REG_ECOLLATE, /* Unsupported/unknown collating character (in '[[.xxx.]]' and '[[=xxx=]]') */
 #endif /* __REG_ECOLLATE */
 #ifdef __REG_ECTYPE
 	REG_ECTYPE   = __REG_ECTYPE, /* Invalid/unknown character class name. */
@@ -169,7 +169,7 @@ typedef enum {
 #define REG_BADPAT   REG_BADPAT   /* General pattern syntax error. */
 #endif /* __REG_BADPAT */
 #ifdef __REG_ECOLLATE
-#define REG_ECOLLATE REG_ECOLLATE /* ??? */
+#define REG_ECOLLATE REG_ECOLLATE /* Unsupported/unknown collating character (in '[[.xxx.]]' and '[[=xxx=]]') */
 #endif /* __REG_ECOLLATE */
 #ifdef __REG_ECTYPE
 #define REG_ECTYPE   REG_ECTYPE   /* Invalid/unknown character class name. */
@@ -247,7 +247,7 @@ typedef enum {
 #define REG_BADPAT   __REG_BADPAT   /* General pattern syntax error. */
 #endif /* __REG_BADPAT */
 #ifdef __REG_ECOLLATE
-#define REG_ECOLLATE __REG_ECOLLATE /* ??? */
+#define REG_ECOLLATE __REG_ECOLLATE /* Unsupported/unknown collating character (in '[[.xxx.]]' and '[[=xxx=]]') */
 #endif /* __REG_ECOLLATE */
 #ifdef __REG_ECTYPE
 #define REG_ECTYPE   __REG_ECTYPE   /* Invalid/unknown character class name. */
@@ -793,24 +793,25 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(re_set_registers, __FORCELOCAL __ATTR_ARTIFICIAL
  * @param: self:    Storage for the produced regex pattern.
  * @param: pattern: The pattern to compile.
  * @param: cflags:  Set of `REG_EXTENDED | REG_ICASE | REG_NEWLINE | REG_NOSUB'
- * @return: REG_NOERROR: Success
- * @return: REG_BADPAT:  General pattern syntax error.
- * @return: REG_ECTYPE:  Invalid/unknown character class name.
- * @return: REG_EESCAPE: Trailing backslash.
- * @return: REG_ESUBREG: Invalid back reference.
- * @return: REG_EBRACK:  Unmatched '['.
- * @return: REG_EPAREN:  Unmatched '('.
- * @return: REG_EBRACE:  Unmatched '{'.
- * @return: REG_BADBR:   Invalid contents of '{...}'.
- * @return: REG_ERANGE:  Invalid range end (e.g. '[z-a]').
- * @return: REG_ESPACE:  Out of memory.
- * @return: REG_BADRPT:  Nothing is preceding '+', '*', '?' or '{'.
- * @return: REG_EEND:    Unexpected end of pattern.
- * @return: REG_ESIZE:   Compiled pattern bigger than 2^16 bytes.
- * @return: REG_ERPAREN: Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
- * @return: REG_EILLSEQ: Illegal unicode character (when `RE_NO_UTF8' wasn't set)
- * @return: REG_EILLSET: Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]")
- * @return: REG_ENOSYS:  Unable to load `libregex.so' (shouldn't happen) */
+ * @return: REG_NOERROR:  Success
+ * @return: REG_BADPAT:   General pattern syntax error.
+ * @return: REG_ECOLLATE: Unsupported/unknown collating character (in '[[.xxx.]]' and '[[=xxx=]]')
+ * @return: REG_ECTYPE:   Invalid/unknown character class name.
+ * @return: REG_EESCAPE:  Trailing backslash.
+ * @return: REG_ESUBREG:  Invalid back reference.
+ * @return: REG_EBRACK:   Unmatched '['.
+ * @return: REG_EPAREN:   Unmatched '('.
+ * @return: REG_EBRACE:   Unmatched '{'.
+ * @return: REG_BADBR:    Invalid contents of '{...}'.
+ * @return: REG_ERANGE:   Invalid range end (e.g. '[z-a]').
+ * @return: REG_ESPACE:   Out of memory.
+ * @return: REG_BADRPT:   Nothing is preceding '+', '*', '?' or '{'.
+ * @return: REG_EEND:     Unexpected end of pattern.
+ * @return: REG_ESIZE:    Compiled pattern bigger than 2^16 bytes.
+ * @return: REG_ERPAREN:  Unmatched ')' (only when `RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD' was set)
+ * @return: REG_EILLSEQ:  Illegal unicode character (when `RE_NO_UTF8' wasn't set)
+ * @return: REG_EILLSET:  Tried to combine raw bytes with unicode characters in charsets (e.g. "[Ä\xC3]")
+ * @return: REG_ENOSYS:   Unable to load `libregex.so' (shouldn't happen) */
 __CDECLARE_OPT(__ATTR_IN(2) __ATTR_OUT(1),int,__NOTHROW_NCX,regcomp,(regex_t *__restrict __self, char const *__restrict __pattern, int __cflags),(__self,__pattern,__cflags))
 /* >> regexec(3)
  * Execute a compiled regular expression `pattern' on the priveded string.

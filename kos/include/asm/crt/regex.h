@@ -27,7 +27,7 @@
 #define __REG_NOERROR  0    /* Success. */
 #define __REG_NOMATCH  1    /* Didn't find a match (for `regexec(3)'). */
 #define __REG_BADPAT   2    /* General pattern syntax error. */
-#define __REG_ECOLLATE 3    /* ??? */
+#define __REG_ECOLLATE 3    /* Unsupported/unknown collating character (in '[[.xxx.]]' and '[[=xxx=]]') */
 #define __REG_ECTYPE   4    /* Invalid/unknown character class name. */
 #define __REG_EESCAPE  5    /* Trailing '\'. */
 #define __REG_ESUBREG  6    /* Back reference to group that was never initialized. */

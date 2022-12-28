@@ -321,6 +321,12 @@ DEFINE_TEST(regex) {
 	/* Ensure that the regex interpreter prefers larger groups. */
 	EQ(6, re_match_g(".*(.*).*", "foobar", { REGMATCH(0, 6) }));
 
+	/* Ensure that collating characters work. */
+	EQ(3, re_match("[[.tab.]]+", "\t\t\tfoo"));
+	EQ(1, re_match("[[.tab.]]+", "\tfoo"));
+	EQ(-RE_NOMATCH, re_match("[[.tab.]]+", "foo"));
+	EQ(RE_ECOLLATE, re_compile_error("[[.BAD COLL NAME.]]", 0));
+
 	/* Cleanup */
 	EQ(0, dlclose(libregex));
 }
