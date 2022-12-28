@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe92a4e1c */
+/* HASH CRC-32:0xfd3924f7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2218,6 +2218,7 @@ DEFINE_PUBLIC_ALIAS(DOS$vfprintf, libd_vfprintf);
 DEFINE_PUBLIC_ALIAS(DOS$vprintf, libd_vprintf);
 DEFINE_PUBLIC_ALIAS(DOS$_IO_vfscanf, libd_vfscanf);
 DEFINE_PUBLIC_ALIAS(DOS$__vfscanf, libd_vfscanf);
+DEFINE_PUBLIC_ALIAS(DOS$_doscan, libd_vfscanf);
 DEFINE_PUBLIC_ALIAS(DOS$vfscanf, libd_vfscanf);
 DEFINE_PUBLIC_ALIAS(DOS$vscanf, libd_vscanf);
 DEFINE_PUBLIC_ALIAS(DOS$_IO_gets, libd_gets);
@@ -2409,6 +2410,7 @@ DEFINE_PUBLIC_ALIAS(DOS$vsnprintf_s, libd_vsnprintf_s);
 DEFINE_PUBLIC_ALIAS(DOS$vfscanf_s, libd_vfscanf_s);
 DEFINE_PUBLIC_ALIAS(DOS$vscanf_s, libd_vscanf_s);
 DEFINE_PUBLIC_ALIAS(DOS$vsscanf_s, libd_vsscanf_s);
+DEFINE_PUBLIC_ALIAS(DOS$_doprnt, libd__doprnt);
 
 /* stdio_ext */
 DEFINE_PUBLIC_ALIAS(DOS$__fbufsize, libd___fbufsize);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b93b39 */
+/* HASH CRC-32:0x16e89b0c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4226,6 +4226,15 @@ NOTHROW_NCX(VLIBCCALL libc_sscanf_s)(char const *buf,
 	va_end(args);
 	return result;
 }
+/* >> fprintf(3), vfprintf(3)
+ * Print  data  to  `stream',  following  `format'
+ * Return the number of successfully printed bytes */
+INTERN ATTR_SECTION(".text.crt.compat.linux") ATTR_IN(1) ATTR_INOUT(3) ATTR_LIBC_PRINTF(1, 0) __STDC_INT_AS_SSIZE_T
+(LIBCCALL libc__doprnt)(char const *__restrict format,
+                        va_list args,
+                        FILE *__restrict stream) THROWS(...) {
+	return libc_vfprintf(stream, format, args);
+}
 #endif /* !__KERNEL__ */
 
 DECL_END
@@ -4271,6 +4280,7 @@ DEFINE_PUBLIC_ALIAS(printf_s, libc_printf);
 DEFINE_PUBLIC_ALIAS(printf, libc_printf);
 DEFINE_PUBLIC_ALIAS(_IO_vfscanf, libc_vfscanf);
 DEFINE_PUBLIC_ALIAS(__vfscanf, libc_vfscanf);
+DEFINE_PUBLIC_ALIAS(_doscan, libc_vfscanf);
 DEFINE_PUBLIC_ALIAS(vfscanf, libc_vfscanf);
 DEFINE_PUBLIC_ALIAS(vscanf, libc_vscanf);
 #endif /* !__KERNEL__ */
@@ -4721,6 +4731,7 @@ DEFINE_PUBLIC_ALIAS(DOS$sscanf_s, libd_sscanf_s);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(sscanf_s, libc_sscanf_s);
+DEFINE_PUBLIC_ALIAS(_doprnt, libc__doprnt);
 #endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_STDIO_C */

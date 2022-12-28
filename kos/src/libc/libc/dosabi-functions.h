@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16eb4384 */
+/* HASH CRC-32:0x7639a638 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2400,6 +2400,7 @@ DFUN(".text.crt.dos.unicode.static.format.printf", libd_vsnprintf_s, libc_vsnpri
 DFUN(".text.crt.dos.FILE.locked.read.scanf", libd_vfscanf_s, libc_vfscanf_s, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.FILE.locked.read.scanf", libd_vscanf_s, libc_vscanf_s, TD, 2, TP, TP)
 DFUN(".text.crt.dos.FILE.locked.read.scanf", libd_vsscanf_s, libc_vsscanf_s, TD, 3, TP, TP, TP)
+DFUN(".text.crt.dos.compat.linux", libd__doprnt, libc__doprnt, TD, 3, TP, TP, TP)
 
 /* stdio_ext */
 DFUN(".text.crt.dos.FILE.utility.ext", libd___fbufsize, libc___fbufsize, TI, 1, TP)

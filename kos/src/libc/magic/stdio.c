@@ -1452,7 +1452,7 @@ __LOCAL_LIBC(@vfscanf_ungetc@) ssize_t
 
 [[std, cp_stdio, guard, wunused, doc_alias("fscanf"), decl_include("<features.h>")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_STDIO_UNLOCKED)), preferred_alias("vfscanf_unlocked")]]
-[[crtbuiltin, export_alias("_IO_vfscanf", "__vfscanf"), alias("_vfscanf", "_vfscanf_s", "vfscanf_unlocked")]]
+[[crtbuiltin, export_alias("_IO_vfscanf", "__vfscanf", "_doscan"), alias("_vfscanf", "_vfscanf_s", "vfscanf_unlocked")]]
 [[requires_dependent_function(fgetc, ungetc)]]
 [[impl_include("<hybrid/typecore.h>")]]
 [[impl_prefix(DEFINE_VFSCANF_HELPERS)]]
@@ -5629,6 +5629,20 @@ __STDC_INT_AS_SSIZE_T vsscanf_s([[in]] char const *buf, [[in, format]] char cons
 %#endif /* __USE_DOS */
 %
 
+/* Some programs check for a function:
+ * >> int _doprnt(char const *format, va_list ap, FILE *stream);
+ * And so we provide it. */
+[[hidden]] /* Not exposed (for now...) */
+[[cp_stdio, decl_include("<features.h>"), doc_alias("fprintf")]]
+[[requires_dependent_function(vfprintf)]]
+[[section(".text.crt{|.dos}.compat.linux")]]
+__STDC_INT_AS_SSIZE_T _doprnt([[in, format("printf")]] char const *__restrict format,
+                              $va_list args, [[inout]] FILE *__restrict stream) {
+	return vfprintf(stream, format, args);
+}
+
+/* This one also sometimes gets referenced, but it's binary-compatible with `vfscanf(3)' */
+/*%[insert:function(_doscan = vfscanf)]*/ /* Not exposed (for now...) */
 
 
 %{

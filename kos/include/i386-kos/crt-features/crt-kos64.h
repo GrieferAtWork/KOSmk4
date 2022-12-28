@@ -1458,6 +1458,8 @@
 #define __CRT_HAVE__cwscanf_s
 #define __CRT_HAVE__cwscanf_s_l
 #define __CRT_HAVE__daylight
+#define __CRT_HAVE__doprnt
+#define __CRT_HAVE__doscan
 #define __CRT_HAVE__dosmaperr
 #define __CRT_HAVE__dpcomp
 #define __CRT_HAVE__dstbias
@@ -7518,6 +7520,8 @@
 #define __CRT_HAVE_KOS$_cwscanf_l
 #define __CRT_HAVE_KOS$_cwscanf_s
 #define __CRT_HAVE_KOS$_cwscanf_s_l
+#define __CRT_HAVE_KOS$_doprnt
+#define __CRT_HAVE_KOS$_doscan
 #define __CRT_HAVE_KOS$_dpcomp
 #define __CRT_HAVE_KOS$_dtest
 #define __CRT_HAVE_KOS$_dupenv_s
@@ -11892,6 +11896,8 @@
 #define __CRT_HAVE_DOS$_dclass
 #define __CRT_HAVE_DOS$_difftime32
 #define __CRT_HAVE_DOS$_difftime64
+#define __CRT_HAVE_DOS$_doprnt
+#define __CRT_HAVE_DOS$_doscan
 #define __CRT_HAVE_DOS$_dpcomp
 #define __CRT_HAVE_DOS$_dsign
 #define __CRT_HAVE_DOS$_dtest
