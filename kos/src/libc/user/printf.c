@@ -167,8 +167,8 @@ PRIVATE ATTR_SECTION(".bss.crt.compat.glibc.printf") printf_arginfo_size_functio
 PRIVATE ATTR_SECTION(".bss.crt.compat.glibc.printf") pthread_once_t libc_printf_hook_didinit = PTHREAD_ONCE_INIT;
 PRIVATE ATTR_SECTION(".text.crt.compat.glibc.printf") void LIBCCALL libc_printf_hook_doinit(void) {
 	/* Allocate tables. */
-	libc___printf_function_table = (printf_function **)xmalloc(256 * sizeof(printf_function *));
-	libc___printf_arginfo_table  = (printf_arginfo_size_function **)xmalloc(256 * sizeof(printf_arginfo_size_function *));
+	libc___printf_function_table = (printf_function **)xcalloc(256, sizeof(printf_function *));
+	libc___printf_arginfo_table  = (printf_arginfo_size_function **)xcalloc(256, sizeof(printf_arginfo_size_function *));
 
 	/* Inject hooks. */
 	if (inject_hooks() != 0)
