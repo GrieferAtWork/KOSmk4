@@ -66,17 +66,12 @@ __SYSDECL_BEGIN
 #define shared_lock_cinit(self)        (void)(sig_cinit(&(self)->sl_sig), __hybrid_assert((self)->sl_lock == 0))
 #define shared_lock_cinit_locked(self) (void)(sig_cinit(&(self)->sl_sig), (self)->sl_lock = 1)
 #else /* __KERNEL__ */
-#if __SIZEOF_INT__ < __SIZEOF_POINTER__
-#define SHARED_LOCK_INIT               { 0, {}, 0 }
-#define SHARED_LOCK_INIT_LOCKED        { 1, {}, 0 }
-#else /* __SIZEOF_INT__ < __SIZEOF_POINTER__ */
-#define SHARED_LOCK_INIT               { 0, 0 }
-#define SHARED_LOCK_INIT_LOCKED        { 1, 0 }
-#endif /* __SIZEOF_INT__ >= __SIZEOF_POINTER__ */
-#define shared_lock_init(self)         (void)((self)->sl_sig = 0, (self)->sl_lock = 0)
-#define shared_lock_init_locked(self)  (void)((self)->sl_sig = 0, (self)->sl_lock = 1)
-#define shared_lock_cinit(self)        (void)(__hybrid_assert((self)->sl_sig == 0), __hybrid_assert((self)->sl_lock == 0))
-#define shared_lock_cinit_locked(self) (void)(__hybrid_assert((self)->sl_sig == 0), (self)->sl_lock = 1)
+#define SHARED_LOCK_INIT               { 0 }
+#define SHARED_LOCK_INIT_LOCKED        { 1 }
+#define shared_lock_init(self)         (void)((self)->sl_lock = 0)
+#define shared_lock_init_locked(self)  (void)((self)->sl_lock = 1)
+#define shared_lock_cinit(self)        (void)(__hybrid_assert((self)->sl_lock == 0))
+#define shared_lock_cinit_locked(self) (void)(__hybrid_assert((self)->sl_lock == 0), (self)->sl_lock = 1)
 #endif /* !__KERNEL__ */
 #define shared_lock_acquired(self)  (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) != 0)
 #define shared_lock_available(self) (__hybrid_atomic_load((self)->sl_lock, __ATOMIC_ACQUIRE) == 0)
@@ -84,14 +79,15 @@ __SYSDECL_BEGIN
 #define shared_lock_broadcast_for_fini(self) \
 	sig_broadcast_for_fini(&(self)->sl_sig)
 #elif defined(__CRT_HAVE_XSC)
-#if __CRT_HAVE_XSC(lfutex)
-/* NOTE: we use `sys_Xlfutex()', because the only possible exception is E_SEGFAULT */
+#if __CRT_HAVE_XSC(futex)
+/* NOTE: we use `sys_Xfutex()', because the only possible exception is E_SEGFAULT */
 #define shared_lock_broadcast_for_fini(self) \
-	((self)->sl_sig ? (void)sys_Xlfutex(&(self)->sl_sig, LFUTEX_WAKE, (__uintptr_t)-1, __NULLPTR, 0) : (void)0)
-#endif /* __CRT_HAVE_XSC(lfutex) */
+	((self)->sl_lock >= 2 ? (void)sys_Xfutex(&(self)->sl_lock, /*FUTEX_WAKE*/ 1, (__UINT32_TYPE__)-1, __NULLPTR, __NULLPTR, 0) : (void)0)
+#endif /* __CRT_HAVE_XSC(futex) */
 #endif /* !__KERNEL__ */
 
 /* Try to acquire a lock to a given `struct shared_lock *self' */
+#ifdef __KERNEL__
 #ifdef __COMPILER_WORKAROUND_GCC_105689_MAC
 #define shared_lock_tryacquire(self) \
 	__COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_xch(__cw_105689_self->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
@@ -99,58 +95,49 @@ __SYSDECL_BEGIN
 #define shared_lock_tryacquire(self) \
 	(__hybrid_atomic_xch((self)->sl_lock, 1, __ATOMIC_ACQUIRE) == 0)
 #endif /* !__COMPILER_WORKAROUND_GCC_105689_MAC */
+#else /* __KERNEL__ */
+#ifdef __COMPILER_WORKAROUND_GCC_105689_MAC
+#define shared_lock_tryacquire(self) \
+	__COMPILER_WORKAROUND_GCC_105689_MAC(self, __hybrid_atomic_cmpxch(__cw_105689_self->sl_lock, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+#else /* __COMPILER_WORKAROUND_GCC_105689_MAC */
+#define shared_lock_tryacquire(self) \
+	__hybrid_atomic_cmpxch((self)->sl_lock, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE)
+#endif /* !__COMPILER_WORKAROUND_GCC_105689_MAC */
+#endif /* !__KERNEL__ */
 
 /* Release a lock from a given shared_lock.
  * @return: true:  A waiting thread was signaled.
  * @return: false: Either no  thread was  signaled, or  the
  *                 lock remains held by the calling thread. */
 #ifdef __shared_lock_send
-#if defined(NDEBUG) || defined(NDEBUG_SYNC)
+#ifdef __KERNEL__
 #define shared_lock_release(self)                                 \
-	(__hybrid_atomic_store((self)->sl_lock, 0, __ATOMIC_RELEASE), \
-	 __shared_lock_send(self))
-#else /* NDEBUG || NDEBUG_SYNC */
-#define shared_lock_release(self)                                 \
-	(__hybrid_assert((self)->sl_lock != 0),                       \
+	(__shared_lock_release_assert_(self)                          \
 	 __hybrid_atomic_store((self)->sl_lock, 0, __ATOMIC_RELEASE), \
 	 __shared_lock_send(self))
+#else /* __KERNEL__ */
+#define shared_lock_release(self)                                        \
+	(__shared_lock_release_assert_(self)                                 \
+	 (__hybrid_atomic_xch((self)->sl_lock, 0, __ATOMIC_RELEASE) >= 2) && \
+	 __shared_lock_send(self))
+#endif /* !__KERNEL__ */
+#if defined(NDEBUG) || defined(NDEBUG_SYNC)
+#define __shared_lock_release_assert_(self) /* nothing */
+#else /* NDEBUG || NDEBUG_SYNC */
+#define __shared_lock_release_assert_(self) __hybrid_assert((self)->sl_lock != 0),
 #endif /* !NDEBUG || !NDEBUG_SYNC */
 #endif /* __shared_lock_send */
 
 }
 
 
-%[define(DEFINE_SHARED_LOCK_ACQUIRE_USER_PREFIX =
-#include <kos/syscalls.h>
-#include <kos/asm/futex.h>
-#include <kos/bits/futex-expr.h>
-@@pp_ifndef __SHARED_LOCK_WAITEXPR_DEFINED@@
-#define __SHARED_LOCK_WAITEXPR_DEFINED
-@@push_namespace(local)@@
-static struct @lfutexexpr@ const @__shared_lock_waitexpr@[] = {
-	/* Wait until `sl_lock == 0' */
-	@LFUTEXEXPR_INIT@(offsetof(struct @shared_lock@, @sl_lock@), @LFUTEX_WAIT_UNTIL@, 0, 0),
-	@LFUTEXEXPR_INIT@(0, @LFUTEX_EXPREND@, 0, 0)
-};
-@@pop_namespace@@
-@@pp_endif@@
-)]
-
-%[define(DEFINE_SHARED_LOCK_ACQUIRE_PREFIX =
-@@pp_ifdef __KERNEL__@@
-#include <hybrid/__assert.h>
-#include <sched/sig.h>
-@@pp_else@@
-DEFINE_SHARED_LOCK_ACQUIRE_USER_PREFIX
-@@pp_endif@@
-)]
-
 @@>> shared_lock_acquire(3)
 @@Acquire a lock to the given shared_lock.
 [[kernel, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[requires(defined(__KERNEL__) || $has_function(LFutexExprI64_except))]]
-[[impl_prefix(DEFINE_SHARED_LOCK_ACQUIRE_PREFIX)]]
+[[requires_include("<kos/bits/shared-lock.h>")]]
+[[requires(defined(__KERNEL__) || defined(__shared_lock_wait))]]
+[[impl_include("<kos/bits/shared-lock.h>")]]
 void shared_lock_acquire([[inout]] struct shared_lock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
@@ -168,9 +155,9 @@ void shared_lock_acquire([[inout]] struct shared_lock *__restrict self) {
 	}
 success:
 @@pp_else@@
-	while (__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(self->@sl_sig@, 1, __ATOMIC_SEQ_CST);
-		LFutexExprI64_except(&self->@sl_sig@, self, __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@, NULL, 0);
+	while (__hybrid_atomic_fetchinc(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->@sl_lock@, 2, __ATOMIC_SEQ_CST);
+		__shared_lock_wait(self);
 	}
 @@pp_endif@@
 	COMPILER_BARRIER();
@@ -185,8 +172,9 @@ success:
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_lock_acquire_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_lock_acquire_with_timeout64")]]
-[[requires(defined(__KERNEL__) || $has_function(LFutexExprI_except))]]
-[[impl_prefix(DEFINE_SHARED_LOCK_ACQUIRE_PREFIX)]]
+[[requires_include("<kos/bits/shared-lock.h>")]]
+[[requires(defined(__KERNEL__) || defined(__shared_lock_wait_timeout))]]
+[[impl_include("<kos/bits/shared-lock.h>")]]
 $bool shared_lock_acquire_with_timeout([[inout]] struct shared_lock *__restrict self,
                                        __shared_lock_timespec abs_timeout) {
 @@pp_ifdef __KERNEL__@@
@@ -206,11 +194,9 @@ $bool shared_lock_acquire_with_timeout([[inout]] struct shared_lock *__restrict 
 	}
 success:
 @@pp_else@@
-	while (__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(self->@sl_sig@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExprI_except(&self->@sl_sig@, self,
-		                       __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@,
-		                       abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
+	while (__hybrid_atomic_fetchinc(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->@sl_lock@, 2, __ATOMIC_SEQ_CST);
+		if (!__shared_lock_wait_timeout(self, abs_timeout))
 			return false;
 	}
 @@pp_endif@@
@@ -223,8 +209,9 @@ success:
 @@Wait for `self' to become available.
 [[kernel, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[requires(defined(__KERNEL__) || $has_function(LFutexExprI64_except))]]
-[[impl_prefix(DEFINE_SHARED_LOCK_ACQUIRE_PREFIX)]]
+[[requires_include("<kos/bits/shared-lock.h>")]]
+[[requires(defined(__KERNEL__) || defined(__shared_lock_wait_timeout))]]
+[[impl_include("<kos/bits/shared-lock.h>")]]
 void shared_lock_waitfor([[inout]] struct shared_lock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());
@@ -241,11 +228,8 @@ void shared_lock_waitfor([[inout]] struct shared_lock *__restrict self) {
 		@task_waitfor@(@KTIME_INFINITE@);
 	}
 @@pp_else@@
-	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(self->@sl_sig@, 1, __ATOMIC_SEQ_CST);
-		LFutexExprI64_except(&self->@sl_sig@, self, __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@,
-		                     NULL, 0);
-	}
+	if (__hybrid_atomic_cmpxch(self->@sl_lock@, 1, 2, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+		__shared_lock_wait(self);
 @@pp_endif@@
 }
 
@@ -258,8 +242,9 @@ void shared_lock_waitfor([[inout]] struct shared_lock *__restrict self) {
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__KERNEL__) || !defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__),  alias("shared_lock_waitfor_with_timeout")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__KERNEL__) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)), alias("shared_lock_waitfor_with_timeout64")]]
-[[requires(defined(__KERNEL__) || $has_function(LFutexExprI_except))]]
-[[impl_prefix(DEFINE_SHARED_LOCK_ACQUIRE_PREFIX)]]
+[[requires_include("<kos/bits/shared-lock.h>")]]
+[[requires(defined(__KERNEL__) || defined(__shared_lock_wait_timeout))]]
+[[impl_include("<kos/bits/shared-lock.h>")]]
 $bool shared_lock_waitfor_with_timeout([[inout]] struct shared_lock *__restrict self,
                                        __shared_lock_timespec abs_timeout) {
 @@pp_ifdef __KERNEL__@@
@@ -279,14 +264,8 @@ $bool shared_lock_waitfor_with_timeout([[inout]] struct shared_lock *__restrict 
 	}
 success:
 @@pp_else@@
-	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(self->@sl_sig@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExprI_except(&self->@sl_sig@, self,
-		                       __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@, abs_timeout,
-		                       @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@ |
-		                       @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@) < 0)
-			return false;
-	}
+	if (__hybrid_atomic_cmpxch(self->@sl_lock@, 1, 2, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+		return __shared_lock_wait_timeout(self, abs_timeout);
 @@pp_endif@@
 	return true;
 }
@@ -298,15 +277,14 @@ success:
 [[preferred_time64_variant_of(shared_lock_acquire_with_timeout), doc_alias("shared_lock_acquire_with_timeout")]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>", "<bits/os/timespec.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[requires($has_function(LFutexExprI64_except))]]
-[[impl_prefix(DEFINE_SHARED_LOCK_ACQUIRE_USER_PREFIX)]]
+[[requires_include("<kos/bits/shared-lock.h>")]]
+[[requires(defined(__shared_lock_wait_timeout64))]]
+[[impl_include("<kos/bits/shared-lock.h>")]]
 $bool shared_lock_acquire_with_timeout64([[inout]] struct shared_lock *__restrict self,
                                          [[in_opt]] struct timespec64 const *abs_timeout) {
-	while (__hybrid_atomic_xch(self->@sl_lock@, 1, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(self->@sl_sig@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExprI64_except(&self->@sl_sig@, self,
-		                         __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@,
-		                         abs_timeout, @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@) < 0)
+	while (__hybrid_atomic_fetchinc(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->@sl_lock@, 2, __ATOMIC_SEQ_CST);
+		if (!__shared_lock_wait_timeout64(self, abs_timeout))
 			return false;
 	}
 	COMPILER_BARRIER();
@@ -316,18 +294,13 @@ $bool shared_lock_acquire_with_timeout64([[inout]] struct shared_lock *__restric
 [[preferred_time64_variant_of(shared_lock_waitfor_with_timeout), doc_alias("shared_lock_waitfor_with_timeout")]]
 [[wunused, decl_include("<kos/anno.h>", "<kos/bits/shared-lock.h>", "<bits/os/timespec.h>")]]
 [[attribute(__BLOCKING), cc(__FCALL), throws(E_WOULDBLOCK, ...)]]
-[[requires($has_function(LFutexExprI64_except))]]
-[[impl_prefix(DEFINE_SHARED_LOCK_ACQUIRE_USER_PREFIX)]]
+[[requires_include("<kos/bits/shared-lock.h>")]]
+[[requires(defined(__shared_lock_wait_timeout64))]]
+[[impl_include("<kos/bits/shared-lock.h>")]]
 $bool shared_lock_waitfor_with_timeout64([[inout]] struct shared_lock *__restrict self,
                                          [[in_opt]] struct timespec64 const *abs_timeout) {
-	while (__hybrid_atomic_load(self->@sl_lock@, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(self->@sl_sig@, 1, __ATOMIC_SEQ_CST);
-		if (LFutexExprI64_except(&self->@sl_sig@, self,
-		                         __NAMESPACE_LOCAL_SYM @__shared_lock_waitexpr@, abs_timeout,
-		                         @LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE@ |
-		                         @LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL@) < 0)
-			return false;
-	}
+	if (__hybrid_atomic_cmpxch(self->@sl_lock@, 1, 2, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+		return __shared_lock_wait_timeout64(self, abs_timeout);
 	return true;
 }
 %#endif /* !__KERNEL__ && __USE_TIME64 */

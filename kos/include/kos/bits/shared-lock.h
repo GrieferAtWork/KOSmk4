@@ -41,25 +41,53 @@
 __DECL_BEGIN
 
 struct shared_lock {
-	unsigned int sl_lock; /* Lock word. (non-zero if held) */
+#ifdef __KERNEL__
+	unsigned int sl_lock; /* Lock word (== 0: available, != 0: held) */
 #if __SIZEOF_INT__ < __SIZEOF_POINTER__
 	__byte_t   __sl_pad[__SIZEOF_POINTER__ - __SIZEOF_INT__];
 #endif /* __SIZEOF_INT__ < __SIZEOF_POINTER__ */
-#ifdef __KERNEL__
 	struct sig   sl_sig;  /* Signal send when the shared_lock is unlocked. */
 #else /* __KERNEL__ */
-	__uintptr_t  sl_sig;  /* Futex (`1' if there are threads waiting for this futex) */
+	unsigned int sl_lock; /* Lock word (== 0: available, == 1: held, >= 2: someone is waiting) */
 #endif /* !__KERNEL__ */
 };
 
 #ifdef __KERNEL__
 #define __shared_lock_send(self) sig_send(&(self)->sl_sig)
 #elif defined(__CRT_HAVE_XSC)
-#if __CRT_HAVE_XSC(lfutex)
-/* NOTE: we use `sys_Xlfutex()', because the only possible exception is E_SEGFAULT */
+#if __CRT_HAVE_XSC(futex)
+/* NOTE: we use `sys_Xfutex()', because the only possible exception is E_SEGFAULT */
 #define __shared_lock_send(self) \
-	((self)->sl_sig ? (sys_Xlfutex(&(self)->sl_sig, LFUTEX_WAKEMASK, 1, __NULLPTR, 0) != 0) : 0)
-#endif /* __CRT_HAVE_XSC(lfutex) */
+	(sys_Xfutex(&(self)->sl_lock, /*FUTEX_WAKE*/ 1, 1, __NULLPTR, __NULLPTR, 0) != 0)
+#define __shared_lock_wait(self) \
+	(void)sys_Xfutex(&(self)->sl_lock, /*FUTEX_WAIT*/ 0, 2, __NULLPTR, __NULLPTR, 0)
+#define __shared_lock_wait_timeout32(self, abs_timeout) \
+	(sys_Xfutex(&(self)->sl_lock, /*FUTEX_WAIT_BITSET*/ 9, 2, abs_timeout, __NULLPTR, (__UINT32_TYPE__)-1) >= 0)
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+#define __shared_lock_wait_timeout64(self, abs_timeout) \
+	__shared_lock_wait_timeout32(self, (struct __timespec32 *)(abs_timeout))
+#elif __CRT_HAVE_XSC(futex_time64)
+#define __shared_lock_wait_timeout64(self, abs_timeout) \
+	(sys_Xfutex_time64(&(self)->sl_lock, /*FUTEX_WAIT_BITSET*/ 9, 2, abs_timeout, __NULLPTR, (__UINT32_TYPE__)-1) >= 0)
+#else /* ... */
+#define __shared_lock_wait_timeout64 __shared_lock_wait_timeout64
+__FORCELOCAL __ATTR_NONNULL((1)) __BOOL
+(__shared_lock_wait_timeout64)(struct shared_lock *__restrict __self,
+                               struct __timespec64 const *abs_timeout) {
+	struct __timespec32 __ts32;
+	if (!abs_timeout)
+		return __shared_lock_wait_timeout32(self, __NULLPTR);
+	__ts32.tv_sec  = (__time32_t)abs_timeout->tv_sec;
+	__ts32.tv_nsec = abs_timeout->tv_nsec;
+	return __shared_lock_wait_timeout32(self, &__ts32);
+}
+#endif /* !... */
+#ifdef __USE_TIME_BITS64
+#define __shared_lock_wait_timeout __shared_lock_wait_timeout64
+#else /* __USE_TIME_BITS64 */
+#define __shared_lock_wait_timeout __shared_lock_wait_timeout32
+#endif /* !__USE_TIME_BITS64 */
+#endif /* __CRT_HAVE_XSC(futex) */
 #endif /* ... */
 
 __DECL_END

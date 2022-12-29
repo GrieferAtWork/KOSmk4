@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x882e4dbb */
+/* HASH CRC-32:0xb76b0ea */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,12 @@ DECL_BEGIN
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __NOBLOCK ATTR_INOUT(1) bool
 NOTHROW(__FCALL libc_shared_recursive_lock_tryacquire)(struct shared_recursive_lock *__restrict self) {
 	__COMPILER_WORKAROUND_GCC_105689(self);
-	if (__hybrid_atomic_xch(self->sr_lock.sl_lock, 1, __ATOMIC_ACQUIRE) == 0) {
+
+
+
+	if (__hybrid_atomic_cmpxch(self->sr_lock.sl_lock, 0, 1, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+
+	{
 		__shared_recursive_lock_setown(self);
 		return true;
 	}
@@ -60,10 +65,20 @@ NOTHROW(__FCALL libc_shared_recursive_lock_release)(struct shared_recursive_lock
 	__hybrid_assertf(self->sr_lock.sl_lock != 0, "Lock isn't acquired");
 	__hybrid_assertf(__shared_recursive_lock_isown(self), "You're not the owner of this lock");
 	if (self->sr_rcnt == 0) {
+
+
+
+
+
+
+		unsigned int lockstate;
 		self->sr_owner = __SHARED_RECURSIVE_LOCK_BADTID;
 		__COMPILER_BARRIER();
+		lockstate = self->sr_lock.sl_lock;
 		__hybrid_atomic_store(self->sr_lock.sl_lock, 0, __ATOMIC_RELEASE);
-		__shared_lock_send(&self->sr_lock);
+		if (lockstate >= 2)
+			__shared_lock_send(&self->sr_lock);
+
 		return true;
 	}
 	--self->sr_rcnt;

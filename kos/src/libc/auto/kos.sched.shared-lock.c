@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd24336cd */
+/* HASH CRC-32:0xc6f81e20 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,29 +25,10 @@
 #include <hybrid/typecore.h>
 #include <kos/types.h>
 #include "kos.sched.shared-lock.h"
-#include "../user/kos.futexexpr.h"
 
 DECL_BEGIN
 
-#ifdef __KERNEL__
-#include <hybrid/__assert.h>
-#include <sched/sig.h>
-#else /* __KERNEL__ */
-#include <kos/syscalls.h>
-#include <kos/asm/futex.h>
-#include <kos/bits/futex-expr.h>
-#ifndef __SHARED_LOCK_WAITEXPR_DEFINED
-#define __SHARED_LOCK_WAITEXPR_DEFINED
-__NAMESPACE_LOCAL_BEGIN
-static struct lfutexexpr const __shared_lock_waitexpr[] = {
-	/* Wait until `sl_lock == 0' */
-	LFUTEXEXPR_INIT(offsetof(struct shared_lock, sl_lock), LFUTEX_WAIT_UNTIL, 0, 0),
-	LFUTEXEXPR_INIT(0, LFUTEX_EXPREND, 0, 0)
-};
-__NAMESPACE_LOCAL_END
-#endif /* !__SHARED_LOCK_WAITEXPR_DEFINED */
-
-#endif /* !__KERNEL__ */
+#include <kos/bits/shared-lock.h>
 /* >> shared_lock_acquire(3)
  * Acquire a lock to the given shared_lock. */
 INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
@@ -68,9 +49,9 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
 	}
 success:
 #else /* __KERNEL__ */
-	while (__hybrid_atomic_xch(self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
-		libc_LFutexExprI64(&self->sl_sig, self, __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr, NULL, 0);
+	while (__hybrid_atomic_fetchinc(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->sl_lock, 2, __ATOMIC_SEQ_CST);
+		__shared_lock_wait(self);
 	}
 #endif /* !__KERNEL__ */
 	COMPILER_BARRIER();
@@ -99,11 +80,9 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 	}
 success:
 #else /* __KERNEL__ */
-	while (__hybrid_atomic_xch(self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
-		if (libc_LFutexExprI(&self->sl_sig, self,
-		                       __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
-		                       abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
+	while (__hybrid_atomic_fetchinc(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->sl_lock, 2, __ATOMIC_SEQ_CST);
+		if (!__shared_lock_wait_timeout(self, abs_timeout))
 			return false;
 	}
 #endif /* !__KERNEL__ */
@@ -129,11 +108,8 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
 		task_waitfor(KTIME_INFINITE);
 	}
 #else /* __KERNEL__ */
-	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
-		libc_LFutexExprI64(&self->sl_sig, self, __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
-		                     NULL, 0);
-	}
+	if (__hybrid_atomic_cmpxch(self->sl_lock, 1, 2, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+		__shared_lock_wait(self);
 #endif /* !__KERNEL__ */
 }
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
@@ -160,14 +136,8 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 	}
 success:
 #else /* __KERNEL__ */
-	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
-		if (libc_LFutexExprI(&self->sl_sig, self,
-		                       __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr, abs_timeout,
-		                       LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE |
-		                       LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) < 0)
-			return false;
-	}
+	if (__hybrid_atomic_cmpxch(self->sl_lock, 1, 2, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+		return __shared_lock_wait_timeout(self, abs_timeout);
 #endif /* !__KERNEL__ */
 	return true;
 }
@@ -176,19 +146,6 @@ success:
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_shared_lock_acquire_with_timeout64, libc_shared_lock_acquire_with_timeout);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-#include <kos/syscalls.h>
-#include <kos/asm/futex.h>
-#include <kos/bits/futex-expr.h>
-#ifndef __SHARED_LOCK_WAITEXPR_DEFINED
-#define __SHARED_LOCK_WAITEXPR_DEFINED
-__NAMESPACE_LOCAL_BEGIN
-static struct lfutexexpr const __shared_lock_waitexpr[] = {
-	/* Wait until `sl_lock == 0' */
-	LFUTEXEXPR_INIT(offsetof(struct shared_lock, sl_lock), LFUTEX_WAIT_UNTIL, 0, 0),
-	LFUTEXEXPR_INIT(0, LFUTEX_EXPREND, 0, 0)
-};
-__NAMESPACE_LOCAL_END
-#endif /* !__SHARED_LOCK_WAITEXPR_DEFINED */
 /* >> shared_lock_acquire_with_timeout(3), shared_lock_acquire_with_timeout64(3)
  * Acquire a lock to the given shared_lock, and block until `abs_timeout' or indefinitely.
  * @return: true:  Successfully acquired a lock.
@@ -196,11 +153,9 @@ __NAMESPACE_LOCAL_END
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2) bool
 (__FCALL libc_shared_lock_acquire_with_timeout64)(struct shared_lock *__restrict self,
                                                   struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
-	while (__hybrid_atomic_xch(self->sl_lock, 1, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
-		if (libc_LFutexExprI64(&self->sl_sig, self,
-		                         __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
-		                         abs_timeout, LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE) < 0)
+	while (__hybrid_atomic_fetchinc(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
+		__hybrid_atomic_store(self->sl_lock, 2, __ATOMIC_SEQ_CST);
+		if (!__shared_lock_wait_timeout64(self, abs_timeout))
 			return false;
 	}
 	COMPILER_BARRIER();
@@ -211,19 +166,6 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) AT
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_shared_lock_waitfor_with_timeout64, libc_shared_lock_waitfor_with_timeout);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
-#include <kos/syscalls.h>
-#include <kos/asm/futex.h>
-#include <kos/bits/futex-expr.h>
-#ifndef __SHARED_LOCK_WAITEXPR_DEFINED
-#define __SHARED_LOCK_WAITEXPR_DEFINED
-__NAMESPACE_LOCAL_BEGIN
-static struct lfutexexpr const __shared_lock_waitexpr[] = {
-	/* Wait until `sl_lock == 0' */
-	LFUTEXEXPR_INIT(offsetof(struct shared_lock, sl_lock), LFUTEX_WAIT_UNTIL, 0, 0),
-	LFUTEXEXPR_INIT(0, LFUTEX_EXPREND, 0, 0)
-};
-__NAMESPACE_LOCAL_END
-#endif /* !__SHARED_LOCK_WAITEXPR_DEFINED */
 /* >> shared_lock_waitfor_with_timeout(3), shared_lock_waitfor_with_timeout64(3)
  * Wait for `self' to become available, blocking until `abs_timeout' or indefinitely.
  * @return: true:  The lock became available.
@@ -231,14 +173,8 @@ __NAMESPACE_LOCAL_END
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2) bool
 (__FCALL libc_shared_lock_waitfor_with_timeout64)(struct shared_lock *__restrict self,
                                                   struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
-	while (__hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(self->sl_sig, 1, __ATOMIC_SEQ_CST);
-		if (libc_LFutexExprI64(&self->sl_sig, self,
-		                         __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr, abs_timeout,
-		                         LFUTEX_WAIT_FLAG_TIMEOUT_ABSOLUTE |
-		                         LFUTEX_WAIT_FLAG_TIMEOUT_FORPOLL) < 0)
-			return false;
-	}
+	if (__hybrid_atomic_cmpxch(self->sl_lock, 1, 2, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+		return __shared_lock_wait_timeout64(self, abs_timeout);
 	return true;
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x401dd480 */
+/* HASH CRC-32:0xbc4bf328 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,54 +21,9 @@
 #ifndef __local_shared_lock_waitfor_defined
 #define __local_shared_lock_waitfor_defined
 #include <__crt.h>
-#include <bits/types.h>
-#if defined(__KERNEL__) || defined(__CRT_HAVE_LFutexExprI64) || defined(__CRT_HAVE_LFutexExprI) || (defined(__cplusplus) && defined(__KOS__) && (defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)))
-#include <kos/anno.h>
 #include <kos/bits/shared-lock.h>
-__NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_LFutexExprI64_except_defined
-#define __local___localdep_LFutexExprI64_except_defined
-#if defined(__CRT_HAVE_LFutexExprI) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__NAMESPACE_LOCAL_END
-#include <bits/os/timespec.h>
-#include <kos/bits/futex-expr.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_IN(3) __ATTR_IN_OPT(4) __ATTR_NONNULL((1)),int,__THROWING,__localdep_LFutexExprI64_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExprI,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_LFutexExprI64)
-__NAMESPACE_LOCAL_END
-#include <bits/os/timespec.h>
-#include <kos/bits/futex-expr.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_IN(3) __ATTR_IN_OPT(4) __ATTR_NONNULL((1)),int,__THROWING,__localdep_LFutexExprI64_except,(__uintptr_t *__ulockaddr, void *__base, struct lfutexexpr const *__expr, struct __timespec64 const *__timeout, unsigned int __timeout_flags),LFutexExprI64,(__ulockaddr,__base,__expr,__timeout,__timeout_flags))
-#elif defined(__CRT_HAVE_LFutexExprI) || (defined(__cplusplus) && defined(__KOS__) && (defined(__CRT_HAVE_LFutexExpr64) || defined(__CRT_HAVE_LFutexExpr)))
-__NAMESPACE_LOCAL_END
-#include <libc/local/kos.futexexpr/LFutexExprI64_except.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_LFutexExprI64_except __LIBC_LOCAL_NAME(LFutexExprI64_except)
-#else /* ... */
-#undef __local___localdep_LFutexExprI64_except_defined
-#endif /* !... */
-#endif /* !__local___localdep_LFutexExprI64_except_defined */
-__NAMESPACE_LOCAL_END
-#ifdef __KERNEL__
-#include <hybrid/__assert.h>
-#include <sched/sig.h>
-#else /* __KERNEL__ */
-#include <kos/syscalls.h>
-#include <kos/asm/futex.h>
-#include <kos/bits/futex-expr.h>
-#ifndef __SHARED_LOCK_WAITEXPR_DEFINED
-#define __SHARED_LOCK_WAITEXPR_DEFINED
-__NAMESPACE_LOCAL_BEGIN
-static struct lfutexexpr const __shared_lock_waitexpr[] = {
-	/* Wait until `sl_lock == 0' */
-	LFUTEXEXPR_INIT(__builtin_offsetof(struct shared_lock, sl_lock), LFUTEX_WAIT_UNTIL, 0, 0),
-	LFUTEXEXPR_INIT(0, LFUTEX_EXPREND, 0, 0)
-};
-__NAMESPACE_LOCAL_END
-#endif /* !__SHARED_LOCK_WAITEXPR_DEFINED */
-
-#endif /* !__KERNEL__ */
+#if defined(__KERNEL__) || defined(__shared_lock_wait_timeout)
+#include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(shared_lock_waitfor) __BLOCKING __ATTR_INOUT(1) void
 (__FCALL __LIBC_LOCAL_NAME(shared_lock_waitfor))(struct shared_lock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
@@ -87,11 +42,8 @@ __LOCAL_LIBC(shared_lock_waitfor) __BLOCKING __ATTR_INOUT(1) void
 		task_waitfor(KTIME_INFINITE);
 	}
 #else /* __KERNEL__ */
-	while (__hybrid_atomic_load(__self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(__self->sl_sig, 1, __ATOMIC_SEQ_CST);
-		(__NAMESPACE_LOCAL_SYM __localdep_LFutexExprI64_except)(&__self->sl_sig, __self, __NAMESPACE_LOCAL_SYM __shared_lock_waitexpr,
-		                     __NULLPTR, 0);
-	}
+	if (__hybrid_atomic_cmpxch(__self->sl_lock, 1, 2, __ATOMIC_ACQUIRE, __ATOMIC_ACQUIRE))
+		__shared_lock_wait(__self);
 #endif /* !__KERNEL__ */
 }
 __NAMESPACE_LOCAL_END
@@ -99,7 +51,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_shared_lock_waitfor_defined
 #define __localdep_shared_lock_waitfor __LIBC_LOCAL_NAME(shared_lock_waitfor)
 #endif /* !__local___localdep_shared_lock_waitfor_defined */
-#else /* __KERNEL__ || __CRT_HAVE_LFutexExprI64 || __CRT_HAVE_LFutexExprI || (__cplusplus && __KOS__ && (__CRT_HAVE_LFutexExpr64 || __CRT_HAVE_LFutexExpr)) */
+#else /* __KERNEL__ || __shared_lock_wait_timeout */
 #undef __local_shared_lock_waitfor_defined
-#endif /* !__KERNEL__ && !__CRT_HAVE_LFutexExprI64 && !__CRT_HAVE_LFutexExprI && (!__cplusplus || !__KOS__ || (!__CRT_HAVE_LFutexExpr64 && !__CRT_HAVE_LFutexExpr)) */
+#endif /* !__KERNEL__ && !__shared_lock_wait_timeout */
 #endif /* !__local_shared_lock_waitfor_defined */
