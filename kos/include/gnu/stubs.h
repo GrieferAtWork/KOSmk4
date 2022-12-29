@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6acc196 */
+/* HASH CRC-32:0x79419e19 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -127,11 +127,6 @@
 #define __stub___clock_getcpuclockid
 #define __stub_clock_getcpuclockid
 #define __stub_closelog
-#define __stub_cond_broadcast
-#define __stub_cond_signal
-#define __stub_condition_implies
-#define __stub_condition_unimplies
-#define __stub_condition_wait
 #define __stub_crypt
 #define __stub_crypt_r
 #define __stub_dehumanize_number

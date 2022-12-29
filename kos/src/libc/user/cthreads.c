@@ -28,6 +28,8 @@
 #include <hybrid/atomic.h>
 #include <hybrid/host.h>
 
+#include <linux/futex.h>
+
 #include <assert.h>
 #include <err.h>
 #include <malloc.h>
@@ -37,18 +39,33 @@
 #include <libiberty.h>
 
 #include "../libc/dl.h"
+#include "../libc/syscalls.h"
 #include "cthreads.h"
 
 DECL_BEGIN
+
+#define condition_as_pthread(self) \
+	container_of((__UINT32_TYPE__ *)&(self)->lock, pthread_cond_t, c_futex)
+
+PRIVATE ATTR_SECTION(".bss.crt.compat.hurd.cthreads")
+bool did_call_condition_implies = false;
 
 /*[[[head:libc_cond_signal,hash:CRC-32=0xe00e4fe3]]]*/
 INTERN ATTR_SECTION(".text.crt.compat.hurd.cthreads") int
 NOTHROW_NCX(LIBCCALL libc_cond_signal)(condition_t self)
 /*[[[body:libc_cond_signal]]]*/
-/*AUTO*/{
-	(void)self;
-	CRT_UNIMPLEMENTEDF("cond_signal(self: %p)", self); /* TODO */
-	return libc_seterrno(ENOSYS);
+{
+	pthread_cond_t *pcond;
+	pcond = condition_as_pthread(self);
+	pthread_cond_signal(pcond);
+	if (did_call_condition_implies) {
+		struct cond_imp *iter;
+		for (iter = self->implications; iter; iter = iter->next) {
+			pcond = condition_as_pthread(iter->implicatand);
+			pthread_cond_signal(pcond); /* XXX: Supposed to stop if we woke someone */
+		}
+	}
+	return 0; /* XXX: Supposed to return `1' if we woke someone */
 }
 /*[[[end:libc_cond_signal]]]*/
 
@@ -56,10 +73,17 @@ NOTHROW_NCX(LIBCCALL libc_cond_signal)(condition_t self)
 INTERN ATTR_SECTION(".text.crt.compat.hurd.cthreads") void
 NOTHROW_NCX(LIBCCALL libc_cond_broadcast)(condition_t self)
 /*[[[body:libc_cond_broadcast]]]*/
-/*AUTO*/{
-	(void)self;
-	CRT_UNIMPLEMENTEDF("cond_broadcast(self: %p)", self); /* TODO */
-	libc_seterrno(ENOSYS);
+{
+	pthread_cond_t *pcond;
+	pcond = condition_as_pthread(self);
+	pthread_cond_broadcast(pcond);
+	if (did_call_condition_implies) {
+		struct cond_imp *iter;
+		for (iter = self->implications; iter; iter = iter->next) {
+			pcond = condition_as_pthread(iter->implicatand);
+			pthread_cond_broadcast(pcond);
+		}
+	}
 }
 /*[[[end:libc_cond_broadcast]]]*/
 
@@ -68,11 +92,32 @@ INTERN ATTR_SECTION(".text.crt.compat.hurd.cthreads") void
 NOTHROW_NCX(LIBCCALL libc_condition_wait)(condition_t self,
                                           mutex_t mutex)
 /*[[[body:libc_condition_wait]]]*/
-/*AUTO*/{
-	(void)self;
-	(void)mutex;
-	CRT_UNIMPLEMENTEDF("condition_wait(self: %p, mutex: %p)", self, mutex); /* TODO */
-	libc_seterrno(ENOSYS);
+{
+	uint32_t lock;
+	pthread_cond_t *pcond;
+	pcond = condition_as_pthread(self);
+
+	/************************************************************************/
+	/* Stolen from our `pthread_cond_wait(3)'                               */
+	/************************************************************************/
+
+	/* Interlocked:begin */
+	lock = ATOMIC_READ(pcond->c_futex);
+
+	/* Interlocked:op */
+	mutex_unlock(mutex);
+	if (!(lock & FUTEX_WAITERS)) {
+		/* NOTE: Don't re-load `lock' here! We _need_ the value from _before_
+		 *       we've released `mutex',  else there'd be  a race  condition! */
+		ATOMIC_OR(pcond->c_futex, FUTEX_WAITERS);
+		lock |= FUTEX_WAITERS;
+	}
+
+	/* Interlocked:wait */
+	sys_futex(&pcond->c_futex, FUTEX_WAIT, lock, NULL, NULL, 0);
+
+	/* Return-path */
+	mutex_lock(mutex);
 }
 /*[[[end:libc_condition_wait]]]*/
 
@@ -82,11 +127,13 @@ INTERN ATTR_SECTION(".text.crt.compat.hurd.cthreads") void
 NOTHROW_NCX(LIBCCALL libc_condition_implies)(condition_t implicator,
                                              condition_t implicatand)
 /*[[[body:libc_condition_implies]]]*/
-/*AUTO*/{
-	(void)implicator;
-	(void)implicatand;
-	CRT_UNIMPLEMENTEDF("condition_implies(implicator: %p, implicatand: %p)", implicator, implicatand); /* TODO */
-	libc_seterrno(ENOSYS);
+{
+	struct cond_imp *item;
+	item = (struct cond_imp *)xmalloc(sizeof(struct cond_imp));
+	item->implicatand        = implicatand;
+	item->next               = implicator->implications;
+	implicator->implications = item;
+	did_call_condition_implies = true;
 }
 /*[[[end:libc_condition_implies]]]*/
 
@@ -95,11 +142,19 @@ INTERN ATTR_SECTION(".text.crt.compat.hurd.cthreads") void
 NOTHROW_NCX(LIBCCALL libc_condition_unimplies)(condition_t implicator,
                                                condition_t implicatand)
 /*[[[body:libc_condition_unimplies]]]*/
-/*AUTO*/{
-	(void)implicator;
-	(void)implicatand;
-	CRT_UNIMPLEMENTEDF("condition_unimplies(implicator: %p, implicatand: %p)", implicator, implicatand); /* TODO */
-	libc_seterrno(ENOSYS);
+{
+	struct cond_imp **p_iter, *iter;
+	for (p_iter = &implicator->implications;
+	     (iter = *p_iter) != NULL;
+	     p_iter = &iter->next) {
+		if (iter->implicatand != implicatand)
+			continue;
+		/* Unlink this item and free it. */
+		*p_iter = iter->next;
+		free(iter);
+		break;
+	}
+	did_call_condition_implies = true;
 }
 /*[[[end:libc_condition_unimplies]]]*/
 
