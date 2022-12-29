@@ -601,6 +601,24 @@ NOTHROW_RPC(LIBCCALL libc_pthread_join)(pthread_t pthread,
 }
 /*[[[end:libc_pthread_join]]]*/
 
+/*[[[head:libc_pthread_getresult_np,hash:CRC-32=0x5785f489]]]*/
+/* >> pthread_getresult_np(3)
+ * Same as `pthread_join(3)', but don't destroy `pthread' at the end.
+ * Instead, the caller must destroy `pthread' themselves via  another
+ * call to `pthread_detach(3)'.
+ * @return: EOK: Success */
+INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT_OPT(2) errno_t
+NOTHROW_RPC(LIBCCALL libc_pthread_getresult_np)(pthread_t pthread,
+                                                void **thread_return)
+/*[[[body:libc_pthread_getresult_np]]]*/
+/*AUTO*/{
+	(void)pthread;
+	(void)thread_return;
+	CRT_UNIMPLEMENTEDF("pthread_getresult_np(pthread: %" PRIxN(__SIZEOF_PTHREAD_T) ", thread_return: %p)", pthread, thread_return); /* TODO */
+	return ENOSYS;
+}
+/*[[[end:libc_pthread_getresult_np]]]*/
+
 /*[[[head:libc_pthread_tryjoin_np,hash:CRC-32=0x61b8953b]]]*/
 /* >> pthread_tryjoin_np(3)
  * Check whether thread `pthread' has terminated. If so return the
@@ -4636,20 +4654,24 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getspecificptr_np)(pthread_key_t key)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xdf3ada84]]]*/
+/*[[[start:exports,hash:CRC-32=0xdca325be]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(DOS$pthread_create, libd_pthread_create);
 #endif /* !__LIBCCALL_IS_LIBDCALL */
 DEFINE_PUBLIC_ALIAS(pthread_create, libc_pthread_create);
 DEFINE_PUBLIC_ALIAS(thr_exit, libc_pthread_exit);
+DEFINE_PUBLIC_ALIAS(cthread_exit, libc_pthread_exit);
 DEFINE_PUBLIC_ALIAS(pthread_exit, libc_pthread_exit);
 DEFINE_PUBLIC_ALIAS(pthread_join, libc_pthread_join);
+DEFINE_PUBLIC_ALIAS(pthread_getresult_np, libc_pthread_getresult_np);
 DEFINE_PUBLIC_ALIAS(pthread_tryjoin_np, libc_pthread_tryjoin_np);
 DEFINE_PUBLIC_ALIAS(pthread_timedjoin_np, libc_pthread_timedjoin_np);
 DEFINE_PUBLIC_ALIAS(pthread_timedjoin64_np, libc_pthread_timedjoin64_np);
+DEFINE_PUBLIC_ALIAS(cthread_detach, libc_pthread_detach);
 DEFINE_PUBLIC_ALIAS(pthread_detach, libc_pthread_detach);
 DEFINE_PUBLIC_ALIAS(thrd_current, libc_pthread_self);
 DEFINE_PUBLIC_ALIAS(thr_self, libc_pthread_self);
+DEFINE_PUBLIC_ALIAS(cthread_self, libc_pthread_self);
 DEFINE_PUBLIC_ALIAS(pthread_self, libc_pthread_self);
 DEFINE_PUBLIC_ALIAS(pthread_attr_init, libc_pthread_attr_init);
 DEFINE_PUBLIC_ALIAS(pthread_attr_destroy, libc_pthread_attr_destroy);
@@ -4682,6 +4704,7 @@ DEFINE_PUBLIC_ALIAS(pthread_setschedprio, libc_pthread_setschedprio);
 DEFINE_PUBLIC_ALIAS(pthread_get_name_np, libc_pthread_getname_np);
 DEFINE_PUBLIC_ALIAS(pthread_getname_np, libc_pthread_getname_np);
 DEFINE_PUBLIC_ALIAS(pthread_set_name_np, libc_pthread_setname_np);
+DEFINE_PUBLIC_ALIAS(cthread_set_name, libc_pthread_setname_np);
 DEFINE_PUBLIC_ALIAS(pthread_setname_np, libc_pthread_setname_np);
 DEFINE_PUBLIC_ALIAS(pthread_gettid_np, libc_pthread_gettid_np);
 DEFINE_PUBLIC_ALIAS(pthread_mainthread_np, libc_pthread_mainthread_np);

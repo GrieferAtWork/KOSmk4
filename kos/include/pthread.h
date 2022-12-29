@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ab9cde8 */
+/* HASH CRC-32:0xf2f7708e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -647,6 +647,11 @@ __CDECLARE_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),__THROWING,pthread_exit,(v
  * Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
 __CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),__THROWING,pthread_exit,(void *__retval),thr_exit,(__retval))
+#elif defined(__CRT_HAVE_cthread_exit)
+/* >> pthread_exit(3)
+ * Terminate calling thread.
+ * The registered cleanup handlers are called via exception handling */
+__CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),__THROWING,pthread_exit,(void *__retval),cthread_exit,(__retval))
 #endif /* ... */
 /* >> pthread_join(3)
  * Make calling thread wait for termination of the thread `pthread'.
@@ -654,6 +659,14 @@ __CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),__THROWING,pthread_exit,(
  * `thread_return' is not `NULL'.
  * @return: EOK: Success */
 __CDECLARE_OPT(__ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_join,(pthread_t __pthread, void **__thread_return),(__pthread,__thread_return))
+#ifdef __USE_KOS
+/* >> pthread_getresult_np(3)
+ * Same as `pthread_join(3)', but don't destroy `pthread' at the end.
+ * Instead, the caller must destroy `pthread' themselves via  another
+ * call to `pthread_detach(3)'.
+ * @return: EOK: Success */
+__CDECLARE_OPT(__ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_getresult_np,(pthread_t __pthread, void **__thread_return),(__pthread,__thread_return))
+#endif /* __USE_KOS */
 #ifdef __USE_GNU
 /* >> pthread_tryjoin_np(3)
  * Check whether thread `pthread' has terminated. If so return the
@@ -724,12 +737,21 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin64_np, __FORCELOCAL __ATTR_ARTI
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_GNU */
+#ifdef __CRT_HAVE_pthread_detach
 /* >> pthread_detach(3)
  * Indicate  that the  thread `pthread' is  never to be  joined with `pthread_join(3)'.
  * The  resources  of   `pthread'  will   therefore  be  freed   immediately  when   it
  * terminates, instead of waiting for another thread to perform `pthread_join(3)' on it
  * @return: EOK: Success */
-__CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_detach,(pthread_t __pthread),(__pthread))
+__CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_detach,(pthread_t __pthread),(__pthread))
+#elif defined(__CRT_HAVE_cthread_detach)
+/* >> pthread_detach(3)
+ * Indicate  that the  thread `pthread' is  never to be  joined with `pthread_join(3)'.
+ * The  resources  of   `pthread'  will   therefore  be  freed   immediately  when   it
+ * terminates, instead of waiting for another thread to perform `pthread_join(3)' on it
+ * @return: EOK: Success */
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_detach,(pthread_t __pthread),cthread_detach,(__pthread))
+#endif /* ... */
 #ifdef __CRT_HAVE_pthread_self
 /* >> pthread_self(3)
  * Obtain the identifier of the current thread
@@ -745,6 +767,11 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,pthread_t,__NOTHROW,pthread_self,(void),
  * Obtain the identifier of the current thread
  * @return: * : Handle for the calling thread */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,pthread_t,__NOTHROW,pthread_self,(void),thr_self,())
+#elif defined(__CRT_HAVE_cthread_self)
+/* >> pthread_self(3)
+ * Obtain the identifier of the current thread
+ * @return: * : Handle for the calling thread */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,pthread_t,__NOTHROW,pthread_self,(void),cthread_self,())
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_equal
 /* >> pthread_equal(3)
@@ -1010,6 +1037,12 @@ __CDECLARE(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __
  * @return: EOK:    Success
  * @return: ERANGE: The given `name' is too long */
 __CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __target_thread, const char *__name),pthread_set_name_np,(__target_thread,__name))
+#elif defined(__CRT_HAVE_cthread_set_name)
+/* >> pthread_setname_np(3)
+ * Set thread name visible in the kernel and its interfaces
+ * @return: EOK:    Success
+ * @return: ERANGE: The given `name' is too long */
+__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __target_thread, const char *__name),cthread_set_name,(__target_thread,__name))
 #endif /* ... */
 #endif /* __USE_GNU */
 #ifdef __USE_KOS
@@ -1066,61 +1099,69 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_setconcurrency,(int __level),thr_se
 #endif /* __USE_UNIX98 */
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_sched_yield
-/* >> pthread_yield(3), thrd_yield(3), sched_yield(2)
- * Yield  the processor to another thread or process.
+/* >> pthread_yield(3), thrd_yield(3), sched_yield(2), cthread_yield(3)
+ * Yield the processor to another thread or process.
  * This function is similar to the POSIX `sched_yield' function but
  * might  be differently implemented in the case of a m-on-n thread
  * implementation
  * @return: EOK: Success */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),sched_yield,())
 #elif defined(__CRT_HAVE_thrd_yield)
-/* >> pthread_yield(3), thrd_yield(3), sched_yield(2)
- * Yield  the processor to another thread or process.
+/* >> pthread_yield(3), thrd_yield(3), sched_yield(2), cthread_yield(3)
+ * Yield the processor to another thread or process.
  * This function is similar to the POSIX `sched_yield' function but
  * might  be differently implemented in the case of a m-on-n thread
  * implementation
  * @return: EOK: Success */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),thrd_yield,())
 #elif defined(__CRT_HAVE_pthread_yield)
-/* >> pthread_yield(3), thrd_yield(3), sched_yield(2)
- * Yield  the processor to another thread or process.
+/* >> pthread_yield(3), thrd_yield(3), sched_yield(2), cthread_yield(3)
+ * Yield the processor to another thread or process.
  * This function is similar to the POSIX `sched_yield' function but
  * might  be differently implemented in the case of a m-on-n thread
  * implementation
  * @return: EOK: Success */
 __CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),())
 #elif defined(__CRT_HAVE___sched_yield)
-/* >> pthread_yield(3), thrd_yield(3), sched_yield(2)
- * Yield  the processor to another thread or process.
+/* >> pthread_yield(3), thrd_yield(3), sched_yield(2), cthread_yield(3)
+ * Yield the processor to another thread or process.
  * This function is similar to the POSIX `sched_yield' function but
  * might  be differently implemented in the case of a m-on-n thread
  * implementation
  * @return: EOK: Success */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),__sched_yield,())
 #elif defined(__CRT_HAVE___libc_sched_yield)
-/* >> pthread_yield(3), thrd_yield(3), sched_yield(2)
- * Yield  the processor to another thread or process.
+/* >> pthread_yield(3), thrd_yield(3), sched_yield(2), cthread_yield(3)
+ * Yield the processor to another thread or process.
  * This function is similar to the POSIX `sched_yield' function but
  * might  be differently implemented in the case of a m-on-n thread
  * implementation
  * @return: EOK: Success */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),__libc_sched_yield,())
 #elif defined(__CRT_HAVE_yield)
-/* >> pthread_yield(3), thrd_yield(3), sched_yield(2)
- * Yield  the processor to another thread or process.
+/* >> pthread_yield(3), thrd_yield(3), sched_yield(2), cthread_yield(3)
+ * Yield the processor to another thread or process.
  * This function is similar to the POSIX `sched_yield' function but
  * might  be differently implemented in the case of a m-on-n thread
  * implementation
  * @return: EOK: Success */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),yield,())
 #elif defined(__CRT_HAVE_thr_yield)
-/* >> pthread_yield(3), thrd_yield(3), sched_yield(2)
- * Yield  the processor to another thread or process.
+/* >> pthread_yield(3), thrd_yield(3), sched_yield(2), cthread_yield(3)
+ * Yield the processor to another thread or process.
  * This function is similar to the POSIX `sched_yield' function but
  * might  be differently implemented in the case of a m-on-n thread
  * implementation
  * @return: EOK: Success */
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),thr_yield,())
+#elif defined(__CRT_HAVE_cthread_yield)
+/* >> pthread_yield(3), thrd_yield(3), sched_yield(2), cthread_yield(3)
+ * Yield the processor to another thread or process.
+ * This function is similar to the POSIX `sched_yield' function but
+ * might  be differently implemented in the case of a m-on-n thread
+ * implementation
+ * @return: EOK: Success */
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),cthread_yield,())
 #endif /* ... */
 /* >> pthread_setaffinity_np(3)
  * Limit specified thread `pthread' to run only on the processors represented in `cpuset'
@@ -2580,7 +2621,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,pthread_main_np,(void),())
  * if the  calling  thread  "hasn't been initialized",  though  this
  * isn't a case that can actually happen under KOS's implementation. */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,pthread_main_np,(void),thr_main,())
-#elif (defined(__CRT_HAVE_pthread_mainthread_np) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self))) || ((defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid) || defined(__CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
+#elif (defined(__CRT_HAVE_pthread_mainthread_np) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self) || defined(__CRT_HAVE_cthread_self))) || ((defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid) || defined(__CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
 #include <libc/local/pthread/pthread_main_np.h>
 /* >> pthread_main_np(3)
  * Returns  1 if the  calling thread is the  main() thread (i.e. the

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28c7363d */
+/* HASH CRC-32:0xd9838d7d */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,10 @@ typedef __spin_lock_t spin_lock_t;
 #define SPIN_LOCK_INITIALIZER __SPIN_LOCK_INITIALIZER
 
 #define spin_lock_init(lock) __spin_lock_init(lock)
+#include <kos/bits/shared-lock.h>
+#if defined(__CRT_HAVE___spin_lock) || defined(__CRT_HAVE_shared_lock_acquire) || defined(__KERNEL__) || defined(__shared_lock_wait)
 #define spin_lock(lock) __spin_lock(lock)
+#endif /* __CRT_HAVE___spin_lock || __CRT_HAVE_shared_lock_acquire || __KERNEL__ || __shared_lock_wait */
 #include <kos/sched/shared-lock.h>
 #if defined(__CRT_HAVE___spin_try_lock) || defined(__shared_lock_tryacquire)
 #define spin_try_lock(lock) __spin_try_lock(lock)

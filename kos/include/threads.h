@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75c1d021 */
+/* HASH CRC-32:0x4176a74f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -218,6 +218,10 @@ __CDECLARE(__ATTR_WUNUSED,thrd_t,__NOTHROW_NCX,thrd_current,(void),())
 /* >> thrd_current(3)
  * Return the descriptor for the calling thread (s.a. `pthread_self(3)') */
 __CREDIRECT(__ATTR_WUNUSED,thrd_t,__NOTHROW_NCX,thrd_current,(void),thr_self,())
+#elif defined(__CRT_HAVE_cthread_self)
+/* >> thrd_current(3)
+ * Return the descriptor for the calling thread (s.a. `pthread_self(3)') */
+__CREDIRECT(__ATTR_WUNUSED,thrd_t,__NOTHROW_NCX,thrd_current,(void),cthread_self,())
 #endif /* ... */
 #include <bits/types.h>
 #if defined(__CRT_HAVE_thrd_sleep) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
@@ -272,7 +276,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_sleep64, __FORCELOCAL __ATTR_ARTIFICIAL __A
 /* >> thrd_exit(3)
  * Terminate the calling thread (s.a. `pthread_exit(3)') */
 __CDECLARE_VOID(__ATTR_NORETURN,__THROWING,thrd_exit,(int __res),(__res))
-#elif defined(__CRT_HAVE_pthread_exit) || defined(__CRT_HAVE_thr_exit)
+#elif defined(__CRT_HAVE_pthread_exit) || defined(__CRT_HAVE_thr_exit) || defined(__CRT_HAVE_cthread_exit)
 #include <libc/local/threads/thrd_exit.h>
 /* >> thrd_exit(3)
  * Terminate the calling thread (s.a. `pthread_exit(3)') */
@@ -284,7 +288,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(thrd_exit, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
  * @return: thrd_success: Success
  * @return: thrd_error:   Error */
 __CDECLARE(,int,__NOTHROW_NCX,thrd_detach,(thrd_t __thr),(__thr))
-#elif defined(__CRT_HAVE_pthread_detach)
+#elif defined(__CRT_HAVE_pthread_detach) || defined(__CRT_HAVE_cthread_detach)
 #include <libc/local/threads/thrd_detach.h>
 /* >> thrd_detach(3)
  * Detach the given thread (s.a. `pthread_detach(3)')
@@ -334,6 +338,10 @@ __CREDIRECT_VOID(,__NOTHROW,thrd_yield,(void),yield,())
 /* >> thrd_yield(3)
  * Yield execution to another thread (s.a. `pthread_yield(3)') */
 __CREDIRECT_VOID(,__NOTHROW,thrd_yield,(void),thr_yield,())
+#elif defined(__CRT_HAVE_cthread_yield)
+/* >> thrd_yield(3)
+ * Yield execution to another thread (s.a. `pthread_yield(3)') */
+__CREDIRECT_VOID(,__NOTHROW,thrd_yield,(void),cthread_yield,())
 #endif /* ... */
 
 
@@ -689,7 +697,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,thr_main,(void),pthread_ma
  * Internally,  this is  the return value  if the caller  doesn't have a
  * proper pthread-controller attached. */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,thr_main,(void),())
-#elif (defined(__CRT_HAVE_pthread_mainthread_np) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self))) || ((defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid) || defined(__CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
+#elif (defined(__CRT_HAVE_pthread_mainthread_np) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self) || defined(__CRT_HAVE_cthread_self))) || ((defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid) || defined(__CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
 #include <libc/local/pthread/pthread_main_np.h>
 /* >> thr_main(3)
  * Another  one of these non-restricted, but solaris-specific functions:

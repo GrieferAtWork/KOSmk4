@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab21eac1 */
+/* HASH CRC-32:0x30d3f836 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2785,6 +2785,7 @@
 #define __CRT_HAVE_DOS$pthread_getattr_np
 #define __CRT_HAVE_DOS$pthread_getcpuclockid
 #define __CRT_HAVE_DOS$pthread_getname_np
+#define __CRT_HAVE_DOS$pthread_getresult_np
 #define __CRT_HAVE_DOS$pthread_getschedparam
 #define __CRT_HAVE_DOS$pthread_getspecific
 #define __CRT_HAVE_DOS$pthread_getspecificptr_np
@@ -4478,6 +4479,7 @@
 #define __CRT_HAVE___mutex_init
 #define __CRT_HAVE___mutex_trylock
 #define __CRT_HAVE___mutex_unlock
+#define __CRT_HAVE___mutex_unlock_solid
 #define __CRT_HAVE___overflow
 #define __CRT_HAVE___p___argc
 #define __CRT_HAVE___p___argv
@@ -5552,6 +5554,11 @@
 #define __CRT_HAVE_concat_copy2
 #define __CRT_HAVE_concat_length
 #define __CRT_HAVE_concat_vcopy
+#define __CRT_HAVE_cond_broadcast
+#define __CRT_HAVE_cond_signal
+#define __CRT_HAVE_condition_implies
+#define __CRT_HAVE_condition_unimplies
+#define __CRT_HAVE_condition_wait
 #define __CRT_HAVE_confstr
 #define __CRT_HAVE_conj
 #define __CRT_HAVE_conjf
@@ -5612,6 +5619,20 @@
 #define __CRT_HAVE_ctanl
 #define __CRT_HAVE_ctermid
 #define __CRT_HAVE_ctermid_r
+#define __CRT_HAVE_cthread_abort
+#define __CRT_HAVE_cthread_count
+#define __CRT_HAVE_cthread_data
+#define __CRT_HAVE_cthread_fork
+#define __CRT_HAVE_cthread_getspecific
+#define __CRT_HAVE_cthread_init
+#define __CRT_HAVE_cthread_join
+#define __CRT_HAVE_cthread_keycreate
+#define __CRT_HAVE_cthread_limit
+#define __CRT_HAVE_cthread_name
+#define __CRT_HAVE_cthread_set_data
+#define __CRT_HAVE_cthread_set_limit
+#define __CRT_HAVE_cthread_setspecific
+#define __CRT_HAVE_cthread_sp
 #define __CRT_HAVE_ctime
 #define __CRT_HAVE_ctime64
 #define __CRT_HAVE_ctime64_r
@@ -7155,6 +7176,7 @@
 #define __CRT_HAVE_pthread_getconcurrency
 #define __CRT_HAVE_pthread_getcpuclockid
 #define __CRT_HAVE_pthread_getname_np
+#define __CRT_HAVE_pthread_getresult_np
 #define __CRT_HAVE_pthread_getschedparam
 #define __CRT_HAVE_pthread_getspecific
 #define __CRT_HAVE_pthread_getspecificptr_np
@@ -8232,6 +8254,7 @@
 #define __CRT_HAVE_unshare
 #define __CRT_HAVE_updwtmp
 #define __CRT_HAVE_updwtmpx
+#define __CRT_HAVE_ur_cthread_self
 #define __CRT_HAVE_uselocale
 #define __CRT_HAVE_user_from_uid
 #define __CRT_HAVE_usleep

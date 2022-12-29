@@ -64,6 +64,7 @@ NOTHROW(LIBCCALL libc_geterrno)(void) {
 	return current.pt_errno_value;
 }
 
+DEFINE_PUBLIC_ALIAS(cthread_errno, libc_geterrno_safe); /* Hurd compat */
 DEFINE_PUBLIC_ALIAS(__get_errno, libc_geterrno_safe);
 DEFINE_INTERN_ALIAS(libc___get_errno, libc_geterrno);
 INTERN NOBLOCK ATTR_PURE ATTR_SECTION(".text.crt.errno_access.core") errno_t
@@ -72,6 +73,7 @@ NOTHROW(LIBCCALL libc_geterrno_safe)(void) {
 }
 
 #ifndef __NO_ATTR_FASTCALL
+DEFINE_PUBLIC_ALIAS(cthread_set_errno_self, libc_seterrno_compat); /* Hurd compat */
 DEFINE_PUBLIC_ALIAS(__set_errno, libc_seterrno_compat);
 INTERN NOBLOCK ATTR_SECTION(".text.crt.errno_access.core") syscall_slong_t
 NOTHROW(LIBCCALL libc_seterrno_compat)(errno_t value) {
@@ -79,6 +81,7 @@ NOTHROW(LIBCCALL libc_seterrno_compat)(errno_t value) {
 }
 DEFINE_PUBLIC_ALIAS(__set_errno_f, libc_seterrno);
 #else /* !__NO_ATTR_FASTCALL */
+DEFINE_PUBLIC_ALIAS(cthread_set_errno_self, libc_seterrno); /* Hurd compat */
 DEFINE_PUBLIC_ALIAS(__set_errno, libc_seterrno);
 #endif /* __NO_ATTR_FASTCALL */
 INTERN NOBLOCK ATTR_SECTION(".text.crt.errno_access.core") syscall_slong_t

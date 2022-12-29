@@ -307,7 +307,7 @@ NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval64)(pid_t pid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x8c9c6d34]]]*/
+/*[[[start:exports,hash:CRC-32=0x64991962]]]*/
 #ifndef __LIBCCALL_IS_LIBDCALL
 DEFINE_PUBLIC_ALIAS(DOS$__clone, libd_clone);
 DEFINE_PUBLIC_ALIAS(DOS$clone, libd_clone);
@@ -334,6 +334,7 @@ DEFINE_PUBLIC_ALIAS(__sched_yield, libc_sched_yield);
 DEFINE_PUBLIC_ALIAS(__libc_sched_yield, libc_sched_yield);
 DEFINE_PUBLIC_ALIAS(yield, libc_sched_yield);
 DEFINE_PUBLIC_ALIAS(thr_yield, libc_sched_yield);
+DEFINE_PUBLIC_ALIAS(cthread_yield, libc_sched_yield);
 DEFINE_PUBLIC_ALIAS(sched_yield, libc_sched_yield);
 DEFINE_PUBLIC_ALIAS(__sched_get_priority_max, libc_sched_get_priority_max);
 DEFINE_PUBLIC_ALIAS(__libc_sched_get_priority_max, libc_sched_get_priority_max);

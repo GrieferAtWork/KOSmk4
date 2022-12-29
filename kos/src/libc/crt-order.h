@@ -371,7 +371,7 @@
 	CB(PREFIX.crt.compat.dos.msabi64.msabi64_RRRR PREFIX.crt.compat.dos.msabi64.msabi64_RRRRR PREFIX.crt.compat.dos.msabi64.msabi64_RRRRRRn) \
 	CB(PREFIX.crt.compat.linux.__register_frame PREFIX.crt.compat.linux.dirent PREFIX.crt.compat.linux.except PREFIX.crt.compat.linux.heap PREFIX.crt.compat.linux.init PREFIX.crt.compat.linux.misc PREFIX.crt.compat.linux.signal PREFIX.crt.compat.linux.stdio PREFIX.crt.compat.linux) \
 	CB(PREFIX.crt.compat.glibc.printf PREFIX.crt.compat.glibc.regex PREFIX.crt.compat.glibc) \
-	CB(PREFIX.crt.compat.hurd.futex) \
+	CB(PREFIX.crt.compat.hurd.cthreads PREFIX.crt.compat.hurd.futex) \
 	CB(PREFIX.crt.wchar.fs.exec.exec) \
 	CB(PREFIX.crt.wchar.heap.strdup) \
 	CB(PREFIX.crt.wchar.FILE.locked.access) \

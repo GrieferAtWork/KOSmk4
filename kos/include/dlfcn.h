@@ -777,6 +777,7 @@ __IMPDEF void *(__DLFCN_VCC dlauxctrl)(void *__handle,
 #define DLAUXCTRL_GET_MAIN_TLSSEG    0xd181 /* Return a pointer to the main thread's TLS segment. The caller must ensure that this
                                              * segment has not, and will not be  deleted. Otherwise, behavior is undefined. -  The
                                              * given `handle' is ignored and there is no error-return-value. */
+#define DLAUXCTRL_GET_TLSSEG_COUNT   0xd182 /* Return the number of currently allocated TLS segments (usually the same as # of running threads). */
 #define DLAUXCTRL_REGISTER_EXTENSION 0xd201 /* Register an extension to libdl:
                                              * >> extension              = va_arg(struct dlmodule_format *);
                                              * >> sizeof_dlmodule_format = va_arg(size_t);

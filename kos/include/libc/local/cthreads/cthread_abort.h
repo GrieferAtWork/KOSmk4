@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8d839a7 */
+/* HASH CRC-32:0xb432aca9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,47 +18,33 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_thrd_detach_defined
-#define __local_thrd_detach_defined
+#ifndef __local_cthread_abort_defined
+#define __local_cthread_abort_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_pthread_detach) || defined(__CRT_HAVE_cthread_detach)
-#include <bits/crt/threads.h>
+#ifdef __CRT_HAVE_pthread_cancel
+struct cthread;
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_pthread_detach_defined
-#define __local___localdep_pthread_detach_defined
-#ifdef __CRT_HAVE_pthread_detach
+#ifndef __local___localdep_pthread_cancel_defined
+#define __local___localdep_pthread_cancel_defined
 __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_detach,(__pthread_t __pthread),pthread_detach,(__pthread))
-#elif defined(__CRT_HAVE_cthread_detach)
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_cancel,(__pthread_t __pthread),pthread_cancel,(__pthread))
+#endif /* !__local___localdep_pthread_cancel_defined */
 __NAMESPACE_LOCAL_END
-#include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_detach,(__pthread_t __pthread),cthread_detach,(__pthread))
-#else /* ... */
-#undef __local___localdep_pthread_detach_defined
-#endif /* !... */
-#endif /* !__local___localdep_pthread_detach_defined */
-__NAMESPACE_LOCAL_END
-#include <asm/crt/threads.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(thrd_detach) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(thrd_detach))(__thrd_t __thr) {
-	__errno_t __error;
-	__error = (__NAMESPACE_LOCAL_SYM __localdep_pthread_detach)((__pthread_t)__thr);
-	if __likely(!__error)
-		return __thrd_success;
-	return __thrd_error;
+__LOCAL_LIBC(cthread_abort) int
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cthread_abort))(struct cthread * __self) {
+	return (__NAMESPACE_LOCAL_SYM __localdep_pthread_cancel)((__pthread_t)__self) == 0 ? 0 : -1;
 }
 __NAMESPACE_LOCAL_END
-#ifndef __local___localdep_thrd_detach_defined
-#define __local___localdep_thrd_detach_defined
-#define __localdep_thrd_detach __LIBC_LOCAL_NAME(thrd_detach)
-#endif /* !__local___localdep_thrd_detach_defined */
-#else /* __CRT_HAVE_pthread_detach || __CRT_HAVE_cthread_detach */
-#undef __local_thrd_detach_defined
-#endif /* !__CRT_HAVE_pthread_detach && !__CRT_HAVE_cthread_detach */
-#endif /* !__local_thrd_detach_defined */
+#ifndef __local___localdep_cthread_abort_defined
+#define __local___localdep_cthread_abort_defined
+#define __localdep_cthread_abort __LIBC_LOCAL_NAME(cthread_abort)
+#endif /* !__local___localdep_cthread_abort_defined */
+#else /* __CRT_HAVE_pthread_cancel */
+#undef __local_cthread_abort_defined
+#endif /* !__CRT_HAVE_pthread_cancel */
+#endif /* !__local_cthread_abort_defined */

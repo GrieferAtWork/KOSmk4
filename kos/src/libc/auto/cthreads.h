@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3fb3141 */
+/* HASH CRC-32:0xcd078c45 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,29 +18,33 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_AUTO_LOCK_INTERN_H
-#define GUARD_LIBC_AUTO_LOCK_INTERN_H 1
+#ifndef GUARD_LIBC_AUTO_CTHREADS_H
+#define GUARD_LIBC_AUTO_CTHREADS_H 1
 
 #include "../api.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include <lock-intern.h>
+#include <cthreads.h>
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF void NOTHROW_NCX(LIBCCALL libc___spin_lock_init)(__spin_lock_t *lock);
-INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc___spin_lock_solid)(__spin_lock_t *lock);
-INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc___spin_unlock)(__spin_lock_t *lock);
-INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc___spin_try_lock)(__spin_lock_t *lock);
-INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBCCALL libc___spin_lock_locked)(__spin_lock_t __KOS_FIXED_CONST *lock);
-INTDEF void NOTHROW_NCX(LIBCCALL libc___mutex_init)(void *lock);
-INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc___mutex_unlock)(void *lock);
-INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc___mutex_unlock_solid)(void *lock);
-INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc___mutex_trylock)(void *lock);
+INTDEF vm_offset_t NOTHROW_NCX(LIBCCALL libc_cthread_init)(void);
+INTDEF NONNULL((1)) cthread_t NOTHROW_NCX(LIBCCALL libc_cthread_fork)(any_t (LIBCCALL *start_routine)(any_t arg), any_t arg);
+INTDEF any_t NOTHROW_NCX(LIBCCALL libc_cthread_join)(cthread_t self);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_cthread_abort)(cthread_t self);
+/* >> cthread_set_limit(3)
+ * No-op */
+INTDEF void NOTHROW_NCX(LIBCCALL libc_cthread_set_limit)(int limit);
+/* >> cthread_limit(3)
+ * No-op (always returns `INT_MAX') */
+INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_cthread_limit)(void);
+INTDEF ATTR_OUT(1) int NOTHROW_NCX(LIBCCALL libc_cthread_keycreate)(cthread_key_t *key);
+INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_cthread_getspecific)(cthread_key_t key, void **p_value);
+INTDEF ATTR_ACCESS_NONE(2) int NOTHROW_NCX(LIBCCALL libc_cthread_setspecific)(cthread_key_t key, void *value);
 #endif /* !__KERNEL__ */
 
 DECL_END
 
-#endif /* !GUARD_LIBC_AUTO_LOCK_INTERN_H */
+#endif /* !GUARD_LIBC_AUTO_CTHREADS_H */

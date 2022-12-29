@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13adade7 */
+/* HASH CRC-32:0x459b9b66 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -75,9 +75,9 @@
 #define _XOPEN_REALTIME_THREADS              1       /* X/Open thread realtime support is available. */
 #endif
 #define _XOPEN_SHM                           1       /* XPG4.2 shared memory is supported. */
-#if defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self)
+#if defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self) || defined(__CRT_HAVE_cthread_self)
 #define _POSIX_THREADS                       200809L /* Tell we have POSIX threads. */
-#endif /* __CRT_HAVE_pthread_self || __CRT_HAVE_thrd_current || __CRT_HAVE_thr_self */
+#endif /* __CRT_HAVE_pthread_self || __CRT_HAVE_thrd_current || __CRT_HAVE_thr_self || __CRT_HAVE_cthread_self */
 #define _POSIX_REENTRANT_FUNCTIONS           1       /* We have the reentrant functions described in POSIX. */
 #include <bits/os/dirent.h>
 #include <libc/template/stdstreams.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2359189 */
+/* HASH CRC-32:0x54a7f2a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -428,6 +428,12 @@ __CREDIRECT(,int,__NOTHROW,sched_yield,(void),yield,())
  *             The thread may not necessarily be apart of the calling process
  * @return: 0: The function returned immediately when no other thread was executed */
 __CREDIRECT(,int,__NOTHROW,sched_yield,(void),thr_yield,())
+#elif defined(__CRT_HAVE_cthread_yield)
+/* >> sched_yield(2)
+ * @return: 1: Another thread was  executed prior to  the function  returning
+ *             The thread may not necessarily be apart of the calling process
+ * @return: 0: The function returned immediately when no other thread was executed */
+__CREDIRECT(,int,__NOTHROW,sched_yield,(void),cthread_yield,())
 #endif /* ... */
 #ifdef __CRT_HAVE_sched_get_priority_max
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,sched_get_priority_max,(__STDC_INT_AS_UINT_T __algorithm),(__algorithm))

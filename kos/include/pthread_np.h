@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc285d08 */
+/* HASH CRC-32:0x99b1e4f9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,6 +99,12 @@ __CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_set_name_np,(pthread_t 
  * @return: EOK:    Success
  * @return: ERANGE: The given `name' is too long */
 __CDECLARE(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_set_name_np,(pthread_t __target_thread, const char *__name),(__target_thread,__name))
+#elif defined(__CRT_HAVE_cthread_set_name)
+/* >> pthread_setname_np(3)
+ * Set thread name visible in the kernel and its interfaces
+ * @return: EOK:    Success
+ * @return: ERANGE: The given `name' is too long */
+__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_set_name_np,(pthread_t __target_thread, const char *__name),cthread_set_name,(__target_thread,__name))
 #endif /* ... */
 #ifndef __pthread_main_np_defined
 #define __pthread_main_np_defined
@@ -118,7 +124,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,pthread_main_np,(void),())
  * if the  calling  thread  "hasn't been initialized",  though  this
  * isn't a case that can actually happen under KOS's implementation. */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,pthread_main_np,(void),thr_main,())
-#elif (defined(__CRT_HAVE_pthread_mainthread_np) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self))) || ((defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid) || defined(__CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
+#elif (defined(__CRT_HAVE_pthread_mainthread_np) && (defined(__CRT_HAVE_pthread_self) || defined(__CRT_HAVE_thrd_current) || defined(__CRT_HAVE_thr_self) || defined(__CRT_HAVE_cthread_self))) || ((defined(__CRT_HAVE_gettid) || defined(__CRT_HAVE___threadid) || defined(__CRT_HAVE_$QGetCurrentThreadId$Aplatform$Adetails$AConcurrency$A$AYAJXZ)) && (defined(__CRT_HAVE_getpid) || defined(__CRT_HAVE__getpid) || defined(__CRT_HAVE___getpid) || defined(__CRT_HAVE___libc_getpid)))
 #include <libc/local/pthread/pthread_main_np.h>
 /* >> pthread_main_np(3)
  * Returns  1 if the  calling thread is the  main() thread (i.e. the

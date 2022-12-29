@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3fb3141 */
+/* HASH CRC-32:0x223fab46 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,29 +18,38 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_AUTO_LOCK_INTERN_H
-#define GUARD_LIBC_AUTO_LOCK_INTERN_H 1
+#ifndef GUARD_LIBC_USER_CTHREADS_H
+#define GUARD_LIBC_USER_CTHREADS_H 1
 
 #include "../api.h"
+#include "../auto/cthreads.h"
 
 #include <hybrid/typecore.h>
 #include <kos/types.h>
-#include <lock-intern.h>
+#include <cthreads.h>
 
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF void NOTHROW_NCX(LIBCCALL libc___spin_lock_init)(__spin_lock_t *lock);
-INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc___spin_lock_solid)(__spin_lock_t *lock);
-INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc___spin_unlock)(__spin_lock_t *lock);
-INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc___spin_try_lock)(__spin_lock_t *lock);
-INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBCCALL libc___spin_lock_locked)(__spin_lock_t __KOS_FIXED_CONST *lock);
-INTDEF void NOTHROW_NCX(LIBCCALL libc___mutex_init)(void *lock);
-INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc___mutex_unlock)(void *lock);
-INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc___mutex_unlock_solid)(void *lock);
-INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc___mutex_trylock)(void *lock);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_cond_signal)(condition_t self);
+INTDEF void NOTHROW_NCX(LIBCCALL libc_cond_broadcast)(condition_t self);
+INTDEF void NOTHROW_NCX(LIBCCALL libc_condition_wait)(condition_t self, mutex_t mutex);
+INTDEF void NOTHROW_NCX(LIBCCALL libc_condition_implies)(condition_t implicator, condition_t implicatand);
+INTDEF void NOTHROW_NCX(LIBCCALL libc_condition_unimplies)(condition_t implicator, condition_t implicatand);
+INTDEF vm_offset_t NOTHROW_NCX(LIBCCALL libc_cthread_sp)(void);
+INTDEF ur_cthread_t NOTHROW_NCX(LIBCCALL libc_ur_cthread_self)(void);
+INTDEF ATTR_IN(1) char const *NOTHROW_NCX(LIBCCALL libc_cthread_name)(cthread_t self);
+/* >> cthread_count(3)
+ * Return the number of running threads (s.a. `DLAUXCTRL_GET_MAIN_TLSSEG') */
+INTDEF int NOTHROW_NCX(LIBCCALL libc_cthread_count)(void);
+/* >> cthread_set_data(3)
+ * Set the value of a TLS variable for `self' */
+INTDEF ATTR_ACCESS_NONE(2) int NOTHROW_NCX(LIBCCALL libc_cthread_set_data)(cthread_t self, void *value);
+/* >> cthread_data(3)
+ * Get the value of a TLS variable for `self' */
+INTDEF void *NOTHROW_NCX(LIBCCALL libc_cthread_data)(cthread_t self);
 #endif /* !__KERNEL__ */
 
 DECL_END
 
-#endif /* !GUARD_LIBC_AUTO_LOCK_INTERN_H */
+#endif /* !GUARD_LIBC_USER_CTHREADS_H */

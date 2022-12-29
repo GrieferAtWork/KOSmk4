@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79419e19 */
+/* HASH CRC-32:0x8e549dd9 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -127,8 +127,18 @@
 #define __stub___clock_getcpuclockid
 #define __stub_clock_getcpuclockid
 #define __stub_closelog
+#define __stub_cond_broadcast
+#define __stub_cond_signal
+#define __stub_condition_implies
+#define __stub_condition_unimplies
+#define __stub_condition_wait
 #define __stub_crypt
 #define __stub_crypt_r
+#define __stub_cthread_count
+#define __stub_cthread_data
+#define __stub_cthread_name
+#define __stub_cthread_set_data
+#define __stub_cthread_sp
 #define __stub_dehumanize_number
 #define __stub_devname_r
 #define __stub___dn_count_labels
@@ -427,6 +437,7 @@
 #define __stub_pthread_barrier_init
 #define __stub_pthread_barrier_wait
 #define __stub_pthread_getcpuclockid
+#define __stub_pthread_getresult_np
 #define __stub_pthread_mutex_consistent_np
 #define __stub_pthread_mutex_consistent
 #define __stub_pthread_mutex_getprioceiling
@@ -562,6 +573,7 @@
 #define __stub_ulckpwdf
 #define __stub_updwtmp
 #define __stub_updwtmpx
+#define __stub_ur_cthread_self
 #define __stub___uselocale
 #define __stub_uselocale
 #define __stub_utmpname

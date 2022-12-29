@@ -542,6 +542,7 @@ incdir("");
 #include <crtdbg.h>
 #include <crtdefs.h>
 #include <crypt.h>
+#include <cthreads.h>
 #include <ctype.h>
 #include <daemon.h>
 #include <dir.h>
@@ -1281,6 +1282,7 @@ incdir("");
 #include <signal.h>
 #include <sort.h>
 #include <spawn.h>
+#include <spin-lock.h>
 #include <ssp/chk.h>
 #include <ssp/ssp.h>
 #include <ssp/string.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec054f5f */
+/* HASH CRC-32:0xf32bbd1b */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -362,6 +362,8 @@ DECL_END
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(__spin_lock, libc_shared_lock_acquire);
 DEFINE_PUBLIC_ALIAS(__mutex_lock, libc_shared_lock_acquire);
+DEFINE_PUBLIC_ALIAS(__mutex_lock_solid, libc_shared_lock_acquire);
+DEFINE_PUBLIC_ALIAS(mutex_wait_lock, libc_shared_lock_acquire);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(shared_lock_acquire, libc_shared_lock_acquire);
 DEFINE_PUBLIC_ALIAS(shared_lock_acquire_with_timeout, libc_shared_lock_acquire_with_timeout);

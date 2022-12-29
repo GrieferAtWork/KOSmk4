@@ -410,7 +410,8 @@ int sched_getscheduler($pid_t pid);
 @@@return: 1: Another thread was  executed prior to  the function  returning
 @@            The thread may not necessarily be apart of the calling process
 @@@return: 0: The function returned immediately when no other thread was executed
-[[export_alias("thrd_yield", "pthread_yield", "__sched_yield", "__libc_sched_yield", "yield", "thr_yield")]]
+[[export_alias("thrd_yield", "pthread_yield", "__sched_yield", "__libc_sched_yield",
+               "yield", "thr_yield", "cthread_yield")]]
 [[nothrow]]
 int sched_yield();
 

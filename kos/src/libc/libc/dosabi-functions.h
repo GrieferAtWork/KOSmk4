@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7639a638 */
+/* HASH CRC-32:0x8749de52 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1792,6 +1792,7 @@ DFUN(".text.crt.dos.fs.exec.spawn", libd_fspawnve, libc_fspawnve, TIn(__SIZEOF_P
 /* pthread */
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_exit, libc_pthread_exit, TV, 1, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_join, libc_pthread_join, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_T), TP)
+DFUN(".text.crt.dos.sched.pthread", libd_pthread_getresult_np, libc_pthread_getresult_np, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_T), TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_tryjoin_np, libc_pthread_tryjoin_np, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PTHREAD_T), TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_timedjoin_np, libc_pthread_timedjoin_np, TIn(__SIZEOF_ERRNO_T__), 3, TIn(__SIZEOF_PTHREAD_T), TP, TP)
 DFUN(".text.crt.dos.sched.pthread", libd_pthread_timedjoin64_np, libc_pthread_timedjoin64_np, TIn(__SIZEOF_ERRNO_T__), 3, TIn(__SIZEOF_PTHREAD_T), TP, TP)

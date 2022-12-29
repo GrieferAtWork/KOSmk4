@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd3fb3141 */
+/* HASH CRC-32:0x42ca4b79 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,29 +18,19 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_LIBC_AUTO_LOCK_INTERN_H
-#define GUARD_LIBC_AUTO_LOCK_INTERN_H 1
-
-#include "../api.h"
-
-#include <hybrid/typecore.h>
-#include <kos/types.h>
-#include <lock-intern.h>
-
-DECL_BEGIN
-
-#ifndef __KERNEL__
-INTDEF void NOTHROW_NCX(LIBCCALL libc___spin_lock_init)(__spin_lock_t *lock);
-INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc___spin_lock_solid)(__spin_lock_t *lock);
-INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc___spin_unlock)(__spin_lock_t *lock);
-INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc___spin_try_lock)(__spin_lock_t *lock);
-INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBCCALL libc___spin_lock_locked)(__spin_lock_t __KOS_FIXED_CONST *lock);
-INTDEF void NOTHROW_NCX(LIBCCALL libc___mutex_init)(void *lock);
-INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc___mutex_unlock)(void *lock);
-INTDEF ATTR_INOUT(1) void NOTHROW_NCX(LIBCCALL libc___mutex_unlock_solid)(void *lock);
-INTDEF ATTR_INOUT(1) int NOTHROW_NCX(LIBCCALL libc___mutex_trylock)(void *lock);
-#endif /* !__KERNEL__ */
-
-DECL_END
-
-#endif /* !GUARD_LIBC_AUTO_LOCK_INTERN_H */
+#ifndef __local_cthread_limit_defined
+#define __local_cthread_limit_defined
+#include <__crt.h>
+#include <hybrid/limitcore.h>
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(cthread_limit) __ATTR_WUNUSED int
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cthread_limit))(void) {
+	__COMPILER_IMPURE();
+	return __INT_MAX__;
+}
+__NAMESPACE_LOCAL_END
+#ifndef __local___localdep_cthread_limit_defined
+#define __local___localdep_cthread_limit_defined
+#define __localdep_cthread_limit __LIBC_LOCAL_NAME(cthread_limit)
+#endif /* !__local___localdep_cthread_limit_defined */
+#endif /* !__local_cthread_limit_defined */

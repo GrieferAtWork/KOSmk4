@@ -694,7 +694,7 @@ $errno_t pthread_create([[out]] pthread_t *__restrict newthread,
 @@>> pthread_exit(3)
 @@Terminate calling thread.
 @@The registered cleanup handlers are called via exception handling
-[[throws, noreturn, export_alias("thr_exit")]]
+[[throws, noreturn, export_alias("thr_exit", "cthread_exit")]]
 void pthread_exit([[access(none)]] void *retval);
 
 @@>> pthread_join(3)
@@ -704,6 +704,16 @@ void pthread_exit([[access(none)]] void *retval);
 @@@return: EOK: Success
 [[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_join(pthread_t pthread, [[out_opt]] void **thread_return);
+
+%#ifdef __USE_KOS
+@@>> pthread_getresult_np(3)
+@@Same as `pthread_join(3)', but don't destroy `pthread' at the end.
+@@Instead, the caller must destroy `pthread' themselves via  another
+@@call to `pthread_detach(3)'.
+@@@return: EOK: Success
+[[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+$errno_t pthread_getresult_np(pthread_t pthread, [[out_opt]] void **thread_return);
+%#endif /* __USE_KOS */
 
 %#ifdef __USE_GNU
 @@>> pthread_tryjoin_np(3)
@@ -777,12 +787,13 @@ $errno_t pthread_timedjoin64_np(pthread_t pthread, [[out_opt]] void **thread_ret
 @@terminates, instead of waiting for another thread to perform `pthread_join(3)' on it
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
+[[export_alias("cthread_detach")]]
 $errno_t pthread_detach(pthread_t pthread);
 
 @@>> pthread_self(3)
 @@Obtain the identifier of the current thread
 @@@return: * : Handle for the calling thread
-[[const, wunused, nothrow, export_alias("thrd_current", "thr_self")]]
+[[const, wunused, nothrow, export_alias("thrd_current", "thr_self", "cthread_self")]]
 [[decl_include("<bits/crt/pthreadtypes.h>")]]
 pthread_t pthread_self();
 
@@ -1130,6 +1141,7 @@ $errno_t pthread_getname_np(pthread_t target_thread,
 @@@return: EOK:    Success
 @@@return: ERANGE: The given `name' is too long
 [[export_alias("pthread_set_name_np")]] /* OpenBSD-specific name */
+[[export_alias("cthread_set_name")]]    /* Hurd compat */
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_setname_np(pthread_t target_thread,
                             [[in]] const char *name);
@@ -1188,8 +1200,8 @@ $errno_t pthread_setconcurrency(int level);
 %#endif /* __USE_UNIX98 */
 
 %#ifdef __USE_GNU
-@@>> pthread_yield(3), thrd_yield(3), sched_yield(2)
-@@Yield  the processor to another thread or process.
+@@>> pthread_yield(3), thrd_yield(3), sched_yield(2), cthread_yield(3)
+@@Yield the processor to another thread or process.
 @@This function is similar to the POSIX `sched_yield' function but
 @@might  be differently implemented in the case of a m-on-n thread
 @@implementation

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb2fd083 */
+/* HASH CRC-32:0xfa7e080a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,6 +64,12 @@ NOTHROW_NCX(LIBCCALL libc___spin_lock_locked)(__spin_lock_t __KOS_FIXED_CONST *l
 }
 DEFINE_INTERN_ALIAS(libc___mutex_init, libc___spin_lock_init);
 DEFINE_INTERN_ALIAS(libc___mutex_unlock, libc___spin_unlock);
+#include <kos/sched/shared-lock.h>
+INTERN ATTR_SECTION(".text.crt.compat.hurd.futex") ATTR_INOUT(1) void
+NOTHROW_NCX(LIBCCALL libc___mutex_unlock_solid)(void *lock) {
+	if (shared_lock_tryacquire((struct shared_lock *)lock))
+		shared_lock_release((struct shared_lock *)lock);
+}
 DEFINE_INTERN_ALIAS(libc___mutex_trylock, libc___spin_try_lock);
 #endif /* !__KERNEL__ */
 
@@ -76,7 +82,10 @@ DEFINE_PUBLIC_ALIAS(__spin_unlock, libc___spin_unlock);
 DEFINE_PUBLIC_ALIAS(__spin_try_lock, libc___spin_try_lock);
 DEFINE_PUBLIC_ALIAS(__spin_lock_locked, libc___spin_lock_locked);
 DEFINE_PUBLIC_ALIAS(__mutex_init, libc___mutex_init);
+DEFINE_PUBLIC_ALIAS(mutex_unlock, libc___mutex_unlock);
 DEFINE_PUBLIC_ALIAS(__mutex_unlock, libc___mutex_unlock);
+DEFINE_PUBLIC_ALIAS(__mutex_unlock_solid, libc___mutex_unlock_solid);
+DEFINE_PUBLIC_ALIAS(mutex_try_lock, libc___mutex_trylock);
 DEFINE_PUBLIC_ALIAS(__mutex_trylock, libc___mutex_trylock);
 #endif /* !__KERNEL__ */
 

@@ -138,7 +138,10 @@ __SYSDECL_BEGIN
 [[requires_include("<kos/bits/shared-lock.h>")]]
 [[requires(defined(__KERNEL__) || defined(__shared_lock_wait))]]
 [[impl_include("<kos/bits/shared-lock.h>")]]
-[[if(!defined(__KERNEL__)), export_as("__spin_lock", "__mutex_lock")]] /* For Hurd compat */
+[[if(!defined(__KERNEL__)), export_as(
+	"__spin_lock", "__mutex_lock", "__mutex_lock_solid", /* For Hurd compat */
+	"mutex_wait_lock"                                    /* For OSX compat */
+)]]
 void shared_lock_acquire([[inout]] struct shared_lock *__restrict self) {
 @@pp_ifdef __KERNEL__@@
 	__hybrid_assert(!@task_wasconnected@());

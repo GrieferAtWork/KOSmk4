@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15b13bee */
+/* HASH CRC-32:0xbddba057 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,6 +40,12 @@ INTDEF ATTR_NORETURN ATTR_ACCESS_NONE(1) void (LIBDCALL libd_pthread_exit)(void 
  * `thread_return' is not `NULL'.
  * @return: EOK: Success */
 INTDEF ATTR_OUT_OPT(2) errno_t NOTHROW_RPC(LIBDCALL libd_pthread_join)(pthread_t pthread, void **thread_return);
+/* >> pthread_getresult_np(3)
+ * Same as `pthread_join(3)', but don't destroy `pthread' at the end.
+ * Instead, the caller must destroy `pthread' themselves via  another
+ * call to `pthread_detach(3)'.
+ * @return: EOK: Success */
+INTDEF ATTR_OUT_OPT(2) errno_t NOTHROW_RPC(LIBDCALL libd_pthread_getresult_np)(pthread_t pthread, void **thread_return);
 /* >> pthread_tryjoin_np(3)
  * Check whether thread `pthread' has terminated. If so return the
  * status of the thread in `*thread_return', if `thread_return' is

@@ -38,6 +38,8 @@ static_assert(alignof(__spin_lock_t) == alignof(struct shared_lock));
 %[insert:prefix(
 #include <features.h>
 )]%[insert:prefix(
+#include <kos/bits/shared-lock.h>
+)]%[insert:prefix(
 #include <kos/sched/shared-lock.h>
 )]%[insert:prefix(
 #include <hybrid/sched/__yield.h>
@@ -48,19 +50,6 @@ __SYSDECL_BEGIN
 
 typedef unsigned int __spin_lock_t;
 #define __SPIN_LOCK_INITIALIZER 0
-
-#ifndef __mutex_defined
-#define __mutex_defined
-struct mutex {
-	__spin_lock_t __held;   /* The actually used lock */
-	__spin_lock_t __lock;   /* unused */
-	const char   *__name;   /* unused */
-	void         *__head;   /* unused */
-	void         *__tail;   /* unused */
-	void         *__holder; /* unused */
-};
-#define MUTEX_INITIALIZER { 0, 0, __NULLPTR, __NULLPTR, __NULLPTR, __NULLPTR }
-#endif /* !__mutex_defined */
 
 }
 
@@ -83,11 +72,11 @@ void __spin_lock_solid([[inout]] __spin_lock_t *lock) {
 
 
 [[nocrt, alias("__spin_lock", "shared_lock_acquire")]]
-[[bind_local_function(shared_lock_acquire)]]
+[[if($extended_include_prefix("<kos/bits/shared-lock.h>")defined(__KERNEL__) || defined(__shared_lock_wait)),
+  bind_local_function(shared_lock_acquire)]]
 void __spin_lock([[inout]] __spin_lock_t *lock);
 
 
-[[extern_inline]]
 [[requires_include("<kos/sched/shared-lock.h>")]]
 [[requires(defined(shared_lock_release))]]
 [[impl_include("<kos/sched/shared-lock.h>")]]
@@ -123,6 +112,26 @@ int __spin_lock_locked([[in]] __spin_lock_t __KOS_FIXED_CONST *lock) {
 /* """Mutex""" API                                                      */
 /************************************************************************/
 
+#if 0
+/* Hurd defines this struct here, but then it also defines it once  again
+ * in `<cthreads.h>', which in turn also includes this header right here.
+ *
+ * So I have no idea how they're able to get gcc to compile a header that
+ * effectively defines the same `struct mutex' 2 times (and even more so:
+ * with differing field names).
+ *
+ * Anyways: KOS's Hurd emulation only defines this one in `<cthreads.h>' */
+struct mutex {
+	__spin_lock_t __held;   /* The actually used lock */
+	__spin_lock_t __lock;   /* unused */
+	const char   *__name;   /* unused */
+	void         *__head;   /* unused */
+	void         *__tail;   /* unused */
+	void         *__holder; /* unused */
+};
+#define MUTEX_INITIALIZER { 0, 0, __NULLPTR, __NULLPTR, __NULLPTR, __NULLPTR }
+#endif
+
 }
 
 [[extern_inline]]
@@ -131,25 +140,42 @@ void __mutex_init([[out]] void *lock) {
 	*(unsigned int *)lock = 0;
 }
 
-[[nocrt, alias("__mutex_lock", "shared_lock_acquire")]]
-[[bind_local_function(shared_lock_acquire)]]
-void __mutex_lock([[out]] void *lock);
+[[nocrt, alias("__mutex_lock", "mutex_wait_lock", "shared_lock_acquire")]]
+[[if($extended_include_prefix("<kos/bits/shared-lock.h>")defined(__KERNEL__) || defined(__shared_lock_wait)),
+  bind_local_function(shared_lock_acquire)]]
+void __mutex_lock([[inout]] void *lock);
 
-[[extern_inline]]
+[[nocrt, alias("__mutex_lock_solid", "mutex_wait_lock", "shared_lock_acquire")]]
+[[if($extended_include_prefix("<kos/bits/shared-lock.h>")defined(__KERNEL__) || defined(__shared_lock_wait)),
+  bind_local_function(shared_lock_acquire)]]
+void __mutex_lock_solid([[inout]] void *lock);
+
+[[export_alias("mutex_unlock")]]
+[[crt_intern_alias(__spin_unlock)]]
+[[if($extended_include_prefix("<kos/sched/shared-lock.h>")defined(shared_lock_release)),
+  bind_local_function(__spin_unlock)]]
 [[requires_include("<kos/sched/shared-lock.h>")]]
 [[requires(defined(shared_lock_release))]]
 [[impl_include("<kos/sched/shared-lock.h>")]]
-[[crt_intern_alias(__spin_unlock)]]
-void __mutex_unlock([[out]] void *lock) {
+void __mutex_unlock([[inout]] void *lock) {
 	shared_lock_release((struct shared_lock *)lock);
+}
+
+[[requires_include("<kos/sched/shared-lock.h>")]]
+[[requires(defined(shared_lock_tryacquire) && defined(shared_lock_release))]]
+[[impl_include("<kos/sched/shared-lock.h>")]]
+void __mutex_unlock_solid([[inout]] void *lock) {
+	if (shared_lock_tryacquire((struct shared_lock *)lock))
+		shared_lock_release((struct shared_lock *)lock);
 }
 
 [[extern_inline]]
 [[requires_include("<kos/sched/shared-lock.h>")]]
 [[requires(defined(shared_lock_tryacquire))]]
-[[impl_include("<kos/sched/shared-lock.h>")]]
 [[crt_intern_alias(__spin_try_lock)]]
-int __mutex_trylock([[out]] void *lock) {
+[[export_alias("mutex_try_lock")]]
+[[impl_include("<kos/sched/shared-lock.h>")]]
+int __mutex_trylock([[inout]] void *lock) {
 	return shared_lock_tryacquire((struct shared_lock *)lock);
 }
 
