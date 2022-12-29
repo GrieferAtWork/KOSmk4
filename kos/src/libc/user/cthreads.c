@@ -47,6 +47,10 @@ DECL_BEGIN
 #define condition_as_pthread(self) \
 	container_of((__UINT32_TYPE__ *)&(self)->lock, pthread_cond_t, c_futex)
 
+/* Not all implementations of `<cthreads.h>' support condition variable implications.
+ * In order to provide  binary compatibility with  those that don't  we only look  at
+ * where we (think) the implications field is located at, if someone ever made called
+ * one of the functions used for linking implications in/out. */
 PRIVATE ATTR_SECTION(".bss.crt.compat.hurd.cthreads")
 bool did_call_condition_implies = false;
 
