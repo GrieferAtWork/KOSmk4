@@ -611,11 +611,9 @@ INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT_OPT(2) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_getresult_np)(pthread_t pthread,
                                                 void **thread_return)
 /*[[[body:libc_pthread_getresult_np]]]*/
-/*AUTO*/{
-	(void)pthread;
-	(void)thread_return;
-	CRT_UNIMPLEMENTEDF("pthread_getresult_np(pthread: %" PRIxN(__SIZEOF_PTHREAD_T) ", thread_return: %p)", pthread, thread_return); /* TODO */
-	return ENOSYS;
+{
+	ATOMIC_INC(pthread->pt_refcnt); /* Consumed by `pthread_join(3)' */
+	return pthread_join(pthread, thread_return);
 }
 /*[[[end:libc_pthread_getresult_np]]]*/
 

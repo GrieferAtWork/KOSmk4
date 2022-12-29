@@ -778,6 +778,7 @@ __IMPDEF void *(__DLFCN_VCC dlauxctrl)(void *__handle,
                                              * segment has not, and will not be  deleted. Otherwise, behavior is undefined. -  The
                                              * given `handle' is ignored and there is no error-return-value. */
 #define DLAUXCTRL_GET_TLSSEG_COUNT   0xd182 /* Return the number of currently allocated TLS segments (usually the same as # of running threads). */
+#define DLAUXCTRL_GET_TLSSEG_VALID   0xd183 /* Return non-zero if `va_arg(void *)' is a valid TLS segment (Not to be confused with TLS handles, which are just regular DL handles). */
 #define DLAUXCTRL_REGISTER_EXTENSION 0xd201 /* Register an extension to libdl:
                                              * >> extension              = va_arg(struct dlmodule_format *);
                                              * >> sizeof_dlmodule_format = va_arg(size_t);

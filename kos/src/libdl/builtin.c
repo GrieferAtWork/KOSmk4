@@ -2736,6 +2736,32 @@ libdl_dlmainsegment(void) {
 	return result;
 }
 
+/* Return the # of allocated TLS segments. */
+PRIVATE ATTR_PURE WUNUSED size_t CC libdl_dltlssegcount(void) {
+	size_t result;
+	dlglobals_tls_segment_read(&dl_globals);
+	result = LIST_COUNT(&dl_globals.dg_tls_segment_list, ts_threads);
+	dlglobals_tls_segment_endread(&dl_globals);
+	return result;
+}
+
+/* Return the # of allocated TLS segments. */
+PRIVATE ATTR_PURE WUNUSED bool CC libdl_dltlssegvalid(struct dltls_segment *seg) {
+	bool result = false;
+	if likely(seg) {
+		struct dltls_segment *iter;
+		dlglobals_tls_segment_read(&dl_globals);
+		LIST_FOREACH (iter, &dl_globals.dg_tls_segment_list, ts_threads) {
+			if (iter == seg) {
+				result = true;
+				break;
+			}
+		}
+		dlglobals_tls_segment_endread(&dl_globals);
+	}
+	return result;
+}
+
 
 
 /* Perform an auxiliary control command about a given module `handle'
@@ -2768,6 +2794,19 @@ libdl_dlauxctrl(USER DlModule *self, unsigned int cmd, ...)
 	case DLAUXCTRL_GET_MAIN_TLSSEG:
 		va_end(args);
 		return libdl_dlmainsegment();
+
+	case DLAUXCTRL_GET_TLSSEG_COUNT:
+		va_end(args);
+		return (void *)(uintptr_t)libdl_dltlssegcount();
+
+	case DLAUXCTRL_GET_TLSSEG_VALID: {
+		bool isvalid;
+		struct dltls_segment *seg;
+		seg = va_arg(args, struct dltls_segment *);
+		va_end(args);
+		isvalid = libdl_dltlssegvalid(seg);
+		return (void *)(uintptr_t)(isvalid ? 1 : 0);
+	}	break;
 
 	default:
 		break;

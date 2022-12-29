@@ -2698,6 +2698,7 @@
 #define __CRT_HAVE_cthread_set_name
 #define __CRT_HAVE_cthread_setspecific
 #define __CRT_HAVE_cthread_sp
+#define __CRT_HAVE_cthread_stack_mask
 #define __CRT_HAVE_cthread_yield
 #define __CRT_HAVE_ctime
 #define __CRT_HAVE_ctime64
