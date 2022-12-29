@@ -21,6 +21,7 @@
 /* (#) Portability: Cygwin        (/newlib/libc/include/utmp.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/utmp.h) */
 /* (#) Portability: GNU C Library (/login/utmp.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/utmp.h) */
 /* (#) Portability: NetBSD        (/include/utmp.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/utmp.h) */
 /* (#) Portability: OpenBSD       (/include/utmp.h) */

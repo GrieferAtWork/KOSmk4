@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa914091d */
+/* HASH CRC-32:0xae32ef92 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 /* (#) Portability: Cygwin        (/newlib/libc/include/fenv.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/fenv.h) */
 /* (#) Portability: GNU C Library (/math/fenv.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/fenv.h) */
 /* (#) Portability: MSVC          (/include/fenv.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/fenv.h) */
 /* (#) Portability: NetBSD        (/include/fenv.h) */

@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: GNU C Library (/misc/syscall.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/syscall.h) */
 /* (#) Portability: libc4/5       (/include/syscall.h) */
 /* (#) Portability: libc6         (/include/syscall.h) */
 /* (#) Portability: mintlib       (/include/syscall.h) */

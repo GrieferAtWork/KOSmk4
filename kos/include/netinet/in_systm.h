@@ -22,6 +22,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/netinet/in_systm.h) */
 /* (#) Portability: FreeBSD       (/sys/netinet/in_systm.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/netinet/in_systm.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/netinet/in_systm.h) */
 /* (#) Portability: NetBSD        (/sys/netinet/in_systm.h) */
 /* (#) Portability: OpenBSD       (/sys/netinet/in_systm.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/in_systm.h) */

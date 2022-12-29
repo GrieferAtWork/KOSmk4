@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc2869c71 */
+/* HASH CRC-32:0x9117571e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/unistd.h) */
 /* (#) Portability: FreeBSD       (/include/unistd.h) */
 /* (#) Portability: GNU C Library (/posix/unistd.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/unistd.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/unistd.h) */
 /* (#) Portability: NetBSD        (/include/unistd.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/unistd.h) */

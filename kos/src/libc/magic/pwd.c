@@ -25,6 +25,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/pwd.h) */
 /* (#) Portability: FreeBSD       (/include/pwd.h) */
 /* (#) Portability: GNU C Library (/pwd/pwd.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/pwd.h) */
 /* (#) Portability: NetBSD        (/include/pwd.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/pwd.h) */
 /* (#) Portability: OpenBSD       (/include/pwd.h) */

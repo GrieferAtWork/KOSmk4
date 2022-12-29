@@ -24,6 +24,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/dlfcn.h) */
 /* (#) Portability: FreeBSD       (/include/dlfcn.h) */
 /* (#) Portability: GNU C Library (/dlfcn/dlfcn.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/dlfcn.h) */
 /* (#) Portability: MinGW         (/include/dlfcn.h) */
 /* (#) Portability: NetBSD        (/include/dlfcn.h) */
 /* (#) Portability: OpenBSD       (/include/dlfcn.h) */

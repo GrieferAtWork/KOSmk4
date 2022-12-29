@@ -23,6 +23,7 @@
 /* (#) Portability: DragonFly BSD (/include/mqueue.h) */
 /* (#) Portability: FreeBSD       (/include/mqueue.h) */
 /* (#) Portability: GNU C Library (/rt/mqueue.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/mqueue.h) */
 /* (#) Portability: NetBSD        (/include/mqueue.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/mqueue.h) */
 /* (#) Portability: diet libc     (/include/mqueue.h) */

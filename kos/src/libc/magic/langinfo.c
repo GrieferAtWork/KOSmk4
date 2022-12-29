@@ -23,6 +23,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/langinfo.h) */
 /* (#) Portability: FreeBSD       (/include/langinfo.h) */
 /* (#) Portability: GNU C Library (/locale/langinfo.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/langinfo.h) */
 /* (#) Portability: NetBSD        (/include/langinfo.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/langinfo.h) */
 /* (#) Portability: OpenBSD       (/include/langinfo.h) */

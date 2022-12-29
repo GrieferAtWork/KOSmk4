@@ -19,6 +19,7 @@
  */
 /* (#) Portability: DragonFly BSD (/include/re_comp.h) */
 /* (#) Portability: GNU C Library (/posix/re_comp.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/re_comp.h) */
 /* (#) Portability: NetBSD        (/include/re_comp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/re_comp.h) */
 /* (#) Portability: libc6         (/include/re_comp.h) */

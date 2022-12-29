@@ -23,6 +23,7 @@
 /* (#) Portability: Cygwin        (/newlib/libc/include/fenv.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/fenv.h) */
 /* (#) Portability: GNU C Library (/math/fenv.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/fenv.h) */
 /* (#) Portability: MSVC          (/include/fenv.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/fenv.h) */
 /* (#) Portability: NetBSD        (/include/fenv.h) */

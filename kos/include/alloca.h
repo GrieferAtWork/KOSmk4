@@ -21,6 +21,7 @@
 /* (#) Portability: DragonFly BSD (/include/alloca.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/alloca.h) */
 /* (#) Portability: GNU C Library (/stdlib/alloca.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/alloca.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/alloca.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/alloca.h) */
 /* (#) Portability: avr-libc      (/include/alloca.h) */

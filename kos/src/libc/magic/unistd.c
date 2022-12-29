@@ -25,6 +25,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/unistd.h) */
 /* (#) Portability: FreeBSD       (/include/unistd.h) */
 /* (#) Portability: GNU C Library (/posix/unistd.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/unistd.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/unistd.h) */
 /* (#) Portability: NetBSD        (/include/unistd.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/unistd.h) */

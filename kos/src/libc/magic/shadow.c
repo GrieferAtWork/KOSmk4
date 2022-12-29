@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: GNU C Library (/shadow/shadow.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/shadow.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/shadow.h) */
 /* (#) Portability: diet libc     (/include/shadow.h) */
 /* (#) Portability: libc4/5       (/include/shadow.h) */

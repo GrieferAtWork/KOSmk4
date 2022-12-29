@@ -25,6 +25,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/glob.h) */
 /* (#) Portability: FreeBSD       (/include/glob.h) */
 /* (#) Portability: GNU C Library (/posix/glob.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/glob.h) */
 /* (#) Portability: MinGW         (/include/glob.h) */
 /* (#) Portability: NetBSD        (/include/glob.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/glob.h) */

@@ -25,6 +25,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/setjmp.h) */
 /* (#) Portability: FreeBSD       (/include/setjmp.h) */
 /* (#) Portability: GNU C Library (/setjmp/setjmp.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/setjmp.h) */
 /* (#) Portability: MSVC          (/include/setjmp.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/setjmp.h) */
 /* (#) Portability: NetBSD        (/include/setjmp.h) */

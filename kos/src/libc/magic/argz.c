@@ -21,6 +21,7 @@
 /* (#) Portability: Cygwin        (/newlib/libc/include/argz.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/argz.h) */
 /* (#) Portability: GNU C Library (/string/argz.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/argz.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/argz.h) */
 /* (#) Portability: libc6         (/include/argz.h) */
 /* (#) Portability: mintlib       (/include/argz.h) */

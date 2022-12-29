@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5780f79 */
+/* HASH CRC-32:0xd27071d2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 /* (#) Portability: Cygwin        (/newlib/libc/include/stdio_ext.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/stdio_ext.h) */
 /* (#) Portability: GNU C Library (/include/stdio_ext.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/stdio_ext.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/stdio_ext.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/stdio_ext.h) */
 /* (#) Portability: diet libc     (/include/stdio_ext.h) */

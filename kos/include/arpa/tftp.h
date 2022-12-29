@@ -21,6 +21,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/arpa/tftp.h) */
 /* (#) Portability: FreeBSD       (/include/arpa/tftp.h) */
 /* (#) Portability: GNU C Library (/inet/arpa/tftp.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/arpa/tftp.h) */
 /* (#) Portability: NetBSD        (/include/arpa/tftp.h) */
 /* (#) Portability: OpenBSD       (/include/arpa/tftp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/arpa/tftp.h) */

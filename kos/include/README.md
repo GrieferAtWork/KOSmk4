@@ -58,6 +58,7 @@ No affiliation exists between KOS and the following projects. This is merely the
 - [`EMX kLIBC`](https://trac.netlabs.org/libc/wiki)
 - [`FreeBSD`](https://github.com/freebsd/freebsd-src)
 - [`GNU C Library`](https://www.gnu.org/software/libc/sources.html)
+- [`GNU Hurd`](https://www.gnu.org/software/hurd/index.html)
 - `Linux` (As installed by `apt-get install linux-headers-$(uname -r)`)
 - `MSVC` (As shipped with old version of Visual Studio (like VS2015), prior to UCRT)
 - [`MinGW`](https://sourceforge.net/projects/mingw/)

@@ -24,6 +24,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/libgen.h) */
 /* (#) Portability: FreeBSD       (/include/libgen.h) */
 /* (#) Portability: GNU C Library (/misc/libgen.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/libgen.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/libgen.h) */
 /* (#) Portability: NetBSD        (/include/libgen.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/libgen.h) */

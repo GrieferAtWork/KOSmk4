@@ -23,6 +23,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/nl_types.h) */
 /* (#) Portability: FreeBSD       (/include/nl_types.h) */
 /* (#) Portability: GNU C Library (/catgets/nl_types.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/nl_types.h) */
 /* (#) Portability: NetBSD        (/include/nl_types.h) */
 /* (#) Portability: OpenBSD       (/include/nl_types.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/nl_types.h) */

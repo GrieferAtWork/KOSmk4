@@ -23,6 +23,7 @@
 /* (#) Portability: DragonFly BSD (/include/monetary.h) */
 /* (#) Portability: FreeBSD       (/include/monetary.h) */
 /* (#) Portability: GNU C Library (/stdlib/monetary.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/monetary.h) */
 /* (#) Portability: NetBSD        (/include/monetary.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/monetary.h) */
 /* (#) Portability: libc6         (/include/monetary.h) */

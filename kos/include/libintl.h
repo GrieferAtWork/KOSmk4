@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8957c83c */
+/* HASH CRC-32:0x7c500cb4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (#) Portability: EMX kLIBC     (/libc/include/libintl.h) */
 /* (#) Portability: GNU C Library (/intl/libintl.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/libintl.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/libintl.h) */
 /* (#) Portability: diet libc     (/include/libintl.h) */
 /* (#) Portability: libc6         (/include/libintl.h) */

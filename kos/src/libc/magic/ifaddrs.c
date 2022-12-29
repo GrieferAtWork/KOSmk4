@@ -22,6 +22,7 @@
 /* (#) Portability: DragonFly BSD (/include/ifaddrs.h) */
 /* (#) Portability: FreeBSD       (/include/ifaddrs.h) */
 /* (#) Portability: GNU C Library (/inet/ifaddrs.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/ifaddrs.h) */
 /* (#) Portability: NetBSD        (/include/ifaddrs.h) */
 /* (#) Portability: OpenBSD       (/include/ifaddrs.h) */
 /* (#) Portability: libc6         (/include/ifaddrs.h) */

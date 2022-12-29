@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ef62e01 */
+/* HASH CRC-32:0xf4daaaa0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/resolv.h) */
 /* (#) Portability: FreeBSD       (/include/resolv.h) */
 /* (#) Portability: GNU C Library (/resolv/resolv.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/resolv.h) */
 /* (#) Portability: NetBSD        (/include/resolv.h) */
 /* (#) Portability: OpenBSD       (/include/resolv.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/resolv.h) */

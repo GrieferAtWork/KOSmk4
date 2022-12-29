@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6b4d103 */
+/* HASH CRC-32:0x7db0ab9c */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/netinet/in.h) */
 /* (#) Portability: FreeBSD       (/sys/netinet/in.h) */
 /* (#) Portability: GNU C Library (/inet/netinet/in.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/netinet/in.h) */
 /* (#) Portability: NetBSD        (/sys/netinet/in.h) */
 /* (#) Portability: OpenBSD       (/sys/netinet/in.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/in.h) */

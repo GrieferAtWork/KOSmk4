@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25d5e167 */
+/* HASH CRC-32:0x11671e04 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 /* (#) Portability: Cygwin        (/newlib/libc/include/argz.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/argz.h) */
 /* (#) Portability: GNU C Library (/string/argz.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/argz.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/argz.h) */
 /* (#) Portability: libc6         (/include/argz.h) */
 /* (#) Portability: mintlib       (/include/argz.h) */

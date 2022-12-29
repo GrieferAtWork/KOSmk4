@@ -24,6 +24,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/regex.h) */
 /* (#) Portability: FreeBSD       (/include/regex.h) */
 /* (#) Portability: GNU C Library (/posix/regex.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/regex.h) */
 /* (#) Portability: NetBSD        (/include/regex.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/regex.h) */
 /* (#) Portability: OpenBSD       (/include/regex.h) */

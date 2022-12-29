@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x957db210 */
+/* HASH CRC-32:0xac0b46e4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 /* (#) Portability: DragonFly BSD (/include/utmpx.h) */
 /* (#) Portability: FreeBSD       (/include/utmpx.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/utmpx.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/utmpx.h) */
 /* (#) Portability: NetBSD        (/include/utmpx.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/utmpx.h) */
 /* (#) Portability: diet libc     (/include/utmpx.h) */

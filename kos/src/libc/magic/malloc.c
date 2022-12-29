@@ -23,6 +23,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/malloc.h) */
 /* (#) Portability: FreeBSD       (/include/malloc.h) */
 /* (#) Portability: GNU C Library (/malloc/malloc.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/malloc.h) */
 /* (#) Portability: MSVC          (/include/malloc.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/malloc.h) */
 /* (#) Portability: NetBSD        (/include/malloc.h) */

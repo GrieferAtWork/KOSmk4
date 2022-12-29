@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2809aca */
+/* HASH CRC-32:0xefd42749 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 /* (#) Portability: DragonFly BSD (/include/printf.h) */
 /* (#) Portability: FreeBSD       (/include/printf.h) */
 /* (#) Portability: GNU C Library (/include/printf.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/printf.h) */
 /* (#) Portability: libc6         (/include/printf.h) */
 /* (#) Portability: mintlib       (/include/printf.h) */
 /* (#) Portability: uClibc        (/include/printf.h) */

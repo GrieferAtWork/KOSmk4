@@ -26,6 +26,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/time.h) */
 /* (#) Portability: FreeBSD       (/include/time.h) */
 /* (#) Portability: GNU C Library (/time/time.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/time.h) */
 /* (#) Portability: MSVC          (/include/time.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/time.h) */
 /* (#) Portability: NetBSD        (/include/time.h) */

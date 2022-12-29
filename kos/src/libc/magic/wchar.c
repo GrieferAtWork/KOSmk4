@@ -26,6 +26,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/wchar.h) */
 /* (#) Portability: FreeBSD       (/include/wchar.h) */
 /* (#) Portability: GNU C Library (/wcsmbs/wchar.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/wchar.h) */
 /* (#) Portability: MSVC          (/include/wchar.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/wchar.h) */
 /* (#) Portability: NetBSD        (/include/wchar.h) */

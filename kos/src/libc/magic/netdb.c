@@ -24,6 +24,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/netdb.h) */
 /* (#) Portability: FreeBSD       (/include/netdb.h) */
 /* (#) Portability: GNU C Library (/resolv/netdb.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/netdb.h) */
 /* (#) Portability: NetBSD        (/include/netdb.h) */
 /* (#) Portability: OpenBSD       (/include/netdb.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/netdb.h) */

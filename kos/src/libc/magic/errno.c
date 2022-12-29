@@ -24,6 +24,7 @@
 /* (#) Portability: DJGPP         (/include/errno.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/errno.h) */
 /* (#) Portability: GNU C Library (/stdlib/errno.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/errno.h) */
 /* (#) Portability: MSVC          (/include/errno.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/errno.h) */
 /* (#) Portability: NetBSD        (/include/errno.h) */

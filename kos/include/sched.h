@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc48b0ae */
+/* HASH CRC-32:0xe2359189 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
 /* (#) Portability: Cygwin        (/newlib/libc/include/sched.h) */
 /* (#) Portability: GNU C Library (/posix/sched.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/sched.h) */
 /* (#) Portability: MinGW         (/mingw-w64-libraries/winpthreads/include/sched.h) */
 /* (#) Portability: NetBSD        (/include/sched.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/sched.h) */

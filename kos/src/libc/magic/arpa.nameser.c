@@ -23,6 +23,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/arpa/nameser.h) */
 /* (#) Portability: FreeBSD       (/include/arpa/nameser.h) */
 /* (#) Portability: GNU C Library (/resolv/arpa/nameser.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/arpa/nameser.h) */
 /* (#) Portability: NetBSD        (/include/arpa/nameser.h) */
 /* (#) Portability: OpenBSD       (/include/arpa/nameser.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/arpa/nameser.h) */

@@ -26,6 +26,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/stdio.h) */
 /* (#) Portability: FreeBSD       (/include/stdio.h) */
 /* (#) Portability: GNU C Library (/libio/stdio.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/stdio.h) */
 /* (#) Portability: MSVC          (/include/stdio.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/stdio.h) */
 /* (#) Portability: NetBSD        (/include/stdio.h) */

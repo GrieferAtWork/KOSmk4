@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: GNU C Library (/include/stdc-predef.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/stdc-predef.h) */
 /* (#) Portability: libc6         (/include/stdc-predef.h) */
 /* (#) Portability: musl libc     (/include/stdc-predef.h) */
 #ifndef _STDC_PREDEF_H

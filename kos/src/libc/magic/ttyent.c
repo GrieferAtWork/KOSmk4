@@ -21,6 +21,7 @@
 /* (#) Portability: DragonFly BSD (/include/ttyent.h) */
 /* (#) Portability: FreeBSD       (/include/ttyent.h) */
 /* (#) Portability: GNU C Library (/misc/ttyent.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/ttyent.h) */
 /* (#) Portability: NetBSD        (/include/ttyent.h) */
 /* (#) Portability: OpenBSD       (/include/ttyent.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/lib/libbc/inc/include/ttyent.h) */

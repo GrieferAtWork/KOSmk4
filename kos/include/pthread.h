@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc493bad */
+/* HASH CRC-32:0x4ab9cde8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 /* (#) Portability: DragonFly BSD (/include/pthread.h) */
 /* (#) Portability: FreeBSD       (/include/pthread.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/pthread.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/pthread.h) */
 /* (#) Portability: MinGW         (/mingw-w64-libraries/winpthreads/include/pthread.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/pthread.h) */
 /* (#) Portability: OpenBSD       (/include/pthread.h) */

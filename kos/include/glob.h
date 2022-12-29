@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4faecdee */
+/* HASH CRC-32:0x74849acb */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/glob.h) */
 /* (#) Portability: FreeBSD       (/include/glob.h) */
 /* (#) Portability: GNU C Library (/posix/glob.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/glob.h) */
 /* (#) Portability: MinGW         (/include/glob.h) */
 /* (#) Portability: NetBSD        (/include/glob.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/glob.h) */

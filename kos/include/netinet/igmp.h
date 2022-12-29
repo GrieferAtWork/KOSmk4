@@ -21,6 +21,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/netinet/igmp.h) */
 /* (#) Portability: FreeBSD       (/sys/netinet/igmp.h) */
 /* (#) Portability: GNU C Library (/inet/netinet/igmp.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/netinet/igmp.h) */
 /* (#) Portability: NetBSD        (/sys/netinet/igmp.h) */
 /* (#) Portability: OpenBSD       (/sys/netinet/igmp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/igmp.h) */

@@ -21,6 +21,7 @@
 /* (#) Portability: DragonFly BSD (/include/arpa/nameser_compat.h) */
 /* (#) Portability: FreeBSD       (/include/arpa/nameser_compat.h) */
 /* (#) Portability: GNU C Library (/resolv/arpa/nameser_compat.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/arpa/nameser_compat.h) */
 /* (#) Portability: NetBSD        (/include/arpa/nameser_compat.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/arpa/nameser_compat.h) */
 /* (#) Portability: libc6         (/include/arpa/nameser_compat.h) */

@@ -18,22 +18,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
-/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
-/* (#) Portability: Cygwin        (/newlib/libc/include/regex.h) */
-/* (#) Portability: DJGPP         (/include/regex.h) */
-/* (#) Portability: EMX kLIBC     (/libc/include/regex.h) */
-/* (#) Portability: FreeBSD       (/include/regex.h) */
-/* (#) Portability: GNU C Library (/posix/regex.h) */
-/* (#) Portability: NetBSD        (/include/regex.h) */
-/* (#) Portability: Newlib        (/newlib/libc/include/regex.h) */
-/* (#) Portability: OpenBSD       (/include/regex.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/head/regex.h) */
-/* (#) Portability: diet libc     (/include/regex.h) */
-/* (#) Portability: libc4/5       (/include/regex.h) */
-/* (#) Portability: libc6         (/include/regex.h) */
-/* (#) Portability: mintlib       (/include/regex.h) */
-/* (#) Portability: musl libc     (/include/regex.h) */
-/* (#) Portability: uClibc        (/include/regex.h) */
+/* (#) Portability: DragonFly BSD (/include/fmtmsg.h) */
+/* (#) Portability: FreeBSD       (/include/fmtmsg.h) */
+/* (#) Portability: GNU C Library (/stdlib/fmtmsg.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/fmtmsg.h) */
+/* (#) Portability: NetBSD        (/include/fmtmsg.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/fmtmsg.h) */
+/* (#) Portability: libc6         (/include/fmtmsg.h) */
+/* (#) Portability: musl libc     (/include/fmtmsg.h) */
 }
 
 %[define_replacement(regoff_t = __regoff_t)]

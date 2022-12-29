@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fe8fb84 */
+/* HASH CRC-32:0xadc4bc0 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/net/if.h) */
 /* (#) Portability: FreeBSD       (/sys/net/if.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/net/if.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/net/if.h) */
 /* (#) Portability: NetBSD        (/sys/net/if.h) */
 /* (#) Portability: OpenBSD       (/sys/net/if.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/net/if.h) */

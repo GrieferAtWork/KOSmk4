@@ -22,6 +22,7 @@
 /* (#) Portability: DragonFly BSD (/include/tar.h) */
 /* (#) Portability: FreeBSD       (/include/tar.h) */
 /* (#) Portability: GNU C Library (/posix/tar.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/tar.h) */
 /* (#) Portability: NetBSD        (/include/tar.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/tar.h) */
 /* (#) Portability: OpenBSD       (/include/tar.h) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b83b261 */
+/* HASH CRC-32:0xa0169001 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,7 @@
 /* (#) Portability: DJGPP         (/include/errno.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/errno.h) */
 /* (#) Portability: GNU C Library (/stdlib/errno.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/errno.h) */
 /* (#) Portability: MSVC          (/include/errno.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/errno.h) */
 /* (#) Portability: NetBSD        (/include/errno.h) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1572deda */
+/* HASH CRC-32:0xbfa84377 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (#) Portability: EMX kLIBC     (/libc/include/sgtty.h) */
 /* (#) Portability: GNU C Library (/misc/sgtty.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/sgtty.h) */
 /* (#) Portability: NetBSD        (/include/sgtty.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/sgtty.h) */
 /* (#) Portability: libc6         (/include/sgtty.h) */

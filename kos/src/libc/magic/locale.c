@@ -26,6 +26,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/locale.h) */
 /* (#) Portability: FreeBSD       (/include/locale.h) */
 /* (#) Portability: GNU C Library (/locale/locale.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/locale.h) */
 /* (#) Portability: MSVC          (/include/locale.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/locale.h) */
 /* (#) Portability: NetBSD        (/include/locale.h) */

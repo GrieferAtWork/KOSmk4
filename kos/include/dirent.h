@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec67a312 */
+/* HASH CRC-32:0x2f1b29c3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/dirent.h) */
 /* (#) Portability: FreeBSD       (/include/dirent.h) */
 /* (#) Portability: GNU C Library (/dirent/dirent.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/dirent.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/dirent.h) */
 /* (#) Portability: NetBSD        (/include/dirent.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/dirent.h) */

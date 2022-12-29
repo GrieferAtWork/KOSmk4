@@ -25,6 +25,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/limits.h) */
 /* (#) Portability: FreeBSD       (/include/limits.h) */
 /* (#) Portability: GNU C Library (/include/limits.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/limits.h) */
 /* (#) Portability: MSVC          (/include/limits.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/limits.h) */
 /* (#) Portability: NetBSD        (/include/limits.h) */

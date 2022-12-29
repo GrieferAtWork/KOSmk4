@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67c96455 */
+/* HASH CRC-32:0x66da064 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,22 +18,14 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
-/* (#) Portability: Cygwin        (/newlib/libc/include/regex.h) */
-/* (#) Portability: DJGPP         (/include/regex.h) */
-/* (#) Portability: EMX kLIBC     (/libc/include/regex.h) */
-/* (#) Portability: FreeBSD       (/include/regex.h) */
-/* (#) Portability: GNU C Library (/posix/regex.h) */
-/* (#) Portability: NetBSD        (/include/regex.h) */
-/* (#) Portability: Newlib        (/newlib/libc/include/regex.h) */
-/* (#) Portability: OpenBSD       (/include/regex.h) */
-/* (#) Portability: OpenSolaris   (/usr/src/head/regex.h) */
-/* (#) Portability: diet libc     (/include/regex.h) */
-/* (#) Portability: libc4/5       (/include/regex.h) */
-/* (#) Portability: libc6         (/include/regex.h) */
-/* (#) Portability: mintlib       (/include/regex.h) */
-/* (#) Portability: musl libc     (/include/regex.h) */
-/* (#) Portability: uClibc        (/include/regex.h) */
+/* (#) Portability: DragonFly BSD (/include/fmtmsg.h) */
+/* (#) Portability: FreeBSD       (/include/fmtmsg.h) */
+/* (#) Portability: GNU C Library (/stdlib/fmtmsg.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/fmtmsg.h) */
+/* (#) Portability: NetBSD        (/include/fmtmsg.h) */
+/* (#) Portability: OpenSolaris   (/usr/src/head/fmtmsg.h) */
+/* (#) Portability: libc6         (/include/fmtmsg.h) */
+/* (#) Portability: musl libc     (/include/fmtmsg.h) */
 #ifndef _FMTMSG_H
 #define _FMTMSG_H 1
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc74b65c */
+/* HASH CRC-32:0x8b316b9a */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
  */
 /* (#) Portability: EMX kLIBC     (/libc/include/obstack.h) */
 /* (#) Portability: GNU C Library (/malloc/obstack.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/obstack.h) */
 /* (#) Portability: libc4/5       (/include/obstack.h) */
 /* (#) Portability: libc6         (/include/obstack.h) */
 /* (#) Portability: mintlib       (/include/obstack.h) */

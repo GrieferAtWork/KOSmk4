@@ -22,6 +22,7 @@
 /* (#) Portability: DragonFly BSD (/include/uchar.h) */
 /* (#) Portability: FreeBSD       (/include/uchar.h) */
 /* (#) Portability: GNU C Library (/wcsmbs/uchar.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/uchar.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/uchar.h) */
 /* (#) Portability: Windows Kits  (/ucrt/uchar.h) */
 /* (#) Portability: libc6         (/include/uchar.h) */

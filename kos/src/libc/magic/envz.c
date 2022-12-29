@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (#) Portability: Cygwin        (/newlib/libc/include/envz.h) */
 /* (#) Portability: GNU C Library (/string/envz.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/envz.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/envz.h) */
 /* (#) Portability: libc6         (/include/envz.h) */
 }

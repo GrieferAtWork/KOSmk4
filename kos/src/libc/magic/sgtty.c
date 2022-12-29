@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (#) Portability: EMX kLIBC     (/libc/include/sgtty.h) */
 /* (#) Portability: GNU C Library (/misc/sgtty.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/sgtty.h) */
 /* (#) Portability: NetBSD        (/include/sgtty.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/sgtty.h) */
 /* (#) Portability: libc6         (/include/sgtty.h) */

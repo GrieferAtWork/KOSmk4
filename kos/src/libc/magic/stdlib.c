@@ -26,6 +26,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/stdlib.h) */
 /* (#) Portability: FreeBSD       (/include/stdlib.h) */
 /* (#) Portability: GNU C Library (/stdlib/stdlib.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/stdlib.h) */
 /* (#) Portability: MSVC          (/include/stdlib.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/stdlib.h) */
 /* (#) Portability: NetBSD        (/include/stdlib.h) */

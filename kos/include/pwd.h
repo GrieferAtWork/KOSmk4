@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b1abcf7 */
+/* HASH CRC-32:0xf83807e7 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/pwd.h) */
 /* (#) Portability: FreeBSD       (/include/pwd.h) */
 /* (#) Portability: GNU C Library (/pwd/pwd.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/pwd.h) */
 /* (#) Portability: NetBSD        (/include/pwd.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/pwd.h) */
 /* (#) Portability: OpenBSD       (/include/pwd.h) */

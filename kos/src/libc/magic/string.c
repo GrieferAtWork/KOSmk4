@@ -26,6 +26,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/string.h) */
 /* (#) Portability: FreeBSD       (/include/string.h) */
 /* (#) Portability: GNU C Library (/string/string.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/string.h) */
 /* (#) Portability: MSVC          (/include/string.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/string.h) */
 /* (#) Portability: NetBSD        (/include/string.h) */

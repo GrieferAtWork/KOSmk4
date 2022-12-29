@@ -20,6 +20,7 @@
 /* (#) Portability: DragonFly BSD (/sys/net/ethernet.h) */
 /* (#) Portability: FreeBSD       (/sys/net/ethernet.h) */
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/net/ethernet.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/net/ethernet.h) */
 /* (#) Portability: diet libc     (/include/net/ethernet.h) */
 /* (#) Portability: libc6         (/include/net/ethernet.h) */
 /* (#) Portability: mintlib       (/include/net/ethernet.h) */

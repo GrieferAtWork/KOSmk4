@@ -21,6 +21,7 @@
 /* (#) Portability: DragonFly BSD (/include/printf.h) */
 /* (#) Portability: FreeBSD       (/include/printf.h) */
 /* (#) Portability: GNU C Library (/include/printf.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/printf.h) */
 /* (#) Portability: libc6         (/include/printf.h) */
 /* (#) Portability: mintlib       (/include/printf.h) */
 /* (#) Portability: uClibc        (/include/printf.h) */

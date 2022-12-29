@@ -25,6 +25,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/ftw.h) */
 /* (#) Portability: FreeBSD       (/include/ftw.h) */
 /* (#) Portability: GNU C Library (/io/ftw.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/ftw.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/ftw.h) */
 /* (#) Portability: NetBSD        (/include/ftw.h) */
 /* (#) Portability: OpenBSD       (/include/ftw.h) */

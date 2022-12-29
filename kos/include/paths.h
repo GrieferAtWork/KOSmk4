@@ -22,6 +22,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/paths.h) */
 /* (#) Portability: FreeBSD       (/include/paths.h) */
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/paths.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/paths.h) */
 /* (#) Portability: NetBSD        (/include/paths.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/paths.h) */
 /* (#) Portability: OpenBSD       (/include/paths.h) */

@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (#) Portability: EMX kLIBC     (/libc/include/libintl.h) */
 /* (#) Portability: GNU C Library (/intl/libintl.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/libintl.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/libintl.h) */
 /* (#) Portability: diet libc     (/include/libintl.h) */
 /* (#) Portability: libc6         (/include/libintl.h) */

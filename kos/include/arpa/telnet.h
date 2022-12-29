@@ -22,6 +22,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/arpa/telnet.h) */
 /* (#) Portability: FreeBSD       (/include/arpa/telnet.h) */
 /* (#) Portability: GNU C Library (/inet/arpa/telnet.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/arpa/telnet.h) */
 /* (#) Portability: NetBSD        (/include/arpa/telnet.h) */
 /* (#) Portability: OpenBSD       (/include/arpa/telnet.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/arpa/telnet.h) */

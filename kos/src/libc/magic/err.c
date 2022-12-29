@@ -23,6 +23,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/err.h) */
 /* (#) Portability: FreeBSD       (/include/err.h) */
 /* (#) Portability: GNU C Library (/misc/err.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/err.h) */
 /* (#) Portability: NetBSD        (/include/err.h) */
 /* (#) Portability: OpenBSD       (/include/err.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/err.h) */

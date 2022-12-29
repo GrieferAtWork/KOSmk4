@@ -23,6 +23,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/resolv.h) */
 /* (#) Portability: FreeBSD       (/include/resolv.h) */
 /* (#) Portability: GNU C Library (/resolv/resolv.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/resolv.h) */
 /* (#) Portability: NetBSD        (/include/resolv.h) */
 /* (#) Portability: OpenBSD       (/include/resolv.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/resolv.h) */

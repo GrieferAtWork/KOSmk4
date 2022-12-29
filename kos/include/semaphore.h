@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8cb2a8e1 */
+/* HASH CRC-32:0x686b67c8 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 /* (#) Portability: DragonFly BSD (/include/semaphore.h) */
 /* (#) Portability: FreeBSD       (/include/semaphore.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/semaphore.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/semaphore.h) */
 /* (#) Portability: MinGW         (/mingw-w64-libraries/winpthreads/include/semaphore.h) */
 /* (#) Portability: NetBSD        (/include/semaphore.h) */
 /* (#) Portability: OpenBSD       (/include/semaphore.h) */

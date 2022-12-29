@@ -20,6 +20,7 @@
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/features.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/features.h) */
 /* (#) Portability: GNU C Library (/include/features.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/features.h) */
 /* (#) Portability: diet libc     (/include/features.h) */
 /* (#) Portability: libc4/5       (/include/features.h) */
 /* (#) Portability: libc6         (/include/features.h) */

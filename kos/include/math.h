@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4532624b */
+/* HASH CRC-32:0x3a10f395 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,7 @@
 /* (#) Portability: DJGPP         (/include/math.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/math.h) */
 /* (#) Portability: GNU C Library (/math/math.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/math.h) */
 /* (#) Portability: MSVC          (/include/math.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/math.h) */
 /* (#) Portability: NetBSD        (/include/math.h) */

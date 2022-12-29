@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/pty.h) */
 /* (#) Portability: GNU C Library (/login/pty.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/pty.h) */
 /* (#) Portability: diet libc     (/include/pty.h) */
 /* (#) Portability: libc6         (/include/pty.h) */
 /* (#) Portability: mintlib       (/include/pty.h) */

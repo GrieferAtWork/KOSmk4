@@ -25,6 +25,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/dirent.h) */
 /* (#) Portability: FreeBSD       (/include/dirent.h) */
 /* (#) Portability: GNU C Library (/dirent/dirent.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/dirent.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/dirent.h) */
 /* (#) Portability: NetBSD        (/include/dirent.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/dirent.h) */

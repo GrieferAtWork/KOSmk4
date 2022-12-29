@@ -23,6 +23,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/netinet/tcp.h) */
 /* (#) Portability: FreeBSD       (/sys/netinet/tcp.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/netinet/tcp.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/netinet/tcp.h) */
 /* (#) Portability: NetBSD        (/sys/netinet/tcp.h) */
 /* (#) Portability: OpenBSD       (/sys/netinet/tcp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/tcp.h) */

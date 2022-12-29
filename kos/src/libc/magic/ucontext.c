@@ -21,6 +21,7 @@
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/ucontext.h) */
 /* (#) Portability: FreeBSD       (/sys/[...]/include/ucontext.h) */
 /* (#) Portability: GNU C Library (/stdlib/ucontext.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/ucontext.h) */
 /* (#) Portability: NetBSD        (/include/ucontext.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/ucontext.h) */
 /* (#) Portability: diet libc     (/include/ucontext.h) */

@@ -26,6 +26,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/wctype.h) */
 /* (#) Portability: FreeBSD       (/include/wctype.h) */
 /* (#) Portability: GNU C Library (/wctype/wctype.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/wctype.h) */
 /* (#) Portability: MSVC          (/include/wctype.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/wctype.h) */
 /* (#) Portability: NetBSD        (/include/wctype.h) */

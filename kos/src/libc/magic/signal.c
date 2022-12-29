@@ -26,6 +26,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/signal.h) */
 /* (#) Portability: FreeBSD       (/include/signal.h) */
 /* (#) Portability: GNU C Library (/signal/signal.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/signal.h) */
 /* (#) Portability: MSVC          (/include/signal.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/signal.h) */
 /* (#) Portability: NetBSD        (/include/signal.h) */

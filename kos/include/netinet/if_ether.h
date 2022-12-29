@@ -21,6 +21,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/netinet/if_ether.h) */
 /* (#) Portability: FreeBSD       (/sys/netinet/if_ether.h) */
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/netinet/if_ether.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/netinet/if_ether.h) */
 /* (#) Portability: NetBSD        (/sys/netinet/if_ether.h) */
 /* (#) Portability: OpenBSD       (/sys/netinet/if_ether.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/if_ether.h) */

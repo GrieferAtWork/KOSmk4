@@ -23,6 +23,7 @@
 /* (#) Portability: DJGPP         (/include/fcntl.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/fcntl.h) */
 /* (#) Portability: GNU C Library (/io/fcntl.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/fcntl.h) */
 /* (#) Portability: MSVC          (/include/fcntl.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/fcntl.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/fcntl.h) */

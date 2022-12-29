@@ -23,6 +23,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/fts.h) */
 /* (#) Portability: FreeBSD       (/include/fts.h) */
 /* (#) Portability: GNU C Library (/io/fts.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/fts.h) */
 /* (#) Portability: NetBSD        (/include/fts.h) */
 /* (#) Portability: OpenBSD       (/include/fts.h) */
 /* (#) Portability: libc6         (/include/fts.h) */

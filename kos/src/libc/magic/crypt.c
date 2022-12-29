@@ -21,6 +21,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/crypt.h) */
 /* (#) Portability: FreeBSD       (/lib/libcrypt/crypt.h) */
 /* (#) Portability: GNU C Library (/crypt/crypt.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/crypt.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/crypt.h) */
 /* (#) Portability: libc6         (/include/crypt.h) */
 /* (#) Portability: mintlib       (/include/crypt.h) */

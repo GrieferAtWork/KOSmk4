@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b1a7d31 */
+/* HASH CRC-32:0x129f48ad */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 /* (#) Portability: DragonFly BSD (/include/monetary.h) */
 /* (#) Portability: FreeBSD       (/include/monetary.h) */
 /* (#) Portability: GNU C Library (/stdlib/monetary.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/monetary.h) */
 /* (#) Portability: NetBSD        (/include/monetary.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/monetary.h) */
 /* (#) Portability: libc6         (/include/monetary.h) */

@@ -25,6 +25,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/grp.h) */
 /* (#) Portability: FreeBSD       (/include/grp.h) */
 /* (#) Portability: GNU C Library (/grp/grp.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/grp.h) */
 /* (#) Portability: NetBSD        (/include/grp.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/grp.h) */
 /* (#) Portability: OpenBSD       (/include/grp.h) */

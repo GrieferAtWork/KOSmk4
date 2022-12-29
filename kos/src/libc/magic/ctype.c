@@ -26,6 +26,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/ctype.h) */
 /* (#) Portability: FreeBSD       (/include/ctype.h) */
 /* (#) Portability: GNU C Library (/ctype/ctype.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/ctype.h) */
 /* (#) Portability: MSVC          (/include/ctype.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/ctype.h) */
 /* (#) Portability: NetBSD        (/include/ctype.h) */

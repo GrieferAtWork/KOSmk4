@@ -20,6 +20,7 @@
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/byteswap.h) */
 /* (#) Portability: DragonFly BSD (/include/byteswap.h) */
 /* (#) Portability: GNU C Library (/string/byteswap.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/byteswap.h) */
 /* (#) Portability: diet libc     (/include/byteswap.h) */
 /* (#) Portability: libc6         (/include/byteswap.h) */
 /* (#) Portability: mintlib       (/include/byteswap.h) */

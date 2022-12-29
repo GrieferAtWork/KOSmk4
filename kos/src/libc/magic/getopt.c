@@ -23,6 +23,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/getopt.h) */
 /* (#) Portability: FreeBSD       (/include/getopt.h) */
 /* (#) Portability: GNU C Library (/posix/getopt.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/getopt.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/getopt.h) */
 /* (#) Portability: NetBSD        (/include/getopt.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/getopt.h) */

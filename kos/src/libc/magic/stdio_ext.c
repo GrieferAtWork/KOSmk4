@@ -21,6 +21,7 @@
 /* (#) Portability: Cygwin        (/newlib/libc/include/stdio_ext.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/stdio_ext.h) */
 /* (#) Portability: GNU C Library (/include/stdio_ext.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/stdio_ext.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/stdio_ext.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/stdio_ext.h) */
 /* (#) Portability: diet libc     (/include/stdio_ext.h) */

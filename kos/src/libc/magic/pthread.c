@@ -23,6 +23,7 @@
 /* (#) Portability: DragonFly BSD (/include/pthread.h) */
 /* (#) Portability: FreeBSD       (/include/pthread.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/pthread.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/pthread.h) */
 /* (#) Portability: MinGW         (/mingw-w64-libraries/winpthreads/include/pthread.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/pthread.h) */
 /* (#) Portability: OpenBSD       (/include/pthread.h) */

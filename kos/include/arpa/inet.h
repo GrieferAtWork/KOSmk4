@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x161ddd76 */
+/* HASH CRC-32:0x880b8155 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/arpa/inet.h) */
 /* (#) Portability: FreeBSD       (/include/arpa/inet.h) */
 /* (#) Portability: GNU C Library (/inet/arpa/inet.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/arpa/inet.h) */
 /* (#) Portability: NetBSD        (/include/arpa/inet.h) */
 /* (#) Portability: OpenBSD       (/include/arpa/inet.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/arpa/inet.h) */

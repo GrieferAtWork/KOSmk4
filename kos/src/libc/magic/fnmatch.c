@@ -25,6 +25,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/fnmatch.h) */
 /* (#) Portability: FreeBSD       (/include/fnmatch.h) */
 /* (#) Portability: GNU C Library (/posix/fnmatch.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/fnmatch.h) */
 /* (#) Portability: NetBSD        (/include/fnmatch.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/fnmatch.h) */
 /* (#) Portability: OpenBSD       (/include/fnmatch.h) */

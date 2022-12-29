@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f87e484 */
+/* HASH CRC-32:0x108ab3c3 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,6 +23,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/fts.h) */
 /* (#) Portability: FreeBSD       (/include/fts.h) */
 /* (#) Portability: GNU C Library (/io/fts.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/fts.h) */
 /* (#) Portability: NetBSD        (/include/fts.h) */
 /* (#) Portability: OpenBSD       (/include/fts.h) */
 /* (#) Portability: libc6         (/include/fts.h) */

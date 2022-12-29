@@ -23,6 +23,7 @@
 /* (#) Portability: DragonFly BSD (/include/semaphore.h) */
 /* (#) Portability: FreeBSD       (/include/semaphore.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/semaphore.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/semaphore.h) */
 /* (#) Portability: MinGW         (/mingw-w64-libraries/winpthreads/include/semaphore.h) */
 /* (#) Portability: NetBSD        (/include/semaphore.h) */
 /* (#) Portability: OpenBSD       (/include/semaphore.h) */

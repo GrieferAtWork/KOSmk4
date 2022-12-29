@@ -22,6 +22,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/netinet/udp.h) */
 /* (#) Portability: FreeBSD       (/sys/netinet/udp.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/netinet/udp.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/netinet/udp.h) */
 /* (#) Portability: NetBSD        (/sys/netinet/udp.h) */
 /* (#) Portability: OpenBSD       (/sys/netinet/udp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/udp.h) */

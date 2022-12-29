@@ -20,6 +20,7 @@
 /* (#) Portability: DragonFly BSD (/include/link.h) */
 /* (#) Portability: FreeBSD       (/include/link.h) */
 /* (#) Portability: GNU C Library (/elf/link.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/link.h) */
 /* (#) Portability: NetBSD        (/include/link.h) */
 /* (#) Portability: OpenBSD       (/include/link.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/link.h) */

@@ -23,6 +23,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/memory.h) */
 /* (#) Portability: FreeBSD       (/include/memory.h) */
 /* (#) Portability: GNU C Library (/string/memory.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/memory.h) */
 /* (#) Portability: MSVC          (/include/memory.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/memory.h) */
 /* (#) Portability: NetBSD        (/include/memory.h) */

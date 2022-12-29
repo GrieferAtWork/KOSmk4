@@ -21,6 +21,7 @@
 /* (#) Portability: DragonFly BSD (/include/elf.h) */
 /* (#) Portability: FreeBSD       (/include/elf.h) */
 /* (#) Portability: GNU C Library (/elf/elf.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/elf.h) */
 /* (#) Portability: NetBSD        (/sys/arch/[...]/include/elf.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/elf.h) */
 /* (#) Portability: OpenBSD       (/include/elf.h) */

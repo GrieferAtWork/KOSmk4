@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bd29451 */
+/* HASH CRC-32:0x4674e8b1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/signal.h) */
 /* (#) Portability: FreeBSD       (/include/signal.h) */
 /* (#) Portability: GNU C Library (/signal/signal.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/signal.h) */
 /* (#) Portability: MSVC          (/include/signal.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/signal.h) */
 /* (#) Portability: NetBSD        (/include/signal.h) */

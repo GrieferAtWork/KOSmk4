@@ -20,6 +20,7 @@
 /* (>) Standard: POSIX.2 (Issue 4, IEEE Std 1003.2-1992) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/poll.h) */
 /* (#) Portability: GNU C Library (/io/poll.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/poll.h) */
 /* (#) Portability: OpenBSD       (/include/poll.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/poll.h) */
 /* (#) Portability: diet libc     (/include/poll.h) */

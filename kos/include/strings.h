@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28fb56d6 */
+/* HASH CRC-32:0xf5b4ba72 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/strings.h) */
 /* (#) Portability: FreeBSD       (/include/strings.h) */
 /* (#) Portability: GNU C Library (/string/strings.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/strings.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/strings.h) */
 /* (#) Portability: NetBSD        (/include/strings.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/strings.h) */

@@ -22,6 +22,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/sysexits.h) */
 /* (#) Portability: FreeBSD       (/include/sysexits.h) */
 /* (#) Portability: GNU C Library (/misc/sysexits.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/sysexits.h) */
 /* (#) Portability: NetBSD        (/include/sysexits.h) */
 /* (#) Portability: Newlib        (/newlib/libc/posix/sysexits.h) */
 /* (#) Portability: OpenBSD       (/include/sysexits.h) */

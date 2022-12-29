@@ -20,6 +20,7 @@
 /* (#) Portability: DragonFly BSD (/sys/netinet/icmp6.h) */
 /* (#) Portability: FreeBSD       (/sys/netinet/icmp6.h) */
 /* (#) Portability: GNU C Library (/inet/netinet/icmp6.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/netinet/icmp6.h) */
 /* (#) Portability: NetBSD        (/sys/netinet/icmp6.h) */
 /* (#) Portability: OpenBSD       (/sys/netinet/icmp6.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/icmp6.h) */

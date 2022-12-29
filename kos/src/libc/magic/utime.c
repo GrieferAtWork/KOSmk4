@@ -25,6 +25,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/utime.h) */
 /* (#) Portability: FreeBSD       (/include/utime.h) */
 /* (#) Portability: GNU C Library (/io/utime.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/utime.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/utime.h) */
 /* (#) Portability: NetBSD        (/include/utime.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/utime.h) */

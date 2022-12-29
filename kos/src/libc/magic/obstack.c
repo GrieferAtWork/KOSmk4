@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (#) Portability: EMX kLIBC     (/libc/include/obstack.h) */
 /* (#) Portability: GNU C Library (/malloc/obstack.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/obstack.h) */
 /* (#) Portability: libc4/5       (/include/obstack.h) */
 /* (#) Portability: libc6         (/include/obstack.h) */
 /* (#) Portability: mintlib       (/include/obstack.h) */

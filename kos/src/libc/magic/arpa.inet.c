@@ -24,6 +24,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/arpa/inet.h) */
 /* (#) Portability: FreeBSD       (/include/arpa/inet.h) */
 /* (#) Portability: GNU C Library (/inet/arpa/inet.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/arpa/inet.h) */
 /* (#) Portability: NetBSD        (/include/arpa/inet.h) */
 /* (#) Portability: OpenBSD       (/include/arpa/inet.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/arpa/inet.h) */

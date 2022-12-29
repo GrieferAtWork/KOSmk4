@@ -25,6 +25,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/assert.h) */
 /* (#) Portability: FreeBSD       (/include/assert.h) */
 /* (#) Portability: GNU C Library (/assert/assert.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/assert.h) */
 /* (#) Portability: MSVC          (/include/assert.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/assert.h) */
 /* (#) Portability: NetBSD        (/include/assert.h) */

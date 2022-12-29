@@ -22,6 +22,7 @@
 /* (#) Portability: DragonFly BSD (/include/cpio.h) */
 /* (#) Portability: FreeBSD       (/include/cpio.h) */
 /* (#) Portability: GNU C Library (/posix/cpio.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/cpio.h) */
 /* (#) Portability: NetBSD        (/include/cpio.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/cpio.h) */
 /* (#) Portability: OpenBSD       (/include/cpio.h) */

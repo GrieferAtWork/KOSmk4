@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2bf4bbe */
+/* HASH CRC-32:0x84dad059 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,6 +21,7 @@
 /* (>) Standard: POSIX.1-2001 (Issue 5, IEEE Std 1003.1-2001) */
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/aio.h) */
 /* (#) Portability: GNU C Library (/rt/aio.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/aio.h) */
 /* (#) Portability: NetBSD        (/include/aio.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/aio.h) */
 /* (#) Portability: libc6         (/include/aio.h) */

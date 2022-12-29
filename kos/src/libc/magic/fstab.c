@@ -21,6 +21,7 @@
 /* (#) Portability: DragonFly BSD (/include/fstab.h) */
 /* (#) Portability: FreeBSD       (/include/fstab.h) */
 /* (#) Portability: GNU C Library (/misc/fstab.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/fstab.h) */
 /* (#) Portability: NetBSD        (/include/fstab.h) */
 /* (#) Portability: OpenBSD       (/include/fstab.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/lib/libbc/inc/include/fstab.h) */

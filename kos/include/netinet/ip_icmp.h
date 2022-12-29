@@ -22,6 +22,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/netinet/ip_icmp.h) */
 /* (#) Portability: FreeBSD       (/sys/netinet/ip_icmp.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/netinet/ip_icmp.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/netinet/ip_icmp.h) */
 /* (#) Portability: NetBSD        (/sys/netinet/ip_icmp.h) */
 /* (#) Portability: OpenBSD       (/sys/netinet/ip_icmp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/netinet/ip_icmp.h) */

@@ -18,6 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: GNU C Library (/include/gnu-versions.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/gnu-versions.h) */
 /* (#) Portability: libc6         (/include/gnu-versions.h) */
 /* (#) Portability: uClibc        (/include/gnu-versions.h) */
 #ifndef _GNU_VERSIONS_H

@@ -22,6 +22,7 @@
 /* (#) Portability: DragonFly BSD (/include/wordexp.h) */
 /* (#) Portability: FreeBSD       (/include/wordexp.h) */
 /* (#) Portability: GNU C Library (/posix/wordexp.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/wordexp.h) */
 /* (#) Portability: NetBSD        (/include/wordexp.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/wordexp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/wordexp.h) */

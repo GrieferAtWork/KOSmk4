@@ -22,6 +22,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/arpa/ftp.h) */
 /* (#) Portability: FreeBSD       (/include/arpa/ftp.h) */
 /* (#) Portability: GNU C Library (/inet/arpa/ftp.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/arpa/ftp.h) */
 /* (#) Portability: NetBSD        (/include/arpa/ftp.h) */
 /* (#) Portability: OpenBSD       (/include/arpa/ftp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/arpa/ftp.h) */

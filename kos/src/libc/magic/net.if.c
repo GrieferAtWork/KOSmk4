@@ -24,6 +24,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/net/if.h) */
 /* (#) Portability: FreeBSD       (/sys/net/if.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/net/if.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/net/if.h) */
 /* (#) Portability: NetBSD        (/sys/net/if.h) */
 /* (#) Portability: OpenBSD       (/sys/net/if.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/net/if.h) */

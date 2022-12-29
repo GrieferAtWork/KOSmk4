@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb8b42fa */
+/* HASH CRC-32:0xe3d3c373 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: GNU C Library (/inet/aliases.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/aliases.h) */
 /* (#) Portability: libc6         (/include/aliases.h) */
 #ifndef _ALIASES_H
 #define _ALIASES_H 1

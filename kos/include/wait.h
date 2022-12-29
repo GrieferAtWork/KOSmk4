@@ -20,6 +20,7 @@
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/wait.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/wait.h) */
 /* (#) Portability: GNU C Library (/posix/wait.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/wait.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/wait.h) */
 /* (#) Portability: libc6         (/include/wait.h) */
 /* (#) Portability: mintlib       (/include/wait.h) */

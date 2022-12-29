@@ -23,6 +23,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/ar.h) */
 /* (#) Portability: FreeBSD       (/include/ar.h) */
 /* (#) Portability: GNU C Library (/misc/ar.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/ar.h) */
 /* (#) Portability: NetBSD        (/include/ar.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/ar.h) */
 /* (#) Portability: OpenBSD       (/include/ar.h) */

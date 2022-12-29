@@ -19,6 +19,7 @@
  */
 %(c_prefix){
 /* (#) Portability: GNU C Library (/debug/execinfo.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/execinfo.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/execinfo.h) */
 /* (#) Portability: libc6         (/include/execinfo.h) */
 /* (#) Portability: uClibc        (/include/execinfo.h) */

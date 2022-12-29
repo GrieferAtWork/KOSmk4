@@ -23,6 +23,7 @@
 /* (#) Portability: DragonFly BSD (/include/utmpx.h) */
 /* (#) Portability: FreeBSD       (/include/utmpx.h) */
 /* (#) Portability: GNU C Library (/sysdeps/[...]/utmpx.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/utmpx.h) */
 /* (#) Portability: NetBSD        (/include/utmpx.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/utmpx.h) */
 /* (#) Portability: diet libc     (/include/utmpx.h) */

@@ -24,6 +24,7 @@
 /* (#) Portability: DragonFly BSD (/include/stdint.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/stdint.h) */
 /* (#) Portability: GNU C Library (/stdlib/stdint.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/stdint.h) */
 /* (#) Portability: MSVC          (/include/stdint.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/stdint.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/stdint.h) */

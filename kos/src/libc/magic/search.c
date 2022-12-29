@@ -25,6 +25,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/search.h) */
 /* (#) Portability: FreeBSD       (/include/search.h) */
 /* (#) Portability: GNU C Library (/misc/search.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/search.h) */
 /* (#) Portability: MSVC          (/include/search.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/search.h) */
 /* (#) Portability: NetBSD        (/include/search.h) */

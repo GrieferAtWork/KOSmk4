@@ -26,6 +26,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/inttypes.h) */
 /* (#) Portability: FreeBSD       (/include/inttypes.h) */
 /* (#) Portability: GNU C Library (/stdlib/inttypes.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/inttypes.h) */
 /* (#) Portability: MSVC          (/include/inttypes.h) */
 /* (#) Portability: MinGW         (/mingw-w64-headers/crt/inttypes.h) */
 /* (#) Portability: NetBSD        (/include/inttypes.h) */

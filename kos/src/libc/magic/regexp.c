@@ -20,6 +20,7 @@
 %(c_prefix){
 /* (#) Portability: EMX kLIBC     (/libc/include/regexp.h) */
 /* (#) Portability: GNU C Library (/misc/regexp.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/regexp.h) */
 /* (#) Portability: NetBSD        (/include/regexp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/regexp.h) */
 /* (#) Portability: libc4/5       (/include/regexp.h) */

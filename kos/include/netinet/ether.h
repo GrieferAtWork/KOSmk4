@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa76de15c */
+/* HASH CRC-32:0xe7ac795 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 /* (#) Portability: GNU C Library (/inet/netinet/ether.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/netinet/ether.h) */
 /* (#) Portability: diet libc     (/include/netinet/ether.h) */
 /* (#) Portability: libc6         (/include/netinet/ether.h) */
 /* (#) Portability: musl libc     (/include/netinet/ether.h) */

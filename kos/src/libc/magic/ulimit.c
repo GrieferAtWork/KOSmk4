@@ -23,6 +23,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/ulimit.h) */
 /* (#) Portability: FreeBSD       (/include/ulimit.h) */
 /* (#) Portability: GNU C Library (/resource/ulimit.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/ulimit.h) */
 /* (#) Portability: NetBSD        (/include/ulimit.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/ulimit.h) */
 /* (#) Portability: libc4/5       (/include/ulimit.h) */

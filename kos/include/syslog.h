@@ -21,6 +21,7 @@
 /* (#) Portability: Cygwin        (/winsup/cygwin/include/syslog.h) */
 /* (#) Portability: EMX kLIBC     (/libc/include/syslog.h) */
 /* (#) Portability: GNU C Library (/misc/syslog.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/syslog.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/syslog.h) */
 /* (#) Portability: diet libc     (/include/syslog.h) */
 /* (#) Portability: libc4/5       (/include/syslog.h) */

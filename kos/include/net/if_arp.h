@@ -21,6 +21,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/net/if_arp.h) */
 /* (#) Portability: FreeBSD       (/sys/net/if_arp.h) */
 /* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/net/if_arp.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/net/if_arp.h) */
 /* (#) Portability: NetBSD        (/sys/net/if_arp.h) */
 /* (#) Portability: OpenBSD       (/sys/net/if_arp.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/uts/common/net/if_arp.h) */

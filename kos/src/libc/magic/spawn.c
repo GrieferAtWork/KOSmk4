@@ -24,6 +24,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/spawn.h) */
 /* (#) Portability: FreeBSD       (/include/spawn.h) */
 /* (#) Portability: GNU C Library (/posix/spawn.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/spawn.h) */
 /* (#) Portability: NetBSD        (/include/spawn.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/spawn.h) */
 /* (#) Portability: OpenBSD       (/include/spawn.h) */

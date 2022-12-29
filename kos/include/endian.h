@@ -22,6 +22,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/endian.h) */
 /* (#) Portability: FreeBSD       (/sys/[...]/include/endian.h) */
 /* (#) Portability: GNU C Library (/string/endian.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/endian.h) */
 /* (#) Portability: NetBSD        (/include/endian.h) */
 /* (#) Portability: OpenBSD       (/sys/arch/[...]/include/endian.h) */
 /* (#) Portability: diet libc     (/include/endian.h) */

@@ -25,6 +25,7 @@
 /* (#) Portability: EMX kLIBC     (/libc/include/termios.h) */
 /* (#) Portability: FreeBSD       (/include/termios.h) */
 /* (#) Portability: GNU C Library (/termios/termios.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/termios.h) */
 /* (#) Portability: Newlib        (/newlib/libc/include/termios.h) */
 /* (#) Portability: OpenSolaris   (/usr/src/head/termios.h) */
 /* (#) Portability: diet libc     (/include/termios.h) */
