@@ -4065,7 +4065,7 @@ NOTHROW_RPC(LIBCCALL libc_fdreopen)(fd_t fd,
 		goto done;
 	}
 	stream->if_fd   = fd;
-	stream->if_flag = IO_LNIFTYY | (stream->if_flag & IO_NOLOCK);
+	stream->if_flag = IO_LNIFTYY | IO_RW | (stream->if_flag & IO_NOLOCK);
 	if (FMUSTLOCK(stream))
 		file_lock_endwrite(stream);
 	sys_close(oldfd);
@@ -4098,7 +4098,7 @@ NOTHROW_RPC(LIBCCALL libc_fdreopen_unlocked)(fd_t fd,
 		goto done;
 	}
 	stream->if_fd   = fd;
-	stream->if_flag = IO_LNIFTYY;
+	stream->if_flag = IO_LNIFTYY | IO_RW;
 	sys_close(oldfd);
 	stream = file_touser(stream);
 done:
