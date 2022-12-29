@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6f81e20 */
+/* HASH CRC-32:0x7582e4b2 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,8 +49,29 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
 	}
 success:
 #else /* __KERNEL__ */
-	while (__hybrid_atomic_fetchinc(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(self->sl_lock, 2, __ATOMIC_SEQ_CST);
+	unsigned int lockword;
+again:
+	/* NOTE: If there suddenly were more than UINT_MAX threads trying to acquire the same
+	 *       lock  all at the same time, this could overflow. -- But I think that's not a
+	 *       thing that could ever happen... */
+	while ((lockword = __hybrid_atomic_fetchinc(self->sl_lock, __ATOMIC_ACQUIRE)) != 0) {
+		if unlikely(lockword != 1) {
+			/* This can happen if multiple threads try to acquire the lock at the same time.
+			 * In  this case, we must normalize the  lock-word back to `state = 2', but only
+			 * for as long as the lock itself remains acquired by some-one.
+			 *
+			 * This code right here is also carefully written such that it always does
+			 * the  right thing, no  matter how many  threads execute it concurrently. */
+			++lockword;
+			while (!__hybrid_atomic_cmpxch(self->sl_lock, lockword, 2,
+			                               __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
+				lockword = __hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE);
+				if unlikely(lockword == 0)
+					goto again; /* Lock suddenly become available */
+				if unlikely(lockword == 2)
+					break; /* Some other thread did the normalize for us! */
+			}
+		}
 		__shared_lock_wait(self);
 	}
 #endif /* !__KERNEL__ */
@@ -80,10 +101,31 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 	}
 success:
 #else /* __KERNEL__ */
-	while (__hybrid_atomic_fetchinc(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(self->sl_lock, 2, __ATOMIC_SEQ_CST);
+	unsigned int lockword;
+again:
+	/* NOTE: If there suddenly were more than UINT_MAX threads trying to acquire the same
+	 *       lock  all at the same time, this could overflow. -- But I think that's not a
+	 *       thing that could ever happen... */
+	while ((lockword = __hybrid_atomic_fetchinc(self->sl_lock, __ATOMIC_ACQUIRE)) != 0) {
+		if unlikely(lockword != 1) {
+			/* This can happen if multiple threads try to acquire the lock at the same time.
+			 * In  this case, we must normalize the  lock-word back to `state = 2', but only
+			 * for as long as the lock itself remains acquired by some-one.
+			 *
+			 * This code right here is also carefully written such that it always does
+			 * the  right thing, no  matter how many  threads execute it concurrently. */
+			++lockword;
+			while (!__hybrid_atomic_cmpxch(self->sl_lock, lockword, 2,
+			                               __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
+				lockword = __hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE);
+				if unlikely(lockword == 0)
+					goto again; /* Lock suddenly become available */
+				if unlikely(lockword == 2)
+					break; /* Some other thread did the normalize for us! */
+			}
+		}
 		if (!__shared_lock_wait_timeout(self, abs_timeout))
-			return false;
+			return false; /* Timeout */
 	}
 #endif /* !__KERNEL__ */
 	COMPILER_BARRIER();
@@ -153,10 +195,31 @@ DEFINE_INTERN_ALIAS(libc_shared_lock_acquire_with_timeout64, libc_shared_lock_ac
 INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) ATTR_IN_OPT(2) bool
 (__FCALL libc_shared_lock_acquire_with_timeout64)(struct shared_lock *__restrict self,
                                                   struct timespec64 const *abs_timeout) THROWS(E_WOULDBLOCK, ...) {
-	while (__hybrid_atomic_fetchinc(self->sl_lock, __ATOMIC_ACQUIRE) != 0) {
-		__hybrid_atomic_store(self->sl_lock, 2, __ATOMIC_SEQ_CST);
+	unsigned int lockword;
+again:
+	/* NOTE: If there suddenly were more than UINT_MAX threads trying to acquire the same
+	 *       lock  all at the same time, this could overflow. -- But I think that's not a
+	 *       thing that could ever happen... */
+	while ((lockword = __hybrid_atomic_fetchinc(self->sl_lock, __ATOMIC_ACQUIRE)) != 0) {
+		if unlikely(lockword != 1) {
+			/* This can happen if multiple threads try to acquire the lock at the same time.
+			 * In  this case, we must normalize the  lock-word back to `state = 2', but only
+			 * for as long as the lock itself remains acquired by some-one.
+			 *
+			 * This code right here is also carefully written such that it always does
+			 * the  right thing, no  matter how many  threads execute it concurrently. */
+			++lockword;
+			while (!__hybrid_atomic_cmpxch(self->sl_lock, lockword, 2,
+			                               __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)) {
+				lockword = __hybrid_atomic_load(self->sl_lock, __ATOMIC_ACQUIRE);
+				if unlikely(lockword == 0)
+					goto again; /* Lock suddenly become available */
+				if unlikely(lockword == 2)
+					break; /* Some other thread did the normalize for us! */
+			}
+		}
 		if (!__shared_lock_wait_timeout64(self, abs_timeout))
-			return false;
+			return false; /* Timeout */
 	}
 	COMPILER_BARRIER();
 	return true;

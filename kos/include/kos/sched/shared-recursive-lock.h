@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8e63ce6f */
+/* HASH CRC-32:0x98cf838f */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -131,8 +131,8 @@ __COMPILER_CEIDECLARE(__NOBLOCK __ATTR_INOUT(1),__BOOL,__NOTHROW,__FCALL,shared_
 #else /* __KERNEL__ */
 		unsigned int __lockstate;
 		__self->sr_owner = __SHARED_RECURSIVE_LOCK_BADTID;
+		__lockstate        = __self->sr_lock.sl_lock;
 		__COMPILER_BARRIER();
-		__lockstate = __self->sr_lock.sl_lock;
 		__hybrid_atomic_store(__self->sr_lock.sl_lock, 0, __ATOMIC_RELEASE);
 		if (__lockstate >= 2)
 			__shared_lock_send(&__self->sr_lock);
@@ -167,8 +167,8 @@ __LOCAL __NOBLOCK __ATTR_INOUT(1) __BOOL __NOTHROW(__FCALL shared_recursive_lock
 #else /* __KERNEL__ */
 		unsigned int __lockstate;
 		__self->sr_owner = __SHARED_RECURSIVE_LOCK_BADTID;
+		__lockstate        = __self->sr_lock.sl_lock;
 		__COMPILER_BARRIER();
-		__lockstate = __self->sr_lock.sl_lock;
 		__hybrid_atomic_store(__self->sr_lock.sl_lock, 0, __ATOMIC_RELEASE);
 		if (__lockstate >= 2)
 			__shared_lock_send(&__self->sr_lock);
@@ -204,10 +204,14 @@ __NAMESPACE_LOCAL_END
 __COMPILER_CEIDECLARE(__BLOCKING __ATTR_INOUT(1),void,__THROWING,__FCALL,shared_recursive_lock_acquire,(struct shared_recursive_lock *__restrict __self),{
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self)) {
-		++__self->sr_rcnt;
+		++__self->sr_rcnt; /* Recursive aquisition */
 		return;
 	}
+
+	/* Lock the underlying (non-recursive) shared-lock */
 	(__NAMESPACE_LOCAL_SYM __localdep_shared_lock_acquire)(&__self->sr_lock);
+
+	/* We're now the owner of `self' */
 	__shared_recursive_lock_setown(__self);
 })
 #elif defined(__CRT_HAVE_shared_recursive_lock_acquire)
@@ -239,10 +243,14 @@ __NAMESPACE_LOCAL_END
 __LOCAL __BLOCKING __ATTR_INOUT(1) void (__FCALL shared_recursive_lock_acquire)(struct shared_recursive_lock *__restrict __self) __THROWS(__E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self)) {
-		++__self->sr_rcnt;
+		++__self->sr_rcnt; /* Recursive aquisition */
 		return;
 	}
+
+	/* Lock the underlying (non-recursive) shared-lock */
 	(__NAMESPACE_LOCAL_SYM __localdep_shared_lock_acquire)(&__self->sr_lock);
+
+	/* We're now the owner of `self' */
 	__shared_recursive_lock_setown(__self);
 }
 #endif /* ... */
@@ -284,12 +292,16 @@ __COMPILER_CEIDECLARE(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWIN
 	__BOOL __result;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self)) {
-		++__self->sr_rcnt;
+		++__self->sr_rcnt; /* Recursive aquisition */
 		return 1;
 	}
+
+	/* Lock the underlying (non-recursive) shared-lock */
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_shared_lock_acquire_with_timeout)(&__self->sr_lock, __abs_timeout);
-	if (__result)
+	if (__result) {
+		/* We're now the owner of `self' */
 		__shared_recursive_lock_setown(__self);
+	}
 	return __result;
 })
 #elif defined(__CRT_HAVE_shared_recursive_lock_acquire_with_timeout) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
@@ -342,12 +354,16 @@ __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursi
 	__BOOL __result;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self)) {
-		++__self->sr_rcnt;
+		++__self->sr_rcnt; /* Recursive aquisition */
 		return 1;
 	}
+
+	/* Lock the underlying (non-recursive) shared-lock */
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_shared_lock_acquire_with_timeout)(&__self->sr_lock, __abs_timeout);
-	if (__result)
+	if (__result) {
+		/* We're now the owner of `self' */
 		__shared_recursive_lock_setown(__self);
+	}
 	return __result;
 }
 #endif /* ... */
@@ -544,12 +560,16 @@ __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2
 	__BOOL __result;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self)) {
-		++__self->sr_rcnt;
+		++__self->sr_rcnt; /* Recursive aquisition */
 		return 1;
 	}
+
+	/* Lock the underlying (non-recursive) shared-lock */
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_shared_lock_acquire_with_timeout64)(&__self->sr_lock, __abs_timeout);
-	if (__result)
+	if (__result) {
+		/* We're now the owner of `self' */
 		__shared_recursive_lock_setown(__self);
+	}
 	return __result;
 })
 #elif defined(__CRT_HAVE_shared_recursive_lock_acquire_with_timeout) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -602,12 +622,16 @@ __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCA
 	__BOOL __result;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self)) {
-		++__self->sr_rcnt;
+		++__self->sr_rcnt; /* Recursive aquisition */
 		return 1;
 	}
+
+	/* Lock the underlying (non-recursive) shared-lock */
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_shared_lock_acquire_with_timeout64)(&__self->sr_lock, __abs_timeout);
-	if (__result)
+	if (__result) {
+		/* We're now the owner of `self' */
 		__shared_recursive_lock_setown(__self);
+	}
 	return __result;
 }
 #endif /* ... */
@@ -747,12 +771,16 @@ __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1),__BOOL,__THROWI
 	__BOOL __result;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self)) {
-		++__self->sr_rcnt;
+		++__self->sr_rcnt; /* Recursive aquisition */
 		return 1;
 	}
+
+	/* Lock the underlying (non-recursive) shared-lock */
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_shared_lock_acquire_with_timeout)(&__self->sr_lock, __abs_timeout);
-	if (__result)
+	if (__result) {
+		/* We're now the owner of `self' */
 		__shared_recursive_lock_setown(__self);
+	}
 	return __result;
 })
 #elif defined(__CRT_HAVE_shared_recursive_lock_acquire_with_timeout) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
@@ -807,12 +835,16 @@ __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __BOOL (__FCALL shared_recursi
 	__BOOL __result;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self)) {
-		++__self->sr_rcnt;
+		++__self->sr_rcnt; /* Recursive aquisition */
 		return 1;
 	}
+
+	/* Lock the underlying (non-recursive) shared-lock */
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_shared_lock_acquire_with_timeout)(&__self->sr_lock, __abs_timeout);
-	if (__result)
+	if (__result) {
+		/* We're now the owner of `self' */
 		__shared_recursive_lock_setown(__self);
+	}
 	return __result;
 }
 #endif /* ... */
@@ -956,12 +988,16 @@ __COMPILER_CEIREDIRECT(__ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2
 	__BOOL __result;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self)) {
-		++__self->sr_rcnt;
+		++__self->sr_rcnt; /* Recursive aquisition */
 		return 1;
 	}
+
+	/* Lock the underlying (non-recursive) shared-lock */
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_shared_lock_acquire_with_timeout64)(&__self->sr_lock, __abs_timeout);
-	if (__result)
+	if (__result) {
+		/* We're now the owner of `self' */
 		__shared_recursive_lock_setown(__self);
+	}
 	return __result;
 })
 #elif defined(__CRT_HAVE_shared_recursive_lock_acquire_with_timeout) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -1016,12 +1052,16 @@ __LOCAL __ATTR_WUNUSED __BLOCKING __ATTR_INOUT(1) __ATTR_IN_OPT(2) __BOOL (__FCA
 	__BOOL __result;
 	__COMPILER_WORKAROUND_GCC_105689(__self);
 	if (__shared_recursive_lock_isown(__self)) {
-		++__self->sr_rcnt;
+		++__self->sr_rcnt; /* Recursive aquisition */
 		return 1;
 	}
+
+	/* Lock the underlying (non-recursive) shared-lock */
 	__result = (__NAMESPACE_LOCAL_SYM __localdep_shared_lock_acquire_with_timeout64)(&__self->sr_lock, __abs_timeout);
-	if (__result)
+	if (__result) {
+		/* We're now the owner of `self' */
 		__shared_recursive_lock_setown(__self);
+	}
 	return __result;
 }
 #endif /* ... */

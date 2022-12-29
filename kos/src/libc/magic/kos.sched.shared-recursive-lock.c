@@ -127,8 +127,8 @@ $bool shared_recursive_lock_release([[inout]] struct shared_recursive_lock *__re
 @@pp_else@@
 		unsigned int lockstate;
 		self->@sr_owner@ = __SHARED_RECURSIVE_LOCK_BADTID;
+		lockstate        = self->@sr_lock@.@sl_lock@;
 		__COMPILER_BARRIER();
-		lockstate = self->@sr_lock@.@sl_lock@;
 		__hybrid_atomic_store(self->@sr_lock@.@sl_lock@, 0, __ATOMIC_RELEASE);
 		if (lockstate >= 2)
 			__shared_lock_send(&self->@sr_lock@);
@@ -152,10 +152,14 @@ $bool shared_recursive_lock_release([[inout]] struct shared_recursive_lock *__re
 void shared_recursive_lock_acquire([[inout]] struct shared_recursive_lock *__restrict self) {
 	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self)) {
-		++self->@sr_rcnt@;
+		++self->@sr_rcnt@; /* Recursive aquisition */
 		return;
 	}
+
+	/* Lock the underlying (non-recursive) shared-lock */
 	shared_lock_acquire(&self->@sr_lock@);
+
+	/* We're now the owner of `self' */
 	__shared_recursive_lock_setown(self);
 }
 
@@ -174,12 +178,16 @@ $bool shared_recursive_lock_acquire_with_timeout([[inout]] struct shared_recursi
 	bool result;
 	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self)) {
-		++self->@sr_rcnt@;
+		++self->@sr_rcnt@; /* Recursive aquisition */
 		return true;
 	}
+
+	/* Lock the underlying (non-recursive) shared-lock */
 	result = shared_lock_acquire_with_timeout(&self->@sr_lock@, abs_timeout);
-	if (result)
+	if (result) {
+		/* We're now the owner of `self' */
 		__shared_recursive_lock_setown(self);
+	}
 	return result;
 }
 
@@ -236,12 +244,16 @@ $bool shared_recursive_lock_acquire_with_timeout64([[inout]] struct shared_recur
 	bool result;
 	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self)) {
-		++self->@sr_rcnt@;
+		++self->@sr_rcnt@; /* Recursive aquisition */
 		return $true;
 	}
+
+	/* Lock the underlying (non-recursive) shared-lock */
 	result = shared_lock_acquire_with_timeout64(&self->@sr_lock@, abs_timeout);
-	if (result)
+	if (result) {
+		/* We're now the owner of `self' */
 		__shared_recursive_lock_setown(self);
+	}
 	return result;
 }
 

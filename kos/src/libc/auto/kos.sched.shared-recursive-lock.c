@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb76b0ea */
+/* HASH CRC-32:0xefeac979 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,8 +73,8 @@ NOTHROW(__FCALL libc_shared_recursive_lock_release)(struct shared_recursive_lock
 
 		unsigned int lockstate;
 		self->sr_owner = __SHARED_RECURSIVE_LOCK_BADTID;
+		lockstate        = self->sr_lock.sl_lock;
 		__COMPILER_BARRIER();
-		lockstate = self->sr_lock.sl_lock;
 		__hybrid_atomic_store(self->sr_lock.sl_lock, 0, __ATOMIC_RELEASE);
 		if (lockstate >= 2)
 			__shared_lock_send(&self->sr_lock);
@@ -90,10 +90,14 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") __BLOCKING ATTR_INOUT(1) void
 (__FCALL libc_shared_recursive_lock_acquire)(struct shared_recursive_lock *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self)) {
-		++self->sr_rcnt;
+		++self->sr_rcnt; /* Recursive aquisition */
 		return;
 	}
+
+	/* Lock the underlying (non-recursive) shared-lock */
 	libc_shared_lock_acquire(&self->sr_lock);
+
+	/* We're now the owner of `self' */
 	__shared_recursive_lock_setown(self);
 }
 /* >> shared_recursive_lock_acquire_with_timeout(3), shared_recursive_lock_acquire_with_timeout64(3)
@@ -106,12 +110,16 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) bo
 	bool result;
 	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self)) {
-		++self->sr_rcnt;
+		++self->sr_rcnt; /* Recursive aquisition */
 		return true;
 	}
+
+	/* Lock the underlying (non-recursive) shared-lock */
 	result = libc_shared_lock_acquire_with_timeout(&self->sr_lock, abs_timeout);
-	if (result)
+	if (result) {
+		/* We're now the owner of `self' */
 		__shared_recursive_lock_setown(self);
+	}
 	return result;
 }
 /* >> shared_recursive_lock_waitfor(3)
@@ -149,12 +157,16 @@ INTERN ATTR_SECTION(".text.crt.sched.futex") WUNUSED __BLOCKING ATTR_INOUT(1) AT
 	bool result;
 	__COMPILER_WORKAROUND_GCC_105689(self);
 	if (__shared_recursive_lock_isown(self)) {
-		++self->sr_rcnt;
+		++self->sr_rcnt; /* Recursive aquisition */
 		return true;
 	}
+
+	/* Lock the underlying (non-recursive) shared-lock */
 	result = libc_shared_lock_acquire_with_timeout64(&self->sr_lock, abs_timeout);
-	if (result)
+	if (result) {
+		/* We're now the owner of `self' */
 		__shared_recursive_lock_setown(self);
+	}
 	return result;
 }
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
