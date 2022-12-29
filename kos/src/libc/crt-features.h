@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17ef1e2f */
+/* HASH CRC-32:0xab21eac1 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4475,6 +4475,9 @@
 #define __CRT_HAVE___memsetq_chk
 #define __CRT_HAVE___memsetw_chk
 #define __CRT_HAVE___minor
+#define __CRT_HAVE___mutex_init
+#define __CRT_HAVE___mutex_trylock
+#define __CRT_HAVE___mutex_unlock
 #define __CRT_HAVE___overflow
 #define __CRT_HAVE___p___argc
 #define __CRT_HAVE___p___argv
@@ -4510,6 +4513,11 @@
 #define __CRT_HAVE___signbitl
 #define __CRT_HAVE___signgam
 #define __CRT_HAVE___solaris_sysinfo
+#define __CRT_HAVE___spin_lock_init
+#define __CRT_HAVE___spin_lock_locked
+#define __CRT_HAVE___spin_lock_solid
+#define __CRT_HAVE___spin_try_lock
+#define __CRT_HAVE___spin_unlock
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE___stack_chk_fail
 #define __CRT_HAVE___stack_chk_guard

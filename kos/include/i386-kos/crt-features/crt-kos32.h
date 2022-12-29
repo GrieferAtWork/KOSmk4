@@ -976,6 +976,10 @@
 #define __CRT_HAVE___munlock
 #define __CRT_HAVE___munlockall
 #define __CRT_HAVE___munmap
+#define __CRT_HAVE___mutex_init
+#define __CRT_HAVE___mutex_lock
+#define __CRT_HAVE___mutex_trylock
+#define __CRT_HAVE___mutex_unlock
 #define __CRT_HAVE___nan
 #define __CRT_HAVE___nanf
 #define __CRT_HAVE___nanl
@@ -1203,6 +1207,12 @@
 #define __CRT_HAVE___socket
 #define __CRT_HAVE___socketcall
 #define __CRT_HAVE___solaris_sysinfo
+#define __CRT_HAVE___spin_lock
+#define __CRT_HAVE___spin_lock_init
+#define __CRT_HAVE___spin_lock_locked
+#define __CRT_HAVE___spin_lock_solid
+#define __CRT_HAVE___spin_try_lock
+#define __CRT_HAVE___spin_unlock
 #define __CRT_HAVE___sqrt
 #define __CRT_HAVE___sqrtf
 #define __CRT_HAVE___sqrtl

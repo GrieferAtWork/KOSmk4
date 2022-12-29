@@ -149,6 +149,7 @@ incdir("");
 #include <asm/crt/aio.h>
 #include <asm/crt/confname.h>
 #include <asm/crt/float.h>
+#include <asm/crt/fmtmsg.h>
 #include <asm/crt/fp_type.h>
 #include <asm/crt/getpassfd.h>
 #include <asm/crt/glob.h>
@@ -563,6 +564,7 @@ incdir("");
 #include <fenv.h>
 #include <file.h>
 #include <float.h>
+#include <fmtmsg.h>
 #include <fnmatch.h>
 #include <format-printer.h>
 #include <fpu_control.h>
@@ -1128,6 +1130,7 @@ incdir("");
 #include <linux/vt.h>
 #include <linux/xattr.h>
 #include <locale.h>
+#include <lock-intern.h>
 #include <machine/_default_types.h>
 #include <machine/_endian.h>
 #include <machine/_time.h>
@@ -1143,6 +1146,7 @@ incdir("");
 #include <machine/termios.h>
 #include <machine/time.h>
 #include <machine/types.h>
+#include <machine-sp.h>
 #include <malloc.h>
 #include <malloc_np.h>
 #include <malloca.h>
