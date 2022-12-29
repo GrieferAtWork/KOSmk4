@@ -133,6 +133,7 @@
 - `<bsd/vis.h>`             (libbsd)
 - `<corecrt_share.h>`       (DOS)
 - `<corecrt_terminate.h>`   (DOS)
+- `<cthreads.h>`            (GNU Mach, Mac OS)
 - `<gshadow.h>`             (Glibc!)
 - `<mcheck.h>`              (Glibc!)
 - `<share.h>`               (DOS)
@@ -167,18 +168,17 @@
 
 ### Referenced, but origin unknown
 
-- `<cthreads.h>`           (Python ./configure)
-- `<fp.h>`                 (libstdc++ ./configure)
+- `<fp.h>`                  (libstdc++ ./configure)
 
 
 ### Unlikely to ever be added
 
 - `<libiberty/demangle.h>`
-- `<nlist.h>`              (libbsd)
-- `<bsd/nlist.h>`          (libbsd)
-- `<_G_config.h>`          (Glibc!)
-- `<gconv.h>`              (Glibc!)
-- `<nss.h>`                (Glibc!)
+- `<nlist.h>`               (libbsd)
+- `<bsd/nlist.h>`           (libbsd)
+- `<_G_config.h>`           (Glibc!)
+- `<gconv.h>`               (Glibc!)
+- `<nss.h>`                 (Glibc!)
 - `<rpc/auth.h>`
 - `<rpc/auth_des.h>`
 - `<rpc/auth_unix.h>`

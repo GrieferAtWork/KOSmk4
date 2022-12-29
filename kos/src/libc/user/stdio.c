@@ -162,8 +162,7 @@ changed_linebuffered_remove(FILE *__restrict self) {
 
 /* Low-level file read operation. */
 PRIVATE ATTR_SECTION(".text.crt.FILE.core.read") NONNULL((1)) ssize_t LIBCCALL
-file_system_read(FILE *__restrict self,
-                 void *buf, size_t num_bytes) {
+file_system_read(FILE *__restrict self, void *buf, size_t num_bytes) {
 	ssize_t result;
 	if (self->if_flag & IO_HASVTAB) {
 		struct iofile_data *ex;
@@ -179,8 +178,7 @@ file_system_read(FILE *__restrict self,
 
 /* Low-level file write operation. */
 PRIVATE ATTR_SECTION(".text.crt.FILE.core.write") NONNULL((1)) ssize_t LIBCCALL
-file_system_write(FILE *__restrict self,
-                  void const *buf, size_t num_bytes) {
+file_system_write(FILE *__restrict self, void const *buf, size_t num_bytes) {
 	ssize_t result;
 	if (self->if_flag & IO_HASVTAB) {
 		struct iofile_data *ex;
@@ -195,8 +193,7 @@ file_system_write(FILE *__restrict self,
 }
 
 PRIVATE ATTR_SECTION(".text.crt.FILE.core.write") NONNULL((1)) ssize_t LIBCCALL
-file_system_writeall(FILE *__restrict self,
-                     void const *buf, size_t num_bytes) {
+file_system_writeall(FILE *__restrict self, void const *buf, size_t num_bytes) {
 	ssize_t result;
 	if (self->if_flag & IO_HASVTAB) {
 		struct iofile_data *ex;
@@ -228,8 +225,7 @@ file_system_writeall(FILE *__restrict self,
 
 /* Low-level file seek operation. */
 PRIVATE ATTR_SECTION(".text.crt.FILE.core.seek") NONNULL((1)) off64_t LIBCCALL
-file_system_seek(FILE *__restrict self,
-                 off64_t offset, int whence) {
+file_system_seek(FILE *__restrict self, off64_t offset, int whence) {
 	off64_t result;
 	if (self->if_flag & IO_HASVTAB) {
 		struct iofile_data *ex;

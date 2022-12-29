@@ -126,18 +126,18 @@ struct iofile_data_novtab {
 	                                           * only  used by `fgetln()' which already is thread-unsafe) */
 	struct shared_recursive_rwlock io_lock;   /* Lock for the file. */
 	byte_t                        *io_chng;   /* [>= :if_base][+io_chsz <= :if_base + :if_bufsiz]
-	                                           * [valid_if(io_chsz != 0)][lock(fb_lock)]
+	                                           * [valid_if(io_chsz != 0)][lock(io_lock)]
 	                                           * Pointer to the  first character that  was
 	                                           * changed since the buffer had been loaded. */
-	size_t                         io_chsz;   /* [lock(fb_lock)] Amount of bytes that were changed. */
+	size_t                         io_chsz;   /* [lock(io_lock)] Amount of bytes that were changed. */
 	LIST_ENTRY(FILE)               io_lnch;   /* [lock(changed_linebuffered_files_lock)][0..1] Chain of line-buffered file that
 	                                           * have  changed and must  be flushed before another  line-buffered file is read. */
 	LIST_ENTRY(FILE)               io_link;   /* [lock(all_files_lock)][0..1] Entry  in  the  global chain  of  open  files.
 	                                           * (Used by `fcloseall()', as well as flushing all open files during `exit()') */
 	uintptr_t                      io_fver;   /* [lock(flushall_lock)] Last time that this file was flushed because of a global flush. */
-	pos64_t                        io_fblk;   /* The starting address of the data block currently stored in `if_base'. */
-	pos64_t                        io_fpos;   /* The current (assumed) position within the underlying file stream. */
-	mbstate_t                      io_mbs;    /* MB State used for translating unicode data. */
+	pos64_t                        io_fblk;   /* [lock(io_lock)] The starting address of the data block currently stored in `if_base'. */
+	pos64_t                        io_fpos;   /* [lock(io_lock)] The current (assumed) position within the underlying file stream. */
+	mbstate_t                      io_mbs;    /* [lock(io_lock)] MB State used for translating unicode data. */
 };
 #define IOFILE_DATA_NOVTAB_INIT()                    \
 	{                                                \
@@ -167,7 +167,7 @@ struct iofile_data: iofile_data_novtab {
 	__funopen2_64_seekfn_t io_seekfn;  /* [0..1][const] Seek function */
 	__funopen2_flushfn_t   io_flushfn; /* [0..1][const] Flush function */
 	__funopen2_closefn_t   io_closefn; /* [0..1][const] Close function */
-	void                  *io_cookie;  /* [const] Magic cookie */
+	void                  *io_cookie;  /* [?..?][const] Magic cookie */
 };
 
 
