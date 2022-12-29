@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd92c862 */
+/* HASH CRC-32:0xbed60996 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,29 +46,29 @@
 
 #include <libc/string.h>
 
+#ifdef __CC__
+__SYSDECL_BEGIN
+
 /* Old, deprecated, (weird), and in many places since-removed posix API for regex.
  *
  * Before this header can be #include'ed, the user has to first define the
  * following set of macros:
  *
  * >> int GETC();
- *    @default: #define GETC() '\0'
  *    Return the next character from the pattern string;
  *    Returns `__eof' (the 4th argument of `compile(3)') once the end has been reached
  *    Additionally,  `compile(3)' will also  stop reading from this  macro once it has
  *    returned either '\0' or '\n'.
  *
  * >> int PEEKC();
- *    @default: -     (this macro is never used by KOS's implementation)
- *    Same as  `GETC()',  but  don't  actually  consume  the  character.
+ *    [optional] (this macro is never used by KOS's implementation)
+ *    Same as `GETC()', but  don't actually consume the  character.
  *
  * >> void UNGETC(int ch);
- *    @default: #define UNGETC(ch) (void)0
  *    Unread a the last-read character `ch' from `GETC()'. It is guarantied that `ch'
  *    is equal to the character last-returned by `GETC()'
  *
  * >> void RETURN(char *endp)
- *    @default: #define RETURN(endp) return NULL;
  *    Called once `compile(3)' is  done. The given  `endp' is supposed  to be a  pointer
  *    to the end of the internal compiled regular expression buffer, but there literally
  *    is  no reason you  would ever need to  know that (since  the actual code-buffer is
@@ -76,7 +76,6 @@
  *    pointer to the end of the internal `regex_t' object.
  *
  * >> void ERROR(int errcode);
- *    @default: #define ERROR(errcode) return (char *)"Error";
  *    Called by `compile(3)' for abnormal termination. The given `errcode' is one of:
  *    - 11: REG_ERANGE
  *    - 16: Never returned (meant to be "Bad number")
@@ -91,9 +90,8 @@
  *    - 49: REG_EBRACK
  *    - 50: REG_ESPACE
  */
-
-#ifdef __CC__
-__SYSDECL_BEGIN
+#if (defined(__BUILDING_LIBC) || defined(__DO_NOT_DEFINE_COMPILE) || \
+     (defined(GETC) && defined(PEEKC) && defined(RETURN) && defined(ERROR)))
 
 /* Variables used by `step(3)' and `advance(3)' */
 #ifndef loc1
@@ -127,11 +125,6 @@ __CSDECLARE(,char *,locs); /* NOTE: Never used internally! */
 #if !defined(__DO_NOT_DEFINE_COMPILE) && !defined(__BUILDING_LIBC)
 #if defined(__CRT_HAVE_regcomp) && defined(__hybrid_alloca)
 
-#ifndef ERROR
-#define __REGEXP_DEFINED_ERROR
-#define ERROR(errcode) return (char *)"Error";
-#endif /* !ERROR */
-
 /* Compile a regular expression
  * @param: instring: Completely unused, and meaningless
  * @param: expbuf:   Start pointer for compiled-regular-expression buffer.  This
@@ -143,11 +136,9 @@ __CSDECLARE(,char *,locs); /* NOTE: Never used internally! */
  *                   be  `UNGETC()'d, unlike when `GETC()' returns `eof') */
 __ATTR_NOINLINE /* noinline because of our use of `alloca(3)' */
 char *(compile)(char *__instring, char *__expbuf, char const *__endbuf, int __eof) {
-#ifdef GETC
 	char *__pattern_str = __NULLPTR;
 	__SIZE_TYPE__ __pattern_size = 0;
 	__SIZE_TYPE__ __pattern_alloc = 0;
-#endif /* GETC */
 	int __ch, __error;
 	regex_t *__re;
 	/* Align the input buffer (this will also be done by `step(3)' and `advance(3)') */
@@ -157,12 +148,9 @@ char *(compile)(char *__instring, char *__expbuf, char const *__endbuf, int __eo
 		ERROR(50);
 	}
 	__re = (regex_t *)__expbuf;
-#ifdef GETC
 	while ((__ch = (GETC())) != __eof) {
 		if (__ch == '\0' || __ch == '\n') {
-#ifdef UNGETC
 			UNGETC(__ch);
-#endif /* UNGETC */
 			break;
 		}
 		if (__pattern_size >= __pattern_alloc) {
@@ -180,14 +168,9 @@ char *(compile)(char *__instring, char *__expbuf, char const *__endbuf, int __eo
 		__pattern_str[__pattern_size++] = (char)(unsigned char)(unsigned int)__ch;
 	}
 	__pattern_str[__pattern_size] = '\0';
-#endif /* GETC */
 
 	/* With the entire pattern string read, compile it */
-#ifdef GETC
 	__error = regcomp(__re, __pattern_str, REG_NEWLINE);
-#else /* GETC */
-	__error = regcomp(__re, "", REG_NEWLINE);
-#endif /* !GETC */
 	if (__error != REG_NOERROR) {
 		switch (__error) {
 		case REG_ERANGE:  /* */ { ERROR(11); }
@@ -203,16 +186,8 @@ char *(compile)(char *__instring, char *__expbuf, char const *__endbuf, int __eo
 	}
 
 	/* Everything is ok.  */
-#ifdef RETURN
 	RETURN((char *)(__re + 1));
-#else /* RETURN */
-	return NULL;
-#endif /* !RETURN */
 }
-#ifdef __REGEXP_DEFINED_ERROR
-#undef __REGEXP_DEFINED_ERROR
-#undef ERROR
-#endif /* __REGEXP_DEFINED_ERROR */
 #endif /* __CRT_HAVE_regcomp && __hybrid_alloca */
 #endif /* !__DO_NOT_DEFINE_COMPILE && !__BUILDING_LIBC */
 
@@ -254,6 +229,19 @@ __CDECLARE(,int,__NOTHROW_NCX,advance,(char const *__string, char const *__expbu
 __NAMESPACE_LOCAL_USING_OR_IMPL(advance, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL advance)(char const *__string, char const *__expbuf) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(advance))(__string, __expbuf); })
 #endif /* __LOCAL_loc2 && __REG_NOTEOL && __CRT_HAVE_regexec */
 #endif /* !__CRT_HAVE_advance */
+
+#endif /* __BUILDING_LIBC || __DO_NOT_DEFINE_COMPILE || (GETC && PEEKC && RETURN && ERROR) */
+
+/* TODO: Rather   than  what's  above,  NetBSD  defines  another,
+ *       deprecated interface here that conflicts with <regex.h>:
+ * >> typedef struct regexp { ... } regexp;
+ * >> regexp *regcomp(char const *pattern) __ASMNAME("__compat_regcomp");
+ * >> int regexec(regexp const *re, char const *input) __ASMNAME("__compat_regexec");
+ * >> void regsub(regexp const *re, char const *???, char *???) __ASMNAME("__compat_regsub");
+ * >> void regerror(char const *???) __ASMNAME("__compat_regerror");
+ *
+ * KOS should implement this API for compatibility
+ */
 
 __SYSDECL_END
 #endif /* __CC__ */
