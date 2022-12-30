@@ -122,6 +122,28 @@
 
 
 
+### Missing linux headers referenced by busybox's networking code
+
+- `<linux/ethtool.h>`           (linux)
+- `<linux/filter.h>`            (linux)
+- `<linux/if.h>`                (linux)
+- `<linux/if_addr.h>`           (linux)
+- `<linux/if_bonding.h>`        (linux)
+- `<linux/if_link.h>`           (linux)
+- `<linux/if_packet.h>`         (linux)
+- `<linux/if_slip.h>`           (linux)
+- `<linux/if_tun.h>`            (linux)
+- `<linux/if_vlan.h>`           (linux)
+- `<linux/mii.h>`               (linux)
+- `<linux/neighbour.h>`         (linux)
+- `<linux/netlink.h>`           (linux)
+- `<linux/pkt_sched.h>`         (linux)
+- `<linux/rtnetlink.h>`         (linux)
+- `<linux/version.h>`           (linux)
+- `<linux/wireless.h>`          (linux)
+
+
+
 ### Missing headers
 
 - `<a.out.h>`                   (Glibc)

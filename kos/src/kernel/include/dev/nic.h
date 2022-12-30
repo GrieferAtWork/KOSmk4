@@ -61,7 +61,7 @@ struct nic_packet {
 	 * NIC packet data should be enumerated as:
 	 * #1: np_head...np_headend
 	 * #2: np_payloadv[0..np_payloadc]
-	 * #3:        np_tail...np_tailend */
+	 * #3: np_tail...np_tailend */
 	WEAK refcnt_t     np_refcnt;   /* Reference counter. */
 	byte_t           *np_head;     /* [1..1] Start of headers (grows up) */
 	union {
