@@ -23,30 +23,46 @@
 #include "api.h"
 /**/
 
+#ifndef LIBREGEX_NO_SYSTEM_INCLUDES
 #include <bits/types.h>
+#endif /* !LIBREGEX_NO_SYSTEM_INCLUDES */
 
 __DECL_BEGIN
 
 struct re_code;
-struct iovec;
 
 /* Flags for `struct re_exec::rx_eflags' */
+#ifndef RE_EXEC_NOTBOL
 #define RE_EXEC_NOTBOL 0x0001 /* '^' (REOP_AT_SOL) doesn't match at the start of the input buffer (but only at an actual begin-of-line) */
+#endif /* !RE_EXEC_NOTBOL */
+#ifndef RE_EXEC_NOTEOL
 #define RE_EXEC_NOTEOL 0x0002 /* '$' (REOP_AT_EOL) doesn't match at the end of the input buffer (but only before an actual line-feed) */
+#endif /* !RE_EXEC_NOTEOL */
 
 /* *sigh* this has to be an int for Glibc compat (but it should have been a `size_t')
  * NOTE: When nothing got matched for some given group, set to `RE_REGOFF_UNSET'. */
+#ifndef __re_regoff_t_defined
+#define __re_regoff_t_defined
 typedef unsigned int re_regoff_t;
 typedef int re_sregoff_t;
+#endif /* !__re_regoff_t_defined */
+#ifndef RE_REGOFF_UNSET
 #define RE_REGOFF_UNSET ((re_regoff_t)-1)
+#endif /* !RE_REGOFF_UNSET */
 
+#ifndef __re_regmatch_t_defined
+#define __re_regmatch_t_defined
 typedef struct {
 	re_regoff_t rm_so; /* [<= rm_eo] Group starting offset (offset of first byte within the group)
 	                    * - Set to `RE_REGOFF_UNSET' if the group was never encountered. */
 	re_regoff_t rm_eo; /* [>= rm_so] Group end offset (offset of first byte past the group)
 	                    * - Set to `RE_REGOFF_UNSET' if the group was never encountered. */
 } re_regmatch_t;
+#endif /* !__re_regmatch_t_defined */
 
+#ifndef __re_exec_defined
+#define __re_exec_defined
+struct iovec;
 struct re_exec {
 	struct re_code const *rx_code;     /* [1..1] Regex code */
 	size_t                rx_nmatch;   /* Max # of group matches to write to `rx_pmatch' (at most `rx_code->rc_ngrps' will ever be written) */
@@ -54,6 +70,15 @@ struct re_exec {
 	                                    * - Up to the first `rx_nmatch' groups are written, but only on success
 	                                    * - Upon failure, the contents of this buffer are left in an undefined state
 	                                    * - Offsets written INCLUDE `rx_startoff' (i.e. are always `>= rx_startoff') */
+#ifdef LIBREGEX_REGEXEC_SINGLE_CHUNK
+	void const           *rx_inbase;   /* [0..rx_insize][valid_if(rx_startoff < rx_endoff)] Input  data to  scan
+	                                    * When `rx_code' was compiled with `DEE_REGEX_COMPILE_NOUTF8', this data
+	                                    * is  treated as raw bytes; otherwise, it  is treated as a utf-8 string.
+	                                    * In either case, `rx_insize' is the # of bytes within this buffer. */
+	__size_t              rx_insize;   /* Total # of bytes starting at `rx_inbase' */
+	__size_t              rx_startoff; /* Starting byte offset into `rx_inbase' of data to match. */
+	__size_t              rx_endoff;   /* Ending byte offset into `rx_inbase' of data to match. */
+#else /* LIBREGEX_REGEXEC_SINGLE_CHUNK */
 	struct iovec const   *rx_iov;      /* [?..*][valid_if(rx_startoff < rx_endoff || rx_extra != 0)]
 	                                    * I/O vector of input data to scan (goes on until chunks totaling
 	                                    * at least  `rx_endoff + rx_extra' bytes  have been  encountered) */
@@ -63,8 +88,10 @@ struct re_exec {
 	__size_t              rx_extra;    /* Number of extra bytes that can still be read after `rx_endoff'
 	                                    * Usually `0', but when  non-zero, `REOP_AT_*' opcodes will  try
 	                                    * to read this extra memory in order to check matches. */
+#endif /* !LIBREGEX_REGEXEC_SINGLE_CHUNK */
 	unsigned int          rx_eflags;   /* Execution-flags (set of `RE_EXEC_*') */
 };
+#endif /* !__re_exec_defined */
 
 /* Execute a regular expression.
  * @return: >= 0:        The # of bytes starting at `exec->rx_startoff' that got matched.

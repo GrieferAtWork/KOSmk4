@@ -22,6 +22,7 @@
 
 #include "api.h"
 
+#ifndef LIBREGEX_NO_SYSTEM_INCLUDES
 #include <bits/types.h>
 
 #include <libc/string.h>
@@ -30,6 +31,7 @@
 #ifndef NDEBUG
 #include <bits/crt/format-printer.h>
 #endif /* !NDEBUG */
+#endif /* !LIBREGEX_NO_SYSTEM_INCLUDES */
 
 __DECL_BEGIN
 
@@ -250,6 +252,86 @@ typedef int re_errno_t;
 
 /* Regex charset opcodes */
 enum {
+/*[[[deemon
+print("#define case_RECS_BITSET_MIN_to_MAX_UTF8        \\");
+for (local segment: [:0x63+1].segments(4)) {
+	local isLast = segment.last == 0x63;
+	print("\t", ": ".join(for (local x: segment) f"case 0x{x.hex()[2:].zfill(2)}")),;
+	if (!isLast)
+		print(": \\"),;
+	print;
+}
+print("#define case_RECS_BITSET_MIN_to_MAX_BYTE        \\");
+print("\tcase_RECS_BITSET_MIN_to_MAX_UTF8:           \\");
+for (local segment: [0x64:0xe3+1].segments(4)) {
+	local isLast = segment.last == 0xe3;
+	print("\t", ": ".join(for (local x: segment) f"case 0x{x.hex()[2:].zfill(2)}")),;
+	if (!isLast)
+		print(": \\"),;
+	print;
+}
+]]]*/
+#define case_RECS_BITSET_MIN_to_MAX_UTF8        \
+	case 0x00: case 0x01: case 0x02: case 0x03: \
+	case 0x04: case 0x05: case 0x06: case 0x07: \
+	case 0x08: case 0x09: case 0x0a: case 0x0b: \
+	case 0x0c: case 0x0d: case 0x0e: case 0x0f: \
+	case 0x10: case 0x11: case 0x12: case 0x13: \
+	case 0x14: case 0x15: case 0x16: case 0x17: \
+	case 0x18: case 0x19: case 0x1a: case 0x1b: \
+	case 0x1c: case 0x1d: case 0x1e: case 0x1f: \
+	case 0x20: case 0x21: case 0x22: case 0x23: \
+	case 0x24: case 0x25: case 0x26: case 0x27: \
+	case 0x28: case 0x29: case 0x2a: case 0x2b: \
+	case 0x2c: case 0x2d: case 0x2e: case 0x2f: \
+	case 0x30: case 0x31: case 0x32: case 0x33: \
+	case 0x34: case 0x35: case 0x36: case 0x37: \
+	case 0x38: case 0x39: case 0x3a: case 0x3b: \
+	case 0x3c: case 0x3d: case 0x3e: case 0x3f: \
+	case 0x40: case 0x41: case 0x42: case 0x43: \
+	case 0x44: case 0x45: case 0x46: case 0x47: \
+	case 0x48: case 0x49: case 0x4a: case 0x4b: \
+	case 0x4c: case 0x4d: case 0x4e: case 0x4f: \
+	case 0x50: case 0x51: case 0x52: case 0x53: \
+	case 0x54: case 0x55: case 0x56: case 0x57: \
+	case 0x58: case 0x59: case 0x5a: case 0x5b: \
+	case 0x5c: case 0x5d: case 0x5e: case 0x5f: \
+	case 0x60: case 0x61: case 0x62: case 0x63
+#define case_RECS_BITSET_MIN_to_MAX_BYTE        \
+	case_RECS_BITSET_MIN_to_MAX_UTF8:           \
+	case 0x64: case 0x65: case 0x66: case 0x67: \
+	case 0x68: case 0x69: case 0x6a: case 0x6b: \
+	case 0x6c: case 0x6d: case 0x6e: case 0x6f: \
+	case 0x70: case 0x71: case 0x72: case 0x73: \
+	case 0x74: case 0x75: case 0x76: case 0x77: \
+	case 0x78: case 0x79: case 0x7a: case 0x7b: \
+	case 0x7c: case 0x7d: case 0x7e: case 0x7f: \
+	case 0x80: case 0x81: case 0x82: case 0x83: \
+	case 0x84: case 0x85: case 0x86: case 0x87: \
+	case 0x88: case 0x89: case 0x8a: case 0x8b: \
+	case 0x8c: case 0x8d: case 0x8e: case 0x8f: \
+	case 0x90: case 0x91: case 0x92: case 0x93: \
+	case 0x94: case 0x95: case 0x96: case 0x97: \
+	case 0x98: case 0x99: case 0x9a: case 0x9b: \
+	case 0x9c: case 0x9d: case 0x9e: case 0x9f: \
+	case 0xa0: case 0xa1: case 0xa2: case 0xa3: \
+	case 0xa4: case 0xa5: case 0xa6: case 0xa7: \
+	case 0xa8: case 0xa9: case 0xaa: case 0xab: \
+	case 0xac: case 0xad: case 0xae: case 0xaf: \
+	case 0xb0: case 0xb1: case 0xb2: case 0xb3: \
+	case 0xb4: case 0xb5: case 0xb6: case 0xb7: \
+	case 0xb8: case 0xb9: case 0xba: case 0xbb: \
+	case 0xbc: case 0xbd: case 0xbe: case 0xbf: \
+	case 0xc0: case 0xc1: case 0xc2: case 0xc3: \
+	case 0xc4: case 0xc5: case 0xc6: case 0xc7: \
+	case 0xc8: case 0xc9: case 0xca: case 0xcb: \
+	case 0xcc: case 0xcd: case 0xce: case 0xcf: \
+	case 0xd0: case 0xd1: case 0xd2: case 0xd3: \
+	case 0xd4: case 0xd5: case 0xd6: case 0xd7: \
+	case 0xd8: case 0xd9: case 0xda: case 0xdb: \
+	case 0xdc: case 0xdd: case 0xde: case 0xdf: \
+	case 0xe0: case 0xe1: case 0xe2: case 0xe3
+/*[[[end]]]*/
 	RECS_BITSET_MIN,        /* [+RECS_BITSET_GETBYTES(.)] First bitset opcode (s.a. `RECS_BITSET_*')
 	                         * >> bool is_char_in_set(byte_t const *layout_ptr, uint8_t ch) {
 	                         * >>     uint8_t layout      = *layout_ptr++; // Layout is the RECS_BITSET_* opcode
@@ -266,6 +348,13 @@ enum {
 	/* In utf-8 mode, the lowest-possible bitset opcode is 0x63, since in this context, bitsets are only
 	 * allowed to define  ASCII characters  (so the last-valid  opcode is  `RECS_BITSET_BUILD(0x60, 4)') */
 	RECS_BITSET_MAX_UTF8 = 0x63, /* [+RECS_BITSET_GETBYTES(.)] Last utf8-bitset opcode (encodes bitset for range 60h-7Fh) */
+#define case_RECS_ISX_MIN_to_MAX                                                     \
+	case RECS_ISCNTRL:   case RECS_ISSPACE:   case RECS_ISUPPER:  case RECS_ISLOWER: \
+	case RECS_ISALPHA:   case RECS_ISDIGIT:   case RECS_ISXDIGIT: case RECS_ISALNUM: \
+	case RECS_ISPUNCT:   case RECS_ISGRAPH:   case RECS_ISPRINT:  case RECS_ISBLANK: \
+	case RECS_ISSYMSTRT: case RECS_ISSYMCONT: case RECS_ISTAB:    case RECS_ISWHITE: \
+	case RECS_ISEMPTY:   case RECS_ISLF:      case RECS_ISHEX:    case RECS_ISTITLE: \
+	case RECS_ISNUMERIC
 #define RECS_ISX_MIN RECS_ISCNTRL
 	RECS_ISCNTRL,           /* [+0] consume trait `unicode_iscntrl(ch)'   (ONLY VALID IN UTF-8 MODE) */
 	RECS_ISSPACE,           /* [+0] consume trait `unicode_isspace(ch)'   (ONLY VALID IN UTF-8 MODE) */
@@ -321,6 +410,10 @@ enum {
 	                            * NOTE: COUNT must be >= 1 */
 #define REOP_MAKEANY(want_nul, want_lf, want_utf8) \
 	((REOP_ANY) + ((want_nul) ? 0 : 4) + ((want_lf) ? 0 : 2) + ((want_utf8) ? 1 : 0))
+#define case_REOP_ANY_MIN_to_MAX                                                 \
+	case REOP_ANY:              case REOP_ANY_UTF8:   case REOP_ANY_NOTLF:       \
+	case REOP_ANY_NOTLF_UTF8:   case REOP_ANY_NOTNUL: case REOP_ANY_NOTNUL_UTF8: \
+	case REOP_ANY_NOTNUL_NOTLF: case REOP_ANY_NOTNUL_NOTLF_UTF8
 #define REOP_ANY_MIN REOP_ANY
 	REOP_ANY,                  /* [+0] Match any byte */
 	REOP_ANY_UTF8,             /* [+0] Match any character */
@@ -352,6 +445,11 @@ enum {
 	REOP_CS_BYTE,              /* [+*] Followed by a `RECS_*' sequence which the next byte must match */
 	REOP_NCS_UTF8,             /* [+*] Followed by a `RECS_*' sequence which the next utf-8 character must not match */
 	REOP_GROUP_MATCH,          /* [+1] Re-match the contents of the (N = *PC++)'th already-matched group; If group start/end aren't, triggers a match-failure. */
+#define case_REOP_GROUP_MATCH_JMIN_to_JMAX                                         \
+	case REOP_GROUP_MATCH_J3: case REOP_GROUP_MATCH_J4:  case REOP_GROUP_MATCH_J5: \
+	case REOP_GROUP_MATCH_J6: case REOP_GROUP_MATCH_J7:  case REOP_GROUP_MATCH_J8: \
+	case REOP_GROUP_MATCH_J9: case REOP_GROUP_MATCH_J10: case REOP_GROUP_MATCH_J11
+#define REOP_GROUP_MATCH_JMIN  REOP_GROUP_MATCH_J3
 	REOP_GROUP_MATCH_J3,       /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 3 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_MATCH_J4,       /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 4 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_MATCH_J5,       /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 5 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
@@ -361,12 +459,17 @@ enum {
 	REOP_GROUP_MATCH_J9,       /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_MATCH_J10,      /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_MATCH_J11,      /* [+1] Same as `REOP_GROUP_MATCH', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
-#define REOP_GROUP_MATCH_JMIN  REOP_GROUP_MATCH_J3
 #define REOP_GROUP_MATCH_JMAX  REOP_GROUP_MATCH_J11
 #define REOP_GROUP_MATCH_Jn(n) (REOP_GROUP_MATCH_J3 + (n) - 3)
 #define REOP_GROUP_MATCH_Joff(opcode) (3 + (opcode) - REOP_GROUP_MATCH_J3)
 
 	/* Opcodes for asserting the current position in input (these don't consume anything) */
+#define case_REOP_AT_MIN_to_MAX                                                                 \
+	case REOP_AT_SOI:     case REOP_AT_EOI:          case REOP_AT_SOL:  case REOP_AT_SOL_UTF8:  \
+	case REOP_AT_EOL:     case REOP_AT_EOL_UTF8:     case REOP_AT_SOXL: case REOP_AT_SOXL_UTF8: \
+	case REOP_AT_EOXL:    case REOP_AT_EOXL_UTF8:    case REOP_AT_WOB:  case REOP_AT_WOB_UTF8:  \
+	case REOP_AT_WOB_NOT: case REOP_AT_WOB_UTF8_NOT: case REOP_AT_SOW:  case REOP_AT_SOW_UTF8:  \
+	case REOP_AT_EOW:     case REOP_AT_EOW_UTF8:     case REOP_AT_SOS_UTF8
 #define REOP_AT_MIN REOP_AT_SOI
 	REOP_AT_SOI,          /* [+0] Start-of-input */
 	REOP_AT_EOI,          /* [+0] End-of-input */
@@ -401,10 +504,13 @@ enum {
 	REOP_GROUP_END,             /* [+1] Mark the end of the (N = *PC++)'th group; closing ")"
 	                             * - The current input pointer is written to `regmatch_t[N].rm_eo')
 	                             * - Writes a backup of the old `regmatch_t[N].rm_eo' that is restored on-fail. */
-#define REOP_GROUP_END_JMIN         REOP_GROUP_END_J3
-#define REOP_GROUP_END_JMAX         REOP_GROUP_END_J11
 #define REOP_GROUP_END_Jn(n)        (REOP_GROUP_END_J3 + (n) - 3)
 #define REOP_GROUP_END_Joff(opcode) (3 + (opcode) - REOP_GROUP_END_J3)
+#define case_REOP_GROUP_END_JMIN_to_JMAX                                     \
+	case REOP_GROUP_END_J3: case REOP_GROUP_END_J4:  case REOP_GROUP_END_J5: \
+	case REOP_GROUP_END_J6: case REOP_GROUP_END_J7:  case REOP_GROUP_END_J8: \
+	case REOP_GROUP_END_J9: case REOP_GROUP_END_J10: case REOP_GROUP_END_J11
+#define REOP_GROUP_END_JMIN         REOP_GROUP_END_J3
 	REOP_GROUP_END_J3,          /* [+1] Same as `REOP_GROUP_END', but skip the next 3 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_END_J4,          /* [+1] Same as `REOP_GROUP_END', but skip the next 4 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_END_J5,          /* [+1] Same as `REOP_GROUP_END', but skip the next 5 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
@@ -414,6 +520,7 @@ enum {
 	REOP_GROUP_END_J9,          /* [+1] Same as `REOP_GROUP_END', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_END_J10,         /* [+1] Same as `REOP_GROUP_END', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
 	REOP_GROUP_END_J11,         /* [+1] Same as `REOP_GROUP_END', but skip the next 8 instruction bytes if epsilon was matched (iow: `regmatch_t[N].rm_so == regmatch_t[N].rm_eo') */
+#define REOP_GROUP_END_JMAX         REOP_GROUP_END_J11
 	REOP_POP_ONFAIL,            /* [+0] Pop the top-most element from the on-fail stack (no-op if the stack is empty) */
 	REOP_POP_ONFAIL_AT,         /* [+2] Pop on-fail stack items until one is found referencing the given 16-bit, signed, relative address.
 	                             * Then, pop one more (i.e. the one at the referenced address). (if the referenced address doesn't  exist,
@@ -448,38 +555,96 @@ enum {
 
 
 /* Regex syntax flags */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS) && !defined(RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS)
 #define RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS 0x00000001 /* '\' can be used to escape characters in sets: '[a\[\]\-]' */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS && !RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_BK_PLUS_QM) && !defined(RE_SYNTAX_BK_PLUS_QM)
 #define RE_SYNTAX_BK_PLUS_QM                0x00000002 /* If clear: '+' and '?' are operators and '\+' and '\?' are literals; if set: the opposite is the case. */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_BK_PLUS_QM && !RE_SYNTAX_BK_PLUS_QM */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_CHAR_CLASSES) && !defined(RE_SYNTAX_CHAR_CLASSES)
 #define RE_SYNTAX_CHAR_CLASSES              0x00000004 /* Support for char-classes (e.g. `[[:alpha:]]') */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_CHAR_CLASSES && !RE_SYNTAX_CHAR_CLASSES */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_CONTEXT_INDEP_ANCHORS) && !defined(RE_SYNTAX_CONTEXT_INDEP_ANCHORS)
 #define RE_SYNTAX_CONTEXT_INDEP_ANCHORS     0x00000008 /* '^' and '$' are always anchors (as opposed to only at the start/end or after/before a '(' and ')') */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_CONTEXT_INDEP_ANCHORS && !RE_SYNTAX_CONTEXT_INDEP_ANCHORS */
+#ifndef RE_SYNTAX_CONTEXT_INDEP_OPS
 #define RE_SYNTAX_CONTEXT_INDEP_OPS         0x00000010 /* Ignored... */
+#endif /* !RE_SYNTAX_CONTEXT_INDEP_OPS */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_CONTEXT_INVALID_OPS) && !defined(RE_SYNTAX_CONTEXT_INVALID_OPS)
 #define RE_SYNTAX_CONTEXT_INVALID_OPS       0x00000020 /* '*', '+', '{' and '?' appearing at the start or after '(' or '|' results in `RE_BADRPT'; If not set, they are treated as literals. */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_CONTEXT_INVALID_OPS && !RE_SYNTAX_CONTEXT_INVALID_OPS */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NEWLINE) && !defined(RE_SYNTAX_DOT_NEWLINE)
 #define RE_SYNTAX_DOT_NEWLINE               0x00000040 /* '.' matches line-feeds (if not set, then it doesn't) */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NEWLINE && !RE_SYNTAX_DOT_NEWLINE */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NOT_NULL) && !defined(RE_SYNTAX_DOT_NOT_NULL)
 #define RE_SYNTAX_DOT_NOT_NULL              0x00000080 /* '.' doesn't match '\0' (if not set, then it does) */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NOT_NULL && !RE_SYNTAX_DOT_NOT_NULL */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_HAT_LISTS_NOT_NEWLINE) && !defined(RE_SYNTAX_HAT_LISTS_NOT_NEWLINE)
 #define RE_SYNTAX_HAT_LISTS_NOT_NEWLINE     0x00000100 /* '[^abc]' will never match line-feeds (as though line-feeds were part of the set of characters never matched). If not set, [^]-sets will match them (unless explicitly added to the set of unmatched characters) */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_HAT_LISTS_NOT_NEWLINE && !RE_SYNTAX_HAT_LISTS_NOT_NEWLINE */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_INTERVALS) && !defined(RE_SYNTAX_INTERVALS)
 #define RE_SYNTAX_INTERVALS                 0x00000200 /* Enable support for intervals: 'x{1,2}' (if not set, '{' and '}' are literals, though escaping is governed by `RE_SYNTAX_NO_BK_BRACES') */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_INTERVALS && !RE_SYNTAX_INTERVALS */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_LIMITED_OPS) && !defined(RE_SYNTAX_LIMITED_OPS)
 #define RE_SYNTAX_LIMITED_OPS               0x00000400 /* If set, support for '+', '?' and '|' is disabled (if not set, support is enabled, though escaping is governed by `RE_SYNTAX_BK_PLUS_QM' and `RE_SYNTAX_NO_BK_VBAR') */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_LIMITED_OPS && !RE_SYNTAX_LIMITED_OPS */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NEWLINE_ALT) && !defined(RE_SYNTAX_NEWLINE_ALT)
 #define RE_SYNTAX_NEWLINE_ALT               0x00000800 /* '\n' (embedded ASCII 10h) is treated like as an alias for the '|'-operator (if not set, '\n' is a literal; but note the kos-exception "\" "n", which matches that 2-character sequence against arbitrary line-feeds) */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NEWLINE_ALT && !RE_SYNTAX_NEWLINE_ALT */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_BRACES) && !defined(RE_SYNTAX_NO_BK_BRACES)
 #define RE_SYNTAX_NO_BK_BRACES              0x00001000 /* If set, '{...}' are intervals, and '\{' and '\}' are literals; if clear, the opposite is the case (iow: '\{...\}' is an interval) */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_BRACES && !RE_SYNTAX_NO_BK_BRACES */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_PARENS) && !defined(RE_SYNTAX_NO_BK_PARENS)
 #define RE_SYNTAX_NO_BK_PARENS              0x00002000 /* If set, '(...)' are groups, and '\(' and '\)' are literals; if clear, the opposite is the case (iow: '\(...\)' is a group) */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_PARENS && !RE_SYNTAX_NO_BK_PARENS */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_REFS) && !defined(RE_SYNTAX_NO_BK_REFS)
 #define RE_SYNTAX_NO_BK_REFS                0x00004000 /* If set, '\<1-9>' matches the literal <1-9>; if clear, '\<1-9>' is a back-reference */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_REFS && !RE_SYNTAX_NO_BK_REFS */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_VBAR) && !defined(RE_SYNTAX_NO_BK_VBAR)
 #define RE_SYNTAX_NO_BK_VBAR                0x00008000 /* If set, '|' is the alternation operation: '(a|b)' (and '\|' is a literal); if clear, the opposite is the case (iow: '(a\|b)' matches '[ab]') */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_VBAR && !RE_SYNTAX_NO_BK_VBAR */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_EMPTY_RANGES) && !defined(RE_SYNTAX_NO_EMPTY_RANGES)
 #define RE_SYNTAX_NO_EMPTY_RANGES           0x00010000 /* If set, a []-set like '[z-a]' results in `RE_ERANGE'; if clear, it is equal to '[]' (iow: bad ranges are simply ignored) */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_EMPTY_RANGES && !RE_SYNTAX_NO_EMPTY_RANGES */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD) && !defined(RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD)
 #define RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD 0x00020000 /* If set, unmatched ')' are treated as literals; if clear, unmatched an ')' results in `RE_ERPAREN' */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD && !RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_POSIX_BACKTRACKING) && !defined(RE_SYNTAX_NO_POSIX_BACKTRACKING)
 #define RE_SYNTAX_NO_POSIX_BACKTRACKING     0x00040000 /* If set, return the first match, rather than the perfect one (s.a. `REOP_MATCHED' and `REOP_MATCHED_PERFECT') */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_POSIX_BACKTRACKING && !RE_SYNTAX_NO_POSIX_BACKTRACKING */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_GNU_OPS) && !defined(RE_SYNTAX_NO_GNU_OPS)
 #define RE_SYNTAX_NO_GNU_OPS                0x00080000 /* If set, disable support for '\<', '\>', '\b', '\B', '\w', '\W', '\s', '\S', '\`' and "\'" */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_GNU_OPS && !RE_SYNTAX_NO_GNU_OPS */
+#ifndef RE_SYNTAX_DEBUG
 #define RE_SYNTAX_DEBUG                     0x00100000 /* Ignored... */
+#endif /* !RE_SYNTAX_DEBUG */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_INVALID_INTERVAL_ORD) && !defined(RE_SYNTAX_INVALID_INTERVAL_ORD)
 #define RE_SYNTAX_INVALID_INTERVAL_ORD      0x00200000 /* Invalid intervals like "a{b" are treated as literals (i.e. like "a\{b") */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_INVALID_INTERVAL_ORD && !RE_SYNTAX_INVALID_INTERVAL_ORD */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_ICASE) && !defined(RE_SYNTAX_ICASE)
 #define RE_SYNTAX_ICASE                     0x00400000 /* Casing is ignored by literal-matches, and '[[:lower:]]', '[[:upper:]]', '[[:title:]]' are aliases for '[[:alpha:]]' */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_ICASE && !RE_SYNTAX_ICASE */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_CARET_ANCHORS_HERE) && !defined(RE_SYNTAX_CARET_ANCHORS_HERE)
 #define RE_SYNTAX_CARET_ANCHORS_HERE        0x00800000 /* Alias for `RE_SYNTAX_CONTEXT_INDEP_ANCHORS', but only for '^', and used internally */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_CARET_ANCHORS_HERE && !RE_SYNTAX_CARET_ANCHORS_HERE */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_CONTEXT_INVALID_DUP) && !defined(RE_SYNTAX_CONTEXT_INVALID_DUP)
 #define RE_SYNTAX_CONTEXT_INVALID_DUP       0x01000000 /* If set, '{' appearing at the start, or after '(', '|' or '}' results in `RE_BADRPT'; else, behavior is governed by `RE_SYNTAX_CONTEXT_INVALID_OPS' */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_CONTEXT_INVALID_DUP && !RE_SYNTAX_CONTEXT_INVALID_DUP */
+#ifndef RE_SYNTAX_NO_SUB
 #define RE_SYNTAX_NO_SUB                    0x02000000 /* Ignored... (used at a different point to implement `RE_NOSUB') */
+#endif /* !RE_SYNTAX_NO_SUB */
 /*      RE_SYNTAX_                          0x04000000  * ... */
 /*      RE_SYNTAX_                          0x08000000  * ... */
 /*      RE_SYNTAX_                          0x10000000  * ... */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_ANCHORS_IGNORE_EFLAGS) && !defined(RE_SYNTAX_ANCHORS_IGNORE_EFLAGS)
 #define RE_SYNTAX_ANCHORS_IGNORE_EFLAGS     0x20000000 /* '^' and '$' operators will ignore `RE_EXEC_NOTBOL' and `RE_EXEC_NOTEOL' */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_ANCHORS_IGNORE_EFLAGS && !RE_SYNTAX_ANCHORS_IGNORE_EFLAGS */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_UTF8) && !defined(RE_SYNTAX_NO_UTF8)
 #define RE_SYNTAX_NO_UTF8                   0x40000000 /* If set, pattern is byte-based (rather than a utf-8 string; e.g. '[ä]' is like '[\xC3\xA4]'). Also disables support for '\uABCD', '\UABCDABCD' */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_UTF8 && !RE_SYNTAX_NO_UTF8 */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_KOS_OPS) && !defined(RE_SYNTAX_NO_KOS_OPS)
 #define RE_SYNTAX_NO_KOS_OPS                0x80000000 /* If set, disable support for python- and kos-extensions: '\n', '\N', "[^:<foo>:]", '\d', '\D', '\0123', '\xAB', '\uABCD', '\UABCDABCD', '\A', '\Z' */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_KOS_OPS && !RE_SYNTAX_NO_KOS_OPS */
 
 /* Regex parser structure.
  * The behavior of `re_parser_yield(3R)' is affected by the following syntax flags:
@@ -546,6 +711,10 @@ typedef __uint32_t re_token_t;
 #define RE_TOKEN_BK_D           (RE_TOKEN_XBASE + 15) /* '\D' (<[^:digit:]>   -- REOP_ASCII_ISDIGIT_NOT / REOP_UTF8_ISDIGIT_NOT) */
 #define RE_TOKEN_BK_n           (RE_TOKEN_XBASE + 16) /* '\n' (<[:lf:]>       -- [\r\n] / REOP_UTF8_ISLF) */
 #define RE_TOKEN_BK_N           (RE_TOKEN_XBASE + 17) /* '\N' (<[:lf:]>       -- [^\r\n] / REOP_UTF8_ISLF_NOT) */
+#define case_RE_TOKEN_AT_MIN_to_MAX                                                             \
+	case RE_TOKEN_AT_SOL: case RE_TOKEN_AT_EOL:     case RE_TOKEN_AT_SOI: case RE_TOKEN_AT_EOI: \
+	case RE_TOKEN_AT_WOB: case RE_TOKEN_AT_WOB_NOT: case RE_TOKEN_AT_SOW: case RE_TOKEN_AT_EOW: \
+	case RE_TOKEN_AT_SOS: case RE_TOKEN_AT_EOS
 #define RE_TOKEN_AT_MIN         RE_TOKEN_AT_SOL
 #define RE_TOKEN_AT_SOL         (RE_TOKEN_XBASE + 18) /* "^" */
 #define RE_TOKEN_AT_EOL         (RE_TOKEN_XBASE + 19) /* "$" */
@@ -558,6 +727,10 @@ typedef __uint32_t re_token_t;
 #define RE_TOKEN_AT_SOS         (RE_TOKEN_XBASE + 26) /* "\_<" */
 #define RE_TOKEN_AT_EOS         (RE_TOKEN_XBASE + 27) /* "\_>" */
 #define RE_TOKEN_AT_MAX         RE_TOKEN_AT_EOS
+#define case_RE_TOKEN_BKREF_1_to_9 \
+	case RE_TOKEN_BKREF_1: case RE_TOKEN_BKREF_2: case RE_TOKEN_BKREF_3: \
+	case RE_TOKEN_BKREF_4: case RE_TOKEN_BKREF_5: case RE_TOKEN_BKREF_6: \
+	case RE_TOKEN_BKREF_7: case RE_TOKEN_BKREF_8: case RE_TOKEN_BKREF_9
 #define RE_TOKEN_BKREF_1        (RE_TOKEN_XBASE + 28) /* "\1" */
 #define RE_TOKEN_BKREF_2        (RE_TOKEN_XBASE + 29) /* "\2" */
 #define RE_TOKEN_BKREF_3        (RE_TOKEN_XBASE + 30) /* "\3" */
@@ -695,13 +868,13 @@ __NOTHROW_NCX(LIBREGEX_CC re_compiler_compile)(struct re_compiler *__restrict se
 typedef __ATTR_NONNULL_T((1)) __ssize_t
 __NOTHROW_NCX_T(LIBREGEX_CC *PRE_CODE_DISASM)(struct re_code const *__restrict self,
                                               __pformatprinter printer, void *arg);
-#ifndef NDEBUG
+#if !defined(LIBREGEX_NO_RE_CODE_DISASM) && !defined(NDEBUG)
 #ifdef LIBREGEX_WANT_PROTOTYPES
 LIBREGEX_DECL __ATTR_NONNULL((1)) __ssize_t
 __NOTHROW_NCX(LIBREGEX_CC re_code_disasm)(struct re_code const *__restrict self,
                                           __pformatprinter printer, void *arg);
 #endif /* LIBREGEX_WANT_PROTOTYPES */
-#endif /* !NDEBUG */
+#endif /* !LIBREGEX_NO_RE_CODE_DISASM && !NDEBUG */
 
 
 

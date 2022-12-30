@@ -953,18 +953,18 @@ lib_mirror_include() {
 	echo "Checking for hard link: $KOS_ROOT/kos/src/$1/include/$2"
 	NLINK="$(stat --printf="%h" "$KOS_ROOT/kos/src/$1/include/$2" 2>/dev/null)"
 	if [[ "$NLINK" != 2 ]]; then
-		unlink "$KOS_ROOT/kos/src/$1/include/$2" > /dev/null 2>&1
+		unlink "$KOS_ROOT/kos/include/$1/$2" > /dev/null 2>&1
 		if ln -P \
-			"$KOS_ROOT/kos/include/$1/$2" \
 			"$KOS_ROOT/kos/src/$1/include/$2" \
+			"$KOS_ROOT/kos/include/$1/$2" \
 		> /dev/null 2>&1; then
 			echo "	Hard link created"
 		else
 			# As fallback (if the filesystem doesn't support hard links), just copy back the file
 			echo "	Failed to create hard link (use copy instead)"
 			cmd cp \
-				"$KOS_ROOT/kos/include/$1/$2" \
-				"$KOS_ROOT/kos/src/$1/include/$2"
+				"$KOS_ROOT/kos/src/$1/include/$2" \
+				"$KOS_ROOT/kos/include/$1/$2"
 		fi
 	fi
 }
