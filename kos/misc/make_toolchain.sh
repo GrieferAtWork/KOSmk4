@@ -231,7 +231,7 @@ configure_mtools() {
 			--prefix="$KOS_BINUTILS/misc"
 
 		# Work around an issue: mtools forgets to add -liconv when
-		# linking, so prevent it from making use of that struff.
+		# linking, so prevent it from making use of that stuff.
 		cmd [ -f "config.h" ]
 		cmd echo "#undef HAVE_ICONV_H" >> "config.h"
 
@@ -949,28 +949,32 @@ EOF
 # git submodule always includes up-to-date versions of its own headers
 # which are normally found in /kos/include/libiconv, we use hardlinks
 # in order to have files in that folder mirror /kos/src/libiconv/include
-libiconv_mirror_include() {
-	echo "Checking for hard link: $KOS_ROOT/kos/src/libiconv/include/$1"
-	NLINK="$(stat --printf="%h" "$KOS_ROOT/kos/src/libiconv/include/$1" 2>/dev/null)"
+lib_mirror_include() {
+	echo "Checking for hard link: $KOS_ROOT/kos/src/$1/include/$2"
+	NLINK="$(stat --printf="%h" "$KOS_ROOT/kos/src/$1/include/$2" 2>/dev/null)"
 	if [[ "$NLINK" != 2 ]]; then
-		unlink "$KOS_ROOT/kos/src/libiconv/include/$1" > /dev/null 2>&1
+		unlink "$KOS_ROOT/kos/src/$1/include/$2" > /dev/null 2>&1
 		if ln -P \
-			"$KOS_ROOT/kos/include/libiconv/$1" \
-			"$KOS_ROOT/kos/src/libiconv/include/$1" \
+			"$KOS_ROOT/kos/include/$1/$2" \
+			"$KOS_ROOT/kos/src/$1/include/$2" \
 		> /dev/null 2>&1; then
 			echo "	Hard link created"
 		else
 			# As fallback (if the filesystem doesn't support hard links), just copy back the file
 			echo "	Failed to create hard link (use copy instead)"
 			cmd cp \
-				"$KOS_ROOT/kos/include/libiconv/$1" \
-				"$KOS_ROOT/kos/src/libiconv/include/$1"
+				"$KOS_ROOT/kos/include/$1/$2" \
+				"$KOS_ROOT/kos/src/$1/include/$2"
 		fi
 	fi
 }
 cmd cd "$KOS_ROOT/kos/include/libiconv"
 for name in *.h; do
-	libiconv_mirror_include "$name"
+	lib_mirror_include "libiconv" "$name"
+done
+cmd cd "$KOS_ROOT/kos/include/libregex"
+for name in *.h; do
+	lib_mirror_include "libregex" "$name"
 done
 
 if test -z "$SYSHEADER_BUILD_CONFIG_SUFFIX"; then

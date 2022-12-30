@@ -1,3 +1,6 @@
 [submodule "kos/src/libiconv"]
 	path = kos/src/libiconv
-	url = https://github.com/GrieferAtWork/kos-libiconv
+	url = https://github.com/GrieferAtWork/kos-libiconv.git
+[submodule "kos/src/libregex"]
+	path = kos/src/libregex
+	url = https://github.com/GrieferAtWork/kos-libregex.git
