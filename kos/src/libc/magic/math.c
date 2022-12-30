@@ -3053,63 +3053,63 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__s
  *    2:    `float_t' <=> `long double', `double_t' <=> `long double'
  *    else: Mapping of `float_t' and `double_t' is unspecified
  */
-#if (defined(__FP_NAN) || defined(__FP_INFINITE) ||   \
-     defined(__FP_ZERO) || defined(__FP_SUBNORMAL) || \
-     defined(__FP_NORMAL))
+#if ((!defined(FP_NAN) && defined(__FP_NAN)) || (!defined(FP_INFINITE) && defined(__FP_INFINITE)) ||     \
+     (!defined(FP_ZERO) && defined(__FP_ZERO)) || (!defined(FP_SUBNORMAL) && defined(__FP_SUBNORMAL)) || \
+     (!defined(FP_NORMAL) && defined(__FP_NORMAL)))
 /* Categories for floating-point numbers. */
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-#ifdef __FP_NAN
+#if !defined(FP_NAN) && defined(__FP_NAN)
 	FP_NAN = __FP_NAN, /* ... */
-#endif /* __FP_NAN */
-#ifdef __FP_INFINITE
+#endif /* !FP_NAN && __FP_NAN */
+#if !defined(FP_INFINITE) && defined(__FP_INFINITE)
 	FP_INFINITE = __FP_INFINITE, /* ... */
-#endif /* __FP_INFINITE */
-#ifdef __FP_ZERO
+#endif /* !FP_INFINITE && __FP_INFINITE */
+#if !defined(FP_ZERO) && defined(__FP_ZERO)
 	FP_ZERO = __FP_ZERO, /* ... */
-#endif /* __FP_ZERO */
-#ifdef __FP_SUBNORMAL
+#endif /* !FP_ZERO && __FP_ZERO */
+#if !defined(FP_SUBNORMAL) && defined(__FP_SUBNORMAL)
 	FP_SUBNORMAL = __FP_SUBNORMAL, /* ... */
-#endif /* __FP_SUBNORMAL */
-#ifdef __FP_NORMAL
+#endif /* !FP_SUBNORMAL && __FP_SUBNORMAL */
+#if !defined(FP_NORMAL) && defined(__FP_NORMAL)
 	FP_NORMAL = __FP_NORMAL /* ... */
-#endif /* __FP_NORMAL */
+#endif /* !FP_NORMAL && __FP_NORMAL */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __FP_NAN
+#if !defined(FP_NAN) && defined(__FP_NAN)
 #define FP_NAN       FP_NAN       /* ... */
-#endif /* __FP_NAN */
-#ifdef __FP_INFINITE
+#endif /* !FP_NAN && __FP_NAN */
+#if !defined(FP_INFINITE) && defined(__FP_INFINITE)
 #define FP_INFINITE  FP_INFINITE  /* ... */
-#endif /* __FP_INFINITE */
-#ifdef __FP_ZERO
+#endif /* !FP_INFINITE && __FP_INFINITE */
+#if !defined(FP_ZERO) && defined(__FP_ZERO)
 #define FP_ZERO      FP_ZERO      /* ... */
-#endif /* __FP_ZERO */
-#ifdef __FP_SUBNORMAL
+#endif /* !FP_ZERO && __FP_ZERO */
+#if !defined(FP_SUBNORMAL) && defined(__FP_SUBNORMAL)
 #define FP_SUBNORMAL FP_SUBNORMAL /* ... */
-#endif /* __FP_SUBNORMAL */
-#ifdef __FP_NORMAL
+#endif /* !FP_SUBNORMAL && __FP_SUBNORMAL */
+#if !defined(FP_NORMAL) && defined(__FP_NORMAL)
 #define FP_NORMAL    FP_NORMAL    /* ... */
-#endif /* __FP_NORMAL */
+#endif /* !FP_NORMAL && __FP_NORMAL */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __FP_NAN
+#if !defined(FP_NAN) && defined(__FP_NAN)
 #define FP_NAN       __FP_NAN       /* ... */
-#endif /* __FP_NAN */
-#ifdef __FP_INFINITE
+#endif /* !FP_NAN && __FP_NAN */
+#if !defined(FP_INFINITE) && defined(__FP_INFINITE)
 #define FP_INFINITE  __FP_INFINITE  /* ... */
-#endif /* __FP_INFINITE */
-#ifdef __FP_ZERO
+#endif /* !FP_INFINITE && __FP_INFINITE */
+#if !defined(FP_ZERO) && defined(__FP_ZERO)
 #define FP_ZERO      __FP_ZERO      /* ... */
-#endif /* __FP_ZERO */
-#ifdef __FP_SUBNORMAL
+#endif /* !FP_ZERO && __FP_ZERO */
+#if !defined(FP_SUBNORMAL) && defined(__FP_SUBNORMAL)
 #define FP_SUBNORMAL __FP_SUBNORMAL /* ... */
-#endif /* __FP_SUBNORMAL */
-#ifdef __FP_NORMAL
+#endif /* !FP_SUBNORMAL && __FP_SUBNORMAL */
+#if !defined(FP_NORMAL) && defined(__FP_NORMAL)
 #define FP_NORMAL    __FP_NORMAL    /* ... */
-#endif /* __FP_NORMAL */
+#endif /* !FP_NORMAL && __FP_NORMAL */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* ... */

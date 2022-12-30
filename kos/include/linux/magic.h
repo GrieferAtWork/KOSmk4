@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Linux (/include/linux/magic.h) */
+/* (#) Portability: Linux (/usr/include/linux/magic.h) */
 #ifndef _LINUX_MAGIC_H
 #define _LINUX_MAGIC_H 1
 

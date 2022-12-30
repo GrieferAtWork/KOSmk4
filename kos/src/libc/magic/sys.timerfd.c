@@ -46,49 +46,50 @@
 __SYSDECL_BEGIN
 
 /* Values for the `flags' argument of `timerfd_create(2)'. */
-#if (defined(__TFD_NONBLOCK) || defined(__TFD_CLOEXEC) || \
-     (defined(__USE_KOS) && defined(__TFD_CLOFORK)))
+#if ((!defined(TFD_NONBLOCK) && defined(__TFD_NONBLOCK)) || \
+     (!defined(TFD_CLOEXEC) && defined(__TFD_CLOEXEC)) ||   \
+     (defined(__USE_KOS) && (!defined(TFD_CLOFORK) && defined(__TFD_CLOFORK))))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-#ifdef __TFD_NONBLOCK
+#if !defined(TFD_NONBLOCK) && defined(__TFD_NONBLOCK)
 	TFD_NONBLOCK      = __TFD_NONBLOCK, /* Set the `IO_NONBLOCK' flag for the returned */
-#endif /* __TFD_NONBLOCK */
-#ifdef __TFD_CLOEXEC
+#endif /* !TFD_NONBLOCK && __TFD_NONBLOCK */
+#if !defined(TFD_CLOEXEC) && defined(__TFD_CLOEXEC)
 	TFD_CLOEXEC       = __TFD_CLOEXEC,  /* Set the `IO_CLOEXEC' flag for the returned */
-#endif /* __TFD_CLOEXEC */
-#if defined(__USE_KOS) && defined(__TFD_CLOFORK)
+#endif /* !TFD_CLOEXEC && __TFD_CLOEXEC */
+#if defined(__USE_KOS) && !defined(TFD_CLOFORK) && defined(__TFD_CLOFORK)
 	TFD_CLOFORK       = __TFD_CLOFORK,  /* Set the `IO_CLOFORK' flag for the returned */
-#endif /* __USE_KOS && __TFD_CLOFORK */
+#endif /* __USE_KOS && !TFD_CLOFORK && __TFD_CLOFORK */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __TFD_NONBLOCK
+#if !defined(TFD_NONBLOCK) && defined(__TFD_NONBLOCK)
 #define TFD_NONBLOCK TFD_NONBLOCK /* Set the `IO_NONBLOCK' flag for the returned */
-#endif /* __TFD_NONBLOCK */
-#ifdef __TFD_CLOEXEC
+#endif /* !TFD_NONBLOCK && __TFD_NONBLOCK */
+#if !defined(TFD_CLOEXEC) && defined(__TFD_CLOEXEC)
 #define TFD_CLOEXEC  TFD_CLOEXEC  /* Set the `IO_CLOEXEC' flag for the returned */
-#endif /* __TFD_CLOEXEC */
-#if defined(__USE_KOS) && defined(__TFD_CLOFORK)
+#endif /* !TFD_CLOEXEC && __TFD_CLOEXEC */
+#if defined(__USE_KOS) && !defined(TFD_CLOFORK) && defined(__TFD_CLOFORK)
 #define TFD_CLOFORK  TFD_CLOFORK  /* Set the `IO_CLOFORK' flag for the returned */
-#endif /* __USE_KOS && __TFD_CLOFORK */
+#endif /* __USE_KOS && !TFD_CLOFORK && __TFD_CLOFORK */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __TFD_NONBLOCK
+#if !defined(TFD_NONBLOCK) && defined(__TFD_NONBLOCK)
 #define TFD_NONBLOCK __TFD_NONBLOCK /* Set the `IO_NONBLOCK' flag for the returned */
-#endif /* __TFD_NONBLOCK */
-#ifdef __TFD_CLOEXEC
+#endif /* !TFD_NONBLOCK && __TFD_NONBLOCK */
+#if !defined(TFD_CLOEXEC) && defined(__TFD_CLOEXEC)
 #define TFD_CLOEXEC  __TFD_CLOEXEC  /* Set the `IO_CLOEXEC' flag for the returned */
-#endif /* __TFD_CLOEXEC */
-#if defined(__USE_KOS) && defined(__TFD_CLOFORK)
+#endif /* !TFD_CLOEXEC && __TFD_CLOEXEC */
+#if defined(__USE_KOS) && !defined(TFD_CLOFORK) && defined(__TFD_CLOFORK)
 #define TFD_CLOFORK  __TFD_CLOFORK  /* Set the `IO_CLOFORK' flag for the returned */
-#endif /* __USE_KOS && __TFD_CLOFORK */
+#endif /* __USE_KOS && !TFD_CLOFORK && __TFD_CLOFORK */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* ... */
 
 /* Values for the `flags' argument of `timerfd_settime(2)'. */
-#ifdef __TFD_TIMER_ABSTIME
+#if !defined(TFD_TIMER_ABSTIME) && defined(__TFD_TIMER_ABSTIME)
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
@@ -102,8 +103,7 @@ enum {
 #define TFD_TIMER_ABSTIME __TFD_TIMER_ABSTIME /* Work with absolute timestamps. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
-#endif /* __TFD_TIMER_ABSTIME */
-
+#endif /* !TFD_TIMER_ABSTIME && __TFD_TIMER_ABSTIME */
 
 
 #ifdef __CC__

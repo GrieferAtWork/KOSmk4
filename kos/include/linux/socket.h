@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Linux (/include/linux/socket.h) */
+/* (#) Portability: Linux (/usr/include/linux/socket.h) */
 #ifndef _LINUX_SOCKET_H
 #define _LINUX_SOCKET_H 1
 

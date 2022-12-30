@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Linux (/include/linux/posix_types.h) */
+/* (#) Portability: Linux (/usr/include/linux/posix_types.h) */
 #ifndef _LINUX_POSIX_TYPES_H
 #define _LINUX_POSIX_TYPES_H 1
 
@@ -127,6 +127,13 @@ typedef __SSIZE_TYPE__ __kernel_ssize_t;
 #ifndef __kernel_gid16_t
 #define __kernel_gid16_t __UINT16_TYPE__
 #endif /* !__kernel_gid16_t */
+
+#ifndef __kernel_old_time_t
+#define __kernel_old_time_t __time32_t
+#endif /* !__kernel_old_time_t */
+#ifndef __kernel_time64_t
+#define __kernel_time64_t __time64_t
+#endif /* !__kernel_time64_t */
 
 
 typedef struct {

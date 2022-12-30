@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Linux (/include/linux/xattr.h) */
+/* (#) Portability: Linux (/usr/include/linux/xattr.h) */
 #ifndef _LINUX_XATTR_H
 #define _LINUX_XATTR_H 1
 

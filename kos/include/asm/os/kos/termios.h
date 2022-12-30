@@ -149,6 +149,7 @@
 #define __HUPCL    __UINT32_C(0x00000400) /* ??? */
 #define __CLOCAL   __UINT32_C(0x00000800) /* ??? */
 #define __CBAUDEX  __UINT32_C(0x00001000) /* ??? */
+#define __BOTHER   __UINT32_C(0x00001000) /* ??? */
 #define __B57600   __UINT32_C(0x00001001) /* ??? */
 #define __B115200  __UINT32_C(0x00001002) /* ??? */
 #define __B230400  __UINT32_C(0x00001003) /* ??? */
@@ -177,6 +178,7 @@
 /*                 __UINT32_C(0x20000000)  * ... */
 #define __CMSPAR   __UINT32_C(0x40000000) /* mark or space (stick) parity */
 #define __CRTSCTS  __UINT32_C(0x80000000) /* flow control */
+#define __IBSHIFT  16                     /* Bit-shift to convert from `CBAUD' to `CIBAUD' */
 
 /* c_lflag bits */
 #define __ISIG      __UINT32_C(0x00000001) /* When any of the characters INTR, QUIT, SUSP, or DSUSP are received, generate the corresponding signal. */

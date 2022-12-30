@@ -55,7 +55,8 @@
        defined(_MIPSEB) || defined(__MOXIE_BIG_ENDIAN__) ||           \
        defined(__NDS32_EB__) || defined(__nios2_big_endian) ||        \
        defined(__nios2_big_endian__) || defined(__RX_BIG_ENDIAN__) || \
-       defined(__XTENSA_EB__) || defined(__THUMBEB__))
+       defined(__XTENSA_EB__) || defined(__THUMBEB__) ||              \
+       defined(__AARCH64EB__))
 #define __BYTE_ORDER__ 4321
 #elif (defined(__LITTLE_ENDIAN__) || defined(__little_endian__) ||          \
        defined(__ARMEL__) || defined(__MIPSEL__) ||                         \
@@ -67,7 +68,8 @@
        defined(_MIPSEL) || defined(__MOXIE_LITTLE_ENDIAN__) ||              \
        defined(__NDS32_EL__) || defined(__nios2_little_endian) ||           \
        defined(__nios2_little_endian__) || defined(__RX_LITTLE_ENDIAN__) || \
-       defined(__XTENSA_EL__) || defined(__THUMBEL__))
+       defined(__XTENSA_EL__) || defined(__THUMBEL__) ||                    \
+       defined(__AARCH64EL__))
 #define __BYTE_ORDER__ 1234
 #else /* ... */
 #if !defined(__NO_has_include) && !defined(__KOS_SYSTEM_HEADERS__)

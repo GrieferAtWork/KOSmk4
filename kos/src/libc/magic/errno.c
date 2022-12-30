@@ -515,12 +515,12 @@ print("%{");
 for (local name: errnoNames.keys.sorted()) {
 	if (name in ["EOK", "EMAX", "ECOUNT", "ELASTERROR", "ELIMIT"])
 		continue;
-	print("#ifdef __", name);
+	print("#if !defined(", name, ") && defined(__", name, ")");
 	print("#define ",
 		name, (" " * (longestNameLen - #name)), " __",
 		name, (" " * (longestNameLen - #name)),
 		" /" "* ", errnoNames[name], " *" "/");
-	print("#endif /" "* __", name, " *" "/");
+	print("#endif /" "* !", name, " && __", name, " *" "/");
 }
 print("}");
 ]]]*/
@@ -816,462 +816,462 @@ print("}");
 %[assume_defined_in_kos(EXDEV, __EXDEV)]
 %[assume_defined_in_kos(EXFULL, __EXFULL)]
 %{
-#ifdef __E2BIG
+#if !defined(E2BIG) && defined(__E2BIG)
 #define E2BIG           __E2BIG           /* Argument list too long */
-#endif /* __E2BIG */
-#ifdef __EACCES
+#endif /* !E2BIG && __E2BIG */
+#if !defined(EACCES) && defined(__EACCES)
 #define EACCES          __EACCES          /* Permission denied */
-#endif /* __EACCES */
-#ifdef __EADDRINUSE
+#endif /* !EACCES && __EACCES */
+#if !defined(EADDRINUSE) && defined(__EADDRINUSE)
 #define EADDRINUSE      __EADDRINUSE      /* Address already in use */
-#endif /* __EADDRINUSE */
-#ifdef __EADDRNOTAVAIL
+#endif /* !EADDRINUSE && __EADDRINUSE */
+#if !defined(EADDRNOTAVAIL) && defined(__EADDRNOTAVAIL)
 #define EADDRNOTAVAIL   __EADDRNOTAVAIL   /* Cannot assign requested address */
-#endif /* __EADDRNOTAVAIL */
-#ifdef __EADV
+#endif /* !EADDRNOTAVAIL && __EADDRNOTAVAIL */
+#if !defined(EADV) && defined(__EADV)
 #define EADV            __EADV            /* Advertise error */
-#endif /* __EADV */
-#ifdef __EAFNOSUPPORT
+#endif /* !EADV && __EADV */
+#if !defined(EAFNOSUPPORT) && defined(__EAFNOSUPPORT)
 #define EAFNOSUPPORT    __EAFNOSUPPORT    /* Address family not supported by protocol */
-#endif /* __EAFNOSUPPORT */
-#ifdef __EAGAIN
+#endif /* !EAFNOSUPPORT && __EAFNOSUPPORT */
+#if !defined(EAGAIN) && defined(__EAGAIN)
 #define EAGAIN          __EAGAIN          /* Try again */
-#endif /* __EAGAIN */
-#ifdef __EALREADY
+#endif /* !EAGAIN && __EAGAIN */
+#if !defined(EALREADY) && defined(__EALREADY)
 #define EALREADY        __EALREADY        /* Operation already in progress */
-#endif /* __EALREADY */
-#ifdef __EAUTH
+#endif /* !EALREADY && __EALREADY */
+#if !defined(EAUTH) && defined(__EAUTH)
 #define EAUTH           __EAUTH           /* ??? */
-#endif /* __EAUTH */
-#ifdef __EBADE
+#endif /* !EAUTH && __EAUTH */
+#if !defined(EBADE) && defined(__EBADE)
 #define EBADE           __EBADE           /* Invalid exchange */
-#endif /* __EBADE */
-#ifdef __EBADF
+#endif /* !EBADE && __EBADE */
+#if !defined(EBADF) && defined(__EBADF)
 #define EBADF           __EBADF           /* Bad file number */
-#endif /* __EBADF */
-#ifdef __EBADFD
+#endif /* !EBADF && __EBADF */
+#if !defined(EBADFD) && defined(__EBADFD)
 #define EBADFD          __EBADFD          /* File descriptor in bad state */
-#endif /* __EBADFD */
-#ifdef __EBADMSG
+#endif /* !EBADFD && __EBADFD */
+#if !defined(EBADMSG) && defined(__EBADMSG)
 #define EBADMSG         __EBADMSG         /* Not a data message */
-#endif /* __EBADMSG */
-#ifdef __EBADR
+#endif /* !EBADMSG && __EBADMSG */
+#if !defined(EBADR) && defined(__EBADR)
 #define EBADR           __EBADR           /* Invalid request descriptor */
-#endif /* __EBADR */
-#ifdef __EBADRPC
+#endif /* !EBADR && __EBADR */
+#if !defined(EBADRPC) && defined(__EBADRPC)
 #define EBADRPC         __EBADRPC         /* ??? */
-#endif /* __EBADRPC */
-#ifdef __EBADRQC
+#endif /* !EBADRPC && __EBADRPC */
+#if !defined(EBADRQC) && defined(__EBADRQC)
 #define EBADRQC         __EBADRQC         /* Invalid request code */
-#endif /* __EBADRQC */
-#ifdef __EBADSLT
+#endif /* !EBADRQC && __EBADRQC */
+#if !defined(EBADSLT) && defined(__EBADSLT)
 #define EBADSLT         __EBADSLT         /* Invalid slot */
-#endif /* __EBADSLT */
-#ifdef __EBFONT
+#endif /* !EBADSLT && __EBADSLT */
+#if !defined(EBFONT) && defined(__EBFONT)
 #define EBFONT          __EBFONT          /* Bad font file format */
-#endif /* __EBFONT */
-#ifdef __EBUSY
+#endif /* !EBFONT && __EBFONT */
+#if !defined(EBUSY) && defined(__EBUSY)
 #define EBUSY           __EBUSY           /* Device or resource busy */
-#endif /* __EBUSY */
-#ifdef __ECANCELED
+#endif /* !EBUSY && __EBUSY */
+#if !defined(ECANCELED) && defined(__ECANCELED)
 #define ECANCELED       __ECANCELED       /* Operation canceled */
-#endif /* __ECANCELED */
-#ifdef __ECASECLASH
+#endif /* !ECANCELED && __ECANCELED */
+#if !defined(ECASECLASH) && defined(__ECASECLASH)
 #define ECASECLASH      __ECASECLASH      /* Filename exists with different case */
-#endif /* __ECASECLASH */
-#ifdef __ECHILD
+#endif /* !ECASECLASH && __ECASECLASH */
+#if !defined(ECHILD) && defined(__ECHILD)
 #define ECHILD          __ECHILD          /* No child processes */
-#endif /* __ECHILD */
-#ifdef __ECHRNG
+#endif /* !ECHILD && __ECHILD */
+#if !defined(ECHRNG) && defined(__ECHRNG)
 #define ECHRNG          __ECHRNG          /* Channel number out of range */
-#endif /* __ECHRNG */
-#ifdef __ECOMM
+#endif /* !ECHRNG && __ECHRNG */
+#if !defined(ECOMM) && defined(__ECOMM)
 #define ECOMM           __ECOMM           /* Communication error on send */
-#endif /* __ECOMM */
-#ifdef __ECONNABORTED
+#endif /* !ECOMM && __ECOMM */
+#if !defined(ECONNABORTED) && defined(__ECONNABORTED)
 #define ECONNABORTED    __ECONNABORTED    /* Software caused connection abort */
-#endif /* __ECONNABORTED */
-#ifdef __ECONNREFUSED
+#endif /* !ECONNABORTED && __ECONNABORTED */
+#if !defined(ECONNREFUSED) && defined(__ECONNREFUSED)
 #define ECONNREFUSED    __ECONNREFUSED    /* Connection refused */
-#endif /* __ECONNREFUSED */
-#ifdef __ECONNRESET
+#endif /* !ECONNREFUSED && __ECONNREFUSED */
+#if !defined(ECONNRESET) && defined(__ECONNRESET)
 #define ECONNRESET      __ECONNRESET      /* Connection reset by peer */
-#endif /* __ECONNRESET */
-#ifdef __EDEADLK
+#endif /* !ECONNRESET && __ECONNRESET */
+#if !defined(EDEADLK) && defined(__EDEADLK)
 #define EDEADLK         __EDEADLK         /* Resource deadlock would occur */
-#endif /* __EDEADLK */
-#ifdef __EDEADLOCK
+#endif /* !EDEADLK && __EDEADLK */
+#if !defined(EDEADLOCK) && defined(__EDEADLOCK)
 #define EDEADLOCK       __EDEADLOCK       /* Resource deadlock would occur */
-#endif /* __EDEADLOCK */
-#ifdef __EDESTADDRREQ
+#endif /* !EDEADLOCK && __EDEADLOCK */
+#if !defined(EDESTADDRREQ) && defined(__EDESTADDRREQ)
 #define EDESTADDRREQ    __EDESTADDRREQ    /* Destination address required */
-#endif /* __EDESTADDRREQ */
-#ifdef __EDOM
+#endif /* !EDESTADDRREQ && __EDESTADDRREQ */
+#if !defined(EDOM) && defined(__EDOM)
 #define EDOM            __EDOM            /* Math argument out of domain of func */
-#endif /* __EDOM */
-#ifdef __EDOTDOT
+#endif /* !EDOM && __EDOM */
+#if !defined(EDOTDOT) && defined(__EDOTDOT)
 #define EDOTDOT         __EDOTDOT         /* RFS specific error */
-#endif /* __EDOTDOT */
-#ifdef __EDQUOT
+#endif /* !EDOTDOT && __EDOTDOT */
+#if !defined(EDQUOT) && defined(__EDQUOT)
 #define EDQUOT          __EDQUOT          /* Quota exceeded */
-#endif /* __EDQUOT */
-#ifdef __EEXIST
+#endif /* !EDQUOT && __EDQUOT */
+#if !defined(EEXIST) && defined(__EEXIST)
 #define EEXIST          __EEXIST          /* File exists */
-#endif /* __EEXIST */
-#ifdef __EFAULT
+#endif /* !EEXIST && __EEXIST */
+#if !defined(EFAULT) && defined(__EFAULT)
 #define EFAULT          __EFAULT          /* Bad address */
-#endif /* __EFAULT */
-#ifdef __EFBIG
+#endif /* !EFAULT && __EFAULT */
+#if !defined(EFBIG) && defined(__EFBIG)
 #define EFBIG           __EFBIG           /* File too large */
-#endif /* __EFBIG */
-#ifdef __EFTYPE
+#endif /* !EFBIG && __EFBIG */
+#if !defined(EFTYPE) && defined(__EFTYPE)
 #define EFTYPE          __EFTYPE          /* Inappropriate file type or format */
-#endif /* __EFTYPE */
-#ifdef __EHOSTDOWN
+#endif /* !EFTYPE && __EFTYPE */
+#if !defined(EHOSTDOWN) && defined(__EHOSTDOWN)
 #define EHOSTDOWN       __EHOSTDOWN       /* Host is down */
-#endif /* __EHOSTDOWN */
-#ifdef __EHOSTUNREACH
+#endif /* !EHOSTDOWN && __EHOSTDOWN */
+#if !defined(EHOSTUNREACH) && defined(__EHOSTUNREACH)
 #define EHOSTUNREACH    __EHOSTUNREACH    /* No route to host */
-#endif /* __EHOSTUNREACH */
-#ifdef __EHWPOISON
+#endif /* !EHOSTUNREACH && __EHOSTUNREACH */
+#if !defined(EHWPOISON) && defined(__EHWPOISON)
 #define EHWPOISON       __EHWPOISON       /* Memory page has hardware error */
-#endif /* __EHWPOISON */
-#ifdef __EIDRM
+#endif /* !EHWPOISON && __EHWPOISON */
+#if !defined(EIDRM) && defined(__EIDRM)
 #define EIDRM           __EIDRM           /* Identifier removed */
-#endif /* __EIDRM */
-#ifdef __EILSEQ
+#endif /* !EIDRM && __EIDRM */
+#if !defined(EILSEQ) && defined(__EILSEQ)
 #define EILSEQ          __EILSEQ          /* Illegal byte sequence */
-#endif /* __EILSEQ */
-#ifdef __EINPROGRESS
+#endif /* !EILSEQ && __EILSEQ */
+#if !defined(EINPROGRESS) && defined(__EINPROGRESS)
 #define EINPROGRESS     __EINPROGRESS     /* Operation now in progress */
-#endif /* __EINPROGRESS */
-#ifdef __EINTR
+#endif /* !EINPROGRESS && __EINPROGRESS */
+#if !defined(EINTR) && defined(__EINTR)
 #define EINTR           __EINTR           /* Interrupted system call */
-#endif /* __EINTR */
-#ifdef __EINVAL
+#endif /* !EINTR && __EINTR */
+#if !defined(EINVAL) && defined(__EINVAL)
 #define EINVAL          __EINVAL          /* Invalid argument */
-#endif /* __EINVAL */
-#ifdef __EIO
+#endif /* !EINVAL && __EINVAL */
+#if !defined(EIO) && defined(__EIO)
 #define EIO             __EIO             /* I/O error */
-#endif /* __EIO */
-#ifdef __EISCONN
+#endif /* !EIO && __EIO */
+#if !defined(EISCONN) && defined(__EISCONN)
 #define EISCONN         __EISCONN         /* Transport endpoint is already connected */
-#endif /* __EISCONN */
-#ifdef __EISDIR
+#endif /* !EISCONN && __EISCONN */
+#if !defined(EISDIR) && defined(__EISDIR)
 #define EISDIR          __EISDIR          /* Is a directory */
-#endif /* __EISDIR */
-#ifdef __EISNAM
+#endif /* !EISDIR && __EISDIR */
+#if !defined(EISNAM) && defined(__EISNAM)
 #define EISNAM          __EISNAM          /* Is a named type file */
-#endif /* __EISNAM */
-#ifdef __EKEYEXPIRED
+#endif /* !EISNAM && __EISNAM */
+#if !defined(EKEYEXPIRED) && defined(__EKEYEXPIRED)
 #define EKEYEXPIRED     __EKEYEXPIRED     /* Key has expired */
-#endif /* __EKEYEXPIRED */
-#ifdef __EKEYREJECTED
+#endif /* !EKEYEXPIRED && __EKEYEXPIRED */
+#if !defined(EKEYREJECTED) && defined(__EKEYREJECTED)
 #define EKEYREJECTED    __EKEYREJECTED    /* Key was rejected by service */
-#endif /* __EKEYREJECTED */
-#ifdef __EKEYREVOKED
+#endif /* !EKEYREJECTED && __EKEYREJECTED */
+#if !defined(EKEYREVOKED) && defined(__EKEYREVOKED)
 #define EKEYREVOKED     __EKEYREVOKED     /* Key has been revoked */
-#endif /* __EKEYREVOKED */
-#ifdef __EL2HLT
+#endif /* !EKEYREVOKED && __EKEYREVOKED */
+#if !defined(EL2HLT) && defined(__EL2HLT)
 #define EL2HLT          __EL2HLT          /* Level 2 halted */
-#endif /* __EL2HLT */
-#ifdef __EL2NSYNC
+#endif /* !EL2HLT && __EL2HLT */
+#if !defined(EL2NSYNC) && defined(__EL2NSYNC)
 #define EL2NSYNC        __EL2NSYNC        /* Level 2 not synchronized */
-#endif /* __EL2NSYNC */
-#ifdef __EL3HLT
+#endif /* !EL2NSYNC && __EL2NSYNC */
+#if !defined(EL3HLT) && defined(__EL3HLT)
 #define EL3HLT          __EL3HLT          /* Level 3 halted */
-#endif /* __EL3HLT */
-#ifdef __EL3RST
+#endif /* !EL3HLT && __EL3HLT */
+#if !defined(EL3RST) && defined(__EL3RST)
 #define EL3RST          __EL3RST          /* Level 3 reset */
-#endif /* __EL3RST */
-#ifdef __ELBIN
+#endif /* !EL3RST && __EL3RST */
+#if !defined(ELBIN) && defined(__ELBIN)
 #define ELBIN           __ELBIN           /* Inode is remote (not really error) */
-#endif /* __ELBIN */
-#ifdef __ELIBACC
+#endif /* !ELBIN && __ELBIN */
+#if !defined(ELIBACC) && defined(__ELIBACC)
 #define ELIBACC         __ELIBACC         /* Can not access a needed shared library */
-#endif /* __ELIBACC */
-#ifdef __ELIBBAD
+#endif /* !ELIBACC && __ELIBACC */
+#if !defined(ELIBBAD) && defined(__ELIBBAD)
 #define ELIBBAD         __ELIBBAD         /* Accessing a corrupted shared library */
-#endif /* __ELIBBAD */
-#ifdef __ELIBEXEC
+#endif /* !ELIBBAD && __ELIBBAD */
+#if !defined(ELIBEXEC) && defined(__ELIBEXEC)
 #define ELIBEXEC        __ELIBEXEC        /* Cannot exec a shared library directly */
-#endif /* __ELIBEXEC */
-#ifdef __ELIBMAX
+#endif /* !ELIBEXEC && __ELIBEXEC */
+#if !defined(ELIBMAX) && defined(__ELIBMAX)
 #define ELIBMAX         __ELIBMAX         /* Attempting to link in too many shared libraries */
-#endif /* __ELIBMAX */
-#ifdef __ELIBSCN
+#endif /* !ELIBMAX && __ELIBMAX */
+#if !defined(ELIBSCN) && defined(__ELIBSCN)
 #define ELIBSCN         __ELIBSCN         /* .lib section in a.out corrupted */
-#endif /* __ELIBSCN */
-#ifdef __ELNRNG
+#endif /* !ELIBSCN && __ELIBSCN */
+#if !defined(ELNRNG) && defined(__ELNRNG)
 #define ELNRNG          __ELNRNG          /* Link number out of range */
-#endif /* __ELNRNG */
-#ifdef __ELOCKUNMAPPED
+#endif /* !ELNRNG && __ELNRNG */
+#if !defined(ELOCKUNMAPPED) && defined(__ELOCKUNMAPPED)
 #define ELOCKUNMAPPED   __ELOCKUNMAPPED   /* ??? */
-#endif /* __ELOCKUNMAPPED */
-#ifdef __ELOOP
+#endif /* !ELOCKUNMAPPED && __ELOCKUNMAPPED */
+#if !defined(ELOOP) && defined(__ELOOP)
 #define ELOOP           __ELOOP           /* Too many symbolic links encountered */
-#endif /* __ELOOP */
-#ifdef __EMEDIUMTYPE
+#endif /* !ELOOP && __ELOOP */
+#if !defined(EMEDIUMTYPE) && defined(__EMEDIUMTYPE)
 #define EMEDIUMTYPE     __EMEDIUMTYPE     /* Wrong medium type */
-#endif /* __EMEDIUMTYPE */
-#ifdef __EMFILE
+#endif /* !EMEDIUMTYPE && __EMEDIUMTYPE */
+#if !defined(EMFILE) && defined(__EMFILE)
 #define EMFILE          __EMFILE          /* Too many open files */
-#endif /* __EMFILE */
-#ifdef __EMLINK
+#endif /* !EMFILE && __EMFILE */
+#if !defined(EMLINK) && defined(__EMLINK)
 #define EMLINK          __EMLINK          /* Too many links */
-#endif /* __EMLINK */
-#ifdef __EMSGSIZE
+#endif /* !EMLINK && __EMLINK */
+#if !defined(EMSGSIZE) && defined(__EMSGSIZE)
 #define EMSGSIZE        __EMSGSIZE        /* Message too long */
-#endif /* __EMSGSIZE */
-#ifdef __EMULTIHOP
+#endif /* !EMSGSIZE && __EMSGSIZE */
+#if !defined(EMULTIHOP) && defined(__EMULTIHOP)
 #define EMULTIHOP       __EMULTIHOP       /* Multihop attempted */
-#endif /* __EMULTIHOP */
-#ifdef __ENAMETOOLONG
+#endif /* !EMULTIHOP && __EMULTIHOP */
+#if !defined(ENAMETOOLONG) && defined(__ENAMETOOLONG)
 #define ENAMETOOLONG    __ENAMETOOLONG    /* File name too long */
-#endif /* __ENAMETOOLONG */
-#ifdef __ENAVAIL
+#endif /* !ENAMETOOLONG && __ENAMETOOLONG */
+#if !defined(ENAVAIL) && defined(__ENAVAIL)
 #define ENAVAIL         __ENAVAIL         /* No XENIX semaphores available */
-#endif /* __ENAVAIL */
-#ifdef __ENEEDAUTH
+#endif /* !ENAVAIL && __ENAVAIL */
+#if !defined(ENEEDAUTH) && defined(__ENEEDAUTH)
 #define ENEEDAUTH       __ENEEDAUTH       /* ??? */
-#endif /* __ENEEDAUTH */
-#ifdef __ENETDOWN
+#endif /* !ENEEDAUTH && __ENEEDAUTH */
+#if !defined(ENETDOWN) && defined(__ENETDOWN)
 #define ENETDOWN        __ENETDOWN        /* Network is down */
-#endif /* __ENETDOWN */
-#ifdef __ENETRESET
+#endif /* !ENETDOWN && __ENETDOWN */
+#if !defined(ENETRESET) && defined(__ENETRESET)
 #define ENETRESET       __ENETRESET       /* Network dropped connection because of reset */
-#endif /* __ENETRESET */
-#ifdef __ENETUNREACH
+#endif /* !ENETRESET && __ENETRESET */
+#if !defined(ENETUNREACH) && defined(__ENETUNREACH)
 #define ENETUNREACH     __ENETUNREACH     /* Network is unreachable */
-#endif /* __ENETUNREACH */
-#ifdef __ENFILE
+#endif /* !ENETUNREACH && __ENETUNREACH */
+#if !defined(ENFILE) && defined(__ENFILE)
 #define ENFILE          __ENFILE          /* File table overflow */
-#endif /* __ENFILE */
-#ifdef __ENMFILE
+#endif /* !ENFILE && __ENFILE */
+#if !defined(ENMFILE) && defined(__ENMFILE)
 #define ENMFILE         __ENMFILE         /* No more files */
-#endif /* __ENMFILE */
-#ifdef __ENOANO
+#endif /* !ENMFILE && __ENMFILE */
+#if !defined(ENOANO) && defined(__ENOANO)
 #define ENOANO          __ENOANO          /* No anode */
-#endif /* __ENOANO */
-#ifdef __ENOATTR
+#endif /* !ENOANO && __ENOANO */
+#if !defined(ENOATTR) && defined(__ENOATTR)
 #define ENOATTR         __ENOATTR         /* ??? */
-#endif /* __ENOATTR */
-#ifdef __ENOBUFS
+#endif /* !ENOATTR && __ENOATTR */
+#if !defined(ENOBUFS) && defined(__ENOBUFS)
 #define ENOBUFS         __ENOBUFS         /* No buffer space available */
-#endif /* __ENOBUFS */
-#ifdef __ENOCSI
+#endif /* !ENOBUFS && __ENOBUFS */
+#if !defined(ENOCSI) && defined(__ENOCSI)
 #define ENOCSI          __ENOCSI          /* No CSI structure available */
-#endif /* __ENOCSI */
-#ifdef __ENODATA
+#endif /* !ENOCSI && __ENOCSI */
+#if !defined(ENODATA) && defined(__ENODATA)
 #define ENODATA         __ENODATA         /* No data available */
-#endif /* __ENODATA */
-#ifdef __ENODEV
+#endif /* !ENODATA && __ENODATA */
+#if !defined(ENODEV) && defined(__ENODEV)
 #define ENODEV          __ENODEV          /* No such device */
-#endif /* __ENODEV */
-#ifdef __ENOENT
+#endif /* !ENODEV && __ENODEV */
+#if !defined(ENOENT) && defined(__ENOENT)
 #define ENOENT          __ENOENT          /* No such file or directory */
-#endif /* __ENOENT */
-#ifdef __ENOEXEC
+#endif /* !ENOENT && __ENOENT */
+#if !defined(ENOEXEC) && defined(__ENOEXEC)
 #define ENOEXEC         __ENOEXEC         /* Exec format error */
-#endif /* __ENOEXEC */
-#ifdef __ENOKEY
+#endif /* !ENOEXEC && __ENOEXEC */
+#if !defined(ENOKEY) && defined(__ENOKEY)
 #define ENOKEY          __ENOKEY          /* Required key not available */
-#endif /* __ENOKEY */
-#ifdef __ENOLCK
+#endif /* !ENOKEY && __ENOKEY */
+#if !defined(ENOLCK) && defined(__ENOLCK)
 #define ENOLCK          __ENOLCK          /* No record locks available */
-#endif /* __ENOLCK */
-#ifdef __ENOLINK
+#endif /* !ENOLCK && __ENOLCK */
+#if !defined(ENOLINK) && defined(__ENOLINK)
 #define ENOLINK         __ENOLINK         /* Link has been severed */
-#endif /* __ENOLINK */
-#ifdef __ENOMEDIUM
+#endif /* !ENOLINK && __ENOLINK */
+#if !defined(ENOMEDIUM) && defined(__ENOMEDIUM)
 #define ENOMEDIUM       __ENOMEDIUM       /* No medium found */
-#endif /* __ENOMEDIUM */
-#ifdef __ENOMEM
+#endif /* !ENOMEDIUM && __ENOMEDIUM */
+#if !defined(ENOMEM) && defined(__ENOMEM)
 #define ENOMEM          __ENOMEM          /* Out of memory */
-#endif /* __ENOMEM */
-#ifdef __ENOMSG
+#endif /* !ENOMEM && __ENOMEM */
+#if !defined(ENOMSG) && defined(__ENOMSG)
 #define ENOMSG          __ENOMSG          /* No message of desired type */
-#endif /* __ENOMSG */
-#ifdef __ENONET
+#endif /* !ENOMSG && __ENOMSG */
+#if !defined(ENONET) && defined(__ENONET)
 #define ENONET          __ENONET          /* Machine is not on the network */
-#endif /* __ENONET */
-#ifdef __ENOPKG
+#endif /* !ENONET && __ENONET */
+#if !defined(ENOPKG) && defined(__ENOPKG)
 #define ENOPKG          __ENOPKG          /* Package not installed */
-#endif /* __ENOPKG */
-#ifdef __ENOPROTOOPT
+#endif /* !ENOPKG && __ENOPKG */
+#if !defined(ENOPROTOOPT) && defined(__ENOPROTOOPT)
 #define ENOPROTOOPT     __ENOPROTOOPT     /* Protocol not available */
-#endif /* __ENOPROTOOPT */
-#ifdef __ENOSHARE
+#endif /* !ENOPROTOOPT && __ENOPROTOOPT */
+#if !defined(ENOSHARE) && defined(__ENOSHARE)
 #define ENOSHARE        __ENOSHARE        /* No such host or network path */
-#endif /* __ENOSHARE */
-#ifdef __ENOSPC
+#endif /* !ENOSHARE && __ENOSHARE */
+#if !defined(ENOSPC) && defined(__ENOSPC)
 #define ENOSPC          __ENOSPC          /* No space left on device */
-#endif /* __ENOSPC */
-#ifdef __ENOSR
+#endif /* !ENOSPC && __ENOSPC */
+#if !defined(ENOSR) && defined(__ENOSR)
 #define ENOSR           __ENOSR           /* Out of streams resources */
-#endif /* __ENOSR */
-#ifdef __ENOSTR
+#endif /* !ENOSR && __ENOSR */
+#if !defined(ENOSTR) && defined(__ENOSTR)
 #define ENOSTR          __ENOSTR          /* Device not a stream */
-#endif /* __ENOSTR */
-#ifdef __ENOSYS
+#endif /* !ENOSTR && __ENOSTR */
+#if !defined(ENOSYS) && defined(__ENOSYS)
 #define ENOSYS          __ENOSYS          /* Function not implemented */
-#endif /* __ENOSYS */
-#ifdef __ENOTACTIVE
+#endif /* !ENOSYS && __ENOSYS */
+#if !defined(ENOTACTIVE) && defined(__ENOTACTIVE)
 #define ENOTACTIVE      __ENOTACTIVE      /* ??? */
-#endif /* __ENOTACTIVE */
-#ifdef __ENOTBLK
+#endif /* !ENOTACTIVE && __ENOTACTIVE */
+#if !defined(ENOTBLK) && defined(__ENOTBLK)
 #define ENOTBLK         __ENOTBLK         /* Block device required */
-#endif /* __ENOTBLK */
-#ifdef __ENOTCONN
+#endif /* !ENOTBLK && __ENOTBLK */
+#if !defined(ENOTCONN) && defined(__ENOTCONN)
 #define ENOTCONN        __ENOTCONN        /* Transport endpoint is not connected */
-#endif /* __ENOTCONN */
-#ifdef __ENOTDIR
+#endif /* !ENOTCONN && __ENOTCONN */
+#if !defined(ENOTDIR) && defined(__ENOTDIR)
 #define ENOTDIR         __ENOTDIR         /* Not a directory */
-#endif /* __ENOTDIR */
-#ifdef __ENOTEMPTY
+#endif /* !ENOTDIR && __ENOTDIR */
+#if !defined(ENOTEMPTY) && defined(__ENOTEMPTY)
 #define ENOTEMPTY       __ENOTEMPTY       /* Directory not empty */
-#endif /* __ENOTEMPTY */
-#ifdef __ENOTNAM
+#endif /* !ENOTEMPTY && __ENOTEMPTY */
+#if !defined(ENOTNAM) && defined(__ENOTNAM)
 #define ENOTNAM         __ENOTNAM         /* Not a XENIX named type file */
-#endif /* __ENOTNAM */
-#ifdef __ENOTRECOVERABLE
+#endif /* !ENOTNAM && __ENOTNAM */
+#if !defined(ENOTRECOVERABLE) && defined(__ENOTRECOVERABLE)
 #define ENOTRECOVERABLE __ENOTRECOVERABLE /* State not recoverable */
-#endif /* __ENOTRECOVERABLE */
-#ifdef __ENOTSOCK
+#endif /* !ENOTRECOVERABLE && __ENOTRECOVERABLE */
+#if !defined(ENOTSOCK) && defined(__ENOTSOCK)
 #define ENOTSOCK        __ENOTSOCK        /* Socket operation on non-socket */
-#endif /* __ENOTSOCK */
-#ifdef __ENOTSUP
+#endif /* !ENOTSOCK && __ENOTSOCK */
+#if !defined(ENOTSUP) && defined(__ENOTSUP)
 #define ENOTSUP         __ENOTSUP         /* Not supported */
-#endif /* __ENOTSUP */
-#ifdef __ENOTTY
+#endif /* !ENOTSUP && __ENOTSUP */
+#if !defined(ENOTTY) && defined(__ENOTTY)
 #define ENOTTY          __ENOTTY          /* Not a typewriter */
-#endif /* __ENOTTY */
-#ifdef __ENOTUNIQ
+#endif /* !ENOTTY && __ENOTTY */
+#if !defined(ENOTUNIQ) && defined(__ENOTUNIQ)
 #define ENOTUNIQ        __ENOTUNIQ        /* Name not unique on network */
-#endif /* __ENOTUNIQ */
-#ifdef __ENXIO
+#endif /* !ENOTUNIQ && __ENOTUNIQ */
+#if !defined(ENXIO) && defined(__ENXIO)
 #define ENXIO           __ENXIO           /* No such device or address */
-#endif /* __ENXIO */
-#ifdef __EOPNOTSUPP
+#endif /* !ENXIO && __ENXIO */
+#if !defined(EOPNOTSUPP) && defined(__EOPNOTSUPP)
 #define EOPNOTSUPP      __EOPNOTSUPP      /* Operation not supported on transport endpoint */
-#endif /* __EOPNOTSUPP */
-#ifdef __EOTHER
+#endif /* !EOPNOTSUPP && __EOPNOTSUPP */
+#if !defined(EOTHER) && defined(__EOTHER)
 #define EOTHER          __EOTHER          /* Other */
-#endif /* __EOTHER */
-#ifdef __EOVERFLOW
+#endif /* !EOTHER && __EOTHER */
+#if !defined(EOVERFLOW) && defined(__EOVERFLOW)
 #define EOVERFLOW       __EOVERFLOW       /* Value too large for defined data type */
-#endif /* __EOVERFLOW */
-#ifdef __EOWNERDEAD
+#endif /* !EOVERFLOW && __EOVERFLOW */
+#if !defined(EOWNERDEAD) && defined(__EOWNERDEAD)
 #define EOWNERDEAD      __EOWNERDEAD      /* Owner died */
-#endif /* __EOWNERDEAD */
-#ifdef __EPERM
+#endif /* !EOWNERDEAD && __EOWNERDEAD */
+#if !defined(EPERM) && defined(__EPERM)
 #define EPERM           __EPERM           /* Operation not permitted */
-#endif /* __EPERM */
-#ifdef __EPFNOSUPPORT
+#endif /* !EPERM && __EPERM */
+#if !defined(EPFNOSUPPORT) && defined(__EPFNOSUPPORT)
 #define EPFNOSUPPORT    __EPFNOSUPPORT    /* Protocol family not supported */
-#endif /* __EPFNOSUPPORT */
-#ifdef __EPIPE
+#endif /* !EPFNOSUPPORT && __EPFNOSUPPORT */
+#if !defined(EPIPE) && defined(__EPIPE)
 #define EPIPE           __EPIPE           /* Broken pipe */
-#endif /* __EPIPE */
-#ifdef __EPROCLIM
+#endif /* !EPIPE && __EPIPE */
+#if !defined(EPROCLIM) && defined(__EPROCLIM)
 #define EPROCLIM        __EPROCLIM        /* Process limit reached */
-#endif /* __EPROCLIM */
-#ifdef __EPROCUNAVAIL
+#endif /* !EPROCLIM && __EPROCLIM */
+#if !defined(EPROCUNAVAIL) && defined(__EPROCUNAVAIL)
 #define EPROCUNAVAIL    __EPROCUNAVAIL    /* ??? */
-#endif /* __EPROCUNAVAIL */
-#ifdef __EPROGMISMATCH
+#endif /* !EPROCUNAVAIL && __EPROCUNAVAIL */
+#if !defined(EPROGMISMATCH) && defined(__EPROGMISMATCH)
 #define EPROGMISMATCH   __EPROGMISMATCH   /* ??? */
-#endif /* __EPROGMISMATCH */
-#ifdef __EPROGUNAVAIL
+#endif /* !EPROGMISMATCH && __EPROGMISMATCH */
+#if !defined(EPROGUNAVAIL) && defined(__EPROGUNAVAIL)
 #define EPROGUNAVAIL    __EPROGUNAVAIL    /* ??? */
-#endif /* __EPROGUNAVAIL */
-#ifdef __EPROTO
+#endif /* !EPROGUNAVAIL && __EPROGUNAVAIL */
+#if !defined(EPROTO) && defined(__EPROTO)
 #define EPROTO          __EPROTO          /* Protocol error */
-#endif /* __EPROTO */
-#ifdef __EPROTONOSUPPORT
+#endif /* !EPROTO && __EPROTO */
+#if !defined(EPROTONOSUPPORT) && defined(__EPROTONOSUPPORT)
 #define EPROTONOSUPPORT __EPROTONOSUPPORT /* Protocol not supported */
-#endif /* __EPROTONOSUPPORT */
-#ifdef __EPROTOTYPE
+#endif /* !EPROTONOSUPPORT && __EPROTONOSUPPORT */
+#if !defined(EPROTOTYPE) && defined(__EPROTOTYPE)
 #define EPROTOTYPE      __EPROTOTYPE      /* Protocol wrong type for socket */
-#endif /* __EPROTOTYPE */
-#ifdef __ERANGE
+#endif /* !EPROTOTYPE && __EPROTOTYPE */
+#if !defined(ERANGE) && defined(__ERANGE)
 #define ERANGE          __ERANGE          /* Math result not representable */
-#endif /* __ERANGE */
-#ifdef __EREMCHG
+#endif /* !ERANGE && __ERANGE */
+#if !defined(EREMCHG) && defined(__EREMCHG)
 #define EREMCHG         __EREMCHG         /* Remote address changed */
-#endif /* __EREMCHG */
-#ifdef __EREMOTE
+#endif /* !EREMCHG && __EREMCHG */
+#if !defined(EREMOTE) && defined(__EREMOTE)
 #define EREMOTE         __EREMOTE         /* Object is remote */
-#endif /* __EREMOTE */
-#ifdef __EREMOTEIO
+#endif /* !EREMOTE && __EREMOTE */
+#if !defined(EREMOTEIO) && defined(__EREMOTEIO)
 #define EREMOTEIO       __EREMOTEIO       /* Remote I/O error */
-#endif /* __EREMOTEIO */
-#ifdef __ERESTART
+#endif /* !EREMOTEIO && __EREMOTEIO */
+#if !defined(ERESTART) && defined(__ERESTART)
 #define ERESTART        __ERESTART        /* Interrupted system call should be restarted */
-#endif /* __ERESTART */
-#ifdef __ERFKILL
+#endif /* !ERESTART && __ERESTART */
+#if !defined(ERFKILL) && defined(__ERFKILL)
 #define ERFKILL         __ERFKILL         /* Operation not possible due to RF-kill */
-#endif /* __ERFKILL */
-#ifdef __EROFS
+#endif /* !ERFKILL && __ERFKILL */
+#if !defined(EROFS) && defined(__EROFS)
 #define EROFS           __EROFS           /* Read-only file system */
-#endif /* __EROFS */
-#ifdef __ERPCMISMATCH
+#endif /* !EROFS && __EROFS */
+#if !defined(ERPCMISMATCH) && defined(__ERPCMISMATCH)
 #define ERPCMISMATCH    __ERPCMISMATCH    /* ??? */
-#endif /* __ERPCMISMATCH */
-#ifdef __ESHUTDOWN
+#endif /* !ERPCMISMATCH && __ERPCMISMATCH */
+#if !defined(ESHUTDOWN) && defined(__ESHUTDOWN)
 #define ESHUTDOWN       __ESHUTDOWN       /* Cannot send after transport endpoint shutdown */
-#endif /* __ESHUTDOWN */
-#ifdef __ESOCKTNOSUPPORT
+#endif /* !ESHUTDOWN && __ESHUTDOWN */
+#if !defined(ESOCKTNOSUPPORT) && defined(__ESOCKTNOSUPPORT)
 #define ESOCKTNOSUPPORT __ESOCKTNOSUPPORT /* Socket type not supported */
-#endif /* __ESOCKTNOSUPPORT */
-#ifdef __ESPIPE
+#endif /* !ESOCKTNOSUPPORT && __ESOCKTNOSUPPORT */
+#if !defined(ESPIPE) && defined(__ESPIPE)
 #define ESPIPE          __ESPIPE          /* Illegal seek */
-#endif /* __ESPIPE */
-#ifdef __ESRCH
+#endif /* !ESPIPE && __ESPIPE */
+#if !defined(ESRCH) && defined(__ESRCH)
 #define ESRCH           __ESRCH           /* No such process */
-#endif /* __ESRCH */
-#ifdef __ESRMNT
+#endif /* !ESRCH && __ESRCH */
+#if !defined(ESRMNT) && defined(__ESRMNT)
 #define ESRMNT          __ESRMNT          /* Srmount error */
-#endif /* __ESRMNT */
-#ifdef __ESTALE
+#endif /* !ESRMNT && __ESRMNT */
+#if !defined(ESTALE) && defined(__ESTALE)
 #define ESTALE          __ESTALE          /* Stale file handle */
-#endif /* __ESTALE */
-#ifdef __ESTRPIPE
+#endif /* !ESTALE && __ESTALE */
+#if !defined(ESTRPIPE) && defined(__ESTRPIPE)
 #define ESTRPIPE        __ESTRPIPE        /* Streams pipe error */
-#endif /* __ESTRPIPE */
-#ifdef __ETIME
+#endif /* !ESTRPIPE && __ESTRPIPE */
+#if !defined(ETIME) && defined(__ETIME)
 #define ETIME           __ETIME           /* Timer expired */
-#endif /* __ETIME */
-#ifdef __ETIMEDOUT
+#endif /* !ETIME && __ETIME */
+#if !defined(ETIMEDOUT) && defined(__ETIMEDOUT)
 #define ETIMEDOUT       __ETIMEDOUT       /* Connection timed out */
-#endif /* __ETIMEDOUT */
-#ifdef __ETOOMANYREFS
+#endif /* !ETIMEDOUT && __ETIMEDOUT */
+#if !defined(ETOOMANYREFS) && defined(__ETOOMANYREFS)
 #define ETOOMANYREFS    __ETOOMANYREFS    /* Too many references: cannot splice */
-#endif /* __ETOOMANYREFS */
-#ifdef __ETXTBSY
+#endif /* !ETOOMANYREFS && __ETOOMANYREFS */
+#if !defined(ETXTBSY) && defined(__ETXTBSY)
 #define ETXTBSY         __ETXTBSY         /* Text file busy */
-#endif /* __ETXTBSY */
-#ifdef __EUCLEAN
+#endif /* !ETXTBSY && __ETXTBSY */
+#if !defined(EUCLEAN) && defined(__EUCLEAN)
 #define EUCLEAN         __EUCLEAN         /* Structure needs cleaning */
-#endif /* __EUCLEAN */
-#ifdef __EUNATCH
+#endif /* !EUCLEAN && __EUCLEAN */
+#if !defined(EUNATCH) && defined(__EUNATCH)
 #define EUNATCH         __EUNATCH         /* Protocol driver not attached */
-#endif /* __EUNATCH */
-#ifdef __EUSERS
+#endif /* !EUNATCH && __EUNATCH */
+#if !defined(EUSERS) && defined(__EUSERS)
 #define EUSERS          __EUSERS          /* Too many users */
-#endif /* __EUSERS */
-#ifdef __EWOULDBLOCK
+#endif /* !EUSERS && __EUSERS */
+#if !defined(EWOULDBLOCK) && defined(__EWOULDBLOCK)
 #define EWOULDBLOCK     __EWOULDBLOCK     /* Operation would block */
-#endif /* __EWOULDBLOCK */
-#ifdef __EXDEV
+#endif /* !EWOULDBLOCK && __EWOULDBLOCK */
+#if !defined(EXDEV) && defined(__EXDEV)
 #define EXDEV           __EXDEV           /* Cross-device link */
-#endif /* __EXDEV */
-#ifdef __EXFULL
+#endif /* !EXDEV && __EXDEV */
+#if !defined(EXFULL) && defined(__EXFULL)
 #define EXFULL          __EXFULL          /* Exchange full */
-#endif /* __EXFULL */
-#ifdef __STRUNCATE
+#endif /* !EXFULL && __EXFULL */
+#if !defined(STRUNCATE) && defined(__STRUNCATE)
 #define STRUNCATE       __STRUNCATE       /* Truncated */
-#endif /* __STRUNCATE */
+#endif /* !STRUNCATE && __STRUNCATE */
 }
 /*[[[end]]]*/
 %[assume_defined_in_kos(EWOULDBLOCK, __EWOULDBLOCK)]
@@ -1288,11 +1288,9 @@ print("}");
 #if !defined(EWOULDBLOCK) && defined(EAGAIN)
 #define EWOULDBLOCK EAGAIN /* Operation would block */
 #endif /* !EWOULDBLOCK && EAGAIN */
-
 #if !defined(EDEADLOCK) && defined(EDEADLK)
 #define EDEADLOCK EDEADLK /* Resource deadlock would occur */
 #endif /* !EDEADLOCK && EDEADLK */
-
 #if !defined(ENOTSUP) && defined(EOPNOTSUPP)
 #define ENOTSUP EOPNOTSUPP /* Not supported */
 #endif /* !ENOTSUP && EOPNOTSUPP */
@@ -1300,24 +1298,24 @@ print("}");
 
 /* Platform-specific extensions for errno limits. */
 #ifdef __USE_NETBSD
-#ifdef __ELIMIT
+#if !defined(ELAST) && defined(__ELIMIT)
 #define ELAST __ELIMIT /* Max possible errno */
-#endif /* __ELIMIT */
+#endif /* !ELAST && __ELIMIT */
 #endif /* __USE_NETBSD */
 
 #if defined(__USE_KOS) || defined(__USE_KOS_KERNEL)
-#ifdef __EOK
+#if !defined(EOK) && defined(__EOK)
 #define EOK    __EOK    /* Operation completed successfully */
-#endif /* __EOK */
-#ifdef __EMAX
+#endif /* !EOK && __EOK */
+#if !defined(EMAX) && defined(__EMAX)
 #define EMAX   __EMAX   /* Max errno */
-#endif /* __EMAX */
-#ifdef __ECOUNT
+#endif /* !EMAX && __EMAX */
+#if !defined(ECOUNT) && defined(__ECOUNT)
 #define ECOUNT __ECOUNT /* Max errno + 1 */
-#endif /* __ECOUNT */
-#ifdef __ELIMIT
+#endif /* !ECOUNT && __ECOUNT */
+#if !defined(ELIMIT) && defined(__ELIMIT)
 #define ELIMIT __ELIMIT /* Max possible errno */
-#endif /* __ELIMIT */
+#endif /* !ELIMIT && __ELIMIT */
 #endif /* __USE_KOS || __USE_KOS_KERNEL */
 
 #if defined(__USE_KOS_KERNEL) && defined(__ELIMIT)

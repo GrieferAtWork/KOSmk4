@@ -1,4 +1,4 @@
-/* (#) Portability: Linux (/include/linux/kernel.h) */
+/* (#) Portability: Linux (/usr/include/linux/kernel.h) */
 #ifndef _LINUX_KERNEL_H
 #define _LINUX_KERNEL_H 1
 

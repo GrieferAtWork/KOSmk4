@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Linux (/include/linux/limits.h) */
+/* (#) Portability: Linux (/usr/include/linux/limits.h) */
 #ifndef _LINUX_LIMITS_H
 #define _LINUX_LIMITS_H 1
 

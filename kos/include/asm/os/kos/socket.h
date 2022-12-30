@@ -59,8 +59,8 @@
 #define __SO_PEERCRED                      17
 #define __SO_RCVLOWAT                      18 /* int min_recv_buffer_size_before_handling */
 #define __SO_SNDLOWAT                      19 /* int min_send_buffer_size_before_handling */
-#define __SO_RCVTIMEO                      20
-#define __SO_SNDTIMEO                      21
+#define __SO_RCVTIMEO_OLD                  20
+#define __SO_SNDTIMEO_OLD                  21
 #define __SO_SECURITY_AUTHENTICATION       22
 #define __SO_SECURITY_ENCRYPTION_TRANSPORT 23
 #define __SO_SECURITY_ENCRYPTION_NETWORK   24
@@ -68,15 +68,15 @@
 #define __SO_ATTACH_FILTER                 26
 #define __SO_DETACH_FILTER                 27
 #define __SO_PEERNAME                      28
-#define __SO_TIMESTAMP                     29
+#define __SO_TIMESTAMP_OLD                 29
 #define __SO_ACCEPTCONN                    30
 #define __SO_PEERSEC                       31
 #define __SO_SNDBUFFORCE                   32
 #define __SO_RCVBUFFORCE                   33
 #define __SO_PASSSEC                       34
-#define __SO_TIMESTAMPNS                   35
+#define __SO_TIMESTAMPNS_OLD               35
 #define __SO_MARK                          36
-#define __SO_TIMESTAMPING                  37
+#define __SO_TIMESTAMPING_OLD              37
 #define __SO_PROTOCOL                      38 /* int protocol = *; (dependent on family+type; e.g. `IPPROTO_UDP') */
 #define __SO_DOMAIN                        39 /* int family = AF_*; */
 #define __SO_RXQ_OVFL                      40
@@ -90,6 +90,44 @@
 #define __SO_BPF_EXTENSIONS                48
 #define __SO_INCOMING_CPU                  49
 #define __SO_ATTACH_BPF                    50
+#define __SO_ATTACH_REUSEPORT_CBPF         51
+#define __SO_ATTACH_REUSEPORT_EBPF         52
+#define __SO_CNX_ADVICE                    53
+#define __SCM_TIMESTAMPING_OPT_STATS       54
+#define __SO_MEMINFO                       55
+#define __SO_INCOMING_NAPI_ID              56
+#define __SO_COOKIE                        57
+#define __SCM_TIMESTAMPING_PKTINFO         58
+#define __SO_PEERGROUPS                    59
+#define __SO_ZEROCOPY                      60
+#define __SO_TXTIME                        61
+#define __SO_BINDTOIFINDEX                 62
+#define __SO_TIMESTAMP_NEW                 63
+#define __SO_TIMESTAMPNS_NEW               64
+#define __SO_TIMESTAMPING_NEW              65
+#define __SO_RCVTIMEO_NEW                  66
+#define __SO_SNDTIMEO_NEW                  67
+#define __SO_DETACH_REUSEPORT_BPF          68
+#define __SO_PREFER_BUSY_POLL              69
+#define __SO_BUSY_POLL_BUDGET              70
+#define __SO_NETNS_COOKIE                  71
+#define __SO_BUF_LOCK                      72
+
+#if 1
+#define __SO_RCVTIMEO     __SO_RCVTIMEO_OLD
+#define __SO_SNDTIMEO     __SO_SNDTIMEO_OLD
+#define __SO_TIMESTAMP    __SO_TIMESTAMP_OLD
+#define __SO_TIMESTAMPNS  __SO_TIMESTAMPNS_OLD
+#define __SO_TIMESTAMPING __SO_TIMESTAMPING_OLD
+#else
+#define __SO_RCVTIMEO     __SO_RCVTIMEO_NEW
+#define __SO_SNDTIMEO     __SO_SNDTIMEO_NEW
+#define __SO_TIMESTAMP    __SO_TIMESTAMP_NEW
+#define __SO_TIMESTAMPNS  __SO_TIMESTAMPNS_NEW
+#define __SO_TIMESTAMPING __SO_TIMESTAMPING_NEW
+#endif
+
+
 
 #ifdef __KOS__
 #define __SO_NOSIGPIPE 1024 /* int always_imply_MSG_NOSIGNAL = 0 or 1; */

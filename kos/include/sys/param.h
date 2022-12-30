@@ -65,10 +65,14 @@
 #define MAX(a, b) __hybrid_max_c2(a, b)
 #endif /* !MAX */
 
+#if !defined(__EXEC_PAGESIZE) && defined(__ARCH_PAGESIZE)
+#define __EXEC_PAGESIZE __ARCH_PAGESIZE
+#endif /* !__EXEC_PAGESIZE && __ARCH_PAGESIZE */
+
 /* System memory page size */
-#if !defined(EXEC_PAGESIZE) && defined(__ARCH_PAGESIZE)
-#define EXEC_PAGESIZE __ARCH_PAGESIZE
-#endif /* !EXEC_PAGESIZE && __ARCH_PAGESIZE */
+#if !defined(EXEC_PAGESIZE) && defined(__EXEC_PAGESIZE)
+#define EXEC_PAGESIZE __EXEC_PAGESIZE
+#endif /* !EXEC_PAGESIZE && __EXEC_PAGESIZE */
 
 /* Scheduler frequency */
 #if !defined(HZ) && defined(__HZ)

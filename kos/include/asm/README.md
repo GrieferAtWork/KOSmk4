@@ -38,8 +38,46 @@ Normally, `<asm/...>` headers are all internal and not meant to be directly incl
 	- `#define PAGE_MASK  <Integer>`
 	- `#define PAGE_SIZE  <Integer>`
 	- `#define PAGE_SHIFT <Integer>`
-- `<asm/prctl.h>` (not kos-specific)
-- `<asm/unistd.h>` (not kos-specific)
+
+
+
+### Public `<asm/foo.h>` headers for linux compat
+
+- `<asm/auxvec.h>`
+- `<asm/bitsperlong.h>`
+- `<asm/byteorder.h>`
+- `<asm/errno-base.h>`
+- `<asm/errno.h>`
+- `<asm/fcntl.h>`
+- `<asm/ioctls.h>`
+- `<asm/mman.h>`
+- `<asm/param.h>`
+- `<asm/perf_regs.h>`
+- `<asm/poll.h>`
+- `<asm/posix_types.h>`
+- `<asm/prctl.h>`
+- `<asm/ptrace.h>`
+- `<asm/resource.h>`
+- `<asm/sembuf.h>`
+- `<asm/setup.h>`
+- `<asm/shmbuf.h>`
+- `<asm/sigcontext.h>`
+- `<asm/siginfo.h>`
+- `<asm/signal.h>`
+- `<asm/socket.h>`
+- `<asm/sockios.h>`
+- `<asm/stat.h>`
+- `<asm/statfs.h>`
+- `<asm/swab.h>`
+- `<asm/termbits.h>`
+- `<asm/termios.h>`
+- `<asm/types.h>`
+- `<asm/ucontext.h>`
+- `<asm/unistd.h>`
+
+
+
+### Other `<asm/foo.h>` headers
 
 Some more headers also exist, but those are arch-specific (`<asm/cfi.h>`, `<asm/cpu-*.h>`, `<asm/intrin-*.h>`, `<asm/registers.h>`, ...)
 

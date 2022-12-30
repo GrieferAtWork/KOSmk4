@@ -125,4 +125,8 @@
 #endif /* __ARCH_PAGESIZE != ... */
 #endif /* !__ARCH_PAGESHIFT && __ARCH_PAGESIZE */
 
+#if !defined(__EXEC_PAGESIZE) && defined(__ARCH_PAGESIZE)
+#define __EXEC_PAGESIZE __ARCH_PAGESIZE
+#endif /* !__EXEC_PAGESIZE && __ARCH_PAGESIZE */
+
 #endif /* !_ASM_PAGESIZE_H */

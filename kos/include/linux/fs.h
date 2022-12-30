@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Linux (/include/linux/fs.h) */
+/* (#) Portability: Linux (/usr/include/linux/fs.h) */
 #ifndef _LINUX_FS_H
 #define _LINUX_FS_H 1
 

@@ -18,8 +18,8 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 %(c_prefix){
-/* (#) Portability: GNU C Library (/mach/spinlock.h) */
-/* (#) Portability: GNU Hurd      (/usr/include/spinlock.h) */
+/* (#) Portability: GNU C Library (/mach/spin-lock.h) */
+/* (#) Portability: GNU Hurd      (/usr/include/spin-lock.h) */
 }
 
 %[default:section(".text.crt{|.dos}.compat.hurd.futex")]

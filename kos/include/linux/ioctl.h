@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Linux (/include/linux/ioctl.h) */
+/* (#) Portability: Linux (/usr/include/linux/ioctl.h) */
 #ifndef _LINUX_IOCTL_H
 #define _LINUX_IOCTL_H 1
 

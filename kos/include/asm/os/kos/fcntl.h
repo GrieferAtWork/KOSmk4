@@ -47,10 +47,11 @@
 #define __F_SETLKW64          14   /* [struct flock64 const *arg] Set record locking info (blocking). */
 #define __F_SETOWN_EX         15   /* [struct f_owner_ex const *arg] Set owner (thread receiving SIGIO). */
 #define __F_GETOWN_EX         16   /* [struct f_owner_ex *arg] Get owner (thread receiving SIGIO). */
+#define __F_GETOWNER_UIDS     17   /* TODO */
 #define __F_OFD_GETLK         36   /* [struct flock *arg] */
 #define __F_OFD_SETLK         37   /* [struct flock const *arg] */
 #define __F_OFD_SETLKW        38   /* [struct flock const *arg] */
-#define __F_LINUX_SPECIFIC_BASE 1024
+#define __F_LINUX_SPECIFIC_BASE 1024 /* Base ID for linux-specific fcntl codes */
 #define __F_SETLEASE          1024 /* [int arg = <One of `F_RDLCK', `F_WRLCK', `F_UNLCK'>] Set a lease. */
 #define __F_GETLEASE          1025 /* [void arg] Enquire what lease is active.
                                     * @return: * : One of `F_RDLCK', `F_WRLCK', `F_UNLCK' */

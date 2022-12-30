@@ -528,25 +528,27 @@ __SYSDECL_BEGIN
 #if (defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS))
 
 /* `sigev_notify' values. */
-#if (defined(__SIGEV_SIGNAL) || defined(__SIGEV_NONE) ||      \
-     defined(__SIGEV_THREAD) || defined(__SIGEV_THREAD_ID) || \
-     defined(__SIGEV_INLINE_THREAD))
+#if ((!defined(SIGEV_SIGNAL) && defined(__SIGEV_SIGNAL)) ||       \
+     (!defined(SIGEV_NONE) && defined(__SIGEV_NONE)) ||           \
+     (!defined(SIGEV_THREAD) && defined(__SIGEV_THREAD)) ||       \
+     (!defined(SIGEV_THREAD_ID) && defined(__SIGEV_THREAD_ID)) || \
+     (!defined(SIGEV_INLINE_THREAD) && defined(__SIGEV_INLINE_THREAD)))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-#ifdef __SIGEV_SIGNAL
+#if !defined(SIGEV_SIGNAL) && defined(__SIGEV_SIGNAL)
 	SIGEV_SIGNAL    = __SIGEV_SIGNAL, /* Notify via signal. */
-#endif /* __SIGEV_SIGNAL */
-#ifdef __SIGEV_NONE
+#endif /* !SIGEV_SIGNAL && __SIGEV_SIGNAL */
+#if !defined(SIGEV_NONE) && defined(__SIGEV_NONE)
 	SIGEV_NONE      = __SIGEV_NONE, /* Other notification: meaningless. */
-#endif /* __SIGEV_NONE */
-#ifdef __SIGEV_THREAD
+#endif /* !SIGEV_NONE && __SIGEV_NONE */
+#if !defined(SIGEV_THREAD) && defined(__SIGEV_THREAD)
 	SIGEV_THREAD    = __SIGEV_THREAD, /* Deliver via thread creation. */
-#endif /* __SIGEV_THREAD */
-#ifdef __SIGEV_THREAD_ID
+#endif /* !SIGEV_THREAD && __SIGEV_THREAD */
+#if !defined(SIGEV_THREAD_ID) && defined(__SIGEV_THREAD_ID)
 	SIGEV_THREAD_ID = __SIGEV_THREAD_ID, /* Send signal to specific thread. */
-#endif /* __SIGEV_THREAD_ID */
-#ifdef __SIGEV_INLINE_THREAD
+#endif /* !SIGEV_THREAD_ID && __SIGEV_THREAD_ID */
+#if !defined(SIGEV_INLINE_THREAD) && defined(__SIGEV_INLINE_THREAD)
 	SIGEV_INLINE_THREAD = __SIGEV_INLINE_THREAD, /* KOS-only: Same as `SIGEV_THREAD', but try not to actually spawn a thread, though
 	                                              * this event kind  is allowed to  be implemented as  an alias for  `SIGEV_THREAD'.
 	                                              * Semantically, the following rules have to be followed by  `SIGEV_INLINE_THREAD':
@@ -561,24 +563,24 @@ enum {
 	                                              * Generally speaking,  you should  act like  your callback  is invoked  as though  it
 	                                              * were a signal handler (note that it may actually be invoked from a signal handler),
 	                                              * meaning that you should only call NOBLOCK and re-entrance-safe functions. */
-#endif /* __SIGEV_INLINE_THREAD */
+#endif /* !SIGEV_INLINE_THREAD && __SIGEV_INLINE_THREAD */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __SIGEV_SIGNAL
+#if !defined(SIGEV_SIGNAL) && defined(__SIGEV_SIGNAL)
 #define SIGEV_SIGNAL        SIGEV_SIGNAL        /* Notify via signal. */
-#endif /* __SIGEV_SIGNAL */
-#ifdef __SIGEV_NONE
+#endif /* !SIGEV_SIGNAL && __SIGEV_SIGNAL */
+#if !defined(SIGEV_NONE) && defined(__SIGEV_NONE)
 #define SIGEV_NONE          SIGEV_NONE          /* Other notification: meaningless. */
-#endif /* __SIGEV_NONE */
-#ifdef __SIGEV_THREAD
+#endif /* !SIGEV_NONE && __SIGEV_NONE */
+#if !defined(SIGEV_THREAD) && defined(__SIGEV_THREAD)
 #define SIGEV_THREAD        SIGEV_THREAD        /* Deliver via thread creation. */
-#endif /* __SIGEV_THREAD */
-#ifdef __SIGEV_THREAD_ID
+#endif /* !SIGEV_THREAD && __SIGEV_THREAD */
+#if !defined(SIGEV_THREAD_ID) && defined(__SIGEV_THREAD_ID)
 #define SIGEV_THREAD_ID     SIGEV_THREAD_ID     /* Send signal to specific thread. */
-#endif /* __SIGEV_THREAD_ID */
-#ifdef __SIGEV_INLINE_THREAD
+#endif /* !SIGEV_THREAD_ID && __SIGEV_THREAD_ID */
+#if !defined(SIGEV_INLINE_THREAD) && defined(__SIGEV_INLINE_THREAD)
 #define SIGEV_INLINE_THREAD SIGEV_INLINE_THREAD /* KOS-only: Same as `SIGEV_THREAD', but try not to actually spawn a thread, though
                                                  * this event kind  is allowed to  be implemented as  an alias for  `SIGEV_THREAD'.
                                                  * Semantically, the following rules have to be followed by  `SIGEV_INLINE_THREAD':
@@ -593,21 +595,21 @@ enum {
                                                  * Generally speaking,  you should  act like  your callback  is invoked  as though  it
                                                  * were a signal handler (note that it may actually be invoked from a signal handler),
                                                  * meaning that you should only call NOBLOCK and re-entrance-safe functions. */
-#endif /* __SIGEV_INLINE_THREAD */
+#endif /* !SIGEV_INLINE_THREAD && __SIGEV_INLINE_THREAD */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __SIGEV_SIGNAL
+#if !defined(SIGEV_SIGNAL) && defined(__SIGEV_SIGNAL)
 #define SIGEV_SIGNAL        __SIGEV_SIGNAL        /* Notify via signal. */
-#endif /* __SIGEV_SIGNAL */
-#ifdef __SIGEV_NONE
+#endif /* !SIGEV_SIGNAL && __SIGEV_SIGNAL */
+#if !defined(SIGEV_NONE) && defined(__SIGEV_NONE)
 #define SIGEV_NONE          __SIGEV_NONE          /* Other notification: meaningless. */
-#endif /* __SIGEV_NONE */
-#ifdef __SIGEV_THREAD
+#endif /* !SIGEV_NONE && __SIGEV_NONE */
+#if !defined(SIGEV_THREAD) && defined(__SIGEV_THREAD)
 #define SIGEV_THREAD        __SIGEV_THREAD        /* Deliver via thread creation. */
-#endif /* __SIGEV_THREAD */
-#ifdef __SIGEV_THREAD_ID
+#endif /* !SIGEV_THREAD && __SIGEV_THREAD */
+#if !defined(SIGEV_THREAD_ID) && defined(__SIGEV_THREAD_ID)
 #define SIGEV_THREAD_ID     __SIGEV_THREAD_ID     /* Send signal to specific thread. */
-#endif /* __SIGEV_THREAD_ID */
-#ifdef __SIGEV_INLINE_THREAD
+#endif /* !SIGEV_THREAD_ID && __SIGEV_THREAD_ID */
+#if !defined(SIGEV_INLINE_THREAD) && defined(__SIGEV_INLINE_THREAD)
 #define SIGEV_INLINE_THREAD __SIGEV_INLINE_THREAD /* KOS-only: Same as `SIGEV_THREAD', but try not to actually spawn a thread, though
                                                    * this event kind  is allowed to  be implemented as  an alias for  `SIGEV_THREAD'.
                                                    * Semantically, the following rules have to be followed by  `SIGEV_INLINE_THREAD':
@@ -622,105 +624,111 @@ enum {
                                                    * Generally speaking,  you should  act like  your callback  is invoked  as though  it
                                                    * were a signal handler (note that it may actually be invoked from a signal handler),
                                                    * meaning that you should only call NOBLOCK and re-entrance-safe functions. */
-#endif /* __SIGEV_INLINE_THREAD */
+#endif /* !SIGEV_INLINE_THREAD && __SIGEV_INLINE_THREAD */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* __SIGEV_SIGNAL || __SIGEV_NONE || __SIGEV_THREAD || __SIGEV_THREAD_ID */
 
 
 /* Values for `si_code'. Positive values are reserved for kernel-generated signals. */
-#if (defined(__SI_ASYNCNL) || defined(__SI_TKILL) || defined(__SI_SIGIO) || \
-     defined(__SI_ASYNCIO) || defined(__SI_MESGQ) || defined(__SI_TIMER) || \
-     defined(__SI_QUEUE) || defined(__SI_USER) || defined(__SI_KERNEL))
+#if ((!defined(SI_ASYNCNL) && defined(__SI_ASYNCNL)) || \
+     (!defined(SI_TKILL) && defined(__SI_TKILL)) ||     \
+     (!defined(SI_SIGIO) && defined(__SI_SIGIO)) ||     \
+     (!defined(SI_ASYNCIO) && defined(__SI_ASYNCIO)) || \
+     (!defined(SI_MESGQ) && defined(__SI_MESGQ)) ||     \
+     (!defined(SI_TIMER) && defined(__SI_TIMER)) ||     \
+     (!defined(SI_QUEUE) && defined(__SI_QUEUE)) ||     \
+     (!defined(SI_USER) && defined(__SI_USER)) ||       \
+     (!defined(SI_KERNEL) && defined(__SI_KERNEL)))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-#ifdef __SI_ASYNCNL
+#if !defined(SI_ASYNCNL) && defined(__SI_ASYNCNL)
 	SI_ASYNCNL = __SI_ASYNCNL, /* Sent by asynch name lookup completion. */
-#endif /* __SI_ASYNCNL */
-#ifdef __SI_TKILL
+#endif /* !SI_ASYNCNL && __SI_ASYNCNL */
+#if !defined(SI_TKILL) && defined(__SI_TKILL)
 	SI_TKILL = __SI_TKILL,     /* Sent by tkill. */
-#endif /* __SI_TKILL */
-#ifdef __SI_SIGIO
+#endif /* !SI_TKILL && __SI_TKILL */
+#if !defined(SI_SIGIO) && defined(__SI_SIGIO)
 	SI_SIGIO = __SI_SIGIO,     /* Sent by queued SIGIO. */
-#endif /* __SI_SIGIO */
-#ifdef __SI_ASYNCIO
+#endif /* !SI_SIGIO && __SI_SIGIO */
+#if !defined(SI_ASYNCIO) && defined(__SI_ASYNCIO)
 	SI_ASYNCIO = __SI_ASYNCIO, /* Sent by AIO completion. */
-#endif /* __SI_ASYNCIO */
-#ifdef __SI_MESGQ
+#endif /* !SI_ASYNCIO && __SI_ASYNCIO */
+#if !defined(SI_MESGQ) && defined(__SI_MESGQ)
 	SI_MESGQ = __SI_MESGQ,     /* Sent by real time mesq state change. */
-#endif /* __SI_MESGQ */
-#ifdef __SI_TIMER
+#endif /* !SI_MESGQ && __SI_MESGQ */
+#if !defined(SI_TIMER) && defined(__SI_TIMER)
 	SI_TIMER = __SI_TIMER,     /* Sent by timer expiration. */
-#endif /* __SI_TIMER */
-#ifdef __SI_QUEUE
+#endif /* !SI_TIMER && __SI_TIMER */
+#if !defined(SI_QUEUE) && defined(__SI_QUEUE)
 	SI_QUEUE = __SI_QUEUE,     /* Sent by sigqueue. */
-#endif /* __SI_QUEUE */
-#ifdef __SI_USER
+#endif /* !SI_QUEUE && __SI_QUEUE */
+#if !defined(SI_USER) && defined(__SI_USER)
 	SI_USER = __SI_USER,       /* Sent by kill, sigsend. */
-#endif /* __SI_USER */
-#ifdef __SI_KERNEL
+#endif /* !SI_USER && __SI_USER */
+#if !defined(SI_KERNEL) && defined(__SI_KERNEL)
 	SI_KERNEL = __SI_KERNEL,   /* Send by kernel. */
-#endif /* __SI_KERNEL */
+#endif /* !SI_KERNEL && __SI_KERNEL */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __SI_ASYNCNL
+#if !defined(SI_ASYNCNL) && defined(__SI_ASYNCNL)
 #define SI_ASYNCNL SI_ASYNCNL /* Sent by asynch name lookup completion. */
-#endif /* __SI_ASYNCNL */
-#ifdef __SI_TKILL
+#endif /* !SI_ASYNCNL && __SI_ASYNCNL */
+#if !defined(SI_TKILL) && defined(__SI_TKILL)
 #define SI_TKILL   SI_TKILL   /* Sent by tkill. */
-#endif /* __SI_TKILL */
-#ifdef __SI_SIGIO
+#endif /* !SI_TKILL && __SI_TKILL */
+#if !defined(SI_SIGIO) && defined(__SI_SIGIO)
 #define SI_SIGIO   SI_SIGIO   /* Sent by queued SIGIO. */
-#endif /* __SI_SIGIO */
-#ifdef __SI_ASYNCIO
+#endif /* !SI_SIGIO && __SI_SIGIO */
+#if !defined(SI_ASYNCIO) && defined(__SI_ASYNCIO)
 #define SI_ASYNCIO SI_ASYNCIO /* Sent by AIO completion. */
-#endif /* __SI_ASYNCIO */
-#ifdef __SI_MESGQ
+#endif /* !SI_ASYNCIO && __SI_ASYNCIO */
+#if !defined(SI_MESGQ) && defined(__SI_MESGQ)
 #define SI_MESGQ   SI_MESGQ   /* Sent by real time mesq state change. */
-#endif /* __SI_MESGQ */
-#ifdef __SI_TIMER
+#endif /* !SI_MESGQ && __SI_MESGQ */
+#if !defined(SI_TIMER) && defined(__SI_TIMER)
 #define SI_TIMER   SI_TIMER   /* Sent by timer expiration. */
-#endif /* __SI_TIMER */
-#ifdef __SI_QUEUE
+#endif /* !SI_TIMER && __SI_TIMER */
+#if !defined(SI_QUEUE) && defined(__SI_QUEUE)
 #define SI_QUEUE   SI_QUEUE   /* Sent by sigqueue. */
-#endif /* __SI_QUEUE */
-#ifdef __SI_USER
+#endif /* !SI_QUEUE && __SI_QUEUE */
+#if !defined(SI_USER) && defined(__SI_USER)
 #define SI_USER    SI_USER    /* Sent by kill, sigsend. */
-#endif /* __SI_USER */
-#ifdef __SI_KERNEL
+#endif /* !SI_USER && __SI_USER */
+#if !defined(SI_KERNEL) && defined(__SI_KERNEL)
 #define SI_KERNEL  SI_KERNEL  /* Send by kernel. */
-#endif /* __SI_KERNEL */
+#endif /* !SI_KERNEL && __SI_KERNEL */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __SI_ASYNCNL
+#if !defined(SI_ASYNCNL) && defined(__SI_ASYNCNL)
 #define SI_ASYNCNL __SI_ASYNCNL /* Sent by asynch name lookup completion. */
-#endif /* __SI_ASYNCNL */
-#ifdef __SI_TKILL
+#endif /* !SI_ASYNCNL && __SI_ASYNCNL */
+#if !defined(SI_TKILL) && defined(__SI_TKILL)
 #define SI_TKILL   __SI_TKILL   /* Sent by tkill. */
-#endif /* __SI_TKILL */
-#ifdef __SI_SIGIO
+#endif /* !SI_TKILL && __SI_TKILL */
+#if !defined(SI_SIGIO) && defined(__SI_SIGIO)
 #define SI_SIGIO   __SI_SIGIO   /* Sent by queued SIGIO. */
-#endif /* __SI_SIGIO */
-#ifdef __SI_ASYNCIO
+#endif /* !SI_SIGIO && __SI_SIGIO */
+#if !defined(SI_ASYNCIO) && defined(__SI_ASYNCIO)
 #define SI_ASYNCIO __SI_ASYNCIO /* Sent by AIO completion. */
-#endif /* __SI_ASYNCIO */
-#ifdef __SI_MESGQ
+#endif /* !SI_ASYNCIO && __SI_ASYNCIO */
+#if !defined(SI_MESGQ) && defined(__SI_MESGQ)
 #define SI_MESGQ   __SI_MESGQ   /* Sent by real time mesq state change. */
-#endif /* __SI_MESGQ */
-#ifdef __SI_TIMER
+#endif /* !SI_MESGQ && __SI_MESGQ */
+#if !defined(SI_TIMER) && defined(__SI_TIMER)
 #define SI_TIMER   __SI_TIMER   /* Sent by timer expiration. */
-#endif /* __SI_TIMER */
-#ifdef __SI_QUEUE
+#endif /* !SI_TIMER && __SI_TIMER */
+#if !defined(SI_QUEUE) && defined(__SI_QUEUE)
 #define SI_QUEUE   __SI_QUEUE   /* Sent by sigqueue. */
-#endif /* __SI_QUEUE */
-#ifdef __SI_USER
+#endif /* !SI_QUEUE && __SI_QUEUE */
+#if !defined(SI_USER) && defined(__SI_USER)
 #define SI_USER    __SI_USER    /* Sent by kill, sigsend. */
-#endif /* __SI_USER */
-#ifdef __SI_KERNEL
+#endif /* !SI_USER && __SI_USER */
+#if !defined(SI_KERNEL) && defined(__SI_KERNEL)
 #define SI_KERNEL  __SI_KERNEL  /* Send by kernel. */
-#endif /* __SI_KERNEL */
+#endif /* !SI_KERNEL && __SI_KERNEL */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* __SI_... */
@@ -730,89 +738,94 @@ enum {
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 
 /* `si_code' values for SIGILL signal. */
-#if (defined(__ILL_ILLOPC) || defined(__ILL_ILLOPN) || defined(__ILL_ILLADR) || \
-     defined(__ILL_ILLTRP) || defined(__ILL_PRVOPC) || defined(__ILL_PRVREG) || \
-     defined(__ILL_COPROC) || defined(__ILL_BADSTK))
+#if ((!defined(ILL_ILLOPC) && defined(__ILL_ILLOPC)) || \
+     (!defined(ILL_ILLOPN) && defined(__ILL_ILLOPN)) || \
+     (!defined(ILL_ILLADR) && defined(__ILL_ILLADR)) || \
+     (!defined(ILL_ILLTRP) && defined(__ILL_ILLTRP)) || \
+     (!defined(ILL_PRVOPC) && defined(__ILL_PRVOPC)) || \
+     (!defined(ILL_PRVREG) && defined(__ILL_PRVREG)) || \
+     (!defined(ILL_COPROC) && defined(__ILL_COPROC)) || \
+     (!defined(ILL_BADSTK) && defined(__ILL_BADSTK)))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-#ifdef __ILL_ILLOPC
+#if !defined(ILL_ILLOPC) && defined(__ILL_ILLOPC)
 	ILL_ILLOPC = __ILL_ILLOPC, /* Illegal opcode. */
-#endif /* __ILL_ILLOPC */
-#ifdef __ILL_ILLOPN
+#endif /* !ILL_ILLOPC && __ILL_ILLOPC */
+#if !defined(ILL_ILLOPN) && defined(__ILL_ILLOPN)
 	ILL_ILLOPN = __ILL_ILLOPN, /* Illegal operand. */
-#endif /* __ILL_ILLOPN */
-#ifdef __ILL_ILLADR
+#endif /* !ILL_ILLOPN && __ILL_ILLOPN */
+#if !defined(ILL_ILLADR) && defined(__ILL_ILLADR)
 	ILL_ILLADR = __ILL_ILLADR, /* Illegal addressing mode. */
-#endif /* __ILL_ILLADR */
-#ifdef __ILL_ILLTRP
+#endif /* !ILL_ILLADR && __ILL_ILLADR */
+#if !defined(ILL_ILLTRP) && defined(__ILL_ILLTRP)
 	ILL_ILLTRP = __ILL_ILLTRP, /* Illegal trap. */
-#endif /* __ILL_ILLTRP */
-#ifdef __ILL_PRVOPC
+#endif /* !ILL_ILLTRP && __ILL_ILLTRP */
+#if !defined(ILL_PRVOPC) && defined(__ILL_PRVOPC)
 	ILL_PRVOPC = __ILL_PRVOPC, /* Privileged opcode. */
-#endif /* __ILL_PRVOPC */
-#ifdef __ILL_PRVREG
+#endif /* !ILL_PRVOPC && __ILL_PRVOPC */
+#if !defined(ILL_PRVREG) && defined(__ILL_PRVREG)
 	ILL_PRVREG = __ILL_PRVREG, /* Privileged register. */
-#endif /* __ILL_PRVREG */
-#ifdef __ILL_COPROC
+#endif /* !ILL_PRVREG && __ILL_PRVREG */
+#if !defined(ILL_COPROC) && defined(__ILL_COPROC)
 	ILL_COPROC = __ILL_COPROC, /* Coprocessor error. */
-#endif /* __ILL_COPROC */
-#ifdef __ILL_BADSTK
+#endif /* !ILL_COPROC && __ILL_COPROC */
+#if !defined(ILL_BADSTK) && defined(__ILL_BADSTK)
 	ILL_BADSTK = __ILL_BADSTK  /* Internal stack error. */
-#endif /* __ILL_BADSTK */
+#endif /* !ILL_BADSTK && __ILL_BADSTK */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __ILL_ILLOPC
+#if !defined(ILL_ILLOPC) && defined(__ILL_ILLOPC)
 #define ILL_ILLOPC ILL_ILLOPC /* Illegal opcode. */
-#endif /* __ILL_ILLOPC */
-#ifdef __ILL_ILLOPN
+#endif /* !ILL_ILLOPC && __ILL_ILLOPC */
+#if !defined(ILL_ILLOPN) && defined(__ILL_ILLOPN)
 #define ILL_ILLOPN ILL_ILLOPN /* Illegal operand. */
-#endif /* __ILL_ILLOPN */
-#ifdef __ILL_ILLADR
+#endif /* !ILL_ILLOPN && __ILL_ILLOPN */
+#if !defined(ILL_ILLADR) && defined(__ILL_ILLADR)
 #define ILL_ILLADR ILL_ILLADR /* Illegal addressing mode. */
-#endif /* __ILL_ILLADR */
-#ifdef __ILL_ILLTRP
+#endif /* !ILL_ILLADR && __ILL_ILLADR */
+#if !defined(ILL_ILLTRP) && defined(__ILL_ILLTRP)
 #define ILL_ILLTRP ILL_ILLTRP /* Illegal trap. */
-#endif /* __ILL_ILLTRP */
-#ifdef __ILL_PRVOPC
+#endif /* !ILL_ILLTRP && __ILL_ILLTRP */
+#if !defined(ILL_PRVOPC) && defined(__ILL_PRVOPC)
 #define ILL_PRVOPC ILL_PRVOPC /* Privileged opcode. */
-#endif /* __ILL_PRVOPC */
-#ifdef __ILL_PRVREG
+#endif /* !ILL_PRVOPC && __ILL_PRVOPC */
+#if !defined(ILL_PRVREG) && defined(__ILL_PRVREG)
 #define ILL_PRVREG ILL_PRVREG /* Privileged register. */
-#endif /* __ILL_PRVREG */
-#ifdef __ILL_COPROC
+#endif /* !ILL_PRVREG && __ILL_PRVREG */
+#if !defined(ILL_COPROC) && defined(__ILL_COPROC)
 #define ILL_COPROC ILL_COPROC /* Coprocessor error. */
-#endif /* __ILL_COPROC */
-#ifdef __ILL_BADSTK
+#endif /* !ILL_COPROC && __ILL_COPROC */
+#if !defined(ILL_BADSTK) && defined(__ILL_BADSTK)
 #define ILL_BADSTK ILL_BADSTK /* Internal stack error. */
-#endif /* __ILL_BADSTK */
+#endif /* !ILL_BADSTK && __ILL_BADSTK */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __ILL_ILLOPC
+#if !defined(ILL_ILLOPC) && defined(__ILL_ILLOPC)
 #define ILL_ILLOPC __ILL_ILLOPC /* Illegal opcode. */
-#endif /* __ILL_ILLOPC */
-#ifdef __ILL_ILLOPN
+#endif /* !ILL_ILLOPC && __ILL_ILLOPC */
+#if !defined(ILL_ILLOPN) && defined(__ILL_ILLOPN)
 #define ILL_ILLOPN __ILL_ILLOPN /* Illegal operand. */
-#endif /* __ILL_ILLOPN */
-#ifdef __ILL_ILLADR
+#endif /* !ILL_ILLOPN && __ILL_ILLOPN */
+#if !defined(ILL_ILLADR) && defined(__ILL_ILLADR)
 #define ILL_ILLADR __ILL_ILLADR /* Illegal addressing mode. */
-#endif /* __ILL_ILLADR */
-#ifdef __ILL_ILLTRP
+#endif /* !ILL_ILLADR && __ILL_ILLADR */
+#if !defined(ILL_ILLTRP) && defined(__ILL_ILLTRP)
 #define ILL_ILLTRP __ILL_ILLTRP /* Illegal trap. */
-#endif /* __ILL_ILLTRP */
-#ifdef __ILL_PRVOPC
+#endif /* !ILL_ILLTRP && __ILL_ILLTRP */
+#if !defined(ILL_PRVOPC) && defined(__ILL_PRVOPC)
 #define ILL_PRVOPC __ILL_PRVOPC /* Privileged opcode. */
-#endif /* __ILL_PRVOPC */
-#ifdef __ILL_PRVREG
+#endif /* !ILL_PRVOPC && __ILL_PRVOPC */
+#if !defined(ILL_PRVREG) && defined(__ILL_PRVREG)
 #define ILL_PRVREG __ILL_PRVREG /* Privileged register. */
-#endif /* __ILL_PRVREG */
-#ifdef __ILL_COPROC
+#endif /* !ILL_PRVREG && __ILL_PRVREG */
+#if !defined(ILL_COPROC) && defined(__ILL_COPROC)
 #define ILL_COPROC __ILL_COPROC /* Coprocessor error. */
-#endif /* __ILL_COPROC */
-#ifdef __ILL_BADSTK
+#endif /* !ILL_COPROC && __ILL_COPROC */
+#if !defined(ILL_BADSTK) && defined(__ILL_BADSTK)
 #define ILL_BADSTK __ILL_BADSTK /* Internal stack error. */
-#endif /* __ILL_BADSTK */
+#endif /* !ILL_BADSTK && __ILL_BADSTK */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* __ILL_... */
@@ -820,89 +833,94 @@ enum {
 
 
 /* `si_code' values for SIGFPE signal. */
-#if (defined(__FPE_INTDIV) || defined(__FPE_INTOVF) || defined(__FPE_FLTDIV) || \
-     defined(__FPE_FLTOVF) || defined(__FPE_FLTUND) || defined(__FPE_FLTRES) || \
-     defined(__FPE_FLTINV) || defined(__FPE_FLTSUB))
+#if ((!defined(FPE_INTDIV) && defined(__FPE_INTDIV)) || \
+     (!defined(FPE_INTOVF) && defined(__FPE_INTOVF)) || \
+     (!defined(FPE_FLTDIV) && defined(__FPE_FLTDIV)) || \
+     (!defined(FPE_FLTOVF) && defined(__FPE_FLTOVF)) || \
+     (!defined(FPE_FLTUND) && defined(__FPE_FLTUND)) || \
+     (!defined(FPE_FLTRES) && defined(__FPE_FLTRES)) || \
+     (!defined(FPE_FLTINV) && defined(__FPE_FLTINV)) || \
+     (!defined(FPE_FLTSUB) && defined(__FPE_FLTSUB)))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-#ifdef __FPE_INTDIV
+#if !defined(FPE_INTDIV) && defined(__FPE_INTDIV)
 	FPE_INTDIV = __FPE_INTDIV, /* Integer divide by zero. */
-#endif /* __FPE_INTDIV */
-#ifdef __FPE_INTOVF
+#endif /* !FPE_INTDIV && __FPE_INTDIV */
+#if !defined(FPE_INTOVF) && defined(__FPE_INTOVF)
 	FPE_INTOVF = __FPE_INTOVF, /* Integer overflow. */
-#endif /* __FPE_INTOVF */
-#ifdef __FPE_FLTDIV
+#endif /* !FPE_INTOVF && __FPE_INTOVF */
+#if !defined(FPE_FLTDIV) && defined(__FPE_FLTDIV)
 	FPE_FLTDIV = __FPE_FLTDIV, /* Floating point divide by zero. */
-#endif /* __FPE_FLTDIV */
-#ifdef __FPE_FLTOVF
+#endif /* !FPE_FLTDIV && __FPE_FLTDIV */
+#if !defined(FPE_FLTOVF) && defined(__FPE_FLTOVF)
 	FPE_FLTOVF = __FPE_FLTOVF, /* Floating point overflow. */
-#endif /* __FPE_FLTOVF */
-#ifdef __FPE_FLTUND
+#endif /* !FPE_FLTOVF && __FPE_FLTOVF */
+#if !defined(FPE_FLTUND) && defined(__FPE_FLTUND)
 	FPE_FLTUND = __FPE_FLTUND, /* Floating point underflow. */
-#endif /* __FPE_FLTUND */
-#ifdef __FPE_FLTRES
+#endif /* !FPE_FLTUND && __FPE_FLTUND */
+#if !defined(FPE_FLTRES) && defined(__FPE_FLTRES)
 	FPE_FLTRES = __FPE_FLTRES, /* Floating point inexact result. */
-#endif /* __FPE_FLTRES */
-#ifdef __FPE_FLTINV
+#endif /* !FPE_FLTRES && __FPE_FLTRES */
+#if !defined(FPE_FLTINV) && defined(__FPE_FLTINV)
 	FPE_FLTINV = __FPE_FLTINV, /* Floating point invalid operation. */
-#endif /* __FPE_FLTINV */
-#ifdef __FPE_FLTSUB
+#endif /* !FPE_FLTINV && __FPE_FLTINV */
+#if !defined(FPE_FLTSUB) && defined(__FPE_FLTSUB)
 	FPE_FLTSUB = __FPE_FLTSUB  /* Subscript out of range. */
-#endif /* __FPE_FLTSUB */
+#endif /* !FPE_FLTSUB && __FPE_FLTSUB */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __FPE_INTDIV
+#if !defined(FPE_INTDIV) && defined(__FPE_INTDIV)
 #define FPE_INTDIV FPE_INTDIV /* Integer divide by zero. */
-#endif /* __FPE_INTDIV */
-#ifdef __FPE_INTOVF
+#endif /* !FPE_INTDIV && __FPE_INTDIV */
+#if !defined(FPE_INTOVF) && defined(__FPE_INTOVF)
 #define FPE_INTOVF FPE_INTOVF /* Integer overflow. */
-#endif /* __FPE_INTOVF */
-#ifdef __FPE_FLTDIV
+#endif /* !FPE_INTOVF && __FPE_INTOVF */
+#if !defined(FPE_FLTDIV) && defined(__FPE_FLTDIV)
 #define FPE_FLTDIV FPE_FLTDIV /* Floating point divide by zero. */
-#endif /* __FPE_FLTDIV */
-#ifdef __FPE_FLTOVF
+#endif /* !FPE_FLTDIV && __FPE_FLTDIV */
+#if !defined(FPE_FLTOVF) && defined(__FPE_FLTOVF)
 #define FPE_FLTOVF FPE_FLTOVF /* Floating point overflow. */
-#endif /* __FPE_FLTOVF */
-#ifdef __FPE_FLTUND
+#endif /* !FPE_FLTOVF && __FPE_FLTOVF */
+#if !defined(FPE_FLTUND) && defined(__FPE_FLTUND)
 #define FPE_FLTUND FPE_FLTUND /* Floating point underflow. */
-#endif /* __FPE_FLTUND */
-#ifdef __FPE_FLTRES
+#endif /* !FPE_FLTUND && __FPE_FLTUND */
+#if !defined(FPE_FLTRES) && defined(__FPE_FLTRES)
 #define FPE_FLTRES FPE_FLTRES /* Floating point inexact result. */
-#endif /* __FPE_FLTRES */
-#ifdef __FPE_FLTINV
+#endif /* !FPE_FLTRES && __FPE_FLTRES */
+#if !defined(FPE_FLTINV) && defined(__FPE_FLTINV)
 #define FPE_FLTINV FPE_FLTINV /* Floating point invalid operation. */
-#endif /* __FPE_FLTINV */
-#ifdef __FPE_FLTSUB
+#endif /* !FPE_FLTINV && __FPE_FLTINV */
+#if !defined(FPE_FLTSUB) && defined(__FPE_FLTSUB)
 #define FPE_FLTSUB FPE_FLTSUB /* Subscript out of range. */
-#endif /* __FPE_FLTSUB */
+#endif /* !FPE_FLTSUB && __FPE_FLTSUB */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __FPE_INTDIV
+#if !defined(FPE_INTDIV) && defined(__FPE_INTDIV)
 #define FPE_INTDIV __FPE_INTDIV /* Integer divide by zero. */
-#endif /* __FPE_INTDIV */
-#ifdef __FPE_INTOVF
+#endif /* !FPE_INTDIV && __FPE_INTDIV */
+#if !defined(FPE_INTOVF) && defined(__FPE_INTOVF)
 #define FPE_INTOVF __FPE_INTOVF /* Integer overflow. */
-#endif /* __FPE_INTOVF */
-#ifdef __FPE_FLTDIV
+#endif /* !FPE_INTOVF && __FPE_INTOVF */
+#if !defined(FPE_FLTDIV) && defined(__FPE_FLTDIV)
 #define FPE_FLTDIV __FPE_FLTDIV /* Floating point divide by zero. */
-#endif /* __FPE_FLTDIV */
-#ifdef __FPE_FLTOVF
+#endif /* !FPE_FLTDIV && __FPE_FLTDIV */
+#if !defined(FPE_FLTOVF) && defined(__FPE_FLTOVF)
 #define FPE_FLTOVF __FPE_FLTOVF /* Floating point overflow. */
-#endif /* __FPE_FLTOVF */
-#ifdef __FPE_FLTUND
+#endif /* !FPE_FLTOVF && __FPE_FLTOVF */
+#if !defined(FPE_FLTUND) && defined(__FPE_FLTUND)
 #define FPE_FLTUND __FPE_FLTUND /* Floating point underflow. */
-#endif /* __FPE_FLTUND */
-#ifdef __FPE_FLTRES
+#endif /* !FPE_FLTUND && __FPE_FLTUND */
+#if !defined(FPE_FLTRES) && defined(__FPE_FLTRES)
 #define FPE_FLTRES __FPE_FLTRES /* Floating point inexact result. */
-#endif /* __FPE_FLTRES */
-#ifdef __FPE_FLTINV
+#endif /* !FPE_FLTRES && __FPE_FLTRES */
+#if !defined(FPE_FLTINV) && defined(__FPE_FLTINV)
 #define FPE_FLTINV __FPE_FLTINV /* Floating point invalid operation. */
-#endif /* __FPE_FLTINV */
-#ifdef __FPE_FLTSUB
+#endif /* !FPE_FLTINV && __FPE_FLTINV */
+#if !defined(FPE_FLTSUB) && defined(__FPE_FLTSUB)
 #define FPE_FLTSUB __FPE_FLTSUB /* Subscript out of range. */
-#endif /* __FPE_FLTSUB */
+#endif /* !FPE_FLTSUB && __FPE_FLTSUB */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* __FPE_... */
@@ -910,33 +928,34 @@ enum {
 
 
 /* `si_code' values for SIGSEGV signal. */
-#if defined(__SEGV_MAPERR) || defined(__SEGV_ACCERR)
+#if ((!defined(SEGV_MAPERR) && defined(__SEGV_MAPERR)) || \
+     (!defined(SEGV_ACCERR) && defined(__SEGV_ACCERR)))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-#ifdef __SEGV_MAPERR
+#if !defined(SEGV_MAPERR) && defined(__SEGV_MAPERR)
 	SEGV_MAPERR = __SEGV_MAPERR, /* Address not mapped to object. */
-#endif /* __SEGV_MAPERR */
-#ifdef __SEGV_ACCERR
+#endif /* !SEGV_MAPERR && __SEGV_MAPERR */
+#if !defined(SEGV_ACCERR) && defined(__SEGV_ACCERR)
 	SEGV_ACCERR = __SEGV_ACCERR  /* Invalid permissions for mapped object. */
-#endif /* __SEGV_ACCERR */
+#endif /* !SEGV_ACCERR && __SEGV_ACCERR */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __SEGV_MAPERR
+#if !defined(SEGV_MAPERR) && defined(__SEGV_MAPERR)
 #define SEGV_MAPERR SEGV_MAPERR /* Address not mapped to object. */
-#endif /* __SEGV_MAPERR */
-#ifdef __SEGV_ACCERR
+#endif /* !SEGV_MAPERR && __SEGV_MAPERR */
+#if !defined(SEGV_ACCERR) && defined(__SEGV_ACCERR)
 #define SEGV_ACCERR SEGV_ACCERR /* Invalid permissions for mapped object. */
-#endif /* __SEGV_ACCERR */
+#endif /* !SEGV_ACCERR && __SEGV_ACCERR */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __SEGV_MAPERR
+#if !defined(SEGV_MAPERR) && defined(__SEGV_MAPERR)
 #define SEGV_MAPERR __SEGV_MAPERR /* Address not mapped to object. */
-#endif /* __SEGV_MAPERR */
-#ifdef __SEGV_ACCERR
+#endif /* !SEGV_MAPERR && __SEGV_MAPERR */
+#if !defined(SEGV_ACCERR) && defined(__SEGV_ACCERR)
 #define SEGV_ACCERR __SEGV_ACCERR /* Invalid permissions for mapped object. */
-#endif /* __SEGV_ACCERR */
+#endif /* !SEGV_ACCERR && __SEGV_ACCERR */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* __SEGV_... */
@@ -944,62 +963,64 @@ enum {
 
 
 /* `si_code' values for SIGBUS signal. */
-#if (defined(__BUS_ADRALN) || defined(__BUS_ADRERR) ||    \
-     defined(__BUS_OBJERR) || defined(__BUS_MCEERR_AR) || \
-     defined(__BUS_MCEERR_AO))
+#if ((!defined(BUS_ADRALN) && defined(__BUS_ADRALN)) ||       \
+     (!defined(BUS_ADRERR) && defined(__BUS_ADRERR)) ||       \
+     (!defined(BUS_OBJERR) && defined(__BUS_OBJERR)) ||       \
+     (!defined(BUS_MCEERR_AR) && defined(__BUS_MCEERR_AR)) || \
+     (!defined(BUS_MCEERR_AO) && defined(__BUS_MCEERR_AO)))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-#ifdef __BUS_ADRALN
+#if !defined(BUS_ADRALN) && defined(__BUS_ADRALN)
 	BUS_ADRALN    = __BUS_ADRALN,    /* Invalid address alignment. */
-#endif /* __BUS_ADRALN */
-#ifdef __BUS_ADRERR
+#endif /* !BUS_ADRALN && __BUS_ADRALN */
+#if !defined(BUS_ADRERR) && defined(__BUS_ADRERR)
 	BUS_ADRERR    = __BUS_ADRERR,    /* Non-existent physical address. */
-#endif /* __BUS_ADRERR */
-#ifdef __BUS_OBJERR
+#endif /* !BUS_ADRERR && __BUS_ADRERR */
+#if !defined(BUS_OBJERR) && defined(__BUS_OBJERR)
 	BUS_OBJERR    = __BUS_OBJERR,    /* Object specific hardware error. */
-#endif /* __BUS_OBJERR */
-#ifdef __BUS_MCEERR_AR
+#endif /* !BUS_OBJERR && __BUS_OBJERR */
+#if !defined(BUS_MCEERR_AR) && defined(__BUS_MCEERR_AR)
 	BUS_MCEERR_AR = __BUS_MCEERR_AR, /* Hardware memory error: action required. */
-#endif /* __BUS_MCEERR_AR */
-#ifdef __BUS_MCEERR_AO
+#endif /* !BUS_MCEERR_AR && __BUS_MCEERR_AR */
+#if !defined(BUS_MCEERR_AO) && defined(__BUS_MCEERR_AO)
 	BUS_MCEERR_AO = __BUS_MCEERR_AO  /* Hardware memory error: action optional. */
-#endif /* __BUS_MCEERR_AO */
+#endif /* !BUS_MCEERR_AO && __BUS_MCEERR_AO */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __BUS_ADRALN
+#if !defined(BUS_ADRALN) && defined(__BUS_ADRALN)
 #define BUS_ADRALN    BUS_ADRALN    /* Invalid address alignment. */
-#endif /* __BUS_ADRALN */
-#ifdef __BUS_ADRERR
+#endif /* !BUS_ADRALN && __BUS_ADRALN */
+#if !defined(BUS_ADRERR) && defined(__BUS_ADRERR)
 #define BUS_ADRERR    BUS_ADRERR    /* Non-existent physical address. */
-#endif /* __BUS_ADRERR */
-#ifdef __BUS_OBJERR
+#endif /* !BUS_ADRERR && __BUS_ADRERR */
+#if !defined(BUS_OBJERR) && defined(__BUS_OBJERR)
 #define BUS_OBJERR    BUS_OBJERR    /* Object specific hardware error. */
-#endif /* __BUS_OBJERR */
-#ifdef __BUS_MCEERR_AR
+#endif /* !BUS_OBJERR && __BUS_OBJERR */
+#if !defined(BUS_MCEERR_AR) && defined(__BUS_MCEERR_AR)
 #define BUS_MCEERR_AR BUS_MCEERR_AR /* Hardware memory error: action required. */
-#endif /* __BUS_MCEERR_AR */
-#ifdef __BUS_MCEERR_AO
+#endif /* !BUS_MCEERR_AR && __BUS_MCEERR_AR */
+#if !defined(BUS_MCEERR_AO) && defined(__BUS_MCEERR_AO)
 #define BUS_MCEERR_AO BUS_MCEERR_AO /* Hardware memory error: action optional. */
-#endif /* __BUS_MCEERR_AO */
+#endif /* !BUS_MCEERR_AO && __BUS_MCEERR_AO */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __BUS_ADRALN
+#if !defined(BUS_ADRALN) && defined(__BUS_ADRALN)
 #define BUS_ADRALN    __BUS_ADRALN    /* Invalid address alignment. */
-#endif /* __BUS_ADRALN */
-#ifdef __BUS_ADRERR
+#endif /* !BUS_ADRALN && __BUS_ADRALN */
+#if !defined(BUS_ADRERR) && defined(__BUS_ADRERR)
 #define BUS_ADRERR    __BUS_ADRERR    /* Non-existent physical address. */
-#endif /* __BUS_ADRERR */
-#ifdef __BUS_OBJERR
+#endif /* !BUS_ADRERR && __BUS_ADRERR */
+#if !defined(BUS_OBJERR) && defined(__BUS_OBJERR)
 #define BUS_OBJERR    __BUS_OBJERR    /* Object specific hardware error. */
-#endif /* __BUS_OBJERR */
-#ifdef __BUS_MCEERR_AR
+#endif /* !BUS_OBJERR && __BUS_OBJERR */
+#if !defined(BUS_MCEERR_AR) && defined(__BUS_MCEERR_AR)
 #define BUS_MCEERR_AR __BUS_MCEERR_AR /* Hardware memory error: action required. */
-#endif /* __BUS_MCEERR_AR */
-#ifdef __BUS_MCEERR_AO
+#endif /* !BUS_MCEERR_AR && __BUS_MCEERR_AR */
+#if !defined(BUS_MCEERR_AO) && defined(__BUS_MCEERR_AO)
 #define BUS_MCEERR_AO __BUS_MCEERR_AO /* Hardware memory error: action optional. */
-#endif /* __BUS_MCEERR_AO */
+#endif /* !BUS_MCEERR_AO && __BUS_MCEERR_AO */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* __BUS_... */
@@ -1009,33 +1030,34 @@ enum {
 
 #ifdef __USE_XOPEN_EXTENDED
 /* `si_code' values for SIGTRAP signal. */
-#if defined(__TRAP_BRKPT) || defined(__TRAP_TRACE)
+#if ((!defined(TRAP_BRKPT) && defined(__TRAP_BRKPT)) || \
+     (!defined(TRAP_TRACE) && defined(__TRAP_TRACE)))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-#ifdef __TRAP_BRKPT
+#if !defined(TRAP_BRKPT) && defined(__TRAP_BRKPT)
 	TRAP_BRKPT = __TRAP_BRKPT, /* Process breakpoint. */
-#endif /* __TRAP_BRKPT */
-#ifdef __TRAP_TRACE
+#endif /* !TRAP_BRKPT && __TRAP_BRKPT */
+#if !defined(TRAP_TRACE) && defined(__TRAP_TRACE)
 	TRAP_TRACE = __TRAP_TRACE  /* Process trace trap. */
-#endif /* __TRAP_TRACE */
+#endif /* !TRAP_TRACE && __TRAP_TRACE */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __TRAP_BRKPT
+#if !defined(TRAP_BRKPT) && defined(__TRAP_BRKPT)
 #define TRAP_BRKPT TRAP_BRKPT /* Process breakpoint. */
-#endif /* __TRAP_BRKPT */
-#ifdef __TRAP_TRACE
+#endif /* !TRAP_BRKPT && __TRAP_BRKPT */
+#if !defined(TRAP_TRACE) && defined(__TRAP_TRACE)
 #define TRAP_TRACE TRAP_TRACE /* Process trace trap. */
-#endif /* __TRAP_TRACE */
+#endif /* !TRAP_TRACE && __TRAP_TRACE */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __TRAP_BRKPT
+#if !defined(TRAP_BRKPT) && defined(__TRAP_BRKPT)
 #define TRAP_BRKPT __TRAP_BRKPT /* Process breakpoint. */
-#endif /* __TRAP_BRKPT */
-#ifdef __TRAP_TRACE
+#endif /* !TRAP_BRKPT && __TRAP_BRKPT */
+#if !defined(TRAP_TRACE) && defined(__TRAP_TRACE)
 #define TRAP_TRACE __TRAP_TRACE /* Process trace trap. */
-#endif /* __TRAP_TRACE */
+#endif /* !TRAP_TRACE && __TRAP_TRACE */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* __TRAP_... */
@@ -1045,71 +1067,74 @@ enum {
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 /* `si_code' values for SIGCHLD signal. */
-#if (defined(__CLD_EXITED) || defined(__CLD_KILLED) ||  \
-     defined(__CLD_DUMPED) || defined(__CLD_TRAPPED) || \
-     defined(__CLD_STOPPED) || defined(__CLD_CONTINUED))
+#if ((!defined(CLD_EXITED) && defined(__CLD_EXITED)) ||   \
+     (!defined(CLD_KILLED) && defined(__CLD_KILLED)) ||   \
+     (!defined(CLD_DUMPED) && defined(__CLD_DUMPED)) ||   \
+     (!defined(CLD_TRAPPED) && defined(__CLD_TRAPPED)) || \
+     (!defined(CLD_STOPPED) && defined(__CLD_STOPPED)) || \
+     (!defined(CLD_CONTINUED) && defined(__CLD_CONTINUED)))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-#ifdef __CLD_EXITED
+#if !defined(CLD_EXITED) && defined(__CLD_EXITED)
 	CLD_EXITED    = __CLD_EXITED,    /* Child has exited. */
-#endif /* __CLD_EXITED */
-#ifdef __CLD_KILLED
+#endif /* !CLD_EXITED && __CLD_EXITED */
+#if !defined(CLD_KILLED) && defined(__CLD_KILLED)
 	CLD_KILLED    = __CLD_KILLED,    /* Child was killed. */
-#endif /* __CLD_KILLED */
-#ifdef __CLD_DUMPED
+#endif /* !CLD_KILLED && __CLD_KILLED */
+#if !defined(CLD_DUMPED) && defined(__CLD_DUMPED)
 	CLD_DUMPED    = __CLD_DUMPED,    /* Child terminated abnormally. */
-#endif /* __CLD_DUMPED */
-#ifdef __CLD_TRAPPED
+#endif /* !CLD_DUMPED && __CLD_DUMPED */
+#if !defined(CLD_TRAPPED) && defined(__CLD_TRAPPED)
 	CLD_TRAPPED   = __CLD_TRAPPED,   /* Traced child has trapped. */
-#endif /* __CLD_TRAPPED */
-#ifdef __CLD_STOPPED
+#endif /* !CLD_TRAPPED && __CLD_TRAPPED */
+#if !defined(CLD_STOPPED) && defined(__CLD_STOPPED)
 	CLD_STOPPED   = __CLD_STOPPED,   /* Child has stopped. */
-#endif /* __CLD_STOPPED */
-#ifdef __CLD_CONTINUED
+#endif /* !CLD_STOPPED && __CLD_STOPPED */
+#if !defined(CLD_CONTINUED) && defined(__CLD_CONTINUED)
 	CLD_CONTINUED = __CLD_CONTINUED  /* Stopped child has continued. */
-#endif /* __CLD_CONTINUED */
+#endif /* !CLD_CONTINUED && __CLD_CONTINUED */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __CLD_EXITED
+#if !defined(CLD_EXITED) && defined(__CLD_EXITED)
 #define CLD_EXITED    CLD_EXITED    /* Child has exited. */
-#endif /* __CLD_EXITED */
-#ifdef __CLD_KILLED
+#endif /* !CLD_EXITED && __CLD_EXITED */
+#if !defined(CLD_KILLED) && defined(__CLD_KILLED)
 #define CLD_KILLED    CLD_KILLED    /* Child was killed. */
-#endif /* __CLD_KILLED */
-#ifdef __CLD_DUMPED
+#endif /* !CLD_KILLED && __CLD_KILLED */
+#if !defined(CLD_DUMPED) && defined(__CLD_DUMPED)
 #define CLD_DUMPED    CLD_DUMPED    /* Child terminated abnormally. */
-#endif /* __CLD_DUMPED */
-#ifdef __CLD_TRAPPED
+#endif /* !CLD_DUMPED && __CLD_DUMPED */
+#if !defined(CLD_TRAPPED) && defined(__CLD_TRAPPED)
 #define CLD_TRAPPED   CLD_TRAPPED   /* Traced child has trapped. */
-#endif /* __CLD_TRAPPED */
-#ifdef __CLD_STOPPED
+#endif /* !CLD_TRAPPED && __CLD_TRAPPED */
+#if !defined(CLD_STOPPED) && defined(__CLD_STOPPED)
 #define CLD_STOPPED   CLD_STOPPED   /* Child has stopped. */
-#endif /* __CLD_STOPPED */
-#ifdef __CLD_CONTINUED
+#endif /* !CLD_STOPPED && __CLD_STOPPED */
+#if !defined(CLD_CONTINUED) && defined(__CLD_CONTINUED)
 #define CLD_CONTINUED CLD_CONTINUED /* Stopped child has continued. */
-#endif /* __CLD_CONTINUED */
+#endif /* !CLD_CONTINUED && __CLD_CONTINUED */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __CLD_EXITED
+#if !defined(CLD_EXITED) && defined(__CLD_EXITED)
 #define CLD_EXITED    __CLD_EXITED    /* Child has exited. */
-#endif /* __CLD_EXITED */
-#ifdef __CLD_KILLED
+#endif /* !CLD_EXITED && __CLD_EXITED */
+#if !defined(CLD_KILLED) && defined(__CLD_KILLED)
 #define CLD_KILLED    __CLD_KILLED    /* Child was killed. */
-#endif /* __CLD_KILLED */
-#ifdef __CLD_DUMPED
+#endif /* !CLD_KILLED && __CLD_KILLED */
+#if !defined(CLD_DUMPED) && defined(__CLD_DUMPED)
 #define CLD_DUMPED    __CLD_DUMPED    /* Child terminated abnormally. */
-#endif /* __CLD_DUMPED */
-#ifdef __CLD_TRAPPED
+#endif /* !CLD_DUMPED && __CLD_DUMPED */
+#if !defined(CLD_TRAPPED) && defined(__CLD_TRAPPED)
 #define CLD_TRAPPED   __CLD_TRAPPED   /* Traced child has trapped. */
-#endif /* __CLD_TRAPPED */
-#ifdef __CLD_STOPPED
+#endif /* !CLD_TRAPPED && __CLD_TRAPPED */
+#if !defined(CLD_STOPPED) && defined(__CLD_STOPPED)
 #define CLD_STOPPED   __CLD_STOPPED   /* Child has stopped. */
-#endif /* __CLD_STOPPED */
-#ifdef __CLD_CONTINUED
+#endif /* !CLD_STOPPED && __CLD_STOPPED */
+#if !defined(CLD_CONTINUED) && defined(__CLD_CONTINUED)
 #define CLD_CONTINUED __CLD_CONTINUED /* Stopped child has continued. */
-#endif /* __CLD_CONTINUED */
+#endif /* !CLD_CONTINUED && __CLD_CONTINUED */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* __CLD_... */
@@ -1117,70 +1142,74 @@ enum {
 
 
 /* `si_code' values for SIGPOLL signal. */
-#if (defined(__POLL_IN) || defined(__POLL_OUT) || defined(__POLL_MSG) || \
-     defined(__POLL_ERR) || defined(__POLL_PRI) || defined(__POLL_HUP))
+#if ((!defined(POLL_IN) && defined(__POLL_IN)) ||   \
+     (!defined(POLL_OUT) && defined(__POLL_OUT)) || \
+     (!defined(POLL_MSG) && defined(__POLL_MSG)) || \
+     (!defined(POLL_ERR) && defined(__POLL_ERR)) || \
+     (!defined(POLL_PRI) && defined(__POLL_PRI)) || \
+     (!defined(POLL_HUP) && defined(__POLL_HUP)))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-#ifdef __POLL_IN
+#if !defined(POLL_IN) && defined(__POLL_IN)
 	POLL_IN  = __POLL_IN,  /* Data input available. */
-#endif /* __POLL_IN */
-#ifdef __POLL_OUT
+#endif /* !POLL_IN && __POLL_IN */
+#if !defined(POLL_OUT) && defined(__POLL_OUT)
 	POLL_OUT = __POLL_OUT, /* Output buffers available. */
-#endif /* __POLL_OUT */
-#ifdef __POLL_MSG
+#endif /* !POLL_OUT && __POLL_OUT */
+#if !defined(POLL_MSG) && defined(__POLL_MSG)
 	POLL_MSG = __POLL_MSG, /* Input message available.   */
-#endif /* __POLL_MSG */
-#ifdef __POLL_ERR
+#endif /* !POLL_MSG && __POLL_MSG */
+#if !defined(POLL_ERR) && defined(__POLL_ERR)
 	POLL_ERR = __POLL_ERR, /* I/O error. */
-#endif /* __POLL_ERR */
-#ifdef __POLL_PRI
+#endif /* !POLL_ERR && __POLL_ERR */
+#if !defined(POLL_PRI) && defined(__POLL_PRI)
 	POLL_PRI = __POLL_PRI, /* High priority input available. */
-#endif /* __POLL_PRI */
-#ifdef __POLL_HUP
+#endif /* !POLL_PRI && __POLL_PRI */
+#if !defined(POLL_HUP) && defined(__POLL_HUP)
 	POLL_HUP = __POLL_HUP  /* Device disconnected. */
-#endif /* __POLL_HUP */
+#endif /* !POLL_HUP && __POLL_HUP */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __POLL_IN
+#if !defined(POLL_IN) && defined(__POLL_IN)
 #define POLL_IN  POLL_IN  /* Data input available. */
-#endif /* __POLL_IN */
-#ifdef __POLL_OUT
+#endif /* !POLL_IN && __POLL_IN */
+#if !defined(POLL_OUT) && defined(__POLL_OUT)
 #define POLL_OUT POLL_OUT /* Output buffers available. */
-#endif /* __POLL_OUT */
-#ifdef __POLL_MSG
+#endif /* !POLL_OUT && __POLL_OUT */
+#if !defined(POLL_MSG) && defined(__POLL_MSG)
 #define POLL_MSG POLL_MSG /* Input message available. */
-#endif /* __POLL_MSG */
-#ifdef __POLL_ERR
+#endif /* !POLL_MSG && __POLL_MSG */
+#if !defined(POLL_ERR) && defined(__POLL_ERR)
 #define POLL_ERR POLL_ERR /* I/O error. */
-#endif /* __POLL_ERR */
-#ifdef __POLL_PRI
+#endif /* !POLL_ERR && __POLL_ERR */
+#if !defined(POLL_PRI) && defined(__POLL_PRI)
 #define POLL_PRI POLL_PRI /* High priority input available. */
-#endif /* __POLL_PRI */
-#ifdef __POLL_HUP
+#endif /* !POLL_PRI && __POLL_PRI */
+#if !defined(POLL_HUP) && defined(__POLL_HUP)
 #define POLL_HUP POLL_HUP /* Device disconnected. */
-#endif /* __POLL_HUP */
+#endif /* !POLL_HUP && __POLL_HUP */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __POLL_IN
+#if !defined(POLL_IN) && defined(__POLL_IN)
 #define POLL_IN  __POLL_IN  /* Data input available. */
-#endif /* __POLL_IN */
-#ifdef __POLL_OUT
+#endif /* !POLL_IN && __POLL_IN */
+#if !defined(POLL_OUT) && defined(__POLL_OUT)
 #define POLL_OUT __POLL_OUT /* Output buffers available. */
-#endif /* __POLL_OUT */
-#ifdef __POLL_MSG
+#endif /* !POLL_OUT && __POLL_OUT */
+#if !defined(POLL_MSG) && defined(__POLL_MSG)
 #define POLL_MSG __POLL_MSG /* Input message available. */
-#endif /* __POLL_MSG */
-#ifdef __POLL_ERR
+#endif /* !POLL_MSG && __POLL_MSG */
+#if !defined(POLL_ERR) && defined(__POLL_ERR)
 #define POLL_ERR __POLL_ERR /* I/O error. */
-#endif /* __POLL_ERR */
-#ifdef __POLL_PRI
+#endif /* !POLL_ERR && __POLL_ERR */
+#if !defined(POLL_PRI) && defined(__POLL_PRI)
 #define POLL_PRI __POLL_PRI /* High priority input available. */
-#endif /* __POLL_PRI */
-#ifdef __POLL_HUP
+#endif /* !POLL_PRI && __POLL_PRI */
+#if !defined(POLL_HUP) && defined(__POLL_HUP)
 #define POLL_HUP __POLL_HUP /* Device disconnected. */
-#endif /* __POLL_HUP */
+#endif /* !POLL_HUP && __POLL_HUP */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* __POLL_... */
@@ -1191,68 +1220,70 @@ enum {
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
 
 /* Possible values for `struct sigaltstack::ss_flags.'. */
-#if defined(__SS_ONSTACK) || defined(__SS_DISABLE) || defined(__SS_AUTODISARM)
+#if ((!defined(SS_ONSTACK) && defined(__SS_ONSTACK)) || \
+     (!defined(SS_DISABLE) && defined(__SS_DISABLE)) || \
+     (!defined(SS_AUTODISARM) && defined(__SS_AUTODISARM)))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-#ifdef __SS_ONSTACK
+#if !defined(SS_ONSTACK) && defined(__SS_ONSTACK)
 	SS_ONSTACK    = __SS_ONSTACK,   /* out.flag: Currently executing from the alternate signal stack. */
-#endif /* __SS_ONSTACK */
-#ifdef __SS_DISABLE
+#endif /* !SS_ONSTACK && __SS_ONSTACK */
+#if !defined(SS_DISABLE) && defined(__SS_DISABLE)
 	SS_DISABLE    = __SS_DISABLE,   /* in.flag: Disable the alternate signal stack. (all other flags are ignored when set)
 	                                 * out.flag: The alternate signal stack is currently disabled. */
-#endif /* __SS_DISABLE */
-#ifdef __SS_AUTODISARM
+#endif /* !SS_DISABLE && __SS_DISABLE */
+#if !defined(SS_AUTODISARM) && defined(__SS_AUTODISARM)
 	SS_AUTODISARM = __SS_AUTODISARM /* flag:     Disable  the  alternate signal  stack upon  signal handler
 	                                 *           entry by  saving its  old configuration  and disabling  it
 	                                 *           by  means  of  `SS_DISABLE',  before  restoring  its prior
 	                                 *           setting  once the signal  handler returns, thus preventing
 	                                 *           other signal handlers from recursing onto an in-use stack. */
-#endif /* __SS_AUTODISARM */
+#endif /* !SS_AUTODISARM && __SS_AUTODISARM */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __SS_ONSTACK
+#if !defined(SS_ONSTACK) && defined(__SS_ONSTACK)
 #define SS_ONSTACK    SS_ONSTACK    /* out.flag: Currently executing from the alternate signal stack. */
-#endif /* __SS_ONSTACK */
-#ifdef __SS_DISABLE
+#endif /* !SS_ONSTACK && __SS_ONSTACK */
+#if !defined(SS_DISABLE) && defined(__SS_DISABLE)
 #define SS_DISABLE    SS_DISABLE    /* in.flag: Disable the alternate signal stack. (all other flags are ignored when set)
                                      * out.flag: The alternate signal stack is currently disabled. */
-#endif /* __SS_DISABLE */
-#ifdef __SS_AUTODISARM
+#endif /* !SS_DISABLE && __SS_DISABLE */
+#if !defined(SS_AUTODISARM) && defined(__SS_AUTODISARM)
 #define SS_AUTODISARM SS_AUTODISARM /* flag:     Disable  the  alternate signal  stack upon  signal handler
                                      *           entry by  saving its  old configuration  and disabling  it
                                      *           by  means  of  `SS_DISABLE',  before  restoring  its prior
                                      *           setting  once the signal  handler returns, thus preventing
                                      *           other signal handlers from recursing onto an in-use stack. */
-#endif /* __SS_AUTODISARM */
+#endif /* !SS_AUTODISARM && __SS_AUTODISARM */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __SS_ONSTACK
+#if !defined(SS_ONSTACK) && defined(__SS_ONSTACK)
 #define SS_ONSTACK    __SS_ONSTACK    /* out.flag: Currently executing from the alternate signal stack. */
-#endif /* __SS_ONSTACK */
-#ifdef __SS_DISABLE
+#endif /* !SS_ONSTACK && __SS_ONSTACK */
+#if !defined(SS_DISABLE) && defined(__SS_DISABLE)
 #define SS_DISABLE    __SS_DISABLE    /* in.flag: Disable the alternate signal stack. (all other flags are ignored when set)
                                        * out.flag: The alternate signal stack is currently disabled. */
-#endif /* __SS_DISABLE */
-#ifdef __SS_AUTODISARM
+#endif /* !SS_DISABLE && __SS_DISABLE */
+#if !defined(SS_AUTODISARM) && defined(__SS_AUTODISARM)
 #define SS_AUTODISARM __SS_AUTODISARM /* flag:     Disable  the  alternate signal  stack upon  signal handler
                                        *           entry by  saving its  old configuration  and disabling  it
                                        *           by  means  of  `SS_DISABLE',  before  restoring  its prior
                                        *           setting  once the signal  handler returns, thus preventing
                                        *           other signal handlers from recursing onto an in-use stack. */
-#endif /* __SS_AUTODISARM */
+#endif /* !SS_AUTODISARM && __SS_AUTODISARM */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* __SS_ONSTACK || __SS_DISABLE */
 
-#ifdef __MINSIGSTKSZ
+#if !defined(MINSIGSTKSZ) && defined(__MINSIGSTKSZ)
 #define MINSIGSTKSZ __MINSIGSTKSZ /* Minimum stack size for a signal handler. */
-#endif /* __MINSIGSTKSZ */
+#endif /* !MINSIGSTKSZ && __MINSIGSTKSZ */
 
-#ifdef __SIGSTKSZ
+#if !defined(SIGSTKSZ) && defined(__SIGSTKSZ)
 #define SIGSTKSZ __SIGSTKSZ /* System default stack size. */
-#endif /* __SIGSTKSZ */
+#endif /* !SIGSTKSZ && __SIGSTKSZ */
 
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
@@ -2422,33 +2453,38 @@ print("@@pp_endif@@");
 @@pp_if defined(__KOS__) || defined(__linux__)@@
 	switch (signo) {
 	case __SIGILL:
-		if ((unsigned int)code <= 0x8) {
+		if ((unsigned int)code <= 0xb) {
 			static char const repr_ill[] =
 			"\0\0ILL_ILLOPC\0Illegal opcode\0ILL_ILLOPN\0Illegal operand\0ILL_ILLAD"
 			"R\0Illegal addressing mode\0ILL_ILLTRP\0Illegal trap\0ILL_PRVOPC\0Pri"
 			"vileged opcode\0ILL_PRVREG\0Privileged register\0ILL_COPROC\0Coproce"
-			"ssor error\0ILL_BADSTK\0Internal stack error";
+			"ssor error\0ILL_BADSTK\0Internal stack error\0ILL_BADIADDR\0???\0ILL_"
+			"BREAK\0???\0ILL_BNDMOD\0???";
 			result = repr_ill;
 		}
 		break;
 
 	case __SIGFPE:
-		if ((unsigned int)code <= 0x8) {
+		if ((unsigned int)code <= 0xf) {
 			static char const repr_fpe[] =
 			"\0\0FPE_INTDIV\0Integer divide by zero\0FPE_INTOVF\0Integer overflow\0"
 			"FPE_FLTDIV\0Floating point divide by zero\0FPE_FLTOVF\0Floating poi"
 			"nt overflow\0FPE_FLTUND\0Floating point underflow\0FPE_FLTRES\0Float"
 			"ing point inexact result\0FPE_FLTINV\0Floating point invalid opera"
-			"tion\0FPE_FLTSUB\0Subscript out of range";
+			"tion\0FPE_FLTSUB\0Subscript out of range\0FPE_DECOVF\0???\0FPE_DECDIV"
+			"\0???\0FPE_DECERR\0???\0FPE_INVASC\0???\0FPE_INVDEC\0???\0FPE_FLTUNK\0???"
+			"\0FPE_CONDTRAP\0???";
 			result = repr_fpe;
 		}
 		break;
 
 	case __SIGSEGV:
-		if ((unsigned int)code <= 0x2) {
+		if ((unsigned int)code <= 0x9) {
 			static char const repr_segv[] =
 			"\0\0SEGV_MAPERR\0Address not mapped to object\0SEGV_ACCERR\0Invalid p"
-			"ermissions for mapped object";
+			"ermissions for mapped object\0SEGV_BNDERR\0???\0SEGV_PKUERR\0???\0SEG"
+			"V_ACCADI\0???\0SEGV_ADIDERR\0???\0SEGV_ADIPERR\0???\0SEGV_MTEAERR\0???\0"
+			"SEGV_MTESERR\0???";
 			result = repr_segv;
 		}
 		break;
@@ -2504,13 +2540,14 @@ print("@@pp_endif@@");
 		} else if ((unsigned int)code == 0xc4) {
 			result = "SI_ASYNCNL\0Sent by asynch name lookup completion";
 			code   = 0;
-		} else if ((unsigned int)code >= 0xfa && (unsigned int)code <= 0xff) {
+		} else if ((unsigned int)code >= 0xf9 && (unsigned int)code <= 0xff) {
 			static char const repr_si[] =
-			"SI_TKILL\0Sent by tkill\0SI_SIGIO\0Sent by queued SIGIO\0SI_ASYNCIO\0"
-			"Sent by AIO completion\0SI_MESGQ\0Sent by real time mesq state cha"
-			"nge\0SI_TIMER\0Sent by timer expiration\0SI_QUEUE\0Sent by sigqueue";
+			"SI_DETHREAD\0Sent by `execve(2)\' killing secondary threads\0SI_TKI"
+			"LL\0Sent by tkill\0SI_SIGIO\0Sent by queued SIGIO\0SI_ASYNCIO\0Sent b"
+			"y AIO completion\0SI_MESGQ\0Sent by real time mesq state change\0SI"
+			"_TIMER\0Sent by timer expiration\0SI_QUEUE\0Sent by sigqueue";
 			result = repr_si;
-			code -= 0xfa;
+			code -= 0xf9;
 		}
 		break;
 	}
@@ -2550,6 +2587,15 @@ print("@@pp_endif@@");
 @@pp_ifdef __ILL_BADSTK@@
 		case __ILL_BADSTK: result = "ILL_BADSTK\0Internal stack error"; break;
 @@pp_endif@@
+@@pp_ifdef __ILL_BADIADDR@@
+		case __ILL_BADIADDR: result = "ILL_BADIADDR\0???"; break;
+@@pp_endif@@
+@@pp_ifdef __ILL_BREAK@@
+		case __ILL_BREAK: result = "ILL_BREAK\0???"; break;
+@@pp_endif@@
+@@pp_ifdef __ILL_BNDMOD@@
+		case __ILL_BNDMOD: result = "ILL_BNDMOD\0???"; break;
+@@pp_endif@@
 		default: break;
 		}
 		break;
@@ -2582,6 +2628,27 @@ print("@@pp_endif@@");
 @@pp_ifdef __FPE_FLTSUB@@
 		case __FPE_FLTSUB: result = "FPE_FLTSUB\0Subscript out of range"; break;
 @@pp_endif@@
+@@pp_ifdef __FPE_DECOVF@@
+		case __FPE_DECOVF: result = "FPE_DECOVF\0???"; break;
+@@pp_endif@@
+@@pp_ifdef __FPE_DECDIV@@
+		case __FPE_DECDIV: result = "FPE_DECDIV\0???"; break;
+@@pp_endif@@
+@@pp_ifdef __FPE_DECERR@@
+		case __FPE_DECERR: result = "FPE_DECERR\0???"; break;
+@@pp_endif@@
+@@pp_ifdef __FPE_INVASC@@
+		case __FPE_INVASC: result = "FPE_INVASC\0???"; break;
+@@pp_endif@@
+@@pp_ifdef __FPE_INVDEC@@
+		case __FPE_INVDEC: result = "FPE_INVDEC\0???"; break;
+@@pp_endif@@
+@@pp_ifdef __FPE_FLTUNK@@
+		case __FPE_FLTUNK: result = "FPE_FLTUNK\0???"; break;
+@@pp_endif@@
+@@pp_ifdef __FPE_CONDTRAP@@
+		case __FPE_CONDTRAP: result = "FPE_CONDTRAP\0???"; break;
+@@pp_endif@@
 		default: break;
 		}
 		break;
@@ -2595,6 +2662,30 @@ print("@@pp_endif@@");
 @@pp_endif@@
 @@pp_ifdef __SEGV_ACCERR@@
 		case __SEGV_ACCERR: result = "SEGV_ACCERR\0Invalid permissions for mapped object"; break;
+@@pp_endif@@
+@@pp_ifdef __SEGV_BNDERR@@
+		case __SEGV_BNDERR: result = "SEGV_BNDERR\0???"; break;
+@@pp_endif@@
+@@pp_ifdef __SEGV_PSTKOVF@@
+		case __SEGV_PSTKOVF: result = "SEGV_PSTKOVF\0???"; break;
+@@pp_endif@@
+@@pp_ifdef __SEGV_PKUERR@@
+		case __SEGV_PKUERR: result = "SEGV_PKUERR\0???"; break;
+@@pp_endif@@
+@@pp_ifdef __SEGV_ACCADI@@
+		case __SEGV_ACCADI: result = "SEGV_ACCADI\0???"; break;
+@@pp_endif@@
+@@pp_ifdef __SEGV_ADIDERR@@
+		case __SEGV_ADIDERR: result = "SEGV_ADIDERR\0???"; break;
+@@pp_endif@@
+@@pp_ifdef __SEGV_ADIPERR@@
+		case __SEGV_ADIPERR: result = "SEGV_ADIPERR\0???"; break;
+@@pp_endif@@
+@@pp_ifdef __SEGV_MTEAERR@@
+		case __SEGV_MTEAERR: result = "SEGV_MTEAERR\0???"; break;
+@@pp_endif@@
+@@pp_ifdef __SEGV_MTESERR@@
+		case __SEGV_MTESERR: result = "SEGV_MTESERR\0???"; break;
 @@pp_endif@@
 		default: break;
 		}
@@ -2694,6 +2785,9 @@ print("@@pp_endif@@");
 		switch (code) {
 @@pp_ifdef __SI_ASYNCNL@@
 		case __SI_ASYNCNL: result = "SI_ASYNCNL\0Sent by asynch name lookup completion"; break;
+@@pp_endif@@
+@@pp_ifdef __SI_DETHREAD@@
+		case __SI_DETHREAD: result = "SI_DETHREAD\0Sent by `execve(2)\' killing secondary threads"; break;
 @@pp_endif@@
 @@pp_ifdef __SI_TKILL@@
 		case __SI_TKILL: result = "SI_TKILL\0Sent by tkill"; break;

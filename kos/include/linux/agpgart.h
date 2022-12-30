@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Linux (/include/linux/agpgart.h) */
+/* (#) Portability: Linux (/usr/include/linux/agpgart.h) */
 #ifndef _LINUX_AGPGART_H
 #define _LINUX_AGPGART_H 1
 

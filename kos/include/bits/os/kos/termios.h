@@ -24,16 +24,15 @@
 
 #include <hybrid/typecore.h>
 
-__DECL_BEGIN
+#define NCCS 32
 
 #ifdef __CC__
+__DECL_BEGIN
+
 typedef __UINT8_TYPE__  cc_t;
 typedef __UINT32_TYPE__ speed_t;
 typedef __UINT32_TYPE__ tcflag_t;
-#endif /* __CC__ */
 
-#define NCCS 32
-#ifdef __CC__
 struct termios {
 	tcflag_t c_iflag;    /* input mode flags. */
 	tcflag_t c_oflag;    /* output mode flags. */
@@ -54,13 +53,14 @@ struct termios2 {
 	speed_t  c_ispeed;   /* input speed. */
 	speed_t  c_ospeed;   /* output speed. */
 };
+
+__DECL_END
 #endif /* __CC__ */
+
 #define _HAVE_STRUCT_TERMIOS_C_ISPEED 1
 #define _HAVE_STRUCT_TERMIOS_C_OSPEED 1
 
 #define _IOT_termios /* Hurd ioctl type field. */ \
 	_IOT(_IOTS(cflag_t), 4, _IOTS(cc_t), NCCS, _IOTS(speed_t), 2)
-
-__DECL_END
 
 #endif /* !_BITS_OS_KOS_TERMIOS_H */

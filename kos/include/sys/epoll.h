@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa20d813b */
+/* HASH CRC-32:0xf168909e */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,203 +47,212 @@
 __SYSDECL_BEGIN
 
 /* Flags accepted by `epoll_create1(2)'. */
-#if defined(__EPOLL_CLOEXEC) || defined(__EPOLL_CLOFORK)
+#if ((!defined(EPOLL_CLOEXEC) && defined(__EPOLL_CLOEXEC)) || \
+     (!defined(EPOLL_CLOFORK) && defined(__EPOLL_CLOFORK)))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-#ifdef __EPOLL_CLOEXEC
+#if !defined(EPOLL_CLOEXEC) && defined(__EPOLL_CLOEXEC)
 	EPOLL_CLOEXEC = __EPOLL_CLOEXEC, /* Set the IO_CLOEXEC flag */
-#endif /* __EPOLL_CLOEXEC */
-#ifdef __EPOLL_CLOFORK
+#endif /* !EPOLL_CLOEXEC && __EPOLL_CLOEXEC */
+#if !defined(EPOLL_CLOFORK) && defined(__EPOLL_CLOFORK)
 	EPOLL_CLOFORK = __EPOLL_CLOFORK, /* Set the IO_CLOFORK flag */
-#endif /* __EPOLL_CLOFORK */
-
+#endif /* !EPOLL_CLOFORK && __EPOLL_CLOFORK */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __EPOLL_CLOEXEC
+#if !defined(EPOLL_CLOEXEC) && defined(__EPOLL_CLOEXEC)
 #define EPOLL_CLOEXEC EPOLL_CLOEXEC /* Set the IO_CLOEXEC flag */
-#endif /* __EPOLL_CLOEXEC */
-#ifdef __EPOLL_CLOFORK
+#endif /* !EPOLL_CLOEXEC && __EPOLL_CLOEXEC */
+#if !defined(EPOLL_CLOFORK) && defined(__EPOLL_CLOFORK)
 #define EPOLL_CLOFORK EPOLL_CLOFORK /* Set the IO_CLOFORK flag */
-#endif /* __EPOLL_CLOFORK */
+#endif /* !EPOLL_CLOFORK && __EPOLL_CLOFORK */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __EPOLL_CLOEXEC
+#if !defined(EPOLL_CLOEXEC) && defined(__EPOLL_CLOEXEC)
 #define EPOLL_CLOEXEC __EPOLL_CLOEXEC /* Set the IO_CLOEXEC flag */
-#endif /* __EPOLL_CLOEXEC */
-#ifdef __EPOLL_CLOFORK
+#endif /* !EPOLL_CLOEXEC && __EPOLL_CLOEXEC */
+#if !defined(EPOLL_CLOFORK) && defined(__EPOLL_CLOFORK)
 #define EPOLL_CLOFORK __EPOLL_CLOFORK /* Set the IO_CLOFORK flag */
-#endif /* __EPOLL_CLOFORK */
+#endif /* !EPOLL_CLOFORK && __EPOLL_CLOFORK */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* __EPOLL_CLOEXEC || __EPOLL_CLOFORK */
 
 /* EPOLL_EVENTS */
-#if (defined(__EPOLLIN) || defined(__EPOLLPRI) ||        \
-     defined(__EPOLLOUT) || defined(__EPOLLERR) ||       \
-     defined(__EPOLLHUP) || defined(__EPOLLRDNORM) ||    \
-     defined(__EPOLLRDBAND) || defined(__EPOLLWRNORM) || \
-     defined(__EPOLLWRBAND) || defined(__EPOLLMSG) ||    \
-     defined(__EPOLLRDHUP) || defined(__EPOLLWAKEUP) ||  \
-     defined(__EPOLLONESHOT) || defined(__EPOLLET))
+#if ((!defined(EPOLLIN) && defined(__EPOLLIN)) ||           \
+     (!defined(EPOLLPRI) && defined(__EPOLLPRI)) ||         \
+     (!defined(EPOLLOUT) && defined(__EPOLLOUT)) ||         \
+     (!defined(EPOLLERR) && defined(__EPOLLERR)) ||         \
+     (!defined(EPOLLHUP) && defined(__EPOLLHUP)) ||         \
+     (!defined(EPOLLRDNORM) && defined(__EPOLLRDNORM)) ||   \
+     (!defined(EPOLLRDBAND) && defined(__EPOLLRDBAND)) ||   \
+     (!defined(EPOLLWRNORM) && defined(__EPOLLWRNORM)) ||   \
+     (!defined(EPOLLWRBAND) && defined(__EPOLLWRBAND)) ||   \
+     (!defined(EPOLLMSG) && defined(__EPOLLMSG)) ||         \
+     (!defined(EPOLLRDHUP) && defined(__EPOLLRDHUP)) ||     \
+     (!defined(EPOLLWAKEUP) && defined(__EPOLLWAKEUP)) ||   \
+     (!defined(EPOLLONESHOT) && defined(__EPOLLONESHOT)) || \
+     (!defined(EPOLLET) && defined(__EPOLLET)))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum EPOLL_EVENTS {
-#ifdef __EPOLLIN
+#if !defined(EPOLLIN) && defined(__EPOLLIN)
 	EPOLLIN      = __EPOLLIN,      /* There is data to read. (`read' & friends won't block when invoked) */
-#endif /* __EPOLLIN */
-#ifdef __EPOLLPRI
+#endif /* !EPOLLIN && __EPOLLIN */
+#if !defined(EPOLLPRI) && defined(__EPOLLPRI)
 	EPOLLPRI     = __EPOLLPRI,     /* There is urgent data to read. */
-#endif /* __EPOLLPRI */
-#ifdef __EPOLLOUT
+#endif /* !EPOLLPRI && __EPOLLPRI */
+#if !defined(EPOLLOUT) && defined(__EPOLLOUT)
 	EPOLLOUT     = __EPOLLOUT,     /* Writing now will not block. (`write' & friends won't block when invoked) */
-#endif /* __EPOLLOUT */
-#ifdef __EPOLLRDNORM
+#endif /* !EPOLLOUT && __EPOLLOUT */
+#if !defined(EPOLLRDNORM) && defined(__EPOLLRDNORM)
 	EPOLLRDNORM  = __EPOLLRDNORM,  /* 100% identical to `POLLIN' (Normal data may be read). */
-#endif /* __EPOLLRDNORM */
-#ifdef __EPOLLRDBAND
+#endif /* !EPOLLRDNORM && __EPOLLRDNORM */
+#if !defined(EPOLLRDBAND) && defined(__EPOLLRDBAND)
 	EPOLLRDBAND  = __EPOLLRDBAND,  /* Priority data may be read. */
-#endif /* __EPOLLRDBAND */
-#ifdef __EPOLLWRNORM
+#endif /* !EPOLLRDBAND && __EPOLLRDBAND */
+#if !defined(EPOLLWRNORM) && defined(__EPOLLWRNORM)
 	EPOLLWRNORM  = __EPOLLWRNORM,  /* 100% identical to `POLLOUT' (Writing now will not block). */
-#endif /* __EPOLLWRNORM */
-#ifdef __EPOLLWRBAND
+#endif /* !EPOLLWRNORM && __EPOLLWRNORM */
+#if !defined(EPOLLWRBAND) && defined(__EPOLLWRBAND)
 	EPOLLWRBAND  = __EPOLLWRBAND,  /* Priority data may be written. */
-#endif /* __EPOLLWRBAND */
-#ifdef __EPOLLMSG
+#endif /* !EPOLLWRBAND && __EPOLLWRBAND */
+#if !defined(EPOLLMSG) && defined(__EPOLLMSG)
 	EPOLLMSG     = __EPOLLMSG,     /* Documented as unused */
-#endif /* __EPOLLMSG */
-#ifdef __EPOLLRDHUP
+#endif /* !EPOLLMSG && __EPOLLMSG */
+#if !defined(EPOLLRDHUP) && defined(__EPOLLRDHUP)
 	EPOLLRDHUP   = __EPOLLRDHUP,   /* Socket peer closed connection, or shut down writing half of its connection */
-#endif /* __EPOLLRDHUP */
-#ifdef __EPOLLWAKEUP
+#endif /* !EPOLLRDHUP && __EPOLLRDHUP */
+#if !defined(EPOLLWAKEUP) && defined(__EPOLLWAKEUP)
 	EPOLLWAKEUP  = __EPOLLWAKEUP,  /* Currently ignored */
-#endif /* __EPOLLWAKEUP */
-#ifdef __EPOLLONESHOT
+#endif /* !EPOLLWAKEUP && __EPOLLWAKEUP */
+#if !defined(EPOLLONESHOT) && defined(__EPOLLONESHOT)
 	EPOLLONESHOT = __EPOLLONESHOT, /* Automatically stop monitoring the file descriptor once it's condition is met. */
-#endif /* __EPOLLONESHOT */
-#ifdef __EPOLLET
+#endif /* !EPOLLONESHOT && __EPOLLONESHOT */
+#if !defined(EPOLLET) && defined(__EPOLLET)
 	EPOLLET      = __EPOLLET,      /* Enable edge-triggered monitoring */
-#endif /* __EPOLLET */
+#endif /* !EPOLLET && __EPOLLET */
 /* Event types always implicitly polled for. */
-#ifdef __EPOLLERR
+#if !defined(EPOLLERR) && defined(__EPOLLERR)
 	EPOLLERR     = __EPOLLERR,     /* Error condition. */
-#endif /* __EPOLLERR */
-#ifdef __EPOLLHUP
+#endif /* !EPOLLERR && __EPOLLERR */
+#if !defined(EPOLLHUP) && defined(__EPOLLHUP)
 	EPOLLHUP     = __EPOLLHUP,     /* Hung up. (writes are no longer possible) */
-#endif /* __EPOLLHUP */
+#endif /* !EPOLLHUP && __EPOLLHUP */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __EPOLLIN
+#if !defined(EPOLLIN) && defined(__EPOLLIN)
 #define EPOLLIN      EPOLLIN      /* There is data to read. (`read' & friends won't block when invoked) */
-#endif /* __EPOLLIN */
-#ifdef __EPOLLPRI
+#endif /* !EPOLLIN && __EPOLLIN */
+#if !defined(EPOLLPRI) && defined(__EPOLLPRI)
 #define EPOLLPRI     EPOLLPRI     /* There is urgent data to read. */
-#endif /* __EPOLLPRI */
-#ifdef __EPOLLOUT
+#endif /* !EPOLLPRI && __EPOLLPRI */
+#if !defined(EPOLLOUT) && defined(__EPOLLOUT)
 #define EPOLLOUT     EPOLLOUT     /* Writing now will not block. (`write' & friends won't block when invoked) */
-#endif /* __EPOLLOUT */
-#ifdef __EPOLLRDNORM
+#endif /* !EPOLLOUT && __EPOLLOUT */
+#if !defined(EPOLLRDNORM) && defined(__EPOLLRDNORM)
 #define EPOLLRDNORM  EPOLLRDNORM  /* 100% identical to `POLLIN' (Normal data may be read). */
-#endif /* __EPOLLRDNORM */
-#ifdef __EPOLLRDBAND
+#endif /* !EPOLLRDNORM && __EPOLLRDNORM */
+#if !defined(EPOLLRDBAND) && defined(__EPOLLRDBAND)
 #define EPOLLRDBAND  EPOLLRDBAND  /* Priority data may be read. */
-#endif /* __EPOLLRDBAND */
-#ifdef __EPOLLWRNORM
+#endif /* !EPOLLRDBAND && __EPOLLRDBAND */
+#if !defined(EPOLLWRNORM) && defined(__EPOLLWRNORM)
 #define EPOLLWRNORM  EPOLLWRNORM  /* 100% identical to `POLLOUT' (Writing now will not block). */
-#endif /* __EPOLLWRNORM */
-#ifdef __EPOLLWRBAND
+#endif /* !EPOLLWRNORM && __EPOLLWRNORM */
+#if !defined(EPOLLWRBAND) && defined(__EPOLLWRBAND)
 #define EPOLLWRBAND  EPOLLWRBAND  /* Priority data may be written. */
-#endif /* __EPOLLWRBAND */
-#ifdef __EPOLLMSG
+#endif /* !EPOLLWRBAND && __EPOLLWRBAND */
+#if !defined(EPOLLMSG) && defined(__EPOLLMSG)
 #define EPOLLMSG     EPOLLMSG     /* Documented as unused */
-#endif /* __EPOLLMSG */
-#ifdef __EPOLLRDHUP
+#endif /* !EPOLLMSG && __EPOLLMSG */
+#if !defined(EPOLLRDHUP) && defined(__EPOLLRDHUP)
 #define EPOLLRDHUP   EPOLLRDHUP   /* Socket peer closed connection, or shut down writing half of its connection */
-#endif /* __EPOLLRDHUP */
-#ifdef __EPOLLWAKEUP
+#endif /* !EPOLLRDHUP && __EPOLLRDHUP */
+#if !defined(EPOLLWAKEUP) && defined(__EPOLLWAKEUP)
 #define EPOLLWAKEUP  EPOLLWAKEUP  /* Currently ignored */
-#endif /* __EPOLLWAKEUP */
-#ifdef __EPOLLONESHOT
+#endif /* !EPOLLWAKEUP && __EPOLLWAKEUP */
+#if !defined(EPOLLONESHOT) && defined(__EPOLLONESHOT)
 #define EPOLLONESHOT EPOLLONESHOT /* Automatically stop monitoring the file descriptor once it's condition is met. */
-#endif /* __EPOLLONESHOT */
-#ifdef __EPOLLET
+#endif /* !EPOLLONESHOT && __EPOLLONESHOT */
+#if !defined(EPOLLET) && defined(__EPOLLET)
 #define EPOLLET      EPOLLET      /* Enable edge-triggered monitoring */
-#endif /* __EPOLLET */
+#endif /* !EPOLLET && __EPOLLET */
 /* Event types always implicitly polled for. */
-#ifdef __EPOLLERR
+#if !defined(EPOLLERR) && defined(__EPOLLERR)
 #define EPOLLERR     EPOLLERR     /* Error condition. */
-#endif /* __EPOLLERR */
-#ifdef __EPOLLHUP
+#endif /* !EPOLLERR && __EPOLLERR */
+#if !defined(EPOLLHUP) && defined(__EPOLLHUP)
 #define EPOLLHUP     EPOLLHUP     /* Hung up. (writes are no longer possible) */
-#endif /* __EPOLLHUP */
+#endif /* !EPOLLHUP && __EPOLLHUP */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __EPOLLIN
+#if !defined(EPOLLIN) && defined(__EPOLLIN)
 #define EPOLLIN      __EPOLLIN      /* There is data to read. (`read' & friends won't block when invoked) */
-#endif /* __EPOLLIN */
-#ifdef __EPOLLPRI
+#endif /* !EPOLLIN && __EPOLLIN */
+#if !defined(EPOLLPRI) && defined(__EPOLLPRI)
 #define EPOLLPRI     __EPOLLPRI     /* There is urgent data to read. */
-#endif /* __EPOLLPRI */
-#ifdef __EPOLLOUT
+#endif /* !EPOLLPRI && __EPOLLPRI */
+#if !defined(EPOLLOUT) && defined(__EPOLLOUT)
 #define EPOLLOUT     __EPOLLOUT     /* Writing now will not block. (`write' & friends won't block when invoked) */
-#endif /* __EPOLLOUT */
-#ifdef __EPOLLRDNORM
+#endif /* !EPOLLOUT && __EPOLLOUT */
+#if !defined(EPOLLRDNORM) && defined(__EPOLLRDNORM)
 #define EPOLLRDNORM  __EPOLLRDNORM  /* 100% identical to `POLLIN' (Normal data may be read). */
-#endif /* __EPOLLRDNORM */
-#ifdef __EPOLLRDBAND
+#endif /* !EPOLLRDNORM && __EPOLLRDNORM */
+#if !defined(EPOLLRDBAND) && defined(__EPOLLRDBAND)
 #define EPOLLRDBAND  __EPOLLRDBAND  /* Priority data may be read. */
-#endif /* __EPOLLRDBAND */
-#ifdef __EPOLLWRNORM
+#endif /* !EPOLLRDBAND && __EPOLLRDBAND */
+#if !defined(EPOLLWRNORM) && defined(__EPOLLWRNORM)
 #define EPOLLWRNORM  __EPOLLWRNORM  /* 100% identical to `POLLOUT' (Writing now will not block). */
-#endif /* __EPOLLWRNORM */
-#ifdef __EPOLLWRBAND
+#endif /* !EPOLLWRNORM && __EPOLLWRNORM */
+#if !defined(EPOLLWRBAND) && defined(__EPOLLWRBAND)
 #define EPOLLWRBAND  __EPOLLWRBAND  /* Priority data may be written. */
-#endif /* __EPOLLWRBAND */
-#ifdef __EPOLLMSG
+#endif /* !EPOLLWRBAND && __EPOLLWRBAND */
+#if !defined(EPOLLMSG) && defined(__EPOLLMSG)
 #define EPOLLMSG     __EPOLLMSG     /* Documented as unused */
-#endif /* __EPOLLMSG */
-#ifdef __EPOLLRDHUP
+#endif /* !EPOLLMSG && __EPOLLMSG */
+#if !defined(EPOLLRDHUP) && defined(__EPOLLRDHUP)
 #define EPOLLRDHUP   __EPOLLRDHUP   /* Socket peer closed connection, or shut down writing half of its connection */
-#endif /* __EPOLLRDHUP */
-#ifdef __EPOLLWAKEUP
+#endif /* !EPOLLRDHUP && __EPOLLRDHUP */
+#if !defined(EPOLLWAKEUP) && defined(__EPOLLWAKEUP)
 #define EPOLLWAKEUP  __EPOLLWAKEUP  /* Currently ignored */
-#endif /* __EPOLLWAKEUP */
-#ifdef __EPOLLONESHOT
+#endif /* !EPOLLWAKEUP && __EPOLLWAKEUP */
+#if !defined(EPOLLONESHOT) && defined(__EPOLLONESHOT)
 #define EPOLLONESHOT __EPOLLONESHOT /* Automatically stop monitoring the file descriptor once it's condition is met. */
-#endif /* __EPOLLONESHOT */
-#ifdef __EPOLLET
+#endif /* !EPOLLONESHOT && __EPOLLONESHOT */
+#if !defined(EPOLLET) && defined(__EPOLLET)
 #define EPOLLET      __EPOLLET      /* Enable edge-triggered monitoring */
-#endif /* __EPOLLET */
+#endif /* !EPOLLET && __EPOLLET */
 /* Event types always implicitly polled for. */
-#ifdef __EPOLLERR
+#if !defined(EPOLLERR) && defined(__EPOLLERR)
 #define EPOLLERR     __EPOLLERR     /* Error condition. */
-#endif /* __EPOLLERR */
-#ifdef __EPOLLHUP
+#endif /* !EPOLLERR && __EPOLLERR */
+#if !defined(EPOLLHUP) && defined(__EPOLLHUP)
 #define EPOLLHUP     __EPOLLHUP     /* Hung up. (writes are no longer possible) */
-#endif /* __EPOLLHUP */
+#endif /* !EPOLLHUP && __EPOLLHUP */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* ... */
 
 /* Command codes for the `op' argument of `epoll_ctl(2)'. */
-#if (defined(__EPOLL_CTL_ADD) || defined(__EPOLL_CTL_DEL) || \
-     defined(__EPOLL_CTL_MOD) || (defined(__USE_KOS_KERNEL) && defined(__EPOLL_CTL_RPC_PROG)))
+#if ((!defined(EPOLL_CTL_ADD) && defined(__EPOLL_CTL_ADD)) || \
+     (!defined(EPOLL_CTL_DEL) && defined(__EPOLL_CTL_DEL)) || \
+     (!defined(EPOLL_CTL_MOD) && defined(__EPOLL_CTL_MOD)) || \
+     (defined(__USE_KOS_KERNEL) && (!defined(EPOLL_CTL_RPC_PROG) && defined(__EPOLL_CTL_RPC_PROG))))
 /*[[[enum]]]*/
 #ifdef __CC__
 typedef enum __epoll_ctl {
-#ifdef __EPOLL_CTL_ADD
+#if !defined(EPOLL_CTL_ADD) && defined(__EPOLL_CTL_ADD)
 	EPOLL_CTL_ADD = __EPOLL_CTL_ADD, /* Add a new file to-be monitored. */
-#endif /* __EPOLL_CTL_ADD */
-#ifdef __EPOLL_CTL_DEL
+#endif /* !EPOLL_CTL_ADD && __EPOLL_CTL_ADD */
+#if !defined(EPOLL_CTL_DEL) && defined(__EPOLL_CTL_DEL)
 	EPOLL_CTL_DEL = __EPOLL_CTL_DEL, /* Stop monitoring a given file. */
-#endif /* __EPOLL_CTL_DEL */
-#ifdef __EPOLL_CTL_MOD
+#endif /* !EPOLL_CTL_DEL && __EPOLL_CTL_DEL */
+#if !defined(EPOLL_CTL_MOD) && defined(__EPOLL_CTL_MOD)
 	EPOLL_CTL_MOD = __EPOLL_CTL_MOD, /* Change the `struct epoll_event' associated with a given file descriptor. */
-#endif /* __EPOLL_CTL_MOD */
-#if defined(__USE_KOS_KERNEL) && defined(__EPOLL_CTL_RPC_PROG)
+#endif /* !EPOLL_CTL_MOD && __EPOLL_CTL_MOD */
+#if defined(__USE_KOS_KERNEL) && !defined(EPOLL_CTL_RPC_PROG) && defined(__EPOLL_CTL_RPC_PROG)
 	EPOLL_CTL_RPC_PROG = __EPOLL_CTL_RPC_PROG, /* Add  a file monitor that will deliver an RPC (~ala <kos/rpc.h>) once any of
 	                                            * the monitored events are triggered  (iow: on the first raising-edge  event,
 	                                            * or immediately if any event is already asserted). This mechanism allows for
@@ -259,21 +268,21 @@ typedef enum __epoll_ctl {
 	                                            * with the mask of events  to monitor. However, `event->data' must  first
 	                                            * be zero- initialized,  before `event->data.ptr' must  be made to  point
 	                                            * at a `struct epoll_rpc_program' which contains RPC-related information. */
-#endif /* __USE_KOS_KERNEL && __EPOLL_CTL_RPC_PROG */
+#endif /* __USE_KOS_KERNEL && !EPOLL_CTL_RPC_PROG && __EPOLL_CTL_RPC_PROG */
 } __epoll_ctl_t;
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __EPOLL_CTL_ADD
+#if !defined(EPOLL_CTL_ADD) && defined(__EPOLL_CTL_ADD)
 #define EPOLL_CTL_ADD      EPOLL_CTL_ADD      /* Add a new file to-be monitored. */
-#endif /* __EPOLL_CTL_ADD */
-#ifdef __EPOLL_CTL_DEL
+#endif /* !EPOLL_CTL_ADD && __EPOLL_CTL_ADD */
+#if !defined(EPOLL_CTL_DEL) && defined(__EPOLL_CTL_DEL)
 #define EPOLL_CTL_DEL      EPOLL_CTL_DEL      /* Stop monitoring a given file. */
-#endif /* __EPOLL_CTL_DEL */
-#ifdef __EPOLL_CTL_MOD
+#endif /* !EPOLL_CTL_DEL && __EPOLL_CTL_DEL */
+#if !defined(EPOLL_CTL_MOD) && defined(__EPOLL_CTL_MOD)
 #define EPOLL_CTL_MOD      EPOLL_CTL_MOD      /* Change the `struct epoll_event' associated with a given file descriptor. */
-#endif /* __EPOLL_CTL_MOD */
-#if defined(__USE_KOS_KERNEL) && defined(__EPOLL_CTL_RPC_PROG)
+#endif /* !EPOLL_CTL_MOD && __EPOLL_CTL_MOD */
+#if defined(__USE_KOS_KERNEL) && !defined(EPOLL_CTL_RPC_PROG) && defined(__EPOLL_CTL_RPC_PROG)
 #define EPOLL_CTL_RPC_PROG EPOLL_CTL_RPC_PROG /* Add  a file monitor that will deliver an RPC (~ala <kos/rpc.h>) once any of
                                                * the monitored events are triggered  (iow: on the first raising-edge  event,
                                                * or immediately if any event is already asserted). This mechanism allows for
@@ -289,18 +298,18 @@ typedef enum __epoll_ctl {
                                                * with the mask of events  to monitor. However, `event->data' must  first
                                                * be zero- initialized,  before `event->data.ptr' must  be made to  point
                                                * at a `struct epoll_rpc_program' which contains RPC-related information. */
-#endif /* __USE_KOS_KERNEL && __EPOLL_CTL_RPC_PROG */
+#endif /* __USE_KOS_KERNEL && !EPOLL_CTL_RPC_PROG && __EPOLL_CTL_RPC_PROG */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __EPOLL_CTL_ADD
+#if !defined(EPOLL_CTL_ADD) && defined(__EPOLL_CTL_ADD)
 #define EPOLL_CTL_ADD      __EPOLL_CTL_ADD      /* Add a new file to-be monitored. */
-#endif /* __EPOLL_CTL_ADD */
-#ifdef __EPOLL_CTL_DEL
+#endif /* !EPOLL_CTL_ADD && __EPOLL_CTL_ADD */
+#if !defined(EPOLL_CTL_DEL) && defined(__EPOLL_CTL_DEL)
 #define EPOLL_CTL_DEL      __EPOLL_CTL_DEL      /* Stop monitoring a given file. */
-#endif /* __EPOLL_CTL_DEL */
-#ifdef __EPOLL_CTL_MOD
+#endif /* !EPOLL_CTL_DEL && __EPOLL_CTL_DEL */
+#if !defined(EPOLL_CTL_MOD) && defined(__EPOLL_CTL_MOD)
 #define EPOLL_CTL_MOD      __EPOLL_CTL_MOD      /* Change the `struct epoll_event' associated with a given file descriptor. */
-#endif /* __EPOLL_CTL_MOD */
-#if defined(__USE_KOS_KERNEL) && defined(__EPOLL_CTL_RPC_PROG)
+#endif /* !EPOLL_CTL_MOD && __EPOLL_CTL_MOD */
+#if defined(__USE_KOS_KERNEL) && !defined(EPOLL_CTL_RPC_PROG) && defined(__EPOLL_CTL_RPC_PROG)
 #define EPOLL_CTL_RPC_PROG __EPOLL_CTL_RPC_PROG /* Add  a file monitor that will deliver an RPC (~ala <kos/rpc.h>) once any of
                                                  * the monitored events are triggered  (iow: on the first raising-edge  event,
                                                  * or immediately if any event is already asserted). This mechanism allows for
@@ -316,15 +325,15 @@ typedef enum __epoll_ctl {
                                                  * with the mask of events  to monitor. However, `event->data' must  first
                                                  * be zero- initialized,  before `event->data.ptr' must  be made to  point
                                                  * at a `struct epoll_rpc_program' which contains RPC-related information. */
-#endif /* __USE_KOS_KERNEL && __EPOLL_CTL_RPC_PROG */
+#endif /* __USE_KOS_KERNEL && !EPOLL_CTL_RPC_PROG && __EPOLL_CTL_RPC_PROG */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #elif defined(__CC__)
 typedef int __epoll_ctl_t;
 #endif /* ... */
 
-#ifdef __CC__
 
+#ifdef __CC__
 typedef union epoll_data epoll_data_t;
 
 #ifndef __sigset_t_defined

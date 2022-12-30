@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Linux (/include/linux/if_fddi.h) */
+/* (#) Portability: Linux (/usr/include/linux/if_fddi.h) */
 #ifndef _LINUX_IF_FDDI_H
 #define _LINUX_IF_FDDI_H
 

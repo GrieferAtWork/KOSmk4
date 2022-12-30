@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Linux (/include/linux/sockios.h) */
+/* (#) Portability: Linux (/usr/include/linux/sockios.h) */
 #ifndef _LINUX_SOCKIOS_H
 #define _LINUX_SOCKIOS_H 1
 

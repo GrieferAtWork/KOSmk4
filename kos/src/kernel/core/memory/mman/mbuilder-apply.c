@@ -273,6 +273,7 @@ NOTHROW(FCALL mbuilder_apply_impl)(struct mbuilder *__restrict self,
 
 PRIVATE NONNULL((1)) void PRPC_EXEC_CALLBACK_CC
 killthread_for_exec_rpc(struct rpc_context *__restrict ctx, void *UNUSED(cookie)) {
+	/* TODO: Supposed to use `si_code == SI_DETHREAD' for this case! */
 	if (ctx->rc_context != RPC_REASONCTX_SHUTDOWN)
 		THROW(E_EXIT_THREAD, W_EXITCODE(0, 0));
 }

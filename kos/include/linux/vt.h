@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Linux     (/include/linux/vt.h) */
+/* (#) Portability: Linux     (/usr/include/linux/vt.h) */
 /* (#) Portability: diet libc (/include/linux/vt.h) */
 #ifndef _LINUX_VT_H
 #define _LINUX_VT_H 1

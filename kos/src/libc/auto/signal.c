@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45fe50a4 */
+/* HASH CRC-32:0x85573a44 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -525,33 +525,38 @@ print("@@pp_endif@@");
 
 	switch (signo) {
 	case __SIGILL:
-		if ((unsigned int)code <= 0x8) {
+		if ((unsigned int)code <= 0xb) {
 			static char const repr_ill[] =
 			"\0\0ILL_ILLOPC\0Illegal opcode\0ILL_ILLOPN\0Illegal operand\0ILL_ILLAD"
 			"R\0Illegal addressing mode\0ILL_ILLTRP\0Illegal trap\0ILL_PRVOPC\0Pri"
 			"vileged opcode\0ILL_PRVREG\0Privileged register\0ILL_COPROC\0Coproce"
-			"ssor error\0ILL_BADSTK\0Internal stack error";
+			"ssor error\0ILL_BADSTK\0Internal stack error\0ILL_BADIADDR\0???\0ILL_"
+			"BREAK\0???\0ILL_BNDMOD\0???";
 			result = repr_ill;
 		}
 		break;
 
 	case __SIGFPE:
-		if ((unsigned int)code <= 0x8) {
+		if ((unsigned int)code <= 0xf) {
 			static char const repr_fpe[] =
 			"\0\0FPE_INTDIV\0Integer divide by zero\0FPE_INTOVF\0Integer overflow\0"
 			"FPE_FLTDIV\0Floating point divide by zero\0FPE_FLTOVF\0Floating poi"
 			"nt overflow\0FPE_FLTUND\0Floating point underflow\0FPE_FLTRES\0Float"
 			"ing point inexact result\0FPE_FLTINV\0Floating point invalid opera"
-			"tion\0FPE_FLTSUB\0Subscript out of range";
+			"tion\0FPE_FLTSUB\0Subscript out of range\0FPE_DECOVF\0???\0FPE_DECDIV"
+			"\0???\0FPE_DECERR\0???\0FPE_INVASC\0???\0FPE_INVDEC\0???\0FPE_FLTUNK\0???"
+			"\0FPE_CONDTRAP\0???";
 			result = repr_fpe;
 		}
 		break;
 
 	case __SIGSEGV:
-		if ((unsigned int)code <= 0x2) {
+		if ((unsigned int)code <= 0x9) {
 			static char const repr_segv[] =
 			"\0\0SEGV_MAPERR\0Address not mapped to object\0SEGV_ACCERR\0Invalid p"
-			"ermissions for mapped object";
+			"ermissions for mapped object\0SEGV_BNDERR\0???\0SEGV_PKUERR\0???\0SEG"
+			"V_ACCADI\0???\0SEGV_ADIDERR\0???\0SEGV_ADIPERR\0???\0SEGV_MTEAERR\0???\0"
+			"SEGV_MTESERR\0???";
 			result = repr_segv;
 		}
 		break;
@@ -607,13 +612,14 @@ print("@@pp_endif@@");
 		} else if ((unsigned int)code == 0xc4) {
 			result = "SI_ASYNCNL\0Sent by asynch name lookup completion";
 			code   = 0;
-		} else if ((unsigned int)code >= 0xfa && (unsigned int)code <= 0xff) {
+		} else if ((unsigned int)code >= 0xf9 && (unsigned int)code <= 0xff) {
 			static char const repr_si[] =
-			"SI_TKILL\0Sent by tkill\0SI_SIGIO\0Sent by queued SIGIO\0SI_ASYNCIO\0"
-			"Sent by AIO completion\0SI_MESGQ\0Sent by real time mesq state cha"
-			"nge\0SI_TIMER\0Sent by timer expiration\0SI_QUEUE\0Sent by sigqueue";
+			"SI_DETHREAD\0Sent by `execve(2)\' killing secondary threads\0SI_TKI"
+			"LL\0Sent by tkill\0SI_SIGIO\0Sent by queued SIGIO\0SI_ASYNCIO\0Sent b"
+			"y AIO completion\0SI_MESGQ\0Sent by real time mesq state change\0SI"
+			"_TIMER\0Sent by timer expiration\0SI_QUEUE\0Sent by sigqueue";
 			result = repr_si;
-			code -= 0xfa;
+			code -= 0xf9;
 		}
 		break;
 	}
@@ -623,6 +629,63 @@ print("@@pp_endif@@");
 		if (!*result)
 			result = NULL;
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

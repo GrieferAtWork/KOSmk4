@@ -43,34 +43,35 @@
 
 __SYSDECL_BEGIN
 
-#if (defined(__UL_GETFSIZE) || defined(__UL_SETFSIZE))
+#if ((!defined(UL_GETFSIZE) && defined(__UL_GETFSIZE)) || \
+     (!defined(UL_SETFSIZE) && defined(__UL_SETFSIZE)))
 /* Arguments for `ulimit(3)' */
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-#ifdef __UL_GETFSIZE
+#if !defined(UL_GETFSIZE) && defined(__UL_GETFSIZE)
 	UL_GETFSIZE = __UL_GETFSIZE, /* TODO: Doc */
-#endif /* __UL_GETFSIZE */
-#ifdef __UL_SETFSIZE
+#endif /* !UL_GETFSIZE && __UL_GETFSIZE */
+#if !defined(UL_SETFSIZE) && defined(__UL_SETFSIZE)
 	UL_SETFSIZE = __UL_SETFSIZE, /* TODO: Doc */
-#endif /* __UL_SETFSIZE */
+#endif /* !UL_SETFSIZE && __UL_SETFSIZE */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __UL_GETFSIZE
+#if !defined(UL_GETFSIZE) && defined(__UL_GETFSIZE)
 #define UL_GETFSIZE UL_GETFSIZE /* TODO: Doc */
-#endif /* __UL_GETFSIZE */
-#ifdef __UL_SETFSIZE
+#endif /* !UL_GETFSIZE && __UL_GETFSIZE */
+#if !defined(UL_SETFSIZE) && defined(__UL_SETFSIZE)
 #define UL_SETFSIZE UL_SETFSIZE /* TODO: Doc */
-#endif /* __UL_SETFSIZE */
+#endif /* !UL_SETFSIZE && __UL_SETFSIZE */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __UL_GETFSIZE
+#if !defined(UL_GETFSIZE) && defined(__UL_GETFSIZE)
 #define UL_GETFSIZE __UL_GETFSIZE /* TODO: Doc */
-#endif /* __UL_GETFSIZE */
-#ifdef __UL_SETFSIZE
+#endif /* !UL_GETFSIZE && __UL_GETFSIZE */
+#if !defined(UL_SETFSIZE) && defined(__UL_SETFSIZE)
 #define UL_SETFSIZE __UL_SETFSIZE /* TODO: Doc */
-#endif /* __UL_SETFSIZE */
+#endif /* !UL_SETFSIZE && __UL_SETFSIZE */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* ... */

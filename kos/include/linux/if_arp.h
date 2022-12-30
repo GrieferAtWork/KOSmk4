@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Linux (/include/linux/if_arp.h) */
+/* (#) Portability: Linux (/usr/include/linux/if_arp.h) */
 #ifndef _LINUX_IF_ARG_H
 #define _LINUX_IF_ARG_H 1
 

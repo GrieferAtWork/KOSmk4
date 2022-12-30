@@ -144,22 +144,31 @@
 
 #define __PKEY_DISABLE_ACCESS 0x1
 #define __PKEY_DISABLE_WRITE  0x2
+#define __PKEY_ACCESS_MASK    0x3
 
-#define __MADV_NORMAL      0   /* ??? */
-#define __MADV_RANDOM      1   /* ??? */
-#define __MADV_SEQUENTIAL  2   /* ??? */
-#define __MADV_WILLNEED    3   /* ??? */
-#define __MADV_DONTNEED    4   /* ??? */
-#define __MADV_REMOVE      9   /* ??? */
-#define __MADV_DONTFORK    10  /* ??? */
-#define __MADV_DOFORK      11  /* ??? */
-#define __MADV_MERGEABLE   12  /* ??? */
-#define __MADV_UNMERGEABLE 13  /* ??? */
-#define __MADV_HUGEPAGE    14  /* ??? */
-#define __MADV_NOHUGEPAGE  15  /* ??? */
-#define __MADV_DONTDUMP    16  /* ??? */
-#define __MADV_DODUMP      17  /* ??? */
-#define __MADV_HWPOISON    100 /* ??? */
+#define __MADV_NORMAL         0   /* ??? */
+#define __MADV_RANDOM         1   /* ??? */
+#define __MADV_SEQUENTIAL     2   /* ??? */
+#define __MADV_WILLNEED       3   /* ??? */
+#define __MADV_DONTNEED       4   /* ??? */
+#define __MADV_FREE           8   /* ??? */
+#define __MADV_REMOVE         9   /* ??? */
+#define __MADV_DONTFORK       10  /* ??? */
+#define __MADV_DOFORK         11  /* ??? */
+#define __MADV_MERGEABLE      12  /* ??? */
+#define __MADV_UNMERGEABLE    13  /* ??? */
+#define __MADV_HUGEPAGE       14  /* ??? */
+#define __MADV_NOHUGEPAGE     15  /* ??? */
+#define __MADV_DONTDUMP       16  /* ??? */
+#define __MADV_DODUMP         17  /* ??? */
+#define __MADV_WIPEONFORK     18  /* ??? */
+#define __MADV_KEEPONFORK     19  /* ??? */
+#define __MADV_COLD           20  /* ??? */
+#define __MADV_PAGEOUT        21  /* ??? */
+#define __MADV_POPULATE_READ  22  /* ??? */
+#define __MADV_POPULATE_WRITE 23  /* ??? */
+#define __MADV_HWPOISON       100 /* ??? */
+#define __MADV_SOFT_OFFLINE   101 /* ??? */
 
 #define __POSIX_MADV_NORMAL     0 /* ??? */
 #define __POSIX_MADV_RANDOM     1 /* ??? */

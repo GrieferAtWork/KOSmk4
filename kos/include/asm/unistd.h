@@ -17,6 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+/* (#) Portability: Linux (/usr/include/[...]/asm/unistd.h) */
 #ifndef _ASM_UNISTD_H
 #define _ASM_UNISTD_H 1
 

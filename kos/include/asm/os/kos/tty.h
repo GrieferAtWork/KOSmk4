@@ -112,15 +112,18 @@
 #define __TIOCSER_TEMT 0x01 /* Transmitter physically empty */
 
 /* modem lines */
-#define __TIOCM_LE  0x001 /* ??? */
-#define __TIOCM_DTR 0x002 /* ??? */
-#define __TIOCM_RTS 0x004 /* ??? */
-#define __TIOCM_ST  0x008 /* ??? */
-#define __TIOCM_SR  0x010 /* ??? */
-#define __TIOCM_CTS 0x020 /* ??? */
-#define __TIOCM_CAR 0x040 /* ??? */
-#define __TIOCM_RNG 0x080 /* ??? */
-#define __TIOCM_DSR 0x100 /* ??? */
+#define __TIOCM_LE   0x0001 /* ??? */
+#define __TIOCM_DTR  0x0002 /* ??? */
+#define __TIOCM_RTS  0x0004 /* ??? */
+#define __TIOCM_ST   0x0008 /* ??? */
+#define __TIOCM_SR   0x0010 /* ??? */
+#define __TIOCM_CTS  0x0020 /* ??? */
+#define __TIOCM_CAR  0x0040 /* ??? */
+#define __TIOCM_RNG  0x0080 /* ??? */
+#define __TIOCM_DSR  0x0100 /* ??? */
+#define __TIOCM_OUT1 0x2000 /* ??? */
+#define __TIOCM_OUT2 0x4000 /* ??? */
+#define __TIOCM_LOOP 0x8000 /* ??? */
 
 
 /************************************************************************/
@@ -136,5 +139,10 @@
 
 #define __FIODTYPE _IOR('f', 122, int) /* Returns set of `__D_*' */
 #endif /* __KOS__ */
+
+/* ??? */
+#define __TIOCGPTPEER  _IO('T', 0x41)                          /* ??? */
+#define __TIOCGISO7816 _IOR('T', 0x42, struct serial_iso7816)  /* ??? */
+#define __TIOCSISO7816 _IOWR('T', 0x43, struct serial_iso7816) /* ??? */
 
 #endif /* !_ASM_OS_KOS_TTY_H */

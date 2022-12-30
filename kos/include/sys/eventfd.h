@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x508de976 */
+/* HASH CRC-32:0x35d47168 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,52 +44,54 @@
 __SYSDECL_BEGIN
 
 /* Flags for `eventfd()'. */
-#if (defined(__EFD_SEMAPHORE) || defined(__EFD_NONBLOCK) || \
-     defined(__EFD_CLOEXEC) || defined(__EFD_CLOFORK))
+#if ((!defined(EFD_SEMAPHORE) && defined(__EFD_SEMAPHORE)) || \
+     (!defined(EFD_NONBLOCK) && defined(__EFD_NONBLOCK)) ||   \
+     (!defined(EFD_CLOEXEC) && defined(__EFD_CLOEXEC)) ||     \
+     (!defined(EFD_CLOFORK) && defined(__EFD_CLOFORK)))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-#ifdef __EFD_SEMAPHORE
+#if !defined(EFD_SEMAPHORE) && defined(__EFD_SEMAPHORE)
 	EFD_SEMAPHORE = __EFD_SEMAPHORE, /* Create a semaphore */
-#endif /* __EFD_SEMAPHORE */
-#ifdef __EFD_NONBLOCK
+#endif /* !EFD_SEMAPHORE && __EFD_SEMAPHORE */
+#if !defined(EFD_NONBLOCK) && defined(__EFD_NONBLOCK)
 	EFD_NONBLOCK  = __EFD_NONBLOCK,  /* Set the IO_NONBLOCK flag */
-#endif /* __EFD_NONBLOCK */
-#ifdef __EFD_CLOEXEC
+#endif /* !EFD_NONBLOCK && __EFD_NONBLOCK */
+#if !defined(EFD_CLOEXEC) && defined(__EFD_CLOEXEC)
 	EFD_CLOEXEC   = __EFD_CLOEXEC,   /* Set the IO_CLOEXEC flag */
-#endif /* __EFD_CLOEXEC */
-#ifdef __EFD_CLOFORK
+#endif /* !EFD_CLOEXEC && __EFD_CLOEXEC */
+#if !defined(EFD_CLOFORK) && defined(__EFD_CLOFORK)
 	EFD_CLOFORK   = __EFD_CLOFORK,   /* Set the IO_CLOFORK flag */
-#endif /* __EFD_CLOFORK */
+#endif /* !EFD_CLOFORK && __EFD_CLOFORK */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __EFD_SEMAPHORE
+#if !defined(EFD_SEMAPHORE) && defined(__EFD_SEMAPHORE)
 #define EFD_SEMAPHORE EFD_SEMAPHORE /* Create a semaphore */
-#endif /* __EFD_SEMAPHORE */
-#ifdef __EFD_NONBLOCK
+#endif /* !EFD_SEMAPHORE && __EFD_SEMAPHORE */
+#if !defined(EFD_NONBLOCK) && defined(__EFD_NONBLOCK)
 #define EFD_NONBLOCK  EFD_NONBLOCK  /* Set the IO_NONBLOCK flag */
-#endif /* __EFD_NONBLOCK */
-#ifdef __EFD_CLOEXEC
+#endif /* !EFD_NONBLOCK && __EFD_NONBLOCK */
+#if !defined(EFD_CLOEXEC) && defined(__EFD_CLOEXEC)
 #define EFD_CLOEXEC   EFD_CLOEXEC   /* Set the IO_CLOEXEC flag */
-#endif /* __EFD_CLOEXEC */
-#ifdef __EFD_CLOFORK
+#endif /* !EFD_CLOEXEC && __EFD_CLOEXEC */
+#if !defined(EFD_CLOFORK) && defined(__EFD_CLOFORK)
 #define EFD_CLOFORK   EFD_CLOFORK   /* Set the IO_CLOFORK flag */
-#endif /* __EFD_CLOFORK */
+#endif /* !EFD_CLOFORK && __EFD_CLOFORK */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __EFD_SEMAPHORE
+#if !defined(EFD_SEMAPHORE) && defined(__EFD_SEMAPHORE)
 #define EFD_SEMAPHORE __EFD_SEMAPHORE /* Create a semaphore */
-#endif /* __EFD_SEMAPHORE */
-#ifdef __EFD_NONBLOCK
+#endif /* !EFD_SEMAPHORE && __EFD_SEMAPHORE */
+#if !defined(EFD_NONBLOCK) && defined(__EFD_NONBLOCK)
 #define EFD_NONBLOCK  __EFD_NONBLOCK  /* Set the IO_NONBLOCK flag */
-#endif /* __EFD_NONBLOCK */
-#ifdef __EFD_CLOEXEC
+#endif /* !EFD_NONBLOCK && __EFD_NONBLOCK */
+#if !defined(EFD_CLOEXEC) && defined(__EFD_CLOEXEC)
 #define EFD_CLOEXEC   __EFD_CLOEXEC   /* Set the IO_CLOEXEC flag */
-#endif /* __EFD_CLOEXEC */
-#ifdef __EFD_CLOFORK
+#endif /* !EFD_CLOEXEC && __EFD_CLOEXEC */
+#if !defined(EFD_CLOFORK) && defined(__EFD_CLOFORK)
 #define EFD_CLOFORK   __EFD_CLOFORK   /* Set the IO_CLOFORK flag */
-#endif /* __EFD_CLOFORK */
+#endif /* !EFD_CLOFORK && __EFD_CLOFORK */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* __EFD_SEMAPHORE || __EFD_NONBLOCK || __EFD_CLOEXEC || __EFD_CLOFORK */

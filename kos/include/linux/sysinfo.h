@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Linux     (/include/linux/sysinfo.h) */
+/* (#) Portability: Linux     (/usr/include/linux/sysinfo.h) */
 /* (#) Portability: diet libc (/include/linux/sysinfo.h) */
 #ifndef _LINUX_SYSINFO_H
 #define _LINUX_SYSINFO_H 1

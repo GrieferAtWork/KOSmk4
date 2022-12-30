@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f1b29c3 */
+/* HASH CRC-32:0x8134cd29 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,100 +58,100 @@ __SYSDECL_BEGIN
 
 #ifdef __USE_MISC
 #ifndef DT_UNKNOWN
-#if (defined(__DT_UNKNOWN) || defined(__DT_FIFO) || \
-     defined(__DT_CHR) || defined(__DT_DIR) ||      \
-     defined(__DT_BLK) || defined(__DT_REG) ||      \
-     defined(__DT_LNK) || defined(__DT_SOCK) ||     \
-     defined(__DT_WHT))
+#if ((!defined(DT_UNKNOWN) && defined(__DT_UNKNOWN)) || (!defined(DT_FIFO) && defined(__DT_FIFO)) || \
+     (!defined(DT_CHR) && defined(__DT_CHR)) || (!defined(DT_DIR) && defined(__DT_DIR)) ||           \
+     (!defined(DT_BLK) && defined(__DT_BLK)) || (!defined(DT_REG) && defined(__DT_REG)) ||           \
+     (!defined(DT_LNK) && defined(__DT_LNK)) || (!defined(DT_SOCK) && defined(__DT_SOCK)) ||         \
+     (!defined(DT_WHT) && defined(__DT_WHT)))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-#ifdef __DT_UNKNOWN
+#if !defined(DT_UNKNOWN) && defined(__DT_UNKNOWN)
 	DT_UNKNOWN = __DT_UNKNOWN, /* Unknown file type */
-#endif /* __DT_UNKNOWN */
-#ifdef __DT_FIFO
+#endif /* !DT_UNKNOWN && __DT_UNKNOWN */
+#if !defined(DT_FIFO) && defined(__DT_FIFO)
 	DT_FIFO    = __DT_FIFO,    /* FistInFirstOut (pipe) file (s.a. `S_ISFIFO()', `S_IFMT & S_IFIFO') */
-#endif /* __DT_FIFO */
-#ifdef __DT_CHR
+#endif /* !DT_FIFO && __DT_FIFO */
+#if !defined(DT_CHR) && defined(__DT_CHR)
 	DT_CHR     = __DT_CHR,     /* Character device file      (s.a. `S_ISCHR()', `S_IFMT & S_IFCHR') */
-#endif /* __DT_CHR */
-#ifdef __DT_DIR
+#endif /* !DT_CHR && __DT_CHR */
+#if !defined(DT_DIR) && defined(__DT_DIR)
 	DT_DIR     = __DT_DIR,     /* Directory                  (s.a. `S_ISDIR()', `S_IFMT & S_IFDIR') */
-#endif /* __DT_DIR */
-#ifdef __DT_BLK
+#endif /* !DT_DIR && __DT_DIR */
+#if !defined(DT_BLK) && defined(__DT_BLK)
 	DT_BLK     = __DT_BLK,     /* Block device file          (s.a. `S_ISBLK()', `S_IFMT & S_IFBLK') */
-#endif /* __DT_BLK */
-#ifdef __DT_REG
+#endif /* !DT_BLK && __DT_BLK */
+#if !defined(DT_REG) && defined(__DT_REG)
 	DT_REG     = __DT_REG,     /* Regular text file          (s.a. `S_ISREG()', `S_IFMT & S_IFREG') */
-#endif /* __DT_REG */
-#ifdef __DT_LNK
+#endif /* !DT_REG && __DT_REG */
+#if !defined(DT_LNK) && defined(__DT_LNK)
 	DT_LNK     = __DT_LNK,     /* Symbolic link              (s.a. `S_ISLNK()', `S_IFMT & S_IFLNK') */
-#endif /* __DT_LNK */
-#ifdef __DT_SOCK
+#endif /* !DT_LNK && __DT_LNK */
+#if !defined(DT_SOCK) && defined(__DT_SOCK)
 	DT_SOCK    = __DT_SOCK,    /* Socket file                (s.a. `S_ISSOCK()', `S_IFMT & S_IFSOCK') */
-#endif /* __DT_SOCK */
-#ifdef __DT_WHT
+#endif /* !DT_SOCK && __DT_SOCK */
+#if !defined(DT_WHT) && defined(__DT_WHT)
 	DT_WHT     = __DT_WHT,     /* Mounting point? */
-#endif /* __DT_WHT */
+#endif /* !DT_WHT && __DT_WHT */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __DT_UNKNOWN
+#if !defined(DT_UNKNOWN) && defined(__DT_UNKNOWN)
 #define DT_UNKNOWN DT_UNKNOWN /* Unknown file type */
-#endif /* __DT_UNKNOWN */
-#ifdef __DT_FIFO
+#endif /* !DT_UNKNOWN && __DT_UNKNOWN */
+#if !defined(DT_FIFO) && defined(__DT_FIFO)
 #define DT_FIFO    DT_FIFO    /* FistInFirstOut (pipe) file (s.a. `S_ISFIFO()', `S_IFMT & S_IFIFO') */
-#endif /* __DT_FIFO */
-#ifdef __DT_CHR
+#endif /* !DT_FIFO && __DT_FIFO */
+#if !defined(DT_CHR) && defined(__DT_CHR)
 #define DT_CHR     DT_CHR     /* Character device file      (s.a. `S_ISCHR()', `S_IFMT & S_IFCHR') */
-#endif /* __DT_CHR */
-#ifdef __DT_DIR
+#endif /* !DT_CHR && __DT_CHR */
+#if !defined(DT_DIR) && defined(__DT_DIR)
 #define DT_DIR     DT_DIR     /* Directory                  (s.a. `S_ISDIR()', `S_IFMT & S_IFDIR') */
-#endif /* __DT_DIR */
-#ifdef __DT_BLK
+#endif /* !DT_DIR && __DT_DIR */
+#if !defined(DT_BLK) && defined(__DT_BLK)
 #define DT_BLK     DT_BLK     /* Block device file          (s.a. `S_ISBLK()', `S_IFMT & S_IFBLK') */
-#endif /* __DT_BLK */
-#ifdef __DT_REG
+#endif /* !DT_BLK && __DT_BLK */
+#if !defined(DT_REG) && defined(__DT_REG)
 #define DT_REG     DT_REG     /* Regular text file          (s.a. `S_ISREG()', `S_IFMT & S_IFREG') */
-#endif /* __DT_REG */
-#ifdef __DT_LNK
+#endif /* !DT_REG && __DT_REG */
+#if !defined(DT_LNK) && defined(__DT_LNK)
 #define DT_LNK     DT_LNK     /* Symbolic link              (s.a. `S_ISLNK()', `S_IFMT & S_IFLNK') */
-#endif /* __DT_LNK */
-#ifdef __DT_SOCK
+#endif /* !DT_LNK && __DT_LNK */
+#if !defined(DT_SOCK) && defined(__DT_SOCK)
 #define DT_SOCK    DT_SOCK    /* Socket file                (s.a. `S_ISSOCK()', `S_IFMT & S_IFSOCK') */
-#endif /* __DT_SOCK */
-#ifdef __DT_WHT
+#endif /* !DT_SOCK && __DT_SOCK */
+#if !defined(DT_WHT) && defined(__DT_WHT)
 #define DT_WHT     DT_WHT     /* Mounting point? */
-#endif /* __DT_WHT */
+#endif /* !DT_WHT && __DT_WHT */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __DT_UNKNOWN
+#if !defined(DT_UNKNOWN) && defined(__DT_UNKNOWN)
 #define DT_UNKNOWN __DT_UNKNOWN /* Unknown file type */
-#endif /* __DT_UNKNOWN */
-#ifdef __DT_FIFO
+#endif /* !DT_UNKNOWN && __DT_UNKNOWN */
+#if !defined(DT_FIFO) && defined(__DT_FIFO)
 #define DT_FIFO    __DT_FIFO    /* FistInFirstOut (pipe) file (s.a. `S_ISFIFO()', `S_IFMT & S_IFIFO') */
-#endif /* __DT_FIFO */
-#ifdef __DT_CHR
+#endif /* !DT_FIFO && __DT_FIFO */
+#if !defined(DT_CHR) && defined(__DT_CHR)
 #define DT_CHR     __DT_CHR     /* Character device file      (s.a. `S_ISCHR()', `S_IFMT & S_IFCHR') */
-#endif /* __DT_CHR */
-#ifdef __DT_DIR
+#endif /* !DT_CHR && __DT_CHR */
+#if !defined(DT_DIR) && defined(__DT_DIR)
 #define DT_DIR     __DT_DIR     /* Directory                  (s.a. `S_ISDIR()', `S_IFMT & S_IFDIR') */
-#endif /* __DT_DIR */
-#ifdef __DT_BLK
+#endif /* !DT_DIR && __DT_DIR */
+#if !defined(DT_BLK) && defined(__DT_BLK)
 #define DT_BLK     __DT_BLK     /* Block device file          (s.a. `S_ISBLK()', `S_IFMT & S_IFBLK') */
-#endif /* __DT_BLK */
-#ifdef __DT_REG
+#endif /* !DT_BLK && __DT_BLK */
+#if !defined(DT_REG) && defined(__DT_REG)
 #define DT_REG     __DT_REG     /* Regular text file          (s.a. `S_ISREG()', `S_IFMT & S_IFREG') */
-#endif /* __DT_REG */
-#ifdef __DT_LNK
+#endif /* !DT_REG && __DT_REG */
+#if !defined(DT_LNK) && defined(__DT_LNK)
 #define DT_LNK     __DT_LNK     /* Symbolic link              (s.a. `S_ISLNK()', `S_IFMT & S_IFLNK') */
-#endif /* __DT_LNK */
-#ifdef __DT_SOCK
+#endif /* !DT_LNK && __DT_LNK */
+#if !defined(DT_SOCK) && defined(__DT_SOCK)
 #define DT_SOCK    __DT_SOCK    /* Socket file                (s.a. `S_ISSOCK()', `S_IFMT & S_IFSOCK') */
-#endif /* __DT_SOCK */
-#ifdef __DT_WHT
+#endif /* !DT_SOCK && __DT_SOCK */
+#if !defined(DT_WHT) && defined(__DT_WHT)
 #define DT_WHT     __DT_WHT     /* Mounting point? */
-#endif /* __DT_WHT */
+#endif /* !DT_WHT && __DT_WHT */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* ... */

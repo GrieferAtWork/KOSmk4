@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5387e9bd */
+/* HASH CRC-32:0x6b0664e4 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -179,33 +179,38 @@ print("@@pp_endif@@");
 #if defined(__KOS__) || defined(__linux__)
 	switch (__signo) {
 	case __SIGILL:
-		if ((unsigned int)__code <= 0x8) {
+		if ((unsigned int)__code <= 0xb) {
 			static char const __repr_ill[] =
 			"\0\0ILL_ILLOPC\0Illegal opcode\0ILL_ILLOPN\0Illegal operand\0ILL_ILLAD"
 			"R\0Illegal addressing mode\0ILL_ILLTRP\0Illegal trap\0ILL_PRVOPC\0Pri"
 			"vileged opcode\0ILL_PRVREG\0Privileged register\0ILL_COPROC\0Coproce"
-			"ssor error\0ILL_BADSTK\0Internal stack error";
+			"ssor error\0ILL_BADSTK\0Internal stack error\0ILL_BADIADDR\0???\0ILL_"
+			"BREAK\0???\0ILL_BNDMOD\0???";
 			__result = __repr_ill;
 		}
 		break;
 
 	case __SIGFPE:
-		if ((unsigned int)__code <= 0x8) {
+		if ((unsigned int)__code <= 0xf) {
 			static char const __repr_fpe[] =
 			"\0\0FPE_INTDIV\0Integer divide by zero\0FPE_INTOVF\0Integer overflow\0"
 			"FPE_FLTDIV\0Floating point divide by zero\0FPE_FLTOVF\0Floating poi"
 			"nt overflow\0FPE_FLTUND\0Floating point underflow\0FPE_FLTRES\0Float"
 			"ing point inexact result\0FPE_FLTINV\0Floating point invalid opera"
-			"tion\0FPE_FLTSUB\0Subscript out of range";
+			"tion\0FPE_FLTSUB\0Subscript out of range\0FPE_DECOVF\0???\0FPE_DECDIV"
+			"\0???\0FPE_DECERR\0???\0FPE_INVASC\0???\0FPE_INVDEC\0???\0FPE_FLTUNK\0???"
+			"\0FPE_CONDTRAP\0???";
 			__result = __repr_fpe;
 		}
 		break;
 
 	case __SIGSEGV:
-		if ((unsigned int)__code <= 0x2) {
+		if ((unsigned int)__code <= 0x9) {
 			static char const __repr_segv[] =
 			"\0\0SEGV_MAPERR\0Address not mapped to object\0SEGV_ACCERR\0Invalid p"
-			"ermissions for mapped object";
+			"ermissions for mapped object\0SEGV_BNDERR\0???\0SEGV_PKUERR\0???\0SEG"
+			"V_ACCADI\0???\0SEGV_ADIDERR\0???\0SEGV_ADIPERR\0???\0SEGV_MTEAERR\0???\0"
+			"SEGV_MTESERR\0???";
 			__result = __repr_segv;
 		}
 		break;
@@ -261,13 +266,14 @@ print("@@pp_endif@@");
 		} else if ((unsigned int)__code == 0xc4) {
 			__result = "SI_ASYNCNL\0Sent by asynch name lookup completion";
 			__code   = 0;
-		} else if ((unsigned int)__code >= 0xfa && (unsigned int)__code <= 0xff) {
+		} else if ((unsigned int)__code >= 0xf9 && (unsigned int)__code <= 0xff) {
 			static char const __repr_si[] =
-			"SI_TKILL\0Sent by tkill\0SI_SIGIO\0Sent by queued SIGIO\0SI_ASYNCIO\0"
-			"Sent by AIO completion\0SI_MESGQ\0Sent by real time mesq state cha"
-			"nge\0SI_TIMER\0Sent by timer expiration\0SI_QUEUE\0Sent by sigqueue";
+			"SI_DETHREAD\0Sent by `execve(2)\' killing secondary threads\0SI_TKI"
+			"LL\0Sent by tkill\0SI_SIGIO\0Sent by queued SIGIO\0SI_ASYNCIO\0Sent b"
+			"y AIO completion\0SI_MESGQ\0Sent by real time mesq state change\0SI"
+			"_TIMER\0Sent by timer expiration\0SI_QUEUE\0Sent by sigqueue";
 			__result = __repr_si;
-			__code -= 0xfa;
+			__code -= 0xf9;
 		}
 		break;
 	}
@@ -307,6 +313,15 @@ print("@@pp_endif@@");
 #ifdef __ILL_BADSTK
 		case __ILL_BADSTK: __result = "ILL_BADSTK\0Internal stack error"; break;
 #endif /* __ILL_BADSTK */
+#ifdef __ILL_BADIADDR
+		case __ILL_BADIADDR: __result = "ILL_BADIADDR\0???"; break;
+#endif /* __ILL_BADIADDR */
+#ifdef __ILL_BREAK
+		case __ILL_BREAK: __result = "ILL_BREAK\0???"; break;
+#endif /* __ILL_BREAK */
+#ifdef __ILL_BNDMOD
+		case __ILL_BNDMOD: __result = "ILL_BNDMOD\0???"; break;
+#endif /* __ILL_BNDMOD */
 		default: break;
 		}
 		break;
@@ -339,6 +354,27 @@ print("@@pp_endif@@");
 #ifdef __FPE_FLTSUB
 		case __FPE_FLTSUB: __result = "FPE_FLTSUB\0Subscript out of range"; break;
 #endif /* __FPE_FLTSUB */
+#ifdef __FPE_DECOVF
+		case __FPE_DECOVF: __result = "FPE_DECOVF\0???"; break;
+#endif /* __FPE_DECOVF */
+#ifdef __FPE_DECDIV
+		case __FPE_DECDIV: __result = "FPE_DECDIV\0???"; break;
+#endif /* __FPE_DECDIV */
+#ifdef __FPE_DECERR
+		case __FPE_DECERR: __result = "FPE_DECERR\0???"; break;
+#endif /* __FPE_DECERR */
+#ifdef __FPE_INVASC
+		case __FPE_INVASC: __result = "FPE_INVASC\0???"; break;
+#endif /* __FPE_INVASC */
+#ifdef __FPE_INVDEC
+		case __FPE_INVDEC: __result = "FPE_INVDEC\0???"; break;
+#endif /* __FPE_INVDEC */
+#ifdef __FPE_FLTUNK
+		case __FPE_FLTUNK: __result = "FPE_FLTUNK\0???"; break;
+#endif /* __FPE_FLTUNK */
+#ifdef __FPE_CONDTRAP
+		case __FPE_CONDTRAP: __result = "FPE_CONDTRAP\0???"; break;
+#endif /* __FPE_CONDTRAP */
 		default: break;
 		}
 		break;
@@ -353,6 +389,30 @@ print("@@pp_endif@@");
 #ifdef __SEGV_ACCERR
 		case __SEGV_ACCERR: __result = "SEGV_ACCERR\0Invalid permissions for mapped object"; break;
 #endif /* __SEGV_ACCERR */
+#ifdef __SEGV_BNDERR
+		case __SEGV_BNDERR: __result = "SEGV_BNDERR\0???"; break;
+#endif /* __SEGV_BNDERR */
+#ifdef __SEGV_PSTKOVF
+		case __SEGV_PSTKOVF: __result = "SEGV_PSTKOVF\0???"; break;
+#endif /* __SEGV_PSTKOVF */
+#ifdef __SEGV_PKUERR
+		case __SEGV_PKUERR: __result = "SEGV_PKUERR\0???"; break;
+#endif /* __SEGV_PKUERR */
+#ifdef __SEGV_ACCADI
+		case __SEGV_ACCADI: __result = "SEGV_ACCADI\0???"; break;
+#endif /* __SEGV_ACCADI */
+#ifdef __SEGV_ADIDERR
+		case __SEGV_ADIDERR: __result = "SEGV_ADIDERR\0???"; break;
+#endif /* __SEGV_ADIDERR */
+#ifdef __SEGV_ADIPERR
+		case __SEGV_ADIPERR: __result = "SEGV_ADIPERR\0???"; break;
+#endif /* __SEGV_ADIPERR */
+#ifdef __SEGV_MTEAERR
+		case __SEGV_MTEAERR: __result = "SEGV_MTEAERR\0???"; break;
+#endif /* __SEGV_MTEAERR */
+#ifdef __SEGV_MTESERR
+		case __SEGV_MTESERR: __result = "SEGV_MTESERR\0???"; break;
+#endif /* __SEGV_MTESERR */
 		default: break;
 		}
 		break;
@@ -452,6 +512,9 @@ print("@@pp_endif@@");
 #ifdef __SI_ASYNCNL
 		case __SI_ASYNCNL: __result = "SI_ASYNCNL\0Sent by asynch name lookup completion"; break;
 #endif /* __SI_ASYNCNL */
+#ifdef __SI_DETHREAD
+		case __SI_DETHREAD: __result = "SI_DETHREAD\0Sent by `execve(2)\' killing secondary threads"; break;
+#endif /* __SI_DETHREAD */
 #ifdef __SI_TKILL
 		case __SI_TKILL: __result = "SI_TKILL\0Sent by tkill"; break;
 #endif /* __SI_TKILL */

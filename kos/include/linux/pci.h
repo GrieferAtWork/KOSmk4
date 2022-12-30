@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Linux (/include/linux/pci.h) */
+/* (#) Portability: Linux (/usr/include/linux/pci.h) */
 #ifndef _LINUX_PCI_H
 #define _LINUX_PCI_H 1
 

@@ -55,43 +55,44 @@
 
 
 /* Flags for signalfd. */
-#if (defined(__SFD_NONBLOCK) || defined(__SFD_CLOEXEC) || \
-     defined(__SFD_CLOFORK))
+#if ((!defined(SFD_NONBLOCK) && defined(__SFD_NONBLOCK)) || \
+     (!defined(SFD_CLOEXEC) && defined(__SFD_CLOEXEC)) ||   \
+     (!defined(SFD_CLOFORK) && defined(__SFD_CLOFORK)))
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-#ifdef __SFD_NONBLOCK
+#if !defined(SFD_NONBLOCK) && defined(__SFD_NONBLOCK)
 	SFD_NONBLOCK = __SFD_NONBLOCK, /* Do not block when trying to read data that hasn't been written, yet. */
-#endif /* __SFD_NONBLOCK */
-#ifdef __SFD_CLOEXEC
+#endif /* !SFD_NONBLOCK && __SFD_NONBLOCK */
+#if !defined(SFD_CLOEXEC) && defined(__SFD_CLOEXEC)
 	SFD_CLOEXEC  = __SFD_CLOEXEC,  /* Close the file during exec() */
-#endif /* __SFD_CLOEXEC */
-#ifdef __SFD_CLOFORK
+#endif /* !SFD_CLOEXEC && __SFD_CLOEXEC */
+#if !defined(SFD_CLOFORK) && defined(__SFD_CLOFORK)
 	SFD_CLOFORK  = __SFD_CLOFORK,  /* Close the handle when the file descriptors are unshared (s.a. `CLONE_FILES') */
-#endif /* __SFD_CLOFORK */
+#endif /* !SFD_CLOFORK && __SFD_CLOFORK */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __SFD_NONBLOCK
+#if !defined(SFD_NONBLOCK) && defined(__SFD_NONBLOCK)
 #define SFD_NONBLOCK SFD_NONBLOCK /* Do not block when trying to read data that hasn't been written, yet. */
-#endif /* __SFD_NONBLOCK */
-#ifdef __SFD_CLOEXEC
+#endif /* !SFD_NONBLOCK && __SFD_NONBLOCK */
+#if !defined(SFD_CLOEXEC) && defined(__SFD_CLOEXEC)
 #define SFD_CLOEXEC  SFD_CLOEXEC  /* Close the file during exec() */
-#endif /* __SFD_CLOEXEC */
-#ifdef __SFD_CLOFORK
+#endif /* !SFD_CLOEXEC && __SFD_CLOEXEC */
+#if !defined(SFD_CLOFORK) && defined(__SFD_CLOFORK)
 #define SFD_CLOFORK  SFD_CLOFORK  /* Close the handle when the file descriptors are unshared (s.a. `CLONE_FILES') */
-#endif /* __SFD_CLOFORK */
+#endif /* !SFD_CLOFORK && __SFD_CLOFORK */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __SFD_NONBLOCK
+#if !defined(SFD_NONBLOCK) && defined(__SFD_NONBLOCK)
 #define SFD_NONBLOCK __SFD_NONBLOCK /* Do not block when trying to read data that hasn't been written, yet. */
-#endif /* __SFD_NONBLOCK */
-#ifdef __SFD_CLOEXEC
+#endif /* !SFD_NONBLOCK && __SFD_NONBLOCK */
+#if !defined(SFD_CLOEXEC) && defined(__SFD_CLOEXEC)
 #define SFD_CLOEXEC  __SFD_CLOEXEC  /* Close the file during exec() */
-#endif /* __SFD_CLOEXEC */
-#ifdef __SFD_CLOFORK
+#endif /* !SFD_CLOEXEC && __SFD_CLOEXEC */
+#if !defined(SFD_CLOFORK) && defined(__SFD_CLOFORK)
 #define SFD_CLOFORK  __SFD_CLOFORK  /* Close the handle when the file descriptors are unshared (s.a. `CLONE_FILES') */
-#endif /* __SFD_CLOFORK */
+#endif /* !SFD_CLOFORK && __SFD_CLOFORK */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* __SFD_NONBLOCK || __SFD_CLOEXEC || __SFD_CLOFORK */

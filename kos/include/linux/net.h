@@ -17,7 +17,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Linux (/include/linux/net.h) */
+/* (#) Portability: Linux (/usr/include/linux/net.h) */
 #ifndef _LINUX_NET_H
 #define _LINUX_NET_H 1
 

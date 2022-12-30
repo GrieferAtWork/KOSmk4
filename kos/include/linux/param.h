@@ -17,17 +17,21 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: Linux (/include/linux/param.h) */
+/* (#) Portability: Linux (/usr/include/linux/param.h) */
 #ifndef _LINUX_PARAM_H
 #define _LINUX_PARAM_H 1
 
 #include <asm/os/limits.h>
 #include <asm/pagesize.h>
 
+#if !defined(__EXEC_PAGESIZE) && defined(__ARCH_PAGESIZE)
+#define __EXEC_PAGESIZE __ARCH_PAGESIZE
+#endif /* !__EXEC_PAGESIZE && __ARCH_PAGESIZE */
+
 /* System memory page size */
-#if !defined(EXEC_PAGESIZE) && defined(__ARCH_PAGESIZE)
-#define EXEC_PAGESIZE __ARCH_PAGESIZE
-#endif /* !EXEC_PAGESIZE && __ARCH_PAGESIZE */
+#if !defined(EXEC_PAGESIZE) && defined(__EXEC_PAGESIZE)
+#define EXEC_PAGESIZE __EXEC_PAGESIZE
+#endif /* !EXEC_PAGESIZE && __EXEC_PAGESIZE */
 
 /* Max # of characters in a hostname (s.a. `sethostname(2)'). */
 #if !defined(NOGROUP) && defined(__NGROUPS_MAX) && (__NGROUPS_MAX + 0) != -1

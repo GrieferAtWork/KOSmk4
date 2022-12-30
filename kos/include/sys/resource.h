@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b7e59cd */
+/* HASH CRC-32:0x7be89825 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,76 +55,85 @@
 
 __SYSDECL_BEGIN
 
-#if (defined(__RLIMIT_CPU) || defined(__RLIMIT_FSIZE) ||        \
-     defined(__RLIMIT_DATA) || defined(__RLIMIT_STACK) ||       \
-     defined(__RLIMIT_CORE) || defined(__RLIMIT_RSS) ||         \
-     defined(__RLIMIT_NPROC) || defined(__RLIMIT_NOFILE) ||     \
-     defined(__RLIMIT_MEMLOCK) || defined(__RLIMIT_AS) ||       \
-     defined(__RLIMIT_LOCKS) || defined(__RLIMIT_SIGPENDING) || \
-     defined(__RLIMIT_MSGQUEUE) || defined(__RLIMIT_NICE) ||    \
-     defined(__RLIMIT_RTPRIO) || defined(__RLIMIT_RTTIME) ||    \
-     defined(__RLIMIT_NLIMITS) || (defined(__USE_KOS) && defined(__RLIMIT_MAXFILE)))
+#if ((!defined(RLIMIT_CPU) && defined(__RLIMIT_CPU)) ||                                     \
+     (!defined(RLIMIT_FSIZE) && defined(__RLIMIT_FSIZE)) ||                                 \
+     (!defined(RLIMIT_DATA) && defined(__RLIMIT_DATA)) ||                                   \
+     (!defined(RLIMIT_STACK) && defined(__RLIMIT_STACK)) ||                                 \
+     (!defined(RLIMIT_CORE) && defined(__RLIMIT_CORE)) ||                                   \
+     (!defined(RLIMIT_RSS) && defined(__RLIMIT_RSS)) ||                                     \
+     (!defined(RLIMIT_NPROC) && defined(__RLIMIT_NPROC)) ||                                 \
+     ((!defined(RLIMIT_NOFILE) || !defined(RLIMIT_OFILE)) && defined(__RLIMIT_NOFILE)) ||   \
+     (!defined(RLIMIT_MEMLOCK) && defined(__RLIMIT_MEMLOCK)) ||                             \
+     (!defined(RLIMIT_AS) && defined(__RLIMIT_AS)) ||                                       \
+     (!defined(RLIMIT_LOCKS) && defined(__RLIMIT_LOCKS)) ||                                 \
+     (!defined(RLIMIT_SIGPENDING) && defined(__RLIMIT_SIGPENDING)) ||                       \
+     (!defined(RLIMIT_MSGQUEUE) && defined(__RLIMIT_MSGQUEUE)) ||                           \
+     (!defined(RLIMIT_NICE) && defined(__RLIMIT_NICE)) ||                                   \
+     (!defined(RLIMIT_RTPRIO) && defined(__RLIMIT_RTPRIO)) ||                               \
+     (!defined(RLIMIT_RTTIME) && defined(__RLIMIT_RTTIME)) ||                               \
+     ((!defined(RLIMIT_NLIMITS) || !defined(RLIM_NLIMITS)) && defined(__RLIMIT_NLIMITS)) || \
+     (defined(__USE_KOS) && (!defined(RLIMIT_MAXFILE) && defined(__RLIMIT_MAXFILE))))
 /* Kinds of resource limit. */
 /*[[[enum]]]*/
 #ifdef __CC__
 enum __rlimit_resource {
-#ifdef __RLIMIT_CPU
+#if !defined(RLIMIT_CPU) && defined(__RLIMIT_CPU)
 	RLIMIT_CPU        = __RLIMIT_CPU,        /* ??? */
-#endif /* __RLIMIT_CPU */
-#ifdef __RLIMIT_FSIZE
+#endif /* !RLIMIT_CPU && __RLIMIT_CPU */
+#if !defined(RLIMIT_FSIZE) && defined(__RLIMIT_FSIZE)
 	RLIMIT_FSIZE      = __RLIMIT_FSIZE,      /* ??? */
-#endif /* __RLIMIT_FSIZE */
-#ifdef __RLIMIT_DATA
+#endif /* !RLIMIT_FSIZE && __RLIMIT_FSIZE */
+#if !defined(RLIMIT_DATA) && defined(__RLIMIT_DATA)
 	RLIMIT_DATA       = __RLIMIT_DATA,       /* ??? */
-#endif /* __RLIMIT_DATA */
-#ifdef __RLIMIT_STACK
+#endif /* !RLIMIT_DATA && __RLIMIT_DATA */
+#if !defined(RLIMIT_STACK) && defined(__RLIMIT_STACK)
 	RLIMIT_STACK      = __RLIMIT_STACK,      /* ??? */
-#endif /* __RLIMIT_STACK */
-#ifdef __RLIMIT_CORE
+#endif /* !RLIMIT_STACK && __RLIMIT_STACK */
+#if !defined(RLIMIT_CORE) && defined(__RLIMIT_CORE)
 	RLIMIT_CORE       = __RLIMIT_CORE,       /* ??? */
-#endif /* __RLIMIT_CORE */
-#ifdef __RLIMIT_RSS
+#endif /* !RLIMIT_CORE && __RLIMIT_CORE */
+#if !defined(RLIMIT_RSS) && defined(__RLIMIT_RSS)
 	RLIMIT_RSS        = __RLIMIT_RSS,        /* ??? */
-#endif /* __RLIMIT_RSS */
-#ifdef __RLIMIT_NPROC
+#endif /* !RLIMIT_RSS && __RLIMIT_RSS */
+#if !defined(RLIMIT_NPROC) && defined(__RLIMIT_NPROC)
 	RLIMIT_NPROC      = __RLIMIT_NPROC,      /* ??? */
-#endif /* __RLIMIT_NPROC */
-#ifdef __RLIMIT_NOFILE
+#endif /* !RLIMIT_NPROC && __RLIMIT_NPROC */
+#if !defined(RLIMIT_NOFILE) && defined(__RLIMIT_NOFILE)
 	RLIMIT_NOFILE     = __RLIMIT_NOFILE,     /* Max # of open file descriptors (total; does not affect greatest usable FD number) */
-#endif /* __RLIMIT_NOFILE */
-#ifdef __RLIMIT_NOFILE
+#endif /* !RLIMIT_NOFILE && __RLIMIT_NOFILE */
+#if !defined(RLIMIT_OFILE) && defined(__RLIMIT_NOFILE)
 	RLIMIT_OFILE      = __RLIMIT_NOFILE,     /* Max # of open file descriptors (total; does not affect greatest usable FD number) */
-#endif /* __RLIMIT_NOFILE */
-#ifdef __RLIMIT_MEMLOCK
+#endif /* !RLIMIT_OFILE && __RLIMIT_NOFILE */
+#if !defined(RLIMIT_MEMLOCK) && defined(__RLIMIT_MEMLOCK)
 	RLIMIT_MEMLOCK    = __RLIMIT_MEMLOCK,    /* ??? */
-#endif /* __RLIMIT_MEMLOCK */
-#ifdef __RLIMIT_AS
+#endif /* !RLIMIT_MEMLOCK && __RLIMIT_MEMLOCK */
+#if !defined(RLIMIT_AS) && defined(__RLIMIT_AS)
 	RLIMIT_AS         = __RLIMIT_AS,         /* ??? */
-#endif /* __RLIMIT_AS */
-#ifdef __RLIMIT_LOCKS
+#endif /* !RLIMIT_AS && __RLIMIT_AS */
+#if !defined(RLIMIT_LOCKS) && defined(__RLIMIT_LOCKS)
 	RLIMIT_LOCKS      = __RLIMIT_LOCKS,      /* ??? */
-#endif /* __RLIMIT_LOCKS */
-#ifdef __RLIMIT_SIGPENDING
+#endif /* !RLIMIT_LOCKS && __RLIMIT_LOCKS */
+#if !defined(RLIMIT_SIGPENDING) && defined(__RLIMIT_SIGPENDING)
 	RLIMIT_SIGPENDING = __RLIMIT_SIGPENDING, /* ??? */
-#endif /* __RLIMIT_SIGPENDING */
-#ifdef __RLIMIT_MSGQUEUE
+#endif /* !RLIMIT_SIGPENDING && __RLIMIT_SIGPENDING */
+#if !defined(RLIMIT_MSGQUEUE) && defined(__RLIMIT_MSGQUEUE)
 	RLIMIT_MSGQUEUE   = __RLIMIT_MSGQUEUE,   /* ??? */
-#endif /* __RLIMIT_MSGQUEUE */
-#ifdef __RLIMIT_NICE
+#endif /* !RLIMIT_MSGQUEUE && __RLIMIT_MSGQUEUE */
+#if !defined(RLIMIT_NICE) && defined(__RLIMIT_NICE)
 	RLIMIT_NICE       = __RLIMIT_NICE,       /* ??? */
-#endif /* __RLIMIT_NICE */
-#ifdef __RLIMIT_RTPRIO
+#endif /* !RLIMIT_NICE && __RLIMIT_NICE */
+#if !defined(RLIMIT_RTPRIO) && defined(__RLIMIT_RTPRIO)
 	RLIMIT_RTPRIO     = __RLIMIT_RTPRIO,     /* ??? */
-#endif /* __RLIMIT_RTPRIO */
-#ifdef __RLIMIT_RTTIME
+#endif /* !RLIMIT_RTPRIO && __RLIMIT_RTPRIO */
+#if !defined(RLIMIT_RTTIME) && defined(__RLIMIT_RTTIME)
 	RLIMIT_RTTIME     = __RLIMIT_RTTIME,     /* ??? */
-#endif /* __RLIMIT_RTTIME */
-#ifdef __RLIMIT_NLIMITS
+#endif /* !RLIMIT_RTTIME && __RLIMIT_RTTIME */
+#if !defined(RLIMIT_NLIMITS) && defined(__RLIMIT_NLIMITS)
 	RLIMIT_NLIMITS    = __RLIMIT_NLIMITS,    /* Total # of (standard) resource limits */
-#endif /* __RLIMIT_NLIMITS */
-#ifdef __RLIMIT_NLIMITS
+#endif /* !RLIMIT_NLIMITS && __RLIMIT_NLIMITS */
+#if !defined(RLIM_NLIMITS) && defined(__RLIMIT_NLIMITS)
 	RLIM_NLIMITS      = __RLIMIT_NLIMITS,    /* Total # of (standard) resource limits */
-#endif /* __RLIMIT_NLIMITS */
+#endif /* !RLIM_NLIMITS && __RLIMIT_NLIMITS */
 
 	/* Extended resource limits (OS-specific) */
 #if defined(__USE_KOS) && defined(__RLIMIT_MAXFILE)
@@ -134,126 +143,126 @@ enum __rlimit_resource {
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __RLIMIT_CPU
+#if !defined(RLIMIT_CPU) && defined(__RLIMIT_CPU)
 #define RLIMIT_CPU        RLIMIT_CPU        /* ??? */
-#endif /* __RLIMIT_CPU */
-#ifdef __RLIMIT_FSIZE
+#endif /* !RLIMIT_CPU && __RLIMIT_CPU */
+#if !defined(RLIMIT_FSIZE) && defined(__RLIMIT_FSIZE)
 #define RLIMIT_FSIZE      RLIMIT_FSIZE      /* ??? */
-#endif /* __RLIMIT_FSIZE */
-#ifdef __RLIMIT_DATA
+#endif /* !RLIMIT_FSIZE && __RLIMIT_FSIZE */
+#if !defined(RLIMIT_DATA) && defined(__RLIMIT_DATA)
 #define RLIMIT_DATA       RLIMIT_DATA       /* ??? */
-#endif /* __RLIMIT_DATA */
-#ifdef __RLIMIT_STACK
+#endif /* !RLIMIT_DATA && __RLIMIT_DATA */
+#if !defined(RLIMIT_STACK) && defined(__RLIMIT_STACK)
 #define RLIMIT_STACK      RLIMIT_STACK      /* ??? */
-#endif /* __RLIMIT_STACK */
-#ifdef __RLIMIT_CORE
+#endif /* !RLIMIT_STACK && __RLIMIT_STACK */
+#if !defined(RLIMIT_CORE) && defined(__RLIMIT_CORE)
 #define RLIMIT_CORE       RLIMIT_CORE       /* ??? */
-#endif /* __RLIMIT_CORE */
-#ifdef __RLIMIT_RSS
+#endif /* !RLIMIT_CORE && __RLIMIT_CORE */
+#if !defined(RLIMIT_RSS) && defined(__RLIMIT_RSS)
 #define RLIMIT_RSS        RLIMIT_RSS        /* ??? */
-#endif /* __RLIMIT_RSS */
-#ifdef __RLIMIT_NPROC
+#endif /* !RLIMIT_RSS && __RLIMIT_RSS */
+#if !defined(RLIMIT_NPROC) && defined(__RLIMIT_NPROC)
 #define RLIMIT_NPROC      RLIMIT_NPROC      /* ??? */
-#endif /* __RLIMIT_NPROC */
-#ifdef __RLIMIT_NOFILE
+#endif /* !RLIMIT_NPROC && __RLIMIT_NPROC */
+#if !defined(RLIMIT_NOFILE) && defined(__RLIMIT_NOFILE)
 #define RLIMIT_NOFILE     RLIMIT_NOFILE     /* Max # of open file descriptors (total; does not affect greatest usable FD number) */
-#endif /* __RLIMIT_NOFILE */
-#ifdef __RLIMIT_NOFILE
+#endif /* !RLIMIT_NOFILE && __RLIMIT_NOFILE */
+#if !defined(RLIMIT_OFILE) && defined(__RLIMIT_NOFILE)
 #define RLIMIT_OFILE      RLIMIT_OFILE      /* Max # of open file descriptors (total; does not affect greatest usable FD number) */
-#endif /* __RLIMIT_NOFILE */
-#ifdef __RLIMIT_MEMLOCK
+#endif /* !RLIMIT_OFILE && __RLIMIT_NOFILE */
+#if !defined(RLIMIT_MEMLOCK) && defined(__RLIMIT_MEMLOCK)
 #define RLIMIT_MEMLOCK    RLIMIT_MEMLOCK    /* ??? */
-#endif /* __RLIMIT_MEMLOCK */
-#ifdef __RLIMIT_AS
+#endif /* !RLIMIT_MEMLOCK && __RLIMIT_MEMLOCK */
+#if !defined(RLIMIT_AS) && defined(__RLIMIT_AS)
 #define RLIMIT_AS         RLIMIT_AS         /* ??? */
-#endif /* __RLIMIT_AS */
-#ifdef __RLIMIT_LOCKS
+#endif /* !RLIMIT_AS && __RLIMIT_AS */
+#if !defined(RLIMIT_LOCKS) && defined(__RLIMIT_LOCKS)
 #define RLIMIT_LOCKS      RLIMIT_LOCKS      /* ??? */
-#endif /* __RLIMIT_LOCKS */
-#ifdef __RLIMIT_SIGPENDING
+#endif /* !RLIMIT_LOCKS && __RLIMIT_LOCKS */
+#if !defined(RLIMIT_SIGPENDING) && defined(__RLIMIT_SIGPENDING)
 #define RLIMIT_SIGPENDING RLIMIT_SIGPENDING /* ??? */
-#endif /* __RLIMIT_SIGPENDING */
-#ifdef __RLIMIT_MSGQUEUE
+#endif /* !RLIMIT_SIGPENDING && __RLIMIT_SIGPENDING */
+#if !defined(RLIMIT_MSGQUEUE) && defined(__RLIMIT_MSGQUEUE)
 #define RLIMIT_MSGQUEUE   RLIMIT_MSGQUEUE   /* ??? */
-#endif /* __RLIMIT_MSGQUEUE */
-#ifdef __RLIMIT_NICE
+#endif /* !RLIMIT_MSGQUEUE && __RLIMIT_MSGQUEUE */
+#if !defined(RLIMIT_NICE) && defined(__RLIMIT_NICE)
 #define RLIMIT_NICE       RLIMIT_NICE       /* ??? */
-#endif /* __RLIMIT_NICE */
-#ifdef __RLIMIT_RTPRIO
+#endif /* !RLIMIT_NICE && __RLIMIT_NICE */
+#if !defined(RLIMIT_RTPRIO) && defined(__RLIMIT_RTPRIO)
 #define RLIMIT_RTPRIO     RLIMIT_RTPRIO     /* ??? */
-#endif /* __RLIMIT_RTPRIO */
-#ifdef __RLIMIT_RTTIME
+#endif /* !RLIMIT_RTPRIO && __RLIMIT_RTPRIO */
+#if !defined(RLIMIT_RTTIME) && defined(__RLIMIT_RTTIME)
 #define RLIMIT_RTTIME     RLIMIT_RTTIME     /* ??? */
-#endif /* __RLIMIT_RTTIME */
-#ifdef __RLIMIT_NLIMITS
+#endif /* !RLIMIT_RTTIME && __RLIMIT_RTTIME */
+#if !defined(RLIMIT_NLIMITS) && defined(__RLIMIT_NLIMITS)
 #define RLIMIT_NLIMITS    RLIMIT_NLIMITS    /* Total # of (standard) resource limits */
-#endif /* __RLIMIT_NLIMITS */
-#ifdef __RLIMIT_NLIMITS
+#endif /* !RLIMIT_NLIMITS && __RLIMIT_NLIMITS */
+#if !defined(RLIM_NLIMITS) && defined(__RLIMIT_NLIMITS)
 #define RLIM_NLIMITS      RLIM_NLIMITS      /* Total # of (standard) resource limits */
-#endif /* __RLIMIT_NLIMITS */
+#endif /* !RLIM_NLIMITS && __RLIMIT_NLIMITS */
 
 	/* Extended resource limits (OS-specific) */
 #if defined(__USE_KOS) && defined(__RLIMIT_MAXFILE)
 #define RLIMIT_MAXFILE    RLIMIT_MAXFILE    /* greatest usable FD number */
 #endif /* __USE_KOS && __RLIMIT_MAXFILE */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __RLIMIT_CPU
+#if !defined(RLIMIT_CPU) && defined(__RLIMIT_CPU)
 #define RLIMIT_CPU        __RLIMIT_CPU        /* ??? */
-#endif /* __RLIMIT_CPU */
-#ifdef __RLIMIT_FSIZE
+#endif /* !RLIMIT_CPU && __RLIMIT_CPU */
+#if !defined(RLIMIT_FSIZE) && defined(__RLIMIT_FSIZE)
 #define RLIMIT_FSIZE      __RLIMIT_FSIZE      /* ??? */
-#endif /* __RLIMIT_FSIZE */
-#ifdef __RLIMIT_DATA
+#endif /* !RLIMIT_FSIZE && __RLIMIT_FSIZE */
+#if !defined(RLIMIT_DATA) && defined(__RLIMIT_DATA)
 #define RLIMIT_DATA       __RLIMIT_DATA       /* ??? */
-#endif /* __RLIMIT_DATA */
-#ifdef __RLIMIT_STACK
+#endif /* !RLIMIT_DATA && __RLIMIT_DATA */
+#if !defined(RLIMIT_STACK) && defined(__RLIMIT_STACK)
 #define RLIMIT_STACK      __RLIMIT_STACK      /* ??? */
-#endif /* __RLIMIT_STACK */
-#ifdef __RLIMIT_CORE
+#endif /* !RLIMIT_STACK && __RLIMIT_STACK */
+#if !defined(RLIMIT_CORE) && defined(__RLIMIT_CORE)
 #define RLIMIT_CORE       __RLIMIT_CORE       /* ??? */
-#endif /* __RLIMIT_CORE */
-#ifdef __RLIMIT_RSS
+#endif /* !RLIMIT_CORE && __RLIMIT_CORE */
+#if !defined(RLIMIT_RSS) && defined(__RLIMIT_RSS)
 #define RLIMIT_RSS        __RLIMIT_RSS        /* ??? */
-#endif /* __RLIMIT_RSS */
-#ifdef __RLIMIT_NPROC
+#endif /* !RLIMIT_RSS && __RLIMIT_RSS */
+#if !defined(RLIMIT_NPROC) && defined(__RLIMIT_NPROC)
 #define RLIMIT_NPROC      __RLIMIT_NPROC      /* ??? */
-#endif /* __RLIMIT_NPROC */
-#ifdef __RLIMIT_NOFILE
+#endif /* !RLIMIT_NPROC && __RLIMIT_NPROC */
+#if !defined(RLIMIT_NOFILE) && defined(__RLIMIT_NOFILE)
 #define RLIMIT_NOFILE     __RLIMIT_NOFILE     /* Max # of open file descriptors (total; does not affect greatest usable FD number) */
-#endif /* __RLIMIT_NOFILE */
-#ifdef __RLIMIT_NOFILE
+#endif /* !RLIMIT_NOFILE && __RLIMIT_NOFILE */
+#if !defined(RLIMIT_OFILE) && defined(__RLIMIT_NOFILE)
 #define RLIMIT_OFILE      __RLIMIT_NOFILE     /* Max # of open file descriptors (total; does not affect greatest usable FD number) */
-#endif /* __RLIMIT_NOFILE */
-#ifdef __RLIMIT_MEMLOCK
+#endif /* !RLIMIT_OFILE && __RLIMIT_NOFILE */
+#if !defined(RLIMIT_MEMLOCK) && defined(__RLIMIT_MEMLOCK)
 #define RLIMIT_MEMLOCK    __RLIMIT_MEMLOCK    /* ??? */
-#endif /* __RLIMIT_MEMLOCK */
-#ifdef __RLIMIT_AS
+#endif /* !RLIMIT_MEMLOCK && __RLIMIT_MEMLOCK */
+#if !defined(RLIMIT_AS) && defined(__RLIMIT_AS)
 #define RLIMIT_AS         __RLIMIT_AS         /* ??? */
-#endif /* __RLIMIT_AS */
-#ifdef __RLIMIT_LOCKS
+#endif /* !RLIMIT_AS && __RLIMIT_AS */
+#if !defined(RLIMIT_LOCKS) && defined(__RLIMIT_LOCKS)
 #define RLIMIT_LOCKS      __RLIMIT_LOCKS      /* ??? */
-#endif /* __RLIMIT_LOCKS */
-#ifdef __RLIMIT_SIGPENDING
+#endif /* !RLIMIT_LOCKS && __RLIMIT_LOCKS */
+#if !defined(RLIMIT_SIGPENDING) && defined(__RLIMIT_SIGPENDING)
 #define RLIMIT_SIGPENDING __RLIMIT_SIGPENDING /* ??? */
-#endif /* __RLIMIT_SIGPENDING */
-#ifdef __RLIMIT_MSGQUEUE
+#endif /* !RLIMIT_SIGPENDING && __RLIMIT_SIGPENDING */
+#if !defined(RLIMIT_MSGQUEUE) && defined(__RLIMIT_MSGQUEUE)
 #define RLIMIT_MSGQUEUE   __RLIMIT_MSGQUEUE   /* ??? */
-#endif /* __RLIMIT_MSGQUEUE */
-#ifdef __RLIMIT_NICE
+#endif /* !RLIMIT_MSGQUEUE && __RLIMIT_MSGQUEUE */
+#if !defined(RLIMIT_NICE) && defined(__RLIMIT_NICE)
 #define RLIMIT_NICE       __RLIMIT_NICE       /* ??? */
-#endif /* __RLIMIT_NICE */
-#ifdef __RLIMIT_RTPRIO
+#endif /* !RLIMIT_NICE && __RLIMIT_NICE */
+#if !defined(RLIMIT_RTPRIO) && defined(__RLIMIT_RTPRIO)
 #define RLIMIT_RTPRIO     __RLIMIT_RTPRIO     /* ??? */
-#endif /* __RLIMIT_RTPRIO */
-#ifdef __RLIMIT_RTTIME
+#endif /* !RLIMIT_RTPRIO && __RLIMIT_RTPRIO */
+#if !defined(RLIMIT_RTTIME) && defined(__RLIMIT_RTTIME)
 #define RLIMIT_RTTIME     __RLIMIT_RTTIME     /* ??? */
-#endif /* __RLIMIT_RTTIME */
-#ifdef __RLIMIT_NLIMITS
+#endif /* !RLIMIT_RTTIME && __RLIMIT_RTTIME */
+#if !defined(RLIMIT_NLIMITS) && defined(__RLIMIT_NLIMITS)
 #define RLIMIT_NLIMITS    __RLIMIT_NLIMITS    /* Total # of (standard) resource limits */
-#endif /* __RLIMIT_NLIMITS */
-#ifdef __RLIMIT_NLIMITS
+#endif /* !RLIMIT_NLIMITS && __RLIMIT_NLIMITS */
+#if !defined(RLIM_NLIMITS) && defined(__RLIMIT_NLIMITS)
 #define RLIM_NLIMITS      __RLIMIT_NLIMITS    /* Total # of (standard) resource limits */
-#endif /* __RLIMIT_NLIMITS */
+#endif /* !RLIM_NLIMITS && __RLIMIT_NLIMITS */
 
 	/* Extended resource limits (OS-specific) */
 #if defined(__USE_KOS) && defined(__RLIMIT_MAXFILE)
@@ -264,116 +273,126 @@ enum __rlimit_resource {
 #endif /* ... */
 
 
+#if !defined(RLIM_INFINITY) && defined(__RLIM_INFINITY)
 #define RLIM_INFINITY   __RLIM_INFINITY   /* Unlimited */
+#endif /* !RLIM_INFINITY && __RLIM_INFINITY */
 #ifdef __USE_LARGEFILE64
+#if !defined(RLIM64_INFINITY) && defined(__RLIM64_INFINITY)
 #define RLIM64_INFINITY __RLIM64_INFINITY /* Unlimited */
+#endif /* !RLIM64_INFINITY && __RLIM64_INFINITY */
 #endif /* __USE_LARGEFILE64 */
 
 #ifndef RLIM_SAVED_MAX
+#if !defined(RLIM_SAVED_MAX) && defined(RLIM_INFINITY)
 #define RLIM_SAVED_MAX RLIM_INFINITY
 #endif /* !RLIM_SAVED_MAX */
 #ifndef RLIM_SAVED_CUR
+#endif /* !RLIM_SAVED_MAX && RLIM_INFINITY */
+#if !defined(RLIM_SAVED_CUR) && defined(RLIM_INFINITY)
 #define RLIM_SAVED_CUR RLIM_INFINITY
 #endif /* !RLIM_SAVED_CUR */
+#endif /* !RLIM_SAVED_CUR && RLIM_INFINITY */
 
-
-#if defined(__PRIO_PROCESS) || defined(__PRIO_PGRP) || defined(__PRIO_USER)
+#if ((!defined(PRIO_PROCESS) && defined(__PRIO_PROCESS)) || \
+     (!defined(PRIO_PGRP) && defined(__PRIO_PGRP)) ||       \
+     (!defined(PRIO_USER) && defined(__PRIO_USER)))
 /* ??? */
 /*[[[enum]]]*/
 #ifdef __CC__
 enum __priority_which {
-#ifdef __PRIO_PROCESS
+#if !defined(PRIO_PROCESS) && defined(__PRIO_PROCESS)
 	PRIO_PROCESS = __PRIO_PROCESS, /* ??? */
-#endif /* __PRIO_PROCESS */
-#ifdef __PRIO_PGRP
+#endif /* !PRIO_PROCESS && __PRIO_PROCESS */
+#if !defined(PRIO_PGRP) && defined(__PRIO_PGRP)
 	PRIO_PGRP    = __PRIO_PGRP,    /* ??? */
-#endif /* __PRIO_PGRP */
-#ifdef __PRIO_USER
+#endif /* !PRIO_PGRP && __PRIO_PGRP */
+#if !defined(PRIO_USER) && defined(__PRIO_USER)
 	PRIO_USER    = __PRIO_USER     /* ??? */
-#endif /* __PRIO_USER */
+#endif /* !PRIO_USER && __PRIO_USER */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __PRIO_PROCESS
+#if !defined(PRIO_PROCESS) && defined(__PRIO_PROCESS)
 #define PRIO_PROCESS PRIO_PROCESS /* ??? */
-#endif /* __PRIO_PROCESS */
-#ifdef __PRIO_PGRP
+#endif /* !PRIO_PROCESS && __PRIO_PROCESS */
+#if !defined(PRIO_PGRP) && defined(__PRIO_PGRP)
 #define PRIO_PGRP    PRIO_PGRP    /* ??? */
-#endif /* __PRIO_PGRP */
-#ifdef __PRIO_USER
+#endif /* !PRIO_PGRP && __PRIO_PGRP */
+#if !defined(PRIO_USER) && defined(__PRIO_USER)
 #define PRIO_USER    PRIO_USER    /* ??? */
-#endif /* __PRIO_USER */
+#endif /* !PRIO_USER && __PRIO_USER */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __PRIO_PROCESS
+#if !defined(PRIO_PROCESS) && defined(__PRIO_PROCESS)
 #define PRIO_PROCESS __PRIO_PROCESS /* ??? */
-#endif /* __PRIO_PROCESS */
-#ifdef __PRIO_PGRP
+#endif /* !PRIO_PROCESS && __PRIO_PROCESS */
+#if !defined(PRIO_PGRP) && defined(__PRIO_PGRP)
 #define PRIO_PGRP    __PRIO_PGRP    /* ??? */
-#endif /* __PRIO_PGRP */
-#ifdef __PRIO_USER
+#endif /* !PRIO_PGRP && __PRIO_PGRP */
+#if !defined(PRIO_USER) && defined(__PRIO_USER)
 #define PRIO_USER    __PRIO_USER    /* ??? */
-#endif /* __PRIO_USER */
+#endif /* !PRIO_USER && __PRIO_USER */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* ... */
 
 
-#if (defined(__RUSAGE_SELF) || defined(__RUSAGE_CHILDREN) || \
-     (defined(__USE_GNU) && defined(__RUSAGE_THREAD)))
+#if ((!defined(RUSAGE_SELF) && defined(__RUSAGE_SELF)) ||         \
+     (!defined(RUSAGE_CHILDREN) && defined(__RUSAGE_CHILDREN)) || \
+     (defined(__USE_GNU) && (!defined(RUSAGE_THREAD) && defined(__RUSAGE_THREAD))))
 /* ??? */
 /*[[[enum]]]*/
 #ifdef __CC__
 enum __rusage_who {
-#ifdef __RUSAGE_SELF
+#if !defined(RUSAGE_SELF) && defined(__RUSAGE_SELF)
 	RUSAGE_SELF     = __RUSAGE_SELF,     /* ??? */
-#endif /* __RUSAGE_SELF */
-#ifdef __RUSAGE_CHILDREN
+#endif /* !RUSAGE_SELF && __RUSAGE_SELF */
+#if !defined(RUSAGE_CHILDREN) && defined(__RUSAGE_CHILDREN)
 	RUSAGE_CHILDREN = __RUSAGE_CHILDREN, /* ??? */
-#endif /* __RUSAGE_CHILDREN */
+#endif /* !RUSAGE_CHILDREN && __RUSAGE_CHILDREN */
 #ifdef __USE_GNU
-#ifdef __RUSAGE_THREAD
+#if !defined(RUSAGE_THREAD) && defined(__RUSAGE_THREAD)
 	RUSAGE_THREAD   = __RUSAGE_THREAD    /* ??? */
-#endif /* __RUSAGE_THREAD */
+#endif /* !RUSAGE_THREAD && __RUSAGE_THREAD */
 #endif /* __USE_GNU */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __RUSAGE_SELF
+#if !defined(RUSAGE_SELF) && defined(__RUSAGE_SELF)
 #define RUSAGE_SELF     RUSAGE_SELF     /* ??? */
-#endif /* __RUSAGE_SELF */
-#ifdef __RUSAGE_CHILDREN
+#endif /* !RUSAGE_SELF && __RUSAGE_SELF */
+#if !defined(RUSAGE_CHILDREN) && defined(__RUSAGE_CHILDREN)
 #define RUSAGE_CHILDREN RUSAGE_CHILDREN /* ??? */
-#endif /* __RUSAGE_CHILDREN */
+#endif /* !RUSAGE_CHILDREN && __RUSAGE_CHILDREN */
 #ifdef __USE_GNU
-#ifdef __RUSAGE_THREAD
+#if !defined(RUSAGE_THREAD) && defined(__RUSAGE_THREAD)
 #define RUSAGE_THREAD   RUSAGE_THREAD   /* ??? */
-#endif /* __RUSAGE_THREAD */
+#endif /* !RUSAGE_THREAD && __RUSAGE_THREAD */
 #endif /* __USE_GNU */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __RUSAGE_SELF
+#if !defined(RUSAGE_SELF) && defined(__RUSAGE_SELF)
 #define RUSAGE_SELF     __RUSAGE_SELF     /* ??? */
-#endif /* __RUSAGE_SELF */
-#ifdef __RUSAGE_CHILDREN
+#endif /* !RUSAGE_SELF && __RUSAGE_SELF */
+#if !defined(RUSAGE_CHILDREN) && defined(__RUSAGE_CHILDREN)
 #define RUSAGE_CHILDREN __RUSAGE_CHILDREN /* ??? */
-#endif /* __RUSAGE_CHILDREN */
+#endif /* !RUSAGE_CHILDREN && __RUSAGE_CHILDREN */
 #ifdef __USE_GNU
-#ifdef __RUSAGE_THREAD
+#if !defined(RUSAGE_THREAD) && defined(__RUSAGE_THREAD)
 #define RUSAGE_THREAD   __RUSAGE_THREAD   /* ??? */
-#endif /* __RUSAGE_THREAD */
+#endif /* !RUSAGE_THREAD && __RUSAGE_THREAD */
 #endif /* __USE_GNU */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* ... */
 
 /* Min/max thread/process priority */
-#ifdef __PRIO_MIN
+#if !defined(PRIO_MIN) && defined(__PRIO_MIN)
 #define PRIO_MIN __PRIO_MIN /* Minimum priority */
-#endif /* __PRIO_MIN */
-#ifdef __PRIO_MAX
+#endif /* !PRIO_MIN && __PRIO_MIN */
+#if !defined(PRIO_MAX) && defined(__PRIO_MAX)
 #define PRIO_MAX __PRIO_MAX /* Maximum priority */
-#endif /* __PRIO_MAX */
+#endif /* !PRIO_MAX && __PRIO_MAX */
 
 
 #ifdef __CC__

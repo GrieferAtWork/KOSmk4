@@ -1,2 +1,2 @@
 
-/* (#) Portability: Linux (/include/linux/stddef.h) */
+/* (#) Portability: Linux (/usr/include/linux/stddef.h) */

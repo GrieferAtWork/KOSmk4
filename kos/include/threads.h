@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4176a74f */
+/* HASH CRC-32:0x1a4e0004 */
 /* Copyright (c) 2019-2022 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,105 +58,108 @@ __SYSDECL_BEGIN
 #endif /* !TSS_DTOR_ITERATIONS */
 
 
-#if (defined(__thrd_success) || defined(__thrd_busy) || \
-     defined(__thrd_error) || defined(__thrd_nomem) ||  \
-     defined(__thrd_timedout))
+#if ((!defined(thrd_success) && defined(__thrd_success)) || \
+     (!defined(thrd_busy) && defined(__thrd_busy)) ||       \
+     (!defined(thrd_error) && defined(__thrd_error)) ||     \
+     (!defined(thrd_nomem) && defined(__thrd_nomem)) ||     \
+     (!defined(thrd_timedout) && defined(__thrd_timedout)))
 /* Exit and error codes.  */
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-#ifdef __thrd_success
+#if !defined(thrd_success) && defined(__thrd_success)
 	thrd_success  = __thrd_success,
-#endif /* __thrd_success */
-#ifdef __thrd_busy
+#endif /* !thrd_success && __thrd_success */
+#if !defined(thrd_busy) && defined(__thrd_busy)
 	thrd_busy     = __thrd_busy,
-#endif /* __thrd_busy */
-#ifdef __thrd_error
+#endif /* !thrd_busy && __thrd_busy */
+#if !defined(thrd_error) && defined(__thrd_error)
 	thrd_error    = __thrd_error,
-#endif /* __thrd_error */
-#ifdef __thrd_nomem
+#endif /* !thrd_error && __thrd_error */
+#if !defined(thrd_nomem) && defined(__thrd_nomem)
 	thrd_nomem    = __thrd_nomem,
-#endif /* __thrd_nomem */
-#ifdef __thrd_timedout
+#endif /* !thrd_nomem && __thrd_nomem */
+#if !defined(thrd_timedout) && defined(__thrd_timedout)
 	thrd_timedout = __thrd_timedout
-#endif /* __thrd_timedout */
+#endif /* !thrd_timedout && __thrd_timedout */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __thrd_success
+#if !defined(thrd_success) && defined(__thrd_success)
 #define thrd_success  thrd_success
-#endif /* __thrd_success */
-#ifdef __thrd_busy
+#endif /* !thrd_success && __thrd_success */
+#if !defined(thrd_busy) && defined(__thrd_busy)
 #define thrd_busy     thrd_busy
-#endif /* __thrd_busy */
-#ifdef __thrd_error
+#endif /* !thrd_busy && __thrd_busy */
+#if !defined(thrd_error) && defined(__thrd_error)
 #define thrd_error    thrd_error
-#endif /* __thrd_error */
-#ifdef __thrd_nomem
+#endif /* !thrd_error && __thrd_error */
+#if !defined(thrd_nomem) && defined(__thrd_nomem)
 #define thrd_nomem    thrd_nomem
-#endif /* __thrd_nomem */
-#ifdef __thrd_timedout
+#endif /* !thrd_nomem && __thrd_nomem */
+#if !defined(thrd_timedout) && defined(__thrd_timedout)
 #define thrd_timedout thrd_timedout
-#endif /* __thrd_timedout */
+#endif /* !thrd_timedout && __thrd_timedout */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __thrd_success
+#if !defined(thrd_success) && defined(__thrd_success)
 #define thrd_success  __thrd_success
-#endif /* __thrd_success */
-#ifdef __thrd_busy
+#endif /* !thrd_success && __thrd_success */
+#if !defined(thrd_busy) && defined(__thrd_busy)
 #define thrd_busy     __thrd_busy
-#endif /* __thrd_busy */
-#ifdef __thrd_error
+#endif /* !thrd_busy && __thrd_busy */
+#if !defined(thrd_error) && defined(__thrd_error)
 #define thrd_error    __thrd_error
-#endif /* __thrd_error */
-#ifdef __thrd_nomem
+#endif /* !thrd_error && __thrd_error */
+#if !defined(thrd_nomem) && defined(__thrd_nomem)
 #define thrd_nomem    __thrd_nomem
-#endif /* __thrd_nomem */
-#ifdef __thrd_timedout
+#endif /* !thrd_nomem && __thrd_nomem */
+#if !defined(thrd_timedout) && defined(__thrd_timedout)
 #define thrd_timedout __thrd_timedout
-#endif /* __thrd_timedout */
+#endif /* !thrd_timedout && __thrd_timedout */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* ... */
 
-#if (defined(__mtx_plain) || defined(__mtx_recursive) || \
-     defined(__mtx_timed))
+#if ((!defined(mtx_plain) && defined(__mtx_plain)) ||         \
+     (!defined(mtx_recursive) && defined(__mtx_recursive)) || \
+     (!defined(mtx_timed) && defined(__mtx_timed)))
 /* Mutex types.  */
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {
-#ifdef __mtx_plain
+#if !defined(mtx_plain) && defined(__mtx_plain)
 	mtx_plain     = __mtx_plain,
-#endif /* __mtx_plain */
-#ifdef __mtx_recursive
+#endif /* !mtx_plain && __mtx_plain */
+#if !defined(mtx_recursive) && defined(__mtx_recursive)
 	mtx_recursive = __mtx_recursive,
-#endif /* __mtx_recursive */
-#ifdef __mtx_timed
+#endif /* !mtx_recursive && __mtx_recursive */
+#if !defined(mtx_timed) && defined(__mtx_timed)
 	mtx_timed     = __mtx_timed
-#endif /* __mtx_timed */
+#endif /* !mtx_timed && __mtx_timed */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
 #ifdef __COMPILER_PREFERR_ENUMS
-#ifdef __mtx_plain
+#if !defined(mtx_plain) && defined(__mtx_plain)
 #define mtx_plain     mtx_plain
-#endif /* __mtx_plain */
-#ifdef __mtx_recursive
+#endif /* !mtx_plain && __mtx_plain */
+#if !defined(mtx_recursive) && defined(__mtx_recursive)
 #define mtx_recursive mtx_recursive
-#endif /* __mtx_recursive */
-#ifdef __mtx_timed
+#endif /* !mtx_recursive && __mtx_recursive */
+#if !defined(mtx_timed) && defined(__mtx_timed)
 #define mtx_timed     mtx_timed
-#endif /* __mtx_timed */
+#endif /* !mtx_timed && __mtx_timed */
 #else /* __COMPILER_PREFERR_ENUMS */
-#ifdef __mtx_plain
+#if !defined(mtx_plain) && defined(__mtx_plain)
 #define mtx_plain     __mtx_plain
-#endif /* __mtx_plain */
-#ifdef __mtx_recursive
+#endif /* !mtx_plain && __mtx_plain */
+#if !defined(mtx_recursive) && defined(__mtx_recursive)
 #define mtx_recursive __mtx_recursive
-#endif /* __mtx_recursive */
-#ifdef __mtx_timed
+#endif /* !mtx_recursive && __mtx_recursive */
+#if !defined(mtx_timed) && defined(__mtx_timed)
 #define mtx_timed     __mtx_timed
-#endif /* __mtx_timed */
+#endif /* !mtx_timed && __mtx_timed */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 #endif /* ... */
