@@ -177,6 +177,24 @@ function splitTables(tab: {int: int}, errorValue: int) {
 #define UNICODE_ISSYMSTRT  0x2000 /* Symbol start character */
 #define UNICODE_ISSYMCONT  0x4000 /* Symbol continue character */
 
+global final FLAG_NAMES = {
+	(UNICODE_ISCNTRL,    "TCNTRL"),
+	(UNICODE_ISCTAB,     "TCTAB"),
+	(UNICODE_ISXTAB,     "TXTAB"),
+	(UNICODE_ISWHITE,    "TWHITE"),
+	(UNICODE_ISLF,       "TLF"),
+	(UNICODE_ISLOWER,    "TLOWER"),
+	(UNICODE_ISUPPER,    "TUPPER"),
+	(UNICODE_ISXALPHA,   "TXALPHA"),
+	(UNICODE_ISDIGIT,    "TDIGIT"),
+	(UNICODE_ISHEX,      "THEX"),
+	(UNICODE_ISPUNCT,    "TPUNCT"),
+	(UNICODE_ISTITLE,    "TTITLE"),
+	(UNICODE_ISXNUMERIC, "TXNUMERIC"),
+	(UNICODE_ISSYMSTRT,  "TSYMSTRT"),
+	(UNICODE_ISSYMCONT,  "TSYMCONT"),
+};
+
 
 
 /* Parse UnicodeData.txt
@@ -533,12 +551,32 @@ function generateUnicodeDatabase() {
 	}
 
 	/* Print the traits descriptors */
+	for (local flag, name: FLAG_NAMES) {
+		print("#ifndef ", name);
+		print("#define ", name, " ", flag.hex());
+		print("#endif /* !", name, " */");
+	}
+	print("#ifndef UNITRAIT");
+	print("#define UNITRAIT(flags, foldSeq, digit, lowerDelta, upperDelta, titleDelta) \\");
+	print("	{ flags, foldSeq, digit, lowerDelta, upperDelta, titleDelta }");
+	print("#endif /* !UNITRAIT */");
 	print("#define UNICODE_DESCRIPTOR_COUNT ", #index2Desc);
 	print("PRIVATE ATTR_SECTION(\".rodata.crt.unicode.UTF\")");
 	print("struct __unitraits const unicode_descriptors[", #index2Desc, "] = {");
 	for (local flags, foldSeq, digit, lowerDelta, upperDelta, titleDelta: index2Desc) {
-		print("	{ ", flags.hex(), ", ", foldSeq, ", ", digit, ", ",
-			lowerDelta, ", ", upperDelta, ", ", titleDelta, " },");
+		print("	UNITRAIT(", ),;
+		if (!flags) {
+			print("0"),;
+		} else {
+			local flagStrings = [];
+			for (local flag, name: FLAG_NAMES) {
+				if (flags & flag)
+					flagStrings.append(name);
+			}
+			print(" | ".join(flagStrings)),;
+		}
+		print(", ", foldSeq, ", ", digit, ", ",
+			lowerDelta, ", ", upperDelta, ", ", titleDelta, "),");
 	}
 	print("};");
 
