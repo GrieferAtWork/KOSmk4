@@ -51,8 +51,13 @@ typedef union {
 #define unidigit_getfrac_denominator(self) ((int32_t)((self)->ud_frac[1]))
 #endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 } unidigit_t;
-#define D_INT(value) { .ud_whole = UINT64_C(value) }
-#define D_FRAC(a, b) { .ud_frac = { (uint32_t)(int32_t)(a), (uint32_t)(int32_t)(b) } }
+#define D_INT(value) { UINT64_C(value) }
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#define _D_FRAC(a, b) { _UNIDIGIT_ISFRAC | (uint64_t)a | ((uint64_t)b << 32) }
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
+#define _D_FRAC(a, b) { _UNIDIGIT_ISFRAC | ((uint64_t)a << 32) | (uint64_t)b }
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
+#define D_FRAC(a, b) _D_FRAC((uint32_t)(int32_t)(a), (uint32_t)(int32_t)(b))
 
 
 #ifdef __INTELLISENSE__
