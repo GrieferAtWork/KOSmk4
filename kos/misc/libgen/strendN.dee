@@ -277,7 +277,7 @@ function printStrendNDatabase(
 	local splitSet = List(splitValues(values));
 	print("#define GETBASE_", prefix.strip("_"), "(result, index) \\");
 	for (local i, startAndItems: util.enumerate(splitSet)) {
-		local stringName = f"repr_{prefix.strip('_')}_{startAndItems[0].hex()[2:]}h";
+		local stringName = f"repr_{prefix.strip('_')}_{startAndItems[0].tostr(16)}h";
 		local minIndex = startAndItems[0];
 		local maxIndex = minIndex + #startAndItems[1] - 1;
 		print("\t", i ? " " : "("),;
@@ -315,7 +315,7 @@ function printStrendNDatabase(
 		if (attr)
 			print(attr, " "),;
 		print("char const repr_",
-			prefix.strip("_"), "_", start.hex()[2:], "h[] =\n",
+			prefix.strip("_"), "_", start.tostr(16), "h[] =\n",
 			"\n".join(for (local e: text.string.segments(64)) repr(e)),
 			";");
 	}

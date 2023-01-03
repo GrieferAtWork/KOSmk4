@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix problem with octal-encoded integers in strings"
-DEEMON_VERSION="edccda44906980c072ca35d7d974a24597fcb50b"
+#     v -- "Add a `precision` argument to `int.tostr()`"
+DEEMON_VERSION="5124d7135066660ae7161d0d7ece744dff52e13f"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 

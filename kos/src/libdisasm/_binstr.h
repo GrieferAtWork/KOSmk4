@@ -25,9 +25,9 @@
 
 /*[[[deemon
 for (local x: [:256]) {
-	local b = x.bin()[2:].zfill(8);
-	local h = x.hex()[2:].lower();
-	print("#define BINSTR_", b, " \"\\x", h.zfill(2), "\"");
+	local b = x.tostr(2, 8);
+	local h = x.tostr(16, 2);
+	print("#define BINSTR_", b, " \"\\x", h, "\"");
 }
 ]]]*/
 #define BINSTR_00000000 "\x00"

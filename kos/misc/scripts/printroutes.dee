@@ -139,9 +139,7 @@ got_name:
 					local addr = l[:spc1] + l[spc1+1:spc2];
 					addr = int(addr, 16).swap64;
 					local info = addr2name(addr);
-					print "0x",;
-					print (lineaddr - start).hex()[2:].zfill(4) + ": ",;
-					print ".quad", addr.hex(),;
+					print((lineaddr - start).hex(4), ": ", ".quad", addr.hex()),;
 					if (info) {
 						print "  # ",;
 						local isFirst = true;
@@ -151,10 +149,8 @@ got_name:
 							isFirst = false;
 							local name, offset = ent...;
 							print name,;
-							if (offset) {
-								print " ",;
-								print "+",offset,;
-							}
+							if (offset)
+								print(" + ", offset),;
 						}
 					}
 					print;

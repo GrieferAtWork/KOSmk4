@@ -102,8 +102,8 @@ for (local l: File.open("cpu-cpuid.h")) {
 }
 local longestFeatureName = features.each[0].length > ...;
 for (local name, index, register, mask, comment: features) {
-	print("#define X86_FEAT_", name, " " * (longestFeatureName - #name), " X86_FEATURE(0x",
-		index.hex()[2:].zfill(8), ", ", register, ", ", str(mask).rjust(2), ")"),;
+	print("#define X86_FEAT_", name, " " * (longestFeatureName - #name), " X86_FEATURE(",
+		index.hex(8), ", ", register, ", ", str(mask).rjust(2), ")"),;
 	if (comment)
 		print(" /" "* ", comment, " *" "/"),;
 	print;

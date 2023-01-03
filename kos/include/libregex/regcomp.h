@@ -359,7 +359,7 @@ enum {
 print("#define case_RECS_BITSET_MIN_to_MAX_UTF8        \\");
 for (local segment: [:0x63+1].segments(4)) {
 	local isLast = segment.last == 0x63;
-	print("\t", ": ".join(for (local x: segment) f"case 0x{x.hex()[2:].zfill(2)}")),;
+	print("\t", ": ".join(for (local x: segment) f"case {x.hex(2)}")),;
 	if (!isLast)
 		print(": \\"),;
 	print;
@@ -368,7 +368,7 @@ print("#define case_RECS_BITSET_MIN_to_MAX_BYTE        \\");
 print("\tcase_RECS_BITSET_MIN_to_MAX_UTF8:           \\");
 for (local segment: [0x64:0xe3+1].segments(4)) {
 	local isLast = segment.last == 0xe3;
-	print("\t", ": ".join(for (local x: segment) f"case 0x{x.hex()[2:].zfill(2)}")),;
+	print("\t", ": ".join(for (local x: segment) f"case {x.hex(2)}")),;
 	if (!isLast)
 		print(": \\"),;
 	print;

@@ -142,7 +142,7 @@ function disassemble(arch: string | Architecture, bytes: {int...}, i: int = 0,
 		local b = bytes[i];
 		print(linePrefix, "	"),;
 		if (printInstructionAddresses)
-			print((i - base).hex()[2:].upper().zfill(4), "	"),;
+			print((i - base).tostr(16, 4, "X"), "	"),;
 		++i;
 		if (b is int) {
 			switch (b) {
@@ -239,14 +239,14 @@ function disassemble(arch: string | Architecture, bytes: {int...}, i: int = 0,
 					} else {
 						sysname = repr List(sysname);
 					}
-					print("ifnotimpl	", repr sysname, ",	", (i + off - base).hex()[2:].upper().zfill(4)),;
+					print("ifnotimpl	", repr sysname, ",	", (i + off - base).tostr(16, 4, "X")),;
 				} else {
 					i = p;
 					local name = {
 						DW_OP_bra  : "bra",
 						DW_OP_skip : "skip",
 					}[b];
-					print(name, "	", (i + off - base).hex()[2:].upper().zfill(4)),;
+					print(name, "	", (i + off - base).tostr(16, 4, "X")),;
 				}
 			}	break;
 
@@ -297,7 +297,7 @@ function disassemble(arch: string | Architecture, bytes: {int...}, i: int = 0,
 		}
 fallback:
 		if (b is int) {
-			print(".cfi_escape 0x", b.hex()[2:].zfill(2)),;
+			print(".cfi_escape ", b.hex(2)),;
 		} else {
 			print(".cfi_escape ", b),;
 		}

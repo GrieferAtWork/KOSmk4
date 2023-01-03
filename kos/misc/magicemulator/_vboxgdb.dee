@@ -473,14 +473,12 @@ function vmControlBreakpoint(add: bool, typ: int, addr: int, len: int) {
 		/* Delete this breakpoint */
 again_delete_breakpoint:
 		if (vBoxTelnetExecNoError("bc " + id) is none) {
-			local idHex = id.hex()[2:].lower();
+			local idHex = id.tostr(16);
 			for (local l: vBoxTelnetExecNoError("bl").splitlines()) {
 				l = l.strip();
 				if (!l)
 					continue;
-				l = l.lower();
-				if (l.startswith("0x"))
-					l = l[2:];
+				l = l.lower().lsstrip("0x");
 				if (l.startswith(idHex))
 					goto again_delete_breakpoint;
 			}
@@ -536,9 +534,7 @@ function _vmSetRegister(name: string, value: string | int) {
 	if (name in ["cs"]) {
 		local oldval = str(_vmGetRegisterAsHex(name));
 		oldval = oldval.lstrip("0");
-		value = value.lower();
-		if (value.startswith("0x"))
-			value = value[2:];
+		value = value.lower().lsstrip("0x");
 		value = value.lstrip("0");
 		if (oldval != value)
 			throw Error(f"Cannot set register {repr name} = {repr value} (oldval = {repr oldval})");
@@ -580,9 +576,9 @@ function vmGetRegisterAsHex(name: string): Bytes {
 		if (_vmIsStepLoopPaused) {
 			local iret = vmReadMemoryAt("rsp");
 			iret = extractWordLeFromBytes(iret, 0, TARGET_ARCH == "x86_64" ? 8 : 4);
-			return iret.hex()[2:];
+			return iret.tostr(16);
 		} else if (_vmNewRip !is none) {
-			result = _vmNewRip.hex()[2:];
+			result = _vmNewRip.tostr(16);
 		}
 		return result;
 	}
@@ -595,7 +591,7 @@ function vmGetRegisterAsHex(name: string): Bytes {
 			} else {
 				iret = extractWordLeFromBytes(iret, 4, 2);
 			}
-			return iret.hex()[2:];
+			return iret.tostr(16);
 		}
 		break;
 
@@ -608,9 +604,9 @@ function vmGetRegisterAsHex(name: string): Bytes {
 			} else {
 				iret = extractWordLeFromBytes(iret, 8, 4);
 			}
-			return iret.hex()[2:];
+			return iret.tostr(16);
 		} else if (_vmNewRflags !is none) {
-			return _vmNewRflags.hex()[2:];
+			return _vmNewRflags.tostr(16);
 		}
 		break;
 
@@ -627,10 +623,10 @@ function vmGetRegisterAsHex(name: string): Bytes {
 				} else {
 					/* Special case: Return a pointer to the ~true~ SP value,
 					 *               which point to the end of the IRET tail. */
-					return (_vmGetRegister("rsp") + 12).hex()[2:];
+					return (_vmGetRegister("rsp") + 12).tostr(16);
 				}
 			}
-			return iret.hex()[2:];
+			return iret.tostr(16);
 		}
 		break;
 
@@ -647,7 +643,7 @@ function vmGetRegisterAsHex(name: string): Bytes {
 					break;
 				}
 			}
-			return iret.hex()[2:];
+			return iret.tostr(16);
 		}
 		break;
 
@@ -668,7 +664,7 @@ function vmGetRegisterAsHex(name: string): Bytes {
 			} else {
 				break;
 			}
-			return iret.hex()[2:];
+			return iret.tostr(16);
 		}
 		break;
 
@@ -754,8 +750,8 @@ function vmSetRegister(name: string, value: string | int) {
 						return;
 					throw Error(
 						f"Cannot move kernel stack-pointer ("
-						f"oldesp: 0x{oldSp.hex()[2:].zfill(8)}, "
-						f"newesp: 0x{value.hex()[2:].zfill(8)})"
+						f"oldesp: {oldSp.hex(8)}, "
+						f"newesp: {value.hex(8)})"
 					);
 				}
 			}
@@ -1220,7 +1216,7 @@ function calculateGdbChecksum(data: Bytes): int {
 }
 
 function gdbEncodeThreadId(id: int): Bytes {
-	return vmCurrentCpu.hex()[2:].zfill(8).bytes();
+	return vmCurrentCpu.tostr(16, 8).bytes();
 }
 
 function gdbDecodeThreadId(id: Bytes): int {

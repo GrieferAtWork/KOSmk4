@@ -62,7 +62,7 @@
 
 
 /*[[[deemon
-#define hex2(x) ("0x" + (x).hex()[2:].zfill(2))
+#define hex2(x) (x).hex(2)
 function genArithBlock(name, start) {
 	local pad = " " * (3 - #name);
 	local reg = start / 8;

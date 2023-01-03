@@ -559,10 +559,6 @@ function compileDBInstruction(instr: Instruction): DBInstruction {
 			instr:   instr);
 }
 
-function hexN(v: int, n: int = 8): string {
-	return "0x" + v.hex()[2:].zfill(n);
-}
-
 function findSubList(seq: {Object...}, findme: {Object...}): int | none {
 	local first = findme.first;
 	local start = 0;
@@ -612,10 +608,10 @@ function printInstructionDatabase() {
 				for (local dbInst: dbInstructions[:existing])
 					groupOffset += dbInst.aligned_sizeof;
 			}
-			print("\t{ U32(", hexN(group.zeroBits | group.oneBits), "), "
-			          "U32(", hexN(group.oneBits), "), "
+			print("\t{ U32(", (group.zeroBits | group.oneBits).hex(8), "), "
+			          "U32(", group.oneBits.hex(8), "), "
 			          "U16(", #group.instructions, "), "
-			          "U16(", hexN(groupOffset, 4), ") },");
+			          "U16(", groupOffset.hex(4), ") },");
 		}
 		print("}; /* ", name, " */");
 		numDbGroups.value += #groups;
@@ -679,8 +675,8 @@ function printInstructionDatabase() {
 	for (local dbInst: dbInstructions) {
 		local padding = dbInst.aligned_sizeof - dbInst.sizeof;
 		print("\t/* ", dbInst.instr.mnemonic.lower().ljust(longestMnemonicLen), " */ "
-		      "P32(", hexN(dbInst.ai_mask), "), ",
-		      "P32(", hexN(dbInst.ai_bits), "), ",
+		      "P32(", dbInst.ai_mask.hex(8), "), ",
+		      "P32(", dbInst.ai_bits.hex(8), "), ",
 		      ", ".join(dbInst.ai_repr),
 		      ", 0" * padding, ",");
 	}

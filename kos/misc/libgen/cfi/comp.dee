@@ -1517,7 +1517,7 @@ function outputBytesForAssembly(bytes: {int | string...},
 	import(".disasm").disassemble(asm.arch, bytes);
 	for (local line: bytes.segments(bytesPerLine))
 		print outputFile: (linePrefix, "\t.cfi_escape ", ",".join(
-			for (local b: line) b !is int ? b : "0x" + b.hex()[2:].zfill(2)), lineSuffix);
+			for (local b: line) b !is int ? b : b.hex(2)), lineSuffix);
 #else
 	for (local line: bytes.segments(bytesPerLine))
 		print outputFile: (linePrefix, "\t.cfi_escape ", ",".join(line), lineSuffix);

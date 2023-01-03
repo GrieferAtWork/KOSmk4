@@ -17,16 +17,16 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#define PRINT_VECTOR_INCLUDES(name, ...)                      \
-	({                                                        \
-		;                                                     \
-		print "#ifdef", name;                                 \
-		for (local x: (__VA_ARGS__)) {                        \
-			print "#define IDT_VECTOR", x.hex()[2:].zfill(2); \
-			print "#include", name;                           \
-		}                                                     \
-		print "#undef", name;                                 \
-		print "#endif /*", name, "*/";                        \
+#define PRINT_VECTOR_INCLUDES(name, ...)                \
+	({                                                  \
+		;                                               \
+		print "#ifdef", name;                           \
+		for (local x: (__VA_ARGS__)) {                  \
+			print "#define IDT_VECTOR", x.tostr(16, 2); \
+			print "#include", name;                     \
+		}                                               \
+		print "#undef", name;                           \
+		print "#endif /*", name, "*/";                  \
 	})
 
 

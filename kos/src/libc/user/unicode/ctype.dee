@@ -491,7 +491,7 @@ function generateUnicodeDatabase() {
 	for (local foldSeq: index2Fold) {
 		print("	{ { ", ", ".join(
 			for (local b: foldSeq)
-				"0x" + b.hex()[2:].upper().zfill(4)
+				"0x" + b.tostr(16, 4, "X")
 			), " } },");
 	}
 	print("};");

@@ -168,7 +168,7 @@ got_line:
 										local firstByte = decl[bStart:bEnd].strip();
 										firstByte = try int(firstByte) catch (...) none;
 										if (firstByte !is none) {
-											firstByte = r'"\x{}"'.format({ firstByte.hex()[2:] });
+											firstByte = r'"\x{}"'.format({ firstByte.tostr(16, 2) });
 											if (decl2.startswith("\"")) {
 												decl2 = firstByte[:-1] + decl2[1:];
 											} else {
@@ -404,7 +404,7 @@ function setCommonOpcodeTypeForRange(min: int, max: int, typ: string) {
 }
 
 function printOpcodeTypeLine(start: int) {
-	print("	/" "*", (start & 0xff).hex()[2:].zfill(2), "*" "/ LINE("),;
+	print("	/" "*", (start & 0xff).tostr(16, 2), "*" "/ LINE("),;
 	for (local opcode: [start:start + 8]) {
 		local typ = GETTYPE(opcode);
 		if (opcode != start + 7)
@@ -415,7 +415,7 @@ function printOpcodeTypeLine(start: int) {
 }
 
 function printOpcodeTypeRange(min: int, max: int) {
-	print("	/" "* ", min.hex()[2:].zfill(6), "-", max.hex()[2:].zfill(6), " *" "/");
+	print("	/" "* ", min.tostr(16, 6), "-", max.tostr(16, 6), " *" "/");
 	for (local start: [min:max + 1, 8])
 		printOpcodeTypeLine(start);
 }

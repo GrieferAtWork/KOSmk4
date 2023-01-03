@@ -567,11 +567,11 @@ createVsFile("kos.vcxproj.filters", (fp: File) -> {
 		filePaths.remove("");
 		for (local i, path: util.enumerate(filePaths.sorted())) {
 			local id = 0x1234567890ABCDEF1234567890ABCDEF + i;
-			local e  = ((id) & 0xffffffffffff).hex()[2:].lower();
-			local d  = ((id >> 48) & 0xffff).hex()[2:].lower();
-			local c  = ((id >> 64) & 0xffff).hex()[2:].lower();
-			local b  = ((id >> 80) & 0xffff).hex()[2:].lower();
-			local a  = ((id >> 96) & 0xffffffff).hex()[2:].lower();
+			local e  = ((id) & 0xffffffffffff).tostr(16);
+			local d  = ((id >> 48) & 0xffff).tostr(16);
+			local c  = ((id >> 64) & 0xffff).tostr(16);
+			local b  = ((id >> 80) & 0xffff).tostr(16);
+			local a  = ((id >> 96) & 0xffffffff).tostr(16);
 			fp <<
 "		<Filter Include=\"" << path << "\">\n"
 "			<UniqueIdentifier>{" << a << "-" << b << "-" << c << "-" << d << "-" << e << "}</UniqueIdentifier>\n"

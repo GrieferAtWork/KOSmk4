@@ -250,7 +250,7 @@ if (SEE_rd_opcodes) {
 	SEE_rd_opcodes = SEE_rd_opcodes.sorted();
 	for (local opcode: SEE_rd_opcodes) {
 		local z = opcode >= 0x1000 ? 6 : opcode >= 0x100 ? 4 : 2;
-		print("	case EMU86_OPCODE_ENCODE(0x", opcode.hex()[2:].zfill(z), "):");
+		print("	case EMU86_OPCODE_ENCODE(", opcode.hex(z), "):");
 	}
 	print "		goto notsup_modrm_getxyzmm;";
 	print "#define NEED_notsup_modrm_getxyzmm";
@@ -261,7 +261,7 @@ if (SEE_wr_opcodes) {
 	SEE_wr_opcodes = SEE_wr_opcodes.sorted();
 	for (local opcode: SEE_wr_opcodes) {
 		local z = opcode >= 0x1000 ? 6 : opcode >= 0x100 ? 4 : 2;
-		print("	case EMU86_OPCODE_ENCODE(0x", opcode.hex()[2:].zfill(z), "):");
+		print("	case EMU86_OPCODE_ENCODE(", opcode.hex(z), "):");
 	}
 	print "		goto notsup_modrm_setxyzmm;";
 	print "#define NEED_notsup_modrm_setxyzmm";
@@ -272,7 +272,7 @@ if (SEE_rdwr_opcodes) {
 	SEE_rdwr_opcodes = SEE_rdwr_opcodes.sorted();
 	for (local opcode: SEE_rdwr_opcodes) {
 		local z = opcode >= 0x1000 ? 6 : opcode >= 0x100 ? 4 : 2;
-		print("	case EMU86_OPCODE_ENCODE(0x", opcode.hex()[2:].zfill(z), "):");
+		print("	case EMU86_OPCODE_ENCODE(", opcode.hex(z), "):");
 	}
 	print "		goto notsup_modrm_getsetxyzmm;";
 	print "#define NEED_notsup_modrm_getsetxyzmm";
