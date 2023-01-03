@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Add a `precision` argument to `int.tostr()`"
-DEEMON_VERSION="5124d7135066660ae7161d0d7ece744dff52e13f"
+#     v -- "Fix/clean-up bytes vs. unicode in c-escape"
+DEEMON_VERSION="4dafa777aca1a6797ff2cd9a728ff17e427909c7"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
