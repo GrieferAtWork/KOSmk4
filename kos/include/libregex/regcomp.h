@@ -346,7 +346,40 @@ typedef int re_errno_t;
 
 
 /* Figure out which opcodes might be needed. */
-/* TODO */
+#define REOP_ANY                   REOP_ANY
+#define REOP_ANY_UTF8              REOP_ANY_UTF8
+#define REOP_ANY_NOTLF             REOP_ANY_NOTLF
+#define REOP_ANY_NOTLF_UTF8        REOP_ANY_NOTLF_UTF8
+#define REOP_ANY_NOTNUL            REOP_ANY_NOTNUL
+#define REOP_ANY_NOTNUL_UTF8       REOP_ANY_NOTNUL_UTF8
+#define REOP_ANY_NOTNUL_NOTLF      REOP_ANY_NOTNUL_NOTLF
+#define REOP_ANY_NOTNUL_NOTLF_UTF8 REOP_ANY_NOTNUL_NOTLF_UTF8
+#ifdef LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NEWLINE
+#if LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NEWLINE
+#undef REOP_ANY_NOTLF
+#undef REOP_ANY_NOTLF_UTF8
+#undef REOP_ANY_NOTNUL_NOTLF
+#undef REOP_ANY_NOTNUL_NOTLF_UTF8
+#else /* LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NEWLINE */
+#undef REOP_ANY
+#undef REOP_ANY_UTF8
+#undef REOP_ANY_NOTNUL
+#undef REOP_ANY_NOTNUL_UTF8
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NEWLINE */
+#endif /* LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NEWLINE */
+#ifdef LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NOT_NULL
+#if LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NOT_NULL
+#undef REOP_ANY
+#undef REOP_ANY_UTF8
+#undef REOP_ANY_NOTLF
+#undef REOP_ANY_NOTLF_UTF8
+#else /* LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NOT_NULL */
+#undef REOP_ANY_NOTNUL
+#undef REOP_ANY_NOTNUL_UTF8
+#undef REOP_ANY_NOTNUL_NOTLF
+#undef REOP_ANY_NOTNUL_NOTLF_UTF8
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NOT_NULL */
+#endif /* LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NOT_NULL */
 
 
 
@@ -514,22 +547,97 @@ enum {
 	REOP_EXACT_UTF8_ICASE,     /* [+1+n] Followed  by  a  COUNT-byte, followed  by  a `COUNT'-character
 	                            * long utf-8 string (matches utf-8 character contained in said string).
 	                            * NOTE: COUNT must be >= 1 */
-#define REOP_MAKEANY(want_nul, want_lf, want_utf8) \
-	((REOP_ANY) + ((want_nul) ? 0 : 4) + ((want_lf) ? 0 : 2) + ((want_utf8) ? 1 : 0))
-#define case_REOP_ANY_MIN_to_MAX                                                 \
-	case REOP_ANY:              case REOP_ANY_UTF8:   case REOP_ANY_NOTLF:       \
-	case REOP_ANY_NOTLF_UTF8:   case REOP_ANY_NOTNUL: case REOP_ANY_NOTNUL_UTF8: \
-	case REOP_ANY_NOTNUL_NOTLF: case REOP_ANY_NOTNUL_NOTLF_UTF8
+
+#ifdef REOP_ANY
 #define REOP_ANY_MIN REOP_ANY
+#undef REOP_ANY_MAX
+#define REOP_ANY_MAX REOP_ANY
 	REOP_ANY,                  /* [+0] Match any byte */
+#endif /* REOP_ANY */
+#ifdef REOP_ANY_UTF8
+#undef REOP_ANY_MAX
+#ifndef REOP_ANY_MIN
+#define REOP_ANY_MIN REOP_ANY_UTF8
+#endif /* !REOP_ANY_MIN */
+#define REOP_ANY_MAX REOP_ANY_UTF8
 	REOP_ANY_UTF8,             /* [+0] Match any character */
+#endif /* REOP_ANY_UTF8 */
+#ifdef REOP_ANY_NOTLF
+#undef REOP_ANY_MAX
+#ifndef REOP_ANY_MIN
+#define REOP_ANY_MIN REOP_ANY_NOTLF
+#endif /* !REOP_ANY_MIN */
+#define REOP_ANY_MAX REOP_ANY_NOTLF
 	REOP_ANY_NOTLF,            /* [+0] Match any character (except ASCII line-feeds) */
+#endif /* REOP_ANY_NOTLF */
+#ifdef REOP_ANY_NOTLF_UTF8
+#undef REOP_ANY_MAX
+#ifndef REOP_ANY_MIN
+#define REOP_ANY_MIN REOP_ANY_NOTLF_UTF8
+#endif /* !REOP_ANY_MIN */
+#define REOP_ANY_MAX REOP_ANY_NOTLF_UTF8
 	REOP_ANY_NOTLF_UTF8,       /* [+0] Match any utf-8 character (except unicode line-feeds) */
+#endif /* REOP_ANY_NOTLF_UTF8 */
+#ifdef REOP_ANY_NOTNUL
+#undef REOP_ANY_MAX
+#ifndef REOP_ANY_MIN
+#define REOP_ANY_MIN REOP_ANY_NOTNUL
+#endif /* !REOP_ANY_MIN */
+#define REOP_ANY_MAX REOP_ANY_NOTNUL
 	REOP_ANY_NOTNUL,           /* [+0] Match any byte (except '\0') */
+#endif /* REOP_ANY_NOTNUL */
+#ifdef REOP_ANY_NOTNUL_UTF8
+#undef REOP_ANY_MAX
+#ifndef REOP_ANY_MIN
+#define REOP_ANY_MIN REOP_ANY_NOTNUL_UTF8
+#endif /* !REOP_ANY_MIN */
+#define REOP_ANY_MAX REOP_ANY_NOTNUL_UTF8
 	REOP_ANY_NOTNUL_UTF8,      /* [+0] Match any utf-8 character (except '\0') */
+#endif /* REOP_ANY_NOTNUL_UTF8 */
+#ifdef REOP_ANY_NOTNUL_NOTLF
+#undef REOP_ANY_MAX
+#ifndef REOP_ANY_MIN
+#define REOP_ANY_MIN REOP_ANY_NOTNUL_NOTLF
+#endif /* !REOP_ANY_MIN */
+#define REOP_ANY_MAX REOP_ANY_NOTNUL_NOTLF
 	REOP_ANY_NOTNUL_NOTLF,     /* [+0] Match any character (except '\0' or ASCII line-feeds) */
-	REOP_ANY_NOTNUL_NOTLF_UTF8, /* [+0] Match any character (except '\0' or unicode line-feeds) */
+#endif /* REOP_ANY_NOTNUL_NOTLF */
+#ifdef REOP_ANY_NOTNUL_NOTLF_UTF8
+#undef REOP_ANY_MAX
+#ifndef REOP_ANY_MIN
+#define REOP_ANY_MIN REOP_ANY_NOTNUL_NOTLF_UTF8
+#endif /* !REOP_ANY_MIN */
 #define REOP_ANY_MAX REOP_ANY_NOTNUL_NOTLF_UTF8
+	REOP_ANY_NOTNUL_NOTLF_UTF8, /* [+0] Match any character (except '\0' or unicode line-feeds) */
+#endif /* REOP_ANY_NOTNUL_NOTLF_UTF8 */
+#if (defined(REOP_ANY_NOTNUL_NOTLF) + defined(REOP_ANY_NOTNUL_NOTLF_UTF8) + defined(REOP_ANY_NOTNUL) + defined(REOP_ANY_NOTNUL_UTF8) + defined(REOP_ANY_NOTLF) + defined(REOP_ANY_NOTLF_UTF8) + defined(REOP_ANY) + defined(REOP_ANY_UTF8)) == 1
+#define case_REOP_ANY_MIN_to_MAX case REOP_ANY_MIN
+#elif (defined(REOP_ANY_NOTNUL_NOTLF) + defined(REOP_ANY_NOTNUL_NOTLF_UTF8) + defined(REOP_ANY_NOTNUL) + defined(REOP_ANY_NOTNUL_UTF8) + defined(REOP_ANY_NOTLF) + defined(REOP_ANY_NOTLF_UTF8) + defined(REOP_ANY) + defined(REOP_ANY_UTF8)) == 2
+#define case_REOP_ANY_MIN_to_MAX case REOP_ANY_MIN: case REOP_ANY_MIN + 1
+#elif (defined(REOP_ANY_NOTNUL_NOTLF) + defined(REOP_ANY_NOTNUL_NOTLF_UTF8) + defined(REOP_ANY_NOTNUL) + defined(REOP_ANY_NOTNUL_UTF8) + defined(REOP_ANY_NOTLF) + defined(REOP_ANY_NOTLF_UTF8) + defined(REOP_ANY) + defined(REOP_ANY_UTF8)) == 3
+#define case_REOP_ANY_MIN_to_MAX case REOP_ANY_MIN: case REOP_ANY_MIN + 1: case REOP_ANY_MIN + 2
+#elif (defined(REOP_ANY_NOTNUL_NOTLF) + defined(REOP_ANY_NOTNUL_NOTLF_UTF8) + defined(REOP_ANY_NOTNUL) + defined(REOP_ANY_NOTNUL_UTF8) + defined(REOP_ANY_NOTLF) + defined(REOP_ANY_NOTLF_UTF8) + defined(REOP_ANY) + defined(REOP_ANY_UTF8)) == 4
+#define case_REOP_ANY_MIN_to_MAX case REOP_ANY_MIN: case REOP_ANY_MIN + 1: case REOP_ANY_MIN + 2: case REOP_ANY_MIN + 3
+#elif (defined(REOP_ANY_NOTNUL_NOTLF) + defined(REOP_ANY_NOTNUL_NOTLF_UTF8) + defined(REOP_ANY_NOTNUL) + defined(REOP_ANY_NOTNUL_UTF8) + defined(REOP_ANY_NOTLF) + defined(REOP_ANY_NOTLF_UTF8) + defined(REOP_ANY) + defined(REOP_ANY_UTF8)) == 5
+#define case_REOP_ANY_MIN_to_MAX                                                            \
+	case REOP_ANY_MIN: case REOP_ANY_MIN + 1: case REOP_ANY_MIN + 2: case REOP_ANY_MIN + 3: \
+	case REOP_ANY_MIN + 4
+#elif (defined(REOP_ANY_NOTNUL_NOTLF) + defined(REOP_ANY_NOTNUL_NOTLF_UTF8) + defined(REOP_ANY_NOTNUL) + defined(REOP_ANY_NOTNUL_UTF8) + defined(REOP_ANY_NOTLF) + defined(REOP_ANY_NOTLF_UTF8) + defined(REOP_ANY) + defined(REOP_ANY_UTF8)) == 6
+#define case_REOP_ANY_MIN_to_MAX                                                            \
+	case REOP_ANY_MIN: case REOP_ANY_MIN + 1: case REOP_ANY_MIN + 2: case REOP_ANY_MIN + 3: \
+	case REOP_ANY_MIN + 4: case REOP_ANY_MIN + 5
+#elif (defined(REOP_ANY_NOTNUL_NOTLF) + defined(REOP_ANY_NOTNUL_NOTLF_UTF8) + defined(REOP_ANY_NOTNUL) + defined(REOP_ANY_NOTNUL_UTF8) + defined(REOP_ANY_NOTLF) + defined(REOP_ANY_NOTLF_UTF8) + defined(REOP_ANY) + defined(REOP_ANY_UTF8)) == 7
+#define case_REOP_ANY_MIN_to_MAX                                                            \
+	case REOP_ANY_MIN: case REOP_ANY_MIN + 1: case REOP_ANY_MIN + 2: case REOP_ANY_MIN + 3: \
+	case REOP_ANY_MIN + 4: case REOP_ANY_MIN + 5: case REOP_ANY_MIN + 6
+#elif (defined(REOP_ANY_NOTNUL_NOTLF) + defined(REOP_ANY_NOTNUL_NOTLF_UTF8) + defined(REOP_ANY_NOTNUL) + defined(REOP_ANY_NOTNUL_UTF8) + defined(REOP_ANY_NOTLF) + defined(REOP_ANY_NOTLF_UTF8) + defined(REOP_ANY) + defined(REOP_ANY_UTF8)) == 8
+#define case_REOP_ANY_MIN_to_MAX                                                            \
+	case REOP_ANY_MIN: case REOP_ANY_MIN + 1: case REOP_ANY_MIN + 2: case REOP_ANY_MIN + 3: \
+	case REOP_ANY_MIN + 4: case REOP_ANY_MIN + 5: case REOP_ANY_MIN + 6: case REOP_ANY_MIN + 7
+#else /* ... */
+#error "Too many REOP_ANY* opcodes"
+#endif /* !... */
+
 	REOP_BYTE,                 /* [+1] Followed by 1 byte that must be matched exactly */
 	REOP_NBYTE,                /* [+1] Followed by 1 byte that must not be matched exactly */
 	REOP_BYTE2,                /* [+2] Followed by 2 bytes, one of which must be matched exactly (for "[ab]" or "a" -> "[aA]" in ICASE-mode) (the 2 bytes must be sorted ascendingly) */
