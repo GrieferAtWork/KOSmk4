@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1701ec3 */
+/* HASH CRC-32:0x89826435 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_INOUT(1),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8,(char const **__restrict __ptext),unicode_readutf8,(__ptext))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8,(char const **__restrict __ptext),unicode_readutf8,(__ptext))
 #else /* __CRT_HAVE_unicode_readutf8 */
 __NAMESPACE_LOCAL_END
 #include <libc/local/unicode/unicode_readutf8.h>

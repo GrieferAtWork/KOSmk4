@@ -227,7 +227,7 @@ parse_next_ch:
 					cmdline = next_ch;
 					if (next_ch >= cmdline_end)
 						goto done_cmdline;
-					unicode_readutf8(&next_ch);
+					next_ch += unicode_utf8seqlen[(unsigned char)*next_ch];
 					continue;
 				}
 				if (ch == end_ch) {
