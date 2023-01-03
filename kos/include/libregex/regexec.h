@@ -125,7 +125,7 @@ __NOTHROW_NCX(LIBREGEX_CC re_exec_search)(struct re_exec const *__restrict exec,
                                           __size_t search_range, __size_t *p_match_size);
 #endif /* LIBREGEX_WANT_PROTOTYPES */
 
-/* Similar to `re_exec_search(3)',  but never matches  epsilon.
+/* Similar to `re_exec_search(3)',  but never returns  epsilon.
  * Instead, keep on searching if epsilon happens to be matched. */
 typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) __ssize_t
 __NOTHROW_NCX_T(LIBREGEX_CC *PRE_EXEC_SEARCH_NOEPSILON)(struct re_exec const *__restrict exec,
