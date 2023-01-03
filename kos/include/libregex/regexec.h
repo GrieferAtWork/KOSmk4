@@ -65,7 +65,7 @@ typedef struct {
 struct iovec;
 struct re_exec {
 	struct re_code const *rx_code;     /* [1..1] Regex code */
-	size_t                rx_nmatch;   /* Max # of group matches to write to `rx_pmatch' (at most `rx_code->rc_ngrps' will ever be written) */
+	__size_t              rx_nmatch;   /* Max # of group matches to write to `rx_pmatch' (at most `rx_code->rc_ngrps' will ever be written) */
 	re_regmatch_t        *rx_pmatch;   /* [?..rx_nmatch] Output buffer for group matches
 	                                    * - Up to the first `rx_nmatch' groups are written, but only on success
 	                                    * - Upon failure, the contents of this buffer are left in an undefined state
@@ -118,11 +118,22 @@ __NOTHROW_NCX(LIBREGEX_CC re_exec_match)(struct re_exec const *__restrict exec);
  * @return: -RE_ESIZE:   On-failure stack became too large. */
 typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) __ssize_t
 __NOTHROW_NCX_T(LIBREGEX_CC *PRE_EXEC_SEARCH)(struct re_exec const *__restrict exec,
-                                              size_t search_range, size_t *p_match_size);
+                                              __size_t search_range, __size_t *p_match_size);
 #ifdef LIBREGEX_WANT_PROTOTYPES
 LIBREGEX_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) __ssize_t
 __NOTHROW_NCX(LIBREGEX_CC re_exec_search)(struct re_exec const *__restrict exec,
-                                          size_t search_range, size_t *p_match_size);
+                                          __size_t search_range, __size_t *p_match_size);
+#endif /* LIBREGEX_WANT_PROTOTYPES */
+
+/* Similar to `re_exec_search(3)',  but never matches  epsilon.
+ * Instead, keep on searching if epsilon happens to be matched. */
+typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) __ssize_t
+__NOTHROW_NCX_T(LIBREGEX_CC *PRE_EXEC_SEARCH_NOEPSILON)(struct re_exec const *__restrict exec,
+                                                        __size_t search_range, __size_t *p_match_size);
+#ifdef LIBREGEX_WANT_PROTOTYPES
+LIBREGEX_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) __ssize_t
+__NOTHROW_NCX(LIBREGEX_CC re_exec_search_noepsilon)(struct re_exec const *__restrict exec,
+                                                    __size_t search_range, __size_t *p_match_size);
 #endif /* LIBREGEX_WANT_PROTOTYPES */
 
 /* Same as `re_exec_search(3R)', but perform searching with starting
@@ -132,11 +143,11 @@ __NOTHROW_NCX(LIBREGEX_CC re_exec_search)(struct re_exec const *__restrict exec,
  * given pattern matches that is still within that range. */
 typedef __ATTR_WUNUSED_T __ATTR_NONNULL_T((1)) __ssize_t
 __NOTHROW_NCX_T(LIBREGEX_CC *PRE_EXEC_RSEARCH)(struct re_exec const *__restrict exec,
-                                               size_t search_range, size_t *p_match_size);
+                                               __size_t search_range, __size_t *p_match_size);
 #ifdef LIBREGEX_WANT_PROTOTYPES
 LIBREGEX_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) __ssize_t
 __NOTHROW_NCX(LIBREGEX_CC re_exec_rsearch)(struct re_exec const *__restrict exec,
-                                           size_t search_range, size_t *p_match_size);
+                                           __size_t search_range, __size_t *p_match_size);
 #endif /* LIBREGEX_WANT_PROTOTYPES */
 
 __DECL_END
