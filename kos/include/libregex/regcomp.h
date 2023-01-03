@@ -250,7 +250,110 @@ typedef int re_errno_t;
  */
 
 
-/* Regex charset opcodes */
+/************************************************************************/
+/* Regex syntax flags                                                   */
+/************************************************************************/
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS) && !defined(RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS)
+#define RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS 0x00000001 /* '\' can be used to escape characters in sets: '[a\[\]\-]' */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS && !RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_BK_PLUS_QM) && !defined(RE_SYNTAX_BK_PLUS_QM)
+#define RE_SYNTAX_BK_PLUS_QM                0x00000002 /* If clear: '+' and '?' are operators and '\+' and '\?' are literals; if set: the opposite is the case. */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_BK_PLUS_QM && !RE_SYNTAX_BK_PLUS_QM */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_CHAR_CLASSES) && !defined(RE_SYNTAX_CHAR_CLASSES)
+#define RE_SYNTAX_CHAR_CLASSES              0x00000004 /* Support for char-classes (e.g. `[[:alpha:]]') */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_CHAR_CLASSES && !RE_SYNTAX_CHAR_CLASSES */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_CONTEXT_INDEP_ANCHORS) && !defined(RE_SYNTAX_CONTEXT_INDEP_ANCHORS)
+#define RE_SYNTAX_CONTEXT_INDEP_ANCHORS     0x00000008 /* '^' and '$' are always anchors (as opposed to only at the start/end or after/before a '(' and ')') */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_CONTEXT_INDEP_ANCHORS && !RE_SYNTAX_CONTEXT_INDEP_ANCHORS */
+#ifndef RE_SYNTAX_CONTEXT_INDEP_OPS
+#define RE_SYNTAX_CONTEXT_INDEP_OPS         0x00000010 /* Ignored... */
+#endif /* !RE_SYNTAX_CONTEXT_INDEP_OPS */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_CONTEXT_INVALID_OPS) && !defined(RE_SYNTAX_CONTEXT_INVALID_OPS)
+#define RE_SYNTAX_CONTEXT_INVALID_OPS       0x00000020 /* '*', '+', '{' and '?' appearing at the start or after '(' or '|' results in `RE_BADRPT'; If not set, they are treated as literals. */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_CONTEXT_INVALID_OPS && !RE_SYNTAX_CONTEXT_INVALID_OPS */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NEWLINE) && !defined(RE_SYNTAX_DOT_NEWLINE)
+#define RE_SYNTAX_DOT_NEWLINE               0x00000040 /* '.' matches line-feeds (if not set, then it doesn't) */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NEWLINE && !RE_SYNTAX_DOT_NEWLINE */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NOT_NULL) && !defined(RE_SYNTAX_DOT_NOT_NULL)
+#define RE_SYNTAX_DOT_NOT_NULL              0x00000080 /* '.' doesn't match '\0' (if not set, then it does) */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NOT_NULL && !RE_SYNTAX_DOT_NOT_NULL */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_HAT_LISTS_NOT_NEWLINE) && !defined(RE_SYNTAX_HAT_LISTS_NOT_NEWLINE)
+#define RE_SYNTAX_HAT_LISTS_NOT_NEWLINE     0x00000100 /* '[^abc]' will never match line-feeds (as though line-feeds were part of the set of characters never matched). If not set, [^]-sets will match them (unless explicitly added to the set of unmatched characters) */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_HAT_LISTS_NOT_NEWLINE && !RE_SYNTAX_HAT_LISTS_NOT_NEWLINE */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_INTERVALS) && !defined(RE_SYNTAX_INTERVALS)
+#define RE_SYNTAX_INTERVALS                 0x00000200 /* Enable support for intervals: 'x{1,2}' (if not set, '{' and '}' are literals, though escaping is governed by `RE_SYNTAX_NO_BK_BRACES') */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_INTERVALS && !RE_SYNTAX_INTERVALS */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_LIMITED_OPS) && !defined(RE_SYNTAX_LIMITED_OPS)
+#define RE_SYNTAX_LIMITED_OPS               0x00000400 /* If set, support for '+', '?' and '|' is disabled (if not set, support is enabled, though escaping is governed by `RE_SYNTAX_BK_PLUS_QM' and `RE_SYNTAX_NO_BK_VBAR') */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_LIMITED_OPS && !RE_SYNTAX_LIMITED_OPS */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NEWLINE_ALT) && !defined(RE_SYNTAX_NEWLINE_ALT)
+#define RE_SYNTAX_NEWLINE_ALT               0x00000800 /* '\n' (embedded ASCII 10h) is treated like as an alias for the '|'-operator (if not set, '\n' is a literal; but note the kos-exception "\" "n", which matches that 2-character sequence against arbitrary line-feeds) */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NEWLINE_ALT && !RE_SYNTAX_NEWLINE_ALT */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_BRACES) && !defined(RE_SYNTAX_NO_BK_BRACES)
+#define RE_SYNTAX_NO_BK_BRACES              0x00001000 /* If set, '{...}' are intervals, and '\{' and '\}' are literals; if clear, the opposite is the case (iow: '\{...\}' is an interval) */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_BRACES && !RE_SYNTAX_NO_BK_BRACES */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_PARENS) && !defined(RE_SYNTAX_NO_BK_PARENS)
+#define RE_SYNTAX_NO_BK_PARENS              0x00002000 /* If set, '(...)' are groups, and '\(' and '\)' are literals; if clear, the opposite is the case (iow: '\(...\)' is a group) */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_PARENS && !RE_SYNTAX_NO_BK_PARENS */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_REFS) && !defined(RE_SYNTAX_NO_BK_REFS)
+#define RE_SYNTAX_NO_BK_REFS                0x00004000 /* If set, '\<1-9>' matches the literal <1-9>; if clear, '\<1-9>' is a back-reference */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_REFS && !RE_SYNTAX_NO_BK_REFS */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_VBAR) && !defined(RE_SYNTAX_NO_BK_VBAR)
+#define RE_SYNTAX_NO_BK_VBAR                0x00008000 /* If set, '|' is the alternation operation: '(a|b)' (and '\|' is a literal); if clear, the opposite is the case (iow: '(a\|b)' matches '[ab]') */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_VBAR && !RE_SYNTAX_NO_BK_VBAR */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_EMPTY_RANGES) && !defined(RE_SYNTAX_NO_EMPTY_RANGES)
+#define RE_SYNTAX_NO_EMPTY_RANGES           0x00010000 /* If set, a []-set like '[z-a]' results in `RE_ERANGE'; if clear, it is equal to '[]' (iow: bad ranges are simply ignored) */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_EMPTY_RANGES && !RE_SYNTAX_NO_EMPTY_RANGES */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD) && !defined(RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD)
+#define RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD 0x00020000 /* If set, unmatched ')' are treated as literals; if clear, unmatched an ')' results in `RE_ERPAREN' */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD && !RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_POSIX_BACKTRACKING) && !defined(RE_SYNTAX_NO_POSIX_BACKTRACKING)
+#define RE_SYNTAX_NO_POSIX_BACKTRACKING     0x00040000 /* If set, return the first match, rather than the perfect one (s.a. `REOP_MATCHED' and `REOP_MATCHED_PERFECT') */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_POSIX_BACKTRACKING && !RE_SYNTAX_NO_POSIX_BACKTRACKING */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_GNU_OPS) && !defined(RE_SYNTAX_NO_GNU_OPS)
+#define RE_SYNTAX_NO_GNU_OPS                0x00080000 /* If set, disable support for '\<', '\>', '\b', '\B', '\w', '\W', '\s', '\S', '\`' and "\'" */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_GNU_OPS && !RE_SYNTAX_NO_GNU_OPS */
+#ifndef RE_SYNTAX_DEBUG
+#define RE_SYNTAX_DEBUG                     0x00100000 /* Ignored... */
+#endif /* !RE_SYNTAX_DEBUG */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_INVALID_INTERVAL_ORD) && !defined(RE_SYNTAX_INVALID_INTERVAL_ORD)
+#define RE_SYNTAX_INVALID_INTERVAL_ORD      0x00200000 /* Invalid intervals like "a{b" are treated as literals (i.e. like "a\{b") */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_INVALID_INTERVAL_ORD && !RE_SYNTAX_INVALID_INTERVAL_ORD */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_ICASE) && !defined(RE_SYNTAX_ICASE)
+#define RE_SYNTAX_ICASE                     0x00400000 /* Casing is ignored by literal-matches, and '[[:lower:]]', '[[:upper:]]', '[[:title:]]' are aliases for '[[:alpha:]]' */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_ICASE && !RE_SYNTAX_ICASE */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_CARET_ANCHORS_HERE) && !defined(RE_SYNTAX_CARET_ANCHORS_HERE)
+#define RE_SYNTAX_CARET_ANCHORS_HERE        0x00800000 /* Alias for `RE_SYNTAX_CONTEXT_INDEP_ANCHORS', but only for '^', and used internally */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_CARET_ANCHORS_HERE && !RE_SYNTAX_CARET_ANCHORS_HERE */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_CONTEXT_INVALID_DUP) && !defined(RE_SYNTAX_CONTEXT_INVALID_DUP)
+#define RE_SYNTAX_CONTEXT_INVALID_DUP       0x01000000 /* If set, '{' appearing at the start, or after '(', '|' or '}' results in `RE_BADRPT'; else, behavior is governed by `RE_SYNTAX_CONTEXT_INVALID_OPS' */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_CONTEXT_INVALID_DUP && !RE_SYNTAX_CONTEXT_INVALID_DUP */
+#ifndef RE_SYNTAX_NO_SUB
+#define RE_SYNTAX_NO_SUB                    0x02000000 /* Ignored... (used at a different point to implement `RE_NOSUB') */
+#endif /* !RE_SYNTAX_NO_SUB */
+/*      RE_SYNTAX_                          0x04000000  * ... */
+/*      RE_SYNTAX_                          0x08000000  * ... */
+/*      RE_SYNTAX_                          0x10000000  * ... */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_ANCHORS_IGNORE_EFLAGS) && !defined(RE_SYNTAX_ANCHORS_IGNORE_EFLAGS)
+#define RE_SYNTAX_ANCHORS_IGNORE_EFLAGS     0x20000000 /* '^' and '$' operators will ignore `RE_EXEC_NOTBOL' and `RE_EXEC_NOTEOL' */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_ANCHORS_IGNORE_EFLAGS && !RE_SYNTAX_ANCHORS_IGNORE_EFLAGS */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_UTF8) && !defined(RE_SYNTAX_NO_UTF8)
+#define RE_SYNTAX_NO_UTF8                   0x40000000 /* If set, pattern is byte-based (rather than a utf-8 string; e.g. '[ä]' is like '[\xC3\xA4]'). Also disables support for '\uABCD', '\UABCDABCD' */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_UTF8 && !RE_SYNTAX_NO_UTF8 */
+#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_KOS_OPS) && !defined(RE_SYNTAX_NO_KOS_OPS)
+#define RE_SYNTAX_NO_KOS_OPS                0x80000000 /* If set, disable support for python- and kos-extensions: '\n', '\N', "[^:<foo>:]", '\d', '\D', '\0123', '\xAB', '\uABCD', '\UABCDABCD', '\A', '\Z' */
+#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_KOS_OPS && !RE_SYNTAX_NO_KOS_OPS */
+
+
+/* Figure out which opcodes might be needed. */
+/* TODO */
+
+
+
+
+/************************************************************************/
+/* Regex charset opcodes                                                */
+/************************************************************************/
 enum {
 /*[[[deemon
 print("#define case_RECS_BITSET_MIN_to_MAX_UTF8        \\");
@@ -396,7 +499,10 @@ for (local segment: [0x64:0xe3+1].segments(4)) {
 	                         * a character contained in said string. NOTE: COUNT must be >= 3 */
 };
 
-/* Regex opcodes (always encoded as a single byte) */
+
+/************************************************************************/
+/* Regex opcodes (always encoded as a single byte)                      */
+/************************************************************************/
 enum {
 
 	/* Opcodes for matching (and thus: consuming) input */
@@ -554,98 +660,6 @@ enum {
 
 
 
-/* Regex syntax flags */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS) && !defined(RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS)
-#define RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS 0x00000001 /* '\' can be used to escape characters in sets: '[a\[\]\-]' */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS && !RE_SYNTAX_BACKSLASH_ESCAPE_IN_LISTS */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_BK_PLUS_QM) && !defined(RE_SYNTAX_BK_PLUS_QM)
-#define RE_SYNTAX_BK_PLUS_QM                0x00000002 /* If clear: '+' and '?' are operators and '\+' and '\?' are literals; if set: the opposite is the case. */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_BK_PLUS_QM && !RE_SYNTAX_BK_PLUS_QM */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_CHAR_CLASSES) && !defined(RE_SYNTAX_CHAR_CLASSES)
-#define RE_SYNTAX_CHAR_CLASSES              0x00000004 /* Support for char-classes (e.g. `[[:alpha:]]') */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_CHAR_CLASSES && !RE_SYNTAX_CHAR_CLASSES */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_CONTEXT_INDEP_ANCHORS) && !defined(RE_SYNTAX_CONTEXT_INDEP_ANCHORS)
-#define RE_SYNTAX_CONTEXT_INDEP_ANCHORS     0x00000008 /* '^' and '$' are always anchors (as opposed to only at the start/end or after/before a '(' and ')') */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_CONTEXT_INDEP_ANCHORS && !RE_SYNTAX_CONTEXT_INDEP_ANCHORS */
-#ifndef RE_SYNTAX_CONTEXT_INDEP_OPS
-#define RE_SYNTAX_CONTEXT_INDEP_OPS         0x00000010 /* Ignored... */
-#endif /* !RE_SYNTAX_CONTEXT_INDEP_OPS */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_CONTEXT_INVALID_OPS) && !defined(RE_SYNTAX_CONTEXT_INVALID_OPS)
-#define RE_SYNTAX_CONTEXT_INVALID_OPS       0x00000020 /* '*', '+', '{' and '?' appearing at the start or after '(' or '|' results in `RE_BADRPT'; If not set, they are treated as literals. */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_CONTEXT_INVALID_OPS && !RE_SYNTAX_CONTEXT_INVALID_OPS */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NEWLINE) && !defined(RE_SYNTAX_DOT_NEWLINE)
-#define RE_SYNTAX_DOT_NEWLINE               0x00000040 /* '.' matches line-feeds (if not set, then it doesn't) */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NEWLINE && !RE_SYNTAX_DOT_NEWLINE */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NOT_NULL) && !defined(RE_SYNTAX_DOT_NOT_NULL)
-#define RE_SYNTAX_DOT_NOT_NULL              0x00000080 /* '.' doesn't match '\0' (if not set, then it does) */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_DOT_NOT_NULL && !RE_SYNTAX_DOT_NOT_NULL */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_HAT_LISTS_NOT_NEWLINE) && !defined(RE_SYNTAX_HAT_LISTS_NOT_NEWLINE)
-#define RE_SYNTAX_HAT_LISTS_NOT_NEWLINE     0x00000100 /* '[^abc]' will never match line-feeds (as though line-feeds were part of the set of characters never matched). If not set, [^]-sets will match them (unless explicitly added to the set of unmatched characters) */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_HAT_LISTS_NOT_NEWLINE && !RE_SYNTAX_HAT_LISTS_NOT_NEWLINE */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_INTERVALS) && !defined(RE_SYNTAX_INTERVALS)
-#define RE_SYNTAX_INTERVALS                 0x00000200 /* Enable support for intervals: 'x{1,2}' (if not set, '{' and '}' are literals, though escaping is governed by `RE_SYNTAX_NO_BK_BRACES') */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_INTERVALS && !RE_SYNTAX_INTERVALS */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_LIMITED_OPS) && !defined(RE_SYNTAX_LIMITED_OPS)
-#define RE_SYNTAX_LIMITED_OPS               0x00000400 /* If set, support for '+', '?' and '|' is disabled (if not set, support is enabled, though escaping is governed by `RE_SYNTAX_BK_PLUS_QM' and `RE_SYNTAX_NO_BK_VBAR') */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_LIMITED_OPS && !RE_SYNTAX_LIMITED_OPS */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NEWLINE_ALT) && !defined(RE_SYNTAX_NEWLINE_ALT)
-#define RE_SYNTAX_NEWLINE_ALT               0x00000800 /* '\n' (embedded ASCII 10h) is treated like as an alias for the '|'-operator (if not set, '\n' is a literal; but note the kos-exception "\" "n", which matches that 2-character sequence against arbitrary line-feeds) */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NEWLINE_ALT && !RE_SYNTAX_NEWLINE_ALT */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_BRACES) && !defined(RE_SYNTAX_NO_BK_BRACES)
-#define RE_SYNTAX_NO_BK_BRACES              0x00001000 /* If set, '{...}' are intervals, and '\{' and '\}' are literals; if clear, the opposite is the case (iow: '\{...\}' is an interval) */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_BRACES && !RE_SYNTAX_NO_BK_BRACES */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_PARENS) && !defined(RE_SYNTAX_NO_BK_PARENS)
-#define RE_SYNTAX_NO_BK_PARENS              0x00002000 /* If set, '(...)' are groups, and '\(' and '\)' are literals; if clear, the opposite is the case (iow: '\(...\)' is a group) */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_PARENS && !RE_SYNTAX_NO_BK_PARENS */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_REFS) && !defined(RE_SYNTAX_NO_BK_REFS)
-#define RE_SYNTAX_NO_BK_REFS                0x00004000 /* If set, '\<1-9>' matches the literal <1-9>; if clear, '\<1-9>' is a back-reference */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_REFS && !RE_SYNTAX_NO_BK_REFS */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_VBAR) && !defined(RE_SYNTAX_NO_BK_VBAR)
-#define RE_SYNTAX_NO_BK_VBAR                0x00008000 /* If set, '|' is the alternation operation: '(a|b)' (and '\|' is a literal); if clear, the opposite is the case (iow: '(a\|b)' matches '[ab]') */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_BK_VBAR && !RE_SYNTAX_NO_BK_VBAR */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_EMPTY_RANGES) && !defined(RE_SYNTAX_NO_EMPTY_RANGES)
-#define RE_SYNTAX_NO_EMPTY_RANGES           0x00010000 /* If set, a []-set like '[z-a]' results in `RE_ERANGE'; if clear, it is equal to '[]' (iow: bad ranges are simply ignored) */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_EMPTY_RANGES && !RE_SYNTAX_NO_EMPTY_RANGES */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD) && !defined(RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD)
-#define RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD 0x00020000 /* If set, unmatched ')' are treated as literals; if clear, unmatched an ')' results in `RE_ERPAREN' */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD && !RE_SYNTAX_UNMATCHED_RIGHT_PAREN_ORD */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_POSIX_BACKTRACKING) && !defined(RE_SYNTAX_NO_POSIX_BACKTRACKING)
-#define RE_SYNTAX_NO_POSIX_BACKTRACKING     0x00040000 /* If set, return the first match, rather than the perfect one (s.a. `REOP_MATCHED' and `REOP_MATCHED_PERFECT') */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_POSIX_BACKTRACKING && !RE_SYNTAX_NO_POSIX_BACKTRACKING */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_GNU_OPS) && !defined(RE_SYNTAX_NO_GNU_OPS)
-#define RE_SYNTAX_NO_GNU_OPS                0x00080000 /* If set, disable support for '\<', '\>', '\b', '\B', '\w', '\W', '\s', '\S', '\`' and "\'" */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_GNU_OPS && !RE_SYNTAX_NO_GNU_OPS */
-#ifndef RE_SYNTAX_DEBUG
-#define RE_SYNTAX_DEBUG                     0x00100000 /* Ignored... */
-#endif /* !RE_SYNTAX_DEBUG */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_INVALID_INTERVAL_ORD) && !defined(RE_SYNTAX_INVALID_INTERVAL_ORD)
-#define RE_SYNTAX_INVALID_INTERVAL_ORD      0x00200000 /* Invalid intervals like "a{b" are treated as literals (i.e. like "a\{b") */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_INVALID_INTERVAL_ORD && !RE_SYNTAX_INVALID_INTERVAL_ORD */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_ICASE) && !defined(RE_SYNTAX_ICASE)
-#define RE_SYNTAX_ICASE                     0x00400000 /* Casing is ignored by literal-matches, and '[[:lower:]]', '[[:upper:]]', '[[:title:]]' are aliases for '[[:alpha:]]' */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_ICASE && !RE_SYNTAX_ICASE */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_CARET_ANCHORS_HERE) && !defined(RE_SYNTAX_CARET_ANCHORS_HERE)
-#define RE_SYNTAX_CARET_ANCHORS_HERE        0x00800000 /* Alias for `RE_SYNTAX_CONTEXT_INDEP_ANCHORS', but only for '^', and used internally */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_CARET_ANCHORS_HERE && !RE_SYNTAX_CARET_ANCHORS_HERE */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_CONTEXT_INVALID_DUP) && !defined(RE_SYNTAX_CONTEXT_INVALID_DUP)
-#define RE_SYNTAX_CONTEXT_INVALID_DUP       0x01000000 /* If set, '{' appearing at the start, or after '(', '|' or '}' results in `RE_BADRPT'; else, behavior is governed by `RE_SYNTAX_CONTEXT_INVALID_OPS' */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_CONTEXT_INVALID_DUP && !RE_SYNTAX_CONTEXT_INVALID_DUP */
-#ifndef RE_SYNTAX_NO_SUB
-#define RE_SYNTAX_NO_SUB                    0x02000000 /* Ignored... (used at a different point to implement `RE_NOSUB') */
-#endif /* !RE_SYNTAX_NO_SUB */
-/*      RE_SYNTAX_                          0x04000000  * ... */
-/*      RE_SYNTAX_                          0x08000000  * ... */
-/*      RE_SYNTAX_                          0x10000000  * ... */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_ANCHORS_IGNORE_EFLAGS) && !defined(RE_SYNTAX_ANCHORS_IGNORE_EFLAGS)
-#define RE_SYNTAX_ANCHORS_IGNORE_EFLAGS     0x20000000 /* '^' and '$' operators will ignore `RE_EXEC_NOTBOL' and `RE_EXEC_NOTEOL' */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_ANCHORS_IGNORE_EFLAGS && !RE_SYNTAX_ANCHORS_IGNORE_EFLAGS */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_UTF8) && !defined(RE_SYNTAX_NO_UTF8)
-#define RE_SYNTAX_NO_UTF8                   0x40000000 /* If set, pattern is byte-based (rather than a utf-8 string; e.g. '[ä]' is like '[\xC3\xA4]'). Also disables support for '\uABCD', '\UABCDABCD' */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_UTF8 && !RE_SYNTAX_NO_UTF8 */
-#if !defined(LIBREGEX_CONSTANT__RE_SYNTAX_NO_KOS_OPS) && !defined(RE_SYNTAX_NO_KOS_OPS)
-#define RE_SYNTAX_NO_KOS_OPS                0x80000000 /* If set, disable support for python- and kos-extensions: '\n', '\N', "[^:<foo>:]", '\d', '\D', '\0123', '\xAB', '\uABCD', '\UABCDABCD', '\A', '\Z' */
-#endif /* !LIBREGEX_CONSTANT__RE_SYNTAX_NO_KOS_OPS && !RE_SYNTAX_NO_KOS_OPS */
-
 /* Regex parser structure.
  * The behavior of `re_parser_yield(3R)' is affected by the following syntax flags:
  * - RE_SYNTAX_BK_PLUS_QM
@@ -718,8 +732,8 @@ typedef __uint32_t re_token_t;
 #define RE_TOKEN_AT_MIN         RE_TOKEN_AT_SOL
 #define RE_TOKEN_AT_SOL         (RE_TOKEN_XBASE + 18) /* "^" */
 #define RE_TOKEN_AT_EOL         (RE_TOKEN_XBASE + 19) /* "$" */
-#define RE_TOKEN_AT_SOI         (RE_TOKEN_XBASE + 20) /* "\`" */
-#define RE_TOKEN_AT_EOI         (RE_TOKEN_XBASE + 21) /* "\'" */
+#define RE_TOKEN_AT_SOI         (RE_TOKEN_XBASE + 20) /* "\`", "\A" */
+#define RE_TOKEN_AT_EOI         (RE_TOKEN_XBASE + 21) /* "\'", "\Z" */
 #define RE_TOKEN_AT_WOB         (RE_TOKEN_XBASE + 22) /* "\b" */
 #define RE_TOKEN_AT_WOB_NOT     (RE_TOKEN_XBASE + 23) /* "\B" */
 #define RE_TOKEN_AT_SOW         (RE_TOKEN_XBASE + 24) /* "\<" */
@@ -759,6 +773,8 @@ __NOTHROW_NCX(LIBREGEX_CC re_parser_yield)(struct re_parser *__restrict self);
 
 
 /* The compiled regex output structure produced by `re_compiler_compile(3R)' */
+#ifndef __re_code_defined
+#define __re_code_defined
 struct re_code {
 	__byte_t   rc_fmap[256]; /* Fast map: take the first byte of input data to match as index:
 	                          * - rc_fmap[input[0]] == 0xff --> input will never match
@@ -784,6 +800,7 @@ struct re_code {
 #define RE_CODE_FLAG_OPTGROUPS  0x02 /* The regex code contains optional groups (e.g. "foo(x)?bar" or "foo(|b(a)r)") */
 	__COMPILER_FLEXIBLE_ARRAY(__byte_t, rc_code); /* Code buffer (`REOP_*' instruction stream) */
 };
+#endif /* !__re_code_defined */
 
 
 /* Regex compiler structure */
