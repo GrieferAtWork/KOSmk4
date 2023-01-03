@@ -94,8 +94,9 @@ function flattenElfBinary(
 		local e_entry;
 		local maxOffset = 0;
 		with (local i = File.open(inputFile, "rb")) {
-			if (i.read(SELFMAG) != ELFMAG)
-				throw Error("Bad ELF magic");
+			local magic = i.read(SELFMAG);
+			if (magic != ELFMAG)
+				throw Error(f"Bad ELF magic in {repr inputFile}: {repr magic}");
 			local elfclass = i.getc();
 			local is64 = false;
 			if (elfclass == ELFCLASS64) {

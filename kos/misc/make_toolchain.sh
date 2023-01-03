@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix problem with ctypes alignment configuration"
-DEEMON_VERSION="22a65983d47ab5266e7790162c37c862eb95201c"
+#     v -- "Fix problem with octal-encoded integers in strings"
+DEEMON_VERSION="edccda44906980c072ca35d7d974a24597fcb50b"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
