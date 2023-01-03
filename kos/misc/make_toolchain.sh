@@ -32,8 +32,8 @@
 
 # Don't use the latest patch, but this very specific one that
 # should be usable to drive the entirety of the KOS toolchain.
-#     v -- "Fix configure script for detecting fixed-item-width memcpy/memmove"
-DEEMON_VERSION="260ce0cedc26c9aa82f6f259655ce7e43092526b"
+#     v -- "Fix problem with ctypes alignment configuration"
+DEEMON_VERSION="22a65983d47ab5266e7790162c37c862eb95201c"
 
 MAKE_PARALLEL_COUNT="$(grep -c ^processor /proc/cpuinfo)"
 
@@ -389,11 +389,8 @@ else
 		rm -rf "$KOS_BINUTILS/deemon" > /dev/null 2>&1
 		cmd mkdir -p "$KOS_BINUTILS/deemon"
 		cmd cd "$KOS_BINUTILS/deemon"
-		# https://stackoverflow.com/questions/3489173/how-to-clone-git-repository-with-specific-revision-changeset
-		cmd git init
-		cmd git remote add origin "https://github.com/GrieferAtWork/deemon.git"
-		cmd git fetch origin "$DEEMON_VERSION"
-		cmd git reset --hard FETCH_HEAD
+		cmd git clone --recursive "https://github.com/GrieferAtWork/deemon.git" "."
+		cmd git checkout -f "$DEEMON_VERSION"
 	fi
 	cmd cd "$KOS_BINUTILS/deemon"
 	echo "Configuring deemon..."

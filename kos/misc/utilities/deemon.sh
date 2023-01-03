@@ -27,7 +27,7 @@ if ! [ -f "$SRCPATH/configure" ]; then
 	rm -rf "$KOS_ROOT/binutils/src/deemon-git" > /dev/null 2>&1
 	cmd mkdir -p "$KOS_ROOT/binutils/src/deemon-git"
 	cmd cd "$KOS_ROOT/binutils/src/deemon-git"
-	cmd git clone "https://github.com/GrieferAtWork/deemon.git"
+	cmd git clone --recursive "https://github.com/GrieferAtWork/deemon.git"
 fi
 
 if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/deemon" ]; then
