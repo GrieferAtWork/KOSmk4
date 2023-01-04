@@ -1,0 +1,15 @@
+diff -Naur nano-4.4-orig/src/nano.h nano-4.4/src/nano.h
+--- nano-4.4-orig/src/nano.h	2019-06-15 11:54:42.000000000 +0200
++++ nano-4.4/src/nano.h	2023-01-04 22:18:07.920613000 +0100
+@@ -65,9 +65,9 @@
+ #define charmove(dest, src, n) memmove(dest, src, (n) * sizeof(char))
+ #define charset(dest, src, n) memset(dest, src, (n) * sizeof(char))
+ 
+-/* In UTF-8 a character is at most six bytes long. */
++/* In UTF-8 a character is at most seven bytes long. */
+ #ifdef ENABLE_UTF8
+-#define MAXCHARLEN 6
++#define MAXCHARLEN 7
+ #else
+ #define MAXCHARLEN 1
+ #endif
