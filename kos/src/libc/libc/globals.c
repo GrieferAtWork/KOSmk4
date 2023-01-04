@@ -110,12 +110,10 @@ DEFINE_NOREL_GLOBAL_META(int, getdate_err, ".crt.time");
 #undef optind
 #undef opterr
 #undef optopt
-DEFINE_NOREL_GLOBAL_META(char *, optarg, ".crt.application.options");
-DEFINE_NOREL_GLOBAL_META(int, optind, ".crt.application.options");
-DEFINE_NOREL_GLOBAL_META(int, opterr, ".crt.application.options");
-DEFINE_NOREL_GLOBAL_META(int, optopt, ".crt.application.options");
-/* HINT: The getopt global variables are defined in "user/getopt.c"
- *       to prevent  redundancy of  section information  meta-data. */
+DEFINE_NOREL_GLOBAL_META(char *, optarg, ".crt.application.getopt");
+DEFINE_NOREL_GLOBAL_META(int, optind, ".crt.application.getopt");
+DEFINE_NOREL_GLOBAL_META(int, opterr, ".crt.application.getopt");
+DEFINE_NOREL_GLOBAL_META(int, optopt, ".crt.application.getopt");
 
 
 /* <libintl.h> */

@@ -228,14 +228,22 @@ DECLARE_NOREL_GLOBAL_META(int, getdate_err);
 #undef optind
 #undef opterr
 #undef optopt
+#undef __LOCAL_optarg
+#undef __LOCAL_optind
+#undef __LOCAL_opterr
+#undef __LOCAL_optopt
 DECLARE_NOREL_GLOBAL_META(char *, optarg);
 DECLARE_NOREL_GLOBAL_META(int, optind);
 DECLARE_NOREL_GLOBAL_META(int, opterr);
 DECLARE_NOREL_GLOBAL_META(int, optopt);
-#define optarg GET_NOREL_GLOBAL(optarg)
-#define optind GET_NOREL_GLOBAL(optind)
-#define opterr GET_NOREL_GLOBAL(opterr)
-#define optopt GET_NOREL_GLOBAL(optopt)
+#define optarg         GET_NOREL_GLOBAL(optarg)
+#define optind         GET_NOREL_GLOBAL(optind)
+#define opterr         GET_NOREL_GLOBAL(opterr)
+#define optopt         GET_NOREL_GLOBAL(optopt)
+#define __LOCAL_optarg GET_NOREL_GLOBAL(optarg)
+#define __LOCAL_optind GET_NOREL_GLOBAL(optind)
+#define __LOCAL_opterr GET_NOREL_GLOBAL(opterr)
+#define __LOCAL_optopt GET_NOREL_GLOBAL(optopt)
 
 
 /* <libintl.h> */

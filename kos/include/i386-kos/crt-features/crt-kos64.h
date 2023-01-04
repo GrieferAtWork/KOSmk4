@@ -7215,6 +7215,7 @@
 #define __CRT_HAVE_KOS$__pathconf
 #define __CRT_HAVE_KOS$__pipe
 #define __CRT_HAVE_KOS$__poll
+#define __CRT_HAVE_KOS$__posix_getopt
 #define __CRT_HAVE_KOS$__pow
 #define __CRT_HAVE_KOS$__pow10
 #define __CRT_HAVE_KOS$__pow10f
@@ -11568,6 +11569,7 @@
 #define __CRT_HAVE_DOS$__pathconf
 #define __CRT_HAVE_DOS$__pipe
 #define __CRT_HAVE_DOS$__poll
+#define __CRT_HAVE_DOS$__posix_getopt
 #define __CRT_HAVE_DOS$__pow
 #define __CRT_HAVE_DOS$__pow10
 #define __CRT_HAVE_DOS$__pow10f

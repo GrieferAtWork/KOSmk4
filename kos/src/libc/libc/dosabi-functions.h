@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fe30c32 */
+/* HASH CRC-32:0x14a5f47b */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -628,9 +628,10 @@ DFUN(".text.crt.dos.fs.fts", libd_fts64_read, libc_fts64_read, TP, 1, TP)
 DFUN(".text.crt.dos.fs.fts", libd_fts64_set, libc_fts64_set, TD, 3, TP, TP, TD)
 
 /* getopt */
-DFUN(".text.crt.dos.application.options", libd_getopt, libc_getopt, TD, 3, TD, TP, TP)
-DFUN(".text.crt.dos.application.options", libd_getopt_long, libc_getopt_long, TD, 5, TD, TP, TP, TP, TP)
-DFUN(".text.crt.dos.application.options", libd_getopt_long_only, libc_getopt_long_only, TD, 5, TD, TP, TP, TP, TP)
+DFUN(".text.crt.dos.application.getopt", libd_getopt, libc_getopt, TD, 3, TD, TP, TP)
+DFUN(".text.crt.dos.application.getopt", libd___posix_getopt, libc___posix_getopt, TD, 3, TD, TP, TP)
+DFUN(".text.crt.dos.application.getopt", libd_getopt_long, libc_getopt_long, TD, 5, TD, TP, TP, TP, TP)
+DFUN(".text.crt.dos.application.getopt", libd_getopt_long_only, libc_getopt_long_only, TD, 5, TD, TP, TP, TP, TP)
 
 /* grp */
 DFUN(".text.crt.dos.database.grp", libd_getgrgid, libc_getgrgid, TP, 1, TIn(__SIZEOF_GID_T__))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7746e276 */
+/* HASH CRC-32:0xb25f5cb0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -163,6 +163,7 @@
 #define __CRT_HAVE_DOS$__p__wpgmptr
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$__posix_getopt
 #define __CRT_HAVE_DOS$__pthread_cleanup_routine
 #define __CRT_HAVE_DOS$__pthread_register_cancel
 #define __CRT_HAVE_DOS$__pthread_register_cancel_defer
@@ -4502,6 +4503,7 @@
 #define __CRT_HAVE___p_program_invocation_short_name
 #define __CRT_HAVE___p_sys_siglist
 #define __CRT_HAVE___peb
+#define __CRT_HAVE___posix_getopt
 #define __CRT_HAVE___progname
 #define __CRT_HAVE___progname_full
 #define __CRT_HAVE___pthread_cleanup_routine
@@ -6265,6 +6267,7 @@
 #define __CRT_HAVE_getnetgrent
 #define __CRT_HAVE_getnetgrent_r
 #define __CRT_HAVE_getopt
+#define __CRT_HAVE_getopt_impl
 #define __CRT_HAVE_getopt_long
 #define __CRT_HAVE_getopt_long_only
 #define __CRT_HAVE_getpagesize

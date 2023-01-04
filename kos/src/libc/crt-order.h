@@ -166,7 +166,7 @@
 
 # Misc sub-systems
 
-	.application.options               # getopt()
+	.application.getopt                # getopt()
 	.io.tty                            # tty / pty
 	.random.* .random                  # rand()
 	.math.*  .math                     # math-functions
@@ -243,6 +243,7 @@
 	CB(PREFIX.crt.errno_access.core) \
 	CB(PREFIX.crt.errno_access) \
 	CB(PREFIX.crt.application.exit) \
+	CB(PREFIX.crt.application.options) \
 	CB(PREFIX.crt.fs.exec.exec PREFIX.crt.sched.access) \
 	CB(PREFIX.crt.sched.thread) \
 	CB(PREFIX.crt.sched.pthread) \
@@ -317,7 +318,7 @@
 	CB(PREFIX.crt.net.db) \
 	CB(PREFIX.crt.net.interface) \
 	CB(PREFIX.crt.net.convert PREFIX.crt.net.inet.6 PREFIX.crt.net.inet.6.RFC_2292 PREFIX.crt.net.inet.6.RFC_3542 PREFIX.crt.net.inet.6.bind_reserved PREFIX.crt.net.inet.6.ipv4_source_filter PREFIX.crt.net.inet.6.source_filter PREFIX.crt.net.nameser) \
-	CB(PREFIX.crt.application.options) \
+	CB(PREFIX.crt.application.getopt) \
 	CB(PREFIX.crt.io.tty) \
 	CB(PREFIX.crt.random.random PREFIX.crt.random.srandom PREFIX.crt.random) \
 	CB(PREFIX.crt.math.complex PREFIX.crt.math.fenv PREFIX.crt.math.float PREFIX.crt.math.math PREFIX.crt.math.utility) \
@@ -430,6 +431,7 @@
 	CB(PREFIX.crt.dos.application.init) \
 	CB(PREFIX.crt.dos.errno_access) \
 	CB(PREFIX.crt.dos.application.exit) \
+	CB(PREFIX.crt.dos.application.options) \
 	CB(PREFIX.crt.dos.fs.exec.exec PREFIX.crt.dos.sched.access) \
 	CB(PREFIX.crt.dos.sched.thread) \
 	CB(PREFIX.crt.dos.sched.pthread) \
@@ -501,7 +503,7 @@
 	CB(PREFIX.crt.dos.net.db) \
 	CB(PREFIX.crt.dos.net.interface) \
 	CB(PREFIX.crt.dos.net.convert PREFIX.crt.dos.net.inet.6.RFC_2292 PREFIX.crt.dos.net.inet.6.RFC_3542 PREFIX.crt.dos.net.inet.6.bind_reserved PREFIX.crt.dos.net.inet.6.ipv4_source_filter PREFIX.crt.dos.net.inet.6.source_filter PREFIX.crt.dos.net.nameser) \
-	CB(PREFIX.crt.dos.application.options) \
+	CB(PREFIX.crt.dos.application.getopt) \
 	CB(PREFIX.crt.dos.io.tty) \
 	CB(PREFIX.crt.dos.random) \
 	CB(PREFIX.crt.dos.math.complex PREFIX.crt.dos.math.fenv PREFIX.crt.dos.math.float PREFIX.crt.dos.math.math PREFIX.crt.dos.math.utility) \

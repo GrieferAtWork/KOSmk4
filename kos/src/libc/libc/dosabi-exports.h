@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9368ecb2 */
+/* HASH CRC-32:0xc05a9317 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -502,6 +502,7 @@ DEFINE_PUBLIC_ALIAS(DOS$fts64_set, libd_fts64_set);
 
 /* getopt */
 DEFINE_PUBLIC_ALIAS(DOS$getopt, libd_getopt);
+DEFINE_PUBLIC_ALIAS(DOS$__posix_getopt, libd___posix_getopt);
 DEFINE_PUBLIC_ALIAS(DOS$getopt_long, libd_getopt_long);
 DEFINE_PUBLIC_ALIAS(DOS$getopt_long_only, libd_getopt_long_only);
 
