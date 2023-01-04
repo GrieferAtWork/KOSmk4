@@ -462,6 +462,8 @@
 #define __CRT_HAVE___cxa_begin_catch
 #define __CRT_HAVE___cxa_end_catch
 #define __CRT_HAVE___cxa_rethrow
+#define __CRT_HAVE___cxa_thread_atexit
+#define __CRT_HAVE___cxa_thread_atexit_impl
 #define __CRT_HAVE___cyg_profile_func_enter
 #define __CRT_HAVE___cyg_profile_func_exit
 #define __CRT_HAVE___cygerrno_location

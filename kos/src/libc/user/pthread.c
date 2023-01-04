@@ -248,14 +248,15 @@ PRIVATE ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread") void
 NOTHROW(LIBCCALL pthread_exit_thread)(struct pthread *__restrict me, int exitcode) {
 	/* Mask _all_ posix signals for our thread.
 	 *
-	 * We  don't  want  to accidentally  invoke  signal handlers
-	 * once our  TLS-state is  broken,  or once  we've  unmapped
-	 * our stack.  Note that  in regards  to the  former,  POSIX
-	 * requires  that  access to  `errno'  be async-signal-safe,
-	 * meaning that since we use ATTR_THREAD-memory to implement
-	 * errno, we mustn't run any  more signal handlers once  TLS
-	 * has been torn down! */
+	 * We don't want to accidentally invoke signal handlers  once
+	 * our TLS-state is broken, or once we've unmapped our stack.
+	 *
+	 * Note that in  regards to the  former, POSIX requires  that
+	 * access to `errno' be async-signal-safe, meaning that since
+	 * we  use ATTR_THREAD-memory to  implement errno, we mustn't
+	 * run  any more signal handlers once TLS has been torn down! */
 	static sigset_t const fullset = SIGSET_INIT_FULL;
+
 #ifdef __LIBC_CONFIG_HAVE_USERPROCMASK
 	/* NOTE: If userprocmask was enabled for the calling thread, then we
 	 *       have to disable it before we can safely destroy our own TLS

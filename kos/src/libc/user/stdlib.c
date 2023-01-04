@@ -46,6 +46,7 @@
 #include <limits.h>
 #include <malloc.h>
 #include <malloca.h>
+#include <pthread.h>
 #include <sched.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -141,13 +142,81 @@ environ_remove_heapstring_locked(struct environ_heapstr *ptr) {
 }
 
 
-/* TODO: Add support for: __cxa_thread_atexit */
-/* TODO: Add support for: __cxa_thread_atexit_impl */
+PRIVATE ATTR_SECTION(".data.crt.sched.process")
+pthread_key_t libc_cxa_thread_atexit_key = PTHREAD_ONCE_KEY_NP;
+struct cxa_thread_atexit_entry {
+	struct cxa_thread_atexit_entry *ctae_next; /* [0..1][owned] Next at-exit callback item. */
+	void (LIBKCALL *ctae_func)(void *arg);     /* [1..1] Callback */
+	void           *ctae_arg;                  /* [?..?] Cookie-argument for `ctae_func' */
+	void           *ctae_dl_handle;            /* [1..1][REF] Module handle for `ctae_func' (must be dlclose'd) */
+};
+
+PRIVATE ATTR_SECTION(".text.crt.sched.process") void LIBKCALL
+libc_cxa_thread_atexit_callback(void *data) {
+	struct cxa_thread_atexit_entry *iter, *next;
+	iter = (struct cxa_thread_atexit_entry *)data;
+	while (iter) {
+		next = iter->ctae_next;
+		(*iter->ctae_func)(iter->ctae_arg);
+		dlclose(iter->ctae_dl_handle);
+		free(iter);
+		iter = next;
+	}
+}
+
+DEFINE_PUBLIC_WEAK_ALIAS(__cxa_thread_atexit, libc___cxa_thread_atexit_impl); /* WEAK, because libstdc++ likes to override this one */
+DEFINE_PUBLIC_ALIAS(__cxa_thread_atexit_impl, libc___cxa_thread_atexit_impl);
+
+/* C++ ABI function to dynamically register at-exit callbacks
+ * to-be  invoked  as  soon  as  the  calling  thread  exits.
+ * @return: 0 : Success
+ * @return: -1: Error (s.a. `errno') */
+INTERN ATTR_SECTION(".text.crt.sched.process") NONNULL((1)) int
+NOTHROW_NCX(LIBCCALL libc___cxa_thread_atexit_impl)(void (LIBKCALL *func)(void *arg),
+                                                    void *arg, void *dso_handle) {
+	struct cxa_thread_atexit_entry *entry;
+	errno_t error;
+	/* Make sure that the cxa thread at-exit TLS descriptor has been allocated. */
+	error = pthread_key_create_once_np(&libc_cxa_thread_atexit_key,
+	                                   &libc_cxa_thread_atexit_callback);
+	if unlikely(error != EOK)
+		return libc_seterrno(error);
+
+	/* Create a new entry for the cxa thread at-exit chain. */
+	entry = (struct cxa_thread_atexit_entry *)malloc(sizeof(struct cxa_thread_atexit_entry));
+	if unlikely(!entry)
+		return -1;
+
+	/* Get a  reference to  the specified  DL module  so  it
+	 * can't be unloaded until the at-exit function has run. */
+	if (dso_handle == NULL) {
+		entry->ctae_dl_handle = dlopen(NULL, 0); /* Main program */
+	} else {
+		entry->ctae_dl_handle = dlgethandle(dso_handle, DLGETHANDLE_FINCREF);
+	}
+	if unlikely(!entry->ctae_dl_handle) {
+		free(entry);
+		return libc_seterrno(EFAULT); /* `dso_handle' doesn't map to any known module. */
+	}
+	entry->ctae_next = (struct cxa_thread_atexit_entry *)pthread_getspecific(libc_cxa_thread_atexit_key);
+	entry->ctae_func = func;
+	entry->ctae_arg  = arg;
+
+	/* Store the new entry in our thread's at-exit callback chain. */
+	error = pthread_setspecific(libc_cxa_thread_atexit_key, entry);
+	if unlikely(error != EOK) {
+		dlclose(entry->ctae_dl_handle);
+		free(entry);
+		return -1;
+	}
+	return 0;
+}
+
 /* TODO: Add support for: __cxa_at_quick_exit */
 /* TODO: Add support for: __cxa_finalize */
 DEFINE_PUBLIC_ALIAS(__cxa_atexit, libc___cxa_atexit);
 
-INTERN ATTR_SECTION(".text.crt.sched.process") int
+INTERN ATTR_SECTION(".text.crt.sched.process") NONNULL((1)) int
 NOTHROW_NCX(LIBCCALL libc___cxa_atexit)(void (LIBCCALL *func)(void *arg),
                                         void *arg, void *dso_handle) {
 	void *dl_handle, *error;
