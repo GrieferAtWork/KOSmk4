@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4c823b */
+/* HASH CRC-32:0x3fe30c32 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3286,6 +3286,8 @@ DFUN(".text.crt.dos.io.tty", libd_tcsetsid, libc_tcsetsid, TD, 2, TIn(__SIZEOF_F
 DFUN(".text.crt.dos.io.tty", libd_cfsetspeed, libc_cfsetspeed, TD, 2, TP, TI32)
 DFUN(".text.crt.dos.io.tty", libd_cfmakeraw, libc_cfmakeraw, TV, 1, TP)
 DFUN(".text.crt.dos.io.tty", libd_cfmakesane, libc_cfmakesane, TV, 1, TP)
+DFUN(".text.crt.dos.io.tty", libd_tcgetwinsize, libc_tcgetwinsize, TD, 2, TIn(__SIZEOF_FD_T__), TP)
+DFUN(".text.crt.dos.io.tty", libd_tcsetwinsize, libc_tcsetwinsize, TD, 2, TIn(__SIZEOF_FD_T__), TP)
 
 /* thread */
 DFUN(".text.crt.dos.sched.threads", libd_thr_create, libc_thr_create, TIn(__SIZEOF_ERRNO_T__), 6, TP, TI, TP, TP, TL, TP)

@@ -6041,10 +6041,12 @@
 #define __CRT_HAVE_tcgetattr
 #define __CRT_HAVE_tcgetpgrp
 #define __CRT_HAVE_tcgetsid
+#define __CRT_HAVE_tcgetwinsize
 #define __CRT_HAVE_tcsendbreak
 #define __CRT_HAVE_tcsetattr
 #define __CRT_HAVE_tcsetpgrp
 #define __CRT_HAVE_tcsetsid
+#define __CRT_HAVE_tcsetwinsize
 #define __CRT_HAVE_tdelete
 #define __CRT_HAVE_tdelete_r
 #define __CRT_HAVE_tdestroy

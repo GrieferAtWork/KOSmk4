@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc69219e5 */
+/* HASH CRC-32:0x7746e276 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3556,10 +3556,12 @@
 #define __CRT_HAVE_DOS$tcgetattr
 #define __CRT_HAVE_DOS$tcgetpgrp
 #define __CRT_HAVE_DOS$tcgetsid
+#define __CRT_HAVE_DOS$tcgetwinsize
 #define __CRT_HAVE_DOS$tcsendbreak
 #define __CRT_HAVE_DOS$tcsetattr
 #define __CRT_HAVE_DOS$tcsetpgrp
 #define __CRT_HAVE_DOS$tcsetsid
+#define __CRT_HAVE_DOS$tcsetwinsize
 #define __CRT_HAVE_DOS$tdelete
 #define __CRT_HAVE_DOS$tdelete_r
 #define __CRT_HAVE_DOS$tdestroy
@@ -8071,10 +8073,12 @@
 #define __CRT_HAVE_tcgetattr
 #define __CRT_HAVE_tcgetpgrp
 #define __CRT_HAVE_tcgetsid
+#define __CRT_HAVE_tcgetwinsize
 #define __CRT_HAVE_tcsendbreak
 #define __CRT_HAVE_tcsetattr
 #define __CRT_HAVE_tcsetpgrp
 #define __CRT_HAVE_tcsetsid
+#define __CRT_HAVE_tcsetwinsize
 #define __CRT_HAVE_tdelete
 #define __CRT_HAVE_tdelete_r
 #define __CRT_HAVE_tdestroy

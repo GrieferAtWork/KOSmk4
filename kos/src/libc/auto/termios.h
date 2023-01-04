@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78d34347 */
+/* HASH CRC-32:0x2c0a7601 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -167,6 +167,22 @@ INTDEF ATTR_OUT(1) void NOTHROW_NCX(LIBDCALL libd_cfmakesane)(struct termios *__
  * Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
  * Sane here  refers  to  setting  all values  to  their  defaults,  as they  are  defined  in  <sys/ttydefaults.h> */
 INTDEF ATTR_OUT(1) void NOTHROW_NCX(LIBCCALL libc_cfmakesane)(struct termios *__restrict termios_p);
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> tcgetwinsize(3) */
+INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBDCALL libd_tcgetwinsize)(fd_t fd, struct winsize *winsize_p);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> tcgetwinsize(3) */
+INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_tcgetwinsize)(fd_t fd, struct winsize *winsize_p);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> tcsetwinsize(3) */
+INTDEF ATTR_IN(2) int NOTHROW_NCX(LIBDCALL libd_tcsetwinsize)(fd_t fd, struct winsize const *winsize_p);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> tcsetwinsize(3) */
+INTDEF ATTR_IN(2) int NOTHROW_NCX(LIBCCALL libc_tcsetwinsize)(fd_t fd, struct winsize const *winsize_p);
+#endif /* !__KERNEL__ */
 
 DECL_END
 

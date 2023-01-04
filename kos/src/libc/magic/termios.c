@@ -53,9 +53,14 @@
 }%[insert:prefix(
 #include <asm/os/termios.h>
 )]%[insert:prefix(
+#include <bits/os/termio.h>
+)]%[insert:prefix(
 #include <bits/os/termios.h>
 )]%{
-/*#include <sys/ioctl.h>*/
+
+#ifdef __USE_GLIBC_BLOAT
+#include <sys/ioctl.h>
+#endif /* __USE_GLIBC_BLOAT */
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 #include <bits/types.h>
@@ -1234,6 +1239,27 @@ void cfmakesane([[out]] struct termios *__restrict termios_p) {
 @@pp_endif@@
 }
 %#endif /* __USE_KOS || __USE_BSD */
+
+
+%
+%/* NetBSD doesn't actually namespace away these functions, but we do to keep everything clean. */
+%#ifdef __USE_NETBSD
+@@>> tcgetwinsize(3)
+[[decl_include("<bits/os/termio.h>", "<bits/types.h>")]]
+[[requires_include("<asm/os/tty.h>")]] /* __TIOCGWINSZ */
+[[requires($has_function(ioctl) && defined(__TIOCGWINSZ))]]
+int tcgetwinsize($fd_t fd, [[out]] struct winsize *winsize_p) {
+	return ioctl(fd, __TIOCGWINSZ, winsize_p);
+}
+
+@@>> tcsetwinsize(3)
+[[decl_include("<bits/os/termio.h>", "<bits/types.h>")]]
+[[requires_include("<asm/os/tty.h>")]] /* __TIOCSWINSZ */
+[[requires($has_function(ioctl) && defined(__TIOCSWINSZ))]]
+int tcsetwinsize($fd_t fd, [[in]] struct winsize const *winsize_p) {
+	return ioctl(fd, __TIOCSWINSZ, winsize_p);
+}
+%#endif /* __USE_NETBSD */
 
 
 %{

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ad63b9e */
+/* HASH CRC-32:0xd6039b20 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,8 +47,12 @@
 #include <features.h>
 
 #include <asm/os/termios.h>
+#include <bits/os/termio.h>
 #include <bits/os/termios.h>
-/*#include <sys/ioctl.h>*/
+
+#ifdef __USE_GLIBC_BLOAT
+#include <sys/ioctl.h>
+#endif /* __USE_GLIBC_BLOAT */
 
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 #include <bits/types.h>
@@ -812,6 +816,32 @@ __CDECLARE_VOID(__ATTR_OUT(1),__NOTHROW_NCX,cfmakesane,(struct termios *__restri
 __NAMESPACE_LOCAL_USING_OR_IMPL(cfmakesane, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) void __NOTHROW_NCX(__LIBCCALL cfmakesane)(struct termios *__restrict __termios_p) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfmakesane))(__termios_p); })
 #endif /* !__CRT_HAVE_cfmakesane */
 #endif /* __USE_KOS || __USE_BSD */
+
+/* NetBSD doesn't actually namespace away these functions, but we do to keep everything clean. */
+#ifdef __USE_NETBSD
+#ifdef __CRT_HAVE_tcgetwinsize
+/* >> tcgetwinsize(3) */
+__CDECLARE(__ATTR_OUT(2),int,__NOTHROW_NCX,tcgetwinsize,(__fd_t __fd, struct winsize *__winsize_p),(__fd,__winsize_p))
+#else /* __CRT_HAVE_tcgetwinsize */
+#include <asm/os/tty.h>
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TIOCGWINSZ)
+#include <libc/local/termios/tcgetwinsize.h>
+/* >> tcgetwinsize(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(tcgetwinsize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(2) int __NOTHROW_NCX(__LIBCCALL tcgetwinsize)(__fd_t __fd, struct winsize *__winsize_p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcgetwinsize))(__fd, __winsize_p); })
+#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TIOCGWINSZ */
+#endif /* !__CRT_HAVE_tcgetwinsize */
+#ifdef __CRT_HAVE_tcsetwinsize
+/* >> tcsetwinsize(3) */
+__CDECLARE(__ATTR_IN(2),int,__NOTHROW_NCX,tcsetwinsize,(__fd_t __fd, struct winsize const *__winsize_p),(__fd,__winsize_p))
+#else /* __CRT_HAVE_tcsetwinsize */
+#include <asm/os/tty.h>
+#if (defined(__CRT_HAVE_ioctl) || defined(__CRT_HAVE___ioctl) || defined(__CRT_HAVE___libc_ioctl)) && defined(__TIOCSWINSZ)
+#include <libc/local/termios/tcsetwinsize.h>
+/* >> tcsetwinsize(3) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(tcsetwinsize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(2) int __NOTHROW_NCX(__LIBCCALL tcsetwinsize)(__fd_t __fd, struct winsize const *__winsize_p) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tcsetwinsize))(__fd, __winsize_p); })
+#endif /* (__CRT_HAVE_ioctl || __CRT_HAVE___ioctl || __CRT_HAVE___libc_ioctl) && __TIOCSWINSZ */
+#endif /* !__CRT_HAVE_tcsetwinsize */
+#endif /* __USE_NETBSD */
 
 __SYSDECL_END
 #endif /* __CC__ */

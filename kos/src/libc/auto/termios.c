@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8289bea6 */
+/* HASH CRC-32:0x536911c3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -581,6 +581,20 @@ NOTHROW_NCX(LIBCCALL libc_cfmakesane)(struct termios *__restrict termios_p) {
 #endif /* ... */
 #endif /* __VSTATUS */
 }
+#ifndef __KERNEL__
+/* >> tcgetwinsize(3) */
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_OUT(2) int
+NOTHROW_NCX(LIBCCALL libc_tcgetwinsize)(fd_t fd,
+                                        struct winsize *winsize_p) {
+	return libc_ioctl(fd, __TIOCGWINSZ, winsize_p);
+}
+/* >> tcsetwinsize(3) */
+INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_IN(2) int
+NOTHROW_NCX(LIBCCALL libc_tcsetwinsize)(fd_t fd,
+                                        struct winsize const *winsize_p) {
+	return libc_ioctl(fd, __TIOCSWINSZ, winsize_p);
+}
+#endif /* !__KERNEL__ */
 
 DECL_END
 
@@ -602,5 +616,9 @@ DEFINE_PUBLIC_ALIAS(cfsetspeed, libc_cfsetspeed);
 DEFINE_PUBLIC_ALIAS(cfmakeraw, libc_cfmakeraw);
 #endif /* !__KERNEL__ */
 DEFINE_PUBLIC_ALIAS(cfmakesane, libc_cfmakesane);
+#ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(tcgetwinsize, libc_tcgetwinsize);
+DEFINE_PUBLIC_ALIAS(tcsetwinsize, libc_tcsetwinsize);
+#endif /* !__KERNEL__ */
 
 #endif /* !GUARD_LIBC_AUTO_TERMIOS_C */

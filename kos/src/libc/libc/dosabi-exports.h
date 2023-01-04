@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17b609bc */
+/* HASH CRC-32:0x9368ecb2 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3552,6 +3552,8 @@ DEFINE_PUBLIC_ALIAS(DOS$tcsetsid, libd_tcsetsid);
 DEFINE_PUBLIC_ALIAS(DOS$cfsetspeed, libd_cfsetspeed);
 DEFINE_PUBLIC_ALIAS(DOS$cfmakeraw, libd_cfmakeraw);
 DEFINE_PUBLIC_ALIAS(DOS$cfmakesane, libd_cfmakesane);
+DEFINE_PUBLIC_ALIAS(DOS$tcgetwinsize, libd_tcgetwinsize);
+DEFINE_PUBLIC_ALIAS(DOS$tcsetwinsize, libd_tcsetwinsize);
 
 /* thread */
 DEFINE_PUBLIC_ALIAS(DOS$thr_create, libd_thr_create);
