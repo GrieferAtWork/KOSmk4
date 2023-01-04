@@ -139,7 +139,7 @@
 #define _NL_TIME_TIMEZONE                      _NL_ITEM(__LC_TIME, 0x6b) /* "" */
 #define _NL_TIME_DATE_FMT                      _NL_ITEM(__LC_TIME, 0x6c) /* "%a %b %e %H:%M:%S %Z %Y" */
 #define _NL_TIME_W_DATE_FMT                    _NL_ITEM(__LC_TIME, 0x6d) /* L"%a %b %e %H:%M:%S %Z %Y" */
-#define _NL_TIME_CODESET                       _NL_ITEM(__LC_TIME, 0x6e) /* "utf-8" */
+#define _NL_TIME_CODESET                       _NL_ITEM(__LC_TIME, 0x6e) /* "UTF-8" */
 #define _NL_TIME_ALTMON_1                      _NL_ITEM(__LC_TIME, 0x6f) /* "January" */
 #define _NL_TIME_ALTMON_2                      _NL_ITEM(__LC_TIME, 0x70) /* "February" */
 #define _NL_TIME_ALTMON_3                      _NL_ITEM(__LC_TIME, 0x71) /* "March" */
@@ -207,7 +207,7 @@
 #define _NL_COLLATE_SYMB_EXTRAMB               _NL_ITEM(__LC_COLLATE, 0x0f) /* L"..." */
 #define _NL_COLLATE_COLLSEQMB                  _NL_ITEM(__LC_COLLATE, 0x10) /* L"..." */
 #define _NL_COLLATE_COLLSEQWC                  _NL_ITEM(__LC_COLLATE, 0x11) /* L"..." */
-#define _NL_COLLATE_CODESET                    _NL_ITEM(__LC_COLLATE, 0x12) /* "utf-8" */
+#define _NL_COLLATE_CODESET                    _NL_ITEM(__LC_COLLATE, 0x12) /* "UTF-8" */
 #define _NL_NUM_LC_COLLATE                     _NL_ITEM(__LC_COLLATE, 0x13)
 #define _NL_CTYPE_CLASS                        _NL_ITEM(__LC_CTYPE, 0x00) /* L"" */
 #define _NL_CTYPE_TOUPPER                      _NL_ITEM(__LC_CTYPE, 0x01) /* L"..." */
@@ -223,7 +223,7 @@
 #define _NL_CTYPE_MAP_NAMES                    _NL_ITEM(__LC_CTYPE, 0x0b) /* "toupper\0tolower\0\0" */
 #define _NL_CTYPE_WIDTH                        _NL_ITEM(__LC_CTYPE, 0x0c) /* [0x07,0x00] [array-of-uint8_t] */
 #define _NL_CTYPE_MB_CUR_MAX                   _NL_ITEM(__LC_CTYPE, 0x0d) /* 1 [uintptr_t] */
-#define _NL_CTYPE_CODESET_NAME                 _NL_ITEM(__LC_CTYPE, 0x0e) /* "utf-8" */
+#define _NL_CTYPE_CODESET_NAME                 _NL_ITEM(__LC_CTYPE, 0x0e) /* "UTF-8" */
 #define _NL_CTYPE_TOUPPER32                    _NL_ITEM(__LC_CTYPE, 0x0f) /* L"" */
 #define _NL_CTYPE_TOLOWER32                    _NL_ITEM(__LC_CTYPE, 0x10) /* L"" */
 #define _NL_CTYPE_CLASS_OFFSET                 _NL_ITEM(__LC_CTYPE, 0x11) /* 72 [uintptr_t] */
@@ -341,24 +341,24 @@
 #define _NL_MONETARY_CONVERSION_RATE           _NL_ITEM(__LC_MONETARY, 0x2a) /* [...,0x00] [array-of-uint32_t] */
 #define _NL_MONETARY_DECIMAL_POINT_WC          _NL_ITEM(__LC_MONETARY, 0x2b) /* 0 [uintptr_t] */
 #define _NL_MONETARY_THOUSANDS_SEP_WC          _NL_ITEM(__LC_MONETARY, 0x2c) /* 0 [uintptr_t] */
-#define _NL_MONETARY_CODESET                   _NL_ITEM(__LC_MONETARY, 0x2d) /* "utf-8" */
+#define _NL_MONETARY_CODESET                   _NL_ITEM(__LC_MONETARY, 0x2d) /* "UTF-8" */
 #define _NL_NUM_LC_MONETARY                    _NL_ITEM(__LC_MONETARY, 0x2e)
 #define _NL_NUMERIC_DECIMAL_POINT              _NL_ITEM(__LC_NUMERIC, 0) /* "." */
 #define _NL_NUMERIC_THOUSANDS_SEP              _NL_ITEM(__LC_NUMERIC, 1) /* "" */
 #define _NL_NUMERIC_GROUPING                   _NL_ITEM(__LC_NUMERIC, 2) /* [0x00] [array-of-uint8_t] */
 #define _NL_NUMERIC_DECIMAL_POINT_WC           _NL_ITEM(__LC_NUMERIC, 3) /* 46 [uintptr_t] */
 #define _NL_NUMERIC_THOUSANDS_SEP_WC           _NL_ITEM(__LC_NUMERIC, 4) /* 0 [uintptr_t] */
-#define _NL_NUMERIC_CODESET                    _NL_ITEM(__LC_NUMERIC, 5) /* "utf-8" */
+#define _NL_NUMERIC_CODESET                    _NL_ITEM(__LC_NUMERIC, 5) /* "UTF-8" */
 #define _NL_NUM_LC_NUMERIC                     _NL_ITEM(__LC_NUMERIC, 6)
 #define _NL_MESSAGES_YESEXPR                   _NL_ITEM(__LC_MESSAGES, 0) /* "^[yY]" */
 #define _NL_MESSAGES_NOEXPR                    _NL_ITEM(__LC_MESSAGES, 1) /* "^[nN]" */
 #define _NL_MESSAGES_YESSTR                    _NL_ITEM(__LC_MESSAGES, 2) /* "" */
 #define _NL_MESSAGES_NOSTR                     _NL_ITEM(__LC_MESSAGES, 3) /* "" */
-#define _NL_MESSAGES_CODESET                   _NL_ITEM(__LC_MESSAGES, 4) /* "utf-8" */
+#define _NL_MESSAGES_CODESET                   _NL_ITEM(__LC_MESSAGES, 4) /* "UTF-8" */
 #define _NL_NUM_LC_MESSAGES                    _NL_ITEM(__LC_MESSAGES, 5)
 #define _NL_PAPER_HEIGHT                       _NL_ITEM(__LC_PAPER, 0) /* 297 [uintptr_t] */
 #define _NL_PAPER_WIDTH                        _NL_ITEM(__LC_PAPER, 1) /* 210 [uintptr_t] */
-#define _NL_PAPER_CODESET                      _NL_ITEM(__LC_PAPER, 2) /* "utf-8" */
+#define _NL_PAPER_CODESET                      _NL_ITEM(__LC_PAPER, 2) /* "UTF-8" */
 #define _NL_NUM_LC_PAPER                       _NL_ITEM(__LC_PAPER, 3)
 #define _NL_NAME_NAME_FMT                      _NL_ITEM(__LC_NAME, 0) /* "%p%t%g%t%m%t%f" */
 #define _NL_NAME_NAME_GEN                      _NL_ITEM(__LC_NAME, 1) /* "" */
@@ -366,7 +366,7 @@
 #define _NL_NAME_NAME_MRS                      _NL_ITEM(__LC_NAME, 3) /* "" */
 #define _NL_NAME_NAME_MISS                     _NL_ITEM(__LC_NAME, 4) /* "" */
 #define _NL_NAME_NAME_MS                       _NL_ITEM(__LC_NAME, 5) /* "" */
-#define _NL_NAME_CODESET                       _NL_ITEM(__LC_NAME, 6) /* "utf-8" */
+#define _NL_NAME_CODESET                       _NL_ITEM(__LC_NAME, 6) /* "UTF-8" */
 #define _NL_NUM_LC_NAME                        _NL_ITEM(__LC_NAME, 7)
 #define _NL_ADDRESS_POSTAL_FMT                 _NL_ITEM(__LC_ADDRESS, 0x00) /* "%a%N%f%N%d%N%b%N%s %h %e %r%N%C-%z %T%N%c%N" */
 #define _NL_ADDRESS_COUNTRY_NAME               _NL_ITEM(__LC_ADDRESS, 0x01) /* "" */
@@ -380,16 +380,16 @@
 #define _NL_ADDRESS_LANG_AB                    _NL_ITEM(__LC_ADDRESS, 0x09) /* "" */
 #define _NL_ADDRESS_LANG_TERM                  _NL_ITEM(__LC_ADDRESS, 0x0a) /* "" */
 #define _NL_ADDRESS_LANG_LIB                   _NL_ITEM(__LC_ADDRESS, 0x0b) /* "" */
-#define _NL_ADDRESS_CODESET                    _NL_ITEM(__LC_ADDRESS, 0x0c) /* "utf-8" */
+#define _NL_ADDRESS_CODESET                    _NL_ITEM(__LC_ADDRESS, 0x0c) /* "UTF-8" */
 #define _NL_NUM_LC_ADDRESS                     _NL_ITEM(__LC_ADDRESS, 0x0d)
 #define _NL_TELEPHONE_TEL_INT_FMT              _NL_ITEM(__LC_TELEPHONE, 0) /* "+%c %a %l" */
 #define _NL_TELEPHONE_TEL_DOM_FMT              _NL_ITEM(__LC_TELEPHONE, 1) /* "" */
 #define _NL_TELEPHONE_INT_SELECT               _NL_ITEM(__LC_TELEPHONE, 2) /* "" */
 #define _NL_TELEPHONE_INT_PREFIX               _NL_ITEM(__LC_TELEPHONE, 3) /* "" */
-#define _NL_TELEPHONE_CODESET                  _NL_ITEM(__LC_TELEPHONE, 4) /* "utf-8" */
+#define _NL_TELEPHONE_CODESET                  _NL_ITEM(__LC_TELEPHONE, 4) /* "UTF-8" */
 #define _NL_NUM_LC_TELEPHONE                   _NL_ITEM(__LC_TELEPHONE, 5)
 #define _NL_MEASUREMENT_MEASUREMENT            _NL_ITEM(__LC_MEASUREMENT, 0) /* 0x1 [pointer-to-uint8_t] */
-#define _NL_MEASUREMENT_CODESET                _NL_ITEM(__LC_MEASUREMENT, 1) /* "utf-8" */
+#define _NL_MEASUREMENT_CODESET                _NL_ITEM(__LC_MEASUREMENT, 1) /* "UTF-8" */
 #define _NL_NUM_LC_MEASUREMENT                 _NL_ITEM(__LC_MEASUREMENT, 2)
 #define _NL_IDENTIFICATION_TITLE               _NL_ITEM(__LC_IDENTIFICATION, 0x00) /* "" */
 #define _NL_IDENTIFICATION_SOURCE              _NL_ITEM(__LC_IDENTIFICATION, 0x01) /* "" */
@@ -406,7 +406,7 @@
 #define _NL_IDENTIFICATION_REVISION            _NL_ITEM(__LC_IDENTIFICATION, 0x0c) /* "" */
 #define _NL_IDENTIFICATION_DATE                _NL_ITEM(__LC_IDENTIFICATION, 0x0d) /* "" */
 #define _NL_IDENTIFICATION_CATEGORY            _NL_ITEM(__LC_IDENTIFICATION, 0x0e) /* "" */
-#define _NL_IDENTIFICATION_CODESET             _NL_ITEM(__LC_IDENTIFICATION, 0x0f) /* "utf-8" */
+#define _NL_IDENTIFICATION_CODESET             _NL_ITEM(__LC_IDENTIFICATION, 0x0f) /* "UTF-8" */
 #define _NL_NUM_LC_IDENTIFICATION              _NL_ITEM(__LC_IDENTIFICATION, 0x10)
 #define _NL_NUM                                _NL_ITEM(__LC_IDENTIFICATION, 0x11)
 
