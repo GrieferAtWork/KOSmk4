@@ -3915,6 +3915,23 @@ int setrgid(gid_t rgid) {
 
 // >> int reboot(int, char *); // Incompatible w/ linux: int reboot(int)
 // >> int swapon(char const *); // Incompatible w/ linux: int swapon(char const *, int)
+
+%{
+
+/* >> suboptarg(3)
+ * Global variable that gets assigned by `getsubopt(3)' from <stdlib.h>
+ * Yes: it's weird that this variable is declared in <unistd.h>, while
+ *      the function that uses it is  in <stdlib.h>; I didn't come  up
+ *      with that... */
+#ifndef suboptarg
+#ifdef __LOCAL_suboptarg
+#define suboptarg __LOCAL_suboptarg
+#elif defined(__CRT_HAVE_suboptarg)
+__CSDECLARE(,char *,suboptarg)
+#define suboptarg suboptarg
+#endif /* ... */
+#endif /* !suboptarg */
+}
 %#endif /* __USE_NETBSD */
 
 

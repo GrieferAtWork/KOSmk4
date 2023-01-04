@@ -5016,6 +5016,7 @@
 #define __CRT_HAVE_strxfrm
 #define __CRT_HAVE_strxfrm_l
 #define __CRT_HAVE_stty
+#define __CRT_HAVE_suboptarg
 #define __CRT_HAVE_swab
 #define __CRT_HAVE_swapcontext
 #define __CRT_HAVE_swapoff

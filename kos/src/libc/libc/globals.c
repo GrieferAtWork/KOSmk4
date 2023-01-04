@@ -49,7 +49,9 @@ DEFINE_PUBLIC_IDATA(__assert_program_name, libc_bind___progname, __SIZEOF_POINTE
 
 /* <stdlib.h> */
 #undef _wenviron
+#undef suboptarg
 DEFINE_NOREL_GLOBAL_META(char32_t **, _wenviron, ".crt.dos.wchar.fs.environ");
+DEFINE_NOREL_GLOBAL_META(char *, suboptarg, ".crt.application.getopt");
 
 
 /* <stdio.h> */

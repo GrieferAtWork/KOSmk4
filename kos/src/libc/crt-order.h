@@ -243,7 +243,6 @@
 	CB(PREFIX.crt.errno_access.core) \
 	CB(PREFIX.crt.errno_access) \
 	CB(PREFIX.crt.application.exit) \
-	CB(PREFIX.crt.application.options) \
 	CB(PREFIX.crt.fs.exec.exec PREFIX.crt.sched.access) \
 	CB(PREFIX.crt.sched.thread) \
 	CB(PREFIX.crt.sched.pthread) \
@@ -431,7 +430,6 @@
 	CB(PREFIX.crt.dos.application.init) \
 	CB(PREFIX.crt.dos.errno_access) \
 	CB(PREFIX.crt.dos.application.exit) \
-	CB(PREFIX.crt.dos.application.options) \
 	CB(PREFIX.crt.dos.fs.exec.exec PREFIX.crt.dos.sched.access) \
 	CB(PREFIX.crt.dos.sched.thread) \
 	CB(PREFIX.crt.dos.sched.pthread) \

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25be2d42 */
+/* HASH CRC-32:0x3a19db39 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4071,6 +4071,20 @@ __CDECLARE(,int,__NOTHROW_NCX,setrgid,(gid_t __rgid),(__rgid))
  * @return: -1: Error (s.a. `errno') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(setrgid, __FORCELOCAL __ATTR_ARTIFICIAL int __NOTHROW_NCX(__LIBCCALL setrgid)(gid_t __rgid) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setrgid))(__rgid); })
 #endif /* ... */
+
+/* >> suboptarg(3)
+ * Global variable that gets assigned by `getsubopt(3)' from <stdlib.h>
+ * Yes: it's weird that this variable is declared in <unistd.h>, while
+ *      the function that uses it is  in <stdlib.h>; I didn't come  up
+ *      with that... */
+#ifndef suboptarg
+#ifdef __LOCAL_suboptarg
+#define suboptarg __LOCAL_suboptarg
+#elif defined(__CRT_HAVE_suboptarg)
+__CSDECLARE(,char *,suboptarg)
+#define suboptarg suboptarg
+#endif /* ... */
+#endif /* !suboptarg */
 #endif /* __USE_NETBSD */
 
 

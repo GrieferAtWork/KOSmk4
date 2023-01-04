@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf119e93d */
+/* HASH CRC-32:0xcb3147e7 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,25 +22,6 @@
 #define __local_getsubopt_defined
 #include <__crt.h>
 __NAMESPACE_LOCAL_BEGIN
-#ifndef __local___localdep_bcmpc_defined
-#define __local___localdep_bcmpc_defined
-#ifdef __CRT_HAVE_bcmpc
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_bcmpc,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),bcmpc,(__s1,__s2,__elem_count,__elem_size))
-#elif defined(__CRT_HAVE_memcmpc)
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_bcmpc,(void const *__s1, void const *__s2, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),memcmpc,(__s1,__s2,__elem_count,__elem_size))
-#else /* ... */
-__NAMESPACE_LOCAL_END
-#include <libc/local/string/memcmpc.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_bcmpc __LIBC_LOCAL_NAME(memcmpc)
-#endif /* !... */
-#endif /* !__local___localdep_bcmpc_defined */
 #ifndef __local___localdep_strchr_defined
 #define __local___localdep_strchr_defined
 #if __has_builtin(__builtin_strchr) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strchr)
@@ -58,61 +39,80 @@ __NAMESPACE_LOCAL_BEGIN
 #define __localdep_strchr __LIBC_LOCAL_NAME(strchr)
 #endif /* !... */
 #endif /* !__local___localdep_strchr_defined */
-#ifndef __local___localdep_strlen_defined
-#define __local___localdep_strlen_defined
-#ifdef __CRT_HAVE_strlen
+#ifndef __local___localdep_strcmp_defined
+#define __local___localdep_strcmp_defined
+#if __has_builtin(__builtin_strcmp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strcmp)
+__CEIREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_strcmp,(char const *__s1, char const *__s2),strcmp,{ return __builtin_strcmp(__s1, __s2); })
+#elif defined(__CRT_HAVE_strcmp)
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1) __ATTR_IN(2),int,__NOTHROW_NCX,__localdep_strcmp,(char const *__s1, char const *__s2),strcmp,(__s1,__s2))
+#else /* ... */
+__NAMESPACE_LOCAL_END
+#include <libc/local/string/strcmp.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_strcmp __LIBC_LOCAL_NAME(strcmp)
+#endif /* !... */
+#endif /* !__local___localdep_strcmp_defined */
 __NAMESPACE_LOCAL_END
 #include <hybrid/typecore.h>
+#include <libc/template/suboptarg.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_IN(1),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __str),strlen,(__str))
-#else /* __CRT_HAVE_strlen */
-__NAMESPACE_LOCAL_END
-#include <libc/local/string/strlen.h>
-__NAMESPACE_LOCAL_BEGIN
-#define __localdep_strlen __LIBC_LOCAL_NAME(strlen)
-#endif /* !__CRT_HAVE_strlen */
-#endif /* !__local___localdep_strlen_defined */
-__NAMESPACE_LOCAL_END
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(getsubopt) __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __ATTR_OUT(3) int
+__LOCAL_LIBC(getsubopt) __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT_OPT(1) __ATTR_OUT(3) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getsubopt))(char **__restrict __optionp, char *const *__restrict __tokens, char **__restrict __valuep) {
 	unsigned int __i;
-	char *__option, *__nextopt;
-	__SIZE_TYPE__ __option_len;
-	__option  = *__optionp;
+	char *__option, *__nextopt, *__eq;
 	*__valuep = __NULLPTR;
+	if __unlikely(!__optionp)
+		goto __err_noopt;
+	__option = *__optionp;
+	if __unlikely(!__option)
+		goto __err_noopt;
+
+	/* Skip leading whitespace and commas */
+#define __GETSUBOPT_ISSPACE(__ch) ((__NAMESPACE_LOCAL_SYM __localdep_strchr)(", \t", __ch) != __NULLPTR)
+	while (__GETSUBOPT_ISSPACE(*__option))
+		++__option;
+	if __unlikely(!*__option)
+		goto __err_noopt;
+
+	/* Save the starting pointer to the sub-option. */
+#ifdef __LOCAL_suboptarg
+	__LOCAL_suboptarg = __option;
+#endif /* __LOCAL_suboptarg */
 
 	/* Find the next option */
-	__nextopt = (__NAMESPACE_LOCAL_SYM __localdep_strchr)(__option, ',');
-	if (__nextopt) {
-		__option_len = (__SIZE_TYPE__)(__nextopt - __option);
+	__nextopt = __option;
+	while (*__nextopt != '\0' && !__GETSUBOPT_ISSPACE(*__nextopt))
+		++__nextopt;
+	if (*__nextopt != '\0')
 		*__nextopt++ = '\0';
-	} else {
-		__option_len = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__option);
-		__nextopt = __option + __option_len;
-	}
+	while (__GETSUBOPT_ISSPACE(*__nextopt))
+		++__nextopt;
 	*__optionp = __nextopt;
+#undef __GETSUBOPT_ISSPACE
+
+	/* Check if this option has a value-part */
+	__eq = (__NAMESPACE_LOCAL_SYM __localdep_strchr)(__option, '=');
+	if (__eq != __NULLPTR) {
+		*__eq++   = '\0';
+		*__valuep = __eq;
+	}
+
+	/* Find the referenced token. */
 	for (__i = 0; __tokens[__i]; ++__i) {
-		__SIZE_TYPE__ __toklen = (__NAMESPACE_LOCAL_SYM __localdep_strlen)(__tokens[__i]);
-
-		/* Check if this token is matches the found option */
-		if ((__NAMESPACE_LOCAL_SYM __localdep_bcmpc)(__tokens[__i], __option, __toklen, sizeof(char)) != 0)
-			continue;
-
-		/* Deal with a potential option value. */
-		if (__option[__toklen] == '=') {
-			*__valuep = __option + __toklen + 1;
-		} else {
-			/* Make sure that the option doesn't keep on going */
-			if (__option[__toklen] != 0)
-				continue;
-		}
-		return (int)__i;
+		if ((__NAMESPACE_LOCAL_SYM __localdep_strcmp)(__tokens[__i], __option) == 0)
+			return (int)__i;
 	}
 
 	/* Not found (return the whole `name[=value]' string) */
 	*__valuep = __option;
+	/* Restore the '=' since we want to return the whole string */
+	if (__eq != __NULLPTR)
+		__eq[-1] = '=';
+	return -1;
+__err_noopt:
+#ifdef __LOCAL_suboptarg
+	__LOCAL_suboptarg = __NULLPTR;
+#endif /* __LOCAL_suboptarg */
 	return -1;
 }
 __NAMESPACE_LOCAL_END

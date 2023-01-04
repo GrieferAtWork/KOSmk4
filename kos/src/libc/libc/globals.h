@@ -105,8 +105,13 @@ DECLARE_NOREL_GLOBAL_META(char **, environ);   /* aka. `_environ', `__environ' *
 
 /* <stdlib.h> */
 #undef _wenviron
+#undef suboptarg
 DECLARE_NOREL_GLOBAL_META(char32_t **, _wenviron);
-#define _wenviron GET_NOREL_GLOBAL(_wenviron)
+DECLARE_NOREL_GLOBAL_META(char *, suboptarg);
+#define _wenviron         GET_NOREL_GLOBAL(_wenviron)
+#define __LOCAL__wenviron GET_NOREL_GLOBAL(_wenviron)
+#define suboptarg         GET_NOREL_GLOBAL(suboptarg)
+#define __LOCAL_suboptarg GET_NOREL_GLOBAL(suboptarg)
 
 
 /* <stdio.h> */

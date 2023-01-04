@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14a5f47b */
+/* HASH CRC-32:0x91a279f6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2534,7 +2534,7 @@ DFUN(".text.crt.dos.bsd", libd_a64l, libc_a64l, TL, 1, TP)
 DFUN(".text.crt.dos.fs.utility", libd_mktemp, libc_mktemp, TP, 1, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_ecvt, libc_ecvt, TP, 4, TFD, TD, TP, TP)
 DFUN(".text.crt.dos.unicode.static.convert", libd_fcvt, libc_fcvt, TP, 4, TFD, TD, TP, TP)
-DFUN(".text.crt.dos.application.options", libd_getsubopt, libc_getsubopt, TD, 3, TP, TP, TP)
+DFUN(".text.crt.dos.application.getopt", libd_getsubopt, libc_getsubopt, TD, 3, TP, TP, TP)
 DFUN(".text.crt.dos.fs.utility", libd_mkstemp, libc_mkstemp, TIn(__SIZEOF_FD_T__), 1, TP)
 DFUN(".text.crt.dos.fs.utility", libd_mkstemp64, libc_mkstemp64, TIn(__SIZEOF_FD_T__), 1, TP)
 DFUN(".text.crt.dos.fs.utility", libd_mkdtemp, libc_mkdtemp, TP, 1, TP)

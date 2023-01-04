@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x670aad3b */
+/* HASH CRC-32:0xba05313 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2401,46 +2401,113 @@ NOTHROW_NCX(LIBCCALL libc_fcvt)(double val,
 		return NULL;
 	return qcvt_buffer;
 }
-INTERN ATTR_SECTION(".text.crt.application.options") WUNUSED ATTR_IN(2) ATTR_INOUT(1) ATTR_OUT(3) int
+#endif /* !__KERNEL__ */
+#ifndef __KERNEL__
+#undef suboptarg
+INTDEF char *libc_suboptarg;
+INTERN ATTR_SECTION(".bss.crt.application.getopt") char *libc_suboptarg = NULL;
+DEFINE_PUBLIC_ALIAS(suboptarg, libc_suboptarg);
+#define suboptarg GET_NOREL_GLOBAL(suboptarg)
+#endif /* !__KERNEL__ */
+#ifndef __KERNEL__
+#include <libc/template/suboptarg.h>
+/* >> getsubopt(3)
+ * Parse a sequence of sub-options from `*optionp'.
+ *
+ * Sub-options look like this "rw,user=root drive=/dev/sda1"
+ * Options may be separated by ',', ' ', or '\t' characters.
+ * Both leading and trailing such characters are skipped.
+ *
+ * Note  that although KOS's implementation of this function only ever writes
+ * to `suboptarg(3)' (meaning that it is technically thread-safe, so-long  as
+ * no other piece of code ever reads from `suboptarg'), other implementations
+ * _will_ in fact  perform reads  from `suboptarg', meaning  that a  portable
+ * application must treat this function as thread-unsafe.
+ *
+ * Note that `suboptarg(3)' gets declared by <unistd.h> under `_NETBSD_SOURCE'
+ *
+ * @param: optionp: Pointer to sub-options that  have yet to be  parsed.
+ *                  Note that the pointed-to string is modified in-place
+ *                  in order to produce NUL-terminated strings.
+ * @param: tokens:  A NULL-terminated  array of  recognized option  names.
+ *                  The function searches this array for options specified
+ *                  in `*optionp' (in the example above: "rw", "user"  and
+ *                  "drive"), and returns the index of matched string,  or
+ *                  `-1' with `*valuep'  set to the  whole sub-opt  option
+ *                  string (e.g. "user=root") when  the option key is  not
+ *                  part of this array.
+ * @param: valuep:  Pointer to the value-portion of the matched sub-option.
+ *                  When the sub-option name is not found in `tokens', this
+ *                  pointer is set to  the entire sub-option string.  Else,
+ *                  it is set to NULL when the end of `optionp' is reached,
+ *                  or when the matched token doesn't have a value-portion.
+ * @return: * : The return'th string from `tokens'  was matched. `*valuep' is  set
+ *              to `NULL' when no `=' appeared in the sub-option, or to the string
+ *              following `='  if it  was present  (e.g. "root"  in  "user=root").
+ *              Additionally, the global variable `suboptarg'  is set to the  name
+ *              of matched option (e.g. "user" in "root=user")
+ * @return: -1: [*valuep == NULL] End of `optionp' has been reached (`suboptarg' is set to `NULL')
+ * @return: -1: [*valuep != NULL] Unknown sub-option encountered (`*valuep' and
+ *                                `suboptarg' are the whole sub-option  string) */
+INTERN ATTR_SECTION(".text.crt.application.getopt") WUNUSED ATTR_IN(2) ATTR_INOUT_OPT(1) ATTR_OUT(3) int
 NOTHROW_NCX(LIBCCALL libc_getsubopt)(char **__restrict optionp,
                                      char *const *__restrict tokens,
                                      char **__restrict valuep) {
 	unsigned int i;
-	char *option, *nextopt;
-	size_t option_len;
-	option  = *optionp;
+	char *option, *nextopt, *eq;
 	*valuep = NULL;
+	if unlikely(!optionp)
+		goto err_noopt;
+	option = *optionp;
+	if unlikely(!option)
+		goto err_noopt;
+
+	/* Skip leading whitespace and commas */
+#define GETSUBOPT_ISSPACE(ch) (libc_strchr(", \t", ch) != NULL)
+	while (GETSUBOPT_ISSPACE(*option))
+		++option;
+	if unlikely(!*option)
+		goto err_noopt;
+
+	/* Save the starting pointer to the sub-option. */
+#ifdef __LOCAL_suboptarg
+	__LOCAL_suboptarg = option;
+#endif /* __LOCAL_suboptarg */
 
 	/* Find the next option */
-	nextopt = libc_strchr(option, ',');
-	if (nextopt) {
-		option_len = (size_t)(nextopt - option);
+	nextopt = option;
+	while (*nextopt != '\0' && !GETSUBOPT_ISSPACE(*nextopt))
+		++nextopt;
+	if (*nextopt != '\0')
 		*nextopt++ = '\0';
-	} else {
-		option_len = libc_strlen(option);
-		nextopt = option + option_len;
-	}
+	while (GETSUBOPT_ISSPACE(*nextopt))
+		++nextopt;
 	*optionp = nextopt;
+#undef GETSUBOPT_ISSPACE
+
+	/* Check if this option has a value-part */
+	eq = libc_strchr(option, '=');
+	if (eq != NULL) {
+		*eq++   = '\0';
+		*valuep = eq;
+	}
+
+	/* Find the referenced token. */
 	for (i = 0; tokens[i]; ++i) {
-		size_t toklen = libc_strlen(tokens[i]);
-
-		/* Check if this token is matches the found option */
-		if (libc_bcmpc(tokens[i], option, toklen, sizeof(char)) != 0)
-			continue;
-
-		/* Deal with a potential option value. */
-		if (option[toklen] == '=') {
-			*valuep = option + toklen + 1;
-		} else {
-			/* Make sure that the option doesn't keep on going */
-			if (option[toklen] != 0)
-				continue;
-		}
-		return (int)i;
+		if (libc_strcmp(tokens[i], option) == 0)
+			return (int)i;
 	}
 
 	/* Not found (return the whole `name[=value]' string) */
 	*valuep = option;
+	/* Restore the '=' since we want to return the whole string */
+	if (eq != NULL)
+		eq[-1] = '=';
+	return -1;
+err_noopt:
+#ifdef __LOCAL_suboptarg
+	__LOCAL_suboptarg = NULL;
+#endif /* __LOCAL_suboptarg */
 	return -1;
 }
 /* >> mkstemp(3), mkstemp64(3)
