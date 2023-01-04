@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85f2275d */
+/* HASH CRC-32:0xd3eb0cc7 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,10 +23,29 @@
 #include <__crt.h>
 #include <bits/os/termios.h>
 #include <bits/types.h>
+#include <asm/os/termios.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(cfsetospeed) __ATTR_INOUT(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfsetospeed))(struct termios *__restrict __termios_p, __UINT32_TYPE__ __speed) {
+#ifdef __CBAUD
+	if __unlikely(__speed & ~__CBAUD) {
+#ifdef __EINVAL
+		return __libc_seterrno(__EINVAL);
+#else /* __EINVAL */
+		return __libc_seterrno(1);
+#endif /* !__EINVAL */
+	}
+	__termios_p->c_cflag &= ~__CBAUD;
+	__termios_p->c_cflag |= __speed;
+#endif /* __CBAUD */
+
+	/* If present, store in the dedicated ospeed field. */
+#ifdef _HAVE_STRUCT_TERMIOS_C_OSPEED
 	__termios_p->c_ospeed = __speed;
+#endif /* _HAVE_STRUCT_TERMIOS_C_OSPEED */
+	(void)__termios_p;
+	(void)__speed;
 	return 0;
 }
 __NAMESPACE_LOCAL_END

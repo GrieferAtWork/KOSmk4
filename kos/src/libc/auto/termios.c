@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb874d910 */
+/* HASH CRC-32:0x8289bea6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,28 +32,106 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
+#include <asm/os/termios.h>
+#include <bits/os/termios.h>
 /* >> cfgetospeed(3) */
 INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_PURE WUNUSED ATTR_IN(1) speed_t
 NOTHROW_NCX(LIBCCALL libc_cfgetospeed)(struct termios const *__restrict termios_p) {
+#ifdef __CBAUD
+	return termios_p->c_cflag & __CBAUD;
+#elif defined(_HAVE_STRUCT_TERMIOS_C_OSPEED)
 	return termios_p->c_ospeed;
+#else /* ... */
+	(void)termios_p;
+	COMPILER_IMPURE();
+	return 0;
+#endif /* !... */
 }
+#include <asm/os/termios.h>
+#include <bits/os/termios.h>
 /* >> cfgetispeed(3) */
 INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_PURE WUNUSED ATTR_IN(1) speed_t
 NOTHROW_NCX(LIBCCALL libc_cfgetispeed)(struct termios const *__restrict termios_p) {
+#if defined(__IBAUD0) && defined(__CBAUD)
+	return (termios_p->c_iflag & __IBAUD0) ? 0 : (termios_p->c_cflag & __CBAUD);
+#elif defined(_HAVE_STRUCT_TERMIOS_C_ISPEED)
 	return termios_p->c_ispeed;
+#else /* ... */
+	(void)termios_p;
+	COMPILER_IMPURE();
+	return 0;
+#endif /* !... */
 }
+#include <asm/os/termios.h>
+#include <bits/os/termios.h>
+#include <libc/errno.h>
 /* >> cfsetospeed(3) */
 INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_INOUT(1) int
 NOTHROW_NCX(LIBCCALL libc_cfsetospeed)(struct termios *__restrict termios_p,
                                        speed_t speed) {
+#ifdef __CBAUD
+	if unlikely(speed & ~__CBAUD) {
+
+		return __libc_seterrno(EINVAL);
+
+
+
+	}
+	termios_p->c_cflag &= ~__CBAUD;
+	termios_p->c_cflag |= speed;
+#endif /* __CBAUD */
+
+	/* If present, store in the dedicated ospeed field. */
+#ifdef _HAVE_STRUCT_TERMIOS_C_OSPEED
 	termios_p->c_ospeed = speed;
+#endif /* _HAVE_STRUCT_TERMIOS_C_OSPEED */
+	(void)termios_p;
+	(void)speed;
 	return 0;
 }
+#include <asm/os/termios.h>
+#include <libc/errno.h>
 /* >> cfsetispeed(3) */
 INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_INOUT(1) int
 NOTHROW_NCX(LIBCCALL libc_cfsetispeed)(struct termios *__restrict termios_p,
                                        speed_t speed) {
+#if defined(__IBAUD0) && defined(__CBAUD)
+	if unlikely(speed & ~__CBAUD) {
+
+		return __libc_seterrno(EINVAL);
+
+
+
+	}
+	if (speed == 0) {
+		termios_p->c_iflag |= __IBAUD0;
+	} else {
+		termios_p->c_iflag &= ~__IBAUD0;
+		termios_p->c_cflag &= ~__CBAUD;
+		termios_p->c_cflag |= speed;
+	}
+#elif defined(__CBAUD) && defined(__IBSHIFT)
+	speed_t used_speed;
+	if unlikely(speed & ~__CBAUD) {
+
+		return __libc_seterrno(EINVAL);
+
+
+
+	}
+	used_speed = speed;
+	if (speed == 0)
+		used_speed = termios_p->c_cflag & __CBAUD;
+	termios_p->c_cflag &= ~(__CBAUD << __IBSHIFT);
+	termios_p->c_cflag |= used_speed << __IBSHIFT;
+#endif /* ... */
+
+	/* If present, store in the dedicated ispeed field. */
+#ifdef _HAVE_STRUCT_TERMIOS_C_ISPEED
 	termios_p->c_ispeed = speed;
+#endif /* _HAVE_STRUCT_TERMIOS_C_ISPEED */
+	(void)termios_p;
+	(void)speed;
 	return 0;
 }
 /* >> tcgetattr(3)
@@ -157,9 +235,8 @@ NOTHROW_NCX(LIBCCALL libc_tcsetsid)(fd_t fd,
 INTERN ATTR_SECTION(".text.crt.io.tty") ATTR_INOUT(1) int
 NOTHROW_NCX(LIBCCALL libc_cfsetspeed)(struct termios *__restrict termios_p,
                                       speed_t speed) {
-	termios_p->c_ospeed = speed;
-	termios_p->c_ispeed = speed;
-	return 0;
+	return libc_cfsetispeed(termios_p, speed) |
+	       libc_cfsetospeed(termios_p, speed);
 }
 #include <asm/os/termios.h>
 /* >> cfmakeraw(3)

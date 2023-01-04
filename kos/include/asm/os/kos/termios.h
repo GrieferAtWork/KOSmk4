@@ -82,7 +82,7 @@
 /*      __I        __UINT32_C(0x10000000)  * ... */
 /*      __I        __UINT32_C(0x20000000)  * ... */
 /*      __I        __UINT32_C(0x40000000)  * ... */
-/*      __I        __UINT32_C(0x80000000)  * ... */
+#define __IBAUD0   __UINT32_C(0x80000000) /* Hack used by `cfsetispeed(3)' */
 
 /* c_oflag bits */
 #define __OPOST    __UINT32_C(0x00000001) /* Enable implementation-defined output processing */

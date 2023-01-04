@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1de4fda8 */
+/* HASH CRC-32:0x933dcaa3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,10 +23,48 @@
 #include <__crt.h>
 #include <bits/os/termios.h>
 #include <bits/types.h>
+#include <asm/os/termios.h>
+#include <libc/errno.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(cfsetispeed) __ATTR_INOUT(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfsetispeed))(struct termios *__restrict __termios_p, __UINT32_TYPE__ __speed) {
+#if defined(__IBAUD0) && defined(__CBAUD)
+	if __unlikely(__speed & ~__CBAUD) {
+#ifdef __EINVAL
+		return __libc_seterrno(__EINVAL);
+#else /* __EINVAL */
+		return __libc_seterrno(1);
+#endif /* !__EINVAL */
+	}
+	if (__speed == 0) {
+		__termios_p->c_iflag |= __IBAUD0;
+	} else {
+		__termios_p->c_iflag &= ~__IBAUD0;
+		__termios_p->c_cflag &= ~__CBAUD;
+		__termios_p->c_cflag |= __speed;
+	}
+#elif defined(__CBAUD) && defined(__IBSHIFT)
+	__UINT32_TYPE__ __used_speed;
+	if __unlikely(__speed & ~__CBAUD) {
+#ifdef __EINVAL
+		return __libc_seterrno(__EINVAL);
+#else /* __EINVAL */
+		return __libc_seterrno(1);
+#endif /* !__EINVAL */
+	}
+	__used_speed = __speed;
+	if (__speed == 0)
+		__used_speed = __termios_p->c_cflag & __CBAUD;
+	__termios_p->c_cflag &= ~(__CBAUD << __IBSHIFT);
+	__termios_p->c_cflag |= __used_speed << __IBSHIFT;
+#endif /* ... */
+
+	/* If present, store in the dedicated ispeed field. */
+#ifdef _HAVE_STRUCT_TERMIOS_C_ISPEED
 	__termios_p->c_ispeed = __speed;
+#endif /* _HAVE_STRUCT_TERMIOS_C_ISPEED */
+	(void)__termios_p;
+	(void)__speed;
 	return 0;
 }
 __NAMESPACE_LOCAL_END

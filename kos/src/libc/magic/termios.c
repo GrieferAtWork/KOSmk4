@@ -648,27 +648,100 @@ typedef __pid_t pid_t;
 
 @@>> cfgetospeed(3)
 [[pure, wunused, decl_include("<bits/os/termios.h>", "<bits/types.h>")]]
+[[impl_include("<asm/os/termios.h>", "<bits/os/termios.h>")]]
 speed_t cfgetospeed([[in]] struct termios const *__restrict termios_p) {
+@@pp_ifdef __CBAUD@@
+	return termios_p->@c_cflag@ & __CBAUD;
+@@pp_elif defined(_HAVE_STRUCT_TERMIOS_C_OSPEED)@@
 	return termios_p->@c_ospeed@;
+@@pp_else@@
+	(void)termios_p;
+	COMPILER_IMPURE();
+	return 0;
+@@pp_endif@@
 }
 
 @@>> cfgetispeed(3)
 [[pure, wunused, decl_include("<bits/os/termios.h>", "<bits/types.h>")]]
+[[impl_include("<asm/os/termios.h>", "<bits/os/termios.h>")]]
 speed_t cfgetispeed([[in]] struct termios const *__restrict termios_p) {
+@@pp_if defined(__IBAUD0) && defined(__CBAUD)@@
+	return (termios_p->@c_iflag@ & __IBAUD0) ? 0 : (termios_p->@c_cflag@ & __CBAUD);
+@@pp_elif defined(_HAVE_STRUCT_TERMIOS_C_ISPEED)@@
 	return termios_p->@c_ispeed@;
+@@pp_else@@
+	(void)termios_p;
+	COMPILER_IMPURE();
+	return 0;
+@@pp_endif@@
 }
 
 @@>> cfsetospeed(3)
 [[decl_include("<bits/os/termios.h>", "<bits/types.h>")]]
+[[impl_include("<asm/os/termios.h>", "<bits/os/termios.h>", "<libc/errno.h>")]]
 int cfsetospeed([[inout]] struct termios *__restrict termios_p, speed_t speed) {
+@@pp_ifdef __CBAUD@@
+	if unlikely(speed & ~__CBAUD) {
+@@pp_ifdef EINVAL@@
+		return __libc_seterrno(EINVAL);
+@@pp_else@@
+		return __libc_seterrno(1);
+@@pp_endif@@
+	}
+	termios_p->@c_cflag@ &= ~__CBAUD;
+	termios_p->@c_cflag@ |= speed;
+@@pp_endif@@
+
+	/* If present, store in the dedicated ospeed field. */
+@@pp_ifdef _HAVE_STRUCT_TERMIOS_C_OSPEED@@
 	termios_p->@c_ospeed@ = speed;
+@@pp_endif@@
+	(void)termios_p;
+	(void)speed;
 	return 0;
 }
 
 @@>> cfsetispeed(3)
 [[decl_include("<bits/os/termios.h>", "<bits/types.h>")]]
+[[impl_include("<asm/os/termios.h>", "<libc/errno.h>")]]
 int cfsetispeed([[inout]] struct termios *__restrict termios_p, speed_t speed) {
+@@pp_if defined(__IBAUD0) && defined(__CBAUD)@@
+	if unlikely(speed & ~__CBAUD) {
+@@pp_ifdef EINVAL@@
+		return __libc_seterrno(EINVAL);
+@@pp_else@@
+		return __libc_seterrno(1);
+@@pp_endif@@
+	}
+	if (speed == 0) {
+		termios_p->@c_iflag@ |= __IBAUD0;
+	} else {
+		termios_p->@c_iflag@ &= ~__IBAUD0;
+		termios_p->@c_cflag@ &= ~__CBAUD;
+		termios_p->@c_cflag@ |= speed;
+	}
+@@pp_elif defined(__CBAUD) && defined(__IBSHIFT)@@
+	speed_t used_speed;
+	if unlikely(speed & ~__CBAUD) {
+@@pp_ifdef EINVAL@@
+		return __libc_seterrno(EINVAL);
+@@pp_else@@
+		return __libc_seterrno(1);
+@@pp_endif@@
+	}
+	used_speed = speed;
+	if (speed == 0)
+		used_speed = termios_p->@c_cflag@ & __CBAUD;
+	termios_p->@c_cflag@ &= ~(__CBAUD << __IBSHIFT);
+	termios_p->@c_cflag@ |= used_speed << __IBSHIFT;
+@@pp_endif@@
+
+	/* If present, store in the dedicated ispeed field. */
+@@pp_ifdef _HAVE_STRUCT_TERMIOS_C_ISPEED@@
 	termios_p->@c_ispeed@ = speed;
+@@pp_endif@@
+	(void)termios_p;
+	(void)speed;
 	return 0;
 }
 
@@ -735,8 +808,8 @@ int tcsendbreak($fd_t fd, int duration) {
 }
 
 @@>> tcdrain(3)
-[[decl_include("<bits/types.h>")]]
-[[cp, requires_include("<asm/os/tty.h>")]]
+[[cp, decl_include("<bits/types.h>")]]
+[[requires_include("<asm/os/tty.h>")]]
 [[requires($has_function(ioctl) && defined(__TCSBRK))]]
 int tcdrain($fd_t fd) {
 	return (int)ioctl(fd, __TCSBRK, 1);
@@ -808,10 +881,10 @@ int tcsetsid($fd_t fd, $pid_t pid) {
 %#ifdef __USE_MISC
 @@>> cfsetspeed(3)
 [[decl_include("<bits/os/termios.h>", "<bits/types.h>")]]
+[[requires_function(cfsetispeed, cfsetospeed)]]
 int cfsetspeed([[inout]] struct termios *__restrict termios_p, speed_t speed) {
-	termios_p->@c_ospeed@ = speed;
-	termios_p->@c_ispeed@ = speed;
-	return 0;
+	return cfsetispeed(termios_p, speed) |
+	       cfsetospeed(termios_p, speed);
 }
 
 @@>> cfmakeraw(3)

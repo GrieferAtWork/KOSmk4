@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88e49f7f */
+/* HASH CRC-32:0xf65fe6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,11 +24,32 @@
 #include <bits/os/termios.h>
 #include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
+#ifndef __local___localdep_cfsetispeed_defined
+#define __local___localdep_cfsetispeed_defined
+#ifdef __CRT_HAVE_cfsetispeed
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,__localdep_cfsetispeed,(struct termios *__restrict __termios_p, __UINT32_TYPE__ __speed),cfsetispeed,(__termios_p,__speed))
+#else /* __CRT_HAVE_cfsetispeed */
+__NAMESPACE_LOCAL_END
+#include <libc/local/termios/cfsetispeed.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_cfsetispeed __LIBC_LOCAL_NAME(cfsetispeed)
+#endif /* !__CRT_HAVE_cfsetispeed */
+#endif /* !__local___localdep_cfsetispeed_defined */
+#ifndef __local___localdep_cfsetospeed_defined
+#define __local___localdep_cfsetospeed_defined
+#ifdef __CRT_HAVE_cfsetospeed
+__CREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,__localdep_cfsetospeed,(struct termios *__restrict __termios_p, __UINT32_TYPE__ __speed),cfsetospeed,(__termios_p,__speed))
+#else /* __CRT_HAVE_cfsetospeed */
+__NAMESPACE_LOCAL_END
+#include <libc/local/termios/cfsetospeed.h>
+__NAMESPACE_LOCAL_BEGIN
+#define __localdep_cfsetospeed __LIBC_LOCAL_NAME(cfsetospeed)
+#endif /* !__CRT_HAVE_cfsetospeed */
+#endif /* !__local___localdep_cfsetospeed_defined */
 __LOCAL_LIBC(cfsetspeed) __ATTR_INOUT(1) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(cfsetspeed))(struct termios *__restrict __termios_p, __UINT32_TYPE__ __speed) {
-	__termios_p->c_ospeed = __speed;
-	__termios_p->c_ispeed = __speed;
-	return 0;
+	return (__NAMESPACE_LOCAL_SYM __localdep_cfsetispeed)(__termios_p, __speed) |
+	       (__NAMESPACE_LOCAL_SYM __localdep_cfsetospeed)(__termios_p, __speed);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_cfsetspeed_defined
