@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8909782 */
+/* HASH CRC-32:0x43cec435 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -135,6 +135,23 @@ __CSDECLARE(,int,optopt)
 #define optopt optopt
 #endif /* ... */
 #endif /* !optopt */
+
+#ifdef __USE_NETBSD
+/* >> optreset(3)
+ * When set to non-zero, the next call to `getopt(3)' will reset the internal
+ * parser. The resulting behavior is the same as when `optind' is set to `0'.
+ * Once the reset is done, this variable is set to `0' again.
+ *
+ * Pre-initialized to `0' */
+#ifndef optreset
+#ifdef __LOCAL_optreset
+#define optreset __LOCAL_optreset
+#elif defined(__CRT_HAVE_optreset)
+__CSDECLARE(,int,optreset)
+#define optreset optreset
+#endif /* ... */
+#endif /* !optreset */
+#endif /* __USE_NETBSD */
 
 #ifndef __getopt_defined
 #define __getopt_defined

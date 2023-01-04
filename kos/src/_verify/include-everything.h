@@ -336,6 +336,7 @@ incdir("");
 #include <bits/crt/format-printer.h>
 #include <bits/crt/fts.h>
 #include <bits/crt/ftw.h>
+#include <bits/crt/getopt.h>
 #include <bits/crt/glob.h>
 #include <bits/crt/ifaddrs.h>
 #include <bits/crt/inttypes.h>

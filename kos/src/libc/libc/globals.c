@@ -110,10 +110,12 @@ DEFINE_NOREL_GLOBAL_META(int, getdate_err, ".crt.time");
 #undef optind
 #undef opterr
 #undef optopt
+#undef optreset
 DEFINE_NOREL_GLOBAL_META(char *, optarg, ".crt.application.getopt");
 DEFINE_NOREL_GLOBAL_META(int, optind, ".crt.application.getopt");
 DEFINE_NOREL_GLOBAL_META(int, opterr, ".crt.application.getopt");
 DEFINE_NOREL_GLOBAL_META(int, optopt, ".crt.application.getopt");
+DEFINE_NOREL_GLOBAL_META(int, optreset, ".crt.application.getopt");
 
 
 /* <libintl.h> */

@@ -83,5 +83,20 @@ __CSDECLARE(,int,optopt)
 #endif /* ... */
 #endif /* !__LOCAL_optopt */
 
+#ifndef __LOCAL_optreset
+#ifdef optreset
+#define __LOCAL_optreset optreset
+#elif defined(__CRT_HAVE_optreset)
+#ifndef __NO_COMPILER_SREDIRECT
+__CSREDIRECT(,int,__LOCAL_optreset,optreset)
+#define __LOCAL_optreset __LOCAL_optreset
+#else /* !__NO_COMPILER_SREDIRECT */
+__CSDECLARE(,int,optreset)
+#define optreset         optreset
+#define __LOCAL_optreset optreset
+#endif /* __NO_COMPILER_SREDIRECT */
+#endif /* ... */
+#endif /* !__LOCAL_optreset */
+
 __DECL_END
 #endif /* !_LIBC_TEMPLATE_GETOPT_H */

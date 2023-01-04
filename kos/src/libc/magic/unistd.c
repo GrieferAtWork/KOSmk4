@@ -129,7 +129,6 @@
 #endif /* __USE_KOS */
 
 #ifdef __USE_SOLARIS
-#include <getopt.h>
 #define GF_PATH "/etc/group"
 #define PF_PATH "/etc/passwd"
 #endif /* __USE_SOLARIS */
@@ -2311,27 +2310,81 @@ int nice(int inc) {
 size_t confstr(__STDC_INT_AS_UINT_T name, [[out(? <= buflen)]] char *buf, size_t buflen);
 
 %{
-#if !defined(optarg) && defined(__CRT_HAVE_optarg)
+
+/* >> optarg(3)
+ * Set to the argument of the option returned by `getopt(3)' (and friends).
+ * When returning an option that doesn't take an argument, `optarg' is  set
+ * to `NULL'.
+ *
+ * Pre-initialized to `NULL' */
+#ifndef optarg
+#ifdef __LOCAL_optarg
+#define optarg __LOCAL_optarg
+#elif defined(__CRT_HAVE_optarg)
 __CSDECLARE(,char *,optarg)
 #define optarg optarg
-#endif /* !optarg && __CRT_HAVE_optarg */
-#if !defined(optind) && defined(__CRT_HAVE_optind)
+#endif /* ... */
+#endif /* !optarg */
+
+/* >> optind(3)
+ * Index of the next `argv'-element that `getopt(3)' (and friends) should parse.
+ * In order for parsing to  start over, this should be  set to `1'. In order  to
+ * fully re-initialize the getopt-parser, it should be set to `0' (in which case
+ * libc will re-load flags from `optstring[0]', and `$POSIXLY_CORRECT').
+ *
+ * Once all arguments have been processed, `getopt(3)' returns `-1', and `optind'
+ * is set to the value of the first non-argument argv-element (when all  elements
+ * of `argv' are arguments, it is set to `argc')
+ *
+ * Pre-initialized to `1' */
+#ifndef optind
+#ifdef __LOCAL_optind
+#define optind __LOCAL_optind
+#elif defined(__CRT_HAVE_optind)
 __CSDECLARE(,int,optind)
 #define optind optind
-#endif /* !optind && __CRT_HAVE_optind */
-#if !defined(opterr) && defined(__CRT_HAVE_opterr)
+#endif /* ... */
+#endif /* !optind */
+
+/* >> opterr(3)
+ * When non-zero, `getopt(3)' will print error messages to `stderr', unless the
+ * first character of `optstring' is `:'.  Setting this global variable to  `0'
+ * will suppress error messages being  printed, allowing the application to  do
+ * its own error-handling without libc doing anything extra.
+ *
+ * Pre-initialized to `1' */
+#ifndef opterr
+#ifdef __LOCAL_opterr
+#define opterr __LOCAL_opterr
+#elif defined(__CRT_HAVE_opterr)
 __CSDECLARE(,int,opterr)
 #define opterr opterr
-#endif /* !opterr && __CRT_HAVE_opterr */
-#if !defined(optopt) && defined(__CRT_HAVE_optopt)
+#endif /* ... */
+#endif /* !opterr */
+
+/* >> optopt(3)
+ * Filled in by `getopt(3)' (and friends) with the character-code of a malformed
+ * option when one is encountered (this is done alongside an error being printed
+ * to `stderr' (but see `opterr'), and `?' being returned by `getopt(3)').
+ *
+ * In the case of long options (s.a. `getopt_long(3)'), a malformed long option
+ * results in that option's `struct option::val' being written to this  global.
+ *
+ * Pre-initialized to `(unsigned char)'?'' */
+#ifndef optopt
+#ifdef __LOCAL_optopt
+#define optopt __LOCAL_optopt
+#elif defined(__CRT_HAVE_optopt)
 __CSDECLARE(,int,optopt)
 #define optopt optopt
-#endif /* !optopt && __CRT_HAVE_optopt */
+#endif /* ... */
+#endif /* !optopt */
+
 }
 %
 
-
-[[guard, wunused, no_crt_impl, crt_name("getopt"), exposed_name("getopt")]]
+[[guard, wunused, no_crt_impl]]
+[[crt_name("getopt"), exposed_name("getopt"), doc_alias("getopt")]]
 [[if($extended_include_prefix("<features.h>")defined(__USE_POSIX2) &&
                                             !defined(__USE_POSIX_IMPLICITLY) &&
                                             !defined(__USE_GNU)),
@@ -4097,6 +4150,10 @@ $off64_t tell64($fd_t fd) {
 
 __SYSDECL_END
 #endif /* __CC__ */
+
+#if defined(__USE_SOLARIS) || defined(__USE_NETBSD)
+#include <getopt.h>
+#endif /* __USE_SOLARIS || __USE_NETBSD */
 
 #ifdef __USE_KOS
 #if defined(_WCHAR_H) && !defined(_PARTS_WCHAR_UNISTD_H)

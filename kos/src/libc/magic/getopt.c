@@ -142,6 +142,23 @@ __CSDECLARE(,int,optopt)
 #endif /* ... */
 #endif /* !optopt */
 
+#ifdef __USE_NETBSD
+/* >> optreset(3)
+ * When set to non-zero, the next call to `getopt(3)' will reset the internal
+ * parser. The resulting behavior is the same as when `optind' is set to `0'.
+ * Once the reset is done, this variable is set to `0' again.
+ *
+ * Pre-initialized to `0' */
+#ifndef optreset
+#ifdef __LOCAL_optreset
+#define optreset __LOCAL_optreset
+#elif defined(__CRT_HAVE_optreset)
+__CSDECLARE(,int,optreset)
+#define optreset optreset
+#endif /* ... */
+#endif /* !optreset */
+#endif /* __USE_NETBSD */
+
 }
 
 %(auto_source){
@@ -150,22 +167,27 @@ __CSDECLARE(,int,optopt)
 #undef optind
 #undef opterr
 #undef optopt
+#undef optreset
 INTDEF char *libc_optarg;
 INTDEF int libc_optind;
 INTDEF int libc_opterr;
 INTDEF int libc_optopt;
+INTDEF int libc_optreset;
 INTERN ATTR_SECTION(".data.crt.application.getopt") char *libc_optarg = NULL;
 INTERN ATTR_SECTION(".data.crt.application.getopt") int libc_optind = 1;
 INTERN ATTR_SECTION(".data.crt.application.getopt") int libc_opterr = 1;
 INTERN ATTR_SECTION(".data.crt.application.getopt") int libc_optopt = '?';
+INTERN ATTR_SECTION(".data.crt.application.getopt") int libc_optreset = 0;
 DEFINE_PUBLIC_ALIAS(optarg, libc_optarg);
 DEFINE_PUBLIC_ALIAS(optind, libc_optind);
 DEFINE_PUBLIC_ALIAS(opterr, libc_opterr);
 DEFINE_PUBLIC_ALIAS(optopt, libc_optopt);
-#define optarg GET_NOREL_GLOBAL(optarg)
-#define optind GET_NOREL_GLOBAL(optind)
-#define opterr GET_NOREL_GLOBAL(opterr)
-#define optopt GET_NOREL_GLOBAL(optopt)
+DEFINE_PUBLIC_ALIAS(optreset, libc_optreset);
+#define optarg   GET_NOREL_GLOBAL(optarg)
+#define optind   GET_NOREL_GLOBAL(optind)
+#define opterr   GET_NOREL_GLOBAL(opterr)
+#define optopt   GET_NOREL_GLOBAL(optopt)
+#define optreset GET_NOREL_GLOBAL(optreset)
 #endif /* !__KERNEL__ */
 }
 
@@ -228,7 +250,14 @@ int getopt_impl(unsigned int argc,
 	       optstring, flags, (unsigned int)getopt_parsemode, getopt_nextchar, *p_optind);*/
 
 	/* (re-)initialize getopt parser configuration on first use (or when `optind == 0'). */
-	if (!getopt_initialized || *p_optind == 0) {
+	if (!getopt_initialized || *p_optind == 0
+@@pp_ifdef __LOCAL_optreset@@
+	    || __LOCAL_optreset
+@@pp_endif@@
+		) {
+@@pp_ifdef __LOCAL_optreset@@
+		__LOCAL_optreset = 0;
+@@pp_endif@@
 		if (*p_optind == 0)
 			*p_optind = 1;
 		getopt_nextchar    = "";

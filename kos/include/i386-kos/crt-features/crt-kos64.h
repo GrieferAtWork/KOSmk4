@@ -3918,6 +3918,7 @@
 #define __CRT_HAVE_opterr
 #define __CRT_HAVE_optind
 #define __CRT_HAVE_optopt
+#define __CRT_HAVE_optreset
 #define __CRT_HAVE_p_cdname
 #define __CRT_HAVE_p_cdnname
 #define __CRT_HAVE_p_class

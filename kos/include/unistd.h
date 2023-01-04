@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba821d36 */
+/* HASH CRC-32:0x25be2d42 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,7 +89,6 @@
 #endif /* __USE_KOS */
 
 #ifdef __USE_SOLARIS
-#include <getopt.h>
 #define GF_PATH "/etc/group"
 #define PF_PATH "/etc/passwd"
 #endif /* __USE_SOLARIS */
@@ -2603,28 +2602,216 @@ __CREDIRECT_VOID_GCCNCX(__ATTR_NORETURN,__THROWING,_exit,(int __status),exit,(__
  * @return: 1 :    Empty configuration string.
  * @return: 0 :    [errno=EINVAL] Bad configuration `name'. */
 __CDECLARE_OPT(__ATTR_OUTS(2, 3),size_t,__NOTHROW_NCX,confstr,(__STDC_INT_AS_UINT_T __name, char *__buf, size_t __buflen),(__name,__buf,__buflen))
-#if !defined(optarg) && defined(__CRT_HAVE_optarg)
+
+/* >> optarg(3)
+ * Set to the argument of the option returned by `getopt(3)' (and friends).
+ * When returning an option that doesn't take an argument, `optarg' is  set
+ * to `NULL'.
+ *
+ * Pre-initialized to `NULL' */
+#ifndef optarg
+#ifdef __LOCAL_optarg
+#define optarg __LOCAL_optarg
+#elif defined(__CRT_HAVE_optarg)
 __CSDECLARE(,char *,optarg)
 #define optarg optarg
-#endif /* !optarg && __CRT_HAVE_optarg */
-#if !defined(optind) && defined(__CRT_HAVE_optind)
+#endif /* ... */
+#endif /* !optarg */
+
+/* >> optind(3)
+ * Index of the next `argv'-element that `getopt(3)' (and friends) should parse.
+ * In order for parsing to  start over, this should be  set to `1'. In order  to
+ * fully re-initialize the getopt-parser, it should be set to `0' (in which case
+ * libc will re-load flags from `optstring[0]', and `$POSIXLY_CORRECT').
+ *
+ * Once all arguments have been processed, `getopt(3)' returns `-1', and `optind'
+ * is set to the value of the first non-argument argv-element (when all  elements
+ * of `argv' are arguments, it is set to `argc')
+ *
+ * Pre-initialized to `1' */
+#ifndef optind
+#ifdef __LOCAL_optind
+#define optind __LOCAL_optind
+#elif defined(__CRT_HAVE_optind)
 __CSDECLARE(,int,optind)
 #define optind optind
-#endif /* !optind && __CRT_HAVE_optind */
-#if !defined(opterr) && defined(__CRT_HAVE_opterr)
+#endif /* ... */
+#endif /* !optind */
+
+/* >> opterr(3)
+ * When non-zero, `getopt(3)' will print error messages to `stderr', unless the
+ * first character of `optstring' is `:'.  Setting this global variable to  `0'
+ * will suppress error messages being  printed, allowing the application to  do
+ * its own error-handling without libc doing anything extra.
+ *
+ * Pre-initialized to `1' */
+#ifndef opterr
+#ifdef __LOCAL_opterr
+#define opterr __LOCAL_opterr
+#elif defined(__CRT_HAVE_opterr)
 __CSDECLARE(,int,opterr)
 #define opterr opterr
-#endif /* !opterr && __CRT_HAVE_opterr */
-#if !defined(optopt) && defined(__CRT_HAVE_optopt)
+#endif /* ... */
+#endif /* !opterr */
+
+/* >> optopt(3)
+ * Filled in by `getopt(3)' (and friends) with the character-code of a malformed
+ * option when one is encountered (this is done alongside an error being printed
+ * to `stderr' (but see `opterr'), and `?' being returned by `getopt(3)').
+ *
+ * In the case of long options (s.a. `getopt_long(3)'), a malformed long option
+ * results in that option's `struct option::val' being written to this  global.
+ *
+ * Pre-initialized to `(unsigned char)'?'' */
+#ifndef optopt
+#ifdef __LOCAL_optopt
+#define optopt __LOCAL_optopt
+#elif defined(__CRT_HAVE_optopt)
 __CSDECLARE(,int,optopt)
 #define optopt optopt
-#endif /* !optopt && __CRT_HAVE_optopt */
+#endif /* ... */
+#endif /* !optopt */
+
 
 #ifndef __getopt_defined
 #define __getopt_defined
 #if defined(__CRT_HAVE___posix_getopt) && defined(__USE_POSIX2) && !defined(__USE_POSIX_IMPLICITLY) && !defined(__USE_GNU)
+/* >> getopt(3), getopt_long(3), getopt_long_only(3)
+ * Parse options from arguments, as passed to `main()', and specified by `optstring'.
+ * Arguments in `argv' appear in one of the following forms:
+ *  - "-x":        Returns "x"                      (assuming `optstring' contains "x")
+ *  - "-x -y":     Returns "x"                      (assuming `optstring' contains "x" and "y")
+ *  - "-xyz":      Returns "x", "y", and then "z"   (assuming `optstring' contains "x", "y" and "z")
+ *  - "-ofoo":     Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
+ *  - "-o", "foo": Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
+ * Long options (`getopt_long(3)'-only)appear in the following formats:
+ *  - "--out":        Returns `longopts["out"].val'                      (assuming `longopts["out"].has_arg != required_argument')
+ *  - "--out=foo":    Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
+ *  - "--out", "foo": Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
+ * When `getopt_long_only(3)' is used, long options may also be written with a single leading "-".
+ *
+ * This function interacts with the globals variables `optarg', `optind', `opterr' and `optopt'.
+ * For  more information on  how these variables/are-used-by `getopt(3)'  (and friends), see the
+ * documentation of the respective variable.
+ *
+ * The first character of `optstring' can be used to affect the behavior of this function:
+ *  - '-': Each  non-option argument will be handled as though it was the argument of an option '\1'
+ *         In other words: ["/bin/myapp", "-x", "foo", "bar"] (with `optstring="-x:"') would then be
+ *         enumerated as  {[getopt:'x',optarg="foo"],  [getopt:1,optarg="bar"],  [getopt:-1]}.  Note
+ *         that the special "--" argument still causes `getopt(3)' to return `-1' (with `optind' set
+ *         to the 1 plus  the index of the  "--"-argument), even when this  option is used,  meaning
+ *         that  when  using  this  option,  the  caller  must  handle  non-option  arguments  like:
+ *         >> int opt;
+ *         >> while ((opt = getopt(argc, argv, "-xy:z")) != -1) {
+ *         >>     if (opt == 1)
+ *         >>         handle_non_option_argument(optarg);
+ *         >>     ...
+ *         >> }
+ *         >> while (optind < argc)
+ *         >>     handle_non_option_argument(argv[optind++]);
+ *         In this case, elements of `argv' are never permutated (and `argv' can be const).
+ *  - '+': Stop parsing as soon as the first non-option argument is encountered. This is also the
+ *         behavior when `optstring[0]' isn't a special character, and "$POSIXLY_CORRECT" is set,
+ *         or `__posix_getopt(3)' was used.
+ *         In this case, elements of `argv' are never permutated (and `argv' can be const).
+ *  - ...: Default behavior (`optstring[0]'  isn't '-' or  '+'). In this  case, scanning of  `argv'
+ *         does not stop at the first non-option argument, but only once the actual end is reached,
+ *         or  an argument "--" is encountered. Once that is done, `getopt(3)' will return with the
+ *         elements of `argv'  permutated such  that all  non-option arguments  appear (in  correct
+ *         order) within `argv', starting at `argv[optind]'.
+ *         e.g. Once option processing  is done, ["-afoo", "bar", "-c", "--", "-x"]  will
+ *              result in `argv[optind...argc-1]' to be the array ["bar", "-x"] (assuming
+ *              an `optstring' similar to "a:cx")
+ *  - ':': Same as setting `opterr = 0' (may be combined with any of the other special flags by
+ *         writing it _AFTER_ the other special flag; e.g. "+:xy:z")
+ *
+ * @param: argc: Number of arguments in `argv'
+ * @param: argv: Argument vector from `main()' -- Shouldn't  actually be `const' here, since  this
+ *               function may permute the  order of elements in  `argv' (to gather all  non-option
+ *               arguments at the end), unless `optstring[0] == '+'', `__posix_getopt(3)' is used,
+ *               or "$POSIXLY_CORRECT" is defined.
+ * @param: optstring: [1..1] Options string (see above)
+ * @param: longopts:  [0..1] Long options array (terminated by an all-NULL/0 element)
+ * @param: longindex: [0..1] When non-NULL, set to the index of the matched long-option,
+ *                           if  one was matched.  If none was (i.e.  a short option was
+ *                           matched), the contents of this pointer are left  unchanged.
+ * @return: 1 : The given `optstring' starts with '-', and a non-option argument `optarg' was encountered.
+ * @return:'?': Error while processing options, or '?' appears in `optstring' (or as an `struct option::val')
+ *              In the case of an error (and unless disabled by ':' or `opterr'), a message has already  been
+ *              written to `stderr'.
+ * @return: 0 : A long option was matched with `struct option::flag != NULL'.
+ * @return: * : Either  a short option (return is that option's character-code), or a long-long (return is
+ *              that option's `struct option::val', so-long as `struct option::flag == NULL') was matched.
+ * @return: -1: Argument processing is done. Non-option arguments are in `argv[optind...argc-1]' */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt,(int ___argc, char *const ___argv[], char const *__shortopts),__posix_getopt,(___argc,___argv,__shortopts))
 #elif defined(__CRT_HAVE_getopt)
+/* >> getopt(3), getopt_long(3), getopt_long_only(3)
+ * Parse options from arguments, as passed to `main()', and specified by `optstring'.
+ * Arguments in `argv' appear in one of the following forms:
+ *  - "-x":        Returns "x"                      (assuming `optstring' contains "x")
+ *  - "-x -y":     Returns "x"                      (assuming `optstring' contains "x" and "y")
+ *  - "-xyz":      Returns "x", "y", and then "z"   (assuming `optstring' contains "x", "y" and "z")
+ *  - "-ofoo":     Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
+ *  - "-o", "foo": Returns "o", with `optarg="foo"' (assuming `optstring' contains "o:")
+ * Long options (`getopt_long(3)'-only)appear in the following formats:
+ *  - "--out":        Returns `longopts["out"].val'                      (assuming `longopts["out"].has_arg != required_argument')
+ *  - "--out=foo":    Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
+ *  - "--out", "foo": Returns `longopts["out"].val', with `optarg="foo"' (assuming `longopts["out"].has_arg != no_argument')
+ * When `getopt_long_only(3)' is used, long options may also be written with a single leading "-".
+ *
+ * This function interacts with the globals variables `optarg', `optind', `opterr' and `optopt'.
+ * For  more information on  how these variables/are-used-by `getopt(3)'  (and friends), see the
+ * documentation of the respective variable.
+ *
+ * The first character of `optstring' can be used to affect the behavior of this function:
+ *  - '-': Each  non-option argument will be handled as though it was the argument of an option '\1'
+ *         In other words: ["/bin/myapp", "-x", "foo", "bar"] (with `optstring="-x:"') would then be
+ *         enumerated as  {[getopt:'x',optarg="foo"],  [getopt:1,optarg="bar"],  [getopt:-1]}.  Note
+ *         that the special "--" argument still causes `getopt(3)' to return `-1' (with `optind' set
+ *         to the 1 plus  the index of the  "--"-argument), even when this  option is used,  meaning
+ *         that  when  using  this  option,  the  caller  must  handle  non-option  arguments  like:
+ *         >> int opt;
+ *         >> while ((opt = getopt(argc, argv, "-xy:z")) != -1) {
+ *         >>     if (opt == 1)
+ *         >>         handle_non_option_argument(optarg);
+ *         >>     ...
+ *         >> }
+ *         >> while (optind < argc)
+ *         >>     handle_non_option_argument(argv[optind++]);
+ *         In this case, elements of `argv' are never permutated (and `argv' can be const).
+ *  - '+': Stop parsing as soon as the first non-option argument is encountered. This is also the
+ *         behavior when `optstring[0]' isn't a special character, and "$POSIXLY_CORRECT" is set,
+ *         or `__posix_getopt(3)' was used.
+ *         In this case, elements of `argv' are never permutated (and `argv' can be const).
+ *  - ...: Default behavior (`optstring[0]'  isn't '-' or  '+'). In this  case, scanning of  `argv'
+ *         does not stop at the first non-option argument, but only once the actual end is reached,
+ *         or  an argument "--" is encountered. Once that is done, `getopt(3)' will return with the
+ *         elements of `argv'  permutated such  that all  non-option arguments  appear (in  correct
+ *         order) within `argv', starting at `argv[optind]'.
+ *         e.g. Once option processing  is done, ["-afoo", "bar", "-c", "--", "-x"]  will
+ *              result in `argv[optind...argc-1]' to be the array ["bar", "-x"] (assuming
+ *              an `optstring' similar to "a:cx")
+ *  - ':': Same as setting `opterr = 0' (may be combined with any of the other special flags by
+ *         writing it _AFTER_ the other special flag; e.g. "+:xy:z")
+ *
+ * @param: argc: Number of arguments in `argv'
+ * @param: argv: Argument vector from `main()' -- Shouldn't  actually be `const' here, since  this
+ *               function may permute the  order of elements in  `argv' (to gather all  non-option
+ *               arguments at the end), unless `optstring[0] == '+'', `__posix_getopt(3)' is used,
+ *               or "$POSIXLY_CORRECT" is defined.
+ * @param: optstring: [1..1] Options string (see above)
+ * @param: longopts:  [0..1] Long options array (terminated by an all-NULL/0 element)
+ * @param: longindex: [0..1] When non-NULL, set to the index of the matched long-option,
+ *                           if  one was matched.  If none was (i.e.  a short option was
+ *                           matched), the contents of this pointer are left  unchanged.
+ * @return: 1 : The given `optstring' starts with '-', and a non-option argument `optarg' was encountered.
+ * @return:'?': Error while processing options, or '?' appears in `optstring' (or as an `struct option::val')
+ *              In the case of an error (and unless disabled by ':' or `opterr'), a message has already  been
+ *              written to `stderr'.
+ * @return: 0 : A long option was matched with `struct option::flag != NULL'.
+ * @return: * : Either  a short option (return is that option's character-code), or a long-long (return is
+ *              that option's `struct option::val', so-long as `struct option::flag == NULL') was matched.
+ * @return: -1: Argument processing is done. Non-option arguments are in `argv[optind...argc-1]' */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt,(int ___argc, char *const ___argv[], char const *__shortopts),(___argc,___argv,__shortopts))
 #else /* ... */
 #undef __getopt_defined
@@ -4326,6 +4513,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tell64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WU
 
 __SYSDECL_END
 #endif /* __CC__ */
+
+#if defined(__USE_SOLARIS) || defined(__USE_NETBSD)
+#include <getopt.h>
+#endif /* __USE_SOLARIS || __USE_NETBSD */
 
 #ifdef __USE_KOS
 #if defined(_WCHAR_H) && !defined(_PARTS_WCHAR_UNISTD_H)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3975ec61 */
+/* HASH CRC-32:0xd074d7d2 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,22 +37,27 @@ DECL_BEGIN
 #undef optind
 #undef opterr
 #undef optopt
+#undef optreset
 INTDEF char *libc_optarg;
 INTDEF int libc_optind;
 INTDEF int libc_opterr;
 INTDEF int libc_optopt;
+INTDEF int libc_optreset;
 INTERN ATTR_SECTION(".data.crt.application.getopt") char *libc_optarg = NULL;
 INTERN ATTR_SECTION(".data.crt.application.getopt") int libc_optind = 1;
 INTERN ATTR_SECTION(".data.crt.application.getopt") int libc_opterr = 1;
 INTERN ATTR_SECTION(".data.crt.application.getopt") int libc_optopt = '?';
+INTERN ATTR_SECTION(".data.crt.application.getopt") int libc_optreset = 0;
 DEFINE_PUBLIC_ALIAS(optarg, libc_optarg);
 DEFINE_PUBLIC_ALIAS(optind, libc_optind);
 DEFINE_PUBLIC_ALIAS(opterr, libc_opterr);
 DEFINE_PUBLIC_ALIAS(optopt, libc_optopt);
-#define optarg GET_NOREL_GLOBAL(optarg)
-#define optind GET_NOREL_GLOBAL(optind)
-#define opterr GET_NOREL_GLOBAL(opterr)
-#define optopt GET_NOREL_GLOBAL(optopt)
+DEFINE_PUBLIC_ALIAS(optreset, libc_optreset);
+#define optarg   GET_NOREL_GLOBAL(optarg)
+#define optind   GET_NOREL_GLOBAL(optind)
+#define opterr   GET_NOREL_GLOBAL(opterr)
+#define optopt   GET_NOREL_GLOBAL(optopt)
+#define optreset GET_NOREL_GLOBAL(optreset)
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 #include <hybrid/typecore.h>
@@ -110,7 +115,14 @@ NOTHROW_NCX(LIBCCALL libc_getopt_impl)(unsigned int argc,
 	       optstring, flags, (unsigned int)getopt_parsemode, getopt_nextchar, *p_optind);*/
 
 	/* (re-)initialize getopt parser configuration on first use (or when `optind == 0'). */
-	if (!getopt_initialized || *p_optind == 0) {
+	if (!getopt_initialized || *p_optind == 0
+#ifdef __LOCAL_optreset
+	    || __LOCAL_optreset
+#endif /* __LOCAL_optreset */
+		) {
+#ifdef __LOCAL_optreset
+		__LOCAL_optreset = 0;
+#endif /* __LOCAL_optreset */
 		if (*p_optind == 0)
 			*p_optind = 1;
 		getopt_nextchar    = "";

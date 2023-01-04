@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90829155 */
+/* HASH CRC-32:0x77622bb3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -318,7 +318,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getopt_impl))(unsigned int ___argc, c
 	       optstring, flags, (unsigned int)getopt_parsemode, getopt_nextchar, *p_optind);*/
 
 	/* (re-)initialize getopt parser configuration on first use (or when `optind == 0'). */
-	if (!__getopt_initialized || *__p_optind == 0) {
+	if (!__getopt_initialized || *__p_optind == 0
+#ifdef __LOCAL_optreset
+	    || __LOCAL_optreset
+#endif /* __LOCAL_optreset */
+		) {
+#ifdef __LOCAL_optreset
+		__LOCAL_optreset = 0;
+#endif /* __LOCAL_optreset */
 		if (*__p_optind == 0)
 			*__p_optind = 1;
 		__getopt_nextchar    = "";
