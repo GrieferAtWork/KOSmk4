@@ -176,7 +176,7 @@ dbg_coredump(void const *const *traceback_vector,
 	for (tbi = 0; tbi < ktraceback_length; ++tbi) {
 		dbg_addr2line_printf(ktraceback_vector[tbi],
 		                     instruction_trysucc(ktraceback_vector[tbi], isa),
-		                     DBGSTR("ktraceback_vector[%" PRIuSIZ "]\n"), tbi);
+		                     DBGSTR("ktraceback_vector[%" PRIuSIZ "]"), tbi);
 	}
 	isa = ucpustate_getisa(orig_ustate);
 	dbg_addr2line_printf(ucpustate_getpc(orig_ustate),
@@ -185,7 +185,7 @@ dbg_coredump(void const *const *traceback_vector,
 	for (tbi = 0; tbi < traceback_length; ++tbi) {
 		dbg_addr2line_printf(traceback_vector[tbi],
 		                     instruction_trysucc(traceback_vector[tbi], isa),
-		                     DBGSTR("traceback_vector[%" PRIuSIZ "]\n"),
+		                     DBGSTR("traceback_vector[%" PRIuSIZ "]"),
 		                     tbi);
 	}
 	current_pc = dbg_getpcreg(DBG_RT_REGLEVEL_TRAP);
