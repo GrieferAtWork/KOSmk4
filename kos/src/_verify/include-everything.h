@@ -178,6 +178,7 @@ incdir("");
 #include <asm/crt/ttyent.h>
 #include <asm/crt/ucontext.h>
 #include <asm/crt/util.h>
+#include <asm/crt/vis.h>
 #include <asm/defsym.h>
 #include <asm/errno-base.h>
 #include <asm/errno.h>
@@ -1537,6 +1538,7 @@ incdir("");
 #include <vcruntime_startup.h>
 #include <vcruntime_string.h>
 #include <vfork.h>
+#include <vis.h>
 #include <wait.h>
 #include <waitflags.h>
 #include <waitstatus.h>

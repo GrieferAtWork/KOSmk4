@@ -1704,7 +1704,7 @@ do_destroy:
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL mpart_trim)(/*inherit(always)*/ REF struct mpart *__restrict self) {
 
-	/* Check for special case: can we destroy the part immediately! */
+	/* Check for special case: can we destroy the part immediately? */
 	if (ATOMIC_CMPXCH(self->mp_refcnt, 1, 0))
 		goto do_destroy;
 

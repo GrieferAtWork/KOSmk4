@@ -69,9 +69,15 @@
 #else
 #include <__crt.h>
 #ifdef __CRT_HAVE_stat
+/*[[[warning(warn("No stat() support for CRT"))]]]*/
 #ifndef __NO_WARNINGS
+#ifdef __PREPROCESSOR_HAVE_WARNING
 #warning "No stat() support for CRT"
+#elif defined(__PREPROCESSOR_HAVE_PRAGMA_WARNING)
+#pragma warning("No stat() support for CRT")
+#endif /* ... */
 #endif /* !__NO_WARNINGS */
+/*[[[end]]]*/
 #ifdef __CC__
 __DECL_BEGIN
 struct stat { int __placeholder; };

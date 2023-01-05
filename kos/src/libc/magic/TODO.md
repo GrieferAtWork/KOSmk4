@@ -168,7 +168,6 @@
 - `<bsd/md5.h>`                 (libbsd)
 - `<bsd/sys/tree.h>`            (libbsd)
 - `<bsd/timeconv.h>`            (libbsd)
-- `<bsd/vis.h>`                 (libbsd)
 - `<corecrt_share.h>`           (DOS)
 - `<corecrt_terminate.h>`       (DOS)
 - `<gshadow.h>`                 (Glibc)

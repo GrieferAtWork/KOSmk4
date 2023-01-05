@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91a279f6 */
+/* HASH CRC-32:0x28f1d4a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3581,6 +3581,30 @@ DFUN(".text.crt.dos.database.utmpx", libd_utmpxname, libc_utmpxname, TD, 1, TP)
 DFUN(".text.crt.dos.database.utmpx", libd_updwtmpx, libc_updwtmpx, TV, 2, TP, TP)
 DFUN(".text.crt.dos.database.utmpx", libd_getutmp, libc_getutmp, TV, 2, TP, TP)
 DFUN(".text.crt.dos.database.utmpx", libd_getutmpx, libc_getutmpx, TV, 2, TP, TP)
+
+/* vis */
+DFUN(".text.crt.dos.bsd.vis", libd_vis, libc_vis, TP, 4, TP, TD, TD, TD)
+DFUN(".text.crt.dos.bsd.vis", libd_nvis, libc_nvis, TP, 5, TP, TI, TD, TD, TD)
+DFUN(".text.crt.dos.bsd.vis", libd_svis, libc_svis, TP, 5, TP, TD, TD, TD, TP)
+DFUN(".text.crt.dos.bsd.vis", libd_snvis, libc_snvis, TP, 6, TP, TI, TD, TD, TD, TP)
+DFUN(".text.crt.dos.bsd.vis", libd_strvis, libc_strvis, TD, 3, TP, TP, TD)
+DFUN(".text.crt.dos.bsd.vis", libd_stravis, libc_stravis, TD, 3, TP, TP, TD)
+DFUN(".text.crt.dos.bsd.vis", libd_strnvis_netbsd, libc_strnvis_netbsd, TD, 4, TP, TI, TP, TD)
+DFUN(".text.crt.dos.bsd.vis", libd_strnvis, libc_strnvis, TD, 4, TP, TP, TI, TD)
+DFUN(".text.crt.dos.bsd.vis", libd_strsvis, libc_strsvis, TD, 4, TP, TP, TD, TP)
+DFUN(".text.crt.dos.bsd.vis", libd_strsnvis, libc_strsnvis, TD, 5, TP, TI, TP, TD, TP)
+DFUN(".text.crt.dos.bsd.vis", libd_strvisx, libc_strvisx, TD, 4, TP, TP, TI, TD)
+DFUN(".text.crt.dos.bsd.vis", libd_strnvisx, libc_strnvisx, TD, 5, TP, TI, TP, TI, TD)
+DFUN(".text.crt.dos.bsd.vis", libd_strenvisx, libc_strenvisx, TD, 6, TP, TI, TP, TI, TD, TP)
+DFUN(".text.crt.dos.bsd.vis", libd_strsvisx, libc_strsvisx, TD, 5, TP, TP, TI, TD, TP)
+DFUN(".text.crt.dos.bsd.vis", libd_strsnvisx, libc_strsnvisx, TD, 6, TP, TI, TP, TI, TD, TP)
+DFUN(".text.crt.dos.bsd.vis", libd_strsenvisx, libc_strsenvisx, TD, 7, TP, TI, TP, TI, TD, TP, TP)
+DFUN(".text.crt.dos.bsd.vis", libd_strunvis, libc_strunvis, TD, 2, TP, TP)
+DFUN(".text.crt.dos.bsd.vis", libd_strnunvis_netbsd, libc_strnunvis_netbsd, TD, 3, TP, TI, TP)
+DFUN(".text.crt.dos.bsd.vis", libd_strnunvis, libc_strnunvis, TD, 3, TP, TP, TI)
+DFUN(".text.crt.dos.bsd.vis", libd_strunvisx, libc_strunvisx, TD, 3, TP, TP, TD)
+DFUN(".text.crt.dos.bsd.vis", libd_strnunvisx, libc_strnunvisx, TD, 4, TP, TI, TP, TD)
+DFUN(".text.crt.dos.bsd.vis", libd_unvis, libc_unvis, TD, 4, TP, TD, TP, TD)
 
 /* wchar */
 DFUN(".text.crt.dos.wchar.unicode.static.mbs", libd_mbsinit, libc_mbsinit, TD, 1, TP)

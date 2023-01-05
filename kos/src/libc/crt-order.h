@@ -221,6 +221,7 @@
 	.libattr                          # <attr/libattr.h>
 	.glibc.* .glibc                   # Glibc-specific stuff
 	.bsd.stringlist                   # BSD's <stringlist.h> header
+	.bsd.vis                          # BSD's <vis.h> header
 	.bsd.* .bsd                       # Misc BSD functions
 	.solaris.* .solaris               # Misc Solaris functions
 	.mbstring.* .mbstring             # <mbstring.h>, <mbctype.h>
@@ -363,6 +364,7 @@
 	CB(PREFIX.crt.libattr) \
 	CB(PREFIX.crt.glibc.application.init PREFIX.crt.glibc.assert PREFIX.crt.glibc.fs.stat) \
 	CB(PREFIX.crt.bsd.stringlist) \
+	CB(PREFIX.crt.bsd.vis) \
 	CB(PREFIX.crt.bsd.io.access PREFIX.crt.bsd.sched.signal PREFIX.crt.bsd.strstat PREFIX.crt.bsd.user PREFIX.crt.bsd) \
 	CB(PREFIX.crt.solaris.io PREFIX.crt.solaris) \
 	CB(PREFIX.crt.capability) \
@@ -540,6 +542,7 @@
 	CB(PREFIX.crt.dos.wordexp) \
 	CB(PREFIX.crt.dos.libattr) \
 	CB(PREFIX.crt.dos.bsd.stringlist) \
+	CB(PREFIX.crt.dos.bsd.vis) \
 	CB(PREFIX.crt.dos.bsd.io.access PREFIX.crt.dos.bsd.strstat PREFIX.crt.dos.bsd.user PREFIX.crt.dos.bsd) \
 	CB(PREFIX.crt.dos.solaris.io PREFIX.crt.dos.solaris) \
 	CB(PREFIX.crt.dos.mbstring) \

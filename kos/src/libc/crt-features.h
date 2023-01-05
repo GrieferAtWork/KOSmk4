@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb25f5cb0 */
+/* HASH CRC-32:0xea6dff53 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2577,6 +2577,7 @@
 #define __CRT_HAVE_DOS$ntp_adjtime64
 #define __CRT_HAVE_DOS$ntp_gettimex
 #define __CRT_HAVE_DOS$ntp_gettimex64
+#define __CRT_HAVE_DOS$nvis
 #define __CRT_HAVE_DOS$objalloc_free
 #define __CRT_HAVE_DOS$objalloc_free_block
 #define __CRT_HAVE_DOS$obstack_free
@@ -3297,6 +3298,7 @@
 #define __CRT_HAVE_DOS$sl_free
 #define __CRT_HAVE_DOS$sleep
 #define __CRT_HAVE_DOS$snprintf
+#define __CRT_HAVE_DOS$snvis
 #define __CRT_HAVE_DOS$sockatmark
 #define __CRT_HAVE_DOS$socket
 #define __CRT_HAVE_DOS$socketpair
@@ -3356,6 +3358,7 @@
 #define __CRT_HAVE_DOS$stpcpy
 #define __CRT_HAVE_DOS$stpncpy
 #define __CRT_HAVE_DOS$str2sig
+#define __CRT_HAVE_DOS$stravis
 #define __CRT_HAVE_DOS$strcadd
 #define __CRT_HAVE_DOS$strcasecmp
 #define __CRT_HAVE_DOS$strcasecmp_l
@@ -3380,6 +3383,7 @@
 #define __CRT_HAVE_DOS$streadd
 #define __CRT_HAVE_DOS$strecpy
 #define __CRT_HAVE_DOS$strend
+#define __CRT_HAVE_DOS$strenvisx
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 #define __CRT_HAVE_DOS$strerror
@@ -3431,8 +3435,14 @@
 #define __CRT_HAVE_DOS$strnroff
 #define __CRT_HAVE_DOS$strnset
 #define __CRT_HAVE_DOS$strnstr
+#define __CRT_HAVE_DOS$strnunvis
+#define __CRT_HAVE_DOS$strnunvis_netbsd
+#define __CRT_HAVE_DOS$strnunvisx
 #define __CRT_HAVE_DOS$strnupr
 #define __CRT_HAVE_DOS$strnupr_l
+#define __CRT_HAVE_DOS$strnvis
+#define __CRT_HAVE_DOS$strnvis_netbsd
+#define __CRT_HAVE_DOS$strnvisx
 #define __CRT_HAVE_DOS$stroff
 #define __CRT_HAVE_DOS$strpbrk
 #define __CRT_HAVE_DOS$strptime
@@ -3444,6 +3454,7 @@
 #define __CRT_HAVE_DOS$strrspn
 #define __CRT_HAVE_DOS$strrstr
 #define __CRT_HAVE_DOS$strrstrip
+#define __CRT_HAVE_DOS$strsenvisx
 #define __CRT_HAVE_DOS$strsep
 #define __CRT_HAVE_DOS$strset
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -3451,6 +3462,8 @@
 #define __CRT_HAVE_DOS$strsignal
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$strsnvis
+#define __CRT_HAVE_DOS$strsnvisx
 #define __CRT_HAVE_DOS$strspn
 #define __CRT_HAVE_DOS$strstartcmp
 #define __CRT_HAVE_DOS$strstartcmpz
@@ -3458,6 +3471,8 @@
 #define __CRT_HAVE_DOS$strstrip
 #define __CRT_HAVE_DOS$strsuftoll
 #define __CRT_HAVE_DOS$strsuftollx
+#define __CRT_HAVE_DOS$strsvis
+#define __CRT_HAVE_DOS$strsvisx
 #define __CRT_HAVE_DOS$strto32
 #define __CRT_HAVE_DOS$strto32_l
 #define __CRT_HAVE_DOS$strto32_r
@@ -3506,12 +3521,17 @@
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$strtrns
+#define __CRT_HAVE_DOS$strunvis
+#define __CRT_HAVE_DOS$strunvisx
 #define __CRT_HAVE_DOS$strupr
 #define __CRT_HAVE_DOS$strupr_l
 #define __CRT_HAVE_DOS$strverscmp
+#define __CRT_HAVE_DOS$strvis
+#define __CRT_HAVE_DOS$strvisx
 #define __CRT_HAVE_DOS$strxfrm
 #define __CRT_HAVE_DOS$strxfrm_l
 #define __CRT_HAVE_DOS$stty
+#define __CRT_HAVE_DOS$svis
 #define __CRT_HAVE_DOS$swab
 #define __CRT_HAVE_DOS$swapoff
 #define __CRT_HAVE_DOS$swapon
@@ -3751,6 +3771,7 @@
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$unshare
+#define __CRT_HAVE_DOS$unvis
 #define __CRT_HAVE_DOS$updwtmp
 #define __CRT_HAVE_DOS$updwtmpx
 #define __CRT_HAVE_DOS$uselocale
@@ -3797,6 +3818,7 @@
 #define __CRT_HAVE_DOS$vfwscanf_unlocked
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+#define __CRT_HAVE_DOS$vis
 #define __CRT_HAVE_DOS$vlimit
 #define __CRT_HAVE_DOS$vmsplice
 #define __CRT_HAVE_DOS$vprintf
@@ -6976,6 +6998,7 @@
 #define __CRT_HAVE_ntp_adjtime64
 #define __CRT_HAVE_ntp_gettimex
 #define __CRT_HAVE_ntp_gettimex64
+#define __CRT_HAVE_nvis
 #define __CRT_HAVE_objalloc_create
 #define __CRT_HAVE_objalloc_free
 #define __CRT_HAVE_objalloc_free_block
@@ -7802,6 +7825,7 @@
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_snprintf
 #ifndef __KERNEL__
+#define __CRT_HAVE_snvis
 #define __CRT_HAVE_sockatmark
 #define __CRT_HAVE_socket
 #define __CRT_HAVE_socketpair
@@ -7851,6 +7875,7 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE_stpncpy
 #define __CRT_HAVE_str2sig
+#define __CRT_HAVE_stravis
 #define __CRT_HAVE_strcadd
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_strcasecmp
@@ -7887,6 +7912,7 @@
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_strend
 #ifndef __KERNEL__
+#define __CRT_HAVE_strenvisx
 #define __CRT_HAVE_strerror
 #define __CRT_HAVE_strerror_l
 #define __CRT_HAVE_strerror_r
@@ -7944,8 +7970,14 @@
 #define __CRT_HAVE_strnroff
 #define __CRT_HAVE_strnset
 #define __CRT_HAVE_strnstr
+#define __CRT_HAVE_strnunvis
+#define __CRT_HAVE_strnunvis_netbsd
+#define __CRT_HAVE_strnunvisx
 #define __CRT_HAVE_strnupr
 #define __CRT_HAVE_strnupr_l
+#define __CRT_HAVE_strnvis
+#define __CRT_HAVE_strnvis_netbsd
+#define __CRT_HAVE_strnvisx
 #define __CRT_HAVE_stroff
 #define __CRT_HAVE_strpbrk
 #define __CRT_HAVE_strptime
@@ -7961,9 +7993,12 @@
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_strrstrip
 #ifndef __KERNEL__
+#define __CRT_HAVE_strsenvisx
 #define __CRT_HAVE_strsep
 #define __CRT_HAVE_strset
 #define __CRT_HAVE_strsignal
+#define __CRT_HAVE_strsnvis
+#define __CRT_HAVE_strsnvisx
 #define __CRT_HAVE_strspn
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_strstartcmp
@@ -7973,6 +8008,8 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE_strsuftoll
 #define __CRT_HAVE_strsuftollx
+#define __CRT_HAVE_strsvis
+#define __CRT_HAVE_strsvisx
 #endif /* !__KERNEL__ */
 #define __CRT_HAVE_strto32
 #ifndef __KERNEL__
@@ -8033,12 +8070,17 @@
 #endif /* !__KERNEL__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG__ && __SIZEOF_INTMAX_T__ != __SIZEOF_LONG_LONG__ && __SIZEOF_INTMAX_T__ != 4 && __SIZEOF_INTMAX_T__ != 8 */
 #ifndef __KERNEL__
 #define __CRT_HAVE_strtrns
+#define __CRT_HAVE_strunvis
+#define __CRT_HAVE_strunvisx
 #define __CRT_HAVE_strupr
 #define __CRT_HAVE_strupr_l
 #define __CRT_HAVE_strverscmp
+#define __CRT_HAVE_strvis
+#define __CRT_HAVE_strvisx
 #define __CRT_HAVE_strxfrm
 #define __CRT_HAVE_strxfrm_l
 #define __CRT_HAVE_stty
+#define __CRT_HAVE_svis
 #define __CRT_HAVE_swab
 #define __CRT_HAVE_swapcontext
 #define __CRT_HAVE_swapoff
@@ -8259,6 +8301,7 @@
 #define __CRT_HAVE_unmapfile
 #define __CRT_HAVE_unsetenv
 #define __CRT_HAVE_unshare
+#define __CRT_HAVE_unvis
 #define __CRT_HAVE_updwtmp
 #define __CRT_HAVE_updwtmpx
 #define __CRT_HAVE_ur_cthread_self
@@ -8305,6 +8348,7 @@
 #define __CRT_HAVE_vfwscanf_s
 #define __CRT_HAVE_vfwscanf_unlocked
 #define __CRT_HAVE_vhangup
+#define __CRT_HAVE_vis
 #define __CRT_HAVE_vlimit
 #define __CRT_HAVE_vmsplice
 #define __CRT_HAVE_vprintf

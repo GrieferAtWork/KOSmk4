@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc05a9317 */
+/* HASH CRC-32:0x5a32961f */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3951,6 +3951,30 @@ DEFINE_PUBLIC_ALIAS(DOS$utmpxname, libd_utmpxname);
 DEFINE_PUBLIC_ALIAS(DOS$updwtmpx, libd_updwtmpx);
 DEFINE_PUBLIC_ALIAS(DOS$getutmp, libd_getutmp);
 DEFINE_PUBLIC_ALIAS(DOS$getutmpx, libd_getutmpx);
+
+/* vis */
+DEFINE_PUBLIC_ALIAS(DOS$vis, libd_vis);
+DEFINE_PUBLIC_ALIAS(DOS$nvis, libd_nvis);
+DEFINE_PUBLIC_ALIAS(DOS$svis, libd_svis);
+DEFINE_PUBLIC_ALIAS(DOS$snvis, libd_snvis);
+DEFINE_PUBLIC_ALIAS(DOS$strvis, libd_strvis);
+DEFINE_PUBLIC_ALIAS(DOS$stravis, libd_stravis);
+DEFINE_PUBLIC_ALIAS(DOS$strnvis_netbsd, libd_strnvis_netbsd);
+DEFINE_PUBLIC_ALIAS(DOS$strnvis, libd_strnvis);
+DEFINE_PUBLIC_ALIAS(DOS$strsvis, libd_strsvis);
+DEFINE_PUBLIC_ALIAS(DOS$strsnvis, libd_strsnvis);
+DEFINE_PUBLIC_ALIAS(DOS$strvisx, libd_strvisx);
+DEFINE_PUBLIC_ALIAS(DOS$strnvisx, libd_strnvisx);
+DEFINE_PUBLIC_ALIAS(DOS$strenvisx, libd_strenvisx);
+DEFINE_PUBLIC_ALIAS(DOS$strsvisx, libd_strsvisx);
+DEFINE_PUBLIC_ALIAS(DOS$strsnvisx, libd_strsnvisx);
+DEFINE_PUBLIC_ALIAS(DOS$strsenvisx, libd_strsenvisx);
+DEFINE_PUBLIC_ALIAS(DOS$strunvis, libd_strunvis);
+DEFINE_PUBLIC_ALIAS(DOS$strnunvis_netbsd, libd_strnunvis_netbsd);
+DEFINE_PUBLIC_ALIAS(DOS$strnunvis, libd_strnunvis);
+DEFINE_PUBLIC_ALIAS(DOS$strunvisx, libd_strunvisx);
+DEFINE_PUBLIC_ALIAS(DOS$strnunvisx, libd_strnunvisx);
+DEFINE_PUBLIC_ALIAS(DOS$unvis, libd_unvis);
 
 /* wchar */
 DEFINE_PUBLIC_ALIAS(DOS$mbsinit, libd_mbsinit);

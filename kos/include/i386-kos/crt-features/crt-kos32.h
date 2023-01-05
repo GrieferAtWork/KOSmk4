@@ -4043,6 +4043,7 @@
 #define __CRT_HAVE_ntp_adjtime64
 #define __CRT_HAVE_ntp_gettimex
 #define __CRT_HAVE_ntp_gettimex64
+#define __CRT_HAVE_nvis
 #define __CRT_HAVE_objalloc_create
 #define __CRT_HAVE_objalloc_free
 #define __CRT_HAVE_objalloc_free_block
@@ -4821,6 +4822,7 @@
 #define __CRT_HAVE_sl_init
 #define __CRT_HAVE_sleep
 #define __CRT_HAVE_snprintf
+#define __CRT_HAVE_snvis
 #define __CRT_HAVE_sockatmark
 #define __CRT_HAVE_socket
 #define __CRT_HAVE_socketcall
@@ -4869,6 +4871,7 @@
 #define __CRT_HAVE_stpcpy
 #define __CRT_HAVE_stpncpy
 #define __CRT_HAVE_str2sig
+#define __CRT_HAVE_stravis
 #define __CRT_HAVE_strcadd
 #define __CRT_HAVE_strcasecmp
 #define __CRT_HAVE_strcasecmp_l
@@ -4894,6 +4897,7 @@
 #define __CRT_HAVE_streadd
 #define __CRT_HAVE_strecpy
 #define __CRT_HAVE_strend
+#define __CRT_HAVE_strenvisx
 #define __CRT_HAVE_strerrno
 #define __CRT_HAVE_strerror
 #define __CRT_HAVE_strerror_l
@@ -4945,8 +4949,14 @@
 #define __CRT_HAVE_strnroff
 #define __CRT_HAVE_strnset
 #define __CRT_HAVE_strnstr
+#define __CRT_HAVE_strnunvis
+#define __CRT_HAVE_strnunvis_netbsd
+#define __CRT_HAVE_strnunvisx
 #define __CRT_HAVE_strnupr
 #define __CRT_HAVE_strnupr_l
+#define __CRT_HAVE_strnvis
+#define __CRT_HAVE_strnvis_netbsd
+#define __CRT_HAVE_strnvisx
 #define __CRT_HAVE_stroff
 #define __CRT_HAVE_strpbrk
 #define __CRT_HAVE_strptime
@@ -4958,10 +4968,13 @@
 #define __CRT_HAVE_strrspn
 #define __CRT_HAVE_strrstr
 #define __CRT_HAVE_strrstrip
+#define __CRT_HAVE_strsenvisx
 #define __CRT_HAVE_strsep
 #define __CRT_HAVE_strset
 #define __CRT_HAVE_strsignal
 #define __CRT_HAVE_strsigno
+#define __CRT_HAVE_strsnvis
+#define __CRT_HAVE_strsnvisx
 #define __CRT_HAVE_strspn
 #define __CRT_HAVE_strstartcmp
 #define __CRT_HAVE_strstartcmpz
@@ -4969,6 +4982,8 @@
 #define __CRT_HAVE_strstrip
 #define __CRT_HAVE_strsuftoll
 #define __CRT_HAVE_strsuftollx
+#define __CRT_HAVE_strsvis
+#define __CRT_HAVE_strsvisx
 #define __CRT_HAVE_strto32
 #define __CRT_HAVE_strto32_l
 #define __CRT_HAVE_strto32_r
@@ -5012,13 +5027,18 @@
 #define __CRT_HAVE_strtoumax_l
 #define __CRT_HAVE_strtouq
 #define __CRT_HAVE_strtrns
+#define __CRT_HAVE_strunvis
+#define __CRT_HAVE_strunvisx
 #define __CRT_HAVE_strupr
 #define __CRT_HAVE_strupr_l
 #define __CRT_HAVE_strverscmp
+#define __CRT_HAVE_strvis
+#define __CRT_HAVE_strvisx
 #define __CRT_HAVE_strxfrm
 #define __CRT_HAVE_strxfrm_l
 #define __CRT_HAVE_stty
 #define __CRT_HAVE_suboptarg
+#define __CRT_HAVE_svis
 #define __CRT_HAVE_swab
 #define __CRT_HAVE_swapcontext
 #define __CRT_HAVE_swapoff
@@ -6231,6 +6251,7 @@
 #define __CRT_HAVE_unmapfile
 #define __CRT_HAVE_unsetenv
 #define __CRT_HAVE_unshare
+#define __CRT_HAVE_unvis
 #define __CRT_HAVE_updwtmp
 #define __CRT_HAVE_updwtmpx
 #define __CRT_HAVE_ur_cthread_self
@@ -6274,6 +6295,7 @@
 #define __CRT_HAVE_vfwscanf_s
 #define __CRT_HAVE_vfwscanf_unlocked
 #define __CRT_HAVE_vhangup
+#define __CRT_HAVE_vis
 #define __CRT_HAVE_vlimit
 #define __CRT_HAVE_vmsplice
 #define __CRT_HAVE_vprintf
