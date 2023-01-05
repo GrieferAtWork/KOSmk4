@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4334fd7a */
+/* HASH CRC-32:0x2ff526a7 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,14 +28,14 @@
 __NAMESPACE_LOCAL_BEGIN
 #if !defined(__local___localdep_crt_pthread_cond_reltimedwait32_np_defined) && defined(__CRT_HAVE_pthread_cond_reltimedwait_np)
 #define __local___localdep_crt_pthread_cond_reltimedwait32_np_defined
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,__localdep_crt_pthread_cond_reltimedwait32_np,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec32 const *__restrict __reltime),pthread_cond_reltimedwait_np,(__cond,__mutex,__reltime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,__localdep_crt_pthread_cond_reltimedwait32_np,(__pthread_cond_t *__restrict __self, __pthread_mutex_t *__restrict __mutex, struct __timespec32 const *__restrict __reltime),pthread_cond_reltimedwait_np,(__self,__mutex,__reltime))
 #endif /* !__local___localdep_crt_pthread_cond_reltimedwait32_np_defined && __CRT_HAVE_pthread_cond_reltimedwait_np */
 #ifndef __local___localdep_pthread_cond_reltimedwait64_np_defined
 #define __local___localdep_pthread_cond_reltimedwait64_np_defined
 #if defined(__CRT_HAVE_pthread_cond_reltimedwait_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_reltimedwait64_np,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __reltime),pthread_cond_reltimedwait_np,(__cond,__mutex,__reltime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_reltimedwait64_np,(__pthread_cond_t *__restrict __self, __pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __reltime),pthread_cond_reltimedwait_np,(__self,__mutex,__reltime))
 #elif defined(__CRT_HAVE_pthread_cond_reltimedwait64_np)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_reltimedwait64_np,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __reltime),pthread_cond_reltimedwait64_np,(__cond,__mutex,__reltime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,__localdep_pthread_cond_reltimedwait64_np,(__pthread_cond_t *__restrict __self, __pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __reltime),pthread_cond_reltimedwait64_np,(__self,__mutex,__reltime))
 #elif defined(__CRT_HAVE_pthread_cond_reltimedwait_np)
 __NAMESPACE_LOCAL_END
 #include <libc/local/pthread/pthread_cond_reltimedwait64_np.h>
@@ -46,20 +46,20 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !... */
 #endif /* !__local___localdep_pthread_cond_reltimedwait64_np_defined */
 __LOCAL_LIBC(pthread_cond_reltimedwait_np) __ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2) __errno_t
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_cond_reltimedwait_np))(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_cond_reltimedwait_np))(__pthread_cond_t *__restrict __self, __pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime) {
 #ifdef __CRT_HAVE_pthread_cond_reltimedwait_np
 	__errno_t __result;
 	struct __timespec32 __reltime32;
 	__reltime32.tv_sec  = (__time32_t)__reltime->tv_sec;
 	__reltime32.tv_nsec = __reltime->tv_nsec;
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_cond_reltimedwait32_np)(__cond, __mutex, &__reltime32);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_cond_reltimedwait32_np)(__self, __mutex, &__reltime32);
 	return __result;
 #else /* __CRT_HAVE_pthread_cond_reltimedwait_np */
 	__errno_t __result;
 	struct __timespec64 __reltime64;
 	__reltime64.tv_sec  = (__time64_t)__reltime->tv_sec;
 	__reltime64.tv_nsec = __reltime->tv_nsec;
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_pthread_cond_reltimedwait64_np)(__cond, __mutex, &__reltime64);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_pthread_cond_reltimedwait64_np)(__self, __mutex, &__reltime64);
 	return __result;
 #endif /* !__CRT_HAVE_pthread_cond_reltimedwait_np */
 }

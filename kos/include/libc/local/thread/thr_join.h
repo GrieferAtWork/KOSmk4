@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc5b72bc */
+/* HASH CRC-32:0x5d293cab */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_join_defined
 #define __local___localdep_pthread_join_defined
-__CREDIRECT(__ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,__localdep_pthread_join,(__pthread_t __pthread, void **__thread_return),pthread_join,(__pthread,__thread_return))
+__CREDIRECT(__ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,__localdep_pthread_join,(__pthread_t __self, void **__thread_return),pthread_join,(__self,__thread_return))
 #endif /* !__local___localdep_pthread_join_defined */
 __LOCAL_LIBC(thr_join) __ATTR_OUT(2) __ATTR_OUT_OPT(3) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(thr_join))(__pthread_t __thr, __pthread_t *__p_departed, void **__thread_return) {

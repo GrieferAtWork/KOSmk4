@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46431f2a */
+/* HASH CRC-32:0xeb47287 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -191,45 +191,45 @@ NOTHROW_NCX(LIBCCALL libc___pthread_cleanup_routine)(struct __pthread_cleanup_fr
 }
 #include <hybrid/__atomic.h>
 /* >> pthread_spin_init(3)
- * Initialize the spinlock `lock'. If `pshared' is nonzero
+ * Initialize the spinlock `self'. If `pshared' is nonzero
  * the  spinlock can be shared between different processes
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT(1) errno_t
-NOTHROW_NCX(LIBCCALL libc_pthread_spin_init)(pthread_spinlock_t *lock,
+NOTHROW_NCX(LIBCCALL libc_pthread_spin_init)(pthread_spinlock_t *self,
                                              int pshared) {
 	(void)pshared;
-	__hybrid_atomic_store(*lock, 0, __ATOMIC_RELAXED);
+	__hybrid_atomic_store(*self, 0, __ATOMIC_RELAXED);
 	return 0;
 }
 /* >> pthread_spin_destroy(3)
- * Destroy the spinlock `lock'
+ * Destroy the spinlock `self'
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
-NOTHROW_NCX(LIBCCALL libc_pthread_spin_destroy)(pthread_spinlock_t *lock) {
+NOTHROW_NCX(LIBCCALL libc_pthread_spin_destroy)(pthread_spinlock_t *self) {
 	COMPILER_IMPURE();
-	(void)lock; /* no-op */
+	(void)self; /* no-op */
 	return 0;
 }
 #include <hybrid/__atomic.h>
 #include <hybrid/sched/__yield.h>
 /* >> pthread_spin_lock(3)
- * Wait until spinlock `lock' is retrieved
+ * Wait until spinlock `self' is retrieved
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
-NOTHROW_NCX(LIBCCALL libc_pthread_spin_lock)(pthread_spinlock_t *lock) {
-	while (libc_pthread_spin_trylock(lock) != 0)
+NOTHROW_NCX(LIBCCALL libc_pthread_spin_lock)(pthread_spinlock_t *self) {
+	while (libc_pthread_spin_trylock(self) != 0)
 		__hybrid_yield();
 	return 0;
 }
 #include <hybrid/__atomic.h>
 #include <libc/errno.h>
 /* >> pthread_spin_trylock(3)
- * Try to lock spinlock `lock'
+ * Try to lock spinlock `self'
  * @return: EOK:   Success
  * @return: EBUSY: Lock has already been acquired */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") WUNUSED ATTR_INOUT(1) errno_t
-NOTHROW_NCX(LIBCCALL libc_pthread_spin_trylock)(pthread_spinlock_t *lock) {
-	if (__hybrid_atomic_xch(*lock, 1, __ATOMIC_ACQUIRE) == 0)
+NOTHROW_NCX(LIBCCALL libc_pthread_spin_trylock)(pthread_spinlock_t *self) {
+	if (__hybrid_atomic_xch(*self, 1, __ATOMIC_ACQUIRE) == 0)
 		return 0;
 
 	return EBUSY;
@@ -243,11 +243,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_spin_trylock)(pthread_spinlock_t *lock) {
 }
 #include <hybrid/__atomic.h>
 /* >> pthread_spin_unlock(3)
- * Release  spinlock  `lock'
+ * Release  spinlock  `self'
  * @return: EOK: Success */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
-NOTHROW_NCX(LIBCCALL libc_pthread_spin_unlock)(pthread_spinlock_t *lock) {
-	__hybrid_atomic_store(*lock, 0, __ATOMIC_RELEASE);
+NOTHROW_NCX(LIBCCALL libc_pthread_spin_unlock)(pthread_spinlock_t *self) {
+	__hybrid_atomic_store(*self, 0, __ATOMIC_RELEASE);
 	return 0;
 }
 #include <hybrid/__atomic.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc7d06aa */
+/* HASH CRC-32:0x9dbd1963 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,18 +27,18 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_pthread_attr_setstackaddr_defined
 #define __local___localdep_crt_pthread_attr_setstackaddr_defined
-__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,__localdep_crt_pthread_attr_setstackaddr,(__pthread_attr_t *__attr, void *__stackaddr),pthread_attr_setstackaddr,(__attr,__stackaddr))
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,__localdep_crt_pthread_attr_setstackaddr,(__pthread_attr_t *__self, void *__stackaddr),pthread_attr_setstackaddr,(__self,__stackaddr))
 #endif /* !__local___localdep_crt_pthread_attr_setstackaddr_defined */
 #ifndef __local___localdep_crt_pthread_attr_setstacksize_defined
 #define __local___localdep_crt_pthread_attr_setstacksize_defined
-__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,__localdep_crt_pthread_attr_setstacksize,(__pthread_attr_t *__attr, __SIZE_TYPE__ __stacksize),pthread_attr_setstacksize,(__attr,__stacksize))
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,__localdep_crt_pthread_attr_setstacksize,(__pthread_attr_t *__self, __SIZE_TYPE__ __stacksize),pthread_attr_setstacksize,(__self,__stacksize))
 #endif /* !__local___localdep_crt_pthread_attr_setstacksize_defined */
 __LOCAL_LIBC(pthread_attr_setstack) __ATTR_INOUT(1) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_attr_setstack))(__pthread_attr_t *__attr, void *__stackaddr, __SIZE_TYPE__ __stacksize) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_attr_setstack))(__pthread_attr_t *__self, void *__stackaddr, __SIZE_TYPE__ __stacksize) {
 	__errno_t __result;
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_attr_setstackaddr)(__attr, __stackaddr);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_attr_setstackaddr)(__self, __stackaddr);
 	if __likely(__result == 0)
-		__result = (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_attr_setstacksize)(__attr, __stacksize);
+		__result = (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_attr_setstacksize)(__self, __stacksize);
 	return __result;
 }
 __NAMESPACE_LOCAL_END

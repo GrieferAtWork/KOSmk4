@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0b82de7 */
+/* HASH CRC-32:0xdcb7d623 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -660,12 +660,12 @@ typedef __size_t size_t;
 /* >> pthread_create(3)
  * Create a  new thread,  starting with  execution of  `start_routine'
  * getting passed `arg'. Creation attributed come from `attr'. The new
- * handle is stored in `*newthread'
+ * handle is stored in `*p_newthread'
  * @return: EOK:    Success
  * @return: EAGAIN: Insufficient resources, or operation-not-permitted
  *                  (read: `ENOMEM', but posix didn't want to use that
  *                  errno for whatever reason...) */
-__CDECLARE_OPT(__ATTR_IN_OPT(2) __ATTR_OUT(1) __ATTR_NONNULL((3)),__errno_t,__NOTHROW_NCX,pthread_create,(pthread_t *__restrict __newthread, pthread_attr_t const *__restrict __attr, void *(__LIBCCALL *__start_routine)(void *__arg), void *__arg),(__newthread,__attr,__start_routine,__arg))
+__CDECLARE_OPT(__ATTR_IN_OPT(2) __ATTR_OUT(1) __ATTR_NONNULL((3)),__errno_t,__NOTHROW_NCX,pthread_create,(pthread_t *__restrict __p_newthread, pthread_attr_t const *__restrict __attr, void *(__LIBCCALL *__start_routine)(void *__arg), void *__arg),(__p_newthread,__attr,__start_routine,__arg))
 #ifdef __CRT_HAVE_pthread_exit
 /* >> pthread_exit(3)
  * Terminate calling thread.
@@ -683,103 +683,103 @@ __CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),__THROWING,pthread_exit,(
 __CREDIRECT_VOID(__ATTR_NORETURN __ATTR_ACCESS_NONE(1),__THROWING,pthread_exit,(void *__retval),cthread_exit,(__retval))
 #endif /* ... */
 /* >> pthread_join(3)
- * Make calling thread wait for termination of the thread `pthread'.
- * The exit status of the  thread is stored in `*thread_return',  if
+ * Make calling thread wait for termination of the thread  `self'.
+ * The exit status of the thread is stored in `*thread_return', if
  * `thread_return' is not `NULL'.
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_join,(pthread_t __pthread, void **__thread_return),(__pthread,__thread_return))
+__CDECLARE_OPT(__ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_join,(pthread_t __self, void **__thread_return),(__self,__thread_return))
 #ifdef __USE_KOS
 /* >> pthread_getresult_np(3)
- * Same as `pthread_join(3)', but don't destroy `pthread' at the end.
- * Instead, the caller must destroy `pthread' themselves via  another
+ * Same as `pthread_join(3)', but don't destroy `self' at the end.
+ * Instead, the caller must destroy `self' themselves via  another
  * call to `pthread_detach(3)'.
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_getresult_np,(pthread_t __pthread, void **__thread_return),(__pthread,__thread_return))
+__CDECLARE_OPT(__ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_getresult_np,(pthread_t __self, void **__thread_return),(__self,__thread_return))
 #endif /* __USE_KOS */
 #ifdef __USE_GNU
 /* >> pthread_tryjoin_np(3)
- * Check whether thread `pthread' has terminated. If so return the
+ * Check whether thread  `self' has terminated.  If so return  the
  * status of the thread in `*thread_return', if `thread_return' is
  * not `NULL'.
  * @return: EOK:   Success
  * @return: EBUSY: The thread has yet to terminate */
-__CDECLARE_OPT(__ATTR_OUT_OPT(2),__errno_t,__NOTHROW_NCX,pthread_tryjoin_np,(pthread_t __pthread, void **__thread_return),(__pthread,__thread_return))
+__CDECLARE_OPT(__ATTR_OUT_OPT(2),__errno_t,__NOTHROW_NCX,pthread_tryjoin_np,(pthread_t __self, void **__thread_return),(__self,__thread_return))
 struct timespec;
 #if defined(__CRT_HAVE_pthread_timedjoin_np) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
- * Make calling thread wait for termination of the thread `pthread',
+ * Make calling thread  wait for termination  of the thread  `self',
  * but only until `timeout'. The exit status of the thread is stored
  * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__CDECLARE(__ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_timedjoin_np,(pthread_t __pthread, void **__thread_return, struct timespec const *__abstime),(__pthread,__thread_return,__abstime))
+__CDECLARE(__ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_timedjoin_np,(pthread_t __self, void **__thread_return, struct timespec const *__abstime),(__self,__thread_return,__abstime))
 #elif defined(__CRT_HAVE_pthread_timedjoin64_np) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
- * Make calling thread wait for termination of the thread `pthread',
+ * Make calling thread  wait for termination  of the thread  `self',
  * but only until `timeout'. The exit status of the thread is stored
  * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__CREDIRECT(__ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_timedjoin_np,(pthread_t __pthread, void **__thread_return, struct timespec const *__abstime),pthread_timedjoin64_np,(__pthread,__thread_return,__abstime))
+__CREDIRECT(__ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_timedjoin_np,(pthread_t __self, void **__thread_return, struct timespec const *__abstime),pthread_timedjoin64_np,(__self,__thread_return,__abstime))
 #elif defined(__CRT_HAVE_pthread_timedjoin64_np) || defined(__CRT_HAVE_pthread_timedjoin_np)
 #include <libc/local/pthread/pthread_timedjoin_np.h>
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
- * Make calling thread wait for termination of the thread `pthread',
+ * Make calling thread  wait for termination  of the thread  `self',
  * but only until `timeout'. The exit status of the thread is stored
  * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(3) __ATTR_OUT_OPT(2) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_timedjoin_np)(pthread_t __pthread, void **__thread_return, struct timespec const *__abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_timedjoin_np))(__pthread, __thread_return, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(3) __ATTR_OUT_OPT(2) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_timedjoin_np)(pthread_t __self, void **__thread_return, struct timespec const *__abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_timedjoin_np))(__self, __thread_return, __abstime); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_pthread_timedjoin_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
- * Make calling thread wait for termination of the thread `pthread',
+ * Make calling thread  wait for termination  of the thread  `self',
  * but only until `timeout'. The exit status of the thread is stored
  * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__CREDIRECT(__ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_timedjoin64_np,(pthread_t __pthread, void **__thread_return, struct timespec64 const *__abstime),pthread_timedjoin_np,(__pthread,__thread_return,__abstime))
+__CREDIRECT(__ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_timedjoin64_np,(pthread_t __self, void **__thread_return, struct timespec64 const *__abstime),pthread_timedjoin_np,(__self,__thread_return,__abstime))
 #elif defined(__CRT_HAVE_pthread_timedjoin64_np)
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
- * Make calling thread wait for termination of the thread `pthread',
+ * Make calling thread  wait for termination  of the thread  `self',
  * but only until `timeout'. The exit status of the thread is stored
  * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__CDECLARE(__ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_timedjoin64_np,(pthread_t __pthread, void **__thread_return, struct timespec64 const *__abstime),(__pthread,__thread_return,__abstime))
+__CDECLARE(__ATTR_IN_OPT(3) __ATTR_OUT_OPT(2),__errno_t,__NOTHROW_RPC,pthread_timedjoin64_np,(pthread_t __self, void **__thread_return, struct timespec64 const *__abstime),(__self,__thread_return,__abstime))
 #elif defined(__CRT_HAVE_pthread_timedjoin_np)
 #include <libc/local/pthread/pthread_timedjoin64_np.h>
 /* >> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
- * Make calling thread wait for termination of the thread `pthread',
+ * Make calling thread  wait for termination  of the thread  `self',
  * but only until `timeout'. The exit status of the thread is stored
  * in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(3) __ATTR_OUT_OPT(2) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_timedjoin64_np)(pthread_t __pthread, void **__thread_return, struct timespec64 const *__abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_timedjoin64_np))(__pthread, __thread_return, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(3) __ATTR_OUT_OPT(2) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_timedjoin64_np)(pthread_t __self, void **__thread_return, struct timespec64 const *__abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_timedjoin64_np))(__self, __thread_return, __abstime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_GNU */
 #ifdef __CRT_HAVE_pthread_detach
 /* >> pthread_detach(3)
- * Indicate  that the  thread `pthread' is  never to be  joined with `pthread_join(3)'.
- * The  resources  of   `pthread'  will   therefore  be  freed   immediately  when   it
- * terminates, instead of waiting for another thread to perform `pthread_join(3)' on it
+ * Indicate that the thread `self' is  never to be joined with  `pthread_join(3)'.
+ * The resources of `self' will therefore be freed immediately when it terminates,
+ * instead of waiting for another thread to perform `pthread_join(3)' on it
  * @return: EOK: Success */
-__CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_detach,(pthread_t __pthread),(__pthread))
+__CDECLARE(,__errno_t,__NOTHROW_NCX,pthread_detach,(pthread_t __self),(__self))
 #elif defined(__CRT_HAVE_cthread_detach)
 /* >> pthread_detach(3)
- * Indicate  that the  thread `pthread' is  never to be  joined with `pthread_join(3)'.
- * The  resources  of   `pthread'  will   therefore  be  freed   immediately  when   it
- * terminates, instead of waiting for another thread to perform `pthread_join(3)' on it
+ * Indicate that the thread `self' is  never to be joined with  `pthread_join(3)'.
+ * The resources of `self' will therefore be freed immediately when it terminates,
+ * instead of waiting for another thread to perform `pthread_join(3)' on it
  * @return: EOK: Success */
-__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_detach,(pthread_t __pthread),cthread_detach,(__pthread))
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_detach,(pthread_t __self),cthread_detach,(__self))
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_self
 /* >> pthread_self(3)
@@ -825,82 +825,82 @@ __LOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL pthread_equal)(pthr
 /* Thread attribute handling. */
 
 /* >> pthread_attr_init(3)
- * Initialize thread  attribute `*attr'  with default  attributes (detachstate  is
+ * Initialize thread  attribute `*self'  with default  attributes (detachstate  is
  * `PTHREAD_JOINABLE', scheduling policy is `SCHED_OTHER', no user-provided stack)
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_init,(pthread_attr_t *__attr),(__attr))
+__CDECLARE_OPT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_init,(pthread_attr_t *__self),(__self))
 /* >> pthread_attr_destroy(3)
- * Destroy thread attribute `*attr'
+ * Destroy thread attribute `*self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_destroy,(pthread_attr_t *__attr),(__attr))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_destroy,(pthread_attr_t *__self),(__self))
 /* >> pthread_attr_getdetachstate(3)
  * Get   detach   state    attribute
  * @param: *detachstate: One of `PTHREAD_CREATE_JOINABLE', `PTHREAD_CREATE_DETACHED'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_attr_getdetachstate,(pthread_attr_t const *__restrict __attr, int *__restrict __detachstate),(__attr,__detachstate))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_attr_getdetachstate,(pthread_attr_t const *__restrict __self, int *__restrict __detachstate),(__self,__detachstate))
 /* >> pthread_attr_setdetachstate(3)
  * Set   detach   state    attribute
  * @param: detachstate: One of `PTHREAD_CREATE_JOINABLE', `PTHREAD_CREATE_DETACHED'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `detachstate' */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setdetachstate,(pthread_attr_t *__attr, int __detachstate),(__attr,__detachstate))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setdetachstate,(pthread_attr_t *__self, int __detachstate),(__self,__detachstate))
 /* >> pthread_attr_getguardsize(3)
  * Get the size of the guard area created for stack overflow protection
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_attr_getguardsize,(pthread_attr_t const *__restrict __attr, size_t *__restrict __guardsize),(__attr,__guardsize))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_attr_getguardsize,(pthread_attr_t const *__restrict __self, size_t *__restrict __guardsize),(__self,__guardsize))
 /* >> pthread_attr_setguardsize(3)
  * Set the size of the guard area created for stack overflow protection
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setguardsize,(pthread_attr_t *__attr, size_t __guardsize),(__attr,__guardsize))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setguardsize,(pthread_attr_t *__self, size_t __guardsize),(__self,__guardsize))
 /* >> pthread_attr_getschedparam(3)
- * Return in `*param' the scheduling parameters of `*attr'
+ * Return in `*param' the scheduling parameters of `*self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_attr_getschedparam,(pthread_attr_t const *__restrict __attr, struct sched_param *__restrict __param),(__attr,__param))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_attr_getschedparam,(pthread_attr_t const *__restrict __self, struct sched_param *__restrict __param),(__self,__param))
 /* >> pthread_attr_setschedparam(3)
- * Set scheduling parameters (priority, etc) in `*attr' according to `param'
+ * Set scheduling parameters (priority, etc) in `*self' according to `param'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `param' */
-__CDECLARE_OPT(__ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setschedparam,(pthread_attr_t *__restrict __attr, struct sched_param const *__restrict __param),(__attr,__param))
+__CDECLARE_OPT(__ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setschedparam,(pthread_attr_t *__restrict __self, struct sched_param const *__restrict __param),(__self,__param))
 /* >> pthread_attr_getschedpolicy(3)
- * Return in `*policy' the scheduling policy of `*attr'
+ * Return in `*policy' the scheduling policy of `*self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_attr_getschedpolicy,(pthread_attr_t const *__restrict __attr, int *__restrict __policy),(__attr,__policy))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_attr_getschedpolicy,(pthread_attr_t const *__restrict __self, int *__restrict __policy),(__self,__policy))
 /* >> pthread_attr_setschedpolicy(3)
- * Set scheduling policy in `*attr' according to `policy'
+ * Set scheduling policy in `*self' according to `policy'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `policy' */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setschedpolicy,(pthread_attr_t *__attr, int __policy),(__attr,__policy))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setschedpolicy,(pthread_attr_t *__self, int __policy),(__self,__policy))
 /* >> pthread_attr_getinheritsched(3)
- * Return in `*inherit' the scheduling inheritance mode of `*attr'
+ * Return in `*inherit' the scheduling inheritance mode of `*self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_attr_getinheritsched,(pthread_attr_t const *__restrict __attr, int *__restrict __inherit),(__attr,__inherit))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_attr_getinheritsched,(pthread_attr_t const *__restrict __self, int *__restrict __inherit),(__self,__inherit))
 /* >> pthread_attr_setinheritsched(3)
- * Set scheduling inheritance mode in `*attr' according to `inherit'
+ * Set scheduling inheritance mode in `*self' according to `inherit'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `inherit' */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setinheritsched,(pthread_attr_t *__attr, int __inherit),(__attr,__inherit))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setinheritsched,(pthread_attr_t *__self, int __inherit),(__self,__inherit))
 /* >> pthread_attr_getscope(3)
- * Return in `*scope' the scheduling contention scope of `*attr'
+ * Return in `*scope' the scheduling contention scope of `*self'
  * @param:  scope: Filled with one of `PTHREAD_SCOPE_*'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_attr_getscope,(pthread_attr_t const *__restrict __attr, int *__restrict __scope),(__attr,__scope))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_attr_getscope,(pthread_attr_t const *__restrict __self, int *__restrict __scope),(__self,__scope))
 /* >> pthread_attr_setscope(3)
- * Set scheduling contention scope in `*attr' according to `scope'
+ * Set scheduling contention scope in `*self' according to `scope'
  * @param:  scope:  One of `PTHREAD_SCOPE_*'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `scope' */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setscope,(pthread_attr_t *__attr, int __scope),(__attr,__scope))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setscope,(pthread_attr_t *__self, int __scope),(__self,__scope))
 #ifdef __CRT_HAVE_pthread_attr_getstackaddr
 /* >> pthread_attr_getstackaddr(3)
  * Return the previously set address for the stack
  * @return: EOK: Success */
-__CDECLARE(__ATTR_DEPRECATED("Use pthread_attr_getstack()") __ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_attr_getstackaddr,(pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr),(__attr,__stackaddr))
+__CDECLARE(__ATTR_DEPRECATED("Use pthread_attr_getstack()") __ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_attr_getstackaddr,(pthread_attr_t const *__restrict __self, void **__restrict __stackaddr),(__self,__stackaddr))
 #elif defined(__CRT_HAVE_pthread_attr_getstack)
 #include <libc/local/pthread/pthread_attr_getstackaddr.h>
 /* >> pthread_attr_getstackaddr(3)
  * Return the previously set address for the stack
  * @return: EOK: Success */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_getstackaddr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Use pthread_attr_getstack()") __ATTR_IN(1) __ATTR_OUT(2) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_getstackaddr)(pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_getstackaddr))(__attr, __stackaddr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_getstackaddr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Use pthread_attr_getstack()") __ATTR_IN(1) __ATTR_OUT(2) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_getstackaddr)(pthread_attr_t const *__restrict __self, void **__restrict __stackaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_getstackaddr))(__self, __stackaddr); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_attr_setstackaddr
 /* >> pthread_attr_setstackaddr(3)
@@ -910,7 +910,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_getstackaddr, __FORCELOCAL __ATTR_A
  * minimal size of the block must be `PTHREAD_STACK_MIN'
  * @return: EOK:    Success
  * @return: EINVAL: The stack isn't suitably aligned */
-__CDECLARE(__ATTR_DEPRECATED("Use pthread_attr_setstack()") __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setstackaddr,(pthread_attr_t *__attr, void *__stackaddr),(__attr,__stackaddr))
+__CDECLARE(__ATTR_DEPRECATED("Use pthread_attr_setstack()") __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setstackaddr,(pthread_attr_t *__self, void *__stackaddr),(__self,__stackaddr))
 #elif (defined(__CRT_HAVE_pthread_attr_getstack) || (defined(__CRT_HAVE_pthread_attr_getstackaddr) && defined(__CRT_HAVE_pthread_attr_getstacksize))) && defined(__CRT_HAVE_pthread_attr_setstack)
 #include <libc/local/pthread/pthread_attr_setstackaddr.h>
 /* >> pthread_attr_setstackaddr(3)
@@ -920,19 +920,19 @@ __CDECLARE(__ATTR_DEPRECATED("Use pthread_attr_setstack()") __ATTR_INOUT(1),__er
  * minimal size of the block must be `PTHREAD_STACK_MIN'
  * @return: EOK:    Success
  * @return: EINVAL: The stack isn't suitably aligned */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_setstackaddr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Use pthread_attr_setstack()") __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_setstackaddr)(pthread_attr_t *__attr, void *__stackaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_setstackaddr))(__attr, __stackaddr); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_setstackaddr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_DEPRECATED("Use pthread_attr_setstack()") __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_setstackaddr)(pthread_attr_t *__self, void *__stackaddr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_setstackaddr))(__self, __stackaddr); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_attr_getstacksize
 /* >> pthread_attr_getstacksize(3)
  * Return the currently used minimal stack size
  * @return: EOK: Success */
-__CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_attr_getstacksize,(pthread_attr_t const *__restrict __attr, size_t *__restrict __stacksize),(__attr,__stacksize))
+__CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_attr_getstacksize,(pthread_attr_t const *__restrict __self, size_t *__restrict __stacksize),(__self,__stacksize))
 #elif defined(__CRT_HAVE_pthread_attr_getstack)
 #include <libc/local/pthread/pthread_attr_getstacksize.h>
 /* >> pthread_attr_getstacksize(3)
  * Return the currently used minimal stack size
  * @return: EOK: Success */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_getstacksize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_OUT(2) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_getstacksize)(pthread_attr_t const *__restrict __attr, size_t *__restrict __stacksize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_getstacksize))(__attr, __stacksize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_getstacksize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_OUT(2) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_getstacksize)(pthread_attr_t const *__restrict __self, size_t *__restrict __stacksize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_getstacksize))(__self, __stacksize); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_attr_setstacksize
 /* >> pthread_attr_setstacksize(3)
@@ -941,7 +941,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_getstacksize, __FORCELOCAL __ATTR_A
  * and must also not exceed the system limits
  * @return: EOK:    Success
  * @return: EINVAL: `stacksize' is too small */
-__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setstacksize,(pthread_attr_t *__attr, size_t __stacksize),(__attr,__stacksize))
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setstacksize,(pthread_attr_t *__self, size_t __stacksize),(__self,__stacksize))
 #elif (defined(__CRT_HAVE_pthread_attr_getstack) || (defined(__CRT_HAVE_pthread_attr_getstackaddr) && defined(__CRT_HAVE_pthread_attr_getstacksize))) && defined(__CRT_HAVE_pthread_attr_setstack)
 #include <libc/local/pthread/pthread_attr_setstacksize.h>
 /* >> pthread_attr_setstacksize(3)
@@ -950,20 +950,20 @@ __CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setstacksize,(pt
  * and must also not exceed the system limits
  * @return: EOK:    Success
  * @return: EINVAL: `stacksize' is too small */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_setstacksize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_setstacksize)(pthread_attr_t *__attr, size_t __stacksize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_setstacksize))(__attr, __stacksize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_setstacksize, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_setstacksize)(pthread_attr_t *__self, size_t __stacksize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_setstacksize))(__self, __stacksize); })
 #endif /* ... */
 #ifdef __USE_XOPEN2K
 #ifdef __CRT_HAVE_pthread_attr_getstack
 /* >> pthread_attr_getstack(3)
  * Return the previously set address for the stack
  * @return: EOK: Success */
-__CDECLARE(__ATTR_IN(1) __ATTR_OUT(2) __ATTR_OUT(3),__errno_t,__NOTHROW_NCX,pthread_attr_getstack,(pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr, size_t *__restrict __stacksize),(__attr,__stackaddr,__stacksize))
+__CDECLARE(__ATTR_IN(1) __ATTR_OUT(2) __ATTR_OUT(3),__errno_t,__NOTHROW_NCX,pthread_attr_getstack,(pthread_attr_t const *__restrict __self, void **__restrict __stackaddr, size_t *__restrict __stacksize),(__self,__stackaddr,__stacksize))
 #elif defined(__CRT_HAVE_pthread_attr_getstackaddr) && defined(__CRT_HAVE_pthread_attr_getstacksize)
 #include <libc/local/pthread/pthread_attr_getstack.h>
 /* >> pthread_attr_getstack(3)
  * Return the previously set address for the stack
  * @return: EOK: Success */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_getstack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_OUT(2) __ATTR_OUT(3) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_getstack)(pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr, size_t *__restrict __stacksize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_getstack))(__attr, __stackaddr, __stacksize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_getstack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_OUT(2) __ATTR_OUT(3) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_getstack)(pthread_attr_t const *__restrict __self, void **__restrict __stackaddr, size_t *__restrict __stacksize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_getstack))(__self, __stackaddr, __stacksize); })
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_attr_setstack
 /* >> pthread_attr_setstack(3)
@@ -972,7 +972,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_getstack, __FORCELOCAL __ATTR_ARTIF
  * address will make the implementation on some architectures impossible
  * @return: EOK:    Success
  * @return: EINVAL: `stacksize' is too small, or the stack isn't suitably aligned */
-__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setstack,(pthread_attr_t *__attr, void *__stackaddr, size_t __stacksize),(__attr,__stackaddr,__stacksize))
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setstack,(pthread_attr_t *__self, void *__stackaddr, size_t __stacksize),(__self,__stackaddr,__stacksize))
 #elif defined(__CRT_HAVE_pthread_attr_setstackaddr) && defined(__CRT_HAVE_pthread_attr_setstacksize)
 #include <libc/local/pthread/pthread_attr_setstack.h>
 /* >> pthread_attr_setstack(3)
@@ -981,7 +981,7 @@ __CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_attr_setstack,(pthrea
  * address will make the implementation on some architectures impossible
  * @return: EOK:    Success
  * @return: EINVAL: `stacksize' is too small, or the stack isn't suitably aligned */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_setstack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_setstack)(pthread_attr_t *__attr, void *__stackaddr, size_t __stacksize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_setstack))(__attr, __stackaddr, __stacksize); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_attr_setstack, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_attr_setstack)(pthread_attr_t *__self, void *__stackaddr, size_t __stacksize) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_attr_setstack))(__self, __stackaddr, __stacksize); })
 #endif /* ... */
 #endif /* __USE_XOPEN2K */
 #ifdef __USE_GNU
@@ -994,12 +994,12 @@ typedef struct __cpu_set_struct cpu_set_t;
  * @return: EOK:    Success
  * @return: EINVAL: The given set contains a non-existant CPU
  * @return: ENOMEM: Insufficient memory */
-__CDECLARE_OPT(__ATTR_INOUT(1) __ATTR_IN_OPT(3),__errno_t,__NOTHROW_NCX,pthread_attr_setaffinity_np,(pthread_attr_t *__attr, size_t __cpusetsize, cpu_set_t const *__cpuset),(__attr,__cpusetsize,__cpuset))
+__CDECLARE_OPT(__ATTR_INOUT(1) __ATTR_IN_OPT(3),__errno_t,__NOTHROW_NCX,pthread_attr_setaffinity_np,(pthread_attr_t *__self, size_t __cpusetsize, cpu_set_t const *__cpuset),(__self,__cpusetsize,__cpuset))
 /* >> pthread_attr_getaffinity_np(3)
  * Get cpuset on which the thread will be allowed to run
  * @return: EOK:    Success
  * @return: EINVAL: `cpusetsize' is too small */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT_OPT(3),__errno_t,__NOTHROW_NCX,pthread_attr_getaffinity_np,(pthread_attr_t const *__attr, size_t __cpusetsize, cpu_set_t *__cpuset),(__attr,__cpusetsize,__cpuset))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT_OPT(3),__errno_t,__NOTHROW_NCX,pthread_attr_getaffinity_np,(pthread_attr_t const *__self, size_t __cpusetsize, cpu_set_t *__cpuset),(__self,__cpusetsize,__cpuset))
 /* >> pthread_getattr_default_np(3)
  * Get the default attributes used by `pthread_create(3)' when given `NULL' for its `attr' argument.
  * @return: EOK:    Success
@@ -1011,78 +1011,78 @@ __CDECLARE_OPT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_getattr_default_np,
  * @return: ENOMEM: Insufficient memory */
 __CDECLARE_OPT(__ATTR_IN(1),__errno_t,__NOTHROW_NCX,pthread_setattr_default_np,(pthread_attr_t const *__attr),(__attr))
 /* >> pthread_getattr_np(3)
- * Initialize thread  attribute `*attr'  with attributes  corresponding to  the
- * already running thread `pthread'. It shall be called on uninitialized `attr'
+ * Initialize thread attribute `*attr' with attributes corresponding to  the
+ * already running thread `self'. It shall be called on uninitialized `attr'
  * and destroyed with `pthread_attr_destroy(3)' when no longer needed
  * @return: EOK:    Success
  * @return: ENOMEM: Insufficient memory */
-__CDECLARE_OPT(__ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_getattr_np,(pthread_t __pthread, pthread_attr_t *__attr),(__pthread,__attr))
+__CDECLARE_OPT(__ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_getattr_np,(pthread_t __self, pthread_attr_t *__attr),(__self,__attr))
 #endif /* __USE_GNU */
 
 /* Functions for scheduling control. */
 
 /* >> pthread_setschedparam(3)
- * Set the scheduling parameters for `target_thread' according to `policy' and `*param'
+ * Set the scheduling parameters for `self' according to `policy' and `*param'
  * @return: EOK:    Success
  * @return: EPERM:  The caller isn't allowed to specify `policy' and `param'
- * @return: ESRCH:  `pthread' has already exited
+ * @return: ESRCH:  `self' has already exited
  * @return: EINVAL: Invalid/unsupported `policy', or `param' is malformed for `policy' */
-__CDECLARE_OPT(__ATTR_IN(3),__errno_t,__NOTHROW_NCX,pthread_setschedparam,(pthread_t __target_thread, int __policy, struct sched_param const *__param),(__target_thread,__policy,__param))
+__CDECLARE_OPT(__ATTR_IN(3),__errno_t,__NOTHROW_NCX,pthread_setschedparam,(pthread_t __self, int __policy, struct sched_param const *__param),(__self,__policy,__param))
 /* >> pthread_getschedparam(3)
- * Return in `*policy' and `*param' the scheduling parameters for `target_thread'
+ * Return in `*policy' and `*param' the scheduling parameters for `self'
  * @return: EOK:   Success
- * @return: ESRCH: `pthread' has already exited */
-__CDECLARE_OPT(__ATTR_OUT(2) __ATTR_OUT(3),__errno_t,__NOTHROW_NCX,pthread_getschedparam,(pthread_t __target_thread, int *__restrict __policy, struct sched_param *__restrict __param),(__target_thread,__policy,__param))
+ * @return: ESRCH: `self' has already exited */
+__CDECLARE_OPT(__ATTR_OUT(2) __ATTR_OUT(3),__errno_t,__NOTHROW_NCX,pthread_getschedparam,(pthread_t __self, int *__restrict __policy, struct sched_param *__restrict __param),(__self,__policy,__param))
 /* >> pthread_setschedprio(3)
- * Set the scheduling priority for `target_thread'
+ * Set the scheduling priority for `self'
  * @return: EOK:    Success
  * @return: EPERM:  The caller isn't allowed to specify `prio'
- * @return: ESRCH:  `pthread' has already exited
+ * @return: ESRCH:  `self' has already exited
  * @return: EINVAL: Invalid/unsupported `prio' */
-__CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_setschedprio,(pthread_t __target_thread, int __prio),(__target_thread,__prio))
+__CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_setschedprio,(pthread_t __self, int __prio),(__self,__prio))
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_pthread_getname_np
 /* >> pthread_getname_np(3)
  * Get thread name visible in the kernel and its interfaces
  * @return: EOK:    Success
  * @return: ERANGE: The given `buflen' is too small */
-__CDECLARE(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_NCX,pthread_getname_np,(pthread_t __target_thread, char *__buf, size_t __buflen),(__target_thread,__buf,__buflen))
+__CDECLARE(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_NCX,pthread_getname_np,(pthread_t __self, char *__buf, size_t __buflen),(__self,__buf,__buflen))
 #elif defined(__CRT_HAVE_pthread_get_name_np)
 /* >> pthread_getname_np(3)
  * Get thread name visible in the kernel and its interfaces
  * @return: EOK:    Success
  * @return: ERANGE: The given `buflen' is too small */
-__CREDIRECT(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_NCX,pthread_getname_np,(pthread_t __target_thread, char *__buf, size_t __buflen),pthread_get_name_np,(__target_thread,__buf,__buflen))
+__CREDIRECT(__ATTR_OUTS(2, 3),__errno_t,__NOTHROW_NCX,pthread_getname_np,(pthread_t __self, char *__buf, size_t __buflen),pthread_get_name_np,(__self,__buf,__buflen))
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_setname_np
 /* >> pthread_setname_np(3)
  * Set thread name visible in the kernel and its interfaces
  * @return: EOK:    Success
  * @return: ERANGE: The given `name' is too long */
-__CDECLARE(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __target_thread, const char *__name),(__target_thread,__name))
+__CDECLARE(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __self, const char *__name),(__self,__name))
 #elif defined(__CRT_HAVE_pthread_set_name_np)
 /* >> pthread_setname_np(3)
  * Set thread name visible in the kernel and its interfaces
  * @return: EOK:    Success
  * @return: ERANGE: The given `name' is too long */
-__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __target_thread, const char *__name),pthread_set_name_np,(__target_thread,__name))
+__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __self, const char *__name),pthread_set_name_np,(__self,__name))
 #elif defined(__CRT_HAVE_cthread_set_name)
 /* >> pthread_setname_np(3)
  * Set thread name visible in the kernel and its interfaces
  * @return: EOK:    Success
  * @return: ERANGE: The given `name' is too long */
-__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __target_thread, const char *__name),cthread_set_name,(__target_thread,__name))
+__CREDIRECT(__ATTR_IN(2),__errno_t,__NOTHROW_NCX,pthread_setname_np,(pthread_t __self, const char *__name),cthread_set_name,(__self,__name))
 #endif /* ... */
 #endif /* __USE_GNU */
 #ifdef __USE_KOS
 #if !defined(__pthread_gettid_np_defined) && defined(__CRT_HAVE_pthread_gettid_np)
 #define __pthread_gettid_np_defined
 /* >> pthread_gettid_np(3)
- * Return the TID of the given `target_thread'.
- * If the given `target_thread' has already terminated, 0 is returned
+ * Return the TID of the given `self'.
+ * If `self' has already terminated, 0 is returned
  * @return: * : The TID of the given thread
- * @return: 0 : The given `target_thread' has already terminated */
-__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,pthread_gettid_np,(pthread_t __target_thread),(__target_thread))
+ * @return: 0 : The given `self' has already terminated */
+__CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,pthread_gettid_np,(pthread_t __self),(__self))
 #endif /* !__pthread_gettid_np_defined && __CRT_HAVE_pthread_gettid_np */
 /* >> pthread_mainthread_np(3)
  * Obtain the identifier of the main thread
@@ -1090,15 +1090,15 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,pthread_gettid_np,(p
 __CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,pthread_t,__NOTHROW,pthread_mainthread_np,(void),())
 struct rpc_context;
 /* >> pthread_rpc_exec(3)
- * Schedule an RPC for `target_thread' to-be executed the next  time
- * it makes a call to a cancellation-point system call (or interrupt
- * an active system call, should one such currently be in progress).
+ * Schedule an RPC for `self' to-be  executed the next time it  makes
+ * a call to a cancellation-point system call (or interrupt an active
+ * system call, should one such currently be in progress).
  *   - RPCs are also executed by `pthread_testcancel(3)'
  *   - The `struct rpc_context' structure is defined in `<kos/rpc.h>'
  * @return: 0:      Success
  * @return: ENOMEM: Insufficient system memory
- * @return: ESRCH:  The given `target_thread' has already terminated */
-__CDECLARE_OPT(__ATTR_WUNUSED,__errno_t,__NOTHROW_RPC,pthread_rpc_exec,(pthread_t __target_thread, void (__LIBKCALL *__func)(struct rpc_context *__restrict __ctx, void *__cookie), void *__cookie),(__target_thread,__func,__cookie))
+ * @return: ESRCH:  The given thread `self' has already terminated */
+__CDECLARE_OPT(__ATTR_WUNUSED,__errno_t,__NOTHROW_RPC,pthread_rpc_exec,(pthread_t __self, void (__LIBKCALL *__func)(struct rpc_context *__restrict __ctx, void *__cookie), void *__cookie),(__self,__func,__cookie))
 #endif /* __USE_KOS */
 #ifdef __USE_UNIX98
 #ifdef __CRT_HAVE_pthread_getconcurrency
@@ -1193,15 +1193,15 @@ __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),thr_yield,())
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,pthread_yield,(void),cthread_yield,())
 #endif /* ... */
 /* >> pthread_setaffinity_np(3)
- * Limit specified thread `pthread' to run only on the processors represented in `cpuset'
+ * Limit specified thread `self' to run only on the processors represented in `cpuset'
  * @return: EOK:   Success
- * @return: ESRCH: `pthread' has already exited */
-__CDECLARE_OPT(__ATTR_IN_OPT(3),__errno_t,__NOTHROW_NCX,pthread_setaffinity_np,(pthread_t __pthread, size_t __cpusetsize, cpu_set_t const *__cpuset),(__pthread,__cpusetsize,__cpuset))
+ * @return: ESRCH: `self' has already exited */
+__CDECLARE_OPT(__ATTR_IN_OPT(3),__errno_t,__NOTHROW_NCX,pthread_setaffinity_np,(pthread_t __self, size_t __cpusetsize, cpu_set_t const *__cpuset),(__self,__cpusetsize,__cpuset))
 /* >> pthread_getaffinity_np(3)
- * Get bit set in `cpuset' representing the processors `pthread' can run on
+ * Get bit set in `cpuset' representing the processors `self' can run on
  * @return: EOK:   Success
- * @return: ESRCH: `pthread' has already exited */
-__CDECLARE_OPT(__ATTR_OUT_OPT(3),__errno_t,__NOTHROW_NCX,pthread_getaffinity_np,(pthread_t __pthread, size_t __cpusetsize, cpu_set_t *__cpuset),(__pthread,__cpusetsize,__cpuset))
+ * @return: ESRCH: `self' has already exited */
+__CDECLARE_OPT(__ATTR_OUT_OPT(3),__errno_t,__NOTHROW_NCX,pthread_getaffinity_np,(pthread_t __self, size_t __cpusetsize, cpu_set_t *__cpuset),(__self,__cpusetsize,__cpuset))
 #endif /* __USE_GNU */
 
 /* Functions for handling initialization. */
@@ -1253,10 +1253,10 @@ __CDECLARE_OPT(__ATTR_OUT_OPT(2),__errno_t,__NOTHROW_NCX,pthread_setcancelstate,
 __CDECLARE(__ATTR_OUT_OPT(2),__errno_t,__NOTHROW_NCX,pthread_setcanceltype,(int __type, int *__oldtype),(__type,__oldtype))
 #endif /* !__pthread_setcanceltype_defined && __CRT_HAVE_pthread_setcanceltype */
 /* >> pthread_cancel(3)
- * Cancel `pthread' immediately or at the next possibility
+ * Cancel `self' immediately or at the next possibility
  * @return: EOK:   Success
- * @return: ESRCH: `pthread' has already exited */
-__CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_cancel,(pthread_t __pthread),(__pthread))
+ * @return: ESRCH: `self' has already exited */
+__CDECLARE_OPT(,__errno_t,__NOTHROW_NCX,pthread_cancel,(pthread_t __self),(__self))
 /* >> pthread_testcancel(3)
  * Test for pending cancellation for the current thread and terminate the
  * thread as per `pthread_exit(PTHREAD_CANCELED)' if it has been canceled */
@@ -1480,31 +1480,31 @@ __CREDIRECT(__ATTR_OUT(1),int,__NOTHROW_NCX,__sigsetjmp,(struct __jmp_buf_tag *_
 /************************************************************************/
 
 /* >> pthread_mutex_init(3)
- * Initialize the given `mutex'
+ * Initialize the given mutex `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_init,(pthread_mutex_t *__mutex, pthread_mutexattr_t const *__mutexattr),(__mutex,__mutexattr))
+__CDECLARE_OPT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_init,(pthread_mutex_t *__self, pthread_mutexattr_t const *__mutexattr),(__self,__mutexattr))
 #ifdef __CRT_HAVE_pthread_mutex_destroy
 /* >> pthread_mutex_destroy(3)
- * Destroy  the  given `mutex'
+ * Destroy the given mutex `self'
  * @return: EOK: Success */
-__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_destroy,(pthread_mutex_t *__mutex),(__mutex))
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_destroy,(pthread_mutex_t *__self),(__self))
 #elif defined(__CRT_HAVE_mtx_destroy)
 /* >> pthread_mutex_destroy(3)
- * Destroy  the  given `mutex'
+ * Destroy the given mutex `self'
  * @return: EOK: Success */
-__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_destroy,(pthread_mutex_t *__mutex),mtx_destroy,(__mutex))
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_destroy,(pthread_mutex_t *__self),mtx_destroy,(__self))
 #endif /* ... */
 /* >> pthread_mutex_trylock(3)
- * Try locking the given `mutex'
+ * Try locking the given mutex `self'
  * @return: EOK:   Success
  * @return: EBUSY: The  mutex  has  already  been   locked
  *                 In case of  a recursive mutex,  another
  *                 thread was the one to acquire the lock. */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_trylock,(pthread_mutex_t *__mutex),(__mutex))
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_trylock,(pthread_mutex_t *__self),(__self))
 /* >> pthread_mutex_lock(3)
- * Lock  the  given `mutex'
+ * Lock the given mutex `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_lock,(pthread_mutex_t *__mutex),(__mutex))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_lock,(pthread_mutex_t *__self),(__self))
 #ifdef __USE_XOPEN2K
 #if defined(__CRT_HAVE_pthread_mutex_timedlock) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> pthread_mutex_timedlock(3), pthread_mutex_timedlock64(3)
@@ -1512,14 +1512,14 @@ __CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_lock,(pthre
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_timedlock,(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),(__mutex,__abstime))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_timedlock,(pthread_mutex_t *__restrict __self, struct timespec const *__restrict __abstime),(__self,__abstime))
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> pthread_mutex_timedlock(3), pthread_mutex_timedlock64(3)
  * Wait until lock becomes available, or specified time passes
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_timedlock,(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_mutex_timedlock64,(__mutex,__abstime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_timedlock,(pthread_mutex_t *__restrict __self, struct timespec const *__restrict __abstime),pthread_mutex_timedlock64,(__self,__abstime))
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock64) || defined(__CRT_HAVE_pthread_mutex_timedlock)
 #include <libc/local/pthread/pthread_mutex_timedlock.h>
 /* >> pthread_mutex_timedlock(3), pthread_mutex_timedlock64(3)
@@ -1527,7 +1527,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_timedlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_mutex_timedlock)(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_timedlock))(__mutex, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_timedlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_mutex_timedlock)(pthread_mutex_t *__restrict __self, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_timedlock))(__self, __abstime); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_pthread_mutex_timedlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -1536,14 +1536,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_timedlock, __FORCELOCAL __ATTR_ART
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_timedlock64,(pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime),pthread_mutex_timedlock,(__mutex,__abstime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_timedlock64,(pthread_mutex_t *__restrict __self, struct timespec64 const *__restrict __abstime),pthread_mutex_timedlock,(__self,__abstime))
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock64)
 /* >> pthread_mutex_timedlock(3), pthread_mutex_timedlock64(3)
  * Wait until lock becomes available, or specified time passes
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_timedlock64,(pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime),(__mutex,__abstime))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_timedlock64,(pthread_mutex_t *__restrict __self, struct timespec64 const *__restrict __abstime),(__self,__abstime))
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock)
 #include <libc/local/pthread/pthread_mutex_timedlock64.h>
 /* >> pthread_mutex_timedlock(3), pthread_mutex_timedlock64(3)
@@ -1551,7 +1551,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,p
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_timedlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_mutex_timedlock64)(pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_timedlock64))(__mutex, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_timedlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_mutex_timedlock64)(pthread_mutex_t *__restrict __self, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_timedlock64))(__self, __abstime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K */
@@ -1562,14 +1562,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_timedlock64, __FORCELOCAL __ATTR_A
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_reltimedlock_np,(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),(__mutex,__reltime))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_reltimedlock_np,(pthread_mutex_t *__restrict __self, struct timespec const *__restrict __reltime),(__self,__reltime))
 #elif defined(__CRT_HAVE_pthread_mutex_reltimedlock64_np) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> pthread_mutex_reltimedlock_np(3), pthread_mutex_reltimedlock64_np(3)
  * Wait until lock becomes available, or specified amount of time has passed
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_reltimedlock_np,(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),pthread_mutex_reltimedlock64_np,(__mutex,__reltime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_reltimedlock_np,(pthread_mutex_t *__restrict __self, struct timespec const *__restrict __reltime),pthread_mutex_reltimedlock64_np,(__self,__reltime))
 #elif defined(__CRT_HAVE_pthread_mutex_reltimedlock64_np) || defined(__CRT_HAVE_pthread_mutex_reltimedlock_np)
 #include <libc/local/pthread/pthread_mutex_reltimedlock_np.h>
 /* >> pthread_mutex_reltimedlock_np(3), pthread_mutex_reltimedlock64_np(3)
@@ -1577,7 +1577,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_reltimedlock_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_mutex_reltimedlock_np)(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_reltimedlock_np))(__mutex, __reltime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_reltimedlock_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_mutex_reltimedlock_np)(pthread_mutex_t *__restrict __self, struct timespec const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_reltimedlock_np))(__self, __reltime); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_pthread_mutex_reltimedlock_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -1586,14 +1586,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_reltimedlock_np, __FORCELOCAL __AT
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_reltimedlock64_np,(pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime),pthread_mutex_reltimedlock_np,(__mutex,__reltime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_reltimedlock64_np,(pthread_mutex_t *__restrict __self, struct timespec64 const *__restrict __reltime),pthread_mutex_reltimedlock_np,(__self,__reltime))
 #elif defined(__CRT_HAVE_pthread_mutex_reltimedlock64_np)
 /* >> pthread_mutex_reltimedlock_np(3), pthread_mutex_reltimedlock64_np(3)
  * Wait until lock becomes available, or specified amount of time has passed
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_reltimedlock64_np,(pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime),(__mutex,__reltime))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_mutex_reltimedlock64_np,(pthread_mutex_t *__restrict __self, struct timespec64 const *__restrict __reltime),(__self,__reltime))
 #elif defined(__CRT_HAVE_pthread_mutex_reltimedlock_np)
 #include <libc/local/pthread/pthread_mutex_reltimedlock64_np.h>
 /* >> pthread_mutex_reltimedlock_np(3), pthread_mutex_reltimedlock64_np(3)
@@ -1601,55 +1601,55 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,p
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_reltimedlock64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_mutex_reltimedlock64_np)(pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_reltimedlock64_np))(__mutex, __reltime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_reltimedlock64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_mutex_reltimedlock64_np)(pthread_mutex_t *__restrict __self, struct timespec64 const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_reltimedlock64_np))(__self, __reltime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_SOLARIS */
 /* >> pthread_mutex_unlock(3)
- * Unlock  the  given `mutex'
+ * Unlock the given mutex `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_unlock,(pthread_mutex_t *__mutex),(__mutex))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_unlock,(pthread_mutex_t *__self),(__self))
 /* >> pthread_mutex_getprioceiling(3)
- * Get the priority ceiling of `mutex'
+ * Get the priority ceiling of `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_mutex_getprioceiling,(pthread_mutex_t const *__restrict __mutex, int *__restrict __prioceiling),(__mutex,__prioceiling))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_mutex_getprioceiling,(pthread_mutex_t const *__restrict __self, int *__restrict __prioceiling),(__self,__prioceiling))
 /* >> pthread_mutex_setprioceiling(3)
- * Set the priority ceiling of `mutex' to `prioceiling',
- * return old priority  ceiling value in  `*old_ceiling'
+ * Set the priority ceiling of `self' to `prioceiling',
+ * return  old priority ceiling value in `*old_ceiling'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `prioceiling' */
-__CDECLARE_OPT(__ATTR_INOUT(1) __ATTR_OUT_OPT(3),__errno_t,__NOTHROW_NCX,pthread_mutex_setprioceiling,(pthread_mutex_t *__restrict __mutex, int __prioceiling, int *__restrict __old_ceiling),(__mutex,__prioceiling,__old_ceiling))
+__CDECLARE_OPT(__ATTR_INOUT(1) __ATTR_OUT_OPT(3),__errno_t,__NOTHROW_NCX,pthread_mutex_setprioceiling,(pthread_mutex_t *__restrict __self, int __prioceiling, int *__restrict __old_ceiling),(__self,__prioceiling,__old_ceiling))
 #ifdef __USE_XOPEN2K8
 #ifdef __CRT_HAVE_pthread_mutex_consistent
 /* >> pthread_mutex_consistent(3)
- * Declare the state protected by `mutex' as consistent
+ * Declare the state protected by `self' as consistent
  * @return: EOK:    Success
  * @return: EINVAL: Not a robust mutex
  * @return: EINVAL: Mutex was already in a consistent state */
-__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_consistent,(pthread_mutex_t *__mutex),(__mutex))
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_consistent,(pthread_mutex_t *__self),(__self))
 #elif defined(__CRT_HAVE_pthread_mutex_consistent_np)
 /* >> pthread_mutex_consistent(3)
- * Declare the state protected by `mutex' as consistent
+ * Declare the state protected by `self' as consistent
  * @return: EOK:    Success
  * @return: EINVAL: Not a robust mutex
  * @return: EINVAL: Mutex was already in a consistent state */
-__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_consistent,(pthread_mutex_t *__mutex),pthread_mutex_consistent_np,(__mutex))
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_consistent,(pthread_mutex_t *__self),pthread_mutex_consistent_np,(__self))
 #endif /* ... */
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_pthread_mutex_consistent
 /* >> pthread_mutex_consistent(3)
- * Declare the state protected by `mutex' as consistent
+ * Declare the state protected by `self' as consistent
  * @return: EOK:    Success
  * @return: EINVAL: Not a robust mutex
  * @return: EINVAL: Mutex was already in a consistent state */
-__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_consistent_np,(pthread_mutex_t *__mutex),pthread_mutex_consistent,(__mutex))
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_consistent_np,(pthread_mutex_t *__self),pthread_mutex_consistent,(__self))
 #elif defined(__CRT_HAVE_pthread_mutex_consistent_np)
 /* >> pthread_mutex_consistent(3)
- * Declare the state protected by `mutex' as consistent
+ * Declare the state protected by `self' as consistent
  * @return: EOK:    Success
  * @return: EINVAL: Not a robust mutex
  * @return: EINVAL: Mutex was already in a consistent state */
-__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_consistent_np,(pthread_mutex_t *__mutex),(__mutex))
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_consistent_np,(pthread_mutex_t *__self),(__self))
 #endif /* ... */
 #endif /* __USE_GNU */
 #endif /* __USE_XOPEN2K8 */
@@ -1660,120 +1660,120 @@ __CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutex_consistent_np,(
 /************************************************************************/
 
 /* >> pthread_mutexattr_init(3)
- * Initialize mutex attribute object `attr' with default
+ * Initialize mutex attribute object `self' with default
  * attributes    (kind    is   `PTHREAD_MUTEX_TIMED_NP')
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_init,(pthread_mutexattr_t *__attr),(__attr))
+__CDECLARE_OPT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_init,(pthread_mutexattr_t *__self),(__self))
 /* >> pthread_mutexattr_destroy(3)
- * Destroy mutex attribute object `attr'
+ * Destroy mutex attribute object `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_destroy,(pthread_mutexattr_t *__attr),(__attr))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_destroy,(pthread_mutexattr_t *__self),(__self))
 /* >> pthread_mutexattr_getpshared(3)
- * Get the process-shared flag of the mutex attribute `attr'
+ * Get the process-shared flag of the mutex attribute `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getpshared,(pthread_mutexattr_t const *__restrict __attr, int *__restrict __pshared),(__attr,__pshared))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getpshared,(pthread_mutexattr_t const *__restrict __self, int *__restrict __pshared),(__self,__pshared))
 /* >> pthread_mutexattr_setpshared(3)
- * Set the process-shared flag of the mutex attribute `attr'
+ * Set the process-shared flag of the mutex attribute `self'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `pshared' */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setpshared,(pthread_mutexattr_t *__attr, int __pshared),(__attr,__pshared))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setpshared,(pthread_mutexattr_t *__self, int __pshared),(__self,__pshared))
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 #ifdef __CRT_HAVE_pthread_mutexattr_gettype
 /* >> pthread_mutexattr_gettype(3)
- * Return in `*kind' the mutex kind attribute in `*attr'
+ * Return in `*kind' the mutex kind attribute in `*self'
  * @return: EOK: Success */
-__CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_mutexattr_gettype,(pthread_mutexattr_t const *__restrict __attr, int *__restrict __kind),(__attr,__kind))
+__CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_mutexattr_gettype,(pthread_mutexattr_t const *__restrict __self, int *__restrict __kind),(__self,__kind))
 #elif defined(__CRT_HAVE_pthread_mutexattr_getkind_np)
 /* >> pthread_mutexattr_gettype(3)
- * Return in `*kind' the mutex kind attribute in `*attr'
+ * Return in `*kind' the mutex kind attribute in `*self'
  * @return: EOK: Success */
-__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_mutexattr_gettype,(pthread_mutexattr_t const *__restrict __attr, int *__restrict __kind),pthread_mutexattr_getkind_np,(__attr,__kind))
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_mutexattr_gettype,(pthread_mutexattr_t const *__restrict __self, int *__restrict __kind),pthread_mutexattr_getkind_np,(__self,__kind))
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_mutexattr_settype
 /* >> pthread_mutexattr_settype(3)
- * Set  the mutex kind attribute in `*attr' to `kind' (either `PTHREAD_MUTEX_NORMAL',
+ * Set  the mutex kind attribute in `*self' to `kind' (either `PTHREAD_MUTEX_NORMAL',
  * `PTHREAD_MUTEX_RECURSIVE', `PTHREAD_MUTEX_ERRORCHECK', or `PTHREAD_MUTEX_DEFAULT')
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `kind' */
-__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_settype,(pthread_mutexattr_t *__attr, int __kind),(__attr,__kind))
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_settype,(pthread_mutexattr_t *__self, int __kind),(__self,__kind))
 #elif defined(__CRT_HAVE_pthread_mutexattr_setkind_np)
 /* >> pthread_mutexattr_settype(3)
- * Set  the mutex kind attribute in `*attr' to `kind' (either `PTHREAD_MUTEX_NORMAL',
+ * Set  the mutex kind attribute in `*self' to `kind' (either `PTHREAD_MUTEX_NORMAL',
  * `PTHREAD_MUTEX_RECURSIVE', `PTHREAD_MUTEX_ERRORCHECK', or `PTHREAD_MUTEX_DEFAULT')
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `kind' */
-__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_settype,(pthread_mutexattr_t *__attr, int __kind),pthread_mutexattr_setkind_np,(__attr,__kind))
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_settype,(pthread_mutexattr_t *__self, int __kind),pthread_mutexattr_setkind_np,(__self,__kind))
 #endif /* ... */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 /* >> pthread_mutexattr_getprotocol(3)
- * Return in `*protocol' the mutex protocol attribute in `*attr'
+ * Return in `*protocol' the mutex protocol attribute in `*self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getprotocol,(pthread_mutexattr_t const *__restrict __attr, int *__restrict __protocol),(__attr,__protocol))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getprotocol,(pthread_mutexattr_t const *__restrict __self, int *__restrict __protocol),(__self,__protocol))
 /* >> pthread_mutexattr_setprotocol(3)
- * Set  the  mutex protocol  attribute  in `*attr'  to  `protocol' (either
+ * Set  the  mutex protocol  attribute  in `*self'  to  `protocol' (either
  * `PTHREAD_PRIO_NONE', `PTHREAD_PRIO_INHERIT', or `PTHREAD_PRIO_PROTECT')
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `protocol' */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setprotocol,(pthread_mutexattr_t *__attr, int __protocol),(__attr,__protocol))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setprotocol,(pthread_mutexattr_t *__self, int __protocol),(__self,__protocol))
 /* >> pthread_mutexattr_getprioceiling(3)
- * Return in `*prioceiling' the mutex prioceiling attribute in `*attr'
+ * Return in `*prioceiling' the mutex prioceiling attribute in `*self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getprioceiling,(pthread_mutexattr_t const *__restrict __attr, int *__restrict __prioceiling),(__attr,__prioceiling))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getprioceiling,(pthread_mutexattr_t const *__restrict __self, int *__restrict __prioceiling),(__self,__prioceiling))
 /* >> pthread_mutexattr_setprioceiling(3)
- * Set the mutex prioceiling attribute in `*attr' to `prioceiling'
+ * Set the mutex prioceiling attribute in `*self' to `prioceiling'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `prioceiling' */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setprioceiling,(pthread_mutexattr_t *__attr, int __prioceiling),(__attr,__prioceiling))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setprioceiling,(pthread_mutexattr_t *__self, int __prioceiling),(__self,__prioceiling))
 #ifdef __USE_XOPEN2K
 #ifdef __CRT_HAVE_pthread_mutexattr_getrobust
 /* >> pthread_mutexattr_getrobust(3)
- * Get the robustness flag of the mutex attribute `attr'
+ * Get the robustness flag of the mutex attribute `self'
  * @return: EOK: Success */
-__CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getrobust,(pthread_mutexattr_t const *__restrict __attr, int *__restrict __robustness),(__attr,__robustness))
+__CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getrobust,(pthread_mutexattr_t const *__restrict __self, int *__restrict __robustness),(__self,__robustness))
 #elif defined(__CRT_HAVE_pthread_mutexattr_getrobust_np)
 /* >> pthread_mutexattr_getrobust(3)
- * Get the robustness flag of the mutex attribute `attr'
+ * Get the robustness flag of the mutex attribute `self'
  * @return: EOK: Success */
-__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getrobust,(pthread_mutexattr_t const *__restrict __attr, int *__restrict __robustness),pthread_mutexattr_getrobust_np,(__attr,__robustness))
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getrobust,(pthread_mutexattr_t const *__restrict __self, int *__restrict __robustness),pthread_mutexattr_getrobust_np,(__self,__robustness))
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_mutexattr_setrobust
 /* >> pthread_mutexattr_setrobust(3)
- * Set the robustness flag of the mutex attribute `attr'
+ * Set the robustness flag of the mutex attribute `self'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `robustness' */
-__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setrobust,(pthread_mutexattr_t *__attr, int __robustness),(__attr,__robustness))
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setrobust,(pthread_mutexattr_t *__self, int __robustness),(__self,__robustness))
 #elif defined(__CRT_HAVE_pthread_mutexattr_setrobust_np)
 /* >> pthread_mutexattr_setrobust(3)
- * Set the robustness flag of the mutex attribute `attr'
+ * Set the robustness flag of the mutex attribute `self'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `robustness' */
-__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setrobust,(pthread_mutexattr_t *__attr, int __robustness),pthread_mutexattr_setrobust_np,(__attr,__robustness))
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setrobust,(pthread_mutexattr_t *__self, int __robustness),pthread_mutexattr_setrobust_np,(__self,__robustness))
 #endif /* ... */
 #endif /* __USE_XOPEN2K */
 #ifdef __USE_GNU
 #ifdef __CRT_HAVE_pthread_mutexattr_getrobust
 /* >> pthread_mutexattr_getrobust(3)
- * Get the robustness flag of the mutex attribute `attr'
+ * Get the robustness flag of the mutex attribute `self'
  * @return: EOK: Success */
-__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getrobust_np,(pthread_mutexattr_t const *__restrict __attr, int *__restrict __robustness),pthread_mutexattr_getrobust,(__attr,__robustness))
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getrobust_np,(pthread_mutexattr_t const *__restrict __self, int *__restrict __robustness),pthread_mutexattr_getrobust,(__self,__robustness))
 #elif defined(__CRT_HAVE_pthread_mutexattr_getrobust_np)
 /* >> pthread_mutexattr_getrobust(3)
- * Get the robustness flag of the mutex attribute `attr'
+ * Get the robustness flag of the mutex attribute `self'
  * @return: EOK: Success */
-__CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getrobust_np,(pthread_mutexattr_t const *__restrict __attr, int *__restrict __robustness),(__attr,__robustness))
+__CDECLARE(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_mutexattr_getrobust_np,(pthread_mutexattr_t const *__restrict __self, int *__restrict __robustness),(__self,__robustness))
 #endif /* ... */
 #ifdef __CRT_HAVE_pthread_mutexattr_setrobust
 /* >> pthread_mutexattr_setrobust(3)
- * Set the robustness flag of the mutex attribute `attr'
+ * Set the robustness flag of the mutex attribute `self'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `robustness' */
-__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setrobust_np,(pthread_mutexattr_t *__attr, int __robustness),pthread_mutexattr_setrobust,(__attr,__robustness))
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setrobust_np,(pthread_mutexattr_t *__self, int __robustness),pthread_mutexattr_setrobust,(__self,__robustness))
 #elif defined(__CRT_HAVE_pthread_mutexattr_setrobust_np)
 /* >> pthread_mutexattr_setrobust(3)
- * Set the robustness flag of the mutex attribute `attr'
+ * Set the robustness flag of the mutex attribute `self'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `robustness' */
-__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setrobust_np,(pthread_mutexattr_t *__attr, int __robustness),(__attr,__robustness))
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setrobust_np,(pthread_mutexattr_t *__self, int __robustness),(__self,__robustness))
 #endif /* ... */
 #endif /* __USE_GNU */
 
@@ -1785,46 +1785,46 @@ __CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_mutexattr_setrobust_n
 /************************************************************************/
 
 /* >> pthread_rwlock_init(3)
- * Initialize read-write lock `rwlock' using attributes `attr',
- * or use the default values if later is `NULL'.
+ * Initialize read-write lock `self' using attributes `attr',
+ * or  use   the  default   values   if  later   is   `NULL'.
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_IN_OPT(2) __ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_init,(pthread_rwlock_t *__restrict __rwlock, pthread_rwlockattr_t const *__restrict __attr),(__rwlock,__attr))
+__CDECLARE_OPT(__ATTR_IN_OPT(2) __ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_init,(pthread_rwlock_t *__restrict __self, pthread_rwlockattr_t const *__restrict __attr),(__self,__attr))
 /* >> pthread_rwlock_destroy(3)
- * Destroy read-write lock `rwlock'
+ * Destroy read-write lock `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_destroy,(pthread_rwlock_t *__rwlock),(__rwlock))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_destroy,(pthread_rwlock_t *__self),(__self))
 /* >> pthread_rwlock_rdlock(3)
- * Acquire read lock for `rwlock'
+ * Acquire read lock for `self'
  * @return: EOK:     Success
  * @return: EAGAIN:  The maximum # of read-locks has been acquired
  * @return: EDEADLK: You're already holding a write-lock
  * @return: EDEADLK: [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                   You're already holding a read-lock */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_rdlock,(pthread_rwlock_t *__rwlock),(__rwlock))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_rdlock,(pthread_rwlock_t *__self),(__self))
 /* >> pthread_rwlock_tryrdlock(3)
- * Try to acquire read lock for `rwlock'
+ * Try to acquire read lock for `self'
  * @return: EOK:    Success
  * @return: EBUSY:  A read-lock cannot be acquired at the moment,
  *                  because a write-lock  is already being  held.
  * @return: EAGAIN: The maximum # of read-locks has been acquired */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_tryrdlock,(pthread_rwlock_t *__rwlock),(__rwlock))
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_tryrdlock,(pthread_rwlock_t *__self),(__self))
 /* >> pthread_rwlock_wrlock(3)
- * Acquire write lock for `rwlock'
+ * Acquire write lock for `self'
  * @return: EOK:     Success
  * @return: EDEADLK: You're already holding a read-lock
  * @return: EDEADLK: [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                   You're already holding a write-lock */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_wrlock,(pthread_rwlock_t *__rwlock),(__rwlock))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_wrlock,(pthread_rwlock_t *__self),(__self))
 /* >> pthread_rwlock_trywrlock(3)
- * Try to acquire write lock for `rwlock'
+ * Try to acquire write lock for `self'
  * @return: EOK:   Success
  * @return: EBUSY: A write-lock cannot be acquired at the moment,
  *                 because read-locks  are  already  being  held. */
-__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_trywrlock,(pthread_rwlock_t *__rwlock),(__rwlock))
+__CDECLARE_OPT(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_trywrlock,(pthread_rwlock_t *__self),(__self))
 #ifdef __USE_XOPEN2K
 #if defined(__CRT_HAVE_pthread_rwlock_timedrdlock) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
- * Try to acquire read lock for `rwlock' or return after the specified time
+ * Try to acquire read lock for `self' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired
@@ -1832,10 +1832,10 @@ __CDECLARE_OPT(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rw
  * @return: EDEADLK:   You're already holding a write-lock
  * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a read-lock */
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),(__rwlock,__abstime))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock,(pthread_rwlock_t *__restrict __self, struct timespec const *__restrict __abstime),(__self,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
- * Try to acquire read lock for `rwlock' or return after the specified time
+ * Try to acquire read lock for `self' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired
@@ -1843,11 +1843,11 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,p
  * @return: EDEADLK:   You're already holding a write-lock
  * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a read-lock */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),pthread_rwlock_timedrdlock64,(__rwlock,__abstime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock,(pthread_rwlock_t *__restrict __self, struct timespec const *__restrict __abstime),pthread_rwlock_timedrdlock64,(__self,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock64) || defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
 #include <libc/local/pthread/pthread_rwlock_timedrdlock.h>
 /* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
- * Try to acquire read lock for `rwlock' or return after the specified time
+ * Try to acquire read lock for `self' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired
@@ -1855,44 +1855,44 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,
  * @return: EDEADLK:   You're already holding a write-lock
  * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a read-lock */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedrdlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock))(__rwlock, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedrdlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restrict __self, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock))(__self, __abstime); })
 #endif /* ... */
 #if defined(__CRT_HAVE_pthread_rwlock_timedwrlock) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for `rwlock' or return after the specified time
+ * Try to acquire write lock for `self' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired
  * @return: EDEADLK:   You're already holding a read-lock
  * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a write-lock */
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedwrlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),(__rwlock,__abstime))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedwrlock,(pthread_rwlock_t *__restrict __self, struct timespec const *__restrict __abstime),(__self,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for `rwlock' or return after the specified time
+ * Try to acquire write lock for `self' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired
  * @return: EDEADLK:   You're already holding a read-lock
  * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a write-lock */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedwrlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),pthread_rwlock_timedwrlock64,(__rwlock,__abstime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedwrlock,(pthread_rwlock_t *__restrict __self, struct timespec const *__restrict __abstime),pthread_rwlock_timedwrlock64,(__self,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock64) || defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
 #include <libc/local/pthread/pthread_rwlock_timedwrlock.h>
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for `rwlock' or return after the specified time
+ * Try to acquire write lock for `self' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired
  * @return: EDEADLK:   You're already holding a read-lock
  * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a write-lock */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedwrlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock))(__rwlock, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedwrlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restrict __self, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock))(__self, __abstime); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_pthread_rwlock_timedrdlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
- * Try to acquire read lock for `rwlock' or return after the specified time
+ * Try to acquire read lock for `self' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired
@@ -1900,10 +1900,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedwrlock, __FORCELOCAL __ATTR_
  * @return: EDEADLK:   You're already holding a write-lock
  * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a read-lock */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock64,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime),pthread_rwlock_timedrdlock,(__rwlock,__abstime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock64,(pthread_rwlock_t *__restrict __self, struct timespec64 const *__restrict __abstime),pthread_rwlock_timedrdlock,(__self,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock64)
 /* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
- * Try to acquire read lock for `rwlock' or return after the specified time
+ * Try to acquire read lock for `self' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired
@@ -1911,11 +1911,11 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,
  * @return: EDEADLK:   You're already holding a write-lock
  * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a read-lock */
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock64,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime),(__rwlock,__abstime))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedrdlock64,(pthread_rwlock_t *__restrict __self, struct timespec64 const *__restrict __abstime),(__self,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
 #include <libc/local/pthread/pthread_rwlock_timedrdlock64.h>
 /* >> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
- * Try to acquire read lock for `rwlock' or return after the specified time
+ * Try to acquire read lock for `self' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired
@@ -1923,46 +1923,46 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,p
  * @return: EDEADLK:   You're already holding a write-lock
  * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a read-lock */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedrdlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedrdlock64)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock64))(__rwlock, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedrdlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedrdlock64)(pthread_rwlock_t *__restrict __self, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock64))(__self, __abstime); })
 #endif /* ... */
 #if defined(__CRT_HAVE_pthread_rwlock_timedwrlock) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for `rwlock' or return after the specified time
+ * Try to acquire write lock for `self' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired
  * @return: EDEADLK:   You're already holding a read-lock
  * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a write-lock */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedwrlock64,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime),pthread_rwlock_timedwrlock,(__rwlock,__abstime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedwrlock64,(pthread_rwlock_t *__restrict __self, struct timespec64 const *__restrict __abstime),pthread_rwlock_timedwrlock,(__self,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock64)
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for `rwlock' or return after the specified time
+ * Try to acquire write lock for `self' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired
  * @return: EDEADLK:   You're already holding a read-lock
  * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a write-lock */
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedwrlock64,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime),(__rwlock,__abstime))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_timedwrlock64,(pthread_rwlock_t *__restrict __self, struct timespec64 const *__restrict __abstime),(__self,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
 #include <libc/local/pthread/pthread_rwlock_timedwrlock64.h>
 /* >> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
- * Try to acquire write lock for `rwlock' or return after the specified time
+ * Try to acquire write lock for `self' or return after the specified time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired
  * @return: EDEADLK:   You're already holding a read-lock
  * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a write-lock */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedwrlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock64))(__rwlock, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedwrlock64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__restrict __self, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock64))(__self, __abstime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K */
 #ifdef __USE_SOLARIS
 #if defined(__CRT_HAVE_pthread_rwlock_reltimedrdlock_np) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
- * Try to acquire  read lock  for `rwlock' or  return after  the specified  time
+ * Try to  acquire read  lock for  `self'  or return  after the  specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired
@@ -1970,10 +1970,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedwrlock64, __FORCELOCAL __ATT
  * @return: EDEADLK:   You're already holding a write-lock
  * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a read-lock */
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedrdlock_np,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __reltime),(__rwlock,__reltime))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedrdlock_np,(pthread_rwlock_t *__restrict __self, struct timespec const *__restrict __reltime),(__self,__reltime))
 #elif defined(__CRT_HAVE_pthread_rwlock_reltimedrdlock64_np) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
- * Try to acquire  read lock  for `rwlock' or  return after  the specified  time
+ * Try to  acquire read  lock for  `self'  or return  after the  specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired
@@ -1981,11 +1981,11 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,p
  * @return: EDEADLK:   You're already holding a write-lock
  * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a read-lock */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedrdlock_np,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __reltime),pthread_rwlock_reltimedrdlock64_np,(__rwlock,__reltime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedrdlock_np,(pthread_rwlock_t *__restrict __self, struct timespec const *__restrict __reltime),pthread_rwlock_reltimedrdlock64_np,(__self,__reltime))
 #elif defined(__CRT_HAVE_pthread_rwlock_reltimedrdlock64_np) || defined(__CRT_HAVE_pthread_rwlock_reltimedrdlock_np)
 #include <libc/local/pthread/pthread_rwlock_reltimedrdlock_np.h>
 /* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
- * Try to acquire  read lock  for `rwlock' or  return after  the specified  time
+ * Try to  acquire read  lock for  `self'  or return  after the  specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired
@@ -1993,44 +1993,44 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,
  * @return: EDEADLK:   You're already holding a write-lock
  * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a read-lock */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedrdlock_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_reltimedrdlock_np)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_reltimedrdlock_np))(__rwlock, __reltime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedrdlock_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_reltimedrdlock_np)(pthread_rwlock_t *__restrict __self, struct timespec const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_reltimedrdlock_np))(__self, __reltime); })
 #endif /* ... */
 #if defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock_np) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
- * Try to acquire  write lock for  `rwlock' or return  after the specified  time
+ * Try to  acquire write  lock for  `self' or  return after  the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired
  * @return: EDEADLK:   You're already holding a read-lock
  * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a write-lock */
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedwrlock_np,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __reltime),(__rwlock,__reltime))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedwrlock_np,(pthread_rwlock_t *__restrict __self, struct timespec const *__restrict __reltime),(__self,__reltime))
 #elif defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock64_np) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
- * Try to acquire  write lock for  `rwlock' or return  after the specified  time
+ * Try to  acquire write  lock for  `self' or  return after  the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired
  * @return: EDEADLK:   You're already holding a read-lock
  * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a write-lock */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedwrlock_np,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __reltime),pthread_rwlock_reltimedwrlock64_np,(__rwlock,__reltime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedwrlock_np,(pthread_rwlock_t *__restrict __self, struct timespec const *__restrict __reltime),pthread_rwlock_reltimedwrlock64_np,(__self,__reltime))
 #elif defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock64_np) || defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock_np)
 #include <libc/local/pthread/pthread_rwlock_reltimedwrlock_np.h>
 /* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
- * Try to acquire  write lock for  `rwlock' or return  after the specified  time
+ * Try to  acquire write  lock for  `self' or  return after  the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired
  * @return: EDEADLK:   You're already holding a read-lock
  * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a write-lock */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedwrlock_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_reltimedwrlock_np)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_reltimedwrlock_np))(__rwlock, __reltime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedwrlock_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_reltimedwrlock_np)(pthread_rwlock_t *__restrict __self, struct timespec const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_reltimedwrlock_np))(__self, __reltime); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_pthread_rwlock_reltimedrdlock_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
- * Try to acquire  read lock  for `rwlock' or  return after  the specified  time
+ * Try to  acquire read  lock for  `self'  or return  after the  specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired
@@ -2038,10 +2038,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedwrlock_np, __FORCELOCAL _
  * @return: EDEADLK:   You're already holding a write-lock
  * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a read-lock */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedrdlock64_np,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __reltime),pthread_rwlock_reltimedrdlock_np,(__rwlock,__reltime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedrdlock64_np,(pthread_rwlock_t *__restrict __self, struct timespec64 const *__restrict __reltime),pthread_rwlock_reltimedrdlock_np,(__self,__reltime))
 #elif defined(__CRT_HAVE_pthread_rwlock_reltimedrdlock64_np)
 /* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
- * Try to acquire  read lock  for `rwlock' or  return after  the specified  time
+ * Try to  acquire read  lock for  `self'  or return  after the  specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired
@@ -2049,11 +2049,11 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,
  * @return: EDEADLK:   You're already holding a write-lock
  * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a read-lock */
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedrdlock64_np,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __reltime),(__rwlock,__reltime))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedrdlock64_np,(pthread_rwlock_t *__restrict __self, struct timespec64 const *__restrict __reltime),(__self,__reltime))
 #elif defined(__CRT_HAVE_pthread_rwlock_reltimedrdlock_np)
 #include <libc/local/pthread/pthread_rwlock_reltimedrdlock64_np.h>
 /* >> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
- * Try to acquire  read lock  for `rwlock' or  return after  the specified  time
+ * Try to  acquire read  lock for  `self'  or return  after the  specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired
@@ -2061,47 +2061,47 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,p
  * @return: EDEADLK:   You're already holding a write-lock
  * @return: EDEADLK:   [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a read-lock */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedrdlock64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_reltimedrdlock64_np)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_reltimedrdlock64_np))(__rwlock, __reltime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedrdlock64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_reltimedrdlock64_np)(pthread_rwlock_t *__restrict __self, struct timespec64 const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_reltimedrdlock64_np))(__self, __reltime); })
 #endif /* ... */
 #if defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
- * Try to acquire  write lock for  `rwlock' or return  after the specified  time
+ * Try to  acquire write  lock for  `self' or  return after  the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired
  * @return: EDEADLK:   You're already holding a read-lock
  * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a write-lock */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedwrlock64_np,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __reltime),pthread_rwlock_reltimedwrlock_np,(__rwlock,__reltime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedwrlock64_np,(pthread_rwlock_t *__restrict __self, struct timespec64 const *__restrict __reltime),pthread_rwlock_reltimedwrlock_np,(__self,__reltime))
 #elif defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock64_np)
 /* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
- * Try to acquire  write lock for  `rwlock' or return  after the specified  time
+ * Try to  acquire write  lock for  `self' or  return after  the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired
  * @return: EDEADLK:   You're already holding a read-lock
  * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a write-lock */
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedwrlock64_np,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __reltime),(__rwlock,__reltime))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_rwlock_reltimedwrlock64_np,(pthread_rwlock_t *__restrict __self, struct timespec64 const *__restrict __reltime),(__self,__reltime))
 #elif defined(__CRT_HAVE_pthread_rwlock_reltimedwrlock_np)
 #include <libc/local/pthread/pthread_rwlock_reltimedwrlock64_np.h>
 /* >> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
- * Try to acquire  write lock for  `rwlock' or return  after the specified  time
+ * Try to  acquire write  lock for  `self' or  return after  the specified  time
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired
  * @return: EDEADLK:   You're already holding a read-lock
  * @return: EDEADLK:   [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
  *                     You're already holding a write-lock */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedwrlock64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_reltimedwrlock64_np)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_reltimedwrlock64_np))(__rwlock, __reltime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_reltimedwrlock64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_rwlock_reltimedwrlock64_np)(pthread_rwlock_t *__restrict __self, struct timespec64 const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_reltimedwrlock64_np))(__self, __reltime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_SOLARIS */
 /* >> pthread_rwlock_unlock(3)
- * Unlock `rwlock'
+ * Unlock `self'
  * @return: EOK:   Success
  * @return: EPERM: You're not holding a read- or write-lock */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_unlock,(pthread_rwlock_t *__rwlock),(__rwlock))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_unlock,(pthread_rwlock_t *__self),(__self))
 
 
 /************************************************************************/
@@ -2109,31 +2109,31 @@ __CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlock_unlock,(pt
 /************************************************************************/
 
 /* >> pthread_rwlockattr_init(3)
- * Initialize attribute object `attr' with default values
+ * Initialize attribute object `self' with default values
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_init,(pthread_rwlockattr_t *__attr),(__attr))
+__CDECLARE_OPT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_init,(pthread_rwlockattr_t *__self),(__self))
 /* >> pthread_rwlockattr_destroy(3)
- * Destroy attribute object  `attr'
+ * Destroy attribute object  `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_destroy,(pthread_rwlockattr_t *__attr),(__attr))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_destroy,(pthread_rwlockattr_t *__self),(__self))
 /* >> pthread_rwlockattr_getpshared(3)
- * Return current setting of process-shared attribute of `attr' in `*pshared'
+ * Return current setting of process-shared attribute of `self' in `*pshared'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_getpshared,(pthread_rwlockattr_t const *__restrict __attr, int *__restrict __pshared),(__attr,__pshared))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_getpshared,(pthread_rwlockattr_t const *__restrict __self, int *__restrict __pshared),(__self,__pshared))
 /* >> pthread_rwlockattr_setpshared(3)
- * Set process-shared attribute of `attr' to `pshared'
+ * Set process-shared attribute of `self' to `pshared'
  * @return: EOK:    Success
- * @return: EINVAL: Invalid/unsupported `pthread' */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_setpshared,(pthread_rwlockattr_t *__attr, int __pshared),(__attr,__pshared))
+ * @return: EINVAL: Invalid/unsupported `pshared' */
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_setpshared,(pthread_rwlockattr_t *__self, int __pshared),(__self,__pshared))
 /* >> pthread_rwlockattr_getkind_np(3)
  * Return current setting of reader/writer preference
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_getkind_np,(pthread_rwlockattr_t const *__restrict __attr, int *__restrict __pref),(__attr,__pref))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_getkind_np,(pthread_rwlockattr_t const *__restrict __self, int *__restrict __pref),(__self,__pref))
 /* >> pthread_rwlockattr_setkind_np(3)
  * Set     reader/write     preference
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `pref' */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_setkind_np,(pthread_rwlockattr_t *__attr, int __pref),(__attr,__pref))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_setkind_np,(pthread_rwlockattr_t *__self, int __pref),(__self,__pref))
 #endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 
@@ -2142,153 +2142,153 @@ __CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_rwlockattr_setkin
 /************************************************************************/
 
 /* >> pthread_cond_init(3)
- * Initialize condition variable `cond' using attributes
+ * Initialize condition variable `self' using attributes
  * `attr', or use the default values if later is `NULL'.
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_IN_OPT(2) __ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_cond_init,(pthread_cond_t *__restrict __cond, pthread_condattr_t const *__restrict __cond_attr),(__cond,__cond_attr))
+__CDECLARE_OPT(__ATTR_IN_OPT(2) __ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_cond_init,(pthread_cond_t *__restrict __self, pthread_condattr_t const *__restrict __cond_attr),(__self,__cond_attr))
 #ifdef __CRT_HAVE_pthread_cond_destroy
 /* >> pthread_cond_destroy(3)
- * Destroy condition variable `cond'
+ * Destroy condition variable `self'
  * @return: EOK: Success */
-__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_cond_destroy,(pthread_cond_t *__cond),(__cond))
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_cond_destroy,(pthread_cond_t *__self),(__self))
 #elif defined(__CRT_HAVE_cnd_destroy)
 /* >> pthread_cond_destroy(3)
- * Destroy condition variable `cond'
+ * Destroy condition variable `self'
  * @return: EOK: Success */
-__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_cond_destroy,(pthread_cond_t *__cond),cnd_destroy,(__cond))
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_cond_destroy,(pthread_cond_t *__self),cnd_destroy,(__self))
 #endif /* ... */
 /* >> pthread_cond_signal(3)
- * Wake up one thread waiting for condition variable `cond'
+ * Wake up one thread waiting for condition variable `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_cond_signal,(pthread_cond_t *__cond),(__cond))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_cond_signal,(pthread_cond_t *__self),(__self))
 /* >> pthread_cond_broadcast(3)
- * Wake up all threads waiting for condition variables `cond'
+ * Wake up all threads waiting for condition variables `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_cond_broadcast,(pthread_cond_t *__cond),(__cond))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_cond_broadcast,(pthread_cond_t *__self),(__self))
 /* >> pthread_cond_wait(3)
- * Wait for condition variable `cond' to be signaled or broadcast.
+ * Wait for condition variable `self' to be signaled or broadcast.
  * `mutex' is assumed to be locked before.
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_wait,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex),(__cond,__mutex))
+__CDECLARE_OPT(__ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_wait,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex),(__self,__mutex))
 #if defined(__CRT_HAVE_pthread_cond_timedwait) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
- * Wait for condition variable `cond' to be signaled or broadcast
+ * Wait for condition variable `self' to be signaled or broadcast
  * until `abstime'.  `mutex'  is  assumed to  be  locked  before.
  * `abstime' is  an  absolute  time specification;  zero  is  the
  * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),(__cond,__mutex,__abstime))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),(__self,__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_cond_timedwait64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
- * Wait for condition variable `cond' to be signaled or broadcast
+ * Wait for condition variable `self' to be signaled or broadcast
  * until `abstime'.  `mutex'  is  assumed to  be  locked  before.
  * `abstime' is  an  absolute  time specification;  zero  is  the
  * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_cond_timedwait64,(__cond,__mutex,__abstime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_cond_timedwait64,(__self,__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_cond_timedwait64) || defined(__CRT_HAVE_pthread_cond_timedwait)
 #include <libc/local/pthread/pthread_cond_timedwait.h>
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
- * Wait for condition variable `cond' to be signaled or broadcast
+ * Wait for condition variable `self' to be signaled or broadcast
  * until `abstime'.  `mutex'  is  assumed to  be  locked  before.
  * `abstime' is  an  absolute  time specification;  zero  is  the
  * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_timedwait, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_cond_timedwait)(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_timedwait))(__cond, __mutex, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_timedwait, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_cond_timedwait)(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_timedwait))(__self, __mutex, __abstime); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_pthread_cond_timedwait) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
- * Wait for condition variable `cond' to be signaled or broadcast
+ * Wait for condition variable `self' to be signaled or broadcast
  * until `abstime'.  `mutex'  is  assumed to  be  locked  before.
  * `abstime' is  an  absolute  time specification;  zero  is  the
  * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait64,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime),pthread_cond_timedwait,(__cond,__mutex,__abstime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait64,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime),pthread_cond_timedwait,(__self,__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_cond_timedwait64)
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
- * Wait for condition variable `cond' to be signaled or broadcast
+ * Wait for condition variable `self' to be signaled or broadcast
  * until `abstime'.  `mutex'  is  assumed to  be  locked  before.
  * `abstime' is  an  absolute  time specification;  zero  is  the
  * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait64,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime),(__cond,__mutex,__abstime))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_timedwait64,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime),(__self,__mutex,__abstime))
 #elif defined(__CRT_HAVE_pthread_cond_timedwait)
 #include <libc/local/pthread/pthread_cond_timedwait64.h>
 /* >> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
- * Wait for condition variable `cond' to be signaled or broadcast
+ * Wait for condition variable `self' to be signaled or broadcast
  * until `abstime'.  `mutex'  is  assumed to  be  locked  before.
  * `abstime' is  an  absolute  time specification;  zero  is  the
  * beginning of the epoch (00:00:00 GMT, January 1, 1970).
  * @return: EOK:       Success
  * @return: EINVAL:    The given `abstime' is invalid
  * @return: ETIMEDOUT: The given `abstime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_timedwait64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_cond_timedwait64)(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_timedwait64))(__cond, __mutex, __abstime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_timedwait64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_cond_timedwait64)(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_timedwait64))(__self, __mutex, __abstime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #ifdef __USE_SOLARIS
 #if defined(__CRT_HAVE_pthread_cond_reltimedwait_np) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
- * Wait for  condition  variable  `cond' to  be  signaled  or  broadcast
+ * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
  * until `reltime'. `mutex' is assumed to be locked before.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_reltimedwait_np,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),(__cond,__mutex,__reltime))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_reltimedwait_np,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),(__self,__mutex,__reltime))
 #elif defined(__CRT_HAVE_pthread_cond_reltimedwait64_np) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
- * Wait for  condition  variable  `cond' to  be  signaled  or  broadcast
+ * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
  * until `reltime'. `mutex' is assumed to be locked before.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_reltimedwait_np,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),pthread_cond_reltimedwait64_np,(__cond,__mutex,__reltime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_reltimedwait_np,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime),pthread_cond_reltimedwait64_np,(__self,__mutex,__reltime))
 #elif defined(__CRT_HAVE_pthread_cond_reltimedwait64_np) || defined(__CRT_HAVE_pthread_cond_reltimedwait_np)
 #include <libc/local/pthread/pthread_cond_reltimedwait_np.h>
 /* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
- * Wait for  condition  variable  `cond' to  be  signaled  or  broadcast
+ * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
  * until `reltime'. `mutex' is assumed to be locked before.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_reltimedwait_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_cond_reltimedwait_np)(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_reltimedwait_np))(__cond, __mutex, __reltime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_reltimedwait_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_cond_reltimedwait_np)(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_reltimedwait_np))(__self, __mutex, __reltime); })
 #endif /* ... */
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_pthread_cond_reltimedwait_np) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
- * Wait for  condition  variable  `cond' to  be  signaled  or  broadcast
+ * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
  * until `reltime'. `mutex' is assumed to be locked before.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_reltimedwait64_np,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime),pthread_cond_reltimedwait_np,(__cond,__mutex,__reltime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_reltimedwait64_np,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime),pthread_cond_reltimedwait_np,(__self,__mutex,__reltime))
 #elif defined(__CRT_HAVE_pthread_cond_reltimedwait64_np)
 /* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
- * Wait for  condition  variable  `cond' to  be  signaled  or  broadcast
+ * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
  * until `reltime'. `mutex' is assumed to be locked before.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-__CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_reltimedwait64_np,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime),(__cond,__mutex,__reltime))
+__CDECLARE(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,pthread_cond_reltimedwait64_np,(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime),(__self,__mutex,__reltime))
 #elif defined(__CRT_HAVE_pthread_cond_reltimedwait_np)
 #include <libc/local/pthread/pthread_cond_reltimedwait64_np.h>
 /* >> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
- * Wait for  condition  variable  `cond' to  be  signaled  or  broadcast
+ * Wait for  condition  variable  `self' to  be  signaled  or  broadcast
  * until `reltime'. `mutex' is assumed to be locked before.
  * @return: EOK:       Success
  * @return: EINVAL:    The given `reltime' is invalid
  * @return: ETIMEDOUT: The given `reltime' has expired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_reltimedwait64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_cond_reltimedwait64_np)(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_reltimedwait64_np))(__cond, __mutex, __reltime); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_reltimedwait64_np, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2) __errno_t __NOTHROW_RPC(__LIBCCALL pthread_cond_reltimedwait64_np)(pthread_cond_t *__restrict __self, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __reltime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_reltimedwait64_np))(__self, __mutex, __reltime); })
 #endif /* ... */
 #endif /* __USE_TIME64 */
 #endif /* __USE_SOLARIS */
@@ -2299,32 +2299,32 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_reltimedwait64_np, __FORCELOCAL __A
 /************************************************************************/
 
 /* >> pthread_condattr_init(3)
- * Initialize condition variable attribute `attr'
+ * Initialize condition variable attribute `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_condattr_init,(pthread_condattr_t *__attr),(__attr))
+__CDECLARE_OPT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_condattr_init,(pthread_condattr_t *__self),(__self))
 /* >> pthread_condattr_destroy(3)
- * Destroy condition variable attribute `attr'
+ * Destroy condition variable attribute `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_condattr_destroy,(pthread_condattr_t *__attr),(__attr))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_condattr_destroy,(pthread_condattr_t *__self),(__self))
 /* >> pthread_condattr_getpshared(3)
- * Get the process-shared flag of the condition variable attribute `attr'
+ * Get the process-shared flag of the condition variable attribute `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_condattr_getpshared,(pthread_condattr_t const *__restrict __attr, int *__restrict __pshared),(__attr,__pshared))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_condattr_getpshared,(pthread_condattr_t const *__restrict __self, int *__restrict __pshared),(__self,__pshared))
 /* >> pthread_condattr_setpshared(3)
- * Set the process-shared flag of the condition variable attribute `attr'
+ * Set the process-shared flag of the condition variable attribute `self'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `pshared' */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_condattr_setpshared,(pthread_condattr_t *__attr, int __pshared),(__attr,__pshared))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_condattr_setpshared,(pthread_condattr_t *__self, int __pshared),(__self,__pshared))
 #ifdef __USE_XOPEN2K
 /* >> pthread_condattr_getclock(3)
- * Get the clock selected for the condition variable attribute `attr'
+ * Get the clock selected for the condition variable attribute `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_condattr_getclock,(pthread_condattr_t const *__restrict __attr, __clockid_t *__restrict __clock_id),(__attr,__clock_id))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_condattr_getclock,(pthread_condattr_t const *__restrict __self, __clockid_t *__restrict __clock_id),(__self,__clock_id))
 /* >> pthread_condattr_setclock(3)
- * Set the clock selected for the condition variable attribute `attr'
+ * Set the clock selected for the condition variable attribute `self'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `clock_id' */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_condattr_setclock,(pthread_condattr_t *__attr, __clockid_t __clock_id),(__attr,__clock_id))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_condattr_setclock,(pthread_condattr_t *__self, __clockid_t __clock_id),(__self,__clock_id))
 #endif /* __USE_XOPEN2K */
 
 
@@ -2335,67 +2335,67 @@ __CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_condattr_setclock
 
 #ifdef __CRT_HAVE_pthread_spin_init
 /* >> pthread_spin_init(3)
- * Initialize the spinlock `lock'. If `pshared' is nonzero
+ * Initialize the spinlock `self'. If `pshared' is nonzero
  * the  spinlock can be shared between different processes
  * @return: EOK: Success */
-__CDECLARE(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_spin_init,(pthread_spinlock_t *__lock, int __pshared),(__lock,__pshared))
+__CDECLARE(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_spin_init,(pthread_spinlock_t *__self, int __pshared),(__self,__pshared))
 #else /* __CRT_HAVE_pthread_spin_init */
 #include <libc/local/pthread/pthread_spin_init.h>
 /* >> pthread_spin_init(3)
- * Initialize the spinlock `lock'. If `pshared' is nonzero
+ * Initialize the spinlock `self'. If `pshared' is nonzero
  * the  spinlock can be shared between different processes
  * @return: EOK: Success */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_init, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_init)(pthread_spinlock_t *__lock, int __pshared) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_init))(__lock, __pshared); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_init, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_OUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_init)(pthread_spinlock_t *__self, int __pshared) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_init))(__self, __pshared); })
 #endif /* !__CRT_HAVE_pthread_spin_init */
 #ifdef __CRT_HAVE_pthread_spin_destroy
 /* >> pthread_spin_destroy(3)
- * Destroy the spinlock `lock'
+ * Destroy the spinlock `self'
  * @return: EOK: Success */
-__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_spin_destroy,(pthread_spinlock_t *__lock),(__lock))
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_spin_destroy,(pthread_spinlock_t *__self),(__self))
 #else /* __CRT_HAVE_pthread_spin_destroy */
 #include <libc/local/pthread/pthread_spin_destroy.h>
 /* >> pthread_spin_destroy(3)
- * Destroy the spinlock `lock'
+ * Destroy the spinlock `self'
  * @return: EOK: Success */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_destroy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_destroy)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_destroy))(__lock); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_destroy, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_destroy)(pthread_spinlock_t *__self) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_destroy))(__self); })
 #endif /* !__CRT_HAVE_pthread_spin_destroy */
 #ifdef __CRT_HAVE_pthread_spin_lock
 /* >> pthread_spin_lock(3)
- * Wait until spinlock `lock' is retrieved
+ * Wait until spinlock `self' is retrieved
  * @return: EOK: Success */
-__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_spin_lock,(pthread_spinlock_t *__lock),(__lock))
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_spin_lock,(pthread_spinlock_t *__self),(__self))
 #else /* __CRT_HAVE_pthread_spin_lock */
 #include <libc/local/pthread/pthread_spin_lock.h>
 /* >> pthread_spin_lock(3)
- * Wait until spinlock `lock' is retrieved
+ * Wait until spinlock `self' is retrieved
  * @return: EOK: Success */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_lock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_lock)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_lock))(__lock); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_lock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_lock)(pthread_spinlock_t *__self) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_lock))(__self); })
 #endif /* !__CRT_HAVE_pthread_spin_lock */
 #ifdef __CRT_HAVE_pthread_spin_trylock
 /* >> pthread_spin_trylock(3)
- * Try to lock spinlock `lock'
+ * Try to lock spinlock `self'
  * @return: EOK:   Success
  * @return: EBUSY: Lock has already been acquired */
-__CDECLARE(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_spin_trylock,(pthread_spinlock_t *__lock),(__lock))
+__CDECLARE(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_spin_trylock,(pthread_spinlock_t *__self),(__self))
 #else /* __CRT_HAVE_pthread_spin_trylock */
 #include <libc/local/pthread/pthread_spin_trylock.h>
 /* >> pthread_spin_trylock(3)
- * Try to lock spinlock `lock'
+ * Try to lock spinlock `self'
  * @return: EOK:   Success
  * @return: EBUSY: Lock has already been acquired */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_trylock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_trylock)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_trylock))(__lock); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_trylock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_trylock)(pthread_spinlock_t *__self) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_trylock))(__self); })
 #endif /* !__CRT_HAVE_pthread_spin_trylock */
 #ifdef __CRT_HAVE_pthread_spin_unlock
 /* >> pthread_spin_unlock(3)
- * Release  spinlock  `lock'
+ * Release  spinlock  `self'
  * @return: EOK: Success */
-__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_spin_unlock,(pthread_spinlock_t *__lock),(__lock))
+__CDECLARE(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_spin_unlock,(pthread_spinlock_t *__self),(__self))
 #else /* __CRT_HAVE_pthread_spin_unlock */
 #include <libc/local/pthread/pthread_spin_unlock.h>
 /* >> pthread_spin_unlock(3)
- * Release  spinlock  `lock'
+ * Release  spinlock  `self'
  * @return: EOK: Success */
-__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_unlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_unlock)(pthread_spinlock_t *__lock) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_unlock))(__lock); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_unlock, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_INOUT(1) __errno_t __NOTHROW_NCX(__LIBCCALL pthread_spin_unlock)(pthread_spinlock_t *__self) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_spin_unlock))(__self); })
 #endif /* !__CRT_HAVE_pthread_spin_unlock */
 
 
@@ -2404,19 +2404,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pthread_spin_unlock, __FORCELOCAL __ATTR_ARTIFIC
 /************************************************************************/
 
 /* >> pthread_barrier_init(3)
- * Initialize `barrier' with the attributes in `attr'.
- * The  barrier is opened when `count' waiters arrived
+ * Initialize `self' with  the attributes in  `attr'.
+ * The barrier is opened when `count' waiters arrived
  * @return: EOK:    Success
  * @return: EINVAL: The given `count' is ZERO(0) */
-__CDECLARE_OPT(__ATTR_IN_OPT(2) __ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_barrier_init,(pthread_barrier_t *__restrict __barrier, pthread_barrierattr_t const *__restrict __attr, unsigned int __count),(__barrier,__attr,__count))
+__CDECLARE_OPT(__ATTR_IN_OPT(2) __ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_barrier_init,(pthread_barrier_t *__restrict __self, pthread_barrierattr_t const *__restrict __attr, unsigned int __count),(__self,__attr,__count))
 /* >> pthread_barrier_destroy(3)
- * Destroy the given (previously dynamically initialized) `barrier'
+ * Destroy the given (previously dynamically initialized) `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_barrier_destroy,(pthread_barrier_t *__barrier),(__barrier))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_barrier_destroy,(pthread_barrier_t *__self),(__self))
 /* >> pthread_barrier_wait(3)
- * Wait on the given `barrier'
+ * Wait on  the given  `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_barrier_wait,(pthread_barrier_t *__barrier),(__barrier))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_barrier_wait,(pthread_barrier_t *__self),(__self))
 
 
 /************************************************************************/
@@ -2424,22 +2424,22 @@ __CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_barrier_wait,(pth
 /************************************************************************/
 
 /* >> pthread_barrierattr_init(3)
- * Initialize barrier attribute `attr'
+ * Initialize barrier attribute `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_barrierattr_init,(pthread_barrierattr_t *__attr),(__attr))
+__CDECLARE_OPT(__ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_barrierattr_init,(pthread_barrierattr_t *__self),(__self))
 /* >> pthread_barrierattr_destroy(3)
- * Destroy previously dynamically initialized barrier attribute `attr'
+ * Destroy previously dynamically initialized barrier attribute `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_barrierattr_destroy,(pthread_barrierattr_t *__attr),(__attr))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_barrierattr_destroy,(pthread_barrierattr_t *__self),(__self))
 /* >> pthread_barrierattr_getpshared(3)
- * Get the process-shared flag of the barrier attribute `attr'
+ * Get the process-shared flag of the barrier attribute `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_barrierattr_getpshared,(pthread_barrierattr_t const *__restrict __attr, int *__restrict __pshared),(__attr,__pshared))
+__CDECLARE_OPT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_barrierattr_getpshared,(pthread_barrierattr_t const *__restrict __self, int *__restrict __pshared),(__self,__pshared))
 /* >> pthread_barrierattr_setpshared(3)
- * Set the process-shared flag of the barrier attribute `attr'
+ * Set the process-shared flag of the barrier attribute `self'
  * @return: EOK:    Success
  * @return: EINVAL: Invalid/unsupported `pshared' */
-__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_barrierattr_setpshared,(pthread_barrierattr_t *__attr, int __pshared),(__attr,__pshared))
+__CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_barrierattr_setpshared,(pthread_barrierattr_t *__self, int __pshared),(__self,__pshared))
 #endif /* __USE_XOPEN2K */
 
 
@@ -2581,9 +2581,9 @@ __CDECLARE_OPT(__ATTR_CONST __ATTR_WUNUSED,void **,__NOTHROW_NCX,pthread_getspec
 #endif /* __USE_KOS */
 #ifdef __USE_XOPEN2K
 /* >> pthread_getcpuclockid(3)
- * Get the ID of CPU-time clock for thread `pthread'
+ * Get the ID of CPU-time clock for thread `self'
  * @return: EOK: Success */
-__CDECLARE_OPT(__ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_getcpuclockid,(pthread_t __pthread, __clockid_t *__clock_id),(__pthread,__clock_id))
+__CDECLARE_OPT(__ATTR_OUT(2),__errno_t,__NOTHROW_NCX,pthread_getcpuclockid,(pthread_t __self, __clockid_t *__clock_id),(__self,__clock_id))
 #endif /* __USE_XOPEN2K */
 #if !defined(__pthread_atfork_defined) && defined(__CRT_HAVE_pthread_atfork)
 #define __pthread_atfork_defined

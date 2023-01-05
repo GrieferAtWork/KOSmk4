@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe73db759 */
+/* HASH CRC-32:0x6166c693 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,12 +27,12 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_pthread_attr_getstack_defined
 #define __local___localdep_crt_pthread_attr_getstack_defined
-__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2) __ATTR_OUT(3),__errno_t,__NOTHROW_NCX,__localdep_crt_pthread_attr_getstack,(__pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr, __SIZE_TYPE__ *__restrict __stacksize),pthread_attr_getstack,(__attr,__stackaddr,__stacksize))
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2) __ATTR_OUT(3),__errno_t,__NOTHROW_NCX,__localdep_crt_pthread_attr_getstack,(__pthread_attr_t const *__restrict __self, void **__restrict __stackaddr, __SIZE_TYPE__ *__restrict __stacksize),pthread_attr_getstack,(__self,__stackaddr,__stacksize))
 #endif /* !__local___localdep_crt_pthread_attr_getstack_defined */
 __LOCAL_LIBC(pthread_attr_getstacksize) __ATTR_IN(1) __ATTR_OUT(2) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_attr_getstacksize))(__pthread_attr_t const *__restrict __attr, __SIZE_TYPE__ *__restrict __stacksize) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_attr_getstacksize))(__pthread_attr_t const *__restrict __self, __SIZE_TYPE__ *__restrict __stacksize) {
 	void *__stackaddr;
-	return (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_attr_getstack)(__attr, &__stackaddr, __stacksize);
+	return (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_attr_getstack)(__self, &__stackaddr, __stacksize);
 }
 __NAMESPACE_LOCAL_END
 #ifndef __local___localdep_pthread_attr_getstacksize_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd080ebc8 */
+/* HASH CRC-32:0xa03a8541 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__pthread_t,__NOTHROW,__localdep_pthread
 __NAMESPACE_LOCAL_END
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_OUT(2),__errno_t,__NOTHROW_NCX,__localdep_pthread_stackseg_np,(__pthread_t __pthread, struct sigaltstack *__sinfo),pthread_stackseg_np,(__pthread,__sinfo))
+__CREDIRECT(__ATTR_OUT(2),__errno_t,__NOTHROW_NCX,__localdep_pthread_stackseg_np,(__pthread_t __self, struct sigaltstack *__sinfo),pthread_stackseg_np,(__self,__sinfo))
 #elif defined(__CRT_HAVE_pthread_getattr_np) && (defined(__CRT_HAVE_pthread_attr_getstack) || (defined(__CRT_HAVE_pthread_attr_getstackaddr) && defined(__CRT_HAVE_pthread_attr_getstacksize)))
 __NAMESPACE_LOCAL_END
 #include <libc/local/pthread_np/pthread_stackseg_np.h>

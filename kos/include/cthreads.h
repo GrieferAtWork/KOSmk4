@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd381804b */
+/* HASH CRC-32:0x251916f0 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -311,16 +311,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(cthread_fork, __FORCELOCAL __ATTR_ARTIFICIAL __A
 __CDECLARE_OPT(,ur_cthread_t,__NOTHROW_NCX,ur_cthread_self,(void),())
 #ifdef __CRT_HAVE_pthread_detach
 /* >> pthread_detach(3)
- * Indicate  that the  thread `pthread' is  never to be  joined with `pthread_join(3)'.
- * The  resources  of   `pthread'  will   therefore  be  freed   immediately  when   it
- * terminates, instead of waiting for another thread to perform `pthread_join(3)' on it
+ * Indicate that the thread `self' is  never to be joined with  `pthread_join(3)'.
+ * The resources of `self' will therefore be freed immediately when it terminates,
+ * instead of waiting for another thread to perform `pthread_join(3)' on it
  * @return: EOK: Success */
 __CREDIRECT_VOID(,__NOTHROW_NCX,cthread_detach,(cthread_t __self),pthread_detach,(__self))
 #elif defined(__CRT_HAVE_cthread_detach)
 /* >> pthread_detach(3)
- * Indicate  that the  thread `pthread' is  never to be  joined with `pthread_join(3)'.
- * The  resources  of   `pthread'  will   therefore  be  freed   immediately  when   it
- * terminates, instead of waiting for another thread to perform `pthread_join(3)' on it
+ * Indicate that the thread `self' is  never to be joined with  `pthread_join(3)'.
+ * The resources of `self' will therefore be freed immediately when it terminates,
+ * instead of waiting for another thread to perform `pthread_join(3)' on it
  * @return: EOK: Success */
 __CDECLARE_VOID(,__NOTHROW_NCX,cthread_detach,(cthread_t __self),(__self))
 #endif /* ... */

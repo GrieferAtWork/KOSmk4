@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4b2b179 */
+/* HASH CRC-32:0x961811a9 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,11 +33,11 @@ DECL_BEGIN
 /* >> pthread_stackseg_np(3)
  * Convenience wrapper for `pthread_getattr_np(3)' + `pthread_attr_getstack()' */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_OUT(2) errno_t
-NOTHROW_NCX(LIBCCALL libc_pthread_stackseg_np)(pthread_t pthread,
+NOTHROW_NCX(LIBCCALL libc_pthread_stackseg_np)(pthread_t self,
                                                stack_t *sinfo) {
 	errno_t result;
 	pthread_attr_t attr;
-	result = libc_pthread_getattr_np(pthread, &attr);
+	result = libc_pthread_getattr_np(self, &attr);
 	if likely(result == 0) {
 		void *stackaddr;
 		size_t stacksize;

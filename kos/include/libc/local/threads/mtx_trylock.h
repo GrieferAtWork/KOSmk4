@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34ee54f3 */
+/* HASH CRC-32:0x83c2274a */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_mutex_trylock,(__pthread_mutex_t *__mutex),pthread_mutex_trylock,(__mutex))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_mutex_trylock,(__pthread_mutex_t *__self),pthread_mutex_trylock,(__self))
 #endif /* !__local___localdep_pthread_mutex_trylock_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd94d9170 */
+/* HASH CRC-32:0xbf823bbd */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_cancel,(__pthread_t __pthread),pthread_cancel,(__pthread))
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep_pthread_cancel,(__pthread_t __self),pthread_cancel,(__self))
 #endif /* !__local___localdep_pthread_cancel_defined */
 __NAMESPACE_LOCAL_END
 #include <bits/crt/pthreadtypes.h>

@@ -58,10 +58,10 @@ typedef struct sigaltstack stack_t;
 @@Convenience wrapper for `pthread_getattr_np(3)' + `pthread_attr_getstack()'
 [[decl_include("<bits/os/sigstack.h>", "<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[requires_function(pthread_getattr_np, pthread_attr_getstack)]]
-$errno_t pthread_stackseg_np(pthread_t pthread, [[out]] stack_t *sinfo) {
+$errno_t pthread_stackseg_np(pthread_t self, [[out]] stack_t *sinfo) {
 	errno_t result;
 	pthread_attr_t attr;
-	result = pthread_getattr_np(pthread, &attr);
+	result = pthread_getattr_np(self, &attr);
 	if likely(result == 0) {
 		void *stackaddr;
 		size_t stacksize;

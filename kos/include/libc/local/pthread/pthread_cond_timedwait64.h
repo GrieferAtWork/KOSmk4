@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x525fabc3 */
+/* HASH CRC-32:0xbd7ecc5 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,15 +28,15 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_pthread_cond_timedwait32_defined
 #define __local___localdep_crt_pthread_cond_timedwait32_defined
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,__localdep_crt_pthread_cond_timedwait32,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec32 const *__restrict __abstime),pthread_cond_timedwait,(__cond,__mutex,__abstime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2),__errno_t,__NOTHROW_RPC,__localdep_crt_pthread_cond_timedwait32,(__pthread_cond_t *__restrict __self, __pthread_mutex_t *__restrict __mutex, struct __timespec32 const *__restrict __abstime),pthread_cond_timedwait,(__self,__mutex,__abstime))
 #endif /* !__local___localdep_crt_pthread_cond_timedwait32_defined */
 __LOCAL_LIBC(pthread_cond_timedwait64) __ATTR_WUNUSED __ATTR_IN(3) __ATTR_INOUT(1) __ATTR_INOUT(2) __errno_t
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_cond_timedwait64))(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __abstime) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_cond_timedwait64))(__pthread_cond_t *__restrict __self, __pthread_mutex_t *__restrict __mutex, struct __timespec64 const *__restrict __abstime) {
 	__errno_t __result;
 	struct __timespec32 __abstime32;
 	__abstime32.tv_sec  = (__time32_t)__abstime->tv_sec;
 	__abstime32.tv_nsec = __abstime->tv_nsec;
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_cond_timedwait32)(__cond, __mutex, &__abstime32);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_cond_timedwait32)(__self, __mutex, &__abstime32);
 	return __result;
 }
 __NAMESPACE_LOCAL_END

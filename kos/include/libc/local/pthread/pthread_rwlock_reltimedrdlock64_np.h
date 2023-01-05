@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1f973ac */
+/* HASH CRC-32:0x8d579c22 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,15 +28,15 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_pthread_rwlock_reltimedrdlock32_np_defined
 #define __local___localdep_crt_pthread_rwlock_reltimedrdlock32_np_defined
-__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,__localdep_crt_pthread_rwlock_reltimedrdlock32_np,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec32 const *__restrict __reltime),pthread_rwlock_reltimedrdlock_np,(__rwlock,__reltime))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,__localdep_crt_pthread_rwlock_reltimedrdlock32_np,(__pthread_rwlock_t *__restrict __self, struct __timespec32 const *__restrict __reltime),pthread_rwlock_reltimedrdlock_np,(__self,__reltime))
 #endif /* !__local___localdep_crt_pthread_rwlock_reltimedrdlock32_np_defined */
 __LOCAL_LIBC(pthread_rwlock_reltimedrdlock64_np) __ATTR_WUNUSED __ATTR_IN(2) __ATTR_INOUT(1) __errno_t
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_rwlock_reltimedrdlock64_np))(__pthread_rwlock_t *__restrict __rwlock, struct __timespec64 const *__restrict __reltime) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_rwlock_reltimedrdlock64_np))(__pthread_rwlock_t *__restrict __self, struct __timespec64 const *__restrict __reltime) {
 	__errno_t __result;
 	struct __timespec32 __reltime32;
 	__reltime32.tv_sec  = (__time32_t)__reltime->tv_sec;
 	__reltime32.tv_nsec = __reltime->tv_nsec;
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_rwlock_reltimedrdlock32_np)(__rwlock, &__reltime32);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_rwlock_reltimedrdlock32_np)(__self, &__reltime32);
 	return __result;
 }
 __NAMESPACE_LOCAL_END

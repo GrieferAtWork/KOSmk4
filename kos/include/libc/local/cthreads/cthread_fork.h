@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c858f5f */
+/* HASH CRC-32:0x5a7af0c9 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_IN_OPT(2) __ATTR_OUT(1) __ATTR_NONNULL((3)),__errno_t,__NOTHROW_NCX,__localdep_pthread_create,(__pthread_t *__restrict __newthread, __pthread_attr_t const *__restrict __attr, void *(__LIBCCALL *__start_routine)(void *__arg), void *__arg),pthread_create,(__newthread,__attr,__start_routine,__arg))
+__CREDIRECT(__ATTR_IN_OPT(2) __ATTR_OUT(1) __ATTR_NONNULL((3)),__errno_t,__NOTHROW_NCX,__localdep_pthread_create,(__pthread_t *__restrict __p_newthread, __pthread_attr_t const *__restrict __attr, void *(__LIBCCALL *__start_routine)(void *__arg), void *__arg),pthread_create,(__p_newthread,__attr,__start_routine,__arg))
 #endif /* !__local___localdep_pthread_create_defined */
 __NAMESPACE_LOCAL_END
 #include <libc/errno.h>

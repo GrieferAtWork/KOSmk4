@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe868a49f */
+/* HASH CRC-32:0x4f9cfe55 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_pthread_spin_trylock_defined
 #define __local___localdep_pthread_spin_trylock_defined
 #ifdef __CRT_HAVE_pthread_spin_trylock
-__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_spin_trylock,(__pthread_spinlock_t *__lock),pthread_spin_trylock,(__lock))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_spin_trylock,(__pthread_spinlock_t *__self),pthread_spin_trylock,(__self))
 #else /* __CRT_HAVE_pthread_spin_trylock */
 __NAMESPACE_LOCAL_END
 #include <libc/local/pthread/pthread_spin_trylock.h>
@@ -40,8 +40,8 @@ __NAMESPACE_LOCAL_END
 #include <hybrid/sched/__yield.h>
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(pthread_spin_lock) __ATTR_INOUT(1) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_lock))(__pthread_spinlock_t *__lock) {
-	while ((__NAMESPACE_LOCAL_SYM __localdep_pthread_spin_trylock)(__lock) != 0)
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_spin_lock))(__pthread_spinlock_t *__self) {
+	while ((__NAMESPACE_LOCAL_SYM __localdep_pthread_spin_trylock)(__self) != 0)
 		__hybrid_yield();
 	return 0;
 }

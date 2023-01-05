@@ -709,14 +709,14 @@ typedef __size_t size_t;
 @@>> pthread_create(3)
 @@Create a  new thread,  starting with  execution of  `start_routine'
 @@getting passed `arg'. Creation attributed come from `attr'. The new
-@@handle is stored in `*newthread'
+@@handle is stored in `*p_newthread'
 @@@return: EOK:    Success
 @@@return: EAGAIN: Insufficient resources, or operation-not-permitted
 @@                 (read: `ENOMEM', but posix didn't want to use that
 @@                 errno for whatever reason...)
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[crt_dos_impl_if(!defined(__LIBCCALL_IS_LIBDCALL)), crt_dos_variant]]
-$errno_t pthread_create([[out]] pthread_t *__restrict newthread,
+$errno_t pthread_create([[out]] pthread_t *__restrict p_newthread,
                         [[in_opt]] pthread_attr_t const *__restrict attr,
                         [[nonnull]] void *(LIBCCALL *start_routine)(void *arg), void *arg);
 
@@ -727,36 +727,36 @@ $errno_t pthread_create([[out]] pthread_t *__restrict newthread,
 void pthread_exit([[access(none)]] void *retval);
 
 @@>> pthread_join(3)
-@@Make calling thread wait for termination of the thread `pthread'.
-@@The exit status of the  thread is stored in `*thread_return',  if
+@@Make calling thread wait for termination of the thread  `self'.
+@@The exit status of the thread is stored in `*thread_return', if
 @@`thread_return' is not `NULL'.
 @@@return: EOK: Success
 [[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_join(pthread_t pthread, [[out_opt]] void **thread_return);
+$errno_t pthread_join(pthread_t self, [[out_opt]] void **thread_return);
 
 %#ifdef __USE_KOS
 @@>> pthread_getresult_np(3)
-@@Same as `pthread_join(3)', but don't destroy `pthread' at the end.
-@@Instead, the caller must destroy `pthread' themselves via  another
+@@Same as `pthread_join(3)', but don't destroy `self' at the end.
+@@Instead, the caller must destroy `self' themselves via  another
 @@call to `pthread_detach(3)'.
 @@@return: EOK: Success
 [[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_getresult_np(pthread_t pthread, [[out_opt]] void **thread_return);
+$errno_t pthread_getresult_np(pthread_t self, [[out_opt]] void **thread_return);
 %#endif /* __USE_KOS */
 
 %#ifdef __USE_GNU
 @@>> pthread_tryjoin_np(3)
-@@Check whether thread `pthread' has terminated. If so return the
+@@Check whether thread  `self' has terminated.  If so return  the
 @@status of the thread in `*thread_return', if `thread_return' is
 @@not `NULL'.
 @@@return: EOK:   Success
 @@@return: EBUSY: The thread has yet to terminate
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_tryjoin_np(pthread_t pthread, [[out_opt]] void **thread_return);
+$errno_t pthread_tryjoin_np(pthread_t self, [[out_opt]] void **thread_return);
 
 %struct timespec;
 @@>> pthread_timedjoin_np(3), pthread_timedjoin64_np(3)
-@@Make calling thread wait for termination of the thread `pthread',
+@@Make calling thread  wait for termination  of the thread  `self',
 @@but only until `timeout'. The exit status of the thread is stored
 @@in  `*thread_return',   if   `thread_return'   is   not   `NULL'.
 @@@return: EOK:       Success
@@ -767,57 +767,57 @@ $errno_t pthread_tryjoin_np(pthread_t pthread, [[out_opt]] void **thread_return)
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_timedjoin64_np")]]
 [[userimpl, requires($has_function(crt_pthread_timedjoin32_np) ||
                      $has_function(pthread_timedjoin64_np))]]
-$errno_t pthread_timedjoin_np(pthread_t pthread,
+$errno_t pthread_timedjoin_np(pthread_t self,
                               [[out_opt]] void **thread_return,
                               [[in_opt]] struct timespec const *abstime) {
 @@pp_if $has_function(crt_pthread_timedjoin32_np)@@
 	struct timespec32 abstime32;
 	if (!abstime)
-		return crt_pthread_timedjoin32_np(pthread, thread_return, NULL);
+		return crt_pthread_timedjoin32_np(self, thread_return, NULL);
 	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
 	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
-	return crt_pthread_timedjoin32_np(pthread, thread_return, &abstime32);
+	return crt_pthread_timedjoin32_np(self, thread_return, &abstime32);
 @@pp_else@@
 	struct timespec64 abstime64;
 	if (!abstime)
-		return pthread_timedjoin64_np(pthread, thread_return, NULL);
+		return pthread_timedjoin64_np(self, thread_return, NULL);
 	abstime64.@tv_sec@  = (time64_t)abstime->@tv_sec@;
 	abstime64.@tv_nsec@ = abstime->@tv_nsec@;
-	return pthread_timedjoin64_np(pthread, thread_return, &abstime32);
+	return pthread_timedjoin64_np(self, thread_return, &abstime32);
 @@pp_endif@@
 }
 
 %#ifdef __USE_TIME64
 [[cp, ignore, doc_alias("pthread_timedjoin_np"), nocrt, alias("pthread_timedjoin_np")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
-$errno_t crt_pthread_timedjoin32_np(pthread_t pthread, [[out_opt]] void **thread_return,
+$errno_t crt_pthread_timedjoin32_np(pthread_t self, [[out_opt]] void **thread_return,
                                     [[in_opt]] struct timespec32 const *abstime);
 
 
 [[cp, preferred_time64_variant_of(pthread_timedjoin_np), doc_alias("pthread_timedjoin_np")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[userimpl, requires_function(crt_pthread_timedjoin32_np)]]
-$errno_t pthread_timedjoin64_np(pthread_t pthread, [[out_opt]] void **thread_return,
+$errno_t pthread_timedjoin64_np(pthread_t self, [[out_opt]] void **thread_return,
                                 [[in_opt]] struct timespec64 const *abstime) {
 	struct timespec32 abstime32;
 	if (!abstime)
-		return crt_pthread_timedjoin32_np(pthread, thread_return, NULL);
+		return crt_pthread_timedjoin32_np(self, thread_return, NULL);
 	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
 	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
-	return crt_pthread_timedjoin32_np(pthread, thread_return, &abstime32);
+	return crt_pthread_timedjoin32_np(self, thread_return, &abstime32);
 }
 
 %#endif /* __USE_TIME64 */
 %#endif /* __USE_GNU */
 
 @@>> pthread_detach(3)
-@@Indicate  that the  thread `pthread' is  never to be  joined with `pthread_join(3)'.
-@@The  resources  of   `pthread'  will   therefore  be  freed   immediately  when   it
-@@terminates, instead of waiting for another thread to perform `pthread_join(3)' on it
+@@Indicate that the thread `self' is  never to be joined with  `pthread_join(3)'.
+@@The resources of `self' will therefore be freed immediately when it terminates,
+@@instead of waiting for another thread to perform `pthread_join(3)' on it
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[export_alias("cthread_detach")]]
-$errno_t pthread_detach(pthread_t pthread);
+$errno_t pthread_detach(pthread_t self);
 
 @@>> pthread_self(3)
 @@Obtain the identifier of the current thread
@@ -840,24 +840,24 @@ int pthread_equal(pthread_t thr1, pthread_t thr2) {
 %/* Thread attribute handling. */
 %
 @@>> pthread_attr_init(3)
-@@Initialize thread  attribute `*attr'  with default  attributes (detachstate  is
+@@Initialize thread  attribute `*self'  with default  attributes (detachstate  is
 @@`PTHREAD_JOINABLE', scheduling policy is `SCHED_OTHER', no user-provided stack)
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_attr_init([[out]] pthread_attr_t *attr);
+$errno_t pthread_attr_init([[out]] pthread_attr_t *self);
 
 @@>> pthread_attr_destroy(3)
-@@Destroy thread attribute `*attr'
+@@Destroy thread attribute `*self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_attr_destroy([[inout]] pthread_attr_t *attr);
+$errno_t pthread_attr_destroy([[inout]] pthread_attr_t *self);
 
 @@>> pthread_attr_getdetachstate(3)
 @@Get   detach   state    attribute
 @@@param: *detachstate: One of `PTHREAD_CREATE_JOINABLE', `PTHREAD_CREATE_DETACHED'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_attr_getdetachstate([[in]] pthread_attr_t const *__restrict attr,
+$errno_t pthread_attr_getdetachstate([[in]] pthread_attr_t const *__restrict self,
                                      [[out]] int *__restrict detachstate);
 
 @@>> pthread_attr_setdetachstate(3)
@@ -866,79 +866,79 @@ $errno_t pthread_attr_getdetachstate([[in]] pthread_attr_t const *__restrict att
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `detachstate'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_attr_setdetachstate([[inout]] pthread_attr_t *attr, int detachstate);
+$errno_t pthread_attr_setdetachstate([[inout]] pthread_attr_t *self, int detachstate);
 
 @@>> pthread_attr_getguardsize(3)
 @@Get the size of the guard area created for stack overflow protection
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_attr_getguardsize([[in]] pthread_attr_t const *__restrict attr,
+$errno_t pthread_attr_getguardsize([[in]] pthread_attr_t const *__restrict self,
                                    [[out]] size_t *__restrict guardsize);
 
 @@>> pthread_attr_setguardsize(3)
 @@Set the size of the guard area created for stack overflow protection
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_attr_setguardsize([[inout]] pthread_attr_t *attr, size_t guardsize);
+$errno_t pthread_attr_setguardsize([[inout]] pthread_attr_t *self, size_t guardsize);
 
 @@>> pthread_attr_getschedparam(3)
-@@Return in `*param' the scheduling parameters of `*attr'
+@@Return in `*param' the scheduling parameters of `*self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_attr_getschedparam([[in]] pthread_attr_t const *__restrict attr,
+$errno_t pthread_attr_getschedparam([[in]] pthread_attr_t const *__restrict self,
                                     [[out]] struct sched_param *__restrict param);
 
 @@>> pthread_attr_setschedparam(3)
-@@Set scheduling parameters (priority, etc) in `*attr' according to `param'
+@@Set scheduling parameters (priority, etc) in `*self' according to `param'
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `param'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_attr_setschedparam([[inout]] pthread_attr_t *__restrict attr,
+$errno_t pthread_attr_setschedparam([[inout]] pthread_attr_t *__restrict self,
                                     [[in]] struct sched_param const *__restrict param);
 
 @@>> pthread_attr_getschedpolicy(3)
-@@Return in `*policy' the scheduling policy of `*attr'
+@@Return in `*policy' the scheduling policy of `*self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_attr_getschedpolicy([[in]] pthread_attr_t const *__restrict attr,
+$errno_t pthread_attr_getschedpolicy([[in]] pthread_attr_t const *__restrict self,
                                      [[out]] int *__restrict policy);
 
 @@>> pthread_attr_setschedpolicy(3)
-@@Set scheduling policy in `*attr' according to `policy'
+@@Set scheduling policy in `*self' according to `policy'
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `policy'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_attr_setschedpolicy([[inout]] pthread_attr_t *attr, int policy);
+$errno_t pthread_attr_setschedpolicy([[inout]] pthread_attr_t *self, int policy);
 
 @@>> pthread_attr_getinheritsched(3)
-@@Return in `*inherit' the scheduling inheritance mode of `*attr'
+@@Return in `*inherit' the scheduling inheritance mode of `*self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_attr_getinheritsched([[in]] pthread_attr_t const *__restrict attr,
+$errno_t pthread_attr_getinheritsched([[in]] pthread_attr_t const *__restrict self,
                                       [[out]] int *__restrict inherit);
 
 @@>> pthread_attr_setinheritsched(3)
-@@Set scheduling inheritance mode in `*attr' according to `inherit'
+@@Set scheduling inheritance mode in `*self' according to `inherit'
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `inherit'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_attr_setinheritsched([[inout]] pthread_attr_t *attr, int inherit);
+$errno_t pthread_attr_setinheritsched([[inout]] pthread_attr_t *self, int inherit);
 
 @@>> pthread_attr_getscope(3)
-@@Return in `*scope' the scheduling contention scope of `*attr'
+@@Return in `*scope' the scheduling contention scope of `*self'
 @@@param:  scope: Filled with one of `PTHREAD_SCOPE_*'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_attr_getscope([[in]] pthread_attr_t const *__restrict attr,
+$errno_t pthread_attr_getscope([[in]] pthread_attr_t const *__restrict self,
                                [[out]] int *__restrict scope);
 
 @@>> pthread_attr_setscope(3)
-@@Set scheduling contention scope in `*attr' according to `scope'
+@@Set scheduling contention scope in `*self' according to `scope'
 @@@param:  scope:  One of `PTHREAD_SCOPE_*'
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `scope'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_attr_setscope([[inout]] pthread_attr_t *attr, int scope);
+$errno_t pthread_attr_setscope([[inout]] pthread_attr_t *self, int scope);
 
 
 /************************************************************************/
@@ -946,26 +946,26 @@ $errno_t pthread_attr_setscope([[inout]] pthread_attr_t *attr, int scope);
 /************************************************************************/
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[ignore, nocrt, alias("pthread_attr_getstackaddr"), doc_alias("pthread_attr_getstackaddr")]]
-$errno_t crt_pthread_attr_getstackaddr([[in]] pthread_attr_t const *__restrict attr,
+$errno_t crt_pthread_attr_getstackaddr([[in]] pthread_attr_t const *__restrict self,
                                        [[out]] void **__restrict stackaddr);
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[ignore, nocrt, alias("pthread_attr_setstackaddr"), doc_alias("pthread_attr_setstackaddr")]]
-$errno_t crt_pthread_attr_setstackaddr([[inout]] pthread_attr_t *attr, void *stackaddr);
+$errno_t crt_pthread_attr_setstackaddr([[inout]] pthread_attr_t *self, void *stackaddr);
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[ignore, nocrt, alias("pthread_attr_getstacksize"), doc_alias("pthread_attr_getstacksize")]]
-$errno_t crt_pthread_attr_getstacksize([[in]] pthread_attr_t const *__restrict attr,
+$errno_t crt_pthread_attr_getstacksize([[in]] pthread_attr_t const *__restrict self,
                                        [[out]] size_t *__restrict stacksize);
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[ignore, nocrt, alias("pthread_attr_setstacksize"), doc_alias("pthread_attr_setstacksize")]]
-$errno_t crt_pthread_attr_setstacksize([[inout]] pthread_attr_t *attr, size_t stacksize);
+$errno_t crt_pthread_attr_setstacksize([[inout]] pthread_attr_t *self, size_t stacksize);
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[ignore, nocrt, alias("pthread_attr_getstack"), doc_alias("pthread_attr_getstack")]]
-$errno_t crt_pthread_attr_getstack([[in]] pthread_attr_t const *__restrict attr,
+$errno_t crt_pthread_attr_getstack([[in]] pthread_attr_t const *__restrict self,
                                    [[out]] void **__restrict stackaddr,
                                    [[out]] size_t *__restrict stacksize);
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[ignore, nocrt, alias("pthread_attr_setstack"), doc_alias("pthread_attr_setstack")]]
-$errno_t crt_pthread_attr_setstack([[inout]] pthread_attr_t *attr, void *stackaddr, size_t stacksize);
+$errno_t crt_pthread_attr_setstack([[inout]] pthread_attr_t *self, void *stackaddr, size_t stacksize);
 /************************************************************************/
 
 
@@ -975,10 +975,10 @@ $errno_t crt_pthread_attr_setstack([[inout]] pthread_attr_t *attr, void *stackad
 [[deprecated("Use pthread_attr_getstack()")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[userimpl, requires_function(crt_pthread_attr_getstack)]]
-$errno_t pthread_attr_getstackaddr([[in]] pthread_attr_t const *__restrict attr,
+$errno_t pthread_attr_getstackaddr([[in]] pthread_attr_t const *__restrict self,
                                    [[out]] void **__restrict stackaddr) {
 	size_t stacksize;
-	return crt_pthread_attr_getstack(attr, stackaddr, &stacksize);
+	return crt_pthread_attr_getstack(self, stackaddr, &stacksize);
 }
 
 
@@ -992,17 +992,17 @@ $errno_t pthread_attr_getstackaddr([[in]] pthread_attr_t const *__restrict attr,
 [[deprecated("Use pthread_attr_setstack()")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[userimpl, requires_function(pthread_attr_getstack, crt_pthread_attr_setstack)]]
-$errno_t pthread_attr_setstackaddr([[inout]] pthread_attr_t *attr, void *stackaddr) {
+$errno_t pthread_attr_setstackaddr([[inout]] pthread_attr_t *self, void *stackaddr) {
 	errno_t result;
 	size_t stacksize;
 @@pp_if $has_function(crt_pthread_attr_getstacksize)@@
-	result = crt_pthread_attr_getstacksize(attr, &stacksize);
+	result = crt_pthread_attr_getstacksize(self, &stacksize);
 @@pp_else@@
 	void *_old_stackaddr;
-	result = pthread_attr_getstack(attr, &_old_stackaddr, &stacksize);
+	result = pthread_attr_getstack(self, &_old_stackaddr, &stacksize);
 @@pp_endif@@
 	if likely(result == 0)
-		result = crt_pthread_attr_setstack(attr, stackaddr, stacksize);
+		result = crt_pthread_attr_setstack(self, stackaddr, stacksize);
 	return result;
 }
 
@@ -1011,10 +1011,10 @@ $errno_t pthread_attr_setstackaddr([[inout]] pthread_attr_t *attr, void *stackad
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[userimpl, requires_function(crt_pthread_attr_getstack)]]
-$errno_t pthread_attr_getstacksize([[in]] pthread_attr_t const *__restrict attr,
+$errno_t pthread_attr_getstacksize([[in]] pthread_attr_t const *__restrict self,
                                    [[out]] size_t *__restrict stacksize) {
 	void *stackaddr;
-	return crt_pthread_attr_getstack(attr, &stackaddr, stacksize);
+	return crt_pthread_attr_getstack(self, &stackaddr, stacksize);
 }
 
 @@>> pthread_attr_setstacksize(3)
@@ -1025,17 +1025,17 @@ $errno_t pthread_attr_getstacksize([[in]] pthread_attr_t const *__restrict attr,
 @@@return: EINVAL: `stacksize' is too small
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[userimpl, requires_function(pthread_attr_getstack, crt_pthread_attr_setstack)]]
-$errno_t pthread_attr_setstacksize([[inout]] pthread_attr_t *attr, size_t stacksize) {
+$errno_t pthread_attr_setstacksize([[inout]] pthread_attr_t *self, size_t stacksize) {
 	errno_t result;
 	void *stackaddr;
 @@pp_if $has_function(crt_pthread_attr_getstackaddr)@@
-	result = crt_pthread_attr_getstackaddr(attr, &stackaddr);
+	result = crt_pthread_attr_getstackaddr(self, &stackaddr);
 @@pp_else@@
 	size_t _old_stacksize;
-	result = pthread_attr_getstack(attr, &stackaddr, &_old_stacksize);
+	result = pthread_attr_getstack(self, &stackaddr, &_old_stacksize);
 @@pp_endif@@
 	if likely(result == 0)
-		result = crt_pthread_attr_setstack(attr, stackaddr, stacksize);
+		result = crt_pthread_attr_setstack(self, stackaddr, stacksize);
 	return result;
 }
 
@@ -1045,13 +1045,13 @@ $errno_t pthread_attr_setstacksize([[inout]] pthread_attr_t *attr, size_t stacks
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[userimpl, requires_function(crt_pthread_attr_getstackaddr, crt_pthread_attr_getstacksize)]]
-$errno_t pthread_attr_getstack([[in]] pthread_attr_t const *__restrict attr,
+$errno_t pthread_attr_getstack([[in]] pthread_attr_t const *__restrict self,
                                [[out]] void **__restrict stackaddr,
                                [[out]] size_t *__restrict stacksize) {
 	errno_t result;
-	result = crt_pthread_attr_getstackaddr(attr, stackaddr);
+	result = crt_pthread_attr_getstackaddr(self, stackaddr);
 	if likely(result == 0)
-		result = crt_pthread_attr_getstacksize(attr, stacksize);
+		result = crt_pthread_attr_getstacksize(self, stacksize);
 	return result;
 }
 
@@ -1064,12 +1064,12 @@ $errno_t pthread_attr_getstack([[in]] pthread_attr_t const *__restrict attr,
 @@@return: EINVAL: `stacksize' is too small, or the stack isn't suitably aligned
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[userimpl, requires_function(crt_pthread_attr_setstackaddr, crt_pthread_attr_setstacksize)]]
-$errno_t pthread_attr_setstack([[inout]] pthread_attr_t *attr,
+$errno_t pthread_attr_setstack([[inout]] pthread_attr_t *self,
                                void *stackaddr, size_t stacksize) {
 	errno_t result;
-	result = crt_pthread_attr_setstackaddr(attr, stackaddr);
+	result = crt_pthread_attr_setstackaddr(self, stackaddr);
 	if likely(result == 0)
-		result = crt_pthread_attr_setstacksize(attr, stacksize);
+		result = crt_pthread_attr_setstacksize(self, stacksize);
 	return result;
 }
 %#endif /* __USE_XOPEN2K */
@@ -1087,7 +1087,7 @@ $errno_t pthread_attr_setstack([[inout]] pthread_attr_t *attr,
 @@@return: EINVAL: The given set contains a non-existant CPU
 @@@return: ENOMEM: Insufficient memory
 [[decl_include("<bits/types.h>", "<bits/os/cpu_set.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_attr_setaffinity_np([[inout]] pthread_attr_t *attr, size_t cpusetsize,
+$errno_t pthread_attr_setaffinity_np([[inout]] pthread_attr_t *self, size_t cpusetsize,
                                      [[in_opt]] cpu_set_t const *cpuset);
 
 @@>> pthread_attr_getaffinity_np(3)
@@ -1095,7 +1095,7 @@ $errno_t pthread_attr_setaffinity_np([[inout]] pthread_attr_t *attr, size_t cpus
 @@@return: EOK:    Success
 @@@return: EINVAL: `cpusetsize' is too small
 [[decl_include("<bits/types.h>", "<bits/os/cpu_set.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_attr_getaffinity_np([[in]] pthread_attr_t const *attr, size_t cpusetsize,
+$errno_t pthread_attr_getaffinity_np([[in]] pthread_attr_t const *self, size_t cpusetsize,
                                      [[out_opt]] cpu_set_t *cpuset);
 
 @@>> pthread_getattr_default_np(3)
@@ -1113,45 +1113,45 @@ $errno_t pthread_getattr_default_np([[out]] pthread_attr_t *attr);
 $errno_t pthread_setattr_default_np([[in]] pthread_attr_t const *attr);
 
 @@>> pthread_getattr_np(3)
-@@Initialize thread  attribute `*attr'  with attributes  corresponding to  the
-@@already running thread `pthread'. It shall be called on uninitialized `attr'
+@@Initialize thread attribute `*attr' with attributes corresponding to  the
+@@already running thread `self'. It shall be called on uninitialized `attr'
 @@and destroyed with `pthread_attr_destroy(3)' when no longer needed
 @@@return: EOK:    Success
 @@@return: ENOMEM: Insufficient memory
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_getattr_np(pthread_t pthread, [[out]] pthread_attr_t *attr);
+$errno_t pthread_getattr_np(pthread_t self, [[out]] pthread_attr_t *attr);
 %#endif /* __USE_GNU */
 
 %
 %/* Functions for scheduling control. */
 %
 @@>> pthread_setschedparam(3)
-@@Set the scheduling parameters for `target_thread' according to `policy' and `*param'
+@@Set the scheduling parameters for `self' according to `policy' and `*param'
 @@@return: EOK:    Success
 @@@return: EPERM:  The caller isn't allowed to specify `policy' and `param'
-@@@return: ESRCH:  `pthread' has already exited
+@@@return: ESRCH:  `self' has already exited
 @@@return: EINVAL: Invalid/unsupported `policy', or `param' is malformed for `policy'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/sched.h>")]]
-$errno_t pthread_setschedparam(pthread_t target_thread, int policy,
+$errno_t pthread_setschedparam(pthread_t self, int policy,
                                [[in]] struct sched_param const *param);
 
 @@>> pthread_getschedparam(3)
-@@Return in `*policy' and `*param' the scheduling parameters for `target_thread'
+@@Return in `*policy' and `*param' the scheduling parameters for `self'
 @@@return: EOK:   Success
-@@@return: ESRCH: `pthread' has already exited
+@@@return: ESRCH: `self' has already exited
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/sched.h>")]]
-$errno_t pthread_getschedparam(pthread_t target_thread,
+$errno_t pthread_getschedparam(pthread_t self,
                                [[out]] int *__restrict policy,
                                [[out]] struct sched_param *__restrict param);
 
 @@>> pthread_setschedprio(3)
-@@Set the scheduling priority for `target_thread'
+@@Set the scheduling priority for `self'
 @@@return: EOK:    Success
 @@@return: EPERM:  The caller isn't allowed to specify `prio'
-@@@return: ESRCH:  `pthread' has already exited
+@@@return: ESRCH:  `self' has already exited
 @@@return: EINVAL: Invalid/unsupported `prio'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_setschedprio(pthread_t target_thread, int prio);
+$errno_t pthread_setschedprio(pthread_t self, int prio);
 
 
 %#ifdef __USE_GNU
@@ -1161,7 +1161,7 @@ $errno_t pthread_setschedprio(pthread_t target_thread, int prio);
 @@@return: ERANGE: The given `buflen' is too small
 [[export_alias("pthread_get_name_np")]] /* OpenBSD-specific name */
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_getname_np(pthread_t target_thread,
+$errno_t pthread_getname_np(pthread_t self,
                             [[out(? <= buflen)]] char *buf,
                             size_t buflen);
 
@@ -1172,20 +1172,20 @@ $errno_t pthread_getname_np(pthread_t target_thread,
 [[export_alias("pthread_set_name_np")]] /* OpenBSD-specific name */
 [[export_alias("cthread_set_name")]]    /* Hurd compat */
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_setname_np(pthread_t target_thread,
+$errno_t pthread_setname_np(pthread_t self,
                             [[in]] const char *name);
 %#endif /* __USE_GNU */
 
 
 %#ifdef __USE_KOS
 @@>> pthread_gettid_np(3)
-@@Return the TID of the given `target_thread'.
-@@If the given `target_thread' has already terminated, 0 is returned
+@@Return the TID of the given `self'.
+@@If `self' has already terminated, 0 is returned
 @@@return: * : The TID of the given thread
-@@@return: 0 : The given `target_thread' has already terminated
+@@@return: 0 : The given `self' has already terminated
 [[guard, pure, wunused]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$pid_t pthread_gettid_np(pthread_t target_thread);
+$pid_t pthread_gettid_np(pthread_t self);
 
 @@>> pthread_mainthread_np(3)
 @@Obtain the identifier of the main thread
@@ -1196,17 +1196,17 @@ pthread_t pthread_mainthread_np(void);
 %struct rpc_context;
 
 @@>> pthread_rpc_exec(3)
-@@Schedule an RPC for `target_thread' to-be executed the next  time
-@@it makes a call to a cancellation-point system call (or interrupt
-@@an active system call, should one such currently be in progress).
+@@Schedule an RPC for `self' to-be  executed the next time it  makes
+@@a call to a cancellation-point system call (or interrupt an active
+@@system call, should one such currently be in progress).
 @@  - RPCs are also executed by `pthread_testcancel(3)'
 @@  - The `struct rpc_context' structure is defined in `<kos/rpc.h>'
 @@@return: 0:      Success
 @@@return: ENOMEM: Insufficient system memory
-@@@return: ESRCH:  The given `target_thread' has already terminated
+@@@return: ESRCH:  The given thread `self' has already terminated
 [[cp, nodos, wunused]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_rpc_exec(pthread_t target_thread,
+$errno_t pthread_rpc_exec(pthread_t self,
                           void (LIBKCALL *func)(struct rpc_context *__restrict ctx, void *cookie),
                           void *cookie);
 %#endif /* __USE_KOS */
@@ -1239,19 +1239,19 @@ $errno_t pthread_setconcurrency(int level);
 $errno_t pthread_yield(void) = sched_yield;
 
 @@>> pthread_setaffinity_np(3)
-@@Limit specified thread `pthread' to run only on the processors represented in `cpuset'
+@@Limit specified thread `self' to run only on the processors represented in `cpuset'
 @@@return: EOK:   Success
-@@@return: ESRCH: `pthread' has already exited
+@@@return: ESRCH: `self' has already exited
 [[decl_include("<bits/types.h>", "<bits/os/cpu_set.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_setaffinity_np(pthread_t pthread, size_t cpusetsize,
+$errno_t pthread_setaffinity_np(pthread_t self, size_t cpusetsize,
                                 [[in_opt]] cpu_set_t const *cpuset);
 
 @@>> pthread_getaffinity_np(3)
-@@Get bit set in `cpuset' representing the processors `pthread' can run on
+@@Get bit set in `cpuset' representing the processors `self' can run on
 @@@return: EOK:   Success
-@@@return: ESRCH: `pthread' has already exited
+@@@return: ESRCH: `self' has already exited
 [[decl_include("<bits/types.h>", "<bits/os/cpu_set.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_getaffinity_np(pthread_t pthread, size_t cpusetsize,
+$errno_t pthread_getaffinity_np(pthread_t self, size_t cpusetsize,
                                 [[out_opt]] cpu_set_t *cpuset);
 %#endif /* __USE_GNU */
 
@@ -1424,11 +1424,11 @@ $errno_t pthread_setcancelstate(int state, [[out_opt]] int *oldstate);
 $errno_t pthread_setcanceltype(int type, [[out_opt]] int *oldtype);
 
 @@>> pthread_cancel(3)
-@@Cancel `pthread' immediately or at the next possibility
+@@Cancel `self' immediately or at the next possibility
 @@@return: EOK:   Success
-@@@return: ESRCH: `pthread' has already exited
+@@@return: ESRCH: `self' has already exited
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_cancel(pthread_t pthread);
+$errno_t pthread_cancel(pthread_t self);
 
 @@>> pthread_testcancel(3)
 @@Test for pending cancellation for the current thread and terminate the
@@ -1701,33 +1701,33 @@ int __sigsetjmp([[out]] struct __jmp_buf_tag *env, int savemask);
 %
 
 @@>> pthread_mutex_init(3)
-@@Initialize the given `mutex'
+@@Initialize the given mutex `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_mutex_init([[out]] pthread_mutex_t *mutex,
+$errno_t pthread_mutex_init([[out]] pthread_mutex_t *self,
                             pthread_mutexattr_t const *mutexattr);
 
 @@>> pthread_mutex_destroy(3)
-@@Destroy  the  given `mutex'
+@@Destroy the given mutex `self'
 @@@return: EOK: Success
 [[export_alias("mtx_destroy")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_mutex_destroy([[inout]] pthread_mutex_t *mutex);
+$errno_t pthread_mutex_destroy([[inout]] pthread_mutex_t *self);
 
 @@>> pthread_mutex_trylock(3)
-@@Try locking the given `mutex'
+@@Try locking the given mutex `self'
 @@@return: EOK:   Success
 @@@return: EBUSY: The  mutex  has  already  been   locked
 @@                In case of  a recursive mutex,  another
 @@                thread was the one to acquire the lock.
 [[wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_mutex_trylock([[inout]] pthread_mutex_t *mutex);
+$errno_t pthread_mutex_trylock([[inout]] pthread_mutex_t *self);
 
 @@>> pthread_mutex_lock(3)
-@@Lock  the  given `mutex'
+@@Lock the given mutex `self'
 @@@return: EOK: Success
 [[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_mutex_lock([[inout]] pthread_mutex_t *mutex);
+$errno_t pthread_mutex_lock([[inout]] pthread_mutex_t *self);
 
 %#ifdef __USE_XOPEN2K
 @@>> pthread_mutex_timedlock(3), pthread_mutex_timedlock64(3)
@@ -1740,21 +1740,21 @@ $errno_t pthread_mutex_lock([[inout]] pthread_mutex_t *mutex);
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_mutex_timedlock64")]]
 [[userimpl, requires($has_function(crt_pthread_mutex_timedlock32) ||
                      $has_function(pthread_mutex_timedlock64))]]
-$errno_t pthread_mutex_timedlock([[inout]] pthread_mutex_t *__restrict mutex,
+$errno_t pthread_mutex_timedlock([[inout]] pthread_mutex_t *__restrict self,
                                  [[in]] struct timespec const *__restrict abstime) {
 @@pp_if $has_function(crt_pthread_mutex_timedlock32)@@
 	$errno_t result;
 	struct timespec32 abstime32;
 	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
 	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
-	result = crt_pthread_mutex_timedlock32(mutex, &abstime32);
+	result = crt_pthread_mutex_timedlock32(self, &abstime32);
 	return result;
 @@pp_else@@
 	$errno_t result;
 	struct timespec64 abstime64;
 	abstime64.@tv_sec@  = (time64_t)abstime->@tv_sec@;
 	abstime64.@tv_nsec@ = abstime->@tv_nsec@;
-	result = pthread_mutex_timedlock64(mutex, &abstime64);
+	result = pthread_mutex_timedlock64(self, &abstime64);
 	return result;
 @@pp_endif@@
 }
@@ -1762,19 +1762,19 @@ $errno_t pthread_mutex_timedlock([[inout]] pthread_mutex_t *__restrict mutex,
 %#ifdef __USE_TIME64
 [[cp, doc_alias("pthread_mutex_timedlock"), ignore, nocrt, alias("pthread_mutex_timedlock")]]
 [[wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
-$errno_t crt_pthread_mutex_timedlock32([[inout]] pthread_mutex_t *__restrict mutex,
+$errno_t crt_pthread_mutex_timedlock32([[inout]] pthread_mutex_t *__restrict self,
                                        [[in]] struct timespec const *__restrict abstime);
 
 [[cp, preferred_time64_variant_of(pthread_mutex_timedlock), doc_alias("pthread_mutex_timedlock")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[wunused, userimpl, requires_function(crt_pthread_mutex_timedlock32)]]
-$errno_t pthread_mutex_timedlock64([[inout]] pthread_mutex_t *__restrict mutex,
+$errno_t pthread_mutex_timedlock64([[inout]] pthread_mutex_t *__restrict self,
                                    [[in]] struct timespec64 const *__restrict abstime) {
 	$errno_t result;
 	struct timespec32 abstime32;
 	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
 	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
-	result = crt_pthread_mutex_timedlock32(mutex, &abstime32);
+	result = crt_pthread_mutex_timedlock32(self, &abstime32);
 	return result;
 }
 
@@ -1792,21 +1792,21 @@ $errno_t pthread_mutex_timedlock64([[inout]] pthread_mutex_t *__restrict mutex,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_mutex_reltimedlock64_np")]]
 [[userimpl, requires($has_function(crt_pthread_mutex_reltimedlock32_np) ||
                      $has_function(pthread_mutex_reltimedlock64_np))]]
-$errno_t pthread_mutex_reltimedlock_np([[inout]] pthread_mutex_t *__restrict mutex,
+$errno_t pthread_mutex_reltimedlock_np([[inout]] pthread_mutex_t *__restrict self,
                                        [[in]] struct timespec const *__restrict reltime) {
 @@pp_if $has_function(crt_pthread_mutex_reltimedlock32_np)@@
 	$errno_t result;
 	struct timespec32 reltime32;
 	reltime32.@tv_sec@  = (time32_t)reltime->@tv_sec@;
 	reltime32.@tv_nsec@ = reltime->@tv_nsec@;
-	result = crt_pthread_mutex_reltimedlock32_np(mutex, &reltime32);
+	result = crt_pthread_mutex_reltimedlock32_np(self, &reltime32);
 	return result;
 @@pp_else@@
 	$errno_t result;
 	struct timespec64 reltime64;
 	reltime64.@tv_sec@  = (time64_t)reltime->@tv_sec@;
 	reltime64.@tv_nsec@ = reltime->@tv_nsec@;
-	result = pthread_mutex_reltimedlock64_np(mutex, &reltime64);
+	result = pthread_mutex_reltimedlock64_np(self, &reltime64);
 	return result;
 @@pp_endif@@
 }
@@ -1814,19 +1814,19 @@ $errno_t pthread_mutex_reltimedlock_np([[inout]] pthread_mutex_t *__restrict mut
 %#ifdef __USE_TIME64
 [[cp, doc_alias("pthread_mutex_reltimedlock_np"), ignore, nocrt, alias("pthread_mutex_reltimedlock_np")]]
 [[wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
-$errno_t crt_pthread_mutex_reltimedlock32_np([[inout]] pthread_mutex_t *__restrict mutex,
+$errno_t crt_pthread_mutex_reltimedlock32_np([[inout]] pthread_mutex_t *__restrict self,
                                              [[in]] struct timespec const *__restrict reltime);
 
 [[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(pthread_mutex_reltimedlock_np), doc_alias("pthread_mutex_reltimedlock_np")]]
 [[userimpl, requires_function(crt_pthread_mutex_reltimedlock32_np)]]
-$errno_t pthread_mutex_reltimedlock64_np([[inout]] pthread_mutex_t *__restrict mutex,
+$errno_t pthread_mutex_reltimedlock64_np([[inout]] pthread_mutex_t *__restrict self,
                                          [[in]] struct timespec64 const *__restrict reltime) {
 	$errno_t result;
 	struct timespec32 reltime32;
 	reltime32.@tv_sec@  = (time32_t)reltime->@tv_sec@;
 	reltime32.@tv_nsec@ = reltime->@tv_nsec@;
-	result = crt_pthread_mutex_reltimedlock32_np(mutex, &reltime32);
+	result = crt_pthread_mutex_reltimedlock32_np(self, &reltime32);
 	return result;
 }
 %#endif /* __USE_TIME64 */
@@ -1835,36 +1835,36 @@ $errno_t pthread_mutex_reltimedlock64_np([[inout]] pthread_mutex_t *__restrict m
 
 
 @@>> pthread_mutex_unlock(3)
-@@Unlock  the  given `mutex'
+@@Unlock the given mutex `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_mutex_unlock([[inout]] pthread_mutex_t *mutex);
+$errno_t pthread_mutex_unlock([[inout]] pthread_mutex_t *self);
 
 @@>> pthread_mutex_getprioceiling(3)
-@@Get the priority ceiling of `mutex'
+@@Get the priority ceiling of `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_mutex_getprioceiling([[in]] pthread_mutex_t const *__restrict mutex,
+$errno_t pthread_mutex_getprioceiling([[in]] pthread_mutex_t const *__restrict self,
                                       [[out]] int *__restrict prioceiling);
 
 @@>> pthread_mutex_setprioceiling(3)
-@@Set the priority ceiling of `mutex' to `prioceiling',
-@@return old priority  ceiling value in  `*old_ceiling'
+@@Set the priority ceiling of `self' to `prioceiling',
+@@return  old priority ceiling value in `*old_ceiling'
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `prioceiling'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_mutex_setprioceiling([[inout]] pthread_mutex_t *__restrict mutex, int prioceiling,
+$errno_t pthread_mutex_setprioceiling([[inout]] pthread_mutex_t *__restrict self, int prioceiling,
                                       [[out_opt]] int *__restrict old_ceiling);
 
 %#ifdef __USE_XOPEN2K8
 @@>> pthread_mutex_consistent(3)
-@@Declare the state protected by `mutex' as consistent
+@@Declare the state protected by `self' as consistent
 @@@return: EOK:    Success
 @@@return: EINVAL: Not a robust mutex
 @@@return: EINVAL: Mutex was already in a consistent state
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[export_alias("pthread_mutex_consistent_np")]]
-$errno_t pthread_mutex_consistent([[inout]] pthread_mutex_t *mutex);
+$errno_t pthread_mutex_consistent([[inout]] pthread_mutex_t *self);
 
 %#ifdef __USE_GNU
 %[insert:function(pthread_mutex_consistent_np = pthread_mutex_consistent)]
@@ -1879,98 +1879,98 @@ $errno_t pthread_mutex_consistent([[inout]] pthread_mutex_t *mutex);
 %
 
 @@>> pthread_mutexattr_init(3)
-@@Initialize mutex attribute object `attr' with default
+@@Initialize mutex attribute object `self' with default
 @@attributes    (kind    is   `PTHREAD_MUTEX_TIMED_NP')
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_mutexattr_init([[out]] pthread_mutexattr_t *attr);
+$errno_t pthread_mutexattr_init([[out]] pthread_mutexattr_t *self);
 
 
 @@>> pthread_mutexattr_destroy(3)
-@@Destroy mutex attribute object `attr'
+@@Destroy mutex attribute object `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_mutexattr_destroy([[inout]] pthread_mutexattr_t *attr);
+$errno_t pthread_mutexattr_destroy([[inout]] pthread_mutexattr_t *self);
 
 @@>> pthread_mutexattr_getpshared(3)
-@@Get the process-shared flag of the mutex attribute `attr'
+@@Get the process-shared flag of the mutex attribute `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_mutexattr_getpshared([[in]] pthread_mutexattr_t const *__restrict attr,
+$errno_t pthread_mutexattr_getpshared([[in]] pthread_mutexattr_t const *__restrict self,
                                       [[out]] int *__restrict pshared);
 
 @@>> pthread_mutexattr_setpshared(3)
-@@Set the process-shared flag of the mutex attribute `attr'
+@@Set the process-shared flag of the mutex attribute `self'
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `pshared'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_mutexattr_setpshared([[inout]] pthread_mutexattr_t *attr, int pshared);
+$errno_t pthread_mutexattr_setpshared([[inout]] pthread_mutexattr_t *self, int pshared);
 
 
 %#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
 @@>> pthread_mutexattr_gettype(3)
-@@Return in `*kind' the mutex kind attribute in `*attr'
+@@Return in `*kind' the mutex kind attribute in `*self'
 @@@return: EOK: Success
 [[export_alias("pthread_mutexattr_getkind_np")]] /* OpenBSD-specific name */
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_mutexattr_gettype([[in]] pthread_mutexattr_t const *__restrict attr,
+$errno_t pthread_mutexattr_gettype([[in]] pthread_mutexattr_t const *__restrict self,
                                    [[out]] int *__restrict kind);
 
 @@>> pthread_mutexattr_settype(3)
-@@Set  the mutex kind attribute in `*attr' to `kind' (either `PTHREAD_MUTEX_NORMAL',
+@@Set  the mutex kind attribute in `*self' to `kind' (either `PTHREAD_MUTEX_NORMAL',
 @@`PTHREAD_MUTEX_RECURSIVE', `PTHREAD_MUTEX_ERRORCHECK', or `PTHREAD_MUTEX_DEFAULT')
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `kind'
 [[export_alias("pthread_mutexattr_setkind_np")]] /* OpenBSD-specific name */
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_mutexattr_settype([[inout]] pthread_mutexattr_t *attr, int kind);
+$errno_t pthread_mutexattr_settype([[inout]] pthread_mutexattr_t *self, int kind);
 %#endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 
 @@>> pthread_mutexattr_getprotocol(3)
-@@Return in `*protocol' the mutex protocol attribute in `*attr'
+@@Return in `*protocol' the mutex protocol attribute in `*self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_mutexattr_getprotocol([[in]] pthread_mutexattr_t const *__restrict attr,
+$errno_t pthread_mutexattr_getprotocol([[in]] pthread_mutexattr_t const *__restrict self,
                                        [[out]] int *__restrict protocol);
 
 @@>> pthread_mutexattr_setprotocol(3)
-@@Set  the  mutex protocol  attribute  in `*attr'  to  `protocol' (either
+@@Set  the  mutex protocol  attribute  in `*self'  to  `protocol' (either
 @@`PTHREAD_PRIO_NONE', `PTHREAD_PRIO_INHERIT', or `PTHREAD_PRIO_PROTECT')
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `protocol'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_mutexattr_setprotocol([[inout]] pthread_mutexattr_t *attr, int protocol);
+$errno_t pthread_mutexattr_setprotocol([[inout]] pthread_mutexattr_t *self, int protocol);
 
 @@>> pthread_mutexattr_getprioceiling(3)
-@@Return in `*prioceiling' the mutex prioceiling attribute in `*attr'
+@@Return in `*prioceiling' the mutex prioceiling attribute in `*self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_mutexattr_getprioceiling([[in]] pthread_mutexattr_t const *__restrict attr,
+$errno_t pthread_mutexattr_getprioceiling([[in]] pthread_mutexattr_t const *__restrict self,
                                           [[out]] int *__restrict prioceiling);
 
 @@>> pthread_mutexattr_setprioceiling(3)
-@@Set the mutex prioceiling attribute in `*attr' to `prioceiling'
+@@Set the mutex prioceiling attribute in `*self' to `prioceiling'
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `prioceiling'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_mutexattr_setprioceiling([[inout]] pthread_mutexattr_t *attr, int prioceiling);
+$errno_t pthread_mutexattr_setprioceiling([[inout]] pthread_mutexattr_t *self, int prioceiling);
 
 %#ifdef __USE_XOPEN2K
 @@>> pthread_mutexattr_getrobust(3)
-@@Get the robustness flag of the mutex attribute `attr'
+@@Get the robustness flag of the mutex attribute `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[export_alias("pthread_mutexattr_getrobust_np")]]
-$errno_t pthread_mutexattr_getrobust([[in]] pthread_mutexattr_t const *__restrict attr,
+$errno_t pthread_mutexattr_getrobust([[in]] pthread_mutexattr_t const *__restrict self,
                                      [[out]] int *__restrict robustness);
 
 @@>> pthread_mutexattr_setrobust(3)
-@@Set the robustness flag of the mutex attribute `attr'
+@@Set the robustness flag of the mutex attribute `self'
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `robustness'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 [[export_alias("pthread_mutexattr_setrobust_np")]]
-$errno_t pthread_mutexattr_setrobust([[inout]] pthread_mutexattr_t *attr, int robustness);
+$errno_t pthread_mutexattr_setrobust([[inout]] pthread_mutexattr_t *self, int robustness);
 %#endif /* __USE_XOPEN2K */
 
 %#ifdef __USE_GNU
@@ -1990,58 +1990,58 @@ $errno_t pthread_mutexattr_setrobust([[inout]] pthread_mutexattr_t *attr, int ro
 %
 
 @@>> pthread_rwlock_init(3)
-@@Initialize read-write lock `rwlock' using attributes `attr',
-@@or use the default values if later is `NULL'.
+@@Initialize read-write lock `self' using attributes `attr',
+@@or  use   the  default   values   if  later   is   `NULL'.
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_rwlock_init([[out]] pthread_rwlock_t *__restrict rwlock,
+$errno_t pthread_rwlock_init([[out]] pthread_rwlock_t *__restrict self,
                              [[in_opt]] pthread_rwlockattr_t const *__restrict attr);
 
 @@>> pthread_rwlock_destroy(3)
-@@Destroy read-write lock `rwlock'
+@@Destroy read-write lock `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_rwlock_destroy([[inout]] pthread_rwlock_t *rwlock);
+$errno_t pthread_rwlock_destroy([[inout]] pthread_rwlock_t *self);
 
 @@>> pthread_rwlock_rdlock(3)
-@@Acquire read lock for `rwlock'
+@@Acquire read lock for `self'
 @@@return: EOK:     Success
 @@@return: EAGAIN:  The maximum # of read-locks has been acquired
 @@@return: EDEADLK: You're already holding a write-lock
 @@@return: EDEADLK: [PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
 @@                  You're already holding a read-lock
 [[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_rwlock_rdlock([[inout]] pthread_rwlock_t *rwlock);
+$errno_t pthread_rwlock_rdlock([[inout]] pthread_rwlock_t *self);
 
 @@>> pthread_rwlock_tryrdlock(3)
-@@Try to acquire read lock for `rwlock'
+@@Try to acquire read lock for `self'
 @@@return: EOK:    Success
 @@@return: EBUSY:  A read-lock cannot be acquired at the moment,
 @@                 because a write-lock  is already being  held.
 @@@return: EAGAIN: The maximum # of read-locks has been acquired
 [[wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_rwlock_tryrdlock([[inout]] pthread_rwlock_t *rwlock);
+$errno_t pthread_rwlock_tryrdlock([[inout]] pthread_rwlock_t *self);
 
 @@>> pthread_rwlock_wrlock(3)
-@@Acquire write lock for `rwlock'
+@@Acquire write lock for `self'
 @@@return: EOK:     Success
 @@@return: EDEADLK: You're already holding a read-lock
 @@@return: EDEADLK: [!PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP]
 @@                  You're already holding a write-lock
 [[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_rwlock_wrlock([[inout]] pthread_rwlock_t *rwlock);
+$errno_t pthread_rwlock_wrlock([[inout]] pthread_rwlock_t *self);
 
 @@>> pthread_rwlock_trywrlock(3)
-@@Try to acquire write lock for `rwlock'
+@@Try to acquire write lock for `self'
 @@@return: EOK:   Success
 @@@return: EBUSY: A write-lock cannot be acquired at the moment,
 @@                because read-locks  are  already  being  held.
 [[wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_rwlock_trywrlock([[inout]] pthread_rwlock_t *rwlock);
+$errno_t pthread_rwlock_trywrlock([[inout]] pthread_rwlock_t *self);
 
 %#ifdef __USE_XOPEN2K
 @@>> pthread_rwlock_timedrdlock(3), pthread_rwlock_timedrdlock64(3)
-@@Try to acquire read lock for `rwlock' or return after the specified time
+@@Try to acquire read lock for `self' or return after the specified time
 @@@return: EOK:       Success
 @@@return: EINVAL:    The given `abstime' is invalid
 @@@return: ETIMEDOUT: The given `abstime' has expired
@@ -2054,27 +2054,27 @@ $errno_t pthread_rwlock_trywrlock([[inout]] pthread_rwlock_t *rwlock);
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_timedrdlock64")]]
 [[userimpl, requires($has_function(crt_pthread_rwlock_timedrdlock32) ||
                      $has_function(pthread_rwlock_timedrdlock64))]]
-$errno_t pthread_rwlock_timedrdlock([[inout]] pthread_rwlock_t *__restrict rwlock,
+$errno_t pthread_rwlock_timedrdlock([[inout]] pthread_rwlock_t *__restrict self,
                                     [[in]] struct timespec const *__restrict abstime) {
 @@pp_if $has_function(crt_pthread_rwlock_timedrdlock32)@@
 	$errno_t result;
 	struct timespec32 abstime32;
 	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
 	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
-	result = crt_pthread_rwlock_timedrdlock32(rwlock, &abstime32);
+	result = crt_pthread_rwlock_timedrdlock32(self, &abstime32);
 	return result;
 @@pp_else@@
 	$errno_t result;
 	struct timespec64 abstime64;
 	abstime64.@tv_sec@  = (time64_t)abstime->@tv_sec@;
 	abstime64.@tv_nsec@ = abstime->@tv_nsec@;
-	result = pthread_rwlock_timedrdlock64(rwlock, &abstime32);
+	result = pthread_rwlock_timedrdlock64(self, &abstime32);
 	return result;
 @@pp_endif@@
 }
 
 @@>> pthread_rwlock_timedwrlock(3), pthread_rwlock_timedwrlock64(3)
-@@Try to acquire write lock for `rwlock' or return after the specified time
+@@Try to acquire write lock for `self' or return after the specified time
 @@@return: EOK:       Success
 @@@return: EINVAL:    The given `abstime' is invalid
 @@@return: ETIMEDOUT: The given `abstime' has expired
@@ -2086,21 +2086,21 @@ $errno_t pthread_rwlock_timedrdlock([[inout]] pthread_rwlock_t *__restrict rwloc
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_timedwrlock64")]]
 [[userimpl, requires($has_function(crt_pthread_rwlock_timedwrlock32) ||
                      $has_function(pthread_rwlock_timedwrlock64))]]
-$errno_t pthread_rwlock_timedwrlock([[inout]] pthread_rwlock_t *__restrict rwlock,
+$errno_t pthread_rwlock_timedwrlock([[inout]] pthread_rwlock_t *__restrict self,
                                     [[in]] struct timespec const *__restrict abstime) {
 @@pp_if $has_function(crt_pthread_rwlock_timedwrlock32)@@
 	$errno_t result;
 	struct timespec32 abstime32;
 	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
 	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
-	result = crt_pthread_rwlock_timedwrlock32(rwlock, &abstime32);
+	result = crt_pthread_rwlock_timedwrlock32(self, &abstime32);
 	return result;
 @@pp_else@@
 	$errno_t result;
 	struct timespec64 abstime64;
 	abstime64.@tv_sec@  = (time64_t)abstime->@tv_sec@;
 	abstime64.@tv_nsec@ = abstime->@tv_nsec@;
-	result = pthread_rwlock_timedwrlock64(rwlock, &abstime32);
+	result = pthread_rwlock_timedwrlock64(self, &abstime32);
 	return result;
 @@pp_endif@@
 }
@@ -2108,36 +2108,36 @@ $errno_t pthread_rwlock_timedwrlock([[inout]] pthread_rwlock_t *__restrict rwloc
 %#ifdef __USE_TIME64
 [[cp, doc_alias("pthread_rwlock_timedrdlock"), ignore, nocrt, alias("pthread_rwlock_timedrdlock")]]
 [[wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
-$errno_t crt_pthread_rwlock_timedrdlock32([[inout]] pthread_rwlock_t *__restrict rwlock,
+$errno_t crt_pthread_rwlock_timedrdlock32([[inout]] pthread_rwlock_t *__restrict self,
                                           [[in]] struct timespec32 const *__restrict abstime);
 [[cp, doc_alias("pthread_rwlock_timedwrlock"), wunused, ignore, nocrt, alias("pthread_rwlock_timedwrlock")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
-$errno_t crt_pthread_rwlock_timedwrlock32([[inout]] pthread_rwlock_t *__restrict rwlock,
+$errno_t crt_pthread_rwlock_timedwrlock32([[inout]] pthread_rwlock_t *__restrict self,
                                           [[in]] struct timespec32 const *__restrict abstime);
 
 [[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(pthread_rwlock_timedrdlock), doc_alias("pthread_rwlock_timedrdlock")]]
 [[userimpl, requires_function(crt_pthread_rwlock_timedrdlock32)]]
-$errno_t pthread_rwlock_timedrdlock64([[inout]] pthread_rwlock_t *__restrict rwlock,
+$errno_t pthread_rwlock_timedrdlock64([[inout]] pthread_rwlock_t *__restrict self,
                                       [[in]] struct timespec64 const *__restrict abstime) {
 	$errno_t result;
 	struct timespec32 abstime32;
 	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
 	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
-	result = crt_pthread_rwlock_timedrdlock32(rwlock, &abstime32);
+	result = crt_pthread_rwlock_timedrdlock32(self, &abstime32);
 	return result;
 }
 
 [[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(pthread_rwlock_timedwrlock), doc_alias("pthread_rwlock_timedwrlock")]]
 [[userimpl, requires_function(crt_pthread_rwlock_timedwrlock32)]]
-$errno_t pthread_rwlock_timedwrlock64([[inout]] pthread_rwlock_t *__restrict rwlock,
+$errno_t pthread_rwlock_timedwrlock64([[inout]] pthread_rwlock_t *__restrict self,
                                       [[in]] struct timespec64 const *__restrict abstime) {
 	$errno_t result;
 	struct timespec32 abstime32;
 	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
 	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
-	result = crt_pthread_rwlock_timedwrlock32(rwlock, &abstime32);
+	result = crt_pthread_rwlock_timedwrlock32(self, &abstime32);
 	return result;
 }
 %#endif /* __USE_TIME64 */
@@ -2145,7 +2145,7 @@ $errno_t pthread_rwlock_timedwrlock64([[inout]] pthread_rwlock_t *__restrict rwl
 
 %#ifdef __USE_SOLARIS
 @@>> pthread_rwlock_reltimedrdlock_np(3), pthread_rwlock_reltimedrdlock64_np(3)
-@@Try to acquire  read lock  for `rwlock' or  return after  the specified  time
+@@Try to  acquire read  lock for  `self'  or return  after the  specified  time
 @@@return: EOK:       Success
 @@@return: EINVAL:    The given `reltime' is invalid
 @@@return: ETIMEDOUT: The given `reltime' has expired
@@ -2158,27 +2158,27 @@ $errno_t pthread_rwlock_timedwrlock64([[inout]] pthread_rwlock_t *__restrict rwl
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_reltimedrdlock64_np")]]
 [[userimpl, requires($has_function(crt_pthread_rwlock_reltimedrdlock32_np) ||
                      $has_function(pthread_rwlock_reltimedrdlock64_np))]]
-$errno_t pthread_rwlock_reltimedrdlock_np([[inout]] pthread_rwlock_t *__restrict rwlock,
+$errno_t pthread_rwlock_reltimedrdlock_np([[inout]] pthread_rwlock_t *__restrict self,
                                           [[in]] struct timespec const *__restrict reltime) {
 @@pp_if $has_function(crt_pthread_rwlock_reltimedrdlock32_np)@@
 	$errno_t result;
 	struct timespec32 reltime32;
 	reltime32.@tv_sec@  = (time32_t)reltime->@tv_sec@;
 	reltime32.@tv_nsec@ = reltime->@tv_nsec@;
-	result = crt_pthread_rwlock_reltimedrdlock32_np(rwlock, &reltime32);
+	result = crt_pthread_rwlock_reltimedrdlock32_np(self, &reltime32);
 	return result;
 @@pp_else@@
 	$errno_t result;
 	struct timespec64 reltime64;
 	reltime64.@tv_sec@  = (time64_t)reltime->@tv_sec@;
 	reltime64.@tv_nsec@ = reltime->@tv_nsec@;
-	result = pthread_rwlock_reltimedrdlock64_np(rwlock, &reltime32);
+	result = pthread_rwlock_reltimedrdlock64_np(self, &reltime32);
 	return result;
 @@pp_endif@@
 }
 
 @@>> pthread_rwlock_reltimedwrlock_np(3), pthread_rwlock_reltimedwrlock64_np(3)
-@@Try to acquire  write lock for  `rwlock' or return  after the specified  time
+@@Try to  acquire write  lock for  `self' or  return after  the specified  time
 @@@return: EOK:       Success
 @@@return: EINVAL:    The given `reltime' is invalid
 @@@return: ETIMEDOUT: The given `reltime' has expired
@@ -2190,21 +2190,21 @@ $errno_t pthread_rwlock_reltimedrdlock_np([[inout]] pthread_rwlock_t *__restrict
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_rwlock_reltimedwrlock64_np")]]
 [[userimpl, requires($has_function(crt_pthread_rwlock_reltimedwrlock32_np) ||
                      $has_function(pthread_rwlock_reltimedwrlock64_np))]]
-$errno_t pthread_rwlock_reltimedwrlock_np([[inout]] pthread_rwlock_t *__restrict rwlock,
+$errno_t pthread_rwlock_reltimedwrlock_np([[inout]] pthread_rwlock_t *__restrict self,
                                           [[in]] struct timespec const *__restrict reltime) {
 @@pp_if $has_function(crt_pthread_rwlock_reltimedwrlock32_np)@@
 	$errno_t result;
 	struct timespec32 reltime32;
 	reltime32.@tv_sec@  = (time32_t)reltime->@tv_sec@;
 	reltime32.@tv_nsec@ = reltime->@tv_nsec@;
-	result = crt_pthread_rwlock_reltimedwrlock32_np(rwlock, &reltime32);
+	result = crt_pthread_rwlock_reltimedwrlock32_np(self, &reltime32);
 	return result;
 @@pp_else@@
 	$errno_t result;
 	struct timespec64 reltime64;
 	reltime64.@tv_sec@  = (time64_t)reltime->@tv_sec@;
 	reltime64.@tv_nsec@ = reltime->@tv_nsec@;
-	result = pthread_rwlock_reltimedwrlock64_np(rwlock, &reltime32);
+	result = pthread_rwlock_reltimedwrlock64_np(self, &reltime32);
 	return result;
 @@pp_endif@@
 }
@@ -2212,47 +2212,47 @@ $errno_t pthread_rwlock_reltimedwrlock_np([[inout]] pthread_rwlock_t *__restrict
 %#ifdef __USE_TIME64
 [[cp, doc_alias("pthread_rwlock_reltimedrdlock_np"), ignore, nocrt, alias("pthread_rwlock_reltimedrdlock_np")]]
 [[wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
-$errno_t crt_pthread_rwlock_reltimedrdlock32_np([[inout]] pthread_rwlock_t *__restrict rwlock,
+$errno_t crt_pthread_rwlock_reltimedrdlock32_np([[inout]] pthread_rwlock_t *__restrict self,
                                                 [[in]] struct timespec32 const *__restrict reltime);
 [[cp, doc_alias("pthread_rwlock_reltimedwrlock_np"), wunused, ignore, nocrt, alias("pthread_rwlock_reltimedwrlock_np")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
-$errno_t crt_pthread_rwlock_reltimedwrlock32_np([[inout]] pthread_rwlock_t *__restrict rwlock,
+$errno_t crt_pthread_rwlock_reltimedwrlock32_np([[inout]] pthread_rwlock_t *__restrict self,
                                                 [[in]] struct timespec32 const *__restrict reltime);
 
 [[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(pthread_rwlock_reltimedrdlock_np), doc_alias("pthread_rwlock_reltimedrdlock_np")]]
 [[userimpl, requires_function(crt_pthread_rwlock_reltimedrdlock32_np)]]
-$errno_t pthread_rwlock_reltimedrdlock64_np([[inout]] pthread_rwlock_t *__restrict rwlock,
+$errno_t pthread_rwlock_reltimedrdlock64_np([[inout]] pthread_rwlock_t *__restrict self,
                                             [[in]] struct timespec64 const *__restrict reltime) {
 	$errno_t result;
 	struct timespec32 reltime32;
 	reltime32.@tv_sec@  = (time32_t)reltime->@tv_sec@;
 	reltime32.@tv_nsec@ = reltime->@tv_nsec@;
-	result = crt_pthread_rwlock_reltimedrdlock32_np(rwlock, &reltime32);
+	result = crt_pthread_rwlock_reltimedrdlock32_np(self, &reltime32);
 	return result;
 }
 
 [[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(pthread_rwlock_reltimedwrlock_np), doc_alias("pthread_rwlock_reltimedwrlock_np")]]
 [[userimpl, requires_function(crt_pthread_rwlock_reltimedwrlock32_np)]]
-$errno_t pthread_rwlock_reltimedwrlock64_np([[inout]] pthread_rwlock_t *__restrict rwlock,
+$errno_t pthread_rwlock_reltimedwrlock64_np([[inout]] pthread_rwlock_t *__restrict self,
                                             [[in]] struct timespec64 const *__restrict reltime) {
 	$errno_t result;
 	struct timespec32 reltime32;
 	reltime32.@tv_sec@  = (time32_t)reltime->@tv_sec@;
 	reltime32.@tv_nsec@ = reltime->@tv_nsec@;
-	result = crt_pthread_rwlock_reltimedwrlock32_np(rwlock, &reltime32);
+	result = crt_pthread_rwlock_reltimedwrlock32_np(self, &reltime32);
 	return result;
 }
 %#endif /* __USE_TIME64 */
 %#endif /* __USE_SOLARIS */
 
 @@>> pthread_rwlock_unlock(3)
-@@Unlock `rwlock'
+@@Unlock `self'
 @@@return: EOK:   Success
 @@@return: EPERM: You're not holding a read- or write-lock
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_rwlock_unlock([[inout]] pthread_rwlock_t *rwlock);
+$errno_t pthread_rwlock_unlock([[inout]] pthread_rwlock_t *self);
 
 %
 %
@@ -2262,36 +2262,36 @@ $errno_t pthread_rwlock_unlock([[inout]] pthread_rwlock_t *rwlock);
 %
 
 @@>> pthread_rwlockattr_init(3)
-@@Initialize attribute object `attr' with default values
+@@Initialize attribute object `self' with default values
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_rwlockattr_init([[out]] pthread_rwlockattr_t *attr);
+$errno_t pthread_rwlockattr_init([[out]] pthread_rwlockattr_t *self);
 
 @@>> pthread_rwlockattr_destroy(3)
-@@Destroy attribute object  `attr'
+@@Destroy attribute object  `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_rwlockattr_destroy([[inout]] pthread_rwlockattr_t *attr);
+$errno_t pthread_rwlockattr_destroy([[inout]] pthread_rwlockattr_t *self);
 
 @@>> pthread_rwlockattr_getpshared(3)
-@@Return current setting of process-shared attribute of `attr' in `*pshared'
+@@Return current setting of process-shared attribute of `self' in `*pshared'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_rwlockattr_getpshared([[in]] pthread_rwlockattr_t const *__restrict attr,
+$errno_t pthread_rwlockattr_getpshared([[in]] pthread_rwlockattr_t const *__restrict self,
                                        [[out]] int *__restrict pshared);
 
 @@>> pthread_rwlockattr_setpshared(3)
-@@Set process-shared attribute of `attr' to `pshared'
+@@Set process-shared attribute of `self' to `pshared'
 @@@return: EOK:    Success
-@@@return: EINVAL: Invalid/unsupported `pthread'
+@@@return: EINVAL: Invalid/unsupported `pshared'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_rwlockattr_setpshared([[inout]] pthread_rwlockattr_t *attr, int pshared);
+$errno_t pthread_rwlockattr_setpshared([[inout]] pthread_rwlockattr_t *self, int pshared);
 
 @@>> pthread_rwlockattr_getkind_np(3)
 @@Return current setting of reader/writer preference
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_rwlockattr_getkind_np([[in]] pthread_rwlockattr_t const *__restrict attr,
+$errno_t pthread_rwlockattr_getkind_np([[in]] pthread_rwlockattr_t const *__restrict self,
                                        [[out]] int *__restrict pref);
 
 @@>> pthread_rwlockattr_setkind_np(3)
@@ -2299,7 +2299,7 @@ $errno_t pthread_rwlockattr_getkind_np([[in]] pthread_rwlockattr_t const *__rest
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `pref'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_rwlockattr_setkind_np([[inout]] pthread_rwlockattr_t *attr, int pref);
+$errno_t pthread_rwlockattr_setkind_np([[inout]] pthread_rwlockattr_t *self, int pref);
 %#endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 %
@@ -2310,42 +2310,42 @@ $errno_t pthread_rwlockattr_setkind_np([[inout]] pthread_rwlockattr_t *attr, int
 %
 
 @@>> pthread_cond_init(3)
-@@Initialize condition variable `cond' using attributes
+@@Initialize condition variable `self' using attributes
 @@`attr', or use the default values if later is `NULL'.
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_cond_init([[out]] pthread_cond_t *__restrict cond,
+$errno_t pthread_cond_init([[out]] pthread_cond_t *__restrict self,
                            [[in_opt]] pthread_condattr_t const *__restrict cond_attr);
 
 @@>> pthread_cond_destroy(3)
-@@Destroy condition variable `cond'
+@@Destroy condition variable `self'
 @@@return: EOK: Success
 [[export_alias("cnd_destroy")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_cond_destroy([[inout]] pthread_cond_t *cond);
+$errno_t pthread_cond_destroy([[inout]] pthread_cond_t *self);
 
 @@>> pthread_cond_signal(3)
-@@Wake up one thread waiting for condition variable `cond'
+@@Wake up one thread waiting for condition variable `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_cond_signal([[inout]] pthread_cond_t *cond);
+$errno_t pthread_cond_signal([[inout]] pthread_cond_t *self);
 
 @@>> pthread_cond_broadcast(3)
-@@Wake up all threads waiting for condition variables `cond'
+@@Wake up all threads waiting for condition variables `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_cond_broadcast([[inout]] pthread_cond_t *cond);
+$errno_t pthread_cond_broadcast([[inout]] pthread_cond_t *self);
 
 @@>> pthread_cond_wait(3)
-@@Wait for condition variable `cond' to be signaled or broadcast.
+@@Wait for condition variable `self' to be signaled or broadcast.
 @@`mutex' is assumed to be locked before.
 @@@return: EOK: Success
 [[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_cond_wait([[inout]] pthread_cond_t *__restrict cond,
+$errno_t pthread_cond_wait([[inout]] pthread_cond_t *__restrict self,
                            [[inout]] pthread_mutex_t *__restrict mutex);
 
 @@>> pthread_cond_timedwait(3), pthread_cond_timedwait64(3)
-@@Wait for condition variable `cond' to be signaled or broadcast
+@@Wait for condition variable `self' to be signaled or broadcast
 @@until `abstime'.  `mutex'  is  assumed to  be  locked  before.
 @@`abstime' is  an  absolute  time specification;  zero  is  the
 @@beginning of the epoch (00:00:00 GMT, January 1, 1970).
@@ -2357,7 +2357,7 @@ $errno_t pthread_cond_wait([[inout]] pthread_cond_t *__restrict cond,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_cond_timedwait64")]]
 [[userimpl, requires($has_function(crt_pthread_cond_timedwait32) ||
                      $has_function(pthread_cond_timedwait64))]]
-$errno_t pthread_cond_timedwait([[inout]] pthread_cond_t *__restrict cond,
+$errno_t pthread_cond_timedwait([[inout]] pthread_cond_t *__restrict self,
                                 [[inout]] pthread_mutex_t *__restrict mutex,
                                 [[in]] struct timespec const *__restrict abstime) {
 @@pp_if $has_function(crt_pthread_cond_timedwait32)@@
@@ -2365,14 +2365,14 @@ $errno_t pthread_cond_timedwait([[inout]] pthread_cond_t *__restrict cond,
 	struct timespec32 abstime32;
 	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
 	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
-	result = crt_pthread_cond_timedwait32(cond, mutex, &abstime32);
+	result = crt_pthread_cond_timedwait32(self, mutex, &abstime32);
 	return result;
 @@pp_else@@
 	$errno_t result;
 	struct timespec64 abstime64;
 	abstime64.@tv_sec@  = (time64_t)abstime->@tv_sec@;
 	abstime64.@tv_nsec@ = abstime->@tv_nsec@;
-	result = pthread_cond_timedwait64(cond, mutex, &abstime64);
+	result = pthread_cond_timedwait64(self, mutex, &abstime64);
 	return result;
 @@pp_endif@@
 }
@@ -2381,21 +2381,21 @@ $errno_t pthread_cond_timedwait([[inout]] pthread_cond_t *__restrict cond,
 [[cp, wunused, doc_alias("pthread_cond_timedwait")]]
 [[ignore, nocrt, alias("pthread_cond_timedwait")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
-$errno_t crt_pthread_cond_timedwait32([[inout]] pthread_cond_t *__restrict cond,
+$errno_t crt_pthread_cond_timedwait32([[inout]] pthread_cond_t *__restrict self,
                                       [[inout]] pthread_mutex_t *__restrict mutex,
                                       [[in]] struct timespec32 const *__restrict abstime);
 
 [[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(pthread_cond_timedwait), doc_alias("pthread_cond_timedwait")]]
 [[userimpl, requires_function(crt_pthread_cond_timedwait32)]]
-$errno_t pthread_cond_timedwait64([[inout]] pthread_cond_t *__restrict cond,
+$errno_t pthread_cond_timedwait64([[inout]] pthread_cond_t *__restrict self,
                                   [[inout]] pthread_mutex_t *__restrict mutex,
                                   [[in]] struct timespec64 const *__restrict abstime) {
 	$errno_t result;
 	struct timespec32 abstime32;
 	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
 	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
-	result = crt_pthread_cond_timedwait32(cond, mutex, &abstime32);
+	result = crt_pthread_cond_timedwait32(self, mutex, &abstime32);
 	return result;
 }
 
@@ -2403,7 +2403,7 @@ $errno_t pthread_cond_timedwait64([[inout]] pthread_cond_t *__restrict cond,
 
 %#ifdef __USE_SOLARIS
 @@>> pthread_cond_reltimedwait_np(3), pthread_cond_reltimedwait64_np(3)
-@@Wait for  condition  variable  `cond' to  be  signaled  or  broadcast
+@@Wait for  condition  variable  `self' to  be  signaled  or  broadcast
 @@until `reltime'. `mutex' is assumed to be locked before.
 @@@return: EOK:       Success
 @@@return: EINVAL:    The given `reltime' is invalid
@@ -2413,7 +2413,7 @@ $errno_t pthread_cond_timedwait64([[inout]] pthread_cond_t *__restrict cond,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("pthread_cond_reltimedwait64_np")]]
 [[userimpl, requires($has_function(crt_pthread_cond_reltimedwait32_np) ||
                      $has_function(pthread_cond_reltimedwait64_np))]]
-$errno_t pthread_cond_reltimedwait_np([[inout]] pthread_cond_t *__restrict cond,
+$errno_t pthread_cond_reltimedwait_np([[inout]] pthread_cond_t *__restrict self,
                                       [[inout]] pthread_mutex_t *__restrict mutex,
                                       [[in]] struct timespec const *__restrict reltime) {
 @@pp_if $has_function(crt_pthread_cond_reltimedwait32_np)@@
@@ -2421,14 +2421,14 @@ $errno_t pthread_cond_reltimedwait_np([[inout]] pthread_cond_t *__restrict cond,
 	struct timespec32 reltime32;
 	reltime32.@tv_sec@  = (time32_t)reltime->@tv_sec@;
 	reltime32.@tv_nsec@ = reltime->@tv_nsec@;
-	result = crt_pthread_cond_reltimedwait32_np(cond, mutex, &reltime32);
+	result = crt_pthread_cond_reltimedwait32_np(self, mutex, &reltime32);
 	return result;
 @@pp_else@@
 	$errno_t result;
 	struct timespec64 reltime64;
 	reltime64.@tv_sec@  = (time64_t)reltime->@tv_sec@;
 	reltime64.@tv_nsec@ = reltime->@tv_nsec@;
-	result = pthread_cond_reltimedwait64_np(cond, mutex, &reltime64);
+	result = pthread_cond_reltimedwait64_np(self, mutex, &reltime64);
 	return result;
 @@pp_endif@@
 }
@@ -2437,21 +2437,21 @@ $errno_t pthread_cond_reltimedwait_np([[inout]] pthread_cond_t *__restrict cond,
 [[cp, wunused, doc_alias("pthread_cond_reltimedwait_np")]]
 [[ignore, nocrt, alias("pthread_cond_reltimedwait_np")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
-$errno_t crt_pthread_cond_reltimedwait32_np([[inout]] pthread_cond_t *__restrict cond,
+$errno_t crt_pthread_cond_reltimedwait32_np([[inout]] pthread_cond_t *__restrict self,
                                             [[inout]] pthread_mutex_t *__restrict mutex,
                                             [[in]] struct timespec32 const *__restrict reltime);
 
 [[cp, wunused, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(pthread_cond_reltimedwait_np), doc_alias("pthread_cond_reltimedwait_np")]]
 [[userimpl, requires_function(crt_pthread_cond_reltimedwait32_np)]]
-$errno_t pthread_cond_reltimedwait64_np([[inout]] pthread_cond_t *__restrict cond,
+$errno_t pthread_cond_reltimedwait64_np([[inout]] pthread_cond_t *__restrict self,
                                         [[inout]] pthread_mutex_t *__restrict mutex,
                                         [[in]] struct timespec64 const *__restrict reltime) {
 	$errno_t result;
 	struct timespec32 reltime32;
 	reltime32.@tv_sec@  = (time32_t)reltime->@tv_sec@;
 	reltime32.@tv_nsec@ = reltime->@tv_nsec@;
-	result = crt_pthread_cond_reltimedwait32_np(cond, mutex, &reltime32);
+	result = crt_pthread_cond_reltimedwait32_np(self, mutex, &reltime32);
 	return result;
 }
 
@@ -2467,47 +2467,47 @@ $errno_t pthread_cond_reltimedwait64_np([[inout]] pthread_cond_t *__restrict con
 %
 
 @@>> pthread_condattr_init(3)
-@@Initialize condition variable attribute `attr'
+@@Initialize condition variable attribute `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_condattr_init([[out]] pthread_condattr_t *attr);
+$errno_t pthread_condattr_init([[out]] pthread_condattr_t *self);
 
 @@>> pthread_condattr_destroy(3)
-@@Destroy condition variable attribute `attr'
+@@Destroy condition variable attribute `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_condattr_destroy([[inout]] pthread_condattr_t *attr);
+$errno_t pthread_condattr_destroy([[inout]] pthread_condattr_t *self);
 
 @@>> pthread_condattr_getpshared(3)
-@@Get the process-shared flag of the condition variable attribute `attr'
+@@Get the process-shared flag of the condition variable attribute `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_condattr_getpshared([[in]] pthread_condattr_t const *__restrict attr,
+$errno_t pthread_condattr_getpshared([[in]] pthread_condattr_t const *__restrict self,
                                      [[out]] int *__restrict pshared);
 
 @@>> pthread_condattr_setpshared(3)
-@@Set the process-shared flag of the condition variable attribute `attr'
+@@Set the process-shared flag of the condition variable attribute `self'
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `pshared'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_condattr_setpshared([[inout]] pthread_condattr_t *attr,
+$errno_t pthread_condattr_setpshared([[inout]] pthread_condattr_t *self,
                                      int pshared);
 
 %#ifdef __USE_XOPEN2K
 
 @@>> pthread_condattr_getclock(3)
-@@Get the clock selected for the condition variable attribute `attr'
+@@Get the clock selected for the condition variable attribute `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_condattr_getclock([[in]] pthread_condattr_t const *__restrict attr,
+$errno_t pthread_condattr_getclock([[in]] pthread_condattr_t const *__restrict self,
                                    [[out]] $clockid_t *__restrict clock_id);
 
 @@>> pthread_condattr_setclock(3)
-@@Set the clock selected for the condition variable attribute `attr'
+@@Set the clock selected for the condition variable attribute `self'
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `clock_id'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_condattr_setclock([[inout]] pthread_condattr_t *attr,
+$errno_t pthread_condattr_setclock([[inout]] pthread_condattr_t *self,
                                    $clockid_t clock_id);
 %#endif /* __USE_XOPEN2K */
 
@@ -2521,46 +2521,46 @@ $errno_t pthread_condattr_setclock([[inout]] pthread_condattr_t *attr,
 
 
 @@>> pthread_spin_init(3)
-@@Initialize the spinlock `lock'. If `pshared' is nonzero
+@@Initialize the spinlock `self'. If `pshared' is nonzero
 @@the  spinlock can be shared between different processes
 @@@return: EOK: Success
 [[impl_include("<hybrid/__atomic.h>")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_spin_init([[out]] pthread_spinlock_t *lock, int pshared) {
+$errno_t pthread_spin_init([[out]] pthread_spinlock_t *self, int pshared) {
 	(void)pshared;
-	__hybrid_atomic_store(*lock, 0, __ATOMIC_RELAXED);
+	__hybrid_atomic_store(*self, 0, __ATOMIC_RELAXED);
 	return 0;
 }
 
 @@>> pthread_spin_destroy(3)
-@@Destroy the spinlock `lock'
+@@Destroy the spinlock `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_spin_destroy([[inout]] pthread_spinlock_t *lock) {
+$errno_t pthread_spin_destroy([[inout]] pthread_spinlock_t *self) {
 	COMPILER_IMPURE();
-	(void)lock; /* no-op */
+	(void)self; /* no-op */
 	return 0;
 }
 
 @@>> pthread_spin_lock(3)
-@@Wait until spinlock `lock' is retrieved
+@@Wait until spinlock `self' is retrieved
 @@@return: EOK: Success
 [[impl_include("<hybrid/__atomic.h>", "<hybrid/sched/__yield.h>")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_spin_lock([[inout]] pthread_spinlock_t *lock) {
-	while (pthread_spin_trylock(lock) != 0)
+$errno_t pthread_spin_lock([[inout]] pthread_spinlock_t *self) {
+	while (pthread_spin_trylock(self) != 0)
 		__hybrid_yield();
 	return 0;
 }
 
 @@>> pthread_spin_trylock(3)
-@@Try to lock spinlock `lock'
+@@Try to lock spinlock `self'
 @@@return: EOK:   Success
 @@@return: EBUSY: Lock has already been acquired
 [[wunused, impl_include("<hybrid/__atomic.h>", "<libc/errno.h>")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_spin_trylock([[inout]] pthread_spinlock_t *lock) {
-	if (__hybrid_atomic_xch(*lock, 1, __ATOMIC_ACQUIRE) == 0)
+$errno_t pthread_spin_trylock([[inout]] pthread_spinlock_t *self) {
+	if (__hybrid_atomic_xch(*self, 1, __ATOMIC_ACQUIRE) == 0)
 		return 0;
 @@pp_ifdef EBUSY@@
 	return EBUSY;
@@ -2574,12 +2574,12 @@ $errno_t pthread_spin_trylock([[inout]] pthread_spinlock_t *lock) {
 }
 
 @@>> pthread_spin_unlock(3)
-@@Release  spinlock  `lock'
+@@Release  spinlock  `self'
 @@@return: EOK: Success
 [[impl_include("<hybrid/__atomic.h>")]]
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_spin_unlock([[inout]] pthread_spinlock_t *lock) {
-	__hybrid_atomic_store(*lock, 0, __ATOMIC_RELEASE);
+$errno_t pthread_spin_unlock([[inout]] pthread_spinlock_t *self) {
+	__hybrid_atomic_store(*self, 0, __ATOMIC_RELEASE);
 	return 0;
 }
 
@@ -2593,26 +2593,26 @@ $errno_t pthread_spin_unlock([[inout]] pthread_spinlock_t *lock) {
 
 
 @@>> pthread_barrier_init(3)
-@@Initialize `barrier' with the attributes in `attr'.
-@@The  barrier is opened when `count' waiters arrived
+@@Initialize `self' with  the attributes in  `attr'.
+@@The barrier is opened when `count' waiters arrived
 @@@return: EOK:    Success
 @@@return: EINVAL: The given `count' is ZERO(0)
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_barrier_init([[out]] pthread_barrier_t *__restrict barrier,
+$errno_t pthread_barrier_init([[out]] pthread_barrier_t *__restrict self,
                               [[in_opt]] pthread_barrierattr_t const *__restrict attr,
                               unsigned int count);
 
 @@>> pthread_barrier_destroy(3)
-@@Destroy the given (previously dynamically initialized) `barrier'
+@@Destroy the given (previously dynamically initialized) `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_barrier_destroy([[inout]] pthread_barrier_t *barrier);
+$errno_t pthread_barrier_destroy([[inout]] pthread_barrier_t *self);
 
 @@>> pthread_barrier_wait(3)
-@@Wait on the given `barrier'
+@@Wait on  the given  `self'
 @@@return: EOK: Success
 [[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_barrier_wait([[inout]] pthread_barrier_t *barrier);
+$errno_t pthread_barrier_wait([[inout]] pthread_barrier_t *self);
 
 %
 %
@@ -2622,30 +2622,30 @@ $errno_t pthread_barrier_wait([[inout]] pthread_barrier_t *barrier);
 %
 
 @@>> pthread_barrierattr_init(3)
-@@Initialize barrier attribute `attr'
+@@Initialize barrier attribute `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_barrierattr_init([[out]] pthread_barrierattr_t *attr);
+$errno_t pthread_barrierattr_init([[out]] pthread_barrierattr_t *self);
 
 @@>> pthread_barrierattr_destroy(3)
-@@Destroy previously dynamically initialized barrier attribute `attr'
+@@Destroy previously dynamically initialized barrier attribute `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_barrierattr_destroy([[inout]] pthread_barrierattr_t *attr);
+$errno_t pthread_barrierattr_destroy([[inout]] pthread_barrierattr_t *self);
 
 @@>> pthread_barrierattr_getpshared(3)
-@@Get the process-shared flag of the barrier attribute `attr'
+@@Get the process-shared flag of the barrier attribute `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_barrierattr_getpshared([[in]] pthread_barrierattr_t const *__restrict attr,
+$errno_t pthread_barrierattr_getpshared([[in]] pthread_barrierattr_t const *__restrict self,
                                         [[out]] int *__restrict pshared);
 
 @@>> pthread_barrierattr_setpshared(3)
-@@Set the process-shared flag of the barrier attribute `attr'
+@@Set the process-shared flag of the barrier attribute `self'
 @@@return: EOK:    Success
 @@@return: EINVAL: Invalid/unsupported `pshared'
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_barrierattr_setpshared([[inout]] pthread_barrierattr_t *attr, int pshared);
+$errno_t pthread_barrierattr_setpshared([[inout]] pthread_barrierattr_t *self, int pshared);
 
 %#endif /* __USE_XOPEN2K */
 
@@ -2790,10 +2790,10 @@ void **pthread_getspecificptr_np(pthread_key_t key);
 
 %#ifdef __USE_XOPEN2K
 @@>> pthread_getcpuclockid(3)
-@@Get the ID of CPU-time clock for thread `pthread'
+@@Get the ID of CPU-time clock for thread `self'
 @@@return: EOK: Success
 [[decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
-$errno_t pthread_getcpuclockid(pthread_t pthread, [[out]] $clockid_t *clock_id);
+$errno_t pthread_getcpuclockid(pthread_t self, [[out]] $clockid_t *clock_id);
 %#endif /* __USE_XOPEN2K */
 
 

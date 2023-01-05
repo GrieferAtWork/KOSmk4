@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c6b6462 */
+/* HASH CRC-32:0x1a002b3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NAMESPACE_LOCAL_END
 #include <bits/types.h>
 #include <bits/crt/pthreadtypes.h>
 __NAMESPACE_LOCAL_BEGIN
-__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_cond_signal,(__pthread_cond_t *__cond),pthread_cond_signal,(__cond))
+__CREDIRECT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,__localdep_pthread_cond_signal,(__pthread_cond_t *__self),pthread_cond_signal,(__self))
 #endif /* !__local___localdep_pthread_cond_signal_defined */
 __NAMESPACE_LOCAL_END
 #include <asm/crt/threads.h>

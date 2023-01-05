@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42ac1fea */
+/* HASH CRC-32:0xd5706a09 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,18 +27,18 @@
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_crt_pthread_attr_getstackaddr_defined
 #define __local___localdep_crt_pthread_attr_getstackaddr_defined
-__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,__localdep_crt_pthread_attr_getstackaddr,(__pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr),pthread_attr_getstackaddr,(__attr,__stackaddr))
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,__localdep_crt_pthread_attr_getstackaddr,(__pthread_attr_t const *__restrict __self, void **__restrict __stackaddr),pthread_attr_getstackaddr,(__self,__stackaddr))
 #endif /* !__local___localdep_crt_pthread_attr_getstackaddr_defined */
 #ifndef __local___localdep_crt_pthread_attr_getstacksize_defined
 #define __local___localdep_crt_pthread_attr_getstacksize_defined
-__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,__localdep_crt_pthread_attr_getstacksize,(__pthread_attr_t const *__restrict __attr, __SIZE_TYPE__ *__restrict __stacksize),pthread_attr_getstacksize,(__attr,__stacksize))
+__CREDIRECT(__ATTR_IN(1) __ATTR_OUT(2),__errno_t,__NOTHROW_NCX,__localdep_crt_pthread_attr_getstacksize,(__pthread_attr_t const *__restrict __self, __SIZE_TYPE__ *__restrict __stacksize),pthread_attr_getstacksize,(__self,__stacksize))
 #endif /* !__local___localdep_crt_pthread_attr_getstacksize_defined */
 __LOCAL_LIBC(pthread_attr_getstack) __ATTR_IN(1) __ATTR_OUT(2) __ATTR_OUT(3) __errno_t
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_attr_getstack))(__pthread_attr_t const *__restrict __attr, void **__restrict __stackaddr, __SIZE_TYPE__ *__restrict __stacksize) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pthread_attr_getstack))(__pthread_attr_t const *__restrict __self, void **__restrict __stackaddr, __SIZE_TYPE__ *__restrict __stacksize) {
 	__errno_t __result;
-	__result = (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_attr_getstackaddr)(__attr, __stackaddr);
+	__result = (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_attr_getstackaddr)(__self, __stackaddr);
 	if __likely(__result == 0)
-		__result = (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_attr_getstacksize)(__attr, __stacksize);
+		__result = (__NAMESPACE_LOCAL_SYM __localdep_crt_pthread_attr_getstacksize)(__self, __stacksize);
 	return __result;
 }
 __NAMESPACE_LOCAL_END
