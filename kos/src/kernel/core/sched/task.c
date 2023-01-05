@@ -264,9 +264,9 @@ INTDEF struct taskpid asyncwork_pid;
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL kernel_initialize_scheduler_after_smp)(void) {
-	/* This right here is needed for `clone(2)', but until this point, we had the
-	 * task  template's mman field  point at the  kernel mman, thus automatically
-	 * initializing it correctly for all of the statically allocated thread, such
+	/* This  right here is needed for `clone(2)', but until this point, we had the
+	 * task template's mman  field point  at the kernel  mman, thus  automatically
+	 * initializing it correctly for all of the statically allocated threads, such
 	 * as CPU IDLE threads, as well as boottask/bootidle and asyncwork. */
 	struct task *task_template;
 	task_template = (struct task *)__kernel_pertask_start;
@@ -288,7 +288,7 @@ NOTHROW(KCALL kernel_initialize_scheduler_after_smp)(void) {
 #endif /* !CONFIG_KERNEL_EVERYONE_IS_ROOT */
 }
 
-/* Define in "mman/driver.c" -- dirent with the string "/os/kernel.bin" */
+/* Defined in "mman/driver.c" -- dirent with the string "/os/kernel.bin" */
 extern struct fdirent kernel_driver_fsname;
 
 INTERN ATTR_FREETEXT void

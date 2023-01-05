@@ -4281,7 +4281,7 @@ again:
 	 *
 	 * Idea: combine `b_in' and `b_current_round' into a single counter,
 	 *       such that `NUM_WAITING_THREADS = b_in % b_count'. Then, use
-	 *       ATOMIC_CMPXCH to reset the counter if it becomse too large.
+	 *       ATOMIC_CMPXCH to reset the counter if it becomes too large.
 	 */
 
 	/* Wait until the current round is over. */

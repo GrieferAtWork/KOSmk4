@@ -1346,7 +1346,7 @@ blkdev_repart(struct blkdev *__restrict self)
  * >> TRY {
  * >>     blkdev_repart(self);
  * >> } EXCEPT {
- * >>     // If we get here, device was globally visible for a short moment.
+ * >>     // If we get here, `self' was globally visible for a short moment.
  * >>     // This can be prevented by using `blkdev_repart_and_register()'
  * >>     device_delete(self);
  * >>     RETHROW();

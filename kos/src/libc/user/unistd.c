@@ -1751,7 +1751,7 @@ NOTHROW_RPC(LIBDCALL libd_chroot)(char const *__restrict path)
 		return -1;
 	result = libd_fchroot(fd);
 	sys_close(fd);
-#if 0 /* Already done for us by `libd_dup2()' */
+#if 0 /* Already done for us by `libd_fchroot()' (which calls `libd_dup2()') */
 	if (result == 0)
 		libd_dos_fsroot_changed();
 #endif

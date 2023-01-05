@@ -314,7 +314,7 @@ again:
 	}
 
 	/* Tell the user what's going on. */
-	printk(FREESTR(KERN_WARNING "[boot] Boot partition not found or ambiguous consider booting with `boot=...'\n"
+	printk(FREESTR(KERN_WARNING "[boot] Boot partition not found or ambiguous. Consider booting with `boot=...'\n"
 	                            "[boot] Trying to find root filesystem by opening all block devices in search of %q\n"),
 	       kernel_driver.md_fsname->fd_name);
 
