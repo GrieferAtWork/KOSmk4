@@ -59,6 +59,7 @@ gcc_opt.append("-Os"); // Optimize for size (don't want to bloat libc too much w
 #include "../auto/format-printer.h"
 #include "../auto/parts.wchar.format-printer.h"
 #include "../auto/string.h" /* Dependency of `#include <libc/template/format-printf.h>' */
+#include "../libc/dl.h"     /* Prevent relocations against real <dlfcn.h> symbols. */
 #include "../libc/globals.h"
 #include "printf.h"
 #include "stdio-api.h"
