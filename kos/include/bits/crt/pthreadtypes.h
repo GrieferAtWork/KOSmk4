@@ -654,10 +654,10 @@ typedef union __pthread_barrierattr {
 #define __OFFSET_PTHREAD_BARRIER_OUT           16
 #ifdef __CC__
 typedef struct __pthread_barrier_s {
-	__UINT32_TYPE__ b_in;            /* ??? */
-	__UINT32_TYPE__ b_current_round; /* ??? */
-	__UINT32_TYPE__ b_count;         /* ??? */
-	__UINT32_TYPE__ b_shared;        /* Non-zero if shared */
+	__UINT32_TYPE__ b_in;            /* # of threads currently waiting at the barrier */
+	__UINT32_TYPE__ b_current_round; /* Incremented every time `b_in' is broadcast (also the futex broadcast for wake-up) */
+	__UINT32_TYPE__ b_count;         /* [const] # of threads that have to reach the barrier */
+	__UINT32_TYPE__ b_shared;        /* [const] Non-zero if shared */
 	__UINT32_TYPE__ b_out;           /* ??? */
 } __pthread_barrier_t;
 #endif /* __CC__ */

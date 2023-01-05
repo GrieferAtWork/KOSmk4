@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7d2d8c1 */
+/* HASH CRC-32:0x146a064 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -739,7 +739,8 @@ INTDEF ATTR_IN_OPT(2) ATTR_OUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_barr
 INTDEF ATTR_INOUT(1) errno_t NOTHROW_NCX(LIBDCALL libd_pthread_barrier_destroy)(pthread_barrier_t *self);
 /* >> pthread_barrier_wait(3)
  * Wait on  the given  `self'
- * @return: EOK: Success */
+ * @return: 0 :                            Success
+ * @return: PTHREAD_BARRIER_SERIAL_THREAD: Success, and you were picked to be the "serialization" thread. */
 INTDEF ATTR_INOUT(1) errno_t NOTHROW_RPC(LIBDCALL libd_pthread_barrier_wait)(pthread_barrier_t *self);
 /* >> pthread_barrierattr_init(3)
  * Initialize barrier attribute `self'

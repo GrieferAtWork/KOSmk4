@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa079c46c */
+/* HASH CRC-32:0xa17ebcf9 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -423,9 +423,6 @@
 #define __stub_printf_size
 #define __stub_printf_size_info
 #define __stub_pthread_atfork
-#define __stub_pthread_barrier_destroy
-#define __stub_pthread_barrier_init
-#define __stub_pthread_barrier_wait
 #define __stub_pthread_getcpuclockid
 #define __stub_pthread_mutex_consistent_np
 #define __stub_pthread_mutex_consistent

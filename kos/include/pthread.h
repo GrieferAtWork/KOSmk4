@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdcb7d623 */
+/* HASH CRC-32:0x8bab9888 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2415,7 +2415,8 @@ __CDECLARE_OPT(__ATTR_IN_OPT(2) __ATTR_OUT(1),__errno_t,__NOTHROW_NCX,pthread_ba
 __CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_NCX,pthread_barrier_destroy,(pthread_barrier_t *__self),(__self))
 /* >> pthread_barrier_wait(3)
  * Wait on  the given  `self'
- * @return: EOK: Success */
+ * @return: 0 :                            Success
+ * @return: PTHREAD_BARRIER_SERIAL_THREAD: Success, and you were picked to be the "serialization" thread. */
 __CDECLARE_OPT(__ATTR_INOUT(1),__errno_t,__NOTHROW_RPC,pthread_barrier_wait,(pthread_barrier_t *__self),(__self))
 
 

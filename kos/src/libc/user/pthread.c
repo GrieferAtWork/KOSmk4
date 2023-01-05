@@ -4175,12 +4175,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_barrier_init)(pthread_barrier_t *__restrict se
                                                 pthread_barrierattr_t const *__restrict attr,
                                                 unsigned int count)
 /*[[[body:libc_pthread_barrier_init]]]*/
-/*AUTO*/{
-	(void)self;
-	(void)attr;
-	(void)count;
-	CRT_UNIMPLEMENTEDF("pthread_barrier_init(self: %p, attr: %p, count: %x)", self, attr, count); /* TODO */
-	return ENOSYS;
+{
+	if unlikely(count == 0)
+		return EINVAL;
+	bzero(self, sizeof(*self));
+	self->b_shared = attr->ba_pshared == PTHREAD_PROCESS_SHARED;
+	self->b_count  = count;
+	return EOK;
 }
 /*[[[end:libc_pthread_barrier_init]]]*/
 
@@ -4191,24 +4192,103 @@ NOTHROW_NCX(LIBCCALL libc_pthread_barrier_init)(pthread_barrier_t *__restrict se
 INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
 NOTHROW_NCX(LIBCCALL libc_pthread_barrier_destroy)(pthread_barrier_t *self)
 /*[[[body:libc_pthread_barrier_destroy]]]*/
-/*AUTO*/{
+{
 	(void)self;
-	CRT_UNIMPLEMENTEDF("pthread_barrier_destroy(self: %p)", self); /* TODO */
-	return ENOSYS;
+	DBG_memset(self, 0xcc, sizeof(*self));
+	return EOK;
 }
 /*[[[end:libc_pthread_barrier_destroy]]]*/
 
-/*[[[head:libc_pthread_barrier_wait,hash:CRC-32=0xb7c25495]]]*/
+/*[[[head:libc_pthread_barrier_wait,hash:CRC-32=0x51605d32]]]*/
 /* >> pthread_barrier_wait(3)
  * Wait on  the given  `self'
- * @return: EOK: Success */
+ * @return: 0 :                            Success
+ * @return: PTHREAD_BARRIER_SERIAL_THREAD: Success, and you were picked to be the "serialization" thread. */
 INTERN ATTR_SECTION(".text.crt.sched.pthread") ATTR_INOUT(1) errno_t
 NOTHROW_RPC(LIBCCALL libc_pthread_barrier_wait)(pthread_barrier_t *self)
 /*[[[body:libc_pthread_barrier_wait]]]*/
-/*AUTO*/{
-	(void)self;
-	CRT_UNIMPLEMENTEDF("pthread_barrier_wait(self: %p)", self); /* TODO */
-	return ENOSYS;
+{
+	uint32_t num_waiting, myround;
+again:
+	/* Get the ID of the current group. This must be done before we increase
+	 * the number of waiting threads below so that the round ID we read here
+	 * is interlocked with the number of waiting threads. */
+	myround = ATOMIC_READ(self->b_current_round);
+
+	/* Increase the # of waiting threads */
+	num_waiting = ATOMIC_INCFETCH(self->b_in);
+
+	/* Check if we're the last thread to arrive before a new round can start. */
+	if (num_waiting == self->b_count) {
+		/* -> Yes: finish the current round. */
+
+		/* Step #1: Activate the next round.
+		 *
+		 * If after we did this, another thread tries to wait for the barrier,
+		 * it  will appear to them as though  the next round was already fully
+		 * filled (even though that's not true). But that's OK since they will
+		 * just `sched_yield()' below until we set `b_in = 0' next. */
+		ATOMIC_INC(self->b_current_round);
+
+		/* Step #2: Set the # of waiting threads within the next round to `0'
+		 *
+		 * This has to be  done _after_ we  go to the  next round; else,  there
+		 * would be a point in time where the current (old) round would  appear
+		 * as though it had just started, which we can't have as it would allow
+		 * additional threads to start waiting in the context of the old round. */
+		ATOMIC_WRITE(self->b_in, 0);
+
+		/* Step #3: Wake up all threads that are waiting for the barrier.
+		 *
+		 * We know that _exactly_ `num_waiting'  threads will be woken here,  and
+		 * that those `num_waiting' threads all started waiting during the  round
+		 * that has just passed. Technically, more threads may already be waiting
+		 * for the next round to finish, and  those get awoken here as well,  but
+		 * that doesn't matter since those threads will just start waiting again,
+		 * because   the   `ATOMIC_READ(self->b_current_round) == myround'  check
+		 * below will indicate that their (new) round isn't over, yet. */
+#ifndef __OPTIMIZE_SIZE__
+		if (num_waiting > 0)
+#endif /* !__OPTIMIZE_SIZE__ */
+		{
+			sys_Xfutex(&self->b_current_round, FUTEX_WAKE, (uint32_t)-1, NULL, NULL, 0);
+		}
+		return PTHREAD_BARRIER_SERIAL_THREAD;
+	}
+
+	/* Check if another thread is finishing the current round. */
+	if (num_waiting > self->b_count) {
+		/* Wait until another thread has finished the current round. */
+		sched_yield();
+		goto again;
+	}
+
+	/* XXX: There is a race condition that goes unhandled here:
+	 *
+	 * - thread #1: myround = ATOMIC_READ(self->b_current_round);
+	 * - thread #2: ATOMIC_INC(self->b_current_round);
+	 * - thread #2: ATOMIC_WRITE(self->b_in, 0);
+	 * - thread #1: num_waiting = ATOMIC_INCFETCH(self->b_in);
+	 *
+	 * In  this scenario, we are thread #1, and have just incremented
+	 * the `b_in' counter of the wrong `b_current_round', but we have
+	 * no way of knowing which round we are actually supposed to wait
+	 * for.  -- Below, we *do* wait for  the old round (but that will
+	 * just result in us to stop waiting immediately since that round
+	 * is already over). As a result, it is possible for the  barrier
+	 * to think that we're still waiting on it when in fact we aren't
+	 * doing so.
+	 *
+	 * Idea: combine `b_in' and `b_current_round' into a single counter,
+	 *       such that `NUM_WAITING_THREADS = b_in % b_count'. Then, use
+	 *       ATOMIC_CMPXCH to reset the counter if it becomse too large.
+	 */
+
+	/* Wait until the current round is over. */
+	do {
+		sys_Xfutex(&self->b_current_round, FUTEX_WAIT, myround, NULL, NULL, 0);
+	} while (ATOMIC_READ(self->b_current_round) == myround);
+	return 0;
 }
 /*[[[end:libc_pthread_barrier_wait]]]*/
 

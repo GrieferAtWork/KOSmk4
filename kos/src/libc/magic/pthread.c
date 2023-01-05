@@ -2610,7 +2610,8 @@ $errno_t pthread_barrier_destroy([[inout]] pthread_barrier_t *self);
 
 @@>> pthread_barrier_wait(3)
 @@Wait on  the given  `self'
-@@@return: EOK: Success
+@@@return: 0 :                            Success
+@@@return: PTHREAD_BARRIER_SERIAL_THREAD: Success, and you were picked to be the "serialization" thread.
 [[cp, decl_include("<bits/types.h>", "<bits/crt/pthreadtypes.h>")]]
 $errno_t pthread_barrier_wait([[inout]] pthread_barrier_t *self);
 
