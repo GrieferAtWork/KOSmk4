@@ -19,4 +19,7 @@
  */
 #ifndef __osockaddr_defined
 #include <sys/socket.h>
+#ifndef __osockaddr_defined
+#define __osockaddr_defined
+#endif /* !__osockaddr_defined */
 #endif /* !__osockaddr_defined */

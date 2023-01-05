@@ -18,5 +18,9 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __tm_defined
-#include <time.h>
+#include <bits/crt/tm.h>
+#ifndef __tm_defined
+#define __tm_defined
+__NAMESPACE_STD_USING(tm)
+#endif /* !__tm_defined */
 #endif /* !__tm_defined */

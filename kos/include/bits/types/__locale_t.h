@@ -19,5 +19,7 @@
  */
 #ifndef _BITS_TYPES___LOCALE_T_H
 #define _BITS_TYPES___LOCALE_T_H 1
+#ifndef __locale_t
 #include <__crt.h>
+#endif /* !__locale_t */
 #endif /* !_BITS_TYPES___LOCALE_T_H */

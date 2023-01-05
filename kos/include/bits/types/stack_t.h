@@ -18,13 +18,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __stack_t_defined
-#ifndef __sigstack_defined
 #include <bits/os/sigstack.h>
-#endif /* !__sigstack_defined */
 #ifndef __stack_t_defined
 #define __stack_t_defined
 #ifdef __CC__
+__DECL_BEGIN
 typedef struct sigaltstack stack_t;
+__DECL_END
 #endif /* __CC__ */
 #endif /* !__stack_t_defined */
 #endif /* !__stack_t_defined */

@@ -17,7 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_TYPES___FILE_H
-#define _BITS_TYPES___FILE_H 1
+#ifndef ____FILE_defined
+#ifndef __FILE
 #include <__crt.h>
-#endif /* !_BITS_TYPES___FILE_H */
+#endif /* !__FILE */
+#ifndef ____FILE_defined
+#define ____FILE_defined
+#endif /* !____FILE_defined */
+#endif /* !____FILE_defined */

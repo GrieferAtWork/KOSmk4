@@ -17,7 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_TYPES_STRUT_ITIMERSPEC_H
-#define _BITS_TYPES_STRUT_ITIMERSPEC_H 1
-#include <time.h>
-#endif /* !_BITS_TYPES_STRUT_ITIMERSPEC_H */
+#ifndef __itimerspec_defined
+#ifndef __SIZEOF_ITIMERSPEC
+#include <bits/os/itimerspec.h>
+#endif /* !__SIZEOF_ITIMERSPEC */
+#ifndef __itimerspec_defined
+#define __itimerspec_defined
+#endif /* !__itimerspec_defined */
+#endif /* !__itimerspec_defined */

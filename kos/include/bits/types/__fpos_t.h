@@ -17,6 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef _____fpos_t_defined
 #ifndef __fpos_t
 #include <bits/crt/stdio.h>
 #endif /* !__fpos_t */
+#ifndef _____fpos_t_defined
+#define _____fpos_t_defined
+#endif /* !_____fpos_t_defined */
+#endif /* !_____fpos_t_defined */

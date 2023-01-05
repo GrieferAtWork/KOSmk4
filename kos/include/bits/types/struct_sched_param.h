@@ -17,14 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef ____sigset_t_defined
-#include <bits/os/sigset.h>
-#ifndef ____sigset_t_defined
-#define ____sigset_t_defined
-#ifdef __CC__
-__DECL_BEGIN
-typedef struct __sigset_struct __sigset_t;
-__DECL_END
-#endif /* __CC__ */
-#endif /* !____sigset_t_defined */
-#endif /* !____sigset_t_defined */
+#ifndef __sched_param_defined
+#ifndef __SIZEOF_SCHED_PARAM
+#include <bits/os/sched.h>
+#endif /* !__SIZEOF_SCHED_PARAM */
+#ifndef __sched_param_defined
+#define __sched_param_defined
+#endif /* !__sched_param_defined */
+#endif /* !__sched_param_defined */

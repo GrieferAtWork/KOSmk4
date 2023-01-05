@@ -18,15 +18,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __sigset_t_defined
-#include <__stdinc.h>
-
 #include <bits/os/sigset.h>
 #ifndef __sigset_t_defined
 #define __sigset_t_defined
 #ifdef __CC__
-__SYSDECL_BEGIN
+__DECL_BEGIN
 typedef struct __sigset_struct sigset_t;
-__SYSDECL_END
+__DECL_END
 #endif /* __CC__ */
 #endif /* !__sigset_t_defined */
 #endif /* !__sigset_t_defined */

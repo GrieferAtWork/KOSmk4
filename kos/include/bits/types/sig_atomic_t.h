@@ -18,7 +18,6 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __sig_atomic_t_defined
-#include <__stdinc.h>
 #include <hybrid/typecore.h>
 #ifndef __sig_atomic_t_defined
 #define __sig_atomic_t_defined

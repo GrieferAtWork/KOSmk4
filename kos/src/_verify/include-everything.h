@@ -457,6 +457,7 @@ incdir("");
 #include <bits/types/clock_t.h>
 #include <bits/types/clockid_t.h>
 #include <bits/types/cookie_io_functions_t.h>
+#include <bits/types/error_t.h>
 #include <bits/types/locale_t.h>
 #include <bits/types/mbstate_t.h>
 #include <bits/types/sig_atomic_t.h>
@@ -465,10 +466,12 @@ incdir("");
 #include <bits/types/sigset_t.h>
 #include <bits/types/sigval_t.h>
 #include <bits/types/stack_t.h>
+#include <bits/types/struct_FILE.h>
 #include <bits/types/struct_iovec.h>
 #include <bits/types/struct_itimerspec.h>
 #include <bits/types/struct_osockaddr.h>
 #include <bits/types/struct_rusage.h>
+#include <bits/types/struct_sched_param.h>
 #include <bits/types/struct_sigstack.h>
 #include <bits/types/struct_timespec.h>
 #include <bits/types/struct_timeval.h>
@@ -508,6 +511,7 @@ incdir("");
 #include <bsd/sys/ttychars.h>
 #include <bsd/tzfile.h>
 #include <bsd/unistd.h>
+#include <bsd/vis.h>
 #include <bsd/wchar.h>
 #include <bstring.h>
 #include <bytesex.h>

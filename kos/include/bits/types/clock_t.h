@@ -18,7 +18,6 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __clock_t_defined
-#include <__stdinc.h>
 #include <bits/types.h>
 #ifndef __clock_t_defined
 #define __clock_t_defined

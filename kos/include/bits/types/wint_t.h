@@ -18,7 +18,6 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __wint_t_defined
-#include <__stdinc.h>
 #include <hybrid/typecore.h>
 #ifndef __wint_t_defined
 #define __wint_t_defined

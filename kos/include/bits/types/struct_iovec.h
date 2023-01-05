@@ -18,7 +18,9 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __iovec_defined
+#ifndef __SIZEOF_IOVEC
 #include <bits/os/iovec.h>
+#endif /* !__SIZEOF_IOVEC */
 #ifndef __iovec_defined
 #define __iovec_defined
 #endif /* !__iovec_defined */

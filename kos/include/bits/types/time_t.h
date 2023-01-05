@@ -18,7 +18,6 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __time_t_defined
-#include <__stdinc.h>
 #include <bits/types.h>
 #ifndef __time_t_defined
 #define __time_t_defined

@@ -17,6 +17,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef __rusage_defined
 #ifndef __SIZEOF_RUSAGE
 #include <bits/os/rusage.h>
 #endif /* !__SIZEOF_RUSAGE */
+#ifndef __rusage_defined
+#define __rusage_defined
+#endif /* !__rusage_defined */
+#endif /* !__rusage_defined */

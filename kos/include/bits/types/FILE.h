@@ -18,7 +18,6 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __FILE_defined
-#include <__stdinc.h>
 #include <__crt.h>
 #ifndef __FILE_defined
 #define __FILE_defined

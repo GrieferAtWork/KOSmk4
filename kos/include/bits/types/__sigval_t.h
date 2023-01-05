@@ -21,5 +21,10 @@
 #include <bits/os/sigval.h>
 #ifndef __sigval_t_defined
 #define __sigval_t_defined
+#ifdef __CC__
+__DECL_BEGIN
+typedef union sigval sigval_t;
+__DECL_END
+#endif /* __CC__ */
 #endif /* !__sigval_t_defined */
 #endif /* !__sigval_t_defined */
