@@ -2894,9 +2894,9 @@ libdl_dlauxctrl(USER DlModule *self, unsigned int cmd, ...)
 
 	case DLAUXCTRL_ADD_FINALIZER: {
 		struct dlmodule_finalizers *flz;
-		void (LIBDL_CC *func)(void *);
+		void (DLFCN_CC *func)(void *);
 		void *arg;
-		func = va_arg(args, void (LIBDL_CC *)(void *));
+		func = va_arg(args, void (DLFCN_CC *)(void *));
 		arg  = va_arg(args, void *);
 again_add_finalizer_read_list:
 		flz = ATOMIC_READ(self->dm_finalize);

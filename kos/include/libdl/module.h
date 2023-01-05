@@ -156,8 +156,8 @@ NOTHROW_NCX(LIBDL_CC DlSection_Destroy)(__USER DlSection *self) __THROWS(E_SEGFA
 #endif /* __BUILDING_LIBDL */
 
 struct dlmodule_finalizer {
-	void (LIBDL_CC *df_func)(void *arg); /* [1..1] Finalizer callback. */
-	void           *df_arg;              /* [?..?] Callback argument. */
+	void (__DLFCN_CC *df_func)(void *arg); /* [1..1] Finalizer callback. */
+	void             *df_arg;              /* [?..?] Callback argument. */
 };
 
 struct dlmodule_finalizers {
