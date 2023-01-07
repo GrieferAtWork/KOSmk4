@@ -194,10 +194,10 @@ struct dlmodule_format {
 	                                            char const *__restrict symbol_name,
 	                                            void **__restrict psymbol_addr,
 	                                            size_t *psymbol_size);
-
 #define DLMODULE_FORMAT_DLSYM_WEAK  1    /* Symbol found, but it is weak */
 #define DLMODULE_FORMAT_DLSYM_OK    0    /* Symbol found */
 #define DLMODULE_FORMAT_DLSYM_ERROR (-1) /* Symbol could not be found (dlerror() was not modified) */
+
 	/* [0..1] Format-specific implementation of `dladdr()'. */
 	NONNULL((1)) int (LIBDL_CC *df_dladdr)(DlModule *__restrict self,
 	                                       uintptr_t module_relative_pointer,

@@ -345,6 +345,7 @@
 #define __BEGIN_EXTERN_C      __DECL_BEGIN
 #define __END_EXTERN_C        __DECL_END
 #define __malloc_like         __ATTR_MALLOC
+#define __dead                __ATTR_NORETURN
 #define __dead2               __ATTR_NORETURN
 #define __pure2               __ATTR_CONST
 #define __noinline            __ATTR_NOINLINE

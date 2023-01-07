@@ -526,7 +526,7 @@ NOTHROW_NCX(DLFCN_CC libdl_dltlsfree)(USER DlModule *self)
 	DlModule_RemoveTLSExtension(self);
 
 	/* Wait for other threads to complete finalization (which may happen
-	 * if  they began  to do so,  just before this  function got called)
+	 * if they began  to do  so just  before this  function got  called)
 	 * s.a. `libdl_dltlsfreeseg()' doing a tryincref() to prevent
 	 *       modules from unloading while TLS finalizers contained within
 	 *       get invoked. */

@@ -60,7 +60,7 @@ static_assert(offsetof(struct link_map, l_prev) == offsetof(DlModule, dm_modules
 INTERN ElfW(Shdr) empty_shdr[1] = { 0 };
 
 /* Module finalizer functions. */
-INTDEF NONNULL((1)) void CC
+INTERN NONNULL((1)) void CC
 dlmodule_finalizers_run(struct dlmodule_finalizers *__restrict self)
 		THROWS(...) {
 	size_t count;
@@ -117,7 +117,7 @@ DlModule_Destroy(USER DlModule *self)
 		dlglobals_global_endwrite(&dl_globals);
 	}
 
-	/* Invoke dynamically regsitered module finalizers (s.a. `__cxa_atexit()') */
+	/* Invoke dynamically registered module finalizers (s.a. `__cxa_atexit()') */
 	if (self->dm_finalize) {
 		dlmodule_finalizers_run(self->dm_finalize);
 		free(self->dm_finalize);

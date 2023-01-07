@@ -2653,9 +2653,6 @@ DlModule_RunAllModuleFinalizers(void)
 again:
 	dlglobals_all_read(&dl_globals);
 	DLIST_FOREACH (mod, &dl_globals.dg_alllist, dm_modules) {
-		size_t i, fini_array_size;
-		uintptr_t fini_func;
-		uintptr_t *fini_array_base;
 		/* Skip finalizers  if the  module was  never
 		 * initialized or has already been finalized. */
 		if (ATOMIC_FETCHOR(mod->dm_flags, (RTLD_NOINIT /*| RTLD_NODELETE*/)) & RTLD_NOINIT)
@@ -2663,59 +2660,56 @@ again:
 		if unlikely(!tryincref(mod))
 			continue;
 		dlglobals_all_endread(&dl_globals);
-		/* Invoke dynamically regsitered module finalizers (s.a. `__cxa_atexit()') */
-		if (mod->dm_finalize)
-			dlmodule_finalizers_run(mod->dm_finalize);
-		/* TODO: Support for formats other than ELF. */
-		if (mod->dm_ops) {
-			if (mod->dm_ops->df_run_finalizers) {
-				TRY {
-					(*mod->dm_ops->df_run_finalizers)(mod);
-				} EXCEPT {
-					decref(mod);
-					RETHROW();
-				}
-			}
-			goto decref_module_and_continue;
-		}
-		fini_func       = 0;
-		fini_array_base = NULL;
-		fini_array_size = 0;
-		for (i = 0; i < mod->dm_elf.de_dyncnt; ++i) {
-			switch (mod->dm_dynhdr[i].d_tag) {
 
-			case DT_NULL:
-				goto done_dyntag;
-
-			case DT_FINI:
-				fini_func = (uintptr_t)mod->dm_dynhdr[i].d_un.d_ptr;
-				break;
-
-			case DT_FINI_ARRAY:
-				fini_array_base = (uintptr_t *)(mod->dm_loadaddr +
-				                                mod->dm_dynhdr[i].d_un.d_ptr);
-				break;
-
-			case DT_FINI_ARRAYSZ:
-				fini_array_size = (size_t)mod->dm_dynhdr[i].d_un.d_val / sizeof(void (*)(void));
-				break;
-
-			default: break;
-			}
-		}
-done_dyntag:
-		/* Service fini-array functions in reverse order. */
 		TRY {
-			while (fini_array_size--)
-				(*(void (*)(void))(fini_array_base[fini_array_size] /* + self->dm_loadaddr*/))();
-			/* Service a fini function, if one was specified. */
-			if (fini_func)
-				(*(void (*)(void))(fini_func + mod->dm_loadaddr))();
+			/* Invoke dynamically registered module finalizers (s.a. `__cxa_atexit()') */
+			if (mod->dm_finalize)
+				dlmodule_finalizers_run(mod->dm_finalize);
+			if (mod->dm_ops) {
+				if (mod->dm_ops->df_run_finalizers)
+					(*mod->dm_ops->df_run_finalizers)(mod);
+			} else {
+				size_t i, fini_array_size;
+				uintptr_t fini_func;
+				uintptr_t *fini_array_base;
+				fini_func       = 0;
+				fini_array_base = NULL;
+				fini_array_size = 0;
+				for (i = 0; i < mod->dm_elf.de_dyncnt; ++i) {
+					switch (mod->dm_dynhdr[i].d_tag) {
+
+					case DT_NULL:
+						goto done_dyntag;
+
+					case DT_FINI:
+						fini_func = (uintptr_t)mod->dm_dynhdr[i].d_un.d_ptr;
+						break;
+
+					case DT_FINI_ARRAY:
+						fini_array_base = (uintptr_t *)(mod->dm_loadaddr +
+						                                mod->dm_dynhdr[i].d_un.d_ptr);
+						break;
+
+					case DT_FINI_ARRAYSZ:
+						fini_array_size = (size_t)mod->dm_dynhdr[i].d_un.d_val / sizeof(void (*)(void));
+						break;
+
+					default: break;
+					}
+				}
+done_dyntag:
+				/* Service fini-array functions in reverse order. */
+				while (fini_array_size--)
+					(*(void (*)(void))(fini_array_base[fini_array_size] /* + self->dm_loadaddr*/))();
+
+				/* Service a fini function, if one was specified. */
+				if (fini_func)
+					(*(void (*)(void))(fini_func + mod->dm_loadaddr))();
+			}
 		} EXCEPT {
 			decref(mod);
 			RETHROW();
 		}
-decref_module_and_continue:
 		decref(mod);
 		goto again;
 	}

@@ -26,7 +26,9 @@
 
 #include <hybrid/limitcore.h>
 
+#ifndef _LIMITS_H
 #include <limits.h>
+#endif /* !_LIMITS_H */
 
 #ifdef __USE_NETBSD
 #ifndef SSIZE_MIN

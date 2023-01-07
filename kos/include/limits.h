@@ -1289,4 +1289,13 @@ for (local alwaysUseMinimum, name, posixName, posixMinimum, doc: limits) {
 
 #endif /* __USE_XOPEN || __USE_NETBSD */
 
+#ifdef __USE_NETBSD
+#ifndef _SYS_COMMON_LIMITS_H
+#include <sys/common_limits.h>
+#endif /* !_SYS_COMMON_LIMITS_H */
+#ifndef _SYS_SYSLIMITS_H
+#include <sys/syslimits.h>
+#endif /* !_SYS_SYSLIMITS_H */
+#endif /* __USE_NETBSD */
+
 #endif /* !_LIMITS_H */

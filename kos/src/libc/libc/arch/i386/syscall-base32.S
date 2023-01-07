@@ -106,7 +106,8 @@
  * >> RESTORE_REGISTERS(WITHOUT: EFLAGS_DF);
  * >> JUMP_TO(PC: return_pc - 7);
  *
- * How  to  encode  CFI  instrumentation?   The  only  real  way   I  see  is  to   use:
+ * How to encode CFI instrumentation?
+ * The only real way I see is to use:
  * >> .cfi_escape DW_OP_GNU_encoded_addr, DW_EH_PE_funcrel | DW_EH_PE_uleb128, 0 // or 1
  * >> .cfi_escape DW_OP_deref_size, 1  // *(u8 *)__i386_syscall
  * >> .cfi_escape DW_OP_const1u, 0xcd  // *(u8 *)__i386_syscall, 0xcd

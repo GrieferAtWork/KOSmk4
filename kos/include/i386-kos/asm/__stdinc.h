@@ -30,9 +30,9 @@
 #if (!defined(__INTELLISENSE__) && defined(__CC__) && \
      defined(__KOS__) && defined(__KERNEL__) &&       \
      defined(__COMPILER_HAVE_GCC_ASM) && !defined(__HAVE_FPU))
-/* Define some macros to force liner errors when GCC tries to use
- * floating-point instructions. This  can unintentionally  happen
- * when 32-bit code uses `ATOMIC_READ()' or `ATOMIC_WRITE()' with
+/* Define some macros to force linker errors when GCC tries to use
+ * floating-point  instructions.  This can  unintentionally happen
+ * when  32-bit code uses `ATOMIC_READ()' or `ATOMIC_WRITE()' with
  * 64-bit operands.
  *
  * These are set-up to cause linker errors (which include file+
