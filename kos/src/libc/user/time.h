@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1ec24cb */
+/* HASH CRC-32:0x43687c3e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,10 @@ INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBCCALL libc_stime)(time_t const *when);
  * Set the system time to `*when'. This call is restricted to the superuser */
 INTDEF ATTR_IN(1) int NOTHROW_NCX(LIBCCALL libc_stime64)(time64_t const *when);
 /* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
+ * Pause execution for a number of nanoseconds
+ * @return: 0 : Success
+ * @return: -1: [errno=EINTR]  System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: -1: [errno=EINVAL] Invalid `requested_time->tv_nsec' */
 INTDEF ATTR_IN(1) ATTR_OUT_OPT(2) int NOTHROW_RPC(LIBCCALL libc_nanosleep)(struct timespec const *requested_time, struct timespec *remaining);
 /* >> clock_getres(2), clock_getres64(2)
  * Get resolution of clock `clock_id' in `*res' */
@@ -78,13 +81,24 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_timer_getoverrun)(timer_t timerid);
  * High-resolution sleep with the specified clock
  * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
  *                   Other clock IDs cannot be used with this system call!
- * @param: flags:    Set of `0 | TIMER_ABSTIME' */
-INTDEF ATTR_IN(3) ATTR_OUT_OPT(4) int NOTHROW_RPC(LIBCCALL libc_clock_nanosleep)(clockid_t clock_id, __STDC_INT_AS_UINT_T flags, struct timespec const *__restrict requested_time, struct timespec *remaining);
+ * @param: flags:    Set of `0 | TIMER_ABSTIME'
+ * @return: 0 :      Success
+ * @return: EINTR:   System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: EINVAL:  Invalid `clock_id', `flags' or `requested_time->tv_nsec'
+ * @return: ENOTSUP: Clock specified by `clock_id' isn't supported. */
+INTDEF ATTR_IN(3) ATTR_OUT_OPT(4) errno_t NOTHROW_RPC(LIBCCALL libc_clock_nanosleep)(clockid_t clock_id, __STDC_INT_AS_UINT_T flags, struct timespec const *__restrict requested_time, struct timespec *remaining);
 /* >> clock_getcpuclockid(2)
- * Return clock ID for CPU-time clock */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_clock_getcpuclockid)(pid_t pid, clockid_t *clock_id);
+ * Return clock ID for CPU-time clock
+ * @return: 0 :     Success
+ * @return: ENOSYS: Not supported
+ * @return: EPERM:  You're not allowed to read the CPU-time clock of `pid'
+ * @return: ESRCH:  No such process `pid' */
+INTDEF errno_t NOTHROW_NCX(LIBCCALL libc_clock_getcpuclockid)(pid_t pid, clockid_t *clock_id);
 /* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
+ * Pause execution for a number of nanoseconds
+ * @return: 0 : Success
+ * @return: -1: [errno=EINTR]  System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: -1: [errno=EINVAL] Invalid `requested_time->tv_nsec' */
 INTDEF ATTR_IN(1) ATTR_OUT_OPT(2) int NOTHROW_RPC(LIBCCALL libc_nanosleep64)(struct timespec64 const *__restrict requested_time, struct timespec64 *remaining);
 /* >> clock_getres(2), clock_getres64(2)
  * Get resolution of clock `clock_id' in `*res' */
@@ -105,8 +119,12 @@ INTDEF ATTR_OUT(2) int NOTHROW_NCX(LIBCCALL libc_timer_gettime64)(timer_t timeri
  * High-resolution sleep with the specified clock
  * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
  *                   Other clock IDs cannot be used with this system call!
- * @param: flags:    Set of `0 | TIMER_ABSTIME' */
-INTDEF ATTR_IN(3) ATTR_OUT_OPT(4) int NOTHROW_RPC(LIBCCALL libc_clock_nanosleep64)(clockid_t clock_id, __STDC_INT_AS_UINT_T flags, struct timespec64 const *requested_time, struct timespec64 *remaining);
+ * @param: flags:    Set of `0 | TIMER_ABSTIME'
+ * @return: 0 :      Success
+ * @return: EINTR:   System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: EINVAL:  Invalid `clock_id', `flags' or `requested_time->tv_nsec'
+ * @return: ENOTSUP: Clock specified by `clock_id' isn't supported. */
+INTDEF ATTR_IN(3) ATTR_OUT_OPT(4) errno_t NOTHROW_RPC(LIBCCALL libc_clock_nanosleep64)(clockid_t clock_id, __STDC_INT_AS_UINT_T flags, struct timespec64 const *requested_time, struct timespec64 *remaining);
 #endif /* !__KERNEL__ */
 INTDEF char *libc_tzname[2];
 INTDEF int libc_daylight;

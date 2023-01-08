@@ -242,9 +242,12 @@ NOTHROW_NCX(LIBCCALL libc_stime64)(time64_t const *when)
 /*[[[end:libc_stime64]]]*/
 
 
-/*[[[head:libc_nanosleep,hash:CRC-32=0xfdc6d656]]]*/
+/*[[[head:libc_nanosleep,hash:CRC-32=0x7ed0a5c6]]]*/
 /* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
+ * Pause execution for a number of nanoseconds
+ * @return: 0 : Success
+ * @return: -1: [errno=EINTR]  System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: -1: [errno=EINVAL] Invalid `requested_time->tv_nsec' */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_IN(1) ATTR_OUT_OPT(2) int
 NOTHROW_RPC(LIBCCALL libc_nanosleep)(struct timespec const *requested_time,
                                      struct timespec *remaining)
@@ -256,12 +259,15 @@ NOTHROW_RPC(LIBCCALL libc_nanosleep)(struct timespec const *requested_time,
 }
 /*[[[end:libc_nanosleep]]]*/
 
-/*[[[head:libc_nanosleep64,hash:CRC-32=0xf22eb431]]]*/
+/*[[[head:libc_nanosleep64,hash:CRC-32=0xe016a9a6]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_nanosleep64, libc_nanosleep);
 #else /* MAGIC:alias */
 /* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
+ * Pause execution for a number of nanoseconds
+ * @return: 0 : Success
+ * @return: -1: [errno=EINTR]  System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: -1: [errno=EINVAL] Invalid `requested_time->tv_nsec' */
 INTERN ATTR_SECTION(".text.crt.time") ATTR_IN(1) ATTR_OUT_OPT(2) int
 NOTHROW_RPC(LIBCCALL libc_nanosleep64)(struct timespec64 const *__restrict requested_time,
                                        struct timespec64 *remaining)
@@ -306,10 +312,14 @@ NOTHROW_NCX(LIBCCALL libc_clock_settime)(clockid_t clock_id,
 }
 /*[[[end:libc_clock_settime]]]*/
 
-/*[[[head:libc_clock_getcpuclockid,hash:CRC-32=0x83d68da1]]]*/
+/*[[[head:libc_clock_getcpuclockid,hash:CRC-32=0x1b48e07d]]]*/
 /* >> clock_getcpuclockid(2)
- * Return clock ID for CPU-time clock */
-INTERN ATTR_SECTION(".text.crt.time") int
+ * Return clock ID for CPU-time clock
+ * @return: 0 :     Success
+ * @return: ENOSYS: Not supported
+ * @return: EPERM:  You're not allowed to read the CPU-time clock of `pid'
+ * @return: ESRCH:  No such process `pid' */
+INTERN ATTR_SECTION(".text.crt.time") errno_t
 NOTHROW_NCX(LIBCCALL libc_clock_getcpuclockid)(pid_t pid,
                                                clockid_t *clock_id)
 /*[[[body:libc_clock_getcpuclockid]]]*/
@@ -317,7 +327,7 @@ NOTHROW_NCX(LIBCCALL libc_clock_getcpuclockid)(pid_t pid,
 	(void)pid;
 	(void)clock_id;
 	CRT_UNIMPLEMENTEDF("clock_getcpuclockid(pid: %" PRIxN(__SIZEOF_PID_T__) ", clock_id: %p)", pid, clock_id); /* TODO */
-	return libc_seterrno(ENOSYS);
+	return ENOSYS;
 }
 /*[[[end:libc_clock_getcpuclockid]]]*/
 
@@ -385,13 +395,17 @@ NOTHROW_NCX(LIBCCALL libc_clock_getres64)(clockid_t clock_id,
 #endif /* MAGIC:alias */
 /*[[[end:libc_clock_getres64]]]*/
 
-/*[[[head:libc_clock_nanosleep,hash:CRC-32=0x13e7372b]]]*/
+/*[[[head:libc_clock_nanosleep,hash:CRC-32=0xac0af5ca]]]*/
 /* >> clock_nanosleep(2), clock_nanosleep64(2)
  * High-resolution sleep with the specified clock
  * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
  *                   Other clock IDs cannot be used with this system call!
- * @param: flags:    Set of `0 | TIMER_ABSTIME' */
-INTERN ATTR_SECTION(".text.crt.time") ATTR_IN(3) ATTR_OUT_OPT(4) int
+ * @param: flags:    Set of `0 | TIMER_ABSTIME'
+ * @return: 0 :      Success
+ * @return: EINTR:   System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: EINVAL:  Invalid `clock_id', `flags' or `requested_time->tv_nsec'
+ * @return: ENOTSUP: Clock specified by `clock_id' isn't supported. */
+INTERN ATTR_SECTION(".text.crt.time") ATTR_IN(3) ATTR_OUT_OPT(4) errno_t
 NOTHROW_RPC(LIBCCALL libc_clock_nanosleep)(clockid_t clock_id,
                                            __STDC_INT_AS_UINT_T flags,
                                            struct timespec const *__restrict requested_time,
@@ -402,11 +416,13 @@ NOTHROW_RPC(LIBCCALL libc_clock_nanosleep)(clockid_t clock_id,
 	error = sys_clock_nanosleep(clock_id,
 	                            (syscall_ulong_t)(unsigned int)flags,
 	                            requested_time, remaining);
-	return libc_seterrno_syserr(error);
+	if unlikely(E_ISERR(error))
+		error = -error;
+	return error; /* Posix wants us to return the actual errno code. */
 }
 /*[[[end:libc_clock_nanosleep]]]*/
 
-/*[[[head:libc_clock_nanosleep64,hash:CRC-32=0xa6245921]]]*/
+/*[[[head:libc_clock_nanosleep64,hash:CRC-32=0x3efca500]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_clock_nanosleep64, libc_clock_nanosleep);
 #else /* MAGIC:alias */
@@ -414,8 +430,12 @@ DEFINE_INTERN_ALIAS(libc_clock_nanosleep64, libc_clock_nanosleep);
  * High-resolution sleep with the specified clock
  * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
  *                   Other clock IDs cannot be used with this system call!
- * @param: flags:    Set of `0 | TIMER_ABSTIME' */
-INTERN ATTR_SECTION(".text.crt.time") ATTR_IN(3) ATTR_OUT_OPT(4) int
+ * @param: flags:    Set of `0 | TIMER_ABSTIME'
+ * @return: 0 :      Success
+ * @return: EINTR:   System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: EINVAL:  Invalid `clock_id', `flags' or `requested_time->tv_nsec'
+ * @return: ENOTSUP: Clock specified by `clock_id' isn't supported. */
+INTERN ATTR_SECTION(".text.crt.time") ATTR_IN(3) ATTR_OUT_OPT(4) errno_t
 NOTHROW_RPC(LIBCCALL libc_clock_nanosleep64)(clockid_t clock_id,
                                              __STDC_INT_AS_UINT_T flags,
                                              struct timespec64 const *requested_time,
@@ -424,9 +444,11 @@ NOTHROW_RPC(LIBCCALL libc_clock_nanosleep64)(clockid_t clock_id,
 {
 	errno_t error;
 	error = sys_clock_nanosleep_time64(clock_id,
-                                       (syscall_ulong_t)(unsigned int)flags,
-                                       requested_time, remaining);
-	return libc_seterrno_syserr(error);
+	                                   (syscall_ulong_t)(unsigned int)flags,
+	                                   requested_time, remaining);
+	if unlikely(E_ISERR(error))
+		error = -error;
+	return error; /* Posix wants us to return the actual errno code. */
 }
 #endif /* MAGIC:alias */
 /*[[[end:libc_clock_nanosleep64]]]*/

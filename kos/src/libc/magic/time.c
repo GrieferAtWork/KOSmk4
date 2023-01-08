@@ -1293,10 +1293,14 @@ int nanosleep32([[in]] struct $timespec32 const *requested_time,
 
 @@>> nanosleep(2), nanosleep64(2)
 @@Pause execution for a number of nanoseconds
+@@@return: 0 : Success
+@@@return: -1: [errno=EINTR]  System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+@@@return: -1: [errno=EINVAL] Invalid `requested_time->tv_nsec'
 [[cp, decl_include("<bits/os/timespec.h>"), no_crt_self_import, export_as("__nanosleep", "__libc_nanosleep")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("nanosleep", "__nanosleep", "__libc_nanosleep")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("nanosleep64")]]
 [[userimpl, requires($has_function(nanosleep32) || $has_function(nanosleep64))]]
+[[impl_include("<bits/os/timespec.h>")]]
 int nanosleep([[in]] struct timespec const *requested_time,
               [[out_opt]] struct timespec *remaining) {
 @@pp_if $has_function(nanosleep32)@@
@@ -1335,6 +1339,7 @@ int clock_getres32(clockid_t clock_id, [[out]] struct $timespec32 *res);
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("clock_getres64")]]
 [[userimpl, requires($has_function(clock_getres32) || $has_function(clock_getres64))]]
 [[export_as("__clock_getres")]]
+[[impl_include("<bits/os/timespec.h>")]]
 int clock_getres(clockid_t clock_id, [[out]] struct timespec *res) {
 @@pp_if $has_function(clock_getres32)@@
 	int result;
@@ -1368,6 +1373,7 @@ int clock_gettime32(clockid_t clock_id, [[out]] struct $timespec32 *tp);
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("clock_gettime64")]]
 [[userimpl, requires($has_function(clock_gettime32) || $has_function(clock_gettime64))]]
 [[export_as("__clock_gettime")]]
+[[impl_include("<bits/os/timespec.h>")]]
 int clock_gettime(clockid_t clock_id, [[out]] struct timespec *tp) {
 @@pp_if $has_function(clock_gettime32)@@
 	int result;
@@ -1403,6 +1409,7 @@ int clock_settime32(clockid_t clock_id, [[in]] struct $timespec32 const *tp);
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("clock_settime64")]]
 [[userimpl, requires($has_function(clock_settime32) || $has_function(clock_settime64))]]
 [[export_as("__clock_settime")]]
+[[impl_include("<bits/os/timespec.h>")]]
 int clock_settime(clockid_t clock_id, [[in]] struct timespec const *tp) {
 @@pp_if $has_function(clock_settime32)@@
 	struct timespec32 tp32;
@@ -1445,6 +1452,7 @@ int timer_settime32(timer_t timerid, __STDC_INT_AS_UINT_T flags,
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timer_settime64")]]
 [[userimpl, requires($has_function(timer_settime32) || $has_function(timer_settime64))]]
 [[section(".text.crt{|.dos}.timer")]]
+[[impl_include("<bits/os/itimerspec.h>")]]
 int timer_settime(timer_t timerid, __STDC_INT_AS_UINT_T flags,
                   [[in]] struct itimerspec const *__restrict value,
                   [[out_opt]] struct itimerspec *__restrict ovalue) {
@@ -1492,6 +1500,7 @@ int timer_gettime32(timer_t timerid, [[out_opt]] struct itimerspec *value);
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("timer_gettime64")]]
 [[userimpl, requires($has_function(timer_gettime32) || $has_function(timer_gettime64))]]
 [[section(".text.crt{|.dos}.timer")]]
+[[impl_include("<bits/os/itimerspec.h>")]]
 int timer_gettime(timer_t timerid, [[out_opt]] struct itimerspec *value) {
 @@pp_if $has_function(timer_gettime32)@@
 	int result;
@@ -1525,27 +1534,33 @@ int timer_getoverrun(timer_t timerid);
 
 %
 %#ifdef __USE_XOPEN2K
+[[cp, ignore, doc_alias("clock_nanosleep")]]
 [[decl_include("<features.h>", "<bits/os/timespec.h>", "<bits/types.h>")]]
-[[cp, doc_alias("clock_nanosleep"), ignore, nocrt, alias("clock_nanosleep", "__clock_nanosleep")]]
-int clock_nanosleep32(clockid_t clock_id, __STDC_INT_AS_UINT_T flags,
-                      [[in]] struct $timespec32 const *__restrict requested_time,
-                      [[out_opt]] struct $timespec32 *remaining);
+[[nocrt, alias("clock_nanosleep", "__clock_nanosleep")]]
+$errno_t clock_nanosleep32(clockid_t clock_id, __STDC_INT_AS_UINT_T flags,
+                           [[in]] struct $timespec32 const *__restrict requested_time,
+                           [[out_opt]] struct $timespec32 *remaining);
 
 @@>> clock_nanosleep(2), clock_nanosleep64(2)
 @@High-resolution sleep with the specified clock
 @@@param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
 @@                  Other clock IDs cannot be used with this system call!
 @@@param: flags:    Set of `0 | TIMER_ABSTIME'
+@@@return: 0 :      Success
+@@@return: EINTR:   System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+@@@return: EINVAL:  Invalid `clock_id', `flags' or `requested_time->tv_nsec'
+@@@return: ENOTSUP: Clock specified by `clock_id' isn't supported.
 [[cp, decl_include("<features.h>", "<bits/os/timespec.h>", "<bits/types.h>"), no_crt_self_import]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("clock_nanosleep", "__clock_nanosleep")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("clock_nanosleep64")]]
 [[userimpl, requires($has_function(clock_nanosleep32) || $has_function(clock_nanosleep64))]]
 [[export_as("__clock_nanosleep")]]
-int clock_nanosleep(clockid_t clock_id, __STDC_INT_AS_UINT_T flags,
-                    [[in]] struct timespec const *__restrict requested_time,
-                    [[out_opt]] struct timespec *remaining) {
+[[impl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
+$errno_t clock_nanosleep(clockid_t clock_id, __STDC_INT_AS_UINT_T flags,
+                         [[in]] struct timespec const *__restrict requested_time,
+                         [[out_opt]] struct timespec *remaining) {
 @@pp_if $has_function(clock_nanosleep32)@@
-	int result;
+	$errno_t result;
 	struct timespec32 req32, rem32;
 	req32.tv_sec  = (time32_t)requested_time->tv_sec;
 	req32.tv_nsec = requested_time->tv_nsec;
@@ -1556,7 +1571,7 @@ int clock_nanosleep(clockid_t clock_id, __STDC_INT_AS_UINT_T flags,
 	}
 	return result;
 @@pp_else@@
-	int result;
+	$errno_t result;
 	struct timespec64 req64, rem64;
 	req64.tv_sec  = (time64_t)requested_time->tv_sec;
 	req64.tv_nsec = requested_time->tv_nsec;
@@ -1571,9 +1586,13 @@ int clock_nanosleep(clockid_t clock_id, __STDC_INT_AS_UINT_T flags,
 
 @@>> clock_getcpuclockid(2)
 @@Return clock ID for CPU-time clock
+@@@return: 0 :     Success
+@@@return: ENOSYS: Not supported
+@@@return: EPERM:  You're not allowed to read the CPU-time clock of `pid'
+@@@return: ESRCH:  No such process `pid'
 [[decl_include("<bits/types.h>")]]
 [[export_alias("__clock_getcpuclockid")]]
-int clock_getcpuclockid(pid_t pid, clockid_t *clock_id);
+$errno_t clock_getcpuclockid(pid_t pid, clockid_t *clock_id);
 %#endif /* __USE_XOPEN2K */
 
 %
@@ -1582,6 +1601,7 @@ int clock_getcpuclockid(pid_t pid, clockid_t *clock_id);
 [[preferred_time64_variant_of(nanosleep), doc_alias("nanosleep")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__nanosleep", "__libc_nanosleep")]]
 [[userimpl, requires_function(nanosleep32)]]
+[[impl_include("<bits/os/timespec.h>")]]
 int nanosleep64([[in]] struct timespec64 const *__restrict requested_time,
                 [[out_opt]] struct timespec64 *remaining) {
 	int result;
@@ -1600,6 +1620,7 @@ int nanosleep64([[in]] struct timespec64 const *__restrict requested_time,
 [[preferred_time64_variant_of(clock_getres), doc_alias("clock_getres")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__clock_getres")]]
 [[userimpl, requires($has_function(clock_getres32))]]
+[[impl_include("<bits/os/timespec.h>")]]
 int clock_getres64(clockid_t clock_id, [[out]] struct timespec64 *res) {
 	int result;
 	struct timespec32 res32;
@@ -1615,6 +1636,7 @@ int clock_getres64(clockid_t clock_id, [[out]] struct timespec64 *res) {
 [[preferred_time64_variant_of(clock_gettime), doc_alias("clock_gettime")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__clock_gettime")]]
 [[userimpl, requires_function(clock_gettime32)]]
+[[impl_include("<bits/os/timespec.h>")]]
 int clock_gettime64(clockid_t clock_id, [[out]] struct timespec64 *tp) {
 	int result;
 	struct timespec32 res32;
@@ -1630,6 +1652,7 @@ int clock_gettime64(clockid_t clock_id, [[out]] struct timespec64 *tp) {
 [[preferred_time64_variant_of(clock_settime), doc_alias("clock_settime")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__clock_settime")]]
 [[userimpl, requires_function(clock_settime32)]]
+[[impl_include("<bits/os/timespec.h>")]]
 int clock_settime64(clockid_t clock_id, [[in]] struct timespec64 const *tp) {
 	struct timespec32 tp32;
 	tp32.tv_sec  = (time32_t)tp->tv_sec;
@@ -1641,6 +1664,7 @@ int clock_settime64(clockid_t clock_id, [[in]] struct timespec64 const *tp) {
 [[preferred_time64_variant_of(timer_settime), doc_alias("timer_settime")]]
 [[userimpl, requires_function(timer_settime32)]]
 [[section(".text.crt{|.dos}.timer")]]
+[[impl_include("<bits/os/itimerspec.h>")]]
 int timer_settime64(timer_t timerid, __STDC_INT_AS_UINT_T flags,
                     [[in]] struct itimerspec64 const *__restrict value,
                     [[out_opt]] struct itimerspec64 *__restrict ovalue) {
@@ -1664,6 +1688,7 @@ int timer_settime64(timer_t timerid, __STDC_INT_AS_UINT_T flags,
 [[preferred_time64_variant_of(timer_gettime), doc_alias("timer_gettime")]]
 [[userimpl, requires_function(timer_gettime32)]]
 [[section(".text.crt{|.dos}.timer")]]
+[[impl_include("<bits/os/itimerspec.h>")]]
 int timer_gettime64(timer_t timerid, [[out]] struct itimerspec64 *value) {
 	int result;
 	struct itimerspec32 value32;
@@ -1682,10 +1707,11 @@ int timer_gettime64(timer_t timerid, [[out]] struct itimerspec64 *value) {
 [[cp, decl_include("<features.h>", "<bits/os/timespec.h>", "<bits/types.h>")]]
 [[preferred_time64_variant_of(clock_nanosleep), doc_alias("clock_nanosleep")]]
 [[userimpl, requires_function(clock_nanosleep32)]]
-int clock_nanosleep64(clockid_t clock_id, __STDC_INT_AS_UINT_T flags,
-                      [[in]] struct timespec64 const *requested_time,
-                      [[out_opt]] struct timespec64 *remaining) {
-	int result;
+[[impl_include("<bits/os/timespec.h>", "<bits/types.h>")]]
+$errno_t clock_nanosleep64(clockid_t clock_id, __STDC_INT_AS_UINT_T flags,
+                           [[in]] struct timespec64 const *requested_time,
+                           [[out_opt]] struct timespec64 *remaining) {
+	$errno_t result;
 	struct timespec32 req32, rem32;
 	req32.tv_sec  = (time32_t)requested_time->tv_sec;
 	req32.tv_nsec = requested_time->tv_nsec;

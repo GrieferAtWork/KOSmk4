@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28f1d4a */
+/* HASH CRC-32:0xcbd3058c */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3349,15 +3349,15 @@ DFUN(".text.crt.dos.timer", libd_timer_delete, libc_timer_delete, TD, 1, TIn(__S
 DFUN(".text.crt.dos.timer", libd_timer_settime, libc_timer_settime, TD, 4, TIn(__SIZEOF_TIMER_T__), TD, TP, TP)
 DFUN(".text.crt.dos.timer", libd_timer_gettime, libc_timer_gettime, TD, 2, TIn(__SIZEOF_TIMER_T__), TP)
 DFUN(".text.crt.dos.timer", libd_timer_getoverrun, libc_timer_getoverrun, TD, 1, TIn(__SIZEOF_TIMER_T__))
-DFUN(".text.crt.dos.time", libd_clock_nanosleep, libc_clock_nanosleep, TD, 4, TIn(__SIZEOF_CLOCKID_T__), TD, TP, TP)
-DFUN(".text.crt.dos.time", libd_clock_getcpuclockid, libc_clock_getcpuclockid, TD, 2, TIn(__SIZEOF_PID_T__), TP)
+DFUN(".text.crt.dos.time", libd_clock_nanosleep, libc_clock_nanosleep, TIn(__SIZEOF_ERRNO_T__), 4, TIn(__SIZEOF_CLOCKID_T__), TD, TP, TP)
+DFUN(".text.crt.dos.time", libd_clock_getcpuclockid, libc_clock_getcpuclockid, TIn(__SIZEOF_ERRNO_T__), 2, TIn(__SIZEOF_PID_T__), TP)
 DFUN(".text.crt.dos.time", libd_nanosleep64, libc_nanosleep64, TD, 2, TP, TP)
 DFUN(".text.crt.dos.time", libd_clock_getres64, libc_clock_getres64, TD, 2, TIn(__SIZEOF_CLOCKID_T__), TP)
 DFUN(".text.crt.dos.time", libd_clock_gettime64, libc_clock_gettime64, TD, 2, TIn(__SIZEOF_CLOCKID_T__), TP)
 DFUN(".text.crt.dos.time", libd_clock_settime64, libc_clock_settime64, TD, 2, TIn(__SIZEOF_CLOCKID_T__), TP)
 DFUN(".text.crt.dos.timer", libd_timer_settime64, libc_timer_settime64, TD, 4, TIn(__SIZEOF_TIMER_T__), TD, TP, TP)
 DFUN(".text.crt.dos.timer", libd_timer_gettime64, libc_timer_gettime64, TD, 2, TIn(__SIZEOF_TIMER_T__), TP)
-DFUN(".text.crt.dos.time", libd_clock_nanosleep64, libc_clock_nanosleep64, TD, 4, TIn(__SIZEOF_CLOCKID_T__), TD, TP, TP)
+DFUN(".text.crt.dos.time", libd_clock_nanosleep64, libc_clock_nanosleep64, TIn(__SIZEOF_ERRNO_T__), 4, TIn(__SIZEOF_CLOCKID_T__), TD, TP, TP)
 DFUN(".text.crt.dos.time", libd_timespec_get, libc_timespec_get, TD, 2, TP, TD)
 DFUN(".text.crt.dos.time", libd_timespec_get64, libc_timespec_get64, TD, 2, TP, TD)
 DFUN(".text.crt.dos.time", libd_timespec_getres, libc_timespec_getres, TD, 2, TP, TD)

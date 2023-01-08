@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xafb42b6 */
+/* HASH CRC-32:0x54bb68bf */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1281,24 +1281,39 @@ __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_PURE __ATTR_WUNUSED __ATTR_INOUT(1) __time
 #ifdef __USE_POSIX199309
 #if defined(__CRT_HAVE_nanosleep) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
+ * Pause execution for a number of nanoseconds
+ * @return: 0 : Success
+ * @return: -1: [errno=EINTR]  System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: -1: [errno=EINVAL] Invalid `requested_time->tv_nsec' */
 __CDECLARE(__ATTR_IN(1) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,nanosleep,(struct timespec const *__requested_time, struct timespec *__remaining),(__requested_time,__remaining))
 #elif defined(__CRT_HAVE___nanosleep) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
+ * Pause execution for a number of nanoseconds
+ * @return: 0 : Success
+ * @return: -1: [errno=EINTR]  System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: -1: [errno=EINVAL] Invalid `requested_time->tv_nsec' */
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,nanosleep,(struct timespec const *__requested_time, struct timespec *__remaining),__nanosleep,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE___libc_nanosleep) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
+ * Pause execution for a number of nanoseconds
+ * @return: 0 : Success
+ * @return: -1: [errno=EINTR]  System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: -1: [errno=EINVAL] Invalid `requested_time->tv_nsec' */
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,nanosleep,(struct timespec const *__requested_time, struct timespec *__remaining),__libc_nanosleep,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE_nanosleep64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
+ * Pause execution for a number of nanoseconds
+ * @return: 0 : Success
+ * @return: -1: [errno=EINTR]  System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: -1: [errno=EINVAL] Invalid `requested_time->tv_nsec' */
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,nanosleep,(struct timespec const *__requested_time, struct timespec *__remaining),nanosleep64,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE_nanosleep64) || defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
 #include <libc/local/time/nanosleep.h>
 /* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
+ * Pause execution for a number of nanoseconds
+ * @return: 0 : Success
+ * @return: -1: [errno=EINTR]  System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: -1: [errno=EINVAL] Invalid `requested_time->tv_nsec' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(nanosleep, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_OUT_OPT(2) int __NOTHROW_RPC(__LIBCCALL nanosleep)(struct timespec const *__requested_time, struct timespec *__remaining) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nanosleep))(__requested_time, __remaining); })
 #endif /* ... */
 #if defined(__CRT_HAVE_clock_getres) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
@@ -1399,63 +1414,102 @@ __CDECLARE_OPT(,int,__NOTHROW_NCX,timer_getoverrun,(timer_t __timerid),(__timeri
  * High-resolution sleep with the specified clock
  * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
  *                   Other clock IDs cannot be used with this system call!
- * @param: flags:    Set of `0 | TIMER_ABSTIME' */
-__CDECLARE(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_RPC,clock_nanosleep,(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec const *__restrict __requested_time, struct timespec *__remaining),(__clock_id,__flags,__requested_time,__remaining))
+ * @param: flags:    Set of `0 | TIMER_ABSTIME'
+ * @return: 0 :      Success
+ * @return: EINTR:   System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: EINVAL:  Invalid `clock_id', `flags' or `requested_time->tv_nsec'
+ * @return: ENOTSUP: Clock specified by `clock_id' isn't supported. */
+__CDECLARE(__ATTR_IN(3) __ATTR_OUT_OPT(4),__errno_t,__NOTHROW_RPC,clock_nanosleep,(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec const *__restrict __requested_time, struct timespec *__remaining),(__clock_id,__flags,__requested_time,__remaining))
 #elif defined(__CRT_HAVE___clock_nanosleep) && (!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> clock_nanosleep(2), clock_nanosleep64(2)
  * High-resolution sleep with the specified clock
  * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
  *                   Other clock IDs cannot be used with this system call!
- * @param: flags:    Set of `0 | TIMER_ABSTIME' */
-__CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_RPC,clock_nanosleep,(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec const *__restrict __requested_time, struct timespec *__remaining),__clock_nanosleep,(__clock_id,__flags,__requested_time,__remaining))
+ * @param: flags:    Set of `0 | TIMER_ABSTIME'
+ * @return: 0 :      Success
+ * @return: EINTR:   System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: EINVAL:  Invalid `clock_id', `flags' or `requested_time->tv_nsec'
+ * @return: ENOTSUP: Clock specified by `clock_id' isn't supported. */
+__CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),__errno_t,__NOTHROW_RPC,clock_nanosleep,(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec const *__restrict __requested_time, struct timespec *__remaining),__clock_nanosleep,(__clock_id,__flags,__requested_time,__remaining))
 #elif defined(__CRT_HAVE_clock_nanosleep64) && (defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> clock_nanosleep(2), clock_nanosleep64(2)
  * High-resolution sleep with the specified clock
  * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
  *                   Other clock IDs cannot be used with this system call!
- * @param: flags:    Set of `0 | TIMER_ABSTIME' */
-__CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_RPC,clock_nanosleep,(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec const *__restrict __requested_time, struct timespec *__remaining),clock_nanosleep64,(__clock_id,__flags,__requested_time,__remaining))
+ * @param: flags:    Set of `0 | TIMER_ABSTIME'
+ * @return: 0 :      Success
+ * @return: EINTR:   System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: EINVAL:  Invalid `clock_id', `flags' or `requested_time->tv_nsec'
+ * @return: ENOTSUP: Clock specified by `clock_id' isn't supported. */
+__CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),__errno_t,__NOTHROW_RPC,clock_nanosleep,(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec const *__restrict __requested_time, struct timespec *__remaining),clock_nanosleep64,(__clock_id,__flags,__requested_time,__remaining))
 #elif defined(__CRT_HAVE_clock_nanosleep64) || defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE___clock_nanosleep)
 #include <libc/local/time/clock_nanosleep.h>
 /* >> clock_nanosleep(2), clock_nanosleep64(2)
  * High-resolution sleep with the specified clock
  * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
  *                   Other clock IDs cannot be used with this system call!
- * @param: flags:    Set of `0 | TIMER_ABSTIME' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(clock_nanosleep, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_OUT_OPT(4) int __NOTHROW_RPC(__LIBCCALL clock_nanosleep)(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec const *__restrict __requested_time, struct timespec *__remaining) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clock_nanosleep))(__clock_id, __flags, __requested_time, __remaining); })
+ * @param: flags:    Set of `0 | TIMER_ABSTIME'
+ * @return: 0 :      Success
+ * @return: EINTR:   System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: EINVAL:  Invalid `clock_id', `flags' or `requested_time->tv_nsec'
+ * @return: ENOTSUP: Clock specified by `clock_id' isn't supported. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(clock_nanosleep, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_OUT_OPT(4) __errno_t __NOTHROW_RPC(__LIBCCALL clock_nanosleep)(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec const *__restrict __requested_time, struct timespec *__remaining) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clock_nanosleep))(__clock_id, __flags, __requested_time, __remaining); })
 #endif /* ... */
 #ifdef __CRT_HAVE_clock_getcpuclockid
 /* >> clock_getcpuclockid(2)
- * Return clock ID for CPU-time clock */
-__CDECLARE(,int,__NOTHROW_NCX,clock_getcpuclockid,(pid_t __pid, clockid_t *__clock_id),(__pid,__clock_id))
+ * Return clock ID for CPU-time clock
+ * @return: 0 :     Success
+ * @return: ENOSYS: Not supported
+ * @return: EPERM:  You're not allowed to read the CPU-time clock of `pid'
+ * @return: ESRCH:  No such process `pid' */
+__CDECLARE(,__errno_t,__NOTHROW_NCX,clock_getcpuclockid,(pid_t __pid, clockid_t *__clock_id),(__pid,__clock_id))
 #elif defined(__CRT_HAVE___clock_getcpuclockid)
 /* >> clock_getcpuclockid(2)
- * Return clock ID for CPU-time clock */
-__CREDIRECT(,int,__NOTHROW_NCX,clock_getcpuclockid,(pid_t __pid, clockid_t *__clock_id),__clock_getcpuclockid,(__pid,__clock_id))
+ * Return clock ID for CPU-time clock
+ * @return: 0 :     Success
+ * @return: ENOSYS: Not supported
+ * @return: EPERM:  You're not allowed to read the CPU-time clock of `pid'
+ * @return: ESRCH:  No such process `pid' */
+__CREDIRECT(,__errno_t,__NOTHROW_NCX,clock_getcpuclockid,(pid_t __pid, clockid_t *__clock_id),__clock_getcpuclockid,(__pid,__clock_id))
 #endif /* ... */
 #endif /* __USE_XOPEN2K */
 
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_nanosleep) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
+ * Pause execution for a number of nanoseconds
+ * @return: 0 : Success
+ * @return: -1: [errno=EINTR]  System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: -1: [errno=EINVAL] Invalid `requested_time->tv_nsec' */
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,nanosleep64,(struct timespec64 const *__restrict __requested_time, struct timespec64 *__remaining),nanosleep,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE___nanosleep) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
+ * Pause execution for a number of nanoseconds
+ * @return: 0 : Success
+ * @return: -1: [errno=EINTR]  System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: -1: [errno=EINVAL] Invalid `requested_time->tv_nsec' */
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,nanosleep64,(struct timespec64 const *__restrict __requested_time, struct timespec64 *__remaining),__nanosleep,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE___libc_nanosleep) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 /* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
+ * Pause execution for a number of nanoseconds
+ * @return: 0 : Success
+ * @return: -1: [errno=EINTR]  System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: -1: [errno=EINVAL] Invalid `requested_time->tv_nsec' */
 __CREDIRECT(__ATTR_IN(1) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,nanosleep64,(struct timespec64 const *__restrict __requested_time, struct timespec64 *__remaining),__libc_nanosleep,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE_nanosleep64)
 /* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
+ * Pause execution for a number of nanoseconds
+ * @return: 0 : Success
+ * @return: -1: [errno=EINTR]  System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: -1: [errno=EINVAL] Invalid `requested_time->tv_nsec' */
 __CDECLARE(__ATTR_IN(1) __ATTR_OUT_OPT(2),int,__NOTHROW_RPC,nanosleep64,(struct timespec64 const *__restrict __requested_time, struct timespec64 *__remaining),(__requested_time,__remaining))
 #elif defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE___nanosleep) || defined(__CRT_HAVE___libc_nanosleep)
 #include <libc/local/time/nanosleep64.h>
 /* >> nanosleep(2), nanosleep64(2)
- * Pause execution for a number of nanoseconds */
+ * Pause execution for a number of nanoseconds
+ * @return: 0 : Success
+ * @return: -1: [errno=EINTR]  System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: -1: [errno=EINVAL] Invalid `requested_time->tv_nsec' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(nanosleep64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(1) __ATTR_OUT_OPT(2) int __NOTHROW_RPC(__LIBCCALL nanosleep64)(struct timespec64 const *__restrict __requested_time, struct timespec64 *__remaining) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nanosleep64))(__requested_time, __remaining); })
 #endif /* ... */
 #if defined(__CRT_HAVE_clock_getres) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -1547,23 +1601,35 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(timer_gettime64, __FORCELOCAL __ATTR_ARTIFICIAL 
  * High-resolution sleep with the specified clock
  * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
  *                   Other clock IDs cannot be used with this system call!
- * @param: flags:    Set of `0 | TIMER_ABSTIME' */
-__CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_RPC,clock_nanosleep64,(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec64 const *__requested_time, struct timespec64 *__remaining),clock_nanosleep,(__clock_id,__flags,__requested_time,__remaining))
+ * @param: flags:    Set of `0 | TIMER_ABSTIME'
+ * @return: 0 :      Success
+ * @return: EINTR:   System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: EINVAL:  Invalid `clock_id', `flags' or `requested_time->tv_nsec'
+ * @return: ENOTSUP: Clock specified by `clock_id' isn't supported. */
+__CREDIRECT(__ATTR_IN(3) __ATTR_OUT_OPT(4),__errno_t,__NOTHROW_RPC,clock_nanosleep64,(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec64 const *__requested_time, struct timespec64 *__remaining),clock_nanosleep,(__clock_id,__flags,__requested_time,__remaining))
 #elif defined(__CRT_HAVE_clock_nanosleep64)
 /* >> clock_nanosleep(2), clock_nanosleep64(2)
  * High-resolution sleep with the specified clock
  * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
  *                   Other clock IDs cannot be used with this system call!
- * @param: flags:    Set of `0 | TIMER_ABSTIME' */
-__CDECLARE(__ATTR_IN(3) __ATTR_OUT_OPT(4),int,__NOTHROW_RPC,clock_nanosleep64,(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec64 const *__requested_time, struct timespec64 *__remaining),(__clock_id,__flags,__requested_time,__remaining))
+ * @param: flags:    Set of `0 | TIMER_ABSTIME'
+ * @return: 0 :      Success
+ * @return: EINTR:   System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: EINVAL:  Invalid `clock_id', `flags' or `requested_time->tv_nsec'
+ * @return: ENOTSUP: Clock specified by `clock_id' isn't supported. */
+__CDECLARE(__ATTR_IN(3) __ATTR_OUT_OPT(4),__errno_t,__NOTHROW_RPC,clock_nanosleep64,(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec64 const *__requested_time, struct timespec64 *__remaining),(__clock_id,__flags,__requested_time,__remaining))
 #elif defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE___clock_nanosleep)
 #include <libc/local/time/clock_nanosleep64.h>
 /* >> clock_nanosleep(2), clock_nanosleep64(2)
  * High-resolution sleep with the specified clock
  * @param: clock_id: One of `CLOCK_REALTIME, CLOCK_TAI, CLOCK_MONOTONIC, CLOCK_BOOTTIME, CLOCK_PROCESS_CPUTIME_ID'
  *                   Other clock IDs cannot be used with this system call!
- * @param: flags:    Set of `0 | TIMER_ABSTIME' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(clock_nanosleep64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_OUT_OPT(4) int __NOTHROW_RPC(__LIBCCALL clock_nanosleep64)(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec64 const *__requested_time, struct timespec64 *__remaining) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clock_nanosleep64))(__clock_id, __flags, __requested_time, __remaining); })
+ * @param: flags:    Set of `0 | TIMER_ABSTIME'
+ * @return: 0 :      Success
+ * @return: EINTR:   System call was interrupted (if non-NULL, `*remaining' holds the amount of time not slept)
+ * @return: EINVAL:  Invalid `clock_id', `flags' or `requested_time->tv_nsec'
+ * @return: ENOTSUP: Clock specified by `clock_id' isn't supported. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(clock_nanosleep64, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN(3) __ATTR_OUT_OPT(4) __errno_t __NOTHROW_RPC(__LIBCCALL clock_nanosleep64)(clockid_t __clock_id, __STDC_INT_AS_UINT_T __flags, struct timespec64 const *__requested_time, struct timespec64 *__remaining) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clock_nanosleep64))(__clock_id, __flags, __requested_time, __remaining); })
 #endif /* ... */
 #endif /* __USE_XOPEN2K */
 #endif /* __USE_TIME64 */
