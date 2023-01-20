@@ -163,10 +163,11 @@ DEFINE_SYSCALL3(errno_t, set_exception_handler,
                 USER UNCHECKED void *, handler_sp) {
 	struct user_except_handler *exc;
 	exc = &PERTASK(this_user_except_handler);
-	if ((mode & EXCEPT_HANDLER_MODE_MASK) > EXCEPT_HANDLER_MODE_SIGHAND)
+	if unlikely((mode & EXCEPT_HANDLER_MODE_MASK) > EXCEPT_HANDLER_MODE_SIGHAND) {
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
 		      E_INVALID_ARGUMENT_CONTEXT_SET_EXCEPTION_HANDLER_MODE,
 		      mode & EXCEPT_HANDLER_MODE_MASK);
+	}
 	VALIDATE_FLAGSET(mode & ~EXCEPT_HANDLER_MODE_MASK,
 	                 EXCEPT_HANDLER_FLAG_ONESHOT |
 	                 EXCEPT_HANDLER_FLAG_SETHANDLER |

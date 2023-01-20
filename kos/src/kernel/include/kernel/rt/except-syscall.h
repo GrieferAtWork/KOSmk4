@@ -174,10 +174,10 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  *      cleared, and the internal kernel-space signal  mask is set to block  all
  *      signals (except `SIGKILL' and `SIGSTOP'), thus mirroring the behavior of
  *      vfork() without userprocmask.
- *      The  child  thread is  started  with the  `TASK_FUSERPROCMASK'  attribute set,
- *      which will be cleared the normal way once the child performs a successful call
- *      to either exec(2) or  _Exit(2), at which pointer  the process will once  again
- *      wake up.
+ *      The child thread is started with the `TASK_FUSERPROCMASK' attribute  set,
+ *      which will be cleared the normal way once the child performs a successful
+ *      call  to either  exec(2) or _Exit(2),  at which pointer  the process will
+ *      once again wake up.
  *      Back in the parent process, the kernel will now perform 2 copy operations:
  *       - memcpy(orig_pm_sigmask, &saved_sigmask, sizeof(sigset_t));
  *       - THIS_USERPROCMASK_POINTER->pm_sigmask = orig_pm_sigmask;
@@ -284,6 +284,7 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  * >>     // Atomically enable use of the new, updated mask
  * >>     // From this point forth, signals sent to our thread will be masked by `newset'
  * >>     ATOMIC_WRITE(mymask.pm_sigmask, newset);
+ * >>     COMPILER_BARRIER();
  * >>
  * >>     // Optimization: If we know that no signal became unmasked, we don't
  * >>     //               have to search for any pending, unmasked signals!
@@ -311,7 +312,7 @@ DATDEF ATTR_PERTASK USER CHECKED pid_t *this_tid_address;
  * >>             sigemptyset(&mymask.pm_pending);
  * >>             ATOMIC_AND(mymask.pm_flags, ~USERPROCMASK_FLAG_HASPENDING);
  * >>
- * >>             // Handle all async RPCs (and thus posix signals)
+ * >>             // Handle all async (== sysret) RPCs (and thus posix signals)
  * >>             sys_rpc_serve_sysret();
  * >>             break;
  * >>         }

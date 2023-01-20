@@ -1525,7 +1525,7 @@ NOTHROW(FCALL comgen_eh_movehere)(struct com_generator *__restrict self);
 
 /* .cfi_offset <regno>, <offset> */
 #define comgen_eh_DW_CFA_offset(self, regno, offset)                         \
-	(void)(!comgen_ehok1(self) ||                                             \
+	(void)(!comgen_ehok1(self) ||                                            \
 	       (assert((offset) < 0 && ((-(offset)) % __SIZEOF_POINTER__) == 0), \
 	        (regno) <= 0x3f                                                  \
 	        ? (comgen_eh_putb(self, DW_CFA_offset | (regno)))                \
@@ -1540,7 +1540,7 @@ NOTHROW(FCALL comgen_eh_movehere)(struct com_generator *__restrict self);
 
 /* .cfi_restore <regno> */
 #define comgen_eh_DW_CFA_restore(self, regno)                  \
-	(void)(!comgen_ehok1(self) ||                               \
+	(void)(!comgen_ehok1(self) ||                              \
 	       ((regno) <= 0x3f                                    \
 	        ? (comgen_eh_putb(self, DW_CFA_restore | (regno))) \
 	        : (comgen_eh_putb(self, DW_CFA_restore_extended),  \
@@ -1558,7 +1558,7 @@ NOTHROW(FCALL comgen_eh_movehere)(struct com_generator *__restrict self);
 /* .cfi_def_cfa <regno>, <offset> */
 #define comgen_eh_DW_CFA_def_cfa(self, regno, offset)                     \
 	(void)(assert(((offset) % __SIZEOF_POINTER__) == 0),                  \
-	       !comgen_ehok1(self) ||                                          \
+	       !comgen_ehok1(self) ||                                         \
 	       (comgen_eh_putb(self, DW_CFA_def_cfa_sf),                      \
 	        comgen_eh_putuleb128(self, regno),                            \
 	        comgen_eh_putsleb128(self, -((offset) / __SIZEOF_POINTER__)), \

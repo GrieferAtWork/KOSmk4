@@ -416,9 +416,9 @@ NOTHROW_RPC(LIBCCALL libc_clock_nanosleep)(clockid_t clock_id,
 	error = sys_clock_nanosleep(clock_id,
 	                            (syscall_ulong_t)(unsigned int)flags,
 	                            requested_time, remaining);
-	if unlikely(E_ISERR(error))
-		error = -error;
-	return error; /* Posix wants us to return the actual errno code. */
+	/* Posix wants us to return the actual errno code. */
+	error = abs(error);
+	return error;
 }
 /*[[[end:libc_clock_nanosleep]]]*/
 

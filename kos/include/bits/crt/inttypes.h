@@ -26,10 +26,10 @@
 #include <hybrid/typecore.h>
 #include <hybrid/__va_size.h> /* __VA_SIZE */
 
-/* Since   `__VA_SIZE >= sizeof(int)',   and   `sizeof(int) != 0',
- * we also  know that  `__VA_SIZE >= 1',  meaning that  any  8-bit
- * data word will _always_ be promoted to an int, meaning in order
- * to  print an 8-bit data word we  never need any sort of prefix! */
+/* Since `__VA_SIZE >= sizeof(int)', and `sizeof(int) != 0',  we
+ * also know that `__VA_SIZE >= 1', meaning that any 8-bit  data
+ * word  will _always_ be  promoted to an  int, meaning in order
+ * to print an 8-bit data word we never need any sort of prefix! */
 #ifndef __PRI1_PREFIX
 #define __PRI1_PREFIX /* nothing */
 #endif /* !__PRI1_PREFIX */

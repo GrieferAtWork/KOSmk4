@@ -111,9 +111,7 @@
  *        may throw is propagated to user-space and re-thrown as  a
  *        KOS exception (s.a. <libunwind/except.h>)
  *     Environment:
- *      - Something behaving like this mode is what you will encounter
- *        for most of your travels.
- *        That is, it is the mode that is emulated by libc with #4.
+ *      - This mode forms the basis for mode #3 and #4
  *
  *  #3 Only use KOS exceptions
  *     Behavior:
@@ -129,21 +127,15 @@
  *        and even then: are only propagated as KOS exceptions when thrown
  *        by the kernel itself.
  *     Environment:
- *      - This mode is enabled by default if an .exe file (rather than
- *        an ELF) is executed, so-as to allow for simpler  integration
- *        with SEH
- *      - Additionally, this mode may be set  at the start of main()  by
- *        applications that were specifically written to run on KOS  and
- *        take full advantage of its feature set, but don't wish to make
- *        use  of #4 to  prevent any possibility  of ambiguity caused by
- *        posix signals not being too  specific when it comes to  signal
- *        causes.
+ *      - This mode is a more strict version of mode #4, and can be set by
+ *        programs that with  to force-enable support  for KOS  exceptions
+ *        even in program modules that aren't `dlexceptaware(3)'.
  *
  *  #4 Use KOS exceptions only in modules that are `dlexceptaware(3)'
  *     Behavior:
  *      - The mode is actually implemented as a sub-set of mode #3, with libc
  *        performing special analysis  to determine how  an exception  should
- *        actually be handled based on the program state when it occurred:
+ *        actually be handled based on the program state when it occurs:
  *         #1:    Check if the `EXCEPT_FINEXCEPT' flag is set
  *                If it is, move on to step #CORE
  *         #2:    Check if the base application is exception aware (see below)

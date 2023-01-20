@@ -207,7 +207,7 @@
 #define _gen86_putb2(p_pc, b1, b2)     _gen86_putw(p_pc, (__UINT16_TYPE__)(b2) << 8 | (b1))
 #define _gen86_putb3(p_pc, b1, b2, b3) (_gen86_putb2(p_pc, b1, b2), _gen86_putb(p_pc, b3))
 
-#define _gen86_putsb_pcrel(p_pc, addr) _gen86_putsb(p_pc, (__INTPTR_TYPE__)((__UINTPTR_TYPE__)(addr) - ((__UINTPTR_TYPE__)(*(p_pc)) + 2)))
+#define _gen86_putsb_pcrel(p_pc, addr) _gen86_putsb(p_pc, (__INTPTR_TYPE__)((__UINTPTR_TYPE__)(addr) - ((__UINTPTR_TYPE__)(*(p_pc)) + 1)))
 #define _gen86_putsw_pcrel(p_pc, addr) _gen86_putsw(p_pc, (__INTPTR_TYPE__)((__UINTPTR_TYPE__)(addr) - ((__UINTPTR_TYPE__)(*(p_pc)) + 2)))
 #define _gen86_putsl_pcrel(p_pc, addr) _gen86_putsl(p_pc, (__INTPTR_TYPE__)((__UINTPTR_TYPE__)(addr) - ((__UINTPTR_TYPE__)(*(p_pc)) + 4)))
 
@@ -226,9 +226,9 @@
 #define _gen86_rex_(p_pc, _rex, reg, rm, index)                      \
 	(!(_rex) && !((reg)&0x18) && !((rm)&0x18) && !((index)&0x18)) || \
 	(_gen86_putb(p_pc, 0x40 | (_rex) |                               \
-	                   ((rm)&8 ? GEN86_REX_B : 0) |        \
-	                   ((index)&8 ? GEN86_REX_X : 0) |     \
-	                   ((reg)&8 ? GEN86_REX_R : 0)),       \
+	                   ((rm)&8 ? GEN86_REX_B : 0) |                  \
+	                   ((index)&8 ? GEN86_REX_X : 0) |               \
+	                   ((reg)&8 ? GEN86_REX_R : 0)),                 \
 	 0),
 #else /* LIBGEN86_TARGET_BITS == 64 */
 #define _gen86_rex_(p_pc, _rex, reg, rm, index) /* nothing */
