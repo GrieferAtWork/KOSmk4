@@ -118,7 +118,8 @@ __DECL_BEGIN
 /* linux / Glibc */
 #define __RTLD_DI_TLS_MODID   9  /* [size_t *arg] Store TLS module id (on KOS: this is the same as `handle') */
 #define __RTLD_DI_TLS_DATA    10 /* [void **arg] Same as `dltlsaddr(3)', but don't allocate TLS if not already done -- Writes NULL if not allocated or no PT_TLS segment */
-#define __RTLD_DI_MAX         10
+#define __RTLD_DI_PHDR        11 /* [ElfW(Phdr) const **] Store PHDR vector pointer, and return # of contained elements (only supported for ELF modules) */
+#define __RTLD_DI_MAX         11
 #if defined(__KOS__) || defined(__CRT_KOS)
 #define __RTLD_DI_ARGSINFO    64 /* [Dl_argsinfo *arg] Return information from the program PEB. */
 #endif /* defined(__KOS__) || __CRT_KOS */

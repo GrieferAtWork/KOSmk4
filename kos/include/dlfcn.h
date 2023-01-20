@@ -867,6 +867,9 @@ typedef struct __Dl_serinfo Dl_serinfo;
 #if !defined(RTLD_DI_TLS_DATA) && defined(__RTLD_DI_TLS_DATA)
 #define RTLD_DI_TLS_DATA    __RTLD_DI_TLS_DATA    /* [void **arg] Same as `dltlsaddr(3)', but don't allocate TLS if not already done -- Writes NULL if not allocated or no PT_TLS segment */
 #endif /* !RTLD_DI_TLS_DATA && __RTLD_DI_TLS_DATA */
+#if !defined(RTLD_DI_PHDR) && defined(__RTLD_DI_PHDR)
+#define RTLD_DI_PHDR        __RTLD_DI_PHDR        /* [ElfW(Phdr) const **] Store PHDR vector pointer, and return # of contained elements (only supported for ELF modules) */
+#endif /* !RTLD_DI_PHDR && __RTLD_DI_PHDR */
 #if !defined(RTLD_DI_MAX) && defined(__RTLD_DI_MAX)
 #define RTLD_DI_MAX         __RTLD_DI_MAX
 #endif /* !RTLD_DI_MAX && __RTLD_DI_MAX */

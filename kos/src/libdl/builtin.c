@@ -1213,6 +1213,12 @@ NOTHROW_NCX(DLFCN_CC libdl_dlinfo)(USER DlModule *self, int request,
 		*(void **)arg = DlModule_TryGetTLSAddr(self);
 		break;
 
+	case RTLD_DI_PHDR:
+		if unlikely(self->dm_ops)
+			goto err_notelf;
+		*(ElfW(Phdr) const **)arg = self->dm_elf.de_phdr;
+		return (int)(unsigned int)self->dm_elf.de_phnum;
+
 	case RTLD_DI_CONFIGADDR: {
 		Dl_info *info = (Dl_info *)arg;
 		info->dli_fname = self->dm_filename;
@@ -1232,6 +1238,8 @@ NOTHROW_NCX(DLFCN_CC libdl_dlinfo)(USER DlModule *self, int request,
 		return dl_seterrorf("dlinfo: unknown request: %d", request);
 	}
 	return 0;
+err_notelf:
+	return dl_seterror_notelf(self->dm_filename);
 err_bad_module:
 	return dl_seterror_badmodule(self);
 }
