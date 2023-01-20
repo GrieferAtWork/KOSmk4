@@ -80,10 +80,7 @@ struct __Dl_argsinfo {
 	auxv_t          *dla_auxv; /* [1..1] NOTE: On KOS, this always pointers to a bzero'd `auxv_t' */
 };
 #endif /* __RTLD_DI_ARGSINFO */
-
-
 #endif /* __CRT_HAVE_dlinfo */
-
 
 __DECL_END
 #endif /* __CC__ */

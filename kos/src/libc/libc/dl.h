@@ -86,23 +86,26 @@ DECL_BEGIN
  *   - __cxa_end_catch    (Defined by libc.so itself, but may be overwritten by `libstdc++.so')
  */
 
-#define LIBC_DLOPEN_SECTION        ".crt.except"        /* Used by `except_handler*()' */
-#define LIBC_DLCLOSE_SECTION       ".crt.sched.process" /* Used by `__cxa_atexit()' (among others) */
-#define LIBC_DLTLSALLOCSEG_SECTION ".crt.sched.pthread" /* Used by pthread */
-#define LIBC_DLTLSFREESEG_SECTION  ".crt.sched.pthread" /* Used by pthread */
-#define LIBC_DLGETHANDLE_SECTION   ".crt.sched.process" /* Used by `__cxa_atexit()' */
-#define LIBC_DLGETMODULE_SECTION   ".crt.system.auxv"   /* Used by `getauxval()' */
-#define LIBC_DLMODULEFD_SECTION    ".crt.system.auxv"   /* Used by `getauxval()' */
-#define LIBC_DLMODULENAME_SECTION  ".crt.system.auxv"   /* Used by `getauxval()' */
-#define LIBC_DLAUXCTRL_SECTION     ".crt.sched.process" /* Used by `__cxa_atexit()' */
-#define LIBC_DLERROR_SECTION       ".crt.heap.utility"  /* Used by `sbrk()' */
-#define LIBC_DLMODULEBASE_SECTION  ".crt.system.auxv"   /* Used by `getauxval()' */
-#define LIBC_DLEXCEPTAWARE_SECTION ".crt.except"        /* Used by `except_handler4()' */
-#define LIBC_DLTLSADDR_SECTION     ".crt.sched.pthread" /* Used by pthread */
-#define LIBC_DLTLSADDR2_SECTION    ".crt.sched.pthread" /* Used by pthread */
-#define LIBC_DLTLSALLOC_SECTION    ".crt.sched.pthread" /* Used by pthread */
-#define LIBC_DLTLSFREE_SECTION     ".crt.sched.pthread" /* Used by pthread */
-#define LIBC_DLADDR_SECTION        ".crt.math.math"     /* Used for <math.h> -- `struct exception::name' */
+#define LIBC_DLOPEN_SECTION          ".crt.except"        /* Used by `except_handler*()' */
+#define LIBC_DLCLOSE_SECTION         ".crt.sched.process" /* Used by `__cxa_atexit()' (among others) */
+#define LIBC_DLTLSALLOCSEG_SECTION   ".crt.sched.pthread" /* Used by pthread */
+#define LIBC_DLTLSFREESEG_SECTION    ".crt.sched.pthread" /* Used by pthread */
+#define LIBC_DLGETHANDLE_SECTION     ".crt.sched.process" /* Used by `__cxa_atexit()' */
+#define LIBC_DLGETMODULE_SECTION     ".crt.system.auxv"   /* Used by `getauxval()' */
+#define LIBC_DLMODULEFD_SECTION      ".crt.system.auxv"   /* Used by `getauxval()' */
+#define LIBC_DLMODULENAME_SECTION    ".crt.system.auxv"   /* Used by `getauxval()' */
+#define LIBC_DLAUXCTRL_SECTION       ".crt.sched.process" /* Used by `__cxa_atexit()' */
+#define LIBC_DLINFO_SECTION          ".crt.compat.glibc"  /* Used by `_dl_find_object()' */
+#define LIBC_DLLOCKSECTION_SECTION   ".crt.compat.glibc"  /* Used by `_dl_find_object()' */
+#define LIBC_DLUNLOCKSECTION_SECTION ".crt.compat.glibc"  /* Used by `_dl_find_object()' */
+#define LIBC_DLERROR_SECTION         ".crt.heap.utility"  /* Used by `sbrk()' */
+#define LIBC_DLMODULEBASE_SECTION    ".crt.system.auxv"   /* Used by `getauxval()' */
+#define LIBC_DLEXCEPTAWARE_SECTION   ".crt.except"        /* Used by `except_handler4()' */
+#define LIBC_DLTLSADDR_SECTION       ".crt.sched.pthread" /* Used by pthread */
+#define LIBC_DLTLSADDR2_SECTION      ".crt.sched.pthread" /* Used by pthread */
+#define LIBC_DLTLSALLOC_SECTION      ".crt.sched.pthread" /* Used by pthread */
+#define LIBC_DLTLSFREE_SECTION       ".crt.sched.pthread" /* Used by pthread */
+#define LIBC_DLADDR_SECTION          ".crt.math.math"     /* Used for <math.h> -- `struct exception::name' */
 
 typedef WUNUSED_T void *(DLFCN_CC *PDLOPEN)(char const *filename, int mode) /*THROWS(...)*/;
 typedef NONNULL_T((1)) int (DLFCN_CC *PDLCLOSE)(void *handle) /*THROWS(...)*/;
@@ -113,6 +116,9 @@ typedef WUNUSED_T void *NOTHROW_NCX_T(DLFCN_CC *PDLGETMODULE)(char const *name, 
 typedef WUNUSED_T NONNULL_T((1)) fd_t NOTHROW_NCX_T(DLFCN_CC *PDLMODULEFD)(void *handle);
 typedef WUNUSED_T NONNULL_T((1)) char const * NOTHROW_NCX_T(DLFCN_CC *PDLMODULENAME)(void *handle);
 typedef void * (DLFCN_VCC *PDLAUXCTRL)(void *handle, unsigned int cmd, ...) /*THROWS(...)*/;
+typedef NONNULL_T((1, 3)) int NOTHROW_NCX_T(DLFCN_CC *PDLINFO)(void *__restrict handle, int request, void *arg);
+typedef WUNUSED_T NONNULL_T((1)) /*REF*/ struct dl_section *NOTHROW_NCX_T(DLFCN_CC *PDLLOCKSECTION)(void *handle, char const *__restrict name, unsigned int flags);
+typedef NONNULL_T((1)) int NOTHROW_NCX_T(DLFCN_CC *PDLUNLOCKSECTION)(/*REF*/ struct dl_section *sect);
 typedef WUNUSED_T char *NOTHROW_NCX_T(DLFCN_CC *PDLERROR)(void);
 typedef WUNUSED_T NONNULL_T((1)) void *NOTHROW_NCX_T(DLFCN_CC *PDLMODULEBASE)(void *handle);
 typedef WUNUSED_T NONNULL_T((1)) int NOTHROW_NCX_T(DLFCN_CC *PDLEXCEPTAWARE)(void *handle);
@@ -136,6 +142,9 @@ INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLGETMODULE NOTHROW_NCX(LIBCCALL libc
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLMODULEFD NOTHROW_NCX(LIBCCALL libc_get_dlmodulefd)(void);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLMODULENAME NOTHROW_NCX(LIBCCALL libc_get_dlmodulename)(void);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLAUXCTRL NOTHROW_NCX(LIBCCALL libc_get_dlauxctrl)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLINFO NOTHROW_NCX(LIBCCALL libc_get_dlinfo)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLLOCKSECTION NOTHROW_NCX(LIBCCALL libc_get_dllocksection)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLUNLOCKSECTION NOTHROW_NCX(LIBCCALL libc_get_dlunlocksection)(void);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLERROR NOTHROW_NCX(LIBCCALL libc_get_dlerror)(void);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLMODULEBASE NOTHROW_NCX(LIBCCALL libc_get_dlmodulebase)(void);
 INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLEXCEPTAWARE NOTHROW_NCX(LIBCCALL libc_get_dlexceptaware)(void);
@@ -155,6 +164,9 @@ INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED PDLSYM NOTHROW_NCX(LIBCCALL libc_get_d
 #define dlmodulefd(handle)                  (*libc_get_dlmodulefd())(handle)
 #define dlmodulename(handle)                (*libc_get_dlmodulename())(handle)
 #define dlauxctrl(handle, ...)              (*libc_get_dlauxctrl())(handle, __VA_ARGS__)
+#define dlinfo(handle, request, arg)        (*libc_get_dlinfo())(handle, request, arg)
+#define dllocksection(handle, name, flags)  (*libc_get_dllocksection())(handle, name, flags)
+#define dlunlocksection(sect)               (*libc_get_dlunlocksection())(sect)
 #define dlerror()                           (*libc_get_dlerror())()
 #define dlmodulebase(handle)                (*libc_get_dlmodulebase())(handle)
 #define dlexceptaware(handle)               (*libc_get_dlexceptaware())(handle)

@@ -62,7 +62,7 @@ struct link_map {
 	 * NOTE: This structure  is also  defined by  GLibC and  must
 	 *       therefor have binary compatibility under KOS (*ugh*) */
 	ElfW(Addr)       l_addr; /* [const] Load address (offset added to `p_vaddr' in `dlpi_phdr') of this module. */
-	char            *l_name; /* [1..1][const] Absolute file name of the module. */
+	char            *l_name; /* [1..1][const] Absolute file name of the module (s.a. `dlmodulename(3D)'). */
 	ElfW(Dyn)       *l_ld;   /* [0..1][const] Dynamic section of the shared object. */
 	/* WARNING: These  link fields  are protected  by an  internal lock, so
 	 *          you'll run into  problems if some  other thread is  loading
@@ -74,7 +74,7 @@ struct link_map {
 
 struct dl_phdr_info {
 	ElfW(Addr)        dlpi_addr;      /* Load address (offset added to `p_vaddr' in `dlpi_phdr') of this module. */
-	char const       *dlpi_name;      /* [1..1] File name of this module. */
+	char const       *dlpi_name;      /* [1..1] Absolute file name of this module (s.a. `dlmodulename(3D)'). */
 	ElfW(Phdr) const *dlpi_phdr;      /* [1..dlpi_phnum] Vector of program headers. */
 	ElfW(Half)        dlpi_phnum;     /* # of program headers. */
 	/* NOTE: Everything that follows may only be available if `info_size' passed

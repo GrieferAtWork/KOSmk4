@@ -19,6 +19,10 @@
  */
 #ifndef GUARD_LIBC_LIBC_DL_C
 #define GUARD_LIBC_LIBC_DL_C 1
+#define _GNU_SOURCE 1
+
+/* Need to define this one so headers expose `struct dl_find_object' for us. */
+#define __CRT_HAVE__dl_find_object
 
 /* Keep this one the first */
 #include "../api.h"
@@ -29,7 +33,10 @@
 #include <kos/exec/ifunc.h>
 
 #include <dlfcn.h>
+#include <elf.h>
+#include <link.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "dl.h"
 
@@ -59,6 +66,9 @@ DEFINE_LAZY_LIBDL_RELOCATION(LIBC_DLGETMODULE_SECTION, PDLGETMODULE, dlgetmodule
 DEFINE_LAZY_LIBDL_RELOCATION(LIBC_DLMODULEFD_SECTION, PDLMODULEFD, dlmodulefd)
 DEFINE_LAZY_LIBDL_RELOCATION(LIBC_DLMODULENAME_SECTION, PDLMODULENAME, dlmodulename)
 DEFINE_LAZY_LIBDL_RELOCATION(LIBC_DLAUXCTRL_SECTION, PDLAUXCTRL, dlauxctrl)
+DEFINE_LAZY_LIBDL_RELOCATION(LIBC_DLINFO_SECTION, PDLINFO, dlinfo)
+DEFINE_LAZY_LIBDL_RELOCATION(LIBC_DLLOCKSECTION_SECTION, PDLLOCKSECTION, dllocksection)
+DEFINE_LAZY_LIBDL_RELOCATION(LIBC_DLUNLOCKSECTION_SECTION, PDLUNLOCKSECTION, dlunlocksection)
 DEFINE_LAZY_LIBDL_RELOCATION(LIBC_DLERROR_SECTION, PDLERROR, dlerror)
 DEFINE_LAZY_LIBDL_RELOCATION(LIBC_DLMODULEBASE_SECTION, PDLMODULEBASE, dlmodulebase)
 DEFINE_LAZY_LIBDL_RELOCATION(LIBC_DLEXCEPTAWARE_SECTION, PDLEXCEPTAWARE, dlexceptaware)
@@ -69,6 +79,66 @@ DEFINE_LAZY_LIBDL_RELOCATION(LIBC_DLTLSFREE_SECTION, PDLTLSFREE, dltlsfree)
 DEFINE_LAZY_LIBDL_RELOCATION(LIBC_DLADDR_SECTION, PDLADDR, dladdr)
 #undef DEFINE_LAZY_LIBDL_RELOCATION
 #endif /* HAVE_LAZY_LIBDL_RELOCATIONS */
+
+#undef EH_FRAME_NAME
+#if DLFO_EH_SEGMENT_TYPE == PT_ARM_EXIDX
+#define EH_FRAME_NAME ".ARM.exidx"
+#elif DLFO_EH_SEGMENT_TYPE == PT_GNU_EH_FRAME
+#define EH_FRAME_NAME ".eh_frame"
+#else /* DLFO_EH_SEGMENT_TYPE == ... */
+#error "Unable to determine name of eh_frame section from `DLFO_EH_SEGMENT_TYPE'"
+#endif /* DLFO_EH_SEGMENT_TYPE != ... */
+
+
+/************************************************************************/
+/* _dl_find_object(3)                                                   */
+/************************************************************************/
+DEFINE_PUBLIC_ALIAS(_dl_find_object, libc__dl_find_object);
+INTERN ATTR_SECTION(".text.crt.compat.glibc") ATTR_OUT(2) int
+NOTHROW_NCX(DLFCN_CC libc__dl_find_object)(void const *address,
+                                           struct dl_find_object *result) {
+	struct dl_section *eh_frame;
+	void *handle;
+	bzero(result, sizeof(*result)); /* Forward compat */
+
+	/* No need to lookup the handle with INCREF, since specs say that we're
+	 * allowed to assume that no  other thread will dlclose(3D) the  module
+	 * while we're working in here. */
+	handle = dlgethandle(address, DLGETHANDLE_FNORMAL);
+	if unlikely(!handle)
+		goto err;
+//	result->dlfo_flags     = 0; /* """Currently unused and always 0""" */
+	result->dlfo_map_start = dlauxctrl(handle, DLAUXCTRL_GET_LOADSTART);
+	result->dlfo_map_end   = dlauxctrl(handle, DLAUXCTRL_GET_LOADEND);
+#if DLFO_STRUCT_HAS_EH_DBASE
+	result->dlfo_eh_dbase = dlauxctrl(handle, DLAUXCTRL_GET_DATABASE);
+#endif /* DLFO_STRUCT_HAS_EH_DBASE */
+
+	/* NOTE: On KOS, you can (technically) just cast a dl-handle into a `struct link_map',
+	 *       and while that probably won't ever change, for the sake of ensuring that this
+	 *       function  will work forever, we still make the call to have libdl do the cast
+	 *       for us. */
+	if unlikely(dlinfo(handle, RTLD_DI_LINKMAP, &result->dlfo_link_map) != 0)
+		goto err; /* Shouldn't get here... */
+
+	/* Load the .eh_frame section (but don't load its data if that hasn't been
+	 * loaded already; we need that data to stay loaded, even after we  unlock
+	 * the section, so it needs to be apart of a PT_LOAD header) */
+	eh_frame = dllocksection(handle, EH_FRAME_NAME, DLLOCKSECTION_FNODATA);
+	if (eh_frame) {
+		if (eh_frame->ds_data != (void *)-1) {
+			result->dlfo_eh_frame = eh_frame->ds_data;
+#if DLFO_STRUCT_HAS_EH_COUNT
+			result->dlfo_eh_count = eh_frame->ds_size / 8;
+#endif /* DLFO_STRUCT_HAS_EH_COUNT */
+		}
+		dlunlocksection(eh_frame);
+	}
+
+	return 0;
+err:
+	return -1;
+}
 
 
 

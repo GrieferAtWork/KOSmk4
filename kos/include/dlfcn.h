@@ -46,9 +46,11 @@
 
 #include <features.h>
 
+#include <bits/crt/dlfcn.h>
+#include <bits/types.h>
+
 #include <libdl/asm/dlfcn.h>
 #include <libdl/bits/dlfcn.h>
-#include <bits/types.h>
 
 /* NOTE: To  use  anything from  this file,  you  must link  with '-ldl',
  *       Though also note that then using the gcc from the KOS toolchain,
@@ -395,10 +397,12 @@ __NOTHROW_NCX(__DLFCN_CC dlexceptaware)(void *__handle);
 #ifndef DLGETHANDLE_FNORMAL
 #define DLGETHANDLE_FNORMAL 0x0000 /* Return weak pointer to a module handle */
 #define DLGETHANDLE_FINCREF 0x0001 /* Return a new reference, that must be closed by `dlclose(return)' */
+/*TODO: DLGETHANDLE_FNODESC 0x0002  * If given the address of a PLT-style wrapper function, return the
+                                    * module defining that wrapper, rather than the pointed-to module. */
 #endif /* !DLGETHANDLE_FNORMAL */
 #ifdef __CRT_HAVE_dlgetmodule
 #ifndef DLGETHANDLE_FNOCASE
-#define DLGETHANDLE_FNOCASE 0x0002 /* For `dlgetmodule(3D)': Ignore casing when comparing module names. */
+#define DLGETHANDLE_FNOCASE 0x8000 /* For `dlgetmodule(3D)': Ignore casing when comparing module names. */
 #endif /* !DLGETHANDLE_FNOCASE */
 #endif /* __CRT_HAVE_dlgetmodule */
 #endif /* ... */
@@ -759,6 +763,8 @@ __IMPDEF void *(__DLFCN_VCC dlauxctrl)(void *__handle,
 #define DLAUXCTRL_MOD_NOTDESTROYED   0xa006 /* check if the module wasdestroyed() (re-returns `handle' if not, or `NULL' if so) */
 #define DLAUXCTRL_GET_TEXTBASE       0xa010 /* Return the text base address, as needed for unwinding. Return NULL on failure, but don't set an error */
 #define DLAUXCTRL_GET_DATABASE       0xa011 /* Return the data base address, as needed for unwinding. Return NULL on failure, but don't set an error */
+#define DLAUXCTRL_GET_LOADSTART      0xa012 /* Return the lowest address mapped by the module */
+#define DLAUXCTRL_GET_LOADEND        0xa013 /* Return 1+ the greatest address mapped by the module */
 #define DLAUXCTRL_RUNFINI            0xd101 /* Run all library finalizers. `handle' is ignored but should be any valid module handle, or `NULL',
                                              * and  all  other arguments  are also  ignored; always  returns  `NULL', but  doesn't set  an error */
 #define DLAUXCTRL_RUNTLSFINI         0xd102 /* Run TLS library finalizers for the calling thread. `handle' is ignored but should
@@ -914,6 +920,22 @@ __IMPDEF __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__DLFCN_CC dladdr1)(void const *__address, Dl_info *__info,
                                   void **__extra_info, int __flags);
 #endif /* __CRT_HAVE_dladdr1 */
+
+
+#ifdef __CRT_HAVE__dl_find_object
+struct dl_find_object;
+
+/* >> _dl_find_object(3)
+ * Find information about the module at `address'.
+ * Similar to  the KOS-specific  `dlgethandle(3D)'
+ * NOTE: On KOS, this function is implemented in libc!
+ * @return: 0:  Success
+ * @return: -1: Error */
+__IMPDEF __ATTR_OUT(2) int
+__NOTHROW_NCX(__DLFCN_CC _dl_find_object)(void const *__address,
+                                          struct dl_find_object *__result);
+#endif /* __CRT_HAVE__dl_find_object */
+
 
 #ifndef DL_CALL_FCT
 /* To support profiling of shared objects it is a good idea to  call

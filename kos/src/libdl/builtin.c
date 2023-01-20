@@ -2886,6 +2886,14 @@ libdl_dlauxctrl(USER DlModule *self, unsigned int cmd, ...)
 			result = NULL;
 	}	break;
 
+	case DLAUXCTRL_GET_LOADSTART:
+		result = (void *)self->dm_loadstart;
+		break;
+
+	case DLAUXCTRL_GET_LOADEND:
+		result = (void *)self->dm_loadend;
+		break;
+
 	case DLAUXCTRL_ADD_FINALIZER: {
 		struct dlmodule_finalizers *flz;
 		void (DLFCN_CC *func)(void *);
