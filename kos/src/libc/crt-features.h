@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea6dff53 */
+/* HASH CRC-32:0xb42878e7 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3003,6 +3003,7 @@
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 #define __CRT_HAVE_DOS$realloc
 #define __CRT_HAVE_DOS$realloc_in_place
+#define __CRT_HAVE_DOS$reallocarr
 #define __CRT_HAVE_DOS$reallocarray
 #define __CRT_HAVE_DOS$reallocf
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
@@ -7412,6 +7413,7 @@
 #ifndef __KERNEL__
 #define __CRT_HAVE_realloc
 #define __CRT_HAVE_realloc_in_place
+#define __CRT_HAVE_reallocarr
 #define __CRT_HAVE_reallocarray
 #define __CRT_HAVE_reallocf
 #define __CRT_HAVE_realpath

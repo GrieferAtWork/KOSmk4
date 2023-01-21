@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5f06e6a8 */
+/* HASH CRC-32:0xa14a5b3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1238,6 +1238,30 @@ INTDEF ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2) void NOTHROW_NCX(VLIBDCALL libd_setproc
  *  - prctl(PR_SET_NAME)
  *  - "/proc/self/comm" */
 INTDEF ATTR_IN(1) ATTR_LIBC_PRINTF(1, 2) void NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format, ...);
+#endif /* !__KERNEL__ */
+#if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+/* >> reallocarr(3)
+ * Badly designed  alternative to  `reallocarray(3)'. Note  that
+ * the given `ptr_p' argument is really typed as `void **ptr_p',
+ * but for API compatibility  is defined as `void *ptr_p'.  This
+ * function simply does:
+ * >> *(void **)ptr_p = reallocarray(*(void **)ptr_p, elem_count, elem_size);
+ * Though `*(void **)ptr_p' is only updated on success.
+ * @return: 0 : Success (`*(void **)ptr_p' was updated)
+ * @return: -1: Error (s.a. `errno'; `*(void **)ptr_p' is unchanged) */
+INTDEF WUNUSED int NOTHROW_NCX(LIBDCALL libd_reallocarr)(void *ptr_p, size_t elem_count, size_t elem_size);
+#endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
+#ifndef __KERNEL__
+/* >> reallocarr(3)
+ * Badly designed  alternative to  `reallocarray(3)'. Note  that
+ * the given `ptr_p' argument is really typed as `void **ptr_p',
+ * but for API compatibility  is defined as `void *ptr_p'.  This
+ * function simply does:
+ * >> *(void **)ptr_p = reallocarray(*(void **)ptr_p, elem_count, elem_size);
+ * Though `*(void **)ptr_p' is only updated on success.
+ * @return: 0 : Success (`*(void **)ptr_p' was updated)
+ * @return: -1: Error (s.a. `errno'; `*(void **)ptr_p' is unchanged) */
+INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_reallocarr)(void *ptr_p, size_t elem_count, size_t elem_size);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> strsuftoll(3)

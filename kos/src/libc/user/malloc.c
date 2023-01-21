@@ -136,12 +136,11 @@ NOTHROW_NCX(LIBCCALL libc_recallocv)(void *mallptr,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x68d44ccd]]]*/
+/*[[[start:exports,hash:CRC-32=0xf193f3ac]]]*/
 DEFINE_PUBLIC_ALIAS(__memdup, libc_memdup);
 DEFINE_PUBLIC_ALIAS(memdup, libc_memdup);
 DEFINE_PUBLIC_ALIAS(__memcdup, libc_memcdup);
 DEFINE_PUBLIC_ALIAS(memcdup, libc_memcdup);
-DEFINE_PUBLIC_ALIAS(reallocarr, libc_reallocarray);
 DEFINE_PUBLIC_ALIAS(reallocarray, libc_reallocarray);
 DEFINE_PUBLIC_ALIAS(recalloc, libc_recalloc);
 DEFINE_PUBLIC_ALIAS(_recalloc, libc_recallocv);

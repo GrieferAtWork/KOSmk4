@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcbd3058c */
+/* HASH CRC-32:0xf0fa35ef */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2575,6 +2575,7 @@ DFUN(".text.crt.dos.bsd", libd_devname, libc_devname, TP, 2, TIn(__SIZEOF_DEV_T_
 DFUN(".text.crt.dos.bsd", libd_devname_r, libc_devname_r, TD, 4, TIn(__SIZEOF_DEV_T__), TIn(__SIZEOF_MODE_T__), TP, TI)
 DFUN(".text.crt.dos.bsd", libd_humanize_number, libc_humanize_number, TD, 6, TP, TI, TI64, TP, TD, TD)
 DFUN(".text.crt.dos.bsd", libd_dehumanize_number, libc_dehumanize_number, TD, 2, TP, TP)
+DFUN(".text.crt.dos.heap.rare_helpers", libd_reallocarr, libc_reallocarr, TD, 3, TP, TI, TI)
 DFUN(".text.crt.dos.bsd", libd_strsuftoll, libc_strsuftoll, TLL, 4, TP, TP, TLL, TLL)
 DFUN(".text.crt.dos.bsd", libd_strsuftollx, libc_strsuftollx, TLL, 6, TP, TP, TLL, TLL, TP, TI)
 DFUN(".text.crt.dos.errno", libd__set_doserrno, libc__set_doserrno, TIn(__SIZEOF_ERRNO_T__), 1, TI32)

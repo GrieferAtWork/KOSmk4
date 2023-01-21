@@ -3906,7 +3906,27 @@ void setproctitle([[in, format("printf")]] char const *format, ...)
 	%{printf("vsetproctitle")}
 
 
-%[insert:function(reallocarr = reallocarray)]
+@@>> reallocarr(3)
+@@Badly designed  alternative to  `reallocarray(3)'. Note  that
+@@the given `ptr_p' argument is really typed as `void **ptr_p',
+@@but for API compatibility  is defined as `void *ptr_p'.  This
+@@function simply does:
+@@>> *(void **)ptr_p = reallocarray(*(void **)ptr_p, elem_count, elem_size);
+@@Though `*(void **)ptr_p' is only updated on success.
+@@@return: 0 : Success (`*(void **)ptr_p' was updated)
+@@@return: -1: Error (s.a. `errno'; `*(void **)ptr_p' is unchanged)
+[[wunused, requires_function(reallocarray)]]
+[[decl_include("<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.heap.rare_helpers")]]
+int reallocarr(void *ptr_p, $size_t elem_count, $size_t elem_size) {
+	void **p_ptr = (void **)ptr_p;
+	void *result;
+	result = reallocarray(ptr_p, elem_count, elem_size);
+	if unlikely(!result)
+		return -1;
+	*p_ptr = result;
+	return 0;
+}
 
 //TODO:ssize_t hmac(char const *, void const *, $size_t, void const *, $size_t, void *, $size_t);
 //TODO:devmajor_t getdevmajor(char const *, mode_t);

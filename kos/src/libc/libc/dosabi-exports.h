@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5a32961f */
+/* HASH CRC-32:0xf5898a97 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -740,7 +740,6 @@ DEFINE_PUBLIC_ALIAS(DOS$__memdup, libd_memdup);
 DEFINE_PUBLIC_ALIAS(DOS$memdup, libd_memdup);
 DEFINE_PUBLIC_ALIAS(DOS$__memcdup, libd_memcdup);
 DEFINE_PUBLIC_ALIAS(DOS$memcdup, libd_memcdup);
-DEFINE_PUBLIC_ALIAS(DOS$reallocarr, libd_reallocarray);
 DEFINE_PUBLIC_ALIAS(DOS$reallocarray, libd_reallocarray);
 DEFINE_PUBLIC_ALIAS(DOS$recalloc, libd_recalloc);
 DEFINE_PUBLIC_ALIAS(DOS$_recalloc, libd_recallocv);
@@ -2676,6 +2675,7 @@ DEFINE_PUBLIC_ALIAS(DOS$devname, libd_devname);
 DEFINE_PUBLIC_ALIAS(DOS$devname_r, libd_devname_r);
 DEFINE_PUBLIC_ALIAS(DOS$humanize_number, libd_humanize_number);
 DEFINE_PUBLIC_ALIAS(DOS$dehumanize_number, libd_dehumanize_number);
+DEFINE_PUBLIC_ALIAS(DOS$reallocarr, libd_reallocarr);
 DEFINE_PUBLIC_ALIAS(DOS$strsuftoll, libd_strsuftoll);
 DEFINE_PUBLIC_ALIAS(DOS$strsuftollx, libd_strsuftollx);
 DEFINE_PUBLIC_ALIAS(DOS$_set_doserrno, libd__set_doserrno);

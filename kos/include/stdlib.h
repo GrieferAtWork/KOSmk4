@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6500ad77 */
+/* HASH CRC-32:0xa7a31fc */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3384,8 +3384,6 @@ __CDECLARE_OPT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_IN(1),char *,__NOTHROW_RPC,ca
 #define __reallocarray_defined
 #ifdef __CRT_HAVE_reallocarray
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,reallocarray,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),(__ptr,__elem_count,__elem_size))
-#elif defined(__CRT_HAVE_reallocarr)
-__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,reallocarray,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),reallocarr,(__ptr,__elem_count,__elem_size))
 #elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/malloc/reallocarray.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(reallocarray, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL reallocarray)(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocarray))(__ptr, __elem_count, __elem_size); })
@@ -3411,8 +3409,6 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(recalloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #define __reallocv_defined
 #ifdef __CRT_HAVE_reallocarray
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,reallocv,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),reallocarray,(__ptr,__elem_count,__elem_size))
-#elif defined(__CRT_HAVE_reallocarr)
-__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,reallocv,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),reallocarr,(__ptr,__elem_count,__elem_size))
 #elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/malloc/reallocarray.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL reallocv)(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocarray))(__ptr, __elem_count, __elem_size); }
@@ -3463,8 +3459,6 @@ void *__NOTHROW_NCX(__LIBCCALL calloc)(__SIZE_TYPE__ __num_bytes) { return (call
 extern "C++" {
 #ifdef __CRT_HAVE_reallocarray
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,realloc,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),reallocarray,(__ptr,__elem_count,__elem_size))
-#elif defined(__CRT_HAVE_reallocarr)
-__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,realloc,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),reallocarr,(__ptr,__elem_count,__elem_size))
 #elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 } /* extern "C++" */
 #include <libc/local/malloc/reallocarray.h>
@@ -4232,13 +4226,29 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(setproctitle, __FORCELOCAL __ATTR_ARTIFICIAL __A
 #endif /* ((!__CRT_HAVE_prctl || !PR_SET_NAME) && ((!__CRT_HAVE_pthread_self && !__CRT_HAVE_thrd_current && !__CRT_HAVE_thr_self && !__CRT_HAVE_cthread_self) || (!__CRT_HAVE_pthread_setname_np && !__CRT_HAVE_pthread_set_name_np && !__CRT_HAVE_cthread_set_name))) || (!__TASK_COMM_LEN && !__CRT_HAVE_vstrdupf && !__CRT_HAVE_vasprintf && ((!__CRT_HAVE_format_aprintf_printer && !__CRT_HAVE_format_aprintf_alloc && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc) || (!__CRT_HAVE_free && !__CRT_HAVE_cfree && !__CRT_HAVE___libc_free))) */
 #endif /* !__CRT_HAVE_setproctitle */
 #endif /* !__setproctitle_defined */
-#ifdef __CRT_HAVE_reallocarray
-__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,reallocarr,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),reallocarray,(__ptr,__elem_count,__elem_size))
-#elif defined(__CRT_HAVE_reallocarr)
-__CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,reallocarr,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),(__ptr,__elem_count,__elem_size))
-#elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
-#include <libc/local/malloc/reallocarray.h>
-__FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL reallocarr)(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocarray))(__ptr, __elem_count, __elem_size); }
+#ifdef __CRT_HAVE_reallocarr
+/* >> reallocarr(3)
+ * Badly designed  alternative to  `reallocarray(3)'. Note  that
+ * the given `ptr_p' argument is really typed as `void **ptr_p',
+ * but for API compatibility  is defined as `void *ptr_p'.  This
+ * function simply does:
+ * >> *(void **)ptr_p = reallocarray(*(void **)ptr_p, elem_count, elem_size);
+ * Though `*(void **)ptr_p' is only updated on success.
+ * @return: 0 : Success (`*(void **)ptr_p' was updated)
+ * @return: -1: Error (s.a. `errno'; `*(void **)ptr_p' is unchanged) */
+__CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,reallocarr,(void *__ptr_p, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),(__ptr_p,__elem_count,__elem_size))
+#elif defined(__CRT_HAVE_reallocarray) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
+#include <libc/local/stdlib/reallocarr.h>
+/* >> reallocarr(3)
+ * Badly designed  alternative to  `reallocarray(3)'. Note  that
+ * the given `ptr_p' argument is really typed as `void **ptr_p',
+ * but for API compatibility  is defined as `void *ptr_p'.  This
+ * function simply does:
+ * >> *(void **)ptr_p = reallocarray(*(void **)ptr_p, elem_count, elem_size);
+ * Though `*(void **)ptr_p' is only updated on success.
+ * @return: 0 : Success (`*(void **)ptr_p' was updated)
+ * @return: -1: Error (s.a. `errno'; `*(void **)ptr_p' is unchanged) */
+__NAMESPACE_LOCAL_USING_OR_IMPL(reallocarr, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL reallocarr)(void *__ptr_p, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocarr))(__ptr_p, __elem_count, __elem_size); })
 #endif /* ... */
 #ifdef __LONGLONG
 #ifdef __CRT_HAVE_strsuftoll

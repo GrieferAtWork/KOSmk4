@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba05313 */
+/* HASH CRC-32:0xf5e303b5 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3452,6 +3452,27 @@ NOTHROW_NCX(VLIBCCALL libc_setproctitle)(char const *format,
 	libc_vsetproctitle(format, args);
 	va_end(args);
 }
+/* >> reallocarr(3)
+ * Badly designed  alternative to  `reallocarray(3)'. Note  that
+ * the given `ptr_p' argument is really typed as `void **ptr_p',
+ * but for API compatibility  is defined as `void *ptr_p'.  This
+ * function simply does:
+ * >> *(void **)ptr_p = reallocarray(*(void **)ptr_p, elem_count, elem_size);
+ * Though `*(void **)ptr_p' is only updated on success.
+ * @return: 0 : Success (`*(void **)ptr_p' was updated)
+ * @return: -1: Error (s.a. `errno'; `*(void **)ptr_p' is unchanged) */
+INTERN ATTR_SECTION(".text.crt.heap.rare_helpers") WUNUSED int
+NOTHROW_NCX(LIBCCALL libc_reallocarr)(void *ptr_p,
+                                      size_t elem_count,
+                                      size_t elem_size) {
+	void **p_ptr = (void **)ptr_p;
+	void *result;
+	result = libc_reallocarray(ptr_p, elem_count, elem_size);
+	if unlikely(!result)
+		return -1;
+	*p_ptr = result;
+	return 0;
+}
 #include <asm/os/stdlib.h>
 /* >> strsuftoll(3)
  * Same as `strsuftollx(3)', but if an error happens, make
@@ -5299,6 +5320,7 @@ DEFINE_PUBLIC_ALIAS(DOS$setproctitle, libd_setproctitle);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_ALIAS(setproctitle, libc_setproctitle);
+DEFINE_PUBLIC_ALIAS(reallocarr, libc_reallocarr);
 DEFINE_PUBLIC_ALIAS(strsuftoll, libc_strsuftoll);
 DEFINE_PUBLIC_ALIAS(strsuftollx, libc_strsuftollx);
 DEFINE_PUBLIC_ALIAS(__p_program_invocation_name, libc___p__pgmptr);
