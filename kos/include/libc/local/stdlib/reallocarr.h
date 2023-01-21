@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff5c170e */
+/* HASH CRC-32:0xf0d831d4 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,13 +21,15 @@
 #ifndef __local_reallocarr_defined
 #define __local_reallocarr_defined
 #include <__crt.h>
-#if defined(__CRT_HAVE_reallocarray) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
+#if defined(__CRT_HAVE_reallocarray) || defined(__CRT_HAVE___libc_reallocarray) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_reallocarray_defined
 #define __local___localdep_reallocarray_defined
 #ifdef __CRT_HAVE_reallocarray
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,__localdep_reallocarray,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),reallocarray,(__ptr,__elem_count,__elem_size))
+#elif defined(__CRT_HAVE___libc_reallocarray)
+__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,__localdep_reallocarray,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),__libc_reallocarray,(__ptr,__elem_count,__elem_size))
 #elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 __NAMESPACE_LOCAL_END
 #include <libc/local/malloc/reallocarray.h>
@@ -52,7 +54,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_reallocarr_defined
 #define __localdep_reallocarr __LIBC_LOCAL_NAME(reallocarr)
 #endif /* !__local___localdep_reallocarr_defined */
-#else /* __CRT_HAVE_reallocarray || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc */
+#else /* __CRT_HAVE_reallocarray || __CRT_HAVE___libc_reallocarray || __CRT_HAVE_realloc || __CRT_HAVE___libc_realloc */
 #undef __local_reallocarr_defined
-#endif /* !__CRT_HAVE_reallocarray && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc */
+#endif /* !__CRT_HAVE_reallocarray && !__CRT_HAVE___libc_reallocarray && !__CRT_HAVE_realloc && !__CRT_HAVE___libc_realloc */
 #endif /* !__local_reallocarr_defined */

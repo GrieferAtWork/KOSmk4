@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43b261df */
+/* HASH CRC-32:0xc28b29fd */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #include <__crt.h>
 #include <features.h>
 #include <bits/types.h>
-#if defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || (defined(__CRT_HAVE_fsetpos64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE__IO_fsetpos64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_fsetpos_unlocked) || (defined(__CRT_HAVE_fsetpos64_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__SEEK_SET) && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)))
+#if defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || (defined(__CRT_HAVE_fsetpos64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE__IO_fsetpos64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_fsetpos_unlocked) || (defined(__CRT_HAVE_fsetpos64_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__SEEK_SET) && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE___fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock) || defined(__CRT_HAVE_fseeko) || defined(__CRT_HAVE_fseeko_unlocked) || defined(__CRT_HAVE_fseek) || defined(__CRT_HAVE_fseek_unlocked) || defined(__CRT_HAVE__fseek_nolock)))
 #include <bits/crt/stdio.h>
 #include <kos/anno.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -47,6 +47,8 @@ __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restr
 __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseeko64,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE___fseeko64) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),__fseeko64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek64) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
 __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_crt_fseek,(__FILE *__restrict __stream, long int __off, int __whence),fseek64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseeki64) && __SIZEOF_LONG__ == __SIZEOF_OFF64_T__
@@ -87,6 +89,8 @@ __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__rest
 __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko64,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE___fseeko64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),__fseeko64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_crt_fseeko,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseek64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseeki64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
@@ -127,6 +131,8 @@ __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_crt_fseeko64,(__FILE *__re
 __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_crt_fseeko64,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseeko64)
 __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_crt_fseeko64,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseeko64,(__stream,__off,__whence))
+#elif defined(__CRT_HAVE___fseeko64)
+__CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_crt_fseeko64,(__FILE *__restrict __stream, __off32_t __off, int __whence),__fseeko64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE_fseek64)
 __CREDIRECT(__ATTR_INOUT(1),int,__THROWING,__localdep_crt_fseeko64,(__FILE *__restrict __stream, __off32_t __off, int __whence),fseek64,(__stream,__off,__whence))
 #elif defined(__CRT_HAVE__fseeki64)
@@ -171,12 +177,12 @@ __CREDIRECT(__ATTR_IN(2) __ATTR_INOUT(1),int,__THROWING,__localdep_crt_fsetpos,(
 #endif /* !__local___localdep_crt_fsetpos_defined */
 __LOCAL_LIBC(fsetpos64) __ATTR_IN(2) __ATTR_INOUT(1) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fsetpos64))(__FILE *__restrict __stream, __fpos64_t const *__restrict __pos) __THROWS(...) {
-#if defined(__SEEK_SET) && ((defined(__CRT_HAVE_fseek) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE_fseeko) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || (defined(__CRT_HAVE_fseek_unlocked) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE__fseek_nolock) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE_fseeko_unlocked) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock))
+#if defined(__SEEK_SET) && ((defined(__CRT_HAVE_fseek) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE_fseeko) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE___fseeko64) || defined(__CRT_HAVE_fseek64) || defined(__CRT_HAVE__fseeki64) || (defined(__CRT_HAVE_fseek_unlocked) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE__fseek_nolock) && __SIZEOF_OFF64_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE_fseeko_unlocked) && __SIZEOF_OFF64_T__ == __SIZEOF_OFF32_T__) || defined(__CRT_HAVE_fseeko64_unlocked) || defined(__CRT_HAVE_fseek64_unlocked) || defined(__CRT_HAVE__fseeki64_nolock))
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_fseeko64)(__stream, (__off64_t)*__pos, __SEEK_SET);
 #elif defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE__IO_fsetpos) || (defined(__CRT_HAVE_fsetpos64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE__IO_fsetpos64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_fsetpos_unlocked) || (defined(__CRT_HAVE_fsetpos64_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 	__pos32_t __pos32 = (__pos32_t)*__pos;
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_fsetpos)(__stream, &__pos32);
-#elif (defined(__CRT_HAVE_fseek) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || defined(__CRT_HAVE_fseeko) || (defined(__CRT_HAVE_fseeko64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE_fseek64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE__fseeki64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE_fseek_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE__fseek_nolock) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || defined(__CRT_HAVE_fseeko_unlocked) || (defined(__CRT_HAVE_fseeko64_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE_fseek64_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE__fseeki64_nolock) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif (defined(__CRT_HAVE_fseek) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || defined(__CRT_HAVE_fseeko) || (defined(__CRT_HAVE_fseeko64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE___fseeko64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE_fseek64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE__fseeki64) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE_fseek_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || (defined(__CRT_HAVE__fseek_nolock) && __SIZEOF_OFF32_T__ == __SIZEOF_LONG__) || defined(__CRT_HAVE_fseeko_unlocked) || (defined(__CRT_HAVE_fseeko64_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE_fseek64_unlocked) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (defined(__CRT_HAVE__fseeki64_nolock) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_fseeko)(__stream, (__off32_t)*__pos, __SEEK_SET);
 #else /* ... */
 	return (__NAMESPACE_LOCAL_SYM __localdep_crt_fseek)(__stream, (long int)*__pos, __SEEK_SET);
@@ -187,7 +193,7 @@ __NAMESPACE_LOCAL_END
 #define __local___localdep_fsetpos64_defined
 #define __localdep_fsetpos64 __LIBC_LOCAL_NAME(fsetpos64)
 #endif /* !__local___localdep_fsetpos64_defined */
-#else /* __CRT_HAVE_fsetpos || __CRT_HAVE__IO_fsetpos || (__CRT_HAVE_fsetpos64 && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (__CRT_HAVE__IO_fsetpos64 && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || __CRT_HAVE_fsetpos_unlocked || (__CRT_HAVE_fsetpos64_unlocked && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (__SEEK_SET && (__CRT_HAVE_fseeko64 || __CRT_HAVE_fseek64 || __CRT_HAVE__fseeki64 || __CRT_HAVE_fseeko64_unlocked || __CRT_HAVE_fseek64_unlocked || __CRT_HAVE__fseeki64_nolock || __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked || __CRT_HAVE_fseek || __CRT_HAVE_fseek_unlocked || __CRT_HAVE__fseek_nolock)) */
+#else /* __CRT_HAVE_fsetpos || __CRT_HAVE__IO_fsetpos || (__CRT_HAVE_fsetpos64 && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (__CRT_HAVE__IO_fsetpos64 && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || __CRT_HAVE_fsetpos_unlocked || (__CRT_HAVE_fsetpos64_unlocked && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || (__SEEK_SET && (__CRT_HAVE_fseeko64 || __CRT_HAVE___fseeko64 || __CRT_HAVE_fseek64 || __CRT_HAVE__fseeki64 || __CRT_HAVE_fseeko64_unlocked || __CRT_HAVE_fseek64_unlocked || __CRT_HAVE__fseeki64_nolock || __CRT_HAVE_fseeko || __CRT_HAVE_fseeko_unlocked || __CRT_HAVE_fseek || __CRT_HAVE_fseek_unlocked || __CRT_HAVE__fseek_nolock)) */
 #undef __local_fsetpos64_defined
-#endif /* !__CRT_HAVE_fsetpos && !__CRT_HAVE__IO_fsetpos && (!__CRT_HAVE_fsetpos64 || __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) && (!__CRT_HAVE__IO_fsetpos64 || __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) && !__CRT_HAVE_fsetpos_unlocked && (!__CRT_HAVE_fsetpos64_unlocked || __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) && (!__SEEK_SET || (!__CRT_HAVE_fseeko64 && !__CRT_HAVE_fseek64 && !__CRT_HAVE__fseeki64 && !__CRT_HAVE_fseeko64_unlocked && !__CRT_HAVE_fseek64_unlocked && !__CRT_HAVE__fseeki64_nolock && !__CRT_HAVE_fseeko && !__CRT_HAVE_fseeko_unlocked && !__CRT_HAVE_fseek && !__CRT_HAVE_fseek_unlocked && !__CRT_HAVE__fseek_nolock)) */
+#endif /* !__CRT_HAVE_fsetpos && !__CRT_HAVE__IO_fsetpos && (!__CRT_HAVE_fsetpos64 || __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) && (!__CRT_HAVE__IO_fsetpos64 || __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) && !__CRT_HAVE_fsetpos_unlocked && (!__CRT_HAVE_fsetpos64_unlocked || __SIZEOF_OFF32_T__ != __SIZEOF_OFF64_T__) && (!__SEEK_SET || (!__CRT_HAVE_fseeko64 && !__CRT_HAVE___fseeko64 && !__CRT_HAVE_fseek64 && !__CRT_HAVE__fseeki64 && !__CRT_HAVE_fseeko64_unlocked && !__CRT_HAVE_fseek64_unlocked && !__CRT_HAVE__fseeki64_nolock && !__CRT_HAVE_fseeko && !__CRT_HAVE_fseeko_unlocked && !__CRT_HAVE_fseek && !__CRT_HAVE_fseek_unlocked && !__CRT_HAVE__fseek_nolock)) */
 #endif /* !__local_fsetpos64_defined */

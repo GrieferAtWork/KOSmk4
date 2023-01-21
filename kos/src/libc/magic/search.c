@@ -801,7 +801,9 @@ done:
 
 @@>> twalk(3), twalk_r(3)
 @@Walk through the whole tree and call the `action' callback for every node or leaf
-[[throws, decl_prefix(DEFINE_VISIT), impl_prefix(
+[[throws, decl_prefix(DEFINE_VISIT)]]
+[[export_alias("__twalk_r")]]
+[[impl_prefix(
 @@push_namespace(local)@@
 /* Walk the nodes of a tree.
  * `root' is the root of the tree to be walked, `action' the function to be

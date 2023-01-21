@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b427f77 */
+/* HASH CRC-32:0xcb395618 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,12 +36,14 @@ __NAMESPACE_LOCAL_BEGIN
 #define __local___localdep_twalk_r_defined
 #ifdef __CRT_HAVE_twalk_r
 __CREDIRECT_VOID(__ATTR_IN_OPT(1),__THROWING,__localdep_twalk_r,(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT ___value, int __level, void *__arg), void *__arg),twalk_r,(__root,__action,__arg))
-#else /* __CRT_HAVE_twalk_r */
+#elif defined(__CRT_HAVE___twalk_r)
+__CREDIRECT_VOID(__ATTR_IN_OPT(1),__THROWING,__localdep_twalk_r,(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT ___value, int __level, void *__arg), void *__arg),__twalk_r,(__root,__action,__arg))
+#else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/search/twalk_r.h>
 __NAMESPACE_LOCAL_BEGIN
 #define __localdep_twalk_r __LIBC_LOCAL_NAME(twalk_r)
-#endif /* !__CRT_HAVE_twalk_r */
+#endif /* !... */
 #endif /* !__local___localdep_twalk_r_defined */
 __NAMESPACE_LOCAL_END
 #ifndef __LIBCCALL_CALLER_CLEANUP

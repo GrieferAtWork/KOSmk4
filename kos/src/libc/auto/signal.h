@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8fe69666 */
+/* HASH CRC-32:0x6bcd154e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,7 @@ DECL_BEGIN
 
 #include <pthread.h>
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+INTDEF int NOTHROW_NCX(LIBDCALL libd_tgkill)(pid_t pid, pid_t tid, signo_t signo);
 /* >> sigblock(3)
  * Deprecated  method  of  SIG_BLOCK-ing  a  given  set  of
  * signals. Modern code should use `sigprocmask()' instead.

@@ -664,7 +664,7 @@ typedef __mode_t mode_t; /* INode type (Set of `S_*' from `<fcntl.h>' or `<sys/s
 
 
 [[decl_include("<features.h>", "<bits/types.h>")]]
-[[doc_alias("mmap"), ignore, nocrt, alias("mmap")]]
+[[doc_alias("mmap"), ignore, nocrt, alias("mmap", "__mmap")]]
 void *mmap32([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
              __STDC_INT_AS_UINT_T flags, $fd_t fd, $off32_t offset);
 
@@ -675,7 +675,7 @@ void *mmap32([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
 @@              MAP_NONBLOCK | MAP_NORESERVE | MAP_POPULATE  | MAP_STACK | MAP_SYNC  |
 @@              MAP_UNINITIALIZED | MAP_DONT_MAP | MAP_FIXED_NOREPLACE'
 [[wunused, decl_include("<features.h>", "<bits/types.h>"), decl_prefix(DEFINE_PIO_OFFSET), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("mmap")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("mmap", "__mmap")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_FILE_OFFSET64) || __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), alias("mmap64")]]
 [[userimpl, requires($has_function(mmap32) || $has_function(mmap64))]]
 [[section(".text.crt{|.dos}.heap.mman")]]
@@ -838,6 +838,7 @@ int mincore([[access(none)]] void *start, size_t len, unsigned char *vec);
 [[decl_include("<features.h>", "<bits/types.h>")]]
 [[wunused, section(".text.crt{|.dos}.heap.mman")]]
 [[doc_alias("mmap"), preferred_off64_variant_of(mmap)]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__), preferred_alias("__mmap")]]
 [[userimpl, requires_function(mmap32), decl_prefix(DEFINE_PIO_OFFSET)]]
 void *mmap64([[access(none)]] void *addr, size_t len, __STDC_INT_AS_UINT_T prot,
              __STDC_INT_AS_UINT_T flags, $fd_t fd, __PIO_OFFSET64 offset) {

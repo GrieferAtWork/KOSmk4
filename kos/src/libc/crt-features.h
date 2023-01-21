@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb42878e7 */
+/* HASH CRC-32:0xc231da88 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3602,6 +3602,7 @@
 #define __CRT_HAVE_DOS$tgamma
 #define __CRT_HAVE_DOS$tgammaf
 #define __CRT_HAVE_DOS$tgammal
+#define __CRT_HAVE_DOS$tgkill
 #define __CRT_HAVE_DOS$tgsigqueueinfo
 #define __CRT_HAVE_DOS$thr_create
 #define __CRT_HAVE_DOS$thr_getprio
@@ -8145,6 +8146,7 @@
 #define __CRT_HAVE_tgamma
 #define __CRT_HAVE_tgammaf
 #define __CRT_HAVE_tgammal
+#define __CRT_HAVE_tgkill
 #define __CRT_HAVE_tgsigqueueinfo
 #define __CRT_HAVE_thr_create
 #define __CRT_HAVE_thr_getprio

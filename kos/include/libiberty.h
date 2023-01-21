@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb9f13d */
+/* HASH CRC-32:0xd047cbf7 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -178,6 +178,18 @@ __CEIDECLARE_GCCNCX(__ATTR_IN(3) __ATTR_LIBC_PRINTF(3, 4) __ATTR_OUTS(1, 2),__ST
 extern "C++" {
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
 __LIBC __ATTR_IN(3) __ATTR_LIBC_PRINTF(3, 4) __ATTR_OUTS(1, 2) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL snprintf)(char *__restrict __buf, size_t __buflen, char const *__restrict __format, ...) __CASMNAME_SAME_GCCNCX("snprintf");
+#ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
+} /* extern "C++" */
+#endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
+#elif defined(__CRT_HAVE___snprintf)
+/* >> snprintf(3), vsnprintf(3)
+ * Print  a formatted string to a given in-member string buffer `buf'
+ * Always return the REQUIRED buffer size (excluding a trailing  NUL-
+ * character), and never write more than `buflen' characters to `buf' */
+#ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
+extern "C++" {
+#endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */
+__LIBC __ATTR_IN(3) __ATTR_LIBC_PRINTF(3, 4) __ATTR_OUTS(1, 2) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL snprintf)(char *__restrict __buf, size_t __buflen, char const *__restrict __format, ...) __CASMNAME_GCCNCX("__snprintf");
 #ifdef __COMPILER_HAVE_GCCNCX_BUILTIN_BUG
 } /* extern "C++" */
 #endif /* __COMPILER_HAVE_GCCNCX_BUILTIN_BUG */

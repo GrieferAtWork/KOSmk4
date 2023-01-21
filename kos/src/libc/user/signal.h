@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf81b07f1 */
+/* HASH CRC-32:0x66bc0ad7 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,6 +71,7 @@ INTDEF sighandler_t NOTHROW_NCX(LIBDCALL libd_sysv_signal)(signo_t signo, sighan
  * @return: * :      The previous signal handler function.
  * @return: SIG_ERR: Error (s.a. `errno') */
 INTDEF sighandler_t NOTHROW_NCX(LIBCCALL libc_sysv_signal)(signo_t signo, sighandler_t handler);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_tgkill)(pid_t pid, pid_t tid, signo_t signo);
 /* >> signal(2/3)
  * Non-portable  signal  handler  establishment  function  that  behaves
  * either like `sysv_signal()', `bsd_signal()', or has its own behavior.

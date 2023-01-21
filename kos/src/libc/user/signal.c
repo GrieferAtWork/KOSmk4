@@ -164,6 +164,19 @@ NOTHROW_NCX(LIBCCALL libc_sysv_signal)(signo_t signo,
 }
 /*[[[end:libc_sysv_signal]]]*/
 
+/*[[[head:libc_tgkill,hash:CRC-32=0xc6a5e7b6]]]*/
+INTERN ATTR_SECTION(".text.crt.sched.signal") int
+NOTHROW_NCX(LIBCCALL libc_tgkill)(pid_t pid,
+                                  pid_t tid,
+                                  signo_t signo)
+/*[[[body:libc_tgkill]]]*/
+{
+	errno_t error;
+	error = sys_tgkill(pid, tid, signo);
+	return libc_seterrno_syserr(error);
+}
+/*[[[end:libc_tgkill]]]*/
+
 
 #undef sys_siglist
 #undef _sys_siglist
@@ -1242,13 +1255,14 @@ NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xf86ffb2d]]]*/
+/*[[[start:exports,hash:CRC-32=0x92d16028]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$raise, libd_raise);
 DEFINE_PUBLIC_ALIAS(raise, libc_raise);
 DEFINE_PUBLIC_ALIAS(DOS$__sysv_signal, libd_sysv_signal);
 DEFINE_PUBLIC_ALIAS(DOS$sysv_signal, libd_sysv_signal);
 DEFINE_PUBLIC_ALIAS(__sysv_signal, libc_sysv_signal);
 DEFINE_PUBLIC_ALIAS(sysv_signal, libc_sysv_signal);
+DEFINE_PUBLIC_ALIAS(tgkill, libc_tgkill);
 DEFINE_PUBLIC_ALIAS(DOS$_signal, libd_signal);
 DEFINE_PUBLIC_ALIAS(DOS$signal, libd_signal);
 DEFINE_PUBLIC_ALIAS(signal, libc_signal);

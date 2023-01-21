@@ -4252,7 +4252,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0xf27cb155]]]*/
+/*[[[start:exports,hash:CRC-32=0x1d8f4611]]]*/
 DEFINE_PUBLIC_ALIAS(DOS$__rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$__libc_rename, libd_rename);
 DEFINE_PUBLIC_ALIAS(DOS$rename, libd_rename);
@@ -4375,9 +4375,11 @@ DEFINE_PUBLIC_ALIAS(fseeko, libc_fseeko);
 DEFINE_PUBLIC_ALIAS(ftello, libc_ftello);
 DEFINE_PUBLIC_ALIAS(tmpfile64, libc_tmpfile64);
 DEFINE_PUBLIC_ALIAS(fseeko64, libc_fseeko64);
+DEFINE_PUBLIC_ALIAS(__fseeko64, libc_fseeko64);
 DEFINE_PUBLIC_ALIAS(fseek64, libc_fseeko64);
 DEFINE_PUBLIC_ALIAS(_fseeki64, libc_fseeko64);
 DEFINE_PUBLIC_ALIAS(ftello64, libc_ftello64);
+DEFINE_PUBLIC_ALIAS(__ftello64, libc_ftello64);
 DEFINE_PUBLIC_ALIAS(ftell64, libc_ftello64);
 DEFINE_PUBLIC_ALIAS(_ftelli64, libc_ftello64);
 DEFINE_PUBLIC_ALIAS(DOS$fopen64, libd_fopen64);

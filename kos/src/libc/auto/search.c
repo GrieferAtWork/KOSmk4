@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd71de16d */
+/* HASH CRC-32:0x44a22162 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1276,9 +1276,11 @@ DEFINE_PUBLIC_ALIAS(DOS$tdelete_r, libd_tdelete_r);
 DEFINE_PUBLIC_ALIAS(tdelete_r, libc_tdelete_r);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
+DEFINE_PUBLIC_ALIAS(DOS$__twalk_r, libd_twalk_r);
 DEFINE_PUBLIC_ALIAS(DOS$twalk_r, libd_twalk_r);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
+DEFINE_PUBLIC_ALIAS(__twalk_r, libc_twalk_r);
 DEFINE_PUBLIC_ALIAS(twalk_r, libc_twalk_r);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)

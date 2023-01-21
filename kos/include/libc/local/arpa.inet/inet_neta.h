@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x298fb755 */
+/* HASH CRC-32:0xde2236b6 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,6 +46,11 @@ __NAMESPACE_LOCAL_END
 #include <features.h>
 __NAMESPACE_LOCAL_BEGIN
 __LIBC __ATTR_IN(3) __ATTR_LIBC_PRINTF(3, 4) __ATTR_OUTS(1, 2) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_snprintf)(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, ...) __CASMNAME("snprintf");
+#elif defined(__CRT_HAVE___snprintf)
+__NAMESPACE_LOCAL_END
+#include <features.h>
+__NAMESPACE_LOCAL_BEGIN
+__LIBC __ATTR_IN(3) __ATTR_LIBC_PRINTF(3, 4) __ATTR_OUTS(1, 2) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_snprintf)(char *__restrict __buf, __SIZE_TYPE__ __buflen, char const *__restrict __format, ...) __CASMNAME("__snprintf");
 #else /* ... */
 __NAMESPACE_LOCAL_END
 #include <libc/local/stdio/snprintf.h>

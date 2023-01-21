@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf96414f */
+/* HASH CRC-32:0x21595108 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -307,12 +307,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tdelete_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR
 /* >> twalk(3), twalk_r(3)
  * Walk through the whole tree and call the `action' callback for every node or leaf */
 __CDECLARE_VOID(__ATTR_IN_OPT(1),__THROWING,twalk_r,(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT ___value, int __level, void *__arg), void *__arg),(__root,__action,__arg))
-#else /* __CRT_HAVE_twalk_r */
+#elif defined(__CRT_HAVE___twalk_r)
+/* >> twalk(3), twalk_r(3)
+ * Walk through the whole tree and call the `action' callback for every node or leaf */
+__CREDIRECT_VOID(__ATTR_IN_OPT(1),__THROWING,twalk_r,(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT ___value, int __level, void *__arg), void *__arg),__twalk_r,(__root,__action,__arg))
+#else /* ... */
 #include <libc/local/search/twalk_r.h>
 /* >> twalk(3), twalk_r(3)
  * Walk through the whole tree and call the `action' callback for every node or leaf */
 __NAMESPACE_LOCAL_USING_OR_IMPL(twalk_r, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_IN_OPT(1) void (__LIBCCALL twalk_r)(void const *__root, void (__LIBCCALL *__action)(void const *__nodep, VISIT ___value, int __level, void *__arg), void *__arg) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(twalk_r))(__root, __action, __arg); })
-#endif /* !__CRT_HAVE_twalk_r */
+#endif /* !... */
 #ifdef __CRT_HAVE_tdestroy_r
 /* >> tdestroy(3), tdestroy_r(3)
  * Destroy the whole tree, call `freefct' for each node or leaf */

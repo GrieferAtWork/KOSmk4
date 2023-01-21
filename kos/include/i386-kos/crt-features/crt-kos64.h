@@ -577,10 +577,12 @@
 #define __CRT_HAVE___frexp
 #define __CRT_HAVE___frexpf
 #define __CRT_HAVE___frexpl
+#define __CRT_HAVE___fseeko64
 #define __CRT_HAVE___fseterr
 #define __CRT_HAVE___fsetlocking
 #define __CRT_HAVE___fstatfs
 #define __CRT_HAVE___fsync
+#define __CRT_HAVE___ftello64
 #define __CRT_HAVE___ftruncate
 #define __CRT_HAVE___fwritable
 #define __CRT_HAVE___fwriting
@@ -801,6 +803,7 @@
 #define __CRT_HAVE___libc_readdir_r
 #define __CRT_HAVE___libc_readlink
 #define __CRT_HAVE___libc_realloc
+#define __CRT_HAVE___libc_reallocarray
 #define __CRT_HAVE___libc_reboot
 #define __CRT_HAVE___libc_rename
 #define __CRT_HAVE___libc_rewinddir
@@ -1203,6 +1206,7 @@
 #define __CRT_HAVE___sinhf
 #define __CRT_HAVE___sinhl
 #define __CRT_HAVE___sinl
+#define __CRT_HAVE___snprintf
 #define __CRT_HAVE___socket
 #define __CRT_HAVE___socketcall
 #define __CRT_HAVE___solaris_sysinfo
@@ -1321,6 +1325,7 @@
 #define __CRT_HAVE___tsearch
 #define __CRT_HAVE___ttyname
 #define __CRT_HAVE___twalk
+#define __CRT_HAVE___twalk_r
 #define __CRT_HAVE___tzname
 #define __CRT_HAVE___ubsan_handle_builtin_unreachable
 #define __CRT_HAVE___uflow
@@ -5746,6 +5751,7 @@
 #define __CRT_HAVE_tgamma
 #define __CRT_HAVE_tgammaf
 #define __CRT_HAVE_tgammal
+#define __CRT_HAVE_tgkill
 #define __CRT_HAVE_tgsigqueueinfo
 #define __CRT_HAVE_thr_create
 #define __CRT_HAVE_thr_exit
@@ -6878,10 +6884,12 @@
 #define __CRT_HAVE_KOS$__frexp
 #define __CRT_HAVE_KOS$__frexpf
 #define __CRT_HAVE_KOS$__frexpl
+#define __CRT_HAVE_KOS$__fseeko64
 #define __CRT_HAVE_KOS$__fseterr
 #define __CRT_HAVE_KOS$__fsetlocking
 #define __CRT_HAVE_KOS$__fstatfs
 #define __CRT_HAVE_KOS$__fsync
+#define __CRT_HAVE_KOS$__ftello64
 #define __CRT_HAVE_KOS$__ftruncate
 #define __CRT_HAVE_KOS$__fwritable
 #define __CRT_HAVE_KOS$__fwriting
@@ -7044,6 +7052,7 @@
 #define __CRT_HAVE_KOS$__libc_read
 #define __CRT_HAVE_KOS$__libc_readlink
 #define __CRT_HAVE_KOS$__libc_realloc
+#define __CRT_HAVE_KOS$__libc_reallocarray
 #define __CRT_HAVE_KOS$__libc_reboot
 #define __CRT_HAVE_KOS$__libc_rename
 #define __CRT_HAVE_KOS$__libc_rewinddir
@@ -7365,6 +7374,7 @@
 #define __CRT_HAVE_KOS$__sinhf
 #define __CRT_HAVE_KOS$__sinhl
 #define __CRT_HAVE_KOS$__sinl
+#define __CRT_HAVE_KOS$__snprintf
 #define __CRT_HAVE_KOS$__socket
 #define __CRT_HAVE_KOS$__solaris_sysinfo
 #define __CRT_HAVE_KOS$__sqrt
@@ -7470,6 +7480,7 @@
 #define __CRT_HAVE_KOS$__tsearch
 #define __CRT_HAVE_KOS$__ttyname
 #define __CRT_HAVE_KOS$__twalk
+#define __CRT_HAVE_KOS$__twalk_r
 #define __CRT_HAVE_KOS$__tzname
 #define __CRT_HAVE_KOS$__uflow
 #define __CRT_HAVE_KOS$__umask
@@ -10517,6 +10528,7 @@
 #define __CRT_HAVE_KOS$tgamma
 #define __CRT_HAVE_KOS$tgammaf
 #define __CRT_HAVE_KOS$tgammal
+#define __CRT_HAVE_KOS$tgkill
 #define __CRT_HAVE_KOS$tgsigqueueinfo
 #define __CRT_HAVE_KOS$thr_create
 #define __CRT_HAVE_KOS$thr_exit
@@ -11248,10 +11260,12 @@
 #define __CRT_HAVE_DOS$__frexp
 #define __CRT_HAVE_DOS$__frexpf
 #define __CRT_HAVE_DOS$__frexpl
+#define __CRT_HAVE_DOS$__fseeko64
 #define __CRT_HAVE_DOS$__fseterr
 #define __CRT_HAVE_DOS$__fsetlocking
 #define __CRT_HAVE_DOS$__fstatfs
 #define __CRT_HAVE_DOS$__fsync
+#define __CRT_HAVE_DOS$__ftello64
 #define __CRT_HAVE_DOS$__ftruncate
 #define __CRT_HAVE_DOS$__fwritable
 #define __CRT_HAVE_DOS$__fwriting
@@ -11418,6 +11432,7 @@
 #define __CRT_HAVE_DOS$__libc_read
 #define __CRT_HAVE_DOS$__libc_readlink
 #define __CRT_HAVE_DOS$__libc_realloc
+#define __CRT_HAVE_DOS$__libc_reallocarray
 #define __CRT_HAVE_DOS$__libc_reboot
 #define __CRT_HAVE_DOS$__libc_rename
 #define __CRT_HAVE_DOS$__libc_rewinddir
@@ -11741,6 +11756,7 @@
 #define __CRT_HAVE_DOS$__sinhf
 #define __CRT_HAVE_DOS$__sinhl
 #define __CRT_HAVE_DOS$__sinl
+#define __CRT_HAVE_DOS$__snprintf
 #define __CRT_HAVE_DOS$__socket
 #define __CRT_HAVE_DOS$__solaris_sysinfo
 #define __CRT_HAVE_DOS$__sqrt
@@ -11848,6 +11864,7 @@
 #define __CRT_HAVE_DOS$__tsearch
 #define __CRT_HAVE_DOS$__ttyname
 #define __CRT_HAVE_DOS$__twalk
+#define __CRT_HAVE_DOS$__twalk_r
 #define __CRT_HAVE_DOS$__tzname
 #define __CRT_HAVE_DOS$__uflow
 #define __CRT_HAVE_DOS$__umask
@@ -15190,6 +15207,7 @@
 #define __CRT_HAVE_DOS$tgamma
 #define __CRT_HAVE_DOS$tgammaf
 #define __CRT_HAVE_DOS$tgammal
+#define __CRT_HAVE_DOS$tgkill
 #define __CRT_HAVE_DOS$tgsigqueueinfo
 #define __CRT_HAVE_DOS$thr_create
 #define __CRT_HAVE_DOS$thr_exit

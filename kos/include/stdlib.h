@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7a31fc */
+/* HASH CRC-32:0x6dfd0c7 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3384,6 +3384,8 @@ __CDECLARE_OPT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_IN(1),char *,__NOTHROW_RPC,ca
 #define __reallocarray_defined
 #ifdef __CRT_HAVE_reallocarray
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,reallocarray,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),(__ptr,__elem_count,__elem_size))
+#elif defined(__CRT_HAVE___libc_reallocarray)
+__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,reallocarray,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),__libc_reallocarray,(__ptr,__elem_count,__elem_size))
 #elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/malloc/reallocarray.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(reallocarray, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL reallocarray)(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocarray))(__ptr, __elem_count, __elem_size); })
@@ -3409,6 +3411,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(recalloc, __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_
 #define __reallocv_defined
 #ifdef __CRT_HAVE_reallocarray
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,reallocv,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),reallocarray,(__ptr,__elem_count,__elem_size))
+#elif defined(__CRT_HAVE___libc_reallocarray)
+__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,reallocv,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),__libc_reallocarray,(__ptr,__elem_count,__elem_size))
 #elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/malloc/reallocarray.h>
 __FORCELOCAL __ATTR_ARTIFICIAL __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *__NOTHROW_NCX(__LIBCCALL reallocv)(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(reallocarray))(__ptr, __elem_count, __elem_size); }
@@ -3459,6 +3463,8 @@ void *__NOTHROW_NCX(__LIBCCALL calloc)(__SIZE_TYPE__ __num_bytes) { return (call
 extern "C++" {
 #ifdef __CRT_HAVE_reallocarray
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,realloc,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),reallocarray,(__ptr,__elem_count,__elem_size))
+#elif defined(__CRT_HAVE___libc_reallocarray)
+__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,realloc,(void *__ptr, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),__libc_reallocarray,(__ptr,__elem_count,__elem_size))
 #elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 } /* extern "C++" */
 #include <libc/local/malloc/reallocarray.h>
@@ -4237,7 +4243,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(setproctitle, __FORCELOCAL __ATTR_ARTIFICIAL __A
  * @return: 0 : Success (`*(void **)ptr_p' was updated)
  * @return: -1: Error (s.a. `errno'; `*(void **)ptr_p' is unchanged) */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,reallocarr,(void *__ptr_p, __SIZE_TYPE__ __elem_count, __SIZE_TYPE__ __elem_size),(__ptr_p,__elem_count,__elem_size))
-#elif defined(__CRT_HAVE_reallocarray) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
+#elif defined(__CRT_HAVE_reallocarray) || defined(__CRT_HAVE___libc_reallocarray) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE___libc_realloc)
 #include <libc/local/stdlib/reallocarr.h>
 /* >> reallocarr(3)
  * Badly designed  alternative to  `reallocarray(3)'. Note  that

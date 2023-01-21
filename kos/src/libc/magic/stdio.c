@@ -514,14 +514,14 @@ __CSDECLARE(,__FILE *,stdtty)
 
 %[define_crt_name_list(CNL_fseek             = ["fseek"])]                                                     /*  int fseek(FILE *, long int, int) */
 %[define_crt_name_list(CNL_fseeko            = ["fseeko"])]                                                    /*  int fseeko(FILE *, off32_t, int) */
-%[define_crt_name_list(CNL_fseeko64          = ["fseeko64", "fseek64", "_fseeki64"])]                          /*  int fseeko64(FILE *, off64_t, int) */
+%[define_crt_name_list(CNL_fseeko64          = ["fseeko64", "__fseeko64", "fseek64", "_fseeki64"])]            /*  int fseeko64(FILE *, off64_t, int) */
 %[define_crt_name_list(CNL_fseek_unlocked    = ["fseek_unlocked", "_fseek_nolock"])]                           /*  int fseek_unlocked(FILE *, long int, int) */
 %[define_crt_name_list(CNL_fseeko_unlocked   = ["fseeko_unlocked"])]                                           /*  int fseeko_unlocked(FILE *, off32_t, int) */
 %[define_crt_name_list(CNL_fseeko64_unlocked = ["fseeko64_unlocked", "fseek64_unlocked", "_fseeki64_nolock"])] /*  int fseeko64_unlocked(FILE *, off64_t, int) */
 
 %[define_crt_name_list(CNL_ftell             = ["ftell", "_IO_ftell"])]                                        /* long int ftell(FILE *) */
 %[define_crt_name_list(CNL_ftello            = ["ftello"])]                                                    /* off32_t ftello(FILE *) */
-%[define_crt_name_list(CNL_ftello64          = ["ftello64", "ftell64", "_ftelli64"])]                          /* off64_t ftello64(FILE *) */
+%[define_crt_name_list(CNL_ftello64          = ["ftello64", "__ftello64", "ftell64", "_ftelli64"])]            /* off64_t ftello64(FILE *) */
 %[define_crt_name_list(CNL_ftell_unlocked    = ["ftell_unlocked", "_ftell_nolock"])]                           /* long int ftell_unlocked(FILE *) */
 %[define_crt_name_list(CNL_ftello_unlocked   = ["ftello_unlocked"])]                                           /* off32_t ftello_unlocked(FILE *) */
 %[define_crt_name_list(CNL_ftello64_unlocked = ["ftello64_unlocked", "ftell64_unlocked", "_ftelli64_nolock"])] /* off64_t ftello64_unlocked(FILE *) */
@@ -1676,8 +1676,10 @@ __STDC_INT_AS_SIZE_T vsnprintf([[out(? <= buflen)]] char *__restrict buf, size_t
 @@Print  a formatted string to a given in-member string buffer `buf'
 @@Always return the REQUIRED buffer size (excluding a trailing  NUL-
 @@character), and never write more than `buflen' characters to `buf'
-[[std, kernel, guard, decl_include("<features.h>", "<hybrid/typecore.h>")]]
-[[crtbuiltin, section(".text.crt{|.dos}.unicode.static.format.printf")]]
+[[std, kernel, guard, crtbuiltin, alias("__snprintf")]]
+[[if(!defined(__KERNEL__)), export_as("__snprintf")]]
+[[decl_include("<features.h>", "<hybrid/typecore.h>")]]
+[[section(".text.crt{|.dos}.unicode.static.format.printf")]]
 __STDC_INT_AS_SIZE_T snprintf([[out(? <= buflen)]] char *__restrict buf, size_t buflen,
                               [[in, format]] char const *__restrict format, ...)
 	%{printf("vsnprintf")}

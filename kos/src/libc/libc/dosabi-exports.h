@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf5898a97 */
+/* HASH CRC-32:0x8718da2e */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -740,6 +740,7 @@ DEFINE_PUBLIC_ALIAS(DOS$__memdup, libd_memdup);
 DEFINE_PUBLIC_ALIAS(DOS$memdup, libd_memdup);
 DEFINE_PUBLIC_ALIAS(DOS$__memcdup, libd_memcdup);
 DEFINE_PUBLIC_ALIAS(DOS$memcdup, libd_memcdup);
+DEFINE_PUBLIC_ALIAS(DOS$__libc_reallocarray, libd_reallocarray);
 DEFINE_PUBLIC_ALIAS(DOS$reallocarray, libd_reallocarray);
 DEFINE_PUBLIC_ALIAS(DOS$recalloc, libd_recalloc);
 DEFINE_PUBLIC_ALIAS(DOS$_recalloc, libd_recallocv);
@@ -2016,6 +2017,7 @@ DEFINE_PUBLIC_ALIAS(DOS$sgetspent_r, libd_sgetspent_r);
 DEFINE_PUBLIC_ALIAS(DOS$fgetspent_r, libd_fgetspent_r);
 
 /* signal */
+DEFINE_PUBLIC_ALIAS(DOS$tgkill, libd_tgkill);
 DEFINE_PUBLIC_ALIAS(DOS$__sigblock, libd_sigblock);
 DEFINE_PUBLIC_ALIAS(DOS$sigblock, libd_sigblock);
 DEFINE_PUBLIC_ALIAS(DOS$__sigsetmask, libd_sigsetmask);
@@ -2297,9 +2299,11 @@ DEFINE_PUBLIC_ALIAS(DOS$obstack_vprintf, libd_obstack_vprintf);
 DEFINE_PUBLIC_ALIAS(DOS$fseeko, libd_fseeko);
 DEFINE_PUBLIC_ALIAS(DOS$ftello, libd_ftello);
 DEFINE_PUBLIC_ALIAS(DOS$fseeko64, libd_fseeko64);
+DEFINE_PUBLIC_ALIAS(DOS$__fseeko64, libd_fseeko64);
 DEFINE_PUBLIC_ALIAS(DOS$fseek64, libd_fseeko64);
 DEFINE_PUBLIC_ALIAS(DOS$_fseeki64, libd_fseeko64);
 DEFINE_PUBLIC_ALIAS(DOS$ftello64, libd_ftello64);
+DEFINE_PUBLIC_ALIAS(DOS$__ftello64, libd_ftello64);
 DEFINE_PUBLIC_ALIAS(DOS$ftell64, libd_ftello64);
 DEFINE_PUBLIC_ALIAS(DOS$_ftelli64, libd_ftello64);
 DEFINE_PUBLIC_ALIAS(DOS$fgetpos64, libd_fgetpos64);

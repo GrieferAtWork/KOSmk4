@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf742d48 */
+/* HASH CRC-32:0xc7eb4047 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -205,6 +205,20 @@ __NAMESPACE_LOCAL_END
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__NOTHROW_NCX,__localdep_mmap64,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __PIO_OFFSET64 __offset),mmap,(__addr,__len,__prot,__flags,__fd,__offset))
+#elif defined(__CRT_HAVE___mmap) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+__NAMESPACE_LOCAL_END
+#include <features.h>
+#ifndef __PIO_OFFSET
+#ifdef __USE_KOS_ALTERATIONS
+#define __PIO_OFFSET   __pos_t
+#define __PIO_OFFSET64 __pos64_t
+#else /* __USE_KOS_ALTERATIONS */
+#define __PIO_OFFSET   __off_t
+#define __PIO_OFFSET64 __off64_t
+#endif /* !__USE_KOS_ALTERATIONS */
+#endif /* !__PIO_OFFSET */
+__NAMESPACE_LOCAL_BEGIN
+__CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__NOTHROW_NCX,__localdep_mmap64,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __PIO_OFFSET64 __offset),__mmap,(__addr,__len,__prot,__flags,__fd,__offset))
 #elif defined(__CRT_HAVE_mmap64)
 __NAMESPACE_LOCAL_END
 #include <features.h>
@@ -219,7 +233,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__PIO_OFFSET */
 __NAMESPACE_LOCAL_BEGIN
 __CREDIRECT(__ATTR_WUNUSED __ATTR_ACCESS_NONE(1),void *,__NOTHROW_NCX,__localdep_mmap64,(void *__addr, __SIZE_TYPE__ __len, __STDC_INT_AS_UINT_T __prot, __STDC_INT_AS_UINT_T __flags, __fd_t __fd, __PIO_OFFSET64 __offset),mmap64,(__addr,__len,__prot,__flags,__fd,__offset))
-#elif defined(__CRT_HAVE_mmap)
+#elif defined(__CRT_HAVE_mmap) || defined(__CRT_HAVE___mmap)
 __NAMESPACE_LOCAL_END
 #include <libc/local/sys.mman/mmap64.h>
 __NAMESPACE_LOCAL_BEGIN
@@ -348,7 +362,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfile))(struct mapfile *__restrict
 	}
 
 	/* Try to use mmap(2) */
-#if defined(__PROT_READ) && defined(__PROT_WRITE) && defined(__MAP_PRIVATE) && defined(__SEEK_SET) && (defined(__CRT_HAVE_mmap64) || defined(__CRT_HAVE_mmap)) && ((defined(__CRT_HAVE_kfstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kfstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__fstat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__fstat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__fstati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__fstat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE_fstat) && defined(__STAT32_MATCHES_STAT64)) || defined(__CRT_HAVE_fstat64)) && (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek))
+#if defined(__PROT_READ) && defined(__PROT_WRITE) && defined(__MAP_PRIVATE) && defined(__SEEK_SET) && (defined(__CRT_HAVE_mmap64) || defined(__CRT_HAVE_mmap) || defined(__CRT_HAVE___mmap)) && ((defined(__CRT_HAVE_kfstat) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE_kfstat64) && defined(__CRT_KOS_PRIMARY)) || (defined(__CRT_HAVE__fstat64) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__fstat64i32) && defined(__CRT_DOS_PRIMARY) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__fstati64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE__fstat32i64) && defined(__CRT_DOS_PRIMARY) && !defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE_fstat) && defined(__STAT32_MATCHES_STAT64)) || defined(__CRT_HAVE_fstat64)) && (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_llseek) || defined(__CRT_HAVE___llseek) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE___libc_lseek))
 	{
 		struct stat64 __st;
 		if ((__NAMESPACE_LOCAL_SYM __localdep_fstat64)(__fd, &__st) == 0) {
@@ -443,7 +457,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fmapfile))(struct mapfile *__restrict
 		}
 	}
 __after_mmap_attempt:
-#endif /* __PROT_READ && __PROT_WRITE && __MAP_PRIVATE && __SEEK_SET && (__CRT_HAVE_mmap64 || __CRT_HAVE_mmap) && ((__CRT_HAVE_kfstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kfstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__fstat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__fstat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__fstati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64) || (__CRT_HAVE__fstat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64) || (__CRT_HAVE_fstat && __STAT32_MATCHES_STAT64) || __CRT_HAVE_fstat64) && (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_llseek || __CRT_HAVE___llseek || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE___libc_lseek) */
+#endif /* __PROT_READ && __PROT_WRITE && __MAP_PRIVATE && __SEEK_SET && (__CRT_HAVE_mmap64 || __CRT_HAVE_mmap || __CRT_HAVE___mmap) && ((__CRT_HAVE_kfstat && __CRT_KOS_PRIMARY) || (__CRT_HAVE_kfstat64 && __CRT_KOS_PRIMARY) || (__CRT_HAVE__fstat64 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__fstat64i32 && __CRT_DOS_PRIMARY && __USE_TIME_BITS64) || (__CRT_HAVE__fstati64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64) || (__CRT_HAVE__fstat32i64 && __CRT_DOS_PRIMARY && !__USE_TIME_BITS64) || (__CRT_HAVE_fstat && __STAT32_MATCHES_STAT64) || __CRT_HAVE_fstat64) && (__CRT_HAVE_lseek64 || __CRT_HAVE__lseeki64 || __CRT_HAVE_llseek || __CRT_HAVE___llseek || __CRT_HAVE_lseek || __CRT_HAVE__lseek || __CRT_HAVE___lseek || __CRT_HAVE___libc_lseek) */
 
 	/* Check if we're to error out if mmap can't be used */
 	if (__flags & __FMAPFILE_MUSTMMAP) {

@@ -272,6 +272,7 @@ void *memcdup([[in(? <= n_bytes)]] void const *__restrict ptr, int needle, size_
 
 [[guard, wunused, ATTR_MALL_DEFAULT_ALIGNED]]
 [[decl_include("<hybrid/typecore.h>")]]
+[[export_alias("__libc_reallocarray")]]
 [[userimpl, requires_function(realloc)]]
 [[impl_include("<hybrid/__overflow.h>")]]
 [[section(".text.crt{|.dos}.heap.rare_helpers")]]

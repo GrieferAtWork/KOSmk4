@@ -577,10 +577,12 @@
 #define __CRT_HAVE___frexp
 #define __CRT_HAVE___frexpf
 #define __CRT_HAVE___frexpl
+#define __CRT_HAVE___fseeko64
 #define __CRT_HAVE___fseterr
 #define __CRT_HAVE___fsetlocking
 #define __CRT_HAVE___fstatfs
 #define __CRT_HAVE___fsync
+#define __CRT_HAVE___ftello64
 #define __CRT_HAVE___ftruncate
 #define __CRT_HAVE___fwritable
 #define __CRT_HAVE___fwriting
@@ -805,6 +807,7 @@
 #define __CRT_HAVE___libc_readdir_r
 #define __CRT_HAVE___libc_readlink
 #define __CRT_HAVE___libc_realloc
+#define __CRT_HAVE___libc_reallocarray
 #define __CRT_HAVE___libc_reboot
 #define __CRT_HAVE___libc_rename
 #define __CRT_HAVE___libc_rewinddir
@@ -1208,6 +1211,7 @@
 #define __CRT_HAVE___sinhf
 #define __CRT_HAVE___sinhl
 #define __CRT_HAVE___sinl
+#define __CRT_HAVE___snprintf
 #define __CRT_HAVE___socket
 #define __CRT_HAVE___socketcall
 #define __CRT_HAVE___solaris_sysinfo
@@ -1327,6 +1331,7 @@
 #define __CRT_HAVE___tsearch
 #define __CRT_HAVE___ttyname
 #define __CRT_HAVE___twalk
+#define __CRT_HAVE___twalk_r
 #define __CRT_HAVE___tzname
 #define __CRT_HAVE___ubsan_handle_builtin_unreachable
 #define __CRT_HAVE___uflow
@@ -6091,6 +6096,7 @@
 #define __CRT_HAVE_tgamma
 #define __CRT_HAVE_tgammaf
 #define __CRT_HAVE_tgammal
+#define __CRT_HAVE_tgkill
 #define __CRT_HAVE_tgsigqueueinfo
 #define __CRT_HAVE_thr_create
 #define __CRT_HAVE_thr_exit

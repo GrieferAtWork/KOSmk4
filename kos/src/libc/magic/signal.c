@@ -1500,6 +1500,9 @@ $sighandler_t sysv_signal($signo_t signo, $sighandler_t handler) {
 	    oact.@sa_handler@ = @__SIG_ERR@;
 	return oact.@sa_handler@;
 }
+
+[[decl_include("<bits/types.h>")]]
+int tgkill($pid_t pid, $pid_t tid, $signo_t signo);
 %#endif /* __USE_GNU */
 
 
@@ -2074,7 +2077,7 @@ int signandset([[out]] $sigset_t *set,
 int sigwaitinfo([[in]] $sigset_t const *__restrict set,
                 [[out_opt]] siginfo_t *__restrict info);
 
-[[cp, ignore, nocrt, alias("sigtimedwait"), doc_alias("sigtimedwait")]]
+[[cp, ignore, nocrt, alias("sigtimedwait", "__sigtimedwait"), doc_alias("sigtimedwait")]]
 [[decl_include("<bits/os/siginfo.h>", "<bits/os/sigset.h>", "<bits/os/timespec.h>")]]
 int sigtimedwait32([[in]] $sigset_t const *__restrict set,
                    [[out_opt]] siginfo_t *__restrict info,
@@ -2088,7 +2091,7 @@ int sigtimedwait32([[in]] $sigset_t const *__restrict set,
 @@@return: -1: [errno=EINTR]  The signal handler for `signo' was executed.
 @@@return: -1: [errno=EAGAIN] A total of `rel_timeout' has passed.
 [[cp, decl_include("<bits/os/siginfo.h>", "<bits/os/timespec.h>"), no_crt_self_import]]
-[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sigtimedwait")]]
+[[if($extended_include_prefix("<features.h>", "<bits/types.h>")!defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sigtimedwait", "__sigtimedwait")]]
 [[if($extended_include_prefix("<features.h>", "<bits/types.h>") defined(__USE_TIME_BITS64) || __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), alias("sigtimedwait64")]]
 [[userimpl, requires($has_function(sigtimedwait32) || $has_function(sigtimedwait64))]]
 int sigtimedwait([[in]] $sigset_t const *__restrict set,
@@ -2132,6 +2135,7 @@ int sigqueue($pid_t pid, $signo_t signo, union sigval const val);
 %#ifdef __USE_TIME64
 
 [[preferred_time64_variant_of(sigtimedwait), doc_alias("sigtimedwait")]]
+[[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__sigtimedwait")]]
 [[cp, userimpl, requires_function(sigtimedwait32)]]
 [[decl_include("<bits/os/siginfo.h>", "<bits/os/timespec.h>")]]
 int sigtimedwait64([[in]] $sigset_t const *__restrict set,
