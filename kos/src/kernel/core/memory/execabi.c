@@ -181,7 +181,8 @@ again:
 	FINALLY_DECREF(old_abis);
 	if (abi_count == 0)
 		return false; /* No ABIs defined by this driver. */
-	new_abis = (REF struct execabis_struct *)kmalloc((old_abis->eas_count - abi_count) *
+	new_abis = (REF struct execabis_struct *)kmalloc(offsetof(struct execabis_struct, eas_abis) +
+	                                                 (old_abis->eas_count - abi_count) *
 	                                                 sizeof(struct execabi),
 	                                                 GFP_NORMAL);
 	new_abis->eas_refcnt = 1;
