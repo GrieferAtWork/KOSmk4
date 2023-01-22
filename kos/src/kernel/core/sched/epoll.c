@@ -1234,9 +1234,13 @@ again_acquire:
 			canceled_rpc = ATOMIC_XCH(newmon->ehm_rpc, NULL);
 			sig_multicompletion_disconnectall(&newmon->ehm_comp);
 			if (canceled_rpc) {
+				/* Remove the monitor from the epoll controller. */
+				epoll_controller_intern_delmon_and_maybe_rehash(self, newmon);
 				sig_multicompletion_fini(&newmon->ehm_comp);
 				(*handle_type_db.h_weakdecref[newmon->ehm_handtyp])(newmon->ehm_handptr);
 				kfree(newmon);
+
+				/* Trigger the RPC */
 				epoll_rpc_trigger(canceled_rpc);
 			}
 		}
