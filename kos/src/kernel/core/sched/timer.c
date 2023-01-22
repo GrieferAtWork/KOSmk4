@@ -615,7 +615,7 @@ timerfd_async_work(struct async *__restrict self) {
 	 *       making calls to `async_start()', but that `ao_work's return value simply
 	 *       ends up being ignored in this case. */
 	FINALLY_DECREF_UNLIKELY(me);
-	sig_broadcast(&me->tfd_timer.t_changed);
+	sig_broadcast(&me->tfd_elapse);
 	return ASYNC_FINISHED;
 }
 
@@ -643,6 +643,7 @@ PRIVATE struct async_ops const timerfd_async_ops = {
 /* Destroy a given `struct timerfd' */
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(FCALL timerfd_destroy)(struct timerfd *__restrict self) {
+	sig_broadcast_for_fini(&self->tfd_elapse);
 	timer_fini(&self->tfd_timer);
 	/* If allocated, halt a linked async job. */
 	if (self->tfd_async != NULL)
@@ -672,6 +673,7 @@ timerfd_create(clockid_t clockid)
 	assert(result->tfd_async == NULL);
 	assert(result->tfd_xover == 0);
 	result->tfd_refcnt = 1;
+	sig_cinit(&result->tfd_elapse);
 	return result;
 }
 
@@ -851,7 +853,7 @@ INTERN BLOCKING NONNULL((1)) void KCALL
 handle_timerfd_pollconnect(struct timerfd *__restrict self,
                            poll_mode_t what) THROWS(...) {
 	if (what & POLLINMASK) {
-		task_connect(&self->tfd_timer.t_changed);
+		task_connect(&self->tfd_elapse);
 		if (!timerfd_haselapsed(self))
 			timerfd_start_async_timeout_notifier(self);
 	}

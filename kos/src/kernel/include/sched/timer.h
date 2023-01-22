@@ -359,11 +359,12 @@ struct timerfd {
 	struct timer              tfd_timer;  /* Underlying timer. */
 	uint64_t                  tfd_xover;  /* [lock(tfd_timer.t_lock)] Extra timer overrun (for `TFD_IOC_SET_TICKS') */
 	WEAK refcnt_t             tfd_refcnt; /* Reference counter. */
-	REF struct timerfd_async *tfd_async;  /* [0..1][lock(WRITE_ONCE)] Timeout handler  async-job (start to  broadcast
-	                                       * `tfd_timer.t_changed' during the next timer  overrun). We need an  extra
-	                                       * async  job to do  this (and can't just  use some general-purpose timeout
-	                                       * system, since there needs to be a way to use timerfd with `sys/epoll.h',
-	                                       * which cannot be implemented via  timeouts, but only via actual  signals) */
+	struct sig                tfd_elapse; /* Signal broadcast by `tfd_async' upon timer overrun. */
+	REF struct timerfd_async *tfd_async;  /* [0..1][lock(WRITE_ONCE)]  Timeout handler async-job (start to broadcast
+	                                       * `tfd_elapse' during the next timer overrun). We need an extra async job
+	                                       * to do this  (and can't  just use some  general-purpose timeout  system,
+	                                       * since there needs to be a way to use timerfd with `sys/epoll.h',  which
+	                                       * cannot be implemented via timeouts, but only via actual signals) */
 };
 
 FUNDEF NOBLOCK void NONNULL((1))
