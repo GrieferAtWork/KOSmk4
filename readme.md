@@ -493,7 +493,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 - Libc:
 	- Try to maintain header (API) compatibility with GLIBc, MSVC and CYGWIN
 	- Try to maintain binary (ABI) compatibility with GLIBc and MSVC (CYGWIN only as far as that is possible)
-- KOS-specific, object-related kernel function can be exported as `MYOBJ_IOC_COMMAND` ioctls from files in `/kos/include/kos/ioctl/`
+- KOS-specific, object-related kernel functions can be exported as `MYOBJ_IOC_COMMAND` ioctls from files in `/kos/include/kos/ioctl/`
 
 
 
@@ -518,8 +518,8 @@ Requirements:
 		- `mpfr`, `gmp`, `mpclib` (needed for building gcc)
 		- `patch` (for patching 3rd party packages to better understand KOS)
 		- `gdb` (if you wish to debug KOS)
-- On linux: Everything work out of the box, but here's some hints:
-	- You'll still need all of the same utilities listed for above under *Cygwin*
+- On linux: Everything should work out of the box, but here's some hints:
+	- You'll still need all of the same utilities listed above under *Cygwin*
 	- To install `mpfr` / `gmp` / `mpclib` (as needed for building gcc), I had to do:  
 	  ```sh
 	  apt-get install libmpc-dev
