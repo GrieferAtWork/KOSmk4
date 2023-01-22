@@ -522,7 +522,7 @@ again:
 PRIVATE NOBLOCK ATTR_PURE WUNUSED NONNULL((2)) bool
 NOTHROW(FCALL is_connection_in_chain)(struct task_connection *chain,
                                       struct task_connection *con) {
-	for (; chain; chain = chain->tc_signext) {
+	for (; chain; chain = chain->tc_connext) {
 		if (chain == con)
 			return true;
 	}
