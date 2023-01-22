@@ -494,7 +494,7 @@ again_rd_stat:
 	st = ATOMIC_READ(job->a_stat);
 	if unlikely(st != _ASYNC_ST_TRIGGERED) {
 		struct aio_handle *aio;
-		assert(st == _ASYNC_ST_TRIGGERED_STOP);
+		assertf(st == _ASYNC_ST_TRIGGERED_STOP, "st = %u", st);
 /*do_handle_triggered_stop:*/
 		aio = ATOMIC_XCH(job->a_aio, NULL);
 		if (aio) {
@@ -553,7 +553,12 @@ again_do_work:
 	TRY {
 		unsigned int status;
 		/* Do the work! */
-		status = (*job->a_ops->ao_work)(job);
+		if ((*job->a_ops->ao_test)(job)) {
+again_do_work_after_test:
+			status = (*job->a_ops->ao_work)(job);
+		} else {
+			status = ASYNC_RESUME;
+		}
 		assert(status == ASYNC_RESUME ||
 		       status == ASYNC_FINISHED ||
 		       status == ASYNC_CANCEL);
@@ -615,7 +620,7 @@ again_rd_stat_after_work:
 			 * check  once again  if there is  more work left  to be done. */
 			if ((*job->a_ops->ao_test)(job)) {
 				sig_multicompletion_disconnectall(&job->a_comp);
-				goto again_do_work;
+				goto again_do_work_after_test;
 			}
 
 			if (timeout != KTIME_INFINITE) {
