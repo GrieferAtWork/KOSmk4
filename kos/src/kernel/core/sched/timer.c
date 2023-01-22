@@ -667,6 +667,7 @@ timerfd_create(clockid_t clockid)
 	}
 	assert(result->tfd_async == NULL);
 	assert(result->tfd_xover == 0);
+	result->tfd_refcnt = 1;
 	return result;
 }
 
