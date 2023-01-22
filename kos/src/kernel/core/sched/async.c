@@ -1039,7 +1039,7 @@ do_async_cancel:
 					 * This way, we don't need one of the async workers to do anything for us! */
 					if (!ATOMIC_CMPXCH_WEAK(self->a_stat,
 					                        _ASYNC_ST_READY_TMO,
-					                        _ASYNC_ST_INIT_STOP)) {
+					                        _ASYNC_ST_TRIGGERED_STOP)) {
 						async_all_release_f();
 						_async_tmo_release();
 						async_all_reap();
