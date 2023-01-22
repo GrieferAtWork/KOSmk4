@@ -613,15 +613,17 @@ again_rd_stat_after_work:
 
 			/* Now that we're interlocked with the job's connect callback,
 			 * check  once again  if there is  more work left  to be done. */
-			if ((*job->a_ops->ao_test)(job))
+			if ((*job->a_ops->ao_test)(job)) {
+				sig_multicompletion_disconnectall(&job->a_comp);
 				goto again_do_work;
+			}
 
 			if (timeout != KTIME_INFINITE) {
 				job->a_tmo = timeout;
 				async_tmo_acquire();
 				if (!ATOMIC_CMPXCH(job->a_stat, st, _ASYNC_ST_READY_TMO)) {
 					async_tmo_release();
-					goto again_rd_stat_after_work;
+					goto disconnect_and_again_rd_stat_after_work;
 				}
 
 				/* Insert `job' into the async-tmo-queue at the correct position. */
@@ -634,8 +636,11 @@ again_rd_stat_after_work:
 			}
 
 			/* Switch back to ready-mode */
-			if (!ATOMIC_CMPXCH(job->a_stat, st, _ASYNC_ST_READY))
+			if (!ATOMIC_CMPXCH(job->a_stat, st, _ASYNC_ST_READY)) {
+disconnect_and_again_rd_stat_after_work:
+				sig_multicompletion_disconnectall(&job->a_comp);
 				goto again_rd_stat_after_work;
+			}
 		} else {
 			/* Don't  directly handle TRIGGERED_STOP. - `async_cancel()' will have
 			 * added the job to the ready-list,  and if we immediately handle  the
