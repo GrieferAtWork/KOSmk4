@@ -326,6 +326,8 @@ NOTHROW(FCALL timer_getoverrun_locked)(struct timer const *__restrict self,
 	assert(timer_reading(self));
 	if (*now < self->t_expire)
 		return 0; /* Not yet expired. */
+	if (!timer_isarmed(self))
+		return 0; /* Special case: not armed. */
 	if (!timer_hasinterval(self))
 		return 1;
 	time_since_expired = *now - self->t_expire;
@@ -366,6 +368,8 @@ NOTHROW(FCALL timer_takeoverrun_locked)(struct timer *__restrict self,
 	assert(timer_writing(self));
 	if (*now < self->t_expire)
 		return 0; /* Not yet expired. */
+	if (!timer_isarmed(self))
+		return 0; /* Special case: not armed. */
 	if (!timer_hasinterval(self)) {
 		/* Non-interval timers are disarmed when they expire. */
 		timer_disarm(self);

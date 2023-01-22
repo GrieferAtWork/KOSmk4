@@ -282,7 +282,8 @@ NOTHROW(FCALL timer_getoverrun_locked)(struct timer const *__restrict self,
 
 /* Check if the timer has elapsed (more efficient alternative
  * to `timer_getoverrun_locked(self) > 0') */
-#define timer_haselapsed_locked(self, now) (*(now) >= (self)->t_expire)
+#define timer_haselapsed_locked(self, now) \
+	(*(now) >= (self)->t_expire && timer_isarmed(self))
 FUNDEF WUNUSED NONNULL((1)) __BOOL FCALL
 timer_haselapsed(struct timer *__restrict self)
 		THROWS(E_WOULDBLOCK);
