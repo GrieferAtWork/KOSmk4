@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55c3872c */
+/* HASH CRC-32:0x974afec3 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -932,7 +932,7 @@ NOTHROW_NCX(LIBCCALL libc_sigstack)(struct sigstack const *ss,
 	return result;
 }
 INTERN ATTR_SECTION(".text.crt.sched.signal") int
-NOTHROW_NCX(LIBCCALL libc_set_single_signal_masked)(int sig,
+NOTHROW_NCX(LIBCCALL libc_set_single_signal_masked)(signo_t sig,
                                                     int how) {
 	sigset_t set;
 	libc_sigemptyset(&set);
@@ -1093,7 +1093,7 @@ NOTHROW_NCX(LIBCCALL libc_sig2str)(signo_t signo,
 	}
 
 	if (signo >= __SIGRTMIN && signo <= __SIGRTMAX) {
-		/* Realtime . */
+		/* Realtime signal. */
 		libc_sprintf(buf, "RTMIN+%u", (unsigned int)(signo - __SIGRTMIN));
 		return 0;
 	}

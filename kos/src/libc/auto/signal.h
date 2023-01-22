@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bcd154e */
+/* HASH CRC-32:0x327d7bb1 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -453,7 +453,7 @@ INTDEF ATTR_IN_OPT(1) ATTR_OUT_OPT(2) int NOTHROW_NCX(LIBCCALL libc_sigstack)(st
 INTDEF ATTR_IN_OPT(1) ATTR_OUT_OPT(2) int NOTHROW_NCX(LIBDCALL libd_sigaltstack)(struct sigaltstack const *ss, struct sigaltstack *oss);
 #endif /* !__LIBCCALL_IS_LIBDCALL && !__KERNEL__ */
 #ifndef __KERNEL__
-INTDEF int NOTHROW_NCX(LIBCCALL libc_set_single_signal_masked)(int sig, int how);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_set_single_signal_masked)(signo_t sig, int how);
 #endif /* !__KERNEL__ */
 #if !defined(__LIBCCALL_IS_LIBDCALL) && !defined(__KERNEL__)
 /* >> sighold(3)

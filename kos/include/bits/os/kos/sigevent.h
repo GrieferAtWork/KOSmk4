@@ -29,6 +29,7 @@
  *    - #define __SIGEV_PAD_SIZE ...
  */
 
+#include <__crt.h>
 #include <__stdinc.h>
 #include <features.h> /* __USE_KOS_ALTERATIONS */
 

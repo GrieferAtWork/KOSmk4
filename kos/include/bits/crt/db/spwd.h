@@ -29,14 +29,14 @@ __DECL_BEGIN
 
 /* Structure of the password file. */
 struct spwd {
-	char             *sp_namp;    /* Login name. */
-	char             *sp_pwdp;    /* Encrypted password. */
-	__LONGPTR_TYPE__  sp_lstchg;  /* Date of last change. */
-	__LONGPTR_TYPE__  sp_min;     /* Minimum number of days between changes. */
-	__LONGPTR_TYPE__  sp_max;     /* Maximum number of days between changes. */
-	__LONGPTR_TYPE__  sp_warn;    /* Number of days to warn user to change the password. */
-	__LONGPTR_TYPE__  sp_inact;   /* Number of days the account may be inactive. */
-	__LONGPTR_TYPE__  sp_expire;  /* Number of days since 1970-01-01 until account expires. */
+	char             *sp_namp;    /* [1..1] Login name. */
+	char             *sp_pwdp;    /* [1..1] Encrypted password. */
+	__LONGPTR_TYPE__  sp_lstchg;  /* # of days since 1970-01-01 of lass password change. */
+	__LONGPTR_TYPE__  sp_min;     /* # of days that must have passed before password may be changed. */
+	__LONGPTR_TYPE__  sp_max;     /* # of days that must have passed before password must be changed. */
+	__LONGPTR_TYPE__  sp_warn;    /* # of days where user is given a warning of impending password force-change before `sp_max' */
+	__LONGPTR_TYPE__  sp_inact;   /* # of extra days after `sp_max' before the account becomes disabled */
+	__LONGPTR_TYPE__  sp_expire;  /* # of days since 1970-01-01 for date when account becomes disabled */
 	__ULONGPTR_TYPE__ sp_flag;    /* Reserved. */
 };
 

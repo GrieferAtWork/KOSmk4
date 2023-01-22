@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4df2b577 */
+/* HASH CRC-32:0x9f2f1f67 */
 /* Copyright (c) 2019-2023 Griefer@Work                                       *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,12 +22,12 @@
 #define __local_set_single_signal_masked_defined
 #include <__crt.h>
 #if defined(__CRT_HAVE_sigprocmask) || defined(__CRT_HAVE___sigprocmask) || defined(__CRT_HAVE___libc_sigprocmask) || defined(__CRT_HAVE_pthread_sigmask) || defined(__CRT_HAVE_thr_sigsetmask)
+#include <bits/types.h>
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __local___localdep_sigaddset_defined
 #define __local___localdep_sigaddset_defined
 #ifdef __CRT_HAVE_sigaddset
 __NAMESPACE_LOCAL_END
-#include <bits/types.h>
 #include <bits/os/sigset.h>
 #include <libc/errno.h>
 #include <asm/os/signal.h>
@@ -66,7 +66,6 @@ __NAMESPACE_LOCAL_BEGIN
 __CEIREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,__localdep_sigaddset,(struct __sigset_struct *__set, __signo_t __signo),sigaddset,{ __ULONGPTR_TYPE__ __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] |= __mask; return 0; })
 #elif defined(__CRT_HAVE___sigaddset)
 __NAMESPACE_LOCAL_END
-#include <bits/types.h>
 #include <bits/os/sigset.h>
 #include <libc/errno.h>
 #include <asm/os/signal.h>
@@ -105,7 +104,6 @@ __NAMESPACE_LOCAL_BEGIN
 __CEIREDIRECT(__ATTR_INOUT(1),int,__NOTHROW_NCX,__localdep_sigaddset,(struct __sigset_struct *__set, __signo_t __signo),__sigaddset,{ __ULONGPTR_TYPE__ __mask, __word; __PRIVATE_SIGSET_VALIDATE_SIGNO(__signo) __mask = __sigset_mask(__signo); __word = __sigset_word(__signo); __set->__val[__word] |= __mask; return 0; })
 #else /* ... */
 __NAMESPACE_LOCAL_END
-#include <bits/types.h>
 #include <bits/os/sigset.h>
 #include <libc/errno.h>
 #include <asm/os/signal.h>
@@ -195,7 +193,7 @@ __CREDIRECT(__ATTR_IN_OPT(2) __ATTR_OUT_OPT(3),int,__NOTHROW_NCX,__localdep_sigp
 #endif /* !... */
 #endif /* !__local___localdep_sigprocmask_defined */
 __LOCAL_LIBC(set_single_signal_masked) int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(set_single_signal_masked))(int __sig, int __how) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(set_single_signal_masked))(__signo_t __sig, int __how) {
 	struct __sigset_struct __set;
 	(__NAMESPACE_LOCAL_SYM __localdep_sigemptyset)(&__set);
 	(__NAMESPACE_LOCAL_SYM __localdep_sigaddset)(&__set, __sig);

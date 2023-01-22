@@ -1375,7 +1375,7 @@ typedef __sighandler_t sig_t;
 }
 
 
-/* NOTE: We can only leave our the `!= 0' check in `sigismember()',
+/* NOTE: We can only leave out the `!= 0' check in `sigismember()',
  *       and do `return sigset->word & mask',  when doing so  can't
  *       cause the value to be  truncated to zero. The later  would
  *       happen in the above when `mask > UINT_MAX', in which  case
@@ -2134,10 +2134,10 @@ int sigqueue($pid_t pid, $signo_t signo, union sigval const val);
 
 %#ifdef __USE_TIME64
 
+[[decl_include("<bits/os/siginfo.h>", "<bits/os/timespec.h>")]]
 [[preferred_time64_variant_of(sigtimedwait), doc_alias("sigtimedwait")]]
 [[if($extended_include_prefix("<bits/types.h>")__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__), preferred_alias("__sigtimedwait")]]
 [[cp, userimpl, requires_function(sigtimedwait32)]]
-[[decl_include("<bits/os/siginfo.h>", "<bits/os/timespec.h>")]]
 int sigtimedwait64([[in]] $sigset_t const *__restrict set,
                    [[out_opt]] siginfo_t *__restrict info,
                    [[in_opt]] struct timespec64 const *rel_timeout) {
@@ -2206,7 +2206,8 @@ int tgsigqueueinfo($pid_t pid, $pid_t tid, $signo_t signo,
 @@@return: -1:   [errno=EINVAL] The given `signo' is invalid
 @@@return: -1:   [errno=EPERM]  The caller does not have permission to send signals to `pgrp'
 @@@return: -1:   [errno=ESRCH]  No process group is identified by `pgrp'
-[[decl_include("<bits/types.h>"), requires_function(kill)]]
+[[decl_include("<bits/types.h>")]]
+[[requires_function(kill)]]
 int killpg($pid_t pgrp, $signo_t signo) {
 	return kill(-pgrp, signo);
 }
@@ -2233,12 +2234,10 @@ void psignal($signo_t signo, [[nullable]] char const *s) {
 
 @@>> psiginfo(3)
 @@Similar to `psignal(3)', but instead print extended signal information from `*pinfo'
-[[decl_include("<bits/os/siginfo.h>")]]
-[[impl_include("<asm/os/signal.h>")]]
-[[impl_include("<bits/crt/inttypes.h>")]]
-[[impl_include("<bits/types.h>")]]
-[[guard, requires_include("<libc/template/stdstreams.h>")]]
+[[guard, decl_include("<bits/os/siginfo.h>")]]
+[[requires_include("<libc/template/stdstreams.h>")]]
 [[requires(defined(__LOCAL_stderr) && $has_function(fprintf))]]
+[[impl_include("<asm/os/signal.h>", "<bits/crt/inttypes.h>", "<bits/types.h>")]]
 void psiginfo([[in]] siginfo_t const *pinfo,
               [[in_opt]] char const *s) {
 	char const *text;
@@ -2860,10 +2859,10 @@ int siginterrupt($signo_t signo, __STDC_INT_AS_UINT_T interrupt);
 @@@return: 0:  Success
 @@@return: -1: Error (s.a. `errno')
 [[decl_include("<bits/os/sigstack.h>")]]
-[[impl_include("<asm/os/signal.h>", "<bits/os/sigstack.h>")]]
 [[requires_include("<asm/os/signal.h>")]]
 [[requires(defined(@__SS_ONSTACK@) && defined(@__SS_DISABLE@) &&
            $has_function(sigaltstack))]]
+[[impl_include("<asm/os/signal.h>", "<bits/os/sigstack.h>")]]
 int sigstack([[in_opt]] struct sigstack const *ss,
              [[out_opt]] struct sigstack *oss) {
 	struct @sigaltstack@ ass, aoss;
@@ -2899,8 +2898,9 @@ int sigaltstack([[in_opt]] struct sigaltstack const *ss,
 %
 %#ifdef __USE_XOPEN_EXTENDED
 
+[[decl_include("<bits/types.h>")]]
 [[static, requires_function(sigprocmask)]]
-int set_single_signal_masked(int sig, int how) {
+int set_single_signal_masked($signo_t sig, int how) {
 	sigset_t set;
 	sigemptyset(&set);
 	sigaddset(&set, sig);
@@ -2913,9 +2913,10 @@ int set_single_signal_masked(int sig, int how) {
 @@as `sigprocmask(SIG_BLOCK, MASKFOR(signo), NULL)'
 @@@return: 0:  Success
 @@@return: -1: Error (s.a. `errno')
-[[decl_include("<bits/types.h>"), impl_include("<asm/os/signal.h>")]]
+[[decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/signal.h>")]]
 [[requires(defined(@__SIG_BLOCK@) && $has_function(set_single_signal_masked))]]
+[[impl_include("<asm/os/signal.h>")]]
 int sighold($signo_t signo) {
 	return set_single_signal_masked(signo, @__SIG_BLOCK@);
 }
@@ -2925,9 +2926,10 @@ int sighold($signo_t signo) {
 @@as `sigprocmask(SIG_UNBLOCK, MASKFOR(signo), NULL)'
 @@@return: 0:  Success
 @@@return: -1: Error (s.a. `errno')
-[[decl_include("<bits/types.h>"), impl_include("<asm/os/signal.h>")]]
+[[decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/signal.h>")]]
 [[requires(defined(@__SIG_UNBLOCK@) && $has_function(set_single_signal_masked))]]
+[[impl_include("<asm/os/signal.h>")]]
 int sigrelse($signo_t signo) {
 	return set_single_signal_masked(signo, @__SIG_UNBLOCK@);
 }
@@ -2936,10 +2938,11 @@ int sigrelse($signo_t signo) {
 @@Change the disposition of `signo' to `SIG_IGN' using `bsd_signal(3)'
 @@@return: 0:  Success
 @@@return: -1: Error (s.a. `errno')
-[[decl_include("<bits/types.h>"), impl_include("<asm/os/signal.h>")]]
+[[decl_include("<bits/types.h>")]]
 [[requires_include("<asm/os/signal.h>")]]
 [[requires(defined(@__SIG_IGN@) && defined(@__SIG_ERR@) &&
            $has_function(bsd_signal))]]
+[[impl_include("<asm/os/signal.h>")]]
 int sigignore($signo_t signo) {
 	return bsd_signal(signo, (sighandler_t)@__SIG_IGN@) == (sighandler_t)@__SIG_ERR@ ? -1 : 0;
 }
@@ -2949,11 +2952,12 @@ int sigignore($signo_t signo) {
 @@the calling threads's signal mask when `disp == SIG_HOLD'
 @@@return: 0:  Success
 @@@return: -1: Error (s.a. `errno')
-[[impl_include("<libc/errno.h>", "<asm/os/signal.h>", "<bits/os/sigaction.h>")]]
-[[requires_include("<asm/os/signal.h>"), decl_include("<bits/types.h>")]]
+[[decl_include("<bits/types.h>")]]
+[[requires_include("<asm/os/signal.h>")]]
 [[requires(defined(@__SIG_ERR@) && defined(@__SIG_HOLD@) &&
            defined(@__SIG_BLOCK@) && $has_function(sigprocmask) &&
            $has_function(sigaction))]]
+[[impl_include("<libc/errno.h>", "<asm/os/signal.h>", "<bits/os/sigaction.h>")]]
 $sighandler_t sigset($signo_t signo, $sighandler_t disp) {
 	struct @sigaction@ act, oact;
 	sigset_t set, oset;
@@ -3123,8 +3127,9 @@ DEFINE___PRIVATE_SIGSET_VALIDATE_SIGNO
 @@the given `name', and the  signal's actual name. When  `name'
 @@isn't recognized, return `0' instead.
 @@This function also handles stuff like "SIGRTMIN+1" or "9"
-[[pure, wunused, impl_include("<asm/os/signal.h>")]]
+[[pure, wunused]]
 [[decl_include("<bits/types.h>")]]
+[[impl_include("<asm/os/signal.h>")]]
 $signo_t signalnumber([[in]] const char *name) {
 	$signo_t result;
 
@@ -3183,8 +3188,9 @@ return_rt_signal:
 @@Return the next-greater signal number that comes after `signo'
 @@When  no such signal number exists, return `0'. When the given
 @@`signo' is `0', return the lowest valid signal number.
-[[const, wunused, impl_include("<asm/os/signal.h>")]]
+[[const, wunused]]
 [[decl_include("<bits/types.h>")]]
+[[impl_include("<asm/os/signal.h>")]]
 $signo_t signalnext($signo_t signo) {
 	if (signo >= (__NSIG - 1))
 		return 0;
@@ -3202,8 +3208,8 @@ $signo_t signalnext($signo_t signo) {
 @@Wrapper around  `sigabbrev_np(3)', that  also adds  additional
 @@handling for `SIGRTMIN...`SIGRTMAX' signals, which are encoded
 @@in a way that is compatible with `str2sig(3)'.
-[[requires_function(sigabbrev_np)]]
 [[decl_include("<bits/types.h>")]]
+[[requires_function(sigabbrev_np)]]
 [[impl_include("<asm/os/signal.h>")]]
 [[section(".text.crt{|.dos}.solaris")]]
 int sig2str($signo_t signo, [[out]] char buf[SIG2STR_MAX]) {
@@ -3215,7 +3221,7 @@ int sig2str($signo_t signo, [[out]] char buf[SIG2STR_MAX]) {
 	}
 @@pp_if defined(__SIGRTMIN) && defined(__SIGRTMAX)@@
 	if (signo >= __SIGRTMIN && signo <= __SIGRTMAX) {
-		/* Realtime . */
+		/* Realtime signal. */
 		sprintf(buf, "RTMIN+%u", (unsigned int)(signo - __SIGRTMIN));
 		return 0;
 	}
