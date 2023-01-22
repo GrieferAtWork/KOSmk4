@@ -101,9 +101,9 @@ struct timespecx64 /*[PREFIX(tv_)]*/ {
 #else /* __USE_KOS_ALTERATIONS */
 	__INT64_TYPE__  tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
 #endif /* !__USE_KOS_ALTERATIONS */
-	__TIMESPEC_CXX_SUPPORT(struct timespecx64, __INT64_TYPE__, __UINT64_TYPE__)
+	__TIMESPEC_CXX_SUPPORT(8, struct timespecx64, __INT64_TYPE__, __UINT64_TYPE__)
 };
-__TIMESPEC_CXX_SUPPORT2(struct timespecx64, __INT64_TYPE__, __UINT64_TYPE__)
+__TIMESPEC_CXX_SUPPORT2(8, struct timespecx64, __INT64_TYPE__, __UINT64_TYPE__)
 
 #ifdef __timespecx64_alt
 struct __timespecx64_alt {
@@ -113,9 +113,9 @@ struct __timespecx64_alt {
 #else /* __USE_KOS_ALTERATIONS */
 	__INT64_TYPE__  tv_nsec;  /* Nano seconds (< 1000000000 == 1_000_000_000) */
 #endif /* !__USE_KOS_ALTERATIONS */
-	__TIMESPEC_CXX_SUPPORT(struct __timespecx64_alt, __INT64_TYPE__, __UINT64_TYPE__)
+	__TIMESPEC_CXX_SUPPORT(8, struct __timespecx64_alt, __INT64_TYPE__, __UINT64_TYPE__)
 };
-__TIMESPEC_CXX_SUPPORT2(struct __timespecx64_alt, __INT64_TYPE__, __UINT64_TYPE__)
+__TIMESPEC_CXX_SUPPORT2(8, struct __timespecx64_alt, __INT64_TYPE__, __UINT64_TYPE__)
 #undef __timespecx64_alt
 #endif /* __timespecx64_alt */
 

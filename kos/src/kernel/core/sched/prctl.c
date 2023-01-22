@@ -163,7 +163,7 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 		if ((syscall_slong_t)arg2 < CAP_FIRST_CAP ||
 		    (syscall_slong_t)arg2 > CAP_LAST_CAP) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_BADCAP,
+			      E_INVALID_ARGUMENT_CONTEXT_BAD_CAP,
 			      (syscall_slong_t)arg2);
 		}
 		return credcap_capable(&mycred->c_cap_bounding, (syscall_slong_t)arg2) ? 1 : 0;
@@ -175,7 +175,7 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 		if ((syscall_slong_t)arg2 < CAP_FIRST_CAP ||
 		    (syscall_slong_t)arg2 > CAP_LAST_CAP) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_BADCAP,
+			      E_INVALID_ARGUMENT_CONTEXT_BAD_CAP,
 			      (syscall_slong_t)arg2);
 		}
 		cred_write(mycred);
@@ -333,7 +333,7 @@ DEFINE_SYSCALL5(syscall_slong_t, prctl, unsigned int, command,
 		if ((syscall_slong_t)arg3 < CAP_FIRST_CAP ||
 		    (syscall_slong_t)arg3 > CAP_LAST_CAP) {
 			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_BADCAP,
+			      E_INVALID_ARGUMENT_CONTEXT_BAD_CAP,
 			      (syscall_slong_t)arg3);
 		}
 		switch (arg2) {

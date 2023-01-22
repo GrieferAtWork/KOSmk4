@@ -40,7 +40,7 @@
 
 #define __TIMEVAL_CXX_DECL_BEGIN extern "C++" {
 #define __TIMEVAL_CXX_DECL_END }
-#define __TIMEVAL_CXX_SUPPORT(T, TV_SEC_TYPE, TV_USEC_TYPE)                \
+#define __TIMEVAL_CXX_SUPPORT(SIZEOF_T, T, TV_SEC_TYPE, TV_USEC_TYPE)      \
 	/* Add microseconds (1/1_000_000 seconds) */                           \
 	__CXX_CLASSMEMBER __NOBLOCK void                                       \
 	(add_microseconds)(TV_USEC_TYPE __n) __CXX_NOEXCEPT {                  \
@@ -170,16 +170,16 @@
 		        (tv_sec == __other.tv_sec && tv_usec >= __other.tv_usec)); \
 	}
 
-#define __TIMEVAL_CXX_SUPPORT2(T, TV_SEC_TYPE, TV_USEC_TYPE)    \
-	__CXX_CLASSMEMBER __NOBLOCK T                               \
-	operator*(unsigned int __n, T const &__tmv)__CXX_NOEXCEPT { \
-		return __tmv * __n;                                     \
+#define __TIMEVAL_CXX_SUPPORT2(SIZEOF_T, T, TV_SEC_TYPE, TV_USEC_TYPE) \
+	__CXX_CLASSMEMBER __NOBLOCK T                                      \
+	operator*(unsigned int __n, T const &__tmv)__CXX_NOEXCEPT {        \
+		return __tmv * __n;                                            \
 	}
 #else /* __cplusplus && __USE_KOS */
-#define __TIMEVAL_CXX_DECL_BEGIN                             /* nothing */
-#define __TIMEVAL_CXX_DECL_END                               /* nothing */
-#define __TIMEVAL_CXX_SUPPORT(T, TV_SEC_TYPE, TV_USEC_TYPE)  /* nothing */
-#define __TIMEVAL_CXX_SUPPORT2(T, TV_SEC_TYPE, TV_USEC_TYPE) /* nothing */
+#define __TIMEVAL_CXX_DECL_BEGIN                                       /* nothing */
+#define __TIMEVAL_CXX_DECL_END                                         /* nothing */
+#define __TIMEVAL_CXX_SUPPORT(SIZEOF_T, T, TV_SEC_TYPE, TV_USEC_TYPE)  /* nothing */
+#define __TIMEVAL_CXX_SUPPORT2(SIZEOF_T, T, TV_SEC_TYPE, TV_USEC_TYPE) /* nothing */
 #endif /* !__cplusplus || !__USE_KOS */
 
 #endif /* !_PARTS_TIMEVAL_CXX_SUPPORT_H */

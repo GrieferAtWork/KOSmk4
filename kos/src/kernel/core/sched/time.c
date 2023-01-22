@@ -599,8 +599,8 @@ serve_and_yield:
 	}	break;
 
 	default:
-		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-		      E_INVALID_ARGUMENT_CONTEXT_CLOCK_GET_CLOCKID,
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_BAD_CLOCKID,
 		      clockid);
 		break;
 	}
@@ -632,8 +632,8 @@ sys_clock_getres_impl(clockid_t clockid,
 		break;
 
 	default:
-		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-		      E_INVALID_ARGUMENT_CONTEXT_CLOCK_GET_CLOCKID,
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_BAD_CLOCKID,
 		      clockid);
 		break;
 	}
@@ -824,8 +824,8 @@ sys_clock_nanosleep_impl(clockid_t clockid, syscall_ulong_t flags,
 	//TODO: case CLOCK_PROCESS_CPUTIME_ID:
 
 	default:
-		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-		      E_INVALID_ARGUMENT_CONTEXT_CLOCK_NANOSLEEP_CLOCKID,
+		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+		      E_INVALID_ARGUMENT_CONTEXT_BAD_CLOCKID,
 		      clockid);
 		break;
 	}

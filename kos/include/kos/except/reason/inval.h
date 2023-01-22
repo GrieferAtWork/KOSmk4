@@ -187,9 +187,10 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS,         /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `getrandom(2)' isn't a set of `GRND_NONBLOCK | GRND_RANDOM' */
 	E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_RESOURCE,        /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown/unsupported `resource' argument passed to `prlimit64(2)', `getrlimit(2)' or `setrlimit(2)' */
 	E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_BADLIMIT,        /* E_INVALID_ARGUMENT_BAD_VALUE: `new_rlim->rlim_cur > new_rlim->rlim_max' in call to `prlimit64(2)' or `setrlimit(2)' */
-	E_INVALID_ARGUMENT_CONTEXT_CLOCK_GET_CLOCKID,       /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `clockid_t' passed to the `clock_gettime(2)' or `clock_getres(2)' system call */
-	E_INVALID_ARGUMENT_CONTEXT_CLOCK_NANOSLEEP_CLOCKID, /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `clockid_t' passed to the `clock_nanosleep(2)' system call */
 	E_INVALID_ARGUMENT_CONTEXT_TIMER_FLAGS,             /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `clock_nanosleep(2)' or `timer_create(2)' isn't a set of `0 | TIMER_ABSTIME' */
+	E_INVALID_ARGUMENT_CONTEXT_TIMERFD_READ_BUFSIZE,    /* E_INVALID_ARGUMENT_BAD_VALUE: The bufsize argument passed to `read(2)' used with a timerfd handle is less than `8' (should have been `E_BUFFER_TOO_SMALL', but linux wants `EINVAL' for this error) */
+	E_INVALID_ARGUMENT_CONTEXT_TIMERFD_CREATE_FLAGS,    /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `timerfd_create(2)' */
+	E_INVALID_ARGUMENT_CONTEXT_TIMERFD_SETTIME_FLAGS,   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `timerfd_settime(2)' */
 
 	/* system call: `fcntl(2)' */
 	E_INVALID_ARGUMENT_CONTEXT_FCNTL_COMMAND = 0x1000, /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown fcntl() command */
@@ -245,7 +246,8 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_BAD_PGID,           /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid PGID used */
 	E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC,   /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timeval::tv_usec' */
 	E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC,  /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timespec::tv_nsec' */
-	E_INVALID_ARGUMENT_CONTEXT_BADCAP,             /* E_INVALID_ARGUMENT_BAD_VALUE: Unknown capability code specified */
+	E_INVALID_ARGUMENT_CONTEXT_BAD_CAP,            /* E_INVALID_ARGUMENT_BAD_VALUE: Unknown capability code specified */
+	E_INVALID_ARGUMENT_CONTEXT_BAD_CLOCKID,        /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid `clockid_t' passed to a system call. */
 
 	/* Socket/Net errors. */
 	E_INVALID_ARGUMENT_CONTEXT_SOCKETCALL_BADCALL = 0x1280,  /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unsupported/invalid `call' argument passed to `socketcall(2)' */
@@ -473,9 +475,10 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS                  E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS                  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `getrandom(2)' isn't a set of `GRND_NONBLOCK | GRND_RANDOM' */
 #define E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_RESOURCE                 E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_RESOURCE                 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown/unsupported `resource' argument passed to `prlimit64(2)', `getrlimit(2)' or `setrlimit(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_BADLIMIT                 E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_BADLIMIT                 /* E_INVALID_ARGUMENT_BAD_VALUE: `new_rlim->rlim_cur > new_rlim->rlim_max' in call to `prlimit64(2)' or `setrlimit(2)' */
-#define E_INVALID_ARGUMENT_CONTEXT_CLOCK_GET_CLOCKID                E_INVALID_ARGUMENT_CONTEXT_CLOCK_GET_CLOCKID                /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `clockid_t' passed to the `clock_gettime(2)' or `clock_getres(2)' system call */
-#define E_INVALID_ARGUMENT_CONTEXT_CLOCK_NANOSLEEP_CLOCKID          E_INVALID_ARGUMENT_CONTEXT_CLOCK_NANOSLEEP_CLOCKID          /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `clockid_t' passed to the `clock_nanosleep(2)' system call */
 #define E_INVALID_ARGUMENT_CONTEXT_TIMER_FLAGS                      E_INVALID_ARGUMENT_CONTEXT_TIMER_FLAGS                      /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `clock_nanosleep(2)' or `timer_create(2)' isn't a set of `0 | TIMER_ABSTIME' */
+#define E_INVALID_ARGUMENT_CONTEXT_TIMERFD_READ_BUFSIZE             E_INVALID_ARGUMENT_CONTEXT_TIMERFD_READ_BUFSIZE             /* E_INVALID_ARGUMENT_BAD_VALUE: The bufsize argument passed to `read(2)' used with a timerfd handle is less than `8' (should have been `E_BUFFER_TOO_SMALL', but linux wants `EINVAL' for this error) */
+#define E_INVALID_ARGUMENT_CONTEXT_TIMERFD_CREATE_FLAGS             E_INVALID_ARGUMENT_CONTEXT_TIMERFD_CREATE_FLAGS             /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `timerfd_create(2)' */
+#define E_INVALID_ARGUMENT_CONTEXT_TIMERFD_SETTIME_FLAGS            E_INVALID_ARGUMENT_CONTEXT_TIMERFD_SETTIME_FLAGS            /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `timerfd_settime(2)' */
 /* system call: `fcntl(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_FCNTL_COMMAND                    E_INVALID_ARGUMENT_CONTEXT_FCNTL_COMMAND                    /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown fcntl() command */
 #define E_INVALID_ARGUMENT_CONTEXT_F_SETFD_FDFLAGS                  E_INVALID_ARGUMENT_CONTEXT_F_SETFD_FDFLAGS                  /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -526,7 +529,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_PGID                         E_INVALID_ARGUMENT_CONTEXT_BAD_PGID                         /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid PGID used */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC                 E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC                 /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timeval::tv_usec' */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC                E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC                /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timespec::tv_nsec' */
-#define E_INVALID_ARGUMENT_CONTEXT_BADCAP                           E_INVALID_ARGUMENT_CONTEXT_BADCAP                           /* E_INVALID_ARGUMENT_BAD_VALUE: Unknown capability code specified */
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_CAP                          E_INVALID_ARGUMENT_CONTEXT_BAD_CAP                          /* E_INVALID_ARGUMENT_BAD_VALUE: Unknown capability code specified */
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_CLOCKID                      E_INVALID_ARGUMENT_CONTEXT_BAD_CLOCKID                      /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid `clockid_t' passed to a system call. */
 /* Socket/Net errors. */
 #define E_INVALID_ARGUMENT_CONTEXT_SOCKETCALL_BADCALL               E_INVALID_ARGUMENT_CONTEXT_SOCKETCALL_BADCALL               /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unsupported/invalid `call' argument passed to `socketcall(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT                       E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT                       /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `getsockopt()'. */
@@ -738,9 +742,10 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_GETRANDOM_FLAGS                  3078 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `getrandom(2)' isn't a set of `GRND_NONBLOCK | GRND_RANDOM' */
 #define E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_RESOURCE                 3079 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown/unsupported `resource' argument passed to `prlimit64(2)', `getrlimit(2)' or `setrlimit(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_PRLIMIT_BADLIMIT                 3080 /* E_INVALID_ARGUMENT_BAD_VALUE: `new_rlim->rlim_cur > new_rlim->rlim_max' in call to `prlimit64(2)' or `setrlimit(2)' */
-#define E_INVALID_ARGUMENT_CONTEXT_CLOCK_GET_CLOCKID                3081 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `clockid_t' passed to the `clock_gettime(2)' or `clock_getres(2)' system call */
-#define E_INVALID_ARGUMENT_CONTEXT_CLOCK_NANOSLEEP_CLOCKID          3082 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Invalid `clockid_t' passed to the `clock_nanosleep(2)' system call */
-#define E_INVALID_ARGUMENT_CONTEXT_TIMER_FLAGS                      3083 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `clock_nanosleep(2)' or `timer_create(2)' isn't a set of `0 | TIMER_ABSTIME' */
+#define E_INVALID_ARGUMENT_CONTEXT_TIMER_FLAGS                      3081 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The flags passed to `clock_nanosleep(2)' or `timer_create(2)' isn't a set of `0 | TIMER_ABSTIME' */
+#define E_INVALID_ARGUMENT_CONTEXT_TIMERFD_READ_BUFSIZE             3082 /* E_INVALID_ARGUMENT_BAD_VALUE: The bufsize argument passed to `read(2)' used with a timerfd handle is less than `8' (should have been `E_BUFFER_TOO_SMALL', but linux wants `EINVAL' for this error) */
+#define E_INVALID_ARGUMENT_CONTEXT_TIMERFD_CREATE_FLAGS             3083 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `timerfd_create(2)' */
+#define E_INVALID_ARGUMENT_CONTEXT_TIMERFD_SETTIME_FLAGS            3084 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Invalid flags passed to `timerfd_settime(2)' */
 /* system call: `fcntl(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_FCNTL_COMMAND                    4096 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unknown fcntl() command */
 #define E_INVALID_ARGUMENT_CONTEXT_F_SETFD_FDFLAGS                  4097 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `FD_*' flag passed to `F_SETFD' */
@@ -791,7 +796,8 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_PGID                         4610 /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid PGID used */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMEVAL_USEC                 4611 /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timeval::tv_usec' */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_TIMESPEC_NSEC                4612 /* E_INVALID_ARGUMENT_BAD_VALUE: Bad value passed through `struct timespec::tv_nsec' */
-#define E_INVALID_ARGUMENT_CONTEXT_BADCAP                           4613 /* E_INVALID_ARGUMENT_BAD_VALUE: Unknown capability code specified */
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_CAP                          4613 /* E_INVALID_ARGUMENT_BAD_VALUE: Unknown capability code specified */
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_CLOCKID                      4614 /* E_INVALID_ARGUMENT_BAD_VALUE: Invalid `clockid_t' passed to a system call. */
 /* Socket/Net errors. */
 #define E_INVALID_ARGUMENT_CONTEXT_SOCKETCALL_BADCALL               4736 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: Unsupported/invalid `call' argument passed to `socketcall(2)' */
 #define E_INVALID_ARGUMENT_CONTEXT_GETSOCKOPT                       4737 /* E_INVALID_ARGUMENT_UNKNOWN_COMMAND: The given level/optname pair was not recognized or isn't supported by `getsockopt()'. */

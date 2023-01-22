@@ -96,9 +96,9 @@ struct timeval /*[PREFIX(tv_)]*/ {
 #if __SIZEOF_TIME_T__ > 4 && __SIZEOF_SUSECONDS_T__ <= 4
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __SIZEOF_TIME_T__ > 4 && __SIZEOF_SUSECONDS_T__ <= 4 */
-	__TIMEVAL_CXX_SUPPORT(struct timeval, __time_t, __CRT_PRIVATE_ULNG(__SIZEOF_SUSECONDS_T__))
+	__TIMEVAL_CXX_SUPPORT(__SIZEOF_TIME_T__, struct timeval, __time_t, __CRT_PRIVATE_ULNG(__SIZEOF_SUSECONDS_T__))
 };
-__TIMEVAL_CXX_SUPPORT2(struct timeval, __time_t, __CRT_PRIVATE_ULNG(__SIZEOF_SUSECONDS_T__))
+__TIMEVAL_CXX_SUPPORT2(__SIZEOF_TIME_T__, struct timeval, __time_t, __CRT_PRIVATE_ULNG(__SIZEOF_SUSECONDS_T__))
 
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 #define _TIMEVAL_MATCHES_TIMEVAL64 1
@@ -128,9 +128,9 @@ struct __timeval64 /*[NAME(timeval64)][PREFIX(tv_)]*/ {
 #if __SIZEOF_TIME64_T__ > 4 && __SIZEOF_SUSECONDS_T__ <= 4
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __SIZEOF_TIME64_T__ > 4 && __SIZEOF_SUSECONDS_T__ <= 4 */
-	__TIMEVAL_CXX_SUPPORT(struct __timeval64, __time64_t, __CRT_PRIVATE_ULNG(__SIZEOF_SUSECONDS_T__))
+	__TIMEVAL_CXX_SUPPORT(__SIZEOF_TIME64_T__, struct __timeval64, __time64_t, __CRT_PRIVATE_ULNG(__SIZEOF_SUSECONDS_T__))
 };
-__TIMEVAL_CXX_SUPPORT2(struct __timeval64, __time64_t, __CRT_PRIVATE_ULNG(__SIZEOF_SUSECONDS_T__))
+__TIMEVAL_CXX_SUPPORT2(__SIZEOF_TIME64_T__, struct __timeval64, __time64_t, __CRT_PRIVATE_ULNG(__SIZEOF_SUSECONDS_T__))
 #endif /* (!__USE_TIME_BITS64 && !_TIMEVAL_MATCHES_TIMEVAL64) || !__USE_STRUCT64_MACRO */
 
 #ifdef __USE_KOS
@@ -157,9 +157,9 @@ struct __timeval32 /*[NAME(timeval32)][PREFIX(tv_)]*/ {
 #if __SIZEOF_TIME32_T__ > 4 && __SIZEOF_SUSECONDS_T__ <= 4
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __SIZEOF_TIME32_T__ > 4 && __SIZEOF_SUSECONDS_T__ <= 4 */
-	__TIMEVAL_CXX_SUPPORT(struct __timeval32, __time32_t, __CRT_PRIVATE_ULNG(__SIZEOF_SUSECONDS_T__))
+	__TIMEVAL_CXX_SUPPORT(__SIZEOF_TIME32_T__, struct __timeval32, __time32_t, __CRT_PRIVATE_ULNG(__SIZEOF_SUSECONDS_T__))
 };
-__TIMEVAL_CXX_SUPPORT2(struct __timeval32, __time32_t, __CRT_PRIVATE_ULNG(__SIZEOF_SUSECONDS_T__))
+__TIMEVAL_CXX_SUPPORT2(__SIZEOF_TIME32_T__, struct __timeval32, __time32_t, __CRT_PRIVATE_ULNG(__SIZEOF_SUSECONDS_T__))
 #endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 
 __TIMEVAL_CXX_DECL_END

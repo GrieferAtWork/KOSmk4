@@ -152,7 +152,7 @@ struct async_ops {
  *   _ASYNC_ST_ADDALL_STOP    ->  _ASYNC_ST_INIT_STOP       // add-to-all-lockop-completion
  *
  *   _ASYNC_ST_READY          ->  _ASYNC_ST_TRIGGERED       // Signal-completion-callback
- *   _ASYNC_ST_READY          ->  _ASYNC_ST_TRIGGERED_STOP  // ao_work:!=ASYNC_RESUME or async_cancel()
+ *   _ASYNC_ST_READY          ->  _ASYNC_ST_TRIGGERED_STOP  // ao_work:return!=ASYNC_RESUME or async_cancel()
  *   _ASYNC_ST_READY          ->  _ASYNC_ST_READY_TMO       // ao_connect:return!=KTIME_INFINITE
  *
  *   _ASYNC_ST_READY_TMO      ->  _ASYNC_ST_SLEEPING        // worker-waits-for-timeout
@@ -165,7 +165,14 @@ struct async_ops {
  *   _ASYNC_ST_SLEEPING       ->  _ASYNC_ST_TRIGGERED_STOP  // timeout-expired->ao_time:ASYNC_CANCEL
  *
  *   _ASYNC_ST_TRIGGERED      ->  _ASYNC_ST_TRIGGERED_STOP  // async_cancel()
- *   _ASYNC_ST_TRIGGERED      ->  _ASYNC_ST_READY           // Async-event-handled
+ *   _ASYNC_ST_TRIGGERED      ->  _ASYNC_ST_WORKING         // About to call `ao_work'
+ *
+ *   _ASYNC_ST_WORKING        ->  _ASYNC_ST_WORKING_STRT    // async_start()
+ *   _ASYNC_ST_WORKING        ->  _ASYNC_ST_READY           // ao_work:return==ASYNC_RESUME
+ *   _ASYNC_ST_WORKING        ->  _ASYNC_ST_TRIGGERED_STOP  // ao_work:return!=ASYNC_RESUME or async_cancel()
+ *
+ *   _ASYNC_ST_WORKING_STRT   ->  _ASYNC_ST_READY           // After `ao_work' (return value doesn't matter)
+ *   _ASYNC_ST_WORKING_STRT   ->  _ASYNC_ST_TRIGGERED_STOP  // async_cancel()
  *
  *   _ASYNC_ST_TRIGGERED_STOP ->  _ASYNC_ST_TRIGGERED       // async_start()
  *   _ASYNC_ST_TRIGGERED_STOP ->  _ASYNC_ST_DELALL          // Async-event-handled
@@ -191,12 +198,17 @@ struct async_ops {
 /*efine _ASYNC_ST_                7  * ... */
 #define _ASYNC_ST_READY_TMO       8 /* Same as `_ASYNC_ST_READY', but a timeout was set. */
 /*efine _ASYNC_ST_                9  * ... */
-#define _ASYNC_ST_TRIGGERED      10 /* An async event was triggered. */
-#define _ASYNC_ST_TRIGGERED_STOP 11 /* Same as `_ASYNC_ST_TRIGGERED', but `async_cancel()' was called */
-#define _ASYNC_ST_SLEEPING       12 /* Waiting for timeout to expire. */
-/*efine _ASYNC_ST_               13  * ... */
-#define _ASYNC_ST_DELTMO_STRT    14 /* Same as `_ASYNC_ST_DELTMO', but `async_start()' was called */
-#define _ASYNC_ST_DELTMO         15 /* A lockop is pending to remove the job from the timeout queue */
+#define _ASYNC_ST_WORKING_STRT   10 /* Currently executing `ao_work()', and act as though it returns `ASYNC_RESUME'
+                                     * Used so that restarting an async-job interlocks with its work-callback, such
+                                     * that  the work-calling detecting a finish-condition has less priority than a
+                                     * control thread setting a resume-condition before calling `async_start()'. */
+#define _ASYNC_ST_WORKING        11 /* Currently executing `ao_work()' */
+#define _ASYNC_ST_TRIGGERED      12 /* An async event was triggered. */
+#define _ASYNC_ST_TRIGGERED_STOP 13 /* Same as `_ASYNC_ST_TRIGGERED', but `async_cancel()' was called */
+#define _ASYNC_ST_SLEEPING       14 /* Waiting for timeout to expire. */
+/*efine _ASYNC_ST_               15  * ... */
+#define _ASYNC_ST_DELTMO_STRT    16 /* Same as `_ASYNC_ST_DELTMO', but `async_start()' was called */
+#define _ASYNC_ST_DELTMO         17 /* A lockop is pending to remove the job from the timeout queue */
 
 
 

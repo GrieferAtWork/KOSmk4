@@ -94,9 +94,9 @@ struct timespec /*[PREFIX(tv_)]*/ {
 #define __TIMESPEC_HAVE_TV_PAD
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __SIZEOF_TIME_T__ > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4 */
-	__TIMESPEC_CXX_SUPPORT(struct timespec, __time_t, __syscall_ulong_t)
+	__TIMESPEC_CXX_SUPPORT(__SIZEOF_TIME_T__, struct timespec, __time_t, __syscall_ulong_t)
 };
-__TIMESPEC_CXX_SUPPORT2(struct timespec, __time_t, __syscall_ulong_t)
+__TIMESPEC_CXX_SUPPORT2(__SIZEOF_TIME_T__, struct timespec, __time_t, __syscall_ulong_t)
 
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 #define _TIMESPEC_MATCHES_TIMESPEC64 1
@@ -128,9 +128,9 @@ struct __timespec64 /*[NAME(timespec64)][PREFIX(tv_)]*/ {
 #define __TIMESPEC64_HAVE_TV_PAD
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __SIZEOF_TIME64_T__ > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4 */
-	__TIMESPEC_CXX_SUPPORT(struct __timespec64, __time64_t, __syscall_ulong_t)
+	__TIMESPEC_CXX_SUPPORT(__SIZEOF_TIME64_T__, struct __timespec64, __time64_t, __syscall_ulong_t)
 };
-__TIMESPEC_CXX_SUPPORT2(struct __timespec64, __time64_t, __syscall_ulong_t)
+__TIMESPEC_CXX_SUPPORT2(__SIZEOF_TIME64_T__, struct __timespec64, __time64_t, __syscall_ulong_t)
 #endif /* (!__USE_TIME_BITS64 && !_TIMESPEC_MATCHES_TIMESPEC64) || !__USE_STRUCT64_MACRO */
 
 #ifdef __USE_KOS
@@ -162,9 +162,9 @@ struct __timespec32 /*[NAME(timespec32)][PREFIX(tv_)]*/ {
 #define __TIMESPEC32_HAVE_TV_PAD
 	__UINT32_TYPE__ __tv_pad; /* ... */
 #endif /* __SIZEOF_TIME32_T__ > 4 && __SIZEOF_SYSCALL_LONG_T__ <= 4 */
-	__TIMESPEC_CXX_SUPPORT(struct __timespec32, __time32_t, __syscall_ulong_t)
+	__TIMESPEC_CXX_SUPPORT(__SIZEOF_TIME32_T__, struct __timespec32, __time32_t, __syscall_ulong_t)
 };
-__TIMESPEC_CXX_SUPPORT2(struct __timespec32, __time32_t, __syscall_ulong_t)
+__TIMESPEC_CXX_SUPPORT2(__SIZEOF_TIME32_T__, struct __timespec32, __time32_t, __syscall_ulong_t)
 #endif /* __USE_TIME_BITS64 && __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 
 __TIMESPEC_CXX_DECL_END

@@ -102,9 +102,9 @@ struct timevalx64 /*[PREFIX(tv_)]*/ {
 #else /* __USE_KOS_ALTERATIONS */
 	__LONG64_TYPE__  tv_usec;  /* Micro seconds (< 1000000 == 1_000_000) */
 #endif /* !__USE_KOS_ALTERATIONS */
-	__TIMEVAL_CXX_SUPPORT(struct timevalx64, __INT64_TYPE__, __UINT64_TYPE__)
+	__TIMEVAL_CXX_SUPPORT(8, struct timevalx64, __INT64_TYPE__, __UINT64_TYPE__)
 };
-__TIMEVAL_CXX_SUPPORT2(struct timevalx64, __INT64_TYPE__, __UINT64_TYPE__)
+__TIMEVAL_CXX_SUPPORT2(8, struct timevalx64, __INT64_TYPE__, __UINT64_TYPE__)
 
 #ifdef __timevalx64_alt
 struct __timevalx64_alt {
@@ -114,9 +114,9 @@ struct __timevalx64_alt {
 #else /* __USE_KOS_ALTERATIONS */
 	__LONG64_TYPE__  tv_usec;  /* Micro seconds (< 1000000 == 1_000_000) */
 #endif /* !__USE_KOS_ALTERATIONS */
-	__TIMEVAL_CXX_SUPPORT(struct __timevalx64_alt, __INT64_TYPE__, __UINT64_TYPE__)
+	__TIMEVAL_CXX_SUPPORT(8, struct __timevalx64_alt, __INT64_TYPE__, __UINT64_TYPE__)
 };
-__TIMEVAL_CXX_SUPPORT2(struct __timevalx64_alt, __INT64_TYPE__, __UINT64_TYPE__)
+__TIMEVAL_CXX_SUPPORT2(8, struct __timevalx64_alt, __INT64_TYPE__, __UINT64_TYPE__)
 #undef __timevalx64_alt
 #endif /* __timevalx64_alt */
 

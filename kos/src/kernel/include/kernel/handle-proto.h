@@ -334,6 +334,7 @@ struct driver_loadlist;
 struct refcountable;
 struct notifyfd;
 struct dirhandlex;
+struct timerfd;
 
 
 
@@ -996,6 +997,36 @@ INTDEF BLOCKING NONNULL((1)) void KCALL handle_dirhandlex_pollconnect(struct dir
 INTDEF BLOCKING WUNUSED NONNULL((1)) poll_mode_t KCALL handle_dirhandlex_polltest(struct dirhandlex *__restrict self, poll_mode_t what) THROWS(...);
 INTDEF BLOCKING NONNULL((1)) REF void *KCALL handle_dirhandlex_tryas(struct dirhandlex *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
 INTDEF BLOCKING NONNULL((1, 2)) ssize_t KCALL handle_dirhandlex_printlink(struct dirhandlex *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
+
+/* Handle operators for `HANDLE_TYPE_TIMERFD' (`struct timerfd') */
+INTDEF NOBLOCK WUNUSED NONNULL((1)) refcnt_t NOTHROW(FCALL handle_timerfd_refcnt)(struct timerfd const *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_timerfd_incref)(struct timerfd *__restrict self);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_timerfd_decref)(REF struct timerfd *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(FCALL handle_timerfd_tryincref)(struct timerfd *__restrict self);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1)) WEAK REF void *NOTHROW(FCALL handle_timerfd_weakgetref)(struct timerfd *__restrict self);
+INTDEF NOBLOCK WUNUSED NONNULL((1)) REF struct timerfd *NOTHROW(FCALL handle_timerfd_weaklckref)(void *__restrict weakref_ptr);
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL handle_timerfd_weakdecref)(WEAK REF void *__restrict weakref_ptr);
+INTDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL handle_timerfd_read(struct timerfd *__restrict self, USER CHECKED void *dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) size_t KCALL handle_timerfd_write(struct timerfd *__restrict self, USER CHECKED void const *src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL handle_timerfd_pread(struct timerfd *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) size_t KCALL handle_timerfd_pwrite(struct timerfd *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL handle_timerfd_readv(struct timerfd *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1, 2)) size_t KCALL handle_timerfd_writev(struct timerfd *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1, 2)) size_t KCALL handle_timerfd_preadv(struct timerfd *__restrict self, struct iov_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1, 2)) size_t KCALL handle_timerfd_pwritev(struct timerfd *__restrict self, struct iov_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1)) size_t KCALL handle_timerfd_readdir(struct timerfd *__restrict self, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_timerfd_seek(struct timerfd *__restrict self, off_t offset, unsigned int whence) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) syscall_slong_t KCALL handle_timerfd_ioctl(struct timerfd *__restrict self, ioctl_t cmd, USER UNCHECKED void *arg, iomode_t mode) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_timerfd_truncate(struct timerfd *__restrict self, pos_t new_size) THROWS(...);
+INTDEF BLOCKING NONNULL((1, 2)) void KCALL handle_timerfd_mmap(struct timerfd *__restrict self, struct handle_mmap_info *__restrict info) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) pos_t KCALL handle_timerfd_allocate(struct timerfd *__restrict self, fallocate_mode_t mode, pos_t start, pos_t length) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_timerfd_sync(struct timerfd *__restrict self) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_timerfd_datasync(struct timerfd *__restrict self) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_timerfd_stat(struct timerfd *__restrict self, USER CHECKED struct stat *result) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) void KCALL handle_timerfd_pollconnect(struct timerfd *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF BLOCKING WUNUSED NONNULL((1)) poll_mode_t KCALL handle_timerfd_polltest(struct timerfd *__restrict self, poll_mode_t what) THROWS(...);
+INTDEF BLOCKING NONNULL((1)) REF void *KCALL handle_timerfd_tryas(struct timerfd *__restrict self, uintptr_half_t wanted_type) THROWS(E_WOULDBLOCK);
+INTDEF BLOCKING NONNULL((1, 2)) ssize_t KCALL handle_timerfd_printlink(struct timerfd *__restrict self, pformatprinter printer, void *arg) THROWS(E_WOULDBLOCK, ...);
 
 #endif /* __CC__ */
 #endif /* BUILDING_KERNEL_CORE */

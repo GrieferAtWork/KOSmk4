@@ -266,6 +266,7 @@ ptymaster_v_pollconnect(struct mfile *__restrict self,
 	REF struct ptyslave *slave;
 	slave = awref_get(&me->pm_slave);
 	if (!slave) {
+		/* ... */
 	} else {
 		FINALLY_DECREF_UNLIKELY(slave);
 		if (what & POLLINMASK)

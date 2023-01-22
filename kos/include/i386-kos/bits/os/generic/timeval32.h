@@ -151,9 +151,9 @@ struct timevalx32 /*[PREFIX(tv_)]*/ {
 #else /* __USE_KOS_ALTERATIONS */
 	__LONG32_TYPE__   tv_usec;  /* Micro seconds (< 1000000 == 1_000_000) */
 #endif /* !__USE_KOS_ALTERATIONS */
-	__TIMEVAL_CXX_SUPPORT(struct timevalx32, __INT32_TYPE__, __UINT32_TYPE__)
+	__TIMEVAL_CXX_SUPPORT(4, struct timevalx32, __INT32_TYPE__, __UINT32_TYPE__)
 };
-__TIMEVAL_CXX_SUPPORT2(struct timevalx32, __INT32_TYPE__, __UINT32_TYPE__)
+__TIMEVAL_CXX_SUPPORT2(4, struct timevalx32, __INT32_TYPE__, __UINT32_TYPE__)
 
 /* 64-bit timeval for i386 */
 struct timevalx32_64 /*[PREFIX(tv_)]*/ {
@@ -164,9 +164,9 @@ struct timevalx32_64 /*[PREFIX(tv_)]*/ {
 	__LONG32_TYPE__   tv_usec;  /* Micro seconds (< 1000000 == 1_000_000) */
 #endif /* !__USE_KOS_ALTERATIONS */
 	__UINT32_TYPE__ __tv_pad;   /* ... */
-	__TIMEVAL_CXX_SUPPORT(struct timevalx32_64, __INT64_TYPE__, __UINT32_TYPE__)
+	__TIMEVAL_CXX_SUPPORT(8, struct timevalx32_64, __INT64_TYPE__, __UINT32_TYPE__)
 };
-__TIMEVAL_CXX_SUPPORT2(struct timevalx32_64, __INT64_TYPE__, __UINT32_TYPE__)
+__TIMEVAL_CXX_SUPPORT2(8, struct timevalx32_64, __INT64_TYPE__, __UINT32_TYPE__)
 
 #ifdef __timevalx32_64_alt
 struct __timevalx32_64_alt {
@@ -177,9 +177,9 @@ struct __timevalx32_64_alt {
 	__LONG32_TYPE__   tv_usec;  /* Micro seconds (< 1000000 == 1_000_000) */
 #endif /* !__USE_KOS_ALTERATIONS */
 	__UINT32_TYPE__ __tv_pad;   /* ... */
-	__TIMEVAL_CXX_SUPPORT(struct __timevalx32_64_alt, __INT64_TYPE__, __UINT32_TYPE__)
+	__TIMEVAL_CXX_SUPPORT(8, struct __timevalx32_64_alt, __INT64_TYPE__, __UINT32_TYPE__)
 };
-__TIMEVAL_CXX_SUPPORT2(struct __timevalx32_64_alt, __INT64_TYPE__, __UINT32_TYPE__)
+__TIMEVAL_CXX_SUPPORT2(8, struct __timevalx32_64_alt, __INT64_TYPE__, __UINT32_TYPE__)
 #endif /* __timevalx32_64_alt */
 
 __TIMEVAL_CXX_DECL_END

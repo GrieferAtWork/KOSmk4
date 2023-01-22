@@ -443,7 +443,7 @@ do_handle_timeout:
 					/* Keep the async job, and handle a regular trigger event.
 					 * If the status  still indicates SLEEPING,  change it  to
 					 * indicate a normal trigger event instead. */
-					ATOMIC_CMPXCH(job->a_stat, _ASYNC_ST_SLEEPING, _ASYNC_ST_TRIGGERED);
+					ATOMIC_CMPXCH(job->a_stat, _ASYNC_ST_SLEEPING, _ASYNC_ST_WORKING);
 					goto again_do_work;
 				}
 
@@ -545,7 +545,7 @@ do_delete_job:
 again_handle_triggered:
 	if (!ATOMIC_CMPXCH_WEAK(job->a_stat,
 	                        _ASYNC_ST_TRIGGERED,
-	                        _ASYNC_ST_READY))
+	                        _ASYNC_ST_WORKING))
 		goto again_rd_stat;
 
 	/* Check if this job is ready! */
@@ -557,7 +557,10 @@ again_do_work:
 		assert(status == ASYNC_RESUME ||
 		       status == ASYNC_FINISHED ||
 		       status == ASYNC_CANCEL);
-		if (status != ASYNC_RESUME) {
+
+again_rd_stat_after_work:
+		st = ATOMIC_READ(job->a_stat);
+		if (status != ASYNC_RESUME && st != _ASYNC_ST_WORKING_STRT) {
 			struct aio_handle *aio;
 			bool did_set_stop;
 
@@ -567,7 +570,7 @@ again_do_work:
 			/* Set  async stop state.  -- If it was  already set, then that
 			 * means that whoever set the state is doing the cleanup, which
 			 * may or many not involve re-adding the job to the ready list. */
-			did_set_stop = ATOMIC_CMPXCH(job->a_stat, _ASYNC_ST_READY,
+			did_set_stop = ATOMIC_CMPXCH(job->a_stat, _ASYNC_ST_WORKING,
 			                             _ASYNC_ST_TRIGGERED_STOP);
 			if (status == ASYNC_CANCEL) {
 				if (aio) {
@@ -575,8 +578,11 @@ again_do_work:
 					aio_handle_complete_nopr(aio, AIO_COMPLETION_CANCEL);
 					PREEMPTION_ENABLE();
 				}
-				if (!did_set_stop)
+				if (!did_set_stop) {
+					if (ATOMIC_READ(job->a_stat) == _ASYNC_ST_WORKING_STRT)
+						goto again_rd_stat_after_work;
 					goto decref_job_and_again;
+				}
 				goto again_rd_stat;
 			}
 
@@ -586,8 +592,11 @@ again_do_work:
 				aio_handle_complete_nopr(aio, AIO_COMPLETION_SUCCESS);
 				PREEMPTION_ENABLE();
 			}
-			if (!did_set_stop)
+			if (!did_set_stop) {
+				if (ATOMIC_READ(job->a_stat) == _ASYNC_ST_WORKING_STRT)
+					goto again_rd_stat_after_work;
 				goto decref_job_and_again;
+			}
 			st = ATOMIC_READ(job->a_stat);
 			if unlikely(st == _ASYNC_ST_TRIGGERED)
 				goto again_handle_triggered;
@@ -595,9 +604,8 @@ again_do_work:
 			goto do_delete_job;
 		}
 
-again_rd_stat_before_reconnect:
-		st = ATOMIC_READ(job->a_stat);
-		if likely(st == _ASYNC_ST_READY) {
+		if likely(likely(st == _ASYNC_ST_WORKING) ||
+		          unlikely(st == _ASYNC_ST_WORKING_STRT)) {
 			ktime_t timeout;
 
 			/* Re-connect completion handling for `job' */
@@ -611,9 +619,9 @@ again_rd_stat_before_reconnect:
 			if (timeout != KTIME_INFINITE) {
 				job->a_tmo = timeout;
 				async_tmo_acquire();
-				if (!ATOMIC_CMPXCH(job->a_stat, _ASYNC_ST_READY, _ASYNC_ST_READY_TMO)) {
+				if (!ATOMIC_CMPXCH(job->a_stat, st, _ASYNC_ST_READY_TMO)) {
 					async_tmo_release();
-					goto again_rd_stat_before_reconnect;
+					goto again_rd_stat_after_work;
 				}
 
 				/* Insert `job' into the async-tmo-queue at the correct position. */
@@ -621,9 +629,13 @@ again_rd_stat_before_reconnect:
 				async_tmo_release();
 
 				/* Directly jump back to the start and don't decref() job,
-				 * since  we've gifted out  reference to the timeout-list! */
+				 * since  we've gifted our  reference to the timeout-list! */
 				goto again;
 			}
+
+			/* Switch back to ready-mode */
+			if (!ATOMIC_CMPXCH(job->a_stat, st, _ASYNC_ST_READY))
+				goto again_rd_stat_after_work;
 		} else {
 			/* Don't  directly handle TRIGGERED_STOP. - `async_cancel()' will have
 			 * added the job to the ready-list,  and if we immediately handle  the
@@ -665,7 +677,13 @@ again_rd_stat_before_reconnect:
 			 * that handle. */
 			except_printf("running async job %p", job);
 		}
-		ATOMIC_CMPXCH(job->a_stat, _ASYNC_ST_READY, _ASYNC_ST_TRIGGERED_STOP);
+		do {
+			st = ATOMIC_READ(job->a_stat);
+			if (st != _ASYNC_ST_READY &&
+			    st != _ASYNC_ST_WORKING &&
+			    st != _ASYNC_ST_WORKING_STRT)
+				break;
+		} while (!ATOMIC_CMPXCH_WEAK(job->a_stat, st, _ASYNC_ST_TRIGGERED_STOP));
 		goto again_rd_stat;
 	}
 
@@ -857,11 +875,13 @@ again:
 #if (_ASYNC_ST_STRTFOR(_ASYNC_ST_ADDALL_STOP) == _ASYNC_ST_ADDALL &&       \
      _ASYNC_ST_STRTFOR(_ASYNC_ST_DELALL) == _ASYNC_ST_DELALL_STRT &&       \
      _ASYNC_ST_STRTFOR(_ASYNC_ST_TRIGGERED_STOP) == _ASYNC_ST_TRIGGERED && \
-     _ASYNC_ST_STRTFOR(_ASYNC_ST_DELTMO) == _ASYNC_ST_DELTMO_STRT)
+     _ASYNC_ST_STRTFOR(_ASYNC_ST_DELTMO) == _ASYNC_ST_DELTMO_STRT && \
+     _ASYNC_ST_STRTFOR(_ASYNC_ST_WORKING) == _ASYNC_ST_WORKING_STRT)
 	case _ASYNC_ST_ADDALL_STOP:
 	case _ASYNC_ST_DELALL:
 	case _ASYNC_ST_TRIGGERED_STOP:
 	case _ASYNC_ST_DELTMO:
+	case _ASYNC_ST_WORKING:
 		if (!ATOMIC_CMPXCH_WEAK(self->a_stat, st, _ASYNC_ST_STRTFOR(st)))
 			goto again;
 		break;
@@ -891,6 +911,13 @@ again:
 		if (!ATOMIC_CMPXCH_WEAK(self->a_stat,
 		                        _ASYNC_ST_DELTMO,
 		                        _ASYNC_ST_DELTMO_STRT))
+			goto again;
+		break;
+
+	case _ASYNC_ST_WORKING:
+		if (!ATOMIC_CMPXCH_WEAK(self->a_stat,
+		                        _ASYNC_ST_WORKING,
+		                        _ASYNC_ST_WORKING_STRT))
 			goto again;
 		break;
 #endif /* !... */
@@ -1152,6 +1179,14 @@ fallback_wait_all_threads:
 			goto again;
 		break;
 #endif /* !... */
+
+	case _ASYNC_ST_WORKING:
+	case _ASYNC_ST_WORKING_STRT:
+		if (!ATOMIC_CMPXCH_WEAK(self->a_stat,
+		                        _ASYNC_ST_WORKING_STRT,
+		                        _ASYNC_ST_TRIGGERED_STOP))
+			goto again;
+		break;
 
 	default:
 		break;

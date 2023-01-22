@@ -60,7 +60,8 @@
 #define HANDLE_TYPE_DIRHANDLEX      0x0016 /* `struct dirhandlex'
                                             * Castable into: HANDLE_TYPE_DIRHANDLE
                                             * NOTE: Constructed from `HANDLE_TYPE_DIRHANDLE' after `F_NOTIFY' was used. */
-#define HANDLE_TYPE_COUNT           0x0017 /* # of recognized handle types
+#define HANDLE_TYPE_TIMERFD         0x0017 /* `struct timerfd' */
+#define HANDLE_TYPE_COUNT           0x0018 /* # of recognized handle types
                                             * NOTE: After changing  this value,  be sure  to
                                             * `touch kos/src/kernel/include/kernel/handle.h' */
 
@@ -82,7 +83,8 @@
 	cb(HANDLE_TYPE_FUTEXFD, struct mfutexfd)             \
 	cb(HANDLE_TYPE_SOCKET, struct socket)                \
 	cb(HANDLE_TYPE_REFCOUNTABLE, struct refcountable)    \
-	cb(HANDLE_TYPE_NOTIFYFD, struct notifyfd)
+	cb(HANDLE_TYPE_NOTIFYFD, struct notifyfd)            \
+	cb(HANDLE_TYPE_TIMERFD, struct timerfd)
 
 /* Invoke `cb(int HANDLE_TYPE, typename T)' for each handle  type
  * that could reasonably be used for callback registrations (such

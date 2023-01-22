@@ -17,28 +17,30 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-/* (#) Portability: GNU C Library (/sysdeps/unix/sysv/linux/machine-sp.h) */
-/* (#) Portability: GNU Hurd      (/usr/include/machine-sp.h) */
-#ifndef _MACHINE_SP_H
-#define _MACHINE_SP_H 1
+/* (#) Portability: Linux (/usr/include/linux/timerfd.h) */
+#ifndef _LINUX_TIMERFD_H
+#define _LINUX_TIMERFD_H 1
 
-#include "__stdinc.h"
+#include <__stdinc.h>
 
-#ifdef __CC__
-#if 1
-#include <asm/intrin.h>
-#define __thread_stack_pointer() __rdsp()
-#else
-__DECL_BEGIN
+#include <asm/os/timerfd.h>
+#include <linux/fcntl.h>
+#include <linux/ioctl.h>
+#include <linux/types.h>
 
-#define __thread_stack_pointer __thread_stack_pointer
-__FORCELOCAL void *__thread_stack_pointer(void) {
-	char volatile __tsp_dummy;
-	return (void *)&__tsp_dummy;
-}
+#if !defined(TFD_TIMER_ABSTIME) && defined(__TFD_TIMER_ABSTIME)
+#define TFD_TIMER_ABSTIME __TFD_TIMER_ABSTIME /* The given timestamp is absolute. */
+#endif /* !TFD_TIMER_ABSTIME && __TFD_TIMER_ABSTIME */
+#if !defined(TFD_TIMER_CANCEL_ON_SET) && defined(__TFD_TIMER_CANCEL_ON_SET)
+#define TFD_TIMER_CANCEL_ON_SET __TFD_TIMER_CANCEL_ON_SET /* ??? */
+#endif /* !TFD_TIMER_CANCEL_ON_SET && __TFD_TIMER_CANCEL_ON_SET */
+#if !defined(TFD_NONBLOCK) && defined(__TFD_NONBLOCK)
+#define TFD_NONBLOCK __TFD_NONBLOCK /* Set the `IO_NONBLOCK' flag for the returned */
+#endif /* !TFD_NONBLOCK && __TFD_NONBLOCK */
+#if !defined(TFD_CLOEXEC) && defined(__TFD_CLOEXEC)
+#define TFD_CLOEXEC __TFD_CLOEXEC /* Set the `IO_CLOEXEC' flag for the returned */
+#endif /* !TFD_CLOEXEC && __TFD_CLOEXEC */
 
-__DECL_END
-#endif
-#endif /* __CC__ */
+#define TFD_IOC_SET_TICKS _IOW('T', 0, __u64) /* Explicitly set the # of extra overrun ticks. */
 
-#endif /* !_MACHINE_SP_H */
+#endif /* !_LINUX_TIMERFD_H */
